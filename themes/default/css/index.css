@@ -4077,6 +4077,20 @@ dl.no_members {
 	.elk_previewvideo {
 		max-width: 100%;
 	}
+	.profile_attachments {
+		margin: 0 0.5em;
+		width: auto;
+		text-align: center;
+	}
+	.profile_attachments tr {
+		display: inline;
+	}
+	.profile_attachments .profile_attachment {
+		display: inline-block;
+		width: 129px;
+		height: 149px;
+		margin: 5px;
+	}
 }
 /* This one does 800 screens at default font size. */
 @media screen and (max-width: 50em) {
@@ -4585,8 +4599,12 @@ dl.no_members {
 		width: 100%;
 		overflow: auto;
 	}
-	.profile_attachments {
-		display: none;
+	.profile_attachments .profile_attachment {
+		width: 100px;
+	}
+	.profile_attachment a img {
+		max-width: 100px;
+		max-height: 100px;
 	}
 	.pagesection div.floatright {
 		float: none;
