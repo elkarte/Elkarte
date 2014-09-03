@@ -168,6 +168,7 @@ class ProfileInfo_Controller extends Action_Controller
 		{
 			include_once(SUBSDIR . '/Who.subs.php');
 			$action = determineActions($user_profile[$memID]['url']);
+			loadLanguage('index');
 
 			if ($action !== false)
 				$context['member']['action'] = $action;
