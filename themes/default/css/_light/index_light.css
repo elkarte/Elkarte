@@ -1608,9 +1608,15 @@ div.bbc_footnotes .meaction{
 	border: 1px solid #ddd;
 	border-radius: 5px;
 }
+.search_results_posts {
+	background: #fff;
+}
 .search_results_posts .topic_body {
 	border-top: 1px solid #ccc;
 	box-shadow: 0 1px 0 #fff inset;
+}
+.search_results_posts>li {
+	border-bottom: 4px solid #ddd;
 }
 
 /*	$MEMBERLIST		*/

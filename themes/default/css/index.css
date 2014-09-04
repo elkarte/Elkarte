@@ -3645,6 +3645,7 @@ a.help .icon {
 }
 .search_results_posts {
 	overflow: hidden;
+	padding: 0.2em 1em;
 }
 .search_results_posts .buttons {
 	padding: 5px 12px 0 0;
@@ -3655,6 +3656,7 @@ a.help .icon {
 .search_results_posts .topic_details {
 	position: relative;
 	margin: 0.2em 1em 0;
+	border-bottom: 0;
 }
 .search_results_posts .quickbuttons {
 	margin-left: 1em;
@@ -3671,7 +3673,7 @@ a.help .icon {
 	top: 10%;
 }
 .search_results_posts .counter {
-	padding: 6px 1.5em;
+	padding: 6px 0 6px 1.5em;
 }
 .compact_view .content {
 	overflow: auto;
