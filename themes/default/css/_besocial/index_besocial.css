@@ -1189,6 +1189,14 @@ a.help .icon {
 	box-shadow: 0 -2px 3px rgba(0,0,0,0.15);
 }
 
+
+/*	$SEARCH		*/
+/* ------------------------------------------------------- */
+.search_results_posts>li {
+	border-bottom: 4px solid #ddd;
+}
+
+
 /* $STATISTICS	*/
 /* ------------------------------------------------------- */
 .statistics .category_header {
