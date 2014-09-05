@@ -1395,7 +1395,7 @@ function getPmsFromDiscussion($pm_heads)
 		FROM {db_prefix}personal_messages
 		WHERE id_pm_head IN ({array_int:pm_heads})',
 		array(
-			'pm_heads' => array_keys($pm_heads),
+			'pm_heads' => $pm_heads,
 		)
 	);
 	// Copy the action from the single to PM to the others.
