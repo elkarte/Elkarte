@@ -156,7 +156,10 @@ function logSpider()
 		{
 			$req = request();
 			$url = $_GET + array('USER_AGENT' => $req->user_agent());
-			unset($url['sesc'], $url[$context['session_var']]);
+			if (isset($context['session_var']))
+				unset($url['sesc'], $url[$context['session_var']]);
+			else
+				unset($url['sesc']);
 			$url = serialize($url);
 		}
 		else
