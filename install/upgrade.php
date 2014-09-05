@@ -11,12 +11,12 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:	BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0 Release Candidate 2
+ * @version 1.0
  *
  */
 
 // Version information...
-define('CURRENT_VERSION', '1.0 RC 2');
+define('CURRENT_VERSION', '1.0');
 define('CURRENT_LANG_VERSION', '1.0');
 define('REQUIRED_PHP_VERSION', '5.2.0');
 

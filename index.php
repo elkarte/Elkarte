@@ -15,11 +15,11 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:		BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0 Release Candidate 2
+ * @version 1.0
  *
  */
 
-$forum_version = 'ElkArte 1.0 RC 2';
+$forum_version = 'ElkArte 1.0';
 
 // First things first, but not necessarily in that order.
 define('ELK', 1);
