@@ -2191,6 +2191,7 @@ INSERT INTO {$db_prefix}themes
 	(id_member, id_theme, variable, value)
 VALUES
 	(-1, 1, 'display_quick_reply', '2'),
+	(-1, 1, 'view_newest_pm_first', '1'),
 	(-1, 1, 'drafts_autosave_enabled', '1');
 # --------------------------------------------------------
 
