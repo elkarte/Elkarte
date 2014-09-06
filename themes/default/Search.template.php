@@ -283,10 +283,10 @@ function template_results()
 
 	if ($context['compact'])
 		echo '
-				<ul id="topicForm" class="topic_listing compact_view search_results_posts">';
+				<ul class="topic_listing compact_view search_results_posts">';
 	else
 		echo '
-				<ul id="topicForm" class="topic_listing search_results_posts">';
+				<ul class="core_posts topic_listing search_results_posts">';
 
 	// While we have results to show ...
 	$controller = $context['get_topics'][0];

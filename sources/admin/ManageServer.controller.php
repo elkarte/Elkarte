@@ -87,18 +87,12 @@ class ManageServer_Controller extends Action_Controller
 		checkSession('request');
 
 		$subActions = array(
-			'general' => array(
-				$this, 'action_generalSettings_display', 'permission' => 'admin_forum'),
-			'database' => array(
-				$this, 'action_databaseSettings_display', 'permission' => 'admin_forum'),
-			'cookie' => array(
-				$this, 'action_cookieSettings_display', 'permission' => 'admin_forum'),
-			'cache' => array(
-				$this, 'action_cacheSettings_display', 'permission' => 'admin_forum'),
-			'loads' => array(
-				$this, 'action_balancingSettings_display', 'permission' => 'admin_forum'),
-			'phpinfo' => array(
-				$this, 'action_phpinfo', 'permission' => 'admin_forum'),
+			'general' => array($this, 'action_generalSettings_display', 'permission' => 'admin_forum'),
+			'database' => array($this, 'action_databaseSettings_display', 'permission' => 'admin_forum'),
+			'cookie' => array($this, 'action_cookieSettings_display', 'permission' => 'admin_forum'),
+			'cache' => array($this, 'action_cacheSettings_display', 'permission' => 'admin_forum'),
+			'loads' => array($this, 'action_balancingSettings_display', 'permission' => 'admin_forum'),
+			'phpinfo' => array($this, 'action_phpinfo', 'permission' => 'admin_forum'),
 		);
 
 		$action = new Action('server_settings');
@@ -336,7 +330,7 @@ class ManageServer_Controller extends Action_Controller
 	 */
 	public function action_cacheSettings_display()
 	{
-		global $context, $scripturl, $txt;
+		global $context, $scripturl, $txt, $cache_accelerator, $modSettings;
 
 		// Initialize the form
 		$this->_initCacheSettingsForm();
@@ -348,6 +342,18 @@ class ManageServer_Controller extends Action_Controller
 			createEventListener(cache_type);
 			cache_type.addEventListener("change", toggleCache);
 			toggleCache();', true);
+
+		$context['settings_message'] = $txt['caching_information'];
+
+		// Let them know if they may have problems
+		if ($cache_accelerator === 'filebased' && !empty($modSettings['cache_enable']) && extension_loaded('Zend OPcache'))
+		{
+			// The opcache will cache the filebased user data files, updating them based on opcache.revalidate_freq
+			// which can cause delays (or prevent) the invalidation of file cache files
+			$opcache_config = @opcache_get_configuration();
+			if (!empty($opcache_config['directives']['opcache.enable']))
+				$context['settings_message'] = $txt['cache_conflict'];
+		}
 
 		// Saving again?
 		if (isset($_GET['save']))
@@ -369,7 +375,6 @@ class ManageServer_Controller extends Action_Controller
 
 		$context['post_url'] = $scripturl . '?action=admin;area=serversettings;sa=cache;save';
 		$context['settings_title'] = $txt['caching_settings'];
-		$context['settings_message'] = $txt['caching_information'];
 
 		// Prepare the template.
 		createToken('admin-ssc');
@@ -641,8 +646,10 @@ class ManageServer_Controller extends Action_Controller
 			$detected['eaccelerator'] = $txt['eAccelerator_cache'];
 		if (function_exists('mmcache_put'))
 			$detected['mmcache'] = $txt['mmcache_cache'];
-		if (function_exists('apc_store'))
+		if (function_exists('apc_store') && !extension_loaded('apcu'))
 			$detected['apc'] = $txt['apc_cache'];
+		if (function_exists('apc_store') && extension_loaded('apcu'))
+			$detected['apcu'] = $txt['apc_cache'];
 		if (function_exists('output_cache_put') || function_exists('zend_shm_cache_store'))
 			$detected['zend'] = $txt['zend_cache'];
 		if (function_exists('memcache_set') || function_exists('memcached_set'))

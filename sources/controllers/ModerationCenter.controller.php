@@ -848,7 +848,7 @@ class ModerationCenter_Controller extends Action_Controller
 				'message' => parse_bbc($row['body']),
 				'time' => standardTime($row['log_time']),
 				'html_time' => htmlTime($row['log_time']),
-				'time' => forum_time(true, $row['log_time']),
+				'timestamp' => forum_time(true, $row['log_time']),
 				'member' => array(
 					'id' => $row['id_member'],
 					'name' => $row['moderator'],

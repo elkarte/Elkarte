@@ -657,6 +657,7 @@ class Admin_Controller extends Action_Controller
 			'apc',
 			'memcache',
 			'xcache',
+			'opcache',
 			'php',
 			'server',
 		);
@@ -728,6 +729,7 @@ class Admin_Controller extends Action_Controller
 			'apc',
 			'memcache',
 			'xcache',
+			'opcache',
 			'php',
 			'server',
 		);
@@ -755,7 +757,9 @@ class Admin_Controller extends Action_Controller
 			'member' => array($this, 'action_search_member', 'permission' => 'admin_forum'),
 		);
 
-		$subAction = !isset($_REQUEST['search_type']) || !isset($subActions[$_REQUEST['search_type']]) ? 'internal' : $_REQUEST['search_type'];
+		// Set the subaction
+		$action = new Action();
+		$subAction = $action->initialize($subActions, 'internal');
 
 		// Keep track of what the admin wants in terms of advanced or not
 		if (empty($context['admin_preferences']['sb']) || $context['admin_preferences']['sb'] != $subAction)
@@ -777,11 +781,7 @@ class Admin_Controller extends Action_Controller
 		if (trim($context['search_term']) == '')
 			$context['search_results'] = array();
 		else
-		{
-			$action = new Action();
-			$subAction = $action->initialize($subActions, 'internal');
 			$action->dispatch($subAction);
-		}
 	}
 
 	/**

@@ -69,7 +69,6 @@ body {
 	color: #666;
 }
 fieldset {
-	border: none;
 	background: transparent;
 	border: 1px solid #ccc;
 	padding: 6px;
@@ -490,7 +489,7 @@ div.bbc_footnotes .meaction{
 	color: orange;
 	background-color: white;
 	border-radius: 0.3em;
-	text-shadow: 1px 1px 0px #000;
+	text-shadow: 1px 1px 0 #000;
 }
 
 #debug_logging a, #debug_logging strong {
@@ -673,7 +672,6 @@ div.bbc_footnotes .meaction{
 }
 .likes_indicator {
 	font-size: .857em;
-	border-radius: 4px 4px 4px 0;
 	box-shadow: 2px 2px 2px rgba(0,0,0,0.25);
 	border-radius: 6px 6px 6px 0;
 	line-height: 1.5em;
@@ -935,8 +933,12 @@ div.bbc_footnotes .meaction{
 .table_grid td, .letterspacing {
 	border-bottom: 1px solid #ccc;
 }
+/* Subtle zebra striping for rows. */
 .table_grid .standard_row:nth-child(even) {
 	background: #fafafa;
+}
+.table_grid .standard_row {
+	background: #fff;
 }
 /* Legacy highlight color, for selected membergroups etc. */
 /* Used by JS to show a selected item. Still used in manage languages */
@@ -1566,7 +1568,7 @@ div.bbc_footnotes .meaction{
 #helpmain {
 	border: 1px solid #ccc;
 	border-radius: 7px;
-	box-shadow: 0 -2px 2px rgba(0,0,0,0.1);
+	box-shadow: 0 -2px 2px rgba(0, 0, 0, 0.1);
 }
 
 /* Styles for the tooltips. */
@@ -1574,20 +1576,20 @@ div.bbc_footnotes .meaction{
 	border: 1px solid #aaa;
 	border-radius: 4px;
 	background: #fff;
-	box-shadow: 3px 3px 3px rgba(0,0,0,0.3);
+	box-shadow: 3px 3px 3px rgba(0, 0, 0, 0.3);
 }
 /* The darkened background for help pop-ups. */
 .popup_container {
 	/* Flat colour fallback will be bad (visually), ie8 only though. */
-	background: rgb(0,0,0);
-	background: rgba(0,0,0,0.4);
+	background: rgb(0, 0, 0);
+	background: rgba(0, 0, 0, 0.4);
 }
 /* The actual pop-up wrapper. */
 .popup_window {
 	border: 1px solid #777;
 	border-radius: 7px 7px 3px 3px;
 	background-color: #fafafa;
-	box-shadow: 0 4px 6px rgba(0,0,0,0.6);
+	box-shadow: 0 4px 6px rgba(0, 0, 0, 0.6);
 }
 /* The text content, hopefully helpful. */
 .popup_content {
@@ -1595,7 +1597,7 @@ div.bbc_footnotes .meaction{
 	border-bottom: 1px solid #ccc;
 	border-radius: 6px 6px 2px 2px;
 	background: #f5f5f5;
-	box-shadow: 0 -2px 3px rgba(0,0,0,0.15);
+	box-shadow: 0 -2px 3px rgba(0, 0, 0, 0.15);
 }
 
 /*	$SEARCH		*/
@@ -1606,9 +1608,15 @@ div.bbc_footnotes .meaction{
 	border: 1px solid #ddd;
 	border-radius: 5px;
 }
+.search_results_posts {
+	background: #fff;
+}
 .search_results_posts .topic_body {
-	border-top: 1px solid #CCCCCC;
-	box-shadow: 0px 1px 0px #FFFFFF inset;
+	border-top: 1px solid #ccc;
+	box-shadow: 0 1px 0 #fff inset;
+}
+.search_results_posts>li {
+	border-bottom: 4px solid #ddd;
 }
 
 /*	$MEMBERLIST		*/
@@ -1653,6 +1661,16 @@ div.bbc_footnotes .meaction{
 
 /*	$BOXES		*/
 /* ------------------------------------------------------- */
+
+/* Lotsa boxes. */
+.description, .information, .warningbox, .successbox, .infobox, .errorbox {
+	background: #fff;
+	border: 1px solid #ccc;
+}
+/* Information boxes. */
+.information {
+	background: #f0f6f0;
+}
 .warningbox {
 	border-top: 1px solid #ffd324;
 	border-bottom: 1px solid #ffd324;
@@ -1743,31 +1761,28 @@ div.bbc_footnotes .meaction{
 	overflow: hidden;
 }
 
-/*floating error box*/
-/* currently used by like funcationality*/
+/* floating error box */
+/* currently used by like funcationality */
 .floating_error {
+	background: #fff;
 	background: rgba(255, 255, 255, 1);
 	font-size: 15px;
 	color: #404040;
 	border-radius: 10px;
 	border: solid 1px #E4E4E4;
 }
-
 .floating_error .error_heading {
 	font-weight: bold;
 }
-
 .floating_error .error_msg {
 	color: #3D3C3C;
 }
-
 .floating_error .error_btn {
 	border-top: solid 1px #D6D6D6;
 	color: #157DFB;
 	font-size: 16px;
 	font-weight: bold;
 }
-
 .floating_error .error_btn:hover {
 	cursor: pointer;
 }
