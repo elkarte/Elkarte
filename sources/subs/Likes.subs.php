@@ -601,36 +601,31 @@ function dbMostLikedTopic($board = null, $limit = 10)
 
 	$db = database();
 
-	// Most liked topic
+	// fetch 10 highest like topics if seeking for board
+	// else fetch only the highest like topic
 	$request = $db->query('', '
-		SELECT m.id_topic, lp.like_count, m.id_msg
-		FROM {db_prefix}message_likes AS ml
-			INNER JOIN {db_prefix}messages AS m ON (m.id_msg = ml.id_msg)
-			INNER JOIN {db_prefix}boards AS b ON (m.id_board = b.id_board)
-			INNER JOIN (
-				SELECT COUNT(m.id_topic) AS like_count, m.id_topic
-				FROM {db_prefix}message_likes AS lp
-					INNER JOIN {db_prefix}messages AS m ON (m.id_msg = lp.id_msg)
-					INNER JOIN {db_prefix}boards AS b ON (m.id_board = b.id_board)
-				WHERE ' . ($board === null ? '{query_wanna_see_board}' : 'b.id_board = {int:id_board}') . '
-				GROUP BY m.id_topic
-				ORDER BY like_count DESC
-				' . ($board === null ? 'LIMIT {int:limit}' : '') . '
-			) AS lp ON (lp.id_topic = m.id_topic)
+		SELECT COUNT(m.id_topic) AS like_count, m.id_topic, m.id_msg
+		FROM elkarte_message_likes AS lp
+			INNER JOIN elkarte_messages AS m ON (m.id_msg = lp.id_msg)
+			INNER JOIN elkarte_boards AS b ON (m.id_board = b.id_board)
 		WHERE ' . ($board === null ? '{query_wanna_see_board}' : 'b.id_board = {int:id_board}') . '
-		ORDER BY m.id_msg DESC
-		LIMIT {int:limit2}',
+		GROUP BY m.id_topic
+		ORDER BY like_count DESC
+		' . ($board === null ? 'LIMIT {int:limit}' : 'LIMIT {int:limit2}') . '',
 		array(
 			'id_board' => $board,
 			'limit' => 1,
 			'limit2' => $limit
 		)
 	);
-
 	$mostLikedTopic = $db->fetch_assoc($request);
+	$topics = array($mostLikedTopic['id_topic']);
 	$msgs = array($mostLikedTopic['id_msg']);
-	while ($row = $db->fetch_assoc($request))
+
+	while ($row = $db->fetch_assoc($request)) {
+		$topics[] = $row['id_topic'];
 		$msgs[] = $row['id_msg'];
+	}
 	$db->free_result($request);
 
 	if (empty($mostLikedTopic))
@@ -640,7 +635,7 @@ function dbMostLikedTopic($board = null, $limit = 10)
 		);
 	}
 
-	// Lets fetch few messages in the topic
+	// Now fetch topics data
 	$request = $db->query('', '
 		SELECT m.id_msg, m.id_topic, m.body, m.poster_time, m.smileys_enabled,
 			IFNULL(a.id_attach, 0) AS id_attach, a.filename, a.attachment_type,
@@ -648,11 +643,13 @@ function dbMostLikedTopic($board = null, $limit = 10)
 		FROM {db_prefix}messages AS m
 			INNER JOIN {db_prefix}members AS mem ON (mem.id_member = m.id_member)
 			LEFT JOIN {db_prefix}attachments AS a ON (a.id_member = mem.id_member)
-		WHERE m.id_msg IN ({array_int:id_msgs})
-		ORDER BY m.id_msg
+
+		WHERE ' . ($board === null ? 'm.id_msg IN ({array_int:id_msg})' : 'm.id_topic IN ({array_int:id_topic})') . '
+		ORDER BY ' . ($board === null ? 'm.id_msg' : 'm.id_topic') . ' DESC
 		LIMIT {int:limit}',
 		array(
-			'id_msgs' => $msgs,
+			'id_msg' => $msgs,
+			'id_topic' => $topics,
 			'limit' => 10
 		)
 	);
@@ -678,7 +675,6 @@ function dbMostLikedTopic($board = null, $limit = 10)
 		);
 	}
 	$db->free_result($request);
-
 	return $mostLikedTopic;
 }
 
