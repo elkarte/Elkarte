@@ -431,12 +431,17 @@ function create_control_richedit($editorOptions)
 
 				foreach ($context['smileys'] as $section => $smileyRows)
 				{
+					$last_row = null;
 					foreach ($smileyRows as $rowIndex => $smileys)
+					{
 						$context['smileys'][$section][$rowIndex]['smileys'][count($smileys['smileys']) - 1]['isLast'] = true;
+						$last_row = $rowIndex;
+					}
 
-					if (!empty($smileyRows))
-						$context['smileys'][$section][count($smileyRows) - 1]['isLast'] = true;
+					if ($last_row !== null)
+						$context['smileys'][$section][$last_row]['isLast'] = true;
 				}
+
 
 				cache_put_data('posting_smileys', $context['smileys'], 480);
 			}
