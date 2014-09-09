@@ -1703,6 +1703,7 @@ function ssi_boardNews($board = null, $limit = null, $start = null, $length = nu
 			$preview = 'first';
 
 		$row['body'] = $row[$preview . '_body'];
+		$row['subject'] = $row[$preview . '_body'];
 		$row['id_msg'] = $row['id_' . $preview . '_msg'];
 		$row['icon'] = $row[$preview . '_icon'];
 		$row['id_member'] = $row[$preview . '_id_member'];
