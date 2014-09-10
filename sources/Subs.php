@@ -4199,6 +4199,19 @@ function elk_autoloader($class)
 		elseif (file_exists(ADMINDIR . '/' . $file_name))
 			$file_name = ADMINDIR . '/' . $file_name;
 	}
+	elseif (substr($class, -10) === '_Interface')
+	{
+		$file_name = str_replace('_', '', str_replace('_Interface', '.interface', $class)) . '.php';
+		if (!file_exists(SUBSDIR . '/' . $file_name))
+		{
+			$dir = str_replace('_', '', substr($file_name, 0, strpos($file_name, '.')));
+			if (file_exists(SUBSDIR . '/' . $dir . '/' . $file_name))
+				$file_name = $dir . '/' . $file_name;
+			// Not knowing what it is, better leave it empty
+			else
+				$file_name = '';
+		}
+	}
 	elseif (strpos($class, 'Verification_Controls_') !== false)
 	{
 		$file_name = SUBSDIR . '/VerificationControls.class.php';

@@ -572,6 +572,52 @@ function run_this_task($id_task, $task_name)
 	// Let's start logging the task and saying we failed it
 	$log_task_id = logTask(0, $id_task);
 
+	$class = implode('', array_map('ucfirst', explode('_', $task_name)));
+
+	if (file_exists(SUBSDIR . '/ScheduledTask/' . $class . '.class.php'))
+	{
+		require_once(SUBSDIR . '/ScheduledTask/' . $class . '.class.php');
+		$task = new $class();
+		$completed = $task->run();
+	}
+	else
+		$completed = run_this_task_compat($task_name)
+
+	// Log that we did it ;)
+	if ($completed)
+	{
+		// Taking care of scheduleTaskImmediate having a maximum of 10 "fast" executions
+		$scheduleTaskImmediate = @unserialize($modSettings['scheduleTaskImmediate']);
+		if (!empty($scheduleTaskImmediate) && isset($scheduleTaskImmediate[$task_name]))
+		{
+			$scheduleTaskImmediate[$task_name]++;
+
+			if ($scheduleTaskImmediate[$task_name] > 9)
+				removeScheduleTaskImmediate($task_name, false);
+			else
+				updateSettings(array('scheduleTaskImmediate' => serialize($scheduleTaskImmediate)));
+		}
+
+		$total_time = round(microtime(true) - $time_start, 3);
+
+		// If the task ended successfully, then log the proper time taken to complete
+		logTask($log_task_id, $id_task, $total_time);
+	}
+}
+
+/**
+ * 1.0 compatibility function, used to maintain compatibility with naming
+ * scheme used in ElkArte 1.0
+ *
+ * @package ScheduledTasks
+ * @param string $task_name name of the task, class name, function name, method in ScheduledTask.class
+ * @return mixed bool
+ * @deprecated since 1.1 - Deprecated in favour of naming scheme
+ */
+function run_this_task_compat($task_name)
+{
+	$completed = false;
+
 	// The method must exist in ScheduledTask class, or we are wasting our time.
 	// Actually for extendability sake, we need to have other ways, so:
 	// A simple procedural function?
@@ -611,26 +657,7 @@ function run_this_task($id_task, $task_name)
 		}
 	}
 
-	// Log that we did it ;)
-	if ($completed)
-	{
-		// Taking care of scheduleTaskImmediate having a maximum of 10 "fast" executions
-		$scheduleTaskImmediate = @unserialize($modSettings['scheduleTaskImmediate']);
-		if (!empty($scheduleTaskImmediate) && isset($scheduleTaskImmediate[$task_name]))
-		{
-			$scheduleTaskImmediate[$task_name]++;
-
-			if ($scheduleTaskImmediate[$task_name] > 9)
-				removeScheduleTaskImmediate($task_name, false);
-			else
-				updateSettings(array('scheduleTaskImmediate' => serialize($scheduleTaskImmediate)));
-		}
-
-		$total_time = round(microtime(true) - $time_start, 3);
-
-		// If the task ended successfully, then log the proper time taken to complete
-		logTask($log_task_id, $id_task, $total_time);
-	}
+	return $completed;
 }
 
 /**
