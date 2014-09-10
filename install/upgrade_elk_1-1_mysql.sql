@@ -58,3 +58,13 @@ $db->query('', '
 );
 ---}
 ---#
+
+---# Make mentions generic and not message-centric...
+---{
+$db_table->db_change_column('{db_prefix}log_mentions', 'id_msg',
+	array(
+		'name' => 'id_target',
+	)
+);
+---}
+---#

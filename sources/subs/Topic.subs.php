@@ -340,9 +340,11 @@ function removeTopics($topics, $decreasePostCount = true, $ignoreRecycling = fal
 	// Remove all mentions now that the topic is gone
 	$db->query('', '
 		DELETE FROM {db_prefix}log_mentions
-		WHERE id_msg IN ({array_int:messages})',
+		WHERE id_target IN ({array_int:messages})
+		AND mention_type IN ({array_string:mension_types})',
 		array(
 			'messages' => $messages,
+			'mension_types' => array('men', 'like', 'rlike'),
 		)
 	);
 
