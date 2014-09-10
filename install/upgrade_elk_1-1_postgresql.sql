@@ -28,3 +28,33 @@ if ($db->num_rows($request) == 0)
 
 ---}
 ---#
+
+/******************************************************************************/
+--- Adapt mentions...
+/******************************************************************************/
+
+---# Separate visibility from accessibility...
+---{
+$db_table->db_add_column('{db_prefix}log_mentions',
+	array(
+		'name' => 'accessible',
+		'type' => 'tinyint',
+		'size' => 1,
+		'default' => 0
+	)
+);
+
+$db->query('', '
+	UPDATE {db_prefix}log_mentions
+	SET accessible = CASE WHEN status < 0 THEN 0 ELSE 1 END',
+	array()
+);
+
+$db->query('', '
+	UPDATE {db_prefix}log_mentions
+	SET status = -(status + 1)
+	WHERE status < 0',
+	array()
+);
+---}
+---#

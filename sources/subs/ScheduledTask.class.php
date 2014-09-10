@@ -1527,7 +1527,7 @@ class Scheduled_Task
 					WHERE mnt.id_member = {int:current_member}
 						AND mnt.mention_type IN ({array_string:mention_types})
 						AND {raw:user_see_board}
-						AND status < 0
+						AND accessible = 0
 					LIMIT 1',
 					array(
 						'current_member' => $row['id_member'],
