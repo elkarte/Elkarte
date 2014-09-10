@@ -4225,6 +4225,23 @@ function elk_autoloader($class)
 				case 'Payment':
 					$file_name = SUBSDIR . '/Subscriptions-' . implode('_', $name) . '.class.php';
 					break;
+				case 'Interface':
+					$file_name = SUBSDIR . '/' . $givenname . '.interface.php';
+					if (!file_exists($file_name))
+					{
+						// Dir out of the name e.g.
+						// /srv/www/htdocs/mysite/forum/sources/subs/MentionType.interface.php
+						// becomes:
+						// /srv/www/htdocs/mysite/forum/sources/subs/MentionType/MentionType.interface.php
+						$dir = substr($file_name, 0, strpos($file_name, '.'));
+
+						if (file_exists($dir . '/' . basename($file_name)))
+							$file_name = $dir . '/' . $file_name;
+						// Not knowing what it is, better leave it empty
+						else
+							$file_name = '';
+					}
+					break;
 				// All the rest, like Browser_Detector, Template_Layers, Site_Dispatcher ...
 				default:
 					$file_name = $givenname . $surname;
