@@ -81,12 +81,12 @@ function getUserMentions($start, $limit, $sort, $all = false, $type = '')
 
 	$request = $db->query('', '
 		SELECT
-			mtn.id_mention, mtn.id_msg, mtn.id_member_from, mtn.log_time, mtn.mention_type, mtn.status,
+			mtn.id_mention, mtn.id_target, mtn.id_member_from, mtn.log_time, mtn.mention_type, mtn.status,
 			m.subject, m.id_topic, m.id_board,
 			IFNULL(mem.real_name, m.poster_name) as mentioner, mem.avatar, mem.email_address,
 			IFNULL(a.id_attach, 0) AS id_attach, a.filename, a.attachment_type
 		FROM {db_prefix}log_mentions AS mtn
-			LEFT JOIN {db_prefix}messages AS m ON (mtn.id_msg = m.id_msg)
+			LEFT JOIN {db_prefix}messages AS m ON (mtn.id_target = m.id_msg)
 			LEFT JOIN {db_prefix}members AS mem ON (mtn.id_member_from = mem.id_member)
 			LEFT JOIN {db_prefix}attachments AS a ON (a.id_member = mem.id_member)
 		WHERE mtn.id_member = {int:current_user}
@@ -124,12 +124,12 @@ function getUserMentions($start, $limit, $sort, $all = false, $type = '')
  * @package Mentions
  * @param int $member_from the id of the member mentioning
  * @param int[] $members_to an array of ids of the members mentioned
- * @param int $msg the id of the message involved in the mention
+ * @param int $target the id of the target involved in the mention
  * @param string $type the type of mention
  * @param string|null $time optional value to set the time of the mention, defaults to now
  * @param string|null $status optional value to set a status, defaults to 0
  */
-function addMentions($member_from, $members_to, $msg, $type, $time = null, $status = null)
+function addMentions($member_from, $members_to, $target, $type, $time = null, $status = null)
 {
 	$inserts = array();
 
@@ -142,12 +142,12 @@ function addMentions($member_from, $members_to, $msg, $type, $time = null, $stat
 		WHERE id_member IN ({array_int:members_to})
 			AND mention_type = {string:type}
 			AND id_member_from = {int:member_from}
-			AND id_msg = {int:msg}',
+			AND id_target = {int:target}',
 		array(
 			'members_to' => $members_to,
 			'type' => $type,
 			'member_from' => $member_from,
-			'msg' => $msg,
+			'target' => $target,
 		)
 	);
 	$existing = array();
@@ -160,7 +160,7 @@ function addMentions($member_from, $members_to, $msg, $type, $time = null, $stat
 		if (!in_array($id_member, $existing))
 			$inserts[] = array(
 				$id_member,
-				$msg,
+				$target,
 				$status === null ? 0 : $status,
 				$member_from,
 				$time === null ? time() : $time,
@@ -175,7 +175,7 @@ function addMentions($member_from, $members_to, $msg, $type, $time = null, $stat
 		'{db_prefix}log_mentions',
 		array(
 			'id_member' => 'int',
-			'id_msg' => 'int',
+			'id_target' => 'int',
 			'status' => 'int',
 			'id_member_from' => 'int',
 			'log_time' => 'int',
@@ -196,11 +196,11 @@ function addMentions($member_from, $members_to, $msg, $type, $time = null, $stat
  * @package Mentions
  * @param int $member_from the id of the member mentioning
  * @param int[] $members_to an array of ids of the members mentioned
- * @param int $msg the id of the message involved in the mention
+ * @param int $target the id of the message involved in the mention
  * @param int $newstatus status to change the mention to if found as unread,
  *             - default is to set it as read (status = 1)
  */
-function rlikeMentions($member_from, $members_to, $msg, $newstatus = 1)
+function rlikeMentions($member_from, $members_to, $target, $newstatus = 1)
 {
 	$db = database();
 
@@ -211,13 +211,13 @@ function rlikeMentions($member_from, $members_to, $msg, $newstatus = 1)
 		WHERE id_member IN ({array_int:members_to})
 			AND mention_type = {string:type}
 			AND id_member_from = {int:member_from}
-			AND id_msg = {int:msg}
+			AND id_target = {int:target}
 			AND status = {int:unread}',
 		array(
 			'members_to' => $members_to,
 			'type' => 'like',
 			'member_from' => $member_from,
-			'msg' => $msg,
+			'target' => $target,
 			'status' => $newstatus,
 			'unread' => 0,
 		)
@@ -279,7 +279,7 @@ function toggleMentionsApproval($msgs, $approved)
 	$db->query('', '
 		UPDATE {db_prefix}log_mentions
 		SET status = {int:status}
-		WHERE id_msg IN ({array_int:messages})',
+		WHERE id_target IN ({array_int:messages})',
 		array(
 			'messages' => $msgs,
 			'status' => $approved ? 0 : 3,
@@ -290,7 +290,7 @@ function toggleMentionsApproval($msgs, $approved)
 	$request = $db->query('', '
 		SELECT id_member, status
 		FROM {db_prefix}log_mentions
-		WHERE id_msg IN ({array_int:messages})',
+		WHERE id_target IN ({array_int:messages})',
 		array(
 			'messages' => $msgs,
 		)

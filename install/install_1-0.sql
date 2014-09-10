@@ -1209,7 +1209,7 @@ $db_table->db_create_table('{db_prefix}log_mentions',
 	array(
 		array('name' => 'id_mention',     'type' => 'int', 'size' => 10, 'unsigned' => true, 'auto' => true),
 		array('name' => 'id_member',      'type' => 'mediumint', 'size' => 8, 'unsigned' => true, 'default' => 0),
-		array('name' => 'id_msg',         'type' => 'int', 'size' => 10, 'unsigned' => true, 'default' => 0),
+		array('name' => 'id_target',      'type' => 'int', 'size' => 10, 'unsigned' => true, 'default' => 0),
 		array('name' => 'status',         'type' => 'tinyint', 'size' => 1, 'default' => 0),
 		array('name' => 'status',         'type' => 'tinyint', 'size' => 1, 'default' => 0),
 		array('name' => 'accessible',     'type' => 'tinyint', 'size' => 1, 'default' => 0),
