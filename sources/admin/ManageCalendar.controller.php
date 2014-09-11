@@ -281,6 +281,7 @@ class ManageCalendar_Controller extends Action_Controller
 
 		// Get the final touches in place.
 		$context['post_url'] = $scripturl . '?action=admin;area=managecalendar;save;sa=settings';
+		$context[$context['admin_menu_name']]['current_subsection'] = 'settings';
 
 		// Saving the settings?
 		if (isset($_GET['save']))
