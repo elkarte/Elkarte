@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Check for old drafts and remove them
+ * This file/class handles known scheduled tasks
  *
  * @name      ElkArte Forum
  * @copyright ElkArte Forum contributors
@@ -21,45 +21,45 @@ if (!defined('ELK'))
 	die('No access...');
 
 /**
- * Check for old drafts and remove them
+ * This class handles known scheduled tasks.
+ *
+ * - Each method implements a task, and
+ * - it's called automatically for the task to run.
  *
  * @package ScheduledTasks
  */
-class Remove_Old_Drafts implements Scheduled_Task_Interface
+class Remove_Topic_Redirect_Task implements Scheduled_Task_Interface
 {
 	public function run()
 	{
-		global $modSettings;
-
 		$db = database();
 
-		if (empty($modSettings['drafts_keep_days']))
-			return true;
+		// Init
+		$topics = array();
 
-		// init
-		$drafts = array();
-
-		// We need this for language items
+		// We will need this for lanaguage files
 		loadEssentialThemeData();
 
-		// Find all of the old drafts
+		// Find all of the old MOVE topic notices that were set to expire
 		$request = $db->query('', '
-			SELECT id_draft
-			FROM {db_prefix}user_drafts
-			WHERE poster_time <= {int:poster_time_old}',
+			SELECT id_topic
+			FROM {db_prefix}topics
+			WHERE redirect_expires <= {int:redirect_expires}
+				AND redirect_expires <> 0',
 			array(
-				'poster_time_old' => time() - (86400 * $modSettings['drafts_keep_days']),
+				'redirect_expires' => time(),
 			)
 		);
+
 		while ($row = $db->fetch_row($request))
-			$drafts[] = (int) $row[0];
+			$topics[] = $row[0];
 		$db->free_result($request);
 
-		// If we have old one, remove them
-		if (count($drafts) > 0)
+		// Zap, you're gone
+		if (count($topics) > 0)
 		{
-			require_once(SUBSDIR . '/Drafts.subs.php');
-			deleteDrafts($drafts, -1, false);
+			require_once(SUBSDIR . '/Topic.subs.php');
+			removeTopics($topics, false, true);
 		}
 
 		return true;

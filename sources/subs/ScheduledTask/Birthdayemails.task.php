@@ -26,7 +26,7 @@ if (!defined('ELK'))
  *
  * @package ScheduledTasks
  */
-class Birthdayemails implements Scheduled_Task_Interface
+class Birthdayemails_Task implements Scheduled_Task_Interface
 {
 	public function run()
 	{

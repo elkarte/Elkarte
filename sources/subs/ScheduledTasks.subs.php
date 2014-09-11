@@ -574,9 +574,9 @@ function run_this_task($id_task, $task_name)
 
 	$class = implode('', array_map('ucfirst', explode('_', $task_name)));
 
-	if (file_exists(SUBSDIR . '/ScheduledTask/' . $class . '.class.php'))
+	if (file_exists(SUBSDIR . '/ScheduledTask/' . str_replace('_Task', '.task', $class) . '.php'))
 	{
-		require_once(SUBSDIR . '/ScheduledTask/' . $class . '.class.php');
+		require_once(SUBSDIR . '/ScheduledTask/' . str_replace('_Task', '.task', $class) . '.php');
 		$task = new $class();
 		$completed = $task->run();
 	}
