@@ -17,8 +17,8 @@ class TestMembers extends UnitTestCase
 	{
 		define('ELK', '1');
 		define('CACHEDIR', TESTDIR . '../cache');
-		require_once(TESTDIR . '../sources/subs/CacheMethodInterface.class.php');
-		require_once(TESTDIR . '../sources/subs/CacheMethodAbstract.class.php');
+		require_once(TESTDIR . '../sources/subs/CacheMethod/CacheMethod.interface.php');
+		require_once(TESTDIR . '../sources/subs/CacheMethod/CacheMethodAbstract.class.php');
 	}
 
 	/**
@@ -34,7 +34,7 @@ class TestMembers extends UnitTestCase
 	 */
 	function testFilebasedCache()
 	{
-		require_once(TESTDIR . '../sources/subs/cache/FilebasedCache.class.php');
+		require_once(TESTDIR . '../sources/subs/CacheMethod/FilebasedCache.class.php');
 		$this->_cache_obj = new Filebased_Cache(array());
 		$this->doCacheTests(function($key) {
 			return file_exists(CACHEDIR . '/data_' . $key . '.php');
