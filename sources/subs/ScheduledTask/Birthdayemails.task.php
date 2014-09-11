@@ -107,3 +107,4 @@ class Birthdayemails_Task implements Scheduled_Task_Interface
 
 		return true;
 	}
+}
