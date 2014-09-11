@@ -572,16 +572,17 @@ function run_this_task($id_task, $task_name)
 	// Let's start logging the task and saying we failed it
 	$log_task_id = logTask(0, $id_task);
 
-	$class = implode('', array_map('ucfirst', explode('_', $task_name)));
+	$class = implode('_', array_map('ucfirst', explode('_', $task_name))) . '_Task';
 
-	if (file_exists(SUBSDIR . '/ScheduledTask/' . str_replace('_Task', '.task', $class) . '.php'))
+	if (file_exists(SUBSDIR . '/ScheduledTask/' . str_replace(array('_Task', '_'), array('.task', ''), $class) . '.php'))
 	{
-		require_once(SUBSDIR . '/ScheduledTask/' . str_replace('_Task', '.task', $class) . '.php');
+		require_once(SUBSDIR . '/ScheduledTask/' . str_replace(array('_Task', '_'), array('.task', ''), $class) . '.php');
 		$task = new $class();
+
 		$completed = $task->run();
 	}
 	else
-		$completed = run_this_task_compat($task_name)
+		$completed = run_this_task_compat($task_name);
 
 	// Log that we did it ;)
 	if ($completed)
@@ -629,21 +630,11 @@ function run_this_task_compat($task_name)
 		$completed = $method();
 	}
 	// It may be a class (no static, sorry)
-	else
+	elseif (strpos($task_name, '::') !== false)
 	{
-		// It may be a custom one
-		if (strpos($task_name, '::') !== false)
-		{
-			$call = explode('::', $task_name);
-			$task_object = new $call[0];
-			$method = $call[1];
-		}
-		// Otherwise we try with the ScheduledTask class
-		else
-		{
-			$task_object = new Scheduled_Task();
-			$method = $task_name;
-		}
+		$call = explode('::', $task_name);
+		$task_object = new $call[0];
+		$method = $call[1];
 
 		if (method_exists($task_object, $method))
 		{
