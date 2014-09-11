@@ -631,6 +631,8 @@ function removeThemeOptions($theme, $membergroups, $old_settings = '')
 {
 	$db = database();
 
+	$query_param = array();
+
 	// The default theme is 1 (id_theme = 1)
 	if ($theme === 'default')
 		$query_param = array('theme_operator' => '=', 'theme' => 1);
