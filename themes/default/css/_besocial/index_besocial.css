@@ -246,6 +246,9 @@ strong {
 	background: #d1e1ef;
 	color: #555;
 }
+.table_grid .standard_row {
+	background: #fff;
+}
 
 /* Used for sections that need somewhat larger corners */
 /* @todo - Daft name. Other stuffz. :P */
@@ -1043,6 +1046,16 @@ a.active {
 }
 
 /*	$BOXES	*/
+
+/* Lotsa boxes. */
+.description, .information, .warningbox, .successbox, .infobox, .errorbox {
+	background: #fff;
+	border: 1px solid #ccc;
+}
+/* Information boxes. */
+.information {
+	background: #f0f6f0;
+}
 /* More little boxes on a hillside. */
 .warningbox {
 	padding: 6px 12px;
@@ -1176,6 +1189,14 @@ a.help .icon {
 	box-shadow: 0 -2px 3px rgba(0,0,0,0.15);
 }
 
+
+/*	$SEARCH		*/
+/* ------------------------------------------------------- */
+.search_results_posts>li {
+	border-bottom: 4px solid #ddd;
+}
+
+
 /* $STATISTICS	*/
 /* ------------------------------------------------------- */
 .statistics .category_header {
@@ -1257,28 +1278,25 @@ a.help .icon {
 /*floating error box*/
 /* currently used by like funcationality*/
 .floating_error {
+	background: #fff;
 	background: rgba(255, 255, 255, 1);
 	font-size: 15px;
 	color: #404040;
 	border-radius: 10px;
 	border: solid 1px #E4E4E4;
 }
-
 .floating_error .error_heading {
 	font-weight: bold;
 }
-
 .floating_error .error_msg {
 	color: #3D3C3C;
 }
-
 .floating_error .error_btn {
 	border-top: solid 1px #D6D6D6;
 	color: #157DFB;
 	font-size: 16px;
 	font-weight: bold;
 }
-
 .floating_error .error_btn:hover {
 	cursor: pointer;
 }

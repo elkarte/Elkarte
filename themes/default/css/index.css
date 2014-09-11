@@ -1298,6 +1298,10 @@ a.bbc_link {
 .follow_ups .listlevel2 {
 	width: 20em;
 }
+.follow_ups .linklevel2 {
+	overflow: hidden;
+	text-overflow: ellipsis;
+}
 .quickbuttons .linklevel2 {
 	padding: 0 6px 0 26px;
 	line-height: 2.1em;
@@ -1467,11 +1471,6 @@ a.bbc_link {
 	padding: 5px 8px;
 	border-bottom: 1px solid #ccc;
 }
-/* Subtle zebra striping for rows. */
-.table_grid .standard_row {
-	background: #fff;
-}
-
 .table_grid textarea {
 	width: 100%;
 }
@@ -1722,7 +1721,7 @@ dl.settings label {
 	width: 25%;
 }
 .inline {
-	padding: 0 32px;
+	padding: 0 29px;
 	font-size: 0.857em;
 }
 
@@ -2178,7 +2177,7 @@ div.core_posts {
 .poster .title {
 	white-space: normal;
 	word-wrap: break-word;
-	max-width: 14em;
+	max-width: 100%;
 }
 .poster .linklevel2, .poster .linklevel2:focus,
 .poster .listlevel2:hover .linklevel2 {
@@ -3347,7 +3346,6 @@ div.labels {
 	margin: 0 0 -95px 11.5em;
 	padding: 8px 8px 100px 8px;
 }
-/* Add a background that fits with the calendar. */
 #calendar_navigation {
 	padding: 12px 0;
 }
@@ -3543,7 +3541,7 @@ a.help .icon {
 	padding: 12px;
 }
 
-/* The darkened background for help pop-ups. */
+/* The help pop-ups. */
 .popup_container {
 	position: fixed;
 	top: 0;
@@ -3589,7 +3587,7 @@ a.help .icon {
 	margin-bottom: 0;
 }
 .custom_mask {
-	 margin: 0 2em;
+	margin: 0 2em;
 }
 
 /*	$SEARCH		*/
@@ -3620,7 +3618,6 @@ a.help .icon {
 	padding-top: 12px;
 	width: 600px;
 }
-
 #advanced_search dt {
 	float: left;
 	clear: both;
@@ -3648,39 +3645,40 @@ a.help .icon {
 }
 .search_results_posts {
 	overflow: hidden;
+	padding: 0.2em 1em;
 }
 .search_results_posts .buttons {
 	padding: 5px 12px 0 0;
 }
 .compact_view .topic_details {
-	border-bottom: 0px;
+	border-bottom: 0;
 }
 .search_results_posts .topic_details {
 	position: relative;
-	margin: 0.2em 1em 0px;
+	margin: 0.2em 1em 0;
+	border-bottom: 0;
 }
 .search_results_posts .quickbuttons {
 	margin-left: 1em;
 	margin-right: 1em;
 }
 .search_results_posts .topic_body {
-	margin: 0px 1em 0px;
+	margin: 0 1em 0;
 	padding-bottom: 12px;
 	padding-top: 12px;
 }
 .search_results_posts .quick_mod {
 	position: absolute;
-	right: 0px;
+	right: 0;
 	top: 10%;
 }
 .search_results_posts .counter {
-	padding: 6px 1.5em;
+	padding: 6px 0 6px 1.5em;
 }
 .compact_view .content {
 	overflow: auto;
 }
-#topicForm .pagesection,
-#topicForm .flow_auto {
+#topicForm .pagesection, #topicForm .flow_auto {
 	display: inline-block;
 }
 #topicForm:after {
@@ -3910,13 +3908,7 @@ dl.no_members {
 .description, .information, .warningbox, .successbox, .infobox, .errorbox {
 	margin: 0 0 12px 0;
 	padding: 6px 12px;
-	border: 1px solid #ccc;
-	background: #fff;
 	font-size: 0.929em;
-}
-/* Information boxes. */
-.information {
-	background: #f0f6f0;
 }
 .information p {
 	padding: 12px;
@@ -4008,17 +4000,14 @@ dl.no_members {
 	text-align: center;
 	z-index: 102;
 }
-
 .floating_error .error_heading {
 	margin: 0;
 	padding: 5px 10px 0;
 }
-
 .floating_error .error_msg {
 	margin: 10px auto 15px;
 	width: 100%;
 }
-
 .floating_error .error_btn {
 	padding: 10px;
 	position: relative;
@@ -4089,6 +4078,20 @@ dl.no_members {
 	}
 	.elk_previewvideo {
 		max-width: 100%;
+	}
+	.profile_attachments {
+		margin: 0 0.5em;
+		width: auto;
+		text-align: center;
+	}
+	.profile_attachments tr {
+		display: inline;
+	}
+	.profile_attachments .profile_attachment {
+		display: inline-block;
+		width: 129px;
+		height: 149px;
+		margin: 5px;
 	}
 }
 /* This one does 800 screens at default font size. */
@@ -4474,7 +4477,7 @@ dl.no_members {
 		display: none !important;
 	}
 	#gotop, #gobottom {
-		bottom: 0%;
+		bottom: 0;
 		padding: 0.2em 0.1em;
 		height: 1em;
 		width: 1.2em;
@@ -4598,8 +4601,12 @@ dl.no_members {
 		width: 100%;
 		overflow: auto;
 	}
-	.profile_attachments {
-		display: none;
+	.profile_attachments .profile_attachment {
+		width: 100px;
+	}
+	.profile_attachment a img {
+		max-width: 100px;
+		max-height: 100px;
 	}
 	.pagesection div.floatright {
 		float: none;

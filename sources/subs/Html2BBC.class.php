@@ -7,7 +7,7 @@
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
- * @version 1.0 Release Candidate 2
+ * @version 1.0
  *
  */
 
@@ -874,7 +874,7 @@ class Html_2_BBC
 					$html = $body[1];
 
 				// Clean it up
-				$html = rtrim($doc->saveHTML(), "\n");
+				$html = rtrim($html, "\n");
 				return html_entity_decode(htmlspecialchars_decode($html, ENT_QUOTES), ENT_QUOTES, 'UTF-8');
 			}
 		}

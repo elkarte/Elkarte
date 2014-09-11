@@ -11,7 +11,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0 Release Candidate 2
+ * @version 1.0
  *
  */
 
@@ -206,7 +206,7 @@ function template_messages()
 		// Maybe they can modify the post (this is the more button)
 		if ($message['can_modify'] || ($context['can_report_moderator']))
 			echo '
-							<li class="listlevel1 subsections" aria-haspopup="true"><a href="#" onclick="return false;" class="linklevel1 post_options">', $txt['post_options'], '</a>';
+							<li class="listlevel1 subsections" aria-haspopup="true"><a href="#" onclick="event.stopPropagation();return false;" class="linklevel1 post_options">', $txt['post_options'], '</a>';
 
 		if ($message['can_modify'] || $message['can_remove'] || $context['can_follow_up'] || ($context['can_split'] && !empty($context['real_num_replies'])) || $context['can_restore_msg'] || $message['can_approve'] || $message['can_unapprove'] || $context['can_report_moderator'])
 		{

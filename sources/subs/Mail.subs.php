@@ -14,7 +14,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0 Release Candidate 2
+ * @version 1.0
  *
  */
 
@@ -110,7 +110,9 @@ function sendmail($to, $subject, $message, $from = null, $message_id = null, $se
 
 		// Add in the 'via' if desired, helps prevent email clients from learning/replacing legit names/emails
 		if (!empty($modSettings['maillist_sitename']) && empty($modSettings['dmarc_spec_standard']))
-			$from = $dmarc_from . ' ' . $txt['via'] . ' ' . $modSettings['maillist_sitename'];
+			// @memo (2014) "via" is still a draft, and it's not yet clear if it will be localized or not.
+			// To play safe, we are keeping it hard-coded, but the string is available for translation.
+			$from = $dmarc_from . ' ' . /* $txt['via'] */ 'via' . ' ' . $modSettings['maillist_sitename'];
 		else
 			$from = $dmarc_from;
 	}

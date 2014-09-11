@@ -13,7 +13,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0 Release Candidate 2
+ * @version 1.0
  *
  */
 
@@ -71,7 +71,6 @@ function cache_put_data($key, $value, $ttl = 120)
 function cache_get_data($key, $ttl = 120)
 {
 	return Cache::instance()->get($key, $ttl);
-
 }
 
 /**

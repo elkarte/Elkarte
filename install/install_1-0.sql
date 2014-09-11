@@ -2696,6 +2696,7 @@ $db->insert('ignore',
 	array('id_member' => 'int', 'id_theme' => 'int', 'variable' => 'string', 'value' => 'string'),
 	array(
 		array(-1, 1, 'display_quick_reply', '2'),
+		array(-1, 1, 'view_newest_pm_first', '1'),
 		array(-1, 1, 'drafts_autosave_enabled', '1'),
 	),
 	array('id_theme', 'id_member', 'variable')
