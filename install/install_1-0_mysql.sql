@@ -2193,6 +2193,7 @@ INSERT INTO {$db_prefix}themes
 VALUES
 	(-1, 1, 'display_quick_reply', '2'),
 	(-1, 1, 'view_newest_pm_first', '1'),
+	(-1, 1, 'return_to_post', '1'),
 	(-1, 1, 'drafts_autosave_enabled', '1');
 # --------------------------------------------------------
 
