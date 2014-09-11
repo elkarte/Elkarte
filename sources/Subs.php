@@ -4206,7 +4206,7 @@ function elk_autoloader($class)
 		{
 			$dir = str_replace('_', '', substr($file_name, 0, strpos($file_name, '.')));
 			if (file_exists(SUBSDIR . '/' . $dir . '/' . $file_name))
-				$file_name = $dir . '/' . $file_name;
+				$file_name = SUBSDIR . '/' . $dir . '/' . $file_name;
 			// Not knowing what it is, better leave it empty
 			else
 				$file_name = '';
@@ -4226,7 +4226,7 @@ function elk_autoloader($class)
 	}
 	elseif (substr($class, -6) === '_Cache')
 	{
-		$file_name = SUBSDIR . '/cache/' . str_replace('_', '', $class) . '.class.php';
+		$file_name = SUBSDIR . '/CacheMethod/' . str_replace('_', '', $class) . '.class.php';
 	}
 	elseif (substr($class, -8) === '_Display' || substr($class, -8) === '_Payment')
 	{
