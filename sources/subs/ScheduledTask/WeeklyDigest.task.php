@@ -26,9 +26,9 @@ class Weekly_Digest_Task implements Scheduled_Task_Interface
 {
 	public function run()
 	{
-		require_once(SUBSDIR . '/ScheduledTask/DailyDigest.class.php');
+		require_once(SUBSDIR . '/ScheduledTask/DailyDigest.task.php');
 
-		$digest = new Daily_Digest();
+		$digest = new Daily_Digest_Task();
 
 		return $digest->runDigest(true);
 	}
