@@ -27,7 +27,7 @@ if (!defined('ELK'))
  *
  * @package ScheduledTasks
  */
-class Approval_Notification implements Scheduled_Task_Interface
+class Approval_Notification_Task implements Scheduled_Task_Interface
 {
 	public function run()
 	{

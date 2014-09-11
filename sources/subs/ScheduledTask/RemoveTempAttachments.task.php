@@ -27,7 +27,7 @@ if (!defined('ELK'))
  *
  * @package ScheduledTasks
  */
-class Remove_Temp_Attachments implements Scheduled_Task_Interface
+class Remove_Temp_Attachments_Task implements Scheduled_Task_Interface
 {
 	public function run()
 	{

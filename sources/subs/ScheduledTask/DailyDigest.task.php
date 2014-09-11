@@ -28,7 +28,7 @@ if (!defined('ELK'))
  *
  * @package ScheduledTasks
  */
-class Daily_Digest implements Scheduled_Task_Interface
+class Daily_Digest_Task implements Scheduled_Task_Interface
 {
 	public function run()
 	{

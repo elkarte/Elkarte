@@ -31,7 +31,7 @@ if (!defined('ELK'))
  *
  * @package ScheduledTasks
  */
-class Daily_Maintenance implements Scheduled_Task_Interface
+class Daily_Maintenance_Task implements Scheduled_Task_Interface
 {
 	public function run()
 	{
