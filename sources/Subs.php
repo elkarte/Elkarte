@@ -4176,7 +4176,6 @@ function elk_autoloader($class)
 
 	switch ($givenname)
 	{
-<<<<<<< HEAD
 		case 'VerificationControls':
 			$file_name = SUBSDIR . '/VerificationControls.class.php';
 			break;
@@ -4230,13 +4229,22 @@ function elk_autoloader($class)
 					$file_name = $givenname . '.interface.php';
 					if (!file_exists(SUBSDIR . '/' . $file_name))
 					{
-						// Dir out of the name e.g.
-						// /srv/www/htdocs/mysite/forum/sources/subs/MentionType.interface.php
-						// becomes:
-						// /srv/www/htdocs/mysite/forum/sources/subs/MentionType/MentionType.interface.php
-						$dir = SUBSDIR . '/' . substr($file_name, 0, strpos($file_name, '.'));
+						$dir = SUBSDIR . '/' . $givenname;
 
-						if (file_exists($dir . '/' . basename($file_name)))
+						if (file_exists($dir . '/' . $file_name))
+							$file_name = $dir . '/' . $file_name;
+						// Not knowing what it is, better leave it empty
+						else
+							$file_name = '';
+					}
+					break;
+				case 'Abstract':
+					$file_name = $givenname . 'Abstract.class.php';
+					if (!file_exists(SUBSDIR . '/' . $file_name))
+					{
+						$dir = SUBSDIR . '/' . $givenname;
+
+						if (file_exists($dir . '/' . $file_name))
 							$file_name = $dir . '/' . $file_name;
 						// Not knowing what it is, better leave it empty
 						else
