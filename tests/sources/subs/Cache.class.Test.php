@@ -14,8 +14,8 @@ class TestCache extends PHPUnit_Framework_TestCase
 	 */
 	public function setUp()
 	{
-		require_once(SUBSDIR . '/CacheMethodInterface.class.php');
-		require_once(SUBSDIR . '/CacheMethodAbstract.class.php');
+		require_once(SUBSDIR . '/CacheMethod/CacheMethod.interface.class.php');
+		require_once(SUBSDIR . '/CacheMethod/CacheMethodAbstract.class.php');
 	}
 
 	/**
@@ -32,7 +32,7 @@ class TestCache extends PHPUnit_Framework_TestCase
 	 */
 	public function testFilebasedCache()
 	{
-		require_once(SUBSDIR . '/cache/FilebasedCache.class.php');
+		require_once(SUBSDIR . '/CacheMethod/FilebasedCache.class.php');
 		$this->_cache_obj = new Filebased_Cache(array());
 		$this->doCacheTests(function($key) {
 			return file_exists(CACHEDIR . '/data_' . $key . '.php');
