@@ -11,7 +11,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0 Release Candidate 2
+ * @version 1.0
  * 
  */
 
@@ -243,7 +243,7 @@ function template_ic_show_events()
 	echo '
 			<li class="board_row">
 				<h3 class="ic_section_header">
-					<a href="', $scripturl, '?action=calendar"><img class="icon" src="', $settings['images_url'], '/icons/calendar.png', '" alt="" />', $context['calendar_only_today'] ? $txt['calendar_today'] : $txt['calendar_upcoming'], '</a>
+					<a href="', $scripturl, '?action=calendar"><img class="icon" src="', $settings['images_url'], '/icons/calendar.png', '" alt="" /> ', $context['calendar_only_today'] ? $txt['calendar_today'] : $txt['calendar_upcoming'], '</a>
 				</h3>';
 
 	// Holidays like "Christmas", "Hanukkah", and "We Love [Unknown] Day" :P.
@@ -319,7 +319,7 @@ function template_ic_show_users()
 	echo '
 			<li class="board_row">
 				<h3 class="ic_section_header">
-					', $context['show_who'] ? '<a href="' . $scripturl . '?action=who">' : '', '<img class="icon" src="', $settings['images_url'], '/icons/online.png', '" alt="" />', $txt['online_now'], ':
+					', $context['show_who'] ? '<a href="' . $scripturl . '?action=who">' : '', '<img class="icon" src="', $settings['images_url'], '/icons/online.png', '" alt="" /> ', $txt['online_now'], ':
 					', comma_format($context['num_guests']), ' ', $context['num_guests'] == 1 ? $txt['guest'] : $txt['guests'], ', ', comma_format($context['num_users_online']), ' ', $context['num_users_online'] == 1 ? $txt['user'] : $txt['users'];
 
 	// Handle hidden users and buddies.

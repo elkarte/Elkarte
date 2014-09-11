@@ -198,6 +198,32 @@ abstract class Database_Abstract implements Database
 	}
 
 	/**
+	 * This function combines the keys and values of the data passed to db::insert.
+	 *
+	 * @param mixed[] $keys
+	 * @param mixed[] $values
+	 * @return mixed[]
+	 */
+	protected function _array_combine($keys, $values)
+	{
+		$is_numeric = array_filter(array_keys($values), 'is_numeric');
+		if ($is_numeric)
+			return array_combine($keys, $values);
+		else
+		{
+			$combined = array();
+			foreach ($keys as $key)
+			{
+				if (isset($values[$key]))
+					$combined[$key] = $values[$key];
+			}
+
+			// @todo should throws an E_WARNING if count($combined) != count($keys)
+			return $combined;
+		}
+	}
+
+	/**
 	 * This function tries to work out additional error information from a back trace.
 	 *
 	 * @param string $error_message

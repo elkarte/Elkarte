@@ -13,7 +13,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0 Release Candidate 2
+ * @version 1.0
  *
  */
 
@@ -2569,7 +2569,7 @@ function profileLoadAttachments($start, $items_per_page, $sort, $boardsAllowed, 
 			'height' => $row['height'],
 			'downloads' => $row['downloads'],
 			'is_image' => !empty($row['width']) && !empty($row['height']) && !empty($modSettings['attachmentShowImages']),
-			'id_thumb' => $row['id_thumb'],
+			'id_thumb' => !empty($row['id_thumb']) ? $row['id_thumb'] : '',
 			'subject' => '<a href="' . $scripturl . '?topic=' . $row['id_topic'] . '.msg' . $row['id_msg'] . '#msg' . $row['id_msg'] . '" rel="nofollow">' . censorText($row['subject']) . '</a>',
 			'posted' => $row['poster_time'],
 			'msg' => $row['id_msg'],

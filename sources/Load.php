@@ -13,7 +13,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:		BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0 Release Candidate 2
+ * @version 1.0
  *
  */
 
@@ -2224,12 +2224,12 @@ function loadLanguage($template_name, $lang = '', $fatal = true, $force_reload =
 	if ($lang == '')
 		$lang = isset($user_info['language']) ? $user_info['language'] : $language;
 
+	if (!$force_reload && isset($already_loaded[$template_name]) && $already_loaded[$template_name] == $lang)
+		return $lang;
+
 	// Do we want the English version of language file as fallback?
 	if (empty($modSettings['disable_language_fallback']) && $lang != 'english')
 		loadLanguage($template_name, 'english', false);
-
-	if (!$force_reload && isset($already_loaded[$template_name]) && $already_loaded[$template_name] == $lang)
-		return $lang;
 
 	// Make sure we have $settings - if not we're in trouble and need to find it!
 	if (empty($settings['default_theme_dir']))

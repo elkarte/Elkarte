@@ -13,7 +13,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:		BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0 Release Candidate 2
+ * @version 1.0
  *
  */
 
@@ -840,7 +840,7 @@ class ModerationCenter_Controller extends Action_Controller
 				'message' => parse_bbc($row['body']),
 				'time' => standardTime($row['log_time']),
 				'html_time' => htmlTime($row['log_time']),
-				'time' => forum_time(true, $row['log_time']),
+				'timestamp' => forum_time(true, $row['log_time']),
 				'member' => array(
 					'id' => $row['id_member'],
 					'name' => $row['moderator'],

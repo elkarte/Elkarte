@@ -279,8 +279,10 @@ class Cache
 					'cache_password' => $cache_password,
 				);
 			}
-
-			self::$_instance = new Cache($cache_enable, $cache_accelerator, $options);
+			elseif ($cache_accelerator == 'acpu')
+				self::$_instance = new Cache($cache_enable, 'acp', $options);
+			else
+				self::$_instance = new Cache($cache_enable, $cache_accelerator, $options);
 		}
 
 		return self::$_instance;
