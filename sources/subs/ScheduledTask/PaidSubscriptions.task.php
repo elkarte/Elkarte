@@ -47,7 +47,7 @@ class Paid_Subscriptions_Task implements Scheduled_Task_Interface
 				'time_now' => time(),
 			)
 		);
-		require_once(SUBSDIR . '/PaidSubsciptions.subs.php');
+		require_once(SUBSDIR . '/PaidSubscriptions.subs.php');
 		while ($row = $db->fetch_assoc($request))
 		{
 			removeSubscription($row['id_subscribe'], $row['id_member']);

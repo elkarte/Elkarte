@@ -170,7 +170,7 @@ class User_Access_Mentions_Task implements Scheduled_Task_Interface
 					WHERE mnt.id_member = {int:current_member}
 						AND mnt.mention_type IN ({array_string:mention_types})
 						AND {raw:user_see_board}
-						AND accessible = 0
+						AND mnt.accessible = 0
 					LIMIT 1',
 					array(
 						'current_member' => $row['id_member'],

@@ -32,7 +32,7 @@ class Daily_Digest_Task implements Scheduled_Task_Interface
 {
 	public function run()
 	{
-		$this->runDigest();
+		return $this->runDigest();
 	}
 
 	public function runDigest($is_weekly = false)
