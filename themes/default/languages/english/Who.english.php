@@ -36,6 +36,7 @@ $txt['whoall_login'] = 'Viewing the login page.';
 $txt['whoall_login2'] = 'Viewing the login page.';
 $txt['whoall_logout'] = 'Logging out of the forum.';
 $txt['whoall_markasread'] = 'Marking topics read or unread.';
+$txt['whoall_mentions'] = 'Viewing their mentions list.';
 $txt['whoall_modifykarma_applaud'] = 'Applauding a member.';
 $txt['whoall_modifykarma_smite'] = 'Smiting a member.';
 $txt['whoall_news'] = 'Viewing the news.';
@@ -66,6 +67,7 @@ $txt['whotopic_deletemsg'] = 'Deleting a message.';
 $txt['whotopic_editpoll'] = 'Editing the poll in &quot;<a href="%1$s">%2$s</a>&quot;.';
 $txt['whotopic_editpoll2'] = 'Editing the poll in &quot;<a href="%1$s">%2$s</a>&quot;.';
 $txt['whotopic_jsmodify'] = 'Modifying a post in &quot;<a href="%1$s">%2$s</a>&quot;.';
+$txt['whotopic_likes'] = 'Liking a message in the topic &quot;<a href="%1$s">%2$s</a>&quot;.';
 $txt['whotopic_lock'] = 'Locking the topic &quot;<a href="%1$s">%2$s</a>&quot;.';
 $txt['whotopic_lockvoting'] = 'Locking the poll in &quot;<a href="%1$s">%2$s</a>&quot;.';
 $txt['whotopic_mergetopics'] = 'Merging the topic &quot;<a href="%1$s">%2$s</a>&quot; with another topic.';
@@ -80,9 +82,9 @@ $txt['whotopic_removetopic2'] = 'Removing the topic <a href="%1$s">%2$s</a>.';
 $txt['whotopic_sendtopic'] = 'Sending the topic &quot;<a href="%1$s">%2$s</a>&quot; to a friend.';
 $txt['whotopic_splittopics'] = 'Splitting the topic &quot;<a href="%1$s">%2$s</a>&quot; into two topics.';
 $txt['whotopic_sticky'] = 'Pinned the topic &quot;<a href="%1$s">%2$s</a>&quot;.';
+$txt['whotopic_unwatch'] = 'Stopped watching a topic.';
 $txt['whotopic_vote'] = 'Voting in <a href="%1$s">%2$s</a>.';
 $txt['whotopic_watch'] = 'Started watching a topic.';
-$txt['whotopic_unwatch'] = 'Stopped watching a topic.';
 
 $txt['whopost_quotefast'] = 'Quoting a post from &quot;<a href="%1$s">%2$s</a>&quot;.';
 
