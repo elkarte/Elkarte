@@ -36,6 +36,7 @@ $txt['whoall_login'] = 'Betrachtet die Anmeldeseite.';
 $txt['whoall_login2'] = 'Betrachtet die Anmeldeseite.';
 $txt['whoall_logout'] = 'Meldet sich vom Forum ab.';
 $txt['whoall_markasread'] = 'Markiert Themen als gelesen oder ungelesen.';
+$txt['whoall_mentions'] = 'Betrachtet seine Erwähnungen.';
 $txt['whoall_modifykarma_applaud'] = 'Applaudiert einem Mitglied.';
 $txt['whoall_modifykarma_smite'] = 'Buht ein Mitglied aus.';
 $txt['whoall_news'] = 'Liest die Neuigkeiten.';
@@ -65,7 +66,8 @@ $txt['whotopic_dlattach'] = 'Betrachtet einen Dateianhang.';
 $txt['whotopic_deletemsg'] = 'Löscht eine Nachricht.';
 $txt['whotopic_editpoll'] = 'Ändert die Umfrage in &quot;<a href="%1$s">%2$s</a>&quot;.';
 $txt['whotopic_editpoll2'] = 'Ändert die Umfrage in &quot;<a href="%1$s">%2$s</a>&quot;.';
-$txt['whotopic_jsmodify'] = 'Ändert einen Beitrag in in &quot;<a href="%1$s">%2$s</a>&quot;.';
+$txt['whotopic_jsmodify'] = 'Ändert einen Beitrag in &quot;<a href="%1$s">%2$s</a>&quot;.';
+$txt['whotopic_likes'] = 'Mag einen Beitrag im Thema &quot;<a href="%1$s">%2$s</a>&quot;.';
 $txt['whotopic_lock'] = 'Sperrt das Thema &quot;<a href="%1$s">%2$s</a>&quot;.';
 $txt['whotopic_lockvoting'] = 'Sperrt die Umfrage in &quot;<a href="%1$s">%2$s</a>&quot;.';
 $txt['whotopic_mergetopics'] = 'Führt das Thema &quot;<a href="%1$s">%2$s</a>&quot; mit einem anderen Thema zusammen.';
@@ -80,9 +82,9 @@ $txt['whotopic_removetopic2'] = 'Entfernt das Thema <a href="%1$s">%2$s</a>.';
 $txt['whotopic_sendtopic'] = 'Sendet das Thema &quot;<a href="%1$s">%2$s</a>&quot; einem Freund.';
 $txt['whotopic_splittopics'] = 'Teilt das Thema &quot;<a href="%1$s">%2$s</a>&quot; in zwei Themen auf.';
 $txt['whotopic_sticky'] = 'Heftet das Thema &quot;<a href="%1$s">%2$s</a>&quot; an.';
+$txt['whotopic_unwatch'] = 'Hat ein Thema abbestellt.';
 $txt['whotopic_vote'] = 'Stimmt in <a href="%1$s">%2$s</a> ab.';
 $txt['whotopic_watch'] = 'Hat ein Thema abonniert.';
-$txt['whotopic_unwatch'] = 'Hat ein Thema abbestellt.';
 
 $txt['whopost_quotefast'] = 'Zitiert einen Beitrag aus &quot;<a href="%1$s">%2$s</a>&quot;.';
 
