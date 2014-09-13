@@ -605,7 +605,7 @@ function dbMostLikedTopic($board = null, $limit = 10)
 	// else fetch only the highest like topic
 	$request = $db->query('', '
 		SELECT COUNT(m.id_topic) AS like_count, m.id_topic, m.id_msg
-		FROM elkarte_message_likes AS lp
+		FROM {db_prefix}message_likes AS lp
 			INNER JOIN elkarte_messages AS m ON (m.id_msg = lp.id_msg)
 			INNER JOIN elkarte_boards AS b ON (m.id_board = b.id_board)
 		WHERE ' . ($board === null ? '{query_wanna_see_board}' : 'b.id_board = {int:id_board}') . '
@@ -643,7 +643,6 @@ function dbMostLikedTopic($board = null, $limit = 10)
 		FROM {db_prefix}messages AS m
 			INNER JOIN {db_prefix}members AS mem ON (mem.id_member = m.id_member)
 			LEFT JOIN {db_prefix}attachments AS a ON (a.id_member = mem.id_member)
-
 		WHERE ' . ($board === null ? 'm.id_msg IN ({array_int:id_msg})' : 'm.id_topic IN ({array_int:id_topic})') . '
 		ORDER BY ' . ($board === null ? 'm.id_msg' : 'm.id_topic') . ' DESC
 		LIMIT {int:limit}',
