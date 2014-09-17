@@ -4334,3 +4334,20 @@ function response_prefix()
 
 	return $response_prefix;
 }
+
+/**
+ * A very simple function to determine if an email address is "valid" for Elkarte.
+ * A valid email for ElkArte is something that resebles an email (filter_var) and
+ * is less than 255 characters (for database limits)
+ *
+ * @param string $value - The string to evaluate as valid email
+ * @return bool|string - The email if valid, false if not a valid email
+ */
+function isValidEmail($value)
+{
+	$value = trim($value);
+	if (filter_var($value, FILTER_VALIDATE_EMAIL) && Util::strlen($value) < 255)
+		return $value;
+	else
+		return false;
+}

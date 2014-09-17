@@ -258,6 +258,7 @@ class SplitTopics_Controller extends Action_Controller
 		$context['old_topic'] = $topic;
 		$context['new_topic'] = splitTopic($topic, $_SESSION['split_selection'][$topic], $this->_new_topic_subject);
 		$context['page_title'] = $txt['split_topic'];
+		$context['sub_template'] = 'split_successful';
 
 		splitAttemptMove($boards, $context['new_topic']);
 	}
