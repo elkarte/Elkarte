@@ -774,6 +774,7 @@ a.bbc_link {
 }
 .top_button {
 	line-height: 1.286em;
+	max-height: 1.357em;
 	padding: 2px;
 	margin-left: 1px;
 	vertical-align: top;
