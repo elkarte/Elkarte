@@ -211,6 +211,33 @@ $.sceditor.command
 		tooltip: 'Insert Spoiler'
 	})
 	.set('footnote', {
+		state: function() {
+			var currentNode = this.currentNode(),
+				currentRange = this.getRangeHelper();
+
+			// We don't really have a node since we don't render the tag in the editor
+			// but we can do a spot check to see if the cursor is inside the tags.  This
+			// will miss with nested tags but its nicer than nothing.
+			if (currentRange.selectedRange())
+			{
+				var end = currentRange.selectedRange().startOffset,
+					$node = $(currentNode),
+					text = $node.text(),
+					parent = '',
+					left = text.substr(0, end),
+					right = text.substr(end);
+
+				if ($node.is('div'))
+					return 0;
+
+				if (!($node.parent().is('div')))
+					parent = ($node.parent().parent().text());
+
+				return (left.indexOf("[footnote]") > -1 || right.indexOf("[/footnote]") > -1 || parent.indexOf("[footnote]") > -1);
+			}
+
+			return 0;
+		},
 		exec: function () {
 			this.insert('[footnote] ', '[/footnote]');
 		},
