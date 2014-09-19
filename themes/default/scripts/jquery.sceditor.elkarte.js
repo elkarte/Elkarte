@@ -204,6 +204,31 @@ $.sceditor.command
 		}
 	})
 	.set('spoiler', {
+		state: function() {
+			var currentNode = this.currentNode(),
+				currentRange = this.getRangeHelper();
+
+			// We don't have a node since we don't render the tag in the wizzy editor
+			// however we can spot check to see if the cursor is inside the tags.
+			if (currentRange.selectedRange())
+			{
+				var end = currentRange.selectedRange().startOffset,
+					$node = $(currentNode),
+					text = $node.text(),
+					parent = '',
+					left = text.substr(0, end),
+					right = text.substr(end);
+		if ($node.is('div'))
+			return 0;
+
+				if (!($node.parent().is('div')))
+					parent = ($node.parent().parent().text());
+
+				return (left.indexOf("[spoiler]") > -1 || right.indexOf("[/spoiler]") > -1 || parent.indexOf("[spoiler]") > -1);
+			}
+
+			return 0;
+		},
 		exec: function () {
 			this.insert('[spoiler]', '[/spoiler]');
 		},
