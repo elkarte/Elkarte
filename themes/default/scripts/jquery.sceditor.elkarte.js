@@ -211,13 +211,8 @@ $.sceditor.command
 		tooltip: 'Insert Spoiler'
 	})
 	.set('footnote', {
-		state: function() {
-			var currentNode = this.currentNode();
-
-			return $(currentNode).is('aside') || $(currentNode).parents('aside').length > 0 ? 1 : 0;
-		},
 		exec: function () {
-			this.insert('[footnote] ', '[/footnote]', false);
+			this.insert('[footnote] ', '[/footnote]');
 		},
 		txtExec: ['[footnote]', '[/footnote]'],
 		tooltip: 'Insert Footnote'
@@ -298,13 +293,6 @@ $.sceditor.plugins.bbcode.bbcode
 		format: '[pre]{0}[/pre]',
 		html: '<pre>{0}</pre>'
 	})
-	.set('footnote', {
-		tags: {
-			aside: null
-		},
-		format: '[footnote]{0}[/footnote]',
-		html: '<aside>{0}</aside>'
-	})
 	/*
 	 * ElkArte modified tags, modified so they support the existing paradigm
 	 *
@@ -363,7 +351,7 @@ $.sceditor.plugins.bbcode.bbcode
 			var author = '',
 				date = '',
 				link = '',
-				$elm  = $(element);
+				$elm = $(element);
 
 			if (element[0].tagName.toLowerCase() === 'cite')
 				return '';
