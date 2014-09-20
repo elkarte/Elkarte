@@ -400,9 +400,6 @@ class ManageBoards_Controller extends Action_Controller
 		// If they want to delete - first give them confirmation.
 		elseif (isset($_POST['delete']) && !isset($_POST['confirmation']) && !isset($_POST['empty']))
 		{
-			// We need a new token.
-			validateToken('admin-bc-' . $_REQUEST['cat']);
-
 			$this->action_cat();
 			return;
 		}

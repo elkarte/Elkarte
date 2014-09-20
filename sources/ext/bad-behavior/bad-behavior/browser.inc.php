@@ -77,7 +77,8 @@ function bb2_opera($package)
 
 function bb2_safari($package)
 {
-	if (!array_key_exists('Accept', $package['headers_mixed'])) {
+	// Bypass this test when Android is detected
+	if (!array_key_exists('Accept', $package['headers_mixed']) && strpos($package['headers_mixed']['User-Agent'], "Android") === FALSE) {
 		return "17566707";
 	}
 	return false;

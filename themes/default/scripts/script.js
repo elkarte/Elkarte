@@ -605,7 +605,7 @@ window.setTimeout(function() {elk_sessionKeepAlive();}, 1200000);
  */
 function elk_setThemeOption(option, value, theme, additional_vars)
 {
-	if (additional_vars === null)
+	if (additional_vars === null || typeof(additional_vars) === 'undefined')
 		additional_vars = '';
 
 	var tempImage = new Image();
