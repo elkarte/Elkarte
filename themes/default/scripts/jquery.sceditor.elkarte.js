@@ -213,18 +213,19 @@ $.sceditor.command
 			if (currentRange.selectedRange())
 			{
 				var end = currentRange.selectedRange().startOffset,
-					$node = $(currentNode),
-					text = $node.text(),
-					parent = '',
-					left = text.substr(0, end),
-					right = text.substr(end);
-		if ($node.is('div'))
-			return 0;
+					text = $(currentNode).text();
 
-				if (!($node.parent().is('div')))
-					parent = ($node.parent().parent().text());
+				// Left and right text from the cursor positon and tag positions
+				var	left = text.substr(0, end),
+					right = text.substr(end),
+					l1 = left.lastIndexOf("[spoiler]"),
+					l2 = left.lastIndexOf("[/spoiler]"),
+					r1 = right.indexOf("[spoiler]"),
+					r2 = right.indexOf("[/spoiler]");
 
-				return (left.indexOf("[spoiler]") > -1 || right.indexOf("[/spoiler]") > -1 || parent.indexOf("[spoiler]") > -1);
+				// Inside spoiler tags
+				if ((l1 > -1 && l1 > l2) || (r2 > -1 && (r1 === -1 || (r1 > r2))))
+					return 1;
 			}
 
 			return 0;
@@ -240,25 +241,25 @@ $.sceditor.command
 			var currentNode = this.currentNode(),
 				currentRange = this.getRangeHelper();
 
-			// We don't really have a node since we don't render the tag in the editor
-			// but we can do a spot check to see if the cursor is inside the tags.  This
+			// We don't have an html node since we don't render the tag in the editor
+			// but we can do a spot check to see if the cursor is placed bewtwee plain tags.  This
 			// will miss with nested tags but its nicer than nothing.
 			if (currentRange.selectedRange())
 			{
 				var end = currentRange.selectedRange().startOffset,
-					$node = $(currentNode),
-					text = $node.text(),
-					parent = '',
-					left = text.substr(0, end),
-					right = text.substr(end);
+					text = $(currentNode).text();
 
-				if ($node.is('div'))
-					return 0;
+				// Left and right text from the cursor positon and tag positions
+				var	left = text.substr(0, end),
+					right = text.substr(end),
+					l1 = left.lastIndexOf("[footnote]"),
+					l2 = left.lastIndexOf("[/footnote]"),
+					r1 = right.indexOf("[footnote]"),
+					r2 = right.indexOf("[/footnote]");
 
-				if (!($node.parent().is('div')))
-					parent = ($node.parent().parent().text());
-
-				return (left.indexOf("[footnote]") > -1 || right.indexOf("[/footnote]") > -1 || parent.indexOf("[footnote]") > -1);
+				// Inside footnote tags
+				if ((l1 > -1 && l1 > l2) || (r2 > -1 && (r1 === -1 || (r1 > r2))))
+					return 1;
 			}
 
 			return 0;
