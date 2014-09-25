@@ -732,7 +732,7 @@ function parse_bbc($message, $smileys = true, $cache_id = '', $parse_tags = arra
 	global $txt, $scripturl, $context, $modSettings, $user_info;
 
 	static $bbc_codes = array(), $itemcodes = array(), $no_autolink_tags = array();
-	static $disabled;
+	static $disabled, $default_disabled, $parse_tag_cache;
 
 	// Don't waste cycles
 	if ($message === '')
@@ -759,18 +759,11 @@ function parse_bbc($message, $smileys = true, $cache_id = '', $parse_tags = arra
 		return $message;
 	}
 
-	// If we are not doing every tag then we don't cache this run.
-	if (!empty($parse_tags) && !empty($bbc_codes))
-	{
-		$temp_bbc = $bbc_codes;
-		$bbc_codes = array();
-	}
-
 	// Allow addons access before entering the main parse_bbc loop
 	call_integration_hook('integrate_pre_parsebbc', array(&$message, &$smileys, &$cache_id, &$parse_tags));
 
 	// Sift out the bbc for a performance improvement.
-	if (empty($bbc_codes) || $message === false || !empty($parse_tags))
+	if (empty($bbc_codes) || $message === false)
 	{
 		if (!empty($modSettings['disabledBBC']))
 		{
@@ -1324,12 +1317,40 @@ function parse_bbc($message, $smileys = true, $cache_id = '', $parse_tags = arra
 		}
 
 		foreach ($codes as $code)
+			$bbc_codes[substr($code['tag'], 0, 1)][] = $code;
+	}
+
+	// If we are not doing every enabled tag then create a cache for this parsing group.
+	if ($parse_tags !== array() && is_array($parse_tags))
+	{
+		$temp_bbc = $bbc_codes;
+		$tags_cache_id = implode(',', $parse_tags);
+
+		if (!isset($default_disabled))
+			$default_disabled = isset($disabled) ? $disabled : array();
+
+		// Already cached, use it, otherwise create it
+		if (isset($parse_tag_cache[$tags_cache_id]))
+			list ($bbc_codes, $disabled) = $parse_tag_cache[$tags_cache_id];
+		else
 		{
-			// If we are not doing every tag only do ones we are interested in.
-			if (empty($parse_tags) || in_array($code['tag'], $parse_tags))
-				$bbc_codes[substr($code['tag'], 0, 1)][] = $code;
+			foreach ($bbc_codes as $key_bbc => $bbc)
+			{
+				foreach ($bbc as $key_code => $code)
+				{
+					if (!in_array($code['tag'], $parse_tags))
+					{
+						$disabled[$code['tag']] = true;
+						unset($bbc_codes[$key_bbc][$key_code]);
+					}
+				}
+			}
+
+			$parse_tag_cache[$tags_cache_id] = array($bbc_codes, $disabled);
 		}
 	}
+	elseif (isset($default_disabled))
+		$disabled = $default_disabled;
 
 	// Shall we take the time to cache this?
 	if ($cache_id != '' && !empty($modSettings['cache_enable']) && (($modSettings['cache_enable'] >= 2 && isset($message[1000])) || isset($message[2400])) && empty($parse_tags))

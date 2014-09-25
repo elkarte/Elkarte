@@ -1107,6 +1107,14 @@ a.bbc_link {
 	border: none;
 	white-space: nowrap;
 }
+.linktree:last-child {
+	max-width: 25em;
+}
+.linktree a {
+	display: block;
+	overflow: hidden;
+	text-overflow: ellipsis;
+}
 
 /* Nifty indicators. */
 .linktree:after {
@@ -1705,6 +1713,9 @@ dl.settings label {
 	padding: 2px 4px;
 	vertical-align: top;
 	text-align: left;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	max-width: 40em;
 }
 .recentpost {
 	width: 40%;
@@ -1792,6 +1803,13 @@ img.new_posts {
 #unread_header {
 	margin-top: 0.5em;
 }
+
+/* The header abover the posts */
+#forumposts .category_header {
+	overflow: hidden;
+	text-overflow: ellipsis;
+}
+
 /* The board description and who-is-viewing stuff. */
 #description_board {
 	margin: 10px 0 0 0;
@@ -1864,6 +1882,8 @@ img.new_posts {
 	line-height: 1.429em;
 	display: inline-block;
 	padding-right: 30px;
+	word-break: break-all;
+    word-wrap: break-word;
 }
 .topic_name h4 a {
 	font-weight: bold;
@@ -4296,7 +4316,7 @@ dl.no_members {
 		min-width: 300px;
 	}
 	#main_content_section {
-		padding: 1px 2px 16px 3px;
+		padding: 1px 1px 16px 0;
 	}
 	#search_form .input_text {
 		width: 7em;
@@ -4369,6 +4389,7 @@ dl.no_members {
 	}
 	#gobottom, #gotop {
 		padding-right: 0.25em;
+		display: none;
 	}
 	#message_index_jump_to {
 		display: block;
@@ -4616,7 +4637,7 @@ dl.no_members {
 	.pm_icon, .pm_quickmod, .label_pms {
 		display: none;
 	}
-	.popup_window {
+	.popup_container .popup_window {
 		width: 95%;
 	}
 	.poster .menulevel2 {

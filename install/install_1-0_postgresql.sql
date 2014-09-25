@@ -1,5 +1,5 @@
 #### ATTENTION: You do not need to run or use this file!  The install.php script does everything for you!
-#### Install script for PostgreSQL 8.0.1
+#### Install script for PostgreSQL 8.3+
 
 #
 # Create PostgreSQL functions.
@@ -2325,7 +2325,7 @@ CREATE SEQUENCE {$db_prefix}postby_emails_filters_seq;
 
 CREATE TABLE {$db_prefix}postby_emails_filters (
   id_filter int default nextval('{$db_prefix}postby_emails_filters_seq'),
-  filter_style char(5) NOT NULL default '',
+  filter_style char(6) NOT NULL default '',
   filter_type varchar(255) NOT NULL default '',
   filter_to varchar(255) NOT NULL default '',
   filter_from varchar(255) NOT NULL default '',

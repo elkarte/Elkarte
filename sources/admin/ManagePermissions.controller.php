@@ -404,12 +404,22 @@ class ManagePermissions_Controller extends Action_Controller
 							'style' => 'width:8%;',
 						),
 						'data' => array(
-							'sprintf' => array(
-								'format' => '<a href="' . $scripturl . '?action=admin;area=permissions;sa=modify;group=%1$d' . (isset($_REQUEST['pid']) ? ';pid=' . $_REQUEST['pid'] : '') . '">' . $txt['membergroups_modify'] . '</a>',
-								'params' => array(
-									'id_group' => false,
-								),
-							),
+							'function' => create_function('$rowData', '
+								global $scripturl, $txt;
+
+								if ($rowData[\'id_group\'] > 0)
+								{
+									require_once(SUBSDIR . \'/Membergroups.subs.php\');
+									$group = membergroupById($rowData[\'id_group\'], true);
+
+									// Can only edit if its not an inherited group!
+									if ($group[\'id_parent\'] == -2)
+										return \'<a href="\' . $scripturl . \'?action=admin;area=permissions;sa=modify;group=\' . $rowData[\'id_group\'] . (isset($_REQUEST[\'pid\']) ? \';pid=\' . $_REQUEST[\'pid\'] : \'\') . \'">\' . $txt[\'membergroups_modify\'] . \'</a>\';
+									else
+										return \'<a href="\' . $scripturl . \'?action=admin;area=permissions;sa=modify;group=\' . $group[\'id_parent\'] . (isset($_REQUEST[\'pid\']) ? \';pid=\' . $_REQUEST[\'pid\'] : \'\') . \'">\' . $txt[\'membergroups_modify\'] . \'</a>\';
+								}
+								return \'\';
+							'),
 						),
 					),
 					'check' => array(
