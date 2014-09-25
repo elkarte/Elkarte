@@ -4296,7 +4296,7 @@ dl.no_members {
 		min-width: 300px;
 	}
 	#main_content_section {
-		padding: 1px 2px 16px 3px;
+		padding: 1px 1px 16px 0;
 	}
 	#search_form .input_text {
 		width: 7em;
@@ -4369,6 +4369,7 @@ dl.no_members {
 	}
 	#gobottom, #gotop {
 		padding-right: 0.25em;
+		display: none;
 	}
 	#message_index_jump_to {
 		display: block;
@@ -4616,7 +4617,7 @@ dl.no_members {
 	.pm_icon, .pm_quickmod, .label_pms {
 		display: none;
 	}
-	.popup_window {
+	.popup_container .popup_window {
 		width: 95%;
 	}
 	.poster .menulevel2 {
