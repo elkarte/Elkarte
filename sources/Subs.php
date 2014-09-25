@@ -986,13 +986,6 @@ function parse_bbc($message, $smileys = true, $cache_id = '', $parse_tags = arra
 				'disabled_after' => ' ($1)',
 			),
 			array(
-				'tag' => 'html',
-				'type' => 'unparsed_content',
-				'content' => '$1',
-				'block_level' => true,
-				'disabled_content' => '$1',
-			),
-			array(
 				'tag' => 'hr',
 				'type' => 'closed',
 				'content' => '<hr />',
