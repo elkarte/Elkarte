@@ -456,9 +456,9 @@ class ManageNews_Controller extends Action_Controller
 			foreach ($mods as $row)
 			{
 				if (in_array(3, $context['recipients']))
-					$context['recipients']['exclude_members'][] = $row['identifier'];
+					$context['recipients']['exclude_members'][] = $row;
 				else
-					$context['recipients']['members'][] = $row['identifier'];
+					$context['recipients']['members'][] = $row;
 			}
 		}
 
