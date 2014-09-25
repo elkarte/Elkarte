@@ -979,13 +979,6 @@ function parse_bbc($message, $smileys = true, $cache_id = '', $parse_tags = arra
 				'disabled_after' => ' ($1)',
 			),
 			array(
-				'tag' => 'html',
-				'type' => 'unparsed_content',
-				'content' => '$1',
-				'block_level' => true,
-				'disabled_content' => '$1',
-			),
-			array(
 				'tag' => 'hr',
 				'type' => 'closed',
 				'content' => '<hr />',
@@ -1001,10 +994,10 @@ function parse_bbc($message, $smileys = true, $cache_id = '', $parse_tags = arra
 				'type' => 'unparsed_content',
 				'parameters' => array(
 					'alt' => array('optional' => true),
-					'width' => array('optional' => true, 'value' => '$1px;', 'match' => '(\d+)'),
-					'height' => array('optional' => true, 'value' => '$1px;', 'match' => '(\d+)'),
+					'width' => array('optional' => true, 'value' => 'width:100%;max-width:$1px;', 'match' => '(\d+)'),
+					'height' => array('optional' => true, 'value' => 'max-height:$1px;', 'match' => '(\d+)'),
 				),
-				'content' => '<img src="$1" alt="{alt}" style="width:{width};height:{height}" class="bbc_img resized" />',
+				'content' => '<img src="$1" alt="{alt}" style="{width}{height}" class="bbc_img resized" />',
 				'validate' => create_function('&$tag, &$data, $disabled', '
 					$data = strtr($data, array(\'<br />\' => \'\'));
 					if (strpos($data, \'http://\') !== 0 && strpos($data, \'https://\') !== 0)
