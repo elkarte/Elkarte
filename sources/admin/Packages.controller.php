@@ -524,7 +524,7 @@ class Packages_Controller extends Action_Controller
 			elseif ($action['type'] == 'credits')
 			{
 				$thisAction = array(
-					'type' => $txt['execute_credits_add'],
+					'type' => $action['reverse'] ? $txt['execute_credits_remove'] : $txt['execute_credits_add'],
 					'action' => sprintf($txt['execute_credits_action'], Util::htmlspecialchars($action['title'])),
 				);
 			}

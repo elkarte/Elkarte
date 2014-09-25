@@ -3,16 +3,9 @@
 // Version: 1.0; Packages
 
 $txt['package_proceed'] = 'Proceed';
-$txt['php_script'] = 'The addon archive was extracted, but this addon also comes with a PHP script which should be executed before it will work';
-$txt['package_run'] = 'Run';
 $txt['package_id'] = 'ID';
-$txt['package_read'] = 'Read';
-$txt['script_output'] = 'Script output:';
-$txt['additional_notes'] = 'Additional notes';
-$txt['notes_file'] = 'Instruction/Additional notes file';
 $txt['list_file'] = 'List files in package';
 $txt['files_archive'] = 'Files in archive';
-$txt['package_get'] = 'Package Get';
 $txt['package_browse'] = 'Browse';
 $txt['add_server'] = 'Add server';
 $txt['server_name'] = 'Server name';
@@ -24,15 +17,10 @@ $txt['package_downloaded_successfully'] = 'Package has been downloaded successfu
 $txt['package_manager'] = 'Package Manager';
 $txt['install_mod'] = 'Install Add-on';
 $txt['uninstall_mod'] = 'Uninstall Add-on';
-$txt['sql_file'] = 'The addon archive has been extracted.  This addon also comes with a database file containing changes the database needs.  You will need to execute this file for the addon to function properly.';
-$txt['sql_queries'] = 'SQL Queries';
 $txt['no_adds_installed'] = 'No addons currently installed';
-$txt['browse_installed'] = 'Browse installed addons';
 $txt['uninstall'] = 'Uninstall';
 $txt['delete_list'] = 'Delete Add-on List';
 $txt['package_delete_list_warning'] = 'Are you sure you wish to clear the installed addons list?';
-$txt['php_safe_mode'] = 'Sorry, your server currently has PHP set to run in SAFE MODE.  This feature is not compatible with SAFE MODE.';
-$txt['lets_try_anyway'] = 'Let me try anyway.';
 
 $txt['package_manager_desc'] = 'From this easy to use interface, you can download and install addons for use on your forum.';
 $txt['installed_packages_desc'] = 'You can use the interface below to view those packages currently installed on the forum, and remove the ones you no longer require.';
@@ -40,8 +28,6 @@ $txt['download_packages_desc'] = 'From this section you can add or remove packag
 $txt['package_servers_desc'] = 'From this easy to use interface, you can manage your package servers and download addon archives on your forum.';
 $txt['upload_packages_desc'] = 'From this section you can upload a package file from your local computer directly to the forum.';
 
-$txt['create_package'] = 'Create a new Package';
-$txt['download_new_package'] = 'Download new packages';
 $txt['upload_new_package'] = 'Upload new package';
 $txt['view_and_remove'] = 'View and remove installed packages';
 $txt['modification_package'] = 'Add-on packages';
@@ -53,7 +39,6 @@ $txt['use_avatars'] = 'Use Avatars';
 $txt['add_languages'] = 'Add Language';
 $txt['list_files'] = 'List Files';
 $txt['package_type'] = 'Package Type';
-$txt['archiving'] = 'Archiving';
 $txt['extracting'] = 'Extracting';
 $txt['avatars_extracted'] = 'The avatars have been installed, you should now be able to use them.';
 $txt['language_extracted'] = 'The language pack has been installed, you can now enable its use in the language settings area of your admin control panel.';
