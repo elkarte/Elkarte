@@ -1036,12 +1036,10 @@ class Scheduled_Task
 					SELECT id_report
 					FROM {db_prefix}log_reported
 					WHERE time_started < {int:time_started}
-						AND closed = {int:not_closed}
-						AND ignore_all = {int:not_ignored}',
+						AND closed = {int:closed}',
 					array(
 						'time_started' => $t,
-						'not_closed' => 0,
-						'not_ignored' => 0,
+						'closed' => 1,
 					)
 				);
 				while ($row = $db->fetch_row($result))
