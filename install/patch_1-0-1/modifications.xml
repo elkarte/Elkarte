@@ -4,7 +4,7 @@
 
 	<id>Elkarte Contributors:ElkArte_101_patch</id>
 	<version>1.0</version>
-	<file name="$boarddir/SSI.php">
+	<file name="BOARDDIR/SSI.php">
 		<operation>
 			<search position="replace"><![CDATA[
 	echo '
@@ -47,7 +47,7 @@
 }]]></add>
 		</operation>
 	</file>
-	<file name="$boarddir/Subs.php">
+	<file name="SOURCEDIR/Subs.php">
 		<operation>
 			<search position="replace"><![CDATA[	global $txt, $scripturl, $context, $modSettings, $user_info;
 
@@ -220,7 +220,7 @@ function isValidEmail($value)
 }]]></add>
 		</operation>
 	</file>
-	<file name="$boarddir/ManageBoards.controller.php">
+	<file name="ADMINDIR/ManageBoards.controller.php">
 		<operation>
 			<search position="replace"><![CDATA[		// If they want to delete - first give them confirmation.
 		elseif (isset($_POST['delete']) && !isset($_POST['confirmation']) && !isset($_POST['empty']))
@@ -239,7 +239,7 @@ function isValidEmail($value)
 		}]]></add>
 		</operation>
 	</file>
-	<file name="$boarddir/ManageCalendar.controller.php">
+	<file name="ADMINDIR/ManageCalendar.controller.php">
 		<operation>
 			<search position="replace"><![CDATA[
 		// Get the final touches in place.
@@ -256,7 +256,7 @@ function isValidEmail($value)
 		if (isset($_GET['save']))]]></add>
 		</operation>
 	</file>
-	<file name="$boarddir/ManagePermissions.controller.php">
+	<file name="ADMINDIR/ManagePermissions.controller.php">
 		<operation>
 			<search position="replace"><![CDATA[				'name' => array(
 					'header' => array(
@@ -449,7 +449,7 @@ function isValidEmail($value)
 					'check' => array(]]></add>
 		</operation>
 	</file>
-	<file name="$boarddir/ManageThemes.controller.php">
+	<file name="ADMINDIR/ManageThemes.controller.php">
 		<operation>
 			<search position="replace"><![CDATA[				elseif ($_POST['default_options_master'][$opt] == 1)
 				{
@@ -467,7 +467,7 @@ function isValidEmail($value)
 					$old_settings[] = $opt;]]></add>
 		</operation>
 	</file>
-	<file name="$boarddir/PackageServers.controller.php">
+	<file name="ADMINDIR/PackageServers.controller.php">
 		<operation>
 			<search position="replace"><![CDATA[						if (!empty($package['author']['email']))
 						{
@@ -485,7 +485,7 @@ function isValidEmail($value)
 					}]]></add>
 		</operation>
 	</file>
-	<file name="$boarddir/Packages.controller.php">
+	<file name="ADMINDIR/Packages.controller.php">
 		<operation>
 			<search position="replace"><![CDATA[			elseif ($action['type'] == 'credits')
 			{
@@ -503,7 +503,7 @@ function isValidEmail($value)
 			}]]></add>
 		</operation>
 	</file>
-	<file name="$boarddir/Post.controller.php">
+	<file name="CONTROLLERDIR/Post.controller.php">
 		<operation>
 			<search position="replace"><![CDATA[		{
 			$context['icons'][count($context['icons']) - 1]['is_last'] = true;
@@ -540,7 +540,7 @@ function isValidEmail($value)
 		// Are we starting a poll? if set the poll icon as selected if its available]]></add>
 		</operation>
 	</file>
-	<file name="$boarddir/Register.controller.php">
+	<file name="CONTROLLERDIR/Register.controller.php">
 		<operation>
 			<search position="replace"><![CDATA[				if ($row['type'] == 'text' && !empty($row['mask']) && $row['mask'] != 'none')
 				{
@@ -558,7 +558,7 @@ function isValidEmail($value)
 						$reg_errors->addError(array('custom_field_not_number', array($row['name'])));]]></add>
 		</operation>
 	</file>
-	<file name="$boarddir/SplitTopics.controller.php">
+	<file name="CONTROLLERDIR/SplitTopics.controller.php">
 		<operation>
 			<search position="replace"><![CDATA[		$context['old_topic'] = $topic;
 		$context['new_topic'] = splitTopic($topic, $_SESSION['split_selection'][$topic], $this->_new_topic_subject);
@@ -575,7 +575,7 @@ function isValidEmail($value)
 	}]]></add>
 		</operation>
 	</file>
-	<file name="$boarddir/Mail.subs.php">
+	<file name="SUBSDIR/Mail.subs.php">
 		<operation>
 			<search position="replace"><![CDATA[	// Add our email back to the queue, manually.
 	$db->insert('insert',
@@ -593,7 +593,7 @@ function isValidEmail($value)
 	);]]></add>
 		</operation>
 	</file>
-	<file name="$boarddir/Membergroups.subs.php">
+	<file name="SUBSDIR/Membergroups.subs.php">
 		<operation>
 			<search position="replace"><![CDATA[	// Start collecting the data.
 	$groups = array();
@@ -727,7 +727,7 @@ function isValidEmail($value)
 					$values['subs_' . $name] = (int) $value;]]></add>
 		</operation>
 	</file>
-	<file name="$boarddir/Post.subs.php">
+	<file name="SUBSDIR/Post.subs.php">
 		<operation>
 			<search position="replace"><![CDATA[				$parts[$i] = preg_replace('~(\[footnote\])/me(?: |&nbsp;)([^\n]*?)(\[\/footnote\])~i', '$1[me=' . $user_info['name'] . ']$2[/me]$3', $parts[$i]);
 			}
@@ -849,7 +849,7 @@ function getFormMsgSubject_br_callback($matches)
  * - If $all is true, for all messages in the topic, otherwise only the first message.]]></add>
 		</operation>
 	</file>
-	<file name="$boarddir/Profile.subs.php">
+	<file name="SUBSDIR/Profile.subs.php">
 		<operation>
 			<search position="replace"><![CDATA[			if ($row['field_type'] == 'text' && !empty($row['mask']) && $row['mask'] != 'none')
 			{
@@ -867,7 +867,7 @@ function getFormMsgSubject_br_callback($matches)
 					$value = (int) $value;]]></add>
 		</operation>
 	</file>
-	<file name="$boarddir/Themes.subs.php">
+	<file name="SUBSDIR/Themes.subs.php">
 		<operation>
 			<search position="replace"><![CDATA[{
 	$db = database();
@@ -885,37 +885,7 @@ function getFormMsgSubject_br_callback($matches)
 		$query_param = array('theme_operator' => '=', 'theme' => 1);]]></add>
 		</operation>
 	</file>
-	<file name="$boarddir/TestSubs.php">
-		<operation>
-			<search position="replace"><![CDATA[		foreach ($testStrings as $string => $value)
-			$this->assertEqual(replaceBasicActionUrl($string), $value);
-	}
-}]]></search>
-			<add><![CDATA[		foreach ($testStrings as $string => $value)
-			$this->assertEqual(replaceBasicActionUrl($string), $value);
-	}
-
-	function testValidEmailsTLD()
-	{
-		$testemails = array(
-			// Shortest TLD
-			'simple.email@domain.it',
-			'simple.email@domain.tld',
-			'simple.email@domain.stupid',
-			// This is the longest TLD currently available at http://data.iana.org/TLD/tlds-alpha-by-domain.txt
-			'simple.email@domain.cancerresearch',
-			// These are longer than the maximum currently known
-			'simple.email@domain.cancerresearch1',
-			'simple.email@domain.cancerresearch12',
-			'simple.email@domain.cancerresearch123',
-		);
-		foreach ($testemails as $email)
-			$this->assertTrue(isValidEmail($email) !== false);
-	}
-}]]></add>
-		</operation>
-	</file>
-	<file name="$boarddir/Display.template.php">
+	<file name="THEMEDIR/Display.template.php">
 		<operation>
 			<search position="replace"><![CDATA[		// Maybe they can modify the post (this is the more button)
 		if ($message['can_modify'] || ($context['can_report_moderator']))
@@ -933,7 +903,7 @@ function getFormMsgSubject_br_callback($matches)
 		{]]></add>
 		</operation>
 	</file>
-	<file name="$boarddir/ManageBoards.template.php">
+	<file name="THEMEDIR/ManageBoards.template.php">
 		<operation>
 			<search position="replace"><![CDATA[	else
 		echo '
@@ -979,7 +949,7 @@ function getFormMsgSubject_br_callback($matches)
 		</form>]]></add>
 		</operation>
 	</file>
-	<file name="$boarddir/MessageIndex.template.php">
+	<file name="THEMEDIR/MessageIndex.template.php">
 		<operation>
 			<search position="replace"><![CDATA[						echo '<a class="topicicon img_remove" href="', $scripturl, '?action=quickmod;board=', $context['current_board'], '.', $context['start'], ';actions%5B', $topic['id'], '%5D=remove;', $context['session_var'], '=', $context['session_id'], '" onclick="return confirm(\'', $txt['quickmod_confirm'], '\');" title="', $txt['remove_topic'], '"></a>';
 
@@ -1009,7 +979,7 @@ function getFormMsgSubject_br_callback($matches)
 						echo '<a class="topicicon img_move" href="', $scripturl, '?action=movetopic;current_board=', $context['current_board'], ';board=', $context['current_board'], '.', $context['start'], ';topic=', $topic['id'], '.0" title="', $txt['move_topic'], '"></a>';]]></add>
 		</operation>
 	</file>
-	<file name="$boarddir/Search.template.php">
+	<file name="THEMEDIR/Search.template.php">
 		<operation>
 			<search position="replace"><![CDATA[
 					if ($topic['quick_mod']['lock'])
@@ -1043,7 +1013,7 @@ function getFormMsgSubject_br_callback($matches)
 						echo ']]></add>
 		</operation>
 	</file>
-	<file name="$boarddir/index.css">
+	<file name="THEMEDIR/css/index.css">
 		<operation>
 			<search position="replace"><![CDATA[	overflow: auto;
 }
@@ -1199,7 +1169,7 @@ function getFormMsgSubject_br_callback($matches)
 	.poster .menulevel2 {]]></add>
 		</operation>
 	</file>
-	<file name="$languagedir/ManageMembers.english.php">
+	<file name="LANGUAGEDIR/ManageMembers.english.php">
 		<operation>
 			<search position="replace"><![CDATA[$txt['membergroups_title'] = 'Manage Membergroups';
 $txt['membergroups_description'] = 'Membergroups are groups of members that have similar permission settings, appearance, or access rights. Some membergroups are based on the amount of posts a user has made. You can assign someone to a membergroup by selecting their profile and changing their account settings.';
@@ -1216,7 +1186,7 @@ $txt['membergroups_add_group'] = 'Add group';
 $txt['membergroups_regular'] = 'Regular groups';]]></add>
 		</operation>
 	</file>
-	<file name="$languagedir/ManagePermissions.english.php">
+	<file name="LANGUAGEDIR/ManagePermissions.english.php">
 		<operation>
 			<search position="replace"><![CDATA[$txt['permissions_profile_copy_from'] = 'Copy Permissions From';
 
@@ -1233,7 +1203,7 @@ $txt['permissions_all'] = 'all';
 $txt['permissions_none'] = 'none';]]></add>
 		</operation>
 	</file>
-	<file name="$languagedir/ManageThemes.english.php">
+	<file name="LANGUAGEDIR/ManageThemes.english.php">
 		<operation>
 			<search position="replace"><![CDATA[$txt['actual_theme_dir'] = 'This theme\'s directory: ';
 $txt['actual_theme_url'] = 'This theme\'s URL: ';
@@ -1267,7 +1237,7 @@ $txt['latest_members'] = 'Show latest member on board index.';
 $txt['last_modification'] = 'Show last modification date on modified posts.';]]></add>
 		</operation>
 	</file>
-	<file name="$languagedir/Packages.english.php">
+	<file name="LANGUAGEDIR/Packages.english.php">
 		<operation>
 			<search position="replace"><![CDATA[// Version: 1.0; Packages
 
@@ -1354,7 +1324,7 @@ $txt['avatars_extracted'] = 'The avatars have been installed, you should now be 
 $txt['language_extracted'] = 'The language pack has been installed, you can now enable its use in the language settings area of your admin control panel.';]]></add>
 		</operation>
 	</file>
-	<file name="$languagedir/Who.english.php">
+	<file name="LANGUAGEDIR/Who.english.php">
 		<operation>
 			<search position="replace"><![CDATA[$txt['whoall_login2'] = 'Viewing the login page.';
 $txt['whoall_logout'] = 'Logging out of the forum.';
@@ -1406,7 +1376,7 @@ $txt['whopost_quotefast'] = 'Quoting a post from &quot;<a href="%1$s">%2$s</a>&q
 ]]></add>
 		</operation>
 	</file>
-	<file name="$themedir/scripts/jquery.sceditor.elkarte.js">
+	<file name="THEMEDIR/scripts/jquery.sceditor.elkarte.js">
 		<operation>
 			<search position="replace"><![CDATA[		}
 	})
@@ -1533,7 +1503,7 @@ $txt['whopost_quotefast'] = 'Quoting a post from &quot;<a href="%1$s">%2$s</a>&q
 				return '';]]></add>
 		</operation>
 	</file>
-	<file name="$themedir/scripts/script.js">
+	<file name="THEMEDIR/scripts/script.js">
 		<operation>
 			<search position="replace"><![CDATA[ */
 function elk_setThemeOption(option, value, theme, additional_vars)
@@ -1636,7 +1606,7 @@ JumpTo.prototype.fillSelect = function (aBoardsAndCategories)
 }]]></add>
 		</operation>
 	</file>
-	<file name="$themedir/scripts/script_elk.js">
+	<file name="THEMEDIR/scripts/script_elk.js">
 		<operation>
 			<search position="replace"><![CDATA[ *
  * @param {string} btn string representing this, generally the anchor link tag <a class="" href="" onclick="">
