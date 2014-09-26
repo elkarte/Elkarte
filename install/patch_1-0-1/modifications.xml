@@ -1805,7 +1805,7 @@ function getFormMsgSubject_br_callback($matches)
 	.poster .menulevel2 {]]></add>
 		</operation>
 	</file>
-	<file name="LANGUAGEDIR/ManageMembers.english.php">
+	<file name="LANGUAGEDIR/english/ManageMembers.english.php">
 		<operation>
 			<search position="replace"><![CDATA[$txt['membergroups_title'] = 'Manage Membergroups';
 $txt['membergroups_description'] = 'Membergroups are groups of members that have similar permission settings, appearance, or access rights. Some membergroups are based on the amount of posts a user has made. You can assign someone to a membergroup by selecting their profile and changing their account settings.';
@@ -1822,7 +1822,7 @@ $txt['membergroups_add_group'] = 'Add group';
 $txt['membergroups_regular'] = 'Regular groups';]]></add>
 		</operation>
 	</file>
-	<file name="LANGUAGEDIR/ManagePermissions.english.php">
+	<file name="LANGUAGEDIR/english/ManagePermissions.english.php">
 		<operation>
 			<search position="replace"><![CDATA[$txt['permissions_profile_copy_from'] = 'Copy Permissions From';
 
@@ -1839,7 +1839,7 @@ $txt['permissions_all'] = 'all';
 $txt['permissions_none'] = 'none';]]></add>
 		</operation>
 	</file>
-	<file name="LANGUAGEDIR/ManageThemes.english.php">
+	<file name="LANGUAGEDIR/english/ManageThemes.english.php">
 		<operation>
 			<search position="replace"><![CDATA[$txt['actual_theme_dir'] = 'This theme\'s directory: ';
 $txt['actual_theme_url'] = 'This theme\'s URL: ';
@@ -1873,7 +1873,7 @@ $txt['latest_members'] = 'Show latest member on board index.';
 $txt['last_modification'] = 'Show last modification date on modified posts.';]]></add>
 		</operation>
 	</file>
-	<file name="LANGUAGEDIR/Packages.english.php">
+	<file name="LANGUAGEDIR/english/Packages.english.php">
 		<operation>
 			<search position="replace"><![CDATA[// Version: 1.0; Packages
 
@@ -1960,7 +1960,7 @@ $txt['avatars_extracted'] = 'The avatars have been installed, you should now be 
 $txt['language_extracted'] = 'The language pack has been installed, you can now enable its use in the language settings area of your admin control panel.';]]></add>
 		</operation>
 	</file>
-	<file name="LANGUAGEDIR/Who.english.php">
+	<file name="LANGUAGEDIR/english/Who.english.php">
 		<operation>
 			<search position="replace"><![CDATA[$txt['whoall_login2'] = 'Viewing the login page.';
 $txt['whoall_logout'] = 'Logging out of the forum.';
@@ -2012,7 +2012,7 @@ $txt['whopost_quotefast'] = 'Quoting a post from &quot;<a href="%1$s">%2$s</a>&q
 ]]></add>
 		</operation>
 	</file>
-	<file name="LANGUAGEDIR/index.english.php">
+	<file name="LANGUAGEDIR/english/index.english.php">
 		<operation>
 			<search position="replace"><![CDATA[$txt['unnotify'] = 'Unnotify';
 $txt['notify_request'] = 'Do you want a notification email if someone replies to this topic?';
