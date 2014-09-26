@@ -6,6 +6,22 @@
 	<version>1.0</version>
 	<file name="BOARDDIR/SSI.php">
 		<operation>
+			<search position="replace"><![CDATA[ * copyright:	2011 Simple Machines (http://www.simplemachines.org)
+ * license:		BSD, See included LICENSE.TXT for terms and conditions.
+ *
+ * @version 1.0
+ *
+ */
+]]></search>
+			<add><![CDATA[ * copyright:	2011 Simple Machines (http://www.simplemachines.org)
+ * license:		BSD, See included LICENSE.TXT for terms and conditions.
+ *
+ * @version 1.0.1
+ *
+ */
+]]></add>
+		</operation>
+		<operation>
 			<search position="replace"><![CDATA[
 	echo '
 		<form action="', $scripturl, '?action=search;sa=results" method="post" accept-charset="UTF-8">
@@ -47,7 +63,83 @@
 }]]></add>
 		</operation>
 	</file>
+	<file name="BOARDDIR/index.php">
+		<operation>
+			<search position="replace"><![CDATA[ * copyright:	2011 Simple Machines (http://www.simplemachines.org)
+ * license:		BSD, See included LICENSE.TXT for terms and conditions.
+ *
+ * @version 1.0
+ *
+ */
+
+$forum_version = 'ElkArte 1.0';
+
+// First things first, but not necessarily in that order.
+define('ELK', 1);]]></search>
+			<add><![CDATA[ * copyright:	2011 Simple Machines (http://www.simplemachines.org)
+ * license:		BSD, See included LICENSE.TXT for terms and conditions.
+ *
+ * @version 1.0.1
+ *
+ */
+
+$forum_version = 'ElkArte 1.0.1';
+
+// First things first, but not necessarily in that order.
+define('ELK', 1);]]></add>
+		</operation>
+	</file>
+	<file name="SOURCEDIR/Load.php">
+		<operation>
+			<search position="replace"><![CDATA[ * copyright:	2011 Simple Machines (http://www.simplemachines.org)
+ * license:		BSD, See included LICENSE.TXT for terms and conditions.
+ *
+ * @version 1.0
+ *
+ */
+]]></search>
+			<add><![CDATA[ * copyright:	2011 Simple Machines (http://www.simplemachines.org)
+ * license:		BSD, See included LICENSE.TXT for terms and conditions.
+ *
+ * @version 1.0.1
+ *
+ */
+]]></add>
+		</operation>
+		<operation>
+			<search position="replace"><![CDATA[	$context['session_var'] = $_SESSION['session_var'];
+	$context['session_id'] = $_SESSION['session_value'];
+	$context['forum_name'] = $mbname;
+	$context['forum_name_html_safe'] = Util::htmlspecialchars($context['forum_name']);
+	$context['current_action'] = isset($_REQUEST['action']) ? $_REQUEST['action'] : null;
+	$context['current_subaction'] = isset($_REQUEST['sa']) ? $_REQUEST['sa'] : null;
+	$context['can_register'] = empty($modSettings['registration_method']) || $modSettings['registration_method'] != 3;]]></search>
+			<add><![CDATA[	$context['session_var'] = $_SESSION['session_var'];
+	$context['session_id'] = $_SESSION['session_value'];
+	$context['forum_name'] = $mbname;
+	$context['forum_name_html_safe'] = $context['forum_name'];
+	$context['current_action'] = isset($_REQUEST['action']) ? $_REQUEST['action'] : null;
+	$context['current_subaction'] = isset($_REQUEST['sa']) ? $_REQUEST['sa'] : null;
+	$context['can_register'] = empty($modSettings['registration_method']) || $modSettings['registration_method'] != 3;]]></add>
+		</operation>
+	</file>
 	<file name="SOURCEDIR/Subs.php">
+		<operation>
+			<search position="replace"><![CDATA[ * copyright:	2011 Simple Machines (http://www.simplemachines.org)
+ * license:		BSD, See included LICENSE.TXT for terms and conditions.
+ *
+ * @version 1.0
+ *
+ */
+]]></search>
+			<add><![CDATA[ * copyright:	2011 Simple Machines (http://www.simplemachines.org)
+ * license:		BSD, See included LICENSE.TXT for terms and conditions.
+ *
+ * @version 1.0.1
+ *
+ */
+]]></add>
+		</operation>
 		<operation>
 			<search position="replace"><![CDATA[	global $txt, $scripturl, $context, $modSettings, $user_info;
 
@@ -193,6 +285,36 @@
 	if ($cache_id != '' && !empty($modSettings['cache_enable']) && (($modSettings['cache_enable'] >= 2 && isset($message[1000])) || isset($message[2400])) && empty($parse_tags))]]></add>
 		</operation>
 		<operation>
+			<search position="replace"><![CDATA[		$find = array(
+			'{forum_name}',
+			'{forum_name_html_safe}',
+			'{script_url}',
+			'{board_url}',
+			'{login_url}',]]></search>
+			<add><![CDATA[		$find = array(
+			'{forum_name}',
+			'{forum_name_html_safe}',
+			'{forum_name_html_unsafe}',
+			'{script_url}',
+			'{board_url}',
+			'{login_url}',]]></add>
+		</operation>
+		<operation>
+			<search position="replace"><![CDATA[		$replace = array(
+			$context['forum_name'],
+			$context['forum_name_html_safe'],
+			$scripturl,
+			$boardurl,
+			$scripturl . '?action=login',]]></search>
+			<add><![CDATA[		$replace = array(
+			$context['forum_name'],
+			$context['forum_name_html_safe'],
+			un_htmlspecialchars($context['forum_name_html_safe']),
+			$scripturl,
+			$boardurl,
+			$scripturl . '?action=login',]]></add>
+		</operation>
+		<operation>
 			<search position="replace"><![CDATA[	}
 
 	return $response_prefix;
@@ -222,6 +344,22 @@ function isValidEmail($value)
 	</file>
 	<file name="ADMINDIR/ManageBoards.controller.php">
 		<operation>
+			<search position="replace"><![CDATA[ * copyright:	2011 Simple Machines (http://www.simplemachines.org)
+ * license:		BSD, See included LICENSE.TXT for terms and conditions.
+ *
+ * @version 1.0
+ *
+ */
+]]></search>
+			<add><![CDATA[ * copyright:	2011 Simple Machines (http://www.simplemachines.org)
+ * license:		BSD, See included LICENSE.TXT for terms and conditions.
+ *
+ * @version 1.0.1
+ *
+ */
+]]></add>
+		</operation>
+		<operation>
 			<search position="replace"><![CDATA[		// If they want to delete - first give them confirmation.
 		elseif (isset($_POST['delete']) && !isset($_POST['confirmation']) && !isset($_POST['empty']))
 		{
@@ -241,6 +379,22 @@ function isValidEmail($value)
 	</file>
 	<file name="ADMINDIR/ManageCalendar.controller.php">
 		<operation>
+			<search position="replace"><![CDATA[ * copyright:	2011 Simple Machines (http://www.simplemachines.org)
+ * license:		BSD, See included LICENSE.TXT for terms and conditions.
+ *
+ * @version 1.0
+ *
+ */
+]]></search>
+			<add><![CDATA[ * copyright:	2011 Simple Machines (http://www.simplemachines.org)
+ * license:		BSD, See included LICENSE.TXT for terms and conditions.
+ *
+ * @version 1.0.1
+ *
+ */
+]]></add>
+		</operation>
+		<operation>
 			<search position="replace"><![CDATA[
 		// Get the final touches in place.
 		$context['post_url'] = $scripturl . '?action=admin;area=managecalendar;save;sa=settings';
@@ -256,7 +410,77 @@ function isValidEmail($value)
 		if (isset($_GET['save']))]]></add>
 		</operation>
 	</file>
+	<file name="ADMINDIR/ManageNews.controller.php">
+		<operation>
+			<search position="replace"><![CDATA[ * copyright:	2011 Simple Machines (http://www.simplemachines.org)
+ * license:		BSD, See included LICENSE.TXT for terms and conditions.
+ *
+ * @version 1.0
+ *
+ */
+]]></search>
+			<add><![CDATA[ * copyright:	2011 Simple Machines (http://www.simplemachines.org)
+ * license:		BSD, See included LICENSE.TXT for terms and conditions.
+ *
+ * @version 1.0.1
+ *
+ */
+]]></add>
+		</operation>
+		<operation>
+			<search position="replace"><![CDATA[		// Setup the template!
+		$context['page_title'] = $txt['admin_newsletters'];
+		$context['sub_template'] = 'email_members_compose';
+		$context['subject'] = !empty($_POST['subject']) ? $_POST['subject'] : htmlspecialchars($context['forum_name'] . ': ' . $txt['subject'], ENT_COMPAT, 'UTF-8');
+		$context['message'] = !empty($_POST['message']) ? $_POST['message'] : htmlspecialchars($txt['message'] . "\n\n" . replaceBasicActionUrl($txt['regards_team']) . "\n\n" . '{$board_url}', ENT_COMPAT, 'UTF-8');
+
+		// Needed for the WYSIWYG editor.]]></search>
+			<add><![CDATA[		// Setup the template!
+		$context['page_title'] = $txt['admin_newsletters'];
+		$context['sub_template'] = 'email_members_compose';
+		$context['subject'] = !empty($_POST['subject']) ? $_POST['subject'] : $context['forum_name'] . ': ' . htmlspecialchars($txt['subject'], ENT_COMPAT, 'UTF-8');
+		$context['message'] = !empty($_POST['message']) ? $_POST['message'] : htmlspecialchars($txt['message'] . "\n\n" . replaceBasicActionUrl($txt['regards_team']) . "\n\n" . '{$board_url}', ENT_COMPAT, 'UTF-8');
+
+		// Needed for the WYSIWYG editor.]]></add>
+		</operation>
+		<operation>
+			<search position="replace"><![CDATA[			foreach ($mods as $row)
+			{
+				if (in_array(3, $context['recipients']))
+					$context['recipients']['exclude_members'][] = $row['identifier'];
+				else
+					$context['recipients']['members'][] = $row['identifier'];
+			}
+		}
+]]></search>
+			<add><![CDATA[			foreach ($mods as $row)
+			{
+				if (in_array(3, $context['recipients']))
+					$context['recipients']['exclude_members'][] = $row;
+				else
+					$context['recipients']['members'][] = $row;
+			}
+		}
+]]></add>
+		</operation>
+	</file>
 	<file name="ADMINDIR/ManagePermissions.controller.php">
+		<operation>
+			<search position="replace"><![CDATA[ * copyright:	2011 Simple Machines (http://www.simplemachines.org)
+ * license:		BSD, See included LICENSE.TXT for terms and conditions.
+ *
+ * @version 1.0
+ *
+ */
+]]></search>
+			<add><![CDATA[ * copyright:	2011 Simple Machines (http://www.simplemachines.org)
+ * license:		BSD, See included LICENSE.TXT for terms and conditions.
+ *
+ * @version 1.0.1
+ *
+ */
+]]></add>
+		</operation>
 		<operation>
 			<search position="replace"><![CDATA[				'name' => array(
 					'header' => array(
@@ -451,6 +675,22 @@ function isValidEmail($value)
 	</file>
 	<file name="ADMINDIR/ManageThemes.controller.php">
 		<operation>
+			<search position="replace"><![CDATA[ * copyright:	2011 Simple Machines (http://www.simplemachines.org)
+ * license:		BSD, See included LICENSE.TXT for terms and conditions.
+ *
+ * @version 1.0
+ *
+ *
+ * @todo Update this for the new package manager?]]></search>
+			<add><![CDATA[ * copyright:	2011 Simple Machines (http://www.simplemachines.org)
+ * license:		BSD, See included LICENSE.TXT for terms and conditions.
+ *
+ * @version 1.0.1
+ *
+ *
+ * @todo Update this for the new package manager?]]></add>
+		</operation>
+		<operation>
 			<search position="replace"><![CDATA[				elseif ($_POST['default_options_master'][$opt] == 1)
 				{
 					// Delete then insert for ease of database compatibility!
@@ -468,6 +708,22 @@ function isValidEmail($value)
 		</operation>
 	</file>
 	<file name="ADMINDIR/PackageServers.controller.php">
+		<operation>
+			<search position="replace"><![CDATA[ * copyright:	2011 Simple Machines (http://www.simplemachines.org)
+ * license:		BSD, See included LICENSE.TXT for terms and conditions.
+ *
+ * @version 1.0
+ *
+ */
+]]></search>
+			<add><![CDATA[ * copyright:	2011 Simple Machines (http://www.simplemachines.org)
+ * license:		BSD, See included LICENSE.TXT for terms and conditions.
+ *
+ * @version 1.0.1
+ *
+ */
+]]></add>
+		</operation>
 		<operation>
 			<search position="replace"><![CDATA[						if (!empty($package['author']['email']))
 						{
@@ -487,6 +743,22 @@ function isValidEmail($value)
 	</file>
 	<file name="ADMINDIR/Packages.controller.php">
 		<operation>
+			<search position="replace"><![CDATA[ * copyright:	2011 Simple Machines (http://www.simplemachines.org)
+ * license:		BSD, See included LICENSE.TXT for terms and conditions.
+ *
+ * @version 1.0
+ *
+ */
+]]></search>
+			<add><![CDATA[ * copyright:	2011 Simple Machines (http://www.simplemachines.org)
+ * license:		BSD, See included LICENSE.TXT for terms and conditions.
+ *
+ * @version 1.0.1
+ *
+ */
+]]></add>
+		</operation>
+		<operation>
 			<search position="replace"><![CDATA[			elseif ($action['type'] == 'credits')
 			{
 				$thisAction = array(
@@ -504,6 +776,22 @@ function isValidEmail($value)
 		</operation>
 	</file>
 	<file name="CONTROLLERDIR/Post.controller.php">
+		<operation>
+			<search position="replace"><![CDATA[ * copyright:	2011 Simple Machines (http://www.simplemachines.org)
+ * license:		BSD, See included LICENSE.TXT for terms and conditions.
+ *
+ * @version 1.0
+ *
+ */
+]]></search>
+			<add><![CDATA[ * copyright:	2011 Simple Machines (http://www.simplemachines.org)
+ * license:		BSD, See included LICENSE.TXT for terms and conditions.
+ *
+ * @version 1.0.1
+ *
+ */
+]]></add>
+		</operation>
 		<operation>
 			<search position="replace"><![CDATA[		{
 			$context['icons'][count($context['icons']) - 1]['is_last'] = true;
@@ -542,6 +830,22 @@ function isValidEmail($value)
 	</file>
 	<file name="CONTROLLERDIR/Register.controller.php">
 		<operation>
+			<search position="replace"><![CDATA[ * copyright:	2011 Simple Machines (http://www.simplemachines.org)
+ * license:		BSD, See included LICENSE.TXT for terms and conditions.
+ *
+ * @version 1.0
+ *
+ */
+]]></search>
+			<add><![CDATA[ * copyright:	2011 Simple Machines (http://www.simplemachines.org)
+ * license:		BSD, See included LICENSE.TXT for terms and conditions.
+ *
+ * @version 1.0.1
+ *
+ */
+]]></add>
+		</operation>
+		<operation>
 			<search position="replace"><![CDATA[				if ($row['type'] == 'text' && !empty($row['mask']) && $row['mask'] != 'none')
 				{
 					// @todo We never error on this - just ignore it at the moment...
@@ -560,6 +864,22 @@ function isValidEmail($value)
 	</file>
 	<file name="CONTROLLERDIR/SplitTopics.controller.php">
 		<operation>
+			<search position="replace"><![CDATA[ * copyright:	2011 Simple Machines (http://www.simplemachines.org)
+ * license:		BSD, See included LICENSE.TXT for terms and conditions.
+ *
+ * @version 1.0
+ *
+ * Original module by Mach8 - We'll never forget you.
+ */]]></search>
+			<add><![CDATA[ * copyright:	2011 Simple Machines (http://www.simplemachines.org)
+ * license:		BSD, See included LICENSE.TXT for terms and conditions.
+ *
+ * @version 1.0.1
+ *
+ * Original module by Mach8 - We'll never forget you.
+ */]]></add>
+		</operation>
+		<operation>
 			<search position="replace"><![CDATA[		$context['old_topic'] = $topic;
 		$context['new_topic'] = splitTopic($topic, $_SESSION['split_selection'][$topic], $this->_new_topic_subject);
 		$context['page_title'] = $txt['split_topic'];
@@ -576,6 +896,22 @@ function isValidEmail($value)
 		</operation>
 	</file>
 	<file name="SUBSDIR/Mail.subs.php">
+		<operation>
+			<search position="replace"><![CDATA[ * copyright:	2011 Simple Machines (http://www.simplemachines.org)
+ * license:  	BSD, See included LICENSE.TXT for terms and conditions.
+ *
+ * @version 1.0
+ *
+ */
+]]></search>
+			<add><![CDATA[ * copyright:	2011 Simple Machines (http://www.simplemachines.org)
+ * license:  	BSD, See included LICENSE.TXT for terms and conditions.
+ *
+ * @version 1.0.1
+ *
+ */
+]]></add>
+		</operation>
 		<operation>
 			<search position="replace"><![CDATA[	// Add our email back to the queue, manually.
 	$db->insert('insert',
@@ -594,6 +930,22 @@ function isValidEmail($value)
 		</operation>
 	</file>
 	<file name="SUBSDIR/Membergroups.subs.php">
+		<operation>
+			<search position="replace"><![CDATA[ * copyright:	2011 Simple Machines (http://www.simplemachines.org)
+ * license:  	BSD, See included LICENSE.TXT for terms and conditions.
+ *
+ * @version 1.0
+ *
+ */
+]]></search>
+			<add><![CDATA[ * copyright:	2011 Simple Machines (http://www.simplemachines.org)
+ * license:  	BSD, See included LICENSE.TXT for terms and conditions.
+ *
+ * @version 1.0.1
+ *
+ */
+]]></add>
+		</operation>
 		<operation>
 			<search position="replace"><![CDATA[	// Start collecting the data.
 	$groups = array();
@@ -729,6 +1081,22 @@ function isValidEmail($value)
 	</file>
 	<file name="SUBSDIR/Post.subs.php">
 		<operation>
+			<search position="replace"><![CDATA[ * copyright:	2011 Simple Machines (http://www.simplemachines.org)
+ * license:  	BSD, See included LICENSE.TXT for terms and conditions.
+ *
+ * @version 1.0
+ *
+ */
+]]></search>
+			<add><![CDATA[ * copyright:	2011 Simple Machines (http://www.simplemachines.org)
+ * license:  	BSD, See included LICENSE.TXT for terms and conditions.
+ *
+ * @version 1.0.1
+ *
+ */
+]]></add>
+		</operation>
+		<operation>
 			<search position="replace"><![CDATA[				$parts[$i] = preg_replace('~(\[footnote\])/me(?: |&nbsp;)([^\n]*?)(\[\/footnote\])~i', '$1[me=' . $user_info['name'] . ']$2[/me]$3', $parts[$i]);
 			}
 
@@ -851,6 +1219,22 @@ function getFormMsgSubject_br_callback($matches)
 	</file>
 	<file name="SUBSDIR/Profile.subs.php">
 		<operation>
+			<search position="replace"><![CDATA[ * copyright:	2011 Simple Machines (http://www.simplemachines.org)
+ * license:  	BSD, See included LICENSE.TXT for terms and conditions.
+ *
+ * @version 1.0
+ *
+ */
+]]></search>
+			<add><![CDATA[ * copyright:	2011 Simple Machines (http://www.simplemachines.org)
+ * license:  	BSD, See included LICENSE.TXT for terms and conditions.
+ *
+ * @version 1.0.1
+ *
+ */
+]]></add>
+		</operation>
+		<operation>
 			<search position="replace"><![CDATA[			if ($row['field_type'] == 'text' && !empty($row['mask']) && $row['mask'] != 'none')
 			{
 				// @todo We never error on this - just ignore it at the moment...
@@ -867,7 +1251,195 @@ function getFormMsgSubject_br_callback($matches)
 					$value = (int) $value;]]></add>
 		</operation>
 	</file>
+	<file name="SUBSDIR/ScheduledTask.class.php">
+		<operation>
+			<search position="replace"><![CDATA[ * copyright:	2011 Simple Machines (http://www.simplemachines.org)
+ * license:  	BSD, See included LICENSE.TXT for terms and conditions.
+ *
+ * @version 1.0
+ *
+ */
+]]></search>
+			<add><![CDATA[ * copyright:	2011 Simple Machines (http://www.simplemachines.org)
+ * license:  	BSD, See included LICENSE.TXT for terms and conditions.
+ *
+ * @version 1.0.1
+ *
+ */
+]]></add>
+		</operation>
+		<operation>
+			<search position="replace"><![CDATA[					SELECT id_report
+					FROM {db_prefix}log_reported
+					WHERE time_started < {int:time_started}
+						AND closed = {int:not_closed}
+						AND ignore_all = {int:not_ignored}',
+					array(
+						'time_started' => $t,
+						'not_closed' => 0,
+						'not_ignored' => 0,
+					)
+				);
+				while ($row = $db->fetch_row($result))]]></search>
+			<add><![CDATA[					SELECT id_report
+					FROM {db_prefix}log_reported
+					WHERE time_started < {int:time_started}
+						AND closed = {int:closed}',
+					array(
+						'time_started' => $t,
+						'closed' => 1,
+					)
+				);
+				while ($row = $db->fetch_row($result))]]></add>
+		</operation>
+	</file>
+	<file name="SUBSDIR/SettingsForm.class.php">
+		<operation>
+			<search position="replace"><![CDATA[ * copyright:	2011 Simple Machines (http://www.simplemachines.org)
+ * license:  	BSD, See included LICENSE.TXT for terms and conditions.
+ *
+ * @version 1.0
+ *
+ *
+ * Adding options to one of the setting screens isn't hard.]]></search>
+			<add><![CDATA[ * copyright:	2011 Simple Machines (http://www.simplemachines.org)
+ * license:  	BSD, See included LICENSE.TXT for terms and conditions.
+ *
+ * @version 1.0.1
+ *
+ *
+ * Adding options to one of the setting screens isn't hard.]]></add>
+		</operation>
+		<operation>
+			<search position="replace"><![CDATA[			'cachedir',
+		);
+
+		foreach ($this->_config_vars as $identifier => $config_var)
+		{
+			if (!is_array($config_var) || !isset($config_var[1]))]]></search>
+			<add><![CDATA[			'cachedir',
+		);
+
+		$safe_strings = array(
+			'mtitle', 'mmessage', 'mbname',
+		);
+
+		foreach ($this->_config_vars as $identifier => $config_var)
+		{
+			if (!is_array($config_var) || !isset($config_var[1]))]]></add>
+		</operation>
+		<operation>
+			<search position="replace"><![CDATA[					$config_var[1] = substr($config_var[1], 0, $divPos);
+				}
+
+				$context['config_vars'][$config_var[0]] = array(
+					'label' => $config_var[1],
+					'help' => isset($config_var[5]) ? $config_var[5] : '',]]></search>
+			<add><![CDATA[					$config_var[1] = substr($config_var[1], 0, $divPos);
+				}
+
+				if ($config_var[2] == 'file')
+				{
+					$value = in_array($varname, $defines) ? constant(strtoupper($varname)) : htmlspecialchars($$varname, ENT_COMPAT, 'UTF-8');
+					if (in_array($varname, $safe_strings))
+						$value = htmlspecialchars_decode($value, ENT_NOQUOTES);
+				}
+				else
+					$value = isset($modSettings[$config_var[0]]) ? htmlspecialchars($modSettings[$config_var[0]], ENT_COMPAT, 'UTF-8') : (in_array($config_var[3], array('int', 'float')) ? 0 : '');
+
+				$context['config_vars'][$config_var[0]] = array(
+					'label' => $config_var[1],
+					'help' => isset($config_var[5]) ? $config_var[5] : '',]]></add>
+		</operation>
+		<operation>
+			<search position="replace"><![CDATA[					'size' => empty($config_var[4]) ? 0 : $config_var[4],
+					'data' => isset($config_var[4]) && is_array($config_var[4]) && $config_var[3] != 'select' ? $config_var[4] : array(),
+					'name' => $config_var[0],
+					'value' => $config_var[2] == 'file' ? (in_array($varname, $defines) ? constant(strtoupper($varname)) : htmlspecialchars($$varname, ENT_COMPAT, 'UTF-8')) : (isset($modSettings[$config_var[0]]) ? htmlspecialchars($modSettings[$config_var[0]], ENT_COMPAT, 'UTF-8') : (in_array($config_var[3], array('int', 'float')) ? 0 : '')),
+					'disabled' => !empty($context['settings_not_writable']) || !empty($config_var['disabled']),
+					'invalid' => false,
+					'subtext' => !empty($config_var['subtext']) ? $config_var['subtext'] : $subtext,]]></search>
+			<add><![CDATA[					'size' => empty($config_var[4]) ? 0 : $config_var[4],
+					'data' => isset($config_var[4]) && is_array($config_var[4]) && $config_var[3] != 'select' ? $config_var[4] : array(),
+					'name' => $config_var[0],
+					'value' => $value,
+					'disabled' => !empty($context['settings_not_writable']) || !empty($config_var['disabled']),
+					'invalid' => false,
+					'subtext' => !empty($config_var['subtext']) ? $config_var['subtext'] : $subtext,]]></add>
+		</operation>
+		<operation>
+			<search position="replace"><![CDATA[					if ($config_var[0] == 'select' && !empty($config_var['multiple']))
+					{
+						$context['config_vars'][$config_var[1]]['name'] .= '[]';
+						$context['config_vars'][$config_var[1]]['value'] = unserialize($context['config_vars'][$config_var[1]]['value']);
+					}
+
+					// If it's associative]]></search>
+			<add><![CDATA[					if ($config_var[0] == 'select' && !empty($config_var['multiple']))
+					{
+						$context['config_vars'][$config_var[1]]['name'] .= '[]';
+						$context['config_vars'][$config_var[1]]['value'] = !empty($context['config_vars'][$config_var[1]]['value']) ? unserialize($context['config_vars'][$config_var[1]]['value']) : array();
+					}
+
+					// If it's associative]]></add>
+		</operation>
+		<operation>
+			<search position="replace"><![CDATA[			'cache_accelerator', 'cache_memcached', 'cache_uid',
+		);
+
+		// All the numeric variables.
+		$config_ints = array(
+			'cache_enable',]]></search>
+			<add><![CDATA[			'cache_accelerator', 'cache_memcached', 'cache_uid',
+		);
+
+		$safe_strings = array(
+			'mtitle', 'mmessage', 'mbname',
+		);
+
+		// All the numeric variables.
+		$config_ints = array(
+			'cache_enable',]]></add>
+		</operation>
+		<operation>
+			<search position="replace"><![CDATA[		foreach ($config_strs as $config_var)
+		{
+			if (isset($_POST[$config_var]))
+				$new_settings[$config_var] = '\'' . addcslashes($_POST[$config_var], '\'\\') . '\'';
+		}
+
+		foreach ($config_ints as $config_var)]]></search>
+			<add><![CDATA[		foreach ($config_strs as $config_var)
+		{
+			if (isset($_POST[$config_var]))
+			{
+				if (in_array($config_var, $safe_strings))
+					$new_settings[$config_var] = '\'' . addcslashes(Util::htmlspecialchars($_POST[$config_var], ENT_QUOTES), '\'\\') . '\'';
+				else
+					$new_settings[$config_var] = '\'' . addcslashes($_POST[$config_var], '\'\\') . '\'';
+			}
+		}
+
+		foreach ($config_ints as $config_var)]]></add>
+		</operation>
+	</file>
 	<file name="SUBSDIR/Themes.subs.php">
+		<operation>
+			<search position="replace"><![CDATA[ * @copyright ElkArte Forum contributors
+ * @license   BSD http://opensource.org/licenses/BSD-3-Clause
+ *
+ * @version 1.0
+ *
+ */
+]]></search>
+			<add><![CDATA[ * @copyright ElkArte Forum contributors
+ * @license   BSD http://opensource.org/licenses/BSD-3-Clause
+ *
+ * @version 1.0.1
+ *
+ */
+]]></add>
+		</operation>
 		<operation>
 			<search position="replace"><![CDATA[{
 	$db = database();
@@ -887,6 +1459,22 @@ function getFormMsgSubject_br_callback($matches)
 	</file>
 	<file name="THEMEDIR/Display.template.php">
 		<operation>
+			<search position="replace"><![CDATA[ * copyright:	2011 Simple Machines (http://www.simplemachines.org)
+ * license:  	BSD, See included LICENSE.TXT for terms and conditions.
+ *
+ * @version 1.0
+ *
+ */
+]]></search>
+			<add><![CDATA[ * copyright:	2011 Simple Machines (http://www.simplemachines.org)
+ * license:  	BSD, See included LICENSE.TXT for terms and conditions.
+ *
+ * @version 1.0.1
+ *
+ */
+]]></add>
+		</operation>
+		<operation>
 			<search position="replace"><![CDATA[		// Maybe they can modify the post (this is the more button)
 		if ($message['can_modify'] || ($context['can_report_moderator']))
 			echo '
@@ -904,6 +1492,22 @@ function getFormMsgSubject_br_callback($matches)
 		</operation>
 	</file>
 	<file name="THEMEDIR/ManageBoards.template.php">
+		<operation>
+			<search position="replace"><![CDATA[ * copyright:	2011 Simple Machines (http://www.simplemachines.org)
+ * license:  	BSD, See included LICENSE.TXT for terms and conditions.
+ *
+ * @version 1.0
+ *
+ */
+]]></search>
+			<add><![CDATA[ * copyright:	2011 Simple Machines (http://www.simplemachines.org)
+ * license:  	BSD, See included LICENSE.TXT for terms and conditions.
+ *
+ * @version 1.0.1
+ *
+ */
+]]></add>
+		</operation>
 		<operation>
 			<search position="replace"><![CDATA[	else
 		echo '
@@ -951,6 +1555,22 @@ function getFormMsgSubject_br_callback($matches)
 	</file>
 	<file name="THEMEDIR/MessageIndex.template.php">
 		<operation>
+			<search position="replace"><![CDATA[ * copyright:	2011 Simple Machines (http://www.simplemachines.org)
+ * license:  	BSD, See included LICENSE.TXT for terms and conditions.
+ *
+ * @version 1.0
+ *
+ */
+]]></search>
+			<add><![CDATA[ * copyright:	2011 Simple Machines (http://www.simplemachines.org)
+ * license:  	BSD, See included LICENSE.TXT for terms and conditions.
+ *
+ * @version 1.0.1
+ *
+ */
+]]></add>
+		</operation>
+		<operation>
 			<search position="replace"><![CDATA[						echo '<a class="topicicon img_remove" href="', $scripturl, '?action=quickmod;board=', $context['current_board'], '.', $context['start'], ';actions%5B', $topic['id'], '%5D=remove;', $context['session_var'], '=', $context['session_id'], '" onclick="return confirm(\'', $txt['quickmod_confirm'], '\');" title="', $txt['remove_topic'], '"></a>';
 
 					if ($topic['quick_mod']['lock'])
@@ -980,6 +1600,22 @@ function getFormMsgSubject_br_callback($matches)
 		</operation>
 	</file>
 	<file name="THEMEDIR/Search.template.php">
+		<operation>
+			<search position="replace"><![CDATA[ * copyright:	2011 Simple Machines (http://www.simplemachines.org)
+ * license:  	BSD, See included LICENSE.TXT for terms and conditions.
+ *
+ * @version 1.0
+ *
+ */
+]]></search>
+			<add><![CDATA[ * copyright:	2011 Simple Machines (http://www.simplemachines.org)
+ * license:  	BSD, See included LICENSE.TXT for terms and conditions.
+ *
+ * @version 1.0.1
+ *
+ */
+]]></add>
+		</operation>
 		<operation>
 			<search position="replace"><![CDATA[
 					if ($topic['quick_mod']['lock'])
@@ -1376,7 +2012,41 @@ $txt['whopost_quotefast'] = 'Quoting a post from &quot;<a href="%1$s">%2$s</a>&q
 ]]></add>
 		</operation>
 	</file>
+	<file name="LANGUAGEDIR/index.english.php">
+		<operation>
+			<search position="replace"><![CDATA[$txt['unnotify'] = 'Unnotify';
+$txt['notify_request'] = 'Do you want a notification email if someone replies to this topic?';
+// Use numeric entities in the below string.
+$txt['regards_team'] = "Regards,\nThe {forum_name} Team.";
+$txt['notify_replies'] = 'Notify of replies';
+$txt['move_topic'] = 'Move';
+$txt['move_to'] = 'Move to';]]></search>
+			<add><![CDATA[$txt['unnotify'] = 'Unnotify';
+$txt['notify_request'] = 'Do you want a notification email if someone replies to this topic?';
+// Use numeric entities in the below string.
+$txt['regards_team'] = "Regards,\nThe {forum_name_html_unsafe} Team.";
+$txt['notify_replies'] = 'Notify of replies';
+$txt['move_topic'] = 'Move';
+$txt['move_to'] = 'Move to';]]></add>
+		</operation>
+	</file>
 	<file name="THEMEDIR/scripts/jquery.sceditor.elkarte.js">
+		<operation>
+			<search position="replace"><![CDATA[ * copyright:	2011 Simple Machines (http://www.simplemachines.org)
+ * license:		BSD, See included LICENSE.TXT for terms and conditions.
+ *
+ * @version 1.0
+ * Extension functions to provide ElkArte compatibility with sceditor
+ */
+]]></search>
+			<add><![CDATA[ * copyright:	2011 Simple Machines (http://www.simplemachines.org)
+ * license:		BSD, See included LICENSE.TXT for terms and conditions.
+ *
+ * @version 1.0.1
+ * Extension functions to provide ElkArte compatibility with sceditor
+ */
+]]></add>
+		</operation>
 		<operation>
 			<search position="replace"><![CDATA[		}
 	})
@@ -1505,6 +2175,22 @@ $txt['whopost_quotefast'] = 'Quoting a post from &quot;<a href="%1$s">%2$s</a>&q
 	</file>
 	<file name="THEMEDIR/scripts/script.js">
 		<operation>
+			<search position="replace"><![CDATA[ * copyright:	2011 Simple Machines (http://www.simplemachines.org)
+ * license:		BSD, See included LICENSE.TXT for terms and conditions.
+ *
+ * @version 1.0
+ *
+ * This file contains javascript utility functions
+ */]]></search>
+			<add><![CDATA[ * copyright:	2011 Simple Machines (http://www.simplemachines.org)
+ * license:		BSD, See included LICENSE.TXT for terms and conditions.
+ *
+ * @version 1.0.1
+ *
+ * This file contains javascript utility functions
+ */]]></add>
+		</operation>
+		<operation>
 			<search position="replace"><![CDATA[ */
 function elk_setThemeOption(option, value, theme, additional_vars)
 {
@@ -1608,6 +2294,22 @@ JumpTo.prototype.fillSelect = function (aBoardsAndCategories)
 	</file>
 	<file name="THEMEDIR/scripts/script_elk.js">
 		<operation>
+			<search position="replace"><![CDATA[ * @copyright ElkArte Forum contributors
+ * @license   BSD http://opensource.org/licenses/BSD-3-Clause
+ *
+ * @version 1.0
+ *
+ * This file contains javascript utility functions specific to ElkArte
+ */]]></search>
+			<add><![CDATA[ * @copyright ElkArte Forum contributors
+ * @license   BSD http://opensource.org/licenses/BSD-3-Clause
+ *
+ * @version 1.0.1
+ *
+ * This file contains javascript utility functions specific to ElkArte
+ */]]></add>
+		</operation>
+		<operation>
 			<search position="replace"><![CDATA[ *
  * @param {string} btn string representing this, generally the anchor link tag <a class="" href="" onclick="">
  * @param {string} confirmation_msg_variable var name of the text sting to display in the "are you sure" box
@@ -1649,7 +2351,8 @@ function toggleButtonAJAX(btn, confirmation_msg_variable, onSuccessCallback)
 
 	return toggleButtonAJAX(btn, 'notification_topic_notice');
 }
-]]></search>
+
+/**]]></search>
 			<add><![CDATA[	if (typeof (notification_topic_notice) !== 'undefined' && !confirm(notification_topic_notice))
 		return false;
 
@@ -1668,7 +2371,8 @@ function toggleButtonAJAX(btn, confirmation_msg_variable, onSuccessCallback)
 		$("input[name='notify']").val(toggle);
 	});
 }
-]]></add>
+
+/**]]></add>
 		</operation>
 	</file>
 </modification>
