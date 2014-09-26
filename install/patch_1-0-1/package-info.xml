@@ -1,0 +1,24 @@
+<?xml version="1.0"?>
+<!DOCTYPE package-info SYSTEM "http://www.elkarte.net/site/package-info">
+<package-info xmlns="http://www.elkarte.net/site/package-info" xmlns:elk="http://www.elkarte.net/">
+	<id>Elkarte Contributors:ElkArte_101_patch</id>
+	<name>ElkArte 1.0.1 patch</name>
+	<version>1.0</version>
+	<type>modification</type>
+		<install for="1.0.0">
+			<require-dir name="webfonts" destination="THEMEDIR" />
+			<require-file name="font-awesome.css" destination="THEMEDIR/css" />
+			<require-file name="browser.inc.php" destination="EXTDIR/bad-behavior/bad-behavior" />
+			<modification>modifications.xml</modification>
+		</install>
+		<uninstall for="1.0.1">
+<!--			<remove-file name="THEMEDIR/webfonts/fontawesome-webfont.eot" />
+			<remove-file name="THEMEDIR/webfonts/fontawesome-webfont.svg" />
+			<remove-file name="THEMEDIR/webfonts/fontawesome-webfont.ttf" />
+			<remove-file name="THEMEDIR/webfonts/fontawesome-webfont.woff" />
+			<remove-file name="THEMEDIR/webfonts/FontAwesome.otf" />
+			<remove-file name="THEMEDIR/css/font-awesome.css" />
+			<remove-file name="EXTDIR/bad-behavior/bad-behavior/browser.inc.php" />-->
+			<modification reverse="true">modifications.xml</modification>
+		</uninstall>
+</package-info>
