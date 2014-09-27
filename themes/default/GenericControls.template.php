@@ -30,11 +30,11 @@ function template_control_richedit($editor_id, $smileyContainer = null, $bbcCont
 
 	$plugins = array_filter(array('bbcode', 'splittag', (!empty($context['mentions_enabled']) ? 'mention' : ''), (!empty($context['drafts_autosave']) && !empty($options['drafts_autosave_enabled']) ? 'draft' : '')));
 
-	// Allow addons to insert additonal editor plugin scripts
-	if (!empty($context['plugin_addons']) && is_array($context['plugin_addons']))
-		$plugins = array_filter(array_merge($plugins, $context['plugin_addons']));
+	// Allow addons to insert additional editor plugin scripts
+	if (!empty($editor_context['plugin_addons']) && is_array($editor_context['plugin_addons']))
+		$plugins = array_filter(array_merge($plugins, $editor_context['plugin_addons']));
 
-	// Add in special config objects to the editor, typlically for plugin use
+	// Add in special config objects to the editor, typically for plugin use
 	$plugin_options = array();
 	$plugin_options[] = '
 					parserOptions: {
@@ -64,9 +64,9 @@ function template_control_richedit($editor_id, $smileyContainer = null, $bbcCont
 						}
 					}';
 
-	// Allow addons to insert additonal editor objects
-	if (!empty($context['plugin_options']) && is_array($context['plugin_options']))
-		$plugin_options = array_merge($plugin_options, $context['plugin_options']);
+	// Allow addons to insert additional editor objects
+	if (!empty($context['plugin_options']) && is_array($editor_context['plugin_options']))
+		$plugin_options = array_merge($plugin_options, $editor_context['plugin_options']);
 
 	echo '
 		<div id="editor_toolbar_container"></div>
