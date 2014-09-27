@@ -85,6 +85,8 @@ $txt['permissionname_karma_edit'] = 'Change other people\'s karma';
 $txt['permissionhelp_karma_edit'] = 'Karma is a feature that shows the popularity of a member. In order to use this feature, you need to have it enabled in \'Features and Options\'. This permission will allow a member group to cast a vote. This permission has no effect on guests.';
 $txt['permissionname_like_posts'] = 'Like other users\' posts';
 $txt['permissionhelp_like_posts'] = 'Likes is a feature that shows the popularity of a post. In order to use this feature, you need to have it enabled in \'Features and Options\'. This permission will allow a member group to like a post or unlike one they previously liked.  This permission has no effect on guests.';
+$txt['permissionname_like_posts_stats'] = 'See like posts stats';
+$txt['permissionhelp_like_posts_stats'] = 'This will allow users to see stats of posts liking';
 $txt['permissionname_disable_censor'] = 'Disable word censor';
 $txt['permissionhelp_disable_censor'] = 'Allows members the option to disable the word censor.';
 
