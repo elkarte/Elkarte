@@ -191,6 +191,9 @@ function create_control_richedit($editorOptions)
 		}
 	}
 
+	// Allow addons an easy way to add plugins, initialization objects, etc to the editor control
+	call_integration_hook('integrate_editor_plugins', array($editorOptions['id']));
+
 	// Start off the editor...
 	$context['controls']['richedit'][$editorOptions['id']] = array(
 		'id' => $editorOptions['id'],
