@@ -13,7 +13,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0 Release Candidate 2
+ * @version 1.0
  *
  * This file contains functions that are specifically done by administrators.
  *
@@ -72,6 +72,13 @@ function getServerVersions($checkFor)
 	{
 		if (in_array($name, $checkFor))
 			$versions[$name] = $details;
+	}
+
+	if (in_array('opcache', $checkFor) && extension_loaded('Zend OPcache'))
+	{
+		$opcache_config = @opcache_get_configuration();
+		if (!empty($opcache_config['directives']['opcache.enable']))
+			$versions['opcache'] = array('title' => $opcache_config['version']['opcache_product_name'], 'version' => $opcache_config['version']['version']);
 	}
 
 	// PHP Version

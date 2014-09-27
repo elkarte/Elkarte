@@ -11,7 +11,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0 Release Candidate 2
+ * @version 1.0
  *
  */
 
@@ -1110,7 +1110,7 @@ function template_admin_search_results()
 						<form id="quick_search" class="floatright" action="', $scripturl, '?action=admin;area=search" method="post" accept-charset="UTF-8">
 							<img class="icon" src="', $settings['images_url'], '/filter.png" alt="" />
 							<input type="text" name="search_term" value="', $context['search_term'], '" class="input_text" />
-							<input type="hidden" name="search_type" value="', $context['search_type'], '" />
+							<input type="hidden" name="sa" value="', $context['search_type'], '" />
 							<input type="submit" name="search_go" value="', $txt['admin_search_results_again'], '" class="button_submit" />
 						</form>
 					</div>
@@ -1461,7 +1461,7 @@ function template_admin_quick_search()
 			<form action="', $scripturl, '?action=admin;area=search" method="post" accept-charset="UTF-8" id="quick_search" class="floatright">
 				<img class="icon" src="', $settings['images_url'], '/filter.png" alt="" />
 				<input type="text" name="search_term" placeholder="', $txt['admin_search'], '" class="input_text" />
-				<select name="search_type">
+				<select name="sa">
 					<option value="internal"', (empty($context['admin_preferences']['sb']) || $context['admin_preferences']['sb'] == 'internal' ? ' selected="selected"' : ''), '>', $txt['admin_search_type_internal'], '</option>
 					<option value="member"', (!empty($context['admin_preferences']['sb']) && $context['admin_preferences']['sb'] == 'member' ? ' selected="selected"' : ''), '>', $txt['admin_search_type_member'], '</option>
 					<option value="online"', (!empty($context['admin_preferences']['sb']) && $context['admin_preferences']['sb'] == 'online' ? ' selected="selected"' : ''), '>', $txt['admin_search_type_online'], '</option>

@@ -11,7 +11,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0 Release Candidate 2
+ * @version 1.0
  *
  */
 
@@ -610,7 +610,7 @@ class Database_PostgreSQL extends Database_Abstract
 			// Here's where the variables are injected to the query.
 			$insertRows = array();
 			foreach ($data as $dataRow)
-				$insertRows[] = $this->quote($insertData, array_combine($indexed_columns, $dataRow), $connection);
+				$insertRows[] = $this->quote($insertData, $this->_array_combine($indexed_columns, $dataRow), $connection);
 
 			$inserted_results = 0;
 			foreach ($insertRows as $entry)

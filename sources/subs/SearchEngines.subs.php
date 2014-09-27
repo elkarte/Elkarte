@@ -13,7 +13,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0 Release Candidate 2
+ * @version 1.0
  *
  */
 
@@ -156,7 +156,10 @@ function logSpider()
 		{
 			$req = request();
 			$url = $_GET + array('USER_AGENT' => $req->user_agent());
-			unset($url['sesc'], $url[$context['session_var']]);
+			if (isset($context['session_var']))
+				unset($url['sesc'], $url[$context['session_var']]);
+			else
+				unset($url['sesc']);
 			$url = serialize($url);
 		}
 		else

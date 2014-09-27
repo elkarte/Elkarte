@@ -15,7 +15,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0 Release Candidate 2
+ * @version 1.0
  *
  */
 
@@ -672,15 +672,22 @@ function createPost(&$msgOptions, &$topicOptions, &$posterOptions)
 	$new_topic = empty($topicOptions['id']);
 
 	$message_columns = array(
-		'id_board' => 'int', 'id_topic' => 'int', 'id_member' => 'int', 'subject' => 'string-255', 'body' => (!empty($modSettings['max_messageLength']) && $modSettings['max_messageLength'] > 65534 ? 'string-' . $modSettings['max_messageLength'] : (empty($modSettings['max_messageLength']) ? 'string' : 'string-65534')),
-		'poster_name' => 'string-255', 'poster_email' => 'string-255', 'poster_time' => 'int', 'poster_ip' => 'string-255',
-		'smileys_enabled' => 'int', 'modified_name' => 'string', 'icon' => 'string-16', 'approved' => 'int',
+		'id_board' => 'int', 'id_topic' => 'int', 'id_member' => 'int',
+		'subject' => 'string-255', 'body' => (!empty($modSettings['max_messageLength']) && $modSettings['max_messageLength'] > 65534 ? 'string-' . $modSettings['max_messageLength'] : (empty($modSettings['max_messageLength']) ? 'string' : 'string-65534')),
+		'poster_name' => 'string-255', 'poster_email' => 'string-255',
+		'poster_time' => 'int', 'poster_ip' => 'string-255',
+		'smileys_enabled' => 'int', 'modified_name' => 'string',
+		'icon' => 'string-16', 'approved' => 'int',
 	);
 
 	$message_parameters = array(
-		$topicOptions['board'], $topicOptions['id'], $posterOptions['id'], $msgOptions['subject'], $msgOptions['body'],
-		$posterOptions['name'], $posterOptions['email'], time(), $posterOptions['ip'],
-		$msgOptions['smileys_enabled'] ? 1 : 0, '', $msgOptions['icon'], $msgOptions['approved'],
+		'id_board' => $topicOptions['board'], 'id_topic' => $topicOptions['id'],
+		'id_member' => $posterOptions['id'], 'subject' => $msgOptions['subject'],
+		'body' => $msgOptions['body'],
+		'poster_name' => $posterOptions['name'], 'poster_email' => $posterOptions['email'],
+		'poster_time' => time(), 'poster_ip' => $posterOptions['ip'],
+		'smileys_enabled' => $msgOptions['smileys_enabled'] ? 1 : 0,'modified_name' => '',
+		'icon' => $msgOptions['icon'], 'approved' => $msgOptions['approved'],
 	);
 
 	// What if we want to do anything with posts?
@@ -718,16 +725,24 @@ function createPost(&$msgOptions, &$topicOptions, &$posterOptions)
 	if ($new_topic)
 	{
 		$topic_columns = array(
-			'id_board' => 'int', 'id_member_started' => 'int', 'id_member_updated' => 'int', 'id_first_msg' => 'int',
-			'id_last_msg' => 'int', 'locked' => 'int', 'is_sticky' => 'int', 'num_views' => 'int',
-			'id_poll' => 'int', 'unapproved_posts' => 'int', 'approved' => 'int',
-			'redirect_expires' => 'int', 'id_redirect_topic' => 'int',
+			'id_board' => 'int', 'id_member_started' => 'int',
+			'id_member_updated' => 'int', 'id_first_msg' => 'int',
+			'id_last_msg' => 'int', 'locked' => 'int',
+			'is_sticky' => 'int', 'num_views' => 'int',
+			'id_poll' => 'int',
+			'unapproved_posts' => 'int', 'approved' => 'int',
+			'redirect_expires' => 'int',
+			'id_redirect_topic' => 'int',
 		);
 		$topic_parameters = array(
-			$topicOptions['board'], $posterOptions['id'], $posterOptions['id'], $msgOptions['id'],
-			$msgOptions['id'], $topicOptions['lock_mode'] === null ? 0 : $topicOptions['lock_mode'], $topicOptions['sticky_mode'] === null ? 0 : $topicOptions['sticky_mode'], 0,
-			$topicOptions['poll'] === null ? 0 : $topicOptions['poll'], $msgOptions['approved'] ? 0 : 1, $msgOptions['approved'],
-			$topicOptions['redirect_expires'] === null ? 0 : $topicOptions['redirect_expires'], $topicOptions['redirect_topic'] === null ? 0 : $topicOptions['redirect_topic'],
+			'id_board' => $topicOptions['board'], 'id_member_started' => $posterOptions['id'],
+			'id_member_updated' => $posterOptions['id'], 'id_first_msg' => $msgOptions['id'],
+			'id_last_msg' => $msgOptions['id'], 'locked' => $topicOptions['lock_mode'] === null ? 0 : $topicOptions['lock_mode'],
+			'is_sticky' => $topicOptions['sticky_mode'] === null ? 0 : $topicOptions['sticky_mode'], 'num_views' => 0,
+			'id_poll' => $topicOptions['poll'] === null ? 0 : $topicOptions['poll'],
+			'unapproved_posts' =>  $msgOptions['approved'] ? 0 : 1, 'approved' => $msgOptions['approved'],
+			'redirect_expires' => $topicOptions['redirect_expires'] === null ? 0 : $topicOptions['redirect_expires'],
+			'id_redirect_topic' => $topicOptions['redirect_topic'] === null ? 0 : $topicOptions['redirect_topic'],
 		);
 
 		call_integration_hook('integrate_before_create_topic', array(&$msgOptions, &$topicOptions, &$posterOptions, &$topic_columns, &$topic_parameters));
