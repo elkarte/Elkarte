@@ -28,12 +28,13 @@ function template_control_richedit($editor_id, $smileyContainer = null, $bbcCont
 
 	$editor_context = &$context['controls']['richedit'][$editor_id];
 
-	$plugins = array('bbcode', 'splittag', (!empty($context['mentions_enabled']) ? 'mention' : ''), (!empty($context['drafts_autosave']) && !empty($options['drafts_autosave_enabled']) ? 'draft' : ''));
+	$plugins = array_filter(array('bbcode', 'splittag', (!empty($context['mentions_enabled']) ? 'mention' : ''), (!empty($context['drafts_autosave']) && !empty($options['drafts_autosave_enabled']) ? 'draft' : '')));
 
 	// Allow addons to insert additonal editor plugin scripts
 	if (!empty($context['plugin_addons']) && is_array($context['plugin_addons']))
-		$plugins = array_merge($plugins, $context['plugin_addons']);
+		$plugins = array_filter(array_merge($plugins, $context['plugin_addons']));
 
+	// Add in special config objects to the editor, typlically for plugin use
 	$plugin_options = array();
 	$plugin_options[] = '
 					parserOptions: {
