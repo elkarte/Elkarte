@@ -191,9 +191,6 @@ function create_control_richedit($editorOptions)
 		}
 	}
 
-	// Allow addons an easy way to add plugins, initialization objects, etc to the editor control
-	call_integration_hook('integrate_editor_plugins', array($editorOptions['id']));
-
 	// Start off the editor...
 	$context['controls']['richedit'][$editorOptions['id']] = array(
 		'id' => $editorOptions['id'],
@@ -210,6 +207,9 @@ function create_control_richedit($editorOptions)
 		'labels' => !empty($editorOptions['labels']) ? $editorOptions['labels'] : array(),
 		'locale' => !empty($txt['lang_locale']) ? $txt['lang_locale'] : 'en_US',
 	);
+
+	// Allow addons an easy way to add plugins, initialization objects, etc to the editor control
+	call_integration_hook('integrate_editor_plugins', array($editorOptions['id']));
 
 	// Switch between default images and back... mostly in case you don't have an PersonalMessage template, but do have a Post template.
 	if (isset($settings['use_default_images']) && $settings['use_default_images'] == 'defaults' && isset($settings['default_template']))
