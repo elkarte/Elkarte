@@ -65,7 +65,7 @@ function template_control_richedit($editor_id, $smileyContainer = null, $bbcCont
 					}';
 
 	// Allow addons to insert additional editor objects
-	if (!empty($context['plugin_options']) && is_array($editor_context['plugin_options']))
+	if (!empty($editor_context['plugin_options']) && is_array($editor_context['plugin_options']))
 		$plugin_options = array_merge($plugin_options, $editor_context['plugin_options']);
 
 	echo '
