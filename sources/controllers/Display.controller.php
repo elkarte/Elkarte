@@ -340,7 +340,7 @@ class Display_Controller
 		// Build the link tree.
 		$context['linktree'][] = array(
 			'url' => $scripturl . '?topic=' . $topic . '.0',
-			'name' => $topicinfo['subject'],
+			'name' =>  Util::shorten_text($topicinfo['subject'], 25, true),
 		);
 
 		// Build a list of this board's moderators.

@@ -826,7 +826,7 @@ class Post_Controller extends Action_Controller
 		{
 			$context['linktree'][] = array(
 				'url' => $scripturl . '?topic=' . $topic . '.' . $_REQUEST['start'],
-				'name' => $form_subject,
+				'name' => Util::shorten_text($form_subject, 25, true),
 				'extra_before' => '<span><strong class="nav">' . $context['page_title'] . ' ( </strong></span>',
 				'extra_after' => '<span><strong class="nav"> )</strong></span>'
 			);
