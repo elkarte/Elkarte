@@ -13,7 +13,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:		BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0
+ * @version 1.0.1
  *
  */
 
@@ -4280,6 +4280,7 @@ function replaceBasicActionUrl($string)
 		$find = array(
 			'{forum_name}',
 			'{forum_name_html_safe}',
+			'{forum_name_html_unsafe}',
 			'{script_url}',
 			'{board_url}',
 			'{login_url}',
@@ -4299,6 +4300,7 @@ function replaceBasicActionUrl($string)
 		$replace = array(
 			$context['forum_name'],
 			$context['forum_name_html_safe'],
+			un_htmlspecialchars($context['forum_name_html_safe']),
 			$scripturl,
 			$boardurl,
 			$scripturl . '?action=login',

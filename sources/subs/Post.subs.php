@@ -15,7 +15,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0
+ * @version 1.0.1
  *
  */
 
@@ -788,7 +788,7 @@ function createPost(&$msgOptions, &$topicOptions, &$posterOptions)
 			$topics_columns[] = 'locked = {int:locked}';
 
 		if ($topicOptions['sticky_mode'] !== null)
-			$topics_columns[] = 'is_sticky = {int:locked}';
+			$topics_columns[] = 'is_sticky = {int:is_sticky}';
 
 		call_integration_hook('integrate_before_modify_topic', array(&$topics_columns, &$update_parameters, &$msgOptions, &$topicOptions, &$posterOptions));
 
