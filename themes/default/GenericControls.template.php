@@ -28,6 +28,46 @@ function template_control_richedit($editor_id, $smileyContainer = null, $bbcCont
 
 	$editor_context = &$context['controls']['richedit'][$editor_id];
 
+	$plugins = array_filter(array('bbcode', 'splittag', (!empty($context['mentions_enabled']) ? 'mention' : ''), (!empty($context['drafts_autosave']) && !empty($options['drafts_autosave_enabled']) ? 'draft' : '')));
+
+	// Allow addons to insert additional editor plugin scripts
+	if (!empty($editor_context['plugin_addons']) && is_array($editor_context['plugin_addons']))
+		$plugins = array_filter(array_merge($plugins, $editor_context['plugin_addons']));
+
+	// Add in special config objects to the editor, typically for plugin use
+	$plugin_options = array();
+	$plugin_options[] = '
+					parserOptions: {
+						quoteType: $.sceditor.BBCodeParser.QuoteType.auto
+					}';
+
+	// Drafts?
+	if (!empty($context['drafts_autosave']) && !empty($options['drafts_autosave_enabled']))
+			$plugin_options[] = '
+					draftOptions: {
+						sLastNote: \'draft_lastautosave\',
+						sSceditorID: \'' . $editor_id . '\',
+						sType: \'post\',
+						iBoard: ' . (empty($context['current_board']) ? 0 : $context['current_board']) . ',
+						iFreq: ' . $context['drafts_autosave_frequency'] . ',' . (!empty($context['drafts_save']) ?
+						'sLastID: \'id_draft\'' : 'sLastID: \'id_pm_draft\', bPM: true') . '
+					}';
+
+	if (!empty($context['mentions_enabled']))
+			$plugin_options[] = '
+					mentionOptions: {
+						editor_id: \'' . $editor_id . '\',
+						cache: {
+							mentions: [],
+							queries: [],
+							names: []
+						}
+					}';
+
+	// Allow addons to insert additional editor objects
+	if (!empty($editor_context['plugin_options']) && is_array($editor_context['plugin_options']))
+		$plugin_options = array_merge($plugin_options, $editor_context['plugin_options']);
+
 	echo '
 		<div id="editor_toolbar_container"></div>
 		<label for="', $editor_id, '">
@@ -51,26 +91,8 @@ function template_control_richedit($editor_id, $smileyContainer = null, $bbcCont
 					rtl: ', empty($context['right_to_left']) ? 'false' : 'true', ',
 					colors: "black,red,yellow,pink,green,orange,purple,blue,beige,brown,teal,navy,maroon,limegreen,white",
 					enablePasteFiltering: true,
-					plugins: "bbcode, splittag', !empty($context['mentions_enabled']) ? ', mention' : '', (!empty($context['drafts_autosave']) && !empty($options['drafts_autosave_enabled']) ? ', draft",
-					draftOptions: {
-						sLastNote: \'draft_lastautosave\',
-						sSceditorID: \'' . $editor_id . '\',
-						sType: \'post\',
-						iBoard: ' . (empty($context['current_board']) ? 0 : $context['current_board']) . ',
-						iFreq: ' . $context['drafts_autosave_frequency'] . ',' . (!empty($context['drafts_save']) ?
-						'sLastID: \'id_draft\'' : 'sLastID: \'id_pm_draft\', bPM: true') . '
-					},' : '",'), (!empty($context['mentions_enabled']) ? '
-					mentionOptions: {
-						editor_id: \'' . $editor_id . '\',
-						cache: {
-							mentions: [],
-							queries: [],
-							names: []
-						}
-					},' : ''), '
-					parserOptions: {
-						quoteType: $.sceditor.BBCodeParser.QuoteType.auto
-					}';
+					plugins: "', implode(',', $plugins), '",
+					', trim(implode(',', $plugin_options));
 
 	// Show the smileys.
 	if ((!empty($context['smileys']['postform']) || !empty($context['smileys']['popup'])) && !$editor_context['disable_smiley_box'] && $smileyContainer !== null)
