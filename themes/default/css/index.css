@@ -1115,6 +1115,19 @@ a.bbc_link {
 	overflow: hidden;
 	text-overflow: ellipsis;
 }
+.linktree:last-child>span>a {
+	display: inline;
+}
+.linktree:last-child>span {
+	display: block;
+	overflow: hidden;
+	max-width: 25em;
+}
+.linktree a {
+	display: block;
+	overflow: hidden;
+	text-overflow: ellipsis;
+}
 
 /* Nifty indicators. */
 .linktree:after {
