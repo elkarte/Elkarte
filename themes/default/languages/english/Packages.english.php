@@ -88,7 +88,6 @@ $txt['execute_hook_action'] = 'Adapting hook %1$s';
 $txt['package_requires'] = 'Requires Modification';
 $txt['package_check_for'] = 'Check for installation:';
 $txt['execute_credits_add'] = 'Add Credits';
-$txt['execute_credits_remove'] = 'Remove Credits';
 $txt['execute_credits_action'] = 'Credits: %1$s';
 
 $txt['package_install_actions'] = 'Installations actions for';
