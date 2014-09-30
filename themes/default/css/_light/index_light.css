@@ -1447,6 +1447,9 @@ div.bbc_footnotes .meaction{
 	background: #47b263;
 	background-image: linear-gradient(to bottom, #60bc78 0%, #27a348 100%);
 }
+.profile_pie {
+	background: url(../../images/_light/stats_pie.png);
+}
 
 .topic_details {
 	border-bottom: 1px solid #999;
