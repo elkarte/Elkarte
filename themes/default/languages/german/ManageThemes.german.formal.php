@@ -50,7 +50,6 @@ $txt['actual_theme_name'] = 'Name des Designs: ';
 $txt['actual_theme_dir'] = 'Verzeichnis des Designs: ';
 $txt['actual_theme_url'] = 'URL des Designs: ';
 $txt['actual_images_url'] = 'Grafiken-URL des Designs: ';
-$txt['current_theme_style'] = 'Stil des Designs: ';
 
 $txt['theme_variants_default'] = 'Standarddesignvariante:';
 $txt['theme_variants_user_disable'] = 'Benutzerseitige Auswahl der Varianten deaktivieren.';
@@ -87,9 +86,6 @@ $txt['who_display_viewing'] = 'Anzeigen, wer die Startseite und Beiträge ansieh
 $txt['who_display_viewing_off'] = 'Nicht anzeigen';
 $txt['who_display_viewing_numbers'] = 'Nur Zahlen anzeigen';
 $txt['who_display_viewing_names'] = 'Mitgliedsnamen anzeigen';
-$txt['disable_recent_posts'] = 'Letzte Beiträge deaktivieren';
-$txt['enable_single_post'] = 'Einzelnen Beitrag aktivieren';
-$txt['enable_multiple_posts'] = 'Mehrfachbeiträge aktivieren';
 $txt['show_stats_index'] = 'Statistiken auf der Startseite anzeigen.';
 $txt['latest_members'] = 'Neuestes Mitglied auf der Startseite anzeigen.';
 $txt['last_modification'] = 'Datum der letzten Änderung in geänderten Beiträgen anzeigen.';

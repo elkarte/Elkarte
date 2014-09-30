@@ -214,7 +214,7 @@ $txt['notify'] = 'Benachrichtigen';
 $txt['unnotify'] = 'Nicht mehr benachrichtigen';
 $txt['notify_request'] = 'Möchten Sie per E-Mail benachrichtigt werden, wenn jemand auf dieses Thema antwortet?';
 // Use numeric entities in the below string.
-$txt['regards_team'] = "Grüße,\ndas {forum_name}-Team.";
+$txt['regards_team'] = "Grüße,\ndas {forum_name_html_unsafe}-Team.";
 $txt['notify_replies'] = 'Bei Antwort benachrichtigen';
 $txt['move_topic'] = 'Verschieben';
 $txt['move_to'] = 'Verschieben nach';

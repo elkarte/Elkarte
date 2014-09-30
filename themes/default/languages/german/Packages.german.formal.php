@@ -3,16 +3,9 @@
 // Version: 1.0; Packages
 
 $txt['package_proceed'] = 'Fortfahren';
-$txt['php_script'] = 'Das Erweiterungsarchiv wurde entpackt, aber die Erweiterung bringt außerdem ein PHP-Skript mit, das ausgeführt werden sollte, bevor sie funktioniert';
-$txt['package_run'] = 'Ausführen';
 $txt['package_id'] = 'ID';
-$txt['package_read'] = 'Lesen';
-$txt['script_output'] = 'Skriptausgabe:';
-$txt['additional_notes'] = 'Weitere Hinweise';
-$txt['notes_file'] = 'Datei für Anweisungen/weitere Hinweise';
 $txt['list_file'] = 'Dateien im Paket auflisten';
 $txt['files_archive'] = 'Dateien im Archiv';
-$txt['package_get'] = 'Paket abrufen';
 $txt['package_browse'] = 'Durchsuchen';
 $txt['add_server'] = 'Server hinzufügen';
 $txt['server_name'] = 'Servername';
@@ -24,15 +17,10 @@ $txt['package_downloaded_successfully'] = 'Das Paket wurde erfolgreich herunterg
 $txt['package_manager'] = 'Paketverwaltung';
 $txt['install_mod'] = 'Erweiterung installieren';
 $txt['uninstall_mod'] = 'Erweiterung deinstallieren';
-$txt['sql_file'] = 'Das Erweiterungsarchiv wurde entpackt.  Diese Erweiterung bringt außerdem eine SQL-Datei mit, die Änderungen enthält, die an der Datenbank vorgenommen werden müssen.  Damit die Erweiterung korrekt funktioniert, müssen Sie diese Datei ausführen.';
-$txt['sql_queries'] = 'SQL-Abfragen';
 $txt['no_adds_installed'] = 'Derzeit sind keine Erweiterungen installiert';
-$txt['browse_installed'] = 'Installierte Erweiterungen durchsuchen';
 $txt['uninstall'] = 'Deinstallieren';
 $txt['delete_list'] = 'Liste der Erweiterungen leeren';
 $txt['package_delete_list_warning'] = 'Sind Sie sich sicher, dass Sie die Liste Ihrer installierten Erweiterungen leeren möchten?';
-$txt['php_safe_mode'] = 'Verzeihung, aber Ihr Server betreibt PHP momentan im abgesicherten Modus.  Diese Funktion arbeitet nicht mit diesem Modus zusammen.';
-$txt['lets_try_anyway'] = 'Lass\' es mich trotzdem versuchen.';
 
 $txt['package_manager_desc'] = 'Mithilfe dieser einfach zu bedienenden Oberfläche können Sie Erweiterungen für Ihr Forum herunterladen und installieren.';
 $txt['installed_packages_desc'] = 'Hier können Sie die Erweiterungen ansehen, die in Ihrem Forum installiert sind, und diejenigen entfernen, die Sie nicht mehr benötigen.';
@@ -40,8 +28,6 @@ $txt['download_packages_desc'] = 'În diesem Bereich können Sie Paketserver hin
 $txt['package_servers_desc'] = 'Mithilfe dieser einfach zu bedienenden Oberfläche können Sie Paketserver verwalten und Paketarchive für Ihr Forum herunterladen.';
 $txt['upload_packages_desc'] = 'In diesem Bereich können Sie eine Paketdatei von Ihrem Rechner direkt in das Forum hochladen.';
 
-$txt['create_package'] = 'Ein neues Paket erstellen';
-$txt['download_new_package'] = 'Neue Pakete herunterladen';
 $txt['upload_new_package'] = 'Neues Paket hochladen';
 $txt['view_and_remove'] = 'Installierte Pakete ansehen und entfernen';
 $txt['modification_package'] = 'Erweiterungspakete';
@@ -53,7 +39,6 @@ $txt['use_avatars'] = 'Avatare verwenden';
 $txt['add_languages'] = 'Sprache hinzufügen';
 $txt['list_files'] = 'Dateien auflisten';
 $txt['package_type'] = 'Pakettyp';
-$txt['archiving'] = 'Archiviere';
 $txt['extracting'] = 'Entpacke';
 $txt['avatars_extracted'] = 'Die Avatare wurden installiert, Sie sollten sie nun verwenden können.';
 $txt['language_extracted'] = 'Das Sprachpaket wurde installiert, Sie können seine Verwendung nun in den Spracheinstellungen Ihres Administrationszentrums aktivieren.';
@@ -103,7 +88,6 @@ $txt['execute_hook_action'] = 'Integriere Einschubmethode %1$s';
 $txt['package_requires'] = 'Benötigt Modifikation';
 $txt['package_check_for'] = 'Prüfung auf Installation:';
 $txt['execute_credits_add'] = 'Füge Danksagungen hinzu';
-$txt['execute_credits_remove'] = 'Entferne Danksagungen';
 $txt['execute_credits_action'] = 'Danksagungen: %1$s';
 
 $txt['package_install_actions'] = 'Installationsaktionen für';

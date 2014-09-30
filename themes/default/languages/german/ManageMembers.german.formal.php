@@ -7,6 +7,7 @@ $txt['viewing_groups'] = 'Betrachtet Benutzergruppen'; // ? :)
 $txt['membergroups_title'] = 'Benutzergruppen verwalten';
 $txt['membergroups_description'] = 'Benutzergruppen sind Gruppen von Mitgliedern, die ähnliche Befugnisse, Erscheinungsbilder oder Zugriffsrechte innehaben. Die Mitgliedschaft in einigen Benutzergruppen ist abhängig von der Anzahl der Beiträge eines Mitglieds. Sie können jemandem eine Benutzergruppe zuweisen, indem Sie seine Kontoeinstellungen über sein Profil anpassen.';
 $txt['membergroups_modify'] = 'Ändern';
+$txt['membergroups_modify_parent'] = 'Elterngruppe ändern';
 
 $txt['membergroups_add_group'] = 'Gruppe hinzufügen';
 $txt['membergroups_regular'] = 'Normale Gruppen';

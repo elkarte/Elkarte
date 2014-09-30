@@ -37,6 +37,7 @@ $txt['permissions_profile_do_delete'] = 'Löschen';
 $txt['permissions_profile_copy_from'] = 'Befugnisse kopieren von';
 
 $txt['permissions_includes_inherited'] = 'Abgeleitete Gruppen';
+$txt['permissions_includes_inherited_from'] = 'Abgeleitet von: ';
 
 $txt['permissions_all'] = 'alle';
 $txt['permissions_none'] = 'keine';
