@@ -10,4 +10,8 @@ Packages/temp
 .settings/
 /site
 nbproject/*
+<<<<<<< HEAD
+elkupdate.bat
+=======
 .*.swp
+>>>>>>> upstream/master

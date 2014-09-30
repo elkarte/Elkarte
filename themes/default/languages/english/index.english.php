@@ -99,7 +99,7 @@ $txt['modSettings_title'] = 'Features and Options';
 $txt['moderate'] = 'Moderate';
 // Sub menu labels
 $txt['modlog_view'] = 'Moderation Log';
-$txt['mc_emailerror'] = 'Unapproved Emails';
+$txt['mc_emailerror'] = 'Unapproved E-mails';
 $txt['mc_reported_posts'] = 'Reported Posts';
 $txt['mc_unapproved_attachments'] = 'Unapproved Attachments';
 $txt['mc_unapproved_poststopics'] = 'Unapproved Posts and Topics';
@@ -146,15 +146,15 @@ $txt['username'] = 'Username';
 $txt['password'] = 'Password';
 
 $txt['username_no_exist'] = 'That username does not exist.';
-$txt['no_user_with_email'] = 'There are no usernames associated with that email.';
+$txt['no_user_with_email'] = 'There are no usernames associated with that e-mail.';
 
 $txt['board_moderator'] = 'Board Moderator';
 $txt['remove_topic'] = 'Remove';
 $txt['topics'] = 'Topics';
 $txt['modify_msg'] = 'Modify message';
 $txt['name'] = 'Name';
-$txt['email'] = 'Email';
-$txt['user_email_address'] = 'Email Address';
+$txt['email'] = 'E-mail';
+$txt['user_email_address'] = 'E-mail Address';
 $txt['subject'] = 'Subject';
 $txt['message'] = 'Message';
 $txt['redirects'] = 'Redirects';
@@ -212,7 +212,7 @@ $txt['topic'] = 'Topic';
 $txt['help'] = 'Help';
 $txt['notify'] = 'Notify';
 $txt['unnotify'] = 'Unnotify';
-$txt['notify_request'] = 'Do you want a notification email if someone replies to this topic?';
+$txt['notify_request'] = 'Do you want a notification e-mail if someone replies to this topic?';
 // Use numeric entities in the below string.
 $txt['regards_team'] = "Regards,\nThe {forum_name} Team.";
 $txt['notify_replies'] = 'Notify of replies';
@@ -292,6 +292,7 @@ $txt['female'] = 'Female';
 $txt['error_invalid_characters_username'] = 'Invalid character used in user name.';
 
 $txt['welcome_guest'] = 'Welcome, <strong>Guest</strong>. Please <a href="{login_url}">login</a>.';
+
 $txt['welcome_guest_register'] = 'Welcome to <strong>{forum_name}</strong>. Please <a href="{login_url}">login</a> or <a href="{register_url}">register</a>.';
 $txt['welcome_guest_activate'] = '<br />Did you miss your <a href="{activate_url}">activation email</a>?';
 
@@ -352,7 +353,7 @@ $txt['redirect_board'] = 'Redirect Board';
 
 $txt['sendtopic_send'] = 'Send';
 $txt['report_sent'] = 'Your report has been sent successfully.';
-$txt['topic_sent'] = 'Your email has been sent successfully.';
+$txt['topic_sent'] = 'Your e-mail has been sent successfully.';
 
 $txt['time_offset'] = 'Time Offset';
 $txt['or'] = 'or';
@@ -430,7 +431,7 @@ $txt['print_page'] = 'Print Page';
 $txt['print_page_text'] = 'Text only';
 $txt['print_page_images'] = 'Text with Images';
 
-$txt['valid_email'] = 'This must be a valid email address.';
+$txt['valid_email'] = 'This must be a valid e-mail address.';
 
 $txt['info_center_title'] = '%1$s - Info Center';
 
@@ -440,12 +441,12 @@ $txt['watch'] = 'Watch';
 
 $txt['sendtopic_title'] = 'Send the topic &quot;%1$s&quot; to a friend.';
 $txt['sendtopic_sender_name'] = 'Your name';
-$txt['sendtopic_sender_email'] = 'Your email address';
+$txt['sendtopic_sender_email'] = 'Your e-mail address';
 $txt['sendtopic_receiver_name'] = 'Recipient\'s name';
-$txt['sendtopic_receiver_email'] = 'Recipient\'s email address';
+$txt['sendtopic_receiver_email'] = 'Recipient\'s e-mail address';
 $txt['sendtopic_comment'] = 'Add a comment';
 
-$txt['allow_user_email'] = 'Allow users to email me';
+$txt['allow_user_email'] = 'Allow users to e-mail me';
 
 $txt['check_all'] = 'Check all';
 
@@ -456,7 +457,7 @@ $txt['file'] = 'File';
 $txt['line'] = 'Line';
 
 // Use numeric entities in the below string.
-$txt['tried_to_repair'] = 'ElkArte has detected and automatically tried to repair an error in your database.  If you continue to have problems, or continue to receive these emails, please contact your host.';
+$txt['tried_to_repair'] = 'ElkArte has detected and automatically tried to repair an error in your database.  If you continue to have problems, or continue to receive these e-mails, please contact your host.';
 $txt['database_error_versions'] = '<strong>Note:</strong> Your database version is %1$s.';
 $txt['template_parse_error'] = 'Template Parse Error!';
 $txt['template_parse_error_message'] = 'It seems something has gone sour on the forum with the template system.  This problem should only be temporary, so please come back later and try again.  If you continue to see this message, please contact the administrator.<br /><br />You can also try <a href="javascript:location.reload();">refreshing this page</a>.';
@@ -544,7 +545,7 @@ $txt['cache_writable'] = 'The cache directory is not writable - this will advers
 
 $txt['page_created_full'] = 'Page created in %1$.3f seconds with %2$d queries.';
 
-$txt['report_to_mod_func'] = 'Use this function to inform the moderators and administrators of an abusive or wrongly posted message.<br /><em>Please note that your email address will be revealed to the moderators if you use this.</em>';
+$txt['report_to_mod_func'] = 'Use this function to inform the moderators and administrators of an abusive or wrongly posted message.<br /><em>Please note that your e-mail address will be revealed to the moderators if you use this.</em>';
 
 $txt['online'] = 'Online';
 $txt['member_is_online'] = '%1$s is online';
@@ -585,7 +586,7 @@ $txt['calendar_week_title'] = 'Week %1$d of %2$d';
 $txt['calendar_numb_days'] = 'Number of Days:';
 $txt['calendar_how_edit'] = 'how do you edit these events?';
 $txt['calendar_link_event'] = 'Link Event To Post:';
-$txt['calendar_confirm_delete'] = 'Are you sure you want to delete this event?';
+$txt['calendar_confirm_delete'] = 'Are you sure you want to delete this event?'; // not "calendar"?
 $txt['calendar_linked_events'] = 'Linked Events';
 $txt['calendar_click_all'] = 'click to see all %1$s';
 
@@ -638,11 +639,11 @@ $txt['smtp_no_connect'] = 'Could not connect to SMTP host';
 $txt['smtp_port_ssl'] = 'SMTP port setting incorrect; it should be 465 for SSL servers.';
 $txt['smtp_bad_response'] = 'Couldn\'t get mail server response codes';
 $txt['smtp_error'] = 'Ran into problems sending Mail. Error: ';
-$txt['mail_send_unable'] = 'Unable to send mail to the email address \'%1$s\'';
+$txt['mail_send_unable'] = 'Unable to send mail to the e-mail address \'%1$s\'';
 
 $txt['mlist_search'] = 'Search For Members';
 $txt['mlist_search_again'] = 'Search again';
-$txt['mlist_search_email'] = 'Search by email address';
+$txt['mlist_search_email'] = 'Search by e-mail address';
 $txt['mlist_search_group'] = 'Search by position';
 $txt['mlist_search_name'] = 'Search by name';
 $txt['mlist_search_website'] = 'Search by website';
@@ -770,11 +771,11 @@ $txt['approve_members_waiting'] = 'awaiting approval.'; //Deprecated
 $txt['approve_one_member_waiting'] = 'There is <a href="%1$s">one member</a> awaiting approval.';
 $txt['approve_many_members_waiting'] = 'There are <a href="%1$s">%2$d members</a> awaiting approval.';
 
-$txt['notifyboard_turnon'] = 'Do you want a notification email when someone posts a new topic in this board?';
+$txt['notifyboard_turnon'] = 'Do you want a notification e-mail when someone posts a new topic in this board?';
 $txt['notifyboard_turnoff'] = 'Are you sure you do not want to receive new topic notifications for this board?';
 
 $txt['find_members'] = 'Find Members';
-$txt['find_username'] = 'Name, username, or email address';
+$txt['find_username'] = 'Name, username, or e-mail address';
 $txt['find_buddies'] = 'Show Buddies Only?';
 $txt['find_wildcards'] = 'Allowed Wildcards: *, ?';
 $txt['find_no_results'] = 'No results found';
@@ -830,9 +831,9 @@ $txt['visual_verification_sound'] = 'Listen to the letters';
 $txt['visual_verification_request_new'] = 'Request another image';
 
 // @todo Send email strings - should move?
-$txt['send_email'] = 'Send email';
+$txt['send_email'] = 'Send e-mail';
 $txt['send_email_disclosed'] = 'Note this will be visible to the recipient.';
-$txt['send_email_subject'] = 'Email Subject';
+$txt['send_email_subject'] = 'E-mail Subject';
 
 $txt['ignoring_user'] = 'You are ignoring this user.';
 $txt['show_ignore_user_post'] = 'Show me the post.';

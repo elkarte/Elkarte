@@ -40,7 +40,7 @@ You can reply to this email and have it posted as a topic reply.
 <*> You can see this message by using this link:
     {TOPICLINK}
 
-<*> Unsubscribe to this by using this link:
+<*> Unsubscribe from this by using this link:
     {UNSUBSCRIBELINK}
 
 {EMAILREGARDS}';
@@ -81,7 +81,7 @@ You can reply to this email and have it posted as a topic reply.
 <*> You can go to your first unread message by using this link:
     {TOPICLINKNEW}
 
-<*> Unsubscribe to this by using this link:
+<*> Unsubscribe from this by using this link:
     {UNSUBSCRIBELINK}
 
 {EMAILREGARDS}';
@@ -122,7 +122,7 @@ You can reply to this email and have it posted as a topic reply.
 <*> You can go to your first unread message by using this link:
     {TOPICLINKNEW}
 
-<*> Unsubscribe to this by using this link:
+<*> Unsubscribe from this by using this link:
     {UNSUBSCRIBELINK}
 
 {EMAILREGARDS}';
@@ -164,7 +164,7 @@ You can reply to this email and have it posted as a reply.
 <*> You can go to your first unread message by using this link:
     {TOPICLINKNEW}
 
-<*> Unsubscribe to this by using this link:
+<*> Unsubscribe from this by using this link:
     {UNSUBSCRIBELINK}
 
 {EMAILREGARDS}';
@@ -180,13 +180,14 @@ You can reply to this email and have it posted as a reply.
 */
 $txt['pbe_new_pm_body_subject'] = 'New Personal Message: {SUBJECT}';
 $txt['pbe_new_pm_body_body'] = 'You have received a personal message from {SENDER} on {FORUMNAMESHORT}
+
 The message they sent you is:
 
 {MESSAGE}
 
 ------------------------------------
 Posting Information:
-You can reply to this email and have it sent as a PM response to {SENDER}
+You can reply to this email and have it sent as a PM response to {SENDER}.
 
 {FORUMNAMESHORT} Links:
 
@@ -198,7 +199,7 @@ You can reply to this email and have it sent as a PM response to {SENDER}
 
 {EMAILREGARDS}';
 
-/**
+/*
 	@additional_params: new_pm_body_tolist
 		SUBJECT: The personal message subject.
 		SENDER:  The user name for the member sending the personal message.
@@ -220,7 +221,7 @@ The message they sent is:
 <*> To visit {FORUMNAMESHORT} on the web, go to:
     {FORUMURL}
 
-<*> Reply to this Personal Message here::
+<*> Reply to this Personal Message here:
     {REPLYLINK}
 
 {EMAILREGARDS}';

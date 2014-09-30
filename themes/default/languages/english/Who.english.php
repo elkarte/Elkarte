@@ -26,7 +26,7 @@ $txt['whoall_activate'] = 'Activating their account.';
 $txt['whoall_buddy'] = 'Modifying their buddy list.';
 $txt['whoall_coppa'] = 'Filling out parent/guardian consent form.';
 $txt['whoall_credits'] = 'Viewing credits page.';
-$txt['whoall_emailuser'] = 'Sending email to another member.';
+$txt['whoall_emailuser'] = 'Sending e-mail to another member.';
 $txt['whoall_groups'] = 'Viewing the member groups page.';
 $txt['whoall_help'] = 'Viewing the <a href="{help_url}">help page</a>.';
 $txt['whoall_quickhelp'] = 'Viewing a help popup.';
@@ -103,7 +103,7 @@ $txt['whoallow_ban'] = 'Editing the ban list.';
 $txt['whoallow_boardrecount'] = 'Recounting the forum totals.';
 $txt['whoallow_calendar'] = 'Viewing the <a href="{calendar_url}">calendar</a>.';
 $txt['whoallow_editnews'] = 'Editing the news.';
-$txt['whoallow_mailing'] = 'Sending a forum email.';
+$txt['whoallow_mailing'] = 'Sending a forum e-mail.';
 $txt['whoallow_maintain'] = 'Performing routine forum maintenance.';
 $txt['whoallow_manageattachments'] = 'Managing the attachments.';
 $txt['whoallow_moderate'] = 'Viewing the <a href="{moderate_url}">Moderation Center</a>.';
@@ -125,10 +125,10 @@ $txt['who_viewprofile'] = 'Viewing <a href="%1$s">%2$s</a>\'s profile.';
 $txt['who_profile'] = 'Editing the profile of <a href="%1$s">%2$s</a>.';
 $txt['who_post'] = 'Posting a new topic in <a href="%1$s">%2$s</a>.';
 $txt['who_poll'] = 'Posting a new poll in <a href="%1$s">%2$s</a>.';
-$txt['who_topicbyemail'] = 'Email starting a new topic in <a href="%1$s">%2$s</a>.';
+$txt['who_topicbyemail'] = 'E-mail starting a new topic in <a href="%1$s">%2$s</a>.';
 
-$txt['whotopic_postbyemail'] = 'Email posting in <a href="%1$s">%2$s</a>.';
-$txt['who_pm_byemail'] = 'Sending a personal message by email.';
+$txt['whotopic_postbyemail'] = 'E-mail posting in <a href="%1$s">%2$s</a>.';
+$txt['who_pm_byemail'] = 'Sending a personal message by e-mail.';
 
 // Credits text
 $txt['credits'] = 'Credits';
@@ -147,7 +147,6 @@ $txt['credits_contrib_list'] = 'For a complete list of the many individuals that
 $txt['credits_license'] = 'License';
 $txt['credits_copyright'] = 'Copyright';
 $txt['credits_version'] = 'Version';
-// Replace "English" with the name of this language pack in the string below.
 $txt['credits_groups_translators'] = 'Language Translators';
 $txt['credits_translators_message'] = 'Thank you for your efforts which make it possible for people all around the world to use ElkArte.  For a complete list please refer to the offical Transifex <a href="https://www.transifex.com/organization/elkarte/dashboard" target="_blank" class="new_win">list of contributors.</a>';
 

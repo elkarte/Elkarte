@@ -191,7 +191,7 @@ function template_modify_subscription()
 						</fieldset>
 					</div>
 					<hr />
-					<input type="submit" name="save" value="', $txt['paid_settings_save'], '" class="right_submit" />
+					<input type="submit" name="save" value="', $txt['save'], '" class="right_submit" />
 					<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />
 					<input type="hidden" name="', $context['admin-pms_token_var'], '" value="', $context['admin-pms_token'], '" />
 				</div>

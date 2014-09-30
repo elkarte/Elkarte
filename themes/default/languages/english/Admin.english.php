@@ -138,7 +138,7 @@ $txt['member_id'] = 'ID';
 
 $txt['unknown'] = 'unknown';
 $txt['security_wrong'] = 'Administration login attempt!
-Referer: %1$s
+Referrer: %1$s
 User agent: %2$s
 IP: %3$s';
 
@@ -322,7 +322,7 @@ $txt['support_resources_p2'] = 'If you can\'t find the answers to your questions
 $txt['support_latest'] = 'Common support &amp; issues';
 $txt['support_latest_fetch'] = 'Retrieving support information...';
 
-$txt['edit_permissions_info'] = 'Use permission settings to manage global and specific board features and what actions that guest, members and moderators can do.';
+$txt['edit_permissions_info'] = 'Use permission settings to manage global and specific board features and to specify what actions guest, members and moderators can do.';
 $txt['membergroups_members'] = 'Regular Members';
 $txt['membergroups_guests'] = 'Guests';
 $txt['membergroups_add_group'] = 'Add group';
@@ -601,7 +601,7 @@ $txt['message_index_preview_last'] = 'Show the text of the last post';
 $txt['enableBBC'] = 'Enable bulletin board code (BBC)';
 $txt['enablePostHTML'] = 'Enable <em>basic</em> HTML in posts';
 $txt['autoLinkUrls'] = 'Automatically link posted URLs';
-$txt['disabledBBC'] = 'Enabled BBC tags';
+$txt['disabledBBC'] = 'Enabled BBC tags'; // << ?!
 $txt['bbcTagsToUse'] = 'Enabled BBC tags';
 $txt['bbcTagsToUse_select'] = 'Select the tags allowed to be used';
 $txt['bbcTagsToUse_select_all'] = 'Select all tags';

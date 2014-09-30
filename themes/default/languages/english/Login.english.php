@@ -13,14 +13,14 @@ $txt['agree_coppa_below'] = 'I am younger than %1$d years old.';
 $txt['registration_form'] = 'Registration Form';
 $txt['error_too_quickly'] = 'You went through the registration process too quickly, faster than should normally be possible. Please wait a moment and try again.';
 $txt['error_token_verification'] = 'Token verification failed. Please try again.';
-$txt['need_username'] = 'You need to fill in a username.';
+$txt['need_username'] = 'You need to fill in a user name.';
 $txt['no_password'] = 'You didn\'t enter your password.';
 $txt['improper_password'] = 'The supplied password is too long.';
 $txt['incorrect_password'] = 'Password incorrect';
 $txt['openid_not_found'] = 'Supplied OpenID identifier not found.';
 $txt['maintain_mode'] = 'Maintenance Mode';
 $txt['registration_successful'] = 'Registration Successful';
-$txt['valid_email_needed'] = 'Please enter a valid email address, %1$s.';
+$txt['valid_email_needed'] = 'Please enter a valid e-mail address, %1$s.';
 $txt['required_info'] = 'Required Information';
 $txt['additional_information'] = 'Additional Information';
 $txt['warning'] = 'Warning!';
@@ -36,14 +36,14 @@ $txt['under_age_registration_prohibited'] = 'Sorry, but users under the age of %
 
 $txt['activate_account'] = 'Account activation';
 $txt['activate_success'] = 'Your account has been successfully activated. You can now proceed to login.';
-$txt['activate_not_completed1'] = 'Your email address needs to be validated before you can login.';
-$txt['activate_not_completed2'] = 'Need another activation email?';
-$txt['activate_after_registration'] = 'Thank you for registering. You will receive an email soon with a link to activate your account.  If you don\'t receive an email after some time, check your spam folder.';
+$txt['activate_not_completed1'] = 'Your e-mail address needs to be validated before you can login.';
+$txt['activate_not_completed2'] = 'Need another activation e-mail?';
+$txt['activate_after_registration'] = 'Thank you for registering. You will receive an e-mail soon with a link to activate your account.  If you don\'t seem to have received an e-mail after some time, check your spam folder.';
 $txt['invalid_userid'] = 'User does not exist';
 $txt['invalid_activation_code'] = 'Invalid activation code';
-$txt['invalid_activation_username'] = 'Username or email';
-$txt['invalid_activation_new'] = 'If you registered with the wrong email address, type a new one and your password here.';
-$txt['invalid_activation_new_email'] = 'New email address';
+$txt['invalid_activation_username'] = 'User name or e-mail';
+$txt['invalid_activation_new'] = 'If you registered with the wrong e-mail address, type a new one and your password here.';
+$txt['invalid_activation_new_email'] = 'New e-mail address';
 $txt['invalid_activation_password'] = 'Old password';
 $txt['invalid_activation_resend'] = 'Resend activation code';
 $txt['invalid_activation_known'] = 'If you already know your activation code, please type it here.';
@@ -53,7 +53,7 @@ $txt['invalid_activation_submit'] = 'Activate';
 $txt['coppa_no_concent'] = 'The administrator has still not received parent/guardian consent for your account.';
 $txt['coppa_need_more_details'] = 'Need more details?';
 
-$txt['awaiting_delete_account'] = 'Your account has been marked for deletion!<br />If you wish to restore your account, please check the &quot;Reactivate my account&quot; box, and login again.';
+$txt['awaiting_delete_account'] = 'Your account has been marked for deletion!<br />If you wish to restore your account, please check the &quot;Reactivate my account&quot; box and log in again.';
 $txt['undelete_account'] = 'Reactivate my account';
 
 $txt['in_maintain_mode'] = 'This board is in Maintenance Mode.';
@@ -62,7 +62,7 @@ $txt['in_maintain_mode'] = 'This board is in Maintenance Mode.';
 $txt['register_agree'] = 'Please read and accept the agreement before registering.';
 $txt['register_passwords_differ_js'] = 'The two passwords you entered are not the same!';
 
-$txt['approval_after_registration'] = 'Thank you for registering. The admin must approve your registration before you may begin to use your account, you will receive an email shortly advising you of the admins decision.';
+$txt['approval_after_registration'] = 'Thank you for registering. The admin must approve your registration before you may begin to use your account, you will receive an e-mail shortly advising you of the admins decision.';
 
 $txt['admin_settings_desc'] = 'Here you can change a variety of settings related to registration of new members.';
 
@@ -71,10 +71,10 @@ $txt['setting_enableOpenID'] = 'Allow users to register using OpenID';
 $txt['setting_registration_method'] = 'Method of registration employed for new members';
 $txt['setting_registration_disabled'] = 'Registration Disabled';
 $txt['setting_registration_standard'] = 'Immediate Registration';
-$txt['setting_registration_activate'] = 'Email Activation';
+$txt['setting_registration_activate'] = 'E-mail Activation';
 $txt['setting_registration_approval'] = 'Admin Approval';
 $txt['setting_notify_new_registration'] = 'Notify administrators when a new member joins';
-$txt['setting_send_welcomeEmail'] = 'Send welcome email to new members';
+$txt['setting_send_welcomeEmail'] = 'Send welcome e-mail to new members';
 
 $txt['setting_coppaAge'] = 'Age below which to apply registration restrictions';
 $txt['setting_coppaAge_desc'] = '(Set to 0 to disable)';
@@ -87,19 +87,19 @@ $txt['setting_coppaFax'] = 'Fax number to which approval forms should be faxed';
 $txt['setting_coppaPhone'] = 'Contact number for parents to contact with age restriction queries';
 
 $txt['admin_register'] = 'Registration of new member';
-$txt['admin_register_desc'] = 'From here you can register new members into the forum, and if desired, email them their details.';
-$txt['admin_register_username'] = 'New Username';
-$txt['admin_register_email'] = 'Email Address';
+$txt['admin_register_desc'] = 'From here you can register new members into the forum, and if desired, e-mail them their details.';
+$txt['admin_register_username'] = 'New user name';
+$txt['admin_register_email'] = 'E-mail Address';
 $txt['admin_register_password'] = 'Password';
-$txt['admin_register_username_desc'] = 'Username for the new member';
-$txt['admin_register_email_desc'] = 'Email address of the member';
-$txt['admin_register_password_desc'] = 'Password for new member';
-$txt['admin_register_email_detail'] = 'Email new password to user';
-$txt['admin_register_email_detail_desc'] = 'Email address required even if unchecked';
+$txt['admin_register_username_desc'] = 'User name for the new member';
+$txt['admin_register_email_desc'] = 'E-mail address of the member';
+$txt['admin_register_password_desc'] = 'Password for the new member';
+$txt['admin_register_email_detail'] = 'E-mail new password to user';
+$txt['admin_register_email_detail_desc'] = 'E-mail address required even if unchecked';
 $txt['admin_register_email_activate'] = 'Require user to activate the account';
-$txt['admin_register_group'] = 'Primary Membergroup';
-$txt['admin_register_group_desc'] = 'Primary membergroup new member will belong to';
-$txt['admin_register_group_none'] = '(no primary membergroup)';
+$txt['admin_register_group'] = 'Primary Member Group';
+$txt['admin_register_group_desc'] = 'Primary member group the new member will belong to';
+$txt['admin_register_group_none'] = '(no primary member group)';
 $txt['admin_register_done'] = 'Member %1$s has been registered successfully!';
 
 $txt['coppa_title'] = 'Age Restricted Forum';
@@ -115,19 +115,19 @@ $txt['coppa_send_by_phone'] = 'Alternatively, arrange for them to phone the admi
 $txt['coppa_form_title'] = 'Permission form for registration at {forum_name_html_safe}';
 $txt['coppa_form_address'] = 'Address';
 $txt['coppa_form_date'] = 'Date';
-$txt['coppa_form_body'] = 'I {PARENT_NAME},<br /><br />give permission for {CHILD_NAME} (child name) to become a fully registered member of the forum: {forum_name_html_safe}, with the username: {USER_NAME}.<br /><br />I understand that certain personal information entered by {USER_NAME} may be shown to other users of the forum.<br /><br />Signed:<br />{PARENT_NAME} (Parent/Guardian).';
+$txt['coppa_form_body'] = 'I {PARENT_NAME},<br /><br />give permission for {CHILD_NAME} (child name) to become a fully registered member of the forum: {forum_name_html_safe}, with the user name: {USER_NAME}.<br /><br />I understand that certain personal information entered by {USER_NAME} may be shown to other users of the forum.<br /><br />Signed:<br />{PARENT_NAME} (Parent/Guardian).';
 
 $txt['visual_verification_sound_again'] = 'Play again';
 $txt['visual_verification_sound_close'] = 'Close window';
 $txt['visual_verification_sound_direct'] = 'Having problems hearing this?  Try a direct link to it.';
 
 // Use numeric entities in the below.
-$txt['registration_username_available'] = 'Username is available';
-$txt['registration_username_unavailable'] = 'Username is not available';
-$txt['registration_username_check'] = 'Check if username is available';
+$txt['registration_username_available'] = 'User name is available';
+$txt['registration_username_unavailable'] = 'User name is not available';
+$txt['registration_username_check'] = 'Check if user name is available';
 $txt['registration_password_short'] = 'Password is too short';
-$txt['registration_password_reserved'] = 'Password contains your username/email';
-$txt['registration_password_numbercase'] = 'Password must contain both upper and lower case, and numbers';
+$txt['registration_password_reserved'] = 'Password contains your user name/e-mail';
+$txt['registration_password_numbercase'] = 'Password must contain both upper and lower case letters and numbers';
 $txt['registration_password_no_match'] = 'Passwords do not match';
 $txt['registration_password_valid'] = 'Password is valid';
 

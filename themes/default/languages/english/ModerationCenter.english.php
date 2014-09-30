@@ -22,7 +22,7 @@ $txt['mc_warnings'] = 'Warnings';
 $txt['mc_notes'] = 'Moderator Notes';
 $txt['mc_required'] = 'Items Requiring Approval';
 $txt['mc_attachments'] = 'Attachments needing approval';
-$txt['mc_emailmod'] = 'Email Postings needing approval';
+$txt['mc_emailmod'] = 'E-mail Postings needing approval';
 $txt['mc_topics'] = 'Topics needing approval';
 $txt['mc_posts'] = 'Posts needing approval';
 $txt['mc_groupreq'] = 'Group requests needing approval';
@@ -143,7 +143,7 @@ $txt['mc_warning_template_error_no_body'] = 'You must set the notification body.
 
 $txt['mc_settings'] = 'Change Settings';
 $txt['mc_prefs_title'] = 'Moderation Preferences';
-$txt['mc_prefs_desc'] = 'This section allows you to set some personal preferences for moderation related activities such as email notifications.';
+$txt['mc_prefs_desc'] = 'This section allows you to set some personal preferences for moderation related activities such as e-mail notifications.';
 $txt['mc_prefs_homepage'] = 'Items to show on moderation homepage';
 $txt['mc_prefs_latest_news'] = 'ElkArte News';
 $txt['mc_prefs_show_reports'] = 'Show open report count in forum header';

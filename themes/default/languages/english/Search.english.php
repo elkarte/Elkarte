@@ -26,12 +26,12 @@ $txt['search_visual_verification_desc'] = 'Please enter the code in the image ab
 
 $txt['search_specific_topic'] = 'Searching only posts in the topic';
 
-$txt['groups_search_posts'] = 'Membergroups with access to the search function';
+$txt['groups_search_posts'] = 'Member groups with access to the search function';
 $txt['search_dropdown'] = 'Enable the Quick Search dropdown';
 $txt['search_results_per_page'] = 'Number of search results per page';
-$txt['search_weight_frequency'] = 'Relative search weight for number of matching messages within a topic';
-$txt['search_weight_age'] = 'Relative search weight for age of last matching message';
-$txt['search_weight_length'] = 'Relative search weight for topic length';
+$txt['search_weight_frequency'] = 'Relative search weight for the number of matching messages within a topic';
+$txt['search_weight_age'] = 'Relative search weight for the age of last matching message';
+$txt['search_weight_length'] = 'Relative search weight for a topic length';
 $txt['search_weight_subject'] = 'Relative search weight for a matching subject';
 $txt['search_weight_first_message'] = 'Relative search weight for a first message match';
 $txt['search_weight_sticky'] = 'Relative search weight for a pinned topic';
@@ -40,6 +40,7 @@ $txt['search_settings_desc'] = 'Here you can change the basic settings of the se
 $txt['search_settings_title'] = 'Search Settings';
 
 $txt['search_weights_desc'] = 'Here you can change the individual components of the relevance rating.';
+$txt['search_weights_none'] = 'Weight factors are not needed when using Sphinx which uses internal methods based on phrase proximity and keyword frequencies.';
 $txt['search_weights_sphinx'] = 'To update weight factors with Sphinx, you must generate and install a new sphinx.conf file.';
 $txt['search_weights_title'] = 'Search - weights';
 $txt['search_weights_total'] = 'Total';
@@ -50,7 +51,7 @@ $txt['search_method_title'] = 'Search - method';
 $txt['search_method_save'] = 'Save';
 $txt['search_method_messages_table_space'] = 'Space used by forum messages in the database';
 $txt['search_method_messages_index_space'] = 'Space used to index messages in the database';
-$txt['search_method_kilobytes'] = 'KB';
+$txt['search_method_kilobytes'] = 'KiB';
 $txt['search_method_fulltext_index'] = 'Fulltext index';
 $txt['search_method_no_index_exists'] = 'doesn\'t currently exist';
 $txt['search_method_fulltext_create'] = 'create a fulltext index';
@@ -61,7 +62,7 @@ $txt['search_method_index_partial'] = 'partially created';
 $txt['search_index_custom_resume'] = 'resume';
 
 // These strings are used in a javascript confirmation popup; don't use entities.
-$txt['search_method_fulltext_warning'] = 'In order to be able to use fulltext search, you\\\'ll have to create a fulltext index first.';
+$txt['search_method_fulltext_warning'] = 'In order to be able to use fulltext search, you\\\'ll have to create a fulltext index first!';
 $txt['search_index_custom_warning'] = 'In order to be able to use a custom index search, you\\\'ll have to create a custom index first!';
 
 $txt['search_index'] = 'Search index';
@@ -116,12 +117,12 @@ $txt['search_example'] = '<em>e.g.</em> Orwell "Animal Farm" -movie';
 
 $txt['search_engines_description'] = 'From this area you can decide in what detail you wish to track search engines as they index your forum as well as review search engine logs.';
 $txt['spider_mode'] = 'Search Engine Tracking Level';
-$txt['spider_mode_note'] = 'Note higher level tracking increases server resource requirement.';
+$txt['spider_mode_note'] = 'Note: higher level tracking increases server resource requirement.';
 $txt['spider_mode_off'] = 'Disabled';
 $txt['spider_mode_standard'] = 'Standard';
 $txt['spider_mode_high'] = 'Moderate';
 $txt['spider_mode_vhigh'] = 'Aggressive';
-$txt['spider_settings_desc'] = 'You can change settings for spider tracking from this page. Note, if you wish to <a href="%1$s">enable automatic pruning of the hit logs you can set this up here</a>';
+$txt['spider_settings_desc'] = 'You can change settings for spider tracking from this page. Note: if you wish to <a href="%1$s">enable automatic pruning of the hit logs you can set this up here</a>';
 
 $txt['spider_group'] = 'Apply restrictive permissions from group';
 $txt['spider_group_note'] = 'To enable you to stop spiders indexing some pages.';
@@ -177,7 +178,7 @@ $txt['sphinxql_test_passed'] = 'All tests were successful, the system was able t
 $txt['sphinx_test_connect_failed'] = 'Unable to connect to the Sphinx daemon. Make sure it is running and configured properly. Sphinx search will not work until you fix the problem.';
 $txt['sphinxql_test_connect_failed'] = 'Unable to access SphinxQL. Make sure your sphinx.conf has a separate listen directive for the SphinxQL port. SphinxQL search will not work until you fix the problem';
 $txt['sphinx_test_api_missing'] = 'The sphinxapi.php file is missing in your &quot;sources&quot; directory. You need to copy this file from the Sphinx distribution. Sphinx search will not work until you fix the problem.';
-$txt['sphinx_description'] = 'Use this interface to supply the access details to your Sphinx search daemon. <strong>These settings are only used to create</strong> an initial sphinx.conf configuration file which you will need to save in your Sphinx configuration directory (typically /usr/local/etc). Generally the options below can be left untouched, however they assume that the Sphinx software was installed in /usr/local and use /var/sphinx for the search index data storage. In order to keep Sphinx up to date, you must use a cron job to update the indexes, otherwise new or deleted content will not be reflected in  the search results. The configuration file defines two indexes:<br /><br/><strong>elkarte_delta_index</strong>, an index that only stores recent changes and can be called frequently. <strong>elkarte_base_index</strong>, an index that stores the full database and should be called less frequently. Example:<br /><span class="tt">10 3 * * * /usr/local/bin/indexer --config /usr/local/etc/sphinx.conf --rotate elkarte_base_index<br />0 * * * * /usr/local/bin/indexer --config /usr/local/etc/sphinx.conf --rotate elkarte_delta_index</span>';
+$txt['sphinx_description'] = 'Use this interface to supply the access details to your Sphinx search daemon. <strong>These settings are only used to create</strong> an initial sphinx.conf configuration file which you will need to save in your Sphinx configuration directory (typically /usr/local/etc). Generally the options below can be left untouched, however they assume that the Sphinx software was installed in /usr/local and uses /var/sphinx for the search index data storage. In order to keep Sphinx up to date, you must use a cron job to update the indexes, otherwise new or deleted content will not be reflected in  the search results. The configuration file defines two indexes:<br /><br/><strong>elkarte_delta_index</strong>, an index that only stores recent changes and can be called frequently. <strong>elkarte_base_index</strong>, an index that stores the full database and should be called less frequently. Example:<br /><span class="tt">10 3 * * * /usr/local/bin/indexer --config /usr/local/etc/sphinx.conf --rotate elkarte_base_index<br />0 * * * * /usr/local/bin/indexer --config /usr/local/etc/sphinx.conf --rotate elkarte_delta_index</span>';
 $txt['sphinx_index_data_path'] = 'Index data path:';
 $txt['sphinx_index_data_path_desc'] = 'This is the path that contains the search index files used by Sphinx.<br />It <strong>must</strong> exist and be accessible for reading and writing by the Sphinx indexer and search daemon.';
 $txt['sphinx_log_file_path'] = 'Log file path:';

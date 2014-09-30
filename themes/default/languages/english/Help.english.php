@@ -182,7 +182,7 @@ $helptxt['warning_enable'] = '<strong>User Warning System</strong><br />
 	actions available to them on the forum. Upon enabling this feature a permission will be available within the permissions section to define
 	which groups may assign warnings to members. Warning levels can be adjusted from a members profile. The following additional options are available:';
 $helptxt['watch_enable'] = '<strong>Warning Level for Member Watch</strong><br />This setting defines the percentage warning level a member must reach to automatically assign a &quot;watch&quot; to the member. Any member who is being &quot;watched&quot; will appear in the relevant area of the moderation center.';
-$helptxt['moderate_enable'] = '<strong>Warning Level for Post Moderation</strong><br />Any member passing the value of this setting will find all their posts require moderator approval before they appear to the forum	community. This will override any local board permissions which may exist related to post moderation.';
+$helptxt['moderate_enable'] = '<strong>Warning Level for Post Moderation</strong><br />Any member passing the value of this setting will find all their posts require moderator approval before they appear to the forum community. This will override any local board permissions which may exist related to post moderation.';
 $helptxt['mute_enable'] = '<strong>Warning Level for Member Muting</strong><br />If this warning level is passed by a member they will find themselves under a post ban. The member will lose all posting rights.';
 $helptxt['perday_limit'] = '<strong>Maximum Member Warning Points per Day</strong><br />This setting limits the amount of points a moderator may add/remove to any particular member in a twenty four hour period. This can be used to limit what a moderator can do in a small period of time. This setting can be disabled by setting to a value of zero. Note that any member with administrator permissions are not affected by this value.';
 $helptxt['error_log'] = '<strong>Error Log</strong><br />
@@ -284,8 +284,8 @@ $helptxt['allow_disableAnnounce'] = 'This will allow users to opt out of notific
 $helptxt['disallow_sendBody'] = 'This option removes the possibility to receive the text of replies, posts and personal messages in notification emails.<br /><br />Often, members will reply to the notification email, which in most cases means the webmaster receives the reply.';
 $helptxt['enable_contactform'] = 'This option adds a contact us button to the registration screen';
 $helptxt['jquery_source'] = 'This will determine the source used to load the jQuery Library.  Auto will use the CDN first and if not available fall back to the local source.  Local will only use the local source, CDN will only load it from Google\'s Content Delivery Network';
-$helptxt['jquery_default'] = 'If you want to use a version of jQuery different than the one that came with ElkArte, select this box and enter the version numer X.XX.X The local file must follow the naming conventing of jquery-X.XX.X.min.js for it to be loaded.';
-$helptxt['jqueryui_default'] = 'If you want to use a version of jQueryUI different than the one that came with ElkArte, select this box and enter the version numer X.XX.X The local file must follow the naming conventing of jquery-ui-X.XX.X.min.js for it to be loaded.';
+$helptxt['jquery_default'] = 'If you want to use a version of jQuery different than the one that came with ElkArte, select this box and enter the version number (X.XX.X). The local file must follow the naming convention of jquery-X.XX.X.min.js in order to be loaded.';
+$helptxt['jqueryui_default'] = 'If you want to use a version of jQuery UI different than the one that came with ElkArte, select this box and enter the version number (X.XX.X). The local file must follow the naming convention of jquery-ui-X.XX.X.min.js in order to be loaded.';
 $helptxt['minify_css_js'] = 'This will combine multiple CSS or JavaScript files per page as needed.  It will also remove unnecessary whitespace and comments from the files to reduce their size.  The combined and minimized files are saved so further requests can instantly serve those files.<br />Note that the first time a compilation is needed/created, there will be a slight delay on that page load in order to create the file (this will also happen after the cache is cleared)';
 $helptxt['compactTopicPagesEnable'] = 'This will show the supplied number of surrounding pages.<br /><em>Example:</em>
 		&quot;3&quot; to display: 1 ... 4 [5] 6 ... 9 <br />
@@ -354,7 +354,7 @@ $helptxt['theme_forum_theme'] = 'Changing the overall forum default does not aff
 
 // Theme Management and Options - Theme settings
 $helptxt['themeadmin_list_reset'] = 'On rare occasions the path to the theme will be lost and your forum will not display properly. This may be due to a mistake by an Admin, database errors, failed software updates, mod installations or some other event. Resetting the themes URLs and directories will usually fix this problem.';
-$helptxt['themeadmin_delete_help'] = 'The default theme cannot be deleted as doing so would break your forum and would break other themes. However, you can delete any theme that has the red \'X\' next to it by clicking on that \'X\'. <br /><br /> Remember this: Deleting a theme does not remove it from the server, it only removes the themes availability to be used on the forum. You will need to FTP into your server or use the host provided panel to remove the custom theme from the server. Do not ever delete the theme named \'default\'.';
+$helptxt['themeadmin_delete_help'] = 'The default theme cannot be deleted as doing so would break your forum and would break other themes. However, you can delete any theme that has the red \'X\' next to it by clicking on that \'X\'. <br /><br /> Remember this: Deleting a theme does not remove it from the server, it only removes the theme\'s availability to be used on the forum. You will need to FTP into your server or use the host provided panel to remove the custom theme from the server. Do not ever delete the theme named \'default\'.';
 
 $helptxt['enableVideoEmbeding'] = 'This allows automatic conversion of standard URLs into an embedded video when the post is viewed.  Currently only supports YouTube, Vimeo and Dailymotion video links';
 $helptxt['enableCodePrettify'] = 'This will load the Prettify script which will color highlight code used in code tags.  It adds styles to code snippets so that tokens stand out and your users can more easily read the code.';
@@ -419,7 +419,7 @@ $helptxt['ssi_db_user'] = 'Optional setting to use a different database user and
 $helptxt['queryless_urls'] = 'This changes the format of URLs a little so search engines will like them better.  They will look like index.php/topic,1.0.html.';
 $helptxt['countChildPosts'] = 'Checking this option will mean that posts and topics in a board\'s sub-board will count toward its totals on the index page.<br /><br />This will make things notably slower, but means that a parent with no posts in it won\'t show \'0\'.';
 $helptxt['allow_ignore_boards'] = 'Checking this option will allow users to select boards they wish to ignore.';
-$helptxt['deny_boards_access'] = 'Checking this option will allow you to deny access to certain boards based on membergroup access';
+$helptxt['deny_boards_access'] = 'Checking this option will allow you to deny access to certain boards based on member group access';
 
 $helptxt['who_enabled'] = 'This option allows you to turn on or off the ability for users to see who is browsing the forum and what they are doing.';
 
@@ -467,10 +467,10 @@ $helptxt['password_strength'] = 'This setting determines the strength required f
 	</ul>';
 $helptxt['enable_password_conversion'] = 'By enabling this setting, ElkArte will attempt to detect passwords stored in other formats and convert them for use in this software.  Typically this is used for converted forums, but may have other uses as well.  Disabling this prevents a user from logging in using their password after a conversion and would need to reset their password.';
 
-$helptxt['coppaAge'] = 'The value specified in this box will determine the minimum age that new members must be to be granted immediate access to the forums.
-	On registration they will be prompted to confirm whether they are over this age, and if not will either have their application rejected or suspended awaiting parental approval - dependant on the type of restriction chosen.
+$helptxt['coppaAge'] = 'The value specified in this box will determine the minimum age of new members to be granted immediate access to the forums.
+	On registration they will be prompted to confirm whether they are over this age, and if not will either have their application rejected or suspended awaiting parental approval - depending on the type of restriction chosen.
 	If a value of 0 is chosen for this setting then all other age restriction settings shall be ignored.';
-$helptxt['coppaType'] = 'If age restrictions are enabled, then this setting will define that happens when a user below the minimum age attempts to register with your forum. There are two possible choices:
+$helptxt['coppaType'] = 'If age restrictions are enabled, this setting will define that happens when a user below the minimum age attempts to register with your forum. There are two possible choices:
 	<ul class="normallist">
 		<li>
 			<strong>Reject Their Registration:</strong><br />

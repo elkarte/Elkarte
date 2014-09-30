@@ -3,7 +3,7 @@
 // Version: 1.0; Packages
 
 $txt['package_proceed'] = 'Proceed';
-$txt['php_script'] = 'The addon archive was extracted, but this addon also comes with a PHP script which should be executed before it will work';
+$txt['php_script'] = 'The add-on archive was extracted, but this add-on also comes with a PHP script which should be executed before it will work';
 $txt['package_run'] = 'Run';
 $txt['package_id'] = 'ID';
 $txt['package_read'] = 'Read';
@@ -24,20 +24,20 @@ $txt['package_downloaded_successfully'] = 'Package has been downloaded successfu
 $txt['package_manager'] = 'Package Manager';
 $txt['install_mod'] = 'Install Add-on';
 $txt['uninstall_mod'] = 'Uninstall Add-on';
-$txt['sql_file'] = 'The addon archive has been extracted.  This addon also comes with a database file containing changes the database needs.  You will need to execute this file for the addon to function properly.';
+$txt['sql_file'] = 'The add-on archive has been extracted.  This add-on also comes with a database file containing changes the database needs.  You will need to execute this file for the add-on to function properly.';
 $txt['sql_queries'] = 'SQL Queries';
-$txt['no_adds_installed'] = 'No addons currently installed';
-$txt['browse_installed'] = 'Browse installed addons';
+$txt['no_adds_installed'] = 'No add-ons currently installed';
+$txt['browse_installed'] = 'Browse installed add-ons';
 $txt['uninstall'] = 'Uninstall';
-$txt['delete_list'] = 'Delete Add-on List';
-$txt['package_delete_list_warning'] = 'Are you sure you wish to clear the installed addons list?';
+$txt['delete_list'] = 'Clear Add-on List';
+$txt['package_delete_list_warning'] = 'Are you sure you wish to clear the installed add-ons list?';
 $txt['php_safe_mode'] = 'Sorry, your server currently has PHP set to run in SAFE MODE.  This feature is not compatible with SAFE MODE.';
 $txt['lets_try_anyway'] = 'Let me try anyway.';
 
-$txt['package_manager_desc'] = 'From this easy to use interface, you can download and install addons for use on your forum.';
+$txt['package_manager_desc'] = 'From this easy to use interface, you can download and install add-ons for use on your forum.';
 $txt['installed_packages_desc'] = 'You can use the interface below to view those packages currently installed on the forum, and remove the ones you no longer require.';
 $txt['download_packages_desc'] = 'From this section you can add or remove package servers, browse for packages, or download new packages from servers.';
-$txt['package_servers_desc'] = 'From this easy to use interface, you can manage your package servers and download addon archives on your forum.';
+$txt['package_servers_desc'] = 'From this easy to use interface, you can manage your package servers and download add-on archives on your forum.';
 $txt['upload_packages_desc'] = 'From this section you can upload a package file from your local computer directly to the forum.';
 
 $txt['create_package'] = 'Create a new Package';
@@ -66,7 +66,7 @@ $txt['package_no_description'] = 'No description given';
 $txt['package_description'] = 'Description';
 $txt['file_location'] = 'Location of file';
 
-$txt['package_installed_key'] = 'Installed addons:';
+$txt['package_installed_key'] = 'Installed add-ons:';
 $txt['package_installed_current'] = 'current version';
 $txt['package_installed_old'] = 'older version';
 $txt['package_installed_warning1'] = 'This package is already installed, and no upgrade was found.';
@@ -111,15 +111,15 @@ $txt['package_will_fail_title'] = 'Error in package %1$s';
 $txt['package_will_fail_warning'] = 'At least one error was encountered during a test %1$s of this package.<br />It is <strong>strongly</strong> recommended that you do not continue with %1$s unless you know what you are doing, and have made a backup very recently.<br /><br />This error may be caused by a conflict between the package you\'re trying to install and another package you have already installed, an error in the package, a package which requires another package that you have not installed yet, or a package designed for another version of the software.';
 $txt['package_will_fail_unknown_action'] = 'The package is trying to perform an unknown action: %1$s';
 // Don't use entities in the below string.
-$txt['package_will_fail_popup'] = 'Are you sure you wish to continue installing this addon, even though it will not install successfully?';
-$txt['package_will_fail_popup_uninstall'] = 'Are you sure you wish to continue uninstalling this addon, even though it will not uninstall successfully?';
+$txt['package_will_fail_popup'] = 'Are you sure you wish to continue installing this add-on, even though it will not install successfully?';
+$txt['package_will_fail_popup_uninstall'] = 'Are you sure you wish to continue uninstalling this add-on, even though it will not uninstall successfully?';
 $txt['package_install'] = 'installation';
 $txt['package_uninstall'] = 'removal';
 $txt['package_install_now'] = 'Install now';
 $txt['package_uninstall_now'] = 'Uninstall now';
 $txt['package_other_themes'] = 'Install in other themes';
-$txt['package_other_themes_uninstall'] = 'UnInstall in other themes';
-$txt['package_other_themes_desc'] = 'To use this addon in themes other than the default, the package manager needs to make additional changes to the other themes. If you\'d like to install this addon in the other themes, please select these themes below.';
+$txt['package_other_themes_uninstall'] = 'Uninstall in other themes';
+$txt['package_other_themes_desc'] = 'To use this add-on in themes other than the default, the package manager needs to make additional changes to the other themes. If you\'d like to install this add-on in the other themes, please select these themes below.';
 // Don't use entities in the below string.
 $txt['package_theme_failure_warning'] = 'At least one error was encountered during a test install of this theme. Are you sure you wish to attempt installation?';
 
@@ -133,16 +133,16 @@ $txt['package_action_skipping'] = '<strong>Skipping file</strong>';
 
 $txt['package_uninstall_actions'] = 'Uninstall Actions';
 $txt['package_uninstall_done'] = 'The package has been successfully uninstalled.';
-$txt['package_uninstall_cannot'] = 'This package cannot be uninstalled, because there is no uninstaller.<br /><br />Please contact the addon author for more information.';
+$txt['package_uninstall_cannot'] = 'This package cannot be uninstalled, because there is no uninstaller.<br /><br />Please contact the add-on author for more information.';
 
 $txt['package_install_options'] = 'Installation Options';
-$txt['package_install_options_desc'] = 'Set various options for how the package manager installs addons, including backups and ftp access';
+$txt['package_install_options_desc'] = 'Set various options for how the package manager installs add-ons, including backups and ftp access';
 $txt['package_install_options_ftp_why'] = 'Using the package manager\'s FTP functionality is the easiest way to avoid having to manually chmod the files writable through FTP yourself for the package manager to work.<br />Here you can set the default values for some fields.';
 $txt['package_install_options_ftp_server'] = 'FTP Server';
 $txt['package_install_options_ftp_port'] = 'Port';
-$txt['package_install_options_ftp_user'] = 'Username';
-$txt['package_install_options_make_backups'] = 'Create Backup versions of replaced files with a tilde (~) on the end of their names.';
-$txt['package_install_options_make_full_backups'] = 'Create an entire backup (excluding smileys, avatars and attachments) of the ElkArte install.';
+$txt['package_install_options_ftp_user'] = 'User Name';
+$txt['package_install_options_make_backups'] = 'Create backup versions of replaced files with a tilde (~) on the end of their names.';
+$txt['package_install_options_make_full_backups'] = 'Create an entire backup (excluding smileys, avatars and attachments) of the ElkArte installation.';
 
 $txt['package_ftp_necessary'] = 'FTP Information Required';
 $txt['package_ftp_why'] = 'Some of the files the package manager needs to modify are not writable.  This needs to be changed by logging into FTP and using it to chmod or create the files and directories.  Your FTP information may be temporarily cached for proper operation of the package manager. Note you can also do this manually using an FTP client - <a href="#" onclick="%1$s">to view a list of the affected files please click here</a>.';
@@ -150,7 +150,7 @@ $txt['package_ftp_why_file_list'] = 'The following files need to made writable t
 $txt['package_ftp_why_download'] = 'In order to download packages, the packages directory, and any files in it, must be writable.  Currently the system does not have the needed permissions to write to this directory.  The package manager can use your FTP information to attempt to fix this problem.';
 $txt['package_ftp_server'] = 'FTP Server';
 $txt['package_ftp_port'] = 'Port';
-$txt['package_ftp_username'] = 'Username';
+$txt['package_ftp_username'] = 'User Name';
 $txt['package_ftp_password'] = 'Password';
 $txt['package_ftp_path'] = 'Local path to ElkArte';
 $txt['package_ftp_test'] = 'Test';
@@ -170,7 +170,7 @@ $txt['package_upload'] = 'Upload';
 $txt['package_uploaded_success'] = 'Package uploaded successfully';
 $txt['package_uploaded_successfully'] = 'The package has been uploaded successfully';
 
-$txt['package_modification_malformed'] = 'Malformed or invalid addon file.';
+$txt['package_modification_malformed'] = 'Malformed or invalid add-on file.';
 $txt['package_modification_missing'] = 'The file could not be found.';
 $txt['package_no_zlib'] = 'Sorry, your PHP configuration doesn\'t have support for <strong>zlib</strong>.  Without this, the package manager cannot function.  Please contact your host about this for more information.';
 
@@ -182,11 +182,11 @@ $txt['package_cleanperms_free'] = 'All files are writable.';
 $txt['package_cleanperms_restrictive'] = 'The minimum files are writable.';
 $txt['package_cleanperms_go'] = 'Change file permissions';
 
-$txt['package_download_by_url'] = 'Download a package by url';
+$txt['package_download_by_url'] = 'Download a package by URL';
 $txt['package_download_filename'] = 'Name of the file';
-$txt['package_download_filename_info'] = 'Optional value.  Should be used when the url does not end in the filename.  For example: index.php?mod=5';
+$txt['package_download_filename_info'] = 'Optional value.  Should be used when the URL does not end in the filename.  For example: index.php?mod=5';
 
-$txt['package_db_uninstall'] = 'Remove all data associated with this addon.';
+$txt['package_db_uninstall'] = 'Remove all data associated with this add-on.';
 $txt['package_db_uninstall_details'] = 'Details';
 $txt['package_db_uninstall_actions'] = 'Checking this option will result in the following actions';
 $txt['package_db_remove_table'] = 'Drop table &quot;%1$s&quot;';
@@ -228,7 +228,7 @@ $txt['package_file_perms_pre_restricted'] = 'Restricted - minimum files writable
 $txt['package_file_perms_pre_standard'] = 'Standard - key files writable';
 $txt['package_file_perms_pre_free'] = 'Free - all files writable';
 $txt['package_file_perms_ftp_details'] = 'On most servers it is only possible to change file permissions using an FTP account. Please enter your FTP details below';
-$txt['package_file_perms_ftp_retain'] = 'Note, the system will only retain the password information temporarily to aid operation of the package manager.';
+$txt['package_file_perms_ftp_retain'] = 'Note that the system will only retain the password information temporarily to aid operation of the package manager.';
 $txt['package_file_perms_go'] = 'Make Changes';
 
 $txt['package_file_perms_applying'] = 'Applying Changes';
@@ -243,9 +243,9 @@ $txt['chmod_value_invalid'] = 'You have tried to enter an invalid chmod value. C
 $txt['package_restore_permissions'] = 'Restore file permissions';
 $txt['package_restore_permissions_desc'] = 'The following file permissions were changed in order to install the selected package(s). You can return these files back to their original status by clicking &quot;Restore&quot; below.';
 $txt['package_restore_permissions_restore'] = 'Restore';
-$txt['package_restore_permissions_filename'] = 'Filename';
-$txt['package_restore_permissions_orig_status'] = 'Original Status';
-$txt['package_restore_permissions_cur_status'] = 'Current Status';
+$txt['package_restore_permissions_filename'] = 'File Name';
+$txt['package_restore_permissions_orig_status'] = 'Original State';
+$txt['package_restore_permissions_cur_status'] = 'Current State';
 $txt['package_restore_permissions_result'] = 'Result';
 $txt['package_restore_permissions_pre_change'] = '%1$s (%3$s)';
 $txt['package_restore_permissions_post_change'] = '%2$s (%3$s - was %2$s)';

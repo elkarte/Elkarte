@@ -57,7 +57,7 @@ $txt['pm_labels_delete'] = 'Are you sure you wish to delete the selected labels?
 $txt['pm_labels_desc'] = 'From here you can add, edit and delete the labels used in your personal message center.';
 $txt['pm_label_add_new'] = 'Add new label';
 $txt['pm_label_name'] = 'Label name';
-$txt['pm_labels_no_exist'] = 'You currently have no labels setup!';
+$txt['pm_labels_no_exist'] = 'You currently have no labels set up!';
 
 // Labeling Drop Down.
 $txt['pm_current_label'] = 'Label';

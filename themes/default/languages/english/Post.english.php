@@ -25,7 +25,7 @@ $txt['rich_edit_wont_work'] = 'Your browser does not support Rich Text editing.'
 $txt['rich_edit_function_disabled'] = 'Your browser does not support this function.';
 
 // Use numeric entities in the below five strings.
-$txt['notifyUnsubscribe'] = 'Unsubscribe to this topic by clicking here';
+$txt['notifyUnsubscribe'] = 'Unsubscribe from this topic by clicking here';
 
 $txt['lock_after_post'] = 'Lock after Post';
 $txt['notify_replies'] = 'Notify me of replies.';
@@ -63,8 +63,8 @@ $txt['board_moderate'] = 'on a board you moderate';
 $txt['report_comment'] = 'The reporter has made the following comment';
 
 $txt['attach_drop_files'] = 'Add files by dragging & dropping or <a class="drop_area_fileselect_text" href="#">selecting them</a>';
-$txt['attach_restrict_attachmentPostLimit'] = 'maximum total size %1$s KB';
-$txt['attach_restrict_attachmentSizeLimit'] = 'maximum individual size %1$s KB';
+$txt['attach_restrict_attachmentPostLimit'] = 'maximum total size %1$s KiB';
+$txt['attach_restrict_attachmentSizeLimit'] = 'maximum individual size %1$s KiB';
 $txt['attach_restrict_attachmentNumPerPostLimit'] = '%1$d per post';
 $txt['attach_restrictions'] = 'Restrictions:';
 
@@ -109,7 +109,6 @@ $txt['more_smileys'] = 'more';
 $txt['more_smileys_title'] = 'Additional smileys';
 $txt['more_smileys_pick'] = 'Pick a smiley';
 $txt['more_smileys_close_window'] = 'Close Window';
-
 $txt['error_new_reply'] = 'while you were typing a new reply has been posted. You may wish to review your post.';
 $txt['error_new_replies'] = 'while you were typing %1$d new replies have been posted. You may wish to review your post.';
 $txt['error_new_reply_reading'] = 'while you were reading a new reply has been posted. You may wish to review your post.';
@@ -117,7 +116,7 @@ $txt['error_new_replies_reading'] = 'while you were reading %1$d new replies hav
 
 $txt['announce_this_topic'] = 'Send an announcement about this topic to the members:';
 $txt['announce_title'] = 'Send an announcement';
-$txt['announce_desc'] = 'This form allows you to send an announcement to the selected membergroups about this topic.';
+$txt['announce_desc'] = 'This form allows you to send an announcement to the selected member groups about this topic.';
 $txt['announce_sending'] = 'Sending announcement of topic';
 $txt['announce_done'] = 'done';
 $txt['announce_continue'] = 'Continue';
@@ -144,14 +143,14 @@ $txt['digest_mod_act_split'] = '"%1$s" was split';
 
 $txt['attach_error_title'] = 'Error uploading attachments.';
 $txt['attach_warning'] = 'There was a problem during the uploading of <strong>%1$s</strong>.';
-$txt['attach_max_total_file_size'] = 'Sorry, you are out of attachment space. The total attachment size allowed per post is %1$s KB. Space remaining is %2$s KB.';
+$txt['attach_max_total_file_size'] = 'Sorry, you are out of attachment space. The total attachment size allowed per post is %1$s KiB. Space remaining is %2$s KiB.';
 $txt['attach_folder_warning'] = 'The attachments directory can not be located. Please notify an administrator of this problem.';
 $txt['attach_folder_admin_warning'] = 'The path to the attachments directory (%1$s) is incorrect. Please correct it in the attachment settings area of your admin panel.';
 $txt['attach_limit_nag'] = 'You have reached the maximum number of attachments allowed per post.';
 $txt['attach_no_upload'] = 'There was a problem and your attachments could not be uploaded';
 $txt['attach_remaining'] = '%1$d remaining';
-$txt['attach_available'] = '%1$s KB available';
-$txt['attach_kb'] = ' (%1$s KB)';
+$txt['attach_available'] = '%1$s KiB available';
+$txt['attach_kb'] = ' (%1$s KiB)';
 $txt['attach_0_byte_file'] = 'The file appears to be empty. Please contact your forum administrator if this continues to be a problem';
 $txt['attached_files_in_session'] = '<em>The above underlined file(s) have been uploaded but will not be attached to this post until it is submitted.</em>';
 
@@ -163,14 +162,14 @@ $txt['php_upload_error_6'] = 'Unable to save. Missing a temporary directory. Ple
 $txt['php_upload_error_7'] = 'Failed to write file to disk. This is a PHP related error. Please contact your host if this problem continues.';
 $txt['php_upload_error_8'] = 'A PHP extension stopped the file upload. This is a PHP related error. Please contact your host if this problem continues.';
 $txt['error_temp_attachments_new'] = 'There are attachments which you had previously attached but not posted. These attachments are still attached to this post. This post does need to be submitted before these attachments are either saved or removed. You <a href="#postAttachment">can do that here</a>';
-$txt['error_temp_attachments_found'] = 'The following attachments were found which you had previously attached to another post but not posted. It is advisable that you do not post until these are either removed or that post has been submitted.<br />Click <a href="%1$s">here to remove </a>those attachments. Or <a href="%2$s">here to return to that post</a>.%3$s';
+$txt['error_temp_attachments_found'] = 'The following attachments were found which you had previously attached to another post but not posted. It is advisable that you do not post until these are either removed or that post has been submitted.<br />Click <a href="%1$s">here to remove those attachments</a>. Or <a href="%2$s">here to return to that post</a>.%3$s';
 $txt['error_temp_attachments_lost'] = 'The following attachments were found which you had previously attached to another post but not posted. It is advisable that you do not upload any more attachments until these are removed or that post has been submitted.<br />Click <a href="%1$s">here to remove these attachments</a>.%2$s';
 $txt['error_temp_attachments_gone'] = 'Those attachments have now been removed and you have been returned to the page you were previously on';
 $txt['error_temp_attachments_flushed'] = 'Please note that any files which had been previously attached, but not posted, have now been removed.';
 $txt['error_topic_already_announced'] = 'Please note that this topic has already been announced.';
 
 $txt['cant_access_upload_path'] = 'Cannot access attachments upload path!';
-$txt['file_too_big'] = 'Your file is too large. The maximum attachment size allowed is %1$s KB.';
+$txt['file_too_big'] = 'Your file is too large. The maximum attachment size allowed is %1$s KiB.';
 $txt['attach_timeout'] = 'Your attachment couldn\'t be saved. This might happen because it took too long to upload or the file is bigger than the server will allow.<br /><br />Please consult your server administrator for more information.';
 $txt['bad_attachment'] = 'Your attachment has failed security checks and cannot be uploaded. Please consult the forum administrator.';
 $txt['ran_out_of_space'] = 'The upload directory is full. Please contact an administrator about this problem.';

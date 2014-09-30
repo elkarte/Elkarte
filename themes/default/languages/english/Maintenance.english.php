@@ -17,18 +17,18 @@ $txt['repair_missing_polls'] = 'Topic #%1$d is tied to non-existent poll #%2$d.'
 $txt['repair_polls_missing_topics'] = 'Poll #%1$d is tied to non-existent topic #%2$d.';
 $txt['repair_missing_calendar_topics'] = 'Event #%1$d is tied to topic #%2$d, which is missing.';
 $txt['repair_missing_log_topics'] = 'Topic #%1$d is marked as read for one or more people, but does not exist.';
-$txt['repair_missing_log_topics_members'] = 'Member #%1$d has marked one or more topics as read, but does not exist.';
-$txt['repair_missing_log_boards'] = 'Board #%1$d is marked as read for one or more people, but does not exist.';
+$txt['repair_missing_log_topics_members'] = 'Member #%1$d has marked one or more topics as read, but does not exist.';    // < redundancy?! 2
+$txt['repair_missing_log_boards'] = 'Board #%1$d is marked as read for one or more people, but does not exist.';          // < redundancy?! 1
 $txt['repair_missing_log_boards_members'] = 'Member #%1$d has marked one or more boards as read, but does not exist.';
-$txt['repair_missing_log_mark_read'] = 'Board #%1$d is marked as read for one or more people, but does not exist.';
-$txt['repair_missing_log_mark_read_members'] = 'Member #%1$d has marked one or more boards as read, but does not exist.';
+$txt['repair_missing_log_mark_read'] = 'Board #%1$d is marked as read for one or more people, but does not exist.';       // < redundancy?! 1
+$txt['repair_missing_log_mark_read_members'] = 'Member #%1$d has marked one or more boards as read, but does not exist.'; // < redundancy?! 2
 $txt['repair_missing_pms'] = 'Personal message #%1$d has been sent to one or more people, but does not exist.';
 $txt['repair_missing_recipients'] = 'Member #%1$d has received one or more personal messages, but does not exist.';
 $txt['repair_missing_senders'] = 'Personal message #%1$d was sent by member #%2$d, who does not exist.';
 $txt['repair_missing_notify_members'] = 'Notifications have been requested by member #%1$d, who does not exist.';
 $txt['repair_missing_cached_subject'] = 'The subject of topic #%1$d is currently not stored in the subject cache.';
 $txt['repair_missing_topic_for_cache'] = 'Cached word \'%1$s\' is linked to a non-existent topic.';
-$txt['repair_missing_log_poll_member'] = 'Poll #%1$d has been given a vote from member #%2$d , who is now missing.';
+$txt['repair_missing_log_poll_member'] = 'Poll #%1$d has been given a vote from member #%2$d, who is now missing.';
 $txt['repair_missing_log_poll_vote'] = 'A vote was cast by member #%1$d on a non-existent poll #%2$d.';
 $txt['repair_missing_thumbnail_parent'] = 'A thumbnail exists called %1$s, but it doesn\'t have a parent.';
 $txt['repair_report_missing_comments'] = 'Report #%1$d of topic: &quot;%2$s&quot; has no comments.';
@@ -81,7 +81,7 @@ $txt['salvaged_poll_message_body'] = 'This poll was found without a topic.';
 $txt['database_optimize'] = 'Optimize Database';
 $txt['database_numb_tables'] = 'Your database contains %1$d tables.';
 $txt['database_optimize_attempt'] = 'Attempting to optimize your database...';
-$txt['database_optimizing'] = 'Optimizing %1$s... %2$01.2f KB optimized.';
+$txt['database_optimizing'] = 'Optimizing %1$s... %2$01.2f KiB loss.';
 $txt['database_already_optimized'] = 'All of the tables were already optimized.';
 $txt['database_optimized'] = ' table(s) optimized.';
 
@@ -161,7 +161,7 @@ $txt['maintain_members'] = 'Remove Inactive Members';
 $txt['maintain_members_since'] = 'Remove all members who have not {select_conditions} for {num_days} days.';
 $txt['maintain_members_activated'] = 'activated their account';
 $txt['maintain_members_logged_in'] = 'logged in';
-$txt['maintain_members_all'] = 'All Membergroups';
+$txt['maintain_members_all'] = 'All Member Groups';
 $txt['maintain_members_choose'] = 'Selected Groups';
 $txt['maintain_members_confirm'] = 'Are you sure you really want to delete these member accounts?\\n\\nThis cannot be undone!';
 
@@ -184,19 +184,19 @@ $txt['move_topics_confirm'] = 'Are you sure you want to move ALL the topics from
 
 $txt['maintain_reattribute_posts'] = 'Reattribute User Posts';
 $txt['reattribute_guest_posts'] = 'Attribute guest posts made with';
-$txt['reattribute_email'] = 'Email address of';
-$txt['reattribute_username'] = 'Username of';
+$txt['reattribute_email'] = 'E-mail address of';
+$txt['reattribute_username'] = 'User name of';
 $txt['reattribute_current_member'] = 'Attribute posts to member';
 $txt['reattribute_increase_posts'] = 'Add posts to users post count';
 $txt['reattribute'] = 'Reattribute';
 // Don't use entities in the below string.
 $txt['reattribute_confirm'] = 'Are you sure you want to attribute all guest posts with %type% of "%find%" to member "%member_to%"?';
-$txt['reattribute_confirm_username'] = 'a username';
-$txt['reattribute_confirm_email'] = 'an email address';
+$txt['reattribute_confirm_username'] = 'a user name';
+$txt['reattribute_confirm_email'] = 'an e-mail address';
 $txt['reattribute_cannot_find_member'] = 'Could not find member to attribute posts to.';
 
 $txt['maintain_recountposts'] = 'Recount User Posts';
-$txt['maintain_recountposts_info'] = 'Run this maintenance task to update your users total post count.  It will recount all (countable) posts made by each user and then update their profile post count totals';
+$txt['maintain_recountposts_info'] = 'Run this maintenance task to update your users\' total post count.  It will recount all (countable) posts made by each user and then update their profile post count totals';
 
 $txt['safe_mode_enabled'] = '<a href="http://php.net/manual/en/features.safe-mode.php">safe_mode</a> is enabled on your server!<br />The backup done with this tool cannot be considered reliable!';
 $txt['use_external_tool'] = 'Please consider using an external tool to backup your database, any backup created with this utility cannot be considered 100% reliable.';

@@ -5,7 +5,7 @@ $txt['boards_and_cats'] = 'Manage Boards and Categories';
 $txt['order'] = 'Order';
 $txt['full_name'] = 'Full name';
 $txt['name_on_display'] = 'This is the name that will be displayed.';
-$txt['boards_and_cats_desc'] = 'Edit your categories and boards here. List multiple moderators as <em>&quot;username&quot;, &quot;username&quot;</em>. (these must be usernames and *not* display names)<br />To create a new board, click the Add Board button.<br />To move a board you can drag and drop it to its new location in the list (across cataegories and Child of locations)<br />To create a new board as a child of a current board, select "Child of..." from the Order drop down menu when creating the board.';
+$txt['boards_and_cats_desc'] = 'Edit your categories and boards here. List multiple moderators as <em>&quot;username&quot;, &quot;username&quot;</em>. (these must be usernames and *not* display names)<br />To create a new board, click the Add Board button.<br />To move a board you can drag and drop it to its new location in the list (across categories and locations).<br />To create a new board as a child of a current board, select "Child of..." from the Order drop down menu when creating the board.';
 $txt['parent_members_only'] = 'Regular Members';
 $txt['parent_guests_only'] = 'Guests';
 $txt['catConfirm'] = 'Do you really want to delete this category?';
@@ -80,13 +80,13 @@ $txt['no_valid_parent'] = 'Board %1$s does not have a valid parent. Use the \'fi
 $txt['mboards_recycle_disabled_delete'] = 'You must select an alternative recycle bin board or disable recycling before you can delete this board.';
 
 $txt['mboards_settings_desc'] = 'Edit general board and category settings.';
-$txt['groups_manage_boards'] = 'Membergroups allowed to manage boards and categories';
+$txt['groups_manage_boards'] = 'Member groups allowed to manage boards and categories';
 $txt['recycle_enable'] = 'Enable recycling of deleted topics';
 $txt['recycle_board'] = 'Board for recycled topics';
 $txt['recycle_board_unselected_notice'] = 'You have enabled the recycling of topics without specifying a board to place them in.  This feature will not be enabled until you specify a board to place recycled topics into.';
 $txt['countChildPosts'] = 'Count child\'s posts in parent\'s totals';
 $txt['allow_ignore_boards'] = 'Allow boards to be ignored';
-$txt['deny_boards_access'] = 'Enable the option to deny board access based on membergroup';
+$txt['deny_boards_access'] = 'Enable the option to deny board access based on member group';
 $txt['boardsaccess_option_desc'] = 'For each permission you can choose \'Allow\' (A), \'Ignore\' (X), or <span class="alert">\'Deny\' (D)</span>.<br /><br />If you deny access, any member - (including moderators) - in that group will be denied access.<br />For this reason, you should set deny carefully, only when <strong>necessary</strong>. Ignore, on the other hand, denies unless otherwise granted.';
 
 $txt['mboards_select_destination'] = 'Select destination for board \'<strong>%1$s</strong>\'';
