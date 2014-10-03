@@ -381,7 +381,7 @@ class Post_Controller extends Action_Controller
 					$_REQUEST['icon'] = 'xx';
 
 				// They are previewing if they asked to preview (i.e. came from quick reply).
-				$really_previewing = !empty($_POST['preview']);
+				$really_previewing = !empty($_REQUEST['preview']);
 			}
 
 			// In order to keep the approval status flowing through, we have to pass it through the form...
@@ -1039,7 +1039,14 @@ class Post_Controller extends Action_Controller
 
 		// If the session has timed out, let the user re-submit their form.
 		if (checkSession('post', '', false) != '')
+		{
 			$post_errors->addError('session_timeout');
+
+			// Disable the preview so that any potentially malicious code is not executed
+			$_REQUEST['preview'] = false;
+
+			return $this->action_post();
+		}
 
 		// Wrong verification code?
 		if (!$user_info['is_admin'] && !$user_info['is_mod'] && !empty($modSettings['posts_require_captcha']) && ($user_info['posts'] < $modSettings['posts_require_captcha'] || ($user_info['is_guest'] && $modSettings['posts_require_captcha'] == -1)))
