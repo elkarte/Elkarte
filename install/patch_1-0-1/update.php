@@ -20,7 +20,7 @@ $db_table->db_add_column(
 );
 
 $db_table->db_change_column(
-	'{db_prefix}postby_emails_error',
+	'{db_prefix}postby_emails_filters',
 	'filter_style',
 	array(
 		'type' => 'char',
@@ -36,6 +36,8 @@ $db_table->db_change_column(
 		'size' => '12',
 	)
 );
+
+updateSettings(array('elkVersion' => '1.0.1'));
 
 if (ELK == 'SSI')
 	echo 'Database changes were carried out successfully.';

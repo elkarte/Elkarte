@@ -156,6 +156,3 @@ $txt['credits_translators_message'] = 'Thank you for your efforts which make it 
 // Overrides the already defined strings to get clean results in the table
 $txt['today'] = '%1$s';
 $txt['yesterday'] = '%1$s';
-
-// List of people who have made more than a token contribution to this translation. (blank for English)
-$txt['translation_credits'] = array();
