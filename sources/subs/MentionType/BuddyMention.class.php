@@ -14,7 +14,7 @@
 if (!defined('ELK'))
 	die('No access...');
 
-class Buddy_Mention extends Mention_BoardAccess_Abstract
+class Buddy_Mention extends Mention_Message_Abstract
 {
 	public function view(&$mentions, $type)
 	{
