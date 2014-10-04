@@ -422,7 +422,7 @@ class ManageFeatures_Controller extends Action_Controller
 			else
 				$enabled_mentions = array_diff($enabled_mentions, array('mentionmem'));
 
-			updateSettings(array('enabled_mentions' => implode(',', $enabled_mentions);
+			updateSettings(array('enabled_mentions' => implode(',', $enabled_mentions)));
 			Settings_Form::save_db($config_vars);
 			redirectexit('action=admin;area=featuresettings;sa=mention');
 		}
