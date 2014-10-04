@@ -412,6 +412,11 @@ class ManageFeatures_Controller extends Action_Controller
 			require_once(SUBSDIR . '/ScheduledTasks.subs.php');
 			toggleTaskStatusByName('user_access_mentions', !empty($_POST['mentions_enabled']));
 
+			if (!empty($_POST['mentions_dont_notify_rlike']))
+				$enabled_mentions[] = 'rlikemsg';
+			else
+				$enabled_mentions = array_diff($enabled_mentions, array('rlikemsg'));
+
 			if (!empty($_POST['mentions_enabled']))
 				$enabled_mentions[] = 'mentionmem';
 			else

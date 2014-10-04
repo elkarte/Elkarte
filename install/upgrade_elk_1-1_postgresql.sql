@@ -112,6 +112,22 @@ $db->query('', '
 	WHERE mention_type = rlike',
 	array()
 );
+
+$enabled_mentions = !empty($modSettings['enabled_mentions']) ? explode(',', $modSettings['enabled_mentions']) : array();
+$known_settings = array(
+	'mentions_enabled' => 'mentionmem',
+	'likes_enabled' => 'likemsg',
+	'mentions_dont_notify_rlike' => 'rlikemsg',
+	'mentions_buddy' => 'buddy',
+);
+foreach ($known_settings as $setting => $toggle)
+{
+	if (!empty($modSettings[$setting]))
+		$enabled_mentions[] = $toggle;
+	else
+		$enabled_mentions = array_diff($enabled_mentions, array($toggle));
+}
+updateSettings(array('enabled_mentions' => implode(',', $enabled_mentions)));
 ---}
 ---#
 
