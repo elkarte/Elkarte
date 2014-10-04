@@ -123,6 +123,54 @@ define('ELK', 1);]]></add>
 	$context['can_register'] = empty($modSettings['registration_method']) || $modSettings['registration_method'] != 3;]]></add>
 		</operation>
 	</file>
+	<file name="SOURCEDIR/Session.php">
+		<operation>
+			<search position="replace"><![CDATA[ * copyright:	2011 Simple Machines (http://www.simplemachines.org)
+ * license:		BSD, See included LICENSE.TXT for terms and conditions.
+ *
+ * @version 1.0
+ *
+ */
+]]></search>
+			<add><![CDATA[ * copyright:	2011 Simple Machines (http://www.simplemachines.org)
+ * license:		BSD, See included LICENSE.TXT for terms and conditions.
+ *
+ * @version 1.0.1
+ *
+ */
+]]></add>
+		</operation>
+		<operation>
+			<search position="replace"><![CDATA[ */
+function loadSession()
+{
+	global $modSettings, $boardurl, $sc, $cache_accelerator;
+
+	// Attempt to change a few PHP settings.
+	@ini_set('session.use_cookies', true);]]></search>
+			<add><![CDATA[ */
+function loadSession()
+{
+	global $modSettings, $boardurl, $sc;
+
+	// Attempt to change a few PHP settings.
+	@ini_set('session.use_cookies', true);]]></add>
+		</operation>
+		<operation>
+			<search position="replace"><![CDATA[		// APC destroys static class members before sessions can be written.  To work around this we
+		// explicitly call session_write_close on script end/exit bugs.php.net/bug.php?id=60657
+		if (!empty($modSettings['cache_enable']) && $cache_accelerator === 'apc')
+			register_shutdown_function('session_write_close');
+
+		// Change it so the cache settings are a little looser than default.]]></search>
+			<add><![CDATA[		// APC destroys static class members before sessions can be written.  To work around this we
+		// explicitly call session_write_close on script end/exit bugs.php.net/bug.php?id=60657
+		if (extension_loaded('apc') && ini_get('apc.enabled') && !extension_loaded('apcu'))
+			register_shutdown_function('session_write_close');
+
+		// Change it so the cache settings are a little looser than default.]]></add>
+		</operation>
+	</file>
 	<file name="SOURCEDIR/Subs.php">
 		<operation>
 			<search position="replace"><![CDATA[ * copyright:	2011 Simple Machines (http://www.simplemachines.org)
