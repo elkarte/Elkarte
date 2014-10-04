@@ -115,28 +115,9 @@ class Mentions_Controller extends Action_Controller
 	{
 		global $modSettings;
 
-		$this->_known_mentions = array(
-			// mentions
-			'men' => array(
-				'callback' => array($this, 'prepareMentionMessage'),
-				'enabled' => !empty($modSettings['mentions_enabled']),
-			),
-			// liked messages
-			'like' => array(
-				'callback' => array($this, 'prepareMentionMessage'),
-				'enabled' => !empty($modSettings['likes_enabled']),
-			),
-			// likes removed
-			'rlike' => array(
-				'callback' => array($this, 'prepareMentionMessage'),
-				'enabled' => !empty($modSettings['likes_enabled']) && empty($modSettings['mentions_dont_notify_rlike']),
-			),
-			// added as buddy
-			'buddy' => array(
-				'callback' => array($this, 'prepareMentionMessage'),
-				'enabled' => !empty($modSettings['mentions_buddy']),
-			),
-		);
+		spl_autoload_register(array($this, 'autoload'));
+
+		$this->_known_mentions = $this->_findMentionTypes();
 
 		$this->_known_status = array(
 			'new' => 0,
@@ -146,8 +127,37 @@ class Mentions_Controller extends Action_Controller
 		);
 
 		$this->_known_sorting = array('id_member_from', 'type', 'log_time');
+	}
+
+	public function autoload($class)
+	{
+		$file = SUBSDIR . '/MentionType/' . str_replace('_', '', $class) . '.class.php';
+
+		if (file_exists($file))
+			require_once($file);
+	}
+
+	protected function _findMentionTypes()
+	{
+		global $modSettings;
+
+		$mentions = explode(',', $modSettings['enabled_mentions']);
+
+		$types = array();
+		foreach ($mentions as $mention)
+		{
+			$class = ucfirst($mention) . '_Mention';
+			$types[$mention] = array(
+				'instance' => new $class(),
+				// @deprecated since 1.1 - kept for backward compatibility
+				'enabled' => true,
+			);
+			$types[$mention]['callback'] = array($types[$mention]['instance'], 'view');
+		}
 
 		call_integration_hook('integrate_add_mention', array(&$this->_known_mentions));
+
+		return $types;
 	}
 
 	/**
@@ -382,10 +392,13 @@ class Mentions_Controller extends Action_Controller
 			// Otherwise we have to test all we know...
 			else
 			{
+			global $ema;
+			$ema = true;
 				$removed = false;
 				// @todo find a way to call only what is actually needed
 				foreach ($this->_callbacks as $type => $callback)
 					$removed = call_user_func_array($callback, array(&$possible_mentions, $type)) || $removed;
+			$ema = false;
 			}
 
 			foreach ($possible_mentions as $mention)
@@ -416,6 +429,14 @@ class Mentions_Controller extends Action_Controller
 	 *
 	 * @param mixed[] $mentions : Mentions retrieved from the database by getUserMentions
 	 * @param string $type : the type of the mention
+	 *
+	 * @deprecated since 1.1 - kept for backward compatibility
+	 * @todo due to this compatibility is not possible to "properly" handle
+	 *       mentions. Properly in this context means rewrite list_loadMentions
+	 *       so that it doesn't call each and every class for all the mentions
+	 *       As soon as we can drop this compat horror (I wrote it, so I'm allowed
+	 *       to say so :P) the code can become quite more nice.
+	 *  @proposal: let's drop this compatibility <strong>NOW</strong>
 	 */
 	public function prepareMentionMessage(&$mentions, $type)
 	{
@@ -431,7 +452,7 @@ class Mentions_Controller extends Action_Controller
 				continue;
 
 			// These things are associated to messages and require permission checks
-			if (in_array($row['mention_type'], array('men', 'like', 'rlike')))
+			if (in_array($row['mention_type'], array('mentionmem', 'likemsg', 'rlikemsg')))
 				$boards[$key] = $row['id_board'];
 
 			$mentions[$key]['message'] = str_replace(
@@ -466,7 +487,7 @@ class Mentions_Controller extends Action_Controller
 			}
 		}
 
-		// If some of these mentions are no longer visable, we need to do some maintenance
+		// If some of these mentions are no longer visible, we need to do some maintenance
 		if ($removed)
 		{
 			if (!empty($modSettings['user_access_mentions']))

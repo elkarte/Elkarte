@@ -177,11 +177,20 @@ class CoreFeatures_Controller extends Action_Controller
 					'likes_enabled' => 1,
 				),
 				'setting_callback' => function ($value) {
+					global $modSettings;
+
 					require_once(SUBSDIR . '/Mentions.subs.php');
 
 					// Makes all the like/rlike mentions invisible (or visible)
-					toggleMentionsVisibility('like', !empty($value));
-					toggleMentionsVisibility('rlike', !empty($value));
+					toggleMentionsVisibility('likemsg', !empty($value));
+					toggleMentionsVisibility('rlikemsg', !empty($value));
+
+					$current = !empty($modSettings['enabled_mentions']) ? explode(',', $modSettings['enabled_mentions']) : array();
+
+					if (!empty($value))
+						return array('enabled_mentions' => implode(',', array_merge($current, array('likemsg', 'rlikemsg'))));
+					else
+						return array('enabled_mentions' => implode(',', array_diff($current, array('likemsg', 'rlikemsg'))));
 				},
 			),
 			// ml = moderation log.

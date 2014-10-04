@@ -70,6 +70,15 @@ $db_table->db_add_column('{db_prefix}log_mentions',
 	)
 );
 
+$db_table->db_change_column('{db_prefix}log_mentions',
+	'mention_type',
+	array(
+		'type' => 'varchar',
+		'size' => 12,
+		'default' => ''
+	)
+);
+
 $db->query('', '
 	UPDATE {db_prefix}log_mentions
 	SET accessible = CASE WHEN status < 0 THEN 0 ELSE 1 END',
@@ -80,6 +89,27 @@ $db->query('', '
 	UPDATE {db_prefix}log_mentions
 	SET status = -(status + 1)
 	WHERE status < 0',
+	array()
+);
+
+$db->query('', '
+	UPDATE {db_prefix}log_mentions
+	SET mention_type = mentionmem
+	WHERE mention_type = men',
+	array()
+);
+
+$db->query('', '
+	UPDATE {db_prefix}log_mentions
+	SET mention_type = likemsg
+	WHERE mention_type = like',
+	array()
+);
+
+$db->query('', '
+	UPDATE {db_prefix}log_mentions
+	SET mention_type = rlikemsg
+	WHERE mention_type = rlike',
 	array()
 );
 ---}
