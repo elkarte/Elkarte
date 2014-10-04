@@ -62,13 +62,7 @@ class Weekly_Maintenance_Task implements Scheduled_Task_Interface
 			'attachment_full_notified',
 		);
 
-		$db->query('', '
-			DELETE FROM {db_prefix}settings
-			WHERE variable IN ({array_string:setting_list})',
-			array(
-				'setting_list' => $deleteAnywaySettings,
-			)
-		);
+		removeSettings($deleteAnywaySettings);
 
 		// Ok should we prune the logs?
 		if (!empty($modSettings['pruningOptions']))
