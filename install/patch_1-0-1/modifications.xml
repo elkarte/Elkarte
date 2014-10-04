@@ -807,6 +807,22 @@ function isValidEmail($value)
 ]]></add>
 		</operation>
 		<operation>
+			<search position="replace"><![CDATA[					$_REQUEST['icon'] = 'xx';
+
+				// They are previewing if they asked to preview (i.e. came from quick reply).
+				$really_previewing = !empty($_POST['preview']);
+			}
+
+			// In order to keep the approval status flowing through, we have to pass it through the form...]]></search>
+			<add><![CDATA[					$_REQUEST['icon'] = 'xx';
+
+				// They are previewing if they asked to preview (i.e. came from quick reply).
+				$really_previewing = !empty($_REQUEST['preview']);
+			}
+
+			// In order to keep the approval status flowing through, we have to pass it through the form...]]></add>
+		</operation>
+		<operation>
 			<search position="replace"><![CDATA[		{
 			$context['icons'][count($context['icons']) - 1]['is_last'] = true;
 			$context['icons'][0]['selected'] = true;
@@ -840,6 +856,29 @@ function isValidEmail($value)
 		}
 
 		// Are we starting a poll? if set the poll icon as selected if its available]]></add>
+		</operation>
+		<operation>
+			<search position="replace"><![CDATA[		// If the session has timed out, let the user re-submit their form.
+		if (checkSession('post', '', false) != '')
+			$post_errors->addError('session_timeout');
+
+		// Wrong verification code?
+		if (!$user_info['is_admin'] && !$user_info['is_mod'] && !empty($modSettings['posts_require_captcha']) && ($user_info['posts'] < $modSettings['posts_require_captcha'] || ($user_info['is_guest'] && $modSettings['posts_require_captcha'] == -1)))
+		{]]></search>
+			<add><![CDATA[		// If the session has timed out, let the user re-submit their form.
+		if (checkSession('post', '', false) != '')
+		{
+			$post_errors->addError('session_timeout');
+
+			// Disable the preview so that any potentially malicious code is not executed
+			$_REQUEST['preview'] = false;
+
+			return $this->action_post();
+		}
+
+		// Wrong verification code?
+		if (!$user_info['is_admin'] && !$user_info['is_mod'] && !empty($modSettings['posts_require_captcha']) && ($user_info['posts'] < $modSettings['posts_require_captcha'] || ($user_info['is_guest'] && $modSettings['posts_require_captcha'] == -1)))
+		{]]></add>
 		</operation>
 	</file>
 	<file name="CONTROLLERDIR/Register.controller.php">
@@ -907,6 +946,41 @@ function isValidEmail($value)
 
 		splitAttemptMove($boards, $context['new_topic']);
 	}]]></add>
+		</operation>
+	</file>
+	<file name="SUBSDIR/Editor.subs.php">
+		<operation>
+			<search position="replace"><![CDATA[ * copyright:	2011 Simple Machines (http://www.simplemachines.org)
+ * license:  	BSD, See included LICENSE.TXT for terms and conditions.
+ *
+ * @version 1.0
+ *
+ */
+]]></search>
+			<add><![CDATA[ * copyright:	2011 Simple Machines (http://www.simplemachines.org)
+ * license:  	BSD, See included LICENSE.TXT for terms and conditions.
+ *
+ * @version 1.0.1
+ *
+ */
+]]></add>
+		</operation>
+		<operation>
+			<search position="replace"><![CDATA[		'locale' => !empty($txt['lang_locale']) ? $txt['lang_locale'] : 'en_US',
+	);
+
+	// Switch between default images and back... mostly in case you don't have an PersonalMessage template, but do have a Post template.
+	if (isset($settings['use_default_images']) && $settings['use_default_images'] == 'defaults' && isset($settings['default_template']))
+	{]]></search>
+			<add><![CDATA[		'locale' => !empty($txt['lang_locale']) ? $txt['lang_locale'] : 'en_US',
+	);
+
+	// Allow addons an easy way to add plugins, initialization objects, etc to the editor control
+	call_integration_hook('integrate_editor_plugins', array($editorOptions['id']));
+
+	// Switch between default images and back... mostly in case you don't have an PersonalMessage template, but do have a Post template.
+	if (isset($settings['use_default_images']) && $settings['use_default_images'] == 'defaults' && isset($settings['default_template']))
+	{]]></add>
 		</operation>
 	</file>
 	<file name="SUBSDIR/Likes.subs.php">
@@ -1251,6 +1325,22 @@ function preparsecode_unhtml_callback($matches)
  * - Used by preparsecode, fixes links in message and returns nothing.]]></add>
 		</operation>
 		<operation>
+			<search position="replace"><![CDATA[			$topics_columns[] = 'locked = {int:locked}';
+
+		if ($topicOptions['sticky_mode'] !== null)
+			$topics_columns[] = 'is_sticky = {int:locked}';
+
+		call_integration_hook('integrate_before_modify_topic', array(&$topics_columns, &$update_parameters, &$msgOptions, &$topicOptions, &$posterOptions));
+]]></search>
+			<add><![CDATA[			$topics_columns[] = 'locked = {int:locked}';
+
+		if ($topicOptions['sticky_mode'] !== null)
+			$topics_columns[] = 'is_sticky = {int:is_sticky}';
+
+		call_integration_hook('integrate_before_modify_topic', array(&$topics_columns, &$update_parameters, &$msgOptions, &$topicOptions, &$posterOptions));
+]]></add>
+		</operation>
+		<operation>
 			<search position="replace"><![CDATA[}
 
 /**
@@ -1517,6 +1607,39 @@ function getFormMsgSubject_br_callback($matches)
 		$query_param = array('theme_operator' => '=', 'theme' => 1);]]></add>
 		</operation>
 	</file>
+	<file name="SUBSDIR/Who.subs.php">
+		<operation>
+			<search position="replace"><![CDATA[ * @copyright ElkArte Forum contributors
+ * @license   BSD http://opensource.org/licenses/BSD-3-Clause
+ *
+ * @version 1.0
+ *
+ */
+]]></search>
+			<add><![CDATA[ * @copyright ElkArte Forum contributors
+ * @license   BSD http://opensource.org/licenses/BSD-3-Clause
+ *
+ * @version 1.0.1
+ *
+ */
+]]></add>
+		</operation>
+		<operation>
+			<search position="replace"><![CDATA[			'<a href="http://openfontlibrary.org/en/font/vshexagonica-v1-0-1">vSHexagonica</a> | &copy; 2012 T.B. von Strong | This font is licensed under the SIL Open Font License, Version 1.1',
+		),
+		'software' => array(
+			'<a href="http://bad-behavior.ioerror.us/">Bad Behavior</a> | &copy; Michael Hampton | Licensed under <a href="http://opensource.org/licenses/LGPL-3.0">GNU Lesser General Public License</a>',
+			'<a href="https://code.google.com/p/google-code-prettify/">Google Code Prettify</a> | Licensed under <a href="http://opensource.org/licenses/Apache-2.0">Apache License, Version 2.0</a>',
+			'<a href="http://cherne.net/brian/resources/jquery.hoverIntent.html">hoverIntent</a> | &copy; Brian Cherne | Licensed under <a href="http://opensource.org/licenses/MIT">The MIT License (MIT)</a>',]]></search>
+			<add><![CDATA[			'<a href="http://openfontlibrary.org/en/font/vshexagonica-v1-0-1">vSHexagonica</a> | &copy; 2012 T.B. von Strong | This font is licensed under the SIL Open Font License, Version 1.1',
+		),
+		'software' => array(
+			'<a href="http://ichord.github.com/At.js">At.js</a> | &copy; Chord Luo | Licensed under <a href="http://opensource.org/licenses/MIT">The MIT License (MIT)</a>',
+			'<a href="http://bad-behavior.ioerror.us/">Bad Behavior</a> | &copy; Michael Hampton | Licensed under <a href="http://opensource.org/licenses/LGPL-3.0">GNU Lesser General Public License</a>',
+			'<a href="https://code.google.com/p/google-code-prettify/">Google Code Prettify</a> | Licensed under <a href="http://opensource.org/licenses/Apache-2.0">Apache License, Version 2.0</a>',
+			'<a href="http://cherne.net/brian/resources/jquery.hoverIntent.html">hoverIntent</a> | &copy; Brian Cherne | Licensed under <a href="http://opensource.org/licenses/MIT">The MIT License (MIT)</a>',]]></add>
+		</operation>
+	</file>
 	<file name="THEMEDIR/Display.template.php">
 		<operation>
 			<search position="replace"><![CDATA[ * copyright:	2011 Simple Machines (http://www.simplemachines.org)
@@ -1549,6 +1672,114 @@ function getFormMsgSubject_br_callback($matches)
 
 		if ($message['can_modify'] || $message['can_remove'] || $context['can_follow_up'] || ($context['can_split'] && !empty($context['real_num_replies'])) || $context['can_restore_msg'] || $message['can_approve'] || $message['can_unapprove'] || $context['can_report_moderator'])
 		{]]></add>
+		</operation>
+	</file>
+	<file name="THEMEDIR/GenericControls.template.php">
+		<operation>
+			<search position="replace"><![CDATA[ * copyright:	2011 Simple Machines (http://www.simplemachines.org)
+ * license:  	BSD, See included LICENSE.TXT for terms and conditions.
+ *
+ * @version 1.0
+ *
+ */
+]]></search>
+			<add><![CDATA[ * copyright:	2011 Simple Machines (http://www.simplemachines.org)
+ * license:  	BSD, See included LICENSE.TXT for terms and conditions.
+ *
+ * @version 1.0.1
+ *
+ */
+]]></add>
+		</operation>
+		<operation>
+			<search position="replace"><![CDATA[
+	$editor_context = &$context['controls']['richedit'][$editor_id];
+
+	echo '
+		<div id="editor_toolbar_container"></div>
+		<label for="', $editor_id, '">]]></search>
+			<add><![CDATA[
+	$editor_context = &$context['controls']['richedit'][$editor_id];
+
+	$plugins = array_filter(array('bbcode', 'splittag', (!empty($context['mentions_enabled']) ? 'mention' : ''), (!empty($context['drafts_autosave']) && !empty($options['drafts_autosave_enabled']) ? 'draft' : '')));
+
+	// Allow addons to insert additional editor plugin scripts
+	if (!empty($editor_context['plugin_addons']) && is_array($editor_context['plugin_addons']))
+		$plugins = array_filter(array_merge($plugins, $editor_context['plugin_addons']));
+
+	// Add in special config objects to the editor, typically for plugin use
+	$plugin_options = array();
+	$plugin_options[] = '
+					parserOptions: {
+						quoteType: $.sceditor.BBCodeParser.QuoteType.auto
+					}';
+
+	// Drafts?
+	if (!empty($context['drafts_autosave']) && !empty($options['drafts_autosave_enabled']))
+			$plugin_options[] = '
+					draftOptions: {
+						sLastNote: \'draft_lastautosave\',
+						sSceditorID: \'' . $editor_id . '\',
+						sType: \'post\',
+						iBoard: ' . (empty($context['current_board']) ? 0 : $context['current_board']) . ',
+						iFreq: ' . $context['drafts_autosave_frequency'] . ',' . (!empty($context['drafts_save']) ?
+						'sLastID: \'id_draft\'' : 'sLastID: \'id_pm_draft\', bPM: true') . '
+					}';
+
+	if (!empty($context['mentions_enabled']))
+			$plugin_options[] = '
+					mentionOptions: {
+						editor_id: \'' . $editor_id . '\',
+						cache: {
+							mentions: [],
+							queries: [],
+							names: []
+						}
+					}';
+
+	// Allow addons to insert additional editor objects
+	if (!empty($editor_context['plugin_options']) && is_array($editor_context['plugin_options']))
+		$plugin_options = array_merge($plugin_options, $editor_context['plugin_options']);
+
+	echo '
+		<div id="editor_toolbar_container"></div>
+		<label for="', $editor_id, '">]]></add>
+		</operation>
+		<operation>
+			<search position="replace"><![CDATA[					rtl: ', empty($context['right_to_left']) ? 'false' : 'true', ',
+					colors: "black,red,yellow,pink,green,orange,purple,blue,beige,brown,teal,navy,maroon,limegreen,white",
+					enablePasteFiltering: true,
+					plugins: "bbcode, splittag', !empty($context['mentions_enabled']) ? ', mention' : '', (!empty($context['drafts_autosave']) && !empty($options['drafts_autosave_enabled']) ? ', draft",
+					draftOptions: {
+						sLastNote: \'draft_lastautosave\',
+						sSceditorID: \'' . $editor_id . '\',
+						sType: \'post\',
+						iBoard: ' . (empty($context['current_board']) ? 0 : $context['current_board']) . ',
+						iFreq: ' . $context['drafts_autosave_frequency'] . ',' . (!empty($context['drafts_save']) ?
+						'sLastID: \'id_draft\'' : 'sLastID: \'id_pm_draft\', bPM: true') . '
+					},' : '",'), (!empty($context['mentions_enabled']) ? '
+					mentionOptions: {
+						editor_id: \'' . $editor_id . '\',
+						cache: {
+							mentions: [],
+							queries: [],
+							names: []
+						}
+					},' : ''), '
+					parserOptions: {
+						quoteType: $.sceditor.BBCodeParser.QuoteType.auto
+					}';
+
+	// Show the smileys.
+	if ((!empty($context['smileys']['postform']) || !empty($context['smileys']['popup'])) && !$editor_context['disable_smiley_box'] && $smileyContainer !== null)]]></search>
+			<add><![CDATA[					rtl: ', empty($context['right_to_left']) ? 'false' : 'true', ',
+					colors: "black,red,yellow,pink,green,orange,purple,blue,beige,brown,teal,navy,maroon,limegreen,white",
+					enablePasteFiltering: true,
+					plugins: "', implode(',', $plugins), '",
+					', trim(implode(',', $plugin_options));
+
+	// Show the smileys.
+	if ((!empty($context['smileys']['postform']) || !empty($context['smileys']['popup'])) && !$editor_context['disable_smiley_box'] && $smileyContainer !== null)]]></add>
 		</operation>
 	</file>
 	<file name="THEMEDIR/ManageBoards.template.php">
@@ -1709,6 +1940,62 @@ function getFormMsgSubject_br_callback($matches)
 						echo ']]></add>
 		</operation>
 	</file>
+	<file name="THEMEDIR/css/_light/index_light.css">
+		<operation>
+			<search position="replace"><![CDATA[	box-shadow: 0 -2px 0 -1px #ccc, 3px -2px 0 -1px #ccc, 3px 1px 0 -1px #ccc;
+}
+.linktree:hover a, .linktree>a:hover,
+.linktree:last-child, .linktree:last-child>a,
+.linktree:last-child>a:hover, .linktree:last-child strong {
+	color: #fff;
+	text-decoration: none;
+}]]></search>
+			<add><![CDATA[	box-shadow: 0 -2px 0 -1px #ccc, 3px -2px 0 -1px #ccc, 3px 1px 0 -1px #ccc;
+}
+.linktree:hover a, .linktree>a:hover,
+.linktree:last-child, .linktree:last-child>span>a,
+.linktree:last-child>span>a:hover, .linktree:last-child strong {
+	color: #fff;
+	text-decoration: none;
+}]]></add>
+		</operation>
+		<operation>
+			<search position="replace"><![CDATA[	background: #47b263;
+	background-image: linear-gradient(to bottom, #60bc78 0%, #27a348 100%);
+}
+
+.topic_details {
+	border-bottom: 1px solid #999;]]></search>
+			<add><![CDATA[	background: #47b263;
+	background-image: linear-gradient(to bottom, #60bc78 0%, #27a348 100%);
+}
+.profile_pie {
+	background: url(../../images/_light/stats_pie.png);
+}
+
+.topic_details {
+	border-bottom: 1px solid #999;]]></add>
+		</operation>
+	</file>
+	<file name="THEMEDIR/css/_light/rtl_light.css">
+		<operation>
+			<search position="replace"><![CDATA[
+/* $PROFILE	*/
+/* ------------------------------------------------------- */
+
+/* $PERSONAL	*/
+/* ------------------------------------------------------- */]]></search>
+			<add><![CDATA[
+/* $PROFILE	*/
+/* ------------------------------------------------------- */
+.profile_pie {
+	background: url(../images/_light/stats_pie_rtl.png);
+}
+
+/* $PERSONAL	*/
+/* ------------------------------------------------------- */]]></add>
+		</operation>
+	</file>
 	<file name="THEMEDIR/css/index.css">
 		<operation>
 			<search position="replace"><![CDATA[	overflow: auto;
@@ -1752,6 +2039,19 @@ function getFormMsgSubject_br_callback($matches)
 	white-space: nowrap;
 }
 .linktree:last-child {
+	max-width: 25em;
+}
+.linktree a {
+	display: block;
+	overflow: hidden;
+	text-overflow: ellipsis;
+}
+.linktree:last-child>span>a {
+	display: inline;
+}
+.linktree:last-child>span {
+	display: block;
+	overflow: hidden;
 	max-width: 25em;
 }
 .linktree a {
@@ -1863,6 +2163,56 @@ function getFormMsgSubject_br_callback($matches)
 		width: 95%;
 	}
 	.poster .menulevel2 {]]></add>
+		</operation>
+	</file>
+	<file name="THEMEDIR/index.template.php">
+		<operation>
+			<search position="replace"><![CDATA[ * copyright:	2011 Simple Machines (http://www.simplemachines.org)
+ * license:  	BSD, See included LICENSE.TXT for terms and conditions.
+ *
+ * @version 1.0
+ *
+ */
+]]></search>
+			<add><![CDATA[ * copyright:	2011 Simple Machines (http://www.simplemachines.org)
+ * license:  	BSD, See included LICENSE.TXT for terms and conditions.
+ *
+ * @version 1.0.1
+ *
+ */
+]]></add>
+		</operation>
+		<operation>
+			<search position="replace"><![CDATA[	foreach ($context[$default] as $tree)
+	{
+		echo '
+					<li class="linktree">';
+
+		// Dividers moved to pseudo-elements in CSS.
+		// Show something before the link?]]></search>
+			<add><![CDATA[	foreach ($context[$default] as $tree)
+	{
+		echo '
+					<li class="linktree">
+						<span>';
+
+		// Dividers moved to pseudo-elements in CSS.
+		// Show something before the link?]]></add>
+		</operation>
+		<operation>
+			<search position="replace"><![CDATA[			echo $tree['extra_after'];
+
+		echo '
+					</li>';
+	}
+]]></search>
+			<add><![CDATA[			echo $tree['extra_after'];
+
+		echo '
+						</span>
+					</li>';
+	}
+]]></add>
 		</operation>
 	</file>
 	<file name="LANGUAGEDIR/english/ManageMembers.english.php">
@@ -2019,6 +2369,21 @@ $txt['extracting'] = 'Extracting';
 $txt['avatars_extracted'] = 'The avatars have been installed, you should now be able to use them.';
 $txt['language_extracted'] = 'The language pack has been installed, you can now enable its use in the language settings area of your admin control panel.';]]></add>
 		</operation>
+		<operation>
+			<search position="replace"><![CDATA[$txt['package_requires'] = 'Requires Modification';
+$txt['package_check_for'] = 'Check for installation:';
+$txt['execute_credits_add'] = 'Add Credits';
+$txt['execute_credits_remove'] = 'Remove Credits';
+$txt['execute_credits_action'] = 'Credits: %1$s';
+
+$txt['package_install_actions'] = 'Installations actions for';]]></search>
+			<add><![CDATA[$txt['package_requires'] = 'Requires Modification';
+$txt['package_check_for'] = 'Check for installation:';
+$txt['execute_credits_add'] = 'Add Credits';
+$txt['execute_credits_action'] = 'Credits: %1$s';
+
+$txt['package_install_actions'] = 'Installations actions for';]]></add>
+		</operation>
 	</file>
 	<file name="LANGUAGEDIR/english/Who.english.php">
 		<operation>
@@ -2070,6 +2435,19 @@ $txt['whotopic_watch'] = 'Started watching a topic.';
 
 $txt['whopost_quotefast'] = 'Quoting a post from &quot;<a href="%1$s">%2$s</a>&quot;.';
 ]]></add>
+		</operation>
+		<operation>
+			<search position="replace"><![CDATA[
+// Overrides the already defined strings to get clean results in the table
+$txt['today'] = '%1$s';
+$txt['yesterday'] = '%1$s';
+
+// List of people who have made more than a token contribution to this translation. (blank for English)
+$txt['translation_credits'] = array();]]></search>
+			<add><![CDATA[
+// Overrides the already defined strings to get clean results in the table
+$txt['today'] = '%1$s';
+$txt['yesterday'] = '%1$s';]]></add>
 		</operation>
 	</file>
 	<file name="LANGUAGEDIR/english/index.english.php">

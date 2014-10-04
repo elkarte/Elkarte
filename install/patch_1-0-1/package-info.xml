@@ -11,7 +11,7 @@
 			<require-file name="browser.inc.php" destination="EXTDIR/bad-behavior/bad-behavior" />
 			<require-dir name="theme/_light" destination="THEMEDIR/images" />
 			<modification>modifications.xml</modification>
-			<database>update.php</database>
+			<code>update.php</code>
 			<redirect url="$scripturl?action=admin;area=packages" timeout="5000" parsebbc="true">redirect</redirect>
 		</install>
 		<uninstall for="1.0.1">
