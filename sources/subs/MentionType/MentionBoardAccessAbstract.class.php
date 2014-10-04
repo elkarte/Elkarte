@@ -14,7 +14,7 @@
 if (!defined('ELK'))
 	die('No access...');
 
-abstract class Mention_BoardAccess_Abstract implements Mention_Type_Interface
+abstract class Mention_BoardAccess_Abstract extends Mention_Message_Abstract
 {
 	public function view(&$mentions, $type)
 	{
@@ -34,24 +34,6 @@ abstract class Mention_BoardAccess_Abstract implements Mention_Type_Interface
 			return $this->_validateAccess($boards);
 		else
 			return false;
-	}
-
-	protected function _replaceMsg($row)
-	{
-		global $txt, $scripturl, $context;
-
-		return str_replace(
-			array(
-				'{msg_link}',
-				'{msg_url}',
-				'{subject}',
-			),
-			array(
-				'<a href="' . $scripturl . '?topic=' . $row['id_topic'] . '.msg' . $row['id_target'] . ';mentionread;mark=read;' . $context['session_var'] . '=' . $context['session_id'] . ';item=' . $row['id_mention'] . '#msg' . $row['id_target'] . '">' . $row['subject'] . '</a>',
-				$scripturl . '?topic=' . $row['id_topic'] . '.msg' . $row['id_target'] . ';mentionread;' . $context['session_var'] . '=' . $context['session_id'] . 'item=' . $row['id_mention'] . '#msg' . $row['id_target'],
-				$row['subject'],
-			),
-			$txt['mention_' . $row['mention_type']]);
 	}
 
 	protected function _validateAccess($boards)
