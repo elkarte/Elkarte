@@ -6,19 +6,17 @@
 	<version>1.0</version>
 	<type>modification</type>
 		<install for="1.0.0">
-			<require-dir name="webfonts" destination="THEMEDIR" />
-			<require-file name="font-awesome.css" destination="THEMEDIR/css" />
+			<require-dir name="theme/webfonts" destination="THEMEDIR" />
+			<require-file name="theme/font-awesome.css" destination="THEMEDIR/css" />
 			<require-file name="browser.inc.php" destination="EXTDIR/bad-behavior/bad-behavior" />
+			<require-dir name="theme/_light" destination="THEMEDIR/images" />
 			<modification>modifications.xml</modification>
+			<database>update.php</database>
+			<redirect url="$scripturl?action=admin;area=packages" timeout="5000" parsebbc="true">redirect</redirect>
 		</install>
 		<uninstall for="1.0.1">
-<!--			<remove-file name="THEMEDIR/webfonts/fontawesome-webfont.eot" />
-			<remove-file name="THEMEDIR/webfonts/fontawesome-webfont.svg" />
-			<remove-file name="THEMEDIR/webfonts/fontawesome-webfont.ttf" />
-			<remove-file name="THEMEDIR/webfonts/fontawesome-webfont.woff" />
-			<remove-file name="THEMEDIR/webfonts/FontAwesome.otf" />
-			<remove-file name="THEMEDIR/css/font-awesome.css" />
-			<remove-file name="EXTDIR/bad-behavior/bad-behavior/browser.inc.php" />-->
 			<modification reverse="true">modifications.xml</modification>
+			<!-- Database changes are not reverted purposefully -->
+			<redirect url="$scripturl?action=admin;area=packages" timeout="5000" parsebbc="true">redirect</redirect>
 		</uninstall>
 </package-info>

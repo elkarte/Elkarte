@@ -789,40 +789,6 @@ function isValidEmail($value)
 					}]]></add>
 		</operation>
 	</file>
-	<file name="ADMINDIR/Packages.controller.php">
-		<operation>
-			<search position="replace"><![CDATA[ * copyright:	2011 Simple Machines (http://www.simplemachines.org)
- * license:		BSD, See included LICENSE.TXT for terms and conditions.
- *
- * @version 1.0
- *
- */
-]]></search>
-			<add><![CDATA[ * copyright:	2011 Simple Machines (http://www.simplemachines.org)
- * license:		BSD, See included LICENSE.TXT for terms and conditions.
- *
- * @version 1.0.1
- *
- */
-]]></add>
-		</operation>
-		<operation>
-			<search position="replace"><![CDATA[			elseif ($action['type'] == 'credits')
-			{
-				$thisAction = array(
-					'type' => $txt['execute_credits_add'],
-					'action' => sprintf($txt['execute_credits_action'], Util::htmlspecialchars($action['title'])),
-				);
-			}]]></search>
-			<add><![CDATA[			elseif ($action['type'] == 'credits')
-			{
-				$thisAction = array(
-					'type' => $action['reverse'] ? $txt['execute_credits_remove'] : $txt['execute_credits_add'],
-					'action' => sprintf($txt['execute_credits_action'], Util::htmlspecialchars($action['title'])),
-				);
-			}]]></add>
-		</operation>
-	</file>
 	<file name="CONTROLLERDIR/Post.controller.php">
 		<operation>
 			<search position="replace"><![CDATA[ * copyright:	2011 Simple Machines (http://www.simplemachines.org)
