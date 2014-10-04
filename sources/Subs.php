@@ -158,7 +158,7 @@ function updateSettings($changeArray, $update = false, $debug = false)
 /**
  * Deletes one setting from the settings table and takes care of $modSettings as well
  *
- * @param string $toRemove the setting or the settings to be removed
+ * @param string|string[] $toRemove the setting or the settings to be removed
  */
 function removeSettings($toRemove)
 {
