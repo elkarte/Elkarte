@@ -4189,6 +4189,7 @@ function replaceBasicActionUrl($string)
  */
 function elk_autoloader($class)
 {
+
 	if (substr($class, -11) === '_Controller')
 	{
 		$file_name = str_replace('_', '', str_replace('_Controller', '.controller', $class)) . '.php';
@@ -4221,6 +4222,7 @@ function elk_autoloader($class)
 	}
 	elseif (substr($class, -10) === '_Interface' || substr($class, -9) === '_Abstract')
 	{
+	
 		$file_name = str_replace('_', '', str_replace(array('_Interface', '_Abstract'), array('.interface', '_Abstract.class'), $class)) . '.php';
 		if (!file_exists(SUBSDIR . '/' . $file_name))
 		{

@@ -69,7 +69,7 @@ class User_Access_Mentions_Task implements Scheduled_Task_Interface
 							LIMIT {int:start}, {int:limit}',
 							array(
 								'current_member' => $member,
-								'mention_types' => array('men', 'like', 'rlike'),
+								'mention_types' => array('mentionmem', 'likemsg', 'rlikemsg'),
 								'user_see_board' => ($can == 'can' ? '' : 'NOT ') . $user_see_board,
 								'start' => $start,
 								'limit' => $limit,
@@ -129,7 +129,7 @@ class User_Access_Mentions_Task implements Scheduled_Task_Interface
 					AND mention_type IN ({array_string:mention_types})',
 				array(
 					'last_id_member' => $current_check,
-					'mention_types' => array('men', 'like', 'rlike'),
+					'mention_types' => array('mentionmem', 'likemsg', 'rlikemsg'),
 				)
 			);
 
@@ -148,7 +148,7 @@ class User_Access_Mentions_Task implements Scheduled_Task_Interface
 				LIMIT {int:limit}',
 				array(
 					'last_id_member' => $current_check,
-					'mention_types' => array('men', 'like', 'rlike'),
+					'mention_types' => array('mentionmem', 'likemsg', 'rlikemsg'),
 					'limit' => $limit,
 				)
 			);
@@ -174,7 +174,7 @@ class User_Access_Mentions_Task implements Scheduled_Task_Interface
 					LIMIT 1',
 					array(
 						'current_member' => $row['id_member'],
-						'mention_types' => array('men', 'like', 'rlike'),
+						'mention_types' => array('mentionmem', 'likemsg', 'rlikemsg'),
 						'user_see_board' => 'NOT ' . $user_see_board,
 					)
 				);

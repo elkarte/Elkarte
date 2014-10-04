@@ -1214,7 +1214,7 @@ $db_table->db_create_table('{db_prefix}log_mentions',
 		array('name' => 'accessible',     'type' => 'tinyint', 'size' => 1, 'default' => 0),
 		array('name' => 'id_member_from', 'type' => 'mediumint', 'size' => 8, 'unsigned' => true, 'default' => 0),
 		array('name' => 'log_time',       'type' => 'int', 'size' => 10, 'unsigned' => true, 'default' => 0),
-		array('name' => 'mention_type',   'type' => 'varchar', 'size' => 5, 'default' => ''),
+		array('name' => 'mention_type',   'type' => 'varchar', 'size' => 12, 'default' => ''),
 	),
 	array(
 		array('name' => 'id_mention',       'columns' => array('id_mention'), 'type' => 'primary'),

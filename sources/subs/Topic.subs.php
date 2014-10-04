@@ -344,7 +344,7 @@ function removeTopics($topics, $decreasePostCount = true, $ignoreRecycling = fal
 		AND mention_type IN ({array_string:mension_types})',
 		array(
 			'messages' => $messages,
-			'mension_types' => array('men', 'like', 'rlike'),
+			'mension_types' => array('mentionmem', 'likemsg', 'rlikemsg'),
 		)
 	);
 

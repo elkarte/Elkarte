@@ -54,7 +54,10 @@ function countUserMentions($all = false, $type = '', $id_member = null)
 
 	// Counts as maintenance! :P
 	if ($all === false && empty($type))
+	{
+		require_once(SUBSDIR . '/Members.subs.php');
 		updateMemberData($id_member, array('mentions' => $counts[$id_member]));
+	}
 
 	return $counts[$id_member];
 }
@@ -188,7 +191,7 @@ function addMentions($member_from, $members_to, $target, $type, $time = null, $s
 }
 
 /**
- * Softly and gently removes a 'like' mention when the post is unliked
+ * Softly and gently removes a 'likemsg' mention when the post is unliked
  *
  * @package Mentions
  * @param int $member_from the id of the member mentioning
@@ -212,7 +215,7 @@ function rlikeMentions($member_from, $members_to, $target, $newstatus = 1)
 			AND status = {int:unread}',
 		array(
 			'members_to' => $members_to,
-			'type' => 'like',
+			'type' => 'likemsg',
 			'member_from' => $member_from,
 			'target' => $target,
 			'status' => $newstatus,
