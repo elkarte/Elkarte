@@ -9,7 +9,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:		BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0
+ * @version 1.0.1
  *
  * This file contains javascript utility functions
  */
@@ -605,7 +605,7 @@ window.setTimeout(function() {elk_sessionKeepAlive();}, 1200000);
  */
 function elk_setThemeOption(option, value, theme, additional_vars)
 {
-	if (additional_vars === null)
+	if (additional_vars === null || typeof(additional_vars) === 'undefined')
 		additional_vars = '';
 
 	var tempImage = new Image();
@@ -1187,6 +1187,14 @@ function JumpTo(oJumpToOptions)
 	this.showSelect();
 }
 
+// Remove all the options in the select. Method of the JumpTo class.
+JumpTo.prototype.removeAll = function ()
+{
+//	var dropdownList = document.getElementById(this.opt.sContainerId + '_select');
+for (var i = this.dropdownList.options.length; i > 0; i--)
+		this.dropdownList.remove(i - 1);
+}
+
 // Show the initial select box (onload). Method of the JumpTo class.
 JumpTo.prototype.showSelect = function ()
 {
@@ -1205,6 +1213,7 @@ JumpTo.prototype.showSelect = function ()
 // Fill the jump to box with entries. Method of the JumpTo class.
 JumpTo.prototype.fillSelect = function (aBoardsAndCategories)
 {
+	this.removeAll();
 	if ('onbeforeactivate' in document)
 		this.dropdownList.onbeforeactivate = null;
 	else
@@ -1224,13 +1233,6 @@ JumpTo.prototype.fillSelect = function (aBoardsAndCategories)
 			sChildLevelPrefix = '',
 			oOption,
 			oText;
-
-		// If we've reached the currently selected board add all items so far.
-		if (!aBoardsAndCategories[i].isCategory && aBoardsAndCategories[i].id === this.opt.iCurBoardId)
-		{
-				this.dropdownList.insertBefore(oOptgroupFragment, this.dropdownList.options[0]);
-				continue;
-		}
 
 		if (aBoardsAndCategories[i].isCategory)
 		{
@@ -1255,6 +1257,9 @@ JumpTo.prototype.fillSelect = function (aBoardsAndCategories)
 		// Applying a category class to this option?
 		if (aBoardsAndCategories[i].isCategory && this.opt.sCatClass)
 			oOption.className = this.opt.sCatClass;
+
+		if (!aBoardsAndCategories[i].isCategory && aBoardsAndCategories[i].id === this.opt.iCurBoardId)
+			oOption.selected = 'selected';
 
 		oOption.appendChild(oText);
 

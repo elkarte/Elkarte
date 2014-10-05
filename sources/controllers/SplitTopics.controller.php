@@ -13,7 +13,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:		BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0
+ * @version 1.0.1
  *
  * Original module by Mach8 - We'll never forget you.
  */
@@ -258,6 +258,7 @@ class SplitTopics_Controller extends Action_Controller
 		$context['old_topic'] = $topic;
 		$context['new_topic'] = splitTopic($topic, $_SESSION['split_selection'][$topic], $this->_new_topic_subject);
 		$context['page_title'] = $txt['split_topic'];
+		$context['sub_template'] = 'split_successful';
 
 		splitAttemptMove($boards, $context['new_topic']);
 	}

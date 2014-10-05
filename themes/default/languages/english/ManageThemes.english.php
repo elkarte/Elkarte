@@ -50,7 +50,6 @@ $txt['actual_theme_name'] = 'This theme\'s name: ';
 $txt['actual_theme_dir'] = 'This theme\'s directory: ';
 $txt['actual_theme_url'] = 'This theme\'s URL: ';
 $txt['actual_images_url'] = 'This theme\'s images URL: ';
-$txt['current_theme_style'] = 'This theme\'s style: ';
 
 $txt['theme_variants_default'] = 'Default theme variant:';
 $txt['theme_variants_user_disable'] = 'Disable user variant selection.';
@@ -87,9 +86,6 @@ $txt['who_display_viewing'] = 'Show who is viewing the board index and posts:';
 $txt['who_display_viewing_off'] = 'Don\'t show';
 $txt['who_display_viewing_numbers'] = 'Show only numbers';
 $txt['who_display_viewing_names'] = 'Show member names';
-$txt['disable_recent_posts'] = 'Disable recent posts';
-$txt['enable_single_post'] = 'Enable single post';
-$txt['enable_multiple_posts'] = 'Enable multiple posts';
 $txt['show_stats_index'] = 'Show statistics on board index.';
 $txt['latest_members'] = 'Show latest member on board index.';
 $txt['last_modification'] = 'Show last modification date on modified posts.';

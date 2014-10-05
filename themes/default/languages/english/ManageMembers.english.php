@@ -7,6 +7,7 @@ $txt['viewing_groups'] = 'Viewing Membergroups';
 $txt['membergroups_title'] = 'Manage Membergroups';
 $txt['membergroups_description'] = 'Membergroups are groups of members that have similar permission settings, appearance, or access rights. Some membergroups are based on the amount of posts a user has made. You can assign someone to a membergroup by selecting their profile and changing their account settings.';
 $txt['membergroups_modify'] = 'Modify';
+$txt['membergroups_modify_parent'] = 'Modify parent group';
 
 $txt['membergroups_add_group'] = 'Add group';
 $txt['membergroups_regular'] = 'Regular groups';

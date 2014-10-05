@@ -14,7 +14,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0
+ * @version 1.0.1
  *
  */
 
@@ -1062,7 +1062,7 @@ function updateFailedQueue($failed_emails)
 	// Add our email back to the queue, manually.
 	$db->insert('insert',
 		'{db_prefix}mail_queue',
-		array('time_sent' => 'int', 'recipient' => 'string', 'body' => 'string', 'subject' => 'string', 'headers' => 'string', 'send_html' => 'int', 'priority' => 'int', 'private' => 'int', 'message_id' => 'int'),
+		array('time_sent' => 'int', 'recipient' => 'string', 'body' => 'string', 'subject' => 'string', 'headers' => 'string', 'send_html' => 'int', 'priority' => 'int', 'private' => 'int', 'message_id' => 'string-255'),
 		$failed_emails,
 		array('id_mail')
 	);

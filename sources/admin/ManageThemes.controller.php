@@ -15,7 +15,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:		BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0
+ * @version 1.0.1
  *
  *
  * @todo Update this for the new package manager?
@@ -447,7 +447,7 @@ class ManageThemes_Controller extends Action_Controller
 				elseif ($_POST['default_options_master'][$opt] == 1)
 				{
 					// Delete then insert for ease of database compatibility!
-					removeThemeOptions('default', 'guests', $opt);
+					removeThemeOptions('default', 'members', $opt);
 					addThemeOptions(1, $opt, $val);
 
 					$old_settings[] = $opt;

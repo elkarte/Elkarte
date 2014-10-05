@@ -1,5 +1,5 @@
 #### ATTENTION: You do not need to run or use this file!  The install.php script does everything for you!
-#### Install script for PostgreSQL 8.0.1
+#### Install script for PostgreSQL 8.3+
 
 #
 # Create PostgreSQL functions.
@@ -1951,6 +1951,7 @@ CREATE TABLE {$db_prefix}message_likes (
 	id_member int NOT NULL default '0',
 	id_msg int NOT NULL default '0',
 	id_poster int NOT NULL default '0',
+	like_timestamp int NOT NULL default '0',
 	PRIMARY KEY (id_msg, id_member)
 );
 
@@ -2324,7 +2325,7 @@ CREATE SEQUENCE {$db_prefix}postby_emails_filters_seq;
 
 CREATE TABLE {$db_prefix}postby_emails_filters (
   id_filter int default nextval('{$db_prefix}postby_emails_filters_seq'),
-  filter_style char(5) NOT NULL default '',
+  filter_style char(6) NOT NULL default '',
   filter_type varchar(255) NOT NULL default '',
   filter_to varchar(255) NOT NULL default '',
   filter_from varchar(255) NOT NULL default '',
@@ -2766,7 +2767,6 @@ INSERT INTO {$db_prefix}themes (id_theme, variable, value) VALUES (1, 'show_user
 INSERT INTO {$db_prefix}themes (id_theme, variable, value) VALUES (1, 'show_blurb', '1');
 INSERT INTO {$db_prefix}themes (id_theme, variable, value) VALUES (1, 'show_gender', '0');
 INSERT INTO {$db_prefix}themes (id_theme, variable, value) VALUES (1, 'number_recent_posts', '0');
-INSERT INTO {$db_prefix}themes (id_theme, variable, value) VALUES (1, 'show_member_bar', '1');
 INSERT INTO {$db_prefix}themes (id_theme, variable, value) VALUES (1, 'linktree_link', '1');
 INSERT INTO {$db_prefix}themes (id_theme, variable, value) VALUES (1, 'show_profile_buttons', '1');
 INSERT INTO {$db_prefix}themes (id_theme, variable, value) VALUES (1, 'show_mark_read', '1');
@@ -2781,6 +2781,7 @@ INSERT INTO {$db_prefix}themes (id_theme, variable, value) VALUES (1, 'forum_wid
 INSERT INTO {$db_prefix}themes (id_member, id_theme, variable, value) VALUES (-1, 1, 'display_quick_reply', '2');
 INSERT INTO {$db_prefix}themes (id_member, id_theme, variable, value) VALUES (-1, 1, 'view_newest_pm_first', '1');
 INSERT INTO {$db_prefix}themes (id_member, id_theme, variable, value) VALUES (-1, 1, 'posts_apply_ignore_list', '1');
+INSERT INTO {$db_prefix}themes (id_member, id_theme, variable, value) VALUES (-1, 1, 'return_to_post', '1');
 INSERT INTO {$db_prefix}themes (id_member, id_theme, variable, value) VALUES (-1, 1, 'drafts_autosave_enabled', '1');
 # --------------------------------------------------------
 

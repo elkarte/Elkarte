@@ -1,5 +1,5 @@
 #### ATTENTION: You do not need to run or use this file!  The install.php script does everything for you!
-#### Install script for MySQL 4.0.18+
+#### Install script for MySQL 5.0.19+
 
 #
 # Table structure for table `admin_info_files`
@@ -1462,6 +1462,7 @@ CREATE TABLE {$db_prefix}message_likes (
   id_member mediumint(8) unsigned NOT NULL default '0',
   id_msg mediumint(8) unsigned NOT NULL default '0',
   id_poster mediumint(8) unsigned NOT NULL default '0',
+  like_timestamp int(10) unsigned NOT NULL default '0',
   PRIMARY KEY (id_msg, id_member),
   KEY id_member (id_member),
   KEY id_poster (id_poster)
@@ -1758,7 +1759,7 @@ CREATE TABLE {$db_prefix}postby_emails_error (
 
 CREATE TABLE {$db_prefix}postby_emails_filters (
   id_filter int(10) NOT NULL auto_increment,
-  filter_style char(5) NOT NULL default '',
+  filter_style char(6) NOT NULL default '',
   filter_type varchar(255) NOT NULL default '',
   filter_to varchar(255) NOT NULL default '',
   filter_from varchar(255) NOT NULL default '',
@@ -2175,7 +2176,6 @@ VALUES (1, 'name', '{$default_theme_name}'),
 	(1, 'show_blurb', '1'),
 	(1, 'show_gender', '0'),
 	(1, 'number_recent_posts', '0'),
-	(1, 'show_member_bar', '1'),
 	(1, 'linktree_link', '1'),
 	(1, 'show_profile_buttons', '1'),
 	(1, 'show_mark_read', '1'),
@@ -2192,6 +2192,7 @@ INSERT INTO {$db_prefix}themes
 VALUES
 	(-1, 1, 'display_quick_reply', '2'),
 	(-1, 1, 'view_newest_pm_first', '1'),
+	(-1, 1, 'return_to_post', '1'),
 	(-1, 1, 'drafts_autosave_enabled', '1');
 # --------------------------------------------------------
 

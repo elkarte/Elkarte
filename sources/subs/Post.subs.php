@@ -15,7 +15,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0
+ * @version 1.0.1
  *
  */
 
@@ -112,18 +112,6 @@ function preparsecode(&$message, $previewing = false)
 			{
 				$parts[$i] = preg_replace('~(\A|\n)/me(?: |&nbsp;)([^\n]*)(?:\z)?~i', '$1[me=' . $user_info['name'] .  ']$2[/me]', $parts[$i]);
 				$parts[$i] = preg_replace('~(\[footnote\])/me(?: |&nbsp;)([^\n]*?)(\[\/footnote\])~i', '$1[me=' . $user_info['name'] . ']$2[/me]$3', $parts[$i]);
-			}
-
-			if (!$previewing && strpos($parts[$i], '[html]') !== false)
-			{
-				if (allowedTo('admin_forum'))
-					$parts[$i] = preg_replace_callback('~\[html\](.+?)\[/html\]~is', 'preparsecode_html_callback', $parts[$i]);
-				// We should edit them out, or else if an admin edits the message they will get shown...
-				else
-				{
-					while (strpos($parts[$i], '[html]') !== false)
-						$parts[$i] = preg_replace('~\[[/]?html\]~i', '', $parts[$i]);
-				}
 			}
 
 			// Make sure all tags are lowercase.
@@ -298,17 +286,6 @@ function preparsecode_nobbc_callback($matches)
 }
 
 /**
- * Prepares text inside of html tags to make them safe for display and prevent bbc rendering
- *
- * @package Posts
- * @param string[] $matches
- */
-function preparsecode_html_callback($matches)
-{
-	return '[html]' . strtr(un_htmlspecialchars($matches[1]), array("\n" => '&#13;', '  ' => ' &#32;', '[' => '&#91;', ']' => '&#93;')) . '[/html]';
-}
-
-/**
  * Takes a tag and lowercases it
  *
  * @package Posts
@@ -332,26 +309,11 @@ function un_preparsecode($message)
 	// We're going to unparse only the stuff outside [code]...
 	for ($i = 0, $n = count($parts); $i < $n; $i++)
 	{
-		// If $i is a multiple of four (0, 4, 8, ...) then it's not a code section...
-		if ($i % 4 == 0)
-			$parts[$i] = preg_replace_callback('~\[html\](.+?)\[/html\]~i', 'preparsecode_unhtml_callback', $parts[$i]);
-
 		call_integration_hook('integrate_unpreparse_code', array(&$message, &$parts, &$i));
 	}
 
 	// Change breaks back to \n's and &nsbp; back to spaces.
 	return preg_replace('~<br( /)?' . '>~', "\n", str_replace('&nbsp;', ' ', implode('', $parts)));
-}
-
-/**
- * Reverses what was done by preparsecode to html tags
- *
- * @package Posts
- * @param string[] $matches
- */
-function preparsecode_unhtml_callback($matches)
-{
-	return '[html]' . strtr(htmlspecialchars($matches[1], ENT_QUOTES, 'UTF-8'), array('\\&quot;' => '&quot;', '&amp;#13;' => '<br />', '&amp;#32;' => ' ', '&amp;#91;' => '[', '&amp;#93;' => ']')) . '[/html]';
 }
 
 /**
@@ -826,7 +788,7 @@ function createPost(&$msgOptions, &$topicOptions, &$posterOptions)
 			$topics_columns[] = 'locked = {int:locked}';
 
 		if ($topicOptions['sticky_mode'] !== null)
-			$topics_columns[] = 'is_sticky = {int:locked}';
+			$topics_columns[] = 'is_sticky = {int:is_sticky}';
 
 		call_integration_hook('integrate_before_modify_topic', array(&$topics_columns, &$update_parameters, &$msgOptions, &$topicOptions, &$posterOptions));
 
@@ -1644,18 +1606,6 @@ function getFormMsgSubject($editing, $topic, $first_subject = '')
 
 		return array($form_subject, $form_message);
 	}
-}
-
-/**
- * Converts br's to entity safe versions <br /> => $lt;br /&gt;<br /> so messages
- * with bbc html tags can be edited
- *
- * @package Posts
- * @param string[] $matches
- */
-function getFormMsgSubject_br_callback($matches)
-{
-	return '[html]' . preg_replace('~<br\s?/?' . '>~i', '&lt;br /&gt;<br />', $matches[1]) . '[/html]';
 }
 
 /**

@@ -64,4 +64,22 @@ class TestSubs extends UnitTestCase
 		foreach ($testStrings as $string => $value)
 			$this->assertEqual(replaceBasicActionUrl($string), $value);
 	}
+
+	function testValidEmailsTLD()
+	{
+		$testemails = array(
+			// Shortest TLD
+			'simple.email@domain.it',
+			'simple.email@domain.tld',
+			'simple.email@domain.stupid',
+			// This is the longest TLD currently available at http://data.iana.org/TLD/tlds-alpha-by-domain.txt
+			'simple.email@domain.cancerresearch',
+			// These are longer than the maximum currently known
+			'simple.email@domain.cancerresearch1',
+			'simple.email@domain.cancerresearch12',
+			'simple.email@domain.cancerresearch123',
+		);
+		foreach ($testemails as $email)
+			$this->assertTrue(isValidEmail($email) !== false);
+	}
 }
