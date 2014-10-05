@@ -13,7 +13,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0
+ * @version 1.0.1
  *
  */
 
@@ -649,6 +649,7 @@ function list_getMembergroups($start, $items_per_page, $sort, $membergroup_type,
 	// Start collecting the data.
 	$groups = array();
 	$group_ids = array();
+	$parent_groups = array();
 
 	if ($membergroup_type === 'all')
 	{
@@ -666,6 +667,7 @@ function list_getMembergroups($start, $items_per_page, $sort, $membergroup_type,
 				'num_members' => $txt['membergroups_guests_na'],
 				'icons' => '',
 				'can_search' => false,
+				'id_parent' => -2,
 				'num_permissions' => array(
 					'allowed' => 0,
 					'denied' => 0,
@@ -680,6 +682,7 @@ function list_getMembergroups($start, $items_per_page, $sort, $membergroup_type,
 				'num_members' => $num_members,
 				'icons' => '',
 				'can_search' => true,
+				'id_parent' => -2,
 				'num_permissions' => array(
 					'allowed' => 0,
 					'denied' => 0,
@@ -693,6 +696,9 @@ function list_getMembergroups($start, $items_per_page, $sort, $membergroup_type,
 		// We only list the groups they can see.
 		if ($row['hidden'] && !$row['can_moderate'] && !$include_hidden)
 			continue;
+
+		if ($row['id_parent'] != -2)
+			$parent_groups[] = $row['id_parent'];
 
 		// If it's inherited, just add it as a child.
 		if ($aggregate && $row['id_parent'] != -2)
@@ -716,6 +722,7 @@ function list_getMembergroups($start, $items_per_page, $sort, $membergroup_type,
 			'moderators' => array(),
 			'icons' => $row['icons'],
 			'can_search' => $row['id_group'] != 3,
+			'id_parent' => $row['id_parent'],
 		);
 
 		if ($count_permissions)
@@ -753,6 +760,31 @@ function list_getMembergroups($start, $items_per_page, $sort, $membergroup_type,
 		while ($row = $db->fetch_assoc($query))
 			$groups[$row['id_group']]['moderators'][] = '<a href="' . $scripturl . '?action=profile;u=' . $row['id_member'] . '">' . $row['real_name'] . '</a>';
 		$db->free_result($query);
+	}
+
+	if (!empty($parent_groups))
+	{
+		$all_group_names = array(
+			-1 => $txt['membergroups_guests'],
+			0 => $txt['membergroups_members']
+		);
+		$request = $db->query('', '
+			SELECT id_group, group_name
+			FROM {db_prefix}membergroups
+			WHERE id_group IN ({array_int:groups})',
+			array(
+				'groups' => $parent_groups,
+			)
+		);
+		while ($row = $db->fetch_assoc($request))
+			$all_group_names[$row['id_group']] = $row['group_name'];
+	}
+	foreach ($groups as $key => $group)
+	{
+		if ($group['id_parent'] != -2)
+		{
+			$groups[$key]['parent_name'] = $all_group_names[$group['id_parent']];
+		}
 	}
 
 	// Apply manual sorting if the 'number of members' column is selected.
@@ -1355,7 +1387,7 @@ function updateMembergroupProperties($properties)
 			switch ($known_properties[$name]['type'])
 			{
 				case 'string':
-					$values['subs_' . $name] = Util::htmlspecialchars($value);
+					$values['subs_' . $name] = Util::htmlspecialchars((string) $value);
 					break;
 				default:
 					$values['subs_' . $name] = (int) $value;

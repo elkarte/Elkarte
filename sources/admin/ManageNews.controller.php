@@ -13,7 +13,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:		BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0
+ * @version 1.0.1
  *
  */
 
@@ -351,7 +351,7 @@ class ManageNews_Controller extends Action_Controller
 		// Setup the template!
 		$context['page_title'] = $txt['admin_newsletters'];
 		$context['sub_template'] = 'email_members_compose';
-		$context['subject'] = !empty($_POST['subject']) ? $_POST['subject'] : htmlspecialchars($context['forum_name'] . ': ' . $txt['subject'], ENT_COMPAT, 'UTF-8');
+		$context['subject'] = !empty($_POST['subject']) ? $_POST['subject'] : $context['forum_name'] . ': ' . htmlspecialchars($txt['subject'], ENT_COMPAT, 'UTF-8');
 		$context['message'] = !empty($_POST['message']) ? $_POST['message'] : htmlspecialchars($txt['message'] . "\n\n" . replaceBasicActionUrl($txt['regards_team']) . "\n\n" . '{$board_url}', ENT_COMPAT, 'UTF-8');
 
 		// Needed for the WYSIWYG editor.
@@ -456,9 +456,9 @@ class ManageNews_Controller extends Action_Controller
 			foreach ($mods as $row)
 			{
 				if (in_array(3, $context['recipients']))
-					$context['recipients']['exclude_members'][] = $row['identifier'];
+					$context['recipients']['exclude_members'][] = $row;
 				else
-					$context['recipients']['members'][] = $row['identifier'];
+					$context['recipients']['members'][] = $row;
 			}
 		}
 

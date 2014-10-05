@@ -13,7 +13,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0
+ * @version 1.0.1
  *
  *
  * Adding options to one of the setting screens isn't hard.
@@ -109,6 +109,10 @@ class Settings_Form
 			'cachedir',
 		);
 
+		$safe_strings = array(
+			'mtitle', 'mmessage', 'mbname',
+		);
+
 		foreach ($this->_config_vars as $identifier => $config_var)
 		{
 			if (!is_array($config_var) || !isset($config_var[1]))
@@ -129,6 +133,15 @@ class Settings_Form
 					$config_var[1] = substr($config_var[1], 0, $divPos);
 				}
 
+				if ($config_var[2] == 'file')
+				{
+					$value = in_array($varname, $defines) ? constant(strtoupper($varname)) : htmlspecialchars($$varname, ENT_COMPAT, 'UTF-8');
+					if (in_array($varname, $safe_strings))
+						$value = htmlspecialchars_decode($value, ENT_NOQUOTES);
+				}
+				else
+					$value = isset($modSettings[$config_var[0]]) ? htmlspecialchars($modSettings[$config_var[0]], ENT_COMPAT, 'UTF-8') : (in_array($config_var[3], array('int', 'float')) ? 0 : '');
+
 				$context['config_vars'][$config_var[0]] = array(
 					'label' => $config_var[1],
 					'help' => isset($config_var[5]) ? $config_var[5] : '',
@@ -136,7 +149,7 @@ class Settings_Form
 					'size' => empty($config_var[4]) ? 0 : $config_var[4],
 					'data' => isset($config_var[4]) && is_array($config_var[4]) && $config_var[3] != 'select' ? $config_var[4] : array(),
 					'name' => $config_var[0],
-					'value' => $config_var[2] == 'file' ? (in_array($varname, $defines) ? constant(strtoupper($varname)) : htmlspecialchars($$varname, ENT_COMPAT, 'UTF-8')) : (isset($modSettings[$config_var[0]]) ? htmlspecialchars($modSettings[$config_var[0]], ENT_COMPAT, 'UTF-8') : (in_array($config_var[3], array('int', 'float')) ? 0 : '')),
+					'value' => $value,
 					'disabled' => !empty($context['settings_not_writable']) || !empty($config_var['disabled']),
 					'invalid' => false,
 					'subtext' => !empty($config_var['subtext']) ? $config_var['subtext'] : $subtext,
@@ -231,7 +244,7 @@ class Settings_Form
 					if ($config_var[0] == 'select' && !empty($config_var['multiple']))
 					{
 						$context['config_vars'][$config_var[1]]['name'] .= '[]';
-						$context['config_vars'][$config_var[1]]['value'] = unserialize($context['config_vars'][$config_var[1]]['value']);
+						$context['config_vars'][$config_var[1]]['value'] = !empty($context['config_vars'][$config_var[1]]['value']) ? unserialize($context['config_vars'][$config_var[1]]['value']) : array();
 					}
 
 					// If it's associative
@@ -407,6 +420,10 @@ class Settings_Form
 			'cache_accelerator', 'cache_memcached', 'cache_uid',
 		);
 
+		$safe_strings = array(
+			'mtitle', 'mmessage', 'mbname',
+		);
+
 		// All the numeric variables.
 		$config_ints = array(
 			'cache_enable',
@@ -429,7 +446,12 @@ class Settings_Form
 		foreach ($config_strs as $config_var)
 		{
 			if (isset($_POST[$config_var]))
-				$new_settings[$config_var] = '\'' . addcslashes($_POST[$config_var], '\'\\') . '\'';
+			{
+				if (in_array($config_var, $safe_strings))
+					$new_settings[$config_var] = '\'' . addcslashes(Util::htmlspecialchars($_POST[$config_var], ENT_QUOTES), '\'\\') . '\'';
+				else
+					$new_settings[$config_var] = '\'' . addcslashes($_POST[$config_var], '\'\\') . '\'';
+			}
 		}
 
 		foreach ($config_ints as $config_var)

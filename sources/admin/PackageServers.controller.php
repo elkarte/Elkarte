@@ -14,7 +14,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:		BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0
+ * @version 1.0.1
  *
  */
 
@@ -361,7 +361,7 @@ class PackageServers_Controller extends Action_Controller
 						if (!empty($package['author']['email']))
 						{
 							// Only put the "mailto:" if it looks like a valid email address.  Some may wish to put a link to an IM Form or other web mail form.
-							$package['author']['href'] = preg_match('~^[\w\.\-]+@[\w][\w\-\.]+[\w]$~', $package['author']['email']) != 0 ? 'mailto:' . $package['author']['email'] : $package['author']['email'];
+							$package['author']['href'] = filter_var($package['author']['email'], FILTER_VALIDATE_EMAIL) ? 'mailto:' . $package['author']['email'] : $package['author']['email'];
 							$package['author']['link'] = '<a href="' . $package['author']['href'] . '">' . $package['author']['name'] . '</a>';
 						}
 					}

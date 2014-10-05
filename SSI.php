@@ -14,7 +14,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:		BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0
+ * @version 1.0.1
  *
  */
 
@@ -1462,7 +1462,7 @@ function ssi_quickSearch($output_method = 'echo')
 
 	echo '
 		<form action="', $scripturl, '?action=search;sa=results" method="post" accept-charset="UTF-8">
-			<input type="hidden" name="advanced" value="0" /><input type="text" name="ssi_search" size="30" class="input_text" /> <input type="submit" value="', $txt['search'], '" class="button_submit" />
+			<input type="hidden" name="advanced" value="0" /><input type="text" name="search" size="30" class="input_text" /> <input type="submit" value="', $txt['search'], '" class="button_submit" />
 		</form>';
 }
 
@@ -1703,6 +1703,7 @@ function ssi_boardNews($board = null, $limit = null, $start = null, $length = nu
 			$preview = 'first';
 
 		$row['body'] = $row[$preview . '_body'];
+		$row['subject'] = $row[$preview . '_body'];
 		$row['id_msg'] = $row['id_' . $preview . '_msg'];
 		$row['icon'] = $row[$preview . '_icon'];
 		$row['id_member'] = $row[$preview . '_id_member'];

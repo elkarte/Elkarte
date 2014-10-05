@@ -15,7 +15,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:		BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0
+ * @version 1.0.1
  *
  */
 
@@ -493,7 +493,7 @@ class Register_Controller extends Action_Controller
 				if ($row['type'] == 'text' && !empty($row['mask']) && $row['mask'] != 'none')
 				{
 					// @todo We never error on this - just ignore it at the moment...
-					if ($row['mask'] == 'email' && (preg_match('~^[0-9A-Za-z=_+\-/][0-9A-Za-z=_\'+\-/\.]*@[\w\-]+(\.[\w\-]+)*(\.[\w]{2,6})$~', $value) === 0 || strlen($value) > 255))
+					if ($row['mask'] == 'email' && !isValidEmail($value))
 						$reg_errors->addError(array('custom_field_invalid_email', array($row['name'])));
 					elseif ($row['mask'] == 'number' && preg_match('~[^\d]~', $value))
 						$reg_errors->addError(array('custom_field_not_number', array($row['name'])));

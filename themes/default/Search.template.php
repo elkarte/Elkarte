@@ -11,7 +11,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0
+ * @version 1.0.1
  *
  */
 
@@ -346,7 +346,7 @@ function template_results()
 
 					if ($topic['quick_mod']['lock'])
 						echo '
-							<a href="', $scripturl, '?action=quickmod;actions%5B', $topic['id'], '%5D=lock;', $context['session_var'], '=', $context['session_id'], '" onclick="return confirm(\'', $txt['quickmod_confirm'], '\');"><img src="', $settings['images_url'], '/icons/quick_lock.png" style="width: 16px;" alt="', $txt['set_lock'], '" title="', $txt['set_lock'], '" /></a>';
+							<a href="', $scripturl, '?action=quickmod;actions%5B', $topic['id'], '%5D=lock;', $context['session_var'], '=', $context['session_id'], '" onclick="return confirm(\'', $txt['quickmod_confirm'], '\');"><img src="', $settings['images_url'], '/icons/quick_lock.png" style="width: 16px;" alt="', $txt[$topic['is_locked'] ? 'set_unlock' : 'set_lock'], '" title="', $txt[$topic['is_locked'] ? 'set_unlock' : 'set_lock'], '" /></a>';
 
 					if ($topic['quick_mod']['lock'] || $topic['quick_mod']['remove'])
 						echo '
@@ -354,7 +354,7 @@ function template_results()
 
 					if ($topic['quick_mod']['sticky'])
 						echo '
-							<a href="', $scripturl, '?action=quickmod;actions%5B', $topic['id'], '%5D=sticky;', $context['session_var'], '=', $context['session_id'], '" onclick="return confirm(\'', $txt['quickmod_confirm'], '\');"><img src="', $settings['images_url'], '/icons/quick_sticky.png" style="width: 16px;" alt="', $txt['set_sticky'], '" title="', $txt['set_sticky'], '" /></a>';
+							<a href="', $scripturl, '?action=quickmod;actions%5B', $topic['id'], '%5D=sticky;', $context['session_var'], '=', $context['session_id'], '" onclick="return confirm(\'', $txt['quickmod_confirm'], '\');"><img src="', $settings['images_url'], '/icons/quick_sticky.png" style="width: 16px;" alt="', $txt[$topic['is_sticky'] ? 'set_nonsticky' : 'set_sticky'], '" title="', $txt[$topic['is_sticky'] ? 'set_nonsticky' : 'set_sticky'], '" /></a>';
 
 					if ($topic['quick_mod']['move'])
 						echo '

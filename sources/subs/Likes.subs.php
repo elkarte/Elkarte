@@ -7,7 +7,7 @@
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
- * @version 1.0
+ * @version 1.0.1
  *
  */
 
@@ -220,8 +220,8 @@ function updateLike($id_liker, $liked_message, $direction)
 	{
 		$db->insert('',
 			'{db_prefix}message_likes',
-			array('id_member' => 'int', 'id_msg' => 'int', 'id_poster' => 'int'),
-			array($id_liker, $liked_message['id_msg'], $liked_message['id_member']),
+			array('id_member' => 'int', 'id_msg' => 'int', 'id_poster' => 'int', 'like_timestamp' => 'int',),
+			array($id_liker, $liked_message['id_msg'], $liked_message['id_member'], time()),
 			array('id_msg', 'id_member', 'id_poster')
 		);
 
