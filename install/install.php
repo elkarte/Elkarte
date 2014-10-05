@@ -11,11 +11,11 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:	BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0
+ * @version 1.0.1
  *
  */
 
-define('CURRENT_VERSION', '1.0');
+define('CURRENT_VERSION', '1.0.1');
 define('DB_SCRIPT_VERSION', '1-0');
 define('REQUIRED_PHP_VERSION', '5.2.0');
 
@@ -1247,7 +1247,7 @@ class Install_Controller
 				$incontext['error'] = $txt['error_invalid_characters_username'];
 				return false;
 			}
-			elseif (empty($_POST['email']) || preg_match('~^[0-9A-Za-z=_+\-/][0-9A-Za-z=_\'+\-/\.]*@[\w\-]+(\.[\w\-]+)*(\.[\w]{2,6})$~', stripslashes($_POST['email'])) === 0 || strlen(stripslashes($_POST['email'])) > 255)
+			elseif (empty($_POST['email']) || !filter_var(stripslashes($_POST['email']), FILTER_VALIDATE_EMAIL) || strlen(stripslashes($_POST['email'])) > 255)
 			{
 				// One step back, this time fill out a proper email address.
 				$incontext['error'] = sprintf($txt['error_valid_email_needed'], $_POST['username']);

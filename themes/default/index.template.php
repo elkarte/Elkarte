@@ -11,7 +11,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0
+ * @version 1.0.1
  *
  */
 
@@ -468,7 +468,8 @@ function theme_linktree($default = 'linktree')
 	foreach ($context[$default] as $tree)
 	{
 		echo '
-					<li class="linktree">';
+					<li class="linktree">
+						<span>';
 
 		// Dividers moved to pseudo-elements in CSS.
 		// Show something before the link?
@@ -483,6 +484,7 @@ function theme_linktree($default = 'linktree')
 			echo $tree['extra_after'];
 
 		echo '
+						</span>
 					</li>';
 	}
 

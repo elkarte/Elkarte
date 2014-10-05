@@ -10,7 +10,7 @@
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
- * @version 1.0
+ * @version 1.0.1
  *
  */
 
@@ -630,6 +630,8 @@ function countConfiguredMemberOptions()
 function removeThemeOptions($theme, $membergroups, $old_settings = '')
 {
 	$db = database();
+
+	$query_param = array();
 
 	// The default theme is 1 (id_theme = 1)
 	if ($theme === 'default')

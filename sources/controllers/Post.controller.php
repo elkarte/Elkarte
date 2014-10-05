@@ -15,7 +15,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:		BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0
+ * @version 1.0.1
  *
  */
 
@@ -328,7 +328,7 @@ class Post_Controller extends Action_Controller
 					$_REQUEST['icon'] = 'xx';
 
 				// They are previewing if they asked to preview (i.e. came from quick reply).
-				$really_previewing = !empty($_POST['preview']);
+				$really_previewing = !empty($_REQUEST['preview']);
 			}
 
 			// In order to keep the approval status flowing through, we have to pass it through the form...
@@ -818,8 +818,25 @@ class Post_Controller extends Action_Controller
 		{
 			$context['icons'][count($context['icons']) - 1]['is_last'] = true;
 			$context['icons'][0]['selected'] = true;
-			$context['icon'] = $context['icons'][0]['value'];
-			$context['icon_url'] = $context['icons'][0]['url'];
+			// $context['icon'] is set when editing a message
+			if (!isset($context['icon']))
+				$context['icon'] = $context['icons'][0]['value'];
+			$found = false;
+			foreach ($context['icons'] as $icon)
+			{
+				if ($icon['value'] === $context['icon'])
+				{
+					$found = true;
+					$context['icon_url'] = $icon['url'];
+					break;
+				}
+			}
+			// Failsafe
+			if (!$found)
+			{
+				$context['icon'] = $context['icons'][0]['value'];
+				$context['icon_url'] = $context['icons'][0]['url'];
+			}
 		}
 
 		// Are we starting a poll? if set the poll icon as selected if its available
@@ -942,7 +959,14 @@ class Post_Controller extends Action_Controller
 
 		// If the session has timed out, let the user re-submit their form.
 		if (checkSession('post', '', false) != '')
+		{
 			$post_errors->addError('session_timeout');
+
+			// Disable the preview so that any potentially malicious code is not executed
+			$_REQUEST['preview'] = false;
+
+			return $this->action_post();
+		}
 
 		// Wrong verification code?
 		if (!$user_info['is_admin'] && !$user_info['is_mod'] && !empty($modSettings['posts_require_captcha']) && ($user_info['posts'] < $modSettings['posts_require_captcha'] || ($user_info['is_guest'] && $modSettings['posts_require_captcha'] == -1)))

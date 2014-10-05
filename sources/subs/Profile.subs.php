@@ -13,7 +13,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0
+ * @version 1.0.1
  *
  */
 
@@ -1568,7 +1568,7 @@ function isCustomFieldValid($field, $value)
 	if ($field['type'] == 'text' && !empty($field['mask']) && $field['mask'] != 'none')
 	{
 		// @todo We never error on this - just ignore it at the moment...
-		if ($field['mask'] == 'email' && (preg_match('~^[0-9A-Za-z=_+\-/][0-9A-Za-z=_\'+\-/\.]*@[\w\-]+(\.[\w\-]+)*(\.[\w]{2,6})$~', $value) === 0 || strlen($value) > 255))
+		if ($field['mask'] == 'email' && !isValidEmail($value))
 			return 'custom_field_invalid_email';
 		elseif ($field['mask'] == 'number' && preg_match('~[^\d]~', $value))
 			return 'custom_field_not_number';

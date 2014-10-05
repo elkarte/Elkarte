@@ -11,7 +11,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0
+ * @version 1.0.1
  *
  */
 
@@ -240,7 +240,7 @@ function template_modify_category()
 	else
 		echo '
 						<input type="submit" name="edit" value="', $txt['modify'], '" onclick="return !isEmptyText(this.form.cat_name);" tabindex="', $context['tabindex']++, '" class="button_submit" />
-						<input type="submit" name="delete" value="', $txt['mboards_delete_cat'], '" onclick="return confirm(\'', $txt['catConfirm'], '\');" class="button_submit" />';
+						<input type="submit" name="delete" value="', $txt['mboards_delete_cat'], '" class="button_submit" />';
 
 	echo '
 						<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />';
@@ -304,10 +304,16 @@ function template_confirm_category_delete()
 	echo '
 						</select>
 					</p>
-					<input type="submit" name="delete" value="', $txt['mboards_delete_confirm'], '" class="button_submit" />
+					<input type="submit" name="delete" value="', $txt['mboards_delete_confirm'], '" class="button_submit" onclick="return confirm(\'', $txt['catConfirm'], '\');" />
 					<input type="submit" name="cancel" value="', $txt['mboards_delete_cancel'], '" class="button_submit" />
 					<input type="hidden" name="confirmation" value="1" />
-					<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />
+					<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />';
+
+		if (!empty($context['token_check']))
+		echo '
+					<input type="hidden" name="', $context[$context['token_check'] . '_token_var'], '" value="', $context[$context['token_check'] . '_token'], '" />';
+
+	echo '
 				</div>
 			</div>
 		</form>

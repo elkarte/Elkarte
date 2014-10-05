@@ -1,5 +1,5 @@
 #### ATTENTION: You do not need to run or use this file!  The install.php script does everything for you!
-#### Install script for PostgreSQL 8.0.1
+#### Install script for PostgreSQL 8.3+
 
 #
 # Create PostgreSQL functions.

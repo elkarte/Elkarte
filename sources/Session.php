@@ -16,7 +16,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:		BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0
+ * @version 1.0.1
  *
  */
 
@@ -28,7 +28,7 @@ if (!defined('ELK'))
  */
 function loadSession()
 {
-	global $modSettings, $boardurl, $sc, $cache_accelerator;
+	global $modSettings, $boardurl, $sc;
 
 	// Attempt to change a few PHP settings.
 	@ini_set('session.use_cookies', true);
@@ -90,7 +90,7 @@ function loadSession()
 
 		// APC destroys static class members before sessions can be written.  To work around this we
 		// explicitly call session_write_close on script end/exit bugs.php.net/bug.php?id=60657
-		if (!empty($modSettings['cache_enable']) && $cache_accelerator === 'apc')
+		if (extension_loaded('apc') && ini_get('apc.enabled') && !extension_loaded('apcu'))
 			register_shutdown_function('session_write_close');
 
 		// Change it so the cache settings are a little looser than default.
