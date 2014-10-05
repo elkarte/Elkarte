@@ -787,3 +787,20 @@ ADD COLUMN mentions smallint(5) NOT NULL default '0';
 ALTER TABLE {$db_prefix}members
 CHANGE instant_messages personal_messages smallint(5) NOT NULL default 0;
 ---#
+
+--- Fixes from 1.0.1
+/******************************************************************************/
+---# Adding new column to message_likes...
+ALTER TABLE {$db_prefix}message_likes
+ADD COLUMN like_timestamp int NOT NULL default '0';
+---#
+
+---# More space for email filters...
+ALTER TABLE {$db_prefix}postby_emails_filters
+CHANGE `filter_style` `filter_style` char(10) NOT NULL default '';
+---#
+
+---# Possible wrong type for mail_queue...
+ALTER TABLE {$db_prefix}mail_queue
+CHANGE `message_id` `message_id` varchar(12) NOT NULL default '';
+---#
