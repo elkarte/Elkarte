@@ -810,8 +810,8 @@ div.bbc_footnotes .meaction{
 	box-shadow: 0 -2px 0 -1px #ccc, 3px -2px 0 -1px #ccc, 3px 1px 0 -1px #ccc;
 }
 .linktree:hover a, .linktree>a:hover,
-.linktree:last-child, .linktree:last-child>a,
-.linktree:last-child>a:hover, .linktree:last-child strong {
+.linktree:last-child, .linktree:last-child>span>a,
+.linktree:last-child>span>a:hover, .linktree:last-child strong {
 	color: #fff;
 	text-decoration: none;
 }
@@ -1471,6 +1471,9 @@ div.bbc_footnotes .meaction{
 .activity_stats li .bar div {
 	background: #47b263;
 	background-image: linear-gradient(to bottom, #60bc78 0%, #27a348 100%);
+}
+.profile_pie {
+	background: url(../../images/_light/stats_pie.png);
 }
 
 .topic_details {

@@ -14,7 +14,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:		BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0
+ * @version 1.0.1
  *
  */
 
@@ -187,6 +187,7 @@ class ManagePermissions_Controller extends Action_Controller
 				'name' => array(
 					'header' => array(
 						'value' => $txt['membergroups_name'],
+						'class' => 'grid50',
 					),
 					'data' => array(
 						'function' => function ($rowData) {
@@ -221,7 +222,7 @@ class ManagePermissions_Controller extends Action_Controller
 				'members' => array(
 					'header' => array(
 						'value' => $txt['membergroups_members_top'],
-						'style' => 'width:10%;',
+						'class' => 'grid10',
 					),
 					'data' => array(
 						'function' => function ($rowData) {
@@ -244,7 +245,7 @@ class ManagePermissions_Controller extends Action_Controller
 				'permissions_allowed' => array(
 					'header' => array(
 						'value' => empty($modSettings['permission_enable_deny']) ? $txt['membergroups_permissions'] : $txt['permissions_allowed'],
-						'style' => 'width:8%;',
+						'class' => 'grid8',
 					),
 					'data' => array(
 						'function' => function ($rowData) {
@@ -256,7 +257,7 @@ class ManagePermissions_Controller extends Action_Controller
 					'evaluate' => !empty($modSettings['permission_enable_deny']),
 					'header' => array(
 						'value' => $txt['permissions_denied'],
-						'style' => 'width:8%;',
+						'class' => 'grid8',
 					),
 					'data' => array(
 						'function' => function ($rowData) {
@@ -267,7 +268,7 @@ class ManagePermissions_Controller extends Action_Controller
 				'modify' => array(
 					'header' => array(
 						'value' => $context['can_modify'] ? $txt['permissions_modify'] : $txt['permissions_view'],
-						'style' => 'width:8%;',
+						'class' => 'grid17',
 					),
 					'data' => array(
 						'function' => function ($rowData) {
@@ -326,6 +327,7 @@ class ManagePermissions_Controller extends Action_Controller
 					'name' => array(
 						'header' => array(
 							'value' => $txt['membergroups_name'],
+							'class' => 'grid25',
 						),
 						'data' => array(
 							'function' => function ($rowData) {
@@ -342,6 +344,7 @@ class ManagePermissions_Controller extends Action_Controller
 					'required_posts' => array(
 						'header' => array(
 							'value' => $txt['membergroups_min_posts'],
+							'class' => 'grid25',
 						),
 						'data' => array(
 							'db' => 'min_posts',
@@ -354,7 +357,7 @@ class ManagePermissions_Controller extends Action_Controller
 					'members' => array(
 						'header' => array(
 							'value' => $txt['membergroups_members_top'],
-							'style' => 'width:10%;',
+							'class' => 'grid10',
 						),
 						'data' => array(
 							'function' => function ($rowData) {
@@ -374,7 +377,7 @@ class ManagePermissions_Controller extends Action_Controller
 					'permissions_allowed' => array(
 						'header' => array(
 							'value' => empty($modSettings['permission_enable_deny']) ? $txt['membergroups_permissions'] : $txt['permissions_allowed'],
-							'style' => 'width:8%;',
+							'class' => 'grid8',
 						),
 						'data' => array(
 							'function' => function ($rowData) {
@@ -386,7 +389,7 @@ class ManagePermissions_Controller extends Action_Controller
 						'evaluate' => !empty($modSettings['permission_enable_deny']),
 						'header' => array(
 							'value' => $txt['permissions_denied'],
-							'style' => 'width:8%;',
+							'class' => 'grid8',
 						),
 						'data' => array(
 							'function' => function ($rowData) {
@@ -397,15 +400,17 @@ class ManagePermissions_Controller extends Action_Controller
 					'modify' => array(
 						'header' => array(
 							'value' => $txt['modify'],
-							'style' => 'width:8%;',
+							'class' => 'grid17',
 						),
 						'data' => array(
-							'sprintf' => array(
-								'format' => '<a href="' . $scripturl . '?action=admin;area=permissions;sa=modify;group=%1$d' . (isset($_REQUEST['pid']) ? ';pid=' . $_REQUEST['pid'] : '') . '">' . $txt['membergroups_modify'] . '</a>',
-								'params' => array(
-									'id_group' => false,
-								),
-							),
+							'function' => create_function('$rowData', '
+								global $scripturl, $txt;
+
+								if ($rowData[\'id_parent\'] == -2)
+										return \'<a href="\' . $scripturl . \'?action=admin;area=permissions;sa=modify;group=\' . $rowData[\'id_group\'] . (isset($_REQUEST[\'pid\']) ? \';pid=\' . $_REQUEST[\'pid\'] : \'\') . \'">\' . $txt[\'membergroups_modify\'] . \'</a>\';
+									else
+										return \'<span class="smalltext">\' . $txt[\'permissions_includes_inherited_from\'] . \'&quot;\' .  $rowData[\'parent_name\'] . \'&quot;\' . \'</span><br /><a href="\' . $scripturl . \'?action=admin;area=permissions;sa=modify;group=\' . $rowData[\'id_parent\'] . (isset($_REQUEST[\'pid\']) ? \';pid=\' . $_REQUEST[\'pid\'] : \'\') . \'">\' . $txt[\'membergroups_modify_parent\'] . \'</a>\';
+							'),
 						),
 					),
 					'check' => array(
