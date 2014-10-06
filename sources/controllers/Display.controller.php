@@ -24,8 +24,16 @@ if (!defined('ELK'))
  * This controller is the most important and probably most accessed of all.
  * It controls topic display, with all related.
  */
-class Display_Controller
+class Display_Controller extends Action_Controller
 {
+	public function __construct()
+	{
+		$this->_hooks = array(
+			'display_pre',
+			'display_topic_query',
+		);
+	}
+
 	/**
 	 * Default action handler for this controller
 	 */
@@ -51,6 +59,8 @@ class Display_Controller
 		global $scripturl, $txt, $modSettings, $context, $settings;
 		global $options, $user_info, $board_info, $topic, $board;
 		global $attachments, $messages_request;
+
+		$this->runExtension('display_pre', array('_REQUEST' => &$_REQUEST, 'topic' => $topic, 'board' => $board));
 
 		// What are you gonna display if these are empty?!
 		if (empty($topic))

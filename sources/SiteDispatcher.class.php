@@ -287,11 +287,14 @@ class Site_Dispatcher
 	 */
 	public function dispatch()
 	{
+		global $modSettings;
+
 		require_once($this->_file_name);
 
 		if (!empty($this->_controller_name))
 		{
 			$controller = new $this->_controller_name();
+			$controller->register($modSettings);
 
 			// Pre-dispatch (load templates and stuff)
 			if (method_exists($controller, 'pre_dispatch'))
