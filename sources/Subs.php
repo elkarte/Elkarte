@@ -4172,47 +4172,75 @@ function replaceBasicActionUrl($string)
  */
 function elk_autoloader($class)
 {
-	if (substr($class, -11) === '_Controller')
+	// Break the class name in to its parts
+	$name = explode('_', $class);
+	$surname = array_pop($name);
+	$givenname = implode('', $name);
+var_dump($class);
+	switch ($givenname)
 	{
-		$file_name = str_replace('_', '', str_replace('_Controller', '.controller', $class)) . '.php';
-
-		$file_name = str_replace('_', '', $file_name);
-		if (file_exists(CONTROLLERDIR . '/' . $file_name))
-			$file_name = CONTROLLERDIR . '/' . $file_name;
-		elseif (file_exists(ADMINDIR . '/' . $file_name))
-			$file_name = ADMINDIR . '/' . $file_name;
-	}
-	elseif (strpos($class, 'Verification_Controls_') !== false)
-	{
-		$file_name = SUBSDIR . '/VerificationControls.class.php';
-	}
-	elseif (strpos($class, 'Database_') !== false || strpos($class, 'DbSearch_') !== false || strpos($class, 'DbTable_') !== false)
-	{
-		$file_name = '';
-	}
-	elseif (substr($class, -7) === '_Search')
-	{
-		$file_name = SUBSDIR . '/SearchAPI-' . substr($class, 0, -7) . '.class.php';
-	}
-	elseif (substr($class, -6) === '_Cache')
-	{
-		$file_name = SUBSDIR . '/cache/' . str_replace('_', '', $class) . '.class.php';
-	}
-	elseif (substr($class, -8) === '_Display' || substr($class, -8) === '_Payment')
-	{
-		$file_name = SUBSDIR . '/Subscriptions-' . substr($class, 0, -8) . '.class.php';
-	}
-	else
-	{
-		$file_name = str_replace('_', '', $class);
-		if (file_exists(SUBSDIR . '/' . $file_name . '.class.php'))
-			$file_name = SUBSDIR . '/' . $file_name . '.class.php';
-		elseif (file_exists(SOURCEDIR . '/' . $file_name . '.class.php'))
-			$file_name = SOURCEDIR . '/' . $file_name . '.class.php';
-		elseif (file_exists(SOURCEDIR . '/' . $file_name . '.php'))
-			$file_name = SOURCEDIR . '/' . $file_name . '.php';
-		else
+		case 'VerificationControls':
+			$file_name = SUBSDIR . '/VerificationControls.class.php';
+			break;
+		// We don't handle these
+		case 'Database':
+		case 'DbSearch':
+		case 'DbTable':
 			$file_name = '';
+			break;
+		// Simple names like Util.class, Action.class, Request.class ...
+		case '':
+			$file_name = $surname;
+
+			if (file_exists(SUBSDIR . '/' . $file_name . '.class.php'))
+				$file_name = SUBSDIR . '/' . $file_name . '.class.php';
+			elseif (file_exists(SOURCEDIR . '/' . $file_name . '.class.php'))
+				$file_name = SOURCEDIR . '/' . $file_name . '.class.php';
+			elseif (file_exists(SOURCEDIR . '/' . $file_name . '.php'))
+				$file_name = SOURCEDIR . '/' . $file_name . '.php';
+			else
+				$file_name = '';
+			break;
+		// Some_Other
+		default:
+			switch ($surname)
+			{
+				// Some_Controller => Some.controller.php
+				case 'Controller':
+					$file_name = $givenname . '.controller.php';
+
+					// Try controller dir first, then admin
+					if (file_exists(CONTROLLERDIR . '/' . $file_name))
+						$file_name = CONTROLLERDIR . '/' . $file_name;
+					elseif (file_exists(ADMINDIR . '/' . $file_name))
+						$file_name = ADMINDIR . '/' . $file_name;
+					break;
+				// Some_Search => SearchAPI-Some.class
+				case 'Search':
+					$file_name = SUBSDIR . '/SearchAPI-' . $givenname . '.class.php';
+					break;
+				// Some_Cache => SomeCache.class.php
+				case 'Cache':
+					$file_name = SUBSDIR . '/cache/' . $givenname . $surname . '.class.php';
+					break;
+				// Some_Display => Subscriptions-Some.class.php
+				case 'Display':
+				case 'Payment':
+					$file_name = SUBSDIR . '/Subscriptions-' . implode('_', $name) . '.class.php';
+					break;
+				// All the rest, like Browser_Detector, Template_Layers, Site_Dispatcher ...
+				default:
+					$file_name = $givenname . $surname;
+
+					if (file_exists(SUBSDIR . '/' . $file_name . '.class.php'))
+						$file_name = SUBSDIR . '/' . $file_name . '.class.php';
+					elseif (file_exists(SOURCEDIR . '/' . $file_name . '.class.php'))
+						$file_name = SOURCEDIR . '/' . $file_name . '.class.php';
+					elseif (file_exists(SOURCEDIR . '/' . $file_name . '.php'))
+						$file_name = SOURCEDIR . '/' . $file_name . '.php';
+					else
+						$file_name = '';
+			}
 	}
 
 	if (!empty($file_name))
