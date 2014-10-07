@@ -3554,7 +3554,7 @@ function elk_seed_generator()
  */
 function call_integration_hook($hook, $parameters = array())
 {
-	global $modSettings, $settings, $db_show_debug, $context;
+	global $modSettings, $settings, $db_show_debug;
 
 	static $path_replacements = array(
 		'BOARDDIR' => BOARDDIR,
@@ -3613,7 +3613,7 @@ function call_integration_hook($hook, $parameters = array())
  */
 function call_integration_include_hook($hook)
 {
-	global $modSettings, $settings, $db_show_debug, $context;
+	global $modSettings, $settings, $db_show_debug;
 
 	static $path_replacements = array(
 		'BOARDDIR' => BOARDDIR,
