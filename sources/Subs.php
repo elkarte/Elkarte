@@ -2027,7 +2027,7 @@ function footnote_callback($matches)
 function parsesmileys(&$message)
 {
 	global $modSettings, $txt, $user_info;
-	static $smileyPregSearch = null, $smileyPregReplacements = array(), $callback;
+	static $smileyPregSearch = null, $smileyPregReplacements = array();
 
 	$db = database();
 
@@ -2098,34 +2098,13 @@ function parsesmileys(&$message)
 		}
 
 		$smileyPregSearch = '~(?<=[>:\?\.\s' . $non_breaking_space . '[\]()*\\\;]|^)(' . implode('|', $searchParts) . ')(?=[^[:alpha:]0-9]|$)~';
-		$callback = new ParseSmileysReplacement;
-		$callback->replacements = $smileyPregReplacements;
 	}
 
 	// Replace away!
-	// @todo When support changes to PHP 5.3+, this can be changed this to "use" keyword and simpifly this.
-	$message = preg_replace_callback($smileyPregSearch, array($callback, 'callback'), $message);
-}
-
-/**
- * Smiley Replacment Callback.
- *
- * This is needed until ELK supports PHP 5.3+ and we can change to "use"
- */
-class ParseSmileysReplacement
-{
-	/**
-	 * Our callback that does the actual smiley replacments.
-	 *
-	 * @param string[] $matches
-	 */
-	public function callback($matches)
+	$message = preg_replace_callback($smileyPregSearch, function ($matches) use ($smileyPregReplacements)
 	{
-		if (isset($this->replacements[$matches[0]]))
-			return $this->replacements[$matches[0]];
-		else
-			return '';
-	}
+		return $smileyPregReplacements[$matches[0]];
+	}, $message);
 }
 
 /**
