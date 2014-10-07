@@ -4183,7 +4183,11 @@ function replaceBasicActionUrl($string)
 }
 
 /**
- * Takes care of automatically include the files of the classes
+ * Elkarte autoloader
+ *
+ * What it does:
+ * - Automatically includes the required files for a given class
+ * - Follows controller naming conventions to find the right file to load
  *
  * @param string $class The name of the class
  */
@@ -4239,6 +4243,9 @@ function elk_autoloader($class)
 /**
  * This function creates a new GenericList from all the passed options.
  *
+ * What it does:
+ * - Calls integration hook integrate_list_"unique_list_id" to allow easy modifiying
+ *
  * @param mixed[] $listOptions associative array of option => value
  */
 function createList($listOptions)
@@ -4253,6 +4260,7 @@ function createList($listOptions)
 /**
  * This handy function retrieves a Request instance and passes it on.
  *
+ * What it does:
  * - To get hold of a Request, you can use this function or directly Request::instance().
  * - This is for convenience, it simply delegates to Request::instance().
  */
@@ -4263,7 +4271,9 @@ function request()
 
 /**
  * Meant to replace any usage of $db_last_error.
- * Reads the file db_last_error.txt, if a time() is present returns it,
+ *
+ * What it does:
+ * - Reads the file db_last_error.txt, if a time() is present returns it,
  * otherwise returns 0.
  */
 function db_last_error()
@@ -4305,7 +4315,8 @@ function response_prefix()
 
 /**
  * A very simple function to determine if an email address is "valid" for Elkarte.
- * A valid email for ElkArte is something that resebles an email (filter_var) and
+ *
+ * - A valid email for ElkArte is something that resebles an email (filter_var) and
  * is less than 255 characters (for database limits)
  *
  * @param string $value - The string to evaluate as valid email
