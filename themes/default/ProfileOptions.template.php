@@ -32,8 +32,8 @@ function template_editBuddies()
 
 	echo '
 	<div class="windowbg" id="edit_buddies">
-		<h2 class="category_header">
-			<img src="', $settings['images_url'], '/icons/online.png" alt="" class="icon" />', $txt['editBuddies'], '
+		<h2 class="category_header hdicon cat_img_buddies">
+			', $txt['editBuddies'], '
 		</h2>
 		<table class="table_grid">
 			<tr class="table_head">
