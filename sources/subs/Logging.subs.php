@@ -128,7 +128,7 @@ function updateLogActivity($update_parameters, $setStringUpdate, $insert_keys, $
 
 	$db->query('', '
 		UPDATE {db_prefix}log_activity
-		SET' . $setStringUpdate . '
+		SET ' . $setStringUpdate . '
 		WHERE date = {date:current_date}',
 		$update_parameters
 	);
