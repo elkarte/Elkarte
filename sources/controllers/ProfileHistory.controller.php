@@ -27,10 +27,9 @@ class ProfileHistory_Controller extends Action_Controller
 {
 	/**
 	 * Member id for the history being viewed
-	 * @todo should be changed to _memID
 	 * @var int
 	 */
-	private $memID = 0;
+	private $_memID = 0;
 
 	/**
 	 * Profile history entry point.
@@ -42,7 +41,7 @@ class ProfileHistory_Controller extends Action_Controller
 	{
 		global $context, $txt, $modSettings, $user_profile;
 
-		$this->memID = currentMemberID();
+		$this->_memID = currentMemberID();
 
 		$subActions = array(
 			'activity' => array('controller' => $this, 'function' => 'action_trackactivity', 'label' => $txt['trackActivity']),
@@ -74,7 +73,7 @@ class ProfileHistory_Controller extends Action_Controller
 
 		// Set a page title.
 		$context['history_area'] = $subAction;
-		$context['page_title'] = $txt['trackUser'] . ' - ' . $subActions[$subAction]['label'] . ' - ' . $user_profile[$this->memID]['real_name'];
+		$context['page_title'] = $txt['trackUser'] . ' - ' . $subActions[$subAction]['label'] . ' - ' . $user_profile[$this->_memID]['real_name'];
 
 		// Pass on to the actual method.
 		$action->dispatch($subAction);
@@ -87,7 +86,7 @@ class ProfileHistory_Controller extends Action_Controller
 	{
 		global $scripturl, $txt, $modSettings, $user_profile, $context;
 
-		$memID = $this->memID;
+		$memID = $this->_memID;
 
 		// Verify if the user has sufficient permissions.
 		isAllowedTo('moderate_forum');
@@ -215,7 +214,7 @@ class ProfileHistory_Controller extends Action_Controller
 		global $user_profile, $scripturl, $txt, $user_info, $modSettings, $context;
 
 		$db = database();
-		$memID = $this->memID;
+		$memID = $this->_memID;
 
 		// Can the user do this?
 		isAllowedTo('moderate_forum');
@@ -498,7 +497,7 @@ class ProfileHistory_Controller extends Action_Controller
 	{
 		global $scripturl, $txt, $context;
 
-		$memID = $this->memID;
+		$memID = $this->_memID;
 
 		if ($memID == 0)
 			$context['base_url'] = $scripturl . '?action=trackip';
@@ -574,7 +573,7 @@ class ProfileHistory_Controller extends Action_Controller
 		global $scripturl, $txt, $modSettings, $context;
 
 		$db = database();
-		$memID = $this->memID;
+		$memID = $this->_memID;
 
 		// Get the names of any custom fields.
 		$request = $db->query('', '
