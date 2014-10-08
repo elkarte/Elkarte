@@ -372,6 +372,7 @@ class Auth_Controller extends Action_Controller
 			call_integration_hook('integrate_logout', array($user_settings['member_name']));
 
 			// If you log out, you aren't online anymore :P.
+			require_once(SUBSDIR . '/Logging.subs.php');
 			logOnline($user_info['id'], false);
 		}
 
@@ -750,6 +751,7 @@ function doLogin()
 	updateMemberData($user_info['id'], array('last_login' => time(), 'member_ip' => $user_info['ip'], 'member_ip2' => $req->ban_ip()));
 
 	// Get rid of the online entry for that old guest....
+	require_once(SUBSDIR . '/Logging.subs.php');
 	deleteOnline('ip' . $user_info['ip']);
 	$_SESSION['log_time'] = 0;
 
