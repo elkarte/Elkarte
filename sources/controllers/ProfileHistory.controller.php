@@ -63,7 +63,9 @@ class ProfileHistory_Controller extends Action_Controller
 		);
 
 		// Set up action/subaction stuff.
-		$action = new Action();
+		$action = new Action('profile_history');
+
+		// Yep, sub-action time and call integrate_sa_profile_history as well
 		$subAction = $action->initialize($subActions, 'activity');
 		$context['sub_action'] = $subAction;
 
