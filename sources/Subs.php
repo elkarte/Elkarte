@@ -4176,7 +4176,7 @@ function elk_autoloader($class)
 	$name = explode('_', $class);
 	$surname = array_pop($name);
 	$givenname = implode('', $name);
-var_dump($class);
+
 	switch ($givenname)
 	{
 		case 'VerificationControls':
