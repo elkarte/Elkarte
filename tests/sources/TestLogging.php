@@ -2,6 +2,7 @@
 
 require_once(TESTDIR . 'simpletest/autorun.php');
 require_once(TESTDIR . '../SSI.php');
+require_once(SUBSDIR . '/Logging.subs.php');
 
 /**
  * TestCase class for logging
