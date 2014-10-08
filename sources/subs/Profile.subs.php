@@ -1603,7 +1603,7 @@ function profileSendActivation()
 	sendmail($profile_vars['email_address'], $emaildata['subject'], $emaildata['body'], null, null, false, 0);
 
 	// Log the user out.
-	require_once(SUBSDIR . '/Auth.subs.php');
+	require_once(SUBSDIR . '/Logging.subs.php');
 	logOnline($context['id_member'], false);
 	$_SESSION['log_time'] = 0;
 	$_SESSION['login_' . $cookiename] = serialize(array(0, '', 0));
