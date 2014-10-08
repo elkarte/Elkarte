@@ -472,3 +472,29 @@ function updateDisplayCache()
 	$db->free_result($request);
 	updateSettings(array('displayFields' => serialize($fields)));
 }
+
+/**
+ * Loads all the custom fields in the system, active or not
+ */
+function loadAllCustomFields()
+{
+	$db = database();
+
+	// Get the names of any custom fields.
+	$request = $db->query('', '
+		SELECT
+			col_name, field_name, bbc
+		FROM {db_prefix}custom_fields',
+		array(
+		)
+	);
+	$custom_field_titles = array();
+	while ($row = $db->fetch_assoc($request))
+		$custom_field_titles['customfield_' . $row['col_name']] = array(
+			'title' => $row['field_name'],
+			'parse_bbc' => $row['bbc'],
+		);
+	$db->free_result($request);
+
+	return $custom_field_titles;
+}

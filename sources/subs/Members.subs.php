@@ -2529,3 +2529,34 @@ function updateMemberData($members, $data)
 		}
 	}
 }
+
+/**
+ * Loads members who are associated with an ip address
+ *
+ * @param string $ip_string raw value to use in where clause
+ * @param string $ip_var
+ */
+function loadMembersIPs($ip_string, $ip_var)
+{
+	global $scripturl;
+
+	$db = database();
+
+	$request = $db->query('', '
+		SELECT
+			id_member, real_name AS display_name, member_ip
+		FROM {db_prefix}members
+		WHERE member_ip ' . $ip_string,
+		array(
+			'ip_address' => $ip_var,
+		)
+	);
+	$ips = array();
+	while ($row = $db->fetch_assoc($request))
+		$ips[$row['member_ip']][] = '<a href="' . $scripturl . '?action=profile;u=' . $row['id_member'] . '">' . $row['display_name'] . '</a>';
+	$db->free_result($request);
+
+	ksort($ips);
+
+	return $ips;
+}
