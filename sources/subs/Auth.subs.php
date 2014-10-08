@@ -711,52 +711,6 @@ function elk_setcookie($name, $value = '', $expire = 0, $path = '', $domain = ''
 }
 
 /**
- * Set the passed users online or not, in the online log table
- *
- * @package Authorization
- * @param int[]|int $ids ids of the member(s) to log
- * @param bool $on = false if true, add the user(s) to online log, if false, remove 'em
- */
-function logOnline($ids, $on = false)
-{
-	$db = database();
-
-	if (!is_array($ids))
-		$ids = array($ids);
-
-	if (empty($on))
-	{
-		// set the user(s) out of log_online
-		$db->query('', '
-			DELETE FROM {db_prefix}log_online
-			WHERE id_member IN ({array_int:members})',
-			array(
-				'members' => $ids,
-			)
-		);
-	}
-}
-
-/**
- * Delete expired/outdated session from log_online
- *
- * @package Authorization
- * @param string $session
- */
-function deleteOnline($session)
-{
-	$db = database();
-
-	$db->query('', '
-		DELETE FROM {db_prefix}log_online
-		WHERE session = {string:session}',
-		array(
-			'session' => $session,
-		)
-	);
-}
-
-/**
  * This functions determines whether this is the first login of the given user.
  *
  * @package Authorization
