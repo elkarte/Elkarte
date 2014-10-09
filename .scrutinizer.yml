@@ -19,6 +19,10 @@ filter:
         - themes/default/scripts/jquery-ui-1.10.4.min.js
         - themes/default/scripts/prettify.min.js
         - themes/default/scripts/sha256.js
+checks:
+    php:
+        code_rating: true
+        duplication: true
 tools:
     js_hint:
         filter:
