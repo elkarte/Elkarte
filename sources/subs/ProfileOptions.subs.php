@@ -25,7 +25,8 @@ if (!defined('ELK'))
  *
  * - Will mention that a buddy has been added if that is enabled
  *
- * @param string[] $new_buddies
+ * @param string[] $buddies
+ * @param boolean $adding true when adding new buddies
  * @return int[]
  */
 function getBuddiesID($buddies, $adding = true)
@@ -51,6 +52,7 @@ function getBuddiesID($buddies, $adding = true)
 		$mentions = new Mentions_Controller();
 
 	// Add the new member(s) to the buddies array.
+	$buddiesArray = array();
 	while ($row = $db->fetch_assoc($request))
 	{
 		$buddiesArray[] = (int) $row['id_member'];
@@ -140,7 +142,7 @@ function loadMembergroupsJoin($groups, $memID)
  * Checks if a given group ID is protected by admin only permissions
  *
  * @param int $group_id
- * @return type
+ * @return int
  */
 function checkMembergroupChange($group_id)
 {
@@ -168,8 +170,8 @@ function checkMembergroupChange($group_id)
 /**
  * Validates and logs a request by a member to join a group
  *
- * @param type $group_id
- * @param type $memID
+ * @param int $group_id
+ * @param int $memID
  */
 function logMembergroupRequest($group_id, $memID)
 {

@@ -26,7 +26,7 @@ if (!defined('ELK'))
  * @param boolean $fatal if the function ends in a fatal error in case of problems (default true)
  * @param boolean $reload_id if true the already set value is ignored (default false)
  *
- * @return mixed and integer if no error, false in case of problems if $fatal is false
+ * @return integer if no error.  May return false in case of problems only if $fatal is set to false
  */
 function currentMemberID($fatal = true, $reload_id = false)
 {
