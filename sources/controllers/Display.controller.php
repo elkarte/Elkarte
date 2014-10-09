@@ -29,8 +29,8 @@ class Display_Controller extends Action_Controller
 	public function __construct()
 	{
 		$this->_hooks = array(
-			'display_pre',
-			'display_topic_query',
+			'pre_load',
+			'topic_query',
 		);
 	}
 
@@ -60,7 +60,7 @@ class Display_Controller extends Action_Controller
 		global $options, $user_info, $board_info, $topic, $board;
 		global $attachments, $messages_request;
 
-		$this->runExtension('display_pre', array('_REQUEST' => &$_REQUEST, 'topic' => $topic, 'board' => $board));
+		$this->runExtension('pre_load', array('_REQUEST' => &$_REQUEST, 'topic' => $topic, 'board' => $board));
 
 		// What are you gonna display if these are empty?!
 		if (empty($topic))

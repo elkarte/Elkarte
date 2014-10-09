@@ -287,42 +287,44 @@ class Site_Dispatcher
 	 */
 	public function dispatch()
 	{
-		global $modSettings;
-
 		require_once($this->_file_name);
 
 		if (!empty($this->_controller_name))
 		{
+			$hook = strtolower(str_replace('_Controller', '', $this->_controller_name));
+			$hook = substr($hook, -1) == 2 ? substr($hook, 0, -1) : $hook;
+
+			$this->_loadAddons($hook);
 			$controller = new $this->_controller_name();
-			$controller->register($modSettings);
+			$controller->register($this->_addons);
 
 			// Pre-dispatch (load templates and stuff)
 			if (method_exists($controller, 'pre_dispatch'))
 				$controller->pre_dispatch();
 
-			$hook = strtolower(str_replace('_Controller', '', $this->_controller_name));
-			$hook = substr($hook, -1) == 2 ? substr($hook, 0, -1) : $hook;
-			call_integration_hook('integrate_action_' . $hook . '_before', array($this->_function_name));
-
 			// 3, 2, ... and go
-			if (method_exists($controller, $this->_function_name))
-				$controller->{$this->_function_name}();
-			elseif (method_exists($controller, 'action_index'))
-				$controller->action_index();
+			if ($this->_validateMethod($controller))
+			{
+				$callable = array($controller, $this->_function_name);
+			}
 			// Fall back
 			elseif (function_exists($this->_function_name))
 			{
-				call_user_func($this->_function_name);
+				$callable = $this->_function_name;
 			}
 			else
 			{
 				// Things went pretty bad, huh?
 				// board index :P
-				call_integration_hook('integrate_action_boardindex_before');
+				$hook = 'boardindex';
+
 				$controller = new BoardIndex_Controller();
-				$controller->action_boardindex();
-				call_integration_hook('integrate_action_boardindex_after');
+				$callable = array($controller, 'action_boardindex');
 			}
+
+			call_integration_hook('integrate_action_' . $hook . '_before', array($this->_function_name));
+
+			call_user_func($callable);
 
 			call_integration_hook('integrate_action_' . $hook . '_after', array($this->_function_name));
 		}
@@ -335,6 +337,35 @@ class Site_Dispatcher
 
 			// It must be a good ole' function
 			call_user_func($this->_function_name);
+		}
+	}
+
+	protected function _validateMethod($controller)
+	{
+		if (method_exists($controller, $this->_function_name))
+			return true;
+		elseif (method_exists($controller, 'action_index'))
+		{
+			$this->_function_name = 'action_index';
+			return true;
+		}
+		else
+			return false;
+	}
+
+	protected function _loadAddons($hook)
+	{
+		foreach (glob(BOARDDIR . '/packages/integration/*/*.integrate.php') as $integrate_file)
+			require_once($integrate_file);
+
+		$classes = get_declared_classes();
+		$prefix = 'Addon_' . ucfirst($hook);
+		$prefix_len = strlen($prefix);
+
+		foreach ($classes as $class)
+		{
+			if (substr($class, 0, $prefix_len) === $prefix)
+				$this->_addons[] = $class;
 		}
 	}
 

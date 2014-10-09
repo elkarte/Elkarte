@@ -24,6 +24,7 @@ abstract class Action_Controller
 {
 	protected $_registered_extensions = array();
 	protected $_hooks = array();
+	protected $_inverted_classes = null;
 
 	/**
 	 * Default action handler.
@@ -80,41 +81,41 @@ abstract class Action_Controller
 		}
 	}
 
-	public function register($extensions)
+	public function register($classes)
 	{
+		if ($this->_inverted_classes === null)
+			$this->_inverClasses($classes);
+
 		foreach ($this->_hooks as $hook)
 			$this->addExtension($hook, $this->getExtensions($hook));
 	}
 
 	protected function getExtensions($position)
 	{
-		global $modSettings;
-
-		$hook = str_replace('_controller', '', strtolower(__CLASS__)) . '_' . $position;
-
-		if (!empty($modSettings[$hook]))
-			$methods = @unserialize($modSettings[$hook]);
-
-		if (empty($methods))
+		if (!empty($this->_inverted_classes[$position]))
+			return $this->_inverted_classes[$position];
+		else
 			return array();
-
-		$return = array();
-		foreach ($methods as $method)
-		{
-			if (is_array($method))
-				$return[] = array($method[0], $method[1]);
-			else
-				$return[] = array($method, array());
-		}
-
-		return $return;
 	}
 
-	protected function addExtension($position, $extensions)
+	protected function _inverClasses($classes)
 	{
-		if (empty($extensions))
-			return;
+		$this->_inverted_classes = array();
+		foreach ($classes as $class)
+		{
+			$hooks = $class::hooks();
+			foreach ($hooks as $position => $hook)
+			{
+				if (!isset($this->_inverted_classes[$position]))
+					$this->_inverted_classes[$position] = array($hook);
+				else
+					$this->_inverted_classes[$position][] = $hook;
+			}
+		}
+	}
 
-		$this->_registered_extensions[$position] = $extensions;
+	protected function addExtension($position, $classes)
+	{
+		$this->_registered_extensions[$position] = $classes;
 	}
 }
