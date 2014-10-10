@@ -22,15 +22,15 @@ $txt['mentions_enabled'] = 'Enable site mentioning';
 $txt['mentions_buddy'] = 'Add a mention when a member is added to someone\'s buddy list';
 $txt['mentions_dont_notify_rlike'] = 'Don\'t inform the member when a post has a liked removed';
 
-$txt['mention_men'] = 'Mentioned you in the message {msg_link}';
-$txt['mention_like'] = 'Liked your message {msg_link}';
-$txt['mention_rlike'] = 'Unliked your message {msg_link}';
+$txt['mention_mentionmem'] = 'Mentioned you in the message {msg_link}';
+$txt['mention_likemsg'] = 'Liked your message {msg_link}';
+$txt['mention_rlikemsg'] = 'Unliked your message {msg_link}';
 $txt['mention_buddy'] = 'Added you to their buddy list.';
 
 $txt['mentions_type_all'] = 'All Mentions';
-$txt['mentions_type_men'] = 'Mentioned';
-$txt['mentions_type_like'] = 'Likes';
-$txt['mentions_type_rlike'] = 'Unlikes';
+$txt['mentions_type_mentionmem'] = 'Mentioned';
+$txt['mentions_type_likemsg'] = 'Likes';
+$txt['mentions_type_rlikemsg'] = 'Unlikes';
 $txt['mentions_type_buddy'] = 'Buddy';
 
 $txt['mentions_mark_all_read'] = 'Mark these mentions as read';

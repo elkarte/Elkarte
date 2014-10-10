@@ -158,7 +158,7 @@ function updateSettings($changeArray, $update = false, $debug = false)
 /**
  * Deletes one setting from the settings table and takes care of $modSettings as well
  *
- * @param string $toRemove the setting or the settings to be removed
+ * @param string|string[] $toRemove the setting or the settings to be removed
  */
 function removeSettings($toRemove)
 {
@@ -4189,6 +4189,7 @@ function replaceBasicActionUrl($string)
  */
 function elk_autoloader($class)
 {
+
 	if (substr($class, -11) === '_Controller')
 	{
 		$file_name = str_replace('_', '', str_replace('_Controller', '.controller', $class)) . '.php';
@@ -4213,11 +4214,26 @@ function elk_autoloader($class)
 	}
 	elseif (substr($class, -6) === '_Cache')
 	{
-		$file_name = SUBSDIR . '/cache/' . str_replace('_', '', $class) . '.class.php';
+		$file_name = SUBSDIR . '/CacheMethod/' . str_replace('_', '', $class) . '.class.php';
 	}
 	elseif (substr($class, -8) === '_Display' || substr($class, -8) === '_Payment')
 	{
 		$file_name = SUBSDIR . '/Subscriptions-' . substr($class, 0, -8) . '.class.php';
+	}
+	elseif (substr($class, -10) === '_Interface' || substr($class, -9) === '_Abstract')
+	{
+	
+		$file_name = str_replace('_', '', str_replace(array('_Interface', '_Abstract'), array('.interface', '_Abstract.class'), $class)) . '.php';
+		if (!file_exists(SUBSDIR . '/' . $file_name))
+		{
+			$dir = str_replace(array('Abstract', '_'), '', substr($file_name, 0, strpos($file_name, '.')));
+
+			if (file_exists(SUBSDIR . '/' . $dir . '/' . $file_name))
+				$file_name = SUBSDIR . '/' . $dir . '/' . $file_name;
+			// Not knowing what it is, better leave it empty
+			else
+				$file_name = '';
+		}
 	}
 	else
 	{

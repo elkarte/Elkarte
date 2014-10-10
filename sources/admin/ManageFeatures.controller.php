@@ -395,16 +395,34 @@ class ManageFeatures_Controller extends Action_Controller
 		{
 			checkSession();
 
+			$enabled_mentions = !empty($modSettings['enabled_mentions']) ? explode(',', $modSettings['enabled_mentions']) : array();
+
 			if ((!isset($_POST['mentions_buddy']) && !empty($modSettings['mentions_buddy'])) || (isset($_POST['mentions_buddy']) && $_POST['mentions_buddy'] != $modSettings['mentions_buddy']))
 			{
 				require_once(SUBSDIR . '/Mentions.subs.php');
 				toggleMentionsVisibility('buddy', !empty($_POST['mentions_buddy']));
+
+				if (!empty($_POST['mentions_buddy']))
+					$enabled_mentions[] = 'buddy';
+				else
+					$enabled_mentions = array_diff($enabled_mentions, array('buddy'));
 			}
 
 			// If mentions are enabled, the related task should be enabled as well, otherwise should be disabled.
 			require_once(SUBSDIR . '/ScheduledTasks.subs.php');
 			toggleTaskStatusByName('user_access_mentions', !empty($_POST['mentions_enabled']));
 
+			if (!empty($_POST['mentions_dont_notify_rlike']))
+				$enabled_mentions[] = 'rlikemsg';
+			else
+				$enabled_mentions = array_diff($enabled_mentions, array('rlikemsg'));
+
+			if (!empty($_POST['mentions_enabled']))
+				$enabled_mentions[] = 'mentionmem';
+			else
+				$enabled_mentions = array_diff($enabled_mentions, array('mentionmem'));
+
+			updateSettings(array('enabled_mentions' => implode(',', $enabled_mentions)));
 			Settings_Form::save_db($config_vars);
 			redirectexit('action=admin;area=featuresettings;sa=mention');
 		}

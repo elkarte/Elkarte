@@ -1691,7 +1691,7 @@ class Post_Controller extends Action_Controller
 			$mentions = new Mentions_Controller();
 			$mentions->setData(array(
 				'id_member' => $actually_mentioned,
-				'type' => 'men',
+				'type' => 'mentionmem',
 				'id_msg' => $msgOptions['id'],
 				'status' => $becomesApproved ? 'new' : 'unapproved',
 			));
