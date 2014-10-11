@@ -294,9 +294,7 @@ class Site_Dispatcher
 			$hook = strtolower(str_replace('_Controller', '', $this->_controller_name));
 			$hook = substr($hook, -1) == 2 ? substr($hook, 0, -1) : $hook;
 
-			$this->_loadAddons($hook);
 			$controller = new $this->_controller_name();
-			$controller->register($this->_addons);
 
 			// Pre-dispatch (load templates and stuff)
 			if (method_exists($controller, 'pre_dispatch'))
@@ -308,6 +306,7 @@ class Site_Dispatcher
 				$callable = array($controller, $this->_function_name);
 			}
 			// Fall back
+			// @todo remove?
 			elseif (function_exists($this->_function_name))
 			{
 				$callable = $this->_function_name;
@@ -321,6 +320,10 @@ class Site_Dispatcher
 				$controller = new BoardIndex_Controller();
 				$callable = array($controller, 'action_boardindex');
 			}
+
+			$this->_loadAddons($hook);
+			$event_manager = new Event_Manager($hook, $this->_addons);
+			$controller->setEventManager($event_manager);
 
 			call_integration_hook('integrate_action_' . $hook . '_before', array($this->_function_name));
 

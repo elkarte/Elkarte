@@ -22,10 +22,7 @@ if (!defined('ELK'))
  */
 abstract class Action_Controller
 {
-	protected $_registered_extensions = array();
-	protected $_hooks = array();
-	protected $_inverted_classes = null;
-
+	protected $_events = null;
 	/**
 	 * Default action handler.
 	 *
@@ -48,74 +45,22 @@ abstract class Action_Controller
 		// such as load the template, load the language(s) file(s)
 	}
 
-	protected function runExtension($position, $args)
+	public function setEventManager($event_manager)
 	{
-		if (empty($this->_registered_extensions[$position]))
-			return;
+		$this->_events = $event_manager;
+		$this->_events->setSource($this);
+	}
 
-		foreach ($this->_registered_extensions[$position] as $class_name)
+	public function provideDependencies($deps, &$dependecies)
+	{
+		foreach ($deps as $dep)
 		{
-			if (!class_exists($class_name))
-				return;
-
-			// Any dependecy you want? In any order you want!
-			if (!empty($class_name::$dep))
-			{
-				$dependecies = array();
-				foreach ($class_name::$dep as $dep)
-					if (isset($args[$dep]))
-						$dependecies[$dep] = &$args[$dep];
-					elseif (property_exists($this, $dep))
-						$dependecies[$dep] = &$this->$dep;
-					elseif (property_exists($this, '_' . $dep))
-						$dependecies[$dep] = &$this->{'_' . $dep};
-			}
-			else
-				$dependecies = &$args;
-
-			$instance = new $class_name($dependecies);
-
-			// Do what we know we should do... if we find it.
-			if (method_exists($instance, 'execute'))
-				$instance->execute();
+			if (property_exists($this, $dep))
+				$dependecies[$dep] = &$this->$dep;
+			elseif (property_exists($this, '_' . $dep))
+				$dependecies[$dep] = &$this->{'_' . $dep};
 		}
-	}
 
-	public function register($classes)
-	{
-		if ($this->_inverted_classes === null)
-			$this->_inverClasses($classes);
-
-		foreach ($this->_hooks as $hook)
-			$this->addExtension($hook, $this->getExtensions($hook));
-	}
-
-	protected function getExtensions($position)
-	{
-		if (!empty($this->_inverted_classes[$position]))
-			return $this->_inverted_classes[$position];
-		else
-			return array();
-	}
-
-	protected function _inverClasses($classes)
-	{
-		$this->_inverted_classes = array();
-		foreach ($classes as $class)
-		{
-			$hooks = $class::hooks();
-			foreach ($hooks as $position => $hook)
-			{
-				if (!isset($this->_inverted_classes[$position]))
-					$this->_inverted_classes[$position] = array($hook);
-				else
-					$this->_inverted_classes[$position][] = $hook;
-			}
-		}
-	}
-
-	protected function addExtension($position, $classes)
-	{
-		$this->_registered_extensions[$position] = $classes;
+		return $dependecies;
 	}
 }

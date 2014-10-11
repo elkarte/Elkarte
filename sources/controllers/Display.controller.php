@@ -26,14 +26,6 @@ if (!defined('ELK'))
  */
 class Display_Controller extends Action_Controller
 {
-	public function __construct()
-	{
-		$this->_hooks = array(
-			'pre_load',
-			'topic_query',
-		);
-	}
-
 	/**
 	 * Default action handler for this controller
 	 */
@@ -60,7 +52,7 @@ class Display_Controller extends Action_Controller
 		global $options, $user_info, $board_info, $topic, $board;
 		global $attachments, $messages_request;
 
-		$this->runExtension('pre_load', array('_REQUEST' => &$_REQUEST, 'topic' => $topic, 'board' => $board));
+		$this->_events->trigger('pre_load', array('_REQUEST' => &$_REQUEST, 'topic' => $topic, 'board' => &$board));
 
 		// What are you gonna display if these are empty?!
 		if (empty($topic))
