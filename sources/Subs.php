@@ -2027,7 +2027,7 @@ function footnote_callback($matches)
 function parsesmileys(&$message)
 {
 	global $modSettings, $txt, $user_info;
-	static $smileyPregSearch = null, $smileyPregReplacements = array(), $callback;
+	static $smileyPregSearch = null, $smileyPregReplacements = array();
 
 	$db = database();
 
@@ -2098,34 +2098,13 @@ function parsesmileys(&$message)
 		}
 
 		$smileyPregSearch = '~(?<=[>:\?\.\s' . $non_breaking_space . '[\]()*\\\;]|^)(' . implode('|', $searchParts) . ')(?=[^[:alpha:]0-9]|$)~';
-		$callback = new ParseSmileysReplacement;
-		$callback->replacements = $smileyPregReplacements;
 	}
 
 	// Replace away!
-	// @todo When support changes to PHP 5.3+, this can be changed this to "use" keyword and simpifly this.
-	$message = preg_replace_callback($smileyPregSearch, array($callback, 'callback'), $message);
-}
-
-/**
- * Smiley Replacment Callback.
- *
- * This is needed until ELK supports PHP 5.3+ and we can change to "use"
- */
-class ParseSmileysReplacement
-{
-	/**
-	 * Our callback that does the actual smiley replacments.
-	 *
-	 * @param string[] $matches
-	 */
-	public function callback($matches)
+	$message = preg_replace_callback($smileyPregSearch, function ($matches) use ($smileyPregReplacements)
 	{
-		if (isset($this->replacements[$matches[0]]))
-			return $this->replacements[$matches[0]];
-		else
-			return '';
-	}
+		return $smileyPregReplacements[$matches[0]];
+	}, $message);
 }
 
 /**
@@ -3554,7 +3533,7 @@ function elk_seed_generator()
  */
 function call_integration_hook($hook, $parameters = array())
 {
-	global $modSettings, $settings, $db_show_debug, $context;
+	global $modSettings, $settings, $db_show_debug;
 
 	static $path_replacements = array(
 		'BOARDDIR' => BOARDDIR,
@@ -3613,7 +3592,7 @@ function call_integration_hook($hook, $parameters = array())
  */
 function call_integration_include_hook($hook)
 {
-	global $modSettings, $settings, $db_show_debug, $context;
+	global $modSettings, $settings, $db_show_debug;
 
 	static $path_replacements = array(
 		'BOARDDIR' => BOARDDIR,
@@ -4183,53 +4162,85 @@ function replaceBasicActionUrl($string)
 }
 
 /**
- * Takes care of automatically include the files of the classes
+ * Elkarte autoloader
+ *
+ * What it does:
+ * - Automatically includes the required files for a given class
+ * - Follows controller naming conventions to find the right file to load
  *
  * @param string $class The name of the class
  */
 function elk_autoloader($class)
 {
-	if (substr($class, -11) === '_Controller')
-	{
-		$file_name = str_replace('_', '', str_replace('_Controller', '.controller', $class)) . '.php';
+	// Break the class name in to its parts
+	$name = explode('_', $class);
+	$surname = array_pop($name);
+	$givenname = implode('', $name);
 
-		$file_name = str_replace('_', '', $file_name);
-		if (file_exists(CONTROLLERDIR . '/' . $file_name))
-			$file_name = CONTROLLERDIR . '/' . $file_name;
-		elseif (file_exists(ADMINDIR . '/' . $file_name))
-			$file_name = ADMINDIR . '/' . $file_name;
-	}
-	elseif (strpos($class, 'Verification_Controls_') !== false)
+	switch ($givenname)
 	{
-		$file_name = SUBSDIR . '/VerificationControls.class.php';
-	}
-	elseif (strpos($class, 'Database_') !== false || strpos($class, 'DbSearch_') !== false || strpos($class, 'DbTable_') !== false)
-	{
-		$file_name = '';
-	}
-	elseif (substr($class, -7) === '_Search')
-	{
-		$file_name = SUBSDIR . '/SearchAPI-' . substr($class, 0, -7) . '.class.php';
-	}
-	elseif (substr($class, -6) === '_Cache')
-	{
-		$file_name = SUBSDIR . '/cache/' . str_replace('_', '', $class) . '.class.php';
-	}
-	elseif (substr($class, -8) === '_Display' || substr($class, -8) === '_Payment')
-	{
-		$file_name = SUBSDIR . '/Subscriptions-' . substr($class, 0, -8) . '.class.php';
-	}
-	else
-	{
-		$file_name = str_replace('_', '', $class);
-		if (file_exists(SUBSDIR . '/' . $file_name . '.class.php'))
-			$file_name = SUBSDIR . '/' . $file_name . '.class.php';
-		elseif (file_exists(SOURCEDIR . '/' . $file_name . '.class.php'))
-			$file_name = SOURCEDIR . '/' . $file_name . '.class.php';
-		elseif (file_exists(SOURCEDIR . '/' . $file_name . '.php'))
-			$file_name = SOURCEDIR . '/' . $file_name . '.php';
-		else
+		case 'VerificationControls':
+			$file_name = SUBSDIR . '/VerificationControls.class.php';
+			break;
+		// We don't handle these
+		case 'Database':
+		case 'DbSearch':
+		case 'DbTable':
 			$file_name = '';
+			break;
+		// Simple names like Util.class, Action.class, Request.class ...
+		case '':
+			$file_name = $surname;
+
+			if (file_exists(SUBSDIR . '/' . $file_name . '.class.php'))
+				$file_name = SUBSDIR . '/' . $file_name . '.class.php';
+			elseif (file_exists(SOURCEDIR . '/' . $file_name . '.class.php'))
+				$file_name = SOURCEDIR . '/' . $file_name . '.class.php';
+			elseif (file_exists(SOURCEDIR . '/' . $file_name . '.php'))
+				$file_name = SOURCEDIR . '/' . $file_name . '.php';
+			else
+				$file_name = '';
+			break;
+		// Some_Other
+		default:
+			switch ($surname)
+			{
+				// Some_Controller => Some.controller.php
+				case 'Controller':
+					$file_name = $givenname . '.controller.php';
+
+					// Try controller dir first, then admin
+					if (file_exists(CONTROLLERDIR . '/' . $file_name))
+						$file_name = CONTROLLERDIR . '/' . $file_name;
+					elseif (file_exists(ADMINDIR . '/' . $file_name))
+						$file_name = ADMINDIR . '/' . $file_name;
+					break;
+				// Some_Search => SearchAPI-Some.class
+				case 'Search':
+					$file_name = SUBSDIR . '/SearchAPI-' . $givenname . '.class.php';
+					break;
+				// Some_Cache => SomeCache.class.php
+				case 'Cache':
+					$file_name = SUBSDIR . '/cache/' . $givenname . $surname . '.class.php';
+					break;
+				// Some_Display => Subscriptions-Some.class.php
+				case 'Display':
+				case 'Payment':
+					$file_name = SUBSDIR . '/Subscriptions-' . implode('_', $name) . '.class.php';
+					break;
+				// All the rest, like Browser_Detector, Template_Layers, Site_Dispatcher ...
+				default:
+					$file_name = $givenname . $surname;
+
+					if (file_exists(SUBSDIR . '/' . $file_name . '.class.php'))
+						$file_name = SUBSDIR . '/' . $file_name . '.class.php';
+					elseif (file_exists(SOURCEDIR . '/' . $file_name . '.class.php'))
+						$file_name = SOURCEDIR . '/' . $file_name . '.class.php';
+					elseif (file_exists(SOURCEDIR . '/' . $file_name . '.php'))
+						$file_name = SOURCEDIR . '/' . $file_name . '.php';
+					else
+						$file_name = '';
+			}
 	}
 
 	if (!empty($file_name))
@@ -4238,6 +4249,9 @@ function elk_autoloader($class)
 
 /**
  * This function creates a new GenericList from all the passed options.
+ *
+ * What it does:
+ * - Calls integration hook integrate_list_"unique_list_id" to allow easy modifiying
  *
  * @param mixed[] $listOptions associative array of option => value
  */
@@ -4253,6 +4267,7 @@ function createList($listOptions)
 /**
  * This handy function retrieves a Request instance and passes it on.
  *
+ * What it does:
  * - To get hold of a Request, you can use this function or directly Request::instance().
  * - This is for convenience, it simply delegates to Request::instance().
  */
@@ -4263,7 +4278,9 @@ function request()
 
 /**
  * Meant to replace any usage of $db_last_error.
- * Reads the file db_last_error.txt, if a time() is present returns it,
+ *
+ * What it does:
+ * - Reads the file db_last_error.txt, if a time() is present returns it,
  * otherwise returns 0.
  */
 function db_last_error()
@@ -4305,7 +4322,8 @@ function response_prefix()
 
 /**
  * A very simple function to determine if an email address is "valid" for Elkarte.
- * A valid email for ElkArte is something that resebles an email (filter_var) and
+ *
+ * - A valid email for ElkArte is something that resebles an email (filter_var) and
  * is less than 255 characters (for database limits)
  *
  * @param string $value - The string to evaluate as valid email

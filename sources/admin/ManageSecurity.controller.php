@@ -499,6 +499,7 @@ class ManageSecurity_Controller extends Action_Controller
 				'pm3' => array('int', 'pm_posts_per_hour', 'postinput' => $txt['pm_posts_per_hour_note']),
 		);
 
+		require_once(SUBSDIR . '/VerificationControls.class.php');
 		$known_verifications = loadVerificationControls();
 
 		foreach ($known_verifications as $verification)

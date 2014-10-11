@@ -29,8 +29,6 @@ function writeLog($force = false)
 {
 	global $user_info, $user_settings, $context, $modSettings, $settings, $topic, $board;
 
-	$db = database();
-
 	// If we are showing who is viewing a topic, let's see if we are, and force an update if so - to make it accurate.
 	if (!empty($settings['display_who_viewing']) && ($topic || $board))
 	{
@@ -78,64 +76,27 @@ function writeLog($force = false)
 	// Grab the last all-of-Elk-specific log_online deletion time.
 	$do_delete = cache_get_data('log_online-update', 30) < time() - 30;
 
+	require_once(SUBSDIR . '/Logging.subs.php');
+
 	// If the last click wasn't a long time ago, and there was a last click...
 	if (!empty($_SESSION['log_time']) && $_SESSION['log_time'] >= time() - $modSettings['lastActive'] * 20)
 	{
 		if ($do_delete)
 		{
-			$db->query('delete_log_online_interval', '
-				DELETE FROM {db_prefix}log_online
-				WHERE log_time < {int:log_time}
-					AND session != {string:session}',
-				array(
-					'log_time' => time() - $modSettings['lastActive'] * 60,
-					'session' => $session_id,
-				)
-			);
+			deleteLogOnlineInterval($session_id);
 
 			// Cache when we did it last.
 			cache_put_data('log_online-update', time(), 30);
 		}
 
-		$db->query('', '
-			UPDATE {db_prefix}log_online
-			SET log_time = {int:log_time}, ip = IFNULL(INET_ATON({string:ip}), 0), url = {string:url}
-			WHERE session = {string:session}',
-			array(
-				'log_time' => time(),
-				'ip' => $user_info['ip'],
-				'url' => $serialized,
-				'session' => $session_id,
-			)
-		);
-
-		// Guess it got deleted.
-		if ($db->affected_rows() == 0)
-			$_SESSION['log_time'] = 0;
+		updateLogOnline($session_id, $serialized);
 	}
 	else
 		$_SESSION['log_time'] = 0;
 
 	// Otherwise, we have to delete and insert.
 	if (empty($_SESSION['log_time']))
-	{
-		if ($do_delete || !empty($user_info['id']))
-			$db->query('', '
-				DELETE FROM {db_prefix}log_online
-				WHERE ' . ($do_delete ? 'log_time < {int:log_time}' : '') . ($do_delete && !empty($user_info['id']) ? ' OR ' : '') . (empty($user_info['id']) ? '' : 'id_member = {int:current_member}'),
-				array(
-					'current_member' => $user_info['id'],
-					'log_time' => time() - $modSettings['lastActive'] * 60,
-				)
-			);
-
-		$db->insert($do_delete ? 'ignore' : 'replace',
-			'{db_prefix}log_online',
-			array('session' => 'string', 'id_member' => 'int', 'id_spider' => 'int', 'log_time' => 'int', 'ip' => 'raw', 'url' => 'string'),
-			array($session_id, $user_info['id'], empty($_SESSION['id_robot']) ? 0 : $_SESSION['id_robot'], time(), 'IFNULL(INET_ATON(\'' . $user_info['ip'] . '\'), 0)', $serialized),
-			array('session')
-		);
-	}
+		insertdeleteLogOnline($session_id, $serialized, $do_delete);
 
 	// Mark your session as being logged.
 	$_SESSION['log_time'] = time();
@@ -222,8 +183,6 @@ function logLastDatabaseError()
 function trackStats($stats = array())
 {
 	global $modSettings;
-
-	$db = database();
 	static $cache_stats = array();
 
 	if (empty($modSettings['trackStats']))
@@ -234,8 +193,9 @@ function trackStats($stats = array())
 	elseif (empty($cache_stats))
 		return false;
 
-	$setStringUpdate = '';
+	$setStringUpdate = array();
 	$insert_keys = array();
+
 	$date = strftime('%Y-%m-%d', forum_time(false));
 	$update_parameters = array(
 		'current_date' => $date,
@@ -243,31 +203,20 @@ function trackStats($stats = array())
 
 	foreach ($cache_stats as $field => $change)
 	{
-		$setStringUpdate .= '
-			' . $field . ' = ' . ($change === '+' ? $field . ' + 1' : '{int:' . $field . '}') . ',';
+		$setStringUpdate[] = $field . ' = ' . ($change === '+' ? $field . ' + 1' : '{int:' . $field . '}');
 
 		if ($change === '+')
 			$cache_stats[$field] = 1;
 		else
 			$update_parameters[$field] = $change;
+
 		$insert_keys[$field] = 'int';
 	}
 
-	$db->query('', '
-		UPDATE {db_prefix}log_activity
-		SET' . substr($setStringUpdate, 0, -1) . '
-		WHERE date = {date:current_date}',
-		$update_parameters
-	);
-	if ($db->affected_rows() == 0)
-	{
-		$db->insert('ignore',
-			'{db_prefix}log_activity',
-			array_merge($insert_keys, array('date' => 'date')),
-			array_merge($cache_stats, array($date)),
-			array('date')
-		);
-	}
+	$setStringUpdate = implode(',', $setStringUpdate);
+
+	require_once(SUBSDIR . '/Logging.subs.php');
+	updateLogActivity($update_parameters, $setStringUpdate, $insert_keys, $cache_stats, $date);
 
 	// Don't do this again.
 	$cache_stats = array();
@@ -308,8 +257,6 @@ function logActions($logs)
 {
 	global $modSettings, $user_info;
 
-	$db = database();
-
 	$inserts = array();
 	$log_types = array(
 		'moderate' => 1,
@@ -337,6 +284,7 @@ function logActions($logs)
 		{
 			if (!is_numeric($log['extra']['topic']))
 				trigger_error('logActions(): data\'s topic is not a number', E_USER_NOTICE);
+
 			$topic_id = empty($log['extra']['topic']) ? 0 : (int) $log['extra']['topic'];
 			unset($log['extra']['topic']);
 		}
@@ -357,24 +305,12 @@ function logActions($logs)
 		// Is there an associated report on this?
 		if (in_array($log['action'], array('move', 'remove', 'split', 'merge')))
 		{
-			$request = $db->query('', '
-				SELECT id_report
-				FROM {db_prefix}log_reported
-				WHERE {raw:column_name} = {int:reported}
-				LIMIT 1',
-				array(
-					'column_name' => !empty($msg_id) ? 'id_msg' : 'id_topic',
-					'reported' => !empty($msg_id) ? $msg_id : $topic_id,
-			));
-
-			// Alright, if we get any result back, update open reports.
-			if ($db->num_rows($request) > 0)
+			if (loadLogReported($msg_id, $topic_id))
 			{
 				require_once(SUBSDIR . '/Moderation.subs.php');
 				updateSettings(array('last_mod_report_action' => time()));
 				recountOpenReports();
 			}
-			$db->free_result($request);
 		}
 
 		if (isset($log['extra']['member']) && !is_numeric($log['extra']['member']))
@@ -384,6 +320,7 @@ function logActions($logs)
 		{
 			if (!is_numeric($log['extra']['board']))
 				trigger_error('logActions(): data\'s board is not a number', E_USER_NOTICE);
+
 			$board_id = empty($log['extra']['board']) ? 0 : (int) $log['extra']['board'];
 			unset($log['extra']['board']);
 		}
@@ -413,42 +350,5 @@ function logActions($logs)
 		);
 	}
 
-	$db->insert('',
-		'{db_prefix}log_actions',
-		array(
-			'log_time' => 'int', 'id_log' => 'int', 'id_member' => 'int', 'ip' => 'string-16', 'action' => 'string',
-			'id_board' => 'int', 'id_topic' => 'int', 'id_msg' => 'int', 'extra' => 'string-65534',
-		),
-		$inserts,
-		array('id_action')
-	);
-
-	return $db->insert_id('{db_prefix}log_actions', 'id_action');
-}
-
-/**
- * Actualize login history, for the passed member and IPs.
- *
- * - It will log it as entry for the current time.
- *
- * @param int $id_member
- * @param string $ip
- * @param string $ip2
- */
-function logLoginHistory($id_member, $ip, $ip2)
-{
-	$db = database();
-
-	$db->insert('insert',
-		'{db_prefix}member_logins',
-		array(
-			'id_member' => 'int', 'time' => 'int', 'ip' => 'string', 'ip2' => 'string',
-		),
-		array(
-			$id_member, time(), $ip, $ip2
-		),
-		array(
-			'id_member', 'time'
-		)
-	);
+	return insertLogActions($inserts);
 }

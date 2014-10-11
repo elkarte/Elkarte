@@ -952,7 +952,7 @@ function updateBanMembers()
 	// We welcome our new members in the realm of the banned.
 	if (!empty($newMembers))
 	{
-		require_once(SUBSDIR . '/Auth.subs.php');
+		require_once(SUBSDIR . '/Logging.subs.php');
 		logOnline($newMembers, false);
 	}
 

@@ -646,8 +646,8 @@ class ManageSearch_Controller extends Action_Controller
 
 					if (strpos($header, '* SearchAPI-' . $matches[1] . '.class.php') !== false)
 					{
-						$index_name = strtolower($matches[1]);
-						$search_class_name = $index_name . '_search';
+						$index_name = ucwords($matches[1]);
+						$search_class_name = $index_name . '_Search';
 						$searchAPI = new $search_class_name();
 
 						// No Support?  NEXT!

@@ -26,7 +26,7 @@ if (!defined('ELK'))
  * @param boolean $fatal if the function ends in a fatal error in case of problems (default true)
  * @param boolean $reload_id if true the already set value is ignored (default false)
  *
- * @return mixed and integer if no error, false in case of problems if $fatal is false
+ * @return integer if no error.  May return false in case of problems only if $fatal is set to false
  */
 function currentMemberID($fatal = true, $reload_id = false)
 {
@@ -1603,7 +1603,7 @@ function profileSendActivation()
 	sendmail($profile_vars['email_address'], $emaildata['subject'], $emaildata['body'], null, null, false, 0);
 
 	// Log the user out.
-	require_once(SUBSDIR . '/Auth.subs.php');
+	require_once(SUBSDIR . '/Logging.subs.php');
 	logOnline($context['id_member'], false);
 	$_SESSION['log_time'] = 0;
 	$_SESSION['login_' . $cookiename] = serialize(array(0, '', 0));

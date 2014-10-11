@@ -68,7 +68,7 @@ function template_lp_stats()
 	echo '
 	</div>';
 
-	echo '<script type="text/javascript"><!-- // --><![CDATA[
+	echo '<script><!-- // --><![CDATA[
 		window.onload = function() {
 			likePostStats.prototype.init({
 				txtStrings: {

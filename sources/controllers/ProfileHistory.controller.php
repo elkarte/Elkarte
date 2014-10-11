@@ -27,10 +27,9 @@ class ProfileHistory_Controller extends Action_Controller
 {
 	/**
 	 * Member id for the history being viewed
-	 * @todo should be changed to _memID
 	 * @var int
 	 */
-	private $memID = 0;
+	private $_memID = 0;
 
 	/**
 	 * Profile history entry point.
@@ -42,7 +41,7 @@ class ProfileHistory_Controller extends Action_Controller
 	{
 		global $context, $txt, $modSettings, $user_profile;
 
-		$this->memID = currentMemberID();
+		$this->_memID = currentMemberID();
 
 		$subActions = array(
 			'activity' => array('controller' => $this, 'function' => 'action_trackactivity', 'label' => $txt['trackActivity']),
@@ -64,7 +63,9 @@ class ProfileHistory_Controller extends Action_Controller
 		);
 
 		// Set up action/subaction stuff.
-		$action = new Action();
+		$action = new Action('profile_history');
+
+		// Yep, sub-action time and call integrate_sa_profile_history as well
 		$subAction = $action->initialize($subActions, 'activity');
 		$context['sub_action'] = $subAction;
 
@@ -74,7 +75,7 @@ class ProfileHistory_Controller extends Action_Controller
 
 		// Set a page title.
 		$context['history_area'] = $subAction;
-		$context['page_title'] = $txt['trackUser'] . ' - ' . $subActions[$subAction]['label'] . ' - ' . $user_profile[$this->memID]['real_name'];
+		$context['page_title'] = $txt['trackUser'] . ' - ' . $subActions[$subAction]['label'] . ' - ' . $user_profile[$this->_memID]['real_name'];
 
 		// Pass on to the actual method.
 		$action->dispatch($subAction);
@@ -87,7 +88,7 @@ class ProfileHistory_Controller extends Action_Controller
 	{
 		global $scripturl, $txt, $modSettings, $user_profile, $context;
 
-		$memID = $this->memID;
+		$memID = $this->_memID;
 
 		// Verify if the user has sufficient permissions.
 		isAllowedTo('moderate_forum');
@@ -214,8 +215,7 @@ class ProfileHistory_Controller extends Action_Controller
 	{
 		global $user_profile, $scripturl, $txt, $user_info, $modSettings, $context;
 
-		$db = database();
-		$memID = $this->memID;
+		$memID = $this->_memID;
 
 		// Can the user do this?
 		isAllowedTo('moderate_forum');
@@ -249,20 +249,9 @@ class ProfileHistory_Controller extends Action_Controller
 		if (empty($context['history_area']))
 			$context['page_title'] = $txt['trackIP'] . ' - ' . $context['ip'];
 
-		$request = $db->query('', '
-			SELECT id_member, real_name AS display_name, member_ip
-			FROM {db_prefix}members
-			WHERE member_ip ' . $ip_string,
-			array(
-				'ip_address' => $ip_var,
-			)
-		);
-		$context['ips'] = array();
-		while ($row = $db->fetch_assoc($request))
-			$context['ips'][$row['member_ip']][] = '<a href="' . $scripturl . '?action=profile;u=' . $row['id_member'] . '">' . $row['display_name'] . '</a>';
-		$db->free_result($request);
-
-		ksort($context['ips']);
+		// Fetch the members that are associated with the ip's
+		require_once(SUBSDIR . '/Members.subs.php');
+		$context['ips'] = loadMembersIPs($ip_string, $ip_var);
 
 		// Start with the user messages.
 		$listOptions = array(
@@ -450,55 +439,41 @@ class ProfileHistory_Controller extends Action_Controller
 				'afrinic' => array(
 					'name' => $txt['whois_afrinic'],
 					'url' => 'http://www.afrinic.net/cgi-bin/whois?searchtext=' . $context['ip'],
-					'range' => array(41, 154, 196),
 				),
 				'apnic' => array(
 					'name' => $txt['whois_apnic'],
 					'url' => 'http://wq.apnic.net/apnic-bin/whois.pl?searchtext=' . $context['ip'],
-					'range' => array(58, 59, 60, 61, 112, 113, 114, 115, 116, 117, 118, 119, 120, 121, 122, 123, 124,
-						125, 126, 133, 150, 153, 163, 171, 202, 203, 210, 211, 218, 219, 220, 221, 222),
 				),
 				'arin' => array(
 					'name' => $txt['whois_arin'],
 					'url' => 'http://whois.arin.net/rest/ip/' . $context['ip'],
-					'range' => array(7, 24, 63, 64, 65, 66, 67, 68, 69, 70, 71, 72, 73, 74, 75, 76, 96, 97, 98, 99,
-						128, 129, 130, 131, 132, 134, 135, 136, 137, 138, 139, 140, 142, 143, 144, 146, 147, 148, 149,
-						152, 155, 156, 157, 158, 159, 160, 161, 162, 164, 165, 166, 167, 168, 169, 170, 172, 173, 174,
-						192, 198, 199, 204, 205, 206, 207, 208, 209, 216),
 				),
 				'lacnic' => array(
 					'name' => $txt['whois_lacnic'],
 					'url' => 'http://lacnic.net/cgi-bin/lacnic/whois?query=' . $context['ip'],
-					'range' => array(186, 187, 189, 190, 191, 200, 201),
 				),
 				'ripe' => array(
 					'name' => $txt['whois_ripe'],
 					'url' => 'https://apps.db.ripe.net/search/query.html?searchtext=' . $context['ip'],
-					'range' => array(62, 77, 78, 79, 80, 81, 82, 83, 84, 85, 86, 87, 88, 89, 90, 91, 92, 93, 94, 95,
-						141, 145, 151, 188, 193, 194, 195, 212, 213, 217),
 				),
 			);
 
-			foreach ($context['whois_servers'] as $whois)
-			{
-				// Strip off the "decimal point" and anything following...
-				if (in_array((int) $context['ip'], $whois['range']))
-					$context['auto_whois_server'] = $whois;
-			}
+			// Let integration add whois servers easily
+			call_integration_hook('integrate_trackip');
 		}
 		$context['sub_template'] = 'trackIP';
 	}
 
 	/**
 	 * Tracks the logins of a given user.
-	 * Accessed by ?action=trackip
-	 * and ?action=profile;area=history;sa=ip
+	 *
+	 * - Accessed by ?action=trackip and ?action=profile;area=history;sa=ip
 	 */
 	public function action_tracklogin()
 	{
 		global $scripturl, $txt, $context;
 
-		$memID = $this->memID;
+		$memID = $this->_memID;
 
 		if ($memID == 0)
 			$context['base_url'] = $scripturl . '?action=trackip';
@@ -573,23 +548,11 @@ class ProfileHistory_Controller extends Action_Controller
 	{
 		global $scripturl, $txt, $modSettings, $context;
 
-		$db = database();
-		$memID = $this->memID;
+		$memID = $this->_memID;
 
 		// Get the names of any custom fields.
-		$request = $db->query('', '
-			SELECT col_name, field_name, bbc
-			FROM {db_prefix}custom_fields',
-			array(
-			)
-		);
-		$context['custom_field_titles'] = array();
-		while ($row = $db->fetch_assoc($request))
-			$context['custom_field_titles']['customfield_' . $row['col_name']] = array(
-				'title' => $row['field_name'],
-				'parse_bbc' => $row['bbc'],
-			);
-		$db->free_result($request);
+		require_once(SUBSDIR . '/ManageFeatures.subs.php');
+		$context['custom_field_titles'] = loadAllCustomFields();
 
 		// Set the options for the error lists.
 		$listOptions = array(
@@ -667,8 +630,10 @@ class ProfileHistory_Controller extends Action_Controller
 	}
 
 	/**
-	 * Get the number of user errors.
-	 * Callback for createList in action_trackip() and action_trackactivity()
+	 * Get the number of user errors
+	 *
+	 * Passthough for createList to getUserErrorCount
+	 * used in action_trackip() and action_trackactivity()
 	 *
 	 * @param string $where
 	 * @param mixed[] $where_vars = array() or values used in the where statement
@@ -676,22 +641,16 @@ class ProfileHistory_Controller extends Action_Controller
 	 */
 	public function list_getUserErrorCount($where, $where_vars = array())
 	{
-		$db = database();
-
-		$request = $db->query('', '
-			SELECT COUNT(*) AS error_count
-			FROM {db_prefix}log_errors
-			WHERE ' . $where,
-			$where_vars
-		);
-		list ($count) = $db->fetch_row($request);
-		$db->free_result($request);
+		require_once(SUBSDIR . '/ProfileHistory.subs.php');
+		$count = getUserErrorCount($where, $where_vars);
 
 		return $count;
 	}
 
 	/**
-	 * Callback for createList in action_trackip() and action_trackactivity()
+	 * Get a list of error messages from this ip (range).
+	 *
+	 * Passthough to getUserErrors for createList in action_trackip() and action_trackactivity()
 	 *
 	 * @param int $start
 	 * @param int $items_per_page
@@ -702,42 +661,16 @@ class ProfileHistory_Controller extends Action_Controller
 	 */
 	public function list_getUserErrors($start, $items_per_page, $sort, $where, $where_vars = array())
 	{
-		global $txt, $scripturl;
-
-		$db = database();
-
-		// Get a list of error messages from this ip (range).
-		$request = $db->query('', '
-			SELECT
-				le.log_time, le.ip, le.url, le.message, IFNULL(mem.id_member, 0) AS id_member,
-				IFNULL(mem.real_name, {string:guest_title}) AS display_name, mem.member_name
-			FROM {db_prefix}log_errors AS le
-				LEFT JOIN {db_prefix}members AS mem ON (mem.id_member = le.id_member)
-			WHERE ' . $where . '
-			ORDER BY ' . $sort . '
-			LIMIT ' . $start . ', ' . $items_per_page,
-			array_merge($where_vars, array(
-				'guest_title' => $txt['guest_title'],
-			))
-		);
-		$error_messages = array();
-		while ($row = $db->fetch_assoc($request))
-			$error_messages[] = array(
-				'ip' => $row['ip'],
-				'member_link' => $row['id_member'] > 0 ? '<a href="' . $scripturl . '?action=profile;u=' . $row['id_member'] . '">' . $row['display_name'] . '</a>' : $row['display_name'],
-				'message' => strtr($row['message'], array('&lt;span class=&quot;remove&quot;&gt;' => '', '&lt;/span&gt;' => '')),
-				'url' => $row['url'],
-				'time' => standardTime($row['log_time']),
-				'html_time' => htmlTime($row['log_time']),
-				'timestamp' => forum_time(true, $row['log_time']),
-			);
-		$db->free_result($request);
+		require_once(SUBSDIR . '/ProfileHistory.subs.php');
+		$error_messages = getUserErrors($start, $items_per_page, $sort, $where, $where_vars);
 
 		return $error_messages;
 	}
 
 	/**
-	 * Callback for createList() in TrackIP()
+	 * count of messages from a matching IP
+	 *
+	 * Passthough to getIPMessageCount for createList() in TrackIP()
 	 *
 	 * @param string $where
 	 * @param mixed[] $where_vars array of values used in the where statement
@@ -745,23 +678,16 @@ class ProfileHistory_Controller extends Action_Controller
 	 */
 	public function list_getIPMessageCount($where, $where_vars = array())
 	{
-		$db = database();
-
-		$request = $db->query('', '
-			SELECT COUNT(*) AS message_count
-			FROM {db_prefix}messages AS m
-				INNER JOIN {db_prefix}boards AS b ON (b.id_board = m.id_board)
-			WHERE {query_see_board} AND ' . $where,
-			$where_vars
-		);
-		list ($count) = $db->fetch_row($request);
-		$db->free_result($request);
+		require_once(SUBSDIR . '/ProfileHistory.subs.php');
+		$count = getIPMessageCount($where, $where_vars);
 
 		return $count;
 	}
 
 	/**
-	 * Callback for createList() in TrackIP()
+	 * Fetch a listing of messages made from a given IP
+	 *
+	 * Passthrough to getIPMessages used by createList() in TrackIP()
 	 *
 	 * @param int $start
 	 * @param int $items_per_page
@@ -772,48 +698,16 @@ class ProfileHistory_Controller extends Action_Controller
 	 */
 	public function list_getIPMessages($start, $items_per_page, $sort, $where, $where_vars = array())
 	{
-		global $scripturl;
-
-		$db = database();
-
-		// Get all the messages fitting this where clause.
-		// @todo SLOW This query is using a filesort.
-		$request = $db->query('', '
-			SELECT
-				m.id_msg, m.poster_ip, IFNULL(mem.real_name, m.poster_name) AS display_name, mem.id_member,
-				m.subject, m.poster_time, m.id_topic, m.id_board
-			FROM {db_prefix}messages AS m
-				INNER JOIN {db_prefix}boards AS b ON (b.id_board = m.id_board)
-				LEFT JOIN {db_prefix}members AS mem ON (mem.id_member = m.id_member)
-			WHERE {query_see_board} AND ' . $where . '
-			ORDER BY ' . $sort . '
-			LIMIT ' . $start . ', ' . $items_per_page,
-			array_merge($where_vars, array(
-			))
-		);
-		$messages = array();
-		while ($row = $db->fetch_assoc($request))
-			$messages[] = array(
-				'ip' => $row['poster_ip'],
-				'member_link' => empty($row['id_member']) ? $row['display_name'] : '<a href="' . $scripturl . '?action=profile;u=' . $row['id_member'] . '">' . $row['display_name'] . '</a>',
-				'board' => array(
-					'id' => $row['id_board'],
-					'href' => $scripturl . '?board=' . $row['id_board']
-				),
-				'topic' => $row['id_topic'],
-				'id' => $row['id_msg'],
-				'subject' => $row['subject'],
-				'time' => standardTime($row['poster_time']),
-				'html_time' => htmlTime($row['poster_time']),
-				'timestamp' => forum_time(true, $row['poster_time'])
-			);
-		$db->free_result($request);
+		require_once(SUBSDIR . '/ProfileHistory.subs.php');
+		$messages = getIPMessages($start, $items_per_page, $sort, $where, $where_vars);
 
 		return $messages;
 	}
 
 	/**
-	 * Callback for trackLogins for counting history.
+	 * Get list of all times this account was logged into
+	 *
+	 * Passthrough to getLoginCount for trackLogins for counting history.
 	 * (createList() in TrackLogins())
 	 *
 	 * @param string $where
@@ -822,24 +716,16 @@ class ProfileHistory_Controller extends Action_Controller
 	 */
 	public function list_getLoginCount($where, $where_vars = array())
 	{
-		$db = database();
-
-		$request = $db->query('', '
-			SELECT COUNT(*) AS message_count
-			FROM {db_prefix}member_logins
-			WHERE ' . $where,
-			array(
-				'id_member' => $where_vars['current_member'],
-			)
-		);
-		list ($count) = $db->fetch_row($request);
-		$db->free_result($request);
+		require_once(SUBSDIR . '/ProfileHistory.subs.php');
+		$count = getLoginCount($where, $where_vars);
 
 		return $count;
 	}
 
 	/**
-	 * Callback for trackLogins data.
+	 * List of login history for a user
+	 *
+	 * Passthrough to getLogins for trackLogins data.
 	 *
 	 * @param int $start
 	 * @param int $items_per_page
@@ -850,59 +736,32 @@ class ProfileHistory_Controller extends Action_Controller
 	 */
 	public function list_getLogins($start, $items_per_page, $sort, $where, $where_vars = array())
 	{
-		$db = database();
-
-		$request = $db->query('', '
-			SELECT time, ip, ip2
-			FROM {db_prefix}member_logins
-			WHERE ' . $where .'
-			ORDER BY time DESC',
-			array(
-				'current_member' => $where_vars['current_member'],
-			)
-		);
-		$logins = array();
-		while ($row = $db->fetch_assoc($request))
-			$logins[] = array(
-				'time' => standardTime($row['time']),
-				'html_time' => htmlTime($row['time']),
-				'timestamp' => forum_time(true, $row['time']),
-				'ip' => $row['ip'],
-				'ip2' => $row['ip2'],
-			);
-		$db->free_result($request);
+		require_once(SUBSDIR . '/ProfileHistory.subs.php');
+		$logins = getLogins($start, $items_per_page, $sort, $where, $where_vars);
 
 		return $logins;
 	}
 
 	/**
-	 * How many edits?
+	 * How many profile edits
+	 *
+	 * Passthrough to getProfileEditCount.
 	 *
 	 * @param int $memID id_member
 	 * @return string number of profile edits
 	 */
 	public function list_getProfileEditCount($memID)
 	{
-		$db = database();
-
-		$request = $db->query('', '
-			SELECT COUNT(*) AS edit_count
-			FROM {db_prefix}log_actions
-			WHERE id_log = {int:log_type}
-				AND id_member = {int:owner}',
-			array(
-				'log_type' => 2,
-				'owner' => $memID,
-			)
-		);
-		list ($edit_count) = $db->fetch_row($request);
-		$db->free_result($request);
+		require_once(SUBSDIR . '/ProfileHistory.subs.php');
+		$edit_count = getProfileEditCount($memID);
 
 		return $edit_count;
 	}
 
 	/**
-	 * Callback function for createList in trackEdits().
+	 * List of profile edits for display
+	 *
+	 * Passthrough to  getProfileEditsfunction for createList in trackEdits().
 	 *
 	 * @param int $start
 	 * @param int $items_per_page
@@ -912,75 +771,8 @@ class ProfileHistory_Controller extends Action_Controller
 	 */
 	public function list_getProfileEdits($start, $items_per_page, $sort, $memID)
 	{
-		global $txt, $scripturl, $context;
-
-		$db = database();
-
-		// Get a list of error messages from this ip (range).
-		$request = $db->query('', '
-			SELECT
-				id_action, id_member, ip, log_time, action, extra
-			FROM {db_prefix}log_actions
-			WHERE id_log = {int:log_type}
-				AND id_member = {int:owner}
-			ORDER BY ' . $sort . '
-			LIMIT ' . $start . ', ' . $items_per_page,
-			array(
-				'log_type' => 2,
-				'owner' => $memID,
-			)
-		);
-		$edits = array();
-		$members = array();
-		while ($row = $db->fetch_assoc($request))
-		{
-			$extra = @unserialize($row['extra']);
-			if (!empty($extra['applicator']))
-				$members[] = $extra['applicator'];
-
-			// Work out what the name of the action is.
-			if (isset($txt['trackEdit_action_' . $row['action']]))
-				$action_text = $txt['trackEdit_action_' . $row['action']];
-			elseif (isset($txt[$row['action']]))
-				$action_text = $txt[$row['action']];
-			// Custom field?
-			elseif (isset($context['custom_field_titles'][$row['action']]))
-				$action_text = $context['custom_field_titles'][$row['action']]['title'];
-			else
-				$action_text = $row['action'];
-
-			// Parse BBC?
-			$parse_bbc = isset($context['custom_field_titles'][$row['action']]) && $context['custom_field_titles'][$row['action']]['parse_bbc'] ? true : false;
-
-			$edits[] = array(
-				'id' => $row['id_action'],
-				'ip' => $row['ip'],
-				'id_member' => !empty($extra['applicator']) ? $extra['applicator'] : 0,
-				'member_link' => $txt['trackEdit_deleted_member'],
-				'action' => $row['action'],
-				'action_text' => $action_text,
-				'before' => !empty($extra['previous']) ? ($parse_bbc ? parse_bbc($extra['previous']) : $extra['previous']) : '',
-				'after' => !empty($extra['new']) ? ($parse_bbc ? parse_bbc($extra['new']) : $extra['new']) : '',
-				'time' => standardTime($row['log_time']),
-				'html_time' => htmlTime($row['log_time']),
-				'timestamp' => forum_time(true, $row['log_time']),
-			);
-		}
-		$db->free_result($request);
-
-		// Get any member names.
-		if (!empty($members))
-		{
-			require_once(SUBSDIR . '/Members.subs.php');
-			$result = getBasicMemberData($members);
-			$members = array();
-			foreach ($result as $row)
-				$members[$row['id_member']] = $row['real_name'];
-
-			foreach ($edits as $key => $value)
-				if (isset($members[$value['id_member']]))
-					$edits[$key]['member_link'] = '<a href="' . $scripturl . '?action=profile;u=' . $value['id_member'] . '">' . $members[$value['id_member']] . '</a>';
-		}
+		require_once(SUBSDIR . '/ProfileHistory.subs.php');
+		$edits = getProfileEdits($start, $items_per_page, $sort, $memID);
 
 		return $edits;
 	}

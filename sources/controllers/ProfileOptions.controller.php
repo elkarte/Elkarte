@@ -30,6 +30,22 @@ if (!defined('ELK'))
 class ProfileOptions_Controller extends Action_Controller
 {
 	/**
+	 * Member id for the profile being viewed
+	 * @var int
+	 */
+	private $_memID = 0;
+
+	/**
+	 * Called before all other methods when comming from the dispatcher or
+	 * action class.  If you initiate the class outside of those methods, call this method.
+	 * or setup the class.
+	 */
+	public function pre_dispatch()
+	{
+		$this->_memID = currentMemberID();
+	}
+
+	/**
 	 * Default method, if another action is not called
 	 * by the menu.
 	 *
@@ -48,8 +64,6 @@ class ProfileOptions_Controller extends Action_Controller
 	public function action_editBuddyIgnoreLists()
 	{
 		global $context, $txt, $modSettings;
-
-		$memID = currentMemberID();
 
 		// Do a quick check to ensure people aren't getting here illegally!
 		if (!$context['user']['is_owner'] || empty($modSettings['enable_buddylist']))
@@ -81,19 +95,15 @@ class ProfileOptions_Controller extends Action_Controller
 		);
 
 		// Pass on to the actual function.
-		$this->{$subActions[$subAction][0]}($memID);
+		$this->{$subActions[$subAction][0]}();
 	}
 
 	/**
 	 * Show all the users buddies, as well as a add/delete interface.
-	 *
-	 * @param int $memID id_member
 	 */
-	public function action_editBuddies($memID)
+	public function action_editBuddies()
 	{
-		global $context, $user_profile, $memberContext, $modSettings;
-
-		$db = database();
+		global $context, $user_profile, $memberContext;
 
 		loadTemplate('ProfileOptions');
 
@@ -102,30 +112,34 @@ class ProfileOptions_Controller extends Action_Controller
 		loadJavascriptFile('suggest.js', array('defer' => true));
 
 		// For making changes!
-		$buddiesArray = explode(',', $user_profile[$memID]['buddy_list']);
+		$buddiesArray = explode(',', $user_profile[$this->_memID]['buddy_list']);
 		foreach ($buddiesArray as $k => $dummy)
+		{
 			if ($dummy == '')
 				unset($buddiesArray[$k]);
+		}
 
 		// Removing a buddy?
 		if (isset($_GET['remove']))
 		{
 			checkSession('get');
 
-			call_integration_hook('integrate_remove_buddy', array($memID));
+			call_integration_hook('integrate_remove_buddy', array($this->_memID));
 
 			// Heh, I'm lazy, do it the easy way...
 			foreach ($buddiesArray as $key => $buddy)
+			{
 				if ($buddy == (int) $_GET['remove'])
 					unset($buddiesArray[$key]);
+			}
 
 			// Make the changes.
-			$user_profile[$memID]['buddy_list'] = implode(',', $buddiesArray);
+			$user_profile[$this->_memID]['buddy_list'] = implode(',', $buddiesArray);
 			require_once(SUBSDIR . '/Members.subs.php');
-			updateMemberData($memID, array('buddy_list' => $user_profile[$memID]['buddy_list']));
+			updateMemberData($this->_memID, array('buddy_list' => $user_profile[$this->_memID]['buddy_list']));
 
 			// Redirect off the page because we don't like all this ugly query stuff to stick in the history.
-			redirectexit('action=profile;area=lists;sa=buddies;u=' . $memID);
+			redirectexit('action=profile;area=lists;sa=buddies;u=' . $this->_memID);
 		}
 		// Or adding a new one
 		elseif (isset($_POST['new_buddy']))
@@ -141,58 +155,26 @@ class ProfileOptions_Controller extends Action_Controller
 			{
 				$new_buddies[$k] = strtr(trim($new_buddies[$k]), array('\'' => '&#039;'));
 
-				if (strlen($new_buddies[$k]) == 0 || in_array($new_buddies[$k], array($user_profile[$memID]['member_name'], $user_profile[$memID]['real_name'])))
+				if (strlen($new_buddies[$k]) == 0 || in_array($new_buddies[$k], array($user_profile[$this->_memID]['member_name'], $user_profile[$this->_memID]['real_name'])))
 					unset($new_buddies[$k]);
 			}
 
-			call_integration_hook('integrate_add_buddies', array($memID, &$new_buddies));
+			call_integration_hook('integrate_add_buddies', array($this->_memID, &$new_buddies));
 
 			if (!empty($new_buddies))
 			{
 				// Now find out the id_member of the buddy.
-				$request = $db->query('', '
-					SELECT id_member
-					FROM {db_prefix}members
-					WHERE member_name IN ({array_string:new_buddies}) OR real_name IN ({array_string:new_buddies})
-					LIMIT {int:count_new_buddies}',
-					array(
-						'new_buddies' => $new_buddies,
-						'count_new_buddies' => count($new_buddies),
-					)
-				);
-
-				// Let them know who's their buddy.
-				if (!empty($modSettings['mentions_enabled']) && !empty($modSettings['mentions_buddy']))
-				{
-					$mentions = new Mentions_Controller();
-				}
-
-				// Add the new member to the buddies array.
-				while ($row = $db->fetch_assoc($request))
-				{
-					$buddiesArray[] = (int) $row['id_member'];
-
-					if (!empty($modSettings['mentions_enabled']) && !empty($modSettings['mentions_buddy']))
-					{
-						// Set a mentions for our buddy.
-						$mentions->setData(array(
-							'id_member' => $row['id_member'],
-							'type' => 'buddy',
-							'id_msg' => 0,
-						));
-						$mentions->action_add();
-					}
-				}
-				$db->free_result($request);
+				require_once(SUBSDIR . '/ProfileOptions.subs.php');
+				$buddiesArray = getBuddiesID($new_buddies);
 
 				// Now update the current users buddy list.
-				$user_profile[$memID]['buddy_list'] = implode(',', $buddiesArray);
+				$user_profile[$this->_memID]['buddy_list'] = implode(',', $buddiesArray);
 				require_once(SUBSDIR . '/Members.subs.php');
-				updateMemberData($memID, array('buddy_list' => $user_profile[$memID]['buddy_list']));
+				updateMemberData($this->_memID, array('buddy_list' => $user_profile[$this->_memID]['buddy_list']));
 			}
 
 			// Back to the buddy list!
-			redirectexit('action=profile;area=lists;sa=buddies;u=' . $memID);
+			redirectexit('action=profile;area=lists;sa=buddies;u=' . $this->_memID);
 		}
 
 		// Get all the users "buddies"...
@@ -201,7 +183,7 @@ class ProfileOptions_Controller extends Action_Controller
 		if (!empty($buddiesArray))
 		{
 			require_once(SUBSDIR . '/Members.subs.php');
-			$result = getBasicMemberData($buddiesArray, array('sort' => 'real_name', 'limit' => substr_count($user_profile[$memID]['buddy_list'], ',') + 1));
+			$result = getBasicMemberData($buddiesArray, array('sort' => 'real_name', 'limit' => substr_count($user_profile[$this->_memID]['buddy_list'], ',') + 1));
 			foreach ($result as $row)
 				$buddies[] = $row['id_member'];
 		}
@@ -219,20 +201,16 @@ class ProfileOptions_Controller extends Action_Controller
 			$context['buddies'][$buddy] = $memberContext[$buddy];
 		}
 
-		call_integration_hook('integrate_view_buddies', array($memID));
+		call_integration_hook('integrate_view_buddies', array($this->_memID));
 	}
 
 	/**
 	 * Allows the user to view their ignore list,
 	 * as well as the option to manage members on it.
-	 *
-	 * @param int $memID id_member
 	 */
-	public function action_editIgnoreList($memID)
+	public function action_editIgnoreList()
 	{
 		global $context, $user_profile, $memberContext;
-
-		$db = database();
 
 		loadTemplate('ProfileOptions');
 
@@ -241,7 +219,7 @@ class ProfileOptions_Controller extends Action_Controller
 		loadJavascriptFile('suggest.js', array('defer' => true));
 
 		// For making changes!
-		$ignoreArray = explode(',', $user_profile[$memID]['pm_ignore_list']);
+		$ignoreArray = explode(',', $user_profile[$this->_memID]['pm_ignore_list']);
 		foreach ($ignoreArray as $k => $dummy)
 		{
 			if ($dummy == '')
@@ -255,16 +233,18 @@ class ProfileOptions_Controller extends Action_Controller
 
 			// Heh, I'm lazy, do it the easy way...
 			foreach ($ignoreArray as $key => $id_remove)
+			{
 				if ($id_remove == (int) $_GET['remove'])
 					unset($ignoreArray[$key]);
+			}
 
 			// Make the changes.
-			$user_profile[$memID]['pm_ignore_list'] = implode(',', $ignoreArray);
+			$user_profile[$this->_memID]['pm_ignore_list'] = implode(',', $ignoreArray);
 			require_once(SUBSDIR . '/Members.subs.php');
-			updateMemberData($memID, array('pm_ignore_list' => $user_profile[$memID]['pm_ignore_list']));
+			updateMemberData($this->_memID, array('pm_ignore_list' => $user_profile[$this->_memID]['pm_ignore_list']));
 
 			// Redirect off the page because we don't like all this ugly query stuff to stick in the history.
-			redirectexit('action=profile;area=lists;sa=ignore;u=' . $memID);
+			redirectexit('action=profile;area=lists;sa=ignore;u=' . $this->_memID);
 		}
 		elseif (isset($_POST['new_ignore']))
 		{
@@ -279,37 +259,24 @@ class ProfileOptions_Controller extends Action_Controller
 			{
 				$new_entries[$k] = strtr(trim($new_entries[$k]), array('\'' => '&#039;'));
 
-				if (strlen($new_entries[$k]) == 0 || in_array($new_entries[$k], array($user_profile[$memID]['member_name'], $user_profile[$memID]['real_name'])))
+				if (strlen($new_entries[$k]) == 0 || in_array($new_entries[$k], array($user_profile[$this->_memID]['member_name'], $user_profile[$this->_memID]['real_name'])))
 					unset($new_entries[$k]);
 			}
 
 			if (!empty($new_entries))
 			{
 				// Now find out the id_member for the members in question.
-				$request = $db->query('', '
-					SELECT id_member
-					FROM {db_prefix}members
-					WHERE member_name IN ({array_string:new_entries}) OR real_name IN ({array_string:new_entries})
-					LIMIT {int:count_new_entries}',
-					array(
-						'new_entries' => $new_entries,
-						'count_new_entries' => count($new_entries),
-					)
-				);
-
-				// Add the new member to the buddies array.
-				while ($row = $db->fetch_assoc($request))
-					$ignoreArray[] = (int) $row['id_member'];
-				$db->free_result($request);
+				require_once(SUBSDIR . '/ProfileOptions.subs.php');
+				$ignoreArray = getBuddiesID($new_entries, false);
 
 				// Now update the current users buddy list.
-				$user_profile[$memID]['pm_ignore_list'] = implode(',', $ignoreArray);
+				$user_profile[$this->_memID]['pm_ignore_list'] = implode(',', $ignoreArray);
 				require_once(SUBSDIR . '/Members.subs.php');
-				updateMemberData($memID, array('pm_ignore_list' => $user_profile[$memID]['pm_ignore_list']));
+				updateMemberData($this->_memID, array('pm_ignore_list' => $user_profile[$this->_memID]['pm_ignore_list']));
 			}
 
 			// Back to the list of pityful people!
-			redirectexit('action=profile;area=lists;sa=ignore;u=' . $memID);
+			redirectexit('action=profile;area=lists;sa=ignore;u=' . $this->_memID);
 		}
 
 		// Initialise the list of members we're ignoring.
@@ -318,7 +285,7 @@ class ProfileOptions_Controller extends Action_Controller
 		if (!empty($ignoreArray))
 		{
 			require_once(SUBSDIR . '/Members.subs.php');
-			$result = getBasicMemberData($ignoreArray, array('sort' => 'real_name', 'limit' => substr_count($user_profile[$memID]['pm_ignore_list'], ',') + 1));
+			$result = getBasicMemberData($ignoreArray, array('sort' => 'real_name', 'limit' => substr_count($user_profile[$this->_memID]['pm_ignore_list'], ',') + 1));
 			foreach ($result as $row)
 				$ignored[] = $row['id_member'];
 		}
@@ -339,19 +306,16 @@ class ProfileOptions_Controller extends Action_Controller
 
 	/**
 	 * Allows the user to see or change their account info.
-	 *
 	 */
 	public function action_account()
 	{
 		global $context, $txt;
 
-		$memID = currentMemberID();
-
 		loadTemplate('ProfileOptions');
-		loadThemeOptions($memID);
+		$this->loadThemeOptions();
 
 		if (allowedTo(array('profile_identity_own', 'profile_identity_any')))
-			loadCustomFields($memID, 'account');
+			loadCustomFields($this->_memID, 'account');
 
 		$context['sub_template'] = 'edit_options';
 		$context['page_desc'] = $txt['account_info'];
@@ -370,19 +334,16 @@ class ProfileOptions_Controller extends Action_Controller
 
 	/**
 	 * Allow the user to change the forum options in their profile.
-	 *
 	 */
 	public function action_forumProfile()
 	{
 		global $context, $txt;
 
-		$memID = currentMemberID();
-
 		loadTemplate('ProfileOptions');
-		loadThemeOptions($memID);
+		$this->loadThemeOptions();
 
 		if (allowedTo(array('profile_extra_own', 'profile_extra_any')))
-			loadCustomFields($memID, 'forumprofile');
+			loadCustomFields($this->_memID, 'forumprofile');
 
 		$context['sub_template'] = 'edit_options';
 		$context['page_desc'] = replaceBasicActionUrl($txt['forumProfile_info']);
@@ -407,10 +368,8 @@ class ProfileOptions_Controller extends Action_Controller
 	{
 		global $context, $txt;
 
-		$memID = currentMemberID();
-
-		loadThemeOptions($memID);
-		loadCustomFields($memID, 'pmprefs');
+		$this->loadThemeOptions();
+		loadCustomFields($this->_memID, 'pmprefs');
 		loadTemplate('ProfileOptions');
 
 		$context['sub_template'] = 'edit_options';
@@ -435,12 +394,10 @@ class ProfileOptions_Controller extends Action_Controller
 	{
 		global $txt, $context;
 
-		$memID = currentMemberID();
-
-		loadThemeOptions($memID);
+		$this->loadThemeOptions();
 
 		if (allowedTo(array('profile_extra_own', 'profile_extra_any')))
-			loadCustomFields($memID, 'theme');
+			loadCustomFields($this->_memID, 'theme');
 
 		loadTemplate('ProfileOptions');
 
@@ -466,8 +423,6 @@ class ProfileOptions_Controller extends Action_Controller
 	public function action_authentication($saving = false)
 	{
 		global $context, $cur_profile, $post_errors, $modSettings;
-
-		$memID = currentMemberID();
 
 		loadLanguage('Login');
 		loadTemplate('ProfileOptions');
@@ -507,14 +462,14 @@ class ProfileOptions_Controller extends Action_Controller
 
 					// Do the important bits.
 					require_once(SUBSDIR . '/Members.subs.php');
-					updateMemberData($memID, array('openid_uri' => '', 'passwd' => $passwd));
+					updateMemberData($this->_memID, array('openid_uri' => '', 'passwd' => $passwd));
 					if ($context['user']['is_owner'])
 					{
-						setLoginCookie(60 * $modSettings['cookieTime'], $memID, hash('sha256', $new_pass . $cur_profile['password_salt']));
+						setLoginCookie(60 * $modSettings['cookieTime'], $this->_memID, hash('sha256', $new_pass . $cur_profile['password_salt']));
 						redirectexit('action=profile;area=authentication;updated');
 					}
 					else
-						redirectexit('action=profile;u=' . $memID);
+						redirectexit('action=profile;u=' . $this->_memID);
 				}
 
 				return true;
@@ -536,16 +491,15 @@ class ProfileOptions_Controller extends Action_Controller
 					if ($context['user']['is_owner'])
 					{
 						$_SESSION['new_openid_uri'] = $_POST['openid_identifier'];
-
 						$openID->validate($_POST['openid_identifier'], false, null, 'change_uri');
 					}
 					else
-						updateMemberData($memID, array('openid_uri' => $_POST['openid_identifier']));
+						updateMemberData($this->_memID, array('openid_uri' => $_POST['openid_identifier']));
 				}
 			}
 		}
 
-		// Some stuff.
+		// Some stuff for the template
 		$context['member']['openid_uri'] = $cur_profile['openid_uri'];
 		$context['auth_method'] = empty($cur_profile['openid_uri']) ? 'password' : 'openid';
 		$context['sub_template'] = 'authentication_method';
@@ -561,8 +515,6 @@ class ProfileOptions_Controller extends Action_Controller
 
 		loadTemplate('ProfileOptions');
 
-		$memID = currentMemberID();
-
 		// Going to need this for the list.
 		require_once(SUBSDIR . '/Boards.subs.php');
 		require_once(SUBSDIR . '/Topic.subs.php');
@@ -573,12 +525,12 @@ class ProfileOptions_Controller extends Action_Controller
 			'width' => '100%',
 			'no_items_label' => $txt['notifications_boards_none'] . '<br /><br />' . $txt['notifications_boards_howto'],
 			'no_items_align' => 'left',
-			'base_href' => $scripturl . '?action=profile;u=' . $memID . ';area=notification',
+			'base_href' => $scripturl . '?action=profile;u=' . $this->_memID . ';area=notification',
 			'default_sort_col' => 'board_name',
 			'get_items' => array(
 				'function' => array($this, 'list_getBoardNotifications'),
 				'params' => array(
-					$memID,
+					$this->_memID,
 				),
 			),
 			'columns' => array(
@@ -626,7 +578,7 @@ class ProfileOptions_Controller extends Action_Controller
 				'include_sort' => true,
 				'include_start' => true,
 				'hidden_fields' => array(
-					'u' => $memID,
+					'u' => $this->_memID,
 					'sa' => $context['menu_item_selected'],
 					$context['session_var'] => $context['session_id'],
 				),
@@ -639,7 +591,7 @@ class ProfileOptions_Controller extends Action_Controller
 				),
 				array(
 					'position' => 'after_title',
-					'value' => getBoardNotificationsCount($memID) == 0 ? $txt['notifications_boards_none'] . '<br />' . $txt['notifications_boards_howto'] : $txt['notifications_boards_current'],
+					'value' => getBoardNotificationsCount($this->_memID) == 0 ? $txt['notifications_boards_none'] . '<br />' . $txt['notifications_boards_howto'] : $txt['notifications_boards_current'],
 				),
 			),
 		);
@@ -654,18 +606,18 @@ class ProfileOptions_Controller extends Action_Controller
 			'items_per_page' => $modSettings['defaultMaxMessages'],
 			'no_items_label' => $txt['notifications_topics_none'] . '<br /><br />' . $txt['notifications_topics_howto'],
 			'no_items_align' => 'left',
-			'base_href' => $scripturl . '?action=profile;u=' . $memID . ';area=notification',
+			'base_href' => $scripturl . '?action=profile;u=' . $this->_memID . ';area=notification',
 			'default_sort_col' => 'last_post',
 			'get_items' => array(
 				'function' => array($this, 'list_getTopicNotifications'),
 				'params' => array(
-					$memID,
+					$this->_memID,
 				),
 			),
 			'get_count' => array(
 				'function' => array($this, 'list_getTopicNotificationCount'),
 				'params' => array(
-					$memID,
+					$this->_memID,
 				),
 			),
 			'columns' => array(
@@ -746,7 +698,7 @@ class ProfileOptions_Controller extends Action_Controller
 				'include_sort' => true,
 				'include_start' => true,
 				'hidden_fields' => array(
-					'u' => $memID,
+					'u' => $this->_memID,
 					'sa' => $context['menu_item_selected'],
 					$context['session_var'] => $context['session_id'],
 				),
@@ -766,13 +718,13 @@ class ProfileOptions_Controller extends Action_Controller
 
 		// What options are set?
 		$context['member'] += array(
-			'notify_announcements' => $user_profile[$memID]['notify_announcements'],
-			'notify_send_body' => $user_profile[$memID]['notify_send_body'],
-			'notify_types' => $user_profile[$memID]['notify_types'],
-			'notify_regularity' => $user_profile[$memID]['notify_regularity'],
+			'notify_announcements' => $user_profile[$this->_memID]['notify_announcements'],
+			'notify_send_body' => $user_profile[$this->_memID]['notify_send_body'],
+			'notify_types' => $user_profile[$this->_memID]['notify_types'],
+			'notify_regularity' => $user_profile[$this->_memID]['notify_regularity'],
 		);
 
-		loadThemeOptions($memID);
+		$this->loadThemeOptions();
 	}
 
 	/**
@@ -827,8 +779,6 @@ class ProfileOptions_Controller extends Action_Controller
 	{
 		global $context, $modSettings, $cur_profile;
 
-		$memID = currentMemberID();
-
 		// Have the admins enabled this option?
 		if (empty($modSettings['allow_ignore_boards']))
 			fatal_lang_error('ignoreboards_disallowed', 'user');
@@ -846,25 +796,20 @@ class ProfileOptions_Controller extends Action_Controller
 			$category['child_ids'] = array_keys($category['boards']);
 		}
 
-		loadThemeOptions($memID);
+		$this->loadThemeOptions();
 	}
 
 	/**
 	 * Function to allow the user to choose group membership etc...
-	 *
 	 */
 	public function action_groupMembership()
 	{
 		global $txt, $user_profile, $context;
 
-		$db = database();
-
-		$memID = currentMemberID();
-
 		loadTemplate('ProfileOptions');
 		$context['sub_template'] = 'groupMembership';
 
-		$curMember = $user_profile[$memID];
+		$curMember = $user_profile[$this->_memID];
 		$context['primary_group'] = $curMember['id_group'];
 
 		// Can they manage groups?
@@ -886,53 +831,8 @@ class ProfileOptions_Controller extends Action_Controller
 			$groups[$k] = (int) $v;
 
 		// Get all the membergroups they can join.
-		$request = $db->query('', '
-			SELECT mg.id_group, mg.group_name, mg.description, mg.group_type, mg.online_color, mg.hidden,
-				IFNULL(lgr.id_member, 0) AS pending
-			FROM {db_prefix}membergroups AS mg
-				LEFT JOIN {db_prefix}log_group_requests AS lgr ON (lgr.id_member = {int:selected_member} AND lgr.id_group = mg.id_group)
-			WHERE (mg.id_group IN ({array_int:group_list})
-				OR mg.group_type > {int:nonjoin_group_id})
-				AND mg.min_posts = {int:min_posts}
-				AND mg.id_group != {int:moderator_group}
-			ORDER BY group_name',
-			array(
-				'group_list' => $groups,
-				'selected_member' => $memID,
-				'nonjoin_group_id' => 1,
-				'min_posts' => -1,
-				'moderator_group' => 3,
-			)
-		);
-		// This beast will be our group holder.
-		$context['groups'] = array(
-			'member' => array(),
-			'available' => array()
-		);
-		while ($row = $db->fetch_assoc($request))
-		{
-			// Can they edit their primary group?
-			if (($row['id_group'] == $context['primary_group'] && $row['group_type'] > 1) || ($row['hidden'] != 2 && $context['primary_group'] == 0 && in_array($row['id_group'], $groups)))
-				$context['can_edit_primary'] = true;
-
-			// If they can't manage (protected) groups, and it's not publically joinable or already assigned, they can't see it.
-			if (((!$context['can_manage_protected'] && $row['group_type'] == 1) || (!$context['can_manage_membergroups'] && $row['group_type'] == 0)) && $row['id_group'] != $context['primary_group'])
-				continue;
-
-			$context['groups'][in_array($row['id_group'], $groups) ? 'member' : 'available'][$row['id_group']] = array(
-				'id' => $row['id_group'],
-				'name' => $row['group_name'],
-				'desc' => $row['description'],
-				'color' => $row['online_color'],
-				'type' => $row['group_type'],
-				'pending' => $row['pending'],
-				'is_primary' => $row['id_group'] == $context['primary_group'],
-				'can_be_primary' => $row['hidden'] != 2,
-				// Anything more than this needs to be done through account settings for security.
-				'can_leave' => $row['id_group'] != 1 && $row['group_type'] > 1 ? true : false,
-			);
-		}
-		$db->free_result($request);
+		require_once(SUBSDIR . '/ProfileOptions.subs.php');
+		$context['groups'] = loadMembergroupsJoin($groups, $this->_memID);
 
 		// Add registered members on the end.
 		$context['groups']['member'][0] = array(
@@ -963,9 +863,6 @@ class ProfileOptions_Controller extends Action_Controller
 	{
 		global $context, $user_profile, $modSettings, $scripturl, $language;
 
-		$db = database();
-		$memID = currentMemberID();
-
 		// Let's be extra cautious...
 		if (!$context['user']['is_owner'] || empty($modSettings['show_group_membership']))
 			isAllowedTo('manage_membergroups');
@@ -977,7 +874,7 @@ class ProfileOptions_Controller extends Action_Controller
 
 		require_once(SUBSDIR . '/Membergroups.subs.php');
 
-		$old_profile = &$user_profile[$memID];
+		$old_profile = &$user_profile[$this->_memID];
 		$context['can_manage_membergroups'] = allowedTo('manage_membergroups');
 		$context['can_manage_protected'] = allowedTo('admin_forum');
 
@@ -1042,23 +939,10 @@ class ProfileOptions_Controller extends Action_Controller
 			fatal_lang_error('no_access', false);
 
 		// Final security check, don't allow users to promote themselves to admin.
+		require_once(SUBSDIR . '/ProfileOptions.subs.php');
 		if ($context['can_manage_membergroups'] && !allowedTo('admin_forum'))
 		{
-			$request = $db->query('', '
-				SELECT COUNT(permission)
-				FROM {db_prefix}permissions
-				WHERE id_group = {int:selected_group}
-					AND permission = {string:admin_forum}
-					AND add_deny = {int:not_denied}',
-				array(
-					'selected_group' => $group_id,
-					'not_denied' => 1,
-					'admin_forum' => 'admin_forum',
-				)
-			);
-			list ($disallow) = $db->fetch_row($request);
-			$db->free_result($request);
-
+			$disallow = checkMembergroupChange($group_id);
 			if ($disallow)
 				isAllowedTo('admin_forum');
 		}
@@ -1066,48 +950,15 @@ class ProfileOptions_Controller extends Action_Controller
 		// If we're requesting, add the note then return.
 		if ($changeType == 'request')
 		{
-			$request = $db->query('', '
-				SELECT id_member
-				FROM {db_prefix}log_group_requests
-				WHERE id_member = {int:selected_member}
-					AND id_group = {int:selected_group}',
-				array(
-					'selected_member' => $memID,
-					'selected_group' => $group_id,
-				)
-			);
-			if ($db->num_rows($request) != 0)
+			if (logMembergroupRequest($group_id, $this->_memID))
 				fatal_lang_error('profile_error_already_requested_group');
-			$db->free_result($request);
-
-			// Log the request.
-			$db->insert('',
-				'{db_prefix}log_group_requests',
-				array(
-					'id_member' => 'int', 'id_group' => 'int', 'time_applied' => 'int', 'reason' => 'string-65534',
-				),
-				array(
-					$memID, $group_id, time(), $_POST['reason'],
-				),
-				array('id_request')
-			);
 
 			// Send an email to all group moderators etc.
 			require_once(SUBSDIR . '/Mail.subs.php');
 
 			// Do we have any group moderators?
-			$request = $db->query('', '
-				SELECT id_member
-				FROM {db_prefix}group_moderators
-				WHERE id_group = {int:selected_group}',
-				array(
-					'selected_group' => $group_id,
-				)
-			);
-			$moderators = array();
-			while ($row = $db->fetch_assoc($request))
-				$moderators[] = $row['id_member'];
-			$db->free_result($request);
+			require_once(SUBSDIR . '/Membergroups.subs.php');
+			$moderators = array_keys(getGroupModerators($group_id));
 
 			// Otherwise this is the backup!
 			if (empty($moderators))
@@ -1200,39 +1051,37 @@ class ProfileOptions_Controller extends Action_Controller
 			updateSettings(array('settings_updated' => time()));
 
 		require_once(SUBSDIR . '/Members.subs.php');
-		updateMemberData($memID, array('id_group' => $newPrimary, 'additional_groups' => $addGroups));
+		updateMemberData($this->_memID, array('id_group' => $newPrimary, 'additional_groups' => $addGroups));
 
 		return $changeType;
 	}
-}
 
-/**
- * Load the options for an user.
- *
- * @param int $memID id_member
- */
-function loadThemeOptions($memID)
-{
-	global $context, $options, $cur_profile;
-
-	if (isset($_POST['default_options']))
-		$_POST['options'] = isset($_POST['options']) ? $_POST['options'] + $_POST['default_options'] : $_POST['default_options'];
-
-	if ($context['user']['is_owner'])
+	/**
+	 * Load the options for an user.
+	 */
+	public function loadThemeOptions()
 	{
-		$context['member']['options'] = $options;
-		if (isset($_POST['options']) && is_array($_POST['options']))
-			foreach ($_POST['options'] as $k => $v)
-				$context['member']['options'][$k] = $v;
-	}
-	else
-	{
-		require_once(SUBSDIR . '/Themes.subs.php');
-		$context['member']['options'] = loadThemeOptionsInto(array(1, (int) $cur_profile['id_theme']), array(-1, $memID), $context['member']['options']);
-		if (isset($_POST['options']))
+		global $context, $options, $cur_profile;
+
+		if (isset($_POST['default_options']))
+			$_POST['options'] = isset($_POST['options']) ? $_POST['options'] + $_POST['default_options'] : $_POST['default_options'];
+
+		if ($context['user']['is_owner'])
 		{
-			foreach ($_POST['options'] as $var => $val)
-				$context['member']['options'][$var] = $val;
+			$context['member']['options'] = $options;
+			if (isset($_POST['options']) && is_array($_POST['options']))
+				foreach ($_POST['options'] as $k => $v)
+					$context['member']['options'][$k] = $v;
+		}
+		else
+		{
+			require_once(SUBSDIR . '/Themes.subs.php');
+			$context['member']['options'] = loadThemeOptionsInto(array(1, (int) $cur_profile['id_theme']), array(-1, $this->_memID), $context['member']['options']);
+			if (isset($_POST['options']))
+			{
+				foreach ($_POST['options'] as $var => $val)
+					$context['member']['options'][$var] = $val;
+			}
 		}
 	}
 }
