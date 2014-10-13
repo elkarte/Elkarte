@@ -817,7 +817,6 @@ function template_display_attachments($message, $ignoring)
 							<div id="msg_', $message['id'], '_footer" class="attachments"', $ignoring ? ' style="display:none;"' : '', '>';
 
 	$last_approved_state = 1;
-	$i = 0;
 
 	foreach ($message['attachment'] as $attachment)
 	{
