@@ -1,12 +1,9 @@
 <?php
 
-require_once(TESTDIR . 'simpletest/autorun.php');
-require_once(TESTDIR . '../SSI.php');
-
 /**
  * TestCase class for manage boards settings
  */
-class TestManageBoardsSettings extends UnitTestCase
+class TestManageBoardsSettings extends PHPUnit_Framework_TestCase
 {
 	/**
 	 * Initialize or add whatever necessary for these tests
