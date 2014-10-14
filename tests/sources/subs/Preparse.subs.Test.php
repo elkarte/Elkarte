@@ -1,17 +1,16 @@
 <?php
 
-require_once(TESTDIR . 'simpletest/autorun.php');
-require_once(TESTDIR . '../SSI.php');
-require_once(SUBSDIR . '/Post.subs.php');
-
-class TestBBC extends UnitTestCase
+class PrepaseBBC extends PHPUnit_Framework_TestCase
 {
 	/**
-	 * prepare what is necessary to use in these tests.
+	 * Prepare what is necessary to use in these tests.
+	 *
 	 * setUp() is run automatically by the testing framework before each test method.
 	 */
-	function setUp()
+	public function setUp()
 	{
+		require_once(SUBSDIR . '/Post.subs.php');
+
 		$this->bbPreparse_tests = array(
 			array(
 				'[font=something]text[/font]',
@@ -44,7 +43,7 @@ class TestBBC extends UnitTestCase
 
 			preparsecode($test);
 
-			$this->assertEqual($expected, $test);
+			$this->assertEquals($expected, $test);
 		}
 	}
 }
