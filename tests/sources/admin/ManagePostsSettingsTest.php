@@ -1,12 +1,9 @@
 <?php
 
-require_once(TESTDIR . 'simpletest/autorun.php');
-require_once(TESTDIR . '../SSI.php');
-
 /**
  * TestCase class for manage posts settings
  */
-class TestManagePostsSettings extends UnitTestCase
+class TestManagePostsSettings extends PHPUnit_Framework_TestCase
 {
 	/**
 	 * Initialize or add whatever necessary for these tests
@@ -21,7 +18,7 @@ class TestManagePostsSettings extends UnitTestCase
 	 */
 	public function testSettings()
 	{
-		// trick
+		// Trick
 		loadLanguage('Admin');
 
 		$controller = new ManagePosts_Controller();
