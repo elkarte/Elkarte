@@ -1,15 +1,13 @@
 <?php
 
-require_once(TESTDIR . 'simpletest/autorun.php');
-require_once(TESTDIR . '../SSI.php');
-
-class TestDataValidator extends UnitTestCase
+class TestDataValidator extends PHPUnit_Framework_TestCase
 {
 	/**
-	 * prepare what is necessary to use in these tests.
+	 * Prepare what is necessary to use in these tests.
+	 *
 	 * setUp() is run automatically by the testing framework before each test method.
 	 */
-	function setUp()
+	public function setUp()
 	{
 		$this->rules = array(
 			'required'      => 'required',
