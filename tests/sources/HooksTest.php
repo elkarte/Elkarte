@@ -1,12 +1,10 @@
 <?php
 
-require_once(TESTDIR . 'simpletest/autorun.php');
-require_once(TESTDIR . '../SSI.php');
-
 /**
  * TestCase class for hooks adding/removing/other stuff
+ * @backupGlobals disabled
  */
-class TestHooks extends UnitTestCase
+class TestHooks extends PHPUnit_Framework_TestCase
 {
 	/**
 	 * Name of the hook used for testing
@@ -19,10 +17,15 @@ class TestHooks extends UnitTestCase
 	private $_tests = array();
 
 	/**
+	 * Array holding all the test calls
+	 */
+	private $_call = array();
+
+	/**
 	 * prepare what is necessary to use in these tests.
 	 * setUp() is run automatically by the testing framework before each test method.
 	 */
-	function setUp()
+	public function setUp()
 	{
 		$this->_tests = array(
 			// A simple one, just the function, default (i.e. in theory permanent)
@@ -48,16 +51,15 @@ class TestHooks extends UnitTestCase
 	 * cleanup data we no longer need at the end of the tests in this class.
 	 * tearDown() is run automatically by the testing framework after each test method.
 	 */
-	function tearDown()
+	public function tearDown()
 	{
 	}
 
 	/**
 	 * Tests adding hooks in some different ways
 	 */
-	function testAddHooks()
+	public function testAddHooks()
 	{
-	global $modSettings;
 		foreach ($this->_tests as $test)
 		{
 			add_integration_function($this->_hook_name, $test['call'], $test['file'], $test['perm']);
@@ -67,19 +69,23 @@ class TestHooks extends UnitTestCase
 
 	/**
 	 * We want to see if they are called
+	 *
+	 * @depends testAddHooks
 	 */
-	function testCallHooks()
+	public function testCallHooks()
 	{
-		$call = call_integration_hook($this->_hook_name);
+		$this->_call = call_integration_hook($this->_hook_name);
 
 		foreach ($this->_tests as $test)
-			$this->assertTrue($this->_is_hook_called($call, $test['call'] . (!empty($test['file']) ? '|' . $test['file'] : '')));
+			$this->assertTrue($this->_is_hook_called($test['call'] . (!empty($test['file']) ? '|' . $test['file'] : '')));
 	}
 
 	/**
 	 * And let's see what happens when removing them
+	 *
+	 * @depends testAddHooks
 	 */
-	function testRemoveHooks()
+	public function testRemoveHooks()
 	{
 		foreach ($this->_tests as $test)
 		{
@@ -177,11 +183,10 @@ class TestHooks extends UnitTestCase
 	/**
 	 * Determines if the hook has been executed by checking the returned value
 	 *
-	 * @param mixed[] $return - the return of call_integration_hook
 	 * @param string $hook_string - the function/method called + file with the hook
 	 * @return bool
 	 */
-	private function _is_hook_called($return, $hook_string)
+	private function _is_hook_called($hook_string)
 	{
 		if (strpos($hook_string, '|') !== false)
 		{
@@ -198,7 +203,7 @@ class TestHooks extends UnitTestCase
 
 		$result = call_user_func_array($call, array());
 
-		return $result === $return[$hook_string];
+		return $result === $this->_call[$hook_string];
 	}
 }
 
@@ -209,6 +214,7 @@ function testing_hook()
 {
 	return 'testing_hook_called';
 }
+
 /**
  * A dummy function to test if hooks are called
  */
@@ -216,6 +222,7 @@ function testing_hook2()
 {
 	return 'testing_hook2_called';
 }
+
 /**
  * A dummy function to test if hooks are called
  */
@@ -223,6 +230,7 @@ function testing_hook_np()
 {
 	return 'testing_hook_np_called';
 }
+
 /**
  * A dummy function to test if hooks are called
  */
@@ -230,6 +238,7 @@ function testing_hook_np2()
 {
 	return 'testing_hook_np2_called';
 }
+
 /**
  * A dummy class to test if hooks are called
  */
@@ -243,6 +252,7 @@ class testing_class
 		return 'testing_class::hook';
 	}
 }
+
 /**
  * A dummy class to test if hooks are called
  */
