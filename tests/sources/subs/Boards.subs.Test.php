@@ -1,31 +1,32 @@
 <?php
 
-require_once(TESTDIR . 'simpletest/autorun.php');
-require_once(TESTDIR . '../SSI.php');
-require_once(SUBSDIR . '/Boards.subs.php');
-
 /**
  * TestCase class for boards subs: working with boards.
+ *
  * WARNING. These tests work directly with the local database. Don't run
  * them if you need to keep your data untouched!
  */
-class TestBoards extends UnitTestCase
+class TestBoards extends PHPUnit_Framework_TestCase
 {
 	/**
-	 * @todo prepare some test data, to use in these tests.
+	 * Prepare some test data, to use in these tests.
+	 *
 	 * setUp() is run automatically by the testing framework before each test method.
 	 */
-	function setUp()
+	public function setUp()
 	{
-		// set up some data for testing
-		// might wanna insert some boards, topics, and use those all through the tests here
+		// Set up some data for testing
+		//
+		// @todo might want to insert some boards, topics, and use those all through the tests here
+		require_once(SUBSDIR . '/Boards.subs.php');
 	}
 
 	/**
-	 * cleanup data we no longer need at the end of the tests in this class.
+	 * Cleanup data we no longer need at the end of the tests in this class.
+	 *
 	 * tearDown() is run automatically by the testing framework after each test method.
 	 */
-	function tearDown()
+	public function tearDown()
 	{
 		// remove useless data.
 		// leave database in initial state!
@@ -34,7 +35,7 @@ class TestBoards extends UnitTestCase
 	/**
 	 * Tests for boardInfo()
 	 */
-	function testBoardInfo()
+	public function testBoardInfo()
 	{
 		// assume we have at least board no 1
 		$boardInfo = boardInfo(1);
@@ -42,13 +43,13 @@ class TestBoards extends UnitTestCase
 		// we expect the return to have a board name and some posts count for us
 		$this->assertNotNull($boardInfo['name']);
 		$this->assertNotNull($boardInfo['count_posts']);
-		$this->assertIsA($boardInfo['count_posts'], 'numeric');
+		$this->assertInternalType('numeric', $boardInfo['count_posts']);
 	}
 
 	/**
 	 * Tests for boardPosts()
 	 */
-	function testBoardPosts()
+	public function testBoardPosts()
 	{
 		// assume we have board no 1
 		$post_counts = boardsPosts(array(1), array());
@@ -57,6 +58,6 @@ class TestBoards extends UnitTestCase
 		$this->assertNotNull($post_counts[1]);
 		$num = is_numeric($post_counts[1]);
 		$this->assertTrue($num);
-		$this->assertIsA($post_counts[1], 'numeric');
+		$this->assertInternalType('numeric', $post_counts[1]);
 	}
 }
