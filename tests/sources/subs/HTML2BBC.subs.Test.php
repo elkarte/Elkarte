@@ -1,20 +1,16 @@
 <?php
 
-require_once(TESTDIR . 'simpletest/autorun.php');
-
-// we are not in Elk, thereby need to set our define
-if (!defined('ELK'))
-	define('ELK', 'SSI');
-
-class TestHTML2BBC extends UnitTestCase
+class TestHTML2BBC extends PHPUnit_Framework_TestCase
 {
 	/**
-	 * prepare what is necessary to use in these tests.
+	 * Prepare what is necessary to use in these tests.
+	 *
 	 * setUp() is run automatically by the testing framework before each test method.
 	 */
-	function setUp()
+	public function setUp()
 	{
-		require_once(TESTDIR . '../sources/subs/Html2BBC.class.php');
+		require_once(SUBSDIR . '/Html2BBC.class.php');
+
 		$this->bbcTestCases = array(
 			array(
 				'Test bold',
@@ -63,7 +59,7 @@ class TestHTML2BBC extends UnitTestCase
 			// Remove pretty print newlines
 			$result = str_replace("\n", '', $result);
 
-			$this->assertEqual($expected, $result);
+			$this->assertEquals($expected, $result);
 		}
 	}
 }
