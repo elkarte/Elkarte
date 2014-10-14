@@ -1,0 +1,32 @@
+{
+	"name": "elkarte/elkarte",
+	"description": "ElkArte Forum Software application",
+	"type": "project",
+	"keywords": ["elkarte", "forum"],
+	"homepage": "http://www.elkarte.net",
+	"license": "BSD-3",
+	"authors": [
+		{
+			"name": "ElkArte Forum Contributors",
+			"email": "operations@elkarte.net",
+			"homepage": "http://www.elkarte.net"
+		}
+	],
+	"support": {
+		"issues": "https://github.com/elkarte/Elkarte/issues",
+		"forum": "https://www.elkarte.com/community/",
+		"wiki": "https://github.com/elkarte/Elkarte/wiki",
+		"irc": "irc://irc.freenode.org/elkarte"
+	},
+	"scripts": {
+	},
+	"replace": {
+	},
+	"require": {
+		"php": ">=5.3.3"
+	},
+	"require-dev": {
+		"phpunit/dbunit": "1.3.*",
+		"phpunit/phpunit": "4.3.*"
+	}
+}
