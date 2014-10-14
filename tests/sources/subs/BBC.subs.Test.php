@@ -1,15 +1,13 @@
 <?php
 
-require_once(TESTDIR . 'simpletest/autorun.php');
-require_once(TESTDIR . '../SSI.php');
-
-class TestBBC extends UnitTestCase
+class TestBBC extends PHPUnit_Framework_TestCase
 {
 	/**
-	 * prepare what is necessary to use in these tests.
+	 * Prepare what is necessary to use in these tests.
+	 *
 	 * setUp() is run automatically by the testing framework before each test method.
 	 */
-	function setUp()
+	public function setUp()
 	{
 		$this->bbcTestCases = array(
 			array(
@@ -96,7 +94,7 @@ class TestBBC extends UnitTestCase
 
 			$result = parse_bbc($test);
 
-			$this->assertEqual($expected, $result);
+			$this->assertEquals($expected, $result);
 		}
 
 		foreach ($this->bbcInvalidTestCases as $testcase)
@@ -106,7 +104,7 @@ class TestBBC extends UnitTestCase
 
 			$result = parse_bbc($test);
 
-			$this->assertEqual($test, $result);
+			$this->assertEquals($test, $result);
 		}
 	}
 }
