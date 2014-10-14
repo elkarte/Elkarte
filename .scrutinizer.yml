@@ -23,7 +23,9 @@ checks:
     php:
         code_rating: true
         duplication: true
+
 tools:
+    external_code_coverage: true
     js_hint:
         filter:
             excluded_paths: ['attachments/*', 'avatars/*', 'cache/*', 'docs/*', 'packages/*', 'smileys/*', 'tests/*', 'sources/ext/*', 'ext/*', themes/default/scripts/jquery-1.11.1.min.js, themes/default/scripts/jquery.atwho.js, themes/default/scripts/jquery.caret.min.js, themes/default/scripts/jquery.sceditor.bbcode.min.js, themes/default/scripts/jquery.sceditor.min.js, themes/default/scripts/jquery-ui-1.10.4.min.js, themes/default/scripts/prettify.min.js, themes/default/scripts/sha256.js]
