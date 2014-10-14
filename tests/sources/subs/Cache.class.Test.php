@@ -1,40 +1,38 @@
 <?php
 
-require_once(TESTDIR . 'simpletest/autorun.php');
-
 /**
  * TestCase class for caching classes.
  */
-class TestMembers extends UnitTestCase
+class TestCache extends PHPUnit_Framework_TestCase
 {
 	private $_cache_obj = null;
 
 	/**
 	 * Prepare some test data, to use in these tests.
+	 *
 	 * setUp() is run automatically by the testing framework before each test method.
 	 */
-	function setUp()
+	public function setUp()
 	{
-		define('ELK', '1');
-		define('CACHEDIR', TESTDIR . '../cache');
-		require_once(TESTDIR . '../sources/subs/CacheMethodInterface.class.php');
-		require_once(TESTDIR . '../sources/subs/CacheMethodAbstract.class.php');
+		require_once(SUBSDIR . '/CacheMethodInterface.class.php');
+		require_once(SUBSDIR . '/CacheMethodAbstract.class.php');
 	}
 
 	/**
 	 * Cleanup data we no longer need at the end of the tests in this class.
+	 *
 	 * tearDown() is run automatically by the testing framework after each test method.
 	 */
-	function tearDown()
+	public function tearDown()
 	{
 	}
 
 	/**
 	 * Testing the filebase caching
 	 */
-	function testFilebasedCache()
+	public function testFilebasedCache()
 	{
-		require_once(TESTDIR . '../sources/subs/cache/FilebasedCache.class.php');
+		require_once(SUBSDIR . '/cache/FilebasedCache.class.php');
 		$this->_cache_obj = new Filebased_Cache(array());
 		$this->doCacheTests(function($key) {
 			return file_exists(CACHEDIR . '/data_' . $key . '.php');
@@ -55,6 +53,6 @@ class TestMembers extends UnitTestCase
 			$this->assertTrue($putAssert($key));
 
 		$test_cached = $this->_cache_obj->get($key);
-		$this->assertIdentical($test_array, $test_cached);
+		$this->assertSame($test_array, $test_cached);
 	}
 }
