@@ -1,34 +1,26 @@
 <?php
 
-require_once(TESTDIR . 'simpletest/autorun.php');
-require_once(TESTDIR . '../SSI.php');
-
 /**
  * TestCase class for tables present
  */
-class TestDatabase extends UnitTestCase
+class TestDatabase extends PHPUnit_Framework_TestCase
 {
 	/**
-	 * prepare what is necessary to use in these tests.
+	 * Prepare what is necessary to use in these tests.
+     *
 	 * setUp() is run automatically by the testing framework before each test method.
 	 */
 	function setUp()
 	{
-		global $db_prefix, $db_name;
-
-		// we are not in Elk, thereby need to set our define
-		if (!defined('ELK'))
-			define('ELK', 'SSI');
-
-		// When running in SSI mode the prefix is fixed to contain the db name
-		$this->db_prefix = strtr($db_prefix, array('`' . $db_name . '`.' => ''));
 	}
 
 	/**
-	 * parseRequest() with a simple string board and no topic
+	 * testTablesExist() get a list of tables and see if they all exist
 	 */
 	function testTablesExist()
 	{
+		global $db_prefix;
+
 		$db = database();
 		$tables = $db->db_list_tables();
 
@@ -112,7 +104,7 @@ class TestDatabase extends UnitTestCase
 
 		foreach ($known_tables as $table)
 		{
-			$exists = in_array($this->db_prefix . $table, $tables);
+			$exists = in_array($db_prefix . $table, $tables);
 			$this->assertTrue($exists, 'The table ' . $table . ' doesn\'t esist');
 		}
 	}
