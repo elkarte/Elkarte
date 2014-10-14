@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<phpunit backupGlobals="true"
+         colors="true"
+         convertErrorsToExceptions="true"
+         convertNoticesToExceptions="true"
+         convertWarningsToExceptions="true"
+         processIsolation="false"
+         stopOnFailure="false"
+         syntaxCheck="false"
+         verbose="true"
+         bootstrap="/var/www/tests/travis-ci/bootstrap.php">
+  <testsuites>
+      <testsuite name="ElkArte Tests">
+          <directory>/var/www/tests</directory>
+      </testsuite>
+  </testsuites>
+
+  <logging>
+      <log type="coverage-clover" target="/tmp/coverage.xml"/>
+      <log type="testdox-text" target="/tmp/testdox.txt"/>
+  </logging>
+
+  <filter>
+      <whitelist addUncoveredFilesFromWhitelist="true">
+          <directory suffix=".php">/var/www/sources</directory>
+          <exclude>
+              <directory suffix=".php">/var/www/sources/ext</directory>
+          </exclude>
+      </whitelist>
+  </filter>
+</phpunit>
