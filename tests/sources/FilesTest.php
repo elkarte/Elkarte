@@ -1,26 +1,25 @@
 <?php
 
-require_once(TESTDIR . 'simpletest/autorun.php');
-require_once(TESTDIR . '../SSI.php');
-
 /**
  * TestCase class for file integrity
  */
-class TestFiles extends UnitTestCase
+class TestFiles extends PHPUnit_Framework_TestCase
 {
 	/**
-	 * prepare what is necessary to use in these tests.
+	 * Prepare what is necessary to use in these tests.
+	 *
 	 * setUp() is run automatically by the testing framework before each test method.
 	 */
-	function setUp()
+	public function setUp()
 	{
 	}
 
 	/**
-	 * cleanup data we no longer need at the end of the tests in this class.
+	 * Cleanup data we no longer need at the end of the tests in this class.
+	 *
 	 * tearDown() is run automatically by the testing framework after each test method.
 	 */
-	function tearDown()
+	public function tearDown()
 	{
 	}
 
@@ -29,7 +28,7 @@ class TestFiles extends UnitTestCase
 	 *
 	 * @todo use recursive fetching of files
 	 */
-	function testSyntaxErrors()
+	public function testSyntaxErrors()
 	{
 		$dirs = array(
 			'board' => BOARDDIR . '/*.php',
