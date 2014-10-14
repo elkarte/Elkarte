@@ -1,23 +1,22 @@
 <?php
 
-require_once(TESTDIR . 'simpletest/autorun.php');
-require_once(TESTDIR . '../SSI.php');
-require_once(SUBSDIR . '/Likes.subs.php');
-
 /**
  * TestCase class for like subs.
+ *
  * WARNING. These tests work directly with the local database. Don't run
  * them if you need to keep your data untouched!
  */
-class TestLikes extends UnitTestCase
+class TestLikes extends PHPUnit_Framework_TestCase
 {
 	/**
 	 * Prepare some test data, to use in these tests.
+	 *
 	 * setUp() is run automatically by the testing framework before each test method.
 	 */
-	function setUp()
+	public function setUp()
 	{
 		// Lets make sure a topic exists by creating one
+		require_once(SUBSDIR . '/Likes.subs.php');
 		require_once(SUBSDIR . '/Post.subs.php');
 
 		// post variables
@@ -53,9 +52,10 @@ class TestLikes extends UnitTestCase
 
 	/**
 	 * Cleanup data we no longer need at the end of the tests in this class.
+	 *
 	 * tearDown() is run automatically by the testing framework after each test method.
 	 */
-	function tearDown()
+	public function tearDown()
 	{
 		// remove temporary test data
 		require_once(SUBSDIR . '/Topic.subs.php');
@@ -65,7 +65,7 @@ class TestLikes extends UnitTestCase
 	/**
 	 * Like the topic
 	 */
-	function testLikeTopic()
+	public function testLikeTopic()
 	{
 		global $modSettings;
 
@@ -77,17 +77,17 @@ class TestLikes extends UnitTestCase
 
 		// Get the number of likes, better be one
 		$likescount = messageLikeCount($this->id_topic);
-		$this->assertEqual($likescount, 1);
+		$this->assertEquals($likescount, 1);
 
 		// Load it in, should be able to find this as well
 		$likes = loadLikes($this->id_topic, false);
-		$this->assertEqual($likes[$this->id_topic]['count'], 1);
+		$this->assertEquals($likes[$this->id_topic]['count'], 1);
 	}
 
 	/**
 	 * Remove the like that was given
 	 */
-	function testRemoveLikeTopic()
+	public function testRemoveLikeTopic()
 	{
 		$liked_message = basicMessageInfo($this->id_topic, true, true);
 
@@ -96,6 +96,6 @@ class TestLikes extends UnitTestCase
 
 		// get the number of likes, better be none now
 		$likescount = messageLikeCount($this->id_topic);
-		$this->assertEqual($likescount, 0);
+		$this->assertEquals($likescount, 0);
 	}
 }
