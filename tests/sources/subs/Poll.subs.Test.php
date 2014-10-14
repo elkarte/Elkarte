@@ -1,23 +1,21 @@
 <?php
 
-require_once(TESTDIR . 'simpletest/autorun.php');
-require_once(TESTDIR . '../SSI.php');
-require_once(SUBSDIR . '/Poll.subs.php');
-
 /**
  * TestCase class for poll subs.
+ * 
  * WARNING. These tests work directly with the local database. Don't run
  * them if you need to keep your data untouched!
  */
-class TestPoll extends UnitTestCase
+class TestPoll extends PHPUnit_Framework_TestCase
 {
 	/**
 	 * Prepare some test data, to use in these tests.
 	 * setUp() is run automatically by the testing framework before each test method.
 	 */
-	function setUp()
+	public function setUp()
 	{
 		// make sure a topic exists
+		require_once(SUBSDIR . '/Poll.subs.php');
 		require_once(SUBSDIR . '/Post.subs.php');
 
 		// post variables
@@ -55,7 +53,7 @@ class TestPoll extends UnitTestCase
 	 * Cleanup data we no longer need at the end of the tests in this class.
 	 * tearDown() is run automatically by the testing framework after each test method.
 	 */
-	function tearDown()
+	public function tearDown()
 	{
 		// remove temporary test data
 		require_once(SUBSDIR . '/Topic.subs.php');
@@ -65,7 +63,7 @@ class TestPoll extends UnitTestCase
 	/**
 	 * Poll creation in an existing topic
 	 */
-	function testCreatePollInTopic()
+	public function testCreatePollInTopic()
 	{
 		// Required values to create the poll with.
 		$question = 'Who is the next best contender for Grudge award?';
@@ -79,26 +77,26 @@ class TestPoll extends UnitTestCase
 		associatedPoll($this->id_topic, $id_poll);
 
 		// it worked, right?
-		$this->assertEqual($id_poll, associatedPoll($this->id_topic));
+		$this->assertEquals($id_poll, associatedPoll($this->id_topic));
 
 		// get some values from it
 		$pollinfo = pollInfoForTopic($this->id_topic);
 
-		$this->assertEqual($pollinfo['id_member_started'], 1);
-		$this->assertEqual($pollinfo['question'], $question);
-		$this->assertEqual($pollinfo['max_votes'], 1); // the default value
-		$this->assertEqual($pollinfo['poll_starter'], 0);
+		$this->assertEquals($pollinfo['id_member_started'], 1);
+		$this->assertEquals($pollinfo['question'], $question);
+		$this->assertEquals($pollinfo['max_votes'], 1); // the default value
+		$this->assertEquals($pollinfo['poll_starter'], 0);
 
 		// lets use pollStarters() and test its result
 		list($topic_starter, $poll_starter) = pollStarters($this->id_topic);
-		$this->assertEqual($topic_starter, 1);
-		$this->assertEqual($poll_starter, 0);
+		$this->assertEquals($topic_starter, 1);
+		$this->assertEquals($poll_starter, 0);
 	}
 
 	/**
 	 * Add options (choices) to a poll created with none.
 	 */
-	function testAddingOptionsToPoll()
+	public function testAddingOptionsToPoll()
 	{
 		// Values to create it first
 		$question = 'Who is the next best contender for Grudge award?';
@@ -124,19 +122,19 @@ class TestPoll extends UnitTestCase
 
 		// Ok, what do we have now.
 		$pollOptions = pollOptions($id_poll);
-		$this->assertEqual($pollOptions[0]['label'], $options[0]);
-		$this->assertEqual($pollOptions[1]['label'], $options[1]);
-		$this->assertEqual($pollOptions[0]['id_choice'], 0);
-		$this->assertEqual($pollOptions[1]['id_choice'], 1);
-		$this->assertEqual($pollOptions[0]['votes'], 0);
-		$this->assertEqual($pollOptions[1]['votes'], 0);
+		$this->assertEquals($pollOptions[0]['label'], $options[0]);
+		$this->assertEquals($pollOptions[1]['label'], $options[1]);
+		$this->assertEquals($pollOptions[0]['id_choice'], 0);
+		$this->assertEquals($pollOptions[1]['id_choice'], 1);
+		$this->assertEquals($pollOptions[0]['votes'], 0);
+		$this->assertEquals($pollOptions[1]['votes'], 0);
 
 	}
 
 	/**
 	 * Remove an existing poll
 	 */
-	function testRemovePoll()
+	public function testRemovePoll()
 	{
 		// Values to create it first
 		$question = 'Who is the next best contender for Grudge award?';
@@ -170,7 +168,7 @@ class TestPoll extends UnitTestCase
 	/**
 	 * Modify a poll
 	 */
-	function testModifyPoll()
+	public function testModifyPoll()
 	{
 		// Values to create it first
 		$question = 'Who is the next best contender for Grudge award?';
