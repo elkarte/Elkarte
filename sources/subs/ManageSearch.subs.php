@@ -204,7 +204,8 @@ index elkarte_base_index
 	stopwords		= ' . $modSettings['sphinx_stopword_path'], '
 	min_word_len	= 2
 	charset_type	= utf-8
-	charset_table	= 0..9, A..Z->a..z, _, a..z
+	charset_table	= 0..9, A..Z->a..z, _, a..z, U+451->U+435, U+401->U+435, U+410..U+42F->U+430..U+44F, U+430..U+44F
+	ignore_chars	= -, U+AD
 }
 
 index elkarte_delta_index : elkarte_base_index
@@ -227,15 +228,15 @@ indexer
 
 searchd
 {
-	listen					= ', (empty($modSettings['sphinx_searchd_port']) ? 3312 : (int) $modSettings['sphinx_searchd_port']), '
-	listen					= ', (empty($modSettings['sphinxql_searchd_port']) ? 3313 : (int) $modSettings['sphinxql_searchd_port']), ':mysql41
+	listen					= ', (empty($modSettings['sphinx_searchd_port']) ? 9312 : (int) $modSettings['sphinx_searchd_port']), '
+	listen					= ', (empty($modSettings['sphinxql_searchd_port']) ? 9306 : (int) $modSettings['sphinxql_searchd_port']), ':mysql41
 	log						= ', $modSettings['sphinx_log_path'], '/searchd.log
 	query_log				= ', $modSettings['sphinx_log_path'], '/query.log
 	read_timeout			= 5
 	max_children			= 30
-	compat_sphinxql_magics	= 1
+	compat_sphinxql_magics	= 0
 	pid_file				= ', $modSettings['sphinx_data_path'], '/searchd.pid
-	max_matches				= ', (empty($modSettings['sphinx_max_results']) ? 3312 : (int) $modSettings['sphinx_max_results']), '
+	max_matches				= ', (empty($modSettings['sphinx_max_results']) ? 2000 : (int) $modSettings['sphinx_max_results']), '
 }
 ';
 	obExit(false, false);
