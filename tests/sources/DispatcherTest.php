@@ -1,22 +1,20 @@
 <?php
 
-require_once(TESTDIR . 'simpletest/autorun.php');
-require_once(TESTDIR . '../SSI.php');
-
 /**
  * TestCase class for dispatching.
+ * 
  * The few tests here test that for the actions known to us,
  * things can be found, and all expected methods exist.
  * Potentially useful during refactoring, as it will fail on us and
  * force to check that all expected subactions are still routed, and
  * update it.
  */
-class TestDispatcher extends UnitTestCase
+class DispatcherTest extends PHPUnit_Framework_TestCase
 {
 	/**
 	 * Tests automagical routing to an action
 	 */
-	function testAutoDispatch()
+	public function testAutoDispatch()
 	{
 		// Auto-loaded actions.
 		// ?action=something;sa=somedetail
@@ -47,7 +45,7 @@ class TestDispatcher extends UnitTestCase
 	 * Tests auto-dispatch to sa, provided that the controller is hardcoded.
 	 * (half-automagical dispatching)
 	 */
-	function testSaDispatch()
+	public function testSaDispatch()
 	{
 		// controller hardcoded, sa action
 		// these are ?action=name routed to SomeController->action_name()
@@ -84,66 +82,10 @@ class TestDispatcher extends UnitTestCase
 
 	}
 
-	function testLegacyDispatch()
-	{
-		// dunno how useful this is :P
-		// controller and sa hardcoded
-		$legacy_actions = array(
-
-		);
-
-		$leftovers = array(
-			'editpoll' => array('Poll.controller.php', 'Poll_Controller', 'action_editpoll'),
-			'editpoll2' => array('Poll.controller.php', 'Poll_Controller', 'action_editpoll2'),
-			'jsmodify' => array('Post.controller.php', 'Post_Controller', 'action_jsmodify'),
-			'jsoption' => array('Themes.php', 'Themes_Controller', 'action_jsoption'),
-			'lockvoting' => array('Poll.controller.php', 'Poll_Controller', 'action_lockvoting'),
-			'markasread' => array('Markasread.controller.php', 'MarkRead_Controller', 'action_index'),
-			'mergetopics' => array('MergeTopics.controller.php', 'MergeTopics_Controller', 'action_index'),
-			'memberlist' => array('Memberlist.controller.php', 'Memberlist_Controller', 'action_index'),
-			'moderate' => array('ModerationCenter.controller.php', 'ModerationCenter_Controller', 'action_modcenter'),
-			'karma' => array('Karma.controller.php', 'Karma_Controller', ''),
-			'movetopic' => array('MoveTopic.controller.php', 'MoveTopic_Controller', 'action_movetopic'),
-			'movetopic2' => array('MoveTopic.controller.php', 'MoveTopic_Controller', 'action_movetopic2'),
-			'notify' => array('Notify.controller.php', 'Notify_Controller', 'action_notify'),
-			'notifyboard' => array('Notify.controller.php', 'Notify_Controller', 'action_notifyboard'),
-			'pm' => array('PersonalMessage.controller.php', 'PersonalMessage_Controller', 'action_index'),
-			'post2' => array('Post.controller.php', 'Post_Controller', 'action_post2'),
-// 			'recent' => array('Recent.controller.php', 'Recent_Controller', 'action_recent'),
-			'register' => array('Register.controller.php', 'Register_Controller', 'action_register'),
-			'register2' => array('Register.controller.php', 'Register_Controller', 'action_register2'),
-// 			'removepoll' => array('Poll.controller.php', 'Poll_Controller', 'action_removepoll'),
-			'removetopic2' => array('RemoveTopic.controller.php', 'RemoveTopic_Controller', 'action_removetopic2'),
-			'reporttm' => array('Emailuser.controller.php', 'Emailuser_Controller', 'action_reporttm'),
-			'restoretopic' => array('RemoveTopic.controller.php', 'RemoveTopic_Controller', 'action_restoretopic'),
-// 			'search' => array('Search.controller.php', 'action_plushsearch1'),
-// 			'search2' => array('Search.controller.php', 'action_plushsearch2'),
-			'sendtopic' => array('Emailuser.controller.php', 'Emailuser_Controller', 'action_sendtopic'),
-			'suggest' => array('Suggest.controller.php', 'Suggest_Controller', 'action_suggest'),
-			'spellcheck' => array('Post.controller.php', 'Post_Controller', 'action_spellcheck'),
-			'splittopics' => array('SplitTopics.controller.php', 'SplitTopics_Controller', 'action_splittopics'),
-			'stats' => array('Stats.controller.php', 'Stats_Controller', 'action_stats'),
-			'theme' => array('Themes.php', 'Themes_Controller', 'action_thememain'),
-			'trackip' => array('ProfileHistory.controller.php', 'action_trackip'),
-			'unread' => array('Recent.controller.php', 'Recent_Controller', 'action_unread'),
-			'unreadreplies' => array('Recent.controller.php', 'Recent_Controller', 'action_unread'),
-			'verificationcode' => array('Register.controller.php', 'Register_Controller', 'action_verificationcode'),
-			'viewprofile' => array('Profile.controller.php', 'action_modifyprofile'),
-// 			'vote' => array('Poll.controller.php', 'Poll_Controller', 'action_vote'),
-			'viewquery' => array('AdminDebug.php', 'AdminDebug_Controller', 'action_viewquery'),
-			'viewadminfile' => array('AdminDebug.php', 'AdminDebug_Controller', 'action_viewadminfile'),
-			'.xml' => array('News.controller.php', 'News_Controller', 'action_showfeed'),
-			'xmlhttp' => array('Xml.controller.php', 'Xml_Controller', 'action_index'),
-		);
-
-		$adminActions = array ('admin', 'attachapprove', 'jsoption', 'theme', 'viewadminfile', 'viewquery');
-
-	}
-
 	/**
 	 * Does a round of tests on the dispatcher itself
 	 */
-	function testElkDispatcher()
+	public function testElkDispatcher()
 	{
 		global $topic, $board;
 
@@ -242,7 +184,7 @@ class TestDispatcher extends UnitTestCase
 	/**
 	 * prepare some test data, to use in these tests
 	 */
-	function setUp()
+	public function setUp()
 	{
 		// set up some data for testing
 	}
@@ -250,7 +192,7 @@ class TestDispatcher extends UnitTestCase
 	/**
 	 * cleanup data we no longer need at the end of the tests in this class.
 	 */
-	function tearDown()
+	public function tearDown()
 	{
 		// remove useless data
 	}
@@ -274,7 +216,7 @@ class Site_Dispatcher_Tester extends Site_Dispatcher
 	 */
 	public function compare($action)
 	{
-		return $this->_file_name == $action['file_name'] && 
+		return $this->_file_name == $action['file_name'] &&
 		       $this->_controller_name == $action['controller_name'] &&
 		       $this->_function_name == $action['function_name'];
 	}
