@@ -1,49 +1,49 @@
 <?php
-require_once(TESTDIR . 'simpletest/autorun.php');
-require_once(TESTDIR . '../SSI.php');
 
 /**
  * TestCase class for (ideally) all the functions in the Subs.php file
  * that do not fit in any other test
  */
-class TestSubs extends UnitTestCase
+class TestSubs extends PHPUnit_Framework_TestCase
 {
 	/**
-	 * prepare what is necessary to use in these tests.
+	 * Prepare what is necessary to use in these tests.
+	 *
 	 * setUp() is run automatically by the testing framework before each test method.
 	 */
-	function setUp()
+	public function setUp()
 	{
 	}
 
 	/**
-	 * cleanup data we no longer need at the end of the tests in this class.
+	 * Cleanup data we no longer need at the end of the tests in this class.
+	 *
 	 * tearDown() is run automatically by the testing framework after each test method.
 	 */
-	function tearDown()
+	public function tearDown()
 	{
 	}
 
 	/**
 	 * Tests the response of the response_prefix function
 	 */
-	function testResponsePrefix()
+	public function testResponsePrefix()
 	{
 		global $txt;
 
-		$this->assertEqual(response_prefix(), $txt['response_prefix']);
+		$this->assertEquals(response_prefix(), $txt['response_prefix']);
 	}
 
 	/**
 	 * Tests the response of the response_prefix function
 	 */
-	function testReplaceBasicActionUrl()
+	public function testReplaceBasicActionUrl()
 	{
 		global $scripturl, $context, $boardurl;
 
 		$testStrings = array(
 			'{forum_name}' => $context['forum_name'],
-			'{forum_name_html_safe}' => $context['forum_name_html_safe'],
+			'{forum_name_html_safe}' => $context['forum_name'],
 			'{script_url}' => $scripturl,
 			'{board_url}' => $boardurl,
 			'{login_url}' => $scripturl . '?action=login',
@@ -62,10 +62,10 @@ class TestSubs extends UnitTestCase
 		);
 
 		foreach ($testStrings as $string => $value)
-			$this->assertEqual(replaceBasicActionUrl($string), $value);
+			$this->assertEquals(replaceBasicActionUrl($string), $value);
 	}
 
-	function testValidEmailsTLD()
+	public function testValidEmailsTLD()
 	{
 		$testemails = array(
 			// Shortest TLD
