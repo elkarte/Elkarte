@@ -1,24 +1,28 @@
 <?php
 
-require_once(TESTDIR . 'simpletest/autorun.php');
-require_once(TESTDIR . '../SSI.php');
-require_once(SUBSDIR . '/Members.subs.php');
-
 /**
  * TestCase class for members subs.
+ *
  * WARNING. These tests work directly with the local database. Don't run
  * them if you need to keep your data untouched!
  */
-class TestMembers extends UnitTestCase
+class TestMembers extends PHPUnit_Framework_TestCase
 {
 	private $memberID = null;
 
 	/**
 	 * Prepare some test data, to use in these tests.
+	 *
 	 * setUp() is run automatically by the testing framework before each test method.
 	 */
-	function setUp()
+	public function setUp()
 	{
+		global $txt;
+
+		$txt['guest_title'] = 'Guest';
+
+		require_once(SUBSDIR . '/Members.subs.php');
+
 		$regOptions = array(
 			'interface' => 'tests',
 			'username' => 'in-test user',
@@ -45,20 +49,21 @@ class TestMembers extends UnitTestCase
 
 	/**
 	 * Cleanup data we no longer need at the end of the tests in this class.
+	 * 
 	 * tearDown() is run automatically by the testing framework after each test method.
 	 */
-	function tearDown()
+	public function tearDown()
 	{
 	}
 
 	/**
 	 * Find a member by IP
 	 */
-	function testMemberByIP()
+	public function testMemberByIP()
 	{
 		// Default is exact and no IP2
 		$result = membersByIP('127.0.0.2');
-		$this->assertEqual($this->memberID, $result[0]['id_member']);
+		$this->assertEquals($this->memberID, $result[0]['id_member']);
 
 		// A test with relaxed query
 		$result = membersByIP('127.0.0.*', 'relaxed');
@@ -77,6 +82,6 @@ class TestMembers extends UnitTestCase
 
 		// Now let's check IP2
 		$result = membersByIP('127.0.0.3', 'exact', true);
-		$this->assertEqual($this->memberID, $result[0]['id_member']);
+		$this->assertEquals($this->memberID, $result[0]['id_member']);
 	}
 }
