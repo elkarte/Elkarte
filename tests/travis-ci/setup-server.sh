@@ -13,7 +13,7 @@ TRAVIS_PHP_VERSION=$2
 
 # Packages installation / update
 sudo apt-get update -qq
-sudo apt-get install -y -qq --force-yes apache2 libapache2-mod-php5 php5-mysql php5-pgsql
+sudo apt-get install -y -qq --force-yes apache2 libapache2-mod-php5 php5-mysql php5-pgsql php5-curl
 
 # Apache webserver configuration
 echo "Alias /behat $(pwd)/web" | sudo tee -a /etc/apache2/sites-available/default
@@ -31,4 +31,17 @@ if [ "$DB" == "mysqli" ]
 then
     mysql -e "DROP DATABASE IF EXISTS elkarte_test;" -uroot
     mysql -e "create database IF NOT EXISTS elkarte_test;" -uroot
+fi
+
+# Install or Update Composer
+composer -v > /dev/null 2>&1
+COMPOSER_IS_INSTALLED=$?
+
+if [ $COMPOSER_IS_INSTALLED -ne 0 ]
+then
+    echo "Installing Composer"
+    curl -sS https://getcomposer.org/installer | sudo php -- --install-dir=/usr/local/bin --filename=composer
+else
+    echo "Updating Composer"
+    composer self-update
 fi
