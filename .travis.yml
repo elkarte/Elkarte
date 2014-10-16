@@ -18,6 +18,7 @@ matrix:
 
 install:
     - chmod +x tests/travis-ci/setup-server.sh
+    - chmod +x tests/travis-ci/setup-selenium.sh
     - tests/travis-ci/setup-server.sh $DB $TRAVIS_PHP_VERSION
 
 before_script:
