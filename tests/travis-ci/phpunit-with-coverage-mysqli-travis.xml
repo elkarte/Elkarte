@@ -11,7 +11,10 @@
          verbose="true"
          bootstrap="/var/www/tests/travis-ci/bootstrap.php">
   <testsuites>
-      <testsuite name="ElkArte Tests">
+      <testsuite name="ElkArte Web Tests">
+          <directory suffix="Web.php">/var/www/tests</directory>
+      </testsuite>
+      <testsuite name="ElkArte Unit Tests">
           <directory>/var/www/tests</directory>
       </testsuite>
   </testsuites>
@@ -29,4 +32,11 @@
           </exclude>
       </whitelist>
   </filter>
+  <php>
+      <const name="DB_TYPE" value="MySQL"/>
+      <const name="PHPUNIT_SELENIUM" value="TRUE"/>
+      <const name="PHPUNIT_TESTSUITE_EXTENSION_SELENIUM_HOST" value="127.0.0.1"/>
+      <const name="PHPUNIT_TESTSUITE_EXTENSION_SELENIUM_BROWSER" value="*firefox"/>
+      <const name="PHPUNIT_TESTSUITE_EXTENSION_SELENIUM2_BROWSER" value="firefox"/>
+  </php>
 </phpunit>
