@@ -22,6 +22,10 @@ global $scripturl, $db_passwd;
 global $boarddir, $sourcedir;
 global $ssi_db_user, $ssi_db_passwd;
 
+// If we are running functional tests as well
+if (defined('PHPUNIT_SELENIUM'))
+	PHPUnit_Extensions_SeleniumTestCase::shareSession(true);
+
 // Lets get the easyones out of the way
 DEFINE('ELK', 1);
 DEFINE('CACHE_STALE', '?R11');
@@ -53,7 +57,7 @@ spl_autoload_register('elk_autoloader');
 
 require_once(SUBSDIR . '/Cache.subs.php');
 
-// Used by the test, could load language if more are needed
+// Used by the test, add others as needed or ...
 $context = array();
 $context['forum_name'] = $mbname;
 $context['forum_name_html_safe'] = $context['forum_name'];
@@ -66,3 +70,6 @@ elk_seed_generator();
 loadSession();
 loadUserSettings();
 loadPermissions();
+
+// Basic language is good to have for functional tests
+loadLanguage('index+Errors');
