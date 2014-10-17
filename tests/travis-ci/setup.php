@@ -1,10 +1,28 @@
 <?php
+
+/**
+ * Installs the ElkArte db on the travis test server
+ *
+ * @name      ElkArte Forum
+ * @copyright ElkArte Forum contributors
+ * @license   BSD http://opensource.org/licenses/BSD-3-Clause
+ *
+ * @version 1.0
+ *
+ */
+
+// Lots of needs
 require_once(BOARDDIR . '/sources/database/Db.php');
 require_once(BOARDDIR . '/sources/database/Db-abstract.class.php');
 require_once(BOARDDIR . '/sources/Errors.php');
+require_once(BOARDDIR . '/sources/Subs.php');
+require_once(BOARDDIR . '/sources/subs/Cache.class.php');
 require_once(BOARDDIR . '/sources/subs/Cache.subs.php');
 require_once(BOARDDIR . '/sources/database/Database.subs.php');
 
+/**
+ * Used to install ElkArte SQL files to a database scheme
+ */
 Class Elk_Testing_Setup
 {
 	protected $_db;
@@ -17,6 +35,9 @@ Class Elk_Testing_Setup
 	protected $_passwd;
 	protected $_prefix;
 
+	/**
+	 * Runs the querys defined in the install files to the db
+	 */
 	public function run_queries()
 	{
 		global $modSettings;
@@ -41,23 +62,31 @@ Class Elk_Testing_Setup
 				$query = '';
 			}
 			else
-			{
 				$query .= "\n" . $part;
-			}
 		}
 	}
 
+	/**
+	 * Loads the querys from the supplied sql install file
+	 *
+	 * @param string $file
+	 */
 	public function load_queries($file)
 	{
 		$this->_queries = str_replace('{$db_prefix}', $this->_db_prefix, file_get_contents($file));
 		$this->_queries_parts = explode("\n", $this->_queries);
-		$this->fix_query_string();
+		$this->_fix_query_string();
 	}
 
-	public function fix_query_string()
+	/**
+	 * Does the variable replacements in the query strings {X} => data
+	 */
+	private function _fix_query_string()
 	{
 		foreach ($this->_queries_parts as $line)
+		{
 			if (!empty($line[0]) && $line[0] != '#')
+			{
 				$this->_clean_queries_parts[] = str_replace(
 					array(
 						'{$current_time}', '{$sched_task_offset}',
@@ -69,11 +98,17 @@ Class Elk_Testing_Setup
 					),
 					$line
 				);
+			}
+		}
 	}
 
+	/**
+	 * Updates the settings.php file to work with a given install / db scheme
+	 */
 	public function prepare_settings()
 	{
 		$file = file_get_contents(BOARDDIR . '/Settings.php');
+
 		$file = str_replace(array(
 			'$boardurl = \'http://127.0.0.1/elkarte\';',
 			'$db_type = \'mysql\';',
@@ -91,13 +126,26 @@ Class Elk_Testing_Setup
 			'$db_passwd = \'' . $this->_db_passwd . '\';',
 		),
 		$file);
+
 		if (strpos($file, 'if (file_exist') !== false)
 			$file = substr($file, 0, strpos($file, 'if (file_exist'));
-		$file .= "\n" . '$test_enabled = 1;';
 
 		file_put_contents(BOARDDIR . '/Settings.php', $file);
 	}
 
+	/**
+	 * Called after db is setup, calls functions to prepare for testing
+	 */
+	public function prepare()
+	{
+		$this->prepare_settings();
+		$this->update();
+		//$this->createTests();
+	}
+
+	/**
+	 * Adds a user, sets time, prepars the forum for phpunit tests
+	 */
 	public function update()
 	{
 		global $settings, $db_type;
@@ -110,9 +158,9 @@ Class Elk_Testing_Setup
 
 		define('SUBSDIR', BOARDDIR . '/sources/subs');
 
-		require(BOARDDIR . '/Settings.php');
-		require(BOARDDIR . '/sources/Subs.php');
-		require(BOARDDIR . '/sources/Load.php');
+		require_once(BOARDDIR . '/Settings.php');
+		require_once(BOARDDIR . '/sources/Subs.php');
+		require_once(BOARDDIR . '/sources/Load.php');
 		require_once(SUBSDIR . '/Util.class.php');
 
 		spl_autoload_register('elk_autoloader');
@@ -123,8 +171,8 @@ Class Elk_Testing_Setup
 		// Create a member
 		$db = database();
 
-		$request = $db->insert('',
-			'{db_prefix}members',
+		$db->insert('', '
+			{db_prefix}members',
 			array(
 				'member_name' => 'string-25', 'real_name' => 'string-25', 'passwd' => 'string', 'email_address' => 'string',
 				'id_group' => 'int', 'posts' => 'int', 'date_registered' => 'int', 'hide_email' => 'int',
@@ -148,7 +196,9 @@ Class Elk_Testing_Setup
 
 		$server_offset = @mktime(0, 0, 0, 1, 1, 1970);
 		$timezone_id = 'Etc/GMT' . ($server_offset > 0 ? '+' : '') . ($server_offset / 3600);
+
 		if (date_default_timezone_set($timezone_id))
+		{
 			$db->insert('',
 				$db_prefix . 'settings',
 				array(
@@ -159,13 +209,17 @@ Class Elk_Testing_Setup
 				),
 				array('variable')
 			);
+		}
 
 		require_once(SUBSDIR . '/Members.subs.php');
 		updateMemberStats();
+
 		require_once(SUBSDIR . '/Messages.subs.php');
 		updateMessageStats();
+
 		require_once(SUBSDIR . '/Topic.subs.php');
 		updateTopicStats();
+
 		loadLanguage('Install');
 		updateSubjectStats(1, htmlspecialchars($txt['default_topic_subject']));
 	}
@@ -192,7 +246,7 @@ Class Elk_Testing_Setup
 			if (in_array(basename($test), $excluded))
 				continue;
 
-			$result = file_put_contents(BOARDDIR . '/tests/run_' . md5($test) . '.php' , '<?php
+			file_put_contents(BOARDDIR . '/tests/run_' . md5($test) . '.php', '<?php
 
 $testName = \'' . $test . '\';
 
@@ -210,16 +264,6 @@ class Test_' . $key . ' extends TestSuite
 	}
 }');
 		}
-	}
-
-	public function prepare()
-	{
-		$this->load_queries(BOARDDIR . '/install/install_1-0.sql');
-
-		$this->run_queries();
-		$this->prepare_settings();
-		$this->update();
-		$this->createTests();
 	}
 
 	private function _testsInDir($dir)

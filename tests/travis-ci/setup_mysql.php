@@ -1,4 +1,17 @@
 <?php
+
+/**
+ * Handles the mysql db actions
+ * Called by setup-elkarte.sh as part of the install: directive in .travis.yml
+ *
+ * @name      ElkArte Forum
+ * @copyright ElkArte Forum contributors
+ * @license   BSD http://opensource.org/licenses/BSD-3-Clause
+ *
+ * @version 1.0
+ *
+ */
+
 define('TESTDIR', dirname(__FILE__));
 define('BOARDDIR', dirname(__FILE__) . '/../..');
 define('ELK', 1);
@@ -8,14 +21,18 @@ require_once(BOARDDIR . '/sources/database/Db-mysql.class.php');
 require_once(BOARDDIR . '/sources/database/DbTable.class.php');
 require_once(BOARDDIR . '/sources/database/DbTable-mysql.php');
 
+/**
+ * Sets up a Database_MySQL object
+ */
 class DbTable_MySQL_Install extends DbTable_MySQL
 {
 	public static $_tbl_inst = null;
+
 	/**
-	* DbTable_MySQL::construct
-	*
-	* @param object $db - A Database_MySQL object
-	*/
+	 * DbTable_MySQL::construct
+	 *
+	 * @param object $db - A Database_MySQL object
+	 */
 	private function __construct($db)
 	{
 		global $db_prefix;
@@ -34,11 +51,11 @@ class DbTable_MySQL_Install extends DbTable_MySQL
 	}
 
 	/**
-	* Static method that allows to retrieve or create an instance of this class.
-	*
-	* @param object $db - A Database_MySQL object
-	* @return object - A DbTable_MySQL object
-	*/
+	 * Static method that allows to retrieve or create an instance of this class.
+	 *
+	 * @param object $db - A Database_MySQL object
+	 * @return object - A DbTable_MySQL object
+	 */
 	public static function db_table($db)
 	{
 		if (is_null(self::$_tbl_inst))
@@ -47,6 +64,9 @@ class DbTable_MySQL_Install extends DbTable_MySQL
 	}
 }
 
+/**
+ * Extend Elk_Testing_Setup with MySql values
+ */
 Class Elk_Testing_mysql extends Elk_Testing_Setup
 {
 	public function init()
@@ -56,14 +76,19 @@ Class Elk_Testing_mysql extends Elk_Testing_Setup
 		$this->_boardurl = 'http://127.0.0.1';
 		$this->_db_server = 'localhost';
 		$this->_db_type = 'mysql';
-		$db_name = $this->_db_name = 'hello_world_test';
+		$db_name = $this->_db_name = 'elkarte_test';
 		$this->_db_user = 'root';
 		$this->_db_passwd = '';
 		$db_prefix = $this->_db_prefix = 'elkarte_';
-		$connection = Database_MySQL::initiate($this->_db_server, $this->_db_name, $this->_db_user, $this->_db_passwd, $this->_db_prefix);
+		Database_MySQL::initiate($this->_db_server, $this->_db_name, $this->_db_user, $this->_db_passwd, $this->_db_prefix);
 		$this->_db = Database_MySQL::db();
 		$this->_db_table = DbTable_MySQL_Install::db_table($this->_db);
 
+		// Load the postgre install sql queryies
+		$this->load_queries(BOARDDIR . '/install/install_1-0.sql');
+		$this->run_queries();
+
+		// Prepare Settings.php, add a member, set time
 		$this->prepare();
 	}
 }

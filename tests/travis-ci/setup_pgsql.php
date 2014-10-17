@@ -1,4 +1,18 @@
 <?php
+
+/**
+ * Handles the postgresql actions for travis-ci
+ *
+ * Called by setup-elkarte.sh as part of the install: directive in .travis.yml
+ *
+ * @name      ElkArte Forum
+ * @copyright ElkArte Forum contributors
+ * @license   BSD http://opensource.org/licenses/BSD-3-Clause
+ *
+ * @version 1.0
+ *
+ */
+
 define('TESTDIR', dirname(__FILE__));
 define('BOARDDIR', dirname(__FILE__) . '/../..');
 define('ELK', 1);
@@ -8,14 +22,18 @@ require_once(BOARDDIR . '/sources/database/Db-postgresql.class.php');
 require_once(BOARDDIR . '/sources/database/DbTable.class.php');
 require_once(BOARDDIR . '/sources/database/DbTable-postgresql.php');
 
+/**
+ * Sets up a Database_PostgreSQL object
+ */
 class DbTable_PostgreSQL_Install extends DbTable_PostgreSQL
 {
 	public static $_tbl_inst = null;
+
 	/**
-	* DbTable_MySQL::construct
-	*
-	* @param object $db - A Database_MySQL object
-	*/
+	 * DbTable_PostgreSQL::construct
+	 *
+	 * @param object $db - A Database_PostgreSQL object
+	 */
 	private function __construct($db)
 	{
 		global $db_prefix;
@@ -34,11 +52,11 @@ class DbTable_PostgreSQL_Install extends DbTable_PostgreSQL
 	}
 
 	/**
-	* Static method that allows to retrieve or create an instance of this class.
-	*
-	* @param object $db - A Database_MySQL object
-	* @return object - A DbTable_MySQL object
-	*/
+	 * Static method that allows to retrieve or create an instance of this class.
+	 *
+	 * @param object $db - A Database_PostgreSQL object
+	 * @return object - A DbTable_PostgreSQL object
+	 */
 	public static function db_table($db)
 	{
 		if (is_null(self::$_tbl_inst))
@@ -47,6 +65,9 @@ class DbTable_PostgreSQL_Install extends DbTable_PostgreSQL
 	}
 }
 
+/**
+ * Extend Elk_Testing_Setup with PostgreSQL values
+ */
 Class Elk_Testing_psql extends Elk_Testing_Setup
 {
 	public function init()
@@ -56,17 +77,23 @@ Class Elk_Testing_psql extends Elk_Testing_Setup
 		$this->_boardurl = 'http://127.0.0.1';
 		$this->_db_server = 'localhost';
 		$this->_db_type = 'postgresql';
-		$db_name = $this->_db_name = 'hello_world_test';
+		$db_name = $this->_db_name = 'elkarte_test';
 		$this->_db_user = 'postgres';
 		$this->_db_passwd = '';
 		$db_prefix = $this->_db_prefix = 'elkarte_';
-		$connection = Database_PostgreSQL::initiate($this->_db_server, $this->_db_name, $this->_db_user, $this->_db_passwd, $this->_db_prefix);
+		Database_PostgreSQL::initiate($this->_db_server, $this->_db_name, $this->_db_user, $this->_db_passwd, $this->_db_prefix);
 		$this->_db = Database_PostgreSQL::db();
 		$this->_db_table = DbTable_PostgreSQL_Install::db_table($this->_db);
 
+		// Load the postgre install sql queryies
 		$this->load_queries(BOARDDIR . '/install/install_1-0_postgresql.sql');
 		$this->run_queries();
 
+		// Now the rest normally
+		$this->load_queries(BOARDDIR . '/install/install_1-0.sql');
+		$this->run_queries();
+
+		// Prepare Settings.php, add a member, set time
 		$this->prepare();
 	}
 }

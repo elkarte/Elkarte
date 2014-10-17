@@ -1,32 +1,34 @@
 language: php
-php:
-  - "5.5"
-  - "5.4"
-  - "5.3"
 
-env:
-  - DB=mysql
-  - DB=postgres
+matrix:
+  include:
+    - php: 5.3
+      env: DB=mysqli
+    - php: 5.4
+      env: DB=mysqli
+    - php: 5.5
+      env: DB=mysqli
+    - php: 5.3
+      env: DB=postgres
+    - php: 5.4
+      env: DB=postgres
+    - php: 5.5
+      env: DB=postgres
+  fast_finish: true
 
-script: php /var/www/tests/travis-ci_testing.php
+install:
+    - chmod +x tests/travis-ci/setup-server.sh
+    - chmod +x tests/travis-ci/setup-selenium.sh
+    - tests/travis-ci/setup-server.sh $DB $TRAVIS_PHP_VERSION
 
 before_script:
-  - mv ./Settings.sample.php ./Settings.php
-  - mv ./Settings_bak.sample.php ./Settings_bak.php
-  - mv ./db_last_error.sample.txt ./db_last_error.txt
-  # Packages installation
-  - sudo apt-get update
-  - sudo apt-get install -y --force-yes apache2 libapache2-mod-php5 php5-mysql php5-sqlite php5-pgsql
-  # Apache webserver configuration
-  - echo "Alias /behat $(pwd)/web" | sudo tee -a /etc/apache2/sites-available/default
-  - sudo mv * /var/www/
-  - sudo a2enmod rewrite
-  - sudo /etc/init.d/apache2 restart
-  - if [[ "$DB" == "postgres" ]]; then psql -c "DROP DATABASE IF EXISTS hello_world_test;" -U postgres; fi
-  - if [[ "$DB" == "postgres" ]]; then psql -c "create database hello_world_test;" -U postgres; fi
-  - if [[ "$DB" == "mysql" ]]; then mysql -e "DROP DATABASE IF EXISTS hello_world_test;" -uroot; fi
-  - if [[ "$DB" == "mysql" ]]; then mysql -e "create database IF NOT EXISTS hello_world_test;" -uroot; fi
-  - if [[ "$DB" == "mysql" ]]; then sudo php /var/www/tests/travis-ci/setup_mysql.php; fi
-  - if [[ "$DB" == "postgres" ]]; then sudo php /var/www/tests/travis-ci/setup_pgsql.php; fi
-  # Remove the install dir
-  - sudo rm -rf /var/www/install
+    - chmod +x tests/travis-ci/setup-elkarte.sh
+    - tests/travis-ci/setup-elkarte.sh $DB $TRAVIS_PHP_VERSION
+
+script: 
+    - chmod +x /var/www/tests/travis-ci/setup-script.sh
+    - /var/www/tests/travis-ci/setup-script.sh $DB $TRAVIS_PHP_VERSION
+
+after_script:
+    - chmod +x /var/www/tests/travis-ci/setup-results.sh
+    - /var/www/tests/travis-ci/setup-results.sh $DB $TRAVIS_PHP_VERSION
