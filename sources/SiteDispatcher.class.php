@@ -57,6 +57,12 @@ class Site_Dispatcher
 	protected $_pre_dispatch_func;
 
 	/**
+	 * List of addons for a certain action
+	 * @var string[]
+	 */
+	protected $_addons = array();
+
+	/**
 	 * Create an instance and initialize it.
 	 * This does all the work to figure out which file and function/method needs called.
 	 */
@@ -234,7 +240,7 @@ class Site_Dispatcher
 		}
 		// Fall back to naming patterns.
 		// addons can use any of them, and it should Just Work (tm).
-		elseif (preg_match('~^[a-zA-Z_\\-]+$~', $_GET['action']))
+		elseif (preg_match('~^[a-zA-Z_\\-]+\d*$~', $_GET['action']))
 		{
 			// action=drafts => Drafts.php
 			// sa=save, sa=load, or sa=savepm => action_save(), action_load()
