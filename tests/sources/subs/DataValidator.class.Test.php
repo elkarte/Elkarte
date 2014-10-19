@@ -31,6 +31,8 @@ class TestDataValidator extends PHPUnit_Framework_TestCase
 			'min_len_csv'   => 'min_length[4]',
 			'min_len_array' => 'min_length[4]',
 			'limits'        => 'limits[0,10]',
+			'valid_color'	=> 'valid_color',
+			'php_syntax'	=> 'php_syntax'
 		);
 
 		$this->invalid_data = array(
@@ -55,6 +57,8 @@ class TestDataValidator extends PHPUnit_Framework_TestCase
 			'min_len_csv'   => '1234,12345, 123',
 			'min_len_array' => array('1234', '12345', '123'),
 			'limits'        => 11,
+			'valid_color'	=> '#fffgff',
+			'php_syntax'	=> 'if ($a == 1) {$b = true'
 		);
 
 		$this->valid_data = array(
@@ -79,6 +83,8 @@ class TestDataValidator extends PHPUnit_Framework_TestCase
 			'min_len_csv'   => '1234,12345,123456',
 			'min_len_array' => array('1234', '12345', '123456'),
 			'limits'        => 9,
+			'valid_color'	=> '#ffffff',
+			'php_syntax'	=> 'if ($a == 1) {$b = true;}'
 		);
 	}
 
@@ -97,6 +103,7 @@ class TestDataValidator extends PHPUnit_Framework_TestCase
 		foreach ($this->invalid_data as $key => $value)
 		{
 			$test = $validation->validation_errors($key);
+			$test[0] = isset($test[0]) ? $test[0] : $key;
 			$value = is_array($value) ? implode(' | ', $value) : $value;
 			$this->assertNotNull($validation->validation_errors($key), 'Test: ' . $test[0] . ' passed data: ' . $value . ' but it should have failed');
 		}
@@ -110,6 +117,7 @@ class TestDataValidator extends PHPUnit_Framework_TestCase
 		foreach ($this->valid_data as $key => $value)
 		{
 			$test = $validation->validation_errors($key);
+			$test[0] = isset($test[0]) ? $test[0] : $key;
 			$value = is_array($value) ? implode(' | ', $value) : $value;
 			$this->assertNull($validation->validation_errors($key), 'Test: ' . $test[0] . ' failed data: ' . $value . ' but it should have passed');
 		}
