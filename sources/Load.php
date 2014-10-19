@@ -2812,7 +2812,7 @@ function loadDatabase()
 		$db_prefix = $db->fix_prefix($db_prefix, $db_name);
 
 	// Case sensitive database? Let's define a constant.
-	if ($db->db_case_sensitive())
+	if ($db->db_case_sensitive() && !defined('DB_CASE_SENSITIVE'))
 		DEFINE('DB_CASE_SENSITIVE', '1');
 }
 
