@@ -12,7 +12,7 @@ class TestUtilclass extends PHPUnit_Framework_TestCase
 	public function setUp()
 	{
 		// Create a utf-8 string with 4 byte characters
-		$this->string = html_entity_decode('Some 4 byte characters&#x2070e;&#x20731;&#x20779; for elkarte testing', ENT_HTML5, 'UTF-8');
+		$this->string = html_entity_decode('Some 4 byte characters&#x2070e;&#x20731;&#x20779; for elkarte testing', ENT_COMPAT, 'UTF-8');
 	}
 
 	/**
@@ -107,7 +107,7 @@ class TestUtilclass extends PHPUnit_Framework_TestCase
 	 */
 	public function test_shorten_text()
 	{
-		$actual = html_entity_decode('Some 4 byte characters&#x2070e;&#x20731;&#x20779;', ENT_HTML5, 'UTF-8');
+		$actual = html_entity_decode('Some 4 byte characters&#x2070e;&#x20731;&#x20779;', ENT_COMPAT, 'UTF-8');
 
 		$this->assertEquals(Util::shorten_text($this->string, 26, true, ''), $actual);
 	}
