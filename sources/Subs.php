@@ -4176,7 +4176,6 @@ function elk_autoloader($class)
 
 	switch ($givenname)
 	{
-<<<<<<< HEAD
 		case 'VerificationControls':
 			$file_name = SUBSDIR . '/VerificationControls.class.php';
 			break;
