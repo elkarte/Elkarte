@@ -133,17 +133,20 @@ class Template_Layers extends Priority
 		// If we are dealing with an error page (fatal_error) then we have to prune all the unwanted layers
 		if ($this->_is_error)
 		{
-			$dummy = $this->_sorted_layers;
+			$dummy = $all_layers;
 			$all_layers = array();
+
 			foreach ($dummy as $key => $val)
+			{
 				if (in_array($key, $this->_error_safe_layers))
 					$all_layers[$key] = $val;
+			}
 		}
 
 		asort($all_layers);
-		$this->_sorted_layers = array_keys($all_layers);
+		$this->_sorted_entities = array_keys($all_layers);
 
-		return $this->_sorted_layers;
+		return $this->_sorted_entities;
 	}
 
 	/**
@@ -153,10 +156,10 @@ class Template_Layers extends Priority
 	 */
 	public function reverseLayers()
 	{
-		if ($this->_sorted_layers === null)
+		if ($this->_sorted_entities === null)
 			$this->prepareContext();
 
-		return array_reverse($this->_sorted_layers);
+		return array_reverse($this->_sorted_entities);
 	}
 
 	/**
