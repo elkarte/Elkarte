@@ -26,22 +26,27 @@ global $ssi_db_user, $ssi_db_passwd;
 if (defined('PHPUNIT_SELENIUM'))
 	PHPUnit_Extensions_SeleniumTestCase::shareSession(true);
 
-// Lets get the easyones out of the way
-DEFINE('ELK', 1);
-DEFINE('CACHE_STALE', '?R11');
+// Done to allow the option to runInSeparateProcess for phpunit
+if (!defined('ELK'))
+{
+	DEFINE('ELK', 1);
+	DEFINE('CACHE_STALE', '?R11');
 
-// Get the forum's settings for database and file paths.
-require_once('/var/www/Settings.php');
+	// Get the forum's settings for database and file paths.
+	require_once('/var/www/Settings.php');
 
-// Set our site "variable" constants
-DEFINE('BOARDDIR', $boarddir);
-DEFINE('CACHEDIR', $cachedir);
-DEFINE('EXTDIR', $extdir);
-DEFINE('LANGUAGEDIR', $boarddir . '/themes/default/languages');
-DEFINE('SOURCEDIR', $sourcedir);
-DEFINE('ADMINDIR', $sourcedir . '/admin');
-DEFINE('CONTROLLERDIR', $sourcedir . '/controllers');
-DEFINE('SUBSDIR', $sourcedir . '/subs');
+	// Set our site "variable" constants
+	DEFINE('BOARDDIR', $boarddir);
+	DEFINE('CACHEDIR', $cachedir);
+	DEFINE('EXTDIR', $extdir);
+	DEFINE('LANGUAGEDIR', $boarddir . '/themes/default/languages');
+	DEFINE('SOURCEDIR', $sourcedir);
+	DEFINE('ADMINDIR', $sourcedir . '/admin');
+	DEFINE('CONTROLLERDIR', $sourcedir . '/controllers');
+	DEFINE('SUBSDIR', $sourcedir . '/subs');
+}
+else
+	require_once('/var/www/Settings.php');
 
 // A few files we cannot live without and will not be autoload
 require_once(SOURCEDIR . '/QueryString.php');

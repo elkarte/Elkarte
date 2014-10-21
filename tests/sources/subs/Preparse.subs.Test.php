@@ -28,6 +28,22 @@ class PrepaseBBC extends PHPUnit_Framework_TestCase
 				'[font=\'something1\', something2]text[/font]',
 				'[font=something1]text[/font]',
 			),
+			array(
+				'something[quote][/quote]',
+				'something',
+			),
+			array(
+				'something[code]without a closing tag',
+				'something[code]without a closing tag[/code]',
+			),
+			array(
+				'some open list[list][li]one[/list]',
+				'some open list[list][li]one[/li][/list]',
+			),
+			array(
+				'some list[code][list][li]one[/list][/code]',
+				'some list[code][list][li]one[/list][/code]',
+			),
 		);
 	}
 

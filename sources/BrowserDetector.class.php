@@ -63,7 +63,7 @@ class Browser_Detector
 	 *
 	 * @var string
 	 */
-	private $_ua = null;
+	protected $_ua = null;
 
 	/**
 	 * The main method of this class, you know the one that does the job: detect the thing.
@@ -86,7 +86,7 @@ class Browser_Detector
 
 		// Saves us many many calls
 		$req = request();
-		$this->_ua = $req->user_agent();
+		$this->_ua = empty($this->_ua) ? $req->user_agent() : $this->_ua;
 
 		// One at a time, one at a time, and in this order too
 		if ($this->isOpera())

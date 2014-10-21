@@ -79,6 +79,21 @@ Class Elk_Testing_Setup
 	}
 
 	/**
+	 * Clear the DB for a new install
+	 *
+	 * @param string $file
+	 */
+	public function clear_tables()
+	{
+		// Get all the tables.
+		$tables = $this->_db->db_list_tables($this->_db_name, $this->_db_prefix . '%');
+
+		// Bu-bye
+		foreach ($tables as $table)
+			$this->_db_table->db_drop_table($table);
+	}
+
+	/**
 	 * Does the variable replacements in the query strings {X} => data
 	 */
 	private function _fix_query_string()
@@ -157,19 +172,25 @@ Class Elk_Testing_Setup
 		global $sourcedir, $boarddir;
 
 		define('SUBSDIR', BOARDDIR . '/sources/subs');
+		define('EXTDIR', BOARDDIR . '/sources/ext');
 
 		require_once(BOARDDIR . '/Settings.php');
 		require_once(BOARDDIR . '/sources/Subs.php');
 		require_once(BOARDDIR . '/sources/Load.php');
 		require_once(SUBSDIR . '/Util.class.php');
+		require_once(SUBSDIR . '/Auth.subs.php');
 
 		spl_autoload_register('elk_autoloader');
 
 		$settings['theme_dir'] = $settings['default_theme_dir'] = BOARDDIR . '/Themes/default';
 		$settings['theme_url'] = $settings['default_theme_url'] = $boardurl . '/themes/default';
 
-		// Create a member
+		// Create an admin member
 		$db = database();
+
+		// Get a security hash for this combination
+		$password = stripslashes('test_admin_pwd');
+		$passwd = validateLoginPassword($password, '', 'test_admin', true);
 
 		$db->insert('', '
 			{db_prefix}members',
@@ -183,7 +204,7 @@ Class Elk_Testing_Setup
 				'additional_groups' => 'string', 'ignore_boards' => 'string', 'openid_uri' => 'string',
 			),
 			array(
-				'test_admin', 'test_admin', sha1(strtolower(stripslashes('test_admin')) . stripslashes('test_admin_pwd')), 'email@testadmin.tld',
+				'test_admin', 'test_admin', $passwd, 'email@testadmin.tld',
 				1, 0, time(), 0,
 				substr(md5(mt_rand()), 0, 4), '', '', '',
 				'123.123.123.123', '123.123.123.123', '', '',

@@ -65,6 +65,11 @@ class TestBBC extends PHPUnit_Framework_TestCase
 				'[list type=decimal][li]test[/li][/list]',
 				'<ul class="bbc_list" style="list-style-type: decimal;"><li>test</li></ul>',
 			),
+			array(
+				'Footnote',
+				'footnote[footnote]footnote[/footnote]',
+				'footnote<sup class="bbc_footnotes"><a class="target" href="#fn1_0" id="ref1_0">[1]</a></sup><div class="bbc_footnotes"><div class="target" id="fn1_0"><sup>1&nbsp;</sup>footnote<a class="footnote_return" href="#ref1_0">&crarr;</a></div></div>',
+			),
 		);
 
 		// These are bbc that will not be converted to an html tag

@@ -103,7 +103,7 @@ $ssi_on_error_method = false;
 if ($maintenance == 2 && (!isset($ssi_maintenance_off) || $ssi_maintenance_off !== true))
 	die($mmessage);
 
-if ($db_show_debug === true)
+if ($db_show_debug === true && isset($rusage_start))
 {
 	Debug::get()->rusage('start', $rusage_start);
 }
