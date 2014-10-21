@@ -14,9 +14,11 @@
 if (!defined('ELK'))
 	die('No access...');
 
-abstract class Mention_Message_Abstract implements Mention_Type_Interface
+abstract class Mention_Message_Abstract extends Event_Abstract implements Mention_Type_Interface
 {
-	public abstract function view(&$mentions, $type);
+	protected $_type = '';
+
+	public abstract function view(&$dependencies);
 
 	protected function _replaceMsg($row)
 	{

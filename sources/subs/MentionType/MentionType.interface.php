@@ -16,5 +16,5 @@ if (!defined('ELK'))
 
 interface Mention_Type_Interface
 {
-	public function view(&$mentions, $type);
+	public function view(&$dependencies);
 }

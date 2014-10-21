@@ -51,16 +51,16 @@ abstract class Action_Controller
 		$this->_events->setSource($this);
 	}
 
-	public function provideDependencies($deps, &$dependecies)
+	public function provideDependencies($deps, &$dependencies)
 	{
 		foreach ($deps as $dep)
 		{
 			if (property_exists($this, $dep))
-				$dependecies[$dep] = &$this->$dep;
+				$dependencies[$dep] = &$this->$dep;
 			elseif (property_exists($this, '_' . $dep))
-				$dependecies[$dep] = &$this->{'_' . $dep};
+				$dependencies[$dep] = &$this->{'_' . $dep};
 		}
 
-		return $dependecies;
+		return $dependencies;
 	}
 }

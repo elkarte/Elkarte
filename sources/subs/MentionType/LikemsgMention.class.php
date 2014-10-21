@@ -16,4 +16,5 @@ if (!defined('ELK'))
 
 class Likemsg_Mention extends Mention_BoardAccess_Abstract
 {
+	protected $_type = 'likemsg';
 }

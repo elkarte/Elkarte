@@ -16,4 +16,5 @@ if (!defined('ELK'))
 
 class Mentionmem_Mention extends Mention_BoardAccess_Abstract
 {
+	protected $_type = 'mentionmem';
 }

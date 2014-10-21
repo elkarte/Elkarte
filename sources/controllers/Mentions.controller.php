@@ -117,8 +117,6 @@ class Mentions_Controller extends Action_Controller
 
 		spl_autoload_register(array($this, 'autoload'));
 
-		$this->_known_mentions = $this->_findMentionTypes();
-
 		$this->_known_status = array(
 			'new' => 0,
 			'read' => 1,
@@ -146,16 +144,8 @@ class Mentions_Controller extends Action_Controller
 		$types = array();
 		foreach ($mentions as $mention)
 		{
-			$class = ucfirst($mention) . '_Mention';
-			$types[$mention] = array(
-				'instance' => new $class(),
-				// @deprecated since 1.1 - kept for backward compatibility
-				'enabled' => true,
-			);
-			$types[$mention]['callback'] = array($types[$mention]['instance'], 'view');
+			$types[] = $mention;
 		}
-
-		call_integration_hook('integrate_add_mention', array(&$this->_known_mentions));
 
 		return $types;
 	}
@@ -179,6 +169,8 @@ class Mentions_Controller extends Action_Controller
 			'id_member_from' => isset($_REQUEST['from']) ? $_REQUEST['from'] : null,
 			'log_time' => isset($_REQUEST['log_time']) ? $_REQUEST['log_time'] : null,
 		);
+
+		$this->_known_mentions = $this->_findMentionTypes();
 	}
 
 	/**
@@ -326,17 +318,13 @@ class Mentions_Controller extends Action_Controller
 			),
 		);
 
-		foreach ($this->_known_mentions as $key => $mention)
+		foreach ($this->_known_mentions as $mention)
 		{
-			if (!empty($mention['enabled']))
-			{
-				$list_options['list_menu']['links'][] = array(
-					'href' => $scripturl . '?action=mentions;type=' . $key . (!empty($this->_all) ? ';all' : ''),
-					'is_selected' => $this->_type === $key,
-					'label' => $txt['mentions_type_' . $key]
-				);
-				$this->_callbacks[$key] = $mention['callback'];
-			}
+			$list_options['list_menu']['links'][] = array(
+				'href' => $scripturl . '?action=mentions;type=' . $mention . (!empty($this->_all) ? ';all' : ''),
+				'is_selected' => $this->_type === $mention,
+				'label' => $txt['mentions_type_' . $mention]
+			);
 		}
 
 		createList($list_options);
@@ -382,21 +370,14 @@ class Mentions_Controller extends Action_Controller
 		$mentions = array();
 		$round = 0;
 
+		$this->_registerEvents($type);
+
 		while ($round < 2)
 		{
 			$possible_mentions = getUserMentions($start, $limit, $sort, $all, $type);
 			$count_possible = count($possible_mentions);
 
-			// With only one type is enough to just call that (if it exists)
-			if (!empty($type) && isset($this->_callbacks[$type]))
-				call_user_func_array($this->_callbacks[$type], array(&$possible_mentions, $type));
-			// Otherwise we have to test all we know...
-			else
-			{
-				// @todo find a way to call only what is actually needed
-				foreach ($this->_callbacks as $type => $callback)
-					call_user_func_array($callback, array(&$possible_mentions, $type));
-			}
+			$this->_events->trigger('view_mentions', array($type, &$possible_mentions));
 
 			foreach ($possible_mentions as $mention)
 			{
@@ -421,87 +402,26 @@ class Mentions_Controller extends Action_Controller
 		return $mentions;
 	}
 
-	/**
-	 * Callback used to prepare the mention message for mentions, likes, removed likes and buddies
-	 *
-	 * @param mixed[] $mentions : Mentions retrieved from the database by getUserMentions
-	 * @param string $type : the type of the mention
-	 *
-	 * @deprecated since 1.1 - kept for backward compatibility
-	 * @todo due to this compatibility is not possible to "properly" handle
-	 *       mentions. Properly in this context means rewrite list_loadMentions
-	 *       so that it doesn't call each and every class for all the mentions
-	 *       As soon as we can drop this compat horror (I wrote it, so I'm allowed
-	 *       to say so :P) the code can become quite more nice.
-	 *  @proposal: let's drop this compatibility <strong>NOW</strong>
-	 */
-	public function prepareMentionMessage(&$mentions, $type)
+	protected function _registerEvents($type)
 	{
-		global $txt, $scripturl, $context, $modSettings, $user_info;
-
-		$boards = array();
-		$removed = false;
-
-		foreach ($mentions as $key => $row)
+		if (!empty($type))
 		{
-			// To ensure it is not done twice
-			if ($row['mention_type'] != $type)
-				continue;
-
-			// These things are associated to messages and require permission checks
-			if (in_array($row['mention_type'], array('mentionmem', 'likemsg', 'rlikemsg')))
-				$boards[$key] = $row['id_board'];
-
-			$mentions[$key]['message'] = str_replace(
-				array(
-					'{msg_link}',
-					'{msg_url}',
-					'{subject}',
-				),
-				array(
-					'<a href="' . $scripturl . '?topic=' . $row['id_topic'] . '.msg' . $row['id_msg'] . ';mentionread;mark=read;' . $context['session_var'] . '=' . $context['session_id'] . ';item=' . $row['id_mention'] . '#msg' . $row['id_msg'] . '">' . $row['subject'] . '</a>',
-					$scripturl . '?topic=' . $row['id_topic'] . '.msg' . $row['id_msg'] . ';mentionread;' . $context['session_var'] . '=' . $context['session_id'] . 'item=' . $row['id_mention'] . '#msg' . $row['id_msg'],
-					$row['subject'],
-				),
-				$txt['mention_' . $row['mention_type']]);
+			$to_register = array($type);
+		}
+		else
+		{
+			$to_register = $this->_known_mentions;
 		}
 
-		// Do the permissions checks and replace inappropriate messages
-		if (!empty($boards))
+		foreach ($to_register as $mention)
 		{
-			require_once(SUBSDIR . '/Boards.subs.php');
-
-			$accessibleBoards = accessibleBoards($boards);
-
-			foreach ($boards as $key => $board)
-			{
-				// You can't see the board where this mention is, so we drop it from the results
-				if (!in_array($board, $accessibleBoards))
-				{
-					$removed = true;
-					unset($mentions[$key]);
-				}
-			}
+			$class = ucfirst($mention) . '_Mention';
+			$this->_events->register('view_mentions', array('view_mentions', array($class, 'view', 0)));
 		}
-
-		// If some of these mentions are no longer visible, we need to do some maintenance
-		if ($removed)
-		{
-			if (!empty($modSettings['user_access_mentions']))
-				$modSettings['user_access_mentions'] = @unserialize($modSettings['user_access_mentions']);
-			else
-				$modSettings['user_access_mentions'] = array();
-
-			$modSettings['user_access_mentions'][$user_info['id']] = 0;
-			updateSettings(array('user_access_mentions' => serialize($modSettings['user_access_mentions'])));
-			scheduleTaskImmediate('user_access_mentions');
-		}
-
-		return $removed;
 	}
 
 	/**
-	 * We will we will notify you
+	 * We will, we will notify you
 	 */
 	public function action_add()
 	{
@@ -652,7 +572,7 @@ class Mentions_Controller extends Action_Controller
 	{
 		$this->_all = isset($_REQUEST['all']);
 		$this->_sort = isset($_REQUEST['sort']) && in_array($_REQUEST['sort'], $this->_known_sorting) ? $_REQUEST['sort'] : $this->_default_sort;
-		$this->_type = isset($_REQUEST['type']) && isset($this->_known_mentions[$_REQUEST['type']]) ? $_REQUEST['type'] : '';
+		$this->_type = isset($_REQUEST['type']) && in_array($_REQUEST['type'], $this->_known_mentions) ? $_REQUEST['type'] : '';
 		$this->_page = isset($_REQUEST['start']) ? $_REQUEST['start'] : '';
 
 		$this->_url_param = ($this->_all ? ';all' : '') . (!empty($this->_type) ? ';type=' . $this->_type : '') . (isset($_REQUEST['start']) ? ';start=' . $_REQUEST['start'] : '');
@@ -692,7 +612,7 @@ class Mentions_Controller extends Action_Controller
 			'msg' => 'intval',
 		);
 		$validation = array(
-			'type' => 'required|contains[' . implode(',', array_keys($this->_known_mentions)) . ']',
+			'type' => 'required|contains[' . implode(',', $this->_known_mentions) . ']',
 			'uid' => 'isarray',
 		);
 

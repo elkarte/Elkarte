@@ -16,8 +16,12 @@ if (!defined('ELK'))
 
 class Buddy_Mention extends Mention_Message_Abstract
 {
-	public function view(&$mentions, $type)
+	protected $_type = 'buddy';
+
+	public function view(&$dependencies)
 	{
+		$mentions = &$dependencies[1];
+		$type = &$dependencies[0];
 		foreach ($mentions as $key => $row)
 		{
 			// To ensure it is not done twice
