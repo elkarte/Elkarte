@@ -4227,22 +4227,12 @@ function elk_autoloader($class)
 					$file_name = SUBSDIR . '/Subscriptions-' . implode('_', $name) . '.class.php';
 					break;
 				case 'Interface':
-					$file_name = $givenname . '.interface.php';
-					if (!file_exists(SUBSDIR . '/' . $file_name))
-					{
-						$dir = SUBSDIR . '/' . $givenname;
-
-						if (file_exists($dir . '/' . $file_name))
-							$file_name = $dir . '/' . $file_name;
-						// Not knowing what it is, better leave it empty
-						else
-							$file_name = '';
-					}
-					else
-						$file_name = SUBSDIR . '/' . $file_name;
-					break;
 				case 'Abstract':
-					$file_name = $givenname . 'Abstract.class.php';
+					if ($surname == 'Interface')
+						$file_name = $givenname . '.interface.php';
+					else
+						$file_name = $givenname . 'Abstract.class.php';
+
 					if (!file_exists(SUBSDIR . '/' . $file_name))
 					{
 						$dir = SUBSDIR . '/' . $givenname;
