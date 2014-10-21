@@ -385,20 +385,17 @@ class Mentions_Controller extends Action_Controller
 		while ($round < 2)
 		{
 			$possible_mentions = getUserMentions($start, $limit, $sort, $all, $type);
+			$count_possible = count($possible_mentions);
 
 			// With only one type is enough to just call that (if it exists)
 			if (!empty($type) && isset($this->_callbacks[$type]))
-				$removed = call_user_func_array($this->_callbacks[$type], array(&$possible_mentions, $type));
+				call_user_func_array($this->_callbacks[$type], array(&$possible_mentions, $type));
 			// Otherwise we have to test all we know...
 			else
 			{
-			global $ema;
-			$ema = true;
-				$removed = false;
 				// @todo find a way to call only what is actually needed
 				foreach ($this->_callbacks as $type => $callback)
-					$removed = call_user_func_array($callback, array(&$possible_mentions, $type)) || $removed;
-			$ema = false;
+					call_user_func_array($callback, array(&$possible_mentions, $type));
 			}
 
 			foreach ($possible_mentions as $mention)
@@ -411,7 +408,7 @@ class Mentions_Controller extends Action_Controller
 			$round++;
 
 			// If nothing has been removed OR there are not enough
-			if (!$removed || count($mentions) == $limit || ($totalMentions - $start < $limit))
+			if (count($mentions) != $count_possible || count($mentions) == $limit || ($totalMentions - $start < $limit))
 				break;
 
 			// Let's start a bit further into the list
