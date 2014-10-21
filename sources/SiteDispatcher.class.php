@@ -57,12 +57,6 @@ class Site_Dispatcher
 	protected $_pre_dispatch_func;
 
 	/**
-	 * List of addons for a certain action
-	 * @var string[]
-	 */
-	protected $_addons = array();
-
-	/**
 	 * Create an instance and initialize it.
 	 * This does all the work to figure out which file and function/method needs called.
 	 */
@@ -302,10 +296,6 @@ class Site_Dispatcher
 
 			$controller = new $this->_controller_name();
 
-			// Pre-dispatch (load templates and stuff)
-			if (method_exists($controller, 'pre_dispatch'))
-				$controller->pre_dispatch();
-
 			// 3, 2, ... and go
 			if ($this->_validateMethod($controller))
 			{
@@ -328,8 +318,13 @@ class Site_Dispatcher
 			}
 
 			$this->_loadAddons($hook);
-			$event_manager = new Event_Manager($hook, $this->_addons);
+			$event_manager = new Event_Manager($hook);
+			$event_manager->registerAddons('Addon_' . ucfirst($hook));
 			$controller->setEventManager($event_manager);
+
+			// Pre-dispatch (load templates and stuff)
+			if (method_exists($controller, 'pre_dispatch'))
+				$controller->pre_dispatch();
 
 			call_integration_hook('integrate_action_' . $hook . '_before', array($this->_function_name));
 
@@ -366,16 +361,6 @@ class Site_Dispatcher
 	{
 		foreach (glob(BOARDDIR . '/packages/integration/*/*.integrate.php') as $integrate_file)
 			require_once($integrate_file);
-
-		$classes = get_declared_classes();
-		$prefix = 'Addon_' . ucfirst($hook);
-		$prefix_len = strlen($prefix);
-
-		foreach ($classes as $class)
-		{
-			if (substr($class, 0, $prefix_len) === $prefix)
-				$this->_addons[] = $class;
-		}
 	}
 
 	/**
