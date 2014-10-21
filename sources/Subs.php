@@ -4176,6 +4176,7 @@ function elk_autoloader($class)
 
 	switch ($givenname)
 	{
+<<<<<<< HEAD
 		case 'VerificationControls':
 			$file_name = SUBSDIR . '/VerificationControls.class.php';
 			break;
@@ -4237,6 +4238,8 @@ function elk_autoloader($class)
 						else
 							$file_name = '';
 					}
+					else
+						$file_name = SUBSDIR . '/' . $file_name;
 					break;
 				case 'Abstract':
 					$file_name = $givenname . 'Abstract.class.php';
@@ -4250,6 +4253,8 @@ function elk_autoloader($class)
 						else
 							$file_name = '';
 					}
+					else
+						$file_name = SUBSDIR . '/' . $file_name;
 					break;
 				// All the rest, like Browser_Detector, Template_Layers, Site_Dispatcher ...
 				default:
