@@ -17,10 +17,15 @@ class Event_Manager
 	protected $_inverted_classes = null;
 	protected $_hook = '';
 
-	public function __construct($hook, $events)
+	/**
+	 * List of classes already registered.
+	 * @var string[]
+	 */
+	protected $_classes = array();
+
+	public function __construct($hook)
 	{
 		$this->_hook = $hook;
-		$this->_register($events);
 	}
 
 	public function setSource($source)
@@ -39,9 +44,10 @@ class Event_Manager
 		foreach ($this->_registered_events[$position]->getEvents() as $event)
 		{
 			$class = $event[1];
-			$class_name = is_array($class) ? $class[0] : $class;
+			$class_name = $class[0];
+			$method_name = $class[1];
 			$deps = isset($event[2]) ? $event[2] : array();
-			unset($dependecies);
+			unset($dependencies);
 
 			if (!class_exists($class_name))
 				return;
@@ -53,41 +59,64 @@ class Event_Manager
 				foreach ($deps as $dep)
 				{
 					if (isset($args[$dep]))
-						$dependecies[$dep] = &$args[$dep];
+						$dependencies[$dep] = &$args[$dep];
 					else
 						$missing[] = $dep;
 				}
 
 				if (!empty($missing))
 				{
-					$this->_source->provideDependencies($missing, $dependecies);
+					$this->_source->provideDependencies($missing, $dependencies);
 				}
 			}
 			else
-				$dependecies = &$args;
+				$dependencies = &$args;
 
-			$instance = new $class_name($dependecies);
+			$instance = new $class_name();
+			$instance->setHook($this->_hook . '.' . $position);
 
 			// Do what we know we should do... if we find it.
-			if (method_exists($instance, 'execute'))
-				$instance->execute();
+			if (method_exists($instance, $method_name))
+				$instance->$method_name($dependencies);
 		}
 	}
 
-	protected function _register($classes)
+	public function register($position, $event, $priority = 0)
+	{
+		if (!isset($this->_registered_events[$position]))
+			$this->_registered_events[$position] = new Event(new Priority());
+
+		$this->_registered_events[$position]->add($event, $priority);
+	}
+
+	public function registerAddons($prefix)
+	{
+		$classes = get_declared_classes();
+		$prefix_len = strlen($prefix);
+		$to_register = array();
+
+		foreach ($classes as $class)
+		{
+			if (substr($class, 0, $prefix_len) === $prefix && !in_array($class, $this->_classes))
+			{
+				$to_register[] = $class;
+				$this->_classes[] = $class;
+			}
+		}
+		$this->_register_events($to_register);
+	}
+
+	protected function _register_events($classes)
 	{
 		foreach ($classes as $class)
 		{
-			$hooks = $class::hooks();
-			foreach ($hooks as $hook)
+			$events = $class::hooks();
+			foreach ($events as $event)
 			{
-				$priority = is_array($hook[1]) ? $hook[1][1] : null;
-				$position = $hook[0];
+				$priority = isset($event[1][2]);
+				$position = $event[0];
 
-				if (!isset($this->_registered_events[$position]))
-					$this->_registered_events[$position] = new Event(new Priority());
-
-				$this->_registered_events[$position]->add($hook, $priority);
+				$this->register($position, $event, $priority);
 			}
 		}
 	}
