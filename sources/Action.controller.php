@@ -22,7 +22,12 @@ if (!defined('ELK'))
  */
 abstract class Action_Controller
 {
+	/**
+	 * The event manager.
+	 * @var object
+	 */
 	protected $_events = null;
+
 	/**
 	 * Default action handler.
 	 *
@@ -45,12 +50,25 @@ abstract class Action_Controller
 		// such as load the template, load the language(s) file(s)
 	}
 
+	/**
+	 * Used to set the event manager for the current action.
+	 *
+	 * @param Event_Manager $event_manager - An Event_Manager object
+	 */
 	public function setEventManager($event_manager)
 	{
 		$this->_events = $event_manager;
 		$this->_events->setSource($this);
 	}
 
+	/**
+	 * An odd function that allows events to request dependencies from properties
+	 * of the class.
+	 *
+	 * @param string[] $deps - The name of the property the even wants
+	 * @param mixed[] $dependencies - the array that will be filled with the
+	 *                                references to the dependencies
+	 */
 	public function provideDependencies($deps, &$dependencies)
 	{
 		foreach ($deps as $dep)
@@ -62,5 +80,24 @@ abstract class Action_Controller
 		}
 
 		return $dependencies;
+	}
+
+	/**
+	 * Shortcut to register an array of names as events triggered at a certain
+	 * position in the code.
+	 *
+	 * @param string $name - Name of the trigger where the events will be executed.
+	 * @param string $method - The method that will be executed.
+	 * @param string $class_suffix - Any class that should be executed by this
+	 *                               trigger shall have this suffix.
+	 * @param string[] $to_register - An array of classes to register (without the suffix).
+	 */
+	protected function _registerEvent($name, $method, $class_suffix, $to_register)
+	{
+		foreach ($to_register as $mention)
+		{
+			$class = ucfirst($mention) . '_' . $class_suffix;
+			$this->_events->register($name, array($name, array($class, $method, 0)));
+		}
 	}
 }

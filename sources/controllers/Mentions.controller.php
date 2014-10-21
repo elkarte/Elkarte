@@ -413,11 +413,7 @@ class Mentions_Controller extends Action_Controller
 			$to_register = $this->_known_mentions;
 		}
 
-		foreach ($to_register as $mention)
-		{
-			$class = ucfirst($mention) . '_Mention';
-			$this->_events->register('view_mentions', array('view_mentions', array($class, 'view', 0)));
-		}
+		$this->_registerEvent('view_mentions', 'view', 'Mention', $to_register);
 	}
 
 	/**
