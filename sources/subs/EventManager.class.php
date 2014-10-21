@@ -73,7 +73,6 @@ class Event_Manager
 				$dependencies = &$args;
 
 			$instance = new $class_name();
-			$instance->setHook($this->_hook . '.' . $position);
 
 			// Do what we know we should do... if we find it.
 			if (method_exists($instance, $method_name))

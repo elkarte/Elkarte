@@ -14,7 +14,7 @@
 if (!defined('ELK'))
 	die('No access...');
 
-abstract class Mention_Message_Abstract extends Event_Abstract implements Mention_Type_Interface
+abstract class Mention_Message_Abstract implements Mention_Type_Interface
 {
 	protected $_type = '';
 
