@@ -179,10 +179,6 @@ source elkarte_source
 	sql_attr_timestamp	= poster_time
 	sql_attr_timestamp	= relevance
 	sql_attr_timestamp	= num_replies
-	sql_query_info		= \
-		SELECT * \
-		FROM ', $db_prefix, 'messages \
-		WHERE id_msg = $id
 }
 
 source elkarte_delta_source : elkarte_source
@@ -234,7 +230,6 @@ searchd
 	query_log				= ', $modSettings['sphinx_log_path'], '/query.log
 	read_timeout			= 5
 	max_children			= 30
-	compat_sphinxql_magics	= 0
 	pid_file				= ', $modSettings['sphinx_data_path'], '/searchd.pid
 	max_matches				= ', (empty($modSettings['sphinx_max_results']) ? 2000 : (int) $modSettings['sphinx_max_results']), '
 }
