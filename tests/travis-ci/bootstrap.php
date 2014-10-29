@@ -22,10 +22,6 @@ global $scripturl, $db_passwd;
 global $boarddir, $sourcedir;
 global $ssi_db_user, $ssi_db_passwd;
 
-// If we are running functional tests as well
-if (defined('PHPUNIT_SELENIUM'))
-	PHPUnit_Extensions_SeleniumTestCase::shareSession(true);
-
 // Done to allow the option to runInSeparateProcess for phpunit
 if (!defined('ELK'))
 {
@@ -78,3 +74,10 @@ loadPermissions();
 
 // Basic language is good to have for functional tests
 loadLanguage('index+Errors');
+
+// If we are running functional tests as well
+if (defined('PHPUNIT_SELENIUM'))
+{
+	require_once('/var/www/tests/sources/controllers/ElkArteWebTest.php');
+	PHPUnit_Extensions_Selenium2TestCase::shareSession(true);
+}
