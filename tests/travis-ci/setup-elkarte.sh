@@ -38,9 +38,12 @@ composer install --dev --no-interaction --prefer-source
 # Update the added phpunit files
 sudo chmod -R 777 /var/www/vendor
 
+# common php.ini updates (if any)
+phpenv config-add /var/www//tests/travis-ci/travis_php.ini
+
 # If this is a code coverage run, we need to enable selenium and capture its coverage results
 if [ "$SHORT_PHP" == "5.4" -a "$DB" == "mysqli" ]
 then
-	phpenv config-add /var/www//tests/travis-ci/travis_php.ini
+	phpenv config-add /var/www//tests/travis-ci/travis_webtest_php.ini
 	sudo ./tests/travis-ci/setup-selenium.sh
 fi
