@@ -32,3 +32,7 @@ script:
 after_script:
     - chmod +x /var/www/tests/travis-ci/setup-results.sh
     - /var/www/tests/travis-ci/setup-results.sh $DB $TRAVIS_PHP_VERSION
+
+after_failure:
+    - chmod +x /var/www/tests/travis-ci/setup-failure.sh
+    - /var/www/tests/travis-ci/setup-failure.sh $DB $TRAVIS_PHP_VERSION
