@@ -16,8 +16,10 @@ sudo apt-get update -qq
 sudo apt-get install -y -qq --force-yes apache2 libapache2-mod-php5 php5-mysql php5-pgsql php5-curl
 
 # Apache webserver configuration
-echo "Alias /behat $(pwd)/web" | sudo tee -a /etc/apache2/sites-available/default
+sudo sed -i -e "/var/www" /etc/apache2/sites-available/default
 sudo a2enmod rewrite
+sudo a2enmod actions
+sudo a2enmod headers
 sudo /etc/init.d/apache2 restart
 
 # Set a database for the install to use
