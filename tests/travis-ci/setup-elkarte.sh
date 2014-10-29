@@ -32,7 +32,7 @@ if [ "$DB" == "postgres" ]; then sudo php ./tests/travis-ci/setup_pgsql.php; fi
 sudo rm -rf /var/www/install
 
 # Load in phpunit and its dependencies via composer, note we have a lock file in place
-# compose is updated in setup-server.sh
+# composer is updated in setup-server.sh
 composer install --dev --no-interaction --prefer-source
 
 # Update the added phpunit files
@@ -41,8 +41,6 @@ sudo chmod -R 777 /var/www/vendor
 # If this is a code coverage run, we need to enable selenium and capture its coverage results
 if [ "$SHORT_PHP" == "5.4" -a "$DB" == "mysqli" ]
 then
+	phpenv config-add /var/www//tests/travis-ci/travis_php.ini
 	sudo ./tests/travis-ci/setup-selenium.sh
-	cp /var/www/vendor/phpunit/phpunit-selenium/PHPUnit/Extensions/SeleniumCommon/*.php /var/www
-    echo "auto_prepend_file=/var/www/prepend.php" >> ~/.phpenv/versions/$(phpenv version-name)/etc/conf.d/travis.ini
-    echo "auto_append_file=/var/www/append.php" >> ~/.phpenv/versions/$(phpenv version-name)/etc/conf.d/travis.ini
 fi
