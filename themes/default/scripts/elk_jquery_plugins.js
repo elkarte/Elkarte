@@ -127,16 +127,17 @@
     };
 })(jQuery);
 
+
 /**
- * jQuery Superfish Menu Plugin
- * Copyright (c) 2013 Joel Birch
+ * jQuery Superfish Menu Plugin - v1.7.4
+ * Copyright (c) 2014 Joel Birch
  *
  * Dual licensed under the MIT and GPL licenses:
  * http://www.opensource.org/licenses/mit-license.php
  * http://www.gnu.org/licenses/gpl.html
  */
 
-(function ($) {
+;(function ($, w) {
 	"use strict";
 
 	var methods = (function () {
@@ -158,7 +159,7 @@
 				var ios = /iPhone|iPad|iPod/i.test(navigator.userAgent);
 				if (ios) {
 					// iOS clicks only bubble as far as body children
-					$(window).load(function () {
+					$(w).load(function () {
 						$('body').children().on('click', $.noop);
 					});
 				}
@@ -167,6 +168,9 @@
 			wp7 = (function () {
 				var style = document.documentElement.style;
 				return ('behavior' in style && 'fill' in style && /iemobile/i.test(navigator.userAgent));
+			})(),
+			unprefixedPointerEvents = (function () {
+				return (!!w.PointerEvent);
 			})(),
 			toggleMenuClasses = function ($menu, o) {
 				var classes = c.menuClass;
@@ -186,9 +190,14 @@
 				$li.children('a').toggleClass(c.anchorClass);
 			},
 			toggleTouchAction = function ($menu) {
-				var touchAction = $menu.css('ms-touch-action');
+				var msTouchAction = $menu.css('ms-touch-action'),
+					touchAction = $menu.css('touch-action');
+				touchAction = touchAction || msTouchAction;
 				touchAction = (touchAction === 'pan-y') ? 'auto' : 'pan-y';
-				$menu.css('ms-touch-action', touchAction);
+				$menu.css({
+					'ms-touch-action': touchAction,
+					'touch-action': touchAction
+				});
 			},
 			applyHandlers = function ($menu, o) {
 				var targets = 'li:has(' + o.popUpSelector + ')';
@@ -201,6 +210,9 @@
 						.on('mouseleave.superfish', targets, out);
 				}
 				var touchevent = 'MSPointerDown.superfish';
+				if (unprefixedPointerEvents) {
+					touchevent = 'pointerdown.superfish';
+				}
 				if (!ios) {
 					touchevent += ' touchend.superfish';
 				}
@@ -218,7 +230,7 @@
 
 				if ($ul.length > 0 && $ul.is(':hidden')) {
 					$this.one('click.superfish', false);
-					if (e.type === 'MSPointerDown') {
+					if (e.type === 'MSPointerDown' || e.type === 'pointerdown') {
 						$this.trigger('focus');
 					} else {
 						$.proxy(over, $this.parent('li'))();
@@ -384,7 +396,7 @@
 		onDestroy: $.noop
 	};
 
-})(jQuery);
+})(jQuery, window);
 
 /*
  * Superclick v1.0.0 - jQuery menu widget
