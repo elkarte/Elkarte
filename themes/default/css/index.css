@@ -655,6 +655,11 @@ div.windowbg, div.windowbg2 {
 	font-family: "DejaVu Sans Mono", Monaco, Consolas, monospace;
 	resize: vertical;
 }
+.bbc_code .tab {
+	width: 4ex;
+	white-space:pre;
+	display: inline-block;
+}
 /* Stop em compounding when elements are nested. */
 /* @todo - Scrap old extra divs in Subs.php. */
 .bbc_standard_quote .bbc_alternate_quote, .bbc_alternate_quote .bbc_standard_quote,

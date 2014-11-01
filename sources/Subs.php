@@ -903,7 +903,7 @@ function parse_bbc($message, $smileys = true, $cache_id = '', $parse_tags = arra
 					global $context;
 
 					if (!isset($disabled[\'code\']))
-						$data = str_replace("\t", "<span style=\"white-space: pre;\">\t</span>", $data);
+						$data = str_replace("\t", "<span class=\"tab\">\t</span>", $data);
 					'),
 				'block_level' => true,
 			),
@@ -915,7 +915,7 @@ function parse_bbc($message, $smileys = true, $cache_id = '', $parse_tags = arra
 					global $context;
 
 					if (!isset($disabled[\'code\']))
-						$data[0] = str_replace("\t", "<span style=\"white-space: pre;\">\t</span>", $data[0]);
+						$data[0] = str_replace("\t", "<span class=\"tab\">\t</span>", $data[0]);
 					'),
 				'block_level' => true,
 			),
