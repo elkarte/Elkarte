@@ -69,7 +69,7 @@ function template_ask()
 	if (!empty($context['can_move']))
 		echo '
 						<p>
-							<label for="move_new_topic"><input type="checkbox" name="move_new_topic" id="move_new_topic" onclick="document.getElementById(\'board_list\').style.display = this.checked ? \'\' : \'none\';" class="input_check" /> ', $txt['splittopic_move'], '.</label>', template_select_boards('board_list'), '
+							<label for="move_new_topic"><input type="checkbox" name="move_new_topic" id="move_new_topic" onclick="document.getElementById(\'board_list\').style.display = this.checked ? \'\' : \'none\';" class="input_check" /> ', $txt['splittopic_move'], '.</label>', template_select_boards('move_to_board'), '
 							<script><!-- // --><![CDATA[
 								document.getElementById(\'board_list\').style.display = \'none\';
 							// ]]></script>
@@ -182,9 +182,6 @@ function template_select()
 				</div>
 				<div class="submitbutton clear_right">
 					<input type="hidden" name="topic" value="', $context['current_topic'], '" />
-					<input type="hidden" name="subname" value="', $context['new_subject'], '" />
-					<input type="hidden" name="move_to_board" value="', $context['move_to_board'], '" />
-					<input type="hidden" name="reason" value="', $context['reason'], '" />
 					<input type="submit" value="', $txt['split_topic'], '" class="button_submit" />
 					<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />
 				</div>
