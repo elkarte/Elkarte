@@ -84,7 +84,7 @@ Class Elk_Testing_mysql extends Elk_Testing_Setup
 		$this->_db = Database_MySQL::db();
 		$this->_db_table = DbTable_MySQL_Install::db_table($this->_db);
 
-		// Load the postgre install sql queryies
+		// Load the mysql install queryies
 		$this->load_queries(BOARDDIR . '/install/install_1-0.sql');
 		$this->run_queries();
 

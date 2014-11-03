@@ -10,18 +10,26 @@
          syntaxCheck="false"
          verbose="true"
          bootstrap="/var/www/tests/travis-ci/bootstrap.php">
+
   <testsuites>
       <testsuite name="ElkArte Web Tests">
           <directory suffix="Web.php">/var/www/tests</directory>
       </testsuite>
       <testsuite name="ElkArte Unit Tests">
-          <directory>/var/www/tests</directory>
+          <directory suffix="Test.php">/var/www/tests</directory>
       </testsuite>
   </testsuites>
 
+  <listeners>
+      <listener class="PHPUnit_Extensions_Selenium2TestCase_ScreenshotListener">
+          <arguments>
+              <string>/var/www/screenshots</string>
+          </arguments>
+      </listener>
+  </listeners>
+
   <logging>
       <log type="coverage-clover" target="/tmp/coverage.xml"/>
-      <log type="testdox-text" target="/tmp/testdox.txt"/>
   </logging>
 
   <filter>
@@ -32,11 +40,15 @@
           </exclude>
       </whitelist>
   </filter>
+
   <php>
       <const name="DB_TYPE" value="MySQL"/>
-      <const name="PHPUNIT_SELENIUM" value="TRUE"/>
+      <const name="PHPUNIT_SELENIUM" value="true"/>
       <const name="PHPUNIT_TESTSUITE_EXTENSION_SELENIUM_HOST" value="127.0.0.1"/>
+      <const name="PHPUNIT_TESTSUITE_EXTENSION_SELENIUM_PORT" value="4444"/>
       <const name="PHPUNIT_TESTSUITE_EXTENSION_SELENIUM_BROWSER" value="*firefox"/>
       <const name="PHPUNIT_TESTSUITE_EXTENSION_SELENIUM2_BROWSER" value="firefox"/>
+      <const name="PHPUNIT_TESTSUITE_EXTENSION_SELENIUM_TESTS_URL" value="http://127.0.0.1"/>
+      <const name="PHPUNIT_TESTSUITE" value="true"/>
   </php>
 </phpunit>

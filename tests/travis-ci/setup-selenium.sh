@@ -31,3 +31,6 @@ then
 else
     echo "Selenium Success"
 fi
+
+# Setup a directory to hold screenshots of failed tests
+sudo mkdir /var/www/screenshots && chmod 777 /var/www/screenshots

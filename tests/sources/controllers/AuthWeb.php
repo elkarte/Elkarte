@@ -7,27 +7,8 @@
  *
  * @backupGlobals disabled
  */
-class TestAuth extends PHPUnit_Extensions_Selenium2TestCase
+class TestAuth_Controller extends ElkArteWebTest
 {
-	/*
-	 * Needed to provide test coverage results to phpunit
-	 */
-	protected $coverageScriptUrl = 'http://127.0.0.1/phpunit_coverage.php';
-
-	/**
-	 * You must provide a setUp() method for Selenium2TestCase
-     *
-	 * This method is used to configure the Selenium Server session, url/browser
-	 */
-	public function setUp()
-	{
-		// Set the browser to be used by Selenium, it must be available on localhost
-		$this->setBrowser(PHPUNIT_TESTSUITE_EXTENSION_SELENIUM2_BROWSER);
-
-		// Set the base URL for the tests.
-        $this->setBrowserUrl(PHPUNIT_TESTSUITE_EXTENSION_SELENIUM_HOST);
-	}
-
 	public function testAlive()
 	{
 		$this->url('index.php');

@@ -7,13 +7,8 @@
  *
  * @backupGlobals disabled
  */
-class TestRegistration extends PHPUnit_Extensions_Selenium2TestCase
+class TestRegister_Controller extends ElkArteWebTest
 {
-	/*
-	 * Needed to provide test coverage results to phpunit
-	 */
-	protected $coverageScriptUrl = 'http://127.0.0.1/phpunit_coverage.php';
-
 	/*
 	 * Used by teardown();
 	 */
@@ -26,12 +21,6 @@ class TestRegistration extends PHPUnit_Extensions_Selenium2TestCase
 	public function setUp()
 	{
 		global $modSettings;
-
-		// Set the browser to be used by Selenium, it must be available on localhost
-		$this->setBrowser(PHPUNIT_TESTSUITE_EXTENSION_SELENIUM2_BROWSER);
-
-		// Set the base URL for the tests.
-        $this->setBrowserUrl(PHPUNIT_TESTSUITE_EXTENSION_SELENIUM_HOST);
 
 		// Let's remember about these
 		$this->registration_method = $modSettings['registration_method'];
