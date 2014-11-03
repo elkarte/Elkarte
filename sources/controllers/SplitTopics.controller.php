@@ -173,7 +173,11 @@ class SplitTopics_Controller extends Action_Controller
 
 		// Redirect to the selector if they chose selective.
 		if ($_POST['step2'] == 'selective')
+		{
+			if (!empty($_POST['at']))
+				$_SESSION['split_selection'][$topic][] = (int) $_POST['at'];
 			return $this->action_splitSelectTopics();
+		}
 
 		// We work with them topics.
 		require_once(SUBSDIR . '/Topic.subs.php');
