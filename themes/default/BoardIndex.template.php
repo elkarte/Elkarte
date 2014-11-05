@@ -12,7 +12,7 @@
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
  * @version 1.0
- * 
+ *
  */
 
 /**
@@ -240,6 +240,9 @@ function template_ic_show_events()
 {
 	global $context, $txt, $scripturl, $settings;
 
+	if (empty($context['calendar_holidays']) && empty($context['calendar_birthdays']) && empty($context['calendar_events']))
+		return;
+	
 	echo '
 			<li class="board_row">
 				<h3 class="ic_section_header">
