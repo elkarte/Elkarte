@@ -10,12 +10,12 @@
 
 
 /*!
- * hoverIntent r7 // 2013.03.11 // jQuery 1.9.1+
+ * hoverIntent v1.8.1 // 2014.08.11 // jQuery v1.9.1+
  * http://cherne.net/brian/resources/jquery.hoverIntent.html
  *
  * You may use hoverIntent under the terms of the MIT license. Basically that
  * means you are free to use hoverIntent as long as this header is left intact.
- * Copyright 2007, 2013 Brian Cherne
+ * Copyright 2007, 2014 Brian Cherne
  */
 
 /**
@@ -75,10 +75,10 @@
         var compare = function(ev,ob) {
             ob.hoverIntent_t = clearTimeout(ob.hoverIntent_t);
             // compare mouse positions to see if they've crossed the threshold
-            if ( ( Math.abs(pX-cX) + Math.abs(pY-cY) ) < cfg.sensitivity ) {
+            if ( Math.sqrt( (pX-cX)*(pX-cX) + (pY-cY)*(pY-cY) ) < cfg.sensitivity ) {
                 $(ob).off("mousemove.hoverIntent",track);
                 // set hoverIntent state to true (so mouseOut can be called)
-                ob.hoverIntent_s = 1;
+                ob.hoverIntent_s = true;
                 return cfg.over.apply(ob,[ev]);
             } else {
                 // set previous coordinates for next time
@@ -91,34 +91,34 @@
         // A private function for delaying the mouseOut function
         var delay = function(ev,ob) {
             ob.hoverIntent_t = clearTimeout(ob.hoverIntent_t);
-            ob.hoverIntent_s = 0;
+            ob.hoverIntent_s = false;
             return cfg.out.apply(ob,[ev]);
         };
 
         // A private function for handling mouse 'hovering'
         var handleHover = function(e) {
             // copy objects to be passed into t (required for event object to be passed in IE)
-            var ev = jQuery.extend({},e);
+            var ev = $.extend({},e);
             var ob = this;
 
             // cancel hoverIntent timer if it exists
             if (ob.hoverIntent_t) { ob.hoverIntent_t = clearTimeout(ob.hoverIntent_t); }
 
-            // if e.type == "mouseenter"
-            if (e.type == "mouseenter") {
+            // if e.type === "mouseenter"
+            if (e.type === "mouseenter") {
                 // set "previous" X and Y position based on initial entry point
                 pX = ev.pageX; pY = ev.pageY;
                 // update "current" X and Y position based on mousemove
                 $(ob).on("mousemove.hoverIntent",track);
                 // start polling interval (self-calling timeout) to compare mouse coordinates over time
-                if (ob.hoverIntent_s != 1) { ob.hoverIntent_t = setTimeout( function(){compare(ev,ob);} , cfg.interval );}
+                if (!ob.hoverIntent_s) { ob.hoverIntent_t = setTimeout( function(){compare(ev,ob);} , cfg.interval );}
 
                 // else e.type == "mouseleave"
             } else {
                 // unbind expensive mousemove event
                 $(ob).off("mousemove.hoverIntent",track);
                 // if hoverIntent state is true, then call the mouseOut function after the specified delay
-                if (ob.hoverIntent_s == 1) { ob.hoverIntent_t = setTimeout( function(){delay(ev,ob);} , cfg.timeout );}
+                if (ob.hoverIntent_s) { ob.hoverIntent_t = setTimeout( function(){delay(ev,ob);} , cfg.timeout );}
             }
         };
 
@@ -127,16 +127,17 @@
     };
 })(jQuery);
 
+
 /**
- * jQuery Superfish Menu Plugin
- * Copyright (c) 2013 Joel Birch
+ * jQuery Superfish Menu Plugin - v1.7.4
+ * Copyright (c) 2014 Joel Birch
  *
  * Dual licensed under the MIT and GPL licenses:
  * http://www.opensource.org/licenses/mit-license.php
  * http://www.gnu.org/licenses/gpl.html
  */
 
-(function ($) {
+;(function ($, w) {
 	"use strict";
 
 	var methods = (function () {
@@ -158,7 +159,7 @@
 				var ios = /iPhone|iPad|iPod/i.test(navigator.userAgent);
 				if (ios) {
 					// iOS clicks only bubble as far as body children
-					$(window).load(function () {
+					$(w).load(function () {
 						$('body').children().on('click', $.noop);
 					});
 				}
@@ -167,6 +168,9 @@
 			wp7 = (function () {
 				var style = document.documentElement.style;
 				return ('behavior' in style && 'fill' in style && /iemobile/i.test(navigator.userAgent));
+			})(),
+			unprefixedPointerEvents = (function () {
+				return (!!w.PointerEvent);
 			})(),
 			toggleMenuClasses = function ($menu, o) {
 				var classes = c.menuClass;
@@ -186,9 +190,14 @@
 				$li.children('a').toggleClass(c.anchorClass);
 			},
 			toggleTouchAction = function ($menu) {
-				var touchAction = $menu.css('ms-touch-action');
+				var msTouchAction = $menu.css('ms-touch-action'),
+					touchAction = $menu.css('touch-action');
+				touchAction = touchAction || msTouchAction;
 				touchAction = (touchAction === 'pan-y') ? 'auto' : 'pan-y';
-				$menu.css('ms-touch-action', touchAction);
+				$menu.css({
+					'ms-touch-action': touchAction,
+					'touch-action': touchAction
+				});
 			},
 			applyHandlers = function ($menu, o) {
 				var targets = 'li:has(' + o.popUpSelector + ')';
@@ -201,6 +210,9 @@
 						.on('mouseleave.superfish', targets, out);
 				}
 				var touchevent = 'MSPointerDown.superfish';
+				if (unprefixedPointerEvents) {
+					touchevent = 'pointerdown.superfish';
+				}
 				if (!ios) {
 					touchevent += ' touchend.superfish';
 				}
@@ -218,7 +230,7 @@
 
 				if ($ul.length > 0 && $ul.is(':hidden')) {
 					$this.one('click.superfish', false);
-					if (e.type === 'MSPointerDown') {
+					if (e.type === 'MSPointerDown' || e.type === 'pointerdown') {
 						$this.trigger('focus');
 					} else {
 						$.proxy(over, $this.parent('li'))();
@@ -384,7 +396,7 @@
 		onDestroy: $.noop
 	};
 
-})(jQuery);
+})(jQuery, window);
 
 /*
  * Superclick v1.0.0 - jQuery menu widget
