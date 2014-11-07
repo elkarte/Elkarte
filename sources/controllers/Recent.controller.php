@@ -999,6 +999,14 @@ class Recent_Controller extends Action_Controller
 				if (!isset($context['icon_sources'][$row['last_icon']]))
 					$context['icon_sources'][$row['last_icon']] = file_exists($settings['theme_dir'] . '/images/post/' . $row['last_icon'] . '.png') ? 'images_url' : 'default_images_url';
 			}
+			else
+			{
+				if (!isset($context['icon_sources'][$row['first_icon']]))
+					$context['icon_sources'][$row['first_icon']] = 'images_url';
+
+				if (!isset($context['icon_sources'][$row['last_icon']]))
+					$context['icon_sources'][$row['last_icon']] = 'images_url';
+			}
 
 			// And build the array.
 			$context['topics'][$row['id_topic']] = array(

@@ -384,6 +384,7 @@ class Profile_Controller extends Action_Controller
 						'function' => 'action_activateaccount',
 						'sc' => 'get',
 						'token' => 'profile-aa%u',
+						'token_type' => 'get',
 						'permission' => array(
 							'own' => array(),
 							'any' => array('moderate_forum'),
