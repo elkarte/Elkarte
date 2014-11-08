@@ -50,9 +50,9 @@ function preparsecode(&$message, $previewing = false)
 
 	// Trim off trailing quotes - these often happen by accident.
 	while (substr($message, -7) == '[quote]')
-		$message = substr($message, 0, -7);
+		$message = trim(substr($message, 0, -7));
 	while (substr($message, 0, 8) == '[/quote]')
-		$message = substr($message, 8);
+		$message = trim( substr($message, 8));
 
 	// Find all code blocks, work out whether we'd be parsing them, then ensure they are all closed.
 	$in_tag = false;
