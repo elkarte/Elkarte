@@ -399,6 +399,9 @@ class Email_Format
 		// The line is simply just their name
 		elseif (($this->_body_array[$i]['content'] === $this->_real_name) && !$this->_found_sig)
 			return true;
+		// check for universal sig dashes
+		elseif (!$this->_found_sig && preg_match('~^-- \n~m', $this->_body_array[$i]['content']))
+			return true;
 
 		return false;
 	}
