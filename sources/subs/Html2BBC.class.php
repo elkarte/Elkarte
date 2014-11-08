@@ -566,19 +566,22 @@ class Html_2_BBC
 		$face = $node->getAttribute('face');
 		$bbc = $this->_get_innerHTML($node);
 
+		// Font / size can't span across ceratian tags with our bbc parser, so fix them now
+		$blocks = preg_split('~(\[hr\]|\[quote\])~s', $bbc, 2, PREG_SPLIT_DELIM_CAPTURE);
+
 		if (!empty($size))
 		{
 			// All this for a depreciated tag attribute :P
 			$size = (int) $size;
 			$size = $this->sizes_equivalence[$size];
-			$bbc = '[size=' . $size . ']' . $bbc . '[/size]';
+			$blocks[0] = '[size=' . $size . ']' . $blocks[0] . '[/size]';
 		}
 		if (!empty($face))
-			$bbc  = '[font=' . strtolower($face). ']' . $bbc . '[/font]';
+			$blocks[0]  = '[font=' . strtolower($face). ']' . $blocks[0] . '[/font]';
 		if (!empty($color))
-			$bbc  = '[color=' . strtolower($color) . ']' . $bbc . '[/color]';
+			$blocks[0]  = '[color=' . strtolower($color) . ']' . $blocks[0] . '[/color]';
 
-		return $bbc;
+		return implode('', $blocks);
 	}
 
 	/**
