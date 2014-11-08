@@ -618,7 +618,8 @@ function pbe_load_text(&$html, $email_message, $pbe)
 		$text = $email_message->body;
 
 	// Convert to BBC and format it so it looks like a post
-	$text = pbe_Email_to_bbc($text, $html);
+	$text = pbe_email_to_bbc($text, $html);
+
 	$pbe['profile']['real_name'] = isset($pbe['profile']['real_name']) ? $pbe['profile']['real_name'] : '';
 	$text = pbe_fix_email_body($text, $html, $pbe['profile']['real_name'], (empty($email_message->_converted_utf8) ? $email_message->headers['x-parameters']['content-type']['charset'] : 'UTF-8'));
 
