@@ -18,16 +18,16 @@ class TestBBC extends UnitTestCase
 				'[font=something]text[/font]',
 			),
 			array(
-				'[font=something1, something2]text[/font]',
-				'[font=something1]text[/font]',
+				'[font=something, someother]text[/font]',
+				'[font=something]text[/font]',
 			),
 			array(
-				'[font=something1, \'something2\']text[/font]',
-				'[font=something1]text[/font]',
+				'[font=something, \'someother\']text[/font]',
+				'[font=something]text[/font]',
 			),
 			array(
-				'[font=\'something1\', something2]text[/font]',
-				'[font=something1]text[/font]',
+				'[font=\'something\', someother]text[/font]',
+				'[font=something]text[/font]',
 			),
 		);
 	}
