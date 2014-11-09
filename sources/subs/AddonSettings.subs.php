@@ -128,7 +128,7 @@ function list_integration_hooks_data($start, $per_page, $sort)
 							unset($temp_hooks[$hook][$function_o]);
 						}
 						// OOP a bit more difficult
-						elseif (!empty($class) && preg_match('~class\s*' . preg_quote(trim($class)) . '.*function\s*' . preg_quote(trim($function)) . '\s*\(~i', $fc) != 0)
+						elseif (!empty($class) && preg_match('~class\s*' . preg_quote(trim($class)) . '.*function\s*' . preg_quote(trim($function), '~') . '\s*\(~i', $fc) != 0)
 						{
 							$hook_status[$hook][$hook_name]['exists'] = true;
 							$hook_status[$hook][$hook_name]['in_file'] = $file['name'];
