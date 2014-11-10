@@ -139,7 +139,7 @@ function pbe_fix_email_body($body, $html = false, $real_name = '', $charset = 'U
 	$body = preg_replace('~(\n){3,}~si', "\n\n", $body);
 
 	// Check for blank quotes
-	$body = preg_replace('~(\[quote(.*)?\]\s*(\[br\]\s*)?\[/quote\])~s', '', $body);
+	$body = preg_replace('~(\[quote\s?([a-zA-Z0-9="]*)?\]\s*(\[br\]\s*)?\[/quote\])~s', '', $body);
 
 	// Reflow and Cleanup this message to something that looks normal-er
 	require_once(SUBSDIR . '/EmailFormat.class.php');
