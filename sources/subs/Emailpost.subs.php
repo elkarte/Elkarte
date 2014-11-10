@@ -516,7 +516,8 @@ function pbe_fix_client_quotes($body)
 				$body = pbe_str_replace_once('[quote author=' . trim($quote[1]) . "]\n\n" . '[/quote][quote]', '[quote author=' . trim($quote[1]) . "]\n", $body);
 
 				// And [quote author=][quote] .... [/quote] issues
-				$body = preg_replace('~\[quote author=' . trim($quote[1]) . '\][\n]{2,3}\[quote\]~', '[quote author=' . trim($quote[1]) . "]\n", $body);
+				$quote[1] = preg_quote($quote[1], '~');
+				$body = preg_replace('~\[quote author=' . trim($quote[1]) . '\][\n]{2,3}\[quote\]~u', '[quote author=' . trim($quote[1]) . "]\n", $body);
 			}
 		}
 	}
