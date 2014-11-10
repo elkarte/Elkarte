@@ -44,33 +44,25 @@ function pbe_email_to_bbc($text, $html)
 	// We are starting with HTML, our goal is to convert the best parts of it to BBC,
 	if ($html)
 	{
-		// Convert the email-HTML to BBC
+		// upfront pre-process $tags, mostly for the email template strings
 		$text = preg_replace(array_keys($tags), array_values($tags), $text);
+
+		// Run the parsers on the html
+		$text = pbe_run_parsers($text);
+
+		// Convert the email-HTML to BBC
 		require_once(SUBSDIR . '/Html2BBC.class.php');
 		$bbc_converter = new Html_2_BBC($text);
 		$text = $bbc_converter->get_bbc();
 
-		// Run our parsers, as defined in the ACP,  to remove the original "replied to" message
-		// before we do any more work.
-		$text_save = $text;
-		$result = pbe_parse_email_message($text);
-
-		// If we have no message left after running the parser, then they may have replied
-		// below and/or inside the original message. People like this should not be allowed
-		// to use the net, or be forced to read their own messed up emails
-		if (empty($result) || (trim(strip_tags(pbe_filter_email_message($text))) === ''))
-			$text = $text_save;
+		// Run our parsers again for the BBC
+		$text = pbe_run_parsers($text);
 	}
 	// Starting with plain text, possibly even markdown style ;)
 	else
 	{
 		// Run the parser to try and remove common mail clients "reply to" stuff
-		$text_save = $text;
-		$result = pbe_parse_email_message($text);
-
-		// Bottom feeder?  If we have no message they could have replied below the original message
-		if (empty($result) || trim(strip_tags(pbe_filter_email_message($text))) === '')
-			$text = $text_save;
+		$text = pbe_run_parsers($text);
 
 		// Set a gmail flag for special quote processing since its quotes are strange
 		$gmail = (bool) preg_match('~<div class="gmail_quote">~i', $text);
@@ -96,6 +88,28 @@ function pbe_email_to_bbc($text, $html)
 		'~(\n){3,}~si' => "\n\n",
 	);
 	$text = preg_replace(array_keys($emptytags), array_values($emptytags), $text);
+
+	return $text;
+}
+
+/**
+ * Runs the ACP email parsers
+ *	 - returns cut email or original if the cut would result in a blank message
+ *
+ * @param string $text
+ * @return string
+ */
+function pbe_run_parsers($text)
+{
+	// Run our parsers, as defined in the ACP,  to remove the original "replied to" message
+	$text_save = $text;
+	$result = pbe_parse_email_message($text);
+
+	// If we have no message left after running the parser, then they may have replied
+	// below and/or inside the original message. People like this should not be allowed
+	// to use the net, or be forced to read their own messed up emails
+	if (empty($result) || (trim(strip_tags(pbe_filter_email_message($text))) === ''))
+		$text = $text_save;
 
 	return $text;
 }
