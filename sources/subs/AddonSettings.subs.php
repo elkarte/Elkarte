@@ -161,7 +161,7 @@ function list_integration_hooks_data($start, $per_page, $sort)
 
 	foreach ($hooks as $hook => $functions)
 	{
-		$hooks_filters[] = '<option ' . ($context['current_filter'] == $hook ? 'selected="selected" ' : '') . ' value="">' . $hook . '</option>';
+		$hooks_filters[] = '<option ' . ($context['current_filter'] == $hook ? 'selected="selected" ' : '') . ' value="' . $hook . '">' . $hook . '</option>';
 		foreach ($functions as $function)
 		{
 			$function = str_replace(']', '', $function);
