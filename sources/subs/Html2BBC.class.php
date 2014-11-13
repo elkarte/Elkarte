@@ -165,6 +165,7 @@ class Html_2_BBC
 		$bbc = trim($bbc);
 		$bbc = preg_replace('~^(?:\[br\s*\/?\]\s*)+~', '', $bbc);
 		$bbc = preg_replace('~(?:\[br\s*\/?\]\s*)+$~', '', $bbc);
+		$bbc = preg_replace('~\s?(\[br\])\s?~', '[br]', $bbc);for ($quotes = 1; $quotes <= $this->_in_quote; $quotes++)
 		$bbc = str_replace('[hr][br]', '[hr]', $bbc);
 
 		// Remove any html tags we left behind ( outside of code tags that is )
@@ -918,9 +919,12 @@ class Html_2_BBC
 	 */
 	private function _recursive_decode($text)
 	{
-		$text = preg_replace('/&amp;([a-zA-Z0-9]{2,7});/', '&$1;', $text, -1, $count);
-		if ($count)
-			$this->_recursive_decode($text);
+		$limit = 100;
+		do
+		{
+			$text = preg_replace('/&amp;([a-zA-Z0-9]{2,7});/', '&$1;', $text, -1, $count);
+			$limit--;
+		} while (!empty($count) && $limit > 0);
 
 		return html_entity_decode(htmlspecialchars_decode($text, ENT_QUOTES), ENT_QUOTES, 'UTF-8');
 	}
