@@ -3225,7 +3225,7 @@ function fetch_web_data($url, $post_data = '', $keep_alive = false, $redirection
 		// Include the file containing the Curl_Fetch_Webdata class.
 		require_once(SOURCEDIR . '/CurlFetchWebdata.class.php');
 
-		$fetch_data = new Curl_Fetch_Webdata();
+		$fetch_data = new Curl_Fetch_Webdata(array(), $redirection_level);
 		$fetch_data->get_url_data($url, $post_data);
 
 		// no errors and a 200 result, then we have a good dataset, well we at least have data ;)
