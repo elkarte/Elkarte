@@ -144,16 +144,16 @@ function pbe_fix_email_body($body, $html = false, $real_name = '', $charset = 'U
 	$body = pbe_fix_client_quotes($body);
 
 	// Attempt to remove any exposed email addresses that are in the reply
-	$body = preg_replace('~>' . $txt['to'] . '(.*)@(.*?)\n~i', '', $body);
+	$body = preg_replace('~>' . $txt['to'] . '(.*)@(.*?)(?:\n|\[br\])~i', '', $body);
 	$body = preg_replace('~\b\s?[a-z0-9._%+-]+@[a-zZ0-9.-]+\.[a-z]{2,4}\b.?' . $txt['email_wrote'] . ':\s?~i', '', $body);
-	$body = preg_replace('~<(.*?)>(.*@.*?)\n~', '$1' . "\n", $body);
+	$body = preg_replace('~<(.*?)>(.*@.*?)(?:\n|\[br\])~', '$1' . "\n", $body);
 	$body = preg_replace('~' . $txt['email_quoting'] . ' (.*) (?:<|&lt;|\[email\]).*?@.*?(?:>|&gt;|\[/email\]):~i', '', $body);
 
 	// Remove multiple sequential blank lines, again
 	$body = preg_replace('~(\n){3,}~si', "\n\n", $body);
 
 	// Check for blank quotes
-	$body = preg_replace('~(\[quote\s?([a-zA-Z0-9="]*)?\]\s*(\[br\]\s*)?\[/quote\])~s', '', $body);
+	$body = preg_replace('~(\[quote\s?([a-zA-Z0-9"=]*)?\]\s*(\[br\]\s*)?\[/quote\])~s', '', $body);
 
 	// Reflow and Cleanup this message to something that looks normal-er
 	require_once(SUBSDIR . '/EmailFormat.class.php');
@@ -515,6 +515,10 @@ function pbe_fix_client_quotes($body)
 	$regex[] = '~---\s.*?"(.*)"\s+' . $txt['email_wrote'] . ':\s(\[quote\])?~i';
 	// --- in some@group.name John Smith wrote
 	$regex[] = '~---\s.*?\b[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,6}\b,\s(.*?)\s' . $txt['email_wrote'] . ':?~i';
+	// --- In some@g..., "someone"  wrote:
+	$regex[] = '~---\s.*?\b[A-Z0-9._%+-]+@[A-Z0-9][.]{3}, [A-Z0-9._%+\-"]+\b(.*?)\s' . $txt['email_wrote'] . ':?~iu';
+	// --- In [email]something[/email] "someone" wrote:
+	$regex[] = '~---\s.*?\[email=.*?/email\],?\s"?(.*?)"?\s' . $txt['email_wrote'] . ':?~iu';
 
 	// For each one see if we can do a nice [quote author=john smith]
 	foreach ($regex as $reg)
@@ -526,12 +530,13 @@ function pbe_fix_client_quotes($body)
 				$quote[1] = preg_replace('~\[email\].*\[\/email\]~', '', $quote[1]);
 				$body = pbe_str_replace_once($quote[0], "\n" . '[quote author=' . trim($quote[1]) . "]\n", $body);
 
-				// Look for [quote author=][/quote][quote] issues
-				$body = pbe_str_replace_once('[quote author=' . trim($quote[1]) . "]\n\n" . '[/quote][quote]', '[quote author=' . trim($quote[1]) . "]\n", $body);
-
-				// And [quote author=][quote] .... [/quote] issues
 				$quote[1] = preg_quote($quote[1], '~');
-				$body = preg_replace('~\[quote author=' . trim($quote[1]) . '\][\n]{2,3}\[quote\]~u', '[quote author=' . trim($quote[1]) . "]\n", $body);
+
+				// Look for [quote author=][/quote][quote] issues
+				$body = preg_replace('~\[quote author=' . trim($quote[1]) . '\] ?(?:\n|\[br\] ?){2,4} ?\[\/quote\] ?\[quote\]~u', '[quote author=' . trim($quote[1]) . "]\n", $body, 1);
+
+				// And [quote author=][quote] newlines [/quote] issues
+				$body = preg_replace('~\[quote author=' . trim($quote[1]) . '\] ?(?:\n|\[br\] ?){2,4}\[quote\]~u', '[quote author=' . trim($quote[1]) . "]\n", $body);
 			}
 		}
 	}
