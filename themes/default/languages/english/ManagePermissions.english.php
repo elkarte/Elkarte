@@ -156,12 +156,8 @@ $txt['permissionname_profile_remove'] = 'Delete account';
 $txt['permissionhelp_profile_remove'] = 'This permission allows a user to delete his account, when set to \'Own Account\'.';
 $txt['permissionname_profile_remove_own'] = 'Own account';
 $txt['permissionname_profile_remove_any'] = 'Any account';
-$txt['permissionname_profile_server_avatar'] = 'Select an avatar from the server';
-$txt['permissionhelp_profile_server_avatar'] = 'If enabled this will allow a user to select an avatar from the avatar collections installed on the server.';
-$txt['permissionname_profile_upload_avatar'] = 'Upload an avatar to the server';
-$txt['permissionhelp_profile_upload_avatar'] = 'This permission will allow a user to upload their personal avatar to the server.';
-$txt['permissionname_profile_remote_avatar'] = 'Choose a remotely stored avatar';
-$txt['permissionhelp_profile_remote_avatar'] = 'Because avatars might influence the page creation time negatively, it is possible to disallow certain member groups to use avatars from external servers.';
+$txt['permissionname_profile_set_avatar'] = 'Select an avatar';
+$txt['permissionhelp_profile_set_avatar'] = 'If enabled this will allow a user to select an avatar.';
 
 $txt['permissiongroup_general_board'] = 'General';
 $txt['permissionname_moderate_board'] = 'Moderate board';
