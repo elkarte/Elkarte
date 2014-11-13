@@ -297,7 +297,7 @@ class Email_Format
 
 		// Close any open quotes we may have left behind
 		for ($quotes = 1; $quotes <= $this->_in_quote; $quotes++)
-			$this->_body_array[$i + $quotes] = '[/quote]';
+			$this->_body_array[$i + $quotes]['content'] = '[/quote]';
 
 		// Join the message back together while dropping null index's
 		$temp = array();
