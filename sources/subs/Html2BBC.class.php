@@ -567,7 +567,7 @@ class Html_2_BBC
 		$face = $node->getAttribute('face');
 		$bbc = $this->_get_innerHTML($node);
 
-		// Font / size can't span across ceratian tags with our bbc parser, so fix them now
+		// Font / size can't span across certain tags with our bbc parser, so fix them now
 		$blocks = preg_split('~(\[hr\]|\[quote\])~s', $bbc, 2, PREG_SPLIT_DELIM_CAPTURE);
 
 		if (!empty($size))
@@ -695,7 +695,7 @@ class Html_2_BBC
 						// Only get the first font if there's a list
 						if (strpos($value, ',') !== false)
 							$value = substr($value, 0, strpos($value, ','));
-						$bbc .= '[font=' . strtr($value, array("'" => '')) . ']' . $bbc . '[/font]';
+						$bbc = '[font=' . strtr($value, array("'" => '')) . ']' . $bbc . '[/font]';
 						break;
 					case 'font-weight':
 						if ($value === 'bold' || $value === 'bolder' || $value == '700' || $value == '600')
@@ -719,6 +719,7 @@ class Html_2_BBC
 						break;
 					case 'color':
 							$bbc = '[color=' . $value . ']' . $bbc . '[/color]';
+						break;	
 					// These tags all mean the same thing as far as BBC is concerned
 					case 'float':
 					case 'text-align':
