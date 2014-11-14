@@ -150,7 +150,7 @@ function pbe_fix_email_body($body, $html = false, $real_name = '', $charset = 'U
 	$body = preg_replace('~' . $txt['email_quoting'] . ' (.*) (?:<|&lt;|\[email\]).*?@.*?(?:>|&gt;|\[/email\]):~i', '', $body);
 
 	// Remove multiple sequential blank lines, again
-	$body = preg_replace('~(\n){3,}~si', "\n\n", $body);
+	$body = preg_replace('~(\n\s?){3,}~si', "\n\n", $body);
 
 	// Check for blank quotes
 	$body = preg_replace('~(\[quote\s?([a-zA-Z0-9"=]*)?\]\s*(\[br\]\s*)?\[/quote\])~s', '', $body);
@@ -514,7 +514,7 @@ function pbe_fix_client_quotes($body)
 	// --- in some group name "John Smith" <johnsmith@tardis.com> wrote:
 	$regex[] = '~---\s.*?"(.*)"\s+' . $txt['email_wrote'] . ':\s(\[quote\])?~i';
 	// --- in some@group.name John Smith wrote
-	$regex[] = '~---\s.*?\b[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,6}\b,\s(.*?)\s' . $txt['email_wrote'] . ':?~i';
+	$regex[] = '~---\s.*?\b[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,6}\b,\s(.*?)\s' . $txt['email_wrote'] . ':?~iu';
 	// --- In some@g..., "someone"  wrote:
 	$regex[] = '~---\s.*?\b[A-Z0-9._%+-]+@[A-Z0-9][.]{3}, [A-Z0-9._%+\-"]+\b(.*?)\s' . $txt['email_wrote'] . ':?~iu';
 	// --- In [email]something[/email] "someone" wrote:
