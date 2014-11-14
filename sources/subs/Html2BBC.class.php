@@ -89,6 +89,7 @@ class Html_2_BBC
 	{
 		// Up front, remove whitespace between html tags
 		$html = preg_replace('/(?:(?<=\>)|(?<=\/\>))(\s+)(?=\<\/?)/', '', $html);
+		$html = strtr($html, array('[' => '&amp#91;', ']' => '&amp#93;'));
 		$this->strip_newlines = $strip;
 
 		// Using PHP built in functions ...
@@ -147,8 +148,6 @@ class Html_2_BBC
 		if ($this->_parser)
 		{
 			// Using the internal DOM methods we need to do a little extra work
-			$bbc = html_entity_decode(htmlspecialchars_decode($bbc, ENT_QUOTES));
-
 			if (preg_match('~<body>(.*)</body>~s', $bbc, $body))
 				$bbc = $body[1];
 		}
@@ -165,7 +164,7 @@ class Html_2_BBC
 		$bbc = trim($bbc);
 		$bbc = preg_replace('~^(?:\[br\s*\/?\]\s*)+~', '', $bbc);
 		$bbc = preg_replace('~(?:\[br\s*\/?\]\s*)+$~', '', $bbc);
-		$bbc = preg_replace('~\s?(\[br\])\s?~', '[br]', $bbc);for ($quotes = 1; $quotes <= $this->_in_quote; $quotes++)
+		$bbc = preg_replace('~\s?(\[br\])\s?~', '[br]', $bbc);
 		$bbc = str_replace('[hr][br]', '[hr]', $bbc);
 
 		// Remove any html tags we left behind ( outside of code tags that is )
@@ -719,7 +718,7 @@ class Html_2_BBC
 						break;
 					case 'color':
 							$bbc = '[color=' . $value . ']' . $bbc . '[/color]';
-						break;	
+						break;
 					// These tags all mean the same thing as far as BBC is concerned
 					case 'float':
 					case 'text-align':
@@ -814,7 +813,7 @@ class Html_2_BBC
 		if ($this->_parser)
 			return $node->nodeValue;
 		else
-			return html_entity_decode(htmlspecialchars_decode($node->innertext, ENT_QUOTES), ENT_QUOTES, 'UTF-8');
+			return $node->innertext;
 	}
 
 	/**
@@ -864,7 +863,7 @@ class Html_2_BBC
 		if ($this->_parser)
 		{
 			if (version_compare(PHP_VERSION, '5.3.6') >= 0)
-				return htmlspecialchars_decode($this->doc->saveHTML($node));
+				return $this->doc->saveHTML($node);
 			else
 			{
 				// @todo remove when 5.3.6 min
@@ -879,8 +878,7 @@ class Html_2_BBC
 					$html = $body[1];
 
 				// Clean it up
-				$html = rtrim($html, "\n");
-				return html_entity_decode(htmlspecialchars_decode($html, ENT_QUOTES), ENT_QUOTES, 'UTF-8');
+				return rtrim($html, "\n");
 			}
 		}
 		else
@@ -920,13 +918,13 @@ class Html_2_BBC
 	 */
 	private function _recursive_decode($text)
 	{
-		$limit = 100;
 		do
 		{
 			$text = preg_replace('/&amp;([a-zA-Z0-9]{2,7});/', '&$1;', $text, -1, $count);
-			$limit--;
-		} while (!empty($count) && $limit > 0);
+		} while (!empty($count));
 
-		return html_entity_decode(htmlspecialchars_decode($text, ENT_QUOTES), ENT_QUOTES, 'UTF-8');
+		$text = html_entity_decode(htmlspecialchars_decode($text, ENT_QUOTES), ENT_QUOTES, 'UTF-8');
+		
+		return str_replace(array('&amp#91;', '&amp#93;'), array('&amp;#91;', '&amp;#93;'), $text);
 	}
 }
