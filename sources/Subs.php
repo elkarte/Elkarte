@@ -4174,6 +4174,24 @@ function elk_autoloader($class)
 	$surname = array_pop($name);
 	$givenname = implode('', $name);
 
+	// Just some very special case...
+	// @todo special cases are bad.
+	if (isset($name[0]))
+	{
+		switch ($name[0])
+		{
+			case 'Mention':
+				$file_name = SUBSDIR . '/MentionType/' . $givenname . $surname . '.class.php';
+
+				if (!empty($file_name) && file_exists($file_name))
+				{
+					require_once($file_name);
+					return;
+				}
+				break;
+		}
+	}
+
 	switch ($givenname)
 	{
 		case 'VerificationControls':
@@ -4219,6 +4237,10 @@ function elk_autoloader($class)
 				// Some_Cache => SomeCache.class.php
 				case 'Cache':
 					$file_name = SUBSDIR . '/CacheMethod/' . $givenname . $surname . '.class.php';
+					break;
+				// Some_Mention => SomeMention.class.php
+				case 'Mention':
+					$file_name = SUBSDIR . '/MentionType/' . $givenname . $surname . '.class.php';
 					break;
 				// Some_Display => Subscriptions-Some.class.php
 				case 'Display':

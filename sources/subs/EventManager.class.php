@@ -33,7 +33,7 @@ class Event_Manager
 		$this->_source = $source;
 	}
 
-	public function trigger($position, $args)
+	public function trigger($position, $args = array())
 	{
 		if (!isset($this->_registered_events[$position]))
 			return;

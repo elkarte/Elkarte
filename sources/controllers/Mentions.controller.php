@@ -115,8 +115,6 @@ class Mentions_Controller extends Action_Controller
 	{
 		global $modSettings;
 
-		spl_autoload_register(array($this, 'autoload'));
-
 		$this->_known_status = array(
 			'new' => 0,
 			'read' => 1,
@@ -125,14 +123,6 @@ class Mentions_Controller extends Action_Controller
 		);
 
 		$this->_known_sorting = array('id_member_from', 'type', 'log_time');
-	}
-
-	public function autoload($class)
-	{
-		$file = SUBSDIR . '/MentionType/' . str_replace('_', '', $class) . '.class.php';
-
-		if (file_exists($file))
-			require_once($file);
 	}
 
 	protected function _findMentionTypes()
