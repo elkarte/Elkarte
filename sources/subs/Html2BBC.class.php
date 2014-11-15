@@ -83,12 +83,13 @@ class Html_2_BBC
 	 * Gets everything started using the built in or external parser
 	 *
 	 * @param string $html string of html to convert
-	 * @param boolean $strip flag to strip unconverted tags, true by default
+	 * @param boolean $strip flag to strip newlines, true by default
 	 */
 	public function __construct($html, $strip = true)
 	{
 		// Up front, remove whitespace between html tags
 		$html = preg_replace('/(?:(?<=\>)|(?<=\/\>))(\s+)(?=\<\/?)/', '', $html);
+		$html = strtr($html, array('[' => '&amp#91;', ']' => '&amp#93;'));
 		$this->strip_newlines = $strip;
 
 		// Using PHP built in functions ...
@@ -147,8 +148,6 @@ class Html_2_BBC
 		if ($this->_parser)
 		{
 			// Using the internal DOM methods we need to do a little extra work
-			$bbc = html_entity_decode(htmlspecialchars_decode($bbc, ENT_QUOTES));
-
 			if (preg_match('~<body>(.*)</body>~s', $bbc, $body))
 				$bbc = $body[1];
 		}
@@ -165,6 +164,7 @@ class Html_2_BBC
 		$bbc = trim($bbc);
 		$bbc = preg_replace('~^(?:\[br\s*\/?\]\s*)+~', '', $bbc);
 		$bbc = preg_replace('~(?:\[br\s*\/?\]\s*)+$~', '', $bbc);
+		$bbc = preg_replace('~\s?(\[br\])\s?~', '[br]', $bbc);
 		$bbc = str_replace('[hr][br]', '[hr]', $bbc);
 
 		// Remove any html tags we left behind ( outside of code tags that is )
@@ -566,19 +566,22 @@ class Html_2_BBC
 		$face = $node->getAttribute('face');
 		$bbc = $this->_get_innerHTML($node);
 
+		// Font / size can't span across certain tags with our bbc parser, so fix them now
+		$blocks = preg_split('~(\[hr\]|\[quote\])~s', $bbc, 2, PREG_SPLIT_DELIM_CAPTURE);
+
 		if (!empty($size))
 		{
 			// All this for a depreciated tag attribute :P
 			$size = (int) $size;
 			$size = $this->sizes_equivalence[$size];
-			$bbc = '[size=' . $size . ']' . $bbc . '[/size]';
+			$blocks[0] = '[size=' . $size . ']' . $blocks[0] . '[/size]';
 		}
 		if (!empty($face))
-			$bbc  = '[font=' . strtolower($face). ']' . $bbc . '[/font]';
+			$blocks[0]  = '[font=' . strtolower($face). ']' . $blocks[0] . '[/font]';
 		if (!empty($color))
-			$bbc  = '[color=' . strtolower($color) . ']' . $bbc . '[/color]';
+			$blocks[0]  = '[color=' . strtolower($color) . ']' . $blocks[0] . '[/color]';
 
-		return $bbc;
+		return implode('', $blocks);
 	}
 
 	/**
@@ -691,7 +694,7 @@ class Html_2_BBC
 						// Only get the first font if there's a list
 						if (strpos($value, ',') !== false)
 							$value = substr($value, 0, strpos($value, ','));
-						$bbc .= '[font=' . strtr($value, array("'" => '')) . ']' . $bbc . '[/font]';
+						$bbc = '[font=' . strtr($value, array("'" => '')) . ']' . $bbc . '[/font]';
 						break;
 					case 'font-weight':
 						if ($value === 'bold' || $value === 'bolder' || $value == '700' || $value == '600')
@@ -715,6 +718,7 @@ class Html_2_BBC
 						break;
 					case 'color':
 							$bbc = '[color=' . $value . ']' . $bbc . '[/color]';
+						break;
 					// These tags all mean the same thing as far as BBC is concerned
 					case 'float':
 					case 'text-align':
@@ -809,7 +813,7 @@ class Html_2_BBC
 		if ($this->_parser)
 			return $node->nodeValue;
 		else
-			return html_entity_decode(htmlspecialchars_decode($node->innertext, ENT_QUOTES), ENT_QUOTES, 'UTF-8');
+			return $node->innertext;
 	}
 
 	/**
@@ -859,7 +863,7 @@ class Html_2_BBC
 		if ($this->_parser)
 		{
 			if (version_compare(PHP_VERSION, '5.3.6') >= 0)
-				return htmlspecialchars_decode($this->doc->saveHTML($node));
+				return $this->doc->saveHTML($node);
 			else
 			{
 				// @todo remove when 5.3.6 min
@@ -874,8 +878,7 @@ class Html_2_BBC
 					$html = $body[1];
 
 				// Clean it up
-				$html = rtrim($html, "\n");
-				return html_entity_decode(htmlspecialchars_decode($html, ENT_QUOTES), ENT_QUOTES, 'UTF-8');
+				return rtrim($html, "\n");
 			}
 		}
 		else
@@ -915,10 +918,13 @@ class Html_2_BBC
 	 */
 	private function _recursive_decode($text)
 	{
-		$text = preg_replace('/&amp;([a-zA-Z0-9]{2,7});/', '&$1;', $text, -1, $count);
-		if ($count)
-			$this->_recursive_decode($text);
+		do
+		{
+			$text = preg_replace('/&amp;([a-zA-Z0-9]{2,7});/', '&$1;', $text, -1, $count);
+		} while (!empty($count));
 
-		return html_entity_decode(htmlspecialchars_decode($text, ENT_QUOTES), ENT_QUOTES, 'UTF-8');
+		$text = html_entity_decode(htmlspecialchars_decode($text, ENT_QUOTES), ENT_QUOTES, 'UTF-8');
+
+		return str_replace(array('&amp#91;', '&amp#93;'), array('&amp;#91;', '&amp;#93;'), $text);
 	}
 }

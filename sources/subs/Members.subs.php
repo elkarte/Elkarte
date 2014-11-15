@@ -620,7 +620,7 @@ function registerMember(&$regOptions, $error_context = 'register')
 		'passwd' => validateLoginPassword($regOptions['password'], '', $regOptions['username'], true),
 		'password_salt' => substr(md5(mt_rand()), 0, 4) ,
 		'posts' => 0,
-		'date_registered' => time(),
+		'date_registered' => !empty($regOptions['time']) ? $regOptions['time'] : time(),
 		'member_ip' => $regOptions['interface'] == 'admin' ? '127.0.0.1' : $regOptions['ip'],
 		'member_ip2' => $regOptions['interface'] == 'admin' ? '127.0.0.1' : $regOptions['ip2'],
 		'validation_code' => $validation_code,

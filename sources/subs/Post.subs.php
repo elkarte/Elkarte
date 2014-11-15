@@ -50,9 +50,9 @@ function preparsecode(&$message, $previewing = false)
 
 	// Trim off trailing quotes - these often happen by accident.
 	while (substr($message, -7) == '[quote]')
-		$message = substr($message, 0, -7);
+		$message = trim(substr($message, 0, -7));
 	while (substr($message, 0, 8) == '[/quote]')
-		$message = substr($message, 8);
+		$message = trim(substr($message, 8));
 
 	// Find all code blocks, work out whether we'd be parsing them, then ensure they are all closed.
 	$in_tag = false;
@@ -169,7 +169,7 @@ function preparsecode(&$message, $previewing = false)
 				// Images with no real url.
 				'~\[img\]https?://.{0,7}\[/img\]~' => '',
 				// Font tags with multiple fonts (copy&paste in the WYSIWYG by some browsers).
-				'~\[font=\\\'?(.*?)\\\'?(?=\,).*\](.*?(?:\[/font\]))~' => '[font=$1]$2',
+				'~\[font=\\\'?(.*?)\\\'?(?=\,[ \'\"A-Za-z]*\]).*?\](.*?(?:\[/font\]))~s'  => '[font=$1]$2'
 			);
 
 			// Fix up some use of tables without [tr]s, etc. (it has to be done more than once to catch it all.)
@@ -643,22 +643,35 @@ function createPost(&$msgOptions, &$topicOptions, &$posterOptions)
 	$new_topic = empty($topicOptions['id']);
 
 	$message_columns = array(
-		'id_board' => 'int', 'id_topic' => 'int', 'id_member' => 'int',
-		'subject' => 'string-255', 'body' => (!empty($modSettings['max_messageLength']) && $modSettings['max_messageLength'] > 65534 ? 'string-' . $modSettings['max_messageLength'] : (empty($modSettings['max_messageLength']) ? 'string' : 'string-65534')),
-		'poster_name' => 'string-255', 'poster_email' => 'string-255',
-		'poster_time' => 'int', 'poster_ip' => 'string-255',
-		'smileys_enabled' => 'int', 'modified_name' => 'string',
-		'icon' => 'string-16', 'approved' => 'int',
+		'id_board' => 'int',
+		'id_topic' => 'int',
+		'id_member' => 'int',
+		'subject' => 'string-255', 
+		'body' => (!empty($modSettings['max_messageLength']) && $modSettings['max_messageLength'] > 65534 ? 'string-' . $modSettings['max_messageLength'] : (empty($modSettings['max_messageLength']) ? 'string' : 'string-65534')),
+		'poster_name' => 'string-255',
+		'poster_email' => 'string-255',
+		'poster_time' => 'int',
+		'poster_ip' => 'string-255',
+		'smileys_enabled' => 'int',
+		'modified_name' => 'string',
+		'icon' => 'string-16',
+		'approved' => 'int',
 	);
 
 	$message_parameters = array(
-		'id_board' => $topicOptions['board'], 'id_topic' => $topicOptions['id'],
-		'id_member' => $posterOptions['id'], 'subject' => $msgOptions['subject'],
+		'id_board' => $topicOptions['board'],
+		'id_topic' => $topicOptions['id'],
+		'id_member' => $posterOptions['id'],
+		'subject' => $msgOptions['subject'],
 		'body' => $msgOptions['body'],
-		'poster_name' => $posterOptions['name'], 'poster_email' => $posterOptions['email'],
-		'poster_time' => time(), 'poster_ip' => $posterOptions['ip'],
-		'smileys_enabled' => $msgOptions['smileys_enabled'] ? 1 : 0,'modified_name' => '',
-		'icon' => $msgOptions['icon'], 'approved' => $msgOptions['approved'],
+		'poster_name' => $posterOptions['name'],
+		'poster_email' => $posterOptions['email'],
+		'poster_time' => empty($posterOptions['time']) ? time() : $posterOptions['time'],
+		'poster_ip' => $posterOptions['ip'],
+		'smileys_enabled' => $msgOptions['smileys_enabled'] ? 1 : 0,
+		'modified_name' => '',
+		'icon' => $msgOptions['icon'],
+		'approved' => $msgOptions['approved'],
 	);
 
 	// What if we want to do anything with posts?
