@@ -268,6 +268,7 @@ function getHolidayRange($low_date, $high_date)
  * - if the user doesn't have proper permissions, an error will be shown.
  *
  * @package Calendar
+ * @todo pass $board, $topic and $user_info['id'] as arguments with fallback for 1.1
  */
 function canLinkEvent()
 {

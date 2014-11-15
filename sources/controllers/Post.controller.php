@@ -48,6 +48,7 @@ class Post_Controller extends Action_Controller
 	{
 		$this->_post_errors = Error_Context::context('post', 1);
 		$this->_attach_errors = Attachment_Error_Context::context();
+		$this->_known_mentions = $this->_findMentionTypes();
 	}
 
 	/**
@@ -60,6 +61,21 @@ class Post_Controller extends Action_Controller
 		// Figure out the right action to do.
 		// hint: I'm post controller. :P
 		$this->action_post();
+	}
+
+	protected function _findMentionTypes()
+	{
+		global $modSettings;
+
+		$mentions = explode(',', $modSettings['enabled_mentions']);
+
+		$types = array();
+		foreach ($mentions as $mention)
+		{
+			$types[] = $mention;
+		}
+
+		return $types;
 	}
 
 	/**
@@ -79,6 +95,10 @@ class Post_Controller extends Action_Controller
 		loadLanguage('Post');
 		loadLanguage('Errors');
 
+		$this->_registerEvent('prepare_post', 'prepare_post', array_map(function($name) {
+				return ucfirst($name) . '_Mention';
+			}, $this->_known_mentions));
+
 		// You can't reply with a poll... hacker.
 		if (isset($_REQUEST['poll']) && !empty($topic) && !isset($_REQUEST['msg']))
 			unset($_REQUEST['poll']);
@@ -86,18 +106,15 @@ class Post_Controller extends Action_Controller
 		$this->_attach_errors->activate();
 		$first_subject = '';
 
-		// Posting an event?
-		$context['make_event'] = isset($_REQUEST['calendar']);
 		$context['robot_no_index'] = true;
 		$template_layers = Template_Layers::getInstance();
 		$template_layers->add('postarea');
 
+		$this->_events->trigger('prepare_post');
+
 		// You must be posting to *some* board.
 		if (empty($board) && !$context['make_event'])
 			fatal_lang_error('no_board', false);
-
-		if ($context['make_event'])
-			$template_layers->add('make_event');
 
 		// All those wonderful modifiers and attachments
 		$template_layers->add('additional_options', 200);
@@ -114,9 +131,6 @@ class Post_Controller extends Action_Controller
 			$context['preview_message'] = '';
 			$context['preview_subject'] = '';
 		}
-
-		if (!empty($modSettings['mentions_enabled']) && !empty($_REQUEST['uid']))
-			$context['member_ids'] = array_unique(array_map('intval', $_REQUEST['uid']));
 
 		// No message is complete without a topic.
 		if (empty($topic) && !empty($_REQUEST['msg']))
@@ -181,6 +195,7 @@ class Post_Controller extends Action_Controller
 		}
 		else
 		{
+			$id_member_poster = 0;
 			$context['becomes_approved'] = true;
 			if ((!$context['make_event'] || !empty($board)))
 			{
@@ -267,21 +282,13 @@ class Post_Controller extends Action_Controller
 			$context['last_choice_id'] = 4;
 		}
 
-		if ($context['make_event'])
+		try
 		{
-			$event_id = isset($_REQUEST['eventid']) ? (int) $_REQUEST['eventid'] : -1;
-
-			// Editing an event?  (but NOT previewing!?)
-			if ($event_id != -1 && !isset($_REQUEST['subject']))
-			{
-				// If the user doesn't have permission to edit the post in this topic, redirect them.
-				if ((empty($id_member_poster) || $id_member_poster != $user_info['id'] || !allowedTo('modify_own')) && !allowedTo('modify_any'))
-				{
-					$controller = new Calendar_Controller();
-					return $controller->action_post();
-				}
-			}
-			$this->_prepareEventContext($id_member_poster);
+			$this->_events->trigger('prepare_context', array('id_member_poster' => $id_member_poster));
+		}
+		catch (Controller_Redirect_Exception $e)
+		{
+			return $e->doRedirect();
 		}
 
 		// See if any new replies have come along.
@@ -716,18 +723,19 @@ class Post_Controller extends Action_Controller
 		}
 
 		// What are you doing? Posting a poll, modifying, previewing, new post, or reply...
-		if (isset($_REQUEST['poll']))
-			$context['page_title'] = $txt['new_poll'];
-		elseif ($context['make_event'])
-			$context['page_title'] = $context['event']['id'] == -1 ? $txt['calendar_post_event'] : $txt['calendar_edit'];
-		elseif (isset($_REQUEST['msg']))
-			$context['page_title'] = $txt['modify_msg'];
-		elseif (isset($_REQUEST['subject'], $context['preview_subject']))
-			$context['page_title'] = $txt['post_reply'];
-		elseif (empty($topic))
-			$context['page_title'] = $txt['start_new_topic'];
-		else
-			$context['page_title'] = $txt['post_reply'];
+		if (empty($context['page_title']))
+		{
+			if (isset($_REQUEST['poll']))
+				$context['page_title'] = $txt['new_poll'];
+			elseif (isset($_REQUEST['msg']))
+				$context['page_title'] = $txt['modify_msg'];
+			elseif (isset($_REQUEST['subject'], $context['preview_subject']))
+				$context['page_title'] = $txt['post_reply'];
+			elseif (empty($topic))
+				$context['page_title'] = $txt['start_new_topic'];
+			else
+				$context['page_title'] = $txt['post_reply'];
+		}
 
 		// Update the topic summary, needed to show new posts in a preview
 		if (!empty($topic) && !empty($modSettings['topicSummaryPosts']))
@@ -1341,8 +1349,7 @@ class Post_Controller extends Action_Controller
 				$this->_post_errors->addError('no_message');
 		}
 
-		if (isset($_POST['calendar']) && !isset($_REQUEST['deleteevent']) && Util::htmltrim($_POST['evtitle']) === '')
-			$this->_post_errors->addError('no_event');
+		$this->_events->trigger('prepare_save_post', array($this->_post_errors));
 
 		// Validate the poll...
 		if (isset($_REQUEST['poll']) && !empty($modSettings['pollMode']))
@@ -1591,59 +1598,7 @@ class Post_Controller extends Action_Controller
 		if (!empty($modSettings['drafts_enabled']) && !empty($_POST['id_draft']))
 			deleteDrafts($_POST['id_draft'], $user_info['id']);
 
-		// Editing or posting an event?
-		if (isset($_POST['calendar']) && (!isset($_REQUEST['eventid']) || $_REQUEST['eventid'] == -1))
-		{
-			require_once(SUBSDIR . '/Calendar.subs.php');
-
-			// Make sure they can link an event to this post.
-			canLinkEvent();
-
-			// Insert the event.
-			$eventOptions = array(
-				'id_board' => $board,
-				'id_topic' => $topic,
-				'title' => $_POST['evtitle'],
-				'member' => $user_info['id'],
-				'start_date' => sprintf('%04d-%02d-%02d', $_POST['year'], $_POST['month'], $_POST['day']),
-				'span' => isset($_POST['span']) && $_POST['span'] > 0 ? min((int) $modSettings['cal_maxspan'], (int) $_POST['span'] - 1) : 0,
-			);
-			insertEvent($eventOptions);
-		}
-		elseif (isset($_POST['calendar']))
-		{
-			$_REQUEST['eventid'] = (int) $_REQUEST['eventid'];
-
-			// Validate the post...
-			$calendarController = new Calendar_Controller;
-			$calendarController->validateEventPost();
-
-			// If you're not allowed to edit any events, you have to be the poster.
-			if (!allowedTo('calendar_edit_any'))
-			{
-				$event_poster = getEventPoster($_REQUEST['eventid']);
-
-				// Silly hacker, Trix are for kids. ...probably trademarked somewhere, this is FAIR USE! (parody...)
-				isAllowedTo('calendar_edit_' . ($event_poster == $user_info['id'] ? 'own' : 'any'));
-			}
-
-			// Delete it?
-			if (isset($_REQUEST['deleteevent']))
-				removeEvent($_REQUEST['eventid']);
-			// ... or just update it?
-			else
-			{
-				$span = !empty($modSettings['cal_allowspan']) && !empty($_REQUEST['span']) ? min((int) $modSettings['cal_maxspan'], (int) $_REQUEST['span'] - 1) : 0;
-				$start_time = mktime(0, 0, 0, (int) $_REQUEST['month'], (int) $_REQUEST['day'], (int) $_REQUEST['year']);
-
-				$eventOptions = array(
-					'start_date' => strftime('%Y-%m-%d', $start_time),
-					'end_date' => strftime('%Y-%m-%d', $start_time + $span * 86400),
-					'title' => $_REQUEST['evtitle'],
-				);
-				modifyEvent($_REQUEST['eventid'], $eventOptions);
-			}
-		}
+		$this->_events->trigger('save_post', array('board' => $board, 'topic' => $topic));
 
 		// Marking boards as read.
 		// (You just posted and they will be unread.)
@@ -2163,99 +2118,6 @@ class Post_Controller extends Action_Controller
 				'link' => '<a href="' . $scripturl . '?action=post;board=' . $draft['id_board'] . ';' . (!empty($draft['id_topic']) ? 'topic='. $draft['id_topic'] .'.0;' : '') . 'id_draft=' . $draft['id_draft'] . '">' . (!empty($draft['subject']) ? $draft['subject'] : $txt['drafts_none']) . '</a>',
 			);
 		}
-	}
-
-	/**
-	 * Loads in context stuff related to the envent
-	 *
-	 * @param int $event_id The id of the event
-	 */
-	private function _prepareEventContext($event_id)
-	{
-		global $context, $user_info, $modSettings, $board;
-
-		// They might want to pick a board.
-		if (!isset($context['current_board']))
-			$context['current_board'] = 0;
-
-		// Start loading up the event info.
-		$context['event'] = array();
-		$context['event']['title'] = isset($_REQUEST['evtitle']) ? htmlspecialchars(stripslashes($_REQUEST['evtitle']), ENT_COMPAT, 'UTF-8') : '';
-		$context['event']['id'] = $event_id;
-		$context['event']['new'] = $context['event']['id'] == -1;
-
-		// Permissions check!
-		isAllowedTo('calendar_post');
-
-		// Editing an event?  (but NOT previewing!?)
-		if (empty($context['event']['new']) && !isset($_REQUEST['subject']))
-		{
-			// Get the current event information.
-			require_once(SUBSDIR . '/Calendar.subs.php');
-			$event_info = getEventProperties($context['event']['id']);
-
-			// Make sure the user is allowed to edit this event.
-			if ($event_info['member'] != $user_info['id'])
-				isAllowedTo('calendar_edit_any');
-			elseif (!allowedTo('calendar_edit_any'))
-				isAllowedTo('calendar_edit_own');
-
-			$context['event']['month'] = $event_info['month'];
-			$context['event']['day'] = $event_info['day'];
-			$context['event']['year'] = $event_info['year'];
-			$context['event']['title'] = $event_info['title'];
-			$context['event']['span'] = $event_info['span'];
-		}
-		else
-		{
-			// Posting a new event? (or preview...)
-			$today = getdate();
-
-			// You must have a month and year specified!
-			if (isset($_REQUEST['month']))
-				$context['event']['month'] = (int) $_REQUEST['month'];
-			else
-				$_REQUEST['month'] = $today['mon'];
-
-			if (isset($_REQUEST['year']))
-				$context['event']['year'] = (int) $_REQUEST['year'];
-			else
-				$_REQUEST['year'] = $today['year'];
-
-			if (isset($_REQUEST['day']))
-				$context['event']['day'] = (int) $_REQUEST['day'];
-			else
-				$context['event']['day'] = $_REQUEST['month'] == $today['mon'] ? $today['mday'] : 0;
-
-			$context['event']['span'] = isset($_REQUEST['span']) ? $_REQUEST['span'] : 1;
-
-			// Make sure the year and month are in the valid range.
-			if ($context['event']['month'] < 1 || $context['event']['month'] > 12)
-				fatal_lang_error('invalid_month', false);
-
-			if ($context['event']['year'] < $modSettings['cal_minyear'] || $context['event']['year'] > $modSettings['cal_maxyear'])
-				fatal_lang_error('invalid_year', false);
-
-			// Get a list of boards they can post in.
-			require_once(SUBSDIR . '/Boards.subs.php');
-
-			$boards = boardsAllowedTo('post_new');
-			if (empty($boards))
-				fatal_lang_error('cannot_post_new', 'user');
-
-			// Load a list of boards for this event in the context.
-			$boardListOptions = array(
-				'included_boards' => in_array(0, $boards) ? null : $boards,
-				'not_redirection' => true,
-				'selected_board' => empty($context['current_board']) ? $modSettings['cal_defaultboard'] : $context['current_board'],
-			);
-			$context += getBoardList($boardListOptions);
-		}
-
-		// Find the last day of the month.
-		$context['event']['last_day'] = (int) strftime('%d', mktime(0, 0, 0, $context['event']['month'] == 12 ? 1 : $context['event']['month'] + 1, 0, $context['event']['month'] == 12 ? $context['event']['year'] + 1 : $context['event']['year']));
-
-		$context['event']['board'] = !empty($board) ? $board : $modSettings['cal_defaultboard'];
 	}
 
 	/**

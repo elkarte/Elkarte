@@ -214,8 +214,7 @@ class Calendar_Controller extends Action_Controller
 			if ($event_id == -1 && isset($_POST['link_to_board']))
 			{
 				$_REQUEST['calendar'] = 1;
-				$controller = new Post_Controller();
-				return $controller->action_post();
+				return $this->_returnToPost();
 			}
 
 			$this->_action_save($event_id);
@@ -228,8 +227,7 @@ class Calendar_Controller extends Action_Controller
 		if (empty($modSettings['cal_allow_unlinked']) && empty($event_id))
 		{
 			$_REQUEST['calendar'] = 1;
-			$controller = new Post_Controller();
-			return $controller->action_post();
+			return $this->_returnToPost();
 		}
 
 		// New?
@@ -295,6 +293,37 @@ class Calendar_Controller extends Action_Controller
 		$context['linktree'][] = array(
 			'name' => $context['page_title'],
 		);
+	}
+
+	protected function _returnToPost()
+	{
+		$this->_loadAddons('post');
+		$this->_loadModules('post');
+		$event_manager = new Event_Manager('post');
+		$event_manager->registerAddons('Addon_Post.+');
+		$event_manager->registerAddons('Module_.+_Post');
+
+		$controller = new Post_Controller();
+		$controller->setEventManager($event_manager);
+
+		$controller->pre_dispatch();
+		return $controller->action_post();
+	}
+
+	protected function _loadModules($hook)
+	{
+		$this->_requireFiles(SUBSDIR . '/Module*' . ucfirst($hook) . '.class.php');
+	}
+
+	protected function _loadAddons()
+	{
+		$this->_requireFiles(BOARDDIR . '/packages/integration/*/*.integrate.php');
+	}
+
+	protected function _requireFiles($pattern)
+	{
+		foreach (glob($pattern) as $require_file)
+			require_once($require_file);
 	}
 
 	/**
