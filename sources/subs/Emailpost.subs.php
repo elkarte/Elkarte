@@ -53,10 +53,8 @@ function pbe_email_to_bbc($text, $html)
 		// Convert the email-HTML to BBC
 		require_once(SUBSDIR . '/Html2BBC.class.php');
 		$bbc_converter = new Html_2_BBC($text);
+		$bbc_converter->skip_tags(array('font', 'span'));
 		$text = $bbc_converter->get_bbc();
-
-		// Run our parsers again for the BBC
-		$text = pbe_run_parsers($text);
 	}
 	// Starting with plain text, possibly even markdown style ;)
 	else
