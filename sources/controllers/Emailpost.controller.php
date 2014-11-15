@@ -608,14 +608,17 @@ function pbe_create_topic($pbe, $email_message, $board_info)
  */
 function pbe_load_text(&$html, $email_message, $pbe)
 {
-	if ($html && preg_match_all('~<table.*?>~i', $email_message->body, $matches) >= 2)
+	if (!$html || ($html && preg_match_all('~<table.*?>~i', $email_message->body, $match) >= 2))
 	{
 		// Some mobile responses wrap everything in a table structure so use plain text
 		$text = $email_message->plain_body;
 		$html = false;
 	}
 	else
-		$text = $email_message->body;
+		$text = un_htmlspecialchars($email_message->body);
+
+	// Run filters now, before the data is manipulated
+	$text = pbe_filter_email_message($text);
 
 	// Convert to BBC and format it so it looks like a post
 	$text = pbe_email_to_bbc($text, $html);
