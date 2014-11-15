@@ -4234,6 +4234,10 @@ function elk_autoloader($class)
 				case 'Search':
 					$file_name = SUBSDIR . '/SearchAPI-' . $givenname . '.class.php';
 					break;
+				// Some_Thing_Exception => SomeThingException.class.php
+				case 'Exception':
+					$file_name = SUBSDIR . '/Exception/' . $givenname . $surname . '.exception.php';
+					break;
 				// Some_Cache => SomeCache.class.php
 				case 'Cache':
 					$file_name = SUBSDIR . '/CacheMethod/' . $givenname . $surname . '.class.php';
