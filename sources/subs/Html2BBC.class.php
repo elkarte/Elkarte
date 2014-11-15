@@ -80,6 +80,12 @@ class Html_2_BBC
 	protected $_skip_tags = array();
 
 	/**
+	 * Holds any style attributes that would normally be convert to bbc but are instead skipped
+	 * @var string[]
+	 */
+	protected $_skip_style = array();
+
+	/**
 	 * Gets everything started using the built in or external parser
 	 *
 	 * @param string $html string of html to convert
@@ -127,6 +133,21 @@ class Html_2_BBC
 
 		if (!empty($tags))
 			$this->_skip_tags = $tags;
+	}
+
+	/**
+	 * If we want to skip over inline style tags (that would normally be converted)
+	 *
+	 * @param string[] $styles
+	 */
+	public function skip_styles($styles = array())
+	{
+		// If its not an array, make it one
+		if (!is_array($styles))
+			$styles = array($styles);
+
+		if (!empty($styles))
+			$this->_skip_style = $styles;
 	}
 
 	/**
@@ -687,6 +708,10 @@ class Html_2_BBC
 			$styles = $this->_get_style_values($style);
 			foreach ($styles as $tag => $value)
 			{
+				// Skip any inline styles as needed
+				if (in_array($tag, $this->_skip_style))
+					continue;
+
 				// Well this can be as long, complete and exhaustive as we want :P
 				switch ($tag)
 				{
@@ -717,7 +742,7 @@ class Html_2_BBC
 						$bbc = '[size=' . $value . ']' . $bbc . '[/size]';
 						break;
 					case 'color':
-							$bbc = '[color=' . $value . ']' . $bbc . '[/color]';
+						$bbc = '[color=' . $value . ']' . $bbc . '[/color]';
 						break;
 					// These tags all mean the same thing as far as BBC is concerned
 					case 'float':
