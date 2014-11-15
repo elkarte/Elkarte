@@ -17,4 +17,12 @@ if (!defined('ELK'))
 class Mentionmem_Mention extends Mention_BoardAccess_Abstract
 {
 	protected $_type = 'mentionmem';
+
+	public function prepare_post()
+	{
+		global $context;
+
+		if (!empty($_REQUEST['uid']))
+			$context['member_ids'] = array_unique(array_map('intval', $_REQUEST['uid']));
+	}
 }

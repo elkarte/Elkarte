@@ -77,6 +77,8 @@ abstract class Action_Controller
 				$dependencies[$dep] = &$this->$dep;
 			elseif (property_exists($this, '_' . $dep))
 				$dependencies[$dep] = &$this->{'_' . $dep};
+			elseif (isset($GLOBALS[$dep]))
+				$dependencies[$dep] = &$GLOBALS[$dep];
 		}
 
 		return $dependencies;
@@ -88,15 +90,12 @@ abstract class Action_Controller
 	 *
 	 * @param string $name - Name of the trigger where the events will be executed.
 	 * @param string $method - The method that will be executed.
-	 * @param string $class_suffix - Any class that should be executed by this
-	 *                               trigger shall have this suffix.
-	 * @param string[] $to_register - An array of classes to register (without the suffix).
+	 * @param string[] $to_register - An array of classes to register.
 	 */
-	protected function _registerEvent($name, $method, $class_suffix, $to_register)
+	protected function _registerEvent($name, $method, $to_register)
 	{
-		foreach ($to_register as $mention)
+		foreach ($to_register as $class)
 		{
-			$class = ucfirst($mention) . '_' . $class_suffix;
 			$this->_events->register($name, array($name, array($class, $method, 0)));
 		}
 	}

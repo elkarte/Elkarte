@@ -16,6 +16,8 @@ class Event_Manager
 	protected $_registered_events = array();
 	protected $_inverted_classes = null;
 	protected $_hook = '';
+	protected $_declared_classes = array();
+	protected $_instances = array();
 
 	/**
 	 * List of classes already registered.
@@ -26,6 +28,7 @@ class Event_Manager
 	public function __construct($hook)
 	{
 		$this->_hook = $hook;
+		$this->_declared_classes = get_declared_classes();
 	}
 
 	public function setSource($source)
@@ -72,12 +75,42 @@ class Event_Manager
 			else
 				$dependencies = &$args;
 
-			$instance = new $class_name();
+			$instance = $this->_getInstance($class_name);
 
 			// Do what we know we should do... if we find it.
 			if (method_exists($instance, $method_name))
-				$instance->$method_name($dependencies);
+			{
+				if (empty($dependencies))
+				{
+					call_user_func(array($instance, $method_name));
+					}
+				else
+				{
+					call_user_func_array(array($instance, $method_name), $dependencies);
+					}
+			}
 		}
+	}
+
+	protected function _getInstance($class_name)
+	{
+		if (isset($this->_instances[$class_name]))
+		{
+			return $this->_instances[$class_name];
+		}
+		else
+		{
+			$instance = new $class_name();
+			$this->_setInstance($class_name, $instance);
+
+			return $instance;
+		}
+	}
+
+	protected function _setInstance($class_name, $instance)
+	{
+		if (!isset($this->_instances[$class_name]))
+			$this->_instances[$class_name] = $instance;
 	}
 
 	public function register($position, $event, $priority = 0)
@@ -88,15 +121,13 @@ class Event_Manager
 		$this->_registered_events[$position]->add($event, $priority);
 	}
 
-	public function registerAddons($prefix)
+	public function registerAddons($pattern)
 	{
-		$classes = get_declared_classes();
-		$prefix_len = strlen($prefix);
 		$to_register = array();
 
-		foreach ($classes as $class)
+		foreach ($this->_declared_classes as $class)
 		{
-			if (substr($class, 0, $prefix_len) === $prefix && !in_array($class, $this->_classes))
+			if (preg_match('/' . $pattern . '/', $class) !== 0 && !in_array($class, $this->_classes))
 			{
 				$to_register[] = $class;
 				$this->_classes[] = $class;
@@ -110,6 +141,7 @@ class Event_Manager
 		foreach ($classes as $class)
 		{
 			$events = $class::hooks();
+
 			foreach ($events as $event)
 			{
 				$priority = isset($event[1][2]);

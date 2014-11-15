@@ -318,8 +318,10 @@ class Site_Dispatcher
 			}
 
 			$this->_loadAddons($hook);
+			$this->_loadModules($hook);
 			$event_manager = new Event_Manager($hook);
-			$event_manager->registerAddons('Addon_' . ucfirst($hook));
+			$event_manager->registerAddons('Addon_' . ucfirst($hook). '.+');
+			$event_manager->registerAddons('Module_.+_' . ucfirst($hook));
 			$controller->setEventManager($event_manager);
 
 			// Pre-dispatch (load templates and stuff)
@@ -357,10 +359,20 @@ class Site_Dispatcher
 			return false;
 	}
 
-	protected function _loadAddons($hook)
+	protected function _loadModules($hook)
 	{
-		foreach (glob(BOARDDIR . '/packages/integration/*/*.integrate.php') as $integrate_file)
-			require_once($integrate_file);
+		$this->_requireFiles(SUBSDIR . '/Module*' . ucfirst($hook) . '.class.php');
+	}
+
+	protected function _loadAddons()
+	{
+		$this->_requireFiles(BOARDDIR . '/packages/integration/*/*.integrate.php');
+	}
+
+	protected function _requireFiles($pattern)
+	{
+		foreach (glob($pattern) as $require_file)
+			require_once($require_file);
 	}
 
 	/**

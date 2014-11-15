@@ -18,10 +18,8 @@ class Buddy_Mention extends Mention_Message_Abstract
 {
 	protected $_type = 'buddy';
 
-	public function view(&$dependencies)
+	public function view($type, &$mentions)
 	{
-		$mentions = &$dependencies[1];
-		$type = &$dependencies[0];
 		foreach ($mentions as $key => $row)
 		{
 			// To ensure it is not done twice

@@ -396,14 +396,16 @@ class Mentions_Controller extends Action_Controller
 	{
 		if (!empty($type))
 		{
-			$to_register = array($type);
+			$to_register = array($type . '_Mention');
 		}
 		else
 		{
-			$to_register = $this->_known_mentions;
+			$to_register = array_map(function($name) {
+				return ucfirst($name) . '_Mention';
+			}, $this->_known_mentions);
 		}
 
-		$this->_registerEvent('view_mentions', 'view', 'Mention', $to_register);
+		$this->_registerEvent('view_mentions', 'view', $to_register);
 	}
 
 	/**

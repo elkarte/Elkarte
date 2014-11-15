@@ -18,7 +18,7 @@ abstract class Mention_Message_Abstract implements Mention_Type_Interface
 {
 	protected $_type = '';
 
-	public abstract function view(&$dependencies);
+	public abstract function view($type, &$mentions);
 
 	protected function _replaceMsg($row)
 	{

@@ -16,11 +16,8 @@ if (!defined('ELK'))
 
 abstract class Mention_BoardAccess_Abstract extends Mention_Message_Abstract
 {
-	public function view(&$dependencies)
+	public function view($type, &$mentions)
 	{
-		$mentions = &$dependencies[1];
-		$type = &$dependencies[0];
-
 		foreach ($mentions as $key => $row)
 		{
 			// To ensure it is not done twice
