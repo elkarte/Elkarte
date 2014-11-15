@@ -83,7 +83,7 @@ class Html_2_BBC
 	 * Gets everything started using the built in or external parser
 	 *
 	 * @param string $html string of html to convert
-	 * @param boolean $strip flag to strip unconverted tags, true by default
+	 * @param boolean $strip flag to strip newlines, true by default
 	 */
 	public function __construct($html, $strip = true)
 	{
@@ -924,7 +924,7 @@ class Html_2_BBC
 		} while (!empty($count));
 
 		$text = html_entity_decode(htmlspecialchars_decode($text, ENT_QUOTES), ENT_QUOTES, 'UTF-8');
-		
+
 		return str_replace(array('&amp#91;', '&amp#93;'), array('&amp;#91;', '&amp;#93;'), $text);
 	}
 }
