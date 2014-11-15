@@ -48,7 +48,6 @@ class Post_Controller extends Action_Controller
 	{
 		$this->_post_errors = Error_Context::context('post', 1);
 		$this->_attach_errors = Attachment_Error_Context::context();
-		$this->_known_mentions = $this->_findMentionTypes();
 	}
 
 	/**
@@ -61,21 +60,6 @@ class Post_Controller extends Action_Controller
 		// Figure out the right action to do.
 		// hint: I'm post controller. :P
 		$this->action_post();
-	}
-
-	protected function _findMentionTypes()
-	{
-		global $modSettings;
-
-		$mentions = explode(',', $modSettings['enabled_mentions']);
-
-		$types = array();
-		foreach ($mentions as $mention)
-		{
-			$types[] = $mention;
-		}
-
-		return $types;
 	}
 
 	/**
@@ -94,10 +78,6 @@ class Post_Controller extends Action_Controller
 
 		loadLanguage('Post');
 		loadLanguage('Errors');
-
-		$this->_registerEvent('prepare_post', 'prepare_post', array_map(function($name) {
-				return ucfirst($name) . '_Mention';
-			}, $this->_known_mentions));
 
 		// You can't reply with a poll... hacker.
 		if (isset($_REQUEST['poll']) && !empty($topic) && !isset($_REQUEST['msg']))
@@ -790,18 +770,6 @@ class Post_Controller extends Action_Controller
 		$context['drafts_save'] = !empty($modSettings['drafts_enabled']) && !empty($modSettings['drafts_post_enabled']) && allowedTo('post_draft');
 		$context['drafts_autosave'] = !empty($context['drafts_save']) && !empty($modSettings['drafts_autosave_enabled']) && allowedTo('post_autosave_draft');
 
-		if (!empty($modSettings['mentions_enabled']))
-		{
-			$context['mentions_enabled'] = true;
-			loadCSSFile('jquery.atwho.css');
-
-			addInlineJavascript('
-			$(document).ready(function () {
-				for (var i = 0, count = all_elk_mentions.length; i < count; i++)
-					all_elk_mentions[i].oMention = new elk_mentions(all_elk_mentions[i].oOptions);
-			});');
-		}
-
 		// Build a list of drafts that they can load into the editor
 		if (!empty($context['drafts_save']))
 		{
@@ -1441,21 +1409,7 @@ class Post_Controller extends Action_Controller
 		if (Util::strlen($_POST['subject']) > 100)
 			$_POST['subject'] = Util::substr($_POST['subject'], 0, 100);
 
-		if (!empty($modSettings['mentions_enabled']) && !empty($_REQUEST['uid']))
-		{
-			$query_params = array();
-			$query_params['member_ids'] = array_unique(array_map('intval', $_REQUEST['uid']));
-			require_once(SUBSDIR . '/Members.subs.php');
-			$mentioned_members = membersBy('member_ids', $query_params, true);
-			$replacements = 0;
-			$actually_mentioned = array();
-			foreach ($mentioned_members as $member)
-			{
-				$_POST['message'] = str_replace('@' . $member['real_name'], '[member=' . $member['id_member'] . ']' . $member['real_name'] . '[/member]', $_POST['message'], $replacements);
-				if ($replacements > 0)
-					$actually_mentioned[] = $member['id_member'];
-			}
-		}
+		$this->_events->trigger('pre_save_post');
 
 		// Make the poll...
 		if (isset($_REQUEST['poll']))
@@ -1598,7 +1552,7 @@ class Post_Controller extends Action_Controller
 		if (!empty($modSettings['drafts_enabled']) && !empty($_POST['id_draft']))
 			deleteDrafts($_POST['id_draft'], $user_info['id']);
 
-		$this->_events->trigger('save_post', array('board' => $board, 'topic' => $topic));
+		$this->_events->trigger('save_post', array('board' => $board, 'topic' => $topic, 'msgOptions' => $msgOptions, 'topicOptions' => $topicOptions, 'becomesApproved' => $becomesApproved));
 
 		// Marking boards as read.
 		// (You just posted and they will be unread.)
@@ -1656,18 +1610,6 @@ class Post_Controller extends Action_Controller
 				else
 					sendNotifications($topic, 'reply', array(), $topic_info['id_member_started']);
 			}
-		}
-
-		if (!empty($modSettings['mentions_enabled']) && !empty($actually_mentioned))
-		{
-			$mentions = new Mentions_Controller();
-			$mentions->setData(array(
-				'id_member' => $actually_mentioned,
-				'type' => 'mentionmem',
-				'id_msg' => $msgOptions['id'],
-				'status' => $becomesApproved ? 'new' : 'unapproved',
-			));
-			$mentions->action_add();
 		}
 
 		if ($board_info['num_topics'] == 0)
