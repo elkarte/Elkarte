@@ -195,6 +195,7 @@ class Maintenance_Controller extends Action_Controller
 		$current_time_limit = ini_get('max_execution_time');
 		@set_time_limit(159); //something strange just to be sure
 		$new_time_limit = ini_get('max_execution_time');
+		@set_time_limit($current_time_limit);
 
 		$context['use_maintenance'] = 0;
 
