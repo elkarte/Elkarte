@@ -141,6 +141,7 @@ $txt['package_ftp_test'] = 'Test';
 $txt['package_ftp_test_connection'] = 'Test Connection';
 $txt['package_ftp_test_success'] = 'FTP connection established.';
 $txt['package_ftp_test_failed'] = 'Could not contact server.';
+$txt['package_ftp_bad_server'] = 'Could not contact server.';
 
 // For a break, use \\n instead of <br />... and don't use entities.
 $txt['package_delete_bad'] = 'The package you are about to delete is currently installed!  If you delete it, you may not be able to uninstall it later.\\n\\nAre you sure?';
