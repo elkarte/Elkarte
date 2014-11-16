@@ -54,6 +54,7 @@ function pbe_email_to_bbc($text, $html)
 		require_once(SUBSDIR . '/Html2BBC.class.php');
 		$bbc_converter = new Html_2_BBC($text);
 		$bbc_converter->skip_tags(array('font', 'span'));
+		$bbc_converter->skip_styles(array('font-family', 'font-size', 'color'));
 		$text = $bbc_converter->get_bbc();
 	}
 	// Starting with plain text, possibly even markdown style ;)
