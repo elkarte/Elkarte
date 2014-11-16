@@ -959,7 +959,7 @@ class Maintenance_Controller extends Action_Controller
 	 */
 	public function action_backup_display()
 	{
-		global $context, $txt;
+		global $context, $txt, $user_info;
 
 		validateToken('admin-maint');
 
@@ -1003,6 +1003,13 @@ class Maintenance_Controller extends Action_Controller
 		}
 		else
 		{
+			require_once(SUBSDIR . '/Admin.subs.php');
+
+			emailAdmins($webmaster_email, array(
+				'BAK_REALNAME' => $user_info['member_name']
+			));
+			logAction('database_backup', array('member' => $user_info['id']), 'admin');
+
 			require_once(SOURCEDIR . '/DumpDatabase.php');
 			DumpDatabase2();
 		}

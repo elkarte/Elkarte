@@ -857,6 +857,18 @@ Once the attachments directory reaches it\'s maximum permitted size users will n
 {REGARDS}';
 
 /**
+	@additional_params: admin_backup_database
+		REALNAME:
+	@description:
+*/
+$txt['admin_backup_database_subject'] = 'A database backup has been taken';
+$txt['admin_backup_database_body'] = '{REALNAME},
+
+this email is to to inform you that {BAK_REALNAME} has just downloaded a backup of the database at {FORUMNAME}.
+
+{REGARDS}';
+
+/**
 	@additional_params: paid_subscription_refund
 		NAME: Subscription title.
 		REALNAME: Recipients name
