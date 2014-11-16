@@ -151,7 +151,7 @@ class Maintenance_Controller extends Action_Controller
 	 */
 	public function action_database()
 	{
-		global $context, $db_type, $modSettings, $maintenance;
+		global $context, $modSettings, $maintenance;
 
 		// We need this, really..
 		require_once(SUBSDIR . '/Maintenance.subs.php');
@@ -159,7 +159,7 @@ class Maintenance_Controller extends Action_Controller
 		// Set up the sub-template
 		$context['sub_template'] = 'maintain_database';
 
-		if ($db_type == 'mysql')
+		if (DB_TYPE == 'MySQL')
 		{
 			$body_type = fetchBodyType();
 
