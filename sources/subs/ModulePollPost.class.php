@@ -271,7 +271,7 @@ class Module_Poll_Post
 	 *
 	 * @return int - the id of the newly created poll
 	 */
-	private function _createPoll($options, $user_name)
+	protected function _createPoll($options, $user_name)
 	{
 		global $user_info, $board;
 

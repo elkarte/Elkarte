@@ -126,9 +126,10 @@ class Module_Calendar_Post
 			// If the user doesn't have permission to edit the post in this topic, redirect them.
 			if ((empty($id_member_poster) || $id_member_poster != $user_info['id'] || !allowedTo('modify_own')) && !allowedTo('modify_any'))
 			{
-				throw new Controller_Redirect_Exception('Calendar_Controller', 'action_post');
+				throw new Controller_Redirect_Exception('calendar', 'action_post');
 			}
 		}
+
 		$this->_prepareEventContext($event_id);
 
 		$context['page_title'] = $context['event']['id'] == -1 ? $txt['calendar_post_event'] : $txt['calendar_edit'];

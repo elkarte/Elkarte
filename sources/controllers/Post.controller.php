@@ -233,7 +233,7 @@ class Post_Controller extends Action_Controller
 		}
 		catch (Controller_Redirect_Exception $e)
 		{
-			return $e->doRedirect();
+			return $e->doRedirect($this);
 		}
 
 		// See if any new replies have come along.

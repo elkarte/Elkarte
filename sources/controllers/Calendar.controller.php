@@ -295,9 +295,17 @@ class Calendar_Controller extends Action_Controller
 		);
 	}
 
+	/**
+	 * Shortcut to instantiate the Post_Controller:
+	 *  - require_once modules of the controller (not addons because these are
+	 *    always all require'd by the dispatcher),
+	 *  - creates the event manager and registers addons and modules,
+	 *  - instantiate the controller
+	 *  - runs pre_dispatch
+	 * @return The return of the action_post.
+	 */
 	protected function _returnToPost()
 	{
-		$this->_loadAddons('post');
 		$this->_loadModules('post');
 		$event_manager = new Event_Manager('post');
 		$event_manager->registerAddons('Addon_Post.+');
@@ -310,19 +318,14 @@ class Calendar_Controller extends Action_Controller
 		return $controller->action_post();
 	}
 
+	/**
+	 * Shortcut to require the files of the modules for a certain controller.
+	 *
+	 * @param string $hook The name of the controller
+	 */
 	protected function _loadModules($hook)
 	{
-		$this->_requireFiles(SUBSDIR . '/Module*' . ucfirst($hook) . '.class.php');
-	}
-
-	protected function _loadAddons()
-	{
-		$this->_requireFiles(BOARDDIR . '/packages/integration/*/*.integrate.php');
-	}
-
-	protected function _requireFiles($pattern)
-	{
-		foreach (glob($pattern) as $require_file)
+		foreach (glob(SUBSDIR . '/Module*' . ucfirst($hook) . '.class.php') as $require_file)
 			require_once($require_file);
 	}
 
