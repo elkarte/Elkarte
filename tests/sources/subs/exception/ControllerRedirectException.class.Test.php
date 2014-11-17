@@ -23,7 +23,7 @@ class TestControllerRedirectException extends PHPUnit_Framework_TestCase
 
 	public function testSameControllerRedirect()
 	{
-		$same = Same_Controller($this);
+		$same = new Same_Controller($this);
 	}
 }
 
