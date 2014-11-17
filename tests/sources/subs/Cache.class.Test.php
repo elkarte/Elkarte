@@ -14,7 +14,7 @@ class TestCache extends PHPUnit_Framework_TestCase
 	 */
 	public function setUp()
 	{
-		require_once(SUBSDIR . '/CacheMethod/CacheMethod.interface.class.php');
+		require_once(SUBSDIR . '/CacheMethod/CacheMethod.interface.php');
 		require_once(SUBSDIR . '/CacheMethod/CacheMethodAbstract.class.php');
 	}
 
