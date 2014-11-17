@@ -27,7 +27,7 @@ class TestControllerRedirectException extends PHPUnit_Framework_TestCase
 	}
 }
 
-class Same_Controller
+class Same_Controller extends Action_Controller
 {
 	public function __construct($tester)
 	{
@@ -43,7 +43,7 @@ class Same_Controller
 	}
 }
 
-class Mock_Controller
+class Mock_Controller extends Action_Controller
 {
 	public function action_plain()
 	{
@@ -51,7 +51,7 @@ class Mock_Controller
 	}
 }
 
-class Mockpre_Controller
+class Mockpre_Controller extends Action_Controller
 {
 	protected $_pre_run = false;
 
