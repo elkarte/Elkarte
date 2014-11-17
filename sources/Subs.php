@@ -4236,7 +4236,7 @@ function elk_autoloader($class)
 					break;
 				// Some_Thing_Exception => SomeThingException.class.php
 				case 'Exception':
-					$file_name = SUBSDIR . '/Exception/' . $givenname . $surname . '.exception.php';
+					$file_name = SUBSDIR . '/Exception/' . $givenname . $surname . '.class.php';
 					break;
 				// Some_Cache => SomeCache.class.php
 				case 'Cache':
