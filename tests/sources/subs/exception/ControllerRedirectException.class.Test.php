@@ -37,6 +37,10 @@ class Same_Controller extends Action_Controller
 		$tester->assertSame($result, 'success');
 	}
 
+	public function action_index()
+	{
+	}
+
 	public function action_plain()
 	{
 		return 'success';
@@ -45,6 +49,10 @@ class Same_Controller extends Action_Controller
 
 class Mock_Controller extends Action_Controller
 {
+	public function action_index()
+	{
+	}
+
 	public function action_plain()
 	{
 		return 'success';
@@ -58,6 +66,10 @@ class Mockpre_Controller extends Action_Controller
 	public function pre_dispatch()
 	{
 		$this->_pre_run = true;
+	}
+
+	public function action_index()
+	{
 	}
 
 	public function action_plain()
