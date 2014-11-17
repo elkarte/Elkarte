@@ -30,7 +30,7 @@ class Module_Mention_Post
 			return array(
 				array('prepare_post', array('Module_Mention_Post', 'prepare_post'), array('events')),
 				array('prepare_context', array('Module_Mention_Post', 'prepare_context'), array()),
-				array('pre_save_post', array('Module_Mention_Post', 'pre_save_post'), array()),
+				array('after_save_post', array('Module_Mention_Post', 'after_save_post'), array()),
 				array('save_post', array('Module_Mention_Post', 'save_post'), array('msgOptions', 'becomesApproved')),
 			);
 		else
@@ -63,7 +63,7 @@ class Module_Mention_Post
 		});');
 	}
 
-	public function pre_save_post()
+	public function after_save_post()
 	{
 		if (!empty($_REQUEST['uid']))
 		{

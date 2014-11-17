@@ -58,18 +58,12 @@ class Event_Manager
 			// Any dependecy you want? In any order you want!
 			if (!empty($deps))
 			{
-				$missing = array();
 				foreach ($deps as $dep)
 				{
 					if (isset($args[$dep]))
 						$dependencies[$dep] = &$args[$dep];
 					else
-						$missing[] = $dep;
-				}
-
-				if (!empty($missing))
-				{
-					$this->_source->provideDependencies($missing, $dependencies);
+						$this->_source->provideDependencies($dep, $dependencies);
 				}
 			}
 			else
@@ -83,11 +77,11 @@ class Event_Manager
 				if (empty($dependencies))
 				{
 					call_user_func(array($instance, $method_name));
-					}
+				}
 				else
 				{
 					call_user_func_array(array($instance, $method_name), $dependencies);
-					}
+				}
 			}
 		}
 	}

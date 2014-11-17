@@ -65,23 +65,18 @@ abstract class Action_Controller
 	 * An odd function that allows events to request dependencies from properties
 	 * of the class.
 	 *
-	 * @param string[] $deps - The name of the property the even wants
+	 * @param string $dep - The name of the property the even wants
 	 * @param mixed[] $dependencies - the array that will be filled with the
 	 *                                references to the dependencies
 	 */
-	public function provideDependencies($deps, &$dependencies)
+	public function provideDependencies($dep, &$dependencies)
 	{
-		foreach ($deps as $dep)
-		{
-			if (property_exists($this, $dep))
-				$dependencies[$dep] = &$this->$dep;
-			elseif (property_exists($this, '_' . $dep))
-				$dependencies[$dep] = &$this->{'_' . $dep};
-			elseif (isset($GLOBALS[$dep]))
-				$dependencies[$dep] = &$GLOBALS[$dep];
-		}
-
-		return $dependencies;
+		if (property_exists($this, $dep))
+			$dependencies[$dep] = &$this->$dep;
+		elseif (property_exists($this, '_' . $dep))
+			$dependencies[$dep] = &$this->{'_' . $dep};
+		elseif (isset($GLOBALS[$dep]))
+			$dependencies[$dep] = &$GLOBALS[$dep];
 	}
 
 	/**

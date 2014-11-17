@@ -710,12 +710,17 @@ function createPost(&$msgOptions, &$topicOptions, &$posterOptions)
 			'id_redirect_topic' => 'int',
 		);
 		$topic_parameters = array(
-			'id_board' => $topicOptions['board'], 'id_member_started' => $posterOptions['id'],
-			'id_member_updated' => $posterOptions['id'], 'id_first_msg' => $msgOptions['id'],
-			'id_last_msg' => $msgOptions['id'], 'locked' => $topicOptions['lock_mode'] === null ? 0 : $topicOptions['lock_mode'],
-			'is_sticky' => $topicOptions['sticky_mode'] === null ? 0 : $topicOptions['sticky_mode'], 'num_views' => 0,
+			'id_board' => $topicOptions['board'],
+			'id_member_started' => $posterOptions['id'],
+			'id_member_updated' => $posterOptions['id'],
+			'id_first_msg' => $msgOptions['id'],
+			'id_last_msg' => $msgOptions['id'],
+			'locked' => $topicOptions['lock_mode'] === null ? 0 : $topicOptions['lock_mode'],
+			'is_sticky' => $topicOptions['sticky_mode'] === null ? 0 : $topicOptions['sticky_mode'],
+			'num_views' => 0,
 			'id_poll' => $topicOptions['poll'] === null ? 0 : $topicOptions['poll'],
-			'unapproved_posts' =>  $msgOptions['approved'] ? 0 : 1, 'approved' => $msgOptions['approved'],
+			'unapproved_posts' =>  $msgOptions['approved'] ? 0 : 1,
+			'approved' => $msgOptions['approved'],
 			'redirect_expires' => $topicOptions['redirect_expires'] === null ? 0 : $topicOptions['redirect_expires'],
 			'id_redirect_topic' => $topicOptions['redirect_topic'] === null ? 0 : $topicOptions['redirect_topic'],
 		);

@@ -42,12 +42,27 @@ class Post_Controller extends Action_Controller
 	protected $_attach_errors = null;
 
 	/**
+	 * The template layers object
+	 *
+	 * @var null|object
+	 */
+	protected $_template_layers = null;
+
+	/**
+	 * An array of attributes of the topic (if not new)
+	 *
+	 * @var mixed[]
+	 */
+	protected $_topic_attributes = array();
+
+	/**
 	 * Sets up common stuff for all or most of the actions.
 	 */
 	public function pre_dispatch()
 	{
 		$this->_post_errors = Error_Context::context('post', 1);
 		$this->_attach_errors = Attachment_Error_Context::context();
+		$this->_template_layers = Template_Layers::getInstance();
 	}
 
 	/**
@@ -67,7 +82,7 @@ class Post_Controller extends Action_Controller
 	 *
 	 * - additionally handles previews of posts.
 	 * - requires different permissions depending on the actions, but most notably post_new, post_reply_own, and post_reply_any.
-	 * - shows options for the editing and posting of calendar events and attachments, as well as the posting of polls.
+	 * - shows options for the editing and posting of calendar events and attachments, as well as the posting of polls (using modules).
 	 * - accessed from ?action=post.
 	 *
 	 * @uses the Post template and language file, main sub template.
@@ -79,25 +94,29 @@ class Post_Controller extends Action_Controller
 		loadLanguage('Post');
 		loadLanguage('Errors');
 
-		// You can't reply with a poll... hacker.
-		if (isset($_REQUEST['poll']) && !empty($topic) && !isset($_REQUEST['msg']))
-			unset($_REQUEST['poll']);
-
 		$this->_attach_errors->activate();
-		$first_subject = '';
 
 		$context['robot_no_index'] = true;
-		$template_layers = Template_Layers::getInstance();
-		$template_layers->add('postarea');
+		$this->_template_layers->add('postarea');
+		$this->_topic_attributes = array(
+			'locked' => false,
+			'notify' => false,
+			'is_sticky' => false,
+			'id_last_msg' => 0,
+			'id_member' => 0,
+			'id_first_msg' => 0,
+			'subject' => '',
+			'last_post_time' => 0
+		);
 
-		$this->_events->trigger('prepare_post');
+		$this->_events->trigger('prepare_post', array('topic_attributes' => &$this->_topic_attributes));
 
 		// You must be posting to *some* board.
 		if (empty($board) && !$context['make_event'])
 			fatal_lang_error('no_board', false);
 
 		// All those wonderful modifiers and attachments
-		$template_layers->add('additional_options', 200);
+		$this->_template_layers->add('additional_options', 200);
 
 		require_once(SUBSDIR . '/Post.subs.php');
 		require_once(SUBSDIR . '/Messages.subs.php');
@@ -123,11 +142,9 @@ class Post_Controller extends Action_Controller
 		// Check if it's locked. It isn't locked if no topic is specified.
 		if (!empty($topic))
 		{
-			list ($locked, $context['notify'], $sticky, $pollID, $context['topic_last_message'], $id_member_poster, $id_first_msg, $first_subject, $lastPostTime) = array_values(topicUserAttributes($topic, $user_info['id']));
-
-			// If this topic already has a poll, they sure can't add another.
-			if (isset($_REQUEST['poll']) && $pollID > 0)
-				unset($_REQUEST['poll']);
+			$this->_topic_attributes = topicUserAttributes($topic, $user_info['id']);
+			$context['notify'] = $this->_topic_attributes['notify'];
+			$context['topic_last_message'] = $this->_topic_attributes['id_last_msg'];
 
 			if (empty($_REQUEST['msg']))
 			{
@@ -136,7 +153,7 @@ class Post_Controller extends Action_Controller
 
 				// By default the reply will be approved...
 				$context['becomes_approved'] = true;
-				if ($id_member_poster != $user_info['id'])
+				if ($this->_topic_attributes['id_member'] != $user_info['id'])
 				{
 					if ($modSettings['postmod_active'] && allowedTo('post_unapproved_replies_any') && !allowedTo('post_reply_any'))
 						$context['becomes_approved'] = false;
@@ -162,20 +179,14 @@ class Post_Controller extends Action_Controller
 			else
 				$context['becomes_approved'] = true;
 
-			$context['can_lock'] = allowedTo('lock_any') || ($user_info['id'] == $id_member_poster && allowedTo('lock_own'));
+			$context['can_lock'] = allowedTo('lock_any') || ($user_info['id'] == $this->_topic_attributes['id_member'] && allowedTo('lock_own'));
 			$context['can_sticky'] = allowedTo('make_sticky') && !empty($modSettings['enableStickyTopics']);
 			$context['notify'] = !empty($context['notify']);
-			$context['sticky'] = isset($_REQUEST['sticky']) ? !empty($_REQUEST['sticky']) : $sticky;
-
-			// It's a new reply
-			if (empty($_REQUEST['msg']))
-				$context['can_add_poll'] = false;
-			else
-				$context['can_add_poll'] = (allowedTo('poll_add_any') || (!empty($_REQUEST['msg']) && $id_first_msg == $_REQUEST['msg'] && allowedTo('poll_add_own'))) && !empty($modSettings['pollMode']) && $pollID <= 0;
+			$context['sticky'] = isset($_REQUEST['sticky']) ? !empty($_REQUEST['sticky']) : $this->_topic_attributes['is_sticky'];
 		}
 		else
 		{
-			$id_member_poster = 0;
+			$this->_topic_attributes['id_member'] = 0;
 			$context['becomes_approved'] = true;
 			if ((!$context['make_event'] || !empty($board)))
 			{
@@ -185,7 +196,7 @@ class Post_Controller extends Action_Controller
 					isAllowedTo('post_new');
 			}
 
-			$locked = 0;
+			$this->_topic_attributes['locked'] = 0;
 
 			// @todo These won't work if you're making an event.
 			$context['can_lock'] = allowedTo(array('lock_any', 'lock_own'));
@@ -193,7 +204,6 @@ class Post_Controller extends Action_Controller
 
 			$context['notify'] = !empty($context['notify']);
 			$context['sticky'] = !empty($_REQUEST['sticky']);
-			$context['can_add_poll'] = (allowedTo('poll_add_any') || allowedTo('poll_add_own')) && !empty($modSettings['pollMode']);
 		}
 
 		// @todo These won't work if you're posting an event!
@@ -202,16 +212,9 @@ class Post_Controller extends Action_Controller
 		$context['move'] = !empty($_REQUEST['move']);
 		$context['announce'] = !empty($_REQUEST['announce']);
 
-		if ($context['can_add_poll'])
-		{
-			addJavascriptVar(array(
-				'poll_remove' => $txt['poll_remove'],
-				'poll_add' => $txt['add_poll']), true);
-		}
-
 		// You can only announce topics that will get approved...
 		$context['can_announce'] = allowedTo('announce_topic') && $context['becomes_approved'];
-		$context['locked'] = !empty($locked) || !empty($_REQUEST['lock']);
+		$context['locked'] = !empty($this->_topic_attributes['locked']) || !empty($_REQUEST['lock']);
 		$context['can_quote'] = empty($modSettings['disabledBBC']) || !in_array('quote', explode(',', $modSettings['disabledBBC']));
 
 		// Generally don't show the approval box... (Assume we want things approved)
@@ -221,50 +224,12 @@ class Post_Controller extends Action_Controller
 		$context['attachments']['current'] = array();
 
 		// Don't allow a post if it's locked and you aren't all powerful.
-		if ($locked && !allowedTo('moderate_board'))
+		if ($this->_topic_attributes['locked'] && !allowedTo('moderate_board'))
 			fatal_lang_error('topic_locked', false);
-
-		// Check the users permissions - is the user allowed to add or post a poll?
-		if (isset($_REQUEST['poll']) && !empty($modSettings['pollMode']))
-		{
-			// New topic, new poll.
-			if (empty($topic))
-				isAllowedTo('poll_post');
-			// This is an old topic - but it is yours!  Can you add to it?
-			elseif ($user_info['id'] == $id_member_poster && !allowedTo('poll_add_any'))
-				isAllowedTo('poll_add_own');
-			// If you're not the owner, can you add to any poll?
-			else
-				isAllowedTo('poll_add_any');
-			$context['can_moderate_poll'] = true;
-
-			require_once(SUBSDIR . '/Members.subs.php');
-			$allowedVoteGroups = groupsAllowedTo('poll_vote', $board);
-
-			// Set up the poll options.
-			$context['poll'] = array(
-				'max_votes' => empty($_POST['poll_max_votes']) ? '1' : max(1, $_POST['poll_max_votes']),
-				'hide_results' => empty($_POST['poll_hide']) ? 0 : $_POST['poll_hide'],
-				'expiration' => !isset($_POST['poll_expire']) ? '' : $_POST['poll_expire'],
-				'change_vote' => isset($_POST['poll_change_vote']),
-				'guest_vote' => isset($_POST['poll_guest_vote']),
-				'guest_vote_allowed' => in_array(-1, $allowedVoteGroups['allowed']),
-			);
-
-			// Make all five poll choices empty.
-			$context['poll']['choices'] = array(
-				array('id' => 0, 'number' => 1, 'label' => '', 'is_last' => false),
-				array('id' => 1, 'number' => 2, 'label' => '', 'is_last' => false),
-				array('id' => 2, 'number' => 3, 'label' => '', 'is_last' => false),
-				array('id' => 3, 'number' => 4, 'label' => '', 'is_last' => false),
-				array('id' => 4, 'number' => 5, 'label' => '', 'is_last' => true)
-			);
-			$context['last_choice_id'] = 4;
-		}
 
 		try
 		{
-			$this->_events->trigger('prepare_context', array('id_member_poster' => $id_member_poster));
+			$this->_events->trigger('prepare_context', array('id_member_poster' => $this->_topic_attributes['id_member']));
 		}
 		catch (Controller_Redirect_Exception $e)
 		{
@@ -294,6 +259,7 @@ class Post_Controller extends Action_Controller
 
 		// Get a response prefix (like 'Re:') in the default forum language.
 		$context['response_prefix'] = response_prefix();
+		$context['destination'] = 'post2;start=' . $_REQUEST['start'];
 
 		// Are we moving a discussion to its own topic?
 		if (!empty($modSettings['enableFollowup']) && !empty($_REQUEST['followup']))
@@ -338,6 +304,7 @@ class Post_Controller extends Action_Controller
 				// They are previewing if they asked to preview (i.e. came from quick reply).
 				$really_previewing = !empty($_REQUEST['preview']);
 			}
+			$this->_events->trigger('prepare_modifying', array('post_errors' => $this->_post_errors, 'attach_errors' => $this->_attach_errors, 'really_previewing' => &$really_previewing));
 
 			// In order to keep the approval status flowing through, we have to pass it through the form...
 			$context['becomes_approved'] = empty($_REQUEST['not_approved']);
@@ -351,9 +318,6 @@ class Post_Controller extends Action_Controller
 			// Make sure the subject isn't too long - taking into account special characters.
 			if (Util::strlen($form_subject) > 100)
 				$form_subject = Util::substr($form_subject, 0, 100);
-
-			if (isset($_REQUEST['poll']))
-				$this->_preparePollContext();
 
 			// Are you... a guest?
 			if ($user_info['is_guest'])
@@ -402,7 +366,7 @@ class Post_Controller extends Action_Controller
 			$context['icon'] = isset($_REQUEST['icon']) ? preg_replace('~[\./\\\\*\':"<>]~', '', $_REQUEST['icon']) : 'xx';
 
 			// Set the destination action for submission.
-			$context['destination'] = 'post2;start=' . $_REQUEST['start'] . (isset($_REQUEST['msg']) ? ';msg=' . $_REQUEST['msg'] . ';' . $context['session_var'] . '=' . $context['session_id'] : '') . (isset($_REQUEST['poll']) ? ';poll' : '');
+			$context['destination'] .= isset($_REQUEST['msg']) ? ';msg=' . $_REQUEST['msg'] . ';' . $context['session_var'] . '=' . $context['session_id'] : '';
 			$context['submit_label'] = isset($_REQUEST['msg']) ? $txt['save'] : $txt['post'];
 
 			// Previewing an edit?
@@ -441,7 +405,7 @@ class Post_Controller extends Action_Controller
 				else
 					$case = 4;
 
-				list ($form_subject,) = getFormMsgSubject($case, $topic, $first_subject);
+				list ($form_subject,) = getFormMsgSubject($case, $topic, $this->_topic_attributes['subject']);
 			}
 
 			// No check is needed, since nothing is really posted.
@@ -457,6 +421,8 @@ class Post_Controller extends Action_Controller
 			// The message they were trying to edit was most likely deleted.
 			if ($message === false)
 				fatal_lang_error('no_message', false);
+
+			$this->_events->trigger('prepare_editing', array('topic' => $topic, 'message' => &$message));
 
 			if (!empty($message['errors']))
 				foreach ($errors as $error)
@@ -474,7 +440,7 @@ class Post_Controller extends Action_Controller
 			$context['icon'] = $message['message']['icon'];
 
 			// Set the destination.
-			$context['destination'] = 'post2;start=' . $_REQUEST['start'] . ';msg=' . $msg_id . ';' . $context['session_var'] . '=' . $context['session_id'] . (isset($_REQUEST['poll']) ? ';poll' : '');
+			$context['destination'] .= ';msg=' . $msg_id . ';' . $context['session_var'] . '=' . $context['session_id'];
 			$context['submit_label'] = $txt['save'];
 		}
 		// Posting...
@@ -489,28 +455,26 @@ class Post_Controller extends Action_Controller
 				$context['name'] = isset($_SESSION['guest_name']) ? $_SESSION['guest_name'] : '';
 				$context['email'] = isset($_SESSION['guest_email']) ? $_SESSION['guest_email'] : '';
 			}
-			$context['destination'] = 'post2;start=' . $_REQUEST['start'] . (isset($_REQUEST['poll']) ? ';poll' : '');
+
+			$this->_events->trigger('prepare_posting');
 
 			$context['submit_label'] = $txt['post'];
 
 			// @todo: sort out what kind of combinations are actually possible
 			// Posting a quoted reply?
 			if ((!empty($topic) && !empty($_REQUEST['quote'])) || (!empty($modSettings['enableFollowup']) && !empty($_REQUEST['followup'])))
-			{
 				$case = 2;
-				$msg_id = !empty($_REQUEST['quote']) ? (int) $_REQUEST['quote'] : (int) $_REQUEST['followup'];
-			}
 			// Posting a reply without a quote?
 			elseif (!empty($topic) && empty($_REQUEST['quote']))
 				$case = 3;
 			else
 				$case = 4;
 
-			list ($form_subject, $form_message) = getFormMsgSubject($case, $topic, $first_subject);
+			list ($form_subject, $form_message) = getFormMsgSubject($case, $topic, $this->_topic_attributes['subject']);
 		}
 
 		// Check whether this is a really old post being bumped...
-		if (!empty($topic) && !empty($modSettings['oldTopicDays']) && $lastPostTime + $modSettings['oldTopicDays'] * 86400 < time() && empty($sticky) && !isset($_REQUEST['subject']))
+		if (!empty($topic) && !empty($modSettings['oldTopicDays']) && $this->_topic_attributes['last_post_time'] + $modSettings['oldTopicDays'] * 86400 < time() && empty($this->_topic_attributes['is_sticky']) && !isset($_REQUEST['subject']))
 			$this->_post_errors->addError(array('old_topic', array($modSettings['oldTopicDays'])), 0);
 
 		$context['attachments']['can']['post'] = !empty($modSettings['attachmentEnable']) && $modSettings['attachmentEnable'] == 1 && (allowedTo('post_attachment') || ($modSettings['postmod_active'] && allowedTo('post_unapproved_attachments')));
@@ -702,12 +666,10 @@ class Post_Controller extends Action_Controller
 			}
 		}
 
-		// What are you doing? Posting a poll, modifying, previewing, new post, or reply...
+		// What are you doing? Posting, modifying, previewing, new post, or reply...
 		if (empty($context['page_title']))
 		{
-			if (isset($_REQUEST['poll']))
-				$context['page_title'] = $txt['new_poll'];
-			elseif (isset($_REQUEST['msg']))
+			if (isset($_REQUEST['msg']))
 				$context['page_title'] = $txt['modify_msg'];
 			elseif (isset($_REQUEST['subject'], $context['preview_subject']))
 				$context['page_title'] = $txt['post_reply'];
@@ -776,7 +738,7 @@ class Post_Controller extends Action_Controller
 			$this->_prepareDraftsContext($user_info['id'], $topic);
 
 			if (!empty($context['drafts']))
-				$template_layers->add('load_drafts', 100);
+				$this->_template_layers->add('load_drafts', 100);
 		}
 
 		// Needed for the editor and message icons.
@@ -798,13 +760,6 @@ class Post_Controller extends Action_Controller
 		create_control_richedit($editorOptions);
 
 		$context['attached'] = '';
-		$context['make_poll'] = isset($_REQUEST['poll']);
-
-		if ($context['make_poll'])
-		{
-			loadTemplate('Poll');
-			$template_layers->add('poll_edit');
-		}
 
 		// Message icons - customized or not, retrieve them...
 		$context['icons'] = getMessageIcons($board);
@@ -836,20 +791,7 @@ class Post_Controller extends Action_Controller
 			}
 		}
 
-		// Are we starting a poll? if set the poll icon as selected if its available
-		if (isset($_REQUEST['poll']))
-		{
-			for ($i = 0, $n = count($context['icons']); $i < $n; $i++)
-			{
-				if ($context['icons'][$i]['value'] == 'poll')
-				{
-					$context['icons'][$i]['selected'] = true;
-					$context['icon'] = 'poll';
-					$context['icon_url'] = $context['icons'][$i]['url'];
-					break;
-				}
-			}
-		}
+		$this->_events->trigger('finalize_post_form', array('destination' => &$context['destination'], 'page_title' => &$context['page_title']));
 
 		// If the user can post attachments prepare the warning labels.
 		if ($context['attachments']['can']['post'])
@@ -906,7 +848,7 @@ class Post_Controller extends Action_Controller
 		$context['show_additional_options'] = !empty($_POST['additional_options']) || isset($_SESSION['temp_attachments']['post']) || isset($_GET['additionalOptions']);
 		$context['is_new_topic'] = empty($topic);
 		$context['is_new_post'] = !isset($_REQUEST['msg']);
-		$context['is_first_post'] = $context['is_new_topic'] || (isset($_REQUEST['msg']) && $_REQUEST['msg'] == $id_first_msg);
+		$context['is_first_post'] = $context['is_new_topic'] || (isset($_REQUEST['msg']) && $_REQUEST['msg'] == $this->_topic_attributes['id_first_msg']);
 		$context['current_action'] = 'post';
 
 		// Register this form in the session variables.
@@ -960,6 +902,8 @@ class Post_Controller extends Action_Controller
 
 			return $this->action_post();
 		}
+
+		$topic_info = array();
 
 		// Wrong verification code?
 		if (!$user_info['is_admin'] && !$user_info['is_mod'] && !empty($modSettings['posts_require_captcha']) && ($user_info['posts'] < $modSettings['posts_require_captcha'] || ($user_info['is_guest'] && $modSettings['posts_require_captcha'] == -1)))
@@ -1060,9 +1004,7 @@ class Post_Controller extends Action_Controller
 			if ($topic_info['locked'] != 0 && !allowedTo('moderate_board'))
 				fatal_lang_error('topic_locked', false);
 
-			// Sorry, multiple polls aren't allowed... yet.  You should stop giving me ideas :P.
-			if (isset($_REQUEST['poll']) && $topic_info['id_poll'] > 0)
-				unset($_REQUEST['poll']);
+			$this->_events->trigger('save_replying', array('topic_info' => &$topic_info));
 
 			// Do the permissions and approval stuff...
 			$becomesApproved = true;
@@ -1142,6 +1084,8 @@ class Post_Controller extends Action_Controller
 			else
 				isAllowedTo('post_new');
 
+			$this->_events->trigger('save_new_topic', array('becomesApproved' => &$becomesApproved));
+
 			if (isset($_POST['lock']))
 			{
 				// New topics are by default not locked.
@@ -1177,6 +1121,8 @@ class Post_Controller extends Action_Controller
 
 			if (empty($msgInfo))
 				fatal_lang_error('cant_find_messages', false);
+
+			$this->_events->trigger('save_modify', array('msgInfo' => &$msgInfo));
 
 			if (!empty($topic_info['locked']) && !allowedTo('moderate_board'))
 				fatal_lang_error('topic_locked', false);
@@ -1317,42 +1263,7 @@ class Post_Controller extends Action_Controller
 				$this->_post_errors->addError('no_message');
 		}
 
-		$this->_events->trigger('prepare_save_post', array($this->_post_errors));
-
-		// Validate the poll...
-		if (isset($_REQUEST['poll']) && !empty($modSettings['pollMode']))
-		{
-			if (!empty($topic) && !isset($_REQUEST['msg']))
-				fatal_lang_error('no_access', false);
-
-			// This is a new topic... so it's a new poll.
-			if (empty($topic))
-				isAllowedTo('poll_post');
-			// Can you add to your own topics?
-			elseif ($user_info['id'] == $topic_info['id_member_started'] && !allowedTo('poll_add_any'))
-				isAllowedTo('poll_add_own');
-			// Can you add polls to any topic, then?
-			else
-				isAllowedTo('poll_add_any');
-
-			if (!isset($_POST['question']) || trim($_POST['question']) == '')
-				$this->_post_errors->addError('no_question');
-
-			$_POST['options'] = empty($_POST['options']) ? array() : htmltrim__recursive($_POST['options']);
-
-			// Get rid of empty ones.
-			foreach ($_POST['options'] as $k => $option)
-			{
-				if ($option == '')
-					unset($_POST['options'][$k], $_POST['options'][$k]);
-			}
-
-			// What are you going to vote between with one choice?!?
-			if (count($_POST['options']) < 2)
-				$this->_post_errors->addError('poll_few');
-			elseif (count($_POST['options']) > 256)
-				$this->_post_errors->addError('poll_many');
-		}
+		$this->_events->trigger('prepare_save_post', array('post_errors' => $this->_post_errors, 'topic_info' => $topic_info));
 
 		if ($posterIsGuest)
 		{
@@ -1408,14 +1319,6 @@ class Post_Controller extends Action_Controller
 		// At this point, we want to make sure the subject isn't too long.
 		if (Util::strlen($_POST['subject']) > 100)
 			$_POST['subject'] = Util::substr($_POST['subject'], 0, 100);
-
-		$this->_events->trigger('pre_save_post');
-
-		// Make the poll...
-		if (isset($_REQUEST['poll']))
-			$id_poll = $this->_createPoll($_POST, $_POST['guestname']);
-		else
-			$id_poll = 0;
 
 		// ...or attach a new file...
 		if (empty($ignore_temp) && $context['attachments']['can']['post'] && !empty($_SESSION['temp_attachments']) && empty($_POST['from_qr']))
@@ -1483,7 +1386,6 @@ class Post_Controller extends Action_Controller
 		$topicOptions = array(
 			'id' => empty($topic) ? 0 : $topic,
 			'board' => $board,
-			'poll' => isset($_REQUEST['poll']) ? $id_poll : null,
 			'lock_mode' => isset($_POST['lock']) ? (int) $_POST['lock'] : null,
 			'sticky_mode' => isset($_POST['sticky']) && !empty($modSettings['enableStickyTopics']) ? (int) $_POST['sticky'] : null,
 			'mark_as_read' => true,
@@ -1496,6 +1398,8 @@ class Post_Controller extends Action_Controller
 			'email' => $_POST['email'],
 			'update_post_count' => !$user_info['is_guest'] && !isset($_REQUEST['msg']) && $board_info['posts_count'],
 		);
+
+		$this->_events->trigger('pre_save_post', array('msgOptions' => &$msgOptions, 'topicOptions' => &$topicOptions, 'posterOptions' => &$posterOptions));
 
 		// This is an already existing message. Edit it.
 		if (!empty($_REQUEST['msg']))
@@ -1552,7 +1456,7 @@ class Post_Controller extends Action_Controller
 		if (!empty($modSettings['drafts_enabled']) && !empty($_POST['id_draft']))
 			deleteDrafts($_POST['id_draft'], $user_info['id']);
 
-		$this->_events->trigger('save_post', array('board' => $board, 'topic' => $topic, 'msgOptions' => $msgOptions, 'topicOptions' => $topicOptions, 'becomesApproved' => $becomesApproved));
+		$this->_events->trigger('after_save_post', array('board' => $board, 'topic' => $topic, 'msgOptions' => $msgOptions, 'topicOptions' => $topicOptions, 'becomesApproved' => $becomesApproved));
 
 		// Marking boards as read.
 		// (You just posted and they will be unread.)
@@ -2014,7 +1918,7 @@ class Post_Controller extends Action_Controller
 			);';
 
 		// And instruct the template system to just show the spellcheck sub template.
-		Template_Layers::getInstance()->removeAll();
+		$this->_template_layers->removeAll();
 		$context['sub_template'] = 'spellcheck';
 	}
 
@@ -2060,128 +1964,5 @@ class Post_Controller extends Action_Controller
 				'link' => '<a href="' . $scripturl . '?action=post;board=' . $draft['id_board'] . ';' . (!empty($draft['id_topic']) ? 'topic='. $draft['id_topic'] .'.0;' : '') . 'id_draft=' . $draft['id_draft'] . '">' . (!empty($draft['subject']) ? $draft['subject'] : $txt['drafts_none']) . '</a>',
 			);
 		}
-	}
-
-	/**
-	 * Loads in context stuff related to polls
-	 */
-	private function _preparePollContext()
-	{
-		global $context;
-
-		$context['poll']['question'] = isset($_REQUEST['question']) ? Util::htmlspecialchars(trim($_REQUEST['question'])) : '';
-
-		$context['poll']['choices'] = array();
-		// @deprecated since 1.1 - backward compatibility with 1.0
-		$context['choices'] &= $context['poll']['choices'];
-		$choice_id = 0;
-
-		$_POST['options'] = empty($_POST['options']) ? array() : htmlspecialchars__recursive($_POST['options']);
-		foreach ($_POST['options'] as $option)
-		{
-			if (trim($option) == '')
-				continue;
-
-			$context['poll']['choices'][] = array(
-				'id' => $choice_id++,
-				'number' => $choice_id,
-				'label' => $option,
-				'is_last' => false
-			);
-		}
-
-		// One empty option for those with js disabled...I know are few... :P
-		$context['poll']['choices'][] = array(
-			'id' => $choice_id++,
-			'number' => $choice_id,
-			'label' => '',
-			'is_last' => false
-		);
-
-		if (count($context['poll']['choices']) < 2)
-		{
-			$context['poll']['choices'][] = array(
-				'id' => $choice_id++,
-				'number' => $choice_id,
-				'label' => '',
-				'is_last' => false
-			);
-		}
-
-		$context['last_choice_id'] = $choice_id;
-		$context['poll']['choices'][count($context['poll']['choices']) - 1]['is_last'] = true;
-	}
-
-	/**
-	 * Creates a poll based on an array (of POST'ed data)
-	 *
-	 * @param mixed[] $options
-	 * @param string $user_name The username of the member that creates the poll
-	 *
-	 * @return int - the id of the newly created poll
-	 */
-	private function _createPoll($options, $user_name)
-	{
-		global $user_info, $board;
-
-		// Make sure that the user has not entered a ridiculous number of options..
-		if (empty($options['poll_max_votes']) || $options['poll_max_votes'] <= 0)
-			$poll_max_votes = 1;
-		elseif ($options['poll_max_votes'] > count($options['options']))
-			$poll_max_votes = count($options['options']);
-		else
-			$poll_max_votes = (int) $options['poll_max_votes'];
-
-		$poll_expire = (int) $options['poll_expire'];
-		$poll_expire = $poll_expire > 9999 ? 9999 : ($poll_expire < 0 ? 0 : $poll_expire);
-
-		// Just set it to zero if it's not there..
-		if (isset($options['poll_hide']))
-			$poll_hide = (int) $options['poll_hide'];
-		else
-			$poll_hide = 0;
-
-		$poll_change_vote = isset($options['poll_change_vote']) ? 1 : 0;
-		$poll_guest_vote = isset($options['poll_guest_vote']) ? 1 : 0;
-
-		// Make sure guests are actually allowed to vote generally.
-		if ($poll_guest_vote)
-		{
-			require_once(SUBSDIR . '/Members.subs.php');
-			$allowedVoteGroups = groupsAllowedTo('poll_vote', $board);
-
-			if (!in_array(-1, $allowedVoteGroups['allowed']))
-				$poll_guest_vote = 0;
-		}
-
-		// If the user tries to set the poll too far in advance, don't let them.
-		if (!empty($poll_expire) && $poll_expire < 1)
-			// @todo this fatal error should not be here
-			fatal_lang_error('poll_range_error', false);
-		// Don't allow them to select option 2 for hidden results if it's not time limited.
-		elseif (empty($poll_expire) && $poll_hide == 2)
-			$poll_hide = 1;
-
-		// Clean up the question and answers.
-		$question = htmlspecialchars($options['question'], ENT_COMPAT, 'UTF-8');
-		$question = Util::substr($question, 255);
-		$question = preg_replace('~&amp;#(\d{4,5}|[2-9]\d{2,4}|1[2-9]\d);~', '&#$1;', $question);
-		$poll_options = htmlspecialchars__recursive($options['options']);
-
-		// Finally, make the poll.
-		require_once(SUBSDIR . '/Poll.subs.php');
-		$id_poll = createPoll(
-			$question,
-			$user_info['id'],
-			$user_name,
-			$poll_max_votes,
-			$poll_hide,
-			$poll_expire,
-			$poll_change_vote,
-			$poll_guest_vote,
-			$poll_options
-		);
-
-		return $id_poll;
 	}
 }
