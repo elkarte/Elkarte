@@ -111,21 +111,4 @@ class TestEvent extends PHPUnit_Framework_TestCase
 		// And should be similar to the original one... inverted
 		$this->assertSame($added, array($event_def[1], $event_def[0]));
 	}
-
-	/**
-	 * Performs the testing of the caching object
-	 */
-	private function doCacheTests($putAssert = null)
-	{
-		$test_array = serialize(array('anindex' => 'avalue'));
-		$key = 'testcache';
-
-		$this->_cache_obj->put($key, $test_array);
-
-		if ($putAssert !== null)
-			$this->assertTrue($putAssert($key));
-
-		$test_cached = $this->_cache_obj->get($key);
-		$this->assertSame($test_array, $test_cached);
-	}
 }

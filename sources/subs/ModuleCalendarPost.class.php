@@ -20,6 +20,10 @@
 if (!defined('ELK'))
 	die('No access...');
 
+/**
+ * This class's task is to bind the posting of a topic to a calendar event.
+ * Used when from the calendar controller the poster is redirected to the post page.
+ */
 class Module_Calendar_Post
 {
 	protected static $_make_event = false;
