@@ -6,6 +6,24 @@
 class TestCalendar_Event extends PHPUnit_Framework_TestCase
 {
 	/**
+	 * To avoid duplicated function declarations, we need an empty Calendar.subs.php
+	 */
+	public function setUpBeforeClass()
+	{
+		rename(SUBSDIR . '/Calendar.subs.php', SUBSDIR . '/Calendar_tmp.subs.php');
+		touch(SUBSDIR . '/Calendar.subs.php');
+	}
+
+	/**
+	 * Better restore it before leaving
+	 */
+	public function tearDownAfterClass()
+	{
+		unlink(SUBSDIR . '/Calendar.subs.php');
+		rename(SUBSDIR . '/Calendar_tmp.subs.php', SUBSDIR . '/Calendar.subs.php');
+	}
+
+	/**
 	 * null or -1 means new event, any other number, means existing one
 	 */
 	public function testNew()
