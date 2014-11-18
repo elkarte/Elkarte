@@ -254,6 +254,6 @@ class Calendar_Event
 	 */
 	public function isStarter($member_id)
 	{
-		return !empty($member_id) && getEventPoster($event_id) == $member_id;
+		return !empty($member_id) && getEventPoster($this->_event_id) == $member_id;
 	}
 }
