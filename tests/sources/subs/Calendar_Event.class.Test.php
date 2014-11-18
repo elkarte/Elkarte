@@ -8,7 +8,7 @@ class TestCalendar_Event extends PHPUnit_Framework_TestCase
 	/**
 	 * To avoid duplicated function declarations, we need an empty Calendar.subs.php
 	 */
-	public function setUpBeforeClass()
+	public static function setUpBeforeClass()
 	{
 		rename(SUBSDIR . '/Calendar.subs.php', SUBSDIR . '/Calendar_tmp.subs.php');
 		touch(SUBSDIR . '/Calendar.subs.php');
@@ -17,7 +17,7 @@ class TestCalendar_Event extends PHPUnit_Framework_TestCase
 	/**
 	 * Better restore it before leaving
 	 */
-	public function tearDownAfterClass()
+	public static function tearDownAfterClass()
 	{
 		unlink(SUBSDIR . '/Calendar.subs.php');
 		rename(SUBSDIR . '/Calendar_tmp.subs.php', SUBSDIR . '/Calendar.subs.php');
