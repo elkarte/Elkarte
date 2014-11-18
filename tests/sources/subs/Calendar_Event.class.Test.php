@@ -23,6 +23,11 @@ class TestCalendar_Event extends PHPUnit_Framework_TestCase
 		rename(SUBSDIR . '/Calendar_tmp.subs.php', SUBSDIR . '/Calendar.subs.php');
 	}
 
+	public function setUp()
+	{
+		$context['linktree'] = array();
+	}
+
 	/**
 	 * null or -1 means new event, any other number, means existing one
 	 */
