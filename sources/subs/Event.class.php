@@ -95,11 +95,16 @@ class Event
 	{
 		if ($this->_sorted === false)
 		{
-			$this->_priority->sort();
-			$this->_sorted = true;
+			$this->_doSorting();
 		}
 
 		return $this->_priority->hasEntities();
+	}
+
+	protected function _doSorting()
+	{
+		$this->_priority->sort();
+		$this->_sorted = true;
 	}
 
 	/**
@@ -110,6 +115,9 @@ class Event
 	public function getEvents()
 	{
 		$return = array();
+		if ($this->_sorted === false)
+			$this->_doSorting();
+
 		foreach ($this->_priority->getSortedEntities() as $value)
 			$return[] = $this->_events[$value];
 
