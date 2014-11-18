@@ -36,6 +36,12 @@ global $boarddir, $sourcedir;
 
 $ssi_error_reporting = error_reporting(E_ALL | E_STRICT);
 
+// Directional only script time usage for display
+if (function_exists('getrusage'))
+	$rusage_start = getrusage();
+else
+	$rusage_start = array();
+
 $time_start = microtime(true);
 $db_show_debug = false;
 
