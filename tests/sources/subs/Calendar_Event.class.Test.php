@@ -25,7 +25,11 @@ class TestCalendar_Event extends PHPUnit_Framework_TestCase
 
 	public function setUp()
 	{
+		global $context, $user_info;
+
 		$context['linktree'] = array();
+		// Faking an admin
+		$user_info['is_admin'] = true;
 	}
 
 	/**
@@ -67,7 +71,7 @@ class TestCalendar_Event extends PHPUnit_Framework_TestCase
 
 	/**
 	 * @expectedException Elk_Exception
-	 * @expectedExceptionMessage no_span
+	 * @expectedExceptionMessage The span feature is currently disabled.
 	 */
 	public function testValidateNoSpan()
 	{
@@ -77,27 +81,27 @@ class TestCalendar_Event extends PHPUnit_Framework_TestCase
 
 	/**
 	 * @expectedException Elk_Exception
-	 * @expectedExceptionMessage invalid_days_numb
+	 * @expectedExceptionMessage Invalid number of days to span.
 	 */
 	public function testValidateInvalidSpan1()
 	{
-		$event = new Calendar_Event(1, array('cal_allowspan' => 2));
+		$event = new Calendar_Event(1, array('cal_allowspan' => 1, 'cal_maxspan' => 3));
 		$event->validate(array('span' => -1));
 	}
 
 	/**
 	 * @expectedException Elk_Exception
-	 * @expectedExceptionMessage invalid_days_numb
+	 * @expectedExceptionMessage Invalid number of days to span.
 	 */
 	public function testValidateInvalidSpan2()
 	{
-		$event = new Calendar_Event(1, array('cal_allowspan' => 2));
+		$event = new Calendar_Event(1, array('cal_allowspan' => 1, 'cal_maxspan' => 3));
 		$event->validate(array('span' => 5));
 	}
 
 	/**
 	 * @expectedException Elk_Exception
-	 * @expectedExceptionMessage event_month_missing
+	 * @expectedExceptionMessage Event month is missing.
 	 */
 	public function testValidateNotDelete1()
 	{
@@ -108,7 +112,7 @@ class TestCalendar_Event extends PHPUnit_Framework_TestCase
 
 	/**
 	 * @expectedException Elk_Exception
-	 * @expectedExceptionMessage event_year_missing
+	 * @expectedExceptionMessage Event year is missing.
 	 */
 	public function testValidateNotDelete2()
 	{
@@ -119,7 +123,7 @@ class TestCalendar_Event extends PHPUnit_Framework_TestCase
 
 	/**
 	 * @expectedException Elk_Exception
-	 * @expectedExceptionMessage invalid_month
+	 * @expectedExceptionMessage Invalid month value.
 	 */
 	public function testValidateNotDelete3()
 	{
@@ -130,7 +134,7 @@ class TestCalendar_Event extends PHPUnit_Framework_TestCase
 
 	/**
 	 * @expectedException Elk_Exception
-	 * @expectedExceptionMessage invalid_month
+	 * @expectedExceptionMessage Invalid month value.
 	 */
 	public function testValidateNotDelete4()
 	{
@@ -141,7 +145,7 @@ class TestCalendar_Event extends PHPUnit_Framework_TestCase
 
 	/**
 	 * @expectedException Elk_Exception
-	 * @expectedExceptionMessage invalid_month
+	 * @expectedExceptionMessage Invalid month value.
 	 */
 	public function testValidateNotDelete5()
 	{
@@ -152,7 +156,7 @@ class TestCalendar_Event extends PHPUnit_Framework_TestCase
 
 	/**
 	 * @expectedException Elk_Exception
-	 * @expectedExceptionMessage invalid_year
+	 * @expectedExceptionMessage Invalid year value.
 	 */
 	public function testValidateNotDelete6()
 	{
@@ -163,7 +167,7 @@ class TestCalendar_Event extends PHPUnit_Framework_TestCase
 
 	/**
 	 * @expectedException Elk_Exception
-	 * @expectedExceptionMessage invalid_year
+	 * @expectedExceptionMessage Invalid year value.
 	 */
 	public function testValidateNotDelete7()
 	{
@@ -174,7 +178,7 @@ class TestCalendar_Event extends PHPUnit_Framework_TestCase
 
 	/**
 	 * @expectedException Elk_Exception
-	 * @expectedExceptionMessage event_day_missing
+	 * @expectedExceptionMessage Event day is missing.
 	 */
 	public function testValidateNotDelete8()
 	{
@@ -185,7 +189,7 @@ class TestCalendar_Event extends PHPUnit_Framework_TestCase
 
 	/**
 	 * @expectedException Elk_Exception
-	 * @expectedExceptionMessage event_title_missing
+	 * @expectedExceptionMessage Event title is missing.
 	 */
 	public function testValidateNotDelete9()
 	{
@@ -196,20 +200,9 @@ class TestCalendar_Event extends PHPUnit_Framework_TestCase
 
 	/**
 	 * @expectedException Elk_Exception
-	 * @expectedExceptionMessage event_title_missing
+	 * @expectedExceptionMessage Invalid date.
 	 */
 	public function testValidateNotDelete10()
-	{
-		$event = new Calendar_Event(1, array('cal_minyear' => 2012, 'cal_maxyear' => 2015));
-		// Subject but no evtitle => Elk_Exception
-		$event->validate(array('month' => 1, 'year' => 2013, 'day' => 1, 'subject' => 'string'));
-	}
-
-	/**
-	 * @expectedException Elk_Exception
-	 * @expectedExceptionMessage invalid_date
-	 */
-	public function testValidateNotDelete11()
 	{
 		$event = new Calendar_Event(1, array('cal_minyear' => 2012, 'cal_maxyear' => 2015));
 		// No need to test the PHP checkdata function, so just one single bad date
@@ -218,13 +211,13 @@ class TestCalendar_Event extends PHPUnit_Framework_TestCase
 
 	/**
 	 * @expectedException Elk_Exception
-	 * @expectedExceptionMessage no_event_title
+	 * @expectedExceptionMessage No event title was entered.
 	 */
-	public function testValidateNotDelete12()
+	public function testValidateNotDelete11()
 	{
 		$event = new Calendar_Event(1, array('cal_minyear' => 2012, 'cal_maxyear' => 2015));
 		// A evtitle made up of spaces should be trimmed and result in an empty string
-		$event->validate(array('month' => 2, 'year' => 2013, 'day' => 30, 'evtitle' => '    ', 'subject' => 'string'));
+		$event->validate(array('month' => 2, 'year' => 2013, 'day' => 1, 'evtitle' => '    ', 'subject' => 'string'));
 	}
 
 	/**
