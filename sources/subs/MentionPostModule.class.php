@@ -14,7 +14,7 @@
 if (!defined('ELK'))
 	die('No access...');
 
-class Module_Mention_Post
+class Mention_Post_Module
 {
 	protected static $_enabled = false;
 	protected $_actually_mentioned = array();
@@ -28,10 +28,10 @@ class Module_Mention_Post
 
 		if (self::$_enabled)
 			return array(
-				array('prepare_post', array('Module_Mention_Post', 'prepare_post'), array('events')),
-				array('prepare_context', array('Module_Mention_Post', 'prepare_context'), array()),
-				array('after_save_post', array('Module_Mention_Post', 'after_save_post'), array()),
-				array('save_post', array('Module_Mention_Post', 'save_post'), array('msgOptions', 'becomesApproved')),
+				array('prepare_post', array('Mention_Post_Module', 'prepare_post'), array('events')),
+				array('prepare_context', array('Mention_Post_Module', 'prepare_context'), array()),
+				array('after_save_post', array('Mention_Post_Module', 'after_save_post'), array()),
+				array('save_post', array('Mention_Post_Module', 'save_post'), array('msgOptions', 'becomesApproved')),
 			);
 		else
 			return array();

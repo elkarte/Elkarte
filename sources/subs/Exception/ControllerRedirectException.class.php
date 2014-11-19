@@ -72,7 +72,7 @@ class Controller_Redirect_Exception extends Exception
 		$this->_loadModules($this->_controller);
 		$event_manager = new Event_Manager($this->_controller);
 		$event_manager->registerAddons('Addon_' . ucfirst($this->_controller) . '.+');
-		$event_manager->registerAddons('Module_.+_' . ucfirst($this->_controller));
+		$event_manager->registerAddons('.+_' . ucfirst($this->_controller) . '_Module');
 
 		$controller_name = ucfirst($this->_controller) . '_Controller';
 		$controller = new $controller_name();
@@ -91,7 +91,7 @@ class Controller_Redirect_Exception extends Exception
 	 */
 	protected function _loadModules($hook)
 	{
-		foreach (glob(SUBSDIR . '/Module*' . ucfirst($hook) . '.class.php') as $require_file)
+		foreach (glob(SUBSDIR . '/' . ucfirst($hook) . '*Module.class.php') as $require_file)
 			require_once($require_file);
 	}
 }

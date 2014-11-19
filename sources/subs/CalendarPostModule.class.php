@@ -24,7 +24,7 @@ if (!defined('ELK'))
  * This class's task is to bind the posting of a topic to a calendar event.
  * Used when from the calendar controller the poster is redirected to the post page.
  */
-class Module_Calendar_Post
+class Calendar_Post_Module
 {
 	protected static $_make_event = false;
 
@@ -39,10 +39,10 @@ class Module_Calendar_Post
 
 		if (self::$_make_event)
 			return array(
-				array('prepare_post', array('Module_Calendar_Post', 'prepare_post'), array()),
-				array('prepare_context', array('Module_Calendar_Post', 'prepare_context'), array()),
-				array('prepare_save_post', array('Module_Calendar_Post', 'prepare_save_post'), array()),
-				array('save_post', array('Module_Calendar_Post', 'save_post'), array()),
+				array('prepare_post', array('Calendar_Post_Module', 'prepare_post'), array()),
+				array('prepare_context', array('Calendar_Post_Module', 'prepare_context'), array()),
+				array('prepare_save_post', array('Calendar_Post_Module', 'prepare_save_post'), array()),
+				array('save_post', array('Calendar_Post_Module', 'save_post'), array()),
 			);
 		else
 			return array();

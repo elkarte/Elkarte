@@ -309,7 +309,7 @@ class Calendar_Controller extends Action_Controller
 		$this->_loadModules('post');
 		$event_manager = new Event_Manager('post');
 		$event_manager->registerAddons('Addon_Post.+');
-		$event_manager->registerAddons('Module_.+_Post');
+		$event_manager->registerAddons('.+_Post_Module');
 
 		$controller = new Post_Controller();
 		$controller->setEventManager($event_manager);
@@ -325,7 +325,7 @@ class Calendar_Controller extends Action_Controller
 	 */
 	protected function _loadModules($hook)
 	{
-		foreach (glob(SUBSDIR . '/Module*' . ucfirst($hook) . '.class.php') as $require_file)
+		foreach (glob(SUBSDIR . '/' . ucfirst($hook) . '*Module.class.php') as $require_file)
 			require_once($require_file);
 	}
 

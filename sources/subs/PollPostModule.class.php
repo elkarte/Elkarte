@@ -20,7 +20,7 @@
 if (!defined('ELK'))
 	die('No access...');
 
-class Module_Poll_Post
+class Poll_Post_Module
 {
 	protected static $_make_poll = false;
 
@@ -34,10 +34,10 @@ class Module_Poll_Post
 		$return = array();
 		if (!empty($modSettings['pollMode']))
 			$return = array(
-				array('prepare_post', array('Module_Poll_Post', 'prepare_post'), array('topic', 'topic_attributes')),
-				array('prepare_context', array('Module_Poll_Post', 'prepare_context'), array('topic_attributes', 'topic', 'board')),
-				array('finalize_post_form', array('Module_Poll_Post', 'finalize_post_form'), array('destination', 'page_title', 'template_layers')),
-				array('prepare_save_post', array('Module_Poll_Post', 'prepare_save_post'), array()),
+				array('prepare_post', array('Poll_Post_Module', 'prepare_post'), array('topic', 'topic_attributes')),
+				array('prepare_context', array('Poll_Post_Module', 'prepare_context'), array('topic_attributes', 'topic', 'board')),
+				array('finalize_post_form', array('Poll_Post_Module', 'finalize_post_form'), array('destination', 'page_title', 'template_layers')),
+				array('prepare_save_post', array('Poll_Post_Module', 'prepare_save_post'), array()),
 			);
 
 		// Posting a poll?
@@ -45,8 +45,8 @@ class Module_Poll_Post
 
 		if (self::$_make_poll)
 			return array_merge($return, array(
-				array('save_replying', array('Module_Poll_Post', 'save_replying'), array()),
-				array('pre_save_post', array('Module_Poll_Post', 'pre_save_post'), array('topicOptions')),
+				array('save_replying', array('Poll_Post_Module', 'save_replying'), array()),
+				array('pre_save_post', array('Poll_Post_Module', 'pre_save_post'), array('topicOptions')),
 			));
 		else
 			return $return;

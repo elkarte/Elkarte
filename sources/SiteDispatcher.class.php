@@ -321,7 +321,7 @@ class Site_Dispatcher
 			$this->_loadModules($hook);
 			$event_manager = new Event_Manager($hook);
 			$event_manager->registerAddons('Addon_' . ucfirst($hook). '.+');
-			$event_manager->registerAddons('Module_.+_' . ucfirst($hook));
+			$event_manager->registerAddons('.+_' . ucfirst($hook) . '_Module');
 			$controller->setEventManager($event_manager);
 
 			// Pre-dispatch (load templates and stuff)
@@ -361,7 +361,7 @@ class Site_Dispatcher
 
 	protected function _loadModules($hook)
 	{
-		$this->_requireFiles(SUBSDIR . '/Module*' . ucfirst($hook) . '.class.php');
+		$this->_requireFiles(SUBSDIR . '/*' . ucfirst($hook) . 'Module.class.php');
 	}
 
 	protected function _loadAddons()
