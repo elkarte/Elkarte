@@ -16,7 +16,18 @@ if (!defined('ELK'))
 
 class Elk_Exception extends Exception
 {
+	/**
+	 * The log under which the error should be displayed.
+	 *
+	 * @var bool|string
+	 */
 	protected $log = '';
+
+	/**
+	 * Values to use in vsprintf.
+	 *
+	 * @var string[]
+	 */
 	protected $sprintf = array();
 
 	/**
