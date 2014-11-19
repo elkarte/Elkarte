@@ -71,7 +71,7 @@ class Controller_Redirect_Exception extends Exception
 	{
 		$this->_loadModules($this->_controller);
 		$event_manager = new Event_Manager($this->_controller);
-		$event_manager->registerAddons('Addon_' . ucfirst($this->_controller) . '.+');
+		$event_manager->registerAddons('.+_' . ucfirst($this->_controller) . '_Addon');
 		$event_manager->registerAddons('.+_' . ucfirst($this->_controller) . '_Module');
 
 		$controller_name = ucfirst($this->_controller) . '_Controller';

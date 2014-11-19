@@ -308,7 +308,7 @@ class Calendar_Controller extends Action_Controller
 	{
 		$this->_loadModules('post');
 		$event_manager = new Event_Manager('post');
-		$event_manager->registerAddons('Addon_Post.+');
+		$event_manager->registerAddons('.+_Post_Addon');
 		$event_manager->registerAddons('.+_Post_Module');
 
 		$controller = new Post_Controller();

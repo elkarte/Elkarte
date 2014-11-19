@@ -320,7 +320,7 @@ class Site_Dispatcher
 			$this->_loadAddons($hook);
 			$this->_loadModules($hook);
 			$event_manager = new Event_Manager($hook);
-			$event_manager->registerAddons('Addon_' . ucfirst($hook). '.+');
+			$event_manager->registerAddons('.+_' . ucfirst($hook). '_Addon');
 			$event_manager->registerAddons('.+_' . ucfirst($hook) . '_Module');
 			$controller->setEventManager($event_manager);
 
