@@ -41,7 +41,7 @@ class Calendar_Post_Module
 			return array(
 				array('prepare_post', array('Calendar_Post_Module', 'prepare_post'), array()),
 				array('prepare_context', array('Calendar_Post_Module', 'prepare_context'), array()),
-				array('prepare_save_post', array('Calendar_Post_Module', 'prepare_save_post'), array()),
+				array('before_save_post', array('Calendar_Post_Module', 'before_save_post'), array()),
 				array('save_post', array('Calendar_Post_Module', 'save_post'), array()),
 			);
 		else
@@ -53,7 +53,7 @@ class Calendar_Post_Module
 		Template_Layers::getInstance()->addAfter('make_event', 'postarea');
 	}
 
-	public function prepare_save_post($post_errors)
+	public function before_save_post($post_errors)
 	{
 		if (!isset($_REQUEST['deleteevent']) && Util::htmltrim($_POST['evtitle']) === '')
 			$post_errors->addError('no_event');

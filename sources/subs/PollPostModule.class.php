@@ -37,7 +37,7 @@ class Poll_Post_Module
 				array('prepare_post', array('Poll_Post_Module', 'prepare_post'), array('topic', 'topic_attributes')),
 				array('prepare_context', array('Poll_Post_Module', 'prepare_context'), array('topic_attributes', 'topic', 'board')),
 				array('finalize_post_form', array('Poll_Post_Module', 'finalize_post_form'), array('destination', 'page_title', 'template_layers')),
-				array('prepare_save_post', array('Poll_Post_Module', 'prepare_save_post'), array()),
+				array('before_save_post', array('Poll_Post_Module', 'before_save_post'), array()),
 			);
 
 		// Posting a poll?
@@ -158,7 +158,7 @@ class Poll_Post_Module
 			$this->_unset_poll();
 	}
 
-	public function prepare_save_post($post_errors, $topic_info)
+	public function before_save_post($post_errors, $topic_info)
 	{
 		global $user_info;
 

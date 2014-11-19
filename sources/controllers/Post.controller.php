@@ -35,13 +35,6 @@ class Post_Controller extends Action_Controller
 	protected $_post_errors = null;
 
 	/**
-	 * The attachments errors object
-	 *
-	 * @var null|object
-	 */
-	protected $_attach_errors = null;
-
-	/**
 	 * The template layers object
 	 *
 	 * @var null|object
@@ -61,7 +54,6 @@ class Post_Controller extends Action_Controller
 	public function pre_dispatch()
 	{
 		$this->_post_errors = Error_Context::context('post', 1);
-		$this->_attach_errors = Attachment_Error_Context::context();
 		$this->_template_layers = Template_Layers::getInstance();
 	}
 
@@ -93,8 +85,6 @@ class Post_Controller extends Action_Controller
 
 		loadLanguage('Post');
 		loadLanguage('Errors');
-
-		$this->_attach_errors->activate();
 
 		$context['robot_no_index'] = true;
 		$this->_template_layers->add('postarea');
@@ -220,9 +210,6 @@ class Post_Controller extends Action_Controller
 		// Generally don't show the approval box... (Assume we want things approved)
 		$context['show_approval'] = allowedTo('approve_posts') && $context['becomes_approved'] ? 2 : (allowedTo('approve_posts') ? 1 : 0);
 
-		// An array to hold all the attachments for this topic.
-		$context['attachments']['current'] = array();
-
 		// Don't allow a post if it's locked and you aren't all powerful.
 		if ($this->_topic_attributes['locked'] && !allowedTo('moderate_board'))
 			fatal_lang_error('topic_locked', false);
@@ -282,10 +269,10 @@ class Post_Controller extends Action_Controller
 
 		// Previewing, modifying, or posting?
 		// Do we have a body, but an error happened.
-		if (isset($_REQUEST['message']) || $this->_post_errors->hasErrors() || $this->_attach_errors->hasErrors())
+		if (isset($_REQUEST['message']) || $this->_post_errors->hasErrors())
 		{
 			// Validate inputs.
-			if (!$this->_post_errors->hasErrors() && !$this->_attach_errors->hasErrors())
+			if (!$this->_post_errors->hasErrors())
 			{
 				// This means they didn't click Post and get an error.
 				$really_previewing = true;
@@ -304,7 +291,7 @@ class Post_Controller extends Action_Controller
 				// They are previewing if they asked to preview (i.e. came from quick reply).
 				$really_previewing = !empty($_REQUEST['preview']);
 			}
-			$this->_events->trigger('prepare_modifying', array('post_errors' => $this->_post_errors, 'attach_errors' => $this->_attach_errors, 'really_previewing' => &$really_previewing));
+			$this->_events->trigger('prepare_modifying', array('post_errors' => $this->_post_errors, 'really_previewing' => &$really_previewing));
 
 			// In order to keep the approval status flowing through, we have to pass it through the form...
 			$context['becomes_approved'] = empty($_REQUEST['not_approved']);
@@ -477,158 +464,6 @@ class Post_Controller extends Action_Controller
 		if (!empty($topic) && !empty($modSettings['oldTopicDays']) && $this->_topic_attributes['last_post_time'] + $modSettings['oldTopicDays'] * 86400 < time() && empty($this->_topic_attributes['is_sticky']) && !isset($_REQUEST['subject']))
 			$this->_post_errors->addError(array('old_topic', array($modSettings['oldTopicDays'])), 0);
 
-		$context['attachments']['can']['post'] = !empty($modSettings['attachmentEnable']) && $modSettings['attachmentEnable'] == 1 && (allowedTo('post_attachment') || ($modSettings['postmod_active'] && allowedTo('post_unapproved_attachments')));
-		if ($context['attachments']['can']['post'])
-		{
-			// If there are attachments, calculate the total size and how many.
-			$attachments = array();
-			$attachments['total_size'] = 0;
-			$attachments['quantity'] = 0;
-
-			// If this isn't a new post, check the current attachments.
-			if (isset($_REQUEST['msg']))
-			{
-				$attachments['quantity'] = count($context['attachments']['current']);
-				foreach ($context['attachments']['current'] as $attachment)
-					$attachments['total_size'] += $attachment['size'];
-			}
-
-			// A bit of house keeping first.
-			if (!empty($_SESSION['temp_attachments']) && count($_SESSION['temp_attachments']) == 1)
-				unset($_SESSION['temp_attachments']);
-
-			if (!empty($_SESSION['temp_attachments']))
-			{
-				// Is this a request to delete them?
-				if (isset($_GET['delete_temp']))
-				{
-					foreach ($_SESSION['temp_attachments'] as $attachID => $attachment)
-					{
-						if (strpos($attachID, 'post_tmp_' . $user_info['id']) !== false)
-							@unlink($attachment['tmp_name']);
-					}
-					$this->_attach_errors->addError('temp_attachments_gone');
-					$_SESSION['temp_attachments'] = array();
-				}
-				// Hmm, coming in fresh and there are files in session.
-				elseif ($context['current_action'] != 'post2' || !empty($_POST['from_qr']))
-				{
-					// Let's be nice and see if they belong here first.
-					if ((empty($_REQUEST['msg']) && empty($_SESSION['temp_attachments']['post']['msg']) && $_SESSION['temp_attachments']['post']['board'] == $board) || (!empty($_REQUEST['msg']) && $_SESSION['temp_attachments']['post']['msg'] == $_REQUEST['msg']))
-					{
-						// See if any files still exist before showing the warning message and the files attached.
-						foreach ($_SESSION['temp_attachments'] as $attachID => $attachment)
-						{
-							if (strpos($attachID, 'post_tmp_' . $user_info['id']) === false)
-								continue;
-
-							if (file_exists($attachment['tmp_name']))
-							{
-								$this->_attach_errors->addError('temp_attachments_new');
-								$context['files_in_session_warning'] = $txt['attached_files_in_session'];
-								unset($_SESSION['temp_attachments']['post']['files']);
-								break;
-							}
-						}
-					}
-					else
-					{
-						// Since, they don't belong here. Let's inform the user that they exist..
-						if (!empty($topic))
-							$delete_url = $scripturl . '?action=post' .(!empty($_REQUEST['msg']) ? (';msg=' . $_REQUEST['msg']) : '') . (!empty($_REQUEST['last_msg']) ? (';last_msg=' . $_REQUEST['last_msg']) : '') . ';topic=' . $topic . ';delete_temp';
-						else
-							$delete_url = $scripturl . '?action=post;board=' . $board . ';delete_temp';
-
-						// Compile a list of the files to show the user.
-						$file_list = array();
-						foreach ($_SESSION['temp_attachments'] as $attachID => $attachment)
-							if (strpos($attachID, 'post_tmp_' . $user_info['id']) !== false)
-								$file_list[] = $attachment['name'];
-
-						$_SESSION['temp_attachments']['post']['files'] = $file_list;
-						$file_list = '<div class="attachments">' . implode('<br />', $file_list) . '</div>';
-
-						if (!empty($_SESSION['temp_attachments']['post']['msg']))
-						{
-							// We have a message id, so we can link back to the old topic they were trying to edit..
-							$goback_link = '<a href="' . $scripturl . '?action=post' .(!empty($_SESSION['temp_attachments']['post']['msg']) ? (';msg=' . $_SESSION['temp_attachments']['post']['msg']) : '') . (!empty($_SESSION['temp_attachments']['post']['last_msg']) ? (';last_msg=' . $_SESSION['temp_attachments']['post']['last_msg']) : '') . ';topic=' . $_SESSION['temp_attachments']['post']['topic'] . ';additionalOptions">' . $txt['here'] . '</a>';
-
-							$this->_attach_errors->addError(array('temp_attachments_found', array($delete_url, $goback_link, $file_list)));
-							$context['ignore_temp_attachments'] = true;
-						}
-						else
-						{
-							$this->_attach_errors->addError(array('temp_attachments_lost', array($delete_url, $file_list)));
-							$context['ignore_temp_attachments'] = true;
-						}
-					}
-				}
-
-				foreach ($_SESSION['temp_attachments'] as $attachID => $attachment)
-				{
-					// Skipping over these
-					if (isset($context['ignore_temp_attachments']) || isset($_SESSION['temp_attachments']['post']['files']))
-						break;
-
-					// Initial errors (such as missing directory), we can recover
-					if ($attachID != 'initial_error' && strpos($attachID, 'post_tmp_' . $user_info['id']) === false)
-						continue;
-
-					if ($attachID == 'initial_error')
-					{
-						if ($context['current_action'] != 'post2')
-						{
-							$txt['error_attach_initial_error'] = $txt['attach_no_upload'] . '<div class="attachmenterrors">' . (is_array($attachment) ? vsprintf($txt[$attachment[0]], $attachment[1]) : $txt[$attachment]) . '</div>';
-							$this->_attach_errors->addError('attach_initial_error');
-						}
-						unset($_SESSION['temp_attachments']);
-						break;
-					}
-
-					// Show any errors which might have occurred.
-					if (!empty($attachment['errors']))
-					{
-						if ($context['current_action'] != 'post2')
-						{
-							$txt['error_attach_errors'] = empty($txt['error_attach_errors']) ? '<br />' : '';
-							$txt['error_attach_errors'] .= vsprintf($txt['attach_warning'], $attachment['name']) . '<div class="attachmenterrors">';
-							foreach ($attachment['errors'] as $error)
-								$txt['error_attach_errors'] .= (is_array($error) ? vsprintf($txt[$error[0]], $error[1]) : $txt[$error]) . '<br  />';
-							$txt['error_attach_errors'] .= '</div>';
-							$this->_attach_errors->addError('attach_errors');
-						}
-
-						// Take out the trash.
-						unset($_SESSION['temp_attachments'][$attachID]);
-						@unlink($attachment['tmp_name']);
-
-						continue;
-					}
-
-					// More house keeping.
-					if (!file_exists($attachment['tmp_name']))
-					{
-						unset($_SESSION['temp_attachments'][$attachID]);
-						continue;
-					}
-
-					$attachments['quantity']++;
-					$attachments['total_size'] += $attachment['size'];
-
-					if (!isset($context['files_in_session_warning']))
-						$context['files_in_session_warning'] = $txt['attached_files_in_session'];
-
-					$context['attachments']['current'][] = array(
-						'name' => '<u>' . htmlspecialchars($attachment['name'], ENT_COMPAT, 'UTF-8') . '</u>',
-						'size' => $attachment['size'],
-						'id' => $attachID,
-						'unchecked' => false,
-						'approved' => 1,
-					);
-				}
-			}
-		}
-
 		// Do we need to show the visual verification image?
 		$context['require_verification'] = !$user_info['is_mod'] && !$user_info['is_admin'] && !empty($modSettings['posts_require_captcha']) && ($user_info['posts'] < $modSettings['posts_require_captcha'] || ($user_info['is_guest'] && $modSettings['posts_require_captcha'] == -1));
 		if ($context['require_verification'])
@@ -651,20 +486,6 @@ class Post_Controller extends Action_Controller
 			'type' => $this->_post_errors->getErrorType() == 0 ? 'minor' : 'serious',
 			'title' => $this->_post_errors->getErrorType() == 0 ? $txt['warning_while_submitting'] : $txt['error_while_submitting'],
 		);
-
-		// If there are attachment errors. Let's show a list to the user.
-		if ($this->_attach_errors->hasErrors())
-		{
-			loadTemplate('Errors');
-
-			$errors = $this->_attach_errors->prepareErrors();
-
-			foreach ($errors as $key => $error)
-			{
-				$context['attachment_error_keys'][] = $key . '_error';
-				$context[$key . '_error'] = $error;
-			}
-		}
 
 		// What are you doing? Posting, modifying, previewing, new post, or reply...
 		if (empty($context['page_title']))
@@ -708,23 +529,6 @@ class Post_Controller extends Action_Controller
 		if (isset($_REQUEST['xml']))
 			obExit();
 
-		// Build the link tree.
-		if (empty($topic))
-		{
-			$context['linktree'][] = array(
-				'name' => '<em>' . $txt['start_new_topic'] . '</em>'
-			);
-		}
-		else
-		{
-			$context['linktree'][] = array(
-				'url' => $scripturl . '?topic=' . $topic . '.' . $_REQUEST['start'],
-				'name' => $form_subject,
-				'extra_before' => '<span><strong class="nav">' . $context['page_title'] . ' ( </strong></span>',
-				'extra_after' => '<span><strong class="nav"> )</strong></span>'
-			);
-		}
-
 		$context['subject'] = addcslashes($form_subject, '"');
 		$context['message'] = str_replace(array('"', '<', '>', '&nbsp;'), array('&quot;', '&lt;', '&gt;', ' '), $form_message);
 
@@ -759,8 +563,6 @@ class Post_Controller extends Action_Controller
 		);
 		create_control_richedit($editorOptions);
 
-		$context['attached'] = '';
-
 		// Message icons - customized or not, retrieve them...
 		$context['icons'] = getMessageIcons($board);
 
@@ -791,61 +593,28 @@ class Post_Controller extends Action_Controller
 			}
 		}
 
-		$this->_events->trigger('finalize_post_form', array('destination' => &$context['destination'], 'page_title' => &$context['page_title']));
+		$context['show_additional_options'] = !empty($_POST['additional_options']) || isset($_GET['additionalOptions']);
 
-		// If the user can post attachments prepare the warning labels.
-		if ($context['attachments']['can']['post'])
+		$this->_events->trigger('finalize_post_form', array('destination' => &$context['destination'], 'page_title' => &$context['page_title'], 'show_additional_options' => $context['show_additional_options']));
+
+		// Build the link tree.
+		if (empty($topic))
 		{
-			// If they've unchecked an attachment, they may still want to attach that many more files, but don't allow more than num_allowed_attachments.
-			$context['attachments']['num_allowed'] = empty($modSettings['attachmentNumPerPostLimit']) ? 50 : min($modSettings['attachmentNumPerPostLimit'] - count($context['attachments']['current']), $modSettings['attachmentNumPerPostLimit']);
-			$context['attachments']['can']['post_unapproved'] = allowedTo('post_attachment');
-			$context['attachments']['restrictions'] = array();
-			if (!empty($modSettings['attachmentCheckExtensions']))
-				$context['attachments']['allowed_extensions'] = strtr(strtolower($modSettings['attachmentExtensions']), array(',' => ', '));
-			else
-				$context['attachments']['allowed_extensions'] = '';
-			$context['attachments']['templates'] = array(
-				'add_new' => 'template_add_new_attachments',
-				'existing' => 'template_show_existing_attachments',
+			$context['linktree'][] = array(
+				'name' => '<em>' . $txt['start_new_topic'] . '</em>'
 			);
-
-			$attachmentRestrictionTypes = array('attachmentNumPerPostLimit', 'attachmentPostLimit', 'attachmentSizeLimit');
-			foreach ($attachmentRestrictionTypes as $type)
-			{
-				if (!empty($modSettings[$type]))
-				{
-					$context['attachments']['restrictions'][] = sprintf($txt['attach_restrict_' . $type], comma_format($modSettings[$type], 0));
-
-					// Show some numbers. If they exist.
-					if ($type == 'attachmentNumPerPostLimit' && $attachments['quantity'] > 0)
-						$context['attachments']['restrictions'][] = sprintf($txt['attach_remaining'], $modSettings['attachmentNumPerPostLimit'] - $attachments['quantity']);
-					elseif ($type == 'attachmentPostLimit' && $attachments['total_size'] > 0)
-						$context['attachments']['restrictions'][] = sprintf($txt['attach_available'], comma_format(round(max($modSettings['attachmentPostLimit'] - ($attachments['total_size'] / 1028), 0)), 0));
-				}
-			}
-
-			// Load up the drag and drop attachment magic
-			addInlineJavascript('
-			var dropAttach = dragDropAttachment.prototype.init({
-				board: ' . $board . ',
-				allowedExtensions: ' . JavaScriptEscape($context['attachments']['allowed_extensions']) . ',
-				totalSizeAllowed: ' . JavaScriptEscape(empty($modSettings['attachmentPostLimit']) ? '' : $modSettings['attachmentPostLimit']) . ',
-				individualSizeAllowed: ' . JavaScriptEscape(empty($modSettings['attachmentSizeLimit']) ? '' : $modSettings['attachmentSizeLimit']) . ',
-				numOfAttachmentAllowed: ' . $context['attachments']['num_allowed'] . ',
-				totalAttachSizeUploaded: ' . (isset($context['attachments']['total_size']) && !empty($context['attachments']['total_size']) ? $context['attachments']['total_size'] : 0) . ',
-				numAttachUploaded: ' . (isset($context['attachments']['quantity']) && !empty($context['attachments']['quantity']) ? $context['attachments']['quantity'] : 0) . ',
-				oTxt: ({
-					allowedExtensions : ' . JavaScriptEscape(sprintf($txt['cant_upload_type'], $context['attachments']['allowed_extensions'])) . ',
-					totalSizeAllowed : ' . JavaScriptEscape($txt['attach_max_total_file_size']) . ',
-					individualSizeAllowed : ' . JavaScriptEscape(sprintf($txt['file_too_big'], comma_format($modSettings['attachmentSizeLimit'], 0))) . ',
-					numOfAttachmentAllowed : ' . JavaScriptEscape(sprintf($txt['attachments_limit_per_post'], $modSettings['attachmentNumPerPostLimit'])) . ',
-					postUploadError : ' . JavaScriptEscape($txt['post_upload_error']) . ',
-				}),
-			});', true);
+		}
+		else
+		{
+			$context['linktree'][] = array(
+				'url' => $scripturl . '?topic=' . $topic . '.' . $_REQUEST['start'],
+				'name' => $form_subject,
+				'extra_before' => '<span><strong class="nav">' . $context['page_title'] . ' ( </strong></span>',
+				'extra_after' => '<span><strong class="nav"> )</strong></span>'
+			);
 		}
 
 		$context['back_to_topic'] = isset($_REQUEST['goback']) || (isset($_REQUEST['msg']) && !isset($_REQUEST['subject']));
-		$context['show_additional_options'] = !empty($_POST['additional_options']) || isset($_SESSION['temp_attachments']['post']) || isset($_GET['additionalOptions']);
 		$context['is_new_topic'] = empty($topic);
 		$context['is_new_post'] = !isset($_REQUEST['msg']);
 		$context['is_first_post'] = $context['is_new_topic'] || (isset($_REQUEST['msg']) && $_REQUEST['msg'] == $this->_topic_attributes['id_first_msg']);
@@ -873,7 +642,7 @@ class Post_Controller extends Action_Controller
 	public function action_post2()
 	{
 		global $board, $topic, $txt, $modSettings, $context, $user_settings;
-		global $user_info, $board_info, $options, $ignore_temp;
+		global $user_info, $board_info, $options;
 
 		// Sneaking off, are we?
 		if (empty($_POST) && empty($topic))
@@ -923,57 +692,11 @@ class Post_Controller extends Action_Controller
 		require_once(SUBSDIR . '/Post.subs.php');
 		loadLanguage('Post');
 
+		$this->_events->trigger('prepare_save_post', array('topic_info' => &$topic_info));
+
 		// Drafts enabled and needed?
 		if (!empty($modSettings['drafts_enabled']) && (isset($_POST['save_draft']) || isset($_POST['id_draft'])))
 			require_once(SUBSDIR . '/Drafts.subs.php');
-
-		// First check to see if they are trying to delete any current attachments.
-		if (isset($_POST['attach_del']))
-		{
-			$keep_temp = array();
-			$keep_ids = array();
-			foreach ($_POST['attach_del'] as $dummy)
-			{
-				if (strpos($dummy, 'post_tmp_' . $user_info['id']) !== false)
-					$keep_temp[] = $dummy;
-				else
-					$keep_ids[] = (int) $dummy;
-			}
-
-			if (isset($_SESSION['temp_attachments']))
-			{
-				foreach ($_SESSION['temp_attachments'] as $attachID => $attachment)
-				{
-					if ((isset($_SESSION['temp_attachments']['post']['files'], $attachment['name']) && in_array($attachment['name'], $_SESSION['temp_attachments']['post']['files'])) || in_array($attachID, $keep_temp) || strpos($attachID, 'post_tmp_' . $user_info['id']) === false)
-						continue;
-
-					unset($_SESSION['temp_attachments'][$attachID]);
-					@unlink($attachment['tmp_name']);
-				}
-			}
-
-			if (!empty($_REQUEST['msg']))
-			{
-				require_once(SUBSDIR . '/ManageAttachments.subs.php');
-				$attachmentQuery = array(
-					'attachment_type' => 0,
-					'id_msg' => (int) $_REQUEST['msg'],
-					'not_id_attach' => $keep_ids,
-				);
-				removeAttachments($attachmentQuery);
-			}
-		}
-
-		// Then try to upload any attachments.
-		$context['attachments']['can']['post'] = !empty($modSettings['attachmentEnable']) && $modSettings['attachmentEnable'] == 1 && (allowedTo('post_attachment') || ($modSettings['postmod_active'] && allowedTo('post_unapproved_attachments')));
-		if ($context['attachments']['can']['post'] && empty($_POST['from_qr']))
-		{
-			require_once(SUBSDIR . '/Attachments.subs.php');
-			if (isset($_REQUEST['msg']))
-				processAttachments((int) $_REQUEST['msg']);
-			else
-				processAttachments();
-		}
 
 		// Previewing? Go back to start.
 		if (isset($_REQUEST['preview']))
@@ -1263,7 +986,7 @@ class Post_Controller extends Action_Controller
 				$this->_post_errors->addError('no_message');
 		}
 
-		$this->_events->trigger('prepare_save_post', array('post_errors' => $this->_post_errors, 'topic_info' => $topic_info));
+		$this->_events->trigger('before_save_post', array('post_errors' => $this->_post_errors, 'topic_info' => $topic_info));
 
 		if ($posterIsGuest)
 		{
@@ -1295,7 +1018,7 @@ class Post_Controller extends Action_Controller
 		}
 
 		// Any mistakes?
-		if ($this->_post_errors->hasErrors() || $this->_attach_errors->hasErrors())
+		if ($this->_post_errors->hasErrors())
 		{
 			// Previewing.
 			$_REQUEST['preview'] = true;
@@ -1320,57 +1043,10 @@ class Post_Controller extends Action_Controller
 		if (Util::strlen($_POST['subject']) > 100)
 			$_POST['subject'] = Util::substr($_POST['subject'], 0, 100);
 
-		// ...or attach a new file...
-		if (empty($ignore_temp) && $context['attachments']['can']['post'] && !empty($_SESSION['temp_attachments']) && empty($_POST['from_qr']))
-		{
-			$attachIDs = array();
-
-			foreach ($_SESSION['temp_attachments'] as $attachID => $attachment)
-			{
-				if ($attachID != 'initial_error' && strpos($attachID, 'post_tmp_' . $user_info['id']) === false)
-					continue;
-
-				// If there was an initial error just show that message.
-				if ($attachID == 'initial_error')
-				{
-					unset($_SESSION['temp_attachments']);
-					break;
-				}
-
-				// No errors, then try to create the attachment
-				if (empty($attachment['errors']))
-				{
-					// Load the attachmentOptions array with the data needed to create an attachment
-					$attachmentOptions = array(
-						'post' => isset($_REQUEST['msg']) ? $_REQUEST['msg'] : 0,
-						'poster' => $user_info['id'],
-						'name' => $attachment['name'],
-						'tmp_name' => $attachment['tmp_name'],
-						'size' => isset($attachment['size']) ? $attachment['size'] : 0,
-						'mime_type' => isset($attachment['type']) ? $attachment['type'] : '',
-						'id_folder' => isset($attachment['id_folder']) ? $attachment['id_folder'] : 0,
-						'approved' => !$modSettings['postmod_active'] || allowedTo('post_attachment'),
-						'errors' => array(),
-					);
-
-					if (createAttachment($attachmentOptions))
-					{
-						$attachIDs[] = $attachmentOptions['id'];
-						if (!empty($attachmentOptions['thumb']))
-							$attachIDs[] = $attachmentOptions['thumb'];
-					}
-				}
-				// We have errors on this file, build out the issues for display to the user
-				else
-					@unlink($attachment['tmp_name']);
-			}
-			unset($_SESSION['temp_attachments']);
-		}
-
 		// Creating a new topic?
 		$newTopic = empty($_REQUEST['msg']) && empty($topic);
 
-		$_POST['icon'] = !empty($attachIDs) && $_POST['icon'] == 'xx' ? 'clip' : $_POST['icon'];
+		$_POST['icon'] = $_POST['icon'] == 'xx' ? 'clip' : $_POST['icon'];
 
 		// Collect all parameters for the creation or modification of a post.
 		$msgOptions = array(
@@ -1379,7 +1055,6 @@ class Post_Controller extends Action_Controller
 			'body' => $_POST['message'],
 			'icon' => preg_replace('~[\./\\\\*:"\'<>]~', '', $_POST['icon']),
 			'smileys_enabled' => !isset($_POST['ns']),
-			'attachments' => empty($attachIDs) ? array() : $attachIDs,
 			'approved' => $becomesApproved,
 		);
 

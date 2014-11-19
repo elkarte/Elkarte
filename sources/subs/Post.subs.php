@@ -574,7 +574,7 @@ function createPost(&$msgOptions, &$topicOptions, &$posterOptions)
 	// Set optional parameters to the default value.
 	$msgOptions['icon'] = empty($msgOptions['icon']) ? 'xx' : $msgOptions['icon'];
 	$msgOptions['smileys_enabled'] = !empty($msgOptions['smileys_enabled']);
-	$msgOptions['attachments'] = empty($msgOptions['attachments']) ? array() : $msgOptions['attachments'];
+// 	$msgOptions['attachments'] = empty($msgOptions['attachments']) ? array() : $msgOptions['attachments'];
 	$msgOptions['approved'] = isset($msgOptions['approved']) ? (int) $msgOptions['approved'] : 1;
 	$topicOptions['id'] = empty($topicOptions['id']) ? 0 : (int) $topicOptions['id'];
 	$topicOptions['poll'] = isset($topicOptions['poll']) ? (int) $topicOptions['poll'] : null;
@@ -680,18 +680,6 @@ function createPost(&$msgOptions, &$topicOptions, &$posterOptions)
 	// Something went wrong creating the message...
 	if (empty($msgOptions['id']))
 		return false;
-
-	// Fix the attachments.
-	if (!empty($msgOptions['attachments']))
-		$db->query('', '
-			UPDATE {db_prefix}attachments
-			SET id_msg = {int:id_msg}
-			WHERE id_attach IN ({array_int:attachment_list})',
-			array(
-				'attachment_list' => $msgOptions['attachments'],
-				'id_msg' => $msgOptions['id'],
-			)
-		);
 
 	// What if we want to export new posts out to a CMS?
 	call_integration_hook('integrate_create_post', array($msgOptions, $topicOptions, $posterOptions, $message_columns, $message_parameters));

@@ -717,7 +717,6 @@ class Display_Controller extends Action_Controller
 				);
 				create_control_richedit($editorOptions);
 
-				$context['attached'] = '';
 				$context['make_poll'] = isset($_REQUEST['poll']);
 
 				// Message icons - customized icons are off?
