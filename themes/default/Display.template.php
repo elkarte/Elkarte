@@ -450,7 +450,7 @@ function template_quickreply_below()
 		if (!empty($context['drafts_save']))
 			echo '
 								<input type="submit" name="save_draft" value="', $txt['draft_save'], '" onclick="return confirm(' . JavaScriptEscape($txt['draft_save_note']) . ') && submitThisOnce(this);" accesskey="d" tabindex="', $context['tabindex']++, '" class="button_submit" />
-								<input type="hidden" id="id_draft" name="id_draft" value="', empty($context['id_draft']) ? 0 : $context['id_draft'], '" />';
+								';
 
 		echo '
 							</div>';
@@ -474,17 +474,6 @@ function template_quickreply_below()
 		{
 			echo '
 			<script><!-- // --><![CDATA[';
-
-			// Draft autosave available and the user has it enabled?
-			if (!empty($context['drafts_autosave']) && !empty($options['drafts_autosave_enabled']))
-				echo '
-				var oDraftAutoSave = new elk_DraftAutoSave({
-					sSelf: \'oDraftAutoSave\',
-					sLastNote: \'draft_lastautosave\',
-					sLastID: \'id_draft\',
-					iBoard: ', (empty($context['current_board']) ? 0 : $context['current_board']), ',
-					iFreq: ', isset($context['drafts_autosave_frequency']) ? $context['drafts_autosave_frequency'] : 30000, '
-				});';
 
 			// Mentions enabled
 			if (!empty($modSettings['mentions_enabled']))
