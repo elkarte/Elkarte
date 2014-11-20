@@ -716,14 +716,6 @@ class Display_Controller extends Action_Controller
 					'preview_type' => 0,
 				);
 				create_control_richedit($editorOptions);
-
-				$context['make_poll'] = isset($_REQUEST['poll']);
-
-				// Message icons - customized icons are off?
-				$context['icons'] = getMessageIcons($board);
-
-				if (!empty($context['icons']))
-					$context['icons'][count($context['icons']) - 1]['is_last'] = true;
 			}
 		}
 
