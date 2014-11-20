@@ -291,6 +291,8 @@ class Post_Controller extends Action_Controller
 				// They are previewing if they asked to preview (i.e. came from quick reply).
 				$really_previewing = !empty($_REQUEST['preview']);
 			}
+			$really_previewing = $really_previewing === true || isset($_REQUEST['xml']);
+
 			$this->_events->trigger('prepare_modifying', array('post_errors' => $this->_post_errors, 'really_previewing' => &$really_previewing));
 
 			// In order to keep the approval status flowing through, we have to pass it through the form...
@@ -315,7 +317,7 @@ class Post_Controller extends Action_Controller
 			}
 
 			// Only show the preview stuff if they hit Preview.
-			if (($really_previewing === true || isset($_REQUEST['xml'])) && !isset($_REQUEST['save_draft']))
+			if ($really_previewing === true)
 			{
 				// Set up the preview message and subject
 				$context['preview_message'] = $form_message;
@@ -532,19 +534,6 @@ class Post_Controller extends Action_Controller
 		$context['subject'] = addcslashes($form_subject, '"');
 		$context['message'] = str_replace(array('"', '<', '>', '&nbsp;'), array('&quot;', '&lt;', '&gt;', ' '), $form_message);
 
-		// Are post drafts enabled?
-		$context['drafts_save'] = !empty($modSettings['drafts_enabled']) && !empty($modSettings['drafts_post_enabled']) && allowedTo('post_draft');
-		$context['drafts_autosave'] = !empty($context['drafts_save']) && !empty($modSettings['drafts_autosave_enabled']) && allowedTo('post_autosave_draft');
-
-		// Build a list of drafts that they can load into the editor
-		if (!empty($context['drafts_save']))
-		{
-			$this->_prepareDraftsContext($user_info['id'], $topic);
-
-			if (!empty($context['drafts']))
-				$this->_template_layers->add('load_drafts', 100);
-		}
-
 		// Needed for the editor and message icons.
 		require_once(SUBSDIR . '/Editor.subs.php');
 
@@ -561,7 +550,6 @@ class Post_Controller extends Action_Controller
 			// We do XML preview here.
 			'preview_type' => 2
 		);
-		create_control_richedit($editorOptions);
 
 		// Message icons - customized or not, retrieve them...
 		$context['icons'] = getMessageIcons($board);
@@ -595,7 +583,9 @@ class Post_Controller extends Action_Controller
 
 		$context['show_additional_options'] = !empty($_POST['additional_options']) || isset($_GET['additionalOptions']);
 
-		$this->_events->trigger('finalize_post_form', array('destination' => &$context['destination'], 'page_title' => &$context['page_title'], 'show_additional_options' => $context['show_additional_options']));
+		$this->_events->trigger('finalize_post_form', array('destination' => &$context['destination'], 'page_title' => &$context['page_title'], 'show_additional_options' => &$context['show_additional_options'], 'editorOptions' => &$editorOptions));
+
+		create_control_richedit($editorOptions);
 
 		// Build the link tree.
 		if (empty($topic))
@@ -694,10 +684,6 @@ class Post_Controller extends Action_Controller
 
 		$this->_events->trigger('prepare_save_post', array('topic_info' => &$topic_info));
 
-		// Drafts enabled and needed?
-		if (!empty($modSettings['drafts_enabled']) && (isset($_POST['save_draft']) || isset($_POST['id_draft'])))
-			require_once(SUBSDIR . '/Drafts.subs.php');
-
 		// Previewing? Go back to start.
 		if (isset($_REQUEST['preview']))
 			return $this->action_post();
@@ -726,8 +712,6 @@ class Post_Controller extends Action_Controller
 			// Don't allow a post if it's locked.
 			if ($topic_info['locked'] != 0 && !allowedTo('moderate_board'))
 				fatal_lang_error('topic_locked', false);
-
-			$this->_events->trigger('save_replying', array('topic_info' => &$topic_info));
 
 			// Do the permissions and approval stuff...
 			$becomesApproved = true;
@@ -778,12 +762,7 @@ class Post_Controller extends Action_Controller
 			if (isset($_POST['sticky']) && (empty($modSettings['enableStickyTopics']) || $_POST['sticky'] == $topic_info['is_sticky'] || !allowedTo('make_sticky')))
 				unset($_POST['sticky']);
 
-			// If drafts are enabled, then pass this off
-			if (!empty($modSettings['drafts_enabled']) && isset($_POST['save_draft']))
-			{
-				saveDraft();
-				return $this->action_post();
-			}
+			$this->_events->trigger('save_replying', array('topic_info' => &$topic_info));
 
 			// If the number of replies has changed, if the setting is enabled, go back to action_post() - which handles the error.
 			if (empty($options['no_new_reply_warning']) && isset($_POST['last_msg']) && $topic_info['id_last_msg'] > $_POST['last_msg'])
@@ -824,13 +803,6 @@ class Post_Controller extends Action_Controller
 
 			if (isset($_POST['sticky']) && (empty($modSettings['enableStickyTopics']) || empty($_POST['sticky']) || !allowedTo('make_sticky')))
 				unset($_POST['sticky']);
-
-			// Saving your new topic as a draft first?
-			if (!empty($modSettings['drafts_enabled']) && isset($_POST['save_draft']))
-			{
-				saveDraft();
-				return $this->action_post();
-			}
 
 			$posterIsGuest = $user_info['is_guest'];
 		}
@@ -902,13 +874,6 @@ class Post_Controller extends Action_Controller
 					$moderationAction = true;
 			}
 
-			// If drafts are enabled, then lets send this off to save
-			if (!empty($modSettings['drafts_enabled']) && isset($_POST['save_draft']))
-			{
-				saveDraft();
-				return $this->action_post();
-			}
-
 			$posterIsGuest = empty($msgInfo['id_member']);
 
 			// Can they approve it?
@@ -963,6 +928,15 @@ class Post_Controller extends Action_Controller
 			}
 		}
 
+		try
+		{
+			$this->_events->trigger('before_save_post', array('post_errors' => $this->_post_errors, 'topic_info' => $topic_info));
+		}
+		catch (Controller_Redirect_Exception $e)
+		{
+			return $e->doRedirect($this);
+		}
+
 		// Check the subject and message.
 		if (!isset($_POST['subject']) || Util::htmltrim(Util::htmlspecialchars($_POST['subject'])) === '')
 			$this->_post_errors->addError('no_subject');
@@ -985,8 +959,6 @@ class Post_Controller extends Action_Controller
 			if (Util::htmltrim(strip_tags(parse_bbc($_POST['message'], false), '<img>')) === '' && (!allowedTo('admin_forum') || strpos($_POST['message'], '[html]') === false))
 				$this->_post_errors->addError('no_message');
 		}
-
-		$this->_events->trigger('before_save_post', array('post_errors' => $this->_post_errors, 'topic_info' => $topic_info));
 
 		if ($posterIsGuest)
 		{
@@ -1126,10 +1098,6 @@ class Post_Controller extends Action_Controller
 					linkMessages($original_post, $topic);
 			}
 		}
-
-		// If we had a draft for this, its time to remove it since it was just posted
-		if (!empty($modSettings['drafts_enabled']) && !empty($_POST['id_draft']))
-			deleteDrafts($_POST['id_draft'], $user_info['id']);
 
 		$this->_events->trigger('after_save_post', array('board' => $board, 'topic' => $topic, 'msgOptions' => $msgOptions, 'topicOptions' => $topicOptions, 'becomesApproved' => $becomesApproved));
 
@@ -1595,49 +1563,5 @@ class Post_Controller extends Action_Controller
 		// And instruct the template system to just show the spellcheck sub template.
 		$this->_template_layers->removeAll();
 		$context['sub_template'] = 'spellcheck';
-	}
-
-	/**
-	 * Loads in a group of post drafts for the user.
-	 * Loads a specific draft for current use in the postbox if selected.
-	 * Used in the posting screens to allow draft selection
-	 * Will load a draft if selected is supplied via post
-	 *
-	 * @param int $member_id
-	 * @param int|false $id_topic if set, load drafts for the specified topic
-	 * @return false|null
-	 */
-	private function _prepareDraftsContext($member_id, $id_topic = false)
-	{
-		global $scripturl, $context, $txt, $modSettings;
-
-		$context['drafts'] = array();
-
-		// Need a member
-		if (empty($member_id))
-			return false;
-
-		// We haz drafts
-		loadLanguage('Drafts');
-		require_once(SUBSDIR . '/Drafts.subs.php');
-
-		// has a specific draft has been selected?  Load it up if there is not already a message already in the editor
-		if (isset($_REQUEST['id_draft']) && empty($_POST['subject']) && empty($_POST['message']))
-			loadDraft((int) $_REQUEST['id_draft'], 0, true, true);
-
-		// load all the drafts for this user that meet the criteria
-		$order = 'poster_time DESC';
-		$user_drafts = load_user_drafts($member_id, 0, $id_topic, $order);
-
-		// Add them to the context draft array for template display
-		foreach ($user_drafts as $draft)
-		{
-			$short_subject = empty($draft['subject']) ? $txt['drafts_none'] : Util::shorten_text(stripslashes($draft['subject']), !empty($modSettings['draft_subject_length']) ? $modSettings['draft_subject_length'] : 24);
-			$context['drafts'][] = array(
-				'subject' => censorText($short_subject),
-				'poster_time' => standardTime($draft['poster_time']),
-				'link' => '<a href="' . $scripturl . '?action=post;board=' . $draft['id_board'] . ';' . (!empty($draft['id_topic']) ? 'topic='. $draft['id_topic'] .'.0;' : '') . 'id_draft=' . $draft['id_draft'] . '">' . (!empty($draft['subject']) ? $draft['subject'] : $txt['drafts_none']) . '</a>',
-			);
-		}
 	}
 }

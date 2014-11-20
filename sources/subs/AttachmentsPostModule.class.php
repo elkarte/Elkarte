@@ -295,6 +295,10 @@ class Attachments_Post_Module
 	{
 		global $user_info, $context, $modSettings;
 
+		$this->_attach_errors = Attachment_Error_Context::context();
+
+		$this->_attach_errors->activate();
+
 		// First check to see if they are trying to delete any current attachments.
 		if (isset($_POST['attach_del']))
 		{
