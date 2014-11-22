@@ -163,13 +163,13 @@ function getBasicThemeInfos($themes)
 			AND variable = {string:name}
 			AND id_theme IN ({array_int:theme_list})',
 		array(
-			'theme_list' => array_keys($themes),
+			'theme_list' => $themes,
 			'no_member' => 0,
 			'name' => 'name',
 		)
 	);
 	while ($row = $db->fetch_assoc($request))
-		$themelist[$themes[$row['id_theme']]] = $row['value'];
+		$themelist[$row['id_theme']] = $row['value'];
 
 	$db->free_result($request);
 
