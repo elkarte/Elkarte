@@ -1567,6 +1567,24 @@ class ManageThemes_Controller extends Action_Controller
 			if ($is_php)
 			{
 				require_once(SUBSDIR . '/DataValidator.class.php');
+				require_once(SUBSDIR . '/Themes.subs.php');
+
+				// Since we are running php code, let's track it, but only once in a while.
+				if (!recentlyLogged('editing_theme', 60))
+				{
+					logAction('editing_theme', array('member' => $user_info['id']), 'admin');
+
+					// But the email only once every 10 minutes should be fine
+					if (!recentlyLogged('editing_theme', 600))
+					{
+						$theme_info = getBasicThemeInfos($context['theme_id']);
+						emailAdmins('editing_theme', array(
+							'EDIT_REALNAME' => $user_info['member_name'],
+							'FILE_EDITED' => $_REQUEST['filename'],
+							'THEME_NAME' => $theme_info[$context['theme_id']],
+						));
+					}
+				}
 
 				$validator = new Data_Validator();
 				$validator->validation_rules(array(

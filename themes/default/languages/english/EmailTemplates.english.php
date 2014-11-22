@@ -869,6 +869,23 @@ this email is to to inform you that {BAK_REALNAME} has just downloaded a backup 
 {REGARDS}';
 
 /**
+	@additional_params: editing_theme
+		EDIT_REALNAME: the name of the user doing the backup
+		FILE_EDITED: the name of the file being modified
+	@description:
+*/
+$txt['editing_theme_subject'] = 'Editing of a theme';
+$txt['editing_theme_body'] = '{REALNAME},
+
+this email is just to to inform you that {EDIT_REALNAME} is going to edit the template file:
+{FILE_EDITED}
+of the theme {THEME_NAME} at {FORUMNAME}.
+
+If you know this is not the case, please investigate the event.
+
+{REGARDS}';
+
+/**
 	@additional_params: paid_subscription_refund
 		NAME: Subscription title.
 		REALNAME: Recipients name
