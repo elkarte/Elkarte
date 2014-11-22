@@ -96,7 +96,7 @@ class Event_Manager
 			{
 				foreach ($deps as $dep)
 				{
-					if (isset($args[$dep]))
+					if (array_key_exists($dep, $args))
 						$dependencies[$dep] = &$args[$dep];
 					else
 						$this->_source->provideDependencies($dep, $dependencies);
