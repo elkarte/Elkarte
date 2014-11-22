@@ -147,7 +147,7 @@ function validateThemeName($indexes, $value_data)
 /**
  * Get a basic list of themes
  *
- * @param int[] $themes
+ * @param int|int[] $themes
  * @return array
  */
 function getBasicThemeInfos($themes)
@@ -163,7 +163,7 @@ function getBasicThemeInfos($themes)
 			AND variable = {string:name}
 			AND id_theme IN ({array_int:theme_list})',
 		array(
-			'theme_list' => $themes,
+			'theme_list' => (array) $themes,
 			'no_member' => 0,
 			'name' => 'name',
 		)
