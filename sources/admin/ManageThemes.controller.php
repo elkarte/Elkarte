@@ -1567,7 +1567,7 @@ class ManageThemes_Controller extends Action_Controller
 			if ($is_php)
 			{
 				require_once(SUBSDIR . '/DataValidator.class.php');
-				require_once(SUBSDIR . '/Themes.subs.php');
+				require_once(SUBSDIR . '/Modlog.subs.php');
 
 				// Since we are running php code, let's track it, but only once in a while.
 				if (!recentlyLogged('editing_theme', 60))
@@ -1577,6 +1577,7 @@ class ManageThemes_Controller extends Action_Controller
 					// But the email only once every 10 minutes should be fine
 					if (!recentlyLogged('editing_theme', 600))
 					{
+						require_once(SUBSDIR . '/Themes.subs.php');
 						$theme_info = getBasicThemeInfos($context['theme_id']);
 						emailAdmins('editing_theme', array(
 							'EDIT_REALNAME' => $user_info['member_name'],
