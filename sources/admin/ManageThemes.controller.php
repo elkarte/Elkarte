@@ -1580,7 +1580,7 @@ class ManageThemes_Controller extends Action_Controller
 						require_once(SUBSDIR . '/Themes.subs.php');
 						$theme_info = getBasicThemeInfos($context['theme_id']);
 						emailAdmins('editing_theme', array(
-							'EDIT_REALNAME' => $user_info['member_name'],
+							'EDIT_REALNAME' => $user_info['name'],
 							'FILE_EDITED' => $_REQUEST['filename'],
 							'THEME_NAME' => $theme_info[$context['theme_id']],
 						));

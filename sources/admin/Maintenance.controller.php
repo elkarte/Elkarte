@@ -1006,7 +1006,7 @@ class Maintenance_Controller extends Action_Controller
 			require_once(SUBSDIR . '/Admin.subs.php');
 
 			emailAdmins('admin_backup_database', array(
-				'BAK_REALNAME' => $user_info['member_name']
+				'BAK_REALNAME' => $user_info['name']
 			));
 			logAction('database_backup', array('member' => $user_info['id']), 'admin');
 
