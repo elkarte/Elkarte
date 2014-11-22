@@ -858,7 +858,7 @@ Once the attachments directory reaches it\'s maximum permitted size users will n
 
 /**
 	@additional_params: admin_backup_database
-		REALNAME:
+		BAK_REALNAME: the name of the user doing the backup
 	@description:
 */
 $txt['admin_backup_database_subject'] = 'A database backup has been taken';
