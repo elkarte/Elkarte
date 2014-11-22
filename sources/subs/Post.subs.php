@@ -143,8 +143,8 @@ function preparsecode(&$message, $previewing = false)
 				'~\[(table|/tr)\]([\s' . $non_breaking_space . ']*)\[tr\]~su' => '[$1]$2[_tr_]',
 				// Any remaining [tr]s should have a [table] before them.
 				'~\[tr\]~s' => '[table][tr]',
-				// Look for [/td]s followed by [/tr].
-				'~\[/td\]([\s' . $non_breaking_space . ']*)\[/tr\]~su' => '[/td]$1[_/tr_]',
+				// Look for [/td]s or [/th]s followed by [/tr].
+				'~\[/t([dh])\]([\s' . $non_breaking_space . ']*)\[/tr\]~su' => '[/t$1]$2[_/tr_]',
 				// Any remaining [/tr]s should have a [/td].
 				'~\[/tr\]~s' => '[/td][/tr]',
 				// Look for properly opened [li]s which aren't closed.
@@ -646,7 +646,7 @@ function createPost(&$msgOptions, &$topicOptions, &$posterOptions)
 		'id_board' => 'int',
 		'id_topic' => 'int',
 		'id_member' => 'int',
-		'subject' => 'string-255', 
+		'subject' => 'string-255',
 		'body' => (!empty($modSettings['max_messageLength']) && $modSettings['max_messageLength'] > 65534 ? 'string-' . $modSettings['max_messageLength'] : (empty($modSettings['max_messageLength']) ? 'string' : 'string-65534')),
 		'poster_name' => 'string-255',
 		'poster_email' => 'string-255',
