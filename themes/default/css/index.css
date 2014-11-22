@@ -1898,10 +1898,9 @@ img.new_posts {
 }
 .topic_name h4 {
 	line-height: 1.429em;
-	display: inline-block;
 	padding-right: 30px;
 	word-break: break-all;
-    word-wrap: break-word;
+	word-wrap: break-word;
 }
 .topic_name h4 a {
 	font-weight: bold;
@@ -4300,6 +4299,9 @@ dl.no_members {
 	}
 	#ic_recentposts, #ps_recentposts, #ps_recenttopics {
 		font-size: 1em;
+	}
+	#ps_recentposts .recentposter {
+		display: table-cell;
 	}
 }
 /* This one does 540 and smaller screens at default font size. */

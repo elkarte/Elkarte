@@ -392,3 +392,29 @@ function deleteLogAction($id_log, $time, $delete = null)
 		)
 	);
 }
+
+/**
+ * Checks if an action has been performed "recently"
+ *
+ * @param string $action Name of the action
+ * @param int $time Timeframe since the last time the action has been performed
+ */
+function recentlyLogged($action, $time = 60)
+{
+	$db = database();
+
+	$request = $db->query('','
+		SELECT COUNT(*)
+		FROM {db_prefix}log_actions
+		WHERE action = {string:action}
+			AND log_time >= {int:last_logged}',
+		array(
+			'action' => $action,
+			'last_logged' => time() - $time,
+		)
+	);
+	list ($present) = $db->fetch_row($request);
+	$db->free_result($request);
+
+	return !empty($present);
+}

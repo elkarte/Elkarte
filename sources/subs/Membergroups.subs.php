@@ -627,6 +627,7 @@ function list_getMembergroups($start, $items_per_page, $sort, $membergroup_type,
 	global $scripturl, $txt, $context;
 
 	$db = database();
+	loadLanguage('Admin');
 
 	$request = $db->query('', '
 		SELECT mg.id_group, mg.group_name, mg.min_posts, mg.description, mg.group_type, mg.online_color,
