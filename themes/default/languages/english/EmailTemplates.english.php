@@ -872,6 +872,7 @@ this email is to to inform you that {BAK_REALNAME} has just downloaded a backup 
 	@additional_params: editing_theme
 		EDIT_REALNAME: the name of the user doing the backup
 		FILE_EDITED: the name of the file being modified
+		THEME_NAME: the name of the theme
 	@description:
 */
 $txt['editing_theme_subject'] = 'Editing of a theme';
