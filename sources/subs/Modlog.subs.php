@@ -413,8 +413,8 @@ function recentlyLogged($action, $time = 60)
 			'last_logged' => time() - $time,
 		)
 	);
-	$present = $db->num_rows($request) > 0;
+	list ($present) = $db->fetch_row($request);
 	$db->free_result($request);
 
-	return $present;
+	return !empty($present);
 }
