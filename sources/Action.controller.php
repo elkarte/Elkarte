@@ -75,7 +75,7 @@ abstract class Action_Controller
 			$dependencies[$dep] = &$this->$dep;
 		elseif (property_exists($this, '_' . $dep))
 			$dependencies[$dep] = &$this->{'_' . $dep};
-		elseif (isset($GLOBALS[$dep]))
+		elseif (array_key_exists($dep, $GLOBALS))
 			$dependencies[$dep] = &$GLOBALS[$dep];
 	}
 
