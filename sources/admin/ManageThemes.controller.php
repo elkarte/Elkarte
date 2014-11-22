@@ -1523,7 +1523,7 @@ class ManageThemes_Controller extends Action_Controller
 	 */
 	private function _action_edit_submit()
 	{
-		global $context, $settings;
+		global $context, $settings, $user_info;
 
 		$selectedTheme = isset($_GET['th']) ? (int) $_GET['th'] : (isset($_GET['id']) ? (int) $_GET['id'] : 0);
 		if (empty($selectedTheme))
@@ -1578,6 +1578,8 @@ class ManageThemes_Controller extends Action_Controller
 					if (!recentlyLogged('editing_theme', 600))
 					{
 						require_once(SUBSDIR . '/Themes.subs.php');
+						require_once(SUBSDIR . '/Admin.subs.php');
+
 						$theme_info = getBasicThemeInfos($context['theme_id']);
 						emailAdmins('editing_theme', array(
 							'EDIT_REALNAME' => $user_info['name'],
