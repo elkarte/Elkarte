@@ -613,54 +613,6 @@ function elk_setThemeOption(option, value, theme, additional_vars)
 }
 
 /**
- * Resize an avatar with JS
- */
-function elk_avatarResize()
-{
-	var possibleAvatars = document.getElementsByTagName('img');
-
-	for (var i = 0; i < possibleAvatars.length; i++)
-	{
-		var tempAvatars = [],
-			j = 0;
-
-		if (possibleAvatars[i].className !== 'avatar')
-			continue;
-
-		// Image.prototype.avatar = possibleAvatars[i];
-		tempAvatars[j] = new Image();
-		tempAvatars[j].avatar = possibleAvatars[i];
-
-		tempAvatars[j].onload = function()
-		{
-			this.avatar.width = this.width;
-			this.avatar.height = this.height;
-
-			if (elk_avatarMaxWidth !== 0 && this.width > elk_avatarMaxWidth)
-			{
-				this.avatar.height = (elk_avatarMaxWidth * this.height) / this.width;
-				this.avatar.width = elk_avatarMaxWidth;
-			}
-
-			if (elk_avatarMaxHeight !== 0 && this.avatar.height > elk_avatarMaxHeight)
-			{
-				this.avatar.width = (elk_avatarMaxHeight * this.avatar.width) / this.avatar.height;
-				this.avatar.height = elk_avatarMaxHeight;
-			}
-		};
-
-		tempAvatars[j].src = possibleAvatars[i].src;
-		j++;
-	}
-
-	if (typeof(window_oldAvatarOnload) !== 'undefined' && window_oldAvatarOnload)
-	{
-		window_oldAvatarOnload();
-		window_oldAvatarOnload = null;
-	}
-}
-
-/**
  * Password hashing for user
  *
  * @param {type} doForm

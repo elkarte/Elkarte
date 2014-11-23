@@ -934,6 +934,7 @@ ALTER TABLE {$db_prefix}members
 ADD COLUMN mentions smallint NOT NULL default '0';
 ---#
 
+/******************************************************************************/
 --- Fixing personal messages column name
 /******************************************************************************/
 ---# Renaming instant_messages to personal_messages...
@@ -941,6 +942,7 @@ ALTER TABLE {$db_prefix}members
 CHANGE `instant_messages` `personal_messages` smallint NOT NULL default 0;
 ---#
 
+/******************************************************************************/
 --- Fixes from 1.0.1
 /******************************************************************************/
 ---# Adding new column to message_likes...
@@ -956,4 +958,53 @@ CHANGE `filter_style` `filter_style` char(10) NOT NULL default '';
 ---# Possible wrong type for mail_queue...
 ALTER TABLE {$db_prefix}mail_queue
 CHANGE `message_id` `message_id` varchar(12) NOT NULL default '';
+---#
+
+/******************************************************************************/
+--- Changes for 1.0.2
+/******************************************************************************/
+---# Remove unused avatar permissions and settings...
+---{
+upgrade_query("
+	DELETE FROM {$db_prefix}permissions
+	WHERE permission = 'profile_upload_avatar'");
+upgrade_query("
+	DELETE FROM {$db_prefix}permissions
+	WHERE permission = 'profile_remote_avatar'");
+upgrade_query("
+	DELETE FROM {$db_prefix}permissions
+	WHERE permission = 'profile_gravatar'");
+upgrade_query("
+	UPDATE {$db_prefix}permissions
+	SET permission = 'profile_set_avatar'
+	WHERE permission = 'profile_server_avatar'");
+
+upgrade_query("
+	UPDATE {$db_prefix}settings
+	SET avatar_max_height = avatar_max_height_external");
+upgrade_query("
+	UPDATE {$db_prefix}settings
+	SET avatar_max_width = avatar_max_width_external");
+
+upgrade_query("
+	INSERT INTO {$db_prefix}settings
+		(variable, value)
+	VALUES
+	('avatar_stored_enabled', '1')");
+upgrade_query("
+	INSERT INTO {$db_prefix}settings
+		(variable, value)
+	VALUES
+	('avatar_external_enabled', '1')");
+upgrade_query("
+	INSERT INTO {$db_prefix}settings
+		(variable, value)
+	VALUES
+	('avatar_gravatar_enabled', '1')");
+upgrade_query("
+	INSERT INTO {$db_prefix}settings
+		(variable, value)
+	VALUES
+	('avatar_upload_enabled', '1')");
+---}
 ---#

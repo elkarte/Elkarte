@@ -2561,18 +2561,15 @@ function setupThemeContext($forceload = false)
 		{
 			$context['user']['avatar']['href'] = $user_info['avatar']['url'];
 
-			if ($modSettings['avatar_action_too_large'] == 'option_html_resize' || $modSettings['avatar_action_too_large'] == 'option_js_resize')
-			{
-				if (!empty($modSettings['avatar_max_width_external']))
-					$context['user']['avatar']['width'] = $modSettings['avatar_max_width_external'];
+			if (!empty($modSettings['avatar_max_width']))
+				$context['user']['avatar']['width'] = $modSettings['avatar_max_width'];
 
-				if (!empty($modSettings['avatar_max_height_external']))
-					$context['user']['avatar']['height'] = $modSettings['avatar_max_height_external'];
-			}
+			if (!empty($modSettings['avatar_max_height']))
+				$context['user']['avatar']['height'] = $modSettings['avatar_max_height'];
 		}
 		// Gravatars URL.
 		elseif ($user_info['avatar']['url'] === 'gravatar')
-			$context['user']['avatar']['href'] = '//www.gravatar.com/avatar/' . md5(strtolower($user_settings['email_address'])) . 'd=' . $modSettings['avatar_max_height_external'] . (!empty($modSettings['gravatar_rating']) ? ('&amp;r=' . $modSettings['gravatar_rating']) : '');
+			$context['user']['avatar']['href'] = '//www.gravatar.com/avatar/' . md5(strtolower($user_settings['email_address'])) . 'd=' . $modSettings['avatar_max_height'] . (!empty($modSettings['gravatar_rating']) ? ('&amp;r=' . $modSettings['gravatar_rating']) : '');
 		// Otherwise we assume it's server stored?
 		elseif ($user_info['avatar']['url'] !== '')
 			$context['user']['avatar']['href'] = $modSettings['avatar_url'] . '/' . htmlspecialchars($user_info['avatar']['url']);
@@ -2629,17 +2626,6 @@ function setupThemeContext($forceload = false)
 				icon: elk_images_url + \'/im_sm_newmsg.png\'
 			});
 		});', true);
-
-	// Resize avatars the fancy, but non-GD requiring way.
-	if ($modSettings['avatar_action_too_large'] == 'option_js_resize' && (!empty($modSettings['avatar_max_width_external']) || !empty($modSettings['avatar_max_height_external'])))
-	{
-		// @todo Move this over to script.js?
-		addInlineJavascript('
-		var elk_avatarMaxWidth = ' . (int) $modSettings['avatar_max_width_external'] . ',
-			elk_avatarMaxHeight = ' . (int) $modSettings['avatar_max_height_external'] . ';' . (!isBrowser('is_ie8') ? '
-		window.addEventListener("load", elk_avatarResize, false);' : '
-		window.attachEvent("load", elk_avatarResize);'), true);
-	}
 
 	// This looks weird, but it's because BoardIndex.controller.php references the variable.
 	$context['common_stats']['latest_member'] = array(

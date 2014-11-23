@@ -2826,21 +2826,44 @@ function loadDatabase()
  */
 function determineAvatar($profile)
 {
-	global $modSettings, $scripturl, $settings;
+	global $modSettings, $scripturl, $settings, $context;
+	static $added_once = false;
 
 	if (empty($profile))
 		return array();
 
+	// @todo compatibility setting for migration
+	if (!isset($modSettings['avatar_max_height']))
+		$modSettings['avatar_max_height'] = $modSettings['avatar_max_height_external'];
+	if (!isset($modSettings['avatar_max_width']))
+		$modSettings['avatar_max_width'] = $modSettings['avatar_max_width_external'];
+
 	// If we're always html resizing, assume it's too large.
-	if ($modSettings['avatar_action_too_large'] == 'option_html_resize' || $modSettings['avatar_action_too_large'] == 'option_js_resize')
+	if ($modSettings['avatar_action_too_large'] == 'option_resize')
 	{
-		$max_avatar_width = !empty($modSettings['avatar_max_width_external']) ? ' max-width:' . $modSettings['avatar_max_width_external'] . 'px;' : '';
-		$max_avatar_height = !empty($modSettings['avatar_max_height_external']) ? ' max-height:' . $modSettings['avatar_max_height_external'] . 'px;' : '';
+		$resize_class = ' avatarresize';
+
+		if (!$added_once)
+		{
+			if (!isset($context['html_headers']))
+				$context['html_headers'] = '';
+
+			if (!empty($modSettings['avatar_max_width']) || !empty($modSettings['avatar_max_height']))
+			{
+				$context['html_headers'] .= '
+	<style>
+		.avatarresize {' . (!empty($modSettings['avatar_max_width']) ? '
+			max-width:' . $modSettings['avatar_max_width'] . 'px;' : '') . (!empty($modSettings['avatar_max_height']) ? '
+			max-height:' . $modSettings['avatar_max_height'] . 'px;' : '') . '
+		}
+	</style>';
+			}
+			$added_once = true;
+		}
 	}
 	else
 	{
-		$max_avatar_width = '';
-		$max_avatar_height = '';
+		$resize_class = '';
 	}
 
 	$avatar_protocol = substr(strtolower($profile['avatar']), 0, 7);
@@ -2853,7 +2876,7 @@ function determineAvatar($profile)
 
 		$avatar = array(
 			'name' => $profile['avatar'],
-			'image' => '<img class="avatar" src="' . $avatar_url . '" alt="" />',
+			'image' => '<img class="avatar' . $resize_class . '" src="' . $avatar_url . '" alt="" />',
 			'href' => $avatar_url,
 			'url' => '',
 		);
@@ -2863,7 +2886,7 @@ function determineAvatar($profile)
 	{
 		$avatar = array(
 			'name' => $profile['avatar'],
-			'image' => '<img class="avatar" src="' . $profile['avatar'] . '" style="' . $max_avatar_width . $max_avatar_height . '" alt="" />',
+			'image' => '<img class="avatar' . $resize_class . '" src="' . $profile['avatar'] . '" alt="" />',
 			'href' => $profile['avatar'],
 			'url' => $profile['avatar'],
 		);
@@ -2872,11 +2895,11 @@ function determineAvatar($profile)
 	elseif (!empty($profile['avatar']) && $profile['avatar'] === 'gravatar')
 	{
 		// Gravatars URL.
-		$gravatar_url = '//www.gravatar.com/avatar/' . md5(strtolower($profile['email_address'])) . 'd=' . $modSettings['avatar_max_height_external'] . (!empty($modSettings['gravatar_rating']) ? ('&amp;r=' . $modSettings['gravatar_rating']) : '');
+		$gravatar_url = '//www.gravatar.com/avatar/' . md5(strtolower($profile['email_address'])) . 'd=' . $modSettings['avatar_max_height'] . (!empty($modSettings['gravatar_rating']) ? ('&amp;r=' . $modSettings['gravatar_rating']) : '');
 
 		$avatar = array(
 			'name' => $profile['avatar'],
-			'image' => '<img class="avatar" src="' . $gravatar_url . '" style="' . $max_avatar_width . $max_avatar_height . '" alt="" />',
+			'image' => '<img class="avatar' . $resize_class . '" src="' . $gravatar_url . '" alt="" />',
 			'href' => $gravatar_url,
 			'url' => $gravatar_url,
 		);
@@ -2886,7 +2909,7 @@ function determineAvatar($profile)
 	{
 		$avatar = array(
 			'name' => $profile['avatar'],
-			'image' => '<img class="avatar" src="' . $modSettings['avatar_url'] . '/' . $profile['avatar'] . '" style="' . $max_avatar_width . $max_avatar_height . '" alt="" />',
+			'image' => '<img class="avatar' . $resize_class . '" src="' . $modSettings['avatar_url'] . '/' . $profile['avatar'] . '" alt="" />',
 			'href' => $modSettings['avatar_url'] . '/' . $profile['avatar'],
 			'url' => $modSettings['avatar_url'] . '/' . $profile['avatar'],
 		);
@@ -2901,7 +2924,7 @@ function determineAvatar($profile)
 		// Let's proceed with the default avatar.
 		$avatar = array(
 			'name' => '',
-			'image' => '<img class="avatar" src="' . $settings['images_url'] . '/default_avatar.png" style="' . $max_avatar_width . $max_avatar_height . '" alt="" />',
+			'image' => '<img class="avatar' . $resize_class . '" src="' . $settings['images_url'] . '/default_avatar.png" alt="" />',
 			'href' => $settings['images_url'] . '/default_avatar.png',
 			'url' => 'http://',
 		);
@@ -2916,7 +2939,7 @@ function determineAvatar($profile)
 		);
 
 	// Make sure there's a preview for gravatars available.
-	$avatar['gravatar_preview'] = '//www.gravatar.com/avatar/' . md5(strtolower($profile['email_address'])) . 'd=' . $modSettings['avatar_max_height_external'] . (!empty($modSettings['gravatar_rating']) ? ('&amp;r=' . $modSettings['gravatar_rating']) : '');
+	$avatar['gravatar_preview'] = '//www.gravatar.com/avatar/' . md5(strtolower($profile['email_address'])) . 'd=' . $modSettings['avatar_max_height'] . (!empty($modSettings['gravatar_rating']) ? ('&amp;r=' . $modSettings['gravatar_rating']) : '');
 
 	return $avatar;
 }
