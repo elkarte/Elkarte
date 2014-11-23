@@ -75,10 +75,14 @@ function template_maintain_database()
 						<label for="struct"><input type="checkbox" name="struct" id="struct" onclick="document.getElementById(\'submitDump\').disabled = !document.getElementById(\'struct\').checked &amp;&amp; !document.getElementById(\'data\').checked;" class="input_check" checked="checked" /> ', $txt['maintain_backup_struct'], '</label><br />
 						<label for="data"><input type="checkbox" name="data" id="data" onclick="document.getElementById(\'submitDump\').disabled = !document.getElementById(\'struct\').checked &amp;&amp; !document.getElementById(\'data\').checked;" checked="checked" class="input_check" /> ', $txt['maintain_backup_data'], '</label><br />
 						<label for="compress"><input type="checkbox" name="compress" id="compress" value="gzip"', $context['suggested_method'] == 'zipped_file' ? ' checked="checked"' : '', ' class="input_check" /> ', $txt['maintain_backup_gz'], '</label>
-					</p>
-					<div class="infobox">', $txt['security_database_download'], '</div>';
+						</p>';
 
-	template_control_chmod();
+	if (empty($context['skip_security']))
+	{
+		echo '
+					<div class="infobox">', $txt['security_database_download'], '</div>';
+		template_control_chmod();
+	}
 
 	echo '
 					<div class="submitbutton">
