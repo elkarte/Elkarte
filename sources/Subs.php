@@ -2900,6 +2900,8 @@ function template_javascript($do_defered = false)
 			$combiner = new Site_Combiner(CACHEDIR, $boardurl . '/cache');
 			$combine_name = $combiner->site_js_combine($context['javascript_files'], $do_defered);
 
+			call_integration_hook('post_javascript_combine', array(&$combine_name, $combiner));
+
 			if (!empty($combine_name))
 				echo '
 	<script src="', $combine_name, '" id="jscombined', $do_defered ? 'bottom' : 'top', '"></script>';
@@ -2986,6 +2988,8 @@ function template_css()
 			require_once(SOURCEDIR . '/SiteCombiner.class.php');
 			$combiner = new Site_Combiner(CACHEDIR, $boardurl . '/cache');
 			$combine_name = $combiner->site_css_combine($context['css_files']);
+
+			call_integration_hook('post_css_combine', array(&$combine_name, $combiner));
 
 			if (!empty($combine_name))
 				echo '
