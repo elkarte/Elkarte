@@ -280,10 +280,20 @@ $.sceditor.command
 			var editor = this,
 				currentNode = this.currentNode();
 
+			// Add a TT span if not in one
 			if (!$(currentNode).is('span.tt') && $(currentNode).parents('span.tt').length === 0)
-				this.insert('<span class="tt">', '</span>', false);
-			else
-				return;
+				editor.insert('<span class="tt">', '</span>', false);
+			// Remove a TT span if in one and its empty
+			else if ($(currentNode).is('span.tt') && $(currentNode).text().length === 1)
+			{
+				$(currentNode).replaceWith('');
+				editor.insert('<span> ', '</span>', false);
+			}
+			// Escape from this one then
+			else if (!$(currentNode).is('span.tt') && $(currentNode).parents('span.tt').length > 0)
+				editor.insert('<span> ', '</span>', false);
+
+			return;
 		},
 		txtExec: ['[tt]', '[/tt]'],
 		tooltip: 'Teletype'
@@ -299,7 +309,22 @@ $.sceditor.command
 				currentNode = this.currentNode();
 
 			if (!$(currentNode).is('pre') && $(currentNode).parents('pre').length === 0)
-				this.insert('<pre>', '</pre>', false);
+				editor.insert('<pre>', '</pre>', false);
+			// In a pre node and selected pre again, lets try to end it and escape
+			else if (!$(currentNode).is('pre') && $(currentNode).parents('pre').length > 0)
+			{
+				var rangerhelper = this.getRangeHelper(),
+					firstblock = rangerhelper.getFirstBlockParent(),
+					sceditor = $("#" + post_box_name).sceditor("instance"),
+					newnode;
+
+				editor.insert('<p id="blank"> ', '</p>', false);
+				rangerhelper.saveRange();
+				newnode = sceditor.getBody().find('#blank').get(0);
+				firstblock.parentNode.insertBefore(newnode, firstblock.nextSibling);
+				rangerhelper.restoreRange();
+				editor.focus();
+			}
 			else
 				return;
 		},
