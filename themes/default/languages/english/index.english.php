@@ -909,3 +909,7 @@ $txt['admin_warning_title'] = 'Warning';
 $txt['via'] = 'via';
 
 $txt['like_post_stats'] = 'Like stats';
+
+$txt['otp_token'] = 'Google Authenticator Token';
+$txt['invalid_otptoken'] = 'Google Authenticator Token is invalid';
+$txt['otp_generate'] = 'Generate';

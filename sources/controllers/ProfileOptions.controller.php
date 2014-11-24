@@ -326,7 +326,8 @@ class ProfileOptions_Controller extends Action_Controller
 				'id_group', 'hr',
 				'email_address', 'hide_email', 'show_online', 'hr',
 				'passwrd1', 'passwrd2', 'hr',
-				'secret_question', 'secret_answer',
+				'secret_question', 'secret_answer', 'hr',
+				'2fa_secret', 'hr' 
 			),
 			'account'
 		);

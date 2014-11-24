@@ -687,6 +687,15 @@ function loadProfileFields($force_reload = false)
 			'permission' => 'profile_identity',
 			'is_dummy' => true,
 		),
+		'2fa_secret' => array(
+			'type' => 'text',
+			'label' => ucwords($txt['otp_token']),
+			'enabled' => empty($cur_profile['openid_uri']),
+			'size' => 20,
+			'value' => empty($cur_profile['2fa_secret']) ? '' : $cur_profile['2fa_secret'],
+			'postinput' => '<span class="smalltext" style="margin-left: 4ex;"><input type="button" value="' . $txt['otp_generate'] . '" onclick="generateOTP();"> [<a target="_blank" href="https://chart.googleapis.com/chart?chs=200x200&chld=M|0&cht=qr&chl=otpauth%3A%2F%2Ftotp%2F'. $context['forum_name'] . '%3Fsecret%3D'. $cur_profile['2fa_secret']. '" onclick="reqWin(this.href, 200, 200, false)">' . 'Show QR-Code' . '</a>]</span>',
+			'permission' => 'profile_identity',
+		),
 		'personal_text' => array(
 			'type' => 'text',
 			'label' => $txt['personal_text'],
