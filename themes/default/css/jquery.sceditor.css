@@ -363,3 +363,7 @@ a.sceditor-button-space, .sceditor-button-space div {
 	/*background: url('../images/bbc/unformat.png');*/
 	background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABcAAAAWAgMAAABWGO+WAAAADFBMVEX///9DYoSQExMAAACJjlfIAAAAAXRSTlMAQObYZgAAAD1JREFUeNpjYsAOGB3AFCuEEoUIOkKkoBQjmAoNBVMCEJ4DlIJoBxpuAKHOAAk2qBATRHBVMzNYgBlMYQIAXLYFFlspUJ4AAAAASUVORK5CYII=);
 }
+.sceditor-button-splittag div {
+	/*background: url('../images/bbc/splittag.png');*/
+	background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABcAAAAWCAMAAAAcqPc3AAAADFBMVEX6+vr////t7e1NTU1hENLnAAAAAXRSTlMAQObYZgAAAExJREFUeF6V0DEKADEMA8Ek+/8/36FmES5CtpzCIK+XYCXS5JMojgM7Lsf336E5DsTluh82ALmTR+9MmuxwuYbLY7js8PtjHd5syA99kCkBeWYcaxcAAAAASUVORK5CYII=);
+}

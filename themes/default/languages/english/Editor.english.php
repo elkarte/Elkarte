@@ -60,3 +60,4 @@ $editortxt['Teletype'] = 'Teletype';
 $editortxt['Move'] = 'Move';
 $editortxt['Insert Spoiler'] = 'Insert Spoiler';
 $editortxt['Insert Footnote'] = 'Insert Footnote';
+$editortxt['Split Tag'] = 'Split quote at cursor (ctrl+enter)';

@@ -344,6 +344,13 @@ $.sceditor.command
 	})
 	.set('table', {
 		txtExec: ['[table]\n[tr]\n[td]', '[/td]\n[/tr]\n[/table]']
+	})
+	.set('splittag', {
+		txtExec: function() {
+			oSplitTags = new elk_SplitTags();
+			oSplitTags.split();
+		},
+		tooltip: "Split Tag"
 	});
 
 /**

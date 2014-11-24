@@ -239,7 +239,7 @@ function create_control_richedit($editorOptions)
 		$bbc_tags['row2'] = array(
 			array('quote', 'code', 'table'),
 			array('bulletlist', 'orderedlist', 'horizontalrule'),
-			array('spoiler', 'footnote'),
+			array('spoiler', 'footnote', 'splittag'),
 			array('image', 'link', 'email'),
 		);
 
