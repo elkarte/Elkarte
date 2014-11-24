@@ -1801,7 +1801,9 @@ function doAutoSubmit(countdown, txt_message, formName)
 
 	setTimeout(function() {doAutoSubmit(countdown, txt_message, formID);}, 1000);
 }
-
+/**
+ * Generate a secret key for Google Authenticator
+ */
 function generateOTP()
 {
     var text = "";
