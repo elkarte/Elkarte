@@ -690,12 +690,14 @@ function loadProfileFields($force_reload = false)
 		'enable_2fa' => array(
 			'type' => 'check',
 			'value' => empty($cur_profile['enable_2fa']) ? false : true,
+			'subtext' => $txt['otp_enabled_help'],
 			'label' => $txt['otp_enabled'],
 			'permission' => 'profile_identity',
 		),
 		'2fa_secret' => array(
 			'type' => 'text',
 			'label' => ucwords($txt['otp_token']),
+			'subtext' => $txt['otp_token_help'],
 			'enabled' => empty($cur_profile['openid_uri']),
 			'size' => 20,
 			'value' => empty($cur_profile['2fa_secret']) ? '' : $cur_profile['2fa_secret'],

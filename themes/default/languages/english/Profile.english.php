@@ -498,3 +498,6 @@ $txt['trackEdit_action_member_name'] = 'Username';
 $txt['trackEdit_action_email_address'] = 'Email Address';
 $txt['trackEdit_action_id_group'] = 'Primary Membergroup';
 $txt['trackEdit_action_additional_groups'] = 'Additional Membergroups';
+
+$txt['otp_enabled_help'] = 'Enabling this will add a second factor (one time password) for authentication.';
+$txt['otp_token_help'] = 'This generates a secret token for the Google authenticator app. Once the secret was generated use the Google Authenticator app and scan the qrcode.<ul><li><a href="https://www.google.de/url?sa=t&rct=j&q=&esrc=s&source=web&cd=1&cad=rja&uact=8&ved=0CCEQFjAA&url=https%3A%2F%2Fplay.google.com%2Fstore%2Fapps%2Fdetails%3Fid%3Dcom.google.android.apps.authenticator2%26hl%3Dde&ei=wWF0VIGkOsjCOavPgOgG&usg=AFQjCNEP4vq0iRsoESNifBAlu2ksgOwGFQ&bvm=bv.80185997,d.ZWU">Google Authenticator for Android</a></li><li><a href="https://www.google.de/url?sa=t&rct=j&q=&esrc=s&source=web&cd=1&cad=rja&uact=8&ved=0CCEQFjAA&url=https%3A%2F%2Fitunes.apple.com%2Fde%2Fapp%2Fgoogle-authenticator%2Fid388497605%3Fmt%3D8&ei=BGJ0VPexMYe3OIOqgdAG&usg=AFQjCNG-SAjiUB7nkssU0dOo4MVDjR1PqQ">Google Authenticator for IOS (Apple)</a></li></ul>';
