@@ -687,6 +687,12 @@ function loadProfileFields($force_reload = false)
 			'permission' => 'profile_identity',
 			'is_dummy' => true,
 		),
+		'enable_2fa' => array(
+			'type' => 'check',
+			'value' => empty($cur_profile['enable_2fa']) ? false : true,
+			'label' => $txt['otp_enabled'],
+			'permission' => 'profile_identity',
+		),
 		'2fa_secret' => array(
 			'type' => 'text',
 			'label' => ucwords($txt['otp_token']),

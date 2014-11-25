@@ -211,6 +211,11 @@ class Auth_Controller extends Action_Controller
 		$user_settings = loadExistingMember($_POST['user']);
 
 		//User using 2FA for login? Let's validate the token...
+		if (!empty($user_settings['enable_2fa']) && empty($_POST['otp_token']))
+		{
+			$context['login_errors'] = array($txt['otp_required']);
+			return;
+		}
 		if (!empty($_POST['otp_token']))
 		{
 			require_once(EXTDIR . '/GoogleAuthenticator.php');
