@@ -687,20 +687,20 @@ function loadProfileFields($force_reload = false)
 			'permission' => 'profile_identity',
 			'is_dummy' => true,
 		),
-		'enable_2fa' => array(
+		'enable_otp' => array(
 			'type' => 'check',
-			'value' => empty($cur_profile['enable_2fa']) ? false : true,
+			'value' => empty($cur_profile['enable_otp']) ? false : true,
 			'subtext' => $txt['otp_enabled_help'],
 			'label' => $txt['otp_enabled'],
 			'permission' => 'profile_identity',
 		),
-		'2fa_secret' => array(
+		'otp_secret' => array(
 			'type' => 'text',
 			'label' => ucwords($txt['otp_token']),
 			'subtext' => $txt['otp_token_help'],
 			'enabled' => empty($cur_profile['openid_uri']),
 			'size' => 20,
-			'value' => empty($cur_profile['2fa_secret']) ? '' : $cur_profile['2fa_secret'],
+			'value' => empty($cur_profile['otp_secret']) ? '' : $cur_profile['otp_secret'],
 			'postinput' => '<span class="smalltext" style="margin-left: 4ex;"><input type="button" value="' . $txt['otp_generate'] . '" onclick="generateSecret();"><div id="qrcode"></div>',
 			'permission' => 'profile_identity',
 		),

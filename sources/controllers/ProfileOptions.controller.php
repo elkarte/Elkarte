@@ -327,13 +327,13 @@ class ProfileOptions_Controller extends Action_Controller
 				'email_address', 'hide_email', 'show_online', 'hr',
 				'passwrd1', 'passwrd2', 'hr',
 				'secret_question', 'secret_answer', 'hr',
-				'enable_2fa', '2fa_secret', 'hr' 
+				'enable_otp', 'otp_secret', 'hr' 
 			),
 			'account'
 		);
 		loadJavascriptFile('qrcode.js');
 		addInlineJavascript('
-			var secret = document.getElementById("2fa_secret").value;
+			var secret = document.getElementById("otp_secret").value;
 			if (secret)
 			{
 				var qrcode = new QRCode("qrcode", {
@@ -355,7 +355,7 @@ class ProfileOptions_Controller extends Action_Controller
 				for( var i=0; i < 16; i++ )
 				text += possible.charAt(Math.floor(Math.random() * possible.length));
 
-				document.getElementById("2fa_secret").value = text;
+				document.getElementById("otp_secret").value = text;
 
 				var qr = document.getElementById("qrcode");
 				while (qr.firstChild) {

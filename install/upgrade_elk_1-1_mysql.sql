@@ -33,7 +33,7 @@ if ($db->num_rows($request) == 0)
 ---{
 $db_table->db_add_column('{db_prefix}members',
 	array(
-		'name' => '2fa_secret',
+		'name' => 'otp_secret',
 		'type' => 'varchar',
 		'size' => 16,
 		'default' => '',
@@ -43,7 +43,7 @@ $db_table->db_add_column('{db_prefix}members',
 );
 $db_table->db_add_column('{db_prefix}members',
 	array(
-		'name' => 'enable_2fa',
+		'name' => 'enable_otp',
 		'type' => 'tinyint',
 		'size' => 1,
 		'default' => 0,
