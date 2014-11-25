@@ -326,10 +326,49 @@ class ProfileOptions_Controller extends Action_Controller
 				'id_group', 'hr',
 				'email_address', 'hide_email', 'show_online', 'hr',
 				'passwrd1', 'passwrd2', 'hr',
-				'secret_question', 'secret_answer',
+				'secret_question', 'secret_answer', 'hr',
+				'enable_otp', 'otp_secret', 'hr' 
 			),
 			'account'
 		);
+		loadJavascriptFile('qrcode.js');
+		addInlineJavascript('
+			var secret = document.getElementById("otp_secret").value;
+			if (secret)
+			{
+				var qrcode = new QRCode("qrcode", {
+					text: "otpauth://totp/' . $context['forum_name'] . '?secret=" + secret, 
+					width: 80,
+					height: 80,
+					colorDark : "#000000",
+					colorLight : "#ffffff",
+				});
+			}
+			/**
+			* Generate a secret key for Google Authenticator
+			*/
+			function generateSecret()
+			{
+				var text = "";
+				var possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZ234567";
+
+				for( var i=0; i < 16; i++ )
+				text += possible.charAt(Math.floor(Math.random() * possible.length));
+
+				document.getElementById("otp_secret").value = text;
+
+				var qr = document.getElementById("qrcode");
+				while (qr.firstChild) {
+					qr.removeChild(qr.firstChild);
+				}
+				var qrcode = new QRCode("qrcode", {
+				text: "otpauth://totp/' . $context['forum_name'] . '?secret=" + text, 
+				width: 80,
+				height: 80,
+				colorDark : "#000000",
+				colorLight : "#ffffff",
+			});
+		}', true);
 	}
 
 	/**

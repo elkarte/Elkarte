@@ -3231,6 +3231,9 @@ dl.merge_topic dd {
 	width: 90%;
 	margin-top: 1em;
 }
+#qrcode {
+	margin-top: 10px;
+}
 
 /* $PERSONAL	*/
 /* ------------------------------------------------------- */

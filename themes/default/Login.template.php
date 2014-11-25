@@ -51,6 +51,8 @@ function template_login()
 					<dd>
 						<input type="password" name="passwrd" id="passwrd" value="', $context['default_password'], '" size="20" class="input_password" placeholder="', $txt['password'], '" />
 					</dd>
+					<dt>', $txt['otp_token'], '</dt>
+					<dd><input type="password" name="otp_token" id="otp_token" value="', $context['default_password'], '" size="8" class="input_password" placeholder="', $txt['otp_token'], '" /></dd>
 				</dl>';
 
 	if (!empty($modSettings['enableOpenID']))

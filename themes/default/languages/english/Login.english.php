@@ -137,6 +137,7 @@ $txt['authenticate_label'] = 'Authentication Method';
 $txt['authenticate_password'] = 'Password';
 $txt['authenticate_openid'] = 'OpenID';
 $txt['authenticate_openid_url'] = 'OpenID Authentication URL';
+$txt['otp_required'] = 'A Google Authenticator token is required in order to log in!';
 
 // Contact form
 $txt['admin_contact_form'] = 'Contact the admins';
