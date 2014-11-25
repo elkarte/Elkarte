@@ -28,3 +28,18 @@ if ($db->num_rows($request) == 0)
 
 ---}
 ---#
+
+---# Adding new columns to members table...
+---{
+$db_table->db_add_column('{db_prefix}members',
+	array(
+		'name' => '2fa_secret',
+		'type' => 'varchar',
+		'size' => 16,
+		'default' => 0
+	),
+	array(),
+	'ignore'
+);
+---}
+---#
