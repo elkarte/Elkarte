@@ -1801,16 +1801,3 @@ function doAutoSubmit(countdown, txt_message, formName)
 
 	setTimeout(function() {doAutoSubmit(countdown, txt_message, formID);}, 1000);
 }
-/**
- * Generate a secret key for Google Authenticator
- */
-function generateOTP()
-{
-    var text = "";
-    var possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZ234567";
-
-    for( var i=0; i < 16; i++ )
-        text += possible.charAt(Math.floor(Math.random() * possible.length));
-
-    document.getElementById('2fa_secret').value = text;
-}

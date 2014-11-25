@@ -331,6 +331,44 @@ class ProfileOptions_Controller extends Action_Controller
 			),
 			'account'
 		);
+		loadJavascriptFile('qrcode.js');
+		addInlineJavascript('
+			var secret = document.getElementById("2fa_secret").value;
+			if (secret)
+			{
+				var qrcode = new QRCode("qrcode", {
+					text: "otpauth://totp/' . $context['forum_name'] . '?secret=" + secret, 
+					width: 80,
+					height: 80,
+					colorDark : "#000000",
+					colorLight : "#ffffff",
+				});
+			}
+			/**
+			* Generate a secret key for Google Authenticator
+			*/
+			function generateSecret()
+			{
+				var text = "";
+				var possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZ234567";
+
+				for( var i=0; i < 16; i++ )
+				text += possible.charAt(Math.floor(Math.random() * possible.length));
+
+				document.getElementById("2fa_secret").value = text;
+
+				var qr = document.getElementById("qrcode");
+				while (qr.firstChild) {
+					qr.removeChild(qr.firstChild);
+				}
+				var qrcode = new QRCode("qrcode", {
+				text: "otpauth://totp/' . $context['forum_name'] . '?secret=" + text, 
+				width: 80,
+				height: 80,
+				colorDark : "#000000",
+				colorLight : "#ffffff",
+			});
+		}', true);
 	}
 
 	/**
