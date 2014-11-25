@@ -1684,6 +1684,7 @@ $db_table->db_create_table('{db_prefix}members',
 		array('name' => 'passwd_flood',         'type' => 'varchar', 'size' => 12, 'default' => ''),
 		array('name' => 'receive_from',         'type' => 'tinyint', 'size' => 4, 'unsigned' => true, 'default' => 1),
 		array('name' => '2fa_secret',			'type' => 'varchar', 'size' => 16, 'default' => ''),
+		array('name' => 'enable_2fa',			'type' => 'tinyint', 'size' => 1, 'default' => 0),
 	),
 	array(
 		array('name' => 'id_member',            'columns' => array('id_member'), 'type' => 'primary'),

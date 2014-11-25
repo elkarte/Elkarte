@@ -36,10 +36,21 @@ $db_table->db_add_column('{db_prefix}members',
 		'name' => '2fa_secret',
 		'type' => 'varchar',
 		'size' => 16,
-		'default' => 0
+		'default' => '',
 	),
 	array(),
 	'ignore'
 );
+$db_table->db_add_column('{db_prefix}members',
+	array(
+		'name' => 'enable_2fa',
+		'type' => 'tinyint',
+		'size' => 1,
+		'default' => 0,
+	),
+	array(),
+	'ignore'
+);
+
 ---}
 ---#
