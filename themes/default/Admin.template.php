@@ -1364,7 +1364,7 @@ function template_php_info()
 	foreach ($context['pinfo'] as $area => $php_area)
 	{
 		echo '
-		<table id="', str_replace(' ', '_', $area), '" class="table_grid">
+		<table id="', str_replace(' ', '_', $area), '" class="table_grid wordbreak">
 			<thead>
 			<tr class="table_head three_column">
 				<th scope="col"></th>
