@@ -11,7 +11,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0.1
+ * @version 1.0.2
  *
  */
 
@@ -123,7 +123,7 @@ function template_messages()
 
 		// Show the message anchor and a "new" anchor if this message is new.
 		echo '
-				<div class="post_wrapper ', $message['approved'] ? ($message['alternate'] == 0 ? 'windowbg' : 'windowbg2') : 'approvebg', '">', $message['id'] != $context['first_message'] ? '
+				<div class="post_wrapper ', $message['classes'], $message['approved'] ? ($message['alternate'] == 0 ? ' windowbg' : ' windowbg2') : ' approvebg', '">', $message['id'] != $context['first_message'] ? '
 					<a class="post_anchor" id="msg' . $message['id'] . '"></a>' . ($message['first_new'] ? '<a id="new"></a>' : '') : '';
 
 		// Showing the sidebar posting area?
