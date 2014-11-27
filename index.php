@@ -25,7 +25,7 @@ $forum_version = 'ElkArte 1.0.1';
 define('ELK', 1);
 
 // Shortcut for the browser cache stale
-define('CACHE_STALE', '?10RC1');
+define('CACHE_STALE', '?102');
 
 if (function_exists('set_magic_quotes_runtime'))
 	@set_magic_quotes_runtime(0);
