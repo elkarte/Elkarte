@@ -242,7 +242,7 @@ function template_ic_show_events()
 
 	if (empty($context['calendar_holidays']) && empty($context['calendar_birthdays']) && empty($context['calendar_events']))
 		return;
-	
+
 	echo '
 			<li class="board_row">
 				<h3 class="ic_section_header">
