@@ -1,12 +1,13 @@
 <?xml version="1.0"?>
 <!DOCTYPE package-info SYSTEM "http://www.elkarte.net/site/package-info">
 <package-info xmlns="http://www.elkarte.net/site/package-info" xmlns:elk="http://www.elkarte.net/">
-	<id>Elkarte Contributors:ElkArte_101_patch</id>
+	<id>Elkarte Contributors:ElkArte_102_patch</id>
 	<name>ElkArte 1.0.2 patch</name>
 	<version>1.0</version>
 	<type>modification</type>
 		<install for="1.0.1">
-			<require-dir name="ext" destination="EXTDIR" />
+			<require-file name="ext/cssmis.php" destination="EXTDIR" />
+			<require-dir name="themes/css/jquery.sceditor.css" destination="THEMEDIR/css" />
 			<modification>modifications.xml</modification>
 			<code>update.php</code>
 			<redirect url="$scripturl?action=admin;area=packages" timeout="5000" parsebbc="true">redirect</redirect>
