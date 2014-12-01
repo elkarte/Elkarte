@@ -2543,11 +2543,7 @@ ul.post_options li {
 }
 .drop_area_fileselect {
 	cursor: pointer;
-	margin-left: -190px;
 	opacity: 0.0001;
-	position: absolute;
-	width: 220px;
-	padding-left: 220px;
 }
 
 #postAttachment >dd.progress_tracker {
