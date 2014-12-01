@@ -3699,6 +3699,11 @@ a.help .icon {
 	margin: 0.2em 1em 0;
 	border-bottom: 0;
 }
+.search_results_posts .topic_moderation {
+	vertical-align: top;
+	width: 2em;
+	padding: 1.3em 1em 0 0;
+}
 .search_results_posts .quickbuttons {
 	margin-left: 1em;
 	margin-right: 1em;
@@ -3707,6 +3712,7 @@ a.help .icon {
 	margin: 0 1em 0;
 	padding-bottom: 12px;
 	padding-top: 12px;
+	width: 100%
 }
 .search_results_posts .quick_mod {
 	position: absolute;
@@ -3715,6 +3721,9 @@ a.help .icon {
 }
 .search_results_posts .counter {
 	padding: 6px 0 6px 1.5em;
+}
+.search_results_posts .topic_details, .search_results_posts .topic_body {
+	padding: 10px 0 10px 10px
 }
 .compact_view .content {
 	overflow: auto;
