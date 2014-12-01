@@ -182,7 +182,7 @@ input, .input_text, button, select {
 	vertical-align: middle;
 }
 select {
-	padding: 0 6px 0 2px;
+	padding: 0 0 0 2px;
 }
 .input_text {
 	font-size: .876em;
