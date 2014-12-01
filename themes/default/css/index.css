@@ -4146,6 +4146,17 @@ dl.no_members {
 }
 /* This one does 800 screens at default font size. */
 @media screen and (max-width: 50em) {
+	dd input, dd select, dd textarea {
+		width: 100% !important;
+		max-width: 100% !important;
+	}
+	#post_header dd select {
+		max-width: 30% !important;
+	}
+	dd .input_check, dd .input_radio {
+		display: inline !important;
+		width: 1.5em !important;
+	}
 	#logobox img {
 		max-width: 95%;
 	}
@@ -4333,9 +4344,8 @@ dl.no_members {
 		width: 90% !important;
 		max-width: 90% !important;
 	}
-	dd .input_check, dd .input_radio {
-		display: inline !important;
-		width: auto !important;
+	#postAttachment2 dt {
+		width: 100% !important;
 	}
 	#search_options {
 		width: 100%;
@@ -4725,6 +4735,15 @@ dl.no_members {
 }
 /* This one does 480px screens at default font size. */
 @media screen and (max-width: 30em) {
+	.content {
+	    padding: 0.1em 0.1em;
+	}
+	.listlevel2, .listlevel3 {
+		max-width: 12em !important;
+	}
+	.menulevel2 {
+		max-width: 12em;
+	}
 	#button_admin {
 		display: none;
 	}
@@ -4736,5 +4755,23 @@ dl.no_members {
 	}
 	.shortcuts {
 		display: none;
+	}
+	dt, dd, dd label, .login dt, #advanced_search dt {
+		width: 100% !important;
+	}
+	dd {
+		padding-left: 4% !important;
+	}
+	dd input, dd select, dd textarea {
+		max-width: 95% !important;
+	}
+	ul.post_options li {
+		width: 50%;
+	}
+	#postAttachment dd, #postAttachment2 dd {
+		margin: 2px 1px;
+	}
+	#postMoreOptions, #postAttachment, #postAttachment2 {
+		padding: 4px;
 	}
 }
