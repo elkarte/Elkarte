@@ -4430,7 +4430,7 @@ dl.no_members {
 	#news, #logobox, .rightheader #logobox, #top_section_notice {
 		display: none;
 	}
-	.avatar {
+	.avatar, .avatar.avatarresize {
 		max-width: 40px;
 		max-height: 40px;
 	}
