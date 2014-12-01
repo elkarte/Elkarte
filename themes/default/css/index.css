@@ -1848,6 +1848,7 @@ img.new_posts {
 	display: table;
 	width: 100%;
 	border-collapse: collapse;
+	table-layout: fixed;
 }
 .topic_listing>li {
 	margin: 1px 0 0 0;
@@ -3706,13 +3707,12 @@ a.help .icon {
 }
 .search_results_posts .quickbuttons {
 	margin-left: 1em;
-	margin-right: 1em;
 }
 .search_results_posts .topic_body {
 	margin: 0 1em 0;
 	padding-bottom: 12px;
 	padding-top: 12px;
-	width: 100%
+	width: 99%
 }
 .search_results_posts .quick_mod {
 	position: absolute;
