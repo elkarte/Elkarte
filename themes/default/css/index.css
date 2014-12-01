@@ -1848,7 +1848,6 @@ img.new_posts {
 	display: table;
 	width: 100%;
 	border-collapse: collapse;
-	table-layout: fixed;
 }
 .topic_listing>li {
 	margin: 1px 0 0 0;
@@ -3688,6 +3687,7 @@ a.help .icon {
 .search_results_posts {
 	overflow: hidden;
 	padding: 0.2em 1em;
+	table-layout: fixed;
 }
 .search_results_posts .buttons {
 	padding: 5px 12px 0 0;
