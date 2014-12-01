@@ -82,6 +82,9 @@ $txt['modlog_ac_install_package'] = 'Installed new package: &quot;{package}&quot
 $txt['modlog_ac_upgrade_package'] = 'Upgraded package: &quot;{package}&quot; to version {version}';
 $txt['modlog_ac_uninstall_package'] = 'Uninstalled package: &quot;{package}&quot;, version {version}';
 
+$txt['modlog_ac_database_backup'] = 'Database backup taken by {member}.';
+$txt['modlog_ac_editing_theme'] = '{member} edited a theme.';
+
 // Restore topic.
 $txt['modlog_ac_restore_topic'] = 'Restored topic &quot;{topic}&quot; from &quot;{board}&quot; to &quot;{board_to}&quot;';
 $txt['modlog_ac_restore_posts'] = 'Restored posts from &quot;{subject}&quot; to the topic &quot;{topic}&quot; in the &quot;{board}&quot; board.';

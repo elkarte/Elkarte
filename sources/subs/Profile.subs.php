@@ -13,7 +13,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0.1
+ * @version 1.0.2
  *
  */
 
@@ -1667,16 +1667,22 @@ function profileLoadAvatarData()
 
 	$valid_protocol = substr($cur_profile['avatar'], 0, 7) === 'http://' || substr($cur_profile['avatar'], 0, 8) === 'https://';
 
+	// @todo Temporary
+	if ($context['user']['is_owner'])
+		$allowedChange = allowedTo('profile_set_avatar') && allowedTo(array('profile_extra_any', 'profile_extra_own'));
+	else
+		$allowedChange = allowedTo('profile_set_avatar') && allowedTo('profile_extra_any');
+
 	// Default context.
 	$context['member']['avatar'] += array(
 		'custom' => $valid_protocol ? $cur_profile['avatar'] : 'http://',
 		'selection' => $valid_protocol ? $cur_profile['avatar'] : '' ,
 		'id_attach' => $cur_profile['id_attach'],
 		'filename' => $cur_profile['filename'],
-		'allow_server_stored' => allowedTo('profile_server_avatar') || (!$context['user']['is_owner'] && allowedTo('profile_extra_any')),
-		'allow_upload' => allowedTo('profile_upload_avatar') || (!$context['user']['is_owner'] && allowedTo('profile_extra_any')),
-		'allow_external' => allowedTo('profile_remote_avatar') || (!$context['user']['is_owner'] && allowedTo('profile_extra_any')),
-		'allow_gravatar' => allowedTo('profile_gravatar') || (!$context['user']['is_owner'] && allowedTo('profile_extra_any')),
+		'allow_server_stored' => !empty($modSettings['avatar_stored_enabled']) && $allowedChange,
+		'allow_upload' =>  !empty($modSettings['avatar_upload_enabled']) && $allowedChange,
+		'allow_external' =>  !empty($modSettings['avatar_external_enabled']) && $allowedChange,
+		'allow_gravatar' =>  !empty($modSettings['avatar_gravatar_enabled']) && $allowedChange,
 	);
 
 	if ($cur_profile['avatar'] == '' && $cur_profile['id_attach'] > 0 && $context['member']['avatar']['allow_upload'])
@@ -2047,7 +2053,7 @@ function profileSaveAvatarData(&$value)
 	$downloadedExternalAvatar = false;
 	$valid_http = isset($_POST['userpicpersonal']) && substr($_POST['userpicpersonal'], 0, 7) === 'http://' && strlen($_POST['userpicpersonal']) > 7;
 	$valid_https = isset($_POST['userpicpersonal']) && substr($_POST['userpicpersonal'], 0, 8) === 'https://' && strlen($_POST['userpicpersonal']) > 8;
-	if ($value == 'external' && allowedTo('profile_remote_avatar') && ($valid_http || $valid_https) && !empty($modSettings['avatar_download_external']))
+	if ($value == 'external' && !empty($modSettings['avatar_external_enabled']) && ($valid_http || $valid_https) && !empty($modSettings['avatar_download_external']))
 	{
 		loadLanguage('Post');
 		if (!is_writable($uploadDir))
@@ -2081,7 +2087,7 @@ function profileSaveAvatarData(&$value)
 
 		removeAttachments(array('id_member' => $memID));
 	}
-	elseif ($value == 'server_stored' && allowedTo('profile_server_avatar'))
+	elseif ($value == 'server_stored' && !empty($modSettings['avatar_stored_enabled']))
 	{
 		$profile_vars['avatar'] = strtr(empty($_POST['file']) ? (empty($_POST['cat']) ? '' : $_POST['cat']) : $_POST['file'], array('&amp;' => '&'));
 		$profile_vars['avatar'] = preg_match('~^([\w _!@%*=\-#()\[\]&.,]+/)?[\w _!@%*=\-#()\[\]&.,]+$~', $profile_vars['avatar']) != 0 && preg_match('/\.\./', $profile_vars['avatar']) == 0 && file_exists($modSettings['avatar_directory'] . '/' . $profile_vars['avatar']) ? ($profile_vars['avatar'] == 'blank.png' ? '' : $profile_vars['avatar']) : '';
@@ -2094,7 +2100,7 @@ function profileSaveAvatarData(&$value)
 		// Get rid of their old avatar. (if uploaded.)
 		removeAttachments(array('id_member' => $memID));
 	}
-	elseif ($value == 'gravatar' && allowedTo('profile_gravatar'))
+	elseif ($value == 'gravatar' && !empty($modSettings['avatar_gravatar_enabled']))
 	{
 		$profile_vars['avatar'] = 'gravatar';
 
@@ -2105,7 +2111,7 @@ function profileSaveAvatarData(&$value)
 
 		removeAttachments(array('id_member' => $memID));
 	}
-	elseif ($value == 'external' && allowedTo('profile_remote_avatar') && ($valid_http || $valid_https) && empty($modSettings['avatar_download_external']))
+	elseif ($value == 'external' && !empty($modSettings['avatar_external_enabled']) && ($valid_http || $valid_https) && empty($modSettings['avatar_download_external']))
 	{
 		// We need these clean...
 		$cur_profile['id_attach'] = 0;
@@ -2123,12 +2129,12 @@ function profileSaveAvatarData(&$value)
 		elseif (!$valid_http && !$valid_https)
 			return 'bad_avatar';
 		// Should we check dimensions?
-		elseif (!empty($modSettings['avatar_max_height_external']) || !empty($modSettings['avatar_max_width_external']))
+		elseif (!empty($modSettings['avatar_max_height']) || !empty($modSettings['avatar_max_width']))
 		{
 			// Now let's validate the avatar.
 			$sizes = url_image_size($profile_vars['avatar']);
 
-			if (is_array($sizes) && (($sizes[0] > $modSettings['avatar_max_width_external'] && !empty($modSettings['avatar_max_width_external'])) || ($sizes[1] > $modSettings['avatar_max_height_external'] && !empty($modSettings['avatar_max_height_external']))))
+			if (is_array($sizes) && (($sizes[0] > $modSettings['avatar_max_width'] && !empty($modSettings['avatar_max_width'])) || ($sizes[1] > $modSettings['avatar_max_height'] && !empty($modSettings['avatar_max_height']))))
 			{
 				// Houston, we have a problem. The avatar is too large!!
 				if ($modSettings['avatar_action_too_large'] == 'option_refuse')
@@ -2137,7 +2143,7 @@ function profileSaveAvatarData(&$value)
 				{
 					// @todo remove this if appropriate
 					require_once(SUBSDIR . '/Attachments.subs.php');
-					if (saveAvatar($profile_vars['avatar'], $memID, $modSettings['avatar_max_width_external'], $modSettings['avatar_max_height_external']))
+					if (saveAvatar($profile_vars['avatar'], $memID, $modSettings['avatar_max_width'], $modSettings['avatar_max_height']))
 					{
 						$profile_vars['avatar'] = '';
 						$cur_profile['id_attach'] = $modSettings['new_avatar_data']['id'];
@@ -2150,7 +2156,7 @@ function profileSaveAvatarData(&$value)
 			}
 		}
 	}
-	elseif (($value == 'upload' && allowedTo('profile_upload_avatar')) || $downloadedExternalAvatar)
+	elseif (($value == 'upload' && !empty($modSettings['avatar_upload_enabled'])) || $downloadedExternalAvatar)
 	{
 		if ((isset($_FILES['attachment']['name']) && $_FILES['attachment']['name'] != '') || $downloadedExternalAvatar)
 		{
@@ -2178,20 +2184,46 @@ function profileSaveAvatarData(&$value)
 				return 'bad_avatar';
 			}
 			// Check whether the image is too large.
-			elseif ((!empty($modSettings['avatar_max_width_upload']) && $sizes[0] > $modSettings['avatar_max_width_upload']) || (!empty($modSettings['avatar_max_height_upload']) && $sizes[1] > $modSettings['avatar_max_height_upload']))
+			elseif ((!empty($modSettings['avatar_max_width']) && $sizes[0] > $modSettings['avatar_max_width']) || (!empty($modSettings['avatar_max_height']) && $sizes[1] > $modSettings['avatar_max_height']))
 			{
-				if (!empty($modSettings['avatar_resize_upload']))
+				if (!empty($modSettings['avatar_action_too_large']) && $modSettings['avatar_action_too_large'] == 'option_download_and_resize')
 				{
 					// Attempt to chmod it.
 					@chmod($_FILES['attachment']['tmp_name'], 0644);
 
 					// @todo remove this require when appropriate
 					require_once(SUBSDIR . '/Attachments.subs.php');
-					if (!saveAvatar($_FILES['attachment']['tmp_name'], $memID, $modSettings['avatar_max_width_upload'], $modSettings['avatar_max_height_upload']))
+					if (!saveAvatar($_FILES['attachment']['tmp_name'], $memID, $modSettings['avatar_max_width'], $modSettings['avatar_max_height']))
 					{
 						// Something went wrong, so lets delete this offender
 						@unlink($_FILES['attachment']['tmp_name']);
 						return 'bad_avatar';
+					}
+
+					// Reset attachment avatar data.
+					$cur_profile['id_attach'] = $modSettings['new_avatar_data']['id'];
+					$cur_profile['filename'] = $modSettings['new_avatar_data']['filename'];
+					$cur_profile['attachment_type'] = $modSettings['new_avatar_data']['type'];
+				}
+				elseif (!empty($modSettings['avatar_action_too_large']) && !empty($modSettings['avatar_reencode']))
+				{
+					// Attempt to chmod it.
+					@chmod($_FILES['attachment']['tmp_name'], 0644);
+
+					require_once(SUBSDIR . '/Graphics.subs.php');
+					if (!reencodeImage($_FILES['attachment']['tmp_name'], $sizes[2]))
+					{
+						@unlink($_FILES['attachment']['tmp_name']);
+						return 'bad_avatar';
+					}
+
+					// @todo remove this require when appropriate
+					require_once(SUBSDIR . '/Attachments.subs.php');
+					if (!saveAvatar($_FILES['attachment']['tmp_name'], $memID, $modSettings['avatar_max_width'], $modSettings['avatar_max_height']))
+					{
+						// Something went wrong, so lets delete this offender
+						@unlink($_FILES['attachment']['tmp_name']);
+						return 'bad_avatar5';
 					}
 
 					// Reset attachment avatar data.

@@ -13,7 +13,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:		BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0
+ * @version 1.0.2
  *
  */
 
@@ -215,7 +215,7 @@ class CoreFeatures_Controller extends Action_Controller
 			),
 			// ih = Integration Hooks Handling.
 			'ih' => array(
-				'url' => 'action=admin;area=addonsettings;sa=hooks',
+				'url' => 'action=admin;area=maintain;sa=hooks',
 				'settings' => array(
 					'handlinghooks_enabled' => 1,
 				),

@@ -13,7 +13,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:		BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0
+ * @version 1.0.2
  *
  */
 
@@ -510,17 +510,17 @@ class ManageSearchEngines_Controller extends Action_Controller
 			foreach ($context['spider_logs']['rows'] as $k => $row)
 			{
 				// Feature disabled?
-				if (empty($row['viewing']['value']) && isset($modSettings['spider_mode']) && $modSettings['spider_mode'] < 3)
-					$context['spider_logs']['rows'][$k]['viewing']['value'] = '<em>' . $txt['spider_disabled'] . '</em>';
+				if (empty($row['data']['viewing']['value']) && isset($modSettings['spider_mode']) && $modSettings['spider_mode'] < 3)
+					$context['spider_logs']['rows'][$k]['data']['viewing']['value'] = '<em>' . $txt['spider_disabled'] . '</em>';
 				else
-					$urls[$k] = array($row['viewing']['value'], -1);
+					$urls[$k] = array($row['data']['viewing']['value'], -1);
 			}
 
 			// Now stick in the new URLs.
 			require_once(SUBSDIR . '/Who.subs.php');
 			$urls = determineActions($urls, 'whospider_');
 			foreach ($urls as $k => $new_url)
-				$context['spider_logs']['rows'][$k]['viewing']['value'] = $new_url;
+				$context['spider_logs']['rows'][$k]['data']['viewing']['value'] = $new_url;
 		}
 
 		$context['page_title'] = $txt['spider_logs'];

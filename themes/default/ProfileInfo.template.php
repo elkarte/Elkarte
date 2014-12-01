@@ -11,7 +11,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0
+ * @version 1.0.2
  *
  */
 
@@ -1038,7 +1038,7 @@ function template_profile_block_buddies()
 
 	// Set the div height to about 4 lines of buddies w/avatars
 	if (isset($context['buddies']))
-		$div_height = 120 + (4 * max(empty($modSettings['avatar_max_height_external']) ? 0 : $modSettings['avatar_max_height_external'], empty($modSettings['avatar_max_height_upload']) ? 0 : $modSettings['avatar_max_height_upload'], 65));
+		$div_height = 120 + (4 * max(empty($modSettings['avatar_max_height']) ? 0 : $modSettings['avatar_max_height'], empty($modSettings['avatar_max_height']) ? 0 : $modSettings['avatar_max_height'], 65));
 
 	if (!empty($modSettings['enable_buddylist']) && $context['user']['is_owner'])
 	{

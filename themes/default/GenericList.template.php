@@ -11,7 +11,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0
+ * @version 1.0.2
  *
  */
 
@@ -34,7 +34,7 @@ function template_show_list($list_id = null)
 		<div class="generic_list">';
 	else
 		echo '
-		<div id="', $list_id, '" class="generic_list_wrapper">';
+		<div id="wrapper_', $list_id, '" class="generic_list_wrapper">';
 
 	// Show the title of the table (if any), with an icon (if defined)
 	if (!empty($cur_list['title']))
