@@ -4564,6 +4564,7 @@ dl.no_members {
 	}
 	.poster .name {
 		white-space: nowrap;
+		text-overflow: clip;
 	}
 	.poster .listlevel1 {
 		float: left;
