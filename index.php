@@ -20,6 +20,7 @@
  */
 
 $forum_version = 'ElkArte 1.0.2';
+define('FORUM_VERSION', $forum_version);
 
 // First things first, but not necessarily in that order.
 define('ELK', 1);
