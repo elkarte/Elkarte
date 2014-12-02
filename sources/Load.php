@@ -3032,7 +3032,7 @@ function doSecurityChecks()
 			$context['warning_controls']['maintenance'] = sprintf($txt['admin_maintenance_active'], ($scripturl . '?action=admin;area=serversettings;' . $context['session_var'] . '=' . $context['session_id']));
 
 		// New updates
-		$index = 'new_in_' . str_replace('ElkArte ', '', FORUM_VERSION);
+		$index = 'new_in_' . str_replace(array('ElkArte ', '.'), array('', '-'), FORUM_VERSION);
 		if (!empty($modSettings[$index]) && empty($options['dismissed_' . $index]))
 		{
 			$context['new_version_updates'] = array(
