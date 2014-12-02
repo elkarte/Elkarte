@@ -319,9 +319,6 @@ $txt['support_resources'] = 'Support Resources';
 $txt['support_resources_p1'] = 'Our <a href="%1$s" target="_blank" class="new_win">Documentation Wiki</a> provides the main documentation for ElkArte. The ElkArte Online Manual has many documents to help answer support questions and explain <a href="%2$s" target="_blank" class="new_win">Features</a>, <a href="%3$s" target="_blank" class="new_win">Settings</a>, <a href="%4$s" target="_blank" class="new_win">Themes</a>, <a href="%5$s" target="_blank" class="new_win">Packages</a>, etc. The Online Manual documents each area of ElkArte thoroughly and should answer most questions quickly.';
 $txt['support_resources_p2'] = 'If you can\'t find the answers to your questions in the Documentation Wiki, you may want to search our <a href="%1$s" target="_blank" class="new_win">Support Community</a> or ask for assistance in our support boards. The ElkArte Support Community can be used for <a href="%2$s" target="_blank" class="new_win">support</a>, <a href="%3$s" target="_blank" class="new_win">customization</a>, and many other things such as discussing ElkArte, finding a host, and discussing administrative issues with other forum administrators.';
 
-$txt['support_latest'] = 'Common support &amp; issues';
-$txt['support_latest_fetch'] = 'Retrieving support information...';
-
 $txt['edit_permissions_info'] = 'Use permission settings to manage global and specific board features and what actions that guest, members and moderators can do.';
 $txt['membergroups_members'] = 'Regular Members';
 $txt['membergroups_guests'] = 'Guests';

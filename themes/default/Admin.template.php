@@ -202,17 +202,6 @@ function template_credits()
 								</div>
 							</div>';
 
-	// Display latest support questions from ElkArte
-	echo '
-							<h3 class="category_header">
-								<a class="hdicon cat_img_helptopics help" href="', $scripturl, '?action=quickhelp;help=latest_support" onclick="return reqOverlayDiv(this.href);"></a>', $txt['support_latest'], '
-							</h3>
-							<div class="windowbg">
-								<div class="content">
-									<div id="latestSupport">', $txt['support_latest_fetch'], '</div>
-								</div>
-							</div>';
-
 	// The most important part - the credits :P.
 	echo '
 							<div id="credits_sections">
