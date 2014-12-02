@@ -454,6 +454,10 @@
 		if (!(window.FormData && ("onprogress" in $.ajaxSettings.xhr())))
 			return;
 
+		// Don't attach D&D on small screens
+		if (!window.matchMedia || window.matchMedia('(max-width: 33.750em)').matches)
+			return;
+
 		// All clear, show the drop zone
 		obj.toggle();
 		$('.drop_attachments_no_js').hide();
