@@ -3176,10 +3176,10 @@ function package_create_backup($id = 'backup')
  * @param string $url
  * @param string $post_data = ''
  * @param bool $keep_alive = false
- * @param int $redirection_level = 0
+ * @param int $redirection_level = 2
  * @return string
  */
-function fetch_web_data($url, $post_data = '', $keep_alive = false, $redirection_level = 0)
+function fetch_web_data($url, $post_data = '', $keep_alive = false, $redirection_level = 2)
 {
 	global $webmaster_email;
 	static $keep_alive_dom = null, $keep_alive_fp = null;
