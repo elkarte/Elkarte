@@ -320,8 +320,6 @@ $txt['support_resources_p1'] = 'Our <a href="%1$s" target="_blank" class="new_wi
 $txt['support_resources_p2'] = 'If you can\'t find the answers to your questions in the Documentation Wiki, you may want to search our <a href="%1$s" target="_blank" class="new_win">Support Community</a> or ask for assistance in our support boards. The ElkArte Support Community can be used for <a href="%2$s" target="_blank" class="new_win">support</a>, <a href="%3$s" target="_blank" class="new_win">customization</a>, and many other things such as discussing ElkArte, finding a host, and discussing administrative issues with other forum administrators.';
 
 $txt['latest_updates'] = 'Latest noteworthy updates';
-$txt['new_version_updates'] = 'You have just updated!';
-$txt['new_version_updates_text'] = 'Check out <a href="{updates_url}">here what\'s new in this version of ElkArte</a>!';
 
 $txt['edit_permissions_info'] = 'Use permission settings to manage global and specific board features and what actions that guest, members and moderators can do.';
 $txt['membergroups_members'] = 'Regular Members';
