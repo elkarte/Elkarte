@@ -4296,6 +4296,12 @@ dl.no_members {
 	#ic_recentposts, #ps_recentposts, #ps_recenttopics {
 		font-size: 1em;
 	}
+	.drop_area {
+		width: 100% !important;
+	}
+	.drop_area_fileselect {
+		display: none;
+	}
 }
 /* This one does 540 and smaller screens at default font size. */
 @media screen and (max-width: 33.750em) {
@@ -4561,6 +4567,7 @@ dl.no_members {
 	}
 	.poster .name {
 		white-space: nowrap;
+		text-overflow: clip;
 	}
 	.poster .listlevel1 {
 		float: left;
