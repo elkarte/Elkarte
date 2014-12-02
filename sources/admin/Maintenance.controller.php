@@ -151,7 +151,7 @@ class Maintenance_Controller extends Action_Controller
 	 */
 	public function action_database()
 	{
-		global $context, $modSettings, $maintenance, $i_know_it_is_unsafe;
+		global $context, $modSettings, $maintenance, $iknowitmaybeunsafe;
 
 		// We need this, really..
 		require_once(SUBSDIR . '/Maintenance.subs.php');
@@ -233,7 +233,7 @@ class Maintenance_Controller extends Action_Controller
 				'error' => '',
 			);
 		}
-		$context['skip_security'] = !empty($i_know_it_is_unsafe);
+		$context['skip_security'] = !empty($iknowitmaybeunsafe);
 	}
 
 	/**
@@ -970,7 +970,7 @@ class Maintenance_Controller extends Action_Controller
 
 		checkSession('post');
 
-		if (empty($i_know_it_is_unsafe))
+		if (empty($iknowitmaybeunsafe))
 		{
 			require_once(SUBSDIR . '/FtpConnection.class.php');
 
