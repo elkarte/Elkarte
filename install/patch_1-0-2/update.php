@@ -13,6 +13,7 @@ updateSettings(array(
 	'avatar_external_enabled' => 1,
 	'avatar_gravatar_enabled' => 1,
 	'avatar_upload_enabled' => 1,
+	'new_in_1.0.2' => 1,
 ));
 
 if (ELK == 'SSI')

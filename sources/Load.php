@@ -3037,7 +3037,7 @@ function doSecurityChecks()
 		{
 			$context['new_version_updates'] = array(
 				'title' => $txt['new_version_updates'],
-				'errors' => array(str_replace('{updates_url}', $scripturl . '?action=admin;area=credits#latest_updates', $txt['new_version_updates_text'])),
+				'errors' => array(replaceBasicActionUrl($txt['new_version_updates_text'])),
 			);
 		}
 	}

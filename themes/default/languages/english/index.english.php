@@ -541,7 +541,7 @@ $txt['generic_warning'] = 'Warning';
 $txt['agreement_missing'] = 'You are requiring new users to accept a registration agreement, however the file (agreement.txt) doesn\'t exist.';
 
 $txt['new_version_updates'] = 'You have just updated!';
-$txt['new_version_updates_text'] = 'Check out <a href="{updates_url}">here what\'s new in this version of ElkArte</a>!';
+$txt['new_version_updates_text'] = 'Check out <a href="{admin_url};area=credits#latest_updates">here what\'s new in this version of ElkArte</a>!';
 
 $txt['cache_writable'] = 'The cache directory is not writable - this will adversely affect the performance of your forum.';
 

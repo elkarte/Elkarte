@@ -743,9 +743,9 @@ class Admin_Controller extends Action_Controller
 		$context['quick_admin_tasks'] = getQuickAdminTasks();
 
 		$index = 'new_in_' . str_replace('ElkArte ', '', FORUM_VERSION);
-		if (!empty($modSettings[$index]))
+		if (!empty($modSettings[$index]) && isset($txt[$index]))
 		{
-			$context['latest_updates'] = $modSettings[$index];
+			$context['latest_updates'] = replaceBasicActionUrl($txt[$index]);
 			require_once(SUBSDIR . '/Themes.subs.php');
 
 			updateThemeOptions(array(1, $user_info['id'], 'dismissed_' . $index, 1));
