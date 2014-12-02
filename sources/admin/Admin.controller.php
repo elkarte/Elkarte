@@ -742,7 +742,7 @@ class Admin_Controller extends Action_Controller
 		// Load in the admin quick tasks
 		$context['quick_admin_tasks'] = getQuickAdminTasks();
 
-		$index = 'new_in_' . str_replace(array('ElkArte ', '.'), array('', '-'), FORUM_VERSION);
+		$index = 'new_in_' . str_replace(array('ElkArte ', '.'), array('', '_'), FORUM_VERSION);
 		if (!empty($modSettings[$index]) && isset($txt[$index]))
 		{
 			$context['latest_updates'] = replaceBasicActionUrl($txt[$index]);
