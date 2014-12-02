@@ -4264,7 +4264,7 @@ dl.no_members {
 	.postarea {
 		margin: 0 0 0 6em;
 	}
-	.avatar {
+	.avatar, .avatar.avatarresize {
 		max-width: 7em;
 	}
 	.poster_avatar a {
