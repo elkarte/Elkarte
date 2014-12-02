@@ -3878,7 +3878,16 @@ function splitDestinationBoard($toboard = 0)
 function template_avatar_settings_below()
 {
 	echo '
-	<script><!-- // --><![CDA' . 'TA[
+	<script><!-- // --><![CDA]]></search>
+			<add><![CDATA[ * copyright:	2011 Simple Machines (http://www.simplemachines.org)
+ * license:  	BSD, See included LICENSE.TXT for terms and conditions.
+ *
+ * @version 1.0.2
+ *
+ */]]></add>
+		</operation>
+		<operation>
+			<search position="replace"><![CDATA[TA[
 	var fUpdateStatus = function ()
 	{
 		document.getElementById("avatar_max_width_external").disabled = document.getElementById("avatar_download_external").checked;
@@ -3888,7 +3897,14 @@ function template_avatar_settings_below()
 		document.getElementById("custom_avatar_url").disabled = document.getElementById("custom_avatar_enabled").value == 0;
 	}
 	addLoadEvent(fUpdateStatus);
-// ]' . ']></script>
+// ]]]></search>
+			<add><![CDATA[
+/**
+ * Forum maintenance page.
+ */]]></add>
+		</operation>
+		<operation>
+			<search position="replace"><![CDATA[]></script>
 ';
 }
 
@@ -3896,16 +3912,7 @@ function template_avatar_settings_below()
  * Forum maintenance page.
  */
 function template_maintenance()]]></search>
-			<add><![CDATA[ * copyright:	2011 Simple Machines (http://www.simplemachines.org)
- * license:  	BSD, See included LICENSE.TXT for terms and conditions.
- *
- * @version 1.0.2
- *
- */
-
-/**
- * Forum maintenance page.
- */
+			<add><![CDATA[
 function template_maintenance()]]></add>
 		</operation>
 	</file>
@@ -4181,20 +4188,10 @@ function template_maintenance()]]></add>
 ]]></add>
 		</operation>
 		<operation>
-			<search position="replace"><![CDATA[	if (!empty($context['can_move']))
-		echo '
-						<p>
-							<label for="move_new_topic"><input type="checkbox" name="move_new_topic" id="move_new_topic" onclick="document.getElementById(\'board_list\').style.display = this.checked ? \'\' : \'none\';" class="input_check" /> ', $txt['splittopic_move'], '.</label>', template_select_boards('board_list'), '
-							<script><!-- // --><![CDA' . 'TA[
-								document.getElementById(\'board_list\').style.display = \'none\';
-							// ]' . ']></script>]]></search>
-			<add><![CDATA[	if (!empty($context['can_move']))
-		echo '
-						<p>
-							<label for="move_new_topic"><input type="checkbox" name="move_new_topic" id="move_new_topic" onclick="document.getElementById(\'board_list\').style.display = this.checked ? \'\' : \'none\';" class="input_check" /> ', $txt['splittopic_move'], '.</label>', template_select_boards('move_to_board'), '
-							<script><!-- // --><![CDA' . 'TA[
-								document.getElementById(\'board_list\').style.display = \'none\';
-							// ]' . ']></script>]]></add>
+			<search position="replace"><![CDATA[
+							<label for="move_new_topic"><input type="checkbox" name="move_new_topic" id="move_new_topic" onclick="document.getElementById(\'board_list\').style.display = this.checked ? \'\' : \'none\';" class="input_check" /> ', $txt['splittopic_move'], '.</label>', template_select_boards('board_list'), ']]></search>
+			<add><![CDATA[
+							<label for="move_new_topic"><input type="checkbox" name="move_new_topic" id="move_new_topic" onclick="document.getElementById(\'board_list\').style.display = this.checked ? \'\' : \'none\';" class="input_check" /> ', $txt['splittopic_move'], '.</label>', template_select_boards('move_to_board'), ']]></add>
 		</operation>
 		<operation>
 			<search position="replace"><![CDATA[						<li class="windowbg', $message['alternate'] ? '2' : '', '" id="not_selected_', $message['id'], '">
@@ -4404,7 +4401,7 @@ function template_maintenance()]]></add>
 }]]></add>
 		</operation>
 	</file>
-	<file name="LANGUAGEDIR/Admin.english.php">
+	<file name="LANGUAGEDIR/english/Admin.english.php">
 		<operation>
 			<search position="replace"><![CDATA[$txt['avatar_default'] = 'Enable a default avatar for all users without their own avatar';
 $txt['avatar_directory'] = 'Avatars directory';
@@ -4461,7 +4458,7 @@ $txt['avatar_download_external'] = 'Download avatar at given URL';
 $txt['custom_avatar_enabled'] = 'Upload avatars to...';]]></add>
 		</operation>
 	</file>
-	<file name="LANGUAGEDIR/Editor.english.php">
+	<file name="LANGUAGEDIR/english/Editor.english.php">
 		<operation>
 			<search position="replace"><![CDATA[$editortxt['Teletype'] = 'Teletype';
 $editortxt['Move'] = 'Move';
@@ -4474,7 +4471,7 @@ $editortxt['Insert Footnote'] = 'Insert Footnote';
 $editortxt['Split Tag'] = 'Split quote at cursor (ctrl+enter)';]]></add>
 		</operation>
 	</file>
-	<file name="LANGUAGEDIR/EmailTemplates.english.php">
+	<file name="LANGUAGEDIR/english/EmailTemplates.english.php">
 		<operation>
 			<search position="replace"><![CDATA[{REGARDS}';
 
@@ -4520,7 +4517,7 @@ If you know this is not the case, please investigate the event.
 		REALNAME: Recipients name]]></add>
 		</operation>
 	</file>
-	<file name="LANGUAGEDIR/Errors.english.php">
+	<file name="LANGUAGEDIR/english/Errors.english.php">
 		<operation>
 			<search position="replace"><![CDATA[$txt['cannot_profile_extra_own'] = 'Sorry, but you don\'t have the necessary permissions to edit your profile data.';
 $txt['cannot_profile_identity_own'] = 'You can\'t change your identity at the current moment.';
@@ -4540,7 +4537,7 @@ $txt['cannot_profile_view_any'] = 'Many apologies, but you can\'t view just any 
 $txt['cannot_delete_own'] = 'Ouch, sorry, you cannot delete your posts on this board.';]]></add>
 		</operation>
 	</file>
-	<file name="LANGUAGEDIR/Help.english.php">
+	<file name="LANGUAGEDIR/english/Help.english.php">
 		<operation>
 			<search position="replace"><![CDATA[$helptxt['avatar_external'] = 'With this enabled, your members can type in a URL to their own avatar.  The downside of this is that, in some cases, they may use avatars that are overly large or portray images you don\'t want on your forum.';
 $helptxt['avatar_download_external'] = 'With this option enabled, the URL given by the user is accessed to download the avatar at that location. On success, the avatar will be treated as uploadable avatar.';
@@ -4557,7 +4554,7 @@ $helptxt['gravatar'] = 'Gravatar (globally recognized avatar) is a service for p
 $helptxt['gravatar_rating'] = 'Gravatar allows users to self-rate their images so that they can indicate if an image is appropriate for a certain audience. By default, only \'G\' rated images are displayed unless you indicate that you would like to see higher ratings. <br /><br /><ul><li><strong>g:</strong> suitable for display on all websites with any audience type.</li><li><strong>pg:</strong> may contain rude gestures, provocatively dressed individuals, the lesser swear words, or mild violence.</li><li><strong>r:</strong> may contain such things as harsh profanity, intense violence, nudity, or hard drug use.</li><li><strong>x:</strong> may contain hardcore sexual imagery or extremely disturbing violence.</li></ul>';]]></add>
 		</operation>
 	</file>
-	<file name="LANGUAGEDIR/Maintenance.english.php">
+	<file name="LANGUAGEDIR/english/Maintenance.english.php">
 		<operation>
 			<search position="replace"><![CDATA[$txt['plain_text'] = 'The best method to backup your database is to create a plain text file, a compressed package may not be completely reliable.';
 $txt['enable_maintenance1'] = 'Due to the size of your forum, it is recommended to place your forum in "maintenance mode" before you start the backup.';
@@ -4568,7 +4565,7 @@ $txt['enable_maintenance2'] = 'To proceed, due to the size of your forum, please
 $txt['security_database_download'] = 'For security reasons, in order to proceed with the download of the backup you have to provide the FTP data:';]]></add>
 		</operation>
 	</file>
-	<file name="LANGUAGEDIR/ManagePermissions.english.php">
+	<file name="LANGUAGEDIR/english/ManagePermissions.english.php">
 		<operation>
 			<search position="replace"><![CDATA[$txt['permissionhelp_profile_remove'] = 'This permission allows a user to delete his account, when set to \'Own Account\'.';
 $txt['permissionname_profile_remove_own'] = 'Own account';
@@ -4592,7 +4589,7 @@ $txt['permissiongroup_general_board'] = 'General';
 $txt['permissionname_moderate_board'] = 'Moderate board';]]></add>
 		</operation>
 	</file>
-	<file name="LANGUAGEDIR/Modlog.english.php">
+	<file name="LANGUAGEDIR/english/Modlog.english.php">
 		<operation>
 			<search position="replace"><![CDATA[$txt['modlog_ac_upgrade_package'] = 'Upgraded package: &quot;{package}&quot; to version {version}';
 $txt['modlog_ac_uninstall_package'] = 'Uninstalled package: &quot;{package}&quot;, version {version}';
@@ -4611,7 +4608,7 @@ $txt['modlog_ac_restore_topic'] = 'Restored topic &quot;{topic}&quot; from &quot
 $txt['modlog_ac_restore_posts'] = 'Restored posts from &quot;{subject}&quot; to the topic &quot;{topic}&quot; in the &quot;{board}&quot; board.';]]></add>
 		</operation>
 	</file>
-	<file name="LANGUAGEDIR/Packages.english.php">
+	<file name="LANGUAGEDIR/english/Packages.english.php">
 		<operation>
 			<search position="replace"><![CDATA[$txt['package_ftp_test_connection'] = 'Test Connection';
 $txt['package_ftp_test_success'] = 'FTP connection established.';
@@ -4628,7 +4625,7 @@ $txt['package_ftp_bad_server'] = 'Could not contact server.';
 $txt['package_delete_bad'] = 'The package you are about to delete is currently installed!  If you delete it, you may not be able to uninstall it later.\\n\\nAre you sure?';]]></add>
 		</operation>
 	</file>
-	<file name="LANGUAGEDIR/Reports.english.php">
+	<file name="LANGUAGEDIR/english/Reports.english.php">
 		<operation>
 			<search position="replace"><![CDATA[$txt['group_perms_name_profile_extra_own'] = 'Edit own additional options';
 $txt['group_perms_name_profile_identity_any'] = 'Edit any account settings';

@@ -6,8 +6,8 @@
 	<version>1.0</version>
 	<type>modification</type>
 		<install for="1.0.1">
-			<require-file name="ext/cssmis.php" destination="EXTDIR" />
-			<require-dir name="themes/css/jquery.sceditor.css" destination="THEMEDIR/css" />
+			<require-file name="ext/cssmin.php" destination="EXTDIR" />
+			<require-dir name="themes/css" destination="THEMEDIR" />
 			<modification>modifications.xml</modification>
 			<code>update.php</code>
 			<redirect url="$scripturl?action=admin;area=packages" timeout="5000" parsebbc="true">redirect</redirect>
