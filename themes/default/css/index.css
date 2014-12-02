@@ -2547,11 +2547,13 @@ ul.post_options li {
 }
 .drop_area_fileselect {
 	cursor: pointer;
-	margin-left: -190px;
+	margin-left: -160px;
 	opacity: 0.0001;
 	position: absolute;
-	width: 220px;
-	padding-left: 220px;
+	width: 160px;
+}
+#chrome .drop_area_fileselect, #safari .drop_area_fileselect {
+	padding-left: 160px;
 }
 .drop_area_fileselect_text {
 	white-space: nowrap;
