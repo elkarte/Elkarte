@@ -182,7 +182,7 @@ input, .input_text, button, select {
 	vertical-align: middle;
 }
 select {
-	padding: 0 6px 0 2px;
+	padding: 0 0 0 2px;
 }
 .input_text {
 	font-size: .876em;
@@ -2547,11 +2547,16 @@ ul.post_options li {
 }
 .drop_area_fileselect {
 	cursor: pointer;
-	margin-left: -190px;
+	margin-left: -160px;
 	opacity: 0.0001;
 	position: absolute;
-	width: 220px;
-	padding-left: 220px;
+	width: 160px;
+}
+#chrome .drop_area_fileselect, #safari .drop_area_fileselect {
+	padding-left: 160px;
+}
+.drop_area_fileselect_text {
+	white-space: nowrap;
 }
 
 #postAttachment >dd.progress_tracker {
@@ -3684,6 +3689,7 @@ a.help .icon {
 .search_results_posts {
 	overflow: hidden;
 	padding: 0.2em 1em;
+	table-layout: fixed;
 }
 .search_results_posts .buttons {
 	padding: 5px 12px 0 0;
@@ -3696,14 +3702,19 @@ a.help .icon {
 	margin: 0.2em 1em 0;
 	border-bottom: 0;
 }
+.search_results_posts .topic_moderation {
+	vertical-align: top;
+	width: 2em;
+	padding: 1.3em 1em 0 0;
+}
 .search_results_posts .quickbuttons {
 	margin-left: 1em;
-	margin-right: 1em;
 }
 .search_results_posts .topic_body {
 	margin: 0 1em 0;
 	padding-bottom: 12px;
 	padding-top: 12px;
+	width: 99%
 }
 .search_results_posts .quick_mod {
 	position: absolute;
@@ -3712,6 +3723,9 @@ a.help .icon {
 }
 .search_results_posts .counter {
 	padding: 6px 0 6px 1.5em;
+}
+.search_results_posts .topic_details, .search_results_posts .topic_body {
+	padding: 10px 0 10px 10px
 }
 .compact_view .content {
 	overflow: auto;
@@ -4134,6 +4148,17 @@ dl.no_members {
 }
 /* This one does 800 screens at default font size. */
 @media screen and (max-width: 50em) {
+	dd input, dd select, dd textarea {
+		width: 100% !important;
+		max-width: 100% !important;
+	}
+	#post_header dd select {
+		max-width: 30% !important;
+	}
+	dd .input_check, dd .input_radio {
+		display: inline !important;
+		width: 1.5em !important;
+	}
 	#logobox img {
 		max-width: 95%;
 	}
@@ -4239,7 +4264,7 @@ dl.no_members {
 	.postarea {
 		margin: 0 0 0 6em;
 	}
-	.avatar {
+	.avatar, .avatar.avatarresize {
 		max-width: 7em;
 	}
 	.poster_avatar a {
@@ -4321,9 +4346,8 @@ dl.no_members {
 		width: 90% !important;
 		max-width: 90% !important;
 	}
-	dd .input_check, dd .input_radio {
-		display: inline !important;
-		width: auto !important;
+	#postAttachment2 dt {
+		width: 100% !important;
 	}
 	#search_options {
 		width: 100%;
@@ -4418,7 +4442,7 @@ dl.no_members {
 	#news, #logobox, .rightheader #logobox, #top_section_notice {
 		display: none;
 	}
-	.avatar {
+	.avatar, .avatar.avatarresize {
 		max-width: 40px;
 		max-height: 40px;
 	}
@@ -4568,6 +4592,7 @@ dl.no_members {
 	}
 	.poster .name {
 		white-space: nowrap;
+		text-overflow: clip;
 	}
 	.poster .listlevel1 {
 		float: left;
@@ -4713,6 +4738,15 @@ dl.no_members {
 }
 /* This one does 480px screens at default font size. */
 @media screen and (max-width: 30em) {
+	.content {
+	    padding: 0.1em 0.1em;
+	}
+	.listlevel2, .listlevel3 {
+		max-width: 12em !important;
+	}
+	.menulevel2 {
+		max-width: 12em;
+	}
 	#button_admin {
 		display: none;
 	}
@@ -4724,5 +4758,23 @@ dl.no_members {
 	}
 	.shortcuts {
 		display: none;
+	}
+	dt, dd, dd label, .login dt, #advanced_search dt {
+		width: 100% !important;
+	}
+	dd {
+		padding-left: 4% !important;
+	}
+	dd input, dd select, dd textarea {
+		max-width: 95% !important;
+	}
+	ul.post_options li {
+		width: 50%;
+	}
+	#postAttachment dd, #postAttachment2 dd {
+		margin: 2px 1px;
+	}
+	#postMoreOptions, #postAttachment, #postAttachment2 {
+		padding: 4px;
 	}
 }
