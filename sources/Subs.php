@@ -3020,6 +3020,11 @@ function template_admin_warning_above()
 		template_show_error('security_controls_ban');
 	}
 
+	if (!empty($context['new_version_updates']))
+	{
+		template_show_error('new_version_updates');
+	}
+
 	// Any special notices to remind the admin about?
 	if (!empty($context['warning_controls']))
 	{

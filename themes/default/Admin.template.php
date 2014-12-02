@@ -188,6 +188,18 @@ function template_credits()
 								</div>
 							</div>';
 
+	// Display latest important updates
+	if (!empty($context['latest_updates']))
+		echo '
+							<h3 id="latest_updates" class="category_header">
+								', $txt['latest_updates'], '
+							</h3>
+							<div class="windowbg2">
+								<div class="content">
+									', $context['latest_updates'], '
+								</div>
+							</div>';
+
 	// Point the admin to common support resources.
 	echo '
 							<div id="support_resources">
