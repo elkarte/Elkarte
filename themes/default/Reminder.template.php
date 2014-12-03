@@ -116,7 +116,14 @@ function template_set_password()
 						<span id="elk_autov_pwverify_div" style="display: none;">
 							<img id="elk_autov_pwverify_img" src="', $settings['images_url'], '/icons/field_invalid.png" alt="*" />
 						</span>
-					</dd>
+					</dd>';
+
+	if (!empty($modSettings['enableOTP']))
+		echo '
+					<dt><label for="otp">', $txt['disable_otp'], '</label>: </dt>
+					<dd><input type="checkbox" id="otp" name="otp" /></dd>';
+	
+	echo '
 				</dl>
 				<div class="centertext">
 					<input type="submit" value="', $txt['save'], '" class="button_submit" />

@@ -244,7 +244,10 @@ class Reminder_Controller extends Action_Controller
 		require_once(SUBSDIR . '/Auth.subs.php');
 		$sha_passwd = $_POST['passwrd1'];
 		require_once(SUBSDIR . '/Members.subs.php');
-		updateMemberData($_POST['u'], array('validation_code' => '', 'passwd' => validateLoginPassword($sha_passwd, '', $member['member_name'], true)));
+		if (isset($_POST['otp']))
+			updateMemberData($_POST['u'], array('validation_code' => '', 'passwd' => validateLoginPassword($sha_passwd, '', $member['member_name'], true), 'enable_otp' => 0));
+		else
+			updateMemberData($_POST['u'], array('validation_code' => '', 'passwd' => validateLoginPassword($sha_passwd, '', $member['member_name'], true)));
 
 		call_integration_hook('integrate_reset_pass', array($member['member_name'], $member['member_name'], $_POST['passwrd1']));
 
