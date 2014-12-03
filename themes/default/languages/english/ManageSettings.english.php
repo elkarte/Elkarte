@@ -56,6 +56,7 @@ $txt['admin_session_lifetime'] = 'Number of minutes an admin session stays activ
 $txt['auto_admin_session'] = 'Automatically start an admin session on logon';
 $txt['securityDisable'] = 'Disable administration security';
 $txt['securityDisable_moderate'] = 'Disable moderation security';
+$txt['enableOTP'] = 'Enable two factor authentication (one time passwords)';
 $txt['send_validation_onChange'] = 'Require reactivation after email change';
 $txt['approveAccountDeletion'] = 'Require admin approval when member deletes account';
 $txt['autoOptMaxOnline'] = 'Maximum users online when optimizing';
