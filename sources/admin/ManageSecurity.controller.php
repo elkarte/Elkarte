@@ -453,6 +453,8 @@ class ManageSecurity_Controller extends Action_Controller
 				array('check', 'securityDisable'),
 				array('check', 'securityDisable_moderate'),
 			'',
+				array('check', 'enableOTP'),
+			'',
 				// Reactive on email, and approve on delete
 				array('check', 'send_validation_onChange'),
 				array('check', 'approveAccountDeletion'),
