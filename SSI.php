@@ -1709,7 +1709,7 @@ function ssi_boardNews($board = null, $limit = null, $start = null, $length = nu
 		$row['id_member'] = $row[$preview . '_id_member'];
 		$row['smileys_enabled'] = $row[$preview . '_smileys'];
 		$row['poster_time'] = $row[$preview . '_poster_time'];
-		$row['poster_name'] = $row[$preview . '_member_name'];
+		$row['poster_name'] = $row[$preview . '_display_name'];
 		$row['body'] = parse_bbc($row['body'], $row['smileys_enabled'], $row['id_msg']);
 
 		// Check that this message icon is there...

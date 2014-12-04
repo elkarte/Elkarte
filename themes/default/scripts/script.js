@@ -1171,9 +1171,6 @@ JumpTo.prototype.fillSelect = function (aBoardsAndCategories)
 	else
 		this.dropdownList.onfocus = null;
 
-	if (this.opt.bNoRedirect)
-		this.dropdownList.options[0].disabled = 'disabled';
-
 	// Create a document fragment that'll allowing inserting big parts at once.
 	var oListFragment = document.createDocumentFragment(),
 		oOptgroupFragment = document.createElement('optgroup');

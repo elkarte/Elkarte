@@ -188,6 +188,18 @@ function template_credits()
 								</div>
 							</div>';
 
+	// Display latest important updates
+	if (!empty($context['latest_updates']))
+		echo '
+							<h3 id="latest_updates" class="category_header">
+								', $txt['latest_updates'], '
+							</h3>
+							<div class="windowbg2">
+								<div class="content">
+									', $context['latest_updates'], '
+								</div>
+							</div>';
+
 	// Point the admin to common support resources.
 	echo '
 							<div id="support_resources">
@@ -199,17 +211,6 @@ function template_credits()
 								<div class="content">
 									<p>', $txt['support_resources_p1'], '</p>
 									<p>', $txt['support_resources_p2'], '</p>
-								</div>
-							</div>';
-
-	// Display latest support questions from ElkArte
-	echo '
-							<h3 class="category_header">
-								<a class="hdicon cat_img_helptopics help" href="', $scripturl, '?action=quickhelp;help=latest_support" onclick="return reqOverlayDiv(this.href);"></a>', $txt['support_latest'], '
-							</h3>
-							<div class="windowbg">
-								<div class="content">
-									<div id="latestSupport">', $txt['support_latest_fetch'], '</div>
 								</div>
 							</div>';
 
