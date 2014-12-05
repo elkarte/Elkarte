@@ -660,7 +660,8 @@ function detectServerCores()
 		$context['quick_admin_tasks'] = getQuickAdminTasks();
 	}
 
-	/**]]></search>
+	/**
+	 * This function allocates out all the search stuff.]]></search>
 			<add><![CDATA[
 		// Load in the admin quick tasks
 		$context['quick_admin_tasks'] = getQuickAdminTasks();
@@ -675,7 +676,8 @@ function detectServerCores()
 		}
 	}
 
-	/**]]></add>
+	/**
+	 * This function allocates out all the search stuff.]]></add>
 		</operation>
 	</file>
 	<file name="ADMINDIR/CoreFeatures.controller.php">
@@ -3808,42 +3810,6 @@ function splitDestinationBoard($toboard = 0)
 	if (!isset($destination_board))]]></add>
 		</operation>
 	</file>
-	<file name="BOARDDIR/TestPreparse.subs.php">
-		<operation>
-			<search position="replace"><![CDATA[				'[font=something]text[/font]',
-			),
-			array(
-				'[font=something1, something2]text[/font]',
-				'[font=something1]text[/font]',
-			),
-			array(
-				'[font=something1, \'something2\']text[/font]',
-				'[font=something1]text[/font]',
-			),
-			array(
-				'[font=\'something1\', something2]text[/font]',
-				'[font=something1]text[/font]',
-			),
-		);
-	}]]></search>
-			<add><![CDATA[				'[font=something]text[/font]',
-			),
-			array(
-				'[font=something, someother]text[/font]',
-				'[font=something]text[/font]',
-			),
-			array(
-				'[font=something, \'someother\']text[/font]',
-				'[font=something]text[/font]',
-			),
-			array(
-				'[font=\'something\', someother]text[/font]',
-				'[font=something]text[/font]',
-			),
-		);
-	}]]></add>
-		</operation>
-	</file>
 	<file name="THEMEDIR/Admin.template.php">
 		<operation>
 			<search position="replace"><![CDATA[ * copyright:	2011 Simple Machines (http://www.simplemachines.org)
@@ -4157,7 +4123,8 @@ function template_avatar_settings_below()
  *
  * @version 1.0.2
  *
- */]]></add>
+ */
+]]></add>
 		</operation>
 		<operation>
 			<search position="replace"><![CDATA[TA[
@@ -4915,7 +4882,7 @@ select {
 	// No buttons? No button strip either.]]></add>
 		</operation>
 	</file>
-	<file name="LANGUAGEDIR/Admin.english.php">
+	<file name="LANGUAGEDIR/english/Admin.english.php">
 		<operation>
 			<search position="replace"><![CDATA[$txt['support_resources_p1'] = 'Our <a href="%1$s" target="_blank" class="new_win">Documentation Wiki</a> provides the main documentation for ElkArte. The ElkArte Online Manual has many documents to help answer support questions and explain <a href="%2$s" target="_blank" class="new_win">Features</a>, <a href="%3$s" target="_blank" class="new_win">Settings</a>, <a href="%4$s" target="_blank" class="new_win">Themes</a>, <a href="%5$s" target="_blank" class="new_win">Packages</a>, etc. The Online Manual documents each area of ElkArte thoroughly and should answer most questions quickly.';
 $txt['support_resources_p2'] = 'If you can\'t find the answers to your questions in the Documentation Wiki, you may want to search our <a href="%1$s" target="_blank" class="new_win">Support Community</a> or ask for assistance in our support boards. The ElkArte Support Community can be used for <a href="%2$s" target="_blank" class="new_win">support</a>, <a href="%3$s" target="_blank" class="new_win">customization</a>, and many other things such as discussing ElkArte, finding a host, and discussing administrative issues with other forum administrators.';
