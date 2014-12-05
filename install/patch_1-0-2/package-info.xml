@@ -8,6 +8,7 @@
 		<install for="1.0.1">
 			<require-file name="ext/cssmin.php" destination="EXTDIR" />
 			<require-dir name="themes/css" destination="THEMEDIR" />
+			<require-dir name="themes/scripts" destination="THEMEDIR" />
 			<modification>modifications.xml</modification>
 			<code>update.php</code>
 			<redirect url="$scripturl?action=admin;area=packages" timeout="5000" parsebbc="true">redirect</redirect>
