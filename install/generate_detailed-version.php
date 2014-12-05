@@ -64,9 +64,6 @@ foreach ($version_info['file_versions'] as $file => $ver)
 foreach ($version_info['default_template_versions'] as $file => $ver)
 	fwrite($handle, "\t'default{$file}': '{$ver}',\n");
 
-foreach ($version_info['default_template_versions'] as $file => $ver)
-	fwrite($handle, "\t'default{$file}': '{$ver}',\n");
-
 // Let's close the "core" files and start the language files
 fwrite($handle, '};');
 fwrite($handle, "\n\nourLanguageVersions = {\n");
