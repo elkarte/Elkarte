@@ -95,6 +95,22 @@ if (function_exists('set_magic_quotes_runtime'))
 	</file>
 	<file name="SOURCEDIR/CurlFetchWebdata.class.php">
 		<operation>
+			<search position="replace"><![CDATA[ * copyright:	2011 Simple Machines (http://www.simplemachines.org)
+ * license:		BSD, See included LICENSE.TXT for terms and conditions.
+ *
+ * @version 1.0
+ *
+ */
+]]></search>
+			<add><![CDATA[ * copyright:	2011 Simple Machines (http://www.simplemachines.org)
+ * license:		BSD, See included LICENSE.TXT for terms and conditions.
+ *
+ * @version 1.0.2
+ *
+ */
+]]></add>
+		</operation>
+		<operation>
 			<search position="replace"><![CDATA[		}
 		else
 			return $post_data;
@@ -639,6 +655,22 @@ function detectServerCores()
 	</file>
 	<file name="ADMINDIR/Admin.controller.php">
 		<operation>
+			<search position="replace"><![CDATA[ * copyright:	2011 Simple Machines (http://www.simplemachines.org)
+ * license:		BSD, See included LICENSE.TXT for terms and conditions.
+ *
+ * @version 1.0
+ *
+ */
+]]></search>
+			<add><![CDATA[ * copyright:	2011 Simple Machines (http://www.simplemachines.org)
+ * license:		BSD, See included LICENSE.TXT for terms and conditions.
+ *
+ * @version 1.0.2
+ *
+ */
+]]></add>
+		</operation>
+		<operation>
 			<search position="replace"><![CDATA[	 */
 	public function action_credits()
 	{
@@ -894,6 +926,22 @@ function detectServerCores()
 		</operation>
 	</file>
 	<file name="ADMINDIR/ManageAttachments.controller.php">
+		<operation>
+			<search position="replace"><![CDATA[ * copyright:	2011 Simple Machines (http://www.simplemachines.org)
+ * license:		BSD, See included LICENSE.TXT for terms and conditions.
+ *
+ * @version 1.0
+ *
+ */
+]]></search>
+			<add><![CDATA[ * copyright:	2011 Simple Machines (http://www.simplemachines.org)
+ * license:		BSD, See included LICENSE.TXT for terms and conditions.
+ *
+ * @version 1.0.2
+ *
+ */
+]]></add>
+		</operation>
 		<operation>
 			<search position="replace"><![CDATA[
 							// Add a link to the topic in case of an attachment.
@@ -1233,6 +1281,22 @@ function detectServerCores()
 		</operation>
 	</file>
 	<file name="CONTROLLERDIR/Display.controller.php">
+		<operation>
+			<search position="replace"><![CDATA[ * copyright:	2011 Simple Machines (http://www.simplemachines.org)
+ * license:		BSD, See included LICENSE.TXT for terms and conditions.
+ *
+ * @version 1.0
+ *
+ */
+]]></search>
+			<add><![CDATA[ * copyright:	2011 Simple Machines (http://www.simplemachines.org)
+ * license:		BSD, See included LICENSE.TXT for terms and conditions.
+ *
+ * @version 1.0.2
+ *
+ */
+]]></add>
+		</operation>
 		<operation>
 			<search position="replace"><![CDATA[			'can_unlike' => $message['use_likes'] && $message['you_liked'],
 			'like_counter' => $message['like_count'],
@@ -1863,6 +1927,22 @@ function pbe_load_text(&$html, $email_message, $pbe)
 		</operation>
 	</file>
 	<file name="SUBSDIR/Action.class.php">
+		<operation>
+			<search position="replace"><![CDATA[ * copyright:	2011 Simple Machines (http://www.simplemachines.org)
+ * license:		BSD, See included LICENSE.TXT for terms and conditions.
+ *
+ * @version 1.0
+ *
+ */
+]]></search>
+			<add><![CDATA[ * copyright:	2011 Simple Machines (http://www.simplemachines.org)
+ * license:		BSD, See included LICENSE.TXT for terms and conditions.
+ *
+ * @version 1.0.2
+ *
+ */
+]]></add>
+		</operation>
 		<operation>
 			<search position="replace"><![CDATA[	 * @param string $default default action if unknown sa is requested
 	 * @return string
@@ -4865,6 +4945,22 @@ select {
 		</operation>
 	</file>
 	<file name="THEMEDIR/index.template.php">
+		<operation>
+			<search position="replace"><![CDATA[ * copyright:	2011 Simple Machines (http://www.simplemachines.org)
+ * license:		BSD, See included LICENSE.TXT for terms and conditions.
+ *
+ * @version 1.0.1
+ *
+ */
+]]></search>
+			<add><![CDATA[ * copyright:	2011 Simple Machines (http://www.simplemachines.org)
+ * license:		BSD, See included LICENSE.TXT for terms and conditions.
+ *
+ * @version 1.0.2
+ *
+ */
+]]></add>
+		</operation>
 		<operation>
 			<search position="replace"><![CDATA[	{
 		if (!isset($value['test']) || !empty($context[$value['test']]))
