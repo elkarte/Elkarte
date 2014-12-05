@@ -3024,13 +3024,16 @@ function doSecurityChecks()
 			$context['warning_controls']['maintenance'] = sprintf($txt['admin_maintenance_active'], ($scripturl . '?action=admin;area=serversettings;' . $context['session_var'] . '=' . $context['session_id']));
 
 		// New updates
-		$index = 'new_in_' . str_replace(array('ElkArte ', '.'), array('', '_'), FORUM_VERSION);
-		if (!empty($modSettings[$index]) && empty($options['dismissed_' . $index]))
+		if (defined('FORUM_VERSION'))
 		{
-			$context['new_version_updates'] = array(
-				'title' => $txt['new_version_updates'],
-				'errors' => array(replaceBasicActionUrl($txt['new_version_updates_text'])),
-			);
+			$index = 'new_in_' . str_replace(array('ElkArte ', '.'), array('', '_'), FORUM_VERSION);
+			if (!empty($modSettings[$index]) && empty($options['dismissed_' . $index]))
+			{
+				$context['new_version_updates'] = array(
+					'title' => $txt['new_version_updates'],
+					'errors' => array(replaceBasicActionUrl($txt['new_version_updates_text'])),
+				);
+			}
 		}
 	}
 
