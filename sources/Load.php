@@ -2838,32 +2838,24 @@ function determineAvatar($profile)
 	if (!isset($modSettings['avatar_max_width']))
 		$modSettings['avatar_max_width'] = $modSettings['avatar_max_width_external'];
 
-	// If we're always html resizing, assume it's too large.
-	if ($modSettings['avatar_action_too_large'] == 'option_resize')
+	// Since it's nice to have avatars all of the same size, and in some cases the size detection may fail,
+	// let's add the css in any case
+	if (!$added_once)
 	{
-		$resize_class = ' avatarresize';
+		if (!isset($context['html_headers']))
+			$context['html_headers'] = '';
 
-		if (!$added_once)
+		if (!empty($modSettings['avatar_max_width']) || !empty($modSettings['avatar_max_height']))
 		{
-			if (!isset($context['html_headers']))
-				$context['html_headers'] = '';
-
-			if (!empty($modSettings['avatar_max_width']) || !empty($modSettings['avatar_max_height']))
-			{
-				$context['html_headers'] .= '
+			$context['html_headers'] .= '
 	<style>
 		.avatarresize {' . (!empty($modSettings['avatar_max_width']) ? '
 			max-width:' . $modSettings['avatar_max_width'] . 'px;' : '') . (!empty($modSettings['avatar_max_height']) ? '
 			max-height:' . $modSettings['avatar_max_height'] . 'px;' : '') . '
 		}
 	</style>';
-			}
-			$added_once = true;
 		}
-	}
-	else
-	{
-		$resize_class = '';
+		$added_once = true;
 	}
 
 	$avatar_protocol = substr(strtolower($profile['avatar']), 0, 7);
@@ -2876,7 +2868,7 @@ function determineAvatar($profile)
 
 		$avatar = array(
 			'name' => $profile['avatar'],
-			'image' => '<img class="avatar' . $resize_class . '" src="' . $avatar_url . '" alt="" />',
+			'image' => '<img class="avatar avatarresize" src="' . $avatar_url . '" alt="" />',
 			'href' => $avatar_url,
 			'url' => '',
 		);
@@ -2886,7 +2878,7 @@ function determineAvatar($profile)
 	{
 		$avatar = array(
 			'name' => $profile['avatar'],
-			'image' => '<img class="avatar' . $resize_class . '" src="' . $profile['avatar'] . '" alt="" />',
+			'image' => '<img class="avatar avatarresize" src="' . $profile['avatar'] . '" alt="" />',
 			'href' => $profile['avatar'],
 			'url' => $profile['avatar'],
 		);
@@ -2899,7 +2891,7 @@ function determineAvatar($profile)
 
 		$avatar = array(
 			'name' => $profile['avatar'],
-			'image' => '<img class="avatar' . $resize_class . '" src="' . $gravatar_url . '" alt="" />',
+			'image' => '<img class="avatar avatarresize" src="' . $gravatar_url . '" alt="" />',
 			'href' => $gravatar_url,
 			'url' => $gravatar_url,
 		);
@@ -2909,7 +2901,7 @@ function determineAvatar($profile)
 	{
 		$avatar = array(
 			'name' => $profile['avatar'],
-			'image' => '<img class="avatar' . $resize_class . '" src="' . $modSettings['avatar_url'] . '/' . $profile['avatar'] . '" alt="" />',
+			'image' => '<img class="avatar avatarresize" src="' . $modSettings['avatar_url'] . '/' . $profile['avatar'] . '" alt="" />',
 			'href' => $modSettings['avatar_url'] . '/' . $profile['avatar'],
 			'url' => $modSettings['avatar_url'] . '/' . $profile['avatar'],
 		);
@@ -2924,7 +2916,7 @@ function determineAvatar($profile)
 		// Let's proceed with the default avatar.
 		$avatar = array(
 			'name' => '',
-			'image' => '<img class="avatar' . $resize_class . '" src="' . $settings['images_url'] . '/default_avatar.png" alt="" />',
+			'image' => '<img class="avatar avatarresize" src="' . $settings['images_url'] . '/default_avatar.png" alt="" />',
 			'href' => $settings['images_url'] . '/default_avatar.png',
 			'url' => 'http://',
 		);
