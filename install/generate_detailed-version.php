@@ -10,6 +10,24 @@
  */
 
 $output_file_name = 'detailed-version.js';
+if (empty($argv[1]))
+{
+	echo "Please specify a branch to compare against master\n";
+	die();
+}
+else
+{
+	$new_release = $argv[1];
+}
+if (empty($argv[2]))
+{
+	echo "Please specify a version\n";
+	die();
+}
+else
+{
+	$new_version = $argv[2];
+}
 
 // Some constants and $settings needed to let getFileVersions do it's magic
 DEFINE('ELK', '1');
@@ -34,6 +52,8 @@ $versionOptions = array(
 	'sort_results' => true,
 );
 $version_info = getFileVersions($versionOptions);
+$changed_files_list = getFilesChanged('master', $new_release);
+$update_files = array();
 
 // Now we need to grab the current version of the script from index.php
 $index = file_get_contents(BOARDDIR . '/index.php');
@@ -56,13 +76,31 @@ fwrite($handle, "\n\t'Version': '{$forum_version}',\n");
 
 foreach (array('admin', 'controllers', 'database', 'subs') as $type)
 	foreach ($version_info['file_versions_' . $type] as $file => $ver)
+	{
+		if ($new_version == $ver)
+		{
+			$update_files[] = $type . $file;
+		}
 		fwrite($handle, "\t'{$type}{$file}': '{$ver}',\n");
+	}
 
 foreach ($version_info['file_versions'] as $file => $ver)
+{
+	if ($new_version == $ver)
+	{
+		$update_files[] = 'sources' . $file;
+	}
 	fwrite($handle, "\t'sources{$file}': '{$ver}',\n");
+}
 
 foreach ($version_info['default_template_versions'] as $file => $ver)
+{
+	if ($new_version == $ver)
+	{
+		$update_files[] = 'default' . $file;
+	}
 	fwrite($handle, "\t'default{$file}': '{$ver}',\n");
+}
 
 // Let's close the "core" files and start the language files
 fwrite($handle, '};');
@@ -82,3 +120,58 @@ foreach ($version_info['default_language_versions'] as $lang => $files)
 fwrite($handle, '};');
 
 fclose($handle);
+
+if (count(array_diff($update_files, $changed_files_list)) !== 0)
+{
+	echo "Something is wrong: at least one of the files updated is not in the list of those changed since the lastest version.\nThis is a list of the files affected by the problem:\n";
+	print_r(array_diff($update_files, $changed_files_list));
+}
+if (count(array_diff($changed_files_list, $update_files)) !== 0)
+{
+	echo "Something is wrong: at least one of the files changed since the last released version has not been updated in the repository.\nThis is a list of the files affected by the problem:\n";
+	print_r(array_diff($changed_files_list, $update_files));
+}
+
+function getFilesChanged($from, $to)
+{
+	global $settings;
+
+	$output = shell_exec('git log --name-only --pretty=oneline --full-index ' . $from . '..' . $to . ' | grep -vE \'^[0-9a-f]{40} \' | sort | uniq');
+
+	$dirs = array(
+		str_replace(BOARDDIR . '/', '', SUBSDIR . '/database/') => 'database',
+		str_replace(BOARDDIR . '/', '', SUBSDIR . '/') => 'subs',
+		str_replace(BOARDDIR . '/', '', CONTROLLERDIR . '/') => 'controllers',
+		str_replace(BOARDDIR . '/', '', SOURCEDIR . '/') => 'sources',
+		str_replace(BOARDDIR . '/', '', ADMINDIR . '/') => 'admin',
+		str_replace(BOARDDIR . '/', '', ADMINDIR . '/') => 'admin',
+		str_replace(BOARDDIR . '/', '', $settings['theme_dir'] . '/') => 'default',
+	);
+
+	$files = array_filter(explode("\n", $output));
+	$list = array();
+	foreach ($files as $file)
+	{
+		if (strpos($file, 'install') !== false)
+			continue;
+		if (strpos($file, '/ext') !== false)
+			continue;
+		if (strpos($file, 'tests') !== false)
+			continue;
+		if (strpos($file, '/scripts') !== false)
+			continue;
+		if (strpos($file, '/css') !== false)
+			continue;
+		if (strpos($file, '/languages') !== false)
+			continue;
+		if ($file === 'SSI.php')
+		{
+			$list[] = 'sourcesSSI.php';
+			continue;
+		}
+
+		$list[] = strtr($file, $dirs);
+	}
+
+	return $list;
+}
