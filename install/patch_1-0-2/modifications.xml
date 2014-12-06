@@ -95,15 +95,15 @@ if (function_exists('set_magic_quotes_runtime'))
 	</file>
 	<file name="SOURCEDIR/CurlFetchWebdata.class.php">
 		<operation>
-			<search position="replace"><![CDATA[ * copyright:	2011 Simple Machines (http://www.simplemachines.org)
- * license:		BSD, See included LICENSE.TXT for terms and conditions.
+			<search position="replace"><![CDATA[ * @copyright ElkArte Forum contributors
+ * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
  * @version 1.0
  *
  */
 ]]></search>
-			<add><![CDATA[ * copyright:	2011 Simple Machines (http://www.simplemachines.org)
- * license:		BSD, See included LICENSE.TXT for terms and conditions.
+			<add><![CDATA[ * @copyright ElkArte Forum contributors
+ * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
  * @version 1.0.2
  *
@@ -1928,15 +1928,15 @@ function pbe_load_text(&$html, $email_message, $pbe)
 	</file>
 	<file name="SUBSDIR/Action.class.php">
 		<operation>
-			<search position="replace"><![CDATA[ * copyright:	2011 Simple Machines (http://www.simplemachines.org)
- * license:		BSD, See included LICENSE.TXT for terms and conditions.
+			<search position="replace"><![CDATA[ * @copyright ElkArte Forum contributors
+ * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
  * @version 1.0
  *
  */
 ]]></search>
-			<add><![CDATA[ * copyright:	2011 Simple Machines (http://www.simplemachines.org)
- * license:		BSD, See included LICENSE.TXT for terms and conditions.
+			<add><![CDATA[ * @copyright ElkArte Forum contributors
+ * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
  * @version 1.0.2
  *
@@ -3977,10 +3977,10 @@ function splitDestinationBoard($toboard = 0)
 	</file>
 	<file name="THEMEDIR/BoardIndex.template.php">
 		<operation>
-			<search position="replace"><![CDATA[ * copyright:	2011 Simple Machines (http://www.simplemachines.org)
+			<search position="replace"><![CDATA[* copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0
+ * @version 1.0.1
  * 
  */
 
