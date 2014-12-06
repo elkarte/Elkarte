@@ -981,10 +981,22 @@ upgrade_query("
 
 upgrade_query("
 	UPDATE {$db_prefix}settings
-	SET avatar_max_height = avatar_max_height_external");
+	SET value = {string:value}
+	WHERE variable = {string:variable}",
+	array(
+		'value' => $modSettings['avatar_max_height_external'],
+		'variable' => 'avatar_max_height'
+	)
+);
 upgrade_query("
 	UPDATE {$db_prefix}settings
-	SET avatar_max_width = avatar_max_width_external");
+	SET value = {string:value}
+	WHERE variable = {string:variable}",
+	array(
+		'value' => $modSettings['avatar_max_width_external'],
+		'variable' => 'avatar_max_width'
+	)
+);
 
 upgrade_query("
 	INSERT INTO {$db_prefix}settings
