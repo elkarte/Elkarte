@@ -4,6 +4,56 @@
 
 	<id>Elkarte Contributors:ElkArte_102_patch</id>
 	<version>1.0</version>
+	<file name="BOARDDIR/SSI.php">
+		<operation>
+			<search position="replace"><![CDATA[ * copyright:	2011 Simple Machines (http://www.simplemachines.org)
+ * license:		BSD, See included LICENSE.TXT for terms and conditions.
+ *
+ * @version 1.0.1
+ *
+ */
+]]></search>
+			<add><![CDATA[ * copyright:	2011 Simple Machines (http://www.simplemachines.org)
+ * license:		BSD, See included LICENSE.TXT for terms and conditions.
+ *
+ * @version 1.0.2
+ *
+ */
+]]></add>
+		</operation>
+		<operation>
+			<search position="replace"><![CDATA[define('ELK', 'SSI');
+
+// Shortcut for the browser cache stale
+define('CACHE_STALE', '?10RC1');
+
+// We're going to want a few globals... these are all set later.
+global $time_start, $maintenance, $msubject, $mmessage, $mbname, $language;]]></search>
+			<add><![CDATA[define('ELK', 'SSI');
+
+// Shortcut for the browser cache stale
+define('CACHE_STALE', '?102');
+
+// We're going to want a few globals... these are all set later.
+global $time_start, $maintenance, $msubject, $mmessage, $mbname, $language;]]></add>
+		</operation>
+		<operation>
+			<search position="replace"><![CDATA[		$row['id_member'] = $row[$preview . '_id_member'];
+		$row['smileys_enabled'] = $row[$preview . '_smileys'];
+		$row['poster_time'] = $row[$preview . '_poster_time'];
+		$row['poster_name'] = $row[$preview . '_member_name'];
+		$row['body'] = parse_bbc($row['body'], $row['smileys_enabled'], $row['id_msg']);
+
+		// Check that this message icon is there...]]></search>
+			<add><![CDATA[		$row['id_member'] = $row[$preview . '_id_member'];
+		$row['smileys_enabled'] = $row[$preview . '_smileys'];
+		$row['poster_time'] = $row[$preview . '_poster_time'];
+		$row['poster_name'] = $row[$preview . '_display_name'];
+		$row['body'] = parse_bbc($row['body'], $row['smileys_enabled'], $row['id_msg']);
+
+		// Check that this message icon is there...]]></add>
+		</operation>
+	</file>
 	<file name="BOARDDIR/index.php">
 		<operation>
 			<search position="replace"><![CDATA[ * copyright:	2011 Simple Machines (http://www.simplemachines.org)
@@ -31,6 +81,7 @@ if (function_exists('set_magic_quotes_runtime'))
  */
 
 $forum_version = 'ElkArte 1.0.2';
+define('FORUM_VERSION', $forum_version);
 
 // First things first, but not necessarily in that order.
 define('ELK', 1);
@@ -43,6 +94,22 @@ if (function_exists('set_magic_quotes_runtime'))
 		</operation>
 	</file>
 	<file name="SOURCEDIR/CurlFetchWebdata.class.php">
+		<operation>
+			<search position="replace"><![CDATA[ * copyright:	2011 Simple Machines (http://www.simplemachines.org)
+ * license:		BSD, See included LICENSE.TXT for terms and conditions.
+ *
+ * @version 1.0
+ *
+ */
+]]></search>
+			<add><![CDATA[ * copyright:	2011 Simple Machines (http://www.simplemachines.org)
+ * license:		BSD, See included LICENSE.TXT for terms and conditions.
+ *
+ * @version 1.0.2
+ *
+ */
+]]></add>
+		</operation>
 		<operation>
 			<search position="replace"><![CDATA[		}
 		else
@@ -129,32 +196,24 @@ function determineAvatar($profile)
 	if (!isset($modSettings['avatar_max_width']))
 		$modSettings['avatar_max_width'] = $modSettings['avatar_max_width_external'];
 
-	// If we're always html resizing, assume it's too large.
-	if ($modSettings['avatar_action_too_large'] == 'option_resize')
+	// Since it's nice to have avatars all of the same size, and in some cases the size detection may fail,
+	// let's add the css in any case
+	if (!$added_once)
 	{
-		$resize_class = ' avatarresize';
+		if (!isset($context['html_headers']))
+			$context['html_headers'] = '';
 
-		if (!$added_once)
+		if (!empty($modSettings['avatar_max_width']) || !empty($modSettings['avatar_max_height']))
 		{
-			if (!isset($context['html_headers']))
-				$context['html_headers'] = '';
-
-			if (!empty($modSettings['avatar_max_width']) || !empty($modSettings['avatar_max_height']))
-			{
-				$context['html_headers'] .= '
+			$context['html_headers'] .= '
 	<style>
 		.avatarresize {' . (!empty($modSettings['avatar_max_width']) ? '
 			max-width:' . $modSettings['avatar_max_width'] . 'px;' : '') . (!empty($modSettings['avatar_max_height']) ? '
 			max-height:' . $modSettings['avatar_max_height'] . 'px;' : '') . '
 		}
 	</style>';
-			}
-			$added_once = true;
 		}
-	}
-	else
-	{
-		$resize_class = '';
+		$added_once = true;
 	}
 
 	$avatar_protocol = substr(strtolower($profile['avatar']), 0, 7);]]></add>
@@ -170,7 +229,7 @@ function determineAvatar($profile)
 			<add><![CDATA[
 		$avatar = array(
 			'name' => $profile['avatar'],
-			'image' => '<img class="avatar' . $resize_class . '" src="' . $avatar_url . '" alt="" />',
+			'image' => '<img class="avatar avatarresize" src="' . $avatar_url . '" alt="" />',
 			'href' => $avatar_url,
 			'url' => '',
 		);]]></add>
@@ -186,7 +245,7 @@ function determineAvatar($profile)
 			<add><![CDATA[	{
 		$avatar = array(
 			'name' => $profile['avatar'],
-			'image' => '<img class="avatar' . $resize_class . '" src="' . $profile['avatar'] . '" alt="" />',
+			'image' => '<img class="avatar avatarresize" src="' . $profile['avatar'] . '" alt="" />',
 			'href' => $profile['avatar'],
 			'url' => $profile['avatar'],
 		);]]></add>
@@ -210,7 +269,7 @@ function determineAvatar($profile)
 
 		$avatar = array(
 			'name' => $profile['avatar'],
-			'image' => '<img class="avatar' . $resize_class . '" src="' . $gravatar_url . '" alt="" />',
+			'image' => '<img class="avatar avatarresize" src="' . $gravatar_url . '" alt="" />',
 			'href' => $gravatar_url,
 			'url' => $gravatar_url,
 		);]]></add>
@@ -226,7 +285,7 @@ function determineAvatar($profile)
 			<add><![CDATA[	{
 		$avatar = array(
 			'name' => $profile['avatar'],
-			'image' => '<img class="avatar' . $resize_class . '" src="' . $modSettings['avatar_url'] . '/' . $profile['avatar'] . '" alt="" />',
+			'image' => '<img class="avatar avatarresize" src="' . $modSettings['avatar_url'] . '/' . $profile['avatar'] . '" alt="" />',
 			'href' => $modSettings['avatar_url'] . '/' . $profile['avatar'],
 			'url' => $modSettings['avatar_url'] . '/' . $profile['avatar'],
 		);]]></add>
@@ -242,7 +301,7 @@ function determineAvatar($profile)
 			<add><![CDATA[		// Let's proceed with the default avatar.
 		$avatar = array(
 			'name' => '',
-			'image' => '<img class="avatar' . $resize_class . '" src="' . $settings['images_url'] . '/default_avatar.png" alt="" />',
+			'image' => '<img class="avatar avatarresize" src="' . $settings['images_url'] . '/default_avatar.png" alt="" />',
 			'href' => $settings['images_url'] . '/default_avatar.png',
 			'url' => 'http://',
 		);]]></add>
@@ -262,6 +321,49 @@ function determineAvatar($profile)
 
 	return $avatar;
 }]]></add>
+		</operation>
+		<operation>
+			<search position="replace"><![CDATA[ */
+function doSecurityChecks()
+{
+	global $modSettings, $context, $maintenance, $user_info, $txt, $scripturl, $user_settings;
+
+	$show_warnings = false;
+]]></search>
+			<add><![CDATA[ */
+function doSecurityChecks()
+{
+	global $modSettings, $context, $maintenance, $user_info, $txt, $scripturl, $user_settings, $options;
+
+	$show_warnings = false;
+]]></add>
+		</operation>
+		<operation>
+			<search position="replace"><![CDATA[		// Maintenance mode enabled?
+		if (!empty($maintenance))
+			$context['warning_controls']['maintenance'] = sprintf($txt['admin_maintenance_active'], ($scripturl . '?action=admin;area=serversettings;' . $context['session_var'] . '=' . $context['session_id']));
+	}
+
+	// Check for database errors.]]></search>
+			<add><![CDATA[		// Maintenance mode enabled?
+		if (!empty($maintenance))
+			$context['warning_controls']['maintenance'] = sprintf($txt['admin_maintenance_active'], ($scripturl . '?action=admin;area=serversettings;' . $context['session_var'] . '=' . $context['session_id']));
+
+		// New updates
+		if (defined('FORUM_VERSION'))
+		{
+			$index = 'new_in_' . str_replace(array('ElkArte ', '.'), array('', '_'), FORUM_VERSION);
+			if (!empty($modSettings[$index]) && empty($options['dismissed_' . $index]))
+			{
+				$context['new_version_updates'] = array(
+					'title' => $txt['new_version_updates'],
+					'errors' => array(replaceBasicActionUrl($txt['new_version_updates_text'])),
+				);
+			}
+		}
+	}
+
+	// Check for database errors.]]></add>
 		</operation>
 		<operation>
 			<search position="replace"><![CDATA[ */
@@ -522,6 +624,25 @@ function detectServerCores()
 	<link rel="stylesheet" href="', $combine_name, '" id="csscombined" />';]]></add>
 		</operation>
 		<operation>
+			<search position="replace"><![CDATA[		template_show_error('security_controls_ban');
+	}
+
+	// Any special notices to remind the admin about?
+	if (!empty($context['warning_controls']))
+	{]]></search>
+			<add><![CDATA[		template_show_error('security_controls_ban');
+	}
+
+	if (!empty($context['new_version_updates']))
+	{
+		template_show_error('new_version_updates');
+	}
+
+	// Any special notices to remind the admin about?
+	if (!empty($context['warning_controls']))
+	{]]></add>
+		</operation>
+		<operation>
 			<search position="replace"><![CDATA[		return $value;
 	else
 		return false;
@@ -530,6 +651,65 @@ function detectServerCores()
 	else
 		return false;
 }]]></add>
+		</operation>
+	</file>
+	<file name="ADMINDIR/Admin.controller.php">
+		<operation>
+			<search position="replace"><![CDATA[ * copyright:	2011 Simple Machines (http://www.simplemachines.org)
+ * license:		BSD, See included LICENSE.TXT for terms and conditions.
+ *
+ * @version 1.0
+ *
+ */
+]]></search>
+			<add><![CDATA[ * copyright:	2011 Simple Machines (http://www.simplemachines.org)
+ * license:		BSD, See included LICENSE.TXT for terms and conditions.
+ *
+ * @version 1.0.2
+ *
+ */
+]]></add>
+		</operation>
+		<operation>
+			<search position="replace"><![CDATA[	 */
+	public function action_credits()
+	{
+		global $forum_version, $txt, $scripturl, $context, $user_info;
+
+		// We need a little help from our friends
+		require_once(SUBSDIR . '/Membergroups.subs.php');]]></search>
+			<add><![CDATA[	 */
+	public function action_credits()
+	{
+		global $forum_version, $txt, $scripturl, $context, $user_info, $modSettings;
+
+		// We need a little help from our friends
+		require_once(SUBSDIR . '/Membergroups.subs.php');]]></add>
+		</operation>
+		<operation>
+			<search position="replace"><![CDATA[
+		// Load in the admin quick tasks
+		$context['quick_admin_tasks'] = getQuickAdminTasks();
+	}
+
+	/**
+	 * This function allocates out all the search stuff.]]></search>
+			<add><![CDATA[
+		// Load in the admin quick tasks
+		$context['quick_admin_tasks'] = getQuickAdminTasks();
+
+		$index = 'new_in_' . str_replace(array('ElkArte ', '.'), array('', '_'), FORUM_VERSION);
+		if (!empty($modSettings[$index]) && isset($txt[$index]))
+		{
+			$context['latest_updates'] = replaceBasicActionUrl($txt[$index]);
+			require_once(SUBSDIR . '/Themes.subs.php');
+
+			updateThemeOptions(array(1, $user_info['id'], 'dismissed_' . $index, 1));
+		}
+	}
+
+	/**
+	 * This function allocates out all the search stuff.]]></add>
 		</operation>
 	</file>
 	<file name="ADMINDIR/CoreFeatures.controller.php">
@@ -594,7 +774,7 @@ function detectServerCores()
 			<add><![CDATA[	 */
 	public function action_database()
 	{
-		global $context, $modSettings, $maintenance, $i_know_it_is_unsafe;
+		global $context, $modSettings, $maintenance, $iknowitmaybeunsafe;
 
 		// We need this, really..
 		require_once(SUBSDIR . '/Maintenance.subs.php');]]></add>
@@ -656,7 +836,7 @@ function detectServerCores()
 				'error' => '',
 			);
 		}
-		$context['skip_security'] = !empty($i_know_it_is_unsafe);
+		$context['skip_security'] = !empty($iknowitmaybeunsafe);
 	}
 
 	/**]]></add>
@@ -687,7 +867,7 @@ function detectServerCores()
 			<add><![CDATA[
 		checkSession('post');
 
-		if (empty($i_know_it_is_unsafe))
+		if (empty($iknowitmaybeunsafe))
 		{
 			require_once(SUBSDIR . '/FtpConnection.class.php');
 
@@ -743,6 +923,40 @@ function detectServerCores()
 		return list_integration_hooks_data($start, $per_page, $sort);
 	}
 }]]></add>
+		</operation>
+	</file>
+	<file name="ADMINDIR/ManageAttachments.controller.php">
+		<operation>
+			<search position="replace"><![CDATA[ * copyright:	2011 Simple Machines (http://www.simplemachines.org)
+ * license:		BSD, See included LICENSE.TXT for terms and conditions.
+ *
+ * @version 1.0
+ *
+ */
+]]></search>
+			<add><![CDATA[ * copyright:	2011 Simple Machines (http://www.simplemachines.org)
+ * license:		BSD, See included LICENSE.TXT for terms and conditions.
+ *
+ * @version 1.0.2
+ *
+ */
+]]></add>
+		</operation>
+		<operation>
+			<search position="replace"><![CDATA[
+							// Add a link to the topic in case of an attachment.
+							if ($context[\'browse_type\'] !== \'avatars\')
+								$date .= sprintf(\'<br />%1$s <a href="%2$s?topic=%3$d.0.msg%4$d#msg%4$d">%5$s</a>\', $txt[\'in\'], $scripturl, $rowData[\'id_topic\'], $rowData[\'id_msg\'], $rowData[\'subject\']);
+
+							return $date;
+							'),]]></search>
+			<add><![CDATA[
+							// Add a link to the topic in case of an attachment.
+							if ($context[\'browse_type\'] !== \'avatars\')
+								$date .= sprintf(\'<br />%1$s <a href="%2$s?topic=%3$d.msg%4$d#msg%4$d">%5$s</a>\', $txt[\'in\'], $scripturl, $rowData[\'id_topic\'], $rowData[\'id_msg\'], $rowData[\'subject\']);
+
+							return $date;
+							'),]]></add>
 		</operation>
 	</file>
 	<file name="ADMINDIR/ManageAvatars.controller.php">
@@ -1067,6 +1281,22 @@ function detectServerCores()
 		</operation>
 	</file>
 	<file name="CONTROLLERDIR/Display.controller.php">
+		<operation>
+			<search position="replace"><![CDATA[ * copyright:	2011 Simple Machines (http://www.simplemachines.org)
+ * license:		BSD, See included LICENSE.TXT for terms and conditions.
+ *
+ * @version 1.0
+ *
+ */
+]]></search>
+			<add><![CDATA[ * copyright:	2011 Simple Machines (http://www.simplemachines.org)
+ * license:		BSD, See included LICENSE.TXT for terms and conditions.
+ *
+ * @version 1.0.2
+ *
+ */
+]]></add>
+		</operation>
 		<operation>
 			<search position="replace"><![CDATA[			'can_unlike' => $message['use_likes'] && $message['you_liked'],
 			'like_counter' => $message['like_count'],
@@ -1697,6 +1927,22 @@ function pbe_load_text(&$html, $email_message, $pbe)
 		</operation>
 	</file>
 	<file name="SUBSDIR/Action.class.php">
+		<operation>
+			<search position="replace"><![CDATA[ * copyright:	2011 Simple Machines (http://www.simplemachines.org)
+ * license:		BSD, See included LICENSE.TXT for terms and conditions.
+ *
+ * @version 1.0
+ *
+ */
+]]></search>
+			<add><![CDATA[ * copyright:	2011 Simple Machines (http://www.simplemachines.org)
+ * license:		BSD, See included LICENSE.TXT for terms and conditions.
+ *
+ * @version 1.0.2
+ *
+ */
+]]></add>
+		</operation>
 		<operation>
 			<search position="replace"><![CDATA[	 * @param string $default default action if unknown sa is requested
 	 * @return string
@@ -2804,6 +3050,28 @@ function recentlyLogged($action, $time = 60)
 ]]></add>
 		</operation>
 		<operation>
+			<search position="replace"><![CDATA[ * @param string $url
+ * @param string $post_data = ''
+ * @param bool $keep_alive = false
+ * @param int $redirection_level = 0
+ * @return string
+ */
+function fetch_web_data($url, $post_data = '', $keep_alive = false, $redirection_level = 0)
+{
+	global $webmaster_email;
+	static $keep_alive_dom = null, $keep_alive_fp = null;]]></search>
+			<add><![CDATA[ * @param string $url
+ * @param string $post_data = ''
+ * @param bool $keep_alive = false
+ * @param int $redirection_level = 2
+ * @return string
+ */
+function fetch_web_data($url, $post_data = '', $keep_alive = false, $redirection_level = 2)
+{
+	global $webmaster_email;
+	static $keep_alive_dom = null, $keep_alive_fp = null;]]></add>
+		</operation>
+		<operation>
 			<search position="replace"><![CDATA[		// Include the file containing the Curl_Fetch_Webdata class.
 		require_once(SOURCEDIR . '/CurlFetchWebdata.class.php');
 
@@ -3640,6 +3908,57 @@ function splitDestinationBoard($toboard = 0)
 ]]></add>
 		</operation>
 		<operation>
+			<search position="replace"><![CDATA[								</div>
+							</div>';
+
+	// Point the admin to common support resources.
+	echo '
+							<div id="support_resources">]]></search>
+			<add><![CDATA[								</div>
+							</div>';
+
+	// Display latest important updates
+	if (!empty($context['latest_updates']))
+		echo '
+							<h3 id="latest_updates" class="category_header">
+								', $txt['latest_updates'], '
+							</h3>
+							<div class="windowbg2">
+								<div class="content">
+									', $context['latest_updates'], '
+								</div>
+							</div>';
+
+	// Point the admin to common support resources.
+	echo '
+							<div id="support_resources">]]></add>
+		</operation>
+		<operation>
+			<search position="replace"><![CDATA[								</div>
+							</div>';
+
+	// Display latest support questions from ElkArte
+	echo '
+							<h3 class="category_header">
+								<a class="hdicon cat_img_helptopics help" href="', $scripturl, '?action=quickhelp;help=latest_support" onclick="return reqOverlayDiv(this.href);"></a>', $txt['support_latest'], '
+							</h3>
+							<div class="windowbg">
+								<div class="content">
+									<div id="latestSupport">', $txt['support_latest_fetch'], '</div>
+								</div>
+							</div>';
+
+	// The most important part - the credits :P.
+	echo '
+							<div id="credits_sections">]]></search>
+			<add><![CDATA[								</div>
+							</div>';
+
+	// The most important part - the credits :P.
+	echo '
+							<div id="credits_sections">]]></add>
+		</operation>
+		<operation>
 			<search position="replace"><![CDATA[	foreach ($context['pinfo'] as $area => $php_area)
 	{
 		echo '
@@ -3884,7 +4203,8 @@ function template_avatar_settings_below()
  *
  * @version 1.0.2
  *
- */]]></add>
+ */
+]]></add>
 		</operation>
 		<operation>
 			<search position="replace"><![CDATA[TA[
@@ -4243,6 +4563,44 @@ function template_maintenance()]]></add>
 				</div>]]></add>
 		</operation>
 	</file>
+	<file name="THEMEDIR/css/_besocial/index_besocial.css">
+		<operation>
+			<search position="replace"><![CDATA[	color: #555;
+	text-decoration: none;
+}
+.poster .listlevel1 a.linklevel1 {
+	font-size: 1.1em;
+}]]></search>
+			<add><![CDATA[	color: #555;
+	text-decoration: none;
+}
+.listlevel1.subsections {
+	top: -1px;
+}
+.poster .listlevel1 a.linklevel1 {
+	font-size: 1.1em;
+}]]></add>
+		</operation>
+	</file>
+	<file name="THEMEDIR/css/admin.css">
+		<operation>
+			<search position="replace"><![CDATA[	margin: 12px 0 0 0;
+	padding: 0;
+}
+#latestSupport{
+	padding: 0 25px 15px 25px;
+}
+#credits_sections {
+	margin: 0 0 -24px 0;
+}]]></search>
+			<add><![CDATA[	margin: 12px 0 0 0;
+	padding: 0;
+}
+#credits_sections {
+	margin: 0 0 -24px 0;
+}]]></add>
+		</operation>
+	</file>
 	<file name="THEMEDIR/css/index.css">
 		<operation>
 			<search position="replace"><![CDATA[	/* 17 - 1.214, 18 - 1.286, 19 - 1.357, 20 - 1.429, 21 - 1.5, 22 - 1.571, 23 - 1.643
@@ -4258,6 +4616,22 @@ function template_maintenance()]]></add>
 }
 
 /* Tables should show empty cells. */]]></add>
+		</operation>
+		<operation>
+			<search position="replace"><![CDATA[	vertical-align: middle;
+}
+select {
+	padding: 0 6px 0 2px;
+}
+.input_text {
+	font-size: .876em;]]></search>
+			<add><![CDATA[	vertical-align: middle;
+}
+select {
+	padding: 0 0 0 2px;
+}
+.input_text {
+	font-size: .876em;]]></add>
 		</operation>
 		<operation>
 			<search position="replace"><![CDATA[	font-family: "DejaVu Sans Mono", Monaco, Consolas, monospace;
@@ -4315,6 +4689,127 @@ function template_maintenance()]]></add>
 	font-weight: bold;]]></add>
 		</operation>
 		<operation>
+			<search position="replace"><![CDATA[}
+.drop_area_fileselect {
+	cursor: pointer;
+	margin-left: -190px;
+	opacity: 0.0001;
+	position: absolute;
+	width: 220px;
+	padding-left: 220px;
+}
+
+#postAttachment >dd.progress_tracker {]]></search>
+			<add><![CDATA[}
+.drop_area_fileselect {
+	cursor: pointer;
+	margin-left: -160px;
+	opacity: 0.0001;
+	position: absolute;
+	width: 160px;
+}
+#chrome .drop_area_fileselect, #safari .drop_area_fileselect {
+	padding-left: 160px;
+}
+.drop_area_fileselect_text {
+	white-space: nowrap;
+}
+
+#postAttachment >dd.progress_tracker {]]></add>
+		</operation>
+		<operation>
+			<search position="replace"><![CDATA[.search_results_posts {
+	overflow: hidden;
+	padding: 0.2em 1em;
+}
+.search_results_posts .buttons {
+	padding: 5px 12px 0 0;]]></search>
+			<add><![CDATA[.search_results_posts {
+	overflow: hidden;
+	padding: 0.2em 1em;
+	table-layout: fixed;
+}
+.search_results_posts .buttons {
+	padding: 5px 12px 0 0;]]></add>
+		</operation>
+		<operation>
+			<search position="replace"><![CDATA[	margin: 0.2em 1em 0;
+	border-bottom: 0;
+}
+.search_results_posts .quickbuttons {
+	margin-left: 1em;
+	margin-right: 1em;
+}
+.search_results_posts .topic_body {
+	margin: 0 1em 0;
+	padding-bottom: 12px;
+	padding-top: 12px;
+}
+.search_results_posts .quick_mod {
+	position: absolute;]]></search>
+			<add><![CDATA[	margin: 0.2em 1em 0;
+	border-bottom: 0;
+}
+.search_results_posts .topic_moderation {
+	vertical-align: top;
+	width: 2em;
+	padding: 1.3em 1em 0 0;
+}
+.search_results_posts .quickbuttons {
+	margin-left: 1em;
+}
+.search_results_posts .topic_body {
+	margin: 0 1em 0;
+	padding-bottom: 12px;
+	padding-top: 12px;
+	width: 99%
+}
+.search_results_posts .quick_mod {
+	position: absolute;]]></add>
+		</operation>
+		<operation>
+			<search position="replace"><![CDATA[.search_results_posts .counter {
+	padding: 6px 0 6px 1.5em;
+}
+.compact_view .content {
+	overflow: auto;
+}]]></search>
+			<add><![CDATA[.search_results_posts .counter {
+	padding: 6px 0 6px 1.5em;
+}
+.search_results_posts .topic_details, .search_results_posts .topic_body {
+	padding: 10px 0 10px 10px
+}
+.compact_view .content {
+	overflow: auto;
+}]]></add>
+		</operation>
+		<operation>
+			<search position="replace"><![CDATA[}
+/* This one does 800 screens at default font size. */
+@media screen and (max-width: 50em) {
+	#logobox img {
+		max-width: 95%;
+	}]]></search>
+			<add><![CDATA[}
+/* This one does 800 screens at default font size. */
+@media screen and (max-width: 50em) {
+	dd input, dd select, dd textarea {
+		width: 100% !important;
+		max-width: 100% !important;
+	}
+	#post_header dd select {
+		max-width: 30% !important;
+	}
+	dd .input_check, dd .input_radio {
+		display: inline !important;
+		width: 1.5em !important;
+	}
+	#logobox img {
+		max-width: 95%;
+	}]]></add>
+		</operation>
+		<operation>
 			<search position="replace"><![CDATA[	.postarea {
 		margin: 0 0 0 6em;
 	}
@@ -4348,6 +4843,25 @@ function template_maintenance()]]></add>
 @media screen and (max-width: 33.750em) {]]></add>
 		</operation>
 		<operation>
+			<search position="replace"><![CDATA[		width: 90% !important;
+		max-width: 90% !important;
+	}
+	dd .input_check, dd .input_radio {
+		display: inline !important;
+		width: auto !important;
+	}
+	#search_options {
+		width: 100%;]]></search>
+			<add><![CDATA[		width: 90% !important;
+		max-width: 90% !important;
+	}
+	#postAttachment2 dt {
+		width: 100% !important;
+	}
+	#search_options {
+		width: 100%;]]></add>
+		</operation>
+		<operation>
 			<search position="replace"><![CDATA[	#news, #logobox, .rightheader #logobox, #top_section_notice {
 		display: none;
 	}
@@ -4363,45 +4877,128 @@ function template_maintenance()]]></add>
 		max-height: 40px;
 	}]]></add>
 		</operation>
-	</file>
-	<file name="THEMEDIR/css/jquery.sceditor.css">
 		<operation>
-			<search position="replace"><![CDATA[	border-top: 0;
-	border-radius: 0 0 4px 4px;
-}
-#editor_toolbar_container {
-	border: 1px solid #bbb;
-	border-top-right-radius: 4px;]]></search>
-			<add><![CDATA[	border-top: 0;
-	border-radius: 0 0 4px 4px;
-}
-.sceditor-unselectable {
-	-moz-user-select: -moz-none;
-	-khtml-user-select: none;
-	-webkit-user-select: none;
-	-o-user-select: none;
-	user-select: none;
-}
-#editor_toolbar_container {
-	border: 1px solid #bbb;
-	border-top-right-radius: 4px;]]></add>
+			<search position="replace"><![CDATA[	}
+	.poster .name {
+		white-space: nowrap;
+	}
+	.poster .listlevel1 {
+		float: left;]]></search>
+			<add><![CDATA[	}
+	.poster .name {
+		white-space: nowrap;
+		text-overflow: clip;
+	}
+	.poster .listlevel1 {
+		float: left;]]></add>
 		</operation>
 		<operation>
-			<search position="replace"><![CDATA[.sceditor-button-unformat div {
-	/*background: url('../images/bbc/unformat.png');*/
-	background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABcAAAAWAgMAAABWGO+WAAAADFBMVEX///9DYoSQExMAAACJjlfIAAAAAXRSTlMAQObYZgAAAD1JREFUeNpjYsAOGB3AFCuEEoUIOkKkoBQjmAoNBVMCEJ4DlIJoBxpuAKHOAAk2qBATRHBVMzNYgBlMYQIAXLYFFlspUJ4AAAAASUVORK5CYII=);
+			<search position="replace"><![CDATA[}
+/* This one does 480px screens at default font size. */
+@media screen and (max-width: 30em) {
+	#button_admin {
+		display: none;
+	}]]></search>
+			<add><![CDATA[}
+/* This one does 480px screens at default font size. */
+@media screen and (max-width: 30em) {
+	.content {
+	    padding: 0.1em 0.1em;
+	}
+	.listlevel2, .listlevel3 {
+		max-width: 12em !important;
+	}
+	.menulevel2 {
+		max-width: 12em;
+	}
+	#button_admin {
+		display: none;
+	}]]></add>
+		</operation>
+		<operation>
+			<search position="replace"><![CDATA[	.shortcuts {
+		display: none;
+	}
 }]]></search>
-			<add><![CDATA[.sceditor-button-unformat div {
-	/*background: url('../images/bbc/unformat.png');*/
-	background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABcAAAAWAgMAAABWGO+WAAAADFBMVEX///9DYoSQExMAAACJjlfIAAAAAXRSTlMAQObYZgAAAD1JREFUeNpjYsAOGB3AFCuEEoUIOkKkoBQjmAoNBVMCEJ4DlIJoBxpuAKHOAAk2qBATRHBVMzNYgBlMYQIAXLYFFlspUJ4AAAAASUVORK5CYII=);
-}
-.sceditor-button-splittag div {
-	/*background: url('../images/bbc/splittag.png');*/
-	background: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABcAAAAWCAMAAAAcqPc3AAAADFBMVEX6+vr////t7e1NTU1hENLnAAAAAXRSTlMAQObYZgAAAExJREFUeF6V0DEKADEMA8Ek+/8/36FmES5CtpzCIK+XYCXS5JMojgM7Lsf336E5DsTluh82ALmTR+9MmuxwuYbLY7js8PtjHd5syA99kCkBeWYcaxcAAAAASUVORK5CYII=);
+			<add><![CDATA[	.shortcuts {
+		display: none;
+	}
+	dt, dd, dd label, .login dt, #advanced_search dt {
+		width: 100% !important;
+	}
+	dd {
+		padding-left: 4% !important;
+	}
+	dd input, dd select, dd textarea {
+		max-width: 95% !important;
+	}
+	ul.post_options li {
+		width: 50%;
+	}
+	#postAttachment dd, #postAttachment2 dd {
+		margin: 2px 1px;
+	}
+	#postMoreOptions, #postAttachment, #postAttachment2 {
+		padding: 4px;
+	}
 }]]></add>
 		</operation>
 	</file>
+	<file name="THEMEDIR/index.template.php">
+		<operation>
+			<search position="replace"><![CDATA[ * copyright:	2011 Simple Machines (http://www.simplemachines.org)
+ * license:		BSD, See included LICENSE.TXT for terms and conditions.
+ *
+ * @version 1.0.1
+ *
+ */
+]]></search>
+			<add><![CDATA[ * copyright:	2011 Simple Machines (http://www.simplemachines.org)
+ * license:		BSD, See included LICENSE.TXT for terms and conditions.
+ *
+ * @version 1.0.2
+ *
+ */
+]]></add>
+		</operation>
+		<operation>
+			<search position="replace"><![CDATA[	{
+		if (!isset($value['test']) || !empty($context[$value['test']]))
+			$buttons[] = '
+								<li role="menuitem"><a' . (isset($value['id']) ? ' id="button_strip_' . $value['id'] . '"' : '') . ' class="linklevel1 button_strip_' . $key . (isset($value['active']) ? ' active' : '') . '" href="' . $value['url'] . '"' . (isset($value['custom']) ? ' ' . $value['custom'] : '') . '>' . $txt[$value['text']] . '</a></li>';
+	}
+
+	// No buttons? No button strip either.]]></search>
+			<add><![CDATA[	{
+		if (!isset($value['test']) || !empty($context[$value['test']]))
+			$buttons[] = '
+								<li role="menuitem"><a' . (isset($value['id']) ? ' id="button_strip_' . $value['id'] . '"' : '') . ' class="linklevel1 button_strip_' . $key . (!empty($value['active']) ? ' active' : '') . '" href="' . $value['url'] . '"' . (isset($value['custom']) ? ' ' . $value['custom'] : '') . '>' . $txt[$value['text']] . '</a></li>';
+	}
+
+	// No buttons? No button strip either.]]></add>
+		</operation>
+	</file>
 	<file name="LANGUAGEDIR/english/Admin.english.php">
+		<operation>
+			<search position="replace"><![CDATA[$txt['support_resources_p1'] = 'Our <a href="%1$s" target="_blank" class="new_win">Documentation Wiki</a> provides the main documentation for ElkArte. The ElkArte Online Manual has many documents to help answer support questions and explain <a href="%2$s" target="_blank" class="new_win">Features</a>, <a href="%3$s" target="_blank" class="new_win">Settings</a>, <a href="%4$s" target="_blank" class="new_win">Themes</a>, <a href="%5$s" target="_blank" class="new_win">Packages</a>, etc. The Online Manual documents each area of ElkArte thoroughly and should answer most questions quickly.';
+$txt['support_resources_p2'] = 'If you can\'t find the answers to your questions in the Documentation Wiki, you may want to search our <a href="%1$s" target="_blank" class="new_win">Support Community</a> or ask for assistance in our support boards. The ElkArte Support Community can be used for <a href="%2$s" target="_blank" class="new_win">support</a>, <a href="%3$s" target="_blank" class="new_win">customization</a>, and many other things such as discussing ElkArte, finding a host, and discussing administrative issues with other forum administrators.';
+
+$txt['support_latest'] = 'Common support &amp; issues';
+$txt['support_latest_fetch'] = 'Retrieving support information...';
+
+$txt['edit_permissions_info'] = 'Use permission settings to manage global and specific board features and what actions that guest, members and moderators can do.';
+$txt['membergroups_members'] = 'Regular Members';]]></search>
+			<add><![CDATA[$txt['support_resources_p1'] = 'Our <a href="%1$s" target="_blank" class="new_win">Documentation Wiki</a> provides the main documentation for ElkArte. The ElkArte Online Manual has many documents to help answer support questions and explain <a href="%2$s" target="_blank" class="new_win">Features</a>, <a href="%3$s" target="_blank" class="new_win">Settings</a>, <a href="%4$s" target="_blank" class="new_win">Themes</a>, <a href="%5$s" target="_blank" class="new_win">Packages</a>, etc. The Online Manual documents each area of ElkArte thoroughly and should answer most questions quickly.';
+$txt['support_resources_p2'] = 'If you can\'t find the answers to your questions in the Documentation Wiki, you may want to search our <a href="%1$s" target="_blank" class="new_win">Support Community</a> or ask for assistance in our support boards. The ElkArte Support Community can be used for <a href="%2$s" target="_blank" class="new_win">support</a>, <a href="%3$s" target="_blank" class="new_win">customization</a>, and many other things such as discussing ElkArte, finding a host, and discussing administrative issues with other forum administrators.';
+
+$txt['latest_updates'] = 'Latest noteworthy updates';
+$txt['new_in_1_0_2'] = 'The most significant change in ElkArte 1.0.2 is avatar permission management. Currently each method of setting an avatar is permission-based, requiring the enabling/disabling of each method for each group. With 1.0.2 avatars are simply enabled/disabled by user group, this allows the enabled groups to add an avatar (by all available methods).<br />
+The only permission available is a general one to allow members to change or not their avatars. Additionally there is only one setting for maximum width and height of avatars, these values apply to all avatar methods.<br /><br />
+Due to the nature of the changes it was not impossible to migrate existing settings to the new format, for that reason you are encouraged to visit the <a href="{admin_url};area=manageattachments;sa=avatars">Avatar Settings</a> page and set the options you prefer.';
+
+$txt['edit_permissions_info'] = 'Use permission settings to manage global and specific board features and what actions that guest, members and moderators can do.';
+$txt['membergroups_members'] = 'Regular Members';]]></add>
+		</operation>
 		<operation>
 			<search position="replace"><![CDATA[$txt['avatar_default'] = 'Enable a default avatar for all users without their own avatar';
 $txt['avatar_directory'] = 'Avatars directory';
@@ -4645,6 +5242,25 @@ $txt['group_perms_name_profile_remove_own'] = 'Delete own account';
 $txt['group_perms_name_profile_title_any'] = 'Edit any custom title';]]></add>
 		</operation>
 	</file>
+	<file name="LANGUAGEDIR/english/index.english.php">
+		<operation>
+			<search position="replace"><![CDATA[$txt['generic_warning'] = 'Warning';
+$txt['agreement_missing'] = 'You are requiring new users to accept a registration agreement, however the file (agreement.txt) doesn\'t exist.';
+
+$txt['cache_writable'] = 'The cache directory is not writable - this will adversely affect the performance of your forum.';
+
+$txt['page_created_full'] = 'Page created in %1$.3f seconds with %2$d queries.';]]></search>
+			<add><![CDATA[$txt['generic_warning'] = 'Warning';
+$txt['agreement_missing'] = 'You are requiring new users to accept a registration agreement, however the file (agreement.txt) doesn\'t exist.';
+
+$txt['new_version_updates'] = 'You have just updated!';
+$txt['new_version_updates_text'] = '<a href="{admin_url};area=credits#latest_updates">Click here to see what\'s new in this version of ElkArte!</a>!';
+
+$txt['cache_writable'] = 'The cache directory is not writable - this will adversely affect the performance of your forum.';
+
+$txt['page_created_full'] = 'Page created in %1$.3f seconds with %2$d queries.';]]></add>
+		</operation>
+	</file>
 	<file name="THEMEDIR/scripts/admin.js">
 		<operation>
 			<search position="replace"><![CDATA[ * copyright:	2011 Simple Machines (http://www.simplemachines.org)
@@ -4677,384 +5293,6 @@ $txt['group_perms_name_profile_title_any'] = 'Edit any custom title';]]></add>
 
 	oElem.innerHTML = sMessages + this.opt.sAnnouncementTemplate.replace('%content%', sMessage);
 	this.init_news = true;]]></add>
-		</operation>
-	</file>
-	<file name="THEMEDIR/scripts/elk_jquery_plugins.js">
-		<operation>
-			<search position="replace"><![CDATA[ * @copyright ElkArte Forum contributors
- * @license   BSD http://opensource.org/licenses/BSD-3-Clause
- *
- * @version 1.0
- *
- * This file contains javascript plugins for use with jquery
- */
-
-
-/*!
- * hoverIntent r7 // 2013.03.11 // jQuery 1.9.1+
- * http://cherne.net/brian/resources/jquery.hoverIntent.html
- *
- * You may use hoverIntent under the terms of the MIT license. Basically that
- * means you are free to use hoverIntent as long as this header is left intact.
- * Copyright 2007, 2013 Brian Cherne
- */
-
-/**]]></search>
-			<add><![CDATA[ * @copyright ElkArte Forum contributors
- * @license   BSD http://opensource.org/licenses/BSD-3-Clause
- *
- * @version 1.0.2
- *
- * This file contains javascript plugins for use with jquery
- */
-
-
-/*!
- * hoverIntent v1.8.1 // 2014.08.11 // jQuery v1.9.1+
- * http://cherne.net/brian/resources/jquery.hoverIntent.html
- *
- * You may use hoverIntent under the terms of the MIT license. Basically that
- * means you are free to use hoverIntent as long as this header is left intact.
- * Copyright 2007, 2014 Brian Cherne
- */
-
-/**]]></add>
-		</operation>
-		<operation>
-			<search position="replace"><![CDATA[        var compare = function(ev,ob) {
-            ob.hoverIntent_t = clearTimeout(ob.hoverIntent_t);
-            // compare mouse positions to see if they've crossed the threshold
-            if ( ( Math.abs(pX-cX) + Math.abs(pY-cY) ) < cfg.sensitivity ) {
-                $(ob).off("mousemove.hoverIntent",track);
-                // set hoverIntent state to true (so mouseOut can be called)
-                ob.hoverIntent_s = 1;
-                return cfg.over.apply(ob,[ev]);
-            } else {
-                // set previous coordinates for next time]]></search>
-			<add><![CDATA[        var compare = function(ev,ob) {
-            ob.hoverIntent_t = clearTimeout(ob.hoverIntent_t);
-            // compare mouse positions to see if they've crossed the threshold
-            if ( Math.sqrt( (pX-cX)*(pX-cX) + (pY-cY)*(pY-cY) ) < cfg.sensitivity ) {
-                $(ob).off("mousemove.hoverIntent",track);
-                // set hoverIntent state to true (so mouseOut can be called)
-                ob.hoverIntent_s = true;
-                return cfg.over.apply(ob,[ev]);
-            } else {
-                // set previous coordinates for next time]]></add>
-		</operation>
-		<operation>
-			<search position="replace"><![CDATA[        // A private function for delaying the mouseOut function
-        var delay = function(ev,ob) {
-            ob.hoverIntent_t = clearTimeout(ob.hoverIntent_t);
-            ob.hoverIntent_s = 0;
-            return cfg.out.apply(ob,[ev]);
-        };
-
-        // A private function for handling mouse 'hovering'
-        var handleHover = function(e) {
-            // copy objects to be passed into t (required for event object to be passed in IE)
-            var ev = jQuery.extend({},e);
-            var ob = this;
-
-            // cancel hoverIntent timer if it exists
-            if (ob.hoverIntent_t) { ob.hoverIntent_t = clearTimeout(ob.hoverIntent_t); }
-
-            // if e.type == "mouseenter"
-            if (e.type == "mouseenter") {
-                // set "previous" X and Y position based on initial entry point
-                pX = ev.pageX; pY = ev.pageY;
-                // update "current" X and Y position based on mousemove
-                $(ob).on("mousemove.hoverIntent",track);
-                // start polling interval (self-calling timeout) to compare mouse coordinates over time
-                if (ob.hoverIntent_s != 1) { ob.hoverIntent_t = setTimeout( function(){compare(ev,ob);} , cfg.interval );}
-
-                // else e.type == "mouseleave"
-            } else {
-                // unbind expensive mousemove event
-                $(ob).off("mousemove.hoverIntent",track);
-                // if hoverIntent state is true, then call the mouseOut function after the specified delay
-                if (ob.hoverIntent_s == 1) { ob.hoverIntent_t = setTimeout( function(){delay(ev,ob);} , cfg.timeout );}
-            }
-        };
-]]></search>
-			<add><![CDATA[        // A private function for delaying the mouseOut function
-        var delay = function(ev,ob) {
-            ob.hoverIntent_t = clearTimeout(ob.hoverIntent_t);
-            ob.hoverIntent_s = false;
-            return cfg.out.apply(ob,[ev]);
-        };
-
-        // A private function for handling mouse 'hovering'
-        var handleHover = function(e) {
-            // copy objects to be passed into t (required for event object to be passed in IE)
-            var ev = $.extend({},e);
-            var ob = this;
-
-            // cancel hoverIntent timer if it exists
-            if (ob.hoverIntent_t) { ob.hoverIntent_t = clearTimeout(ob.hoverIntent_t); }
-
-            // if e.type === "mouseenter"
-            if (e.type === "mouseenter") {
-                // set "previous" X and Y position based on initial entry point
-                pX = ev.pageX; pY = ev.pageY;
-                // update "current" X and Y position based on mousemove
-                $(ob).on("mousemove.hoverIntent",track);
-                // start polling interval (self-calling timeout) to compare mouse coordinates over time
-                if (!ob.hoverIntent_s) { ob.hoverIntent_t = setTimeout( function(){compare(ev,ob);} , cfg.interval );}
-
-                // else e.type == "mouseleave"
-            } else {
-                // unbind expensive mousemove event
-                $(ob).off("mousemove.hoverIntent",track);
-                // if hoverIntent state is true, then call the mouseOut function after the specified delay
-                if (ob.hoverIntent_s) { ob.hoverIntent_t = setTimeout( function(){delay(ev,ob);} , cfg.timeout );}
-            }
-        };
-]]></add>
-		</operation>
-		<operation>
-			<search position="replace"><![CDATA[    };
-})(jQuery);
-
-/**
- * jQuery Superfish Menu Plugin
- * Copyright (c) 2013 Joel Birch
- *
- * Dual licensed under the MIT and GPL licenses:
- * http://www.opensource.org/licenses/mit-license.php
- * http://www.gnu.org/licenses/gpl.html
- */
-
-(function ($) {
-	"use strict";
-
-	var methods = (function () {]]></search>
-			<add><![CDATA[    };
-})(jQuery);
-
-
-/**
- * jQuery Superfish Menu Plugin - v1.7.4
- * Copyright (c) 2014 Joel Birch
- *
- * Dual licensed under the MIT and GPL licenses:
- * http://www.opensource.org/licenses/mit-license.php
- * http://www.gnu.org/licenses/gpl.html
- */
-
-;(function ($, w) {
-	"use strict";
-
-	var methods = (function () {]]></add>
-		</operation>
-		<operation>
-			<search position="replace"><![CDATA[				var ios = /iPhone|iPad|iPod/i.test(navigator.userAgent);
-				if (ios) {
-					// iOS clicks only bubble as far as body children
-					$(window).load(function () {
-						$('body').children().on('click', $.noop);
-					});
-				}]]></search>
-			<add><![CDATA[				var ios = /iPhone|iPad|iPod/i.test(navigator.userAgent);
-				if (ios) {
-					// iOS clicks only bubble as far as body children
-					$(w).load(function () {
-						$('body').children().on('click', $.noop);
-					});
-				}]]></add>
-		</operation>
-		<operation>
-			<search position="replace"><![CDATA[				var style = document.documentElement.style;
-				return ('behavior' in style && 'fill' in style && /iemobile/i.test(navigator.userAgent));
-			})(),
-			toggleMenuClasses = function ($menu, o) {
-				var classes = c.menuClass;
-				if (o.cssArrows) {]]></search>
-			<add><![CDATA[				var style = document.documentElement.style;
-				return ('behavior' in style && 'fill' in style && /iemobile/i.test(navigator.userAgent));
-			})(),
-			unprefixedPointerEvents = (function () {
-				return (!!w.PointerEvent);
-			})(),
-			toggleMenuClasses = function ($menu, o) {
-				var classes = c.menuClass;
-				if (o.cssArrows) {]]></add>
-		</operation>
-		<operation>
-			<search position="replace"><![CDATA[				$li.children('a').toggleClass(c.anchorClass);
-			},
-			toggleTouchAction = function ($menu) {
-				var touchAction = $menu.css('ms-touch-action');
-				touchAction = (touchAction === 'pan-y') ? 'auto' : 'pan-y';
-				$menu.css('ms-touch-action', touchAction);
-			},
-			applyHandlers = function ($menu, o) {
-				var targets = 'li:has(' + o.popUpSelector + ')';]]></search>
-			<add><![CDATA[				$li.children('a').toggleClass(c.anchorClass);
-			},
-			toggleTouchAction = function ($menu) {
-				var msTouchAction = $menu.css('ms-touch-action'),
-					touchAction = $menu.css('touch-action');
-				touchAction = touchAction || msTouchAction;
-				touchAction = (touchAction === 'pan-y') ? 'auto' : 'pan-y';
-				$menu.css({
-					'ms-touch-action': touchAction,
-					'touch-action': touchAction
-				});
-			},
-			applyHandlers = function ($menu, o) {
-				var targets = 'li:has(' + o.popUpSelector + ')';]]></add>
-		</operation>
-		<operation>
-			<search position="replace"><![CDATA[						.on('mouseleave.superfish', targets, out);
-				}
-				var touchevent = 'MSPointerDown.superfish';
-				if (!ios) {
-					touchevent += ' touchend.superfish';
-				}]]></search>
-			<add><![CDATA[						.on('mouseleave.superfish', targets, out);
-				}
-				var touchevent = 'MSPointerDown.superfish';
-				if (unprefixedPointerEvents) {
-					touchevent = 'pointerdown.superfish';
-				}
-				if (!ios) {
-					touchevent += ' touchend.superfish';
-				}]]></add>
-		</operation>
-		<operation>
-			<search position="replace"><![CDATA[
-				if ($ul.length > 0 && $ul.is(':hidden')) {
-					$this.one('click.superfish', false);
-					if (e.type === 'MSPointerDown') {
-						$this.trigger('focus');
-					} else {
-						$.proxy(over, $this.parent('li'))();]]></search>
-			<add><![CDATA[
-				if ($ul.length > 0 && $ul.is(':hidden')) {
-					$this.one('click.superfish', false);
-					if (e.type === 'MSPointerDown' || e.type === 'pointerdown') {
-						$this.trigger('focus');
-					} else {
-						$.proxy(over, $this.parent('li'))();]]></add>
-		</operation>
-		<operation>
-			<search position="replace"><![CDATA[		onDestroy: $.noop
-	};
-
-})(jQuery);
-
-/*
- * Superclick v1.0.0 - jQuery menu widget]]></search>
-			<add><![CDATA[		onDestroy: $.noop
-	};
-
-})(jQuery, window);
-
-/*
- * Superclick v1.0.0 - jQuery menu widget]]></add>
-		</operation>
-	</file>
-	<file name="THEMEDIR/scripts/jquery.sceditor.elkarte.js">
-		<operation>
-			<search position="replace"><![CDATA[ * copyright:	2011 Simple Machines (http://www.simplemachines.org)
- * license:		BSD, See included LICENSE.TXT for terms and conditions.
- *
- * @version 1.0.1
- * Extension functions to provide ElkArte compatibility with sceditor
- */
-]]></search>
-			<add><![CDATA[ * copyright:	2011 Simple Machines (http://www.simplemachines.org)
- * license:		BSD, See included LICENSE.TXT for terms and conditions.
- *
- * @version 1.0.2
- * Extension functions to provide ElkArte compatibility with sceditor
- */
-]]></add>
-		</operation>
-		<operation>
-			<search position="replace"><![CDATA[			var editor = this,
-				currentNode = this.currentNode();
-
-			if (!$(currentNode).is('span.tt') && $(currentNode).parents('span.tt').length === 0)
-				this.insert('<span class="tt">', '</span>', false);
-			else
-				return;
-		},
-		txtExec: ['[tt]', '[/tt]'],
-		tooltip: 'Teletype']]></search>
-			<add><![CDATA[			var editor = this,
-				currentNode = this.currentNode();
-
-			// Add a TT span if not in one
-			if (!$(currentNode).is('span.tt') && $(currentNode).parents('span.tt').length === 0)
-				editor.insert('<span class="tt">', '</span>', false);
-			// Remove a TT span if in one and its empty
-			else if ($(currentNode).is('span.tt') && $(currentNode).text().length === 1)
-			{
-				$(currentNode).replaceWith('');
-				editor.insert('<span> ', '</span>', false);
-			}
-			// Escape from this one then
-			else if (!$(currentNode).is('span.tt') && $(currentNode).parents('span.tt').length > 0)
-				editor.insert('<span> ', '</span>', false);
-
-			return;
-		},
-		txtExec: ['[tt]', '[/tt]'],
-		tooltip: 'Teletype']]></add>
-		</operation>
-		<operation>
-			<search position="replace"><![CDATA[				currentNode = this.currentNode();
-
-			if (!$(currentNode).is('pre') && $(currentNode).parents('pre').length === 0)
-				this.insert('<pre>', '</pre>', false);
-			else
-				return;
-		},]]></search>
-			<add><![CDATA[				currentNode = this.currentNode();
-
-			if (!$(currentNode).is('pre') && $(currentNode).parents('pre').length === 0)
-				editor.insert('<pre>', '</pre>', false);
-			// In a pre node and selected pre again, lets try to end it and escape
-			else if (!$(currentNode).is('pre') && $(currentNode).parents('pre').length > 0)
-			{
-				var rangerhelper = this.getRangeHelper(),
-					firstblock = rangerhelper.getFirstBlockParent(),
-					sceditor = $("#" + post_box_name).sceditor("instance"),
-					newnode;
-
-				editor.insert('<p id="blank"> ', '</p>', false);
-				rangerhelper.saveRange();
-				newnode = sceditor.getBody().find('#blank').get(0);
-				firstblock.parentNode.insertBefore(newnode, firstblock.nextSibling);
-				rangerhelper.restoreRange();
-				editor.focus();
-			}
-			else
-				return;
-		},]]></add>
-		</operation>
-		<operation>
-			<search position="replace"><![CDATA[	})
-	.set('table', {
-		txtExec: ['[table]\n[tr]\n[td]', '[/td]\n[/tr]\n[/table]']
-	});
-
-/**]]></search>
-			<add><![CDATA[	})
-	.set('table', {
-		txtExec: ['[table]\n[tr]\n[td]', '[/td]\n[/tr]\n[/table]']
-	})
-	.set('splittag', {
-		txtExec: function() {
-			oSplitTags = new elk_SplitTags();
-			oSplitTags.split();
-		},
-		tooltip: "Split Tag"
-	});
-
-/**]]></add>
 		</operation>
 	</file>
 	<file name="THEMEDIR/scripts/script.js">
@@ -5136,230 +5374,20 @@ function elk_avatarResize()
  *
  * @param {type} doForm]]></add>
 		</operation>
-	</file>
-	<file name="THEMEDIR/scripts/splittag.plugin.js">
 		<operation>
-			<search position="replace"><![CDATA[ * Original code author: Aziz
- * License: http://opensource.org/licenses/Zlib
- *
- * @version 1.0
- *
- */
-]]></search>
-			<add><![CDATA[ * Original code author: Aziz
- * License: http://opensource.org/licenses/Zlib
- *
- * @version 1.0.2
- *
- */
-]]></add>
-		</operation>
-		<operation>
-			<search position="replace"><![CDATA[				oSplitTags.split();
-		};
-	};
+			<search position="replace"><![CDATA[	else
+		this.dropdownList.onfocus = null;
 
-	/**
-	 * Class used to split contents and tags at the cursor position
-	 */
-	function elk_SplitTags()
-	{
-		// Array to hold our bbc tags
-		this.tagStack = [];
+	if (this.opt.bNoRedirect)
+		this.dropdownList.options[0].disabled = 'disabled';
 
-		// Regex to find bbc tags and attr's
-		// [1] open tag name, [2] open tag attribs, [3] closing tag name
-		this.regex = /\[(?:([a-z]+)([^\]]*)|(\/[a-z]+))\]/gi;
-	}
+	// Create a document fragment that'll allowing inserting big parts at once.
+	var oListFragment = document.createDocumentFragment(),]]></search>
+			<add><![CDATA[	else
+		this.dropdownList.onfocus = null;
 
-	/**
-	 * "Splits" the text at the caret position by closing any open bbc tags in front of
-	 * the caret position and then re-opening them past the caret position
-	 * e.g. | represents the caret
-	 * [quote]ElkArte is |cool[/quote] => [quote]ElkArte is [/quote]|[quote]cool[/quote]
-	 */
-	elk_SplitTags.prototype.split = function () {
-		// Right now this is a non wizzy function
-		if (base.inSourceMode() === false)
-			return;
-		// Splits tags starting at the current cursor position.
-		else
-		{
-			var i = 0,
-				tagTextStart = "",
-				tagTextEnd = "",
-				contents = base.val(),
-				editor = $(".sceditor-container").find("textarea")[0],
-				startPos = Math.min(editor.selectionEnd, contents.length),
-				endPos = Math.min(editor.selectionStart, contents.length);
-
-			// Determine what bbc tag(s) we may be inside of
-			this.parseTags(contents, endPos);
-
-			// Inside tag(s), we need to insert close/open tags to split at this point
-			if (this.tagStack.length !== 0)
-			{
-				// Traverse in reverse and build closing tags.
-				for (i = this.tagStack.length - 1; i >= 0; i--)
-					tagTextStart += '[/' + this.tagStack[i].name + ']';
-
-				// Traverse forward and build opening tags (with attr's)
-				for (i = 0; i < this.tagStack.length; i++)
-				{
-					if (i === 0)
-						tagTextEnd += "\n";
-					tagTextEnd += '[' + this.tagStack[i].name + this.tagStack[i].attributes + "]";
-				}
-
-				// Did someone select text that they expect to be wrapped in tags as well?
-				if (startPos !== endPos)
-					base.insertText(tagTextStart + tagTextEnd, tagTextStart + tagTextEnd);
-				// Insert the new close/open tags at the cursor position
-				else
-					base.insertText(tagTextStart, tagTextEnd);
-			}
-		}
-	};
-
-	/**
-	 * Search a string for open bbc tags (ahead of the endPos in the string) and returns them
-	 *
-	 * It does no checking to verify that a tag has a matching closing tag in the stack, its a simple
-	 * queue stack.  It also does not check if the tag is valid child of any tag before it. etc.
-	 *
-	 * [quote]this[b]is[i]a te|st[/i][/b][/quote] (| = caret pos) Returns: [i][b][quote]
-	 *		Improper syntax will result in wrong results
-	 * [quote]this[b]is[i]a [/b]te|st[/i][/quote] (| = caret pos) Returns: [b][quote]
-	 *
-	 * @param {string} text Text inside the current editor window
-	 * @param {int} endPos caret position in the text
-	 */
-	elk_SplitTags.prototype.parseTags = function(text, endPos) {
-		// Start off empty
-		this.tagStack = [];
-
-		// All the text before the cursor position
-		text = text.slice(0, endPos);
-
-		// Run our BBC regex on the leading text
-		while (matches = this.regex.exec(text))
-		{
-			// Closing tag [/bbcName] found, remove one from the stack
-			// We could attempt to find a matching open in the stack as well ...
-			if (matches[3])
-				this.tagStack.pop();
-			// Opening tag [bbcName], add it to the stack
-			else
-				this.tagStack.push({"name": matches[1], "attributes": matches[2]});
-		}
-
-		// Return what's left in the stack, these are the "open" tags
-		return this.tagStack;
-	};
-
-})(jQuery, window, document);]]></search>
-			<add><![CDATA[				oSplitTags.split();
-		};
-	};
-})(jQuery, window, document);
-
-/**
- * Class used to split contents and tags at the cursor position
- */
-function elk_SplitTags()
-{
-	// Array to hold our bbc tags
-	this.tagStack = [];
-
-	// Regex to find bbc tags and attr's
-	// [1] open tag name, [2] open tag attribs, [3] closing tag name
-	this.regex = /\[(?:([a-z]+)([^\]]*)|(\/[a-z]+))\]/gi;
-}
-
-/**
- * "Splits" the text at the caret position by closing any open bbc tags in front of
- * the caret position and then re-opening them past the caret position
- * e.g. | represents the caret
- * [quote]ElkArte is |cool[/quote] => [quote]ElkArte is [/quote]|[quote]cool[/quote]
- */
-elk_SplitTags.prototype.split = function () {
-	// Right now this is a non wizzy function
-	if (base.inSourceMode() === false)
-		return;
-	// Splits tags starting at the current cursor position.
-	else
-	{
-		var i = 0,
-			tagTextStart = "",
-			tagTextEnd = "",
-			contents = base.val(),
-			editor = $(".sceditor-container").find("textarea")[0],
-			startPos = Math.min(editor.selectionEnd, contents.length),
-			endPos = Math.min(editor.selectionStart, contents.length);
-
-		// Determine what bbc tag(s) we may be inside of
-		this.parseTags(contents, endPos);
-
-		// Inside tag(s), we need to insert close/open tags to split at this point
-		if (this.tagStack.length !== 0)
-		{
-			// Traverse in reverse and build closing tags.
-			for (i = this.tagStack.length - 1; i >= 0; i--)
-				tagTextStart += '[/' + this.tagStack[i].name + ']';
-
-			// Traverse forward and build opening tags (with attr's)
-			for (i = 0; i < this.tagStack.length; i++)
-			{
-				if (i === 0)
-					tagTextEnd += "\n";
-				tagTextEnd += '[' + this.tagStack[i].name + this.tagStack[i].attributes + "]";
-			}
-
-			// Did someone select text that they expect to be wrapped in tags as well?
-			if (startPos !== endPos)
-				base.insertText(tagTextStart + tagTextEnd, tagTextStart + tagTextEnd);
-			// Insert the new close/open tags at the cursor position
-			else
-				base.insertText(tagTextStart, tagTextEnd);
-		}
-	}
-};
-
-/**
- * Search a string for open bbc tags (ahead of the endPos in the string) and returns them
- *
- * It does no checking to verify that a tag has a matching closing tag in the stack, its a simple
- * queue stack.  It also does not check if the tag is valid child of any tag before it. etc.
- *
- * [quote]this[b]is[i]a te|st[/i][/b][/quote] (| = caret pos) Returns: [i][b][quote]
- *		Improper syntax will result in wrong results
- * [quote]this[b]is[i]a [/b]te|st[/i][/quote] (| = caret pos) Returns: [b][quote]
- *
- * @param {string} text Text inside the current editor window
- * @param {int} endPos caret position in the text
- */
-elk_SplitTags.prototype.parseTags = function(text, endPos) {
-	// Start off empty
-	this.tagStack = [];
-
-	// All the text before the cursor position
-	text = text.slice(0, endPos);
-
-	// Run our BBC regex on the leading text
-	while (matches = this.regex.exec(text))
-	{
-		// Closing tag [/bbcName] found, remove one from the stack
-		// We could attempt to find a matching open in the stack as well ...
-		if (matches[3])
-			this.tagStack.pop();
-		// Opening tag [bbcName], add it to the stack
-		else
-			this.tagStack.push({"name": matches[1], "attributes": matches[2]});
-	}
-
-	// Return what's left in the stack, these are the "open" tags
-	return this.tagStack;
-};]]></add>
+	// Create a document fragment that'll allowing inserting big parts at once.
+	var oListFragment = document.createDocumentFragment(),]]></add>
 		</operation>
 	</file>
 </modification>
