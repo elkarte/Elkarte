@@ -13,7 +13,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0.1
+ * @version 1.0.2
  *
  */
 
@@ -261,7 +261,7 @@ class Scheduled_Task
 		$db = database();
 
 		// First clean out the cache.
-		clean_cache();
+		clean_cache('data');
 
 		// If warning decrement is enabled and we have people who have not had a new warning in 24 hours, lower their warning level.
 		list (, , $modSettings['warning_decrement']) = explode(',', $modSettings['warning_settings']);

@@ -14,7 +14,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:		BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0.1
+ * @version 1.0.2
  *
  */
 
@@ -23,6 +23,9 @@ if (defined('ELK'))
 	return true;
 
 define('ELK', 'SSI');
+
+// Shortcut for the browser cache stale
+define('CACHE_STALE', '?102');
 
 // We're going to want a few globals... these are all set later.
 global $time_start, $maintenance, $msubject, $mmessage, $mbname, $language;
@@ -1716,7 +1719,7 @@ function ssi_boardNews($board = null, $limit = null, $start = null, $length = nu
 		$row['id_member'] = $row[$preview . '_id_member'];
 		$row['smileys_enabled'] = $row[$preview . '_smileys'];
 		$row['poster_time'] = $row[$preview . '_poster_time'];
-		$row['poster_name'] = $row[$preview . '_member_name'];
+		$row['poster_name'] = $row[$preview . '_display_name'];
 		$row['body'] = parse_bbc($row['body'], $row['smileys_enabled'], $row['id_msg']);
 
 		// Check that this message icon is there...

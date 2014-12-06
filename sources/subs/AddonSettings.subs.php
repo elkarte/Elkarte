@@ -13,7 +13,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0
+ * @version 1.0.2
  *
  */
 
@@ -128,7 +128,7 @@ function list_integration_hooks_data($start, $per_page, $sort)
 							unset($temp_hooks[$hook][$function_o]);
 						}
 						// OOP a bit more difficult
-						elseif (!empty($class) && preg_match('~class\s*' . preg_quote(trim($class)) . '.*function\s*' . preg_quote(trim($function)) . '\s*\(~i', $fc) != 0)
+						elseif (!empty($class) && preg_match('~class\s*' . preg_quote(trim($class)) . '.*function\s*' . preg_quote(trim($function), '~') . '\s*\(~i', $fc) != 0)
 						{
 							$hook_status[$hook][$hook_name]['exists'] = true;
 							$hook_status[$hook][$hook_name]['in_file'] = $file['name'];
@@ -161,7 +161,7 @@ function list_integration_hooks_data($start, $per_page, $sort)
 
 	foreach ($hooks as $hook => $functions)
 	{
-		$hooks_filters[] = '<option ' . ($context['current_filter'] == $hook ? 'selected="selected" ' : '') . ' value="">' . $hook . '</option>';
+		$hooks_filters[] = '<option ' . ($context['current_filter'] == $hook ? 'selected="selected" ' : '') . ' value="' . $hook . '">' . $hook . '</option>';
 		foreach ($functions as $function)
 		{
 			$function = str_replace(']', '', $function);

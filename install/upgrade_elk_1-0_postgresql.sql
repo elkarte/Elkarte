@@ -1790,6 +1790,7 @@ $db_table->db_add_column('{db_prefix}members',
 ---}
 ---#
 
+/******************************************************************************/
 --- Fixing personal messages column name
 /******************************************************************************/
 ---# Adding new columns to log_packages ..
@@ -1801,6 +1802,112 @@ $db_table->db_change_column('{db_prefix}members',
 		'type' => 'smallint',
 		'size' => 5,
 		'default' => 1
+	),
+	array()
+);
+---}
+---#
+
+/******************************************************************************/
+--- Fixes from 1.0.1
+/******************************************************************************/
+---# Adding new column to message_likes...
+---{
+$db_table->db_add_column('{db_prefix}message_likes',
+	array(
+		'name' => 'like_timestamp',
+		'type' => 'int',
+		'size' => 10,
+		'default' => 0
+	),
+	array(),
+	'ignore'
+);
+---}
+---#
+
+---# More space for email filters...
+---{
+$db_table->db_change_column('{db_prefix}postby_emails_filters',
+	'filter_style',
+	array(
+		'name' => 'filter_style',
+		'type' => 'char',
+		'size' => 10,
+		'default' => ''
+	),
+	array()
+);
+---}
+---#
+
+---# Possible wrong type for mail_queue...
+---{
+$db_table->db_change_column('{db_prefix}mail_queue',
+	'message_id',
+	array(
+		'name' => 'message_id',
+		'type' => 'varchar',
+		'size' => 12,
+		'default' => ''
+	),
+	array()
+);
+---}
+---#
+
+/******************************************************************************/
+--- Changes for 1.0.2
+/******************************************************************************/
+---# Remove unused avatar permissions...
+---{
+foreach (array('profile_upload_avatar', 'profile_remote_avatar', 'profile_gravatar') as $remove)
+{
+	$db->query('', '
+		DELETE FROM {db_prefix}permissions
+		WHERE permission = {string:remove}',
+		array(
+			'remove' => $remove,
+		)
+	);
+}
+$db->query('', '
+	UPDATE {db_prefix}permissions
+	SET permission = {string:new_permission}
+	WHERE permission = {string:permission}',
+	array(
+		'new_permission' => 'profile_set_avatar',
+		'permission' => 'profile_server_avatar',
+	)
+);
+
+$db->query('', '
+	UPDATE {db_prefix}settings
+	SET value = {string:value}
+	WHERE variable = {string:variable}',
+	array(
+		'value' => $modSettings['avatar_max_height_external'],
+		'variable' => 'avatar_max_height'
+	)
+);
+$db->query('', '
+	UPDATE {$db_prefix}settings
+	SET value = {string:value}
+	WHERE variable = {string:variable}',
+	array(
+		'value' => $modSettings['avatar_max_width_external'],
+		'variable' => 'avatar_max_width'
+	)
+);
+
+$db->insert('ignore',
+	'{db_prefix}settings',
+	array('variable', 'value'),
+	array(
+		array('avatar_stored_enabled', '1'),
+		array('avatar_external_enabled', '1'),
+		array('avatar_gravatar_enabled', '1'),
+		array('avatar_upload_enabled', '1')
 	),
 	array()
 );

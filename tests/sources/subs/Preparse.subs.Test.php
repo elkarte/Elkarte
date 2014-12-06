@@ -17,16 +17,16 @@ class PrepaseBBC extends PHPUnit_Framework_TestCase
 				'[font=something]text[/font]',
 			),
 			array(
-				'[font=something1, something2]text[/font]',
-				'[font=something1]text[/font]',
+				'[font=something, someother]text[/font]',
+				'[font=something]text[/font]',
 			),
 			array(
-				'[font=something1, \'something2\']text[/font]',
-				'[font=something1]text[/font]',
+				'[font=something, \'someother\']text[/font]',
+				'[font=something]text[/font]',
 			),
 			array(
-				'[font=\'something1\', something2]text[/font]',
-				'[font=something1]text[/font]',
+				'[font=\'something\', someother]text[/font]',
+				'[font=something]text[/font]',
 			),
 			array(
 				'something[quote][/quote]',

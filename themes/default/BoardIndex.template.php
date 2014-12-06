@@ -11,8 +11,8 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0
- * 
+ * @version 1.0.2
+ *
  */
 
 /**
@@ -239,6 +239,9 @@ function template_ic_recent_posts()
 function template_ic_show_events()
 {
 	global $context, $txt, $scripturl, $settings;
+
+	if (empty($context['calendar_holidays']) && empty($context['calendar_birthdays']) && empty($context['calendar_events']))
+		return;
 
 	echo '
 			<li class="board_row">

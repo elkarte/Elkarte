@@ -7,7 +7,7 @@
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
- * @version 1.0
+ * @version 1.0.2
  *
  */
 
@@ -91,7 +91,7 @@ function sendNotifications($topics, $type, $exclude = array(), $members_only = a
 			'last_id' => $row['id_last_msg'],
 			'topic' => $row['id_topic'],
 			'board' => $row['id_board'],
-			'name' => $row['poster_name'],
+			'name' => $type === 'reply' ? $row['poster_name'] : $user_info['name'],
 			'exclude' => '',
 			'signature' => $row['signature'],
 			'attachments' => $row['num_attach'],
@@ -253,7 +253,7 @@ function sendNotifications($topics, $type, $exclude = array(), $members_only = a
 		SELECT
 			mem.id_member, mem.email_address, mem.notify_regularity, mem.notify_types, mem.warning,
 			mem.notify_send_body, mem.lngfile, mem.id_group, mem.additional_groups,mem.id_post_group,
-			t.id_member_started, b.member_groups, b.name, b.id_profile,
+			t.id_member_started, b.member_groups, b.name, b.id_profile, b.id_board,
 			ln.id_topic, ln.sent
 		FROM {db_prefix}log_notify AS ln
 			INNER JOIN {db_prefix}members AS mem ON (mem.id_member = ln.id_member)
@@ -810,12 +810,11 @@ function validateNotificationAccess($row, $maillist, &$email_perm = true)
 {
 	global $modSettings;
 
-	$db = database();
 	static $board_profile = array();
 
 	// No need to check for you ;)
 	if ($row['id_group'] == 1)
-		return;
+		return $email_perm;
 
 	$allowed = explode(',', $row['member_groups']);
 	$row['additional_groups'] = !empty( $row['additional_groups']) ? explode(',', $row['additional_groups']) : array();
@@ -834,27 +833,22 @@ function validateNotificationAccess($row, $maillist, &$email_perm = true)
 			$email_perm = false;
 		else
 		{
-			// In a group that has email posting permissions on this board
-			if (!isset($board_profile[$row['id_profile']]))
+			if (!isset($board_profile[$row['id_board']]))
 			{
-				$request = $db->query('', '
-					SELECT permission, add_deny, id_group
-					FROM {db_prefix}board_permissions
-					WHERE id_profile = {int:id_profile}
-						AND permission = {string:permission}',
-					array(
-						'id_profile' => $row['id_profile'],
-						'permission' => 'postby_email',
-					)
-				);
-				while ($row_perm = $db->fetch_assoc($request))
-					$board_profile[$row['id_profile']][] = $row_perm['id_group'];
-				$db->free_result($request);
+				require_once(SUBSDIR . '/Members.subs.php');
+				$board_profile[$row['id_board']] = groupsAllowedTo('postby_email', $row['id_board']);
 			}
 
-			// Get the email permission for this board / posting group
-			if (count(array_intersect($board_profile[$row['id_profile']], $row['additional_groups'])) === 0)
+			// In a group that has email posting permissions on this board
+			if (count(array_intersect($board_profile[$row['id_board']]['allowed'], $row['additional_groups'])) === 0)
+				$email_perm = false;
+
+			// And not specifically denied?
+			if ($email_perm && !empty($modSettings['permission_enable_deny'])
+				&& count(array_intersect($row['additional_groups'], $board_profile[$row['id_board']]['denied'])) !== 0)
 				$email_perm = false;
 		}
 	}
+
+	return $email_perm;
 }
