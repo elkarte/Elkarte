@@ -11,30 +11,9 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0
+ * @version 1.0.2
  *
  */
-
-/**
- * Template template wraps around the simple settings page to add javascript functionality.
- * (section above)
- */
-function template_avatar_settings_below()
-{
-	echo '
-	<script><!-- // --><![CDATA[
-	var fUpdateStatus = function ()
-	{
-		document.getElementById("avatar_max_width_external").disabled = document.getElementById("avatar_download_external").checked;
-		document.getElementById("avatar_max_height_external").disabled = document.getElementById("avatar_download_external").checked;
-		document.getElementById("avatar_action_too_large").disabled = document.getElementById("avatar_download_external").checked;
-		document.getElementById("custom_avatar_dir").disabled = document.getElementById("custom_avatar_enabled").value == 0;
-		document.getElementById("custom_avatar_url").disabled = document.getElementById("custom_avatar_enabled").value == 0;
-	}
-	addLoadEvent(fUpdateStatus);
-// ]]></script>
-';
-}
 
 /**
  * Forum maintenance page.

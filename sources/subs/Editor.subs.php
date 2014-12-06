@@ -14,7 +14,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0.1
+ * @version 1.0.2
  *
  */
 
@@ -239,7 +239,7 @@ function create_control_richedit($editorOptions)
 		$bbc_tags['row2'] = array(
 			array('quote', 'code', 'table'),
 			array('bulletlist', 'orderedlist', 'horizontalrule'),
-			array('spoiler', 'footnote'),
+			array('spoiler', 'footnote', 'splittag'),
 			array('image', 'link', 'email'),
 		);
 

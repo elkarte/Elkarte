@@ -11,7 +11,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0
+ * @version 1.0.2
  *
  */
 
@@ -69,7 +69,7 @@ function template_ask()
 	if (!empty($context['can_move']))
 		echo '
 						<p>
-							<label for="move_new_topic"><input type="checkbox" name="move_new_topic" id="move_new_topic" onclick="document.getElementById(\'board_list\').style.display = this.checked ? \'\' : \'none\';" class="input_check" /> ', $txt['splittopic_move'], '.</label>', template_select_boards('board_list'), '
+							<label for="move_new_topic"><input type="checkbox" name="move_new_topic" id="move_new_topic" onclick="document.getElementById(\'board_list\').style.display = this.checked ? \'\' : \'none\';" class="input_check" /> ', $txt['splittopic_move'], '.</label>', template_select_boards('move_to_board'), '
 							<script><!-- // --><![CDATA[
 								document.getElementById(\'board_list\').style.display = \'none\';
 							// ]]></script>
@@ -139,7 +139,7 @@ function template_select()
 						<li class="windowbg', $message['alternate'] ? '2' : '', '" id="not_selected_', $message['id'], '">
 							<div class="content">
 								<div class="message_header">
-									<a class="split_icon floatright" href="', $scripturl, '?action=splittopics;sa=selectTopics;subname=', $context['topic']['subject'], ';topic=', $context['topic']['id'], '.', $context['not_selected']['start'], ';start2=', $context['selected']['start'], ';move=down;msg=', $message['id'], '" onclick="return topicSplitselect(\'down\', ', $message['id'], ');"><img src="', $settings['images_url'], '/split_select.png" alt="-&gt;" /></a>
+									<a class="split_icon floatright" href="', $scripturl, '?action=splittopics;sa=selectTopics;subname=', $context['topic']['subject'], ';topic=', $context['topic']['id'], '.', $context['not_selected']['start'], ';start2=', $context['selected']['start'], ';move=down;msg=', $message['id'], '" onclick="return topicSplitselect(\'down\', ', $message['id'], ');"><i class="fa fa-2x fa-arrow-circle-o-right"></i></a>
 									<strong>', $message['subject'], '</strong> ', $txt['by'], ' <strong>', $message['poster'], '</strong><br />
 									<em>', $message['time'], '</em>
 								</div>
@@ -167,7 +167,7 @@ function template_select()
 						<li class="windowbg', $message['alternate'] ? '2' : '', '" id="selected_', $message['id'], '">
 							<div class="content">
 								<div class="message_header">
-									<a class="split_icon floatleft" href="', $scripturl, '?action=splittopics;sa=selectTopics;subname=', $context['topic']['subject'], ';topic=', $context['topic']['id'], '.', $context['not_selected']['start'], ';start2=', $context['selected']['start'], ';move=up;msg=', $message['id'], '" onclick="return topicSplitselect(\'up\', ', $message['id'], ');"><img src="', $settings['images_url'], '/split_deselect.png" alt="&lt;-" /></a>
+									<a class="split_icon floatleft" href="', $scripturl, '?action=splittopics;sa=selectTopics;subname=', $context['topic']['subject'], ';topic=', $context['topic']['id'], '.', $context['not_selected']['start'], ';start2=', $context['selected']['start'], ';move=up;msg=', $message['id'], '" onclick="return topicSplitselect(\'up\', ', $message['id'], ');"><i class="fa fa-2x fa-arrow-circle-o-left"></i></a>
 									<strong>', $message['subject'], '</strong> ', $txt['by'], ' <strong>', $message['poster'], '</strong><br />
 									<em>', $message['time'], '</em>
 								</div>
@@ -182,9 +182,6 @@ function template_select()
 				</div>
 				<div class="submitbutton clear_right">
 					<input type="hidden" name="topic" value="', $context['current_topic'], '" />
-					<input type="hidden" name="subname" value="', $context['new_subject'], '" />
-					<input type="hidden" name="move_to_board" value="', $context['move_to_board'], '" />
-					<input type="hidden" name="reason" value="', $context['reason'], '" />
 					<input type="submit" value="', $txt['split_topic'], '" class="button_submit" />
 					<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />
 				</div>

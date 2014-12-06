@@ -11,7 +11,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0
+ * @version 1.0.2
  *
  */
 
@@ -632,7 +632,7 @@ function template_control_chmod()
 	}
 
 	echo '
-				<div id="ftp_error_div" style="', (!empty($context['package_ftp']['error']) ? '' : 'display:none;'), '">
+				<div id="ftp_error_div" class="errorbox" style="', (!empty($context['package_ftp']['error']) ? '' : 'display:none;'), '">
 					<span id="ftp_error_message">', !empty($context['package_ftp']['error']) ? $context['package_ftp']['error'] : '', '</span>
 				</div>';
 

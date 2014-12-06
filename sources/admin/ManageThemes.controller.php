@@ -15,7 +15,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:		BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0.1
+ * @version 1.0.2
  *
  *
  * @todo Update this for the new package manager?
@@ -1527,7 +1527,7 @@ class ManageThemes_Controller extends Action_Controller
 	 */
 	private function _action_edit_submit()
 	{
-		global $context, $settings;
+		global $context, $settings, $user_info;
 
 		$selectedTheme = isset($_GET['th']) ? (int) $_GET['th'] : (isset($_GET['id']) ? (int) $_GET['id'] : 0);
 		if (empty($selectedTheme))
@@ -1570,6 +1570,28 @@ class ManageThemes_Controller extends Action_Controller
 			// For PHP files, we check the syntax.
 			if ($is_php)
 			{
+				require_once(SUBSDIR . '/Modlog.subs.php');
+
+				// Since we are running php code, let's track it, but only once in a while.
+				if (!recentlyLogged('editing_theme', 60))
+				{
+					logAction('editing_theme', array('member' => $user_info['id']), 'admin');
+
+					// But the email only once every 10 minutes should be fine
+					if (!recentlyLogged('editing_theme', 600))
+					{
+						require_once(SUBSDIR . '/Themes.subs.php');
+						require_once(SUBSDIR . '/Admin.subs.php');
+
+						$theme_info = getBasicThemeInfos($context['theme_id']);
+						emailAdmins('editing_theme', array(
+							'EDIT_REALNAME' => $user_info['name'],
+							'FILE_EDITED' => $_REQUEST['filename'],
+							'THEME_NAME' => $theme_info[$context['theme_id']],
+						));
+					}
+				}
+
 				$validator = new Data_Validator();
 				$validator->validation_rules(array(
 					'entire_file' => 'php_syntax'
