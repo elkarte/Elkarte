@@ -37,7 +37,7 @@ class TestManageMembergroups_Controller extends ElkArteWebTest
 
 		// We should be back at the group listing, the new group should be there
 		$this->assertEquals("Manage Membergroups", $this->title());
-		$this->assertContains('Test Group', $this->byCssSelector('#regular_membergroups_list > #regular_membergroups_list')->text());
+		$this->assertContains('Test Group', $this->byCssSelector('#regular_membergroups_list_9')->text());
 	}
 
 	/**
