@@ -3980,7 +3980,7 @@ function splitDestinationBoard($toboard = 0)
 			<search position="replace"><![CDATA[* copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0.1
+ * @version 1.0
  * 
  */
 
@@ -4947,7 +4947,7 @@ select {
 	<file name="THEMEDIR/index.template.php">
 		<operation>
 			<search position="replace"><![CDATA[ * copyright:	2011 Simple Machines (http://www.simplemachines.org)
- * license:		BSD, See included LICENSE.TXT for terms and conditions.
+ * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
  * @version 1.0.1
  *
