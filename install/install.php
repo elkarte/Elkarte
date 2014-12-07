@@ -432,6 +432,7 @@ function action_checkFilesWritable()
 		'smileys',
 		'themes',
 		'agreement.txt',
+		'db_last_error.php',
 		'Settings.php',
 		'Settings_bak.php'
 	);
