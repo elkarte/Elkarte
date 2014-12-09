@@ -4264,11 +4264,18 @@ dl.no_members {
 	.postarea {
 		margin: 0 0 0 6em;
 	}
+	.poster .name {
+		padding: 0;
+	}
 	.avatar, .avatar.avatarresize {
-		max-width: 7em;
+		max-width: 80px;
 	}
 	.poster_avatar a {
 		padding: 0;
+	}
+	.poster .membergroup {
+		word-break: normal;
+		word-wrap: break-word;
 	}
 	.quickbuttons .modified {
 		display: block;
