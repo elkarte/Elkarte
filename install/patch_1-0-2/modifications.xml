@@ -4021,7 +4021,7 @@ function splitDestinationBoard($toboard = 0)
 	</file>
 	<file name="THEMEDIR/BoardIndex.template.php">
 		<operation>
-			<search position="replace"><![CDATA[* copyright:	2011 Simple Machines (http://www.simplemachines.org)
+			<search position="replace"><![CDATA[ * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
  * @version 1.0
@@ -5035,7 +5035,7 @@ select {
  */
 ]]></search>
 			<add><![CDATA[ * copyright:	2011 Simple Machines (http://www.simplemachines.org)
- * license:		BSD, See included LICENSE.TXT for terms and conditions.
+ * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
  * @version 1.0.2
  *
