@@ -148,7 +148,7 @@ window.ourVersions = {
 	'subsMessages.subs.php': '1.0',
 	'subsModeration.subs.php': '1.0',
 	'subsModlog.subs.php': '1.0.2',
-	'subsNews.subs.php': '1.0',
+	'subsNews.subs.php': '1.0.2',
 	'subsNotification.subs.php': '1.0.2',
 	'subsOpenID.subs.php': '1.0',
 	'subsPackage.subs.php': '1.0.2',
