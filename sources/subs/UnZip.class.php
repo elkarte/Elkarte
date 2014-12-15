@@ -69,6 +69,12 @@ class Unzip
 	protected $_data_cdr = '';
 
 	/**
+	 * If the file passes or fails crc check
+	 * @var boolean
+	 */
+	protected $_crc_check = false;
+
+	/**
 	 * If we are going to write out the files processed
 	 * @var boolean
 	 */
@@ -165,7 +171,7 @@ class Unzip
 
 		// Looking for a single file and this is it
 		if ($this->_found && $this->single_file)
-			return $this->_found;
+			return $this->_crc_check ? $this->_found : false;
 
 		// Wanted many files then we need to clean up
 		if ($this->destination !== null && !$this->single_file)
@@ -326,7 +332,8 @@ class Unzip
 					'md5' => md5($this->_file_info['data']),
 					'preview' => substr($this->_file_info['data'], 0, 100),
 					'size' => $this->_file_info['size'],
-					'skipped' => false
+					'skipped' => false,
+					'crc' => $this->_crc_check,
 				);
 			}
 		}
@@ -363,6 +370,7 @@ class Unzip
 		$this->_file_info['filename_length'] = $local_file_data['filename_length'];
 		$this->_file_info['extra_field_length'] = $local_file_data['extra_field_length'];
 		$this->_file_info['compress_data'] = substr($this->_file_info['data'], 30 + $this->_file_info['filename_length'] + $this->_file_info['extra_field_length'], $this->_file_info['compressed_size']);
+		$this->_file_info['crc'] = empty($this->_file_info['crc']) ? $local_file_data['crc'] : $this->_file_info['crc'];
 	}
 
 	/**
@@ -417,7 +425,7 @@ class Unzip
 			$this->_skip = true;
 
 		// Write it out then
-		if ($this->_skip === false && $this->_found === false)
+		if ($this->_check_crc() && $this->_skip === false && $this->_found === false)
 			package_put_contents($this->destination . '/' . $this->_filename, $this->_file_info['data']);
 	}
 
@@ -457,9 +465,24 @@ class Unzip
 
 			// These values should be what's in the CDR record per spec
 			$general_purpose_data = unpack('Vcrc/Vcompressed_size/Vsize', $general_purpose);
-			$this->_file_info['crc'] = $general_purpose_data['crc'];
+			$this->_file_info['crc'] = empty($this->_file_info['crc']) ? $general_purpose_data['crc'] : $this->_file_info['crc'];
 			$this->_file_info['compressed_size'] = $general_purpose_data['compressed_size'];
 			$this->_file_info['size'] = $general_purpose_data['size'];
 		}
+	}
+
+	/**
+	 * Checks the saved vs calculated crc values
+	 */
+	private function _check_crc()
+	{
+		// Convert everything to a hex value (unsigned)
+		$crc_uncompressed = hash('crc32b', $this->_file_info['data']);
+		$crc_compressed = hash('crc32b', $this->_file_info['compress_data']);
+		$crc_this = str_pad(dechex($this->_file_info['crc']), 8, '0', STR_PAD_LEFT);
+
+		$this->_crc_check = ($crc_this === $crc_uncompressed || $crc_this === $crc_compressed);
+
+		return $this->_crc_check;
 	}
 }
