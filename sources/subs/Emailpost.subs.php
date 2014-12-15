@@ -35,7 +35,7 @@ function pbe_email_to_bbc($text, $html)
 {
 	// Define some things that need to be converted/modified, outside normal html or markup
 	$tags = array(
-		'~\*\*(.*)\*\*~isUe' => '\'**\'.ltrim(\'$1\').\'**\'',
+		'~\*\*\s?(.*?)\*\*~is' => '**$1**',
 		'~<\*>~i' => '&lt;*&gt;',
 		'~-{20,}~' => '<hr>',
 		'~#([0-9a-fA-F]{4,6}\b)~' => '&#35;$1',
