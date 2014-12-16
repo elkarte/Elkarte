@@ -7,7 +7,7 @@
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
- * @version 1.0
+ * @version 1.0.2
  */
 
 if (!defined('ELK'))
@@ -48,9 +48,7 @@ function loadIllegalGuestPermissions()
 		'profile_extra',
 		'profile_title',
 		'profile_remove',
-		'profile_server_avatar',
-		'profile_upload_avatar',
-		'profile_remote_avatar',
+		'profile_set_avatar',
 		'profile_view_own',
 		'mark_any_notify',
 		'mark_notify',

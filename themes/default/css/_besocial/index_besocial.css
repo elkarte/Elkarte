@@ -484,6 +484,9 @@ div.bbc_footnotes .meaction {
 	color: #555;
 	text-decoration: none;
 }
+.listlevel1.subsections {
+	top: -1px;
+}
 .poster .listlevel1 a.linklevel1 {
 	font-size: 1.1em;
 }
@@ -765,8 +768,10 @@ a.active {
 .pagelinks .navPages:hover, .pagelinks .current_page {
 	background: #7bb128;
 	color: white;
-	border-radius: 8px;
 	text-decoration: none;
+}
+.pagelinks .navPages, .pagelinks .current_page {
+	border-radius: 8px;
 }
 
 /* our buddies &laquo; &raquo; */

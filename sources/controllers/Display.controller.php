@@ -13,7 +13,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:		BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0
+ * @version 1.0.2
  *
  */
 
@@ -977,6 +977,7 @@ class Display_Controller
 			'can_unlike' => $message['use_likes'] && $message['you_liked'],
 			'like_counter' => $message['like_count'],
 			'likes_enabled' => !empty($modSettings['likes_enabled']) && ($message['use_likes'] || ($message['like_count'] != 0)),
+			'classes' => array(),
 		);
 
 		if (!empty($output['modified']['name']))
@@ -991,6 +992,8 @@ class Display_Controller
 		}
 
 		call_integration_hook('integrate_prepare_display_context', array(&$output, &$message));
+
+		$output['classes'] = implode(' ', $output['classes']);
 
 		$counter++;
 

@@ -10,7 +10,7 @@
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
- * @version 1.0.1
+ * @version 1.0.2
  *
  */
 
@@ -147,7 +147,7 @@ function validateThemeName($indexes, $value_data)
 /**
  * Get a basic list of themes
  *
- * @param int[] $themes
+ * @param int|int[] $themes
  * @return array
  */
 function getBasicThemeInfos($themes)
@@ -163,13 +163,13 @@ function getBasicThemeInfos($themes)
 			AND variable = {string:name}
 			AND id_theme IN ({array_int:theme_list})',
 		array(
-			'theme_list' => array_keys($themes),
+			'theme_list' => (array) $themes,
 			'no_member' => 0,
 			'name' => 'name',
 		)
 	);
 	while ($row = $db->fetch_assoc($request))
-		$themelist[$themes[$row['id_theme']]] = $row['value'];
+		$themelist[$row['id_theme']] = $row['value'];
 
 	$db->free_result($request);
 

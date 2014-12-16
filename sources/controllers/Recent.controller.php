@@ -13,7 +13,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:		BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0
+ * @version 1.0.2
  *
  */
 
@@ -998,6 +998,14 @@ class Recent_Controller extends Action_Controller
 				// Last icon... last... duh.
 				if (!isset($context['icon_sources'][$row['last_icon']]))
 					$context['icon_sources'][$row['last_icon']] = file_exists($settings['theme_dir'] . '/images/post/' . $row['last_icon'] . '.png') ? 'images_url' : 'default_images_url';
+			}
+			else
+			{
+				if (!isset($context['icon_sources'][$row['first_icon']]))
+					$context['icon_sources'][$row['first_icon']] = 'images_url';
+
+				if (!isset($context['icon_sources'][$row['last_icon']]))
+					$context['icon_sources'][$row['last_icon']] = 'images_url';
 			}
 
 			// And build the array.

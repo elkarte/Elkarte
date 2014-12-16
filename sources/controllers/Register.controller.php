@@ -15,7 +15,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:		BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0.1
+ * @version 1.0.2
  *
  */
 
@@ -346,13 +346,15 @@ class Register_Controller extends Action_Controller
 			'pm_ignore_list',
 			'smiley_set',
 			'personal_text', 'avatar',
-			'lngfile',
+			'lngfile', 'location',
 			'secret_question', 'secret_answer',
+			'website_url', 'website_title',
 		);
 		$possible_ints = array(
 			'pm_email_notify',
 			'notify_types',
 			'id_theme',
+			'gender',
 		);
 		$possible_floats = array(
 			'time_offset',

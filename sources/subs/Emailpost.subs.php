@@ -8,7 +8,7 @@
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
- * @version 1.0
+ * @version 1.0.2
  *
  */
 
@@ -35,7 +35,7 @@ function pbe_email_to_bbc($text, $html)
 {
 	// Define some things that need to be converted/modified, outside normal html or markup
 	$tags = array(
-		'~\*\*(.*)\*\*~isUe' => '\'**\'.ltrim(\'$1\').\'**\'',
+		'~\*\*\s?(.*?)\*\*~is' => '**$1**',
 		'~<\*>~i' => '&lt;*&gt;',
 		'~-{20,}~' => '<hr>',
 		'~#([0-9a-fA-F]{4,6}\b)~' => '&#35;$1',
@@ -44,33 +44,24 @@ function pbe_email_to_bbc($text, $html)
 	// We are starting with HTML, our goal is to convert the best parts of it to BBC,
 	if ($html)
 	{
-		// Convert the email-HTML to BBC
+		// upfront pre-process $tags, mostly for the email template strings
 		$text = preg_replace(array_keys($tags), array_values($tags), $text);
+
+		// Run the parsers on the html
+		$text = pbe_run_parsers($text);
+
+		// Convert the email-HTML to BBC
 		require_once(SUBSDIR . '/Html2BBC.class.php');
 		$bbc_converter = new Html_2_BBC($text);
+		$bbc_converter->skip_tags(array('font', 'span'));
+		$bbc_converter->skip_styles(array('font-family', 'font-size', 'color'));
 		$text = $bbc_converter->get_bbc();
-
-		// Run our parsers, as defined in the ACP,  to remove the original "replied to" message
-		// before we do any more work.
-		$text_save = $text;
-		$result = pbe_parse_email_message($text);
-
-		// If we have no message left after running the parser, then they may have replied
-		// below and/or inside the original message. People like this should not be allowed
-		// to use the net, or be forced to read their own messed up emails
-		if (empty($result) || (trim(strip_tags(pbe_filter_email_message($text))) === ''))
-			$text = $text_save;
 	}
 	// Starting with plain text, possibly even markdown style ;)
 	else
 	{
 		// Run the parser to try and remove common mail clients "reply to" stuff
-		$text_save = $text;
-		$result = pbe_parse_email_message($text);
-
-		// Bottom feeder?  If we have no message they could have replied below the original message
-		if (empty($result) || trim(strip_tags(pbe_filter_email_message($text))) === '')
-			$text = $text_save;
+		$text = pbe_run_parsers($text);
 
 		// Set a gmail flag for special quote processing since its quotes are strange
 		$gmail = (bool) preg_match('~<div class="gmail_quote">~i', $text);
@@ -96,6 +87,28 @@ function pbe_email_to_bbc($text, $html)
 		'~(\n){3,}~si' => "\n\n",
 	);
 	$text = preg_replace(array_keys($emptytags), array_values($emptytags), $text);
+
+	return $text;
+}
+
+/**
+ * Runs the ACP email parsers
+ *	 - returns cut email or original if the cut would result in a blank message
+ *
+ * @param string $text
+ * @return string
+ */
+function pbe_run_parsers($text)
+{
+	// Run our parsers, as defined in the ACP,  to remove the original "replied to" message
+	$text_save = $text;
+	$result = pbe_parse_email_message($text);
+
+	// If we have no message left after running the parser, then they may have replied
+	// below and/or inside the original message. People like this should not be allowed
+	// to use the net, or be forced to read their own messed up emails
+	if (empty($result) || (trim(strip_tags(pbe_filter_email_message($text))) === ''))
+		$text = $text_save;
 
 	return $text;
 }
@@ -130,16 +143,16 @@ function pbe_fix_email_body($body, $html = false, $real_name = '', $charset = 'U
 	$body = pbe_fix_client_quotes($body);
 
 	// Attempt to remove any exposed email addresses that are in the reply
-	$body = preg_replace('~>' . $txt['to'] . '(.*)@(.*?)\n~i', '', $body);
+	$body = preg_replace('~>' . $txt['to'] . '(.*)@(.*?)(?:\n|\[br\])~i', '', $body);
 	$body = preg_replace('~\b\s?[a-z0-9._%+-]+@[a-zZ0-9.-]+\.[a-z]{2,4}\b.?' . $txt['email_wrote'] . ':\s?~i', '', $body);
-	$body = preg_replace('~<(.*?)>(.*@.*?)\n~', '$1' . "\n", $body);
+	$body = preg_replace('~<(.*?)>(.*@.*?)(?:\n|\[br\])~', '$1' . "\n", $body);
 	$body = preg_replace('~' . $txt['email_quoting'] . ' (.*) (?:<|&lt;|\[email\]).*?@.*?(?:>|&gt;|\[/email\]):~i', '', $body);
 
 	// Remove multiple sequential blank lines, again
-	$body = preg_replace('~(\n){3,}~si', "\n\n", $body);
+	$body = preg_replace('~(\n\s?){3,}~si', "\n\n", $body);
 
 	// Check for blank quotes
-	$body = preg_replace('~(\[quote(.*)?\]\s*(\[br\]\s*)?\[/quote\])~s', '', $body);
+	$body = preg_replace('~(\[quote\s?([a-zA-Z0-9"=]*)?\]\s*(\[br\]\s*)?\[/quote\])~s', '', $body);
 
 	// Reflow and Cleanup this message to something that looks normal-er
 	require_once(SUBSDIR . '/EmailFormat.class.php');
@@ -500,7 +513,11 @@ function pbe_fix_client_quotes($body)
 	// --- in some group name "John Smith" <johnsmith@tardis.com> wrote:
 	$regex[] = '~---\s.*?"(.*)"\s+' . $txt['email_wrote'] . ':\s(\[quote\])?~i';
 	// --- in some@group.name John Smith wrote
-	$regex[] = '~---\s.*?\b[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,6}\b,\s(.*?)\s' . $txt['email_wrote'] . ':?~i';
+	$regex[] = '~---\s.*?\b[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,6}\b,\s(.*?)\s' . $txt['email_wrote'] . ':?~iu';
+	// --- In some@g..., "someone"  wrote:
+	$regex[] = '~---\s.*?\b[A-Z0-9._%+-]+@[A-Z0-9][.]{3}, [A-Z0-9._%+\-"]+\b(.*?)\s' . $txt['email_wrote'] . ':?~iu';
+	// --- In [email]something[/email] "someone" wrote:
+	$regex[] = '~---\s.*?\[email=.*?/email\],?\s"?(.*?)"?\s' . $txt['email_wrote'] . ':?~iu';
 
 	// For each one see if we can do a nice [quote author=john smith]
 	foreach ($regex as $reg)
@@ -512,11 +529,13 @@ function pbe_fix_client_quotes($body)
 				$quote[1] = preg_replace('~\[email\].*\[\/email\]~', '', $quote[1]);
 				$body = pbe_str_replace_once($quote[0], "\n" . '[quote author=' . trim($quote[1]) . "]\n", $body);
 
-				// Look for [quote author=][/quote][quote] issues
-				$body = pbe_str_replace_once('[quote author=' . trim($quote[1]) . "]\n\n" . '[/quote][quote]', '[quote author=' . trim($quote[1]) . "]\n", $body);
+				$quote[1] = preg_quote($quote[1], '~');
 
-				// And [quote author=][quote] .... [/quote] issues
-				$body = preg_replace('~\[quote author=' . trim($quote[1]) . '\][\n]{2,3}\[quote\]~', '[quote author=' . trim($quote[1]) . "]\n", $body);
+				// Look for [quote author=][/quote][quote] issues
+				$body = preg_replace('~\[quote author=' . trim($quote[1]) . '\] ?(?:\n|\[br\] ?){2,4} ?\[\/quote\] ?\[quote\]~u', '[quote author=' . trim($quote[1]) . "]\n", $body, 1);
+
+				// And [quote author=][quote] newlines [/quote] issues
+				$body = preg_replace('~\[quote author=' . trim($quote[1]) . '\] ?(?:\n|\[br\] ?){2,4}\[quote\]~u', '[quote author=' . trim($quote[1]) . "]\n", $body);
 			}
 		}
 	}

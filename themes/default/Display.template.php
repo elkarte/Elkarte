@@ -11,7 +11,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0.1
+ * @version 1.0.2
  *
  */
 
@@ -123,7 +123,7 @@ function template_messages()
 
 		// Show the message anchor and a "new" anchor if this message is new.
 		echo '
-				<div class="post_wrapper ', $message['approved'] ? ($message['alternate'] == 0 ? 'windowbg' : 'windowbg2') : 'approvebg', '">', $message['id'] != $context['first_message'] ? '
+				<div class="post_wrapper ', $message['classes'], $message['approved'] ? ($message['alternate'] == 0 ? ' windowbg' : ' windowbg2') : ' approvebg', '">', $message['id'] != $context['first_message'] ? '
 					<a class="post_anchor" id="msg' . $message['id'] . '"></a>' . ($message['first_new'] ? '<a id="new"></a>' : '') : '';
 
 		// Showing the sidebar posting area?
@@ -230,7 +230,7 @@ function template_messages()
 									<li class="listlevel2"><a href="', $scripturl, '?action=post;board=', $context['current_board'], ';quote=', $message['id'], ';followup=', $message['id'], '" class="linklevel2 quotetonew_button">', $txt['quote_new'], '</a></li>';
 
 			// What about splitting it off the rest of the topic?
-			if ($context['can_split'] && !empty($context['real_num_replies']))
+			if ($context['can_split'] && !empty($context['real_num_replies']) && $context['topic_first_message'] !== $message['id'])
 				echo '
 									<li class="listlevel2"><a href="', $scripturl, '?action=splittopics;topic=', $context['current_topic'], '.0;at=', $message['id'], '" class="linklevel2 split_button">', $txt['split_topic'], '</a></li>';
 
@@ -817,7 +817,6 @@ function template_display_attachments($message, $ignoring)
 							<div id="msg_', $message['id'], '_footer" class="attachments"', $ignoring ? ' style="display:none;"' : '', '>';
 
 	$last_approved_state = 1;
-	$i = 0;
 
 	foreach ($message['attachment'] as $attachment)
 	{

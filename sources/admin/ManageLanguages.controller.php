@@ -13,7 +13,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:		BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0
+ * @version 1.0.2
  *
  */
 
@@ -508,7 +508,7 @@ class ManageLanguages_Controller extends Action_Controller
 
 			// Now we have the id_theme we can get the pretty description.
 			if (!empty($themes))
-				$context['themes'] = getBasicThemeInfos($themes);
+				$context['theme_names'] = getBasicThemeInfos($themes);
 		}
 
 		// Before we go to far can we make anything writable, eh, eh?

@@ -13,7 +13,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:		BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0
+ * @version 1.0.2
  *
  */
 
@@ -688,7 +688,7 @@ class Admin_Controller extends Action_Controller
 	 */
 	public function action_credits()
 	{
-		global $forum_version, $txt, $scripturl, $context, $user_info;
+		global $forum_version, $txt, $scripturl, $context, $user_info, $modSettings;
 
 		// We need a little help from our friends
 		require_once(SUBSDIR . '/Membergroups.subs.php');
@@ -741,6 +741,15 @@ class Admin_Controller extends Action_Controller
 
 		// Load in the admin quick tasks
 		$context['quick_admin_tasks'] = getQuickAdminTasks();
+
+		$index = 'new_in_' . str_replace(array('ElkArte ', '.'), array('', '_'), FORUM_VERSION);
+		if (!empty($modSettings[$index]) && isset($txt[$index]))
+		{
+			$context['latest_updates'] = replaceBasicActionUrl($txt[$index]);
+			require_once(SUBSDIR . '/Themes.subs.php');
+
+			updateThemeOptions(array(1, $user_info['id'], 'dismissed_' . $index, 1));
+		}
 	}
 
 	/**

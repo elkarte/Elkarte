@@ -14,7 +14,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0
+ * @version 1.0.2
  *
  */
 
@@ -174,14 +174,14 @@ class Sphinxql_Search
 		if (($cached_results = cache_get_data('searchql_results_' . md5($user_info['query_see_board'] . '_' . $context['params']))) === null)
 		{
 			// Create an instance of the sphinx client and set a few options.
-			$mySphinx = @mysql_connect(($modSettings['sphinx_searchd_server'] === 'localhost' ? '127.0.0.1' : $modSettings['sphinx_searchd_server']) . ':' . (int) $modSettings['sphinxql_searchd_port']);
+			$mySphinx = @mysqli_connect(($modSettings['sphinx_searchd_server'] === 'localhost' ? '127.0.0.1' : $modSettings['sphinx_searchd_server']), '', '', '', (int) $modSettings['sphinxql_searchd_port']);
 
 			// No connection, daemon not running?  log the error
 			if ($mySphinx === false)
 				fatal_lang_error('error_no_search_daemon');
 
 			// Compile different options for our query
-			$query = 'SELECT *' . (empty($search_params['topic']) ? ', COUNT(*) num' : '') . ', (weight() + (relevance/1000)) rank FROM elkarte_index';
+			$query = 'SELECT *' . (empty($search_params['topic']) ? ', COUNT(*) num' : '') . ', WEIGHT() weights, (weights + (relevance/1000)) rank FROM elkarte_index';
 
 			// Construct the (binary mode & |) query.
 			$where_match = $this->_constructQuery($search_params['search']);
@@ -229,14 +229,14 @@ class Sphinxql_Search
 			$query .= ' OPTION field_weights=(subject=' . (!empty($modSettings['search_weight_subject']) ? $modSettings['search_weight_subject'] * 200 : 1000) . ',body=1000)';
 
 			// Execute the search query.
-			$request = mysql_query($query, $mySphinx);
+			$request = mysqli_query($mySphinx, $query);
 
 			// Can a connection to the daemon be made?
 			if ($request === false)
 			{
 				// Just log the error.
-				if (mysql_error($mySphinx))
-					log_error(mysql_error($mySphinx));
+				if (mysqli_error($mySphinx))
+					log_error(mysqli_error($mySphinx));
 
 				fatal_lang_error('error_no_search_daemon');
 			}
@@ -247,9 +247,9 @@ class Sphinxql_Search
 				'matches' => array(),
 			);
 
-			if (mysql_num_rows($request) != 0)
+			if (mysqli_num_rows($request) != 0)
 			{
-				while ($match = mysql_fetch_assoc($request))
+				while ($match = mysqli_fetch_assoc($request))
 				{
 					if (empty($search_params['topic']))
 						$num = isset($match['num']) ? $match['num'] : (isset($match['@count']) ? $match['@count'] : 0);
@@ -264,8 +264,8 @@ class Sphinxql_Search
 					);
 				}
 			}
-			mysql_free_result($request);
-			mysql_close($mySphinx);
+			mysqli_free_result($request);
+			mysqli_close($mySphinx);
 
 			$cached_results['num_results'] = count($cached_results['matches']);
 

@@ -11,7 +11,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0
+ * @version 1.0.2
  */
 
 /**
@@ -67,16 +67,24 @@ function template_maintain_database()
 	else
 		echo '
 					<div class="', $context['suggested_method'] == 'use_external_tool' || $context['use_maintenance'] != 0 ? 'errorbox' : 'infobox', '">
-					', $txt[$context['suggested_method']],
-		$context['use_maintenance'] != 0 ? '<br />' . $txt['enable_maintenance' . $context['use_maintenance']] : '',
-		'</div>';
-
-	echo '
+						', $txt[$context['suggested_method']], $context['use_maintenance'] != 0 ? '
+						<br />
+						' . $txt['enable_maintenance' . $context['use_maintenance']] : '', '
+					</div>
 					<p>
 						<label for="struct"><input type="checkbox" name="struct" id="struct" onclick="document.getElementById(\'submitDump\').disabled = !document.getElementById(\'struct\').checked &amp;&amp; !document.getElementById(\'data\').checked;" class="input_check" checked="checked" /> ', $txt['maintain_backup_struct'], '</label><br />
 						<label for="data"><input type="checkbox" name="data" id="data" onclick="document.getElementById(\'submitDump\').disabled = !document.getElementById(\'struct\').checked &amp;&amp; !document.getElementById(\'data\').checked;" checked="checked" class="input_check" /> ', $txt['maintain_backup_data'], '</label><br />
 						<label for="compress"><input type="checkbox" name="compress" id="compress" value="gzip"', $context['suggested_method'] == 'zipped_file' ? ' checked="checked"' : '', ' class="input_check" /> ', $txt['maintain_backup_gz'], '</label>
-					</p>
+						</p>';
+
+	if (empty($context['skip_security']))
+	{
+		echo '
+					<div class="infobox">', $txt['security_database_download'], '</div>';
+		template_control_chmod();
+	}
+
+	echo '
 					<div class="submitbutton">
 						<input ', $context['use_maintenance'] == 2 ? 'disabled="disabled" ' : '', 'type="submit" value="', $txt['maintain_backup_save'], '" id="submitDump" onclick="return document.getElementById(\'struct\').checked || document.getElementById(\'data\').checked;" class="button_submit" />';
 

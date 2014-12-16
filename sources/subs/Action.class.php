@@ -7,7 +7,7 @@
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
- * @version 1.0
+ * @version 1.0.2
  *
  */
 
@@ -89,7 +89,7 @@ class Action
 	 * @param string $default default action if unknown sa is requested
 	 * @return string
 	 */
-	public function initialize($subactions, $default = '')
+	public function initialize(&$subactions, $default = '')
 	{
 		if ($this->_name !== null)
 			call_integration_hook('integrate_sa_' . $this->_name, array(&$subactions));

@@ -15,7 +15,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:		BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0
+ * @version 1.0.2
  *
  */
 
@@ -384,6 +384,7 @@ class Profile_Controller extends Action_Controller
 						'function' => 'action_activateaccount',
 						'sc' => 'get',
 						'token' => 'profile-aa%u',
+						'token_type' => 'get',
 						'permission' => array(
 							'own' => array(),
 							'any' => array('moderate_forum'),

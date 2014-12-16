@@ -16,7 +16,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0
+ * @version 1.0.2
  *
  */
 
@@ -2397,7 +2397,7 @@ function splitTopic($split1_ID_TOPIC, $splitMessages, $new_subject)
  */
 function splitAttemptMove($boards, $totopic)
 {
-	global $board, $user_info, $context;
+	global $board, $user_info;
 
 	$db = database();
 
@@ -2457,11 +2457,6 @@ function splitAttemptMove($boards, $totopic)
 		else
 			$boards['destination'] = $boards['current'];
 	}
-
-	// Create a link to this in the old topic.
-	// @todo Does this make sense if the topic was unapproved before? We are not yet sure if the resulting topic is unapproved.
-	if (!empty($_POST['messageRedirect']))
-		postSplitRedirect($context['reason'], $_POST['subname'], $boards['destination'], $context['new_topic']);
 }
 
 /**
@@ -2469,7 +2464,7 @@ function splitAttemptMove($boards, $totopic)
  *
  * @return array
  */
-function splitDestinationBoard()
+function splitDestinationBoard($toboard = 0)
 {
 	global $board, $topic;
 
@@ -2477,15 +2472,11 @@ function splitDestinationBoard()
 	if (empty($current_board))
 		fatal_lang_error('no_board');
 
-	if (!empty($_POST['move_new_topic']))
+	if (!empty($toboard) && $board !== $toboard)
 	{
-		$toboard = !empty($_POST['board_list']) ? (int) $_POST['board_list'] : 0;
-		if (!empty($toboard) && $board !== $toboard)
-		{
-			$destination_board = boardInfo($toboard);
-			if (empty($destination_board))
-				fatal_lang_error('no_board');
-		}
+		$destination_board = boardInfo($toboard);
+		if (empty($destination_board))
+			fatal_lang_error('no_board');
 	}
 
 	if (!isset($destination_board))

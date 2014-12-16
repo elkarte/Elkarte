@@ -13,7 +13,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0.1
+ * @version 1.0.2
  *
  *
  * Adding options to one of the setting screens isn't hard.
@@ -462,10 +462,14 @@ class Settings_Form
 
 		foreach ($config_bools as $key)
 		{
-			if (!empty($_POST[$key]))
-				$new_settings[$key] = '1';
-			else
-				$new_settings[$key] = '0';
+			// Check boxes need to be part of this settings form
+			if ($this->_array_value_exists__recursive($key, $this->settings()))
+			{
+				if (!empty($_POST[$key]))
+					$new_settings[$key] = '1';
+				else
+					$new_settings[$key] = '0';
+			}
 		}
 
 		// Save the relevant settings in the Settings.php file.
@@ -797,4 +801,22 @@ class Settings_Form
 			return $this->_config_vars;
 		}
 	}
+
+	/**
+	 * Recursively checks if a value exists in an array
+	 *
+	 * @param string $needle
+	 * @param mixed[] $haystack
+	 * @return boolean
+	 */
+	private function _array_value_exists__recursive($needle, $haystack)
+	{
+		foreach ($haystack as $item)
+		{
+			if ($item == $needle || (is_array($item) && $this->_array_value_exists__recursive($needle, $item)))
+				return true;
+		}
+
+		return false;
+    }
 }

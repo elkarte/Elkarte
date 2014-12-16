@@ -857,6 +857,36 @@ Once the attachments directory reaches it\'s maximum permitted size users will n
 {REGARDS}';
 
 /**
+	@additional_params: admin_backup_database
+		BAK_REALNAME: the name of the user doing the backup
+	@description:
+*/
+$txt['admin_backup_database_subject'] = 'A database backup has been taken';
+$txt['admin_backup_database_body'] = '{REALNAME},
+
+this email is to to inform you that {BAK_REALNAME} has just downloaded a backup of the database at {FORUMNAME}.
+
+{REGARDS}';
+
+/**
+	@additional_params: editing_theme
+		EDIT_REALNAME: the name of the user doing the backup
+		FILE_EDITED: the name of the file being modified
+		THEME_NAME: the name of the theme
+	@description:
+*/
+$txt['editing_theme_subject'] = 'Editing of a theme';
+$txt['editing_theme_body'] = '{REALNAME},
+
+this email is just to to inform you that {EDIT_REALNAME} is going to edit the template file:
+{FILE_EDITED}
+of the theme {THEME_NAME} at {FORUMNAME}.
+
+If you know this is not the case, please investigate the event.
+
+{REGARDS}';
+
+/**
 	@additional_params: paid_subscription_refund
 		NAME: Subscription title.
 		REALNAME: Recipients name

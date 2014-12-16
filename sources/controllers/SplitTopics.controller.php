@@ -13,7 +13,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:		BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0.1
+ * @version 1.0.2
  *
  * Original module by Mach8 - We'll never forget you.
  */
@@ -131,6 +131,7 @@ class SplitTopics_Controller extends Action_Controller
 		if ($messageInfo['id_first_msg'] == $splitAt)
 		{
 			$this->_new_topic_subject = $messageInfo['subject'];
+			$this->_set_session_values();
 			return $this->action_splitSelectTopics();
 		}
 
@@ -160,41 +161,32 @@ class SplitTopics_Controller extends Action_Controller
 		// Check the session to make sure they meant to do this.
 		checkSession();
 
-		// Clean up the subject.
-		if (isset($_POST['subname']))
-			$this->_new_topic_subject = trim(Util::htmlspecialchars($_POST['subname']));
+		// Set the form options in to session
+		$this->_set_session_values();
 
-		if (empty($this->_new_topic_subject))
-			$this->_new_topic_subject = $txt['new_topic'];
-
-		if (empty($_SESSION['move_to_board']))
+		// Cant post an empty redirect topic
+		if (!empty($_SESSION['messageRedirect']) && empty($_SESSION['reason']))
 		{
-			$context['move_to_board'] = !empty($_POST['move_to_board']) ? (int) $_POST['move_to_board'] : 0;
-			$context['reason'] = !empty($_POST['reason']) ? trim(Util::htmlspecialchars($_POST['reason'], ENT_QUOTES)) : '';
+			$this->_unset_session_values();
+			fatal_lang_error('splittopic_no_reason', false);
 		}
-		else
-		{
-			$context['move_to_board'] = (int) $_SESSION['move_to_board'];
-			$context['reason'] = trim(Util::htmlspecialchars($_SESSION['reason']));
-		}
-
-		$_SESSION['move_to_board'] = $context['move_to_board'];
-		$_SESSION['reason'] = $context['reason'];
 
 		// Redirect to the selector if they chose selective.
 		if ($_POST['step2'] == 'selective')
+		{
+			if (!empty($_POST['at']))
+				$_SESSION['split_selection'][$topic][] = (int) $_POST['at'];
 			return $this->action_splitSelectTopics();
+		}
 
 		// We work with them topics.
 		require_once(SUBSDIR . '/Topic.subs.php');
 		require_once(SUBSDIR . '/Boards.subs.php');
 
-		// Make sure they can see the board they are trying to move to (and get whether posts count in the target board).
-		if (!empty($_POST['messageRedirect']) && empty($context['reason']))
-			fatal_lang_error('splittopic_no_reason', false);
-
+		// Make sure they can see the board they are trying to move to
+		// (and get whether posts count in the target board).
 		// Before the actual split because of the fatal_lang_errors
-		$boards = splitDestinationBoard();
+		$boards = splitDestinationBoard($_SESSION['move_to_board']);
 
 		$splitAt = (int) $_POST['at'];
 		$messagesToBeSplit = array();
@@ -207,14 +199,24 @@ class SplitTopics_Controller extends Action_Controller
 			$messagesToBeSplit[] = $splitAt;
 		// There's another action?!
 		else
+		{
+			$this->_unset_session_values();
 			fatal_lang_error('no_access', false);
+		}
 
 		$context['old_topic'] = $topic;
-		$context['new_topic'] = splitTopic($topic, $messagesToBeSplit, $this->_new_topic_subject);
+		$context['new_topic'] = splitTopic($topic, $messagesToBeSplit, $_SESSION['new_topic_subject']);
 		$context['page_title'] = $txt['split_topic'];
 		$context['sub_template'] = 'split_successful';
 
 		splitAttemptMove($boards, $context['new_topic']);
+
+		// Create a link to this in the old topic.
+		// @todo Does this make sense if the topic was unapproved before? We are not yet sure if the resulting topic is unapproved.
+		if ($_SESSION['messageRedirect'])
+			postSplitRedirect($_SESSION['reason'], $_SESSION['new_topic_subject'], $boards['destination'], $context['new_topic']);
+
+		$this->_unset_session_values();
 	}
 
 	/**
@@ -232,35 +234,29 @@ class SplitTopics_Controller extends Action_Controller
 
 		require_once(SUBSDIR . '/Topic.subs.php');
 
-		// Default the subject in case it's blank.
-		if (isset($_POST['subname']))
-			$this->_new_topic_subject = trim(Util::htmlspecialchars($_POST['subname']));
-		if (empty($this->_new_topic_subject))
-			$this->_new_topic_subject = $txt['new_topic'];
-
 		// You must've selected some messages!  Can't split out none!
 		if (empty($_SESSION['split_selection'][$topic]))
+		{
+			$this->_unset_session_values();
 			fatal_lang_error('no_posts_selected', false);
-
-		if (!empty($_POST['messageRedirect']) && empty($context['reason']))
-			fatal_lang_error('splittopic_no_reason', false);
-
-		$context['move_to_board'] = !empty($_POST['move_to_board']) ? (int) $_POST['move_to_board'] : 0;
-		$reason = !empty($_POST['reason']) ? trim(Util::htmlspecialchars($_POST['reason'], ENT_QUOTES)) : '';
-
-		// Make sure they can see the board they are trying to move to (and get whether posts count in the target board).
-		if (!empty($_POST['messageRedirect']) && empty($reason))
-			fatal_lang_error('splittopic_no_reason', false);
+		}
 
 		// This is here because there are two fatal_lang_errors in there
-		$boards = splitDestinationBoard();
+		$boards = splitDestinationBoard($_SESSION['move_to_board']);
 
 		$context['old_topic'] = $topic;
-		$context['new_topic'] = splitTopic($topic, $_SESSION['split_selection'][$topic], $this->_new_topic_subject);
+		$context['new_topic'] = splitTopic($topic, $_SESSION['split_selection'][$topic], $_SESSION['new_topic_subject']);
 		$context['page_title'] = $txt['split_topic'];
 		$context['sub_template'] = 'split_successful';
 
 		splitAttemptMove($boards, $context['new_topic']);
+
+		// Create a link to this in the old topic.
+		// @todo Does this make sense if the topic was unapproved before? We are not yet sure if the resulting topic is unapproved.
+		if ($_SESSION['messageRedirect'])
+			postSplitRedirect($_SESSION['reason'], $_SESSION['new_topic_subject'], $boards['destination'], $context['new_topic']);
+
+		$this->_unset_session_values();
 	}
 
 	/**
@@ -285,10 +281,10 @@ class SplitTopics_Controller extends Action_Controller
 
 		// This is a special case for split topics from quick-moderation checkboxes
 		if (isset($_REQUEST['subname_enc']))
+		{
 			$this->_new_topic_subject = urldecode($_REQUEST['subname_enc']);
-
-		$context['move_to_board'] = !empty($_SESSION['move_to_board']) ? (int) $_SESSION['move_to_board'] : 0;
-		$context['reason'] = !empty($_SESSION['reason']) ? trim(Util::htmlspecialchars($_SESSION['reason'])) : '';
+			$this->_set_session_values();
+		}
 
 		require_once(SUBSDIR . '/Topic.subs.php');
 		require_once(SUBSDIR . '/Messages.subs.php');
@@ -307,11 +303,11 @@ class SplitTopics_Controller extends Action_Controller
 
 		$context['topic'] = array(
 			'id' => $topic,
-			'subject' => urlencode($this->_new_topic_subject),
+			'subject' => urlencode($_SESSION['new_topic_subject']),
 		);
 
 		// Some stuff for our favorite template.
-		$context['new_subject'] = $this->_new_topic_subject;
+		$context['new_subject'] = $_SESSION['new_topic_subject'];
 
 		// Using the "select" sub template.
 		$context['sub_template'] = isset($_REQUEST['xml']) ? 'split' : 'select';
@@ -384,7 +380,7 @@ class SplitTopics_Controller extends Action_Controller
 		if ($context['selected']['start'] >= $context['selected']['num_messages'])
 			$context['selected']['start'] = $context['selected']['num_messages'] <= $context['messages_per_page'] ? 0 : ($context['selected']['num_messages'] - (($context['selected']['num_messages'] % $context['messages_per_page']) == 0 ? $context['messages_per_page'] : ($context['selected']['num_messages'] % $context['messages_per_page'])));
 
-		$page_index_url = $scripturl . '?action=splittopics;sa=selectTopics;subname=' . strtr(urlencode($this->_new_topic_subject), array('%' => '%%')) . ';topic=' . $topic;
+		$page_index_url = $scripturl . '?action=splittopics;sa=selectTopics;subname=' . strtr(urlencode($_SESSION['new_topic_subject']), array('%' => '%%')) . ';topic=' . $topic;
 		// Build a page list of the not-selected topics...
 		$context['not_selected']['page_index'] = constructPageIndex($page_index_url . '.%1$d;start2=' . $context['selected']['start'], $context['not_selected']['start'], $context['not_selected']['num_messages'], $context['messages_per_page'], true);
 
@@ -433,5 +429,43 @@ class SplitTopics_Controller extends Action_Controller
 				}
 			}
 		}
+	}
+
+	/**
+	 * Set the values for this split session
+	 */
+	private function _set_session_values()
+	{
+		global $txt;
+
+		// Clean up the subject.
+		if (isset($_POST['subname']) && empty($this->_new_topic_subject))
+			$this->_new_topic_subject = trim(Util::htmlspecialchars($_POST['subname']));
+
+		if (empty($this->_new_topic_subject))
+			$this->_new_topic_subject = $txt['new_topic'];
+
+		// Save in session so its available across all the form pages
+		if (empty($_SESSION['move_to_board']))
+		{
+			$_SESSION['move_to_board'] = (!empty($_POST['move_new_topic']) && !empty($_POST['move_to_board'])) ? (int) $_POST['move_to_board'] : 0;
+			$_SESSION['reason'] = !empty($_POST['reason']) ? trim(Util::htmlspecialchars($_POST['reason'], ENT_QUOTES)) : '';
+			$_SESSION['messageRedirect'] = !empty($_POST['messageRedirect']);
+			$_SESSION['new_topic_subject'] = $this->_new_topic_subject;
+		}
+	}
+
+	/**
+	 * Clear out this split session
+	 */
+	private function _unset_session_values()
+	{
+		unset(
+			$_SESSION['move_to_board'],
+			$_SESSION['reason'],
+			$_SESSION['messageRedirect'],
+			$_SESSION['split_selection'],
+			$_SESSION['new_topic_subject']
+		);
 	}
 }

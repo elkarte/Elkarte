@@ -13,7 +13,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:		BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0
+ * @version 1.0.2
  *
  */
 
@@ -151,7 +151,7 @@ class Maintenance_Controller extends Action_Controller
 	 */
 	public function action_database()
 	{
-		global $context, $db_type, $modSettings, $maintenance;
+		global $context, $modSettings, $maintenance, $iknowitmaybeunsafe;
 
 		// We need this, really..
 		require_once(SUBSDIR . '/Maintenance.subs.php');
@@ -159,7 +159,7 @@ class Maintenance_Controller extends Action_Controller
 		// Set up the sub-template
 		$context['sub_template'] = 'maintain_database';
 
-		if ($db_type == 'mysql')
+		if (DB_TYPE == 'MySQL')
 		{
 			$body_type = fetchBodyType();
 
@@ -195,6 +195,7 @@ class Maintenance_Controller extends Action_Controller
 		$current_time_limit = ini_get('max_execution_time');
 		@set_time_limit(159); //something strange just to be sure
 		$new_time_limit = ini_get('max_execution_time');
+		@set_time_limit($current_time_limit);
 
 		$context['use_maintenance'] = 0;
 
@@ -216,6 +217,23 @@ class Maintenance_Controller extends Action_Controller
 			$context['use_maintenance'] = 1;
 			$context['suggested_method'] = 'plain_text';
 		}
+
+		loadTemplate('Packages');
+		loadLanguage('Packages');
+
+		// $context['package_ftp'] may be set action_backup_display when an error occur
+		if (!isset($context['package_ftp']))
+		{
+			$context['package_ftp'] = array(
+				'form_elements_only' => true,
+				'server' => '',
+				'port' => '',
+				'username' => '',
+				'path' => '',
+				'error' => '',
+			);
+		}
+		$context['skip_security'] = !empty($iknowitmaybeunsafe);
 	}
 
 	/**
@@ -942,6 +960,8 @@ class Maintenance_Controller extends Action_Controller
 	 */
 	public function action_backup_display()
 	{
+		global $context, $txt, $user_info;
+
 		validateToken('admin-maint');
 
 		// Administrators only!
@@ -949,6 +969,49 @@ class Maintenance_Controller extends Action_Controller
 			fatal_lang_error('no_dump_database', 'critical');
 
 		checkSession('post');
+
+		if (empty($iknowitmaybeunsafe))
+		{
+			require_once(SUBSDIR . '/FtpConnection.class.php');
+
+			$ftp = new Ftp_Connection($_POST['ftp_server'], $_POST['ftp_port'],$_POST['ftp_username'], $_POST['ftp_password']);
+
+			if ($ftp->error === false)
+			{
+				// I know, I know... but a lot of people want to type /home/xyz/... which is wrong, but logical.
+				if (!$ftp->chdir($_POST['ftp_path']))
+				{
+					$ftp_error = $ftp->error;
+					$ftp->chdir(preg_replace('~^/home[2]?/[^/]+?~', '', $_POST['ftp_path']));
+				}
+			}
+
+			// If we had an error...
+			if ($ftp->error !== false)
+			{
+				loadLanguage('Packages');
+				$ftp_error = $ftp->last_message === null ? (isset($txt['package_ftp_' . $ftp->error]) ? $txt['package_ftp_' . $ftp->error] : '') : $ftp->last_message;
+
+				// Fill the boxes for a FTP connection with data from the previous attempt
+				$context['package_ftp'] = array(
+					'form_elements_only' => 1,
+					'server' => $_POST['ftp_server'],
+					'port' => $_POST['ftp_port'],
+					'username' => $_POST['ftp_username'],
+					'path' => $_POST['ftp_path'],
+					'error' => empty($ftp_error) ? null : $ftp_error,
+				);
+
+				return $this->action_database();
+			}
+		}
+
+		require_once(SUBSDIR . '/Admin.subs.php');
+
+		emailAdmins('admin_backup_database', array(
+			'BAK_REALNAME' => $user_info['name']
+		));
+		logAction('database_backup', array('member' => $user_info['id']), 'admin');
 
 		require_once(SOURCEDIR . '/DumpDatabase.php');
 		DumpDatabase2();

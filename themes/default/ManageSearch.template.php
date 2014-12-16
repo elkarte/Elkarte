@@ -11,7 +11,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0
+ * @version 1.0.2
  *
  */
 
@@ -521,14 +521,14 @@ function template_manage_sphinx()
 							<span class="smalltext">', $txt['sphinx_searchd_port_desc'], '</span>
 						</dt>
 						<dd>
-							<input type="text" name="sphinx_searchd_port" id="sphinx_searchd_port_input" value="', isset($modSettings['sphinx_searchd_port']) ? $modSettings['sphinx_searchd_port'] : '3312', '" size="4" />
+							<input type="text" name="sphinx_searchd_port" id="sphinx_searchd_port_input" value="', isset($modSettings['sphinx_searchd_port']) ? $modSettings['sphinx_searchd_port'] : '9312', '" size="4" />
 						</dd>
 						<dt>
 							<label for="sphinxql_searchd_port_input"><strong>', $txt['sphinx_searchd_qlport'], '</strong></label><br />
 							<span class="smalltext">', $txt['sphinx_searchd_qlport_desc'], '</span>
 						</dt>
 						<dd>
-							<input type="text" name="sphinxql_searchd_port" id="sphinxql_searchd_port_input" value="', isset($modSettings['sphinxql_searchd_port']) ? $modSettings['sphinxql_searchd_port'] : '3313', '" size="4" />
+							<input type="text" name="sphinxql_searchd_port" id="sphinxql_searchd_port_input" value="', isset($modSettings['sphinxql_searchd_port']) ? $modSettings['sphinxql_searchd_port'] : '9306', '" size="4" />
 						</dd>
 						<dt>
 							<label for="sphinx_max_results_input"><strong>', $txt['sphinx_max_matches'], '</strong></label><br />

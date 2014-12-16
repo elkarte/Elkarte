@@ -13,7 +13,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0.1
+ * @version 1.0.2
  *
  */
 
@@ -627,6 +627,7 @@ function list_getMembergroups($start, $items_per_page, $sort, $membergroup_type,
 	global $scripturl, $txt, $context;
 
 	$db = database();
+	loadLanguage('Admin');
 
 	$request = $db->query('', '
 		SELECT mg.id_group, mg.group_name, mg.min_posts, mg.description, mg.group_type, mg.online_color,

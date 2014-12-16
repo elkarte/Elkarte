@@ -13,7 +13,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:		BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0.1
+ * @version 1.0.2
  *
  */
 
@@ -903,7 +903,7 @@ function parse_bbc($message, $smileys = true, $cache_id = '', $parse_tags = arra
 					global $context;
 
 					if (!isset($disabled[\'code\']))
-						$data = str_replace("\t", "<span style=\"white-space: pre;\">\t</span>", $data);
+						$data = str_replace("\t", "<span class=\"tab\">\t</span>", $data);
 					'),
 				'block_level' => true,
 			),
@@ -915,7 +915,7 @@ function parse_bbc($message, $smileys = true, $cache_id = '', $parse_tags = arra
 					global $context;
 
 					if (!isset($disabled[\'code\']))
-						$data[0] = str_replace("\t", "<span style=\"white-space: pre;\">\t</span>", $data[0]);
+						$data[0] = str_replace("\t", "<span class=\"tab\">\t</span>", $data[0]);
 					'),
 				'block_level' => true,
 			),
@@ -2340,9 +2340,9 @@ function redirectexit($setLocation = '', $refresh = false)
 	if (!empty($modSettings['queryless_urls']) && (empty($context['server']['is_cgi']) || ini_get('cgi.fix_pathinfo') == 1 || @get_cfg_var('cgi.fix_pathinfo') == 1) && (!empty($context['server']['is_apache']) || !empty($context['server']['is_lighttpd']) || !empty($context['server']['is_litespeed'])))
 	{
 		if (defined('SID') && SID != '')
-			$setLocation = preg_replace_callback('~^' . preg_quote($scripturl, '/') . '\?(?:' . SID . '(?:;|&|&amp;))((?:board|topic)=[^#]+?)(#[^"]*?)?$~', 'redirectexit_callback', $setLocation);
+			$setLocation = preg_replace_callback('~^' . preg_quote($scripturl, '~') . '\?(?:' . SID . '(?:;|&|&amp;))((?:board|topic)=[^#]+?)(#[^"]*?)?$~', 'redirectexit_callback', $setLocation);
 		else
-			$setLocation = preg_replace_callback('~^' . preg_quote($scripturl, '/') . '\?((?:board|topic)=[^#"]+?)(#[^"]*?)?$~', 'redirectexit_callback', $setLocation);
+			$setLocation = preg_replace_callback('~^' . preg_quote($scripturl, '~') . '\?((?:board|topic)=[^#"]+?)(#[^"]*?)?$~', 'redirectexit_callback', $setLocation);
 	}
 
 	// Maybe integrations want to change where we are heading?
@@ -2561,18 +2561,15 @@ function setupThemeContext($forceload = false)
 		{
 			$context['user']['avatar']['href'] = $user_info['avatar']['url'];
 
-			if ($modSettings['avatar_action_too_large'] == 'option_html_resize' || $modSettings['avatar_action_too_large'] == 'option_js_resize')
-			{
-				if (!empty($modSettings['avatar_max_width_external']))
-					$context['user']['avatar']['width'] = $modSettings['avatar_max_width_external'];
+			if (!empty($modSettings['avatar_max_width']))
+				$context['user']['avatar']['width'] = $modSettings['avatar_max_width'];
 
-				if (!empty($modSettings['avatar_max_height_external']))
-					$context['user']['avatar']['height'] = $modSettings['avatar_max_height_external'];
-			}
+			if (!empty($modSettings['avatar_max_height']))
+				$context['user']['avatar']['height'] = $modSettings['avatar_max_height'];
 		}
 		// Gravatars URL.
 		elseif ($user_info['avatar']['url'] === 'gravatar')
-			$context['user']['avatar']['href'] = '//www.gravatar.com/avatar/' . md5(strtolower($user_settings['email_address'])) . 'd=' . $modSettings['avatar_max_height_external'] . (!empty($modSettings['gravatar_rating']) ? ('&amp;r=' . $modSettings['gravatar_rating']) : '');
+			$context['user']['avatar']['href'] = '//www.gravatar.com/avatar/' . md5(strtolower($user_settings['email_address'])) . 'd=' . $modSettings['avatar_max_height'] . (!empty($modSettings['gravatar_rating']) ? ('&amp;r=' . $modSettings['gravatar_rating']) : '');
 		// Otherwise we assume it's server stored?
 		elseif ($user_info['avatar']['url'] !== '')
 			$context['user']['avatar']['href'] = $modSettings['avatar_url'] . '/' . htmlspecialchars($user_info['avatar']['url']);
@@ -2629,17 +2626,6 @@ function setupThemeContext($forceload = false)
 				icon: elk_images_url + \'/im_sm_newmsg.png\'
 			});
 		});', true);
-
-	// Resize avatars the fancy, but non-GD requiring way.
-	if ($modSettings['avatar_action_too_large'] == 'option_js_resize' && (!empty($modSettings['avatar_max_width_external']) || !empty($modSettings['avatar_max_height_external'])))
-	{
-		// @todo Move this over to script.js?
-		addInlineJavascript('
-		var elk_avatarMaxWidth = ' . (int) $modSettings['avatar_max_width_external'] . ',
-			elk_avatarMaxHeight = ' . (int) $modSettings['avatar_max_height_external'] . ';' . (!isBrowser('is_ie8') ? '
-		window.addEventListener("load", elk_avatarResize, false);' : '
-		window.attachEvent("load", elk_avatarResize);'), true);
-	}
 
 	// This looks weird, but it's because BoardIndex.controller.php references the variable.
 	$context['common_stats']['latest_member'] = array(
@@ -2900,6 +2886,8 @@ function template_javascript($do_defered = false)
 			$combiner = new Site_Combiner(CACHEDIR, $boardurl . '/cache');
 			$combine_name = $combiner->site_js_combine($context['javascript_files'], $do_defered);
 
+			call_integration_hook('post_javascript_combine', array(&$combine_name, $combiner));
+
 			if (!empty($combine_name))
 				echo '
 	<script src="', $combine_name, '" id="jscombined', $do_defered ? 'bottom' : 'top', '"></script>';
@@ -2987,6 +2975,8 @@ function template_css()
 			$combiner = new Site_Combiner(CACHEDIR, $boardurl . '/cache');
 			$combine_name = $combiner->site_css_combine($context['css_files']);
 
+			call_integration_hook('post_css_combine', array(&$combine_name, $combiner));
+
 			if (!empty($combine_name))
 				echo '
 	<link rel="stylesheet" href="', $combine_name, '" id="csscombined" />';
@@ -3028,6 +3018,11 @@ function template_admin_warning_above()
 	{
 		$context['security_controls_ban']['type'] = 'serious';
 		template_show_error('security_controls_ban');
+	}
+
+	if (!empty($context['new_version_updates']))
+	{
+		template_show_error('new_version_updates');
 	}
 
 	// Any special notices to remind the admin about?

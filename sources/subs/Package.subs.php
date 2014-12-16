@@ -13,7 +13,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0
+ * @version 1.0.2
  *
  */
 
@@ -3176,10 +3176,10 @@ function package_create_backup($id = 'backup')
  * @param string $url
  * @param string $post_data = ''
  * @param bool $keep_alive = false
- * @param int $redirection_level = 0
+ * @param int $redirection_level = 2
  * @return string
  */
-function fetch_web_data($url, $post_data = '', $keep_alive = false, $redirection_level = 0)
+function fetch_web_data($url, $post_data = '', $keep_alive = false, $redirection_level = 2)
 {
 	global $webmaster_email;
 	static $keep_alive_dom = null, $keep_alive_fp = null;
@@ -3225,7 +3225,7 @@ function fetch_web_data($url, $post_data = '', $keep_alive = false, $redirection
 		// Include the file containing the Curl_Fetch_Webdata class.
 		require_once(SOURCEDIR . '/CurlFetchWebdata.class.php');
 
-		$fetch_data = new Curl_Fetch_Webdata();
+		$fetch_data = new Curl_Fetch_Webdata(array(), $redirection_level);
 		$fetch_data->get_url_data($url, $post_data);
 
 		// no errors and a 200 result, then we have a good dataset, well we at least have data ;)

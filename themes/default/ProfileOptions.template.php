@@ -11,7 +11,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0
+ * @version 1.0.2
  *
  */
 
@@ -1201,7 +1201,7 @@ function template_profile_avatar_select()
 									<div class="smalltext"><label for="userpicpersonal">', $txt['avatar_by_url'], '</label></div>
 									<input type="text" id="userpicpersonal" name="userpicpersonal" value="', $context['member']['avatar']['external'], '" onchange="previewExternalAvatar(this.value);" class="input_text" />
 									<br /><br />
-									<img id="external" src="', !empty($context['member']['avatar']['allow_external']) && $context['member']['avatar']['choice'] == 'external' ? $context['member']['avatar']['external'] : $modSettings['avatar_url'] . '/blank.png', '" alt="" ', !empty($modSettings['avatar_max_height_external']) ? 'height="' . $modSettings['avatar_max_height_external'] . '" ' : '', !empty($modSettings['avatar_max_width_external']) ? 'width="' . $modSettings['avatar_max_width_external'] . '"' : '', '/>
+									<img id="external" src="', !empty($context['member']['avatar']['allow_external']) && $context['member']['avatar']['choice'] == 'external' ? $context['member']['avatar']['external'] : $modSettings['avatar_url'] . '/blank.png', '" alt="" ', !empty($modSettings['avatar_max_height']) ? 'height="' . $modSettings['avatar_max_height'] . '" ' : '', !empty($modSettings['avatar_max_width']) ? 'width="' . $modSettings['avatar_max_width'] . '"' : '', '/>
 								</div>';
 	}
 
@@ -1235,8 +1235,8 @@ function template_profile_avatar_select()
 										selavatar = "' . $context['avatar_selected'] . '",
 										avatardir = "' . $modSettings['avatar_url'] . '/",
 										refuse_too_large = ', !empty($modSettings['avatar_action_too_large']) && $modSettings['avatar_action_too_large'] == 'option_refuse' ? 'true' : 'false', ',
-										maxHeight = ', !empty($modSettings['avatar_max_height_external']) ? $modSettings['avatar_max_height_external'] : 0, ',
-										maxWidth = ', !empty($modSettings['avatar_max_width_external']) ? $modSettings['avatar_max_width_external'] : 0, ';
+										maxHeight = ', !empty($modSettings['avatar_max_height']) ? $modSettings['avatar_max_height'] : 0, ',
+										maxWidth = ', !empty($modSettings['avatar_max_width']) ? $modSettings['avatar_max_width'] : 0, ';
 
 									// Display the right avatar box based on what they are using
 									init_avatars();

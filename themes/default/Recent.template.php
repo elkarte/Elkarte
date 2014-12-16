@@ -11,7 +11,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0
+ * @version 1.0.2
  *
  */
 
@@ -296,7 +296,7 @@ function template_replies()
 										', $topic['views'], ' ', $txt['views'], '
 									</p>
 									<p class="topic_lastpost">
-										<a class="topicicon img_last_post" href="', $topic['last_post']['href'], ' title="', $txt['last_post'], '"></a>
+										<a class="topicicon img_last_post" href="', $topic['last_post']['href'], '" title="', $txt['last_post'], '"></a>
 										', $topic['last_post']['html_time'], '<br />
 										', $txt['by'], ' ', $topic['last_post']['member']['link'], '
 									</p>

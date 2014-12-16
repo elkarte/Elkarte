@@ -7,7 +7,7 @@
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
- * @version 1.0
+ * @version 1.0.2
  *
  */
 
@@ -110,16 +110,13 @@ class ManageAvatars_Controller extends Action_Controller
 		$context['post_url'] = $scripturl . '?action=admin;area=manageattachments;save;sa=avatars';
 		Settings_Form::prepare_db($config_vars);
 
-		// Add a layer for the javascript.
-		Template_Layers::getInstance()->add('avatar_settings');
 		$context['sub_template'] = 'show_settings';
 	}
 
 	/**
 	 * This method retrieves and returns avatar settings.
 	 *
-	 * - It also returns avatar-related permissions profile_server_avatar,
-	 * profile_upload_avatar, profile_remote_avatar, profile_gvatar.
+	 * - It also returns the avatar-related permission profile_set_avatar.
 	 * - Initializes the avatarSettings form.
 	 */
 	private function _initAvatarSettingsForm()
@@ -150,28 +147,28 @@ class ManageAvatars_Controller extends Action_Controller
 		$config_vars = array(
 			array('title', 'avatar_settings'),
 				array('check', 'avatar_default'),
+				array('text', 'avatar_max_width', 'subtext' => $txt['zero_for_no_limit'], 6),
+				array('text', 'avatar_max_height', 'subtext' => $txt['zero_for_no_limit'], 6),
+				array('select', 'avatar_action_too_large',
+					array(
+						'option_refuse' => $txt['option_refuse'],
+						'option_resize' => $txt['option_resize'],
+						'option_download_and_resize' => $txt['option_download_and_resize'],
+					),
+				),
+				array('permissions', 'profile_set_avatar', 0, $txt['profile_set_avatar']),
 			// Server stored avatars!
 			array('title', 'avatar_server_stored'),
 				array('warning', empty($testImg) ? 'avatar_img_enc_warning' : ''),
-				array('permissions', 'profile_server_avatar', 0, $txt['avatar_server_stored_groups']),
+				array('check', 'avatar_stored_enabled'),
 				array('text', 'avatar_directory', 40, 'invalid' => !$context['valid_avatar_dir']),
 				array('text', 'avatar_url', 40),
 			// External avatars?
 			array('title', 'avatar_external'),
-				array('permissions', 'profile_remote_avatar', 0, $txt['avatar_external_url_groups']),
+				array('check', 'avatar_external_enabled'),
 				array('check', 'avatar_download_external', 0, 'onchange' => 'fUpdateStatus();'),
-				array('text', 'avatar_max_width_external', 'subtext' => $txt['zero_for_no_limit'], 6),
-				array('text', 'avatar_max_height_external', 'subtext' => $txt['zero_for_no_limit'], 6),
-				array('select', 'avatar_action_too_large',
-					array(
-						'option_refuse' => $txt['option_refuse'],
-						'option_html_resize' => $txt['option_html_resize'],
-						'option_js_resize' => $txt['option_js_resize'],
-						'option_download_and_resize' => $txt['option_download_and_resize'],
-					),
-				),
 			array('title','gravatar'),
-				array('permissions', 'profile_gvatar', 0, $txt['gravatar_groups']),
+				array('check', 'avatar_gravatar_enabled'),
 				array('select', 'gravatar_rating',
 					array(
 						'g' => 'g',
@@ -182,12 +179,9 @@ class ManageAvatars_Controller extends Action_Controller
 				),
 			// Uploadable avatars?
 			array('title', 'avatar_upload'),
-				array('permissions', 'profile_upload_avatar', 0, $txt['avatar_upload_groups']),
-				array('text', 'avatar_max_width_upload', 'subtext' => $txt['zero_for_no_limit'], 6),
-				array('text', 'avatar_max_height_upload', 'subtext' => $txt['zero_for_no_limit'], 6),
-				array('check', 'avatar_resize_upload', 'subtext' => $txt['avatar_resize_upload_note']),
+				array('check', 'avatar_upload_enabled'),
+			array('title', 'avatar_resize_options'),
 				array('check', 'avatar_reencode'),
-			'',
 				array('warning', 'avatar_paranoid_warning'),
 				array('check', 'avatar_paranoid'),
 			'',

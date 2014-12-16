@@ -7,7 +7,7 @@
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
- * @version 1.0
+ * @version 1.0.2
  *
  */
 
@@ -135,7 +135,7 @@ class Email_Format
 	 * @param string $real_name
 	 * @param string $charset
 	 */
-	public function reflow($data, $html = false, $real_name = '', $charset = 'UTF-8')
+	public function reflow($data, $html = false, $real_name = '', $charset = 'UTF-8', $bbc_br = true)
 	{
 		global $modSettings;
 
@@ -145,7 +145,7 @@ class Email_Format
 		$this->_maillist_sig_keys = empty($modSettings['maillist_sig_keys']) ? '' : $modSettings['maillist_sig_keys'];
 
 		$this->_real_name = $real_name;
-		$this->_prep_data($data);
+		$this->_prep_data($data, $bbc_br);
 		$this->_fix_body();
 		$this->_clean_up($charset);
 
@@ -160,9 +160,11 @@ class Email_Format
 	 *
 	 * @param string $data
 	 */
-	private function _prep_data($data)
+	private function _prep_data($data, $bbc_br)
 	{
 		// Un-wordwrap the email, create a line by line array broken on the newlines
+		if ($bbc_br === true)
+			$data = str_replace('[br]', "\n", $data);
 		$temp = explode("\n", $data);
 
 		// Remove any 'stuck' whitespace using the trim value function on all lines
@@ -295,7 +297,7 @@ class Email_Format
 
 		// Close any open quotes we may have left behind
 		for ($quotes = 1; $quotes <= $this->_in_quote; $quotes++)
-			$this->_body_array[$i + $quotes] = '[/quote]';
+			$this->_body_array[$i + $quotes]['content'] = '[/quote]';
 
 		// Join the message back together while dropping null index's
 		$temp = array();
@@ -398,6 +400,9 @@ class Email_Format
 			return true;
 		// The line is simply just their name
 		elseif (($this->_body_array[$i]['content'] === $this->_real_name) && !$this->_found_sig)
+			return true;
+		// check for universal sig dashes
+		elseif (!$this->_found_sig && preg_match('~^-- \n~m', $this->_body_array[$i]['content']))
 			return true;
 
 		return false;

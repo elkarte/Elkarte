@@ -11,11 +11,11 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:	BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0.1
+ * @version 1.0.2
  *
  */
 
-define('CURRENT_VERSION', '1.0.1');
+define('CURRENT_VERSION', '1.0.2');
 define('DB_SCRIPT_VERSION', '1-0');
 
 $GLOBALS['required_php_version'] = '5.2.0';
@@ -432,6 +432,7 @@ function action_checkFilesWritable()
 		'smileys',
 		'themes',
 		'agreement.txt',
+		'db_last_error.php',
 		'Settings.php',
 		'Settings_bak.php'
 	);

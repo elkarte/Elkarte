@@ -13,7 +13,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:		BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0.1
+ * @version 1.0.2
  *
  */
 
@@ -2826,21 +2826,36 @@ function loadDatabase()
  */
 function determineAvatar($profile)
 {
-	global $modSettings, $scripturl, $settings;
+	global $modSettings, $scripturl, $settings, $context;
+	static $added_once = false;
 
 	if (empty($profile))
 		return array();
 
-	// If we're always html resizing, assume it's too large.
-	if ($modSettings['avatar_action_too_large'] == 'option_html_resize' || $modSettings['avatar_action_too_large'] == 'option_js_resize')
+	// @todo compatibility setting for migration
+	if (!isset($modSettings['avatar_max_height']))
+		$modSettings['avatar_max_height'] = $modSettings['avatar_max_height_external'];
+	if (!isset($modSettings['avatar_max_width']))
+		$modSettings['avatar_max_width'] = $modSettings['avatar_max_width_external'];
+
+	// Since it's nice to have avatars all of the same size, and in some cases the size detection may fail,
+	// let's add the css in any case
+	if (!$added_once)
 	{
-		$max_avatar_width = !empty($modSettings['avatar_max_width_external']) ? ' max-width:' . $modSettings['avatar_max_width_external'] . 'px;' : '';
-		$max_avatar_height = !empty($modSettings['avatar_max_height_external']) ? ' max-height:' . $modSettings['avatar_max_height_external'] . 'px;' : '';
-	}
-	else
-	{
-		$max_avatar_width = '';
-		$max_avatar_height = '';
+		if (!isset($context['html_headers']))
+			$context['html_headers'] = '';
+
+		if (!empty($modSettings['avatar_max_width']) || !empty($modSettings['avatar_max_height']))
+		{
+			$context['html_headers'] .= '
+	<style>
+		.avatarresize {' . (!empty($modSettings['avatar_max_width']) ? '
+			max-width:' . $modSettings['avatar_max_width'] . 'px;' : '') . (!empty($modSettings['avatar_max_height']) ? '
+			max-height:' . $modSettings['avatar_max_height'] . 'px;' : '') . '
+		}
+	</style>';
+		}
+		$added_once = true;
 	}
 
 	$avatar_protocol = substr(strtolower($profile['avatar']), 0, 7);
@@ -2853,7 +2868,7 @@ function determineAvatar($profile)
 
 		$avatar = array(
 			'name' => $profile['avatar'],
-			'image' => '<img class="avatar" src="' . $avatar_url . '" alt="" />',
+			'image' => '<img class="avatar avatarresize" src="' . $avatar_url . '" alt="" />',
 			'href' => $avatar_url,
 			'url' => '',
 		);
@@ -2863,7 +2878,7 @@ function determineAvatar($profile)
 	{
 		$avatar = array(
 			'name' => $profile['avatar'],
-			'image' => '<img class="avatar" src="' . $profile['avatar'] . '" style="' . $max_avatar_width . $max_avatar_height . '" alt="" />',
+			'image' => '<img class="avatar avatarresize" src="' . $profile['avatar'] . '" alt="" />',
 			'href' => $profile['avatar'],
 			'url' => $profile['avatar'],
 		);
@@ -2872,11 +2887,11 @@ function determineAvatar($profile)
 	elseif (!empty($profile['avatar']) && $profile['avatar'] === 'gravatar')
 	{
 		// Gravatars URL.
-		$gravatar_url = '//www.gravatar.com/avatar/' . md5(strtolower($profile['email_address'])) . 'd=' . $modSettings['avatar_max_height_external'] . (!empty($modSettings['gravatar_rating']) ? ('&amp;r=' . $modSettings['gravatar_rating']) : '');
+		$gravatar_url = '//www.gravatar.com/avatar/' . md5(strtolower($profile['email_address'])) . 'd=' . $modSettings['avatar_max_height'] . (!empty($modSettings['gravatar_rating']) ? ('&amp;r=' . $modSettings['gravatar_rating']) : '');
 
 		$avatar = array(
 			'name' => $profile['avatar'],
-			'image' => '<img class="avatar" src="' . $gravatar_url . '" style="' . $max_avatar_width . $max_avatar_height . '" alt="" />',
+			'image' => '<img class="avatar avatarresize" src="' . $gravatar_url . '" alt="" />',
 			'href' => $gravatar_url,
 			'url' => $gravatar_url,
 		);
@@ -2886,7 +2901,7 @@ function determineAvatar($profile)
 	{
 		$avatar = array(
 			'name' => $profile['avatar'],
-			'image' => '<img class="avatar" src="' . $modSettings['avatar_url'] . '/' . $profile['avatar'] . '" style="' . $max_avatar_width . $max_avatar_height . '" alt="" />',
+			'image' => '<img class="avatar avatarresize" src="' . $modSettings['avatar_url'] . '/' . $profile['avatar'] . '" alt="" />',
 			'href' => $modSettings['avatar_url'] . '/' . $profile['avatar'],
 			'url' => $modSettings['avatar_url'] . '/' . $profile['avatar'],
 		);
@@ -2901,7 +2916,7 @@ function determineAvatar($profile)
 		// Let's proceed with the default avatar.
 		$avatar = array(
 			'name' => '',
-			'image' => '<img class="avatar" src="' . $settings['images_url'] . '/default_avatar.png" style="' . $max_avatar_width . $max_avatar_height . '" alt="" />',
+			'image' => '<img class="avatar avatarresize" src="' . $settings['images_url'] . '/default_avatar.png" alt="" />',
 			'href' => $settings['images_url'] . '/default_avatar.png',
 			'url' => 'http://',
 		);
@@ -2916,7 +2931,7 @@ function determineAvatar($profile)
 		);
 
 	// Make sure there's a preview for gravatars available.
-	$avatar['gravatar_preview'] = '//www.gravatar.com/avatar/' . md5(strtolower($profile['email_address'])) . 'd=' . $modSettings['avatar_max_height_external'] . (!empty($modSettings['gravatar_rating']) ? ('&amp;r=' . $modSettings['gravatar_rating']) : '');
+	$avatar['gravatar_preview'] = '//www.gravatar.com/avatar/' . md5(strtolower($profile['email_address'])) . 'd=' . $modSettings['avatar_max_height'] . (!empty($modSettings['gravatar_rating']) ? ('&amp;r=' . $modSettings['gravatar_rating']) : '');
 
 	return $avatar;
 }
@@ -2955,7 +2970,7 @@ function detectServer()
  */
 function doSecurityChecks()
 {
-	global $modSettings, $context, $maintenance, $user_info, $txt, $scripturl, $user_settings;
+	global $modSettings, $context, $maintenance, $user_info, $txt, $scripturl, $user_settings, $options;
 
 	$show_warnings = false;
 
@@ -3007,6 +3022,19 @@ function doSecurityChecks()
 		// Maintenance mode enabled?
 		if (!empty($maintenance))
 			$context['warning_controls']['maintenance'] = sprintf($txt['admin_maintenance_active'], ($scripturl . '?action=admin;area=serversettings;' . $context['session_var'] . '=' . $context['session_id']));
+
+		// New updates
+		if (defined('FORUM_VERSION'))
+		{
+			$index = 'new_in_' . str_replace(array('ElkArte ', '.'), array('', '_'), FORUM_VERSION);
+			if (!empty($modSettings[$index]) && empty($options['dismissed_' . $index]))
+			{
+				$context['new_version_updates'] = array(
+					'title' => $txt['new_version_updates'],
+					'errors' => array(replaceBasicActionUrl($txt['new_version_updates_text'])),
+				);
+			}
+		}
 	}
 
 	// Check for database errors.
@@ -3063,12 +3091,48 @@ function doSecurityChecks()
  */
 function detectServerLoad()
 {
-	$load_average = @file_get_contents('/proc/loadavg');
+	if (stristr(PHP_OS, 'win'))
+		return false;
 
-	if (!empty($load_average) && preg_match('~^([^ ]+?) ([^ ]+?) ([^ ]+)~', $load_average, $matches) != 0)
-		return (float) $matches[1];
-	elseif (($load_average = @`uptime`) != null && preg_match('~load average[s]?: (\d+\.\d+), (\d+\.\d+), (\d+\.\d+)~i', $load_average, $matches) != 0)
-		return (float) $matches[1];
+	$cores = detectServerCores();
 
-	return false;
+	// The internal function should always be available
+	if (function_exists('sys_getloadavg'))
+	{
+		$sys_load = sys_getloadavg();
+        return $sys_load[0] / $cores;
+	}
+	// Maybe someone has a custom compile
+	else
+	{
+		$load_average = @file_get_contents('/proc/loadavg');
+
+		if (!empty($load_average) && preg_match('~^([^ ]+?) ([^ ]+?) ([^ ]+)~', $load_average, $matches) != 0)
+			return (float) $matches[1] / $cores;
+		elseif (($load_average = @`uptime`) != null && preg_match('~load average[s]?: (\d+\.\d+), (\d+\.\d+), (\d+\.\d+)~i', $load_average, $matches) != 0)
+			return (float) $matches[1] / $cores;
+
+		return false;
+	}
+}
+
+/**
+ * Determines the number of cpu cores available
+ *
+ * - Used to normalize server load based on cores
+ *
+ * @return int
+ */
+function detectServerCores()
+{
+	$cores = @file_get_contents('/proc/cpuinfo');
+
+	if (!empty($cores))
+	{
+		$cores = preg_match_all('~^physical id~m', $cores, $matches);
+		if (!empty($cores))
+			return (int) $cores;
+	}
+
+	return 1;
 }
