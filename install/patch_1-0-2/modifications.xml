@@ -95,15 +95,15 @@ if (function_exists('set_magic_quotes_runtime'))
 	</file>
 	<file name="SOURCEDIR/CurlFetchWebdata.class.php">
 		<operation>
-			<search position="replace"><![CDATA[ * copyright:	2011 Simple Machines (http://www.simplemachines.org)
- * license:		BSD, See included LICENSE.TXT for terms and conditions.
+			<search position="replace"><![CDATA[ * @copyright ElkArte Forum contributors
+ * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
  * @version 1.0
  *
  */
 ]]></search>
-			<add><![CDATA[ * copyright:	2011 Simple Machines (http://www.simplemachines.org)
- * license:		BSD, See included LICENSE.TXT for terms and conditions.
+			<add><![CDATA[ * @copyright ElkArte Forum contributors
+ * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
  * @version 1.0.2
  *
@@ -1928,15 +1928,15 @@ function pbe_load_text(&$html, $email_message, $pbe)
 	</file>
 	<file name="SUBSDIR/Action.class.php">
 		<operation>
-			<search position="replace"><![CDATA[ * copyright:	2011 Simple Machines (http://www.simplemachines.org)
- * license:		BSD, See included LICENSE.TXT for terms and conditions.
+			<search position="replace"><![CDATA[ * @copyright ElkArte Forum contributors
+ * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
  * @version 1.0
  *
  */
 ]]></search>
-			<add><![CDATA[ * copyright:	2011 Simple Machines (http://www.simplemachines.org)
- * license:		BSD, See included LICENSE.TXT for terms and conditions.
+			<add><![CDATA[ * @copyright ElkArte Forum contributors
+ * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
  * @version 1.0.2
  *
@@ -2185,6 +2185,14 @@ function pbe_load_text(&$html, $email_message, $pbe)
  *
  */
 ]]></add>
+		</operation>
+		<operation>
+			<search position="replace"><![CDATA[	$tags = array(
+		'~\*\*(.*)\*\*~isUe' => '\'**\'.ltrim(\'$1\').\'**\'',
+		'~<\*>~i' => '&lt;*&gt;',]]></search>
+			<add><![CDATA[	$tags = array(
+		'~\*\*\s?(.*?)\*\*~is' => '**$1**',
+		'~<\*>~i' => '&lt;*&gt;',]]></add>
 		</operation>
 		<operation>
 			<search position="replace"><![CDATA[	// We are starting with HTML, our goal is to convert the best parts of it to BBC,
@@ -2904,6 +2912,42 @@ function recentlyLogged($action, $time = 60)
 
 	return !empty($present);
 }]]></add>
+		</operation>
+	</file>
+	<file name="SUBSDIR/News.subs.php">
+		<operation>
+			<search position="replace"><![CDATA[ * copyright:	2011 Simple Machines (http://www.simplemachines.org)
+ * license:  	BSD, See included LICENSE.TXT for terms and conditions.
+ *
+ * @version 1.0
+ *
+ */
+]]></search>
+			<add><![CDATA[ * copyright:	2011 Simple Machines (http://www.simplemachines.org)
+ * license:  	BSD, See included LICENSE.TXT for terms and conditions.
+ *
+ * @version 1.0.2
+ *
+ */
+]]></add>
+		</operation>
+		<operation>
+			<search position="replace"><![CDATA[		FROM {db_prefix}ban_items AS bi
+			INNER JOIN {db_prefix}ban_groups AS bg ON (bg.id_ban_group = bi.id_ban_group)
+		WHERE (bg.cannot_access = {int:cannot_access} OR bg.cannot_login = {int:cannot_login})
+			AND (COALESCE(bg.expire_time, 1=1) OR bg.expire_time > {int:current_time})
+			AND bi.email_address != {string:blank_string}',
+		array(
+			'cannot_access' => 1,
+]]></search>
+			<add><![CDATA[		FROM {db_prefix}ban_items AS bi
+			INNER JOIN {db_prefix}ban_groups AS bg ON (bg.id_ban_group = bi.id_ban_group)
+		WHERE (bg.cannot_access = {int:cannot_access} OR bg.cannot_login = {int:cannot_login})
+			AND (bg.expire_time IS NULL OR bg.expire_time > {int:current_time})
+			AND bi.email_address != {string:blank_string}',
+		array(
+			'cannot_access' => 1,
+]]></add>
 		</operation>
 	</file>
 	<file name="SUBSDIR/Notification.subs.php">
@@ -4581,6 +4625,30 @@ function template_maintenance()]]></add>
 	font-size: 1.1em;
 }]]></add>
 		</operation>
+		<operation>
+			<search position="replace"><![CDATA[.pagelinks .navPages:hover, .pagelinks .current_page {
+	background: #7bb128;
+	color: white;
+	border-radius: 8px;
+	text-decoration: none;
+}
+
+/* our buddies &laquo; &raquo; */
+.small_pagelinks:before {
+]]></search>
+			<add><![CDATA[.pagelinks .navPages:hover, .pagelinks .current_page {
+	background: #7bb128;
+	color: white;
+	text-decoration: none;
+}
+.pagelinks .navPages, .pagelinks .current_page {
+	border-radius: 8px;
+}
+
+/* our buddies &laquo; &raquo; */
+.small_pagelinks:before {
+]]></add>
+		</operation>
 	</file>
 	<file name="THEMEDIR/css/admin.css">
 		<operation>
@@ -4816,14 +4884,27 @@ select {
 	.avatar {
 		max-width: 7em;
 	}
-	.poster_avatar a {]]></search>
+	.poster_avatar a {
+		padding: 0;
+	}
+]]></search>
 			<add><![CDATA[	.postarea {
 		margin: 0 0 0 6em;
 	}
-	.avatar, .avatar.avatarresize {
-		max-width: 7em;
+	.poster .name {
+		padding: 0;
 	}
-	.poster_avatar a {]]></add>
+	.avatar, .avatar.avatarresize {
+		max-width: 80px;
+	}
+	.poster_avatar a {
+		padding: 0;
+	}
+	.poster .membergroup {
+		word-break: normal;
+		word-wrap: break-word;
+	}
+]]></add>
 		</operation>
 		<operation>
 			<search position="replace"><![CDATA[	#ic_recentposts, #ps_recentposts, #ps_recenttopics {
@@ -4947,14 +5028,14 @@ select {
 	<file name="THEMEDIR/index.template.php">
 		<operation>
 			<search position="replace"><![CDATA[ * copyright:	2011 Simple Machines (http://www.simplemachines.org)
- * license:		BSD, See included LICENSE.TXT for terms and conditions.
+ * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
  * @version 1.0.1
  *
  */
 ]]></search>
 			<add><![CDATA[ * copyright:	2011 Simple Machines (http://www.simplemachines.org)
- * license:		BSD, See included LICENSE.TXT for terms and conditions.
+ * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
  * @version 1.0.2
  *

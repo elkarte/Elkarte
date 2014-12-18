@@ -13,7 +13,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0
+ * @version 1.0.2
  *
  */
 
@@ -86,7 +86,7 @@ function excludeBannedMembers()
 		FROM {db_prefix}ban_items AS bi
 			INNER JOIN {db_prefix}ban_groups AS bg ON (bg.id_ban_group = bi.id_ban_group)
 		WHERE (bg.cannot_access = {int:cannot_access} OR bg.cannot_login = {int:cannot_login})
-			AND (COALESCE(bg.expire_time, 1=1) OR bg.expire_time > {int:current_time})
+			AND (bg.expire_time IS NULL OR bg.expire_time > {int:current_time})
 			AND bi.email_address != {string:blank_string}',
 		array(
 			'cannot_access' => 1,
