@@ -768,8 +768,10 @@ a.active {
 .pagelinks .navPages:hover, .pagelinks .current_page {
 	background: #7bb128;
 	color: white;
-	border-radius: 8px;
 	text-decoration: none;
+}
+.pagelinks .navPages, .pagelinks .current_page {
+	border-radius: 8px;
 }
 
 /* our buddies &laquo; &raquo; */
