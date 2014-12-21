@@ -24,13 +24,12 @@ if (!defined('ELK'))
  * - returns the contents of the file specified by destination, if it exists, or false.
  * - destination can start with * and / to signify that the file may come from any directory.
  * - destination should not begin with a / if single_file is true.
- *
  * - overwrites existing files with newer modification times if and only if overwrite is true.
  * - creates the destination directory if it doesn't exist, and is is specified.
  * - requires zlib support be built into PHP.
  * - returns an array of the files extracted on success
  */
-class Unzip
+class UnZip
 {
 	/**
 	 * Holds the return array of files processed
@@ -140,6 +139,13 @@ class Unzip
 		$this->overwrite = $overwrite;
 		$this->files_to_extract = $files_to_extract;
 
+		// This function sorta needs gzinflate!
+		if (!function_exists('gzinflate'))
+			fatal_lang_error('package_no_zlib', 'critical');
+
+		// Make sure we have this loaded.
+		loadLanguage('Packages');
+
 		// Likely to need this
 		require_once(SUBSDIR . '/Package.subs.php');
 
@@ -156,6 +162,10 @@ class Unzip
 	 */
 	public function read_zip_data()
 	{
+		// Make sure we have a zip file
+		if ($this->check_valid_zip() === false)
+			return false;
+
 		// The the overall zip information for this archive
 		$this->_read_endof_cdr();
 
@@ -184,27 +194,45 @@ class Unzip
 	}
 
 	/**
+	 * Does a quick check to see if this is a valid looking zip file
+	 *
+	 * @return boolean
+	 */
+	public function check_valid_zip()
+	{
+		// No signature?
+		if (strlen($this->data) < 10)
+			return false;
+
+		// Look for an end of central directory signature 0x06054b50
+		$check = explode("\x50\x4b\x05\x06", $this->data);
+		if (!isset($check[1]))
+			return false;
+
+		return true;
+	}
+
+	/**
 	 * Finds and reads the end of central directory record.
 	 *
 	 * What it does:
 	 *  - Read so we can find the actual central directory record for processing.
 	 *
-	 * end of central dir signature: 4 bytes, always(0x06054b50)
-	 * number of this disk: 2 bytes
-	 * number of the disk with the start of the central directory: 2 bytes
-	 * total number of entries in the central dir on this disk: 2 bytes
-	 * total number of entries in the central dir: 2 bytes
-	 * size of the central directory: 4 bytes
-	 * offset of start of central directory with respect to the starting disk number: 4 bytes
-	 * zipfile comment length: 2 bytes
-	 * zipfile comment (variable size)
+	 * Signature Definition:
+	 * - end of central dir signature: 4 bytes, always(0x06054b50)
+	 * - number of this disk: 2 bytes
+	 * - number of the disk with the start of the central directory: 2 bytes
+	 * - total number of entries in the central dir on this disk: 2 bytes
+	 * - total number of entries in the central dir: 2 bytes
+	 * - size of the central directory: 4 bytes
+	 * - offset of start of central directory with respect to the starting disk number: 4 bytes
+	 * - zipfile comment length: 2 bytes
+	 * - zipfile comment (variable size)
 	 */
 	private function _read_endof_cdr()
 	{
 		// Look for the end of central directory signature 0x06054b50
 		$data_ecdr = explode("\x50\x4b\x05\x06", $this->data);
-		if (!isset($data_ecdr[1]))
-			return false;
 
 		// Handle edge cases for files with duplicate ecdr strings
 		$data_ecdr = array_pop($data_ecdr);
@@ -222,23 +250,24 @@ class Unzip
 	 * - relative offset, used so we can find the actual data entry for each file in the archive
 	 * - validates the number of found files in the CDR matches what the ECDR record claims
 	 *
-	 * central file header signature: 4 bytes always(0x02014b50)
-	 * version made by: 2 bytes
-	 * version needed to extract: 2 bytes
-	 * general purpose bit flag: 2 bytes
-	 * compression method: 2 bytes
-	 * last mod file time: 2 bytes
-	 * last mod file date: 2 bytes
-	 * crc-32: 4 bytes
-	 * compressed size: 4 bytes
-	 * uncompressed size: 4 bytes
-	 * filename length: 2 bytes
-	 * extra field length: 2 bytes
-	 * file comment length: 2 bytes
-	 * disk number start: 2 bytes
-	 * internal file attributes: 2 bytes
-	 * external file attributes: 4 bytes
-	 * relative offset of local header: 4 bytes
+	 * Signature Definition:
+	 * - central file header signature: 4 bytes always(0x02014b50)
+	 * - version made by: 2 bytes
+	 * - version needed to extract: 2 bytes
+	 * - general purpose bit flag: 2 bytes
+	 * - compression method: 2 bytes
+	 * - last mod file time: 2 bytes
+	 * - last mod file date: 2 bytes
+	 * - crc-32: 4 bytes
+	 * - compressed size: 4 bytes
+	 * - uncompressed size: 4 bytes
+	 * - filename length: 2 bytes
+	 * - extra field length: 2 bytes
+	 * - file comment length: 2 bytes
+	 * - disk number start: 2 bytes
+	 * - internal file attributes: 2 bytes
+	 * - external file attributes: 4 bytes
+	 * - relative offset of local header: 4 bytes
 	 */
 	private function _load_file_headers()
 	{
@@ -325,7 +354,7 @@ class Unzip
 			}
 
 			// Not a directory, add it to our results
-			if (substr($this->_filename, -1, 1) !== '/')
+			if (substr($this->_filename, -1) !== '/')
 			{
 				$this->return[] = array(
 					'filename' => $this->_filename,
@@ -347,20 +376,20 @@ class Unzip
 	 * - Updates certain CDR fields based on the variable length data found
 	 * - Sets the compressed data in to the array for processing
 	 *
-	 * local file header signature: 4 bytes, always (0x04034b50)
-	 * version needed to extract: 2 bytes
-	 * general purpose bit flag: 2 bytes
-	 * compression method: 2 bytes
-	 * last mod file time: 2 bytes
-	 * last mod file date: 2 bytes
-	 * crc-32: 4 bytes
-	 * compressed size: 4 bytes
-	 * uncompressed size: 4 bytes
-	 * filename length: 2 bytes
-	 * extra field length: 2 bytes
-	 * filename (variable size)
-	 * extra field (variable size)
-	 *
+	 * Signature Definition:
+	 * - local file header signature: 4 bytes, always (0x04034b50)
+	 * - version needed to extract: 2 bytes
+	 * - general purpose bit flag: 2 bytes
+	 * - compression method: 2 bytes
+	 * - last mod file time: 2 bytes
+	 * - last mod file date: 2 bytes
+	 * - crc-32: 4 bytes
+	 * - compressed size: 4 bytes
+	 * - uncompressed size: 4 bytes
+	 * - filename length: 2 bytes
+	 * - extra field length: 2 bytes
+	 * - filename (variable size)
+	 * - extra field (variable size)
 	 */
 	private function _read_local_header()
 	{
@@ -402,7 +431,7 @@ class Unzip
 	 * Does the actual writing of the file
 	 *
 	 * - Writes the extracted file to disk or if we are extracting a single file
-	 * it returns the extracted data
+	 * - it returns the extracted data
 	 */
 	private function _write_this_file()
 	{
@@ -425,7 +454,11 @@ class Unzip
 			$this->_skip = true;
 
 		// Write it out then
-		if ($this->_check_crc() && $this->_skip === false && $this->_found === false)
+		if ($this->_skip === true)
+			return;
+		elseif (!empty($this->_found ))
+			$this->_check_crc();
+		elseif ($this->_skip === false && $this->_found === false && $this->_check_crc())
 			package_put_contents($this->destination . '/' . $this->_filename, $this->_file_info['data']);
 	}
 
