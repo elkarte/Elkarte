@@ -206,10 +206,8 @@ class UnZip
 
 		// Look for an end of central directory signature 0x06054b50
 		$check = explode("\x50\x4b\x05\x06", $this->data);
-		if (!isset($check[1]))
-			return false;
 
-		return true;
+		return isset($check[1]);
 	}
 
 	/**

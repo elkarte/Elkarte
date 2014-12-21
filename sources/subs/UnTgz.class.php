@@ -56,6 +56,18 @@ class UnTgz
 	protected $_crc_check = false;
 
 	/**
+	 * The currnt crc value of the data
+	 * @var string|int
+	 */
+	protected $_crc;
+
+	/**
+	 * The claimied size of the data in the tarball
+	 * @var int
+	 */
+	protected $_size;
+
+	/**
 	 * If we are going to write out the files processed
 	 * @var boolean
 	 */
@@ -75,7 +87,7 @@ class UnTgz
 
 	/**
 	 * Current file header we are working on
-	 * @var boolean
+	 * @var mixed[]|string
 	 */
 	protected $_header = array();
 
@@ -159,13 +171,8 @@ class UnTgz
 			return false;
 
 		// With the offset found, read and deflate the archive data
-		$this->_ungzip_data();
-
-		// Validate the CRC of the ungziped data
-		if (!$this->_check_crc())
-		{
+		if ($this->_ungzip_data() === false)
 			return false;
-		}
 
 		// With the archive data in hand, we need to un tarball it
 		$this->_process_files();
@@ -199,10 +206,7 @@ class UnTgz
 		$this->_header = unpack('H2a/H2b/Ct/Cf/Vmtime/Cxtra/Cos', substr($this->data, 0, 10));
 
 		// The IDentification number, gzip must be 1f8b
-		if (strtolower($this->_header['a'] . $this->_header['b']) !== '1f8b')
-			return false;
-
-		return true;
+		return !(strtolower($this->_header['a'] . $this->_header['b']) !== '1f8b');
 	}
 
 	/**
@@ -262,9 +266,9 @@ class UnTgz
 			$this->_offset++;
 		}
 
-		// "Read" the header CRC
+		// "Read" the header CRC $crc16 = unpack('vcrc16', substr($data, $this->_offset, 2));
 		if ($flags & 2)
-			$this->_offset += 2; // $crc16 = unpack('vcrc16', substr($data, $this->_offset, 2));
+			$this->_offset += 2;
 	}
 
 	/**
@@ -274,12 +278,16 @@ class UnTgz
 	public function _ungzip_data()
 	{
 		// Unpack the crc and original size, its the trailing 8 bytes
-		$temp = unpack('Vcrc32/Visize', substr($this->data, strlen($this->data) -8));
-		$this->crc = $temp['crc32'];
-		$this->size = $temp['isize'];
+		$check = unpack('Vcrc32/Visize', substr($this->data, strlen($this->data) - 8));
+		$this->_crc = $check['crc32'];
+		$this->_size = $check['isize'];
 
 		// Extract the data, in this case its the tarball
 		$this->data = @gzinflate(substr($this->data, $this->_offset, strlen($this->data) - 8 - $this->_offset));
+
+		// Check the crc and the data size
+		if (!$this->_check_crc() || (strlen($this->data) !== $check['isize']))
+			return false;
 	}
 
 	/**
@@ -370,10 +378,10 @@ class UnTgz
 		$octdec = array('mode', 'uid', 'gid', 'size', 'mtime', 'checksum', 'type');
 
 		// Each file object is preceded by a 512-byte header record on 512 boundaries
-		$this->header = substr($this->data, $this->_offset << 9, 512);
+		$this->_header = substr($this->data, $this->_offset << 9, 512);
 
 		// Unpack
-		$this->_current = unpack('a100filename/a8mode/a8uid/a8gid/a12size/a12mtime/a8checksum/a1type/a100linkname/a6magic/a2version/a32uname/a32gname/a8devmajor/a8devminor/a155path', $this->header);
+		$this->_current = unpack('a100filename/a8mode/a8uid/a8gid/a12size/a12mtime/a8checksum/a1type/a100linkname/a6magic/a2version/a32uname/a32gname/a8devmajor/a8devminor/a155path', $this->_header);
 
 		// Clean the header fields, convert octal to decimal as needed
 		foreach ($this->_current as $key => $value)
@@ -445,11 +453,11 @@ class UnTgz
 	 */
 	private function _check_crc()
 	{
-		// Make sure we have unsined crc padded hex.
+		// Make sure we have unsigned crc padded hex.
 		$crc_uncompressed = hash('crc32b', $this->data);
-		$this->crc = str_pad(dechex($this->crc), 8, '0', STR_PAD_LEFT);
+		$this->_crc = str_pad(dechex($this->_crc), 8, '0', STR_PAD_LEFT);
 
-		return !($this->data === false || ($this->crc !== $crc_uncompressed));
+		return !($this->data === false || ($this->_crc !== $crc_uncompressed));
 	}
 
 	/**
@@ -457,15 +465,15 @@ class UnTgz
 	 */
 	private function _check_header_crc()
 	{
-		$this->crc = 256;
+		$this->_crc = 256;
 
 		// Build the checksum for this header and make sure it matches what it claims
 		for ($i = 0; $i < 148; $i++)
-			$this->crc += ord($this->header[$i]);
+			$this->_crc += ord($this->_header[$i]);
 		for ($i = 156; $i < 512; $i++)
-			$this->crc += ord($this->header[$i]);
+			$this->_crc += ord($this->_header[$i]);
 
-		$this->_crc_check = $this->_current['checksum'] === $this->crc;
+		$this->_crc_check = $this->_current['checksum'] === $this->_crc;
 
 		return $this->_crc_check;
 	}
