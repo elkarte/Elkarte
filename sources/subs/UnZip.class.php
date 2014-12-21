@@ -338,6 +338,8 @@ class UnZip
 				elseif ($this->_file_info['compress_method'] == 12 && function_exists('bzdecompress'))
 					$this->_file_info['data'] = bzdecompress($this->_file_info['compress_data']);
 			}
+			else
+				$this->_file_info['data'] = $this->_file_info['compress_data'];
 
 			// Okay!  We can write this file, looks good from here...
 			if ($this->_write_this && $this->destination !== null)
