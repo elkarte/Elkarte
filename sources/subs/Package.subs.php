@@ -35,7 +35,7 @@ if (!defined('ELK'))
 function read_tgz_file($gzfilename, $destination, $single_file = false, $overwrite = false, $files_to_extract = null)
 {
 	// From a web site
-	if (substr($gzfilename, 0, 7) == 'http://' || substr($gzfilename, 0, 8) == 'https://')
+	if (substr($gzfilename, 0, 7) === 'http://' || substr($gzfilename, 0, 8) === 'https://')
 	{
 		$data = fetch_web_data($gzfilename);
 
@@ -83,182 +83,17 @@ function read_tgz_file($gzfilename, $destination, $single_file = false, $overwri
  */
 function read_tgz_data($data, $destination, $single_file = false, $overwrite = false, $files_to_extract = null)
 {
-	// Make sure we have this loaded.
-	loadLanguage('Packages');
+	require_once(SUBSDIR . '/UnTgz.class.php');
+	$untgz = new UnTgz($data, $destination, $single_file, $overwrite, $files_to_extract);
 
-	// This function sorta needs gzinflate!
-	if (!function_exists('gzinflate'))
-		fatal_lang_error('package_no_zlib', 'critical');
-
-	umask(0);
-	if (!$single_file && $destination !== null && !file_exists($destination))
-		mktree($destination, 0777);
-
-	// No signature?
-	if (strlen($data) < 10)
-		return false;
-
-	// Unpack the signature so we can see what we have
-	$header = unpack('H2a/H2b/Ct/Cf/Vmtime/Cxtra/Cos', substr($data, 0, 10));
-	$header['filename'] = '';
-	$header['comment'] = '';
-
-	// The IDentification number, gzip must be 1f8b
-	if (strtolower($header['a'] . $header['b']) != '1f8b')
-	{
-		// Okay, this is not a tar.gz, but maybe it's a zip file.
-		if (substr($data, 0, 2) === 'PK')
-			return read_zip_data($data, $destination, $single_file, $overwrite, $files_to_extract);
-		else
-			return false;
-	}
-
-	// Compression method needs to be 8 = deflate!
-	if ($header['t'] != 8)
-		return false;
-
-	// Each bit of this byte represents a processing flag as follows
-	// 0 fTEXT, 1 fHCRC, 2 fEXTRA, 3 fNAME, 4 fCOMMENT, 5 fENCRYPT, 6-7 reserved
-	$flags = $header['f'];
-
-	// Start to read any data defined by the flags
-	$offset = 10;
-
-	// fEXTRA flag set we simply skip over its entry and the length of its data
-	if ($flags & 4)
-	{
-		$xlen = unpack('vxlen', substr($data, $offset, 2));
-		$offset += $xlen['xlen'] + 2;
-	}
-
-	// Read the filename, its zero terminated
-	if ($flags & 8)
-	{
-		while ($data[$offset] != "\0")
-			$header['filename'] .= $data[$offset++];
-		$offset++;
-	}
-
-	// Read the comment, its also zero terminated
-	if ($flags & 16)
-	{
-		while ($data[$offset] != "\0")
-			$header['comment'] .= $data[$offset++];
-		$offset++;
-	}
-
-	// "Read" the header CRC
-	if ($flags & 2)
-		$offset += 2; // $crc16 = unpack('vcrc16', substr($data, $offset, 2));
-
-	// We have now arrived at the start of the compressed data,
-	// Its terminated with 4 bytes of CRC and 4 bytes of the original input size
-	$crc = unpack('Vcrc32/Visize', substr($data, strlen($data) - 8, 8));
-	$data = @gzinflate(substr($data, $offset, strlen($data) - 8 - $offset));
-
-	// crc32_compat and crc32 may not return the same results, so we accept either.
-	if ($data === false || ($crc['crc32'] != crc32_compat($data) && $crc['crc32'] != crc32($data)))
-		return false;
-
-	$octdec = array('mode', 'uid', 'gid', 'size', 'mtime', 'checksum', 'type');
-	$blocks = strlen($data) / 512 - 1;
-	$offset = 0;
-	$return = array();
-
-	// We have Un-gziped the data, now lets extract the tar files
-	while ($offset < $blocks)
-	{
-		$header = substr($data, $offset << 9, 512);
-		$current = unpack('a100filename/a8mode/a8uid/a8gid/a12size/a12mtime/a8checksum/a1type/a100linkname/a6magic/a2version/a32uname/a32gname/a8devmajor/a8devminor/a155path', $header);
-
-		// Clean the header fields, convert octal ones to decimal
-		foreach ($current as $k => $v)
-		{
-			if (in_array($k, $octdec))
-				$current[$k] = octdec(trim($v));
-			else
-				$current[$k] = trim($v);
-		}
-
-		// Blank record?  This is probably at the end of the file.
-		if (empty($current['filename']))
-		{
-			$offset += 512;
-			continue;
-		}
-
-		// If its a directory, lets make sure it ends in a /
-		if ($current['type'] == 5 && substr($current['filename'], -1) != '/')
-			$current['filename'] .= '/';
-
-		// Build the checksum for this file and make sure it matches
-		$checksum = 256;
-		for ($i = 0; $i < 148; $i++)
-			$checksum += ord($header[$i]);
-		for ($i = 156; $i < 512; $i++)
-			$checksum += ord($header[$i]);
-
-		if ($current['checksum'] != $checksum)
-			break;
-
-		$size = ceil($current['size'] / 512);
-		$current['data'] = substr($data, ++$offset << 9, $current['size']);
-		$offset += $size;
-
-		// Not a directory and doesn't exist already...
-		if (substr($current['filename'], -1, 1) != '/' && !file_exists($destination . '/' . $current['filename']))
-			$write_this = true;
-		// File exists... check if it is newer.
-		elseif (substr($current['filename'], -1, 1) != '/')
-			$write_this = $overwrite || filemtime($destination . '/' . $current['filename']) < $current['mtime'];
-		// Folder... create.
-		elseif ($destination !== null && !$single_file)
-		{
-			// Protect from accidental parent directory writing...
-			$current['filename'] = strtr($current['filename'], array('../' => '', '/..' => ''));
-
-			if (!file_exists($destination . '/' . $current['filename']))
-				mktree($destination . '/' . $current['filename'], 0777);
-			$write_this = false;
-		}
-		else
-			$write_this = false;
-
-		if ($write_this && $destination !== null)
-		{
-			if (strpos($current['filename'], '/') !== false && !$single_file)
-				mktree($destination . '/' . dirname($current['filename']), 0777);
-
-			// Is this the file we're looking for?
-			if ($single_file && ($destination == $current['filename'] || $destination == '*/' . basename($current['filename'])))
-				return $current['data'];
-			// If we're looking for another file, keep going.
-			elseif ($single_file)
-				continue;
-			// Looking for restricted files?
-			elseif ($files_to_extract !== null && !in_array($current['filename'], $files_to_extract))
-				continue;
-
-			package_put_contents($destination . '/' . $current['filename'], $current['data']);
-		}
-
-		if (substr($current['filename'], -1, 1) != '/')
-			$return[] = array(
-				'filename' => $current['filename'],
-				'md5' => md5($current['data']),
-				'preview' => substr($current['data'], 0, 100),
-				'size' => $current['size'],
-				'skipped' => false
-			);
-	}
-
-	if ($destination !== null && !$single_file)
-		package_flush_cache();
-
-	if ($single_file)
-		return false;
+	// Choose the right method for the file
+	if ($untgz->check_valid_tgz())
+		return $untgz->read_tgz_data();
 	else
-		return $return;
+	{
+		unset($untgz);
+		return read_zip_data($data, $destination, $single_file, $overwrite, $files_to_extract);
+	}
 }
 
 /**
