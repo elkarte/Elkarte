@@ -3029,6 +3029,7 @@ function doSecurityChecks()
 			$index = 'new_in_' . str_replace(array('ElkArte ', '.'), array('', '_'), FORUM_VERSION);
 			if (!empty($modSettings[$index]) && empty($options['dismissed_' . $index]))
 			{
+				$show_warnings = true;
 				$context['new_version_updates'] = array(
 					'title' => $txt['new_version_updates'],
 					'errors' => array(replaceBasicActionUrl($txt['new_version_updates_text'])),
