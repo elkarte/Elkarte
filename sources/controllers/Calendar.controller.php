@@ -306,27 +306,12 @@ class Calendar_Controller extends Action_Controller
 	 */
 	protected function _returnToPost()
 	{
-		$this->_loadModules('post');
-		$event_manager = new Event_Manager('post');
-		$event_manager->registerAddons('.+_Post_Addon');
-		$event_manager->registerAddons('.+_Post_Module');
+		$loader = new Controller_Loader('post');
+		$loader->initDispatch();
 
-		$controller = new Post_Controller();
-		$controller->setEventManager($event_manager);
+		$controller = $loader->getController();
 
-		$controller->pre_dispatch();
 		return $controller->action_post();
-	}
-
-	/**
-	 * Shortcut to require the files of the modules for a certain controller.
-	 *
-	 * @param string $hook The name of the controller
-	 */
-	protected function _loadModules($hook)
-	{
-		foreach (glob(SUBSDIR . '/' . ucfirst($hook) . '*Module.class.php') as $require_file)
-			require_once($require_file);
 	}
 
 	/**

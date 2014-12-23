@@ -294,12 +294,17 @@ class Site_Dispatcher
 			$hook = strtolower(str_replace('_Controller', '', $this->_controller_name));
 			$hook = substr($hook, -1) == 2 ? substr($hook, 0, -1) : $hook;
 
-			$controller = new $this->_controller_name();
+			require_once(SOURCEDIR . '/ControllerLoader.class.php');
+			$loader = new Controller_Loader(str_replace('_Controller', '', $this->_controller_name));
 
 			// 3, 2, ... and go
-			if ($this->_validateMethod($controller))
+			if ($loader->methodExists($this->_function_name))
 			{
-				$callable = array($controller, $this->_function_name);
+				$callable = array($loader->getController(), $this->_function_name);
+			}
+			elseif ($loader->methodExists('action_index'))
+			{
+				$callable = array($loader->getController(), 'action_index');
 			}
 			// Fall back
 			// @todo remove?
@@ -307,26 +312,20 @@ class Site_Dispatcher
 			{
 				$callable = $this->_function_name;
 			}
+			// This should never happen
 			else
 			{
 				// Things went pretty bad, huh?
 				// board index :P
-				$hook = 'boardindex';
+				$this->_controller_name = 'BoardIndex';
+				$this->_function_name = 'action_index';
 
-				$controller = new BoardIndex_Controller();
-				$callable = array($controller, 'action_boardindex');
+				return $this->dispatch();
 			}
 
-			$this->_loadAddons($hook);
-			$this->_loadModules($hook);
-			$event_manager = new Event_Manager($hook);
-			$event_manager->registerAddons('.+_' . ucfirst($hook). '_Addon');
-			$event_manager->registerAddons('.+_' . ucfirst($hook) . '_Module');
-			$controller->setEventManager($event_manager);
+			$this->_loadAddons();
 
-			// Pre-dispatch (load templates and stuff)
-			if (method_exists($controller, 'pre_dispatch'))
-				$controller->pre_dispatch();
+			$loader->initDispatch();
 
 			call_integration_hook('integrate_action_' . $hook . '_before', array($this->_function_name));
 
@@ -344,24 +343,6 @@ class Site_Dispatcher
 			// It must be a good ole' function
 			call_user_func($this->_function_name);
 		}
-	}
-
-	protected function _validateMethod($controller)
-	{
-		if (method_exists($controller, $this->_function_name))
-			return true;
-		elseif (method_exists($controller, 'action_index'))
-		{
-			$this->_function_name = 'action_index';
-			return true;
-		}
-		else
-			return false;
-	}
-
-	protected function _loadModules($hook)
-	{
-		$this->_requireFiles(SUBSDIR . '/*' . ucfirst($hook) . 'Module.class.php');
 	}
 
 	protected function _loadAddons()

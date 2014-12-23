@@ -69,29 +69,9 @@ class Controller_Redirect_Exception extends Exception
 	 */
 	protected function _loadController()
 	{
-		$this->_loadModules($this->_controller);
-		$event_manager = new Event_Manager($this->_controller);
-		$event_manager->registerAddons('.+_' . ucfirst($this->_controller) . '_Addon');
-		$event_manager->registerAddons('.+_' . ucfirst($this->_controller) . '_Module');
+		$loader = new Controller_Loader($this->_controller);
+		$loader->initDispatch();
 
-		$controller_name = ucfirst($this->_controller) . '_Controller';
-		$controller = new $controller_name();
-		$controller->setEventManager($event_manager);
-
-		if (method_exists($controller, 'pre_dispatch'))
-			$controller->pre_dispatch();
-
-		return $controller;
-	}
-
-	/**
-	 * Shortcut to require the files of the modules for a certain controller.
-	 *
-	 * @param string $hook The name of the controller
-	 */
-	protected function _loadModules($hook)
-	{
-		foreach (glob(SUBSDIR . '/' . ucfirst($hook) . '*Module.class.php') as $require_file)
-			require_once($require_file);
+		return $loader->getController();
 	}
 }
