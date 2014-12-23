@@ -652,15 +652,6 @@ class Display_Controller extends Action_Controller
 
 		$context['can_follow_up'] = !empty($modSettings['enableFollowup']) && boardsallowedto('post_new') !== array();
 
-		// Check if the draft functions are enabled and that they have permission to use them (for quick reply.)
-		$context['drafts_save'] = !empty($modSettings['drafts_enabled']) && !empty($modSettings['drafts_post_enabled']) && allowedTo('post_draft') && $context['can_reply'];
-		$context['drafts_autosave'] = !empty($context['drafts_save']) && !empty($modSettings['drafts_autosave_enabled']) && allowedTo('post_autosave_draft');
-		if (!empty($context['drafts_save']))
-			loadLanguage('Drafts');
-
-		if (!empty($context['drafts_autosave']) && empty($options['use_editor_quick_reply']))
-			loadJavascriptFile('drafts.js');
-
 		if (!empty($modSettings['mentions_enabled']))
 		{
 			$context['mentions_enabled'] = true;
@@ -718,6 +709,10 @@ class Display_Controller extends Action_Controller
 				create_control_richedit($editorOptions);
 			}
 		}
+		else
+			$editorOptions = array();
+
+		$this->_events->trigger('prepare_context', array('editorOptions' => &$editorOptions));
 
 		addJavascriptVar(array('notification_topic_notice' => $context['is_marked_notify'] ? $txt['notification_disable_topic'] : $txt['notification_enable_topic']), true);
 		if ($context['can_send_topic'])

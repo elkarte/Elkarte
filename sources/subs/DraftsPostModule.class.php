@@ -22,13 +22,24 @@ if (!defined('ELK'))
 
 class Drafts_Post_Module
 {
+	protected static $_autosave_enabled = false;
+	protected static $_autosave_frequency = 30000;
+	protected static $_subject_length = 24;
 
 	public static function hooks()
 	{
 		global $modSettings;
 
-		if (!empty($modSettings['drafts_enabled']))
+		if (!empty($modSettings['drafts_enabled']) && !empty($modSettings['drafts_post_enabled']))
 		{
+			self::$_autosave_enabled = !empty($modSettings['drafts_autosave_enabled']);
+
+			if (!empty($modSettings['drafts_autosave_frequency']))
+				self::$_autosave_frequency = $modSettings['drafts_autosave_frequency'] * 1000;
+
+			if (!empty($modSettings['draft_subject_length']))
+				self::$_subject_length = $modSettings['draft_subject_length'];
+
 			return array(
 				array('prepare_modifying', array('Drafts_Post_Module', 'prepare_modifying'), array('really_previewing')),
 				array('finalize_post_form', array('Drafts_Post_Module', 'finalize_post_form'), array('editorOptions', 'board', 'topic', 'template_layers')),
@@ -49,11 +60,11 @@ class Drafts_Post_Module
 
 	public function finalize_post_form(&$editorOptions, $board, $topic, $template_layers)
 	{
-		global $context, $user_info, $modSettings, $options;
+		global $context, $user_info, $options;
 
 		// Are post drafts enabled?
-		$context['drafts_save'] = !empty($modSettings['drafts_post_enabled']) && allowedTo('post_draft');
-		$context['drafts_autosave'] = !empty($context['drafts_save']) && !empty($modSettings['drafts_autosave_enabled']) && allowedTo('post_autosave_draft');
+		$context['drafts_save'] = allowedTo('post_draft');
+		$context['drafts_autosave'] = $context['drafts_save'] && self::$_autosave_enabled && allowedTo('post_autosave_draft');
 
 		// Build a list of drafts that they can load into the editor
 		if (!empty($context['drafts_save']))
@@ -66,7 +77,8 @@ class Drafts_Post_Module
 				if (!isset($editorOptions['plugin_options']))
 					$editorOptions['plugin_options'] = array();
 
-				$context['drafts_autosave_frequency'] = empty($modSettings['drafts_autosave_frequency']) ? 30000 : $modSettings['drafts_autosave_frequency'] * 1000;
+				// @todo remove
+				$context['drafts_autosave_frequency'] = self::$_autosave_frequency;
 
 				$editorOptions['plugin_addons'][] = 'draft';
 				$editorOptions['plugin_options'][] = '
@@ -75,8 +87,10 @@ class Drafts_Post_Module
 						sSceditorID: \'' . $editorOptions['id'] . '\',
 						sType: \'post\',
 						iBoard: ' . (empty($board) ? 0 : $board) . ',
-						iFreq: ' . $context['drafts_autosave_frequency'] . ',' . (!empty($context['drafts_save']) ?
-						'sLastID: \'id_draft\'' : 'sLastID: \'id_pm_draft\', bPM: true') . '
+						iFreq: ' . self::$_autosave_frequency . ',
+						sLastID: \'id_draft\',
+						sTextareaID: \'' . $editorOptions['id'] . '\',
+						id_draft: ' . (empty($context['id_draft']) ? 0 : $context['id_draft']) . '
 					}';
 
 				loadJavascriptFile('drafts.plugin.js', array('defer' => true));
@@ -127,7 +141,7 @@ class Drafts_Post_Module
 	 */
 	private function _prepareDraftsContext($member_id, $id_topic = false)
 	{
-		global $scripturl, $context, $txt, $modSettings;
+		global $scripturl, $context, $txt;
 
 		$context['drafts'] = array();
 
@@ -150,7 +164,7 @@ class Drafts_Post_Module
 		// Add them to the context draft array for template display
 		foreach ($user_drafts as $draft)
 		{
-			$short_subject = empty($draft['subject']) ? $txt['drafts_none'] : Util::shorten_text(stripslashes($draft['subject']), !empty($modSettings['draft_subject_length']) ? $modSettings['draft_subject_length'] : 24);
+			$short_subject = empty($draft['subject']) ? $txt['drafts_none'] : Util::shorten_text(stripslashes($draft['subject']), self::$_subject_length);
 			$context['drafts'][] = array(
 				'subject' => censorText($short_subject),
 				'poster_time' => standardTime($draft['poster_time']),
