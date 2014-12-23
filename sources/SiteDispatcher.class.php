@@ -323,8 +323,6 @@ class Site_Dispatcher
 				return $this->dispatch();
 			}
 
-			$this->_loadAddons();
-
 			$loader->initDispatch();
 
 			call_integration_hook('integrate_action_' . $hook . '_before', array($this->_function_name));
@@ -343,17 +341,6 @@ class Site_Dispatcher
 			// It must be a good ole' function
 			call_user_func($this->_function_name);
 		}
-	}
-
-	protected function _loadAddons()
-	{
-		$this->_requireFiles(BOARDDIR . '/packages/integration/*/*.integrate.php');
-	}
-
-	protected function _requireFiles($pattern)
-	{
-		foreach (glob($pattern) as $require_file)
-			require_once($require_file);
 	}
 
 	/**

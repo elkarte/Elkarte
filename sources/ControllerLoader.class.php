@@ -92,6 +92,8 @@ class Controller_Loader
 		$event_manager = new Event_Manager($controller);
 		$event_manager->registerAddons('.+_' . ucfirst($controller) . '_Addon');
 		$event_manager->registerAddons('.+_' . ucfirst($controller) . '_Module');
+
+		return $event_manager;
 	}
 
 	/**

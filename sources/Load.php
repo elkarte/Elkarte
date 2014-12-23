@@ -125,9 +125,19 @@ function reloadSettings()
 
 	// Any files to pre include?
 	call_integration_include_hook('integrate_pre_include');
+	autoLoadAddons();
 
 	// Call pre load integration functions.
 	call_integration_hook('integrate_pre_load');
+}
+
+/**
+ * Automatically loads all the integrate files found.
+ */
+function autoLoadAddons()
+{
+	foreach (glob(BOARDDIR . '/packages/integration/*/*.integrate.php') as $require_file)
+		require_once($require_file);
 }
 
 /**
