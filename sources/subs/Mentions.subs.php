@@ -39,14 +39,14 @@ function countUserMentions($all = false, $type = '', $id_member = null)
 		FROM {db_prefix}log_mentions as mtn
 		WHERE mtn.id_member = {int:current_user}
 			AND mtn.status IN ({array_int:status})' . (empty($type) ? '' : (is_array($type) ? '
-			AND mtn.accessible = {int:accessible}
+			AND mtn.is_accessible = {int:is_accessible}
 			AND mtn.mention_type IN ({array_string:current_type})' : '
 			AND mtn.mention_type = {string:current_type}')),
 		array(
 			'current_user' => $id_member,
 			'current_type' => $type,
 			'status' => $all ? array(0, 1) : array(0),
-			'accessible' => 1,
+			'is_accessible' => 1,
 		)
 	);
 	list ($counts[$id_member]) = $db->fetch_row($request);
@@ -91,7 +91,7 @@ function getUserMentions($start, $limit, $sort, $all = false, $type = '')
 			LEFT JOIN {db_prefix}attachments AS a ON (a.id_member = mem.id_member)
 		WHERE mtn.id_member = {int:current_user}
 			AND mtn.status IN ({array_int:status})' . (empty($type) ? '' : (is_array($type) ? '
-			AND mtn.accessible = {int:accessible}
+			AND mtn.is_accessible = {int:is_accessible}
 			AND mtn.mention_type IN ({array_string:current_type})' : '
 			AND mtn.mention_type = {string:current_type}')) . '
 		ORDER BY {raw:sort}
@@ -100,7 +100,7 @@ function getUserMentions($start, $limit, $sort, $all = false, $type = '')
 			'current_user' => $user_info['id'],
 			'current_type' => $type,
 			'status' => $all ? array(0, 1) : array(0),
-			'accessible' => 1,
+			'is_accessible' => 1,
 			'start' => $start,
 			'limit' => $limit,
 			'sort' => $sort,
@@ -321,7 +321,7 @@ function toggleMentionsVisibility($type, $enable)
 			status = status ' . ($enable ? '-' : '+') . ' {int:toggle}
 		WHERE mention_type = {string:type}
 			AND status ' . ($enable ? '>=' : '<') . ' {int:toggle}
-			AND accessible = 1',
+			AND is_accessible = 1',
 		array(
 			'type' => $type,
 			'toggle' => 10,
@@ -334,7 +334,7 @@ function toggleMentionsVisibility($type, $enable)
 			status = status ' . ($enable ? '-' : '+') . ' {int:toggle}
 		WHERE mention_type = {string:type}
 			AND status ' . ($enable ? '>=' : '<') . ' {int:toggle}
-			AND accessible = 0',
+			AND is_accessible = 0',
 		array(
 			'type' => $type,
 			'toggle' => -10,
@@ -356,11 +356,10 @@ function toggleMentionsAccessibility($mentions, $access)
 	$db->query('', '
 		UPDATE {db_prefix}log_mentions
 		SET
-			accessible = CASE WHEN accessible = 1 THEN 0 ELSE 1 END
+			is_accessible = CASE WHEN is_accessible = 1 THEN 0 ELSE 1 END
 		WHERE id_mention IN ({array_int:mentions})
-			AND accessible ' . ($access ? '<' : '>=') . ' 0',
+			AND is_accessible ' . ($access ? '<' : '>=') . ' 0',
 		array(
-			'accessible' => $mentions,
 			'mentions' => $mentions,
 		)
 	);

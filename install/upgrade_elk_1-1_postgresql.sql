@@ -63,7 +63,7 @@ $db_table->db_add_column('{db_prefix}members',
 ---{
 $db_table->db_add_column('{db_prefix}log_mentions',
 	array(
-		'name' => 'accessible',
+		'name' => 'is_accessible',
 		'type' => 'tinyint',
 		'size' => 1,
 		'default' => 0
@@ -81,7 +81,7 @@ $db_table->db_change_column('{db_prefix}log_mentions',
 
 $db->query('', '
 	UPDATE {db_prefix}log_mentions
-	SET accessible = CASE WHEN status < 0 THEN 0 ELSE 1 END',
+	SET is_accessible = CASE WHEN status < 0 THEN 0 ELSE 1 END',
 	array()
 );
 
