@@ -144,18 +144,6 @@ class CoreFeatures_Controller extends Action_Controller
 						return array();
 				},
 			),
-			// dr = drafts
-			'dr' => array(
-				'url' => 'action=admin;area=managedrafts',
-				'settings' => array(
-					'drafts_enabled' => 1,
-					'drafts_post_enabled' => 2,
-					'drafts_pm_enabled' => 2,
-					'drafts_autosave_enabled' => 2,
-					'drafts_show_saved_enabled' => 2,
-				),
-				'setting_callback' => 'drafts_toggle_callback',
-			),
 			// ih = Integration Hooks Handling.
 			'ih' => array(
 				'url' => 'action=admin;area=maintain;sa=hooks',
@@ -286,10 +274,29 @@ class CoreFeatures_Controller extends Action_Controller
 			),
 		);
 
+		$this->_getModulesConfig($core_features);
+
 		// Anyone who would like to add a core feature?
 		call_integration_hook('integrate_core_features', array(&$core_features));
 
 		return $core_features;
+	}
+
+	/**
+	 * Searches the ADMINDIR looking for module managers and load the "Core Feature"
+	 * if existing.
+	 *
+	 * @param mixed[] $core_features The core features array
+	 */
+	protected function _getModulesConfig(&$core_features)
+	{
+		foreach (glob(ADMINDIR . '/Manage*Module.controller.php') as $file)
+		{
+			$class = basename($file, '.controller.php') . '_Controller';
+
+			if (method_exists($class, 'addCoreFeature'))
+				$class::addCoreFeature($core_features);
+		}
 	}
 
 	/**

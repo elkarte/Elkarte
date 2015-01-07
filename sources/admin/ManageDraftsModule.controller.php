@@ -19,13 +19,65 @@ if (!defined('ELK'))
  *
  * @package Drafts
  */
-class ManageDrafts_Controller extends Action_Controller
+class ManageDraftsModule_Controller extends Action_Controller
 {
 	/**
 	 * Drafts settings form
 	 * @var Settings_Form
 	 */
 	protected $_draftSettings;
+
+	/**
+	 * Used to add the Drafts entry to the Core Features list.
+	 *
+	 * @param mixed[] $core_features The core features array
+	 */
+	public static function addCoreFeature(&$core_features)
+	{
+		$core_features['dr'] = array(
+			'url' => 'action=admin;area=managedrafts',
+			'settings' => array(
+				'drafts_enabled' => 1,
+				'drafts_post_enabled' => 2,
+				'drafts_pm_enabled' => 2,
+				'drafts_autosave_enabled' => 2,
+				'drafts_show_saved_enabled' => 2,
+			),
+			'setting_callback' => 'drafts_toggle_callback',
+		);
+	}
+
+	/**
+	 * Used to add the Drafts entry to the admin menu.
+	 *
+	 * @param mixed[] $admin_areas The admin menu array
+	 */
+	public static function addAdminMenu(&$admin_areas)
+	{
+		global $txt, $context;
+
+		$admin_areas['layout']['areas']['managedrafts'] = array(
+			'label' => $txt['manage_drafts'],
+			'controller' => 'ManageDraftsModule_Controller',
+			'function' => 'action_index',
+			'icon' => 'transparent.png',
+			'class' => 'admin_img_logs',
+			'permission' => array('admin_forum'),
+			'enabled' => in_array('dr', $context['admin_features']),
+		);
+	}
+
+	/**
+	 * Used to add the Drafts entry to the admin search.
+	 *
+	 * @param string[] $language_files
+	 * @param string[] $include_files
+	 * @param mixed[] $settings_search
+	 */
+	public static function addAdminSearch(&$language_files, &$include_files, &$settings_search)
+	{
+		$settings_search[] = array('settings_search', 'area=managedrafts', 'ManageDraftsModule_Controller');
+	}
 
 	/**
 	 * Default method.

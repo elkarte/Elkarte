@@ -344,15 +344,6 @@ class Admin_Controller extends Action_Controller
 							'settings' => array($txt['calendar_settings'], 'admin_forum'),
 						),
 					),
-					'managedrafts' => array(
-						'label' => $txt['manage_drafts'],
-						'controller' => 'ManageDrafts_Controller',
-						'function' => 'action_index',
-						'icon' => 'transparent.png',
-						'class' => 'admin_img_logs',
-						'permission' => array('admin_forum'),
-						'enabled' => in_array('dr', $context['admin_features']),
-					),
 				),
 			),
 			'members' => array(
@@ -534,6 +525,8 @@ class Admin_Controller extends Action_Controller
 			),
 		);
 
+		$this->_getModulesMenu($admin_areas);
+
 		// Any files to include for administration?
 		call_integration_include_hook('integrate_admin_include');
 
@@ -577,6 +570,23 @@ class Admin_Controller extends Action_Controller
 			require_once($admin_include_data['file']);
 
 		callMenu($admin_include_data);
+	}
+
+	/**
+	 * Searches the ADMINDIR looking for module managers and load the corresponding
+	 * admin menu entry.
+	 *
+	 * @param mixed[] $admin_areas The admin menu array
+	 */
+	protected function _getModulesMenu(&$admin_areas)
+	{
+		foreach (glob(ADMINDIR . '/Manage*Module.controller.php') as $file)
+		{
+			$class = basename($file, '.controller.php') . '_Controller';
+
+			if (method_exists($class, 'addAdminMenu'))
+				$class::addAdminMenu($admin_areas);
+		}
 	}
 
 	/**
@@ -780,7 +790,7 @@ class Admin_Controller extends Action_Controller
 		$include_files = array(
 			'AddonSettings.controller', 'AdminLog.controller', 'CoreFeatures.controller',
 			'ManageAttachments.controller', 'ManageAvatars.controller', 'ManageBBC.controller',
-			'ManageBoards.controller', 'ManageCalendar.controller', 'ManageDrafts.controller',
+			'ManageBoards.controller', 'ManageCalendar.controller',
 			'ManageFeatures.controller', 'ManageLanguages.controller', 'ManageMail.controller',
 			'ManageNews.controller', 'ManagePaid.controller', 'ManagePermissions.controller',
 			'ManagePosts.controller', 'ManageRegistration.controller', 'ManageSearch.controller',
@@ -806,7 +816,6 @@ class Admin_Controller extends Action_Controller
 			array('settings_search', 'area=postsettings;sa=bbc', 'ManageBBC_Controller'),
 			array('settings_search', 'area=manageboards;sa=settings', 'ManageBoards_Controller'),
 			array('settings_search', 'area=managecalendar;sa=settings', 'ManageCalendar_Controller'),
-			array('settings_search', 'area=managedrafts', 'ManageDrafts_Controller'),
 			array('settings_search', 'area=languages;sa=settings', 'ManageLanguages_Controller'),
 			array('settings_search', 'area=mailqueue;sa=settings', 'ManageMail_Controller'),
 			array('settings_search', 'area=maillist;sa=emailsettings', 'ManageMaillist_Controller'),
