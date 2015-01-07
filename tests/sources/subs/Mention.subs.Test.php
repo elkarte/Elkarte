@@ -20,6 +20,8 @@ class TestMentions extends PHPUnit_Framework_TestCase
 		// We are not logged in for this test, so lets fake it
 		$modSettings['mentions_enabled'] = true;
 
+		$modSettings['enabled_mentions'] = 'likemsg,mentionmem';
+
 		// Lets start by ensuring a topic exists by creating one
 		require_once(SUBSDIR . '/Post.subs.php');
 		require_once(SUBSDIR . '/Mentions.subs.php');
