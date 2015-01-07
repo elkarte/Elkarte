@@ -426,6 +426,11 @@ class CoreFeatures_Controller extends Action_Controller
 			);
 		}
 
+		// Sort by title attribute
+		uasort($features, function($a, $b) {
+			return strcmp($a["title"], $b["title"]);
+		});
+
 		return $features;
 	}
 }
