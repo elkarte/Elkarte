@@ -331,19 +331,6 @@ class Admin_Controller extends Action_Controller
 							'settings' => array($txt['settings']),
 						),
 					),
-					'managecalendar' => array(
-						'label' => $txt['manage_calendar'],
-						'controller' => 'ManageCalendar_Controller',
-						'function' => 'action_index',
-						'icon' => 'transparent.png',
-						'class' => 'admin_img_calendar',
-						'permission' => array('admin_forum'),
-						'enabled' => in_array('cd', $context['admin_features']),
-						'subsections' => array(
-							'holidays' => array($txt['manage_holidays'], 'admin_forum', 'enabled' => !empty($modSettings['cal_enabled'])),
-							'settings' => array($txt['calendar_settings'], 'admin_forum'),
-						),
-					),
 				),
 			),
 			'members' => array(
@@ -782,7 +769,7 @@ class Admin_Controller extends Action_Controller
 
 		// Load a lot of language files.
 		$language_files = array(
-			'Help', 'ManageMail', 'ManageSettings', 'ManageCalendar', 'ManageBoards', 'ManagePaid', 'ManagePermissions', 'Search',
+			'Help', 'ManageMail', 'ManageSettings', 'ManageBoards', 'ManagePaid', 'ManagePermissions', 'Search',
 			'Login', 'ManageSmileys', 'Maillist',
 		);
 
@@ -790,7 +777,7 @@ class Admin_Controller extends Action_Controller
 		$include_files = array(
 			'AddonSettings.controller', 'AdminLog.controller', 'CoreFeatures.controller',
 			'ManageAttachments.controller', 'ManageAvatars.controller', 'ManageBBC.controller',
-			'ManageBoards.controller', 'ManageCalendar.controller',
+			'ManageBoards.controller',
 			'ManageFeatures.controller', 'ManageLanguages.controller', 'ManageMail.controller',
 			'ManageNews.controller', 'ManagePaid.controller', 'ManagePermissions.controller',
 			'ManagePosts.controller', 'ManageRegistration.controller', 'ManageSearch.controller',
@@ -815,7 +802,6 @@ class Admin_Controller extends Action_Controller
 			array('settings_search', 'area=manageattachments;sa=avatars', 'ManageAvatars_Controller'),
 			array('settings_search', 'area=postsettings;sa=bbc', 'ManageBBC_Controller'),
 			array('settings_search', 'area=manageboards;sa=settings', 'ManageBoards_Controller'),
-			array('settings_search', 'area=managecalendar;sa=settings', 'ManageCalendar_Controller'),
 			array('settings_search', 'area=languages;sa=settings', 'ManageLanguages_Controller'),
 			array('settings_search', 'area=mailqueue;sa=settings', 'ManageMail_Controller'),
 			array('settings_search', 'area=maillist;sa=emailsettings', 'ManageMaillist_Controller'),

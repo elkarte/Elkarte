@@ -122,13 +122,6 @@ class CoreFeatures_Controller extends Action_Controller
 	public function settings()
 	{
 		$core_features = array(
-			// cd = calendar.
-			'cd' => array(
-				'url' => 'action=admin;area=managecalendar',
-				'settings' => array(
-					'cal_enabled' => 1,
-				),
-			),
 			// cp = custom profile fields.
 			'cp' => array(
 				'url' => 'action=admin;area=featuresettings;sa=profile',

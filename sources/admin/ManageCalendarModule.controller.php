@@ -26,13 +26,64 @@ if (!defined('ELK'))
  *
  * @package Calendar
  */
-class ManageCalendar_Controller extends Action_Controller
+class ManageCalendarModule_Controller extends Action_Controller
 {
 	/**
 	 * Calendar settings form
 	 * @var Settings_Form
 	 */
 	protected $_calendarSettings;
+
+	/**
+	 * Used to add the Calendar entry to the Core Features list.
+	 *
+	 * @param mixed[] $core_features The core features array
+	 */
+	public static function addCoreFeature(&$core_features)
+	{
+		$core_features['cd'] = array(
+			'url' => 'action=admin;area=managecalendar',
+			'settings' => array(
+				'cal_enabled' => 1,
+			),
+		);
+	}
+
+	/**
+	 * Used to add the Calendar entry to the admin menu.
+	 *
+	 * @param mixed[] $admin_areas The admin menu array
+	 */
+	public static function addAdminMenu(&$admin_areas)
+	{
+		global $txt, $context, $modSettings;
+
+		$admin_areas['layout']['areas']['managecalendar'] = array(
+			'label' => $txt['manage_calendar'],
+			'controller' => 'ManageCalendarModule_Controller',
+			'function' => 'action_index',
+			'icon' => 'transparent.png',
+			'class' => 'admin_img_calendar',
+			'permission' => array('admin_forum'),
+			'enabled' => in_array('cd', $context['admin_features']),
+			'subsections' => array(
+				'holidays' => array($txt['manage_holidays'], 'admin_forum', 'enabled' => !empty($modSettings['cal_enabled'])),
+				'settings' => array($txt['calendar_settings'], 'admin_forum'),
+			),
+		);
+	}
+
+	/**
+	 * Used to add the Calendar entry to the admin search.
+	 *
+	 * @param string[] $language_files
+	 * @param string[] $include_files
+	 * @param mixed[] $settings_search
+	 */
+	public static function addAdminSearch(&$language_files, &$include_files, &$settings_search)
+	{
+		$settings_search[] = array('settings_search', 'area=managecalendar;sa=settings', 'ManageCalendarModule_Controller');
+	}
 
 	/**
 	 * The main controlling function doesn't have much to do... yet.
