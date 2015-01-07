@@ -38,7 +38,7 @@ class Debug
 		'templates' => array(),
 		'sub_templates' => array(),
 		'language_files' => array(),
-		'stylesheets' => array(),
+		'sheets' => array(),
 		'javascript' => array(),
 		'hooks' => array(),
 		'files_included' => array(),
