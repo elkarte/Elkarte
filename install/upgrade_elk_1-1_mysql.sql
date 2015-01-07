@@ -140,3 +140,11 @@ $db_table->db_change_column('{db_prefix}log_mentions', 'id_msg',
 );
 ---}
 ---#
+
+---# Introducing modules...
+---{
+// @todo verify that calendar, attachments, drafts, mentions and polls are enabled
+updateSettings(array('modules_post', implode(',', array('attachments', 'calendar', 'drafts', 'mention', 'poll'))));
+updateSettings(array('modules_display', implode(',', array('drafts'))));
+---}
+---#

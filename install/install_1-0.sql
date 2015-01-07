@@ -2469,6 +2469,8 @@ $db->insert('ignore',
 		array('badbehavior_ip_wl_desc', 'a:3:{i:2;s:18:"RFC 1918 addresses";i:5;s:18:"RFC 1918 addresses";i:6;s:18:"RFC 1918 addresses";}'),
 		array('badbehavior_url_wl', 'a:1:{i:0;s:18:"/subscriptions.php";}'),
 		array('badbehavior_url_wl_desc', 'a:1:{i:0;s:15:"Payment Gateway";}'),
+		array('modules_post', implode(',', array('attachments', 'calendar', 'drafts', 'mention', 'poll'))),
+		array('modules_display', implode(',', array('drafts'))),
 	),
 	array('variable')
 );

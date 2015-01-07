@@ -98,12 +98,34 @@ class Controller_Loader
 
 	/**
 	 * Shortcut to require the files of the modules for a certain controller.
-	 *
-	 * @param string $hook The name of the controller
 	 */
-	protected function _loadModules($hook)
+	protected function _loadModules()
 	{
-		foreach (glob(SUBSDIR . '/' . ucfirst($hook) . '*Module.class.php') as $require_file)
+		foreach ($this->_getModuleFiles() as $require_file)
 			require_once($require_file);
+	}
+
+	/**
+	 * Finds the modules for a certain controller.
+	 *
+	 * @return string[] File names with full path
+	 */
+	protected function _getModuleFiles()
+	{
+		global $modSettings;
+
+		$files = array();
+		if (!empty($modSettings['modules_' . $this->_controller_name]))
+		{
+			$modules = explode(',', $modSettings['modules_' . strtolower($this->_controller_name)]);
+			foreach ($modules as $module)
+			{
+				$file = SUBSDIR . '/' . ucfirst($module) . ucfirst($this->_controller_name) . 'Module.class.php';
+				if (file_exists($file))
+					$files[] = $file;
+			}
+		}
+
+		return $files;
 	}
 }
