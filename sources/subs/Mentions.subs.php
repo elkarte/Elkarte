@@ -179,7 +179,7 @@ function addMentions($member_from, $members_to, $target, $type, $time = null, $s
 			'status' => 'int',
 			'id_member_from' => 'int',
 			'log_time' => 'int',
-			'mention_type' => 'string-5',
+			'mention_type' => 'string-12',
 		),
 		$inserts,
 		array('id_mention')
