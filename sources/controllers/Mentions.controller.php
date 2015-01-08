@@ -129,15 +129,7 @@ class Mentions_Controller extends Action_Controller
 	{
 		global $modSettings;
 
-		$mentions = explode(',', $modSettings['enabled_mentions']);
-
-		$types = array();
-		foreach ($mentions as $mention)
-		{
-			$types[] = $mention;
-		}
-
-		return $types;
+		return array_filter(array_unique(explode(',', $modSettings['enabled_mentions'])));
 	}
 
 	/**
@@ -396,7 +388,7 @@ class Mentions_Controller extends Action_Controller
 	{
 		if (!empty($type))
 		{
-			$to_register = array($type . '_Mention');
+			$to_register = array(ucfirst($type) . '_Mention');
 		}
 		else
 		{
