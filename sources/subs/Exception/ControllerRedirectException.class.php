@@ -35,7 +35,7 @@ class Controller_Redirect_Exception extends Exception
 	 */
 	public function __construct($controller, $method)
 	{
-		$this->_controller = $controller;
+		$this->_controller = ucfirst($controller);
 		$this->_method = $method;
 	}
 
@@ -48,7 +48,7 @@ class Controller_Redirect_Exception extends Exception
 	 */
 	public function doRedirect($source)
 	{
-		$controller_name = ucfirst($this->_controller) . '_Controller';
+		$controller_name = $this->_controller . '_Controller';
 
 		if (get_class($source) === $controller_name)
 			return $source->{$this->_method}();
@@ -70,8 +70,7 @@ class Controller_Redirect_Exception extends Exception
 	protected function _loadController()
 	{
 		$loader = new Controller_Loader($this->_controller);
-		$loader->initDispatch();
 
-		return $loader->getController();
+		return $loader->initDispatch();
 	}
 }

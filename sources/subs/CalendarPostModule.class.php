@@ -87,7 +87,8 @@ class Calendar_Post_Module
 			$_REQUEST['eventid'] = (int) $_REQUEST['eventid'];
 
 			// Validate the post...
-			$calendarController = new Calendar_Controller;
+			$loader = new Controller_Loader('Calendar');
+			$calendarController = $loader->initDispatch();
 			$calendarController->validateEventPost();
 
 			// If you're not allowed to edit any events, you have to be the poster.

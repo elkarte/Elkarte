@@ -149,7 +149,8 @@ class Xml_Controller extends Action_Controller
 		$validation = validateSession();
 		if (empty($validation))
 		{
-			$controller = new CoreFeatures_Controller();
+			$loader = new Controller_Loader('CoreFeatures');
+			$controller = $loader->initDispatch();
 			$result = $controller->action_index();
 
 			// Load up the core features of the system

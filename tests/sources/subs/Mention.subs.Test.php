@@ -74,8 +74,8 @@ class TestMentions extends PHPUnit_Framework_TestCase
 	 */
 	public function testAddMentionByMember()
 	{
-		$mentions = new Mentions_Controller();
-		$mentions->pre_dispatch();
+		$loader = new Controller_Loader('Mentions');
+		$mentions = $loader->initDispatch();
 		$id_member = 2;
 
 		// Lets mention the member
@@ -100,12 +100,13 @@ class TestMentions extends PHPUnit_Framework_TestCase
 	 */
 	public function testAddMentionByLike()
 	{
-		$mentions = new Mentions_Controller();
-		$mentions->pre_dispatch();
+		$loader = new Controller_Loader('Mentions');
+		$mentions = $loader->initDispatch();
+		$id_member = 1;
 
 		// Lets like a post mention
 		$mentions->setData(array(
-			'id_member' => 1,
+			'id_member' => $id_member,
 			'type' => 'likemsg',
 			'id_msg' => $this->id_msg,
 			'status' => 'new',
@@ -113,7 +114,7 @@ class TestMentions extends PHPUnit_Framework_TestCase
 		$mentions->action_add();
 
 		// Get the number of mentions, should be one
-		$count = countUserMentions(false, 'likemsg', 1);
+		$count = countUserMentions(false, 'likemsg', $id_member);
 		$this->assertEquals(1, $count);
 	}
 

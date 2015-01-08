@@ -1279,7 +1279,8 @@ function ssi_pollVote()
 	list ($topic, $board) = topicFromPoll($pollID);
 	loadBoard();
 
-	$poll_action = new Poll_Controller();
+	$loader = new Controller_Loader('Poll');
+	$poll_action = $loader->initDispatch();
 
 	// The controller takes already care of redirecting properly or fail
 	$poll_action->action_vote();

@@ -233,7 +233,8 @@ class Display_Controller extends Action_Controller
 		// Mark the mention as read if requested
 		if (isset($_REQUEST['mentionread']) && !empty($virtual_msg))
 		{
-			$mentions = new Mentions_Controller();
+			$loader = new Controller_Loader('Mentions');
+			$mentions = $loader->initDispatch();
 			$mentions->setData(array(
 				'id_mention' => $_REQUEST['item'],
 				'mark' => $_REQUEST['mark'],

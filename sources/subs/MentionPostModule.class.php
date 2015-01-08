@@ -91,7 +91,8 @@ class Mention_Post_Module
 
 		if (!empty($this->_actually_mentioned))
 		{
-			$mentions = new Mentions_Controller();
+			$loader = new Controller_Loader('Mentions');
+			$mentions = $loader->initDispatch();
 			$mentions->setData(array(
 				'id_member' => $this->_actually_mentioned,
 				'type' => 'mentionmem',

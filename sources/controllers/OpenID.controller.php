@@ -137,7 +137,8 @@ class OpenID_Controller extends Action_Controller
 						$_POST[$id] = $value;
 				}
 
-				$controller = new Register_Controller();
+				$loader = new Controller_Loader('Register');
+				$controller = $loader->initDispatch();
 				return $controller->do_register(true);
 			}
 			else

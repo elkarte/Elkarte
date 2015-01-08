@@ -71,7 +71,7 @@ class Controller_Loader
 	public function initDispatch()
 	{
 		$this->_loadModules($this->_controller_name);
-		$event_manager = $this->_setEventManager($this->_controller_name);
+		$event_manager = $this->_setEventManager();
 
 		$this->_controller->setEventManager($event_manager);
 
@@ -87,11 +87,11 @@ class Controller_Loader
 	 *
 	 * @param string $controller The name of the controller
 	 */
-	protected function _setEventManager($controller)
+	protected function _setEventManager()
 	{
-		$event_manager = new Event_Manager($controller);
-		$event_manager->registerAddons('.+_' . ucfirst($controller) . '_Addon');
-		$event_manager->registerAddons('.+_' . ucfirst($controller) . '_Module');
+		$event_manager = new Event_Manager($this->_controller_name);
+		$event_manager->registerAddons('.+_' . ucfirst($this->_controller_name) . '_Addon');
+		$event_manager->registerAddons('.+_' . ucfirst($this->_controller_name) . '_Module');
 
 		return $event_manager;
 	}

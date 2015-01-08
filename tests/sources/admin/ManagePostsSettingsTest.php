@@ -21,7 +21,8 @@ class TestManagePostsSettings extends PHPUnit_Framework_TestCase
 		// Trick
 		loadLanguage('Admin');
 
-		$controller = new ManagePosts_Controller();
+		$loader = new Controller_Loader('ManagePosts');
+		$controller = $loader->initDispatch();
 		$settings = $controller->settings_search();
 
 		// Lets see some hardcoded setting for posts management...

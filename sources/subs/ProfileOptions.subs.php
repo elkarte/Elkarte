@@ -49,7 +49,10 @@ function getBuddiesID($buddies, $adding = true)
 
 	// If we are mentioning buddies, then let them know who's their buddy.
 	if ($adding && !empty($modSettings['mentions_enabled']) && !empty($modSettings['mentions_buddy']))
-		$mentions = new Mentions_Controller();
+	{
+		$loader = new Controller_Loader('Mentions');
+		$mentions = $loader->initDispatch();
+	}
 
 	// Add the new member(s) to the buddies array.
 	$buddiesArray = array();

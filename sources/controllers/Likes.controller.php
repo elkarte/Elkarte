@@ -142,7 +142,8 @@ class Likes_Controller extends Action_Controller
 					// Lets add in a mention to the member that just had their post liked
 					if (!empty($modSettings['mentions_enabled']))
 					{
-						$mentions = new Mentions_Controller();
+						$loader = new Controller_Loader('Mentions');
+						$mentions = $loader->initDispatch();
 						$mentions->setData(array(
 							'id_member' => $liked_message['id_member'],
 							'type' => $type,

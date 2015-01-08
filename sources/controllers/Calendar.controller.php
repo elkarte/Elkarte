@@ -306,10 +306,8 @@ class Calendar_Controller extends Action_Controller
 	 */
 	protected function _returnToPost()
 	{
-		$loader = new Controller_Loader('post');
-		$loader->initDispatch();
-
-		$controller = $loader->getController();
+		$loader = new Controller_Loader('Post');
+		$controller = $loader->initDispatch();
 
 		return $controller->action_post();
 	}

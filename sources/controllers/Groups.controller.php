@@ -69,7 +69,8 @@ class Groups_Controller extends Action_Controller
 		if (allowedTo('access_mod_center') || $user_info['mod_cache']['bq'] != '0=1' || $user_info['mod_cache']['gq'] != '0=1' || allowedTo('manage_membergroups'))
 		{
 			$_GET['area'] = (!empty($_REQUEST['sa']) && $_REQUEST['sa'] == 'requests') ? 'groups' : 'viewgroups';
-			$controller = new ModerationCenter_Controller();
+			$loader = new Controller_Loader('ModerationCenter');
+			$controller = $loader->initDispatch();
 			$controller->prepareModcenter();
 		}
 		// Otherwise add something to the link tree, for normal people.
