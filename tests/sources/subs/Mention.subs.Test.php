@@ -100,13 +100,19 @@ class TestMentions extends PHPUnit_Framework_TestCase
 	 */
 	public function testAddMentionByLike()
 	{
+		global $user_info;
+
 		$loader = new Controller_Loader('Mentions');
 		$mentions = $loader->initDispatch();
-		$id_member = 1;
 
-		// Lets like a post mention
+		$user_info = array(
+			'id' => 2,
+			'ip' => '127.0.0.1',
+		);
+
+		// Lets like a post
 		$mentions->setData(array(
-			'id_member' => $id_member,
+			'id_member' => 1,
 			'type' => 'likemsg',
 			'id_msg' => $this->id_msg,
 			'status' => 'new',
@@ -114,7 +120,7 @@ class TestMentions extends PHPUnit_Framework_TestCase
 		$mentions->action_add();
 
 		// Get the number of mentions, should be one
-		$count = countUserMentions(false, 'likemsg', $id_member);
+		$count = countUserMentions(false, 'likemsg', $user_info['id']);
 		$this->assertEquals(1, $count);
 	}
 
@@ -133,18 +139,34 @@ class TestMentions extends PHPUnit_Framework_TestCase
 	}
 
 	/**
-	 * Load all the users mentions
+	 * Loads the "current user" mentions.
 	 *
 	 * @depends testAddMentionByLike
 	 * @depends testAddMentionByMember
 	 */
-	public function testLoadMention()
+	public function testLoadCurrentUserMention()
 	{
-// 		global $user_info;
+		global $user_info;
 
-// 		$user_info['id'] = 1;
+		// User 1 has 1 unread mention (i.e. the like)
+		$user_info = array(
+			'id' => 1,
+		);
+
 		$mentions = getUserMentions(0, 10, 'mtn.id_mention', true);
 
-		$this->assertEquals(2, count($mentions));
+		$this->assertEquals(1, count($mentions));
+
+		$user_info = array(
+			'id' => 2,
+		);
+
+		// User 2 has 1 total mentions
+		$mentions = getUserMentions(1, 10, 'mtn.id_mention', true);
+		$this->assertEquals(0, count($mentions));
+
+		// User 2 has 0 unread mention because it has been marked as read in testReadMention
+		$mentions = getUserMentions(1, 10, 'mtn.id_mention', false);
+		$this->assertEquals(0, count($mentions));
 	}
 }
