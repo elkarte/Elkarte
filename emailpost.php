@@ -23,7 +23,7 @@ if (!defined('STDIN'))
 error_reporting(0);
 
 // Need SSI to do much
-require_once(dirname(__FILE__) . '/SSI.php');
+require_once(dirname(__FILE__) . '/bootstrap.php');
 
 // No need to ID the server if we fall on our face :)
 $_SERVER['SERVER_SOFTWARE'] = '';

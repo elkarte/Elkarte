@@ -18,7 +18,7 @@ error_reporting(0);
 // Being run as a cron job
 if (!defined('ELK'))
 {
-	require_once(dirname(__FILE__) . '/SSI.php');
+	require_once(dirname(__FILE__) . '/bootstrap.php');
 	postbyemail_imap();
 
 	// Need to keep the cli clean on return
