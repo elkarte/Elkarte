@@ -297,7 +297,7 @@ class PBE_IMAP
 	 *
 	 * @return string
 	 */
-	protected function __get_trash_folder()
+	protected function _get_trash_folder()
 	{
 		// Known names for the trash bin, I'm sure there are more
 		$trashbox = array('[Google Mail]/Bin', '[Google Mail]/Trash', '[Gmail]/Bin', '[Gmail]/Trash');
