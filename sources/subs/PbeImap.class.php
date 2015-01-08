@@ -150,7 +150,7 @@ class Pbe_Imap
 	protected function _get_inbox()
 	{
 		// Based on the type selected get/set the additional connection details
-		$connection = _port_type($this->_type);
+		$connection = $this->_port_type();
 		$this->_hostname .= (strpos($this->_hostname, ':') === false) ? ':' . $connection['port'] : '';
 		$this->_imap_server = '{' . $this->_hostname . '/' . $connection['protocol'] . $connection['flags'] . '}';
 		$this->_mailbox = $this->_imap_server .  imap_utf7_encode($this->_mailbox);
@@ -190,7 +190,7 @@ class Pbe_Imap
 		if ($this->_is_gmail)
 		{
 			// If using gmail, we may need the trash bin name as well
-			$trash_bin = _get_trash_folder();
+			$trash_bin = $this->_get_trash_folder();
 			imap_mail_move($this->_inbox, $email_uid, $trash_bin, CP_UID);
 		}
 
