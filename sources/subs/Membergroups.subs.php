@@ -2082,3 +2082,55 @@ function getUnassignableGroups($ignore_protected)
 
 	return $unassignableGroups;
 }
+
+function getGroupsList()
+{
+	global $context, $txt;
+
+	loadLanguage('Profile');
+
+	$db = database();
+	$member_groups = array(
+		0 => array(
+			'id' => 0,
+			'name' => $txt['no_primary_membergroup'],
+			'is_primary' => false,
+			'can_be_additional' => false,
+			'can_be_primary' => true,
+		)
+	);
+
+	// Load membergroups, but only those groups the user can assign.
+	$request = $db->query('', '
+		SELECT group_name, id_group, hidden
+		FROM {db_prefix}membergroups
+		WHERE id_group != {int:moderator_group}
+			AND min_posts = {int:min_posts}' . (allowedTo('admin_forum') ? '' : '
+			AND group_type != {int:is_protected}') . '
+		ORDER BY min_posts, CASE WHEN id_group < {int:newbie_group} THEN id_group ELSE 4 END, group_name',
+		array(
+			'moderator_group' => 3,
+			'min_posts' => -1,
+			'is_protected' => 1,
+			'newbie_group' => 4,
+		)
+	);
+
+	while ($row = $db->fetch_assoc($request))
+	{
+		// We should skip the administrator group if they don't have the admin_forum permission!
+		if ($row['id_group'] == 1 && !allowedTo('admin_forum'))
+			continue;
+
+		$member_groups[$row['id_group']] = array(
+			'id' => $row['id_group'],
+			'name' => $row['group_name'],
+			'hidden' => $row['hidden'],
+			'is_primary' => false,
+			'can_be_primary' => $row['hidden'] != 2,
+		);
+	}
+	$db->free_result($request);
+
+	return $member_groups;
+}

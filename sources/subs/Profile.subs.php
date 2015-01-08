@@ -1800,50 +1800,24 @@ function profileLoadGroups()
 {
 	global $cur_profile, $txt, $context, $user_settings;
 
-	$db = database();
+	require_once(SUBSDIR . '/Membergroups.subs.php');
 
-	$context['member_groups'] = array(
-		0 => array(
-			'id' => 0,
-			'name' => $txt['no_primary_membergroup'],
-			'is_primary' => $cur_profile['id_group'] == 0,
-			'can_be_additional' => false,
-			'can_be_primary' => true,
-		)
-	);
+	$context['member_groups'] = getGroupsList();
+	$context['member_groups'][0]['is_primary'] = $cur_profile['id_group'] == 0;
+
 	$curGroups = explode(',', $cur_profile['additional_groups']);
 
-	// Load membergroups, but only those groups the user can assign.
-	$request = $db->query('', '
-		SELECT group_name, id_group, hidden
-		FROM {db_prefix}membergroups
-		WHERE id_group != {int:moderator_group}
-			AND min_posts = {int:min_posts}' . (allowedTo('admin_forum') ? '' : '
-			AND group_type != {int:is_protected}') . '
-		ORDER BY min_posts, CASE WHEN id_group < {int:newbie_group} THEN id_group ELSE 4 END, group_name',
-		array(
-			'moderator_group' => 3,
-			'min_posts' => -1,
-			'is_protected' => 1,
-			'newbie_group' => 4,
-		)
-	);
-	while ($row = $db->fetch_assoc($request))
+	foreach ($context['member_groups'] as $id_group => $row)
 	{
-		// We should skip the administrator group if they don't have the admin_forum permission!
-		if ($row['id_group'] == 1 && !allowedTo('admin_forum'))
+		// Registered member was already taken care before
+		if ($id_group == 0)
 			continue;
 
-		$context['member_groups'][$row['id_group']] = array(
-			'id' => $row['id_group'],
-			'name' => $row['group_name'],
-			'is_primary' => $cur_profile['id_group'] == $row['id_group'],
-			'is_additional' => in_array($row['id_group'], $curGroups),
-			'can_be_additional' => true,
-			'can_be_primary' => $row['hidden'] != 2,
-		);
+		$context['member_groups'][$id_group]['is_primary'] = $cur_profile['id_group'] == $id_group;
+		$context['member_groups'][$id_group]['is_additional'] = in_array($id_group, $curGroups);
+		$context['member_groups'][$id_group]['can_be_additional'] = true;
+		$context['member_groups'][$id_group]['can_be_primary'] = $row['hidden'] != 2;
 	}
-	$db->free_result($request);
 
 	$context['member']['group_id'] = $user_settings['id_group'];
 
