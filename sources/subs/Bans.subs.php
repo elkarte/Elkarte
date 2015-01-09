@@ -29,7 +29,21 @@ if (!defined('ELK'))
  * - Validates and saves/updates the triggers for a given ban
  *
  * @package Bans
- * @param mixed[] $suggestions  array of ban triggers to values
+ * @param mixed[] $suggestions A bit messy array, it should look something like:
+ *                 array(
+ *                   'main_ip' => '123.123.123.123',
+ *                   'hostname' => 'hostname.tld',
+ *                   'email' => 'email@address.tld',
+ *                   'ban_suggestions' => array(
+ *                     'main_ip',     // <= these two are those that will be
+ *                     'hostname',    // <= used for the ban, so no email
+ *                     'other_ips' => array(
+ *                       'ips_in_messages' => array(...),
+ *                       'ips_in_errors' => array(...),
+ *                       'other_custom' => array(...),
+ *                     )
+ *                   )
+ *                 )
  * @param int $ban_group
  * @param int $member
  * @param int $ban_id
@@ -52,12 +66,12 @@ function saveTriggers($suggestions, $ban_group, $member = 0, $ban_id = 0)
 		return false;
 
 	// What triggers are we adding (like ip, host, email, etc)
-	foreach ($suggestions as $key => $value)
+	foreach ($suggestions['ban_suggestions'] as $key => $value)
 	{
 		if (is_array($value))
 			$triggers[$key] = $value;
 		else
-			$triggers[$value] = !empty($_POST[$value]) ? $_POST[$value] : '';
+			$triggers[$value] = !empty($suggestions[$value]) ? $suggestions[$value] : '';
 	}
 
 	// Make sure the triggers for this ban are valid

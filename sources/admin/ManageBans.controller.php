@@ -710,7 +710,7 @@ class ManageBans_Controller extends Action_Controller
 		// Update the triggers associated with this ban
 		if (isset($_POST['ban_suggestions']))
 		{
-			$saved_triggers = saveTriggers($_POST['ban_suggestions'], $ban_info['id'], isset($_REQUEST['u']) ? (int) $_REQUEST['u'] : 0, isset($_REQUEST['bi']) ? (int) $_REQUEST['bi'] : 0);
+			$saved_triggers = saveTriggers($_POST, $ban_info['id'], isset($_REQUEST['u']) ? (int) $_REQUEST['u'] : 0, isset($_REQUEST['bi']) ? (int) $_REQUEST['bi'] : 0);
 			$context['ban_suggestions']['saved_triggers'] = $saved_triggers;
 		}
 
@@ -784,7 +784,7 @@ class ManageBans_Controller extends Action_Controller
 		// Adding a new trigger
 		if (isset($_POST['add_new_trigger']) && !empty($_POST['ban_suggestions']))
 		{
-			saveTriggers($_POST['ban_suggestions'], $ban_group, 0, $ban_id);
+			saveTriggers($_POST, $ban_group, 0, $ban_id);
 			redirectexit('action=admin;area=ban;sa=edit' . (!empty($ban_group) ? ';bg=' . $ban_group : ''));
 		}
 		// Edit an existing trigger with new / updated details
@@ -792,9 +792,11 @@ class ManageBans_Controller extends Action_Controller
 		{
 			// The first replaces the old one, the others are added new
 			// (simplification, otherwise it would require another query and some work...)
-			saveTriggers(array_shift($_POST['ban_suggestions']), $ban_group, 0, $ban_id);
+			$dummy = $_POST;
+			$dummy['ban_suggestions'] = array_shift($_POST['ban_suggestions']);
+			saveTriggers($dummy, $ban_group, 0, $ban_id);
 			if (!empty($_POST['ban_suggestions']))
-				saveTriggers($_POST['ban_suggestions'], $ban_group);
+				saveTriggers($_POST, $ban_group);
 
 			redirectexit('action=admin;area=ban;sa=edit' . (!empty($ban_group) ? ';bg=' . $ban_group : ''));
 		}
