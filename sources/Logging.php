@@ -350,5 +350,7 @@ function logActions($logs)
 		);
 	}
 
+	require_once(SUBSDIR . '/Logging.subs.php');
+
 	return insertLogActions($inserts);
 }
