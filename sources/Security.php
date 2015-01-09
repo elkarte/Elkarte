@@ -301,6 +301,7 @@ function is_not_banned($forceCheck = false)
 			while ($row = $db->fetch_assoc($request))
 			{
 				foreach ($restrictions as $restriction)
+				{
 					if (!empty($row[$restriction]))
 					{
 						$_SESSION['ban'][$restriction]['reason'] = $row['reason'];
@@ -311,6 +312,7 @@ function is_not_banned($forceCheck = false)
 						if (!$user_info['is_guest'] && $restriction == 'cannot_access' && ($row['id_member'] == $user_info['id'] || $row['email_address'] == $user_info['email']))
 							$flag_is_activated = true;
 					}
+				}
 			}
 			$db->free_result($request);
 		}
