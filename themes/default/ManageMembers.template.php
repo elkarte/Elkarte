@@ -320,3 +320,33 @@ function template_admin_browse()
 	echo '
 	</div>';
 }
+
+function template_users_multiactions($groups)
+{
+	global $txt;
+
+	$select = '
+					<select name="maction" onchange="this.form.new_membergroup.disabled = (this.options[this.selectedIndex].value != \'pgroup\' && this.options[this.selectedIndex].value != \'agroup\');">
+						<option value="">--------</option>
+						<option value="delete">' . $txt['admin_delete_members'] . '</option>
+						<option value="pgroup">' . $txt['admin_change_primary_membergroup'] . '</option>
+						<option value="agroup">' . $txt['admin_change_secondary_membergroup'] . '</option>
+						<option value="ban_names">' . $txt['admin_ban_usernames'] . '</option>
+						<option value="ban_mails">' . $txt['admin_ban_useremails'] . '</option>
+						<option value="ban_names_mails">' . $txt['admin_ban_usernames_and_emails'] . '</option>
+						<option value="ban_ips">' . $txt['admin_ban_userips'] . '</option>
+					</select>
+					<select onchange="if(this.value==-1){if(!confirm(\'' . $txt['confirm_remove_membergroup'] . '\')){this.value=0;}}" name="new_membergroup" id="new_membergroup" disabled="disabled">';
+
+	foreach($groups as $member_group)
+	{
+		$select .= '
+			<option value="' . $member_group['id'] . '"' . ($member_group['is_primary'] ? ' selected="selected"' : '') . '>
+				' . $member_group['name'] . '
+			</option>';
+	}
+	$select .= '</select>
+					<input type="submit" name="maction_on_members" value="' . $txt['quick_mod_go'] . '" onclick="return confirm(\'' . $txt['quickmod_confirm'] . '\');" class="button_submit" />';
+
+	return $select;
+}

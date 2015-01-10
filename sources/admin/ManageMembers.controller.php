@@ -180,27 +180,9 @@ class ManageMembers_Controller extends Action_Controller
 		// Set the current sub action.
 		$context['sub_action'] = isset($_REQUEST['sa']) ? $_REQUEST['sa'] : 'all';
 
-		// Are we performing a delete?
-		if (isset($_POST['delete_members']) && !empty($_POST['delete']) && allowedTo('profile_remove_any'))
-		{
-			checkSession();
-
-			// Clean the input.
-			$delete = array();
-			foreach ($_POST['delete'] as $key => $value)
-			{
-				// Don't delete yourself, idiot.
-				if ($value != $user_info['id'])
-					$delete[$key] = (int) $value;
-			}
-
-			if (!empty($delete))
-			{
-				// Delete all the selected members.
-				require_once(SUBSDIR . '/Members.subs.php');
-				deleteMembers($delete, true);
-			}
-		}
+		// Are we performing a mass action?
+		if (isset($_POST['maction_on_members']) && isset($_POST['maction']) && !empty($_POST['members']))
+			$this->_multiMembersAction();
 
 		// Check input after a member search has been submitted.
 		if ($context['sub_action'] == 'query')
@@ -576,7 +558,7 @@ class ManageMembers_Controller extends Action_Controller
 						'function' => function ($rowData) {
 							global $user_info;
 
-							return '<input type="checkbox" name="delete[]" value="' . $rowData['id_member'] . '" class="input_check" ' . ($rowData['id_member'] == $user_info['id'] || $rowData['id_group'] == 1 || in_array(1, explode(',', $rowData['additional_groups'])) ? 'disabled="disabled"' : '') . ' />';
+							return '<input type="checkbox" name="members[]" value="' . $rowData['id_member'] . '" class="input_check" ' . ($rowData['id_member'] == $user_info['id'] || $rowData['id_group'] == 1 || in_array(1, explode(',', $rowData['additional_groups'])) ? 'disabled="disabled"' : '') . ' />';
 						},
 						'class' => 'centertext',
 					),
@@ -590,7 +572,8 @@ class ManageMembers_Controller extends Action_Controller
 			'additional_rows' => array(
 				array(
 					'position' => 'below_table_data',
-					'value' => '<input type="submit" name="delete_members" value="' . $txt['admin_delete_members'] . '" onclick="return confirm(\'' . $txt['confirm_delete_members'] . '\');" class="right_submit" />',
+					'value' => template_users_multiactions($this->_getGroups()),
+					'class' => 'floatright',
 				),
 			),
 		);
@@ -603,6 +586,106 @@ class ManageMembers_Controller extends Action_Controller
 
 		$context['sub_template'] = 'show_list';
 		$context['default_list'] = 'member_list';
+	}
+
+	protected function _multiMembersAction()
+	{
+		global $txt, $user_info;
+
+		// @todo add a token too?
+		checkSession();
+
+		// Clean the input.
+		$members = array();
+		foreach ($_POST['members'] as $value)
+		{
+			// Don't delete yourself, idiot.
+			if ($_POST['maction'] === 'delete' && $value == $user_info['id'])
+				continue;
+
+			$members[] = (int) $value;
+		}
+		$members = array_filter($members);
+
+		// No members, nothing to do.
+		if (empty($members))
+			return;
+
+		// Are we performing a delete?
+		if ($_POST['maction'] == 'delete' && allowedTo('profile_remove_any'))
+		{
+			// Delete all the selected members.
+			require_once(SUBSDIR . '/Members.subs.php');
+			deleteMembers($members, true);
+		}
+
+		// Are we changing groups?
+		if (($_POST['maction'] == 'pgroup' || $_POST['maction'] == 'agroup') && allowedTo('manage_membergroups'))
+		{
+			require_once(SUBSDIR . '/Membergroups.subs.php');
+
+			$groups = array('p', 'a');
+			foreach ($groups as $group)
+			{
+				if ($_POST['maction'] == $group . 'group' && !empty($_POST['new_membergroup']))
+				{
+					if ($group == 'p')
+						$type = 'force_primary';
+					else
+						$type = 'only_additional';
+
+					// Change all the selected members' group.
+					if ($_POST['new_membergroup'] != -1)
+						addMembersToGroup($members, $_POST['new_membergroup'], $type, true);
+					else
+						removeMembersFromGroups($members, null, true);
+				}
+			}
+		}
+
+		// Are we banning?
+		if(in_array($_POST['maction'], array('ban_names', 'ban_mails', 'ban_ips', 'ban_names_mails')) && allowedTo('manage_bans'))
+		{
+			require_once(SUBSDIR . '/Bans.subs.php');
+			require_once(SUBSDIR . '/Members.subs.php');
+
+			$ban_group_id = insertBanGroup(array(
+				'name' => $txt['admin_ban_name'],
+				'cannot' => array(
+					'access' => 1,
+					'register' => 0,
+					'post' => 0,
+					'login' => 0,
+				),
+				'db_expiration' => 'NULL',
+				'reason' => '',
+				'notes' => '',
+			));
+
+			$ban_name = in_array($_POST['maction'], array('ban_names', 'ban_names_mails'));
+			$ban_email = in_array($_POST['maction'], array('ban_mails', 'ban_names_mails'));
+			$ban_ips = $_POST['maction'] === 'ban_ips';
+			$suggestions = array();
+
+			if ($ban_email)
+				$suggestions[] = 'email';
+			if ($ban_name)
+				$suggestions[] = 'user';
+			if ($ban_ips)
+				$suggestions[] = 'main_ip';
+
+			$members_data = getBasicMemberData($members, array('moderation' => true));
+			foreach ($members_data as $member)
+			{
+				saveTriggers(array(
+					'main_ip' => $ban_ips ? $member['member_ip'] : '',
+					'hostname' => '',
+					'email' => $ban_email ? $member['email_address'] : '',
+					'user' => $ban_name ? $member['member_name'] : '',
+					'ban_suggestions' => $suggestions,
+				), $ban_group_id, $ban_name ? $member['id_member'] : 0);
+			}
+		}
 	}
 
 	/**
@@ -1172,5 +1255,34 @@ class ManageMembers_Controller extends Action_Controller
 		}
 
 		redirectexit('action=admin;area=viewmembers;sa=browse;type=' . $_REQUEST['type'] . ';sort=' . $_REQUEST['sort'] . ';filter=' . $current_filter . ';start=' . $_REQUEST['start']);
+	}
+
+	/**
+	 * Prepares the list of groups to be used in the dropdown for "mass actions".
+	 *
+	 * @return mixed[]
+	 */
+	protected function _getGroups()
+	{
+		global $txt;
+
+		require_once(SUBSDIR . '/Membergroups.subs.php');
+
+		$member_groups = getGroupsList();
+
+		// Better remove admin membergroup...and set it to a "remove all"
+		$member_groups[1] = array(
+			'id' => -1,
+			'name' => $txt['remove_groups'],
+			'is_primary' => 0,
+		);
+		// no primary is tricky...
+		$member_groups[0] = array(
+			'id' => 0,
+			'name' => '',
+			'is_primary' => 1,
+		);
+
+		return $member_groups;
 	}
 }

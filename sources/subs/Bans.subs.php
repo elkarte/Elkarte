@@ -29,13 +29,27 @@ if (!defined('ELK'))
  * - Validates and saves/updates the triggers for a given ban
  *
  * @package Bans
- * @param mixed[] $suggestions  array of ban triggers to values
+ * @param mixed[] $suggestions A bit messy array, it should look something like:
+ *                 array(
+ *                   'main_ip' => '123.123.123.123',
+ *                   'hostname' => 'hostname.tld',
+ *                   'email' => 'email@address.tld',
+ *                   'ban_suggestions' => array(
+ *                     'main_ip',     // <= these two are those that will be
+ *                     'hostname',    // <= used for the ban, so no email
+ *                     'other_ips' => array(
+ *                       'ips_in_messages' => array(...),
+ *                       'ips_in_errors' => array(...),
+ *                       'other_custom' => array(...),
+ *                     )
+ *                   )
+ *                 )
  * @param int $ban_group
  * @param int $member
- * @param int $ban_id
+ * @param int $trigger_id
  * @return mixed array with the saved triggers or false on failure
  */
-function saveTriggers($suggestions, $ban_group, $member = 0, $ban_id = 0)
+function saveTriggers($suggestions, $ban_group, $member = 0, $trigger_id = 0)
 {
 	$triggers = array(
 		'main_ip' => '',
@@ -52,12 +66,12 @@ function saveTriggers($suggestions, $ban_group, $member = 0, $ban_id = 0)
 		return false;
 
 	// What triggers are we adding (like ip, host, email, etc)
-	foreach ($suggestions as $key => $value)
+	foreach ($suggestions['ban_suggestions'] as $key => $value)
 	{
 		if (is_array($value))
 			$triggers[$key] = $value;
 		else
-			$triggers[$value] = !empty($_POST[$value]) ? $_POST[$value] : '';
+			$triggers[$value] = !empty($suggestions[$value]) ? $suggestions[$value] : '';
 	}
 
 	// Make sure the triggers for this ban are valid
@@ -66,10 +80,10 @@ function saveTriggers($suggestions, $ban_group, $member = 0, $ban_id = 0)
 	// Time to save or update!
 	if (!empty($ban_triggers['ban_triggers']) && !$ban_errors->hasErrors())
 	{
-		if (empty($ban_id))
+		if (empty($trigger_id))
 			addTriggers($ban_group, $ban_triggers['ban_triggers'], $ban_triggers['log_info']);
 		else
-			updateTriggers($ban_id, $ban_group, array_shift($ban_triggers['ban_triggers']), $ban_triggers['log_info']);
+			updateTriggers($trigger_id, $ban_group, array_shift($ban_triggers['ban_triggers']), $ban_triggers['log_info']);
 	}
 
 	// No errors, then return the ban triggers
@@ -244,29 +258,13 @@ function validateTriggers(&$triggers)
 			{
 				$value = trim($value);
 				$ip_parts = ip2range($value);
-				if (!checkExistingTriggerIP($ip_parts, $value))
-					$ban_errors->addError('invalid_ip');
-				else
+				$ban_trigger = validateIPBan($ip_parts, $value);
+				if (empty($ban_trigger['error']))
 				{
-					$ban_triggers['main_ip'] = array(
-						'ip_low1' => $ip_parts[0]['low'],
-						'ip_high1' => $ip_parts[0]['high'],
-						'ip_low2' => $ip_parts[1]['low'],
-						'ip_high2' => $ip_parts[1]['high'],
-						'ip_low3' => $ip_parts[2]['low'],
-						'ip_high3' => $ip_parts[2]['high'],
-						'ip_low4' => $ip_parts[3]['low'],
-						'ip_high4' => $ip_parts[3]['high'],
-						'ip_low5' => $ip_parts[4]['low'],
-						'ip_high5' => $ip_parts[4]['high'],
-						'ip_low6' => $ip_parts[5]['low'],
-						'ip_high6' => $ip_parts[5]['high'],
-						'ip_low7' => $ip_parts[6]['low'],
-						'ip_high7' => $ip_parts[6]['high'],
-						'ip_low8' => $ip_parts[7]['low'],
-						'ip_high8' => $ip_parts[7]['high'],
-					);
+					$ban_triggers['main_ip'] = $ban_trigger;
 				}
+				else
+					$ban_errors->addError($ban_trigger['error']);
 			}
 			elseif ($key == 'hostname')
 			{
@@ -346,34 +344,19 @@ function validateTriggers(&$triggers)
 				{
 					$val = trim($val);
 					$ip_parts = ip2range($val);
-					if (!checkExistingTriggerIP($ip_parts, $val))
-						$ban_errors->addError('invalid_ip');
-					else
+					$ban_trigger = validateIPBan($ip_parts, $val);
+
+					if (empty($ban_trigger['error']))
 					{
-						$ban_triggers[$key][] = array(
-							'ip_low1' => $ip_parts[0]['low'],
-							'ip_high1' => $ip_parts[0]['high'],
-							'ip_low2' => $ip_parts[1]['low'],
-							'ip_high2' => $ip_parts[1]['high'],
-							'ip_low3' => $ip_parts[2]['low'],
-							'ip_high3' => $ip_parts[2]['high'],
-							'ip_low4' => $ip_parts[3]['low'],
-							'ip_high4' => $ip_parts[3]['high'],
-							'ip_low5' => $ip_parts[4]['low'],
-							'ip_high5' => $ip_parts[4]['high'],
-							'ip_low6' => $ip_parts[5]['low'],
-							'ip_high6' => $ip_parts[5]['high'],
-							'ip_low7' => $ip_parts[6]['low'],
-							'ip_high7' => $ip_parts[6]['high'],
-							'ip_low8' => $ip_parts[7]['low'],
-							'ip_high8' => $ip_parts[7]['high'],
-						);
+						$ban_triggers[$key][] = $ban_trigger;
 
 						$log_info[] = array(
 							'value' => $val,
 							'bantype' => 'ip_range',
 						);
 					}
+					else
+						$ban_errors->addError($ban_trigger['error']);
 				}
 			}
 			else
@@ -472,7 +455,7 @@ function addTriggers($group_id = 0, $triggers = array(), $logs = array())
 	if ($ban_errors->hasErrors())
 		return false;
 
-	$db->insert('',
+	$db->insert('ignore',
 		'{db_prefix}ban_items',
 		$insertKeys,
 		$insertTriggers,
@@ -797,7 +780,7 @@ function range2ip($low, $high)
  * @param string $fullip
  * @return boolean
  */
-function checkExistingTriggerIP($ip_array, $fullip = '')
+function validateIPBan($ip_array, $fullip = '')
 {
 	global $scripturl;
 
@@ -823,7 +806,7 @@ function checkExistingTriggerIP($ip_array, $fullip = '')
 			'ip_high8' => $ip_array[7]['high'],
 		);
 	else
-		return false;
+		$values = array('error' => 'invalid_ip');
 
 	$request = $db->query('', '
 		SELECT bg.id_ban_group, bg.name
@@ -844,14 +827,41 @@ function checkExistingTriggerIP($ip_array, $fullip = '')
 	if ($db->num_rows($request) != 0)
 	{
 		list ($error_id_ban, $error_ban_name) = $db->fetch_row($request);
-		fatal_lang_error('ban_trigger_already_exists', false, array(
+		$values = array('error' => array('ban_trigger_already_exists', array(
 			$fullip,
 			'<a href="' . $scripturl . '?action=admin;area=ban;sa=edit;bg=' . $error_id_ban . '">' . $error_ban_name . '</a>',
-		));
+		)));
 	}
 	$db->free_result($request);
 
 	return $values;
+}
+
+/**
+ * Checks whether a given IP range already exists in the trigger list.
+ *
+ * What it does:
+ * - If yes, it returns an error message.
+ * - Otherwise, it returns an array
+ * - optimized for the database.
+ *
+ * @package Bans
+ * @param int[] $ip_array array of ip array ints
+ * @param string $fullip
+ * @return boolean
+ * @deprecated since 1.1 - use validateIPBan instead
+ */
+function checkExistingTriggerIP($ip_array, $fullip = '')
+{
+	$return = validateIPBan($ip_array, $fullip);
+
+	if (empty($return['error']))
+		return $return;
+
+	if ($return['error'] === 'ban_trigger_already_exists')
+		fatal_lang_error($return['error'][0], false, $return['error'][1]);
+
+	return false;
 }
 
 /**

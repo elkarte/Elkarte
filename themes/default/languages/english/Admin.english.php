@@ -50,7 +50,20 @@ $txt['admin_checkbox_agreement'] = 'Show a checkbox for the agreement in registr
 $txt['admin_agreement_default'] = 'Default';
 $txt['admin_agreement_select_language'] = 'Language to edit';
 $txt['admin_agreement_select_language_change'] = 'Change';
+
 $txt['admin_delete_members'] = 'Delete Selected Members';
+$txt['admin_change_primary_membergroup'] = 'Change primary member group';
+$txt['admin_change_secondary_membergroup'] = 'Change/add additional member group';
+$txt['confirm_remove_membergroup'] = 'Selecting this all the membergroups will be removed! Are you sure?';
+$txt['confirm_change_primary_membergroup'] = 'Are you sure you want to change the primary group of the selected members?';
+$txt['confirm_change_secondary_membergroup'] = 'Are you sure you want to change the additional group of the selected members?';
+$txt['admin_ban_usernames'] = 'Ban by usernames';
+$txt['admin_ban_useremails'] = 'Ban by email addresses';
+$txt['admin_ban_userips'] = 'Ban by IPs';
+$txt['admin_ban_usernames_and_emails'] = 'Ban by usernames and email addresses';
+$txt['admin_ban_name'] = 'Mass-user Ban';
+$txt['remove_groups'] = 'Remove all groups';
+
 $txt['admin_repair'] = 'Repair All boards and topics';
 $txt['admin_main_welcome'] = 'This is your &quot;%1$s&quot;.  From here, you can edit settings, maintain your forum, view logs, install packages, manage themes, and many other things.<br /><br />If you have any trouble, please look at the &quot;Support &amp; Credits&quot; page.  If the information there doesn\'t help you, feel free to <a href="http://www.elkarte.net/index.php" target="_blank" class="new_win">look to us for help</a> with the problem.<br />You may also find answers to your questions or problems by clicking the <img src="%3$s/helptopics.png" alt="%2$s" title="%2$s" /> symbols for more information on the related functions.';
 $txt['admin_news_desc'] = 'Please place one news item per box. BBC tags, such as <span>[b]</span>, <span>[i]</span> and <span>[u]</span> are allowed in your news, as well as smileys. Clear a news item\'s text box to remove it.';

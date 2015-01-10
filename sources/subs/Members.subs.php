@@ -1626,13 +1626,13 @@ function maxMemberID()
  * @package Members
  * @param int[]|int $member_ids an array of member IDs or a single ID
  * @param mixed[] $options an array of possible little alternatives, can be:
- * - 'add_guest' (set or not) to add a guest user to the returned array
+ * - 'add_guest' (bool) to add a guest user to the returned array
  * - 'limit' int if set overrides the default query limit
  * - 'sort' (string) a column to sort the results
- * - 'moderation' (set or not) includes member_ip, id_group, additional_groups, last_login
- * - 'authentication' (set or not) includes secret_answer, secret_question, openid_uri,
+ * - 'moderation' (bool) includes member_ip, id_group, additional_groups, last_login
+ * - 'authentication' (bool) includes secret_answer, secret_question, openid_uri,
  *    is_activated, validation_code, passwd_flood
- * - 'preferences' (set or not) includes lngfile, mod_prefs, notify_types, signature
+ * - 'preferences' (bool) includes lngfile, mod_prefs, notify_types, signature
  * @return array
  */
 function getBasicMemberData($member_ids, $options = array())
@@ -1666,9 +1666,9 @@ function getBasicMemberData($member_ids, $options = array())
 
 	// Get some additional member info...
 	$request = $db->query('', '
-		SELECT id_member, member_name, real_name, email_address, hide_email, posts, id_theme' . (isset($options['moderation']) ? ',
-		member_ip, id_group, additional_groups, last_login, id_post_group' : '') . (isset($options['authentication']) ? ',
-		secret_answer, secret_question, openid_uri, is_activated, validation_code, passwd_flood' : '') . (isset($options['preferences']) ? ',
+		SELECT id_member, member_name, real_name, email_address, hide_email, posts, id_theme' . (!empty($options['moderation']) ? ',
+		member_ip, id_group, additional_groups, last_login, id_post_group' : '') . (!empty($options['authentication']) ? ',
+		secret_answer, secret_question, openid_uri, is_activated, validation_code, passwd_flood' : '') . (!empty($options['preferences']) ? ',
 		lngfile, mod_prefs, notify_types, signature' : '') . '
 		FROM {db_prefix}members
 		WHERE id_member IN ({array_int:member_list})

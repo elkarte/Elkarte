@@ -20,11 +20,11 @@
 
 // Start things rolling by getting the forum alive...
 $ssi_guest_access = true;
-if (!file_exists(dirname(__FILE__) . '/SSI.php'))
-	die('Cannot find SSI.php');
+if (!file_exists(dirname(__FILE__) . '/bootstrap.php'))
+	die('Cannot find bootstrap.php');
 
 // Need lots of help
-require_once(dirname(__FILE__) . '/SSI.php');
+require_once(dirname(__FILE__) . '/bootstrap.php');
 require_once(SUBSDIR . '/PaidSubscriptions.subs.php');
 require_once(SUBSDIR . '/Admin.subs.php');
 require_once(SUBSDIR . '/Members.subs.php');
