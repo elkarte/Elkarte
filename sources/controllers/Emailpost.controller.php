@@ -81,7 +81,7 @@ class Emailpost_Controller extends Action_Controller
 			return pbe_emailError('error_email_notenabled', $email_message);
 
 		// Spam I am?
-		if ($email_message->load_spam())
+		if ($email_message->load_spam() && !$force)
 			return pbe_emailError('error_found_spam', $email_message);
 
 		// Load the user from the database based on the sending email address
@@ -101,7 +101,7 @@ class Emailpost_Controller extends Action_Controller
 
 		// Can't find this key in the database, either
 		// a) spam attempt or b) replying with an expired/consumed key
-		if (empty($key_owner))
+		if (empty($key_owner) && !$force)
 			return pbe_emailError('error_' . ($email_message->message_type === 'p' ? 'pm_' : '') . 'not_find_entry', $email_message);
 
 		// The key received was not sent to this member ... how we love those email aggregators

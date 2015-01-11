@@ -1384,7 +1384,7 @@ function reduceMailQueue($batch_size = false, $override_limit = false, $force_se
  * This function finds email address and few other details of the
  * poster of a certain message.
  *
- * @todo very similar to mailFromMesasge
+ * @todo very similar to mailFromMessage
  * @package Mail
  * @param int $id_msg the id of a message
  * @param int $topic_id the topic the message belongs to
