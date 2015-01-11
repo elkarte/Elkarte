@@ -337,42 +337,47 @@ function template_replies_below()
 {
 	global $context;
 
-	template_pagesection('recent_buttons', 'right');
-
-	echo '
-	<div id="topic_icons" class="description">';
-
 	if (!empty($context['topics']))
-		template_basicicons_legend();
+	{
+		template_pagesection('recent_buttons', 'right');
 
-	if (!empty($context['using_relative_time']))
 		echo '
-		<script><!-- // --><![CDATA[
-			$(\'.topic_latest\').addClass(\'relative\');
-		// ]]></script>';
+		<div id="topic_icons" class="description">';
 
-	echo '
-	</div>';
+			template_basicicons_legend();
+
+		if (!empty($context['using_relative_time']))
+			echo '
+			<script><!-- // --><![CDATA[
+				$(\'.topic_latest\').addClass(\'relative\');
+			// ]]></script>';
+
+		echo '
+		</div>';
+	}
 }
 
 function template_unread_below()
 {
 	global $context;
 
-	template_pagesection('recent_buttons', 'right');
-
-	echo '
-	<div id="topic_icons" class="description">';
-
 	if (!empty($context['topics']))
-		template_basicicons_legend();
+	{
+		template_pagesection('recent_buttons', 'right');
 
-	if (!empty($context['using_relative_time']))
 		echo '
-		<script><!-- // --><![CDATA[
-			$(\'.topic_latest\').addClass(\'relative\');
-		// ]]></script>';
+		<div id="topic_icons" class="description">';
 
-	echo '
-	</div>';
+			template_basicicons_legend();
+
+		if (!empty($context['using_relative_time']))
+			echo '
+			<script><!-- // --><![CDATA[
+				$(\'.topic_latest\').addClass(\'relative\');
+			// ]]></script>';
+
+		echo '
+		</div>';
+	}
+
 }
