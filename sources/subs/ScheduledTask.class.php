@@ -428,7 +428,7 @@ class Scheduled_Task
 		loadEssentialThemeData();
 
 		// If the maillist function is on then so is the enhanced digest
-		$maillist = !empty($modSettings['maillist_enabled']) && !empty($modSettings['pbe_digest_enabled']);
+		$maillist = !empty($modSettings['maillist_enabled']) && !empty($modSettings['maillist_digest_enabled']);
 		if ($maillist)
 			require_once(SUBSDIR . '/Emailpost.subs.php');
 
