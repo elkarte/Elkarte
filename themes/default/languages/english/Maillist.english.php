@@ -145,6 +145,10 @@ $txt['show_notice_text'] = 'Post text';
 $txt['noaccess'] = 'Private Messages can not be reviewed';
 $txt['badid'] = 'Invalid or missing email ID';
 $txt['delete_warning'] = 'Are you sure you want to delete this entry?';
+$txt['pm_approve_warning'] = 'Approve this personal message with CAUTION!
+The PM being replied to has been REMOVED.
+The system attempts to find others in that conversation but the results are not 100% accurate.
+If in doubt, its better to bounce!';
 $txt['filter_delete_warning'] = 'Are you sure you want to remove this filter?';
 $txt['parser_delete_warning'] = 'Are you sure you want to remove this parser?';
 $txt['bounce'] = 'Bounce';
