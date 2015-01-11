@@ -1142,7 +1142,7 @@ function countSplitMessages($topic, $include_unapproved, $selection = array())
  * @param int $id_msg the id of a message
  * @return array
  */
-function mailFromMesasge($id_msg)
+function mailFromMessage($id_msg)
 {
 	$db = database();
 
