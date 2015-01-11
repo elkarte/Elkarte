@@ -758,6 +758,10 @@ function template_spellcheck()
 				overflow: auto;
 				background: #ffffff;
 			}
+			select {
+				height: auto;
+				max-height: none;
+			}
 		</style>';
 
 	// As you may expect - we need a lot of javascript for this... load it from the separate files.
