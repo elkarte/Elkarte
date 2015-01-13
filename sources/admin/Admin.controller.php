@@ -60,6 +60,7 @@ class Admin_Controller extends Action_Controller
 
 		// Need these to do much
 		require_once(SUBSDIR . '/Menu.subs.php');
+		require_once(SUBSDIR . '/Admin.subs.php');
 
 		// Define the menu structure - see subs/Menu.subs.php for details!
 		$admin_areas = array(
@@ -569,9 +570,11 @@ class Admin_Controller extends Action_Controller
 	{
 		foreach (glob(ADMINDIR . '/Manage*Module.controller.php') as $file)
 		{
-			$class = basename($file, '.controller.php') . '_Controller';
+			$name = basename($file, '.controller.php');
+			$class = $name . '_Controller';
+			$module = strtolower(substr($name, 6, -6));
 
-			if (method_exists($class, 'addAdminMenu'))
+			if (isModuleEnabled($module) && method_exists($class, 'addAdminMenu') )
 				$class::addAdminMenu($admin_areas);
 		}
 	}
@@ -594,7 +597,6 @@ class Admin_Controller extends Action_Controller
 
 		// We need a little help
 		require_once(SUBSDIR . '/Membergroups.subs.php');
-		require_once(SUBSDIR . '/Admin.subs.php');
 
 		// You have to be able to do at least one of the below to see this page.
 		isAllowedTo(array('admin_forum', 'manage_permissions', 'moderate_forum', 'manage_membergroups', 'manage_bans', 'send_mail', 'edit_news', 'manage_boards', 'manage_smileys', 'manage_attachments'));
