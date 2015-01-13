@@ -135,7 +135,7 @@ class Maintenance_Controller extends Action_Controller
 		// Any special activity defined, then go to it.
 		if (isset($activity))
 		{
-			if (method_exists($this, $subActions[$subAction]['activities'][$activity]))
+			if (is_string($subActions[$subAction]['activities'][$activity]) && method_exists($this, $subActions[$subAction]['activities'][$activity]))
 				$this->{$subActions[$subAction]['activities'][$activity]}();
 			else
 				$subActions[$subAction]['activities'][$activity]();
