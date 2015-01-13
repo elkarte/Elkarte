@@ -296,14 +296,6 @@ function template_maintain_topics()
 	// If maintenance has finished tell the user.
 	template_show_error('maintenance_finished');
 
-	// Bit of javascript for showing which boards to prune in an otherwise hidden list.
-	echo '
-	<script><!-- // --><![CDATA[
-		var rotSwap = false;
-			maintain_old_choose = ', JavaScriptEscape($txt['maintain_old_choose']), ',
-			maintain_old_all = ', JavaScriptEscape($txt['maintain_old_all']), ';
-	// ]]></script>';
-
 	echo '
 	<div id="manage_maintenance">
 		<h2 class="category_header">', $txt['maintain_old'], '</h2>
