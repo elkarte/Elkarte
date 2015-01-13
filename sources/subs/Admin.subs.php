@@ -568,3 +568,21 @@ function disableModules($module, $controllers)
 		updateSettings(array('modules_' . $controller => implode(',', $existing)));
 	}
 }
+
+function isModuleEnabled($module)
+{
+	global $modSettings;
+
+	$module = strtolower($module);
+	foreach ($modSettings as $key => $val)
+	{
+		if (substr($key, 0, 8) === 'modules_')
+		{
+			$modules = explode(',', $val);
+			if (in_array($module, $modules))
+				return true;
+		}
+	}
+
+	return false;
+}
