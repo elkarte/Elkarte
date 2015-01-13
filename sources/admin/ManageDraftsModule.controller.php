@@ -56,6 +56,7 @@ class ManageDraftsModule_Controller extends Action_Controller
 					add_integration_function('integrate_load_permissions', 'ManageDraftsModule_Controller::integrate_load_permissions');
 					add_integration_function('integrate_sa_manage_maintenance', 'ManageDraftsModule_Controller::integrate_sa_manage_maintenance');
 					add_integration_function('integrate_topics_maintenance', 'ManageDraftsModule_Controller::integrate_topics_maintenance');
+					add_integration_function('integrate_load_illegal_guest_permissions', 'ManageDraftsModule_Controller::integrate_load_illegal_guest_permissions');
 				}
 				// Disabling, just forget about the modules
 				else
@@ -65,6 +66,7 @@ class ManageDraftsModule_Controller extends Action_Controller
 					remove_integration_function('integrate_load_permissions', 'ManageDraftsModule_Controller::integrate_load_permissions');
 					remove_integration_function('integrate_sa_manage_maintenance', 'ManageDraftsModule_Controller::integrate_sa_manage_maintenance');
 					remove_integration_function('integrate_topics_maintenance', 'ManageDraftsModule_Controller::integrate_topics_maintenance');
+					remove_integration_function('integrate_load_illegal_guest_permissions', 'ManageDraftsModule_Controller::integrate_load_illegal_guest_permissions');
 				}
 			},
 		);
@@ -109,6 +111,16 @@ class ManageDraftsModule_Controller extends Action_Controller
 		$permissionList['board'] += array(
 			'post_draft' => array(false, 'topic'),
 			'post_autosave_draft' => array(false, 'topic'),
+		);
+	}
+
+	public static function integrate_load_illegal_guest_permissions()
+	{
+		global $context;
+
+		$context['non_guest_permissions'] += array(
+			'post_draft',
+			'post_autosave_draft',
 		);
 	}
 

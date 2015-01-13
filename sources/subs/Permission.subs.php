@@ -67,8 +67,6 @@ function loadIllegalGuestPermissions()
 		'modify_replies',
 		'send_mail',
 		'approve_posts',
-		'post_draft',
-		'post_autosave_draft',
 		'postby_email',
 		'approve_emails',
 		'like_posts',

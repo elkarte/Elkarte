@@ -469,8 +469,6 @@ function loadAllPermissions()
 			'post_unapproved_topics' => array(false, 'topic'),
 			'post_unapproved_replies' => array(true, 'topic'),
 			'post_reply' => array(true, 'topic'),
-// 			'post_draft' => array(false, 'topic'),
-// 			'post_autosave_draft' => array(false, 'topic'),
 			'merge_any' => array(false, 'topic'),
 			'split_any' => array(false, 'topic'),
 			'send_topic' => array(false, 'topic'),
@@ -540,9 +538,7 @@ function loadAllPermissions()
 	}
 	if (!in_array('dr', $context['admin_features']))
 	{
-// 		$hiddenPermissions[] = 'post_draft';
 		$hiddenPermissions[] = 'pm_draft';
-// 		$hiddenPermissions[] = 'post_autosave_draft';
 		$hiddenPermissions[] = 'pm_autosave_draft';
 	}
 
