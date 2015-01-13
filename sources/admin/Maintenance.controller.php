@@ -101,7 +101,6 @@ class Maintenance_Controller extends Action_Controller
 				'activities' => array(
 					'massmove' => 'action_massmove_display',
 					'pruneold' => 'action_pruneold_display',
-					'olddrafts' => 'action_olddrafts_display',
 				),
 			),
 			'hooks' => array(
@@ -358,16 +357,6 @@ class Maintenance_Controller extends Action_Controller
 				'title' => $txt['maintain_old'],
 				'submit' => $txt['maintain_old_remove'],
 				'confirm' => $txt['maintain_old_confirm'],
-				'hidden' => array(
-					'session_var' => 'session_id',
-					'admin-maint_token_var' => 'admin-maint_token',
-				)
-			),
-			'olddrafts' => array(
-				'url' => $scripturl . '?action=admin;area=maintain;sa=topics;activity=olddrafts',
-				'title' => $txt['maintain_old_drafts'],
-				'submit' => $txt['maintain_old_remove'],
-				'confirm' => $txt['maintain_old_drafts_confirm'],
 				'hidden' => array(
 					'session_var' => 'session_id',
 					'admin-maint_token_var' => 'admin-maint_token',
@@ -1141,28 +1130,6 @@ class Maintenance_Controller extends Action_Controller
 		logAction('pruned', array('days' => (int) $_POST['maxdays']));
 
 		redirectexit('action=admin;area=maintain;sa=topics;done=purgeold');
-	}
-
-	/**
-	 * This method removes old drafts.
-	 */
-	public function action_olddrafts_display()
-	{
-		global $context, $txt;
-
-		validateToken('admin-maint');
-
-		require_once(SUBSDIR . '/Drafts.subs.php');
-		$drafts = getOldDrafts($_POST['draftdays']);
-
-		// If we have old drafts, remove them
-		if (count($drafts) > 0)
-			deleteDrafts($drafts, -1, false);
-
-		// Errors?  no errors, only success !
-		$context['maintenance_finished'] = array(
-			'errors' => array(sprintf($txt['maintain_done'], $txt['maintain_old_drafts'])),
-		);
 	}
 
 	/**

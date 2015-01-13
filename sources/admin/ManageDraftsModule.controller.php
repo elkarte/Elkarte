@@ -80,6 +80,65 @@ class ManageDraftsModule_Controller extends Action_Controller
 			'permission' => array('admin_forum'),
 			'enabled' => in_array('dr', $context['admin_features']),
 		);
+
+		add_integration_function('integrate_load_permissions', 'ManageDraftsModule_Controller::integrate_load_permissions', '', false);
+		add_integration_function('integrate_sa_manage_maintenance', 'ManageDraftsModule_Controller::integrate_sa_manage_maintenance', '', false);
+		add_integration_function('integrate_topics_maintenance', 'ManageDraftsModule_Controller::integrate_topics_maintenance', '', false);
+	}
+
+	public static function integrate_load_permissions(&$permissionGroups, &$permissionList, &$leftPermissionGroups, &$hiddenPermissions, &$relabelPermissions)
+	{
+		$permissionList['board'] += array(
+			'post_draft' => array(false, 'topic'),
+			'post_autosave_draft' => array(false, 'topic'),
+		);
+	}
+
+	public static function integrate_topics_maintenance(&$topics_actions)
+	{
+		global $scripturl, $txt;
+
+		$topics_actions['olddrafts'] = array(
+			'url' => $scripturl . '?action=admin;area=maintain;sa=topics;activity=olddrafts',
+			'title' => $txt['maintain_old_drafts'],
+			'submit' => $txt['maintain_old_remove'],
+			'confirm' => $txt['maintain_old_drafts_confirm'],
+			'hidden' => array(
+				'session_var' => 'session_id',
+				'admin-maint_token_var' => 'admin-maint_token',
+			)
+		);
+	}
+
+	public static function integrate_sa_manage_maintenance(&$subActions)
+	{
+		$subActions['topics']['activities']['olddrafts'] = function() {
+			$loader = new Controller_Loader('ManageDraftsModule');
+			$controller = $loader->initDispatch();
+			$controller->action_olddrafts_display();
+		};
+	}
+
+	/**
+	 * This method removes old drafts.
+	 */
+	public function action_olddrafts_display()
+	{
+		global $context, $txt;
+
+		validateToken('admin-maint');
+
+		require_once(SUBSDIR . '/Drafts.subs.php');
+		$drafts = getOldDrafts((int) $_POST['draftdays']);
+
+		// If we have old drafts, remove them
+		if (count($drafts) > 0)
+			deleteDrafts($drafts, -1, false);
+
+		// Errors?  no errors, only success !
+		$context['maintenance_finished'] = array(
+			'errors' => array(sprintf($txt['maintain_done'], $txt['maintain_old_drafts'])),
+		);
 	}
 
 	/**
