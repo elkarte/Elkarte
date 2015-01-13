@@ -301,7 +301,7 @@ class Maintenance_Controller extends Action_Controller
 			),
 		);
 
-		call_integration_hook('integrate_routine_maintenance');
+		call_integration_hook('integrate_routine_maintenance', array(&$context['routine_actions']));
 	}
 
 	/**
@@ -385,7 +385,7 @@ class Maintenance_Controller extends Action_Controller
 			),
 		);
 
-		call_integration_hook('integrate_topics_maintenance');
+		call_integration_hook('integrate_topics_maintenance', array(&$context['topics_actions']));
 
 		if (isset($_GET['done']) && $_GET['done'] == 'purgeold')
 			$context['maintenance_finished'] = array(
