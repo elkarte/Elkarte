@@ -1144,33 +1144,6 @@ function checkAttributeValidity()
 }
 
 /**
- * Function for showing which boards to prune in an otherwise hidden list.
- * Used by topic maintenance task, will select all boards when collapsed or allow
- * specific boards to be chosen when expanded
- */
-function swapRot()
-{
-	rotSwap = !rotSwap;
-
-	// Toggle icon
-	document.getElementById("rotIcon").src = elk_images_url + (rotSwap ? "/selected_open.png" : "/selected.png");
-	document.getElementById("rotText").innerHTML = rotSwap ? maintain_old_choose : maintain_old_all;
-
-	// Toggle panel
-	$("#rotPanel").slideToggle(300);
-
-	// Toggle checkboxes
-	var rotPanel = document.getElementById("rotPanel"),
-		oBoardCheckBoxes = rotPanel.getElementsByTagName("input");
-
-	for (var i = 0; i < oBoardCheckBoxes.length; i++)
-	{
-		if (oBoardCheckBoxes[i].type.toLowerCase() === "checkbox")
-			oBoardCheckBoxes[i].checked = !rotSwap;
-	}
-}
-
-/**
  * Enable/disable fields when transfering attachments
  *
  * @returns {undefined}

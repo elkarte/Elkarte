@@ -309,7 +309,7 @@ function template_maintain_topics()
 		<h2 class="category_header">', $txt['maintain_old'], '</h2>
 		<div class="windowbg">
 			<div class="content flow_auto">
-				<form action="', $scripturl, '?action=admin;area=maintain;sa=topics;activity=pruneold" method="post" accept-charset="UTF-8">';
+				<form name="manage_maintenance" action="', $scripturl, '?action=admin;area=maintain;sa=topics;activity=pruneold" method="post" accept-charset="UTF-8">';
 
 	// The otherwise hidden "choose which boards to prune".
 	echo '
@@ -326,47 +326,13 @@ function template_maintain_topics()
 		echo '
 					<p>
 						<label for="delete_old_not_sticky"><input type="checkbox" name="delete_old_not_sticky" id="delete_old_not_sticky" class="input_check" checked="checked" /> ', $txt['maintain_old_are_not_stickied'], '</label><br />
-					</p>';
-
-	echo '
-					<p>
-						<a href="#rotLink" onclick="swapRot();"><img src="', $settings['images_url'], '/selected.png" alt="+" id="rotIcon" /></a> <a href="#rotLink" onclick="swapRot();" id="rotText">', $txt['maintain_old_all'], '</a>
 					</p>
-					<div style="display: none;" id="rotPanel" class="flow_hidden">
-						<div class="floatleft grid50">';
+					<fieldset id="pick_boards" class="content">';
 
-	// This is the "middle" of the list.
-	$middle = ceil(count($context['categories']) / 2);
-
-	$i = 0;
-	foreach ($context['categories'] as $category)
-	{
-		echo '
-							<fieldset>
-								<legend>', $category['name'], '</legend>
-								<ul>';
-
-		// Display a checkbox with every board.
-		foreach ($category['boards'] as $board)
-			echo '
-									<li style="margin-', $context['right_to_left'] ? 'right' : 'left', ': ', $board['child_level'] * 1.5, 'em;">
-										<label for="boards_', $board['id'], '"><input type="checkbox" name="boards[', $board['id'], ']" id="boards_', $board['id'], '" checked="checked" class="input_check" />', $board['name'], '</label>
-									</li>';
-
-		echo '
-								</ul>
-							</fieldset>';
-
-		// Increase $i, and check if we're at the middle yet.
-		if (++$i == $middle)
-			echo '
-						</div>
-						<div class="floatright grid50">';
-	}
+	template_pick_boards('manage_maintenance', 'boards');
 
 	echo '
-						</div>
-					</div>
+					</fieldset>
 					<div class="submitbutton">
 						<input type="submit" value="', $txt['maintain_old_remove'], '" onclick="return confirm(\'', $txt['maintain_old_confirm'], '\');" class="button_submit" />
 						<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />

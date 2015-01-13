@@ -340,6 +340,18 @@ class Maintenance_Controller extends Action_Controller
 		// Let's load up the boards in case they are useful.
 		$context += getBoardList(array('not_redirection' => true));
 
+		// Include a list of boards per category for easy toggling.
+		foreach ($context['categories'] as $cat => &$category)
+		{
+			$context['boards_in_category'][$cat] = count($category['boards']);
+			$category['child_ids'] = array_keys($category['boards']);
+		}
+
+		// @todo Hacky!
+		$txt['choose_board'] = $txt['maintain_old_all'];
+		$context['boards_check_all'] = true;
+		loadTemplate('GenericBoards');
+
 		if (isset($_GET['done']) && $_GET['done'] == 'purgeold')
 			$context['maintenance_finished'] = array(
 				'errors' => array(sprintf($txt['maintain_done'], $txt['maintain_old'])),
