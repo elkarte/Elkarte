@@ -333,7 +333,7 @@ class Maintenance_Controller extends Action_Controller
 	 */
 	public function action_topics()
 	{
-		global $context, $txt;
+		global $context, $txt, $scripturl;
 
 		require_once(SUBSDIR . '/Boards.subs.php');
 
@@ -351,6 +351,41 @@ class Maintenance_Controller extends Action_Controller
 		$txt['choose_board'] = $txt['maintain_old_all'];
 		$context['boards_check_all'] = true;
 		loadTemplate('GenericBoards');
+
+		$context['topics_actions'] = array(
+			'pruneold' => array(
+				'url' => $scripturl, '?action=admin;area=maintain;sa=topics;activity=pruneold',
+				'title' => $txt['maintain_old'],
+				'submit' => $txt['maintain_old_remove'],
+				'confirm' => $txt['maintain_old_confirm'],
+				'hidden' => array(
+					'session_var' => 'session_id',
+					'admin-maint_token_var' => 'admin-maint_token',
+				)
+			),
+			'olddrafts' => array(
+				'url' => $scripturl, '?action=admin;area=maintain;sa=topics;activity=olddrafts',
+				'title' => $txt['maintain_old_drafts'],
+				'submit' => $txt['maintain_old_remove'],
+				'confirm' => $txt['maintain_old_drafts_confirm'],
+				'hidden' => array(
+					'session_var' => 'session_id',
+					'admin-maint_token_var' => 'admin-maint_token',
+				)
+			),
+			'massmove' => array(
+				'url' => $scripturl, '?action=admin;area=maintain;sa=topics;activity=massmove',
+				'title' => $txt['move_topics_maintenance'],
+				'submit' => $txt['move_topics_now'],
+				'confirm' => $txt['move_topics_confirm'],
+				'hidden' => array(
+					'session_var' => 'session_id',
+					'admin-maint_token_var' => 'admin-maint_token',
+				)
+			),
+		);
+
+		call_integration_hook('integrate_topics_maintenance');
 
 		if (isset($_GET['done']) && $_GET['done'] == 'purgeold')
 			$context['maintenance_finished'] = array(
