@@ -34,7 +34,7 @@ if (!defined('ELK'))
  * error logs, ban logs and moderation logs.
  * - removes these members' personal messages (only the inbox)
  * - rmoves avatars, ban entries, theme settings, moderator positions, poll votes,
- * drafts, likes, mentions, notifications
+ * likes, mentions, notifications
  * - removes custom field data associated with them
  * - updates member statistics afterwards.
  *
@@ -216,15 +216,6 @@ function deleteMembers($users, $check_not_admin = false)
 	// Delete the member.
 	$db->query('', '
 		DELETE FROM {db_prefix}members
-		WHERE id_member IN ({array_int:users})',
-		array(
-			'users' => $users,
-		)
-	);
-
-	// Delete any drafts...
-	$db->query('', '
-		DELETE FROM {db_prefix}user_drafts
 		WHERE id_member IN ({array_int:users})',
 		array(
 			'users' => $users,

@@ -52,11 +52,19 @@ class ManageDraftsModule_Controller extends Action_Controller
 				{
 					enableModules('drafts', array('post', 'display'));
 					calculateNextTrigger('remove_old_drafts');
+					add_integration_function('integrate_delete_members', 'ManageDraftsModule_Controller::integrate_delete_members');
+					add_integration_function('integrate_load_permissions', 'ManageDraftsModule_Controller::integrate_load_permissions');
+					add_integration_function('integrate_sa_manage_maintenance', 'ManageDraftsModule_Controller::integrate_sa_manage_maintenance');
+					add_integration_function('integrate_topics_maintenance', 'ManageDraftsModule_Controller::integrate_topics_maintenance');
 				}
 				// Disabling, just forget about the modules
 				else
 				{
 					disableModules('drafts', array('post', 'display'));
+					remove_integration_function('integrate_delete_members', 'ManageDraftsModule_Controller::integrate_delete_members');
+					remove_integration_function('integrate_load_permissions', 'ManageDraftsModule_Controller::integrate_load_permissions');
+					remove_integration_function('integrate_sa_manage_maintenance', 'ManageDraftsModule_Controller::integrate_sa_manage_maintenance');
+					remove_integration_function('integrate_topics_maintenance', 'ManageDraftsModule_Controller::integrate_topics_maintenance');
 				}
 			},
 		);
@@ -80,10 +88,20 @@ class ManageDraftsModule_Controller extends Action_Controller
 			'permission' => array('admin_forum'),
 			'enabled' => in_array('dr', $context['admin_features']),
 		);
+	}
 
-		add_integration_function('integrate_load_permissions', 'ManageDraftsModule_Controller::integrate_load_permissions', '', false);
-		add_integration_function('integrate_sa_manage_maintenance', 'ManageDraftsModule_Controller::integrate_sa_manage_maintenance', '', false);
-		add_integration_function('integrate_topics_maintenance', 'ManageDraftsModule_Controller::integrate_topics_maintenance', '', false);
+	public static function integrate_delete_members($users)
+	{
+		$db = database();
+
+		// Delete any drafts...
+		$db->query('', '
+			DELETE FROM {db_prefix}user_drafts
+			WHERE id_member IN ({array_int:users})',
+			array(
+				'users' => $users,
+			)
+		);
 	}
 
 	public static function integrate_load_permissions(&$permissionGroups, &$permissionList, &$leftPermissionGroups, &$hiddenPermissions, &$relabelPermissions)
