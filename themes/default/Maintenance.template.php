@@ -314,8 +314,8 @@ function template_maintain_topics()
 					<div class="submitbutton">
 						<input type="submit" value="', $maintenace['submit'], '" ', !empty($maintenace['confirm']) ? 'onclick="return confirm(\'' . $maintenace['confirm'] . '\');"' : '', ' class="button_submit" />';
 
-		if (!empty($action['hidden']))
-			foreach ($action['hidden'] as $name => $val)
+		if (!empty($maintenace['hidden']))
+			foreach ($maintenace['hidden'] as $name => $val)
 				echo '
 						<input type="hidden" name="', $context[$name], '" value="', $context[$val], '" />';
 
