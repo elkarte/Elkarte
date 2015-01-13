@@ -485,32 +485,6 @@ function custom_profiles_toggle_callback($value)
 }
 
 /**
- * Callback used in the core features page when the drafts
- * are enabled or disabled.
- *
- * @package Admin
- * @param bool $value the "new" status of the drafts
- * (true => enabled, false => disabled)
- */
-function drafts_toggle_callback($value)
-{
-	require_once(SUBSDIR . '/ScheduledTasks.subs.php');
-	toggleTaskStatusByName('remove_old_drafts', $value);
-
-	// Enabling, let's register the modules and prepare the scheuled task
-	if ($value)
-	{
-		enableModules('drafts', array('post', 'display'));
-		calculateNextTrigger('remove_old_drafts');
-	}
-	// Disabling, just forget about the modules
-	else
-	{
-		disableModules('drafts', array('post', 'display'));
-	}
-}
-
-/**
  * Callback used in the core features page when the paid subscriptions
  * are enabled or disabled.
  *
