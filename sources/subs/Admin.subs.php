@@ -497,9 +497,17 @@ function drafts_toggle_callback($value)
 	require_once(SUBSDIR . '/ScheduledTasks.subs.php');
 	toggleTaskStatusByName('remove_old_drafts', $value);
 
-	// Should we calculate next trigger?
+	// Enabling, let's register the modules and prepare the scheuled task
 	if ($value)
+	{
+		enableModules('drafts', array('post', 'display'));
 		calculateNextTrigger('remove_old_drafts');
+	}
+	// Disabling, just forget about the modules
+	else
+	{
+		disableModules('drafts', array('post', 'display'));
+	}
 }
 
 /**
@@ -536,4 +544,52 @@ function postbyemail_toggle_callback($value)
 	// Should we calculate next trigger?
 	if ($value)
 		calculateNextTrigger('maillist_fetch_IMAP');
+}
+
+/**
+ * Enables a certain module on a set of controllers
+ *
+ * @package Admin
+ * @param string $module the name of the module (e.g. drafts)
+ * @param string[] $controllers list of controllers on which the module is
+ *                 activated
+ */
+function enableModules($module, $controllers)
+{
+	global $modSettings;
+
+	foreach ((array) $controllers as $controller)
+	{
+		if (!empty($modSettings['modules_' . $controller]))
+			$existing = explode(',', $modSettings['modules_' . $controller]);
+		else
+			$existing = array();
+
+		$existing[] = $module;
+		updateSettings(array('modules_' . $controller => implode(',', $existing)));
+	}
+}
+
+/**
+ * Disable a certain module on a set of controllers
+ *
+ * @package Admin
+ * @param string $module the name of the module (e.g. drafts)
+ * @param string[] $controllers list of controllers on which the module is
+ *                 activated
+ */
+function disableModules($module, $controllers)
+{
+	global $modSettings;
+
+	foreach ((array) $controllers as $controller)
+	{
+		if (!empty($modSettings['modules_' . $controller]))
+			$existing = explode(',', $modSettings['modules_' . $controller]);
+		else
+			$existing = array();
+
+		$existing[] = $module;
+		updateSettings(array('modules_' . $controller => implode(',', $existing)));
+	}
 }

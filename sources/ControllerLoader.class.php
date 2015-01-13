@@ -115,9 +115,10 @@ class Controller_Loader
 		global $modSettings;
 
 		$files = array();
-		if (!empty($modSettings['modules_' . $this->_controller_name]))
+		$setting_key = 'modules_' . strtolower($this->_controller_name);
+		if (!empty($modSettings[$setting_key]))
 		{
-			$modules = explode(',', $modSettings['modules_' . strtolower($this->_controller_name)]);
+			$modules = explode(',', $modSettings[$setting_key]);
 			foreach ($modules as $module)
 			{
 				$file = SUBSDIR . '/' . ucfirst($module) . ucfirst($this->_controller_name) . 'Module.class.php';
