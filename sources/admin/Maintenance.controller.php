@@ -354,7 +354,7 @@ class Maintenance_Controller extends Action_Controller
 
 		$context['topics_actions'] = array(
 			'pruneold' => array(
-				'url' => $scripturl, '?action=admin;area=maintain;sa=topics;activity=pruneold',
+				'url' => $scripturl . '?action=admin;area=maintain;sa=topics;activity=pruneold',
 				'title' => $txt['maintain_old'],
 				'submit' => $txt['maintain_old_remove'],
 				'confirm' => $txt['maintain_old_confirm'],
@@ -364,7 +364,7 @@ class Maintenance_Controller extends Action_Controller
 				)
 			),
 			'olddrafts' => array(
-				'url' => $scripturl, '?action=admin;area=maintain;sa=topics;activity=olddrafts',
+				'url' => $scripturl . '?action=admin;area=maintain;sa=topics;activity=olddrafts',
 				'title' => $txt['maintain_old_drafts'],
 				'submit' => $txt['maintain_old_remove'],
 				'confirm' => $txt['maintain_old_drafts_confirm'],
@@ -374,7 +374,7 @@ class Maintenance_Controller extends Action_Controller
 				)
 			),
 			'massmove' => array(
-				'url' => $scripturl, '?action=admin;area=maintain;sa=topics;activity=massmove',
+				'url' => $scripturl . '?action=admin;area=maintain;sa=topics;activity=massmove',
 				'title' => $txt['move_topics_maintenance'],
 				'submit' => $txt['move_topics_now'],
 				'confirm' => $txt['move_topics_confirm'],
