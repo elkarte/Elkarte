@@ -566,6 +566,7 @@ function enableModules($module, $controllers)
 			$existing = array();
 
 		$existing[] = $module;
+		$existing = array_filter(array_unique($existing));
 		updateSettings(array('modules_' . $controller => implode(',', $existing)));
 	}
 }
@@ -589,7 +590,7 @@ function disableModules($module, $controllers)
 		else
 			$existing = array();
 
-		$existing[] = $module;
+		$existing = array_diff($existing, (array) $module);
 		updateSettings(array('modules_' . $controller => implode(',', $existing)));
 	}
 }
