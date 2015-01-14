@@ -364,7 +364,7 @@ function printMemberListRows($request)
 				}
 
 				// Should it be enclosed for display?
-				if (!empty($column['enclose']))
+				if (!empty($column['enclose']) && !empty($context['members'][$member]['options'][$curField]))
 					$context['members'][$member]['options'][$curField] = strtr($column['enclose'], array(
 						'{SCRIPTURL}' => $scripturl,
 						'{IMAGES_URL}' => $settings['images_url'],
