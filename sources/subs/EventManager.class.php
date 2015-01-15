@@ -124,7 +124,7 @@ class Event_Manager
 
 	/**
 	 * Retrieves or creates the instance of an object.
-	 * Objects are stored in oredr to be shared between different triggers
+	 * Objects are stored in order to be shared between different triggers
 	 * in the same Event_Manager.
 	 * If the object doesn't exist yet, it is created
 	 *

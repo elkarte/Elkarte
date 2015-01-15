@@ -39,6 +39,7 @@ function reloadSettings()
 
 	$db = database();
 	$cache = Cache::instance();
+	$hooks = Hooks::get();
 
 	// Try to load it from the cache first; it'll never get cached if the setting is off.
 	if (($modSettings = $cache->get('modSettings', 90)) == null)
@@ -71,6 +72,9 @@ function reloadSettings()
 		if (!empty($modSettings['cache_enable']))
 			$cache->put('modSettings', $modSettings, 90);
 	}
+
+	$hooks->loadIntegrations(BOARDDIR . '/packages/integration');
+	$hooks->loadIntegrations(SOURCEDIR);
 
 	// Setting the timezone is a requirement for some functions in PHP >= 5.1.
 	if (isset($modSettings['default_timezone']))
@@ -125,19 +129,9 @@ function reloadSettings()
 
 	// Any files to pre include?
 	call_integration_include_hook('integrate_pre_include');
-	autoLoadAddons();
 
 	// Call pre load integration functions.
 	call_integration_hook('integrate_pre_load');
-}
-
-/**
- * Automatically loads all the integrate files found.
- */
-function autoLoadAddons()
-{
-	foreach (glob(BOARDDIR . '/packages/integration/*/*.integrate.php') as $require_file)
-		require_once($require_file);
 }
 
 /**
@@ -1743,6 +1737,8 @@ function loadTheme($id_theme = 0, $initialize = true)
 		window.setTimeout("elkAutoTask();", 1);', true);
 		}
 	}
+
+	Hooks::get()->newPath(array('$themedir' => $settings['theme_dir']));
 
 	// Any files to include at this point?
 	call_integration_include_hook('integrate_theme_include');

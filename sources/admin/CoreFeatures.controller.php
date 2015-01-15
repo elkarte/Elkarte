@@ -290,6 +290,30 @@ class CoreFeatures_Controller extends Action_Controller
 			if (method_exists($class, 'addCoreFeature'))
 				$class::addCoreFeature($core_features);
 		}
+
+		$integrations = Hooks::get()->discoverIntegrations(BOARDDIR . '/packages/integration');
+		$integrations += Hooks::get()->discoverIntegrations(SOURCEDIR);
+
+		foreach ($integrations as $integration)
+		{
+			$core_features[$integration['id']] = array(
+				'url' => empty($integration['details']->extra->setting_url) ? '?action=admin;area=addonsettings' : $integration['details']->extra->setting_url,
+				'title' => $integration['title'],
+				'desc' => $integration['description'],
+			);
+			if (method_exists($integration['class'], 'setting_callback'))
+			{
+				$core_features[$integration['id']]['setting_callback'] = function ($value) {
+					$integration['class']::setting_callback($value);
+				};
+			}
+			if (method_exists($integration['class'], 'setting_callback'))
+			{
+				$core_features[$integration['id']]['on_save'] = function () {
+					$integration['class']::on_save();
+				};
+			}
+		}
 	}
 
 	/**
@@ -428,7 +452,7 @@ class CoreFeatures_Controller extends Action_Controller
 
 		// Sort by title attribute
 		uasort($features, function($a, $b) {
-			return strcmp($a["title"], $b["title"]);
+			return strcmp(strtolower($a["title"]), strtolower($b["title"]));
 		});
 
 		return $features;

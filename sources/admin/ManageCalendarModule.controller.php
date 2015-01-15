@@ -46,6 +46,18 @@ class ManageCalendarModule_Controller extends Action_Controller
 			'settings' => array(
 				'cal_enabled' => 1,
 			),
+			'setting_callback' => function ($value) {
+				if ($value)
+				{
+					enableModules('calendar', array('post'));
+					Hooks::get()->enableIntegration('subs/Calendar.integrate.php');
+				}
+				else
+				{
+					disableModules('calendar', array('post'));
+					Hooks::get()->disableIntegration('subs/Calendar.integrate.php');
+				}
+			},
 		);
 	}
 

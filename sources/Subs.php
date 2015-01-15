@@ -3530,56 +3530,7 @@ function elk_seed_generator()
  */
 function call_integration_hook($hook, $parameters = array())
 {
-	global $modSettings, $settings, $db_show_debug;
-
-	static $path_replacements = array(
-		'BOARDDIR' => BOARDDIR,
-		'SOURCEDIR' => SOURCEDIR,
-		'EXTDIR' => EXTDIR,
-		'LANGUAGEDIR' => LANGUAGEDIR,
-		'ADMINDIR' => ADMINDIR,
-		'CONTROLLERDIR' => CONTROLLERDIR,
-		'SUBSDIR' => SUBSDIR,
-	);
-
-	if ($db_show_debug === true)
-		Debug::get()->add('hooks', $hook);
-
-	$results = array();
-	if (empty($modSettings[$hook]))
-		return $results;
-
-	if (!empty($settings['theme_dir']))
-		$path_replacements['$themedir'] = $settings['theme_dir'];
-
-	// Loop through each function.
-	$functions = explode(',', $modSettings[$hook]);
-	foreach ($functions as $function)
-	{
-		$function = trim($function);
-		if (strpos($function, '|') !== false)
-			list ($call, $file) = explode('|', $function);
-		else
-			$call = $function;
-
-		// OOP static method
-		if (strpos($call, '::') !== false)
-			$call = explode('::', $call);
-
-		if (!empty($file))
-		{
-			$absPath = strtr(trim($file), $path_replacements);
-
-			if (file_exists($absPath))
-				require_once($absPath);
-		}
-
-		// Is it valid?
-		if (is_callable($call))
-			$results[$function] = call_user_func_array($call, $parameters);
-	}
-
-	return $results;
+	return Hooks::get()->hook($hook, $parameters);
 }
 
 /**
@@ -3589,36 +3540,7 @@ function call_integration_hook($hook, $parameters = array())
  */
 function call_integration_include_hook($hook)
 {
-	global $modSettings, $settings, $db_show_debug;
-
-	static $path_replacements = array(
-		'BOARDDIR' => BOARDDIR,
-		'SOURCEDIR' => SOURCEDIR,
-		'EXTDIR' => EXTDIR,
-		'LANGUAGEDIR' => LANGUAGEDIR,
-		'ADMINDIR' => ADMINDIR,
-		'CONTROLLERDIR' => CONTROLLERDIR,
-		'SUBSDIR' => SUBSDIR,
-	);
-
-	if ($db_show_debug === true)
-		Debug::get()->add('hooks', $hook);
-
-	// Any file to include?
-	if (!empty($modSettings[$hook]))
-	{
-		if (!empty($settings['theme_dir']))
-			$path_replacements['$themedir'] = $settings['theme_dir'];
-
-		$pre_includes = explode(',', $modSettings[$hook]);
-		foreach ($pre_includes as $include)
-		{
-			$include = strtr(trim($include), $path_replacements);
-
-			if (file_exists($include))
-				require_once($include);
-		}
-	}
+	Hooks::get()->include_hook($hook);
 }
 
 /**
@@ -3626,57 +3548,7 @@ function call_integration_include_hook($hook)
  */
 function call_integration_buffer()
 {
-	global $modSettings, $settings, $db_show_debug;
-
-	static $path_replacements = array(
-		'BOARDDIR' => BOARDDIR,
-		'SOURCEDIR' => SOURCEDIR,
-		'EXTDIR' => EXTDIR,
-		'LANGUAGEDIR' => LANGUAGEDIR,
-		'ADMINDIR' => ADMINDIR,
-		'CONTROLLERDIR' => CONTROLLERDIR,
-		'SUBSDIR' => SUBSDIR,
-	);
-
-	if ($db_show_debug === true)
-		Debug::get()->add('hooks', 'integrate_buffer');
-
-	if (!empty($settings['theme_dir']))
-		$path_replacements['$themedir'] = $settings['theme_dir'];
-
-	if (isset($modSettings['integrate_buffer']))
-		$buffers = explode(',', $modSettings['integrate_buffer']);
-
-	if (empty($buffers))
-		return;
-
-	foreach ($buffers as $function)
-	{
-		$function = trim($function);
-
-		if (strpos($function, '|') !== false)
-			list($call, $file) = explode('|', $function);
-		else
-			$call = $function;
-
-		// OOP static method
-		if (strpos($call, '::') !== false)
-		{
-			$call = explode('::', $call);
-		}
-
-		if (!empty($file))
-		{
-			$absPath = strtr(trim($file), $path_replacements);
-
-			if (file_exists($absPath))
-				require_once($absPath);
-		}
-
-		// Is it valid?
-		if (is_callable($call))
-			ob_start($call);
-	}
+	Hooks::get()->buffer_hook();
 }
 
 /**
@@ -3691,49 +3563,7 @@ function call_integration_buffer()
  */
 function add_integration_function($hook, $function, $file = '', $permanent = true)
 {
-	global $modSettings;
-
-	$db = database();
-
-	$integration_call = (!empty($file) && $file !== true) ? $function . '|' . $file : $function;
-
-	// Is it going to be permanent?
-	if ($permanent)
-	{
-		$request = $db->query('', '
-			SELECT value
-			FROM {db_prefix}settings
-			WHERE variable = {string:variable}',
-			array(
-				'variable' => $hook,
-			)
-		);
-		list ($current_functions) = $db->fetch_row($request);
-		$db->free_result($request);
-
-		if (!empty($current_functions))
-		{
-			$current_functions = explode(',', $current_functions);
-			if (in_array($integration_call, $current_functions))
-				return;
-
-			$permanent_functions = array_merge($current_functions, array($integration_call));
-		}
-		else
-			$permanent_functions = array($integration_call);
-
-		updateSettings(array($hook => implode(',', $permanent_functions)));
-	}
-
-	// Make current function list usable.
-	$functions = empty($modSettings[$hook]) ? array() : explode(',', $modSettings[$hook]);
-
-	// Do nothing, if it's already there.
-	if (in_array($integration_call, $functions))
-		return;
-
-	$functions[] = $integration_call;
-	$modSettings[$hook] = implode(',', $functions);
+	Hooks::get()->add($hook, $function, $file, $permanent);
 }
 
 /**
@@ -3749,45 +3579,7 @@ function add_integration_function($hook, $function, $file = '', $permanent = tru
  */
 function remove_integration_function($hook, $function, $file = '')
 {
-	global $modSettings;
-
-	$db = database();
-	$integration_call = (!empty($file) && $file !== true) ? $function . '|' . $file : $function;
-
-	// Get the permanent functions.
-	$request = $db->query('', '
-		SELECT value
-		FROM {db_prefix}settings
-		WHERE variable = {string:variable}',
-		array(
-			'variable' => $hook,
-		)
-	);
-	list ($current_functions) = $db->fetch_row($request);
-	$db->free_result($request);
-
-	// If we found entries for this hook
-	if (!empty($current_functions))
-	{
-		$current_functions = explode(',', $current_functions);
-
-		if (in_array($integration_call, $current_functions))
-		{
-			updateSettings(array($hook => implode(',', array_diff($current_functions, array($integration_call)))));
-			if (empty($modSettings[$hook]))
-				removeSettings($hook);
-		}
-	}
-
-	// Turn the function list into something usable.
-	$functions = empty($modSettings[$hook]) ? array() : explode(',', $modSettings[$hook]);
-
-	// You can only remove it if it's available.
-	if (!in_array($integration_call, $functions))
-		return;
-
-	$functions = array_diff($functions, array($integration_call));
-	$modSettings[$hook] = implode(',', $functions);
+	Hooks::get()->remove($hook, $function, $file);
 }
 
 /**
