@@ -2511,12 +2511,16 @@ function list_getUserWarningCount($memID)
  * @param string $sort
  * @param int[] $boardsAllowed
  * @param integer $memID
+ * @param int[]|null|boolean $exclude_boards
  */
-function profileLoadAttachments($start, $items_per_page, $sort, $boardsAllowed, $memID)
+function profileLoadAttachments($start, $items_per_page, $sort, $boardsAllowed, $memID, $exclude_boards = null)
 {
 	global $board, $modSettings, $context, $settings, $scripturl, $txt;
 
 	$db = database();
+
+	if ($exclude_boards === null && !empty($modSettings['recycle_enable']) && $modSettings['recycle_board'] > 0)
+		$exclude_boards = array($modSettings['recycle_board']);
 
 	// Retrieve some attachments.
 	$request = $db->query('', '
@@ -2531,12 +2535,14 @@ function profileLoadAttachments($start, $items_per_page, $sort, $boardsAllowed, 
 			AND a.id_msg != {int:no_message}
 			AND m.id_member = {int:current_member}' . (!empty($board) ? '
 			AND b.id_board = {int:board}' : '') . (!in_array(0, $boardsAllowed) ? '
-			AND b.id_board IN ({array_int:boards_list})' : '') . (!$modSettings['postmod_active'] || $context['user']['is_owner'] ? '' : '
+			AND b.id_board IN ({array_int:boards_list})' : '') . (!empty($exclude_boards) ? '
+			AND b.id_board NOT IN ({array_int:exclude_boards})' : '') . (!$modSettings['postmod_active'] || $context['user']['is_owner'] ? '' : '
 			AND m.approved = {int:is_approved}') . '
 		ORDER BY {raw:sort}
 		LIMIT {int:offset}, {int:limit}',
 		array(
 			'boards_list' => $boardsAllowed,
+			'exclude_boards' => $exclude_boards,
 			'attachment_type' => 0,
 			'no_message' => 0,
 			'current_member' => $memID,
