@@ -69,13 +69,9 @@ class Memberlist_Controller extends Action_Controller
 
 		// Set up the standard columns...
 		$context['columns'] = array(
-			'online' => array(
-				'label' => $txt['status'],
-				'class' => 'status',
-				'sort' => array(
-					'down' => allowedTo('moderate_forum') ? 'IFNULL(lo.log_time, 1) ASC, real_name ASC' : 'CASE WHEN mem.show_online THEN IFNULL(lo.log_time, 1) ELSE 1 END ASC, real_name ASC',
-					'up' => allowedTo('moderate_forum') ? 'IFNULL(lo.log_time, 1) DESC, real_name DESC' : 'CASE WHEN mem.show_online THEN IFNULL(lo.log_time, 1) ELSE 1 END DESC, real_name DESC'
-				),
+			'avatar' => array(
+				'label' => '',
+				'class' => '',
 			),
 			'real_name' => array(
 				'label' => $txt['username'],
@@ -83,6 +79,14 @@ class Memberlist_Controller extends Action_Controller
 				'sort' => array(
 					'down' => 'mem.real_name DESC',
 					'up' => 'mem.real_name ASC'
+				),
+			),
+			'online' => array(
+				'label' => $txt['status'],
+				'class' => 'status',
+				'sort' => array(
+					'down' => allowedTo('moderate_forum') ? 'IFNULL(lo.log_time, 1) ASC, real_name ASC' : 'CASE WHEN mem.show_online THEN IFNULL(lo.log_time, 1) ELSE 1 END ASC, real_name ASC',
+					'up' => allowedTo('moderate_forum') ? 'IFNULL(lo.log_time, 1) DESC, real_name DESC' : 'CASE WHEN mem.show_online THEN IFNULL(lo.log_time, 1) ELSE 1 END DESC, real_name DESC'
 				),
 			),
 			'email_address' => array(

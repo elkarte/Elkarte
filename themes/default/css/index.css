@@ -3773,7 +3773,12 @@ dl.no_members {
 	padding: 12px 0;
 }
 #memberlist .status {
-	width: 60px;
+	width: 20px;
+}
+#memberlist .avatar.avatarresize {
+	width: 2.4em;
+	heigth: 2.4em;
+	margin: -4px -1.5em -8px 0;
 }
 #memberlist .selected {
 	width: auto;
