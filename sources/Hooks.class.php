@@ -48,7 +48,7 @@ class Hooks
 
 		if ($paths !== null)
 		{
-			$this->newPaths($paths);
+			$this->newPath($paths);
 		}
 	}
 
@@ -97,7 +97,7 @@ class Hooks
 	/**
 	 * Splits up strings from $modSettings into functions and files to include.
 	 *
-	 * @param string $hook
+	 * @param string $hook_calls
 	 */
 	protected function _prepare_hooks($hook_calls)
 	{

@@ -303,13 +303,13 @@ class CoreFeatures_Controller extends Action_Controller
 			);
 			if (method_exists($integration['class'], 'setting_callback'))
 			{
-				$core_features[$integration['id']]['setting_callback'] = function ($value) {
+				$core_features[$integration['id']]['setting_callback'] = function ($value) use ($integration) {
 					$integration['class']::setting_callback($value);
 				};
 			}
 			if (method_exists($integration['class'], 'setting_callback'))
 			{
-				$core_features[$integration['id']]['on_save'] = function () {
+				$core_features[$integration['id']]['on_save'] = function () use ($integration) {
 					$integration['class']::on_save();
 				};
 			}
