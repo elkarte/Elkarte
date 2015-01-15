@@ -1505,7 +1505,7 @@ function makeCustomFieldChanges($memID, $area, $sanitize = true)
 		}
 
 		// Did it change or has it been set?
-		if ((!isset($user_profile[$memID]['options'][$row['col_name']]) && !empty($value)) || $user_profile[$memID]['options'][$row['col_name']] !== $value)
+		if ((!isset($user_profile[$memID]['options'][$row['col_name']]) && !empty($value)) || (isset($user_profile[$memID]['options'][$row['col_name']]) && $user_profile[$memID]['options'][$row['col_name']] !== $value))
 		{
 			$log_changes[] = array(
 				'action' => 'customfield_' . $row['col_name'],
