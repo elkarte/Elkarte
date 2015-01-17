@@ -1372,9 +1372,11 @@ function makeNotificationChanges($memID)
 		$request = $db->query('', '
 			SELECT id_board
 			FROM {db_prefix}log_notify
-			WHERE id_member = {int:selected_member}',
+			WHERE id_member = {int:selected_member}
+				AND id_board != {int:id_board}',
 			array(
 				'selected_member' => $memID,
+				'id_board' => 0,
 			)
 		);
 		$notification_current = array();
@@ -1412,18 +1414,19 @@ function makeNotificationChanges($memID)
 	// We are editing topic notifications......
 	elseif (isset($_POST['edit_notify_topics']) && !empty($_POST['notify_topics']))
 	{
+		$edit_notify_topics = array();
 		foreach ($_POST['notify_topics'] as $index => $id)
-			$_POST['notify_topics'][$index] = (int) $id;
+			$edit_notify_topics[$index] = (int) $id;
 
 		// Make sure there are no zeros left.
-		$_POST['notify_topics'] = array_diff($_POST['notify_topics'], array(0));
+		$edit_notify_topics = array_diff($edit_notify_topics, array(0));
 
 		$db->query('', '
 			DELETE FROM {db_prefix}log_notify
 			WHERE id_topic IN ({array_int:topic_list})
 				AND id_member = {int:selected_member}',
 			array(
-				'topic_list' => $_POST['notify_topics'],
+				'topic_list' => $edit_notify_topics,
 				'selected_member' => $memID,
 			)
 		);
