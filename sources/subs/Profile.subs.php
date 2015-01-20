@@ -1372,9 +1372,11 @@ function makeNotificationChanges($memID)
 		$request = $db->query('', '
 			SELECT id_board
 			FROM {db_prefix}log_notify
-			WHERE id_member = {int:selected_member}',
+			WHERE id_member = {int:selected_member}
+				AND id_board != {int:id_board}',
 			array(
 				'selected_member' => $memID,
+				'id_board' => 0,
 			)
 		);
 		$notification_current = array();
@@ -1412,18 +1414,19 @@ function makeNotificationChanges($memID)
 	// We are editing topic notifications......
 	elseif (isset($_POST['edit_notify_topics']) && !empty($_POST['notify_topics']))
 	{
+		$edit_notify_topics = array();
 		foreach ($_POST['notify_topics'] as $index => $id)
-			$_POST['notify_topics'][$index] = (int) $id;
+			$edit_notify_topics[$index] = (int) $id;
 
 		// Make sure there are no zeros left.
-		$_POST['notify_topics'] = array_diff($_POST['notify_topics'], array(0));
+		$edit_notify_topics = array_diff($edit_notify_topics, array(0));
 
 		$db->query('', '
 			DELETE FROM {db_prefix}log_notify
 			WHERE id_topic IN ({array_int:topic_list})
 				AND id_member = {int:selected_member}',
 			array(
-				'topic_list' => $_POST['notify_topics'],
+				'topic_list' => $edit_notify_topics,
 				'selected_member' => $memID,
 			)
 		);
@@ -1504,8 +1507,8 @@ function makeCustomFieldChanges($memID, $area, $sanitize = true)
 			}
 		}
 
-		// Did it change?
-		if (!isset($user_profile[$memID]['options'][$row['col_name']]) || $user_profile[$memID]['options'][$row['col_name']] !== $value)
+		// Did it change or has it been set?
+		if ((!isset($user_profile[$memID]['options'][$row['col_name']]) && !empty($value)) || (isset($user_profile[$memID]['options'][$row['col_name']]) && $user_profile[$memID]['options'][$row['col_name']] !== $value))
 		{
 			$log_changes[] = array(
 				'action' => 'customfield_' . $row['col_name'],
@@ -2511,12 +2514,16 @@ function list_getUserWarningCount($memID)
  * @param string $sort
  * @param int[] $boardsAllowed
  * @param integer $memID
+ * @param int[]|null|boolean $exclude_boards
  */
-function profileLoadAttachments($start, $items_per_page, $sort, $boardsAllowed, $memID)
+function profileLoadAttachments($start, $items_per_page, $sort, $boardsAllowed, $memID, $exclude_boards = null)
 {
 	global $board, $modSettings, $context, $settings, $scripturl, $txt;
 
 	$db = database();
+
+	if ($exclude_boards === null && !empty($modSettings['recycle_enable']) && $modSettings['recycle_board'] > 0)
+		$exclude_boards = array($modSettings['recycle_board']);
 
 	// Retrieve some attachments.
 	$request = $db->query('', '
@@ -2531,12 +2538,14 @@ function profileLoadAttachments($start, $items_per_page, $sort, $boardsAllowed, 
 			AND a.id_msg != {int:no_message}
 			AND m.id_member = {int:current_member}' . (!empty($board) ? '
 			AND b.id_board = {int:board}' : '') . (!in_array(0, $boardsAllowed) ? '
-			AND b.id_board IN ({array_int:boards_list})' : '') . (!$modSettings['postmod_active'] || $context['user']['is_owner'] ? '' : '
+			AND b.id_board IN ({array_int:boards_list})' : '') . (!empty($exclude_boards) ? '
+			AND b.id_board NOT IN ({array_int:exclude_boards})' : '') . (!$modSettings['postmod_active'] || $context['user']['is_owner'] ? '' : '
 			AND m.approved = {int:is_approved}') . '
 		ORDER BY {raw:sort}
 		LIMIT {int:offset}, {int:limit}',
 		array(
 			'boards_list' => $boardsAllowed,
+			'exclude_boards' => $exclude_boards,
 			'attachment_type' => 0,
 			'no_message' => 0,
 			'current_member' => $memID,

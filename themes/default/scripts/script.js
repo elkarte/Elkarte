@@ -26,7 +26,9 @@ var ua = navigator.userAgent.toLowerCase(),
 	is_chrome = !!window.chrome, // Chrome 1+, Opera 15+
 	is_ie = !!document.documentMode, // IE8+
 	is_webkit = ua.indexOf('applewebkit') !== -1;
-	is_osx = navigator.platform.toUpperCase().indexOf('MAC') >= 0;
+	is_osx = navigator.platform.toUpperCase().indexOf('MAC') >= 0,
+	is_mobile = navigator.userAgent.indexOf('Mobi') !== -1, // Common mobile including Mozilla, Safari, IE, Opera, Chrome
+	is_touch = 'ontouchstart' in window || window.DocumentTouch && document instanceof DocumentTouch;
 
 // Versions of ie < 9 do not have this built in
 if (!('getElementsByClassName' in document))

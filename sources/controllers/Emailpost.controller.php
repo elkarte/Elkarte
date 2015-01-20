@@ -179,7 +179,7 @@ class Emailpost_Controller extends Action_Controller
 			query_key_maintenance($email_message);
 
 			// Update this user so the log shows they were/are active, no luking in the email ether
-			query_update_member_stats($pbe, $email_message, $topic_info);
+			query_update_member_stats($pbe, $email_message, $email_message->message_type === 'p' ? $pm_info : $topic_info);
 		}
 
 		return !empty($result);

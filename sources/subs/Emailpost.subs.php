@@ -68,11 +68,13 @@ function pbe_email_to_bbc($text, $html)
 
 		// Attempt to fix textual ('>') quotes so we also fix wrapping issues first!
 		$text = pbe_fix_email_quotes($text, ($html && !$gmail));
+		$text = str_replace(array('[quote]','[/quote]'), array('&gt;blockquote>', '&gt;/blockquote>'), $text);
 
 		// Convert this (markup) text to html
 		$text = preg_replace(array_keys($tags), array_values($tags), $text);
 		require_once(EXTDIR . '/markdown/markdown.php');
 		$text = Markdown($text);
+		$text = str_replace(array('&gt;blockquote>','&gt;/blockquote>'), array('<blockquote>', '</blockquote>'), $text);
 
 		// Convert any resulting HTML created by markup style text in the email to BBC
 		require_once(SUBSDIR . '/Html2BBC.class.php');
