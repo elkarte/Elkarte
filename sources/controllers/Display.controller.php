@@ -147,6 +147,8 @@ class Display_Controller extends Action_Controller
 			}
 		}
 
+		$this->_events->trigger('topicinfo', array('topicinfo' => &$topicinfo));
+
 		// Add up unapproved replies to get real number of replies...
 		if ($modSettings['postmod_active'] && allowedTo('approve_posts'))
 			$context['real_num_replies'] += $topicinfo['unapproved_posts'] - ($topicinfo['approved'] ? 0 : 1);
@@ -368,52 +370,6 @@ class Display_Controller extends Action_Controller
 		// For quick reply we need a response prefix in the default forum language.
 		$context['response_prefix'] = response_prefix();
 
-		// If we want to show event information in the topic, prepare the data.
-		if (allowedTo('calendar_view') && !empty($modSettings['cal_showInTopic']) && !empty($modSettings['cal_enabled']))
-		{
-			// We need events details and all that jazz
-			require_once(SUBSDIR . '/Calendar.subs.php');
-
-			// First, try create a better time format, ignoring the "time" elements.
-			if (preg_match('~%[AaBbCcDdeGghjmuYy](?:[^%]*%[AaBbCcDdeGghjmuYy])*~', $user_info['time_format'], $matches) == 0 || empty($matches[0]))
-				$date_string = $user_info['time_format'];
-			else
-				$date_string = $matches[0];
-
-			// Get event information for this topic.
-			$events = eventInfoForTopic($topic);
-
-			$context['linked_calendar_events'] = array();
-			foreach ($events as $event)
-			{
-				// Prepare the dates for being formatted.
-				$start_date = sscanf($event['start_date'], '%04d-%02d-%02d');
-				$start_date = mktime(12, 0, 0, $start_date[1], $start_date[2], $start_date[0]);
-				$end_date = sscanf($event['end_date'], '%04d-%02d-%02d');
-				$end_date = mktime(12, 0, 0, $end_date[1], $end_date[2], $end_date[0]);
-
-				$context['linked_calendar_events'][] = array(
-					'id' => $event['id_event'],
-					'title' => $event['title'],
-					'can_edit' => allowedTo('calendar_edit_any') || ($event['id_member'] == $user_info['id'] && allowedTo('calendar_edit_own')),
-					'modify_href' => $scripturl . '?action=post;msg=' . $topicinfo['id_first_msg'] . ';topic=' . $topic . '.0;calendar;eventid=' . $event['id_event'] . ';' . $context['session_var'] . '=' . $context['session_id'],
-					'can_export' => allowedTo('calendar_edit_any') || ($event['id_member'] == $user_info['id'] && allowedTo('calendar_edit_own')),
-					'export_href' => $scripturl . '?action=calendar;sa=ical;eventid=' . $event['id_event'] . ';' . $context['session_var'] . '=' . $context['session_id'],
-				'start_date' => standardTime($start_date, $date_string, 'none'),
-					'start_timestamp' => $start_date,
-				'end_date' => standardTime($end_date, $date_string, 'none'),
-					'end_timestamp' => $end_date,
-					'is_last' => false
-				);
-			}
-
-			if (!empty($context['linked_calendar_events']))
-			{
-				$context['linked_calendar_events'][count($context['linked_calendar_events']) - 1]['is_last'] = true;
-				$template_layers->add('display_calendar');
-			}
-		}
-
 		// Create the poll info if it exists.
 		if ($context['is_poll'])
 		{
@@ -598,7 +554,6 @@ class Display_Controller extends Action_Controller
 			'can_sticky' => 'make_sticky',
 			'can_merge' => 'merge_any',
 			'can_split' => 'split_any',
-			'calendar_post' => 'calendar_post',
 			'can_mark_notify' => 'mark_any_notify',
 			'can_send_topic' => 'send_topic',
 			'can_send_pm' => 'pm_send',
@@ -628,7 +583,6 @@ class Display_Controller extends Action_Controller
 		// Cleanup all the permissions with extra stuff...
 		$context['can_mark_notify'] &= !$context['user']['is_guest'];
 		$context['can_sticky'] &= !empty($modSettings['enableStickyTopics']);
-		$context['calendar_post'] &= !empty($modSettings['cal_enabled']) && (allowedTo('modify_any') || ($context['user']['started'] && allowedTo('modify_own')));
 		$context['can_add_poll'] &= !empty($modSettings['pollMode']) && $topicinfo['id_poll'] <= 0;
 		$context['can_remove_poll'] &= !empty($modSettings['pollMode']) && $topicinfo['id_poll'] > 0;
 		$context['can_reply'] &= empty($topicinfo['locked']) || allowedTo('moderate_board');
@@ -743,7 +697,6 @@ class Display_Controller extends Action_Controller
 			'lock' => array('test' => 'can_lock', 'text' => empty($context['is_locked']) ? 'set_lock' : 'set_unlock', 'image' => 'admin_lock.png', 'lang' => true, 'url' => $scripturl . '?action=topic;sa=lock;topic=' . $context['current_topic'] . '.' . $context['start'] . ';' . $context['session_var'] . '=' . $context['session_id']),
 			'sticky' => array('test' => 'can_sticky', 'text' => empty($context['is_sticky']) ? 'set_sticky' : 'set_nonsticky', 'image' => 'admin_sticky.png', 'lang' => true, 'url' => $scripturl . '?action=topic;sa=sticky;topic=' . $context['current_topic'] . '.' . $context['start'] . ';' . $context['session_var'] . '=' . $context['session_id']),
 			'merge' => array('test' => 'can_merge', 'text' => 'merge', 'image' => 'merge.png', 'lang' => true, 'url' => $scripturl . '?action=mergetopics;board=' . $context['current_board'] . '.0;from=' . $context['current_topic']),
-			'calendar' => array('test' => 'calendar_post', 'text' => 'calendar_link', 'image' => 'linktocal.png', 'lang' => true, 'url' => $scripturl . '?action=post;calendar;msg=' . $context['topic_first_message'] . ';topic=' . $context['current_topic'] . '.0'),
 		);
 
 		// Restore topic. eh?  No monkey business.
