@@ -49,7 +49,7 @@ class ManageCalendarModule_Controller extends Action_Controller
 			'setting_callback' => function ($value) {
 				if ($value)
 				{
-					enableModules('calendar', array('post'));
+					enableModules('calendar', array('post', 'boardindex'));
 					Hooks::get()->enableIntegration('subs/Calendar.integrate.php');
 				}
 				else
