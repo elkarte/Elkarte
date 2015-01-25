@@ -31,7 +31,7 @@ class Calendar_Display_Module
 
 		$context['calendar_post'] = allowedTo('calendar_post');
 
-		add_integration_function('integrate_mod_buttons', 'Calendar_Display_Module::mod_buttons', '', false);
+		add_integration_function('integrate_mod_buttons', 'Calendar_Display_Module::integrate_mod_buttons', '', false);
 
 		if (!empty($modSettings['cal_showInTopic']))
 			return array(
@@ -41,7 +41,7 @@ class Calendar_Display_Module
 			return array();
 	}
 
-	public static function mod_buttons()
+	public static function integrate_mod_buttons()
 	{
 		global $context, $scripturl;
 

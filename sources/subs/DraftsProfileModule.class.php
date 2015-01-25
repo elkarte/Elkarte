@@ -28,7 +28,7 @@ class Drafts_Profile_Module
 
 		if (!empty($modSettings['drafts_enabled']) && !empty($modSettings['drafts_post_enabled']))
 		{
-			add_integration_function('integrate_profile_areas', 'Drafts_Profile_Module::profile_areas', '', false);
+			add_integration_function('integrate_profile_areas', 'Drafts_Profile_Module::integrate_profile_areas', '', false);
 			return array(
 				array('pre_load', array('Drafts_Display_Module', 'pre_load'), array('post_errors')),
 			);
@@ -37,7 +37,7 @@ class Drafts_Profile_Module
 			return array();
 	}
 
-	public static function profile_areas(&$profile_areas)
+	public static function integrate_profile_areas(&$profile_areas)
 	{
 		global $txt, $context;
 
