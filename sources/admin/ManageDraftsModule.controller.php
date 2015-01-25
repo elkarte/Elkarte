@@ -50,7 +50,7 @@ class ManageDraftsModule_Controller extends Action_Controller
 				// Enabling, let's register the modules and prepare the scheuled task
 				if ($value)
 				{
-					enableModules('drafts', array('post', 'display'));
+					enableModules('drafts', array('post', 'display', 'profile'));
 					calculateNextTrigger('remove_old_drafts');
 					add_integration_function('integrate_delete_members', 'ManageDraftsModule_Controller::integrate_delete_members');
 					add_integration_function('integrate_load_permissions', 'ManageDraftsModule_Controller::integrate_load_permissions');
@@ -61,7 +61,7 @@ class ManageDraftsModule_Controller extends Action_Controller
 				// Disabling, just forget about the modules
 				else
 				{
-					disableModules('drafts', array('post', 'display'));
+					disableModules('drafts', array('post', 'display', 'profile'));
 					remove_integration_function('integrate_delete_members', 'ManageDraftsModule_Controller::integrate_delete_members');
 					remove_integration_function('integrate_load_permissions', 'ManageDraftsModule_Controller::integrate_load_permissions');
 					remove_integration_function('integrate_sa_manage_maintenance', 'ManageDraftsModule_Controller::integrate_sa_manage_maintenance');
