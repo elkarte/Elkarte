@@ -30,7 +30,7 @@ class Drafts_Profile_Module
 		{
 			add_integration_function('integrate_profile_areas', 'Drafts_Profile_Module::integrate_profile_areas', '', false);
 			return array(
-				array('pre_load', array('Drafts_Display_Module', 'pre_load'), array('post_errors')),
+				array('pre_load', array('Drafts_Profile_Module', 'pre_load'), array('post_errors')),
 			);
 		}
 		else
