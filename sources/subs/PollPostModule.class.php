@@ -37,7 +37,6 @@ class Poll_Post_Module
 				array('prepare_post', array('Poll_Post_Module', 'prepare_post'), array('topic', 'topic_attributes')),
 				array('prepare_context', array('Poll_Post_Module', 'prepare_context'), array('topic_attributes', 'topic', 'board')),
 				array('finalize_post_form', array('Poll_Post_Module', 'finalize_post_form'), array('destination', 'page_title', 'template_layers')),
-				array('before_save_post', array('Poll_Post_Module', 'before_save_post'), array()),
 			);
 
 		// Posting a poll?
@@ -45,6 +44,7 @@ class Poll_Post_Module
 
 		if (self::$_make_poll)
 			return array_merge($return, array(
+				array('before_save_post', array('Poll_Post_Module', 'before_save_post'), array()),
 				array('save_replying', array('Poll_Post_Module', 'save_replying'), array()),
 				array('pre_save_post', array('Poll_Post_Module', 'pre_save_post'), array('topicOptions')),
 			));
