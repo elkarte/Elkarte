@@ -21,7 +21,7 @@ class Mention_Post_Module
 
 	public static function hooks()
 	{
-		global $context;
+		global $modSettings;
 
 		// Posting an event?
 		self::$_enabled = !empty($modSettings['mentions_enabled']);
@@ -87,8 +87,6 @@ class Mention_Post_Module
 
 	public function save_post($msgOptions, $becomesApproved)
 	{
-		global $user_info, $modSettings;
-
 		if (!empty($this->_actually_mentioned))
 		{
 			$loader = new Controller_Loader('Mentions');

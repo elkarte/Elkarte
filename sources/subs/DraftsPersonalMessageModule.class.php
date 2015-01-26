@@ -116,7 +116,7 @@ class Drafts_PersonalMessage_Module
 
 			// Our not so concise shortcut line
 			if (!isset($context['shortcuts_text']))
-				$context['shortcuts_text'] = $txt['shortcuts' . (!empty($context['drafts_pm_save']) ? '_drafts' : '') . (isBrowser('is_firefox') ? '_firefox' : '')];
+				$context['shortcuts_text'] = $txt['shortcuts_drafts' . (isBrowser('is_firefox') ? '_firefox' : '')];
 
 			if (!isset($editorOptions['buttons']))
 				$editorOptions['buttons'] = array();

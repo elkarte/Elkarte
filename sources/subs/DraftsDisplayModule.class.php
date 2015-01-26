@@ -24,7 +24,6 @@ class Drafts_Display_Module
 {
 	protected static $_autosave_enabled = false;
 	protected static $_autosave_frequency = 30000;
-	protected static $_subject_length = 24;
 
 	public static function hooks()
 	{
@@ -35,10 +34,7 @@ class Drafts_Display_Module
 			self::$_autosave_enabled = !empty($modSettings['drafts_autosave_enabled']);
 
 			if (!empty($modSettings['drafts_autosave_frequency']))
-				self::$_autosave_frequency = $modSettings['drafts_autosave_frequency'] * 1000;
-
-			if (!empty($modSettings['draft_subject_length']))
-				self::$_subject_length = $modSettings['draft_subject_length'];
+				self::$_autosave_frequency = (int) $modSettings['drafts_autosave_frequency'] * 1000;
 
 			return array(
 				array('prepare_context', array('Drafts_Display_Module', 'prepare_context'), array('editorOptions', 'board')),
@@ -79,7 +75,7 @@ class Drafts_Display_Module
 							sLastNote: \'draft_lastautosave\',
 							sSceditorID: \'' . $editorOptions['id'] . '\',
 							sType: \'post\',
-							iBoard: ' . (empty($board) ? 0 : $board) . ',
+							iBoard: ' . $board . ',
 							iFreq: ' . self::$_autosave_frequency . ',
 							sLastID: \'id_draft\',
 							sTextareaID: \'' . $editorOptions['id'] . '\',
@@ -98,8 +94,8 @@ class Drafts_Display_Module
 					sLastNote: \'draft_lastautosave\',
 					sTextareaID: \'message\',
 					sLastID: \'id_draft\',
-					iBoard: ' . (empty($context['current_board']) ? 0 : $context['current_board']) . ',
-					iFreq: ' . (isset($context['drafts_autosave_frequency']) ? $context['drafts_autosave_frequency'] : 30000) . '
+					iBoard: ' . $board . ',
+					iFreq: ' . self::$_autosave_frequency . '
 				});', true);
 				}
 			}
