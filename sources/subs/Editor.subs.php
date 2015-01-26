@@ -204,6 +204,8 @@ function create_control_richedit($editorOptions)
 		'locale' => !empty($txt['lang_locale']) ? $txt['lang_locale'] : 'en_US',
 		'plugin_addons' => !empty($editorOptions['plugin_addons']) ? $editorOptions['plugin_addons'] : array(),
 		'plugin_options' => !empty($editorOptions['plugin_options']) ? $editorOptions['plugin_options'] : array(),
+		'buttons' => !empty($editorOptions['buttons']) ? $editorOptions['buttons'] : array(),
+		'hidden_fields' => !empty($editorOptions['hidden_fields']) ? $editorOptions['hidden_fields'] : array(),
 	);
 
 	// Allow addons an easy way to add plugins, initialization objects, etc to the editor control

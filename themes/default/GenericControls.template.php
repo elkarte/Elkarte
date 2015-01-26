@@ -200,6 +200,18 @@ function template_control_richedit_buttons($editor_id)
 		echo '
 		<input type="button" value="', $txt['spell_check'], '" tabindex="', $context['tabindex']++, '" onclick="spellCheckStart();" class="button_submit" />';
 
+	foreach ($editor_context['buttons'] as $button)
+	{
+		echo '
+		<input type="submit" name="', $button['name'], '" value="', $button['value'], '" tabindex="', $context['tabindex']++, '" ', $button['options'], ' class="button_submit" />';
+	}
+
+	foreach ($editor_context['hidden_fields'] as $hidden)
+	{
+		echo '
+		<input type="hidden" id="', $hidden['name'], '" name="', $hidden['name'], '" value="', $hidden['value'], '" />';
+	}
+
 	// Maybe drafts are enabled?
 	if (!empty($context['drafts_save']))
 	{
