@@ -52,10 +52,12 @@ class PersonalMessage_Controller extends Action_Controller
 		require_once(SUBSDIR . '/PersonalMessage.subs.php');
 
 		// Templates, language, javascripts
-		loadLanguage('PersonalMessage+Drafts');
+		loadLanguage('PersonalMessage');
 		loadJavascriptFile(array('PersonalMessage.js', 'suggest.js'));
 		if (!isset($_REQUEST['xml']))
 			loadTemplate('PersonalMessage');
+
+		$this->_events->trigger('pre_dispatch', array('xml' => isset($_REQUEST['xml'])));
 
 		// Load up the members maximum message capacity.
 		loadMessageLimit();
@@ -144,10 +146,6 @@ class PersonalMessage_Controller extends Action_Controller
 		$context['current_label_redirect'] = 'action=pm;f=' . $context['folder'] . (isset($_GET['start']) ? ';start=' . $_GET['start'] : '') . (isset($_REQUEST['l']) ? ';l=' . $_REQUEST['l'] : '');
 		$context['can_issue_warning'] = in_array('w', $context['admin_features']) && allowedTo('issue_warning') && !empty($modSettings['warning_enable']);
 
-		// Are PM drafts enabled?
-		$context['drafts_pm_save'] = !empty($modSettings['drafts_enabled']) && !empty($modSettings['drafts_pm_enabled']) && allowedTo('pm_draft');
-		$context['drafts_autosave'] = !empty($context['drafts_pm_save']) && !empty($modSettings['drafts_autosave_enabled']) && allowedTo('pm_autosave_draft');
-
 		// Build the linktree for all the actions...
 		$context['linktree'][] = array(
 			'url' => $scripturl . '?action=pm',
@@ -187,12 +185,11 @@ class PersonalMessage_Controller extends Action_Controller
 			'send' => array($this, 'action_send', 'permission' => 'pm_read'),
 			'send2' => array($this, 'action_send2', 'permission' => 'pm_read'),
 			'settings' => array($this, 'action_settings', 'permission' => 'pm_read'),
-			'showpmdrafts' => array('controller' => 'Draft_Controller', 'function' => 'action_showPMDrafts', 'permission' => 'pm_read'),
 			'inbox' => array($this, 'action_folder', 'permission' => 'pm_read'),
 		);
 
 		// Set up our action array
-		$action = new Action();
+		$action = new Action('pm_index');
 
 		// Known action, go to it, otherwise the inbox for you
 		$subAction = $action->initialize($subActions, 'inbox');
@@ -658,13 +655,6 @@ class PersonalMessage_Controller extends Action_Controller
 			'name' => $txt['new_message']
 		);
 
-		// If drafts are enabled, lets generate a list of drafts that they can load in to the editor
-		if (!empty($context['drafts_pm_save']))
-		{
-			$pm_seed = isset($_REQUEST['pmsg']) ? $_REQUEST['pmsg'] : (isset($_REQUEST['quote']) ? $_REQUEST['quote'] : 0);
-			prepareDraftsContext($user_info['id'], $pm_seed);
-		}
-
 		// Needed for the editor.
 		require_once(SUBSDIR . '/Editor.subs.php');
 
@@ -679,6 +669,9 @@ class PersonalMessage_Controller extends Action_Controller
 			),
 			'preview_type' => 2,
 		);
+
+		$this->_events->trigger('prepare_send_context', array('pmsg' => isset($_REQUEST['pmsg']) ? $_REQUEST['pmsg'] : (isset($_REQUEST['quote']) ? $_REQUEST['quote'] : 0), 'editorOptions' => &$editorOptions));
+
 		create_control_richedit($editorOptions);
 
 		// No one is bcc'ed just yet
@@ -711,10 +704,6 @@ class PersonalMessage_Controller extends Action_Controller
 		// All the helpers we need
 		require_once(SUBSDIR . '/Auth.subs.php');
 		require_once(SUBSDIR . '/Post.subs.php');
-
-		// PM Drafts enabled and needed?
-		if ($context['drafts_pm_save'] && (isset($_POST['save_draft']) || isset($_POST['id_pm_draft'])))
-			require_once(SUBSDIR . '/Drafts.subs.php');
 
 		loadLanguage('PersonalMessage', '', false);
 
@@ -917,14 +906,18 @@ class PersonalMessage_Controller extends Action_Controller
 			return messagePostError($namedRecipientList, $recipientList);
 		}
 
-		// Want to save this as a draft and think about it some more?
-		if ($context['drafts_pm_save'] && isset($_POST['save_draft']))
+
+		try
 		{
-			savePMDraft($recipientList);
+			$this->_events->trigger('before_sending', array('namedRecipientList' => $namedRecipientList, 'recipientList' => $recipientList, 'namesNotFound' => $namesNotFound));
+		}
+		catch (Controller_Redirect_Exception $e)
+		{
 			return messagePostError($namedRecipientList, $recipientList);
 		}
+
 		// Before we send the PM, let's make sure we don't have an abuse of numbers.
-		elseif (!empty($modSettings['max_pm_recipients']) && count($recipientList['to']) + count($recipientList['bcc']) > $modSettings['max_pm_recipients'] && !allowedTo(array('moderate_forum', 'send_mail', 'admin_forum')))
+		if (!empty($modSettings['max_pm_recipients']) && count($recipientList['to']) + count($recipientList['bcc']) > $modSettings['max_pm_recipients'] && !allowedTo(array('moderate_forum', 'send_mail', 'admin_forum')))
 		{
 			$context['send_log'] = array(
 				'sent' => array(),
@@ -956,21 +949,21 @@ class PersonalMessage_Controller extends Action_Controller
 			setPMRepliedStatus($user_info['id'], (int) $_REQUEST['replied_to'] );
 		}
 
+		$failed = !empty($context['send_log']['failed']);
+		$this->_events->trigger('message_sent', array('failed' => $failed));
+
 		// If one or more of the recipients were invalid, go back to the post screen with the failed usernames.
-		if (!empty($context['send_log']['failed']))
+		if ($failed)
+		{
 			return messagePostError($namesNotFound, array(
 				'to' => array_intersect($recipientList['to'], $context['send_log']['failed']),
 				'bcc' => array_intersect($recipientList['bcc'], $context['send_log']['failed'])
 			));
-
+		}
 		// Message sent successfully?
-		if (!empty($context['send_log']) && empty($context['send_log']['failed']))
+		else
 		{
 			$context['current_label_redirect'] = $context['current_label_redirect'] . ';done=sent';
-
-			// If we had a PM draft for this one, then its time to remove it since it was just sent
-			if ($context['drafts_pm_save'] && !empty($_POST['id_pm_draft']))
-				deleteDrafts($_POST['id_pm_draft'], $user_info['id']);
 		}
 
 		// Go back to the where they sent from, if possible...
@@ -2258,12 +2251,6 @@ function messageIndexBar($area)
 					'label' => $txt['sent_items'],
 					'custom_url' => $scripturl . '?action=pm;f=sent',
 				),
-				'drafts' => array(
-					'label' => $txt['drafts_show'],
-					'custom_url' => $scripturl . '?action=pm;sa=showpmdrafts',
-					'permission' => 'pm_draft',
-					'enabled' => !empty($modSettings['drafts_enabled']) && !empty($modSettings['drafts_pm_enabled']),
-				),
 			),
 		),
 		'labels' => array(
@@ -2688,50 +2675,4 @@ function messagePostError($named_recipients, $recipient_ids = array())
 
 	// Acquire a new form sequence number.
 	checkSubmitOnce('register');
-}
-
-/**
- * Loads in a group of PM drafts for the user.
- *
- * What it does:
- * - Loads a specific draft for current use in pm editing box if selected.
- * - Used in the posting screens to allow draft selection
- * - Will load a draft if selected is supplied via post
- *
- * @param int $member_id
- * @param int|false $id_pm = false if set, it will try to load drafts for this id
- * @return false|null
- */
-function prepareDraftsContext($member_id, $id_pm = false)
-{
-	global $scripturl, $context, $txt, $modSettings;
-
-	$context['drafts'] = array();
-
-	// Permissions
-	if (empty($member_id))
-		return false;
-
-	// We haz drafts
-	loadLanguage('Drafts');
-	require_once(SUBSDIR . '/Drafts.subs.php');
-
-	// Has a specific draft has been selected?  Load it up if there is not already a message already in the editor
-	if (isset($_REQUEST['id_draft']) && empty($_POST['subject']) && empty($_POST['message']))
-		loadDraft((int) $_REQUEST['id_draft'], 1, true, true);
-
-	// Load all the drafts for this user that meet the criteria
-	$order = 'poster_time DESC';
-	$user_drafts = load_user_drafts($member_id, 1, $id_pm, $order);
-
-	// Add them to the context draft array for template display
-	foreach ($user_drafts as $draft)
-	{
-		$short_subject = empty($draft['subject']) ? $txt['drafts_none'] : Util::shorten_text(stripslashes($draft['subject']), !empty($modSettings['draft_subject_length']) ? $modSettings['draft_subject_length'] : 24);
-		$context['drafts'][] = array(
-			'subject' => censorText($short_subject),
-			'poster_time' => standardTime($draft['poster_time']),
-				'link' => '<a href="' . $scripturl . '?action=pm;sa=send;id_draft=' . $draft['id_draft'] . '">' . (!empty($draft['subject']) ? $draft['subject'] : $txt['drafts_none']) . '</a>',
-			);
-	}
 }

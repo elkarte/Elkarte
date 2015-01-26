@@ -436,8 +436,6 @@ function loadAllPermissions()
 			'disable_censor' => array(false, 'general'),
 			'pm_read' => array(false, 'pm'),
 			'pm_send' => array(false, 'pm'),
-			'pm_draft' => array(false, 'pm'),
-			'pm_autosave_draft' => array(false, 'pm'),
 			'send_email_to_members' => array(false, 'pm'),
 			'calendar_view' => array(false, 'calendar'),
 			'calendar_post' => array(false, 'calendar'),
@@ -535,11 +533,6 @@ function loadAllPermissions()
 	{
 		$hiddenPermissions[] = 'approve_emails';
 		$hiddenPermissions[] = 'postby_email';
-	}
-	if (!in_array('dr', $context['admin_features']))
-	{
-		$hiddenPermissions[] = 'pm_draft';
-		$hiddenPermissions[] = 'pm_autosave_draft';
 	}
 
 	// Post moderation?

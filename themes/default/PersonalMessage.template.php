@@ -953,7 +953,7 @@ function template_send()
 					<input type="hidden" name="l" value="', isset($context['current_label_id']) ? $context['current_label_id'] : -1, '" />';
 
 	// If the admin enabled the pm drafts feature, show a draft selection box
-	if (!empty($modSettings['drafts_enabled']) && !empty($context['drafts_pm_save']) && !empty($context['drafts']))
+	if (!empty($context['drafts_pm_save']) && !empty($context['drafts']))
 	{
 		echo '
 			<h3 id="postDraftOptionsHeader" class="category_header">

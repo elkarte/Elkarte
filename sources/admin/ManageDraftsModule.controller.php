@@ -47,26 +47,28 @@ class ManageDraftsModule_Controller extends Action_Controller
 				require_once(SUBSDIR . '/ScheduledTasks.subs.php');
 				toggleTaskStatusByName('remove_old_drafts', $value);
 
+				$modules = array('post', 'display', 'profile', 'personalmessage');
+				$hooks = array(
+					'integrate_delete_members',
+					'integrate_load_permissions',
+					'integrate_sa_manage_maintenance',
+					'integrate_topics_maintenance',
+					'integrate_load_illegal_guest_permissions',
+				);
 				// Enabling, let's register the modules and prepare the scheuled task
 				if ($value)
 				{
-					enableModules('drafts', array('post', 'display', 'profile'));
+					enableModules('drafts', $modules);
 					calculateNextTrigger('remove_old_drafts');
-					add_integration_function('integrate_delete_members', 'ManageDraftsModule_Controller::integrate_delete_members');
-					add_integration_function('integrate_load_permissions', 'ManageDraftsModule_Controller::integrate_load_permissions');
-					add_integration_function('integrate_sa_manage_maintenance', 'ManageDraftsModule_Controller::integrate_sa_manage_maintenance');
-					add_integration_function('integrate_topics_maintenance', 'ManageDraftsModule_Controller::integrate_topics_maintenance');
-					add_integration_function('integrate_load_illegal_guest_permissions', 'ManageDraftsModule_Controller::integrate_load_illegal_guest_permissions');
+					foreach ($hooks as $hook)
+						add_integration_function($hook, 'ManageDraftsModule_Controller::' . $hook);
 				}
 				// Disabling, just forget about the modules
 				else
 				{
-					disableModules('drafts', array('post', 'display', 'profile'));
-					remove_integration_function('integrate_delete_members', 'ManageDraftsModule_Controller::integrate_delete_members');
-					remove_integration_function('integrate_load_permissions', 'ManageDraftsModule_Controller::integrate_load_permissions');
-					remove_integration_function('integrate_sa_manage_maintenance', 'ManageDraftsModule_Controller::integrate_sa_manage_maintenance');
-					remove_integration_function('integrate_topics_maintenance', 'ManageDraftsModule_Controller::integrate_topics_maintenance');
-					remove_integration_function('integrate_load_illegal_guest_permissions', 'ManageDraftsModule_Controller::integrate_load_illegal_guest_permissions');
+					disableModules('drafts', $modules);
+					foreach ($hooks as $hook)
+						remove_integration_function($hook, 'ManageDraftsModule_Controller::' . $hook);
 				}
 			},
 		);
@@ -111,6 +113,11 @@ class ManageDraftsModule_Controller extends Action_Controller
 		$permissionList['board'] += array(
 			'post_draft' => array(false, 'topic'),
 			'post_autosave_draft' => array(false, 'topic'),
+		);
+
+		$permissionList['membergroup'] += array(
+			'pm_draft' => array(false, 'pm'),
+			'pm_autosave_draft' => array(false, 'pm'),
 		);
 	}
 

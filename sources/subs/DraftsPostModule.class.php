@@ -60,7 +60,7 @@ class Drafts_Post_Module
 
 	public function finalize_post_form(&$editorOptions, $board, $topic, $template_layers)
 	{
-		global $context, $user_info, $options;
+		global $context, $user_info, $options, $txt;
 
 		// Are post drafts enabled?
 		$context['drafts_save'] = allowedTo('post_draft');
@@ -95,6 +95,7 @@ class Drafts_Post_Module
 
 				loadJavascriptFile('drafts.plugin.js', array('defer' => true));
 			}
+			$context['shortcuts_text'] = $txt['shortcuts_drafts' . (isBrowser('is_firefox') ? '_firefox' : '')];
 
 			$this->_prepareDraftsContext($user_info['id'], $topic);
 

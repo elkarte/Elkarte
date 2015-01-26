@@ -242,7 +242,7 @@
 			$('#' + formID).append(
 				$('<input />').attr({
 					type: 'hidden',
-					id: this.opt.sLastID,
+					id: this.opts.sLastID,
 					name: 'id_draft',
 					value: this.opts.id_draft
 				})
