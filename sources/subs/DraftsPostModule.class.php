@@ -97,6 +97,15 @@ class Drafts_Post_Module
 			}
 			$context['shortcuts_text'] = $txt['shortcuts_drafts' . (isBrowser('is_firefox') ? '_firefox' : '')];
 
+			if (!isset($editorOptions['buttons']))
+				$editorOptions['buttons'] = array();
+
+			$editorOptions['buttons'][] = array(
+				'name' => 'save_draft',
+				'value' => $txt['draft_save'],
+				'options' => 'onclick="return confirm(' . JavaScriptEscape($txt['draft_save_note']) . ') && submitThisOnce(this);" accesskey="d"',
+			);
+
 			$this->_prepareDraftsContext($user_info['id'], $topic);
 
 			if (!empty($context['drafts']))

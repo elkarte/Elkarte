@@ -212,21 +212,6 @@ function template_control_richedit_buttons($editor_id)
 		<input type="hidden" id="', $hidden['name'], '" name="', $hidden['name'], '" value="', $hidden['value'], '" />';
 	}
 
-	// Maybe drafts are enabled?
-	if (!empty($context['drafts_save']))
-	{
-		echo '
-		<input type="submit" name="save_draft" value="', $txt['draft_save'], '" tabindex="', $context['tabindex']++, '" onclick="return confirm(' . JavaScriptEscape($txt['draft_save_note']) . ') && submitThisOnce(this);" accesskey="d" class="button_submit" />';
-	}
-
-	// The PM draft save button
-	if (!empty($context['drafts_pm_save']))
-	{
-		echo '
-		<input type="submit" name="save_draft" value="', $txt['draft_save'], '" tabindex="', $context['tabindex']++, '" onclick="submitThisOnce(this);" accesskey="d" class="button_submit" />
-		<input type="hidden" id="id_pm_draft" name="id_pm_draft" value="', empty($context['id_pm_draft']) ? 0 : $context['id_pm_draft'], '" />';
-	}
-
 	// Create an area to show the draft last saved on text
 	if (!empty($context['drafts_autosave']) && !empty($options['drafts_autosave_enabled']))
 		echo '

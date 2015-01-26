@@ -117,6 +117,21 @@ class Drafts_PersonalMessage_Module
 			// Our not so concise shortcut line
 			if (!isset($context['shortcuts_text']))
 				$context['shortcuts_text'] = $txt['shortcuts' . (!empty($context['drafts_pm_save']) ? '_drafts' : '') . (isBrowser('is_firefox') ? '_firefox' : '')];
+
+			if (!isset($editorOptions['buttons']))
+				$editorOptions['buttons'] = array();
+			if (!isset($editorOptions['hidden_fields']))
+				$editorOptions['hidden_fields'] = array();
+
+			$editorOptions['buttons'][] = array(
+				'name' => 'save_draft',
+				'value' => $txt['draft_save'],
+				'options' => 'onclick="submitThisOnce(this);" accesskey="d"',
+			);
+			$editorOptions['hidden_fields'][] = array(
+				'name' => 'id_pm_draft',
+				'value' => empty($context['id_pm_draft']) ? 0 : $context['id_pm_draft'],
+			);
 		}
 	}
 
