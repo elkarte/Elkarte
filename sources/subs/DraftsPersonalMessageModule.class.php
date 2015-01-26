@@ -72,7 +72,7 @@ class Drafts_PersonalMessage_Module
 			)), 'after');
 	}
 
-	public static function integrate_sa_pm_index(&$subactions)
+	public static function integrate_sa_pm_index(&$subActions)
 	{
 		$subActions['showpmdrafts'] = array('controller' => 'Draft_Controller', 'function' => 'action_showPMDrafts', 'permission' => 'pm_read');
 	}
@@ -104,11 +104,11 @@ class Drafts_PersonalMessage_Module
 					sLastNote: \'draft_lastautosave\',
 					sSceditorID: \'' . $editorOptions['id'] . '\',
 					sType: \'post\',
-					iBoard: ' . (empty($board) ? 0 : $board) . ',
+					iBoard: 0,
 					iFreq: ' . self::$_autosave_frequency . ',
-					sLastID: \'id_draft\',
+					sLastID: \'id_pm_draft\',
 					sTextareaID: \'' . $editorOptions['id'] . '\',
-					id_draft: ' . (empty($context['id_draft']) ? 0 : $context['id_draft']) . '
+					bPM: true
 				}';
 
 			loadJavascriptFile('drafts.plugin.js', array('defer' => true));
@@ -153,7 +153,7 @@ class Drafts_PersonalMessage_Module
 	 * @param int|false $id_pm = false if set, it will try to load drafts for this id
 	 * @return false|null
 	 */
-	protected function ($member_id, $id_pm = false)
+	protected function _prepareDraftsContext($member_id, $id_pm = false)
 	{
 		global $scripturl, $context, $txt, $modSettings;
 

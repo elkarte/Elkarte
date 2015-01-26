@@ -46,6 +46,7 @@ class Draft_Controller extends Action_Controller
 		// Language and helper functions
 		loadLanguage('Drafts');
 		require_once(SUBSDIR . '/Drafts.subs.php');
+		require_once(SUBSDIR . '/Profile.subs.php');
 
 		$this->_memID = currentMemberID();
 	}
@@ -157,7 +158,6 @@ class Draft_Controller extends Action_Controller
 	{
 		global $txt, $user_info, $scripturl, $modSettings, $context;
 
-		require_once(SUBSDIR . '/Profile.subs.php');
 		require_once(SUBSDIR . '/Drafts.subs.php');
 
 		// Quick check how we got here.

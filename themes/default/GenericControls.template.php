@@ -28,13 +28,7 @@ function template_control_richedit($editor_id, $smileyContainer = null, $bbcCont
 
 	$editor_context = &$context['controls']['richedit'][$editor_id];
 
-	// @todo temporary until Display and PMs are converted to events
-	if (empty($editor_context['plugin_addons']) || !in_array('draft', $editor_context['plugin_addons']))
-		$add_drafts = true;
-	else
-		$add_drafts = false;
-
-	$plugins = array_filter(array('bbcode', 'splittag', (!empty($context['mentions_enabled']) ? 'mention' : ''), ($add_drafts && !empty($context['drafts_autosave']) && !empty($options['drafts_autosave_enabled']) ? 'draft' : '')));
+	$plugins = array_filter(array('bbcode', 'splittag', (!empty($context['mentions_enabled']) ? 'mention' : '')));
 
 	// Allow addons to insert additional editor plugin scripts
 	if (!empty($editor_context['plugin_addons']) && is_array($editor_context['plugin_addons']))
@@ -45,18 +39,6 @@ function template_control_richedit($editor_id, $smileyContainer = null, $bbcCont
 	$plugin_options[] = '
 					parserOptions: {
 						quoteType: $.sceditor.BBCodeParser.QuoteType.auto
-					}';
-
-	// Drafts?
-	if ($add_drafts && !empty($context['drafts_autosave']) && !empty($options['drafts_autosave_enabled']))
-			$plugin_options[] = '
-					draftOptions: {
-						sLastNote: \'draft_lastautosave\',
-						sSceditorID: \'' . $editor_id . '\',
-						sType: \'post\',
-						iBoard: ' . (empty($context['current_board']) ? 0 : $context['current_board']) . ',
-						iFreq: ' . $context['drafts_autosave_frequency'] . ',' . (!empty($context['drafts_save']) ?
-						'sLastID: \'id_draft\'' : 'sLastID: \'id_pm_draft\', bPM: true') . '
 					}';
 
 	if (!empty($context['mentions_enabled']))
@@ -185,7 +167,7 @@ function template_control_richedit($editor_id, $smileyContainer = null, $bbcCont
 }
 
 /**
- * Shows the buttons that the user can see .. preview, spellchecker, drafts, etc
+ * Shows the buttons that the user can see .. preview, spellchecker, etc
  *
  * @param string $editor_id
  */
