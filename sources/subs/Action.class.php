@@ -148,12 +148,9 @@ class Action
 			if (isset($subAction['controller']))
 			{
 				// 'controller'->'function'
-				$controller_name = $subAction['controller'];
-				$controller = new $controller_name();
-
-				// Starting a new controller, run pre_dispatch
-				if (method_exists($controller, 'pre_dispatch'))
-					$controller->pre_dispatch();
+				$controller_name = str_replace('_Controller', '', $subAction['controller']);
+				$loader = new Controller_Loader($controller_name);
+				$controller = $loader->initDispatch();
 
 				$controller->{$subAction['function']}();
 			}
@@ -173,8 +170,9 @@ class Action
 					$subAction['controller']->{$subAction['function']}();
 				else
 				{
-					$controller_name = $subAction['controller'];
-					$controller = new $controller_name();
+					$controller_name = str_replace('_Controller', '', $subAction['controller']);
+					$loader = new Controller_Loader($controller_name);
+					$controller = $loader->initDispatch();
 
 					$controller->{$subAction['function']}();
 				}
