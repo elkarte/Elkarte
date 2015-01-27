@@ -76,6 +76,7 @@ DEFINE('SOURCEDIR', $sourcedir);
 DEFINE('ADMINDIR', $sourcedir . '/admin');
 DEFINE('CONTROLLERDIR', $sourcedir . '/controllers');
 DEFINE('SUBSDIR', $sourcedir . '/subs');
+DEFINE('ADDONSDIR', $sourcedir . '/addons');
 unset($boarddir, $cachedir, $sourcedir, $languagedir, $extdir);
 
 // Files we cannot live without.
