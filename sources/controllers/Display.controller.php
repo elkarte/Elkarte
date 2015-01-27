@@ -34,6 +34,13 @@ class Display_Controller extends Action_Controller
 	protected $_template_layers = null;
 
 	/**
+	 * The message id when in the form msg123
+	 *
+	 * @var int
+	 */
+	protected $_virtual_msg = 0;
+
+	/**
 	 * Default action handler for this controller
 	 */
 	public function action_index()
@@ -223,32 +230,20 @@ class Display_Controller extends Action_Controller
 			// Link to a message...
 			elseif (substr($_REQUEST['start'], 0, 3) == 'msg')
 			{
-				$virtual_msg = (int) substr($_REQUEST['start'], 3);
-				if (!$topicinfo['unapproved_posts'] && $virtual_msg >= $topicinfo['id_last_msg'])
+				$this->_virtual_msg = (int) substr($_REQUEST['start'], 3);
+				if (!$topicinfo['unapproved_posts'] && $this->_virtual_msg >= $topicinfo['id_last_msg'])
 					$context['start_from'] = $total_visible_posts - 1;
-				elseif (!$topicinfo['unapproved_posts'] && $virtual_msg <= $topicinfo['id_first_msg'])
+				elseif (!$topicinfo['unapproved_posts'] && $this->_virtual_msg <= $topicinfo['id_first_msg'])
 					$context['start_from'] = 0;
 				else
 				{
 					$only_approved = $modSettings['postmod_active'] && $topicinfo['unapproved_posts'] && !allowedTo('approve_posts');
-					$context['start_from'] = countMessagesBefore($topic, $virtual_msg, false, $only_approved, !$user_info['is_guest']);
+					$context['start_from'] = countMessagesBefore($topic, $this->_virtual_msg, false, $only_approved, !$user_info['is_guest']);
 				}
 
 				// We need to reverse the start as well in this case.
 				$_REQUEST['start'] = $context['start_from'];
 			}
-		}
-
-		// Mark the mention as read if requested
-		if (isset($_REQUEST['mentionread']) && !empty($virtual_msg))
-		{
-			$loader = new Controller_Loader('Mentions');
-			$mentions = $loader->initDispatch();
-			$mentions->setData(array(
-				'id_mention' => $_REQUEST['item'],
-				'mark' => $_REQUEST['mark'],
-			));
-			$mentions->action_markread();
 		}
 
 		// Create a previous next string if the selected theme has it as a selected option.
@@ -587,23 +582,6 @@ class Display_Controller extends Action_Controller
 		$context['can_restore_msg'] &= !empty($modSettings['recycle_enable']) && $modSettings['recycle_board'] == $board && !empty($topicinfo['id_previous_topic']);
 
 		$context['can_follow_up'] = !empty($modSettings['enableFollowup']) && boardsallowedto('post_new') !== array();
-
-		if (!empty($modSettings['mentions_enabled']))
-		{
-			$context['mentions_enabled'] = true;
-
-			// Just using the plain text quick reply and not the editor
-			if (empty($options['use_editor_quick_reply']))
-				loadJavascriptFile(array('jquery.atwho.js', 'jquery.caret.min.js', 'mentioning.js'));
-
-			loadCSSFile('jquery.atwho.css');
-
-			addInlineJavascript('
-			$(document).ready(function () {
-				for (var i = 0, count = all_elk_mentions.length; i < count; i++)
-					all_elk_mentions[i].oMention = new elk_mentions(all_elk_mentions[i].oOptions);
-			});');
-		}
 
 		// Load up the Quick ModifyTopic and Quick Reply scripts
 		loadJavascriptFile('topic.js');
