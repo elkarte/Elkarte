@@ -170,11 +170,11 @@ class Drafts_PersonalMessage_Module
 	 */
 	protected function _prepareDraftsContext($member_id, $id_pm = false)
 	{
-		global $scripturl, $context, $txt, $modSettings;
+		global $scripturl, $context, $txt;
 
 		$context['drafts'] = array();
 
-		// Permissions
+		// Need a member
 		if (empty($member_id))
 			return false;
 
@@ -193,7 +193,7 @@ class Drafts_PersonalMessage_Module
 		// Add them to the context draft array for template display
 		foreach ($user_drafts as $draft)
 		{
-			$short_subject = empty($draft['subject']) ? $txt['drafts_none'] : Util::shorten_text(stripslashes($draft['subject']), !empty($modSettings['draft_subject_length']) ? $modSettings['draft_subject_length'] : 24);
+			$short_subject = empty($draft['subject']) ? $txt['drafts_none'] : Util::shorten_text(stripslashes($draft['subject']),self::$_subject_length);
 			$context['drafts'][] = array(
 				'subject' => censorText($short_subject),
 				'poster_time' => standardTime($draft['poster_time']),

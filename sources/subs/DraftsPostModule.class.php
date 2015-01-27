@@ -149,7 +149,7 @@ class Drafts_Post_Module
 	 * @param int|false $id_topic if set, load drafts for the specified topic
 	 * @return false|null
 	 */
-	private function _prepareDraftsContext($member_id, $id_topic = false)
+	protected function _prepareDraftsContext($member_id, $id_topic = false)
 	{
 		global $scripturl, $context, $txt;
 
