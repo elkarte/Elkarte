@@ -233,7 +233,7 @@ class Event_Manager
 
 			foreach ($events as $event)
 			{
-				$priority = isset($event[1][2]);
+				$priority = isset($event[1][2]) ? $event[1][2] : 0;
 				$position = $event[0];
 
 				$this->register($position, $event, $priority);
