@@ -2316,7 +2316,7 @@ function determineTopicClass(&$topic_context)
 	else
 		$topic_context['class'] = 'normal';
 
-	$topic_context['class'] .= $topic_context['is_poll'] ? '_poll' : '_post';
+	$topic_context['class'] .= !empty($topic_context['is_poll']) ? '_poll' : '_post';
 
 	if ($topic_context['is_locked'])
 		$topic_context['class'] .= '_locked';
