@@ -37,19 +37,19 @@ class Drafts_Display_Module
 				self::$_autosave_frequency = (int) $modSettings['drafts_autosave_frequency'] * 1000;
 
 			return array(
-				array('prepare_context', array('Drafts_Display_Module', 'prepare_context'), array('editorOptions', 'board')),
+				array('prepare_context', array('Drafts_Display_Module', 'prepare_context'), array('use_quick_reply', 'editorOptions', 'board')),
 			);
 		}
 		else
 			return array();
 	}
 
-	public function prepare_context(&$editorOptions, $board)
+	public function prepare_context($use_quick_reply, &$editorOptions, $board)
 	{
 		global $context, $options;
 
 		// Check if the draft functions are enabled and that they have permission to use them (for quick reply.)
-		$context['drafts_save'] = allowedTo('post_draft') && $context['can_reply'];
+		$context['drafts_save'] = $use_quick_reply && allowedTo('post_draft') && $context['can_reply'];
 		$context['drafts_autosave'] = $context['drafts_save'] && self::$_autosave_enabled && allowedTo('post_autosave_draft') && !empty($options['drafts_autosave_enabled']);
 
 		// Build a list of drafts that they can load into the editor

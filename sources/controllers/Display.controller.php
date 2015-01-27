@@ -596,6 +596,22 @@ class Display_Controller extends Action_Controller
 			);
 		}
 
+		// Now create the editor.
+		$editorOptions = array(
+			'id' => 'message',
+			'value' => '',
+			'labels' => array(
+				'post_button' => $txt['post'],
+			),
+			// add height and width for the editor
+			'height' => '250px',
+			'width' => '100%',
+			// We do XML preview here.
+			'preview_type' => 0,
+		);
+
+		$this->_events->trigger('prepare_context', array('editorOptions' => &$editorOptions, 'use_quick_reply' => !empty($options['display_quick_reply'])));
+
 		// Load up the "double post" sequencing magic.
 		if (!empty($options['display_quick_reply']))
 		{
@@ -607,26 +623,9 @@ class Display_Controller extends Action_Controller
 				// Needed for the editor and message icons.
 				require_once(SUBSDIR . '/Editor.subs.php');
 
-				// Now create the editor.
-				$editorOptions = array(
-					'id' => 'message',
-					'value' => '',
-					'labels' => array(
-						'post_button' => $txt['post'],
-					),
-					// add height and width for the editor
-					'height' => '250px',
-					'width' => '100%',
-					// We do XML preview here.
-					'preview_type' => 0,
-				);
 				create_control_richedit($editorOptions);
 			}
 		}
-		else
-			$editorOptions = array();
-
-		$this->_events->trigger('prepare_context', array('editorOptions' => &$editorOptions));
 
 		addJavascriptVar(array('notification_topic_notice' => $context['is_marked_notify'] ? $txt['notification_disable_topic'] : $txt['notification_enable_topic']), true);
 		if ($context['can_send_topic'])
