@@ -31,7 +31,7 @@ class Mention_Display_Module
 			$context['mentions_enabled'] = true;
 
 			return array(
-				array('prepare_context', array('Mention_Post_Module', 'prepare_context'), array('virtual_msg')),
+				array('prepare_context', array('Mention_Display_Module', 'prepare_context'), array('virtual_msg')),
 			);
 		}
 		else
