@@ -410,7 +410,7 @@ class Attachments_Post_Module
 
 	public function after_save_post($msgOptions)
 	{
-		if ($this->_is_new_message)
+		if ($this->_is_new_message && !empty($this->_saved_attach_id))
 			bindMessageAttachments($msgOptions['id'], $this->_saved_attach_id);
 	}
 }
