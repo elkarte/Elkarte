@@ -30,8 +30,8 @@ class Mention_Post_Module
 			return array(
 				array('prepare_post', array('Mention_Post_Module', 'prepare_post'), array('events')),
 				array('prepare_context', array('Mention_Post_Module', 'prepare_context'), array()),
-				array('after_save_post', array('Mention_Post_Module', 'after_save_post'), array()),
-				array('save_post', array('Mention_Post_Module', 'save_post'), array('msgOptions', 'becomesApproved')),
+				array('before_save_post', array('Mention_Post_Module', 'before_save_post'), array()),
+				array('after_save_post', array('Mention_Post_Module', 'after_save_post'), array('msgOptions', 'becomesApproved')),
 			);
 		else
 			return array();
@@ -45,7 +45,7 @@ class Mention_Post_Module
 
 		foreach ($mentions as $mention)
 		{
-			$events->register('prepare_post', array('prepare_post', array(ucfirst($mention) . '_Mention', 'prepare_post', 0)));
+			$events->register('prepare_context', array('prepare_context', array(ucfirst($mention) . '_Mention', 'prepare_context', 0)));
 		}
 	}
 
@@ -63,7 +63,7 @@ class Mention_Post_Module
 		});');
 	}
 
-	public function after_save_post()
+	public function before_save_post()
 	{
 		if (!empty($_REQUEST['uid']))
 		{
@@ -85,7 +85,7 @@ class Mention_Post_Module
 		}
 	}
 
-	public function save_post($msgOptions, $becomesApproved)
+	public function after_save_post($msgOptions, $becomesApproved)
 	{
 		if (!empty($this->_actually_mentioned))
 		{

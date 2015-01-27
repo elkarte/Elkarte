@@ -18,7 +18,7 @@ class Mentionmem_Mention extends Mention_BoardAccess_Abstract
 {
 	protected $_type = 'mentionmem';
 
-	public function prepare_post()
+	public function prepare_context()
 	{
 		global $context;
 
