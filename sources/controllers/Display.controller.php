@@ -27,6 +27,13 @@ if (!defined('ELK'))
 class Display_Controller extends Action_Controller
 {
 	/**
+	 * The template layers object
+	 *
+	 * @var null|object
+	 */
+	protected $_template_layers = null;
+
+	/**
 	 * Default action handler for this controller
 	 */
 	public function action_index()
@@ -71,8 +78,8 @@ class Display_Controller extends Action_Controller
 
 		// How much are we sticking on each page?
 		$context['messages_per_page'] = empty($modSettings['disableCustomPerPage']) && !empty($options['messages_per_page']) ? $options['messages_per_page'] : $modSettings['defaultMaxMessages'];
-		$template_layers = Template_Layers::getInstance();
-		$template_layers->addEnd('messages_informations');
+		$this->_template_layers = Template_Layers::getInstance();
+		$this->_template_layers->addEnd('messages_informations');
 		$includeUnapproved = !$modSettings['postmod_active'] || allowedTo('approve_posts');
 
 		// Let's do some work on what to search index.
@@ -292,7 +299,7 @@ class Display_Controller extends Action_Controller
 		// Did we report a post to a moderator just now?
 		$context['report_sent'] = isset($_GET['reportsent']);
 		if ($context['report_sent'])
-			$template_layers->add('report_sent');
+			$this->_template_layers->add('report_sent');
 
 		// Let's get nosey, who is viewing this topic?
 		if (!empty($settings['display_who_viewing']))
@@ -351,7 +358,7 @@ class Display_Controller extends Action_Controller
 		$context['is_very_hot'] = $topicinfo['num_replies'] >= $modSettings['hotTopicVeryPosts'];
 		$context['is_hot'] = $topicinfo['num_replies'] >= $modSettings['hotTopicPosts'];
 		$context['is_approved'] = $topicinfo['approved'];
-		$context['is_poll'] = $topicinfo['id_poll'] > 0 && !empty($modSettings['pollMode']) && allowedTo('poll_view');
+
 		determineTopicClass($context);
 
 		// Did this user start the topic or not?
@@ -369,28 +376,6 @@ class Display_Controller extends Action_Controller
 
 		// For quick reply we need a response prefix in the default forum language.
 		$context['response_prefix'] = response_prefix();
-
-		// Create the poll info if it exists.
-		if ($context['is_poll'])
-		{
-			$template_layers->add('display_poll');
-			require_once(SUBSDIR . '/Poll.subs.php');
-
-			loadPollContext($topicinfo['id_poll']);
-
-			// Build the poll moderation button array.
-			$context['poll_buttons'] = array(
-				'vote' => array('test' => 'allow_return_vote', 'text' => 'poll_return_vote', 'image' => 'poll_options.png', 'lang' => true, 'url' => $scripturl . '?topic=' . $context['current_topic'] . '.' . $context['start']),
-				'results' => array('test' => 'allow_poll_view', 'text' => 'poll_results', 'image' => 'poll_results.png', 'lang' => true, 'url' => $scripturl . '?topic=' . $context['current_topic'] . '.' . $context['start'] . ';viewresults'),
-				'change_vote' => array('test' => 'allow_change_vote', 'text' => 'poll_change_vote', 'image' => 'poll_change_vote.png', 'lang' => true, 'url' => $scripturl . '?action=poll;sa=vote;topic=' . $context['current_topic'] . '.' . $context['start'] . ';poll=' . $context['poll']['id'] . ';' . $context['session_var'] . '=' . $context['session_id']),
-				'lock' => array('test' => 'allow_lock_poll', 'text' => (!$context['poll']['is_locked'] ? 'poll_lock' : 'poll_unlock'), 'image' => 'poll_lock.png', 'lang' => true, 'url' => $scripturl . '?action=lockvoting;topic=' . $context['current_topic'] . '.' . $context['start'] . ';' . $context['session_var'] . '=' . $context['session_id']),
-				'edit' => array('test' => 'allow_edit_poll', 'text' => 'poll_edit', 'image' => 'poll_edit.png', 'lang' => true, 'url' => $scripturl . '?action=editpoll;topic=' . $context['current_topic'] . '.' . $context['start']),
-				'remove_poll' => array('test' => 'can_remove_poll', 'text' => 'poll_remove', 'image' => 'admin_remove_poll.png', 'lang' => true, 'custom' => 'onclick="return confirm(\'' . $txt['poll_remove_warn'] . '\');"', 'url' => $scripturl . '?action=poll;sa=remove;topic=' . $context['current_topic'] . '.' . $context['start'] . ';' . $context['session_var'] . '=' . $context['session_id']),
-			);
-
-			// Allow mods to add additional buttons here
-			call_integration_hook('integrate_poll_buttons');
-		}
 
 		// Calculate the fastest way to get the messages!
 		$ascending = true;
@@ -572,8 +557,6 @@ class Display_Controller extends Action_Controller
 			'can_move' => 'move',
 			'can_lock' => 'lock',
 			'can_delete' => 'remove',
-			'can_add_poll' => 'poll_add',
-			'can_remove_poll' => 'poll_remove',
 			'can_reply' => 'post_reply',
 			'can_reply_unapproved' => 'post_unapproved_replies',
 		);
@@ -583,8 +566,6 @@ class Display_Controller extends Action_Controller
 		// Cleanup all the permissions with extra stuff...
 		$context['can_mark_notify'] &= !$context['user']['is_guest'];
 		$context['can_sticky'] &= !empty($modSettings['enableStickyTopics']);
-		$context['can_add_poll'] &= !empty($modSettings['pollMode']) && $topicinfo['id_poll'] <= 0;
-		$context['can_remove_poll'] &= !empty($modSettings['pollMode']) && $topicinfo['id_poll'] > 0;
 		$context['can_reply'] &= empty($topicinfo['locked']) || allowedTo('moderate_board');
 		$context['can_reply_unapproved'] &= $modSettings['postmod_active'] && (empty($topicinfo['locked']) || allowedTo('moderate_board'));
 		$context['can_issue_warning'] &= in_array('w', $context['admin_features']) && !empty($modSettings['warning_enable']);
@@ -704,8 +685,8 @@ class Display_Controller extends Action_Controller
 			$context['mod_buttons'][] = array('text' => 'restore_topic', 'image' => '', 'lang' => true, 'url' => $scripturl . '?action=restoretopic;topics=' . $context['current_topic'] . ';' . $context['session_var'] . '=' . $context['session_id']);
 
 		if ($context['can_reply'] && !empty($options['display_quick_reply']))
-			$template_layers->add('quickreply');
-		$template_layers->add('pages_and_buttons');
+			$this->_template_layers->add('quickreply');
+		$this->_template_layers->add('pages_and_buttons');
 
 		// Allow adding new buttons easily.
 		call_integration_hook('integrate_display_buttons');
