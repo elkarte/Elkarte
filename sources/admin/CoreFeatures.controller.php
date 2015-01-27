@@ -291,7 +291,7 @@ class CoreFeatures_Controller extends Action_Controller
 				$class::addCoreFeature($core_features);
 		}
 
-		$integrations = Hooks::get()->discoverIntegrations(BOARDDIR . '/packages/integration');
+		$integrations = Hooks::get()->discoverIntegrations(ADDONSDIR);
 		$integrations += Hooks::get()->discoverIntegrations(SOURCEDIR);
 
 		foreach ($integrations as $integration)

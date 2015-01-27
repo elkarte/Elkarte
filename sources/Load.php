@@ -73,7 +73,7 @@ function reloadSettings()
 			$cache->put('modSettings', $modSettings, 90);
 	}
 
-	$hooks->loadIntegrations(BOARDDIR . '/packages/integration');
+	$hooks->loadIntegrations(ADDONSDIR);
 	$hooks->loadIntegrations(SOURCEDIR);
 
 	// Setting the timezone is a requirement for some functions in PHP >= 5.1.
