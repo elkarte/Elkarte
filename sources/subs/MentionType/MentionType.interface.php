@@ -17,12 +17,11 @@ if (!defined('ELK'))
 interface Mention_Type_Interface
 {
 	/**
-	 * This static function is used to register events to the controller.
+	 * This static function is used to obtain the events to register to a controller.
 	 *
-	 * @param Event_Manager $events The event manager attached to the controller
 	 * @param string $controller The name of the controller initializing the system
 	 */
-	public static function register($events, $controller);
+	public static function getEvents($controller);
 
 	/**
 	 * Used by Mentions_Controller to filter the mentions to display in the list.

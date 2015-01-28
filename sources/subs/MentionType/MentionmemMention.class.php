@@ -22,7 +22,7 @@ class Mentionmem_Mention extends Mention_BoardAccess_Abstract
 	/**
 	 * {@inheritdoc }
 	 */
-	public static function register($events, $controller)
+	public static function getEvents($controller)
 	{
 		$methods = array(
 			'post' => array('prepare_context' => array(), 'before_save_post' => array(), 'after_save_post' => array('msgOptions', 'becomesApproved')),
@@ -30,12 +30,9 @@ class Mentionmem_Mention extends Mention_BoardAccess_Abstract
 		);
 
 		if (isset($methods[$controller]))
-		{
-			foreach ($methods[$controller] as $method => $dependencies)
-			{
-				$events->register($method, array($method, array('Mentionmem_Mention', $controller . '_' . $method), $dependencies));
-			}
-		}
+			return $methods[$controller];
+		else
+			return array();
 	}
 
 	public function display_prepare_context($virtual_msg)

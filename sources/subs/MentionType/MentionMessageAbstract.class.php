@@ -19,15 +19,15 @@ abstract class Mention_Message_Abstract implements Mention_Type_Interface
 	protected $_type = '';
 
 	/**
-	 * This static function is used to register events to the controller.
+	 * This static function is used to find the events to attach to a controller.
 	 * The implementation of this abstract class is empty because it's
 	 * just a dummy to cover mentions that don't need to register anything.
 	 *
-	 * @param Event_Manager $events The event manager attached to the controller
 	 * @param string $controller The name of the controller initializing the system
 	 */
-	public static function register($events, $controller)
+	public static function getEvents($controller)
 	{
+		return array();
 	}
 
 	public abstract function view($type, &$mentions);

@@ -27,7 +27,12 @@ abstract class Mention_Module_Abstract
 			foreach ($mentions as $mention)
 			{
 				$class = ucfirst($mention) . '_Mention';
-				$class::register($eventsManager, $action);
+				$hooks = $class::getEvents($action);
+
+				foreach ($hooks as $method => $dependencies)
+				{
+					$eventsManager->register($method, array($method, array($class, $action . '_' . $method), $dependencies));
+				}
 			}
 		}
 	}
