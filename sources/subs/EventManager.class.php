@@ -229,7 +229,7 @@ class Event_Manager
 	{
 		foreach ($classes as $class)
 		{
-			$events = $class::hooks();
+			$events = $class::hooks($this);
 
 			foreach ($events as $event)
 			{

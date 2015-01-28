@@ -16,6 +16,9 @@ if (!defined('ELK'))
 
 abstract class Mention_BoardAccess_Abstract extends Mention_Message_Abstract
 {
+	/**
+	 * {@inheritdoc }
+	 */
 	public function view($type, &$mentions)
 	{
 		foreach ($mentions as $key => $row)

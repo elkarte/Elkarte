@@ -14,90 +14,12 @@
 if (!defined('ELK'))
 	die('No access...');
 
-class Mention_Post_Module
+class Mention_Post_Module extends Mention_Module_Abstract
 {
-	protected static $_enabled = false;
-	protected $_actually_mentioned = array();
-
-	public static function hooks()
+	public static function hooks($eventsManager)
 	{
-		global $modSettings;
+		self::registerHooks('post', $eventsManager);
 
-		// Posting an event?
-		self::$_enabled = !empty($modSettings['mentions_enabled']);
-
-		if (self::$_enabled)
-			return array(
-				array('prepare_post', array('Mention_Post_Module', 'prepare_post'), array('events')),
-				array('prepare_context', array('Mention_Post_Module', 'prepare_context'), array()),
-				array('before_save_post', array('Mention_Post_Module', 'before_save_post'), array()),
-				array('after_save_post', array('Mention_Post_Module', 'after_save_post'), array('msgOptions', 'becomesApproved')),
-			);
-		else
-			return array();
-	}
-
-	public function prepare_post($events)
-	{
-		global $modSettings;
-
-		$mentions = explode(',', $modSettings['enabled_mentions']);
-
-		foreach ($mentions as $mention)
-		{
-			$events->register('prepare_context', array('prepare_context', array(ucfirst($mention) . '_Mention', 'prepare_context', 0)));
-		}
-	}
-
-	public function prepare_context()
-	{
-		global $context;
-
-		$context['mentions_enabled'] = true;
-		loadCSSFile('jquery.atwho.css');
-
-		addInlineJavascript('
-		$(document).ready(function () {
-			for (var i = 0, count = all_elk_mentions.length; i < count; i++)
-				all_elk_mentions[i].oMention = new elk_mentions(all_elk_mentions[i].oOptions);
-		});');
-	}
-
-	public function before_save_post()
-	{
-		if (!empty($_REQUEST['uid']))
-		{
-			$query_params = array(
-				'member_ids' => array_unique(array_map('intval', $_REQUEST['uid']))
-			);
-
-			require_once(SUBSDIR . '/Members.subs.php');
-			$mentioned_members = membersBy('member_ids', $query_params, true);
-			$replacements = 0;
-			$this->_actually_mentioned = array();
-
-			foreach ($mentioned_members as $member)
-			{
-				$_POST['message'] = str_replace('@' . $member['real_name'], '[member=' . $member['id_member'] . ']' . $member['real_name'] . '[/member]', $_POST['message'], $replacements);
-				if ($replacements > 0)
-					$this->_actually_mentioned[] = $member['id_member'];
-			}
-		}
-	}
-
-	public function after_save_post($msgOptions, $becomesApproved)
-	{
-		if (!empty($this->_actually_mentioned))
-		{
-			$loader = new Controller_Loader('Mentions');
-			$mentions = $loader->initDispatch();
-			$mentions->setData(array(
-				'id_member' => $this->_actually_mentioned,
-				'type' => 'mentionmem',
-				'id_msg' => $msgOptions['id'],
-				'status' => $becomesApproved ? 'new' : 'unapproved',
-			));
-			$mentions->action_add();
-		}
+		return array();
 	}
 }
