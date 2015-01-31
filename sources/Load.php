@@ -1792,6 +1792,7 @@ function loadEssentialThemeData()
 
 	// Assume we want this.
 	$context['forum_name'] = $mbname;
+	$context['forum_name_html_safe'] = $context['forum_name'];
 
 	// Check loadLanguage actually exists!
 	if (!function_exists('loadLanguage'))
