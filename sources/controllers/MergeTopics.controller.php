@@ -375,7 +375,7 @@ class MergeTopics_Controller extends Action_Controller
 
 		// Determine target board.
 		$target_board = count($boards) > 1 ? (int) $_REQUEST['board'] : $boards[0];
-		if (!in_array($target_board, $boards))
+		if (!in_array($target_board, array_keys($boards_info)))
 			fatal_lang_error('no_board');
 
 		// Determine which poll will survive and which polls won't.
