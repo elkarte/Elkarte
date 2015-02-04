@@ -15,6 +15,11 @@
  *
  */
 
+function template_MergeTopics_init()
+{
+	loadTemplate('GenericHelpers');
+}
+
 /**
  * Template for the bit to show when merge topics is finished.
  */
@@ -202,17 +207,11 @@ function template_merge_extra_options()
 	{
 		echo '
 					<fieldset id="merge_board" class="merge_options">
-						<legend>', $txt['merge_select_target_board'], '</legend>
-						<ul>';
+						<legend>', $txt['merge_select_target_board'], '</legend>';
 
-		foreach ($context['boards'] as $board)
-			echo '
-							<li>
-								<input type="radio" id="board', $board['id'], '" name="board" value="', $board['id'], '"', $board['selected'] ? ' checked="checked"' : '', ' class="input_radio" /> <label for="board', $board['id'], '">', $board['name'], '</label>
-							</li>';
+		template_select_boards('board');
 
 		echo '
-						</ul>
 					</fieldset>';
 	}
 
