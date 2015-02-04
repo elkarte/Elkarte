@@ -4789,4 +4789,8 @@ dl.no_members {
 	#postMoreOptions, #postAttachment, #postAttachment2 {
 		padding: 4px;
 	}
+	#confirm_buttons .button_submit {
+		height: inherit;
+		max-height: none;
+	}
 }
