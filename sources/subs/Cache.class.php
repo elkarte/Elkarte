@@ -78,8 +78,7 @@ class Cache
 		if ($this->_cache_obj !== null)
 			$this->_cache_enable = $this->_cache_obj->init();
 
-		if ($this->_cache_enable)
-			$this->_key_prefix = $this->_build_prefix();
+		$this->_build_prefix();
 	}
 
 	/**
@@ -279,7 +278,7 @@ class Cache
 					'cache_password' => $cache_password,
 				);
 			}
-			elseif ($cache_accelerator == 'acpu')
+			if ($cache_accelerator == 'acpu')
 				self::$_instance = new Cache($cache_enable, 'acp', $options);
 			else
 				self::$_instance = new Cache($cache_enable, $cache_accelerator, $options);
