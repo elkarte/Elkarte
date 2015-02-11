@@ -490,7 +490,7 @@ class Recent_Controller extends Action_Controller
 		$context['sub_template'] = $_REQUEST['action'] == 'unread' ? 'unread' : 'replies';
 
 		$template_layers = Template_Layers::getInstance();
-		$template_layers->add($context['sub_template'] );
+		$template_layers->add($context['sub_template']);
 
 		// Setup the default topic icons... for checking they exist and the like ;)
 		require_once(SUBSDIR . '/MessageIndex.subs.php');
@@ -1076,6 +1076,7 @@ class Recent_Controller extends Action_Controller
 				)
 			);
 
+			// @deprecated since 1.0 - better have the sprintf in the template because using html here is bad
 			$context['topics'][$row['id_topic']]['first_post']['started_by'] = sprintf($txt['topic_started_by_in'], '<strong>' . $context['topics'][$row['id_topic']]['first_post']['member']['link'] . '</strong>', '<em>' . $context['topics'][$row['id_topic']]['board']['link'] . '</em>');
 			determineTopicClass($context['topics'][$row['id_topic']]);
 		}

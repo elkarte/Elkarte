@@ -454,8 +454,11 @@
 					func;
 
 				if ($popUp.length) {
+					var tmp = !$popUp.is(':hidden');
 					func = ($popUp.is(':hidden')) ? over : out;
 					$.proxy(func, $this.parent('li'))();
+					if (tmp)
+						return true;
 					return false;
 				}
 			},

@@ -146,8 +146,7 @@ function template_unread()
 										</h4>
 									</div>
 									<div class="topic_starter">
-										', $txt['started_by'], ' ', $topic['first_post']['member']['link'], ' ',
-										$txt['in'], ' <em>', $topic['board']['link'], '</em>', !empty($topic['pages']) ? '
+										', sprintf($txt['topic_started_by_in'], $topic['first_post']['member']['link'], '<em>' . $topic['board']['link'] . '</em>'), !empty($topic['pages']) ? '
 										<ul class="small_pagelinks" id="pages' . $topic['first_post']['id'] . '" role="menubar">' . $topic['pages'] . '</ul>' : '', '
 									</div>
 								</div>
@@ -286,8 +285,7 @@ function template_replies()
 										</h4>
 									</div>
 									<div class="topic_starter">
-										', $txt['started_by'], ' ', $topic['first_post']['member']['link'], ' ',
-										$txt['in'], ' <em>', $topic['board']['link'], '</em>', !empty($topic['pages']) ? '
+										', sprintf($txt['topic_started_by_in'], $topic['first_post']['member']['link'], '<em>' . $topic['board']['link'] . '</em>'), !empty($topic['pages']) ? '
 										<ul class="small_pagelinks" id="pages' . $topic['first_post']['id'] . '" role="menubar">' . $topic['pages'] . '</ul>' : '', '
 									</div>
 								</div>

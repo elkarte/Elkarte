@@ -189,7 +189,7 @@ class MergeTopics_Controller extends Action_Controller
 		// Get info about the topics and polls that will be merged.
 		$request = $db->query('', '
 			SELECT
-				t.id_topic, t.id_board, t.id_poll, t.num_views, t.is_sticky, t.approved, t.num_replies, t.unapproved_posts,
+				t.id_topic, t.id_board, b.id_cat, t.id_poll, t.num_views, t.is_sticky, t.approved, t.num_replies, t.unapproved_posts,
 				m1.subject, m1.poster_time AS time_started, IFNULL(mem1.id_member, 0) AS id_member_started, IFNULL(mem1.real_name, m1.poster_name) AS name_started,
 				m2.poster_time AS time_updated, IFNULL(mem2.id_member, 0) AS id_member_updated, IFNULL(mem2.real_name, m2.poster_name) AS name_updated
 			FROM {db_prefix}topics AS t
@@ -197,6 +197,7 @@ class MergeTopics_Controller extends Action_Controller
 				INNER JOIN {db_prefix}messages AS m2 ON (m2.id_msg = t.id_last_msg)
 				LEFT JOIN {db_prefix}members AS mem1 ON (mem1.id_member = m1.id_member)
 				LEFT JOIN {db_prefix}members AS mem2 ON (mem2.id_member = m2.id_member)
+				LEFT JOIN {db_prefix}boards AS b ON (b.id_board = t.id_board)
 			WHERE t.id_topic IN ({array_int:topic_list})
 			ORDER BY t.id_first_msg
 			LIMIT ' . count($topics),
@@ -213,6 +214,7 @@ class MergeTopics_Controller extends Action_Controller
 		$boards = array();
 		$polls = array();
 		$firstTopic = 0;
+		$firstBoard = 0;
 		while ($row = $db->fetch_assoc($request))
 		{
 			// Make a note for the board counts...
@@ -267,7 +269,10 @@ class MergeTopics_Controller extends Action_Controller
 
 			// Store the id_topic with the lowest id_first_msg.
 			if (empty($firstTopic))
+			{
 				$firstTopic = $row['id_topic'];
+				$firstBoard = $row['id_board'];
+			}
 
 			$is_sticky = max($is_sticky, $row['is_sticky']);
 		}
@@ -301,6 +306,17 @@ class MergeTopics_Controller extends Action_Controller
 
 		// Saved in a variable to (potentially) save a query later
 		$boards_info = fetchBoardsInfo($query_boards);
+
+		$boardListOptions = array(
+			'not_redirection' => true,
+			'selected_board' => $firstBoard
+		);
+
+		if (!in_array(0, $merge_boards))
+			$boardListOptions['included_boards'] = $merge_boards;
+		$context += getBoardList($boardListOptions);
+		// This is removed to avoid the board not being selectable.
+		$context['current_board'] = null;
 
 		// This happens when a member is moderator of a board he cannot see
 		foreach ($boards as $board)
@@ -336,12 +352,15 @@ class MergeTopics_Controller extends Action_Controller
 			}
 			if (count($boards) > 1)
 			{
+				// @deprecated since 1.0.3 - Kept in the remote case someone created a theme changing MergeTopics.template.php
 				foreach ($boards_info as $row)
+				{
 					$context['boards'][] = array(
 						'id' => $row['id_board'],
 						'name' => $row['name'],
 						'selected' => $row['id_board'] == $topic_data[$firstTopic]['board']
 					);
+				}
 			}
 
 			$context['topics'] = $topic_data;
@@ -356,7 +375,7 @@ class MergeTopics_Controller extends Action_Controller
 
 		// Determine target board.
 		$target_board = count($boards) > 1 ? (int) $_REQUEST['board'] : $boards[0];
-		if (!in_array($target_board, $boards))
+		if (!in_array($target_board, array_keys($boards_info)))
 			fatal_lang_error('no_board');
 
 		// Determine which poll will survive and which polls won't.
