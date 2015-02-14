@@ -77,8 +77,8 @@ class Members_Controller extends Action_Controller
 			// Do we want a mention for our newly added buddy?
 			if (!empty($modSettings['mentions_enabled']) && !empty($modSettings['mentions_buddy']))
 			{
-				$loader = new Controller_Loader('Mentions');
-				$mentions = $loader->initDispatch();
+				$mentions = new Mentions_Controller(new Event_Maager());
+				$mentions->pre_dispatch();
 
 				// Set a mention for our buddy.
 				$mentions->setData(array(

@@ -150,7 +150,7 @@ class ManageDraftsModule_Controller extends Action_Controller
 	public static function integrate_sa_manage_maintenance(&$subActions)
 	{
 		$subActions['topics']['activities']['olddrafts'] = function() {
-			$loader = new Controller_Loader('ManageDraftsModule');
+			$loader = new ManageDraftsModule_Controller(new Event_manager());
 			$controller = $loader->initDispatch();
 			$controller->action_olddrafts_display();
 		};

@@ -380,11 +380,10 @@ function callMenu($selectedMenu)
 	{
 		// 'controller' => 'ManageAttachments_Controller'
 		// 'function' => 'action_avatars'
-		$controller = new $selectedMenu['controller']();
+		$controller = new $selectedMenu['controller'](new Event_Manager());
 
 		// always set up the environment
-		if (method_exists($controller, 'pre_dispatch'))
-			$controller->pre_dispatch();
+		$controller->pre_dispatch();
 		// and go!
 		$controller->{$selectedMenu['function']}();
 	}

@@ -1350,8 +1350,8 @@ class PersonalMessage_Controller extends Action_Controller
 		}
 
 		// Load up the fields.
-		$loader = new Controller_Loader('ProfileOptions');
-		$controller = $loader->initDispatch();
+		$controller = new ProfileOptions_Controller(new Event_Manager());
+		$controller->pre_dispatch();
 		$controller->action_pmprefs();
 	}
 

@@ -7,7 +7,7 @@ class TestControllerRedirectException extends PHPUnit_Framework_TestCase
 {
 	public function testBasicRedirect()
 	{
-		$exception = new Controller_Redirect_Exception('mock', 'action_plain');
+		$exception = new Controller_Redirect_Exception('Mock_Controller', 'action_plain');
 		$result = $exception->doRedirect($this);
 
 		$this->assertSame($result, 'success');
@@ -15,7 +15,7 @@ class TestControllerRedirectException extends PHPUnit_Framework_TestCase
 
 	public function testPredispatchRedirect()
 	{
-		$exception = new Controller_Redirect_Exception('mockpre', 'action_plain');
+		$exception = new Controller_Redirect_Exception('Mockpre_Controller', 'action_plain');
 		$result = $exception->doRedirect($this);
 
 		$this->assertSame($result, 'success');
@@ -31,7 +31,7 @@ class Same_Controller extends Action_Controller
 {
 	public function __construct($tester)
 	{
-		$exception = new Controller_Redirect_Exception('same', 'action_plain');
+		$exception = new Controller_Redirect_Exception('Same_Controller', 'action_plain');
 		$result = $exception->doRedirect($this);
 
 		$tester->assertSame($result, 'success');

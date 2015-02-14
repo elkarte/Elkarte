@@ -399,7 +399,7 @@ class Maintenance_Controller extends Action_Controller
 		// Honestly, this should be done in the sub function.
 		validateToken('admin-maint');
 
-		$loader = new Controller_Loader('RepairBoards');
+		$loader = new RepairBoards_Controller(new Event_manager());
 		$controller = $loader->initDispatch();
 		$controller->action_repairboards();
 	}

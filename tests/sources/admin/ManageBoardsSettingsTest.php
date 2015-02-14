@@ -20,8 +20,8 @@ class TestManageBoardsSettings extends PHPUnit_Framework_TestCase
 	{
 		global $txt;
 
-		$loader = new Controller_Loader('ManageBoards');
-		$controller = $loader->initDispatch();
+		$controller = new ManageBoards_Controller(new Event_Manager());
+		$controller->pre_dispatch();
 		$settings = $controller->settings_search();
 
 		// Lets see some hardcoded setting for boards management...

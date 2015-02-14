@@ -258,7 +258,7 @@ class Site_Dispatcher
 			// sa=upload => action_upload()
 			elseif (file_exists(CONTROLLERDIR . '/' . ucfirst($_GET['action']) . '.controller.php'))
 			{
-				$this->_file_name = CONTROLLERDIR . '/' . ucfirst($_GET['action']) . '.controller.php';
+// 				$this->_file_name = CONTROLLERDIR . '/' . ucfirst($_GET['action']) . '.controller.php';
 				$this->_controller_name = ucfirst($_GET['action']) . '_Controller';
 				if (isset($_GET['sa']) && preg_match('~^\w+$~', $_GET['sa']))
 					$this->_function_name = 'action_' . $_GET['sa'];
@@ -268,7 +268,7 @@ class Site_Dispatcher
 		}
 
 		// The file and function weren't found yet?
-		if (empty($this->_file_name) || empty($this->_function_name))
+		if (empty($this->_controller_name) || empty($this->_function_name))
 		{
 			// Catch the action with the theme?
 			// We still haven't found what we're looking for...
@@ -287,24 +287,22 @@ class Site_Dispatcher
 	 */
 	public function dispatch()
 	{
-		require_once($this->_file_name);
+		if (!empty($this->_file_name))
+			require_once($this->_file_name);
 
 		if (!empty($this->_controller_name))
 		{
-			$hook = strtolower(str_replace('_Controller', '', $this->_controller_name));
-			$hook = substr($hook, -1) == 2 ? substr($hook, 0, -1) : $hook;
-
-			require_once(SOURCEDIR . '/ControllerLoader.class.php');
-			$loader = new Controller_Loader(str_replace('_Controller', '', $this->_controller_name));
+			$controller = new $this->_controller_name(new Event_Manager());
+			$hook = $controller->getHook();
 
 			// 3, 2, ... and go
-			if ($loader->methodExists($this->_function_name))
+			if (method_exists($controller, $this->_function_name))
 			{
-				$callable = array($loader->getController(), $this->_function_name);
+				$callable = array($controller, $this->_function_name);
 			}
-			elseif ($loader->methodExists('action_index'))
+			elseif (method_mxists($controller, 'action_index'))
 			{
-				$callable = array($loader->getController(), 'action_index');
+				$callable = array($controller, 'action_index');
 			}
 			// Fall back
 			// @todo remove?
@@ -323,7 +321,7 @@ class Site_Dispatcher
 				return $this->dispatch();
 			}
 
-			$loader->initDispatch();
+			$controller->pre_dispatch();
 
 			call_integration_hook('integrate_action_' . $hook . '_before', array($this->_function_name));
 

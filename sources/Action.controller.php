@@ -29,6 +29,85 @@ abstract class Action_Controller
 	protected $_events = null;
 
 	/**
+	 * The current hook.
+	 * @var string
+	 */
+	protected $_hook = '';
+
+	/**
+	 * Constructor...
+	 * Requires the name of the controller we want to instantiate, lowercase and
+	 * without the "_Controller" part.
+	 *
+	 * @param null|Event_Manager $eventManager - The event manager
+	 */
+	public function __construct($eventManager = null)
+	{
+		// A safety-net to remain backward compatible
+		if ($eventManager === null)
+			$eventManager = new Event_Manager();
+
+		$this->_events = $eventManager;
+
+		$this->_initEventManager();
+	}
+
+	protected function _initEventManager()
+	{
+
+		$this->_hook = str_replace('_Controller', '', get_class($this));
+
+		$this->_loadModules();
+
+		$this->_events->registerAddons('.+_' . $this->_hook . '_Addon');
+		$this->_events->registerAddons('.+_' . $this->_hook . '_Module');
+
+		$this->_events->setSource($this);
+	}
+
+	public function getHook()
+	{
+		return $this->_hook;
+	}
+
+	/**
+	 * Shortcut to require the files of the modules for a certain controller.
+	 */
+	protected function _loadModules()
+	{
+		foreach ($this->_getModuleFiles() as $require_file)
+			require_once($require_file);
+	}
+
+	/**
+	 * Finds the modules for a certain controller.
+	 *
+	 * @return string[] File names with full path
+	 */
+	protected function _getModuleFiles()
+	{
+		global $modSettings;
+
+		$files = array();
+		$hook = strtolower(str_replace('_Controller', '', $this->_hook));
+		$setting_key = 'modules_' . $hook;
+		if (!empty($modSettings[$setting_key]))
+		{
+			$modules = explode(',', $modSettings[$setting_key]);
+			foreach ($modules as $module)
+			{
+				$file = SUBSDIR . '/' . ucfirst($module) . ucfirst($hook) . 'Module.class.php';
+				if (file_exists($file))
+				{
+					$files[] = $file;
+				}
+			}
+		}
+
+		return $files;
+	}
+
+	/**
 	 * Default action handler.
 	 *
 	 * - This will be called by the dispatcher in many cases.
@@ -48,17 +127,6 @@ abstract class Action_Controller
 		// By default, do nothing.
 		// Sub-classes may implement their prerequisite loading,
 		// such as load the template, load the language(s) file(s)
-	}
-
-	/**
-	 * Used to set the event manager for the current action.
-	 *
-	 * @param Event_Manager $event_manager - An Event_Manager object
-	 */
-	public function setEventManager($event_manager)
-	{
-		$this->_events = $event_manager;
-		$this->_events->setSource($this);
 	}
 
 	/**

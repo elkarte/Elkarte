@@ -42,8 +42,8 @@ class Mentionmem_Mention extends Mention_BoardAccess_Abstract
 		// Mark the mention as read if requested
 		if (isset($_REQUEST['mentionread']) && !empty($virtual_msg))
 		{
-			$loader = new Controller_Loader('Mentions');
-			$mentions = $loader->initDispatch();
+			$mentions = new Mentions_Controller(new Event_Manager());
+			$mentions->pre_dispatch();
 			$mentions->setData(array(
 				'id_mention' => $_REQUEST['item'],
 				'mark' => $_REQUEST['mark'],
@@ -107,8 +107,8 @@ class Mentionmem_Mention extends Mention_BoardAccess_Abstract
 	{
 		if (!empty($this->_actually_mentioned))
 		{
-			$loader = new Controller_Loader('Mentions');
-			$mentions = $loader->initDispatch();
+			$mentions = new Mentions_Controller(new Event_Manager());
+			$mentions->pre_dispatch();
 			$mentions->setData(array(
 				'id_member' => $this->_actually_mentioned,
 				'type' => 'mentionmem',

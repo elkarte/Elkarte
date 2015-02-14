@@ -74,8 +74,8 @@ class TestMentions extends PHPUnit_Framework_TestCase
 	 */
 	public function testAddMentionByMember()
 	{
-		$loader = new Controller_Loader('Mentions');
-		$mentions = $loader->initDispatch();
+		$mentions = new Mentions_Controller(new Event_Manager());
+		$mentions->pre_dispatch();
 		$id_member = 2;
 
 		// Lets mention the member
@@ -102,8 +102,8 @@ class TestMentions extends PHPUnit_Framework_TestCase
 	{
 		global $user_info;
 
-		$loader = new Controller_Loader('Mentions');
-		$mentions = $loader->initDispatch();
+		$mentions = new Mentions_Controller(new Event_Manager());
+		$mentions->pre_dispatch();
 
 		$user_info = array(
 			'id' => 2,

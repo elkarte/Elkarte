@@ -533,8 +533,8 @@ class Profile_Controller extends Action_Controller
 			{
 				if (empty($post_errors))
 				{
-					$loader = new Controller_Loader('ProfileAccount');
-					$controller = $loader->initDispatch();
+					$controller = new ProfileAccount_Controller(new Event_Manager());
+					$controller->pre_dispatch();
 					$controller->action_activateaccount();
 				}
 			}
@@ -542,16 +542,16 @@ class Profile_Controller extends Action_Controller
 			{
 				if (empty($post_errors))
 				{
-					$loader = new Controller_Loader('ProfileAccount');
-					$controller = $loader->initDispatch();
+					$controller = new ProfileAccount_Controller(new Event_Manager());
+					$controller->pre_dispatch();
 					$controller->action_deleteaccount2();
 					redirectexit();
 				}
 			}
 			elseif ($current_area == 'groupmembership' && empty($post_errors))
 			{
-				$loader = new Controller_Loader('Profileoptions');
-				$controller = $loader->initDispatch();
+				$controller = new Profileoptions_Controller(new Event_Manager());
+				$controller->per_dispatch();
 				$msg = $controller->action_groupMembership2();
 
 				// Whatever we've done, we have nothing else to do here...
@@ -560,8 +560,8 @@ class Profile_Controller extends Action_Controller
 			// Authentication changes?
 			elseif ($current_area == 'authentication')
 			{
-				$loader = new Controller_Loader('Profileoptions');
-				$controller = $loader->initDispatch();
+				$controller = new Profileoptions_Controller(new Event_Manager());
+				$controller->pre_dispatch();
 				$controller->action_authentication(true);
 			}
 			elseif (in_array($current_area, array('account', 'forumprofile', 'theme', 'contactprefs')))

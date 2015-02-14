@@ -35,7 +35,7 @@ class Controller_Redirect_Exception extends Exception
 	 */
 	public function __construct($controller, $method)
 	{
-		$this->_controller = ucfirst($controller);
+		$this->_controller = $controller;
 		$this->_method = $method;
 	}
 
@@ -48,29 +48,12 @@ class Controller_Redirect_Exception extends Exception
 	 */
 	public function doRedirect($source)
 	{
-		$controller_name = $this->_controller . '_Controller';
-
-		if (get_class($source) === $controller_name)
+		if (get_class($source) === $this->_controller)
 			return $source->{$this->_method}();
 
-		$controller = $this->_loadController();
+		$controller = new $this->_controller(new Event_Manager());
+		$controller->pre_dispatch();
 
 		return $controller->{$this->_method}();
-	}
-
-	/**
-	 * Shortcut to instantiate the new controller:
-	 *  - require_once modules of the controller (not addons because these are
-	 *    always all require'd by the dispatcher),
-	 *  - creates the event manager and registers addons and modules,
-	 *  - instantiate the controller
-	 *  - runs pre_dispatch if necessary
-	 * @return the controller's instance
-	 */
-	protected function _loadController()
-	{
-		$loader = new Controller_Loader($this->_controller);
-
-		return $loader->initDispatch();
 	}
 }

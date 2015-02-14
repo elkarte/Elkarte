@@ -19,19 +19,6 @@ class Event_Manager
 	protected $_registered_events = array();
 
 	/**
-	 * The current hook.
-	 * @var string
-	 */
-	protected $_hook = '';
-
-	/**
-	 * All the declared classes present at the moment the Event_Manager
-	 * is instantiated.
-	 * @var string[]
-	 */
-	protected $_declared_classes = array();
-
-	/**
 	 * Instances of addons already loaded.
 	 * @var object[]
 	 */
@@ -44,15 +31,20 @@ class Event_Manager
 	protected $_classes = array();
 
 	/**
+	 * List of classes declared, kept here just to avoid
+	 * call get_declared_classes at each trigger
+	 * @var null|string[]
+	 */
+	protected $_declared_classes = null;
+
+	/**
 	 * To instantiate the class a "hook" must be specified.
 	 *
 	 * @param string $hook Usually is the first part of the name of the
 	 *               controller, without "_Controller" and lowercase
 	 */
-	public function __construct($hook)
+	public function __construct()
 	{
-		$this->_hook = $hook;
-		$this->_declared_classes = get_declared_classes();
 	}
 
 	/**
@@ -205,7 +197,7 @@ class Event_Manager
 	{
 		$to_register = array();
 
-		foreach ($this->_declared_classes as $class)
+		foreach ($this->_declared_classes() as $class)
 		{
 			if (preg_match('/' . $pattern . '/', $class) !== 0 && !in_array($class, $this->_classes))
 			{
@@ -213,7 +205,22 @@ class Event_Manager
 				$this->_classes[] = $class;
 			}
 		}
+
 		$this->_register_events($to_register);
+	}
+
+	/**
+	 * Gets the names of all the classes already loaded.
+	 *
+	 * @return string[]
+	 */
+	protected function _declared_classes()
+	{
+		if ($this->_declared_classes === null)
+		{
+			$this->_declared_classes = get_declared_classes();
+		}
+		return $this->_declared_classes;
 	}
 
 	/**

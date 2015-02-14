@@ -148,9 +148,8 @@ class Action
 			if (isset($subAction['controller']))
 			{
 				// 'controller'->'function'
-				$controller_name = str_replace('_Controller', '', $subAction['controller']);
-				$loader = new Controller_Loader($controller_name);
-				$controller = $loader->initDispatch();
+				$controller = new $subAction['controller'](new Event_Manager());
+				$controller->pre_dispatch();
 
 				$controller->{$subAction['function']}();
 			}
@@ -170,9 +169,8 @@ class Action
 					$subAction['controller']->{$subAction['function']}();
 				else
 				{
-					$controller_name = str_replace('_Controller', '', $subAction['controller']);
-					$loader = new Controller_Loader($controller_name);
-					$controller = $loader->initDispatch();
+					$controller = new $subAction['controller'](new Event_Manager());
+					$controller->pre_dispatch();
 
 					$controller->{$subAction['function']}();
 				}

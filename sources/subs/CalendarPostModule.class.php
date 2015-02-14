@@ -87,8 +87,8 @@ class Calendar_Post_Module
 			$_REQUEST['eventid'] = (int) $_REQUEST['eventid'];
 
 			// Validate the post...
-			$loader = new Controller_Loader('Calendar');
-			$calendarController = $loader->initDispatch();
+			$calendarController = new Calendar_Controller(new Event_Manager());
+			$calendarController->pre_dispatch();
 			$calendarController->validateEventPost();
 
 			// If you're not allowed to edit any events, you have to be the poster.
@@ -131,7 +131,7 @@ class Calendar_Post_Module
 			// If the user doesn't have permission to edit the post in this topic, redirect them.
 			if ((empty($id_member_poster) || $id_member_poster != $user_info['id'] || !allowedTo('modify_own')) && !allowedTo('modify_any'))
 			{
-				throw new Controller_Redirect_Exception('calendar', 'action_post');
+				throw new Controller_Redirect_Exception('Calendar_Controller', 'action_post');
 			}
 		}
 
