@@ -123,6 +123,8 @@ class Mentions_Controller extends Action_Controller
 		);
 
 		$this->_known_sorting = array('id_member_from', 'type', 'log_time');
+
+		parent::__construct();
 	}
 
 	protected function _findMentionTypes()
