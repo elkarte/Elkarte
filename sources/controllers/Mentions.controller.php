@@ -111,7 +111,7 @@ class Mentions_Controller extends Action_Controller
 	/**
 	 * Start things up, what else does a constructor do
 	 */
-	public function __construct()
+	public function __construct($eventManager)
 	{
 		global $modSettings;
 
@@ -124,7 +124,7 @@ class Mentions_Controller extends Action_Controller
 
 		$this->_known_sorting = array('id_member_from', 'type', 'log_time');
 
-		parent::__construct();
+		parent::__construct($eventManager);
 	}
 
 	protected function _findMentionTypes()

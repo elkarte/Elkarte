@@ -63,33 +63,30 @@ class Calendar_Post_Module
 	{
 		global $user_info, $modSettings;
 
-		// Editing or posting an event?
-		if (!isset($_REQUEST['eventid']) || $_REQUEST['eventid'] == -1)
-		{
-			require_once(SUBSDIR . '/Calendar.subs.php');
+		$_REQUEST['eventid'] = (int) $_REQUEST['eventid'];
 
+		$event = new Calendar_Event($_REQUEST['eventid'], $modSettings);
+
+		try
+		{
+			$save_data = $event->validate($_POST);
+		}
+		catch (Elk_Exception $e)
+		{
+			$e->fatalLangError();
+		}
+
+		// Editing or posting an event?
+		if ($event->isNew())
+		{
 			// Make sure they can link an event to this post.
 			canLinkEvent();
 
 			// Insert the event.
-			$eventOptions = array(
-				'id_board' => $board,
-				'id_topic' => $topic,
-				'title' => $_POST['evtitle'],
-				'member' => $user_info['id'],
-				'start_date' => sprintf('%04d-%02d-%02d', $_POST['year'], $_POST['month'], $_POST['day']),
-				'span' => isset($_POST['span']) && $_POST['span'] > 0 ? min((int) $modSettings['cal_maxspan'], (int) $_POST['span'] - 1) : 0,
-			);
-			insertEvent($eventOptions);
+			$event->insert($save_data, $user_info['id']);
 		}
 		else
 		{
-			$_REQUEST['eventid'] = (int) $_REQUEST['eventid'];
-
-			// Validate the post...
-			$calendarController = new Calendar_Controller(new Event_Manager());
-			$calendarController->pre_dispatch();
-			$calendarController->validateEventPost();
 
 			// If you're not allowed to edit any events, you have to be the poster.
 			if (!allowedTo('calendar_edit_any'))
@@ -102,19 +99,11 @@ class Calendar_Post_Module
 
 			// Delete it?
 			if (isset($_REQUEST['deleteevent']))
-				removeEvent($_REQUEST['eventid']);
+				$event->remove();
 			// ... or just update it?
 			else
 			{
-				$span = !empty($modSettings['cal_allowspan']) && !empty($_REQUEST['span']) ? min((int) $modSettings['cal_maxspan'], (int) $_REQUEST['span'] - 1) : 0;
-				$start_time = mktime(0, 0, 0, (int) $_REQUEST['month'], (int) $_REQUEST['day'], (int) $_REQUEST['year']);
-
-				$eventOptions = array(
-					'start_date' => strftime('%Y-%m-%d', $start_time),
-					'end_date' => strftime('%Y-%m-%d', $start_time + $span * 86400),
-					'title' => $_REQUEST['evtitle'],
-				);
-				modifyEvent($_REQUEST['eventid'], $eventOptions);
+				$event->update($save_data);
 			}
 		}
 	}

@@ -126,7 +126,7 @@ class Drafts_Post_Module
 		if (isset($_POST['save_draft']))
 		{
 			saveDraft();
-			return $this->action_post();
+			throw new Controller_Redirect_Exception('Post_Controller', 'action_post');
 		}
 	}
 

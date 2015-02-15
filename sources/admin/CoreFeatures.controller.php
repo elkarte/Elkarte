@@ -452,7 +452,7 @@ class CoreFeatures_Controller extends Action_Controller
 
 		// Sort by title attribute
 		uasort($features, function($a, $b) {
-			return strcmp(strtolower($a["title"]), strtolower($b["title"]));
+			return strcmp(strtolower($a['title']), strtolower($b['title']));
 		});
 
 		return $features;

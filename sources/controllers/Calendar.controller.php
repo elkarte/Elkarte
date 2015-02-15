@@ -306,7 +306,7 @@ class Calendar_Controller extends Action_Controller
 	 */
 	protected function _returnToPost()
 	{
-		$controller = new Post_Controller(new Event_Manager(1111));
+		$controller = new Post_Controller(new Event_Manager());
 		$controller->pre_dispatch();
 
 		return $controller->action_post();

@@ -551,7 +551,7 @@ class Profile_Controller extends Action_Controller
 			elseif ($current_area == 'groupmembership' && empty($post_errors))
 			{
 				$controller = new Profileoptions_Controller(new Event_Manager());
-				$controller->per_dispatch();
+				$controller->pre_dispatch();
 				$msg = $controller->action_groupMembership2();
 
 				// Whatever we've done, we have nothing else to do here...

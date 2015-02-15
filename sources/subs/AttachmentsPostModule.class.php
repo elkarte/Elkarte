@@ -22,9 +22,28 @@ if (!defined('ELK'))
 
 class Attachments_Post_Module
 {
+	/**
+	 * The mode of attachments (disabled/enabled/show only).
+	 * @var int
+	 */
 	protected static $_attach_level = 0;
-	protected $_attach_errors = false;
+
+	/**
+	 * The objects that keeps track of errors.
+	 * @var Attachment_Error_Context
+	 */
+	protected $_attach_errors = null;
+
+	/**
+	 * List of attachments ID already saved.
+	 * @var int[]
+	 */
 	protected $_saved_attach_id = array();
+
+	/**
+	 * If it is a new message or if it is an existing one edited.
+	 * @var bool
+	 */
 	protected $_is_new_message = false;
 
 	public static function hooks()

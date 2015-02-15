@@ -26,7 +26,7 @@ class Mentionmem_Mention extends Mention_BoardAccess_Abstract
 	{
 		$methods = array(
 			'post' => array('prepare_context' => array(), 'before_save_post' => array(), 'after_save_post' => array('msgOptions', 'becomesApproved')),
-			'display' => array('prepare_context' => array('virtual_msg')),
+			'display' => array('display_prepare_context' => array('virtual_msg')),
 		);
 
 		if (isset($methods[$controller]))

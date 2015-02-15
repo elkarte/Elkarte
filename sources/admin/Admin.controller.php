@@ -854,8 +854,8 @@ class Admin_Controller extends Action_Controller
 		$_POST['membername'] = un_htmlspecialchars($context['search_term']);
 		$_POST['types'] = '';
 
-		$loader = new ManageMembers_Controller(new Event_manager());
-		$managemembers = $loader->initDispatch();
+		$managemembers = new ManageMembers_Controller(new Event_manager());
+		$managemembers->pre_dispatch();
 		$managemembers->action_index();
 	}
 

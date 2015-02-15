@@ -152,7 +152,7 @@ class Error_Context
 	/**
 	 * Return an error based on the id of the error set when adding the error itself.
 	 *
-	 * @param string $error the id of the error
+	 * @param null|string $error the id of the error
 	 * @return null|mixed whatever the error is (string, object, array), noll if not found
 	 */
 	public function getError($error = null)

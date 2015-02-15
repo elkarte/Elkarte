@@ -21,6 +21,8 @@ abstract class Mention_BoardAccess_Abstract extends Mention_Message_Abstract
 	 */
 	public function view($type, &$mentions)
 	{
+		$boards = array();
+
 		foreach ($mentions as $key => $row)
 		{
 			// To ensure it is not done twice

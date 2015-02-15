@@ -121,8 +121,8 @@ class Calendar_Event
 	/**
 	 * Does the save of an event.
 	 *
-	 * @param int $event_id - the id of the event being saved (if -1 is a new event)
-	 * @param int $member_id - the id of the member saving the event
+	 * @param mixed[] $options - An array of options for the event.
+	 * @param int $member_id - the id of the member saving the event.
 	 */
 	public function insert($options, $member_id)
 	{
@@ -140,9 +140,6 @@ class Calendar_Event
 	/**
 	 * Deletes an event.
 	 * No permission checks.
-	 *
-	 * @param int $event_id - the id of the event being saved (if -1 is a new event)
-	 * @param int $member_id - the id of the member saving the event
 	 */
 	public function remove()
 	{

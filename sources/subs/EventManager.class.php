@@ -38,10 +38,7 @@ class Event_Manager
 	protected $_declared_classes = null;
 
 	/**
-	 * To instantiate the class a "hook" must be specified.
-	 *
-	 * @param string $hook Usually is the first part of the name of the
-	 *               controller, without "_Controller" and lowercase
+	 * Just a dummy for the time being.
 	 */
 	public function __construct()
 	{
