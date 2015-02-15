@@ -92,6 +92,7 @@ class DispatcherTest extends PHPUnit_Framework_TestCase
 		$tests = array(
 			// No action
 			array(
+				'test_name' => 'no action',
 				'result' => array(
 					'file_name' => CONTROLLERDIR . '/BoardIndex.controller.php',
 					'function_name' => 'action_boardindex',
@@ -100,6 +101,7 @@ class DispatcherTest extends PHPUnit_Framework_TestCase
 			),
 			// A topic
 			array(
+				'test_name' => 'a topic',
 				'board' => 1,
 				'topic' => 1,
 				'result' => array(
@@ -110,6 +112,7 @@ class DispatcherTest extends PHPUnit_Framework_TestCase
 			),
 			// A board
 			array(
+				'test_name' => 'a board',
 				'board' => 1,
 				'result' => array(
 					'file_name' => CONTROLLERDIR . '/MessageIndex.controller.php',
@@ -119,6 +122,7 @@ class DispatcherTest extends PHPUnit_Framework_TestCase
 			),
 			// Non-existing action
 			array(
+				'test_name' => 'non-existing action',
 				'action' => 'qwerty',
 				'result' => array(
 					'file_name' => CONTROLLERDIR . '/BoardIndex.controller.php',
@@ -128,6 +132,7 @@ class DispatcherTest extends PHPUnit_Framework_TestCase
 			),
 			// An existing one, no sub-action, naming patterns
 			array(
+				'test_name' => 'existing action without sub-action',
 				'action' => 'announce',
 				'result' => array(
 					'file_name' => CONTROLLERDIR . '/Announce.controller.php',
@@ -137,6 +142,7 @@ class DispatcherTest extends PHPUnit_Framework_TestCase
 			),
 			// An existing one, with sub-action, naming patterns
 			array(
+				'test_name' => 'existing action with sub-action (naming patern)',
 				'action' => 'announce',
 				'sa' => 'test',
 				'result' => array(
@@ -147,6 +153,7 @@ class DispatcherTest extends PHPUnit_Framework_TestCase
 			),
 			// An existing one, action array, naming patterns, ADMINDIR
 			array(
+				'test_name' => 'existing action using ADMINDIR',
 				'action' => 'admin',
 				'result' => array(
 					'file_name' => ADMINDIR . '/Admin.controller.php',
@@ -156,6 +163,7 @@ class DispatcherTest extends PHPUnit_Framework_TestCase
 			),
 			// An existing one, action array
 			array(
+				'test_name' => 'action from actionarray',
 				'action' => 'removetopic2',
 				'result' => array(
 					'file_name' => CONTROLLERDIR . '/RemoveTopic.controller.php',
@@ -177,7 +185,7 @@ class DispatcherTest extends PHPUnit_Framework_TestCase
 
 			// Start a new dispatcher every time (the dispatching is done on __construct)
 			$dispatcher = New Site_Dispatcher_Tester();
-			$this->assertTrue($dispatcher->compare($test['result']));
+			$this->assertTrue($dispatcher->compare($test['result']), $test['test_name']);
 		}
 	}
 
@@ -216,7 +224,7 @@ class Site_Dispatcher_Tester extends Site_Dispatcher
 	 */
 	public function compare($action)
 	{
-		return $this->_file_name == $action['file_name'] &&
+		return (empty($this->_file_name) || $this->_file_name == $action['file_name']) &&
 		       $this->_controller_name == $action['controller_name'] &&
 		       $this->_function_name == $action['function_name'];
 	}
