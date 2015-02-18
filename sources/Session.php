@@ -2,7 +2,7 @@
 
 /**
  * Implementation of PHP's session API.
- * 
+ *
  * What it does:
  *  - it handles the session data in the database (more scalable.)
  *  - it uses the databaseSession_lifetime setting for garbage collection.
@@ -94,7 +94,7 @@ function loadSession()
 			register_shutdown_function('session_write_close');
 
 		// Change it so the cache settings are a little looser than default.
-		if (!empty($modSettings['databaseSession_loose']))
+		if (!empty($modSettings['databaseSession_loose']) || (isset($_REQUEST['action']) && $_REQUEST['action'] == 'search'))
 			header('Cache-Control: private');
 	}
 
