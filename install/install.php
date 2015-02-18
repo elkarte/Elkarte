@@ -15,9 +15,7 @@
  *
  */
 
-define('CURRENT_VERSION', '1.0.2');
-define('DB_SCRIPT_VERSION', '1-0');
-define('REQUIRED_PHP_VERSION', '5.2.0');
+require('installcore.php');
 
 // Don't have PHP support, do you?
 // ><html dir="ltr"><head><title>Error!</title></head><body>Sorry, this installer requires PHP!<div style="display: none;">
@@ -27,14 +25,12 @@ $databases = array();
 load_possible_databases();
 
 // Initialize everything and load the language files.
+$txt = array();
 initialize_inputs();
 load_lang_file();
 
 // This is what we are.
 $installurl = $_SERVER['PHP_SELF'];
-
-// This is where home is.
-$oursite = 'http://www.elkarte.net/';
 
 $action = new Install_Controller();
 
@@ -58,10 +54,10 @@ function load_possible_databases()
 {
 	global $databases;
 
-	$files = glob(dirname(__FILE__) . '/Db-check-*.php');
+	$files = glob(__DIR__ . '/Db-check-*.php');
 
 	foreach ($files as $file)
-		require_once($file);
+		require($file);
 }
 
 /**
@@ -71,12 +67,10 @@ function load_possible_databases()
 function initialize_inputs()
 {
 	// Turn off magic quotes runtime and enable error reporting.
-	if (function_exists('set_magic_quotes_runtime'))
-		@set_magic_quotes_runtime(0);
-	error_reporting(E_ALL);
+	error_reporting(E_ALL | E_STRICT);
 
 	if (!defined('TMP_BOARDDIR'))
-		define('TMP_BOARDDIR', realpath(dirname(__FILE__) . '/..'));
+		define('TMP_BOARDDIR', realpath(__DIR__ . '/..'));
 
 	// This is the test for support of compression
 	if (isset($_GET['obgz']))
@@ -88,7 +82,7 @@ function initialize_inputs()
 
 	ob_start();
 
-	if (ini_get('session.save_handler') == 'user')
+	if (ini_get('session.save_handler') === 'user')
 		@ini_set('session.save_handler', 'files');
 	if (function_exists('session_start'))
 		@session_start();
@@ -159,7 +153,7 @@ function load_lang_file()
 		<p>In some cases, FTP clients do not properly upload files with this many folders.  Please double check to make sure you <span style="font-weight: 600;">have uploaded all the files in the distribution</span>.</p>
 		<p>If that doesn\'t help, please make sure this install.php file is in the same place as the themes folder.</p>
 
-		<p>If you continue to get this error message, feel free to <a href="http://www.elkarte.net/">look to us for support</a>.</p>
+		<p>If you continue to get this error message, feel free to <a href="', SITE_SOFTWARE, '">look to us for support</a>.</p>
 	</div>
 	</body>
 </html>';
@@ -365,7 +359,7 @@ class Install_Controller
 		{
 			if ($db['supported'])
 			{
-				if (!empty($db['additional_file']) && !file_exists(dirname(__FILE__) . '/' . $db['additional_file']))
+				if (!empty($db['additional_file']) && !file_exists(__DIR__ . '/' . $db['additional_file']))
 				{
 					$databases[$key]['supported'] = false;
 					$notFoundSQLFile = true;
@@ -1032,12 +1026,12 @@ class Install_Controller
 
 		if (!empty($databases[$db_type]['additional_file']))
 		{
-			$sql_lines = explode("\n", strtr(implode(' ', file(dirname(__FILE__) . '/' . $databases[$db_type]['additional_file'])), $replaces));
+			$sql_lines = explode("\n", strtr(implode(' ', file(__DIR__ . '/' . $databases[$db_type]['additional_file'])), $replaces));
 			parse_sqlLines($sql_lines);
 		}
 
 		// Read in the SQL.  Turn this on and that off... internationalize... etc.
-		$sql_lines = explode("\n", strtr(implode(' ', file(dirname(__FILE__) . '/install_' . DB_SCRIPT_VERSION . '.sql')), $replaces));
+		$sql_lines = explode("\n", strtr(implode(' ', file(__DIR__ . '/install_' . DB_SCRIPT_VERSION . '.sql')), $replaces));
 		parse_sqlLines($sql_lines);
 
 		// Make sure UTF will be used globally.
@@ -1459,8 +1453,8 @@ class Install_Controller
 			updateSettings(array('db_mysql_group_by_fix' => '1'));
 
 		// Some final context for the template.
-		$incontext['dir_still_writable'] = is_writable(dirname(__FILE__)) && substr(__FILE__, 1, 2) != ':\\';
-		$incontext['probably_delete_install'] = isset($_SESSION['installer_temp_ftp']) || is_writable(dirname(__FILE__)) || is_writable(__FILE__);
+		$incontext['dir_still_writable'] = is_writable(__DIR__) && substr(__FILE__, 1, 2) != ':\\';
+		$incontext['probably_delete_install'] = isset($_SESSION['installer_temp_ftp']) || is_writable(__DIR__) || is_writable(__FILE__);
 
 		return false;
 	}
@@ -2324,7 +2318,7 @@ function action_deleteInstaller()
 		$package_ftp->chdir($_SESSION['installer_temp_ftp']['path']);
 	}
 
-	deltree(dirname(__FILE__));
+	deltree(__DIR__);
 
 	if (isset($_SESSION['installer_temp_ftp']))
 	{
@@ -2453,7 +2447,7 @@ function template_install_below()
 		<div id="footer_section">
 			<div class="frame">
 				<ul>
-					<li class="copyright"><a href="http://www.elkarte.net/" title="ElkArte Community" target="_blank" class="new_win">ElkArte &copy; 2012 - 2014, ElkArte Community</a></li>
+					<li class="copyright"><a href="', SITE_SOFTWARE, '" title="ElkArte Community" target="_blank" class="new_win">ElkArte &copy; 2012 - 2014, ElkArte Community</a></li>
 				</ul>
 			</div>
 		</div>
