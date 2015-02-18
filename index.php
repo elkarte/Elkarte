@@ -19,6 +19,8 @@
  *
  */
 
+$time_start = microtime(true);
+
 $forum_version = 'ElkArte 1.0.2';
 define('FORUM_VERSION', $forum_version);
 
@@ -36,16 +38,14 @@ if (function_exists('getrusage'))
 else
 	$rusage_start = array();
 
-// Turn on output buffering.
-ob_start();
+// Turn on output buffering if it isn't already on (via php.ini for example)
+if (!ob_get_level())
+	ob_start();
+
 
 if (function_exists('set_magic_quotes_runtime'))
 	@set_magic_quotes_runtime(0);
-$time_start = microtime(true);
 $db_show_debug = false;
-
-// Shortcut for the browser cache stale
-define('CACHE_STALE', '?10RC1');
 
 // We don't need no globals. (a bug in "old" versions of PHP)
 foreach (array('db_character_set', 'cachedir') as $variable)
@@ -124,6 +124,10 @@ elk_seed_generator();
 // Before we get carried away, are we doing a scheduled task? If so save CPU cycles by jumping out!
 if (isset($_GET['scheduled']))
 {
+	// Don't make people wait on us if we can help it.
+	// TODO: Once minimum php version is >= 5.3.3 we can drop the check.
+	if (function_exists('fastcgi_finish_request'))
+	    fastcgi_finish_request();
 	$controller = new ScheduledTasks_Controller();
 	$controller->action_autotask();
 }
