@@ -42,9 +42,6 @@ else
 if (!ob_get_level())
 	ob_start();
 
-
-if (function_exists('set_magic_quotes_runtime'))
-	@set_magic_quotes_runtime(0);
 $db_show_debug = false;
 
 // We don't need no globals. (a bug in "old" versions of PHP)
@@ -53,15 +50,15 @@ foreach (array('db_character_set', 'cachedir') as $variable)
 		unset($GLOBALS[$variable], $GLOBALS[$variable]);
 
 // First thing: if the install dir exists, just send anybody there
-if (file_exists(dirname(__FILE__) . '/install'))
+if (file_exists(__DIR__ . '/install'))
 	header('Location: http' . (!empty($_SERVER['HTTPS']) && strtolower($_SERVER['HTTPS']) == 'on' ? 's' : '') . '://' . (empty($_SERVER['HTTP_HOST']) ? $_SERVER['SERVER_NAME'] . (empty($_SERVER['SERVER_PORT']) || $_SERVER['SERVER_PORT'] == '80' ? '' : ':' . $_SERVER['SERVER_PORT']) : $_SERVER['HTTP_HOST']) . (strtr(dirname($_SERVER['PHP_SELF']), '\\', '/') == '/' ? '' : strtr(dirname($_SERVER['PHP_SELF']), '\\', '/')) . '/install/install.php');
 
 // Get the forum's settings for database and file paths.
-require_once(dirname(__FILE__) . '/Settings.php');
+require_once(__DIR__ . '/Settings.php');
 
 // Make sure the paths are correct... at least try to fix them.
-if (!file_exists($boarddir) && file_exists(dirname(__FILE__) . '/agreement.txt'))
-	$boarddir = dirname(__FILE__);
+if (!file_exists($boarddir) && file_exists(__DIR__ . '/agreement.txt'))
+	$boarddir = __DIR__;
 if (!file_exists($sourcedir . '/SiteDispatcher.class.php') && file_exists($boarddir . '/sources'))
 	$sourcedir = $boarddir . '/sources';
 
@@ -125,9 +122,7 @@ elk_seed_generator();
 if (isset($_GET['scheduled']))
 {
 	// Don't make people wait on us if we can help it.
-	// TODO: Once minimum php version is >= 5.3.3 we can drop the check.
-	if (function_exists('fastcgi_finish_request'))
-	    fastcgi_finish_request();
+	fastcgi_finish_request();
 	$controller = new ScheduledTasks_Controller();
 	$controller->action_autotask();
 }

@@ -151,7 +151,7 @@ $cache_memcached = '';
  * It is also recommended that you place this in /tmp/ if you are going to use this.
  * @var string
  */
-$cachedir = dirname(__FILE__) . '/cache';
+$cachedir = __DIR__ . '/cache';
 
 ########## Directories/Files ##########
 # Note: These directories do not have to be changed unless you move things.
@@ -159,19 +159,19 @@ $cachedir = dirname(__FILE__) . '/cache';
  * The absolute path to the forum's folder. (not just '.'!)
  * @var string
  */
-$boarddir = dirname(__FILE__);
+$boarddir = __DIR__;
 /**
  * Path to the sources directory.
  * @var string
  */
-$sourcedir = dirname(__FILE__) . '/sources';
+$sourcedir = __DIR__ . '/sources';
 /**
  * Path to the external resources directory.
  * @var string
  */
-$extdir = dirname(__FILE__) . '/sources/ext';
+$extdir = __DIR__ . '/sources/ext';
 /**
  * Path to the languages directory.
  * @var string
  */
-$languagedir = dirname(__FILE__) . '/themes/default/languages';
+$languagedir = __DIR__ . '/themes/default/languages';
