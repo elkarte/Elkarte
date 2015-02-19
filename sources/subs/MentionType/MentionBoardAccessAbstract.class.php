@@ -36,12 +36,12 @@ abstract class Mention_BoardAccess_Abstract extends Mention_Message_Abstract
 		}
 
 		if (!empty($boards))
-			return $this->_validateAccess($boards);
+			return $this->_validateAccess($boards, $mentions);
 		else
 			return false;
 	}
 
-	protected function _validateAccess($boards)
+	protected function _validateAccess($boards, &$mentions)
 	{
 		global $user_info, $modSettings;
 
