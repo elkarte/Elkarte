@@ -145,8 +145,8 @@ function sendmail($to, $subject, $message, $from = null, $message_id = null, $se
 	$headers .= 'Date: ' . gmdate('D, d M Y H:i:s') . ' -0000' . $line_break;
 	$headers .= 'X-Mailer: ELK' . $line_break;
 
-	// If Using the maillist we include a few more headers for compliance
-	if ($maillist)
+	// For maillist, digests or newsletters we include a few more headers for compliance
+	if ($maillist || $priority > 3)
 	{
 		// Lets try to avoid auto replies
 		$headers .= 'X-Auto-Response-Suppress: All' . $line_break;
