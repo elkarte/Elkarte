@@ -94,7 +94,13 @@ class ManageSearchEngines_Controller extends Action_Controller
 
 		$groups = getBasicMembergroupData(array('globalmod', 'postgroups', 'protected', 'member'));
 		foreach ($groups as $row)
-			$config_vars['spider_group'][2][$row['id']] = $row['name'];
+		{
+			// Unfortunately, regular members have to be 1 because 0 is for disabled.
+			if ($row['id'] == 0)
+				$config_vars['spider_group'][2][1] = $row['name'];
+			else
+				$config_vars['spider_group'][2][$row['id']] = $row['name'];
+		}
 
 		// Make sure it's valid - note that regular members are given id_group = 1 which is reversed in Load.php - no admins here!
 		if (isset($_POST['spider_group']) && !isset($config_vars['spider_group'][2][$_POST['spider_group']]))
@@ -180,7 +186,7 @@ class ManageSearchEngines_Controller extends Action_Controller
 		$config_vars = array(
 			// How much detail?
 			array('select', 'spider_mode', 'subtext' => $txt['spider_mode_note'], array($txt['spider_mode_off'], $txt['spider_mode_standard'], $txt['spider_mode_high'], $txt['spider_mode_vhigh']), 'onchange' => 'disableFields();'),
-			'spider_group' => array('select', 'spider_group', 'subtext' => $txt['spider_group_note'], array($txt['spider_group_none'], $txt['membergroups_members'])),
+			'spider_group' => array('select', 'spider_group', 'subtext' => $txt['spider_group_note'], array($txt['spider_group_none'])),
 			array('select', 'show_spider_online', array($txt['show_spider_online_no'], $txt['show_spider_online_summary'], $txt['show_spider_online_detail'], $txt['show_spider_online_detail_admin'])),
 		);
 

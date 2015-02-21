@@ -726,7 +726,7 @@ function loadPermissions()
 				' . $spider_restrict,
 			array(
 				'member_groups' => $user_info['groups'],
-				'spider_group' => !empty($modSettings['spider_group']) ? $modSettings['spider_group'] : 0,
+				'spider_group' => !empty($modSettings['spider_group']) && $modSettings['spider_group'] != 1 ? $modSettings['spider_group'] : 0,
 			)
 		);
 		$removals = array();
@@ -759,7 +759,7 @@ function loadPermissions()
 			array(
 				'member_groups' => $user_info['groups'],
 				'id_profile' => $board_info['profile'],
-				'spider_group' => !empty($modSettings['spider_group']) ? $modSettings['spider_group'] : 0,
+				'spider_group' => !empty($modSettings['spider_group']) && $modSettings['spider_group'] != 1 ? $modSettings['spider_group'] : 0,
 			)
 		);
 		while ($row = $db->fetch_assoc($request))
