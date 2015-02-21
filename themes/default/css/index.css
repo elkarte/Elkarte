@@ -2557,6 +2557,7 @@ ul.post_options li {
 }
 .drop_area_fileselect_text {
 	white-space: nowrap;
+	padding: 0 4px;
 }
 
 #postAttachment >dd.progress_tracker {

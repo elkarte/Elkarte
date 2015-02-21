@@ -128,7 +128,7 @@ input[disabled].input_text {
 /*    .right_submit is right floated */
 /*    .left_submit is left floated */
 /* The button_reset class may need attention too. */
-.button_submit, .right_submit, .left_submit, .button_reset,
+.button_submit, .right_submit, .left_submit, .button_reset, .drop_area_fileselect_text,
 /* Anchors styled to look like buttons. */
 /* These have standard body text size. Can be chained with smalltext class. */
 .linkbutton:link, .linkbutton_right:link, .linkbutton_left:link,
