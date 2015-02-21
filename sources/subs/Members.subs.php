@@ -2410,7 +2410,13 @@ function memberQuerySeeBoard($id_member)
 
 	$member = getBasicMemberData($id_member, array('moderation' => true));
 
-	$groups = array_merge(array($member['id_group'], $member['id_post_group']), explode(',', $member['additional_groups']));
+	if (empty($member['additional_groups']))
+		$groups = array($member['id_group'], $member['id_post_group']);
+	else
+		$groups = array_merge(
+			array($member['id_group'], $member['id_post_group']),
+			explode(',', $member['additional_groups'])
+		);
 
 	foreach ($groups as $k => $v)
 		$groups[$k] = (int) $v;
