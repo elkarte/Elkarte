@@ -3,6 +3,7 @@
 
 global $editortxt;
 
+$editortxt['Close'] = 'Close';
 $editortxt['Bold'] = 'Bold';
 $editortxt['Italic'] = 'Italic';
 $editortxt['Underline'] = 'Underline';

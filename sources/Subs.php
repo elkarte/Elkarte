@@ -466,6 +466,8 @@ function standardTime($log_time, $show_today = true, $offset_type = false)
  */
 function htmlTime($timestamp)
 {
+	global $txt, $context;
+
 	if (empty($timestamp))
 		return '';
 
@@ -474,7 +476,7 @@ function htmlTime($timestamp)
 	$stdtime = standardTime($timestamp, true, true);
 
 	// @todo maybe htmlspecialchars on the title attribute?
-	return '<time title="' . $stdtime . '" datetime="' . $time . '" data-timestamp="' . $timestamp . '">' . $stdtime . '</time>';
+	return '<time title="' . (!empty($context['using_relative_time']) ? $stdtime : $txt['last_post']) . '" datetime="' . $time . '" data-timestamp="' . $timestamp . '">' . $stdtime . '</time>';
 }
 
 /**

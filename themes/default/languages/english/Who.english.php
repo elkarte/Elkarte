@@ -130,7 +130,7 @@ $txt['who_poll'] = 'Posting a new poll in <a href="%1$s">%2$s</a>.';
 $txt['who_topicbyemail'] = 'Email starting a new topic in <a href="%1$s">%2$s</a>.';
 
 $txt['whotopic_postbyemail'] = 'Email posting in <a href="%1$s">%2$s</a>.';
-$txt['who_pm_byemail'] = 'Sending a personal message by email.';
+$txt['whoall_pm_byemail'] = 'Sending a personal message by email.';
 
 // Credits text
 $txt['credits'] = 'Credits';

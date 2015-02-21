@@ -128,7 +128,7 @@ input[disabled].input_text {
 /*    .right_submit is right floated */
 /*    .left_submit is left floated */
 /* The button_reset class may need attention too. */
-.button_submit, .right_submit, .left_submit, .button_reset,
+.button_submit, .right_submit, .left_submit, .button_reset, .drop_area_fileselect_text,
 /* Anchors styled to look like buttons. */
 /* These have standard body text size. Can be chained with smalltext class. */
 .linkbutton:link, .linkbutton_right:link, .linkbutton_left:link,
@@ -1366,7 +1366,7 @@ a.help .icon {
 
 /* This one does 800 screens at default font size. */
 @media screen and (min-width: 50em) {
-		#menu_nav .listlevel1.subsections>a:before {
+	#menu_nav .listlevel1.subsections>a:before {
 		font-family: "FontAwesome";
 		margin: -1px 5px 0 0;
 		float: left;
@@ -1374,7 +1374,7 @@ a.help .icon {
 		content: "\f0d7";
 		color: #43a8da;
 	}
-		#menu_nav .listlevel1 {
+	#menu_nav .listlevel1 {
 		margin: 1px 2px 0;
 	}
 }

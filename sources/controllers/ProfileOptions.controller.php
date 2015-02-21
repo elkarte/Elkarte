@@ -598,7 +598,8 @@ class ProfileOptions_Controller extends Action_Controller
 				'delete' => array(
 					'header' => array(
 						'value' => '<input type="checkbox" class="input_check" onclick="invertAll(this, this.form);" />',
-						'style' => 'width: 4%;text-align: center',
+						'class' => 'centertext',
+						'style' => 'width:4%;',
 					),
 					'data' => array(
 						'sprintf' => array(
@@ -607,8 +608,8 @@ class ProfileOptions_Controller extends Action_Controller
 								'id' => false,
 								'checked' => false,
 							),
-						'class' => 'centertext',
 						),
+						'class' => 'centertext',
 					),
 				),
 			),
@@ -719,7 +720,8 @@ class ProfileOptions_Controller extends Action_Controller
 				'delete' => array(
 					'header' => array(
 						'value' => '<input type="checkbox" class="input_check" onclick="invertAll(this, this.form);" />',
-						'style' => 'width: 4%;text-align: center',
+						'class' => 'centertext',
+						'style' => 'width:4%;',
 					),
 					'data' => array(
 						'sprintf' => array(

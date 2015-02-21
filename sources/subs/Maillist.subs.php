@@ -49,17 +49,19 @@ function list_maillist_unapproved($id = 0, $start = 0, $chunk_size = 0, $sort = 
 	else
 		$approve_query = ' AND 0';
 
+	if ($id === 0)
+		$where_query = 'id_email > {int:id} AND (({query_see_board}' . $approve_query . ') OR e.id_board = -1)';
+	else
+		$where_query = 'id_email = {int:id} AND (({query_see_board}' . $approve_query . ') OR e.id_board = -1)';
+
 	// Load them errors
 	$request = $db->query('', '
 		SELECT e.id_email, e.error, e.data_id, e.subject, e.id_message, e.email_from, e.message_type, e.message, e.id_board
 		FROM {db_prefix}postby_emails_error e
 			LEFT JOIN {db_prefix}boards AS b ON (b.id_board = e.id_board)
-		WHERE id_email' . ($id === 0 ? ' > {int:id}' : ' = {int:id}') . '
-			AND ({query_see_board}
-				' . $approve_query . ')
-			OR e.id_board = -1
+		WHERE ' . $where_query . '
 		ORDER BY {raw:sort}
-		' . ((!empty($chunk_size)) ? 'LIMIT {int:offset}, {int:limit} ' : ''),
+		' . ((!empty($chunk_size)) ? 'LIMIT {int:offset}, {int:limit} ' : 'LIMIT 1'),
 		array(
 			'offset' => $start,
 			'limit' => $chunk_size,

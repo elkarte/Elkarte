@@ -740,7 +740,7 @@ function findUser($where, $where_params, $fatal = true)
 
 	// Find the user!
 	$request = $db->query('', '
-		SELECT id_member, real_name, member_name, email_address, is_activated, validation_code, lngfile, openid_uri, secret_question
+		SELECT id_member, real_name, member_name, email_address, is_activated, validation_code, lngfile, openid_uri, secret_question, passwd
 		FROM {db_prefix}members
 		WHERE ' . $where . '
 		LIMIT 1',

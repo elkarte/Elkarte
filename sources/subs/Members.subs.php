@@ -838,7 +838,7 @@ function isReservedName($name, $current_ID_MEMBER = 0, $is_name = true, $fatal =
 				continue;
 
 			// The admin might've used entities too, level the playing field.
-			$reservedCheck = preg_replace('~(&#(\d{1,7}|x[0-9a-fA-F]{1,6});)~', 'replaceEntities__callback', $reserved);
+			$reservedCheck = preg_replace_callback('~(&#(\d{1,7}|x[0-9a-fA-F]{1,6});)~', 'replaceEntities__callback', $reserved);
 
 			// Case sensitive name?
 			if (empty($modSettings['reserveCase']))
@@ -2354,7 +2354,13 @@ function memberQuerySeeBoard($id_member)
 
 	$member = getBasicMemberData($id_member, array('moderation' => true));
 
-	$groups = array_merge(array($member['id_group'], $member['id_post_group']), explode(',', $member['additional_groups']));
+	if (empty($member['additional_groups']))
+		$groups = array($member['id_group'], $member['id_post_group']);
+	else
+		$groups = array_merge(
+			array($member['id_group'], $member['id_post_group']),
+			explode(',', $member['additional_groups'])
+		);
 
 	foreach ($groups as $k => $v)
 		$groups[$k] = (int) $v;

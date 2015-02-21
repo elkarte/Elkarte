@@ -219,13 +219,13 @@ function loadCustomFields($memID, $area = 'summary', array $custom_fields = arra
 		if ($row['field_type'] == 'check')
 		{
 			$true = (!$exists && $row['default_value']) || $value;
-			$input_html = '<input type="checkbox" name="customfield[' . $row['col_name'] . ']" ' . ($true ? 'checked="checked"' : '') . ' class="input_check" />';
+			$input_html = '<input id="' . $row['col_name'] . '" type="checkbox" name="customfield[' . $row['col_name'] . ']" ' . ($true ? 'checked="checked"' : '') . ' class="input_check" />';
 			$output_html = $true ? $txt['yes'] : $txt['no'];
 		}
 		// A select list
 		elseif ($row['field_type'] == 'select')
 		{
-			$input_html = '<select name="customfield[' . $row['col_name'] . ']"><option value="-1"></option>';
+			$input_html = '<select id="' . $row['col_name'] . '" name="customfield[' . $row['col_name'] . ']"><option value="-1"></option>';
 			$options = explode(',', $row['field_options']);
 			foreach ($options as $k => $v)
 			{
@@ -254,13 +254,13 @@ function loadCustomFields($memID, $area = 'summary', array $custom_fields = arra
 		// A standard input field, including some html5 varients
 		elseif (in_array($row['field_type'], array('text', 'url', 'search', 'date', 'email', 'color')))
 		{
-			$input_html = '<input type="' . $row['field_type'] . '" name="customfield[' . $row['col_name'] . ']" ' . ($row['field_length'] != 0 ? 'maxlength="' . $row['field_length'] . '"' : '') . ' size="' . ($row['field_length'] == 0 || $row['field_length'] >= 50 ? 50 : ($row['field_length'] > 30 ? 30 : ($row['field_length'] > 10 ? 20 : 10))) . '" value="' . $value . '" class="input_text" />';
+			$input_html = '<input id="' . $row['col_name'] . '" type="' . $row['field_type'] . '" name="customfield[' . $row['col_name'] . ']" ' . ($row['field_length'] != 0 ? 'maxlength="' . $row['field_length'] . '"' : '') . ' size="' . ($row['field_length'] == 0 || $row['field_length'] >= 50 ? 50 : ($row['field_length'] > 30 ? 30 : ($row['field_length'] > 10 ? 20 : 10))) . '" value="' . $value . '" class="input_text" />';
 		}
 		// Only thing left, a textbox for you
 		else
 		{
 			@list ($rows, $cols) = @explode(',', $row['default_value']);
-			$input_html = '<textarea name="customfield[' . $row['col_name'] . ']" ' . (!empty($rows) ? 'rows="' . $rows . '"' : '') . ' ' . (!empty($cols) ? 'cols="' . $cols . '"' : '') . '>' . $value . '</textarea>';
+			$input_html = '<textarea id="' . $row['col_name'] . '" name="customfield[' . $row['col_name'] . ']" ' . (!empty($rows) ? 'rows="' . $rows . '"' : '') . ' ' . (!empty($cols) ? 'cols="' . $cols . '"' : '') . '>' . $value . '</textarea>';
 		}
 
 		// Parse BBCode
@@ -1390,9 +1390,11 @@ function makeNotificationChanges($memID)
 		$request = $db->query('', '
 			SELECT id_board
 			FROM {db_prefix}log_notify
-			WHERE id_member = {int:selected_member}',
+			WHERE id_member = {int:selected_member}
+				AND id_board != {int:id_board}',
 			array(
 				'selected_member' => $memID,
+				'id_board' => 0,
 			)
 		);
 		$notification_current = array();
@@ -1430,18 +1432,19 @@ function makeNotificationChanges($memID)
 	// We are editing topic notifications......
 	elseif (isset($_POST['edit_notify_topics']) && !empty($_POST['notify_topics']))
 	{
+		$edit_notify_topics = array();
 		foreach ($_POST['notify_topics'] as $index => $id)
-			$_POST['notify_topics'][$index] = (int) $id;
+			$edit_notify_topics[$index] = (int) $id;
 
 		// Make sure there are no zeros left.
-		$_POST['notify_topics'] = array_diff($_POST['notify_topics'], array(0));
+		$edit_notify_topics = array_diff($edit_notify_topics, array(0));
 
 		$db->query('', '
 			DELETE FROM {db_prefix}log_notify
 			WHERE id_topic IN ({array_int:topic_list})
 				AND id_member = {int:selected_member}',
 			array(
-				'topic_list' => $_POST['notify_topics'],
+				'topic_list' => $edit_notify_topics,
 				'selected_member' => $memID,
 			)
 		);
@@ -1526,8 +1529,8 @@ function makeCustomFieldChanges($memID, $area, $sanitize = true)
 				$value = (int) $value;
 		}
 
-		// Did it change?
-		if (!isset($user_profile[$memID]['options'][$row['col_name']]) || $user_profile[$memID]['options'][$row['col_name']] !== $value)
+		// Did it change or has it been set?
+		if ((!isset($user_profile[$memID]['options'][$row['col_name']]) && !empty($value)) || (isset($user_profile[$memID]['options'][$row['col_name']]) && $user_profile[$memID]['options'][$row['col_name']] !== $value))
 		{
 			$log_changes[] = array(
 				'action' => 'customfield_' . $row['col_name'],
@@ -2540,12 +2543,16 @@ function list_getUserWarningCount($memID)
  * @param string $sort
  * @param int[] $boardsAllowed
  * @param integer $memID
+ * @param int[]|null|boolean $exclude_boards
  */
-function profileLoadAttachments($start, $items_per_page, $sort, $boardsAllowed, $memID)
+function profileLoadAttachments($start, $items_per_page, $sort, $boardsAllowed, $memID, $exclude_boards = null)
 {
 	global $board, $modSettings, $context, $settings, $scripturl, $txt;
 
 	$db = database();
+
+	if ($exclude_boards === null && !empty($modSettings['recycle_enable']) && $modSettings['recycle_board'] > 0)
+		$exclude_boards = array($modSettings['recycle_board']);
 
 	// Retrieve some attachments.
 	$request = $db->query('', '
@@ -2560,12 +2567,14 @@ function profileLoadAttachments($start, $items_per_page, $sort, $boardsAllowed, 
 			AND a.id_msg != {int:no_message}
 			AND m.id_member = {int:current_member}' . (!empty($board) ? '
 			AND b.id_board = {int:board}' : '') . (!in_array(0, $boardsAllowed) ? '
-			AND b.id_board IN ({array_int:boards_list})' : '') . (!$modSettings['postmod_active'] || $context['user']['is_owner'] ? '' : '
+			AND b.id_board IN ({array_int:boards_list})' : '') . (!empty($exclude_boards) ? '
+			AND b.id_board NOT IN ({array_int:exclude_boards})' : '') . (!$modSettings['postmod_active'] || $context['user']['is_owner'] ? '' : '
 			AND m.approved = {int:is_approved}') . '
 		ORDER BY {raw:sort}
 		LIMIT {int:offset}, {int:limit}',
 		array(
 			'boards_list' => $boardsAllowed,
+			'exclude_boards' => $exclude_boards,
 			'attachment_type' => 0,
 			'no_message' => 0,
 			'current_member' => $memID,

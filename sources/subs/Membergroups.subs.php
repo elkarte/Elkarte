@@ -197,6 +197,8 @@ function deleteMembergroups($groups)
 	$settings_update = array('settings_updated' => time());
 
 	// Have we deleted the spider group?
+	// @memo we are lucky that the group 1 and 0 cannot be deleted
+	// $modSettings['spider_group'] is set to 1 (admin) for regular members (that usually is group 0)
 	if (isset($modSettings['spider_group']) && in_array($modSettings['spider_group'], $groups))
 		$settings_update['spider_group'] = 0;
 

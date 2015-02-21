@@ -416,7 +416,7 @@ class Boards_List
 	 */
 	public function getLatestPost()
 	{
-		if (empty($this->_latest_post))
+		if (empty($this->_latest_post) || empty($this->_latest_post['link']))
 			return array();
 		else
 			return $this->_latest_post;

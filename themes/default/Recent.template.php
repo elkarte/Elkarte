@@ -49,6 +49,12 @@ function template_recent()
 		</div>';
 
 	template_pagesection();
+
+	if (!empty($context['using_relative_time']))
+		echo '
+		<script><!-- // --><![CDATA[
+			$(\'.topic_latest\').addClass(\'relative\');
+		// ]]></script>';
 }
 
 /**
@@ -141,7 +147,7 @@ function template_unread()
 										</h4>
 									</div>
 									<div class="topic_starter">
-										', sprintf($txt['topic_started_by_in'], '<strong>' . $topic['first_post']['member']['link'] . '</strong>', '<em>' . $topic['board']['link'] . '</em>'), !empty($topic['pages']) ? '
+										', sprintf($txt['topic_started_by_in'], $topic['first_post']['member']['link'], '<em>' . $topic['board']['link'] . '</em>'), !empty($topic['pages']) ? '
 										<ul class="small_pagelinks" id="pages' . $topic['first_post']['id'] . '" role="menubar">' . $topic['pages'] . '</ul>' : '', '
 									</div>
 								</div>
@@ -191,4 +197,29 @@ function template_unread()
 							', $context['showing_all_topics'] ? '<strong>' . $txt['find_no_results'] . '</strong>' : $txt['unread_topics_visit_none'], '
 						</div>
 					</div>';
+}
+
+function template_unread_below()
+{
+	global $context;
+
+	if (!empty($context['topics']))
+	{
+		template_pagesection('recent_buttons', 'right');
+
+		echo '
+		<div id="topic_icons" class="description">';
+
+			template_basicicons_legend();
+
+		if (!empty($context['using_relative_time']))
+			echo '
+			<script><!-- // --><![CDATA[
+				$(\'.topic_latest\').addClass(\'relative\');
+			// ]]></script>';
+
+		echo '
+		</div>';
+	}
+
 }

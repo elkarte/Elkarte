@@ -442,6 +442,9 @@ function processRecentTopicList($topics_info, $topicseen = false)
 		if (!empty($settings['avatars_on_indexes']))
 			$topics[$row['id_topic']]['last_post']['member']['avatar'] = determineAvatar($row);
 
+		// @deprecated since 1.0 - better have the sprintf in the template because using html here is bad
+		$topics[$row['id_topic']]['first_post']['started_by'] = sprintf($txt['topic_started_by_in'], '<strong>' . $topics[$row['id_topic']]['first_post']['member']['link'] . '</strong>', '<em>' . $topics[$row['id_topic']]['board']['link'] . '</em>');
+
 		determineTopicClass($topics[$row['id_topic']]);
 	}
 
