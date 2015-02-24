@@ -44,6 +44,13 @@ class TopicsMerge
 	public $firstTopic = 0;
 
 	/**
+	 * The id_board of the topic TopicsMerge::$firstTopic
+	 *
+	 * @var int
+	 */
+	public $firstBoard = 0;
+
+	/**
 	 * Just the array of topics to merge.
 	 *
 	 * @var int[]
@@ -110,6 +117,7 @@ class TopicsMerge
 		$this->boards = array();
 		$this->_polls = array();
 		$this->firstTopic = 0;
+		$this->firstBoard = 0;
 		$this->_errors = array();
 
 		// Ensure all the id are integers
@@ -201,7 +209,7 @@ class TopicsMerge
 
 		// Determine target board.
 		$target_board = count($this->boards) > 1 ? (int) $details['board'] : $this->boards[0];
-		if (!in_array($target_board, $this->boards))
+		if (!in_array($target_board, $details['accessible_boards']))
 		{
 			$this->_errors[] = array('no_board', true);
 			return;
@@ -419,7 +427,7 @@ class TopicsMerge
 		// Get info about the topics and polls that will be merged.
 		$request = $this->_db->query('', '
 			SELECT
-				t.id_topic, t.id_board, t.id_poll, t.num_views, t.is_sticky, t.approved, t.num_replies, t.unapproved_posts,
+				t.id_topic, t.id_board, b.id_cat, t.id_poll, t.num_views, t.is_sticky, t.approved, t.num_replies, t.unapproved_posts,
 				m1.subject, m1.poster_time AS time_started, IFNULL(mem1.id_member, 0) AS id_member_started, IFNULL(mem1.real_name, m1.poster_name) AS name_started,
 				m2.poster_time AS time_updated, IFNULL(mem2.id_member, 0) AS id_member_updated, IFNULL(mem2.real_name, m2.poster_name) AS name_updated
 			FROM {db_prefix}topics AS t
@@ -427,6 +435,7 @@ class TopicsMerge
 				INNER JOIN {db_prefix}messages AS m2 ON (m2.id_msg = t.id_last_msg)
 				LEFT JOIN {db_prefix}members AS mem1 ON (mem1.id_member = m1.id_member)
 				LEFT JOIN {db_prefix}members AS mem2 ON (mem2.id_member = m2.id_member)
+				LEFT JOIN {db_prefix}boards AS b ON (b.id_board = t.id_board)
 			WHERE t.id_topic IN ({array_int:topic_list})
 			ORDER BY t.id_first_msg
 			LIMIT {int:limit}',
@@ -497,7 +506,10 @@ class TopicsMerge
 
 			// Store the id_topic with the lowest id_first_msg.
 			if (empty($this->firstTopic))
+			{
 				$this->firstTopic = $row['id_topic'];
+				$this->firstBoard = $row['id_board'];
+			}
 
 			$this->_is_sticky = max($this->_is_sticky, $row['is_sticky']);
 		}

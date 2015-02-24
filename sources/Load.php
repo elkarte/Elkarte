@@ -728,7 +728,7 @@ function loadPermissions()
 				' . $spider_restrict,
 			array(
 				'member_groups' => $user_info['groups'],
-				'spider_group' => !empty($modSettings['spider_group']) ? $modSettings['spider_group'] : 0,
+				'spider_group' => !empty($modSettings['spider_group']) && $modSettings['spider_group'] != 1 ? $modSettings['spider_group'] : 0,
 			)
 		);
 		$removals = array();
@@ -761,7 +761,7 @@ function loadPermissions()
 			array(
 				'member_groups' => $user_info['groups'],
 				'id_profile' => $board_info['profile'],
-				'spider_group' => !empty($modSettings['spider_group']) ? $modSettings['spider_group'] : 0,
+				'spider_group' => !empty($modSettings['spider_group']) && $modSettings['spider_group'] != 1 ? $modSettings['spider_group'] : 0,
 			)
 		);
 		while ($row = $db->fetch_assoc($request))
@@ -1081,7 +1081,7 @@ function loadMemberContext($user, $display_custom_fields = false)
 			'group_id' => $profile['id_group'],
 			'post_group' => $profile['post_group'],
 			'post_group_color' => $profile['post_group_color'],
-			'group_icons' => str_repeat('<img src="' . str_replace('$language', $context['user']['language'], isset($profile['icons'][1]) ? $settings['images_url'] . '/group_icons/' . $profile['icons'][1] : '') . '" alt="*" />', empty($profile['icons'][0]) || empty($profile['icons'][1]) ? 0 : $profile['icons'][0]),
+			'group_icons' => str_repeat('<img src="' . str_replace('$language', $context['user']['language'], isset($profile['icons'][1]) ? $settings['images_url'] . '/group_icons/' . $profile['icons'][1] : '') . '" alt="[*]" />', empty($profile['icons'][0]) || empty($profile['icons'][1]) ? 0 : $profile['icons'][0]),
 			'warning' => $profile['warning'],
 			'warning_status' => !empty($modSettings['warning_mute']) && $modSettings['warning_mute'] <= $profile['warning'] ? 'mute' : (!empty($modSettings['warning_moderate']) && $modSettings['warning_moderate'] <= $profile['warning'] ? 'moderate' : (!empty($modSettings['warning_watch']) && $modSettings['warning_watch'] <= $profile['warning'] ? 'watch' : (''))),
 			'local_time' => standardTime(time() + ($profile['time_offset'] - $user_info['time_offset']) * 3600, false),
@@ -1793,6 +1793,7 @@ function loadEssentialThemeData()
 
 	// Assume we want this.
 	$context['forum_name'] = $mbname;
+	$context['forum_name_html_safe'] = $context['forum_name'];
 
 	// Check loadLanguage actually exists!
 	if (!function_exists('loadLanguage'))
@@ -3029,6 +3030,7 @@ function doSecurityChecks()
 			$index = 'new_in_' . str_replace(array('ElkArte ', '.'), array('', '_'), FORUM_VERSION);
 			if (!empty($modSettings[$index]) && empty($options['dismissed_' . $index]))
 			{
+				$show_warnings = true;
 				$context['new_version_updates'] = array(
 					'title' => $txt['new_version_updates'],
 					'errors' => array(replaceBasicActionUrl($txt['new_version_updates_text'])),

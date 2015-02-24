@@ -205,6 +205,17 @@ class MergeTopics_Controller extends Action_Controller
 		// Saved in a variable to (potentially) save a query later
 		$boards_info = fetchBoardsInfo($query_boards);
 
+		$boardListOptions = array(
+			'not_redirection' => true,
+			'selected_board' => $merger->firstBoard,
+		);
+
+		if (!in_array(0, $merge_boards))
+			$boardListOptions['included_boards'] = $merge_boards;
+		$context += getBoardList($boardListOptions);
+		// This is removed to avoid the board not being selectable.
+		$context['current_board'] = null;
+
 		// This happens when a member is moderator of a board he cannot see
 		foreach ($merger->boards as $board)
 			if (!isset($boards_info[$board]))
@@ -216,12 +227,15 @@ class MergeTopics_Controller extends Action_Controller
 
 			if (count($merger->boards) > 1)
 			{
+				// @deprecated since 1.0.3 - Kept in the remote case someone created a theme changing MergeTopics.template.php
 				foreach ($boards_info as $row)
+				{
 					$context['boards'][] = array(
 						'id' => $row['id_board'],
 						'name' => $row['name'],
 						'selected' => $row['id_board'] == $merger->topic_data[$merger->firstTopic]['board']
 					);
+				}
 			}
 
 			$context['topics'] = $merger->topic_data;
@@ -241,6 +255,7 @@ class MergeTopics_Controller extends Action_Controller
 			'custom_subject' => isset($_POST['custom_subject']) ? $_POST['custom_subject'] : '',
 			'enforce_subject' => isset($_POST['enforce_subject']) ? $_POST['enforce_subject'] : '',
 			'notifications' => isset($_POST['notifications']) ? $_POST['notifications'] : '',
+			'accessible_boards' => array_keys($boards_info),
 		));
 
 		if ($merger->hasErrors())

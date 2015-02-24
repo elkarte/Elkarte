@@ -54,12 +54,6 @@ function template_init()
 		// The version this template/theme is for. This should probably be the version of the forum it was created for.
 		'theme_version' => '1.0',
 
-		// Use plain buttons - as opposed to text buttons?
-		'use_buttons' => true,
-
-		// Show sticky and lock status separate from topic icons?
-		'separate_sticky_lock' => true,
-
 		// Set the following variable to true if this theme requires the optional theme strings file to be loaded.
 		'require_theme_strings' => false,
 

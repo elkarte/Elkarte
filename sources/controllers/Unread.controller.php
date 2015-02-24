@@ -107,6 +107,9 @@ class Unread_Controller extends Action_Controller
 		$context['sub_template'] = 'unread';
 		$context['unread_header_title'] = $this->_action_unread ? ($context['showing_all_topics'] ? $txt['unread_topics_all'] : $txt['unread_topics_visit']) : $txt['unread_replies'];
 
+		$template_layers = Template_Layers::getInstance();
+		$template_layers->add($context['sub_template']);
+
 		// Setup the default topic icons... for checking they exist and the like ;)
 		require_once(SUBSDIR . '/MessageIndex.subs.php');
 		$context['icon_sources'] = MessageTopicIcons();
@@ -350,7 +353,7 @@ class Unread_Controller extends Action_Controller
 
 		foreach ($sort_methods as $key => $val)
 			$context['topics_headers'][$key] = array(
-				'url' => $scripturl . '?action=' . $this->_action . ($context['showing_all_topics'] ? ';all' : '') . sprintf($context['querystring_board_limits'], $_REQUEST['start']) . ';sort=subject' . ($context['sort_by'] == 'subject' && $context['sort_direction'] == 'up' ? ';desc' : ''),
+				'url' => $scripturl . '?action=' . $this->_action . ($context['showing_all_topics'] ? ';all' : '') . sprintf($context['querystring_board_limits'], $_REQUEST['start']) . ';sort=' . $key . ($context['sort_by'] == $key && $context['sort_direction'] == 'up' ? ';desc' : ''),
 				'sort_dir_img' => $context['sort_by'] == $key ? '<img class="sort" src="' . $settings['images_url'] . '/sort_' . $context['sort_direction'] . '.png" alt="" title="' . $context['sort_title'] .'" />' : '',
 			);
 	}

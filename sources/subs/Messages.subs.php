@@ -597,11 +597,13 @@ function countNewPosts($topic, $topicinfo, $timestamp)
  * @param string[] $msg_selects
  * @param string[] $msg_tables
  * @param mixed[] $msg_parameters
- * @param mixed[] $options
+ * @param mixed[] $optional
  * @return A request object
  */
-function loadMessageRequest($msg_selects, $msg_tables, $msg_parameters, $options = array())
+function loadMessageRequest($msg_selects, $msg_tables, $msg_parameters, $optional = array())
 {
+	global $options;
+
 	$db = database();
 
 	$request = $db->query('', '
@@ -614,7 +616,7 @@ function loadMessageRequest($msg_selects, $msg_tables, $msg_parameters, $options
 		FROM {db_prefix}messages AS m
 			' . (!empty($msg_tables) ? implode("\n\t\t\t", $msg_tables) : '') . '
 		WHERE m.id_msg IN ({array_int:message_list})
-			' . (!empty($options['additional_conditions']) ? $options['additional_conditions'] : '') . '
+			' . (!empty($optional['additional_conditions']) ? $optional['additional_conditions'] : '') . '
 		ORDER BY m.id_msg',
 		$msg_parameters
 	);
@@ -629,10 +631,10 @@ function loadMessageRequest($msg_selects, $msg_tables, $msg_parameters, $options
  * @param string[] $msg_selects
  * @param string[] $msg_tables
  * @param mixed[] $msg_parameters
- * @param mixed[] $options
+ * @param mixed[] $optional
  * @return array
  */
-function loadMessageDetails($msg_selects, $msg_tables, $msg_parameters, $options = array())
+function loadMessageDetails($msg_selects, $msg_tables, $msg_parameters, $optional = array())
 {
 	$db = database();
 
@@ -644,7 +646,7 @@ function loadMessageDetails($msg_selects, $msg_tables, $msg_parameters, $options
 	else
 		$single = false;
 
-	$request = loadMessageRequest($msg_selects, $msg_tables, $msg_parameters, $options);
+	$request = loadMessageRequest($msg_selects, $msg_tables, $msg_parameters, $optional);
 
 	$return = array();
 	while ($row = $db->fetch_assoc($request))
@@ -738,7 +740,7 @@ function countSplitMessages($topic, $include_unapproved, $selection = array())
  * @param int $id_msg the id of a message
  * @return array
  */
-function mailFromMesasge($id_msg)
+function mailFromMessage($id_msg)
 {
 	$db = database();
 

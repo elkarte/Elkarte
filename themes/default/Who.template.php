@@ -82,7 +82,7 @@ function template_whos_online()
 
 		echo '
 						</div>
-						<div class="online_time">', $member['time'], '</div>
+						<div class="online_time nowrap">', $member['time'], '</div>
 						<div class="online_action">', $member['action'], '</div>
 					</dd>';
 	}

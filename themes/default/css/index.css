@@ -2557,6 +2557,7 @@ ul.post_options li {
 }
 .drop_area_fileselect_text {
 	white-space: nowrap;
+	padding: 0 4px;
 }
 
 #postAttachment >dd.progress_tracker {
@@ -4791,6 +4792,10 @@ dl.no_members {
 	}
 	#postMoreOptions, #postAttachment, #postAttachment2 {
 		padding: 4px;
+	}
+	#confirm_buttons .button_submit {
+		height: inherit;
+		max-height: none;
 	}
 }
 

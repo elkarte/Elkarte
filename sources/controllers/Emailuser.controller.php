@@ -299,7 +299,7 @@ class Emailuser_Controller extends Action_Controller
 		elseif (isset($_REQUEST['msg']))
 		{
 			require_once(SUBSDIR . '/Messages.subs.php');
-			$row = mailFromMesasge((int) $_REQUEST['msg']);
+			$row = mailFromMessage((int) $_REQUEST['msg']);
 
 			$context['form_hidden_vars']['msg'] = (int) $_REQUEST['msg'];
 		}

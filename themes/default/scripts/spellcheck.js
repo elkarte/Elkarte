@@ -34,7 +34,7 @@ function spellCheck(formName, fieldName, bFull)
 	// Register the name of the editing form for future reference.
 	spell_formname = formName;
 	spell_fieldname = fieldName;
-	spell_full = bFull !== 'undefined' ? bFull : (typeof($editor_data) !== 'undefined' ? true : false);
+	spell_full = typeof(bFull) !== 'undefined' ? bFull : (typeof($editor_data) !== 'undefined' ? true : false);
 
 	// This should match a word (most of the time).
 	var regexpWordMatch = /(?:<[^>]+>)|(?:\[[^ ][^\]]*\])|(?:&[^; ]+;)|(?:[^0-9\s\]\[{};:"\\|,<.>\/?`~!@#$%^&*()_+=]+)/g;
@@ -44,7 +44,7 @@ function spellCheck(formName, fieldName, bFull)
 
 	var aWords = [],
 		aResult = [],
-		sText = (spell_full) ? $editor_data[fieldName].getText() : document.forms[formName][fieldName].value,
+		sText = (spell_full) ? $editor_data[spell_fieldname].getText() : document.forms[spell_formname][spell_fieldname].value,
 		bInCode = false,
 		iOffset1,
 		iOffset2;
@@ -84,11 +84,11 @@ function spellCheck(formName, fieldName, bFull)
 	openSpellWin(640, 480);
 
 	// Pass the data to a form...
-	spellform.spellstring.value = aWords.join('\n');
-	spellform.fulleditor.value = spell_full ? 'true' : 'false';
+	document.getElementById("spellstring").value = aWords.join('\n');
+	document.getElementById("fulleditor").value = spell_full ? 'true' : 'false';
 
-	//  and go!
-	spellform.submit();
+	// and go!
+	document.getElementById("spell_form").submit();
 
 	return true;
 }

@@ -189,8 +189,16 @@ class RemoveTopic_Controller extends Action_Controller
 		if ($restorer->unfoundRestoreMessages())
 			fatal_lang_error('restore_not_found', false, array('<ul style="margin-top: 0px;"><li>' . implode('</li><li>', $restorer->unfoundRestoreMessages(true)) . '</li></ul>'));
 
-		// Just send them to the index if they get here.
-		redirectexit();
+		// Lets send them back somewhere that may make sense
+		if (count($actioned_messages) == 1 && empty($topics_to_restore))
+		{
+			reset($actioned_messages);
+			redirectexit('topic=' . key($actioned_messages));
+		}
+		elseif (count($topics_to_restore) == 1)
+			redirectexit('topic=' . $topics_to_restore[0]);
+		else
+			redirectexit();
 	}
 
 	/**
