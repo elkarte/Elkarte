@@ -15,22 +15,12 @@
  *
  */
 
-// Version information...
-define('CURRENT_VERSION', '1.0.2');
-define('CURRENT_LANG_VERSION', '1.0');
-define('REQUIRED_PHP_VERSION', '5.2.0');
-
-// Database info.
-$databases = array();
-load_possible_databases();
+require('installcore.php');
 
 // General options for the script.
 $timeLimitThreshold = 3;
-$upgrade_path = realpath(dirname(__FILE__) . '/..');
+$upgrade_path = realpath(__DIR__ . '/..');
 $upgradeurl = $_SERVER['PHP_SELF'];
-
-// Where the images etc are kept.
-$oursite = 'http://www.elkarte.net';
 
 // Disable the need for admins to login?
 $disable_security = false;
@@ -546,17 +536,17 @@ function action_welcomeLogin()
 	$check = @file_exists($modSettings['theme_dir'] . '/index.template.php')
 		&& @file_exists(SOURCEDIR . '/QueryString.php')
 		&& @file_exists(SOURCEDIR . '/database/Db-' . $db_type . '.class.php')
-		&& @file_exists(dirname(__FILE__) . '/upgrade_elk_1-0_' . $db_type . '.sql');
+		&& @file_exists(__DIR__ . '/upgrade_elk_1-0_' . $db_type . '.sql');
 
 	// Need scripts to migrate from SMF?
 	if (isset($modSettings['smfVersion']) && $modSettings['smfVersion'] < 2.1)
-		$check &= @file_exists(dirname(__FILE__) . '/upgrade_2-0_' . $db_type . '.sql');
+		$check &= @file_exists(__DIR__ . '/upgrade_2-0_' . $db_type . '.sql');
 
 	if (isset($modSettings['smfVersion']) && $modSettings['smfVersion'] < 2.0)
-		$check &= @file_exists(dirname(__FILE__) . '/upgrade_1-1.sql');
+		$check &= @file_exists(__DIR__ . '/upgrade_1-1.sql');
 
 	if (isset($modSettings['smfVersion']) && $modSettings['smfVersion'] < 1.1)
-		$check &= @file_exists(dirname(__FILE__) . '/upgrade_1-0.sql');
+		$check &= @file_exists(__DIR__ . '/upgrade_1-0.sql');
 
 	// If the db is not UTF
 	if (!isset($modSettings['elkVersion']) && ($db_type == 'mysql' || $db_type == 'mysqli') && (!isset($db_character_set) || $db_character_set !== 'utf8' || empty($modSettings['global_character_set']) || $modSettings['global_character_set'] !== 'UTF-8'))
@@ -1160,7 +1150,7 @@ function action_databaseChanges()
 			// @todo Do we actually need to do this still?
 			if (!isset($modSettings['elkVersion']) || $modSettings['elkVersion'] < $file[1] || ($modSettings['elkVersion'] == '2.1 dev0' && $file[0] == 'upgrade_elk_1-0_' . $db_type . '.sql'))
 			{
-				$nextFile = parse_sql(dirname(__FILE__) . '/' . $file[0]);
+				$nextFile = parse_sql(__DIR__ . '/' . $file[0]);
 				if ($nextFile)
 				{
 					// Only update the version of this if complete.
@@ -1268,7 +1258,7 @@ function action_deleteUpgrade()
 	clean_cache();
 
 	// Can we delete the file?
-	$upcontext['can_delete_script'] = is_writable(dirname(__FILE__)) || is_writable(__FILE__);
+	$upcontext['can_delete_script'] = is_writable(__DIR__) || is_writable(__FILE__);
 
 	// Log what we've done.
 	if (empty($user_info['id']))
@@ -2698,16 +2688,16 @@ function deleteUpgrader()
 	@unlink(__FILE__);
 
 	// And the extra little files ;).
-	@unlink(dirname(__FILE__) . '/upgrade_1-0.sql');
-	@unlink(dirname(__FILE__) . '/upgrade_1-1.sql');
-	@unlink(dirname(__FILE__) . '/upgrade_2-0_' . $db_type . '.sql');
-	@unlink(dirname(__FILE__) . '/upgrade_2-1_' . $db_type . '.sql');
+	@unlink(__DIR__ . '/upgrade_1-0.sql');
+	@unlink(__DIR__ . '/upgrade_1-1.sql');
+	@unlink(__DIR__ . '/upgrade_2-0_' . $db_type . '.sql');
+	@unlink(__DIR__ . '/upgrade_2-1_' . $db_type . '.sql');
 
-	$dh = opendir(dirname(__FILE__));
+	$dh = opendir(__DIR__);
 	while ($file = readdir($dh))
 	{
 		if (preg_match('~upgrade_\d-\d_([A-Za-z])+\.sql~i', $file, $matches) && isset($matches[1]))
-			@unlink(dirname(__FILE__) . '/' . $file);
+			@unlink(__DIR__ . '/' . $file);
 	}
 	closedir($dh);
 
@@ -3563,7 +3553,7 @@ function template_upgrade_below()
 		</div>
 	</div></div>
 	<div id="footer_section"><div class="frame" style="height: 40px;">
-		<div class="smalltext"><a href="http://www.elkarte.net/" title="ElkArte Community" target="_blank" class="new_win">ElkArte &copy; 2012 - 2014, ElkArte</a></div>
+		<div class="smalltext"><a href="', SITE_SOFTWARE, '" title="ElkArte Community" target="_blank" class="new_win">ElkArte &copy; 2012 - 2014, ElkArte</a></div>
 	</div></div>
 	</body>
 </html>';
@@ -4362,7 +4352,7 @@ function template_upgrade_complete()
 			<img src="', $settings['default_theme_url'], '/images/blank.png" alt="" id="delete_upgrader" /><br />';
 
 	echo '<br />
-			If you had any problems with this upgrade, or have any problems using ElkArte, please don\'t hesitate to <a href="http://www.elkarte.net/index.php">look to us for assistance</a>.<br />
+			If you had any problems with this upgrade, or have any problems using ElkArte, please don\'t hesitate to <a href="', SITE_SOFTWARE, '/index.php">look to us for assistance</a>.<br />
 			<br />
 			Best of luck,<br />
 			ElkArte';

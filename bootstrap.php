@@ -34,18 +34,10 @@ global $modSettings, $context, $sc, $user_info, $topic, $board, $txt;
 global $ssi_db_user, $scripturl, $ssi_db_passwd, $db_passwd;
 global $boarddir, $sourcedir;
 
-// Remember the current configuration so it can be set back.
-$ssi_magic_quotes_runtime = function_exists('get_magic_quotes_gpc') && get_magic_quotes_runtime();
-
 $ssi_error_reporting = error_reporting(E_ALL | E_STRICT);
 
-if (function_exists('set_magic_quotes_runtime'))
-	@set_magic_quotes_runtime(0);
 $time_start = microtime(true);
 $db_show_debug = false;
-
-// Shortcut for the browser cache stale
-define('CACHE_STALE', '?10RC1');
 
 // We don't need no globals. (a bug in "old" versions of PHP)
 foreach (array('db_character_set', 'cachedir') as $variable)
@@ -53,11 +45,11 @@ foreach (array('db_character_set', 'cachedir') as $variable)
 		unset($GLOBALS[$variable], $GLOBALS[$variable]);
 
 // Get the forum's settings for database and file paths.
-require_once(dirname(__FILE__) . '/Settings.php');
+require_once(__DIR__ . '/Settings.php');
 
 // Make sure the paths are correct... at least try to fix them.
-if (!file_exists($boarddir) && file_exists(dirname(__FILE__) . '/agreement.txt'))
-	$boarddir = dirname(__FILE__);
+if (!file_exists($boarddir) && file_exists(__DIR__ . '/agreement.txt'))
+	$boarddir = __DIR__;
 if (!file_exists($sourcedir . '/SiteDispatcher.class.php') && file_exists($boarddir . '/sources'))
 	$sourcedir = $boarddir . '/sources';
 
