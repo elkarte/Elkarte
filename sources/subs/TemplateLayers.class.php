@@ -26,7 +26,7 @@ class Template_Layers extends Priority
 	 * they will be rendered, and used in reverseLayers to return
 	 * the reverse order for the "below" loop
 	 */
-	private $_sorted_layers = null;
+	private $_sorted_entities = null;
 
 	/**
 	 * Layers not removed in case of errors
@@ -122,7 +122,7 @@ class Template_Layers extends Priority
 	/**
 	 * Prepares the layers so that they are usable by the template
 	 * The function sorts the layers according to the priority and saves the
-	 * result in $_sorted_layers
+	 * result in $_sorted_entities
 	 *
 	 * @return array the sorted layers
 	 */
