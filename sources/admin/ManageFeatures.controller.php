@@ -413,9 +413,9 @@ class ManageFeatures_Controller extends Action_Controller
 			toggleTaskStatusByName('user_access_mentions', !empty($_POST['mentions_enabled']));
 
 			if (!empty($_POST['mentions_dont_notify_rlike']))
-				$enabled_mentions[] = 'rlikemsg';
-			else
 				$enabled_mentions = array_diff($enabled_mentions, array('rlikemsg'));
+			else
+				$enabled_mentions[] = 'rlikemsg';
 
 			$modules = array('post', 'display');
 			if (!empty($_POST['mentions_enabled']))
