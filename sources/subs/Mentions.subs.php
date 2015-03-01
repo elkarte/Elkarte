@@ -434,6 +434,8 @@ function findMemberMention($id_mention, $id_member)
  */
 function updateMentionMenuCount($status, $member_id)
 {
+	require_once(SUBSDIR . '/Members.subs.php');
+
 	// If its new add to our menu count
 	if ($status === 0)
 		updateMemberdata($member_id, array('mentions' => '+'));
