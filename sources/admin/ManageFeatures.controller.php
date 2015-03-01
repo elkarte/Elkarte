@@ -407,6 +407,12 @@ class ManageFeatures_Controller extends Action_Controller
 		{
 			checkSession();
 
+			if ((!isset($_POST['mentions_dont_notify_rlike']) && !empty($modSettings['mentions_dont_notify_rlike'])) || (isset($_POST['mentions_dont_notify_rlike']) && $_POST['mentions_dont_notify_rlike'] != $modSettings['mentions_dont_notify_rlike']))
+			{
+				require_once(SUBSDIR . '/Mentions.subs.php');
+				toggleMentionsVisibility('rlike', empty($_POST['mentions_dont_notify_rlike']));
+			}
+
 			if ((!isset($_POST['mentions_buddy']) && !empty($modSettings['mentions_buddy'])) || (isset($_POST['mentions_buddy']) && $_POST['mentions_buddy'] != $modSettings['mentions_buddy']))
 			{
 				require_once(SUBSDIR . '/Mentions.subs.php');
