@@ -86,7 +86,10 @@ abstract class Database_Abstract implements Database
 			return $user_info['query_wanna_see_board'];
 
 		if (!isset($matches[2]))
+		{
+		_debug($matches);
 			$this->error_backtrace('Invalid value inserted or no type specified.', '', E_USER_ERROR, __FILE__, __LINE__);
+		}
 
 		if (!isset($values[$matches[2]]))
 			$this->error_backtrace('The database value you\'re trying to insert does not exist: ' . htmlspecialchars($matches[2], ENT_COMPAT, 'UTF-8'), '', E_USER_ERROR, __FILE__, __LINE__);

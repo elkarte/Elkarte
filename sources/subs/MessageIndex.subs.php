@@ -133,6 +133,7 @@ function messageIndexTopics($id_board, $id_member, $start, $per_page, $sort_by, 
 
 /**
  * This simple function returns the sort methods for message index in an array.
+ * @deprecated since 1.1 - see Message_Index class
  */
 function messageIndexSort()
 {
