@@ -38,8 +38,8 @@ function countUserMentions($all = false, $type = '', $id_member = null)
 		SELECT COUNT(*)
 		FROM {db_prefix}log_mentions as mtn
 		WHERE mtn.id_member = {int:current_user}
-			AND mtn.status IN ({array_int:status})' . (empty($type) ? '' : (is_array($type) ? '
 			AND mtn.is_accessible = {int:is_accessible}
+			AND mtn.status IN ({array_int:status})' . (empty($type) ? '' : (is_array($type) ? '
 			AND mtn.mention_type IN ({array_string:current_type})' : '
 			AND mtn.mention_type = {string:current_type}')),
 		array(
@@ -90,8 +90,8 @@ function getUserMentions($start, $limit, $sort, $all = false, $type = '')
 			LEFT JOIN {db_prefix}members AS mem ON (mtn.id_member_from = mem.id_member)
 			LEFT JOIN {db_prefix}attachments AS a ON (a.id_member = mem.id_member)
 		WHERE mtn.id_member = {int:current_user}
-			AND mtn.status IN ({array_int:status})' . (empty($type) ? '' : (is_array($type) ? '
 			AND mtn.is_accessible = {int:is_accessible}
+			AND mtn.status IN ({array_int:status})' . (empty($type) ? '' : (is_array($type) ? '
 			AND mtn.mention_type IN ({array_string:current_type})' : '
 			AND mtn.mention_type = {string:current_type}')) . '
 		ORDER BY {raw:sort}
