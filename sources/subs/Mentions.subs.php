@@ -128,8 +128,9 @@ function getUserMentions($start, $limit, $sort, $all = false, $type = '')
  * @param string $type the type of mention
  * @param string|null $time optional value to set the time of the mention, defaults to now
  * @param string|null $status optional value to set a status, defaults to 0
+ * @param bool|null $is_accessible optional if the mention is accessible to the user
  */
-function addMentions($member_from, $members_to, $target, $type, $time = null, $status = null)
+function addMentions($member_from, $members_to, $target, $type, $time = null, $status = null, $is_accessible = null)
 {
 	$inserts = array();
 
@@ -162,6 +163,7 @@ function addMentions($member_from, $members_to, $target, $type, $time = null, $s
 				$id_member,
 				$target,
 				$status === null ? 0 : $status,
+				$is_accessible === null ? 1 : $is_accessible,
 				$member_from,
 				$time === null ? time() : $time,
 				$type
@@ -177,6 +179,7 @@ function addMentions($member_from, $members_to, $target, $type, $time = null, $s
 			'id_member' => 'int',
 			'id_target' => 'int',
 			'status' => 'int',
+			'is_accessible' => 'int',
 			'id_member_from' => 'int',
 			'log_time' => 'int',
 			'mention_type' => 'string-12',
@@ -305,7 +308,7 @@ function toggleMentionsApproval($msgs, $approved)
  * Toggles a mention visibility on/off
  *
  * - if off is restored to visible,
- * - if on is switched to unvisible) for all the users
+ * - if on is switched to unvisible for all the users
  *
  * @package Mentions
  * @param string $type type of the mention that you want to toggle
@@ -358,7 +361,7 @@ function toggleMentionsAccessibility($mentions, $access)
 		SET
 			is_accessible = CASE WHEN is_accessible = 1 THEN 0 ELSE 1 END
 		WHERE id_mention IN ({array_int:mentions})
-			AND is_accessible ' . ($access ? '<' : '>=') . ' 0',
+			AND is_accessible ' . ($access ? '=' : '!=') . ' 0',
 		array(
 			'mentions' => $mentions,
 		)
