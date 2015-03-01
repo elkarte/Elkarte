@@ -61,7 +61,7 @@ class User_Access_Mentions_Task implements Scheduled_Task_Interface
 						$request = $db->query('', '
 							SELECT mnt.id_mention
 							FROM {db_prefix}log_mentions as mnt
-								LEFT JOIN {db_prefix}messages AS m ON (m.id_msg = mnt.id_msg)
+								LEFT JOIN {db_prefix}messages AS m ON (m.id_msg = mnt.id_target)
 								LEFT JOIN {db_prefix}boards AS b ON (b.id_board = m.id_board)
 							WHERE mnt.id_member = {int:current_member}
 								AND mnt.mention_type IN ({array_string:mention_types})
@@ -165,7 +165,7 @@ class User_Access_Mentions_Task implements Scheduled_Task_Interface
 				$request2 = $db->query('', '
 					SELECT mnt.id_mention
 					FROM {db_prefix}log_mentions as mnt
-						LEFT JOIN {db_prefix}messages AS m ON (m.id_msg = mnt.id_msg)
+						LEFT JOIN {db_prefix}messages AS m ON (m.id_msg = mnt.id_target)
 						LEFT JOIN {db_prefix}boards AS b ON (b.id_board = m.id_board)
 					WHERE mnt.id_member = {int:current_member}
 						AND mnt.mention_type IN ({array_string:mention_types})
