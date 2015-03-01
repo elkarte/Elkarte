@@ -417,10 +417,17 @@ class ManageFeatures_Controller extends Action_Controller
 			else
 				$enabled_mentions = array_diff($enabled_mentions, array('rlikemsg'));
 
+			$modules = array('post', 'display');
 			if (!empty($_POST['mentions_enabled']))
+			{
+				enableModules('mention', $modules);
 				$enabled_mentions[] = 'mentionmem';
+			}
 			else
+			{
+				disableModules('mention', $modules);
 				$enabled_mentions = array_diff($enabled_mentions, array('mentionmem'));
+			}
 
 			updateSettings(array('enabled_mentions' => implode(',', $enabled_mentions)));
 			Settings_Form::save_db($config_vars);
