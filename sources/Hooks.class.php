@@ -223,24 +223,32 @@ class Hooks
 
 		foreach ($enabled as $class)
 		{
-			if (is_callable($class, 'register'))
+			if (is_callable(array($class, 'register')))
 			{
 				$hooks = $class::register();
+
+				if (empty($hooks))
+					continue;
+
 				foreach ($hooks as $hook)
 					$this->add($hook[0], $hook[1], isset($hook[2]) ? $hook[2] : '', false);
 			}
 		}
 	}
 
-	public function loadIntegrationsSettings($basepath, $ext = '.integrate.php')
+	public function loadIntegrationsSettings()
 	{
 		$enabled = $this->_get_enabled_integrations();
 
 		foreach ($enabled as $class)
 		{
-			if (is_callable($class, 'settingsRegister'))
+			if (is_callable(array($class, 'settingsRegister')))
 			{
 				$hooks = $class::settingsRegister();
+
+				if (empty($hooks))
+					continue;
+
 				foreach ($hooks as $hook)
 					$this->add($hook[0], $hook[1], isset($hook[2]) ? $hook[2] : '', false);
 			}
