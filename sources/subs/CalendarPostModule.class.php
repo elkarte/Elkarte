@@ -42,7 +42,7 @@ class Calendar_Post_Module
 				array('prepare_post', array('Calendar_Post_Module', 'prepare_post'), array()),
 				array('prepare_context', array('Calendar_Post_Module', 'prepare_context'), array()),
 				array('before_save_post', array('Calendar_Post_Module', 'before_save_post'), array()),
-				array('save_post', array('Calendar_Post_Module', 'save_post'), array()),
+				array('after_save_post', array('Calendar_Post_Module', 'after_save_post'), array()),
 			);
 		else
 			return array();
@@ -59,7 +59,7 @@ class Calendar_Post_Module
 			$post_errors->addError('no_event');
 	}
 
-	public function save_post($board, $topic)
+	public function after_save_post()
 	{
 		global $user_info, $modSettings;
 
