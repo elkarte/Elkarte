@@ -574,7 +574,8 @@ function createPost(&$msgOptions, &$topicOptions, &$posterOptions)
 	// Set optional parameters to the default value.
 	$msgOptions['icon'] = empty($msgOptions['icon']) ? 'xx' : $msgOptions['icon'];
 	$msgOptions['smileys_enabled'] = !empty($msgOptions['smileys_enabled']);
-// 	$msgOptions['attachments'] = empty($msgOptions['attachments']) ? array() : $msgOptions['attachments'];
+	// @todo 2015/03/02 - The following line should probably be moved to a module
+	$msgOptions['attachments'] = empty($msgOptions['attachments']) ? array() : $msgOptions['attachments'];
 	$msgOptions['approved'] = isset($msgOptions['approved']) ? (int) $msgOptions['approved'] : 1;
 	$topicOptions['id'] = empty($topicOptions['id']) ? 0 : (int) $topicOptions['id'];
 	$topicOptions['poll'] = isset($topicOptions['poll']) ? (int) $topicOptions['poll'] : null;
