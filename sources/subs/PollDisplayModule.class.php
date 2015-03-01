@@ -47,8 +47,6 @@ class Poll_Display_Module
 		global $context;
 
 		// @deprecated since 1.1 - $context['is_poll'] is not used anywhere.
-		$context['is_poll'] = $topicinfo['id_poll'] > 0;
-
 		$context['is_poll'] = $topicinfo['id_poll'] > 0 && self::$_enabled && allowedTo('poll_view');
 
 		$this->_id_poll = $topicinfo['id_poll'];
