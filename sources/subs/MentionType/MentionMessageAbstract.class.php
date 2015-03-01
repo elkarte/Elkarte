@@ -30,7 +30,7 @@ abstract class Mention_Message_Abstract implements Mention_Type_Interface
 		return array();
 	}
 
-	public abstract function view($type, &$mentions);
+	abstract public function view($type, &$mentions);
 
 	protected function _replaceMsg($row)
 	{
