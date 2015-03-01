@@ -143,8 +143,24 @@ $db_table->db_change_column('{db_prefix}log_mentions', 'id_msg',
 
 ---# Introducing modules...
 ---{
-// @todo verify that calendar, attachments, drafts, mentions and polls are enabled
-updateSettings(array('modules_post', implode(',', array('attachments', 'calendar', 'drafts', 'mention', 'poll'))));
-updateSettings(array('modules_display', implode(',', array('drafts'))));
+if (!empty($modSettings['attachmentEnable']))
+{
+	enableModules('attachments', array('post'));
+}
+if (!empty($modSettings['cal_enabled']))
+{
+	enableModules('calendar', array('post', 'boardindex'));
+	Hooks::get()->enableIntegration('Calendar_Integrate');
+}
+if (!empty($modSettings['drafts_enabled']))
+{
+	enableModules('drafts', array('post', 'display', 'profile', 'personalmessage'));
+	Hooks::get()->enableIntegration('Drafts_Integrate');
+}
+if (!empty($modSettings['enabled_mentions']))
+{
+	enableModules('mention', 'post', 'display');
+}
+enableModules('poll', array('display'));
 ---}
 ---#
