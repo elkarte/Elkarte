@@ -50,12 +50,12 @@ class ManageCalendarModule_Controller extends Action_Controller
 				if ($value)
 				{
 					enableModules('calendar', array('post', 'boardindex'));
-					Hooks::get()->enableIntegration('subs/Calendar.integrate.php');
+					Hooks::get()->enableIntegration('Calendar_Integrate');
 				}
 				else
 				{
 					disableModules('calendar', array('post', 'boardindex'));
-					Hooks::get()->disableIntegration('subs/Calendar.integrate.php');
+					Hooks::get()->disableIntegration('Calendar_Integrate');
 				}
 			},
 		);

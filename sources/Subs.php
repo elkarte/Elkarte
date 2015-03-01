@@ -4034,6 +4034,10 @@ function elk_autoloader($class)
 				case 'Cache':
 					$file_name = SUBSDIR . '/CacheMethod/' . $givenname . $surname . '.class.php';
 					break;
+				// Some_Cache => SomeCache.class.php
+				case 'Integrate':
+					$file_name = SUBSDIR . '/' . $givenname . '.integrate.php';
+					break;
 				// Some_Mention => SomeMention.class.php
 				case 'Mention':
 					$file_name = SUBSDIR . '/MentionType/' . $givenname . $surname . '.class.php';

@@ -215,20 +215,15 @@ class Hooks
 	}
 
 	/**
-	 * Automatically loads all the integrate files found.
+	 * Automatically loads all the integrations enabled and that can be found.
 	 */
-	public function loadIntegrations($basepath, $admin = false, $ext = '.integrate.php')
+	public function loadIntegrations()
 	{
 		$enabled = $this->_get_enabled_integrations();
 
-		foreach ($enabled as $file)
+		foreach ($enabled as $class)
 		{
-			if (file_exists($basepath . '/' . $file))
-				require_once($basepath . '/' . $file);
-
-			$class = str_replace('.integrate', '_Integrate', basename($file, '.php'));
-
-			if (method_exists($class, 'register'))
+			if (is_callable($class, 'register'))
 			{
 				$hooks = $class::register();
 				foreach ($hooks as $hook)
@@ -241,14 +236,9 @@ class Hooks
 	{
 		$enabled = $this->_get_enabled_integrations();
 
-		foreach ($enabled as $file)
+		foreach ($enabled as $class)
 		{
-			if (file_exists($basepath . '/' . $file))
-				require_once($basepath . '/' . $file);
-
-			$class = str_replace('.integrate', '_Integrate', basename($file, '.php'));
-
-			if (method_exists($class, 'settingsRegister'))
+			if (is_callable($class, 'settingsRegister'))
 			{
 				$hooks = $class::settingsRegister();
 				foreach ($hooks as $hook)
@@ -483,7 +473,7 @@ class Hooks
 	}
 
 	/**
-	 * Being a singleton, this is the stati method to retrieve the instance of the class
+	 * Being a singleton, this is the static method to retrieve the instance of the class
 	 *
 	 * @param Database|null $db A database connection
 	 * @param Debug|null $debug A class for debugging
