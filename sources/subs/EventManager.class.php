@@ -25,6 +25,12 @@ class Event_Manager
 	protected $_instances = array();
 
 	/**
+	 * Instances of the controller.
+	 * @var object
+	 */
+	protected $_source = null;
+
+	/**
 	 * List of classes already registered.
 	 * @var string[]
 	 */
