@@ -30,7 +30,8 @@ abstract class Mention_BoardAccess_Abstract extends Mention_Message_Abstract
 				continue;
 
 			// These things are associated to messages and require permission checks
-			$boards[$key] = $row['id_board'];
+			if (!empty($row['id_board']))
+				$boards[$key] = $row['id_board'];
 
 			$mentions[$key]['message'] = $this->_replaceMsg($row);
 		}
