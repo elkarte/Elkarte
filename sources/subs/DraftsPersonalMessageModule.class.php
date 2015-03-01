@@ -45,10 +45,10 @@ class Drafts_PersonalMessage_Module
 			add_integration_function('integrate_pm_areas', 'Drafts_PersonalMessage_Module::integrate_pm_areas', '', false);
 
 			if (!empty($modSettings['drafts_autosave_frequency']))
-				self::$_autosave_frequency = $modSettings['drafts_autosave_frequency'] * 1000;
+				self::$_autosave_frequency = (int) $modSettings['drafts_autosave_frequency'] * 1000;
 
 			if (!empty($modSettings['draft_subject_length']))
-				self::$_subject_length = $modSettings['draft_subject_length'];
+				self::$_subject_length = (int) $modSettings['draft_subject_length'];
 
 			return array(
 				array('prepare_send_context', array('Drafts_PersonalMessage_Module', 'prepare_send_context'), array('pmsg', 'editorOptions')),

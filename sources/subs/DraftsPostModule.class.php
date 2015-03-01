@@ -35,10 +35,10 @@ class Drafts_Post_Module
 			self::$_autosave_enabled = !empty($modSettings['drafts_autosave_enabled']);
 
 			if (!empty($modSettings['drafts_autosave_frequency']))
-				self::$_autosave_frequency = $modSettings['drafts_autosave_frequency'] * 1000;
+				self::$_autosave_frequency = (int) $modSettings['drafts_autosave_frequency'] * 1000;
 
 			if (!empty($modSettings['draft_subject_length']))
-				self::$_subject_length = $modSettings['draft_subject_length'];
+				self::$_subject_length = (int) $modSettings['draft_subject_length'];
 
 			return array(
 				array('prepare_modifying', array('Drafts_Post_Module', 'prepare_modifying'), array('really_previewing')),
