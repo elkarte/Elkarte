@@ -48,27 +48,19 @@ class ManageDraftsModule_Controller extends Action_Controller
 				toggleTaskStatusByName('remove_old_drafts', $value);
 
 				$modules = array('post', 'display', 'profile', 'personalmessage');
-				$hooks = array(
-					'integrate_delete_members',
-					'integrate_load_permissions',
-					'integrate_sa_manage_maintenance',
-					'integrate_topics_maintenance',
-					'integrate_load_illegal_guest_permissions',
-				);
+
 				// Enabling, let's register the modules and prepare the scheuled task
 				if ($value)
 				{
 					enableModules('drafts', $modules);
 					calculateNextTrigger('remove_old_drafts');
-					foreach ($hooks as $hook)
-						add_integration_function($hook, 'ManageDraftsModule_Controller::' . $hook);
+					Hooks::get()->enableIntegration('Drafts_Integrate');
 				}
 				// Disabling, just forget about the modules
 				else
 				{
 					disableModules('drafts', $modules);
-					foreach ($hooks as $hook)
-						remove_integration_function($hook, 'ManageDraftsModule_Controller::' . $hook);
+					Hooks::get()->disableIntegration('Drafts_Integrate');
 				}
 			},
 		);
