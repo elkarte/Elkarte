@@ -25,8 +25,12 @@ class Mentionmem_Mention extends Mention_BoardAccess_Abstract
 	public static function getEvents($controller)
 	{
 		$methods = array(
-			'post' => array('prepare_context' => array(), 'before_save_post' => array(), 'after_save_post' => array('msgOptions', 'becomesApproved')),
-			'display' => array('display_prepare_context' => array('virtual_msg')),
+			'post' => array(
+				'prepare_context' => array(),
+				'before_save_post' => array(),
+				'after_save_post' => array('msgOptions', 'becomesApproved')
+			),
+			'display' => array('prepare_context' => array('virtual_msg')),
 		);
 
 		if (isset($methods[$controller]))
