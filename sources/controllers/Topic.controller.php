@@ -143,7 +143,8 @@ class Topic_Controller extends Action_Controller
 		require_once(SUBSDIR . '/Topic.subs.php');
 
 		// Is this topic already stickied, or no?
-		$is_sticky = topicAttribute($topic, 'sticky');
+		$sticky = topicAttribute($topic, 'is_sticky');
+		$is_sticky = $sticky['is_sticky'];
 
 		// Toggle the sticky value.
 		setTopicAttribute($topic, array('is_sticky' => (empty($is_sticky) ? 1 : 0)));
