@@ -22,13 +22,6 @@ if (!defined('ELK'))
 class Template_Layers extends Priority
 {
 	/**
-	 * Used in prepareContext to store the layers in the order
-	 * they will be rendered, and used in reverseLayers to return
-	 * the reverse order for the "below" loop
-	 */
-	private $_sorted_entities = null;
-
-	/**
 	 * Layers not removed in case of errors
 	 */
 	private $_error_safe_layers = null;
