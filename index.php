@@ -79,6 +79,7 @@ DEFINE('SOURCEDIR', $sourcedir);
 DEFINE('ADMINDIR', $sourcedir . '/admin');
 DEFINE('CONTROLLERDIR', $sourcedir . '/controllers');
 DEFINE('SUBSDIR', $sourcedir . '/subs');
+DEFINE('ADDONSDIR', $sourcedir . '/addons');
 unset($boarddir, $cachedir, $sourcedir, $languagedir, $extdir);
 
 // Files we cannot live without.
@@ -108,6 +109,9 @@ cleanRequest();
 
 // Initiate the database connection and define some database functions to use.
 loadDatabase();
+
+// Let's set up out shiny new hooks handler.
+Hooks::init(database(), Debug::get());
 
 // It's time for settings loaded from the database.
 reloadSettings();

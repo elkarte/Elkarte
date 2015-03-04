@@ -150,6 +150,20 @@ class Error_Context
 	}
 
 	/**
+	 * Return an error based on the id of the error set when adding the error itself.
+	 *
+	 * @param null|string $error the id of the error
+	 * @return null|mixed whatever the error is (string, object, array), noll if not found
+	 */
+	public function getError($error = null)
+	{
+		if (isset($this->_errors[$error]))
+			return $this->_errors[$error];
+		else
+			return null;
+	}
+
+	/**
 	 * Returns if there are errors or not.
 	 *
 	 * @param string|null $severity the severity level wanted. If null returns all the errors
@@ -232,6 +246,8 @@ class Error_Context
 		{
 			if (is_array($error_val))
 				$returns[$error_val[0]] = vsprintf(isset($txt['error_' . $error_val[0]]) ? $txt['error_' . $error_val[0]] : (isset($txt[$error_val[0]]) ? $txt[$error_val[0]] : $error_val[0]), $error_val[1]);
+			elseif (is_object($error_val))
+				continue;
 			else
 				$returns[$error_val] = isset($txt['error_' . $error_val]) ? $txt['error_' . $error_val] : (isset($txt[$error_val]) ? $txt[$error_val] : $error_val);
 		}

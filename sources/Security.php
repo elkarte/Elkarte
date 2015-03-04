@@ -941,7 +941,7 @@ function cleanTokens($complete = false, $suffix = '')
  * @param string $action
  * @param bool $is_fatal = true
  */
-function checkSubmitOnce($action, $is_fatal = true)
+function checkSubmitOnce($action, $is_fatal = false)
 {
 	global $context;
 

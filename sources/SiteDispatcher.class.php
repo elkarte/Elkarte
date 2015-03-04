@@ -234,7 +234,7 @@ class Site_Dispatcher
 		}
 		// Fall back to naming patterns.
 		// addons can use any of them, and it should Just Work (tm).
-		elseif (preg_match('~^[a-zA-Z_\\-]+$~', $_GET['action']))
+		elseif (preg_match('~^[a-zA-Z_\\-]+\d*$~', $_GET['action']))
 		{
 			// action=drafts => Drafts.php
 			// sa=save, sa=load, or sa=savepm => action_save(), action_load()
@@ -258,7 +258,7 @@ class Site_Dispatcher
 			// sa=upload => action_upload()
 			elseif (file_exists(CONTROLLERDIR . '/' . ucfirst($_GET['action']) . '.controller.php'))
 			{
-				$this->_file_name = CONTROLLERDIR . '/' . ucfirst($_GET['action']) . '.controller.php';
+// 				$this->_file_name = CONTROLLERDIR . '/' . ucfirst($_GET['action']) . '.controller.php';
 				$this->_controller_name = ucfirst($_GET['action']) . '_Controller';
 				if (isset($_GET['sa']) && preg_match('~^\w+$~', $_GET['sa']))
 					$this->_function_name = 'action_' . $_GET['sa'];
@@ -268,7 +268,7 @@ class Site_Dispatcher
 		}
 
 		// The file and function weren't found yet?
-		if (empty($this->_file_name) || empty($this->_function_name))
+		if (empty($this->_controller_name) || empty($this->_function_name))
 		{
 			// Catch the action with the theme?
 			// We still haven't found what we're looking for...
@@ -287,39 +287,45 @@ class Site_Dispatcher
 	 */
 	public function dispatch()
 	{
-		require_once($this->_file_name);
+		if (!empty($this->_file_name))
+			require_once($this->_file_name);
 
 		if (!empty($this->_controller_name))
 		{
-			$controller = new $this->_controller_name();
-
-			// Pre-dispatch (load templates and stuff)
-			if (method_exists($controller, 'pre_dispatch'))
-				$controller->pre_dispatch();
-
-			$hook = strtolower(str_replace('_Controller', '', $this->_controller_name));
-			$hook = substr($hook, -1) == 2 ? substr($hook, 0, -1) : $hook;
-			call_integration_hook('integrate_action_' . $hook . '_before', array($this->_function_name));
+			$controller = new $this->_controller_name(new Event_Manager());
+			$hook = $controller->getHook();
 
 			// 3, 2, ... and go
 			if (method_exists($controller, $this->_function_name))
-				$controller->{$this->_function_name}();
-			elseif (method_exists($controller, 'action_index'))
-				$controller->action_index();
+			{
+				$callable = array($controller, $this->_function_name);
+			}
+			elseif (method_mxists($controller, 'action_index'))
+			{
+				$callable = array($controller, 'action_index');
+			}
 			// Fall back
+			// @todo remove?
 			elseif (function_exists($this->_function_name))
 			{
-				call_user_func($this->_function_name);
+				$callable = $this->_function_name;
 			}
+			// This should never happen
 			else
 			{
 				// Things went pretty bad, huh?
 				// board index :P
-				call_integration_hook('integrate_action_boardindex_before');
-				$controller = new BoardIndex_Controller();
-				$controller->action_boardindex();
-				call_integration_hook('integrate_action_boardindex_after');
+				$this->_controller_name = 'BoardIndex';
+				$this->_function_name = 'action_index';
+
+				return $this->dispatch();
 			}
+
+			$controller->pre_dispatch();
+
+			call_integration_hook('integrate_action_' . $hook . '_before', array($this->_function_name));
+
+			call_user_func($callable);
 
 			call_integration_hook('integrate_action_' . $hook . '_after', array($this->_function_name));
 		}

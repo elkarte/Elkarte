@@ -343,9 +343,11 @@ function removeTopics($topics, $decreasePostCount = true, $ignoreRecycling = fal
 		// Remove all mentions now that the topic is gone
 		$db->query('', '
 			DELETE FROM {db_prefix}log_mentions
-			WHERE id_msg IN ({array_int:messages})',
+			WHERE id_target IN ({array_int:messages})
+				AND mention_type IN ({array_string:mension_types})',
 			array(
 				'messages' => $messages,
+				'mension_types' => array('mentionmem', 'likemsg', 'rlikemsg'),
 			)
 		);
 	}
@@ -1962,8 +1964,8 @@ function topicUserAttributes($id_topic, $user)
 
 	$request = $db->query('', '
 		SELECT
-			t.locked, IFNULL(ln.id_topic, 0) AS notify, t.is_sticky, t.id_poll, t.id_last_msg, mf.id_member,
-			t.id_first_msg, mf.subject,
+			t.locked, IFNULL(ln.id_topic, 0) AS notify, t.is_sticky, t.id_poll,
+			t.id_last_msg, mf.id_member, t.id_first_msg, mf.subject,
 			CASE WHEN ml.poster_time > ml.modified_time THEN ml.poster_time ELSE ml.modified_time END AS last_post_time
 		FROM {db_prefix}topics AS t
 			LEFT JOIN {db_prefix}log_notify AS ln ON (ln.id_topic = t.id_topic AND ln.id_member = {int:current_member})

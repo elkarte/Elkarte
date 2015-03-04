@@ -436,8 +436,6 @@ function loadAllPermissions()
 			'disable_censor' => array(false, 'general'),
 			'pm_read' => array(false, 'pm'),
 			'pm_send' => array(false, 'pm'),
-			'pm_draft' => array(false, 'pm'),
-			'pm_autosave_draft' => array(false, 'pm'),
 			'send_email_to_members' => array(false, 'pm'),
 			'calendar_view' => array(false, 'calendar'),
 			'calendar_post' => array(false, 'calendar'),
@@ -469,8 +467,6 @@ function loadAllPermissions()
 			'post_unapproved_topics' => array(false, 'topic'),
 			'post_unapproved_replies' => array(true, 'topic'),
 			'post_reply' => array(true, 'topic'),
-			'post_draft' => array(false, 'topic'),
-			'post_autosave_draft' => array(false, 'topic'),
 			'merge_any' => array(false, 'topic'),
 			'split_any' => array(false, 'topic'),
 			'send_topic' => array(false, 'topic'),
@@ -537,13 +533,6 @@ function loadAllPermissions()
 	{
 		$hiddenPermissions[] = 'approve_emails';
 		$hiddenPermissions[] = 'postby_email';
-	}
-	if (!in_array('dr', $context['admin_features']))
-	{
-		$hiddenPermissions[] = 'post_draft';
-		$hiddenPermissions[] = 'pm_draft';
-		$hiddenPermissions[] = 'post_autosave_draft';
-		$hiddenPermissions[] = 'pm_autosave_draft';
 	}
 
 	// Post moderation?

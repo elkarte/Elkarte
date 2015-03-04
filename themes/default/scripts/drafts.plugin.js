@@ -234,8 +234,20 @@
 	 */
 	elk_Drafts.prototype.formCheck = function() {
 		var oInstance = this,
-			formID = $('#id_draft').closest("form").attr('id');
+			formID = $('#' + this.opts.sTextareaID).closest("form").attr('id');
 
+		// @deprecated since 1.1 - the check on #id_draft existance is for backward compatibility with 1.0
+		if ($('#id_draft').length == 0)
+		{
+			$('#' + formID).append(
+				$('<input />').attr({
+					type: 'hidden',
+					id: this.opts.sLastID,
+					name: 'id_draft',
+					value: this.opts.id_draft
+				})
+			);
+		}
 		// Prevent autosave on post/save selection by mouse or keyboard
 		$('#' + formID + ' .button_submit').on('mousedown', oInstance, function() {
 			oInstance.opts._bInDraftMode = true;

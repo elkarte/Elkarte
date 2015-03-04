@@ -485,24 +485,6 @@ function custom_profiles_toggle_callback($value)
 }
 
 /**
- * Callback used in the core features page when the drafts
- * are enabled or disabled.
- *
- * @package Admin
- * @param bool $value the "new" status of the drafts
- * (true => enabled, false => disabled)
- */
-function drafts_toggle_callback($value)
-{
-	require_once(SUBSDIR . '/ScheduledTasks.subs.php');
-	toggleTaskStatusByName('remove_old_drafts', $value);
-
-	// Should we calculate next trigger?
-	if ($value)
-		calculateNextTrigger('remove_old_drafts');
-}
-
-/**
  * Callback used in the core features page when the paid subscriptions
  * are enabled or disabled.
  *
@@ -536,4 +518,71 @@ function postbyemail_toggle_callback($value)
 	// Should we calculate next trigger?
 	if ($value)
 		calculateNextTrigger('maillist_fetch_IMAP');
+}
+
+/**
+ * Enables a certain module on a set of controllers
+ *
+ * @package Admin
+ * @param string $module the name of the module (e.g. drafts)
+ * @param string[] $controllers list of controllers on which the module is
+ *                 activated
+ */
+function enableModules($module, $controllers)
+{
+	global $modSettings;
+
+	foreach ((array) $controllers as $controller)
+	{
+		if (!empty($modSettings['modules_' . $controller]))
+			$existing = explode(',', $modSettings['modules_' . $controller]);
+		else
+			$existing = array();
+
+		$existing[] = $module;
+		$existing = array_filter(array_unique($existing));
+		updateSettings(array('modules_' . $controller => implode(',', $existing)));
+	}
+}
+
+/**
+ * Disable a certain module on a set of controllers
+ *
+ * @package Admin
+ * @param string $module the name of the module (e.g. drafts)
+ * @param string[] $controllers list of controllers on which the module is
+ *                 activated
+ */
+function disableModules($module, $controllers)
+{
+	global $modSettings;
+
+	foreach ((array) $controllers as $controller)
+	{
+		if (!empty($modSettings['modules_' . $controller]))
+			$existing = explode(',', $modSettings['modules_' . $controller]);
+		else
+			$existing = array();
+
+		$existing = array_diff($existing, (array) $module);
+		updateSettings(array('modules_' . $controller => implode(',', $existing)));
+	}
+}
+
+function isModuleEnabled($module)
+{
+	global $modSettings;
+
+	$module = strtolower($module);
+	foreach ($modSettings as $key => $val)
+	{
+		if (substr($key, 0, 8) === 'modules_')
+		{
+			$modules = explode(',', $val);
+			if (in_array($module, $modules))
+				return true;
+		}
+	}
+
+	return false;
 }

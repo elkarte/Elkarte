@@ -128,9 +128,6 @@ function create_control_richedit($editorOptions)
 	// Load the Post language file... for the moment at least.
 	loadLanguage('Post');
 
-	if (!empty($context['drafts_save']) || !empty($context['drafts_pm_save']))
-		loadLanguage('Drafts');
-
 	// Every control must have a ID!
 	assert(isset($editorOptions['id']));
 	assert(isset($editorOptions['value']));
@@ -143,7 +140,9 @@ function create_control_richedit($editorOptions)
 
 		// Some general stuff.
 		$settings['smileys_url'] = $modSettings['smileys_url'] . '/' . $user_info['smiley_set'];
-		if (!empty($context['drafts_autosave']) && !empty($options['drafts_autosave_enabled']))
+
+		// @deprectated since 1.1
+		if (!isset($context['drafts_autosave_frequency']) && !empty($context['drafts_autosave']) && !empty($options['drafts_autosave_enabled']))
 			$context['drafts_autosave_frequency'] = empty($modSettings['drafts_autosave_frequency']) ? 30000 : $modSettings['drafts_autosave_frequency'] * 1000;
 
 		// This really has some WYSIWYG stuff.
@@ -165,16 +164,13 @@ function create_control_richedit($editorOptions)
 		if (!empty($txt['lang_locale']))
 			loadJavascriptFile($scripturl . '?action=jslocale;sa=sceditor', array('defer' => true), 'sceditor_language');
 
-		// Drafts?
-		if ((!empty($context['drafts_save']) || !empty($context['drafts_pm_save'])) && !empty($context['drafts_autosave']) && !empty($options['drafts_autosave_enabled']))
-			loadJavascriptFile('drafts.plugin.js');
-
 		// Mentions?
 		if (!empty($context['mentions_enabled']))
 			loadJavascriptFile(array('jquery.atwho.js', 'jquery.caret.min.js', 'mentioning.plugin.js'));
 
 		// Our not so concise shortcut line
-		$context['shortcuts_text'] = $txt['shortcuts' . (!empty($context['drafts_save']) || !empty($context['drafts_pm_save']) ? '_drafts' : '') . (isBrowser('is_firefox') ? '_firefox' : '')];
+		if (!isset($context['shortcuts_text']))
+			$context['shortcuts_text'] = $txt['shortcuts' . (isBrowser('is_firefox') ? '_firefox' : '')];
 
 		// Spellcheck?
 		$context['show_spellchecking'] = !empty($modSettings['enableSpellChecking']) && function_exists('pspell_new');
@@ -206,6 +202,10 @@ function create_control_richedit($editorOptions)
 		'preview_type' => isset($editorOptions['preview_type']) ? (int) $editorOptions['preview_type'] : 1,
 		'labels' => !empty($editorOptions['labels']) ? $editorOptions['labels'] : array(),
 		'locale' => !empty($txt['lang_locale']) ? $txt['lang_locale'] : 'en_US',
+		'plugin_addons' => !empty($editorOptions['plugin_addons']) ? $editorOptions['plugin_addons'] : array(),
+		'plugin_options' => !empty($editorOptions['plugin_options']) ? $editorOptions['plugin_options'] : array(),
+		'buttons' => !empty($editorOptions['buttons']) ? $editorOptions['buttons'] : array(),
+		'hidden_fields' => !empty($editorOptions['hidden_fields']) ? $editorOptions['hidden_fields'] : array(),
 	);
 
 	// Allow addons an easy way to add plugins, initialization objects, etc to the editor control

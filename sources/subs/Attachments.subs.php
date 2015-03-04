@@ -1845,3 +1845,25 @@ function getLegacyAttachmentFilename($filename, $attachment_id, $dir = null, $ne
 
 	return $filename;
 }
+
+/**
+ * Binds a set of attachments to a message.
+ *
+ * @package Attachments
+ * @param int $id_msg
+ * @param int[] $attachment_ids
+ */
+function bindMessageAttachments($id_msg, $attachment_ids)
+{
+	$db = database();
+
+	$db->query('', '
+		UPDATE {db_prefix}attachments
+		SET id_msg = {int:id_msg}
+		WHERE id_attach IN ({array_int:attachment_list})',
+		array(
+			'attachment_list' => $attachment_ids,
+			'id_msg' => $id_msg,
+		)
+	);
+}

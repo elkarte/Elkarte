@@ -122,13 +122,6 @@ class CoreFeatures_Controller extends Action_Controller
 	public function settings()
 	{
 		$core_features = array(
-			// cd = calendar.
-			'cd' => array(
-				'url' => 'action=admin;area=managecalendar',
-				'settings' => array(
-					'cal_enabled' => 1,
-				),
-			),
 			// cp = custom profile fields.
 			'cp' => array(
 				'url' => 'action=admin;area=featuresettings;sa=profile',
@@ -143,18 +136,6 @@ class CoreFeatures_Controller extends Action_Controller
 					else
 						return array();
 				},
-			),
-			// dr = drafts
-			'dr' => array(
-				'url' => 'action=admin;area=managedrafts',
-				'settings' => array(
-					'drafts_enabled' => 1,
-					'drafts_post_enabled' => 2,
-					'drafts_pm_enabled' => 2,
-					'drafts_autosave_enabled' => 2,
-					'drafts_show_saved_enabled' => 2,
-				),
-				'setting_callback' => 'drafts_toggle_callback',
 			),
 			// ih = Integration Hooks Handling.
 			'ih' => array(
@@ -177,11 +158,20 @@ class CoreFeatures_Controller extends Action_Controller
 					'likes_enabled' => 1,
 				),
 				'setting_callback' => function ($value) {
+					global $modSettings;
+
 					require_once(SUBSDIR . '/Mentions.subs.php');
 
 					// Makes all the like/rlike mentions invisible (or visible)
-					toggleMentionsVisibility('like', !empty($value));
-					toggleMentionsVisibility('rlike', !empty($value));
+					toggleMentionsVisibility('likemsg', !empty($value));
+					toggleMentionsVisibility('rlikemsg', !empty($value));
+
+					$current = !empty($modSettings['enabled_mentions']) ? explode(',', $modSettings['enabled_mentions']) : array();
+
+					if (!empty($value))
+						return array('enabled_mentions' => implode(',', array_merge($current, array('likemsg', 'rlikemsg'))));
+					else
+						return array('enabled_mentions' => implode(',', array_diff($current, array('likemsg', 'rlikemsg'))));
 				},
 			),
 			// ml = moderation log.
@@ -277,10 +267,53 @@ class CoreFeatures_Controller extends Action_Controller
 			),
 		);
 
+		$this->_getModulesConfig($core_features);
+
 		// Anyone who would like to add a core feature?
 		call_integration_hook('integrate_core_features', array(&$core_features));
 
 		return $core_features;
+	}
+
+	/**
+	 * Searches the ADMINDIR looking for module managers and load the "Core Feature"
+	 * if existing.
+	 *
+	 * @param mixed[] $core_features The core features array
+	 */
+	protected function _getModulesConfig(&$core_features)
+	{
+		foreach (glob(ADMINDIR . '/Manage*Module.controller.php') as $file)
+		{
+			$class = basename($file, '.controller.php') . '_Controller';
+
+			if (method_exists($class, 'addCoreFeature'))
+				$class::addCoreFeature($core_features);
+		}
+
+		$integrations = Hooks::get()->discoverIntegrations(ADDONSDIR);
+		$integrations += Hooks::get()->discoverIntegrations(SOURCEDIR);
+
+		foreach ($integrations as $integration)
+		{
+			$core_features[$integration['id']] = array(
+				'url' => empty($integration['details']->extra->setting_url) ? '?action=admin;area=addonsettings' : $integration['details']->extra->setting_url,
+				'title' => $integration['title'],
+				'desc' => $integration['description'],
+			);
+			if (method_exists($integration['class'], 'setting_callback'))
+			{
+				$core_features[$integration['id']]['setting_callback'] = function ($value) use ($integration) {
+					$integration['class']::setting_callback($value);
+				};
+			}
+			if (method_exists($integration['class'], 'setting_callback'))
+			{
+				$core_features[$integration['id']]['on_save'] = function () use ($integration) {
+					$integration['class']::on_save();
+				};
+			}
+		}
 	}
 
 	/**
@@ -416,6 +449,11 @@ class CoreFeatures_Controller extends Action_Controller
 				'image' => (file_exists($settings['theme_dir'] . '/images/admin/feature_' . $id . '.png') ? $settings['images_url'] : $settings['default_images_url']) . '/admin/feature_' . $id . '.png',
 			);
 		}
+
+		// Sort by title attribute
+		uasort($features, function($a, $b) {
+			return strcmp(strtolower($a['title']), strtolower($b['title']));
+		});
 
 		return $features;
 	}

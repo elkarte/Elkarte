@@ -616,9 +616,11 @@ class MessagesDelete
 			// Remove the mentions!
 			$db->query('', '
 				DELETE FROM {db_prefix}log_mentions
-				WHERE id_msg = {int:id_msg}',
+				WHERE id_target = {int:id_msg}
+				AND mention_type IN ({array_string:mension_types})',
 				array(
 					'id_msg' => $message,
+					'mension_types' => array('mentionmem', 'likemsg', 'rlikemsg'),
 				)
 			);
 

@@ -15,10 +15,17 @@ class TestMentions extends PHPUnit_Framework_TestCase
 	 */
 	public function setUp()
 	{
-		global $modSettings;
+		global $modSettings, $user_info;
 
 		// We are not logged in for this test, so lets fake it
 		$modSettings['mentions_enabled'] = true;
+
+		$modSettings['enabled_mentions'] = 'likemsg,mentionmem';
+
+		$user_info = array(
+			'id' => 1,
+			'ip' => '127.0.0.1',
+		);
 
 		// Lets start by ensuring a topic exists by creating one
 		require_once(SUBSDIR . '/Post.subs.php');
@@ -39,18 +46,18 @@ class TestMentions extends PHPUnit_Framework_TestCase
 			'mark_as_read' => false
 		);
 		$posterOptions = array(
-			'id' => 1,
+			'id' => $user_info['id'],
 			'name' => 'test-user',
 			'email' => 'noemail@test.tes',
 			'update_post_count' => false,
-			'ip' => ''
+			'ip' => '127.0.0.1'
 		);
 
 		// Attempt to make the new topic.
 		createPost($msgOptions, $topicOptions, $posterOptions);
 
 		// Keep id of the new topic.
-		$this->id_topic = $topicOptions['id'];
+		$this->id_msg = $msgOptions['id'];
 	}
 
 	/**
@@ -67,25 +74,25 @@ class TestMentions extends PHPUnit_Framework_TestCase
 	 */
 	public function testAddMentionByMember()
 	{
-		$mentions = new Mentions_Controller();
-
-		$test_message = basicMessageInfo($this->id_topic, true, true);
+		$mentions = new Mentions_Controller(new Event_Manager());
+		$mentions->pre_dispatch();
+		$id_member = 2;
 
 		// Lets mention the member
 		$mentions->setData(array(
-			'id_member' => 1,
-			'type' => 'men',
-			'id_msg' => $test_message['id_msg'],
+			'id_member' => $id_member,
+			'type' => 'mentionmem',
+			'id_msg' => $this->id_msg,
 			'status' => 'new',
 		));
 		$mentions->action_add();
 
 		// Get the number of mentions, should be one
-		$count = countUserMentions(false, 'men', 1);
+		$count = countUserMentions(false, 'mentionmem', $id_member);
 		$this->assertEquals(1, $count);
 
 		// Check this is thier mention
-		$this->assertTrue(findMemberMention(1, 1));
+		$this->assertTrue(findMemberMention(1, $id_member));
 	}
 
 	/**
@@ -93,21 +100,27 @@ class TestMentions extends PHPUnit_Framework_TestCase
 	 */
 	public function testAddMentionByLike()
 	{
-		$mentions = new Mentions_Controller();
+		global $user_info;
 
-		$test_message = basicMessageInfo($this->id_topic, true, true);
+		$mentions = new Mentions_Controller(new Event_Manager());
+		$mentions->pre_dispatch();
 
-		// Lets like a post mention
+		$user_info = array(
+			'id' => 2,
+			'ip' => '127.0.0.1',
+		);
+
+		// Lets like a post
 		$mentions->setData(array(
 			'id_member' => 1,
-			'type' => 'like',
-			'id_msg' => $test_message['id_msg'],
+			'type' => 'likemsg',
+			'id_msg' => $this->id_msg,
 			'status' => 'new',
 		));
 		$mentions->action_add();
 
 		// Get the number of mentions, should be one
-		$count = countUserMentions(false, 'like', 1);
+		$count = countUserMentions(false, 'likemsg', $user_info['id']);
 		$this->assertEquals(1, $count);
 	}
 
@@ -126,18 +139,34 @@ class TestMentions extends PHPUnit_Framework_TestCase
 	}
 
 	/**
-	 * Load all the users mentions
+	 * Loads the "current user" mentions.
 	 *
 	 * @depends testAddMentionByLike
 	 * @depends testAddMentionByMember
 	 */
-	public function testLoadMention()
+	public function testLoadCurrentUserMention()
 	{
 		global $user_info;
 
-		$user_info['id'] = 1;
+		// User 1 has 1 unread mention (i.e. the like)
+		$user_info = array(
+			'id' => 1,
+		);
+
 		$mentions = getUserMentions(0, 10, 'mtn.id_mention', true);
 
-		$this->assertEquals(2, count($mentions));
+		$this->assertEquals(1, count($mentions));
+
+		$user_info = array(
+			'id' => 2,
+		);
+
+		// User 2 has 1 total mentions
+		$mentions = getUserMentions(1, 10, 'mtn.id_mention', true);
+		$this->assertEquals(0, count($mentions));
+
+		// User 2 has 0 unread mention because it has been marked as read in testReadMention
+		$mentions = getUserMentions(1, 10, 'mtn.id_mention', false);
+		$this->assertEquals(0, count($mentions));
 	}
 }

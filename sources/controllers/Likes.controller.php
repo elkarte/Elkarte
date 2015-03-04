@@ -67,7 +67,7 @@ class Likes_Controller extends Action_Controller
 		global $txt;
 
 		// An error if not possible to like.
-		if (!$this->_doLikePost('+', 'like'))
+		if (!$this->_doLikePost('+', 'likemsg'))
 		{
 			loadLanguage('Errors');
 			$this->_likes_response = array('result' => false, 'data' => $txt['like_unlike_error']);
@@ -85,7 +85,7 @@ class Likes_Controller extends Action_Controller
 		global $txt;
 
 		// An error if not possible to like.
-		if (!$this->_doLikePost('-', 'rlike'))
+		if (!$this->_doLikePost('-', 'rlikemsg'))
 		{
 			loadLanguage('Errors');
 			$this->_likes_response = array('result' => false, 'data' => $txt['like_unlike_error']);
@@ -104,7 +104,7 @@ class Likes_Controller extends Action_Controller
 	{
 		global $topic;
 
-		$this->_doLikePost('+', 'like');
+		$this->_doLikePost('+', 'likemsg');
 
 		redirectexit('topic=' . $topic . '.msg' . $this->_id_liked . '#msg' . $this->_id_liked);
 	}
@@ -115,7 +115,7 @@ class Likes_Controller extends Action_Controller
 	 * Fills $_likes_response that can be used by likeResponse() in order to
 	 * return a JSON response
 	 * @param string $sign '+' or '-'
-	 * @param string $type the type of like 'like' or 'rlike'
+	 * @param string $type the type of like 'likemsg' or 'rlikemsg'
 	 *
 	 * @return bool
 	 */
@@ -142,7 +142,8 @@ class Likes_Controller extends Action_Controller
 					// Lets add in a mention to the member that just had their post liked
 					if (!empty($modSettings['mentions_enabled']))
 					{
-						$mentions = new Mentions_Controller();
+						$mentions = new Mentions_Controller(new Event_Manager());
+						$mentions->pre_dispatch();
 						$mentions->setData(array(
 							'id_member' => $liked_message['id_member'],
 							'type' => $type,
@@ -150,7 +151,7 @@ class Likes_Controller extends Action_Controller
 						));
 
 						// Notifying that likes were removed ?
-						if ($type === 'rlike' && !empty($modSettings['mentions_dont_notify_rlike']))
+						if ($type === 'rlikemsg' && !empty($modSettings['mentions_dont_notify_rlike']))
 							$mentions->action_rlike();
 						else
 							$mentions->action_add();
@@ -171,7 +172,7 @@ class Likes_Controller extends Action_Controller
 	{
 		global $user_info, $topic, $txt, $modSettings;
 
-		$this->_doLikePost('-', 'rlike');
+		$this->_doLikePost('-', 'rlikemsg');
 
 		if (!isset($_REQUEST['profile']))
 			redirectexit('topic=' . $topic . '.msg' . $this->_id_liked . '#msg' . $this->_id_liked);

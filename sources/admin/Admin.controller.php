@@ -31,6 +31,10 @@ if (!defined('ELK'))
  */
 class Admin_Controller extends Action_Controller
 {
+	public function pre_dispatch()
+	{
+		Hooks::get()->loadIntegrationsSettings();
+	}
 	/**
 	 * The main admin handling function.
 	 *
@@ -60,6 +64,7 @@ class Admin_Controller extends Action_Controller
 
 		// Need these to do much
 		require_once(SUBSDIR . '/Menu.subs.php');
+		require_once(SUBSDIR . '/Admin.subs.php');
 
 		// Define the menu structure - see subs/Menu.subs.php for details!
 		$admin_areas = array(
@@ -331,28 +336,6 @@ class Admin_Controller extends Action_Controller
 							'settings' => array($txt['settings']),
 						),
 					),
-					'managecalendar' => array(
-						'label' => $txt['manage_calendar'],
-						'controller' => 'ManageCalendar_Controller',
-						'function' => 'action_index',
-						'icon' => 'transparent.png',
-						'class' => 'admin_img_calendar',
-						'permission' => array('admin_forum'),
-						'enabled' => in_array('cd', $context['admin_features']),
-						'subsections' => array(
-							'holidays' => array($txt['manage_holidays'], 'admin_forum', 'enabled' => !empty($modSettings['cal_enabled'])),
-							'settings' => array($txt['calendar_settings'], 'admin_forum'),
-						),
-					),
-					'managedrafts' => array(
-						'label' => $txt['manage_drafts'],
-						'controller' => 'ManageDrafts_Controller',
-						'function' => 'action_index',
-						'icon' => 'transparent.png',
-						'class' => 'admin_img_logs',
-						'permission' => array('admin_forum'),
-						'enabled' => in_array('dr', $context['admin_features']),
-					),
 				),
 			),
 			'members' => array(
@@ -534,6 +517,8 @@ class Admin_Controller extends Action_Controller
 			),
 		);
 
+		$this->_getModulesMenu($admin_areas);
+
 		// Any files to include for administration?
 		call_integration_include_hook('integrate_admin_include');
 
@@ -580,6 +565,25 @@ class Admin_Controller extends Action_Controller
 	}
 
 	/**
+	 * Searches the ADMINDIR looking for module managers and load the corresponding
+	 * admin menu entry.
+	 *
+	 * @param mixed[] $admin_areas The admin menu array
+	 */
+	protected function _getModulesMenu(&$admin_areas)
+	{
+		foreach (glob(ADMINDIR . '/Manage*Module.controller.php') as $file)
+		{
+			$name = basename($file, '.controller.php');
+			$class = $name . '_Controller';
+			$module = strtolower(substr($name, 6, -6));
+
+			if (isModuleEnabled($module) && method_exists($class, 'addAdminMenu') )
+				$class::addAdminMenu($admin_areas);
+		}
+	}
+
+	/**
 	 * The main administration section.
 	 *
 	 * What it does:
@@ -597,7 +601,6 @@ class Admin_Controller extends Action_Controller
 
 		// We need a little help
 		require_once(SUBSDIR . '/Membergroups.subs.php');
-		require_once(SUBSDIR . '/Admin.subs.php');
 
 		// You have to be able to do at least one of the below to see this page.
 		isAllowedTo(array('admin_forum', 'manage_permissions', 'moderate_forum', 'manage_membergroups', 'manage_bans', 'send_mail', 'edit_news', 'manage_boards', 'manage_smileys', 'manage_attachments'));
@@ -772,7 +775,7 @@ class Admin_Controller extends Action_Controller
 
 		// Load a lot of language files.
 		$language_files = array(
-			'Help', 'ManageMail', 'ManageSettings', 'ManageCalendar', 'ManageBoards', 'ManagePaid', 'ManagePermissions', 'Search',
+			'Help', 'ManageMail', 'ManageSettings', 'ManageBoards', 'ManagePaid', 'ManagePermissions', 'Search',
 			'Login', 'ManageSmileys', 'Maillist',
 		);
 
@@ -780,7 +783,7 @@ class Admin_Controller extends Action_Controller
 		$include_files = array(
 			'AddonSettings.controller', 'AdminLog.controller', 'CoreFeatures.controller',
 			'ManageAttachments.controller', 'ManageAvatars.controller', 'ManageBBC.controller',
-			'ManageBoards.controller', 'ManageCalendar.controller', 'ManageDrafts.controller',
+			'ManageBoards.controller',
 			'ManageFeatures.controller', 'ManageLanguages.controller', 'ManageMail.controller',
 			'ManageNews.controller', 'ManagePaid.controller', 'ManagePermissions.controller',
 			'ManagePosts.controller', 'ManageRegistration.controller', 'ManageSearch.controller',
@@ -805,8 +808,6 @@ class Admin_Controller extends Action_Controller
 			array('settings_search', 'area=manageattachments;sa=avatars', 'ManageAvatars_Controller'),
 			array('settings_search', 'area=postsettings;sa=bbc', 'ManageBBC_Controller'),
 			array('settings_search', 'area=manageboards;sa=settings', 'ManageBoards_Controller'),
-			array('settings_search', 'area=managecalendar;sa=settings', 'ManageCalendar_Controller'),
-			array('settings_search', 'area=managedrafts', 'ManageDrafts_Controller'),
 			array('settings_search', 'area=languages;sa=settings', 'ManageLanguages_Controller'),
 			array('settings_search', 'area=mailqueue;sa=settings', 'ManageMail_Controller'),
 			array('settings_search', 'area=maillist;sa=emailsettings', 'ManageMaillist_Controller'),
@@ -857,7 +858,8 @@ class Admin_Controller extends Action_Controller
 		$_POST['membername'] = un_htmlspecialchars($context['search_term']);
 		$_POST['types'] = '';
 
-		$managemembers = new ManageMembers_Controller();
+		$managemembers = new ManageMembers_Controller(new Event_manager());
+		$managemembers->pre_dispatch();
 		$managemembers->action_index();
 	}
 

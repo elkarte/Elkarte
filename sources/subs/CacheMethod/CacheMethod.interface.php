@@ -1,4 +1,5 @@
 <?php
+
 /**
  * The interface of the caching methods
  *

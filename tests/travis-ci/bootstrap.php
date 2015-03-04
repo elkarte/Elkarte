@@ -40,6 +40,7 @@ if (!defined('ELK'))
 	DEFINE('ADMINDIR', $sourcedir . '/admin');
 	DEFINE('CONTROLLERDIR', $sourcedir . '/controllers');
 	DEFINE('SUBSDIR', $sourcedir . '/subs');
+	DEFINE('ADDONSDIR', $sourcedir . '/addons');
 }
 else
 	require_once('/var/www/Settings.php');

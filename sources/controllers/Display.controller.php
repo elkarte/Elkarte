@@ -24,8 +24,22 @@ if (!defined('ELK'))
  * This controller is the most important and probably most accessed of all.
  * It controls topic display, with all related.
  */
-class Display_Controller
+class Display_Controller extends Action_Controller
 {
+	/**
+	 * The template layers object
+	 *
+	 * @var null|object
+	 */
+	protected $_template_layers = null;
+
+	/**
+	 * The message id when in the form msg123
+	 *
+	 * @var int
+	 */
+	protected $_virtual_msg = 0;
+
 	/**
 	 * Default action handler for this controller
 	 */
@@ -52,6 +66,8 @@ class Display_Controller
 		global $options, $user_info, $board_info, $topic, $board;
 		global $attachments, $messages_request;
 
+		$this->_events->trigger('pre_load', array('_REQUEST' => &$_REQUEST, 'topic' => $topic, 'board' => &$board));
+
 		// What are you gonna display if these are empty?!
 		if (empty($topic))
 			fatal_lang_error('no_board', false);
@@ -69,8 +85,8 @@ class Display_Controller
 
 		// How much are we sticking on each page?
 		$context['messages_per_page'] = empty($modSettings['disableCustomPerPage']) && !empty($options['messages_per_page']) ? $options['messages_per_page'] : $modSettings['defaultMaxMessages'];
-		$template_layers = Template_Layers::getInstance();
-		$template_layers->addEnd('messages_informations');
+		$this->_template_layers = Template_Layers::getInstance();
+		$this->_template_layers->addEnd('messages_informations');
 		$includeUnapproved = !$modSettings['postmod_active'] || allowedTo('approve_posts');
 
 		// Let's do some work on what to search index.
@@ -145,6 +161,8 @@ class Display_Controller
 			}
 		}
 
+		$this->_events->trigger('topicinfo', array('topicinfo' => &$topicinfo));
+
 		// Add up unapproved replies to get real number of replies...
 		if ($modSettings['postmod_active'] && allowedTo('approve_posts'))
 			$context['real_num_replies'] += $topicinfo['unapproved_posts'] - ($topicinfo['approved'] ? 0 : 1);
@@ -212,31 +230,20 @@ class Display_Controller
 			// Link to a message...
 			elseif (substr($_REQUEST['start'], 0, 3) == 'msg')
 			{
-				$virtual_msg = (int) substr($_REQUEST['start'], 3);
-				if (!$topicinfo['unapproved_posts'] && $virtual_msg >= $topicinfo['id_last_msg'])
+				$this->_virtual_msg = (int) substr($_REQUEST['start'], 3);
+				if (!$topicinfo['unapproved_posts'] && $this->_virtual_msg >= $topicinfo['id_last_msg'])
 					$context['start_from'] = $total_visible_posts - 1;
-				elseif (!$topicinfo['unapproved_posts'] && $virtual_msg <= $topicinfo['id_first_msg'])
+				elseif (!$topicinfo['unapproved_posts'] && $this->_virtual_msg <= $topicinfo['id_first_msg'])
 					$context['start_from'] = 0;
 				else
 				{
 					$only_approved = $modSettings['postmod_active'] && $topicinfo['unapproved_posts'] && !allowedTo('approve_posts');
-					$context['start_from'] = countMessagesBefore($topic, $virtual_msg, false, $only_approved, !$user_info['is_guest']);
+					$context['start_from'] = countMessagesBefore($topic, $this->_virtual_msg, false, $only_approved, !$user_info['is_guest']);
 				}
 
 				// We need to reverse the start as well in this case.
 				$_REQUEST['start'] = $context['start_from'];
 			}
-		}
-
-		// Mark the mention as read if requested
-		if (isset($_REQUEST['mentionread']) && !empty($virtual_msg))
-		{
-			$mentions = new Mentions_Controller();
-			$mentions->setData(array(
-				'id_mention' => $_REQUEST['item'],
-				'mark' => $_REQUEST['mark'],
-			));
-			$mentions->action_markread();
 		}
 
 		// Create a previous next string if the selected theme has it as a selected option.
@@ -287,7 +294,7 @@ class Display_Controller
 		// Did we report a post to a moderator just now?
 		$context['report_sent'] = isset($_GET['reportsent']);
 		if ($context['report_sent'])
-			$template_layers->add('report_sent');
+			$this->_template_layers->add('report_sent');
 
 		// Let's get nosey, who is viewing this topic?
 		if (!empty($settings['display_who_viewing']))
@@ -346,7 +353,7 @@ class Display_Controller
 		$context['is_very_hot'] = $topicinfo['num_replies'] >= $modSettings['hotTopicVeryPosts'];
 		$context['is_hot'] = $topicinfo['num_replies'] >= $modSettings['hotTopicPosts'];
 		$context['is_approved'] = $topicinfo['approved'];
-		$context['is_poll'] = $topicinfo['id_poll'] > 0 && !empty($modSettings['pollMode']) && allowedTo('poll_view');
+
 		determineTopicClass($context);
 
 		// Did this user start the topic or not?
@@ -357,81 +364,13 @@ class Display_Controller
 		$context['subject'] = $topicinfo['subject'];
 		$context['num_views'] = $topicinfo['num_views'];
 		$context['num_views_text'] = $context['num_views'] == 1 ? $txt['read_one_time'] : sprintf($txt['read_many_times'], $context['num_views']);
-		$context['mark_unread_time'] = !empty($virtual_msg) ? $virtual_msg : $topicinfo['new_from'];
+		$context['mark_unread_time'] = !empty($this->_virtual_msg) ? $this->_virtual_msg : $topicinfo['new_from'];
 
 		// Set a canonical URL for this page.
 		$context['canonical_url'] = $scripturl . '?topic=' . $topic . '.' . $context['start'];
 
 		// For quick reply we need a response prefix in the default forum language.
 		$context['response_prefix'] = response_prefix();
-
-		// If we want to show event information in the topic, prepare the data.
-		if (allowedTo('calendar_view') && !empty($modSettings['cal_showInTopic']) && !empty($modSettings['cal_enabled']))
-		{
-			// We need events details and all that jazz
-			require_once(SUBSDIR . '/Calendar.subs.php');
-
-			// First, try create a better time format, ignoring the "time" elements.
-			if (preg_match('~%[AaBbCcDdeGghjmuYy](?:[^%]*%[AaBbCcDdeGghjmuYy])*~', $user_info['time_format'], $matches) == 0 || empty($matches[0]))
-				$date_string = $user_info['time_format'];
-			else
-				$date_string = $matches[0];
-
-			// Get event information for this topic.
-			$events = eventInfoForTopic($topic);
-
-			$context['linked_calendar_events'] = array();
-			foreach ($events as $event)
-			{
-				// Prepare the dates for being formatted.
-				$start_date = sscanf($event['start_date'], '%04d-%02d-%02d');
-				$start_date = mktime(12, 0, 0, $start_date[1], $start_date[2], $start_date[0]);
-				$end_date = sscanf($event['end_date'], '%04d-%02d-%02d');
-				$end_date = mktime(12, 0, 0, $end_date[1], $end_date[2], $end_date[0]);
-
-				$context['linked_calendar_events'][] = array(
-					'id' => $event['id_event'],
-					'title' => $event['title'],
-					'can_edit' => allowedTo('calendar_edit_any') || ($event['id_member'] == $user_info['id'] && allowedTo('calendar_edit_own')),
-					'modify_href' => $scripturl . '?action=post;msg=' . $topicinfo['id_first_msg'] . ';topic=' . $topic . '.0;calendar;eventid=' . $event['id_event'] . ';' . $context['session_var'] . '=' . $context['session_id'],
-					'can_export' => allowedTo('calendar_edit_any') || ($event['id_member'] == $user_info['id'] && allowedTo('calendar_edit_own')),
-					'export_href' => $scripturl . '?action=calendar;sa=ical;eventid=' . $event['id_event'] . ';' . $context['session_var'] . '=' . $context['session_id'],
-				'start_date' => standardTime($start_date, $date_string, 'none'),
-					'start_timestamp' => $start_date,
-				'end_date' => standardTime($end_date, $date_string, 'none'),
-					'end_timestamp' => $end_date,
-					'is_last' => false
-				);
-			}
-
-			if (!empty($context['linked_calendar_events']))
-			{
-				$context['linked_calendar_events'][count($context['linked_calendar_events']) - 1]['is_last'] = true;
-				$template_layers->add('display_calendar');
-			}
-		}
-
-		// Create the poll info if it exists.
-		if ($context['is_poll'])
-		{
-			$template_layers->add('display_poll');
-			require_once(SUBSDIR . '/Poll.subs.php');
-
-			loadPollContext($topicinfo['id_poll']);
-
-			// Build the poll moderation button array.
-			$context['poll_buttons'] = array(
-				'vote' => array('test' => 'allow_return_vote', 'text' => 'poll_return_vote', 'image' => 'poll_options.png', 'lang' => true, 'url' => $scripturl . '?topic=' . $context['current_topic'] . '.' . $context['start']),
-				'results' => array('test' => 'allow_poll_view', 'text' => 'poll_results', 'image' => 'poll_results.png', 'lang' => true, 'url' => $scripturl . '?topic=' . $context['current_topic'] . '.' . $context['start'] . ';viewresults'),
-				'change_vote' => array('test' => 'allow_change_vote', 'text' => 'poll_change_vote', 'image' => 'poll_change_vote.png', 'lang' => true, 'url' => $scripturl . '?action=poll;sa=vote;topic=' . $context['current_topic'] . '.' . $context['start'] . ';poll=' . $context['poll']['id'] . ';' . $context['session_var'] . '=' . $context['session_id']),
-				'lock' => array('test' => 'allow_lock_poll', 'text' => (!$context['poll']['is_locked'] ? 'poll_lock' : 'poll_unlock'), 'image' => 'poll_lock.png', 'lang' => true, 'url' => $scripturl . '?action=lockvoting;topic=' . $context['current_topic'] . '.' . $context['start'] . ';' . $context['session_var'] . '=' . $context['session_id']),
-				'edit' => array('test' => 'allow_edit_poll', 'text' => 'poll_edit', 'image' => 'poll_edit.png', 'lang' => true, 'url' => $scripturl . '?action=editpoll;topic=' . $context['current_topic'] . '.' . $context['start']),
-				'remove_poll' => array('test' => 'can_remove_poll', 'text' => 'poll_remove', 'image' => 'admin_remove_poll.png', 'lang' => true, 'custom' => 'onclick="return confirm(\'' . $txt['poll_remove_warn'] . '\');"', 'url' => $scripturl . '?action=poll;sa=remove;topic=' . $context['current_topic'] . '.' . $context['start'] . ';' . $context['session_var'] . '=' . $context['session_id']),
-			);
-
-			// Allow mods to add additional buttons here
-			call_integration_hook('integrate_poll_buttons');
-		}
 
 		// Calculate the fastest way to get the messages!
 		$ascending = true;
@@ -595,7 +534,6 @@ class Display_Controller
 			'can_sticky' => 'make_sticky',
 			'can_merge' => 'merge_any',
 			'can_split' => 'split_any',
-			'calendar_post' => 'calendar_post',
 			'can_mark_notify' => 'mark_any_notify',
 			'can_send_topic' => 'send_topic',
 			'can_send_pm' => 'pm_send',
@@ -614,8 +552,6 @@ class Display_Controller
 			'can_move' => 'move',
 			'can_lock' => 'lock',
 			'can_delete' => 'remove',
-			'can_add_poll' => 'poll_add',
-			'can_remove_poll' => 'poll_remove',
 			'can_reply' => 'post_reply',
 			'can_reply_unapproved' => 'post_unapproved_replies',
 		);
@@ -625,9 +561,6 @@ class Display_Controller
 		// Cleanup all the permissions with extra stuff...
 		$context['can_mark_notify'] &= !$context['user']['is_guest'];
 		$context['can_sticky'] &= !empty($modSettings['enableStickyTopics']);
-		$context['calendar_post'] &= !empty($modSettings['cal_enabled']) && (allowedTo('modify_any') || ($context['user']['started'] && allowedTo('modify_own')));
-		$context['can_add_poll'] &= !empty($modSettings['pollMode']) && $topicinfo['id_poll'] <= 0;
-		$context['can_remove_poll'] &= !empty($modSettings['pollMode']) && $topicinfo['id_poll'] > 0;
 		$context['can_reply'] &= empty($topicinfo['locked']) || allowedTo('moderate_board');
 		$context['can_reply_unapproved'] &= $modSettings['postmod_active'] && (empty($topicinfo['locked']) || allowedTo('moderate_board'));
 		$context['can_issue_warning'] &= in_array('w', $context['admin_features']) && !empty($modSettings['warning_enable']);
@@ -650,32 +583,6 @@ class Display_Controller
 
 		$context['can_follow_up'] = !empty($modSettings['enableFollowup']) && boardsallowedto('post_new') !== array();
 
-		// Check if the draft functions are enabled and that they have permission to use them (for quick reply.)
-		$context['drafts_save'] = !empty($modSettings['drafts_enabled']) && !empty($modSettings['drafts_post_enabled']) && allowedTo('post_draft') && $context['can_reply'];
-		$context['drafts_autosave'] = !empty($context['drafts_save']) && !empty($modSettings['drafts_autosave_enabled']) && allowedTo('post_autosave_draft');
-		if (!empty($context['drafts_save']))
-			loadLanguage('Drafts');
-
-		if (!empty($context['drafts_autosave']) && empty($options['use_editor_quick_reply']))
-			loadJavascriptFile('drafts.js');
-
-		if (!empty($modSettings['mentions_enabled']))
-		{
-			$context['mentions_enabled'] = true;
-
-			// Just using the plain text quick reply and not the editor
-			if (empty($options['use_editor_quick_reply']))
-				loadJavascriptFile(array('jquery.atwho.js', 'jquery.caret.min.js', 'mentioning.js'));
-
-			loadCSSFile('jquery.atwho.css');
-
-			addInlineJavascript('
-			$(document).ready(function () {
-				for (var i = 0, count = all_elk_mentions.length; i < count; i++)
-					all_elk_mentions[i].oMention = new elk_mentions(all_elk_mentions[i].oOptions);
-			});');
-		}
-
 		// Load up the Quick ModifyTopic and Quick Reply scripts
 		loadJavascriptFile('topic.js');
 
@@ -689,6 +596,22 @@ class Display_Controller
 			);
 		}
 
+		// Now create the editor.
+		$editorOptions = array(
+			'id' => 'message',
+			'value' => '',
+			'labels' => array(
+				'post_button' => $txt['post'],
+			),
+			// add height and width for the editor
+			'height' => '250px',
+			'width' => '100%',
+			// We do XML preview here.
+			'preview_type' => 0,
+		);
+
+		$this->_events->trigger('prepare_context', array('editorOptions' => &$editorOptions, 'use_quick_reply' => !empty($options['display_quick_reply'])));
+
 		// Load up the "double post" sequencing magic.
 		if (!empty($options['display_quick_reply']))
 		{
@@ -700,29 +623,7 @@ class Display_Controller
 				// Needed for the editor and message icons.
 				require_once(SUBSDIR . '/Editor.subs.php');
 
-				// Now create the editor.
-				$editorOptions = array(
-					'id' => 'message',
-					'value' => '',
-					'labels' => array(
-						'post_button' => $txt['post'],
-					),
-					// add height and width for the editor
-					'height' => '250px',
-					'width' => '100%',
-					// We do XML preview here.
-					'preview_type' => 0,
-				);
 				create_control_richedit($editorOptions);
-
-				$context['attached'] = '';
-				$context['make_poll'] = isset($_REQUEST['poll']);
-
-				// Message icons - customized icons are off?
-				$context['icons'] = getMessageIcons($board);
-
-				if (!empty($context['icons']))
-					$context['icons'][count($context['icons']) - 1]['is_last'] = true;
 			}
 		}
 
@@ -754,7 +655,6 @@ class Display_Controller
 			'lock' => array('test' => 'can_lock', 'text' => empty($context['is_locked']) ? 'set_lock' : 'set_unlock', 'image' => 'admin_lock.png', 'lang' => true, 'url' => $scripturl . '?action=topic;sa=lock;topic=' . $context['current_topic'] . '.' . $context['start'] . ';' . $context['session_var'] . '=' . $context['session_id']),
 			'sticky' => array('test' => 'can_sticky', 'text' => empty($context['is_sticky']) ? 'set_sticky' : 'set_nonsticky', 'image' => 'admin_sticky.png', 'lang' => true, 'url' => $scripturl . '?action=topic;sa=sticky;topic=' . $context['current_topic'] . '.' . $context['start'] . ';' . $context['session_var'] . '=' . $context['session_id']),
 			'merge' => array('test' => 'can_merge', 'text' => 'merge', 'image' => 'merge.png', 'lang' => true, 'url' => $scripturl . '?action=mergetopics;board=' . $context['current_board'] . '.0;from=' . $context['current_topic']),
-			'calendar' => array('test' => 'calendar_post', 'text' => 'calendar_link', 'image' => 'linktocal.png', 'lang' => true, 'url' => $scripturl . '?action=post;calendar;msg=' . $context['topic_first_message'] . ';topic=' . $context['current_topic'] . '.0'),
 		);
 
 		// Restore topic. eh?  No monkey business.
@@ -762,8 +662,8 @@ class Display_Controller
 			$context['mod_buttons'][] = array('text' => 'restore_topic', 'image' => '', 'lang' => true, 'url' => $scripturl . '?action=restoretopic;topics=' . $context['current_topic'] . ';' . $context['session_var'] . '=' . $context['session_id']);
 
 		if ($context['can_reply'] && !empty($options['display_quick_reply']))
-			$template_layers->add('quickreply');
-		$template_layers->add('pages_and_buttons');
+			$this->_template_layers->add('quickreply');
+		$this->_template_layers->add('pages_and_buttons');
 
 		// Allow adding new buttons easily.
 		call_integration_hook('integrate_display_buttons');

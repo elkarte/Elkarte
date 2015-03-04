@@ -29,7 +29,6 @@ if ($db->num_rows($request) == 0)
 ---}
 ---#
 
-
 ---# Adding new columns to members table...
 ---{
 $db_table->db_add_column('{db_prefix}members',
@@ -53,5 +52,115 @@ $db_table->db_add_column('{db_prefix}members',
 	'ignore'
 );
 
+---}
+---#
+
+/******************************************************************************/
+--- Adapt mentions...
+/******************************************************************************/
+
+---# Separate visibility from accessibility...
+---{
+$db_table->db_add_column('{db_prefix}log_mentions',
+	array(
+		'name' => 'is_accessible',
+		'type' => 'tinyint',
+		'size' => 1,
+		'default' => 0
+	)
+);
+
+$db_table->db_change_column('{db_prefix}log_mentions',
+	'mention_type',
+	array(
+		'type' => 'varchar',
+		'size' => 12,
+		'default' => ''
+	)
+);
+
+$db->query('', '
+	UPDATE {db_prefix}log_mentions
+	SET is_accessible = CASE WHEN status < 0 THEN 0 ELSE 1 END',
+	array()
+);
+
+$db->query('', '
+	UPDATE {db_prefix}log_mentions
+	SET status = -(status + 1)
+	WHERE status < 0',
+	array()
+);
+
+$db->query('', '
+	UPDATE {db_prefix}log_mentions
+	SET mention_type = mentionmem
+	WHERE mention_type = men',
+	array()
+);
+
+$db->query('', '
+	UPDATE {db_prefix}log_mentions
+	SET mention_type = likemsg
+	WHERE mention_type = like',
+	array()
+);
+
+$db->query('', '
+	UPDATE {db_prefix}log_mentions
+	SET mention_type = rlikemsg
+	WHERE mention_type = rlike',
+	array()
+);
+
+$enabled_mentions = !empty($modSettings['enabled_mentions']) ? explode(',', $modSettings['enabled_mentions']) : array();
+$known_settings = array(
+	'mentions_enabled' => 'mentionmem',
+	'likes_enabled' => 'likemsg',
+	'mentions_dont_notify_rlike' => 'rlikemsg',
+	'mentions_buddy' => 'buddy',
+);
+foreach ($known_settings as $setting => $toggle)
+{
+	if (!empty($modSettings[$setting]))
+		$enabled_mentions[] = $toggle;
+	else
+		$enabled_mentions = array_diff($enabled_mentions, array($toggle));
+}
+updateSettings(array('enabled_mentions' => implode(',', $enabled_mentions)));
+---}
+---#
+
+---# Make mentions generic and not message-centric...
+---{
+$db_table->db_change_column('{db_prefix}log_mentions', 'id_msg',
+	array(
+		'name' => 'id_target',
+	)
+);
+---}
+---#
+
+---# Introducing modules...
+---{
+if (!empty($modSettings['attachmentEnable']))
+{
+	enableModules('attachments', array('post'));
+}
+if (!empty($modSettings['cal_enabled']))
+{
+	enableModules('calendar', array('post', 'boardindex'));
+	Hooks::get()->enableIntegration('Calendar_Integrate');
+}
+if (!empty($modSettings['drafts_enabled']))
+{
+	enableModules('drafts', array('post', 'display', 'profile', 'personalmessage'));
+	Hooks::get()->enableIntegration('Drafts_Integrate');
+}
+if (!empty($modSettings['enabled_mentions']))
+{
+	enableModules('mention', 'post', 'display');
+}
+enableModules('poll', array('display'));
 ---}
 ---#

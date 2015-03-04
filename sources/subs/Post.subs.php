@@ -574,6 +574,7 @@ function createPost(&$msgOptions, &$topicOptions, &$posterOptions)
 	// Set optional parameters to the default value.
 	$msgOptions['icon'] = empty($msgOptions['icon']) ? 'xx' : $msgOptions['icon'];
 	$msgOptions['smileys_enabled'] = !empty($msgOptions['smileys_enabled']);
+	// @todo 2015/03/02 - The following line should probably be moved to a module
 	$msgOptions['attachments'] = empty($msgOptions['attachments']) ? array() : $msgOptions['attachments'];
 	$msgOptions['approved'] = isset($msgOptions['approved']) ? (int) $msgOptions['approved'] : 1;
 	$topicOptions['id'] = empty($topicOptions['id']) ? 0 : (int) $topicOptions['id'];
@@ -681,18 +682,6 @@ function createPost(&$msgOptions, &$topicOptions, &$posterOptions)
 	if (empty($msgOptions['id']))
 		return false;
 
-	// Fix the attachments.
-	if (!empty($msgOptions['attachments']))
-		$db->query('', '
-			UPDATE {db_prefix}attachments
-			SET id_msg = {int:id_msg}
-			WHERE id_attach IN ({array_int:attachment_list})',
-			array(
-				'attachment_list' => $msgOptions['attachments'],
-				'id_msg' => $msgOptions['id'],
-			)
-		);
-
 	// What if we want to export new posts out to a CMS?
 	call_integration_hook('integrate_create_post', array($msgOptions, $topicOptions, $posterOptions, $message_columns, $message_parameters));
 
@@ -710,12 +699,17 @@ function createPost(&$msgOptions, &$topicOptions, &$posterOptions)
 			'id_redirect_topic' => 'int',
 		);
 		$topic_parameters = array(
-			'id_board' => $topicOptions['board'], 'id_member_started' => $posterOptions['id'],
-			'id_member_updated' => $posterOptions['id'], 'id_first_msg' => $msgOptions['id'],
-			'id_last_msg' => $msgOptions['id'], 'locked' => $topicOptions['lock_mode'] === null ? 0 : $topicOptions['lock_mode'],
-			'is_sticky' => $topicOptions['sticky_mode'] === null ? 0 : $topicOptions['sticky_mode'], 'num_views' => 0,
+			'id_board' => $topicOptions['board'],
+			'id_member_started' => $posterOptions['id'],
+			'id_member_updated' => $posterOptions['id'],
+			'id_first_msg' => $msgOptions['id'],
+			'id_last_msg' => $msgOptions['id'],
+			'locked' => $topicOptions['lock_mode'] === null ? 0 : $topicOptions['lock_mode'],
+			'is_sticky' => $topicOptions['sticky_mode'] === null ? 0 : $topicOptions['sticky_mode'],
+			'num_views' => 0,
 			'id_poll' => $topicOptions['poll'] === null ? 0 : $topicOptions['poll'],
-			'unapproved_posts' =>  $msgOptions['approved'] ? 0 : 1, 'approved' => $msgOptions['approved'],
+			'unapproved_posts' =>  $msgOptions['approved'] ? 0 : 1,
+			'approved' => $msgOptions['approved'],
 			'redirect_expires' => $topicOptions['redirect_expires'] === null ? 0 : $topicOptions['redirect_expires'],
 			'id_redirect_topic' => $topicOptions['redirect_topic'] === null ? 0 : $topicOptions['redirect_topic'],
 		);

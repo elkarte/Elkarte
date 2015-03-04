@@ -66,6 +66,9 @@ class BoardIndex_Controller extends Action_Controller
 			'set_latest_post' => true,
 			'countChildPosts' => !empty($modSettings['countChildPosts']),
 		);
+
+		$this->_events->trigger('pre_load', array('boardIndexOptions' => &$boardIndexOptions));
+
 		$boardlist = new Boards_List($boardIndexOptions);
 		$context['categories'] = $boardlist->getBoards();
 		$context['latest_post'] = $boardlist->getLatestPost();
@@ -103,47 +106,25 @@ class BoardIndex_Controller extends Action_Controller
 		$context['show_member_list'] = allowedTo('view_mlist');
 		$context['show_who'] = allowedTo('who_view') && !empty($modSettings['who_enabled']);
 
-		// Load the calendar?
-		if (!empty($modSettings['cal_enabled']) && allowedTo('calendar_view'))
-		{
-			// Retrieve the calendar data (events, birthdays, holidays).
-			$eventOptions = array(
-				'include_holidays' => $modSettings['cal_showholidays'] > 1,
-				'include_birthdays' => $modSettings['cal_showbdays'] > 1,
-				'include_events' => $modSettings['cal_showevents'] > 1,
-				'num_days_shown' => empty($modSettings['cal_days_for_index']) || $modSettings['cal_days_for_index'] < 1 ? 1 : $modSettings['cal_days_for_index'],
-			);
-			$context += cache_quick_get('calendar_index_offset_' . ($user_info['time_offset'] + $modSettings['time_offset']), 'subs/Calendar.subs.php', 'cache_getRecentEvents', array($eventOptions));
-
-			// Whether one or multiple days are shown on the board index.
-			$context['calendar_only_today'] = $modSettings['cal_days_for_index'] == 1;
-
-			// This is used to show the "how-do-I-edit" help.
-			$context['calendar_can_edit'] = allowedTo('calendar_edit_any');
-			$show_calendar = true;
-		}
-		else
-			$show_calendar = false;
 
 		$context['page_title'] = sprintf($txt['forum_index'], $context['forum_name']);
 		$context['sub_template'] = 'boards_list';
-
-		// Mark read button
-		$context['mark_read_button'] = array(
-			'markread' => array('text' => 'mark_as_read', 'image' => 'markread.png', 'lang' => true, 'custom' => 'onclick="return markallreadButton(this);"', 'url' => $scripturl . '?action=markasread;sa=all;bi;' . $context['session_var'] . '=' . $context['session_id']),
-		);
 
 		$context['info_center_callbacks'] = array();
 		if (!empty($settings['number_recent_posts']) && (!empty($context['latest_posts']) || !empty($context['latest_post'])))
 			$context['info_center_callbacks'][] = 'recent_posts';
 
-		if ($show_calendar)
-			$context['info_center_callbacks'][] = 'show_events';
-
 		if (!empty($settings['show_stats_index']))
 			$context['info_center_callbacks'][] = 'show_stats';
 
 		$context['info_center_callbacks'][] = 'show_users';
+
+		$this->_events->trigger('post_load', array('callbacks' => &$context['info_center_callbacks']));
+
+		// Mark read button
+		$context['mark_read_button'] = array(
+			'markread' => array('text' => 'mark_as_read', 'image' => 'markread.png', 'lang' => true, 'custom' => 'onclick="return markallreadButton(this);"', 'url' => $scripturl . '?action=markasread;sa=all;bi;' . $context['session_var'] . '=' . $context['session_id']),
+		);
 
 		// Allow mods to add additional buttons here
 		call_integration_hook('integrate_mark_read_button');

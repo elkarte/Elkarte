@@ -183,7 +183,7 @@ class Calendar_Controller extends Action_Controller
 	 */
 	public function action_post()
 	{
-		global $context, $txt, $user_info, $scripturl, $modSettings, $topic;
+		global $context, $txt, $user_info, $modSettings;
 
 		// You need to view what you're doing :P
 		isAllowedTo('calendar_view');
@@ -191,65 +191,28 @@ class Calendar_Controller extends Action_Controller
 		// Well - can they post?
 		isAllowedTo('calendar_post');
 
-		// We need this for all kinds of useful functions.
-		require_once(SUBSDIR . '/Calendar.subs.php');
-
 		// Cast this for safety...
 		$event_id = isset($_REQUEST['eventid']) ? (int) $_REQUEST['eventid'] : null;
 
 		// Submitting?
 		if (isset($_POST[$context['session_var']], $event_id))
 		{
-			checkSession();
-
-			// Validate the post...
-			if (!isset($_POST['link_to_board']))
-				$this->validateEventPost();
-
-			// If you're not allowed to edit any events, you have to be the poster.
-			if ($event_id > 0 && !allowedTo('calendar_edit_any'))
-				isAllowedTo('calendar_edit_' . (!empty($user_info['id']) && getEventPoster($event_id) == $user_info['id'] ? 'own' : 'any'));
-
-			// New - and directing?
-			if ($event_id == -1 && isset($_POST['link_to_board']))
-			{
-				$_REQUEST['calendar'] = 1;
-				$controller = new Post_Controller();
-				return $controller->action_post();
-			}
-
-			$this->_action_save($event_id);
-
-			// No point hanging around here now...
-			redirectexit($scripturl . '?action=calendar;month=' . $_POST['month'] . ';year=' . $_POST['year']);
+			return $this->action_save();
 		}
 
 		// If we are not enabled... we are not enabled.
 		if (empty($modSettings['cal_allow_unlinked']) && empty($event_id))
 		{
 			$_REQUEST['calendar'] = 1;
-			$controller = new Post_Controller();
-			return $controller->action_post();
+			return $this->_returnToPost();
 		}
 
-		// New?
-		if (!isset($event_id))
+		$event = new Calendar_Event($event_id, $modSettings);
+
+		$context['event'] = $event->load($_REQUEST, $user_info['id']);
+
+		if ($event->isNew())
 		{
-			$today = getdate();
-
-			$context['event'] = array(
-				'boards' => array(),
-				'board' => 0,
-				'new' => 1,
-				'eventid' => -1,
-				'year' => isset($_REQUEST['year']) ? $_REQUEST['year'] : $today['year'],
-				'month' => isset($_REQUEST['month']) ? $_REQUEST['month'] : $today['mon'],
-				'day' => isset($_REQUEST['day']) ? $_REQUEST['day'] : $today['mday'],
-				'title' => '',
-				'span' => 1,
-			);
-			$context['event']['last_day'] = (int) strftime('%d', mktime(0, 0, 0, $context['event']['month'] == 12 ? 1 : $context['event']['month'] + 1, 0, $context['event']['month'] == 12 ? $context['event']['year'] + 1 : $context['event']['year']));
-
 			// Get list of boards that can be posted in.
 			$boards = boardsAllowedTo('post_new');
 			if (empty($boards))
@@ -264,37 +227,89 @@ class Calendar_Controller extends Action_Controller
 			);
 			$context += getBoardList($boardListOptions);
 		}
-		else
-		{
-			// Reload the event after making changes
-			$context['event'] = getEventProperties($event_id);
-
-			if ($context['event'] === false)
-				fatal_lang_error('no_access', false);
-
-			// If it has a board, then they should be editing it within the topic.
-			if (!empty($context['event']['topic']['id']) && !empty($context['event']['topic']['first_msg']))
-			{
-				// We load the board up, for a check on the board access rights...
-				$topic = $context['event']['topic']['id'];
-				loadBoard();
-			}
-
-			// Make sure the user is allowed to edit this event.
-			if ($context['event']['member'] != $user_info['id'])
-				isAllowedTo('calendar_edit_any');
-			elseif (!allowedTo('calendar_edit_any'))
-				isAllowedTo('calendar_edit_own');
-		}
 
 		// Template, sub template, etc.
 		loadTemplate('Calendar');
 		$context['sub_template'] = 'unlinked_event_post';
 
-		$context['page_title'] = isset($event_id) ? $txt['calendar_edit'] : $txt['calendar_post_event'];
+		$context['page_title'] = $event->isNew() ? $txt['calendar_edit'] : $txt['calendar_post_event'];
 		$context['linktree'][] = array(
 			'name' => $context['page_title'],
 		);
+	}
+
+	/**
+	 * Takes care of the saving process.
+	 * Not yet used directly, but throught Calendar_Controller::action_post
+	 */
+	public function action_save()
+	{
+		global $modSettings, $user_info, $scripturl;
+
+		checkSession();
+
+		// Cast this for safety...
+		$event_id = isset($_REQUEST['eventid']) ? (int) $_REQUEST['eventid'] : null;
+
+		$event = new Calendar_Event($event_id, $modSettings);
+
+		// Validate the post...
+		if (!isset($_POST['link_to_board']))
+		{
+			try
+			{
+				$save_data = $event->validate($_POST);
+			}
+			catch (Elk_Exception $e)
+			{
+				$e->fatalLangError();
+			}
+		}
+
+		// If you're not allowed to edit any events, you have to be the poster.
+		if (!$event->isNew() && !allowedTo('calendar_edit_any'))
+			isAllowedTo('calendar_edit_' . ($event->isStarter($user_info['id']) ? 'own' : 'any'));
+
+		// New - and directing?
+		if ($event->isNew() && isset($_POST['link_to_board']))
+		{
+			$_REQUEST['calendar'] = 1;
+			return $this->_returnToPost();
+		}
+
+		// New...
+		if ($event->isNew())
+		{
+			$event->insert($save_data, $user_info['id']);
+		}
+		elseif (isset($_REQUEST['deleteevent']))
+		{
+			$event->remove();
+		}
+		else
+		{
+			$event->update($save_data);
+		}
+
+		// No point hanging around here now...
+		redirectexit($scripturl . '?action=calendar;month=' . $_POST['month'] . ';year=' . $_POST['year']);
+	}
+
+	/**
+	 * Shortcut to instantiate the Post_Controller:
+	 *  - require_once modules of the controller (not addons because these are
+	 *    always all require'd by the dispatcher),
+	 *  - creates the event manager and registers addons and modules,
+	 *  - instantiate the controller
+	 *  - runs pre_dispatch
+	 * @return The return of the action_post.
+	 */
+	protected function _returnToPost()
+	{
+		$controller = new Post_Controller(new Event_Manager());
+		$controller->pre_dispatch();
+
+		return $controller->action_post();
 	}
 
 	/**
@@ -362,104 +377,5 @@ class Calendar_Controller extends Action_Controller
 
 		// Off we pop - lovely!
 		obExit(false);
-	}
-
-	/**
-	 * Makes sure the calendar post is valid.
-	 */
-	public function validateEventPost()
-	{
-		global $modSettings;
-
-		// Make sure they're allowed to post...
-		isAllowedTo('calendar_post');
-
-		if (isset($_POST['span']))
-		{
-			// Make sure it's turned on and not some fool trying to trick it.
-			if (empty($modSettings['cal_allowspan']))
-				fatal_lang_error('no_span', false);
-			if ($_POST['span'] < 1 || $_POST['span'] > $modSettings['cal_maxspan'])
-				fatal_lang_error('invalid_days_numb', false);
-		}
-
-		// There is no need to validate the following values if we are just deleting the event.
-		if (!isset($_POST['deleteevent']))
-		{
-			// No month?  No year?
-			if (!isset($_POST['month']))
-				fatal_lang_error('event_month_missing', false);
-			if (!isset($_POST['year']))
-				fatal_lang_error('event_year_missing', false);
-
-			// Check the month and year...
-			if ($_POST['month'] < 1 || $_POST['month'] > 12)
-				fatal_lang_error('invalid_month', false);
-			if ($_POST['year'] < $modSettings['cal_minyear'] || $_POST['year'] > $modSettings['cal_maxyear'])
-				fatal_lang_error('invalid_year', false);
-
-			// No day?
-			if (!isset($_POST['day']))
-				fatal_lang_error('event_day_missing', false);
-			if (!isset($_POST['evtitle']) && !isset($_POST['subject']))
-				fatal_lang_error('event_title_missing', false);
-			elseif (!isset($_POST['evtitle']))
-				$_POST['evtitle'] = $_POST['subject'];
-
-			// Bad day?
-			if (!checkdate($_POST['month'], $_POST['day'], $_POST['year']))
-				fatal_lang_error('invalid_date', false);
-
-			// No title?
-			if (Util::htmltrim($_POST['evtitle']) === '')
-				fatal_lang_error('no_event_title', false);
-			if (Util::strlen($_POST['evtitle']) > 100)
-				$_POST['evtitle'] = Util::substr($_POST['evtitle'], 0, 100);
-			$_POST['evtitle'] = str_replace(';', '', $_POST['evtitle']);
-		}
-	}
-
-	/**
-	 * Does the save of an event
-	 *
-	 * @param int $event_id - the id of the event being saved (if -1 is a new event)
-	 */
-	private function _action_save($event_id)
-	{
-		global $user_info, $modSettings;
-
-		// New...
-		if ($event_id == -1)
-		{
-			$eventOptions = array(
-				'id_board' => 0,
-				'id_topic' => 0,
-				'title' => Util::substr($_REQUEST['evtitle'], 0, 100),
-				'member' => $user_info['id'],
-				'start_date' => sprintf('%04d-%02d-%02d', $_POST['year'], $_POST['month'], $_POST['day']),
-				'span' => isset($_POST['span']) && $_POST['span'] > 0 ? min((int) $modSettings['cal_maxspan'], (int) $_POST['span'] - 1) : 0,
-			);
-			insertEvent($eventOptions);
-		}
-		// Deleting...
-		elseif (isset($_REQUEST['deleteevent']))
-			removeEvent($event_id);
-		// ... or just update it?
-		else
-		{
-			// There could be already a topic you are not allowed to modify
-			if (!allowedTo('post_new') && empty($modSettings['disableNoPostingCalendarEdits']))
-				$eventProperties = getEventProperties($event_id, true);
-
-			$eventOptions = array(
-				'title' => Util::substr($_REQUEST['evtitle'], 0, 100),
-				'span' => empty($modSettings['cal_allowspan']) || empty($_POST['span']) || $_POST['span'] == 1 || empty($modSettings['cal_maxspan']) || $_POST['span'] > $modSettings['cal_maxspan'] ? 0 : min((int) $modSettings['cal_maxspan'], (int) $_POST['span'] - 1),
-				'start_date' => strftime('%Y-%m-%d', mktime(0, 0, 0, (int) $_REQUEST['month'], (int) $_REQUEST['day'], (int) $_REQUEST['year'])),
-				'id_board' => isset($eventProperties['id_board']) ? (int) $eventProperties['id_board'] : 0,
-				'id_topic' => isset($eventProperties['id_topic']) ? (int) $eventProperties['id_topic'] : 0,
-			);
-
-			modifyEvent($event_id, $eventOptions);
-		}
 	}
 }

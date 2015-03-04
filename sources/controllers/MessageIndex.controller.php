@@ -451,7 +451,8 @@ class MessageIndex_Controller extends Action_Controller
 				if (empty($_REQUEST['topics']) || count($_REQUEST['topics']) < 2)
 					redirectexit($redirect_url);
 
-				$controller = new MergeTopics_Controller();
+				$controller = new MergeTopics_Controller(new Event_Manager());
+				$controller->pre_dispatch();
 				return $controller->action_mergeExecute($_REQUEST['topics']);
 			}
 
