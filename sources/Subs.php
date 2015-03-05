@@ -2061,7 +2061,12 @@ function parse_bbc($message, $smileys = true, $cache_id = '', $parse_tags = arra
 
 			// For parsed content, we must recurse to avoid security problems.
 			if ($tag['type'] !== 'unparsed_equals')
+			{
 				$data = parse_bbc($data, !empty($tag['parsed_tags_allowed']) ? false : true, '', !empty($tag['parsed_tags_allowed']) ? $tag['parsed_tags_allowed'] : array());
+
+				// Unfortunately after we recurse, we must manually reset the static disabled tags to what they were
+				parse_bbc('dummy');
+			}
 
 			$tag['after'] = strtr($tag['after'], array('$1' => $data));
 
