@@ -464,7 +464,7 @@ class Search_Controller extends Action_Controller
 				$boards_can = array_merge($boards_can, boardsAllowedTo(array('lock_any', 'lock_own', 'make_sticky', 'move_any', 'move_own', 'remove_any', 'remove_own', 'merge_any'), true, false));
 
 				$context['can_lock'] = in_array(0, $boards_can['lock_any']);
-				$context['can_sticky'] = in_array(0, $boards_can['make_sticky']) && !empty($modSettings['enableStickyTopics']);
+				$context['can_sticky'] = in_array(0, $boards_can['make_sticky']);
 				$context['can_move'] = in_array(0, $boards_can['move_any']);
 				$context['can_remove'] = in_array(0, $boards_can['remove_any']);
 				$context['can_merge'] = in_array(0, $boards_can['merge_any']);
@@ -659,7 +659,7 @@ class Search_Controller extends Action_Controller
 
 		$output = array_merge($context['topics'][$message['id_msg']], array(
 			'id' => $message['id_topic'],
-			'is_sticky' => !empty($modSettings['enableStickyTopics']) && !empty($message['is_sticky']),
+			'is_sticky' => !empty($message['is_sticky']),
 			'is_locked' => !empty($message['locked']),
 			'is_poll' => !empty($modSettings['pollMode']) && $message['id_poll'] > 0,
 			'is_hot' => !empty($modSettings['useLikesNotViews']) ? $message['num_likes'] >= $modSettings['hotTopicPosts'] : $message['num_replies'] >= $modSettings['hotTopicPosts'],
@@ -733,7 +733,7 @@ class Search_Controller extends Action_Controller
 
 			$output['quick_mod'] = array(
 				'lock' => in_array(0, $boards_can['lock_any']) || in_array($output['board']['id'], $boards_can['lock_any']) || ($started && (in_array(0, $boards_can['lock_own']) || in_array($output['board']['id'], $boards_can['lock_own']))),
-				'sticky' => (in_array(0, $boards_can['make_sticky']) || in_array($output['board']['id'], $boards_can['make_sticky'])) && !empty($modSettings['enableStickyTopics']),
+				'sticky' => (in_array(0, $boards_can['make_sticky']) || in_array($output['board']['id'], $boards_can['make_sticky'])),
 				'move' => in_array(0, $boards_can['move_any']) || in_array($output['board']['id'], $boards_can['move_any']) || ($started && (in_array(0, $boards_can['move_own']) || in_array($output['board']['id'], $boards_can['move_own']))),
 				'remove' => in_array(0, $boards_can['remove_any']) || in_array($output['board']['id'], $boards_can['remove_any']) || ($started && (in_array(0, $boards_can['remove_own']) || in_array($output['board']['id'], $boards_can['remove_own']))),
 			);

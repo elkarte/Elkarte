@@ -462,7 +462,7 @@ function saveDraft()
 		'icon' => empty($_POST['icon']) ? 'xx' : preg_replace('~[\./\\\\*:"\'<>]~', '', $_POST['icon']),
 		'smileys_enabled' => isset($_POST['ns']) ? 0 : 1,
 		'locked' => isset($_POST['lock']) ? (int) $_POST['lock'] : 0,
-		'sticky' => isset($_POST['sticky']) && !empty($modSettings['enableStickyTopics']) ? (int) $_POST['sticky'] : 0,
+		'sticky' => isset($_POST['sticky']) ? (int) $_POST['sticky'] : 0,
 		'subject' => strtr(Util::htmlspecialchars($_POST['subject']), array("\r" => '', "\n" => '', "\t" => '')),
 		'body' => Util::htmlspecialchars($_POST['message'], ENT_QUOTES),
 		'id_member' => $user_info['id'],
