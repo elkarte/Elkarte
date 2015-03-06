@@ -9,7 +9,7 @@ $txt['no_new_mentions'] = 'No new mentions';
 
 $txt['mentions_from'] = 'Member';
 $txt['mentions_when'] = 'When';
-$txt['mentions_what'] = 'Mention';
+$txt['mentions_what'] = 'Message';
 $txt['mentions_all'] = 'Show all';
 $txt['mentions_unread'] = 'Show unread';
 $txt['mentions_action'] = 'Actions';

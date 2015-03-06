@@ -2553,31 +2553,18 @@ function setupThemeContext($forceload = false)
 			$context['user']['popup_messages'] = false;
 		$_SESSION['unread_messages'] = $user_info['unread_messages'];
 
-		$context['user']['avatar'] = array();
+		$context['user']['avatar'] = array(
+			'href' => $user_info['avatar']['href'],
+			'image' => $user_info['avatar']['image'],
+		);
 
-		// Figure out the avatar... uploaded?
-		if ($user_info['avatar']['url'] == '' && !empty($user_info['avatar']['id_attach']))
-			$context['user']['avatar']['href'] = $user_info['avatar']['custom_dir'] ? $modSettings['custom_avatar_url'] . '/' . $user_info['avatar']['filename'] : $scripturl . '?action=dlattach;attach=' . $user_info['avatar']['id_attach'] . ';type=avatar';
-		// Full URL?
-		elseif (substr($user_info['avatar']['url'], 0, 7) == 'http://' || substr($user_info['avatar']['url'], 0, 8) == 'https://')
-		{
-			$context['user']['avatar']['href'] = $user_info['avatar']['url'];
+		// @deprecated since 1.0.2
+		if (!empty($modSettings['avatar_max_width']))
+			$context['user']['avatar']['width'] = $modSettings['avatar_max_width'];
 
-			if (!empty($modSettings['avatar_max_width']))
-				$context['user']['avatar']['width'] = $modSettings['avatar_max_width'];
-
-			if (!empty($modSettings['avatar_max_height']))
-				$context['user']['avatar']['height'] = $modSettings['avatar_max_height'];
-		}
-		// Gravatars URL.
-		elseif ($user_info['avatar']['url'] === 'gravatar')
-			$context['user']['avatar']['href'] = '//www.gravatar.com/avatar/' . md5(strtolower($user_settings['email_address'])) . 'd=' . $modSettings['avatar_max_height'] . (!empty($modSettings['gravatar_rating']) ? ('&amp;r=' . $modSettings['gravatar_rating']) : '');
-		// Otherwise we assume it's server stored?
-		elseif ($user_info['avatar']['url'] !== '')
-			$context['user']['avatar']['href'] = $modSettings['avatar_url'] . '/' . htmlspecialchars($user_info['avatar']['url']);
-
-		if (!empty($context['user']['avatar']))
-			$context['user']['avatar']['image'] = '<img src="' . $context['user']['avatar']['href'] . '" style="' . (isset($context['user']['avatar']['width']) ? 'width: ' . $context['user']['avatar']['width'] . 'px;' : '') . (isset($context['user']['avatar']['height']) ? 'height: ' . $context['user']['avatar']['height'] . 'px' : '') . '" alt="" class="avatar" />';
+		// @deprecated since 1.0.2
+		if (!empty($modSettings['avatar_max_height']))
+			$context['user']['avatar']['height'] = $modSettings['avatar_max_height'];
 
 		// Figure out how long they've been logged in.
 		$context['user']['total_time_logged_in'] = array(
