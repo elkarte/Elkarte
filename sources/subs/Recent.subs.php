@@ -410,7 +410,7 @@ function processRecentTopicList($topics_info, $topicseen = false)
 				'link' => '<a href="' . $scripturl . '?topic=' . $row['id_topic'] . ($row['num_replies'] == 0 ? '.0' : '.msg' . $row['id_last_msg']) . $topicseen . '#msg' . $row['id_last_msg'] . '" rel="nofollow">' . $row['last_subject'] . '</a>'
 			),
 			'default_preview' => trim($row[!empty($modSettings['message_index_preview']) && $modSettings['message_index_preview'] == 2 ? 'last_body' : 'first_body']),
-			'is_sticky' => !empty($modSettings['enableStickyTopics']) && !empty($row['is_sticky']),
+			'is_sticky' => !empty($row['is_sticky']),
 			'is_locked' => !empty($row['locked']),
 			'is_poll' => !empty($modSettings['pollMode']) && $row['id_poll'] > 0,
 			'is_hot' => !empty($modSettings['useLikesNotViews']) ? $row['num_likes'] >= $modSettings['hotTopicPosts'] : $row['num_replies'] >= $modSettings['hotTopicPosts'],

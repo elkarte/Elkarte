@@ -250,7 +250,6 @@ class MessageIndex_Controller extends Action_Controller
 
 		// Set up the query options
 		$indexOptions = array(
-			'include_sticky' => !empty($modSettings['enableStickyTopics']),
 			'only_approved' => $modSettings['postmod_active'] && !allowedTo('approve_posts'),
 			'previews' => !empty($modSettings['message_index_preview']) ? (empty($modSettings['preview_characters']) ? -1 : $modSettings['preview_characters']) : 0,
 			'include_avatars' => !empty($settings['avatars_on_indexes']),
@@ -295,7 +294,7 @@ class MessageIndex_Controller extends Action_Controller
 		{
 			$context['can_markread'] = $context['user']['is_logged'];
 			$context['can_lock'] = allowedTo('lock_any');
-			$context['can_sticky'] = allowedTo('make_sticky') && !empty($modSettings['enableStickyTopics']);
+			$context['can_sticky'] = allowedTo('make_sticky');
 			$context['can_move'] = allowedTo('move_any');
 			$context['can_remove'] = allowedTo('remove_any');
 			$context['can_merge'] = allowedTo('merge_any');
@@ -312,7 +311,7 @@ class MessageIndex_Controller extends Action_Controller
 				$started = $topic['first_post']['member']['id'] == $user_info['id'];
 				$context['topics'][$t]['quick_mod'] = array(
 					'lock' => allowedTo('lock_any') || ($started && allowedTo('lock_own')),
-					'sticky' => allowedTo('make_sticky') && !empty($modSettings['enableStickyTopics']),
+					'sticky' => allowedTo('make_sticky'),
 					'move' => allowedTo('move_any') || ($started && allowedTo('move_own')),
 					'modify' => allowedTo('modify_any') || ($started && allowedTo('modify_own')),
 					'remove' => allowedTo('remove_any') || ($started && allowedTo('remove_own')),
@@ -425,7 +424,7 @@ class MessageIndex_Controller extends Action_Controller
 
 		if (!$user_info['is_guest'])
 			$possibleActions[] = 'markread';
-		if (!empty($boards_can['make_sticky']) && !empty($modSettings['enableStickyTopics']))
+		if (!empty($boards_can['make_sticky']))
 			$possibleActions[] = 'sticky';
 		if (!empty($boards_can['move_any']) || !empty($boards_can['move_own']))
 			$possibleActions[] = 'move';

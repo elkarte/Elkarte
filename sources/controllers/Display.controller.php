@@ -108,8 +108,7 @@ class Display_Controller extends Action_Controller
 			// No use in calculating the next topic if there's only one.
 			if ($board_info['num_topics'] > 1)
 			{
-				$includeStickies = !empty($modSettings['enableStickyTopics']);
-				$topic = $_REQUEST['prev_next'] === 'prev' ? previousTopic($topic, $board, $user_info['id'], $includeUnapproved, $includeStickies) : nextTopic($topic, $board, $user_info['id'], $includeUnapproved, $includeStickies);
+				$topic = $_REQUEST['prev_next'] === 'prev' ? previousTopic($topic, $board, $user_info['id'], $includeUnapproved) : nextTopic($topic, $board, $user_info['id'], $includeUnapproved);
 				$context['current_topic'] = $topic;
 			}
 
@@ -281,9 +280,6 @@ class Display_Controller extends Action_Controller
 		// Censor the title...
 		censorText($topicinfo['subject']);
 		$context['page_title'] = $topicinfo['subject'];
-
-		// Is this topic sticky, or can it even be?
-		$topicinfo['is_sticky'] = empty($modSettings['enableStickyTopics']) ? '0' : $topicinfo['is_sticky'];
 
 		// Allow addons access to the topicinfo array
 		call_integration_hook('integrate_display_topic', array($topicinfo));
@@ -560,7 +556,6 @@ class Display_Controller extends Action_Controller
 
 		// Cleanup all the permissions with extra stuff...
 		$context['can_mark_notify'] &= !$context['user']['is_guest'];
-		$context['can_sticky'] &= !empty($modSettings['enableStickyTopics']);
 		$context['can_reply'] &= empty($topicinfo['locked']) || allowedTo('moderate_board');
 		$context['can_reply_unapproved'] &= $modSettings['postmod_active'] && (empty($topicinfo['locked']) || allowedTo('moderate_board'));
 		$context['can_issue_warning'] &= in_array('w', $context['admin_features']) && !empty($modSettings['warning_enable']);

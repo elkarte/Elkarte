@@ -124,7 +124,6 @@ class ManageTopics_Controller extends Action_Controller
 		// initialize it with our settings
 		$config_vars = array(
 				// Some simple big bools...
-				array('check', 'enableStickyTopics'),
 				array('check', 'enableParticipation'),
 				array('check', 'enableFollowup'),
 				array('check', 'pollMode'),

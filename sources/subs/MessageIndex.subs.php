@@ -39,6 +39,15 @@ function messageIndexTopics($id_board, $id_member, $start, $per_page, $sort_by, 
 
 	$topics = array();
 	$topic_ids = array();
+	$indexOptions = array_merge(array(
+		'include_sticky' => true,
+		'fake_ascending' => false,
+		'ascending' => true,
+		'only_approved' => true,
+		'previews' => -1,
+		'include_avatars' => false,
+		'custom_selects' => array(),
+	), $indexOptions);
 
 	// Extra-query for the pages after the first
 	$ids_query = $start > 0;
@@ -355,7 +364,7 @@ function processMessageIndexTopicList($topics_info, $topicseen = false)
 				'link' => '<a href="' . $scripturl . '?topic=' . $row['id_topic'] . ($user_info['is_guest'] ? ('.' . ((int) (($row['num_replies']) / $messages_per_page)) * $messages_per_page . $topicseen . '#msg' . $row['id_last_msg']) : (($row['num_replies'] == 0 ? '.0' : '.msg' . $row['id_last_msg']) . $topicseen . '#new')) . '" ' . ($row['num_replies'] == 0 ? '' : 'rel="nofollow"') . '>' . $row['last_subject'] . '</a>'
 			),
 			'default_preview' => trim($row[!empty($modSettings['message_index_preview']) && $modSettings['message_index_preview'] == 2 ? 'last_body' : 'first_body']),
-			'is_sticky' => !empty($modSettings['enableStickyTopics']) && !empty($row['is_sticky']),
+			'is_sticky' => !empty($row['is_sticky']),
 			'is_locked' => !empty($row['locked']),
 			'is_poll' => !empty($modSettings['pollMode']) && $row['id_poll'] > 0,
 			'is_hot' => !empty($modSettings['useLikesNotViews']) ? $row['num_likes'] >= $modSettings['hotTopicPosts'] : $row['num_replies'] >= $modSettings['hotTopicPosts'],

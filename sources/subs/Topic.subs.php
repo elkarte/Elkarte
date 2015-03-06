@@ -2879,12 +2879,11 @@ function mergeableTopics($id_board, $id_topic, $approved, $offset)
 		WHERE t.id_board = {int:id_board}
 			AND t.id_topic != {int:id_topic}' . (empty($approved) ? '
 			AND t.approved = {int:is_approved}' : '') . '
-		ORDER BY {raw:sort}
+		ORDER BY t.is_sticky DESC, t.id_last_msg DESC
 		LIMIT {int:offset}, {int:limit}',
 		array(
 			'id_board' => $id_board,
 			'id_topic' => $id_topic,
-			'sort' => (!empty($modSettings['enableStickyTopics']) ? 't.is_sticky DESC, ' : '') . 't.id_last_msg DESC',
 			'offset' => $offset,
 			'limit' => $modSettings['defaultMaxTopics'],
 			'is_approved' => 1,
