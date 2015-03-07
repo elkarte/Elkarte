@@ -2061,7 +2061,12 @@ function parse_bbc($message, $smileys = true, $cache_id = '', $parse_tags = arra
 
 			// For parsed content, we must recurse to avoid security problems.
 			if ($tag['type'] !== 'unparsed_equals')
+			{
 				$data = parse_bbc($data, !empty($tag['parsed_tags_allowed']) ? false : true, '', !empty($tag['parsed_tags_allowed']) ? $tag['parsed_tags_allowed'] : array());
+
+				// Unfortunately after we recurse, we must manually reset the static disabled tags to what they were
+				parse_bbc('dummy');
+			}
 
 			$tag['after'] = strtr($tag['after'], array('$1' => $data));
 
@@ -2458,7 +2463,7 @@ function obExit($header = null, $do_footer = null, $from_index = false, $from_fa
 	$req = request();
 
 	// Remember this URL in case someone doesn't like sending HTTP_REFERER.
-	if (strpos($_SERVER['REQUEST_URL'], 'action=dlattach') === false && strpos($_SERVER['REQUEST_URL'], 'action=viewadminfile') === false && strpos($_SERVER['REQUEST_URL'], ';xml') === false)
+	if (strpos($_SERVER['REQUEST_URL'], 'action=dlattach') === false && strpos($_SERVER['REQUEST_URL'], 'action=viewadminfile') === false && strpos($_SERVER['REQUEST_URL'], ';xml') === false && strpos($_SERVER['REQUEST_URL'], ';api') === false)
 		$_SESSION['old_url'] = $_SERVER['REQUEST_URL'];
 
 	// For session check verification.... don't switch browsers...
