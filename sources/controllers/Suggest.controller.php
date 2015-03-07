@@ -33,6 +33,7 @@ class Suggest_Controller extends Action_Controller
 	public function action_index()
 	{
 		// Call the right method for this user request.
+		return $this->action_suggest();
 	}
 
 	/**
