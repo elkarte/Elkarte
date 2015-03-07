@@ -33,7 +33,7 @@ class TestRegister_Controller extends ElkArteWebTest
 
 	/**
 	 * Cleanup data we no longer need at the end of the tests in this class.
-     *
+	 *
 	 * tearDown() is run automatically by the testing framework after each test method.
 	 */
 	public function tearDown()
@@ -48,9 +48,9 @@ class TestRegister_Controller extends ElkArteWebTest
 	 */
 	public function testRegisterInValid()
 	{
-        $username = 'testuser';
+		$username = 'testuser';
 		$email = 'a.valid@emailaddress.tld';
-        $password = 'ainttellin';
+		$password = 'ainttellin';
 
 		// Register from the main menu
 		$this->url('index.php');
@@ -68,7 +68,7 @@ class TestRegister_Controller extends ElkArteWebTest
 		$this->byId('elk_autov_pwverify')->value($password);
 
 		// Lets select register!
-        $this->byName("regSubmit")->click();
+		$this->byName("regSubmit")->click();
 
 		// Should fail for speed reasons
 		$this->assertContains("You went through the registration process too quickly", $this->byCssSelector("div.errorbox")->text());
@@ -79,9 +79,9 @@ class TestRegister_Controller extends ElkArteWebTest
 	 */
 	public function testRegisterValid()
 	{
-        $username = 'testuser';
+		$username = 'testuser';
 		$email = 'a.valid@emailaddress.tld';
-        $password = 'ainttellin';
+		$password = 'ainttellin';
 
 		// Register from the main menu
 		$this->url('index.php');
@@ -116,7 +116,7 @@ class TestRegister_Controller extends ElkArteWebTest
 		sleep(8.5);
 
 		// Lets select register!
-        $this->byName("regSubmit")->click();
+		$this->byName("regSubmit")->click();
 
 		// I hope :P
 		$this->assertEquals("Registration Successful", $this->byCssSelector("h2.category_header")->text());
