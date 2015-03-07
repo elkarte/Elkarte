@@ -81,14 +81,12 @@ class Site_Dispatcher
 			// You can only login
 			if (isset($_GET['action']) && ($_GET['action'] == 'login2' || $_GET['action'] == 'logout'))
 			{
-				$this->_file_name = CONTROLLERDIR . '/Auth.controller.php';
 				$this->_controller_name = 'Auth_Controller';
 				$this->_function_name = $_GET['action'] == 'login2' ? 'action_login2' : 'action_logout';
 			}
 			// "maintenance mode" page
 			else
 			{
-				$this->_file_name = CONTROLLERDIR . '/Auth.controller.php';
 				$this->_controller_name = 'Auth_Controller';
 				$this->_function_name = 'action_maintenance_mode';
 			}
@@ -96,7 +94,6 @@ class Site_Dispatcher
 		// If guest access is disallowed, a guest is kicked out... politely. :P
 		elseif (empty($modSettings['allow_guestAccess']) && $user_info['is_guest'] && (!isset($_GET['action']) || !in_array($_GET['action'], array('coppa', 'login', 'login2', 'register', 'register2', 'reminder', 'activate', 'help', 'quickhelp', 'mailq', 'verificationcode', 'openidreturn'))))
 		{
-			$this->_file_name = CONTROLLERDIR . '/Auth.controller.php';
 			$this->_controller_name = 'Auth_Controller';
 			$this->_function_name = 'action_kickguest';
 		}
@@ -116,21 +113,19 @@ class Site_Dispatcher
 			// ?board=b message index
 			elseif (empty($topic))
 			{
-				$this->_file_name = CONTROLLERDIR . '/MessageIndex.controller.php';
 				$this->_controller_name = 'MessageIndex_Controller';
 				$this->_function_name = 'action_messageindex';
 			}
 			// board=b;topic=t topic display
 			else
 			{
-				$this->_file_name = CONTROLLERDIR . '/Display.controller.php';
 				$this->_controller_name = 'Display_Controller';
 				$this->_function_name = 'action_display';
 			}
 		}
 
 		// Now this return won't be cool, but lets do it
-		if (!empty($this->_file_name) && !empty($this->_function_name))
+		if (!empty($this->_controller_name) && !empty($this->_function_name))
 			return;
 
 		// Start with our nice and cozy err... *cough*
@@ -229,7 +224,6 @@ class Site_Dispatcher
 			// sa=upload => action_upload()
 			if (file_exists(CONTROLLERDIR . '/' . ucfirst($_GET['action']) . '.controller.php'))
 			{
-// 				$this->_file_name = CONTROLLERDIR . '/' . ucfirst($_GET['action']) . '.controller.php';
 				$this->_controller_name = ucfirst($_GET['action']) . '_Controller';
 				if (isset($_GET['sa']) && preg_match('~^\w+$~', $_GET['sa']))
 					$this->_function_name = 'action_' . $_GET['sa'];
