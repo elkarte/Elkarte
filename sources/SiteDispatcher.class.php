@@ -51,12 +51,6 @@ class Site_Dispatcher
 	protected $_controller_name;
 
 	/**
-	 * Name of pre_dispatch function, for procedural controllers
-	 * @var string
-	 */
-	protected $_pre_dispatch_func;
-
-	/**
 	 * Create an instance and initialize it.
 	 * This does all the work to figure out which file and function/method needs called.
 	 */
@@ -109,8 +103,7 @@ class Site_Dispatcher
 				if (empty($this->_function_name))
 				{
 					$this->_file_name = $default_action['file'];
-					if (isset($default_action['controller']))
-						$this->_controller_name = $default_action['controller'];
+					$this->_controller_name = $default_action['controller'];
 					$this->_function_name = $default_action['function'];
 				}
 			}
@@ -210,53 +203,25 @@ class Site_Dispatcher
 			// Admin files have their own place
 			$path = in_array($_GET['action'], $adminActions) ? ADMINDIR : CONTROLLERDIR;
 
-			// Is it an object oriented controller?
-			if (isset($actionArray[$_GET['action']][2]))
-			{
-				$this->_file_name = $path . '/' . $actionArray[$_GET['action']][0];
-				$this->_controller_name = $actionArray[$_GET['action']][1];
+			$this->_file_name = $path . '/' . $actionArray[$_GET['action']][0];
+			$this->_controller_name = $actionArray[$_GET['action']][1];
 
-				// If the method is coded in, use it
-				if (!empty($actionArray[$_GET['action']][2]))
-					$this->_function_name = $actionArray[$_GET['action']][2];
-				// Otherwise fall back to naming patterns
-				elseif (isset($_GET['sa']) && preg_match('~^\w+$~', $_GET['sa']))
-					$this->_function_name = 'action_' . $_GET['sa'];
-				else
-					$this->_function_name = 'action_index';
-			}
-			// Then it's one of our legacy functions
+			// If the method is coded in, use it
+			if (!empty($actionArray[$_GET['action']][2]))
+				$this->_function_name = $actionArray[$_GET['action']][2];
+			// Otherwise fall back to naming patterns
+			elseif (isset($_GET['sa']) && preg_match('~^\w+$~', $_GET['sa']))
+				$this->_function_name = 'action_' . $_GET['sa'];
 			else
-			{
-				$this->_file_name = $path . '/' . $actionArray[$_GET['action']][0];
-				$this->_function_name = $actionArray[$_GET['action']][1];
-			}
+				$this->_function_name = 'action_index';
 		}
 		// Fall back to naming patterns.
 		// addons can use any of them, and it should Just Work (tm).
 		elseif (preg_match('~^[a-zA-Z_\\-]+\d*$~', $_GET['action']))
 		{
-			// action=drafts => Drafts.php
-			// sa=save, sa=load, or sa=savepm => action_save(), action_load()
-			// ... if it's not there yet, no problem.
-			if (file_exists(CONTROLLERDIR . '/' . ucfirst($_GET['action']) . '.php'))
-			{
-				$this->_file_name = CONTROLLERDIR . '/' . ucfirst($_GET['action']) . '.php';
-
-				// Procedural controller... we might need to pre dispatch to its main function
-				// i.e. for action=mergetopics it was MergeTopics(), now it's mergetopics()
-				$this->_pre_dispatch_func = 'pre_' . $_GET['action'];
-
-				// Then, figure out the function for the subaction
-				if (isset($_GET['sa']) && preg_match('~^\w+$~', $_GET['sa']))
-					$this->_function_name = 'action_' . $_GET['sa'];
-				else
-					$this->_function_name = 'action_' . $_GET['action'];
-			}
-			// Or... an addon can do just this!
 			// action=gallery => Gallery.controller.php
 			// sa=upload => action_upload()
-			elseif (file_exists(CONTROLLERDIR . '/' . ucfirst($_GET['action']) . '.controller.php'))
+			if (file_exists(CONTROLLERDIR . '/' . ucfirst($_GET['action']) . '.controller.php'))
 			{
 // 				$this->_file_name = CONTROLLERDIR . '/' . ucfirst($_GET['action']) . '.controller.php';
 				$this->_controller_name = ucfirst($_GET['action']) . '_Controller';
@@ -273,8 +238,7 @@ class Site_Dispatcher
 			// Catch the action with the theme?
 			// We still haven't found what we're looking for...
 			$this->_file_name = $default_action['file'];
-			if (isset($default_action['controller']))
-				$this->_controller_name = $default_action['controller'];
+			$this->_controller_name = $default_action['controller'];
 			$this->_function_name = $default_action['function'];
 		}
 
@@ -304,12 +268,6 @@ class Site_Dispatcher
 			{
 				$callable = array($controller, 'action_index');
 			}
-			// Fall back
-			// @todo remove?
-			elseif (function_exists($this->_function_name))
-			{
-				$callable = $this->_function_name;
-			}
 			// This should never happen
 			else
 			{
@@ -331,13 +289,12 @@ class Site_Dispatcher
 		}
 		else
 		{
-			// pre-dispatch (load templates and stuff)
-			// For procedural controllers, we know this name (instance var)
-			if (!empty($this->_pre_dispatch_func) && function_exists($this->_pre_dispatch_func))
-				call_user_func($this->_pre_dispatch_func);
+			// Things went pretty bad, huh?
+			// board index :P
+			$this->_controller_name = 'BoardIndex';
+			$this->_function_name = 'action_index';
 
-			// It must be a good ole' function
-			call_user_func($this->_function_name);
+			return $this->dispatch();
 		}
 	}
 
