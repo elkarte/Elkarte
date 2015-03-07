@@ -2934,6 +2934,8 @@ function determineAvatar($profile)
 	// Make sure there's a preview for gravatars available.
 	$avatar['gravatar_preview'] = '//www.gravatar.com/avatar/' . md5(strtolower($profile['email_address'])) . ';s=' . $modSettings['avatar_max_height'] . (!empty($modSettings['gravatar_rating']) ? ('&amp;r=' . $modSettings['gravatar_rating']) : '');
 
+	call_integration_hook('integrate_avatar', array(&$avatar));
+
 	return $avatar;
 }
 
