@@ -300,7 +300,7 @@ class Site_Dispatcher
 			{
 				$callable = array($controller, $this->_function_name);
 			}
-			elseif (method_mxists($controller, 'action_index'))
+			elseif (method_exists($controller, 'action_index'))
 			{
 				$callable = array($controller, 'action_index');
 			}
