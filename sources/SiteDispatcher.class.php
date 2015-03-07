@@ -228,7 +228,6 @@ class Site_Dispatcher
 		// The file and function weren't found yet?
 		if (empty($this->_controller_name) || empty($this->_function_name))
 		{
-			// Catch the action with the theme?
 			// We still haven't found what we're looking for...
 			$this->_file_name = $this->_default_action['file'];
 			$this->_controller_name = $this->_default_action['controller'];
@@ -249,17 +248,14 @@ class Site_Dispatcher
 
 		if (!empty($this->_controller_name))
 		{
-			$controller = new $this->_controller_name(new Event_Manager());
-			$hook = $controller->getHook();
-
 			// 3, 2, ... and go
-			if (method_exists($controller, $this->_function_name))
+			if (method_exists($this->_controller_name, $this->_function_name))
 			{
-				$callable = array($controller, $this->_function_name);
+				$method = $this->_function_name;
 			}
-			elseif (method_exists($controller, 'action_index'))
+			elseif (method_exists($this->_controller_name, 'action_index'))
 			{
-				$callable = array($controller, 'action_index');
+				$method = 'action_index';
 			}
 			// This should never happen
 			else
@@ -273,13 +269,18 @@ class Site_Dispatcher
 				return $this->dispatch();
 			}
 
+			$controller = new $this->_controller_name(new Event_Manager());
+			$hook = $controller->getHook();
+
 			$controller->pre_dispatch();
 
 			call_integration_hook('integrate_action_' . $hook . '_before', array($this->_function_name));
 
-			call_user_func($callable);
+			$result = $controller->$method;
 
 			call_integration_hook('integrate_action_' . $hook . '_after', array($this->_function_name));
+
+			return $result;
 		}
 		else
 		{
