@@ -130,11 +130,9 @@ class Site_Dispatcher
 
 		// Start with our nice and cozy err... *cough*
 		// Format:
-		// $_GET['action'] => array($file, $function)
 		// $_GET['action'] => array($file, $class, $method)
 		$actionArray = array(
 			'activate' => array('Register.controller.php', 'Register_Controller', 'action_activate'),
-			'admin' => array('Admin.controller.php', 'Admin_Controller', 'action_index'),
 			'attachapprove' => array('ModerateAttachments.controller.php', 'ModerateAttachments_Controller', 'action_attachapprove'),
 			'buddy' => array('Members.controller.php', 'Members_Controller', 'action_buddy'),
 			'collapse' => array('BoardIndex.controller.php', 'BoardIndex_Controller', 'action_collapse'),
@@ -156,9 +154,7 @@ class Site_Dispatcher
 			'logout' => array('Auth.controller.php', 'Auth_Controller', 'action_logout'),
 			'markasread' => array('Markasread.controller.php', 'MarkRead_Controller', 'action_index'),
 			'mergetopics' => array('MergeTopics.controller.php', 'MergeTopics_Controller', 'action_index'),
-			'memberlist' => array('Memberlist.controller.php', 'Memberlist_Controller', 'action_index'),
 			'moderate' => array('ModerationCenter.controller.php', 'ModerationCenter_Controller', 'action_index'),
-			'karma' => array('Karma.controller.php', 'Karma_Controller', ''),
 			'movetopic' => array('MoveTopic.controller.php', 'MoveTopic_Controller', 'action_movetopic'),
 			'movetopic2' => array('MoveTopic.controller.php', 'MoveTopic_Controller', 'action_movetopic2'),
 			'notify' => array('Notify.controller.php', 'Notify_Controller', 'action_notify'),
@@ -167,22 +163,17 @@ class Site_Dispatcher
 			'xrds' => array('OpenID.controller.php', 'OpenID_Controller', 'action_xrds'),
 			'pm' => array('PersonalMessage.controller.php', 'PersonalMessage_Controller', 'action_index'),
 			'post2' => array('Post.controller.php', 'Post_Controller', 'action_post2'),
-			'profile' => array('Profile.controller.php', 'Profile_Controller', 'action_index'),
 			'quotefast' => array('Post.controller.php', 'Post_Controller', 'action_quotefast'),
 			'quickmod' => array('MessageIndex.controller.php', 'MessageIndex_Controller', 'action_quickmod'),
 			'quickmod2' => array('Display.controller.php', 'Display_Controller', 'action_quickmod2'),
-			'register' => array('Register.controller.php', 'Register_Controller', 'action_register'),
 			'register2' => array('Register.controller.php', 'Register_Controller', 'action_register2'),
 			'removetopic2' => array('RemoveTopic.controller.php', 'RemoveTopic_Controller', 'action_removetopic2'),
 			'reporttm' => array('Emailuser.controller.php', 'Emailuser_Controller', 'action_reporttm'),
 			'restoretopic' => array('RemoveTopic.controller.php', 'RemoveTopic_Controller', 'action_restoretopic'),
-			'suggest' => array('Suggest.controller.php', 'Suggest_Controller', 'action_suggest'),
 			'spellcheck' => array('Post.controller.php', 'Post_Controller', 'action_spellcheck'),
 			'splittopics' => array('SplitTopics.controller.php', 'SplitTopics_Controller', 'action_splittopics'),
-			'stats' => array('Stats.controller.php', 'Stats_Controller', 'action_stats'),
 			'theme' => array('ManageThemes.controller.php', 'ManageThemes_Controller', 'action_thememain'),
 			'trackip' => array('ProfileHistory.controller.php', 'ProfileHistory_Controller', 'action_trackip'),
-// 			'unread' => array('Recent.controller.php', 'Recent_Controller', 'action_unread'),
 			'unreadreplies' => array('Unread.controller.php', 'Unread_Controller', 'action_unreadreplies'),
 			'verificationcode' => array('Register.controller.php', 'Register_Controller', 'action_verificationcode'),
 			'viewprofile' => array('Profile.controller.php', 'Profile_Controller', 'action_index'),
@@ -220,9 +211,11 @@ class Site_Dispatcher
 		// addons can use any of them, and it should Just Work (tm).
 		elseif (preg_match('~^[a-zA-Z_\\-]+\d*$~', $_GET['action']))
 		{
+			$path = in_array($_GET['action'], $adminActions) ? ADMINDIR : CONTROLLERDIR;
+
 			// action=gallery => Gallery.controller.php
 			// sa=upload => action_upload()
-			if (file_exists(CONTROLLERDIR . '/' . ucfirst($_GET['action']) . '.controller.php'))
+			if (file_exists($path . '/' . ucfirst($_GET['action']) . '.controller.php'))
 			{
 				$this->_controller_name = ucfirst($_GET['action']) . '_Controller';
 				if (isset($_GET['sa']) && preg_match('~^\w+$~', $_GET['sa']))
