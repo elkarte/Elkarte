@@ -51,6 +51,12 @@ class Site_Dispatcher
 	protected $_controller_name;
 
 	/**
+	 * The default action data (file, controller and function)
+	 * @var string[]
+	 */
+	protected $_default_action;
+
+	/**
 	 * Create an instance and initialize it.
 	 * This does all the work to figure out which file and function/method needs called.
 	 */
@@ -60,14 +66,14 @@ class Site_Dispatcher
 
 		// Default action of the forum: board index
 		// Everytime we don't know what to do, we'll do this :P
-		$default_action = array(
-			'file' => CONTROLLERDIR . '/BoardIndex.controller.php',
+		$this->_default_action = array(
+			'file' => '',
 			'controller' => 'BoardIndex_Controller',
 			'function' => 'action_boardindex'
 		);
 
 		// Reminder: hooks need to account for multiple addons setting this hook.
-		call_integration_hook('integrate_action_frontpage', array(&$default_action));
+		call_integration_hook('integrate_action_frontpage', array(&$this->_default_action));
 
 		// Maintenance mode: you're out of here unless you're admin
 		if (!empty($maintenance) && !allowedTo('admin_forum'))
@@ -102,9 +108,9 @@ class Site_Dispatcher
 				// Was it, wasn't it....
 				if (empty($this->_function_name))
 				{
-					$this->_file_name = $default_action['file'];
-					$this->_controller_name = $default_action['controller'];
-					$this->_function_name = $default_action['function'];
+					$this->_file_name = $this->_default_action['file'];
+					$this->_controller_name = $this->_default_action['controller'];
+					$this->_function_name = $this->_default_action['function'];
 				}
 			}
 			// ?board=b message index
@@ -237,9 +243,9 @@ class Site_Dispatcher
 		{
 			// Catch the action with the theme?
 			// We still haven't found what we're looking for...
-			$this->_file_name = $default_action['file'];
-			$this->_controller_name = $default_action['controller'];
-			$this->_function_name = $default_action['function'];
+			$this->_file_name = $this->_default_action['file'];
+			$this->_controller_name = $this->_default_action['controller'];
+			$this->_function_name = $this->_default_action['function'];
 		}
 
 		if (isset($_REQUEST['api']))
@@ -272,9 +278,10 @@ class Site_Dispatcher
 			else
 			{
 				// Things went pretty bad, huh?
-				// board index :P
-				$this->_controller_name = 'BoardIndex';
-				$this->_function_name = 'action_index';
+				// default action :P
+				$this->_file_name = $this->_default_action['file'];
+				$this->_controller_name = $this->_default_action['controller'];
+				$this->_function_name = $this->_default_action['function'];
 
 				return $this->dispatch();
 			}
@@ -290,9 +297,10 @@ class Site_Dispatcher
 		else
 		{
 			// Things went pretty bad, huh?
-			// board index :P
-			$this->_controller_name = 'BoardIndex';
-			$this->_function_name = 'action_index';
+			// default action :P
+			$this->_file_name = $this->_default_action['file'];
+			$this->_controller_name = $this->_default_action['controller'];
+			$this->_function_name = $this->_default_action['function'];
 
 			return $this->dispatch();
 		}
