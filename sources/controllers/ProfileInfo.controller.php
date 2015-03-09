@@ -555,7 +555,7 @@ class ProfileInfo_Controller extends Action_Controller
 				'buttons' => array(
 					// How about... even... remove it entirely?!
 					'remove' => array(
-						'href' => $scripturl . '?action=deletemsg;msg=' . $row['id_msg'] . ';topic=' . $row['id_topic'] . ';profile;u=' . $context['member']['id'] . ';start=' . $context['start'],
+						'href' => $scripturl . '?action=deletemsg;msg=' . $row['id_msg'] . ';topic=' . $row['id_topic'] . ';profile;u=' . $context['member']['id'] . ';start=' . $context['start'] . ';'.  $context['session_var'] . '=' . $context['session_id'],
 						'text' => $txt['remove'],
 						'test' => 'can_delete',
 						'custom' => 'onclick="return confirm(' . JavaScriptEscape($txt['remove_message'] . '?') . ');"',
