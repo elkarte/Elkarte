@@ -26,7 +26,7 @@ define('FORUM_VERSION', $forum_version);
 define('ELK', 1);
 
 // Shortcut for the browser cache stale
-define('CACHE_STALE', '?102');
+define('CACHE_STALE', '?103');
 
 if (function_exists('set_magic_quotes_runtime'))
 	@set_magic_quotes_runtime(0);

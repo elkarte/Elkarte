@@ -25,7 +25,7 @@ if (defined('ELK'))
 define('ELK', 'SSI');
 
 // Shortcut for the browser cache stale
-define('CACHE_STALE', '?102');
+define('CACHE_STALE', '?103');
 
 // We're going to want a few globals... these are all set later.
 global $time_start, $maintenance, $msubject, $mmessage, $mbname, $language;
