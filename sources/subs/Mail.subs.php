@@ -1351,7 +1351,7 @@ function reduceMailQueue($batch_size = false, $override_limit = false, $force_se
 				@apache_reset_timeout();
 		}
 		else
-			$result = smtp_mail(array($email['to']), $email['subject'], $email['body'], $email['send_html'] ? $email['headers'] : 'Mime-Version: 1.0' . "\r\n" . $email['headers'], $email['priority'], $email['message_id']);
+			$result = smtp_mail(array($email['to']), $email['subject'], $email['body'], $email['headers'], $email['priority'], $email['message_id']);
 
 		// Hopefully it sent?
 		if (!$result)
