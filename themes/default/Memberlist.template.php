@@ -128,7 +128,7 @@ function template_memberlist()
 					if ($column == 'online')
 					{
 						echo '
-						', $context['can_send_pm'] ? '<a href="' . $member['online']['href'] . '" title="' . $member['online']['text'] . '">' : '', $settings['use_image_buttons'] ? '<img src="' . $member['online']['image_href'] . '" alt="' . $member['online']['text'] . '" class="centericon" />' : $member['online']['label'], $context['can_send_pm'] ? '</a>' : '';
+						', $context['can_send_pm'] ? '<a href="' . $member['online']['href'] . '" title="' . $member['online']['text'] . '">' : '', $settings['use_image_buttons'] ? '<img src="' . $member['online']['image_href'] . '" alt="' . $member['online']['text'] . '" />' : $member['online']['label'], $context['can_send_pm'] ? '</a>' : '';
 					}
 					elseif ($column == 'email_address')
 					{
