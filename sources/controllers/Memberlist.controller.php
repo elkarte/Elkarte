@@ -71,7 +71,7 @@ class Memberlist_Controller extends Action_Controller
 		$context['columns'] = array(
 			'avatar' => array(
 				'label' => '',
-				'class' => '',
+				'class' => 'avatar',
 			),
 			'real_name' => array(
 				'label' => $txt['username'],

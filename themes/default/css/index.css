@@ -3795,9 +3795,14 @@ dl.no_members {
 	width: 20px;
 }
 #memberlist .avatar.avatarresize {
-	width: 2.4em;
-	heigth: 2.4em;
-	margin: -4px -1.5em -8px 0;
+	max-width: 2.4em;
+	max-height: 3.4em;
+}
+.mlist li div {
+	margin: 0 auto;
+	height: 2.4em;
+	padding: 3px 8px;
+	vertical-align: middle;
 }
 #memberlist .selected {
 	width: auto;
