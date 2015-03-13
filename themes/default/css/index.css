@@ -3801,7 +3801,7 @@ dl.no_members {
 .mlist li div {
 	margin: 0 auto;
 	height: 2.4em;
-	padding: 3px 8px;
+	padding: 3px 8px 0;
 	vertical-align: middle;
 }
 #memberlist .selected {
