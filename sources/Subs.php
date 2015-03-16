@@ -2559,8 +2559,8 @@ function setupThemeContext($forceload = false)
 		$_SESSION['unread_messages'] = $user_info['unread_messages'];
 
 		$context['user']['avatar'] = array(
-			'href' => $user_info['avatar']['href'],
-			'image' => $user_info['avatar']['image'],
+			'href' => !empty($user_info['avatar']['href']) ? $user_info['avatar']['href'] : '',
+			'image' => !empty($user_info['avatar']['image']) ? $user_info['avatar']['image'] : '',
 		);
 
 		// @deprecated since 1.0.2
