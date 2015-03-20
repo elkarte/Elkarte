@@ -13,7 +13,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:		BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0
+ * @version 1.0.3
  *
  */
 
@@ -652,6 +652,9 @@ class Poll_Controller extends Action_Controller
 			else
 				$add_options[] = array($bcinfo['id_poll'], $k, $option, 0);
 		}
+		if (!empty($update_options))
+			modifyPollOption($update_options);
+
 		if (!empty($add_options))
 			insertPollOptions($add_options);
 

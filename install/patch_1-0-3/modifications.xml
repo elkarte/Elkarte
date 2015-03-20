@@ -1038,6 +1038,41 @@ function htmlTime($timestamp)
 		// Determine which poll will survive and which polls won't.]]></add>
 		</operation>
 	</file>
+	<file name="CONTROLLERDIR/Poll.controller.php">
+		<operation>
+			<search position="replace"><![CDATA[ * copyright:	2011 Simple Machines (http://www.simplemachines.org)
+ * license:		BSD, See included LICENSE.TXT for terms and conditions.
+ *
+ * @version 1.0
+ *
+ */
+]]></search>
+			<add><![CDATA[ * copyright:	2011 Simple Machines (http://www.simplemachines.org)
+ * license:		BSD, See included LICENSE.TXT for terms and conditions.
+ *
+ * @version 1.0.3
+ *
+ */
+]]></add>
+		</operation>
+		<operation>
+			<search position="replace"><![CDATA[			else
+				$add_options[] = array($bcinfo['id_poll'], $k, $option, 0);
+		}
+		if (!empty($add_options))
+			insertPollOptions($add_options);
+]]></search>
+			<add><![CDATA[			else
+				$add_options[] = array($bcinfo['id_poll'], $k, $option, 0);
+		}
+		if (!empty($update_options))
+			modifyPollOption($update_options);
+
+		if (!empty($add_options))
+			insertPollOptions($add_options);
+]]></add>
+		</operation>
+	</file>
 	<file name="CONTROLLERDIR/ProfileInfo.controller.php">
 		<operation>
 			<search position="replace"><![CDATA[ * copyright:	2011 Simple Machines (http://www.simplemachines.org)
