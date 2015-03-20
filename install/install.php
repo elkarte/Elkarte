@@ -2007,6 +2007,9 @@ function updateSettingsFile($vars)
 	}
 	fclose($fp);
 
+	if (function_exists('opcache_invalidate'))
+		opcache_invalidate(dirname(__FILE__) . '/Settings.php');
+
 	return true;
 }
 
