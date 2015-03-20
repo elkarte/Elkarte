@@ -7,7 +7,7 @@
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
- * @version 1.0.2
+ * @version 1.0.3
  *
  */
 
@@ -812,14 +812,14 @@ function validateNotificationAccess($row, $maillist, &$email_perm = true)
 
 	static $board_profile = array();
 
-	// No need to check for you ;)
-	if ($row['id_group'] == 1)
-		return $email_perm;
-
 	$allowed = explode(',', $row['member_groups']);
 	$row['additional_groups'] = !empty( $row['additional_groups']) ? explode(',', $row['additional_groups']) : array();
 	$row['additional_groups'][] = $row['id_group'];
 	$row['additional_groups'][] = $row['id_post_group'];
+
+	// No need to check for you ;)
+	if ($row['id_group'] == 1 || in_array('1', $row['additional_groups']))
+		return $email_perm;
 
 	// They do have access to this board?
 	if (count(array_intersect($allowed, $row['additional_groups'])) === 0)

@@ -7,7 +7,7 @@
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
- * @version 1.0
+ * @version 1.0.3
  *
  */
 
@@ -845,7 +845,7 @@ class Email_Parse
 	}
 
 	/**
-	 * Loads in the most emal from, to and cc address
+	 * Loads in the most email from, to and cc address
 	 *
 	 * - will attempt to return the name and address for fields "name:" <email>
 	 * - will become email['to'] = email and email['to_name'] = name
@@ -955,11 +955,11 @@ class Email_Parse
 	 */
 	private function _parse_ip($string)
 	{
-		$match = array();
+		$string = trim($string, '[] ');
 
 		// Validate it matches an ip4 standard
-		if (preg_match('~^((([1]?\d)?\d|2[0-4]\d|25[0-5])\.){3}(([1]?\d)?\d|2[0-4]\d|25[0-5])$~', $string, $match))
-			return $match[1];
+		if (filter_var($string, FILTER_VALIDATE_IP, FILTER_FLAG_IPV4) !== false)
+			return $string;
 		else
 			return;
 	}

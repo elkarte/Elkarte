@@ -7,7 +7,7 @@
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
- * @version 1.0.2
+ * @version 1.0.3
  *
  */
 
@@ -192,7 +192,7 @@ class Curl_Fetch_Webdata
 		);
 
 		// If this a redirect with a location header and we have not given up, then we play it again Sam
-		if (preg_match('~30[127]~i', $http_code) === 1 && $this->_headers['location'] !== '' && $this->_current_redirect <= $this->_max_redirect)
+		if (preg_match('~30[127]~i', $http_code) === 1 && !empty($this->_headers['location']) && $this->_current_redirect <= $this->_max_redirect)
 		{
 			$this->_current_redirect++;
 			$header_location = $this->_getRedirectURL($url, $this->_headers['location']);

@@ -14,7 +14,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0
+ * @version 1.0.3
  *
  */
 
@@ -416,7 +416,7 @@ class Boards_List
 	 */
 	public function getLatestPost()
 	{
-		if (empty($this->_latest_post))
+		if (empty($this->_latest_post) || empty($this->_latest_post['link']))
 			return array();
 		else
 			return $this->_latest_post;

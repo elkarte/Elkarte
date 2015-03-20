@@ -7,7 +7,7 @@
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
- * @version 1.0
+ * @version 1.0.3
  *
  */
 
@@ -35,7 +35,7 @@ function template_show_email()
 			</dl>
 		</div>
 		<div class="centertext">
-			<a href="' . $boardurl . '/index.php?action=admin;area=maillist;sa=emaillist">', $txt['back'], '</a>
+			<a class="linkbutton" href="' . $boardurl . '/index.php?action=admin;area=maillist;sa=emaillist">', $txt['back'], '</a>
 		</div>';
 }
 

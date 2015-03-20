@@ -8,7 +8,7 @@
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
- * @version 1.0
+ * @version 1.0.3
  *
  */
 
@@ -162,7 +162,13 @@ class ManageMaillist_Controller extends Action_Controller
 						'value' => $txt['error'],
 					),
 					'data' => array(
-						'db' => 'error',
+						'function' => create_function('$rowData', '
+							$error = $rowData[\'error_code\'];
+							if ($error === \'error_pm_not_found\')
+								return \'<span class="errorbox">\' . $rowData[\'error\'] . \'<span>\';
+							else
+								return $rowData[\'error\'];
+						'),
 					),
 					'sort' => array(
 						'default' => 'error ',
@@ -256,14 +262,22 @@ class ManageMaillist_Controller extends Action_Controller
 						'value' => $txt['message_action'],
 					),
 					'data' => array(
-						'sprintf' => array(
-							'format' => '<a href="?action=admin;area=maillist;sa=approve;item=%1$s;' . $context['session_var'] . '=' . $context['session_id'] . ';' . $context['admin-ml_token_var'] . '=' . $context['admin-ml_token'] . '"><img title="' . $txt['approve'] . '" src="' . $settings['images_url'] . '/icons/field_valid.png" alt="*" /></a>&nbsp;
-						<a href="?action=admin;area=maillist;sa=delete;item=%1$s;' . $context['session_var'] . '=' . $context['session_id'] . ';' . $context['admin-ml_token_var'] . '=' . $context['admin-ml_token'] . '" onclick="return confirm(' . JavaScriptEscape($txt['delete_warning']) . ') && submitThisOnce(this);" accesskey="d"><img title="' . $txt['delete'] . '" src="' . $settings['images_url'] . '/icons/quick_remove.png" alt="*" /></a><br />
-						<a href="?action=admin;area=maillist;sa=bounce;item=%1$s;' . $context['session_var'] . '=' . $context['session_id'] . ';' . $context['admin-ml_token_var'] . '=' . $context['admin-ml_token'] . '"><img title="' . $txt['bounce'] . '" src="' . $settings['images_url'] . '/icons/pm_replied.png" alt="*" /></a>&nbsp;
-						<a href="?action=admin;area=maillist;sa=view;item=%1$s;' . $context['session_var'] . '=' . $context['session_id'] . ';' . $context['admin-ml_token_var'] . '=' . $context['admin-ml_token'] . '"><img title="' . $txt['view'] . '" src="' . $settings['images_url'] . '/icons/pm_read.png" alt="*" /></a>',
-							'params' => array(
-								'id_email' => true,
-							),
+						'function' => create_function('$rowData', '
+							global $context, $txt, $settings;
+
+							$id = $rowData[\'id_email\'] . \';\';
+							$commands = array();
+
+							if ($rowData[\'error_code\'] === \'error_pm_not_found\')
+								$commands[] = \'<a href="?action=admin;area=maillist;sa=approve;item=\' . $id . $context[\'session_var\'] . \'=\' . $context[\'session_id\'] . \';\' . $context[\'admin-ml_token_var\'] . \'=\' . $context[\'admin-ml_token\'] . \'" onclick="return confirm(\' . JavaScriptEscape($txt[\'pm_approve_warning\']) . \') && submitThisOnce(this);"><img title="\' . $txt[\'approve\'] . \'" src="\' . $settings[\'images_url\'] . \'/icons/field_valid.png" alt="*" /></a>&nbsp;\';
+							else
+								$commands[] = \'<a href="?action=admin;area=maillist;sa=approve;item=\' . $id . $context[\'session_var\'] . \'=\' . $context[\'session_id\'] . \';\' . $context[\'admin-ml_token_var\'] . \'=\' . $context[\'admin-ml_token\'] . \'"><img title="\' . $txt[\'approve\'] . \'" src="\' . $settings[\'images_url\'] . \'/icons/field_valid.png" alt="*" /></a>&nbsp;\';
+
+							$commands[] = \'<a href="?action=admin;area=maillist;sa=delete;item=\' . $id . $context[\'session_var\'] . \'=\' . $context[\'session_id\'] . \';\' . $context[\'admin-ml_token_var\'] . \'=\' . $context[\'admin-ml_token\'] . \'" onclick="return confirm(\' . JavaScriptEscape($txt[\'delete_warning\']) . \') && submitThisOnce(this);" accesskey="d"><img title="\' . $txt[\'delete\'] . \'" src="\' . $settings[\'images_url\'] . \'/icons/quick_remove.png" alt="*" /></a><br />\';
+							$commands[] = \'<a href="?action=admin;area=maillist;sa=bounce;item=\' . $id . $context[\'session_var\'] . \'=\' . $context[\'session_id\'] . \';\' . $context[\'admin-ml_token_var\'] . \'=\' . $context[\'admin-ml_token\'] . \'"><img title="\' . $txt[\'bounce\'] . \'" src="\' . $settings[\'images_url\'] . \'/icons/pm_replied.png" alt="*" /></a>&nbsp;\';
+							$commands[] = \'<a href="?action=admin;area=maillist;sa=view;item=\' . $id . $context[\'session_var\'] . \'=\' . $context[\'session_id\'] . \';\' . $context[\'admin-ml_token_var\'] . \'=\' . $context[\'admin-ml_token\'] . \'"><img title="\' . $txt[\'view\'] . \'" src="\' . $settings[\'images_url\'] . \'/icons/pm_read.png" alt="*" /></a>\';
+
+							return implode(\'\', $commands);'
 						),
 						'class' => 'listaction',
 					),
@@ -408,11 +422,11 @@ class ManageMaillist_Controller extends Action_Controller
 			if (!empty($temp_email))
 			{
 				// Do we have the needed data to approve this, after all it failed for a reason yes?
-				if (!empty($temp_email[0]['key']) && (!in_array($temp_email[0]['error_code'], array('error_pm_not_found', 'error_no_message', 'error_not_find_board', 'error_topic_gone'))))
+				if (!empty($temp_email[0]['key']) && (!in_array($temp_email[0]['error_code'], array('error_no_message', 'error_not_find_board', 'error_topic_gone'))))
 				{
 					// Set up the details needed to get this posted
 					$force = true;
-					$key = $temp_email[0]['key'] . $temp_email[0]['type'] . $temp_email[0]['message'];
+					$key = $temp_email[0]['key'];
 					$data = $temp_email[0]['body'];
 
 					// Unknown from email?  Update the message ONLY if we found an appropriate one during the error checking process

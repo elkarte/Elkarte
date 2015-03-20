@@ -11,11 +11,11 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:	BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0.2
+ * @version 1.0.3
  *
  */
 
-define('CURRENT_VERSION', '1.0.2');
+define('CURRENT_VERSION', '1.0.3');
 define('DB_SCRIPT_VERSION', '1-0');
 
 $GLOBALS['required_php_version'] = '5.2.0';
@@ -2006,6 +2006,9 @@ function updateSettingsFile($vars)
 			fwrite($fp, strtr($settingsArray[$i], "\r", ''));
 	}
 	fclose($fp);
+
+	if (function_exists('opcache_invalidate'))
+		opcache_invalidate(dirname(__FILE__) . '/Settings.php');
 
 	return true;
 }

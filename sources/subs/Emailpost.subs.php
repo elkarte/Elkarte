@@ -8,7 +8,7 @@
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
- * @version 1.0.2
+ * @version 1.0.3
  *
  */
 
@@ -68,11 +68,13 @@ function pbe_email_to_bbc($text, $html)
 
 		// Attempt to fix textual ('>') quotes so we also fix wrapping issues first!
 		$text = pbe_fix_email_quotes($text, ($html && !$gmail));
+		$text = str_replace(array('[quote]','[/quote]'), array('&gt;blockquote>', '&gt;/blockquote>'), $text);
 
 		// Convert this (markup) text to html
 		$text = preg_replace(array_keys($tags), array_values($tags), $text);
 		require_once(EXTDIR . '/markdown/markdown.php');
 		$text = Markdown($text);
+		$text = str_replace(array('&gt;blockquote>','&gt;/blockquote>'), array('<blockquote>', '</blockquote>'), $text);
 
 		// Convert any resulting HTML created by markup style text in the email to BBC
 		require_once(SUBSDIR . '/Html2BBC.class.php');
@@ -679,7 +681,7 @@ function pbe_emailError($error, $email_message)
 	}
 
 	// No key? We should at a minimum have who its from and a subject, so use that
-	if (empty($message_key) && $email_message->message_type !== 'x')
+	if ($email_message->message_type !== 'x' && (empty($message_key) || $error === 'error_pm_not_found'))
 	{
 		// We don't have the message type (since we don't have a key)
 		// Attempt to see if it might be a PM so we handle it correctly
@@ -699,16 +701,16 @@ function pbe_emailError($error, $email_message)
 				$message = $match[3];
 
 				// If we know/suspect its a "m,t or p" then use that to avoid a match on a wrong type, that would be bad ;)
-				if ((!empty($message_type) && $message_type === $type) || empty($message_type))
+				if ((!empty($message_type) && $message_type === $type) || (empty($message_type) && $type !== 'p'))
 				{
 					// lets look up this message/topic/pm and see if the subjects match ... if they do then tada!
-					if (query_load_subject($message, $type, $email_message->email['from']) === $email_message->subject)
+					if (query_load_subject($message, $type, $email_message->email['from']) === $subject)
 					{
 						// This email has a subject that matches the subject of a message that was sent to them
 						$message_key = $key;
 						$message_id = $message;
 						$message_type = $type;
-						continue;
+						break;
 					}
 				}
 			}
@@ -720,8 +722,8 @@ function pbe_emailError($error, $email_message)
 		$board_id = query_load_board($message_id);
 
 	// Log the error so the moderators can take a look, helps keep them sharp
-	$id = isset($_POST['item']) ? (int) $_POST['item'] : 0;
-	$db->insert(isset($_POST['item']) ? 'replace' : 'ignore',
+	$id = isset($_REQUEST['item']) ? (int) $_REQUEST['item'] : 0;
+	$db->insert(!empty($id) ? 'replace' : 'ignore',
 		'{db_prefix}postby_emails_error',
 		array('id_email' => 'int', 'error' => 'string', 'data_id' => 'string', 'subject' => 'string', 'id_message' => 'int', 'id_board' => 'int', 'email_from' => 'string', 'message_type' => 'string', 'message' => 'string'),
 		array($id, $error, $message_key, $subject, $message_id, $board_id, $email_message->email['from'], $message_type, $email_message->raw_message),
@@ -929,6 +931,9 @@ function pbe_prepare_text(&$message, &$subject = '', &$signature = '')
 	// Leave code tags as code tags for the conversion
 	$message = preg_replace('~\[code(.*?)\](.*?)\[/code\]~is', '`&lt;code\\1>\\2`&lt;/code>', $message);
 
+	// Allow addons to account for their own unique bbc additions e.g. gallery's etc.
+	call_integration_hook('integrate_mailist_pre_parsebbc', array(&$message));
+
 	// Convert the remaining bbc to html
 	$message = parse_bbc($message, false);
 
@@ -977,6 +982,8 @@ function pbe_prepare_text(&$message, &$subject = '', &$signature = '')
 	// Finally the sig, its goes as just plain text
 	if ($signature !== '')
 	{
+		call_integration_hook('integrate_mailist_pre_sig_parsebbc', array(&$signature));
+
 		$signature = parse_bbc($signature, false);
 		$signature = trim(un_htmlspecialchars(strip_tags(strtr($signature, array('</tr>' => "   \n", '<br />' => "   \n", '</div>' => "\n", '</li>' => "   \n", '&#91;' => '[', '&#93;' => ']')))));
 	}

@@ -9,7 +9,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:		BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0
+ * @version 1.0.3
  *
  * This file contains javascript associated with the current theme
  */
@@ -39,7 +39,8 @@ $(document).ready(function() {
 	});
 
 	// Tooltips
-	$('.preview').SiteTooltip({hoverIntent: {sensitivity: 10, interval: 750, timeout: 50}});
+	if ((!is_mobile && !is_touch) || use_click_menu)
+		$('.preview').SiteTooltip({hoverIntent: {sensitivity: 10, interval: 750, timeout: 50}});
 
 	// Find all nested linked images and turn off the border
 	$('a.bbc_link img.bbc_img').parent().css('border', '0');

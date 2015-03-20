@@ -11,7 +11,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0.2
+ * @version 1.0.3
  *
  */
 
@@ -478,8 +478,8 @@ function template_edit_options()
 	if (!empty($context['show_spellchecking']))
 		echo '
 		<form name="spell_form" id="spell_form" method="post" accept-charset="UTF-8" target="spellWindow" action="', $scripturl, '?action=spellcheck">
-			<input type="hidden" name="spellstring" value="" />
-			<input type="hidden" name="fulleditor" value="" />
+			<input type="hidden" id="spellstring" name="spellstring" value="" />
+			<input type="hidden" id="fulleditor" name="fulleditor" value="" />
 		</form>';
 }
 

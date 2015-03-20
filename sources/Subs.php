@@ -13,7 +13,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:		BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0.2
+ * @version 1.0.3
  *
  */
 
@@ -620,6 +620,8 @@ function standardTime($log_time, $show_today = true, $offset_type = false)
  */
 function htmlTime($timestamp)
 {
+	global $txt, $context;
+
 	if (empty($timestamp))
 		return '';
 
@@ -628,7 +630,7 @@ function htmlTime($timestamp)
 	$stdtime = standardTime($timestamp, true, true);
 
 	// @todo maybe htmlspecialchars on the title attribute?
-	return '<time title="' . $stdtime . '" datetime="' . $time . '" data-timestamp="' . $timestamp . '">' . $stdtime . '</time>';
+	return '<time title="' . (!empty($context['using_relative_time']) ? $stdtime : $txt['last_post']) . '" datetime="' . $time . '" data-timestamp="' . $timestamp . '">' . $stdtime . '</time>';
 }
 
 /**
@@ -2059,7 +2061,12 @@ function parse_bbc($message, $smileys = true, $cache_id = '', $parse_tags = arra
 
 			// For parsed content, we must recurse to avoid security problems.
 			if ($tag['type'] !== 'unparsed_equals')
+			{
 				$data = parse_bbc($data, !empty($tag['parsed_tags_allowed']) ? false : true, '', !empty($tag['parsed_tags_allowed']) ? $tag['parsed_tags_allowed'] : array());
+
+				// Unfortunately after we recurse, we must manually reset the static disabled tags to what they were
+				parse_bbc('dummy');
+			}
 
 			$tag['after'] = strtr($tag['after'], array('$1' => $data));
 
@@ -2456,7 +2463,7 @@ function obExit($header = null, $do_footer = null, $from_index = false, $from_fa
 	$req = request();
 
 	// Remember this URL in case someone doesn't like sending HTTP_REFERER.
-	if (strpos($_SERVER['REQUEST_URL'], 'action=dlattach') === false && strpos($_SERVER['REQUEST_URL'], 'action=viewadminfile') === false && strpos($_SERVER['REQUEST_URL'], ';xml') === false)
+	if (strpos($_SERVER['REQUEST_URL'], 'action=dlattach') === false && strpos($_SERVER['REQUEST_URL'], 'action=viewadminfile') === false && strpos($_SERVER['REQUEST_URL'], ';xml') === false && strpos($_SERVER['REQUEST_URL'], ';api') === false)
 		$_SESSION['old_url'] = $_SERVER['REQUEST_URL'];
 
 	// For session check verification.... don't switch browsers...
@@ -2551,31 +2558,18 @@ function setupThemeContext($forceload = false)
 			$context['user']['popup_messages'] = false;
 		$_SESSION['unread_messages'] = $user_info['unread_messages'];
 
-		$context['user']['avatar'] = array();
+		$context['user']['avatar'] = array(
+			'href' => !empty($user_info['avatar']['href']) ? $user_info['avatar']['href'] : '',
+			'image' => !empty($user_info['avatar']['image']) ? $user_info['avatar']['image'] : '',
+		);
 
-		// Figure out the avatar... uploaded?
-		if ($user_info['avatar']['url'] == '' && !empty($user_info['avatar']['id_attach']))
-			$context['user']['avatar']['href'] = $user_info['avatar']['custom_dir'] ? $modSettings['custom_avatar_url'] . '/' . $user_info['avatar']['filename'] : $scripturl . '?action=dlattach;attach=' . $user_info['avatar']['id_attach'] . ';type=avatar';
-		// Full URL?
-		elseif (substr($user_info['avatar']['url'], 0, 7) == 'http://' || substr($user_info['avatar']['url'], 0, 8) == 'https://')
-		{
-			$context['user']['avatar']['href'] = $user_info['avatar']['url'];
+		// @deprecated since 1.0.2
+		if (!empty($modSettings['avatar_max_width']))
+			$context['user']['avatar']['width'] = $modSettings['avatar_max_width'];
 
-			if (!empty($modSettings['avatar_max_width']))
-				$context['user']['avatar']['width'] = $modSettings['avatar_max_width'];
-
-			if (!empty($modSettings['avatar_max_height']))
-				$context['user']['avatar']['height'] = $modSettings['avatar_max_height'];
-		}
-		// Gravatars URL.
-		elseif ($user_info['avatar']['url'] === 'gravatar')
-			$context['user']['avatar']['href'] = '//www.gravatar.com/avatar/' . md5(strtolower($user_settings['email_address'])) . 'd=' . $modSettings['avatar_max_height'] . (!empty($modSettings['gravatar_rating']) ? ('&amp;r=' . $modSettings['gravatar_rating']) : '');
-		// Otherwise we assume it's server stored?
-		elseif ($user_info['avatar']['url'] !== '')
-			$context['user']['avatar']['href'] = $modSettings['avatar_url'] . '/' . htmlspecialchars($user_info['avatar']['url']);
-
-		if (!empty($context['user']['avatar']))
-			$context['user']['avatar']['image'] = '<img src="' . $context['user']['avatar']['href'] . '" style="' . (isset($context['user']['avatar']['width']) ? 'width: ' . $context['user']['avatar']['width'] . 'px;' : '') . (isset($context['user']['avatar']['height']) ? 'height: ' . $context['user']['avatar']['height'] . 'px' : '') . '" alt="" class="avatar" />';
+		// @deprecated since 1.0.2
+		if (!empty($modSettings['avatar_max_height']))
+			$context['user']['avatar']['height'] = $modSettings['avatar_max_height'];
 
 		// Figure out how long they've been logged in.
 		$context['user']['total_time_logged_in'] = array(

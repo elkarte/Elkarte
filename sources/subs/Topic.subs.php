@@ -16,7 +16,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0.2
+ * @version 1.0.3
  *
  */
 
@@ -306,23 +306,27 @@ function removeTopics($topics, $decreasePostCount = true, $ignoreRecycling = fal
 	if (empty($messages))
 		$messages = messagesInTopics($topics);
 
-	// Remove all likes now that the topic is gone
-	$db->query('', '
-		DELETE FROM {db_prefix}message_likes
-		WHERE id_msg IN ({array_int:messages})',
-		array(
-			'messages' => $messages,
-		)
-	);
+	// If there are messages left in this topic
+	if (!empty($messages))
+	{
+		// Remove all likes now that the topic is gone
+		$db->query('', '
+			DELETE FROM {db_prefix}message_likes
+			WHERE id_msg IN ({array_int:messages})',
+			array(
+				'messages' => $messages,
+			)
+		);
 
-	// Remove all mentions now that the topic is gone
-	$db->query('', '
-		DELETE FROM {db_prefix}log_mentions
-		WHERE id_msg IN ({array_int:messages})',
-		array(
-			'messages' => $messages,
-		)
-	);
+		// Remove all mentions now that the topic is gone
+		$db->query('', '
+			DELETE FROM {db_prefix}log_mentions
+			WHERE id_msg IN ({array_int:messages})',
+			array(
+				'messages' => $messages,
+			)
+		);
+	}
 
 	// Delete messages in each topic.
 	$db->query('', '

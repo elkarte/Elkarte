@@ -14,7 +14,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0.1
+ * @version 1.0.3
  *
  */
 
@@ -145,8 +145,8 @@ function sendmail($to, $subject, $message, $from = null, $message_id = null, $se
 	$headers .= 'Date: ' . gmdate('D, d M Y H:i:s') . ' -0000' . $line_break;
 	$headers .= 'X-Mailer: ELK' . $line_break;
 
-	// If Using the maillist we include a few more headers for compliance
-	if ($maillist)
+	// For maillist, digests or newsletters we include a few more headers for compliance
+	if ($maillist || $priority > 3)
 	{
 		// Lets try to avoid auto replies
 		$headers .= 'X-Auto-Response-Suppress: All' . $line_break;
@@ -1351,7 +1351,7 @@ function reduceMailQueue($batch_size = false, $override_limit = false, $force_se
 				@apache_reset_timeout();
 		}
 		else
-			$result = smtp_mail(array($email['to']), $email['subject'], $email['body'], $email['send_html'] ? $email['headers'] : 'Mime-Version: 1.0' . "\r\n" . $email['headers'], $email['priority'], $email['message_id']);
+			$result = smtp_mail(array($email['to']), $email['subject'], $email['body'], $email['headers'], $email['priority'], $email['message_id']);
 
 		// Hopefully it sent?
 		if (!$result)
@@ -1384,7 +1384,7 @@ function reduceMailQueue($batch_size = false, $override_limit = false, $force_se
  * This function finds email address and few other details of the
  * poster of a certain message.
  *
- * @todo very similar to mailFromMesasge
+ * @todo very similar to mailFromMessage
  * @package Mail
  * @param int $id_msg the id of a message
  * @param int $topic_id the topic the message belongs to

@@ -11,7 +11,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0.2
+ * @version 1.0.3
  *
  */
 
@@ -1299,18 +1299,18 @@ function template_repair_boards()
 
 			echo '
 				</ul>
-				<p>
+				<p class="noticebox">
 					', $txt['errors_fix'], '
 				</p>
 				<p>
-					<strong><a href="', $scripturl, '?action=admin;area=repairboards;fixErrors;', $context['session_var'], '=', $context['session_id'], '">', $txt['yes'], '</a> - <a href="', $scripturl, '?action=admin;area=maintain">', $txt['no'], '</a></strong>
+					<strong><a class="linkbutton" href="', $scripturl, '?action=admin;area=repairboards;fixErrors;', $context['session_var'], '=', $context['session_id'], '">', $txt['yes'], '</a> - <a href="', $scripturl, '?action=admin;area=maintain">', $txt['no'], '</a></strong>
 				</p>';
 		}
 		else
 			echo '
-				<p>', $txt['maintain_no_errors'], '</p>
+				<p class="infobox">', $txt['maintain_no_errors'], '</p>
 				<p>
-					<a href="', $scripturl, '?action=admin;area=maintain;sa=routine">', $txt['maintain_return'], '</a>
+					<a class="linkbutton" href="', $scripturl, '?action=admin;area=maintain;sa=routine">', $txt['maintain_return'], '</a>
 				</p>';
 	}
 	else
@@ -1329,9 +1329,9 @@ function template_repair_boards()
 		else
 		{
 			echo '
-				<p>', $txt['errors_fixed'], '</p>
+				<p class="successbox">', $txt['errors_fixed'], '</p>
 				<p>
-					<a href="', $scripturl, '?action=admin;area=maintain;sa=routine">', $txt['maintain_return'], '</a>
+					<a class="linkbutton" href="', $scripturl, '?action=admin;area=maintain;sa=routine">', $txt['maintain_return'], '</a>
 				</p>';
 		}
 	}

@@ -11,9 +11,14 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0.2
+ * @version 1.0.3
  *
  */
+
+function template_MergeTopics_init()
+{
+	loadTemplate('GenericHelpers');
+}
 
 /**
  * Template for the bit to show when merge topics is finished.
@@ -119,7 +124,7 @@ function template_merge()
 							<a class="linkbutton" href="', $scripturl, '?action=mergetopics;sa=options;board=', $context['current_board'], '.0;from=', $context['origin_topic'], ';to=', $topic['id'], ';', $context['session_var'], '=', $context['session_id'], '">
 								<img class="centericon" src="', $settings['images_url'], '/buttons/merge.png" alt="', $txt['merge'], '"  />
 							</a>&nbsp;
-							<a href="', $scripturl, '?topic=', $topic['id'], '.0" target="_blank" class="new_win">', $topic['subject'], '</a> ', $txt['started_by'], ' ', $topic['poster']['link'], '
+							<a href="', $scripturl, '?topic=', $topic['id'], '.0" target="_blank" class="new_win">', $topic['subject'], '</a> ', sprintf($txt['topic_started_by'], $topic['poster']['link']), '
 						</li>';
 
 	echo '
@@ -202,17 +207,11 @@ function template_merge_extra_options()
 	{
 		echo '
 					<fieldset id="merge_board" class="merge_options">
-						<legend>', $txt['merge_select_target_board'], '</legend>
-						<ul>';
+						<legend>', $txt['merge_select_target_board'], '</legend>';
 
-		foreach ($context['boards'] as $board)
-			echo '
-							<li>
-								<input type="radio" id="board', $board['id'], '" name="board" value="', $board['id'], '"', $board['selected'] ? ' checked="checked"' : '', ' class="input_radio" /> <label for="board', $board['id'], '">', $board['name'], '</label>
-							</li>';
+		template_select_boards('board');
 
 		echo '
-						</ul>
 					</fieldset>';
 	}
 

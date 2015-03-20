@@ -11,7 +11,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0.2
+ * @version 1.0.3
  *
  */
 
@@ -334,8 +334,7 @@ function template_ic_show_users()
 		$bracketList[] = comma_format($context['num_spiders']) . ' ' . ($context['num_spiders'] == 1 ? $txt['spider'] : $txt['spiders']);
 
 	if (!empty($context['num_users_hidden']))
-		$bracketList[] = comma_format($context['num_users_hidden']) . ' ' . ($context['num_spiders'] == 1 ? $txt['hidden'] : $txt['hidden_s']);
-
+		$bracketList[] = comma_format($context['num_users_hidden']) . ' ' . ($context['num_users_hidden'] == 1 ? $txt['hidden'] : $txt['hidden_s']);
 	if (!empty($bracketList))
 		echo ' (' . implode(', ', $bracketList) . ')';
 

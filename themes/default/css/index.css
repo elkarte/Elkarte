@@ -2557,6 +2557,7 @@ ul.post_options li {
 }
 .drop_area_fileselect_text {
 	white-space: nowrap;
+	padding: 0 4px;
 }
 
 #postAttachment >dd.progress_tracker {
@@ -3791,7 +3792,17 @@ dl.no_members {
 	padding: 12px 0;
 }
 #memberlist .status {
-	width: 60px;
+	width: 20px;
+}
+#memberlist .avatar.avatarresize {
+	max-width: 2.4em;
+	max-height: 3.4em;
+}
+.mlist li div {
+	margin: 0 auto;
+	height: 2.4em;
+	padding: 3px 8px 0;
+	vertical-align: middle;
 }
 #memberlist .selected {
 	width: auto;
@@ -4783,5 +4794,9 @@ dl.no_members {
 	}
 	#postMoreOptions, #postAttachment, #postAttachment2 {
 		padding: 4px;
+	}
+	#confirm_buttons .button_submit {
+		height: inherit;
+		max-height: none;
 	}
 }

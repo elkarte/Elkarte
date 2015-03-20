@@ -11,7 +11,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0
+ * @version 1.0.3
  *
  */
 
@@ -757,6 +757,10 @@ function template_spellcheck()
 				height: 314px;
 				overflow: auto;
 				background: #ffffff;
+			}
+			select {
+				height: auto;
+				max-height: none;
 			}
 		</style>';
 

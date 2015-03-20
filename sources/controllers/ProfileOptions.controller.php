@@ -15,7 +15,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:		BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0
+ * @version 1.0.3
  *
  */
 
@@ -604,7 +604,8 @@ class ProfileOptions_Controller extends Action_Controller
 				'delete' => array(
 					'header' => array(
 						'value' => '<input type="checkbox" class="input_check" onclick="invertAll(this, this.form);" />',
-						'style' => 'width: 4%;text-align: center',
+						'class' => 'centertext',
+						'style' => 'width:4%;',
 					),
 					'data' => array(
 						'sprintf' => array(
@@ -613,8 +614,8 @@ class ProfileOptions_Controller extends Action_Controller
 								'id' => false,
 								'checked' => false,
 							),
-						'class' => 'centertext',
 						),
+						'class' => 'centertext',
 					),
 				),
 			),
@@ -725,7 +726,8 @@ class ProfileOptions_Controller extends Action_Controller
 				'delete' => array(
 					'header' => array(
 						'value' => '<input type="checkbox" class="input_check" onclick="invertAll(this, this.form);" />',
-						'style' => 'width: 4%;text-align: center',
+						'class' => 'centertext',
+						'style' => 'width:4%;',
 					),
 					'data' => array(
 						'sprintf' => array(
