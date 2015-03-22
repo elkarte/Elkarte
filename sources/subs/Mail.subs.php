@@ -14,7 +14,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0.1
+ * @version 1.0.3
  *
  */
 
@@ -1351,7 +1351,7 @@ function reduceMailQueue($batch_size = false, $override_limit = false, $force_se
 				@apache_reset_timeout();
 		}
 		else
-			$result = smtp_mail(array($email['to']), $email['subject'], $email['body'], $email['send_html'] ? $email['headers'] : 'Mime-Version: 1.0' . "\r\n" . $email['headers'], $email['priority'], $email['message_id']);
+			$result = smtp_mail(array($email['to']), $email['subject'], $email['body'], $email['headers'], $email['priority'], $email['message_id']);
 
 		// Hopefully it sent?
 		if (!$result)

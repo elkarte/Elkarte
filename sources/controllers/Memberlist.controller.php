@@ -14,7 +14,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:		BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0
+ * @version 1.0.3
  *
  */
 
@@ -71,7 +71,7 @@ class Memberlist_Controller extends Action_Controller
 		$context['columns'] = array(
 			'avatar' => array(
 				'label' => '',
-				'class' => '',
+				'class' => 'avatar',
 			),
 			'real_name' => array(
 				'label' => $txt['username'],

@@ -160,6 +160,8 @@ function getFilesChanged($from, $to)
 			continue;
 		if (strpos($file, '/scripts') !== false)
 			continue;
+		if (strpos($file, '/images') !== false)
+			continue;
 		if (strpos($file, '/css') !== false)
 			continue;
 		if (strpos($file, '/languages') !== false)
