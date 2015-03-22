@@ -449,7 +449,7 @@ class Unread_Controller extends Action_Controller
 		elseif (!$this->_is_topics && isset($topics_to_mark))
 		{
 			$context['recent_buttons'] = array(
-				'markread' => array('text' => 'mark_as_read', 'image' => 'markread.png', 'lang' => true, 'url' => $scripturl . '?action=markasread;sa=unreadreplies;topics=' . $topics_to_mark . ';' . $context['session_var'] . '=' . $context['session_id']),
+				'markread' => array('text' => 'mark_these_as_read', 'image' => 'markread.png', 'lang' => true, 'url' => $scripturl . '?action=markasread;sa=unreadreplies;topics=' . $topics_to_mark . ';' . $context['session_var'] . '=' . $context['session_id']),
 			);
 
 			if ($context['showCheckboxes'])

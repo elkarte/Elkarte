@@ -13,7 +13,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0
+ * @version 1.0.3
  *
  */
 if (!defined('ELK'))
@@ -777,7 +777,7 @@ function updateZeroPostMembers()
 				'zero' => 0,
 				'string_zero' => '0',
 				'db_error_skip' => true,
-				'recycle' => $modSettings['recycle_enable'],
+				'recycle' => $modSettings['recycle_board'],
 			)
 		) !== false;
 
