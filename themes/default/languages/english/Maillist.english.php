@@ -41,6 +41,8 @@ $txt['error_in_maintenance_mode_short'] = 'In Maintenance';
 $txt['error_email_notenabled_short'] = 'Not Enabled';
 $txt['error_email_notenabled'] = 'The post by email function was not enabled, the email could not be processed';
 $txt['error_permission'] = 'The poster does not have post by email permissions on this board';
+$txt['error_bounced'] = 'The message was refused by the destination mail server';
+$txt['error_bounced_short'] = 'The message could not be delivered';
 
 // Maillist page items
 $txt['ml_admin_configuration'] = 'Maillist Configuration';
