@@ -148,7 +148,21 @@ class Email_Parse
 	 * @var boolean
 	 */
 	public $_converted_utf8 = false;
-
+	
+	/**
+	 * Whether the message is a DSN (Delivery Status Notification - aka "bounce"),
+	 * indicating failed delivery
+	 * @var boolean
+	 */
+	public $_is_dsn = false;
+	
+	/**
+	 * Holds the field/value/type report codes from DSN messages
+	 * Acessible as [$field]['type'] and [$field]['value']
+	 * @var mixed[]
+	 */
+	public $_dsn = null;
+	
 	/**
 	 * Holds the current email address, to, from, cc
 	 * @var mixed[]
@@ -178,7 +192,7 @@ class Email_Parse
 	 * @var string
 	 */
 	private $_header_block = null;
-
+	
 	/**
 	 * Loads an email message from stdin, file or from a supplied string
 	 *
@@ -261,13 +275,14 @@ class Email_Parse
 		// Main, will read, split, parse, decode an email
 		$this->read_data($data, $location);
 		if ($this->raw_message)
-		{
-			$this->_split_headers();
-			$this->_parse_headers();
-			$this->_parse_content_headers();
+		{			
+			$this->_split_headers();			
+			$this->_parse_headers();			
+			$this->_parse_content_headers();			
 			$this->_parse_body($html);
 			$this->load_subject();
-		}
+			$this->_is_dsn = $this->_check_dsn();
+		}		
 	}
 
 	/**
@@ -284,14 +299,14 @@ class Email_Parse
 
 		// Do we even start with a header in this boundary section?
 		if (!preg_match('~^[\w-]+:[ ].*?\r?\n~i', $this->raw_message))
-			return;
+			return;		
 
 		// The header block ends based on condition (1) or (2)
 		if (!preg_match('~^(.*?)\r?\n(?:\r?\n|(?!(\t|[\w-]+:|[ ])))(.*)~s', $this->raw_message, $match))
 			return;
 
 		$this->_header_block = $match[1];
-		$this->body = $match[3];
+		$this->body = $match[3];		
 	}
 
 	/**
@@ -464,7 +479,7 @@ class Email_Parse
 			case 'multipart/report':
 			case 'multipart/signed':
 			case 'multipart/encrypted':
-			case 'message/rfc822':
+			case 'message/rfc822':			
 				if (!isset($this->headers['x-parameters']['content-type']['boundary']))
 				{
 					// No boundary's but presented as multipart?, then we must have a incomplete message
@@ -478,13 +493,13 @@ class Email_Parse
 
 				// Some multi-part messages ... are singletons :P
 				if ($this->_boundary_section_count === 1)
-				{
+				{					
 					$this->body = $this->_boundary_section[0]->body;
 					$this->headers['x-parameters'] = $this->_boundary_section[0]->headers['x-parameters'];
 				}
 				// We found multiple sections, lets go through each
 				elseif ($this->_boundary_section_count > 1)
-				{
+				{					
 					$html_ids = array();
 					$text_ids = array();
 					$this->body = '';
@@ -493,7 +508,7 @@ class Email_Parse
 
 					// Go through each boundary section
 					for ($i = 0; $i < $this->_boundary_section_count; $i++)
-					{
+					{						
 						// Stuff we can't or don't want to process
 						if (in_array($this->_boundary_section[$i]->headers['content-type'], $bypass))
 							continue;
@@ -503,6 +518,39 @@ class Email_Parse
 						// Plain section
 						elseif ($this->_boundary_section[$i]->headers['content-type'] === 'text/plain')
 							$text_ids[] = $i;
+						//Message is a DSN
+						elseif ($this->_boundary_section[$i]->headers['content-type'] === 'message/delivery-status'){							
+							//These sections often have extra blank lines, so cannot be counted on to be
+							//fully accessible in ->headers. The "body" of this section contains values
+							//formatted by FIELD: [TYPE;] VALUE
+							$dsn_body = array();
+							$body = (str_replace("\r\n", "\n", $this->_boundary_section[$i]->body));
+							foreach(explode("\n",str_replace("\r\n", "\n", $this->_boundary_section[$i]->body)) as $l){
+								$field = $type = $val = "";
+								
+								list($field, $rest) = explode(":", $l);
+								if (strpos($l, ";")){
+									list ($type, $val)  = explode(";", $rest);	
+								} else {
+									$val = $rest;
+								}																
+								$dsn_body[trim(strtolower($field))] = array('type'=>trim($type), 'value'=>trim($val));								
+							}							
+							switch ($dsn_body['action']['value']){
+								case 'failed':
+								//Remove this if we don't want to flag delayed delivery addresses as "dirty"
+								//May be caused by temporary net failures, e.g. DNS outage
+								case 'delayed':
+									$this->_is_dsn = true;
+									$this->_dsn = array('headers'=>$this->_boundary_section[$i]->headers,
+									'body'=>$dsn_body
+									);
+								default:
+									$this->is_dsn = false;
+							}
+							
+						}
+						
 
 						// Attachments, we love em
 						if ($this->_boundary_section[$i]->headers['content-disposition'] === 'attachment' || $this->_boundary_section[$i]->headers['content-disposition'] === 'inline' || isset($this->_boundary_section[$i]->headers['content-id']))
@@ -731,6 +779,26 @@ class Email_Parse
 
 		return $val;
 	}
+	
+	/**
+	 * Checks the message components to determine if the message is a DSN
+	 *
+	 * What it does:
+	 * 	Checks the content of the message, looking for headers and values that
+	 * 	correlate with the message being a DSN. _parse_body checks for the existence
+	 * 	of a "message/delivery-status" header
+	 * 	As many, many daemons and providers do not adhere to the RFC 3464
+	 *	standard, this function will hold the "special cases"
+	 *	
+	 * @return boolean
+	 */
+	private function _check_dsn()
+	{
+		if ($this->_is_dsn) { return true; } //If we already know it's a DSN, bug out
+		
+		/** Add non-header-based detection **/
+	}
+	
 
 	/**
 	 * Find the message return_path and well return it
@@ -769,6 +837,7 @@ class Email_Parse
 
 		return $this->subject;
 	}
+
 
 	/**
 	 * Check for the message security key in common headers, in-reply-to and references
