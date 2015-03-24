@@ -192,7 +192,7 @@ class Email_Parse
 	 * @var string
 	 */
 	private $_header_block = null;
-	
+
 	/**
 	 * Loads an email message from stdin, file or from a supplied string
 	 *
@@ -275,14 +275,14 @@ class Email_Parse
 		// Main, will read, split, parse, decode an email
 		$this->read_data($data, $location);
 		if ($this->raw_message)
-		{			
-			$this->_split_headers();			
-			$this->_parse_headers();			
-			$this->_parse_content_headers();			
+		{
+			$this->_split_headers();
+			$this->_parse_headers();
+			$this->_parse_content_headers();
 			$this->_parse_body($html);
 			$this->load_subject();
 			$this->_is_dsn = $this->_check_dsn();
-		}		
+		}
 	}
 
 	/**
@@ -299,14 +299,14 @@ class Email_Parse
 
 		// Do we even start with a header in this boundary section?
 		if (!preg_match('~^[\w-]+:[ ].*?\r?\n~i', $this->raw_message))
-			return;		
+			return;
 
 		// The header block ends based on condition (1) or (2)
 		if (!preg_match('~^(.*?)\r?\n(?:\r?\n|(?!(\t|[\w-]+:|[ ])))(.*)~s', $this->raw_message, $match))
 			return;
 
 		$this->_header_block = $match[1];
-		$this->body = $match[3];		
+		$this->body = $match[3];
 	}
 
 	/**
@@ -493,13 +493,13 @@ class Email_Parse
 
 				// Some multi-part messages ... are singletons :P
 				if ($this->_boundary_section_count === 1)
-				{					
+				{
 					$this->body = $this->_boundary_section[0]->body;
 					$this->headers['x-parameters'] = $this->_boundary_section[0]->headers['x-parameters'];
 				}
 				// We found multiple sections, lets go through each
 				elseif ($this->_boundary_section_count > 1)
-				{					
+				{
 					$html_ids = array();
 					$text_ids = array();
 					$this->body = '';
@@ -550,7 +550,6 @@ class Email_Parse
 							}
 							
 						}
-						
 
 						// Attachments, we love em
 						if ($this->_boundary_section[$i]->headers['content-disposition'] === 'attachment' || $this->_boundary_section[$i]->headers['content-disposition'] === 'inline' || isset($this->_boundary_section[$i]->headers['content-id']))
@@ -798,7 +797,6 @@ class Email_Parse
 		
 		/** Add non-header-based detection **/
 	}
-	
 
 	/**
 	 * Find the message return_path and well return it
@@ -837,7 +835,6 @@ class Email_Parse
 
 		return $this->subject;
 	}
-
 
 	/**
 	 * Check for the message security key in common headers, in-reply-to and references
