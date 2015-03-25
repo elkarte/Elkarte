@@ -523,8 +523,7 @@ class Email_Parse
 							//These sections often have extra blank lines, so cannot be counted on to be
 							//fully accessible in ->headers. The "body" of this section contains values
 							//formatted by FIELD: [TYPE;] VALUE
-							$dsn_body = array();
-							$body = (str_replace("\r\n", "\n", $this->_boundary_section[$i]->body));
+							$dsn_body = array();							
 							foreach(explode("\n",str_replace("\r\n", "\n", $this->_boundary_section[$i]->body)) as $l){
 								$field = $type = $val = "";
 								
@@ -538,15 +537,16 @@ class Email_Parse
 							}							
 							switch ($dsn_body['action']['value']){
 								case 'failed':
+								//No Break
 								//Remove this if we don't want to flag delayed delivery addresses as "dirty"
-								//May be caused by temporary net failures, e.g. DNS outage
+								//May be caused by temporary net failures, e.g. DNS outage								
 								case 'delayed':
 									$this->_is_dsn = true;
 									$this->_dsn = array('headers'=>$this->_boundary_section[$i]->headers,
 									'body'=>$dsn_body
 									);
 								default:
-									$this->is_dsn = false;
+									$this->_is_dsn = false;
 							}
 							
 						}
