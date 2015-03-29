@@ -75,6 +75,13 @@ class Emailpost_Controller extends Action_Controller
 		$email_message->load_address();
 		$email_message->load_key($key);
 
+		//Check if it's a DSN
+		//Hopefully, this will eventually DO something but for now
+		//we'll just add it with a more specific error reason
+		if ($email_message->_is_dsn){
+			return pbe_emailError('error_bounced',$email_message);
+		}
+
 		// If the feature is on but the post/pm function is not enabled, just log the message.
 		if (empty($modSettings['pbe_post_enabled']) && empty($modSettings['pbe_pm_enabled']))
 			return pbe_emailError('error_email_notenabled', $email_message);
