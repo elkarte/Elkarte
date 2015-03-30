@@ -223,7 +223,7 @@ function template_topic_listing()
 					</p>
 					<p class="topic_lastpost">';
 
-			if (!empty($settings['avatars_on_indexes']))
+			if (!empty($settings['avatars_on_indexes']) && $settings['avatars_on_indexes'] !== 2)
 				echo '
 						<span class="board_avatar"><a href="', $topic['last_post']['member']['href'], '"><img class="avatar" src="', $topic['last_post']['member']['avatar']['href'], '" alt="" /></a></span>';
 
