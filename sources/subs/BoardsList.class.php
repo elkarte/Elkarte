@@ -122,7 +122,7 @@ class Boards_List
 			'get_moderators' => true,
 		), $options);
 
-		$this->_options['avatars_on_indexes'] = !empty($settings['avatars_on_indexes']);
+		$this->_options['avatars_on_indexes'] = !empty($settings['avatars_on_indexes']) && $settings['avatars_on_indexes'] !== 2;
 
 		$this->_images_url = $settings['images_url'] . '/' . $context['theme_variant_url'];
 		$this->_scripturl = $scripturl;

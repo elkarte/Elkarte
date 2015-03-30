@@ -252,7 +252,7 @@ class MessageIndex_Controller extends Action_Controller
 		$indexOptions = array(
 			'only_approved' => $modSettings['postmod_active'] && !allowedTo('approve_posts'),
 			'previews' => !empty($modSettings['message_index_preview']) ? (empty($modSettings['preview_characters']) ? -1 : $modSettings['preview_characters']) : 0,
-			'include_avatars' => !empty($settings['avatars_on_indexes']) ? (int) $settings['avatars_on_indexes'] : 0,
+			'include_avatars' => $settings['avatars_on_indexes'],
 			'ascending' => $ascending,
 			'fake_ascending' => $fake_ascending
 		);
