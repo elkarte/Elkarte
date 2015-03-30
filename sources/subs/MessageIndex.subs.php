@@ -84,15 +84,28 @@ function messageIndexTopics($id_board, $id_member, $start, $per_page, $sort_by, 
 	// and some you wish you didn't! :P
 	if (!$ids_query || !empty($topic_ids))
 	{
-		// If empty, no preview at all
-		if (empty($indexOptions['previews']))
-			$preview_bodies = '';
-		// If -1 means everything
-		elseif ($indexOptions['previews'] === -1)
-			$preview_bodies = ', ml.body AS last_body, mf.body AS first_body';
+		// If -1 means preview the whole body
+		if ($indexOptions['previews'] === -1)
+			$indexOptions['custom_selects'] += array('ml.body AS last_body', 'mf.body AS first_body');
 		// Default: a SUBSTRING
-		else
-			$preview_bodies = ', SUBSTRING(ml.body, 1, ' . ($indexOptions['previews'] + 256) . ') AS last_body, SUBSTRING(mf.body, 1, ' . ($indexOptions['previews'] + 256) . ') AS first_body';
+		elseif (!empty($indexOptions['previews']))
+			$indexOptions['custom_selects'] += array('SUBSTRING(ml.body, 1, ' . ($indexOptions['previews'] + 256) . ') AS last_body', 'SUBSTRING(mf.body, 1, ' . ($indexOptions['previews'] + 256) . ') AS first_body');
+
+		if (!empty($indexOptions['include_avatars']))
+		{
+			// Double equal comparison for 1 because it is backward compatible with 1.0 where the value was true/false
+			if ($indexOptions['include_avatars'] == 1 || $indexOptions['include_avatars'] === 3)
+			{
+				$indexOptions['custom_selects'] = array_merge($indexOptions['custom_selects'], array('meml.avatar', 'IFNULL(a.id_attach, 0) AS id_attach', 'a.filename', 'a.attachment_type', 'meml.email_address'));
+				$indexOptions['custom_joins'] = array_merge($indexOptions['custom_joins'], array('LEFT JOIN {db_prefix}attachments AS a ON (a.id_member = ml.id_member AND a.id_member != 0)'));
+			}
+
+			if ($indexOptions['include_avatars'] === 2 || $indexOptions['include_avatars'] === 3)
+			{
+				$indexOptions['custom_selects'] = array_merge($indexOptions['custom_selects'], array('memf.avatar AS avatar_first', 'IFNULL(af.id_attach, 0) AS id_attach_first', 'af.filename AS filename_first', 'af.attachment_type AS attachment_type_first', 'memf.email_address AS email_address_first'));
+				$indexOptions['custom_joins'] = array_merge($indexOptions['custom_joins'], array('LEFT JOIN {db_prefix}attachments AS af ON (af.id_member = mf.id_member AND af.id_member != 0)'));
+			}
+		}
 
 		$request = $db->query('substring', '
 			SELECT
@@ -105,17 +118,14 @@ function messageIndexTopics($id_board, $id_member, $start, $per_page, $sort_by, 
 				mf.poster_time AS first_poster_time, mf.subject AS first_subject, mf.icon AS first_icon,
 				mf.poster_name AS first_member_name, mf.id_member AS first_id_member, mf.smileys_enabled AS first_smileys,
 				IFNULL(memf.real_name, mf.poster_name) AS first_display_name
-				' . $preview_bodies . '
-				' . (!empty($indexOptions['include_avatars']) ? ', meml.avatar, IFNULL(a.id_attach, 0) AS id_attach, a.filename, a.attachment_type, meml.email_address' : '') .
-				(!empty($indexOptions['custom_selects']) ? ' ,' . implode(',', $indexOptions['custom_selects']) : '') . '
+				' . (!empty($indexOptions['custom_selects']) ? ' ,' . implode(',', $indexOptions['custom_selects']) : '') . '
 			FROM {db_prefix}topics AS t
 				INNER JOIN {db_prefix}messages AS ml ON (ml.id_msg = t.id_last_msg)
 				INNER JOIN {db_prefix}messages AS mf ON (mf.id_msg = t.id_first_msg)
 				LEFT JOIN {db_prefix}members AS meml ON (meml.id_member = ml.id_member)
 				LEFT JOIN {db_prefix}members AS memf ON (memf.id_member = mf.id_member)' . ($id_member == 0 ? '' : '
 				LEFT JOIN {db_prefix}log_topics AS lt ON (lt.id_topic = t.id_topic AND lt.id_member = {int:current_member})
-				LEFT JOIN {db_prefix}log_mark_read AS lmr ON (lmr.id_board = {int:current_board} AND lmr.id_member = {int:current_member})') . (!empty($indexOptions['include_avatars']) ? '
-				LEFT JOIN {db_prefix}attachments AS a ON (a.id_member = ml.id_member AND a.id_member != 0)' : '') .
+				LEFT JOIN {db_prefix}log_mark_read AS lmr ON (lmr.id_board = {int:current_board} AND lmr.id_member = {int:current_member})') .
 				(!empty($indexOptions['custom_joins']) ? implode("\n\t\t\t\t", $indexOptions['custom_joins']) : '') . '
 			WHERE ' . ($ids_query ? 't.id_topic IN ({array_int:topic_list})' : 't.id_board = {int:current_board}') . (!$indexOptions['only_approved'] ? '' : '
 				AND (t.approved = {int:is_approved}' . ($id_member == 0 ? '' : ' OR t.id_member_started = {int:current_member}') . ')') . '
@@ -397,7 +407,20 @@ function processMessageIndexTopicList($topics_info, $topicseen = false)
 			);
 
 		if (!empty($settings['avatars_on_indexes']))
+		{
 			$topics[$row['id_topic']]['last_post']['member']['avatar'] = determineAvatar($row);
+			if ($settings['avatars_on_indexes'] > 1)
+			{
+				$first_avatar = array(
+					'avatar' => $row['avatar_first'],
+					'id_attach' => $row['id_attach_first'],
+					'attachment_type' => $row['attachment_type_first'],
+					'filename' => $row['filename_first'],
+					'email_address' => $row['email_address_first'],
+				);
+				$topics[$row['id_topic']]['first_post']['member']['avatar'] = determineAvatar($first_avatar);
+			}
+		}
 
 		determineTopicClass($topics[$row['id_topic']]);
 	}
