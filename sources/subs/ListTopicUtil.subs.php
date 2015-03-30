@@ -198,12 +198,17 @@ function prepareContextTopicList($topics_info, $topicseen = false)
 		);
 
 		if (!empty($row['id_board']))
+		{
 			$topics[$row['id_topic']]['board'] = array(
 				'id' => $row['id_board'],
 				'name' => $row['bname'],
 				'href' => $scripturl . '?board=' . $row['id_board'] . '.0',
 				'link' => '<a href="' . $scripturl . '?board=' . $row['id_board'] . '.0">' . $row['bname'] . '</a>'
 			);
+
+			// @deprecated since 1.0 - better have the sprintf in the template because using html here is bad
+			$topics[$row['id_topic']]['first_post']['started_by'] = sprintf($txt['topic_started_by_in'], '<strong>' . $topics[$row['id_topic']]['first_post']['member']['link'] . '</strong>', '<em>' . $topics[$row['id_topic']]['board']['link'] . '</em>');
+		}
 
 		if (!empty($settings['avatars_on_indexes']))
 		{
@@ -220,9 +225,6 @@ function prepareContextTopicList($topics_info, $topicseen = false)
 				$topics[$row['id_topic']]['first_post']['member']['avatar'] = determineAvatar($first_avatar);
 			}
 		}
-
-		// @deprecated since 1.0 - better have the sprintf in the template because using html here is bad
-		$topics[$row['id_topic']]['first_post']['started_by'] = sprintf($txt['topic_started_by_in'], '<strong>' . $topics[$row['id_topic']]['first_post']['member']['link'] . '</strong>', '<em>' . $topics[$row['id_topic']]['board']['link'] . '</em>');
 
 		determineTopicClass($topics[$row['id_topic']]);
 	}
