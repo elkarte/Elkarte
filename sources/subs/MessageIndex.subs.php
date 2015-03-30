@@ -241,20 +241,3 @@ function MessageTopicIcons()
 
 	return $icon_sources;
 }
-
-/**
- * Prepares the array with topics info useable in MessageIndex
- * to fill the template
- *
- * @param mixed[] $topics_info - array of data regarding a topic, usually the
- *                output of messageIndexTopics
- * @param bool $topicseen - if use the temp table or not
- * @return mixed[] - array of data related to topics
- * @deprecated since 1.1 - replaced by prepareContextTopicList
- * @uses prepareContextTopicList
- */
-function processMessageIndexTopicList($topics_info, $topicseen = false)
-{
-	require_once(SUBSDIR . '/ListTopicUtil.subs.php');
-	return prepareContextTopicList($topics_info, $topicseen);
-}
