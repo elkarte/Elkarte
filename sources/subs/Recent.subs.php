@@ -272,7 +272,7 @@ function earliest_msg()
 }
 
 /**
- * Formats the data obtained by the database in a way that is template-friendly
+ * Formats the data obtained from the database in a template-friendly way
  *
  * Currently used by getUnreadTopics and getUnreadReplies
  *
@@ -283,7 +283,7 @@ function earliest_msg()
  */
 function processRecentTopicList($topics_info, $topicseen = false)
 {
-	global $modSettings, $options, $scripturl, $context, $txt, $settings;
+	global $modSettings, $options, $scripturl, $context, $txt, $settings, $user_info;
 
 	$topics = array();
 	$messages_per_page = empty($modSettings['disableCustomPerPage']) && !empty($options['messages_per_page']) ? $options['messages_per_page'] : $modSettings['defaultMaxMessages'];
@@ -370,12 +370,22 @@ function processRecentTopicList($topics_info, $topicseen = false)
 				$context['icon_sources'][$row['last_icon']] = 'images_url';
 		}
 
+		if ($user_info['is_guest'])
+		{
+			$url_fragment = '.' . ((int) (($row['num_replies']) / $messages_per_page)) * $messages_per_page . $topicseen . '#msg' . $row['id_last_msg'];
+		}
+		else
+		{
+			$url_fragment = ($row['num_replies'] == 0 ? '.0' : '.msg' . $row['id_last_msg']) . $topicseen . '#new';
+		}
+
 		// And build the array.
 		$topics[$row['id_topic']] = array(
 			'id' => $row['id_topic'],
 			'first_post' => array(
 				'id' => $row['id_first_msg'],
 				'member' => array(
+					'username' => $row['first_member_name'],
 					'name' => $row['first_display_name'],
 					'id' => $row['first_id_member'],
 					'href' => !empty($row['first_id_member']) ? $scripturl . '?action=profile;u=' . $row['first_id_member'] : '',
@@ -394,6 +404,7 @@ function processRecentTopicList($topics_info, $topicseen = false)
 			'last_post' => array(
 				'id' => $row['id_last_msg'],
 				'member' => array(
+					'username' => $row['last_member_name'],
 					'name' => $row['last_display_name'],
 					'id' => $row['last_id_member'],
 					'href' => !empty($row['last_id_member']) ? $scripturl . '?action=profile;u=' . $row['last_id_member'] : '',
@@ -406,8 +417,8 @@ function processRecentTopicList($topics_info, $topicseen = false)
 				'preview' => trim($row['last_body']),
 				'icon' => $row['last_icon'],
 				'icon_url' => $settings[$context['icon_sources'][$row['last_icon']]] . '/post/' . $row['last_icon'] . '.png',
-				'href' => $scripturl . '?topic=' . $row['id_topic'] . ($row['num_replies'] == 0 ? '.0' : '.msg' . $row['id_last_msg']) . $topicseen . '#msg' . $row['id_last_msg'],
-				'link' => '<a href="' . $scripturl . '?topic=' . $row['id_topic'] . ($row['num_replies'] == 0 ? '.0' : '.msg' . $row['id_last_msg']) . $topicseen . '#msg' . $row['id_last_msg'] . '" rel="nofollow">' . $row['last_subject'] . '</a>'
+				'href' => $scripturl . '?topic=' . $row['id_topic'] . $url_fragment,
+				'link' => '<a href="' . $scripturl . '?topic=' . $row['id_topic'] . $url_fragment . '" ' . ($row['num_replies'] == 0 ? '' : 'rel="nofollow"') . '>' . $row['last_subject'] . '</a>',
 			),
 			'default_preview' => trim($row[!empty($modSettings['message_index_preview']) && $modSettings['message_index_preview'] == 2 ? 'last_body' : 'first_body']),
 			'is_sticky' => !empty($row['is_sticky']),
@@ -425,10 +436,13 @@ function processRecentTopicList($topics_info, $topicseen = false)
 			'new_href' => $scripturl . '?topic=' . $row['id_topic'] . '.msg' . $row['new_from'] . $topicseen . '#new',
 			'href' => $scripturl . '?topic=' . $row['id_topic'] . ($row['num_replies'] == 0 ? '.0' : '.msg' . $row['new_from']) . $topicseen . ($row['num_replies'] == 0 ? '' : 'new'),
 			'link' => '<a href="' . $scripturl . '?topic=' . $row['id_topic'] . ($row['num_replies'] == 0 ? '.0' : '.msg' . $row['new_from']) . $topicseen . '#msg' . $row['new_from'] . '" rel="nofollow">' . $row['first_subject'] . '</a>',
+			'redir_href' => !empty($row['id_redirect_topic']) ? $scripturl . '?topic=' . $row['id_topic'] . '.0;noredir' : '',
 			'pages' => $pages,
 			'replies' => comma_format($row['num_replies']),
 			'views' => comma_format($row['num_views']),
 			'likes' => comma_format($row['num_likes']),
+			'approved' => $row['approved'],
+			'unapproved_posts' => !empty($row['unapproved_posts']) ? $row['unapproved_posts'] : 0,
 		);
 
 		if (!empty($row['id_board']))
