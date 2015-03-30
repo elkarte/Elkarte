@@ -210,20 +210,20 @@ function prepareContextTopicList($topics_info, $topicseen = false)
 			$topics[$row['id_topic']]['first_post']['started_by'] = sprintf($txt['topic_started_by_in'], '<strong>' . $topics[$row['id_topic']]['first_post']['member']['link'] . '</strong>', '<em>' . $topics[$row['id_topic']]['board']['link'] . '</em>');
 		}
 
-		if (!empty($settings['avatars_on_indexes']))
+		if (!empty($row['avatar']))
 		{
 			$topics[$row['id_topic']]['last_post']['member']['avatar'] = determineAvatar($row);
-			if ($settings['avatars_on_indexes'] > 1)
-			{
-				$first_avatar = array(
-					'avatar' => $row['avatar_first'],
-					'id_attach' => $row['id_attach_first'],
-					'attachment_type' => $row['attachment_type_first'],
-					'filename' => $row['filename_first'],
-					'email_address' => $row['email_address_first'],
-				);
-				$topics[$row['id_topic']]['first_post']['member']['avatar'] = determineAvatar($first_avatar);
-			}
+		}
+		if (!empty($row['avatar_first']))
+		{
+			$first_avatar = array(
+				'avatar' => $row['avatar_first'],
+				'id_attach' => $row['id_attach_first'],
+				'attachment_type' => $row['attachment_type_first'],
+				'filename' => $row['filename_first'],
+				'email_address' => $row['email_address_first'],
+			);
+			$topics[$row['id_topic']]['first_post']['member']['avatar'] = determineAvatar($first_avatar);
 		}
 
 		determineTopicClass($topics[$row['id_topic']]);
