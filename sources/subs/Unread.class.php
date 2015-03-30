@@ -264,7 +264,7 @@ class Unread
 				ml.icon AS last_icon, ms.icon AS first_icon, t.id_poll, t.is_sticky, t.locked, ml.modified_time AS last_modified_time,
 				IFNULL(lt.id_msg, IFNULL(lmr.id_msg, -1)) + 1 AS new_from,
 				' . $body_query . '
-				' . (!empty($custom_selects) ? implode(',', $custom_selects) . ' ,' : '') . '
+				' . (!empty($custom_selects) ? implode(',', $custom_selects) . ', ' : '') . '
 				ml.smileys_enabled AS last_smileys, ms.smileys_enabled AS first_smileys, t.id_first_msg, t.id_last_msg
 			FROM {db_prefix}messages AS ms
 				INNER JOIN {db_prefix}topics AS t ON (t.id_topic = ms.id_topic AND t.id_first_msg = ms.id_msg)
@@ -486,7 +486,7 @@ class Unread
 				ml.icon AS last_icon, ms.icon AS first_icon, t.id_poll, t.is_sticky, t.locked, ml.modified_time AS last_modified_time,
 				IFNULL(lt.id_msg, IFNULL(lmr.id_msg, -1)) + 1 AS new_from,
 				' . $body_query . '
-				' . (!empty($custom_selects) ? implode(',', $custom_selects) . ' ,' : '') . '
+				' . (!empty($custom_selects) ? implode(',', $custom_selects) . ', ' : '') . '
 				ml.smileys_enabled AS last_smileys, ms.smileys_enabled AS first_smileys, t.id_first_msg, t.id_last_msg
 			FROM {db_prefix}topics AS t
 				INNER JOIN {db_prefix}messages AS ms ON (ms.id_topic = t.id_topic AND ms.id_msg = t.id_first_msg)
