@@ -248,7 +248,8 @@ function MessageTopicIcons()
  *
  * @param mixed[] $topics_info - array of data regarding a topic, usually the
  *                output of messageIndexTopics
- * @param bool $topicseen - if add or not the ";topicseen" param to the url
+ * @param bool $topicseen - if use the temp table or not
+ * @return mixed[] - array of data related to topics
  */
 function processMessageIndexTopicList($topics_info, $topicseen = false)
 {
@@ -264,14 +265,15 @@ function processMessageIndexTopicList($topics_info, $topicseen = false)
 		if (!empty($modSettings['message_index_preview']))
 		{
 			// Limit them to $modSettings['preview_characters'] characters - do this FIRST because it's a lot of wasted censoring otherwise.
-			$row['first_body'] = strip_tags(strtr(parse_bbc($row['first_body'], false, $row['id_first_msg']), array('<br />' => "\n", '&nbsp;' => ' ')));
+			$row['first_body'] = strip_tags(strtr(parse_bbc($row['first_body'], $row['first_smileys'], $row['id_first_msg']), array('<br />' => "\n", '&nbsp;' => ' ')));
 			$row['first_body'] = Util::shorten_text($row['first_body'], !empty($modSettings['preview_characters']) ? $modSettings['preview_characters'] : 128, true);
 
+			// No reply then they are the same, no need to process it again
 			if ($row['num_replies'] == 0)
 				$row['last_body'] == $row['first_body'];
 			else
 			{
-				$row['last_body'] = strip_tags(strtr(parse_bbc($row['last_body'], false, $row['id_last_msg']), array('<br />' => "\n", '&nbsp;' => ' ')));
+				$row['last_body'] = strip_tags(strtr(parse_bbc($row['last_body'], $row['last_smileys'], $row['id_last_msg']), array('<br />' => "\n", '&nbsp;' => ' ')));
 				$row['last_body'] = Util::shorten_text($row['last_body'], !empty($modSettings['preview_characters']) ? $modSettings['preview_characters'] : 128, true);
 			}
 
@@ -309,7 +311,11 @@ function processMessageIndexTopicList($topics_info, $topicseen = false)
 		{
 			// We can't pass start by reference.
 			$start = -1;
-			$pages = constructPageIndex($scripturl . '?topic=' . $row['id_topic'] . '.%1$d' . $topicseen, $start, $topic_length, $messages_per_page, true, array('prev_next' => false, 'all' => !empty($modSettings['enableAllMessages']) && $row['num_replies'] + 1 < $modSettings['enableAllMessages']));
+			$pages = constructPageIndex($scripturl . '?topic=' . $row['id_topic'] . '.%1$d' . $topicseen, $start, $topic_length, $messages_per_page, true, array('prev_next' => false, 'all' => !empty($modSettings['enableAllMessages']) && $topic_length < $modSettings['enableAllMessages']));
+
+			// If we can use all, show it.
+			if (!empty($modSettings['enableAllMessages']) && $topic_length < $modSettings['enableAllMessages'])
+				$pages .= ' &nbsp;<a href="' . $scripturl . '?topic=' . $row['id_topic'] . '.0;all">' . $txt['all'] . '</a>';
 		}
 		else
 			$pages = '';
@@ -332,6 +338,15 @@ function processMessageIndexTopicList($topics_info, $topicseen = false)
 
 			if (!isset($context['icon_sources'][$row['last_icon']]))
 				$context['icon_sources'][$row['last_icon']] = 'images_url';
+		}
+
+		if ($user_info['is_guest'])
+		{
+			$url_fragment = '.' . ((int) (($row['num_replies']) / $messages_per_page)) * $messages_per_page . $topicseen . '#msg' . $row['id_last_msg'];
+		}
+		else
+		{
+			$url_fragment = ($row['num_replies'] == 0 ? '.0' : '.msg' . $row['id_last_msg']) . $topicseen . '#new';
 		}
 
 		// And build the array.
@@ -372,8 +387,8 @@ function processMessageIndexTopicList($topics_info, $topicseen = false)
 				'preview' => trim($row['last_body']),
 				'icon' => $row['last_icon'],
 				'icon_url' => $settings[$context['icon_sources'][$row['last_icon']]] . '/post/' . $row['last_icon'] . '.png',
-				'href' => $scripturl . '?topic=' . $row['id_topic'] . ($user_info['is_guest'] ? ('.' . ((int) (($row['num_replies']) / $messages_per_page)) * $messages_per_page . $topicseen . '#msg' . $row['id_last_msg']) : (($row['num_replies'] == 0 ? '.0' : '.msg' . $row['id_last_msg']) . $topicseen . '#new')),
-				'link' => '<a href="' . $scripturl . '?topic=' . $row['id_topic'] . ($user_info['is_guest'] ? ('.' . ((int) (($row['num_replies']) / $messages_per_page)) * $messages_per_page . $topicseen . '#msg' . $row['id_last_msg']) : (($row['num_replies'] == 0 ? '.0' : '.msg' . $row['id_last_msg']) . $topicseen . '#new')) . '" ' . ($row['num_replies'] == 0 ? '' : 'rel="nofollow"') . '>' . $row['last_subject'] . '</a>'
+				'href' => $scripturl . '?topic=' . $row['id_topic'] . $url_fragment,
+				'link' => '<a href="' . $scripturl . '?topic=' . $row['id_topic'] . $url_fragment . '" ' . ($row['num_replies'] == 0 ? '' : 'rel="nofollow"') . '>' . $row['last_subject'] . '</a>',
 			),
 			'default_preview' => trim($row[!empty($modSettings['message_index_preview']) && $modSettings['message_index_preview'] == 2 ? 'last_body' : 'first_body']),
 			'is_sticky' => !empty($row['is_sticky']),
@@ -389,13 +404,15 @@ function processMessageIndexTopicList($topics_info, $topicseen = false)
 			'new_from' => $row['new_from'],
 			'newtime' => $row['new_from'],
 			'new_href' => $scripturl . '?topic=' . $row['id_topic'] . '.msg' . $row['new_from'] . $topicseen . '#new',
+			'href' => $scripturl . '?topic=' . $row['id_topic'] . ($row['num_replies'] == 0 ? '.0' : '.msg' . $row['new_from']) . $topicseen . ($row['num_replies'] == 0 ? '' : 'new'),
+			'link' => '<a href="' . $scripturl . '?topic=' . $row['id_topic'] . ($row['num_replies'] == 0 ? '.0' : '.msg' . $row['new_from']) . $topicseen . '#msg' . $row['new_from'] . '" rel="nofollow">' . $row['first_subject'] . '</a>',
 			'redir_href' => !empty($row['id_redirect_topic']) ? $scripturl . '?topic=' . $row['id_topic'] . '.0;noredir' : '',
 			'pages' => $pages,
 			'replies' => comma_format($row['num_replies']),
 			'views' => comma_format($row['num_views']),
 			'likes' => comma_format($row['num_likes']),
 			'approved' => $row['approved'],
-			'unapproved_posts' => $row['unapproved_posts'],
+			'unapproved_posts' => !empty($row['unapproved_posts']) ? $row['unapproved_posts'] : 0,
 		);
 
 		if (!empty($row['id_board']))
