@@ -197,7 +197,7 @@ class Unread
 	 * @param int $start - position to start the query
 	 * @param int $limit - number of entries to grab
 	 * @param bool $include_avatars - if avatars should be retrieved as well
-	 * @return mixed[] - processRecentTopicList
+	 * @return mixed[] - see prepareContextTopicList
 	 */
 	public function getUnreads($join, $start, $limit, $include_avatars)
 	{
@@ -217,7 +217,7 @@ class Unread
 	 * @param int $start - position to start the query
 	 * @param int $limit - number of entries to grab
 	 * @param bool|int $include_avatars - if avatars should be retrieved as well
-	 * @return processRecentTopicList
+	 * @return mixed[] - see prepareContextTopicList
 	 */
 	private function _getUnreadTopics($join, $start, $limit, $include_avatars = false)
 	{
@@ -298,7 +298,8 @@ class Unread
 			$topics[] = $row;
 		$this->_db->free_result($request);
 
-		return processRecentTopicList($topics, true);
+		require_once(SUBSDIR . '/ListTopicUtil.subs.php');
+		return prepareContextTopicList($topics, true);
 	}
 
 	/**
@@ -383,7 +384,7 @@ class Unread
 	 * @param int $start - position to start the query
 	 * @param int $limit - number of entries to grab
 	 * @param bool|int $include_avatars - if avatars should be retrieved as well
-	 * @return processRecentTopicList
+	 * @return mixed[] - see prepareContextTopicList
 	 */
 	private function _getUnreadReplies($start, $limit, $include_avatars = false)
 	{
@@ -512,7 +513,8 @@ class Unread
 			$return[] = $row;
 		$this->_db->free_result($request);
 
-		return processRecentTopicList($return, true);
+		require_once(SUBSDIR . '/ListTopicUtil.subs.php');
+		return prepareContextTopicList($return, true);
 	}
 
 	/**

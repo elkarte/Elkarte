@@ -262,7 +262,8 @@ class MessageIndex_Controller extends Action_Controller
 
 		$topics_info = messageIndexTopics($board, $user_info['id'], $start, $maxindex, $context['sort_by'], $sort_column, $indexOptions);
 
-		$context['topics'] = processMessageIndexTopicList($topics_info);
+		require_once(SUBSDIR . '/ListTopicUtil.subs.php');
+		$context['topics'] = prepareContextTopicList($topics_info);
 
 		// Allow addons to add to the $context['topics']
 		call_integration_hook('integrate_messageindex_listing', array($topics_info));
