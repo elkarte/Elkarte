@@ -256,14 +256,15 @@ class Unread
 
 		$request = $this->_db->query('substring', '
 			SELECT
-				ms.subject AS first_subject, ms.poster_time AS first_poster_time, ms.id_topic, t.id_board, b.name AS bname,
-				t.num_replies, t.num_views, t.num_likes, ms.id_member AS first_id_member, ml.id_member AS last_id_member,
+				ms.subject AS first_subject, ms.poster_time AS first_poster_time, mf.poster_name AS first_member_name,
+				ms.id_topic, t.id_board, b.name AS bname, t.num_replies, t.num_views, t.num_likes,
+				ms.id_member AS first_id_member, ml.id_member AS last_id_member, ml.poster_name AS last_member_name,
 				ml.poster_time AS last_poster_time, IFNULL(mems.real_name, ms.poster_name) AS first_display_name,
 				IFNULL(meml.real_name, ml.poster_name) AS last_display_name, ml.subject AS last_subject,
 				ml.icon AS last_icon, ms.icon AS first_icon, t.id_poll, t.is_sticky, t.locked, ml.modified_time AS last_modified_time,
 				IFNULL(lt.id_msg, IFNULL(lmr.id_msg, -1)) + 1 AS new_from,
 				' . $body_query . '
-				' . (!empty($custom_selects) ? ' ,' . implode(',', $custom_selects) : '') . '
+				' . (!empty($custom_selects) ? implode(',', $custom_selects) . ' ,' : '') . '
 				ml.smileys_enabled AS last_smileys, ms.smileys_enabled AS first_smileys, t.id_first_msg, t.id_last_msg
 			FROM {db_prefix}messages AS ms
 				INNER JOIN {db_prefix}topics AS t ON (t.id_topic = ms.id_topic AND t.id_first_msg = ms.id_msg)
@@ -393,7 +394,9 @@ class Unread
 				FROM {db_prefix}topics_posted_in AS t
 					LEFT JOIN {db_prefix}log_topics_posted_in AS lt ON (lt.id_topic = t.id_topic)
 				WHERE t.id_board IN ({array_int:boards})
-					AND IFNULL(lt.id_msg, t.id_msg) < t.id_last_msg
+					AND IFNULL(lt.id_msg, t.id_msg) < t.id_last_msg' .
+					($this->_post_mod ? ' AND t.approved = {int:is_approved}' : '') .
+					($this->_unwatch ? ' AND IFNULL(lt.unwatched, 0) != 1' : '') . '
 				ORDER BY {raw:order}
 				LIMIT {int:offset}, {int:limit}',
 				array_merge($this->_query_parameters, array(
@@ -469,20 +472,21 @@ class Unread
 			if ($include_avatars === 2 || $include_avatars === 3)
 			{
 				$custom_selects = array_merge($custom_selects, array('memf.avatar AS avatar_first', 'IFNULL(af.id_attach, 0) AS id_attach_first', 'af.filename AS filename_first', 'af.attachment_type AS attachment_type_first', 'memf.email_address AS email_address_first'));
-				$custom_joins = array_merge($custom_joins, array('LEFT JOIN {db_prefix}attachments AS af ON (af.id_member = mf.id_member AND af.id_member != 0)'));
+				$custom_joins = array_merge($custom_joins, array('LEFT JOIN {db_prefix}attachments AS af ON (af.id_member = ms.id_member AND af.id_member != 0)'));
 			}
 		}
 
 		$request = $this->_db->query('substring', '
 			SELECT
 				ms.subject AS first_subject, ms.poster_time AS first_poster_time, ms.id_topic, t.id_board, b.name AS bname,
+				ms.poster_name AS first_member_name, ml.poster_name AS last_member_name, t.approved,
 				t.num_replies, t.num_views, t.num_likes, ms.id_member AS first_id_member, ml.id_member AS last_id_member,
 				ml.poster_time AS last_poster_time, IFNULL(mems.real_name, ms.poster_name) AS first_display_name,
 				IFNULL(meml.real_name, ml.poster_name) AS last_display_name, ml.subject AS last_subject,
 				ml.icon AS last_icon, ms.icon AS first_icon, t.id_poll, t.is_sticky, t.locked, ml.modified_time AS last_modified_time,
 				IFNULL(lt.id_msg, IFNULL(lmr.id_msg, -1)) + 1 AS new_from,
 				' . $body_query . '
-				' . (!empty($custom_selects) ? ' ,' . implode(',', $custom_selects) : '') . '
+				' . (!empty($custom_selects) ? implode(',', $custom_selects) . ' ,' : '') . '
 				ml.smileys_enabled AS last_smileys, ms.smileys_enabled AS first_smileys, t.id_first_msg, t.id_last_msg
 			FROM {db_prefix}topics AS t
 				INNER JOIN {db_prefix}messages AS ms ON (ms.id_topic = t.id_topic AND ms.id_msg = t.id_first_msg)
