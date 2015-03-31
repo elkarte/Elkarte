@@ -1572,7 +1572,6 @@ class ManageMaillist_Controller extends Action_Controller
 				array('check', 'pbe_pm_enabled'),
 				array('check', 'pbe_no_mod_notices', 'subtext' => $txt['pbe_no_mod_notices_desc'], 'postinput' => $txt['recommended']),
 				array('check', 'pbe_bounce_detect', 'subtext'=>$txt['pbe_bounce_detect_desc'], 'postinput'=>$txt['experimental']),
-				array('check', 'pbe_bounce_record', 'subtext'=>$txt['pbe_bounce_record_desc'], 'postinput'=>$txt['experimental']),
 			array('title', 'maillist_outbound'),
 				array('desc', 'maillist_outbound_desc'),
 				array('check', 'maillist_group_mode'),
