@@ -141,7 +141,8 @@ function sendmail($to, $subject, $message, $from = null, $message_id = null, $se
 	}
 
 	// Return path, date, mailer
-	$headers .= 'Return-Path: ' . (!empty($modSettings['maillist_sitename_address']) ? $modSettings['maillist_sitename_address'] : (empty($modSettings['maillist_mail_from']) ? $webmaster_email : $modSettings['maillist_mail_from'])) . $line_break;
+	$return_path = (!empty($modSettings['maillist_sitename_address']) ? $modSettings['maillist_sitename_address'] : (empty($modSettings['maillist_mail_from']) ? $webmaster_email : $modSettings['maillist_mail_from'])); //We'll need this later
+	$headers .= 'Return-Path: ' . $return_path . $line_break;
 	$headers .= 'Date: ' . gmdate('D, d M Y H:i:s') . ' -0000' . $line_break;
 	$headers .= 'X-Mailer: ELK' . $line_break;
 
@@ -226,7 +227,7 @@ function sendmail($to, $subject, $message, $from = null, $message_id = null, $se
 
 	// SMTP or sendmail?
 	if ($use_sendmail)
-	{
+	{		
 		$subject = strtr($subject, array("\r" => '', "\n" => ''));
 		if (!empty($modSettings['mail_strip_carriage']))
 		{
@@ -252,7 +253,10 @@ function sendmail($to, $subject, $message, $from = null, $message_id = null, $se
 			elseif (empty($modSettings['mail_no_message_id']))
 				$unq_id = ($need_break ? $line_break : '') . 'Message-ID: <' . md5($boardurl . microtime()) . '-' . $message_id . strstr(empty($modSettings['maillist_mail_from']) ? $webmaster_email : $modSettings['maillist_mail_from'], '@') . '>';
 
-			if (!mail(strtr($to, array("\r" => '', "\n" => '')), $subject, $message, $headers . $unq_id))
+			//This is frequently not set, or not set according to the needs of PBE and bounce detection
+			//We have to use ini_set, since "-f <address>" doesn't work on windows systems, so we need both
+			$old_return = ini_set('sendmail_from', $return_path); 
+			if (!mail(strtr($to, array("\r" => '', "\n" => '')), $subject, $message, $headers . $unq_id, '-f ' . $return_path))
 			{
 				log_error(sprintf($txt['mail_send_unable'], $to));
 				$mail_result = false;
@@ -267,7 +271,8 @@ function sendmail($to, $subject, $message, $from = null, $message_id = null, $se
 				if (!empty($modSettings['trackStats']))
 					trackStats(array('email' => '+'));
 			}
-
+			ini_set('sendmail_from', $old_return); //Put it back
+			
 			// Wait, wait, I'm still sending here!
 			@set_time_limit(300);
 			if (function_exists('apache_reset_timeout'))
@@ -281,9 +286,9 @@ function sendmail($to, $subject, $message, $from = null, $message_id = null, $se
 			log_email($sent);
 		}
 	}
-	else
-		// SMTP protocol it is
+	else// SMTP protocol it is
 		$mail_result = $mail_result && smtp_mail($to_array, $subject, $message, $headers, $priority, $message_id);
+	
 
 	// Clear out the stat cache.
 	trackStats();
