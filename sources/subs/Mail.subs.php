@@ -289,7 +289,7 @@ function sendmail($to, $subject, $message, $from = null, $message_id = null, $se
 	else
 		// SMTP protocol it is
 		$mail_result = $mail_result && smtp_mail($to_array, $subject, $message, $headers, $priority, $message_id);
-	
+
 	// Clear out the stat cache.
 	trackStats();
 
