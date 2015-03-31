@@ -57,7 +57,11 @@ $txt['pbe_post_enabled'] = 'Allow posting to the forum by Email';
 $txt['pbe_pm_enabled'] = 'Allow replying to PMs by Email';
 $txt['pbe_no_mod_notices'] = 'Turn off moderation notices';
 $txt['pbe_no_mod_notices_desc'] = 'Do not send notifications of moved, locked, deleted, merged, etc.  These consume your email quota with no real purpose';
+$txt['pbe_bounce_detect'] = 'Turn on automatic bounce detection';
+$txt['pbe_bounce_detect_desc'] = 'Attempt to identify mail bounces and disable further notifications';
+
 $txt['saved'] = 'Information Saved';
+
 
 // General Sending Settings
 $txt['maillist_outbound'] = 'General Sending Settings';
@@ -112,6 +116,7 @@ $txt['maillist_newtopic_change'] = 'Allow the starting of a new topic by changin
 $txt['maillist_newtopic_needsapproval'] = 'Require New Topic approval';
 $txt['maillist_newtopic_needsapproval_desc'] = 'Require all new topics sent by email to be approved before they are posted to prevent email spoofing';
 $txt['recommended'] = 'This is recommended';
+$txt['experimental'] = 'This functionality is experimental';
 $txt['receiving_address'] = 'Receiving email addresses';
 $txt['receiving_board'] = 'Board to post new messages to';
 $txt['reply_add_more'] = 'Add another address';
