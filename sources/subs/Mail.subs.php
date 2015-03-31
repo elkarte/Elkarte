@@ -227,7 +227,7 @@ function sendmail($to, $subject, $message, $from = null, $message_id = null, $se
 
 	// SMTP or sendmail?
 	if ($use_sendmail)
-	{		
+	{
 		$subject = strtr($subject, array("\r" => '', "\n" => ''));
 		if (!empty($modSettings['mail_strip_carriage']))
 		{
@@ -286,7 +286,8 @@ function sendmail($to, $subject, $message, $from = null, $message_id = null, $se
 			log_email($sent);
 		}
 	}
-	else// SMTP protocol it is
+	else
+		// SMTP protocol it is
 		$mail_result = $mail_result && smtp_mail($to_array, $subject, $message, $headers, $priority, $message_id);
 	
 
