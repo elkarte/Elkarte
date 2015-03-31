@@ -252,7 +252,7 @@ class MessageIndex_Controller extends Action_Controller
 		$indexOptions = array(
 			'only_approved' => $modSettings['postmod_active'] && !allowedTo('approve_posts'),
 			'previews' => !empty($modSettings['message_index_preview']) ? (empty($modSettings['preview_characters']) ? -1 : $modSettings['preview_characters']) : 0,
-			'include_avatars' => !empty($settings['avatars_on_indexes']),
+			'include_avatars' => $settings['avatars_on_indexes'],
 			'ascending' => $ascending,
 			'fake_ascending' => $fake_ascending
 		);
@@ -262,7 +262,7 @@ class MessageIndex_Controller extends Action_Controller
 
 		$topics_info = messageIndexTopics($board, $user_info['id'], $start, $maxindex, $context['sort_by'], $sort_column, $indexOptions);
 
-		$context['topics'] = processMessageIndexTopicList($topics_info);
+		$context['topics'] = Topic_Util::prepareContext($topics_info);
 
 		// Allow addons to add to the $context['topics']
 		call_integration_hook('integrate_messageindex_listing', array($topics_info));

@@ -191,7 +191,7 @@ class Unread_Controller extends Action_Controller
 			return;
 		}
 
-		$context['topics'] = $this->_grabber->getUnreads($type, $_REQUEST['start'], $context['topics_per_page'], !empty($settings['avatars_on_indexes']));
+		$context['topics'] = $this->_grabber->getUnreads($type, $_REQUEST['start'], $context['topics_per_page'], $settings['avatars_on_indexes']);
 
 		$this->_exiting_unread();
 	}
@@ -231,7 +231,7 @@ class Unread_Controller extends Action_Controller
 			'num_pages' => floor(($this->_num_topics - 1) / $context['topics_per_page']) + 1
 		);
 
-		$context['topics'] = $this->_grabber->getUnreads(null, $_REQUEST['start'], $context['topics_per_page'], !empty($settings['avatars_on_indexes']));
+		$context['topics'] = $this->_grabber->getUnreads(null, $_REQUEST['start'], $context['topics_per_page'], $settings['avatars_on_indexes']);
 
 		if ($context['topics'] === false)
 		{

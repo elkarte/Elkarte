@@ -1549,6 +1549,9 @@ function loadTheme($id_theme = 0, $initialize = true)
 			$template_layers->addBegin($layer);
 	}
 
+	// Defaults in case of odd things
+	$settings['avatars_on_indexes'] = 0;
+
 	// Initialize the theme.
 	if (function_exists('template_init'))
 		$settings = array_merge($settings, template_init());
