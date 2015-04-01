@@ -141,7 +141,8 @@ function sendmail($to, $subject, $message, $from = null, $message_id = null, $se
 	}
 
 	// Return path, date, mailer
-	$return_path = (!empty($modSettings['maillist_sitename_address']) ? $modSettings['maillist_sitename_address'] : (empty($modSettings['maillist_mail_from']) ? $webmaster_email : $modSettings['maillist_mail_from'])); //We'll need this later
+	//We'll need this later for the envelope fix, too, so keep it 
+	$return_path = (!empty($modSettings['maillist_sitename_address']) ? $modSettings['maillist_sitename_address'] : (empty($modSettings['maillist_mail_from']) ? $webmaster_email : $modSettings['maillist_mail_from'])); 
 	$headers .= 'Return-Path: ' . $return_path . $line_break;
 	$headers .= 'Date: ' . gmdate('D, d M Y H:i:s') . ' -0000' . $line_break;
 	$headers .= 'X-Mailer: ELK' . $line_break;
@@ -271,7 +272,8 @@ function sendmail($to, $subject, $message, $from = null, $message_id = null, $se
 				if (!empty($modSettings['trackStats']))
 					trackStats(array('email' => '+'));
 			}
-			ini_set('sendmail_from', $old_return); //Put it back
+			//Put it back
+			ini_set('sendmail_from', $old_return); 
 			
 			// Wait, wait, I'm still sending here!
 			@set_time_limit(300);
