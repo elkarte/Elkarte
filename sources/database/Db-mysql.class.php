@@ -14,7 +14,7 @@
  * copyright:	2004-2011, GreyWyvern - All rights reserved.
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0
+ * @version 1.0.4
  *
  */
 
@@ -745,6 +745,7 @@ class Database_MySQL implements Database
 			// Check for the "lost connection" or "deadlock found" errors - and try it just one more time.
 			if (in_array($query_errno, array(1205, 1213, 2006, 2013)))
 			{
+				$new_connection = false;
 				if (in_array($query_errno, array(2006, 2013)) && $this->_connection == $connection)
 				{
 					// Are we in SSI mode?  If so try that username and password first
