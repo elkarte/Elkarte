@@ -69,7 +69,7 @@ function template_memberlist()
 
 	if (!isset($context['old_search']))
 		echo '
-				<span class="floatright" letter_links>', $context['letter_links'], '</span>';
+				<span class="floatright letter_links">', $context['letter_links'], '</span>';
 
 	echo '
 		</h2>
