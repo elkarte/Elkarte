@@ -14,7 +14,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:		BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0
+ * @version 1.0.4
  *
  */
 
@@ -183,8 +183,6 @@ class ManageSecurity_Controller extends Action_Controller
 		if (isset($_GET['save']))
 		{
 			checkSession();
-
-			call_integration_hook('integratesave_moderation_settings', array(&$config_vars));
 
 			// Make sure these don't have an effect.
 			if ($modSettings['warning_settings'][0] != 1)

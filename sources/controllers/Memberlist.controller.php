@@ -14,7 +14,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:		BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0.3
+ * @version 1.0.4
  *
  */
 
@@ -238,7 +238,7 @@ class Memberlist_Controller extends Action_Controller
 			$context['num_members'] = ml_memberCount();
 
 		// Set defaults for sort (real_name) and start. (0)
-		if (!isset($_REQUEST['sort']) || !isset($context['columns'][$_REQUEST['sort']]))
+		if (!isset($_REQUEST['sort']) || !isset($context['columns'][$_REQUEST['sort']]['sort']))
 			$_REQUEST['sort'] = 'real_name';
 
 		if (!is_numeric($_REQUEST['start']))

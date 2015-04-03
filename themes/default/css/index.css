@@ -1127,6 +1127,7 @@ a.bbc_link {
 	display: block;
 	overflow: hidden;
 	max-width: 25em;
+	text-overflow: ellipsis;
 }
 .linktree a {
 	display: block;

@@ -15,7 +15,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:		BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0.2
+ * @version 1.0.4
  *
  *
  * @todo Update this for the new package manager?
@@ -1574,8 +1574,8 @@ class ManageThemes_Controller extends Action_Controller
 				{
 					logAction('editing_theme', array('member' => $user_info['id']), 'admin');
 
-					// But the email only once every 10 minutes should be fine
-					if (!recentlyLogged('editing_theme', 600))
+					// But the email only once every 60 minutes should be fine
+					if (!recentlyLogged('editing_theme', 3600))
 					{
 						require_once(SUBSDIR . '/Themes.subs.php');
 						require_once(SUBSDIR . '/Admin.subs.php');

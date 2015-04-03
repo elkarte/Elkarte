@@ -11,7 +11,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0.3
+ * @version 1.0.4
  *
  */
 
@@ -69,7 +69,7 @@ function template_memberlist()
 
 	if (!isset($context['old_search']))
 		echo '
-				<span class="floatright" letter_links>', $context['letter_links'], '</span>';
+				<span class="floatright letter_links">', $context['letter_links'], '</span>';
 
 	echo '
 		</h2>
