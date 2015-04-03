@@ -13,7 +13,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:		BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0.3
+ * @version 1.0.4
  *
  */
 
@@ -1793,10 +1793,6 @@ function loadEssentialThemeData()
 	// Assume we want this.
 	$context['forum_name'] = $mbname;
 	$context['forum_name_html_safe'] = $context['forum_name'];
-
-	// Check loadLanguage actually exists!
-	if (!function_exists('loadLanguage'))
-		require_once(SOURCEDIR . '/Subs.php');
 
 	loadLanguage('index+Addons');
 }
