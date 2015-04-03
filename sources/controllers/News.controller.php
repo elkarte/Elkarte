@@ -100,6 +100,7 @@ class News_Controller extends Action_Controller
 				$feed_title = ' - ' . strip_tags($feed_title);
 			}
 
+			require_once(SUBSDIR . '/Boards.subs.php');
 			$boards_posts = boardsPosts(array(), $categories);
 			$total_cat_posts = array_sum($boards_posts);
 			$boards = array_keys($boards_posts);
