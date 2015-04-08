@@ -189,7 +189,7 @@ class PackageServers_Controller extends Action_Controller
 			fatal_lang_error('packageget_unable', false, array($url . '/index.php'));
 
 		// Might take some time.
-		@set_time_limit(600);
+		setTimeLimit(600);
 
 		// Read packages.xml and parse into Xml_Array. (the true tells it to trim things ;).)
 		$listing = new Xml_Array(fetch_web_data($_GET['package']), true);

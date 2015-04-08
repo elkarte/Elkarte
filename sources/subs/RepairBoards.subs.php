@@ -1347,9 +1347,7 @@ function pauseRepairProcess($to_fix, $current_step_description, $max_substep = 0
 	global $context, $txt, $time_start, $db_temp_cache, $db_show_debug;
 
 	// More time, I need more time!
-	@set_time_limit(600);
-	if (function_exists('apache_reset_timeout'))
-		@apache_reset_timeout();
+	setTimeLimit(600);
 
 	// Errr, wait.  How much time has this taken already?
 	if (!$force && time() - array_sum(explode(' ', $time_start)) < 3)
@@ -1391,7 +1389,7 @@ function pauseRepairProcess($to_fix, $current_step_description, $max_substep = 0
  * - It keeps track of the errors it did find, so that the actual repair
  * won't have to recheck everything.
  * - returns the errors found.
- * 
+ *
  * @param boolean $do_fix
  * @return mixed[]
  */
@@ -1402,7 +1400,7 @@ function findForumErrors($do_fix = false)
 	$db = database();
 
 	// This may take some time...
-	@set_time_limit(600);
+	setTimeLimit(600);
 
 	$to_fix = !empty($_SESSION['repairboards_to_fix']) ? $_SESSION['repairboards_to_fix'] : array();
 	$context['repair_errors'] = isset($_SESSION['repairboards_to_fix2']) ? $_SESSION['repairboards_to_fix2'] : array();

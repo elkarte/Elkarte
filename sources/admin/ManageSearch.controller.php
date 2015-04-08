@@ -417,9 +417,7 @@ class ManageSearch_Controller extends Action_Controller
 		global $modSettings, $context, $txt, $db_show_debug;
 
 		// Scotty, we need more time...
-		@set_time_limit(600);
-		if (function_exists('apache_reset_timeout'))
-			@apache_reset_timeout();
+		setTimeLimit(600);
 
 		$context[$context['admin_menu_name']]['current_subsection'] = 'method';
 		$context['page_title'] = $txt['search_index_custom'];

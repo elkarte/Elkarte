@@ -420,9 +420,7 @@ class ManageMail_Controller extends Action_Controller
 		global $context, $txt, $time_start;
 
 		// Try get more time...
-		@set_time_limit(600);
-		if (function_exists('apache_reset_timeout'))
-			@apache_reset_timeout();
+		setTimeLimit(600);
 
 		// Have we already used our maximum time?
 		if (time() - array_sum(explode(' ', $time_start)) < 5)

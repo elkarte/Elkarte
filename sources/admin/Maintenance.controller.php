@@ -527,7 +527,7 @@ class Maintenance_Controller extends Action_Controller
 			$max_msgs = countMessages();
 
 			// Try for as much time as possible.
-			@set_time_limit(600);
+			setTimeLimit(600);
 
 			while ($_REQUEST['start'] < $max_msgs)
 			{
@@ -665,7 +665,7 @@ class Maintenance_Controller extends Action_Controller
 		$context['sub_template'] = 'not_done';
 
 		// Try for as much time as possible.
-		@set_time_limit(600);
+		setTimeLimit(600);
 
 		// Step the number of topics at a time so things don't time out...
 		$max_topics = getMaxTopicID();
@@ -1451,7 +1451,7 @@ class Maintenance_Controller extends Action_Controller
 		$_REQUEST['start'] = !isset($_REQUEST['start']) ? 0 : (int) $_REQUEST['start'];
 
 		// Ask for some extra time, on big boards this may take a bit
-		@set_time_limit(600);
+		setTimeLimit(600);
 
 		// The functions here will come in handy
 		require_once(SUBSDIR . '/Maintenance.subs.php');
@@ -1480,9 +1480,6 @@ class Maintenance_Controller extends Action_Controller
 			$context['not_done_title'] = $txt['not_done_title'] . ' (' . $context['continue_percent'] . '%)';
 			$context['continue_post_data'] = '<input type="hidden" name="' . $context['admin-recountposts_token_var'] . '" value="' . $context['admin-recountposts_token'] . '" />
 					<input type="hidden" name="' . $context['session_var'] . '" value="' . $context['session_id'] . '" />';
-
-			if (function_exists('apache_reset_timeout'))
-				apache_reset_timeout();
 
 			return;
 		}

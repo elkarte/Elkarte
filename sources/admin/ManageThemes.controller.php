@@ -1108,9 +1108,7 @@ class ManageThemes_Controller extends Action_Controller
 			mkdir($theme_dir, 0777);
 
 			// Get some more time if we can
-			@set_time_limit(600);
-			if (function_exists('apache_reset_timeout'))
-				@apache_reset_timeout();
+			setTimeLimit(600);
 
 			// Create the subdirectories for css, javascript and font files.
 			mkdir($theme_dir . '/css', 0777);
@@ -1806,7 +1804,7 @@ class ManageThemes_Controller extends Action_Controller
 
 	/**
 	 * Makes a copy of a template file in a new location
-	 * 
+	 *
 	 * @uses ManageThemes template, copy_template sub-template.
 	 */
 	public function action_copy()
