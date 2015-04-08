@@ -64,7 +64,6 @@ $txt['pbe_bounce_record_desc'] = 'Bounce messages will always be recorded if Bou
 
 $txt['saved'] = 'Information Saved';
 
-
 // General Sending Settings
 $txt['maillist_outbound'] = 'General Sending Settings';
 $txt['maillist_outbound_desc'] = 'Use these settings to modify how outbound emails appear to the user and where a reply will be sent to.  ';
