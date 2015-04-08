@@ -2577,7 +2577,7 @@ function setTimeLimit($time_limit, $server_reset = true)
 	// Make sure the function exists, it may be in the ini disable_functions list
 	if (function_exists('set_time_limit'))
 	{
-		$current = ini_get('max_execution_time');
+		$current = (int) ini_get('max_execution_time');
 
 		// Do not set a limit if it is currently unlimited.
 		if ($current !== 0)
