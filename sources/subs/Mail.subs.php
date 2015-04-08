@@ -228,7 +228,7 @@ function sendmail($to, $subject, $message, $from = null, $message_id = null, $se
 
 	// SMTP or sendmail?
 	if ($use_sendmail)
-	{		
+	{
 		$subject = strtr($subject, array("\r" => '', "\n" => ''));
 		if (!empty($modSettings['mail_strip_carriage']))
 		{
