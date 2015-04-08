@@ -535,12 +535,13 @@ class Email_Parse
 								}																
 								$dsn_body[trim(strtolower($field))] = array('type'=>trim($type), 'value'=>trim($val));								
 							}							
-							switch ($dsn_body['action']['value']){
-								case 'failed':
-								//No Break
-								//Remove this if we don't want to flag delayed delivery addresses as "dirty"
-								//May be caused by temporary net failures, e.g. DNS outage								
+							switch ($dsn_body['action']['value']){								
 								case 'delayed':
+									//Remove this if we don't want to flag delayed delivery addresses as "dirty"
+									//May be caused by temporary net failures, e.g. DNS outage
+									//Lack of break is intentional
+								case 'failed':
+									//The email failed to be delivered.
 									$this->_is_dsn = true;
 									$this->_dsn = array('headers'=>$this->_boundary_section[$i]->headers,
 									'body'=>$dsn_body
