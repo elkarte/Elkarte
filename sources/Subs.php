@@ -2549,6 +2549,55 @@ function memoryReturnBytes($val)
 }
 
 /**
+ * Wrapper function for set_time_limit
+ *
+ * When called, attempts to restart the timeout counter from zero.
+ *
+ * This sets the maximum time in seconds a script is allowed to run before it is terminated by the parser.
+ * You can not change this setting with ini_set() when running in safe mode.
+ * Your web server can have other timeout configurations that may also interrupt PHP execution.
+ * Apache has a Timeout directive and IIS has a CGI timeout function.
+ * Security extension may also disable this function, such as Suhosin
+ * Hosts may add this to the disabled_functions list in php.ini
+ *
+ * If the current time limit is not unlimited it is possible to decrease the
+ * total time limit if the sum of the new time limit and the current time spent
+ * running the script is inferior to the original time limit. It is inherent to
+ * the way set_time_limit() works, it should rather be called with an
+ * appropriate value every time you need to allocate a certain amount of time
+ * to execute a task than only once at the beginning of the script.
+ *
+ * Before calling set_time_limit(), we check if this function is available
+ *
+ * @param int $time_limit The time limit
+ * @param bool $server_reset Wether to reset the server timer or not
+ */
+function setTimeLimit($time_limit, $server_reset = true)
+{
+	// Make sure the function exists, it may be in the ini disable_functions list
+	if (function_exists('set_time_limit'))
+	{
+		$current = ini_get('max_execution_time');
+
+		// Do not set a limit if it is currently unlimited.
+		if ($current !== 0)
+		{
+			// Set it to the maximum that we can, not more, not less
+			$time_limit = min($current, max($time_limit, $current));
+
+			// Still need error supression as some security addons many prevent this action
+			@set_time_limit($time_limit);
+		}
+	}
+
+	// Don't let apache close the connection
+	if ($server_reset && function_exists('apache_reset_timeout'))
+		@apache_reset_timeout();
+
+	return ini_get('max_execution_time');
+}
+
+/**
  * This is the only template included in the sources.
  */
 function template_rawdata()
