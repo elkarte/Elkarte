@@ -540,11 +540,12 @@ class Email_Parse
 								//No Break
 								//Remove this if we don't want to flag delayed delivery addresses as "dirty"
 								//May be caused by temporary net failures, e.g. DNS outage								
-								case 'delayed':
+								case 'delayed':									
 									$this->_is_dsn = true;
 									$this->_dsn = array('headers'=>$this->_boundary_section[$i]->headers,
 									'body'=>$dsn_body
 									);
+									break;
 								default:
 									$this->_is_dsn = false;
 							}
