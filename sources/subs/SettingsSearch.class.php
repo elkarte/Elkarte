@@ -48,7 +48,7 @@ class Settings_Search
 	 * @param string[] $language_files - Language file names
 	 * @param string[] $include_files - File names to include (see _include_files
 	 *                 for details on the structure)
-	 * @param string[] $settings_search - Settings to search in (see
+	 * @param mixed[] $settings_search - Settings to search in (see
 	 *                 _load_settings for details on the structure)
 	 */
 	public function __construct($language_files = array(), $include_files = array(), $settings_search = array())
