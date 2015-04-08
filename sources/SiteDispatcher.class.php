@@ -250,18 +250,12 @@ class Site_Dispatcher
 		{
 			// 3, 2, ... and go
 			if (method_exists($this->_controller_name, $this->_function_name))
-			{
 				$method = $this->_function_name;
-			}
 			elseif (method_exists($this->_controller_name, 'action_index'))
-			{
 				$method = 'action_index';
-			}
-			// This should never happen
+			// This should never happen, thats why its here :P
 			else
 			{
-				// Things went pretty bad, huh?
-				// default action :P
 				$this->_file_name = $this->_default_action['file'];
 				$this->_controller_name = $this->_default_action['controller'];
 				$this->_function_name = $this->_default_action['function'];
@@ -269,11 +263,16 @@ class Site_Dispatcher
 				return $this->dispatch();
 			}
 
+			// Initialize this controller with its own event manager
 			$controller = new $this->_controller_name(new Event_Manager());
+
+			// Fetch controllers generic hook name from the action controller
 			$hook = $controller->getHook();
 
+			// Call the controllers pre dispatch method
 			$controller->pre_dispatch();
 
+			// Call integrate_action_XYZ_before -> XYZ_controller -> integrate_action_XYZ_after
 			call_integration_hook('integrate_action_' . $hook . '_before', array($this->_function_name));
 
 			$result = $controller->$method();
@@ -282,9 +281,9 @@ class Site_Dispatcher
 
 			return $result;
 		}
+		// Things went pretty bad, huh?
 		else
 		{
-			// Things went pretty bad, huh?
 			// default action :P
 			$this->_file_name = $this->_default_action['file'];
 			$this->_controller_name = $this->_default_action['controller'];
