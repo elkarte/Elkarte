@@ -52,9 +52,11 @@ abstract class Action_Controller
 		$this->_initEventManager();
 	}
 
+	/**
+	 * Initialize the event manager for the controller
+	 */
 	protected function _initEventManager()
 	{
-
 		$this->_hook = str_replace('_Controller', '', get_class($this));
 
 		$this->_loadModules();
@@ -65,6 +67,9 @@ abstract class Action_Controller
 		$this->_events->setSource($this);
 	}
 
+	/**
+	 * Public function to return the controllers generic hook name
+	 */
 	public function getHook()
 	{
 		return $this->_hook;
@@ -91,6 +96,7 @@ abstract class Action_Controller
 		$files = array();
 		$hook = strtolower(str_replace('_Controller', '', $this->_hook));
 		$setting_key = 'modules_' . $hook;
+
 		if (!empty($modSettings[$setting_key]))
 		{
 			$modules = explode(',', $modSettings[$setting_key]);
@@ -98,9 +104,7 @@ abstract class Action_Controller
 			{
 				$file = SUBSDIR . '/' . ucfirst($module) . ucfirst($hook) . 'Module.class.php';
 				if (file_exists($file))
-				{
 					$files[] = $file;
-				}
 			}
 		}
 
