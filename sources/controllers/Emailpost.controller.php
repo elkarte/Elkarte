@@ -71,15 +71,27 @@ class Emailpost_Controller extends Action_Controller
 			return false;
 
 		// Ask for an html version (if available) and some needed details
-		$email_message->read_email(true, $email_message->raw_message);
+		$email_message->read_email(true, $email_message->raw_message);		
 		$email_message->load_address();
 		$email_message->load_key($key);
 
-		//Check if it's a DSN
-		//Hopefully, this will eventually DO something but for now
-		//we'll just add it with a more specific error reason
+		//Check if it's a DSN, and handle it		
 		if ($email_message->_is_dsn){
-			return pbe_emailError('error_bounced',$email_message);
+			if (!empty($modSettings['pbe_bounce_detect'])){
+				pbe_disable_user_notify($email_message);
+				//[TODO] Notify the user				
+				if (!empty($modSettings['pbe_bounce_record'])){
+					//They can record the message anyway, if they so wish
+					return pbe_emailError('error_bounced',$email_message);
+				} 
+				//If they don't wish, then return false like recording the failure
+				//would do
+				return false;
+			} else {
+				//When the auto-disable function is not turned on, record the DSN
+				//In the failed email table for the admins to handle however
+				return pbe_emailError('error_bounced',$email_message);
+			}
 		}
 
 		// If the feature is on but the post/pm function is not enabled, just log the message.
@@ -231,6 +243,13 @@ class Emailpost_Controller extends Action_Controller
 		$email_message->message_type = 'x';
 		$email_message->message_key_id = '';
 		$email_message->message_id = 0;
+		
+		//Check if it's a DSN
+		//Hopefully, this will eventually DO something but for now
+		//we'll just add it with a more specific error reason
+		if ($email_message->_is_dsn){
+			return pbe_emailError('error_bounced',$email_message);
+		}
 
 		// If the feature is on but the post/pm function is not enabled, just log the message.
 		if (empty($modSettings['pbe_post_enabled']))
