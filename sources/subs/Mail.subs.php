@@ -141,7 +141,7 @@ function sendmail($to, $subject, $message, $from = null, $message_id = null, $se
 	}
 
 	// Return path, date, mailer
-	//We'll need this later for the envelope fix, too, so keep it 
+	//We'll need this later, too, so keep it
 	$return_path = (!empty($modSettings['maillist_sitename_address']) ? $modSettings['maillist_sitename_address'] : (empty($modSettings['maillist_mail_from']) ? $webmaster_email : $modSettings['maillist_mail_from'])); 
 	$headers .= 'Return-Path: ' . $return_path . $line_break;
 	$headers .= 'Date: ' . gmdate('D, d M Y H:i:s') . ' -0000' . $line_break;
@@ -291,6 +291,7 @@ function sendmail($to, $subject, $message, $from = null, $message_id = null, $se
 	else
 		// SMTP protocol it is
 		$mail_result = $mail_result && smtp_mail($to_array, $subject, $message, $headers, $priority, $message_id);
+	
 
 	// Clear out the stat cache.
 	trackStats();
