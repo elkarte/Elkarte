@@ -545,6 +545,7 @@ class Email_Parse
 									$this->_dsn = array('headers'=>$this->_boundary_section[$i]->headers,
 									'body'=>$dsn_body
 									);
+									break;
 								default:
 									$this->_is_dsn = false;
 							}
