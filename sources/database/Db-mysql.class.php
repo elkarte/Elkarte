@@ -175,6 +175,7 @@ class Database_MySQL extends Database_Abstract
 		if ($db_show_debug === true)
 		{
 			$debug = Debug::get();
+
 			// Get the file and line number this function was called.
 			list ($file, $line) = $this->error_backtrace('', '', 'return', __FILE__, __LINE__);
 
@@ -188,6 +189,7 @@ class Database_MySQL extends Database_Abstract
 
 			// Don't overload it.
 			$st = microtime(true);
+			$db_cache = array();
 			$db_cache['q'] = $this->_query_count < 50 ? $db_string : '...';
 			$db_cache['f'] = $file;
 			$db_cache['l'] = $line;
