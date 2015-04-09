@@ -923,6 +923,8 @@ function findOrphanAttachments($start, $fix_errors, $to_fix)
 			)
 		);
 	}
+
+	return $to_remove;
 }
 
 /**
