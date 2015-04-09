@@ -1068,7 +1068,7 @@ function modifyPost(&$msgOptions, &$topicOptions, &$posterOptions)
  * Approve (or not) some posts... without permission checks...
  *
  * @package Posts
- * @param int[] $msgs - array of message ids
+ * @param int|int[] $msgs - array of message ids
  * @param bool $approve = true
  */
 function approvePosts($msgs, $approve = true)
@@ -1522,7 +1522,7 @@ function lastPost()
  */
 function getFormMsgSubject($editing, $topic, $first_subject = '', $msg_id = 0)
 {
-	global $modSettings, $context;
+	global $modSettings;
 
 	$db = database();
 
@@ -1572,8 +1572,8 @@ function getFormMsgSubject($editing, $topic, $first_subject = '', $msg_id = 0)
 			list ($form_subject, $mname, $mdate, $form_message) = $db->fetch_row($request);
 			$db->free_result($request);
 
-			$response_prefix = response_prefix();
 			// Add 'Re: ' to the front of the quoted subject.
+			$response_prefix = response_prefix();
 			if (trim($response_prefix) != '' && Util::strpos($form_subject, trim($response_prefix)) !== 0)
 				$form_subject = $response_prefix . $form_subject;
 
@@ -1597,9 +1597,9 @@ function getFormMsgSubject($editing, $topic, $first_subject = '', $msg_id = 0)
 		{
 			// Get the first message's subject.
 			$form_subject = $first_subject;
-			$response_prefix = response_prefix();
 
 			// Add 'Re: ' to the front of the subject.
+			$response_prefix = response_prefix();
 			if (trim($response_prefix) != '' && $form_subject != '' && Util::strpos($form_subject, trim($response_prefix)) !== 0)
 				$form_subject = $response_prefix . $form_subject;
 
