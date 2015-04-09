@@ -117,7 +117,7 @@ class ManageMaillist_Controller extends Action_Controller
 	 */
 	public function action_unapproved_email()
 	{
-		global $context, $scripturl, $modSettings, $txt, $settings;
+		global $context, $scripturl, $modSettings, $txt;
 
 		// Set an id if none was supplied
 		$id = (isset($_REQUEST['e_id']) ? (int) $_REQUEST['e_id'] : 0);

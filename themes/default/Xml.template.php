@@ -510,7 +510,7 @@ function template_xml_news($data, $i, $tag = null, $xml_format = 'rss')
  */
 function template_rdf()
 {
-	global $context, $scripturl, $txt, $boardurl, $forum_version;
+	global $context, $scripturl, $txt;
 
 	echo '<?xml version="1.0" encoding="UTF-8"?' . '>
 	<rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns="http://purl.org/rss/1.0/">

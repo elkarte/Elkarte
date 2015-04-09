@@ -600,8 +600,6 @@ function countNewPosts($topic, $topicinfo, $timestamp)
  */
 function loadMessageRequest($msg_selects, $msg_tables, $msg_parameters, $optional = array())
 {
-	global $options;
-
 	$db = database();
 
 	$request = $db->query('', '

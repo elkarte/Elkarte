@@ -105,7 +105,7 @@ class Announce_Controller extends Action_Controller
 	 */
 	public function action_send()
 	{
-		global $topic, $board, $board_info, $context, $modSettings, $language, $scripturl;
+		global $topic, $board, $board_info, $context, $modSettings;
 
 		checkSession();
 

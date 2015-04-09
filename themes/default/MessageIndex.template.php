@@ -125,7 +125,7 @@ function template_topic_listing_above()
  */
 function template_topic_listing()
 {
-	global $context, $settings, $options, $scripturl, $txt, $modSettings;
+	global $context, $options, $scripturl, $txt, $modSettings;
 
 	if (!$context['no_topic_listing'])
 	{

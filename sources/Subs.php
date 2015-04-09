@@ -748,8 +748,6 @@ function parse_bbc($message, $smileys = true, $cache_id = '', $parse_tags = arra
 				'type' => 'unparsed_content',
 				'content' => '<div class="codeheader">' . $txt['code'] . ': <a href="javascript:void(0);" onclick="return elkSelectText(this);" class="codeoperation">' . $txt['code_select'] . '</a></div><pre class="bbc_code prettyprint">$1</pre>',
 				'validate' => isset($disabled['code']) ? null : function(&$tag, &$data, $disabled) {
-					global $context;
-
 					if (!isset($disabled['code']))
 						$data = str_replace("\t", "<span class=\"tab\">\t</span>", $data);
 				},
@@ -760,8 +758,6 @@ function parse_bbc($message, $smileys = true, $cache_id = '', $parse_tags = arra
 				'type' => 'unparsed_equals_content',
 				'content' => '<div class="codeheader">' . $txt['code'] . ': ($2) <a href="#" onclick="return elkSelectText(this);" class="codeoperation">' . $txt['code_select'] . '</a></div><pre class="bbc_code prettyprint">$1</pre>',
 				'validate' => isset($disabled['code']) ? null : function(&$tag, &$data, $disabled) {
-					global $context;
-
 					if (!isset($disabled['code']))
 						$data[0] = str_replace("\t", "<span class=\"tab\">\t</span>", $data[0]);
 				},
@@ -2342,7 +2338,6 @@ function determineTopicClass(&$topic_context)
 function setupThemeContext($forceload = false)
 {
 	global $modSettings, $user_info, $scripturl, $context, $settings, $options, $txt;
-	global $user_settings;
 
 	static $loaded = false;
 

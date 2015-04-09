@@ -156,7 +156,7 @@ class MergeTopics_Controller extends Action_Controller
 	 */
 	public function action_mergeExecute($topics = array())
 	{
-		global $user_info, $txt, $context, $scripturl, $modSettings;
+		global $txt, $context;
 
 		// Check the session.
 		checkSession('request');

@@ -658,7 +658,7 @@ class Admin_Controller extends Action_Controller
 	 */
 	public function action_credits()
 	{
-		global $forum_version, $txt, $scripturl, $context, $user_info, $modSettings;
+		global $forum_version, $txt, $scripturl, $context, $user_info;
 
 		// We need a little help from our friends
 		require_once(SUBSDIR . '/Membergroups.subs.php');

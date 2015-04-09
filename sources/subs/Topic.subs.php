@@ -2972,8 +2972,6 @@ function topicsPosters($topics)
  */
 function fixMergedTopics($first_msg, $topics, $id_topic, $target_board, $target_subject, $enforce_subject, $notifications)
 {
-	global $context;
-
 	$db = database();
 
 	// Delete the remaining topics.

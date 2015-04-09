@@ -170,7 +170,7 @@ class Likes_Controller extends Action_Controller
 	 */
 	public function action_unlikepost()
 	{
-		global $user_info, $topic, $txt, $modSettings;
+		global $user_info, $topic;
 
 		$this->_doLikePost('-', 'rlikemsg');
 

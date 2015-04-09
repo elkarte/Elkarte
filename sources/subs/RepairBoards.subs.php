@@ -1344,7 +1344,7 @@ function createSalvageArea()
  */
 function pauseRepairProcess($to_fix, $current_step_description, $max_substep = 0, $force = false)
 {
-	global $context, $txt, $time_start, $db_temp_cache, $db_show_debug;
+	global $context, $txt, $time_start, $db_show_debug;
 
 	// More time, I need more time!
 	setTimeLimit(600);
@@ -1395,7 +1395,7 @@ function pauseRepairProcess($to_fix, $current_step_description, $max_substep = 0
  */
 function findForumErrors($do_fix = false)
 {
-	global $context, $txt, $errorTests, $db_show_debug, $db_temp_cache;
+	global $context, $txt, $errorTests, $db_show_debug;
 
 	$db = database();
 

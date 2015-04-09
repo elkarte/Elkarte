@@ -121,7 +121,7 @@ class Topic_Controller extends Action_Controller
 	 */
 	public function action_sticky()
 	{
-		global $modSettings, $topic, $board;
+		global $topic, $board;
 
 		// Make sure the user can sticky it, and they are stickying *something*.
 		isAllowedTo('make_sticky');

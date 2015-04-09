@@ -120,8 +120,6 @@ function cache_get_key($key)
  */
 function loadCacheEngines($supported_only = true)
 {
-	global $modSettings, $txt;
-
 	$engines = array();
 
 	$classes = glob(SUBSDIR . '/cache/*.php');

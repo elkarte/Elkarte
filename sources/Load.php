@@ -1827,7 +1827,7 @@ function loadEssentialThemeData()
  */
 function loadTemplate($template_name, $style_sheets = array(), $fatal = true)
 {
-	global $context, $settings;
+	global $settings;
 	static $delay = array();
 
 	// If we don't know yet the default theme directory, let's wait a bit.
@@ -1960,7 +1960,7 @@ function requireTemplate($template_name, $style_sheets, $fatal)
  */
 function loadSubTemplate($sub_template_name, $fatal = false)
 {
-	global $context, $txt, $db_show_debug;
+	global $txt, $db_show_debug;
 
 	if ($db_show_debug === true)
 		Debug::get()->add('sub_templates', $sub_template_name);
@@ -2223,7 +2223,7 @@ function addInlineJavascript($javascript, $defer = false)
  */
 function loadLanguage($template_name, $lang = '', $fatal = true, $force_reload = false)
 {
-	global $user_info, $language, $settings, $context, $modSettings;
+	global $user_info, $language, $settings, $modSettings;
 	global $db_show_debug, $txt;
 	static $already_loaded = array();
 
