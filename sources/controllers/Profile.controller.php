@@ -416,7 +416,7 @@ class Profile_Controller extends Action_Controller
 		}
 
 		// Does this require session validating?
-		if (!empty($area['validate']) || (isset($_REQUEST['save']) && !$context['user']['is_owner']))
+		if (!empty($profile_include_data['validate']) || (isset($_REQUEST['save']) && !$context['user']['is_owner']))
 			validateSession();
 
 		// Do we need to perform a token check?
