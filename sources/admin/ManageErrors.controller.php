@@ -102,7 +102,7 @@ class ManageErrors_Controller extends Action_Controller
 		$type = isset($_POST['delall']) ? 'delall' : (isset($_POST['delete']) ? 'delete' : false);
 		$error_list = isset($_POST['delete']) ? $_POST['delete'] : null;
 
-		if ($type != false)
+		if ($type !== false)
 		{
 			// Make sure the session exists and is correct; otherwise, might be a hacker.
 			checkSession();
