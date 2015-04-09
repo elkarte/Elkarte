@@ -443,7 +443,7 @@ class ProfileInfo_Controller extends Action_Controller
 
 			// We can be lazy, since removeMessage() will check the permissions for us.
 			$remover = new MessagesDelete($modSettings['recycle_enable'], $modSettings['recycle_board']);
-			$remover->removeMessage((int) $_GET['delete'], $decreasePostCount, true);
+			$remover->removeMessage((int) $_GET['delete']);
 
 			// Back to... where we are now ;).
 			redirectexit('action=profile;u=' . $memID . ';area=showposts;start=' . $context['start']);
