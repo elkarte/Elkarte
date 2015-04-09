@@ -95,6 +95,13 @@ class Mentions_Controller extends Action_Controller
 	protected $_default_sort = 'log_time';
 
 	/**
+	 * User chosen sorting column
+	 *
+	 * @var string
+	 */
+	protected $_sort = '';
+
+	/**
 	 * The sorting methods we know
 	 *
 	 * @var string[]
@@ -113,8 +120,6 @@ class Mentions_Controller extends Action_Controller
 	 */
 	public function __construct($eventManager)
 	{
-		global $modSettings;
-
 		$this->_known_status = array(
 			'new' => 0,
 			'read' => 1,
