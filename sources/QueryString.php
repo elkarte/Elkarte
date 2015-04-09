@@ -103,7 +103,7 @@ function cleanRequest()
 
 				for ($i = 1, $n = count($temp); $i < $n; $i++)
 				{
-					@list ($key, $val) = @explode('=', $temp[$i], 2);
+					list ($key, $val) = array_pad(explode('=', $temp[$i], 2), 2, '');
 					if (!isset($_GET[$key]))
 						$_GET[$key] = $val;
 				}
