@@ -1094,11 +1094,14 @@ function list_getNumHolidays()
  * Remove a holiday from the calendar.
  *
  * @package Calendar
- * @param int[] $holiday_ids An array of ids for holidays.
+ * @param int|int[] $holiday_ids An array of ids for holidays.
  */
 function removeHolidays($holiday_ids)
 {
 	$db = database();
+
+	if (!is_array($holiday_ids))
+		$holiday_ids = array($holiday_ids);
 
 	$db->query('', '
 		DELETE FROM {db_prefix}calendar_holidays
