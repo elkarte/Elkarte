@@ -1613,6 +1613,7 @@ class ManageAttachments_Controller extends Action_Controller
 
 				// Move them
 				$moved = array();
+				$dir_size = empty($dir_size) ? 0 : $dir_size;
 				foreach ($tomove as $row)
 				{
 					$source = getAttachmentFilename($row['filename'], $row['id_attach'], $row['id_folder'], false, $row['file_hash']);
