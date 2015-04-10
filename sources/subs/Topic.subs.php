@@ -131,8 +131,7 @@ function removeTopics($topics, $decreasePostCount = true, $ignoreRecycling = fal
 				if ($row['id_board'] == $modSettings['recycle_board'])
 					continue;
 
-				if (function_exists('apache_reset_timeout'))
-					@apache_reset_timeout();
+				setTimeLimit(300);
 
 				$recycleTopics[] = $row['id_topic'];
 
@@ -221,11 +220,9 @@ function removeTopics($topics, $decreasePostCount = true, $ignoreRecycling = fal
 	$db->free_result($request);
 
 	// Decrease number of posts and topics for each board.
+	setTimeLimit(300);
 	foreach ($adjustBoards as $stats)
 	{
-		if (function_exists('apache_reset_timeout'))
-			@apache_reset_timeout();
-
 		$db->query('', '
 			UPDATE {db_prefix}boards
 			SET
@@ -303,8 +300,7 @@ function removeTopics($topics, $decreasePostCount = true, $ignoreRecycling = fal
 		$messages = array();
 		while ($row = $db->fetch_assoc($request))
 		{
-			if (function_exists('apache_reset_timeout'))
-				@apache_reset_timeout();
+			setTimeLimit(300);
 
 			$words = array_merge($words, text2words($row['body'], $customIndexSettings['bytes_per_word'], true));
 			$messages[] = $row['id_msg'];
@@ -1366,7 +1362,7 @@ function getTopicInfoByMsg($topic, $msg = null)
 /**
  * So long as you are sure... all old posts will be gone.
  * Used in Maintenance.controller.php to prune old topics.
- * 
+ *
  * @param int[] $boards
  * @param string $delete_type
  * @param boolean $exclude_stickies

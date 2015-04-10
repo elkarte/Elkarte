@@ -1568,7 +1568,7 @@ class Packages_Controller extends Action_Controller
 
 		// This is a time and memory eating ...
 		setMemoryLimit('128M');
-		@set_time_limit(600);
+		setTimeLimit(600);
 
 		// Load up some FTP stuff.
 		create_chmod_control();
@@ -2564,9 +2564,7 @@ function pausePermsSave()
 	global $context, $txt;
 
 	// Try get more time...
-	@set_time_limit(600);
-	if (function_exists('apache_reset_timeout'))
-		@apache_reset_timeout();
+	setTimeLimit(600);
 
 	// Set up the items for the pause form
 	$context['sub_template'] = 'pause_action_permissions';

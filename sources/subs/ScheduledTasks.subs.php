@@ -639,9 +639,7 @@ function run_this_task_compat($task_name)
 		if (method_exists($task_object, $method))
 		{
 			// Try to stop a timeout, this would be bad...
-			@set_time_limit(300);
-			if (function_exists('apache_reset_timeout'))
-				@apache_reset_timeout();
+			setTimeLimit(300);
 
 			// Do the task...
 			$completed = $task_object->{$method}();

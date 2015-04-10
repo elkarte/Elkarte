@@ -140,9 +140,10 @@ function sendmail($to, $subject, $message, $from = null, $message_id = null, $se
 		$headers .= ($from !== null && strpos($from, '@') !== false) ? 'Reply-To: <' . $from . '>' . $line_break : '';
 	}
 
+	// We'll need this later for the envelope fix, too, so keep it
+	$return_path = (!empty($modSettings['maillist_sitename_address']) ? $modSettings['maillist_sitename_address'] : (empty($modSettings['maillist_mail_from']) ? $webmaster_email : $modSettings['maillist_mail_from']));
+
 	// Return path, date, mailer
-	//We'll need this later for the envelope fix, too, so keep it 
-	$return_path = (!empty($modSettings['maillist_sitename_address']) ? $modSettings['maillist_sitename_address'] : (empty($modSettings['maillist_mail_from']) ? $webmaster_email : $modSettings['maillist_mail_from'])); 
 	$headers .= 'Return-Path: ' . $return_path . $line_break;
 	$headers .= 'Date: ' . gmdate('D, d M Y H:i:s') . ' -0000' . $line_break;
 	$headers .= 'X-Mailer: ELK' . $line_break;
@@ -254,9 +255,9 @@ function sendmail($to, $subject, $message, $from = null, $message_id = null, $se
 			elseif (empty($modSettings['mail_no_message_id']))
 				$unq_id = ($need_break ? $line_break : '') . 'Message-ID: <' . md5($boardurl . microtime()) . '-' . $message_id . strstr(empty($modSettings['maillist_mail_from']) ? $webmaster_email : $modSettings['maillist_mail_from'], '@') . '>';
 
-			//This is frequently not set, or not set according to the needs of PBE and bounce detection
-			//We have to use ini_set, since "-f <address>" doesn't work on windows systems, so we need both
-			$old_return = ini_set('sendmail_from', $return_path); 
+			// This is frequently not set, or not set according to the needs of PBE and bounce detection
+			// We have to use ini_set, since "-f <address>" doesn't work on windows systems, so we need both
+			$old_return = ini_set('sendmail_from', $return_path);
 			if (!mail(strtr($to, array("\r" => '', "\n" => '')), $subject, $message, $headers . $unq_id, '-f ' . $return_path))
 			{
 				log_error(sprintf($txt['mail_send_unable'], $to));
@@ -264,21 +265,20 @@ function sendmail($to, $subject, $message, $from = null, $message_id = null, $se
 			}
 			else
 			{
-				// keep our post via email log
+				// Keep our post via email log
 				if (!empty($unq_head))
 					$sent[] = array($unq_head, time(), $to);
 
-				// track total emails sent
+				// Track total emails sent
 				if (!empty($modSettings['trackStats']))
 					trackStats(array('email' => '+'));
 			}
-			//Put it back
-			ini_set('sendmail_from', $old_return); 
-			
+
+			// Put it back
+			ini_set('sendmail_from', $old_return);
+
 			// Wait, wait, I'm still sending here!
-			@set_time_limit(300);
-			if (function_exists('apache_reset_timeout'))
-				@apache_reset_timeout();
+			setTimeLimit(300);
 		}
 
 		// Log each email that we sent so they can be replied to
@@ -666,9 +666,7 @@ function smtp_mail($mail_to_array, $subject, $message, $headers, $priority, $mes
 			$sent[] = array($unq_head, time(), $mail_to);
 
 		// Almost done, almost done... don't stop me just yet!
-		@set_time_limit(300);
-		if (function_exists('apache_reset_timeout'))
-			@apache_reset_timeout();
+		setTimeLimit(300);
 	}
 
 	// say our goodbyes
@@ -1353,9 +1351,7 @@ function reduceMailQueue($batch_size = false, $override_limit = false, $force_se
 				trackStats(array('email' => '+'));
 
 			// Try to stop a timeout, this would be bad...
-			@set_time_limit(300);
-			if (function_exists('apache_reset_timeout'))
-				@apache_reset_timeout();
+			setTimeLimit(300);
 		}
 		else
 			$result = smtp_mail(array($email['to']), $email['subject'], $email['body'], $email['headers'], $email['priority'], $email['message_id']);

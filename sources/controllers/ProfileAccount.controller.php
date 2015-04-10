@@ -313,7 +313,7 @@ class ProfileAccount_Controller extends Action_Controller
 							</div>';
 
 							return $ret;
-						
+
 						},
 					),
 				),
@@ -421,7 +421,7 @@ class ProfileAccount_Controller extends Action_Controller
 		global $user_info, $context, $cur_profile, $user_profile, $modSettings;
 
 		// Try get more time...
-		@set_time_limit(600);
+		setTimeLimit(600);
 
 		// @todo Add a way to delete pms as well?
 		if (!$context['user']['is_owner'])
@@ -492,6 +492,7 @@ class ProfileAccount_Controller extends Action_Controller
 			// Setup their account for deletion ;)
 			require_once(SUBSDIR . '/Members.subs.php');
 			updateMemberData($memID, array('is_activated' => 4));
+			
 			// Another account needs approval...
 			updateSettings(array('unapprovedMembers' => true), true);
 		}

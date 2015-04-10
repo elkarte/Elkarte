@@ -49,7 +49,7 @@ function deleteMembers($users, $check_not_admin = false)
 	$db = database();
 
 	// Try give us a while to sort this out...
-	@set_time_limit(600);
+	setTimeLimit(600);
 
 	// Try to get some more memory.
 	setMemoryLimit('128M');

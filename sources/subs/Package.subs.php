@@ -1711,7 +1711,7 @@ function parseModification($file, $testing = true, $undo = false, $theme_paths =
 {
 	global $txt, $modSettings;
 
-	@set_time_limit(600);
+	setTimeLimit(600);
 
 	$xml = new Xml_Array(strtr($file, array("\r" => '')));
 	$actions = array();
@@ -2095,7 +2095,7 @@ function parseBoardMod($file, $testing = true, $undo = false, $theme_paths = arr
 {
 	global $settings, $modSettings;
 
-	@set_time_limit(600);
+	setTimeLimit(600);
 	$file = strtr($file, array("\r" => ''));
 
 	$working_file = null;
@@ -2806,9 +2806,7 @@ function package_create_backup($id = 'backup')
 		$output_file .= $output_ext;
 
 	// Buy some more time so we have enough to create this archive
-	@set_time_limit(300);
-	if (function_exists('apache_reset_timeout'))
-		@apache_reset_timeout();
+	setTimeLimit(300);
 
 	// Set up the file output handle, try gzip first to save space
 	if (function_exists('gzopen'))

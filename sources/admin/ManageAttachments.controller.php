@@ -767,7 +767,7 @@ class ManageAttachments_Controller extends Action_Controller
 			redirectexit('action=admin;area=manageattachments;sa=maintenance');
 
 		// Try give us a while to sort this out...
-		@set_time_limit(600);
+		setTimeLimit(600);
 
 		$_GET['step'] = empty($_GET['step']) ? 0 : (int) $_GET['step'];
 		$context['starting_substep'] = $_GET['substep'] = empty($_GET['substep']) ? 0 : (int) $_GET['substep'];
@@ -1586,9 +1586,7 @@ class ManageAttachments_Controller extends Action_Controller
 			$break = false;
 			while ($break === false)
 			{
-				@set_time_limit(300);
-				if (function_exists('apache_reset_timeout'))
-					@apache_reset_timeout();
+				setTimeLimit(300);
 
 				// If limits are set, get the file count and size for the destination folder
 				if ($dir_files <= 0 && (!empty($modSettings['attachmentDirSizeLimit']) || !empty($modSettings['attachmentDirFileLimit'])))
@@ -1722,9 +1720,7 @@ function pauseAttachmentMaintenance($to_fix, $max_substep = 0)
 	global $context, $txt, $time_start;
 
 	// Try get more time...
-	@set_time_limit(600);
-	if (function_exists('apache_reset_timeout'))
-		@apache_reset_timeout();
+	setTimeLimit(600);
 
 	// Have we already used our maximum time?
 	if (time() - array_sum(explode(' ', $time_start)) < 3 || $context['starting_substep'] == $_GET['substep'])
