@@ -627,8 +627,6 @@ class ManageServer_Controller extends Action_Controller
 	{
 		global $txt;
 
-		require_once (SUBSDIR . '/Cache.subs.php');
-
 		// Detect all available optimizers
 		$detected = loadCacheEngines(false);
 		$detected_names = array();
