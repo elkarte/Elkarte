@@ -430,7 +430,7 @@ class ManageLanguages_Controller extends Action_Controller
 					'version_compare' => 'newer',
 				);
 
-				list ($name, $language) = explode('.', $filename);
+				list ($name,) = explode('.', $filename);
 
 				// Let's get the new version, I like versions, they tell me that I'm up to date.
 				if (preg_match('~\s*Version:\s+(.+?);\s*' . preg_quote($name, '~') . '~i', $file['preview'], $match) == 1)
