@@ -31,10 +31,14 @@ if (!defined('ELK'))
  */
 class Admin_Controller extends Action_Controller
 {
+	/**
+	 * Pre Dispatch, called before other methods.  Loads integration hooks
+	 */
 	public function pre_dispatch()
 	{
 		Hooks::get()->loadIntegrationsSettings();
 	}
+
 	/**
 	 * The main admin handling function.
 	 *
