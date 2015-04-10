@@ -115,7 +115,7 @@ class Email_Parse
 
 	/**
 	 * Message id of the key
-	 * @var int|string
+	 * @var string
 	 */
 	public $message_id = null;
 
@@ -518,7 +518,7 @@ class Email_Parse
 						// Plain section
 						elseif ($this->_boundary_section[$i]->headers['content-type'] === 'text/plain')
 							$text_ids[] = $i;
-						// Message is a DSN
+						//Message is a DSN
 						elseif ($this->_boundary_section[$i]->headers['content-type'] === 'message/delivery-status')
 						{
 							// These sections often have extra blank lines, so cannot be counted on to be
@@ -528,24 +528,26 @@ class Email_Parse
 							foreach (explode("\n", str_replace("\r\n", "\n", $this->_boundary_section[$i]->body)) as $l)
 							{
 								$field = $type = $val = "";
-								list($field, $rest) = explode(":", $l);
+								list($field, $rest) = explode(':', $l);
 
-								if (strpos($l, ";"))
-									list ($type, $val) = explode(";", $rest);
+								if (strpos($l, ';'))
+									list ($type, $val) = explode(';', $rest);
 								else
 									$val = $rest;
 
 								$dsn_body[trim(strtolower($field))] = array('type' => trim($type), 'value' => trim($val));
 							}
-							switch ($dsn_body['action']['value']){								
+
+							switch ($dsn_body['action']['value'])
+							{
 								case 'delayed':
-									//Remove this if we don't want to flag delayed delivery addresses as "dirty"
-									//May be caused by temporary net failures, e.g. DNS outage
-									//Lack of break is intentional
+								// Remove this if we don't want to flag delayed delivery addresses as "dirty"
+								// May be caused by temporary net failures, e.g. DNS outage
+								// Lack of break is intentional
 								case 'failed':
-									//The email failed to be delivered.
+									// The email failed to be delivered.
 									$this->_is_dsn = true;
-									$this->_dsn = array('headers'=>$this->_boundary_section[$i]->headers, 'body'=>$dsn_body);
+									$this->_dsn = array('headers' => $this->_boundary_section[$i]->headers, 'body' => $dsn_body);
 									break;
 								default:
 									$this->_is_dsn = false;
@@ -784,10 +786,10 @@ class Email_Parse
 	 * Checks the message components to determine if the message is a DSN
 	 *
 	 * What it does:
-	 * 	- Checks the content of the message, looking for headers and values that
+	 * 	Checks the content of the message, looking for headers and values that
 	 * 	correlate with the message being a DSN. _parse_body checks for the existence
 	 * 	of a "message/delivery-status" header
-	 * 	- As many, many daemons and providers do not adhere to the RFC 3464
+	 * 	As many, many daemons and providers do not adhere to the RFC 3464
 	 *	standard, this function will hold the "special cases"
 	 *
 	 * @return boolean
