@@ -30,9 +30,7 @@ class Memcached_Cache extends Cache_Method_Abstract
 		if (!function_exists('memcache_get') && !function_exists('memcached_get'))
 			return false;
 
-		require_once (SUBSDIR . '/Cache.subs.php');
 		$memcached = self::get_memcached_server();
-
 		if (!$memcached)
 			return false;
 
