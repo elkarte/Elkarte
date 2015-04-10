@@ -708,7 +708,7 @@ class ManageBans_Controller extends Action_Controller
 		}
 
 		// Update the triggers associated with this ban
-		if (isset($_POST['ban_suggestions']))
+		if (isset($_POST['ban_suggestions'], $ban_info['id']))
 		{
 			$saved_triggers = saveTriggers($_POST, $ban_info['id'], isset($_REQUEST['u']) ? (int) $_REQUEST['u'] : 0, isset($_REQUEST['bi']) ? (int) $_REQUEST['bi'] : 0);
 			$context['ban_suggestions']['saved_triggers'] = $saved_triggers;
@@ -717,7 +717,7 @@ class ManageBans_Controller extends Action_Controller
 		// Something went wrong somewhere, ban info or triggers, ... Oh well, let's go back.
 		if ($ban_errors->hasErrors())
 		{
-			$context['ban_suggestions'] = $saved_triggers;
+			$context['ban_suggestions'] = !empty($saved_triggers) ? $saved_triggers : '';
 			$context['ban']['from_user'] = true;
 
 			// They may have entered a name not using the member select box
@@ -752,7 +752,7 @@ class ManageBans_Controller extends Action_Controller
 		updateBanMembers();
 
 		// Go back to an appropriate spot
-		redirectexit('action=admin;area=ban;sa=' . (isset($_POST['add_ban']) ? 'list' : 'edit;bg=' . $ban_group_id));
+		redirectexit('action=admin;area=ban;sa=' . (isset($_POST['add_ban']) ? 'list' : 'edit;bg=' . isset($ban_group_id) ? $ban_group_id : 0));
 	}
 
 	/**
