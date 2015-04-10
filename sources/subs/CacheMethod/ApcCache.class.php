@@ -14,7 +14,7 @@ if (!defined('ELK'))
 	die('No access...');
 
 /**
- * Alternative PHP Cache or APC
+ * Alternative PHP Cache or APC / APCu
  */
 class Apc_Cache extends Cache_Method_Abstract
 {
@@ -66,7 +66,7 @@ class Apc_Cache extends Cache_Method_Abstract
 	 */
 	public static function available()
 	{
-		return extension_loaded('apc');
+		return extension_loaded('apc') || extension_loaded('apcu');
 	}
 
 	/**

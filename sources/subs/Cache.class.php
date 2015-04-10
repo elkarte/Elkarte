@@ -55,6 +55,7 @@ class Cache
 
 	/**
 	 * Initialize the class, defines the options and the caching method to use
+	 *
 	 * @param int $enabled The level of caching
 	 * @param string $accelerator The accelerator used
 	 * @param mixed[] $options Any setting necessary to the caching engine
@@ -271,17 +272,15 @@ class Cache
 			global $cache_accelerator, $cache_enable, $cache_uid, $cache_password;
 
 			$options = array();
-			if ($cache_accelerator == 'xcache')
+			if ($cache_accelerator === 'xcache')
 			{
 				$options = array(
 					'cache_uid' => $cache_uid,
 					'cache_password' => $cache_password,
 				);
 			}
-			if ($cache_accelerator == 'acpu')
-				self::$_instance = new Cache($cache_enable, 'acp', $options);
-			else
-				self::$_instance = new Cache($cache_enable, $cache_accelerator, $options);
+
+			self::$_instance = new Cache($cache_enable, $cache_accelerator, $options);
 		}
 
 		return self::$_instance;
