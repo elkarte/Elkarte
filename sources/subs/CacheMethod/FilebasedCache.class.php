@@ -14,9 +14,10 @@ if (!defined('ELK'))
 	die('No access...');
 
 /**
- * Filebased caching is the fallback is anything else is available, it simply
+ * Filebased caching is the fallback if nothing else is available, it simply
  * uses the filesystem to store queries results in order to try to reduce the
- * number of queries.
+ * number of queries per time period.
+ *
  * The performance gain may or may not exist depending on many factors.
  *
  * It requires the CACHEDIR constant to be defined and pointing to a
@@ -37,9 +38,10 @@ class Filebased_Cache extends Cache_Method_Abstract
 	 */
 	public function put($key, $value, $ttl = 120)
 	{
-		// Otherwise custom cache?
+		// Clearing this data
 		if ($value === null)
 			@unlink(CACHEDIR . '/data_' . $key . '.php');
+		// Or stashing it away
 		else
 		{
 			$cache_data = '<?php if (!defined(\'ELK\')) die; if (' . (time() + $ttl) . ' < time()) return false; else{return \'' . addcslashes($value, '\\\'') . '\';}';
