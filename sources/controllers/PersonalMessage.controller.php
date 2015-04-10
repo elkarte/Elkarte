@@ -2442,7 +2442,7 @@ function preparePMContext_callback($type = 'subject', $reset = false)
 		return false;
 
 	// Reset the data?
-	if ($reset == true)
+	if ($reset === true)
 		return $db->data_seek($messages_request, 0);
 
 	// Get the next one... bail if anything goes wrong.
