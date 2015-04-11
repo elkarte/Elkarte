@@ -83,14 +83,12 @@ unset($boarddir, $cachedir, $sourcedir, $languagedir, $extdir);
 require_once(SOURCEDIR . '/QueryString.php');
 require_once(SOURCEDIR . '/Session.php');
 require_once(SOURCEDIR . '/Subs.php');
-require_once(SOURCEDIR . '/Errors.php');
 require_once(SOURCEDIR . '/Logging.php');
 require_once(SOURCEDIR . '/Load.php');
 require_once(SOURCEDIR . '/Security.php');
+require_once(SUBSDIR . '/Cache.subs.php');
 
 spl_autoload_register('elk_autoloader');
-
-require_once(SUBSDIR . '/Cache.subs.php');
 
 /**
  * Set this to one of three values depending on what you want to happen in the case of a fatal error.

@@ -49,15 +49,13 @@ else
 require_once(SOURCEDIR . '/QueryString.php');
 require_once(SOURCEDIR . '/Session.php');
 require_once(SOURCEDIR . '/Subs.php');
-require_once(SOURCEDIR . '/Errors.php');
 require_once(SOURCEDIR . '/Logging.php');
 require_once(SOURCEDIR . '/Load.php');
 require_once(SOURCEDIR . '/Security.php');
+require_once(SUBSDIR . '/Cache.subs.php');
 
 // Get the autoloader rolling
 spl_autoload_register('elk_autoloader');
-
-require_once(SUBSDIR . '/Cache.subs.php');
 
 // Used by the test, add others as needed or ...
 $context = array();
