@@ -19,9 +19,8 @@
 
 /**
  * Perform a search in the admin settings (and maybe other settings as well)
- *
  */
-class Settings_Search
+class AdminSettings_Search
 {
 	/**
 	 * All the settings we have found

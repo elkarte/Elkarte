@@ -2342,7 +2342,7 @@ function setupThemeContext($forceload = false)
 	static $loaded = false;
 
 	// Under SSI this function can be called more then once.  That can cause some problems.
-	//   So only run the function once unless we are forced to run it again.
+	// So only run the function once unless we are forced to run it again.
 	if ($loaded && !$forceload)
 		return;
 
@@ -4024,6 +4024,9 @@ function elk_autoloader($class)
 	{
 		case 'VerificationControls':
 			$file_name = SUBSDIR . '/VerificationControls.class.php';
+			break;
+		case 'AdminSettings':
+			$file_name = SUBSDIR . '/AdminSettingsSearch.class.php';
 			break;
 		// We don't handle these
 		case 'Database':

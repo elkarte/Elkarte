@@ -841,7 +841,7 @@ class Admin_Controller extends Action_Controller
 		// Go through all the search data trying to find this text!
 		$search_term = strtolower(un_htmlspecialchars($context['search_term']));
 
-		$search = new Settings_Search($language_files, $include_files, $settings_search);
+		$search = new AdminSettings_Search($language_files, $include_files, $settings_search);
 		$search->initSearch($context['admin_menu_name'], array(
 			array('COPPA', 'area=regcenter;sa=settings'),
 			array('CAPTCHA', 'area=securitysettings;sa=spam'),
