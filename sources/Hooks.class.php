@@ -32,6 +32,13 @@ class Hooks
 	protected $_db = null;
 	protected $_debug = null;
 
+	/**
+	 * The class constructor, loads globals in to the class object
+	 *
+	 * @param object $db
+	 * @param boolean $debug
+	 * @param string[]|string|null $paths - additonal paths to add to the replacement array
+	 */
 	private function __construct($db, $debug, $paths = null)
 	{
 		$this->_path_replacements = array(
@@ -47,9 +54,7 @@ class Hooks
 		$this->_debug = $debug;
 
 		if ($paths !== null)
-		{
 			$this->newPath($paths);
-		}
 	}
 
 	/**
@@ -87,9 +92,7 @@ class Hooks
 		// Loop through each function.
 		$functions = $this->_prepare_hooks($modSettings[$hook]);
 		foreach ($functions as $function => $call)
-		{
 			$results[$function] = call_user_func_array($call, $parameters);
-		}
 
 		return $results;
 	}
@@ -116,9 +119,7 @@ class Hooks
 
 			// OOP static method
 			if (strpos($call, '::') !== false)
-			{
 				$call = explode('::', $call);
-			}
 
 			if (!empty($file))
 			{
@@ -199,9 +200,7 @@ class Hooks
 
 		// Is it going to be permanent?
 		if ($permanent)
-		{
 			$this->_store($hook, $integration_call);
-		}
 
 		// Make current function list usable.
 		$functions = empty($modSettings[$hook]) ? array() : explode(',', $modSettings[$hook]);
@@ -236,6 +235,9 @@ class Hooks
 		}
 	}
 
+	/**
+	 * @todo
+	 */
 	public function loadIntegrationsSettings()
 	{
 		$enabled = $this->_get_enabled_integrations();
@@ -255,16 +257,24 @@ class Hooks
 		}
 	}
 
+	/**
+	 * Find all integration files (default is *.integrate.php) in the supplied directory
+	 *
+	 * @param string $basepath
+	 * @param string $ext
+	 */
 	public function discoverIntegrations($basepath, $ext = '.integrate.php')
 	{
 		$path = $basepath . '/*/*' . $ext;
-
 		$names = array();
+
+		// Find all integration files
 		foreach (glob($path) as $file)
 		{
 			$name = str_replace($ext, '', basename($file));
 			$composer_file = dirname($file) . '/composer.json';
 
+			// Already have the integration compose file, then use it, otherwise create one
 			if (file_exists($composer_file))
 				$composer_data = json_decode(file_get_contents($composer_file));
 			else
@@ -474,6 +484,7 @@ class Hooks
 	{
 		if ($db === null)
 			$db = database();
+
 		if ($debug === null)
 			$debug = Debug::get();
 
@@ -491,13 +502,9 @@ class Hooks
 	public static function get($db = null, $debug = null, $paths = null)
 	{
 		if (self::$_instance === null)
-		{
 			Hooks::init($db, $debug, $paths);
-		}
 		elseif ($paths !== null)
-		{
 			self::$_instance->newPaths($paths);
-		}
 
 		return self::$_instance;
 	}
