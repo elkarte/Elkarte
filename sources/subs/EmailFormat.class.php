@@ -159,6 +159,7 @@ class Email_Format
 	 * in a quote (&depth) code (&depth) or list (bbc or plain) etc.
 	 *
 	 * @param string $data
+	 * @param boolean $bbc_br
 	 */
 	private function _prep_data($data, $bbc_br)
 	{
