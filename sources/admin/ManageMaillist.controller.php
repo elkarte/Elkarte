@@ -873,7 +873,7 @@ class ManageMaillist_Controller extends Action_Controller
 			// Needs to be an int!
 			$id = (int) $_REQUEST['f_id'];
 			if (empty($id) || $id <= 0)
-				fatal_lang_error('error_no_id_filter');
+				Errors::fatal_lang_error('error_no_id_filter');
 
 			// Load it up and set it as the current values
 			$row = maillist_load_filter_parser($id, 'filter');
@@ -1265,7 +1265,7 @@ class ManageMaillist_Controller extends Action_Controller
 			// Needs to be an int!
 			$id = (int) $_REQUEST['f_id'];
 			if (empty($id) || $id < 0)
-				fatal_lang_error('error_no_id_filter');
+				Errors::fatal_lang_error('error_no_id_filter');
 
 			// Load this filter so we can edit it
 			$row = maillist_load_filter_parser($id, 'parser');

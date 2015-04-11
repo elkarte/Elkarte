@@ -188,7 +188,7 @@ function adminLogin($type = 'admin')
 		// log some info along with it! referer, user agent
 		$req = request();
 		$txt['security_wrong'] = sprintf($txt['security_wrong'], isset($_SERVER['HTTP_REFERER']) ? $_SERVER['HTTP_REFERER'] : $txt['unknown'], $req->user_agent(), $user_info['ip']);
-		log_error($txt['security_wrong'], 'critical');
+		Errors::log_error($txt['security_wrong'], 'critical');
 
 		if (isset($_POST[$type . '_hash_pass']))
 			unset($_POST[$type . '_hash_pass']);
@@ -436,7 +436,7 @@ function resetPassword($memID, $username = null)
 		// Otherwise grab all of them and don't log anything
 		$error_severity = $errors->hasErrors(1) && !$user_info['is_admin'] ? 1 : null;
 		foreach ($errors->prepareErrors($error_severity) as $error)
-			fatal_error($error, $error_severity === null ? false : 'general');
+			Errors::fatal_error($error, $error_severity === null ? false : 'general');
 
 		// Update the database...
 		updateMemberData($memID, array('member_name' => $user, 'passwd' => $db_hash));
@@ -764,7 +764,7 @@ function findUser($where, $where_params, $fatal = true)
 		if ($db->num_rows($request) == 0)
 		{
 			if ($fatal)
-				fatal_lang_error('no_user_with_email', false);
+				Errors::fatal_lang_error('no_user_with_email', false);
 			else
 				return false;
 		}

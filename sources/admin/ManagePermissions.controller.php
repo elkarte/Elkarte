@@ -439,7 +439,7 @@ class ManagePermissions_Controller extends Action_Controller
 		if (!empty($_REQUEST['pid']))
 		{
 			if (!isset($context['profiles'][$_REQUEST['pid']]))
-				fatal_lang_error('no_access', false);
+				Errors::fatal_lang_error('no_access', false);
 
 			// Change the selected tab to better reflect that this really is a board profile.
 			$context[$context['admin_menu_name']]['current_subsection'] = 'profiles';
@@ -558,7 +558,7 @@ class ManagePermissions_Controller extends Action_Controller
 
 		// Make sure only one of the quick options was selected.
 		if ((!empty($_POST['predefined']) && ((isset($_POST['copy_from']) && $_POST['copy_from'] != 'empty') || !empty($_POST['permissions']))) || (!empty($_POST['copy_from']) && $_POST['copy_from'] != 'empty' && !empty($_POST['permissions'])))
-			fatal_lang_error('permissions_only_one_option', false);
+			Errors::fatal_lang_error('permissions_only_one_option', false);
 
 		if (empty($_POST['group']) || !is_array($_POST['group']))
 			$_POST['group'] = array();
@@ -578,7 +578,7 @@ class ManagePermissions_Controller extends Action_Controller
 
 		// No modifying the predefined profiles.
 		if ($_REQUEST['pid'] > 1 && $_REQUEST['pid'] < 5)
-			fatal_lang_error('no_access', false);
+			Errors::fatal_lang_error('no_access', false);
 
 		// Clear out any cached authority.
 		updateSettings(array('settings_updated' => time()));
@@ -683,7 +683,7 @@ class ManagePermissions_Controller extends Action_Controller
 		global $context, $txt;
 
 		if (!isset($_GET['group']))
-			fatal_lang_error('no_access', false);
+			Errors::fatal_lang_error('no_access', false);
 
 		require_once(SUBSDIR . '/ManagePermissions.subs.php');
 		$context['group']['id'] = (int) $_GET['group'];
@@ -705,7 +705,7 @@ class ManagePermissions_Controller extends Action_Controller
 
 			// Cannot edit an inherited group!
 			if ($parent != -2)
-				fatal_lang_error('cannot_edit_permissions_inherited');
+				Errors::fatal_lang_error('cannot_edit_permissions_inherited');
 		}
 		elseif ($context['group']['id'] == -1)
 			$context['group']['name'] = $txt['membergroups_guests'];
@@ -796,7 +796,7 @@ class ManagePermissions_Controller extends Action_Controller
 
 		// Cannot modify predefined profiles.
 		if ($_GET['pid'] > 1 && $_GET['pid'] < 5)
-			fatal_lang_error('no_access', false);
+			Errors::fatal_lang_error('no_access', false);
 
 		// Verify this isn't inherited.
 		if ($current_group_id == -1 || $current_group_id == 0)
@@ -809,7 +809,7 @@ class ManagePermissions_Controller extends Action_Controller
 		}
 
 		if ($parent != -2)
-			fatal_lang_error('cannot_edit_permissions_inherited');
+			Errors::fatal_lang_error('cannot_edit_permissions_inherited');
 
 		$givePerms = array('membergroup' => array(), 'board' => array());
 

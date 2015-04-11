@@ -164,7 +164,7 @@ class Poll_Post_Module
 
 		// Validate the poll...
 		if (!empty($topic_info) && !isset($_REQUEST['msg']))
-			fatal_lang_error('no_access', false);
+			Errors::fatal_lang_error('no_access', false);
 
 		// This is a new topic... so it's a new poll.
 		if (empty($topic_info))
@@ -308,7 +308,7 @@ class Poll_Post_Module
 		// If the user tries to set the poll too far in advance, don't let them.
 		if (!empty($poll_expire) && $poll_expire < 1)
 			// @todo this fatal error should not be here
-			fatal_lang_error('poll_range_error', false);
+			Errors::fatal_lang_error('poll_range_error', false);
 		// Don't allow them to select option 2 for hidden results if it's not time limited.
 		elseif (empty($poll_expire) && $poll_hide == 2)
 			$poll_hide = 1;

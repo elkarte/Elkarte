@@ -176,7 +176,7 @@ class ManageRegistration_Controller extends Action_Controller
 			// Otherwise grab all of them and don't log anything
 			$error_severity = $reg_errors->hasErrors(1) && !$user_info['is_admin'] ? 1 : null;
 			foreach ($reg_errors->prepareErrors($error_severity) as $error)
-				fatal_error($error, $error_severity === null ? false : 'general');
+				Errors::fatal_error($error, $error_severity === null ? false : 'general');
 
 			if (!empty($memberID))
 			{
@@ -346,7 +346,7 @@ class ManageRegistration_Controller extends Action_Controller
 
 			// Are there some contacts missing?
 			if (!empty($_POST['coppaAge']) && !empty($_POST['coppaType']) && empty($_POST['coppaPost']) && empty($_POST['coppaFax']))
-				fatal_lang_error('admin_setting_coppa_require_contact');
+				Errors::fatal_lang_error('admin_setting_coppa_require_contact');
 
 			// Post needs to take into account line breaks.
 			$_POST['coppaPost'] = str_replace("\n", '<br />', empty($_POST['coppaPost']) ? '' : $_POST['coppaPost']);

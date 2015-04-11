@@ -534,7 +534,7 @@ class Admin_Controller extends Action_Controller
 
 		// Nothing valid?
 		if ($admin_include_data == false)
-			fatal_lang_error('no_access', false);
+			Errors::fatal_lang_error('no_access', false);
 
 		// Build the link tree.
 		$context['linktree'][] = array(
@@ -896,7 +896,7 @@ class Admin_Controller extends Action_Controller
 
 		// If we didn't get any xml back we are in trouble - perhaps the doc site is overloaded?
 		if (!$search_results || preg_match('~<' . '\?xml\sversion="\d+\.\d+"\?>\s*(<api>.+?</api>)~is', $search_results, $matches) !== 1)
-			fatal_lang_error('cannot_connect_doc_site');
+			Errors::fatal_lang_error('cannot_connect_doc_site');
 
 		$search_results = !empty($matches[1]) ? $matches[1] : '';
 
@@ -908,7 +908,7 @@ class Admin_Controller extends Action_Controller
 
 		// Move through the api layer.
 		if (!$results->exists('api'))
-			fatal_lang_error('cannot_connect_doc_site');
+			Errors::fatal_lang_error('cannot_connect_doc_site');
 
 		// Are there actually some results?
 		if ($results->exists('api/query/search/p'))

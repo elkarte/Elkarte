@@ -151,7 +151,7 @@ class Packages_Controller extends Action_Controller
 
 				deltree(BOARDDIR . '/packages/temp', false);
 				if (!mktree(BOARDDIR . '/packages/temp', 0777))
-					fatal_lang_error('package_cant_download', false);
+					Errors::fatal_lang_error('package_cant_download', false);
 			}
 		}
 
@@ -167,7 +167,7 @@ class Packages_Controller extends Action_Controller
 		if (!file_exists(BOARDDIR . '/packages/' . $context['filename']))
 		{
 			deltree(BOARDDIR . '/packages/temp');
-			fatal_lang_error('package_no_file', false);
+			Errors::fatal_lang_error('package_no_file', false);
 		}
 
 		// Extract the files so we can get things like the readme, etc.
@@ -196,7 +196,7 @@ class Packages_Controller extends Action_Controller
 			$context['base_path'] = '';
 		}
 		else
-			fatal_lang_error('no_access', false);
+			Errors::fatal_lang_error('no_access', false);
 
 		// Load up any custom themes we may want to install into...
 		$theme_paths = getThemesPathbyID();
@@ -204,7 +204,7 @@ class Packages_Controller extends Action_Controller
 		// Get the package info...
 		$packageInfo = getPackageInfo($context['filename']);
 		if (!is_array($packageInfo))
-			fatal_lang_error($packageInfo);
+			Errors::fatal_lang_error($packageInfo);
 
 		$packageInfo['filename'] = $context['filename'];
 		$context['package_name'] = isset($packageInfo['name']) ? $packageInfo['name'] : $context['filename'];
@@ -241,7 +241,7 @@ class Packages_Controller extends Action_Controller
 			if (!isset($package_installed['old_version']) && $context['uninstalling'])
 			{
 				deltree(BOARDDIR . '/packages/temp');
-				fatal_lang_error('package_cant_uninstall', false);
+				Errors::fatal_lang_error('package_cant_uninstall', false);
 			}
 
 			$actions = parsePackageInfo($packageInfo['xml'], true, 'uninstall');
@@ -250,7 +250,7 @@ class Packages_Controller extends Action_Controller
 			if (empty($actions))
 			{
 				deltree(BOARDDIR . '/packages/temp');
-				fatal_lang_error('package_uninstall_cannot', false);
+				Errors::fatal_lang_error('package_uninstall_cannot', false);
 			}
 
 			// Can't edit the custom themes it's edited if you're unisntalling, they must be removed.
@@ -770,7 +770,7 @@ class Packages_Controller extends Action_Controller
 		$context['sub_template'] = 'extract_package';
 
 		if (!file_exists(BOARDDIR . '/packages/' . $context['filename']))
-			fatal_lang_error('package_no_file', false);
+			Errors::fatal_lang_error('package_no_file', false);
 
 		// Load up the package FTP information?
 		create_chmod_control(array(), array('destination_url' => $scripturl . '?action=admin;area=packages;sa=' . $_REQUEST['sa'] . ';package=' . $_REQUEST['package']));
@@ -808,7 +808,7 @@ class Packages_Controller extends Action_Controller
 			$context['base_path'] = '';
 		}
 		else
-			fatal_lang_error('no_access', false);
+			Errors::fatal_lang_error('no_access', false);
 
 		// Are we installing this into any custom themes?
 		$custom_themes = array(1);
@@ -849,7 +849,7 @@ class Packages_Controller extends Action_Controller
 		$packageInfo = getPackageInfo($context['filename']);
 
 		if (!is_array($packageInfo))
-			fatal_lang_error($packageInfo);
+			Errors::fatal_lang_error($packageInfo);
 
 		$packageInfo['filename'] = $context['filename'];
 
@@ -876,7 +876,7 @@ class Packages_Controller extends Action_Controller
 		if (!isset($package_installed['old_version']) && $context['uninstalling'])
 		{
 			deltree(BOARDDIR . '/packages/temp');
-			fatal_error('Hacker?', false);
+			Errors::fatal_error('Hacker?', false);
 		}
 		// Uninstalling?
 		elseif ($context['uninstalling'])
@@ -885,7 +885,7 @@ class Packages_Controller extends Action_Controller
 
 			// Gadzooks!  There's no uninstaller at all!?
 			if (empty($install_log))
-				fatal_lang_error('package_uninstall_cannot', false);
+				Errors::fatal_lang_error('package_uninstall_cannot', false);
 
 			// They can only uninstall from what it was originally installed into.
 			foreach ($theme_paths as $id => $data)
@@ -1472,7 +1472,7 @@ class Packages_Controller extends Action_Controller
 
 		// We need to know the operation key for the search and replace, mod file looking at, is it a board mod?
 		if (!isset($_REQUEST['operation_key'], $_REQUEST['filename']) && !is_numeric($_REQUEST['operation_key']))
-			fatal_lang_error('operation_invalid', 'general');
+			Errors::fatal_lang_error('operation_invalid', 'general');
 
 		// Load the required file.
 		require_once(SUBSDIR . '/Package.subs.php');
@@ -1563,7 +1563,7 @@ class Packages_Controller extends Action_Controller
 		if (isset($_GET['restore']))
 		{
 			create_chmod_control(array(), array(), true);
-			fatal_lang_error('no_access', false);
+			Errors::fatal_lang_error('no_access', false);
 		}
 
 		// This is a time and memory eating ...
@@ -1920,7 +1920,7 @@ class Packages_Controller extends Action_Controller
 				if ($validate_custom)
 				{
 					if (preg_match('~^[4567][4567][4567]$~', $context['custom_value']) == false)
-						fatal_error($txt['chmod_value_invalid']);
+						Errors::fatal_error($txt['chmod_value_invalid']);
 				}
 
 				// Nothing to do?
@@ -1929,7 +1929,7 @@ class Packages_Controller extends Action_Controller
 			}
 			// Should never get here,
 			else
-				fatal_lang_error('no_access', false);
+				Errors::fatal_lang_error('no_access', false);
 
 			// Setup the custom value.
 			$custom_value = octdec('0' . $context['custom_value']);
@@ -2408,7 +2408,7 @@ function fetchPerms__recursive($path, &$data, $level)
 
 	// @todo Shouldn't happen - but better error message?
 	if (!is_dir($path))
-		fatal_lang_error('no_access', false);
+		Errors::fatal_lang_error('no_access', false);
 
 	// This is where we put stuff we've found for sorting.
 	$foundData = array(

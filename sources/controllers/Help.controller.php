@@ -91,7 +91,7 @@ class Help_Controller extends Action_Controller
 		global $txt, $helptxt, $context, $scripturl;
 
 		if (!isset($_GET['help']) || !is_string($_GET['help']))
-			fatal_lang_error('no_access', false);
+			Errors::fatal_lang_error('no_access', false);
 
 		if (!isset($helptxt))
 			$helptxt = array();

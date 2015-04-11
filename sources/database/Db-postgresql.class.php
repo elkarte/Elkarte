@@ -87,7 +87,7 @@ class Database_PostgreSQL extends Database_Abstract
 			if (!empty($db_options['non_fatal']))
 				return null;
 			else
-				display_db_error();
+				Errors::display_db_error();
 		}
 
 		self::$_db->_connection = $connection;
@@ -498,7 +498,7 @@ class Database_PostgreSQL extends Database_Abstract
 
 		// Log the error.
 		if (function_exists('log_error'))
-			log_error($txt['database_error'] . ': ' . $query_error . (!empty($modSettings['enableErrorQueryLogging']) ? "\n\n" .$db_string : ''), 'database', $file, $line);
+			Errors::log_error($txt['database_error'] . ': ' . $query_error . (!empty($modSettings['enableErrorQueryLogging']) ? "\n\n" .$db_string : ''), 'database', $file, $line);
 
 		// Nothing's defined yet... just die with it.
 		if (empty($context) || empty($txt))
@@ -519,7 +519,7 @@ class Database_PostgreSQL extends Database_Abstract
 			$context['error_message'] .= '<br /><br />' . nl2br($db_string);
 
 		// It's already been logged... don't log it again.
-		fatal_error($context['error_message'], false);
+		Errors::fatal_error($context['error_message'], false);
 	}
 
 	/**

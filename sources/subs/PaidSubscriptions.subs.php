@@ -881,7 +881,7 @@ function validateSubscriptionID($id)
 
 	// Humm this should not happen, if it does, boom
 	if ($sub_id === null)
-		fatal_lang_error('no_access', false);
+		Errors::fatal_lang_error('no_access', false);
 
 	return $sub_id;
 }
@@ -943,7 +943,7 @@ function getSubscriptionStatus($log_id)
 
 	// Nothing found?
 	if (empty($status))
-		fatal_lang_error('no_access', false);
+		Errors::fatal_lang_error('no_access', false);
 
 	return $status;
 }

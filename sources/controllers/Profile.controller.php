@@ -393,7 +393,7 @@ class Profile_Controller extends Action_Controller
 
 		// No menu means no access.
 		if (!$profile_include_data || (isset($profile_include_data['enabled']) && $profile_include_data['enabled'] === false))
-			fatal_lang_error('no_access', false);
+			Errors::fatal_lang_error('no_access', false);
 
 		// Make a note of the Unique ID for this menu.
 		$context['profile_menu_id'] = $context['max_menu_id'];

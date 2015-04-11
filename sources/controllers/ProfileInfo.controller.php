@@ -50,7 +50,7 @@ class ProfileInfo_Controller extends Action_Controller
 
 		// Attempt to load the member's profile data.
 		if (!loadMemberContext($memID) || !isset($memberContext[$memID]))
-			fatal_lang_error('not_a_user', false);
+			Errors::fatal_lang_error('not_a_user', false);
 
 		loadTemplate('ProfileInfo');
 
@@ -424,7 +424,7 @@ class ProfileInfo_Controller extends Action_Controller
 
 		// Is the load average too high to allow searching just now?
 		if (!empty($modSettings['loadavg_show_posts']) && $modSettings['current_load'] >= $modSettings['loadavg_show_posts'])
-			fatal_lang_error('loadavg_show_posts_disabled', false);
+			Errors::fatal_lang_error('loadavg_show_posts_disabled', false);
 
 		// If we're specifically dealing with attachments use that function!
 		if (isset($_GET['sa']) && $_GET['sa'] == 'attach')
@@ -878,7 +878,7 @@ class ProfileInfo_Controller extends Action_Controller
 
 		// Is the load average too high to allow searching just now?
 		if (!empty($modSettings['loadavg_userstats']) && $modSettings['current_load'] >= $modSettings['loadavg_userstats'])
-			fatal_lang_error('loadavg_userstats_disabled', false);
+			Errors::fatal_lang_error('loadavg_userstats_disabled', false);
 
 		loadTemplate('ProfileInfo');
 
@@ -1012,7 +1012,7 @@ class ProfileInfo_Controller extends Action_Controller
 
 		// Firstly, can we actually even be here?
 		if (!allowedTo('issue_warning') && (empty($modSettings['warning_show']) || ($modSettings['warning_show'] == 1 && !$context['user']['is_owner'])))
-			fatal_lang_error('no_access', false);
+			Errors::fatal_lang_error('no_access', false);
 
 		loadTemplate('ProfileInfo');
 

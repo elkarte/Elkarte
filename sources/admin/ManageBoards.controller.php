@@ -407,7 +407,7 @@ class ManageBoards_Controller extends Action_Controller
 			if (isset($_POST['delete_action']) && $_POST['delete_action'] == 1)
 			{
 				if (empty($_POST['cat_to']))
-					fatal_lang_error('mboards_delete_error');
+					Errors::fatal_lang_error('mboards_delete_error');
 
 				deleteCategories(array($_POST['cat']), (int) $_POST['cat_to']);
 			}
@@ -625,7 +625,7 @@ class ManageBoards_Controller extends Action_Controller
 			elseif (!empty($_POST['placement']) && !empty($_POST['board_order']))
 			{
 				if (!in_array($_POST['placement'], array('before', 'after', 'child')))
-					fatal_lang_error('mangled_post', false);
+					Errors::fatal_lang_error('mangled_post', false);
 
 				$boardOptions['move_to'] = $_POST['placement'];
 				$boardOptions['target_board'] = (int) $_POST['board_order'];
@@ -648,7 +648,7 @@ class ManageBoards_Controller extends Action_Controller
 				}
 
 			if (strlen(implode(',', $boardOptions['access_groups'])) > 255 || strlen(implode(',', $boardOptions['deny_groups'])) > 255)
-				fatal_lang_error('too_many_groups', false);
+				Errors::fatal_lang_error('too_many_groups', false);
 
 			// Change '1 & 2' to '1 &amp; 2', but not '&amp;' to '&amp;amp;'...
 			$boardOptions['board_name'] = preg_replace('~[&]([^;]{8}|[^;]{0,8}$)~', '&amp;$1', $_POST['board_name']);
@@ -715,7 +715,7 @@ class ManageBoards_Controller extends Action_Controller
 			if (isset($_POST['delete_action']) && $_POST['delete_action'] == 1)
 			{
 				if (empty($_POST['board_to']))
-					fatal_lang_error('mboards_delete_board_error');
+					Errors::fatal_lang_error('mboards_delete_board_error');
 
 				deleteBoards(array($board_id), (int) $_POST['board_to']);
 			}

@@ -227,7 +227,7 @@ class Groups_Controller extends Action_Controller
 
 		// No browsing of guests, membergroup 0 or moderators.
 		if (in_array($current_group, array(-1, 0, 3)))
-			fatal_lang_error('membergroup_does_not_exist', false);
+			Errors::fatal_lang_error('membergroup_does_not_exist', false);
 
 		// These will be needed
 		require_once(SUBSDIR . '/Membergroups.subs.php');
@@ -271,7 +271,7 @@ class Groups_Controller extends Action_Controller
 
 		// If this group is hidden then it can only "exist" if the user can moderate it!
 		if ($context['group']['hidden'] && !$context['group']['can_moderate'])
-			fatal_lang_error('membergroup_does_not_exist', false);
+			Errors::fatal_lang_error('membergroup_does_not_exist', false);
 
 		// You can only assign membership if you are the moderator and/or can manage groups!
 		if (!$context['group']['can_moderate'])

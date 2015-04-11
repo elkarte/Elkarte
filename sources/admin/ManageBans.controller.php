@@ -779,7 +779,7 @@ class ManageBans_Controller extends Action_Controller
 		$ban_id = isset($_REQUEST['bi']) ? (int) $_REQUEST['bi'] : 0;
 
 		if (empty($ban_group))
-			fatal_lang_error('ban_not_found', false);
+			Errors::fatal_lang_error('ban_not_found', false);
 
 		// Adding a new trigger
 		if (isset($_POST['add_new_trigger']) && !empty($_POST['ban_suggestions']))
@@ -837,7 +837,7 @@ class ManageBans_Controller extends Action_Controller
 		{
 			$ban_row = banDetails($ban_id, $ban_group);
 			if (empty($ban_row))
-				fatal_lang_error('ban_not_found', false);
+				Errors::fatal_lang_error('ban_not_found', false);
 			$row = $ban_row[$ban_id];
 
 			// Load it up for the template

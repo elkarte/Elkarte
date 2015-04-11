@@ -104,7 +104,7 @@ function checkImageContents($fileName, $extensiveCheck = false)
 {
 	$fp = fopen($fileName, 'rb');
 	if (!$fp)
-		fatal_lang_error('attach_timeout');
+		Errors::fatal_lang_error('attach_timeout');
 
 	$prev_chunk = '';
 	while (!feof($fp))

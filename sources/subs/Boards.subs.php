@@ -212,7 +212,7 @@ function modifyBoard($board_id, &$boardOptions)
 
 	// Make sure given boards and categories exist.
 	if (!isset($boards[$board_id]) || (isset($boardOptions['target_board']) && !isset($boards[$boardOptions['target_board']])) || (isset($boardOptions['target_category']) && !isset($cat_tree[$boardOptions['target_category']])))
-		fatal_lang_error('no_board');
+		Errors::fatal_lang_error('no_board');
 
 	// All things that will be updated in the database will be in $boardUpdates.
 	$boardUpdates = array();
@@ -250,9 +250,9 @@ function modifyBoard($board_id, &$boardOptions)
 
 			// People can be creative, in many ways...
 			if (isChildOf($id_parent, $board_id))
-				fatal_lang_error('mboards_parent_own_child_error', false);
+				Errors::fatal_lang_error('mboards_parent_own_child_error', false);
 			elseif ($id_parent == $board_id)
-				fatal_lang_error('mboards_board_own_child_error', false);
+				Errors::fatal_lang_error('mboards_board_own_child_error', false);
 
 			$after = $boards[$boardOptions['target_board']]['order'];
 
@@ -900,7 +900,7 @@ function getBoardTree()
 			{
 				// Parent doesn't exist!
 				if (!isset($boards[$row['id_parent']]['tree']))
-					fatal_lang_error('no_valid_parent', false, array($row['board_name']));
+					Errors::fatal_lang_error('no_valid_parent', false, array($row['board_name']));
 
 				// Wrong childlevel...we can silently fix this...
 				if ($boards[$row['id_parent']]['tree']['node']['level'] != $row['child_level'] - 1)

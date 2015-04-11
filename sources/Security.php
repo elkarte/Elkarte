@@ -410,7 +410,7 @@ function is_not_banned($forceCheck = false)
 		writeLog(true);
 
 		// You banned, sucka!
-		fatal_error(sprintf($txt['your_ban'], $old_name) . (empty($_SESSION['ban']['cannot_access']['reason']) ? '' : '<br />' . $_SESSION['ban']['cannot_access']['reason']) . '<br />' . (!empty($_SESSION['ban']['expire_time']) ? sprintf($txt['your_ban_expires'], standardTime($_SESSION['ban']['expire_time'], false)) : $txt['your_ban_expires_never']), 'user');
+		Errors::fatal_error(sprintf($txt['your_ban'], $old_name) . (empty($_SESSION['ban']['cannot_access']['reason']) ? '' : '<br />' . $_SESSION['ban']['cannot_access']['reason']) . '<br />' . (!empty($_SESSION['ban']['expire_time']) ? sprintf($txt['your_ban_expires'], standardTime($_SESSION['ban']['expire_time'], false)) : $txt['your_ban_expires_never']), 'user');
 
 		// If we get here, something's gone wrong.... but let's try anyway.
 		trigger_error('Hacking attempt...', E_USER_ERROR);
@@ -453,7 +453,7 @@ function is_not_banned($forceCheck = false)
 		$controller->action_logout(true, false);
 
 		// Tell them thanks
-		fatal_error(sprintf($txt['your_ban'], $old_name) . (empty($_SESSION['ban']['cannot_login']['reason']) ? '' : '<br />' . $_SESSION['ban']['cannot_login']['reason']) . '<br />' . (!empty($_SESSION['ban']['expire_time']) ? sprintf($txt['your_ban_expires'], standardTime($_SESSION['ban']['expire_time'], false)) : $txt['your_ban_expires_never']) . '<br />' . $txt['ban_continue_browse'], 'user');
+		Errors::fatal_error(sprintf($txt['your_ban'], $old_name) . (empty($_SESSION['ban']['cannot_login']['reason']) ? '' : '<br />' . $_SESSION['ban']['cannot_login']['reason']) . '<br />' . (!empty($_SESSION['ban']['expire_time']) ? sprintf($txt['your_ban_expires'], standardTime($_SESSION['ban']['expire_time'], false)) : $txt['your_ban_expires_never']) . '<br />' . $txt['ban_continue_browse'], 'user');
 	}
 
 	// Fix up the banning permissions.
@@ -649,14 +649,14 @@ function isBannedEmail($email, $restriction, $error)
 		log_ban($_SESSION['ban']['cannot_access']['ids']);
 		$_SESSION['ban']['last_checked'] = time();
 
-		fatal_error(sprintf($txt['your_ban'], $txt['guest_title']) . $_SESSION['ban']['cannot_access']['reason'], false);
+		Errors::fatal_error(sprintf($txt['your_ban'], $txt['guest_title']) . $_SESSION['ban']['cannot_access']['reason'], false);
 	}
 
 	if (!empty($ban_ids))
 	{
 		// Log this ban for future reference.
 		log_ban($ban_ids, $email);
-		fatal_error($error . $ban_reason, false);
+		Errors::fatal_error($error . $ban_reason, false);
 	}
 }
 
@@ -773,7 +773,7 @@ function checkSession($type = 'post', $from_action = '', $is_fatal = true)
 			die;
 		}
 		else
-			fatal_lang_error($error, isset($log_error) ? 'user' : false);
+			Errors::fatal_lang_error($error, isset($log_error) ? 'user' : false);
 	}
 	// A session error occurred, return the error to the calling function.
 	else
@@ -884,7 +884,7 @@ function validateToken($action, $type = 'post', $reset = true, $fatal = true)
 		createToken($action, $type);
 
 		if ($fatal)
-			fatal_lang_error('token_verify_fail', false);
+			Errors::fatal_lang_error('token_verify_fail', false);
 		else
 			return false;
 	}
@@ -966,7 +966,7 @@ function checkSubmitOnce($action, $is_fatal = false)
 			return true;
 		}
 		elseif ($is_fatal)
-			fatal_lang_error('error_form_already_submitted', false);
+			Errors::fatal_lang_error('error_form_already_submitted', false);
 		else
 			return false;
 	}
@@ -1100,7 +1100,7 @@ function isAllowedTo($permission, $boards = null)
 		$_GET['topic'] = '';
 		writeLog(true);
 
-		fatal_lang_error('cannot_' . $error_permission, false);
+		Errors::fatal_lang_error('cannot_' . $error_permission, false);
 
 		// Getting this far is a really big problem, but let's try our best to prevent any cases...
 		trigger_error('Hacking attempt...', E_USER_ERROR);
@@ -1315,7 +1315,7 @@ function spamProtection($error_type, $fatal = true)
 		// Spammer!  You only have to wait a *few* seconds!
 		if ($fatal)
 		{
-			fatal_lang_error($error_type . '_WaitTime_broken', false, array($timeLimit));
+			Errors::fatal_lang_error($error_type . '_WaitTime_broken', false, array($timeLimit));
 			return true;
 		}
 		else
@@ -1507,7 +1507,7 @@ function validatePasswordFlood($id_member, $password_flood_value = false, $was_c
 		redirectexit();
 
 		// Probably not needed, but still make sure...
-		fatal_lang_error('no_access', false);
+		Errors::fatal_lang_error('no_access', false);
 	}
 
 	// Let's just initialize to something (and 0 is better than nothing)
@@ -1530,7 +1530,7 @@ function validatePasswordFlood($id_member, $password_flood_value = false, $was_c
 
 	// Broken the law?
 	if ($number_tries > 5)
-		fatal_lang_error('login_threshold_brute_fail', 'critical');
+		Errors::fatal_lang_error('login_threshold_brute_fail', 'critical');
 
 	// Otherwise set the members data. If they correct on their first attempt then we actually clear it, otherwise we set it!
 	require_once(SUBSDIR . '/Members.subs.php');

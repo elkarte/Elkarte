@@ -149,7 +149,7 @@ class Mentions_Controller extends Action_Controller
 
 		// I'm not sure this is needed, though better have it. :P
 		if (empty($modSettings['mentions_enabled']))
-			fatal_lang_error('no_access', false);
+			Errors::fatal_lang_error('no_access', false);
 
 		$this->_data = array(
 			'type' => isset($_REQUEST['type']) ? $_REQUEST['type'] : null,

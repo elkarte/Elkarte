@@ -279,9 +279,9 @@ function canLinkEvent()
 
 	// No board?  No topic?!?
 	if (empty($board))
-		fatal_lang_error('missing_board_id', false);
+		Errors::fatal_lang_error('missing_board_id', false);
 	if (empty($topic))
-		fatal_lang_error('missing_topic_id', false);
+		Errors::fatal_lang_error('missing_topic_id', false);
 
 	// Administrator, Moderator, or owner.  Period.
 	if (!allowedTo('admin_forum') && !allowedTo('moderate_board'))
@@ -292,11 +292,11 @@ function canLinkEvent()
 		{
 			// Not the owner of the topic.
 			if ($row['id_member_started'] != $user_info['id'])
-				fatal_lang_error('not_your_topic', 'user');
+				Errors::fatal_lang_error('not_your_topic', 'user');
 		}
 		// Topic/Board doesn't exist.....
 		else
-			fatal_lang_error('calendar_no_topic', 'general');
+			Errors::fatal_lang_error('calendar_no_topic', 'general');
 	}
 }
 

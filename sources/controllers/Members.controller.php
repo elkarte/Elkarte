@@ -62,7 +62,7 @@ class Members_Controller extends Action_Controller
 
 		// You have to give a user
 		if (empty($_REQUEST['u']))
-			fatal_lang_error('no_access', false);
+			Errors::fatal_lang_error('no_access', false);
 
 		// Always an int
 		$user = (int) $_REQUEST['u'];
@@ -115,7 +115,7 @@ class Members_Controller extends Action_Controller
 
 		// You have to give a user
 		if (empty($_REQUEST['u']))
-			fatal_lang_error('no_access', false);
+			Errors::fatal_lang_error('no_access', false);
 
 		// Always an int
 		$user = (int) $_REQUEST['u'];

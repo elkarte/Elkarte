@@ -1330,7 +1330,7 @@ class Install_Controller
 
 		chdir(TMP_BOARDDIR);
 
-		require_once(SOURCEDIR . '/Errors.php');
+		require_once(SOURCEDIR . '/Errors.class.php');
 		require_once(SOURCEDIR . '/Logging.php');
 		require_once(SOURCEDIR . '/Subs.php');
 		require_once(SOURCEDIR . '/Load.php');

@@ -67,7 +67,7 @@ class MergeTopics_Controller extends Action_Controller
 		global $txt, $board, $context, $scripturl, $user_info, $modSettings;
 
 		if (!isset($_GET['from']))
-			fatal_lang_error('no_access', false);
+			Errors::fatal_lang_error('no_access', false);
 		$_GET['from'] = (int) $_GET['from'];
 
 		$_REQUEST['targetboard'] = isset($_REQUEST['targetboard']) ? (int) $_REQUEST['targetboard'] : $board;
@@ -94,7 +94,7 @@ class MergeTopics_Controller extends Action_Controller
 
 		// @todo review: double check the logic
 		if (empty($topic_info) || ($topic_info['id_board'] != $board) || ($onlyApproved && empty($topic_info['approved'])))
-			fatal_lang_error('no_board');
+			Errors::fatal_lang_error('no_board');
 
 		// Tell the template a few things..
 		$context['origin_topic'] = $_GET['from'];
@@ -106,7 +106,7 @@ class MergeTopics_Controller extends Action_Controller
 		$merge_boards = boardsAllowedTo('merge_any');
 
 		if (empty($merge_boards))
-			fatal_lang_error('cannot_merge_any', 'user');
+			Errors::fatal_lang_error('cannot_merge_any', 'user');
 
 		// Get a list of boards they can navigate to to merge.
 		require_once(SUBSDIR . '/Boards.subs.php');
@@ -132,7 +132,7 @@ class MergeTopics_Controller extends Action_Controller
 		$context['topics'] = mergeableTopics($_REQUEST['targetboard'], $_GET['from'], $onlyApproved, $_REQUEST['start']);
 
 		if (empty($context['topics']) && count($context['boards']) <= 1)
-			fatal_lang_error('merge_need_more_topics');
+			Errors::fatal_lang_error('merge_need_more_topics');
 
 		$context['sub_template'] = 'merge';
 	}
@@ -174,13 +174,13 @@ class MergeTopics_Controller extends Action_Controller
 
 		// There's nothing to merge with just one topic...
 		if (empty($topics) || !is_array($topics) || count($topics) == 1)
-			fatal_lang_error('merge_need_more_topics');
+			Errors::fatal_lang_error('merge_need_more_topics');
 
 		$merger = new TopicsMerge($topics);
 
 		// If we didn't get any topics then they've been messing with unapproved stuff.
 		if ($merger->hasErrors())
-			fatal_lang_error($merger->firstError());
+			Errors::fatal_lang_error($merger->firstError());
 
 		// The parameters of action_mergeExecute were set, so this must've been an internal call.
 		if (!empty($topics))
@@ -192,7 +192,7 @@ class MergeTopics_Controller extends Action_Controller
 		// Get the boards a user is allowed to merge in.
 		$merge_boards = boardsAllowedTo('merge_any');
 		if (empty($merge_boards))
-			fatal_lang_error('cannot_merge_any', 'user');
+			Errors::fatal_lang_error('cannot_merge_any', 'user');
 
 		require_once(SUBSDIR . '/Boards.subs.php');
 
@@ -219,7 +219,7 @@ class MergeTopics_Controller extends Action_Controller
 		// This happens when a member is moderator of a board he cannot see
 		foreach ($merger->boards as $board)
 			if (!isset($boards_info[$board]))
-				fatal_lang_error('no_board');
+				Errors::fatal_lang_error('no_board');
 
 		if (empty($_REQUEST['sa']) || $_REQUEST['sa'] == 'options')
 		{
@@ -261,7 +261,7 @@ class MergeTopics_Controller extends Action_Controller
 		if ($merger->hasErrors())
 		{
 			$error = $merger->firstError();
-			fatal_lang_error($error[0], $error[1]);
+			Errors::fatal_lang_error($error[0], $error[1]);
 		}
 
 		// Send them to the all done page.

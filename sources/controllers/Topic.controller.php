@@ -63,7 +63,7 @@ class Topic_Controller extends Action_Controller
 
 		// Just quit if there's no topic to lock.
 		if (empty($topic))
-			fatal_lang_error('not_a_topic', false);
+			Errors::fatal_lang_error('not_a_topic', false);
 
 		checkSession('get');
 
@@ -93,7 +93,7 @@ class Topic_Controller extends Action_Controller
 			$locked = '0';
 		// You cannot unlock this!
 		else
-			fatal_lang_error('locked_by_admin', 'user');
+			Errors::fatal_lang_error('locked_by_admin', 'user');
 
 		// Lock the topic!
 		setTopicAttribute($topic, array('locked' => $locked));
@@ -128,7 +128,7 @@ class Topic_Controller extends Action_Controller
 
 		// You can't sticky a board or something!
 		if (empty($topic))
-			fatal_lang_error('not_a_topic', false);
+			Errors::fatal_lang_error('not_a_topic', false);
 
 		checkSession('get');
 
@@ -179,7 +179,7 @@ class Topic_Controller extends Action_Controller
 		{
 			unset($_REQUEST['action']);
 			$context['theme_loaded'] = false;
-			fatal_lang_error('feature_disabled', false);
+			Errors::fatal_lang_error('feature_disabled', false);
 		}
 
 		require_once(SUBSDIR . '/Topic.subs.php');

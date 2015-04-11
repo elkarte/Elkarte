@@ -274,7 +274,7 @@ class ManageScheduledTasks_Controller extends Action_Controller
 
 		// Cleaning...
 		if (!isset($_GET['tid']))
-			fatal_lang_error('no_access', false);
+			Errors::fatal_lang_error('no_access', false);
 		$_GET['tid'] = (int) $_GET['tid'];
 
 		// Saving?

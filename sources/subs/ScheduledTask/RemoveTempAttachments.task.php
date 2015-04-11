@@ -46,7 +46,7 @@ class Remove_Temp_Attachments_Task implements Scheduled_Task_Interface
 				loadLanguage('Post');
 
 				$context['scheduled_errors']['remove_temp_attachments'][] = $txt['cant_access_upload_path'] . ' (' . $attach_dir . ')';
-				log_error($txt['cant_access_upload_path'] . ' (' . $attach_dir . ')', 'critical');
+				Errors::log_error($txt['cant_access_upload_path'] . ' (' . $attach_dir . ')', 'critical');
 
 				return false;
 			}

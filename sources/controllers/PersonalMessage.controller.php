@@ -306,7 +306,7 @@ class PersonalMessage_Controller extends Action_Controller
 
 			// Make sure you have access to this PM.
 			if (!isAccessiblePM($pmID, $context['folder'] == 'sent' ? 'outbox' : 'inbox'))
-				fatal_lang_error('no_access', false);
+				Errors::fatal_lang_error('no_access', false);
 
 			$context['current_pm'] = $pmID;
 
@@ -330,7 +330,7 @@ class PersonalMessage_Controller extends Action_Controller
 			$pmsg = (int) $_GET['pmsg'];
 
 			if (!isAccessiblePM($pmsg, $context['folder'] === 'sent' ? 'outbox' : 'inbox'))
-				fatal_lang_error('no_access', false);
+				Errors::fatal_lang_error('no_access', false);
 		}
 
 		// Determine the navigation context
@@ -359,7 +359,7 @@ class PersonalMessage_Controller extends Action_Controller
 
 		// Make sure that we have been given a correct head pm id if we are in converstation mode
 		if ($context['display_mode'] == 2 && !empty($pmID) && $pmID != $lastData['id'])
-			fatal_lang_error('no_access', false);
+			Errors::fatal_lang_error('no_access', false);
 
 		// If loadPMs returned results, lets show the pm subject list
 		if (!empty($pms))
@@ -513,7 +513,7 @@ class PersonalMessage_Controller extends Action_Controller
 			$pmCount = pmCount($user_info['id'], 3600);
 
 			if (!empty($pmCount) && $pmCount >= $modSettings['pm_posts_per_hour'])
-				fatal_lang_error('pm_too_many_per_hour', true, array($modSettings['pm_posts_per_hour']));
+				Errors::fatal_lang_error('pm_too_many_per_hour', true, array($modSettings['pm_posts_per_hour']));
 		}
 
 		// Quoting / Replying to a message?
@@ -523,7 +523,7 @@ class PersonalMessage_Controller extends Action_Controller
 
 			// Make sure this is accessible (not deleted)
 			if (!isAccessiblePM($pmsg))
-				fatal_lang_error('no_access', false);
+				Errors::fatal_lang_error('no_access', false);
 
 			// Validate that this is one has been received?
 			$isReceived = checkPMReceived($pmsg);
@@ -531,7 +531,7 @@ class PersonalMessage_Controller extends Action_Controller
 			// Get the quoted message (and make sure you're allowed to see this quote!).
 			$row_quoted = loadPMQuote($pmsg, $isReceived);
 			if ($row_quoted === false)
-				fatal_lang_error('pm_not_yours', false);
+				Errors::fatal_lang_error('pm_not_yours', false);
 
 			// Censor the message.
 			censorText($row_quoted['subject']);
@@ -722,7 +722,7 @@ class PersonalMessage_Controller extends Action_Controller
 			if (!empty($pmCount) && $pmCount >= $modSettings['pm_posts_per_hour'])
 			{
 				if (!isset($_REQUEST['xml']))
-					fatal_lang_error('pm_too_many_per_hour', true, array($modSettings['pm_posts_per_hour']));
+					Errors::fatal_lang_error('pm_too_many_per_hour', true, array($modSettings['pm_posts_per_hour']));
 				else
 					$post_errors->addError('pm_too_many_per_hour');
 			}
@@ -1049,7 +1049,7 @@ class PersonalMessage_Controller extends Action_Controller
 
 			// Any errors?
 			if (!empty($updateErrors))
-				fatal_lang_error('labels_too_many', true, array($updateErrors));
+				Errors::fatal_lang_error('labels_too_many', true, array($updateErrors));
 		}
 
 		// Back to the folder.
@@ -1371,12 +1371,12 @@ class PersonalMessage_Controller extends Action_Controller
 
 		// Check that this feature is even enabled!
 		if (empty($modSettings['enableReportPM']) || empty($_REQUEST['pmsg']))
-			fatal_lang_error('no_access', false);
+			Errors::fatal_lang_error('no_access', false);
 
 		$pmsg = (int) $_REQUEST['pmsg'];
 
 		if (!isAccessiblePM($pmsg, 'inbox'))
-			fatal_lang_error('no_access', false);
+			Errors::fatal_lang_error('no_access', false);
 
 		$context['pm_id'] = $pmsg;
 		$context['page_title'] = $txt['pm_report_title'];
@@ -1417,7 +1417,7 @@ class PersonalMessage_Controller extends Action_Controller
 
 			// Maybe we shouldn't advertise this?
 			if (empty($admins))
-				fatal_lang_error('no_access', false);
+				Errors::fatal_lang_error('no_access', false);
 
 			$memberFromName = un_htmlspecialchars($memberFromName);
 
@@ -1603,11 +1603,11 @@ class PersonalMessage_Controller extends Action_Controller
 			// Name is easy!
 			$ruleName = Util::htmlspecialchars(trim($_POST['rule_name']));
 			if (empty($ruleName))
-				fatal_lang_error('pm_rule_no_name', false);
+				Errors::fatal_lang_error('pm_rule_no_name', false);
 
 			// Sanity check...
 			if (empty($_POST['ruletype']) || empty($_POST['acttype']))
-				fatal_lang_error('pm_rule_no_criteria', false);
+				Errors::fatal_lang_error('pm_rule_no_criteria', false);
 
 			// Let's do the criteria first - it's also hardest!
 			$criteria = array();
@@ -1656,7 +1656,7 @@ class PersonalMessage_Controller extends Action_Controller
 			}
 
 			if (empty($criteria) || (empty($actions) && !$doDelete))
-				fatal_lang_error('pm_rule_no_criteria', false);
+				Errors::fatal_lang_error('pm_rule_no_criteria', false);
 
 			// What are we storing?
 			$criteria = serialize($criteria);
@@ -1790,7 +1790,7 @@ class PersonalMessage_Controller extends Action_Controller
 
 		// Make sure the server is able to do this right now
 		if (!empty($modSettings['loadavg_search']) && $modSettings['current_load'] >= $modSettings['loadavg_search'])
-			fatal_lang_error('loadavg_search_disabled', false);
+			Errors::fatal_lang_error('loadavg_search_disabled', false);
 
 		// Some useful general permissions.
 		$context['can_send_pm'] = allowedTo('pm_send');
@@ -2210,7 +2210,7 @@ class PersonalMessage_Controller extends Action_Controller
 		{
 			// Make sure this is accessible, should be of course
 			if (!isAccessiblePM($pmsg, 'inbox'))
-				fatal_lang_error('no_access', false);
+				Errors::fatal_lang_error('no_access', false);
 
 			// Well then, you get to hear about it all over again
 			markMessagesUnread($pmsg);
@@ -2346,7 +2346,7 @@ function messageIndexBar($area)
 
 	// No menu means no access.
 	if (!$pm_include_data && (!$user_info['is_guest'] || validateSession()))
-		fatal_lang_error('no_access', false);
+		Errors::fatal_lang_error('no_access', false);
 
 	// Make a note of the Unique ID for this menu.
 	$context['pm_menu_id'] = $context['max_menu_id'];
@@ -2598,7 +2598,7 @@ function messagePostError($named_recipients, $recipient_ids = array())
 		if ($row_quoted === false)
 		{
 			if (!isset($_REQUEST['xml']))
-				fatal_lang_error('pm_not_yours', false);
+				Errors::fatal_lang_error('pm_not_yours', false);
 			else
 				$error_types->addError('pm_not_yours');
 		}
