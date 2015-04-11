@@ -266,8 +266,6 @@ $helptxt['pollMode'] = 'This selects whether polls are enabled or not. If polls 
 <br /><br />To choose who can post polls, view polls, and similar, you can allow and disallow those permissions. Remember this if polls don\'t seem to be working.';
 $helptxt['enableVBStyleLogin'] = 'This will show a more compact login on every page of the forum for guests.';
 $helptxt['enableCompressedOutput'] = 'This option will compress output to lower bandwidth consumption, but it requires zlib to be installed.';
-$helptxt['disableTemplateEval'] = 'By default, templates are evaluated instead of just included. This helps with showing more useful debug information in case a template contains an error.<br /><br />
-		On large forums however, this customised inclusion process may be significantly slower. Therefore, advanced users may wish to disable it.';
 $helptxt['databaseSession_enable'] = 'This option makes use of the database for session storage - it is best for load balanced servers, but helps with all timeout issues and can make the forum faster.';
 $helptxt['databaseSession_loose'] = 'Turning this on will decrease the bandwidth your forum uses, and make it so clicking back will not reload the page - the downside is that the (new) icons won\'t update, among other things. (unless you click to that page instead of going back to it.)';
 $helptxt['databaseSession_lifetime'] = 'This is the number of seconds for sessions to last after they haven\'t been accessed.  If a session is not accessed for too long, it is said to have &quot;timed out&quot;.  Anything higher than 2400 is recommended.';

@@ -266,7 +266,7 @@ class ManageServer_Controller extends Action_Controller
 				unset($_POST['globalCookies']);
 
 			if (!empty($_POST['globalCookiesDomain']) && strpos($boardurl, $_POST['globalCookiesDomain']) === false)
-				fatal_lang_error('invalid_cookie_domain', false);
+				Errors::fatal_lang_error('invalid_cookie_domain', false);
 
 			//Settings_Form::save_db($config_vars);
 			$this->_cookieSettingsForm->save();
@@ -521,7 +521,6 @@ class ManageServer_Controller extends Action_Controller
 				array('webmaster_email', $txt['admin_webmaster_email'], 'file', 'text', 30),
 			'',
 				array('enableCompressedOutput', $txt['enableCompressedOutput'], 'db', 'check', null, 'enableCompressedOutput'),
-				array('disableTemplateEval', $txt['disableTemplateEval'], 'db', 'check', null, 'disableTemplateEval'),
 				array('disableHostnameLookup', $txt['disableHostnameLookup'], 'db', 'check', null, 'disableHostnameLookup'),
 		);
 
