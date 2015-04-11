@@ -70,7 +70,7 @@ class Errors {
 		$query_string = empty($_SERVER['QUERY_STRING']) ? (empty($_SERVER['REQUEST_URL']) ? '' : str_replace($scripturl, '', $_SERVER['REQUEST_URL'])) : $_SERVER['QUERY_STRING'];
 
 		// Don't log the session hash in the url twice, it's a waste.
-		$query_string = htmlspecialchars((ELK == 'SSI' ? '' : '?') . preg_replace(array('~;sesc=[^&;]+~', '~' . session_name() . '=' . session_id() . '[&;]~'), array(';sesc', ''), $query_string), ENT_COMPAT, 'UTF-8');
+		$query_string = htmlspecialchars((ELK === 'SSI' ? '' : '?') . preg_replace(array('~;sesc=[^&;]+~', '~' . session_name() . '=' . session_id() . '[&;]~'), array(';sesc', ''), $query_string), ENT_COMPAT, 'UTF-8');
 
 		// Just so we know what board error messages are from.
 		if (isset($_POST['board']) && !isset($_GET['board']))
@@ -236,12 +236,12 @@ class Errors {
 	 */
 	public static function error_handler($error_level, $error_string, $file, $line)
 	{
-		// Ignore errors if we're ignoring them
+		// Ignore errors if we're ignoring them or if the error code is not included in error_reporting
 		if (!($error_level & error_reporting()))
 			return;
 
 		// Throw it as an exception so our exception_handler deals with it
-		throw new ErrorException($error_string, 0, $error_level, $file, $line);
+		return self::exception_handler(new Exception($error_string, $error_level));
 	}
 
 	/**
@@ -265,10 +265,6 @@ class Errors {
 			{
 				$function = (isset($entry['class']) ? $entry['class'] . $entry['type'] : '') . $entry['function'];
 
-				// No sense in showing our error handler trace in the output
-				//if (strpos($function, 'Errors::') === 0)
-				//	continue;
-
 				if (isset($entry['file']))
 					$file = str_replace($current_directory, '', str_replace('\\', '/', $entry['file']));
 				else
@@ -284,14 +280,16 @@ class Errors {
 		$error_level = $e->getCode();
 		$file = htmlspecialchars($e->getFile());
 		$line = $e->getLine();
+		$error_name =  $error_level % 255 === E_ERROR ? 'Error' : ($error_level % 255 === E_WARNING ? 'Warning' : 'Notice');
 
 		// Logged !
-		$message = self::log_error($error_level . ': ' . $error_string, $error_type, $file, $line);
+		$message = self::log_error($error_name . ': ' . $error_string, $error_type, $file, $line);
 
+		// Display debug information
 		if ($db_show_debug === true)
 		{
 			// Commonly, undefined indexes will occur inside attributes; try to show them anyway!
-			if ($error_level % 255 != E_ERROR)
+			if ($error_level % 255 !== E_ERROR)
 			{
 				$temporary = ob_get_contents();
 				if (substr($temporary, -2) === '="')
@@ -299,7 +297,7 @@ class Errors {
 			}
 
 			// Debugging!  This should look like a PHP error message.
-			echo '<br /><strong>', $error_level % 255 === E_ERROR ? 'Error' : ($error_level % 255 === E_WARNING ? 'Warning' : 'Notice'), '</strong>: ' . $error_string . '<ol>' . $error_text . '</ol>';
+			echo '<br /><strong>', $error_name, '</strong>: ' . $error_string . '<ol>' . $error_text . '</ol>';
 		}
 
 		// Let's give integrations a chance to output a bit differently
@@ -317,7 +315,7 @@ class Errors {
 
 		// If this is an E_ERROR, E_USER_ERROR, E_WARNING, or E_USER_WARNING.... die.  Violently so.
 		if ($error_level % 255 === E_ERROR || $error_level % 255 === E_WARNING)
-			fatal_error(allowedTo('admin_forum') ? $message : $error_string, false);
+			self::fatal_error(allowedTo('admin_forum') ? $message : $error_string, false);
 
 		// We should NEVER get to this point.  Any fatal error MUST quit, or very bad things can happen.
 		if ($error_level % 255 === E_ERROR)
