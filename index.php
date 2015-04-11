@@ -30,7 +30,7 @@ define('ELK', 1);
 // Shortcut for the browser cache stale
 define('CACHE_STALE', '?103');
 
-error_reporting(E_ALL | E_STRICT);
+error_reporting(E_ALL | E_STRICT & ~8192);
 
 // Directional only script time usage for display
 if (function_exists('getrusage'))
@@ -86,23 +86,20 @@ unset($boarddir, $cachedir, $sourcedir, $languagedir, $extdir);
 require_once(SOURCEDIR . '/QueryString.php');
 require_once(SOURCEDIR . '/Session.php');
 require_once(SOURCEDIR . '/Subs.php');
-require_once(SOURCEDIR . '/Errors.php');
 require_once(SOURCEDIR . '/Logging.php');
 require_once(SOURCEDIR . '/Load.php');
 require_once(SOURCEDIR . '/Security.php');
-
-spl_autoload_register('elk_autoloader');
-
 require_once(SUBSDIR . '/Cache.subs.php');
 
+// The class autoloader
+spl_autoload_register('elk_autoloader');
+
 if ($db_show_debug === true)
-{
 	Debug::get()->rusage('start', $rusage_start);
-}
 
 // Forum in extended maintenance mode? Our trip ends here with a bland message.
 if (!empty($maintenance) && $maintenance == 2)
-	display_maintenance_message();
+	Error::display_maintenance_message();
 
 // Clean the request.
 cleanRequest();
@@ -144,8 +141,9 @@ if (!empty($modSettings['enableCompressedOutput']) && !headers_sent())
 	}
 }
 
-// Register an error handler.
-set_error_handler('error_handler');
+// Register error & exception handlers.
+set_error_handler(array('Errors', 'error_handler'));
+set_exception_handler(array('Errors', 'exception_handler'));
 
 // Start the session. (assuming it hasn't already been.)
 loadSession();
@@ -206,7 +204,7 @@ function elk_main()
 
 	// If we are in a topic and don't have permission to approve it then duck out now.
 	if (!empty($topic) && empty($board_info['cur_topic_approved']) && !allowedTo('approve_posts') && ($user_info['id'] != $board_info['cur_topic_starter'] || $user_info['is_guest']))
-		fatal_lang_error('not_a_topic', false);
+		Errors::fatal_lang_error('not_a_topic', false);
 
 	$no_stat_actions = array('dlattach', 'findmember', 'jsoption', 'requestmembers', 'jslocale', 'xmlpreview', 'suggest', '.xml', 'xmlhttp', 'verificationcode', 'viewquery', 'viewadminfile');
 	call_integration_hook('integrate_pre_log_stats', array(&$no_stat_actions));
