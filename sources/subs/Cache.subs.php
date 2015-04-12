@@ -112,6 +112,9 @@ function cache_get_key($key)
  * Finds all the caching engines available and loads some details depending on
  * parameters.
  *
+ * - Caching engines must follow the naming convention of XyzCache.class.php and
+ * have a class name of Xyz_Cache
+ *
  * @param bool $supported_only If true, for each engine supported by the server
  *             an array with 'title' and 'version' is returned.
  *             If false, for each engine available an array with 'title' (string)
@@ -120,18 +123,18 @@ function cache_get_key($key)
  */
 function loadCacheEngines($supported_only = true)
 {
-	global $modSettings, $txt;
-
 	$engines = array();
 
-	$classes = glob(SUBSDIR . '/cache/*.php');
+	$classes = glob(SUBSDIR . '/CacheMethod/*Cache.class.php');
 
 	foreach ($classes as $file_path)
 	{
+		// Get the engine name from the file name
 		$parts = explode('.', basename($file_path));
 		$engine_name = substr($parts[0], 0, -5);
 		$class = $engine_name . '_Cache';
 
+		// Validate the class name exists
 		if (class_exists($class))
 		{
 			if ($supported_only && $class::available())

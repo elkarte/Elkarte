@@ -106,7 +106,7 @@ function automanage_attachments_check_directory()
 		case 5:
 			$updir = $basedirectory . DIRECTORY_SEPARATOR . (empty($modSettings['use_subdirectories_for_attachments']) ? 'attachments-' : 'random_') . $rand . DIRECTORY_SEPARATOR . $rand1;
 			break;
-		default :
+		default:
 			$updir = '';
 	}
 
@@ -1823,7 +1823,7 @@ function getLegacyAttachmentFilename($filename, $attachment_id, $dir = null, $ne
 	$enc_name = $attachment_id . '_' . strtr($clean_name, '.', '_') . md5($clean_name);
 	$clean_name = preg_replace('~\.[\.]+~', '.', $clean_name);
 
-	if ($attachment_id == false || ($new && empty($modSettings['attachmentEncryptFilenames'])))
+	if (empty($attachment_id) || ($new && empty($modSettings['attachmentEncryptFilenames'])))
 		return $clean_name;
 	elseif ($new)
 		return $enc_name;

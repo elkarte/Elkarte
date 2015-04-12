@@ -519,7 +519,7 @@ function messageLikeCount($message)
  */
 function dbMostLikedMessage()
 {
-	global $scripturl, $modSettings, $settings, $txt;
+	global $scripturl, $txt;
 
 	$db = database();
 
@@ -594,7 +594,7 @@ function dbMostLikedMessage()
  */
 function dbMostLikedMessagesByTopic($topic)
 {
-	global $scripturl, $modSettings, $settings, $txt;
+	global $scripturl;
 
 	$db = database();
 
@@ -650,7 +650,6 @@ function dbMostLikedMessagesByTopic($topic)
 				'avatar' => $avatar['href'],
 			),
 		);
-		$id_msg = $row['id_msg'];
 	}
 	$db->free_result($request);
 
@@ -667,7 +666,7 @@ function dbMostLikedMessagesByTopic($topic)
  */
 function dbMostLikedTopic($board = null, $limit = 10)
 {
-	global $scripturl, $modSettings, $settings, $txt;
+	global $txt;
 
 	$db = database();
 
@@ -710,7 +709,7 @@ function dbMostLikedTopic($board = null, $limit = 10)
  */
 function dbMostLikedBoard()
 {
-	global $scripturl, $txt;
+	global $txt;
 
 	$db = database();
 

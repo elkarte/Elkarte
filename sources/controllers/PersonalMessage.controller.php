@@ -1708,7 +1708,7 @@ class PersonalMessage_Controller extends Action_Controller
 			$context['search_params'] = array();
 			foreach ($temp_params as $i => $data)
 			{
-				@list ($k, $v) = explode('|\'|', $data);
+				list ($k, $v) = array_pad(explode('|\'|', $data), 2, '');
 				$context['search_params'][$k] = $v;
 			}
 		}
@@ -1805,7 +1805,7 @@ class PersonalMessage_Controller extends Action_Controller
 			$temp_params = explode('|"|', base64_decode(strtr($_REQUEST['params'], array(' ' => '+'))));
 			foreach ($temp_params as $i => $data)
 			{
-				@list ($k, $v) = explode('|\'|', $data);
+				list ($k, $v) = array_pad(explode('|\'|', $data), 2, '');
 				$search_params[$k] = $v;
 			}
 		}
@@ -2442,7 +2442,7 @@ function preparePMContext_callback($type = 'subject', $reset = false)
 		return false;
 
 	// Reset the data?
-	if ($reset == true)
+	if ($reset === true)
 		return $db->data_seek($messages_request, 0);
 
 	// Get the next one... bail if anything goes wrong.

@@ -1153,7 +1153,7 @@ function recursiveBoards(&$_boardList, &$_tree)
  *
  * @package Boards
  * @param int $child
- * @param mixed[]|int $parent
+ * @param int $parent
  * @return boolean
  */
 function isChildOf($child, $parent)

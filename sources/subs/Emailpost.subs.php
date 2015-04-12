@@ -994,32 +994,39 @@ function pbe_prepare_text(&$message, &$subject = '', &$signature = '')
  * @package Maillist
  * @param Email_Parse $email_message
  */
-function pbe_disable_user_notify($email_message){
+function pbe_disable_user_notify($email_message)
+{
 	$db = database();
 
 	$email = $email_message->_dsn['body']['original-recipient']['value'];
+
 	$request = $db->query('', '
 		SELECT
 			id_member
 		FROM {db_prefix}members
 		WHERE email_address = {string:email}
 		LIMIT 1',
-		array('email' => $email)
-		);
+		array(
+			'email' => $email
+		)
+	);
 
 	if ($db->num_rows($request) !== 0)
 	{
 		list ($id_member) = $db->fetch_row($request);
 		$db->free_result($request);
 
-		//Once we have the member's ID, we can turn off notifications
-		//by setting notify_regularity->99 ("Never")
-		$db->query('','
+		// Once we have the member's ID, we can turn off notifications
+		// by setting notify_regularity->99 ("Never")
+		$db->query('', '
 			UPDATE {db_prefix}members
 			SET
 				notify_regularity = 99
-			WHERE id_member = {int:id_member}'
-		,array('id_member'=>$id_member));
+			WHERE id_member = {int:id_member}',
+			array(
+				'id_member' => $id_member
+			)
+		);
 	}
 }
 

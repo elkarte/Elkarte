@@ -166,7 +166,7 @@ class UnZip
 		if ($this->check_valid_zip() === false)
 			return false;
 
-		// The the overall zip information for this archive
+		// The overall zip information for this archive
 		$this->_read_endof_cdr();
 
 		// Load the actual CDR as defined by offset in the ecdr record

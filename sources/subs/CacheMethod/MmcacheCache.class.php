@@ -52,6 +52,9 @@ class Mmcache_Cache extends Cache_Method_Abstract
 		return mmcache_get($key);
 	}
 
+	/**
+	 * {@inheritdoc }
+	 */
 	public function clean($type = '')
 	{
 		// Removes all expired keys from shared memory, this is not a complete cache flush :(

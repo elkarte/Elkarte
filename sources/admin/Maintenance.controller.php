@@ -470,13 +470,16 @@ class Maintenance_Controller extends Action_Controller
 		// Show me your badge!
 		isAllowedTo('admin_forum');
 
-		if ($db_type != 'mysql')
+		if ($db_type !== 'mysql')
 			return;
 
+		$body_type = '';
+
+		// Find the body column "type" from the message table
 		$colData = getMessageTableColumns();
 		foreach ($colData as $column)
 		{
-			if ($column['name'] == 'body')
+			if ($column['name'] === 'body')
 			{
 				$body_type = $column['type'];
 				break;
@@ -485,13 +488,13 @@ class Maintenance_Controller extends Action_Controller
 
 		$context['convert_to'] = $body_type == 'text' ? 'mediumtext' : 'text';
 
-		if ($body_type == 'text' || ($body_type != 'text' && isset($_POST['do_conversion'])))
+		if ($body_type === 'text' || ($body_type !== 'text' && isset($_POST['do_conversion'])))
 		{
 			checkSession();
 			validateToken('admin-maint');
 
 			// Make it longer so we can do their limit.
-			if ($body_type == 'text')
+			if ($body_type === 'text')
 				resizeMessageTableBody('mediumtext');
 			// Shorten the column so we can have a bit (literally per record) less space occupied
 			else
@@ -499,16 +502,16 @@ class Maintenance_Controller extends Action_Controller
 
 			$colData = getMessageTableColumns();
 			foreach ($colData as $column)
-				if ($column['name'] == 'body')
+				if ($column['name'] === 'body')
 					$body_type = $column['type'];
 
 			$context['maintenance_finished'] = $txt[$context['convert_to'] . '_title'];
-			$context['convert_to'] = $body_type == 'text' ? 'mediumtext' : 'text';
-			$context['convert_to_suggest'] = ($body_type != 'text' && !empty($modSettings['max_messageLength']) && $modSettings['max_messageLength'] < 65536);
+			$context['convert_to'] = $body_type === 'text' ? 'mediumtext' : 'text';
+			$context['convert_to_suggest'] = ($body_type !== 'text' && !empty($modSettings['max_messageLength']) && $modSettings['max_messageLength'] < 65536);
 
 			return;
 		}
-		elseif ($body_type != 'text' && (!isset($_POST['do_conversion']) || isset($_POST['cont'])))
+		elseif ($body_type !== 'text' && (!isset($_POST['do_conversion']) || isset($_POST['cont'])))
 		{
 			checkSession();
 
@@ -1013,10 +1016,7 @@ class Maintenance_Controller extends Action_Controller
 			{
 				// I know, I know... but a lot of people want to type /home/xyz/... which is wrong, but logical.
 				if (!$ftp->chdir($_POST['ftp_path']))
-				{
-					$ftp_error = $ftp->error;
 					$ftp->chdir(preg_replace('~^/home[2]?/[^/]+?~', '', $_POST['ftp_path']));
-				}
 			}
 
 			// If we had an error...

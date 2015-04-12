@@ -1542,6 +1542,7 @@ class ManageAttachments_Controller extends Action_Controller
 		$current_progress = 0;
 		$total_moved = 0;
 		$total_not_moved = 0;
+		$total_progress = 0;
 
 		// Need to know where we are moving things from
 		if (empty($_POST['from']) || (empty($_POST['auto']) && empty($_POST['to'])))
@@ -1613,6 +1614,7 @@ class ManageAttachments_Controller extends Action_Controller
 
 				// Move them
 				$moved = array();
+				$dir_size = empty($dir_size) ? 0 : $dir_size;
 				foreach ($tomove as $row)
 				{
 					$source = getAttachmentFilename($row['filename'], $row['id_attach'], $row['id_folder'], false, $row['file_hash']);

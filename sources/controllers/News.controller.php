@@ -68,8 +68,7 @@ class News_Controller extends Action_Controller
 	 */
 	public function action_showfeed()
 	{
-		global $board, $board_info, $context, $scripturl, $boardurl, $txt, $modSettings, $user_info;
-		global $forum_version, $cdata_override, $settings;
+		global $board, $board_info, $context, $txt, $modSettings, $user_info, $cdata_override;
 
 		// If it's not enabled, die.
 		if (empty($modSettings['xmlnews_enable']))

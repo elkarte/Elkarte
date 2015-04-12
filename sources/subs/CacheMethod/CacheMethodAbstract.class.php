@@ -20,10 +20,10 @@ if (!defined('ELK'))
 abstract class Cache_Method_Abstract implements Cache_Method_Interface
 {
 	/**
-	 * The settings of the caching
+	 * The settings of the caching engin
 	 * @var array
 	 */
-	private $_options = null;
+	public $_options = null;
 
 	/**
 	 * {@inheritdoc }

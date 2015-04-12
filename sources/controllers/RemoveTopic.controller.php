@@ -181,7 +181,7 @@ class RemoveTopic_Controller extends Action_Controller
 
 		// Now any topics?
 		if (!empty($_REQUEST['topics']))
-			$restorer->restoreTopics(',', $_REQUEST['topics']);
+			$restorer->restoreTopics(explode(',', $_REQUEST['topics']));
 
 		$restorer->doRestore();
 

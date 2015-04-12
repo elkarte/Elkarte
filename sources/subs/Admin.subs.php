@@ -30,7 +30,7 @@ if (!defined('ELK'))
  */
 function getServerVersions($checkFor)
 {
-	global $txt, $modSettings;
+	global $txt;
 
 	$db = database();
 
@@ -292,7 +292,7 @@ function getFileVersions(&$versionOptions)
 /**
  * Read a directory searching for files with a certain pattern in the name
  *
- * @param mixed[] $version_info - 
+ * @param mixed[] $version_info -
  * @param string[] $directories - an array of directories to loop
  * @param string $pattern - how the name of the files should end
  */

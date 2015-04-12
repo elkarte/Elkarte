@@ -1801,7 +1801,7 @@ function profileLoadAvatarData()
  */
 function profileLoadGroups()
 {
-	global $cur_profile, $txt, $context, $user_settings;
+	global $cur_profile, $context, $user_settings;
 
 	require_once(SUBSDIR . '/Membergroups.subs.php');
 

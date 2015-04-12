@@ -367,8 +367,6 @@ class MessageIndex_Controller extends Action_Controller
 	{
 		global $board, $user_info, $modSettings, $context;
 
-		$db = database();
-
 		// Check the session = get or post.
 		checkSession('request');
 
@@ -472,7 +470,6 @@ class MessageIndex_Controller extends Action_Controller
 				$all_actions[(int) $topic] = $action;
 		}
 
-		$real_actions = array();
 		$stickyCache = array();
 		$moveCache = array(0 => array(), 1 => array());
 		$removeCache = array();

@@ -170,7 +170,7 @@ class Likes_Controller extends Action_Controller
 	 */
 	public function action_unlikepost()
 	{
-		global $user_info, $topic, $txt, $modSettings;
+		global $user_info, $topic;
 
 		$this->_doLikePost('-', 'rlikemsg');
 
@@ -620,7 +620,7 @@ class Likes_Controller extends Action_Controller
 	 */
 	public function action_likestats_api()
 	{
-		global $context, $user_info, $topic, $txt, $modSettings;
+		global $context, $modSettings;
 
 		require_once(SUBSDIR . '/Likes.subs.php');
 
@@ -659,7 +659,7 @@ class Likes_Controller extends Action_Controller
 	 */
 	public function action_likestats()
 	{
-		global $context, $user_info, $topic, $txt, $modSettings;
+		global $context, $txt, $modSettings;
 
 		require_once(SUBSDIR . '/Likes.subs.php');
 
@@ -712,13 +712,9 @@ class Likes_Controller extends Action_Controller
 		$data = dbMostLikedMessage();
 
 		if ($data)
-		{
 			$this->_likes_response = array('result' => true, 'data' => $data);
-		}
 		else
-		{
 			$this->_likes_response = array('result' => false, 'error' => $txt['like_post_error_something_wrong']);
-		}
 
 		$this->likeResponse();
 	}
@@ -734,13 +730,9 @@ class Likes_Controller extends Action_Controller
 		$data = dbMostLikedTopic();
 
 		if ($data)
-		{
 			$this->_likes_response = array('result' => true, 'data' => $data);
-		}
 		else
-		{
 			$this->_likes_response = array('result' => false, 'error' => $txt['like_post_error_something_wrong']);
-		}
 
 		$this->likeResponse();
 	}
@@ -756,13 +748,9 @@ class Likes_Controller extends Action_Controller
 		$data = dbMostLikedBoard();
 
 		if ($data)
-		{
 			$this->_likes_response = array('result' => true, 'data' => $data);
-		}
 		else
-		{
 			$this->_likes_response = array('result' => false, 'error' => $txt['like_post_error_something_wrong']);
-		}
 
 		$this->likeResponse();
 	}
@@ -778,13 +766,9 @@ class Likes_Controller extends Action_Controller
 		$data = dbMostLikesReceivedUser();
 
 		if ($data)
-		{
 			$this->_likes_response = array('result' => true, 'data' => $data);
-		}
 		else
-		{
 			$this->_likes_response = array('result' => false, 'error' => $txt['like_post_error_something_wrong']);
-		}
 
 		$this->likeResponse();
 	}
@@ -800,13 +784,9 @@ class Likes_Controller extends Action_Controller
 		$data = dbMostLikesGivenUser();
 
 		if ($data)
-		{
 			$this->_likes_response = array('result' => true, 'data' => $data);
-		}
 		else
-		{
 			$this->_likes_response = array('result' => false, 'error' => $txt['like_post_error_something_wrong']);
-		}
 		$this->likeResponse();
 	}
 }

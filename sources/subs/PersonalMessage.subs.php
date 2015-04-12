@@ -302,7 +302,7 @@ function deleteMessages($personal_messages, $folder = null, $owner = null)
  * Mark the specified personal messages read.
  *
  * @package PersonalMessage
- * @param int[]|null $personal_messages null or array of pm ids
+ * @param int[]|int|null $personal_messages null or array of pm ids
  * @param string|null $label = null, if label is set, only marks messages with that label
  * @param int|null $owner = null, if owner is set, marks messages owned by that member id
  */

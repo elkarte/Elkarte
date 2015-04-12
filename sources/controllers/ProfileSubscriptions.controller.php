@@ -132,7 +132,7 @@ class ProfileSubscriptions_Controller extends Action_Controller
 			$id_sub = (int) $k;
 
 		// Selecting a subscription that does not exist or is not active?
-		if (!isset($context['subscriptions'][$id_sub]) || $context['subscriptions'][$id_sub]['active'] == 0)
+		if (!isset($id_sub, $context['subscriptions'][$id_sub]) || $context['subscriptions'][$id_sub]['active'] == 0)
 			fatal_lang_error('paid_sub_not_active');
 
 		// Simplify...

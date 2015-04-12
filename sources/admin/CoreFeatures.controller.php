@@ -26,6 +26,7 @@ if (!defined('ELK'))
  * What it does:
  * - It sets up the context, initializes the features info for display
  * - updates the settings for enabled/disabled core features as requested.
+ * - loads in module core features
  *
  * @package CoreFeatures
  */
@@ -283,6 +284,7 @@ class CoreFeatures_Controller extends Action_Controller
 	 */
 	protected function _getModulesConfig(&$core_features)
 	{
+		// Find appropriately named core feature files in the admin directory
 		foreach (glob(ADMINDIR . '/Manage*Module.controller.php') as $file)
 		{
 			$class = basename($file, '.controller.php') . '_Controller';
@@ -301,13 +303,15 @@ class CoreFeatures_Controller extends Action_Controller
 				'title' => $integration['title'],
 				'desc' => $integration['description'],
 			);
+
 			if (method_exists($integration['class'], 'setting_callback'))
 			{
 				$core_features[$integration['id']]['setting_callback'] = function ($value) use ($integration) {
 					$integration['class']::setting_callback($value);
 				};
 			}
-			if (method_exists($integration['class'], 'setting_callback'))
+
+			if (method_exists($integration['class'], 'on_save'))
 			{
 				$core_features[$integration['id']]['on_save'] = function () use ($integration) {
 					$integration['class']::on_save();

@@ -747,7 +747,7 @@ class Display_Controller extends Action_Controller
 	 */
 	public function prepareDisplayContext_callback($reset = false)
 	{
-		global $settings, $txt, $modSettings, $scripturl, $options, $user_info;
+		global $settings, $txt, $modSettings, $scripturl, $user_info;
 		global $memberContext, $context, $messages_request, $topic;
 		static $counter = null;
 

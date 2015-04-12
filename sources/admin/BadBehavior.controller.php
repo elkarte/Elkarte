@@ -58,9 +58,7 @@ class BadBehavior_Controller extends Action_Controller
 		// Set up the filtering...
 		$filter = array();
 		if (isset($_GET['value'], $_GET['filter']))
-		{
 			$filter = $this->_setFilter();
-		}
 
 		if (empty($filter))
 		{
@@ -178,7 +176,7 @@ class BadBehavior_Controller extends Action_Controller
 		);
 
 		if (!isset($filters[$_GET['filter']]))
-			return false;
+			return array();
 
 		return array(
 			'variable' => $_GET['filter'] == 'useragent' ? 'user_agent' : $_GET['filter'],

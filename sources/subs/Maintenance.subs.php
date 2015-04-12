@@ -223,7 +223,7 @@ function optimizeTable($tablename)
 {
 	$db_table = db_table();
 
-	$db_table->optimize($tablename);
+	return $db_table->optimize($tablename);
 }
 
 /**

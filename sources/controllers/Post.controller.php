@@ -384,10 +384,7 @@ class Post_Controller extends Action_Controller
 				// @todo: sort out what kind of combinations are actually possible
 				// Posting a quoted reply?
 				if ((!empty($topic) && !empty($_REQUEST['quote'])) || (!empty($modSettings['enableFollowup']) && !empty($_REQUEST['followup'])))
-				{
 					$case = 2;
-					$msg_id = !empty($_REQUEST['quote']) ? (int) $_REQUEST['quote'] : (int) $_REQUEST['followup'];
-				}
 				// Posting a reply without a quote?
 				elseif (!empty($topic) && empty($_REQUEST['quote']))
 					$case = 3;
@@ -414,7 +411,7 @@ class Post_Controller extends Action_Controller
 			$this->_events->trigger('prepare_editing', array('topic' => $topic, 'message' => &$message));
 
 			if (!empty($message['errors']))
-				foreach ($errors as $error)
+				foreach ($message['errors'] as $error)
 					$this->_post_errors->addError($error);
 
 			// Get the stuff ready for the form.

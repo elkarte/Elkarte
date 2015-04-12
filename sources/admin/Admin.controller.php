@@ -31,10 +31,14 @@ if (!defined('ELK'))
  */
 class Admin_Controller extends Action_Controller
 {
+	/**
+	 * Pre Dispatch, called before other methods.  Loads integration hooks
+	 */
 	public function pre_dispatch()
 	{
 		Hooks::get()->loadIntegrationsSettings();
 	}
+
 	/**
 	 * The main admin handling function.
 	 *
@@ -658,7 +662,7 @@ class Admin_Controller extends Action_Controller
 	 */
 	public function action_credits()
 	{
-		global $forum_version, $txt, $scripturl, $context, $user_info, $modSettings;
+		global $forum_version, $txt, $scripturl, $context, $user_info;
 
 		// We need a little help from our friends
 		require_once(SUBSDIR . '/Membergroups.subs.php');
@@ -837,7 +841,7 @@ class Admin_Controller extends Action_Controller
 		// Go through all the search data trying to find this text!
 		$search_term = strtolower(un_htmlspecialchars($context['search_term']));
 
-		$search = new Settings_Search($language_files, $include_files, $settings_search);
+		$search = new AdminSettings_Search($language_files, $include_files, $settings_search);
 		$search->initSearch($context['admin_menu_name'], array(
 			array('COPPA', 'area=regcenter;sa=settings'),
 			array('CAPTCHA', 'area=securitysettings;sa=spam'),
@@ -891,10 +895,10 @@ class Admin_Controller extends Action_Controller
 		$search_results = fetch_web_data($context['doc_apiurl'] . '?action=query&list=search&srprop=timestamp|snippet&format=xml&srwhat=text&srsearch=' . $postVars);
 
 		// If we didn't get any xml back we are in trouble - perhaps the doc site is overloaded?
-		if (!$search_results || preg_match('~<' . '\?xml\sversion="\d+\.\d+"\?>\s*(<api>.+?</api>)~is', $search_results, $matches) != true)
+		if (!$search_results || preg_match('~<' . '\?xml\sversion="\d+\.\d+"\?>\s*(<api>.+?</api>)~is', $search_results, $matches) !== 1)
 			fatal_lang_error('cannot_connect_doc_site');
 
-		$search_results = $matches[1];
+		$search_results = !empty($matches[1]) ? $matches[1] : '';
 
 		// Otherwise we simply walk through the XML and stick it in context for display.
 		$context['search_results'] = array();

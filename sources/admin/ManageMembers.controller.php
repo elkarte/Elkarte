@@ -175,7 +175,7 @@ class ManageMembers_Controller extends Action_Controller
 	 */
 	public function action_list()
 	{
-		global $txt, $scripturl, $context, $modSettings, $user_info;
+		global $txt, $scripturl, $context, $modSettings;
 
 		// Set the current sub action.
 		$context['sub_action'] = isset($_REQUEST['sa']) ? $_REQUEST['sa'] : 'all';

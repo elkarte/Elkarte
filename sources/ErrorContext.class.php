@@ -207,9 +207,13 @@ class Error_Context
 	public function getErrorType()
 	{
 		$levels = array_reverse($this->_severity_levels);
+		$level = null;
+
 		foreach ($levels as $level)
+		{
 			if (!empty($this->_errors[$level]))
 				return $level;
+		}
 
 		return $level;
 	}

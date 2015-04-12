@@ -207,7 +207,8 @@ abstract class Database_Abstract implements Database
 	protected function _array_combine($keys, $values)
 	{
 		$is_numeric = array_filter(array_keys($values), 'is_numeric');
-		if ($is_numeric)
+		
+		if (!empty($is_numeric))
 			return array_combine($keys, $values);
 		else
 		{
@@ -333,7 +334,7 @@ abstract class Database_Abstract implements Database
 	 *
 	 * @return int
 	 */
-	function num_queries()
+	public function num_queries()
 	{
 		return $this->_query_count;
 	}

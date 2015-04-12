@@ -69,12 +69,14 @@ class Event_Manager
 	 */
 	public function trigger($position, $args = array())
 	{
+		// No registered events, just return
 		if (!isset($this->_registered_events[$position]))
 			return;
 
 		if (!$this->_registered_events[$position]->hasEvents())
 			return;
 
+		// For all events that registered here, lets trigger an event
 		foreach ($this->_registered_events[$position]->getEvents() as $event)
 		{
 			$class = $event[1];
@@ -106,13 +108,9 @@ class Event_Manager
 			if (method_exists($instance, $method_name))
 			{
 				if (empty($dependencies))
-				{
 					call_user_func(array($instance, $method_name));
-				}
 				else
-				{
 					call_user_func_array(array($instance, $method_name), $dependencies);
-				}
 			}
 		}
 	}
@@ -129,9 +127,7 @@ class Event_Manager
 	protected function _getInstance($class_name)
 	{
 		if (isset($this->_instances[$class_name]))
-		{
 			return $this->_instances[$class_name];
-		}
 		else
 		{
 			$instance = new $class_name();
@@ -158,26 +154,19 @@ class Event_Manager
 	 *
 	 * @param string $position The position at which the event will be triggered
 	 * @param mixed[] $event An array describing the event we want to trigger:
-	 *                   array(
-	 *                     0 => string - the position at which the event will be triggered
-	 *                     1 => string[] - the class and method we want to call:
-	 *                         array(
-	 *                           0 => string - name of the class to instantiate
-	 *                           1 => string - name of the method to call
-	 *                         )
-	 *                     2 => null|string[] - an array of dependencies in the
-	 *                                          form of strings representing the
-	 *                                          name of the variables the method
-	 *                                          requires.
-	 *                                          The variables can be from:
-	 *                                            - the default list of variables passed
-	 *                                              to the trigger
-	 *                                            - properties (private, protected,
-	 *                                              or public) of the object that
-	 *                                              instantiate the Event_Manager
-	 *                                              (i.e. the controller)
-	 *                                            - globals
-	 *                   )
+	 *   0 => string - the position at which the event will be triggered
+	 *   1 => string[] - the class and method we want to call:
+	 *      array(
+	 *        0 => string - name of the class to instantiate
+	 *        1 => string - name of the method to call
+	 *      )
+	 *   2 => null|string[] - an array of dependencies in the form of strings representing the
+	 *        name of the variables the method requires.
+	 *        The variables can be from:
+	 *          - the default list of variables passed to the trigger
+	 *          - properties (private, protected, or public) of the object that instantiate the Event_Manager
+	 *            (i.e. the controller)
+	 *          - globals
 	 * @param int $priority Defines the order the method is called.
 	 */
 	public function register($position, $event, $priority = 0)
@@ -220,9 +209,8 @@ class Event_Manager
 	protected function _declared_classes()
 	{
 		if ($this->_declared_classes === null)
-		{
 			$this->_declared_classes = get_declared_classes();
-		}
+
 		return $this->_declared_classes;
 	}
 
