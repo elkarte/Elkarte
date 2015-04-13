@@ -141,7 +141,7 @@ class UnZip
 
 		// This function sorta needs gzinflate!
 		if (!function_exists('gzinflate'))
-			fatal_lang_error('package_no_zlib', 'critical');
+			Errors::fatal_lang_error('package_no_zlib', 'critical');
 
 		// Make sure we have this loaded.
 		loadLanguage('Packages');

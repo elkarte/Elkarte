@@ -217,10 +217,10 @@ class ManageThemes_Controller extends Action_Controller
 				foreach ($_POST['options']['known_themes'] as $key => $id)
 					$_POST['options']['known_themes'][$key] = (int) $id;
 			else
-				fatal_lang_error('themes_none_selectable', false);
+				Errors::fatal_lang_error('themes_none_selectable', false);
 
 			if (!in_array($_POST['options']['theme_guests'], $_POST['options']['known_themes']))
-					fatal_lang_error('themes_default_selectable', false);
+					Errors::fatal_lang_error('themes_default_selectable', false);
 
 			// Commit the new settings.
 			updateSettings(array(
@@ -582,7 +582,7 @@ class ManageThemes_Controller extends Action_Controller
 
 		// Validate inputs/user.
 		if (empty($theme))
-			fatal_lang_error('no_theme', false);
+			Errors::fatal_lang_error('no_theme', false);
 
 		// Select the best fitting tab.
 		$context[$context['admin_menu_name']]['current_subsection'] = 'list';
@@ -760,7 +760,7 @@ class ManageThemes_Controller extends Action_Controller
 
 		// You can't delete the default theme!
 		if ($theme == 1)
-			fatal_lang_error('no_access', false);
+			Errors::fatal_lang_error('no_access', false);
 
 		// Its no longer known
 		$known = explode(',', $modSettings['knownThemes']);
@@ -895,7 +895,7 @@ class ManageThemes_Controller extends Action_Controller
 		require_once(SUBSDIR . '/Themes.subs.php');
 
 		if (!$modSettings['theme_allow'] && $settings['disable_user_variant'] && !allowedTo('admin_forum'))
-			fatal_lang_error('no_access', false);
+			Errors::fatal_lang_error('no_access', false);
 
 		loadLanguage('Profile');
 		loadTemplate('ManageThemes');
@@ -1100,7 +1100,7 @@ class ManageThemes_Controller extends Action_Controller
 		{
 			// Hopefully the themes directory is writable, or we might have a problem.
 			if (!is_writable(BOARDDIR . '/themes'))
-				fatal_lang_error('theme_install_write_error', 'critical');
+				Errors::fatal_lang_error('theme_install_write_error', 'critical');
 
 			// Make the new directory, standard characters only
 			$theme_dir = BOARDDIR . '/themes/' . preg_replace('~[^A-Za-z0-9_\- ]~', '', $_REQUEST['copy']);
@@ -1143,7 +1143,7 @@ class ManageThemes_Controller extends Action_Controller
 		elseif (isset($_REQUEST['theme_dir']) && $method == 'path')
 		{
 			if (!is_dir($_REQUEST['theme_dir']) || !file_exists($_REQUEST['theme_dir'] . '/theme_info.xml'))
-				fatal_lang_error('theme_install_error', false);
+				Errors::fatal_lang_error('theme_install_error', false);
 
 			$theme_name = basename($_REQUEST['theme_dir']);
 			$theme_dir = $_REQUEST['theme_dir'];
@@ -1153,7 +1153,7 @@ class ManageThemes_Controller extends Action_Controller
 		{
 			// Hopefully the themes directory is writable, or we might have a problem.
 			if (!is_writable(BOARDDIR . '/themes'))
-				fatal_lang_error('theme_install_write_error', 'critical');
+				Errors::fatal_lang_error('theme_install_write_error', 'critical');
 
 			// This happens when the admin session is gone and the user has to login again
 			if (empty($_FILES['theme_gz']) && empty($_REQUEST['theme_gz']))
@@ -1169,7 +1169,7 @@ class ManageThemes_Controller extends Action_Controller
 			elseif (isset($_REQUEST['theme_gz']))
 			{
 				if (!isAuthorizedServer($_REQUEST['theme_gz']))
-					fatal_lang_error('not_valid_server');
+					Errors::fatal_lang_error('not_valid_server');
 
 				read_tgz_file($_REQUEST['theme_gz'], BOARDDIR . '/themes/' . $theme_name, false, true);
 			}
@@ -1177,7 +1177,7 @@ class ManageThemes_Controller extends Action_Controller
 				redirectexit('action=admin;area=theme;sa=admin;' . $context['session_var'] . '=' . $context['session_id']);
 		}
 		else
-			fatal_lang_error('theme_install_general', false);
+			Errors::fatal_lang_error('theme_install_general', false);
 
 		// Something go wrong?
 		if ($theme_dir != '' && basename($theme_dir) != 'themes')
@@ -1531,7 +1531,7 @@ class ManageThemes_Controller extends Action_Controller
 		if (empty($selectedTheme))
 		{
 			// This should never be happening. Never I say. But... in case it does :P
-			fatal_lang_error('theme_edit_missing');
+			Errors::fatal_lang_error('theme_edit_missing');
 		}
 
 		$theme_dir = themeDirectory($context['theme_id']);
@@ -1541,7 +1541,7 @@ class ManageThemes_Controller extends Action_Controller
 		if (empty($file))
 		{
 			// @todo a better error message
-			fatal_lang_error('theme_edit_missing');
+			Errors::fatal_lang_error('theme_edit_missing');
 		}
 
 		// Checking PHP syntax on css files is not a most constructive use of processing power :P
@@ -1711,7 +1711,7 @@ class ManageThemes_Controller extends Action_Controller
 
 		// Eh? not trying to sneak a peek outside the theme directory are we
 		if (!file_exists($theme_dir . '/index.template.php') && !file_exists($theme_dir . '/css/index.css'))
-			fatal_lang_error('theme_edit_missing', false);
+			Errors::fatal_lang_error('theme_edit_missing', false);
 
 		// Now, where exactly are you?
 		if (isset($_GET['directory']))
@@ -1828,7 +1828,7 @@ class ManageThemes_Controller extends Action_Controller
 			elseif (file_exists($settings['default_theme_dir'] . '/' . $_REQUEST['template'] . '.template.php'))
 				$filename = $settings['default_theme_dir'] . '/' . $_REQUEST['template'] . '.template.php';
 			else
-				fatal_lang_error('no_access', false);
+				Errors::fatal_lang_error('no_access', false);
 
 			$fp = fopen($theme_dirs['theme_dir'] . '/' . $_REQUEST['template'] . '.template.php', 'w');
 			fwrite($fp, file_get_contents($filename));
@@ -1843,7 +1843,7 @@ class ManageThemes_Controller extends Action_Controller
 			elseif (file_exists($settings['default_theme_dir'] . '/languages/' . $_REQUEST['template'] . '.php'))
 				$filename = $settings['default_theme_dir'] . '/languages/' . $_REQUEST['template'] . '.php';
 			else
-				fatal_lang_error('no_access', false);
+				Errors::fatal_lang_error('no_access', false);
 
 			$fp = fopen($theme_dirs['theme_dir'] . '/languages/' . $_REQUEST['lang_file'] . '.php', 'w');
 			fwrite($fp, file_get_contents($filename));
@@ -1953,7 +1953,7 @@ class ManageThemes_Controller extends Action_Controller
 
 		// Eh? not trying to sneak a peek outside the theme directory are we
 		if (!file_exists($theme_dir . '/index.template.php') && !file_exists($theme_dir . '/css/index.css'))
-			fatal_lang_error('theme_edit_missing', false);
+			Errors::fatal_lang_error('theme_edit_missing', false);
 
 		// You're editing a file: we have extra-checks coming up first.
 		if (substr($_REQUEST['filename'], 0, 1) === '.')
@@ -1969,7 +1969,7 @@ class ManageThemes_Controller extends Action_Controller
 
 		// We shouldn't end up with no file
 		if (empty($_REQUEST['filename']))
-			fatal_lang_error('theme_edit_missing', false);
+			Errors::fatal_lang_error('theme_edit_missing', false);
 
 		// Initialize context
 		$context['allow_save'] = is_writable($theme_dir . '/' . $_REQUEST['filename']);

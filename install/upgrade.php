@@ -148,7 +148,7 @@ loadEssentialData();
 if (isset($_GET['ssi']))
 {
 	require_once(SOURCEDIR . '/Subs.php');
-	require_once(SOURCEDIR . '/Errors.php');
+	require_once(SOURCEDIR . '/Errors.class.php');
 	require_once(SOURCEDIR . '/Logging.php');
 	require_once(SOURCEDIR . '/Load.php');
 	require_once(SUBSDIR . '/Cache.subs.php');

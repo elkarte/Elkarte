@@ -244,7 +244,7 @@ class Memberlist_Controller extends Action_Controller
 		if (!is_numeric($_REQUEST['start']))
 		{
 			if (preg_match('~^[^\'\\\\/]~u', Util::strtolower($_REQUEST['start']), $match) === 0)
-				fatal_error('Hacker?', false);
+				Errors::fatal_error('Hacker?', false);
 
 			$_REQUEST['start'] = ml_alphaStart($match[0]);
 		}

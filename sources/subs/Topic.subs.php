@@ -880,7 +880,7 @@ function moveTopicConcurrence($move_from = null, $id_board = null, $id_topic = n
 
 		$board_link = '<a href="' . $scripturl . '?board=' . $id_board . '.0">' . $board_name . '</a>';
 		$topic_link = '<a href="' . $scripturl . '?topic=' . $id_topic . '.0">' . $topic_subject . '</a>';
-		fatal_lang_error('topic_already_moved', false, array($topic_link, $board_link));
+		Errors::fatal_lang_error('topic_already_moved', false, array($topic_link, $board_link));
 	}
 }
 
@@ -909,7 +909,7 @@ function removeDeleteConcurrence()
 	else
 		$confirm_url = $scripturl . '?action=removetopic2;confirm_delete;topic=' . $context['current_topic'] . '.0;' . $context['session_var'] . '=' . $context['session_id'];
 
-		fatal_lang_error('post_already_deleted', false, array($confirm_url));
+		Errors::fatal_lang_error('post_already_deleted', false, array($confirm_url));
 }
 
 /**
@@ -2351,7 +2351,7 @@ function splitTopic($split1_ID_TOPIC, $splitMessages, $new_subject)
 
 	// Nothing to split?
 	if (empty($splitMessages))
-		fatal_lang_error('no_posts_selected', false);
+		Errors::fatal_lang_error('no_posts_selected', false);
 
 	// Get some board info.
 	$topicAttribute = topicAttribute($split1_ID_TOPIC, array('id_board', 'approved'));
@@ -2376,7 +2376,7 @@ function splitTopic($split1_ID_TOPIC, $splitMessages, $new_subject)
 	);
 	// You can't select ALL the messages!
 	if ($db->num_rows($request) == 0)
-		fatal_lang_error('selected_all_posts', false);
+		Errors::fatal_lang_error('selected_all_posts', false);
 
 	$split1_first_msg = null;
 	$split1_last_msg = null;
@@ -2462,11 +2462,11 @@ function splitTopic($split1_ID_TOPIC, $splitMessages, $new_subject)
 
 	// No database changes yet, so let's double check to see if everything makes at least a little sense.
 	if ($split1_first_msg <= 0 || $split1_last_msg <= 0 || $split2_first_msg <= 0 || $split2_last_msg <= 0 || $split1_replies < 0 || $split2_replies < 0 || $split1_unapprovedposts < 0 || $split2_unapprovedposts < 0 || !isset($split1_approved) || !isset($split2_approved))
-		fatal_lang_error('cant_find_messages');
+		Errors::fatal_lang_error('cant_find_messages');
 
 	// You cannot split off the first message of a topic.
 	if ($split1_first_msg > $split2_first_msg)
-		fatal_lang_error('split_first_post', false);
+		Errors::fatal_lang_error('split_first_post', false);
 
 	// We're off to insert the new topic!  Use 0 for now to avoid UNIQUE errors.
 	$db->insert('',
@@ -2490,7 +2490,7 @@ function splitTopic($split1_ID_TOPIC, $splitMessages, $new_subject)
 	);
 	$split2_ID_TOPIC = $db->insert_id('{db_prefix}topics', 'id_topic');
 	if ($split2_ID_TOPIC <= 0)
-		fatal_lang_error('cant_insert_topic');
+		Errors::fatal_lang_error('cant_insert_topic');
 
 	// Move the messages over to the other topic.
 	$new_subject = strtr(Util::htmltrim(Util::htmlspecialchars($new_subject)), array("\r" => '', "\n" => '', "\t" => ''));
@@ -2671,13 +2671,13 @@ function splitDestinationBoard($toboard = 0)
 
 	$current_board = boardInfo($board, $topic);
 	if (empty($current_board))
-		fatal_lang_error('no_board');
+		Errors::fatal_lang_error('no_board');
 
 	if (!empty($toboard) && $board !== $toboard)
 	{
 		$destination_board = boardInfo($toboard);
 		if (empty($destination_board))
-			fatal_lang_error('no_board');
+			Errors::fatal_lang_error('no_board');
 	}
 
 	if (!isset($destination_board))
@@ -3144,7 +3144,7 @@ function getSubject($id_topic)
 	);
 
 	if ($db->num_rows($request) == 0)
-		fatal_lang_error('topic_gone', false);
+		Errors::fatal_lang_error('topic_gone', false);
 
 	list ($subject) = $db->fetch_row($request);
 	$db->free_result($request);

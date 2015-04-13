@@ -252,14 +252,14 @@ class ManageErrors_Controller extends Action_Controller
 		$basename = strtolower(basename($file));
 		$ext = strrchr($basename, '.');
 		if ($ext !== '.php' || (strpos($file, $real_board) === false && strpos($file, $real_source) === false) || strpos($file, $real_cache) !== false || in_array($basename, $excluded) || !is_readable($file))
-			fatal_lang_error('error_bad_file', true, array(htmlspecialchars($filename, ENT_COMPAT, 'UTF-8')));
+			Errors::fatal_lang_error('error_bad_file', true, array(htmlspecialchars($filename, ENT_COMPAT, 'UTF-8')));
 
 		// Get the min and max lines
 		$min = $line - 16 <= 0 ? 1 : $line - 16;
 		$max = $line + 21; // One additional line to make everything work out correctly
 
 		if ($max <= 0 || $min >= $max)
-			fatal_lang_error('error_bad_line');
+			Errors::fatal_lang_error('error_bad_line');
 
 		$file_data = explode('<br />', highlight_php_code(htmlspecialchars(implode('', file($file)), ENT_COMPAT, 'UTF-8')));
 

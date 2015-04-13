@@ -57,7 +57,7 @@ class Register_Controller extends Action_Controller
 
 		// Check if the administrator has it disabled.
 		if (!empty($modSettings['registration_method']) && $modSettings['registration_method'] == '3')
-			fatal_lang_error('registration_disabled', false);
+			Errors::fatal_lang_error('registration_disabled', false);
 
 		// If this user is an admin - redirect them to the admin registration page.
 		if (allowedTo('moderate_forum') && !$user_info['is_guest'])
@@ -105,7 +105,7 @@ class Register_Controller extends Action_Controller
 				if (empty($modSettings['coppaType']) && empty($_SESSION['skip_coppa']))
 				{
 					loadLanguage('Login');
-					fatal_lang_error('under_age_registration_prohibited', false, array($modSettings['coppaAge']));
+					Errors::fatal_lang_error('under_age_registration_prohibited', false, array($modSettings['coppaAge']));
 				}
 			}
 		}
@@ -150,8 +150,8 @@ class Register_Controller extends Action_Controller
 			if (empty($context['agreement']))
 			{
 				// No file found or a blank file, log the error so the admin knows there is a problem!
-				log_error($txt['registration_agreement_missing'], 'critical');
-				fatal_lang_error('registration_disabled', false);
+				Errors::log_error($txt['registration_agreement_missing'], 'critical');
+				Errors::fatal_lang_error('registration_disabled', false);
 			}
 		}
 
@@ -281,7 +281,7 @@ class Register_Controller extends Action_Controller
 		if (!empty($modSettings['coppaAge']) && empty($modSettings['coppaType']) && empty($_SESSION['skip_coppa']))
 		{
 			loadLanguage('Login');
-			fatal_lang_error('under_age_registration_prohibited', false, array($modSettings['coppaAge']));
+			Errors::fatal_lang_error('under_age_registration_prohibited', false, array($modSettings['coppaAge']));
 		}
 
 		// Check the time gate for miscreants. First make sure they came from somewhere that actually set it up.
@@ -323,11 +323,11 @@ class Register_Controller extends Action_Controller
 
 		// You can't register if it's disabled.
 		if (!empty($modSettings['registration_method']) && $modSettings['registration_method'] == 3)
-			fatal_lang_error('registration_disabled', false);
+			Errors::fatal_lang_error('registration_disabled', false);
 
 		// Make sure they didn't just register with this session.
 		if (!empty($_SESSION['just_registered']) && empty($modSettings['disableRegisterCheck']))
-			fatal_lang_error('register_only_once', false);
+			Errors::fatal_lang_error('register_only_once', false);
 	}
 
 	/**
@@ -495,7 +495,7 @@ class Register_Controller extends Action_Controller
 		// Otherwise grab all of them and don't log anything
 		if ($reg_errors->hasErrors(1) && !$user_info['is_admin'])
 			foreach ($reg_errors->prepareErrors(1) as $error)
-				fatal_error($error, 'general');
+				Errors::fatal_error($error, 'general');
 
 		// Was there actually an error of some kind dear boy?
 		if ($reg_errors->hasErrors())
@@ -560,7 +560,7 @@ class Register_Controller extends Action_Controller
 		if (empty($_REQUEST['u']) && empty($_POST['user']))
 		{
 			if (empty($modSettings['registration_method']) || $modSettings['registration_method'] == '3')
-				fatal_lang_error('no_access', false);
+				Errors::fatal_lang_error('no_access', false);
 
 			$context['member_id'] = 0;
 			$context['sub_template'] = 'resend';
@@ -596,11 +596,11 @@ class Register_Controller extends Action_Controller
 		if (isset($_POST['new_email'], $_REQUEST['passwd']) && validateLoginPassword($_REQUEST['passwd'], $row['passwd'], $row['member_name'], true) && ($row['is_activated'] == 0 || $row['is_activated'] == 2))
 		{
 			if (empty($modSettings['registration_method']) || $modSettings['registration_method'] == 3)
-				fatal_lang_error('no_access', false);
+				Errors::fatal_lang_error('no_access', false);
 
 			// @todo Separate the sprintf?
 			if (!Data_Validator::is_valid($_POST, array('new_email' => 'valid_email|required|max_length[255]'), array('new_email' => 'trim')))
-				fatal_error(sprintf($txt['valid_email_needed'], htmlspecialchars($_POST['new_email'], ENT_COMPAT, 'UTF-8')), false);
+				Errors::fatal_error(sprintf($txt['valid_email_needed'], htmlspecialchars($_POST['new_email'], ENT_COMPAT, 'UTF-8')), false);
 
 			// Make sure their email isn't banned.
 			isBannedEmail($_POST['new_email'], 'cannot_register', $txt['ban_register_prohibited']);
@@ -608,7 +608,7 @@ class Register_Controller extends Action_Controller
 			// Ummm... don't even dare try to take someone else's email!!
 			// @todo Separate the sprintf?
 			if (userByEmail($_POST['new_email']))
-				fatal_lang_error('email_in_use', false, array(htmlspecialchars($_POST['new_email'], ENT_COMPAT, 'UTF-8')));
+				Errors::fatal_lang_error('email_in_use', false, array(htmlspecialchars($_POST['new_email'], ENT_COMPAT, 'UTF-8')));
 
 			require_once(SUBSDIR . '/Members.subs.php');
 			updateMemberData($row['id_member'], array('email_address' => $_POST['new_email']));
@@ -640,18 +640,18 @@ class Register_Controller extends Action_Controller
 			// This will ensure we don't actually get an error message if it works!
 			$context['error_title'] = '';
 
-			fatal_lang_error(!empty($email_change) ? 'change_email_success' : 'resend_email_success', false);
+			Errors::fatal_lang_error(!empty($email_change) ? 'change_email_success' : 'resend_email_success', false);
 		}
 
 		// Quit if this code is not right.
 		if (empty($_REQUEST['code']) || $row['validation_code'] != $_REQUEST['code'])
 		{
 			if (!empty($row['is_activated']))
-				fatal_lang_error('already_activated', false);
+				Errors::fatal_lang_error('already_activated', false);
 			elseif ($row['validation_code'] == '')
 			{
 				loadLanguage('Profile');
-				fatal_error($txt['registration_not_approved'] . ' <a href="' . $scripturl . '?action=activate;user=' . $row['member_name'] . '">' . $txt['here'] . '</a>.', false);
+				Errors::fatal_error($txt['registration_not_approved'] . ' <a href="' . $scripturl . '?action=activate;user=' . $row['member_name'] . '">' . $txt['here'] . '</a>.', false);
 			}
 
 			$context['sub_template'] = 'retry_activate';
@@ -701,7 +701,7 @@ class Register_Controller extends Action_Controller
 
 		// No User ID??
 		if (!isset($_GET['member']))
-			fatal_lang_error('no_access', false);
+			Errors::fatal_lang_error('no_access', false);
 
 		// Get the user details...
 		require_once(SUBSDIR . '/Members.subs.php');
@@ -709,7 +709,7 @@ class Register_Controller extends Action_Controller
 
 		// If doesn't exist or not pending coppa
 		if (empty($member) || $member['is_activated'] != 5)
-			fatal_lang_error('no_access', false);
+			Errors::fatal_lang_error('no_access', false);
 
 		if (isset($_GET['form']))
 		{

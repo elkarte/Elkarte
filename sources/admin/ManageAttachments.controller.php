@@ -607,7 +607,7 @@ class ManageAttachments_Controller extends Action_Controller
 
 			// Guess that didn't work?
 			if (!is_writable($modSettings['custom_avatar_dir']))
-				fatal_lang_error('attachments_no_write', 'critical');
+				Errors::fatal_lang_error('attachments_no_write', 'critical');
 		}
 
 		// Finally move the attachments..

@@ -253,7 +253,7 @@ class ManagePosts_Controller extends Action_Controller
 						$body_type = $column['type'];
 
 				if (isset($body_type) && ($_POST['max_messageLength'] > 65535 || $_POST['max_messageLength'] == 0) && $body_type == 'text')
-					fatal_lang_error('convert_to_mediumtext', false, array($scripturl . '?action=admin;area=maintain;sa=database'));
+					Errors::fatal_lang_error('convert_to_mediumtext', false, array($scripturl . '?action=admin;area=maintain;sa=database'));
 
 			}
 

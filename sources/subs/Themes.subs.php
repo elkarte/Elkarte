@@ -328,7 +328,7 @@ function get_file_listing($path, $relative)
 
 	// Is it even a directory?
 	if (!is_dir($path))
-		fatal_lang_error('error_invalid_dir', 'critical');
+		Errors::fatal_lang_error('error_invalid_dir', 'critical');
 
 	// Read this directorys contents
 	$entries = array();
@@ -735,7 +735,7 @@ function deleteTheme($id)
 
 	// Make sure we never ever delete the default theme!
 	if ($id === 1)
-		fatal_lang_error('no_access', false);
+		Errors::fatal_lang_error('no_access', false);
 
 	$db->query('', '
 		DELETE FROM {db_prefix}themes

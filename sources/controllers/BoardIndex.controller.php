@@ -145,7 +145,7 @@ class BoardIndex_Controller extends Action_Controller
 		checkSession('request');
 
 		if (!isset($_GET['sa']))
-			fatal_lang_error('no_access', false);
+			Errors::fatal_lang_error('no_access', false);
 
 		// Check if the input values are correct.
 		if (in_array($_REQUEST['sa'], array('expand', 'collapse', 'toggle')) && isset($_REQUEST['c']))

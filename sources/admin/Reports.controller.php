@@ -585,7 +585,7 @@ class Reports_Controller extends Action_Controller
 
 		// This is a bit of a cop out - but we're protecting their forum, really!
 		if (count($allStaff) > 300)
-			fatal_lang_error('report_error_too_many_staff');
+			Errors::fatal_lang_error('report_error_too_many_staff');
 
 		// Get all the possible membergroups!
 		$all_groups = getBasicMembergroupData(array('all'), array(), null, false);

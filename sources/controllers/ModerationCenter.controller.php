@@ -253,7 +253,7 @@ class ModerationCenter_Controller extends Action_Controller
 
 		// We got something - didn't we? DIDN'T WE!
 		if ($mod_include_data == false)
-			fatal_lang_error('no_access', false);
+			Errors::fatal_lang_error('no_access', false);
 
 		// Retain the ID information in case required by a subaction.
 		$context['moderation_menu_id'] = $context['max_menu_id'];
@@ -368,7 +368,7 @@ class ModerationCenter_Controller extends Action_Controller
 
 		// legit?
 		if (empty($notice) || !$context['can_moderate_boards'])
-			fatal_lang_error('no_access', false);
+			Errors::fatal_lang_error('no_access', false);
 
 		list ($context['notice_body'], $context['notice_subject']) = $notice;
 
@@ -756,7 +756,7 @@ class ModerationCenter_Controller extends Action_Controller
 
 		// Have to at least give us something
 		if (empty($_REQUEST['report']))
-			fatal_lang_error('mc_no_modreport_specified');
+			Errors::fatal_lang_error('mc_no_modreport_specified');
 
 		// Integers only please
 		$report = (int) $_REQUEST['report'];
@@ -766,7 +766,7 @@ class ModerationCenter_Controller extends Action_Controller
 
 		// So did we find anything?
 		if ($row === false)
-			fatal_lang_error('mc_no_modreport_found');
+			Errors::fatal_lang_error('mc_no_modreport_found');
 
 		// Woohoo we found a report and they can see it!  Bad news is we have more work to do
 		// If they are adding a comment then... add a comment.

@@ -267,7 +267,7 @@ class ManagePaid_Controller extends Action_Controller
 
 		// Not made the settings yet?
 		if (empty($modSettings['paid_currency_symbol']))
-			fatal_lang_error('paid_not_set_currency', false, array($scripturl . '?action=admin;area=paidsubscribe;sa=settings'));
+			Errors::fatal_lang_error('paid_not_set_currency', false, array($scripturl . '?action=admin;area=paidsubscribe;sa=settings'));
 
 		// Some basic stuff.
 		$context['page_title'] = $txt['paid_subs_view'];
@@ -467,7 +467,7 @@ class ManagePaid_Controller extends Action_Controller
 
 				// There needs to be something.
 				if (empty($_POST['span_value']) || empty($_POST['cost']))
-					fatal_lang_error('paid_no_cost_value');
+					Errors::fatal_lang_error('paid_no_cost_value');
 			}
 			// Flexible is harder but more fun ;)
 			else
@@ -482,7 +482,7 @@ class ManagePaid_Controller extends Action_Controller
 				);
 
 				if (empty($_POST['cost_day']) && empty($_POST['cost_week']) && empty($_POST['cost_month']) && empty($_POST['cost_year']))
-					fatal_lang_error('paid_all_freq_blank');
+					Errors::fatal_lang_error('paid_all_freq_blank');
 			}
 			$cost = serialize($cost);
 
@@ -816,7 +816,7 @@ class ManagePaid_Controller extends Action_Controller
 			$context['sub_id'] = validateSubscriptionID($context['log_id']);
 
 		if (!isset($context['subscriptions'][$context['sub_id']]))
-			fatal_lang_error('no_access', false);
+			Errors::fatal_lang_error('no_access', false);
 
 		$context['current_subscription'] = $context['subscriptions'][$context['sub_id']];
 
@@ -843,10 +843,10 @@ class ManagePaid_Controller extends Action_Controller
 				$member = getMemberByName($_POST['name']);
 
 				if (empty($member))
-					fatal_lang_error('error_member_not_found');
+					Errors::fatal_lang_error('error_member_not_found');
 
 				if (alreadySubscribed($context['sub_id'], $member['id_member']))
-					fatal_lang_error('member_already_subscribed');
+					Errors::fatal_lang_error('member_already_subscribed');
 
 				// Actually put the subscription in place.
 				if ($status == 1)
@@ -954,7 +954,7 @@ class ManagePaid_Controller extends Action_Controller
 		{
 			$row = getPendingSubscriptions($context['log_id']);
 			if (empty($row))
-				fatal_lang_error('no_access', false);
+				Errors::fatal_lang_error('no_access', false);
 
 			// Any pending payments?
 			$context['pending_payments'] = array();

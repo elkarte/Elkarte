@@ -51,7 +51,7 @@ class AdminDebug_Controller extends Action_Controller
 
 		// We should have debug mode enabled, as well as something to display!
 		if ($db_show_debug !== true || !isset($_SESSION['debug']))
-			fatal_lang_error('no_access', false);
+			Errors::fatal_lang_error('no_access', false);
 
 		// Don't allow except for administrators.
 		isAllowedTo('admin_forum');
@@ -88,6 +88,6 @@ class AdminDebug_Controller extends Action_Controller
 	 */
 	public function action_viewadminfile()
 	{
-		fatal_lang_error('no_access', false);
+		Errors::fatal_lang_error('no_access', false);
 	}
 }

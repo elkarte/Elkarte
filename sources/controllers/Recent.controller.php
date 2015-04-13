@@ -87,7 +87,7 @@ class Recent_Controller extends Action_Controller
 				$name = categoryName($categories[0]);
 
 				if (empty($name))
-					fatal_lang_error('no_access', false);
+					Errors::fatal_lang_error('no_access', false);
 
 				$context['linktree'][] = array(
 					'url' => $scripturl . '#c' . $categories[0],
@@ -101,7 +101,7 @@ class Recent_Controller extends Action_Controller
 			$boards = array_keys($boards_posts);
 
 			if (empty($boards))
-				fatal_lang_error('error_no_boards_selected');
+				Errors::fatal_lang_error('error_no_boards_selected');
 
 			// The query for getting the messages
 			$this->_grabber->setBoards($boards);
@@ -125,7 +125,7 @@ class Recent_Controller extends Action_Controller
 			$boards = array_keys($boards_posts);
 
 			if (empty($boards))
-				fatal_lang_error('error_no_boards_selected');
+				Errors::fatal_lang_error('error_no_boards_selected');
 
 			// Build the query for finding the messages
 			$this->_grabber->setBoards($boards);

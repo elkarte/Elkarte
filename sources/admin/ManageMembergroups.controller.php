@@ -403,7 +403,7 @@ class ManageMembergroups_Controller extends Action_Controller
 
 					// Protected groups are... well, protected!
 					if ($copy_type['group_type'] == 1)
-						fatal_lang_error('membergroup_does_not_exist');
+						Errors::fatal_lang_error('membergroup_does_not_exist');
 				}
 
 				// Don't allow copying of a real priviledged person!
@@ -526,7 +526,7 @@ class ManageMembergroups_Controller extends Action_Controller
 
 		// Now, do we have a valid id?
 		if (!allowedTo('admin_forum') && !empty($current_group_id) && $current_group['group_type'] == 1)
-			fatal_lang_error('membergroup_does_not_exist', false);
+			Errors::fatal_lang_error('membergroup_does_not_exist', false);
 
 		// The delete this membergroup button was pressed.
 		if (isset($_POST['delete']))
@@ -535,7 +535,7 @@ class ManageMembergroups_Controller extends Action_Controller
 			validateToken('admin-mmg');
 
 			if (empty($current_group_id))
-				fatal_lang_error('membergroup_does_not_exist', false);
+				Errors::fatal_lang_error('membergroup_does_not_exist', false);
 
 			// Let's delete the group
 			deleteMembergroups($current_group['id_group']);
@@ -550,7 +550,7 @@ class ManageMembergroups_Controller extends Action_Controller
 			validateToken('admin-mmg');
 
 			if (empty($current_group_id))
-				fatal_lang_error('membergroup_does_not_exist', false);
+				Errors::fatal_lang_error('membergroup_does_not_exist', false);
 
 			$validator = new Data_Validator();
 
@@ -709,7 +709,7 @@ class ManageMembergroups_Controller extends Action_Controller
 		$row = membergroupById($current_group['id_group'], true);
 
 		if (empty($row) || (!allowedTo('admin_forum') && $row['group_type'] == 1))
-			fatal_lang_error('membergroup_does_not_exist', false);
+			Errors::fatal_lang_error('membergroup_does_not_exist', false);
 
 		$row['icons'] = explode('#', $row['icons']);
 

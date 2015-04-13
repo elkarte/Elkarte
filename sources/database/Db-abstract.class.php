@@ -74,7 +74,7 @@ abstract class Database_Abstract implements Database
 
 		// Connection gone???  This should *never* happen at this point, yet it does :'(
 		if (!$this->_validConnection($connection))
-			display_db_error();
+			Errors::display_db_error();
 
 		if ($matches[1] === 'db_prefix')
 			return $db_prefix;
@@ -207,7 +207,7 @@ abstract class Database_Abstract implements Database
 	protected function _array_combine($keys, $values)
 	{
 		$is_numeric = array_filter(array_keys($values), 'is_numeric');
-		
+
 		if (!empty($is_numeric))
 			return array_combine($keys, $values);
 		else
@@ -260,11 +260,11 @@ abstract class Database_Abstract implements Database
 
 		// Is always a critical error.
 		if (function_exists('log_error'))
-			log_error($log_message, 'critical', $file, $line);
+			Errors::log_error($log_message, 'critical', $file, $line);
 
 		if (function_exists('fatal_error'))
 		{
-			fatal_error($error_message, false);
+			Errors::fatal_error($error_message, false);
 
 			// Cannot continue...
 			exit;

@@ -2160,7 +2160,7 @@ function loadPersonalMessage($pm_id)
 	);
 	// Can only be a hacker here!
 	if ($db->num_rows($request) == 0)
-		fatal_lang_error('no_access', false);
+		Errors::fatal_lang_error('no_access', false);
 	$pm_details = $db->fetch_row($request);
 	$db->free_result($request);
 
