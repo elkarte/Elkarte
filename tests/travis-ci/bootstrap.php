@@ -55,7 +55,8 @@ require_once(SOURCEDIR . '/Security.php');
 require_once(SUBSDIR . '/Cache.subs.php');
 
 // Get the autoloader rolling
-spl_autoload_register('elk_autoloader');
+require(SOURCEDIR . '/Autoloader.class.php');
+Elk_Autoloader::getInstance()->setupAutoloader(array(SOURCEDIR, SUBSDIR, CONTROLLERDIR, ADMINDIR, ADDONSDIR));
 
 // Used by the test, add others as needed or ...
 $context = array();
