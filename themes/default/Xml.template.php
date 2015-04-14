@@ -542,7 +542,7 @@ function template_rdf()
  */
 function template_feedatom()
 {
-	global $context, $scripturl, $txt, $boardurl, $forum_version;
+	global $context, $scripturl, $txt, $boardurl;
 
 	echo '<?xml version="1.0" encoding="UTF-8"?' . '>
 	<feed xmlns="http://www.w3.org/2005/Atom">
@@ -554,7 +554,7 @@ function template_feedatom()
 
 		<updated>', gmstrftime('%Y-%m-%dT%H:%M:%SZ'), '</updated>
 		<subtitle><![CDATA[', strip_tags($txt['xml_rss_desc']), ']]></subtitle>
-		<generator uri="http://www.elkarte.net" version="', strtr($forum_version, array('ElkArte' => '')), '">ElkArte</generator>
+		<generator uri="http://www.elkarte.net" version="', strtr(FORUM_VERSION, array('ElkArte' => '')), '">ElkArte</generator>
 		<author>
 			<name>', strip_tags($context['forum_name']), '</name>
 		</author>';

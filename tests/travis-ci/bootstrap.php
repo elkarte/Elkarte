@@ -25,8 +25,8 @@ global $ssi_db_user, $ssi_db_passwd;
 // Done to allow the option to runInSeparateProcess for phpunit
 if (!defined('ELK'))
 {
-	DEFINE('ELK', 1);
-	DEFINE('CACHE_STALE', '?R11');
+	const ELK = '1';
+	const CACHE_STALE = '?R11';
 
 	// Get the forum's settings for database and file paths.
 	require_once('/var/www/Settings.php');

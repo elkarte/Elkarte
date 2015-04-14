@@ -1219,7 +1219,7 @@ function getHoliday($id_holiday)
  */
 function build_ical_content($event)
 {
-	global $forum_version, $webmaster_email, $mbname;
+	global $webmaster_email, $mbname;
 
 	// Check the title isn't too long - iCal requires some formatting if so.
 	$title = str_split($event['title'], 30);
@@ -1246,7 +1246,7 @@ function build_ical_content($event)
 	$filecontents = '';
 	$filecontents .= 'BEGIN:VCALENDAR' . "\n";
 	$filecontents .= 'METHOD:PUBLISH' . "\n";
-	$filecontents .= 'PRODID:-//ElkArteCommunity//ElkArte ' . (empty($forum_version) ? 2.0 : strtr($forum_version, array('ElkArte ' => ''))) . '//EN' . "\n";
+	$filecontents .= 'PRODID:-//ElkArteCommunity//ElkArte ' . (!defined(FORUM_VERSION) ? 2.0 : strtr(FORUM_VERSION, array('ElkArte ' => ''))) . '//EN' . "\n";
 	$filecontents .= 'VERSION:2.0' . "\n";
 	$filecontents .= 'BEGIN:VEVENT' . "\n";
 	$filecontents .= 'ORGANIZER;CN="' . $event['realname'] . '":MAILTO:' . $webmaster_email . "\n";
