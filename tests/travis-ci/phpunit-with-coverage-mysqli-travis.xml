@@ -42,6 +42,7 @@
   </filter>
 
   <php>
+      <const name="DBTYPE" value="MySQL"/>
       <const name="PHPUNIT_SELENIUM" value="true"/>
       <const name="PHPUNIT_TESTSUITE_EXTENSION_SELENIUM_HOST" value="127.0.0.1"/>
       <const name="PHPUNIT_TESTSUITE_EXTENSION_SELENIUM_PORT" value="4444"/>
