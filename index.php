@@ -21,15 +21,16 @@
 
 $time_start = microtime(true);
 
-$forum_version = 'ElkArte 1.0.3';
-define('FORUM_VERSION', $forum_version);
+// The software version
+const FORUM_VERSION = 'ElkArte 1.1';
 
 // First things first, but not necessarily in that order.
-define('ELK', 1);
+const ELK = '1';
 
 // Shortcut for the browser cache stale
-define('CACHE_STALE', '?103');
+const CACHE_STALE = '?R11';
 
+// Report errors but not depreciated ones
 error_reporting(E_ALL | E_STRICT & ~8192);
 
 // Directional only script time usage for display
@@ -91,9 +92,11 @@ require_once(SOURCEDIR . '/Load.php');
 require_once(SOURCEDIR . '/Security.php');
 require_once(SUBSDIR . '/Cache.subs.php');
 
+// Initialize the class Autoloader
 require(SOURCEDIR . '/Autoloader.class.php');
 Elk_Autoloader::getInstance()->setupAutoloader(array(SOURCEDIR, SUBSDIR, CONTROLLERDIR, ADMINDIR, ADDONSDIR));
 
+// Show lots of debug information below the page, not for producion sites
 if ($db_show_debug === true)
 	Debug::get()->rusage('start', $rusage_start);
 
