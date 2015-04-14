@@ -20,7 +20,7 @@ if (!defined('ELK'))
 	die('No access...');
 
 /**
- * PostgreSQL database class, implements database class to control mysql functions
+ * Abstract database class, implements database to control functions
  */
 abstract class Database_Abstract implements Database
 {

@@ -125,7 +125,7 @@ class PackageServers_Controller extends Action_Controller
 	 */
 	public function action_browse()
 	{
-		global $txt, $scripturl, $forum_version, $context;
+		global $txt, $scripturl, $context;
 
 		// Load our subs worker.
 		require_once(SUBSDIR . '/PackageServers.subs.php');
@@ -241,7 +241,7 @@ class PackageServers_Controller extends Action_Controller
 				$default_title = Util::htmlspecialchars($listing->fetch('default-website/@title'));
 		}
 
-		$the_version = strtr($forum_version, array('ElkArte ' => ''));
+		$the_version = strtr(FORUM_VERSION, array('ElkArte ' => ''));
 		if (!empty($_SESSION['version_emulate']))
 			$the_version = $_SESSION['version_emulate'];
 

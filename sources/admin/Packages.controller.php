@@ -1259,10 +1259,10 @@ class Packages_Controller extends Action_Controller
 	 */
 	public function action_browse()
 	{
-		global $txt, $scripturl, $context, $forum_version, $settings;
+		global $txt, $scripturl, $context, $settings;
 
 		$context['page_title'] .= ' - ' . $txt['browse_packages'];
-		$context['forum_version'] = $forum_version;
+		$context['forum_version'] = FORUM_VERSION;
 		$installed = $context['sub_action'] == 'installed' ? true : false;
 		$context['package_types'] = $installed ? array('modification') : array('modification', 'avatar', 'language', 'smiley', 'unknown');
 
@@ -2108,7 +2108,7 @@ class Packages_Controller extends Action_Controller
 	 */
 	public function list_packages($start, $items_per_page, $sort, $params, $installed)
 	{
-		global $scripturl, $context, $forum_version;
+		global $scripturl, $context;
 		static $instadds, $packages;
 
 		// Start things up
@@ -2119,14 +2119,14 @@ class Packages_Controller extends Action_Controller
 		if (!@is_writable(BOARDDIR . '/packages'))
 			create_chmod_control(array(BOARDDIR . '/packages'), array('destination_url' => $scripturl . '?action=admin;area=packages', 'crash_on_error' => true));
 
-		list ($the_brand, $the_version) = explode(' ', $forum_version, 2);
+		list ($the_brand, $the_version) = explode(' ', FORUM_VERSION, 2);
 
 		// Here we have a little code to help those who class themselves as something of gods, version emulation ;)
 		if (isset($_GET['version_emulate']) && strtr($_GET['version_emulate'], array($the_brand => '')) == $the_version)
 			unset($_SESSION['version_emulate']);
 		elseif (isset($_GET['version_emulate']))
 		{
-			if (($_GET['version_emulate'] === 0 || $_GET['version_emulate'] === $forum_version) && isset($_SESSION['version_emulate']))
+			if (($_GET['version_emulate'] === 0 || $_GET['version_emulate'] === FORUM_VERSION) && isset($_SESSION['version_emulate']))
 				unset($_SESSION['version_emulate']);
 			elseif ($_GET['version_emulate'] !== 0)
 				$_SESSION['version_emulate'] = strtr($_GET['version_emulate'], array('-' => ' ', '+' => ' ', $the_brand . ' ' => ''));

@@ -807,7 +807,7 @@ function packageRequireFTP($destination_url, $files = null, $return = false)
  */
 function parsePackageInfo(&$packageXML, $testing_only = true, $method = 'install', $previous_version = '')
 {
-	global $forum_version, $context, $temp_path, $language;
+	global $context, $temp_path, $language;
 
 	// Mayday!  That action doesn't exist!!
 	if (empty($packageXML) || !$packageXML->exists($method))
@@ -815,7 +815,7 @@ function parsePackageInfo(&$packageXML, $testing_only = true, $method = 'install
 
 	// We haven't found the package script yet...
 	$script = false;
-	$the_version = strtr($forum_version, array('ElkArte ' => ''));
+	$the_version = strtr(FORUM_VERSION, array('ElkArte ' => ''));
 
 	// Emulation support...
 	if (!empty($_SESSION['version_emulate']))
@@ -1256,7 +1256,6 @@ function parsePackageInfo(&$packageXML, $testing_only = true, $method = 'install
  */
 function matchHighestPackageVersion($versions, $reset = false, $the_version)
 {
-	global $forum_version;
 	static $near_version = 0;
 
 	if ($reset)
@@ -1266,7 +1265,7 @@ function matchHighestPackageVersion($versions, $reset = false, $the_version)
 	$versions = explode(',', str_replace(' ', '', strtolower($versions)));
 
 	// If it is not ElkArte, let's just give up
-	list ($the_brand,) = explode(' ', $forum_version, 2);
+	list ($the_brand,) = explode(' ', FORUM_VERSION, 2);
 	if ($the_brand != 'ElkArte')
 		return false;
 

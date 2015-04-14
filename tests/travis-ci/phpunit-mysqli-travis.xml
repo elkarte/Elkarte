@@ -15,7 +15,4 @@
           <directory>/var/www/tests</directory>
       </testsuite>
   </testsuites>
-  <php>
-      <const name="DB_TYPE" value="MySQL"/>
-  </php>
 </phpunit>
