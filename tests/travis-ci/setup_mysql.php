@@ -20,6 +20,9 @@ require_once(BOARDDIR . '/sources/database/Db-mysql.class.php');
 require_once(BOARDDIR . '/sources/database/DbTable.class.php');
 require_once(BOARDDIR . '/sources/database/DbTable-mysql.php');
 
+$setup = new Elk_Testing_mysql();
+$setup->init();
+
 /**
  * Sets up a Database_MySQL object
  */
@@ -59,6 +62,7 @@ class DbTable_MySQL_Install extends DbTable_MySQL
 	{
 		if (is_null(self::$_tbl_inst))
 			self::$_tbl_inst = new DbTable_MySQL_Install($db);
+
 		return self::$_tbl_inst;
 	}
 }
@@ -79,6 +83,8 @@ Class Elk_Testing_mysql extends Elk_Testing_Setup
 		$this->_db_user = 'root';
 		$this->_db_passwd = '';
 		$db_prefix = $this->_db_prefix = 'elkarte_';
+
+		// Initialize the db and connection
 		Database_MySQL::initiate($this->_db_server, $this->_db_name, $this->_db_user, $this->_db_passwd, $this->_db_prefix);
 		$this->_db = Database_MySQL::db();
 		$this->_db_table = DbTable_MySQL_Install::db_table($this->_db);
@@ -91,6 +97,3 @@ Class Elk_Testing_mysql extends Elk_Testing_Setup
 		$this->prepare();
 	}
 }
-
-$setup = new Elk_Testing_mysql();
-$setup->init();
