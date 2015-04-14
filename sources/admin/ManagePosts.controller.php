@@ -227,7 +227,7 @@ class ManagePosts_Controller extends Action_Controller
 	 */
 	public function action_postSettings_display()
 	{
-		global $context, $txt, $modSettings, $scripturl, $db_type;
+		global $context, $txt, $modSettings, $scripturl;
 
 		// Initialize the form
 		$this->_initPostSettingsForm();
@@ -244,7 +244,7 @@ class ManagePosts_Controller extends Action_Controller
 			checkSession();
 
 			// If we're changing the message length (and we are using MySQL) let's check the column is big enough.
-			if (isset($_POST['max_messageLength']) && $_POST['max_messageLength'] != $modSettings['max_messageLength'] && $db_type == 'mysql')
+			if (isset($_POST['max_messageLength']) && $_POST['max_messageLength'] != $modSettings['max_messageLength'] && DB_TYPE === 'MySQL')
 			{
 				require_once(SUBSDIR . '/Maintenance.subs.php');
 				$colData = getMessageTableColumns();

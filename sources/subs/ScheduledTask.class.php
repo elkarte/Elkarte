@@ -256,7 +256,7 @@ class Scheduled_Task
 	 */
 	public function daily_maintenance()
 	{
-		global $modSettings, $db_type;
+		global $modSettings;
 
 		$db = database();
 
@@ -325,7 +325,7 @@ class Scheduled_Task
 
 		// Check the database version - for some buggy MySQL version.
 		$server_version = $db->db_server_info();
-		if ($db_type == 'mysql' && in_array(substr($server_version, 0, 6), array('5.0.50', '5.0.51')))
+		if (DB_TYPE == 'MySQL' && in_array(substr($server_version, 0, 6), array('5.0.50', '5.0.51')))
 			updateSettings(array('db_mysql_group_by_fix' => '1'));
 		elseif (!empty($modSettings['db_mysql_group_by_fix']))
 			$db->query('', '
