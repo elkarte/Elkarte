@@ -403,14 +403,14 @@ class ManagePermissions_Controller extends Action_Controller
 							'class' => 'grid17',
 						),
 						'data' => array(
-							'function' => create_function('$rowData', '
+							'function' => function($rowData) {
 								global $scripturl, $txt;
 
-								if ($rowData[\'id_parent\'] == -2)
-										return \'<a href="\' . $scripturl . \'?action=admin;area=permissions;sa=modify;group=\' . $rowData[\'id_group\'] . (isset($_REQUEST[\'pid\']) ? \';pid=\' . $_REQUEST[\'pid\'] : \'\') . \'">\' . $txt[\'membergroups_modify\'] . \'</a>\';
+								if ($rowData['id_parent'] == -2)
+										return '<a href="' . $scripturl . '?action=admin;area=permissions;sa=modify;group=' . $rowData['id_group'] . (isset($_REQUEST['pid']) ? ';pid=' . $_REQUEST['pid'] : '') . '">' . $txt['membergroups_modify'] . '</a>';
 									else
-										return \'<span class="smalltext">\' . $txt[\'permissions_includes_inherited_from\'] . \'&quot;\' .  $rowData[\'parent_name\'] . \'&quot;\' . \'</span><br /><a href="\' . $scripturl . \'?action=admin;area=permissions;sa=modify;group=\' . $rowData[\'id_parent\'] . (isset($_REQUEST[\'pid\']) ? \';pid=\' . $_REQUEST[\'pid\'] : \'\') . \'">\' . $txt[\'membergroups_modify_parent\'] . \'</a>\';
-							'),
+										return '<span class="smalltext">' . $txt['permissions_includes_inherited_from'] . '&quot;' .  $rowData['parent_name'] . '&quot;</span><br /><a href="' . $scripturl . '?action=admin;area=permissions;sa=modify;group=' . $rowData['id_parent'] . (isset($_REQUEST['pid']) ? ';pid=' . $_REQUEST['pid'] : '') . '">' . $txt['membergroups_modify_parent'] . '</a>';
+							}
 						),
 					),
 					'check' => array(
