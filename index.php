@@ -91,8 +91,8 @@ require_once(SOURCEDIR . '/Load.php');
 require_once(SOURCEDIR . '/Security.php');
 require_once(SUBSDIR . '/Cache.subs.php');
 
-// The class autoloader
-spl_autoload_register('elk_autoloader');
+require(SOURCEDIR . '/Autoloader.class.php');
+Elk_Autoloader::getInstance()->setupAutoloader(array(SOURCEDIR, SUBSDIR, CONTROLLERDIR, ADMINDIR, ADDONSDIR));
 
 if ($db_show_debug === true)
 	Debug::get()->rusage('start', $rusage_start);

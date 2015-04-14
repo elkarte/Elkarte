@@ -171,16 +171,22 @@ Class Elk_Testing_Setup
 		global $ssi_db_user, $scripturl, $ssi_db_passwd, $db_passwd;
 		global $sourcedir, $boarddir;
 
-		define('SUBSDIR', BOARDDIR . '/sources/subs');
-		define('EXTDIR', BOARDDIR . '/sources/ext');
+		DEFINE('SUBSDIR', BOARDDIR . '/sources/subs');
+		DEFINE('EXTDIR', BOARDDIR . '/sources/ext');
+		DEFINE('SOURCEDIR', BOARDDIR . '/sources');
+		DEFINE('LANGUAGEDIR', BOARDDIR . '/themes/default/languages');
+		DEFINE('ADMINDIR', SOURCEDIR . '/admin');
+		DEFINE('CONTROLLERDIR', SOURCEDIR . '/controllers');
+		DEFINE('ADDONSDIR', SOURCEDIR . '/addons');
 
 		require_once(BOARDDIR . '/Settings.php');
-		require_once(BOARDDIR . '/sources/Subs.php');
-		require_once(BOARDDIR . '/sources/Load.php');
+		require_once(SOURCEDIR . '/Subs.php');
+		require_once(SOURCEDIR . '/Load.php');
 		require_once(SUBSDIR . '/Util.class.php');
 		require_once(SUBSDIR . '/Auth.subs.php');
 
-		spl_autoload_register('elk_autoloader');
+		require(SOURCEDIR . '/Autoloader.class.php');
+		Elk_Autoloader::getInstance()->setupAutoloader(array(SOURCEDIR, SUBSDIR, CONTROLLERDIR, ADMINDIR, ADDONSDIR));
 
 		$settings['theme_dir'] = $settings['default_theme_dir'] = BOARDDIR . '/Themes/default';
 		$settings['theme_url'] = $settings['default_theme_url'] = $boardurl . '/themes/default';
