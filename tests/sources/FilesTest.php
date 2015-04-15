@@ -45,8 +45,8 @@ class TestFiles extends PHPUnit_Framework_TestCase
 			'defaulttheme' => BOARDDIR . '/themes/default/*.php',
 		);
 
-		// These create constants (when evaled) which are already defined (notice error)
-		$skip_files = array(SOURCEDIR . '/database/Db-mysql.class.php',  SOURCEDIR . '/database/Db-postgresql.class.php', BOARDDIR . '/index.php');
+		// Provide a way to skip eval of files where needed
+		$skip_files = array(BOARDDIR . '/index.php');
 
 		foreach ($dirs as $dir)
 		{
