@@ -46,7 +46,7 @@ class TestFiles extends PHPUnit_Framework_TestCase
 		);
 
 		// These create constants (when evaled) which are already defined (notice error)
-		$skip_files = array('Db-mysql.class.php', 'Db-postgresql.class.php');
+		$skip_files = array(SOURCEDIR . '/database/Db-mysql.class.php',  SOURCEDIR . '/database/Db-postgresql.class.php', BOARDDIR . '/index.php');
 
 		foreach ($dirs as $dir)
 		{
@@ -54,10 +54,6 @@ class TestFiles extends PHPUnit_Framework_TestCase
 
 			foreach ($files as $file)
 			{
-				// Skipping the eval of this one?
-				if (in_array($file, $skip_files))
-					continue;
-
 				$file_content = file_get_contents($file);
 
 				// This is likely to be one of the two files emailpost.php or emailtopic.php
@@ -77,7 +73,8 @@ class TestFiles extends PHPUnit_Framework_TestCase
 
 				if (!empty($level))
 					$this->assertTrue($syntax_valid, empty($level));
-				else
+				// Skipping the eval of this one?
+				elseif (!in_array($file, $skip_files))
 				{
 					// Check the validity of the syntax.
 					ob_start();
@@ -97,7 +94,7 @@ class TestFiles extends PHPUnit_Framework_TestCase
 					{
 						$error = error_get_last();
 						$error_message = $error['message'] . ' at [' . $file . ' line ' . ($error['line'] - 3) . ']' . "\n";
-						print_r($error);
+						print_r($error_message);
 					}
 					else
 						$error_message = '';
