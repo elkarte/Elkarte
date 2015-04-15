@@ -23,6 +23,7 @@ global $boarddir, $sourcedir;
 global $ssi_db_user, $ssi_db_passwd;
 
 // Done to allow the option to runInSeparateProcess for phpunit
+// as done in Auth.subs.Test
 if (!defined('ELK'))
 {
 	DEFINE('ELK', '1');

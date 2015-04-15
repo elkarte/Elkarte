@@ -22,7 +22,8 @@ if (!defined('ELK'))
 	die('No access...');
 
 // Let's define the name of the class so that we will be able to use it in the instantiations
-const DB_TYPE = 'MySQL';
+if (!defined('DB_TYPE'))
+	define('DB_TYPE', 'MySQL');
 
 /**
  * SQL database class, implements database class to control mysql functions
