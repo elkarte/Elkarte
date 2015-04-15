@@ -162,13 +162,13 @@ class ManageMaillist_Controller extends Action_Controller
 						'value' => $txt['error'],
 					),
 					'data' => array(
-						'function' => create_function('$rowData', '
-							$error = $rowData[\'error_code\'];
-							if ($error === \'error_pm_not_found\')
-								return \'<span class="errorbox">\' . $rowData[\'error\'] . \'<span>\';
+						'function' => function($rowData) {
+							$error = $rowData['error_code'];
+							if ($error === 'error_pm_not_found')
+								return '<span class="errorbox">' . $rowData['error'] . '<span>';
 							else
-								return $rowData[\'error\'];
-						'),
+								return $rowData['error'];
+						},
 					),
 					'sort' => array(
 						'default' => 'error ',
@@ -262,25 +262,26 @@ class ManageMaillist_Controller extends Action_Controller
 						'value' => $txt['message_action'],
 					),
 					'data' => array(
-						'function' => create_function('$rowData', '
+						'function' => function($rowData) {
 							global $context, $txt, $settings;
 
-							$id = $rowData[\'id_email\'] . \';\';
+							$id = $rowData['id_email'] . ';';
 							$commands = array();
+							$security = $context['session_var'] . '=' . $context['session_id'] . ';' . $context['admin-ml_token_var'] . '=' . $context['admin-ml_token'];
 
-							if ($rowData[\'error_code\'] === \'error_pm_not_found\')
-								$commands[] = \'<a href="?action=admin;area=maillist;sa=approve;item=\' . $id . $context[\'session_var\'] . \'=\' . $context[\'session_id\'] . \';\' . $context[\'admin-ml_token_var\'] . \'=\' . $context[\'admin-ml_token\'] . \'" onclick="return confirm(\' . JavaScriptEscape($txt[\'pm_approve_warning\']) . \') && submitThisOnce(this);"><img title="\' . $txt[\'approve\'] . \'" src="\' . $settings[\'images_url\'] . \'/icons/field_valid.png" alt="*" /></a>&nbsp;\';
+							if ($rowData['error_code'] === 'error_pm_not_found')
+								$commands[] = '<a href="?action=admin;area=maillist;sa=approve;item=' . $id . $security . '" onclick="return confirm(' . JavaScriptEscape($txt['pm_approve_warning']) . ') && submitThisOnce(this);"><img title="' . $txt['approve'] . '" src="' . $settings['images_url'] . '/icons/field_valid.png" alt="*" /></a>&nbsp;';
 							else
-								$commands[] = \'<a href="?action=admin;area=maillist;sa=approve;item=\' . $id . $context[\'session_var\'] . \'=\' . $context[\'session_id\'] . \';\' . $context[\'admin-ml_token_var\'] . \'=\' . $context[\'admin-ml_token\'] . \'"><img title="\' . $txt[\'approve\'] . \'" src="\' . $settings[\'images_url\'] . \'/icons/field_valid.png" alt="*" /></a>&nbsp;\';
+								$commands[] = '<a href="?action=admin;area=maillist;sa=approve;item=' . $id . $security . '"><img title="' . $txt['approve'] . '" src="' . $settings['images_url'] . '/icons/field_valid.png" alt="*" /></a>&nbsp;';
 
-							$commands[] = \'<a href="?action=admin;area=maillist;sa=delete;item=\' . $id . $context[\'session_var\'] . \'=\' . $context[\'session_id\'] . \';\' . $context[\'admin-ml_token_var\'] . \'=\' . $context[\'admin-ml_token\'] . \'" onclick="return confirm(\' . JavaScriptEscape($txt[\'delete_warning\']) . \') && submitThisOnce(this);" accesskey="d"><img title="\' . $txt[\'delete\'] . \'" src="\' . $settings[\'images_url\'] . \'/icons/quick_remove.png" alt="*" /></a><br />\';
-							$commands[] = \'<a href="?action=admin;area=maillist;sa=bounce;item=\' . $id . $context[\'session_var\'] . \'=\' . $context[\'session_id\'] . \';\' . $context[\'admin-ml_token_var\'] . \'=\' . $context[\'admin-ml_token\'] . \'"><img title="\' . $txt[\'bounce\'] . \'" src="\' . $settings[\'images_url\'] . \'/icons/pm_replied.png" alt="*" /></a>&nbsp;\';
-							$commands[] = \'<a href="?action=admin;area=maillist;sa=view;item=\' . $id . $context[\'session_var\'] . \'=\' . $context[\'session_id\'] . \';\' . $context[\'admin-ml_token_var\'] . \'=\' . $context[\'admin-ml_token\'] . \'"><img title="\' . $txt[\'view\'] . \'" src="\' . $settings[\'images_url\'] . \'/icons/pm_read.png" alt="*" /></a>\';
+							$commands[] = '<a href="?action=admin;area=maillist;sa=delete;item=' . $id . $security . '" onclick="return confirm(' . JavaScriptEscape($txt['delete_warning']) . ') && submitThisOnce(this);" accesskey="d"><img title="' . $txt['delete'] . '" src="' . $settings['images_url'] . '/icons/quick_remove.png" alt="*" /></a><br />';
+							$commands[] = '<a href="?action=admin;area=maillist;sa=bounce;item=' . $id . $security . '"><img title="' . $txt['bounce'] . '" src="' . $settings['images_url'] . '/icons/pm_replied.png" alt="*" /></a>&nbsp;';
+							$commands[] = '<a href="?action=admin;area=maillist;sa=view;item=' . $id . $security . '"><img title="' . $txt['view'] . '" src="' . $settings['images_url'] . '/icons/pm_read.png" alt="*" /></a>';
 
-							return implode(\'\', $commands);'
-						),
-						'class' => 'listaction',
+							return implode('', $commands);
+						},
 					),
+					'class' => 'listaction',
 				),
 			),
 			'form' => array(
