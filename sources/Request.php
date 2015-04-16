@@ -314,6 +314,10 @@ class Request
 	 */
 	private function _checkTopic()
 	{
+		// Look for threadid, old YaBB SE links have those. Just read it as a topic.
+		if (isset($_REQUEST['threadid']) && !isset($_REQUEST['topic']))
+			$_REQUEST['topic'] = $_REQUEST['threadid'];
+		
 		if (isset($_REQUEST['topic']))
 		{
 			// Make sure it's a string (not an array, say)
