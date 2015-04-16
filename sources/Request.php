@@ -57,6 +57,24 @@ class Request
 	private $_server_software;
 
 	/**
+	 * This is the pattern of a local (or unknown) IP address in both IPv4 and IPv6
+	 * @var string
+	 */
+	private $_local_ip_pattern = '((0|10|172\.(1[6-9]|2[0-9]|3[01])|192\.168|255|127)\.|unknown|::1|fe80::|fc00::)';
+
+	/**
+	 * Local copy of the server query string
+	 * @var string
+	 */
+	private $_server_query_string;
+
+	/**
+	 * Creats gloval and used internal
+	 * @var string
+	 */
+	private $_scripturl;
+
+	/**
 	 * Sole private Request instance
 	 * @var Request
 	 */
@@ -119,72 +137,11 @@ class Request
 	 */
 	private function __construct()
 	{
-		// This is the pattern of a local (or unknown) IP address in both IPv4 and IPv6
-		$local_ip_pattern = '((0|10|172\.(1[6-9]|2[0-9]|3[01])|192\.168|255|127)\.|unknown|::1|fe80::|fc00::)';
-
 		// Client IP: REMOTE_ADDR, unless missing
-		if (!isset($_SERVER['REMOTE_ADDR']))
-		{
-			// Command line, or else.
-			$this->_client_ip = '';
-		}
-		// Perhaps we have a IPv6 address.
-		elseif (!isValidIPv6($_SERVER['REMOTE_ADDR']) || preg_match('~::ffff:\d+\.\d+\.\d+\.\d+~', $_SERVER['REMOTE_ADDR']) !== 0)
-		{
-			$this->_client_ip = preg_replace('~^::ffff:(\d+\.\d+\.\d+\.\d+)~', '\1', $_SERVER['REMOTE_ADDR']);
-
-			// Just incase we have a legacy IPv4 address.
-			// @ TODO: Convert to IPv6.
-			if (filter_var($this->_client_ip, FILTER_VALIDATE_IP, FILTER_FLAG_IPV4) === false)
-				$this->_client_ip = 'unknown';
-		}
-		else
-			$this->_client_ip = $_SERVER['REMOTE_ADDR'];
+		$this->_getClientIP();
 
 		// Second IP, guesswork it is, try to get the best IP we can, when using proxies or such
-		$this->_ban_ip = $this->_client_ip;
-
-		// Forwarded, maybe?
-		if (!empty($_SERVER['HTTP_X_FORWARDED_FOR']) && !empty($_SERVER['HTTP_CLIENT_IP']) && (preg_match('~^' . $local_ip_pattern . '~', $_SERVER['HTTP_CLIENT_IP']) == 0 || preg_match('~^' . $local_ip_pattern . '~', $this->_client_ip) != 0))
-		{
-			// check the first forwarded for as the block - only switch if it's better that way.
-			if (strtok($_SERVER['HTTP_X_FORWARDED_FOR'], '.') != strtok($_SERVER['HTTP_CLIENT_IP'], '.') && '.' . strtok($_SERVER['HTTP_X_FORWARDED_FOR'], '.') == strrchr($_SERVER['HTTP_CLIENT_IP'], '.') && (preg_match('~^((0|10|172\.(1[6-9]|2[0-9]|3[01])|192\.168|255|127)\.|unknown)~', $_SERVER['HTTP_X_FORWARDED_FOR']) == 0 || preg_match('~^((0|10|172\.(1[6-9]|2[0-9]|3[01])|192\.168|255|127)\.|unknown)~', $this->_client_ip) != 0))
-				$this->_ban_ip = implode('.', array_reverse(explode('.', $_SERVER['HTTP_CLIENT_IP'])));
-			else
-				$this->_ban_ip = $_SERVER['HTTP_CLIENT_IP'];
-		}
-
-		if (!empty($_SERVER['HTTP_CLIENT_IP']) && (preg_match('~^' . $local_ip_pattern . '~', $_SERVER['HTTP_CLIENT_IP']) == 0 || preg_match('~^' . $local_ip_pattern . '~', $this->_client_ip) != 0))
-		{
-			// Since they are in different blocks, it's probably reversed.
-			if (strtok($this->_client_ip, '.') != strtok($_SERVER['HTTP_CLIENT_IP'], '.'))
-				$this->_ban_ip = implode('.', array_reverse(explode('.', $_SERVER['HTTP_CLIENT_IP'])));
-			else
-				$this->_ban_ip = $_SERVER['HTTP_CLIENT_IP'];
-		}
-		elseif (!empty($_SERVER['HTTP_X_FORWARDED_FOR']))
-		{
-			// If there are commas, get the last one.. probably.
-			if (strpos($_SERVER['HTTP_X_FORWARDED_FOR'], ',') !== false)
-			{
-				$ips = array_reverse(explode(', ', $_SERVER['HTTP_X_FORWARDED_FOR']));
-
-				// Go through each IP...
-				foreach ($ips as $i => $ip)
-				{
-					// Make sure it's in a valid range...
-					if (preg_match('~^' . $local_ip_pattern . '~', $ip) != 0 && preg_match('~^' . $local_ip_pattern . '~', $this->_client_ip) == 0)
-						continue;
-
-					// Otherwise, we've got an IP!
-					$this->_ban_ip = trim($ip);
-					break;
-				}
-			}
-			// Otherwise just use the only one.
-			elseif (preg_match('~^' . $local_ip_pattern . '~', $_SERVER['HTTP_X_FORWARDED_FOR']) == 0 || preg_match('~^' . $local_ip_pattern . '~', $this->_client_ip) != 0)
-				$this->_ban_ip = $_SERVER['HTTP_X_FORWARDED_FOR'];
-		}
+		$this->_getBanIP();
 
 		// Some final checking.
 		if (filter_var($this->_ban_ip, FILTER_VALIDATE_IP, FILTER_FLAG_IPV4) === false && !isValidIPv6($this->_ban_ip))
@@ -210,6 +167,84 @@ class Request
 	}
 
 	/**
+	 * Finds the claimed client IP for this connection
+	 */
+	private function _getClientIP()
+	{
+		// Client IP: REMOTE_ADDR, unless missing
+		if (!isset($_SERVER['REMOTE_ADDR']))
+		{
+			// Command line, or else.
+			$this->_client_ip = '';
+		}
+		// Perhaps we have a IPv6 address.
+		elseif (!isValidIPv6($_SERVER['REMOTE_ADDR']) || preg_match('~::ffff:\d+\.\d+\.\d+\.\d+~', $_SERVER['REMOTE_ADDR']) !== 0)
+		{
+			$this->_client_ip = preg_replace('~^::ffff:(\d+\.\d+\.\d+\.\d+)~', '\1', $_SERVER['REMOTE_ADDR']);
+
+			// Just incase we have a legacy IPv4 address.
+			// @ TODO: Convert to IPv6.
+			if (filter_var($this->_client_ip, FILTER_VALIDATE_IP, FILTER_FLAG_IPV4) === false)
+				$this->_client_ip = 'unknown';
+		}
+		else
+			$this->_client_ip = $_SERVER['REMOTE_ADDR'];
+	}
+
+	/**
+	 * Hunts in most request areas for connection IP's for use in banning
+	 */
+	private function _getBanIP()
+	{
+		// Start off the same as the client ip
+		$this->_ban_ip = $this->_client_ip;
+
+		// Forwarded, maybe?
+		if (!empty($_SERVER['HTTP_X_FORWARDED_FOR']) && !empty($_SERVER['HTTP_CLIENT_IP']) && (preg_match('~^' . $this->_local_ip_pattern . '~', $_SERVER['HTTP_CLIENT_IP']) == 0 || preg_match('~^' . $this->_local_ip_pattern . '~', $this->_client_ip) != 0))
+		{
+			// Check the first forwarded for as the block - only switch if it's better that way.
+			if (strtok($_SERVER['HTTP_X_FORWARDED_FOR'], '.') != strtok($_SERVER['HTTP_CLIENT_IP'], '.')
+					&& '.' . strtok($_SERVER['HTTP_X_FORWARDED_FOR'], '.') == strrchr($_SERVER['HTTP_CLIENT_IP'], '.')
+					&& (preg_match('~^((0|10|172\.(1[6-9]|2[0-9]|3[01])|192\.168|255|127)\.|unknown)~', $_SERVER['HTTP_X_FORWARDED_FOR']) == 0 || preg_match('~^((0|10|172\.(1[6-9]|2[0-9]|3[01])|192\.168|255|127)\.|unknown)~', $this->_client_ip) != 0))
+				$this->_ban_ip = implode('.', array_reverse(explode('.', $_SERVER['HTTP_CLIENT_IP'])));
+			else
+				$this->_ban_ip = $_SERVER['HTTP_CLIENT_IP'];
+		}
+
+		if (!empty($_SERVER['HTTP_CLIENT_IP']) && (preg_match('~^' . $this->_local_ip_pattern . '~', $_SERVER['HTTP_CLIENT_IP']) == 0 || preg_match('~^' . $this->_local_ip_pattern . '~', $this->_client_ip) != 0))
+		{
+			// Since they are in different blocks, it's probably reversed.
+			if (strtok($this->_client_ip, '.') != strtok($_SERVER['HTTP_CLIENT_IP'], '.'))
+				$this->_ban_ip = implode('.', array_reverse(explode('.', $_SERVER['HTTP_CLIENT_IP'])));
+			else
+				$this->_ban_ip = $_SERVER['HTTP_CLIENT_IP'];
+		}
+		elseif (!empty($_SERVER['HTTP_X_FORWARDED_FOR']))
+		{
+			// If there are commas, get the last one.. probably.
+			if (strpos($_SERVER['HTTP_X_FORWARDED_FOR'], ',') !== false)
+			{
+				$ips = array_reverse(explode(', ', $_SERVER['HTTP_X_FORWARDED_FOR']));
+
+				// Go through each IP...
+				foreach ($ips as $i => $ip)
+				{
+					// Make sure it's in a valid range...
+					if (preg_match('~^' . $this->_local_ip_pattern . '~', $ip) != 0 && preg_match('~^' . $this->_local_ip_pattern . '~', $this->_client_ip) == 0)
+						continue;
+
+					// Otherwise, we've got an IP!
+					$this->_ban_ip = trim($ip);
+					break;
+				}
+			}
+			// Otherwise just use the only one.
+			elseif (preg_match('~^' . $this->_local_ip_pattern . '~', $_SERVER['HTTP_X_FORWARDED_FOR']) == 0 || preg_match('~^' . $this->_local_ip_pattern . '~', $this->_client_ip) != 0)
+				$this->_ban_ip = $_SERVER['HTTP_X_FORWARDED_FOR'];
+		}
+	}
+
+	/**
 	 * Parse the $_REQUEST, for always necessary data, such as 'action', 'board', 'topic', 'start'.
 	 * Also figures out if this is an xml request.
 	 */
@@ -217,10 +252,35 @@ class Request
 	{
 		global $board, $topic;
 
-		// Parse the request for our dear globals, I know
-		// they're in there somewhere...
+		// Parse the request for our dear globals, I know they're in there somewhere...
 
 		// Look for $board first
+		$board = $this->_checkBoard();
+
+		// Look for $topic
+		$topic = $this->_checkTopic();
+
+		// There should be a $_REQUEST['start'], some at least.  If you need to default to other than 0, use $_GET['start'].
+		if (empty($_REQUEST['start']) || $_REQUEST['start'] < 0 || (int) $_REQUEST['start'] > 2147473647)
+			$_REQUEST['start'] = 0;
+
+		// The action needs to be a string, too.
+		if (isset($_REQUEST['action']))
+			$_REQUEST['action'] = (string) $_REQUEST['action'];
+
+		if (isset($_GET['action']))
+			$_GET['action'] = (string) $_GET['action'];
+
+		$this->_xml = (isset($_SERVER['X_REQUESTED_WITH']) && $_SERVER['X_REQUESTED_WITH'] == 'XMLHttpRequest') || isset($_REQUEST['xml']);
+	}
+
+	/**
+	 * Finds and returns the board numeric if its been requested
+	 *
+	 * - helper function for parseRequest
+	 */
+	private function _checkBoard()
+	{
 		if (isset($_REQUEST['board']))
 		{
 			// Make sure it's a string (not an array, say)
@@ -244,11 +304,16 @@ class Request
 		else
 			$board = 0;
 
-		// Look for threadid, old YaBB SE links have those. Just read it as a topic.
-		if (isset($_REQUEST['threadid']) && !isset($_REQUEST['topic']))
-			$_REQUEST['topic'] = $_REQUEST['threadid'];
+		return $board;
+	}
 
-		// Look for $topic
+	/**
+	 * Finds and returns the topic numeric if its been requested
+	 *
+	 * helper function for parseRequest
+	 */
+	private function _checkTopic()
+	{
 		if (isset($_REQUEST['topic']))
 		{
 			// Make sure it's a string (not an array, say)
@@ -263,6 +328,7 @@ class Request
 
 			// $topic and $_REQUEST['start'] are numbers, numbers I say.
 			$topic = (int) $_REQUEST['topic'];
+
 			// @todo in Display $_REQUEST['start'] is not always a number
 			$_REQUEST['start'] = isset($_REQUEST['start']) && preg_match('~^(:?(:?from|msg)?\d+|new)$~', $_REQUEST['start']) ? $_REQUEST['start'] : 0;
 
@@ -273,18 +339,184 @@ class Request
 		else
 			$topic = 0;
 
-		// There should be a $_REQUEST['start'], some at least.  If you need to default to other than 0, use $_GET['start'].
-		if (empty($_REQUEST['start']) || $_REQUEST['start'] < 0 || (int) $_REQUEST['start'] > 2147473647)
-			$_REQUEST['start'] = 0;
+		return $topic;
+	}
 
-		// The action needs to be a string, too.
-		if (isset($_REQUEST['action']))
-			$_REQUEST['action'] = (string) $_REQUEST['action'];
+	/**
+	 * Clean the request variables - add html entities to GET and slashes if magic_quotes_gpc is Off.
+	 *
+	 * What it does:
+	 * - cleans the request variables (ENV, GET, POST, COOKIE, SERVER) and
+	 *   makes sure the query string was parsed correctly.
+	 * - handles the URLs passed by the queryless URLs option.
+	 * - makes sure, regardless of php.ini, everything has slashes.
+	 * - use with ->parseRequest() to clean and set up variables like $board or $_REQUEST['start'].
+	 * - uses Request to try to determine client IPs for the current request.
+	 */
+	public function cleanRequest()
+	{
+		global $boardurl, $scripturl;
 
-		if (isset($_GET['action']))
-			$_GET['action'] = (string) $_GET['action'];
+		// Makes it easier to refer to things this way.
+		$scripturl = $boardurl . '/index.php';
+		$this->_scripturl = $scripturl;
 
-		$this->_xml = (isset($_SERVER['X_REQUESTED_WITH']) && $_SERVER['X_REQUESTED_WITH'] == 'XMLHttpRequest') || isset($_REQUEST['xml']);
+		// Live to die another day
+		$this->_checkExit();
+
+		// Process server_query_string as needed
+		$this->_cleanArg();
+
+		// Process request_uri
+		$this->_cleanRequest();
+
+		// Add entities to GET.  This is kinda like the slashes on everything else.
+		$_GET = htmlspecialchars__recursive($_GET);
+
+		// Let's not depend on the ini settings... why even have COOKIE in there, anyway?
+		$_REQUEST = $_POST + $_GET;
+
+		// Make sure REMOTE_ADDR, other IPs, and the like are parsed
+		// Parse the $_REQUEST and make sure things like board, topic don't have weird stuff
+		$this->parseRequest();
+
+		// Make sure we know the URL of the current request.
+		if (empty($_SERVER['REQUEST_URI']))
+			$_SERVER['REQUEST_URL'] = $this->_scripturl . (!empty($this->_server_query_string) ? '?' . $this->_server_query_string : '');
+		elseif (preg_match('~^([^/]+//[^/]+)~', $this->_scripturl, $match) == 1)
+			$_SERVER['REQUEST_URL'] = $match[1] . $_SERVER['REQUEST_URI'];
+		else
+			$_SERVER['REQUEST_URL'] = $_SERVER['REQUEST_URI'];
+	}
+
+	/**
+	 * Checks the request and abrubly stops processing if issues are found
+	 *
+	 * - No magic quotes allowed
+	 * - Don't try to set a GLOBLAS key in globals
+	 * - No numeric keys in $_GET, $_POST or $_FILE
+	 * - No URL's appended to the query string
+	 */
+	private function _checkExit()
+	{
+		// Reject magic_quotes_sybase='on'.
+		if (ini_get('magic_quotes_sybase') || strtolower(ini_get('magic_quotes_sybase')) == 'on')
+			Errors::fatal_error('magic_quotes_sybase=on was detected: your host is using an unsecure PHP configuration, deprecated and removed in current versions. Please upgrade PHP.', false);
+
+		// Reject magic_quotes_gpc='on'.
+		if (function_exists('get_magic_quotes_gpc') && get_magic_quotes_gpc() != 0)
+			Errors::fatal_error('magic_quotes_gpc=on was detected: your host is using an unsecure PHP configuration, deprecated and removed in current versions. Please upgrade PHP.', false);
+
+		// Save some memory.. (since we don't use these anyway.)
+		unset($GLOBALS['HTTP_POST_VARS'], $GLOBALS['HTTP_POST_VARS']);
+		unset($GLOBALS['HTTP_POST_FILES'], $GLOBALS['HTTP_POST_FILES']);
+
+		// These keys shouldn't be set...ever.
+		if (isset($_REQUEST['GLOBALS']) || isset($_COOKIE['GLOBALS']))
+			Errors::fatal_error('Invalid request variable.', false);
+
+		// Same goes for numeric keys.
+		foreach (array_merge(array_keys($_POST), array_keys($_GET), array_keys($_FILES)) as $key)
+		{
+			if (is_numeric($key))
+				Errors::fatal_error('Numeric request keys are invalid.', false);
+		}
+
+		// Numeric keys in cookies are less of a problem. Just unset those.
+		foreach ($_COOKIE as $key => $value)
+		{
+			if (is_numeric($key))
+				unset($_COOKIE[$key]);
+		}
+
+		// Get the correct query string.  It may be in an environment variable...
+		if (!isset($_SERVER['QUERY_STRING']))
+			$_SERVER['QUERY_STRING'] = getenv('QUERY_STRING');
+
+		// It seems that sticking a URL after the query string is mighty common, well, it's evil - don't.
+		if (strpos($_SERVER['QUERY_STRING'], 'http') === 0)
+		{
+			header('HTTP/1.1 400 Bad Request');
+			Errors::fatal_error('', false);
+		}
+
+		$this->_server_query_string = $_SERVER['QUERY_STRING'];
+	}
+
+	/**
+	 * Helper mehtod used to clean $_GET arguments
+	 */
+	private function _cleanArg()
+	{
+		// Are we going to need to parse the ; out?
+		if (strpos(ini_get('arg_separator.input'), ';') === false && !empty($this->_server_query_string))
+		{
+			// Get rid of the old one! You don't know where it's been!
+			$_GET = array();
+
+			// Was this redirected? If so, get the REDIRECT_QUERY_STRING.
+			// Do not urldecode() the querystring, unless you so much wish to break OpenID implementation. :)
+			$this->_server_query_string = substr($this->_server_query_string, 0, 5) === 'url=/' ? $_SERVER['REDIRECT_QUERY_STRING'] : $this->_server_query_string;
+
+			// Some german webmailers need a decoded string, so let's decode the string for action=activate and action=reminder
+			if (strpos($this->_server_query_string, 'activate') !== false || strpos($this->_server_query_string, 'reminder') !== false)
+				$this->_server_query_string = urldecode($this->_server_query_string);
+
+			// Replace ';' with '&' and '&something&' with '&something=&'.  (this is done for compatibility...)
+			parse_str(preg_replace('/&(\w+)(?=&|$)/', '&$1=', strtr($this->_server_query_string, array(';?' => '&', ';' => '&', '%00' => '', "\0" => ''))), $_GET);
+
+			// reSet the global in case an addon grabs it
+			$_SERVER['SERVER_QUERY_STRING'] = $this->_server_query_string;
+		}
+		elseif (strpos(ini_get('arg_separator.input'), ';') !== false)
+		{
+			// Search engines will send action=profile%3Bu=1, which confuses PHP.
+			foreach ($_GET as $k => $v)
+			{
+				if ((string) $v === $v && strpos($k, ';') !== false)
+				{
+					$temp = explode(';', $v);
+					$_GET[$k] = $temp[0];
+
+					for ($i = 1, $n = count($temp); $i < $n; $i++)
+					{
+						list ($key, $val) = array_pad(explode('=', $temp[$i], 2), 2, '');
+						if (!isset($_GET[$key]))
+							$_GET[$key] = $val;
+					}
+				}
+
+				// This helps a lot with integration!
+				if (strpos($k, '?') === 0)
+				{
+					$_GET[substr($k, 1)] = $v;
+					unset($_GET[$k]);
+				}
+			}
+		}
+	}
+
+	/**
+	 * If a request URI is present, this will prepare it for use
+	 */
+	private function _cleanRequest()
+	{
+		// There's no query string, but there is a URL... try to get the data from there.
+		if (!empty($_SERVER['REQUEST_URI']))
+		{
+			// Remove the .html, assuming there is one.
+			if (substr($_SERVER['REQUEST_URI'], strrpos($_SERVER['REQUEST_URI'], '.'), 4) === '.htm')
+				$request = substr($_SERVER['REQUEST_URI'], 0, strrpos($_SERVER['REQUEST_URI'], '.'));
+			else
+				$request = $_SERVER['REQUEST_URI'];
+
+			// Replace 'index.php/a,b,c/d/e,f' with 'a=b,c&d=&e=f' and parse it into $_GET.
+			if (strpos($request, basename($this->_scripturl) . '/') !== false)
+			{
+				parse_str(substr(preg_replace('/&(\w+)(?=&|$)/', '&$1=', strtr(preg_replace('~/([^,/]+),~', '/$1=', substr($request, strpos($request, basename($this->_scripturl)) + strlen(basename($this->_scripturl)))), '/', '&')), 1), $temp);
+				$_GET += $temp;
+			}
+		}
 	}
 
 	/**
