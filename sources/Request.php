@@ -69,7 +69,7 @@ class Request
 	private $_server_query_string;
 
 	/**
-	 * Creats gloval and used internal
+	 * Creates the global and method internal
 	 * @var string
 	 */
 	private $_scripturl;
@@ -143,13 +143,6 @@ class Request
 		// Second IP, guesswork it is, try to get the best IP we can, when using proxies or such
 		$this->_getBanIP();
 
-		// Some final checking.
-		if (filter_var($this->_ban_ip, FILTER_VALIDATE_IP, FILTER_FLAG_IPV4) === false && !isValidIPv6($this->_ban_ip))
-			$this->_ban_ip = '';
-
-		if ($this->_client_ip == 'unknown')
-			$this->_client_ip = '';
-
 		// Keep compatibility with the uses of $_SERVER['REMOTE_ADDR']...
 		$_SERVER['REMOTE_ADDR'] = $this->_client_ip;
 
@@ -189,6 +182,10 @@ class Request
 		}
 		else
 			$this->_client_ip = $_SERVER['REMOTE_ADDR'];
+
+		// Final check
+		if ($this->_client_ip == 'unknown')
+			$this->_client_ip = '';
 	}
 
 	/**
@@ -242,17 +239,21 @@ class Request
 			elseif (preg_match('~^' . $this->_local_ip_pattern . '~', $_SERVER['HTTP_X_FORWARDED_FOR']) == 0 || preg_match('~^' . $this->_local_ip_pattern . '~', $this->_client_ip) != 0)
 				$this->_ban_ip = $_SERVER['HTTP_X_FORWARDED_FOR'];
 		}
+
+		// Some final checking.
+		if (filter_var($this->_ban_ip, FILTER_VALIDATE_IP, FILTER_FLAG_IPV4) === false && !isValidIPv6($this->_ban_ip))
+			$this->_ban_ip = '';
 	}
 
 	/**
 	 * Parse the $_REQUEST, for always necessary data, such as 'action', 'board', 'topic', 'start'.
 	 * Also figures out if this is an xml request.
+	 *
+	 * - Parse the request for our dear globals, I know they're in there somewhere...
 	 */
 	public function parseRequest()
 	{
 		global $board, $topic;
-
-		// Parse the request for our dear globals, I know they're in there somewhere...
 
 		// Look for $board first
 		$board = $this->_checkBoard();
@@ -317,7 +318,7 @@ class Request
 		// Look for threadid, old YaBB SE links have those. Just read it as a topic.
 		if (isset($_REQUEST['threadid']) && !isset($_REQUEST['topic']))
 			$_REQUEST['topic'] = $_REQUEST['threadid'];
-		
+
 		if (isset($_REQUEST['topic']))
 		{
 			// Make sure it's a string (not an array, say)
@@ -404,18 +405,37 @@ class Request
 	private function _checkExit()
 	{
 		// Reject magic_quotes_sybase='on'.
-		if (ini_get('magic_quotes_sybase') || strtolower(ini_get('magic_quotes_sybase')) == 'on')
-			Errors::fatal_error('magic_quotes_sybase=on was detected: your host is using an unsecure PHP configuration, deprecated and removed in current versions. Please upgrade PHP.', false);
-
-		// Reject magic_quotes_gpc='on'.
-		if (function_exists('get_magic_quotes_gpc') && get_magic_quotes_gpc() != 0)
-			Errors::fatal_error('magic_quotes_gpc=on was detected: your host is using an unsecure PHP configuration, deprecated and removed in current versions. Please upgrade PHP.', false);
+		$this->_checkMagicQuotes();
 
 		// Save some memory.. (since we don't use these anyway.)
 		unset($GLOBALS['HTTP_POST_VARS'], $GLOBALS['HTTP_POST_VARS']);
 		unset($GLOBALS['HTTP_POST_FILES'], $GLOBALS['HTTP_POST_FILES']);
 
 		// These keys shouldn't be set...ever.
+		$this->_checkNumericKeys();
+
+		// Get the correct query string.  It may be in an environment variable...
+		if (!isset($_SERVER['QUERY_STRING']))
+			$_SERVER['QUERY_STRING'] = getenv('QUERY_STRING');
+
+		// It seems that sticking a URL after the query string is mighty common, well, it's evil - don't.
+		if (strpos($_SERVER['QUERY_STRING'], 'http') === 0)
+		{
+			header('HTTP/1.1 400 Bad Request');
+			Errors::fatal_error('', false);
+		}
+
+		$this->_server_query_string = $_SERVER['QUERY_STRING'];
+	}
+
+	/**
+	 * Check for illegal numeric keys
+	 *
+	 * - Fail on illgal keys
+	 * - Clear ones that should not be allowed
+	 */
+	private function _checkNumericKeys()
+	{
 		if (isset($_REQUEST['GLOBALS']) || isset($_COOKIE['GLOBALS']))
 			Errors::fatal_error('Invalid request variable.', false);
 
@@ -432,19 +452,25 @@ class Request
 			if (is_numeric($key))
 				unset($_COOKIE[$key]);
 		}
+	}
 
-		// Get the correct query string.  It may be in an environment variable...
-		if (!isset($_SERVER['QUERY_STRING']))
-			$_SERVER['QUERY_STRING'] = getenv('QUERY_STRING');
-
-		// It seems that sticking a URL after the query string is mighty common, well, it's evil - don't.
-		if (strpos($_SERVER['QUERY_STRING'], 'http') === 0)
+	/**
+	 * No magic quotes allowed.
+	 *
+	 * - depreciated in 5.3 and done in 5.4
+	 */
+	private function _checkMagicQuotes()
+	{
+		if (version_compare(PHP_VERSION, '5.4.0', '<'))
 		{
-			header('HTTP/1.1 400 Bad Request');
-			Errors::fatal_error('', false);
-		}
+			// Reject magic_quotes_sybase='on'.
+			if (ini_get('magic_quotes_sybase') || strtolower(ini_get('magic_quotes_sybase')) == 'on')
+				Errors::fatal_error('magic_quotes_sybase=on was detected: your host is using an unsecure PHP configuration, deprecated and removed in current versions. Please upgrade PHP.', false);
 
-		$this->_server_query_string = $_SERVER['QUERY_STRING'];
+			// Reject magic_quotes_gpc='on'.
+			if (function_exists('get_magic_quotes_gpc') && get_magic_quotes_gpc() != 0)
+				Errors::fatal_error('magic_quotes_gpc=on was detected: your host is using an unsecure PHP configuration, deprecated and removed in current versions. Please upgrade PHP.', false);
+		}
 	}
 
 	/**
