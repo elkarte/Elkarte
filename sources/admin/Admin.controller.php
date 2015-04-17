@@ -29,14 +29,23 @@ if (!defined('ELK'))
  *
  * @package Admin
  */
+
 class Admin_Controller extends Action_Controller
 {
+	/**
+	 * Holds instance of HttpReq object
+	 * @var HttpReq
+	 */
+	private $_req;
+
 	/**
 	 * Pre Dispatch, called before other methods.  Loads integration hooks
 	 */
 	public function pre_dispatch()
 	{
 		Hooks::get()->loadIntegrationsSettings();
+
+		$this->_req = HttpReq::instance();
 	}
 
 	/**
@@ -756,7 +765,7 @@ class Admin_Controller extends Action_Controller
 
 		// Setup for the template
 		$context['search_type'] = $subAction;
-		$context['search_term'] = isset($_REQUEST['search_term']) ? Util::htmlspecialchars($_REQUEST['search_term'], ENT_QUOTES) : '';
+		$context['search_term'] = $this->_req->getPost('search_term', 'Util::htmlspecialchars[ENT_QUOTES]');
 		$context['sub_template'] = 'admin_search_results';
 		$context['page_title'] = $txt['admin_search_results'];
 
@@ -936,7 +945,7 @@ class Admin_Controller extends Action_Controller
 		// Clean any admin tokens as well.
 		cleanTokens(false, '-admin');
 
-		if (isset($_GET['redir']) && isset($_SERVER['HTTP_REFERER']))
+		if (isset($this->_req->query->redir, $this->_req->server->HTTP_REFERER))
 			redirectexit($_SERVER['HTTP_REFERER']);
 		else
 			redirectexit();

@@ -36,6 +36,20 @@ class AddonSettings_Controller extends Action_Controller
 	protected $_addonSettings;
 
 	/**
+	 * Holds instance of HttpReq object
+	 * @var HttpReq
+	 */
+	private $_req;
+
+	/**
+	 * Pre Dispatch, called before other methods.  Loads integration hooks
+	 */
+	public function pre_dispatch()
+	{
+		$this->_req = HttpReq::instance();
+	}
+
+	/**
 	 * This, my friend, is for all the authors of addons out there.
 	 *
 	 * @see Action_Controller::action_index()
@@ -92,7 +106,7 @@ class AddonSettings_Controller extends Action_Controller
 		$config_vars = $this->_addonSettings->settings();
 
 		// Saving?
-		if (isset($_GET['save']))
+		if (isset($this->_req->query->save))
 		{
 			checkSession();
 
@@ -172,16 +186,16 @@ class AddonSettings_Controller extends Action_Controller
 		$context['sub_template'] = 'show_settings';
 
 		// By default do the basic settings.
-		if (isset($_REQUEST['sa']) && isset($subActions[$_REQUEST['sa']]))
-			$_REQUEST['sa'] = $_REQUEST['sa'];
+		if (isset($this->_req->query->sa, $subActions[$this->_req->query->sa]))
+			$sa = $this->_req->query->sa;
 		elseif (!empty($defaultAction))
-			$_REQUEST['sa'] = $defaultAction;
+			$sa = $defaultAction;
 		else
 		{
 			$keys = array_keys($subActions);
-			$_REQUEST['sa'] = array_pop($keys);
+			$sa = array_pop($keys);
 		}
 
-		$context['sub_action'] = $_REQUEST['sa'];
+		$context['sub_action'] = $sa;
 	}
 }
