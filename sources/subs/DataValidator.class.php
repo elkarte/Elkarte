@@ -450,7 +450,7 @@ class Data_Validator
 						$sanitation_method = '_sanitation_' . $match[1];
 						$sanitation_parameters = $match[2];
 						$sanitation_function = $match[1];
-						$sanitation_parameters_function = explode(',', $match[2]);
+						$sanitation_parameters_function = explode(',', defined($match[2]) ? constant($match[2]) : $match[2]);
 					}
 					// Or just a predefined rule e.g. trim
 					else
