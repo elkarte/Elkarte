@@ -48,21 +48,36 @@ class HttpReq
 	public $session;
 
 	/**
+	 * The returned SERVER values
+	 * @var object
+	 */
+	public $server;
+
+	/**
 	 * Sole private HttpReq instance
 	 * @var HttpReq
 	 */
 	private static $_req = null;
 
+	private $_param;
+	private $_dataValidator;
+
+
 	/**
 	 * Class constructor, sets PHP gobals to class members
 	 */
-	public function __construct()
+	public function __construct($dataValidator = null)
 	{
+		// Make sure the validator is initiated
+		$this->_dataValidator = $dataValidator === null ? new Data_Validator : $dataValidator;
+
+		// Make the superglobals available as R/W properties
 		$this->post = new ArrayObject($_POST, ArrayObject::ARRAY_AS_PROPS);
 		$this->query = new ArrayObject($_GET, ArrayObject::ARRAY_AS_PROPS);
 		$this->request = new ArrayObject($_REQUEST, ArrayObject::ARRAY_AS_PROPS);
 		$this->cookie = new ArrayObject($_COOKIE, ArrayObject::ARRAY_AS_PROPS);
 		$this->session = new ArrayObject($_SESSION, ArrayObject::ARRAY_AS_PROPS);
+		$this->server = new ArrayObject($_SERVER, ArrayObject::ARRAY_AS_PROPS);
 	}
 
 	/**
@@ -73,6 +88,8 @@ class HttpReq
 	public function __get($key)
 	{
 		switch (true) {
+			case isset($this->_param[$key]):
+				return $this->_param[$key];
 			case isset($this->request->$key):
 				return $this->request->$key;
 			case isset($this->query->$key):
@@ -102,6 +119,8 @@ class HttpReq
 	public function __isset($key)
 	{
 		switch (true) {
+			case isset($this->_param[$key]):
+				return true;
 			case isset($this->request->$key):
 				return true;
 			case isset($this->query->$key):
@@ -124,33 +143,72 @@ class HttpReq
 	}
 
 	/**
-	 * Method to set, clean, sanitize a $_GET value if set
+	 * Method to get, clean, sanitize a $_REQUEST value if set
 	 *
-	 * @param string $name The name of the value to return
+	 * - Uses any sanitize rule(s) that can be passed to the Data_Validator class
+	 * - Returned value will be the sanitized value or null of the key is not in $_REQUEST
+	 * - If you just want a value back access it directly as $req->request->$name
+	 *
+	 * @param string $name The key name of the value to return
+	 * @param string|null $sanitize a comma separated list of sanitation rules to apply
 	 */
-	public function getRequest($name = '')
+	public function getRequest($name = '', $sanitize = null)
 	{
-		return (isset($this->request->$name)) ? $this->request->$name : null;
+		$this->_param[$name] = null;
+
+		if (isset($this->request->$name))
+		{
+			$this->_param[$name] = $this->request->$name;
+			$this->_param[$name] = $this->cleanValue($name, $sanitize);
+		}
+
+		return $this->_param[$name];
 	}
-	
+
 	/**
 	 * Method to return a $_GET value
 	 *
-	 * @param string $name The name of the value to return
+	 * - Uses any sanitize rule(s) that can be passed to the Data_Validator class
+	 * - Returned value will be the sanitized value or null of the key is not in $_GET
+	 * - If you just want a value back access it directly as $req->query->$name
+	 *
+	 * @param string $name The key name of the value to return
+	 * @param string|null $sanitize a comma separated list of sanitation rules to apply
 	 */
-	public function getQuery($name = '')
+	public function getQuery($name = '', $sanitize = null)
 	{
-		return (isset($this->query->$name)) ? $this->query->$name : null;
+		$this->_param[$name] = null;
+
+		if (isset($this->query->$name))
+		{
+			$this->_param[$name] = $this->query->$name;
+			$this->_param[$name] = $this->cleanValue($name, $sanitize);
+		}
+
+		return $this->_param[$name];
 	}
 
 	/**
 	 * Method to return a $_POST value
 	 *
-	 * @param string $name the name of the value to return
+	 * - Uses any sanitize rule(s) that can be passed to the Data_Validator class
+	 * - Returned value will be the sanitized value or null of the key is not in $_POST
+	 * - If you just want a value back access it directly as $req->post->$name
+	 *
+	 * @param string $name The key name of the value to return
+	 * @param string|null $sanitize a comma separated list of sanitation rules to apply
 	 */
-	public function getPost($name = '')
+	public function getPost($name = '', $sanitize = null)
 	{
-		return (isset($this->post->$name)) ? $this->post->$name : null;
+		$this->_param[$name] = null;
+
+		if (isset($this->post->$name))
+		{
+			$this->_param[$name] = $this->post->$name;
+			$this->_param[$name] = $this->cleanValue($name, $sanitize);
+		}
+
+		return $this->_param[$name];
 	}
 
 	/**
@@ -170,14 +228,28 @@ class HttpReq
 	 */
 	public function getSession($name = '')
 	{
-		$this->session->$name = (isset($this->session->$name)) ? $this->session->$name : null;
-
-		return $this->session;
+		return (isset($this->session->$name)) ? $this->session->$name : null;
 	}
 
-	public function cleanValue($value)
+	/**
+	 * Runs sanitation rules against a single value
+	 *
+	 * @param string $name the key name in the _param array
+	 * @param string|null $sanitize comma seperated list of rules
+	 */
+	public function cleanValue($name, $sanitize = null)
 	{
-		return Util::htmlspecialchars($value, ENT_QUOTES);
+		// No rules, then return the current value
+		if ($sanitize === null)
+			return $this->_param[$name];
+
+		// To the validator
+		$this->_dataValidator->validation_rules(array());
+		$this->_dataValidator->sanitation_rules(array($name => $sanitize));
+		$this->_dataValidator->validate($this->_param);
+
+		// Return the clean value
+		return $this->_dataValidator->validation_data($name);
 	}
 
 	/**
