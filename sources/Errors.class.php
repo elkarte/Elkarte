@@ -155,9 +155,9 @@ class Errors {
 	 * @param string $error
 	 * @param string|boolean $log defaults to 'general', use false to skip _setup_fatal_error_context
 	 */
-	public static function fatal_error($error, $log = 'general')
+	public static function fatal_error($error = '', $log = 'general')
 	{
-		global $txt, $modSettings;
+		global $txt;
 
 		// We don't have $txt yet, but that's okay...
 		if (empty($txt))
@@ -166,7 +166,7 @@ class Errors {
 		if (class_exists('Template_Layers'))
 			Template_Layers::getInstance()->isError();
 
-		self::_setup_fatal_error_context($log || (!empty($modSettings['enableErrorLogging']) && $modSettings['enableErrorLogging'] == 2) ? self::log_error($error, $log) : $error, $error);
+		self::_setup_fatal_error_context($log ? self::log_error($error, $log) : $error, $error);
 	}
 
 	/**
@@ -186,7 +186,7 @@ class Errors {
 	 */
 	public static function fatal_lang_error($error, $log = 'general', $sprintf = array())
 	{
-		global $txt, $language, $modSettings, $user_info, $context;
+		global $txt, $language, $user_info, $context;
 		static $fatal_error_called = false;
 
 		// Try to load a theme if we don't have one.
@@ -206,7 +206,7 @@ class Errors {
 		$reload_lang_file = true;
 
 		// Log the error in the forum's language, but don't waste the time if we aren't logging
-		if ($log || (!empty($modSettings['enableErrorLogging']) && $modSettings['enableErrorLogging'] == 2))
+		if ($log)
 		{
 			loadLanguage('Errors', $language);
 			$reload_lang_file = $language != $user_info['language'];
