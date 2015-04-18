@@ -1350,7 +1350,7 @@ function pauseRepairProcess($to_fix, $current_step_description, $max_substep = 0
 	setTimeLimit(600);
 
 	// Errr, wait.  How much time has this taken already?
-	if (!$force && time() - array_sum(explode(' ', $time_start)) < 3)
+	if (!$force && microtime(true) - $time_start > 3)
 		return;
 
 	// Restore the query cache if interested.
@@ -1417,6 +1417,7 @@ function findForumErrors($do_fix = false)
 	// For all the defined error types do the necessary tests.
 	$current_step = -1;
 	$total_queries = 0;
+
 	foreach ($errorTests as $error_type => $test)
 	{
 		$current_step++;
