@@ -82,6 +82,7 @@ class HttpReq
 
 	/**
 	 * Generic access values contained in the superglobals
+	 * - gets in order of param, get and post
 	 *
 	 * @param string $key
 	 */
@@ -90,8 +91,6 @@ class HttpReq
 		switch (true) {
 			case isset($this->_param[$key]):
 				return $this->_param[$key];
-			case isset($this->request->$key):
-				return $this->request->$key;
 			case isset($this->query->$key):
 				return $this->query->$key;
 			case isset($this->post->$key):
@@ -114,14 +113,14 @@ class HttpReq
 	/**
 	 * Generic check to see if a property is set
 	 *
+	 * - checks in order of param, get, post
+	 *
 	 * @param string $key
 	 */
 	public function __isset($key)
 	{
 		switch (true) {
 			case isset($this->_param[$key]):
-				return true;
-			case isset($this->request->$key):
 				return true;
 			case isset($this->query->$key):
 				return true;
@@ -151,10 +150,11 @@ class HttpReq
 	 *
 	 * @param string $name The key name of the value to return
 	 * @param string|null $sanitize a comma separated list of sanitation rules to apply
+	 * @param mixed|null $default default value to return if key value is not found
 	 */
-	public function getRequest($name = '', $sanitize = null)
+	public function getRequest($name = '', $sanitize = null, $default = null)
 	{
-		$this->_param[$name] = null;
+		$this->_param[$name] = $default;
 
 		if (isset($this->request->$name))
 		{
@@ -174,10 +174,11 @@ class HttpReq
 	 *
 	 * @param string $name The key name of the value to return
 	 * @param string|null $sanitize a comma separated list of sanitation rules to apply
+	 * @param mixed|null $default default value to return if key value is not found
 	 */
-	public function getQuery($name = '', $sanitize = null)
+	public function getQuery($name = '', $sanitize = null, $default = null)
 	{
-		$this->_param[$name] = null;
+		$this->_param[$name] = $default;
 
 		if (isset($this->query->$name))
 		{
@@ -197,10 +198,11 @@ class HttpReq
 	 *
 	 * @param string $name The key name of the value to return
 	 * @param string|null $sanitize a comma separated list of sanitation rules to apply
+	 * @param mixed|null $default default value to return if key value is not found
 	 */
-	public function getPost($name = '', $sanitize = null)
+	public function getPost($name = '', $sanitize = null, $default = null)
 	{
-		$this->_param[$name] = null;
+		$this->_param[$name] = $default;
 
 		if (isset($this->post->$name))
 		{
