@@ -1,7 +1,7 @@
 <?php
 
 /**
- * This file contains the post integration of mentions.
+ * This file contains the integration of mentions into Display_Controller.
  *
  * @name      ElkArte Forum
  * @copyright ElkArte Forum contributors
@@ -14,11 +14,11 @@
 if (!defined('ELK'))
 	die('No access...');
 
-class Mention_Post_Module extends Mention_Module_Abstract
+class Mentions_Display_Module extends Mentions_Module_Abstract
 {
 	public static function hooks($eventsManager)
 	{
-		self::registerHooks('post', $eventsManager);
+		self::registerHooks('display', $eventsManager);
 
 		return array();
 	}

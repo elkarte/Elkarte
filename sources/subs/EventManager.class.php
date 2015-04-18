@@ -182,23 +182,11 @@ class Event_Manager
 	 * The pattern defines the names of the classes that will be registered
 	 * to this Event_Manager.
 	 *
-	 * @param string $pattern A regular expression that identifies the classes
-	 *               that should be attached to the Event_Manager
+	 * @param string[] $classes A set of class names that should be attached
 	 */
-	public function registerAddons($pattern)
+	public function registerClasses($classes)
 	{
-		$to_register = array();
-
-		foreach ($this->_declared_classes() as $class)
-		{
-			if (preg_match('/' . $pattern . '/', $class) !== 0 && !in_array($class, $this->_classes))
-			{
-				$to_register[] = $class;
-				$this->_classes[] = $class;
-			}
-		}
-
-		$this->_register_events($to_register);
+		$this->_register_events($classes);
 	}
 
 	/**

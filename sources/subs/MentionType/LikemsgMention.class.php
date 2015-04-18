@@ -11,6 +11,8 @@
  *
  */
 
+namespace ElkArte\sources\subs\MentionType;
+
 if (!defined('ELK'))
 	die('No access...');
 
