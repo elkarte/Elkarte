@@ -23,9 +23,10 @@ global $boarddir, $sourcedir;
 global $ssi_db_user, $ssi_db_passwd;
 
 // Done to allow the option to runInSeparateProcess for phpunit
+// as done in Auth.subs.Test
 if (!defined('ELK'))
 {
-	DEFINE('ELK', 1);
+	DEFINE('ELK', '1');
 	DEFINE('CACHE_STALE', '?R11');
 
 	// Get the forum's settings for database and file paths.

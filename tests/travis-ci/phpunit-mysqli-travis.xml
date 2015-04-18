@@ -16,6 +16,6 @@
       </testsuite>
   </testsuites>
   <php>
-      <const name="DB_TYPE" value="MySQL"/>
+      <const name="DBTYPE" value="MySQL"/>
   </php>
 </phpunit>

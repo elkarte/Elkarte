@@ -157,7 +157,7 @@ class Maintenance_Controller extends Action_Controller
 		// Set up the sub-template
 		$context['sub_template'] = 'maintain_database';
 
-		if (DB_TYPE == 'MySQL')
+		if (DB_TYPE === 'MySQL')
 		{
 			$body_type = fetchBodyType();
 
@@ -465,12 +465,12 @@ class Maintenance_Controller extends Action_Controller
 	 */
 	public function action_convertmsgbody_display()
 	{
-		global $context, $txt, $db_type, $modSettings, $time_start;
+		global $context, $txt, $modSettings, $time_start;
 
 		// Show me your badge!
 		isAllowedTo('admin_forum');
 
-		if ($db_type !== 'mysql')
+		if (DB_TYPE !== 'MySQL')
 			return;
 
 		$body_type = '';
@@ -899,7 +899,7 @@ class Maintenance_Controller extends Action_Controller
 	 */
 	public function action_version_display()
 	{
-		global $forum_version, $txt, $context, $modSettings;
+		global $txt, $context, $modSettings;
 
 		isAllowedTo('admin_forum');
 
@@ -926,7 +926,7 @@ class Maintenance_Controller extends Action_Controller
 		);
 
 		// Make it easier to manage for the template.
-		$context['forum_version'] = $forum_version;
+		$context['forum_version'] = FORUM_VERSION;
 
 		$context['sub_template'] = 'view_versions';
 		$context['page_title'] = $txt['admin_version_check'];

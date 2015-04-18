@@ -2650,14 +2650,14 @@ function template_header()
  */
 function theme_copyright()
 {
-	global $forum_copyright, $forum_version;
+	global $forum_copyright;
 
 	// Don't display copyright for things like SSI.
-	if (!isset($forum_version))
+	if (!defined(FORUM_VERSION))
 		return;
 
 	// Put in the version...
-	$forum_copyright = replaceBasicActionUrl(sprintf($forum_copyright, $forum_version));
+	$forum_copyright = replaceBasicActionUrl(sprintf($forum_copyright, FORUM_VERSION));
 
 	echo '
 					', $forum_copyright;

@@ -14,10 +14,6 @@
 if (!defined('ELK'))
 	die('No access...');
 
-// It should be already defined in Db-type.class.php, but better have it twice
-if (!defined('DB_TYPE'))
-	define('DB_TYPE', 'MySQL');
-
 /**
  * MySQL implementation of DbSearch
  */

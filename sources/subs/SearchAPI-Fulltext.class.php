@@ -67,17 +67,17 @@ class Fulltext_Search extends SearchAPI
 	 * What databases support the fulltext index?
 	 * @var array
 	 */
-	protected $supported_databases = array('mysql');
+	protected $supported_databases = array('MySQL');
 
 	/**
 	 * Fulltext_Search::__construct()
 	 */
 	public function __construct()
 	{
-		global $modSettings, $db_type;
+		global $modSettings;
 
 		// Is this database supported?
-		if (!in_array($db_type, $this->supported_databases))
+		if (!in_array(DB_TYPE, $this->supported_databases))
 		{
 			$this->is_supported = false;
 			return;

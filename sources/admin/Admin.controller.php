@@ -601,7 +601,7 @@ class Admin_Controller extends Action_Controller
 	 */
 	public function action_home()
 	{
-		global $forum_version, $txt, $scripturl, $context, $user_info, $settings;
+		global $txt, $scripturl, $context, $user_info, $settings;
 
 		// We need a little help
 		require_once(SUBSDIR . '/Membergroups.subs.php');
@@ -618,7 +618,7 @@ class Admin_Controller extends Action_Controller
 
 		// This makes it easier to get the latest news with your time format.
 		$context['time_format'] = urlencode($user_info['time_format']);
-		$context['forum_version'] = $forum_version;
+		$context['forum_version'] = FORUM_VERSION;
 
 		// Get a list of current server versions.
 		$checkFor = array(
@@ -662,7 +662,7 @@ class Admin_Controller extends Action_Controller
 	 */
 	public function action_credits()
 	{
-		global $forum_version, $txt, $scripturl, $context, $user_info;
+		global $txt, $scripturl, $context, $user_info;
 
 		// We need a little help from our friends
 		require_once(SUBSDIR . '/Membergroups.subs.php');
@@ -690,7 +690,7 @@ class Admin_Controller extends Action_Controller
 
 		// This makes it easier to get the latest news with your time format.
 		$context['time_format'] = urlencode($user_info['time_format']);
-		$context['forum_version'] = $forum_version;
+		$context['forum_version'] = FORUM_VERSION;
 
 		// Get a list of current server versions.
 		$checkFor = array(
