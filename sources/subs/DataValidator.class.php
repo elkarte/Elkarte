@@ -151,7 +151,7 @@ class Data_Validator
 
 		// Replace the data
 		if (!empty($sanitation_rules))
-			$data = $validator->_array_replace($data, $validator->validation_data());
+			$data = array_replace($data, $validator->validation_data());
 
 		// Return true or false on valid data
 		return $result;
@@ -229,9 +229,13 @@ class Data_Validator
 	 */
 	public function validate($input)
 	{
+		// If its an object, convert it to an array
+		if (is_object($input))
+			$input = (array) $input;
+
 		// @todo this won't work, $input[$field] will be undefined
 		if (!is_array($input))
-			$input = array($input);
+			$input[$input] = array($input);
 
 		// Clean em
 		$this->_data = $this->_sanitize($input, $this->_sanitation_rules);
@@ -269,21 +273,6 @@ class Data_Validator
 			return $this->_data;
 
 		return isset($this->_data[$key]) ? $this->_data[$key] : null;
-	}
-
-	/**
-	 * array_replace is a php 5.3+ function, this is needed to support the oldies
-	 */
-	private function _array_replace()
-	{
-		$array = array();
-		$n = func_num_args();
-
-		// Union each array passed
-		while ($n-- > 0)
-			$array += func_get_arg($n);
-
-		return $array;
 	}
 
 	/**
