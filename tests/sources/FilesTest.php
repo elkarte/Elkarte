@@ -72,7 +72,7 @@ class TestFiles extends PHPUnit_Framework_TestCase
 				}
 
 				if (!empty($level))
-					$this->assertTrue(empty($level));
+					$this->assertTrue($syntax_valid, empty($level));
 				// Skipping the eval of this one?
 				elseif (!in_array($file, $skip_files))
 				{
