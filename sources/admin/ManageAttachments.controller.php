@@ -797,8 +797,8 @@ class ManageAttachments_Controller extends Action_Controller
 		// Try give us a while to sort this out...
 		setTimeLimit(600);
 
-		$this->step = $this->_reqQuery('step', 'intval', 0);
-		$this->substep = $this->_reqQuery('substep', 'intval', 0);
+		$this->step = $this->_req->getQuery('step', 'intval', 0);
+		$this->substep = $this->_req->getQuery('substep', 'intval', 0);
 		$this->starting_substep = $this->substep;
 
 		// Don't recall the session just in case.
@@ -836,7 +836,7 @@ class ManageAttachments_Controller extends Action_Controller
 		);
 
 		$to_fix = !empty($this->_req->session->attachments_to_fix) ? $this->_req->session->attachments_to_fix : array();
-		$context['repair_errors'] = $this->_req->getSsession('attachments_to_fix2', $context['repair_errors']);
+		$context['repair_errors'] = $this->_req->getSession('attachments_to_fix2', $context['repair_errors']);
 		$fix_errors = isset($this->_req->query->fixErrors) ? true : false;
 
 		// Get stranded thumbnails.
@@ -1272,7 +1272,7 @@ class ManageAttachments_Controller extends Action_Controller
 			checkSession();
 
 			// Changing the current base directory?
-			$this->current_base_dir = $this->getQuery('current_base_dir', 'intval');
+			$this->current_base_dir = $this->_req->getQuery('current_base_dir', 'intval');
 			if (empty($this->_req->post->new_base_dir) && !empty($this->current_base_dir))
 			{
 				if ($modSettings['basedirectory_for_attachments'] != $modSettings['attachmentUploadDir'][$this->current_base_dir])

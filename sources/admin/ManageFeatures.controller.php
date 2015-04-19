@@ -71,6 +71,20 @@ class ManageFeatures_Controller extends Action_Controller
 	protected $_PMSettings;
 
 	/**
+	 * Holds instance of HttpReq object
+	 * @var HttpReq
+	 */
+	protected $_req;
+
+	/**
+	 * Pre Dispatch, called before other methods.  Loads HttpReq
+	 */
+	public function pre_dispatch()
+	{
+		$this->_req = HttpReq::instance();
+	}
+
+	/**
 	 * This function passes control through to the relevant tab.
 	 *
 	 * @see Action_Controller::action_index()
@@ -196,17 +210,17 @@ class ManageFeatures_Controller extends Action_Controller
 		$config_vars = $this->_basicSettings->settings();
 
 		// Saving?
-		if (isset($_GET['save']))
+		if (isset($this->_req->query->save))
 		{
 			checkSession();
 
 			// Prevent absurd boundaries here - make it a day tops.
-			if (isset($_POST['lastActive']))
-				$_POST['lastActive'] = min((int) $_POST['lastActive'], 1440);
+			if (isset($this->_req->post->lastActive))
+				$this->_req->post->lastActive = min((int) $this->_req->post->lastActive, 1440);
 
 			call_integration_hook('integrate_save_basic_settings');
 
-			Settings_Form::save_db($config_vars);
+			Settings_Form::save_db($config_vars, $this->_req->post);
 
 			writeLog();
 			redirectexit('action=admin;area=featuresettings;sa=basic');
@@ -251,13 +265,13 @@ class ManageFeatures_Controller extends Action_Controller
 		$config_vars = $this->_layoutSettings->settings();
 
 		// Saving?
-		if (isset($_GET['save']))
+		if (isset($this->_req->query->save))
 		{
 			checkSession();
 
 			call_integration_hook('integrate_save_layout_settings');
 
-			Settings_Form::save_db($config_vars);
+			Settings_Form::save_db($config_vars, $this->_req->post);
 			writeLog();
 
 			redirectexit('action=admin;area=featuresettings;sa=layout');
@@ -299,13 +313,13 @@ class ManageFeatures_Controller extends Action_Controller
 		$config_vars = $this->_karmaSettings->settings();
 
 		// Saving?
-		if (isset($_GET['save']))
+		if (isset($this->_req->query->save))
 		{
 			checkSession();
 
 			call_integration_hook('integrate_save_karma_settings');
 
-			Settings_Form::save_db($config_vars);
+			Settings_Form::save_db($config_vars, $this->_req->post);
 			redirectexit('action=admin;area=featuresettings;sa=karma');
 		}
 
@@ -345,13 +359,13 @@ class ManageFeatures_Controller extends Action_Controller
 		$config_vars = $this->_likesSettings->settings();
 
 		// Saving?
-		if (isset($_GET['save']))
+		if (isset($this->_req->query->save))
 		{
 			checkSession();
 
 			call_integration_hook('integrate_save_likes_settings');
 
-			Settings_Form::save_db($config_vars);
+			Settings_Form::save_db($config_vars, $this->_req->post);
 			redirectexit('action=admin;area=featuresettings;sa=likes');
 		}
 
@@ -391,24 +405,24 @@ class ManageFeatures_Controller extends Action_Controller
 		$config_vars = $this->_mentionSettings->settings();
 
 		// Saving the settings?
-		if (isset($_GET['save']))
+		if (isset($this->_req->query->save))
 		{
 			checkSession();
 
 			$enabled_mentions = !empty($modSettings['enabled_mentions']) ? explode(',', $modSettings['enabled_mentions']) : array();
 
-			if ((!isset($_POST['mentions_dont_notify_rlike']) && !empty($modSettings['mentions_dont_notify_rlike'])) || (isset($_POST['mentions_dont_notify_rlike']) && $_POST['mentions_dont_notify_rlike'] != $modSettings['mentions_dont_notify_rlike']))
+			if ((!isset($this->_req->post->mentions_dont_notify_rlike) && !empty($modSettings['mentions_dont_notify_rlike'])) || (isset($this->_req->post->mentions_dont_notify_rlike) && $this->_req->post->mentions_dont_notify_rlike != $modSettings['mentions_dont_notify_rlike']))
 			{
 				require_once(SUBSDIR . '/Mentions.subs.php');
-				toggleMentionsVisibility('rlike', empty($_POST['mentions_dont_notify_rlike']));
+				toggleMentionsVisibility('rlike', empty($this->_req->post->mentions_dont_notify_rlike));
 			}
 
-			if ((!isset($_POST['mentions_buddy']) && !empty($modSettings['mentions_buddy'])) || (isset($_POST['mentions_buddy']) && $_POST['mentions_buddy'] != $modSettings['mentions_buddy']))
+			if ((!isset($this->_req->post->mentions_buddy) && !empty($modSettings['mentions_buddy'])) || (isset($this->_req->post->mentions_buddy) && $this->_req->post->mentions_buddy != $modSettings['mentions_buddy']))
 			{
 				require_once(SUBSDIR . '/Mentions.subs.php');
-				toggleMentionsVisibility('buddy', !empty($_POST['mentions_buddy']));
+				toggleMentionsVisibility('buddy', !empty($this->_req->post->mentions_buddy));
 
-				if (!empty($_POST['mentions_buddy']))
+				if (!empty($this->_req->post->mentions_buddy))
 					$enabled_mentions[] = 'buddy';
 				else
 					$enabled_mentions = array_diff($enabled_mentions, array('buddy'));
@@ -416,15 +430,15 @@ class ManageFeatures_Controller extends Action_Controller
 
 			// If mentions are enabled, the related task should be enabled as well, otherwise should be disabled.
 			require_once(SUBSDIR . '/ScheduledTasks.subs.php');
-			toggleTaskStatusByName('user_access_mentions', !empty($_POST['mentions_enabled']));
+			toggleTaskStatusByName('user_access_mentions', !empty($this->_req->post->mentions_enabled));
 
-			if (!empty($_POST['mentions_dont_notify_rlike']))
+			if (!empty($this->_req->post->mentions_dont_notify_rlike))
 				$enabled_mentions = array_diff($enabled_mentions, array('rlikemsg'));
 			else
 				$enabled_mentions[] = 'rlikemsg';
 
 			$modules = array('post', 'display');
-			if (!empty($_POST['mentions_enabled']))
+			if (!empty($this->_req->post->mentions_enabled))
 			{
 				enableModules('mention', $modules);
 				$enabled_mentions[] = 'mentionmem';
@@ -436,7 +450,7 @@ class ManageFeatures_Controller extends Action_Controller
 			}
 
 			updateSettings(array('enabled_mentions' => implode(',', $enabled_mentions)));
-			Settings_Form::save_db($config_vars);
+			Settings_Form::save_db($config_vars, $this->_req->post);
 			redirectexit('action=admin;area=featuresettings;sa=mention');
 		}
 
@@ -496,227 +510,17 @@ class ManageFeatures_Controller extends Action_Controller
 		$disabledTags = !empty($sig_bbc) ? explode(',', $sig_bbc) : array();
 
 		// Applying to ALL signatures?!!
-		if (isset($_GET['apply']))
+		if (isset($this->_req->query->apply))
 		{
 			// Security!
 			checkSession('get');
 
 			require_once(SUBSDIR . '/ManageFeatures.subs.php');
-			require_once(SUBSDIR . '/Members.subs.php');
 			$sig_start = time();
 
 			// This is horrid - but I suppose some people will want the option to do it.
-			$applied_sigs = isset($_GET['step']) ? (int) $_GET['step'] : 0;
-			$done = false;
-			$context['max_member'] = maxMemberID();
-
-			while (!$done)
-			{
-				$changes = array();
-				$update_sigs = getSignatureFromMembers($applied_sigs);
-
-				if (empty($update_sigs))
-					$done = true;
-
-				foreach ($update_sigs as $row)
-				{
-					// Apply all the rules we can realistically do.
-					$sig = strtr($row['signature'], array('<br />' => "\n"));
-
-					// Max characters...
-					if (!empty($sig_limits[1]))
-						$sig = Util::substr($sig, 0, $sig_limits[1]);
-
-					// Max lines...
-					if (!empty($sig_limits[2]))
-					{
-						$count = 0;
-						$str_len = strlen($sig);
-						for ($i = 0; $i < $str_len; $i++)
-						{
-							if ($sig[$i] == "\n")
-							{
-								$count++;
-								if ($count >= $sig_limits[2])
-									$sig = substr($sig, 0, $i) . strtr(substr($sig, $i), array("\n" => ' '));
-							}
-						}
-					}
-
-					if (!empty($sig_limits[7]) && preg_match_all('~\[size=([\d\.]+)?(px|pt|em|x-large|larger)~i', $sig, $matches) !== false && isset($matches[2]))
-					{
-						foreach ($matches[1] as $ind => $size)
-						{
-							$limit_broke = 0;
-
-							// Attempt to allow all sizes of abuse, so to speak.
-							if ($matches[2][$ind] == 'px' && $size > $sig_limits[7])
-								$limit_broke = $sig_limits[7] . 'px';
-							elseif ($matches[2][$ind] == 'pt' && $size > ($sig_limits[7] * 0.75))
-								$limit_broke = ((int) $sig_limits[7] * 0.75) . 'pt';
-							elseif ($matches[2][$ind] == 'em' && $size > ((float) $sig_limits[7] / 16))
-								$limit_broke = ((float) $sig_limits[7] / 16) . 'em';
-							elseif ($matches[2][$ind] != 'px' && $matches[2][$ind] != 'pt' && $matches[2][$ind] != 'em' && $sig_limits[7] < 18)
-								$limit_broke = 'large';
-
-							if ($limit_broke)
-								$sig = str_replace($matches[0][$ind], '[size=' . $sig_limits[7] . 'px', $sig);
-						}
-					}
-
-					// Stupid images - this is stupidly, stupidly challenging.
-					if ((!empty($sig_limits[3]) || !empty($sig_limits[5]) || !empty($sig_limits[6])))
-					{
-						$replaces = array();
-						$img_count = 0;
-
-						// Get all BBC tags...
-						preg_match_all('~\[img(\s+width=([\d]+))?(\s+height=([\d]+))?(\s+width=([\d]+))?\s*\](?:<br />)*([^<">]+?)(?:<br />)*\[/img\]~i', $sig, $matches);
-
-						// ... and all HTML ones.
-						preg_match_all('~&lt;img\s+src=(?:&quot;)?((?:http://|ftp://|https://|ftps://).+?)(?:&quot;)?(?:\s+alt=(?:&quot;)?(.*?)(?:&quot;)?)?(?:\s?/)?&gt;~i', $sig, $matches2, PREG_PATTERN_ORDER);
-
-						// And stick the HTML in the BBC.
-						if (!empty($matches2))
-						{
-							foreach ($matches2[0] as $ind => $dummy)
-							{
-								$matches[0][] = $matches2[0][$ind];
-								$matches[1][] = '';
-								$matches[2][] = '';
-								$matches[3][] = '';
-								$matches[4][] = '';
-								$matches[5][] = '';
-								$matches[6][] = '';
-								$matches[7][] = $matches2[1][$ind];
-							}
-						}
-
-						// Try to find all the images!
-						if (!empty($matches))
-						{
-							$image_count_holder = array();
-							foreach ($matches[0] as $key => $image)
-							{
-								$width = -1; $height = -1;
-								$img_count++;
-
-								// Too many images?
-								if (!empty($sig_limits[3]) && $img_count > $sig_limits[3])
-								{
-									// If we've already had this before we only want to remove the excess.
-									if (isset($image_count_holder[$image]))
-									{
-										$img_offset = -1;
-										$rep_img_count = 0;
-										while ($img_offset !== false)
-										{
-											$img_offset = strpos($sig, $image, $img_offset + 1);
-											$rep_img_count++;
-											if ($rep_img_count > $image_count_holder[$image])
-											{
-												// Only replace the excess.
-												$sig = substr($sig, 0, $img_offset) . str_replace($image, '', substr($sig, $img_offset));
-
-												// Stop looping.
-												$img_offset = false;
-											}
-										}
-									}
-									else
-										$replaces[$image] = '';
-
-									continue;
-								}
-
-								// Does it have predefined restraints? Width first.
-								if ($matches[6][$key])
-									$matches[2][$key] = $matches[6][$key];
-
-								if ($matches[2][$key] && $sig_limits[5] && $matches[2][$key] > $sig_limits[5])
-								{
-									$width = $sig_limits[5];
-									$matches[4][$key] = $matches[4][$key] * ($width / $matches[2][$key]);
-								}
-								elseif ($matches[2][$key])
-									$width = $matches[2][$key];
-
-								// ... and height.
-								if ($matches[4][$key] && $sig_limits[6] && $matches[4][$key] > $sig_limits[6])
-								{
-									$height = $sig_limits[6];
-									if ($width != -1)
-										$width = $width * ($height / $matches[4][$key]);
-								}
-								elseif ($matches[4][$key])
-									$height = $matches[4][$key];
-
-								// If the dimensions are still not fixed - we need to check the actual image.
-								if (($width == -1 && $sig_limits[5]) || ($height == -1 && $sig_limits[6]))
-								{
-									// We'll mess up with images, who knows.
-									require_once(SUBSDIR . '/Attachments.subs.php');
-
-									$sizes = url_image_size($matches[7][$key]);
-									if (is_array($sizes))
-									{
-										// Too wide?
-										if ($sizes[0] > $sig_limits[5] && $sig_limits[5])
-										{
-											$width = $sig_limits[5];
-											$sizes[1] = $sizes[1] * ($width / $sizes[0]);
-										}
-
-										// Too high?
-										if ($sizes[1] > $sig_limits[6] && $sig_limits[6])
-										{
-											$height = $sig_limits[6];
-											if ($width == -1)
-												$width = $sizes[0];
-											$width = $width * ($height / $sizes[1]);
-										}
-										elseif ($width != -1)
-											$height = $sizes[1];
-									}
-								}
-
-								// Did we come up with some changes? If so remake the string.
-								if ($width != -1 || $height != -1)
-									$replaces[$image] = '[img' . ($width != -1 ? ' width=' . round($width) : '') . ($height != -1 ? ' height=' . round($height) : '') . ']' . $matches[7][$key] . '[/img]';
-
-								// Record that we got one.
-								$image_count_holder[$image] = isset($image_count_holder[$image]) ? $image_count_holder[$image] + 1 : 1;
-							}
-
-							if (!empty($replaces))
-								$sig = str_replace(array_keys($replaces), array_values($replaces), $sig);
-						}
-					}
-
-					// Try to fix disabled tags.
-					if (!empty($disabledTags))
-					{
-						$sig = preg_replace('~\[(?:' . implode('|', $disabledTags) . ').+?\]~i', '', $sig);
-						$sig = preg_replace('~\[/(?:' . implode('|', $disabledTags) . ')\]~i', '', $sig);
-					}
-
-					$sig = strtr($sig, array("\n" => '<br />'));
-					call_integration_hook('integrate_apply_signature_settings', array(&$sig, $sig_limits, $disabledTags));
-					if ($sig != $row['signature'])
-						$changes[$row['id_member']] = $sig;
-				}
-
-				// Do we need to delete what we have?
-				if (!empty($changes))
-				{
-					foreach ($changes as $id => $sig)
-						updateSignature($id, $sig);
-				}
-
-				$applied_sigs += 50;
-				if (!$done)
-					pauseSignatureApplySettings($applied_sigs);
-			}
+			$applied_sigs = $this->_req->getQuery('step', 'intval', 0);
+			updateAllSignatures($applied_sigs);
 
 			$settings_applied = true;
 		}
@@ -741,7 +545,7 @@ class ManageFeatures_Controller extends Action_Controller
 		$modSettings['bbc_disabled_signature_bbc'] = $disabledTags;
 
 		// Saving?
-		if (isset($_GET['save']))
+		if (isset($this->_req->query->save))
 		{
 			checkSession();
 
@@ -750,31 +554,31 @@ class ManageFeatures_Controller extends Action_Controller
 			foreach (parse_bbc(false) as $tag)
 				$bbcTags[] = $tag['tag'];
 
-			if (!isset($_POST['signature_bbc_enabledTags']))
-				$_POST['signature_bbc_enabledTags'] = array();
-			elseif (!is_array($_POST['signature_bbc_enabledTags']))
-				$_POST['signature_bbc_enabledTags'] = array($_POST['signature_bbc_enabledTags']);
+			if (!isset($this->_req->post->signature_bbc_enabledTags))
+				$this->_req->post->signature_bbc_enabledTags = array();
+			elseif (!is_array($this->_req->post->signature_bbc_enabledTags))
+				$this->_req->post->signature_bbc_enabledTags = array($this->_req->post->signature_bbc_enabledTags);
 
 			$sig_limits = array();
 			foreach ($context['signature_settings'] as $key => $value)
 			{
 				if ($key == 'allow_smileys')
 					continue;
-				elseif ($key == 'max_smileys' && empty($_POST['signature_allow_smileys']))
+				elseif ($key == 'max_smileys' && empty($this->_req->post->signature_allow_smileys))
 					$sig_limits[] = -1;
 				else
-					$sig_limits[] = !empty($_POST['signature_' . $key]) ? max(1, (int) $_POST['signature_' . $key]) : 0;
+					$sig_limits[] = !empty($this->_req->getPost('signature_' . $key)) ? max(1, $this->_req->getPost('signature_' . $key, 'intval')) : 0;
 			}
 
 			call_integration_hook('integrate_save_signature_settings', array(&$sig_limits, &$bbcTags));
 
-			$_POST['signature_settings'] = implode(',', $sig_limits) . ':' . implode(',', array_diff($bbcTags, $_POST['signature_bbc_enabledTags']));
+			$this->_req->post->signature_settings = implode(',', $sig_limits) . ':' . implode(',', array_diff($bbcTags, $this->_req->post->signature_bbc_enabledTags));
 
 			// Even though we have practically no settings let's keep the convention going!
 			$save_vars = array();
 			$save_vars[] = array('text', 'signature_settings');
 
-			Settings_Form::save_db($save_vars);
+			Settings_Form::save_db($save_vars, $this->_req->post);
 			redirectexit('action=admin;area=featuresettings;sa=sig');
 		}
 
@@ -822,7 +626,7 @@ class ManageFeatures_Controller extends Action_Controller
 		$context['fields_no_registration'] = array('posts', 'warning_status');
 
 		// Are we saving any standard field changes?
-		if (isset($_POST['save']))
+		if (isset($this->_req->query->save))
 		{
 			checkSession();
 			validateToken('admin-scp');
@@ -831,11 +635,13 @@ class ManageFeatures_Controller extends Action_Controller
 
 			// Do the active ones first.
 			$disable_fields = array_flip($standard_fields);
-			if (!empty($_POST['active']))
+			if (!empty($this->_req->post->active))
 			{
-				foreach ($_POST['active'] as $value)
+				foreach ($this->_req->post->active as $value)
+				{
 					if (isset($disable_fields[$value]))
 						unset($disable_fields[$value]);
+				}
 			}
 
 			// What we have left!
@@ -843,11 +649,13 @@ class ManageFeatures_Controller extends Action_Controller
 
 			// Things we want to show on registration?
 			$reg_fields = array();
-			if (!empty($_POST['reg']))
+			if (!empty($this->_req->post->reg))
 			{
-				foreach ($_POST['reg'] as $value)
+				foreach ($this->_req->post->reg as $value)
+				{
 					if (in_array($value, $standard_fields) && !isset($disable_fields[$value]))
 						$reg_fields[] = $value;
+				}
 			}
 
 			// What we have left!
@@ -1089,18 +897,18 @@ class ManageFeatures_Controller extends Action_Controller
 		loadTemplate('ManageFeatures');
 
 		// Sort out the context!
-		$context['fid'] = isset($_GET['fid']) ? (int) $_GET['fid'] : 0;
+		$context['fid'] = $this->_req->getQuery('fid', 'intval', 0);
 		$context[$context['admin_menu_name']]['current_subsection'] = 'profile';
 		$context['page_title'] = $context['fid'] ? $txt['custom_edit_title'] : $txt['custom_add_title'];
 		$context['sub_template'] = 'edit_profile_field';
 
-		// any errors messages to show?
-		if (isset($_GET['msg']))
+		// Any errors messages to show?
+		if (isset($this->_req->query->msg))
 		{
 			loadLanguage('Errors');
 
-			if (isset($txt['custom_option_' . $_GET['msg']]))
-				$context['custom_option__error'] = $txt['custom_option_' . $_GET['msg']];
+			if (isset($txt['custom_option_' . $this->_req->query->msg]))
+				$context['custom_option__error'] = $txt['custom_option_' . $this->_req->query->msg];
 		}
 
 		// Load the profile language for section names.
@@ -1142,61 +950,61 @@ class ManageFeatures_Controller extends Action_Controller
 		addInlineJavascript('updateInputBoxes();', true);
 
 		// Are we toggling which ones are active?
-		if (isset($_POST['onoff']))
+		if (isset($this->_req->post->onoff))
 		{
 			checkSession();
 			validateToken('admin-scp');
 
 			// Enable and disable custom fields as required.
 			$enabled = array(0);
-			foreach ($_POST['cust'] as $id)
+			foreach ($this->_req->post->cust as $id)
 				$enabled[] = (int) $id;
 
 			updateRenamedProfileStatus($enabled);
 		}
 		// Are we saving?
-		elseif (isset($_POST['save']))
+		elseif (isset($this->_req->post->save))
 		{
 			checkSession();
 			validateToken('admin-ecp');
 
 			// Everyone needs a name - even the (bracket) unknown...
-			if (trim($_POST['field_name']) == '')
-				redirectexit($scripturl . '?action=admin;area=featuresettings;sa=profileedit;fid=' . $_GET['fid'] . ';msg=need_name');
+			if (trim($this->_req->post->field_name) == '')
+				redirectexit($scripturl . '?action=admin;area=featuresettings;sa=profileedit;fid=' . $this->_req->query->fid . ';msg=need_name');
 
 			// Regex you say?  Do a very basic test to see if the pattern is valid
-			if (!empty($_POST['regex']) && @preg_match($_POST['regex'], 'dummy') === false)
-				redirectexit($scripturl . '?action=admin;area=featuresettings;sa=profileedit;fid=' . $_GET['fid'] . ';msg=regex_error');
+			if (!empty($this->_req->post->regex) && @preg_match($this->_req->post->regex, 'dummy') === false)
+				redirectexit($scripturl . '?action=admin;area=featuresettings;sa=profileedit;fid=' . $this->_req->query->fid . ';msg=regex_error');
 
-			$_POST['field_name'] = Util::htmlspecialchars($_POST['field_name']);
-			$_POST['field_desc'] = Util::htmlspecialchars($_POST['field_desc']);
+			$this->_req->post->field_name = $this->_req->getPost('field_name', 'Util::htmlspecialchars');
+			$this->_req->post->field_desc = $this->_req->getPost('field_desc', 'Util::htmlspecialchars');
 
 			// Checkboxes...
-			$show_reg = isset($_POST['reg']) ? (int) $_POST['reg'] : 0;
-			$show_display = isset($_POST['display']) ? 1 : 0;
-			$show_memberlist = isset($_POST['memberlist']) ? 1 : 0;
-			$bbc = isset($_POST['bbc']) ? 1 : 0;
-			$show_profile = $_POST['profile_area'];
-			$active = isset($_POST['active']) ? 1 : 0;
-			$private = isset($_POST['private']) ? (int) $_POST['private'] : 0;
-			$can_search = isset($_POST['can_search']) ? 1 : 0;
+			$show_reg = $this->_req->getPost('reg', 'intval', 0);
+			$show_display = isset($this->_req->post->display) ? 1 : 0;
+			$show_memberlist = isset($this->_req->post->memberlist) ? 1 : 0;
+			$bbc = isset($this->_req->post->bbc) ? 1 : 0;
+			$show_profile = $this->_req->post->profile_area;
+			$active = isset($this->_req->post->active) ? 1 : 0;
+			$private = $this->_req->getPost('private', 'intval', 0);
+			$can_search = isset($this->_req->post->can_search) ? 1 : 0;
 
 			// Some masking stuff...
-			$mask = isset($_POST['mask']) ? $_POST['mask'] : '';
-			if ($mask == 'regex' && isset($_POST['regex']))
-				$mask .= $_POST['regex'];
+			$mask = $this->_req->getPost('mask', 'strval', '');
+			if ($mask == 'regex' && isset($this->_req->post->regex))
+				$mask .= $this->_req->post->regex;
 
-			$field_length = isset($_POST['max_length']) ? (int) $_POST['max_length'] : 255;
-			$enclose = isset($_POST['enclose']) ? $_POST['enclose'] : '';
-			$placement = isset($_POST['placement']) ? (int) $_POST['placement'] : 0;
+			$field_length = $this->_req->getPost('max_length', 'intval', 255);
+			$enclose = $this->_req->getPost('enclose', 'strval', '');
+			$placement = $this->_req->getPost('placement', 'intval', 0);
 
 			// Select options?
 			$field_options = '';
 			$newOptions = array();
-			$default = isset($_POST['default_check']) && $_POST['field_type'] == 'check' ? 1 : '';
-			if (!empty($_POST['select_option']) && ($_POST['field_type'] == 'select' || $_POST['field_type'] == 'radio'))
+			$default = isset($this->_req->post->default_check) && $this->_req->post->field_type == 'check' ? 1 : '';
+			if (!empty($this->_req->post->select_option) && ($this->_req->post->field_type == 'select' || $this->_req->post->field_type == 'radio'))
 			{
-				foreach ($_POST['select_option'] as $k => $v)
+				foreach ($this->_req->post->select_option as $k => $v)
 				{
 					// Clean, clean, clean...
 					$v = Util::htmlspecialchars($v);
@@ -1213,7 +1021,7 @@ class ManageFeatures_Controller extends Action_Controller
 					$newOptions[$k] = $v;
 
 					// Is it default?
-					if (isset($_POST['default_select']) && $_POST['default_select'] == $k)
+					if (isset($this->_req->post->default_select) && $this->_req->post->default_select == $k)
 						$default = $v;
 				}
 
@@ -1221,13 +1029,13 @@ class ManageFeatures_Controller extends Action_Controller
 			}
 
 			// Text area by default has dimensions
-			if ($_POST['field_type'] == 'textarea')
-				$default = (int) $_POST['rows'] . ',' . (int) $_POST['cols'];
+			if ($this->_req->post->field_type == 'textarea')
+				$default = (int) $this->_req->post->rows . ',' . (int) $this->_req->post->cols;
 
 			// Come up with the unique name?
 			if (empty($context['fid']))
 			{
-				$colname = Util::substr(strtr($_POST['field_name'], array(' ' => '')), 0, 6);
+				$colname = Util::substr(strtr($this->_req->post->field_name, array(' ' => '')), 0, 6);
 				preg_match('~([\w\d_-]+)~', $colname, $matches);
 
 				// If there is nothing to the name, then let's start our own - for foreign languages etc.
@@ -1238,7 +1046,7 @@ class ManageFeatures_Controller extends Action_Controller
 
 				$unique = ensureUniqueProfileField($colname, $initial_colname);
 
-				// Still not a unique colum name? Leave it up to the user, then.
+				// Still not a unique column name? Leave it up to the user, then.
 				if (!$unique)
 					Errors::fatal_lang_error('custom_option_not_unique');
 			}
@@ -1246,14 +1054,14 @@ class ManageFeatures_Controller extends Action_Controller
 			else
 			{
 				// Anything going to check or select is pointless keeping - as is anything coming from check!
-				if (($_POST['field_type'] == 'check' && $context['field']['type'] != 'check')
-					|| (($_POST['field_type'] == 'select' || $_POST['field_type'] == 'radio') && $context['field']['type'] != 'select' && $context['field']['type'] != 'radio')
-					|| ($context['field']['type'] == 'check' && $_POST['field_type'] != 'check'))
+				if (($this->_req->post->field_type == 'check' && $context['field']['type'] != 'check')
+					|| (($this->_req->post->field_type == 'select' || $this->_req->post->field_type == 'radio') && $context['field']['type'] != 'select' && $context['field']['type'] != 'radio')
+					|| ($context['field']['type'] == 'check' && $this->_req->post->field_type != 'check'))
 				{
 					deleteProfileFieldUserData($context['field']['colname']);
 				}
 				// Otherwise - if the select is edited may need to adjust!
-				elseif ($_POST['field_type'] == 'select' || $_POST['field_type'] == 'radio')
+				elseif ($this->_req->post->field_type == 'select' || $this->_req->post->field_type == 'radio')
 				{
 					$optionChanges = array();
 					$takenKeys = array();
@@ -1296,9 +1104,9 @@ class ManageFeatures_Controller extends Action_Controller
 					'can_search' => $can_search,
 					'bbc' => $bbc,
 					'current_field' => $context['fid'],
-					'field_name' => $_POST['field_name'],
-					'field_desc' => $_POST['field_desc'],
-					'field_type' => $_POST['field_type'],
+					'field_name' => $this->_req->post->field_name,
+					'field_desc' => $this->_req->post->field_desc,
+					'field_type' => $this->_req->post->field_type,
 					'field_options' => $field_options,
 					'show_profile' => $show_profile,
 					'default_value' => $default,
@@ -1310,7 +1118,7 @@ class ManageFeatures_Controller extends Action_Controller
 				updateProfileField($field_data);
 
 				// Just clean up any old selects - these are a pain!
-				if (($_POST['field_type'] == 'select' || $_POST['field_type'] == 'radio') && !empty($newOptions))
+				if (($this->_req->post->field_type == 'select' || $this->_req->post->field_type == 'radio') && !empty($newOptions))
 					deleteOldProfileFieldSelects($newOptions, $context['field']['colname']);
 			}
 			// Otherwise creating a new one
@@ -1318,9 +1126,9 @@ class ManageFeatures_Controller extends Action_Controller
 			{
 				$new_field = array(
 					'col_name' => $colname,
-					'field_name' => $_POST['field_name'],
-					'field_desc' => $_POST['field_desc'],
-					'field_type' => $_POST['field_type'],
+					'field_name' => $this->_req->post->field_name,
+					'field_desc' => $this->_req->post->field_desc,
+					'field_type' => $this->_req->post->field_type,
 					'field_length' => $field_length,
 					'field_options' => $field_options,
 					'show_reg' => $show_reg,
@@ -1341,7 +1149,7 @@ class ManageFeatures_Controller extends Action_Controller
 			}
 		}
 		// Deleting?
-		elseif (isset($_POST['delete']) && $context['field']['colname'])
+		elseif (isset($this->_req->post->delete) && $context['field']['colname'])
 		{
 			checkSession();
 			validateToken('admin-ecp');
@@ -1352,7 +1160,7 @@ class ManageFeatures_Controller extends Action_Controller
 		}
 
 		// Rebuild display cache etc.
-		if (isset($_POST['delete']) || isset($_POST['save']) || isset($_POST['onoff']))
+		if (isset($this->_req->post->delete) || isset($this->_req->post->save) || isset($this->_req->post->onoff))
 		{
 			checkSession();
 
@@ -1385,20 +1193,20 @@ class ManageFeatures_Controller extends Action_Controller
 		$context['pm_limits'] = loadPMLimits();
 
 		// Saving?
-		if (isset($_GET['save']))
+		if (isset($this->_req->query->save))
 		{
 			checkSession();
 
 			require_once(SUBSDIR . '/Membergroups.subs.php');
 			foreach ($context['pm_limits'] as $group_id => $group)
 			{
-				if (isset($_POST['group'][$group_id]) && $_POST['group'][$group_id] != $group['max_messages'])
-					updateMembergroupProperties(array('current_group' => $group_id, 'max_messages' => $_POST['group'][$group_id]));
+				if (isset($this->_req->post->group[$group_id]) && $this->_req->post->group[$group_id] != $group['max_messages'])
+					updateMembergroupProperties(array('current_group' => $group_id, 'max_messages' => $this->_req->post->group[$group_id]));
 			}
 
 			call_integration_hook('integrate_save_pmsettings_settings');
 
-			Settings_Form::save_db($config_vars);
+			Settings_Form::save_db($config_vars, $this->_req->post);
 			redirectexit('action=admin;area=featuresettings;sa=pmsettings');
 		}
 
