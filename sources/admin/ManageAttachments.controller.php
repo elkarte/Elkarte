@@ -47,6 +47,7 @@ class ManageAttachments_Controller extends Action_Controller
 	{
 		$this->_req = HttpReq::instance();
 	}
+
 	/**
 	 * The main 'Attachments and Avatars' admin.
 	 *
@@ -141,25 +142,28 @@ class ManageAttachments_Controller extends Action_Controller
 		require_once(SUBSDIR . '/Attachments.subs.php');
 
 		// Saving settings?
-		if (isset($_GET['save']))
+		if (isset($this->_req->query->save))
 		{
 			checkSession();
 
-			if (isset($_POST['attachmentUploadDir']))
+			// Changing the attachment upload directory
+			if (isset($this->_req->post->attachmentUploadDir))
 			{
-				if (!empty($_POST['attachmentUploadDir']) && $modSettings['attachmentUploadDir'] != $_POST['attachmentUploadDir'])
-					rename($modSettings['attachmentUploadDir'], $_POST['attachmentUploadDir']);
+				if (!empty($this->_req->post->attachmentUploadDir) && $modSettings['attachmentUploadDir'] != $this->_req->post->attachmentUploadDir)
+					rename($modSettings['attachmentUploadDir'], $this->_req->post->attachmentUploadDir);
 
-				$modSettings['attachmentUploadDir'] = array(1 => $_POST['attachmentUploadDir']);
-				$_POST['attachmentUploadDir'] = serialize($modSettings['attachmentUploadDir']);
+				$modSettings['attachmentUploadDir'] = array(1 => $this->_req->post->attachmentUploadDir);
+				$this->_req->post->attachmentUploadDir = serialize($modSettings['attachmentUploadDir']);
 			}
 
-			if (!empty($_POST['use_subdirectories_for_attachments']))
+			// Adding / changing the sub directorys for attachments
+			if (!empty($this->_req->post->use_subdirectories_for_attachments))
 			{
-				if (isset($_POST['use_subdirectories_for_attachments']) && empty($_POST['basedirectory_for_attachments']))
-					$_POST['basedirectory_for_attachments'] = (!empty($modSettings['basedirectory_for_attachments']) ? ($modSettings['basedirectory_for_attachments']) : BOARDDIR);
+				// Make sure we have a base directory defined
+				if (isset($this->_req->post->use_subdirectories_for_attachments) && empty($this->_req->post->basedirectory_for_attachments))
+					$this->_req->post->basedirectory_for_attachments = (!empty($modSettings['basedirectory_for_attachments']) ? ($modSettings['basedirectory_for_attachments']) : BOARDDIR);
 
-				if (!empty($_POST['use_subdirectories_for_attachments']) && !empty($modSettings['attachment_basedirectories']))
+				if (!empty($modSettings['attachment_basedirectories']))
 				{
 					if (!is_array($modSettings['attachment_basedirectories']))
 						$modSettings['attachment_basedirectories'] = unserialize($modSettings['attachment_basedirectories']);
@@ -167,33 +171,33 @@ class ManageAttachments_Controller extends Action_Controller
 				else
 					$modSettings['attachment_basedirectories'] = array();
 
-				if (!empty($_POST['use_subdirectories_for_attachments']) && !empty($_POST['basedirectory_for_attachments']) && !in_array($_POST['basedirectory_for_attachments'], $modSettings['attachment_basedirectories']))
+				if (!empty($this->_req->post->basedirectory_for_attachments) && !in_array($this->_req->post->basedirectory_for_attachments, $modSettings['attachment_basedirectories']))
 				{
 					$currentAttachmentUploadDir = $modSettings['currentAttachmentUploadDir'];
 
-					if (!in_array($_POST['basedirectory_for_attachments'], $modSettings['attachmentUploadDir']))
+					if (!in_array($this->_req->post->basedirectory_for_attachments, $modSettings['attachmentUploadDir']))
 					{
-						if (!automanage_attachments_create_directory($_POST['basedirectory_for_attachments']))
-							$_POST['basedirectory_for_attachments'] = $modSettings['basedirectory_for_attachments'];
+						if (!automanage_attachments_create_directory($this->_req->post->basedirectory_for_attachments))
+							$this->_req->post->basedirectory_for_attachments = $modSettings['basedirectory_for_attachments'];
 					}
 
-					if (!in_array($_POST['basedirectory_for_attachments'], $modSettings['attachment_basedirectories']))
+					if (!in_array($this->_req->post->basedirectory_for_attachments, $modSettings['attachment_basedirectories']))
 					{
-						$modSettings['attachment_basedirectories'][$modSettings['currentAttachmentUploadDir']] = $_POST['basedirectory_for_attachments'];
+						$modSettings['attachment_basedirectories'][$modSettings['currentAttachmentUploadDir']] = $this->_req->post->basedirectory_for_attachments;
 						updateSettings(array(
 							'attachment_basedirectories' => serialize($modSettings['attachment_basedirectories']),
 							'currentAttachmentUploadDir' => $currentAttachmentUploadDir,
 						));
 
-						$_POST['use_subdirectories_for_attachments'] = 1;
-						$_POST['attachmentUploadDir'] = serialize($modSettings['attachmentUploadDir']);
+						$this->_req->post->use_subdirectories_for_attachments = 1;
+						$this->_req->post->attachmentUploadDir = serialize($modSettings['attachmentUploadDir']);
 					}
 				}
 			}
 
 			call_integration_hook('integrate_save_attachment_settings');
 
-			Settings_Form::save_db($config_vars);
+			Settings_Form::save_db($config_vars, $this->_req->post);
 			redirectexit('action=admin;area=manageattachments;sa=attachments');
 		}
 
@@ -237,7 +241,7 @@ class ManageAttachments_Controller extends Action_Controller
 			$modSettings['attachmentUploadDir'] = $modSettings['attachmentUploadDir'][1];
 
 		// If not set, show a default path for the base directory
-		if (!isset($_GET['save']) && empty($modSettings['basedirectory_for_attachments']))
+		if (!isset($this->_req->query->save) && empty($modSettings['basedirectory_for_attachments']))
 			$modSettings['basedirectory_for_attachments'] = $context['attachmentUploadDir'];
 
 		$context['valid_upload_dir'] = is_dir($context['attachmentUploadDir']) && is_writable($context['attachmentUploadDir']);
@@ -279,8 +283,18 @@ class ManageAttachments_Controller extends Action_Controller
 				// Directory and size limits.
 				array('select', 'automanage_attachments', array(0 => $txt['attachments_normal'], 1 => $txt['attachments_auto_space'], 2 => $txt['attachments_auto_years'], 3 => $txt['attachments_auto_months'], 4 => $txt['attachments_auto_16'])),
 				array('check', 'use_subdirectories_for_attachments', 'subtext' => $txt['use_subdirectories_for_attachments_note']),
-				(empty($modSettings['attachment_basedirectories']) ? array('text', 'basedirectory_for_attachments', 40,) : array('var_message', 'basedirectory_for_attachments', 'message' => 'basedirectory_for_attachments_path', 'invalid' => empty($context['valid_basedirectory']), 'text_label' => (!empty($context['valid_basedirectory']) ? $txt['basedirectory_for_attachments_current'] : $txt['basedirectory_for_attachments_warning']))),
-				empty($modSettings['attachment_basedirectories']) && $modSettings['currentAttachmentUploadDir'] == 1 && count($modSettings['attachmentUploadDir']) == 1 ? array('text', 'attachmentUploadDir', 'subtext' => $txt['attachmentUploadDir_multiple_configure'], 40, 'invalid' => !$context['valid_upload_dir']) : array('var_message', 'attach_current_directory', 'subtext' => $txt['attachmentUploadDir_multiple_configure'], 'message' => 'attachment_path', 'invalid' => empty($context['valid_upload_dir']), 'text_label' => (!empty($context['valid_upload_dir']) ? $txt['attach_current_dir'] : $txt['attach_current_dir_warning'])),
+				(empty($modSettings['attachment_basedirectories'])
+					? array('text', 'basedirectory_for_attachments', 40,)
+					: array('var_message', 'basedirectory_for_attachments', 'message' => 'basedirectory_for_attachments_path', 'invalid' => empty($context['valid_basedirectory']), 'text_label' => (!empty($context['valid_basedirectory'])
+						? $txt['basedirectory_for_attachments_current']
+						: $txt['basedirectory_for_attachments_warning']))
+				),
+				empty($modSettings['attachment_basedirectories']) && $modSettings['currentAttachmentUploadDir'] == 1 && count($modSettings['attachmentUploadDir']) == 1
+					? array('text', 'attachmentUploadDir', 'subtext' => $txt['attachmentUploadDir_multiple_configure'], 40, 'invalid' => !$context['valid_upload_dir'])
+					: array('var_message', 'attach_current_directory', 'subtext' => $txt['attachmentUploadDir_multiple_configure'], 'message' => 'attachment_path', 'invalid' => empty($context['valid_upload_dir']), 'text_label' => (!empty($context['valid_upload_dir'])
+						? $txt['attach_current_dir']
+						: $txt['attach_current_dir_warning'])
+				),
 				array('int', 'attachmentDirFileLimit', 'subtext' => $txt['zero_for_no_limit'], 6),
 				array('int', 'attachmentDirSizeLimit', 'subtext' => $txt['zero_for_no_limit'], 6, 'postinput' => $txt['kilobyte']),
 			'',
@@ -348,7 +362,7 @@ class ManageAttachments_Controller extends Action_Controller
 		require_once(SUBSDIR . '/ManageAttachments.subs.php');
 
 		// Attachments or avatars?
-		$context['browse_type'] = isset($_REQUEST['avatars']) ? 'avatars' : (isset($_REQUEST['thumbs']) ? 'thumbs' : 'attachments');
+		$context['browse_type'] = isset($this->_req->query->avatars) ? 'avatars' : (isset($this->_req->query->thumbs) ? 'thumbs' : 'attachments');
 
 		// Set the options for the list component.
 		$listOptions = array(
@@ -595,10 +609,10 @@ class ManageAttachments_Controller extends Action_Controller
 		$context['attach_multiple_dirs'] = count($attach_dirs) > 1 ? true : false;
 		$context['attach_dirs'] = $attach_dirs;
 		$context['base_dirs'] = !empty($modSettings['attachment_basedirectories']) ? unserialize($modSettings['attachment_basedirectories']) : array();
-		$context['checked'] = isset($_SESSION['checked']) ? $_SESSION['checked'] : true;
-		if (!empty($_SESSION['results']))
+		$context['checked'] = $this->_req->getSession('checked', true);
+		if (!empty($this->_req->session->results))
 		{
-			$context['results'] = implode('<br />', $_SESSION['results']);
+			$context['results'] = implode('<br />', $this->_req->session->results);
 			unset($_SESSION['results']);
 		}
 	}
@@ -647,21 +661,22 @@ class ManageAttachments_Controller extends Action_Controller
 		require_once(SUBSDIR . '/ManageAttachments.subs.php');
 
 		// Deleting an attachment?
-		if ($_REQUEST['type'] != 'avatars')
+		if ($this->_req->getQuery('type', 'strval') !== 'avatars')
 		{
 			// Get rid of all the old attachments.
-			$messages = removeAttachments(array('attachment_type' => 0, 'poster_time' => (time() - 24 * 60 * 60 * $_POST['age'])), 'messages', true);
+			$messages = removeAttachments(array('attachment_type' => 0, 'poster_time' => (time() - 24 * 60 * 60 * $this->_req->post->age)), 'messages', true);
 
 			// Update the messages to reflect the change.
-			if (!empty($messages) && !empty($_POST['notice']))
-				setRemovalNotice($messages, $_POST['notice']);
+			if (!empty($messages) && !empty($this->_req->post->notice))
+				setRemovalNotice($messages, $this->_req->post->notice);
 		}
 		else
 		{
 			// Remove all the old avatars.
-			removeAttachments(array('not_id_member' => 0, 'last_login' => (time() - 24 * 60 * 60 * $_POST['age'])), 'members');
+			removeAttachments(array('not_id_member' => 0, 'last_login' => (time() - 24 * 60 * 60 * $this->_req->post->age)), 'members');
 		}
-		redirectexit('action=admin;area=manageattachments' . (empty($_REQUEST['avatars']) ? ';sa=maintenance' : ';avatars'));
+
+		redirectexit('action=admin;area=manageattachments' . (empty($this->_req->query->avatars) ? ';sa=maintenance' : ';avatars'));
 	}
 
 	/**
@@ -678,11 +693,11 @@ class ManageAttachments_Controller extends Action_Controller
 		require_once(SUBSDIR . '/ManageAttachments.subs.php');
 
 		// Find humungous attachments.
-		$messages = removeAttachments(array('attachment_type' => 0, 'size' => 1024 * $_POST['size']), 'messages', true);
+		$messages = removeAttachments(array('attachment_type' => 0, 'size' => 1024 * $this->_req->post->size), 'messages', true);
 
 		// And make a note on the post.
-		if (!empty($messages) && !empty($_POST['notice']))
-			setRemovalNotice($messages, $_POST['notice']);
+		if (!empty($messages) && !empty($this->_req->post->notice))
+			setRemovalNotice($messages, $this->_req->post->notice);
 
 		redirectexit('action=admin;area=manageattachments;sa=maintenance');
 	}
@@ -698,17 +713,17 @@ class ManageAttachments_Controller extends Action_Controller
 
 		checkSession('post');
 
-		if (!empty($_POST['remove']))
+		if (!empty($this->_req->post->remove))
 		{
 			// we'll need this
 			require_once(SUBSDIR . '/ManageAttachments.subs.php');
 
 			// There must be a quicker way to pass this safety test??
 			$attachments = array();
-			foreach ($_POST['remove'] as $removeID => $dummy)
+			foreach ($this->_req->post->remove as $removeID => $dummy)
 				$attachments[] = (int) $removeID;
 
-			if ($_REQUEST['type'] == 'avatars' && !empty($attachments))
+			if ($this->_req->query->type == 'avatars' && !empty($attachments))
 				removeAttachments(array('id_attach' => $attachments));
 			elseif (!empty($attachments))
 			{
@@ -724,8 +739,8 @@ class ManageAttachments_Controller extends Action_Controller
 			}
 		}
 
-		$_GET['sort'] = isset($_GET['sort']) ? $_GET['sort'] : 'date';
-		redirectexit('action=admin;area=manageattachments;sa=browse;' . $_REQUEST['type'] . ';sort=' . $_GET['sort'] . (isset($_GET['desc']) ? ';desc' : '') . ';start=' . $_REQUEST['start']);
+		$sort = $this->_req->getQuery('sort', 'strval', 'date');
+		redirectexit('action=admin;area=manageattachments;sa=browse;' . $this->_req->query->type . ';sort=' . $sort . (isset($this->_req->query->desc) ? ';desc' : '') . ';start=' . $this->_req->query->start);
 	}
 
 	/**
@@ -744,7 +759,7 @@ class ManageAttachments_Controller extends Action_Controller
 
 		$messages = removeAttachments(array('attachment_type' => 0), '', true);
 
-		$notice = isset($_POST['notice']) ? $_POST['notice'] : $txt['attachment_delete_admin'];
+		$notice = $this->_req->getPost('notice', 'strval', $txt['attachment_delete_admin']);
 
 		// Add the notice on the end of the changed messages.
 		if (!empty($messages))
@@ -776,28 +791,29 @@ class ManageAttachments_Controller extends Action_Controller
 		checkSession('get');
 
 		// If we choose cancel, redirect right back.
-		if (isset($_POST['cancel']))
+		if (isset($this->_req->post->cancel))
 			redirectexit('action=admin;area=manageattachments;sa=maintenance');
 
 		// Try give us a while to sort this out...
 		setTimeLimit(600);
 
-		$_GET['step'] = empty($_GET['step']) ? 0 : (int) $_GET['step'];
-		$context['starting_substep'] = $_GET['substep'] = empty($_GET['substep']) ? 0 : (int) $_GET['substep'];
+		$this->step = $this->_reqQuery('step', 'intval', 0);
+		$this->substep = $this->_reqQuery('substep', 'intval', 0);
+		$this->starting_substep = $this->substep;
 
 		// Don't recall the session just in case.
-		if ($_GET['step'] == 0 && $_GET['substep'] == 0)
+		if ($this->step === 0 && $this->substep === 0)
 		{
 			unset($_SESSION['attachments_to_fix'], $_SESSION['attachments_to_fix2']);
 
 			// If we're actually fixing stuff - work out what.
-			if (isset($_GET['fixErrors']))
+			if (isset($this->_req->query->fixErrors))
 			{
 				// Nothing?
-				if (empty($_POST['to_fix']))
+				if (empty($this->_req->post->to_fix))
 					redirectexit('action=admin;area=manageattachments;sa=maintenance');
 
-				foreach($_POST['to_fix'] as $key => $value)
+				foreach($this->_req->post->to_fix as $key => $value)
 					$_SESSION['attachments_to_fix'][] = $value;
 			}
 		}
@@ -819,108 +835,107 @@ class ManageAttachments_Controller extends Action_Controller
 			'files_without_attachment' => 0,
 		);
 
-		$to_fix = !empty($_SESSION['attachments_to_fix']) ? $_SESSION['attachments_to_fix'] : array();
-		$context['repair_errors'] = isset($_SESSION['attachments_to_fix2']) ? $_SESSION['attachments_to_fix2'] : $context['repair_errors'];
-		$fix_errors = isset($_GET['fixErrors']) ? true : false;
+		$to_fix = !empty($this->_req->session->attachments_to_fix) ? $this->_req->session->attachments_to_fix : array();
+		$context['repair_errors'] = $this->_req->getSsession('attachments_to_fix2', $context['repair_errors']);
+		$fix_errors = isset($this->_req->query->fixErrors) ? true : false;
 
 		// Get stranded thumbnails.
-		if ($_GET['step'] <= 0)
+		if ($this->step <= 0)
 		{
 			$thumbnails = getMaxThumbnail();
 
-			for (; $_GET['substep'] < $thumbnails; $_GET['substep'] += 500)
+			for (; $this->substep < $thumbnails; $this->substep += 500)
 			{
-				$removed = findOrphanThumbnails($_GET['substep'], $fix_errors, $to_fix);
+				$removed = findOrphanThumbnails($this->substep, $fix_errors, $to_fix);
 				$context['repair_errors']['missing_thumbnail_parent'] += count($removed);
 
-				pauseAttachmentMaintenance($to_fix, $thumbnails);
+				$this->_pauseAttachmentMaintenance($to_fix, $thumbnails);
 			}
 
 			// Done here, on to the next
-			$_GET['step'] = 1;
-			$_GET['substep'] = 0;
-			pauseAttachmentMaintenance($to_fix);
+			$this->step = 1;
+			$this->substep = 0;
+			$this->_pauseAttachmentMaintenance($to_fix);
 		}
 
 		// Find parents which think they have thumbnails, but actually, don't.
-		if ($_GET['step'] <= 1)
+		if ($this->step <= 1)
 		{
 			$thumbnails = maxNoThumb();
 
-			for (; $_GET['substep'] < $thumbnails; $_GET['substep'] += 500)
+			for (; $this->substep < $thumbnails; $this->substep += 500)
 			{
-				$to_update = findParentsOrphanThumbnails($_GET['substep'], $fix_errors, $to_fix);
+				$to_update = findParentsOrphanThumbnails($this->substep, $fix_errors, $to_fix);
 				$context['repair_errors']['parent_missing_thumbnail'] += count($to_update);
 
-				pauseAttachmentMaintenance($to_fix, $thumbnails);
+				$this->_pauseAttachmentMaintenance($to_fix, $thumbnails);
 			}
 
 			// Another step done, but many to go
-			$_GET['step'] = 2;
-			$_GET['substep'] = 0;
-			pauseAttachmentMaintenance($to_fix);
-
+			$this->step = 2;
+			$this->substep = 0;
+			$this->_pauseAttachmentMaintenance($to_fix);
 		}
 
 		// This may take forever I'm afraid, but life sucks... recount EVERY attachments!
-		if ($_GET['step'] <= 2)
+		if ($this->step <= 2)
 		{
 			$thumbnails = maxAttachment();
 
-			for (; $_GET['substep'] < $thumbnails; $_GET['substep'] += 250)
+			for (; $this->substep < $thumbnails; $this->substep += 250)
 			{
-				$repair_errors = repairAttachmentData($_GET['substep'], $fix_errors, $to_fix);
+				$repair_errors = repairAttachmentData($this->substep, $fix_errors, $to_fix);
 
 				foreach($repair_errors as $key => $value)
 					$context['repair_errors'][$key] += $value;
 
-				pauseAttachmentMaintenance($to_fix, $thumbnails);
+				$this->_pauseAttachmentMaintenance($to_fix, $thumbnails);
 			}
 
 			// And onward we go
-			$_GET['step'] = 3;
-			$_GET['substep'] = 0;
-			pauseAttachmentMaintenance($to_fix);
+			$this->step = 3;
+			$this->substep = 0;
+			$this->_pauseAttachmentMaintenance($to_fix);
 		}
 
 		// Get avatars with no members associated with them.
-		if ($_GET['step'] <= 3)
+		if ($this->step <= 3)
 		{
 			$thumbnails = maxAttachment();
 
-			for (; $_GET['substep'] < $thumbnails; $_GET['substep'] += 500)
+			for (; $this->substep < $thumbnails; $this->substep += 500)
 			{
-				$to_remove = findOrphanAvatars($_GET['substep'], $fix_errors, $to_fix);
+				$to_remove = findOrphanAvatars($this->substep, $fix_errors, $to_fix);
 				$context['repair_errors']['avatar_no_member'] += count($to_remove);
 
-				pauseAttachmentMaintenance($to_fix, $thumbnails);
+				$this->_pauseAttachmentMaintenance($to_fix, $thumbnails);
 			}
 
-			$_GET['step'] = 4;
-			$_GET['substep'] = 0;
-			pauseAttachmentMaintenance($to_fix);
+			$this->step = 4;
+			$this->substep = 0;
+			$this->_pauseAttachmentMaintenance($to_fix);
 		}
 
 		// What about attachments, who are missing a message :'(
-		if ($_GET['step'] <= 4)
+		if ($this->step <= 4)
 		{
 			$thumbnails = maxAttachment();
 
-			for (; $_GET['substep'] < $thumbnails; $_GET['substep'] += 500)
+			for (; $this->substep < $thumbnails; $this->substep += 500)
 			{
-				$to_remove = findOrphanAttachments($_GET['substep'], $fix_errors, $to_fix);
+				$to_remove = findOrphanAttachments($this->substep, $fix_errors, $to_fix);
 				$context['repair_errors']['attachment_no_msg'] += count($to_remove);
 
-				pauseAttachmentMaintenance($to_fix, $thumbnails);
+				$this->_pauseAttachmentMaintenance($to_fix, $thumbnails);
 			}
 
-			$_GET['step'] = 5;
-			$_GET['substep'] = 0;
-			pauseAttachmentMaintenance($to_fix);
+			$this->step = 5;
+			$this->substep = 0;
+			$this->_pauseAttachmentMaintenance($to_fix);
 		}
 
 		// What about files who are not recorded in the database?
-		if ($_GET['step'] <= 5)
+		if ($this->step <= 5)
 		{
 			// Just use the current path for temp files.
 			if (!is_array($modSettings['attachmentUploadDir']))
@@ -929,7 +944,7 @@ class ManageAttachments_Controller extends Action_Controller
 
 			$current_check = 0;
 			$max_checks = 500;
-			$files_checked = empty($_GET['substep']) ? 0 : $_GET['substep'];
+			$files_checked = empty($this->substep) ? 0 : $this->substep;
 			foreach ($attach_dirs as $attach_dir)
 			{
 				if ($dir = @opendir($attach_dir))
@@ -972,17 +987,18 @@ class ManageAttachments_Controller extends Action_Controller
 							}
 						}
 						$current_check++;
-						$_GET['substep'] = $current_check;
+						$this->substep = $current_check;
+
 						if ($current_check - $files_checked >= $max_checks)
-							pauseAttachmentMaintenance($to_fix);
+							$this->_pauseAttachmentMaintenance($to_fix);
 					}
 					closedir($dir);
 				}
 			}
 
-			$_GET['step'] = 5;
-			$_GET['substep'] = 0;
-			pauseAttachmentMaintenance($to_fix);
+			$this->step = 5;
+			$this->substep = 0;
+			$this->_pauseAttachmentMaintenance($to_fix);
 		}
 
 		// Got here we must be doing well - just the template! :D
@@ -994,11 +1010,13 @@ class ManageAttachments_Controller extends Action_Controller
 		$context['completed'] = $fix_errors ? true : false;
 		$context['errors_found'] = false;
 		foreach ($context['repair_errors'] as $number)
+		{
 			if (!empty($number))
 			{
 				$context['errors_found'] = true;
 				break;
 			}
+		}
 	}
 
 	/**
@@ -1023,11 +1041,11 @@ class ManageAttachments_Controller extends Action_Controller
 		$errors = array();
 
 		// Saving?
-		if (isset($_REQUEST['save']))
+		if (isset($this->_req->query->save))
 		{
 			checkSession();
 
-			$_POST['current_dir'] = isset($_POST['current_dir']) ? (int) $_POST['current_dir'] : 0;
+			$this->current_dir = $this->_req->getPost('current_dir', 'intval', 0);
 			$new_dirs = array();
 
 			require_once(SUBSDIR . '/Themes.subs.php');
@@ -1036,7 +1054,7 @@ class ManageAttachments_Controller extends Action_Controller
 			foreach ($themes as $theme)
 				$reserved_dirs[] = $theme['theme_dir'];
 
-			foreach ($_POST['dirs'] as $id => $path)
+			foreach ($this->_req->post->dirs as $id => $path)
 			{
 				$error = '';
 				$id = (int) $id;
@@ -1068,7 +1086,7 @@ class ManageAttachments_Controller extends Action_Controller
 
 					// OK, so let's try to create it then.
 					if (automanage_attachments_create_directory($path))
-						$_POST['current_dir'] = $modSettings['currentAttachmentUploadDir'];
+						$this->current_dir = $modSettings['currentAttachmentUploadDir'];
 					else
 						$errors[] = $path . ': ' . $txt[$context['dir_creation_error']];
 				}
@@ -1109,7 +1127,7 @@ class ManageAttachments_Controller extends Action_Controller
 					$real_path = $modSettings['attachmentUploadDir'][$id];
 
 					// It's not a good idea to delete the current directory.
-					if ($id == (!empty($_POST['current_dir']) ? $_POST['current_dir'] : $modSettings['currentAttachmentUploadDir']))
+					if ($id == (!empty($this->current_dir) ? $this->current_dir : $modSettings['currentAttachmentUploadDir']))
 						$errors[] = $real_path . ': ' . $txt['attach_dir_is_current'];
 					// Or the current base directory
 					elseif (!empty($modSettings['basedirectory_for_attachments']) && $modSettings['basedirectory_for_attachments'] == $modSettings['attachmentUploadDir'][$id])
@@ -1169,25 +1187,25 @@ class ManageAttachments_Controller extends Action_Controller
 			}
 
 			// We need to make sure the current directory is right.
-			if (empty($_POST['current_dir']) && !empty($modSettings['currentAttachmentUploadDir']))
-				$_POST['current_dir'] = $modSettings['currentAttachmentUploadDir'];
+			if (empty($this->current_dir) && !empty($modSettings['currentAttachmentUploadDir']))
+				$this->current_dir = $modSettings['currentAttachmentUploadDir'];
 
 			// Find the current directory if there's no value carried,
-			if (empty($_POST['current_dir']) || empty($new_dirs[$_POST['current_dir']]))
+			if (empty($this->current_dir) || empty($new_dirs[$this->current_dir]))
 			{
 				if (array_key_exists($modSettings['currentAttachmentUploadDir'], $modSettings['attachmentUploadDir']))
-					$_POST['current_dir'] = $modSettings['currentAttachmentUploadDir'];
+					$this->current_dir = $modSettings['currentAttachmentUploadDir'];
 				else
-					$_POST['current_dir'] = max(array_keys($modSettings['attachmentUploadDir']));
+					$this->current_dir = max(array_keys($modSettings['attachmentUploadDir']));
 			}
 
 			// If the user wishes to go back, update the last_dir array
-			if ($_POST['current_dir'] != $modSettings['currentAttachmentUploadDir'] && !empty($modSettings['last_attachments_directory']) && (isset($modSettings['last_attachments_directory'][$_POST['current_dir']]) || isset($modSettings['last_attachments_directory'][0])))
+			if ($this->current_dir != $modSettings['currentAttachmentUploadDir'] && !empty($modSettings['last_attachments_directory']) && (isset($modSettings['last_attachments_directory'][$this->current_dir]) || isset($modSettings['last_attachments_directory'][0])))
 			{
 				if (!is_array($modSettings['last_attachments_directory']))
 					$modSettings['last_attachments_directory'] = unserialize($modSettings['last_attachments_directory']);
-				$num = substr(strrchr($modSettings['attachmentUploadDir'][$_POST['current_dir']], '_'), 1);
 
+				$num = substr(strrchr($modSettings['attachmentUploadDir'][$this->current_dir], '_'), 1);
 				if (is_numeric($num))
 				{
 					// Need to find the base folder.
@@ -1195,13 +1213,13 @@ class ManageAttachments_Controller extends Action_Controller
 					$use_subdirectories_for_attachments = 0;
 					if (!empty($modSettings['attachment_basedirectories']))
 						foreach ($modSettings['attachment_basedirectories'] as $bid => $base)
-							if (strpos($modSettings['attachmentUploadDir'][$_POST['current_dir']], $base . DIRECTORY_SEPARATOR) !== false)
+							if (strpos($modSettings['attachmentUploadDir'][$this->current_dir], $base . DIRECTORY_SEPARATOR) !== false)
 							{
 								$use_subdirectories_for_attachments = 1;
 								break;
 							}
 
-					if ($use_subdirectories_for_attachments == 0 && strpos($modSettings['attachmentUploadDir'][$_POST['current_dir']], BOARDDIR . DIRECTORY_SEPARATOR) !== false)
+					if ($use_subdirectories_for_attachments == 0 && strpos($modSettings['attachmentUploadDir'][$this->current_dir], BOARDDIR . DIRECTORY_SEPARATOR) !== false)
 						$bid = 0;
 
 					$modSettings['last_attachments_directory'][$bid] = (int) $num;
@@ -1234,7 +1252,7 @@ class ManageAttachments_Controller extends Action_Controller
 			{
 				// Save it to the database.
 				$update = array(
-					'currentAttachmentUploadDir' => $_POST['current_dir'],
+					'currentAttachmentUploadDir' => $this->current_dir,
 					'attachmentUploadDir' => serialize($new_dirs),
 				);
 			}
@@ -1249,25 +1267,25 @@ class ManageAttachments_Controller extends Action_Controller
 		}
 
 		// Saving a base directory?
-		if (isset($_REQUEST['save2']))
+		if (isset($this->_req->post->save2))
 		{
 			checkSession();
 
 			// Changing the current base directory?
-			$_POST['current_base_dir'] = (int) $_POST['current_base_dir'];
-			if (empty($_POST['new_base_dir']) && !empty($_POST['current_base_dir']))
+			$this->current_base_dir = $this->getQuery('current_base_dir', 'intval');
+			if (empty($this->_req->post->new_base_dir) && !empty($this->current_base_dir))
 			{
-				if ($modSettings['basedirectory_for_attachments'] != $modSettings['attachmentUploadDir'][$_POST['current_base_dir']])
+				if ($modSettings['basedirectory_for_attachments'] != $modSettings['attachmentUploadDir'][$this->current_base_dir])
 					$update = (array(
-						'basedirectory_for_attachments' => $modSettings['attachmentUploadDir'][$_POST['current_base_dir']],
+						'basedirectory_for_attachments' => $modSettings['attachmentUploadDir'][$this->current_base_dir],
 					));
 
 				//$modSettings['attachmentUploadDir'] = serialize($modSettings['attachmentUploadDir']);
 			}
 
-			if (isset($_POST['base_dir']))
+			if (isset($this->_req->post->base_dir))
 			{
-				foreach ($_POST['base_dir'] as $id => $dir)
+				foreach ($this->_req->post->base_dir as $id => $dir)
 				{
 					if (!empty($dir) && $dir != $modSettings['attachmentUploadDir'][$id])
 					{
@@ -1278,14 +1296,14 @@ class ManageAttachments_Controller extends Action_Controller
 							$update = (array(
 								'attachmentUploadDir' => serialize($modSettings['attachmentUploadDir']),
 								'attachment_basedirectories' => serialize($modSettings['attachment_basedirectories']),
-								'basedirectory_for_attachments' => $modSettings['attachmentUploadDir'][$_POST['current_base_dir']],
+								'basedirectory_for_attachments' => $modSettings['attachmentUploadDir'][$this->current_base_dir],
 							));
 						}
 					}
 
 					if (empty($dir))
 					{
-						if ($id == $_POST['current_base_dir'])
+						if ($id == $this->current_base_dir)
 						{
 							$errors[] = $modSettings['attachmentUploadDir'][$id] . ': ' . $txt['attach_dir_is_current'];
 							continue;
@@ -1294,40 +1312,40 @@ class ManageAttachments_Controller extends Action_Controller
 						unset($modSettings['attachment_basedirectories'][$id]);
 						$update = (array(
 							'attachment_basedirectories' => serialize($modSettings['attachment_basedirectories']),
-							'basedirectory_for_attachments' => $modSettings['attachmentUploadDir'][$_POST['current_base_dir']],
+							'basedirectory_for_attachments' => $modSettings['attachmentUploadDir'][$this->current_base_dir],
 						));
 					}
 				}
 			}
 
 			// Or adding a new one?
-			if (!empty($_POST['new_base_dir']))
+			if (!empty($this->_req->post->new_base_dir))
 			{
 				require_once(SUBSDIR . '/Attachments.subs.php');
-				$_POST['new_base_dir'] = htmlspecialchars($_POST['new_base_dir'], ENT_QUOTES, 'UTF-8');
+				$this->_req->post->new_base_dir = htmlspecialchars($this->_req->post->new_base_dir, ENT_QUOTES, 'UTF-8');
 
 				$current_dir = $modSettings['currentAttachmentUploadDir'];
 
-				if (!in_array($_POST['new_base_dir'], $modSettings['attachmentUploadDir']))
+				if (!in_array($this->_req->post->new_base_dir, $modSettings['attachmentUploadDir']))
 				{
-					if (!automanage_attachments_create_directory($_POST['new_base_dir']))
-						$errors[] = $_POST['new_base_dir'] . ': ' . $txt['attach_dir_base_no_create'];
+					if (!automanage_attachments_create_directory($this->_req->post->new_base_dir))
+						$errors[] = $this->_req->post->new_base_dir . ': ' . $txt['attach_dir_base_no_create'];
 				}
 
-				$modSettings['currentAttachmentUploadDir'] = array_search($_POST['new_base_dir'], $modSettings['attachmentUploadDir']);
-				if (!in_array($_POST['new_base_dir'], $modSettings['attachment_basedirectories']))
-					$modSettings['attachment_basedirectories'][$modSettings['currentAttachmentUploadDir']] = $_POST['new_base_dir'];
+				$modSettings['currentAttachmentUploadDir'] = array_search($this->_req->post->new_base_dir, $modSettings['attachmentUploadDir']);
+				if (!in_array($this->_req->post->new_base_dir, $modSettings['attachment_basedirectories']))
+					$modSettings['attachment_basedirectories'][$modSettings['currentAttachmentUploadDir']] = $this->_req->post->new_base_dir;
 				ksort($modSettings['attachment_basedirectories']);
 
 				$update = (array(
 					'attachment_basedirectories' => serialize($modSettings['attachment_basedirectories']),
-					'basedirectory_for_attachments' => $_POST['new_base_dir'],
+					'basedirectory_for_attachments' => $this->_req->post->new_base_dir,
 					'currentAttachmentUploadDir' => $current_dir,
 				));
 			}
 
 			if (!empty($errors))
-				$_SESSION['errors']['base'] = $errors;
+				$this->_req->SESSION->errors['base'] = $errors;
 
 			if (!empty($update))
 				updateSettings($update);
@@ -1335,20 +1353,20 @@ class ManageAttachments_Controller extends Action_Controller
 			redirectexit('action=admin;area=manageattachments;sa=attachpaths;' . $context['session_var'] . '=' . $context['session_id']);
 		}
 
-		if (isset($_SESSION['errors']))
+		if (isset($this->_req->SESSION->errors))
 		{
-			if (is_array($_SESSION['errors']))
+			if (is_array($this->_req->SESSION->errors))
 			{
 				$errors = array();
-				if (!empty($_SESSION['errors']['dir']))
-					foreach ($_SESSION['errors']['dir'] as $error)
+				if (!empty($this->_req->SESSION->errors['dir']))
+					foreach ($this->_req->SESSION->errors['dir'] as $error)
 						$errors['dir'][] = Util::htmlspecialchars($error, ENT_QUOTES);
 
-				if (!empty($_SESSION['errors']['base']))
-					foreach ($_SESSION['errors']['base'] as $error)
+				if (!empty($this->_req->SESSION->errors['base']))
+					foreach ($this->_req->SESSION->errors['base'] as $error)
 						$errors['base'][] = Util::htmlspecialchars($error, ENT_QUOTES);
 			}
-			unset($_SESSION['errors']);
+			unset($this->_req->SESSION->errors);
 		}
 
 		$listOptions = array(
@@ -1542,11 +1560,11 @@ class ManageAttachments_Controller extends Action_Controller
 			$modSettings['basedirectory_for_attachments'] = array();
 
 		// Clean the inputs
-		$_POST['from'] = (int) $_POST['from'];
-		$_POST['auto'] = !empty($_POST['auto']) ? (int) $_POST['auto'] : 0;
-		$_POST['to'] = (int) $_POST['to'];
-		$start = !empty($_POST['empty_it']) ? 0 : $modSettings['attachmentDirFileLimit'];
-		$_SESSION['checked'] = !empty($_POST['empty_it']) ? true : false;
+		$this->from = $this->_req->getPost('from', 'intval');
+		$this->auto = $this->_req->getPost('auto', 'intval', 0);
+		$this->to = $this->_req->getPost('to', 'intval');
+		$start = !empty($this->_req->post->empty_it) ? 0 : $modSettings['attachmentDirFileLimit'];
+		$_SESSION['checked'] = !empty($this->_req->post->empty_it) ? true : false;
 
 		// Prepare for the moving
 		$limit = 501;
@@ -1558,18 +1576,18 @@ class ManageAttachments_Controller extends Action_Controller
 		$total_progress = 0;
 
 		// Need to know where we are moving things from
-		if (empty($_POST['from']) || (empty($_POST['auto']) && empty($_POST['to'])))
+		if (empty($this->from) || (empty($this->auto) && empty($this->to)))
 			$results[] = $txt['attachment_transfer_no_dir'];
 
 		// Same location, that's easy
-		if ($_POST['from'] == $_POST['to'])
+		if ($this->from == $this->to)
 			$results[] = $txt['attachment_transfer_same_dir'];
 
 		// No errors so determine how many we may have to move
 		if (empty($results))
 		{
 			// Get the total file count for the progress bar.
-			$total_progress = getFolderAttachmentCount($_POST['from']);
+			$total_progress = getFolderAttachmentCount($this->from);
 			$total_progress -= $start;
 
 			if ($total_progress < 1)
@@ -1580,13 +1598,13 @@ class ManageAttachments_Controller extends Action_Controller
 		if (empty($results))
 		{
 			// Moving them automaticaly?
-			if (!empty($_POST['auto']))
+			if (!empty($this->auto))
 			{
 				$modSettings['automanage_attachments'] = 1;
 
 				// Create sub directroys off the root or from an attachment directory?
-				$modSettings['use_subdirectories_for_attachments'] = $_POST['auto'] == -1 ? 0 : 1;
-				$modSettings['basedirectory_for_attachments'] = $_POST['auto'] > 0 ? $modSettings['attachmentUploadDir'][$_POST['auto']] : $modSettings['basedirectory_for_attachments'];
+				$modSettings['use_subdirectories_for_attachments'] = $this->auto == -1 ? 0 : 1;
+				$modSettings['basedirectory_for_attachments'] = $this->auto > 0 ? $modSettings['attachmentUploadDir'][$this->auto] : $modSettings['basedirectory_for_attachments'];
 
 				// Finaly, where do they need to go
 				automanage_attachments_check_directory();
@@ -1594,7 +1612,7 @@ class ManageAttachments_Controller extends Action_Controller
 			}
 			// Or to a specified directory
 			else
-				$new_dir = $_POST['to'];
+				$new_dir = $this->to;
 
 			$modSettings['currentAttachmentUploadDir'] = $new_dir;
 			$break = false;
@@ -1611,7 +1629,7 @@ class ManageAttachments_Controller extends Action_Controller
 				}
 
 				// Find some attachments to move
-				list ($tomove_count, $tomove) = findAttachmentsToMove($_POST['from'], $start, $limit);
+				list ($tomove_count, $tomove) = findAttachmentsToMove($this->from, $start, $limit);
 
 				// Nothing found to move
 				if ($tomove_count === 0)
@@ -1643,7 +1661,7 @@ class ManageAttachments_Controller extends Action_Controller
 						if (!empty($modSettings['attachmentDirSizeLimit']) && $dir_size > $modSettings['attachmentDirSizeLimit'] * 1024 || (!empty($modSettings['attachmentDirFileLimit']) && $dir_files > $modSettings['attachmentDirFileLimit']))
 						{
 							// Since we're in auto mode. Create a new folder and reset the counters.
-							if (!empty($_POST['auto']))
+							if (!empty($this->auto))
 							{
 								automanage_attachments_by_space();
 
@@ -1716,51 +1734,52 @@ class ManageAttachments_Controller extends Action_Controller
 
 		redirectexit('action=admin;area=manageattachments;sa=maintenance#transfer');
 	}
-}
 
-/**
- * Function called in-between each round of attachments and avatar repairs.
- *
- * What it does:
- * - Called by repairAttachments().
- * - If repairAttachments() has more steps added, this function needs updated!
- *
- * @package Attachments
- * @param mixed[] $to_fix attachments to fix
- * @param int $max_substep = 0
- * @todo Move to ManageAttachments.subs.php
- */
-function pauseAttachmentMaintenance($to_fix, $max_substep = 0)
-{
-	global $context, $txt, $time_start;
+	/**
+	 * Function called in-between each round of attachments and avatar repairs.
+	 *
+	 * What it does:
+	 * - Called by repairAttachments().
+	 * - If repairAttachments() has more steps added, this function needs updated!
+	 *
+	 * @package Attachments
+	 * @param mixed[] $to_fix attachments to fix
+	 * @param int $max_substep = 0
+	 * @todo Move to ManageAttachments.subs.php
+	 */
+	private function _pauseAttachmentMaintenance($to_fix, $max_substep = 0)
+	{
+		global $context, $txt, $time_start;
 
-	// Try get more time...
-	setTimeLimit(600);
+		// Try get more time...
+		setTimeLimit(600);
 
-	// Have we already used our maximum time?
-	if (time() - array_sum(explode(' ', $time_start)) < 3 || $context['starting_substep'] == $_GET['substep'])
-		return;
+		// Have we already used our maximum time?
+		if (microtime(true) - $time_start < 3 || $this->starting_substep == $this->substep)
+			return;
 
-	$context['continue_get_data'] = '?action=admin;area=manageattachments;sa=repair' . (isset($_GET['fixErrors']) ? ';fixErrors' : '') . ';step=' . $_GET['step'] . ';substep=' . $_GET['substep'] . ';' . $context['session_var'] . '=' . $context['session_id'];
-	$context['page_title'] = $txt['not_done_title'];
-	$context['continue_post_data'] = '';
-	$context['continue_countdown'] = '2';
-	$context['sub_template'] = 'not_done';
+		$context['continue_get_data'] = '?action=admin;area=manageattachments;sa=repair' . (isset($this->_req->query->fixErrors) ? ';fixErrors' : '') . ';step=' . $this->step . ';substep=' . $this->substep . ';' . $context['session_var'] . '=' . $context['session_id'];
+		$context['page_title'] = $txt['not_done_title'];
+		$context['continue_post_data'] = '';
+		$context['continue_countdown'] = '2';
+		$context['sub_template'] = 'not_done';
 
-	// Specific stuff to not break this template!
-	$context[$context['admin_menu_name']]['current_subsection'] = 'maintenance';
+		// Specific stuff to not break this template!
+		$context[$context['admin_menu_name']]['current_subsection'] = 'maintenance';
 
-	// Change these two if more steps are added!
-	if (empty($max_substep))
-		$context['continue_percent'] = round(($_GET['step'] * 100) / 25);
-	else
-		$context['continue_percent'] = round(($_GET['step'] * 100 + ($_GET['substep'] * 100) / $max_substep) / 25);
+		// Change these two if more steps are added!
+		if (empty($max_substep))
+			$context['continue_percent'] = round(($this->step * 100) / 25);
+		else
+			$context['continue_percent'] = round(($this->step * 100 + ($this->substep * 100) / $max_substep) / 25);
 
-	// Never more than 100%!
-	$context['continue_percent'] = min($context['continue_percent'], 100);
+		// Never more than 100%!
+		$context['continue_percent'] = min($context['continue_percent'], 100);
 
-	$_SESSION['attachments_to_fix'] = $to_fix;
-	$_SESSION['attachments_to_fix2'] = $context['repair_errors'];
+		// Save the needed infomation for the next look
+		$_SESSION['attachments_to_fix'] = $to_fix;
+		$_SESSION['attachments_to_fix2'] = $context['repair_errors'];
 
-	obExit();
+		obExit();
+	}
 }
