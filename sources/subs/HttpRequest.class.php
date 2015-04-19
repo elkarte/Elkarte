@@ -217,20 +217,32 @@ class HttpReq
 	 * Method to return a $_COOKIE value
 	 *
 	 * @param string $name the name of the value to return
+	 * @param mixed|null $default default value to return if key value is not found
 	 */
-	public function getCookie($name = '')
+	public function getCookie($name = '', $default = null)
 	{
-		return (isset($this->cookie->$name)) ? $this->cookie->$name : null;
+		if (isset($this->cookie->$name))
+			return $this->cookie->$name;
+		elseif ($default !== null)
+			return $default;
+		else
+			return null;
 	}
 
 	/**
 	 * Method to get a $_SESSION value
 	 *
 	 * @param string $name the name of the value to return
+	 * @param mixed|null $default default value to return if key value is not found
 	 */
-	public function getSession($name = '')
+	public function getSession($name = '', $default = null)
 	{
-		return (isset($this->session->$name)) ? $this->session->$name : null;
+		if (isset($this->session->$name))
+			return $this->session->$name;
+		elseif ($default !== null)
+			return $default;
+		else
+			return null;
 	}
 
 	/**
