@@ -10,20 +10,22 @@
  *
  */
 
+namespace ElkArte\sources\subs\CacheMethod;
+
 if (!defined('ELK'))
 	die('No access...');
 
 /**
- * eAccelerator
+ * Alternative PHP Cache or APC / APCu
  */
-class Eaccelerator_Cache extends Cache_Method_Abstract
+class Apc extends Cache_Method_Abstract
 {
 	/**
 	 * {@inheritdoc }
 	 */
 	public function init()
 	{
-		return function_exists('eaccelerator_put');
+		return function_exists('apc_store');
 	}
 
 	/**
@@ -31,13 +33,11 @@ class Eaccelerator_Cache extends Cache_Method_Abstract
 	 */
 	public function put($key, $value, $ttl = 120)
 	{
-		if (mt_rand(0, 10) == 1)
-			eaccelerator_gc();
-
+		// An extended key is needed to counteract a bug in APC.
 		if ($value === null)
-			@eaccelerator_rm($key);
+			apc_delete($key . 'elkarte');
 		else
-			eaccelerator_put($key, $value, $ttl);
+			apc_store($key . 'elkarte', $value, $ttl);
 	}
 
 	/**
@@ -45,8 +45,7 @@ class Eaccelerator_Cache extends Cache_Method_Abstract
 	 */
 	public function get($key, $ttl = 120)
 	{
-		if (function_exists('eaccelerator_get'))
-			return eaccelerator_get($key);
+		return apc_fetch($key . 'elkarte');
 	}
 
 	/**
@@ -54,12 +53,14 @@ class Eaccelerator_Cache extends Cache_Method_Abstract
 	 */
 	public function clean($type = '')
 	{
-		// Clean out the already expired items
-		@eaccelerator_clean();
-
-		// Remove all unused scripts and data from shared memory and disk cache,
-		// e.g. all data that isn't used in the current requests.
-		@eaccelerator_clear();
+		// If passed a type, clear that type out
+		if ($type === '' || $type === 'data')
+		{
+			apc_clear_cache('user');
+			apc_clear_cache('system');
+		}
+		elseif ($type === 'user')
+			apc_clear_cache('user');
 	}
 
 	/**
@@ -67,7 +68,7 @@ class Eaccelerator_Cache extends Cache_Method_Abstract
 	 */
 	public static function available()
 	{
-		return defined('EACCELERATOR_VERSION');
+		return extension_loaded('apc') || extension_loaded('apcu');
 	}
 
 	/**
@@ -75,7 +76,7 @@ class Eaccelerator_Cache extends Cache_Method_Abstract
 	 */
 	public static function details()
 	{
-		return array('title' => self::title(), 'version' => EACCELERATOR_VERSION);
+		return array('title' => self::title(), 'version' => phpversion('apc'));
 	}
 
 	/**
@@ -83,6 +84,6 @@ class Eaccelerator_Cache extends Cache_Method_Abstract
 	 */
 	public static function title()
 	{
-		return 'eAccelerator';
+		return 'Alternative PHP Cache';
 	}
 }

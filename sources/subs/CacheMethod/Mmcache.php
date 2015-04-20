@@ -10,20 +10,22 @@
  *
  */
 
+namespace ElkArte\sources\subs\CacheMethod;
+
 if (!defined('ELK'))
 	die('No access...');
 
 /**
- * Alternative PHP Cache or APC / APCu
+ * MMCache, also known as Turck MMCache
  */
-class Apc_Cache extends Cache_Method_Abstract
+class Mmcache extends Cache_Method_Abstract
 {
 	/**
 	 * {@inheritdoc }
 	 */
 	public function init()
 	{
-		return function_exists('apc_store');
+		return function_exists('mmcache_put');
 	}
 
 	/**
@@ -31,11 +33,17 @@ class Apc_Cache extends Cache_Method_Abstract
 	 */
 	public function put($key, $value, $ttl = 120)
 	{
-		// An extended key is needed to counteract a bug in APC.
+		if (mt_rand(0, 10) == 1)
+			mmcache_gc();
+
 		if ($value === null)
-			apc_delete($key . 'elkarte');
+			@mmcache_rm($key);
 		else
-			apc_store($key . 'elkarte', $value, $ttl);
+		{
+			mmcache_lock($key);
+			mmcache_put($key, $value, $ttl);
+			mmcache_unlock($key);
+		}
 	}
 
 	/**
@@ -43,7 +51,7 @@ class Apc_Cache extends Cache_Method_Abstract
 	 */
 	public function get($key, $ttl = 120)
 	{
-		return apc_fetch($key . 'elkarte');
+		return mmcache_get($key);
 	}
 
 	/**
@@ -51,14 +59,9 @@ class Apc_Cache extends Cache_Method_Abstract
 	 */
 	public function clean($type = '')
 	{
-		// If passed a type, clear that type out
-		if ($type === '' || $type === 'data')
-		{
-			apc_clear_cache('user');
-			apc_clear_cache('system');
-		}
-		elseif ($type === 'user')
-			apc_clear_cache('user');
+		// Removes all expired keys from shared memory, this is not a complete cache flush :(
+		// @todo there is no clear function, should we try to find all of the keys and delete those? with mmcache_rm
+		mmcache_gc();
 	}
 
 	/**
@@ -66,7 +69,7 @@ class Apc_Cache extends Cache_Method_Abstract
 	 */
 	public static function available()
 	{
-		return extension_loaded('apc') || extension_loaded('apcu');
+		return defined('MMCACHE_VERSION');
 	}
 
 	/**
@@ -74,7 +77,7 @@ class Apc_Cache extends Cache_Method_Abstract
 	 */
 	public static function details()
 	{
-		return array('title' => self::title(), 'version' => phpversion('apc'));
+		return array('title' => self::title(), 'version' => MMCACHE_VERSION);
 	}
 
 	/**
@@ -82,6 +85,6 @@ class Apc_Cache extends Cache_Method_Abstract
 	 */
 	public static function title()
 	{
-		return 'Alternative PHP Cache';
+		return 'Turck MMCache';
 	}
 }

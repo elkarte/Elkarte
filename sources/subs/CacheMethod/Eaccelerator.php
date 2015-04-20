@@ -10,20 +10,22 @@
  *
  */
 
+namespace ElkArte\sources\subs\CacheMethod;
+
 if (!defined('ELK'))
 	die('No access...');
 
 /**
- * MMCache, also known as Turck MMCache
+ * eAccelerator
  */
-class Mmcache_Cache extends Cache_Method_Abstract
+class Eaccelerator extends Cache_Method_Abstract
 {
 	/**
 	 * {@inheritdoc }
 	 */
 	public function init()
 	{
-		return function_exists('mmcache_put');
+		return function_exists('eaccelerator_put');
 	}
 
 	/**
@@ -32,16 +34,12 @@ class Mmcache_Cache extends Cache_Method_Abstract
 	public function put($key, $value, $ttl = 120)
 	{
 		if (mt_rand(0, 10) == 1)
-			mmcache_gc();
+			eaccelerator_gc();
 
 		if ($value === null)
-			@mmcache_rm($key);
+			@eaccelerator_rm($key);
 		else
-		{
-			mmcache_lock($key);
-			mmcache_put($key, $value, $ttl);
-			mmcache_unlock($key);
-		}
+			eaccelerator_put($key, $value, $ttl);
 	}
 
 	/**
@@ -49,7 +47,8 @@ class Mmcache_Cache extends Cache_Method_Abstract
 	 */
 	public function get($key, $ttl = 120)
 	{
-		return mmcache_get($key);
+		if (function_exists('eaccelerator_get'))
+			return eaccelerator_get($key);
 	}
 
 	/**
@@ -57,9 +56,12 @@ class Mmcache_Cache extends Cache_Method_Abstract
 	 */
 	public function clean($type = '')
 	{
-		// Removes all expired keys from shared memory, this is not a complete cache flush :(
-		// @todo there is no clear function, should we try to find all of the keys and delete those? with mmcache_rm
-		mmcache_gc();
+		// Clean out the already expired items
+		@eaccelerator_clean();
+
+		// Remove all unused scripts and data from shared memory and disk cache,
+		// e.g. all data that isn't used in the current requests.
+		@eaccelerator_clear();
 	}
 
 	/**
@@ -67,7 +69,7 @@ class Mmcache_Cache extends Cache_Method_Abstract
 	 */
 	public static function available()
 	{
-		return defined('MMCACHE_VERSION');
+		return defined('EACCELERATOR_VERSION');
 	}
 
 	/**
@@ -75,7 +77,7 @@ class Mmcache_Cache extends Cache_Method_Abstract
 	 */
 	public static function details()
 	{
-		return array('title' => self::title(), 'version' => MMCACHE_VERSION);
+		return array('title' => self::title(), 'version' => EACCELERATOR_VERSION);
 	}
 
 	/**
@@ -83,6 +85,6 @@ class Mmcache_Cache extends Cache_Method_Abstract
 	 */
 	public static function title()
 	{
-		return 'Turck MMCache';
+		return 'eAccelerator';
 	}
 }

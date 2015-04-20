@@ -290,10 +290,6 @@ class Elk_Autoloader
 			case 'Exception':
 				$this->_file_name = SUBSDIR . '/Exception/' . $this->_givenname . $this->_surname . '.class.php';
 				break;
-			// Some_Cache => /CacheMethod/SomeCache.class.php
-			case 'Cache':
-				$this->_file_name = SUBSDIR . '/CacheMethod/' . $this->_givenname . $this->_surname . '.class.php';
-				break;
 			// Some_Cache => SomeCache.class.php
 			case 'Integrate':
 				$this->_file_name = SUBSDIR . '/' . $this->_givenname . '.integrate.php';

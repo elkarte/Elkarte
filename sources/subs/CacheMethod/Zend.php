@@ -10,6 +10,8 @@
  *
  */
 
+namespace ElkArte\sources\subs\CacheMethod;
+
 if (!defined('ELK'))
 	die('No access...');
 
@@ -17,7 +19,7 @@ if (!defined('ELK'))
  * Zend caching engine.
  * Supports both zend_shm_cache_store and the deprecated output_cache_put
  */
-class Zend_Cache extends Cache_Method_Abstract
+class Zend extends Cache_Method_Abstract
 {
 	private $_shm = false;
 

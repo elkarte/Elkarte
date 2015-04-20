@@ -10,6 +10,8 @@
  *
  */
 
+namespace ElkArte\sources\subs\CacheMethod;
+
 if (!defined('ELK'))
 	die('No access...');
 
@@ -23,7 +25,7 @@ if (!defined('ELK'))
  * It requires the CACHEDIR constant to be defined and pointing to a
  * writable directory.
  */
-class Filebased_Cache extends Cache_Method_Abstract
+class Filebased extends Cache_Method_Abstract
 {
 	/**
 	 * {@inheritdoc }

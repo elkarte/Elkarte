@@ -10,6 +10,8 @@
  *
  */
 
+namespace ElkArte\sources\subs\CacheMethod;
+
 if (!defined('ELK'))
 	die('No access...');
 
@@ -18,7 +20,7 @@ if (!defined('ELK'))
  *
  * memcache is the first choice, if this is not available then memcached is used
  */
-class Memcached_Cache extends Cache_Method_Abstract
+class Memcached extends Cache_Method_Abstract
 {
 	private $_memcache = null;
 

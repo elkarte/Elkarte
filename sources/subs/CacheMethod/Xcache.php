@@ -10,6 +10,8 @@
  *
  */
 
+namespace ElkArte\sources\subs\CacheMethod;
+
 if (!defined('ELK'))
 	die('No access...');
 
@@ -22,7 +24,7 @@ if (!defined('ELK'))
  *   - cache_uid
  *   - cache_password
  */
-class Xcache_Cache extends Cache_Method_Abstract
+class Xcache extends Cache_Method_Abstract
 {
 	/**
 	 * {@inheritdoc }
