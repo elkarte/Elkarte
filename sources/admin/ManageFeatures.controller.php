@@ -567,7 +567,10 @@ class ManageFeatures_Controller extends Action_Controller
 				elseif ($key == 'max_smileys' && empty($this->_req->post->signature_allow_smileys))
 					$sig_limits[] = -1;
 				else
-					$sig_limits[] = !empty($this->_req->getPost('signature_' . $key)) ? max(1, $this->_req->getPost('signature_' . $key, 'intval')) : 0;
+				{
+					$current_key = $this->_req->getPost('signature_' . $key, 'intval');
+					$sig_limits[] = !empty($current_key) ? max(1, $current_key) : 0;
+				}
 			}
 
 			call_integration_hook('integrate_save_signature_settings', array(&$sig_limits, &$bbcTags));
