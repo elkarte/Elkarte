@@ -576,7 +576,7 @@ function run_this_task($id_task, $task_name)
 
 	$class = 'ElkArte\\sources\\subs\\ScheduledTask\\' . implode('_', array_map('ucfirst', explode('_', $task_name)));
 
-	if (class_exists($class)
+	if (class_exists($class))
 	{
 		$task = new $class();
 
