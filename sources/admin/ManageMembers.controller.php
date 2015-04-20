@@ -29,6 +29,20 @@ if (!defined('ELK'))
 class ManageMembers_Controller extends Action_Controller
 {
 	/**
+	 * Holds instance of HttpReq object
+	 * @var HttpReq
+	 */
+	protected $_req;
+
+	/**
+	 * Pre Dispatch, called before other methods.  Loads HttpReq
+	 */
+	public function pre_dispatch()
+	{
+		$this->_req = HttpReq::instance();
+	}
+
+	/**
 	 * The main entrance point for the Manage Members screen.
 	 *
 	 * What it does:
@@ -141,16 +155,16 @@ class ManageMembers_Controller extends Action_Controller
 		call_integration_hook('integrate_manage_members', array(&$subActions));
 
 		// Sort out the tabs for the ones which may not exist!
-		if (!$context['show_activate'] && ($subAction != 'browse' || $_REQUEST['type'] != 'activate'))
+		if (!$context['show_activate'] && ($subAction != 'browse' || $this->_req->query->type != 'activate'))
 		{
 			$context['tabs']['approve']['is_last'] = true;
 			unset($context['tabs']['activate']);
 		}
 
 		// Unset approval tab if it shouldn't be there.
-		if (!$context['show_approve'] && ($subAction != 'browse' || $_REQUEST['type'] != 'approve'))
+		if (!$context['show_approve'] && ($subAction != 'browse' || $this->_req->query->type != 'approve'))
 		{
-			if (!$context['show_activate'] && ($subAction != 'browse' || $_REQUEST['type'] != 'activate'))
+			if (!$context['show_activate'] && ($subAction != 'browse' || $this->_req->query->type != 'activate'))
 				$context['tabs']['search']['is_last'] = true;
 			unset($context['tabs']['approve']);
 		}
@@ -178,10 +192,10 @@ class ManageMembers_Controller extends Action_Controller
 		global $txt, $scripturl, $context, $modSettings;
 
 		// Set the current sub action.
-		$context['sub_action'] = isset($_REQUEST['sa']) ? $_REQUEST['sa'] : 'all';
+		$context['sub_action'] = $this->_req->getPost('sa', 'strval', 'all');
 
 		// Are we performing a mass action?
-		if (isset($_POST['maction_on_members']) && isset($_POST['maction']) && !empty($_POST['members']))
+		if (isset($this->_req->post->maction_on_members, $this->_req->post->maction) && !empty($this->_req->post->members))
 			$this->_multiMembersAction();
 
 		// Check input after a member search has been submitted.
@@ -264,14 +278,16 @@ class ManageMembers_Controller extends Action_Controller
 			call_integration_hook('integrate_view_members_params', array(&$params));
 
 			$search_params = array();
-			if ($context['sub_action'] == 'query' && !empty($_REQUEST['params']) && empty($_POST['types']))
-				$search_params = @unserialize(base64_decode($_REQUEST['params']));
-			elseif (!empty($_POST))
+			if ($context['sub_action'] == 'query' && !empty($this->_req->query->params) && empty($this->_req->post->types))
+				$search_params = @unserialize(base64_decode($this->_req->query->params));
+			elseif (!empty($this->_req->post))
 			{
-				$search_params['types'] = $_POST['types'];
+				$search_params['types'] = $this->_req->post->types;
 				foreach ($params as $param_name => $param_info)
-					if (isset($_POST[$param_name]))
-						$search_params[$param_name] = $_POST[$param_name];
+				{
+					if (isset($this->_req->post->$param_name))
+						$search_params[$param_name] = $this->_req->post->$param_name;
+				}
 			}
 
 			$search_url_params = isset($search_params) ? base64_encode(serialize($search_params)) : null;
@@ -588,6 +604,13 @@ class ManageMembers_Controller extends Action_Controller
 		$context['default_list'] = 'member_list';
 	}
 
+	/**
+	 * Handle mass action processing on a group of members
+	 *
+	 * - Deleteing members
+	 * - Group changes
+	 * - Banning
+	 */
 	protected function _multiMembersAction()
 	{
 		global $txt, $user_info;
@@ -597,10 +620,10 @@ class ManageMembers_Controller extends Action_Controller
 
 		// Clean the input.
 		$members = array();
-		foreach ($_POST['members'] as $value)
+		foreach ($this->_req->post->members as $value)
 		{
 			// Don't delete yourself, idiot.
-			if ($_POST['maction'] === 'delete' && $value == $user_info['id'])
+			if ($this->_req->post->maction === 'delete' && $value == $user_info['id'])
 				continue;
 
 			$members[] = (int) $value;
@@ -612,7 +635,7 @@ class ManageMembers_Controller extends Action_Controller
 			return;
 
 		// Are we performing a delete?
-		if ($_POST['maction'] == 'delete' && allowedTo('profile_remove_any'))
+		if ($this->_req->post->maction == 'delete' && allowedTo('profile_remove_any'))
 		{
 			// Delete all the selected members.
 			require_once(SUBSDIR . '/Members.subs.php');
@@ -620,14 +643,14 @@ class ManageMembers_Controller extends Action_Controller
 		}
 
 		// Are we changing groups?
-		if (($_POST['maction'] == 'pgroup' || $_POST['maction'] == 'agroup') && allowedTo('manage_membergroups'))
+		if (in_array($this->_req->post->maction, array('pgroup', 'agroup')) && allowedTo('manage_membergroups'))
 		{
 			require_once(SUBSDIR . '/Membergroups.subs.php');
 
 			$groups = array('p', 'a');
 			foreach ($groups as $group)
 			{
-				if ($_POST['maction'] == $group . 'group' && !empty($_POST['new_membergroup']))
+				if ($this->_req->post->maction == $group . 'group' && !empty($this->_req->post->new_membergroup))
 				{
 					if ($group == 'p')
 						$type = 'force_primary';
@@ -635,8 +658,8 @@ class ManageMembers_Controller extends Action_Controller
 						$type = 'only_additional';
 
 					// Change all the selected members' group.
-					if ($_POST['new_membergroup'] != -1)
-						addMembersToGroup($members, $_POST['new_membergroup'], $type, true);
+					if ($this->_req->post->new_membergroup != -1)
+						addMembersToGroup($members, $this->_req->post->new_membergroup, $type, true);
 					else
 						removeMembersFromGroups($members, null, true);
 				}
@@ -644,7 +667,7 @@ class ManageMembers_Controller extends Action_Controller
 		}
 
 		// Are we banning?
-		if(in_array($_POST['maction'], array('ban_names', 'ban_mails', 'ban_ips', 'ban_names_mails')) && allowedTo('manage_bans'))
+		if(in_array($this->_req->post->maction, array('ban_names', 'ban_mails', 'ban_ips', 'ban_names_mails')) && allowedTo('manage_bans'))
 		{
 			require_once(SUBSDIR . '/Bans.subs.php');
 			require_once(SUBSDIR . '/Members.subs.php');
@@ -662,9 +685,9 @@ class ManageMembers_Controller extends Action_Controller
 				'notes' => '',
 			));
 
-			$ban_name = in_array($_POST['maction'], array('ban_names', 'ban_names_mails'));
-			$ban_email = in_array($_POST['maction'], array('ban_mails', 'ban_names_mails'));
-			$ban_ips = $_POST['maction'] === 'ban_ips';
+			$ban_name = in_array($this->_req->post->maction, array('ban_names', 'ban_names_mails'));
+			$ban_email = in_array($this->_req->post->maction, array('ban_mails', 'ban_names_mails'));
+			$ban_ips = $this->_req->post->maction === 'ban_ips';
 			$suggestions = array();
 
 			if ($ban_email)
@@ -733,14 +756,14 @@ class ManageMembers_Controller extends Action_Controller
 		// Not a lot here!
 		$context['page_title'] = $txt['admin_members'];
 		$context['sub_template'] = 'admin_browse';
-		$context['browse_type'] = isset($_REQUEST['type']) ? $_REQUEST['type'] : (!empty($modSettings['registration_method']) && $modSettings['registration_method'] == 1 ? 'activate' : 'approve');
+		$context['browse_type'] = isset($this->_req->query->type) ? $this->_req->query->type : (!empty($modSettings['registration_method']) && $modSettings['registration_method'] == 1 ? 'activate' : 'approve');
 
 		if (isset($context['tabs'][$context['browse_type']]))
 			$context['tabs'][$context['browse_type']]['is_selected'] = true;
 
 		// Allowed filters are those we can have, in theory.
 		$context['allowed_filters'] = $context['browse_type'] == 'approve' ? array(3, 4, 5) : array(0, 2);
-		$context['current_filter'] = isset($_REQUEST['filter']) && in_array($_REQUEST['filter'], $context['allowed_filters']) && !empty($context['activation_numbers'][$_REQUEST['filter']]) ? (int) $_REQUEST['filter'] : -1;
+		$context['current_filter'] = isset($this->_req->query->filter) && in_array($this->_req->query->filter, $context['allowed_filters']) && !empty($context['activation_numbers'][$this->_req->query->filter]) ? (int) $this->_req->query->filter : -1;
 
 		// Sort out the different sub areas that we can actually filter by.
 		$context['available_filters'] = array();
@@ -776,8 +799,8 @@ class ManageMembers_Controller extends Action_Controller
 		);
 
 		// Are we showing duplicate information?
-		if (isset($_GET['showdupes']))
-			$_SESSION['showdupes'] = (int) $_GET['showdupes'];
+		if (isset($this->_req->query->showdupes))
+			$_SESSION['showdupes'] = (int) $this->_req->query->showdupes;
 		$context['show_duplicates'] = !empty($_SESSION['showdupes']);
 
 		// Determine which actions we should allow on this page.
@@ -1072,7 +1095,7 @@ class ManageMembers_Controller extends Action_Controller
 	 */
 	public function action_approve()
 	{
-		global $scripturl, $modSettings;
+		global $modSettings;
 
 		// First, check our session.
 		checkSession();
@@ -1084,158 +1107,71 @@ class ManageMembers_Controller extends Action_Controller
 		loadLanguage('Login');
 
 		// Start off clean
-		$conditions = array();
+		$this->conditions = array();
 
 		// Sort out where we are going...
-		$current_filter = $conditions['activated_status'] = (int) $_REQUEST['orig_filter'];
+		$current_filter = $$this->conditions['activated_status'] = (int) $this->_req->query->orig_filter;
 
 		// If we are applying a filter do just that - then redirect.
-		if (isset($_REQUEST['filter']) && $_REQUEST['filter'] != $_REQUEST['orig_filter'])
-			redirectexit('action=admin;area=viewmembers;sa=browse;type=' . $_REQUEST['type'] . ';sort=' . $_REQUEST['sort'] . ';filter=' . $_REQUEST['filter'] . ';start=' . $_REQUEST['start']);
+		if (isset($this->_req->query->filter) && $this->_req->query->filter != $this->_req->query->orig_filter)
+			redirectexit('action=admin;area=viewmembers;sa=browse;type=' . $this->_req->query->type . ';sort=' . $this->_req->query->sort . ';filter=' . $this->_req->query->filter . ';start=' . $this->_req->query->start);
 
 		// Nothing to do?
-		if (!isset($_POST['todoAction']) && !isset($_POST['time_passed']))
-			redirectexit('action=admin;area=viewmembers;sa=browse;type=' . $_REQUEST['type'] . ';sort=' . $_REQUEST['sort'] . ';filter=' . $current_filter . ';start=' . $_REQUEST['start']);
+		if (!isset($this->_req->post->todoAction) && !isset($this->_req->post->time_passed))
+			redirectexit('action=admin;area=viewmembers;sa=browse;type=' . $this->_req->query->type . ';sort=' . $this->_req->query->sort . ';filter=' . $current_filter . ';start=' . $this->_req->query->start);
 
 		// Are we dealing with members who have been waiting for > set amount of time?
-		if (isset($_POST['time_passed']))
-			$conditions['time_before'] = time() - 86400 * (int) $_POST['time_passed'];
+		if (isset($this->_req->post->time_passed))
+			$this->conditions['time_before'] = time() - 86400 * (int) $this->_req->post->time_passed;
 		// Coming from checkboxes - validate the members passed through to us.
 		else
 		{
-			$conditions['members'] = array();
-			foreach ($_POST['todoAction'] as $id)
-				$conditions['members'][] = (int) $id;
+			$this->conditions['members'] = array();
+			foreach ($this->_req->post->todoAction as $id)
+				$this->conditions['members'][] = (int) $id;
 		}
 
-		$data = retrieveMemberData($conditions);
+		$data = retrieveMemberData($this->conditions);
 		if ($data['member_count'] == 0)
-			redirectexit('action=admin;area=viewmembers;sa=browse;type=' . $_REQUEST['type'] . ';sort=' . $_REQUEST['sort'] . ';filter=' . $current_filter . ';start=' . $_REQUEST['start']);
+			redirectexit('action=admin;area=viewmembers;sa=browse;type=' . $this->_req->query->type . ';sort=' . $this->_req->query->sort . ';filter=' . $current_filter . ';start=' . $this->_req->query->start);
 
-		$member_info = $data['member_info'];
-		$conditions['members'] = $data['members'];
+		$this->member_info = $data['member_info'];
+		$this->conditions['members'] = $data['members'];
 
-		// Are we activating or approving the members?
-		if ($_POST['todo'] == 'ok' || $_POST['todo'] == 'okemail')
+		// What do we want to do with this application?
+		switch ($this->_req->post->todo)
 		{
-			// Approve / activate this member.
-			approveMembers($conditions);
-
-			// Do we have to let the integration code know about the activations?
-			if (!empty($modSettings['integrate_activate']))
-			{
-				foreach ($member_info as $member)
-					call_integration_hook('integrate_activate', array($member['username']));
-			}
-
-			// Check for email.
-			if ($_POST['todo'] == 'okemail')
-			{
-				foreach ($member_info as $member)
-				{
-					$replacements = array(
-						'NAME' => $member['name'],
-						'USERNAME' => $member['username'],
-						'PROFILELINK' => $scripturl . '?action=profile;u=' . $member['id'],
-						'FORGOTPASSWORDLINK' => $scripturl . '?action=reminder',
-					);
-
-					$emaildata = loadEmailTemplate('admin_approve_accept', $replacements, $member['language']);
-					sendmail($member['email'], $emaildata['subject'], $emaildata['body'], null, null, false, 0);
-				}
-			}
-
-			// Update the menu action cache so its forced to refresh
-			cache_put_data('num_menu_errors', null, 900);
-		}
-		// Maybe we're sending it off for activation?
-		elseif ($_POST['todo'] == 'require_activation')
-		{
-			require_once(SUBSDIR . '/Auth.subs.php');
-
-			// We have to do this for each member I'm afraid.
-			foreach ($member_info as $member)
-			{
-				$conditions['selected_member'] = $member['id'];
-
-				// Generate a random activation code.
-				$conditions['validation_code'] = generateValidationCode();
-
-				// Set these members for activation - I know this includes two id_member checks but it's safer than bodging $condition ;).
-				enforceReactivation($conditions);
-
-				$replacements = array(
-					'USERNAME' => $member['name'],
-					'ACTIVATIONLINK' => $scripturl . '?action=activate;u=' . $member['id'] . ';code=' . $conditions['validation_code'],
-					'ACTIVATIONLINKWITHOUTCODE' => $scripturl . '?action=activate;u=' . $member['id'],
-					'ACTIVATIONCODE' => $conditions['validation_code'],
-				);
-
-				$emaildata = loadEmailTemplate('admin_approve_activation', $replacements, $member['language']);
-				sendmail($member['email'], $emaildata['subject'], $emaildata['body'], null, null, false, 0);
-			}
-		}
-		// Are we rejecting them?
-		elseif ($_POST['todo'] == 'reject' || $_POST['todo'] == 'rejectemail')
-		{
-			deleteMembers($conditions['members']);
-
-			// Send email telling them they aren't welcome?
-			if ($_POST['todo'] == 'rejectemail')
-			{
-				foreach ($member_info as $member)
-				{
-					$replacements = array(
-						'USERNAME' => $member['name'],
-					);
-
-					$emaildata = loadEmailTemplate('admin_approve_reject', $replacements, $member['language']);
-					sendmail($member['email'], $emaildata['subject'], $emaildata['body'], null, null, false, 1);
-				}
-			}
-		}
-		// A simple delete?
-		elseif ($_POST['todo'] == 'delete' || $_POST['todo'] == 'deleteemail')
-		{
-			deleteMembers($conditions['members']);
-
-			// Send email telling them they aren't welcome?
-			if ($_POST['todo'] == 'deleteemail')
-			{
-				foreach ($member_info as $member)
-				{
-					$replacements = array(
-						'USERNAME' => $member['name'],
-					);
-
-					$emaildata = loadEmailTemplate('admin_approve_delete', $replacements, $member['language']);
-					sendmail($member['email'], $emaildata['subject'], $emaildata['body'], null, null, false, 1);
-				}
-			}
-		}
-		// Remind them to activate their account?
-		elseif ($_POST['todo'] == 'remind')
-		{
-			foreach ($member_info as $member)
-			{
-				$replacements = array(
-					'USERNAME' => $member['name'],
-					'ACTIVATIONLINK' => $scripturl . '?action=activate;u=' . $member['id'] . ';code=' . $member['code'],
-					'ACTIVATIONLINKWITHOUTCODE' => $scripturl . '?action=activate;u=' . $member['id'],
-					'ACTIVATIONCODE' => $member['code'],
-				);
-
-				$emaildata = loadEmailTemplate('admin_approve_remind', $replacements, $member['language']);
-				sendmail($member['email'], $emaildata['subject'], $emaildata['body'], null, null, false, 1);
-			}
+			// Are we activating or approving the members?
+			case 'ok':
+			case 'okemail':
+				$this->_okMember();
+				break;
+			// Maybe we're sending it off for activation?
+			case 'require_activation':
+				$this->_requireMember();
+				break;
+			// Are we rejecting them?
+			case 'reject':
+			case 'rejectemail':
+				$this->_rejectMember();
+				break;
+			// A simple delete?
+			case 'delete':
+			case 'deleteemail':
+				$this->_deleteMember();
+				break;
+			// Remind them to activate their account?
+			case 'remind':
+				$this->_remindMember();
+				break;
 		}
 
 		// Log what we did?
-		if (!empty($modSettings['modlog_enabled']) && in_array($_POST['todo'], array('ok', 'okemail', 'require_activation', 'remind')))
+		if (!empty($modSettings['modlog_enabled']) && in_array($this->_req->post->todo, array('ok', 'okemail', 'require_activation', 'remind')))
 		{
-			$log_action = $_POST['todo'] == 'remind' ? 'remind_member' : 'approve_member';
+			$log_action = $this->_req->post->todo == 'remind' ? 'remind_member' : 'approve_member';
 
-			foreach ($member_info as $member)
+			foreach ($this->member_info as $member)
 				logAction($log_action, array('member' => $member['id']), 'admin');
 		}
 
@@ -1248,13 +1184,148 @@ class ManageMembers_Controller extends Action_Controller
 		updateMemberStats();
 
 		// If they haven't been deleted, update the post group statistics on them...
-		if (!in_array($_POST['todo'], array('delete', 'deleteemail', 'reject', 'rejectemail', 'remind')))
+		if (!in_array($this->_req->post->todo, array('delete', 'deleteemail', 'reject', 'rejectemail', 'remind')))
 		{
 			require_once(SUBSDIR . '/Membergroups.subs.php');
-			updatePostGroupStats($conditions['members']);
+			updatePostGroupStats($this->conditions['members']);
 		}
 
-		redirectexit('action=admin;area=viewmembers;sa=browse;type=' . $_REQUEST['type'] . ';sort=' . $_REQUEST['sort'] . ';filter=' . $current_filter . ';start=' . $_REQUEST['start']);
+		redirectexit('action=admin;area=viewmembers;sa=browse;type=' . $this->_req->query->type . ';sort=' . $this->_req->query->sort . ';filter=' . $current_filter . ';start=' . $this->_req->query->start);
+	}
+
+	/**
+	 * Remind a set of members that they have an activation email waiting
+	 */
+	private function _remindMember()
+	{
+		global $scripturl;
+
+		foreach ($this->member_info as $member)
+		{
+			$replacements = array(
+				'USERNAME' => $member['name'],
+				'ACTIVATIONLINK' => $scripturl . '?action=activate;u=' . $member['id'] . ';code=' . $member['code'],
+				'ACTIVATIONLINKWITHOUTCODE' => $scripturl . '?action=activate;u=' . $member['id'],
+				'ACTIVATIONCODE' => $member['code'],
+			);
+
+			$emaildata = loadEmailTemplate('admin_approve_remind', $replacements, $member['language']);
+			sendmail($member['email'], $emaildata['subject'], $emaildata['body'], null, null, false, 1);
+		}
+	}
+
+	/**
+	 * Remove a set of member applications
+	 */
+	private function _deleteMember()
+	{
+		deleteMembers($this->conditions['members']);
+
+		// Send email telling them they aren't welcome?
+		if ($this->_req->post->todo == 'deleteemail')
+		{
+			foreach ($this->member_info as $member)
+			{
+				$replacements = array(
+					'USERNAME' => $member['name'],
+				);
+
+				$emaildata = loadEmailTemplate('admin_approve_delete', $replacements, $member['language']);
+				sendmail($member['email'], $emaildata['subject'], $emaildata['body'], null, null, false, 1);
+			}
+		}
+	}
+
+	/**
+	 * Reject a set a member applications, maybe even tell them
+	 */
+	private function _rejectMember()
+	{
+		deleteMembers($this->conditions['members']);
+
+		// Send email telling them they aren't welcome?
+		if ($this->_req->post->todo == 'rejectemail')
+		{
+			foreach ($this->member_info as $member)
+			{
+				$replacements = array(
+					'USERNAME' => $member['name'],
+				);
+
+				$emaildata = loadEmailTemplate('admin_approve_reject', $replacements, $member['language']);
+				sendmail($member['email'], $emaildata['subject'], $emaildata['body'], null, null, false, 1);
+			}
+		}
+	}
+
+	/**
+	 * Approve a member application
+	 */
+	private function _okMember()
+	{
+		global $modSettings, $scripturl;
+
+		// Approve / activate this member.
+		approveMembers($this->conditions);
+
+		// Do we have to let the integration code know about the activations?
+		if (!empty($modSettings['integrate_activate']))
+		{
+			foreach ($this->member_info as $member)
+				call_integration_hook('integrate_activate', array($member['username']));
+		}
+
+		// Check for email.
+		if ($this->_req->post->todo == 'okemail')
+		{
+			foreach ($this->member_info as $member)
+			{
+				$replacements = array(
+					'NAME' => $member['name'],
+					'USERNAME' => $member['username'],
+					'PROFILELINK' => $scripturl . '?action=profile;u=' . $member['id'],
+					'FORGOTPASSWORDLINK' => $scripturl . '?action=reminder',
+				);
+
+				$emaildata = loadEmailTemplate('admin_approve_accept', $replacements, $member['language']);
+				sendmail($member['email'], $emaildata['subject'], $emaildata['body'], null, null, false, 0);
+			}
+		}
+
+		// Update the menu action cache so its forced to refresh
+		cache_put_data('num_menu_errors', null, 900);
+	}
+
+	/**
+	 * Tell some members that they require activation of thier account
+	 */
+	private function _requireMember()
+	{
+		global $scripturl;
+
+		require_once(SUBSDIR . '/Auth.subs.php');
+
+		// We have to do this for each member I'm afraid.
+		foreach ($this->member_info as $member)
+		{
+			$this->conditions['selected_member'] = $member['id'];
+
+			// Generate a random activation code.
+			$this->conditions['validation_code'] = generateValidationCode();
+
+			// Set these members for activation - I know this includes two id_member checks but it's safer than bodging $condition ;).
+			enforceReactivation($this->conditions);
+
+			$replacements = array(
+				'USERNAME' => $member['name'],
+				'ACTIVATIONLINK' => $scripturl . '?action=activate;u=' . $member['id'] . ';code=' . $this->conditions['validation_code'],
+				'ACTIVATIONLINKWITHOUTCODE' => $scripturl . '?action=activate;u=' . $member['id'],
+				'ACTIVATIONCODE' => $this->conditions['validation_code'],
+			);
+
+			$emaildata = loadEmailTemplate('admin_approve_activation', $replacements, $member['language']);
+			sendmail($member['email'], $emaildata['subject'], $emaildata['body'], null, null, false, 0);
+		}
 	}
 
 	/**
