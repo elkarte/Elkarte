@@ -37,6 +37,20 @@ class ManageMail_Controller extends Action_Controller
 	protected $_mailSettings;
 
 	/**
+	 * Holds instance of HttpReq object
+	 * @var HttpReq
+	 */
+	protected $_req;
+
+	/**
+	 * Pre Dispatch, called before other methods.  Loads HttpReq
+	 */
+	public function pre_dispatch()
+	{
+		$this->_req = HttpReq::instance();
+	}
+
+	/**
 	 * Main dispatcher.
 	 *
 	 * - This function checks permissions and passes control through to the relevant section.
@@ -91,10 +105,10 @@ class ManageMail_Controller extends Action_Controller
 		loadTemplate('ManageMail');
 
 		// First, are we deleting something from the queue?
-		if (isset($_REQUEST['delete']))
+		if (isset($this->_req->post->delete))
 		{
 			checkSession('post');
-			deleteMailQueueItems($_REQUEST['delete']);
+			deleteMailQueueItems($this->_req->post->delete);
 		}
 
 		// Fetch the number of items in the current queue
@@ -126,7 +140,6 @@ class ManageMail_Controller extends Action_Controller
 						'function' => function ($rowData) {
 							return Util::shorten_text(Util::htmlspecialchars($rowData['subject'], 50));
 						},
-						// @todo class popped out while merging
 						'class' => 'smalltext',
 					),
 					'sort' => array(
@@ -166,7 +179,6 @@ class ManageMail_Controller extends Action_Controller
 							// But if not, revert to priority 0.
 							return isset($txt[$txtKey]) ? $txt[$txtKey] : $txt['mq_mpriority_1'];
 						},
-						// @todo class popped out while merging
 						'class' => 'centertext smalltext',
 					),
 					'sort' => array(
@@ -182,7 +194,6 @@ class ManageMail_Controller extends Action_Controller
 						'function' => function ($rowData) {
 							return time_since(time() - $rowData['time_sent']);
 						},
-						// @todo class popped out while merging
 						'class' => 'smalltext',
 					),
 					'sort' => array(
@@ -198,7 +209,6 @@ class ManageMail_Controller extends Action_Controller
 						'function' => function ($rowData) {
 							return '<input type="checkbox" name="delete[]" value="' . $rowData['id_mail'] . '" class="input_check" />';
 						},
-						// @todo class popped out while merging
 						'class' => 'centertext',
 					),
 				),
@@ -250,13 +260,13 @@ class ManageMail_Controller extends Action_Controller
 		$config_vars = $this->_mailSettings->settings();
 
 		// Saving?
-		if (isset($_GET['save']))
+		if (isset($this->_req->query->save))
 		{
 			// Make the SMTP password a little harder to see in a backup etc.
-			if (!empty($_POST['smtp_password'][1]))
+			if (!empty($this->_req->post->smtp_password[1]))
 			{
-				$_POST['smtp_password'][0] = base64_encode($_POST['smtp_password'][0]);
-				$_POST['smtp_password'][1] = base64_encode($_POST['smtp_password'][1]);
+				$this->_req->post->smtp_password[0] = base64_encode($this->_req->post->smtp_password[0]);
+				$this->_req->post->smtp_password[1] = base64_encode($this->_req->post->smtp_password[1]);
 			}
 			checkSession();
 
@@ -265,8 +275,8 @@ class ManageMail_Controller extends Action_Controller
 			call_integration_hook('integrate_save_mail_settings');
 
 			// You can not send more per page load than you can per minute
-			if (!empty($_POST['mail_batch_size']))
-				 $_POST['mail_batch_size'] = min((int) $_POST['mail_batch_size'], (int) $_POST['mail_period_limit']);
+			if (!empty($this->_req->post->mail_batch_size))
+				$this->_req->post->mail_batch_size = min((int) $this->_req->post->mail_batch_size, (int) $this->_req->post->mail_period_limit);
 
 			Settings_Form::save_db($config_vars);
 			redirectexit('action=admin;area=mailqueue;sa=settings');
@@ -393,10 +403,10 @@ class ManageMail_Controller extends Action_Controller
 		$number_to_send = empty($modSettings['mail_period_limit']) ? 25 : $modSettings['mail_period_limit'];
 
 		// If we don't yet have the total to clear, find it.
-		$all_emails = isset($_GET['te']) ? (int) $_GET['te'] : list_getMailQueueSize();
+		$all_emails = isset($this->_req->query->te) ? (int) $this->_req->query->te : list_getMailQueueSize();
 
 		// If we don't know how many we sent, it must be because... we didn't send any!
-		$sent_emails = isset($_GET['sent']) ? (int) $_GET['sent'] : 0;
+		$sent_emails = isset($this->_req->query->sent) ? (int) $this->_req->query->sent : 0;
 
 		// Send this batch, then go for a short break...
 		while (reduceMailQueue($number_to_send, true, true) === true)
