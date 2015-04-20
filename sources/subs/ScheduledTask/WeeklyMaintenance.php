@@ -17,6 +17,8 @@
  *
  */
 
+namespace ElkArte\sources\subs\ScheduledTask;
+
 if (!defined('ELK'))
 	die('No access...');
 
@@ -31,7 +33,7 @@ if (!defined('ELK'))
  *
  * @package ScheduledTasks
  */
-class Weekly_Maintenance_Task implements Scheduled_Task_Interface
+class Weekly_Maintenance implements Scheduled_Task_Interface
 {
 	public function run()
 	{

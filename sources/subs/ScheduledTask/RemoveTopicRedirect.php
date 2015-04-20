@@ -17,6 +17,8 @@
  *
  */
 
+namespace ElkArte\sources\subs\ScheduledTask;
+
 if (!defined('ELK'))
 	die('No access...');
 
@@ -28,7 +30,7 @@ if (!defined('ELK'))
  *
  * @package ScheduledTasks
  */
-class Remove_Topic_Redirect_Task implements Scheduled_Task_Interface
+class Remove_Topic_Redirect implements Scheduled_Task_Interface
 {
 	public function run()
 	{

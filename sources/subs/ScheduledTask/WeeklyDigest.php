@@ -11,6 +11,8 @@
  *
  */
 
+namespace ElkArte\sources\subs\ScheduledTask;
+
 if (!defined('ELK'))
 	die('No access...');
 
@@ -22,13 +24,11 @@ if (!defined('ELK'))
  *
  * @package ScheduledTasks
  */
-class Weekly_Digest_Task implements Scheduled_Task_Interface
+class Weekly_Digest implements Scheduled_Task_Interface
 {
 	public function run()
 	{
-		require_once(SUBSDIR . '/ScheduledTask/DailyDigest.task.php');
-
-		$digest = new Daily_Digest_Task();
+		$digest = new Daily_Digest();
 
 		return $digest->runDigest(true);
 	}

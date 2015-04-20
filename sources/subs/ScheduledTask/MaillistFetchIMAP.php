@@ -11,6 +11,8 @@
  *
  */
 
+namespace ElkArte\sources\subs\ScheduledTask;
+
 if (!defined('ELK'))
 	die('No access...');
 
@@ -21,7 +23,7 @@ if (!defined('ELK'))
  *
  * @package ScheduledTasks
  */
-class Maillist_Fetch_IMAP_Task implements Scheduled_Task_Interface
+class Maillist_Fetch_IMAP implements Scheduled_Task_Interface
 {
 	public function run()
 	{
