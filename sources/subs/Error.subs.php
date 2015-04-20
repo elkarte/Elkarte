@@ -21,7 +21,7 @@ if (!defined('ELK'))
  * Redirects back to the error log when done.
  *
  * @param string $type action
- * @param mixed[]|null $filter db query of the view filter being used
+ * @param array|null $filter db query of the view filter being used
  * @param int[]|null $error_list int list of error ID's to work on
  */
 function deleteErrors($type, $filter = null, $error_list = null)
@@ -86,7 +86,7 @@ function numErrors($filter = array())
  *
  * @param int $start
  * @param string $sort_direction
- * @param mixed[]|null $filter
+ * @param array|null $filter
  */
 function getErrorLogData($start, $sort_direction = 'DESC', $filter = null)
 {

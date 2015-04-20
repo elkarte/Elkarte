@@ -305,7 +305,7 @@ class ManageCalendarModule_Controller extends Action_Controller
 				removeHolidays($this->_req->post->holiday);
 			else
 			{
-				$date = strftime($this->_req->post->year <= 4 ? '0004-%m-%d' : '%Y-%m-%d', mktime(0, 0, 0, $this->_req->post->month, $this->_req->REQUEST->day, $this->_req->REQUEST->year));
+				$date = strftime($this->_req->post->year <= 4 ? '0004-%m-%d' : '%Y-%m-%d', mktime(0, 0, 0, $this->_req->post->month, $this->_req->post->day, $this->_req->post->year));
 				if (isset($this->_req->post->edit))
 					editHoliday($this->_req->post->holiday, $date, $this->_req->post->title);
 				else

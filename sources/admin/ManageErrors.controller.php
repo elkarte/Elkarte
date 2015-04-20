@@ -105,6 +105,7 @@ class ManageErrors_Controller extends Action_Controller
 		}
 
 		$num_errors = numErrors($filter);
+		$members = array();
 
 		// If this filter is empty...
 		if ($num_errors == 0 && isset($filter))

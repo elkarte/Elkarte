@@ -134,7 +134,7 @@ class Data_Validator
 	/**
 	 * Shorthand static method for simple inline validation
 	 *
-	 * @param mixed[] $data generally $_POST data for this method
+	 * @param mixed[]|object $data generally $_POST data for this method
 	 * @param mixed[] $validation_rules assoicative array of field => rules
 	 * @param mixed[] $sanitation_rules assoicative array of field => rules
 	 */
@@ -225,7 +225,7 @@ class Data_Validator
 	/**
 	 * Run the sanitation and validation on the data
 	 *
-	 * @param mixed[] $input associative array of data to process name => value
+	 * @param mixed[]|object $input associative array or object of data to process name => value
 	 */
 	public function validate($input)
 	{
