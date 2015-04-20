@@ -216,7 +216,7 @@ class Elk_Autoloader
 		{
 			foreach ($this->_paths[$this->_current_namespace] as $possible_dir)
 			{
-				$file = $possible_dir . '/' . implode('', $this->_name) . $suffix;
+				$file = $possible_dir . '/' . $this->_givenname . $this->_surname . '.php';
 
 				if (file_exists($file))
 				{
