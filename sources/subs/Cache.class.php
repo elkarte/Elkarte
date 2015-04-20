@@ -279,6 +279,7 @@ class Cache
 					'cache_password' => $cache_password,
 				);
 			}
+			Elk_Autoloader::getInstance()->register(SUBSDIR . '/CacheMethod', 'ElkArte\\sources\\subs\\CacheMethod');
 
 			self::$_instance = new Cache($cache_enable, $cache_accelerator, $options);
 		}
