@@ -31,7 +31,7 @@ class TestCache extends PHPUnit_Framework_TestCase
 	 */
 	public function testFilebasedCache()
 	{
-		$this->_cache_obj = new Filebased(array());
+		$this->_cache_obj = new ElkArte\sources\subs\CacheMethod\Filebased(array());
 		$this->doCacheTests(function($key) {
 			return file_exists(CACHEDIR . '/data_' . $key . '.php');
 		});
