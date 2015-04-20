@@ -158,10 +158,6 @@ class Elk_Autoloader
 		if ($this->_current_namespace !== false)
 			$this->_handle_nacespaces();
 
-		// Just some very special case
-		if ($this->_file_name === false)
-			$this->_handle_exceptions();
-
 		// Basic cases like Util.class, Action.class, Request.class
 		if ($this->_file_name === false)
 			$this->_handle_basic_cases();
@@ -211,6 +207,9 @@ class Elk_Autoloader
 		return true;
 	}
 
+	/**
+	 * This handles any case where a namespace is present.
+	 */
 	protected function _handle_nacespaces()
 	{
 		if (isset($this->_paths[$this->_current_namespace]))
@@ -224,27 +223,6 @@ class Elk_Autoloader
 					$this->_file_name = $file;
 					break;
 				}
-			}
-		}
-	}
-
-	/**
-	 * This handles some exceptions that fall outside our normal loading rules
-	 *
-	 * @todo special cases are bad.
-	 * @todo why is this case also in other cases?
-	 */
-	private function _handle_exceptions()
-	{
-		if (isset($this->_name[0]))
-		{
-			switch ($this->_name[0])
-			{
-				case 'Mention':
-					$this->_file_name = SUBSDIR . '/MentionType/' . $this->_givenname . $this->_surname . '.class.php';
-					break;
-				default:
-					$this->_file_name = false;
 			}
 		}
 	}
@@ -319,10 +297,6 @@ class Elk_Autoloader
 			// Some_Cache => SomeCache.class.php
 			case 'Integrate':
 				$this->_file_name = SUBSDIR . '/' . $this->_givenname . '.integrate.php';
-				break;
-			// Some_Mention => /MentionType/SomeMention.class.php
-			case 'Mention':
-				$this->_file_name = SUBSDIR . '/MentionType/' . $this->_givenname . $this->_surname . '.class.php';
 				break;
 			// Some_Display => Subscriptions-Some.class.php
 			case 'Display':
