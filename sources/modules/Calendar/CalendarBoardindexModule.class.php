@@ -23,7 +23,7 @@ if (!defined('ELK'))
 /**
  * This class's task is to show the upcoming events in the BoardIndex.
  */
-class Calendar_BoardIndex_Module
+class Calendar_Boardindex_Module
 {
 	public static function hooks()
 	{
