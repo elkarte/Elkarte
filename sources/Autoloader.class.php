@@ -215,11 +215,6 @@ class Elk_Autoloader
 	{
 		if (isset($this->_paths[$this->_current_namespace]))
 		{
-			if ($this->_surname === 'Interface')
-				$suffix = '.interface.php';
-			else
-				$suffix = '.class.php';
-
 			foreach ($this->_paths[$this->_current_namespace] as $possible_dir)
 			{
 				$file = $possible_dir . '/' . implode('', $this->_name) . $suffix;
