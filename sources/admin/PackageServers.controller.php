@@ -30,6 +30,20 @@ if (!defined('ELK'))
 class PackageServers_Controller extends Action_Controller
 {
 	/**
+	 * Holds instance of HttpReq object
+	 * @var HttpReq
+	 */
+	protected $_req;
+
+	/**
+	 * Pre Dispatch, called before other methods.  Loads HttpReq
+	 */
+	public function pre_dispatch()
+	{
+		$this->_req = HttpReq::instance();
+	}
+
+	/**
 	 * Called before all other methods when comming from the dispatcher or
 	 * action class.  Loads lanaguage and templates files so they are available
 	 * to the other methods.
@@ -131,12 +145,11 @@ class PackageServers_Controller extends Action_Controller
 		require_once(SUBSDIR . '/PackageServers.subs.php');
 
 		// Browsing the packages from a server
-		if (isset($_GET['server']))
+		if (isset($this->_req->query->server))
 		{
-			if ($_GET['server'] == '')
+			$server = $this->_req->getQuery('server', 'intval', 0);
+			if (empty($server))
 				redirectexit('action=admin;area=packageservers');
-
-			$server = (int) $_GET['server'];
 
 			// Query the server list to find the current server.
 			$packageserver = fetchPackageServers($server);
@@ -148,30 +161,30 @@ class PackageServers_Controller extends Action_Controller
 				Errors::fatal_lang_error('couldnt_connect', false);
 
 			// If there is a relative link, append to the stored server url.
-			if (isset($_GET['relative']))
-				$url = $url . (substr($url, -1) == '/' ? '' : '/') . $_GET['relative'];
+			if (isset($this->_req->query->relative))
+				$url = $url . (substr($url, -1) == '/' ? '' : '/') . $this->_req->query->relative;
 
 			// Clear any "absolute" URL.  Since "server" is present, "absolute" is garbage.
-			unset($_GET['absolute']);
+			unset($this->_req->query->absolute);
 		}
-		elseif (isset($_GET['absolute']) && $_GET['absolute'] != '')
+		elseif (isset($this->_req->query->absolute) && $this->_req->query->absolute != '')
 		{
 			// Initialize the required variables.
 			$server = '';
-			$url = $_GET['absolute'];
+			$url = $this->_req->query->absolute;
 			$name = '';
-			$_GET['package'] = $url . '/packages.xml?language=' . $context['user']['language'];
+			$this->_req->query->package = $url . '/packages.xml?language=' . $context['user']['language'];
 
 			// Clear any "relative" URL.  Since "server" is not present, "relative" is garbage.
-			unset($_GET['relative']);
+			unset($this->_req->query->relative);
 
 			$token = checkConfirm('get_absolute_url');
 			if ($token !== true)
 			{
 				$context['sub_template'] = 'package_confirm';
 				$context['page_title'] = $txt['package_servers'];
-				$context['confirm_message'] = sprintf($txt['package_confirm_view_package_content'], htmlspecialchars($_GET['absolute'], ENT_COMPAT, 'UTF-8'));
-				$context['proceed_href'] = $scripturl . '?action=admin;area=packageservers;sa=browse;absolute=' . urlencode($_GET['absolute']) . ';confirm=' . $token;
+				$context['confirm_message'] = sprintf($txt['package_confirm_view_package_content'], htmlspecialchars($this->_req->query->absolute, ENT_COMPAT, 'UTF-8'));
+				$context['proceed_href'] = $scripturl . '?action=admin;area=packageservers;sa=browse;absolute=' . urlencode($this->_req->query->absolute) . ';confirm=' . $token;
 
 				return;
 			}
@@ -181,18 +194,18 @@ class PackageServers_Controller extends Action_Controller
 			Errors::fatal_lang_error('couldnt_connect', false);
 
 		// Attempt to connect.  If unsuccessful... try the URL.
-		if (!isset($_GET['package']) || file_exists($_GET['package']))
-			$_GET['package'] = $url . '/packages.xml?language=' . $context['user']['language'];
+		if (!isset($this->_req->query->package) || file_exists($this->_req->query->package))
+			$this->_req->query->package = $url . '/packages.xml?language=' . $context['user']['language'];
 
 		// Check to be sure the packages.xml file actually exists where it is should be... or dump out.
-		if ((isset($_GET['absolute']) || isset($_GET['relative'])) && !url_exists($_GET['package']))
+		if ((isset($this->_req->query->absolute) || isset($this->_req->query->relative)) && !url_exists($this->_req->query->package))
 			Errors::fatal_lang_error('packageget_unable', false, array($url . '/index.php'));
 
 		// Might take some time.
 		setTimeLimit(600);
 
 		// Read packages.xml and parse into Xml_Array. (the true tells it to trim things ;).)
-		$listing = new Xml_Array(fetch_web_data($_GET['package']), true);
+		$listing = new Xml_Array(fetch_web_data($this->_req->query->package), true);
 
 		// Errm.... empty file?  Try the URL....
 		if (!$listing->exists('package-list'))
@@ -276,15 +289,15 @@ class PackageServers_Controller extends Action_Controller
 
 					if ($remote_type == 'relative' && (substr($thisPackage->fetch('@href'), 0, 7) !== 'http://' || substr($thisPackage->fetch('@href'), 0, 8) !== 'https://'))
 					{
-						if (isset($_GET['absolute']))
-							$current_url = $_GET['absolute'] . '/';
-						elseif (isset($_GET['relative']))
-							$current_url = $_GET['relative'] . '/';
+						if (isset($this->_req->query->absolute))
+							$current_url = $this->_req->query->absolute . '/';
+						elseif (isset($this->_req->query->relative))
+							$current_url = $this->_req->query->relative . '/';
 						else
 							$current_url = '';
 
 						$current_url .= $thisPackage->fetch('@href');
-						if (isset($_GET['absolute']))
+						if (isset($this->_req->query->absolute))
 							$package['href'] = $scripturl . '?action=admin;area=packageservers;sa=browse;absolute=' . $current_url;
 						else
 							$package['href'] = $scripturl . '?action=admin;area=packageservers;sa=browse;server=' . $context['package_server'] . ';relative=' . $current_url;
@@ -301,10 +314,10 @@ class PackageServers_Controller extends Action_Controller
 				// It's a package...
 				else
 				{
-					if (isset($_GET['absolute']))
-						$current_url = $_GET['absolute'] . '/';
-					elseif (isset($_GET['relative']))
-						$current_url = $_GET['relative'] . '/';
+					if (isset($this->_req->query->absolute))
+						$current_url = $this->_req->query->absolute . '/';
+					elseif (isset($this->_req->query->relative))
+						$current_url = $this->_req->query->relative . '/';
 					else
 						$current_url = '';
 
@@ -470,12 +483,12 @@ class PackageServers_Controller extends Action_Controller
 		checkSession('get');
 
 		// To download something, we need a valid server or url.
-		if (empty($_GET['server']) && (!empty($_GET['get']) && !empty($_REQUEST['package'])))
+		if (empty($this->_req->query->server) && (!empty($this->_req->query->get) && !empty($this->_req->post->package)))
 			Errors::fatal_lang_error('package_get_error_is_zero', false);
 
-		if (isset($_GET['server']))
+		if (isset($this->_req->query->server))
 		{
-			$server = (int) $_GET['server'];
+			$server = (int) $this->_req->query->server;
 
 			// Query the server table to find the requested server.
 			$packageserver = fetchPackageServers($server);
@@ -495,13 +508,13 @@ class PackageServers_Controller extends Action_Controller
 		}
 
 		// Entered a url and name to download?
-		if (isset($_REQUEST['byurl']) && !empty($_POST['filename']))
-			$package_name = basename($_REQUEST['filename']);
+		if (isset($this->_req->query->byurl) && !empty($this->_req->post->filename))
+			$package_name = basename($this->_req->post->filename);
 		else
-			$package_name = basename($_REQUEST['package']);
+			$package_name = basename($this->_req->query->package);
 
 		// Is this a "master" package from github or bitbucket?
-		if (preg_match('~^http(s)?://(www.)?(bitbucket\.org|github\.com)/(.+?(master(\.zip|\.tar\.gz)))$~', $_REQUEST['package'], $matches) == 1)
+		if (preg_match('~^http(s)?://(www.)?(bitbucket\.org|github\.com)/(.+?(master(\.zip|\.tar\.gz)))$~', $this->_req->query->package, $matches) == 1)
 		{
 			// @todo maybe use the name/version in the package instead, although the link will be cleaner
 			// Name this master.zip based on repo name in the link
@@ -515,10 +528,10 @@ class PackageServers_Controller extends Action_Controller
 			// We could read the package info and see if we have a duplicate id & version, however that is
 			// not always accurate, especially when dealing with repos.  So for now just put in in no conflict mode
 			// and do the save.
-			$_REQUEST['auto'] = true;
+			$this->_req->query->auto = true;
 		}
 
-		if (isset($_REQUEST['conflict']) || (isset($_REQUEST['auto']) && file_exists(BOARDDIR . '/packages/' . $package_name)))
+		if (isset($this->_req->query->conflict) || (isset($this->_req->query->auto) && file_exists(BOARDDIR . '/packages/' . $package_name)))
 		{
 			// Find the extension, change abc.tar.gz to abc_1.tar.gz...
 			if (strrpos(substr($package_name, 0, -3), '.') !== false)
@@ -538,16 +551,23 @@ class PackageServers_Controller extends Action_Controller
 		}
 
 		// First make sure it's a package.
-		$packageInfo = getPackageInfo($url . $_REQUEST['package']);
+		$packageInfo = getPackageInfo($url . $this->_req->query->package);
 		if (!is_array($packageInfo))
 			Errors::fatal_lang_error($packageInfo);
 
 		// Save the package to disk, use FTP if necessary
-		create_chmod_control(array(BOARDDIR . '/packages/' . $package_name), array('destination_url' => $scripturl . '?action=admin;area=packageservers;sa=download' . (isset($_GET['server']) ? ';server=' . $_GET['server'] : '') . (isset($_REQUEST['auto']) ? ';auto' : '') . ';package=' . $_REQUEST['package'] . (isset($_REQUEST['conflict']) ? ';conflict' : '') . ';' . $context['session_var'] . '=' . $context['session_id'], 'crash_on_error' => true));
-		package_put_contents(BOARDDIR . '/packages/' . $package_name, fetch_web_data($url . $_REQUEST['package']));
+		create_chmod_control(
+			array(BOARDDIR . '/packages/' . $package_name),
+			array('destination_url' => $scripturl . '?action=admin;area=packageservers;sa=download' . (isset($this->_req->query->server)
+				? ';server=' . $this->_req->query->server : '') . (isset($this->_req->query->auto)
+				? ';auto' : '') . ';package=' . $this->_req->query->package . (isset($this->_req->query->conflict)
+				? ';conflict' : '') . ';' . $context['session_var'] . '=' . $context['session_id'],
+				'crash_on_error' => true)
+		);
+		package_put_contents(BOARDDIR . '/packages/' . $package_name, fetch_web_data($url . $this->_req->query->package));
 
 		// Done!  Did we get this package automatically?
-		if (preg_match('~^http://[\w_\-]+\.elkarte\.net/~', $_REQUEST['package']) == 1 && strpos($_REQUEST['package'], 'dlattach') === false && isset($_REQUEST['auto']))
+		if (preg_match('~^http://[\w_\-]+\.elkarte\.net/~', $this->_req->query->package) == 1 && strpos($this->_req->query->package, 'dlattach') === false && isset($this->_req->query->auto))
 			redirectexit('action=admin;area=packages;sa=install;package=' . $package_name);
 
 		// You just downloaded a addon from SERVER_NAME_GOES_HERE.
@@ -633,7 +653,11 @@ class PackageServers_Controller extends Action_Controller
 			while ($package = readdir($dir))
 			{
 				// No need to check these
-				if ($package == '.' || $package == '..' || $package == 'temp' || $package == $packageName || (!(is_dir(BOARDDIR . '/packages/' . $package) && file_exists(BOARDDIR . '/packages/' . $package . '/package-info.xml')) && substr(strtolower($package), -7) != '.tar.gz' && substr(strtolower($package), -4) != '.tgz' && substr(strtolower($package), -4) != '.zip'))
+				if ($package == '.' || $package == '..' || $package == 'temp' || $package == $packageName ||
+					(!(is_dir(BOARDDIR . '/packages/' . $package) && file_exists(BOARDDIR . '/packages/' . $package . '/package-info.xml'))
+						&& substr(strtolower($package), -7) != '.tar.gz'
+						&& substr(strtolower($package), -4) != '.tgz'
+						&& substr(strtolower($package), -4) != '.zip'))
 					continue;
 
 				// Read package info for the archive we found
@@ -682,12 +706,12 @@ class PackageServers_Controller extends Action_Controller
 		checkSession();
 
 		// If they put a slash on the end, get rid of it.
-		if (substr($_POST['serverurl'], -1) == '/')
-			$_POST['serverurl'] = substr($_POST['serverurl'], 0, -1);
+		if (substr($this->_req->post->serverurl, -1) == '/')
+			$this->_req->post->serverurl = substr($this->_req->post->serverurl, 0, -1);
 
 		// Are they both nice and clean?
-		$servername = trim(Util::htmlspecialchars($_POST['servername']));
-		$serverurl = trim(Util::htmlspecialchars($_POST['serverurl']));
+		$servername = trim(Util::htmlspecialchars($this->_req->post->servername));
+		$serverurl = trim(Util::htmlspecialchars($this->_req->post->serverurl));
 
 		// Make sure the URL has the correct prefix.
 		if (substr($serverurl, 0, 7) !== 'http://' && substr($serverurl, 0, 8) !== 'https://')
@@ -711,8 +735,8 @@ class PackageServers_Controller extends Action_Controller
 		require_once(SUBSDIR . '/PackageServers.subs.php');
 
 		// We no longer browse this server.
-		$_GET['server'] = (int) $_GET['server'];
-		deletePackageServer($_GET['server']);
+		$this->_req->query->server = (int) $this->_req->query->server;
+		deletePackageServer($this->_req->query->server);
 
 		redirectexit('action=admin;area=packageservers');
 	}
@@ -774,17 +798,17 @@ class PackageServers_Controller extends Action_Controller
 		if ($unwritable)
 		{
 			// Are they connecting to their FTP account already?
-			if (isset($_POST['ftp_username']))
+			if (isset($this->_req->post->ftp_username))
 			{
-				$ftp = new Ftp_Connection($_POST['ftp_server'], $_POST['ftp_port'], $_POST['ftp_username'], $_POST['ftp_password']);
+				$ftp = new Ftp_Connection($this->_req->post->ftp_server, $this->_req->post->ftp_port, $this->_req->post->ftp_username, $this->_req->post->ftp_password);
 
 				if ($ftp->error === false)
 				{
 					// I know, I know... but a lot of people want to type /home/xyz/... which is wrong, but logical.
-					if (!$ftp->chdir($_POST['ftp_path']))
+					if (!$ftp->chdir($this->_req->post->ftp_path))
 					{
 						$ftp_error = $ftp->error;
-						$ftp->chdir(preg_replace('~^/home[2]?/[^/]+?~', '', $_POST['ftp_path']));
+						$ftp->chdir(preg_replace('~^/home[2]?/[^/]+?~', '', $this->_req->post->ftp_path));
 					}
 				}
 			}
@@ -803,18 +827,18 @@ class PackageServers_Controller extends Action_Controller
 
 				list ($username, $detect_path, $found_path) = $ftp->detect_path(BOARDDIR);
 
-				if ($found_path || !isset($_POST['ftp_path']))
-					$_POST['ftp_path'] = $detect_path;
+				if ($found_path || !isset($this->_req->post->ftp_path))
+					$this->_req->post->ftp_path = $detect_path;
 
-				if (!isset($_POST['ftp_username']))
-					$_POST['ftp_username'] = $username;
+				if (!isset($this->_req->post->ftp_username))
+					$this->_req->post->ftp_username = $username;
 
 				// Fill the boxes for a FTP connection with data from the previous attempt too, if any
 				$context['package_ftp'] = array(
-					'server' => isset($_POST['ftp_server']) ? $_POST['ftp_server'] : (isset($modSettings['package_server']) ? $modSettings['package_server'] : 'localhost'),
-					'port' => isset($_POST['ftp_port']) ? $_POST['ftp_port'] : (isset($modSettings['package_port']) ? $modSettings['package_port'] : '21'),
-					'username' => isset($_POST['ftp_username']) ? $_POST['ftp_username'] : (isset($modSettings['package_username']) ? $modSettings['package_username'] : ''),
-					'path' => $_POST['ftp_path'],
+					'server' => isset($this->_req->post->ftp_server) ? $this->_req->post->ftp_server : (isset($modSettings['package_server']) ? $modSettings['package_server'] : 'localhost'),
+					'port' => isset($this->_req->post->ftp_port) ? $this->_req->post->ftp_port : (isset($modSettings['package_port']) ? $modSettings['package_port'] : '21'),
+					'username' => isset($this->_req->post->ftp_username) ? $this->_req->post->ftp_username : (isset($modSettings['package_username']) ? $modSettings['package_username'] : ''),
+					'path' => $this->_req->post->ftp_path,
 					'error' => empty($ftp_error) ? null : $ftp_error,
 				);
 
