@@ -35,7 +35,7 @@ class ManageNews_Controller extends Action_Controller
 
 	/**
 	 * Members specifically being included in a newsletter
-	 * @var int[]
+	 * @var array
 	 */
 	protected $_members = array();
 

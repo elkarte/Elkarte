@@ -770,7 +770,7 @@ class Admin_Controller extends Action_Controller
 		$context['page_title'] = $txt['admin_search_results'];
 
 		// You did remember to enter something to search for, otherwise its easy
-		if (trim($context['search_term']) == '')
+		if ($context['search_term'] === '')
 			$context['search_results'] = array();
 		else
 			$action->dispatch($subAction);

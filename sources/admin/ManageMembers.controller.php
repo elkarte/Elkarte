@@ -29,6 +29,18 @@ if (!defined('ELK'))
 class ManageMembers_Controller extends Action_Controller
 {
 	/**
+	 * Holds varous setting conditions for the current action
+	 * @var array
+	 */
+	protected $conditions;
+
+	/**
+	 * Holds the members that the action is being applied to
+	 * @var int[]
+	 */
+	protected $member_info;
+
+	/**
 	 * Holds instance of HttpReq object
 	 * @var HttpReq
 	 */
