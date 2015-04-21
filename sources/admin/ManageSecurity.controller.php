@@ -376,7 +376,7 @@ class ManageSecurity_Controller extends Action_Controller
 					$this_list = array_map('trim', array_filter($this->_req->post->$list));
 					$this_desc = array_intersect_key($this->_req->post->{$list . '_desc'}, $this_list);
 				}
-				var_dump($this_desc);
+
 				updateSettings(array($list => serialize($this_list), $list . '_desc' => serialize($this_desc)));
 			}
 
