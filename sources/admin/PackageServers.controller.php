@@ -36,14 +36,6 @@ class PackageServers_Controller extends Action_Controller
 	protected $_req;
 
 	/**
-	 * Pre Dispatch, called before other methods.  Loads HttpReq
-	 */
-	public function pre_dispatch()
-	{
-		$this->_req = HttpReq::instance();
-	}
-
-	/**
 	 * Called before all other methods when comming from the dispatcher or
 	 * action class.  Loads lanaguage and templates files so they are available
 	 * to the other methods.
@@ -55,6 +47,9 @@ class PackageServers_Controller extends Action_Controller
 
 		// Use the PackageServers template.
 		loadTemplate('PackageServers', 'admin');
+
+		// Load request interface
+		$this->_req = HttpReq::instance();
 	}
 
 	/**
