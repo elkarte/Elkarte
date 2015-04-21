@@ -433,7 +433,7 @@ function removeCommonWordsFromIndex($start, $column_definition)
 		$db->free_result($request);
 
 		updateSettings(array('search_stopwords' => implode(',', $stop_words)));
-
+var_dump($stop_words);
 		if (!empty($stop_words))
 			$db->query('', '
 				DELETE FROM {db_prefix}log_search_words
