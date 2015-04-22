@@ -48,6 +48,48 @@ if (!defined('ELK'))
 class ManageThemes_Controller extends Action_Controller
 {
 	/**
+	 * Holds the selected theme options
+	 * @var mixed[]
+	 */
+	private $_options;
+
+	/**
+	 * Holds the selected default theme options
+	 * @var mixed[]
+	 */
+	private $_default_options;
+
+	/**
+	 * Holds the selected master options for a theme
+	 * @var mixed[]
+	 */
+	private $_options_master;
+
+	/**
+	 * Holds the selected default master options for a theme
+	 * @var mixed[]
+	 */
+	private $_default_options_master;
+
+	/**
+	 * Name of the theme
+	 * @var string
+	 */
+	private $theme_name;
+
+	/**
+	 * Full path to the theme
+	 * @var string
+	 */
+	private $theme_dir;
+
+	/**
+	 * The themes images url if any
+	 * @var string|null
+	 */
+	private $images_url;
+
+	/**
 	 * Holds instance of HttpReq object
 	 * @var HttpReq
 	 */
@@ -647,6 +689,7 @@ class ManageThemes_Controller extends Action_Controller
 			checkSession();
 			validateToken('admin-sts');
 
+			$options = array();
 			$options['options'] = empty($this->_req->post->options) ? array() : (array) $this->_req->post->options;
 			$options['default_options'] = empty($this->_req->post->default_options) ? array() : (array) $this->_req->post->default_options;
 
@@ -1221,6 +1264,8 @@ class ManageThemes_Controller extends Action_Controller
 	 */
 	public function installFromZip()
 	{
+		global $context;
+
 		// Hopefully the themes directory is writable, or we might have a problem.
 		if (!is_writable(BOARDDIR . '/themes'))
 			Errors::fatal_lang_error('theme_install_write_error', 'critical');
@@ -1266,7 +1311,7 @@ class ManageThemes_Controller extends Action_Controller
 	 */
 	public function copyDefault()
 	{
-		global $boardurl, $modSettings;
+		global $boardurl, $modSettings, $settings;
 
 		// Hopefully the themes directory is writable, or we might have a problem.
 		if (!is_writable(BOARDDIR . '/themes'))

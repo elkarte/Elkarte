@@ -130,7 +130,7 @@ class Modlog_Controller extends Action_Controller
 			$search_params_string = $search_params['string'];
 
 		if (isset($this->_req->post->search_type) || empty($search_params['type']) || !isset($searchTypes[$search_params['type']]))
-			$search_params_type = isset($this->_req->post->search_type) && isset($searchTypes[$this->_req->post->search_type]) ? $this->_req->REQUEST->search_type : $context['order'];
+			$search_params_type = isset($this->_req->post->search_type) && isset($searchTypes[$this->_req->post->search_type]) ? $this->_req->query->search_type : $context['order'];
 		else
 			$search_params_type = $search_params['type'];
 

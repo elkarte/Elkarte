@@ -473,7 +473,7 @@ class ManageSmileys_Controller extends Action_Controller
 	 */
 	private function _subActionModifySet()
 	{
-		global $context, $txt;
+		global $context, $txt, $modSettings;
 
 		if ($context['sub_action'] == 'modifyset')
 		{
@@ -599,9 +599,9 @@ class ManageSmileys_Controller extends Action_Controller
 			$allowedTypes = array('jpeg', 'jpg', 'gif', 'png', 'bmp');
 			$disabledFiles = array('con', 'com1', 'com2', 'com3', 'com4', 'prn', 'aux', 'lpt1', '.htaccess', 'index.php');
 
-			$this->_req->post->smiley_code = htmltrim__recursive($this->_req->post->smiley_code);
+			$this->_req->post->smiley_code = $this->_req->getPost('smiley_code', 'Util::htmltrim', '');
+			$this->_req->post->smiley_filename = $this->_req->getPost('smiley_filename', 'Util::htmltrim', '');
 			$this->_req->post->smiley_location = empty($this->_req->post->smiley_location) || $this->_req->post->smiley_location > 2 || $this->_req->post->smiley_location < 0 ? 0 : (int) $this->_req->post->smiley_location;
-			$this->_req->post->smiley_filename = htmltrim__recursive($this->_req->post->smiley_filename);
 
 			// Make sure some code was entered.
 			if (empty($this->_req->post->smiley_code))
@@ -849,8 +849,8 @@ class ManageSmileys_Controller extends Action_Controller
 				// Otherwise an edit.
 				else
 				{
-					$this->_req->post->smiley_code = htmltrim__recursive($this->_req->post->smiley_code);
-					$this->_req->post->smiley_filename = htmltrim__recursive($this->_req->post->smiley_filename);
+					$this->_req->post->smiley_code = $this->_req->getPost('smiley_code', 'Util::htmltrim', '');
+					$this->_req->post->smiley_filename = $this->_req->getPost('smiley_filename', 'Util::htmltrim', '');
 					$this->_req->post->smiley_location = empty($this->_req->post->smiley_location) || $this->_req->post->smiley_location > 2 || $this->_req->post->smiley_location < 0 ? 0 : (int) $this->_req->post->smiley_location;
 
 					// Make sure some code was entered.
