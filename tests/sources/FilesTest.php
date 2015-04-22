@@ -79,21 +79,15 @@ class TestFiles extends PHPUnit_Framework_TestCase
 					// Check the validity of the syntax.
 					ob_start();
 					$errorReporting = error_reporting(0);
-					$result = @eval('
-						if (false)
-						{
-							' . preg_replace('~(?:^\s*<\\?(?:php)?|\\?>\s*$)~', '', $file_content) . '
-						}
-					');
+					$result = shell_exec(str_replace('{filename}', $file, 'php -l {filename}'));
 					error_reporting($errorReporting);
 					@ob_end_clean();
 
 					// Did eval run without error?
-					$syntax_valid = $result !== false;
+					$syntax_valid = strpos($result, 'No syntax errors') !== false;
 					if (!$syntax_valid)
 					{
-						$error = error_get_last();
-						$error_message = $error['message'] . ' at [' . $file . ' line ' . ($error['line'] - 3) . ']' . "\n";
+						$error_message = $result;
 						print_r($error_message);
 					}
 					else

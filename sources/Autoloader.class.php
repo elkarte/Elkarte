@@ -76,7 +76,14 @@ class Elk_Autoloader
 	 *
 	 * @var string
 	 */
-	protected $_file_name;
+	protected $_file_name = false;
+
+	/**
+	 * Holds the pairs namespace => paths
+	 *
+	 * @var string[]
+	 */
+	protected $_paths;
 
 	/**
 	* Constructor, not used, instead use getInstance()
@@ -90,13 +97,32 @@ class Elk_Autoloader
 	 */
 	public function setupAutoloader($dir)
 	{
-		// Already done, return
-		if ($this->_setup)
-			return;
-
 		if (!is_array($dir))
 			$dir = array($dir);
 
+		foreach ($dir as $path)
+			$this->register($path);
+	}
+
+	/**
+	 * Registers new paths for the autoloader
+	 */
+	public function register($dir, $namespace = null)
+	{
+		if ($namespace === null)
+			$namespace = 0;
+
+		if (!isset($this->_paths[$namespace]))
+			$this->_paths[$namespace] = array();
+
+		$this->_paths[$namespace][] = $dir;
+		array_unique($this->_paths[$namespace]);
+
+		$this->_buildPaths((array) $dir);
+	}
+
+	protected function _buildPaths($dir)
+	{
 		// Build the paths where we are going to look for files
 		foreach ($dir as $include)
 			$this->_dir .= $include .  PATH_SEPARATOR;
@@ -125,16 +151,12 @@ class Elk_Autoloader
 	 */
 	public function elk_autoloader($class)
 	{
-		// If its loaded, bug out
-		if (class_exists($class, false) || interface_exists($class, false))
-			return true;
-
 		// Break the class name in to its parts
 		if (!$this->_string_to_class($class))
 			return false;
 
-		// Just some very special case
-		$this->_handle_exceptions();
+		if ($this->_current_namespace !== false)
+			$this->_handle_nacespaces();
 
 		// Basic cases like Util.class, Action.class, Request.class
 		if ($this->_file_name === false)
@@ -144,13 +166,17 @@ class Elk_Autoloader
 		if ($this->_file_name === false)
 			$this->_handle_other_cases();
 
+		$file = $this->_file_name;
+
+		// Start fresh for the next one
+		$this->_file_name = false;
 		// Well do we have something to do?
-		if (!empty($this->_file_name))
+		if (!empty($file))
 		{
-			if ($this->_strict && stream_resolve_include_path($this->_file_name))
-				require_once($this->_file_name);
+			if ($this->_strict && stream_resolve_include_path($file))
+				require_once($file);
 			else
-				require_once($this->_file_name);
+				require_once($file);
 		}
 	}
 
@@ -161,6 +187,15 @@ class Elk_Autoloader
 	 */
 	private function _string_to_class($class)
 	{
+		$namespaces = explode('\\', $class);
+		if (count($namespaces) > 1)
+		{
+			$class = array_pop($namespaces);
+			$this->_current_namespace = implode('\\', $namespaces);
+		}
+		else
+			$this->_current_namespace = false;
+
 		// The name must be letters, numbers and _ only
 		if (preg_match('~[^a-z0-9_]~i', $class))
 			return false;
@@ -173,24 +208,21 @@ class Elk_Autoloader
 	}
 
 	/**
-	 * This handles some exceptions that fall outside our normal loading rules
-	 *
-	 * @todo special cases are bad.
-	 * @todo why is this case also in other cases?
+	 * This handles any case where a namespace is present.
 	 */
-	private function _handle_exceptions()
+	protected function _handle_nacespaces()
 	{
-		$this->_file_name = false;
-
-		if (isset($this->_name[0]))
+		if (isset($this->_paths[$this->_current_namespace]))
 		{
-			switch ($this->_name[0])
+			foreach ($this->_paths[$this->_current_namespace] as $possible_dir)
 			{
-				case 'Mention':
-					$this->_file_name = SUBSDIR . '/MentionType/' . $this->_givenname . $this->_surname . '.class.php';
+				$file = $possible_dir . '/' . $this->_givenname . $this->_surname . '.php';
+
+				if (file_exists($file))
+				{
+					$this->_file_name = $file;
 					break;
-				default:
-					$this->_file_name = false;
+				}
 			}
 		}
 	}
@@ -258,22 +290,17 @@ class Elk_Autoloader
 			case 'Exception':
 				$this->_file_name = SUBSDIR . '/Exception/' . $this->_givenname . $this->_surname . '.class.php';
 				break;
-			// Some_Cache => /CacheMethod/SomeCache.class.php
-			case 'Cache':
-				$this->_file_name = SUBSDIR . '/CacheMethod/' . $this->_givenname . $this->_surname . '.class.php';
-				break;
 			// Some_Cache => SomeCache.class.php
 			case 'Integrate':
 				$this->_file_name = SUBSDIR . '/' . $this->_givenname . '.integrate.php';
-				break;
-			// Some_Mention => /MentionType/SomeMention.class.php
-			case 'Mention':
-				$this->_file_name = SUBSDIR . '/MentionType/' . $this->_givenname . $this->_surname . '.class.php';
 				break;
 			// Some_Display => Subscriptions-Some.class.php
 			case 'Display':
 			case 'Payment':
 				$this->_file_name = SUBSDIR . '/Subscriptions-' . implode('_', $this->_name) . '.class.php';
+				break;
+			case 'Module':
+				$this->_file_name = SOURCEDIR . '/modules/' . $this->_name[0] . '/' . $this->_givenname . 'Module.class.php';
 				break;
 			case 'Interface':
 			case 'Abstract':
@@ -282,18 +309,20 @@ class Elk_Autoloader
 				else
 					$this->_file_name = $this->_givenname . 'Abstract.class.php';
 
-				if (!file_exists(SUBSDIR . '/' . $this->_file_name))
+				if (file_exists(SUBSDIR . '/' . $this->_file_name))
+					$this->_file_name = SUBSDIR . '/' . $this->_file_name;
+				else
 				{
 					$dir = SUBSDIR . '/' . $this->_givenname;
 
 					if (file_exists($dir . '/' . $this->_file_name))
 						$this->_file_name = $dir . '/' . $this->_file_name;
+					elseif (!empty($this->_name[1]) && $this->_name[1] == 'Module')
+						$this->_file_name = SOURCEDIR . '/modules/' . $this->_name[0] . '/' . $this->_file_name;
 					// Not knowing what it is, better leave it empty
 					else
 						$this->_file_name = '';
 				}
-				else
-					$this->_file_name = SUBSDIR . '/' . $this->_file_name;
 				break;
 			// All the rest, like Browser_Detector, Template_Layers, Site_Dispatcher ...
 			default:

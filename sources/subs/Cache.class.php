@@ -26,32 +26,32 @@ class Cache
 	 * Holds our static instance of the class
 	 * @var object
 	 */
-	private static $_instance = null;
+	protected static $_instance = null;
 
 	/**
 	 * Array of options for the methods (if needed)
 	 * @var mixed[]
 	 */
-	private $_options = array();
+	protected $_options = array();
 
 	/**
 	 * If the cache is enabled or not.
 	 * Set in __construct based on the global $cache_enable
 	 * @var int
 	 */
-	private $_cache_enable = false;
+	protected $_cache_enable = false;
 
 	/**
 	 * The prefix to append to the cache key
 	 * @var string
 	 */
-	private $_key_prefix = null;
+	protected $_key_prefix = null;
 
 	/**
 	 * The cacheing object
 	 * @var object
 	 */
-	private $_cache_obj = null;
+	protected $_cache_obj = null;
 
 	/**
 	 * Initialize the class, defines the options and the caching method to use
@@ -73,7 +73,7 @@ class Cache
 		if (empty($accelerator))
 			$accelerator = 'filebased';
 
-		$cache_class = ucfirst($accelerator) . '_Cache';
+		$cache_class = 'ElkArte\\sources\\subs\\CacheMethod\\' . ucfirst($accelerator);
 		$this->_cache_obj = new $cache_class($this->_options);
 
 		if ($this->_cache_obj !== null)
@@ -279,6 +279,7 @@ class Cache
 					'cache_password' => $cache_password,
 				);
 			}
+			Elk_Autoloader::getInstance()->register(SUBSDIR . '/CacheMethod', 'ElkArte\\sources\\subs\\CacheMethod');
 
 			self::$_instance = new Cache($cache_enable, $cache_accelerator, $options);
 		}

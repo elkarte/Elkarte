@@ -59,10 +59,9 @@ abstract class Action_Controller
 	{
 		$this->_hook = str_replace('_Controller', '', get_class($this));
 
-		$this->_loadModules();
+		$classes = $this->_loadModules();
 
-		$this->_events->registerAddons('.+_' . $this->_hook . '_Addon');
-		$this->_events->registerAddons('.+_' . $this->_hook . '_Module');
+		$this->_events->registerClasses($classes);
 
 		$this->_events->setSource($this);
 	}
@@ -76,24 +75,15 @@ abstract class Action_Controller
 	}
 
 	/**
-	 * Shortcut to require the files of the modules for a certain controller.
+	 * Finds the modules for a certain controller.
+	 *
+	 * @return string[] Class names to look for
 	 */
 	protected function _loadModules()
 	{
-		foreach ($this->_getModuleFiles() as $require_file)
-			require_once($require_file);
-	}
-
-	/**
-	 * Finds the modules for a certain controller.
-	 *
-	 * @return string[] File names with full path
-	 */
-	protected function _getModuleFiles()
-	{
 		global $modSettings;
 
-		$files = array();
+		$classes = array();
 		$hook = strtolower(str_replace('_Controller', '', $this->_hook));
 		$setting_key = 'modules_' . $hook;
 
@@ -102,13 +92,13 @@ abstract class Action_Controller
 			$modules = explode(',', $modSettings[$setting_key]);
 			foreach ($modules as $module)
 			{
-				$file = SUBSDIR . '/' . ucfirst($module) . ucfirst($hook) . 'Module.class.php';
-				if (file_exists($file))
-					$files[] = $file;
+				$class = ucfirst($module) . '_' . ucfirst($hook) . '_Module';
+				if (class_exists($class))
+					$classes[] = $class;
 			}
 		}
 
-		return $files;
+		return $classes;
 	}
 
 	/**

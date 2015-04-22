@@ -14,8 +14,7 @@ class TestCache extends PHPUnit_Framework_TestCase
 	 */
 	public function setUp()
 	{
-		require_once(SUBSDIR . '/CacheMethod/CacheMethod.interface.php');
-		require_once(SUBSDIR . '/CacheMethod/CacheMethodAbstract.class.php');
+		Elk_Autoloader::getInstance()->register(SUBSDIR . '/CacheMethod', 'ElkArte\\sources\\subs\\CacheMethod');
 	}
 
 	/**
@@ -32,8 +31,7 @@ class TestCache extends PHPUnit_Framework_TestCase
 	 */
 	public function testFilebasedCache()
 	{
-		require_once(SUBSDIR . '/CacheMethod/FilebasedCache.class.php');
-		$this->_cache_obj = new Filebased_Cache(array());
+		$this->_cache_obj = new ElkArte\sources\subs\CacheMethod\Filebased(array());
 		$this->doCacheTests(function($key) {
 			return file_exists(CACHEDIR . '/data_' . $key . '.php');
 		});
