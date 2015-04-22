@@ -40,6 +40,7 @@ class Admin_Controller extends Action_Controller
 
 	/**
 	 * Pre Dispatch, called before other methods.  Loads integration hooks
+	 * and HttpReq instance.
 	 */
 	public function pre_dispatch()
 	{

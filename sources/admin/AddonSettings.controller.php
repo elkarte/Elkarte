@@ -42,7 +42,7 @@ class AddonSettings_Controller extends Action_Controller
 	private $_req;
 
 	/**
-	 * Pre Dispatch, called before other methods.  Loads integration hooks
+	 * Pre Dispatch, called before other methods.  Loads HttpReq
 	 */
 	public function pre_dispatch()
 	{

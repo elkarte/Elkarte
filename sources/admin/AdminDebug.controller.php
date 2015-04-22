@@ -32,7 +32,7 @@ class AdminDebug_Controller extends Action_Controller
 	private $_req;
 
 	/**
-	 * Pre Dispatch, called before other methods.  Loads integration hooks
+	 * Pre Dispatch, called before other methods.  Loads HttpReq instance.
 	 */
 	public function pre_dispatch()
 	{

@@ -2145,8 +2145,7 @@ class Packages_Controller extends Action_Controller
 			unset($_SESSION['version_emulate']);
 		elseif (isset($this->_req->query->version_emulate))
 		{
-			if (($_GET['version_emulate'] === 0 || $_GET['version_emulate'] === FORUM_VERSION) && isset($_SESSION['version_emulate']))
-			if (($this->_req->query->version_emulate === 0 || $this->_req->query->version_emulate === $forum_version) && isset($_SESSION['version_emulate']))
+			if (($this->_req->query->version_emulate === 0 || $this->_req->query->version_emulate === FORUM_VERSION) && isset($this->_req->session->version_emulate))
 				unset($_SESSION['version_emulate']);
 			elseif ($this->_req->query->version_emulate !== 0)
 				$_SESSION['version_emulate'] = strtr($this->_req->query->version_emulate, array('-' => ' ', '+' => ' ', $the_brand . ' ' => ''));
