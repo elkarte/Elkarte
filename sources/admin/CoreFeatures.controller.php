@@ -88,7 +88,7 @@ class CoreFeatures_Controller extends Action_Controller
 		{
 			checkSession();
 
-			if (isset($this->_req->get->xml))
+			if (isset($this->_req->query->xml))
 			{
 				$tokenValidation = validateToken('admin-core', 'post', false);
 

@@ -29,6 +29,54 @@ if (!defined('ELK'))
 class ManageAttachments_Controller extends Action_Controller
 {
 	/**
+	 * Loop counter for paused attachment maintance actions
+	 * @var int
+	 */
+	public $step;
+
+	/**
+	 * substep counter for paused attachment maintance actions
+	 * @var int
+	 */
+	public $substep;
+
+	/**
+	 * Substep at the beginig of a maintance loop
+	 * @var int
+	 */
+	public $starting_substep;
+
+	/**
+	 * Current directory key being processed
+	 * @var int
+	 */
+	public $current_dir;
+
+	/**
+	 * Current base directory key being processed
+	 * @var int
+	 */
+	public $current_base_dir;
+
+	/**
+	 * Used during transfer of files
+	 * @var string
+	 */
+	public $from;
+
+	/**
+	 * Type of attachment management in use
+	 * @var string
+	 */
+	public $auto;
+
+	/**
+	 * Desitination when transfering attachments
+	 * @var string
+	 */
+	public $to;
+
+	/**
 	 * Attachments settings form
 	 * @var Settings_Form
 	 */
@@ -1345,7 +1393,7 @@ class ManageAttachments_Controller extends Action_Controller
 			}
 
 			if (!empty($errors))
-				$this->_req->SESSION->errors['base'] = $errors;
+				$_SESSION['errors']['base'] = $errors;
 
 			if (!empty($update))
 				updateSettings($update);
@@ -1353,20 +1401,20 @@ class ManageAttachments_Controller extends Action_Controller
 			redirectexit('action=admin;area=manageattachments;sa=attachpaths;' . $context['session_var'] . '=' . $context['session_id']);
 		}
 
-		if (isset($this->_req->SESSION->errors))
+		if (isset($this->_req->session->errors))
 		{
-			if (is_array($this->_req->SESSION->errors))
+			if (is_array($this->_req->session->errors))
 			{
 				$errors = array();
-				if (!empty($this->_req->SESSION->errors['dir']))
-					foreach ($this->_req->SESSION->errors['dir'] as $error)
+				if (!empty($this->_req->session->errors['dir']))
+					foreach ($this->_req->session->errors['dir'] as $error)
 						$errors['dir'][] = Util::htmlspecialchars($error, ENT_QUOTES);
 
-				if (!empty($this->_req->SESSION->errors['base']))
-					foreach ($this->_req->SESSION->errors['base'] as $error)
+				if (!empty($this->_req->session->errors['base']))
+					foreach ($this->_req->session->errors['base'] as $error)
 						$errors['base'][] = Util::htmlspecialchars($error, ENT_QUOTES);
 			}
-			unset($this->_req->SESSION->errors);
+			unset($_SESSION['errors'], $this->_req->session->errors);
 		}
 
 		$listOptions = array(

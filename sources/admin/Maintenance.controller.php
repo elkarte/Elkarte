@@ -29,6 +29,36 @@ if (!defined('ELK'))
 class Maintenance_Controller extends Action_Controller
 {
 	/**
+	 * Maximum topic counter
+	 * @var int
+	 */
+	public $max_topics;
+
+	/**
+	 * How many actions to take for a maintance actions
+	 * @var int
+	 */
+	public $increment;
+
+	/**
+	 * Total steps for a given maintance action
+	 * @var int
+	 */
+	public $total_steps;
+
+	/**
+	 * reStart pointer for paused maintance actions
+	 * @var int
+	 */
+	public $start;
+
+	/**
+	 * Loop counter for paused maintance actions
+	 * @var int
+	 */
+	public $step;
+
+	/**
 	 * Holds instance of HttpReq object
 	 * @var HttpReq
 	 */
@@ -687,7 +717,7 @@ class Maintenance_Controller extends Action_Controller
 
 		// Step the number of topics at a time so things don't time out...
 		$this->max_topics = getMaxTopicID();
-		$this->increment = min(max(50, ceil($this->max_topics / 4)), 2000);
+		$this->increment = (int) min(max(50, ceil($this->max_topics / 4)), 2000);
 
 		// An 8 step process, should be 12 for the admin
 		$this->total_steps = 8;
@@ -700,7 +730,6 @@ class Maintenance_Controller extends Action_Controller
 			// let's just do some at a time, though.
 			while ($this->start < $this->max_topics)
 			{
-				var_dump($this->start, $this->increment);
 				recountApprovedMessages($this->start, $this->increment);
 				recountUnapprovedMessages($this->start, $this->increment);
 				$this->start += $this->increment;
@@ -818,7 +847,7 @@ class Maintenance_Controller extends Action_Controller
 			if (microtime(true) - $time_start > 3)
 			{
 				$this->start = 0;
-				$percent = round(700 / $total_steps);
+				$percent = round(700 / $this->total_steps);
 				$this->_buildContinue($percent, 6);
 				return;
 			}
@@ -837,7 +866,7 @@ class Maintenance_Controller extends Action_Controller
 
 				if (microtime(true) - $time_start > 3)
 				{
-					$percent = round((700 + 100 * $this->start / $modSettings['maxMsgID']) / $total_steps);
+					$percent = round((700 + 100 * $this->start / $modSettings['maxMsgID']) / $this->total_steps);
 					$this->_buildContinue($percent, 6);
 					return;
 				}
@@ -1155,7 +1184,7 @@ class Maintenance_Controller extends Action_Controller
 		$context['continue_post_data'] = '';
 		$context['continue_get_data'] = '';
 		$context['sub_template'] = 'not_done';
-		$context['start'] = $this->_reqQuery('start', 'intval', 0);
+		$context['start'] = $this->_req->getQuery('start', 'intval', 0);
 
 		// First time we do this?
 		$id_board_from = $this->_req->getPost('id_board_from', 'intval', (int) $this->_req->query->id_board_from);

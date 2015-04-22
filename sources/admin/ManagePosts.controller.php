@@ -258,14 +258,15 @@ class ManagePosts_Controller extends Action_Controller
 			checkSession();
 
 			// If we're changing the message length (and we are using MySQL) let's check the column is big enough.
-			if (isset($_POST['max_messageLength']) && $_POST['max_messageLength'] != $modSettings['max_messageLength'] && DB_TYPE === 'MySQL')
-			if (isset($this->_req->post->max_messageLength) && $this->_req->post->max_messageLength != $modSettings['max_messageLength'] && $db_type == 'mysql')
+			if (isset($this->_req->post->max_messageLength) && $this->_req->post->max_messageLength != $modSettings['max_messageLength'] && DB_TYPE === 'MySQL')
 			{
 				require_once(SUBSDIR . '/Maintenance.subs.php');
 				$colData = getMessageTableColumns();
 				foreach ($colData as $column)
+				{
 					if ($column['name'] == 'body')
 						$body_type = $column['type'];
+				}
 
 				if (isset($body_type) && ($this->_req->post->max_messageLength > 65535 || $this->_req->post->max_messageLength == 0) && $body_type == 'text')
 					Errors::fatal_lang_error('convert_to_mediumtext', false, array($scripturl . '?action=admin;area=maintain;sa=database'));

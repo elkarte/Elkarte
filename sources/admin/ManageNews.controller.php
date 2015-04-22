@@ -41,7 +41,7 @@ class ManageNews_Controller extends Action_Controller
 
 	/**
 	 * Members specifically being excluded from a newsletter
-	 * @var int[]
+	 * @var array
 	 */
 	protected $_exclude_members = array();
 

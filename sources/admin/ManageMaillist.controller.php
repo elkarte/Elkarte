@@ -1527,7 +1527,7 @@ class ManageMaillist_Controller extends Action_Controller
 					updateSettings(array('disallow_sendBody' => ''));
 
 				updateSettings(array('maillist_receiving_address' => serialize($maillist_receiving_address)));
-				Settings_Form::save_db($config_vars, $this->req->post);
+				Settings_Form::save_db($config_vars, $this->_req->post);
 				writeLog();
 				redirectexit('action=admin;area=maillist;sa=emailsettings;saved');
 			}

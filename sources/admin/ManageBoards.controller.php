@@ -29,6 +29,18 @@ if (!defined('ELK'))
 class ManageBoards_Controller extends Action_Controller
 {
 	/**
+	 * Category being worked on
+	 * @var int
+	 */
+	public $cat;
+
+	/**
+	 * Current board id being modified
+	 * @var int
+	 */
+	public $boardid;
+
+	/**
 	 * Boards settings form.
 	 * @var Settings_Form
 	 */

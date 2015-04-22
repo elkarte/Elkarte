@@ -171,7 +171,7 @@ class ManageErrors_Controller extends Action_Controller
 	/**
 	 * Applys the filter to the template
 	 *
-	 * @param mixed[] $filter
+	 * @param array $filter
 	 */
 	private function _applyFilter($filter)
 	{

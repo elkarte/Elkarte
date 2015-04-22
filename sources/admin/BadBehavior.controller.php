@@ -127,7 +127,7 @@ class BadBehavior_Controller extends Action_Controller
 	 */
 	protected function _prepareMembers()
 	{
-		global $context, $txt;
+		global $context, $txt, $scripturl;
 
 		$members = array();
 		foreach ($context['bb_entries'] as $member)
@@ -232,7 +232,7 @@ class BadBehavior_Controller extends Action_Controller
 
 		if ($redirect === 'delete')
 		{
-			$start = $this->getQuery('start', 'intval', 0);
+			$start = $this->_req->getQuery('start', 'intval', 0);
 
 			// Go back to where we were.
 			redirectexit($redirect_path . ';start=' . $start . (!empty($filter) ? $filter['href'] : ''));

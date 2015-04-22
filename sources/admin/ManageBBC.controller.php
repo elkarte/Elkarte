@@ -110,7 +110,7 @@ class ManageBBC_Controller extends Action_Controller
 
 			if (!isset($this->_req->post->disabledBBC_enabledTags))
 				$this->_req->post->disabledBBC_enabledTags = array();
-			elseif (!is_array($this->_req->POST->disabledBBC_enabledTags))
+			elseif (!is_array($this->_req->post->disabledBBC_enabledTags))
 				$this->_req->post->disabledBBC_enabledTags = array($this->_req->post->disabledBBC_enabledTags);
 
 			// Work out what is actually disabled!
