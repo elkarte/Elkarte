@@ -134,8 +134,8 @@ class Maintenance_Controller extends Action_Controller
 		$subAction = $action->initialize($subActions, 'routine');
 
 		// Doing something special, does it exist?
-		if (isset($this->_req->request->activity, $subActions[$subAction]['activities'][$this->_req->request->activity]))
-			$activity = $this->_req->request->activity;
+		if (isset($this->_req->query->activity, $subActions[$subAction]['activities'][$this->_req->query->activity]))
+			$activity = $this->_req->query->activity;
 
 		// Set a few things.
 		$context[$context['admin_menu_name']]['current_subsection'] = $subAction;
@@ -529,7 +529,7 @@ class Maintenance_Controller extends Action_Controller
 		{
 			checkSession();
 
-			if (empty($this->_req->request->start))
+			if (empty($this->_req->query->start))
 				validateToken('admin-maint');
 			else
 				validateToken('admin-convertMsg');
@@ -832,7 +832,7 @@ class Maintenance_Controller extends Action_Controller
 		{
 			while ($this->start < $modSettings['maxMsgID'])
 			{
-				updateMessagesBoardID($this->_req->request->start, $this->increment);
+				updateMessagesBoardID($this->_req->query->start, $this->increment);
 				$this->start += $this->increment;
 
 				if (microtime(true) - $time_start > 3)
@@ -1170,11 +1170,11 @@ class Maintenance_Controller extends Action_Controller
 		require_once(SUBSDIR . '/Topic.subs.php');
 
 		// How many topics are we moving?
-		if (!isset($this->_req->request->totaltopics))
+		if (!isset($this->_req->query->totaltopics))
 			$total_topics = countTopicsFromBoard($id_board_from);
 		else
 		{
-			$total_topics = (int) $this->_req->request->totaltopics;
+			$total_topics = (int) $this->_req->query->totaltopics;
 			validateToken('admin_movetopics');
 		}
 

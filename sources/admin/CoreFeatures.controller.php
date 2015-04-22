@@ -100,7 +100,7 @@ class CoreFeatures_Controller extends Action_Controller
 
 			$this->_save_core_features($core_features);
 
-			if (!isset($this->_req->request->xml))
+			if (!isset($this->_req->query->xml))
 				redirectexit('action=admin;area=corefeatures;' . $context['session_var'] . '=' . $context['session_id']);
 		}
 
@@ -116,7 +116,7 @@ class CoreFeatures_Controller extends Action_Controller
 			updateSettings(array('admin_features' => ''));
 
 		// sub_template is already generic_xml and the token is created somewhere else
-		if (isset($this->_req->request->xml))
+		if (isset($this->_req->query->xml))
 			return;
 
 		$context['sub_template'] = 'core_features';
@@ -376,8 +376,8 @@ class CoreFeatures_Controller extends Action_Controller
 		$context['sub_template'] = 'show_settings';
 
 		// By default do the basic settings.
-		if (isset($this->_req->request->sa, $subActions[$this->_req->request->sa]))
-			$context['sub_action'] = $this->_req->request->sa;
+		if (isset($this->_req->query->sa, $subActions[$this->_req->query->sa]))
+			$context['sub_action'] = $this->_req->query->sa;
 		elseif (!empty($defaultAction))
 			$context['sub_action'] = $defaultAction;
 		else
