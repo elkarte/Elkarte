@@ -13,7 +13,14 @@
  */
 
 /**
+ * Class uesed to interact with super globals, POST, GET, SERVER, COOKEIS, SESSION
  *
+ * - Currenty only a 'getter' of values
+ * - Can be passed DataValidation sanitation values to return sanitized values
+ * - Fetch raw values as $instance->post->keyname
+ *     - $this->-req->post->filename
+ * - Fetch cleaned values with $instance->getPost('keyname', 'sanitation needs', 'default value')
+ *     - $this->-req->getPost('filename', 'trim|strval', '');
  */
 class HttpReq
 {
@@ -28,12 +35,6 @@ class HttpReq
 	 * @var object
 	 */
 	public $query;
-
-	/**
-	 * The returned REQUEST values
-	 * @var object
-	 */
-	public $request;
 
 	/**
 	 * The returned COOKIE values
@@ -59,9 +60,17 @@ class HttpReq
 	 */
 	private static $_req = null;
 
+	/**
+	 * Used to hold processed (sanitised) values
+	 * @var array
+	 */
 	private $_param;
-	private $_dataValidator;
 
+	/**
+	 * holds instance of the validator
+	 * @var Data_Validator
+	 */
+	protected $_dataValidator;
 
 	/**
 	 * Class constructor, sets PHP gobals to class members
@@ -74,15 +83,19 @@ class HttpReq
 		// Make the superglobals available as R/W properties
 		$this->post = new ArrayObject($_POST, ArrayObject::ARRAY_AS_PROPS);
 		$this->query = new ArrayObject($_GET, ArrayObject::ARRAY_AS_PROPS);
-		$this->request = new ArrayObject($_REQUEST, ArrayObject::ARRAY_AS_PROPS);
 		$this->cookie = new ArrayObject($_COOKIE, ArrayObject::ARRAY_AS_PROPS);
 		$this->session = new ArrayObject($_SESSION, ArrayObject::ARRAY_AS_PROPS);
 		$this->server = new ArrayObject($_SERVER, ArrayObject::ARRAY_AS_PROPS);
 	}
 
 	/**
-	 * Generic access values contained in the superglobals
+	 * Generic fetch access for values contained in the superglobals
 	 * - gets in order of param, get and post
+	 *
+	 * - $instance->keyanme will check cleaned params, get then post for values
+	 *     - $_POST['foo'] = 'bar', $_GET['bar'] = 'foo'
+	 *     - $this->req->post->foo is explicit and returns bar
+	 *     - $this->req->foo is loose and will trigger this method, return foo as its a found key in GET
 	 *
 	 * @param string $key
 	 */
@@ -103,15 +116,30 @@ class HttpReq
 	/**
 	 * Alias to __get
 	 *
-	 * @param string $key
+	 * Allows lazy way to find and return a value from get or post key name
+	 *
+	 * @param string $name The key name of the value to return
+	 * @param string|null $sanitize a comma separated list of sanitation rules to apply
+	 * @param mixed|null $default default value to return if key value is not found
 	 */
-	public function get($key)
+	public function get($name, $sanitize = null, $default = null)
 	{
-		return $this->__get($key);
+		// See if it exists in one of the supers
+		$temp = $this->__get($name);
+
+		$this->_param[$name] = $default;
+
+		if (isset($temp))
+		{
+			$this->_param[$name] = $temp;
+			$this->_param[$name] = $this->cleanValue($name, $sanitize);
+		}
+
+		return $this->_param[$name];
 	}
 
 	/**
-	 * Generic check to see if a property is set
+	 * Generic check to see if a property is set in one of the super globals
 	 *
 	 * - checks in order of param, get, post
 	 *
@@ -139,30 +167,6 @@ class HttpReq
 	public function is_set($key)
 	{
 		return $this->__isset($key);
-	}
-
-	/**
-	 * Method to get, clean, sanitize a $_REQUEST value if set
-	 *
-	 * - Uses any sanitize rule(s) that can be passed to the Data_Validator class
-	 * - Returned value will be the sanitized value or null of the key is not in $_REQUEST
-	 * - If you just want a value back access it directly as $req->request->$name
-	 *
-	 * @param string $name The key name of the value to return
-	 * @param string|null $sanitize a comma separated list of sanitation rules to apply
-	 * @param mixed|null $default default value to return if key value is not found
-	 */
-	public function getRequest($name = '', $sanitize = null, $default = null)
-	{
-		$this->_param[$name] = $default;
-
-		if (isset($this->request->$name))
-		{
-			$this->_param[$name] = $this->request->$name;
-			$this->_param[$name] = $this->cleanValue($name, $sanitize);
-		}
-
-		return $this->_param[$name];
 	}
 
 	/**
@@ -216,6 +220,8 @@ class HttpReq
 	/**
 	 * Method to return a $_COOKIE value
 	 *
+	 * - Does not provide sanitation capability
+	 *
 	 * @param string $name the name of the value to return
 	 * @param mixed|null $default default value to return if key value is not found
 	 */
@@ -231,6 +237,8 @@ class HttpReq
 
 	/**
 	 * Method to get a $_SESSION value
+	 *
+	 * - Does not provide sanitation capability
 	 *
 	 * @param string $name the name of the value to return
 	 * @param mixed|null $default default value to return if key value is not found
