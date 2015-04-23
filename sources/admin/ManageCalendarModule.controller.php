@@ -35,6 +35,20 @@ class ManageCalendarModule_Controller extends Action_Controller
 	protected $_calendarSettings;
 
 	/**
+	 * Holds instance of HttpReq object
+	 * @var HttpReq
+	 */
+	protected $_req;
+
+	/**
+	 * Pre Dispatch, called before other methods.  Loads HttpReq
+	 */
+	public function pre_dispatch()
+	{
+		$this->_req = HttpReq::instance();
+	}
+
+	/**
 	 * Used to add the Calendar entry to the Core Features list.
 	 *
 	 * @param mixed[] $core_features The core features array
@@ -154,12 +168,12 @@ class ManageCalendarModule_Controller extends Action_Controller
 		global $scripturl, $txt, $context;
 
 		// Submitting something...
-		if (isset($_REQUEST['delete']) && !empty($_REQUEST['holiday']))
+		if (isset($this->_req->query->delete) && !empty($this->_req->query->holiday))
 		{
 			checkSession();
 			validateToken('admin-mc');
 
-			$to_remove = array_map('intval', array_keys($_REQUEST['holiday']));
+			$to_remove = array_map('intval', array_keys($this->_req->query->holiday));
 
 			// Now the IDs are "safe" do the delete...
 			require_once(SUBSDIR . '/Calendar.subs.php');
@@ -271,32 +285,31 @@ class ManageCalendarModule_Controller extends Action_Controller
 
 		loadTemplate('ManageCalendar');
 
-		$context['is_new'] = !isset($_REQUEST['holiday']);
+		$context['is_new'] = !isset($this->_req->query->holiday);
 		$context['page_title'] = $context['is_new'] ? $txt['holidays_add'] : $txt['holidays_edit'];
 		$context['sub_template'] = 'edit_holiday';
 
 		// Cast this for safety...
-		if (isset($_REQUEST['holiday']))
-			$_REQUEST['holiday'] = (int) $_REQUEST['holiday'];
+		$this->_req->query->holiday = $this->_req->getQuery('holiday', 'intval');
 
 		// Submitting?
-		if (isset($_POST[$context['session_var']]) && (isset($_REQUEST['delete']) || $_REQUEST['title'] != ''))
+		if (isset($_POST[$context['session_var']]) && (isset($this->_req->post->delete) || $this->_req->post->title != ''))
 		{
 			checkSession();
 
 			// Not too long good sir?
-			$_REQUEST['title'] = Util::substr($_REQUEST['title'], 0, 60);
-			$_REQUEST['holiday'] = isset($_REQUEST['holiday']) ? (int) $_REQUEST['holiday'] : 0;
+			$this->_req->post->title = Util::substr($this->_req->post->title, 0, 60);
+			$this->_req->post->holiday = $this->_req->getPost('holiday', 'intval', 0);
 
-			if (isset($_REQUEST['delete']))
-				removeHolidays($_REQUEST['holiday']);
+			if (isset($this->_req->post->delete))
+				removeHolidays($this->_req->post->holiday);
 			else
 			{
-				$date = strftime($_REQUEST['year'] <= 4 ? '0004-%m-%d' : '%Y-%m-%d', mktime(0, 0, 0, $_REQUEST['month'], $_REQUEST['day'], $_REQUEST['year']));
-				if (isset($_REQUEST['edit']))
-					editHoliday($_REQUEST['holiday'], $date, $_REQUEST['title']);
+				$date = strftime($this->_req->post->year <= 4 ? '0004-%m-%d' : '%Y-%m-%d', mktime(0, 0, 0, $this->_req->post->month, $this->_req->post->day, $this->_req->post->year));
+				if (isset($this->_req->post->edit))
+					editHoliday($this->_req->post->holiday, $date, $this->_req->post->title);
 				else
-					insertHoliday($date, $_REQUEST['title']);
+					insertHoliday($date, $this->_req->post->title);
 			}
 
 			redirectexit('action=admin;area=managecalendar;sa=holidays');
@@ -315,7 +328,7 @@ class ManageCalendarModule_Controller extends Action_Controller
 		}
 		// If it's not new load the data.
 		else
-			$context['holiday'] = getHoliday($_REQUEST['holiday']);
+			$context['holiday'] = getHoliday($this->_req->query->holiday);
 
 		// Last day for the drop down?
 		$context['holiday']['last_day'] = (int) strftime('%d', mktime(0, 0, 0, $context['holiday']['month'] == 12 ? 1 : $context['holiday']['month'] + 1, 0, $context['holiday']['month'] == 12 ? $context['holiday']['year'] + 1 : $context['holiday']['year']));
@@ -340,11 +353,11 @@ class ManageCalendarModule_Controller extends Action_Controller
 		$context[$context['admin_menu_name']]['current_subsection'] = 'settings';
 
 		// Saving the settings?
-		if (isset($_GET['save']))
+		if (isset($this->_req->query->save))
 		{
 			checkSession();
 			call_integration_hook('integrate_save_calendar_settings');
-			Settings_Form::save_db($config_vars);
+			Settings_Form::save_db($config_vars, $this->_req->post);
 
 			// Update the stats in case.
 			updateSettings(array(

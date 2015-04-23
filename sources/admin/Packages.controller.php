@@ -30,6 +30,20 @@ if (!defined('ELK'))
 class Packages_Controller extends Action_Controller
 {
 	/**
+	 * Holds instance of HttpReq object
+	 * @var HttpReq
+	 */
+	protected $_req;
+
+	/**
+	 * Pre Dispatch, called before other methods.  Loads HttpReq
+	 */
+	public function pre_dispatch()
+	{
+		$this->_req = HttpReq::instance();
+	}
+
+	/**
 	 * Entry point, the default method of this controller.
 	 *
 	 * @see Action_Controller::action_index()
@@ -121,13 +135,13 @@ class Packages_Controller extends Action_Controller
 		global $txt, $context, $scripturl, $settings;
 
 		// You have to specify a file!!
-		if (!isset($_REQUEST['package']) || trim($_REQUEST['package']) == '')
+		if (!isset($this->_req->query->package) || trim($this->_req->query->package) == '')
 			redirectexit('action=admin;area=packages');
 
-		$context['filename'] = preg_replace('~[\.]+~', '.', $_REQUEST['package']);
+		$context['filename'] = preg_replace('~[\.]+~', '.', $this->_req->query->package);
 
 		// Do we have an existing id, for uninstalls and the like.
-		$context['install_id'] = isset($_REQUEST['pid']) ? (int) $_REQUEST['pid'] : 0;
+		$context['install_id'] = $this->_req->getQuery('pid', 'intval', 0);
 
 		// These will be needed
 		require_once(SUBSDIR . '/Package.subs.php');
@@ -147,7 +161,7 @@ class Packages_Controller extends Action_Controller
 			if (!mktree(BOARDDIR . '/packages/temp', 0777))
 			{
 				deltree(BOARDDIR . '/packages/temp', false);
-				create_chmod_control(array(BOARDDIR . '/packages/temp/delme.tmp'), array('destination_url' => $scripturl . '?action=admin;area=packages;sa=' . $_REQUEST['sa'] . ';package=' . $context['filename'], 'crash_on_error' => true));
+				create_chmod_control(array(BOARDDIR . '/packages/temp/delme.tmp'), array('destination_url' => $scripturl . '?action=admin;area=packages;sa=' . $this->_req->query->sa . ';package=' . $context['filename'], 'crash_on_error' => true));
 
 				deltree(BOARDDIR . '/packages/temp', false);
 				if (!mktree(BOARDDIR . '/packages/temp', 0777))
@@ -156,7 +170,7 @@ class Packages_Controller extends Action_Controller
 		}
 
 		// Change our last link tree item for more information on this Packages area.
-		$context['uninstalling'] = $_REQUEST['sa'] === 'uninstall';
+		$context['uninstalling'] = $this->_req->query->sa === 'uninstall';
 		$context['linktree'][count($context['linktree']) - 1] = array(
 			'url' => $scripturl . '?action=admin;area=packages;sa=browse',
 			'name' => $context['uninstalling'] ? $txt['package_uninstall_actions'] : $txt['install_actions']
@@ -748,18 +762,18 @@ class Packages_Controller extends Action_Controller
 		checkSession();
 
 		// If there's no file, what are we installing?
-		if (!isset($_REQUEST['package']) || $_REQUEST['package'] == '')
+		if (!isset($this->_req->query->package) || $this->_req->query->package == '')
 			redirectexit('action=admin;area=packages');
-		$context['filename'] = $_REQUEST['package'];
+		$context['filename'] = $this->_req->query->package;
 
 		// If this is an uninstall, we'll have an id.
-		$context['install_id'] = isset($_REQUEST['pid']) ? (int) $_REQUEST['pid'] : 0;
+		$context['install_id'] = $this->_req->getQuery('pid', 'intval', 0);
 
 		require_once(SUBSDIR . '/Package.subs.php');
 		require_once(SUBSDIR . '/Themes.subs.php');
 
 		// @todo Perhaps do it in steps, if necessary?
-		$context['uninstalling'] = $_REQUEST['sa'] == 'uninstall2';
+		$context['uninstalling'] = $this->_req->query->sa === 'uninstall2';
 
 		// Set up the linktree for other.
 		$context['linktree'][count($context['linktree']) - 1] = array(
@@ -773,7 +787,7 @@ class Packages_Controller extends Action_Controller
 			Errors::fatal_lang_error('package_no_file', false);
 
 		// Load up the package FTP information?
-		create_chmod_control(array(), array('destination_url' => $scripturl . '?action=admin;area=packages;sa=' . $_REQUEST['sa'] . ';package=' . $_REQUEST['package']));
+		create_chmod_control(array(), array('destination_url' => $scripturl . '?action=admin;area=packages;sa=' . $this->_req->query->sa . ';package=' . $this->_req->query->package));
 
 		// Make sure temp directory exists and is empty!
 		if (file_exists(BOARDDIR . '/packages/temp'))
@@ -813,9 +827,9 @@ class Packages_Controller extends Action_Controller
 		// Are we installing this into any custom themes?
 		$custom_themes = array(1);
 		$known_themes = explode(',', $modSettings['knownThemes']);
-		if (!empty($_POST['custom_theme']))
+		if (!empty($this->_req->post->custom_theme))
 		{
-			foreach ($_POST['custom_theme'] as $tid)
+			foreach ($this->_req->post->custom_theme as $tid)
 				if (in_array($tid, $known_themes))
 					$custom_themes[] = (int) $tid;
 		}
@@ -830,12 +844,13 @@ class Packages_Controller extends Action_Controller
 			'require-dir' => array(),
 		);
 
-		if (!empty($_POST['theme_changes']))
+		if (!empty($this->_req->post->theme_changes))
 		{
-			foreach ($_POST['theme_changes'] as $change)
+			foreach ($this->_req->post->theme_changes as $change)
 			{
 				if (empty($change))
 					continue;
+
 				$theme_data = unserialize(base64_decode($change));
 				if (empty($theme_data['type']))
 					continue;
@@ -978,7 +993,7 @@ class Packages_Controller extends Action_Controller
 						add_integration_function($action['hook'], $action['function'], $action['include_file']);
 				}
 				// Only do the database changes on uninstall if requested.
-				elseif ($action['type'] == 'database' && !empty($action['filename']) && (!$context['uninstalling'] || !empty($_POST['do_db_changes'])))
+				elseif ($action['type'] === 'database' && !empty($action['filename']) && (!$context['uninstalling'] || !empty($this->_req->post->do_db_changes)))
 				{
 					// These can also be there for database changes.
 					global $txt, $modSettings, $context;
@@ -988,7 +1003,7 @@ class Packages_Controller extends Action_Controller
 						require(BOARDDIR . '/packages/temp/' . $context['base_path'] . $action['filename']);
 				}
 				// Handle a redirect...
-				elseif ($action['type'] == 'redirect' && !empty($action['redirect_url']))
+				elseif ($action['type'] === 'redirect' && !empty($action['redirect_url']))
 				{
 					$context['redirect_url'] = $action['redirect_url'];
 					$context['redirect_text'] = !empty($action['filename']) && file_exists(BOARDDIR . '/packages/temp/' . $context['base_path'] . $action['filename']) ? file_get_contents(BOARDDIR . '/packages/temp/' . $context['base_path'] . $action['filename']) : ($context['uninstalling'] ? $txt['package_uninstall_done'] : $txt['package_installed_done']);
@@ -1076,7 +1091,7 @@ class Packages_Controller extends Action_Controller
 		}
 
 		// If there's database changes - and they want them removed - let's do it last!
-		if (!empty($package_installed['db_changes']) && !empty($_POST['do_db_changes']))
+		if (!empty($package_installed['db_changes']) && !empty($this->_req->post->do_db_changes))
 		{
 			foreach ($package_installed['db_changes'] as $change)
 			{
@@ -1127,18 +1142,18 @@ class Packages_Controller extends Action_Controller
 		require_once(SUBSDIR . '/Package.subs.php');
 
 		// No package?  Show him or her the door.
-		if (!isset($_REQUEST['package']) || $_REQUEST['package'] == '')
+		if (!isset($this->_req->query->package) || $this->_req->query->package == '')
 			redirectexit('action=admin;area=packages');
 
 		$context['linktree'][] = array(
-			'url' => $scripturl . '?action=admin;area=packages;sa=list;package=' . $_REQUEST['package'],
+			'url' => $scripturl . '?action=admin;area=packages;sa=list;package=' . $this->_req->query->package,
 			'name' => $txt['list_file']
 		);
 		$context['page_title'] .= ' - ' . $txt['list_file'];
 		$context['sub_template'] = 'list';
 
 		// The filename...
-		$context['filename'] = $_REQUEST['package'];
+		$context['filename'] = $this->_req->query->package;
 
 		// Let the unpacker do the work.
 		if (is_file(BOARDDIR . '/packages/' . $context['filename']))
@@ -1157,48 +1172,48 @@ class Packages_Controller extends Action_Controller
 		require_once(SUBSDIR . '/Package.subs.php');
 
 		// No package?  Show him or her the door.
-		if (!isset($_REQUEST['package']) || $_REQUEST['package'] == '')
+		if (!isset($this->_req->query->package) || $this->_req->query->package == '')
 			redirectexit('action=admin;area=packages');
 
 		// No file?  Show him or her the door.
-		if (!isset($_REQUEST['file']) || $_REQUEST['file'] == '')
+		if (!isset($this->_req->query->file) || $this->_req->query->file == '')
 			redirectexit('action=admin;area=packages');
 
-		$_REQUEST['package'] = preg_replace('~[\.]+~', '.', strtr($_REQUEST['package'], array('/' => '_', '\\' => '_')));
-		$_REQUEST['file'] = preg_replace('~[\.]+~', '.', $_REQUEST['file']);
+		$this->_req->query->package = preg_replace('~[\.]+~', '.', strtr($this->_req->query->package, array('/' => '_', '\\' => '_')));
+		$this->_req->query->file = preg_replace('~[\.]+~', '.', $this->_req->query->file);
 
-		if (isset($_REQUEST['raw']))
+		if (isset($this->_req->query->raw))
 		{
-			if (is_file(BOARDDIR . '/packages/' . $_REQUEST['package']))
-				echo read_tgz_file(BOARDDIR . '/packages/' . $_REQUEST['package'], $_REQUEST['file'], true);
-			elseif (is_dir(BOARDDIR . '/packages/' . $_REQUEST['package']))
-				echo file_get_contents(BOARDDIR . '/packages/' . $_REQUEST['package'] . '/' . $_REQUEST['file']);
+			if (is_file(BOARDDIR . '/packages/' . $this->_req->query->package))
+				echo read_tgz_file(BOARDDIR . '/packages/' . $this->_req->query->package, $this->_req->query->file, true);
+			elseif (is_dir(BOARDDIR . '/packages/' . $this->_req->query->package))
+				echo file_get_contents(BOARDDIR . '/packages/' . $this->_req->query->package . '/' . $this->_req->query->file);
 
 			obExit(false);
 		}
 
 		$context['linktree'][count($context['linktree']) - 1] = array(
-			'url' => $scripturl . '?action=admin;area=packages;sa=list;package=' . $_REQUEST['package'],
+			'url' => $scripturl . '?action=admin;area=packages;sa=list;package=' . $this->_req->query->package,
 			'name' => $txt['package_examine_file']
 		);
 		$context['page_title'] .= ' - ' . $txt['package_examine_file'];
 		$context['sub_template'] = 'examine';
 
 		// The filename...
-		$context['package'] = $_REQUEST['package'];
-		$context['filename'] = $_REQUEST['file'];
+		$context['package'] = $this->_req->query->package;
+		$context['filename'] = $this->_req->query->file;
 
 		// Let the unpacker do the work.... but make sure we handle images properly.
-		if (in_array(strtolower(strrchr($_REQUEST['file'], '.')), array('.bmp', '.gif', '.jpeg', '.jpg', '.png')))
-			$context['filedata'] = '<img src="' . $scripturl . '?action=admin;area=packages;sa=examine;package=' . $_REQUEST['package'] . ';file=' . $_REQUEST['file'] . ';raw" alt="' . $_REQUEST['file'] . '" />';
+		if (in_array(strtolower(strrchr($this->_req->query->file, '.')), array('.bmp', '.gif', '.jpeg', '.jpg', '.png')))
+			$context['filedata'] = '<img src="' . $scripturl . '?action=admin;area=packages;sa=examine;package=' . $this->_req->query->package . ';file=' . $this->_req->query->file . ';raw" alt="' . $this->_req->query->file . '" />';
 		else
 		{
-			if (is_file(BOARDDIR . '/packages/' . $_REQUEST['package']))
-				$context['filedata'] = htmlspecialchars(read_tgz_file(BOARDDIR . '/packages/' . $_REQUEST['package'], $_REQUEST['file'], true));
-			elseif (is_dir(BOARDDIR . '/packages/' . $_REQUEST['package']))
-				$context['filedata'] = htmlspecialchars(file_get_contents(BOARDDIR . '/packages/' . $_REQUEST['package'] . '/' . $_REQUEST['file']));
+			if (is_file(BOARDDIR . '/packages/' . $this->_req->query->package))
+				$context['filedata'] = htmlspecialchars(read_tgz_file(BOARDDIR . '/packages/' . $this->_req->query->package, $this->_req->query->file, true));
+			elseif (is_dir(BOARDDIR . '/packages/' . $this->_req->query->package))
+				$context['filedata'] = htmlspecialchars(file_get_contents(BOARDDIR . '/packages/' . $this->_req->query->package . '/' . $this->_req->query->file));
 
-			if (strtolower(strrchr($_REQUEST['file'], '.')) == '.php')
+			if (strtolower(strrchr($this->_req->query->file, '.')) == '.php')
 				$context['filedata'] = highlight_php_code($context['filedata']);
 		}
 	}
@@ -1233,21 +1248,23 @@ class Packages_Controller extends Action_Controller
 		checkSession('get');
 
 		// Ack, don't allow deletion of arbitrary files here, could become a security hole somehow!
-		if (!isset($_GET['package']) || $_GET['package'] == 'index.php' || $_GET['package'] == 'installed.list' || $_GET['package'] == 'backups')
+		if (!isset($this->_req->query->package) || $this->_req->query->package == 'index.php' || $this->_req->query->package == 'installed.list' || $this->_req->query->package == 'backups')
 			redirectexit('action=admin;area=packages;sa=browse');
-		$_GET['package'] = preg_replace('~[\.]+~', '.', strtr($_GET['package'], array('/' => '_', '\\' => '_')));
+		$this->_req->query->package = preg_replace('~[\.]+~', '.', strtr($this->_req->query->package, array('/' => '_', '\\' => '_')));
 
 		// Can't delete what's not there.
-		if (file_exists(BOARDDIR . '/packages/' . $_GET['package']) && (substr($_GET['package'], -4) == '.zip' || substr($_GET['package'], -4) == '.tgz' || substr($_GET['package'], -7) == '.tar.gz' || is_dir(BOARDDIR . '/packages/' . $_GET['package'])) && $_GET['package'] != 'backups' && substr($_GET['package'], 0, 1) != '.')
+		if (file_exists(BOARDDIR . '/packages/' . $this->_req->query->package)
+			&& (substr($this->_req->query->package, -4) == '.zip' || substr($this->_req->query->package, -4) == '.tgz' || substr($this->_req->query->package, -7) == '.tar.gz' || is_dir(BOARDDIR . '/packages/' . $this->_req->query->package))
+			&& $this->_req->query->package != 'backups' && substr($this->_req->query->package, 0, 1) != '.')
 		{
-			create_chmod_control(array(BOARDDIR . '/packages/' . $_GET['package']), array('destination_url' => $scripturl . '?action=admin;area=packages;sa=remove;package=' . $_GET['package'], 'crash_on_error' => true));
+			create_chmod_control(array(BOARDDIR . '/packages/' . $this->_req->query->package), array('destination_url' => $scripturl . '?action=admin;area=packages;sa=remove;package=' . $this->_req->query->package, 'crash_on_error' => true));
 
-			if (is_dir(BOARDDIR . '/packages/' . $_GET['package']))
-				deltree(BOARDDIR . '/packages/' . $_GET['package']);
+			if (is_dir(BOARDDIR . '/packages/' . $this->_req->query->package))
+				deltree(BOARDDIR . '/packages/' . $this->_req->query->package);
 			else
 			{
-				@chmod(BOARDDIR . '/packages/' . $_GET['package'], 0777);
-				unlink(BOARDDIR . '/packages/' . $_GET['package']);
+				@chmod(BOARDDIR . '/packages/' . $this->_req->query->package, 0777);
+				unlink(BOARDDIR . '/packages/' . $this->_req->query->package);
 			}
 		}
 
@@ -1377,7 +1394,9 @@ class Packages_Controller extends Action_Controller
 					array(
 						'position' => 'bottom_of_list',
 						'class' => 'submitbutton',
-						'value' => ($context['sub_action'] == 'browse' ? '<div class="smalltext">' . $txt['package_installed_key'] . '<img src="' . $settings['images_url'] . '/icons/package_installed.png" alt="" class="centericon" /> ' . $txt['package_installed_current'] . '<img src="' . $settings['images_url'] . '/icons/package_old.png" alt="" class="centericon" /> ' . $txt['package_installed_old'] . '</div>' : '<a class="linkbutton" href="' . $scripturl . '?action=admin;area=packages;sa=flush;' . $context['session_var'] . '=' . $context['session_id'] . '" onclick="return confirm(\'' . $txt['package_delete_list_warning'] . '\');">' . $txt['delete_list'] . '</a>'),
+						'value' => ($context['sub_action'] == 'browse'
+							? '<div class="smalltext">' . $txt['package_installed_key'] . '<img src="' . $settings['images_url'] . '/icons/package_installed.png" alt="" class="centericon" /> ' . $txt['package_installed_current'] . '<img src="' . $settings['images_url'] . '/icons/package_old.png" alt="" class="centericon" /> ' . $txt['package_installed_old'] . '</div>'
+							: '<a class="linkbutton" href="' . $scripturl . '?action=admin;area=packages;sa=flush;' . $context['session_var'] . '=' . $context['session_id'] . '" onclick="return confirm(\'' . $txt['package_delete_list_warning'] . '\');">' . $txt['delete_list'] . '</a>'),
 					),
 				),
 			);
@@ -1431,22 +1450,22 @@ class Packages_Controller extends Action_Controller
 	{
 		global $txt, $context, $modSettings;
 
-		if (isset($_POST['save']))
+		if (isset($this->_req->post->save))
 		{
 			checkSession('post');
 
 			updateSettings(array(
-				'package_server' => trim(Util::htmlspecialchars($_POST['pack_server'])),
-				'package_port' => trim(Util::htmlspecialchars($_POST['pack_port'])),
-				'package_username' => trim(Util::htmlspecialchars($_POST['pack_user'])),
-				'package_make_backups' => !empty($_POST['package_make_backups']),
-				'package_make_full_backups' => !empty($_POST['package_make_full_backups'])
+				'package_server' => $this->_req->getPost('pack_server', 'trim|Util::htmlspecialchars'),
+				'package_port' => $this->_req->getPost('pack_port', 'trim|Util::htmlspecialchars'),
+				'package_username' => $this->_req->getPost('pack_user', 'trim|Util::htmlspecialchars'),
+				'package_make_backups' => !empty($this->_req->post->package_make_backups),
+				'package_make_full_backups' => !empty($this->_req->post->package_make_full_backups)
 			));
 
 			redirectexit('action=admin;area=packages;sa=options');
 		}
 
-		if (preg_match('~^/home\d*/([^/]+?)/public_html~', $_SERVER['DOCUMENT_ROOT'], $match))
+		if (preg_match('~^/home\d*/([^/]+?)/public_html~', $this->_req->server->DOCUMENT_ROOT, $match))
 			$default_username = $match[1];
 		else
 			$default_username = '';
@@ -1471,7 +1490,7 @@ class Packages_Controller extends Action_Controller
 		isAllowedTo('admin_forum');
 
 		// We need to know the operation key for the search and replace, mod file looking at, is it a board mod?
-		if (!isset($_REQUEST['operation_key'], $_REQUEST['filename']) && !is_numeric($_REQUEST['operation_key']))
+		if (!isset($this->_req->query->operation_key, $this->_req->query->filename) && !is_numeric($this->_req->query->operation_key))
 			Errors::fatal_lang_error('operation_invalid', 'general');
 
 		// Load the required file.
@@ -1479,10 +1498,10 @@ class Packages_Controller extends Action_Controller
 		require_once(SUBSDIR . '/Themes.subs.php');
 
 		// Uninstalling the mod?
-		$reverse = isset($_REQUEST['reverse']) ? true : false;
+		$reverse = isset($this->_req->query->reverse) ? true : false;
 
 		// Get the base name.
-		$context['filename'] = preg_replace('~[\.]+~', '.', $_REQUEST['package']);
+		$context['filename'] = preg_replace('~[\.]+~', '.', $this->_req->query->package);
 
 		// We need to extract this again.
 		if (is_file(BOARDDIR . '/packages/' . $context['filename']))
@@ -1512,9 +1531,9 @@ class Packages_Controller extends Action_Controller
 		$theme_paths = getThemesPathbyID();
 
 		// For uninstall operations we only consider the themes in which the package is installed.
-		if (isset($_REQUEST['reverse']) && !empty($_REQUEST['install_id']))
+		if (isset($this->_req->query->reverse) && !empty($this->_req->query->install_id))
 		{
-			$install_id = (int) $_REQUEST['install_id'];
+			$install_id = (int) $this->_req->query->install_id;
 			if ($install_id > 0)
 			{
 				$old_themes = loadThemesAffected($install_id);
@@ -1527,16 +1546,16 @@ class Packages_Controller extends Action_Controller
 		}
 
 		// Boardmod?
-		if (isset($_REQUEST['boardmod']))
-			$mod_actions = parseBoardMod(@file_get_contents(BOARDDIR . '/packages/temp/' . $context['base_path'] . $_REQUEST['filename']), true, $reverse, $theme_paths);
+		if (isset($this->_req->query->boardmod))
+			$mod_actions = parseBoardMod(@file_get_contents(BOARDDIR . '/packages/temp/' . $context['base_path'] . $this->_req->query->filename), true, $reverse, $theme_paths);
 		else
-			$mod_actions = parseModification(@file_get_contents(BOARDDIR . '/packages/temp/' . $context['base_path'] . $_REQUEST['filename']), true, $reverse, $theme_paths);
+			$mod_actions = parseModification(@file_get_contents(BOARDDIR . '/packages/temp/' . $context['base_path'] . $this->_req->query->filename), true, $reverse, $theme_paths);
 
 		// Ok lets get the content of the file.
 		$context['operations'] = array(
-			'search' => strtr(htmlspecialchars($mod_actions[$_REQUEST['operation_key']]['search_original'], ENT_COMPAT, 'UTF-8'), array('[' => '&#91;', ']' => '&#93;')),
-			'replace' => strtr(htmlspecialchars($mod_actions[$_REQUEST['operation_key']]['replace_original'], ENT_COMPAT, 'UTF-8'), array('[' => '&#91;', ']' => '&#93;')),
-			'position' => $mod_actions[$_REQUEST['operation_key']]['position'],
+			'search' => strtr(htmlspecialchars($mod_actions[$this->_req->query->operation_key]['search_original'], ENT_COMPAT, 'UTF-8'), array('[' => '&#91;', ']' => '&#93;')),
+			'replace' => strtr(htmlspecialchars($mod_actions[$this->_req->query->operation_key]['replace_original'], ENT_COMPAT, 'UTF-8'), array('[' => '&#91;', ']' => '&#93;')),
+			'position' => $mod_actions[$this->_req->query->operation_key]['position'],
 		);
 
 		// Let's do some formatting...
@@ -1560,7 +1579,7 @@ class Packages_Controller extends Action_Controller
 		checkSession('get');
 
 		// If we're restoring permissions this is just a pass through really.
-		if (isset($_GET['restore']))
+		if (isset($this->_req->query->restore))
 		{
 			create_chmod_control(array(), array(), true);
 			Errors::fatal_lang_error('no_access', false);
@@ -1573,7 +1592,7 @@ class Packages_Controller extends Action_Controller
 		// Load up some FTP stuff.
 		create_chmod_control();
 
-		if (empty($package_ftp) && !isset($_POST['skip_ftp']))
+		if (empty($package_ftp) && !isset($this->_req->post->skip_ftp))
 		{
 			$ftp = new Ftp_Connection(null);
 			list ($username, $detect_path, $found_path) = $ftp->detect_path(BOARDDIR);
@@ -1780,36 +1799,36 @@ class Packages_Controller extends Action_Controller
 		}
 
 		// If we're submitting then let's move on to another function to keep things cleaner..
-		if (isset($_POST['action_changes']))
+		if (isset($this->_req->post->action_changes))
 			return $this->action_perms_save();
 
 		$context['look_for'] = array();
 
 		// Are we looking for a particular tree - normally an expansion?
-		if (!empty($_REQUEST['find']))
-			$context['look_for'][] = base64_decode($_REQUEST['find']);
+		if (!empty($this->_req->query->find))
+			$context['look_for'][] = base64_decode($this->_req->query->find);
 
 		// Only that tree?
-		$context['only_find'] = isset($_GET['xml']) && !empty($_REQUEST['onlyfind']) ? $_REQUEST['onlyfind'] : '';
+		$context['only_find'] = isset($this->_req->query->xml) && !empty($this->_req->query->onlyfind) ? $this->_req->query->onlyfind : '';
 		if ($context['only_find'])
 			$context['look_for'][] = $context['only_find'];
 
 		// Have we got a load of back-catalogue trees to expand from a submit etc?
-		if (!empty($_GET['back_look']))
+		if (!empty($this->_req->query->back_look))
 		{
-			$potententialTrees = unserialize(base64_decode($_GET['back_look']));
+			$potententialTrees = unserialize(base64_decode($this->_req->query->back_look));
 			foreach ($potententialTrees as $tree)
 				$context['look_for'][] = $tree;
 		}
 
 		// ... maybe posted?
-		if (!empty($_POST['back_look']))
-			$context['only_find'] = array_merge($context['only_find'], $_POST['back_look']);
+		if (!empty($this->_req->post->back_look))
+			$context['only_find'] = array_merge($context['only_find'], $this->_req->post->back_look);
 
 		$context['back_look_data'] = base64_encode(serialize(array_slice($context['look_for'], 0, 15)));
 
 		// Are we finding more files than first thought?
-		$context['file_offset'] = !empty($_REQUEST['fileoffset']) ? (int) $_REQUEST['fileoffset'] : 0;
+		$context['file_offset'] = !empty($this->_req->query->fileoffset) ? (int) $this->_req->query->fileoffset : 0;
 
 		// Don't list more than this many files in a directory.
 		$context['file_limit'] = 150;
@@ -1850,7 +1869,7 @@ class Packages_Controller extends Action_Controller
 		}
 
 		// Is this actually xml?
-		if (isset($_GET['xml']))
+		if (isset($this->_req->query->xml))
 		{
 			loadTemplate('Xml');
 			$context['sub_template'] = 'generic_xml';
@@ -1868,8 +1887,8 @@ class Packages_Controller extends Action_Controller
 		umask(0);
 
 		$timeout_limit = 5;
-		$context['method'] = $_POST['method'] === 'individual' ? 'individual' : 'predefined';
-		$context['back_look_data'] = isset($_POST['back_look']) ? $_POST['back_look'] : array();
+		$context['method'] = $this->_req->post->method === 'individual' ? 'individual' : 'predefined';
+		$context['back_look_data'] = isset($this->_req->post->back_look) ? $this->_req->post->back_look : array();
 
 		// Skipping use of FTP?
 		if (empty($package_ftp))
@@ -1880,17 +1899,17 @@ class Packages_Controller extends Action_Controller
 		{
 			// Only these path roots are legal.
 			$legal_roots = array_keys($context['file_tree']);
-			$context['custom_value'] = (int) $_POST['custom_value'];
+			$context['custom_value'] = (int) $this->_req->post->custom_value;
 
 			// Continuing?
-			if (isset($_POST['toProcess']))
-				$_POST['permStatus'] = unserialize(base64_decode($_POST['toProcess']));
+			if (isset($this->_req->post->toProcess))
+				$this->_req->post->permStatus = unserialize(base64_decode($this->_req->post->toProcess));
 
-			if (isset($_POST['permStatus']))
+			if (isset($this->_req->post->permStatus))
 			{
 				$context['to_process'] = array();
 				$validate_custom = false;
-				foreach ($_POST['permStatus'] as $path => $status)
+				foreach ($this->_req->post->permStatus as $path => $status)
 				{
 					// Nothing to see here?
 					if ($status === 'no_change')
@@ -1914,7 +1933,7 @@ class Packages_Controller extends Action_Controller
 					// Now add it.
 					$context['to_process'][$path] = $status;
 				}
-				$context['total_items'] = isset($_POST['totalItems']) ? (int) $_POST['totalItems'] : count($context['to_process']);
+				$context['total_items'] = isset($this->_req->post->totalItems) ? (int) $this->_req->post->totalItems : count($context['to_process']);
 
 				// Make sure the chmod status is valid?
 				if ($validate_custom)
@@ -1962,10 +1981,10 @@ class Packages_Controller extends Action_Controller
 		// If predefined this is a little different.
 		else
 		{
-			$context['predefined_type'] = isset($_POST['predefined']) ? $_POST['predefined'] : 'restricted';
-			$context['total_items'] = isset($_POST['totalItems']) ? (int) $_POST['totalItems'] : 0;
-			$context['directory_list'] = isset($_POST['dirList']) ? unserialize(base64_decode($_POST['dirList'])) : array();
-			$context['file_offset'] = isset($_POST['fileOffset']) ? (int) $_POST['fileOffset'] : 0;
+			$context['predefined_type'] = $this->_req->getPost('predefined', 'trim|strval', 'restricted');
+			$context['total_items'] = $this->_req->getPost('totalItems', 'intval', 0);
+			$context['directory_list'] = isset($this->_req->post->dirList) ? unserialize(base64_decode($this->_req->post->dirList)) : array();
+			$context['file_offset'] = $this->_req->getPost('fileOffset', 'intval', 0);
 
 			// Haven't counted the items yet?
 			if (empty($context['total_items']))
@@ -1982,7 +2001,7 @@ class Packages_Controller extends Action_Controller
 			}
 
 			// Have we built up our list of special files?
-			if (!isset($_POST['specialFiles']) && $context['predefined_type'] != 'free')
+			if (!isset($this->_req->post->specialFiles) && $context['predefined_type'] != 'free')
 			{
 				$context['special_files'] = array();
 
@@ -1993,7 +2012,7 @@ class Packages_Controller extends Action_Controller
 			elseif ($context['predefined_type'] === 'free')
 				$context['special_files'] = array();
 			else
-				$context['special_files'] = unserialize(base64_decode($_POST['specialFiles']));
+				$context['special_files'] = unserialize(base64_decode($this->_req->post->specialFiles));
 
 			// Now we definitely know where we are, we need to go through again doing the chmod!
 			foreach ($context['directory_list'] as $path => $dummy)
@@ -2122,14 +2141,14 @@ class Packages_Controller extends Action_Controller
 		list ($the_brand, $the_version) = explode(' ', FORUM_VERSION, 2);
 
 		// Here we have a little code to help those who class themselves as something of gods, version emulation ;)
-		if (isset($_GET['version_emulate']) && strtr($_GET['version_emulate'], array($the_brand => '')) == $the_version)
+		if (isset($this->_req->query->version_emulate) && strtr($this->_req->query->version_emulate, array($the_brand => '')) == $the_version)
 			unset($_SESSION['version_emulate']);
-		elseif (isset($_GET['version_emulate']))
+		elseif (isset($this->_req->query->version_emulate))
 		{
-			if (($_GET['version_emulate'] === 0 || $_GET['version_emulate'] === FORUM_VERSION) && isset($_SESSION['version_emulate']))
+			if (($this->_req->query->version_emulate === 0 || $this->_req->query->version_emulate === FORUM_VERSION) && isset($this->_req->session->version_emulate))
 				unset($_SESSION['version_emulate']);
-			elseif ($_GET['version_emulate'] !== 0)
-				$_SESSION['version_emulate'] = strtr($_GET['version_emulate'], array('-' => ' ', '+' => ' ', $the_brand . ' ' => ''));
+			elseif ($this->_req->query->version_emulate !== 0)
+				$_SESSION['version_emulate'] = strtr($this->_req->query->version_emulate, array('-' => ' ', '+' => ' ', $the_brand . ' ' => ''));
 		}
 
 		if (!empty($_SESSION['version_emulate']))
@@ -2368,9 +2387,9 @@ class Packages_Controller extends Action_Controller
 			closedir($dir);
 		}
 
-		if (isset($_GET['type']) && $_GET['type'] == $params)
+		if (isset($this->_req->query->type) && $this->_req->query->type == $params)
 		{
-			if (isset($_GET['desc']))
+			if (isset($this->_req->query->desc))
 				krsort($packages[$params]);
 			else
 				ksort($packages[$params]);
@@ -2394,8 +2413,10 @@ function fetchPerms__recursive($path, &$data, $level)
 
 	$isLikelyPath = false;
 	foreach ($context['look_for'] as $possiblePath)
+	{
 		if (substr($possiblePath, 0, strlen($path)) == $path)
 			$isLikelyPath = true;
+	}
 
 	// Is this where we stop?
 	if (isset($_GET['xml']) && !empty($context['look_for']) && !$isLikelyPath)

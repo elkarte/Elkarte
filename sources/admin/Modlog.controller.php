@@ -28,6 +28,20 @@ if (!defined('ELK'))
 class Modlog_Controller extends Action_Controller
 {
 	/**
+	 * Holds instance of HttpReq object
+	 * @var HttpReq
+	 */
+	protected $_req;
+
+	/**
+	 * Pre Dispatch, called before other methods.  Loads HttpReq
+	 */
+	public function pre_dispatch()
+	{
+		$this->_req = HttpReq::instance();
+	}
+
+	/**
 	 * Default method for this controller.
 	 *
 	 * @see Action_Controller::action_index()
@@ -54,13 +68,14 @@ class Modlog_Controller extends Action_Controller
 		require_once(SUBSDIR . '/Modlog.subs.php');
 
 		// Are we looking at the moderation log or the administration log.
-		$context['log_type'] = isset($_REQUEST['sa']) && $_REQUEST['sa'] == 'adminlog' ? 3 : 1;
+		$context['log_type'] = isset($this->_req->query->sa) && $this->_req->query->sa == 'adminlog' ? 3 : 1;
 
+		// Trying to view the admin log, lets check you can.
 		if ($context['log_type'] == 3)
 			isAllowedTo('admin_forum');
 
 		// These change dependant on whether we are viewing the moderation or admin log.
-		if ($context['log_type'] == 3 || $_REQUEST['action'] == 'admin')
+		if ($context['log_type'] == 3 || $this->_req->query->action == 'admin')
 			$context['url_start'] = '?action=admin;area=logs;sa=' . ($context['log_type'] == 3 ? 'adminlog' : 'modlog') . ';type=' . $context['log_type'];
 		else
 			$context['url_start'] = '?action=moderate;area=modlog;type=' . $context['log_type'];
@@ -78,23 +93,23 @@ class Modlog_Controller extends Action_Controller
 		$context['hoursdisable'] = 24;
 
 		// Handle deletion...
-		if (isset($_POST['removeall']) && $context['can_delete'])
+		if (isset($this->_req->post->removeall) && $context['can_delete'])
 		{
 			checkSession();
 			validateToken('mod-ml');
 			deleteLogAction($context['log_type'], $context['hoursdisable']);
 		}
-		elseif (!empty($_POST['remove']) && isset($_POST['delete']) && $context['can_delete'])
+		elseif (!empty($this->_req->post->remove) && isset($this->_req->post->delete) && $context['can_delete'])
 		{
 			checkSession();
 			validateToken('mod-ml');
-			deleteLogAction($context['log_type'], $context['hoursdisable'], $_POST['delete']);
+			deleteLogAction($context['log_type'], $context['hoursdisable'], $this->_req->post->delete);
 		}
 
 		// If we're coming from a search, get the variables.
-		if (!empty($_REQUEST['params']) && empty($_REQUEST['is_search']))
+		if (!empty($this->_req->post->params) && empty($this->_req->post->is_search))
 		{
-			$search_params = base64_decode(strtr($_REQUEST['params'], array(' ' => '+')));
+			$search_params = base64_decode(strtr($this->_req->post->params, array(' ' => '+')));
 			$search_params = @unserialize($search_params);
 		}
 
@@ -107,15 +122,15 @@ class Modlog_Controller extends Action_Controller
 		);
 
 		// Setup the allowed search
-		$context['order'] = isset($_REQUEST['sort']) && isset($searchTypes[$_REQUEST['sort']]) ? $_REQUEST['sort'] : 'member';
+		$context['order'] = isset($this->_req->query->sort) && isset($searchTypes[$this->_req->query->sort]) ? $this->_req->query->sort : 'member';
 
-		if (!isset($search_params['string']) || (!empty($_REQUEST['search']) && $search_params['string'] != $_REQUEST['search']))
-			$search_params_string = empty($_REQUEST['search']) ? '' : $_REQUEST['search'];
+		if (!isset($search_params['string']) || (!empty($this->_req->post->search) && $search_params['string'] != $this->_req->post->search))
+			$search_params_string = $this->_req->getPost('search', 'trim', '');
 		else
 			$search_params_string = $search_params['string'];
 
-		if (isset($_REQUEST['search_type']) || empty($search_params['type']) || !isset($searchTypes[$search_params['type']]))
-			$search_params_type = isset($_REQUEST['search_type']) && isset($searchTypes[$_REQUEST['search_type']]) ? $_REQUEST['search_type'] : $context['order'];
+		if (isset($this->_req->post->search_type) || empty($search_params['type']) || !isset($searchTypes[$search_params['type']]))
+			$search_params_type = isset($this->_req->post->search_type) && isset($searchTypes[$this->_req->post->search_type]) ? $this->_req->query->search_type : $context['order'];
 		else
 			$search_params_type = $search_params['type'];
 
@@ -159,7 +174,7 @@ class Modlog_Controller extends Action_Controller
 			'width' => '100%',
 			'items_per_page' => $context['displaypage'],
 			'no_items_label' => $txt['modlog_' . ($context['log_type'] == 3 ? 'admin_log_' : '') . 'no_entries_found'],
-			'base_href' => $scripturl . $context['url_start'] . (!empty($context['search_params']) ? ';params=' . $context['search_params'] : ''),
+			'base_href' => $scripturl . $context['url_start'],
 			'default_sort_col' => 'time',
 			'get_items' => array(
 				'function' => array($this, 'getModLogEntries'),

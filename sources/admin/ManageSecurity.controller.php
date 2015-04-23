@@ -54,6 +54,20 @@ class ManageSecurity_Controller extends Action_Controller
 	protected $_spamSettings;
 
 	/**
+	 * Holds instance of HttpReq object
+	 * @var HttpReq
+	 */
+	protected $_req;
+
+	/**
+	 * Pre Dispatch, called before other methods.  Loads HttpReq
+	 */
+	public function pre_dispatch()
+	{
+		$this->_req = HttpReq::instance();
+	}
+
+	/**
 	 * This function passes control through to the relevant security tab.
 	 *
 	 * @see Action_Controller::action_index()
@@ -122,11 +136,11 @@ class ManageSecurity_Controller extends Action_Controller
 		$config_vars = $this->_securitySettings->settings();
 
 		// Saving?
-		if (isset($_GET['save']))
+		if (isset($this->_req->query->save))
 		{
 			checkSession();
 
-			Settings_Form::save_db($config_vars);
+			Settings_Form::save_db($config_vars, $this->_req->post);
 
 			call_integration_hook('integrate_save_general_security_settings');
 
@@ -174,7 +188,7 @@ class ManageSecurity_Controller extends Action_Controller
 			unset($config_vars['moderate']);
 
 		// Saving?
-		if (isset($_GET['save']))
+		if (isset($this->_req->query->save))
 		{
 			checkSession();
 
@@ -183,25 +197,25 @@ class ManageSecurity_Controller extends Action_Controller
 			// Make sure these don't have an effect.
 			if ($modSettings['warning_settings'][0] != 1)
 			{
-				$_POST['warning_watch'] = 0;
-				$_POST['warning_moderate'] = 0;
-				$_POST['warning_mute'] = 0;
+				$this->_req->post->warning_watch = 0;
+				$this->_req->post->warning_moderate = 0;
+				$this->_req->post->warning_mute = 0;
 			}
 			else
 			{
-				$_POST['warning_watch'] = min($_POST['warning_watch'], 100);
-				$_POST['warning_moderate'] = $modSettings['postmod_active'] ? min($_POST['warning_moderate'], 100) : 0;
-				$_POST['warning_mute'] = min($_POST['warning_mute'], 100);
+				$this->_req->post->warning_watch = min($this->_req->post->warning_watch, 100);
+				$this->_req->post->warning_moderate = $modSettings['postmod_active'] ? min($this->_req->post->warning_moderate, 100) : 0;
+				$this->_req->post->warning_mute = min($this->_req->post->warning_mute, 100);
 			}
 
 			// Fix the warning setting array!
-			$_POST['warning_settings'] = '1,' . min(100, (int) $_POST['user_limit']) . ',' . min(100, (int) $_POST['warning_decrement']);
+			$this->_req->post->warning_settings = '1,' . min(100, (int) $this->_req->post->user_limit) . ',' . min(100, (int) $this->_req->post->warning_decrement);
 			$config_vars[] = array('text', 'warning_settings');
 			unset($config_vars['rem1'], $config_vars['rem2']);
 
 			call_integration_hook('integrate_save_moderation_settings');
 
-			Settings_Form::save_db($config_vars);
+			Settings_Form::save_db($config_vars, $this->_req->post);
 			redirectexit('action=admin;area=securitysettings;sa=moderation');
 		}
 
@@ -247,16 +261,16 @@ class ManageSecurity_Controller extends Action_Controller
 		$config_vars = $this->_spamSettings->settings();
 
 		// Saving?
-		if (isset($_GET['save']))
+		if (isset($this->_req->query->save))
 		{
 			checkSession();
 
 			// Fix PM settings.
-			$_POST['pm_spam_settings'] = (int) $_POST['max_pm_recipients'] . ',' . (int) $_POST['pm_posts_verification'] . ',' . (int) $_POST['pm_posts_per_hour'];
+			$this->_req->post->pm_spam_settings = (int) $this->_req->post->max_pm_recipients . ',' . (int) $this->_req->post->pm_posts_verification . ',' . (int) $this->_req->post->pm_posts_per_hour;
 
 			// Guest requiring verification!
-			if (empty($_POST['posts_require_captcha']) && !empty($_POST['guests_require_captcha']))
-				$_POST['posts_require_captcha'] = -1;
+			if (empty($this->_req->post->posts_require_captcha) && !empty($this->_req->post->guests_require_captcha))
+				$this->_req->post->posts_require_captcha = -1;
 
 			unset($config_vars['pm1'], $config_vars['pm2'], $config_vars['pm3'], $config_vars['guest_verify']);
 
@@ -265,7 +279,7 @@ class ManageSecurity_Controller extends Action_Controller
 			call_integration_hook('integrate_save_spam_settings');
 
 			// Now save.
-			Settings_Form::save_db($config_vars);
+			Settings_Form::save_db($config_vars, $this->_req->post);
 			cache_put_data('verificationQuestionIds', null, 300);
 			redirectexit('action=admin;area=securitysettings;sa=spam');
 		}
@@ -341,14 +355,14 @@ class ManageSecurity_Controller extends Action_Controller
 		$config_vars = $this->_bbSettings->settings();
 
 		// Saving?
-		if (isset($_GET['save']))
+		if (isset($this->_req->query->save))
 		{
 			checkSession();
 
 			// Make sure Bad Behavior defaults are set if nothing was specified
-			$_POST['badbehavior_httpbl_threat'] = empty($_POST['badbehavior_httpbl_threat']) ? 25 : $_POST['badbehavior_httpbl_threat'];
-			$_POST['badbehavior_httpbl_maxage'] = empty($_POST['badbehavior_httpbl_maxage']) ? 30 : $_POST['badbehavior_httpbl_maxage'];
-			$_POST['badbehavior_reverse_proxy_header'] = empty($_POST['badbehavior_reverse_proxy_header']) ? 'X-Forwarded-For' : $_POST['badbehavior_reverse_proxy_header'];
+			$this->_req->post->badbehavior_httpbl_threat = empty($this->_req->post->badbehavior_httpbl_threat) ? 25 : $this->_req->post->badbehavior_httpbl_threat;
+			$this->_req->post->badbehavior_httpbl_maxage = empty($this->_req->post->badbehavior_httpbl_maxage) ? 30 : $this->_req->post->badbehavior_httpbl_maxage;
+			$this->_req->post->badbehavior_reverse_proxy_header = empty($this->_req->post->badbehavior_reverse_proxy_header) ? 'X-Forwarded-For' : $this->_req->post->badbehavior_reverse_proxy_header;
 
 			// Build up the whitelist options
 			foreach ($whitelist as $list)
@@ -356,16 +370,17 @@ class ManageSecurity_Controller extends Action_Controller
 				$this_list = array();
 				$this_desc = array();
 
-				if (isset($_POST[$list]))
+				if (isset($this->_req->post->$list))
 				{
 					// Clear blanks from the data field, only grab the comments that don't have blank data value
-					$this_list = array_map('trim', array_filter($_POST[$list]));
-					$this_desc = array_intersect_key($_POST[$list . '_desc'], $this_list);
+					$this_list = array_map('trim', array_filter($this->_req->post->$list));
+					$this_desc = array_intersect_key($this->_req->post->{$list . '_desc'}, $this_list);
 				}
+
 				updateSettings(array($list => serialize($this_list), $list . '_desc' => serialize($this_desc)));
 			}
 
-			Settings_Form::save_db($config_vars);
+			Settings_Form::save_db($config_vars, $this->_req->post);
 			redirectexit('action=admin;area=securitysettings;sa=badbehavior');
 		}
 

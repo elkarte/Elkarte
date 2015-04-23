@@ -29,6 +29,20 @@ class ManageBBC_Controller extends Action_Controller
 	protected $_bbcSettings;
 
 	/**
+	 * Holds instance of HttpReq object
+	 * @var HttpReq
+	 */
+	protected $_req;
+
+	/**
+	 * Pre Dispatch, called before other methods.  Loads HttpReq
+	 */
+	public function pre_dispatch()
+	{
+		$this->_req = HttpReq::instance();
+	}
+
+	/**
 	 * The BBC admin area
 	 *
 	 * What it does:
@@ -85,7 +99,7 @@ class ManageBBC_Controller extends Action_Controller
 		$modSettings['bbc_disabled_disabledBBC'] = empty($modSettings['disabledBBC']) ? array() : explode(',', $modSettings['disabledBBC']);
 
 		// Save page
-		if (isset($_GET['save']))
+		if (isset($this->_req->query->save))
 		{
 			checkSession();
 
@@ -94,19 +108,19 @@ class ManageBBC_Controller extends Action_Controller
 			foreach (parse_bbc(false) as $tag)
 				$bbcTags[] = $tag['tag'];
 
-			if (!isset($_POST['disabledBBC_enabledTags']))
-				$_POST['disabledBBC_enabledTags'] = array();
-			elseif (!is_array($_POST['disabledBBC_enabledTags']))
-				$_POST['disabledBBC_enabledTags'] = array($_POST['disabledBBC_enabledTags']);
+			if (!isset($this->_req->post->disabledBBC_enabledTags))
+				$this->_req->post->disabledBBC_enabledTags = array();
+			elseif (!is_array($this->_req->post->disabledBBC_enabledTags))
+				$this->_req->post->disabledBBC_enabledTags = array($this->_req->post->disabledBBC_enabledTags);
 
 			// Work out what is actually disabled!
-			$_POST['disabledBBC'] = implode(',', array_diff($bbcTags, $_POST['disabledBBC_enabledTags']));
+			$this->_req->post->disabledBBC = implode(',', array_diff($bbcTags, $this->_req->post->disabledBBC_enabledTags));
 
 			// Notify addons and integrations
 			call_integration_hook('integrate_save_bbc_settings', array($bbcTags));
 
 			// Save the result
-			Settings_Form::save_db($config_vars);
+			Settings_Form::save_db($config_vars, $this->_req->post);
 
 			// And we're out of here!
 			redirectexit('action=admin;area=postsettings;sa=bbc');

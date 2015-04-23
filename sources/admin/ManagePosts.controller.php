@@ -34,6 +34,20 @@ class ManagePosts_Controller extends Action_Controller
 	protected $_postSettings;
 
 	/**
+	 * Holds instance of HttpReq object
+	 * @var HttpReq
+	 */
+	protected $_req;
+
+	/**
+	 * Pre Dispatch, called before other methods.  Loads HttpReq
+	 */
+	public function pre_dispatch()
+	{
+		$this->_req = HttpReq::instance();
+	}
+
+	/**
 	 * The main entrance point for the 'Posts and topics' screen.
 	 *
 	 * What it does:
@@ -113,7 +127,7 @@ class ManagePosts_Controller extends Action_Controller
 	{
 		global $txt, $modSettings, $context;
 
-		if (!empty($_POST['save_censor']))
+		if (!empty($this->_req->post->save_censor))
 		{
 			// Make sure censoring is something they can do.
 			checkSession();
@@ -123,30 +137,30 @@ class ManagePosts_Controller extends Action_Controller
 			$censored_proper = array();
 
 			// Rip it apart, then split it into two arrays.
-			if (isset($_POST['censortext']))
+			if (isset($this->_req->post->censortext))
 			{
-				$_POST['censortext'] = explode("\n", strtr($_POST['censortext'], array("\r" => '')));
+				$this->_req->post->censortext = explode("\n", strtr($this->_req->post->censortext, array("\r" => '')));
 
-				foreach ($_POST['censortext'] as $c)
+				foreach ($this->_req->post->censortext as $c)
 					list ($censored_vulgar[], $censored_proper[]) = array_pad(explode('=', trim($c)), 2, '');
 			}
-			elseif (isset($_POST['censor_vulgar'], $_POST['censor_proper']))
+			elseif (isset($this->_req->post->censor_vulgar, $this->_req->post->censor_proper))
 			{
-				if (is_array($_POST['censor_vulgar']))
+				if (is_array($this->_req->post->censor_vulgar))
 				{
-					foreach ($_POST['censor_vulgar'] as $i => $value)
+					foreach ($this->_req->post->censor_vulgar as $i => $value)
 					{
 						if (trim(strtr($value, '*', ' ')) == '')
-							unset($_POST['censor_vulgar'][$i], $_POST['censor_proper'][$i]);
+							unset($this->_req->post->censor_vulgar[$i], $this->_req->POST->censor_proper[$i]);
 					}
 
-					$censored_vulgar = $_POST['censor_vulgar'];
-					$censored_proper = $_POST['censor_proper'];
+					$censored_vulgar = $this->_req->post->censor_vulgar;
+					$censored_proper = $this->_req->post->censor_proper;
 				}
 				else
 				{
-					$censored_vulgar = explode("\n", strtr($_POST['censor_vulgar'], array("\r" => '')));
-					$censored_proper = explode("\n", strtr($_POST['censor_proper'], array("\r" => '')));
+					$censored_vulgar = explode("\n", strtr($this->_req->post->censor_vulgar, array("\r" => '')));
+					$censored_proper = explode("\n", strtr($this->_req->post->censor_proper, array("\r" => '')));
 				}
 			}
 
@@ -154,8 +168,8 @@ class ManagePosts_Controller extends Action_Controller
 			$updates = array(
 				'censor_vulgar' => implode("\n", $censored_vulgar),
 				'censor_proper' => implode("\n", $censored_proper),
-				'censorWholeWord' => empty($_POST['censorWholeWord']) ? '0' : '1',
-				'censorIgnoreCase' => empty($_POST['censorIgnoreCase']) ? '0' : '1',
+				'censorWholeWord' => empty($this->_req->post->censorWholeWord) ? '0' : '1',
+				'censorIgnoreCase' => empty($this->_req->post->censorIgnoreCase) ? '0' : '1',
 			);
 
 			call_integration_hook('integrate_save_censors', array(&$updates));
@@ -164,10 +178,10 @@ class ManagePosts_Controller extends Action_Controller
 		}
 
 		// Testing a word to see how it will be censored?
-		if (isset($_POST['censortest']))
+		if (isset($this->_req->post->censortest))
 		{
 			require_once(SUBSDIR . '/Post.subs.php');
-			$censorText = htmlspecialchars($_POST['censortest'], ENT_QUOTES, 'UTF-8');
+			$censorText = htmlspecialchars($this->_req->post->censortest, ENT_QUOTES, 'UTF-8');
 			preparsecode($censorText);
 			$pre_censor = $censorText;
 			$context['censor_test'] = strtr(censorText($censorText), array('"' => '&quot;'));
@@ -194,7 +208,7 @@ class ManagePosts_Controller extends Action_Controller
 		createToken('admin-censor');
 
 		// Using ajax?
-		if (isset($_REQUEST['xml'], $_POST['censortest']))
+		if (isset($this->_req->query->xml, $this->_req->post->censortest))
 		{
 			// Clear the templates
 			$template_layers = Template_Layers::getInstance();
@@ -239,31 +253,33 @@ class ManagePosts_Controller extends Action_Controller
 		$context['sub_template'] = 'show_settings';
 
 		// Are we saving them - are we??
-		if (isset($_GET['save']))
+		if (isset($this->_req->query->save))
 		{
 			checkSession();
 
 			// If we're changing the message length (and we are using MySQL) let's check the column is big enough.
-			if (isset($_POST['max_messageLength']) && $_POST['max_messageLength'] != $modSettings['max_messageLength'] && DB_TYPE === 'MySQL')
+			if (isset($this->_req->post->max_messageLength) && $this->_req->post->max_messageLength != $modSettings['max_messageLength'] && DB_TYPE === 'MySQL')
 			{
 				require_once(SUBSDIR . '/Maintenance.subs.php');
 				$colData = getMessageTableColumns();
 				foreach ($colData as $column)
+				{
 					if ($column['name'] == 'body')
 						$body_type = $column['type'];
+				}
 
-				if (isset($body_type) && ($_POST['max_messageLength'] > 65535 || $_POST['max_messageLength'] == 0) && $body_type == 'text')
+				if (isset($body_type) && ($this->_req->post->max_messageLength > 65535 || $this->_req->post->max_messageLength == 0) && $body_type == 'text')
 					Errors::fatal_lang_error('convert_to_mediumtext', false, array($scripturl . '?action=admin;area=maintain;sa=database'));
 
 			}
 
 			// If we're changing the post preview length let's check its valid
-			if (!empty($_POST['preview_characters']))
-				$_POST['preview_characters'] = (int) min(max(0, $_POST['preview_characters']), 512);
+			if (!empty($this->_req->post->preview_characters))
+				$this->_req->post->preview_characters = (int) min(max(0, $this->_req->post->preview_characters), 512);
 
 			call_integration_hook('integrate_save_post_settings');
 
-			Settings_Form::save_db($config_vars);
+			Settings_Form::save_db($config_vars, $this->_req->post);
 			redirectexit('action=admin;area=postsettings;sa=posts');
 		}
 

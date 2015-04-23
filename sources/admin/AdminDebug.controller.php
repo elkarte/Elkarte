@@ -26,6 +26,20 @@ if (!defined('ELK'))
 class AdminDebug_Controller extends Action_Controller
 {
 	/**
+	 * Holds instance of HttpReq object
+	 * @var HttpReq
+	 */
+	private $_req;
+
+	/**
+	 * Pre Dispatch, called before other methods.  Loads HttpReq instance.
+	 */
+	public function pre_dispatch()
+	{
+		$this->_req = HttpReq::instance();
+	}
+
+	/**
 	 * Main dispatcher.
 	 *
 	 * @see Action_Controller::action_index()
@@ -50,25 +64,28 @@ class AdminDebug_Controller extends Action_Controller
 		global $context, $db_show_debug;
 
 		// We should have debug mode enabled, as well as something to display!
-		if ($db_show_debug !== true || !isset($_SESSION['debug']))
+		if ($db_show_debug !== true || !isset($this->_req->session->debug))
 			Errors::fatal_lang_error('no_access', false);
 
 		// Don't allow except for administrators.
 		isAllowedTo('admin_forum');
 
 		$debug = Debug::get();
+
 		// If we're just hiding/showing, do it now.
-		if (isset($_REQUEST['sa']) && $_REQUEST['sa'] == 'hide')
+		if (isset($this->_req->query->sa) && $this->_req->query->sa === 'hide')
 		{
 			$debug->toggleViewQueries();
 
-			if (strpos($_SESSION['old_url'], 'action=viewquery') !== false)
+			if (strpos($this->_req->session->old_url, 'action=viewquery') !== false)
 				redirectexit();
 			else
-				redirectexit($_SESSION['old_url']);
+				redirectexit($this->_req->session->old_url);
 		}
 
-		$query_id = isset($_REQUEST['qq']) ? (int) $_REQUEST['qq'] - 1 : -1;
+		// Looking at a specific query?
+		$query_id = $this->_req->getQuery('qq', 'intval');
+		$query_id = $query_id === null ? -1 : $query_id - 1;
 
 		// Just to stay on the safe side, better remove any layer and add back only html
 		$layers = Template_Layers::getInstance();

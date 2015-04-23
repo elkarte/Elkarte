@@ -28,6 +28,20 @@ class ManageDraftsModule_Controller extends Action_Controller
 	protected $_draftSettings;
 
 	/**
+	 * Holds instance of HttpReq object
+	 * @var HttpReq
+	 */
+	protected $_req;
+
+	/**
+	 * Pre Dispatch, called before other methods.  Loads HttpReq
+	 */
+	public function pre_dispatch()
+	{
+		$this->_req = HttpReq::instance();
+	}
+
+	/**
 	 * Used to add the Drafts entry to the Core Features list.
 	 *
 	 * @param mixed[] $core_features The core features array
@@ -158,7 +172,7 @@ class ManageDraftsModule_Controller extends Action_Controller
 		validateToken('admin-maint');
 
 		require_once(SUBSDIR . '/Drafts.subs.php');
-		$drafts = getOldDrafts((int) $_POST['draftdays']);
+		$drafts = getOldDrafts((int) $this->_req->post->draftdays);
 
 		// If we have old drafts, remove them
 		if (count($drafts) > 0)
@@ -226,16 +240,16 @@ class ManageDraftsModule_Controller extends Action_Controller
 		);
 
 		// Saving them ?
-		if (isset($_GET['save']))
+		if (isset($this->_req->query->save))
 		{
 			checkSession();
 
 			call_integration_hook('integrate_save_drafts_settings');
 
 			// Protect them from themselves.
-			$_POST['drafts_autosave_frequency'] = $_POST['drafts_autosave_frequency'] < 30 ? 30 : $_POST['drafts_autosave_frequency'];
+			$this->_req->post->drafts_autosave_frequency = $this->_req->post->drafts_autosave_frequency < 30 ? 30 : $this->_req->post->drafts_autosave_frequency;
 
-			Settings_Form::save_db($config_vars);
+			Settings_Form::save_db($config_vars, $this->_req->post);
 			redirectexit('action=admin;area=managedrafts');
 		}
 

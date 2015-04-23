@@ -32,6 +32,20 @@ class AdminLog_Controller extends Action_Controller
 	protected $_pruningSettings;
 
 	/**
+	 * Holds instance of HttpReq object
+	 * @var HttpReq
+	 */
+	private $_req;
+
+	/**
+	 * Pre Dispatch, called before other methods.  Loads HttpReq
+	 */
+	public function pre_dispatch()
+	{
+		$this->_req = HttpReq::instance();
+	}
+
+	/**
 	 * This method decides which log to load.
 	 * Accessed by ?action=admin;area=logs
 	 */
@@ -105,11 +119,10 @@ class AdminLog_Controller extends Action_Controller
 
 		// Give integration a way to add items
 		call_integration_hook('integrate_manage_logs', array(&$log_functions));
-
-		$sub_action = isset($_REQUEST['sa']) && isset($log_functions[$_REQUEST['sa']]) && empty($log_functions[$_REQUEST['sa']]['disabled']) ? $_REQUEST['sa'] : 'errorlog';
+		$sub_action = isset($this->_req->query->sa, $log_functions[$this->_req->query->sa]) && empty($log_functions[$this->_req->query->sa]['disabled']) ? $this->_req->query->sa : 'errorlog';
 
 		// If it's not got a sa set it must have come here for first time, pretend error log should be reversed.
-		if (!isset($_REQUEST['sa']))
+		if (!isset($this->_req->query->sa))
 			$_REQUEST['desc'] = true;
 
 		// figure out what to call
@@ -163,7 +176,7 @@ class AdminLog_Controller extends Action_Controller
 		call_integration_hook('integrate_prune_settings');
 
 		// Saving?
-		if (isset($_GET['save']))
+		if (isset($this->_req->query->save))
 		{
 			checkSession();
 
@@ -171,7 +184,7 @@ class AdminLog_Controller extends Action_Controller
 				array('text', 'pruningOptions')
 			);
 
-			if (!empty($_POST['pruningOptions']))
+			if (!empty($this->_req->post->pruningOptions))
 			{
 				$vals = array();
 				foreach ($config_vars as $index => $dummy)
@@ -179,7 +192,7 @@ class AdminLog_Controller extends Action_Controller
 					if (!is_array($dummy) || $index == 'pruningOptions')
 						continue;
 
-					$vals[] = empty($_POST[$dummy[1]]) || $_POST[$dummy[1]] < 0 ? 0 : (int) $_POST[$dummy[1]];
+					$vals[] = empty($this->_req->post->$dummy[1]) || $this->_req->post->$dummy[1] < 0 ? 0 : $this->_req->getPost($dummy[1], 'intval');
 				}
 				$_POST['pruningOptions'] = implode(',', $vals);
 			}

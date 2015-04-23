@@ -515,9 +515,13 @@ class Settings_Form
 	 *
 	 * @param mixed[] $config_vars
 	 */
-	public static function save_db(&$config_vars)
+	public static function save_db(&$config_vars, $post_object = null)
 	{
 		static $known_rules = null;
+
+		// Just look away if you have a weak stomach
+		if ($post_object !== null && is_object($post_object))
+			$_POST = array_replace($_POST, (array) $post_object);
 
 		if ($known_rules === null)
 			$known_rules = array(
