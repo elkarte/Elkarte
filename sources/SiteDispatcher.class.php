@@ -218,7 +218,7 @@ class Site_Dispatcher
 			if (file_exists($path . '/' . ucfirst($_GET['action']) . '.controller.php'))
 			{
 				$this->_controller_name = ucfirst($_GET['action']) . '_Controller';
-				if (isset($_GET['sa']) && preg_match('~^\w+$~', $_GET['sa']))
+				if (isset($_GET['sa']) && preg_match('~^\w+$~', $_GET['sa']) && !isset($_GET['area']))
 					$this->_function_name = 'action_' . $_GET['sa'];
 				else
 					$this->_function_name = 'action_index';
