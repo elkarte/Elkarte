@@ -239,6 +239,7 @@ class Xml_Controller extends Action_Controller
 				// The field ids arrive in 1-n view order ...
 				foreach ($_POST['list_custom_profile_fields'] as $id)
 				{
+					$id = (int) $id;
 					$replace .= '
 						WHEN id_field = ' . $id . ' THEN ' . $view_order++;
 				}
@@ -648,7 +649,7 @@ class Xml_Controller extends Action_Controller
 				// The field ids arrive in 1-n view order ...
 				foreach ($_POST['list_sort_email_fp'] as $id)
 				{
-					$filters[] = $id;
+					$filters[] = (int) $id;
 					$replace .= '
 						WHEN id_filter = ' . $id . ' THEN ' . $filter_order++;
 				}
