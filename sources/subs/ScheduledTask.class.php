@@ -888,8 +888,8 @@ class Scheduled_Task
 		{
 			// We need to do some shuffling to make this work properly.
 			loadLanguage('EmailTemplates', $lang);
-			$txt['emails']['happy_birthday']['subject'] = $txtBirthdayEmails[$greeting . '_subject'];
-			$txt['emails']['happy_birthday']['body'] = $txtBirthdayEmails[$greeting . '_body'];
+			$txt['happy_birthday_subject'] = $txtBirthdayEmails[$greeting . '_subject'];
+			$txt['happy_birthday_body'] = $txtBirthdayEmails[$greeting . '_body'];
 
 			foreach ($recps as $recp)
 			{
@@ -910,7 +910,8 @@ class Scheduled_Task
 		}
 
 		// Flush the mail queue, just in case.
-		AddMailQueue(true);
+		if (!empty($modSettings['mail_queue']))
+			AddMailQueue(true);
 
 		return true;
 	}
