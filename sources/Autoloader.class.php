@@ -293,6 +293,8 @@ class Elk_Autoloader
 			// Some_Cache => SomeCache.class.php
 			case 'Integrate':
 				$this->_file_name = SUBSDIR . '/' . $this->_givenname . '.integrate.php';
+				if (!stream_resolve_include_path($this->_file_name))
+					$this->_file_name = '';
 				break;
 			// Some_Display => Subscriptions-Some.class.php
 			case 'Display':
