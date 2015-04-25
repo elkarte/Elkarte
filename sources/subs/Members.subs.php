@@ -1628,7 +1628,7 @@ function maxMemberID()
  */
 function getBasicMemberData($member_ids, $options = array())
 {
-	global $txt;
+	global $txt, $language;
 
 	$db = database();
 
@@ -1674,6 +1674,9 @@ function getBasicMemberData($member_ids, $options = array())
 	);
 	while ($row = $db->fetch_assoc($request))
 	{
+		if (empty($row['lngfile']))
+			$row['lngfile'] = $language;
+
 		if (!empty($single))
 			$members = $row;
 		else
