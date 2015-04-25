@@ -13,7 +13,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:		BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0.2
+ * @version 1.0.4
  *
  *
  */
@@ -211,7 +211,7 @@ class News_Controller extends Action_Controller
 				cache_put_data('xmlfeed-' . $xml_format . ':' . ($user_info['is_guest'] ? '' : $user_info['id'] . '-') . $cachekey, $xml, 240);
 		}
 
-		$feed_title = htmlspecialchars(strip_tags($context['forum_name']), ENT_COMPAT, 'UTF-8') . (isset($feed_title) ? $feed_title : '');
+		$feed_title = encode_special(strip_tags(un_htmlspecialchars($context['forum_name']) . (isset($feed_title) ? $feed_title : '')));
 
 		// This is an xml file....
 		@ob_end_clean();
@@ -241,7 +241,7 @@ class News_Controller extends Action_Controller
 		<channel>
 			<title>', $feed_title, '</title>
 			<link>', $scripturl, '</link>
-			<description><![CDATA[', strip_tags($txt['xml_rss_desc']), ']]></description>
+			<description><![CDATA[', un_htmlspecialchars(strip_tags($txt['xml_rss_desc'])), ']]></description>
 			<generator>ElkArte</generator>
 			<ttl>30</ttl>
 			<image>
@@ -437,8 +437,8 @@ class News_Controller extends Action_Controller
 				$data[] = array(
 					'title' => cdata_parse($row['subject']),
 					'link' => $scripturl . '?topic=' . $row['id_topic'] . '.0',
-					'description' => cdata_parse($row['body']),
-					'author' => in_array(showEmailAddress(!empty($row['hide_email']), $row['id_member']), array('yes', 'yes_permission_override')) ? $row['poster_email'] . ' (' . $row['poster_name'] . ')' : $row['poster_name'],
+					'description' => cdata_parse(strtr(un_htmlspecialchars($row['body']), '&', '&#x26;')),
+					'author' => in_array(showEmailAddress(!empty($row['hide_email']), $row['id_member']), array('yes', 'yes_permission_override')) ? $row['poster_email'] . ' (' . un_htmlspecialchars($row['poster_name']) . ')' : '<![CDATA[none@noreply.net (' . un_htmlspecialchars($row['poster_name']) . ')]]>',
 					'comments' => $scripturl . '?action=post;topic=' . $row['id_topic'] . '.0',
 					'category' => '<![CDATA[' . $row['bname'] . ']]>',
 					'pubDate' => gmdate('D, d M Y H:i:s \G\M\T', $row['poster_time']),
@@ -447,7 +447,10 @@ class News_Controller extends Action_Controller
 
 				// Add the poster name on if we are rss2
 				if ($xml_format == 'rss2')
+				{
 					$data[count($data) - 1]['dc:creator'] = $row['poster_name'];
+					unset($data[count($data) - 1]['author']);
+				}
 			}
 			// RDF Format anyone
 			elseif ($xml_format == 'rdf')
@@ -538,8 +541,8 @@ class News_Controller extends Action_Controller
 				$data[] = array(
 					'title' => $row['subject'],
 					'link' => $scripturl . '?topic=' . $row['id_topic'] . '.msg' . $row['id_msg'] . '#msg' . $row['id_msg'],
-					'description' => cdata_parse($row['body']),
-					'author' => in_array(showEmailAddress(!empty($row['hide_email']), $row['id_member']), array('yes', 'yes_permission_override')) ? $row['poster_email'] : $row['poster_name'],
+					'description' => cdata_parse(strtr(un_htmlspecialchars($row['body']), '&', '&#x26;')),
+					'author' => in_array(showEmailAddress(!empty($row['hide_email']), $row['id_member']), array('yes', 'yes_permission_override')) ? $row['poster_email'] . ' (' . un_htmlspecialchars($row['poster_name']) . ')' : '<![CDATA[none@noreply.net (' . un_htmlspecialchars($row['poster_name']) . ')]]>',
 					'category' => cdata_parse($row['bname']),
 					'comments' => $scripturl . '?action=post;topic=' . $row['id_topic'] . '.0',
 					'pubDate' => gmdate('D, d M Y H:i:s \G\M\T', $row['poster_time']),
@@ -548,7 +551,10 @@ class News_Controller extends Action_Controller
 
 				// Add the poster name on if we are rss2
 				if ($xml_format == 'rss2')
+				{
 					$data[count($data) - 1]['dc:creator'] = $row['poster_name'];
+					unset($data[count($data) - 1]['author']);
+				}
 			}
 			elseif ($xml_format == 'rdf')
 			{
@@ -771,6 +777,17 @@ function fix_possible_url_callback($matches)
 	global $scripturl;
 
 	return $scripturl . '/' . strtr($matches[1], '&;=', '//,') . '.html' . (isset($matches[2]) ? $matches[2] : '');
+}
+
+/**
+ * For highest feed compatibility, some special characters should be provided 
+ * as character entities and not html entities 
+ *
+ * @param string $data
+ */
+function encode_special($data)
+{
+	return strtr($data, array('>' => '&#x3E;', '&' => '&#x26;', '<' => '&#x3C;'));
 }
 
 /**
