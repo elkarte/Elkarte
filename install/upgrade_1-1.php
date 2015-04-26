@@ -245,4 +245,48 @@ class UpgradeInstructions_upgrade_1_1
 			)
 		);
 	}
+
+	public function introducing_notifications_title()
+	{
+		return 'Introducing notifications...';
+	}
+
+	public function introducing_notifications()
+	{
+		return array(
+			array(
+				'debug_title' => 'Adding new tables...',
+				'function' => function($db, $db_table)
+				{
+					$db_table->db_create_table('{db_prefix}pending_notifications',
+						array(
+							array('name' => 'notification_type', 'type' => 'varchar', 'size' => 10),
+							array('name' => 'id_member',         'type' => 'mediumint', 'size' => 8, 'unsigned' => true, 'default' => 0),
+							array('name' => 'log_time',          'type' => 'int', 'size' => 10, 'default' => 0),
+							array('name' => 'frequency',         'type' => 'varchar', 'size' => 1, 'default' => ''),
+							array('name' => 'snippet',           'type' => 'text'),
+						),
+						array(
+							array('name' => 'types_member', 'columns' => array('notification_type', 'id_member'), 'type' => 'unique'),
+						),
+						array(),
+						'ignore'
+					);
+
+					$db_table->db_create_table('{db_prefix}notifications_pref',
+						array(
+							array('name' => 'id_member',          'type' => 'mediumint', 'size' => 8, 'unsigned' => true, 'default' => 0),
+							array('name' => 'notification_level', 'type' => 'tinyint', 'size' => 1, 'default' => 1),
+							array('name' => 'mention_type',       'type' => 'varchar', 'size' => 12, 'default' => ''),
+						),
+						array(
+							array('name' => 'mention_member', 'columns' => array('id_member', 'mention_type'), 'type' => 'unique'),
+						),
+						array(),
+						'ignore'
+					);
+				}
+			)
+		);
+	}
 }

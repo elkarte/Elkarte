@@ -141,7 +141,7 @@ class Notifications extends AbstractModel
 				'notification_type' => 'string-10',
 				'id_member' => 'int',
 				'log_time' => 'int',
-				'frequency ' => 'string-1',
+				'frequency' => 'string-1',
 				'snippet ' => 'string',
 			),
 			$insert_array,

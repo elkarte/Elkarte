@@ -1805,6 +1805,22 @@ class InstallInstructions_install_1_1
 		);
 	}
 
+	public function table_notifications_pref()
+	{
+		return $db_table->db_create_table('{db_prefix}notifications_pref',
+			array(
+				array('name' => 'id_member',          'type' => 'mediumint', 'size' => 8, 'unsigned' => true, 'default' => 0),
+				array('name' => 'notification_level', 'type' => 'tinyint', 'size' => 1, 'default' => 1),
+				array('name' => 'mention_type',       'type' => 'varchar', 'size' => 12, 'default' => ''),
+			),
+			array(
+				array('name' => 'mention_member', 'columns' => array('id_member', 'mention_type'), 'type' => 'unique'),
+			),
+			array(),
+			'ignore'
+		);
+	}
+
 	public function table_openid_assoc()
 	{
 		return $this->table->db_create_table('{db_prefix}openid_assoc',
@@ -1850,6 +1866,24 @@ class InstallInstructions_install_1_1
 				array('ElkArte Third-party Add-ons Site', 'https://github.com/elkarte/addons/tree/master/packages'),
 			),
 			array('id_server')
+		);
+	}
+
+	public function table_pending_notifications()
+	{
+		return $this->table->db_create_table('{db_prefix}pending_notifications',
+			array(
+				array('name' => 'notification_type', 'type' => 'varchar', 'size' => 10),
+				array('name' => 'id_member',         'type' => 'mediumint', 'size' => 8, 'unsigned' => true, 'default' => 0),
+				array('name' => 'log_time',          'type' => 'int', 'size' => 10, 'default' => 0),
+				array('name' => 'frequency',         'type' => 'varchar', 'size' => 1, 'default' => ''),
+				array('name' => 'snippet',           'type' => 'text'),
+			),
+			array(
+				array('name' => 'types_member', 'columns' => array('notification_type', 'id_member'), 'type' => 'unique'),
+			),
+			array(),
+			'ignore'
 		);
 	}
 
