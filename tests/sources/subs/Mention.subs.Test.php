@@ -27,6 +27,9 @@ class TestMentions extends PHPUnit_Framework_TestCase
 		$user_info = array(
 			'id' => 1,
 			'ip' => '127.0.0.1',
+			'is_admin' => true,
+			'is_guest' => false,
+			'username' => 'testing',
 		);
 
 		// Lets start by ensuring a topic exists by creating one
