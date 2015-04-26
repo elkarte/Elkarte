@@ -109,7 +109,7 @@ class Mentionmem_Mention extends Mention_BoardAccess_Abstract
 		if (!empty($this->_actually_mentioned))
 		{
 			$notifier = Notifications::getInstance();
-			$notifier->add(new Notifications_Task(
+			$notifier->add(new \Notifications_Task(
 				'mentionmem',
 				$msgOptions['id'],
 				$posterOptions['id'],
@@ -135,7 +135,7 @@ class Mentionmem_Mention extends Mention_BoardAccess_Abstract
 				break;
 			case 'notification':
 			default:
-				return $this->_getNotificationStrings('', array('subject' => $this->_type, 'body' => $this->_type), $this->_task);
+				return $this->_getNotificationStrings('', array('subject' => $this->_type, 'body' => $this->_type), $members, $this->_task);
 		}
 
 		$replacements = array(

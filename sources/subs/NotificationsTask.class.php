@@ -55,7 +55,7 @@ class Notifications_Task extends \ElkArte\ValuesContainer
 		if ($this->_members_data === null)
 		{
 			require_once(SUBSDIR . '/Members.subs.php');
-			$this->_members_data = getBasicMemberData($users, array('preferences' => true));
+			$this->_members_data = getBasicMemberData($this->getMembers(), array('preferences' => true));
 		}
 
 		return $this->_members_data;
@@ -72,9 +72,13 @@ class Notifications_Task extends \ElkArte\ValuesContainer
 		return $this->_notifier_data;
 	}
 
+	public function getLastId()
+	{
+		return isset($this->data['source_data']['last_id']) ? $this->data['source_data']['last_id'] : null;
+	}
 
 	public function getClass()
 	{
-		return $this->data['namespace'] . ucfirst($this->data['notification_type']);
+		return $this->data['namespace'] . ucfirst($this->data['notification_type']) . '_Mention';
 	}
 }

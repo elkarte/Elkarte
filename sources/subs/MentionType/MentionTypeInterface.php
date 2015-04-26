@@ -66,7 +66,6 @@ interface Mention_Type_Interface
 	 *
 	 * @param string $frequency
 	 * @param int[] $users
-	 * @param Notifications_Task $task
 	 * @return mixed[] array(array(
 	 *                  id_member_to (int),
 	 *                  email_address (text),
@@ -75,15 +74,15 @@ interface Mention_Type_Interface
 	 *                  last_id (int), ???
 	 *                ))
 	 */
-	public function getNotificationBody($frequency, $users, Notifications_Task $task);
+	public function getNotificationBody($frequency, $users);
 
 	/**
 	 * The Notifications_Task contains few data that may be necessary for the processing
 	 * of the mention.
 	 *
-	 * @param Notifications_Task $task
+	 * @param \Notifications_Task $task
 	 */
-	public function setTask(Notifications_Task $task);
+	public function setTask(\Notifications_Task $task);
 
 	/**
 	 * Used when sending an immediate email to get the last message id (email id)

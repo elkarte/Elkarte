@@ -18,7 +18,7 @@ if (!defined('ELK'))
 
 class Rlikemsg_Mention extends Mention_BoardAccess_Abstract
 {
-	protected static $_type = 'rlikemsg';
+	protected $_type = 'rlikemsg';
 
 	/**
 	 * {@inheritdoc }

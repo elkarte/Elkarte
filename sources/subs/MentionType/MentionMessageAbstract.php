@@ -18,7 +18,7 @@ if (!defined('ELK'))
 
 abstract class Mention_Message_Abstract implements Mention_Type_Interface
 {
-	protected static $_type = '';
+	protected $_type = '';
 
 	protected $_db = null;
 	protected $_task = null;
@@ -56,7 +56,7 @@ abstract class Mention_Message_Abstract implements Mention_Type_Interface
 	/**
 	 * {@inheritdoc }
 	 */
-	public function setTask(Notifications_Task $task)
+	public function setTask(\Notifications_Task $task)
 	{
 		$this->_task = $task;
 	}
@@ -88,7 +88,7 @@ abstract class Mention_Message_Abstract implements Mention_Type_Interface
 			$txt['mention_' . $row['mention_type']]);
 	}
 
-	protected function _getNotificationStrings($template, $keys, $members, Notifications_Task $task, $lang_files = array(), $replacements = array())
+	protected function _getNotificationStrings($template, $keys, $members, \Notifications_Task $task, $lang_files = array(), $replacements = array())
 	{
 		$members_data = $task->getMembersData();
 
@@ -134,20 +134,14 @@ abstract class Mention_Message_Abstract implements Mention_Type_Interface
 		$langs = array();
 		foreach ($users as $user)
 		{
-			$langs[$users_data[$user]] = $users_data[$user];
+			$langs[$users_data[$user]['lngfile']] = $users_data[$user]['lngfile'];
 		}
 
 		// Let's load all the languages into a cache thingy.
 		$langtxt = array();
 		foreach ($langs as $lang)
 		{
-			$langtxt[$lang] = array();
-
-			$strings = loadEmailTemplate($template, $replacements, $lang, true, array('digest', 'snippet'), $lang_files);
-			foreach ($keys as $key => $index)
-			{
-				$langtxt[$lang][$key] = $strings[$index];
-			}
+			$langtxt[$lang] = loadEmailTemplate($template, $replacements, $lang, true, array('digest', 'snippet'), $lang_files);
 		}
 
 		// Better be sure we have the correct language loaded (though it may be useless)

@@ -27,6 +27,7 @@ class TestMentions extends PHPUnit_Framework_TestCase
 		$user_info = array(
 			'id' => 1,
 			'ip' => '127.0.0.1',
+			'language' => 'english',
 			'is_admin' => true,
 			'is_guest' => false,
 			'username' => 'testing',
@@ -66,6 +67,7 @@ class TestMentions extends PHPUnit_Framework_TestCase
 		$this->id_msg = $msgOptions['id'];
 
 		$db = database();
+
 		$db->insert('ignore',
 			'{db_prefix}notifications_pref',
 			array(
@@ -74,6 +76,16 @@ class TestMentions extends PHPUnit_Framework_TestCase
 				'mention_type' => 'string',
 			),
 			array(
+				array(
+					0,
+					1,
+					'likemsg'
+				),
+				array(
+					0,
+					1,
+					'mentionmem'
+				),
 				array(
 					2,
 					1,
@@ -130,10 +142,8 @@ class TestMentions extends PHPUnit_Framework_TestCase
 	{
 		global $user_info;
 
-		$user_info = array(
-			'id' => 2,
-			'ip' => '127.0.0.1',
-		);
+		$user_info['id'] = 2;
+		$user_info['ip'] = '127.0.0.1';
 
 		$notifier = Notifications::getInstance();
 		$notifier->add(new Notifications_Task(

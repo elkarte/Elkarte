@@ -37,7 +37,7 @@ class Likemsg_Mention extends Mention_BoardAccess_Abstract
 				break;
 			case 'notification':
 			default:
-				return $this->_getNotificationStrings('', array('subject' => $this->_type, 'body' => $this->_type), $this->_task);
+				return $this->_getNotificationStrings('', array('subject' => $this->_type, 'body' => $this->_type), $members, $this->_task);
 		}
 
 		$notifier = $this->_task->getNotifierData();

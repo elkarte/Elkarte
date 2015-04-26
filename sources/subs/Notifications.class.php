@@ -26,7 +26,7 @@ class Notifications extends AbstractModel
 
 	protected $_sending_type = 0;
 
-	public function add(Notifications_Task $task)
+	public function add(\Notifications_Task $task)
 	{
 		$this->_to_send[] = $task;
 	}
@@ -36,7 +36,7 @@ class Notifications extends AbstractModel
 		Elk_Autoloader::getInstance()->register(SUBSDIR . '/MentionType', '\\ElkArte\\sources\\subs\\MentionType');
 
 		$this->_notification_frequencies = array(
-			'notification',
+			1 => 'notification',
 			'email',
 			'email_daily',
 			'email_weekly',
@@ -70,11 +70,11 @@ class Notifications extends AbstractModel
 
 				// This is made for cases when a certain setting may not be available:
 				// just return an empty body array and the notifications are skipped.
-				if (emtpy($bodies))
+				if (empty($bodies))
 					continue;
 
 				$method = '_send_' . $key;
-				$this->{$method}($task, $bodies);
+				$this->{$method}($obj, $task, $bodies);
 			}
 		}
 	}
@@ -188,7 +188,7 @@ class Notifications extends AbstractModel
 			if (!isset($preferences[$member]))
 				$level = (int) $preferences[0];
 			else
-				$level = 0;
+				$level = $preferences[$member];
 
 			if ($level === 0)
 				continue;
