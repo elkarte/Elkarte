@@ -766,8 +766,10 @@ function mail_insert_key($message, $unq_head, $encoded_unq_head, $line_break)
  * @param mixed[] $replacements
  * @param string $lang = ''
  * @param bool $loadLang = true
+ * @param string[] $suffixes - Additional suffixes to find and return
+ * @param string[] $additional_files - Additional language files to load
  */
-function loadEmailTemplate($template, $replacements = array(), $lang = '', $loadLang = true)
+function loadEmailTemplate($template, $replacements = array(), $lang = '', $loadLang = true, $suffixes = array(), $additional_files = array())
 {
 	global $txt, $mbname, $scripturl, $settings, $boardurl, $modSettings;
 
@@ -777,6 +779,12 @@ function loadEmailTemplate($template, $replacements = array(), $lang = '', $load
 		loadLanguage('EmailTemplates', $lang);
 		if (!empty($modSettings['maillist_enabled']))
 			loadLanguage('MaillistTemplates', $lang);
+
+		if (!empty($additional_files))
+		{
+			foreach ($additional_files as $file)
+				loadLanguage($file, $lang);
+		}
 	}
 
 	if (!isset($txt[$template . '_subject']) || !isset($txt[$template . '_body']))
@@ -786,6 +794,11 @@ function loadEmailTemplate($template, $replacements = array(), $lang = '', $load
 		'subject' => $txt[$template . '_subject'],
 		'body' => $txt[$template . '_body'],
 	);
+	if (!empty($suffixes))
+	{
+		foreach ($suffixes as $key)
+			$ret[$key] = $txt[$template . '_' . $key];
+	}
 
 	// Add in the default replacements.
 	$replacements += array(
@@ -811,12 +824,12 @@ function loadEmailTemplate($template, $replacements = array(), $lang = '', $load
 	}
 
 	// Do the variable replacements.
-	$ret['subject'] = str_replace($find, $replace, $ret['subject']);
-	$ret['body'] = str_replace($find, $replace, $ret['body']);
-
-	// Now deal with the {USER.variable} items.
-	$ret['subject'] = preg_replace_callback('~{USER.([^}]+)}~', 'user_info_callback', $ret['subject']);
-	$ret['body'] = preg_replace_callback('~{USER.([^}]+)}~', 'user_info_callback', $ret['body']);
+	foreach ($ret as $key => $val)
+	{
+		$ret[$key] = str_replace($find, $replace, $val);
+		// Now deal with the {USER.variable} items.
+		$ret[$key] = preg_replace_callback('~{USER.([^}]+)}~', 'user_info_callback', $val);
+	}
 
 	// Finally return the email to the caller so they can send it out.
 	return $ret;
