@@ -22,13 +22,13 @@ abstract class Mentions_Module_Abstract
 
 		if (!empty($modSettings['mentions_enabled']))
 		{
-			Elk_Autoloader::getInstance()->register(SUBSDIR . '/MentionType', 'ElkArte\\sources\\subs\\MentionType');
+			Elk_Autoloader::getInstance()->register(SUBSDIR . '/MentionType', '\\ElkArte\\sources\\subs\\MentionType');
 
 			$mentions = explode(',', $modSettings['enabled_mentions']);
 
 			foreach ($mentions as $mention)
 			{
-				$class = 'ElkArte\\sources\\subs\\MentionType\\' . ucfirst($mention) . '_Mention';
+				$class = '\\ElkArte\\sources\\subs\\MentionType\\' . ucfirst($mention) . '_Mention';
 				$hooks = $class::getEvents($action);
 
 				foreach ($hooks as $method => $dependencies)

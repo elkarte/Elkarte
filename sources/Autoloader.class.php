@@ -187,11 +187,11 @@ class Elk_Autoloader
 	 */
 	private function _string_to_class($class)
 	{
-		$namespaces = explode('\\', $class);
+		$namespaces = explode('\\', ltrim($class, '\\'));
 		if (count($namespaces) > 1)
 		{
 			$class = array_pop($namespaces);
-			$this->_current_namespace = implode('\\', $namespaces);
+			$this->_current_namespace = '\\' . implode('\\', $namespaces);
 		}
 		else
 			$this->_current_namespace = false;

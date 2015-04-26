@@ -151,7 +151,7 @@ class Mentions_Controller extends Action_Controller
 		if (empty($modSettings['mentions_enabled']))
 			Errors::instance()->fatal_lang_error('no_access', false);
 
-		Elk_Autoloader::getInstance()->register(SUBSDIR . '/MentionType', 'ElkArte\\sources\\subs\\MentionType');
+		Elk_Autoloader::getInstance()->register(SUBSDIR . '/MentionType', '\\ElkArte\\sources\\subs\\MentionType');
 
 		$this->_data = array(
 			'type' => isset($_REQUEST['type']) ? $_REQUEST['type'] : null,
@@ -402,7 +402,7 @@ class Mentions_Controller extends Action_Controller
 		else
 		{
 			$to_register = array_map(function($name) {
-				return 'ElkArte\\sources\\subs\\MentionType\\' . ucfirst($name) . '_Mention';
+				return '\\ElkArte\\sources\\subs\\MentionType\\' . ucfirst($name) . '_Mention';
 			}, $this->_known_mentions);
 		}
 
