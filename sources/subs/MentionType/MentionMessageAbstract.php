@@ -18,7 +18,9 @@ if (!defined('ELK'))
 
 abstract class Mention_Message_Abstract implements Mention_Type_Interface
 {
-	protected $_type = '';
+	protected static $_type = '';
+
+	protected $_db = null;
 
 	/**
 	 * This static function is used to find the events to attach to a controller.
@@ -32,7 +34,29 @@ abstract class Mention_Message_Abstract implements Mention_Type_Interface
 		return array();
 	}
 
+	/**
+	 * {@inheritdoc }
+	 */
 	abstract public function view($type, &$mentions);
+
+	/**
+	 * {@inheritdoc }
+	 */
+	abstract public function getUsersToNotify($task);
+
+	/**
+	 * {@inheritdoc }
+	 */
+	abstract public function getNotificationBody($frequency, $members, Notifications_Task $task);
+
+	/**
+	 * {@inheritdoc }
+	 * By default returns null.
+	 */
+	public function getLastId()
+	{
+		return null;
+	}
 
 	protected function _replaceMsg($row)
 	{
@@ -50,5 +74,149 @@ abstract class Mention_Message_Abstract implements Mention_Type_Interface
 				$row['subject'],
 			),
 			$txt['mention_' . $row['mention_type']]);
+	}
+
+	protected function _getNotificationStrings($template, $keys, $members, Notifications_Task $task, $lang_files = array(), $replacements = array())
+	{
+		$members_data = $task->getMembersData();
+
+		$return = array();
+		if (!empty($template))
+		{
+			$langstrings = $this->_loadStringsByTemplate($template, $keys, $members, $members_data, $lang_files, $replacements);
+			foreach ($members as $member)
+			{
+				$return[] = array(
+					'id_member_to' => $member,
+					'email_address' => $members_data[$member]['email_address'],
+					'subject' => $langstrings[$members_data[$member]['lngfile']]['subject'],
+					'body' => $langstrings[$members_data[$member]['lngfile']]['body'],
+					'last_id' => 0
+				);
+			}
+		}
+		else
+		{
+			foreach ($members as $member)
+			{
+				$return[] = array(
+					'id_member_to' => $member,
+					'email_address' => $members_data[$member]['email_address'],
+					'subject' => $keys['subject'],
+					'body' => $keys['body'],
+					'last_id' => 0
+				);
+			}
+		}
+
+		return $return;
+	}
+
+	protected function _loadStringsByTemplate($template, $keys, $users, $users_data, $lang_files = array(), $replacements = array())
+	{
+		global $user_info;
+
+		require_once(SUBSDIR . '/Mail.subs.php');
+
+		$lang = $user_info['language'];
+		$langs = array();
+		foreach ($users as $user)
+		{
+			$langs[$users_data[$user]] = $users_data[$user];
+		}
+
+		// Let's load all the languages into a cache thingy.
+		$langtxt = array();
+		foreach ($langs as $lang)
+		{
+			$langtxt[$lang] = array();
+
+			$strings = loadEmailTemplate($template, $replacements, $lang, true, array('digest', 'snippet'), $lang_files);
+			foreach ($keys as $key => $index)
+			{
+				$langtxt[$lang][$key] = $strings[$index];
+			}
+		}
+
+		// Better be sure we have the correct language loaded (though it may be useless)
+		if (!empty($lang_files) && $lang !== $user_info['language'])
+		{
+			foreach ($lang_files as $file)
+				loadLanguage($file);
+		}
+
+		return $langtxt;
+	}
+
+	/**
+	 * {@inheritdoc }
+	 */
+	public function setDb($db)
+	{
+		$this->_db = $db;
+	}
+
+	/**
+	 * {@inheritdoc }
+	 */
+	public function insert($member_from, $members_to, $target, $time = null, $status = null, $is_accessible = null)
+	{
+		$inserts = array();
+
+		// $time is not checked because it's useless
+		$request = $this->_db->query('', '
+			SELECT id_member
+			FROM {db_prefix}log_mentions
+			WHERE id_member IN ({array_int:members_to})
+				AND mention_type = {string:type}
+				AND id_member_from = {int:member_from}
+				AND id_target = {int:target}',
+			array(
+				'members_to' => $members_to,
+				'type' => $this->_type,
+				'member_from' => $member_from,
+				'target' => $target,
+			)
+		);
+		$existing = array();
+		while ($row = $this->_db->fetch_assoc($request))
+			$existing[] = $row['id_member'];
+		$this->_db->free_result($request);
+
+		// If the member has already been mentioned, it's not necessary to do it again
+		foreach ($members_to as $id_member)
+		{
+			if (!in_array($id_member, $existing))
+			{
+				$inserts[] = array(
+					$id_member,
+					$target,
+					$status === null ? 0 : $status,
+					$is_accessible === null ? 1 : $is_accessible,
+					$member_from,
+					$time === null ? time() : $time,
+					$this->_type
+				);
+			}
+		}
+
+		if (empty($inserts))
+			return;
+
+		// Insert the new mentions
+		$this->_db->insert('',
+			'{db_prefix}log_mentions',
+			array(
+				'id_member' => 'int',
+				'id_target' => 'int',
+				'status' => 'int',
+				'is_accessible' => 'int',
+				'id_member_from' => 'int',
+				'log_time' => 'int',
+				'mention_type' => 'string-12',
+			),
+			$inserts,
+			array('id_mention')
+		);
 	}
 }

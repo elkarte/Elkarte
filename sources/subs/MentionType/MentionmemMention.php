@@ -124,4 +124,42 @@ class Mentionmem_Mention extends Mention_BoardAccess_Abstract
 			$mentions->action_add();
 		}
 	}
+
+	/**
+	 * {@inheritdoc }
+	 * I hope I'll pass the list of member IDs.
+	 */
+	public function getUsersToNotify($task)
+	{
+		return (array) $task['source_data']['id_members'];
+	}
+
+	/**
+	 * {@inheritdoc }
+	 */
+	public function getNotificationBody($frequency, $members, Notifications_Task $task)
+	{
+		switch ($frequency)
+		{
+			case 'email_daily':
+			case 'email_weekly':
+				$keys = array('subject' => 'notify_mentionmem_digest', 'body' => 'notify_mentionmem_snippet');
+				break;
+			case 'email':
+				// @todo send an email for any like received may be a bit too much. Consider not allowing this method of notification
+				$keys = array('subject' => 'notify_mentionmem_subject', 'body' => 'notify_mentionmem_body');
+				break;
+			case 'notification':
+			default:
+				return $this->_getNotificationStrings('', array('subject' => $this->_type, 'body' => $this->_type), $task);
+		}
+
+		$notifier = $task->getNotifierData();
+		$replacements = array(
+			'ACTIONNAME' => $notifier['real_name'],
+			'MSGLINK' => replaceBasicActionUrl('{script_url}?msg=' . $task->id_target),
+		);
+
+		return $this->_getNotificationStrings('notify_mentionmem', $keys, $members, $task, array(), $replacements);
+	}
 }

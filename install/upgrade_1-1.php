@@ -238,7 +238,7 @@ class UpgradeInstructions_upgrade_1_1
 					}
 					if (!empty($modSettings['enabled_mentions']))
 					{
-						enableModules('mention', 'post', 'display');
+						enableModules('mentions', 'post', 'display');
 					}
 					enableModules('poll', array('display'));
 				}
