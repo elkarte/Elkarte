@@ -36,10 +36,9 @@ interface Mention_Type_Interface
 	/**
 	 * Used by the Notifications class to find the users that want a notification.
 	 *
-	 * @param mixed[] $task
 	 * @return int[] An array of members id
 	 */
-	public function getUsersToNotify($task);
+	public function getUsersToNotify();
 
 	/**
 	 * Used to inject the database object.
@@ -77,6 +76,14 @@ interface Mention_Type_Interface
 	 *                ))
 	 */
 	public function getNotificationBody($frequency, $users, Notifications_Task $task);
+
+	/**
+	 * The Notifications_Task contains few data that may be necessary for the processing
+	 * of the mention.
+	 *
+	 * @param Notifications_Task $task
+	 */
+	public function setTask(Notifications_Task $task);
 
 	/**
 	 * Used when sending an immediate email to get the last message id (email id)

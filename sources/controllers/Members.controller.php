@@ -77,16 +77,13 @@ class Members_Controller extends Action_Controller
 			// Do we want a mention for our newly added buddy?
 			if (!empty($modSettings['mentions_enabled']) && !empty($modSettings['mentions_buddy']))
 			{
-				$mentions = new Mentions_Controller(new Event_Manager());
-				$mentions->pre_dispatch();
-
-				// Set a mention for our buddy.
-				$mentions->setData(array(
-					'id_member' => $user,
-					'type' => 'buddy',
-					'id_msg' => 0,
-					));
-				$mentions->action_add();
+				$notifier = Notifications::getInstance();
+				$notifier->add(new Notifications_Task(
+					'buddy',
+					$user,
+					$user_info['id'],
+					array('id_members' => array($user))
+				));
 			}
 		}
 

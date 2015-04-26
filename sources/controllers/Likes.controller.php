@@ -142,19 +142,13 @@ class Likes_Controller extends Action_Controller
 					// Lets add in a mention to the member that just had their post liked
 					if (!empty($modSettings['mentions_enabled']))
 					{
-						$mentions = new Mentions_Controller(new Event_Manager());
-						$mentions->pre_dispatch();
-						$mentions->setData(array(
-							'id_member' => $liked_message['id_member'],
-							'type' => $type,
-							'id_msg' => $this->_id_liked,
+						$notifier = Notifications::getInstance();
+						$notifier->add(new Notifications_Task(
+							$type,
+							$this->_id_liked,
+							$user_info['id'],
+							array('id_members' => array($liked_message['id_member']), 'rlike_notif' => empty($modSettings['mentions_dont_notify_rlike']))
 						));
-
-						// Notifying that likes were removed ?
-						if ($type === 'rlikemsg' && !empty($modSettings['mentions_dont_notify_rlike']))
-							$mentions->action_rlike();
-						else
-							$mentions->action_add();
 					}
 				}
 				return true;

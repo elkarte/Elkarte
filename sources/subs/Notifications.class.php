@@ -55,17 +55,18 @@ class Notifications extends AbstractModel
 	{
 		$class = $task->getClass();
 		$obj = new $class($this->_db);
+		$obj->setTask($task);
 
 		// Cleanup the list of members to notify,
 		// in certain cases it may differ from the list passed (if any)
-		$task->setMembers($obj->getUsersToNotify($task->getMembers()));
+		$task->setMembers($obj->getUsersToNotify());
 		$notif_prefs = $this->_getNotificationPreferences($task->notification_type, $task->getMembers());
 
 		foreach ($this->_notification_frequencies as $key)
 		{
 			if (!empty($notif_prefs[$key]))
 			{
-				$bodies = $obj->getNotificationBody($key, $notif_prefs[$key], $task);
+				$bodies = $obj->getNotificationBody($key, $notif_prefs[$key]);
 
 				// This is made for cases when a certain setting may not be available:
 				// just return an empty body array and the notifications are skipped.
@@ -91,7 +92,7 @@ class Notifications extends AbstractModel
 				'id_msg' => $task['id_target'],
 				'type' => $task['notification_type'],
 				'log_time' => $task['log_time'],
-				'status' => $task['source_data']['status']
+				'status' => $task['source_data']['status'],
 			));
 		}
 	}
@@ -210,7 +211,7 @@ class Notifications extends AbstractModel
 	public static function getInstance()
 	{
 		if (self::$_instance === null)
-			self::$_instance = new Notifications();
+			self::$_instance = new Notifications(database());
 
 		return self::$_instance;
 	}

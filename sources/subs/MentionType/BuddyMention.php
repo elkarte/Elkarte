@@ -39,17 +39,8 @@ class Buddy_Mention extends Mention_Message_Abstract
 
 	/**
 	 * {@inheritdoc }
-	 * And notify just the user that has been added as buddy.
 	 */
-	public function getUsersToNotify($task)
-	{
-		return array($task['source_data']['id_members']);
-	}
-
-	/**
-	 * {@inheritdoc }
-	 */
-	public function getNotificationBody($frequency, $members, Notifications_Task $task)
+	public function getNotificationBody($frequency, $members)
 	{
 		switch ($frequency)
 		{
@@ -62,14 +53,14 @@ class Buddy_Mention extends Mention_Message_Abstract
 				break;
 			case 'notification':
 			default:
-				return $this->_getNotificationStrings('', array('subject' => $this->_type, 'body' => $this->_type), $task);
+				return $this->_getNotificationStrings('', array('subject' => $this->_type, 'body' => $this->_type), $this->_task);
 		}
 
-		$notifier = $task->getNotifierData();
+		$notifier = $this->_task->getNotifierData();
 		$replacements = array(
 			'ACTIONNAME' => $notifier['real_name'],
 		);
 
-		return $this->_getNotificationStrings('notify_new_buddy', $keys, $members, $task, array(), $replacements);
+		return $this->_getNotificationStrings('notify_new_buddy', $keys, $members, $this->_task, array(), $replacements);
 	}
 }

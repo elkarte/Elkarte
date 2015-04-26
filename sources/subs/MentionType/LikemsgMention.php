@@ -22,17 +22,8 @@ class Likemsg_Mention extends Mention_BoardAccess_Abstract
 
 	/**
 	 * {@inheritdoc }
-	 * And notify just the user whose message has been liked.
 	 */
-	public function getUsersToNotify($task)
-	{
-		return array($task['source_data']['id_members']);
-	}
-
-	/**
-	 * {@inheritdoc }
-	 */
-	public function getNotificationBody($frequency, $members, Notifications_Task $task)
+	public function getNotificationBody($frequency, $members)
 	{
 		switch ($frequency)
 		{
@@ -46,15 +37,15 @@ class Likemsg_Mention extends Mention_BoardAccess_Abstract
 				break;
 			case 'notification':
 			default:
-				return $this->_getNotificationStrings('', array('subject' => $this->_type, 'body' => $this->_type), $task);
+				return $this->_getNotificationStrings('', array('subject' => $this->_type, 'body' => $this->_type), $this->_task);
 		}
 
-		$notifier = $task->getNotifierData();
+		$notifier = $this->_task->getNotifierData();
 		$replacements = array(
 			'ACTIONNAME' => $notifier['real_name'],
-			'MSGLINK' => replaceBasicActionUrl('{script_url}?msg=' . $task->id_target),
+			'MSGLINK' => replaceBasicActionUrl('{script_url}?msg=' . $this->_task->id_target),
 		);
 
-		return $this->_getNotificationStrings('notify_new_buddy', $keys, $members, $task, array(), $replacements);
+		return $this->_getNotificationStrings('notify_new_buddy', $keys, $members, $this->_task, array(), $replacements);
 	}
 }

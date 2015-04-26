@@ -8,6 +8,8 @@
  */
 class TestMentions extends PHPUnit_Framework_TestCase
 {
+	protected $_posterOptions = null;
+
 	/**
 	 * Prepare some test data, to use in these tests.
 	 *
@@ -52,12 +54,29 @@ class TestMentions extends PHPUnit_Framework_TestCase
 			'update_post_count' => false,
 			'ip' => '127.0.0.1'
 		);
+		$this->_posterOptions = $posterOptions;
 
 		// Attempt to make the new topic.
 		createPost($msgOptions, $topicOptions, $posterOptions);
 
 		// Keep id of the new topic.
 		$this->id_msg = $msgOptions['id'];
+
+		$db = database();
+		$db->insert('ignore',
+			'{db_prefix}notifications_pref',
+			array(
+				'id_member' => 'int',
+				'notification_level' => 'int',
+				'mention_type' => 'string',
+			),
+			array(
+				2,
+				1,
+				'mentionmem'
+			),
+			array('id_member', 'mention_type')
+		);
 	}
 
 	/**
@@ -74,18 +93,17 @@ class TestMentions extends PHPUnit_Framework_TestCase
 	 */
 	public function testAddMentionByMember()
 	{
-		$mentions = new Mentions_Controller(new Event_Manager());
-		$mentions->pre_dispatch();
 		$id_member = 2;
 
-		// Lets mention the member
-		$mentions->setData(array(
-			'id_member' => $id_member,
-			'type' => 'mentionmem',
-			'id_msg' => $this->id_msg,
-			'status' => 'new',
+		$notifier = Notifications::getInstance();
+		$notifier->add(new Notifications_Task(
+			'mentionmem',
+			$this->id_msg,
+			$this->_posterOptions['id'],
+			array('id_members' => array($id_member), 'notifier_data' => $this->_posterOptions)
 		));
-		$mentions->action_add();
+
+		$notifier->send();
 
 		// Get the number of mentions, should be one
 		$count = countUserMentions(false, 'mentionmem', $id_member);

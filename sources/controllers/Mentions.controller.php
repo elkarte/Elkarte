@@ -411,6 +411,7 @@ class Mentions_Controller extends Action_Controller
 
 	/**
 	 * We will, we will notify you
+	 * @deprecated since 1.1 - Use Notifications::create instead
 	 */
 	public function action_add()
 	{
