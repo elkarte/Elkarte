@@ -74,9 +74,16 @@ class TestMentions extends PHPUnit_Framework_TestCase
 				'mention_type' => 'string',
 			),
 			array(
-				2,
-				1,
-				'mentionmem'
+				array(
+					2,
+					1,
+					'mentionmem'
+				),
+				array(
+					2,
+					1,
+					'likemsg'
+				),
 			),
 			array('id_member', 'mention_type')
 		);
@@ -123,22 +130,20 @@ class TestMentions extends PHPUnit_Framework_TestCase
 	{
 		global $user_info;
 
-		$mentions = new Mentions_Controller(new Event_Manager());
-		$mentions->pre_dispatch();
-
 		$user_info = array(
 			'id' => 2,
 			'ip' => '127.0.0.1',
 		);
 
-		// Lets like a post
-		$mentions->setData(array(
-			'id_member' => 1,
-			'type' => 'likemsg',
-			'id_msg' => $this->id_msg,
-			'status' => 'new',
+		$notifier = Notifications::getInstance();
+		$notifier->add(new Notifications_Task(
+			'likemsg',
+			$this->id_msg,
+			$user_info['id'],
+			array('id_members' => array(1), 'rlike_notif' => true)
 		));
-		$mentions->action_add();
+
+		$notifier->send();
 
 		// Get the number of mentions, should be one
 		$count = countUserMentions(false, 'likemsg', $user_info['id']);

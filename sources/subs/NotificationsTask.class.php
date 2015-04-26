@@ -22,7 +22,7 @@ class Notifications_Task extends \ElkArte\ValuesContainer
 
 	public function __construct($type, $id, $id_member, $data, $namespace = '')
 	{
-		$this->_data = array(
+		$this->data = array(
 			'notification_type' => $type,
 			'namespace' => empty($namespace) ? '\\ElkArte\\sources\\subs\\MentionType\\' : rtrim($namespace, '\\') . '\\',
 			'id_target' => $id,
@@ -31,20 +31,23 @@ class Notifications_Task extends \ElkArte\ValuesContainer
 			'log_time' => time()
 		);
 
-		if (isset($this->_data['source_data']['id_members']))
-			$this->_data['source_data']['id_members'] = (array) $this->_data['source_data']['id_members'];
+		if (!isset($this->data['source_data']['status']))
+			$this->data['source_data']['status'] = 'new';
+
+		if (isset($this->data['source_data']['id_members']))
+			$this->data['source_data']['id_members'] = (array) $this->data['source_data']['id_members'];
 		else
-			$this->_data['source_data']['id_members'] = array();
+			$this->data['source_data']['id_members'] = array();
 	}
 
 	public function getMembers()
 	{
-		return $this->_data['source_data']['id_members'];
+		return $this->data['source_data']['id_members'];
 	}
 
 	public function setMembers($members)
 	{
-		$this->_data['source_data']['id_members'] = (array) $members;
+		$this->data['source_data']['id_members'] = (array) $members;
 	}
 
 	public function getMembersData()
@@ -72,6 +75,6 @@ class Notifications_Task extends \ElkArte\ValuesContainer
 
 	public function getClass()
 	{
-		return $this->_data['namespace'] . ucfirst($this->_data['notification_type']);
+		return $this->data['namespace'] . ucfirst($this->data['notification_type']);
 	}
 }
