@@ -30,7 +30,7 @@ class Mentionmem_Mention extends Mention_BoardAccess_Abstract
 			'post' => array(
 				'prepare_context' => array(),
 				'before_save_post' => array(),
-				'after_save_post' => array('msgOptions', 'becomesApproved')
+				'after_save_post' => array('msgOptions', 'becomesApproved', 'posterOptions')
 			),
 			'display' => array('prepare_context' => array('virtual_msg')),
 		);
@@ -48,13 +48,8 @@ class Mentionmem_Mention extends Mention_BoardAccess_Abstract
 		// Mark the mention as read if requested
 		if (isset($_REQUEST['mentionread']) && !empty($virtual_msg))
 		{
-			$mentions = new Mentions_Controller(new Event_Manager());
-			$mentions->pre_dispatch();
-			$mentions->setData(array(
-				'id_mention' => $_REQUEST['item'],
-				'mark' => $_REQUEST['mark'],
-			));
-			$mentions->action_markread();
+			$mentions = new Mentioning(database());
+			$mentions->markread((int) $_REQUEST['item']);
 		}
 
 		$this->_setup_editor(empty($options['use_editor_quick_reply']));
@@ -109,35 +104,24 @@ class Mentionmem_Mention extends Mention_BoardAccess_Abstract
 		}
 	}
 
-	public function post_after_save_post($msgOptions, $becomesApproved)
+	public function post_after_save_post($msgOptions, $becomesApproved, $posterOptions)
 	{
 		if (!empty($this->_actually_mentioned))
 		{
-			$mentions = new Mentions_Controller(new Event_Manager());
-			$mentions->pre_dispatch();
-			$mentions->setData(array(
-				'id_member' => $this->_actually_mentioned,
-				'type' => 'mentionmem',
-				'id_msg' => $msgOptions['id'],
-				'status' => $becomesApproved ? 'new' : 'unapproved',
+			$notifier = Notifications::getInstance();
+			$notifier->add(new Notifications_Task(
+				'mentionmem',
+				$msgOptions['id'],
+				$posterOptions['id'],
+				array('id_members' => $this->_actually_mentioned, 'notifier_data' => $posterOptions)
 			));
-			$mentions->action_add();
 		}
 	}
 
 	/**
 	 * {@inheritdoc }
-	 * I hope I'll pass the list of member IDs.
 	 */
-	public function getUsersToNotify($task)
-	{
-		return (array) $task['source_data']['id_members'];
-	}
-
-	/**
-	 * {@inheritdoc }
-	 */
-	public function getNotificationBody($frequency, $members, Notifications_Task $task)
+	public function getNotificationBody($frequency, $members)
 	{
 		switch ($frequency)
 		{
@@ -151,15 +135,14 @@ class Mentionmem_Mention extends Mention_BoardAccess_Abstract
 				break;
 			case 'notification':
 			default:
-				return $this->_getNotificationStrings('', array('subject' => $this->_type, 'body' => $this->_type), $task);
+				return $this->_getNotificationStrings('', array('subject' => $this->_type, 'body' => $this->_type), $this->_task);
 		}
 
-		$notifier = $task->getNotifierData();
 		$replacements = array(
-			'ACTIONNAME' => $notifier['real_name'],
-			'MSGLINK' => replaceBasicActionUrl('{script_url}?msg=' . $task->id_target),
+			'ACTIONNAME' => $this->_task['notifier_data']['name'],
+			'MSGLINK' => replaceBasicActionUrl('{script_url}?msg=' . $this->_task->id_target),
 		);
 
-		return $this->_getNotificationStrings('notify_mentionmem', $keys, $members, $task, array(), $replacements);
+		return $this->_getNotificationStrings('notify_mentionmem', $keys, $members, $this->_task, array(), $replacements);
 	}
 }

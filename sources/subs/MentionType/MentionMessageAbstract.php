@@ -21,6 +21,7 @@ abstract class Mention_Message_Abstract implements Mention_Type_Interface
 	protected static $_type = '';
 
 	protected $_db = null;
+	protected $_task = null;
 
 	/**
 	 * This static function is used to find the events to attach to a controller.
@@ -42,12 +43,23 @@ abstract class Mention_Message_Abstract implements Mention_Type_Interface
 	/**
 	 * {@inheritdoc }
 	 */
-	abstract public function getUsersToNotify($task);
+	public function getUsersToNotify()
+	{
+		return (array) $this->_task['source_data']['id_members'];
+	}
 
 	/**
 	 * {@inheritdoc }
 	 */
-	abstract public function getNotificationBody($frequency, $members, Notifications_Task $task);
+	abstract public function getNotificationBody($frequency, $members);
+
+	/**
+	 * {@inheritdoc }
+	 */
+	public function setTask(Notifications_Task $task)
+	{
+		$this->_task = $task;
+	}
 
 	/**
 	 * {@inheritdoc }

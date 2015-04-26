@@ -25,13 +25,16 @@ class Rlikemsg_Mention extends Mention_BoardAccess_Abstract
 	 */
 	public function getUsersToNotify()
 	{
-		return array();
+		if ($this->_task['source_data']['rlike_notif'])
+			return array($this->_task['source_data']['id_members']);
+		else
+			return array();
 	}
 
 	/**
 	 * {@inheritdoc }
 	 */
-	public function getNotificationBody($frequency, $users, Notifications_Task $task)
+	public function getNotificationBody($frequency, $users)
 	{
 		return array();
 	}
@@ -50,23 +53,30 @@ class Rlikemsg_Mention extends Mention_BoardAccess_Abstract
 	 */
 	public function insert($member_from, $members_to, $target, $time = null, $status = null, $is_accessible = null)
 	{
-		// If this like is still unread then we mark it as read and decrease the counter
-		$this->_db->query('', '
-			UPDATE {db_prefix}log_mentions
-			SET status = {int:status}
-			WHERE id_member IN ({array_int:members_to})
-				AND mention_type = {string:type}
-				AND id_member_from = {int:member_from}
-				AND id_target = {int:target}
-				AND status = {int:unread}',
-			array(
-				'members_to' => $members_to,
-				'type' => 'likemsg',
-				'member_from' => $member_from,
-				'target' => $target,
-				'status' => $newstatus,
-				'unread' => 0,
-			)
-		);
+		if ($this->_task['source_data']['rlike_notif'])
+		{
+			parent::insert($member_from, $members_to, $target, $time, $status, $is_accessible);
+		}
+		else
+		{
+			// If this like is still unread then we mark it as read and decrease the counter
+			$this->_db->query('', '
+				UPDATE {db_prefix}log_mentions
+				SET status = {int:status}
+				WHERE id_member IN ({array_int:members_to})
+					AND mention_type = {string:type}
+					AND id_member_from = {int:member_from}
+					AND id_target = {int:target}
+					AND status = {int:unread}',
+				array(
+					'members_to' => $members_to,
+					'type' => 'likemsg',
+					'member_from' => $member_from,
+					'target' => $target,
+					'status' => $newstatus,
+					'unread' => 0,
+				)
+			);
+		}
 	}
 }
