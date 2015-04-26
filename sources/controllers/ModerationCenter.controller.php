@@ -1214,7 +1214,7 @@ class ModerationCenter_Controller extends Action_Controller
 		$context['url_start'] = '?action=moderate;area=warnings;sa=log;sort='.  $context['order'];
 
 		if (!isset($search_params['string']) || (!empty($_REQUEST['search']) && $search_params['string'] != $_REQUEST['search']))
-			$search_params_string = empty($_REQUEST['search']) ? '' : $_REQUEST['search'];
+			$search_params_string = empty($_REQUEST['search']) ? '' : Util::htmlspecialchars($_REQUEST['search']);
 		else
 			$search_params_string = $search_params['string'];
 

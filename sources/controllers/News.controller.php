@@ -192,7 +192,7 @@ class News_Controller extends Action_Controller
 		foreach (array('board', 'boards', 'c') as $var)
 		{
 			if (isset($_REQUEST[$var]))
-				$cachekey[] = $_REQUEST[$var];
+				$cachekey[] = implode(',', array_map('intval', explode(',', $_REQUEST[$var])));
 		}
 
 		$cachekey = md5(serialize($cachekey) . (!empty($this->_query_this_board) ? $this->_query_this_board : ''));
@@ -780,8 +780,8 @@ function fix_possible_url_callback($matches)
 }
 
 /**
- * For highest feed compatibility, some special characters should be provided 
- * as character entities and not html entities 
+ * For highest feed compatibility, some special characters should be provided
+ * as character entities and not html entities
  *
  * @param string $data
  */

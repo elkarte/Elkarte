@@ -155,6 +155,8 @@ class Curl_Fetch_Webdata
 		// We do have a url I hope
 		if ($url == '')
 			return false;
+		elseif (filter_var($url, FILTER_VALIDATE_URL) === false)
+			return false;
 		else
 			$this->_options[CURLOPT_URL] = $url;
 

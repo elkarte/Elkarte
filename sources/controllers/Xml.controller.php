@@ -232,7 +232,7 @@ class Xml_Controller extends Action_Controller
 		if (empty($validation_session) && $validation_token === true)
 		{
 			// No questions that we are reordering
-			if (isset($_POST['order']) && $_POST['order'] == 'reorder')
+			if (isset($_POST['order']) && $_POST['order'] === 'reorder')
 			{
 				$view_order = 1;
 				$replace = '';
@@ -241,7 +241,7 @@ class Xml_Controller extends Action_Controller
 				foreach ($_POST['list_custom_profile_fields'] as $id)
 				{
 					$replace .= '
-						WHEN id_field = ' . $id . ' THEN ' . $view_order++;
+						WHEN id_field = ' . (int) $id . ' THEN ' . $view_order++;
 				}
 
 				// With the replace set
@@ -335,7 +335,9 @@ class Xml_Controller extends Action_Controller
 				// The board ids arrive in 1-n view order ...
 				foreach ($_POST['cbp'] as $id)
 				{
-					list ($category, $board, $childof) = explode(',', $id);
+					$cpb = explode(',', $id);
+					$cpb = array_map('intval', $cpb);
+					list ($category, $board, $childof) = $cpb;
 
 					if ($board == -1)
 						continue;
@@ -485,7 +487,7 @@ class Xml_Controller extends Action_Controller
 		if (empty($validation_session) && $validation_token === true)
 		{
 			// Valid posting
-			if (isset($_POST['order']) && $_POST['order'] == 'reorder')
+			if (isset($_POST['order']) && $_POST['order'] === 'reorder')
 			{
 				// Get the details on the moved smile
 				list (, $smile_moved) = explode('_', $_POST['moved']);
@@ -502,6 +504,7 @@ class Xml_Controller extends Action_Controller
 						'popup' => 2
 					);
 					list ($smile_received_location, $smile_received_row) = explode('|', $_POST['received']);
+					$smile_received_row = (int) $smile_received_row;
 					$smile_received_location = $displayTypes[substr($smile_received_location, 7)];
 				}
 
@@ -515,7 +518,7 @@ class Xml_Controller extends Action_Controller
 
 					foreach ($_POST['smile'] as $smile_id)
 					{
-						$smiley_tree[] = $smile_id;
+						$smiley_tree[] = (int) $smile_id;
 
 						// Keep track of where the moved smiley is in the sort stack
 						if ($smile_id == $smile_moved)
@@ -640,7 +643,7 @@ class Xml_Controller extends Action_Controller
 		if (empty($validation_session) && $validation_token === true)
 		{
 			// No questions that we are reordering
-			if (isset($_POST['order'], $_POST['list_sort_email_fp']) && $_POST['order'] == 'reorder')
+			if (isset($_POST['order'], $_POST['list_sort_email_fp']) && $_POST['order'] === 'reorder')
 			{
 				$filters = array();
 				$filter_order = 1;
@@ -649,7 +652,7 @@ class Xml_Controller extends Action_Controller
 				// The field ids arrive in 1-n view order ...
 				foreach ($_POST['list_sort_email_fp'] as $id)
 				{
-					$filters[] = $id;
+					$filters[] = (int) $id;
 					$replace .= '
 						WHEN id_filter = ' . $id . ' THEN ' . $filter_order++;
 				}
@@ -730,7 +733,7 @@ class Xml_Controller extends Action_Controller
 		if (empty($validation_session) && $validation_token === true)
 		{
 			// No questions that we are reordering
-			if (isset($_POST['order']) && $_POST['order'] == 'reorder')
+			if (isset($_POST['order']) && $_POST['order'] === 'reorder')
 			{
 				// Get the current list of icons.
 				$message_icons = fetchMessageIconsDetails();
@@ -741,6 +744,7 @@ class Xml_Controller extends Action_Controller
 				// The field ids arrive in 1-n view order, so we simply build an update array
 				foreach ($_POST['list_message_icon_list'] as $id)
 				{
+						$id = (int) $id;
 						$iconInsert[] = array($id, $message_icons[$id]['board_id'], $message_icons[$id]['title'], $message_icons[$id]['filename'], $view_order);
 						$view_order++;
 				}

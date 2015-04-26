@@ -286,7 +286,7 @@ class Memberlist_Controller extends Action_Controller
 			'extra_after' => ' (' . sprintf($txt['of_total_members'], $context['num_members']) . ')'
 		);
 
-		$limit = $_REQUEST['start'];
+		$limit = (int) $_REQUEST['start'];
 		$where = '';
 		$query_parameters = array(
 			'regular_id_group' => 0,
@@ -454,7 +454,7 @@ class Memberlist_Controller extends Action_Controller
 			$where = implode(' ' . $query . ' OR ', $fields) . ' ' . $query . $condition;
 
 			// Find the members from the database.
-			$numResults = ml_searchMembers($query_parameters, $customJoin, $where, $_REQUEST['start']);
+			$numResults = ml_searchMembers($query_parameters, $customJoin, $where, (int) $_REQUEST['start']);
 			$context['page_index'] = constructPageIndex($scripturl . '?action=memberlist;sa=search;search=' . $search . ';fields=' . implode(',', $validFields), $_REQUEST['start'], $numResults, $modSettings['defaultMaxMembers']);
 		}
 		else
