@@ -291,7 +291,7 @@ class News_Controller extends Action_Controller
 			$url_parts = array();
 			foreach (array('board', 'boards', 'c') as $var)
 				if (isset($_REQUEST[$var]))
-					$url_parts[] = $var . '=' . (is_array($_REQUEST[$var]) ? implode(',', $_REQUEST[$var]) : $_REQUEST[$var]);
+					$url_parts[] = $var . '=' . implode(',', array_map('intval', explode(',', $_REQUEST[$var])));
 
 			echo '
 	<feed xmlns="http://www.w3.org/2005/Atom">

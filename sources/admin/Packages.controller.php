@@ -1161,7 +1161,7 @@ class Packages_Controller extends Action_Controller
 			redirectexit('action=admin;area=packages');
 
 		$_REQUEST['package'] = preg_replace('~[\.]+~', '.', strtr($_REQUEST['package'], array('/' => '_', '\\' => '_')));
-		$_REQUEST['file'] = preg_replace('~[\.]+~', '.', $_REQUEST['file']);
+		$_REQUEST['file'] = preg_replace(array('/\s/', '/\.[\.]+/', '/[^\w_\.\-]/'), array('_', '.', ''), $_REQUEST['file']);
 
 		if (isset($_REQUEST['raw']))
 		{

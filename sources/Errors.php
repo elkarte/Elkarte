@@ -157,7 +157,7 @@ function fatal_error($error, $log = 'general')
 
 	// We don't have $txt yet, but that's okay...
 	if (empty($txt))
-		die($error);
+		die(Util::htmlspecialchars($error));
 
 	if (class_exists('Template_Layers'))
 		Template_Layers::getInstance()->isError();
@@ -194,7 +194,7 @@ function fatal_lang_error($error, $log = 'general', $sprintf = array())
 
 	// If we have no theme stuff we can't have the language file...
 	if (empty($context['theme_loaded']))
-		die($error);
+		die(Util::htmlspecialchars($error));
 
 	if (class_exists('Template_Layers'))
 		Template_Layers::getInstance()->isError();
