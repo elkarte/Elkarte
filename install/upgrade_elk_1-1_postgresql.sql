@@ -159,7 +159,7 @@ if (!empty($modSettings['drafts_enabled']))
 }
 if (!empty($modSettings['enabled_mentions']))
 {
-	enableModules('mention', 'post', 'display');
+	enableModules('mentions', 'post', 'display');
 }
 enableModules('poll', array('display'));
 ---}

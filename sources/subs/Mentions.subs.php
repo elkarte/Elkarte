@@ -129,6 +129,8 @@ function getUserMentions($start, $limit, $sort, $all = false, $type = '')
  * @param string|null $time optional value to set the time of the mention, defaults to now
  * @param string|null $status optional value to set a status, defaults to 0
  * @param bool|null $is_accessible optional if the mention is accessible to the user
+ *
+ * @deprecated since 1.1 - Use Mentioning::create() instead
  */
 function addMentions($member_from, $members_to, $target, $type, $time = null, $status = null, $is_accessible = null)
 {
@@ -202,6 +204,7 @@ function addMentions($member_from, $members_to, $target, $type, $time = null, $s
  * @param int $target the id of the message involved in the mention
  * @param int $newstatus status to change the mention to if found as unread,
  *             - default is to set it as read (status = 1)
+ * @deprecated since 1.1 use Mentioning::create() instead
  */
 function rlikeMentions($member_from, $members_to, $target, $newstatus = 1)
 {
@@ -241,6 +244,8 @@ function rlikeMentions($member_from, $members_to, $target, $newstatus = 1)
  * @package Mentions
  * @param int $id_mention the mention id in the db
  * @param int $status status to update, 'new' => 0, 'read' => 1, 'deleted' => 2, 'unapproved' => 3
+ *
+ * @deprecated since 1.1 - Use Mentioning::changestatus() instead
  */
 function changeMentionStatus($id_mention, $status = 1)
 {
@@ -377,6 +382,7 @@ function toggleMentionsAccessibility($mentions, $access)
  * @param string $field
  * @param mixed[] $input
  * @param string|null $validation_parameters
+ * @deprecated since 1.1 - use Mentioning::validate_ownmention() instead
  */
 function validate_ownmention($field, $input, $validation_parameters = null)
 {

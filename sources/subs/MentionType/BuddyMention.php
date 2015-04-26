@@ -20,6 +20,9 @@ class Buddy_Mention extends Mention_Message_Abstract
 {
 	protected $_type = 'buddy';
 
+	/**
+	 * {@inheritdoc }
+	 */
 	public function view($type, &$mentions)
 	{
 		foreach ($mentions as $key => $row)
@@ -32,5 +35,41 @@ class Buddy_Mention extends Mention_Message_Abstract
 		}
 
 		return false;
+	}
+
+	/**
+	 * {@inheritdoc }
+	 * And notify just the user that has been added as buddy.
+	 */
+	public function getUsersToNotify($task)
+	{
+		return array($task['source_data']['id_members']);
+	}
+
+	/**
+	 * {@inheritdoc }
+	 */
+	public function getNotificationBody($frequency, $members, Notifications_Task $task)
+	{
+		switch ($frequency)
+		{
+			case 'email_weekly':
+			case 'email_daily':
+				$keys = array('subject' => 'notify_new_buddy_digest', 'body' => 'notify_new_buddy_snippet');
+				break;
+			case 'email':
+				$keys = array('subject' => 'notify_new_buddy_subject', 'body' => 'notify_new_buddy_body');
+				break;
+			case 'notification':
+			default:
+				return $this->_getNotificationStrings('', array('subject' => $this->_type, 'body' => $this->_type), $task);
+		}
+
+		$notifier = $task->getNotifierData();
+		$replacements = array(
+			'ACTIONNAME' => $notifier['real_name'],
+		);
+
+		return $this->_getNotificationStrings('notify_new_buddy', $keys, $members, $task, array(), $replacements);
 	}
 }
