@@ -27,7 +27,7 @@ class Notifications extends AbstractModel
 	/**
 	 * List of notifications to send
 	 *
-	 * @var \Notifications_Task
+	 * @var \Notifications_Task[]
 	 */
 	protected $_to_send;
 
@@ -108,7 +108,7 @@ class Notifications extends AbstractModel
 	/**
 	 * Inserts a new mention in the database (those that appear in the mentions area).
 	 *
-	 * @param \ElkArte\sources\subs\MentionType\Mention_Type_Interface $task
+	 * @param \ElkArte\sources\subs\MentionType\Mention_Type_Interface $obj
 	 * @param \Notifications_Task $task
 	 * @param mixed[] $bodies
 	 * @global $modSettings - Not sure if actually necessary
@@ -134,11 +134,11 @@ class Notifications extends AbstractModel
 	/**
 	 * Sends an immediate email notification.
 	 *
-	 * @param \ElkArte\sources\subs\MentionType\Mention_Type_Interface $task
+	 * @param \ElkArte\sources\subs\MentionType\Mention_Type_Interface $obj
 	 * @param \Notifications_Task $task
 	 * @param mixed[] $bodies
 	 */
-	protected function _send_email($obj, $task, $bodies)
+	protected function _send_email(\ElkArte\sources\subs\MentionType\Mention_Type_Interface $obj, \Notifications_Task $task, $bodies)
 	{
 		$last_id = $obj->getLastId();
 		foreach ($bodies as $body)
@@ -150,11 +150,11 @@ class Notifications extends AbstractModel
 	/**
 	 * Stores data in the database to send a daily digest.
 	 *
-	 * @param \ElkArte\sources\subs\MentionType\Mention_Type_Interface $task
+	 * @param \ElkArte\sources\subs\MentionType\Mention_Type_Interface $obj
 	 * @param \Notifications_Task $task
 	 * @param mixed[] $bodies
 	 */
-	protected function _send_daily_email($obj, $task, $bodies)
+	protected function _send_daily_email(\ElkArte\sources\subs\MentionType\Mention_Type_Interface $obj, \Notifications_Task $task, $bodies)
 	{
 		foreach ($bodies as $body)
 		{
@@ -171,11 +171,11 @@ class Notifications extends AbstractModel
 	/**
 	 * Stores data in the database to send a weekly digest.
 	 *
-	 * @param \ElkArte\sources\subs\MentionType\Mention_Type_Interface $task
+	 * @param \ElkArte\sources\subs\MentionType\Mention_Type_Interface $obj
 	 * @param \Notifications_Task $task
 	 * @param mixed[] $bodies
 	 */
-	protected function _send_weekly_email($obj, $task, $bodies)
+	protected function _send_weekly_email(\ElkArte\sources\subs\MentionType\Mention_Type_Interface $obj, \Notifications_Task $task, $bodies)
 	{
 		foreach ($bodies as $body)
 		{

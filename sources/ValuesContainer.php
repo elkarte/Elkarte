@@ -28,7 +28,7 @@ class ValuesContainer implements \ArrayAccess
 	/**
 	 * Constructor
 	 *
-	 * @param mixed[] $data Any array of data used to initialize the object (optional)
+	 * @param mixed[]|null $data Any array of data used to initialize the object (optional)
 	 */
 	public function __construct($data = null)
 	{
