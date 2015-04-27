@@ -22,6 +22,34 @@ if (!defined('ELK'))
 class Mentioning extends AbstractModel
 {
 	/**
+	 * Value assumed by a new mention
+	 *
+	 * @const int
+	 */
+	const MNEW = 0;
+
+	/**
+	 * Value assumed by a mention that has been read
+	 *
+	 * @const int
+	 */
+	const READ = 1;
+
+	/**
+	 * Value assumed by a mention that has been deleted
+	 *
+	 * @const int
+	 */
+	const DELETED = 2;
+
+	/**
+	 * Value assumed by an unapproved mention
+	 *
+	 * @const int
+	 */
+	const UNAPPROVED = 3;
+
+	/**
 	 * Will hold all available mention types
 	 *
 	 * @var array
@@ -56,10 +84,10 @@ class Mentioning extends AbstractModel
 	public function __construct($db, $validator, $enabled_mentions = '')
 	{
 		$this->_known_status = array(
-			'new' => 0,
-			'read' => 1,
-			'deleted' => 2,
-			'unapproved' => 3,
+			'new' => Mentioning::MNEW,
+			'read' => Mentioning::READ,
+			'deleted' => Mentioning::DELETED,
+			'unapproved' => Mentioning::UNAPPROVED,
 		);
 
 		$this->_validator = $validator;

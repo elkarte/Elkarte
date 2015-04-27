@@ -121,10 +121,10 @@ class Mentions_Controller extends Action_Controller
 	public function __construct($eventManager)
 	{
 		$this->_known_status = array(
-			'new' => 0,
-			'read' => 1,
-			'deleted' => 2,
-			'unapproved' => 3,
+			'new' => Mentioning::MNEW,
+			'read' => Mentioning::READ,
+			'deleted' => Mentioning::DELETED,
+			'unapproved' => Mentioning::UNAPPROVED,
 		);
 
 		$this->_known_sorting = array('id_member_from', 'type', 'log_time');
