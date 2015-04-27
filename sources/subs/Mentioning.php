@@ -142,7 +142,7 @@ class Mentioning extends AbstractModel
 				'uid' => is_array($data['id_member']) ? $data['id_member'] : array($data['id_member']),
 				'type' => $data['type'],
 				'msg' => $data['id_msg'],
-				'status' => isset($data['status']) && in_array($data['status'], $this->_known_status) ? $this->_known_status[$data['status']] : 0,
+				'status' => isset($data['status']) && isset($this->_known_status[$data['status']]) ? $this->_known_status[$data['status']] : 0,
 			);
 
 			if (isset($data['id_member_from']))
@@ -272,7 +272,7 @@ class Mentioning extends AbstractModel
 	 *
 	 * @package Mentions
 	 * @param int|int[] $id_mentions the mention id in the db
-	 * @param int $status status to update, 'new', 'read', 'deleted', 'unapproved'
+	 * @param string $status status to update, 'new', 'read', 'deleted', 'unapproved'
 	 */
 	protected function _changeStatus($id_mentions, $status = 'read')
 	{
