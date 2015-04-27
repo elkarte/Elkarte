@@ -67,6 +67,11 @@ class ValuesContainer implements \ArrayAccess
 		return isset($this->data[$key]);
 	}
 
+	/**
+	 * Assigns a value to a certain offset.
+	 *
+	 * @param mixed|mixed[] $offset
+	 */
 	public function offsetSet($offset, $value)
 	{
 		if (is_null($offset))
@@ -79,16 +84,33 @@ class ValuesContainer implements \ArrayAccess
 		}
 	}
 
+	/**
+	 * Tests if an offeset key is set.
+	 *
+	 * @param string|int $offset
+	 * @return bool
+	 */
 	public function offsetExists($offset)
 	{
 		return isset($this->data[$offset]);
 	}
 
+	/**
+	 * Unsets a certain offeset key.
+	 *
+	 * @param string|int $offset
+	 */
 	public function offsetUnset($offset)
 	{
 		unset($this->data[$offset]);
 	}
 
+	/**
+	 * Returns the value associated to a certain offeset.
+	 *
+	 * @param string|int $offset
+	 * @return mixed|mixed[]
+	 */
 	public function offsetGet($offset)
 	{
 		return isset($this->data[$offset]) ? $this->data[$offset] : null;

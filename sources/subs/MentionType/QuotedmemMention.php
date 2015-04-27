@@ -18,8 +18,10 @@ if (!defined('ELK'))
 
 class Quotedmem_Mention extends Mention_BoardAccess_Abstract
 {
+	/**
+	 * {@inheritdoc }
+	 */
 	protected $_type = 'quotedmem';
-	protected $_actually_mentioned = array();
 
 	/**
 	 * {@inheritdoc }
@@ -39,9 +41,17 @@ class Quotedmem_Mention extends Mention_BoardAccess_Abstract
 			return array();
 	}
 
+	/**
+	 * Listener attached to the prepare_context event of the Display controller
+	 * used to mark a mention as read.
+	 *
+	 * @param int $virtual_msg
+	 * @global $modSettings
+	 * @global $_REQUEST
+	 */
 	public function display_prepare_context($virtual_msg)
 	{
-		global $options, $modSettings;
+		global $modSettings;
 
 		// Mark the mention as read if requested
 		if (isset($_REQUEST['mentionread']) && !empty($virtual_msg))
@@ -51,9 +61,28 @@ class Quotedmem_Mention extends Mention_BoardAccess_Abstract
 		}
 	}
 
+	/**
+	 * Listener attached to the after_save_post event of the Post controller
+	 * @param mixed[] $msgOptions
+	 * @param bool $becomesApproved
+	 * @param mixed[] $posterOptions
+	 */
 	public function post_after_save_post($msgOptions, $becomesApproved, $posterOptions)
 	{
-		$quoted_names = $this->_findQuotedMembers($msgOptions['body']);
+		if ($becomesApproved)
+			$this->_sendNotification($msgOptions['body'], $msgOptions['id'], $posterOptions);
+	}
+
+	/**
+	 * Checks if a message has been quoted and if so notifies the owner
+	 *
+	 * @param string $text The message body
+	 * @param int $msg_id The message id of the post containing the quote
+	 * @param mixed[] $posterOptions
+	 */
+	protected function _sendNotification($text, $msg_id, $posterOptions)
+	{
+		$quoted_names = $this->_findQuotedMembers($text);
 		if (!empty($quoted_names))
 		{
 			require_once(SUBSDIR . '/Members.subs.php');
@@ -65,16 +94,24 @@ class Quotedmem_Mention extends Mention_BoardAccess_Abstract
 			$notifier = \Notifications::getInstance();
 			$notifier->add(new \Notifications_Task(
 				'quotedmem',
-				$msgOptions['id'],
+				$msg_id,
 				$posterOptions['id'],
 				array('id_members' => $members_id, 'notifier_data' => $posterOptions)
 			));
 		}
 	}
 
+	/**
+	 * Finds member names in quote tags present in a passed string.
+	 *
+	 * @param string $text the string to look into for member names
+	 * @return string[] An array of member names
+	 */
 	protected function _findQuotedMembers($text)
 	{
 /*
+The following bbcode is for testing, to be moved to a test when ready.
+
 [quote author=emanuele date=1430141592 link=msg=972]
 [quote author=lele]test[/quote]
 [/quote]
