@@ -25,6 +25,11 @@ class ValuesContainer implements \ArrayAccess
 	 */
 	protected $data = array();
 
+	/**
+	 * Constructor
+	 *
+	 * @param mixed[] $data Any array of data used to initialize the object (optional)
+	 */
 	public function __construct($data = null)
 	{
 		if ($data !== null)

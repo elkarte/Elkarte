@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Interface for mentions objects
+ * Handles mentioning of buddies
  *
  * @name      ElkArte Forum
  * @copyright ElkArte Forum contributors
@@ -18,6 +18,9 @@ if (!defined('ELK'))
 
 class Buddy_Mention extends Mention_Message_Abstract
 {
+	/**
+	 * {@inheritdoc }
+	 */
 	protected $_type = 'buddy';
 
 	/**

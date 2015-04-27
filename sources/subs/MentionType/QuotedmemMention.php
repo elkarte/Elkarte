@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Interface for mentions objects
+ * Handles mentionf of members whose messages has been quoted.
  *
  * @name      ElkArte Forum
  * @copyright ElkArte Forum contributors
@@ -62,7 +62,8 @@ class Quotedmem_Mention extends Mention_BoardAccess_Abstract
 	}
 
 	/**
-	 * Listener attached to the after_save_post event of the Post controller
+	 * Listener attached to the after_save_post event of the Post controller.
+	 *
 	 * @param mixed[] $msgOptions
 	 * @param bool $becomesApproved
 	 * @param mixed[] $posterOptions
@@ -135,8 +136,7 @@ The following bbcode is for testing, to be moved to a test when ready.
 		{
 			$quoted = array();
 			$blocks = preg_split('~\[quote~', $text);
-			echo '<pre>';
-			print_r($blocks);
+
 			$skip_next = false;
 			foreach ($blocks as $block)
 			{

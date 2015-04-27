@@ -1,8 +1,8 @@
 <?php
 
 /**
- * Class that centrilize the "notification" process.
- * ... or at least tries to.
+ * This is a notification task, by default a container that may act like
+ * an array (through ArrayAccess), with some ad-hoc methods.
  *
  * @name      ElkArte Forum
  * @copyright ElkArte Forum contributors

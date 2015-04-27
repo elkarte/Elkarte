@@ -1,7 +1,7 @@
 <?php
 
 /**
- * This just provides a common way to replace the mention message
+ * Common methods shared by any type of mention so far.
  *
  * @name      ElkArte Forum
  * @copyright ElkArte Forum contributors
@@ -86,6 +86,13 @@ abstract class Mention_Message_Abstract implements Mention_Type_Interface
 		return null;
 	}
 
+	/**
+	 * Does the replacement of some placeholders with the corresponding
+	 * text/link/url.
+	 *
+	 * @param string $row A text string on which replacements are done
+	 * @return string the input string with the placeholders replaced
+	 */
 	protected function _replaceMsg($row)
 	{
 		global $txt, $scripturl, $context;
@@ -104,6 +111,18 @@ abstract class Mention_Message_Abstract implements Mention_Type_Interface
 			$txt['mention_' . $row['mention_type']]);
 	}
 
+	/**
+	 * Does the replacement of some placeholders with the corresponding
+	 * text/link/url.
+	 *
+	 * @param string $template An email template to load
+	 * @param string[] $keys Pair values to match the $txt indexes to subject and body
+	 * @param int[] $members
+	 * @param \Notifications_Task $task
+	 * @param string[] $lang_files Language files to load (optional)
+	 * @param string[] $replacements Additional replacements for the loadEmailTemplate function (optional)
+	 * @return mixed[]
+	 */
 	protected function _getNotificationStrings($template, $keys, $members, \Notifications_Task $task, $lang_files = array(), $replacements = array())
 	{
 		$members_data = $task->getMembersData();
@@ -140,6 +159,17 @@ abstract class Mention_Message_Abstract implements Mention_Type_Interface
 		return $return;
 	}
 
+	/**
+	 * Retrieves the strings from the $txt variable.
+	 *
+	 * @param string $template An email template to load
+	 * @param string[] $keys Pair values to match the $txt indexes to subject and body
+	 * @param int[] $users
+	 * @param mixed[] $users_data Should at least contain the lngfile index
+	 * @param string[] $lang_files Language files to load (optional)
+	 * @param string[] $replacements Additional replacements for the loadEmailTemplate function (optional)
+	 * @return mixed[]
+	 */
 	protected function _loadStringsByTemplate($template, $keys, $users, $users_data, $lang_files = array(), $replacements = array())
 	{
 		global $user_info;
