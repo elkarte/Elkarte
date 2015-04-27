@@ -152,7 +152,7 @@ class Mentionmem_Mention extends Mention_BoardAccess_Abstract
 				'mentionmem',
 				$msgOptions['id'],
 				$posterOptions['id'],
-				array('id_members' => $this->_actually_mentioned, 'notifier_data' => $posterOptions)
+				array('id_members' => $this->_actually_mentioned, 'notifier_data' => $posterOptions, 'status' => $becomesApproved ? 'new' : 'unapproved')
 			));
 		}
 	}
