@@ -25,6 +25,20 @@ class Notifications extends AbstractModel
 	protected static $_instance;
 
 	/**
+	 * List of notifications to send
+	 *
+	 * @var \Notifications_Task
+	 */
+	protected $_to_send;
+
+	/**
+	 * Available notification frequencies
+	 *
+	 * @var string[]
+	 */
+	protected $_notification_frequencies;
+
+	/**
 	 * We hax a new notification to send out!
 	 *
 	 * @param \Notifications_Task $task
@@ -94,12 +108,12 @@ class Notifications extends AbstractModel
 	/**
 	 * Inserts a new mention in the database (those that appear in the mentions area).
 	 *
-	 * @param \ElkArta\sources\subs\Mention_Type $task
+	 * @param \ElkArte\sources\subs\MentionType\Mention_Type_Interface $task
 	 * @param \Notifications_Task $task
 	 * @param mixed[] $bodies
 	 * @global $modSettings - Not sure if actually necessary
 	 */
-	protected function _send_notification(\ElkArta\sources\subs\Mention_Type $obj, \Notifications_Task $task, $bodies)
+	protected function _send_notification(\ElkArte\sources\subs\MentionType\Mention_Type_Interface $obj, \Notifications_Task $task, $bodies)
 	{
 		global $modSettings;
 
@@ -120,7 +134,7 @@ class Notifications extends AbstractModel
 	/**
 	 * Sends an immediate email notification.
 	 *
-	 * @param \ElkArta\sources\subs\Mention_Type $task
+	 * @param \ElkArte\sources\subs\MentionType\Mention_Type_Interface $task
 	 * @param \Notifications_Task $task
 	 * @param mixed[] $bodies
 	 */
@@ -136,7 +150,7 @@ class Notifications extends AbstractModel
 	/**
 	 * Stores data in the database to send a daily digest.
 	 *
-	 * @param \ElkArta\sources\subs\Mention_Type $task
+	 * @param \ElkArte\sources\subs\MentionType\Mention_Type_Interface $task
 	 * @param \Notifications_Task $task
 	 * @param mixed[] $bodies
 	 */
@@ -157,7 +171,7 @@ class Notifications extends AbstractModel
 	/**
 	 * Stores data in the database to send a weekly digest.
 	 *
-	 * @param \ElkArta\sources\subs\Mention_Type $task
+	 * @param \ElkArte\sources\subs\MentionType\Mention_Type_Interface $task
 	 * @param \Notifications_Task $task
 	 * @param mixed[] $bodies
 	 */
