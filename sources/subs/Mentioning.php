@@ -61,7 +61,7 @@ class Mentioning extends AbstractModel
 	/**
 	 * Start things up, what else does a constructor do
 	 */
-	public function __construct($db, $enabled_mentions = '')
+	public function __construct($db, $validator, $enabled_mentions = '')
 	{
 		$this->_known_status = array(
 			'new' => 0,
@@ -69,6 +69,8 @@ class Mentioning extends AbstractModel
 			'deleted' => 2,
 			'unapproved' => 3,
 		);
+
+		$this->_validator = $validator;
 
 		$this->_known_mentions = array_filter(array_unique(explode(',', $enabled_mentions)));
 
@@ -180,9 +182,6 @@ class Mentioning extends AbstractModel
 	 */
 	protected function _getAccessible($mention_ids, $action)
 	{
-		if ($this->_validator === null)
-			$this->_validator = new Data_Validator();
-
 		$sanitization = array(
 			'id_mention' => 'intval',
 			'mark' => 'trim',
@@ -210,9 +209,6 @@ class Mentioning extends AbstractModel
 	 */
 	protected function _isValid()
 	{
-		if ($this->_validator === null)
-			$this->_validator = new Data_Validator();
-
 		$sanitization = array(
 			'type' => 'trim',
 			'msg' => 'intval',

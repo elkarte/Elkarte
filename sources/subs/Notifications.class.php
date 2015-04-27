@@ -83,7 +83,7 @@ class Notifications extends AbstractModel
 	{
 		global $modSettings;
 
-		$mentioning = new Mentioning($this->_db, $modSettings['enabled_mentions']);
+		$mentioning = new Mentioning($this->_db, new Data_Validator(), $modSettings['enabled_mentions']);
 		foreach ($bodies as $body)
 		{
 			$mentioning->create($obj, array(
