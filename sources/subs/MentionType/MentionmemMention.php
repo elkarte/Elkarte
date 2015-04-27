@@ -43,12 +43,12 @@ class Mentionmem_Mention extends Mention_BoardAccess_Abstract
 
 	public function display_prepare_context($virtual_msg)
 	{
-		global $options;
+		global $options, $modSettings;
 
 		// Mark the mention as read if requested
 		if (isset($_REQUEST['mentionread']) && !empty($virtual_msg))
 		{
-			$mentions = new Mentioning(database());
+			$mentions = new Mentioning(database(), new Data_Validator(), $modSettings['enabled_mentions']);
 			$mentions->markread((int) $_REQUEST['item']);
 		}
 
