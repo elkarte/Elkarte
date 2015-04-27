@@ -1094,7 +1094,7 @@ class Post_Controller extends Action_Controller
 			}
 		}
 
-		$this->_events->trigger('after_save_post', array('board' => $board, 'topic' => $topic, 'msgOptions' => $msgOptions, 'topicOptions' => $topicOptions, 'becomesApproved' => $becomesApproved));
+		$this->_events->trigger('after_save_post', array('board' => $board, 'topic' => $topic, 'msgOptions' => $msgOptions, 'topicOptions' => $topicOptions, 'becomesApproved' => $becomesApproved, 'posterOptions' => $posterOptions));
 
 		// Marking boards as read.
 		// (You just posted and they will be unread.)
