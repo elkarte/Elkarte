@@ -52,7 +52,7 @@ class Rlikemsg_Mention extends Mention_BoardAccess_Abstract
 	 * @param int[] $members_to an array of ids of the members mentioned
 	 * @param int $target the id of the target involved in the mention
 	 * @param string|null $time optional value to set the time of the mention, defaults to now
-	 * @param int $status status to change the mention to, if no notification,
+	 * @param int|null $status status to change the mention to, if no notification,
 	 *             - default is to set it as read (status = 1)
 	 * @param bool|null $is_accessible optional if the mention is accessible to the user
 	 */

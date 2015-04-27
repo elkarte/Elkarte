@@ -28,14 +28,14 @@ abstract class Mention_Message_Abstract implements Mention_Type_Interface
 	/**
 	 * The database object
 	 *
-	 * @var Database
+	 * @var \Database
 	 */
 	protected $_db = null;
 
 	/**
 	 * The Notifications_Task in use
 	 *
-	 * @var Notifications_Task
+	 * @var \Notifications_Task
 	 */
 	protected $_task = null;
 
@@ -203,7 +203,7 @@ abstract class Mention_Message_Abstract implements Mention_Type_Interface
 	/**
 	 * {@inheritdoc }
 	 */
-	public function setDb($db)
+	public function setDb(\Database $db)
 	{
 		$this->_db = $db;
 	}
