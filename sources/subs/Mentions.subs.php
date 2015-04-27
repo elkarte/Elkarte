@@ -382,7 +382,6 @@ function toggleMentionsAccessibility($mentions, $access)
  * @param string $field
  * @param mixed[] $input
  * @param string|null $validation_parameters
- * @deprecated since 1.1 - use Mentioning::validate_ownmention() instead
  */
 function validate_ownmention($field, $input, $validation_parameters = null)
 {

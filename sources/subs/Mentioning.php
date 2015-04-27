@@ -153,7 +153,7 @@ class Mentioning extends AbstractModel
 	public function updateStatus($items, $mark)
 	{
 		// Make sure its all good
-		$own_id = $this->_getAccessible($items, $mark);
+		$own_id = $this->_getAccessible((array) $items, $mark);
 
 		if (!empty($own_id))
 		{
@@ -182,12 +182,13 @@ class Mentioning extends AbstractModel
 	 */
 	protected function _getAccessible($mention_ids, $action)
 	{
+		require_once(SUBSDIR . '/Mentions.subs.php');
 		$sanitization = array(
 			'id_mention' => 'intval',
 			'mark' => 'trim',
 		);
 		$validation = array(
-			'id_mention' => 'Mentioning::validate_ownmention',
+			'id_mention' => 'validate_ownmention',
 			'mark' => 'contains[read,unread,delete,readall]',
 		);
 
@@ -273,34 +274,6 @@ class Mentioning extends AbstractModel
 			$this->_updateMenuCount($this->_known_status[$status], $user_info['id']);
 
 		return $success;
-	}
-
-	/**
-	 * To validate access to read/unread/delete mentions
-	 *
-	 * - Called from the validation class
-	 *
-	 * @package Mentions
-	 * @param string $field
-	 * @param mixed[] $input
-	 * @param string|null $validation_parameters
-	 */
-	public static function validate_ownmention($field, $input, $validation_parameters = null)
-	{
-		global $user_info;
-
-		if (!isset($input[$field]))
-			return;
-
-		if (!findMemberMention($input[$field], $user_info['id']))
-		{
-			return array(
-				'field' => $field,
-				'input' => $input[$field],
-				'function' => __FUNCTION__,
-				'param' => $validation_parameters
-			);
-		}
 	}
 
 	/**
