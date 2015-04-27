@@ -1071,6 +1071,21 @@ $txt['notify_mentionmem_digest'] = 'You have been mentioned in the followin mess
 $txt['notify_mentionmem_snippet'] = '{MSGLINK}';
 
 /**
+	@additional_params: notify_quotedmem
+		ACTIONNAME:  The user name of the member that quoted someone's message.
+		MSGLINK:  The url to the message where someone has been quoted.
+	@description: A notification email sent to the members quoted in someone else message
+*/
+$txt['notify_quotedmem_subject'] = 'A message has been quoted';
+$txt['notify_quotedmem_body'] = '{REALNAME},
+
+this email is to to inform you that {ACTIONNAME} has just quoted one of your messages in {MSGLINK} at {FORUMNAME}.
+
+{REGARDS}';
+$txt['notify_quotedmem_digest'] = 'Your messages have been quoted in:';
+$txt['notify_quotedmem_snippet'] = '{MSGLINK}';
+
+/**
 	@additional_params: happy_birthday
 		REALNAME: The real (display) name of the person receiving the birthday message.
 	@description: A message sent to members on their birthday.
