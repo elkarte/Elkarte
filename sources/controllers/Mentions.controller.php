@@ -41,6 +41,7 @@ class Mentions_Controller extends Action_Controller
 	 * Holds the instance of the data validation class
 	 *
 	 * @var object
+	 * @deprecated since 1.1
 	 */
 	protected $_validator = null;
 
@@ -48,16 +49,9 @@ class Mentions_Controller extends Action_Controller
 	 * Holds the passed data for this instance, is passed through the validator
 	 *
 	 * @var array
+	 * @deprecated since 1.1
 	 */
 	protected $_data = null;
-
-	/**
-	 * A set of functions that will be called passing the mentions retrieved from the db
-	 * Are originally stored in $_known_mentions
-	 *
-	 * @var array
-	 */
-	protected $_callbacks = array();
 
 	/**
 	 * The type of the mention we are looking at (if empty means all of them)
@@ -132,6 +126,12 @@ class Mentions_Controller extends Action_Controller
 		parent::__construct($eventManager);
 	}
 
+	/**
+	 * Determines the enabled mention types.
+	 *
+	 * @global $modSettings
+	 * @return string[]
+	 */
 	protected function _findMentionTypes()
 	{
 		global $modSettings;
@@ -153,6 +153,7 @@ class Mentions_Controller extends Action_Controller
 
 		Elk_Autoloader::getInstance()->register(SUBSDIR . '/MentionType', '\\ElkArte\\sources\\subs\\MentionType');
 
+		// @deprecated since 1.1
 		$this->_data = array(
 			'type' => isset($_REQUEST['type']) ? $_REQUEST['type'] : null,
 			'uid' => isset($_REQUEST['uid']) ? $_REQUEST['uid'] : null,
@@ -393,6 +394,11 @@ class Mentions_Controller extends Action_Controller
 		return $mentions;
 	}
 
+	/**
+	 * Register the listeners for a mention type or for all the mentions.
+	 *
+	 * @param string|string[] $type
+	 */
 	protected function _registerEvents($type)
 	{
 		if (!empty($type))
