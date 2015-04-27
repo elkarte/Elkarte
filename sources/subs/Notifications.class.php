@@ -97,16 +97,16 @@ class Notifications extends AbstractModel
 		}
 	}
 
-	protected function _send_email($task, $bodies)
+	protected function _send_email($obj, $task, $bodies)
 	{
-		$last_id = $task->getLastId();
+		$last_id = $obj->getLastId();
 		foreach ($bodies as $body)
 		{
 			sendmail($body['email_address'], $body['subject'], $body['body'], null, $last_id);
 		}
 	}
 
-	protected function _send_daily_email($task, $bodies)
+	protected function _send_daily_email($obj, $task, $bodies)
 	{
 		foreach ($bodies as $body)
 		{
@@ -120,7 +120,7 @@ class Notifications extends AbstractModel
 		}
 	}
 
-	protected function _send_weekly_email($task, $bodies)
+	protected function _send_weekly_email($obj, $task, $bodies)
 	{
 		foreach ($bodies as $body)
 		{
