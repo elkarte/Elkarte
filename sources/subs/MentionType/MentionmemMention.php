@@ -83,7 +83,6 @@ class Mentionmem_Mention extends Mention_BoardAccess_Abstract
 
 	public function post_before_save_post()
 	{
-
 		if (!empty($_REQUEST['uid']))
 		{
 			$query_params = array(
