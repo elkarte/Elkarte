@@ -24,18 +24,25 @@ class Notifications extends AbstractModel
 	 */
 	protected static $_instance;
 
-	protected $_sending_type = 0;
-
+	/**
+	 * We hax a new notification to send out!
+	 *
+	 * @param \Notifications_Task $task
+	 */
 	public function add(\Notifications_Task $task)
 	{
 		$this->_to_send[] = $task;
 	}
 
+	/**
+	 * Time to notify our beloved members! YAY!
+	 */
 	public function send()
 	{
 		Elk_Autoloader::getInstance()->register(SUBSDIR . '/MentionType', '\\ElkArte\\sources\\subs\\MentionType');
 
 		$this->_notification_frequencies = array(
+			// 0 is for no notifications, so we start from 1 the counting, that saves a +1 later
 			1 => 'notification',
 			'email',
 			'email_daily',
@@ -51,7 +58,12 @@ class Notifications extends AbstractModel
 		$this->_to_send = array();
 	}
 
-	protected function _send_task($task)
+	/**
+	 * Process a certain task in order to send out the notifications.
+	 *
+	 * @param \Notifications_Task $task
+	 */
+	protected function _send_task(\Notifications_Task $task)
 	{
 		$class = $task->getClass();
 		$obj = new $class($this->_db);
@@ -79,7 +91,15 @@ class Notifications extends AbstractModel
 		}
 	}
 
-	protected function _send_notification($obj, $task, $bodies)
+	/**
+	 * Inserts a new mention in the database (those that appear in the mentions area).
+	 *
+	 * @param \ElkArta\sources\subs\Mention_Type $task
+	 * @param \Notifications_Task $task
+	 * @param mixed[] $bodies
+	 * @global $modSettings - Not sure if actually necessary
+	 */
+	protected function _send_notification(\ElkArta\sources\subs\Mention_Type $obj, \Notifications_Task $task, $bodies)
 	{
 		global $modSettings;
 
@@ -97,6 +117,13 @@ class Notifications extends AbstractModel
 		}
 	}
 
+	/**
+	 * Sends an immediate email notification.
+	 *
+	 * @param \ElkArta\sources\subs\Mention_Type $task
+	 * @param \Notifications_Task $task
+	 * @param mixed[] $bodies
+	 */
 	protected function _send_email($obj, $task, $bodies)
 	{
 		$last_id = $obj->getLastId();
@@ -106,6 +133,13 @@ class Notifications extends AbstractModel
 		}
 	}
 
+	/**
+	 * Stores data in the database to send a daily digest.
+	 *
+	 * @param \ElkArta\sources\subs\Mention_Type $task
+	 * @param \Notifications_Task $task
+	 * @param mixed[] $bodies
+	 */
 	protected function _send_daily_email($obj, $task, $bodies)
 	{
 		foreach ($bodies as $body)
@@ -120,6 +154,13 @@ class Notifications extends AbstractModel
 		}
 	}
 
+	/**
+	 * Stores data in the database to send a weekly digest.
+	 *
+	 * @param \ElkArta\sources\subs\Mention_Type $task
+	 * @param \Notifications_Task $task
+	 * @param mixed[] $bodies
+	 */
 	protected function _send_weekly_email($obj, $task, $bodies)
 	{
 		foreach ($bodies as $body)
@@ -134,6 +175,11 @@ class Notifications extends AbstractModel
 		}
 	}
 
+	/**
+	 * Do the insert into the database for daily and weekly digests.
+	 *
+	 * @param mixed[] $insert_array
+	 */
 	protected function _insert_delayed($insert_array)
 	{
 		$this->_db->insert('ignore',
@@ -150,6 +196,13 @@ class Notifications extends AbstractModel
 		);
 	}
 
+	/**
+	 * Loads from the database the notification preferences for a certain type
+	 * of mention for a bunch of members.
+	 *
+	 * @param string $notification_type
+	 * @param int[] $members
+	 */
 	protected function _getNotificationPreferences($notification_type, $members)
 	{
 		$query_members = $members;
