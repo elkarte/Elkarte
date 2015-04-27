@@ -432,6 +432,7 @@ class Mentions_Controller extends Action_Controller
 
 	/**
 	 * Politley remove a mention when a post like is taken back
+	 * @deprecated since 1.1 - Use Notifications::create instead
 	 */
 	public function action_rlike()
 	{
@@ -454,6 +455,7 @@ class Mentions_Controller extends Action_Controller
 	 * Sets the specifics of a mention call in this instance
 	 *
 	 * @param mixed[] $data must contain uid, type and msg at a minimum
+	 * @deprecated since 1.1
 	 */
 	public function setData($data)
 	{
@@ -480,6 +482,7 @@ class Mentions_Controller extends Action_Controller
 	 * Did you read the mention? Then let's move it to the graveyard.
 	 * Used in Display.controller.php, it may be merged to action_updatestatus
 	 * though that would require to add an optional parameter to avoid the redirect
+	 * @deprecated since 1.1 - Use Mentioning::markread instead
 	 */
 	public function action_markread()
 	{
@@ -496,6 +499,7 @@ class Mentions_Controller extends Action_Controller
 
 	/**
 	 * Updating the status from the listing?
+	 * @deprecated since 1.1 - Use Mentioning::updateStatus instead
 	 */
 	public function action_updatestatus()
 	{
@@ -537,6 +541,7 @@ class Mentions_Controller extends Action_Controller
 	 *
 	 * @param int[] $mention_ids An array of mention ids. Each of them will be
 	 *              validated independently
+	 * @deprecated since 1.1
 	 */
 	protected function _markMentionsRead($mention_ids)
 	{
@@ -570,6 +575,7 @@ class Mentions_Controller extends Action_Controller
 
 	/**
 	 * Check if the user can access the mention
+	 * @deprecated since 1.1
 	 */
 	protected function _isAccessible()
 	{
@@ -593,6 +599,7 @@ class Mentions_Controller extends Action_Controller
 
 	/**
 	 * Check if the user can do what he is supposed to do, and validates the input
+	 * @deprecated since 1.1
 	 */
 	protected function _isValid()
 	{
