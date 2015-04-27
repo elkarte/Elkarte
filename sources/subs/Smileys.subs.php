@@ -204,7 +204,7 @@ function getSmiley($id)
 		)
 	);
 	if ($db->num_rows($request) != 1)
-		Errors::fatal_lang_error('smiley_not_found');
+		Errors::instance()->fatal_lang_error('smiley_not_found');
 	$current_smiley = $db->fetch_assoc($request);
 	$db->free_result($request);
 

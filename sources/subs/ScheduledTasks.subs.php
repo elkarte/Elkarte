@@ -340,7 +340,7 @@ function loadTaskDetails($id_task)
 	);
 	// Should never, ever, happen!
 	if ($db->num_rows($request) == 0)
-		Errors::fatal_lang_error('no_access', false);
+		Errors::instance()->fatal_lang_error('no_access', false);
 	while ($row = $db->fetch_assoc($request))
 	{
 		$task = array(

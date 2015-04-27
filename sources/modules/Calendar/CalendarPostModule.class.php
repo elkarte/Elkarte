@@ -195,17 +195,17 @@ class Calendar_Post_Module
 
 			// Make sure the year and month are in the valid range.
 			if ($context['event']['month'] < 1 || $context['event']['month'] > 12)
-				Errors::fatal_lang_error('invalid_month', false);
+				Errors::instance()->fatal_lang_error('invalid_month', false);
 
 			if ($context['event']['year'] < $modSettings['cal_minyear'] || $context['event']['year'] > $modSettings['cal_maxyear'])
-				Errors::fatal_lang_error('invalid_year', false);
+				Errors::instance()->fatal_lang_error('invalid_year', false);
 
 			// Get a list of boards they can post in.
 			require_once(SUBSDIR . '/Boards.subs.php');
 
 			$boards = boardsAllowedTo('post_new');
 			if (empty($boards))
-				Errors::fatal_lang_error('cannot_post_new', 'user');
+				Errors::instance()->fatal_lang_error('cannot_post_new', 'user');
 
 			// Load a list of boards for this event in the context.
 			$boardListOptions = array(

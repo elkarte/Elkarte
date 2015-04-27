@@ -47,15 +47,15 @@ class OpenID_Controller extends Action_Controller
 
 		// Is OpenID even enabled?
 		if (empty($modSettings['enableOpenID']))
-			Errors::fatal_lang_error('no_access', false);
+			Errors::instance()->fatal_lang_error('no_access', false);
 
 		// The OpenID provider did not respond with the OpenID mode? Throw an error..
 		if (!isset($_GET['openid_mode']))
-			Errors::fatal_lang_error('openid_return_no_mode', false);
+			Errors::instance()->fatal_lang_error('openid_return_no_mode', false);
 
 		// @todo Check for error status!
 		if ($_GET['openid_mode'] != 'id_res')
-			Errors::fatal_lang_error('openid_not_resolved');
+			Errors::instance()->fatal_lang_error('openid_not_resolved');
 
 		// this has annoying habit of removing the + from the base64 encoding.  So lets put them back.
 		foreach (array('openid_assoc_handle', 'openid_invalidate_handle', 'openid_sig', 'sf') as $key)
@@ -74,20 +74,20 @@ class OpenID_Controller extends Action_Controller
 		// Get the association data.
 		$assoc = $openID->getAssociation($server_info['server'], $_GET['openid_assoc_handle'], true);
 		if ($assoc === null)
-			Errors::fatal_lang_error('openid_no_assoc');
+			Errors::instance()->fatal_lang_error('openid_no_assoc');
 
 		// Verify the OpenID signature.
 		if (!$this->_verify_string($assoc['secret']))
-			Errors::fatal_lang_error('openid_sig_invalid', 'critical');
+			Errors::instance()->fatal_lang_error('openid_sig_invalid', 'critical');
 
 		if (!isset($_SESSION['openid']['saved_data'][$_GET['t']]))
-			Errors::fatal_lang_error('openid_load_data');
+			Errors::instance()->fatal_lang_error('openid_load_data');
 
 		$openid_uri = $_SESSION['openid']['saved_data'][$_GET['t']]['openid_uri'];
 		$modSettings['cookieTime'] = $_SESSION['openid']['saved_data'][$_GET['t']]['cookieTime'];
 
 		if (empty($openid_uri))
-			Errors::fatal_lang_error('openid_load_data');
+			Errors::instance()->fatal_lang_error('openid_load_data');
 
 		// Any save fields to restore?
 		$openid_save_fields = isset($_GET['sf']) ? unserialize(base64_decode($_GET['sf'])) : array();

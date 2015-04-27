@@ -60,7 +60,7 @@ class Calendar_Controller extends Action_Controller
 
 		// You can't do anything if the calendar is off.
 		if (empty($modSettings['cal_enabled']))
-			Errors::fatal_lang_error('calendar_off', false);
+			Errors::instance()->fatal_lang_error('calendar_off', false);
 
 		// Set the page title to mention the calendar ;).
 		$context['page_title'] = $txt['calendar'];
@@ -86,16 +86,16 @@ class Calendar_Controller extends Action_Controller
 
 		// Make sure the year and month are in valid ranges.
 		if ($curPage['month'] < 1 || $curPage['month'] > 12)
-			Errors::fatal_lang_error('invalid_month', false);
+			Errors::instance()->fatal_lang_error('invalid_month', false);
 
 		if ($curPage['year'] < $modSettings['cal_minyear'] || $curPage['year'] > $modSettings['cal_maxyear'])
-			Errors::fatal_lang_error('invalid_year', false);
+			Errors::instance()->fatal_lang_error('invalid_year', false);
 
 		// If we have a day clean that too.
 		if ($context['view_week'])
 		{
 			if ($curPage['day'] > 31 || !mktime(0, 0, 0, $curPage['month'], $curPage['day'], $curPage['year']))
-				Errors::fatal_lang_error('invalid_day', false);
+				Errors::instance()->fatal_lang_error('invalid_day', false);
 		}
 
 		// Load all the context information needed to show the calendar grid.
@@ -216,7 +216,7 @@ class Calendar_Controller extends Action_Controller
 			// Get list of boards that can be posted in.
 			$boards = boardsAllowedTo('post_new');
 			if (empty($boards))
-				Errors::fatal_lang_error('cannot_post_new', 'permission');
+				Errors::instance()->fatal_lang_error('cannot_post_new', 'permission');
 
 			// Load the list of boards and categories in the context.
 			require_once(SUBSDIR . '/Boards.subs.php');
@@ -332,11 +332,11 @@ class Calendar_Controller extends Action_Controller
 
 		// You can't export if the calendar export feature is off.
 		if (empty($modSettings['cal_export']))
-			Errors::fatal_lang_error('calendar_export_off', false);
+			Errors::instance()->fatal_lang_error('calendar_export_off', false);
 
 		// Goes without saying that this is required.
 		if (!isset($_REQUEST['eventid']))
-			Errors::fatal_lang_error('no_access', false);
+			Errors::instance()->fatal_lang_error('no_access', false);
 
 		// This is kinda wanted.
 		require_once(SUBSDIR . '/Calendar.subs.php');
@@ -345,7 +345,7 @@ class Calendar_Controller extends Action_Controller
 		$event = getEventProperties($_REQUEST['eventid']);
 
 		if ($event === false)
-			Errors::fatal_lang_error('no_access', false);
+			Errors::instance()->fatal_lang_error('no_access', false);
 
 		$filecontents = build_ical_content($event);
 

@@ -1051,7 +1051,7 @@ class ManageFeatures_Controller extends Action_Controller
 
 				// Still not a unique column name? Leave it up to the user, then.
 				if (!$unique)
-					Errors::fatal_lang_error('custom_option_not_unique');
+					Errors::instance()->fatal_lang_error('custom_option_not_unique');
 			}
 			// Work out what to do with the user data otherwise...
 			else

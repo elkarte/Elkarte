@@ -280,7 +280,7 @@ class ManageServer_Controller extends Action_Controller
 				unset($this->_req->post->globalCookies);
 
 			if (!empty($this->_req->post->globalCookiesDomain) && strpos($boardurl, $this->_req->post->globalCookiesDomain) === false)
-				Errors::fatal_lang_error('invalid_cookie_domain', false);
+				Errors::instance()->fatal_lang_error('invalid_cookie_domain', false);
 
 			//Settings_Form::save_db($config_vars);
 			$this->_cookieSettingsForm->save();

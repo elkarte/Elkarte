@@ -804,7 +804,7 @@ function getPollStarter($id_topic)
 		)
 	);
 	if ($db->num_rows($request) == 0)
-		Errors::fatal_lang_error('no_board');
+		Errors::instance()->fatal_lang_error('no_board');
 	$bcinfo = $db->fetch_assoc($request);
 	$db->free_result($request);
 

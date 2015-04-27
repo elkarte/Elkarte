@@ -66,7 +66,7 @@ class ProfileAccount_Controller extends Action_Controller
 
 		// Doesn't hurt to be overly cautious.
 		if (empty($modSettings['warning_enable']) || ($context['user']['is_owner'] && !$cur_profile['warning']) || !allowedTo('issue_warning'))
-			Errors::fatal_lang_error('no_access', false);
+			Errors::instance()->fatal_lang_error('no_access', false);
 
 		// Get the base (errors related) stuff done.
 		loadLanguage('Errors');
@@ -435,7 +435,7 @@ class ProfileAccount_Controller extends Action_Controller
 
 		// Check we got here as we should have!
 		if ($cur_profile != $user_profile[$memID])
-			Errors::fatal_lang_error('no_access', false);
+			Errors::instance()->fatal_lang_error('no_access', false);
 
 		$old_profile = &$cur_profile;
 
@@ -451,7 +451,7 @@ class ProfileAccount_Controller extends Action_Controller
 			$another = isAnotherAdmin($memID);
 
 			if (empty($another))
-				Errors::fatal_lang_error('at_least_one_admin', 'critical');
+				Errors::instance()->fatal_lang_error('at_least_one_admin', 'critical');
 		}
 
 		// Do you have permission to delete others profiles, or is that your profile you wanna delete?

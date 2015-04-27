@@ -120,7 +120,7 @@ class News_Controller extends Action_Controller
 			// Either the board specified doesn't exist or you have no access.
 			$num_boards = count($boards_data);
 			if ($num_boards == 0)
-				Errors::fatal_lang_error('no_board');
+				Errors::instance()->fatal_lang_error('no_board');
 
 			$total_posts = 0;
 			$boards = array_keys($boards_data);

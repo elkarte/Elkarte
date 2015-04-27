@@ -78,11 +78,11 @@ class Unread_Controller extends Action_Controller
 			$context['page_title'] = $txt['unread_replies'];
 
 		if ($context['showing_all_topics'] && !empty($modSettings['loadavg_allunread']) && $modSettings['current_load'] >= $modSettings['loadavg_allunread'])
-			Errors::fatal_lang_error('loadavg_allunread_disabled', false);
+			Errors::instance()->fatal_lang_error('loadavg_allunread_disabled', false);
 		elseif ($this->_action_unreadreplies && !empty($modSettings['loadavg_unreadreplies']) && $modSettings['current_load'] >= $modSettings['loadavg_unreadreplies'])
-			Errors::fatal_lang_error('loadavg_unreadreplies_disabled', false);
+			Errors::instance()->fatal_lang_error('loadavg_unreadreplies_disabled', false);
 		elseif (!$context['showing_all_topics'] && $this->_action_unread && !empty($modSettings['loadavg_unread']) && $modSettings['current_load'] >= $modSettings['loadavg_unread'])
-			Errors::fatal_lang_error('loadavg_unread_disabled', false);
+			Errors::instance()->fatal_lang_error('loadavg_unread_disabled', false);
 
 		// Are we specifying any specific board?
 		$this->_wanted_boards();
@@ -306,7 +306,7 @@ class Unread_Controller extends Action_Controller
 		}
 
 		if (empty($this->_boards))
-			Errors::fatal_lang_error('error_no_boards_selected');
+			Errors::instance()->fatal_lang_error('error_no_boards_selected');
 
 		$this->_grabber->setBoards($this->_boards);
 	}

@@ -87,7 +87,7 @@ class Reminder_Controller extends Action_Controller
 
 		// You must enter a username/email address.
 		if (empty($where))
-			Errors::fatal_lang_error('username_no_exist', false);
+			Errors::instance()->fatal_lang_error('username_no_exist', false);
 
 		// Make sure we are not being slammed
 		// Don't call this if you're coming from the "Choose a reminder type" page - otherwise you'll likely get an error
@@ -103,15 +103,15 @@ class Reminder_Controller extends Action_Controller
 		{
 			// Awaiting approval...
 			if (trim($member['validation_code']) == '')
-				Errors::fatal_error($txt['registration_not_approved'] . ' <a href="' . $scripturl . '?action=activate;user=' . $_POST['user'] . '">' . $txt['here'] . '</a>.', false);
+				Errors::instance()->fatal_error($txt['registration_not_approved'] . ' <a href="' . $scripturl . '?action=activate;user=' . $_POST['user'] . '">' . $txt['here'] . '</a>.', false);
 			else
-				Errors::fatal_error($txt['registration_not_activated'] . ' <a href="' . $scripturl . '?action=activate;user=' . $_POST['user'] . '">' . $txt['here'] . '</a>.', false);
+				Errors::instance()->fatal_error($txt['registration_not_activated'] . ' <a href="' . $scripturl . '?action=activate;user=' . $_POST['user'] . '">' . $txt['here'] . '</a>.', false);
 		}
 
 		// You can't get emailed if you have no email address.
 		$member['email_address'] = trim($member['email_address']);
 		if ($member['email_address'] == '')
-			Errors::fatal_error($txt['no_reminder_email'] . '<br />' . $txt['send_email'] . ' <a href="mailto:' . $webmaster_email . '">webmaster</a> ' . $txt['to_ask_password'] . '.');
+			Errors::instance()->fatal_error($txt['no_reminder_email'] . '<br />' . $txt['send_email'] . ' <a href="mailto:' . $webmaster_email . '">webmaster</a> ' . $txt['to_ask_password'] . '.');
 
 		// If they have no secret question then they can only get emailed the item, or they are requesting the email, send them an email.
 		if (empty($member['secret_question']) || (isset($_POST['reminder_type']) && $_POST['reminder_type'] == 'email'))
@@ -171,7 +171,7 @@ class Reminder_Controller extends Action_Controller
 
 		// You need a code!
 		if (!isset($_REQUEST['code']))
-			Errors::fatal_lang_error('no_access', false);
+			Errors::instance()->fatal_lang_error('no_access', false);
 
 		// Fill the context array.
 		$context += array(
@@ -200,15 +200,15 @@ class Reminder_Controller extends Action_Controller
 		validateToken('remind-sp');
 
 		if (empty($_POST['u']) || !isset($_POST['passwrd1']) || !isset($_POST['passwrd2']))
-			Errors::fatal_lang_error('no_access', false);
+			Errors::instance()->fatal_lang_error('no_access', false);
 
 		$_POST['u'] = (int) $_POST['u'];
 
 		if ($_POST['passwrd1'] != $_POST['passwrd2'])
-			Errors::fatal_lang_error('passwords_dont_match', false);
+			Errors::instance()->fatal_lang_error('passwords_dont_match', false);
 
 		if ($_POST['passwrd1'] == '')
-			Errors::fatal_lang_error('no_password', false);
+			Errors::instance()->fatal_lang_error('no_password', false);
 
 		loadLanguage('Login');
 
@@ -218,7 +218,7 @@ class Reminder_Controller extends Action_Controller
 
 		// Does this user exist at all? Is he activated? Does he have a validation code?
 		if (empty($member) || $member['is_activated'] != 1 || $member['validation_code'] == '')
-			Errors::fatal_lang_error('invalid_userid', false);
+			Errors::instance()->fatal_lang_error('invalid_userid', false);
 
 		// Is the password actually valid?
 		require_once(SUBSDIR . '/Auth.subs.php');
@@ -226,7 +226,7 @@ class Reminder_Controller extends Action_Controller
 
 		// What - it's not?
 		if ($passwordError != null)
-			Errors::fatal_lang_error('profile_error_password_' . $passwordError, false);
+			Errors::instance()->fatal_lang_error('profile_error_password_' . $passwordError, false);
 
 		// Quit if this code is not right.
 		if (empty($_POST['code']) || substr($member['validation_code'], 0, 10) !== substr(md5($_POST['code']), 0, 10))
@@ -234,7 +234,7 @@ class Reminder_Controller extends Action_Controller
 			// Stop brute force attacks like this.
 			validatePasswordFlood($_POST['u'], $member['passwd_flood'], false);
 
-			Errors::fatal_error($txt['invalid_activation_code'], false);
+			Errors::instance()->fatal_error($txt['invalid_activation_code'], false);
 		}
 
 		// Just in case, flood control.
@@ -277,7 +277,7 @@ class Reminder_Controller extends Action_Controller
 
 		// Hacker?  How did you get this far without an email or username?
 		if (empty($_REQUEST['uid']))
-			Errors::fatal_lang_error('username_no_exist', false);
+			Errors::instance()->fatal_lang_error('username_no_exist', false);
 
 		loadLanguage('Login');
 
@@ -285,13 +285,13 @@ class Reminder_Controller extends Action_Controller
 		require_once(SUBSDIR . '/Members.subs.php');
 		$member = getBasicMemberData((int) $_REQUEST['uid'], array('authentication' => true));
 		if (empty($member))
-			Errors::fatal_lang_error('username_no_exist', false);
+			Errors::instance()->fatal_lang_error('username_no_exist', false);
 
 		// Check if the secret answer is correct.
 		if ($member['secret_question'] == '' || $member['secret_answer'] == '' || md5($_POST['secret_answer']) !== $member['secret_answer'])
 		{
-			Errors::log_error(sprintf($txt['reminder_error'], $member['member_name']), 'user');
-			Errors::fatal_lang_error('incorrect_answer', false);
+			Errors::instance()->log_error(sprintf($txt['reminder_error'], $member['member_name']), 'user');
+			Errors::instance()->fatal_lang_error('incorrect_answer', false);
 		}
 
 		// If it's OpenID this is where the music ends.
@@ -304,11 +304,11 @@ class Reminder_Controller extends Action_Controller
 
 		// You can't use a blank one!
 		if (strlen(trim($_POST['passwrd1'])) === 0)
-			Errors::fatal_lang_error('no_password', false);
+			Errors::instance()->fatal_lang_error('no_password', false);
 
 		// They have to be the same too.
 		if ($_POST['passwrd1'] != $_POST['passwrd2'])
-			Errors::fatal_lang_error('passwords_dont_match', false);
+			Errors::instance()->fatal_lang_error('passwords_dont_match', false);
 
 		// Make sure they have a strong enough password.
 		require_once(SUBSDIR . '/Auth.subs.php');
@@ -316,7 +316,7 @@ class Reminder_Controller extends Action_Controller
 
 		// Invalid?
 		if ($passwordError != null)
-			Errors::fatal_lang_error('profile_error_password_' . $passwordError, false);
+			Errors::instance()->fatal_lang_error('profile_error_password_' . $passwordError, false);
 
 		// Alright, so long as 'yer sure.
 		require_once(SUBSDIR . '/Auth.subs.php');
@@ -356,19 +356,19 @@ function secretAnswerInput()
 
 	// Check they entered something...
 	if (empty($_REQUEST['uid']))
-		Errors::fatal_lang_error('username_no_exist', false);
+		Errors::instance()->fatal_lang_error('username_no_exist', false);
 
 	// Get the stuff....
 	require_once(SUBSDIR . '/Members.subs.php');
 	$member = getBasicMemberData((int) $_REQUEST['uid'], array('authentication' => true));
 	if (empty($member))
-		Errors::fatal_lang_error('username_no_exist', false);
+		Errors::instance()->fatal_lang_error('username_no_exist', false);
 
 	$context['account_type'] = !empty($member['openid_uri']) ? 'openid' : 'password';
 
 	// If there is NO secret question - then throw an error.
 	if (trim($member['secret_question']) == '')
-		Errors::fatal_lang_error('registration_no_secret_question', false);
+		Errors::instance()->fatal_lang_error('registration_no_secret_question', false);
 
 	// Ask for the answer...
 	$context['remind_user'] = $member['id_member'];

@@ -74,7 +74,7 @@ abstract class Database_Abstract implements Database
 
 		// Connection gone???  This should *never* happen at this point, yet it does :'(
 		if (!$this->_validConnection($connection))
-			Errors::display_db_error();
+			Errors::instance()->display_db_error();
 
 		if ($matches[1] === 'db_prefix')
 			return $db_prefix;
@@ -260,11 +260,11 @@ abstract class Database_Abstract implements Database
 
 		// Is always a critical error.
 		if (function_exists('log_error'))
-			Errors::log_error($log_message, 'critical', $file, $line);
+			Errors::instance()->log_error($log_message, 'critical', $file, $line);
 
 		if (function_exists('fatal_error'))
 		{
-			Errors::fatal_error($error_message, false);
+			Errors::instance()->fatal_error($error_message, false);
 
 			// Cannot continue...
 			exit;

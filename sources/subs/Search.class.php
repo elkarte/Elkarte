@@ -121,7 +121,7 @@ class Search
 		// Load up the search API we are going to use.
 		$modSettings['search_index'] = empty($modSettings['search_index']) ? 'standard' : $modSettings['search_index'];
 		if (!file_exists(SUBSDIR . '/SearchAPI-' . ucwords($modSettings['search_index']) . '.class.php'))
-			Errors::fatal_lang_error('search_api_missing');
+			Errors::instance()->fatal_lang_error('search_api_missing');
 
 		// Create an instance of the search API and check it is valid for this version of the software.
 		$search_class_name = ucwords($modSettings['search_index']) . '_Search';
@@ -132,7 +132,7 @@ class Search
 		{
 			// Log the error.
 			loadLanguage('Errors');
-			Errors::log_error(sprintf($txt['search_api_not_compatible'], 'SearchAPI-' . ucwords($modSettings['search_index']) . '.class.php'), 'critical');
+			Errors::instance()->log_error(sprintf($txt['search_api_not_compatible'], 'SearchAPI-' . ucwords($modSettings['search_index']) . '.class.php'), 'critical');
 
 			$this->_searchAPI = new Standard_Search();
 		}
@@ -610,7 +610,7 @@ class Search
 			);
 
 			if ($this->_db->num_rows($request) == 0)
-				Errors::fatal_lang_error('topic_gone', false);
+				Errors::instance()->fatal_lang_error('topic_gone', false);
 
 			$this->_search_params['brd'] = array();
 			list ($this->_search_params['brd'][0]) = $this->_db->fetch_row($request);

@@ -1226,7 +1226,7 @@ class Scheduled_Task
 				loadLanguage('Post');
 
 				$context['scheduled_errors']['remove_temp_attachments'][] = $txt['cant_access_upload_path'] . ' (' . $attach_dir . ')';
-				Errors::log_error($txt['cant_access_upload_path'] . ' (' . $attach_dir . ')', 'critical');
+				Errors::instance()->log_error($txt['cant_access_upload_path'] . ' (' . $attach_dir . ')', 'critical');
 
 				return false;
 			}
