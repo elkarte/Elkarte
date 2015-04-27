@@ -1,7 +1,7 @@
 <?php
 
 /**
- * This file contains the post integration of mentions.
+ * This module is attached to the Post action to enable mentions on it.
  *
  * @name      ElkArte Forum
  * @copyright ElkArte Forum contributors
@@ -16,7 +16,10 @@ if (!defined('ELK'))
 
 class Mentions_Post_Module extends Mentions_Module_Abstract
 {
-	public static function hooks($eventsManager)
+	/**
+	 * {@inheritdoc }
+	 */
+	public static function hooks(\Event_Manager $eventsManager)
 	{
 		self::registerHooks('post', $eventsManager);
 
