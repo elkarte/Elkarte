@@ -70,8 +70,8 @@ class Quotedmem_Mention extends Mention_BoardAccess_Abstract
 	 */
 	public function post_after_save_post($msgOptions, $becomesApproved, $posterOptions)
 	{
-		if ($becomesApproved)
-			$this->_sendNotification($msgOptions['body'], $msgOptions['id'], $posterOptions);
+		$status = $becomesApproved ? 'new' : 'unapproved';
+		$this->_sendNotification($msgOptions['body'], $msgOptions['id'], $status, $posterOptions);
 	}
 
 	/**
@@ -81,7 +81,7 @@ class Quotedmem_Mention extends Mention_BoardAccess_Abstract
 	 * @param int $msg_id The message id of the post containing the quote
 	 * @param mixed[] $posterOptions
 	 */
-	protected function _sendNotification($text, $msg_id, $posterOptions)
+	protected function _sendNotification($text, $msg_id, $status, $posterOptions)
 	{
 		$quoted_names = $this->_findQuotedMembers($text);
 		if (!empty($quoted_names))
@@ -97,7 +97,7 @@ class Quotedmem_Mention extends Mention_BoardAccess_Abstract
 				'quotedmem',
 				$msg_id,
 				$posterOptions['id'],
-				array('id_members' => $members_id, 'notifier_data' => $posterOptions)
+				array('id_members' => $members_id, 'notifier_data' => $posterOptions, 'status' => $status)
 			));
 		}
 	}
