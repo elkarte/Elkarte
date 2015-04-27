@@ -27,10 +27,10 @@ if (!defined('ELK'))
  */
 class Errors {
 	/**
-	 * The error string to display if debug is enabled
+	 * The prepared error string from getTrace to display when debug is enabled
 	 * @var string
 	 */
-	private $error_text;
+	private $error_text = '';
 
 	/**
 	 * Sole private Errors instance
@@ -39,13 +39,31 @@ class Errors {
 	private static $_errors = null;
 
 	/**
-	 * Mask for errors that are fatal and will hault
+	 * Mask for errors that are fatal and will halt
 	 * @var int
 	 */
 	protected $fatalErrors;
 
 	/**
-	 * Good old constuctor
+	 * The error string from $e->getMessage()
+	 * @var string
+	 */
+	private $error_string;
+
+	/**
+	 * The level of error from $e->getCode
+	 * @var int
+	 */
+	private $error_level;
+
+	/**
+	 * Common name for the error , Error, Waning, Notice
+	 * @var string
+	 */
+	private $error_name;
+
+	/**
+	 * Good old constructor
 	 */
 	public function __construct()
 	{
@@ -63,13 +81,13 @@ class Errors {
 	}
 
 	/**
-	 * Haults execution, optionaly displays an error mesage
+	 * Halts execution, optional displays an error message
 	 *
-	 * @param string|int $error
+	 * @param string|integer $error
 	 */
 	protected function terminate($error = 0)
 	{
-		die(Util::htmlspecialchars($error));
+		die(htmlspecialchars($error));
 	}
 
 	/**
@@ -306,23 +324,23 @@ class Errors {
 
 		// Prepare the error details for the log
 		$this->error_string = $e->getMessage();
-		$this->error_type = stripos($this->error_string, 'undefined') !== false ? 'undefined_vars' : 'general';
 		$this->error_level = $e->getCode();
-		$this->file = htmlspecialchars(isset($err_file) ? $err_file : $e->getFile());
-		$this->line = isset($err_line) ? $err_line : $e->getLine();
 		$this->error_name =  $this->error_level % 255 === E_ERROR ? 'Error' : ($this->error_level % 255 === E_WARNING ? 'Warning' : 'Notice');
+		$error_type = stripos($this->error_string, 'undefined') !== false ? 'undefined_vars' : 'general';
+		$err_file = htmlspecialchars(isset($err_file) ? $err_file : $e->getFile());
+		$err_line = isset($err_line) ? $err_line : $e->getLine();
 
 		// Logged !
-		$message = $this->log_error($this->error_name . ': ' . $this->error_string, $this->error_type, $this->file, $this->line);
+		$message = $this->log_error($this->error_name . ': ' . $this->error_string, $error_type, $err_file, $err_line);
 
 		// Display debug information?
-		$this->_displayDebug($this->error_level, $err_file, $err_line);
+		$this->_displayDebug();
 
 		// Let's give integrations a chance to output a bit differently
-		call_integration_hook('integrate_output_error', array($message, $this->error_type, $this->error_level, $this->file, $this->line));
+		call_integration_hook('integrate_output_error', array($message, $error_type, $this->error_level, $err_file, $err_line));
 
 		// Dying on these errors only causes MORE problems (blank pages!)
-		if ($this->file === 'Unknown')
+		if ($err_file === 'Unknown')
 			return;
 
 		// If this is an E_ERROR or E_USER_ERROR.... die.  Violently so.
@@ -367,8 +385,8 @@ class Errors {
 	 * Builds the error text stack trace for display when using debug options
 	 *
 	 * @param exception $e
-	 * @param string $err_file
-	 * @param int $err_line
+	 * @param string|null $err_file
+	 * @param int|null $err_line
 	 */
 	private function _prepareErrorDisplay($e, $err_file = null, $err_line = null)
 	{
