@@ -51,14 +51,6 @@ class Mentioning extends AbstractModel
 	protected $_data = null;
 
 	/**
-	 * A set of functions that will be called passing the mentions retrieved from the db
-	 * Are originally stored in $_known_mentions
-	 *
-	 * @var array
-	 */
-	protected $_callbacks = array();
-
-	/**
 	 * Start things up, what else does a constructor do
 	 */
 	public function __construct($db, $validator, $enabled_mentions = '')
