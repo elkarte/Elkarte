@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Interface for mentions objects
+ * Handles the mentioning of members (@member stuff)
  *
  * @name      ElkArte Forum
  * @copyright ElkArte Forum contributors
@@ -18,7 +18,16 @@ if (!defined('ELK'))
 
 class Mentionmem_Mention extends Mention_BoardAccess_Abstract
 {
+	/**
+	 * {@inheritdoc }
+	 */
 	protected $_type = 'mentionmem';
+
+	/**
+	 * List of members mentioned
+	 *
+	 * @var int[]
+	 */
 	protected $_actually_mentioned = array();
 
 	/**
@@ -41,6 +50,14 @@ class Mentionmem_Mention extends Mention_BoardAccess_Abstract
 			return array();
 	}
 
+	/**
+	 * Listener attached to the prepare_context event of the Display controller
+	 * used to mark a mention as read.
+	 *
+	 * @param int $virtual_msg
+	 * @global $modSettings
+	 * @global $_REQUEST
+	 */
 	public function display_prepare_context($virtual_msg)
 	{
 		global $options, $modSettings;
@@ -55,6 +72,11 @@ class Mentionmem_Mention extends Mention_BoardAccess_Abstract
 		$this->_setup_editor(empty($options['use_editor_quick_reply']));
 	}
 
+	/**
+	 * Takes care of setting up the editor javascript.
+	 *
+	 * @param bool $simple If true means the plain textarea, otherwise SCEditor.
+	 */
 	protected function _setup_editor($simple = false)
 	{
 		// Just using the plain text quick reply and not the editor
@@ -70,6 +92,11 @@ class Mentionmem_Mention extends Mention_BoardAccess_Abstract
 		});');
 	}
 
+	/**
+	 * Listener attached to the prepare_context event of the Post controller.
+	 *
+	 * @global $_REQUEST
+	 */
 	public function post_prepare_context()
 	{
 		global $context;
@@ -81,6 +108,12 @@ class Mentionmem_Mention extends Mention_BoardAccess_Abstract
 		$this->_setup_editor();
 	}
 
+	/**
+	 * Listener attached to the before_save_post event of the Post controller.
+	 *
+	 * @global $_REQUEST
+	 * @global $_POST
+	 */
 	public function post_before_save_post()
 	{
 		if (!empty($_REQUEST['uid']))
@@ -103,6 +136,13 @@ class Mentionmem_Mention extends Mention_BoardAccess_Abstract
 		}
 	}
 
+	/**
+	 * Listener attached to the after_save_post event of the Post controller.
+	 *
+	 * @param mixed[] $msgOptions
+	 * @param bool $becomesApproved
+	 * @param mixed[] $posterOptions
+	 */
 	public function post_after_save_post($msgOptions, $becomesApproved, $posterOptions)
 	{
 		if (!empty($this->_actually_mentioned))

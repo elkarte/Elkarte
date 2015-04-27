@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Interface for mentions objects
+ * Handles mentions of likes
  *
  * @name      ElkArte Forum
  * @copyright ElkArte Forum contributors
@@ -18,6 +18,9 @@ if (!defined('ELK'))
 
 class Likemsg_Mention extends Mention_BoardAccess_Abstract
 {
+	/**
+	 * {@inheritdoc }
+	 */
 	protected $_type = 'likemsg';
 
 	/**

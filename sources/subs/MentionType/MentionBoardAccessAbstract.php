@@ -44,6 +44,13 @@ abstract class Mention_BoardAccess_Abstract extends Mention_Message_Abstract
 			return false;
 	}
 
+	/**
+	 * Verifies that the current user can access the boards where the messages
+	 * are in.
+	 *
+	 * @param int[] $boards Array of board ids
+	 * @param mixed[] $mentions
+	 */
 	protected function _validateAccess($boards, &$mentions)
 	{
 		global $user_info, $modSettings;

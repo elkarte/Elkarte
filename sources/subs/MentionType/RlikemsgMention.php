@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Interface for mentions objects
+ * Handles the notification (or non-notification) of removed likes.
  *
  * @name      ElkArte Forum
  * @copyright ElkArte Forum contributors
@@ -43,16 +43,18 @@ class Rlikemsg_Mention extends Mention_BoardAccess_Abstract
 	}
 
 	/**
-	 * Softly and gently removes a 'likemsg' mention when the post is unliked
+	 * Depending on the value of $this->_task['source_data']['rlike_notif']
+	 * May notify the user about a like removed, or softly and gently remove
+	 * a 'likemsg' mention when the post is unliked.
 	 *
 	 * @package Mentions
 	 * @param int $member_from the id of the member mentioning
 	 * @param int[] $members_to an array of ids of the members mentioned
-	 * @param int $target the id of the message involved in the mention
-	 * @param string|null $time not used
-	 * @param int $status status to change the mention to if found as unread,
+	 * @param int $target the id of the target involved in the mention
+	 * @param string|null $time optional value to set the time of the mention, defaults to now
+	 * @param int $status status to change the mention to, if no notification,
 	 *             - default is to set it as read (status = 1)
-	 * @param bool|null $is_accessible not used
+	 * @param bool|null $is_accessible optional if the mention is accessible to the user
 	 */
 	public function insert($member_from, $members_to, $target, $time = null, $status = null, $is_accessible = null)
 	{
@@ -76,7 +78,7 @@ class Rlikemsg_Mention extends Mention_BoardAccess_Abstract
 					'type' => 'likemsg',
 					'member_from' => $member_from,
 					'target' => $target,
-					'status' => $newstatus,
+					'status' => $status === null ? 1 : $status,
 					'unread' => 0,
 				)
 			);
