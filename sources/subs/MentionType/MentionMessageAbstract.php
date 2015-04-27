@@ -18,9 +18,25 @@ if (!defined('ELK'))
 
 abstract class Mention_Message_Abstract implements Mention_Type_Interface
 {
+	/**
+	 * The identifier of the mention (the name that is stored in the db)
+	 *
+	 * @var string
+	 */
 	protected $_type = '';
 
+	/**
+	 * The database object
+	 *
+	 * @var Database
+	 */
 	protected $_db = null;
+
+	/**
+	 * The Notifications_Task in use
+	 *
+	 * @var Notifications_Task
+	 */
 	protected $_task = null;
 
 	/**

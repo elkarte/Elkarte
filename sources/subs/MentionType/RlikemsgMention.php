@@ -18,6 +18,9 @@ if (!defined('ELK'))
 
 class Rlikemsg_Mention extends Mention_BoardAccess_Abstract
 {
+	/**
+	 * {@inheritdoc }
+	 */
 	protected $_type = 'rlikemsg';
 
 	/**
