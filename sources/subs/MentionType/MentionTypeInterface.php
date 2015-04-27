@@ -43,9 +43,9 @@ interface Mention_Type_Interface
 	/**
 	 * Used to inject the database object.
 	 *
-	 * @param Database $db
+	 * @param \Database $db
 	 */
-	public function setDb($db);
+	public function setDb(\Database $db);
 
 	/**
 	 * Inserts a new mention into the database.
