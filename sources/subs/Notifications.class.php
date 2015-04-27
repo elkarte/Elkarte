@@ -186,7 +186,7 @@ class Notifications extends AbstractModel
 		{
 
 			if (!isset($preferences[$member]))
-				$level = (int) $preferences[0];
+				$level = isset($preferences[0]) ? (int) $preferences[0] : 1;
 			else
 				$level = $preferences[$member];
 
