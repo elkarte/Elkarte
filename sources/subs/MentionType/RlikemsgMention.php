@@ -26,7 +26,7 @@ class Rlikemsg_Mention extends Mention_BoardAccess_Abstract
 	public function getUsersToNotify()
 	{
 		if ($this->_task['source_data']['rlike_notif'])
-			return array($this->_task['source_data']['id_members']);
+			return (array) $this->_task['source_data']['id_members'];
 		else
 			return array();
 	}
