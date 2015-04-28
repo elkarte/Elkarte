@@ -314,14 +314,14 @@ class ManageLanguages_Controller extends Action_Controller
 		global $context, $txt, $scripturl, $modSettings;
 
 		// @todo for the moment there is no facility to download packages, so better kill it here
-		Errors::fatal_lang_error('no_access', false);
+		Errors::instance()->fatal_lang_error('no_access', false);
 
 		loadLanguage('ManageSettings');
 		require_once(SUBSDIR . '/Package.subs.php');
 
 		// Clearly we need to know what to request.
 		if (!isset($this->_req->query->did))
-			Errors::fatal_lang_error('no_access', false);
+			Errors::instance()->fatal_lang_error('no_access', false);
 
 		// Some lovely context.
 		$context['download_id'] = $this->_req->query->did;
@@ -342,7 +342,7 @@ class ManageLanguages_Controller extends Action_Controller
 			{
 				// Check it's not very bad.
 				if (strpos($file, '..') !== false || (strpos($file, 'themes') !== 0 && !preg_match('~agreement\.[A-Za-z-_0-9]+\.txt$~', $file)))
-					Errors::fatal_error($txt['languages_download_illegal_paths']);
+					Errors::instance()->fatal_error($txt['languages_download_illegal_paths']);
 
 				$chmod_files[] = BOARDDIR . '/' . $file;
 				$install_files[] = $file;
@@ -374,7 +374,7 @@ class ManageLanguages_Controller extends Action_Controller
 			$archive_content = read_tgz_file('http://download.elkarte.net/fetch_language.php?version=' . urlencode(strtr(FORUM_VERSION, array('ElkArte ' => ''))) . ';fetch=' . urlencode($this->_req->query->did), null);
 
 		if (empty($archive_content))
-			Errors::fatal_error($txt['add_language_error_no_response']);
+			Errors::instance()->fatal_error($txt['add_language_error_no_response']);
 
 		// Now for each of the files, let's do some *stuff*
 		$context['files'] = array(

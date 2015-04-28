@@ -58,7 +58,7 @@ class Stats_Controller extends Action_Controller
 
 		// Page disabled - redirect them out
 		if (empty($modSettings['trackStats']))
-			Errors::fatal_lang_error('feature_disabled', true);
+			Errors::instance()->fatal_lang_error('feature_disabled', true);
 
 		if (!empty($_REQUEST['expand']))
 		{

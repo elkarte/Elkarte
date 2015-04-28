@@ -153,7 +153,7 @@ class PackageServers_Controller extends Action_Controller
 
 			// If the server does not exist, dump out.
 			if (empty($url))
-				Errors::fatal_lang_error('couldnt_connect', false);
+				Errors::instance()->fatal_lang_error('couldnt_connect', false);
 
 			// If there is a relative link, append to the stored server url.
 			if (isset($this->_req->query->relative))
@@ -186,7 +186,7 @@ class PackageServers_Controller extends Action_Controller
 		}
 		// Minimum required parameter did not exist so dump out.
 		else
-			Errors::fatal_lang_error('couldnt_connect', false);
+			Errors::instance()->fatal_lang_error('couldnt_connect', false);
 
 		// Attempt to connect.  If unsuccessful... try the URL.
 		if (!isset($this->_req->query->package) || file_exists($this->_req->query->package))
@@ -194,7 +194,7 @@ class PackageServers_Controller extends Action_Controller
 
 		// Check to be sure the packages.xml file actually exists where it is should be... or dump out.
 		if ((isset($this->_req->query->absolute) || isset($this->_req->query->relative)) && !url_exists($this->_req->query->package))
-			Errors::fatal_lang_error('packageget_unable', false, array($url . '/index.php'));
+			Errors::instance()->fatal_lang_error('packageget_unable', false, array($url . '/index.php'));
 
 		// Might take some time.
 		setTimeLimit(600);
@@ -204,7 +204,7 @@ class PackageServers_Controller extends Action_Controller
 
 		// Errm.... empty file?  Try the URL....
 		if (!$listing->exists('package-list'))
-			Errors::fatal_lang_error('packageget_unable', false, array($url . '/index.php'));
+			Errors::instance()->fatal_lang_error('packageget_unable', false, array($url . '/index.php'));
 
 		// List out the packages...
 		$context['package_list'] = array();
@@ -479,7 +479,7 @@ class PackageServers_Controller extends Action_Controller
 
 		// To download something, we need a valid server or url.
 		if (empty($this->_req->query->server) && (!empty($this->_req->query->get) && !empty($this->_req->post->package)))
-			Errors::fatal_lang_error('package_get_error_is_zero', false);
+			Errors::instance()->fatal_lang_error('package_get_error_is_zero', false);
 
 		if (isset($this->_req->query->server))
 		{
@@ -491,7 +491,7 @@ class PackageServers_Controller extends Action_Controller
 
 			// If server does not exist then dump out.
 			if (empty($url))
-				Errors::fatal_lang_error('couldnt_connect', false);
+				Errors::instance()->fatal_lang_error('couldnt_connect', false);
 
 			$url = $url . '/';
 		}
@@ -548,7 +548,7 @@ class PackageServers_Controller extends Action_Controller
 		// First make sure it's a package.
 		$packageInfo = getPackageInfo($url . $this->_req->query->package);
 		if (!is_array($packageInfo))
-			Errors::fatal_lang_error($packageInfo);
+			Errors::instance()->fatal_lang_error($packageInfo);
 
 		// Save the package to disk, use FTP if necessary
 		create_chmod_control(
@@ -572,7 +572,7 @@ class PackageServers_Controller extends Action_Controller
 		$context['package'] = getPackageInfo($package_name);
 
 		if (!is_array($context['package']))
-			Errors::fatal_lang_error('package_cant_download', false);
+			Errors::instance()->fatal_lang_error('package_cant_download', false);
 
 		if ($context['package']['type'] == 'modification')
 			$context['package']['install']['link'] = '<a href="' . $scripturl . '?action=admin;area=packages;sa=install;package=' . $context['package']['filename'] . '">[ ' . $txt['install_mod'] . ' ]</a>';
@@ -606,15 +606,15 @@ class PackageServers_Controller extends Action_Controller
 		// @todo Use FTP if the packages directory is not writable.
 		// Check the file was even sent!
 		if (!isset($_FILES['package']['name']) || $_FILES['package']['name'] == '')
-			Errors::fatal_lang_error('package_upload_error_nofile');
+			Errors::instance()->fatal_lang_error('package_upload_error_nofile');
 		elseif (!is_uploaded_file($_FILES['package']['tmp_name']) || (ini_get('open_basedir') == '' && !file_exists($_FILES['package']['tmp_name'])))
-			Errors::fatal_lang_error('package_upload_error_failed');
+			Errors::instance()->fatal_lang_error('package_upload_error_failed');
 
 		// Make sure it has a sane filename.
 		$_FILES['package']['name'] = preg_replace(array('/\s/', '/\.[\.]+/', '/[^\w_\.\-]/'), array('_', '.', ''), $_FILES['package']['name']);
 
 		if (strtolower(substr($_FILES['package']['name'], -4)) != '.zip' && strtolower(substr($_FILES['package']['name'], -4)) != '.tgz' && strtolower(substr($_FILES['package']['name'], -7)) != '.tar.gz')
-			Errors::fatal_lang_error('package_upload_error_supports', false, array('zip, tgz, tar.gz'));
+			Errors::instance()->fatal_lang_error('package_upload_error_supports', false, array('zip, tgz, tar.gz'));
 
 		// We only need the filename...
 		$packageName = basename($_FILES['package']['name']);
@@ -624,7 +624,7 @@ class PackageServers_Controller extends Action_Controller
 
 		// @todo Maybe just roll it like we do for downloads?
 		if (file_exists($destination))
-			Errors::fatal_lang_error('package_upload_error_exists');
+			Errors::instance()->fatal_lang_error('package_upload_error_exists');
 
 		// Now move the file.
 		move_uploaded_file($_FILES['package']['tmp_name'], $destination);
@@ -640,7 +640,7 @@ class PackageServers_Controller extends Action_Controller
 			@unlink($destination);
 			loadLanguage('Errors');
 			$txt[$context['package']] = str_replace('{MANAGETHEMEURL}', $scripturl . '?action=admin;area=theme;sa=admin;' . $context['session_var'] . '=' . $context['session_id'] . '#theme_install', $txt[$context['package']]);
-			Errors::fatal_lang_error('package_upload_error_broken', false, $txt[$context['package']]);
+			Errors::instance()->fatal_lang_error('package_upload_error_broken', false, $txt[$context['package']]);
 		}
 		// Is it already uploaded, maybe?
 		elseif ($dir = @opendir(BOARDDIR . '/packages'))
@@ -665,7 +665,7 @@ class PackageServers_Controller extends Action_Controller
 				{
 					@unlink($destination);
 					loadLanguage('Errors');
-					Errors::fatal_lang_error('package_upload_already_exists', 'general', $package);
+					Errors::instance()->fatal_lang_error('package_upload_already_exists', 'general', $package);
 				}
 			}
 			closedir($dir);

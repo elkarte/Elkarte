@@ -54,7 +54,7 @@ function currentMemberID($fatal = true, $reload_id = false)
 		is_not_guest('', $fatal);
 
 		if ($fatal)
-			Errors::fatal_lang_error('not_a_user', false);
+			Errors::instance()->fatal_lang_error('not_a_user', false);
 		else
 			return false;
 	}
@@ -636,7 +636,7 @@ function loadProfileFields($force_reload = false)
 							// Otherwise grab all of them and do not log anything
 							$error_severity = $errors->hasErrors(1) && !$user_info['is_admin'] ? 1 : null;
 							foreach ($errors->prepareErrors($error_severity) as $error)
-								Errors::fatal_error($error, $error_severity === null ? false : 'general');
+								Errors::instance()->fatal_error($error, $error_severity === null ? false : 'general');
 						}
 					}
 				}
@@ -1292,7 +1292,7 @@ function makeThemeChanges($memID, $id_theme)
 
 	// Can't change reserved vars.
 	if ((isset($_POST['options']) && count(array_intersect(array_keys($_POST['options']), $reservedVars)) != 0) || (isset($_POST['default_options']) && count(array_intersect(array_keys($_POST['default_options']), $reservedVars)) != 0))
-		Errors::fatal_lang_error('no_access', false);
+		Errors::instance()->fatal_lang_error('no_access', false);
 
 	// Don't allow any overriding of custom fields with default or non-default options.
 	$request = $db->query('', '
@@ -2089,7 +2089,7 @@ function profileSaveAvatarData(&$value)
 	{
 		loadLanguage('Post');
 		if (!is_writable($uploadDir))
-			Errors::fatal_lang_error('attachments_no_write', 'critical');
+			Errors::instance()->fatal_lang_error('attachments_no_write', 'critical');
 
 		require_once(SUBSDIR . '/Package.subs.php');
 
@@ -2198,12 +2198,12 @@ function profileSaveAvatarData(&$value)
 				if (!is_writable($uploadDir))
 				{
 					loadLanguage('Post');
-					Errors::fatal_lang_error('attachments_no_write', 'critical');
+					Errors::instance()->fatal_lang_error('attachments_no_write', 'critical');
 				}
 
 				$new_avatar_name = $uploadDir . '/' . getAttachmentFilename('avatar_tmp_' . $memID, false, null, true);
 				if (!move_uploaded_file($_FILES['attachment']['tmp_name'], $new_avatar_name))
-					Errors::fatal_lang_error('attach_timeout', 'critical');
+					Errors::instance()->fatal_lang_error('attach_timeout', 'critical');
 
 				$_FILES['attachment']['tmp_name'] = $new_avatar_name;
 			}
@@ -2331,7 +2331,7 @@ function profileSaveAvatarData(&$value)
 				{
 					// I guess a man can try.
 					removeAttachments(array('id_member' => $memID));
-					Errors::fatal_lang_error('attach_timeout', 'critical');
+					Errors::instance()->fatal_lang_error('attach_timeout', 'critical');
 				}
 
 				// Attempt to chmod it.
@@ -2442,7 +2442,7 @@ function profileSaveGroups(&$value)
 			$db->free_result($request);
 
 			if (empty($another))
-				Errors::fatal_lang_error('at_least_one_admin', 'critical');
+				Errors::instance()->fatal_lang_error('at_least_one_admin', 'critical');
 		}
 	}
 

@@ -102,7 +102,7 @@ if ($db_show_debug === true)
 
 // Forum in extended maintenance mode? Our trip ends here with a bland message.
 if (!empty($maintenance) && $maintenance == 2)
-	Error::display_maintenance_message();
+	Errors::instance()->display_maintenance_message();
 
 // Clean the request.
 cleanRequest();
@@ -145,8 +145,7 @@ if (!empty($modSettings['enableCompressedOutput']) && !headers_sent())
 }
 
 // Register error & exception handlers.
-set_error_handler(array('Errors', 'error_handler'));
-set_exception_handler(array('Errors', 'exception_handler'));
+Errors::instance()->register_handlers();
 
 // Start the session. (assuming it hasn't already been.)
 loadSession();
@@ -207,7 +206,7 @@ function elk_main()
 
 	// If we are in a topic and don't have permission to approve it then duck out now.
 	if (!empty($topic) && empty($board_info['cur_topic_approved']) && !allowedTo('approve_posts') && ($user_info['id'] != $board_info['cur_topic_starter'] || $user_info['is_guest']))
-		Errors::fatal_lang_error('not_a_topic', false);
+		Errors::instance()->fatal_lang_error('not_a_topic', false);
 
 	$no_stat_actions = array('dlattach', 'findmember', 'jsoption', 'requestmembers', 'jslocale', 'xmlpreview', 'suggest', '.xml', 'xmlhttp', 'verificationcode', 'viewquery', 'viewadminfile');
 	call_integration_hook('integrate_pre_log_stats', array(&$no_stat_actions));

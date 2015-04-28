@@ -58,7 +58,7 @@ class SplitTopics_Controller extends Action_Controller
 
 		// And... which topic were you splitting, again?
 		if (empty($topic))
-			Errors::fatal_lang_error('numbers_one_to_nine', false);
+			Errors::instance()->fatal_lang_error('numbers_one_to_nine', false);
 
 		// Load up the "dependencies" - the template, getMsgMemberID().
 		if (!isset($_REQUEST['xml']))
@@ -95,7 +95,7 @@ class SplitTopics_Controller extends Action_Controller
 
 		// Validate "at".
 		if (empty($_GET['at']))
-			Errors::fatal_lang_error('numbers_one_to_nine', false);
+			Errors::instance()->fatal_lang_error('numbers_one_to_nine', false);
 
 		// Split at a specific topic
 		$splitAt = (int) $_GET['at'];
@@ -110,7 +110,7 @@ class SplitTopics_Controller extends Action_Controller
 		// Retrieve message info for the message at the split point.
 		$messageInfo = basicMessageInfo($splitAt, false, true);
 		if ($messageInfo === false)
-			Errors::fatal_lang_error('cant_find_messages');
+			Errors::instance()->fatal_lang_error('cant_find_messages');
 
 		// If not approved validate they can approve it.
 		if ($modSettings['postmod_active'] && !$messageInfo['topic_approved'])
@@ -124,7 +124,7 @@ class SplitTopics_Controller extends Action_Controller
 
 		// Check if there is more than one message in the topic.  (there should be.)
 		if ($messageInfo['num_replies'] < 1)
-			Errors::fatal_lang_error('topic_one_post', false);
+			Errors::instance()->fatal_lang_error('topic_one_post', false);
 
 		// Check if this is the first message in the topic (if so, the first and second option won't be available)
 		if ($messageInfo['id_first_msg'] == $splitAt)
@@ -167,7 +167,7 @@ class SplitTopics_Controller extends Action_Controller
 		if (!empty($_SESSION['messageRedirect']) && empty($_SESSION['reason']))
 		{
 			$this->_unset_session_values();
-			Errors::fatal_lang_error('splittopic_no_reason', false);
+			Errors::instance()->fatal_lang_error('splittopic_no_reason', false);
 		}
 
 		// Redirect to the selector if they chose selective.
@@ -200,7 +200,7 @@ class SplitTopics_Controller extends Action_Controller
 		else
 		{
 			$this->_unset_session_values();
-			Errors::fatal_lang_error('no_access', false);
+			Errors::instance()->fatal_lang_error('no_access', false);
 		}
 
 		$context['old_topic'] = $topic;
@@ -237,7 +237,7 @@ class SplitTopics_Controller extends Action_Controller
 		if (empty($_SESSION['split_selection'][$topic]))
 		{
 			$this->_unset_session_values();
-			Errors::fatal_lang_error('no_posts_selected', false);
+			Errors::instance()->fatal_lang_error('no_posts_selected', false);
 		}
 
 		// This is here because there are two fatal_lang_errors in there

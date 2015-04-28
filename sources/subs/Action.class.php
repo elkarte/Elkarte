@@ -119,7 +119,7 @@ class Action
 		if (!key_exists($sa, $this->_subActions) || !is_array($this->_subActions[$sa]))
 		{
 			// send an error and get out of here
-			Errors::fatal_lang_error('error_sa_not_set');
+			Errors::instance()->fatal_lang_error('error_sa_not_set');
 		}
 
 		$subAction = $this->_subActions[$sa];
@@ -130,7 +130,7 @@ class Action
 				$subAction = $this->_subActions[$this->_default];
 			else
 				// no dice
-				Errors::fatal_lang_error('error_sa_not_set');
+				Errors::instance()->fatal_lang_error('error_sa_not_set');
 
 		// are you even permitted to?
 		if (isset($subAction['permission']))
@@ -209,7 +209,7 @@ class Action
 				$sa = $this->_default;
 			else
 				// no dice
-				Errors::fatal_lang_error('error_sa_not_set');
+				Errors::instance()->fatal_lang_error('error_sa_not_set');
 
 		return $sa;
 	}
@@ -233,7 +233,7 @@ class Action
 		}
 
 		// can't let you continue, sorry.
-		Errors::fatal_lang_error('error_sa_not_set');
+		Errors::instance()->fatal_lang_error('error_sa_not_set');
 
 		// I said... can't.
 		trigger_error('No access...', E_USER_ERROR);

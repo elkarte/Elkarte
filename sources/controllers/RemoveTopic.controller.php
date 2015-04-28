@@ -129,7 +129,7 @@ class RemoveTopic_Controller extends Action_Controller
 					isAllowedTo('delete_own');
 			}
 			elseif (!allowedTo('delete_any') && ($topic_info['id_member_started'] != $user_info['id'] || !allowedTo('delete_replies')) && !empty($modSettings['edit_disable_time']) && $topic_info['poster_time'] + $modSettings['edit_disable_time'] * 60 < time())
-				Errors::fatal_lang_error('modify_post_time_passed', false);
+				Errors::instance()->fatal_lang_error('modify_post_time_passed', false);
 		}
 		elseif ($topic_info['id_member_started'] == $user_info['id'] && !allowedTo('delete_any'))
 			isAllowedTo('delete_replies');
@@ -165,7 +165,7 @@ class RemoveTopic_Controller extends Action_Controller
 
 		// Is recycled board enabled?
 		if (empty($modSettings['recycle_enable']))
-			Errors::fatal_lang_error('restored_disabled', 'critical');
+			Errors::instance()->fatal_lang_error('restored_disabled', 'critical');
 
 		// Can we be in here?
 		isAllowedTo('move_any', $modSettings['recycle_board']);
@@ -187,7 +187,7 @@ class RemoveTopic_Controller extends Action_Controller
 
 		// Didn't find some things?
 		if ($restorer->unfoundRestoreMessages())
-			Errors::fatal_lang_error('restore_not_found', false, array('<ul style="margin-top: 0px;"><li>' . implode('</li><li>', $restorer->unfoundRestoreMessages(true)) . '</li></ul>'));
+			Errors::instance()->fatal_lang_error('restore_not_found', false, array('<ul style="margin-top: 0px;"><li>' . implode('</li><li>', $restorer->unfoundRestoreMessages(true)) . '</li></ul>'));
 
 		// Lets send them back somewhere that may make sense
 		if (count($actioned_messages) == 1 && empty($topics_to_restore))

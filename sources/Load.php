@@ -52,7 +52,7 @@ function reloadSettings()
 		);
 		$modSettings = array();
 		if (!$request)
-			Errors::display_db_error();
+			Errors::instance()->display_db_error();
 		while ($row = $db->fetch_row($request))
 			$modSettings[$row[0]] = $row[1];
 		$db->free_result($request);
@@ -99,7 +99,7 @@ function reloadSettings()
 			$modSettings['current_load'] = $modSettings['load_average'];
 
 		if (!empty($modSettings['loadavg_forum']) && $modSettings['current_load'] >= $modSettings['loadavg_forum'])
-			Errors::display_loadavg_error();
+			Errors::instance()->display_loadavg_error();
 	}
 	else
 		$modSettings['current_load'] = 0;
@@ -454,7 +454,7 @@ function loadBoard()
 		{
 			loadPermissions();
 			loadTheme();
-			Errors::fatal_lang_error('topic_gone', false);
+			Errors::instance()->fatal_lang_error('topic_gone', false);
 		}
 	}
 
@@ -665,7 +665,7 @@ function loadBoard()
 			is_not_guest($txt['topic_gone']);
 		}
 		else
-			Errors::fatal_lang_error('topic_gone', false);
+			Errors::instance()->fatal_lang_error('topic_gone', false);
 	}
 
 	if ($user_info['is_mod'])
@@ -751,7 +751,7 @@ function loadPermissions()
 	{
 		// Make sure the board (if any) has been loaded by loadBoard().
 		if (!isset($board_info['profile']))
-			Errors::fatal_lang_error('no_board');
+			Errors::instance()->fatal_lang_error('no_board');
 
 		$request = $db->query('', '
 			SELECT permission, add_deny
@@ -1938,9 +1938,9 @@ function requireTemplate($template_name, $style_sheets, $fatal)
 	}
 	// Cause an error otherwise.
 	elseif ($template_name != 'Errors' && $template_name != 'index' && $fatal)
-		Errors::fatal_lang_error('theme_template_error', 'template', array((string) $template_name));
+		Errors::instance()->fatal_lang_error('theme_template_error', 'template', array((string) $template_name));
 	elseif ($fatal)
-		die(Errors::log_error(sprintf(isset($txt['theme_template_error']) ? $txt['theme_template_error'] : 'Unable to load themes/default/%s.template.php!', (string) $template_name), 'template'));
+		die(Errors::instance()->log_error(sprintf(isset($txt['theme_template_error']) ? $txt['theme_template_error'] : 'Unable to load themes/default/%s.template.php!', (string) $template_name), 'template'));
 	else
 		return false;
 }
@@ -1971,9 +1971,9 @@ function loadSubTemplate($sub_template_name, $fatal = false)
 	if (function_exists($theme_function))
 		$theme_function();
 	elseif ($fatal === false)
-		Errors::fatal_lang_error('theme_template_error', 'template', array((string) $sub_template_name));
+		Errors::instance()->fatal_lang_error('theme_template_error', 'template', array((string) $sub_template_name));
 	elseif ($fatal !== 'ignore')
-		die(Errors::log_error(sprintf(isset($txt['theme_template_error']) ? $txt['theme_template_error'] : 'Unable to load the %s sub template!', (string) $sub_template_name), 'template'));
+		die(Errors::instance()->log_error(sprintf(isset($txt['theme_template_error']) ? $txt['theme_template_error'] : 'Unable to load the %s sub template!', (string) $sub_template_name), 'template'));
 
 	// Are we showing debugging for templates?  Just make sure not to do it before the doctype...
 	if (allowedTo('admin_forum') && isset($_REQUEST['debug']) && !in_array($sub_template_name, array('init')) && ob_get_length() > 0 && !isset($_REQUEST['xml']))
@@ -2308,7 +2308,7 @@ function loadLanguage($template_name, $lang = '', $fatal = true, $force_reload =
 		// That couldn't be found!  Log the error, but *try* to continue normally.
 		if (!$found && $fatal)
 		{
-			Errors::log_error(sprintf($txt['theme_language_error'], $template_name . '.' . $lang, 'template'));
+			Errors::instance()->log_error(sprintf($txt['theme_language_error'], $template_name . '.' . $lang, 'template'));
 			break;
 		}
 	}
@@ -2427,7 +2427,7 @@ function getBoardParents($id_parent)
 			);
 			// In the EXTREMELY unlikely event this happens, give an error message.
 			if ($db->num_rows($result) == 0)
-				Errors::fatal_lang_error('parent_not_found', 'critical');
+				Errors::instance()->fatal_lang_error('parent_not_found', 'critical');
 			while ($row = $db->fetch_assoc($result))
 			{
 				if (!isset($boards[$row['id_board']]))
@@ -2802,7 +2802,7 @@ function loadDatabase()
 
 	// Safe guard here, if there isn't a valid connection lets put a stop to it.
 	if (!$connection)
-		Errors::display_db_error();
+		Errors::instance()->display_db_error();
 
 	// If in SSI mode fix up the prefix.
 	$db = database();

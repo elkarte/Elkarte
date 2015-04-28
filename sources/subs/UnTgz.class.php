@@ -141,7 +141,7 @@ class UnTgz
 
 		// This class sorta needs gzinflate!
 		if (!function_exists('gzinflate'))
-			Errors::fatal_lang_error('package_no_zlib', 'critical');
+			Errors::instance()->fatal_lang_error('package_no_zlib', 'critical');
 
 		// Make sure we have this loaded.
 		loadLanguage('Packages');

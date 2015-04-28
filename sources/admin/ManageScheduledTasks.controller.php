@@ -290,7 +290,7 @@ class ManageScheduledTasks_Controller extends Action_Controller
 
 		// Cleaning...
 		if (!isset($this->_req->query->tid))
-			Errors::fatal_lang_error('no_access', false);
+			Errors::instance()->fatal_lang_error('no_access', false);
 		$this->_req->query->tid = (int) $this->_req->query->tid;
 
 		// Saving?

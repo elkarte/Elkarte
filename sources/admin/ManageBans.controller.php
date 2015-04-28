@@ -793,7 +793,7 @@ class ManageBans_Controller extends Action_Controller
 		$ban_id = $this->_req->getQuery('bi'. 'intval', 0);
 
 		if (empty($ban_group))
-			Errors::fatal_lang_error('ban_not_found', false);
+			Errors::instance()->fatal_lang_error('ban_not_found', false);
 
 		// Adding a new trigger
 		if (isset($this->_req->post->add_new_trigger) && !empty($this->_req->post->ban_suggestions))
@@ -851,7 +851,7 @@ class ManageBans_Controller extends Action_Controller
 		{
 			$ban_row = banDetails($ban_id, $ban_group);
 			if (empty($ban_row))
-				Errors::fatal_lang_error('ban_not_found', false);
+				Errors::instance()->fatal_lang_error('ban_not_found', false);
 			$row = $ban_row[$ban_id];
 
 			// Load it up for the template

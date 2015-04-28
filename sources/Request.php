@@ -422,7 +422,7 @@ class Request
 		if (strpos($_SERVER['QUERY_STRING'], 'http') === 0)
 		{
 			header('HTTP/1.1 400 Bad Request');
-			Errors::fatal_error('', false);
+			Errors::instance()->fatal_error('', false);
 		}
 
 		$this->_server_query_string = $_SERVER['QUERY_STRING'];
@@ -437,13 +437,13 @@ class Request
 	private function _checkNumericKeys()
 	{
 		if (isset($_REQUEST['GLOBALS']) || isset($_COOKIE['GLOBALS']))
-			Errors::fatal_error('Invalid request variable.', false);
+			Errors::instance()->fatal_error('Invalid request variable.', false);
 
 		// Same goes for numeric keys.
 		foreach (array_merge(array_keys($_POST), array_keys($_GET), array_keys($_FILES)) as $key)
 		{
 			if (is_numeric($key))
-				Errors::fatal_error('Numeric request keys are invalid.', false);
+				Errors::instance()->fatal_error('Numeric request keys are invalid.', false);
 		}
 
 		// Numeric keys in cookies are less of a problem. Just unset those.
@@ -465,11 +465,11 @@ class Request
 		{
 			// Reject magic_quotes_sybase='on'.
 			if (ini_get('magic_quotes_sybase') || strtolower(ini_get('magic_quotes_sybase')) == 'on')
-				Errors::fatal_error('magic_quotes_sybase=on was detected: your host is using an unsecure PHP configuration, deprecated and removed in current versions. Please upgrade PHP.', false);
+				Errors::instance()->fatal_error('magic_quotes_sybase=on was detected: your host is using an unsecure PHP configuration, deprecated and removed in current versions. Please upgrade PHP.', false);
 
 			// Reject magic_quotes_gpc='on'.
 			if (function_exists('get_magic_quotes_gpc') && get_magic_quotes_gpc() != 0)
-				Errors::fatal_error('magic_quotes_gpc=on was detected: your host is using an unsecure PHP configuration, deprecated and removed in current versions. Please upgrade PHP.', false);
+				Errors::instance()->fatal_error('magic_quotes_gpc=on was detected: your host is using an unsecure PHP configuration, deprecated and removed in current versions. Please upgrade PHP.', false);
 		}
 	}
 

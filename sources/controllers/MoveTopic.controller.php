@@ -52,14 +52,14 @@ class MoveTopic_Controller extends Action_Controller
 		global $txt, $topic, $user_info, $context, $language, $scripturl, $modSettings;
 
 		if (empty($topic))
-			Errors::fatal_lang_error('no_access', false);
+			Errors::instance()->fatal_lang_error('no_access', false);
 
 		// Retrieve the basic topic information for whats being moved
 		require_once(SUBSDIR . '/Topic.subs.php');
 		$topic_info = getTopicInfo($topic, 'message');
 
 		if (empty($topic_info))
-			Errors::fatal_lang_error('topic_gone', false);
+			Errors::instance()->fatal_lang_error('topic_gone', false);
 
 		$context['is_approved'] = $topic_info['approved'];
 		$context['subject'] = $topic_info['subject'];
@@ -70,7 +70,7 @@ class MoveTopic_Controller extends Action_Controller
 
 		// Are they allowed to actually move any topics or even their own?
 		if (!allowedTo('move_any') && ($topic_info['id_member_started'] == $user_info['id'] && !allowedTo('move_own')))
-			Errors::fatal_lang_error('cannot_move_any', false);
+			Errors::instance()->fatal_lang_error('cannot_move_any', false);
 
 		loadTemplate('MoveTopic');
 
@@ -80,7 +80,7 @@ class MoveTopic_Controller extends Action_Controller
 
 		// No boards?
 		if (empty($context['categories']) || $context['num_boards'] == 1)
-			Errors::fatal_lang_error('moveto_noboards', false);
+			Errors::instance()->fatal_lang_error('moveto_noboards', false);
 
 		// Already used the function, let's set the selected board back to the last
 		$last_moved_to = isset($_SESSION['move_to_topic']['move_to']) && $_SESSION['move_to_topic']['move_to'] != $context['current_board'] ? (int) $_SESSION['move_to_topic']['move_to'] : 0;
@@ -145,15 +145,15 @@ class MoveTopic_Controller extends Action_Controller
 		global $txt, $board, $topic, $scripturl, $context, $language, $user_info;
 
 		if (empty($topic))
-			Errors::fatal_lang_error('no_access', false);
+			Errors::instance()->fatal_lang_error('no_access', false);
 
 		// You can't choose to have a redirection topic and use an empty reason.
 		if (isset($_POST['postRedirect']) && (!isset($_POST['reason']) || trim($_POST['reason']) == ''))
-			Errors::fatal_lang_error('movetopic_no_reason', false);
+			Errors::instance()->fatal_lang_error('movetopic_no_reason', false);
 
 		// You have to tell us were you are moving to
 		if (!isset($_POST['toboard']))
-			Errors::fatal_lang_error('movetopic_no_board', false);
+			Errors::instance()->fatal_lang_error('movetopic_no_board', false);
 
 		// We will need this
 		require_once(SUBSDIR . '/Topic.subs.php');
@@ -190,7 +190,7 @@ class MoveTopic_Controller extends Action_Controller
 		// Make sure they can see the board they are trying to move to (and get whether posts count in the target board).
 		$board_info = boardInfo($toboard, $topic);
 		if (empty($board_info))
-			Errors::fatal_lang_error('no_board');
+			Errors::instance()->fatal_lang_error('no_board');
 
 		// Remember this for later.
 		$_SESSION['move_to_topic'] = array(

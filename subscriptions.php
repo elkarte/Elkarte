@@ -270,7 +270,7 @@ function generateSubscriptionError($text)
 	}
 
 	// Then just log and die.
-	Errors::log_error($text);
+	Errors::instance()->log_error($text);
 
 	exit;
 }

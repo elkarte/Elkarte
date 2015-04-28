@@ -62,7 +62,7 @@ class Draft_Controller extends Action_Controller
 
 		// Safe is safe.
 		if ($this->_memID != $user_info['id'])
-			Errors::fatal_lang_error('no_access', false);
+			Errors::instance()->fatal_lang_error('no_access', false);
 
 		require_once(SUBSDIR . '/Drafts.subs.php');
 
@@ -163,7 +163,7 @@ class Draft_Controller extends Action_Controller
 		// Quick check how we got here.
 		if ($this->_memID != $user_info['id'])
 			// empty($modSettings['drafts_enabled']) || empty($modSettings['drafts_pm_enabled']))
-			Errors::fatal_lang_error('no_access', false);
+			Errors::instance()->fatal_lang_error('no_access', false);
 
 		// Set up what we will need
 		$context['start'] = isset($_REQUEST['start']) ? (int) $_REQUEST['start'] : 0;

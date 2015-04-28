@@ -54,7 +54,7 @@ class Likes_Controller extends Action_Controller
 
 		// If likes are disabled, we don't go any further
 		if (empty($modSettings['likes_enabled']))
-			Errors::fatal_lang_error('feature_disabled', true);
+			Errors::instance()->fatal_lang_error('feature_disabled', true);
 	}
 
 	/**
@@ -625,7 +625,7 @@ class Likes_Controller extends Action_Controller
 		require_once(SUBSDIR . '/Likes.subs.php');
 
 		if (empty($modSettings['likes_enabled']))
-			Errors::fatal_lang_error('feature_disabled', true);
+			Errors::instance()->fatal_lang_error('feature_disabled', true);
 
 		isAllowedTo('like_posts_stats');
 
@@ -664,7 +664,7 @@ class Likes_Controller extends Action_Controller
 		require_once(SUBSDIR . '/Likes.subs.php');
 
 		if (empty($modSettings['likes_enabled']))
-			Errors::fatal_lang_error('feature_disabled', true);
+			Errors::instance()->fatal_lang_error('feature_disabled', true);
 
 		isAllowedTo('like_posts_stats');
 

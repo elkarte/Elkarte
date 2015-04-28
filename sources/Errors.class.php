@@ -27,19 +27,83 @@ if (!defined('ELK'))
  */
 class Errors {
 	/**
+	 * The prepared error string from getTrace to display when debug is enabled
+	 * @var string
+	 */
+	private $error_text = '';
+
+	/**
+	 * Sole private Errors instance
+	 * @var Errors
+	 */
+	private static $_errors = null;
+
+	/**
+	 * Mask for errors that are fatal and will halt
+	 * @var int
+	 */
+	protected $fatalErrors;
+
+	/**
+	 * The error string from $e->getMessage()
+	 * @var string
+	 */
+	private $error_string;
+
+	/**
+	 * The level of error from $e->getCode
+	 * @var int
+	 */
+	private $error_level;
+
+	/**
+	 * Common name for the error , Error, Waning, Notice
+	 * @var string
+	 */
+	private $error_name;
+
+	/**
+	 * Good old constructor
+	 */
+	public function __construct()
+	{
+		// Build the bitwise mask
+		$this->fatalErrors = E_ERROR | E_USER_ERROR | E_COMPILE_ERROR | E_CORE_ERROR | E_PARSE;
+	}
+
+	/**
+	 * Registers the class handlers to the PHP handler functions
+	 */
+	public function register_handlers()
+	{
+		set_error_handler(array($this, 'error_handler'));
+		set_exception_handler(array($this, 'exception_handler'));
+	}
+
+	/**
+	 * Halts execution, optional displays an error message
+	 *
+	 * @param string|integer $error
+	 */
+	protected function terminate($error = 0)
+	{
+		die(htmlspecialchars($error));
+	}
+
+	/**
 	 * Log an error to the error log if the error logging is enabled.
 	 *
 	 * - filename and line should be __FILE__ and __LINE__, respectively.
 	 *
 	 * Example use:
-	 *   - die(Errors::log_error($msg));
+	 *   - die(Errors::instance()->log_error($msg));
 	 *
 	 * @param string $error_message
 	 * @param string|boolean $error_type = 'general'
 	 * @param string|null $file = null
 	 * @param int|null $line = null
 	 */
-	public static function log_error($error_message, $error_type = 'general', $file = null, $line = null)
+	public function log_error($error_message, $error_type = 'general', $file = null, $line = null)
 	{
 		global $modSettings, $sc, $user_info, $scripturl, $last_error;
 
@@ -130,7 +194,7 @@ class Errors {
 	 * @param string|null $file = null
 	 * @param int|null $line = null
 	 */
-	public static function log_lang_error($error, $error_type = 'general', $sprintf = array(), $file = null, $line = null)
+	public function log_lang_error($error, $error_type = 'general', $sprintf = array(), $file = null, $line = null)
 	{
 		global $user_info, $language, $txt;
 
@@ -139,7 +203,7 @@ class Errors {
 		$reload_lang_file = $language != $user_info['language'];
 
 		$error_message = !isset($txt[$error]) ? $error : (empty($sprintf) ? $txt[$error] : vsprintf($txt[$error], $sprintf));
-		self::log_error($error_message, $error_type, $file, $line);
+		$this->log_error($error_message, $error_type, $file, $line);
 
 		// Load the language file, only if it needs to be reloaded
 		if ($reload_lang_file)
@@ -155,18 +219,18 @@ class Errors {
 	 * @param string $error
 	 * @param string|boolean $log defaults to 'general', use false to skip _setup_fatal_error_context
 	 */
-	public static function fatal_error($error = '', $log = 'general')
+	public function fatal_error($error = '', $log = 'general')
 	{
 		global $txt;
 
 		// We don't have $txt yet, but that's okay...
 		if (empty($txt))
-			die($error);
+			$this->terminate($error);
 
 		if (class_exists('Template_Layers'))
 			Template_Layers::getInstance()->isError();
 
-		self::_setup_fatal_error_context($log ? self::log_error($error, $log) : $error, $error);
+		$this->_setup_fatal_error_context($log ? $this->log_error($error, $log) : $error, $error);
 	}
 
 	/**
@@ -184,7 +248,7 @@ class Errors {
 	 * @param string|boolean $log defaults to 'general' false will skip logging, true will use general
 	 * @param string[] $sprintf defaults to empty array()
 	 */
-	public static function fatal_lang_error($error, $log = 'general', $sprintf = array())
+	public function fatal_lang_error($error, $log = 'general', $sprintf = array())
 	{
 		global $txt, $language, $user_info, $context;
 		static $fatal_error_called = false;
@@ -198,7 +262,7 @@ class Errors {
 
 		// If we have no theme stuff we can't have the language file...
 		if (empty($context['theme_loaded']))
-			die($error);
+			$this->terminate($error);
 
 		if (class_exists('Template_Layers'))
 			Template_Layers::getInstance()->isError();
@@ -211,7 +275,7 @@ class Errors {
 			loadLanguage('Errors', $language);
 			$reload_lang_file = $language != $user_info['language'];
 			$error_message = empty($sprintf) ? $txt[$error] : vsprintf($txt[$error], $sprintf);
-			self::log_error($error_message, $log);
+			$this->log_error($error_message, $log);
 		}
 
 		// Load the language file, only if it needs to be reloaded
@@ -221,7 +285,7 @@ class Errors {
 			$error_message = empty($sprintf) ? $txt[$error] : vsprintf($txt[$error], $sprintf);
 		}
 
-		self::_setup_fatal_error_context($error_message, $error);
+		$this->_setup_fatal_error_context($error_message, $error);
 	}
 
 	/**
@@ -234,14 +298,14 @@ class Errors {
 	 * @param string $file
 	 * @param int $line
 	 */
-	public static function error_handler($error_level, $error_string, $file, $line)
+	public function error_handler($error_level, $error_string, $file, $line)
 	{
 		// Ignore errors if we're ignoring them or if the error code is not included in error_reporting
 		if (!($error_level & error_reporting()))
 			return;
 
 		// Throw it as an exception so our exception_handler deals with it
-		return self::exception_handler(new Exception($error_string, $error_level));
+		return $this->exception_handler(new Exception($error_string, $error_level), $file, $line);
 	}
 
 	/**
@@ -251,45 +315,61 @@ class Errors {
 	 *
 	 * @param Exception $e
 	 */
-	public static function exception_handler(Exception $e)
+	public function exception_handler(Exception $e, $err_file = null, $err_line = null)
+	{
+		$this->error_text = '';
+
+		// Showing the errors? Format them to look decent
+		$this->_prepareErrorDisplay($e, $err_file, $err_line);
+
+		// Prepare the error details for the log
+		$this->error_string = $e->getMessage();
+		$this->error_level = $e->getCode();
+		$this->error_name =  $this->error_level % 255 === E_ERROR ? 'Error' : ($this->error_level % 255 === E_WARNING ? 'Warning' : 'Notice');
+		$error_type = stripos($this->error_string, 'undefined') !== false ? 'undefined_vars' : 'general';
+		$err_file = htmlspecialchars(isset($err_file) ? $err_file : $e->getFile());
+		$err_line = isset($err_line) ? $err_line : $e->getLine();
+
+		// Logged !
+		$message = $this->log_error($this->error_name . ': ' . $this->error_string, $error_type, $err_file, $err_line);
+
+		// Display debug information?
+		$this->_displayDebug();
+
+		// Let's give integrations a chance to output a bit differently
+		call_integration_hook('integrate_output_error', array($message, $error_type, $this->error_level, $err_file, $err_line));
+
+		// Dying on these errors only causes MORE problems (blank pages!)
+		if ($err_file === 'Unknown')
+			return;
+
+		// If this is an E_ERROR or E_USER_ERROR.... die.  Violently so.
+		if ($this->error_level & $this->fatalErrors)
+			obExit(false);
+		else
+			return;
+
+		// If this is an E_ERROR, E_USER_ERROR, E_WARNING, or E_USER_WARNING.... die.  Violently so.
+		if ($this->error_level & $this->fatalErrors || $this->error_level % 255 === E_WARNING)
+			$this->fatal_error(allowedTo('admin_forum') ? $message : $this->error_string, false);
+
+		// We should NEVER get to this point.  Any fatal error MUST quit, or very bad things can happen.
+		if ($this->error_level & $this->fatalErrors)
+			$this->terminate('Hacking attempt...');
+	}
+
+	/**
+	 * Display debug information, shows exceptions / errors similar to standard
+	 * PHP error output.
+	 */
+	private function _displayDebug()
 	{
 		global $db_show_debug;
 
-		$error_text = '';
-		$current_directory = str_replace('\\', '/', getcwd());
-
-		// Showing the errors, lets make it look decent
-		if ($db_show_debug === true)
-		{
-			foreach ($e->getTrace() as $entry)
-			{
-				$function = (isset($entry['class']) ? $entry['class'] . $entry['type'] : '') . $entry['function'];
-
-				if (isset($entry['file']))
-					$file = str_replace($current_directory, '', str_replace('\\', '/', $entry['file']));
-				else
-					$file = '';
-
-				$error_text .= '<li><strong>' . htmlspecialchars($function) . '()</strong>' . (isset($entry['file'], $entry['line']) ? ' in <strong>' . $file . '</strong> at line <strong>' . $entry['line'] . '</strong>' : '') . "</li>\n";
-			}
-		}
-
-		// Prepare the error details for the log
-		$error_string = $e->getMessage();
-		$error_type = stripos($error_string, 'undefined') !== false ? 'undefined_vars' : 'general';
-		$error_level = $e->getCode();
-		$file = htmlspecialchars($e->getFile());
-		$line = $e->getLine();
-		$error_name =  $error_level % 255 === E_ERROR ? 'Error' : ($error_level % 255 === E_WARNING ? 'Warning' : 'Notice');
-
-		// Logged !
-		$message = self::log_error($error_name . ': ' . $error_string, $error_type, $file, $line);
-
-		// Display debug information
 		if ($db_show_debug === true)
 		{
 			// Commonly, undefined indexes will occur inside attributes; try to show them anyway!
-			if ($error_level % 255 !== E_ERROR)
+			if ($this->error_level % 255 !== E_ERROR)
 			{
 				$temporary = ob_get_contents();
 				if (substr($temporary, -2) === '="')
@@ -297,29 +377,48 @@ class Errors {
 			}
 
 			// Debugging!  This should look like a PHP error message.
-			echo '<br /><strong>', $error_name, '</strong>: ' . $error_string . '<ol>' . $error_text . '</ol>';
+			echo '<br /><strong>', $this->error_name, '</strong>: ' . $this->error_string . '<ol>' . $this->error_text . '</ol>';
 		}
+	}
 
-		// Let's give integrations a chance to output a bit differently
-		call_integration_hook('integrate_output_error', array($message, $error_type, $error_level, $file, $line));
+	/**
+	 * Builds the error text stack trace for display when using debug options
+	 *
+	 * @param exception $e
+	 * @param string|null $err_file
+	 * @param int|null $err_line
+	 */
+	private function _prepareErrorDisplay($e, $err_file = null, $err_line = null)
+	{
+		global $db_show_debug;
 
-		// Dying on these errors only causes MORE problems (blank pages!)
-		if ($file === 'Unknown')
-			return;
+		$skip = true;
+		$current_directory = str_replace('\\', '/', getcwd());
 
-		// If this is an E_ERROR or E_USER_ERROR.... die.  Violently so.
-		if ($error_level % 255 === E_ERROR)
-			obExit(false);
-		else
-			return;
+		// Showing the errors, lets make it look decent
+		if ($db_show_debug === true)
+		{
+			foreach ($e->getTrace() as $entry)
+			{
+				// If comming from the error_handler, skim off the first exception trace
+				if (isset($err_file, $skip))
+				{
+					$skip = null;
+					continue;
+				}
 
-		// If this is an E_ERROR, E_USER_ERROR, E_WARNING, or E_USER_WARNING.... die.  Violently so.
-		if ($error_level % 255 === E_ERROR || $error_level % 255 === E_WARNING)
-			self::fatal_error(allowedTo('admin_forum') ? $message : $error_string, false);
+				$function = (isset($entry['class']) ? $entry['class'] . $entry['type'] : '') . $entry['function'];
 
-		// We should NEVER get to this point.  Any fatal error MUST quit, or very bad things can happen.
-		if ($error_level % 255 === E_ERROR)
-			die('Hacking attempt...');
+				if (isset($entry['file']))
+					$file = str_replace($current_directory, '', str_replace('\\', '/', $entry['file']));
+				else
+					$file = '';
+
+				$this->error_text .= '<li><strong>' . htmlspecialchars($function) . '()</strong>' . (isset($entry['file'], $entry['line'])
+						? ' in <strong>' . $file . '</strong> at line <strong>' .  (isset($err_line) ? $err_line : $entry['line']) . '</strong>'
+						: '') . "</li>\n";
+			}
+		}
 	}
 
 	/**
@@ -329,7 +428,7 @@ class Errors {
 	 * @param string $error_message
 	 * @param string $error_code string or int code
 	 */
-	private static function _setup_fatal_error_context($error_message, $error_code)
+	private function _setup_fatal_error_context($error_message, $error_code)
 	{
 		global $context, $txt, $ssi_on_error_method;
 		static $level = 0;
@@ -366,7 +465,7 @@ class Errors {
 
 			// No layers?
 			if (empty($ssi_on_error_method) || $ssi_on_error_method !== true)
-				exit;
+				$this->terminate();
 		}
 
 		// We want whatever for the header, and a footer. (footer includes sub template!)
@@ -389,11 +488,11 @@ class Errors {
 	 * - It is used only if $maintenance = 2 in Settings.php.
 	 * - It stops further execution of the script.
 	 */
-	public static function display_maintenance_message()
+	public function display_maintenance_message()
 	{
 		global $maintenance, $mtitle, $mmessage;
 
-		self::_set_fatal_error_headers();
+		$this->_set_fatal_error_headers();
 
 		if (!empty($maintenance))
 			echo '<!DOCTYPE html>
@@ -408,7 +507,7 @@ class Errors {
 		</body>
 	</html>';
 
-		die();
+		$this->terminate();
 	}
 
 	/**
@@ -419,7 +518,7 @@ class Errors {
 	 * - It is used only if there's no way to connect to the database.
 	 * - It stops further execution of the script.
 	 */
-	public static function display_db_error()
+	public function display_db_error()
 	{
 		global $mbname, $modSettings, $maintenance, $webmaster_email, $db_error_send;
 
@@ -431,7 +530,7 @@ class Errors {
 			@ob_end_clean();
 
 		// Set the output headers
-		self::_set_fatal_error_headers();
+		$this->_set_fatal_error_headers();
 
 		$db_last_error = db_last_error();
 
@@ -467,7 +566,7 @@ class Errors {
 		</body>
 	</html>';
 
-		die();
+		$this->terminate();
 	}
 
 	/**
@@ -478,10 +577,10 @@ class Errors {
 	 * - It is used only if the load averages are too high to continue execution.
 	 * - It stops further execution of the script.
 	 */
-	public static function display_loadavg_error()
+	public function display_loadavg_error()
 	{
 		// If this is a load average problem, display an appropriate message (but we still don't have language files!)
-		self::_set_fatal_error_headers();
+		$this->_set_fatal_error_headers();
 
 		echo '<!DOCTYPE html>
 	<html>
@@ -495,16 +594,16 @@ class Errors {
 		</body>
 	</html>';
 
-		die();
+		$this->terminate();
 	}
 
 	/**
-	 * Small utility function for fatal error pages.
+	 * Small utility function for fatal error pages, sets the headers.
 	 *
 	 * - Used by display_db_error(), display_loadavg_error(),
 	 * display_maintenance_message()
 	 */
-	private static function _set_fatal_error_headers()
+	private function _set_fatal_error_headers()
 	{
 		// Don't cache this page!
 		header('Expires: Mon, 26 Jul 1997 05:00:00 GMT');
@@ -515,5 +614,18 @@ class Errors {
 		header('HTTP/1.1 503 Service Temporarily Unavailable');
 		header('Status: 503 Service Temporarily Unavailable');
 		header('Retry-After: 3600');
+	}
+
+	/**
+	 * Retrieve the sole instance of this class.
+	 *
+	 * @return Errors
+	 */
+	public static function instance()
+	{
+		if (self::$_errors === null)
+			self::$_errors = new Errors();
+
+		return self::$_errors;
 	}
 }

@@ -113,6 +113,6 @@ class Elk_Exception extends Exception
 	 */
 	public function fatalLangError()
 	{
-		Errors::fatal_lang_error($this->message, $this->log, $this->sprintf);
+		Errors::instance()->fatal_lang_error($this->message, $this->log, $this->sprintf);
 	}
 }

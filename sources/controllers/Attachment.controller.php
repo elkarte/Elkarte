@@ -191,7 +191,7 @@ class Attachment_Controller extends Action_Controller
 
 		// Make sure some attachment was requested!
 		if (!isset($_REQUEST['attach']) && !isset($_REQUEST['id']))
-			Errors::fatal_lang_error('no_access', false);
+			Errors::instance()->fatal_lang_error('no_access', false);
 
 		// We need to do some work on attachments and avatars.
 		require_once(SUBSDIR . '/Attachments.subs.php');
@@ -213,7 +213,7 @@ class Attachment_Controller extends Action_Controller
 		}
 
 		if (empty($attachment))
-			Errors::fatal_lang_error('no_access', false);
+			Errors::instance()->fatal_lang_error('no_access', false);
 		list ($id_folder, $real_filename, $file_hash, $file_ext, $id_attach, $attachment_type, $mime_type, $is_approved, $id_member) = $attachment;
 
 		// If it isn't yet approved, do they have permission to view it?

@@ -241,7 +241,7 @@ class ProfileHistory_Controller extends Action_Controller
 			$context['ip'] = trim($_REQUEST['searchip']);
 
 		if (preg_match('/^\d{1,3}\.(\d{1,3}|\*)\.(\d{1,3}|\*)\.(\d{1,3}|\*)$/', $context['ip']) == 0 && isValidIPv6($context['ip']) === false)
-			Errors::fatal_lang_error('invalid_tracking_ip', false);
+			Errors::instance()->fatal_lang_error('invalid_tracking_ip', false);
 
 		$ip_var = str_replace('*', '%', $context['ip']);
 		$ip_string = strpos($ip_var, '%') === false ? '= {string:ip_address}' : 'LIKE {string:ip_address}';
