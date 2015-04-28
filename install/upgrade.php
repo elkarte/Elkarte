@@ -542,7 +542,7 @@ function action_welcomeLogin()
 	$check = @file_exists($modSettings['theme_dir'] . '/index.template.php')
 		&& @file_exists(SOURCEDIR . '/QueryString.php')
 		&& @file_exists(SOURCEDIR . '/database/Db-' . $db_type . '.class.php')
-		&& @file_exists(__DIR__ . '/upgrade_1-0.sql');
+		&& @file_exists(__DIR__ . '/upgrade_1-1.sql');
 
 	// If the db is not UTF
 	if (!isset($modSettings['elkVersion']) && ($db_type == 'mysql' || $db_type == 'mysqli') && (!isset($db_character_set) || $db_character_set !== 'utf8' || empty($modSettings['global_character_set']) || $modSettings['global_character_set'] !== 'UTF-8'))
