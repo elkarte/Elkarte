@@ -1432,9 +1432,6 @@ class Install_Controller
 			updateStats('subject', 1, htmlspecialchars($txt['default_topic_subject']));
 		$db->free_result($request);
 
-		// Now is the perfect time to fetch remote files.
-		require_once(SUBSDIR . '/ScheduledTask.class.php');
-
 		// Sanity check that they loaded earlier!
 		if (isset($modSettings['recycle_board']))
 		{

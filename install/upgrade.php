@@ -1195,7 +1195,6 @@ function action_databaseChanges()
  * Updates maintenance mode to what it was before the upgrade started
  * Updates settings.php, sometimes even correctly
  * Flushes the cache so there is a clean start
- * Runs a scheduled fetch files so the install can be checked in the admin panel
  */
 function action_deleteUpgrade()
 {
