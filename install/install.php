@@ -206,6 +206,68 @@ function load_database()
 	return database();
 }
 
+class DbWrapper
+{
+	protected $db = null;
+	protected $count_mode = false;
+	protected $replaces = array();
+
+	public function __construct($db, $replaces)
+	{
+		$this->db = $db;
+	}
+
+	public function insert()
+	{
+		$args = func_get_args();
+
+		if ($this->count_mode)
+			return count($args[3]);
+
+		foreach ($args[3] as $key => $data)
+		{
+			foreach ($data as $k => $v)
+			{
+				$args[3][$key][$k] = strtr($v, $replaces);
+			}
+		}
+
+		call_user_func_array(array($this->db, 'insert'), $args);
+
+		return $this->db->affected_rows();
+	}
+
+	public function countMode($on = true)
+	{
+		$this->count_mode = (bool) $on;
+	}
+}
+
+class DbTableWrapper
+{
+	protected $db = null;
+
+	public function __construct($db)
+	{
+		$this->db = $db;
+	}
+
+	public function __call($name, $args)
+	{
+		return call_user_func_array(array($this->db, $name), $args);
+	}
+
+	public function db_add_index()
+	{
+		$args = func_get_args();
+
+		// In this case errors are ignored, so the return is always true
+		call_user_func_array(array($this->db, 'db_create_table'), $args);
+
+		return true;
+	}
+}
+
 /**
  * This is called upon exiting the installer, for template etc.
  * @param bool $fallThrough
@@ -1026,13 +1088,11 @@ class Install_Controller
 
 		if (!empty($databases[$db_type]['additional_file']))
 		{
-			$sql_lines = explode("\n", strtr(implode(' ', file(__DIR__ . '/' . $databases[$db_type]['additional_file'])), $replaces));
-			parse_sqlLines($sql_lines);
+			parse_sqlLines(__DIR__ . '/' . $databases[$db_type]['additional_file'], $replaces);
 		}
 
 		// Read in the SQL.  Turn this on and that off... internationalize... etc.
-		$sql_lines = explode("\n", strtr(implode(' ', file(__DIR__ . '/install_' . DB_SCRIPT_VERSION . '.sql')), $replaces));
-		parse_sqlLines($sql_lines);
+		parse_sqlLines(__DIR__ . '/install_' . DB_SCRIPT_VERSION . '.php', $replaces);
 
 		// Make sure UTF will be used globally.
 		$db->insert('replace',
@@ -2089,66 +2149,87 @@ function db_table_install()
 	return call_user_func(array('DbTable_' . DB_TYPE . '_Install', 'db_table'), $db);
 }
 
-function parse_sqlLines($sql_lines)
+function parse_sqlLines($sql_file, $replaces)
 {
-	global $incontext, $txt;
+	global $incontext, $txt, $db_prefix;
 
 	$db = load_database();
 	$db_table = db_table_install();
+	$db_wrapper = new DbWrapper($db, $replaces);
+	$db_table_wrapper = new DbTableWrapper($db_table);
 
 	$current_statement = '';
 	$exists = array();
 
-	foreach ($sql_lines as $count => $line)
+	require_once($sql_file);
+
+	$class_name = 'InstallInstructions_' . str_replace('-', '_', basename($sql_file, '.php'));
+	$install_instance = new $class_name($db_wrapper, $db_table_wrapper);
+
+	$methods = get_class_methods($install_instance);
+	$tables = array_filter($methods, function($method) {
+		return strpos($method, 'table_') === 0;
+	});
+	$inserts = array_filter($methods, function($method) {
+		return strpos($method, 'insert_') === 0;
+	});
+	$others = array_filter($methods, function($method) {
+		return strpos($method, 'insert_') !== 0 && strpos($method, 'table_') !== 0;
+	});
+
+	foreach ($tables as $table_method)
 	{
-		// No comments allowed!
-		if (substr(trim($line), 0, 1) != '#')
-			$current_statement .= "\n" . rtrim($line);
+		$table_name = substr($table_method, 6);
 
-		// Is this the end of the query string?
-		if (empty($current_statement) || (preg_match('~;[\s]*$~s', $line) == 0 && $count != count($sql_lines)))
-			continue;
+		// Copied from DbTable class
+		// Strip out the table name, we might not need it in some cases
+		$real_prefix = preg_match('~^("?)(.+?)\\1\\.(.*?)$~', $db_prefix, $match) === 1 ? $match[3] : $db_prefix;
 
-		// Does this table already exist? If so, don't insert more data into it!
-		if (preg_match('~^\s*\$db->insert\(.*(\{db_prefix\}\w+)~s', $current_statement, $match) != 0 && in_array($match[1], $exists))
+		// With or without the database name, the fullname looks like this.
+		$full_table_name = str_replace('{db_prefix}', $real_prefix, $table_name);
+
+		if ($db_table->table_exists($full_table_name))
 		{
-			$incontext['sql_results']['insert_dups']++;
-			$current_statement = '';
+			$incontext['sql_results']['table_dups']++;
+			$exists[] = $table_method;
 			continue;
 		}
 
-		$result = eval('return ' . $current_statement);
+		$result = $install_instance->{$table_method}();
 
 		if ($result === false)
 		{
-			// Error 1050: Table already exists!
-			// @todo Needs to be made better!
-			if (($db_type != 'mysql' || mysqli_errno($db_connection) === 1050) && preg_match('~^\s*\$db_table->db_create_table\(.*(\{db_prefix\}\w+)~s', $current_statement, $match) == 1)
-			{
-				$exists[] = $match[1];
-				$incontext['sql_results']['table_dups']++;
-			}
-			// Don't error on duplicate indexes (or duplicate operators in PostgreSQL.)
-			elseif (!preg_match('~^\s*\$db->query\(.*CREATE( UNIQUE)? INDEX ([^\n\r]+?)~s', $current_statement) && !($db_type == 'postgresql' && preg_match('~^\s*\$db->query\(.*CREATE OPERATOR (^\n\r]+?)~s', $current_statement)))
-			{
-				$incontext['failures'][$count] = $db->last_error();
-			}
+			$incontext['failures'][$table_method] = $db->last_error();
 		}
-		else
+	}
+
+	foreach ($inserts as $insert_method)
+	{
+		$table_name = substr($insert_method, 6);
+
+		if (in_array($table_name, $exists))
 		{
-			if (preg_match('~^\s*\$db_table->db_create_table\(.*(\{db_prefix\}\w+)~s', $current_statement, $match) == 1)
-				$incontext['sql_results']['tables']++;
-			else
-			{
-				preg_match_all('~^\s*array\(.+\),$~m', $current_statement, $matches);
-				if (!empty($matches[0]))
-					$incontext['sql_results']['inserts'] += (count($matches[0]) - 1);
-				else
-					$incontext['sql_results']['inserts']++;
-			}
+			$db_wrapper->countMode();
+			$incontext['sql_results']['insert_dups'] += $install_instance->{$insert_method}();
+			$db_wrapper->countMode(false);
+
+			continue;
 		}
 
-		$current_statement = '';
+		$result = $install_instance->{$insert_method}();
+
+		if ($result === false)
+		{
+			$incontext['failures'][$count] = $db->last_error();
+		}
+		else
+			$incontext['sql_results']['inserts'] += $result;
+	}
+
+	// Errors here are ignored
+	foreach ($others as $other_method)
+	{
+		$install_instance->{$other_method}();
 	}
 
 	// Sort out the context for the SQL.
