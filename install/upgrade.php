@@ -163,10 +163,6 @@ require_once(SUBSDIR . '/Package.subs.php');
 // All the non-SSI stuff.
 loadEssentialFunctions();
 
-// Don't do security check if on Yabbse or SMF
-if (!isset($modSettings['elkVersion']))
-	$disable_security = true;
-
 // We should have the database easily at this point
 $db = database();
 
@@ -206,7 +202,7 @@ if (!isset($settings['default_theme_dir']))
 	$settings['default_theme_dir'] = $modSettings['theme_dir'];
 
 $upcontext['is_large_forum'] = (empty($modSettings['elkVersion']) || $modSettings['elkVersion'] <= '1.0') && !empty($modSettings['totalMessages']) && $modSettings['totalMessages'] > 75000;
-$upcontext['page_title'] = isset($modSettings['elkVersion']) ? 'Updating Your ElkArte Install!' : (isset($modSettings['smfVersion']) ? 'Upgrading from SMF!' : 'Upgrading from YaBB SE!');
+$upcontext['page_title'] = 'Upgrading Your ElkArte Install!';
 $upcontext['right_to_left'] = isset($txt['lang_rtl']) ? $txt['lang_rtl'] : false;
 
 // Have we got log data - if so use it (It will be clean!)
@@ -536,17 +532,7 @@ function action_welcomeLogin()
 	$check = @file_exists($modSettings['theme_dir'] . '/index.template.php')
 		&& @file_exists(SOURCEDIR . '/QueryString.php')
 		&& @file_exists(SOURCEDIR . '/database/Db-' . $db_type . '.class.php')
-		&& @file_exists(__DIR__ . '/upgrade_elk_1-0_' . $db_type . '.sql');
-
-	// Need scripts to migrate from SMF?
-	if (isset($modSettings['smfVersion']) && $modSettings['smfVersion'] < 2.1)
-		$check &= @file_exists(__DIR__ . '/upgrade_2-0_' . $db_type . '.sql');
-
-	if (isset($modSettings['smfVersion']) && $modSettings['smfVersion'] < 2.0)
-		$check &= @file_exists(__DIR__ . '/upgrade_1-1.sql');
-
-	if (isset($modSettings['smfVersion']) && $modSettings['smfVersion'] < 1.1)
-		$check &= @file_exists(__DIR__ . '/upgrade_1-0.sql');
+		&& @file_exists(__DIR__ . '/upgrade_1-0_' . $db_type . '.sql');
 
 	// If the db is not UTF
 	if (!isset($modSettings['elkVersion']) && ($db_type == 'mysql' || $db_type == 'mysqli') && (!isset($db_character_set) || $db_character_set !== 'utf8' || empty($modSettings['global_character_set']) || $modSettings['global_character_set'] !== 'UTF-8'))
@@ -1112,11 +1098,7 @@ function action_databaseChanges()
 	// All possible files.
 	// Name, less than version, insert_on_complete.
 	$files = array(
-		array('upgrade_1-0.sql', '1.1', '1.1 RC0'),
-		array('upgrade_1-1.sql', '2.0', '2.0 a'),
-		array('upgrade_2-0_' . $db_type . '.sql', '2.1', '2.1 dev0'),
-		// array('upgrade_2-1_' . $db_type . '.sql', '3.0', '3.0 dev0'),
-		array('upgrade_elk_1-0_' . $db_type . '.sql', '1.1', CURRENT_VERSION),
+		array('upgrade_1-0_' . $db_type . '.sql', '1.1', CURRENT_VERSION),
 	);
 
 	// How many files are there in total?
@@ -1127,9 +1109,7 @@ function action_databaseChanges()
 		$upcontext['file_count'] = 0;
 		foreach ($files as $file)
 		{
-			if (!isset($modSettings['elkVersion']) && isset($modSettings['smfVersion']) && strpos($file[0], '_elk_') === false && version_compare($modSettings['smfVersion'], $file[1]) < 0)
-				$upcontext['file_count']++;
-			elseif ((!isset($modSettings['elkVersion']) && strpos($file[0], '_elk_') !== false) || (strpos($file[0], '_elk_') !== false && version_compare($modSettings['elkVersion'], $file[1]) < 0))
+			if (version_compare($modSettings['elkVersion'], $file[1]) < 0)
 				$upcontext['file_count']++;
 		}
 	}
@@ -1148,7 +1128,7 @@ function action_databaseChanges()
 			$upcontext['cur_file_name'] = $file[0];
 
 			// @todo Do we actually need to do this still?
-			if (!isset($modSettings['elkVersion']) || $modSettings['elkVersion'] < $file[1] || ($modSettings['elkVersion'] == '2.1 dev0' && $file[0] == 'upgrade_elk_1-0_' . $db_type . '.sql'))
+			if (!isset($modSettings['elkVersion']) || version_compare($modSettings['elkVersion'], $file[1]) < 0)
 			{
 				$nextFile = parse_sql(__DIR__ . '/' . $file[0]);
 				if ($nextFile)
