@@ -17,6 +17,16 @@
 
 require('installcore.php');
 
+function getUpgradeFiles()
+{
+	global $db_type;
+
+	return array(
+		array('upgrade_1-1.sql', '1.1', CURRENT_VERSION),
+		array('upgrade_1-1_' . $db_type . '.sql', '1.1', CURRENT_VERSION),
+	);
+}
+
 // General options for the script.
 $timeLimitThreshold = 3;
 $upgrade_path = realpath(__DIR__ . '/..');
@@ -532,7 +542,7 @@ function action_welcomeLogin()
 	$check = @file_exists($modSettings['theme_dir'] . '/index.template.php')
 		&& @file_exists(SOURCEDIR . '/QueryString.php')
 		&& @file_exists(SOURCEDIR . '/database/Db-' . $db_type . '.class.php')
-		&& @file_exists(__DIR__ . '/upgrade_1-0_' . $db_type . '.sql');
+		&& @file_exists(__DIR__ . '/upgrade_1-0.sql');
 
 	// If the db is not UTF
 	if (!isset($modSettings['elkVersion']) && ($db_type == 'mysql' || $db_type == 'mysqli') && (!isset($db_character_set) || $db_character_set !== 'utf8' || empty($modSettings['global_character_set']) || $modSettings['global_character_set'] !== 'UTF-8'))
@@ -1097,9 +1107,7 @@ function action_databaseChanges()
 
 	// All possible files.
 	// Name, less than version, insert_on_complete.
-	$files = array(
-		array('upgrade_1-0_' . $db_type . '.sql', '1.1', CURRENT_VERSION),
-	);
+	$files = getUpgradeFiles();
 
 	// How many files are there in total?
 	if (isset($_GET['filecount']))
@@ -1109,7 +1117,7 @@ function action_databaseChanges()
 		$upcontext['file_count'] = 0;
 		foreach ($files as $file)
 		{
-			if (version_compare($modSettings['elkVersion'], $file[1]) < 0)
+			if (file_exists(__DIR__ . '/' . $file[0]) && version_compare($modSettings['elkVersion'], $file[1]) < 0)
 				$upcontext['file_count']++;
 		}
 	}
@@ -1128,7 +1136,7 @@ function action_databaseChanges()
 			$upcontext['cur_file_name'] = $file[0];
 
 			// @todo Do we actually need to do this still?
-			if (!isset($modSettings['elkVersion']) || version_compare($modSettings['elkVersion'], $file[1]) < 0)
+			if (file_exists(__DIR__ . '/' . $file[0]) && (!isset($modSettings['elkVersion']) || version_compare($modSettings['elkVersion'], $file[1]) < 0))
 			{
 				$nextFile = parse_sql(__DIR__ . '/' . $file[0]);
 				if ($nextFile)
@@ -2663,15 +2671,12 @@ function makeFilesWritable(&$files)
  */
 function deleteUpgrader()
 {
-	global $db_type;
-
 	@unlink(__FILE__);
 
 	// And the extra little files ;).
-	@unlink(__DIR__ . '/upgrade_1-0.sql');
-	@unlink(__DIR__ . '/upgrade_1-1.sql');
-	@unlink(__DIR__ . '/upgrade_2-0_' . $db_type . '.sql');
-	@unlink(__DIR__ . '/upgrade_2-1_' . $db_type . '.sql');
+	$files = getUpgradeFiles();
+	foreach ($files as $file)
+		@unlink(__DIR__ . '/' . $file);
 
 	$dh = opendir(__DIR__);
 	while ($file = readdir($dh))
