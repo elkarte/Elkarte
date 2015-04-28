@@ -803,7 +803,7 @@ class Install_Controller
 
 			// Do they meet the install requirements?
 			// @todo Old client, new server?
-			if (version_compare($databases[$db_type]['version'], preg_replace('~^\D*|\-.+?$~', '', eval($databases[$db_type]['version_check']))) > 0)
+			if (version_compare($databases[$db_type]['version'], preg_replace('~^\D*|\-.+?$~', '', $databases[$db_type]['version_check']($db_connection))) > 0)
 			{
 				$incontext['error'] = $txt['error_db_too_low'];
 				return false;
@@ -917,7 +917,7 @@ class Install_Controller
 			require(TMP_BOARDDIR . '/Settings.php');
 
 			// UTF-8 requires a setting to override any language charset.
-			if (!empty($databases[$db_type]['utf8_version_check']) && version_compare($databases[$db_type]['utf8_version'], preg_replace('~\-.+?$~', '', eval($databases[$db_type]['utf8_version_check'])), '>'))
+			if (!empty($databases[$db_type]['utf8_version_check']) && version_compare($databases[$db_type]['utf8_version'], preg_replace('~\-.+?$~', '', $databases[$db_type]['utf8_version_check']($db_connection)), '>'))
 			{
 				// our uft-8 check support on the db failed ....
 				$incontext['error'] = sprintf($txt['error_utf8_version'], $databases[$db_type]['utf8_version']);

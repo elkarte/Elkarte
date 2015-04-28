@@ -1297,97 +1297,6 @@ function action_deleteUpgrade()
 	return false;
 }
 
-function convertSettingsToTheme()
-{
-	global $db_prefix, $modSettings;
-
-	$values = array(
-		'show_latest_member' => @$GLOBALS['showlatestmember'],
-		'show_bbc' => isset($GLOBALS['showyabbcbutt']) ? $GLOBALS['showyabbcbutt'] : @$GLOBALS['showbbcbutt'],
-		'show_modify' => @$GLOBALS['showmodify'],
-		'show_user_images' => @$GLOBALS['showuserpic'],
-		'show_blurb' => @$GLOBALS['showusertext'],
-		'show_gender' => @$GLOBALS['showgenderimage'],
-		'show_newsfader' => @$GLOBALS['shownewsfader'],
-		'display_recent_bar' => @$GLOBALS['Show_RecentBar'],
-		'show_member_bar' => @$GLOBALS['Show_MemberBar'],
-		'linktree_link' => @$GLOBALS['curposlinks'],
-		'show_profile_buttons' => @$GLOBALS['profilebutton'],
-		'show_mark_read' => @$GLOBALS['showmarkread'],
-		'newsfader_time' => @$GLOBALS['fadertime'],
-		'use_image_buttons' => empty($GLOBALS['MenuType']) ? 1 : 0,
-		'enable_news' => @$GLOBALS['enable_news'],
-		'return_to_post' => @$modSettings['returnToPost'],
-	);
-
-	$themeData = array();
-	foreach ($values as $variable => $value)
-	{
-		if (!isset($value) || $value === null)
-			$value = 0;
-
-		$themeData[] = array(0, 1, $variable, $value);
-	}
-
-	if (!empty($themeData))
-	{
-		$db = database();
-
-		$db->insert('ignore',
-			$db_prefix . 'themes',
-			array('id_member' => 'int', 'id_theme' => 'int', 'variable' => 'string', 'value' => 'string'),
-			$themeData,
-			array('id_member', 'id_theme', 'variable')
-		);
-	}
-}
-
-/**
- * This function only works with MySQL but that's fine as it is only used for SMF v1.0 upgrades
- */
-function convertSettingstoOptions()
-{
-	global $modSettings;
-
-	$db = database();
-
-	// Format: new_setting -> old_setting_name.
-	$values = array(
-		'calendar_start_day' => 'cal_startmonday',
-		'view_newest_first' => 'viewNewestFirst',
-		'view_newest_pm_first' => 'viewNewestFirst',
-	);
-
-	foreach ($values as $variable => $value)
-	{
-		if (empty($modSettings[$value[0]]))
-			continue;
-
-		$db->query('', '
-			INSERT IGNORE INTO {db_prefix}themes
-				(id_member, id_theme, variable, value)
-			SELECT id_member, 1, {string:variable}, {string:value}
-			FROM {db_prefix}members',
-			array(
-				'variable' => $variable,
-				'value' => $modSettings[$value[0]],
-				'db_error_skip' => true,
-			)
-		);
-
-		$db->query('', '
-			INSERT IGNORE INTO {db_prefix}themes
-				(id_member, id_theme, variable, value)
-			VALUES (-1, 1, {string:variable}, {string:value})',
-			array(
-				'variable' => $variable,
-				'value' => $modSettings[$value[0]],
-				'db_error_skip' => true,
-			)
-		);
-	}
-}
-
 /**
  * Reads in our backup setting_bak.php file
  * Removes flagged settings
@@ -1477,7 +1386,7 @@ function db_version_check()
 {
 	global $db_type, $databases, $db_connection;
 
-	$curver = eval($databases[$db_type]['version_check']);
+	$curver = $databases[$db_type]['version_check']($db_connection);
 	$curver = preg_replace('~\-.+?$~', '', $curver);
 
 	return version_compare($databases[$db_type]['version'], $curver, '<=');
@@ -1591,7 +1500,7 @@ function parse_sql($filename)
 	set_error_handler('sql_error_handler');
 
 	// If we're on MySQL supporting collations then let's find out what the members table uses and put it in a global var - to allow upgrade script to match collations!
-	if (!empty($databases[$db_type]['utf8_support']) && version_compare($databases[$db_type]['utf8_version'], eval($databases[$db_type]['utf8_version_check']), '>'))
+	if (!empty($databases[$db_type]['utf8_support']) && version_compare($databases[$db_type]['utf8_version'], $databases[$db_type]['utf8_version_check']($db_connection), '>'))
 	{
 		$request = $db->query('', '
 			SHOW TABLE STATUS
@@ -2175,7 +2084,7 @@ function checkChange(&$change)
 	// Attempt to find a database_version.
 	if (empty($database_version))
 	{
-		$database_version = $databases[$db_type]['version_check'];
+		$database_version = $databases[$db_type]['version_check']($db_connection);
 		$where_field_support = $db_type == 'mysql' && version_compare('5.0', $database_version, '<=');
 	}
 
