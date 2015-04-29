@@ -86,11 +86,11 @@ class Elk_Testing_psql extends Elk_Testing_Setup
 		$this->_db_table = DbTable_PostgreSQL_Install::db_table($this->_db);
 
 		// Load the postgre install sql queryies
-		$this->load_queries(BOARDDIR . '/install/install_1-0_postgresql.sql');
+		$this->load_queries(BOARDDIR . '/install/install_' . DB_SCRIPT_VERSION . '_postgresql.sql');
 		$this->run_queries();
 
 		// Now the rest normally
-		$this->load_queries(BOARDDIR . '/install/install_1-0.sql');
+		$this->load_queries(BOARDDIR . '/install/install_' . DB_SCRIPT_VERSION . '.sql');
 		$this->run_queries();
 
 		// Prepare Settings.php, add a member, set time
