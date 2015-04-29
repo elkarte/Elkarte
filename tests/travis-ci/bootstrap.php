@@ -54,7 +54,7 @@ require_once(SOURCEDIR . '/Logging.php');
 require_once(SOURCEDIR . '/Load.php');
 require_once(SOURCEDIR . '/Security.php');
 require_once(SUBSDIR . '/Cache.subs.php');
-require_once(BOARDDIR . '/tests/dummies/Errors.php');
+// require_once(BOARDDIR . '/tests/dummies/Errors.php');
 
 // Get the autoloader rolling
 require(SOURCEDIR . '/Autoloader.class.php');
