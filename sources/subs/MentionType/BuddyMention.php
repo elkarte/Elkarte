@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Interface for mentions objects
+ * Handles mentioning of buddies
  *
  * @name      ElkArte Forum
  * @copyright ElkArte Forum contributors
@@ -18,8 +18,14 @@ if (!defined('ELK'))
 
 class Buddy_Mention extends Mention_Message_Abstract
 {
+	/**
+	 * {@inheritdoc }
+	 */
 	protected $_type = 'buddy';
 
+	/**
+	 * {@inheritdoc }
+	 */
 	public function view($type, &$mentions)
 	{
 		foreach ($mentions as $key => $row)
@@ -32,5 +38,32 @@ class Buddy_Mention extends Mention_Message_Abstract
 		}
 
 		return false;
+	}
+
+	/**
+	 * {@inheritdoc }
+	 */
+	public function getNotificationBody($frequency, $members)
+	{
+		switch ($frequency)
+		{
+			case 'email_weekly':
+			case 'email_daily':
+				$keys = array('subject' => 'notify_new_buddy_digest', 'body' => 'notify_new_buddy_snippet');
+				break;
+			case 'email':
+				$keys = array('subject' => 'notify_new_buddy_subject', 'body' => 'notify_new_buddy_body');
+				break;
+			case 'notification':
+			default:
+				return $this->_getNotificationStrings('', array('subject' => $this->_type, 'body' => $this->_type), $members, $this->_task);
+		}
+
+		$notifier = $this->_task->getNotifierData();
+		$replacements = array(
+			'ACTIONNAME' => $notifier['real_name'],
+		);
+
+		return $this->_getNotificationStrings('notify_new_buddy', $keys, $members, $this->_task, array(), $replacements);
 	}
 }

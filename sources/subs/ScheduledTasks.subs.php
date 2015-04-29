@@ -569,12 +569,12 @@ function run_this_task($id_task, $task_name)
 {
 	global $time_start, $modSettings;
 
-	Elk_Autoloader::getInstance()->register(SUBSDIR . '/ScheduledTask', 'ElkArte\\sources\\subs\\ScheduledTask');
+	Elk_Autoloader::getInstance()->register(SUBSDIR . '/ScheduledTask', '\\ElkArte\\sources\\subs\\ScheduledTask');
 
 	// Let's start logging the task and saying we failed it
 	$log_task_id = logTask(0, $id_task);
 
-	$class = 'ElkArte\\sources\\subs\\ScheduledTask\\' . implode('_', array_map('ucfirst', explode('_', $task_name)));
+	$class = '\\ElkArte\\sources\\subs\\ScheduledTask\\' . implode('_', array_map('ucfirst', explode('_', $task_name)));
 
 	if (class_exists($class))
 	{

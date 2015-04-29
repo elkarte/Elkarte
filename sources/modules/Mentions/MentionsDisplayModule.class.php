@@ -16,7 +16,10 @@ if (!defined('ELK'))
 
 class Mentions_Display_Module extends Mentions_Module_Abstract
 {
-	public static function hooks($eventsManager)
+	/**
+	 * {@inheritdoc }
+	 */
+	public static function hooks(\Event_Manager $eventsManager)
 	{
 		self::registerHooks('display', $eventsManager);
 

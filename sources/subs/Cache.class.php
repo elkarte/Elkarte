@@ -73,7 +73,7 @@ class Cache
 		if (empty($accelerator))
 			$accelerator = 'filebased';
 
-		$cache_class = 'ElkArte\\sources\\subs\\CacheMethod\\' . ucfirst($accelerator);
+		$cache_class = '\\ElkArte\\sources\\subs\\CacheMethod\\' . ucfirst($accelerator);
 		$this->_cache_obj = new $cache_class($this->_options);
 
 		if ($this->_cache_obj !== null)
@@ -279,7 +279,7 @@ class Cache
 					'cache_password' => $cache_password,
 				);
 			}
-			Elk_Autoloader::getInstance()->register(SUBSDIR . '/CacheMethod', 'ElkArte\\sources\\subs\\CacheMethod');
+			Elk_Autoloader::getInstance()->register(SUBSDIR . '/CacheMethod', '\\ElkArte\\sources\\subs\\CacheMethod');
 
 			self::$_instance = new Cache($cache_enable, $cache_accelerator, $options);
 		}
