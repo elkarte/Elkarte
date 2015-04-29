@@ -383,7 +383,7 @@ class Install_Controller
 			$probably_installed = 0;
 			foreach (file(TMP_BOARDDIR . '/Settings.php') as $line)
 			{
-				if (preg_match('~^\$db_passwd\s=\s\'([^\']+)\';$~', $line))
+				if (preg_match('~^\$boarddir\s=\s\'([^\']+)\';$~', $line))
 					$probably_installed++;
 				if (preg_match('~^\$boardurl\s=\s\'([^\']+)\';~', $line) && !preg_match('~^\$boardurl\s=\s\'http://127\.0\.0\.1/elkarte\';~', $line))
 					$probably_installed++;
@@ -529,7 +529,7 @@ class Install_Controller
 			'smileys',
 			'themes',
 			'agreement.txt',
-			'db_last_error.php',
+			'db_last_error.txt',
 			'Settings.php',
 			'Settings_bak.php'
 		);
