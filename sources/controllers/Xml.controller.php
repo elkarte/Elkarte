@@ -105,18 +105,18 @@ class Xml_Controller extends Action_Controller
 		$icons = array();
 
 		// Get all the available member group icons
-		$files = scandir($directory);
-		foreach ($files as $id => $file)
+		$files = new FilesystemIterator($directory, FilesystemIterator::SKIP_DOTS);
+		foreach ($files as $file)
 		{
-			if ($file === 'blank.png')
+			if ($file->getFilename() === 'blank.png')
 				continue;
 
-			if (in_array(strtolower(pathinfo($file, PATHINFO_EXTENSION)), $allowedTypes))
+			if (in_array(strtolower($file->getExtension()), $allowedTypes))
 			{
-				$icons[$id] = array(
-					'value' => $file,
+				$icons[] = array(
+					'value' => $file->getFilename(),
 					'name' => '',
-					'url' => $settings['images_url'] . '/group_icons/' .  $file,
+					'url' => $settings['images_url'] . '/group_icons/' .  $file->getFilename(),
 					'is_last' => false,
 				);
 			}
