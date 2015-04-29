@@ -71,6 +71,7 @@ reloadSettings();
 elk_seed_generator();
 loadSession();
 loadUserSettings();
+loadBoard();
 loadPermissions();
 
 // Basic language is good to have for functional tests

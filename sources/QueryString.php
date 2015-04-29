@@ -44,9 +44,6 @@ function cleanRequest()
 
 	// Parse the $_REQUEST and make sure things like board, topic don't have weird stuff
 	$req->parseRequest();
-
-	// Make the global interface class available
-	require_once(SUBSDIR . '/HttpRequest.class.php');
 }
 
 /**
