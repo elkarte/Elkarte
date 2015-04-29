@@ -2,11 +2,16 @@
 
 class Errors
 {
-	public static function fatal_error($msg)
+	public function fatal_error($msg)
 	{
 		print_r($msg);
 	}
-	public static function log_error()
+	public function log_error()
 	{
+	}
+
+	public static function instance()
+	{
+		return new Errors();
 	}
 }
