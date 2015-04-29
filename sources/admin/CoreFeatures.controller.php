@@ -299,9 +299,11 @@ class CoreFeatures_Controller extends Action_Controller
 	protected function _getModulesConfig(&$core_features)
 	{
 		// Find appropriately named core feature files in the admin directory
-		foreach (glob(ADMINDIR . '/Manage*Module.controller.php') as $file)
+		$glob = new GlobIterator(ADMINDIR . '/Manage*Module.controller.php', FilesystemIterator::SKIP_DOTS);
+
+		foreach ($glob as $file)
 		{
-			$class = basename($file, '.controller.php') . '_Controller';
+			$class = $file->getBasename('.controller.php') . '_Controller';
 
 			if (method_exists($class, 'addCoreFeature'))
 				$class::addCoreFeature($core_features);
