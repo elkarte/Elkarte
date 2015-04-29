@@ -88,7 +88,17 @@ Class Elk_Testing_Setup
 	 */
 	public function load_queries($sql_file)
 	{
-		$replaces = array();
+		$replaces = array(
+			'{$db_prefix}' => $this->_db_prefix,
+			'{BOARDDIR}' => BOARDDIR,
+			'{$boardurl}' => $this->_boardurl,
+			'{$enableCompressedOutput}' => 0,
+			'{$databaseSession_enable}' => 1,
+			'{$current_version}' => CURRENT_VERSION,
+			'{$current_time}' => time(),
+			'{$sched_task_offset}' => 82800 + mt_rand(0, 86399),
+		);
+
 		$this->_db->skip_error();
 		$db_wrapper = new DbWrapper($this->_db, $replaces);
 		$db_table_wrapper = new DbTableWrapper($this->_db_table);
