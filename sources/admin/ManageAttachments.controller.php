@@ -988,48 +988,50 @@ class ManageAttachments_Controller extends Action_Controller
 			// Just use the current path for temp files.
 			if (!is_array($modSettings['attachmentUploadDir']))
 				$modSettings['attachmentUploadDir'] = unserialize($modSettings['attachmentUploadDir']);
-			$attach_dirs = $modSettings['attachmentUploadDir'];
 
+			$attach_dirs = $modSettings['attachmentUploadDir'];
 			$current_check = 0;
 			$max_checks = 500;
+
 			$files_checked = empty($this->substep) ? 0 : $this->substep;
 			foreach ($attach_dirs as $attach_dir)
 			{
-				if ($dir = @opendir($attach_dir))
+				try
 				{
-					while ($file = readdir($dir))
+					$files = new FilesystemIterator($attach_dir, FilesystemIterator::SKIP_DOTS);
+					foreach ($files as $file)
 					{
-						if ($file == '.' || $file == '..' || $file == '.htaccess')
+						if ($file->getFilename() === '.htaccess')
 							continue;
 
 						if ($files_checked <= $current_check)
 						{
 							// Temporary file, get rid of it!
-							if (strpos($file, 'post_tmp_') !== false)
+							if (strpos($file->getFilename(), 'post_tmp_') !== false)
 							{
 								// Temp file is more than 5 hours old!
-								if (filemtime($attach_dir . '/' . $file) < time() - 18000)
-									@unlink($attach_dir . '/' . $file);
+								if ($file->getMTime() < time() - 18000)
+									@unlink($file->getPathname());
 							}
 							// That should be an attachment, let's check if we have it in the database
-							elseif (strpos($file, '_') !== false)
+							elseif (strpos($file->getFilename(), '_') !== false)
 							{
-								$attachID = (int) substr($file, 0, strpos($file, '_'));
+								$attachID = (int) substr($file->getFilename(), 0, strpos($file->getFilename(), '_'));
 								if (!empty($attachID))
 								{
 									if (!validateAttachID($attachID))
 									{
 										if ($fix_errors && in_array('files_without_attachment', $to_fix))
-											@unlink($attach_dir . '/' . $file);
+											@unlink($file->getPathname());
 										else
 											$context['repair_errors']['files_without_attachment']++;
 									}
 								}
 							}
-							elseif ($file != 'index.php' && !is_dir($attach_dir . '/' . $file))
+							elseif ($file->getFilename() !== 'index.php' && !$file->isDir())
 							{
 								if ($fix_errors && in_array('files_without_attachment', $to_fix))
-									@unlink($attach_dir . '/' . $file);
+									@unlink($file->getPathname());
 								else
 									$context['repair_errors']['files_without_attachment']++;
 							}
@@ -1040,7 +1042,10 @@ class ManageAttachments_Controller extends Action_Controller
 						if ($current_check - $files_checked >= $max_checks)
 							$this->_pauseAttachmentMaintenance($to_fix);
 					}
-					closedir($dir);
+				}
+				catch (UnexpectedValueException $e)
+				{
+					// @todo for now do nothing...
 				}
 			}
 
