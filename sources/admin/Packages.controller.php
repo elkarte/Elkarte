@@ -2018,31 +2018,38 @@ class Packages_Controller extends Action_Controller
 			foreach ($context['directory_list'] as $path => $dummy)
 			{
 				// Do the contents of the directory first.
-				$dh = @opendir($path);
-				$file_count = 0;
-				$dont_chmod = false;
-				while ($entry = readdir($dh))
+				try
 				{
-					$file_count++;
+					$entrys = new FilesystemIterator($path, FilesystemIterator::SKIP_DOTS);
+					$file_count = 0;
+					$dont_chmod = false;
 
-					// Actually process this file?
-					if (!$dont_chmod && !is_dir($path . '/' . $entry) && (empty($context['file_offset']) || $context['file_offset'] < $file_count))
+					foreach ($entrys as $entry)
 					{
-						$status = $context['predefined_type'] === 'free' || isset($context['special_files'][$path . '/' . $entry]) ? 'writable' : 'execute';
-						package_chmod($path . '/' . $entry, $status);
-					}
+						$file_count++;
 
-					// See if we're out of time?
-					if (!$dont_chmod && time() - array_sum(explode(' ', $time_start)) > $timeout_limit)
-					{
-						$dont_chmod = true;
+						// Actually process this file?
+						if (!$dont_chmod && !$entry->isDir() && (empty($context['file_offset']) || $context['file_offset'] < $file_count))
+						{
+							$status = $context['predefined_type'] === 'free' || isset($context['special_files'][$entry->getPathname()]) ? 'writable' : 'execute';
+							package_chmod($entry->getPathname(), $status);
+						}
 
-						// Make note of how far we have come so we restart at the right point
-						$context['file_offset'] = $file_count;
-						break;
+						// See if we're out of time?
+						if (!$dont_chmod && time() - array_sum(explode(' ', $time_start)) > $timeout_limit)
+						{
+							$dont_chmod = true;
+
+							// Make note of how far we have come so we restart at the right point
+							$context['file_offset'] = $file_count;
+							break;
+						}
 					}
 				}
-				closedir($dh);
+				catch (UnexpectedValueException $e)
+				{
+					// @todo for now do nothing...
+				}
 
 				// If this is set it means we timed out half way through.
 				if ($dont_chmod)
@@ -2098,17 +2105,28 @@ class Packages_Controller extends Action_Controller
 		global $context;
 
 		$count = 0;
-		$dh = @opendir($dir);
-		while ($entry = readdir($dh))
+
+		try
 		{
-			if ($entry != '.' && $entry != '..' && is_dir($dir . '/' . $entry))
+			$iterator = new RecursiveIteratorIterator(
+				new RecursiveDirectoryIterator($dir, RecursiveDirectoryIterator::SKIP_DOTS),
+				RecursiveIteratorIterator::SELF_FIRST,
+				RecursiveIteratorIterator::CATCH_GET_CHILD
+			);
+
+			foreach ($iterator as $path => $file)
 			{
-				$context['directory_list'][$dir . '/' . $entry] = 1;
-				$count++;
-				$count += $this->count_directories__recursive($dir . '/' . $entry);
+				if ($file->isDir())
+				{
+					$context['directory_list'][$path] = 1;
+					$count++;
+				}
 			}
 		}
-		closedir($dh);
+		catch (UnexpectedValueException $e)
+		{
+			// @todo
+		}
 
 		return $count;
 	}
@@ -2198,8 +2216,10 @@ class Packages_Controller extends Action_Controller
 			foreach ($context['package_types'] as $type)
 				$packages[$type] = array();
 
-		if ($dir = @opendir(BOARDDIR . '/packages'))
+		try
 		{
+			$dir = new FilesystemIterator(BOARDDIR . '/packages', FilesystemIterator::SKIP_DOTS);
+
 			$dirs = array();
 			$sort_id = array(
 				'mod' => 1,
@@ -2210,40 +2230,40 @@ class Packages_Controller extends Action_Controller
 				'smiley' => 1,
 				'unknown' => 1,
 			);
-			while ($package = readdir($dir))
+			foreach ($dir as $package)
 			{
-				if ($package == '.' || $package == '..' || $package == 'temp' || (!(is_dir(BOARDDIR . '/packages/' . $package) && file_exists(BOARDDIR . '/packages/' . $package . '/package-info.xml')) && substr(strtolower($package), -7) != '.tar.gz' && substr(strtolower($package), -4) != '.tgz' && substr(strtolower($package), -4) != '.zip'))
+				if ($package->getFilename() == 'temp'
+					|| (!($package->isDir() && file_exists($package->getPathname() . '/package-info.xml'))
+						&& substr(strtolower($package->getFilename()), -7) !== '.tar.gz'
+						&& strtolower($package->getExtension()) !== 'tgz'
+						&& strtolower($package->getExtension()) !== 'zip'))
 					continue;
 
-				$skip = false;
 				foreach ($context['package_types'] as $type)
-					if (isset($context['available_' . $type][md5($package)]))
-						$skip = true;
-
-				if ($skip)
-					continue;
+					if (isset($context['available_' . $type][md5($package->getFilename())]))
+						continue 2;
 
 				// Skip directories or files that are named the same.
-				if (is_dir(BOARDDIR . '/packages/' . $package))
+				if ($package->isDir())
 				{
 					if (in_array($package, $dirs))
 						continue;
 					$dirs[] = $package;
 				}
-				elseif (substr(strtolower($package), -7) == '.tar.gz')
+				elseif (substr(strtolower($package->getFilename()), -7) === '.tar.gz')
 				{
 					if (in_array(substr($package, 0, -7), $dirs))
 						continue;
 					$dirs[] = substr($package, 0, -7);
 				}
-				elseif (substr(strtolower($package), -4) == '.zip' || substr(strtolower($package), -4) == '.tgz')
+				elseif (strtolower($package->getExtension()) === 'zip' || strtolower($package->getExtension()) === 'tgz')
 				{
-					if (in_array(substr($package, 0, -4), $dirs))
+					if (in_array(substr($package->getBasename(), 0, -4), $dirs))
 						continue;
-					$dirs[] = substr($package, 0, -4);
+					$dirs[] = substr($package->getBasename(), 0, -4);
 				}
 
-				$packageInfo = getPackageInfo($package);
+				$packageInfo = getPackageInfo($package->getFilename());
 				if (!is_array($packageInfo))
 					continue;
 
@@ -2350,41 +2370,44 @@ class Packages_Controller extends Action_Controller
 						}
 						else
 						{
-							$packages['modification'][strtolower($packageInfo[$sort]) . '_' . $sort_id['mod']] = md5($package);
-							$context['available_modification'][md5($package)] = $packageInfo;
+							$packages['modification'][strtolower($packageInfo[$sort]) . '_' . $sort_id['mod']] = md5($package->getFilename());
+							$context['available_modification'][md5($package->getFilename())] = $packageInfo;
 						}
 					}
 					// Avatar package.
 					elseif ($packageInfo['type'] == 'avatar')
 					{
 						$sort_id[$packageInfo['type']]++;
-						$packages['avatar'][strtolower($packageInfo[$sort])] = md5($package);
-						$context['available_avatar'][md5($package)] = $packageInfo;
+						$packages['avatar'][strtolower($packageInfo[$sort])] = md5($package->getFilename());
+						$context['available_avatar'][md5($package->getFilename())] = $packageInfo;
 					}
 					// Smiley package.
 					elseif ($packageInfo['type'] == 'smiley')
 					{
 						$sort_id[$packageInfo['type']]++;
-						$packages['smiley'][strtolower($packageInfo[$sort])] = md5($package);
-						$context['available_smiley'][md5($package)] = $packageInfo;
+						$packages['smiley'][strtolower($packageInfo[$sort])] = md5($package->getFilename());
+						$context['available_smiley'][md5($package->getFilename())] = $packageInfo;
 					}
 					// Language package.
 					elseif ($packageInfo['type'] == 'language')
 					{
 						$sort_id[$packageInfo['type']]++;
-						$packages['language'][strtolower($packageInfo[$sort])] = md5($package);
-						$context['available_language'][md5($package)] = $packageInfo;
+						$packages['language'][strtolower($packageInfo[$sort])] = md5($package->getFilename());
+						$context['available_language'][md5($package->getFilename())] = $packageInfo;
 					}
 					// Other stuff.
 					else
 					{
 						$sort_id['unknown']++;
-						$packages['unknown'][strtolower($packageInfo[$sort])] = md5($package);
-						$context['available_unknown'][md5($package)] = $packageInfo;
+						$packages['unknown'][strtolower($packageInfo[$sort])] = md5($package->getFilename());
+						$context['available_unknown'][md5($package->getFilename())] = $packageInfo;
 					}
 				}
 			}
-			closedir($dir);
+		}
+		catch (UnexpectedValueException $e)
+		{
+			// @todo for now do nothing...
 		}
 
 		if (isset($this->_req->query->type) && $this->_req->query->type == $params)
@@ -2437,47 +2460,57 @@ function fetchPerms__recursive($path, &$data, $level)
 		'folders' => array(),
 	);
 
-	$dh = opendir($path);
-	while ($entry = readdir($dh))
+	try
 	{
-		// Some kind of file?
-		if (is_file($path . '/' . $entry))
+		$entrys = new FilesystemIterator($path, FilesystemIterator::SKIP_DOTS);
+		foreach ($entrys as $entry)
 		{
-			// Are we listing PHP files in this directory?
-			if ($save_data && !empty($data['list_contents']) && substr($entry, -4) == '.php')
-				$foundData['files'][$entry] = true;
-			// A file we were looking for.
-			elseif ($save_data && isset($data['contents'][$entry]))
-				$foundData['files'][$entry] = true;
-		}
-		// It's a directory - we're interested one way or another, probably...
-		elseif ($entry != '.' && $entry != '..')
-		{
-			// Going further?
-			if ((!empty($data['type']) && $data['type'] == 'dir_recursive') || (isset($data['contents'][$entry]) && (!empty($data['contents'][$entry]['list_contents']) || (!empty($data['contents'][$entry]['type']) && $data['contents'][$entry]['type'] == 'dir_recursive'))))
+			// Some kind of file?
+			if ($entry->isFile())
 			{
-				if (!isset($data['contents'][$entry]))
-					$foundData['folders'][$entry] = 'dir_recursive';
-				else
-					$foundData['folders'][$entry] = true;
-
-				// If this wasn't expected inherit the recusiveness...
-				if (!isset($data['contents'][$entry]))
-					// We need to do this as we will be going all recursive.
-					$data['contents'][$entry] = array(
-						'type' => 'dir_recursive',
-					);
-
-				// Actually do the recursive stuff...
-				fetchPerms__recursive($path . '/' . $entry, $data['contents'][$entry], $level + 1);
+				// Are we listing PHP files in this directory?
+				if ($save_data && !empty($data['list_contents']) && $entry->getExtension() === 'php')
+					$foundData['files'][$entry->getFilename()] = true;
+				// A file we were looking for.
+				elseif ($save_data && isset($data['contents'][$entry->getFilename()]))
+					$foundData['files'][$entry->getFilename()] = true;
 			}
-			// Maybe it is a folder we are not descending into.
-			elseif (isset($data['contents'][$entry]))
-				$foundData['folders'][$entry] = true;
-			// Otherwise we stop here.
+			// It's a directory - we're interested one way or another, probably...
+			elseif ($entry->isDir())
+			{
+				// Going further?
+				if ((!empty($data['type']) && $data['type'] === 'dir_recursive')
+					|| (isset($data['contents'][$entry->getFilename()])
+						&& (!empty($data['contents'][$entry->getFilename()]['list_contents'])
+							|| (!empty($data['contents'][$entry->getFilename()]['type'])
+								&& $data['contents'][$entry->getFilename()]['type'] === 'dir_recursive'))))
+				{
+					if (!isset($data['contents'][$entry->getFilename()]))
+						$foundData['folders'][$entry->getFilename()] = 'dir_recursive';
+					else
+						$foundData['folders'][$entry->getFilename()] = true;
+
+					// If this wasn't expected inherit the recusiveness...
+					if (!isset($data['contents'][$entry->getFilename()]))
+						// We need to do this as we will be going all recursive.
+						$data['contents'][$entry->getFilename()] = array(
+							'type' => 'dir_recursive',
+						);
+
+					// Actually do the recursive stuff...
+					fetchPerms__recursive($entry->getPathname(), $data['contents'][$entry->getFilename()], $level + 1);
+				}
+				// Maybe it is a folder we are not descending into.
+				elseif (isset($data['contents'][$entry->getFilename()]))
+					$foundData['folders'][$entry->getFilename()] = true;
+				// Otherwise we stop here.
+			}
 		}
 	}
-	closedir($dh);
+	catch (UnexpectedValueException $e)
+	{
+		// @todo for now do nothing...
+	}
 
 	// Nothing to see here?
 	if (!$save_data)
