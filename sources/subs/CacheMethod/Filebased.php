@@ -86,14 +86,20 @@ class Filebased extends Cache_Method_Abstract
 	{
 		// To be complete, we also clear out the cache dir so we get any js/css hive files
 		// Remove the cache files in our disk cache directory
-		$dh = opendir(CACHEDIR);
-		while ($file = readdir($dh))
+		try
 		{
-			if ($file != '.' && $file != '..' && $file != 'index.php' && $file != '.htaccess' && (!$type || substr($file, 0, strlen($type)) == $type))
-				@unlink(CACHEDIR . '/' . $file);
-		}
+			$files = new FilesystemIterator(CACHEDIR, FilesystemIterator::SKIP_DOTS);
 
-		closedir($dh);
+			foreach ($files as $file)
+			{
+				if ($file !== 'index.php' && $file !== '.htaccess' && (!$type || $file->getExtension() == $type))
+					@unlink($file->getPathname());
+			}
+		}
+		catch (UnexpectedValueException $e)
+		{
+			// @todo
+		}
 	}
 
 	/**
