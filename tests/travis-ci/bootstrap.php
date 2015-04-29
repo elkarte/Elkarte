@@ -82,3 +82,4 @@ if (defined('PHPUNIT_SELENIUM'))
 	require_once('/var/www/tests/sources/controllers/ElkArteWebTest.php');
 	PHPUnit_Extensions_Selenium2TestCase::shareSession(true);
 }
+file_put_contents('/var/www/bootstrapcompleted.lock', '1');
