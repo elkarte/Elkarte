@@ -645,22 +645,23 @@ class ManageSearch_Controller extends Action_Controller
 		global $txt, $scripturl;
 
 		$apis = array();
-		$dh = opendir(SUBSDIR);
-		if ($dh)
+
+		try
 		{
-			while (($file = readdir($dh)) !== false)
+			$files = new FilesystemIterator(SUBSDIR, FilesystemIterator::SKIP_DOTS);
+			foreach ($files as $file)
 			{
-				if (is_file(SUBSDIR . '/' . $file) && preg_match('~^SearchAPI-([A-Za-z\d_]+)\.class\.php$~', $file, $matches))
+				if ($file->isFile() && preg_match('~^SearchAPI-([A-Za-z\d_]+)\.class\.php$~', $file->getFilename(), $matches))
 				{
 					// Check that this is definitely a valid API!
-					$fp = fopen(SUBSDIR . '/' . $file, 'rb');
+					$fp = fopen($file->getPathname(), 'rb');
 					$header = fread($fp, 4096);
 					fclose($fp);
 
 					if (strpos($header, '* SearchAPI-' . $matches[1] . '.class.php') !== false)
 					{
-						$index_name = ucwords($matches[1]);
-						$search_class_name = $index_name . '_Search';
+						$index_name = strtolower($matches[1]);
+						$search_class_name = ucwords($index_name) . '_Search';
 						$searchAPI = new $search_class_name();
 
 						// No Support?  NEXT!
@@ -668,7 +669,7 @@ class ManageSearch_Controller extends Action_Controller
 							continue;
 
 						$apis[$index_name] = array(
-							'filename' => $file,
+							'filename' => $file->getFilename(),
 							'setting_index' => $index_name,
 							'has_template' => in_array($index_name, array('custom', 'fulltext', 'standard')),
 							'label' => $index_name && isset($txt['search_index_' . $index_name]) ? str_replace('{managesearch_url}', $scripturl . '?action=admin;area=managesearch;sa=manage' . $index_name, $txt['search_index_' . $index_name]) : '',
@@ -678,7 +679,10 @@ class ManageSearch_Controller extends Action_Controller
 				}
 			}
 		}
-		closedir($dh);
+		catch (UnexpectedValueException $e)
+		{
+			// @todo for now just passthrough
+		}
 
 		return $apis;
 	}
