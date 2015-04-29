@@ -1585,15 +1585,7 @@ function parse_sql($filename)
 		{
 			$type = substr($line, 3, 1);
 
-			// An error??
-			if (trim($current_data) != '' && $type !== '}')
-			{
-				$upcontext['error_message'] = 'Error in upgrade script - line ' . $line_number . '!' . $endl;
-				if ($command_line)
-					echo $upcontext['error_message'];
-			}
-
-			if ($type == ' ')
+			if (completed step)
 			{
 				if (!$support_js && $do_current && $_GET['substep'] != 0 && $command_line)
 				{
@@ -1656,66 +1648,13 @@ function parse_sql($filename)
 			}
 			elseif ($type == '{')
 				$current_type = 'code';
-			elseif ($type == '}')
-			{
-				$current_type = 'sql';
-
-				if (!$do_current)
-				{
-					$current_data = '';
-					continue;
-				}
-
-				if (eval('global $db_prefix, $modSettings; $db = database(); ' . $current_data) === false)
-				{
-					$upcontext['error_message'] = 'Error in upgrade script ' . basename($filename) . ' on line ' . $line_number . '!' . $endl;
-					if ($command_line)
-						echo $upcontext['error_message'];
-				}
-
-				// Done with code!
-				$current_data = '';
-				$done_something = true;
-			}
 
 			continue;
 		}
 
 		$current_data .= $line;
-		if (substr(rtrim($current_data), -1) === ';' && $current_type === 'sql')
-		{
-			if ((!$support_js || isset($_GET['xml'])))
-			{
-				if (!$do_current)
-				{
-					$current_data = '';
-					continue;
-				}
-
-				$current_data = strtr(substr(rtrim($current_data), 0, -1), array('{$db_prefix}' => $db_prefix, '{BOARDDIR}' => BOARDDIR, '{$sboarddir}' => addslashes(BOARDDIR), '{$boardurl}' => $boardurl, '{$db_collation}' => $db_collation));
-
-				upgrade_query($current_data);
-
-				// @todo This will be how it kinda does it once mysql all stripped out - needed for postgre (etc).
-				/*
-				$result = $db->query('', $current_data, false, false);
-				// Went wrong?
-				if (!$result)
-				{
-					// Bit of a bodge - do we want the error?
-					if (!empty($upcontext['return_error']))
-					{
-						$upcontext['error_message'] = $db->last_error($db_connection);
-						return false;
-					}
-				}*/
-				$done_something = true;
-			}
-
-			$current_data = '';
-		}
 		// If this is xml based and we're just getting the item name then that's grand.
-		elseif ($support_js && !isset($_GET['xml']) && $upcontext['current_debug_item_name'] != '' && $do_current)
+		if ($support_js && !isset($_GET['xml']) && $upcontext['current_debug_item_name'] != '' && $do_current)
 		{
 			restore_error_handler();
 			return false;
