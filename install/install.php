@@ -215,6 +215,7 @@ class DbWrapper
 	public function __construct($db, $replaces)
 	{
 		$this->db = $db;
+		$this->replaces = $replaces;
 	}
 
 	public function insert()
@@ -228,7 +229,7 @@ class DbWrapper
 		{
 			foreach ($data as $k => $v)
 			{
-				$args[3][$key][$k] = strtr($v, $replaces);
+				$args[3][$key][$k] = strtr($v, $this->replaces);
 			}
 		}
 
