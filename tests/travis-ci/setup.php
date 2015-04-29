@@ -27,8 +27,7 @@ require_once(BOARDDIR . '/install/installcore.php');
 Class Elk_Testing_Setup
 {
 	protected $_db;
-	protected $_queries_parts;
-	protected $_clean_queries_parts;
+	protected $_install_instance;
 	protected $_queries;
 	protected $_dbserver;
 	protected $_name;
@@ -43,40 +42,76 @@ Class Elk_Testing_Setup
 	{
 		global $modSettings;
 
-		$modSettings['disableQueryCheck'] = true;
-		$query = '';
-		$db = $this->_db;
-		$db->skip_error();
-		$db_table = $this->_db_table;
-
-		if (empty($this->_clean_queries_parts))
-			$this->_clean_queries_parts = $this->_queries_parts;
-
-		foreach ($this->_clean_queries_parts as $part)
+		foreach ($this->_queries['tables'] as $table_method)
 		{
-			if (substr($part, -1) == ';')
-			{
-				$result = eval('return ' . $query . $part);
-				if ($result === false)
-					echo 'Query failed: ' . "\n" . $query . "\n" . substr($part, 0, -1) . "\n";
+			$table_name = substr($table_method, 6);
 
-				$query = '';
+			// Copied from DbTable class
+			// Strip out the table name, we might not need it in some cases
+			$real_prefix = preg_match('~^("?)(.+?)\\1\\.(.*?)$~', $this->_prefix, $match) === 1 ? $match[3] : $this->_prefix;
+
+			// With or without the database name, the fullname looks like this.
+			$full_table_name = str_replace('{db_prefix}', $real_prefix, $table_name);
+
+			if ($this->_db_table->table_exists($full_table_name))
+			{
+				$exists[] = $table_method;
+				continue;
 			}
-			else
-				$query .= "\n" . $part;
+
+			$result = $this->_install_instance->{$table_method}();
+		}
+
+		foreach ($this->_queries['inserts'] as $insert_method)
+		{
+			$table_name = substr($insert_method, 6);
+
+			if (in_array($table_name, $exists))
+			{
+				continue;
+			}
+
+			$result = $this->_install_instance->{$insert_method}();
+		}
+
+		// Errors here are ignored
+		foreach ($this->_queries['others'] as $other_method)
+		{
+			$this->_install_instance->{$other_method}();
 		}
 	}
 
 	/**
 	 * Loads the querys from the supplied sql install file
 	 *
-	 * @param string $file
+	 * @param string $sql_file
 	 */
-	public function load_queries($file)
+	public function load_queries($sql_file)
 	{
-		$this->_queries = str_replace('{$db_prefix}', $this->_db_prefix, file_get_contents($file));
-		$this->_queries_parts = explode("\n", $this->_queries);
-		$this->_fix_query_string();
+		$replaces = array();
+		$this->_db->skip_error();
+		$db_wrapper = new DbWrapper($this->_db, $replaces);
+		$db_table_wrapper = new DbTableWrapper($this->_db_table);
+
+		$current_statement = '';
+		$exists = array();
+
+		require_once($sql_file);
+
+		$class_name = 'InstallInstructions_' . str_replace('-', '_', basename($sql_file, '.php'));
+		$this->_install_instance = new $class_name($db_wrapper, $db_table_wrapper);
+		$methods = get_class_methods($this->_install_instance);
+		$this->_queries['tables'] = array_filter($methods, function($method) {
+			return strpos($method, 'table_') === 0;
+		});
+		$this->_queries['inserts'] = array_filter($methods, function($method) {
+			return strpos($method, 'insert_') === 0;
+		});
+		$this->_queries['others'] = array_filter($methods, function($method) {
+			return substr($method, 0, 2) !== '__' && strpos($method, 'insert_') !== 0 && strpos($method, 'table_') !== 0;
+		});
+
+
 	}
 
 	/**
@@ -92,30 +127,6 @@ Class Elk_Testing_Setup
 		// Bu-bye
 		foreach ($tables as $table)
 			$this->_db_table->db_drop_table($table);
-	}
-
-	/**
-	 * Does the variable replacements in the query strings {X} => data
-	 */
-	private function _fix_query_string()
-	{
-		foreach ($this->_queries_parts as $line)
-		{
-			if (!empty($line[0]) && $line[0] != '#')
-			{
-				$this->_clean_queries_parts[] = str_replace(
-					array(
-						'{$current_time}', '{$sched_task_offset}',
-						'{BOARDDIR}', '{$boardurl}'
-					),
-					array(
-						time(), '1',
-						BOARDDIR, $this->_boardurl
-					),
-					$line
-				);
-			}
-		}
 	}
 
 	/**
@@ -306,5 +317,68 @@ class Test_' . $key . ' extends TestSuite
 				$files[] = $entity;
 		}
 		return $files;
+	}
+}
+
+class DbWrapper
+{
+	protected $db = null;
+	protected $count_mode = false;
+	protected $replaces = array();
+
+	public function __construct($db, $replaces)
+	{
+		$this->db = $db;
+		$this->replaces = $replaces;
+	}
+
+	public function insert()
+	{
+		$args = func_get_args();
+
+		if ($this->count_mode)
+			return count($args[3]);
+
+		foreach ($args[3] as $key => $data)
+		{
+			foreach ($data as $k => $v)
+			{
+				$args[3][$key][$k] = strtr($v, $this->replaces);
+			}
+		}
+
+		call_user_func_array(array($this->db, 'insert'), $args);
+
+		return $this->db->affected_rows();
+	}
+
+	public function countMode($on = true)
+	{
+		$this->count_mode = (bool) $on;
+	}
+}
+
+class DbTableWrapper
+{
+	protected $db = null;
+
+	public function __construct($db)
+	{
+		$this->db = $db;
+	}
+
+	public function __call($name, $args)
+	{
+		return call_user_func_array(array($this->db, $name), $args);
+	}
+
+	public function db_add_index()
+	{
+		$args = func_get_args();
+
+		// In this case errors are ignored, so the return is always true
+		call_user_func_array(array($this->db, 'db_create_table'), $args);
+
+		return true;
 	}
 }

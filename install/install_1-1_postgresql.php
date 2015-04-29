@@ -9,7 +9,7 @@
  * IP Regex in inet_aton from http://www.mkyong.com/database/regular-expression-in-postgresql/.
  */
 
-class InstallInstructions_install_1_0_postgresql
+class InstallInstructions_install_1_1_postgresql
 {
 	protected $db = null;
 	protected $table = null;

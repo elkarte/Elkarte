@@ -84,8 +84,8 @@ class Elk_Testing_mysql extends Elk_Testing_Setup
 		$this->_db = Database_MySQL::db();
 		$this->_db_table = DbTable_MySQL_Install::db_table($this->_db);
 
-		// Load the mysql install queryies
-		$this->load_queries(BOARDDIR . '/install/install_' . DB_SCRIPT_VERSION . '.sql');
+		// Load the mysql install queries
+		$this->load_queries(BOARDDIR . '/install/install_' . DB_SCRIPT_VERSION . '.php');
 		$this->run_queries();
 
 		// Prepare Settings.php, add a member, set time
