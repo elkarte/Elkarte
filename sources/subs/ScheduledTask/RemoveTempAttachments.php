@@ -25,7 +25,7 @@ if (!defined('ELK'))
 /**
  * Check for un-posted attachments is something we can do once in a while :P
  *
- * - This function uses opendir cycling through all the attachments
+ * - This function uses FilesystemIterator cycling through all the attachments
  *
  * @package ScheduledTasks
  */
@@ -41,31 +41,29 @@ class Remove_Temp_Attachments implements Scheduled_Task_Interface
 
 		foreach ($attach_dirs as $attach_dir)
 		{
-			$dir = @opendir($attach_dir);
-			if (!$dir)
+			try
+			{
+				$files = new FilesystemIterator($attach_dir, FilesystemIterator::SKIP_DOTS);
+				foreach ($files as $file)
+				{
+					if (strpos($file->getFilename(), 'post_tmp_') !== false)
+					{
+						// Temp file is more than 5 hours old!
+						if ($file->getMTime() < time() - 18000)
+							@unlink($file->getPathname());
+					}
+				}
+			}
+			catch (UnexpectedValueException $e)
 			{
 				loadEssentialThemeData();
 				loadLanguage('Post');
 
 				$context['scheduled_errors']['remove_temp_attachments'][] = $txt['cant_access_upload_path'] . ' (' . $attach_dir . ')';
-				Errors::instance()->log_error($txt['cant_access_upload_path'] . ' (' . $attach_dir . ')', 'critical');
+				Errors::instance()->log_error($txt['cant_access_upload_path'] . ' (' . $e->getMessage() . ')', 'critical');
 
 				return false;
 			}
-
-			while ($file = readdir($dir))
-			{
-				if ($file == '.' || $file == '..')
-					continue;
-
-				if (strpos($file, 'post_tmp_') !== false)
-				{
-					// Temp file is more than 5 hours old!
-					if (filemtime($attach_dir . '/' . $file) < time() - 18000)
-						@unlink($attach_dir . '/' . $file);
-				}
-			}
-			closedir($dir);
 		}
 
 		return true;
