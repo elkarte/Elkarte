@@ -2177,7 +2177,7 @@ function parse_sqlLines($sql_file, $replaces)
 		return strpos($method, 'insert_') === 0;
 	});
 	$others = array_filter($methods, function($method) {
-		return strpos($method, 'insert_') !== 0 && strpos($method, 'table_') !== 0;
+		return substr($method, 0, 2) !== '__' && strpos($method, 'insert_') !== 0 && strpos($method, 'table_') !== 0;
 	});
 
 	foreach ($tables as $table_method)
