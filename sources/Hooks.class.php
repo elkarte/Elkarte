@@ -268,11 +268,13 @@ class Hooks
 		$path = $basepath . '/*/*' . $ext;
 		$names = array();
 
+		$glob = new GlobIterator($path, FilesystemIterator::SKIP_DOTS);
+
 		// Find all integration files
-		foreach (glob($path) as $file)
+		foreach ($glob as $file)
 		{
-			$name = str_replace($ext, '', basename($file));
-			$composer_file = dirname($file) . '/composer.json';
+			$name = str_replace($ext, '', $file->getBasename());
+			$composer_file = $file->getPath() . '/composer.json';
 
 			// Already have the integration compose file, then use it, otherwise create one
 			if (file_exists($composer_file))
@@ -318,10 +320,10 @@ class Hooks
 
 			$names[] = array(
 				'id' => $name,
-				'class' => str_replace('.integrate.php', '_Integrate', basename($file)),
+				'class' => str_replace('.integrate.php', '_Integrate', $file->getBasename()),
 				'title' => $composer_data->name,
 				'description' => $composer_data->description,
-				'path' => str_replace($basepath, '', $file),
+				'path' => str_replace($basepath, '', $file->getPathname()),
 				'details' => $composer_data,
 			);
 		}

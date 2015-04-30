@@ -1283,7 +1283,8 @@ function attachDirStatus($dir, $expected_files)
 		return array('not_writable', true, '');
 
 	// Count the files with a glob, easier and less time consuming
-	$num_files = count(glob($dir . '/*.elk'));
+	$glob = new GlobIterator($dir . '/*.elk', FilesystemIterator::SKIP_DOTS);
+	$num_files = $glob->count();
 
 	if ($num_files < $expected_files)
 		return array('files_missing', true, $num_files);

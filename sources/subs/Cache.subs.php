@@ -125,12 +125,12 @@ function loadCacheEngines($supported_only = true)
 {
 	$engines = array();
 
-	$classes = glob(SUBSDIR . '/CacheMethod/*.php');
+	$classes = new GlobIterator(SUBSDIR . '/CacheMethod/*.php', FilesystemIterator::SKIP_DOTS);
 
 	foreach ($classes as $file_path)
 	{
 		// Get the engine name from the file name
-		$parts = explode('.', basename($file_path));
+		$parts = explode('.', $file_path->getBasename());
 		$engine_name = $parts[0];
 		$class = 'ElkArte\\sources\\subs\\CacheMethod\\' . $parts[0];
 

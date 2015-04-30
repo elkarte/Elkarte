@@ -643,32 +643,39 @@ class PackageServers_Controller extends Action_Controller
 			Errors::instance()->fatal_lang_error('package_upload_error_broken', false, $txt[$context['package']]);
 		}
 		// Is it already uploaded, maybe?
-		elseif ($dir = @opendir(BOARDDIR . '/packages'))
+		else
 		{
-			while ($package = readdir($dir))
+			try
 			{
-				// No need to check these
-				if ($package == '.' || $package == '..' || $package == 'temp' || $package == $packageName ||
-					(!(is_dir(BOARDDIR . '/packages/' . $package) && file_exists(BOARDDIR . '/packages/' . $package . '/package-info.xml'))
-						&& substr(strtolower($package), -7) != '.tar.gz'
-						&& substr(strtolower($package), -4) != '.tgz'
-						&& substr(strtolower($package), -4) != '.zip'))
-					continue;
-
-				// Read package info for the archive we found
-				$packageInfo = getPackageInfo($package);
-				if (!is_array($packageInfo))
-					continue;
-
-				// If it was already uploaded under another name don't upload it again.
-				if ($packageInfo['id'] == $context['package']['id'] && $packageInfo['version'] == $context['package']['version'])
+				$packages = new FilesystemIterator(BOARDDIR . '/packages', FilesystemIterator::SKIP_DOTS);
+				foreach ($packages as $package)
 				{
-					@unlink($destination);
-					loadLanguage('Errors');
-					Errors::instance()->fatal_lang_error('package_upload_already_exists', 'general', $package);
+					// No need to check these
+					if ($package->getFilename() === 'temp' || $package->getFilename() == $packageName ||
+						(!($package->isDir()) && file_exists($package->getPathname() . '/package-info.xml')
+							&& substr(strtolower($package->getFilename()), -7) !== '.tar.gz'
+							&& strtolower($package->getExtension()) !== 'tgz'
+							&& strtolower($package->getExtension()) !== 'zip'))
+						continue;
+
+					// Read package info for the archive we found
+					$packageInfo = getPackageInfo($package->getFilename());
+					if (!is_array($packageInfo))
+						continue;
+
+					// If it was already uploaded under another name don't upload it again.
+					if ($packageInfo['id'] == $context['package']['id'] && $packageInfo['version'] == $context['package']['version'])
+					{
+						@unlink($destination);
+						loadLanguage('Errors');
+						Errors::instance()->fatal_lang_error('package_upload_already_exists', 'general', $package->getFilename());
+					}
 				}
 			}
-			closedir($dir);
+			catch (UnexpectedValueException $e)
+			{
+				// @todo for now do nothing...
+			}
 		}
 
 		if ($context['package']['type'] == 'modification')

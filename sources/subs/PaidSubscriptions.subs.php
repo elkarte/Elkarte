@@ -384,23 +384,25 @@ function addSubscription($id_subscribe, $id_member, $renewal = '', $forceStartTi
 function loadPaymentGateways()
 {
 	$gateways = array();
-	if ($dh = opendir(SUBSDIR))
+
+	try
 	{
-		while (($file = readdir($dh)) !== false)
+		$files = new FilesystemIterator(SUBSDIR, FilesystemIterator::SKIP_DOTS);
+		foreach ($files as $file)
 		{
-			if (is_file(SUBSDIR .'/'. $file) && preg_match('~^Subscriptions-([A-Za-z\d]+)\.class\.php$~', $file, $matches))
+			if ($file->isFile() && preg_match('~^Subscriptions-([A-Za-z\d]+)\.class\.php$~', $file->getFilename(), $matches))
 			{
 				// Check this is definitely a valid gateway!
-				$fp = fopen(SUBSDIR . '/' . $file, 'rb');
+				$fp = fopen($file->getPathname(), 'rb');
 				$header = fread($fp, 4096);
 				fclose($fp);
 
 				if (strpos($header, 'Payment Gateway: ' . $matches[1]) !== false)
 				{
-					require_once(SUBSDIR . '/' . $file);
+					require_once($file->getPathname());
 
 					$gateways[] = array(
-						'filename' => $file,
+						'filename' => $file->getFilename(),
 						'code' => strtolower($matches[1]),
 						// Don't need anything snazzier than this yet.
 						'valid_version' => class_exists($matches[1] . '_Payment') && class_exists($matches[1] . '_Display'),
@@ -411,7 +413,10 @@ function loadPaymentGateways()
 			}
 		}
 	}
-	closedir($dh);
+	catch (UnexpectedValueException $e)
+	{
+		// @todo
+	}
 
 	return $gateways;
 }

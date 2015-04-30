@@ -1461,8 +1461,39 @@ function deltree($dir, $delete_dir = true)
 	if (!file_exists($dir))
 		return;
 
-	$current_dir = @opendir($dir);
-	if ($current_dir == false)
+	// Read all the files in the directory
+	try
+	{
+		$entrynames = new FilesystemIterator($dir, FilesystemIterator::SKIP_DOTS);
+		foreach ($entrynames as $entryname)
+		{
+			// Recursivly dive in to each directory looking for files to delete
+			if ($entryname->isDir())
+				deltree($entryname->getPathname());
+			// A file, delete it by any means necessary
+			else
+			{
+				// Here, 755 doesn't really matter since we're deleting it anyway.
+				if (isset($package_ftp))
+				{
+					$ftp_file = strtr($entryname->getPathname(), array($_SESSION['pack_ftp']['root'] => ''));
+
+					if (!$entryname->isWritable())
+						$package_ftp->chmod($ftp_file, 0777);
+
+					$package_ftp->unlink($ftp_file);
+				}
+				else
+				{
+					if (!$entryname->isWritable())
+						@chmod($entryname->getPathname(), 0777);
+
+					@unlink($entryname->getPathname());
+				}
+			}
+		}
+	}
+	catch (UnexpectedValueException $e)
 	{
 		// Can't open the directory for reading, try FTP to remove it before quiting
 		if ($delete_dir && isset($package_ftp))
@@ -1476,52 +1507,23 @@ function deltree($dir, $delete_dir = true)
 		return;
 	}
 
-	// Read all the files in the directory
-	while ($entryname = readdir($current_dir))
-	{
-		if (in_array($entryname, array('.', '..')))
-			continue;
-
-		// Recursivly dive in to each directory looking for files to delete
-		if (is_dir($dir . '/' . $entryname))
-			deltree($dir . '/' . $entryname);
-		// A file, delete it by any means necessary
-		else
-		{
-			// Here, 755 doesn't really matter since we're deleting it anyway.
-			if (isset($package_ftp))
-			{
-				$ftp_file = strtr($dir . '/' . $entryname, array($_SESSION['pack_ftp']['root'] => ''));
-
-				if (!is_writable($dir . '/' . $entryname))
-					$package_ftp->chmod($ftp_file, 0777);
-				$package_ftp->unlink($ftp_file);
-			}
-			else
-			{
-				if (!is_writable($dir . '/' . $entryname))
-					@chmod($dir . '/' . $entryname, 0777);
-				@unlink($dir . '/' . $entryname);
-			}
-		}
-	}
-
-	closedir($current_dir);
-
 	// Remove the directory entry as well?
 	if ($delete_dir)
 	{
 		if (isset($package_ftp))
 		{
 			$ftp_file = strtr($dir, array($_SESSION['pack_ftp']['root'] => ''));
-			if (!is_writable($dir . '/' . $entryname))
+
+			if ($entryname->getPathname()->isWritable())
 				$package_ftp->chmod($ftp_file, 0777);
+
 			$package_ftp->unlink($ftp_file);
 		}
 		else
 		{
 			if (!is_writable($dir))
 				@chmod($dir, 0777);
+
 			@rmdir($dir);
 		}
 	}

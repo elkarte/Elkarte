@@ -586,9 +586,11 @@ class Admin_Controller extends Action_Controller
 	 */
 	protected function _getModulesMenu(&$admin_areas)
 	{
-		foreach (glob(ADMINDIR . '/Manage*Module.controller.php') as $file)
+		$glob = new GlobIterator(ADMINDIR . '/Manage*Module.controller.php', FilesystemIterator::SKIP_DOTS);
+
+		foreach ($glob as $file)
 		{
-			$name = basename($file, '.controller.php');
+			$name = $file->getBasename('.controller.php');
 			$class = $name . '_Controller';
 			$module = strtolower(substr($name, 6, -6));
 
