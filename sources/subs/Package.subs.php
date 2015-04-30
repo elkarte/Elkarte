@@ -1514,7 +1514,7 @@ function deltree($dir, $delete_dir = true)
 		{
 			$ftp_file = strtr($dir, array($_SESSION['pack_ftp']['root'] => ''));
 
-			if (!is_writable($dir . '/' . $entryname))
+			if ($entryname->getPathname()->isWritable())
 				$package_ftp->chmod($ftp_file, 0777);
 
 			$package_ftp->unlink($ftp_file);
@@ -1523,7 +1523,7 @@ function deltree($dir, $delete_dir = true)
 		{
 			if (!is_writable($dir))
 				@chmod($dir, 0777);
-			
+
 			@rmdir($dir);
 		}
 	}

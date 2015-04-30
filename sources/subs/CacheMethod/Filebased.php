@@ -12,6 +12,9 @@
 
 namespace ElkArte\sources\subs\CacheMethod;
 
+use FilesystemIterator;
+use UnexpectedValueException;
+
 if (!defined('ELK'))
 	die('No access...');
 

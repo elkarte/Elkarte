@@ -19,6 +19,9 @@
 
 namespace ElkArte\sources\subs\ScheduledTask;
 
+use FilesystemIterator;
+use UnexpectedValueException;
+
 if (!defined('ELK'))
 	die('No access...');
 

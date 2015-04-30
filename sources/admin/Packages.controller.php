@@ -2020,10 +2020,10 @@ class Packages_Controller extends Action_Controller
 				// Do the contents of the directory first.
 				try
 				{
-					$entrys = new FilesystemIterator($path, FilesystemIterator::SKIP_DOTS);
 					$file_count = 0;
 					$dont_chmod = false;
 
+					$entrys = new FilesystemIterator($path, FilesystemIterator::SKIP_DOTS);
 					foreach ($entrys as $entry)
 					{
 						$file_count++;
@@ -2041,7 +2041,7 @@ class Packages_Controller extends Action_Controller
 							$dont_chmod = true;
 
 							// Make note of how far we have come so we restart at the right point
-							$context['file_offset'] = $file_count;
+							$context['file_offset'] = isset($file_count) ? $file_count : 0;
 							break;
 						}
 					}
@@ -2052,9 +2052,9 @@ class Packages_Controller extends Action_Controller
 				}
 
 				// If this is set it means we timed out half way through.
-				if ($dont_chmod)
+				if (!empty($dont_chmod))
 				{
-					$context['total_files'] = $file_count;
+					$context['total_files'] = isset($file_count) ? $file_count : 0;
 					pausePermsSave();
 				}
 
