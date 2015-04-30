@@ -42,6 +42,7 @@ Class Elk_Testing_Setup
 	{
 		global $modSettings;
 
+		$exists = array();
 		foreach ($this->_queries['tables'] as $table_method)
 		{
 			$table_name = substr($table_method, 6);
