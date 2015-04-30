@@ -519,6 +519,142 @@ class DbTableWrapper
 	}
 }
 
+class DbTable_MySQL_Install extends DbTable_MySQL
+{
+	public static $_tbl_inst = null;
+	/**
+	* DbTable_MySQL::construct
+	*
+	* @param object $db - A Database_MySQL object
+	*/
+	private function __construct($db)
+	{
+		global $db_prefix;
+
+		// We are doing install, of course we want to do any remove on these
+		$this->_reservedTables = array();
+
+		// let's be sure.
+		$this->_package_log = array();
+
+		// This executes queries and things
+		$this->_db = $db;
+	}
+
+	/**
+	* Static method that allows to retrieve or create an instance of this class.
+	*
+	* @param object $db - A Database_MySQL object
+	* @return object - A DbTable_MySQL object
+	*/
+	public static function db_table($db)
+	{
+		if (is_null(self::$_tbl_inst))
+			self::$_tbl_inst = new DbTable_MySQL_Install($db);
+		return self::$_tbl_inst;
+	}
+}
+
+class DbTable_PostgreSQL_Install extends DbTable_PostgreSQL
+{
+	public static $_tbl_inst = null;
+	/**
+	* DbTable_MySQL::construct
+	*
+	* @param object $db - A Database_MySQL object
+	*/
+	private function __construct($db)
+	{
+		global $db_prefix;
+
+		// We are doing install, of course we want to do any remove on these
+		$this->_reservedTables = array();
+
+		// let's be sure.
+		$this->_package_log = array();
+
+		// This executes queries and things
+		$this->_db = $db;
+	}
+
+	/**
+	* Static method that allows to retrieve or create an instance of this class.
+	*
+	* @param object $db - A Database_MySQL object
+	* @return object - A DbTable_MySQL object
+	*/
+	public static function db_table($db)
+	{
+		if (is_null(self::$_tbl_inst))
+			self::$_tbl_inst = new DbTable_PostgreSQL_Install($db);
+		return self::$_tbl_inst;
+	}
+}
+
+/**
+ * This handy function loads some settings and the like.
+ */
+function load_database()
+{
+	global $db_prefix, $db_connection, $modSettings, $db_type, $db_name, $db_user, $db_persist;
+
+	// Connect the database.
+	if (empty($db_connection))
+	{
+		if (!defined('SOURCEDIR'))
+			define('SOURCEDIR', TMP_BOARDDIR . '/sources');
+
+		// Need this to check whether we need the database password.
+		require(TMP_BOARDDIR . '/Settings.php');
+
+		if (!defined('ELK'))
+			define('ELK', 1);
+
+		require_once(SOURCEDIR . '/database/Database.subs.php');
+
+		$db_connection = elk_db_initiate($db_server, $db_name, $db_user, $db_passwd, $db_prefix, array('persist' => $db_persist, 'port' => $db_port), $db_type);
+	}
+
+	return database();
+}
+
+/**
+ * The normal DbTable disallows to delete/create "core" tables
+ */
+function db_table_install()
+{
+	global $db_type;
+
+	$db = load_database();
+
+	require_once(SOURCEDIR . '/database/DbTable.class.php');
+	require_once(SOURCEDIR . '/database/DbTable-' . $db_type . '.php');
+
+	return call_user_func(array('DbTable_' . DB_TYPE . '_Install', 'db_table'), $db);
+}
+
+/**
+ * Logs db errors as they happen
+ */
+function updateLastError()
+{
+	// Clear out the db_last_error file
+	file_put_contents(TMP_BOARDDIR . '/db_last_error.txt', '0');
+}
+
+/**
+ * Checks the servers database version against our requirements
+ */
+function db_version_check()
+{
+	global $db_type, $databases, $db_connection;
+
+	$curver = $databases[$db_type]['version_check']($db_connection);
+	$curver = preg_replace('~\-.+?$~', '', $curver);
+
+	return version_compare($databases[$db_type]['version'], $curver, '<=');
+}
+
 /**
  * Delete the installer and its additional files.
  * Called by ?delete
@@ -552,3 +688,83 @@ function action_deleteInstaller()
 	exit;
 }
 
+/**
+ * Removes flagged settings
+ * Appends new settings as passed in $config_vars to the array
+ * Writes out a new Settings.php file, overwriting any that may have existed
+ *
+ * @param array $config_vars
+ * @param array $settingsArray
+ */
+function saveFileSettings($config_vars, $settingsArray)
+{
+	if (count($settingsArray) == 1)
+		$settingsArray = preg_split('~[\r\n]~', $settingsArray[0]);
+
+	for ($i = 0, $n = count($settingsArray); $i < $n; $i++)
+	{
+		if (trim($settingsArray[$i]) === '?>')
+			$settingsArray[$i] = '';
+		// Don't trim or bother with it if it's not a variable.
+		if (substr($settingsArray[$i], 0, 1) == '$')
+		{
+			$settingsArray[$i] = trim($settingsArray[$i]) . "\n";
+
+			foreach ($config_vars as $var => $val)
+			{
+				if (isset($settingsArray[$i]) && strncasecmp($settingsArray[$i], '$' . $var, 1 + strlen($var)) == 0)
+				{
+					if ($val === '#remove#')
+					{
+						unset($settingsArray[$i]);
+					}
+					else
+					{
+						$comment = strstr(substr($settingsArray[$i], strpos($settingsArray[$i], ';')), '#');
+						$settingsArray[$i] = '$' . $var . ' = ' . $val . ';' . ($comment != '' ? "\t\t" . $comment : "\n");
+					}
+
+					unset($config_vars[$var]);
+				}
+			}
+		}
+	}
+
+	// Add in the new vars we were passed
+	if (!empty($config_vars))
+	{
+		$settingsArray[$i++] = '';
+		foreach ($config_vars as $var => $val)
+		{
+			if ($val != '#remove#')
+				$settingsArray[$i++] = "\n$" . $var . ' = ' . $val . ';';
+		}
+	}
+
+	// Blank out the file - done to fix a oddity with some servers.
+	$fp = @fopen(TMP_BOARDDIR . '/Settings.php', 'w');
+	if (!$fp)
+		return false;
+	fclose($fp);
+
+	$fp = fopen(TMP_BOARDDIR . '/Settings.php', 'r+');
+
+	// Gotta have one of these ;)
+	if (trim($settingsArray[0]) != '<?php')
+		fwrite($fp, "<?php\n");
+
+	$lines = count($settingsArray);
+	for ($i = 0; $i < $lines; $i++)
+	{
+		// Don't just write a bunch of blank lines.
+		if ($settingsArray[$i] != '' || @$settingsArray[$i - 1] != '')
+			fwrite($fp, strtr($settingsArray[$i], "\r", ''));
+	}
+	fclose($fp);
+
+	return true;
+
+	// Blank out the file - done to fix a oddity with some servers.
+	//file_put_contents(BOARDDIR . '/Settings.php', '', LOCK_EX);
+	//file_put_contents(BOARDDIR . '/Settings.php', $settingsArray, LOCK_EX);
+}
