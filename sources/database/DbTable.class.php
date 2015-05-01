@@ -42,7 +42,7 @@ abstract class DbTable
 	 *
 	 * @var array
 	 */
-	private $_package_log = null;
+	protected $_package_log = null;
 
 	/**
 	 * This function can be used to create a table without worrying about schema
