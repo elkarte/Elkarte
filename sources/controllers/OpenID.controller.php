@@ -11,7 +11,7 @@
  * copyright:	2012 Simple Machines Forum contributors (http://www.simplemachines.org)
  * license:		BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0
+ * @version 1.1 dev
  *
  */
 

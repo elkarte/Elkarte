@@ -1,5 +1,5 @@
 <?php
-// Version: 1.0; Profile
+// Version: 1.1; Profile
 
 $txt['no_profile_edit'] = 'You are not allowed to change this person\'s profile.';
 $txt['website_title'] = 'Website title';

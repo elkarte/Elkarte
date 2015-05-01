@@ -1,3 +1,3 @@
 <?php
-// Version: 1.0; Addons
+// Version: 1.1; Addons
 
