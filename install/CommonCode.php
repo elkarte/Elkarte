@@ -940,3 +940,215 @@ function saveFileSettings($config_vars, $settingsArray)
 	//file_put_contents(BOARDDIR . '/Settings.php', '', LOCK_EX);
 	//file_put_contents(BOARDDIR . '/Settings.php', $settingsArray, LOCK_EX);
 }
+
+/**
+ * Check files are writable - make them writable if necessary...
+ *
+ * @param array $files
+ */
+function makeFilesWritable(&$files)
+{
+	global $upcontext;
+
+	if (empty($files))
+		return true;
+
+	$failure = false;
+
+	// On linux, it's easy - just use is_writable!
+	if (substr(__FILE__, 1, 2) != ':\\')
+	{
+		foreach ($files as $k => $file)
+		{
+			if (!is_writable($file))
+			{
+				@chmod($file, 0755);
+
+				// Well, 755 hopefully worked... if not, try 777.
+				if (!is_writable($file) && !@chmod($file, 0777))
+					$failure = true;
+				// Otherwise remove it as it's good!
+				else
+					unset($files[$k]);
+			}
+			else
+				unset($files[$k]);
+		}
+	}
+	// Windows is trickier.  Let's try opening for r+...
+	else
+	{
+		foreach ($files as $k => $file)
+		{
+			// Folders can't be opened for write... but the index.php in them can ;).
+			if (is_dir($file))
+				$file .= '/index.php';
+
+			// Funny enough, chmod actually does do something on windows - it removes the read only attribute.
+			@chmod($file, 0777);
+			$fp = @fopen($file, 'r+');
+
+			// Hmm, okay, try just for write in that case...
+			if (!$fp)
+				$fp = @fopen($file, 'w');
+
+			if (!$fp)
+				$failure = true;
+			else
+				unset($files[$k]);
+			@fclose($fp);
+		}
+	}
+
+	if (empty($files))
+		return true;
+
+	if (!isset($_SERVER))
+		return !$failure;
+
+	// What still needs to be done?
+	$upcontext['chmod']['files'] = $files;
+
+	// If it's windows it's a mess...
+	if ($failure && substr(__FILE__, 1, 2) == ':\\')
+	{
+		$upcontext['chmod']['ftp_error'] = 'total_mess';
+
+		return false;
+	}
+	// We're going to have to use... FTP!
+	elseif ($failure)
+	{
+		// Load any session data we might have...
+		if (!isset($_POST['ftp_username']) && isset($_SESSION['installer_temp_ftp']))
+		{
+			$upcontext['chmod']['server'] = $_SESSION['installer_temp_ftp']['server'];
+			$upcontext['chmod']['port'] = $_SESSION['installer_temp_ftp']['port'];
+			$upcontext['chmod']['username'] = $_SESSION['installer_temp_ftp']['username'];
+			$upcontext['chmod']['password'] = $_SESSION['installer_temp_ftp']['password'];
+			$upcontext['chmod']['path'] = $_SESSION['installer_temp_ftp']['path'];
+		}
+		// Or have we submitted?
+		elseif (isset($_POST['ftp_username']))
+		{
+			$upcontext['chmod']['server'] = $_POST['ftp_server'];
+			$upcontext['chmod']['port'] = $_POST['ftp_port'];
+			$upcontext['chmod']['username'] = $_POST['ftp_username'];
+			$upcontext['chmod']['password'] = $_POST['ftp_password'];
+			$upcontext['chmod']['path'] = $_POST['ftp_path'];
+		}
+
+		if (isset($upcontext['chmod']['username']))
+		{
+			$ftp = new Ftp_Connection($upcontext['chmod']['server'], $upcontext['chmod']['port'], $upcontext['chmod']['username'], $upcontext['chmod']['password']);
+
+			if ($ftp->error === false)
+			{
+				// Try it without /home/abc just in case they messed up.
+				if (!$ftp->chdir($upcontext['chmod']['path']))
+				{
+					$upcontext['chmod']['ftp_error'] = $ftp->last_message;
+					$ftp->chdir(preg_replace('~^/home[2]?/[^/]+?~', '', $upcontext['chmod']['path']));
+				}
+			}
+		}
+
+		if (!isset($ftp) || $ftp->error !== false)
+		{
+			if (!isset($ftp))
+				$ftp = new Ftp_Connection(null);
+			// Save the error so we can mess with listing...
+			elseif ($ftp->error !== false && !isset($upcontext['chmod']['ftp_error']))
+				$upcontext['chmod']['ftp_error'] = $ftp->last_message === null ? '' : $ftp->last_message;
+
+			list ($username, $detect_path, $found_path) = $ftp->detect_path(TMP_BOARDDIR);
+
+			if ($found_path || !isset($upcontext['chmod']['path']))
+				$upcontext['chmod']['path'] = $detect_path;
+
+			if (!isset($upcontext['chmod']['username']))
+				$upcontext['chmod']['username'] = $username;
+
+			return false;
+		}
+		else
+		{
+			// We want to do a relative path for FTP.
+			if (!in_array($upcontext['chmod']['path'], array('', '/')))
+			{
+				$ftp_root = strtr(BOARDDIR, array($upcontext['chmod']['path'] => ''));
+				if (substr($ftp_root, -1) == '/' && ($upcontext['chmod']['path'] == '' || $upcontext['chmod']['path'][0] === '/'))
+				$ftp_root = substr($ftp_root, 0, -1);
+			}
+			else
+				$ftp_root = BOARDDIR;
+
+			// Save the info for next time!
+			$_SESSION['installer_temp_ftp'] = array(
+				'server' => $upcontext['chmod']['server'],
+				'port' => $upcontext['chmod']['port'],
+				'username' => $upcontext['chmod']['username'],
+				'password' => $upcontext['chmod']['password'],
+				'path' => $upcontext['chmod']['path'],
+				'root' => $ftp_root,
+			);
+
+			foreach ($files as $k => $file)
+			{
+				if (!is_writable($file))
+					$ftp->chmod($file, 0755);
+				if (!is_writable($file))
+					$ftp->chmod($file, 0777);
+
+				// Assuming that didn't work calculate the path without the boarddir.
+				if (!is_writable($file))
+				{
+					if (strpos($file, BOARDDIR) === 0)
+					{
+						$ftp_file = strtr($file, array($_SESSION['installer_temp_ftp']['root'] => ''));
+						$ftp->chmod($ftp_file, 0755);
+						if (!is_writable($file))
+							$ftp->chmod($ftp_file, 0777);
+						// Sometimes an extra slash can help...
+						$ftp_file = '/' . $ftp_file;
+						if (!is_writable($file))
+							$ftp->chmod($ftp_file, 0755);
+						if (!is_writable($file))
+							$ftp->chmod($ftp_file, 0777);
+					}
+				}
+
+				if (is_writable($file))
+					unset($files[$k]);
+			}
+
+			$ftp->close();
+		}
+	}
+
+	// What remains?
+	$upcontext['chmod']['files'] = $files;
+
+	if (empty($files))
+		return true;
+
+	return false;
+}
+
+/**
+ * Our custom error handler - does nothing but does stop public errors from XML!
+ *
+ * @param int $errno
+ * @param string $errstr
+ * @param string $errfile
+ * @param string $errline
+ */
+function sql_error_handler($errno, $errstr, $errfile, $errline)
+{
+	global $support_js;
+
+	if ($support_js)
+		return true;
+	else
+		echo 'Error: ' . $errstr . ' File: ' . $errfile . ' Line: ' . $errline;
+}
