@@ -22,8 +22,8 @@ function getUpgradeFiles()
 	global $db_type;
 
 	return array(
-		array('upgrade_1-1.sql', '1.1', CURRENT_VERSION),
-		array('upgrade_1-1_' . $db_type . '.sql', '1.1', CURRENT_VERSION),
+		array('upgrade_' . DB_SCRIPT_VERSION . '.php', '1.1', CURRENT_VERSION),
+		array('upgrade_' . DB_SCRIPT_VERSION . '_' . $db_type . '.php', '1.1', CURRENT_VERSION),
 	);
 }
 
@@ -310,7 +310,7 @@ function upgradeExit($fallThrough = false)
 		$upcontext['user']['updated'] = time();
 		$upgradeData = base64_encode(serialize($upcontext['user']));
 		copy(BOARDDIR . '/Settings.php', BOARDDIR . '/Settings_bak.php');
-		changeSettings(array('upgradeData' => '"' . $upgradeData . '"'));
+		changeSettings(array('upgradeData' => '\'' . $upgradeData . '\''));
 		updateLastError();
 	}
 
@@ -543,7 +543,7 @@ function action_welcomeLogin()
 	$check = @file_exists($modSettings['theme_dir'] . '/index.template.php')
 		&& @file_exists(SOURCEDIR . '/QueryString.php')
 		&& @file_exists(SOURCEDIR . '/database/Db-' . $db_type . '.class.php')
-		&& @file_exists(__DIR__ . '/upgrade_1-1.sql');
+		&& @file_exists(__DIR__ . '/upgrade_' . DB_SCRIPT_VERSION . '.php');
 
 	// If the db is not UTF
 	if (!isset($modSettings['elkVersion']) && ($db_type == 'mysql' || $db_type == 'mysqli') && (!isset($db_character_set) || $db_character_set !== 'utf8' || empty($modSettings['global_character_set']) || $modSettings['global_character_set'] !== 'UTF-8'))
@@ -1406,8 +1406,16 @@ function parse_sql($filename)
 		- {$db_collation}
 */
 
+	$replaces =  array(
+		'{$db_prefix}' => $db_prefix,
+		'{BOARDDIR}' => BOARDDIR,
+		'{$boardurl}' => $boardurl,
+		'{$db_collation}' => discoverCollation()
+	);
 	$db = load_database();
 	$db_table = db_table_install();
+	$db_wrapper = new DbWrapper($db, $replaces);
+	$db_table_wrapper = new DbTableWrapper($db_table);
 	$db->skip_error();
 
 	// Our custom error handler - does nothing but does stop public errors from XML!
@@ -1427,62 +1435,21 @@ function parse_sql($filename)
 	// Make our own error handler.
 	set_error_handler('sql_error_handler');
 
-	// If we're on MySQL supporting collations then let's find out what the members table uses and put it in a global var - to allow upgrade script to match collations!
-	if (!empty($databases[$db_type]['utf8_support']) && version_compare($databases[$db_type]['utf8_version'], $databases[$db_type]['utf8_version_check']($db_connection), '>'))
-	{
-		$request = $db->query('', '
-			SHOW TABLE STATUS
-			LIKE {string:table_name}',
-			array(
-				'table_name' => "{$db_prefix}members",
-				'db_error_skip' => true,
-			)
-		);
-		if ($db->num_rows($request) === 0)
-			die('Unable to find members table!');
-		$table_status = $db->fetch_assoc($request);
-		$db->free_result($request);
-
-		if (!empty($table_status['Collation']))
-		{
-			$request = $db->query('', '
-				SHOW COLLATION
-				LIKE {string:collation}',
-				array(
-					'collation' => $table_status['Collation'],
-					'db_error_skip' => true,
-				)
-			);
-			// Got something?
-			if ($db->num_rows($request) !== 0)
-				$collation_info = $db->fetch_assoc($request);
-			$db->free_result($request);
-
-			// Excellent!
-			if (!empty($collation_info['Collation']) && !empty($collation_info['Charset']))
-				$db_collation = ' CHARACTER SET ' . $collation_info['Charset'] . ' COLLATE ' . $collation_info['Collation'];
-		}
-	}
-
-	if (empty($db_collation))
-		$db_collation = '';
-
 	$endl = $command_line ? "\n" : '<br />' . "\n";
 
-	$lines = file($filename);
+	$class_name = 'UpgradeInstructions_' . str_replace('-', '_', basename($sql_file, '.php'));
+	$install_instance = new $class_name($db_wrapper, $db_table_wrapper);
 
-	$current_type = 'sql';
-	$current_data = '';
+	$methods = array_filter(get_class_methods($install_instance), function($method) {
+		return substr($method, 0, 2) !== '__' && substr($method, -6) !== '_title';
+	});
+
 	$substep = 0;
 	$last_step = '';
 
-	// Make sure all newly created tables will have the proper characters set.
-	if (isset($db_character_set) && $db_character_set === 'utf8')
-		$lines = str_replace(') ENGINE=MyISAM;', ') ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci;', $lines);
-
 	// Count the total number of steps within this file - for progress.
-	$file_steps = substr_count(implode('', $lines), '---#');
-	$upcontext['total_items'] = substr_count(implode('', $lines), '--- ');
+	$file_steps = countSteps($install_instance, $methods);
+	$upcontext['total_items'] = count($methods);
 	$upcontext['debug_items'] = $file_steps;
 	$upcontext['current_item_num'] = 0;
 	$upcontext['current_item_name'] = '';
@@ -1494,93 +1461,63 @@ function parse_sql($filename)
 
 	$done_something = false;
 
-	foreach ($lines as $line_number => $line)
+	foreach ($methods as $method)
 	{
 		$do_current = $substep >= $_GET['substep'];
-
-		// Get rid of any comments in the beginning of the line...
-		if (substr(trim($line), 0, 2) === '/*')
-			$line = preg_replace('~/\*.+?\*/~', '', $line);
 
 		// Always flush.  Flush, flush, flush.  Flush, flush, flush, flush!  FLUSH!
 		if ($is_debug && !$support_js && $command_line)
 			flush();
 
-		if (trim($line) === '')
-			continue;
+		$upcontext['current_item_num']++;
+		$upcontext['current_item_name'] = $last_step;
+		$title = htmlspecialchars(rtrim($install_instance->{$table_method . '_title'}()), ENT_COMPAT, 'UTF-8');
 
-		if (trim(substr($line, 0, 3)) === '---')
+		if ($do_current)
 		{
-			$type = substr($line, 3, 1);
-
-			if (completed step)
-			{
-				if (!$support_js && $do_current && $_GET['substep'] != 0 && $command_line)
-				{
-					echo ' Successful.', $endl;
-					flush();
-				}
-
-				$last_step = htmlspecialchars(rtrim(substr($line, 4)), ENT_COMPAT, 'UTF-8');
-				$upcontext['current_item_num']++;
-				$upcontext['current_item_name'] = $last_step;
-
-				if ($do_current)
-				{
-					$upcontext['actioned_items'][] = $last_step;
-					if ($command_line)
-						echo ' * ';
-				}
-			}
-			elseif ($type == '#')
-			{
-				$upcontext['step_progress'] += (100 / $upcontext['file_count']) / $file_steps;
-
-				$upcontext['current_debug_item_num']++;
-				if (trim($line) != '---#')
-					$upcontext['current_debug_item_name'] = htmlspecialchars(rtrim(substr($line, 4)), ENT_COMPAT, 'UTF-8');
-
-				// Have we already done something?
-				if (isset($_GET['xml']) && $done_something)
-				{
-					restore_error_handler();
-					return $upcontext['current_debug_item_num'] >= $upcontext['debug_items'] ? true : false;
-				}
-
-				if ($do_current)
-				{
-					if (trim($line) == '---#' && $command_line)
-						echo ' done.', $endl;
-					elseif ($command_line)
-						echo ' +++ ', rtrim(substr($line, 4));
-					elseif (trim($line) != '---#')
-					{
-						if ($is_debug)
-							$upcontext['actioned_items'][] = htmlspecialchars(rtrim(substr($line, 4)), ENT_COMPAT, 'UTF-8');
-					}
-				}
-
-				if ($substep < $_GET['substep'] && $substep + 1 >= $_GET['substep'])
-				{
-					if ($command_line)
-						echo ' * ';
-					else
-						$upcontext['actioned_items'][] = $last_step;
-				}
-
-				// Small step - only if we're actually doing stuff.
-				if ($do_current)
-					nextSubstep(++$substep);
-				else
-					$substep++;
-			}
-			elseif ($type == '{')
-				$current_type = 'code';
-
-			continue;
+			$upcontext['actioned_items'][] = $title;
+			if ($command_line)
+				echo ' * ';
 		}
 
-		$current_data .= $line;
+		$actions = $install_instance->{$table_method}();
+		foreach ($actions as $action)
+		{
+			$upcontext['step_progress'] += (100 / $upcontext['file_count']) / $file_steps;
+			$upcontext['current_debug_item_num']++;
+			$upcontext['current_debug_item_name'] = htmlspecialchars(rtrim($action['debug_title']), ENT_COMPAT, 'UTF-8');
+
+			// Have we already done something?
+			if (isset($_GET['xml']) && $done_something)
+			{
+				restore_error_handler();
+				return $upcontext['current_debug_item_num'] >= $upcontext['debug_items'] ? true : false;
+			}
+
+			if ($command_line)
+				echo ' +++ ' . $upcontext['current_debug_item_name'];
+
+			$action['function']($db_wrapper, $db_table_wrapper);
+
+			// Small step - only if we're actually doing stuff.
+			if ($do_current)
+			{
+				$done_something = true;
+				// nextSubstep calls upgradeExit that terminates the execution if necessary.
+				nextSubstep(++$substep);
+			}
+			else
+				$substep++;
+
+			if ($command_line)
+				echo ' done.' . $endl;
+			else
+			{
+				if ($is_debug)
+					$upcontext['actioned_items'][] = $upcontext['current_debug_item_name'];
+			}
+		}
+
 		// If this is xml based and we're just getting the item name then that's grand.
 		if ($support_js && !isset($_GET['xml']) && $upcontext['current_debug_item_name'] != '' && $do_current)
 		{
@@ -1588,9 +1525,14 @@ function parse_sql($filename)
 			return false;
 		}
 
+		if (!$support_js && $do_current && $_GET['substep'] != 0 && $command_line)
+		{
+			echo ' Successful.', $endl;
+			flush();
+		}
+
 		// Clean up by cleaning any step info.
 		$step_progress = array();
-		$custom_warning = '';
 	}
 
 	// Put back the error handler.
@@ -2258,4 +2200,64 @@ function loadEssentialFunctions()
 		}
 	}
 
+}
+
+function discoverCollation()
+{
+	global $databases;
+
+	$db_collation = '';
+
+	// If we're on MySQL supporting collations then let's find out what the members table uses and put it in a global var - to allow upgrade script to match collations!
+	if (!empty($databases[$db_type]['utf8_support']) && version_compare($databases[$db_type]['utf8_version'], $databases[$db_type]['utf8_version_check']($db_connection), '>'))
+	{
+		$db = load_database();
+
+		$request = $db->query('', '
+			SHOW TABLE STATUS
+			LIKE {string:table_name}',
+			array(
+				'table_name' => "{$db_prefix}members",
+				'db_error_skip' => true,
+			)
+		);
+		if ($db->num_rows($request) === 0)
+			die('Unable to find members table!');
+		$table_status = $db->fetch_assoc($request);
+		$db->free_result($request);
+
+		if (!empty($table_status['Collation']))
+		{
+			$request = $db->query('', '
+				SHOW COLLATION
+				LIKE {string:collation}',
+				array(
+					'collation' => $table_status['Collation'],
+					'db_error_skip' => true,
+				)
+			);
+			// Got something?
+			if ($db->num_rows($request) !== 0)
+				$collation_info = $db->fetch_assoc($request);
+			$db->free_result($request);
+
+			// Excellent!
+			if (!empty($collation_info['Collation']) && !empty($collation_info['Charset']))
+				$db_collation = ' CHARACTER SET ' . $collation_info['Charset'] . ' COLLATE ' . $collation_info['Collation'];
+		}
+	}
+
+	return $db_collation;
+}
+
+function countSteps($install_instance, $methods)
+{
+	$total = 0;
+	foreach ($methods as $method)
+	{
+		$action = $install_instance->{$method}();
+		$total += count($action);
+	}
+
+	return $total;
 }

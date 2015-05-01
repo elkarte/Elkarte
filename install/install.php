@@ -1463,7 +1463,6 @@ function parse_sqlLines($sql_file, $replaces)
 	$db_wrapper = new DbWrapper($db, $replaces);
 	$db_table_wrapper = new DbTableWrapper($db_table);
 
-	$current_statement = '';
 	$exists = array();
 
 	require_once($sql_file);
