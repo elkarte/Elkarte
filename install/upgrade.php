@@ -1434,8 +1434,8 @@ function parse_sql($filename)
 			flush();
 
 		$upcontext['current_item_num']++;
-		$upcontext['current_item_name'] = $last_step;
 		$title = htmlspecialchars(rtrim($install_instance->{$method . '_title'}()), ENT_COMPAT, 'UTF-8');
+		$upcontext['current_item_name'] = $title;
 
 		if ($do_current)
 		{

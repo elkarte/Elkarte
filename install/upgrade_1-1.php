@@ -30,12 +30,12 @@ class UpgradeInstructions_upgrade_1_1
 		return $this->table = $table;
 	}
 
-	public function admin_info_file_title()
+	public function admin_info_files_title()
 	{
-		return 'Deprecating admin_info_file table...';
+		return 'Deprecating admin_info_files table...';
 	}
 
-	public function admin_info_file()
+	public function admin_info_files()
 	{
 		return array(
 			array(
@@ -45,7 +45,7 @@ class UpgradeInstructions_upgrade_1_1
 					foreach (array('current-version.js', 'detailed-version.js', 'latest-news.js', 'latest-smileys.js', 'latest-versions.txt') as $file)
 					{
 						$db->query('', '
-							DELETE FROM {db_prefix}admin_info_file
+							DELETE FROM {db_prefix}admin_info_files
 							WHERE file = {string:current_file}',
 							array(
 								'current_file' => $file
@@ -54,13 +54,17 @@ class UpgradeInstructions_upgrade_1_1
 					}
 					$request = $db->query('', '
 						SELECT COUNT(*)
-						FROM {db_prefix}admin_info_file',
+						FROM {db_prefix}admin_info_files',
 						array()
 					);
 
-					// Drop it only if it is empty
-					if ($db->num_rows($request) == 0)
-						$db_table->db_drop_table('{db_prefix}admin_info_file');
+					if ($request)
+					{
+						// Drop it only if it is empty
+						list ($count) = (int) $db->fetch_row($request);
+						if ($count == 0)
+							$db_table->db_drop_table('{db_prefix}admin_info_files');
+					}
 				}
 			),
 		);
@@ -217,6 +221,7 @@ class UpgradeInstructions_upgrade_1_1
 				{
 					global $modSettings;
 
+					require_once(SUBSDIR . '/Admin.subs.php');
 					if (!empty($modSettings['attachmentEnable']))
 					{
 						enableModules('attachments', array('post'));

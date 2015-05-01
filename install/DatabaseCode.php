@@ -12,6 +12,11 @@ class DbWrapper
 		$this->replaces = $replaces;
 	}
 
+	public function __call($name, $args)
+	{
+		return call_user_func_array(array($this->db, $name), $args);
+	}
+
 	public function insert()
 	{
 		$args = func_get_args();
