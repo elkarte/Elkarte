@@ -163,16 +163,20 @@ abstract class DbTable
 	abstract public function db_list_indexes($table_name, $detail = false, $parameters = array());
 
 	/**
-	 * Alter table.
+	 * A very simple wrapper around the ALTER TABLE SQL statement.
 	 *
 	 * @param string $table_name
-	 * @param mixed[] $columns
+	 * @param string $statement
 	 */
-	public function db_alter_table($table_name, $columns)
+	protected function _alter_table($table_name, $statement)
 	{
-		// Not implemented by default.
-		// Only SQLite needed it.
-		return;
+		return $this->_db->query('', '
+			ALTER TABLE ' . $table_name . '
+			' . $statement,
+			array(
+				'security_override' => true,
+			)
+		);
 	}
 
 	/**

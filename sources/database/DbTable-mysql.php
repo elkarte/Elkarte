@@ -244,15 +244,8 @@ class DbTable_MySQL extends DbTable
 			}
 
 		// Now add the thing!
-		$query = '
-			ALTER TABLE ' . $table_name . '
-			ADD ' . $this->_db_create_query_column($column_info) . (empty($column_info['auto']) ? '' : ' primary key');
-
-		$this->_db->query('', $query,
-			array(
-				'security_override' => true,
-			)
-		);
+		$this->_alter_table($table_name, '
+			ADD ' . $this->_db_create_query_column($column_info) . (empty($column_info['auto']) ? '' : ' primary key'));
 
 		return true;
 	}
@@ -276,13 +269,8 @@ class DbTable_MySQL extends DbTable
 		foreach ($columns as $column)
 			if ($column['name'] == $column_name)
 			{
-				$this->_db->query('', '
-					ALTER TABLE ' . $table_name . '
-					DROP COLUMN ' . $column_name,
-					array(
-						'security_override' => true,
-					)
-				);
+				$this->_alter_table($table_name, '
+					DROP COLUMN ' . $column_name);
 
 				return true;
 			}
@@ -333,13 +321,8 @@ class DbTable_MySQL extends DbTable
 		if (!isset($column_info['unsigned']) || !in_array($column_info['type'], array('int', 'tinyint', 'smallint', 'mediumint', 'bigint')))
 			$column_info['unsigned'] = '';
 
-		$this->_db->query('', '
-			ALTER TABLE ' . $table_name . '
-			CHANGE COLUMN `' . $old_column . '` ' . $this->_db_create_query_column($column_info),
-			array(
-				'security_override' => true,
-			)
-		);
+		$this->_alter_table($table_name, '
+			CHANGE COLUMN `' . $old_column . '` ' . $this->_db_create_query_column($column_info));
 	}
 
 	/**
@@ -396,23 +379,13 @@ class DbTable_MySQL extends DbTable
 		// If we're here we know we don't have the index - so just add it.
 		if (!empty($index_info['type']) && $index_info['type'] == 'primary')
 		{
-			$this->_db->query('', '
-				ALTER TABLE ' . $table_name . '
-				ADD PRIMARY KEY (' . $columns . ')',
-				array(
-					'security_override' => true,
-				)
-			);
+			$this->_alter_table($table_name, '
+				ADD PRIMARY KEY (' . $columns . ')');
 		}
 		else
 		{
-			$this->_db->query('', '
-				ALTER TABLE ' . $table_name . '
-				ADD ' . (isset($index_info['type']) && $index_info['type'] == 'unique' ? 'UNIQUE' : 'INDEX') . ' ' . $index_info['name'] . ' (' . $columns . ')',
-				array(
-					'security_override' => true,
-				)
-			);
+			$this->_alter_table($table_name, '
+				ADD ' . (isset($index_info['type']) && $index_info['type'] == 'unique' ? 'UNIQUE' : 'INDEX') . ' ' . $index_info['name'] . ' (' . $columns . ')');
 		}
 	}
 
@@ -439,13 +412,8 @@ class DbTable_MySQL extends DbTable
 			if ($index['type'] == 'primary' && $index_name == 'primary')
 			{
 				// Dropping primary key?
-				$this->_db->query('', '
-					ALTER TABLE ' . $table_name . '
-					DROP PRIMARY KEY',
-					array(
-						'security_override' => true,
-					)
-				);
+				$this->_alter_table($table_name, '
+					DROP PRIMARY KEY');
 
 				return true;
 			}
@@ -453,13 +421,8 @@ class DbTable_MySQL extends DbTable
 			if ($index['name'] == $index_name)
 			{
 				// Drop the bugger...
-				$this->_db->query('', '
-					ALTER TABLE ' . $table_name . '
-					DROP INDEX ' . $index_name,
-					array(
-						'security_override' => true,
-					)
-				);
+				$this->_alter_table($table_name, '
+					DROP INDEX ' . $index_name);
 
 				return true;
 			}

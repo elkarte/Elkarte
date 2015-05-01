@@ -308,15 +308,8 @@ class DbTable_PostgreSQL extends DbTable
 			$type = $type . '(' . $size . ')';
 
 		// Now add the thing!
-		$query = '
-			ALTER TABLE ' . $table_name . '
-			ADD COLUMN ' . $column_info['name'] . ' ' . $type;
-
-		$this->_db->query('', $query,
-			array(
-				'security_override' => true,
-			)
-		);
+		$this->_alter_table($table_name, '
+			ADD COLUMN ' . $column_info['name'] . ' ' . $type);
 
 		// If there's more attributes they need to be done via a change on PostgreSQL.
 		unset($column_info['type'], $column_info['size']);
@@ -355,13 +348,8 @@ class DbTable_PostgreSQL extends DbTable
 						)
 					);
 
-				$this->_db->query('', '
-					ALTER TABLE ' . $table_name . '
-					DROP COLUMN ' . $column_name,
-					array(
-						'security_override' => true,
-					)
-				);
+				$this->_alter_table($table_name, '
+					DROP COLUMN ' . $column_name);
 
 				return true;
 			}
@@ -399,26 +387,16 @@ class DbTable_PostgreSQL extends DbTable
 		// Now we check each bit individually and ALTER as required.
 		if (isset($column_info['name']) && $column_info['name'] != $old_column)
 		{
-			$this->_db->query('', '
-				ALTER TABLE ' . $table_name . '
-				RENAME COLUMN ' . $old_column . ' TO ' . $column_info['name'],
-				array(
-					'security_override' => true,
-				)
-			);
+			$this->_alter_table($table_name, '
+				RENAME COLUMN ' . $old_column . ' TO ' . $column_info['name']);
 		}
 
 		// Different default?
 		if (isset($column_info['default']) && $column_info['default'] != $old_info['default'])
 		{
 			$action = $column_info['default'] !== null ? 'SET DEFAULT \'' . $this->_db->escape_string($column_info['default']) . '\'' : 'DROP DEFAULT';
-			$this->_db->query('', '
-				ALTER TABLE ' . $table_name . '
-				ALTER COLUMN ' . $column_info['name'] . ' ' . $action,
-				array(
-					'security_override' => true,
-				)
-			);
+			$this->_alter_table($table_name, '
+				ALTER COLUMN ' . $column_info['name'] . ' ' . $action);
 		}
 
 		// Is it null - or otherwise?
@@ -439,13 +417,8 @@ class DbTable_PostgreSQL extends DbTable
 					)
 				);
 			}
-			$this->_db->query('', '
-				ALTER TABLE ' . $table_name . '
-				ALTER COLUMN ' . $column_info['name'] . ' ' . $action . ' NOT NULL',
-				array(
-					'security_override' => true,
-				)
-			);
+			$this->_alter_table($table_name, '
+				ALTER COLUMN ' . $column_info['name'] . ' ' . $action . ' NOT NULL');
 			$this->_db->db_transaction('commit');
 		}
 
@@ -459,13 +432,8 @@ class DbTable_PostgreSQL extends DbTable
 
 			// The alter is a pain.
 			$this->_db->db_transaction('begin');
-			$this->_db->query('', '
-				ALTER TABLE ' . $table_name . '
-				ADD COLUMN ' . $column_info['name'] . '_tempxx ' . $type,
-				array(
-					'security_override' => true,
-				)
-			);
+			$this->_alter_table($table_name, '
+				ADD COLUMN ' . $column_info['name'] . '_tempxx ' . $type);
 			$this->_db->query('', '
 				UPDATE ' . $table_name . '
 				SET ' . $column_info['name'] . '_tempxx = CAST(' . $column_info['name'] . ' AS ' . $type . ')',
@@ -473,20 +441,10 @@ class DbTable_PostgreSQL extends DbTable
 					'security_override' => true,
 				)
 			);
-			$this->_db->query('', '
-				ALTER TABLE ' . $table_name . '
-				DROP COLUMN ' . $column_info['name'],
-				array(
-					'security_override' => true,
-				)
-			);
-			$this->_db->query('', '
-				ALTER TABLE ' . $table_name . '
-				RENAME COLUMN ' . $column_info['name'] . '_tempxx TO ' . $column_info['name'],
-				array(
-					'security_override' => true,
-				)
-			);
+			$this->_alter_table($table_name, '
+				DROP COLUMN ' . $column_info['name']);
+			$this->_alter_table($table_name, '
+				RENAME COLUMN ' . $column_info['name'] . '_tempxx TO ' . $column_info['name']);
 			$this->_db->db_transaction('commit');
 		}
 
@@ -497,13 +455,8 @@ class DbTable_PostgreSQL extends DbTable
 			if ($old_info['auto'])
 			{
 				// Alter the table first - then drop the sequence.
-				$this->_db->query('', '
-					ALTER TABLE ' . $table_name . '
-					ALTER COLUMN ' . $column_info['name'] . ' SET DEFAULT \'0\'',
-					array(
-						'security_override' => true,
-					)
-				);
+				$this->_alter_table($table_name, '
+					ALTER COLUMN ' . $column_info['name'] . ' SET DEFAULT \'0\'');
 				$this->_db->query('', '
 					DROP SEQUENCE ' . $table_name . '_seq',
 					array(
@@ -520,13 +473,8 @@ class DbTable_PostgreSQL extends DbTable
 						'security_override' => true,
 					)
 				);
-				$this->_db->query('', '
-					ALTER TABLE ' . $table_name . '
-					ALTER COLUMN ' . $column_info['name'] . ' SET DEFAULT nextval(\'' . $table_name . '_seq\')',
-					array(
-						'security_override' => true,
-					)
-				);
+				$this->_alter_table($table_name, '
+					ALTER COLUMN ' . $column_info['name'] . ' SET DEFAULT nextval(\'' . $table_name . '_seq\')');
 			}
 		}
 	}
@@ -591,13 +539,8 @@ class DbTable_PostgreSQL extends DbTable
 		// If we're here we know we don't have the index - so just add it.
 		if (!empty($index_info['type']) && $index_info['type'] == 'primary')
 		{
-			$this->_db->query('', '
-				ALTER TABLE ' . $table_name . '
-				ADD PRIMARY KEY (' . $columns . ')',
-				array(
-					'security_override' => true,
-				)
-			);
+			$this->_alter_table($table_name, '
+				ADD PRIMARY KEY (' . $columns . ')');
 		}
 		else
 		{
@@ -635,13 +578,8 @@ class DbTable_PostgreSQL extends DbTable
 			if ($index['type'] == 'primary' && $index_name == 'primary')
 			{
 				// Dropping primary key is odd...
-				$this->_db->query('', '
-					ALTER TABLE ' . $table_name . '
-					DROP CONSTRAINT ' . $index['name'],
-					array(
-						'security_override' => true,
-					)
-				);
+				$this->_alter_table($table_name, '
+					DROP CONSTRAINT ' . $index['name']);
 
 				return true;
 			}
