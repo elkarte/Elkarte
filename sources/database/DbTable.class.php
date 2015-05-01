@@ -200,13 +200,13 @@ abstract class DbTable
 	 * @param string $column_name
 	 * @return mixed[]|false
 	 */
-	protected function _get_column_info($table, $column_name)
+	protected function _get_column_info($table_name, $column_name)
 	{
 		$columns = $this->db_list_columns($table_name, false);
 
 		foreach ($columns as $column)
 		{
-			if ($column == $column_info['name'])
+			if ($column_name == $column['name'])
 			{
 				return $column_info;
 			}
