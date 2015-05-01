@@ -1360,29 +1360,6 @@ function parse_sql($filename)
 	global $db_prefix, $boardurl, $command_line, $file_steps, $step_progress;
 	global $upcontext, $support_js, $is_debug;
 
-/*
-	Failure allowed on:
-		- INSERT INTO but not INSERT IGNORE INTO.
-		- UPDATE IGNORE but not UPDATE.
-		- ALTER TABLE and ALTER IGNORE TABLE.
-		- DROP TABLE.
-	Yes, I realize that this is a bit confusing... maybe it should be done differently?
-
-	If a comment...
-		- begins with --- it is to be output, with a break only in debug mode. (and say successful\n\n if there was one before.)
-		- begins with ---# it is a debugging statement, no break - only shown at all in debug.
-		- is only ---#, it is "done." and then a break - only shown in debug.
-		- begins with ---{ it is a code block terminating at ---}.
-
-	Every block of between "--- ..."s is a step.  Every "---#" section represents a substep.
-
-	Replaces the following variables:
-		- {BOARDDIR}
-		- {$boardurl}
-		- {$db_prefix}
-		- {$db_collation}
-*/
-
 	$replaces =  array(
 		'{$db_prefix}' => $db_prefix,
 		'{BOARDDIR}' => BOARDDIR,
