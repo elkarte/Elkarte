@@ -1,5 +1,24 @@
 <?php
 
+/**
+ * This class is the core of the upgrade system.
+ * Methods starting with "__" (double underscore) are not executed.
+ * Each method that contains one or more actions is paired with a method
+ * with the same name plus "_title", for example:
+ *   - my_new_action
+ *   - my_new_action_title
+ * Methods whose name ends with "_title" are supposed to return a single
+ * string representing the title of the step.
+ * Methods containing the actions are supposed to return a multidimentional
+ * array with the following structure:
+ * array(
+ *     array(
+ *         'debug_title' => 'A string representing a title shown when debugging',
+ *         'function' => function($db, $db_table) { // Code },
+ *     ),
+ *     [...],
+ * );
+ */
 class UpgradeInstructions_upgrade_1_1
 {
 	protected $db = null;

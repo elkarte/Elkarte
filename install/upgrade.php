@@ -1374,9 +1374,7 @@ function fixRelativePath($path)
 }
 
 /**
- * Used to parse our .sql files
- * Generates db commands to be used by upgrade_query
- * Executes php code defined in the .sql files
+ * Used to parse out upgrade files
  */
 function parse_sql($filename)
 {
