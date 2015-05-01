@@ -614,7 +614,7 @@ function saveFileSettings($config_vars, $settingsArray)
 					else
 					{
 						$comment = strstr(substr($settingsArray[$i], strpos($settingsArray[$i], ';')), '#');
-						$settingsArray[$i] = '$' . $var . ' = ' . $val . ';' . ($comment != '' ? "\t\t" . $comment : "\n");
+						$settingsArray[$i] = '$' . $var . ' = \'' . $val . '\';' . ($comment != '' ? "\t\t" . $comment : "\n");
 					}
 
 					unset($config_vars[$var]);
@@ -630,7 +630,7 @@ function saveFileSettings($config_vars, $settingsArray)
 		foreach ($config_vars as $var => $val)
 		{
 			if ($val != '#remove#')
-				$settingsArray[$i++] = "\n$" . $var . ' = ' . $val . ';';
+				$settingsArray[$i++] = "\n$" . $var . ' = \'' . $val . '\';';
 		}
 	}
 
