@@ -398,7 +398,7 @@ function redirectLocation($location, $addForm = true)
  */
 function loadEssentialData()
 {
-	global $db_server, $db_user, $db_passwd, $db_name, $db_connection, $db_prefix, $db_character_set, $db_type, $db_port, $modSettings;
+	global $db_character_set, $db_type, $modSettings;
 
 	// Do the non-SSI stuff...
 	@set_magic_quotes_runtime(0);
@@ -514,7 +514,7 @@ function initialize_inputs()
  */
 function action_welcomeLogin()
 {
-	global $modSettings, $upgradeurl, $upcontext, $db_type, $databases, $txt, $db_character_set;
+	global $modSettings, $upgradeurl, $upcontext, $db_type, $databases, $db_character_set;
 
 	$db = load_database();
 
@@ -1076,7 +1076,7 @@ function backupTable($table)
  */
 function action_databaseChanges()
 {
-	global $db_prefix, $modSettings, $command_line, $upcontext, $support_js, $db_type;
+	global $db_prefix, $modSettings, $command_line, $upcontext, $support_js;
 
 	$db = load_database();
 
@@ -1090,6 +1090,7 @@ function action_databaseChanges()
 	// All possible files.
 	// Name, less than version, insert_on_complete.
 	$files = getUpgradeFiles();
+	$files_todo = array();
 
 	// How many files are there in total?
 	if (isset($_GET['filecount']))
@@ -1100,58 +1101,55 @@ function action_databaseChanges()
 		foreach ($files as $file)
 		{
 			if (file_exists(__DIR__ . '/' . $file[0]) && version_compare($modSettings['elkVersion'], $file[1]) < 0)
+			{
+				$files_todo[] = $file;
 				$upcontext['file_count']++;
+			}
 		}
 	}
 
 	// Do each file!
-	$did_not_do = count($files) - $upcontext['file_count'];
 	$upcontext['step_progress'] = 0;
 	$upcontext['cur_file_num'] = 0;
-	foreach ($files as $file)
+	foreach ($files_todo as $file)
 	{
-		if ($did_not_do)
-			$did_not_do--;
-		else
+		$upcontext['cur_file_num']++;
+		$upcontext['cur_file_name'] = $file[0];
+
+		// @todo Do we actually need to do this still?
+		if (file_exists(__DIR__ . '/' . $file[0]) && (!isset($modSettings['elkVersion']) || version_compare($modSettings['elkVersion'], $file[1]) < 0))
 		{
-			$upcontext['cur_file_num']++;
-			$upcontext['cur_file_name'] = $file[0];
-
-			// @todo Do we actually need to do this still?
-			if (file_exists(__DIR__ . '/' . $file[0]) && (!isset($modSettings['elkVersion']) || version_compare($modSettings['elkVersion'], $file[1]) < 0))
+			$nextFile = parse_sql(__DIR__ . '/' . $file[0]);
+			if ($nextFile)
 			{
-				$nextFile = parse_sql(__DIR__ . '/' . $file[0]);
-				if ($nextFile)
-				{
-					// Only update the version of this if complete.
-					$db->insert('replace',
-						$db_prefix . 'settings',
-						array('variable' => 'string', 'value' => 'string'),
-						array('elkVersion', $file[2]),
-						array('variable')
-					);
+				// Only update the version of this if complete.
+				$db->insert('replace',
+					$db_prefix . 'settings',
+					array('variable' => 'string', 'value' => 'string'),
+					array('elkVersion', $file[2]),
+					array('variable')
+				);
 
-					$modSettings['elkVersion'] = $file[2];
-				}
-
-				// If this is XML we only do this stuff once.
-				if (isset($_GET['xml']))
-				{
-					// Flag to move on to the next.
-					$upcontext['completed_step'] = true;
-
-					// Did we complete the whole file?
-					if ($nextFile)
-						$upcontext['current_debug_item_num'] = -1;
-					return upgradeExit();
-				}
-				elseif ($support_js)
-					break;
+				$modSettings['elkVersion'] = $file[2];
 			}
 
-			// Set the progress bar to be right as if we had - even if we hadn't...
-			$upcontext['step_progress'] = ($upcontext['cur_file_num'] / $upcontext['file_count']) * 100;
+			// If this is XML we only do this stuff once.
+			if (isset($_GET['xml']))
+			{
+				// Flag to move on to the next.
+				$upcontext['completed_step'] = true;
+
+				// Did we complete the whole file?
+				if ($nextFile)
+					$upcontext['current_debug_item_num'] = -1;
+				return upgradeExit();
+			}
+			elseif ($support_js)
+				break;
 		}
+
+		// Set the progress bar to be right as if we had - even if we hadn't...
+		$upcontext['step_progress'] = ($upcontext['cur_file_num'] / $upcontext['file_count']) * 100;
 	}
 
 	$_GET['substep'] = 0;
@@ -1180,7 +1178,7 @@ function action_databaseChanges()
  */
 function action_deleteUpgrade()
 {
-	global $command_line, $language, $upcontext, $forum_version, $user_info, $maintenance, $db_type;
+	global $command_line, $language, $upcontext, $forum_version, $user_info, $maintenance, $db_type, $modSettings;
 
 	// Now it's nice to have some of the basic source files.
 	if (!isset($_GET['ssi']) && !$command_line)
@@ -1359,8 +1357,8 @@ function fixRelativePath($path)
  */
 function parse_sql($filename)
 {
-	global $db_prefix, $db_collation, $boardurl, $command_line, $file_steps, $step_progress, $custom_warning;
-	global $upcontext, $support_js, $is_debug, $databases, $db_type, $db_character_set, $db_connection;
+	global $db_prefix, $boardurl, $command_line, $file_steps, $step_progress;
+	global $upcontext, $support_js, $is_debug;
 
 /*
 	Failure allowed on:
@@ -1401,8 +1399,9 @@ function parse_sql($filename)
 	set_error_handler('sql_error_handler');
 
 	$endl = $command_line ? "\n" : '<br />' . "\n";
+	require_once($filename);
 
-	$class_name = 'UpgradeInstructions_' . str_replace('-', '_', basename($sql_file, '.php'));
+	$class_name = 'UpgradeInstructions_' . str_replace('-', '_', basename($filename, '.php'));
 	$install_instance = new $class_name($db_wrapper, $db_table_wrapper);
 
 	$methods = array_filter(get_class_methods($install_instance), function($method) {
@@ -1436,7 +1435,7 @@ function parse_sql($filename)
 
 		$upcontext['current_item_num']++;
 		$upcontext['current_item_name'] = $last_step;
-		$title = htmlspecialchars(rtrim($install_instance->{$table_method . '_title'}()), ENT_COMPAT, 'UTF-8');
+		$title = htmlspecialchars(rtrim($install_instance->{$method . '_title'}()), ENT_COMPAT, 'UTF-8');
 
 		if ($do_current)
 		{
@@ -1445,7 +1444,7 @@ function parse_sql($filename)
 				echo ' * ';
 		}
 
-		$actions = $install_instance->{$table_method}();
+		$actions = $install_instance->{$method}();
 		foreach ($actions as $action)
 		{
 			$upcontext['step_progress'] += (100 / $upcontext['file_count']) / $file_steps;
@@ -1775,7 +1774,7 @@ function loadEssentialFunctions()
 
 	if (!function_exists('text2words'))
 	{
-		function text2words($text)
+		function text2words($text, $max_chars = 20)
 		{
 			// Step 1: Remove entities/things we don't consider words:
 			$words = preg_replace('~(?:[\x0B\0\x{A0}\t\r\s\n(){}\\[\\]<>!@$%^*.,:+=`\~\?/\\\\]+|&(?:amp|lt|gt|quot);)+~u', ' ', strtr($text, array('<br />' => ' ')));
@@ -1836,7 +1835,7 @@ function loadEssentialFunctions()
 
 function discoverCollation()
 {
-	global $databases;
+	global $databases, $db_type, $db_prefix, $db_connection;
 
 	$db_collation = '';
 

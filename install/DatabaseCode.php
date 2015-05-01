@@ -87,8 +87,6 @@ if (class_exists('DbTable_MySQL'))
 		*/
 		private function __construct($db)
 		{
-			global $db_prefix;
-
 			// We are doing install, of course we want to do any remove on these
 			$this->_reservedTables = array();
 
@@ -205,8 +203,6 @@ if (class_exists('DbTable_PostgreSQL'))
 		*/
 		private function __construct($db)
 		{
-			global $db_prefix;
-
 			// We are doing install, of course we want to do any remove on these
 			$this->_reservedTables = array();
 

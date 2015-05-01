@@ -483,7 +483,7 @@ function load_possible_databases($type = null)
  */
 function load_database()
 {
-	global $db_prefix, $db_connection, $modSettings, $db_type, $db_name, $db_user, $db_persist;
+	global $db_prefix, $db_connection, $db_type, $db_name, $db_user, $db_persist, $db_server, $db_passwd, $db_port;
 
 	// Connect the database.
 	if (empty($db_connection))
@@ -554,7 +554,7 @@ function db_version_check()
  */
 function action_deleteInstaller()
 {
-	global $databases, $package_ftp;
+	global $package_ftp;
 
 	definePaths();
 	define('ELK', 'SSI');

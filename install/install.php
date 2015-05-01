@@ -103,7 +103,7 @@ function initialize_inputs()
  */
 function load_lang_file()
 {
-	global $incontext, $txt;
+	global $incontext;
 
 	$incontext['detected_languages'] = array();
 
@@ -263,7 +263,7 @@ class Install_Controller
 	 */
 	private function action_welcome()
 	{
-		global $incontext, $txt, $databases, $installurl;
+		global $incontext, $txt, $databases, $installurl, $db_type;
 
 		$incontext['page_title'] = $txt['install_welcome'];
 		$incontext['sub_template'] = 'welcome_message';
@@ -370,7 +370,7 @@ class Install_Controller
 	 */
 	private function action_checkFilesExist()
 	{
-		global $incontext, $txt, $databases, $installurl;
+		global $incontext, $txt;
 
 		$incontext['page_title'] = $txt['install_welcome'];
 		$incontext['sub_template'] = 'welcome_message';
@@ -613,7 +613,7 @@ class Install_Controller
 	 */
 	private function action_databaseSettings()
 	{
-		global $txt, $databases, $incontext, $db_type, $db_connection, $modSettings;
+		global $txt, $databases, $incontext, $db_type, $db_connection, $modSettings, $db_server, $db_name, $db_user, $db_passwd;
 
 		$incontext['sub_template'] = 'database_settings';
 		$incontext['page_title'] = $txt['db_settings'];
@@ -905,7 +905,7 @@ class Install_Controller
 	 */
 	private function action_databasePopulation()
 	{
-		global $txt, $db_connection, $databases, $modSettings, $db_type, $db_prefix, $incontext, $db_name, $boardurl;
+		global $txt, $databases, $modSettings, $db_type, $db_prefix, $incontext, $db_name, $boardurl;
 
 		$incontext['sub_template'] = 'populate_database';
 		$incontext['page_title'] = $txt['db_populate'];
@@ -978,7 +978,6 @@ class Install_Controller
 			$replaces[') ENGINE=MyISAM;'] = ') ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci;';
 
 		// Execute the SQL.
-		$current_statement = '';
 		$exists = array();
 		$incontext['failures'] = array();
 		$incontext['sql_results'] = array(
@@ -1091,7 +1090,7 @@ class Install_Controller
 	 */
 	private function action_adminAccount()
 	{
-		global $txt, $db_type, $db_connection, $databases, $incontext, $db_prefix, $db_passwd;
+		global $txt, $db_type, $db_connection, $databases, $incontext, $db_prefix, $db_passwd, $webmaster_email;
 
 		$incontext['sub_template'] = 'admin_account';
 		$incontext['page_title'] = $txt['user_settings'];
@@ -1510,7 +1509,7 @@ function parse_sqlLines($sql_file, $replaces)
 
 		if ($result === false)
 		{
-			$incontext['failures'][$count] = $db->last_error();
+			$incontext['failures'][] = $db->last_error();
 		}
 		else
 			$incontext['sql_results']['inserts'] += $result;
