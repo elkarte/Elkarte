@@ -33,20 +33,6 @@ class DbTable_MySQL extends DbTable
 	private static $_tbl = null;
 
 	/**
-	 * Array of table names we don't allow to be removed by addons.
-	 * @var array
-	 */
-	protected $_reservedTables = null;
-
-	/**
-	 * Keeps a (reverse) log of changes to the table structure, to be undone.
-	 * This is used by Packages admin installation/uninstallation/upgrade.
-	 *
-	 * @var array
-	 */
-	private $_package_log = null;
-
-	/**
 	 * DbTable_MySQL::construct
 	 *
 	 * @param object $db - A Database_MySQL object
@@ -232,16 +218,14 @@ class DbTable_MySQL extends DbTable
 		$this->_package_log[] = array('remove_column', $table_name, $column_info['name']);
 
 		// Does it exist - if so don't add it again!
-		$columns = $this->db_list_columns($table_name, false);
-		foreach ($columns as $column)
-			if ($column == $column_info['name'])
-			{
-				// If we're going to overwrite then use change column.
-				if ($if_exists == 'update')
-					return $this->db_change_column($table_name, $column_info['name'], $column_info);
-				else
-					return false;
-			}
+		if ($this->_get_column_info($table_name, $column_info['name']))
+		{
+			// If we're going to overwrite then use change column.
+			if ($if_exists == 'update')
+				return $this->db_change_column($table_name, $column_info['name'], $column_info);
+			else
+				return false;
+		}
 
 		// Now add the thing!
 		$this->_alter_table($table_name, '
@@ -265,15 +249,14 @@ class DbTable_MySQL extends DbTable
 		$table_name = str_replace('{db_prefix}', $db_prefix, $table_name);
 
 		// Does it exist?
-		$columns = $this->db_list_columns($table_name, true);
-		foreach ($columns as $column)
-			if ($column['name'] == $column_name)
-			{
-				$this->_alter_table($table_name, '
-					DROP COLUMN ' . $column_name);
+		$column = $this->_get_column_info($table_name, $column_name);
+		if ($column !== false)
+		{
+			$this->_alter_table($table_name, '
+				DROP COLUMN ' . $column_name);
 
-				return true;
-			}
+			return true;
+		}
 
 		// If here we didn't have to work - joy!
 		return false;
@@ -295,14 +278,10 @@ class DbTable_MySQL extends DbTable
 		$table_name = str_replace('{db_prefix}', $db_prefix, $table_name);
 
 		// Check it does exist!
-		$columns = $this->db_list_columns($table_name, true);
-		$old_info = null;
-		foreach ($columns as $column)
-			if ($column['name'] == $old_column)
-				$old_info = $column;
+		$old_info = $this->_get_column_info($table_name, $old_column);
 
 		// Nothing?
-		if ($old_info == null)
+		if ($old_info === false)
 			return false;
 
 		// Get the right bits.

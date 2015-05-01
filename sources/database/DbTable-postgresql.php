@@ -33,20 +33,6 @@ class DbTable_PostgreSQL extends DbTable
 	private static $_tbl = null;
 
 	/**
-	 * Array of table names we don't allow to be removed by addons.
-	 * @var array
-	 */
-	protected $_reservedTables = null;
-
-	/**
-	 * Keeps a (reverse) log of changes to the table structure, to be undone.
-	 * This is used by Packages admin installation/uninstallation/upgrade.
-	 *
-	 * @var array
-	 */
-	private $_package_log = null;
-
-	/**
 	 * DbTable_PostgreSQL::construct
 	 *
 	 * @param object $db - A Database_PostgreSQL object
@@ -66,6 +52,7 @@ class DbTable_PostgreSQL extends DbTable
 			'messages', 'moderators', 'package_servers', 'permission_profiles', 'permissions', 'personal_messages',
 			'pm_recipients', 'poll_choices', 'polls', 'scheduled_tasks', 'sessions', 'settings', 'smileys',
 			'themes', 'topics');
+
 		foreach ($this->_reservedTables as $k => $table_name)
 			$this->_reservedTables[$k] = strtolower($db_prefix . $table_name);
 
@@ -202,11 +189,13 @@ class DbTable_PostgreSQL extends DbTable
 		);
 		// And the indexes...
 		foreach ($index_queries as $query)
+		{
 			$this->_db->query('', $query,
-			array(
-				'security_override' => true,
-			)
-		);
+				array(
+					'security_override' => true,
+				)
+			);
+		}
 
 		// Go, go power rangers!
 		$this->_db->db_transaction('commit');
@@ -290,16 +279,14 @@ class DbTable_PostgreSQL extends DbTable
 		$this->_package_log[] = array('remove_column', $table_name, $column_info['name']);
 
 		// Does it exist - if so don't add it again!
-		$columns = $this->db_list_columns($table_name, false);
-		foreach ($columns as $column)
-			if ($column == $column_info['name'])
-			{
-				// If we're going to overwrite then use change column.
-				if ($if_exists == 'update')
-					return $this->db_change_column($table_name, $column_info['name'], $column_info);
-				else
-					return false;
-			}
+		if ($this->_get_column_info($table_name, $column_info['name']))
+		{
+			// If we're going to overwrite then use change column.
+			if ($if_exists == 'update')
+				return $this->db_change_column($table_name, $column_info['name'], $column_info);
+			else
+				return false;
+		}
 
 		// Get the specifics...
 		$column_info['size'] = isset($column_info['size']) && is_numeric($column_info['size']) ? $column_info['size'] : null;
@@ -335,24 +322,23 @@ class DbTable_PostgreSQL extends DbTable
 		$table_name = str_replace('{db_prefix}', $db_prefix, $table_name);
 
 		// Does it exist?
-		$columns = $this->db_list_columns($table_name, true);
-		foreach ($columns as $column)
-			if ($column['name'] == $column_name)
-			{
-				// If there is an auto we need remove it!
-				if ($column['auto'])
-					$this->_db->query('',
-						'DROP SEQUENCE ' . $table_name . '_seq',
-						array(
-							'security_override' => true,
-						)
-					);
+		$column = $this->_get_column_info($table_name, $column_name);
+		if ($column !== false)
+		{
+			// If there is an auto we need remove it!
+			if ($column['auto'])
+				$this->_db->query('',
+					'DROP SEQUENCE ' . $table_name . '_seq',
+					array(
+						'security_override' => true,
+					)
+				);
 
-				$this->_alter_table($table_name, '
-					DROP COLUMN ' . $column_name);
+			$this->_alter_table($table_name, '
+				DROP COLUMN ' . $column_name);
 
-				return true;
-			}
+			return true;
+		}
 
 		// If here we didn't have to work - joy!
 		return false;
@@ -374,14 +360,10 @@ class DbTable_PostgreSQL extends DbTable
 		$table_name = str_replace('{db_prefix}', $db_prefix, $table_name);
 
 		// Check it does exist!
-		$columns = $this->db_list_columns($table_name, true);
-		$old_info = null;
-		foreach ($columns as $column)
-			if ($column['name'] == $old_column)
-				$old_info = $column;
+		$old_info = $this->_get_column_info($table_name, $old_column);
 
 		// Nothing?
-		if ($old_info == null)
+		if ($old_info === false)
 			return false;
 
 		// Now we check each bit individually and ALTER as required.
@@ -801,6 +783,7 @@ class DbTable_PostgreSQL extends DbTable
 	 * This function optimizes a table.
 	 *
 	 * @param string $table - the table to be optimized
+	 *
 	 * @return int how much it was gained
 	 */
 	public function optimize($table)

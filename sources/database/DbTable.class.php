@@ -31,6 +31,20 @@ abstract class DbTable
 	protected $_db = null;
 
 	/**
+	 * Array of table names we don't allow to be removed by addons.
+	 * @var array
+	 */
+	protected $_reservedTables = null;
+
+	/**
+	 * Keeps a (reverse) log of changes to the table structure, to be undone.
+	 * This is used by Packages admin installation/uninstallation/upgrade.
+	 *
+	 * @var array
+	 */
+	private $_package_log = null;
+
+	/**
 	 * This function can be used to create a table without worrying about schema
 	 *  compatabilities across supported database systems.
 	 *  - If the table exists will, by default, do nothing.
@@ -177,6 +191,28 @@ abstract class DbTable
 				'security_override' => true,
 			)
 		);
+	}
+
+	/**
+	 * Finds a column by name in a table and returns some info.
+	 *
+	 * @param string $table_name
+	 * @param string $column_name
+	 * @return mixed[]|false
+	 */
+	protected function _get_column_info($table, $column_name)
+	{
+		$columns = $this->db_list_columns($table_name, false);
+
+		foreach ($columns as $column)
+		{
+			if ($column == $column_info['name'])
+			{
+				return $column_info;
+			}
+		}
+
+		return false;
 	}
 
 	/**
