@@ -47,20 +47,6 @@ $incontext['overall_percent'] = $action->overall_percent;
 installExit();
 
 /**
- * Grabs all the files with db definitions and loads them.
- * That's the easy way, in the future we can make it as complex as possible. :P
- */
-function load_possible_databases()
-{
-	global $databases;
-
-	$files = glob(__DIR__ . '/Db-check-*.php');
-
-	foreach ($files as $file)
-		require($file);
-}
-
-/**
  * Initialization step. Called at each request.
  * It either sets up variables for other steps, or handle a few requests on its own.
  */
