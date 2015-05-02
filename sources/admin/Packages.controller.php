@@ -1131,11 +1131,7 @@ class Packages_Controller extends Action_Controller
 			}
 		}
 
-		// Boardmod?
-		if (isset($this->_req->query->boardmod))
-			$mod_actions = parseBoardMod(@file_get_contents(BOARDDIR . '/packages/temp/' . $context['base_path'] . $this->_req->query->filename), true, $reverse, $theme_paths);
-		else
-			$mod_actions = parseModification(@file_get_contents(BOARDDIR . '/packages/temp/' . $context['base_path'] . $this->_req->query->filename), true, $reverse, $theme_paths);
+		$mod_actions = parseModification(@file_get_contents(BOARDDIR . '/packages/temp/' . $context['base_path'] . $this->_req->query->filename), true, $reverse, $theme_paths);
 
 		// Ok lets get the content of the file.
 		$context['operations'] = array(

@@ -188,10 +188,7 @@ class Package_Actions extends Action_Controller
 		}
 		else
 		{
-			if ($this->_action['boardmod'])
-				$mod_actions = parseBoardMod(@file_get_contents(BOARDDIR . '/packages/temp/' . $this->_base_path . $this->_action['filename']), true, $this->_action['reverse'], $this->_theme_paths);
-			else
-				$mod_actions = parseModification(@file_get_contents(BOARDDIR . '/packages/temp/' . $this->_base_path . $this->_action['filename']), true, $this->_action['reverse'], $this->_theme_paths);
+			$mod_actions = parseModification(@file_get_contents(BOARDDIR . '/packages/temp/' . $this->_base_path . $this->_action['filename']), true, $this->_action['reverse'], $this->_theme_paths);
 
 			if (count($mod_actions) == 1 && isset($mod_actions[0]) && $mod_actions[0]['type'] === 'error' && $mod_actions[0]['filename'] === '-')
 				$mod_actions[0]['filename'] = $this->_action['filename'];
@@ -231,7 +228,6 @@ class Package_Actions extends Action_Controller
 							'position' => $mod_action['position'],
 							'operation_key' => $operation_key,
 							'filename' => $this->_action['filename'],
-							'is_boardmod' => $this->_action['boardmod'],
 							'failed' => $mod_action['failed'],
 							'ignore_failure' => !empty($mod_action['ignore_failure']),
 						);
@@ -246,7 +242,6 @@ class Package_Actions extends Action_Controller
 							'position' => $mod_action['position'],
 							'operation_key' => $operation_key,
 							'filename' => $this->_action['filename'],
-							'is_boardmod' => $this->_action['boardmod'],
 							'failed' => $mod_action['failed'],
 							'ignore_failure' => !empty($mod_action['ignore_failure']),
 						);
@@ -573,10 +568,7 @@ class Package_Actions extends Action_Controller
 
 		if (!empty($this->_action['filename']))
 		{
-			if ($this->_action['boardmod'])
-				$mod_actions = parseBoardMod(file_get_contents(BOARDDIR . '/packages/temp/' . $context['base_path'] . $this->_action['filename']), false, $this->_action['reverse'], $this->_theme_paths);
-			else
-				$mod_actions = parseModification(file_get_contents(BOARDDIR . '/packages/temp/' . $context['base_path'] . $this->_action['filename']), false, $this->_action['reverse'], $this->_theme_paths);
+			$mod_actions = parseModification(file_get_contents(BOARDDIR . '/packages/temp/' . $context['base_path'] . $this->_action['filename']), false, $this->_action['reverse'], $this->_theme_paths);
 
 			// Any errors worth noting?
 			foreach ($mod_actions as $key => $action)
