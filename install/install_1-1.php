@@ -1807,7 +1807,7 @@ class InstallInstructions_install_1_1
 
 	public function table_notifications_pref()
 	{
-		return $db_table->db_create_table('{db_prefix}notifications_pref',
+		return $this->table->db_create_table('{db_prefix}notifications_pref',
 			array(
 				array('name' => 'id_member',          'type' => 'mediumint', 'size' => 8, 'unsigned' => true, 'default' => 0),
 				array('name' => 'notification_level', 'type' => 'tinyint', 'size' => 1, 'default' => 1),
