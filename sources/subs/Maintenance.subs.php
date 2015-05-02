@@ -287,7 +287,7 @@ function recountUnapprovedMessages($start, $increment)
 	$db = database();
 
 	// Recount unapproved messages
-	$db->fetchQueryCallback('', '
+	$db->fetchQueryCallback('
 		SELECT /*!40001 SQL_NO_CACHE */ t.id_topic, MAX(t.unapproved_posts) AS unapproved_posts,
 			COUNT(mu.id_msg) AS real_unapproved_posts
 		FROM {db_prefix}topics AS t
@@ -499,7 +499,7 @@ function updatePersonalMessagesCounter()
 		}
 	);
 
-	$db->fetchQueryCallback('', '
+	$db->fetchQueryCallback('
 		SELECT /*!40001 SQL_NO_CACHE */ mem.id_member, COUNT(pmr.id_pm) AS real_num,
 			MAX(mem.unread_messages) AS unread_messages
 		FROM {db_prefix}members AS mem

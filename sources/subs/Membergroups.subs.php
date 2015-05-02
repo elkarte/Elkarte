@@ -2063,7 +2063,7 @@ function getUnassignableGroups($ignore_protected)
 {
 	$db = database();
 
-	return $db->fetchQueryCallback('', '
+	return $db->fetchQueryCallback('
 		SELECT id_group
 		FROM {db_prefix}membergroups
 		WHERE min_posts != {int:min_posts}' . ($ignore_protected ? '' : '

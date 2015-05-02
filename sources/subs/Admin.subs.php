@@ -411,7 +411,7 @@ function emailAdmins($template, $replacements = array(), $additional_recipients 
 	$groups[] = 1;
 	$groups = array_unique($groups);
 
-	$emails_sent = $db->fetchQueryCallback('', '
+	$emails_sent = $db->fetchQueryCallback('
 		SELECT id_member, member_name, real_name, lngfile, email_address
 		FROM {db_prefix}members
 		WHERE (id_group IN ({array_int:group_list}) OR FIND_IN_SET({raw:group_array_implode}, additional_groups) != 0)
