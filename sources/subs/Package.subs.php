@@ -290,67 +290,6 @@ function create_chmod_control($chmodFiles = array(), $chmodOptions = array(), $r
 	// If we're restoring the status of existing files prepare the data.
 	if ($restore_write_status && isset($_SESSION['pack_ftp']) && !empty($_SESSION['pack_ftp']['original_perms']))
 	{
-		/**
-		 * Get a listing of files that will need to be set back to the original state
-		 *
-		 * @param string $dummy1
-		 * @param string $dummy2
-		 * @param string $dummy3
-		 * @param boolean $do_change
-		 */
-		function list_restoreFiles($dummy1, $dummy2, $dummy3, $do_change)
-		{
-			global $txt, $package_ftp;
-
-			$restore_files = array();
-			foreach ($_SESSION['pack_ftp']['original_perms'] as $file => $perms)
-			{
-				// Check the file still exists, and the permissions were indeed different than now.
-				$file_permissions = @fileperms($file);
-				if (!file_exists($file) || $file_permissions == $perms)
-				{
-					unset($_SESSION['pack_ftp']['original_perms'][$file]);
-					continue;
-				}
-
-				// Are we wanting to change the permission?
-				if ($do_change && isset($_POST['restore_files']) && in_array($file, $_POST['restore_files']))
-				{
-					// Use FTP if we have it.
-					if (!empty($package_ftp))
-					{
-						$ftp_file = strtr($file, array($_SESSION['pack_ftp']['root'] => ''));
-						$package_ftp->chmod($ftp_file, $perms);
-					}
-					else
-						@chmod($file, $perms);
-
-					$new_permissions = @fileperms($file);
-					$result = $new_permissions == $perms ? 'success' : 'failure';
-					unset($_SESSION['pack_ftp']['original_perms'][$file]);
-				}
-				elseif ($do_change)
-				{
-					$new_permissions = '';
-					$result = 'skipped';
-					unset($_SESSION['pack_ftp']['original_perms'][$file]);
-				}
-
-				// Record the results!
-				$restore_files[] = array(
-					'path' => $file,
-					'old_perms_raw' => $perms,
-					'old_perms' => substr(sprintf('%o', $perms), -4),
-					'cur_perms' => substr(sprintf('%o', $file_permissions), -4),
-					'new_perms' => isset($new_permissions) ? substr(sprintf('%o', $new_permissions), -4) : '',
-					'result' => isset($result) ? $result : '',
-					'writable_message' => '<span style="color: ' . (@is_writable($file) ? 'green' : 'red') . '">' . (@is_writable($file) ? $txt['package_file_perms_writable'] : $txt['package_file_perms_not_writable']) . '</span>',
-				);
-			}
-
-			return $restore_files;
-		}
-
 		$listOptions = array(
 			'id' => 'restore_file_permissions',
 			'title' => $txt['package_restore_permissions'],
@@ -590,6 +529,68 @@ function create_chmod_control($chmodFiles = array(), $chmodOptions = array(), $r
 	}
 
 	return $return_data;
+}
+
+/**
+ * Get a listing of files that will need to be set back to the original state
+ *
+ * @param string $dummy1
+ * @param string $dummy2
+ * @param string $dummy3
+ * @param boolean $do_change
+ */
+function list_restoreFiles($dummy1, $dummy2, $dummy3, $do_change)
+{
+	global $txt, $package_ftp;
+
+	$restore_files = array();
+
+	foreach ($_SESSION['pack_ftp']['original_perms'] as $file => $perms)
+	{
+		// Check the file still exists, and the permissions were indeed different than now.
+		$file_permissions = @fileperms($file);
+		if (!file_exists($file) || $file_permissions == $perms)
+		{
+			unset($_SESSION['pack_ftp']['original_perms'][$file]);
+			continue;
+		}
+
+		// Are we wanting to change the permission?
+		if ($do_change && isset($_POST['restore_files']) && in_array($file, $_POST['restore_files']))
+		{
+			// Use FTP if we have it.
+			if (!empty($package_ftp))
+			{
+				$ftp_file = strtr($file, array($_SESSION['pack_ftp']['root'] => ''));
+				$package_ftp->chmod($ftp_file, $perms);
+			}
+			else
+				@chmod($file, $perms);
+
+			$new_permissions = @fileperms($file);
+			$result = $new_permissions == $perms ? 'success' : 'failure';
+			unset($_SESSION['pack_ftp']['original_perms'][$file]);
+		}
+		elseif ($do_change)
+		{
+			$new_permissions = '';
+			$result = 'skipped';
+			unset($_SESSION['pack_ftp']['original_perms'][$file]);
+		}
+
+		// Record the results!
+		$restore_files[] = array(
+			'path' => $file,
+			'old_perms_raw' => $perms,
+			'old_perms' => substr(sprintf('%o', $perms), -4),
+			'cur_perms' => substr(sprintf('%o', $file_permissions), -4),
+			'new_perms' => isset($new_permissions) ? substr(sprintf('%o', $new_permissions), -4) : '',
+			'result' => isset($result) ? $result : '',
+			'writable_message' => '<span style="color: ' . (@is_writable($file) ? 'green' : 'red') . '">' . (@is_writable($file) ? $txt['package_file_perms_writable'] : $txt['package_file_perms_not_writable']) . '</span>',
+		);
+	}
+
+	return $restore_files;
 }
 
 /**
@@ -3066,11 +3067,10 @@ if (!function_exists('crc32_compat'))
  *
  * @package Packages
  * @param string $id of package to check
+ * @param string|null $install_id to check
  */
-function isPackageInstalled($id)
+function isPackageInstalled($id, $install_id = null)
 {
-	global $context;
-
 	$db = database();
 
 	$result = array(
@@ -3090,13 +3090,13 @@ function isPackageInstalled($id)
 		FROM {db_prefix}log_packages
 		WHERE package_id = {string:current_package}
 			AND install_state != {int:not_installed}
-			' . (!empty($context['install_id']) ? ' AND id_install = {int:install_id} ' : '') . '
+			' . (!empty($install_id) ? ' AND id_install = {int:install_id} ' : '') . '
 		ORDER BY time_installed DESC
 		LIMIT 1',
 		array(
 			'not_installed' => 0,
 			'current_package' => $id,
-			'install_id' => $context['install_id'],
+			'install_id' => $install_id,
 		)
 	);
 	while ($row = $db->fetch_assoc($request))
@@ -3119,10 +3119,11 @@ function isPackageInstalled($id)
  *
  * @package Packages
  * @param string $id package_id to update
+ * @param string $install_id install id of the package
  */
-function setPackageState($id)
+function setPackageState($id, $install_id)
 {
-	global $context, $user_info;
+	global $user_info;
 
 	$db = database();
 
@@ -3138,7 +3139,7 @@ function setPackageState($id)
 			'current_time' => time(),
 			'package_id' => $id,
 			'member_name' => $user_info['name'],
-			'install_id' => $context['install_id'],
+			'install_id' => $install_id,
 		)
 	);
 }
