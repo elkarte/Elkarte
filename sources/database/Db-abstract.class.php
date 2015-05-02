@@ -198,6 +198,39 @@ abstract class Database_Abstract implements Database
 	}
 
 	/**
+	 * {@inheritDoc}
+	 */
+	public function fetchQuery($db_string, $db_values = array())
+	{
+		$request = $this->query('', $db_string, $db_values);
+
+		$results = array();
+		while ($row = $this->fetch_assoc($request))
+			$results[] = $row;
+		$this->free_result($request);
+
+		return $results;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	public function fetchQueryCallback($db_string, $db_values = array(), $callback = null)
+	{
+		if ($callback === null)
+			return $this->fetchQuery($db_string, $db_values);
+
+		$request = $this->query('', $db_string, $db_values);
+
+		$results = array();
+		while ($row = $this->fetch_assoc($request))
+			$results[] = $callback($row);
+		$this->free_result($request);
+
+		return $results;
+	}
+
+	/**
 	 * This function combines the keys and values of the data passed to db::insert.
 	 *
 	 * @param mixed[] $keys

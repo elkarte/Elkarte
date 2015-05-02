@@ -61,6 +61,28 @@ interface Database
 	public function query($identifier, $db_string, $db_values = array(), $connection = null);
 
 	/**
+	 * Do a query, and returns the results.
+	 *
+	 * @param string $db_string
+	 * @param mixed[] $db_values = array()
+	 * @return array
+	 */
+	public function fetchQuery($db_string, $db_values = array());
+
+	/**
+	 * Do a query and returns the results calling a callback on each row.
+	 *
+	 * The callback is supposed to accept as argument the row of data fetched
+	 * by the query from the database.
+	 *
+	 * @param string $db_string
+	 * @param mixed[] $db_values = array()
+	 * @param object|null $callback
+	 * @return array
+	 */
+	public function fetchQueryCallback($db_string, $db_values = array(), $callback = null);
+
+	/**
 	 * Fetch next result as association.
 	 *
 	 * @param resource $request
