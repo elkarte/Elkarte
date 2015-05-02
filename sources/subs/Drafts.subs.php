@@ -245,8 +245,7 @@ function load_user_drafts($member_id, $draft_type = 0, $topic = false, $order = 
 	$db = database();
 
 	// Load the drafts that the user has available for the given type & action
-	$user_drafts = array();
-	$request = $db->query('', '
+	return $db->fetchQuery('
 		SELECT ud.*' . ($draft_type === 0 ? ',b.id_board, b.name AS bname' : '') . '
 		FROM {db_prefix}user_drafts AS ud' . ($draft_type === 0 ? '
 			INNER JOIN {db_prefix}boards AS b ON (b.id_board = ud.id_board)' : '') . '
@@ -266,13 +265,6 @@ function load_user_drafts($member_id, $draft_type = 0, $topic = false, $order = 
 			'limit' => $limit,
 		)
 	);
-
-	// Place them in the draft array
-	while ($row = $db->fetch_assoc($request))
-		$user_drafts[] = $row;
-	$db->free_result($request);
-
-	return $user_drafts;
 }
 
 /**
@@ -392,22 +384,19 @@ function getOldDrafts($days)
 {
 	$db = database();
 
-	$drafts = array();
-
 	// Find all of the old drafts
-	$request = $db->query('', '
+	return $db->fetchQueryCallback('
 		SELECT id_draft
 		FROM {db_prefix}user_drafts
 		WHERE poster_time <= {int:poster_time_old}',
 		array(
 			'poster_time_old' => time() - (86400 * $days),
-		)
+		),
+		function($row)
+		{
+			$drafts[] = (int) $row['id_draft'];
+		}
 	);
-	while ($row = $db->fetch_row($request))
-		$drafts[] = (int) $row[0];
-	$db->free_result($request);
-
-	return $drafts;
 }
 
 /**

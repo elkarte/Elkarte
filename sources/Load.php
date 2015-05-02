@@ -197,7 +197,7 @@ function loadUserSettings()
 		// Is the member data cached?
 		if (empty($modSettings['cache_enable']) || $modSettings['cache_enable'] < 2 || ($user_settings = $cache->get('user_settings-' . $id_member, 60)) == null)
 		{
-			$request = $db->query('', '
+			$user_settings = $db->fetchQuery('
 				SELECT mem.*, IFNULL(a.id_attach, 0) AS id_attach, a.filename, a.attachment_type
 				FROM {db_prefix}members AS mem
 					LEFT JOIN {db_prefix}attachments AS a ON (a.id_member = {int:id_member})
@@ -207,8 +207,6 @@ function loadUserSettings()
 					'id_member' => $id_member,
 				)
 			);
-			$user_settings = $db->fetch_assoc($request);
-			$db->free_result($request);
 
 			// Make the ID specifically an integer
 			$user_settings['id_member'] = (int) $user_settings['id_member'];
@@ -1763,7 +1761,7 @@ function loadEssentialThemeData()
 	$db = database();
 
 	// Get all the default theme variables.
-	$result = $db->query('', '
+	$db->fetchQueryCallback('
 		SELECT id_theme, variable, value
 		FROM {db_prefix}themes
 		WHERE id_member = {int:no_member}
@@ -1771,17 +1769,18 @@ function loadEssentialThemeData()
 		array(
 			'no_member' => 0,
 			'theme_guests' => $modSettings['theme_guests'],
-		)
-	);
-	while ($row = $db->fetch_assoc($result))
-	{
-		$settings[$row['variable']] = $row['value'];
+		),
+		function($row)
+		{
+			global $settings;
 
-		// Is this the default theme?
-		if (in_array($row['variable'], array('theme_dir', 'theme_url', 'images_url')) && $row['id_theme'] == '1')
-			$settings['default_' . $row['variable']] = $row['value'];
-	}
-	$db->free_result($result);
+			$settings[$row['variable']] = $row['value'];
+
+			// Is this the default theme?
+			if (in_array($row['variable'], array('theme_dir', 'theme_url', 'images_url')) && $row['id_theme'] == '1')
+				$settings['default_' . $row['variable']] = $row['value'];
+		}
+	);
 
 	// Check we have some directories setup.
 	if (empty($settings['template_dirs']))

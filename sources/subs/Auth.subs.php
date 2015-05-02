@@ -621,18 +621,18 @@ function rebuildModCache()
 
 	if ($group_query == '0=1')
 	{
-		$request = $db->query('', '
+		$groups = $db->fetchQueryCallback('
 			SELECT id_group
 			FROM {db_prefix}group_moderators
 			WHERE id_member = {int:current_member}',
 			array(
 				'current_member' => $user_info['id'],
-			)
+			),
+			function($row)
+			{
+				return $row['id_group'];
+			}
 		);
-		$groups = array();
-		while ($row = $db->fetch_assoc($request))
-			$groups[] = $row['id_group'];
-		$db->free_result($request);
 
 		if (empty($groups))
 			$group_query = '0=1';

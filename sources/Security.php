@@ -288,33 +288,31 @@ function is_not_banned($forceCheck = false)
 				'cannot_post',
 				'cannot_register',
 			);
-			$request = $db->query('', '
+			$db->fetchQueryCallback('', '
 				SELECT bi.id_ban, bi.email_address, bi.id_member, bg.cannot_access, bg.cannot_register,
 					bg.cannot_post, bg.cannot_login, bg.reason, IFNULL(bg.expire_time, 0) AS expire_time
 				FROM {db_prefix}ban_items AS bi
 					INNER JOIN {db_prefix}ban_groups AS bg ON (bg.id_ban_group = bi.id_ban_group AND (bg.expire_time IS NULL OR bg.expire_time > {int:current_time}))
 				WHERE
 					(' . implode(' OR ', $ban_query) . ')',
-				$ban_query_vars
-			);
-			// Store every type of ban that applies to you in your session.
-			while ($row = $db->fetch_assoc($request))
-			{
-				foreach ($restrictions as $restriction)
+				$ban_query_vars, function($row) use($user_info, $restrictions, &$flag_is_activated)
 				{
-					if (!empty($row[$restriction]))
+					// Store every type of ban that applies to you in your session.
+					foreach ($restrictions as $restriction)
 					{
-						$_SESSION['ban'][$restriction]['reason'] = $row['reason'];
-						$_SESSION['ban'][$restriction]['ids'][] = $row['id_ban'];
-						if (!isset($_SESSION['ban']['expire_time']) || ($_SESSION['ban']['expire_time'] != 0 && ($row['expire_time'] == 0 || $row['expire_time'] > $_SESSION['ban']['expire_time'])))
-							$_SESSION['ban']['expire_time'] = $row['expire_time'];
+						if (!empty($row[$restriction]))
+						{
+							$_SESSION['ban'][$restriction]['reason'] = $row['reason'];
+							$_SESSION['ban'][$restriction]['ids'][] = $row['id_ban'];
+							if (!isset($_SESSION['ban']['expire_time']) || ($_SESSION['ban']['expire_time'] != 0 && ($row['expire_time'] == 0 || $row['expire_time'] > $_SESSION['ban']['expire_time'])))
+								$_SESSION['ban']['expire_time'] = $row['expire_time'];
 
-						if (!$user_info['is_guest'] && $restriction == 'cannot_access' && ($row['id_member'] == $user_info['id'] || $row['email_address'] == $user_info['email']))
-							$flag_is_activated = true;
+							if (!$user_info['is_guest'] && $restriction == 'cannot_access' && ($row['id_member'] == $user_info['id'] || $row['email_address'] == $user_info['email']))
+								$flag_is_activated = true;
+						}
 					}
 				}
-			}
-			$db->free_result($request);
+			);
 		}
 
 		// Mark the cannot_access and cannot_post bans as being 'hit'.
@@ -337,7 +335,7 @@ function is_not_banned($forceCheck = false)
 		foreach ($bans as $key => $value)
 			$bans[$key] = (int) $value;
 
-		$request = $db->query('', '
+		$db->fetchQueryCallback('
 			SELECT bi.id_ban, bg.reason
 			FROM {db_prefix}ban_items AS bi
 				INNER JOIN {db_prefix}ban_groups AS bg ON (bg.id_ban_group = bi.id_ban_group)
@@ -349,14 +347,13 @@ function is_not_banned($forceCheck = false)
 				'cannot_access' => 1,
 				'ban_list' => $bans,
 				'current_time' => time(),
-			)
+			),
+			function($row)
+			{
+				$_SESSION['ban']['cannot_access']['ids'][] = $row['id_ban'];
+				$_SESSION['ban']['cannot_access']['reason'] = $row['reason'];
+			}
 		);
-		while ($row = $db->fetch_assoc($request))
-		{
-			$_SESSION['ban']['cannot_access']['ids'][] = $row['id_ban'];
-			$_SESSION['ban']['cannot_access']['reason'] = $row['reason'];
-		}
-		$db->free_result($request);
 
 		// My mistake. Next time better.
 		if (!isset($_SESSION['ban']['cannot_access']))

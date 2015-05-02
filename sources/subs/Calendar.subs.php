@@ -1017,10 +1017,8 @@ function eventInfoForTopic($id_topic)
 {
 	$db = database();
 
-	$events = array();
-
 	// Get event for this topic. If we have one.
-	$request = $db->query('', '
+	return $db->fetchQuery('
 		SELECT cal.id_event, cal.start_date, cal.end_date, cal.title, cal.id_member, mem.real_name
 		FROM {db_prefix}calendar AS cal
 			LEFT JOIN {db_prefix}members AS mem ON (mem.id_member = cal.id_member)
@@ -1030,12 +1028,6 @@ function eventInfoForTopic($id_topic)
 			'current_topic' => $id_topic,
 		)
 	);
-
-	while ($row = $db->fetch_assoc($request))
-		$events[] = $row;
-	$db->free_result($request);
-
-	return $events;
 }
 
 /**
@@ -1051,7 +1043,7 @@ function list_getHolidays($start, $items_per_page, $sort)
 {
 	$db = database();
 
-	$request = $db->query('', '
+	return $db->fetchQuery('
 		SELECT id_holiday, YEAR(event_date) AS year, MONTH(event_date) AS month, DAYOFMONTH(event_date) AS day, title
 		FROM {db_prefix}calendar_holidays
 		ORDER BY {raw:sort}
@@ -1060,12 +1052,6 @@ function list_getHolidays($start, $items_per_page, $sort)
 			'sort' => $sort,
 		)
 	);
-	$holidays = array();
-	while ($row = $db->fetch_assoc($request))
-		$holidays[] = $row;
-	$db->free_result($request);
-
-	return $holidays;
 }
 
 /**

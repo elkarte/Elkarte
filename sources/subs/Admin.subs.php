@@ -396,7 +396,7 @@ function emailAdmins($template, $replacements = array(), $additional_recipients 
 	require_once(SUBSDIR . '/Mail.subs.php');
 
 	// Load all groups which are effectively admins.
-	$request = $db->query('', '
+	$groups = $db->fetchQuery('
 		SELECT id_group
 		FROM {db_prefix}permissions
 		WHERE permission = {string:admin_forum}
@@ -408,12 +408,10 @@ function emailAdmins($template, $replacements = array(), $additional_recipients 
 			'admin_forum' => 'admin_forum',
 		)
 	);
-	$groups = array(1);
-	while ($row = $db->fetch_assoc($request))
-		$groups[] = $row['id_group'];
-	$db->free_result($request);
+	$groups[] = 1;
+	$groups = array_unique($groups);
 
-	$request = $db->query('', '
+	$emails_sent = $db->fetchQueryCallback('', '
 		SELECT id_member, member_name, real_name, lngfile, email_address
 		FROM {db_prefix}members
 		WHERE (id_group IN ({array_int:group_list}) OR FIND_IN_SET({raw:group_array_implode}, additional_groups) != 0)
@@ -423,29 +421,28 @@ function emailAdmins($template, $replacements = array(), $additional_recipients 
 			'group_list' => $groups,
 			'notify_types' => 4,
 			'group_array_implode' => implode(', additional_groups) != 0 OR FIND_IN_SET(', $groups),
-		)
+		),
+		function($row) use($replacements, $modSettings, $language)
+		{
+			// Stick their particulars in the replacement data.
+			$replacements['IDMEMBER'] = $row['id_member'];
+			$replacements['REALNAME'] = $row['member_name'];
+			$replacements['USERNAME'] = $row['real_name'];
+
+			// Load the data from the template.
+			$emaildata = loadEmailTemplate($template, $replacements, empty($row['lngfile']) || empty($modSettings['userLanguage']) ? $language : $row['lngfile']);
+
+			// Then send the actual email.
+			sendmail($row['email_address'], $emaildata['subject'], $emaildata['body'], null, null, false, 1);
+
+			// Track who we emailed so we don't do it twice.
+			return $row['email_address'];
+		}
 	);
-	$emails_sent = array();
-	while ($row = $db->fetch_assoc($request))
-	{
-		// Stick their particulars in the replacement data.
-		$replacements['IDMEMBER'] = $row['id_member'];
-		$replacements['REALNAME'] = $row['member_name'];
-		$replacements['USERNAME'] = $row['real_name'];
-
-		// Load the data from the template.
-		$emaildata = loadEmailTemplate($template, $replacements, empty($row['lngfile']) || empty($modSettings['userLanguage']) ? $language : $row['lngfile']);
-
-		// Then send the actual email.
-		sendmail($row['email_address'], $emaildata['subject'], $emaildata['body'], null, null, false, 1);
-
-		// Track who we emailed so we don't do it twice.
-		$emails_sent[] = $row['email_address'];
-	}
-	$db->free_result($request);
 
 	// Any additional users we must email this to?
 	if (!empty($additional_recipients))
+	{
 		foreach ($additional_recipients as $recipient)
 		{
 			if (in_array($recipient['email'], $emails_sent))
@@ -461,6 +458,7 @@ function emailAdmins($template, $replacements = array(), $additional_recipients 
 			// Send off the email.
 			sendmail($recipient['email'], $emaildata['subject'], $emaildata['body'], null, null, false, 1);
 		}
+	}
 }
 
 /**

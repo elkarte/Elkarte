@@ -122,7 +122,9 @@ function markBoardsRead($boards, $unread = false, $resetTopics = false)
 			return;
 
 		// @todo SLOW This query seems to eat it sometimes.
-		$result = $db->query('', '
+		$delete_topics = array();
+		$update_topics = array();
+		$db->fetchQueryCallback('
 			SELECT lt.id_topic, lt.unwatched
 			FROM {db_prefix}log_topics AS lt
 				INNER JOIN {db_prefix}topics AS t /*!40000 USE INDEX (PRIMARY) */ ON (t.id_topic = lt.id_topic
@@ -133,23 +135,20 @@ function markBoardsRead($boards, $unread = false, $resetTopics = false)
 				'current_member' => $user_info['id'],
 				'board_list' => $boards,
 				'lowest_topic' => $lowest_topic,
-			)
+			),
+			function($row) use (&$delete_topics, &$update_topics, $user_info, $modSettings)
+			{
+				if (!empty($row['unwatched']))
+					$update_topics[] = array(
+						$user_info['id'],
+						$modSettings['maxMsgID'],
+						$row['id_topic'],
+						1,
+					);
+				else
+					$delete_topics[] = $row['id_topic'];
+			}
 		);
-		$delete_topics = array();
-		$update_topics = array();
-		while ($row = $db->fetch_assoc($result))
-		{
-			if (!empty($row['unwatched']))
-				$update_topics[] = array(
-					$user_info['id'],
-					$modSettings['maxMsgID'],
-					$row['id_topic'],
-					1,
-				);
-			else
-				$delete_topics[] = $row['id_topic'];
-		}
-		$db->free_result($result);
 
 		if (!empty($update_topics))
 			$db->insert('replace',
@@ -438,18 +437,19 @@ function modifyBoard($board_id, &$boardOptions)
 				$boardOptions['moderators'] = array();
 			if (!empty($moderators))
 			{
-				$request = $db->query('', '
+				$boardOptions['moderators'] = $db->fetchQueryCallback('
 					SELECT id_member
 					FROM {db_prefix}members
 					WHERE member_name IN ({array_string:moderator_list}) OR real_name IN ({array_string:moderator_list})
 					LIMIT ' . count($moderators),
 					array(
 						'moderator_list' => $moderators,
-					)
+					),
+					function($row)
+					{
+						return $row['id_member'];
+					}
 				);
-				while ($row = $db->fetch_assoc($request))
-					$boardOptions['moderators'][] = $row['id_member'];
-				$db->free_result($request);
 			}
 		}
 
@@ -626,7 +626,7 @@ function deleteBoards($boards_to_remove, $moveChildrenTo = null)
 	}
 
 	// Delete ALL topics in the selected boards (done first so topics can't be marooned.)
-	$request = $db->query('', '
+	$topics = $db->fetchQuery('
 		SELECT id_topic
 		FROM {db_prefix}topics
 		WHERE id_board IN ({array_int:boards_to_remove})',
@@ -634,10 +634,6 @@ function deleteBoards($boards_to_remove, $moveChildrenTo = null)
 			'boards_to_remove' => $boards_to_remove,
 		)
 	);
-	$topics = array();
-	while ($row = $db->fetch_assoc($request))
-		$topics[] = $row['id_topic'];
-	$db->free_result($request);
 
 	require_once(SUBSDIR . '/Topic.subs.php');
 	removeTopics($topics, false);
@@ -780,18 +776,18 @@ function fixChildren($parent, $newLevel, $newParent)
 	$db = database();
 
 	// Grab all children of $parent...
-	$result = $db->query('', '
+	$children = $db->fetchQueryCallback('
 		SELECT id_board
 		FROM {db_prefix}boards
 		WHERE id_parent = {int:parent_board}',
 		array(
 			'parent_board' => $parent,
-		)
+		),
+		function($row)
+		{
+			return $row['id_board'];
+		}
 	);
-	$children = array();
-	while ($row = $db->fetch_assoc($result))
-		$children[] = $row['id_board'];
-	$db->free_result($result);
 
 	// ...and set it to a new parent and child_level.
 	$db->query('', '
@@ -1398,28 +1394,25 @@ function wantedBoards($see_board, $hide_recycle = true)
 	global $modSettings, $user_info;
 
 	$db = database();
-	$boards = array();
 	$allowed_see = array(
 		'query_see_board',
 		'query_wanna_see_board'
 	);
 
 	// Find all boards down from $id_parent
-	$request = $db->query('', '
+	return $db->fetchQueryCallback('
 		SELECT b.id_board
 		FROM {db_prefix}boards AS b
 		WHERE ' . $user_info[in_array($see_board, $allowed_see) ? $see_board : $allowed_see[0]] . ($hide_recycle && !empty($modSettings['recycle_enable']) && $modSettings['recycle_board'] > 0 ? '
 			AND b.id_board != {int:recycle_board}' : ''),
 		array(
 			'recycle_board' => (int) $modSettings['recycle_board'],
-		)
+		),
+		function($row)
+		{
+			return $row['id_board'];
+		}
 	);
-
-	while ($row = $db->fetch_assoc($request))
-		$boards[] = $row['id_board'];
-	$db->free_result($request);
-
-	return $boards;
 }
 
 /**
@@ -1616,20 +1609,18 @@ function boardsModerated($id_member)
 
 	$boards = array();
 
-	$request = $db->query('', '
+	return $db->fetchQueryCallback('
 		SELECT id_board
 		FROM {db_prefix}moderators
 		WHERE id_member = {int:current_member}',
 		array(
 			'current_member' => $id_member,
-		)
+		),
+		function($row)
+		{
+			return $row['id_board'];
+		}
 	);
-
-	while ($row = $db->fetch_assoc($request))
-		$boards[] = $row['id_board'];
-	$db->free_result($request);
-
-	return $boards;
 }
 
 /**
@@ -1642,10 +1633,8 @@ function getAllThemes()
 {
 	$db = database();
 
-	$themes = array();
-
 	// Get all the themes...
-	$request = $db->query('', '
+	return $db->fetchQuery('
 		SELECT id_theme AS id, value AS name
 		FROM {db_prefix}themes
 		WHERE variable = {string:name}',
@@ -1653,12 +1642,6 @@ function getAllThemes()
 			'name' => 'name',
 		)
 	);
-
-	while ($row = $db->fetch_assoc($request))
-		$themes[] = $row;
-	$db->free_result($request);
-
-	return $themes;
 }
 
 /**
@@ -2036,7 +2019,7 @@ function boardNotifications($start, $items_per_page, $sort, $memID)
 	$db = database();
 
 	// All the boards that you have notification enabled
-	$request = $db->query('', '
+	$notification_boards = $db->fetchQueryCallback('
 		SELECT b.id_board, b.name, IFNULL(lb.id_msg, 0) AS board_read, b.id_msg_updated
 		FROM {db_prefix}log_notify AS ln
 			INNER JOIN {db_prefix}boards AS b ON (b.id_board = ln.id_board)
@@ -2047,20 +2030,19 @@ function boardNotifications($start, $items_per_page, $sort, $memID)
 		array(
 			'current_member' => $user_info['id'],
 			'selected_member' => $memID,
-		)
+		),
+		function($row)
+		{
+			return array(
+				'id' => $row['id_board'],
+				'name' => $row['name'],
+				'href' => $scripturl . '?board=' . $row['id_board'] . '.0',
+				'link' => '<a href="' . $scripturl . '?board=' . $row['id_board'] . '.0"><strong>' . $row['name'] . '</strong></a>',
+				'new' => $row['board_read'] < $row['id_msg_updated'],
+				'checked' => 'checked="checked"',
+			);
+		}
 	);
-
-	$notification_boards = array();
-	while ($row = $db->fetch_assoc($request))
-		$notification_boards[] = array(
-			'id' => $row['id_board'],
-			'name' => $row['name'],
-			'href' => $scripturl . '?board=' . $row['id_board'] . '.0',
-			'link' => '<a href="' . $scripturl . '?board=' . $row['id_board'] . '.0"><strong>' . $row['name'] . '</strong></a>',
-			'new' => $row['board_read'] < $row['id_msg_updated'],
-			'checked' => 'checked="checked"',
-		);
-	$db->free_result($request);
 
 	// and all the boards that you can see but don't have notify turned on for
 	$request = $db->query('', '

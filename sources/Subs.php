@@ -2053,23 +2053,22 @@ function parsesmileys(&$message)
 			// Load the smileys in reverse order by length so they don't get parsed wrong.
 			if (($temp = cache_get_data('parsing_smileys', 480)) == null)
 			{
-				$result = $db->query('', '
+				$smileysfrom = array();
+				$smileysto = array();
+				$smileysdescs = array();
+
+				$db->fetchQueryCallback('
 					SELECT code, filename, description
 					FROM {db_prefix}smileys
 					ORDER BY LENGTH(code) DESC',
 					array(
-					)
+					), function ($row) use (&$smileysfrom, &$smileysto, &$smileysdescs)
+					{
+						$smileysfrom[] = $row['code'];
+						$smileysto[] = htmlspecialchars($row['filename']);
+						$smileysdescs[] = $row['description'];
+					}
 				);
-				$smileysfrom = array();
-				$smileysto = array();
-				$smileysdescs = array();
-				while ($row = $db->fetch_assoc($result))
-				{
-					$smileysfrom[] = $row['code'];
-					$smileysto[] = htmlspecialchars($row['filename']);
-					$smileysdescs[] = $row['description'];
-				}
-				$db->free_result($result);
 
 				cache_put_data('parsing_smileys', array($smileysfrom, $smileysto, $smileysdescs), 480);
 			}
