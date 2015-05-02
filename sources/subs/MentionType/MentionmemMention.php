@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Interface for mentions objects
+ * Handles the mentioning of members (@member stuff)
  *
  * @name      ElkArte Forum
  * @copyright ElkArte Forum contributors
@@ -18,7 +18,16 @@ if (!defined('ELK'))
 
 class Mentionmem_Mention extends Mention_BoardAccess_Abstract
 {
+	/**
+	 * {@inheritdoc }
+	 */
 	protected $_type = 'mentionmem';
+
+	/**
+	 * List of members mentioned
+	 *
+	 * @var int[]
+	 */
 	protected $_actually_mentioned = array();
 
 	/**
@@ -30,7 +39,7 @@ class Mentionmem_Mention extends Mention_BoardAccess_Abstract
 			'post' => array(
 				'prepare_context' => array(),
 				'before_save_post' => array(),
-				'after_save_post' => array('msgOptions', 'becomesApproved')
+				'after_save_post' => array('msgOptions', 'becomesApproved', 'posterOptions')
 			),
 			'display' => array('prepare_context' => array('virtual_msg')),
 		);
@@ -41,25 +50,33 @@ class Mentionmem_Mention extends Mention_BoardAccess_Abstract
 			return array();
 	}
 
+	/**
+	 * Listener attached to the prepare_context event of the Display controller
+	 * used to mark a mention as read.
+	 *
+	 * @param int $virtual_msg
+	 * @global $modSettings
+	 * @global $_REQUEST
+	 */
 	public function display_prepare_context($virtual_msg)
 	{
-		global $options;
+		global $options, $modSettings;
 
 		// Mark the mention as read if requested
 		if (isset($_REQUEST['mentionread']) && !empty($virtual_msg))
 		{
-			$mentions = new Mentions_Controller(new Event_Manager());
-			$mentions->pre_dispatch();
-			$mentions->setData(array(
-				'id_mention' => $_REQUEST['item'],
-				'mark' => $_REQUEST['mark'],
-			));
-			$mentions->action_markread();
+			$mentions = new \Mentioning(database(), new \Data_Validator(), $modSettings['enabled_mentions']);
+			$mentions->markread((int) $_REQUEST['item']);
 		}
 
 		$this->_setup_editor(empty($options['use_editor_quick_reply']));
 	}
 
+	/**
+	 * Takes care of setting up the editor javascript.
+	 *
+	 * @param bool $simple If true means the plain textarea, otherwise SCEditor.
+	 */
 	protected function _setup_editor($simple = false)
 	{
 		// Just using the plain text quick reply and not the editor
@@ -75,6 +92,11 @@ class Mentionmem_Mention extends Mention_BoardAccess_Abstract
 		});');
 	}
 
+	/**
+	 * Listener attached to the prepare_context event of the Post controller.
+	 *
+	 * @global $_REQUEST
+	 */
 	public function post_prepare_context()
 	{
 		global $context;
@@ -86,9 +108,14 @@ class Mentionmem_Mention extends Mention_BoardAccess_Abstract
 		$this->_setup_editor();
 	}
 
+	/**
+	 * Listener attached to the before_save_post event of the Post controller.
+	 *
+	 * @global $_REQUEST
+	 * @global $_POST
+	 */
 	public function post_before_save_post()
 	{
-
 		if (!empty($_REQUEST['uid']))
 		{
 			$query_params = array(
@@ -109,19 +136,52 @@ class Mentionmem_Mention extends Mention_BoardAccess_Abstract
 		}
 	}
 
-	public function post_after_save_post($msgOptions, $becomesApproved)
+	/**
+	 * Listener attached to the after_save_post event of the Post controller.
+	 *
+	 * @param mixed[] $msgOptions
+	 * @param bool $becomesApproved
+	 * @param mixed[] $posterOptions
+	 */
+	public function post_after_save_post($msgOptions, $becomesApproved, $posterOptions)
 	{
 		if (!empty($this->_actually_mentioned))
 		{
-			$mentions = new Mentions_Controller(new Event_Manager());
-			$mentions->pre_dispatch();
-			$mentions->setData(array(
-				'id_member' => $this->_actually_mentioned,
-				'type' => 'mentionmem',
-				'id_msg' => $msgOptions['id'],
-				'status' => $becomesApproved ? 'new' : 'unapproved',
+			$notifier = \Notifications::getInstance();
+			$notifier->add(new \Notifications_Task(
+				'mentionmem',
+				$msgOptions['id'],
+				$posterOptions['id'],
+				array('id_members' => $this->_actually_mentioned, 'notifier_data' => $posterOptions, 'status' => $becomesApproved ? 'new' : 'unapproved')
 			));
-			$mentions->action_add();
 		}
+	}
+
+	/**
+	 * {@inheritdoc }
+	 */
+	public function getNotificationBody($frequency, $members)
+	{
+		switch ($frequency)
+		{
+			case 'email_daily':
+			case 'email_weekly':
+				$keys = array('subject' => 'notify_mentionmem_digest', 'body' => 'notify_mentionmem_snippet');
+				break;
+			case 'email':
+				// @todo send an email for any like received may be a bit too much. Consider not allowing this method of notification
+				$keys = array('subject' => 'notify_mentionmem_subject', 'body' => 'notify_mentionmem_body');
+				break;
+			case 'notification':
+			default:
+				return $this->_getNotificationStrings('', array('subject' => $this->_type, 'body' => $this->_type), $members, $this->_task);
+		}
+
+		$replacements = array(
+			'ACTIONNAME' => $this->_task['notifier_data']['name'],
+			'MSGLINK' => replaceBasicActionUrl('{script_url}?msg=' . $this->_task->id_target),
+		);
+
+		return $this->_getNotificationStrings('notify_mentionmem', $keys, $members, $this->_task, array(), $replacements);
 	}
 }

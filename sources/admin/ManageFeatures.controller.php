@@ -440,16 +440,16 @@ class ManageFeatures_Controller extends Action_Controller
 			$modules = array('post', 'display');
 			if (!empty($this->_req->post->mentions_enabled))
 			{
-				enableModules('mention', $modules);
+				enableModules('mentions', $modules);
 				$enabled_mentions[] = 'mentionmem';
 			}
 			else
 			{
-				disableModules('mention', $modules);
+				disableModules('mentions', $modules);
 				$enabled_mentions = array_diff($enabled_mentions, array('mentionmem'));
 			}
 
-			updateSettings(array('enabled_mentions' => implode(',', $enabled_mentions)));
+			updateSettings(array('enabled_mentions' => implode(',', array_unique($enabled_mentions))));
 			Settings_Form::save_db($config_vars, $this->_req->post);
 			redirectexit('action=admin;area=featuresettings;sa=mention');
 		}

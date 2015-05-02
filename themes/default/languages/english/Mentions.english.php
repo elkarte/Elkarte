@@ -26,11 +26,13 @@ $txt['mention_mentionmem'] = 'Mentioned you in the message {msg_link}';
 $txt['mention_likemsg'] = 'Liked your message {msg_link}';
 $txt['mention_rlikemsg'] = 'Unliked your message {msg_link}';
 $txt['mention_buddy'] = 'Added you to their buddy list.';
+$txt['mention_quotedmem'] = 'Quoted a message of yours in {msg_link}';
 
 $txt['mentions_type_all'] = 'All Mentions';
 $txt['mentions_type_mentionmem'] = 'Mentioned';
 $txt['mentions_type_likemsg'] = 'Likes';
 $txt['mentions_type_rlikemsg'] = 'Unlikes';
 $txt['mentions_type_buddy'] = 'Buddy';
+$txt['mentions_type_quotedmem'] = 'Quoted';
 
 $txt['mentions_mark_all_read'] = 'Mark these mentions as read';

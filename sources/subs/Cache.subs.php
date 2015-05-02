@@ -132,7 +132,7 @@ function loadCacheEngines($supported_only = true)
 		// Get the engine name from the file name
 		$parts = explode('.', $file_path->getBasename());
 		$engine_name = $parts[0];
-		$class = 'ElkArte\\sources\\subs\\CacheMethod\\' . $parts[0];
+		$class = '\\ElkArte\\sources\\subs\\CacheMethod\\' . $parts[0];
 
 		// Validate the class name exists
 		if (class_exists($class))

@@ -41,6 +41,7 @@ class Mentions_Controller extends Action_Controller
 	 * Holds the instance of the data validation class
 	 *
 	 * @var object
+	 * @deprecated since 1.1
 	 */
 	protected $_validator = null;
 
@@ -48,16 +49,9 @@ class Mentions_Controller extends Action_Controller
 	 * Holds the passed data for this instance, is passed through the validator
 	 *
 	 * @var array
+	 * @deprecated since 1.1
 	 */
 	protected $_data = null;
-
-	/**
-	 * A set of functions that will be called passing the mentions retrieved from the db
-	 * Are originally stored in $_known_mentions
-	 *
-	 * @var array
-	 */
-	protected $_callbacks = array();
 
 	/**
 	 * The type of the mention we are looking at (if empty means all of them)
@@ -121,10 +115,10 @@ class Mentions_Controller extends Action_Controller
 	public function __construct($eventManager)
 	{
 		$this->_known_status = array(
-			'new' => 0,
-			'read' => 1,
-			'deleted' => 2,
-			'unapproved' => 3,
+			'new' => Mentioning::MNEW,
+			'read' => Mentioning::READ,
+			'deleted' => Mentioning::DELETED,
+			'unapproved' => Mentioning::UNAPPROVED,
 		);
 
 		$this->_known_sorting = array('id_member_from', 'type', 'log_time');
@@ -132,6 +126,12 @@ class Mentions_Controller extends Action_Controller
 		parent::__construct($eventManager);
 	}
 
+	/**
+	 * Determines the enabled mention types.
+	 *
+	 * @global $modSettings
+	 * @return string[]
+	 */
 	protected function _findMentionTypes()
 	{
 		global $modSettings;
@@ -151,8 +151,9 @@ class Mentions_Controller extends Action_Controller
 		if (empty($modSettings['mentions_enabled']))
 			Errors::instance()->fatal_lang_error('no_access', false);
 
-		Elk_Autoloader::getInstance()->register(SUBSDIR . '/MentionType', 'ElkArte\\sources\\subs\\MentionType');
+		Elk_Autoloader::getInstance()->register(SUBSDIR . '/MentionType', '\\ElkArte\\sources\\subs\\MentionType');
 
+		// @deprecated since 1.1
 		$this->_data = array(
 			'type' => isset($_REQUEST['type']) ? $_REQUEST['type'] : null,
 			'uid' => isset($_REQUEST['uid']) ? $_REQUEST['uid'] : null,
@@ -393,6 +394,11 @@ class Mentions_Controller extends Action_Controller
 		return $mentions;
 	}
 
+	/**
+	 * Register the listeners for a mention type or for all the mentions.
+	 *
+	 * @param string|string[] $type
+	 */
 	protected function _registerEvents($type)
 	{
 		if (!empty($type))
@@ -402,7 +408,7 @@ class Mentions_Controller extends Action_Controller
 		else
 		{
 			$to_register = array_map(function($name) {
-				return 'ElkArte\\sources\\subs\\MentionType\\' . ucfirst($name) . '_Mention';
+				return '\\ElkArte\\sources\\subs\\MentionType\\' . ucfirst($name) . '_Mention';
 			}, $this->_known_mentions);
 		}
 
@@ -411,6 +417,7 @@ class Mentions_Controller extends Action_Controller
 
 	/**
 	 * We will, we will notify you
+	 * @deprecated since 1.1 - Use Notifications::create instead
 	 */
 	public function action_add()
 	{
@@ -431,6 +438,7 @@ class Mentions_Controller extends Action_Controller
 
 	/**
 	 * Politley remove a mention when a post like is taken back
+	 * @deprecated since 1.1 - Use Notifications::create instead
 	 */
 	public function action_rlike()
 	{
@@ -453,6 +461,7 @@ class Mentions_Controller extends Action_Controller
 	 * Sets the specifics of a mention call in this instance
 	 *
 	 * @param mixed[] $data must contain uid, type and msg at a minimum
+	 * @deprecated since 1.1
 	 */
 	public function setData($data)
 	{
@@ -479,6 +488,7 @@ class Mentions_Controller extends Action_Controller
 	 * Did you read the mention? Then let's move it to the graveyard.
 	 * Used in Display.controller.php, it may be merged to action_updatestatus
 	 * though that would require to add an optional parameter to avoid the redirect
+	 * @deprecated since 1.1 - Use Mentioning::markread instead
 	 */
 	public function action_markread()
 	{
@@ -495,6 +505,7 @@ class Mentions_Controller extends Action_Controller
 
 	/**
 	 * Updating the status from the listing?
+	 * @deprecated since 1.1 - Use Mentioning::updateStatus instead
 	 */
 	public function action_updatestatus()
 	{
@@ -536,6 +547,7 @@ class Mentions_Controller extends Action_Controller
 	 *
 	 * @param int[] $mention_ids An array of mention ids. Each of them will be
 	 *              validated independently
+	 * @deprecated since 1.1
 	 */
 	protected function _markMentionsRead($mention_ids)
 	{
@@ -569,6 +581,7 @@ class Mentions_Controller extends Action_Controller
 
 	/**
 	 * Check if the user can access the mention
+	 * @deprecated since 1.1
 	 */
 	protected function _isAccessible()
 	{
@@ -592,6 +605,7 @@ class Mentions_Controller extends Action_Controller
 
 	/**
 	 * Check if the user can do what he is supposed to do, and validates the input
+	 * @deprecated since 1.1
 	 */
 	protected function _isValid()
 	{

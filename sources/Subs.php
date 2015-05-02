@@ -2155,6 +2155,8 @@ function redirectexit($setLocation = '', $refresh = false)
 		// @todo this relies on 'flush_mail' being only set in AddMailQueue itself... :\
 		AddMailQueue(true);
 
+	Notifications::getInstance()->send();
+
 	$add = preg_match('~^(ftp|http)[s]?://~', $setLocation) == 0 && substr($setLocation, 0, 6) != 'about:';
 
 	if ($add)
@@ -2243,6 +2245,8 @@ function obExit($header = null, $do_footer = null, $from_index = false, $from_fa
 	if (!empty($context['flush_mail']))
 		// @todo this relies on 'flush_mail' being only set in AddMailQueue itself... :\
 		AddMailQueue(true);
+
+	Notifications::getInstance()->send();
 
 	$do_header = $header === null ? !$header_done : $header;
 	if ($do_footer === null)
