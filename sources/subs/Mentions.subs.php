@@ -79,7 +79,7 @@ function getUserMentions($start, $limit, $sort, $all = false, $type = '')
 
 	$db = database();
 
-	$request = $db->query('', '
+	return $db->fetchQueryCallback('
 		SELECT
 			mtn.id_mention, mtn.id_target, mtn.id_member_from, mtn.log_time, mtn.mention_type, mtn.status,
 			m.subject, m.id_topic, m.id_board,
@@ -104,17 +104,13 @@ function getUserMentions($start, $limit, $sort, $all = false, $type = '')
 			'start' => $start,
 			'limit' => $limit,
 			'sort' => $sort,
-		)
+		),
+		function($row)
+		{
+			$row['avatar'] = determineAvatar($row);
+			return $row;
+		}
 	);
-	$mentions = array();
-	while ($row = $db->fetch_assoc($request))
-	{
-		$row['avatar'] = determineAvatar($row);
-		$mentions[] = $row;
-	}
-	$db->free_result($request);
-
-	return $mentions;
 }
 
 /**
@@ -139,7 +135,7 @@ function addMentions($member_from, $members_to, $target, $type, $time = null, $s
 	$db = database();
 
 	// $time is not checked because it's useless
-	$request = $db->query('', '
+	$existing = $db->fetchQueryCallback('
 		SELECT id_member
 		FROM {db_prefix}log_mentions
 		WHERE id_member IN ({array_int:members_to})
@@ -151,16 +147,18 @@ function addMentions($member_from, $members_to, $target, $type, $time = null, $s
 			'type' => $type,
 			'member_from' => $member_from,
 			'target' => $target,
-		)
+		),
+		function($row)
+		{
+			return $row['id_member'];
+		}
 	);
-	$existing = array();
-	while ($row = $db->fetch_assoc($request))
-		$existing[] = $row['id_member'];
-	$db->free_result($request);
 
 	// If the member has already been mentioned, it's not necessary to do it again
 	foreach ($members_to as $id_member)
+	{
 		if (!in_array($id_member, $existing))
+		{
 			$inserts[] = array(
 				$id_member,
 				$target,
@@ -170,6 +168,8 @@ function addMentions($member_from, $members_to, $target, $type, $time = null, $s
 				$time === null ? time() : $time,
 				$type
 			);
+		}
+	}
 
 	if (empty($inserts))
 		return;
@@ -295,18 +295,19 @@ function toggleMentionsApproval($msgs, $approved)
 	);
 
 	// Update the mentions menu count for the members that have this message
-	$request = $db->query('', '
+	$status = $approved ? 0 : 3;
+	$db->fetchQueryCallback('
 		SELECT id_member, status
 		FROM {db_prefix}log_mentions
 		WHERE id_target IN ({array_int:messages})',
 		array(
 			'messages' => $msgs,
-		)
+		),
+		function($row) use ($status)
+		{
+			updateMentionMenuCount($status, $row['id_member']);
+		}
 	);
-	$status = $approved ? 0 : 3;
-	while ($row = $db->fetch_row($request))
-		updateMentionMenuCount($status, $row['id_member']);
-	$db->free_result($request);
 }
 
 /**

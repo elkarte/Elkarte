@@ -338,10 +338,9 @@ function likesPostsGiven($start, $items_per_page, $sort, $memberID)
 	global $scripturl, $context;
 
 	$db = database();
-	$likes = array();
 
 	// Load up what the user likes from the db
-	$request = $db->query('', '
+	return $db->fetchQueryCallback('
 		SELECT
 			l.id_member, l.id_msg,
 			m.subject, m.poster_name, m.id_board, m.id_topic,
@@ -357,19 +356,17 @@ function likesPostsGiven($start, $items_per_page, $sort, $memberID)
 			'sort' => $sort,
 			'start' => $start,
 			'per_page' => $items_per_page,
-		)
+		),
+		function($row) use ($scripturl, $context)
+		{
+			return array(
+				'subject' => '<a href="' . $scripturl . '?topic=' . $row['id_topic'] . '.msg' . $row['id_msg'] . '#msg' . $row['id_msg'] . '">' . $row['subject'] . '</a>',
+				'poster_name' => $row['poster_name'],
+				'name' => $row['name'],
+				'delete' => $scripturl . '?action=likes;sa=unlikepost;profile;msg=' . $row['id_msg'] . ';' . $context['session_var'] . '=' . $context['session_id'],
+			);
+		}
 	);
-	while ($row = $db->fetch_assoc($request))
-	{
-		$likes[] = array(
-			'subject' => '<a href="' . $scripturl . '?topic=' . $row['id_topic'] . '.msg' . $row['id_msg'] . '#msg' . $row['id_msg'] . '">' . $row['subject'] . '</a>',
-			'poster_name' => $row['poster_name'],
-			'name' => $row['name'],
-			'delete' => $scripturl . '?action=likes;sa=unlikepost;profile;msg=' . $row['id_msg'] . ';' . $context['session_var'] . '=' . $context['session_id'],
-		);
-	}
-
-	return $likes;
 }
 
 /**
@@ -389,10 +386,9 @@ function likesPostsReceived($start, $items_per_page, $sort, $memberID)
 	global $scripturl;
 
 	$db = database();
-	$likes = array();
 
 	// Load up what the user likes from the db
-	$request = $db->query('', '
+	return = $db->fetchQueryCallback('
 		SELECT
 			m.subject, m.id_topic,
 			b.name, l.id_msg, COUNT(l.id_msg) AS likes
@@ -408,17 +404,17 @@ function likesPostsReceived($start, $items_per_page, $sort, $memberID)
 			'sort' => $sort,
 			'start' => $start,
 			'per_page' => $items_per_page,
-		)
+		),
+		function($row) use ($scripturl)
+		{
+			return array(
+				'subject' => '<a href="' . $scripturl . '?topic=' . $row['id_topic'] . '.msg' . $row['id_msg'] . '#msg' . $row['id_msg'] . '">' . $row['subject'] . '</a>',
+				'name' => $row['name'],
+				'who' => $scripturl . '?action=likes;sa=showWhoLiked;msg=' . $row['id_msg'],
+				'likes' => $row['likes']
+			);
+		}
 	);
-	while ($row = $db->fetch_assoc($request))
-	{
-		$likes[] = array(
-			'subject' => '<a href="' . $scripturl . '?topic=' . $row['id_topic'] . '.msg' . $row['id_msg'] . '#msg' . $row['id_msg'] . '">' . $row['subject'] . '</a>',
-			'name' => $row['name'],
-			'who' => $scripturl . '?action=likes;sa=showWhoLiked;msg=' . $row['id_msg'],
-			'likes' => $row['likes']
-		);
-	}
 
 	return $likes;
 }
@@ -444,7 +440,7 @@ function postLikers($start, $items_per_page, $sort, $messageID, $simple = true)
 		return $likes;
 
 	// Load up the likes for this message
-	$request = $db->query('', '
+	return $db->fetchQueryCallback('
 		SELECT
 			l.id_member, l.id_msg,
 			m.real_name' . ($simple === true ? '' : ',
@@ -461,26 +457,23 @@ function postLikers($start, $items_per_page, $sort, $messageID, $simple = true)
 			'sort' => $sort,
 			'start' => $start,
 			'per_page' => $items_per_page,
-		)
-	);
-	while ($row = $db->fetch_assoc($request))
-	{
-		$like = array(
-			'real_name' => $row['real_name'],
-			'id_member' => $row['id_member'],
-			'link' => '<a href="' . $scripturl . '?action=profile;u=' . $row['id_member'] . '">' . $row['real_name'] . '</a>',
-		);
-		if ($simple !== true)
+		),
+		function($row) use ($scripturl, $simple)
 		{
-			$avatar = determineAvatar($row);
-			$like['href'] = !empty($row['id_member']) ? $scripturl . '?action=profile;u=' . $row['id_member'] : '';
-			$like['avatar'] = $avatar['href'];
+			$like = array(
+				'real_name' => $row['real_name'],
+				'id_member' => $row['id_member'],
+				'link' => '<a href="' . $scripturl . '?action=profile;u=' . $row['id_member'] . '">' . $row['real_name'] . '</a>',
+			);
+			if ($simple !== true)
+			{
+				$avatar = determineAvatar($row);
+				$like['href'] = !empty($row['id_member']) ? $scripturl . '?action=profile;u=' . $row['id_member'] : '';
+				$like['avatar'] = $avatar['href'];
+			}
+			return $like;
 		}
-		$likes[] = $like;
-	}
-	$db->free_result($request);
-
-	return $likes;
+	);
 }
 
 /**
@@ -599,9 +592,7 @@ function dbMostLikedMessagesByTopic($topic)
 	$db = database();
 
 	// Most liked Message
-	$mostLikedMessage = array();
-
-	$request = $db->query('', '
+	return $db->fetchQueryCallback('
 		SELECT IFNULL(mem.real_name, m.poster_name) AS member_received_name, lp.id_msg,
 			m.id_topic, m.id_board, m.id_member,
 			lp.like_count AS like_count, m.subject, m.body, m.poster_time,
@@ -623,35 +614,33 @@ function dbMostLikedMessagesByTopic($topic)
 		array(
 			'id_topic' => $topic,
 			'limit' => 5,
-		)
+		),
+		function($row) use ($scripturl)
+		{
+			censorText($row['body']);
+			$msgString = Util::shorten_text($row['body'], 255, true);
+			$avatar = determineAvatar($row);
+
+			return array(
+				'id_msg' => $row['id_msg'],
+				'id_topic' => $row['id_topic'],
+				'id_board' => $row['id_board'],
+				'like_count' => $row['like_count'],
+				'subject' => $row['subject'],
+				'body' => parse_bbc($msgString, $row['smileys_enabled'], $row['id_msg']),
+				'time' => standardTime($row['poster_time']),
+				'html_time' => htmlTime($row['poster_time']),
+				'timestamp' => forum_time(true, $row['poster_time']),
+				'member' => array(
+					'id_member' => $row['id_member'],
+					'name' => $row['member_received_name'],
+					'total_posts' => $row['posts'],
+					'href' => !empty($row['id_member']) ? $scripturl . '?action=profile;u=' . $row['id_member'] : '',
+					'avatar' => $avatar['href'],
+				),
+			);
+		}
 	);
-
-	while ($row = $db->fetch_assoc($request))
-	{
-		censorText($row['body']);
-		$msgString = Util::shorten_text($row['body'], 255, true);
-		$avatar = determineAvatar($row);
-
-		$mostLikedMessage[] = array(
-			'id_msg' => $row['id_msg'],
-			'id_topic' => $row['id_topic'],
-			'id_board' => $row['id_board'],
-			'like_count' => $row['like_count'],
-			'subject' => $row['subject'],
-			'body' => parse_bbc($msgString, $row['smileys_enabled'], $row['id_msg']),
-			'time' => standardTime($row['poster_time']),
-			'html_time' => htmlTime($row['poster_time']),
-			'timestamp' => forum_time(true, $row['poster_time']),
-			'member' => array(
-				'id_member' => $row['id_member'],
-				'name' => $row['member_received_name'],
-				'total_posts' => $row['posts'],
-				'href' => !empty($row['id_member']) ? $scripturl . '?action=profile;u=' . $row['id_member'] : '',
-				'avatar' => $avatar['href'],
-			),
-		);
-	}
-	$db->free_result($request);
 
 	return $mostLikedMessage;
 }
@@ -814,7 +803,7 @@ function dbMostLikesReceivedUser()
 	}
 
 	// Lets fetch highest liked posts by this user
-	$request = $db->query('', '
+	$mostLikedMember['topic_data'] = $db->fetchQueryCallback('
 		SELECT lp.id_msg, m.id_topic, COUNT(lp.id_msg) AS like_count, m.subject,
 			m.body, m.poster_time, m.smileys_enabled
 		FROM {db_prefix}message_likes AS lp
@@ -827,25 +816,24 @@ function dbMostLikesReceivedUser()
 		LIMIT 10',
 		array(
 			'id_member' => $id_member
-		)
-	);
-	while ($row = $db->fetch_assoc($request))
-	{
-		censorText($row['body']);
-		$msgString = Util::shorten_text($row['body'], 255, true);
+		),
+		function($row)
+		{
+			censorText($row['body']);
+			$msgString = Util::shorten_text($row['body'], 255, true);
 
-		$mostLikedMember['topic_data'][] = array(
-			'id_topic' => $row['id_topic'],
-			'id_msg' => $row['id_msg'],
-			'like_count' => $row['like_count'],
-			'subject' => $row['subject'],
-			'body' => parse_bbc($msgString, $row['smileys_enabled'], $row['id_msg']),
-			'time' => standardTime($row['poster_time']),
-			'html_time' => htmlTime($row['poster_time']),
-			'timestamp' => forum_time(true, $row['poster_time']),
-		);
-	}
-	$db->free_result($request);
+			return array(
+				'id_topic' => $row['id_topic'],
+				'id_msg' => $row['id_msg'],
+				'like_count' => $row['like_count'],
+				'subject' => $row['subject'],
+				'body' => parse_bbc($msgString, $row['smileys_enabled'], $row['id_msg']),
+				'time' => standardTime($row['poster_time']),
+				'html_time' => htmlTime($row['poster_time']),
+				'timestamp' => forum_time(true, $row['poster_time']),
+			);
+		}
+	);
 
 	return $mostLikedMember;
 }
@@ -905,7 +893,7 @@ function dbMostLikesGivenUser()
 	}
 
 	// Lets fetch the latest posts by this user
-	$request = $db->query('', '
+	$mostLikeGivingMember['topic_data'] = $db->fetchQueryCallback('
 		SELECT m.id_msg, m.id_topic, m.subject, m.body, m.poster_time, m.smileys_enabled
 		FROM {db_prefix}messages AS m
 			INNER JOIN {db_prefix}boards AS b ON (b.id_board = m.id_board)
@@ -915,24 +903,23 @@ function dbMostLikesGivenUser()
 		LIMIT 10',
 		array(
 			'id_member' => $id_liker
-		)
-	);
-	while ($row = $db->fetch_assoc($request))
-	{
-		censorText($row['body']);
-		$msgString = Util::shorten_text($row['body'], 255, true);
+		),
+		function($row)
+		{
+			censorText($row['body']);
+			$msgString = Util::shorten_text($row['body'], 255, true);
 
-		$mostLikeGivingMember['topic_data'][] = array(
-			'id_msg' => $row['id_msg'],
-			'id_topic' => $row['id_topic'],
-			'subject' => $row['subject'],
-			'body' => parse_bbc($msgString, $row['smileys_enabled'], $row['id_msg']),
-			'time' => standardTime($row['poster_time']),
-			'html_time' => htmlTime($row['poster_time']),
-			'timestamp' => forum_time(true, $row['poster_time']),
-		);
-	}
-	$db->free_result($request);
+			return array(
+				'id_msg' => $row['id_msg'],
+				'id_topic' => $row['id_topic'],
+				'subject' => $row['subject'],
+				'body' => parse_bbc($msgString, $row['smileys_enabled'], $row['id_msg']),
+				'time' => standardTime($row['poster_time']),
+				'html_time' => htmlTime($row['poster_time']),
+				'timestamp' => forum_time(true, $row['poster_time']),
+			);
+		}
+	);
 
 	return $mostLikeGivingMember;
 }

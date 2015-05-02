@@ -200,11 +200,11 @@ abstract class Database_Abstract implements Database
 	/**
 	 * {@inheritDoc}
 	 */
-	public function fetchQuery($db_string, $db_values = array())
+	public function fetchQuery($db_string, $db_values = array(), $seeds = null)
 	{
 		$request = $this->query('', $db_string, $db_values);
 
-		$results = array();
+		$results = $seeds !== null ? $seeds : array();
 		while ($row = $this->fetch_assoc($request))
 			$results[] = $row;
 		$this->free_result($request);
@@ -215,14 +215,14 @@ abstract class Database_Abstract implements Database
 	/**
 	 * {@inheritDoc}
 	 */
-	public function fetchQueryCallback($db_string, $db_values = array(), $callback = null)
+	public function fetchQueryCallback($db_string, $db_values = array(), $callback = null, $seeds = null)
 	{
 		if ($callback === null)
 			return $this->fetchQuery($db_string, $db_values);
 
 		$request = $this->query('', $db_string, $db_values);
 
-		$results = array();
+		$results = $seeds !== null ? $seeds : array();
 		while ($row = $this->fetch_assoc($request))
 			$results[] = $callback($row);
 		$this->free_result($request);

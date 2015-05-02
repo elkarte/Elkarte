@@ -380,7 +380,7 @@ function maillist_templates($template_type, $subject = null)
 
 	$notification_templates = array();
 
-	$request = $db->query('', '
+	return $db->fetchQueryCallback('
 		SELECT recipient_name AS template_title, body
 		FROM {db_prefix}log_comments
 		WHERE comment_type = {string:tpltype}
@@ -389,23 +389,20 @@ function maillist_templates($template_type, $subject = null)
 			'tpltype' => $template_type,
 			'generic' => 0,
 			'current_member' => $user_info['id'],
-		)
+		),
+		function($row)
+		{
+			$template = array(
+				'title' => $row['template_title'],
+				'body' => $row['body'],
+			);
+
+			if ($subject !== null)
+				$template['subject'] = $subject;
+
+			return $template;
+		}
 	);
-	while ($row = $db->fetch_assoc($request))
-	{
-		$template = array(
-			'title' => $row['template_title'],
-			'body' => $row['body'],
-		);
-
-		if ($subject !== null)
-			$template['subject'] = $subject;
-
-		$notification_templates[] = $template;
-	}
-	$db->free_result($request);
-
-	return $notification_templates;
 }
 
 /**

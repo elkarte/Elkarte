@@ -134,9 +134,7 @@ function detectExceedingMessages($start, $increment)
 {
 	$db = database();
 
-	$id_msg_exceeding = array();
-
-	$request = $db->query('', '
+	return $db->fetchQueryCallback('
 		SELECT /*!40001 SQL_NO_CACHE */ id_msg
 		FROM {db_prefix}messages
 		WHERE id_msg BETWEEN {int:start} AND {int:start} + {int:increment}
@@ -144,13 +142,12 @@ function detectExceedingMessages($start, $increment)
 		array(
 			'start' => $start,
 			'increment' => $increment - 1,
-		)
+		),
+		function($row)
+		{
+			return $row['id_msg'];
+		}
 	);
-	while ($row = $db->fetch_assoc($request))
-		$id_msg_exceeding[] = $row['id_msg'];
-	$db->free_result($request);
-
-	return $id_msg_exceeding;
 }
 
 /**
@@ -169,21 +166,18 @@ function getExceedingMessages($msg)
 
 	$db = database();
 
-	$exceeding_messages = array();
-
-	$request = $db->query('', '
+	return $db->fetchQueryCallback('
 		SELECT id_msg, id_topic, subject
 		FROM {db_prefix}messages
 		WHERE id_msg IN ({array_int:messages})',
 		array(
 			'messages' => $msg,
-		)
+		),
+		function($row) use ($scripturl)
+		{
+			return '<a href="' . $scripturl . '?topic=' . $row['id_topic'] . '.msg' . $row['id_msg'] . '#msg' . $row['id_msg'] . '">' . $row['subject'] . '</a>';
+		}
 	);
-	while ($row = $db->fetch_assoc($request))
-		$exceeding_messages[] = '<a href="' . $scripturl . '?topic=' . $row['id_topic'] . '.msg' . $row['id_msg'] . '#msg' . $row['id_msg'] . '">' . $row['subject'] . '</a>';
-	$db->free_result($request);
-
-	return $exceeding_messages;
 }
 
 /**
@@ -260,7 +254,7 @@ function recountApprovedMessages($start, $increment)
 	$db = database();
 
 	// Recount approved messages
-	$request = $db->query('', '
+	$db->fetchQueryCallback('
 		SELECT /*!40001 SQL_NO_CACHE */ t.id_topic, MAX(t.num_replies) AS num_replies,
 			CASE WHEN COUNT(ma.id_msg) >= 1 THEN COUNT(ma.id_msg) - 1 ELSE 0 END AS real_num_replies
 		FROM {db_prefix}topics AS t
@@ -273,12 +267,12 @@ function recountApprovedMessages($start, $increment)
 			'is_approved' => 1,
 			'start' => $start,
 			'max_id' => $start + $increment,
-		)
+		),
+		function($row)
+		{
+			setTopicAttribute($row['id_topic'], array('num_replies' => $row['real_num_replies']));
+		}
 	);
-	while ($row = $db->fetch_assoc($request))
-		setTopicAttribute($row['id_topic'], array('num_replies' => $row['real_num_replies']));
-
-	$db->free_result($request);
 }
 
 /**
@@ -293,7 +287,7 @@ function recountUnapprovedMessages($start, $increment)
 	$db = database();
 
 	// Recount unapproved messages
-	$request = $db->query('', '
+	$db->fetchQueryCallback('', '
 		SELECT /*!40001 SQL_NO_CACHE */ t.id_topic, MAX(t.unapproved_posts) AS unapproved_posts,
 			COUNT(mu.id_msg) AS real_unapproved_posts
 		FROM {db_prefix}topics AS t
@@ -306,12 +300,12 @@ function recountUnapprovedMessages($start, $increment)
 			'not_approved' => 0,
 			'start' => $start,
 			'max_id' => $start + $increment,
-		)
+		),
+		function($row)
+		{
+			setTopicAttribute($row['id_topic'], array('unapproved_posts' => $row['real_unapproved_posts']));
+		}
 	);
-	while ($row = $db->fetch_assoc($request))
-		setTopicAttribute($row['id_topic'], array('unapproved_posts' => $row['real_unapproved_posts']));
-
-	$db->free_result($request);
 }
 
 /**
@@ -372,6 +366,7 @@ function updateBoardsCounter($type, $start, $increment)
 			)
 		);
 		while ($row = $db->fetch_assoc($request))
+		{
 			$db->query('', '
 				UPDATE {db_prefix}boards
 				SET num_posts = num_posts + {int:real_num_posts}
@@ -381,6 +376,7 @@ function updateBoardsCounter($type, $start, $increment)
 					'real_num_posts' => $row['real_num_posts'],
 				)
 			);
+		}
 		$db->free_result($request);
 		break;
 
@@ -399,6 +395,7 @@ function updateBoardsCounter($type, $start, $increment)
 			)
 		);
 		while ($row = $db->fetch_assoc($request))
+		{
 			$db->query('', '
 				UPDATE {db_prefix}boards
 				SET num_topics = num_topics + {int:real_num_topics}
@@ -408,6 +405,7 @@ function updateBoardsCounter($type, $start, $increment)
 					'real_num_topics' => $row['real_num_topics'],
 				)
 			);
+		}
 		$db->free_result($request);
 		break;
 
@@ -426,6 +424,7 @@ function updateBoardsCounter($type, $start, $increment)
 			)
 		);
 		while ($row = $db->fetch_assoc($request))
+		{
 			$db->query('', '
 				UPDATE {db_prefix}boards
 				SET unapproved_posts = unapproved_posts + {int:unapproved_posts}
@@ -435,6 +434,7 @@ function updateBoardsCounter($type, $start, $increment)
 					'unapproved_posts' => $row['real_unapproved_posts'],
 				)
 			);
+		}
 		$db->free_result($request);
 		break;
 
@@ -453,6 +453,7 @@ function updateBoardsCounter($type, $start, $increment)
 			)
 		);
 		while ($row = $db->fetch_assoc($request))
+		{
 			$db->query('', '
 				UPDATE {db_prefix}boards
 				SET unapproved_topics = unapproved_topics + {int:real_unapproved_topics}
@@ -462,6 +463,7 @@ function updateBoardsCounter($type, $start, $increment)
 					'real_unapproved_topics' => $row['real_unapproved_topics'],
 				)
 			);
+		}
 		$db->free_result($request);
 		break;
 
@@ -481,7 +483,7 @@ function updatePersonalMessagesCounter()
 
 	require_once(SUBSDIR . '/Members.subs.php');
 
-	$request = $db->query('', '
+	$db->fetchQueryCallback('
 		SELECT /*!40001 SQL_NO_CACHE */ mem.id_member, COUNT(pmr.id_pm) AS real_num,
 			MAX(mem.personal_messages) AS personal_messages
 		FROM {db_prefix}members AS mem
@@ -490,14 +492,14 @@ function updatePersonalMessagesCounter()
 		HAVING COUNT(pmr.id_pm) != MAX(mem.personal_messages)',
 		array(
 			'is_not_deleted' => 0,
-		)
+		),
+		function($row)
+		{
+			updateMemberData($row['id_member'], array('personal_messages' => $row['real_num']));
+		}
 	);
-	while ($row = $db->fetch_assoc($request))
-		updateMemberData($row['id_member'], array('personal_messages' => $row['real_num']));
 
-	$db->free_result($request);
-
-	$request = $db->query('', '
+	$db->fetchQueryCallback('', '
 		SELECT /*!40001 SQL_NO_CACHE */ mem.id_member, COUNT(pmr.id_pm) AS real_num,
 			MAX(mem.unread_messages) AS unread_messages
 		FROM {db_prefix}members AS mem
@@ -507,11 +509,12 @@ function updatePersonalMessagesCounter()
 		array(
 			'is_not_deleted' => 0,
 			'is_not_read' => 0,
-		)
+		),
+		function($row)
+		{
+			updateMemberData($row['id_member'], array('unread_messages' => $row['real_num']));
+		}
 	);
-	while ($row = $db->fetch_assoc($request))
-		updateMemberData($row['id_member'], array('unread_messages' => $row['real_num']));
-	$db->free_result($request);
 }
 
 /**
@@ -661,22 +664,19 @@ function getTopicsToMove($id_board)
 	$topics = array();
 
 	// Lets get the topics.
-	$request = $db->query('', '
+	$db->fetchQueryCallback('
 		SELECT id_topic
 		FROM {db_prefix}topics
 		WHERE id_board = {int:id_board}
 		LIMIT 10',
 		array(
 			'id_board' => $id_board,
-		)
+		),
+		function($row)
+		{
+			return $row['id_topic'];
+		}
 	);
-
-	// Get the ids.
-	while ($row = $db->fetch_assoc($request))
-		$topics[] = $row['id_topic'];
-	$db->free_result($request);
-
-	return $topics;
 }
 
 /**
@@ -785,7 +785,7 @@ function updateZeroPostMembers()
 		{
 			// Outer join the members table on the temporary table finding the members that
 			// have a post count but no posts in the message table
-			$request = $db->query('', '
+			$members = $db->fetchQueryCallback('
 				SELECT mem.id_member, mem.posts
 				FROM {db_prefix}members AS mem
 				LEFT OUTER JOIN {db_prefix}tmp_maint_recountposts AS res
@@ -794,14 +794,13 @@ function updateZeroPostMembers()
 					AND mem.posts != {int:zero}',
 				array(
 					'zero' => 0,
-				)
+				),
+				function($row)
+				{
+					// Set the post count to zero for any delinquents we may have found
+					return $row['id_member'];
+				}
 			);
-
-			// Set the post count to zero for any delinquents we may have found
-			$members = array();
-			while ($row = $db->fetch_assoc($request))
-				$members[] = $row['id_member'];
-			$db->free_result($request);
 
 			if (!empty($members))
 			{

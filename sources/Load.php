@@ -197,7 +197,7 @@ function loadUserSettings()
 		// Is the member data cached?
 		if (empty($modSettings['cache_enable']) || $modSettings['cache_enable'] < 2 || ($user_settings = $cache->get('user_settings-' . $id_member, 60)) == null)
 		{
-			$user_settings = $db->fetchQuery('
+			list ($user_settings) = $db->fetchQuery('
 				SELECT mem.*, IFNULL(a.id_attach, 0) AS id_attach, a.filename, a.attachment_type
 				FROM {db_prefix}members AS mem
 					LEFT JOIN {db_prefix}attachments AS a ON (a.id_member = {int:id_member})

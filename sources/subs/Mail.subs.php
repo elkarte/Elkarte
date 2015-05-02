@@ -949,7 +949,7 @@ function list_getMailQueue($start, $items_per_page, $sort)
 
 	$db = database();
 
-	$request = $db->query('', '
+	return $db->fetchQueryCallback('
 		SELECT
 			id_mail, time_sent, recipient, priority, private, subject
 		FROM {db_prefix}mail_queue
@@ -959,20 +959,16 @@ function list_getMailQueue($start, $items_per_page, $sort)
 			'start' => $start,
 			'sort' => $sort,
 			'items_per_page' => $items_per_page,
-		)
+		),
+		function($row)
+		{
+			// Private PM/email subjects and similar shouldn't be shown in the mailbox area.
+			if (!empty($row['private']))
+				$row['subject'] = $txt['personal_message'];
+
+			return $row;
+		}
 	);
-	$mails = array();
-	while ($row = $db->fetch_assoc($request))
-	{
-		// Private PM/email subjects and similar shouldn't be shown in the mailbox area.
-		if (!empty($row['private']))
-			$row['subject'] = $txt['personal_message'];
-
-		$mails[] = $row;
-	}
-	$db->free_result($request);
-
-	return $mails;
 }
 
 /**
@@ -1177,35 +1173,34 @@ function updateNextSendTime()
 function emailsInfo($number)
 {
 	$db = database();
+	$ids = array();
+	$emails = array();
 
 	// Get the next $number emails, with all that's to know about them and one more.
-	$request = $db->query('', '
+	$db->fetchQueryCallback('
 		SELECT /*!40001 SQL_NO_CACHE */ id_mail, recipient, body, subject, headers, send_html, time_sent, priority, private, message_id
 		FROM {db_prefix}mail_queue
 		ORDER BY priority ASC, id_mail ASC
 		LIMIT ' . $number,
 		array(
-		)
+		),
+		function($row) use(&$ids, &$emails)
+		{
+			// Just get the data and go.
+			$ids[] = $row['id_mail'];
+			$emails[] = array(
+				'to' => $row['recipient'],
+				'body' => $row['body'],
+				'subject' => $row['subject'],
+				'headers' => $row['headers'],
+				'send_html' => $row['send_html'],
+				'time_sent' => $row['time_sent'],
+				'priority' => $row['priority'],
+				'private' => $row['private'],
+				'message_id' => $row['message_id'],
+			);
+		}
 	);
-	$ids = array();
-	$emails = array();
-	while ($row = $db->fetch_assoc($request))
-	{
-		// Just get the data and go.
-		$ids[] = $row['id_mail'];
-		$emails[] = array(
-			'to' => $row['recipient'],
-			'body' => $row['body'],
-			'subject' => $row['subject'],
-			'headers' => $row['headers'],
-			'send_html' => $row['send_html'],
-			'time_sent' => $row['time_sent'],
-			'priority' => $row['priority'],
-			'private' => $row['private'],
-			'message_id' => $row['message_id'],
-		);
-	}
-	$db->free_result($request);
 
 	return array($ids, $emails);
 }

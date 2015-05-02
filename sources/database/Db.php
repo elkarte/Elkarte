@@ -65,9 +65,10 @@ interface Database
 	 *
 	 * @param string $db_string
 	 * @param mixed[] $db_values = array()
+	 * @param mixed[]|null
 	 * @return array
 	 */
-	public function fetchQuery($db_string, $db_values = array());
+	public function fetchQuery($db_string, $db_values = array(), $seeds = null);
 
 	/**
 	 * Do a query and returns the results calling a callback on each row.
@@ -78,9 +79,10 @@ interface Database
 	 * @param string $db_string
 	 * @param mixed[] $db_values = array()
 	 * @param object|null $callback
+	 * @param mixed[]|null
 	 * @return array
 	 */
-	public function fetchQueryCallback($db_string, $db_values = array(), $callback = null);
+	public function fetchQueryCallback($db_string, $db_values = array(), $callback = null, $seeds = null);
 
 	/**
 	 * Fetch next result as association.

@@ -1128,18 +1128,18 @@ function clearPostgroupPermissions()
 {
 	$db = database();
 
-	$post_groups = array();
-	$request = $db->query('', '
+	$post_groups = $db->fetchQueryCallback('
 		SELECT id_group
 		FROM {db_prefix}membergroups
 		WHERE min_posts != {int:min_posts}',
 		array(
 			'min_posts' => -1,
-		)
+		),
+		function($row)
+		{
+			return $row['id_group'];
+		}
 	);
-	while ($row = $db->fetch_assoc($request))
-		$post_groups[] = $row['id_group'];
-	$db->free_result($request);
 
 	// Remove'em.
 	$db->query('', '
@@ -1193,26 +1193,28 @@ function copyPermissionProfile($profile_name, $copy_from)
 	$profile_id = $db->insert_id('{db_prefix}permission_profiles', 'id_profile');
 
 	// Load the permissions from the one it's being copied from.
-	$request = $db->query('', '
+	$inserts = $db->fetchQueryCallback('
 		SELECT id_group, permission, add_deny
 		FROM {db_prefix}board_permissions
 		WHERE id_profile = {int:copy_from}',
 		array(
 			'copy_from' => $copy_from,
-		)
+		),
+		function($row) use ($profile_id)
+		{
+			return array($profile_id, $row['id_group'], $row['permission'], $row['add_deny']);
+		}
 	);
-	$inserts = array();
-	while ($row = $db->fetch_assoc($request))
-		$inserts[] = array($profile_id, $row['id_group'], $row['permission'], $row['add_deny']);
-	$db->free_result($request);
 
 	if (!empty($inserts))
+	{
 		$db->insert('insert',
 			'{db_prefix}board_permissions',
 			array('id_profile' => 'int', 'id_group' => 'int', 'permission' => 'string', 'add_deny' => 'int'),
 			$inserts,
 			array('id_profile', 'id_group', 'permission')
 		);
+	}
 }
 
 /**
