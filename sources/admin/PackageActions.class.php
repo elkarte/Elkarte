@@ -24,8 +24,12 @@ class Package_Actions extends Action_Controller
 {
 	protected $_actions = array();
 	protected $_passed_actions;
+	protected $_base_path;
+	protected $_uninstalling;
+	protected $_theme_paths;
 
 	private $_failed_count = 0;
+	private $_action;
 
 	public $failed = false;
 	public $thisAction = array();
@@ -63,11 +67,12 @@ class Package_Actions extends Action_Controller
 		$this->action_test();
 	}
 
-	public function install_init($actions, $uninstalling, $base_path, $themes_installed)
+	public function install_init($actions, $uninstalling, $base_path, $theme_paths, $themes_installed)
 	{
 		$this->_passed_actions = $actions;
 		$this->_uninstalling = $uninstalling;
 		$this->_base_path = $base_path;
+		$this->_theme_paths = $theme_paths;
 		$this->themes_installed = $themes_installed;
 
 		$this->action_install();
@@ -355,6 +360,8 @@ class Package_Actions extends Action_Controller
 
 	public function action_create_dir_file()
 	{
+		global $txt;
+
 		$this->thisAction = array(
 			'type' => $txt['package_create'] . ' ' . ($this->_action['type'] == 'create-dir' ? $txt['package_tree'] : $txt['package_file']),
 			'action' => Util::htmlspecialchars(strtr($this->_action['destination'], array(BOARDDIR => '.')))
@@ -562,12 +569,14 @@ class Package_Actions extends Action_Controller
 
 	public function action_modification2()
 	{
+		global $context;
+
 		if (!empty($this->_action['filename']))
 		{
 			if ($this->_action['boardmod'])
-				$mod_actions = parseBoardMod(file_get_contents(BOARDDIR . '/packages/temp/' . $context['base_path'] . $this->_action['filename']), false, $this->_action['reverse'], $this->theme_paths);
+				$mod_actions = parseBoardMod(file_get_contents(BOARDDIR . '/packages/temp/' . $context['base_path'] . $this->_action['filename']), false, $this->_action['reverse'], $this->_theme_paths);
 			else
-				$mod_actions = parseModification(file_get_contents(BOARDDIR . '/packages/temp/' . $context['base_path'] . $this->_action['filename']), false, $this->_action['reverse'], $this->theme_paths);
+				$mod_actions = parseModification(file_get_contents(BOARDDIR . '/packages/temp/' . $context['base_path'] . $this->_action['filename']), false, $this->_action['reverse'], $this->_theme_paths);
 
 			// Any errors worth noting?
 			foreach ($mod_actions as $key => $action)
@@ -628,7 +637,7 @@ class Package_Actions extends Action_Controller
 	public function action_database2()
 	{
 		// Only do the database changes on uninstall if requested.
-		if (!empty($this->_action['filename']) && (!$this->_uninstalling || !empty($this->_req->post->do_db_changes)))
+		if (!empty($this->_action['filename']) && (!$this->_uninstalling || !empty(HttpReq::instance()->post->do_db_changes)))
 		{
 			// These can also be there for database changes.
 			global $txt, $modSettings, $context;

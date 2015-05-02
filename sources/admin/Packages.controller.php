@@ -25,7 +25,8 @@ if (!defined('ELK'))
  * Its main job is to install/uninstall, allow to browse, packages.
  * In fact, just about everything related to addon packages, including FTP connections when necessary.
  *
- * @package Packages
+ * @package Packages				else
+
  */
 class Packages_Controller extends Action_Controller
 {
@@ -38,6 +39,13 @@ class Packages_Controller extends Action_Controller
 	private $_extracted_files;
 	private $_filename;
 	private $_base_path;
+	private $_uninstalling;
+	private $_is_installed;
+
+	public $install_id;
+	public $theme_paths;
+	public $chmod_files;
+	public $filename;
 
 	/**
 	 * Pre Dispatch, called before other methods.  Loads HttpReq
@@ -476,7 +484,7 @@ class Packages_Controller extends Action_Controller
 	 */
 	public function action_install2()
 	{
-		global $txt, $context, $boardurl, $scripturl, $modSettings;
+		global $txt, $context, $scripturl, $modSettings;
 
 		// Make sure we don't install this addon twice.
 		checkSubmitOnce('check');
@@ -596,7 +604,7 @@ class Packages_Controller extends Action_Controller
 		{
 			// @todo Make a log of any errors that occurred and output them?
 			$pka = new Package_Actions();
-			$pka->install_init($install_log, $this->_uninstalling, $this->_base_path, $themes_installed);
+			$pka->install_init($install_log, $this->_uninstalling, $this->_base_path, $this->theme_paths, $themes_installed);
 			$failed_steps = $pka->failed_steps;
 			$credits_tag = $pka->credits_tag;
 			$themes_installed = $pka->themes_installed;
@@ -1518,7 +1526,7 @@ class Packages_Controller extends Action_Controller
 				// Make sure the chmod status is valid?
 				if ($validate_custom)
 				{
-					if (preg_match('~^[4567][4567][4567]$~', $context['custom_value']) == false)
+					if (!preg_match('~^[4567][4567][4567]$~', $context['custom_value']))
 						Errors::instance()->fatal_error($txt['chmod_value_invalid']);
 				}
 
@@ -1852,8 +1860,8 @@ class Packages_Controller extends Action_Controller
 					$packageInfo['installed_id'] = isset($installed_adds[$packageInfo['id']]) ? $installed_adds[$packageInfo['id']]['id'] : 0;
 					$packageInfo['sort_id'] = isset($sort_id[$packageInfo['type']]) ? $sort_id[$packageInfo['type']] : $sort_id['unknown'];
 					$packageInfo['is_installed'] = isset($installed_adds[$packageInfo['id']]);
-					$packageInfo['is_current'] = $packageInfo['is_installed'] && ($installed_adds[$packageInfo['id']]['version'] == $packageInfo['version']);
-					$packageInfo['is_newer'] = $packageInfo['is_installed'] && ($installed_adds[$packageInfo['id']]['version'] > $packageInfo['version']);
+					$packageInfo['is_current'] = $packageInfo['is_installed'] && isset($installed_adds[$packageInfo['id']]) && ($installed_adds[$packageInfo['id']]['version'] == $packageInfo['version']);
+					$packageInfo['is_newer'] = $packageInfo['is_installed'] && isset($installed_adds[$packageInfo['id']]) && ($installed_adds[$packageInfo['id']]['version'] > $packageInfo['version']);
 					$packageInfo['can_install'] = false;
 					$packageInfo['can_uninstall'] = false;
 					$packageInfo['can_upgrade'] = false;
