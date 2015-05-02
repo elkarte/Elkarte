@@ -388,7 +388,7 @@ function likesPostsReceived($start, $items_per_page, $sort, $memberID)
 	$db = database();
 
 	// Load up what the user likes from the db
-	return = $db->fetchQueryCallback('
+	return $db->fetchQueryCallback('
 		SELECT
 			m.subject, m.id_topic,
 			b.name, l.id_msg, COUNT(l.id_msg) AS likes

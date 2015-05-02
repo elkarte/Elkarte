@@ -1347,7 +1347,7 @@ function membersByIP($ip1, $match = 'exact', $ip2 = false)
 			OR member_ip2 ' . implode(' OR member_ip', $ip_query);
 	}
 
-	return = $db->fetchQuery('
+	return $db->fetchQuery('
 		SELECT
 			id_member, member_name, email_address, member_ip, member_ip2, is_activated
 		FROM {db_prefix}members

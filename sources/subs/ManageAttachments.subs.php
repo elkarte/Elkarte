@@ -1091,7 +1091,7 @@ function list_getUnapprovedAttachments($start, $items_per_page, $sort, $approve_
 			'items_per_page' => $items_per_page,
 			'approve_query' => $approve_query,
 		),
-		function($row) use ($$scripturl)
+		function($row) use ($scripturl)
 		{
 			return array(
 				'id' => $row['id_attach'],
