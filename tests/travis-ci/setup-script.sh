@@ -17,3 +17,4 @@ then
 else
     /var/www/vendor/bin/phpunit --configuration /var/www/tests/travis-ci/phpunit-$DB-travis.xml
 fi
+/var/www/vendor/bin/phpunit /var/www/tests/travis-ci/BootstrapRunTest.php

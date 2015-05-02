@@ -1,5 +1,5 @@
 <?php
-// Version: 1.0; mentions
+// Version: 1.1; mentions
 
 $txt['my_mentions'] = 'My notifications';
 $txt['my_unread_mentions'] = 'My unread notifications';

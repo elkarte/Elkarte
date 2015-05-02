@@ -10,7 +10,7 @@
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
- * @version 1.0
+ * @version 1.1 dev
  *
  */
 
@@ -29,6 +29,20 @@ abstract class DbTable
 	 * @var Database
 	 */
 	protected $_db = null;
+
+	/**
+	 * Array of table names we don't allow to be removed by addons.
+	 * @var array
+	 */
+	protected $_reservedTables = null;
+
+	/**
+	 * Keeps a (reverse) log of changes to the table structure, to be undone.
+	 * This is used by Packages admin installation/uninstallation/upgrade.
+	 *
+	 * @var array
+	 */
+	protected $_package_log = null;
 
 	/**
 	 * This function can be used to create a table without worrying about schema
@@ -163,16 +177,42 @@ abstract class DbTable
 	abstract public function db_list_indexes($table_name, $detail = false, $parameters = array());
 
 	/**
-	 * Alter table.
+	 * A very simple wrapper around the ALTER TABLE SQL statement.
 	 *
 	 * @param string $table_name
-	 * @param mixed[] $columns
+	 * @param string $statement
 	 */
-	public function db_alter_table($table_name, $columns)
+	protected function _alter_table($table_name, $statement)
 	{
-		// Not implemented by default.
-		// Only SQLite needed it.
-		return;
+		return $this->_db->query('', '
+			ALTER TABLE ' . $table_name . '
+			' . $statement,
+			array(
+				'security_override' => true,
+			)
+		);
+	}
+
+	/**
+	 * Finds a column by name in a table and returns some info.
+	 *
+	 * @param string $table_name
+	 * @param string $column_name
+	 * @return mixed[]|false
+	 */
+	protected function _get_column_info($table_name, $column_name)
+	{
+		$columns = $this->db_list_columns($table_name, false);
+
+		foreach ($columns as $column)
+		{
+			if ($column_name == $column['name'])
+			{
+				return $column_info;
+			}
+		}
+
+		return false;
 	}
 
 	/**

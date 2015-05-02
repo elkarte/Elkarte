@@ -9,7 +9,7 @@
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
- * @version 1.0
+ * @version 1.1 dev
  *
  */
 
@@ -85,12 +85,12 @@ class Elk_Testing_psql extends Elk_Testing_Setup
 		$this->_db = Database_PostgreSQL::db();
 		$this->_db_table = DbTable_PostgreSQL_Install::db_table($this->_db);
 
-		// Load the postgre install sql queryies
-		$this->load_queries(BOARDDIR . '/install/install_1-0_postgresql.sql');
+		// Load the postgre install queries
+		$this->load_queries(BOARDDIR . '/install/install_' . DB_SCRIPT_VERSION . '_postgresql.php');
 		$this->run_queries();
 
 		// Now the rest normally
-		$this->load_queries(BOARDDIR . '/install/install_1-0.sql');
+		$this->load_queries(BOARDDIR . '/install/install_' . DB_SCRIPT_VERSION . '.php');
 		$this->run_queries();
 
 		// Prepare Settings.php, add a member, set time

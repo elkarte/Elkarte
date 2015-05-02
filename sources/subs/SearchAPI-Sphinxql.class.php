@@ -14,7 +14,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0.2
+ * @version 1.1 dev
  *
  */
 
@@ -37,7 +37,7 @@ class Sphinxql_Search extends SearchAPI
 	 * This is the last version of ElkArte that this was tested on, to protect against API changes.
 	 * @var string
 	 */
-	public $version_compatible = 'ElkArte 1.0';
+	public $version_compatible = 'ElkArte 1.1';
 
 	/**
 	 * This won't work with versions of ElkArte less than this.
