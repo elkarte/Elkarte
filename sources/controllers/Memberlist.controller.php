@@ -44,8 +44,9 @@ class Memberlist_Controller extends Action_Controller
 		require_once(SUBSDIR . '/Memberlist.subs.php');
 		ml_findSearchableCustomFields();
 
-		// This is handy for the template
+		// These are handy later
 		$context['old_search_value'] = '';
+		$context['in_search'] = !empty($_REQUEST['search']);
 
 		foreach ($context['custom_search_fields'] as $field)
 			$this->_search_fields['cust_' . $field['colname']] = sprintf($txt['mlist_search_by'], $field['name']);
@@ -184,9 +185,14 @@ class Memberlist_Controller extends Action_Controller
 		$context['can_send_pm'] = allowedTo('pm_send');
 
 		// Build the memberlist button array.
-		$context['memberlist_buttons'] = array(
-			'view_all_members' => array('text' => 'view_all_members', 'image' => 'mlist.png', 'lang' => true, 'url' => $scripturl . '?action=memberlist;sa=all', 'active' => true),
-		);
+		if ($context['in_search'])
+		{
+			$context['memberlist_buttons'] = array(
+				'view_all_members' => array('text' => 'view_all_members', 'image' => 'mlist.png', 'lang' => true, 'url' => $scripturl . '?action=memberlist;sa=all', 'active' => true),
+			);
+		}
+		else
+			$context['memberlist_buttons'] = array();
 
 		// Make fields available to the template
 		$context['search_fields'] = $this->_search_fields;
@@ -381,7 +387,6 @@ class Memberlist_Controller extends Action_Controller
 				if (in_array($val, $fields_key))
 					$context['search_defaults'] = $input_fields;
 			}
-			$context['in_search'] = !empty($_REQUEST['search']);
 			$context['old_search_value'] = $search;
 
 			// No fields?  Use default...
