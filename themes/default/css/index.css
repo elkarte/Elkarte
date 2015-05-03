@@ -2098,9 +2098,6 @@ img.new_posts {
 }
 /* Poll results */
 #poll_options .results {
-	display: inline;
-}
-#poll_options li {
 	position: relative;
 }
 /* Absolute positioning stops these breaking the bars on narrow screens. */
