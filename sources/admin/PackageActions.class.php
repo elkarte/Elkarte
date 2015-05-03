@@ -18,7 +18,7 @@
  */
 
 /**
- * Coordiantes the processing for all known package actions
+ * Coordinates the processing for all known package actions
  */
 class Package_Actions extends Action_Controller
 {
@@ -45,8 +45,6 @@ class Package_Actions extends Action_Controller
 
 	/**
 	 * Start the Package Actions
-	 *
-	 * @param mixed[] $actions
 	 */
 	public function action_index()
 	{
@@ -196,7 +194,7 @@ class Package_Actions extends Action_Controller
 	}
 
 	/**
-	 * Set the error mesasge
+	 * Set the warning message that there is a problem
 	 */
 	public function action_error()
 	{
@@ -210,6 +208,9 @@ class Package_Actions extends Action_Controller
 			$this->failure_details = isset($txt['package_will_fail_' . $this->_action['error_msg']]) ? $txt['package_will_fail_' . $this->_action['error_msg']] : $this->_action['error_msg'];
 	}
 
+	/**
+	 * Validates that a file can be modified.
+	 */
 	public function action_modification()
 	{
 		global $context, $txt;
@@ -234,27 +235,14 @@ class Package_Actions extends Action_Controller
 
 			foreach ($mod_actions as $key => $mod_action)
 			{
-				// Lets get the last section of the file name.
-				if (isset($mod_action['filename']) && substr($mod_action['filename'], -13) != '.template.php')
-					$this->_actual_filename = strtolower(substr(strrchr($mod_action['filename'], '/'), 1) . '||' . $this->_action['filename']);
-				elseif (isset($mod_action['filename']) && preg_match('~([\w]*)/([\w]*)\.template\.php$~', $mod_action['filename'], $matches))
-					$this->_actual_filename = strtolower($matches[1] . '/' . $matches[2] . '.template.php||' . $this->_action['filename']);
-				else
-					$this->_actual_filename = $key;
-
+				$this->_get_filename($mod_action, $key);
 				$this->_check_modification($mod_action);
 			}
 
 			// We need to loop again just to get the operations down correctly.
 			foreach ($mod_actions as $operation_key => $mod_action)
 			{
-				// Lets get the last section of the file name.
-				if (isset($mod_action['filename']) && substr($mod_action['filename'], -13) != '.template.php')
-					$this->_actual_filename = strtolower(substr(strrchr($mod_action['filename'], '/'), 1) . '||' . $this->_action['filename']);
-				elseif (isset($mod_action['filename']) && preg_match('~([\w]*)/([\w]*)\.template\.php$~', $mod_action['filename'], $matches))
-					$this->_actual_filename = strtolower($matches[1] . '/' . $matches[2] . '.template.php||' . $this->_action['filename']);
-				else
-					$this->_actual_filename = $operation_key;
+				$this->_get_filename($mod_action, $operation_key);
 
 				// We just need it for actual parse changes.
 				if (!in_array($mod_action['type'], array('error', 'result', 'opened', 'saved', 'end', 'missing', 'skipping', 'chmod')))
@@ -290,6 +278,28 @@ class Package_Actions extends Action_Controller
 		}
 	}
 
+	/**
+	 * Get the last section of the file name
+	 *
+	 * @param array $mod_action
+	 * @param string $key
+	 */
+	private function _get_filename($mod_action, $key)
+	{
+		// Lets get the last section of the file name.
+		if (isset($mod_action['filename']) && substr($mod_action['filename'], -13) !== '.template.php')
+			$this->_actual_filename = strtolower(substr(strrchr($mod_action['filename'], '/'), 1) . '||' . $this->_action['filename']);
+		elseif (isset($mod_action['filename']) && preg_match('~([\w]*)/([\w]*)\.template\.php$~', $mod_action['filename'], $matches))
+			$this->_actual_filename = strtolower($matches[1] . '/' . $matches[2] . '.template.php||' . $this->_action['filename']);
+		else
+			$this->_actual_filename = $key;
+	}
+
+	/**
+	 * Helper function to parse the results of the parseModification test
+	 *
+	 * @param array $mod_action
+	 */
 	private function _check_modification($mod_action)
 	{
 		global $context, $txt;
@@ -372,6 +382,9 @@ class Package_Actions extends Action_Controller
 		}
 	}
 
+	/**
+	 * A code file that needs to be run during the install phase
+	 */
 	public function action_code()
 	{
 		global $txt;
@@ -382,6 +395,9 @@ class Package_Actions extends Action_Controller
 		);
 	}
 
+	/**
+	 * Database actions that need to occur during the install phase
+	 */
 	public function action_database()
 	{
 		global $txt;
@@ -392,6 +408,9 @@ class Package_Actions extends Action_Controller
 		);
 	}
 
+	/**
+	 * A directory will need to be created
+	 */
 	public function action_create_dir_file()
 	{
 		global $txt;
@@ -402,6 +421,9 @@ class Package_Actions extends Action_Controller
 		);
 	}
 
+	/**
+	 * Hooks to add during the install
+	 */
 	public function action_hook()
 	{
 		global $txt;
@@ -417,6 +439,9 @@ class Package_Actions extends Action_Controller
 		);
 	}
 
+	/**
+	 * Credits that will be added to the about area
+	 */
 	public function action_credits()
 	{
 		global $txt;
@@ -427,6 +452,9 @@ class Package_Actions extends Action_Controller
 		);
 	}
 
+	/**
+	 * Checks if this addon relies on other addons to be installed
+	 */
 	public function action_requries()
 	{
 		global $txt;
@@ -455,6 +483,9 @@ class Package_Actions extends Action_Controller
 		);
 	}
 
+	/**
+	 * Requires a directory to move to
+	 */
 	public function action_require_dir_file()
 	{
 		global $txt;
@@ -466,27 +497,13 @@ class Package_Actions extends Action_Controller
 		);
 
 		// Could this be theme related?
-		if (!empty($this->_action['unparsed_destination']) && preg_match('~^\$(languagedir|languages_dir|imagesdir|themedir|themes_dir)~i', $this->_action['unparsed_destination'], $matches))
-		{
-			// Is the action already stated?
-			$theme_action = !empty($this->_action['theme_action']) && in_array($this->_action['theme_action'], array('no', 'yes', 'auto')) ? $this->_action['theme_action'] : 'auto';
-
-			// If it's not auto do we think we have something we can act upon?
-			if ($theme_action != 'auto' && !in_array($matches[1], array('languagedir', 'languages_dir', 'imagesdir', 'themedir')))
-				$theme_action = '';
-			// ... or if it's auto do we even want to do anything?
-			elseif ($theme_action == 'auto' && $matches[1] != 'imagesdir')
-				$theme_action = '';
-
-			// So, we still want to do something?
-			if ($theme_action != '')
-				$this->themeFinds['candidates'][] = $this->_action;
-			// Otherwise is this is going into another theme record it.
-			elseif ($matches[1] == 'themes_dir')
-				$this->themeFinds['other_themes'][] = strtolower(strtr(parse_path($this->_action['unparsed_destination']), array('\\' => '/')) . '/' . basename($this->_action['filename']));
-		}
+		if (!empty($this->_action['unparsed_destination']))
+			$this->_check_theme_actions($this->_action['unparsed_destination']);
 	}
 
+	/**
+	 * Moving files from a directory
+	 */
 	public function action_move_dir_file()
 	{
 		global $txt;
@@ -497,6 +514,9 @@ class Package_Actions extends Action_Controller
 		);
 	}
 
+	/**
+	 * Remove a directory file
+	 */
 	public function action_remove_dir_file()
 	{
 		global $txt;
@@ -507,11 +527,23 @@ class Package_Actions extends Action_Controller
 		);
 
 		// Could this be theme related?
-		if (!empty($this->_action['unparsed_filename']) && preg_match('~^\$(languagedir|languages_dir|imagesdir|themedir|themes_dir)~i', $this->_action['unparsed_filename'], $matches))
+		if (!empty($this->_action['unparsed_filename']))
+			$this->_check_theme_actions($this->_action['theme_action'], true);
+	}
+
+	/**
+	 * Helper function for action_remove_dir_file and action_require_dir_file
+	 */
+	private function _check_theme_actions($destination, $set_destination = false)
+	{
+		if (preg_match('~^\$(languagedir|languages_dir|imagesdir|themedir|themes_dir)~i', $destination, $matches))
 		{
 			// Is the action already stated?
 			$theme_action = !empty($this->_action['theme_action']) && in_array($this->_action['theme_action'], array('no', 'yes', 'auto')) ? $this->_action['theme_action'] : 'auto';
-			$this->_action['unparsed_destination'] = $this->_action['unparsed_filename'];
+
+			// Need to set it?
+			if ($set_destination)
+				$this->_action['unparsed_destination'] = $this->_action['unparsed_filename'];
 
 			// If it's not auto do we think we have something we can act upon?
 			if ($theme_action != 'auto' && !in_array($matches[1], array('languagedir', 'languages_dir', 'imagesdir', 'themedir')))
@@ -525,10 +557,13 @@ class Package_Actions extends Action_Controller
 				$this->themeFinds['candidates'][] = $this->_action;
 			// Otherwise is this is going into another theme record it.
 			elseif ($matches[1] == 'themes_dir')
-				$this->themeFinds['other_themes'][] = strtolower(strtr(parse_path($this->_action['unparsed_filename']), array('\\' => '/')) . '/' . basename($this->_action['filename']));
+				$this->themeFinds['other_themes'][] = strtolower(strtr(parse_path($destination), array('\\' => '/')) . '/' . basename($this->_action['filename']));
 		}
 	}
 
+	/**
+	 * Test install loop collector
+	 */
 	private function _action_post()
 	{
 		global $txt;
@@ -562,6 +597,9 @@ class Package_Actions extends Action_Controller
 		$this->ourActions[] = $this->thisAction;
 	}
 
+	/**
+	 * Called when we are actually installing an addon
+	 */
 	public function action_install()
 	{
 		// Admins-only!
@@ -570,7 +608,7 @@ class Package_Actions extends Action_Controller
 		// Generic subs for this controller
 		require_once(SUBSDIR . '/Package.subs.php');
 
-		// Here is what we know to do!
+		// Here is what we need to do!
 		$subActions = array(
 			'redirect' => array($this, 'action_redirect2'),
 			'modification' => array($this, 'action_modification2'),
@@ -601,6 +639,10 @@ class Package_Actions extends Action_Controller
 		}
 	}
 
+	/**
+	 * Modify one of the core files!  Lets parseModification do the work and
+	 * reports on errors
+	 */
 	public function action_modification2()
 	{
 		global $context;
@@ -627,6 +669,9 @@ class Package_Actions extends Action_Controller
 		}
 	}
 
+	/**
+	 * Runs a code file that was supplied with the addon
+	 */
 	public function action_code2()
 	{
 		if ($this->_action['type'] == 'code' && !empty($this->_action['filename']))
@@ -640,6 +685,9 @@ class Package_Actions extends Action_Controller
 		}
 	}
 
+	/**
+	 * Sets up for installing addon credits to the forum
+	 */
 	public function action_credits2()
 	{
 		if ($this->_action['type'] == 'credits')
@@ -654,6 +702,9 @@ class Package_Actions extends Action_Controller
 		}
 	}
 
+	/**
+	 * Do the actual add or removal of hooks
+	 */
 	public function action_hook2()
 	{
 		if (isset($this->_action['hook'], $this->_action['function']))
@@ -665,6 +716,9 @@ class Package_Actions extends Action_Controller
 		}
 	}
 
+	/**
+	 * Updates the database as defined by the addon db files
+	 */
 	public function action_database2()
 	{
 		// Only do the database changes on uninstall if requested.
@@ -679,6 +733,9 @@ class Package_Actions extends Action_Controller
 		}
 	}
 
+	/**
+	 * Redirect to a page, generally the addon settings page but could be anywhere
+	 */
 	public function action_redirect2()
 	{
 		global $boardurl, $scripturl, $context, $txt;
