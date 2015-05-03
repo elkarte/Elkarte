@@ -26,6 +26,31 @@ if (!defined('ELK'))
  */
 class Memberlist_Controller extends Action_Controller
 {
+	protected $_known_search_methods = array();
+
+	public function pre_dispatch()
+	{
+		global $context, $txt;
+
+		// These are all the possible fields.
+		$this->_search_fields = array(
+			'name' => $txt['mlist_search_name'],
+			'email' => $txt['mlist_search_email'],
+			'website' => $txt['mlist_search_website'],
+			'group' => $txt['mlist_search_group'],
+		);
+
+		// Are there custom fields they can search?
+		require_once(SUBSDIR . '/Memberlist.subs.php');
+		ml_findSearchableCustomFields();
+
+		// This is handy for the template
+		$context['old_search_value'] = '';
+
+		foreach ($context['custom_search_fields'] as $field)
+			$this->_search_fields['cust_' . $field['colname']] = sprintf($txt['mlist_search_by'], $field['name']);
+	}
+
 	/**
 	 * Sets up the context for showing a listing of registered members.
 	 * For the handlers in this file, it requires the view_mlist permission.
@@ -134,7 +159,6 @@ class Memberlist_Controller extends Action_Controller
 		);
 
 		// Add in any custom profile columns
-		require_once(SUBSDIR . '/Memberlist.subs.php');
 		if (ml_CustomProfile())
 			$context['columns'] += $context['custom_profile_fields']['columns'];
 
@@ -164,19 +188,8 @@ class Memberlist_Controller extends Action_Controller
 			'view_all_members' => array('text' => 'view_all_members', 'image' => 'mlist.png', 'lang' => true, 'url' => $scripturl . '?action=memberlist;sa=all', 'active' => true),
 		);
 
-		// Are there custom fields they can search?
-		ml_findSearchableCustomFields();
-
-		// These are all the possible fields.
-		$context['search_fields'] = array(
-			'name' => $txt['mlist_search_name'],
-			'email' => $txt['mlist_search_email'],
-			'website' => $txt['mlist_search_website'],
-			'group' => $txt['mlist_search_group'],
-		);
-
-		foreach ($context['custom_search_fields'] as $field)
-			$context['search_fields']['cust_' . $field['colname']] = sprintf($txt['mlist_search_by'], $field['name']);
+		// Make fields available to the template
+		$context['search_fields'] = $this->_search_fields;
 
 		// What do we search for by default?
 		$context['search_defaults'] = array('name', 'email');
@@ -355,17 +368,21 @@ class Memberlist_Controller extends Action_Controller
 		$context['page_title'] = $txt['mlist_search'];
 		$context['can_moderate_forum'] = allowedTo('moderate_forum');
 
-		// Are there custom fields they can search?
-		ml_findSearchableCustomFields();
-
 		// They're searching..
 		if (isset($_REQUEST['search']) && isset($_REQUEST['fields']))
 		{
 			$search = Util::htmlspecialchars(trim(isset($_GET['search']) ? $_GET['search'] : $_POST['search']), ENT_QUOTES);
 			$input_fields = isset($_GET['fields']) ? explode(',', $_GET['fields']) : $_POST['fields'];
 
-			$context['old_search'] = $_REQUEST['search'];
-			$context['old_search_value'] = urlencode($_REQUEST['search']);
+			$fields_key = array_keys($this->_search_fields);
+			$context['search_defaults'] = array();
+			foreach ($input_fields as $val)
+			{
+				if (in_array($val, $fields_key))
+					$context['search_defaults'] = $input_fields;
+			}
+			$context['in_search'] = !empty($_REQUEST['search']);
+			$context['old_search_value'] = $search;
 
 			// No fields?  Use default...
 			if (empty($input_fields))
