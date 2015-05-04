@@ -128,7 +128,8 @@ class Notifications extends AbstractModel
 		if ($this->_protect_id && $id < 5)
 			throw new Elk_Exception('error_invalid_notification_id');
 
-		$this->_notifiers[$id] = array(
+		$this->_notifiers[$key] = array(
+			'id' => $id,
 			'key' => $key,
 			'callback' => $callback,
 			'lang_data' => $lang_data,
