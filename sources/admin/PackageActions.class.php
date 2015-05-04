@@ -113,6 +113,12 @@ class Package_Actions extends Action_Controller
 	private $_action;
 
 	/**
+	 * Current check for a modification add/replace failure for the file being changed
+	 * @var boolean
+	 */
+	private $_failure;
+
+	/**
 	 * Holds the last section of the file name
 	 * @var string
 	 */
@@ -205,6 +211,7 @@ class Package_Actions extends Action_Controller
 			'move-file' => array($this, 'action_move_dir_file'),
 			'remove-dir' => array($this, 'action_remove_dir_file'),
 			'remove-file' => array($this, 'action_remove_dir_file'),
+			'skip' => array($this, 'action_skip'),
 		);
 
 		// Set up action/subaction stuff.
@@ -212,22 +219,26 @@ class Package_Actions extends Action_Controller
 
 		foreach ($this->_passed_actions as $this->_action)
 		{
+			// Not failed until proven otherwise.
+			$this->_failure = false;
+			$this->thisAction = array();
+
 			// Yes I know, but thats how this works right now
 			$_REQUEST['sa'] = $this->_action['type'];
 
 			// Work out exactly which test function we are calling
-			$subAction = $action->initialize($subActions, 'unknown');
+			$subAction = $action->initialize($subActions, 'skip');
 
 			// Lets just do it!
 			$action->dispatch($subAction);
 
 			// Loop collector
-			$this->_action_post();
+			$this->_action_our_actions();
 		}
 	}
 
 	/**
-	 * Chmod action requested, make a note
+	 * Chmod action requested, add it to the list
 	 */
 	public function action_chmod()
 	{
@@ -264,6 +275,14 @@ class Package_Actions extends Action_Controller
 	 * Noted for test, handled in the real install
 	 */
 	public function action_redirect()
+	{
+		return;
+	}
+
+	/**
+	 * Don't know this one or handled outside.
+	 */
+	public function action_skip()
 	{
 		return;
 	}
@@ -376,13 +395,13 @@ class Package_Actions extends Action_Controller
 		switch ($mod_action['type'])
 		{
 			case 'opened':
-				$failed = false;
+				$this->_failure = false;
 				break;
 			case 'failure':
 				if (empty($mod_action['is_custom']))
 					$this->has_failure = true;
 
-				$failed = true;
+				$this->_failure = true;
 				break;
 			case 'chmod':
 				$this->chmod_files[] = $mod_action['filename'];
@@ -394,16 +413,16 @@ class Package_Actions extends Action_Controller
 						$context['theme_actions'][$mod_action['is_custom']] = array(
 							'name' => $this->_theme_paths[$mod_action['is_custom']]['name'],
 							'actions' => array(),
-							'has_failure' => $failed,
+							'has_failure' => $this->_failure,
 						);
 					else
-						$context['theme_actions'][$mod_action['is_custom']]['has_failure'] |= $failed;
+						$context['theme_actions'][$mod_action['is_custom']]['has_failure'] |= $this->_failure;
 
 					$context['theme_actions'][$mod_action['is_custom']]['actions'][$this->_actual_filename] = array(
 						'type' => $txt['execute_modification'],
 						'action' => Util::htmlspecialchars(strtr($mod_action['filename'], array(BOARDDIR => '.'))),
-						'description' => $failed ? $txt['package_action_failure'] : $txt['package_action_success'],
-						'failed' => $failed,
+						'description' => $this->_failure ? $txt['package_action_failure'] : $txt['package_action_success'],
+						'failed' => $this->_failure,
 					);
 				}
 				elseif (!isset($this->ourActions[$this->_actual_filename]))
@@ -411,13 +430,13 @@ class Package_Actions extends Action_Controller
 					$this->ourActions[$this->_actual_filename] = array(
 						'type' => $txt['execute_modification'],
 						'action' => Util::htmlspecialchars(strtr($mod_action['filename'], array(BOARDDIR => '.'))),
-						'description' => $failed ? $txt['package_action_failure'] : $txt['package_action_success'],
-						'failed' => $failed,
+						'description' => $this->_failure ? $txt['package_action_failure'] : $txt['package_action_success'],
+						'failed' => $this->_failure,
 					);
 				}
 				else
 				{
-					$this->ourActions[$this->_actual_filename]['failed'] |= $failed;
+					$this->ourActions[$this->_actual_filename]['failed'] |= $this->_failure;
 					$this->ourActions[$this->_actual_filename]['description'] = $this->ourActions[$this->_actual_filename]['failed'] ? $txt['package_action_failure'] : $txt['package_action_success'];
 				}
 				break;
@@ -610,7 +629,7 @@ class Package_Actions extends Action_Controller
 
 		// Could this be theme related?
 		if (!empty($this->_action['unparsed_filename']))
-			$this->_check_theme_actions($this->_action['theme_action'], true);
+			$this->_check_theme_actions($this->_action['unparsed_filename'], true);
 	}
 
 	/**
@@ -646,7 +665,7 @@ class Package_Actions extends Action_Controller
 	/**
 	 * Test install loop collector
 	 */
-	private function _action_post()
+	private function _action_our_actions()
 	{
 		global $txt;
 
@@ -698,8 +717,10 @@ class Package_Actions extends Action_Controller
 			'database' => array($this, 'action_database2'),
 			'hook' => array($this, 'action_hook2'),
 			'credits' => array($this, 'action_credits2'),
+			'skip' => array($this, 'action_skip'),
 		);
 
+		// No failures yet
 		$this->_failed_count = 0;
 		$this->failed_steps = array();
 
@@ -714,7 +735,7 @@ class Package_Actions extends Action_Controller
 			$_REQUEST['sa'] = $this->_action['type'] . '2';
 
 			// Work out exactly who it is we are calling. call integrate_sa_packages
-			$subAction = $action->initialize($subActions, 'unknown');
+			$subAction = $action->initialize($subActions, 'skip');
 
 			// Lets just do it!
 			$action->dispatch($subAction);

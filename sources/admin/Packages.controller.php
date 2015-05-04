@@ -371,7 +371,7 @@ class Packages_Controller extends Action_Controller
 				$this->_base_path = '';
 		}
 		// Perhaps its a directory then, assumed to be extracted
-		elseif (is_dir(BOARDDIR . '/packages/' . $this->_filename))
+		elseif (!empty($this->_filename) && is_dir(BOARDDIR . '/packages/' . $this->_filename))
 		{
 			// Copy the directory to the temp directory
 			copytree(BOARDDIR . '/packages/' . $this->_filename, BOARDDIR . '/packages/temp');
@@ -385,7 +385,7 @@ class Packages_Controller extends Action_Controller
 			Errors::instance()->fatal_lang_error('no_access', false);
 	}
 
-	private function _get_package_actions($package_installed, $packageInfo)
+	private function _get_package_actions($package_installed, $packageInfo, $testing = true)
 	{
 		global $context;
 
@@ -401,7 +401,7 @@ class Packages_Controller extends Action_Controller
 				Errors::instance()->fatal_lang_error('package_cant_uninstall', false);
 			}
 
-			$actions = parsePackageInfo($packageInfo['xml'], true, 'uninstall');
+			$actions = parsePackageInfo($packageInfo['xml'], $testing, 'uninstall');
 
 			// Gadzooks!  There's no uninstaller at all!?
 			if (empty($actions))
@@ -424,7 +424,7 @@ class Packages_Controller extends Action_Controller
 		elseif (isset($package_installed['old_version']) && $package_installed['old_version'] != $packageInfo['version'])
 		{
 			// Look for an upgrade...
-			$actions = parsePackageInfo($packageInfo['xml'], true, 'upgrade', $package_installed['old_version']);
+			$actions = parsePackageInfo($packageInfo['xml'], $testing, 'upgrade', $package_installed['old_version']);
 
 			// There was no upgrade....
 			if (empty($actions))
@@ -444,7 +444,7 @@ class Packages_Controller extends Action_Controller
 			$this->_is_installed = true;
 
 		if (!isset($package_installed['old_version']) || $this->_is_installed)
-			$actions = parsePackageInfo($packageInfo['xml'], true, 'install');
+			$actions = parsePackageInfo($packageInfo['xml'], $testing, 'install');
 
 		return $actions;
 	}
@@ -490,32 +490,23 @@ class Packages_Controller extends Action_Controller
 		checkSubmitOnce('check');
 		checkSession();
 
-		// If there's no file, what are we installing?
-		$this->filename = $this->_req->getQuery('package', 'trim');
-		if (empty($this->filename))
+		// If there's no package file, what are we installing?
+		$this->_filename = $this->_req->getQuery('package', 'trim');
+		if (empty($this->_filename))
 			redirectexit('action=admin;area=packages');
 
 		// And if the file does not exist there is a problem
-		if (!file_exists(BOARDDIR . '/packages/' . $this->filename))
+		if (!file_exists(BOARDDIR . '/packages/' . $this->_filename))
 			Errors::instance()->fatal_lang_error('package_no_file', false);
 
 		// If this is an uninstall, we'll have an id.
 		$this->install_id = $this->_req->getQuery('pid', 'intval', 0);
 
-		// Intsalling in themes will require some help
+		// Installing in themes will require some help
 		require_once(SUBSDIR . '/Themes.subs.php');
 
 		// @todo Perhaps do it in steps, if necessary?
 		$this->_uninstalling = $this->_req->query->sa === 'uninstall2';
-
-		// Set up the details for the sub tempalte, linktree, etc
-		$context['linktree'][count($context['linktree']) - 1] = array(
-			'url' => $scripturl . '?action=admin;area=packages;sa=browse',
-			'name' => $this->_uninstalling ? $txt['uninstall'] : $txt['extracting']
-		);
-		$context['page_title'] .= ' - ' . ($this->_uninstalling ? $txt['uninstall'] : $txt['extracting']);
-		$context['sub_template'] = 'extract_package';
-		$context['filename'] = $this->filename;
 
 		// Load up the package FTP information?
 		create_chmod_control(array(), array('destination_url' => $scripturl . '?action=admin;area=packages;sa=' . $this->_req->query->sa . ';package=' . $this->_req->query->package));
@@ -566,19 +557,19 @@ class Packages_Controller extends Action_Controller
 		}
 
 		// Get the package info...
-		$packageInfo = getPackageInfo($this->filename);
+		$packageInfo = getPackageInfo($this->_filename);
 		if (!is_array($packageInfo))
 			Errors::instance()->fatal_lang_error($packageInfo);
 
-		$packageInfo['filename'] = $this->filename;
+		$packageInfo['filename'] = $this->_filename;
 
 		// Create a backup file to roll back to! (but if they do this more than once, don't run it a zillion times.)
-		if (!empty($modSettings['package_make_full_backups']) && (!isset($_SESSION['last_backup_for']) || $_SESSION['last_backup_for'] != $this->filename . ($this->_uninstalling ? '$$' : '$')))
+		if (!empty($modSettings['package_make_full_backups']) && (!isset($_SESSION['last_backup_for']) || $_SESSION['last_backup_for'] != $this->_filename . ($this->_uninstalling ? '$$' : '$')))
 		{
-			$_SESSION['last_backup_for'] = $this->filename . ($this->_uninstalling ? '$$' : '$');
+			$_SESSION['last_backup_for'] = $this->_filename . ($this->_uninstalling ? '$$' : '$');
 
 			// @todo Internationalize this?
-			package_create_backup(($this->_uninstalling ? 'backup_' : 'before_') . strtok($this->filename, '.'));
+			package_create_backup(($this->_uninstalling ? 'backup_' : 'before_') . strtok($this->_filename, '.'));
 		}
 
 		// The addon isn't installed.... unless proven otherwise.
@@ -588,12 +579,19 @@ class Packages_Controller extends Action_Controller
 		$package_installed = isPackageInstalled($packageInfo['id'], $this->install_id);
 
 		// Fetch the install status and action log
-		$install_log = _get_package_actions($package_installed, $packageInfo);
+		$install_log = $this->_get_package_actions($package_installed, $packageInfo, false);
 
+		// Set up the details for the sub template, linktree, etc
+		$context['linktree'][count($context['linktree']) - 1] = array(
+			'url' => $scripturl . '?action=admin;area=packages;sa=browse',
+			'name' => $this->_uninstalling ? $txt['uninstall'] : $txt['extracting']
+		);
+		$context['page_title'] .= ' - ' . ($this->_uninstalling ? $txt['uninstall'] : $txt['extracting']);
+		$context['sub_template'] = 'extract_package';
+		$context['filename'] = $this->_filename;
 		$context['install_finished'] = false;
 		$context['is_installed'] = $this->_is_installed;
-
-		// Set the type of extraction...
+		$context['uninstalling'] = $this->_uninstalling;
 		$context['extract_type'] = isset($packageInfo['type']) ? $packageInfo['type'] : 'modification';
 
 		// We're gonna be needing the table db functions! ...Sometimes.
@@ -606,7 +604,6 @@ class Packages_Controller extends Action_Controller
 			$pka = new Package_Actions();
 			$pka->install_init($install_log, $this->_uninstalling, $this->_base_path, $this->theme_paths, $themes_installed);
 			$failed_steps = $pka->failed_steps;
-			$credits_tag = $pka->credits_tag;
 			$themes_installed = $pka->themes_installed;
 
 			package_flush_cache();
@@ -670,7 +667,7 @@ class Packages_Controller extends Action_Controller
 				$failed_step_insert = serialize($failed_steps);
 
 				// Credits tag?
-				$credits_tag = (empty($credits_tag)) ? '' : serialize($credits_tag);
+				$credits_tag = (empty($pka->credits_tag)) ? '' : serialize($pka->credits_tag);
 
 				// Add to the log packages
 				addPackageLog($packageInfo, $failed_step_insert, $themes_installed, $package_installed['db_changes'], $is_upgrade, $credits_tag);
