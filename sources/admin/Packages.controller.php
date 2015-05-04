@@ -25,8 +25,7 @@ if (!defined('ELK'))
  * Its main job is to install/uninstall, allow to browse, packages.
  * In fact, just about everything related to addon packages, including FTP connections when necessary.
  *
- * @package Packages				else
-
+ * @package Packages
  */
 class Packages_Controller extends Action_Controller
 {
@@ -36,16 +35,53 @@ class Packages_Controller extends Action_Controller
 	 */
 	protected $_req;
 
+	/**
+	 * listing of files in a packages
+	 * @var string[]
+	 */
 	private $_extracted_files;
+
+	/**
+	 * Filename of the package
+	 * @var string
+	 */
 	private $_filename;
+
+	/**
+	 * Base path of the package
+	 * @var string
+	 */
 	private $_base_path;
+
+	/**
+	 * If this is an un-install pass or not
+	 * @var boolean
+	 */
 	private $_uninstalling;
+
+	/**
+	 * If the package is installed, previously or not
+	 * @var boolean
+	 */
 	private $_is_installed;
 
+	/**
+	 * The id from the DB or an installed package
+	 * @var int
+	 */
 	public $install_id;
+
+	/**
+	 * Array of installed theme paths
+	 * @var string[]
+	 */
 	public $theme_paths;
+
+	/**
+	 * Array of files / directories that require permissions
+	 * @var array
+	 */
 	public $chmod_files;
-	public $filename;
 
 	/**
 	 * Pre Dispatch, called before other methods.  Loads HttpReq
@@ -253,7 +289,7 @@ class Packages_Controller extends Action_Controller
 		if (file_exists(BOARDDIR . '/packages/temp'))
 			deltree(BOARDDIR . '/packages/temp');
 
-		// Will we need chmod permissins to pull this off
+		// Will we need chmod permissions to pull this off
 		$this->chmod_files = !empty($pka->chmod_files) ? $pka->chmod_files : array();
 		if (!empty($this->chmod_files))
 		{
@@ -265,6 +301,10 @@ class Packages_Controller extends Action_Controller
 		checkSubmitOnce('register');
 	}
 
+	/**
+	 * Determines the availability / validity of installing a package in any of the installed themes
+	 * @param array $themeFinds
+	 */
 	private function _multi_theme($themeFinds)
 	{
 		global $settings, $txt, $context;
@@ -305,6 +345,7 @@ class Packages_Controller extends Action_Controller
 								$temp = dirname($real_path);
 								while (!file_exists($temp) && strlen($temp) > 1)
 									$temp = dirname($temp);
+
 								$this->chmod_files[] = $temp;
 							}
 
@@ -385,6 +426,15 @@ class Packages_Controller extends Action_Controller
 			Errors::instance()->fatal_lang_error('no_access', false);
 	}
 
+	/**
+	 * Returns the actions that are required to install / uninstall / upgrade a package.
+	 * Actions are defined by parsePackageInfo
+	 * Sets the is_installed flag
+	 *
+	 * @param array $package_installed
+	 * @param array $packageInfo Details for the package being tested/installed, set by getPackageInfo
+	 * @param boolean $testing passed to parsePackageInfo, true for test install, false for real install
+	 */
 	private function _get_package_actions($package_installed, $packageInfo, $testing = true)
 	{
 		global $context;
@@ -420,7 +470,7 @@ class Packages_Controller extends Action_Controller
 					unset($this->theme_paths[$id]);
 			}
 		}
-		// Or is it already installed an you want to upgrade
+		// Or is it already installed and you want to upgrade
 		elseif (isset($package_installed['old_version']) && $package_installed['old_version'] != $packageInfo['version'])
 		{
 			// Look for an upgrade...
@@ -452,9 +502,9 @@ class Packages_Controller extends Action_Controller
 	/**
 	 * Creates the packages temp directory
 	 *
-	 * - First trys as 755, faling moves to 777
+	 * - First trys as 755, failing moves to 777
 	 * - Will try with FTP permissions for cases where the web server credentials
-	 * do not have create directroy permissions
+	 * do not have create directory permissions
 	 */
 	private function _create_temp_dir()
 	{
