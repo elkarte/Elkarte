@@ -1375,6 +1375,21 @@ function makeNotificationChanges($memID)
 {
 	$db = database();
 
+	if (isset($_POST['notify_submit']))
+	{
+		$to_save = array();
+		foreach (getMemberNotificationsProfile($memID) as $mention => $data)
+		{
+			if (isset($_POST['notify'][$mention]) && !empty($_POST['notify'][$mention]['status']) && isset($data['data'][$_POST['notify'][$mention]['method']]))
+			{
+				$to_save[$mention] = (int) $_POST['notify'][$mention]['method'];
+			}
+			else
+				$to_save[$mention] = 0;
+		}
+		saveUserNotificationsPreferences($memID, $to_save);
+	}
+
 	// Update the boards they are being notified on.
 	if (isset($_POST['edit_notify_boards']))
 	{
@@ -3320,7 +3335,7 @@ function getMemberNotificationsProfile($member_id)
 
 		foreach ($notif as $key => $val)
 		{
-			$notif[$key] = array('id' => $val, 'level' => $user_preferences[$member_id][$type]);
+			$notif[$key] = array('id' => $val, 'enabled' => $user_preferences[$member_id][$type] === $key);
 			if ($user_preferences[$member_id][$type] > 0)
 				$type_on = true;
 		}

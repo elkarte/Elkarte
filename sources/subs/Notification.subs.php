@@ -883,7 +883,7 @@ function getUsersNotificationsPreferences($notification_types, $members)
 		if (!isset($results[$row['id_member']]))
 			$results[$row['id_member']] = array();
 
-		$results[$row['id_member']][$row['mention_type']] = $row['notification_level'];
+		$results[$row['id_member']][$row['mention_type']] = (int) $row['notification_level'];
 	}
 
 	$db->free_result($request);
@@ -907,4 +907,50 @@ function getUsersNotificationsPreferences($notification_types, $members)
 	}
 
 	return $preferences;
+}
+
+/**
+ * Saves into the database the notification preferences of a certain member.
+ *
+ * @param int $member The member id
+ * @param string[] $notification_types The array of notifications ('type' => 'level')
+ */
+function saveUserNotificationsPreferences($member, $notification_data)
+{
+	$db = database();
+
+	// First drop the existing settings
+	$db->query('', '
+		DELETE FROM {db_prefix}notifications_pref
+		WHERE id_member = {int:member}
+			AND mention_type IN ({array_string:mention_types})',
+		array(
+			'member' => $member,
+			'mention_types' => array_keys($notification_data),
+		)
+	);
+
+	$inserts = array();
+	foreach ($notification_data as $type => $level)
+	{
+		$inserts[] = array(
+			$member,
+			$type,
+			$level,
+		);
+	}
+
+	if (empty($inserts))
+		return;
+
+	$db->insert('',
+		'{db_prefix}notifications_pref',
+		array(
+			'id_member' => 'int',
+			'mention_type' => 'string-12',
+			'notification_level' => 'int',
+		),
+		$inserts,
+		array('id_member', 'mention_type')
+	);
 }

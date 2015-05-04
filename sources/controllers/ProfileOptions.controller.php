@@ -553,7 +553,6 @@ class ProfileOptions_Controller extends Action_Controller
 		global $txt, $scripturl, $user_profile, $context, $modSettings;
 
 		loadTemplate('ProfileOptions');
-		Elk_Autoloader::getInstance()->register(SUBSDIR . '/MentionType', '\\ElkArte\\sources\\subs\\MentionType');
 
 		// Going to need this for the list.
 		require_once(SUBSDIR . '/Boards.subs.php');
