@@ -22,29 +22,104 @@
  */
 class Package_Actions extends Action_Controller
 {
-	protected $_actions = array();
+	/**
+	 * Passed actions from parsePackageInfo
+	 * @var array
+	 */
 	protected $_passed_actions;
+
+	/**
+	 * passed base path value for the package location within the temp directory
+	 * @var string
+	 */
 	protected $_base_path;
+
+	/**
+	 * Passed value to indidate if this is an install or uninstall pass
+	 * @var boolean
+	 */
 	protected $_uninstalling;
+
+	/**
+	 * Passed array of theme paths
+	 * @var array
+	 */
 	protected $_theme_paths;
 
-	private $_failed_count = 0;
-	private $_action;
-	private $_actual_filename;
-
-	public $failed = false;
-	public $thisAction = array();
-	public $chmod_files = array();
-	public $ourActions = array();
-	public $has_failure = false;
-	public $failure_details;
-	public $themeFinds;
-	public $failed_steps = array();
-	public $credits_tag = array();
+	/**
+	 * Passed and updated array of themes to install in
+	 * @var array
+	 */
 	public $themes_installed = array();
 
 	/**
-	 * Start the Package Actions
+	 * Current action step of the passed actions
+	 * @var array
+	 */
+	public $thisAction = array();
+
+	/**
+	 * Holds the files that will need to be chmod'ed for the package to install
+	 * @var array
+	 */
+	public $chmod_files = array();
+
+	/**
+	 * The actions that must be compltete to install a pacakged
+	 * @var array
+	 */
+	public $ourActions = array();
+
+	/**
+	 * If any of the steps will fail to complete
+	 * @var boolean
+	 */
+	public $has_failure = false;
+
+	/**
+	 * Details of what the failure entails
+	 * @var string
+	 */
+	public $failure_details;
+
+	/**
+	 * Available during the install phase, holds what when wrong and where
+	 * @var array
+	 */
+	public $failed_steps = array();
+
+	/**
+	 * Other themems found that this addon can be installed in
+	 * @var array
+	 */
+	public $themeFinds;
+
+	/**
+	 * Created during install for use in addPackageLog
+	 * @var array
+	 */
+	public $credits_tag = array();
+
+	/**
+	 * failed counter
+	 * @var int
+	 */
+	private $_failed_count = 0;
+
+	/**
+	 * Current action step of the passed actions
+	 * @var array
+	 */
+	private $_action;
+
+	/**
+	 * Holds the last section of the file name
+	 * @var string
+	 */
+	private $_actual_filename;
+
+	/**
+	 * Start the Package Actions, here for the abstract only
 	 */
 	public function action_index()
 	{
@@ -209,7 +284,10 @@ class Package_Actions extends Action_Controller
 	}
 
 	/**
-	 * Validates that a file can be modified.
+	 * Validates that a file can be found and modified.
+	 *
+	 * <modification></modification> or <modification />
+	 * <search>, <add>, <replace>, before, after, ignore attributes
 	 */
 	public function action_modification()
 	{
@@ -247,32 +325,23 @@ class Package_Actions extends Action_Controller
 				// We just need it for actual parse changes.
 				if (!in_array($mod_action['type'], array('error', 'result', 'opened', 'saved', 'end', 'missing', 'skipping', 'chmod')))
 				{
+					$summary = array(
+						'type' => $txt['execute_modification'],
+						'action' => Util::htmlspecialchars(strtr($mod_action['filename'], array(BOARDDIR => '.'))),
+						'description' => $mod_action['failed'] ? $txt['package_action_failure'] : $txt['package_action_success'],
+						'position' => $mod_action['position'],
+						'operation_key' => $operation_key,
+						'filename' => $this->_action['filename'],
+						'failed' => $mod_action['failed'],
+						'ignore_failure' => !empty($mod_action['ignore_failure'])
+					);
+
 					if (empty($mod_action['is_custom']))
-						$this->ourActions[$this->_actual_filename]['operations'][] = array(
-							'type' => $txt['execute_modification'],
-							'action' => Util::htmlspecialchars(strtr($mod_action['filename'], array(BOARDDIR => '.'))),
-							'description' => $mod_action['failed'] ? $txt['package_action_failure'] : $txt['package_action_success'],
-							'position' => $mod_action['position'],
-							'operation_key' => $operation_key,
-							'filename' => $this->_action['filename'],
-							'failed' => $mod_action['failed'],
-							'ignore_failure' => !empty($mod_action['ignore_failure']),
-						);
+						$this->ourActions[$this->_actual_filename]['operations'][] = $summary;
 
 					// Themes are under the saved type.
 					if (isset($mod_action['is_custom']) && isset($context['theme_actions'][$mod_action['is_custom']]))
-					{
-						$context['theme_actions'][$mod_action['is_custom']]['actions'][$this->_actual_filename]['operations'][] = array(
-							'type' => $txt['execute_modification'],
-							'action' => Util::htmlspecialchars(strtr($mod_action['filename'], array(BOARDDIR => '.'))),
-							'description' => $mod_action['failed'] ? $txt['package_action_failure'] : $txt['package_action_success'],
-							'position' => $mod_action['position'],
-							'operation_key' => $operation_key,
-							'filename' => $this->_action['filename'],
-							'failed' => $mod_action['failed'],
-							'ignore_failure' => !empty($mod_action['ignore_failure']),
-						);
-					}
+						$context['theme_actions'][$mod_action['is_custom']]['actions'][$this->_actual_filename]['operations'][] = $summary;
 				}
 			}
 		}
@@ -307,13 +376,13 @@ class Package_Actions extends Action_Controller
 		switch ($mod_action['type'])
 		{
 			case 'opened':
-				$this->failed = false;
+				$failed = false;
 				break;
 			case 'failure':
 				if (empty($mod_action['is_custom']))
 					$this->has_failure = true;
 
-				$this->failed = true;
+				$failed = true;
 				break;
 			case 'chmod':
 				$this->chmod_files[] = $mod_action['filename'];
@@ -325,16 +394,16 @@ class Package_Actions extends Action_Controller
 						$context['theme_actions'][$mod_action['is_custom']] = array(
 							'name' => $this->_theme_paths[$mod_action['is_custom']]['name'],
 							'actions' => array(),
-							'has_failure' => $this->failed,
+							'has_failure' => $failed,
 						);
 					else
-						$context['theme_actions'][$mod_action['is_custom']]['has_failure'] |= $this->failed;
+						$context['theme_actions'][$mod_action['is_custom']]['has_failure'] |= $failed;
 
 					$context['theme_actions'][$mod_action['is_custom']]['actions'][$this->_actual_filename] = array(
 						'type' => $txt['execute_modification'],
 						'action' => Util::htmlspecialchars(strtr($mod_action['filename'], array(BOARDDIR => '.'))),
-						'description' => $this->failed ? $txt['package_action_failure'] : $txt['package_action_success'],
-						'failed' => $this->failed,
+						'description' => $failed ? $txt['package_action_failure'] : $txt['package_action_success'],
+						'failed' => $failed,
 					);
 				}
 				elseif (!isset($this->ourActions[$this->_actual_filename]))
@@ -342,13 +411,13 @@ class Package_Actions extends Action_Controller
 					$this->ourActions[$this->_actual_filename] = array(
 						'type' => $txt['execute_modification'],
 						'action' => Util::htmlspecialchars(strtr($mod_action['filename'], array(BOARDDIR => '.'))),
-						'description' => $this->failed ? $txt['package_action_failure'] : $txt['package_action_success'],
-						'failed' => $this->failed,
+						'description' => $failed ? $txt['package_action_failure'] : $txt['package_action_success'],
+						'failed' => $failed,
 					);
 				}
 				else
 				{
-					$this->ourActions[$this->_actual_filename]['failed'] |= $this->failed;
+					$this->ourActions[$this->_actual_filename]['failed'] |= $failed;
 					$this->ourActions[$this->_actual_filename]['description'] = $this->ourActions[$this->_actual_filename]['failed'] ? $txt['package_action_failure'] : $txt['package_action_success'];
 				}
 				break;
@@ -384,6 +453,9 @@ class Package_Actions extends Action_Controller
 
 	/**
 	 * A code file that needs to be run during the install phase
+	 *
+	 * <code></code> or <code /> (for use with type="file" only)
+	 * Filename of a php file to be required.
 	 */
 	public function action_code()
 	{
@@ -397,6 +469,9 @@ class Package_Actions extends Action_Controller
 
 	/**
 	 * Database actions that need to occur during the install phase
+	 *
+	 * <database></database> or <database /> (for use with type="file" only)
+	 * Filename of a database code to be executed.
 	 */
 	public function action_database()
 	{
@@ -409,7 +484,8 @@ class Package_Actions extends Action_Controller
 	}
 
 	/**
-	 * A directory will need to be created
+	 * An empty directory or blank file will need to be created
+	 * <create-dir /> or <create-file />
 	 */
 	public function action_create_dir_file()
 	{
@@ -484,9 +560,9 @@ class Package_Actions extends Action_Controller
 	}
 
 	/**
-	 * Extract Tree or Extract File to a location
-	 * - require-file destination
-	 * - require-dir destination
+	 * Extract Tree or Extract File from the package to a location
+	 * - <require-file /> require-file destination
+	 * - <require-dir /> require-dir destination
 	 */
 	public function action_require_dir_file()
 	{
@@ -504,7 +580,9 @@ class Package_Actions extends Action_Controller
 	}
 
 	/**
-	 * Moving files from a directory
+	 * Move an entire directory or a single file.
+	 * <move-dir />
+	 * <move-file />
 	 */
 	public function action_move_dir_file()
 	{
@@ -517,7 +595,9 @@ class Package_Actions extends Action_Controller
 	}
 
 	/**
-	 * Remove a directory file
+	 * Remove a directory and all its file or remove a single file
+	 * <remove-dir />
+	 * <remove-file />
 	 */
 	public function action_remove_dir_file()
 	{
