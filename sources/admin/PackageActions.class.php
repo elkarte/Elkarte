@@ -19,6 +19,8 @@
 
 /**
  * Coordinates the processing for all known package actions
+ *
+ * @package Packages
  */
 class Package_Actions extends Action_Controller
 {
@@ -29,13 +31,13 @@ class Package_Actions extends Action_Controller
 	protected $_passed_actions;
 
 	/**
-	 * passed base path value for the package location within the temp directory
+	 * Passed base path value for the package location within the temp directory
 	 * @var string
 	 */
 	protected $_base_path;
 
 	/**
-	 * Passed value to indidate if this is an install or uninstall pass
+	 * Passed value to indicate if this is an install or uninstall pass
 	 * @var boolean
 	 */
 	protected $_uninstalling;
@@ -65,7 +67,7 @@ class Package_Actions extends Action_Controller
 	public $chmod_files = array();
 
 	/**
-	 * The actions that must be compltete to install a pacakged
+	 * The actions that must be completed to install a package
 	 * @var array
 	 */
 	public $ourActions = array();
@@ -101,7 +103,7 @@ class Package_Actions extends Action_Controller
 	public $credits_tag = array();
 
 	/**
-	 * failed counter
+	 * Failed counter
 	 * @var int
 	 */
 	private $_failed_count = 0;
@@ -732,7 +734,7 @@ class Package_Actions extends Action_Controller
 			$this->_failed_count++;
 
 			// Yes I know, but thats how this works right now
-			$_REQUEST['sa'] = $this->_action['type'] . '2';
+			$_REQUEST['sa'] = $this->_action['type'];
 
 			// Work out exactly who it is we are calling. call integrate_sa_packages
 			$subAction = $action->initialize($subActions, 'skip');
