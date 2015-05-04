@@ -37,7 +37,7 @@ class Packages_Controller extends Action_Controller
 
 	/**
 	 * listing of files in a packages
-	 * @var string[]
+	 * @var string[]|boolean
 	 */
 	private $_extracted_files;
 
