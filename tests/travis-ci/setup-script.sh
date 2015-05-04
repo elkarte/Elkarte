@@ -1,6 +1,6 @@
 #!/bin/bash
 #
-# Run PHPUnit tests, 
+# Run PHPUnit tests,
 # if its 5.4+mysql then generate test coverage as well
 
 set -e

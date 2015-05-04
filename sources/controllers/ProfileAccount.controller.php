@@ -492,7 +492,7 @@ class ProfileAccount_Controller extends Action_Controller
 			// Setup their account for deletion ;)
 			require_once(SUBSDIR . '/Members.subs.php');
 			updateMemberData($memID, array('is_activated' => 4));
-			
+
 			// Another account needs approval...
 			updateSettings(array('unapprovedMembers' => true), true);
 		}

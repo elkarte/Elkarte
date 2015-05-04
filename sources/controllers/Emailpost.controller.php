@@ -266,7 +266,7 @@ class Emailpost_Controller extends Action_Controller
 					// They can record the message anyway, if they so wish
 					return pbe_emailError('error_bounced', $email_message);
 				}
-				
+
 				// If they don't wish, then return false like recording the failure
 				// would do
 				return false;

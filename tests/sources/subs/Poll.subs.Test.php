@@ -2,7 +2,7 @@
 
 /**
  * TestCase class for poll subs.
- * 
+ *
  * WARNING. These tests work directly with the local database. Don't run
  * them if you need to keep your data untouched!
  */
