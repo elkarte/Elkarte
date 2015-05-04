@@ -1076,7 +1076,7 @@ class Packages_Controller extends Action_Controller
 		// Can't be in here buddy.
 		isAllowedTo('admin_forum');
 
-		// We need to know the operation key for the search and replace, mod file looking at, is it a board mod?
+		// We need to know the operation key for the search and replace?
 		if (!isset($this->_req->query->operation_key, $this->_req->query->filename) && !is_numeric($this->_req->query->operation_key))
 			Errors::instance()->fatal_lang_error('operation_invalid', 'general');
 
@@ -1096,7 +1096,7 @@ class Packages_Controller extends Action_Controller
 			if ($context['extracted_files'] && !file_exists(BOARDDIR . '/packages/temp/package-info.xml'))
 			{
 				foreach ($context['extracted_files'] as $file)
-					if (basename($file['filename']) == 'package-info.xml')
+					if (basename($file['filename']) === 'package-info.xml')
 					{
 						$context['base_path'] = dirname($file['filename']) . '/';
 						break;
@@ -1117,7 +1117,7 @@ class Packages_Controller extends Action_Controller
 		$theme_paths = getThemesPathbyID();
 
 		// For uninstall operations we only consider the themes in which the package is installed.
-		if (isset($this->_req->query->reverse) && !empty($this->_req->query->install_id))
+		if ($reverse && !empty($this->_req->query->install_id))
 		{
 			$install_id = (int) $this->_req->query->install_id;
 			if ($install_id > 0)

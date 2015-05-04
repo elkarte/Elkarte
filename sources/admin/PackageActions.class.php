@@ -416,7 +416,7 @@ class Package_Actions extends Action_Controller
 		global $txt;
 
 		$this->thisAction = array(
-			'type' => $txt['package_create'] . ' ' . ($this->_action['type'] == 'create-dir' ? $txt['package_tree'] : $txt['package_file']),
+			'type' => $txt['package_create'] . ' ' . ($this->_action['type'] === 'create-dir' ? $txt['package_tree'] : $txt['package_file']),
 			'action' => Util::htmlspecialchars(strtr($this->_action['destination'], array(BOARDDIR => '.')))
 		);
 	}
@@ -484,7 +484,9 @@ class Package_Actions extends Action_Controller
 	}
 
 	/**
-	 * Requires a directory to move to
+	 * Extract Tree or Extract File to a location
+	 * - require-file destination
+	 * - require-dir destination
 	 */
 	public function action_require_dir_file()
 	{
@@ -492,7 +494,7 @@ class Package_Actions extends Action_Controller
 
 		// Do this one...
 		$this->thisAction = array(
-			'type' => $txt['package_extract'] . ' ' . ($this->_action['type'] == 'require-dir' ? $txt['package_tree'] : $txt['package_file']),
+			'type' => $txt['package_extract'] . ' ' . ($this->_action['type'] === 'require-dir' ? $txt['package_tree'] : $txt['package_file']),
 			'action' => Util::htmlspecialchars(strtr($this->_action['destination'], array(BOARDDIR => '.')))
 		);
 
@@ -509,7 +511,7 @@ class Package_Actions extends Action_Controller
 		global $txt;
 
 		$this->thisAction = array(
-			'type' => $txt['package_move'] . ' ' . ($this->_action['type'] == 'move-dir' ? $txt['package_tree'] : $txt['package_file']),
+			'type' => $txt['package_move'] . ' ' . ($this->_action['type'] === 'move-dir' ? $txt['package_tree'] : $txt['package_file']),
 			'action' => Util::htmlspecialchars(strtr($this->_action['source'], array(BOARDDIR => '.'))) . ' => ' . Util::htmlspecialchars(strtr($this->_action['destination'], array(BOARDDIR => '.')))
 		);
 	}
@@ -522,7 +524,7 @@ class Package_Actions extends Action_Controller
 		global $txt;
 
 		$this->thisAction = array(
-			'type' => $txt['package_delete'] . ' ' . ($this->_action['type'] == 'remove-dir' ? $txt['package_tree'] : $txt['package_file']),
+			'type' => $txt['package_delete'] . ' ' . ($this->_action['type'] === 'remove-dir' ? $txt['package_tree'] : $txt['package_file']),
 			'action' => Util::htmlspecialchars(strtr($this->_action['filename'], array(BOARDDIR => '.')))
 		);
 
