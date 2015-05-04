@@ -23,6 +23,13 @@ class Likemsg_Mention extends Mention_BoardAccess_Abstract
 	 */
 	protected $_type = 'likemsg';
 
+	public static function canNotify($methods)
+	{
+		return array_filter($methods, function($entry) {
+			return strpos($entry, 'email') === false;
+		});
+	}
+
 	/**
 	 * {@inheritdoc }
 	 */

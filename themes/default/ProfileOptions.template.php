@@ -710,6 +710,30 @@ function template_action_notification()
 				<div class="content">
 					<dl class="settings">';
 
+	foreach ($context['mention_types'] as $type => $mentions)
+	{
+		echo '
+						<dt><label for="notify_', $type, '">', $txt['notify_type_' . $type], '</label></dt>
+						<dd>
+							<input id="notify_', $type, '" name="notify_', $type, '" class="toggle_notify" type="checkbox" value="1" ', $mentions['enabled'] ? 'checked="checked"' : '', '/>
+							<label id="notify_', $type, '_method" for="notify_', $type, '_method">', $txt['notify_method'], '
+							<select name="notify_', $type, '_method">';
+
+		foreach ($mentions['data'] as $key => $method)
+		{
+			echo '
+								<option value="', $key, '">', $txt['notify_' . $method['id']], '</option>';
+		}
+		echo '
+							</select>
+							</label>
+						</dd>';
+	}
+
+	echo '
+					</dl>
+					<dl class="settings">';
+
 	// Allow notification on announcements to be disabled?
 	if (!empty($modSettings['allow_disableAnnounce']))
 		echo '

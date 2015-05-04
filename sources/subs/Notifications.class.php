@@ -109,6 +109,17 @@ class Notifications extends AbstractModel
 		$this->_notification_frequencies[$id] = $key;
 	}
 
+	public function getNotifiers()
+	{
+		$keys = array();
+		foreach ($this->_notifiers as $val)
+		{
+			$keys[] = $val['key'];
+		}
+
+		return $keys;
+	}
+
 	/**
 	 * Process a certain task in order to send out the notifications.
 	 *
@@ -259,21 +270,8 @@ class Notifications extends AbstractModel
 		// The member 0 is the "default" setting
 		$query_members[] = 0;
 
-		$request = $this->_db->query('', '
-			SELECT id_member, notification_level
-			FROM {db_prefix}notifications_pref
-			WHERE id_member IN ({array_int:members_to})
-				AND mention_type LIKE {string:mention_type}',
-			array(
-				'members_to' => $query_members,
-				'mention_type' => $notification_type,
-			)
-		);
-		$preferences = array();
-		while ($row = $this->_db->fetch_assoc($request))
-			$preferences[$row['id_member']] = $row['notification_level'];
-
-		$this->_db->free_result($request);
+		require_once(SUBSDIR . '/Notification.subs.php');
+		$preferences = getUsersNotificationsPreferences($notification_type, $query_members);
 
 		$notification_types = array();
 		foreach ($this->_notification_frequencies as $freq)
@@ -288,20 +286,14 @@ class Notifications extends AbstractModel
 		//    - 5+ => usable by addons
 		foreach ($members as $member)
 		{
-
-			if (!isset($preferences[$member]))
-				$level = isset($preferences[0]) ? (int) $preferences[0] : 1;
-			else
-				$level = $preferences[$member];
-
-			if ($level === 0)
+			if ($preferences[$member] === 0)
 				continue;
 
 			if (isset($this->_notification_frequencies[1]))
 				$notification_types[$this->_notification_frequencies[1]][] = $member;
 
-			if (isset($this->_notification_frequencies[$level]))
-				$notification_types[$this->_notification_frequencies[$level]][] = $member;
+			if (isset($this->_notification_frequencies[$preferences[$member]]))
+				$notification_types[$this->_notification_frequencies[$preferences[$member]]][] = $member;
 		}
 
 		return $notification_types;
@@ -317,10 +309,12 @@ class Notifications extends AbstractModel
 		if (self::$_instance === null)
 		{
 			self::$_instance = new Notifications(database());
+
+			// Let's register all the notifications we know by default
 			self::$_instance->register(1, 'notification', array(self::$_instance, '_send_notification'));
 			self::$_instance->register(2, 'email', array(self::$_instance, '_send_email'), array('subject' => 'subject', 'body' => 'body'));
 			self::$_instance->register(3, 'email_daily', array(self::$_instance, '_send_daily_email'), array('subject' => 'subject', 'body' => 'snippet'));
-			self::$_instance->register(4, 'weeemail_daily', array(self::$_instance, '_send_weekly_email'), array('subject' => 'subject', 'body' => 'snippet'));
+			self::$_instance->register(4, 'email_weekly', array(self::$_instance, '_send_weekly_email'), array('subject' => 'subject', 'body' => 'snippet'));
 
 			call_integration_hook('integrate_notifications_methods', array(self::$_instance));
 		}

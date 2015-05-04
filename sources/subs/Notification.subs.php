@@ -852,3 +852,59 @@ function validateNotificationAccess($row, $maillist, &$email_perm = true)
 
 	return $email_perm;
 }
+
+/**
+ * Queries the database for notification preferences of a set of members.
+ *
+ * @param string[]|string $notification_types
+ * @param int[]|int $members
+ */
+function getUsersNotificationsPreferences($notification_types, $members)
+{
+	$db = database();
+
+	$query_members = (array) $members;
+	$query_members[] = 0;
+
+	$request = $db->query('', '
+		SELECT id_member, notification_level, mention_type
+		FROM {db_prefix}notifications_pref
+		WHERE id_member IN ({array_int:members_to})
+			AND mention_type IN ({array_string:mention_types})',
+		array(
+			'members_to' => $query_members,
+			'mention_types' => (array) $notification_types,
+		)
+	);
+	$results = array();
+
+	while ($row = $db->fetch_assoc($request))
+	{
+		if (!isset($results[$row['id_member']]))
+			$results[$row['id_member']] = array();
+
+		$results[$row['id_member']][$row['mention_type']] = $row['notification_level'];
+	}
+
+	$db->free_result($request);
+
+	$defaults = array();
+	foreach ($notification_types as $val)
+	{
+		$defaults[$val] = 0;
+	}
+	if (isset($results[0]))
+	{
+		$defaults = array_merge($defaults, $results[0]);
+	}
+
+	$preferences = array();
+	foreach ((array) $members as $member)
+	{
+		$preferences[$member] = $defaults;
+		if (isset($results[$member]))
+		$preferences[$member] = array_merge($preferences[$member], $results[$member]);
+	}
+
+	return $preferences;
+}

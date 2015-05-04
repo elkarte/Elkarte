@@ -26,6 +26,19 @@ class Rlikemsg_Mention extends Mention_BoardAccess_Abstract
 	/**
 	 * {@inheritdoc }
 	 */
+	public static function canNotify($methods)
+	{
+		global $modSettings;
+
+		if (empty($modSettings['mentions_dont_notify_rlike']))
+			return $methods;
+		else
+			return array();
+	}
+
+	/**
+	 * {@inheritdoc }
+	 */
 	public function getUsersToNotify()
 	{
 		if ($this->_task['source_data']['rlike_notif'])

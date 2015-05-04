@@ -118,6 +118,18 @@ $txt['notify_send_body'] = 'When sending notifications of a reply to a topic, se
 $txt['notify_send_body_pbe'] = 'When sending email notifications, send the full text of the post in the email';
 $txt['notify_send_body_pbe_post'] = '<strong>NOT</strong> available with Daily / Weekly summary';
 
+$txt['notify_method'] = 'Notify with:';
+$txt['notify_notification'] = 'no emai (only mention/alert)';
+$txt['notify_email'] = 'immediate email';
+$txt['notify_email_daily'] = 'daily email';
+$txt['notify_email_weekly'] = 'weekly email';
+
+$txt['notify_type_likemsg'] = 'Notify when one of your messages is liked';
+$txt['notify_type_mentionmem'] = 'Notify when you are @mentioned';
+$txt['notify_type_rlikemsg'] = 'Notify when a like is removed from one of your messages';
+$txt['notify_type_buddy'] = 'Notify when someone adds you as buddy';
+$txt['notify_type_quotedmem'] = 'Notify when someone quotes one of your messages';
+
 $txt['notifications_topics'] = 'Current Topic Notifications';
 $txt['notifications_topics_none'] = 'You are not currently receiving any notifications from topics.';
 $txt['notifications_topics_howto'] = 'To receive notifications from a specific topic, click the &quot;Notify&quot; button while viewing it.';

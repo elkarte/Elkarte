@@ -22,6 +22,12 @@ $(document).ready(function() {
 
 		$('#karmaTotal').text((isNaN(good) ? 0 : good) - (isNaN(bad) ? 0 : bad));
 	});
+	$('.toggle_notify').change(function() {
+		if (this.checked)
+			$('#' + this.id + '_method').fadeIn('fast');
+		else
+			$('#' + this.id + '_method').fadeOut('fast');
+	}).change();
 });
 
 /**

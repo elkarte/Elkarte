@@ -26,6 +26,14 @@ interface Mention_Type_Interface
 	public static function getEvents($controller);
 
 	/**
+	 * Filters the notification methods returning those that are allowed.
+	 *
+	 * @param string[] $methods Array of methods of notification
+	 *                 (e.g. notification, email, email_daily, etc.)
+	 */
+	public static function canNotify($methods);
+
+	/**
 	 * Used by Mentions_Controller to filter the mentions to display in the list.
 	 *
 	 * @param string $type

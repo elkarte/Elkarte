@@ -553,10 +553,34 @@ class ProfileOptions_Controller extends Action_Controller
 		global $txt, $scripturl, $user_profile, $context, $modSettings;
 
 		loadTemplate('ProfileOptions');
+		Elk_Autoloader::getInstance()->register(SUBSDIR . '/MentionType', '\\ElkArte\\sources\\subs\\MentionType');
 
 		// Going to need this for the list.
 		require_once(SUBSDIR . '/Boards.subs.php');
 		require_once(SUBSDIR . '/Topic.subs.php');
+		require_once(SUBSDIR . '/Notification.subs.php');
+
+		$mention_methods = Notifications::getInstance()->getNotifiers();
+		$enabled_mentions = explode(',', $modSettings['enabled_mentions']);
+		$user_preferences = getUsersNotificationsPreferences($enabled_mentions, $this->_memID);
+		$context['mention_types'] = array();
+
+		foreach ($enabled_mentions as $type)
+		{
+			$type_on = false;
+			$class = '\\ElkArte\\sources\\subs\\MentionType\\' . ucfirst($type) . '_Mention';
+			$notif = (array) $class::canNotify($mention_methods);
+
+			foreach ($notif as $key => $val)
+			{
+				$notif[$key] = array('id' => $val, 'level' => $user_preferences[$this->_memID][$type]);
+				if ($user_preferences[$this->_memID][$type] > 0)
+					$type_on = true;
+			}
+
+			if (!empty($notif))
+				$context['mention_types'][$type] = array('data' => $notif, 'enabled' => $type_on);
+		}
 
 		// Fine, start with the board list.
 		$listOptions = array(
