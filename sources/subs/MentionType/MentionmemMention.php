@@ -162,20 +162,10 @@ class Mentionmem_Mention extends Mention_BoardAccess_Abstract
 	 */
 	public function getNotificationBody($frequency, $members)
 	{
-		switch ($frequency)
-		{
-			case 'email_daily':
-			case 'email_weekly':
-				$keys = array('subject' => 'notify_mentionmem_digest', 'body' => 'notify_mentionmem_snippet');
-				break;
-			case 'email':
-				// @todo send an email for any like received may be a bit too much. Consider not allowing this method of notification
-				$keys = array('subject' => 'notify_mentionmem_subject', 'body' => 'notify_mentionmem_body');
-				break;
-			case 'notification':
-			default:
-				return $this->_getNotificationStrings('', array('subject' => $this->_type, 'body' => $this->_type), $members, $this->_task);
-		}
+		if (empty($lang_data['suffix']))
+			return $this->_getNotificationStrings('', array('subject' => $this->_type, 'body' => $this->_type), $members, $this->_task);
+		else
+			$keys = array('subject' => 'notify_mentionmem_' . $lang_data['subject'], 'body' => 'notify_mentionmem_' . $lang_data['body']);
 
 		$replacements = array(
 			'ACTIONNAME' => $this->_task['notifier_data']['name'],

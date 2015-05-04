@@ -164,20 +164,10 @@ The following bbcode is for testing, to be moved to a test when ready.
 	 */
 	public function getNotificationBody($frequency, $members)
 	{
-		switch ($frequency)
-		{
-			case 'email_daily':
-			case 'email_weekly':
-				$keys = array('subject' => 'notify_quotedmem_digest', 'body' => 'notify_quotedmem_snippet');
-				break;
-			case 'email':
-				// @todo send an email for any like received may be a bit too much. Consider not allowing this method of notification
-				$keys = array('subject' => 'notify_quotedmem_subject', 'body' => 'notify_quotedmem_body');
-				break;
-			case 'notification':
-			default:
-				return $this->_getNotificationStrings('', array('subject' => $this->_type, 'body' => $this->_type), $members, $this->_task);
-		}
+		if (empty($lang_data['suffix']))
+			return $this->_getNotificationStrings('', array('subject' => $this->_type, 'body' => $this->_type), $members, $this->_task);
+		else
+			$keys = array('subject' => 'notify_quotedmem_' . $lang_data['subject'], 'body' => 'notify_quotedmem_' . $lang_data['body']);
 
 		$replacements = array(
 			'ACTIONNAME' => $this->_task['notifier_data']['name'],

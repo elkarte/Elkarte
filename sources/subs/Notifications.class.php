@@ -39,6 +39,13 @@ class Notifications extends AbstractModel
 	protected $_notification_frequencies;
 
 	/**
+	 * Available notification frequencies
+	 *
+	 * @var string[]
+	 */
+	protected $_notifiers;
+
+	/**
 	 * We hax a new notification to send out!
 	 *
 	 * @param \Notifications_Task $task
@@ -73,6 +80,36 @@ class Notifications extends AbstractModel
 	}
 
 	/**
+	 * Function to register any new notification method.
+	 *
+	 * @param int $id This shall be a unique integer representing the
+	 *            notification method.
+	 *            <b>WARNING for addons developers</b>: please note that this has
+	 *            to be unique across addons, so if you develop an addon that
+	 *            extends notifications, please verify this id has not been
+	 *            "taken" by someone else!
+	 * @param int $key The string name identifying the notification method
+	 * @param mixed|mixed[] $callback A callable function/array/whatever that
+	 *                      will take care of sending the notification
+	 * @param null|string[] $lang_data For the moment an array containing at least:
+	 *                        - 'subject' => 'something'
+	 *                        - 'body' => 'something_else'
+	 *                       the two will be used to identify the strings to be
+	 *                       used for the subject and the body respectively of
+	 *                       the notification.
+	 */
+	public function register($id, $key, $callback, $lang_data = null)
+	{
+		$this->_notifiers[$id] = array(
+			'key' => $key,
+			'callback' => $callback,
+			'lang_data' => $lang_data,
+		);
+
+		$this->_notification_frequencies[$id] = $key;
+	}
+
+	/**
 	 * Process a certain task in order to send out the notifications.
 	 *
 	 * @param \Notifications_Task $task
@@ -92,15 +129,14 @@ class Notifications extends AbstractModel
 		{
 			if (!empty($notif_prefs[$key]))
 			{
-				$bodies = $obj->getNotificationBody($key, $notif_prefs[$key]);
+				$bodies = $obj->getNotificationBody($this->_notifiers[$key]['lang_data'], $notif_prefs[$key]);
 
 				// This is made for cases when a certain setting may not be available:
 				// just return an empty body array and the notifications are skipped.
 				if (empty($bodies))
 					continue;
 
-				$method = '_send_' . $key;
-				$this->{$method}($obj, $task, $bodies);
+				call_user_func_array($this->_notifiers[$key]['callback'], array($obj, $task, $bodies, $this->_db));
 			}
 		}
 	}
@@ -249,6 +285,7 @@ class Notifications extends AbstractModel
 		//    - 2 => mention + immediate email
 		//    - 3 => mention + daily email
 		//    - 4 => mention + weekly email
+		//    - 5+ => usable by addons
 		foreach ($members as $member)
 		{
 
@@ -278,7 +315,15 @@ class Notifications extends AbstractModel
 	public static function getInstance()
 	{
 		if (self::$_instance === null)
+		{
 			self::$_instance = new Notifications(database());
+			self::$_instance->register(1, 'notification', array(self::$_instance, '_send_notification'));
+			self::$_instance->register(2, 'email', array(self::$_instance, '_send_email'), array('subject' => 'subject', 'body' => 'body'));
+			self::$_instance->register(3, 'email_daily', array(self::$_instance, '_send_daily_email'), array('subject' => 'subject', 'body' => 'snippet'));
+			self::$_instance->register(4, 'weeemail_daily', array(self::$_instance, '_send_weekly_email'), array('subject' => 'subject', 'body' => 'snippet'));
+
+			call_integration_hook('integrate_notifications_methods', array(self::$_instance));
+		}
 
 		return self::$_instance;
 	}
