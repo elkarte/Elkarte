@@ -284,6 +284,7 @@ class Notifications extends AbstractModel
 	 * Loads from the database the notification preferences for a certain type
 	 * of mention for a bunch of members.
 	 *
+	 * @param string[] $notification_frequencies
 	 * @param string $notification_type
 	 * @param int[] $members
 	 */
@@ -309,7 +310,8 @@ class Notifications extends AbstractModel
 		//    - 5+ => usable by addons
 		foreach ($members as $member)
 		{
-			if ($preferences[$member] === 0)
+			$this_pref = $preferences[$member][$notification_type];
+			if ($this_pref === 0)
 				continue;
 
 			// In the following two checks the use of the $this->_notification_frequencies
@@ -318,8 +320,8 @@ class Notifications extends AbstractModel
 			if (isset($this->_notification_frequencies[1]))
 				$notification_types[$this->_notification_frequencies[1]][] = $member;
 
-			if (isset($this->_notification_frequencies[$preferences[$member]]) && isset($notification_types[$this->_notification_frequencies[$preferences[$member]]]))
-				$notification_types[$this->_notification_frequencies[$preferences[$member]]][] = $member;
+			if (isset($this->_notification_frequencies[$this_pref]) && isset($notification_types[$this->_notification_frequencies[$this_pref]]))
+				$notification_types[$this->_notification_frequencies[$this_pref]][] = $member;
 		}
 
 		return $notification_types;
