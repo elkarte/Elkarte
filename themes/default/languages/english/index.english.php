@@ -645,7 +645,7 @@ $txt['smtp_error'] = 'Ran into problems sending Mail. Error: ';
 $txt['mail_send_unable'] = 'Unable to send mail to the email address \'%1$s\'';
 
 $txt['mlist_search'] = 'Search For Members';
-$txt['mlist_search_again'] = 'Search again';
+$txt['mlist_search_again'] = 'Search again'; // @deprecated since 1.0.4
 $txt['mlist_search_email'] = 'Search by email address';
 $txt['mlist_search_group'] = 'Search by position';
 $txt['mlist_search_name'] = 'Search by name';

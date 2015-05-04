@@ -2098,9 +2098,6 @@ img.new_posts {
 }
 /* Poll results */
 #poll_options .results {
-	display: inline;
-}
-#poll_options li {
 	position: relative;
 }
 /* Absolute positioning stops these breaking the bars on narrow screens. */
@@ -4646,9 +4643,6 @@ dl.no_members {
 	}
 	.linktree .board_moderators {
 		display: none;
-	}
-	.statsbar .bar {
-		max-width: 12em;
 	}
 	.signature {
 		display: none;

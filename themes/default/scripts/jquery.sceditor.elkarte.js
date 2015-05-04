@@ -83,11 +83,6 @@
 						e.preventDefault();
 					})
 				);
-
-			if (line.children().length > 0)
-				content.append(line);
-
-			$(".sceditor-toolbar").append(content);
 		},
 		storeLastState: function (){
 			this.wasSource = this.inSourceMode();
@@ -173,6 +168,11 @@
 
 			// show the standard placement icons
 			$.each(emoticons, base.appendEmoticon);
+
+			if (line.children().length > 0)
+				content.append(line);
+
+			$(".sceditor-toolbar").append(content);
 
 			// Show the more button on the editor if we have more
 			if (typeof moreButton !== "undefined")
