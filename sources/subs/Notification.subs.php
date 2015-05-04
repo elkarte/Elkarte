@@ -863,6 +863,7 @@ function getUsersNotificationsPreferences($notification_types, $members)
 {
 	$db = database();
 
+	$notification_types = (array) $notification_types;
 	$query_members = (array) $members;
 	$query_members[] = 0;
 
@@ -873,7 +874,7 @@ function getUsersNotificationsPreferences($notification_types, $members)
 			AND mention_type IN ({array_string:mention_types})',
 		array(
 			'members_to' => $query_members,
-			'mention_types' => (array) $notification_types,
+			'mention_types' => $notification_types,
 		)
 	);
 	$results = array();
