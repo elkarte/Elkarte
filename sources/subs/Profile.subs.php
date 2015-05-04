@@ -1213,6 +1213,8 @@ function saveProfileChanges(&$profile_vars, $memID)
 		'ignore_boards',
 	);
 
+	call_integration_hook('integrate_save_profile_changes', array(&$profile_bools, &$profile_ints, &$profile_floats, &$profile_strings));
+
 	if (isset($_POST['sa']) && $_POST['sa'] == 'ignoreboards' && empty($_POST['ignore_brd']))
 		$_POST['ignore_brd'] = array();
 
