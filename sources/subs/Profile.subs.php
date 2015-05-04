@@ -3292,3 +3292,42 @@ function getMembersInRange($ips, $memID)
 
 	return $members_in_range;
 }
+
+/**
+ * Return a detailed situation of the notification methods for a certain member.
+ * Used in the profile page to load the defaults and validate the new
+ * settings.
+ *
+ * @param int $memID the id of a member
+ */
+function getMemberNotificationsProfile($member_id)
+{
+	global $modSettings;
+
+	require_once(SUBSDIR . '/Notification.subs.php');
+	Elk_Autoloader::getInstance()->register(SUBSDIR . '/MentionType', '\\ElkArte\\sources\\subs\\MentionType');
+
+	$mention_methods = Notifications::getInstance()->getNotifiers();
+	$enabled_mentions = explode(',', $modSettings['enabled_mentions']);
+	$user_preferences = getUsersNotificationsPreferences($enabled_mentions, $member_id);
+	$mention_types = array();
+
+	foreach ($enabled_mentions as $type)
+	{
+		$type_on = false;
+		$class = '\\ElkArte\\sources\\subs\\MentionType\\' . ucfirst($type) . '_Mention';
+		$notif = (array) $class::canNotify($mention_methods);
+
+		foreach ($notif as $key => $val)
+		{
+			$notif[$key] = array('id' => $val, 'level' => $user_preferences[$member_id][$type]);
+			if ($user_preferences[$member_id][$type] > 0)
+				$type_on = true;
+		}
+
+		if (!empty($notif))
+			$mention_types[$type] = array('data' => $notif, 'enabled' => $type_on);
+	}
+
+	return $mention_types;
+}
