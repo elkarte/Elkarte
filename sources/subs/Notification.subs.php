@@ -914,7 +914,7 @@ function getUsersNotificationsPreferences($notification_types, $members)
  * Saves into the database the notification preferences of a certain member.
  *
  * @param int $member The member id
- * @param string[] $notification_types The array of notifications ('type' => 'level')
+ * @param int[] $notification_types The array of notifications ('type' => 'level')
  */
 function saveUserNotificationsPreferences($member, $notification_data)
 {

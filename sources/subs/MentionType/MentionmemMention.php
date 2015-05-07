@@ -160,6 +160,15 @@ class Mentionmem_Mention extends Mention_BoardAccess_Abstract
 	/**
 	 * {@inheritdoc }
 	 */
+	public static function getModules($modules)
+	{
+		$modules['mentions'] = array('post', 'display');
+		return $modules;
+	}
+
+	/**
+	 * {@inheritdoc }
+	 */
 	public function getNotificationBody($frequency, $members)
 	{
 		if (empty($lang_data['suffix']))

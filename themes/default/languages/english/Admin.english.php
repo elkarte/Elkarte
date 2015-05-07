@@ -696,7 +696,6 @@ $txt['badbehavior_title'] = 'Bad Behavior';
 $txt['mods_cat_modifications_misc'] = 'Miscellaneous';
 $txt['mods_cat_layout'] = 'Layout';
 $txt['karma'] = 'Karma';
-$txt['mentions_settings_desc'] = 'Mentioning allow members of your community to be alerted when they are @mentioned in a post, added as a buddy or if one of their posts is liked by another member.';
 $txt['moderation_settings_short'] = 'Moderation';
 $txt['signature_settings_short'] = 'Signatures';
 $txt['custom_profile_shorttitle'] = 'Profile Fields';

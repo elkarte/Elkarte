@@ -153,10 +153,19 @@ The following bbcode is for testing, to be moved to a test when ready.
 
 				$skip_next = strpos($block, '[/quote]') === false;
 			}
-			return $quoted;
+			return array_unique($quoted);
 		}
 		else
 			return false;
+	}
+
+	/**
+	 * {@inheritdoc }
+	 */
+	public static function getModules($modules)
+	{
+		$modules['mentions'] = array('post', 'display');
+		return $modules;
 	}
 
 	/**

@@ -120,9 +120,9 @@ $txt['notify_send_body_pbe_post'] = '<strong>NOT</strong> available with Daily /
 
 $txt['notify_method'] = 'Notify with:';
 $txt['notify_notification'] = 'no emai (only mention/alert)';
-$txt['notify_email'] = 'immediate email';
-$txt['notify_email_daily'] = 'daily email';
-$txt['notify_email_weekly'] = 'weekly email';
+$txt['notify_email'] = 'Immediate email';
+$txt['notify_email_daily'] = 'Daily email';
+$txt['notify_email_weekly'] = 'Weekly email';
 
 $txt['notify_type_likemsg'] = 'Notify when one of your messages is liked';
 $txt['notify_type_mentionmem'] = 'Notify when you are @mentioned';

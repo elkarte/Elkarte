@@ -357,7 +357,7 @@ $txt['topic_sent'] = 'Your email has been sent successfully.';
 $txt['time_offset'] = 'Time Offset';
 $txt['or'] = 'or';
 
-$txt['mention'] = 'Mentions';
+$txt['mention'] = 'Notifications';
 $txt['notifications'] = 'Notifications';
 
 $txt['your_ban'] = 'Sorry %1$s, you are banned from using this forum!';

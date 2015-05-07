@@ -54,9 +54,28 @@ abstract class Mention_Message_Abstract implements Mention_Type_Interface
 	/**
 	 * {@inheritdoc }
 	 */
+	public static function getModules($modules)
+	{
+		return $modules;
+	}
+
+	/**
+	 * {@inheritdoc }
+	 */
 	public static function canNotify($methods)
 	{
 		return $methods;
+	}
+
+	/**
+	 * {@inheritdoc }
+	 */
+	public function getSettings($methods)
+	{
+		return array(
+			'title' => $this->_type,
+			'methods' => static::canNotify($methods),
+		);
 	}
 
 	/**

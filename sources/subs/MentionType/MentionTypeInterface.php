@@ -34,6 +34,24 @@ interface Mention_Type_Interface
 	public static function canNotify($methods);
 
 	/**
+	 * Returns the modules to enable when turning on the mention.
+	 *
+	 * @param string[] $modules An empty array, or array of active modules
+	 *                 in the form array('module' => array('controller'))
+	 * @return string[] Array of modules to activate on controllers in the form:
+	 *                  array('module' => array('controller'))
+	 */
+	public static function getModules($modules);
+
+	/**
+	 * Get the settings needed by a certain notification type.
+	 *
+	 * @param string[] $methods Array of methods of notification
+	 *                 (e.g. notification, email, email_daily, etc.)
+	 */
+	public function getSettings($methods);
+
+	/**
 	 * Used by Mentions_Controller to filter the mentions to display in the list.
 	 *
 	 * @param string $type

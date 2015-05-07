@@ -1740,3 +1740,33 @@ function ajax_getCensorPreview()
 
 	return false;
 }
+
+$(document).ready(function() {
+	var $headers = $("dd:nth-child(2) input");
+
+	$headers.change(function() {
+		var $top = $(this).closest('dl'),
+			$hparent = $(this).parent();
+
+		if (this.checked)
+		{
+			$top.find('dt:not(:first-child)').fadeIn();
+			$top.find('dd:not(:nth-child(2))').each(function() {
+				$(this).fadeIn();
+				$(this).find('input').prop('disabled', false);
+			});
+		}
+		else
+		{
+			$top.find('dt:not(:first-child)').hide();
+			$top.find('dd:not(:nth-child(2))').each(function() {
+				$(this).hide();
+				$(this).find('input').prop('disabled', true);
+			});
+		}
+
+		$hparent.show();
+		$hparent.prev().show();
+	});
+	$headers.change();
+});
