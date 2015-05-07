@@ -2657,7 +2657,7 @@ function theme_copyright()
 	global $forum_copyright;
 
 	// Don't display copyright for things like SSI.
-	if (!defined(FORUM_VERSION))
+	if (!defined('FORUM_VERSION'))
 		return;
 
 	// Put in the version...
