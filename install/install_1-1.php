@@ -1821,6 +1821,42 @@ class InstallInstructions_install_1_1
 		);
 	}
 
+	public function insert_notifications_pref()
+	{
+		return $this->db->insert('ignore',
+			'{db_prefix}notifications_pref',
+			array('id_member' => 'int', 'notification_level' => 'int', 'mention_type' => 'string-12'),
+			array(
+				array(
+					0,
+					1,
+					'buddy'
+				),
+				array(
+					0,
+					1,
+					'likemsg'
+				),
+				array(
+					0,
+					1,
+					'quotedmem'
+				),
+				array(
+					0,
+					1,
+					'rlikemsg'
+				),
+				array(
+					0,
+					1,
+					'mentionmem'
+				),
+			),
+			array('id_server')
+		);
+	}
+
 	public function table_openid_assoc()
 	{
 		return $this->table->db_create_table('{db_prefix}openid_assoc',
