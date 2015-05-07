@@ -29,19 +29,19 @@ if (!defined('ELK'))
 class ManageAttachments_Controller extends Action_Controller
 {
 	/**
-	 * Loop counter for paused attachment maintance actions
+	 * Loop counter for paused attachment maintenance actions
 	 * @var int
 	 */
 	public $step;
 
 	/**
-	 * substep counter for paused attachment maintance actions
+	 * substep counter for paused attachment maintenance actions
 	 * @var int
 	 */
 	public $substep;
 
 	/**
-	 * Substep at the beginig of a maintance loop
+	 * Substep at the beginning of a maintenance loop
 	 * @var int
 	 */
 	public $starting_substep;
@@ -71,7 +71,7 @@ class ManageAttachments_Controller extends Action_Controller
 	public $auto;
 
 	/**
-	 * Desitination when transfering attachments
+	 * Destination when transferring attachments
 	 * @var string
 	 */
 	public $to;
@@ -204,7 +204,7 @@ class ManageAttachments_Controller extends Action_Controller
 				$this->_req->post->attachmentUploadDir = serialize($modSettings['attachmentUploadDir']);
 			}
 
-			// Adding / changing the sub directorys for attachments
+			// Adding / changing the sub directory's for attachments
 			if (!empty($this->_req->post->use_subdirectories_for_attachments))
 			{
 				// Make sure we have a base directory defined
@@ -1650,7 +1650,7 @@ class ManageAttachments_Controller extends Action_Controller
 		// Nothing to move (no files in source or below the max limit)
 		if (empty($results))
 		{
-			// Moving them automaticaly?
+			// Moving them automatically?
 			if (!empty($this->auto))
 			{
 				$modSettings['automanage_attachments'] = 1;
@@ -1659,7 +1659,7 @@ class ManageAttachments_Controller extends Action_Controller
 				$modSettings['use_subdirectories_for_attachments'] = $this->auto == -1 ? 0 : 1;
 				$modSettings['basedirectory_for_attachments'] = $this->auto > 0 ? $modSettings['attachmentUploadDir'][$this->auto] : $modSettings['basedirectory_for_attachments'];
 
-				// Finaly, where do they need to go
+				// Finally, where do they need to go
 				automanage_attachments_check_directory();
 				$new_dir = $modSettings['currentAttachmentUploadDir'];
 			}
@@ -1829,7 +1829,7 @@ class ManageAttachments_Controller extends Action_Controller
 		// Never more than 100%!
 		$context['continue_percent'] = min($context['continue_percent'], 100);
 
-		// Save the needed infomation for the next look
+		// Save the needed information for the next look
 		$_SESSION['attachments_to_fix'] = $to_fix;
 		$_SESSION['attachments_to_fix2'] = $context['repair_errors'];
 

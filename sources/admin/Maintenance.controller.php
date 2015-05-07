@@ -21,7 +21,7 @@ if (!defined('ELK'))
 	die('No access...');
 
 /**
- * Entry point class for all of the maintance ,routine, members, database,
+ * Entry point class for all of the maintenance ,routine, members, database,
  * attachments, topics and hooks
  *
  * @package Maintenance
@@ -35,25 +35,25 @@ class Maintenance_Controller extends Action_Controller
 	public $max_topics;
 
 	/**
-	 * How many actions to take for a maintance actions
+	 * How many actions to take for a maintenance actions
 	 * @var int
 	 */
 	public $increment;
 
 	/**
-	 * Total steps for a given maintance action
+	 * Total steps for a given maintenance action
 	 * @var int
 	 */
 	public $total_steps;
 
 	/**
-	 * reStart pointer for paused maintance actions
+	 * reStart pointer for paused maintenance actions
 	 * @var int
 	 */
 	public $start;
 
 	/**
-	 * Loop counter for paused maintance actions
+	 * Loop counter for paused maintenance actions
 	 * @var int
 	 */
 	public $step;
@@ -157,7 +157,7 @@ class Maintenance_Controller extends Action_Controller
 			),
 		);
 
-		// Set up the action handeler
+		// Set up the action handler
 		$action = new Action('manage_maintenance');
 
 		// Yep, sub-action time and call integrate_sa_manage_maintenance as well
@@ -469,7 +469,7 @@ class Maintenance_Controller extends Action_Controller
 	}
 
 	/**
-	 * Empties all uninmportant logs.
+	 * Empties all unimportant logs.
 	 *
 	 * - This action may be called periodically, by the tasks scheduler,
 	 * or manually by the admin in Maintenance area.
@@ -500,7 +500,7 @@ class Maintenance_Controller extends Action_Controller
 	 * What it does:
 	 * - It requires the admin_forum permission.
 	 * - This is needed only for MySQL.
-	 * - During the convertion from MEDIUMTEXT to TEXT it check if any of the
+	 * - During the conversion from MEDIUMTEXT to TEXT it check if any of the
 	 * posts exceed the TEXT length and if so it aborts.
 	 * - This action is linked from the maintenance screen (if it's applicable).
 	 * - Accessed by ?action=admin;area=maintain;sa=database;activity=convertmsgbody.
@@ -1457,7 +1457,7 @@ class Maintenance_Controller extends Action_Controller
 	 * - recounts all posts for members found in the message table
 	 * - updates the members post count record in the members table
 	 * - honors the boards post count flag
-	 * - does not count posts in the recyle bin
+	 * - does not count posts in the recycle bin
 	 * - zeros post counts for all members with no posts in the message table
 	 * - runs as a delayed loop to avoid server overload
 	 * - uses the not_done template in Admin.template
@@ -1522,7 +1522,7 @@ class Maintenance_Controller extends Action_Controller
 		// No countable posts? set posts counter to 0
 		updateZeroPostMembers();
 
-		// All done, clean up and go back to maintainance
+		// All done, clean up and go back to maintenance
 		unset($_SESSION['total_members']);
 		redirectexit('action=admin;area=maintain;sa=members;done=recountposts');
 	}

@@ -330,7 +330,7 @@ function get_file_listing($path, $relative)
 	if (!is_dir($path))
 		Errors::instance()->fatal_lang_error('error_invalid_dir', 'critical');
 
-	// Read this directorys contents
+	// Read this directory's contents
 	$entries = array();
 	$dir = dir($path);
 	while ($entry = $dir->read())

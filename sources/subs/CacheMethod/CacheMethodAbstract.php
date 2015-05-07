@@ -22,7 +22,7 @@ if (!defined('ELK'))
 abstract class Cache_Method_Abstract implements Cache_Method_Interface
 {
 	/**
-	 * The settings of the caching engin
+	 * The settings of the caching engine
 	 * @var array
 	 */
 	public $_options = null;

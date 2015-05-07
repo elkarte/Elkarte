@@ -425,7 +425,7 @@ function nextMessage($id_msg, $id_topic)
  * @param int $id_topic the id of the topic
  * @param mixed[] $params an (optional) array of params, includes:
  *      - 'not_in' => array - of messages to exclude
- *      - 'include' => array - of messages to explicitely include
+ *      - 'include' => array - of messages to explicitly include
  *      - 'only_approved' => true/false - include or exclude the unapproved messages
  *      - 'limit' => mixed - the number of values to return (if false, no limits applied)
  * @todo very similar to selectMessages in Topics.subs.php

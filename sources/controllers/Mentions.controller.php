@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Handles all the mentions actions so members are notified of mentionalbe actions
+ * Handles all the mentions actions so members are notified of mentionable actions
  *
  * @name      ElkArte Forum
  * @copyright ElkArte Forum contributors
@@ -15,7 +15,7 @@ if (!defined('ELK'))
 	die('No access...');
 
 /**
- * Mentions_Controller Class:  Add mention notificaions for various actions such
+ * Mentions_Controller Class:  Add mention notifications for various actions such
  * as liking a post, adding a buddy, @ calling a member in a post
  *
  * @package Mentions

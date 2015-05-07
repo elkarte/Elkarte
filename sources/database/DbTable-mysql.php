@@ -21,7 +21,7 @@ if (!defined('ELK'))
 
 /**
  * Adds MySQL table level functionality,
- * Table creation / droping, column adding / removing
+ * Table creation / dropping, column adding / removing
  * Most often used during install and Upgrades of the forum and addons
  */
 class DbTable_MySQL extends DbTable
@@ -65,7 +65,7 @@ class DbTable_MySQL extends DbTable
 
 	/**
 	 * This function can be used to create a table without worrying about schema
-	 *  compatabilities across supported database systems.
+	 *  compatibilities across supported database systems.
 	 *  - If the table exists will, by default, do nothing.
 	 *  - Builds table with columns as passed to it - at least one column must be sent.
 	 *  The columns array should have one sub-array for each column - these sub arrays contain:

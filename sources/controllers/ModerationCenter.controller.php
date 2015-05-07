@@ -781,7 +781,7 @@ class ModerationCenter_Controller extends Action_Controller
 			{
 				addReportComment($report, $newComment);
 
-				// Redirect to prevent double submittion.
+				// Redirect to prevent double submission.
 				redirectexit($scripturl . '?action=moderate;area=reports;report=' . $report);
 			}
 		}

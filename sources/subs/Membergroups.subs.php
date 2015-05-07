@@ -297,7 +297,7 @@ function removeMembersFromGroups($members, $groups = null, $permissionCheckDone 
 	else
 		$groups = array_unique(array_map('intval', $groups));
 
-	// Fetch a list of groups members cannot be assigned to explicitely, and the group names of the ones we want.
+	// Fetch a list of groups members cannot be assigned to explicitly, and the group names of the ones we want.
 	$implicitGroups = array(-1, 0, 3);
 	$group_names = array();
 	$group_details = membergroupsById($groups, 0, true);

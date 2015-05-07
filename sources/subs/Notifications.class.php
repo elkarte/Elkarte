@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Class that centrilize the "notification" process.
+ * Class that centralize the "notification" process.
  * ... or at least tries to.
  *
  * @name      ElkArte Forum

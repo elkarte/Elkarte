@@ -435,7 +435,7 @@ function log_email($sent)
  * - Called by Xmlcontroller as part of drag sort event
  *
  * @package Maillist
- * @param string $replace constucted as WHEN fieldname=value THEN new viewvalue WHEN .....
+ * @param string $replace constructed as WHEN fieldname=value THEN new viewvalue WHEN .....
  * @param int[] $filters list of ids in the WHEN clause to keep from updating the entire table
  */
 function updateParserFilterOrder($replace, $filters)

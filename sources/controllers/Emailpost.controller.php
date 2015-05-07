@@ -203,7 +203,7 @@ class Emailpost_Controller extends Action_Controller
 			// We have now posted or PM'ed .. lets do some database maintenance cause maintenance is fun :'(
 			query_key_maintenance($email_message);
 
-			// Update this user so the log shows they were/are active, no luking in the email ether
+			// Update this user so the log shows they were/are active, no lurking in the email ether
 			query_update_member_stats($pbe, $email_message, $email_message->message_type === 'p' ? $pm_info : $topic_info);
 		}
 
@@ -649,7 +649,7 @@ function pbe_create_topic($pbe, $email_message, $board_info)
  * Calls the necessary functions to extract and format the message so its ready for posting
  *
  * What it does:
- * - Converts an email response (text or html) to a BBC equivalant via pbe_Email_to_bbc
+ * - Converts an email response (text or html) to a BBC equivalent via pbe_Email_to_bbc
  * - Formats the email response so it looks structured and not chopped up (via pbe_fix_email_body)
  *
  * @package Maillist

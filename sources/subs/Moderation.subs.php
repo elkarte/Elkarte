@@ -115,7 +115,7 @@ function recountUnapprovedPosts($approve_query = null)
 }
 
 /**
- * How many falied emails (that they can see) do we have?
+ * How many failed emails (that they can see) do we have?
  *
  * @param string|null $approve_query
  */

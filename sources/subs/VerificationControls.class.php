@@ -2,7 +2,7 @@
 
 /**
  * This file contains those functions specific to the various verification controls
- * used to challange users, and hopefully robots as well.
+ * used to challenge users, and hopefully robots as well.
  *
  * @name      ElkArte Forum
  * @copyright ElkArte Forum contributors
@@ -204,7 +204,7 @@ interface Verification_Controls
 	public function doTest();
 
 	/**
-	 * If the control has a visable location on the template or if its hidden
+	 * If the control has a visible location on the template or if its hidden
 	 *
 	 * @return boolean
 	 */
@@ -224,14 +224,14 @@ interface Verification_Controls
 class Verification_Controls_Captcha implements Verification_Controls
 {
 	/**
-	 * Holds the $verificationOptions passed to the constuctor
+	 * Holds the $verificationOptions passed to the constructor
 	 *
 	 * @var array
 	 */
 	private $_options = null;
 
 	/**
-	 * If we are actualy displaying the captcha image
+	 * If we are actually displaying the captcha image
 	 *
 	 * @var boolean
 	 */
@@ -266,7 +266,7 @@ class Verification_Controls_Captcha implements Verification_Controls
 	private $_tested = false;
 
 	/**
-	 * If the GD libary is available for use
+	 * If the GD library is available for use
 	 *
 	 * @var boolean
 	 */
@@ -320,7 +320,7 @@ class Verification_Controls_Captcha implements Verification_Controls
 
 		$this->_tested = false;
 
-		// Requesting a new challange, build the image link, seed the JS
+		// Requesting a new challenge, build the image link, seed the JS
 		if ($isNew)
 		{
 			$this->_show_captcha = !empty($this->_options['override_visual']) || (!empty($modSettings['visual_verification_type']) && !isset($this->_options['override_visual']));
@@ -380,7 +380,7 @@ class Verification_Controls_Captcha implements Verification_Controls
 	}
 
 	/**
-	 * Peform the test, make people do it again and robots pass :P
+	 * Perform the test, make people do it again and robots pass :P
 	 * @return string|boolean
 	 */
 	public function doTest()
@@ -487,7 +487,7 @@ class Verification_Controls_Questions implements Verification_Controls
 	private $_questionIDs = null;
 
 	/**
-	 * Number of challange questions to use
+	 * Number of challenge questions to use
 	 *
 	 * @var int
 	 */
@@ -501,7 +501,7 @@ class Verification_Controls_Questions implements Verification_Controls
 	private $_questions_language = null;
 
 	/**
-	 * Questions that can be used given what available (trys to account for lanaguges)
+	 * Questions that can be used given what available (trys to account for languages)
 	 *
 	 * @var int[]
 	 */
@@ -527,7 +527,7 @@ class Verification_Controls_Questions implements Verification_Controls
 
 	/**
 	 * Show the question to the user
-	 * Trys to account for lanaguges
+	 * Trys to account for languages
 	 *
 	 * @param boolean $isNew
 	 * @param boolean $force_refresh

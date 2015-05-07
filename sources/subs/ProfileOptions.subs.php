@@ -117,7 +117,7 @@ function loadMembergroupsJoin($groups, $memID)
 		if (($row['id_group'] == $context['primary_group'] && $row['group_type'] > 1) || ($row['hidden'] != 2 && $context['primary_group'] == 0 && in_array($row['id_group'], $groups)))
 			$context['can_edit_primary'] = true;
 
-		// If they can't manage (protected) groups, and it's not publically joinable or already assigned, they can't see it.
+		// If they can't manage (protected) groups, and it's not publicly joinable or already assigned, they can't see it.
 		if (((!$context['can_manage_protected'] && $row['group_type'] == 1) || (!$context['can_manage_membergroups'] && $row['group_type'] == 0)) && $row['id_group'] != $context['primary_group'])
 			continue;
 
@@ -149,7 +149,7 @@ function checkMembergroupChange($group_id)
 {
 	$db = database();
 
-	// Chck if non admin users are trying to promote themselves to admin.
+	// Check if non admin users are trying to promote themselves to admin.
 	$request = $db->query('', '
 		SELECT COUNT(permission)
 		FROM {db_prefix}permissions

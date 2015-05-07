@@ -197,7 +197,7 @@ class Emailuser_Controller extends Action_Controller
 
 	/**
 	 * Prepares the form data and database data for sending in an email format
-	 * Does the actual sending of the email if everthing checks out as OK
+	 * Does the actual sending of the email if everything checks out as OK
 	 *
 	 * @param mixed[] $row
 	 */

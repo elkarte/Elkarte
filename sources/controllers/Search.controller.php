@@ -28,7 +28,7 @@ if (!defined('ELK'))
 class Search_Controller extends Action_Controller
 {
 	/**
-	 * Weighing factor each area, ie frequncy, age, sticky, ec
+	 * Weighing factor each area, ie frequency, age, sticky, ec
 	 * @var array
 	 */
 	private $_weight = array();
@@ -64,7 +64,7 @@ class Search_Controller extends Action_Controller
 	{
 		global $modSettings, $scripturl;
 
-		// Coming from quick search box and going to some custome place?
+		// Coming from quick search box and going to some custom place?
 		if (isset($_REQUEST['search_selection']) && !empty($modSettings['additional_search_engines']))
 		{
 			$engines = prepareSearchEngines();
@@ -75,7 +75,7 @@ class Search_Controller extends Action_Controller
 			}
 		}
 
-		// if comming from the quick search box, and we want to search on members, well we need to do that ;)
+		// if coming from the quick search box, and we want to search on members, well we need to do that ;)
 		if (isset($_REQUEST['search_selection']) && $_REQUEST['search_selection'] === 'members')
 			redirectexit($scripturl . '?action=memberlist;sa=search;fields=name,email;search=' . urlencode($_REQUEST['search']));
 

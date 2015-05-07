@@ -251,7 +251,7 @@ function loadCustomFields($memID, $area = 'summary', array $custom_fields = arra
 			}
 			$input_html .= '</fieldset>';
 		}
-		// A standard input field, including some html5 varients
+		// A standard input field, including some html5 variants
 		elseif (in_array($row['field_type'], array('text', 'url', 'search', 'date', 'email', 'color')))
 		{
 			$input_html = '<input id="' . $row['col_name'] . '" type="' . $row['field_type'] . '" name="customfield[' . $row['col_name'] . ']" ' . ($row['field_length'] != 0 ? 'maxlength="' . $row['field_length'] . '"' : '') . ' size="' . ($row['field_length'] == 0 || $row['field_length'] >= 50 ? 50 : ($row['field_length'] > 30 ? 30 : ($row['field_length'] > 10 ? 20 : 10))) . '" value="' . $value . '" class="input_text" />';
@@ -980,7 +980,7 @@ function loadProfileFields($force_reload = false)
 
 	$disabled_fields = !empty($modSettings['disabled_profile_fields']) ? explode(',', $modSettings['disabled_profile_fields']) : array();
 
-	// Hard to imagine this won't be neccessary
+	// Hard to imagine this won't be necessary
 	require_once(SUBSDIR . '/Members.subs.php');
 
 	// For each of the above let's take out the bits which don't apply - to save memory and security!
@@ -1797,7 +1797,7 @@ function profileLoadAvatarData()
 
 /**
  * Loads all the member groups that this member can assign
- * Places the result in context for tempate use
+ * Places the result in context for template use
  */
 function profileLoadGroups()
 {
@@ -2857,7 +2857,7 @@ function findMinMaxUserMessage($memID, $board = null)
 }
 
 /**
- * Determins a members minimum and maximum topic id
+ * Determines a members minimum and maximum topic id
  *
  * - Can limit the results to a particular board
  * - Used to help limit queries by proving start/stop points

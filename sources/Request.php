@@ -395,7 +395,7 @@ class Request
 	}
 
 	/**
-	 * Checks the request and abrubly stops processing if issues are found
+	 * Checks the request and abruptly stops processing if issues are found
 	 *
 	 * - No magic quotes allowed
 	 * - Don't try to set a GLOBLAS key in globals

@@ -210,7 +210,7 @@ class Sphinx_Search extends SearchAPI
 			if (empty($search_params['topic']) )
 				$mySphinx->SetGroupBy('id_topic', SPH_GROUPBY_ATTR, $sphinx_sort);
 
-			// Set up the sort expresssion
+			// Set up the sort expression
 			$mySphinx->SetSortMode(SPH_SORT_EXPR, '(@weight + (relevance / 1000))');
 
 			// Update the field weights for subject vs body

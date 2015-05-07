@@ -29,7 +29,7 @@ if (!defined('ELK'))
 class ManageMembers_Controller extends Action_Controller
 {
 	/**
-	 * Holds varous setting conditions for the current action
+	 * Holds various setting conditions for the current action
 	 * @var array
 	 */
 	protected $conditions;
@@ -619,7 +619,7 @@ class ManageMembers_Controller extends Action_Controller
 	/**
 	 * Handle mass action processing on a group of members
 	 *
-	 * - Deleteing members
+	 * - Deleting members
 	 * - Group changes
 	 * - Banning
 	 */

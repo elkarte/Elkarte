@@ -1,7 +1,7 @@
 <?php
 
 /**
- * A class to analyse and extract informations from queries
+ * A class to analyse and extract information from queries
  *
  * @name      ElkArte Forum
  * @copyright ElkArte Forum contributors
@@ -22,7 +22,7 @@ class Query_Analysis
 	/**
 	 * Analyze the text of a query and the execution time of a query
 	 *
-	 * @param mixed[] $query_data array of informations regarding the query
+	 * @param mixed[] $query_data array of information regarding the query
 	 * @return string[] - 'text', 'is_select', 'position_time'
 	 */
 	public function extractInfo($query_data)
@@ -143,7 +143,7 @@ class Query_Analysis
 	 *
 	 * @param string $query_data - The query string
 	 * @return false|string false if the query doesn't have a SELECT, otherwise
-	 *                      returnes the SELECT itself
+	 *                      returns the SELECT itself
 	 */
 	protected function _is_select_query($query_data)
 	{

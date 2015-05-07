@@ -913,7 +913,7 @@ class Scheduled_Task
 	}
 
 	/**
-	 * Weekly maintenance taks
+	 * Weekly maintenance tasks
 	 *
 	 * What it does:
 	 * - remove empty or temporary settings
@@ -1259,7 +1259,7 @@ class Scheduled_Task
 		// Init
 		$topics = array();
 
-		// We will need this for lanaguage files
+		// We will need this for language files
 		loadEssentialThemeData();
 
 		// Find all of the old MOVE topic notices that were set to expire

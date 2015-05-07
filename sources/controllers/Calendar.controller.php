@@ -240,7 +240,7 @@ class Calendar_Controller extends Action_Controller
 
 	/**
 	 * Takes care of the saving process.
-	 * Not yet used directly, but throught Calendar_Controller::action_post
+	 * Not yet used directly, but through Calendar_Controller::action_post
 	 */
 	public function action_save()
 	{

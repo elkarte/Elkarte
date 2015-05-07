@@ -1067,8 +1067,8 @@ function quote_callback_2($matches)
  *
  * - Similar to loadMemberData, loadPermissions, loadUserSettings, but only loads a
  * subset of that data, enough to validate that a user can make a post to a given board.
- * - Done this way to avoid over-writting user_info etc for those who are running
- * this function (on behalf of the email owner, simliar to profile views etc)
+ * - Done this way to avoid over-writing user_info etc for those who are running
+ * this function (on behalf of the email owner, similar to profile views etc)
  *
  * Sets:
  * - pbe['profile']

@@ -101,7 +101,7 @@ class AdminDebug_Controller extends Action_Controller
 	 * Get admin information from the database.
 	 * Accessed by ?action=viewadminfile.
 	 *
-	 * @deprecated since 1.1 - the action has been removeds
+	 * @deprecated since 1.1 - the action has been removed
 	 */
 	public function action_viewadminfile()
 	{

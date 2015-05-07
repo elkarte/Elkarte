@@ -563,7 +563,7 @@ class Likes_Controller extends Action_Controller
 
 	/**
 	 * Callback for createList()
-	 * Returns a list of liked posts for a memmber
+	 * Returns a list of liked posts for a member
 	 *
 	 * @param int $start
 	 * @param int $items_per_page

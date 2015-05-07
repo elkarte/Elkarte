@@ -288,7 +288,7 @@ function increaseTopicLikes($id_topic, $direction)
 }
 
 /**
- * Return how many likes a user has given or the count of thier posts that
+ * Return how many likes a user has given or the count of their posts that
  * have received a like (not the total likes received)
  *
  * @package Likes

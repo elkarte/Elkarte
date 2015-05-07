@@ -23,7 +23,7 @@ if (!defined('ELK'))
 	die('No access...');
 
 /**
- * Takes a message and parses it, returning the prepared message as a referance.
+ * Takes a message and parses it, returning the prepared message as a reference.
  *
  * - Cleans up links (javascript, etc.) and code/quote sections.
  * - Won't convert \n's and a few other things if previewing is true.
@@ -1508,7 +1508,7 @@ function lastPost()
 /**
  * Prepares a post subject for the post form
  *
- * - Will add the approriate Re: to the post subject if its a reply to an existing post
+ * - Will add the appropriate Re: to the post subject if its a reply to an existing post
  * - If quoting a post, or editing a post, this function also prepares the message body
  * - if editing is true, returns $message|$message[errors], else returns array($subject, $message)
  *

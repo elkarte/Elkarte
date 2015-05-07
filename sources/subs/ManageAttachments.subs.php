@@ -545,7 +545,7 @@ function maxNoThumb()
  * Finds orphan thumbnails in the database
  *
  * - Checks in groups of 500
- * - Called by attachment maintance
+ * - Called by attachment maintenance
  * - If $fix_errors is set to true it will attempt to remove the thumbnail from disk
  *
  * @package Attachments
@@ -612,7 +612,7 @@ function findOrphanThumbnails($start, $fix_errors, $to_fix)
  * Finds parents who thing they do have thumbnails, but dont
  *
  * - Checks in groups of 500
- * - Called by attachment maintance
+ * - Called by attachment maintenance
  * - If $fix_errors is set to true it will attempt to remove the thumbnail from disk
  *
  * @package Attachments

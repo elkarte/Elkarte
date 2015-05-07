@@ -277,7 +277,7 @@ class Database_MySQL extends Database_Abstract
 	 * Checks if the string contains any 4byte chars and if so,
 	 * converts them into HTML entities.
 	 *
-	 * This is necessary because MySQL utf8 doesn't knw how to store such
+	 * This is necessary because MySQL utf8 doesn't know how to store such
 	 * characters and would generate an error any time one is used.
 	 * The 4byte chars are used by emoji
 	 *

@@ -67,7 +67,7 @@ class PayPal_Display
 	 * plus all the standard ones for the subscription form
 	 *
 	 * @param int $unique_id for the transaction
-	 * @param mixed[] $sub_data subscription data array, name, reocurring, etc
+	 * @param mixed[] $sub_data subscription data array, name, reoccurring, etc
 	 * @param int $value amount of the transaction
 	 * @param string $period length of the transaction
 	 * @param string $return_url

@@ -80,7 +80,7 @@ function cache_get_data($key, $ttl = 120)
  * Type can be user, data or left blank
  *  - user clears out user data
  *  - data clears out system / opcode data
- *  - If no type is specified will perfom a complete cache clearing
+ *  - If no type is specified will perform a complete cache clearing
  * For cache engines that do not distinguish on types, a full cache flush will be done
  *
  * @param string $type = ''

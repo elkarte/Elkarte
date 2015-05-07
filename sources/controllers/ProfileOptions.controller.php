@@ -24,7 +24,7 @@ if (!defined('ELK'))
 
 /**
  * ProfileOptions_Controller class. Does the job of showing and editing people's profiles.
- * Interface to buddy list, ignore list, notifications, authenitcation options, forum profile
+ * Interface to buddy list, ignore list, notifications, authentication options, forum profile
  * account settings, etc
  */
 class ProfileOptions_Controller extends Action_Controller
@@ -36,7 +36,7 @@ class ProfileOptions_Controller extends Action_Controller
 	private $_memID = 0;
 
 	/**
-	 * Called before all other methods when comming from the dispatcher or
+	 * Called before all other methods when coming from the dispatcher or
 	 * action class.  If you initiate the class outside of those methods, call this method.
 	 * or setup the class.
 	 */
@@ -275,7 +275,7 @@ class ProfileOptions_Controller extends Action_Controller
 				updateMemberData($this->_memID, array('pm_ignore_list' => $user_profile[$this->_memID]['pm_ignore_list']));
 			}
 
-			// Back to the list of pityful people!
+			// Back to the list of pitiful people!
 			redirectexit('action=profile;area=lists;sa=ignore;u=' . $this->_memID);
 		}
 

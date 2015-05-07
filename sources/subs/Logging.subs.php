@@ -112,7 +112,7 @@ function insertdeleteLogOnline($session_id, $serialized, $do_delete = false)
 }
 
 /**
- * Update the system tracking statitics
+ * Update the system tracking statistics
  *
  * - Used by trackStats
  *

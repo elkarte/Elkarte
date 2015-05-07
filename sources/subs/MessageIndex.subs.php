@@ -25,13 +25,13 @@ if (!defined('ELK'))
  * @param string $sort_by how to sort the results asc/desc
  * @param string $sort_column which value we sort by
  * @param mixed[] $indexOptions
- *     'include_sticky' => if on, loads sticky topics as additonal
+ *     'include_sticky' => if on, loads sticky topics as additional
  *     'only_approved' => if on, only load approved topics
  *     'previews' => if on, loads in a substring of the first/last message text for use in previews
  *     'include_avatars' => if on loads the last message posters avatar
  *     'ascending' => ASC or DESC for the sort
  *     'fake_ascending' =>
- *     'custom_selects' => loads additonal values from the tables used in the query, for addon use
+ *     'custom_selects' => loads additional values from the tables used in the query, for addon use
  */
 function messageIndexTopics($id_board, $id_member, $start, $per_page, $sort_by, $sort_column, $indexOptions)
 {

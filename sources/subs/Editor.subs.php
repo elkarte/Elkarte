@@ -108,8 +108,8 @@ function getMessageIcons($board_id)
  *  must contain:
  *   - id => unique id for the css
  *   - value => text for the editor or blank
- *  Optionaly
- *   - height => height of the intial box
+ *  Optionally
+ *   - height => height of the initial box
  *   - width => width of the box (100%)
  *   - force_rich => force wysiwyg to be enabled
  *   - disable_smiley_box => boolean to turn off the smiley box
@@ -141,7 +141,7 @@ function create_control_richedit($editorOptions)
 		// Some general stuff.
 		$settings['smileys_url'] = $modSettings['smileys_url'] . '/' . $user_info['smiley_set'];
 
-		// @deprectated since 1.1
+		// @deprecated since 1.1
 		if (!isset($context['drafts_autosave_frequency']) && !empty($context['drafts_autosave']) && !empty($options['drafts_autosave_enabled']))
 			$context['drafts_autosave_frequency'] = empty($modSettings['drafts_autosave_frequency']) ? 30000 : $modSettings['drafts_autosave_frequency'] * 1000;
 

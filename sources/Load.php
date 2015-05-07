@@ -24,7 +24,7 @@ if (!defined('ELK'))
  * Load the $modSettings array and many necessary forum settings.
  *
  * What it does:
- * - load the settings from cache if available, otherwse from the database.
+ * - load the settings from cache if available, otherwise from the database.
  * - sets the timezone
  * - checks the load average settings if available.
  * - check whether post moderation is enabled.
@@ -109,7 +109,7 @@ function reloadSettings()
 
 	// Here to justify the name of this function. :P
 	// It should be added to the install and upgrade scripts.
-	// But since the convertors need to be updated also. This is easier.
+	// But since the converters need to be updated also. This is easier.
 	if (empty($modSettings['currentAttachmentUploadDir']))
 	{
 		updateSettings(array(
@@ -1167,11 +1167,11 @@ function isBrowser($browser)
  * What it does:
  * - identify the theme to be loaded.
  * - validate that the theme is valid and that the user has permission to use it
- * - load the users theme settings and site setttings into $options.
+ * - load the users theme settings and site settings into $options.
  * - prepares the list of folders to search for template loading.
  * - identify what smiley set to use.
  * - sets up $context['user']
- * - detects the users browser and sets a mobile friendly enviroment if needed
+ * - detects the users browser and sets a mobile friendly environment if needed
  * - loads default JS variables for use in every theme
  * - loads default JS scripts for use in every theme
  *
@@ -1228,7 +1228,7 @@ function loadTheme($id_theme = 0, $initialize = true)
 
 	$member = empty($user_info['id']) ? -1 : $user_info['id'];
 
-	// Do we already have this members theme data and specific options loaded (for agressive cache settings)
+	// Do we already have this members theme data and specific options loaded (for aggressive cache settings)
 	if (!empty($modSettings['cache_enable']) && $modSettings['cache_enable'] >= 2 && ($temp = cache_get_data('theme_settings-' . $id_theme . ':' . $member, 60)) != null && time() - 60 > $modSettings['settings_updated'])
 	{
 		$themeData = $temp;
@@ -1654,7 +1654,7 @@ function loadTheme($id_theme = 0, $initialize = true)
 		'todayMod' => !empty($modSettings['todayMod']) ? (int) $modSettings['todayMod'] : 0)
 	);
 
-	// Auto video embeding enabled, then load the needed JS
+	// Auto video embedding enabled, then load the needed JS
 	if (!empty($modSettings['enableVideoEmbeding']))
 	{
 		addInlineJavascript('
@@ -2904,7 +2904,7 @@ function determineAvatar($profile)
 			'url' => $modSettings['avatar_url'] . '/' . $profile['avatar'],
 		);
 	}
-	// no custon avatar found yet, maybe a default avatar?
+	// no custom avatar found yet, maybe a default avatar?
 	elseif (!empty($modSettings['avatar_default']) && empty($profile['avatar']) && empty($profile['filename']))
 	{
 		// $settings not initialized? We can't do anything further..
@@ -2966,7 +2966,7 @@ function detectServer()
  * - checks for an active admin session.
  * - checks cache directory is writable.
  * - calls secureDirectory to protect attachments & cache.
- * - checks if the forum is in maintance mode.
+ * - checks if the forum is in maintenance mode.
  */
 function doSecurityChecks()
 {
@@ -2984,7 +2984,7 @@ function doSecurityChecks()
 			$show_warnings = true;
 		}
 
-		// Cache directory writeable?
+		// Cache directory writable?
 		if (!empty($modSettings['cache_enable']) && !is_writable(CACHEDIR))
 		{
 			$context['security_controls_files']['title'] = $txt['generic_warning'];

@@ -2,7 +2,7 @@
 
 /**
  * General exception handler. Has support for throwing errors that
- * are specifically targetted at users, and even placing multiple messages
+ * are specifically targeted at users, and even placing multiple messages
  * in one exception.
  *
  * @name      ElkArte Forum

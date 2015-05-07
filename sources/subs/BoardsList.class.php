@@ -410,7 +410,7 @@ class Boards_List
 	}
 
 	/**
-	 * Returns the array containing the "latest post" informations
+	 * Returns the array containing the "latest post" information
 	 *
 	 * @return array
 	 */

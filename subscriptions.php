@@ -15,7 +15,7 @@
  * license:	BSD, See included LICENSE.TXT for terms and conditions.
  *
  * @version 1.1 dev
- * 
+ *
  */
 
 // Start things rolling by getting the forum alive...
@@ -73,7 +73,7 @@ foreach ($gatewayHandles as $gateway)
 if (empty($txnType))
 	generateSubscriptionError($txt['paid_unknown_transaction_type']);
 
-// Get the subscription and member ID amoungst others...
+// Get the subscription and member ID amongst others...
 @list($subscription_id, $member_id) = $gatewayClass->precheck();
 
 // Integer these just in case.

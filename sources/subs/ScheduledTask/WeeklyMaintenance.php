@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Weekly maintenance taks
+ * Weekly maintenance tasks
  *
  * @name      ElkArte Forum
  * @copyright ElkArte Forum contributors
@@ -23,7 +23,7 @@ if (!defined('ELK'))
 	die('No access...');
 
 /**
- * Weekly maintenance taks
+ * Weekly maintenance tasks
  *
  * What it does:
  * - remove empty or temporary settings

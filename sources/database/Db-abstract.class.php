@@ -25,7 +25,7 @@ if (!defined('ELK'))
 abstract class Database_Abstract implements Database
 {
 	/**
-	 * Current connetcion to the database
+	 * Current connection to the database
 	 * @var resource
 	 */
 	protected $_connection = null;

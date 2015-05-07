@@ -1,7 +1,7 @@
 <?php
 
 /**
- * This controller allows to choose the features activated and disactivate them.
+ * This controller allows to choose features to activated and deactivate them.
  *
  * @name      ElkArte Forum
  * @copyright ElkArte Forum contributors

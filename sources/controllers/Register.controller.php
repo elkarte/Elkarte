@@ -23,7 +23,7 @@ if (!defined('ELK'))
 	die('No access...');
 
 /**
- * Register Controller Class, It registers new members, and it alows
+ * Register Controller Class, It registers new members, and it allows
  * the administrator moderate member registration
  */
 class Register_Controller extends Action_Controller
@@ -225,7 +225,7 @@ class Register_Controller extends Action_Controller
 			$context['username'] = !empty($_POST['user']) ? Util::htmlspecialchars($_POST['user']) : $_SESSION['openid']['nickname'];
 			$context['email'] = !empty($_POST['email']) ? Util::htmlspecialchars($_POST['email']) : $_SESSION['openid']['email'];
 		}
-		// See whether we have some prefiled values.
+		// See whether we have some pre filled values.
 		else
 		{
 			$context += array(
@@ -288,7 +288,7 @@ class Register_Controller extends Action_Controller
 		if (empty($_SESSION['register']['timenow']) || empty($_SESSION['register']['limit']))
 			redirectexit('action=register');
 
-		// Failing that, check the time limit for exessive speed.
+		// Failing that, check the time limit for excessive speed.
 		if (time() - $_SESSION['register']['timenow'] < $_SESSION['register']['limit'])
 		{
 			loadLanguage('Login');

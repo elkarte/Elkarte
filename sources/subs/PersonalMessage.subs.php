@@ -635,7 +635,7 @@ function sendpm($recipients, $subject, $message, $store_outbox = true, $from = n
 	}
 	$db->free_result($request);
 
-	// Load the membergrounp message limits.
+	// Load the membergroup message limits.
 	static $message_limit_cache = array();
 	if (!allowedTo('moderate_forum') && empty($message_limit_cache))
 	{
@@ -1948,7 +1948,7 @@ function loadPMSubjectRequest($pms, $orderBy)
 {
 	$db = database();
 
-	// Seperate query for these bits!
+	// Separate query for these bits!
 	$subjects_request = $db->query('', '
 		SELECT
 			pm.id_pm, pm.subject, pm.id_member_from, pm.msgtime, IFNULL(mem.real_name, pm.from_name) AS from_name,
@@ -2073,7 +2073,7 @@ function loadPMQuote($pmsg, $isReceived)
 /**
  * For a given PM ID, loads all "other" recipients, (excludes the current member)
  *
- * - Will optionaly count the number of bcc recipients and return that count
+ * - Will optionally count the number of bcc recipients and return that count
  *
  * @package PersonalMessage
  * @param int $pmsg

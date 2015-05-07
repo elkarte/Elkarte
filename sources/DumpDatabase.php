@@ -78,7 +78,7 @@ function DumpDatabase2()
 	}
 	else
 	{
-		// Get rid of the gzipping alreading being done.
+		// Get rid of the gzipping already being done.
 		if (!empty($modSettings['enableCompressedOutput']))
 			@ob_end_clean();
 		// If we can, clean anything already sent from the output buffer...
@@ -180,6 +180,7 @@ function DumpDatabase2()
 			{
 				echo $output_function($db_backup);
 				$current_used_memory = 0;
+
 				// This is probably redundant
 				unset($db_backup);
 				$db_backup = '';

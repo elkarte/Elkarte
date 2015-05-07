@@ -94,7 +94,7 @@ function getMessageTableColumns()
 }
 
 /**
- * Retrieve informations about the body column of the messages table
+ * Retrieve information about the body column of the messages table
  * Used in action_database
  *
  * @package Maintenance
@@ -154,7 +154,7 @@ function detectExceedingMessages($start, $increment)
 }
 
 /**
- * loads messages, which exceed the lenght that will fit in the col field
+ * loads messages, which exceed the length that will fit in the col field
  *
  * - Used by maintenance when convert the column "body" of the table from TEXT
  * to MEDIUMTEXT and vice versa.
@@ -318,7 +318,7 @@ function recountUnapprovedMessages($start, $increment)
  * Reset the boards table's counter for posts, topics, unapproved posts and
  * unapproved topics
  *
- * - Allowed parameters: num_posts, num_topics, unapproved_posts, unapproved_topcis
+ * - Allowed parameters: num_posts, num_topics, unapproved_posts, unapproved_topics
  *
  * @package Maintenance
  * @param string $column

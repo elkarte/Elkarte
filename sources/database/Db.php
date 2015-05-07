@@ -33,7 +33,7 @@ interface Database
 	 * Callback for preg_replace_callback on the query.
 	 * It allows to replace on the fly a few pre-defined strings, for convenience ('query_see_board', 'query_wanna_see_board'), with
 	 * their current values from $user_info.
-	 * In addition, it performs checks and sanitization on the values sent to the database.
+	 * In addition, it performs checks and sanitation on the values sent to the database.
 	 *
 	 * @param mixed[] $matches
 	 */
@@ -164,7 +164,7 @@ interface Database
 	 *
 	 * @param string $error_message
 	 * @param string $log_message
-	 * @param string|false $error_type
+	 * @param string|boolean $error_type
 	 * @param string|null $file
 	 * @param int|null $line
 	 */

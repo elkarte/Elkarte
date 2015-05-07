@@ -149,7 +149,7 @@ class UnZip
 		// Likely to need this
 		require_once(SUBSDIR . '/Package.subs.php');
 
-		// The destination needs exist and be writeable or we are doomed
+		// The destination needs exist and be writable or we are doomed
 		umask(0);
 		if ($this->destination !== null && !file_exists($this->destination) && !$this->single_file)
 			mktree($this->destination, 0777);

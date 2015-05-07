@@ -553,7 +553,7 @@ function getCalendarWeek($month, $year, $day, $calendarOptions)
 
 		$calendarGrid['week_number'] = (int) strftime('%U', mktime(0, 0, 0, $month, $day, $year)) + $nWeekAdjust;
 
-		// If this crosses a year boundry and includes january it should be week one.
+		// If this crosses a year boundary and includes january it should be week one.
 		if ((int) strftime('%Y', $curTimestamp + 518400) != $year && $calendarGrid['week_number'] > 53 && $first_day_of_next_year < 5)
 			$calendarGrid['week_number'] = 1;
 	}

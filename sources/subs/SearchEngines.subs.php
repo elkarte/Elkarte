@@ -98,7 +98,7 @@ function spiderCheck()
 			break;
 	}
 
-	// If this is low server tracking then log the spider here as oppossed to the main logging function.
+	// If this is low server tracking then log the spider here as opposed to the main logging function.
 	if (!empty($modSettings['spider_mode']) && $modSettings['spider_mode'] == 1 && !empty($_SESSION['id_robot']))
 		logSpider();
 
@@ -244,7 +244,7 @@ function consolidateSpiderStats()
 }
 
 /**
- * Recache spider names.
+ * Re cache spider names.
  *
  * @package SearchEngines
  */
@@ -488,7 +488,7 @@ function removeSpiderOldLogs($time)
 {
 	$db = database();
 
-	// Delete the entires.
+	// Delete the entries.
 	$db->query('', '
 		DELETE FROM {db_prefix}log_spider_hits
 		WHERE log_time < {int:delete_period}',
@@ -508,7 +508,7 @@ function removeSpiderOldStats($time)
 {
 	$db = database();
 
-	// Delete the entires.
+	// Delete the entries.
 	$db->query('', '
 		DELETE FROM {db_prefix}log_spider_stats
 		WHERE last_seen < {int:delete_period}',

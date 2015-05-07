@@ -88,7 +88,7 @@ class Event_Manager
 			if (!class_exists($class_name))
 				return;
 
-			// Any dependecy you want? In any order you want!
+			// Any dependency you want? In any order you want!
 			if (!empty($deps))
 			{
 				foreach ($deps as $dep)

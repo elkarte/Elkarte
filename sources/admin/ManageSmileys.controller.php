@@ -468,7 +468,7 @@ class ManageSmileys_Controller extends Action_Controller
 	}
 
 	/**
-	 * If we're modifying or adding a smileyset, or if we imported from antoher
+	 * If we're modifying or adding a smileyset, or if we imported from another
 	 * set, then some context info needs to be set.
 	 */
 	private function _subActionModifySet()
@@ -1197,7 +1197,7 @@ class ManageSmileys_Controller extends Action_Controller
 			{
 				$this->_req->query->icon = (int) $this->_req->query->icon;
 
-				// Do some preperation with the data... like check the icon exists *somewhere*
+				// Do some preparation with the data... like check the icon exists *somewhere*
 				if (strpos($this->_req->post->icon_filename, '.png') !== false)
 					$this->_req->post->icon_filename = substr($this->_req->post->icon_filename, 0, -4);
 

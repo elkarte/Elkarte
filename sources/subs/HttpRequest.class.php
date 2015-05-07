@@ -13,9 +13,9 @@
  */
 
 /**
- * Class uesed to interact with super globals, POST, GET, SERVER, COOKEIS, SESSION
+ * Class used to interact with super globals, POST, GET, SERVER, COOKEIS, SESSION
  *
- * - Currenty only a 'getter' of values
+ * - Currently only a 'getter' of values
  * - Can be passed DataValidation sanitation values to return sanitized values
  * - Fetch raw values as $instance->post->keyname
  *     - $this->-req->post->filename
@@ -73,7 +73,7 @@ class HttpReq
 	protected $_dataValidator;
 
 	/**
-	 * Class constructor, sets PHP gobals to class members
+	 * Class constructor, sets PHP globals to class members
 	 */
 	public function __construct($dataValidator = null)
 	{

@@ -61,7 +61,7 @@ interface Cache_Method_Interface
 	 * Type can be user, data or left blank
 	 *  - user clears out user data
 	 *  - data clears out system / opcode data
-	 *  - If no type is specified will perfom a complete cache clearing
+	 *  - If no type is specified will perform a complete cache clearing
 	 * For cache engines that do not distinguish on types, a full cache flush
 	 * should be done.
 	 *

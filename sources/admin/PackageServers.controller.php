@@ -2,7 +2,7 @@
 
 /**
  * This file handles the package servers and packages download, in Package Servers
- * area of admininstration panel.
+ * area of administration panel.
  *
  * @name      ElkArte Forum
  * @copyright ElkArte Forum contributors
@@ -36,8 +36,8 @@ class PackageServers_Controller extends Action_Controller
 	protected $_req;
 
 	/**
-	 * Called before all other methods when comming from the dispatcher or
-	 * action class.  Loads lanaguage and templates files so they are available
+	 * Called before all other methods when coming from the dispatcher or
+	 * action class.  Loads language and templates files so they are available
 	 * to the other methods.
 	 */
 	public function pre_dispatch()

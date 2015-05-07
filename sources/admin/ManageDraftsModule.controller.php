@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Allows for the modifing of the forum drafts settings.
+ * Allows for the modifying of the forum drafts settings.
  *
  * @name      ElkArte Forum
  * @copyright ElkArte Forum contributors
@@ -63,7 +63,7 @@ class ManageDraftsModule_Controller extends Action_Controller
 
 				$modules = array('post', 'display', 'profile', 'personalmessage');
 
-				// Enabling, let's register the modules and prepare the scheuled task
+				// Enabling, let's register the modules and prepare the scheduled task
 				if ($value)
 				{
 					enableModules('drafts', $modules);

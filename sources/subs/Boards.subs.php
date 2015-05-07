@@ -942,7 +942,7 @@ function getBoardTree()
  * @package Boards
  * @param mixed[] $boardListOptions
  * @param boolean $simple if true a simple array is returned containing some basic
- *                informations regarding the board (id_board, board_name, child_level, id_cat, cat_name)
+ *                information regarding the board (id_board, board_name, child_level, id_cat, cat_name)
  *                if false the boards are returned in an array subdivided by categories including also
  *                additional data like the number of boards
  * @return array An array of boards sorted according to the normal boards order
@@ -1045,7 +1045,7 @@ function getBoardList($boardListOptions = array(), $simple = false)
 				'child_level' => $row['child_level'],
 			);
 
-			// Do we want access informations?
+			// Do we want access information?
 			if (!empty($boardListOptions['access']))
 			{
 				$return_value[$row['id_board']]['allow'] = !(empty($row['can_access']) || $row['can_access'] == 'f');
@@ -1092,7 +1092,7 @@ function getBoardList($boardListOptions = array(), $simple = false)
 				'deny' => false,
 				'selected' => isset($boardListOptions['selected_board']) && $boardListOptions['selected_board'] == $row['id_board'],
 			);
-			// Do we want access informations?
+			// Do we want access information?
 
 			if (!empty($boardListOptions['access']))
 			{
@@ -1695,7 +1695,7 @@ function getBoardProperties($idboard)
  * @param int[]|null $boards an array of board IDs
  * @param int[]|null $categories an array of category IDs
  * @param bool $wanna_see_board if true uses {query_wanna_see_board}, otherwise {query_see_board}
- * @param bool $include_recycle if false exclues any results from the recycle board (if enabled)
+ * @param bool $include_recycle if false excludes any results from the recycle board (if enabled)
  */
 function boardsPosts($boards, $categories, $wanna_see_board = false, $include_recycle = true)
 {
@@ -1779,7 +1779,7 @@ function sumRecentPosts()
  *              if conditions is set to 'all' (not an array) all the boards are queried
  * @param mixed[] $params is an optional array that allows to control the results returned:
  *              'sort_by' => (string) defines the sorting of the results (allowed: id_board, name)
- *              'selects' => (string) determines what informations are retrieved and returned
+ *              'selects' => (string) determines what information are retrieved and returned
  *                           Allowed values: 'name', 'posts', 'detailed', 'permissions', 'reports';
  *                           default: 'name';
  *                           see the function for details on the fields associated to each value

@@ -9,7 +9,7 @@
  *
  * This file includes code also covered by:
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
- * license:  	BSD, See included LICENSE.TXT for terms and conditio
+ * license:  	BSD, See included LICENSE.TXT for terms and conditions
  *
  * @version 1.1 dev
  *
@@ -54,7 +54,7 @@ class Generic_List
 
 	/**
 	 * Starts a new list
-	 * Makes sure the passed list contains the miniumn needed options to create a list
+	 * Makes sure the passed list contains the minimum needed options to create a list
 	 * Loads the options in to this instance
 	 *
 	 * @param mixed[] $listOptions

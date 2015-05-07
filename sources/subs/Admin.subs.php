@@ -102,7 +102,7 @@ function getServerVersions($checkFor)
 }
 
 /**
- * Builds the availalble tasks for this admin / moderator
+ * Builds the available tasks for this admin / moderator
  *
  * What it does:
  * - Sets up the support resource txt stings
@@ -217,7 +217,7 @@ function getFileVersions(&$versionOptions)
 	if (!empty($versionOptions['include_subscriptions']) && file_exists(BOARDDIR . '/subscriptions.php'))
 		readFileVersions($version_info, array('file_versions' => BOARDDIR), 'subscriptions.php');
 
-	// Load all the files in the sources and its sub directorys
+	// Load all the files in the sources and its sub directory's
 	$directories = array(
 		'file_versions' => SOURCEDIR,
 		'file_versions_admin' => ADMINDIR,
@@ -298,7 +298,7 @@ function getFileVersions(&$versionOptions)
  */
 function readFileVersions(&$version_info, $directories, $pattern)
 {
-	// The comment looks rougly like... that.
+	// The comment looks roughly like... that.
 	$version_regex = '~\*\s@version\s+(.+)[\s]{2}~i';
 	$unknown_version = '??';
 
