@@ -1742,7 +1742,7 @@ function ajax_getCensorPreview()
 }
 
 $(document).ready(function() {
-	var $headers = $("dd:nth-child(2) input");
+	var $headers = $("mention dd:nth-child(2) input");
 
 	$headers.change(function() {
 		var $top = $(this).closest('dl'),
