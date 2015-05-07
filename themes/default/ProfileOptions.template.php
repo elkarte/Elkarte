@@ -611,6 +611,13 @@ function template_profile_theme_settings()
 							<dd>
 								<input type="hidden" name="default_options[no_new_reply_warning]" value="0" />
 								<input type="checkbox" name="default_options[no_new_reply_warning]" id="no_new_reply_warning" value="1"', !empty($context['member']['options']['no_new_reply_warning']) ? ' checked="checked"' : '', ' class="input_check" />
+							</dd>
+							<dt>
+								<label for="wysiwyg_default">', $txt['wysiwyg_default'], '</label>
+							</dt>
+							<dd>
+								<input type="hidden" name="default_options[wysiwyg_default]" value="0" />
+								<input type="checkbox" name="default_options[wysiwyg_default]" id="wysiwyg_default" value="1"', !empty($context['member']['options']['wysiwyg_default']) ? ' checked="checked"' : '', ' class="input_check" />
 							</dd>';
 
 	if (empty($modSettings['disableCustomPerPage']))
