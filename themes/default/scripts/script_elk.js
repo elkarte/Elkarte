@@ -98,7 +98,7 @@ function toggleButtonAJAX(btn, confirmation_msg_variable, onSuccessCallback)
  *
  * @todo it may be merged into the function if not used anywhere else
  *
- * @param {string} btn string representing this, generally the anchor link tag <a class="" href="" onclick="">
+ * @param {HTMLElement|string} btn string representing this, generally the anchor link tag <a class="" href="" onclick="">
  * @param {string} container_id  css ID of the data container
  */
 function toggleHeaderAJAX(btn, container_id)
@@ -308,8 +308,8 @@ function updateRelativeTime()
  * sTo is optional, if omitted the relative time is
  * calculated from sFrom up to "now"
  *
- * @param {string} sFrom
- * @param {string} sTo
+ * @param {int} sFrom
+ * @param {int} sTo
  */
 function relativeTime(sFrom, sTo)
 {
@@ -436,12 +436,12 @@ function revalidateMentions(sForm, sInput)
 		body,
 		mentions,
 		pos = -1,
-		// Some random punctation marks that may appear next to a name
+		// Some random punctuation marks that may appear next to a name
 		boundaries_pattern = /[ \.,;!\?'-\\\/="]/i;
 
 	for (var i = 0, count = all_elk_mentions.length; i < count; i++)
 	{
-		// Make sure this mention object is for this selector, saftey first
+		// Make sure this mention object is for this selector, safety first
 		if (all_elk_mentions[i].selector === sInput || all_elk_mentions[i].selector === '#' + sInput)
 		{
 			// Was this invoked as the editor plugin?
@@ -508,7 +508,7 @@ function revalidateMentions(sForm, sInput)
 						// alert(names[l].name);
 						pos = body.indexOf(' @' + names[l].name);
 
-						// If there is something like "{space}@username" AND the following char is a space or a punctation mark
+						// If there is something like "{space}@username" AND the following char is a space or a punctuation mark
 						if (pos !== -1 && body.charAt(pos + 2 + names[l].name.length + 1).search(boundaries_pattern) === 0)
 							mentions.append($('<input type="hidden" name="uid[]" />').val(names[l].id));
 					}
@@ -707,17 +707,20 @@ function add_elk_mention(selector, oOptions)
 						}, 1000);
 				})
 				.done(function(data, textStatus, jqXHR) {
+					var $_errorContent = $('#errorContent'),
+						$_errorContainer = $('#errorContainer');
+
 					if ($(data).find("error").length !== 0)
 					{
 						// Errors get a modal dialog box and redirect on close
-						$('#errorContainer').append('<p id="errorContent"></p>');
-						$('#errorContent').html($(data).find("error").text());
-						$('#errorContent').dialog({
+						$_errorContainer.append('<p id="errorContent"></p>');
+						$_errorContent.html($(data).find("error").text());
+						$_errorContent.dialog({
 							autoOpen: true,
 							title: oSettings.title,
 							modal: true,
 							close: function(event, ui) {
-								// Redirecting due to the error, thats a good idea
+								// Redirecting due to the error, that's a good idea
 								if (oSettings.href !== '')
 									window.location.href = elk_scripturl + oSettings.href;
 							}
@@ -735,9 +738,9 @@ function add_elk_mention(selector, oOptions)
 					else
 					{
 						// Something "other" happened ...
-						$('#errorContainer').append('<p id="errorContent"></p>');
-						$('#errorContent').html(oSettings.error + ' : ' + textStatus);
-						$('#errorContent').dialog({autoOpen: true, title: oSettings.title, modal: true});
+						$_errorContainer.append('<p id="errorContent"></p>');
+						$_errorContent.html(oSettings.error + ' : ' + textStatus);
+						$_errorContent.dialog({autoOpen: true, title: oSettings.title, modal: true});
 					}
 				})
 				.always(function(data, textStatus, jqXHR) {
@@ -934,7 +937,8 @@ function setBoardIds() {
 		var positionTooltip = function(event)
 		{
 			var iPosx = 0,
-				iPosy = 0;
+				iPosy = 0,
+				$_tip = $('#' + oSettings.tooltipID);
 
 			if (!event)
 				event = window.event;
@@ -952,13 +956,13 @@ function setBoardIds() {
 
 			// Position of the tooltip top left corner and its size
 			var oPosition = {
-				x: iPosx + oSettings.positionLeft,
-				y: iPosy + oSettings.positionTop,
-				w: $('#' + oSettings.tooltipID).width(),
-				h: $('#' + oSettings.tooltipID).height()
-			};
+					x: iPosx + oSettings.positionLeft,
+					y: iPosy + oSettings.positionTop,
+					w: $_tip.width(),
+					h: $_tip.height()
+				};
 
-			// Display limits and window scroll postion
+			// Display limits and window scroll position
 			var oLimits = {
 				x: $(window).scrollLeft(),
 				y: $(window).scrollTop(),
@@ -966,7 +970,7 @@ function setBoardIds() {
 				h: $(window).height() - 24
 			};
 
-			// Don't go off screen with our tooltop
+			// Don't go off screen with our tooltip
 			if ((oPosition.y + oPosition.h > oLimits.y + oLimits.h) && (oPosition.x + oPosition.w > oLimits.x + oLimits.w))
 			{
 				oPosition.x = (oPosition.x - oPosition.w) - 45;
@@ -974,15 +978,15 @@ function setBoardIds() {
 			}
 			else if ((oPosition.x + oPosition.w) > (oLimits.x + oLimits.w))
 			{
-				oPosition.x = oPosition.x - (((oPosition.x + oPosition.w) - (oLimits.x + oLimits.w)) + 24);
+				oPosition.x -= (((oPosition.x + oPosition.w) - (oLimits.x + oLimits.w)) + 24);
 			}
 			else if (oPosition.y + oPosition.h > oLimits.y + oLimits.h)
 			{
-				oPosition.y = oPosition.y - (((oPosition.y + oPosition.h) - (oLimits.y + oLimits.h)) + 24);
+				oPosition.y -= (((oPosition.y + oPosition.h) - (oLimits.y + oLimits.h)) + 24);
 			}
 
 			// Finally set the position we determined
-			$('#' + oSettings.tooltipID).css({'left': oPosition.x + 'px', 'top': oPosition.y + 'px'});
+			$_tip.css({'left': oPosition.x + 'px', 'top': oPosition.y + 'px'});
 		};
 
 		// Used to show a tooltip
@@ -992,7 +996,8 @@ function setBoardIds() {
 
 		// Used to hide a tooltip
 		var hideTooltip = function() {
-			$('#' + oSettings.tooltipID).fadeOut('slow').trigger("unload").remove();
+			var $_tip = $('#' + oSettings.tooltipID);
+			$_tip.fadeOut('slow').trigger("unload").remove();
 		};
 
 		// Used to keep html encoded
@@ -1039,7 +1044,7 @@ function setBoardIds() {
 					else
 						ttContent.text($(this).children('.' + oSettings.tooltipSwapClass).text());
 
-					// Show then position or it may postion off screen
+					// Show then position or it may position off screen
 					tt.show();
 					showTooltip();
 					positionTooltip(event);
@@ -1259,9 +1264,9 @@ function addAnotherOption(parent, oDtName, oDdName, oData)
 	if (oData !== '')
 	{
 		// The options are children of the newInput select box
-		var opt = null,
-			key = null,
-			obj = {};
+		var opt,
+			key,
+			obj;
 
 		for (key in oData)
 		{
@@ -1282,19 +1287,22 @@ function addAnotherOption(parent, oDtName, oDdName, oData)
 }
 
 /**
- * Shows the member search dropdown with the serch options
+ * Shows the member search dropdown with the search options
  */
 function toggle_mlsearch_opt()
 {
+	var $_mlsearch = $('#mlsearch_options');
+
 	// If the box is already visible just forget about it
-	if ($('#mlsearch_options').is(':visible'))
+	if ($_mlsearch.is(':visible'))
 		return;
 
 	// Time to show the droppy
-	$('#mlsearch_options').fadeIn('fast');
+	$_mlsearch.fadeIn('fast');
 
 	// A click anywhere on the page will close the droppy
 	$('body').on('click', mlsearch_opt_hide);
+
 	// Except clicking on the box itself or into the search text input
 	$('#mlsearch_options, #mlsearch_input').off('click', mlsearch_opt_hide).click(function(ev) {
 		ev.stopPropagation();
@@ -1315,7 +1323,7 @@ function mlsearch_opt_hide()
  *
  * Used to add add/remove poll input area above the post new topic screen
  * Updates the message icon to the poll icon
- * Swaps poll button to match the current condtions
+ * Swaps poll button to match the current conditions
  *
  * @param {object} button
  * @param {int} id_board
@@ -1327,7 +1335,8 @@ function loadAddNewPoll(button, id_board, form_name)
 		return true;
 
 	// Find the form and add poll to the url
-	var $form = $('#post_header').closest("form");
+	var $form = $('#post_header').closest("form"),
+		$_poll_main_option = $('#poll_main, #poll_options');
 
 	// Change the button label
 	if ($(button).val() === poll_add)
@@ -1336,8 +1345,9 @@ function loadAddNewPoll(button, id_board, form_name)
 
 		// We usually like to have the poll icon associated to polls,
 		// but only if the currently selected is the default one
-		if ($('#icon').val() === 'xx')
-			$('#icon').val('poll').change();
+		var $_pollicon = $('#icon');
+		if ($_pollicon.val() === 'xx')
+			$_pollicon.val('poll').change();
 
 		// Add poll to the form action
 		$form.attr('action', $form.attr('action') + ';poll');
@@ -1345,25 +1355,27 @@ function loadAddNewPoll(button, id_board, form_name)
 		// If the form already exists...just show it back and go out
 		if ($('#poll_main').length > 0)
 		{
-			$('#poll_main, #poll_options').find('input').each(function() {
+			$_poll_main_option.find('input').each(function() {
 				if ($(this).data('required') === 'required')
 					$(this).attr('required', 'required');
 			});
 
-			$('#poll_main, #poll_options').toggle();
+			$_poll_main_option.toggle();
 			return false;
 		}
 	}
 	// Remove the poll section
 	else
 	{
-		if ($('#icon').val() === 'poll')
-			$('#icon').val('xx').change();
+		var $_icon = $('#icon');
+
+		if ($_icon.val() === 'poll')
+			$_icon.val('xx').change();
 
 		// Remove poll to the form action
 		$form.attr('action', $form.attr('action').replace(';poll', ''));
 
-		$('#poll_main, #poll_options').hide().find('input').each(function() {
+		$_poll_main_option.hide().find('input').each(function() {
 			if ($(this).attr('required') === 'required')
 			{
 				$(this).data('required', 'required');
