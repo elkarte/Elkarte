@@ -16,10 +16,12 @@
 (function($) {
 	var extensionMethods = {
 		addEvent: function(id, event, func) {
-			var current_event = event;
-			$('#' + id).parent().on(event, 'textarea', func);
+			var current_event = event,
+				$_id = $('#' + id);
 
-			var oIframe = $('#' + id).parent().find('iframe')[0],
+			$_id.parent().on(event, 'textarea', func);
+
+			var oIframe = $_id.parent().find('iframe')[0],
 				oIframeWindow = oIframe.contentWindow;
 
 			if (oIframeWindow !== null && oIframeWindow.document)
@@ -97,22 +99,14 @@
 				this.toggleSourceMode();
 		},
 		createPermanentDropDown: function() {
-			var emoticons = $.extend({}, this.opts.emoticons.dropdown),
-				popup_exists = false,
-				smiley_popup = '';
+			var emoticons = $.extend({}, this.opts.emoticons.dropdown);
 
 			base = this;
 			content = $('<div class="sceditor-insertemoticon" />');
 			line = $('<div id="sceditor-smileycontainer" />');
 
-			for (smiley_popup in this.opts.emoticons.popup)
-			{
-				popup_exists = true;
-				break;
-			}
-
 			// For any smileys that go in the more popup
-			if (popup_exists)
+			if (!$.isEmptyObject(this.opts.emoticons.popup))
 			{
 				this.opts.emoticons.more = this.opts.emoticons.popup;
 				moreButton = $('<div class="sceditor-more" />').text(this._('More')).click(function () {
@@ -131,6 +125,7 @@
 						// create our popup, title bar, smiles, then the close button
 						popupContent.append(titlebar);
 
+						// Add in all the smileys / lines
 						$.each(emoticons, base.appendEmoticon);
 						if (line.children().length > 0)
 							popupContent.append(line);
@@ -150,15 +145,15 @@
 							content.find(':not(input,textarea)').filter(function() {return this.nodeType === 1;}).attr('unselectable', 'on');
 						}
 
-						popupContent = $('<div class="sceditor-dropdown sceditor-smileyPopup" />').append(popupContent);
-						$dropdown = popupContent.appendTo('body');
+						// Show the smiley popup
+						$dropdown = $('<div class="sceditor-dropdown sceditor-smileyPopup" />')
+							.append(popupContent)
+							.appendTo($('body'))
+							.css({
+								"top": $(window).height() * 0.2,
+								"left": $(window).width() * 0.5 - (popupContent.find('#sceditor-popup-smiley').width() / 2)
+							});
 						dropdownIgnoreLastClick = true;
-
-						// position it on the screen
-						$dropdown.css({
-							"top": $(window).height() * 0.2,
-							"left": $(window).width() * 0.5 - ($dropdown.find('#sceditor-popup-smiley').width() / 2)
-						});
 
 						// Allow the smiley window to be moved about
 						$('.sceditor-smileyPopup').draggable({handle: '.sceditor-popup-grip'});
@@ -185,10 +180,10 @@
 
 /**
  * ElkArte unique commands to add to the toolbar, when a button
- * with the same name is selected, it will trigger these defiintions
+ * with the same name is selected, it will trigger these definitions
  *
  * tooltip - the hover text, this is the name in the editors.xxxx.php file
- * txtExec - this is the text to insert before and after the cursor or seleted text
+ * txtExec - this is the text to insert before and after the cursor or selected text
  *           when in the plain text part of the editor
  * exec - this is called when in the wizzy part of the editor to insert text or html tags
  * state - this is used to determine if a button should be shown as active or not
@@ -215,7 +210,7 @@ $.sceditor.command
 				var end = currentRange.selectedRange().startOffset,
 					text = $(currentNode).text();
 
-				// Left and right text from the cursor positon and tag positions
+				// Left and right text from the cursor position and tag positions
 				var	left = text.substr(0, end),
 					right = text.substr(end),
 					l1 = left.lastIndexOf("[spoiler]"),
@@ -242,14 +237,14 @@ $.sceditor.command
 				currentRange = this.getRangeHelper();
 
 			// We don't have an html node since we don't render the tag in the editor
-			// but we can do a spot check to see if the cursor is placed bewtwee plain tags.  This
+			// but we can do a spot check to see if the cursor is placed between plain tags.  This
 			// will miss with nested tags but its nicer than nothing.
 			if (currentRange.selectedRange())
 			{
 				var end = currentRange.selectedRange().startOffset,
 					text = $(currentNode).text();
 
-				// Left and right text from the cursor positon and tag positions
+				// Left and right text from the cursor position and tag positions
 				var	left = text.substr(0, end),
 					right = text.substr(end),
 					l1 = left.lastIndexOf("[footnote]"),
@@ -292,8 +287,6 @@ $.sceditor.command
 			// Escape from this one then
 			else if (!$(currentNode).is('span.tt') && $(currentNode).parents('span.tt').length > 0)
 				editor.insert('<span> ', '</span>', false);
-
-			return;
 		},
 		txtExec: ['[tt]', '[/tt]'],
 		tooltip: 'Teletype'
@@ -325,8 +318,6 @@ $.sceditor.command
 				rangerhelper.restoreRange();
 				editor.focus();
 			}
-			else
-				return;
 		},
 		txtExec: ['[pre]', '[/pre]'],
 		tooltip: 'Preformatted Text'
