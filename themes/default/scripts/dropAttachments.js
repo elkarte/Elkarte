@@ -60,6 +60,8 @@
 			 *
 			 * @param {object} formData current file with data to upload
 			 * @param {object} status current progress bar UI instance
+			 * @param {int} fileSize current progress bar UI instance
+			 * @param {string} fileName current progress bar UI instance
 			 */
 			sendFileToServer = function(formData, status, fileSize, fileName) {
 				var jqXHR = $.ajax({
@@ -180,8 +182,7 @@
 					numAttachUploaded--;
 
 					// Done with this one, so remove it from existence
-					$('#' + dataToSend.attachid).unbind();
-					$('#' + dataToSend.attachid).remove();
+					$('#' + dataToSend.attachid).unbind().remove();
 				} else
 					console.log('error success');
 			}).fail(function(jqXHR, textStatus, errorThrown) {
@@ -381,7 +382,9 @@
 		 *    file names having size error
 		 */
 		populateErrors = function(params) {
-			$('.drop_attachments_error').html('');
+			var $drop_attachments_error = $('.drop_attachments_error');
+
+			$drop_attachments_error.html('');
 
 			var wrapper = '<p class="warningbox">';
 
@@ -405,7 +408,7 @@
 				}
 
 				// Show them what they are doing wrong
-				$('.drop_attachments_error').append(errorMsg);
+				$drop_attachments_error.append(errorMsg);
 			}
 		},
 
@@ -421,7 +424,7 @@
 				indexOf = Array.prototype.indexOf;
 			else {
 				indexOf = function(needle) {
-					var i = -1,
+					var i,
 						index = -1;
 
 					for (i = 0; i < this.length; i++) {
