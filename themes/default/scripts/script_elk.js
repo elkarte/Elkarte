@@ -913,7 +913,7 @@ function setBoardIds() {
 	$.fn.SiteTooltip = function(oInstanceSettings) {
 		$.fn.SiteTooltip.oDefaultsSettings = {
 			followMouse: 1,
-			hoverIntent: {sensitivity: 10, interval: 750, timeout: 50},
+			hoverIntent: {sensitivity: 10, interval: 650, timeout: 50},
 			positionTop: 12,
 			positionLeft: 12,
 			tooltipID: 'site_tooltip', // ID used on the outer div
@@ -991,13 +991,16 @@ function setBoardIds() {
 
 		// Used to show a tooltip
 		var showTooltip = function() {
-			$('#' + oSettings.tooltipID + ' #' + oSettings.tooltipTextID).show();
+			$('#' + oSettings.tooltipID + ' #' + oSettings.tooltipTextID).slideDown(150);
 		};
 
 		// Used to hide a tooltip
 		var hideTooltip = function() {
 			var $_tip = $('#' + oSettings.tooltipID);
-			$_tip.fadeOut('slow').trigger("unload").remove();
+
+			$_tip.fadeOut(175, function() {
+				$(this).trigger("unload").remove();
+			});
 		};
 
 		// Used to keep html encoded
@@ -1036,8 +1039,7 @@ function setBoardIds() {
 					$('body').append('<div id="' + oSettings.tooltipID + '" class="' + oSettings.tooltipClass + '"><div id="' + oSettings.tooltipTextID + '" style="display:none;"></div></div>');
 
 					// Load information in to our newly created div
-					var tt = $('#' + oSettings.tooltipID),
-						ttContent = $('#' + oSettings.tooltipID + ' #' + oSettings.tooltipTextID);
+					var ttContent = $('#' + oSettings.tooltipTextID);
 
 					if (oSettings.tooltipContent === 'html')
 						ttContent.html($(this).children('.' + oSettings.tooltipSwapClass).html());
@@ -1045,7 +1047,6 @@ function setBoardIds() {
 						ttContent.text($(this).children('.' + oSettings.tooltipSwapClass).text());
 
 					// Show then position or it may position off screen
-					tt.show();
 					showTooltip();
 					positionTooltip(event);
 				}
