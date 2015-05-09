@@ -21,7 +21,7 @@ class Mentionmem_Mention extends Mention_BoardAccess_Abstract
 	/**
 	 * {@inheritdoc }
 	 */
-	protected $_type = 'mentionmem';
+	protected static $_type = 'mentionmem';
 
 	/**
 	 * List of members mentioned
@@ -172,7 +172,7 @@ class Mentionmem_Mention extends Mention_BoardAccess_Abstract
 	public function getNotificationBody($frequency, $members)
 	{
 		if (empty($lang_data['suffix']))
-			return $this->_getNotificationStrings('', array('subject' => $this->_type, 'body' => $this->_type), $members, $this->_task);
+			return $this->_getNotificationStrings('', array('subject' => static::$_type, 'body' => static::$_type), $members, $this->_task);
 		else
 			$keys = array('subject' => 'notify_mentionmem_' . $lang_data['subject'], 'body' => 'notify_mentionmem_' . $lang_data['body']);
 

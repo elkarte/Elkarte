@@ -23,7 +23,7 @@ abstract class Mention_Message_Abstract implements Mention_Type_Interface
 	 *
 	 * @var string
 	 */
-	protected $_type = '';
+	protected static $_type = '';
 
 	/**
 	 * The database object
@@ -62,20 +62,9 @@ abstract class Mention_Message_Abstract implements Mention_Type_Interface
 	/**
 	 * {@inheritdoc }
 	 */
-	public static function canNotify($methods)
+	public static function getType()
 	{
-		return $methods;
-	}
-
-	/**
-	 * {@inheritdoc }
-	 */
-	public function getSettings($methods)
-	{
-		return array(
-			'title' => $this->_type,
-			'methods' => static::canNotify($methods),
-		);
+		return static::$_type;
 	}
 
 	/**
@@ -252,7 +241,7 @@ abstract class Mention_Message_Abstract implements Mention_Type_Interface
 				AND id_target = {int:target}',
 			array(
 				'members_to' => $members_to,
-				'type' => $this->_type,
+				'type' => static::$_type,
 				'member_from' => $member_from,
 				'target' => $target,
 			)
@@ -274,7 +263,7 @@ abstract class Mention_Message_Abstract implements Mention_Type_Interface
 					$is_accessible === null ? 1 : $is_accessible,
 					$member_from,
 					$time === null ? time() : $time,
-					$this->_type
+					static::$_type
 				);
 			}
 		}

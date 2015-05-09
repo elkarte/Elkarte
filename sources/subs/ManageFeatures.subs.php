@@ -731,19 +731,19 @@ function loadAllCustomFields()
 	return $custom_field_titles;
 }
 
-function getNotificationsDetails($notification_methods)
+function getNotificationTypes()
 {
 	Elk_Autoloader::getInstance()->register(SUBSDIR . '/MentionType', '\\ElkArte\\sources\\subs\\MentionType');
 
 	$glob = new GlobIterator(SUBSDIR . '/MentionType/*Mention.php', FilesystemIterator::SKIP_DOTS);
-	$settings = array();
+	$types = array();
 	foreach ($glob as $file)
 	{
 		$class_name = '\\ElkArte\\sources\\subs\\MentionType\\' . preg_replace('~([^^])((?<=)[A-Z](?=[a-z]))~', '$1_$2', $file->getBasename('.php'));
-		$obj = new $class_name();
-		$settings[] = $obj->getSettings($notification_methods);
+		$types[] = $class_name::getType();
 	}
-	return $settings;
+
+	return $types;
 }
 
 function getMentionsModules($enabled_mentions)

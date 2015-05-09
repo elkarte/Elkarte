@@ -1457,22 +1457,22 @@ class ManageFeatures_Controller extends Action_Controller
 		);
 
 		$notification_methods = Notifications::getInstance()->getNotifiers();
-		$notifications_details = getNotificationsDetails($notification_methods);
+		$notification_types = getNotificationTypes();
 		$current_settings = unserialize($modSettings['notification_methods']);
 
-		foreach ($notifications_details as $notification)
+		foreach ($notification_types as $title)
 		{
-			$config_vars[] = array('title', 'setting_' . $notification['title']);
+			$config_vars[] = array('title', 'setting_' . $title);
 
-			foreach ($notification['methods'] as $method)
+			foreach ($notification_methods as $method)
 			{
 				if ($method === 'notification')
 					$text_label = $txt['setting_notify_enable_this'];
 				else
 					$text_label = $txt['notify_' . $method];
 
-				$config_vars[] = array('check', 'notifications[' . $notification['title'] . '][' . $method . ']', 'text_label' => $text_label);
-				$modSettings['notifications[' . $notification['title'] . '][' . $method . ']'] = !empty($current_settings[$notification['title']][$method]);
+				$config_vars[] = array('check', 'notifications[' . $title . '][' . $method . ']', 'text_label' => $text_label);
+				$modSettings['notifications[' . $title . '][' . $method . ']'] = !empty($current_settings[$title][$method]);
 			}
 		}
 

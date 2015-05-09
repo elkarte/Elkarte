@@ -21,7 +21,7 @@ class Buddy_Mention extends Mention_Message_Abstract
 	/**
 	 * {@inheritdoc }
 	 */
-	protected $_type = 'buddy';
+	protected static $_type = 'buddy';
 
 	/**
 	 * {@inheritdoc }
@@ -46,7 +46,7 @@ class Buddy_Mention extends Mention_Message_Abstract
 	public function getNotificationBody($lang_data, $members)
 	{
 		if (empty($lang_data['subject']))
-			return $this->_getNotificationStrings('', array('subject' => $this->_type, 'body' => $this->_type), $members, $this->_task);
+			return $this->_getNotificationStrings('', array('subject' => static::$_type, 'body' => static::$_type), $members, $this->_task);
 		else
 			$keys = array('subject' => 'notify_new_buddy_' . $lang_data['subject'], 'body' => 'notify_new_buddy_' . $lang_data['body']);
 

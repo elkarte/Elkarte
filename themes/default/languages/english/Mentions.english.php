@@ -38,7 +38,7 @@ $txt['mentions_type_quotedmem'] = 'Quoted';
 
 $txt['mentions_mark_all_read'] = 'Mark these mentions as read';
 
-$txt['setting_notify_enable_this'] = 'Enable the notification of this event.';
+$txt['setting_notify_enable_this'] = 'Enable user notifications of this event.';
 
 $txt['setting_buddy'] = 'Buddies';
 $txt['setting_likemsg'] = 'Likes';

@@ -21,7 +21,7 @@ class Quotedmem_Mention extends Mention_BoardAccess_Abstract
 	/**
 	 * {@inheritdoc }
 	 */
-	protected $_type = 'quotedmem';
+	protected static $_type = 'quotedmem';
 
 	/**
 	 * {@inheritdoc }
@@ -174,7 +174,7 @@ The following bbcode is for testing, to be moved to a test when ready.
 	public function getNotificationBody($frequency, $members)
 	{
 		if (empty($lang_data['suffix']))
-			return $this->_getNotificationStrings('', array('subject' => $this->_type, 'body' => $this->_type), $members, $this->_task);
+			return $this->_getNotificationStrings('', array('subject' => static::$_type, 'body' => static::$_type), $members, $this->_task);
 		else
 			$keys = array('subject' => 'notify_quotedmem_' . $lang_data['subject'], 'body' => 'notify_quotedmem_' . $lang_data['body']);
 

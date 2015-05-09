@@ -955,3 +955,51 @@ function saveUserNotificationsPreferences($member, $notification_data)
 		array('id_member', 'mention_type')
 	);
 }
+
+/**
+ * From the list of all possible notification methods available, only those
+ * enabled are returned.
+ *
+ * @param string[] $possible_methods The array of notifications ('type' => 'level')
+ * @param string $type The type of notification (mentionmem, likemsg, etc.)
+ */
+function filterNotificationMethods($possible_methods, $type)
+{
+	$unserialized = getConfiguredNotificationMethods($type);
+
+	if (empty($unserialized))
+		return array();
+
+	$allowed = array();
+	foreach ($possible_methods as $key => $val)
+	{
+		if (isset($unserialized[$val]))
+			$allowed[$key] = $val;
+	}
+
+	return $allowed;
+}
+
+/**
+ * Returns all the enabled methods of notification for a specific
+ * type of notification.
+ *
+ * @param string $type The type of notification (mentionmem, likemsg, etc.)
+ */
+function getConfiguredNotificationMethods($type)
+{
+	global $modSettings;
+	static $unserialized = null;
+
+	if ($unserialized === null)
+		$unserialized = unserialize($modSettings['notification_methods']);
+
+	if (isset($unserialized[$type]))
+	{
+		return $unserialized[$type];
+	}
+	else
+	{
+		return array();
+	}
+}

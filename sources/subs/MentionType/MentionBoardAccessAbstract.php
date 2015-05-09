@@ -28,7 +28,7 @@ abstract class Mention_BoardAccess_Abstract extends Mention_Message_Abstract
 		foreach ($mentions as $key => $row)
 		{
 			// To ensure it is not done twice
-			if (empty($this->_type) || $row['mention_type'] != $this->_type)
+			if (empty(static::$_type) || $row['mention_type'] != static::$_type)
 				continue;
 
 			// These things are associated to messages and require permission checks

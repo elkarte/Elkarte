@@ -3330,8 +3330,7 @@ function getMemberNotificationsProfile($member_id)
 	foreach ($enabled_mentions as $type)
 	{
 		$type_on = false;
-		$class = '\\ElkArte\\sources\\subs\\MentionType\\' . ucfirst($type) . '_Mention';
-		$notif = (array) $class::canNotify($mention_methods);
+		$notif = filterNotificationMethods($mention_methods, $type);
 
 		foreach ($notif as $key => $val)
 		{
