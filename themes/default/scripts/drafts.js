@@ -55,10 +55,11 @@ elk_DraftAutoSave.prototype.init = function()
 		};
 
 		// Prevent autosave when selecting post/save by mouse or keyboard
-		$('#postmodify .button_submit').on('mousedown', this.oDraftHandle.instanceRef, function() {
+		var $_button = $('#postmodify .button_submit');
+		$_button .on('mousedown', this.oDraftHandle.instanceRef, function() {
 			this.bInDraftMode = true;
 		});
-		$('#postmodify .button_submit').on('onkeypress', this.oDraftHandle.instanceRef, function() {
+		$_button .on('onkeypress', this.oDraftHandle.instanceRef, function() {
 			this.bInDraftMode = true;
 		});
 	}
@@ -127,9 +128,9 @@ elk_DraftAutoSave.prototype.draftSave = function()
 	var aSections = [
 		'topic=' + parseInt(document.forms.postmodify.elements['topic'].value),
 		'id_draft=' + (('id_draft' in document.forms.postmodify.elements) ? parseInt(document.forms.postmodify.elements['id_draft'].value) : 0),
-		'subject=' + escape(document.forms.postmodify['subject'].value.replace(/&#/g, "&#38;#").php_to8bit()).replace(/\+/g, "%2B"),
-		'message=' + escape(sPostdata.replace(/&#/g, "&#38;#").php_to8bit()).replace(/\+/g, "%2B"),
-		'icon=' + escape(document.forms.postmodify['icon'].value.replace(/&#/g, "&#38;#").php_to8bit()).replace(/\+/g, "%2B"),
+		'subject=' + document.forms.postmodify['subject'].value.replace(/&#/g, "&#38;#").php_urlencode(),
+		'message=' + sPostdata.replace(/&#/g, "&#38;#").php_urlencode(),
+		'icon=' + document.forms.postmodify['icon'].value.replace(/&#/g, "&#38;#").php_urlencode(),
 		'save_draft=true',
 		elk_session_var + '=' + elk_session_id
 	];
@@ -151,8 +152,8 @@ elk_DraftAutoSave.prototype.onDraftDone = function(XMLDoc)
 	if (!XMLDoc || !XMLDoc.getElementsByTagName('draft')[0])
 		return this.draftCancel();
 
-	// @deprecated since 1.1 - the check on #id_draft existance is for backward compatibility with 1.0
-	if ($('#id_draft').length == 0)
+	// @deprecated since 1.1 - the check on #id_draft existence is for backward compatibility with 1.0
+	if ($('#id_draft').length === 0)
 	{
 		var formID = $('#' + this.opt.sTextareaID).closest("form").attr('id');
 		$('#' + formID).append(
@@ -171,8 +172,8 @@ elk_DraftAutoSave.prototype.onDraftDone = function(XMLDoc)
 
 	// Update the form to show we finished, if the id is not set, then set it
 	document.getElementById(this.opt.sLastID).value = this.sCurDraftId;
-	oCurDraftDiv = document.getElementById(this.opt.sLastNote);
-	oCurDraftDiv.innerHTML = this.sLastSaved;
+	this.oCurDraftDiv = document.getElementById(this.opt.sLastNote);
+	this.oCurDraftDiv.innerHTML = this.sLastSaved;
 
 	// thank you sir, may I have another
 	this.bInDraftMode = false;
