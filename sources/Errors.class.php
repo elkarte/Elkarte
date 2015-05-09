@@ -323,6 +323,7 @@ class Errors {
 		$this->_prepareErrorDisplay($e, $err_file, $err_line);
 
 		// Prepare the error details for the log
+		$exception = !isset($err_file, $err_line);
 		$this->error_string = $e->getMessage();
 		$this->error_level = $e->getCode();
 		$this->error_name =  $this->error_level % 255 === E_ERROR ? 'Error' : ($this->error_level % 255 === E_WARNING ? 'Warning' : 'Notice');
@@ -344,7 +345,7 @@ class Errors {
 			return;
 
 		// If this is an E_ERROR or E_USER_ERROR.... die.  Violently so.
-		if ($this->error_level & $this->fatalErrors)
+		if ($this->error_level & $this->fatalErrors || $exception)
 			obExit(false);
 		else
 			return;
@@ -392,30 +393,29 @@ class Errors {
 	{
 		global $db_show_debug;
 
-		$skip = true;
 		$current_directory = str_replace('\\', '/', getcwd());
 
 		// Showing the errors, lets make it look decent
 		if ($db_show_debug === true)
 		{
-			foreach ($e->getTrace() as $entry)
+			$error_trace = $e->getTrace();
+
+			// Set the proper top
+			$error_trace[0]['file'] = isset($err_file) ? $err_file : $e->getFile();
+			$error_trace[0]['line'] = isset($err_line) ? $err_line : $e->getLine();
+
+			foreach ($error_trace as $key => $entry)
 			{
-				// If comming from the error_handler, skim off the first exception trace
-				if (isset($err_file, $skip))
-				{
-					$skip = null;
-					continue;
-				}
-
-				$function = (isset($entry['class']) ? $entry['class'] . $entry['type'] : '') . $entry['function'];
-
-				if (isset($entry['file']))
-					$file = str_replace($current_directory, '', str_replace('\\', '/', $entry['file']));
+				// If from the error_handler, the stack is out of sync
+				if (isset($err_file, $err_line))
+					$function = (isset($error_trace[$key + 1]['class']) ? $error_trace[$key + 1]['class'] . $error_trace[$key + 1]['type'] : '') . isset($error_trace[$key + 1]['function']) ? $error_trace[$key + 1]['function'] : '';
 				else
-					$file = '';
+					$function = (isset($entry['class']) ? $entry['class'] . $entry['type'] : '') . $entry['function'];
+
+				$entry['file'] = isset($entry['file']) ? str_replace($current_directory, '', str_replace('\\', '/', $entry['file'])) : '';
 
 				$this->error_text .= '<li><strong>' . htmlspecialchars($function) . '()</strong>' . (isset($entry['file'], $entry['line'])
-						? ' in <strong>' . $file . '</strong> at line <strong>' .  (isset($err_line) ? $err_line : $entry['line']) . '</strong>'
+						? ' in <strong>' . $entry['file'] . '</strong> at line <strong>' .  $entry['line'] . '</strong>'
 						: '') . "</li>\n";
 			}
 		}
