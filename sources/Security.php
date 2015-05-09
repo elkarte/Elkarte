@@ -72,11 +72,11 @@ function validateSession($type = 'admin')
 	// Is the security option off?
 	// @todo remove the exception (means update the db as well)
 	if (!empty($modSettings['securityDisable' . ($type != 'admin' ? '_' . $type : '')]))
-		return;
+		return true;
 
 	// If their admin or moderator session hasn't expired yet, let it pass, let the admin session trump a moderation one as well
 	if ((!empty($_SESSION[$type . '_time']) && $_SESSION[$type . '_time'] + $refreshTime >= time()) || (!empty($_SESSION['admin_time']) && $_SESSION['admin_time'] + $refreshTime >= time()))
-		return;
+		return true;
 
 	require_once(SUBSDIR . '/Auth.subs.php');
 
@@ -98,7 +98,7 @@ function validateSession($type = 'admin')
 				$_SESSION[$type . '_time'] = time();
 				unset($_SESSION['request_referer']);
 
-				return;
+				return true;
 			}
 		}
 
@@ -115,7 +115,7 @@ function validateSession($type = 'admin')
 				$_SESSION[$type . '_time'] = time();
 				unset($_SESSION['request_referer']);
 
-				return;
+				return true;
 			}
 		}
 	}
@@ -129,7 +129,8 @@ function validateSession($type = 'admin')
 
 		$_SESSION[$type . '_time'] = time();
 		unset($_SESSION['request_referer']);
-		return;
+
+		return true;
 	}
 
 	// Better be sure to remember the real referer
@@ -141,8 +142,8 @@ function validateSession($type = 'admin')
 	// Need to type in a password for that, man.
 	if (!isset($_GET['xml']))
 		adminLogin($type);
-	else
-		return 'session_verify_fail';
+
+	return 'session_verify_fail';
 }
 
 /**
