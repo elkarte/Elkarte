@@ -112,7 +112,7 @@ class Mentioning extends AbstractModel
 
 		// Common checks to determine if we can go on
 		if (!$this->_isValid())
-			return;
+			return false;
 
 		// Cleanup, validate and remove the invalid values (0 and $user_info['id'])
 		$id_targets = array_diff(array_map('intval', array_unique($this->_validator->uid)), array(0, $user_info['id']));
@@ -126,6 +126,8 @@ class Mentioning extends AbstractModel
 		// Update the member mention count
 		foreach ($id_targets as $id_target)
 			$this->_updateMenuCount($this->_data['status'], $id_target);
+
+		return true;
 	}
 
 	/**

@@ -80,6 +80,8 @@ class Filebased extends Cache_Method_Abstract
 
 			return $return;
 		}
+
+		return null;
 	}
 
 	/**

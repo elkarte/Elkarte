@@ -38,6 +38,8 @@ function associatedPoll($topicID, $pollID = null)
 	{
 		setTopicAttribute($topicID, array('id_poll' => $pollID));
 	}
+
+	return false;
 }
 
 /**
