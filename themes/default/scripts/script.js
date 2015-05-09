@@ -485,8 +485,8 @@ function getInnerHTML(oElement)
 /**
  * Set the "outer" HTML of an element.
  *
- * @param {type} oElement
- * @param {type} sToValue
+ * @param {HTMLElement} oElement
+ * @param {string} sToValue
  */
 function setOuterHTML(oElement, sToValue)
 {
