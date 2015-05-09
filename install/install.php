@@ -16,6 +16,7 @@
  */
 
 require('installcore.php');
+require('CommonCode.php');
 
 // Don't have PHP support, do you?
 // ><html dir="ltr"><head><title>Error!</title></head><body>Sorry, this installer requires PHP!<div style="display: none;">
@@ -103,7 +104,7 @@ function initialize_inputs()
  */
 function load_lang_file()
 {
-	global $incontext;
+	global $incontext, $txt;
 
 	$incontext['detected_languages'] = array();
 
