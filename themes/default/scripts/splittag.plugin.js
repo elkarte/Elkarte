@@ -53,7 +53,7 @@ function elk_SplitTags()
 
 	// Regex to find bbc tags and attr's
 	// [1] open tag name, [2] open tag attribs, [3] closing tag name
-	this.regex = /\[(?:([a-z]+)([^\]]*)|(\/[a-z]+))\]/gi;
+	this.regex = /\[(?:([a-z]+)([^\]]*)|(\/[a-z]+))]/gi;
 }
 
 /**
@@ -126,6 +126,7 @@ elk_SplitTags.prototype.parseTags = function(text, endPos) {
 	text = text.slice(0, endPos);
 
 	// Run our BBC regex on the leading text
+	var matches;
 	while (matches = this.regex.exec(text))
 	{
 		// Closing tag [/bbcName] found, remove one from the stack

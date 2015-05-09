@@ -139,9 +139,9 @@ function previewNews()
 /**
  * Gets the form data for the selected fields so they can be posted via ajax
  *
- * @param {array} textFields
- * @param {array} numericFields
- * @param {array} checkboxFields
+ * @param {string[]} textFields
+ * @param {string[]} numericFields
+ * @param {string[]} checkboxFields
  * @param {string} form_name
  */
 function getFields(textFields, numericFields, checkboxFields, form_name)
@@ -241,12 +241,12 @@ function onDocSent(XMLDoc)
 	for (i = 0, numErrors = errors.getElementsByTagName('error').length; i < numErrors; i++)
 	{
 		errorCode = errors.getElementsByTagName('error')[i].attributes.getNamedItem("code").value;
-		if (errorCode == 'no_message' || errorCode == 'long_message')
+		if (errorCode === 'no_message' || errorCode === 'long_message')
 			error_post = true;
 		errorList += '<li id="' + error_area + '_' + errorCode + '" class="error">' + errors.getElementsByTagName('error')[i].firstChild.nodeValue + '</li>';
 	}
 
-	oError_box = $(document.getElementById(error_area));
+	var oError_box = $(document.getElementById(error_area));
 	if ($.trim(oError_box.children(error_list).html()) === '')
 		oError_box.append("<ul id='" + error_list + "'></ul>");
 
@@ -292,9 +292,9 @@ function onDocSent(XMLDoc)
 		// Remove the new image from old-new replies!
 		for (i = 0; i < new_replies.length; i++)
 			document.getElementById('image_new_' + new_replies[i]).style.display = 'none';
-		new_replies = [];
 
-		var ignored_replies = [],
+		var new_replies = [],
+			ignored_replies = [],
 			ignoring = null,
 			newPosts = XMLDoc.getElementsByTagName('elk')[0].getElementsByTagName('new_posts')[0] ? XMLDoc.getElementsByTagName('elk')[0].getElementsByTagName('new_posts')[0].getElementsByTagName('post') : {length: 0},
 			numNewPosts = newPosts.length;
@@ -374,6 +374,8 @@ function onDocSent(XMLDoc)
  */
 function addPollOption()
 {
+	var pollTabIndex;
+
 	if (pollOptionNum === 0)
 	{
 		for (var i = 0, n = document.forms[form_name].elements.length; i < n; i++)
@@ -395,8 +397,9 @@ function addPollOption()
  */
 function addAttachment()
 {
-	allowed_attachments = allowed_attachments - 1;
-	current_attachment = current_attachment + 1;
+	allowed_attachments -= 1;
+	current_attachment += 1;
+
 	if (allowed_attachments <= 0)
 		return alert(txt_more_attachments_error);
 
