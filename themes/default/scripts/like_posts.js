@@ -125,13 +125,14 @@
 
 				var screenWidth = $(window).width(),
 					screenHeight = $(window).height(),
-					popupHeight = $('.floating_error').outerHeight(),
-					popupWidth = $('.floating_error').outerWidth(),
+					$floating_error = $('.floating_error'),
+					popupHeight = $floating_error.outerHeight(),
+					popupWidth = $floating_error.outerWidth(),
 					topPopUpOffset = (screenHeight - popupHeight) / 2,
 					leftPopUpOffset = (screenWidth - popupWidth) / 2;
 
 				// Center the error popup on the screen
-				$('.floating_error').css({
+				$floating_error.css({
 					top: topPopUpOffset + 'px',
 					left: leftPopUpOffset + 'px'
 				});
@@ -148,8 +149,9 @@
 				if (typeof(e) === 'undefined')
 					return false;
 				else if ((e.type === 'keyup' && e.keyCode === 27) || e.type === 'click') {
-					$('.floating_error').remove();
-					$('.floating_error').unbind('click');
+					var $floating_error = $('.floating_error');
+					$floating_error.remove();
+					$floating_error.unbind('click');
 					$(document).unbind('click', removeOverlay);
 					$(document).unbind('keyup', removeOverlay);
 				}
@@ -279,9 +281,10 @@
 			showMessageStats = function() {
 				var data = tabsVisitedCurrentSession[currentUrlFrag],
 					htmlContent = '',
-					messageUrl = elk_scripturl + '?topic=' + data.id_topic + '.msg' + data.id_msg;
+					messageUrl = elk_scripturl + '?topic=' + data.id_topic + '.msg' + data.id_msg,
+					$like_post_message_data = $('.like_post_message_data');
 
-				$('.like_post_message_data').html('');
+				$like_post_message_data.html('');
 				htmlContent += '<a class="message_title" href="' + messageUrl + '">' + txtStrings.topic + ': ' + data.subject + '</a>' + '<span style="display: none;">' + data.body + '</span>';
 
 				htmlContent += '<div class="poster_avatar"><div class="avatar" style="background-image: url(' + encodeURI(data.member_received.avatar) + ')"></div></div>' + '<div class="poster_data">' + '<a class="poster_details" href="' + data.member_received.href + '" style="font-size: 20px;">' + data.member_received.name + '</a>' + '<div class="poster_details">' + txtStrings.totalPosts + ': ' + data.member_received.total_posts + '</div>' + '</div>';
@@ -294,15 +297,14 @@
 				htmlContent += '</div>';
 
 				$('#like_post_current_tab').text(txtStrings.mostLikedMessage);
-				$('.like_post_message_data').append(htmlContent).show();
+				$like_post_message_data.append(htmlContent).show();
 				$(".message_title").on('mouseenter', function(e) {
 					e.preventDefault();
 					var currText = $(this).next().html();
 
 					$("<div class=\'subject_details\'></div>").html(currText).appendTo("body").fadeIn("slow");
 				}).on('mouseout', function() {
-					$(".subject_details").fadeOut("slow");
-					$(".subject_details").remove();
+					$(".subject_details").fadeOut("slow", function() {$(this).remove();});
 				}).on('mousemove', function(e) {
 					var mousex = e.pageX + 20,
 						mousey = e.pageY + 10,
@@ -320,9 +322,10 @@
 			showTopicStats = function() {
 				var data = tabsVisitedCurrentSession[currentUrlFrag],
 					htmlContent = '',
-					topicUrl = elk_scripturl + '?topic=' + data.id_topic;
+					topicUrl = elk_scripturl + '?topic=' + data.id_topic,
+					$like_post_topic_data = $('.like_post_topic_data');
 
-				$('.like_post_topic_data').html('');
+				$like_post_topic_data.html('');
 				htmlContent += '<a class="topic_title" href="' + topicUrl + '">' + txtStrings.mostPopularTopicHeading1 + ' ' + data.like_count + ' ' + txtStrings.genricHeading1 + '</a>';
 				htmlContent += '<p class="topic_info">' + txtStrings.mostPopularTopicSubHeading1 + ' ' + data.msg_data.length + ' ' + txtStrings.mostPopularTopicSubHeading2 + '</p>';
 
@@ -332,16 +335,17 @@
 					htmlContent += '<div class="message_body">' + '<div class="posted_at">' + data.msg_data[i].member.name + ' : ' + txtStrings.postedAt + ' ' + data.msg_data[i].html_time + '</div> ' + '<a class="poster_details" href="' + data.msg_data[i].member.href + '"><div class="poster_avatar" style="background-image: url(' + encodeURI(data.msg_data[i].member.avatar) + ')"></div></a><div class="content_encapsulate">' + data.msg_data[i].body + '</div><a class="read_more" href="' + msgUrl + '">' + txtStrings.readMore + '</a>' + '</div>';
 				}
 				$('#like_post_current_tab').text(txtStrings.mostLikedTopic);
-				$('.like_post_topic_data').html(htmlContent).show();
+				$like_post_topic_data.html(htmlContent).show();
 				hideSpinnerOverlay();
 			},
 
 			showBoardStats = function(response) {
 				var data = tabsVisitedCurrentSession[currentUrlFrag],
 					htmlContent = '',
-					boardUrl = elk_scripturl + '?board=' + data.id_board;
+					boardUrl = elk_scripturl + '?board=' + data.id_board,
+					$like_post_board_data = $('.like_post_board_data');
 
-				$('.like_post_board_data').html('');
+				$like_post_board_data.html('');
 				htmlContent += '<a class="board_title" href="' + boardUrl + '">' + data.name + ' ' + txtStrings.mostPopularBoardHeading1 + ' ' + data.like_count + ' ' + txtStrings.genricHeading1 + '</a>';
 				htmlContent += '<p class="board_info">' + txtStrings.mostPopularBoardSubHeading1 + ' ' + data.num_topics + ' ' + txtStrings.mostPopularBoardSubHeading2 + ' ' + data.topics_liked + ' ' + txtStrings.mostPopularBoardSubHeading3 + '</p>';
 				htmlContent += '<p class="board_info" style="margin: 5px 0 20px;">' + txtStrings.mostPopularBoardSubHeading4 + ' ' + data.num_posts + ' ' + txtStrings.mostPopularBoardSubHeading5 + ' ' + data.msgs_liked + ' ' + txtStrings.mostPopularBoardSubHeading6 + '</p>';
@@ -352,15 +356,16 @@
 					htmlContent += '<div class="message_body">' + '<div class="posted_at">' + data.topic_data[i].member.name + ' : ' + txtStrings.postedAt + ' ' + data.topic_data[i].html_time + '</div> ' + '<a class="poster_details" href="' + data.topic_data[i].member.href + '"><div class="poster_avatar" style="background-image: url(' + encodeURI(data.topic_data[i].member.avatar) + ')"></div></a><div class="content_encapsulate">' + data.topic_data[i].body + '</div><a class="read_more" href="' + topicUrl + '">' + txtStrings.readMore + '</a></div>';
 				}
 				$('#like_post_current_tab').text(txtStrings.mostLikedBoard);
-				$('.like_post_board_data').html(htmlContent).show();
+				$like_post_board_data.html(htmlContent).show();
 				hideSpinnerOverlay();
 			},
 
 			showMostLikesReceivedUserStats = function(response) {
 				var data = tabsVisitedCurrentSession[currentUrlFrag],
-					htmlContent = '';
+					htmlContent = '',
+					$like_post_most_liked_user_data = $('.like_post_most_liked_user_data');
 
-				$('.like_post_most_liked_user_data').html('');
+				$like_post_most_liked_user_data.html('');
 				htmlContent += '<div class="poster_avatar"><div class="avatar" style="background-image: url(' + encodeURI(data.member_received.avatar) + ')"></div></div>' + '<div class="poster_data">' + '<a class="poster_details" href="' + data.member_received.href + '" style="font-size: 20px;">' + data.member_received.name + '</a>' + '<div class="poster_details">' + txtStrings.totalPosts + ': ' + data.member_received.total_posts + '</div>' + '<div class="poster_details">' + txtStrings.totalLikesReceived + ': ' + data.like_count + '</div>' + '</div>';
 
 				htmlContent += '<p class="generic_text">' + txtStrings.mostPopularUserHeading1 + '</p>';
@@ -370,15 +375,16 @@
 					htmlContent += '<div class="message_body">' + '<div class="posted_at">' + txtStrings.postedAt + ' ' + data.topic_data[i].html_time + ': ' + txtStrings.likesReceived + ' (' + data.topic_data[i].like_count + ')</div><div class="content_encapsulate">' + data.topic_data[i].body + '</div><a class="read_more" href="' + msgUrl + '">' + txtStrings.readMore + '</a></div>';
 				}
 				$('#like_post_current_tab').text(txtStrings.mostLikedMember);
-				$('.like_post_most_liked_user_data').html(htmlContent).show();
+				$like_post_most_liked_user_data.html(htmlContent).show();
 				hideSpinnerOverlay();
 			},
 
 			showMostLikesGivenUserStats = function(response) {
 				var data = tabsVisitedCurrentSession[currentUrlFrag],
-					htmlContent = '';
+					htmlContent = '',
+					$like_post_most_likes_given_user_data = $('.like_post_most_likes_given_user_data');
 
-				$('.like_post_most_likes_given_user_data').html('');
+				$like_post_most_likes_given_user_data.html('');
 				htmlContent += '<div class="poster_avatar"><div class="avatar" style="background-image: url(' + encodeURI(data.member_given.avatar) + ')"></div></div>' + '<div class="poster_data">' + '<a class="poster_details" href="' + data.member_given.href + '" style="font-size: 20px;">' + data.member_given.name + '</a>' + '<div class="poster_details">' + txtStrings.totalPosts + ': ' + data.member_given.total_posts + '</div>' + '<div class="poster_details">' + txtStrings.totalLikesGiven + ': ' + data.like_count + '</div>' + '</div>';
 
 				htmlContent += '<p class="generic_text">' + txtStrings.mostLikeGivenUserHeading1 + '</p>';
@@ -388,7 +394,7 @@
 					htmlContent += '<div class="message_body">' + '<div class="posted_at">' + txtStrings.postedAt + ' ' + data.topic_data[i].html_time + '</div><div class="content_encapsulate">' + data.topic_data[i].body + '</div><a class="read_more" href="' + msgUrl + '">' + txtStrings.readMore + '</a></div>';
 				}
 				$('#like_post_current_tab').text(txtStrings.mostLikeGivingMember);
-				$('.like_post_most_likes_given_user_data').html(htmlContent).show();
+				$like_post_most_likes_given_user_data.html(htmlContent).show();
 				hideSpinnerOverlay();
 			},
 
