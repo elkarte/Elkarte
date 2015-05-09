@@ -743,18 +743,16 @@ function template_spellcheck()
 				margin: 0;
 				background: #f0f0f0;
 				color: #000;
-				padding: 10px;
+				padding: 10px 10px 0 10px;
 			}
 			.highlight {
 				color: red;
 				font-weight: bold;
 			}
 			#spellview {
-				border-style: outset;
-				border: 1px solid black;
+				border: 1px inset black;
 				padding: 5px;
-				width: 95%;
-				height: 314px;
+				height: 300px;
 				overflow: auto;
 				background: #ffffff;
 			}
