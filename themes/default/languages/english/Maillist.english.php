@@ -258,7 +258,7 @@ $txt['ml_bounce_template_desc'] = 'Use this page to fill in the details of the t
 $txt['ml_bounce_template_title'] = 'Template Title';
 $txt['ml_bounce_template_title_desc'] = 'A name for use in the template selection list';
 $txt['ml_bounce_template_body'] = 'Template Content';
-$txt['ml_bounce_template_body_desc'] = 'The content of the bounced message. Note that you can use the following shortcuts in this template:<ul style="margin-top: 0px;"><li>{MEMBER} - Member Name.</li><li>{FORUMNAME} - Forum Name.</li><li>{FORUMNAMESHORT} - Short name for the site.</li><li>{ERROR} - The error that the email generated.</li><li>{SUBJECT} - The subject of the email that failed.</li><li>{SCRIPTURL} - Web address of the forum.</li><li>{EMAILREGARDS} - Maillist email sign-off.</li><li>{REGARDS} - Standard forum sign-off.</li></ul>';
+$txt['ml_bounce_template_body_desc'] = 'The content of the bounced message. Note that you can use the following shortcuts in this template:<ul style="margin-top: 0;"><li>{MEMBER} - Member Name.</li><li>{FORUMNAME} - Forum Name.</li><li>{FORUMNAMESHORT} - Short name for the site.</li><li>{ERROR} - The error that the email generated.</li><li>{SUBJECT} - The subject of the email that failed.</li><li>{SCRIPTURL} - Web address of the forum.</li><li>{EMAILREGARDS} - Maillist email sign-off.</li><li>{REGARDS} - Standard forum sign-off.</li></ul>';
 $txt['ml_bounce_template_personal'] = 'Personal Template';
 $txt['ml_bounce_template_personal_desc'] = 'If you select this option only you will be able to see, edit and use this template, otherwise all moderators will be able to use it.';
 $txt['ml_bounce_template_error_no_title'] = 'You must set a descriptive title.';
