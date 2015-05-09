@@ -23,7 +23,7 @@ if (!defined('ELK'))
 	die('No access...');
 
 /**
- * Class to handle all forum errors and exeptions
+ * Class to handle all forum errors and exceptions
  */
 class Errors {
 	/**
@@ -253,6 +253,8 @@ class Errors {
 		global $txt, $language, $user_info, $context;
 		static $fatal_error_called = false;
 
+		$error_message = '';
+
 		// Try to load a theme if we don't have one.
 		if (empty($context['theme_loaded']) && empty($fatal_error_called))
 		{
@@ -302,10 +304,12 @@ class Errors {
 	{
 		// Ignore errors if we're ignoring them or if the error code is not included in error_reporting
 		if (!($error_level & error_reporting()))
-			return;
+			return true;
 
 		// Throw it as an exception so our exception_handler deals with it
-		return $this->exception_handler(new Exception($error_string, $error_level), $file, $line);
+		$this->exception_handler(new Exception($error_string, $error_level), $file, $line);
+
+		return false;
 	}
 
 	/**
@@ -314,6 +318,8 @@ class Errors {
 	 * - It dies with fatal_error() if the error_level matches with error_reporting.
 	 *
 	 * @param Exception $e
+	 * @param string|null $err_file
+	 * @param int|null $err_line
 	 */
 	public function exception_handler(Exception $e, $err_file = null, $err_line = null)
 	{
@@ -404,14 +410,13 @@ class Errors {
 			$error_trace[0]['file'] = isset($err_file) ? $err_file : $e->getFile();
 			$error_trace[0]['line'] = isset($err_line) ? $err_line : $e->getLine();
 
+			// Where are we coming from
+			$not_thrown = isset($err_file, $err_line);
+
+			// Build the debug error trace html
 			foreach ($error_trace as $key => $entry)
 			{
-				// If from the error_handler, the stack is out of sync
-				if (isset($err_file, $err_line))
-					$function = (isset($error_trace[$key + 1]['class']) ? $error_trace[$key + 1]['class'] . $error_trace[$key + 1]['type'] : '') . isset($error_trace[$key + 1]['function']) ? $error_trace[$key + 1]['function'] : '';
-				else
-					$function = (isset($entry['class']) ? $entry['class'] . $entry['type'] : '') . $entry['function'];
-
+				$function = $this->_debug_error_func($error_trace, $entry, $not_thrown, $key);
 				$entry['file'] = isset($entry['file']) ? str_replace($current_directory, '', str_replace('\\', '/', $entry['file'])) : '';
 
 				$this->error_text .= '<li><strong>' . htmlspecialchars($function) . '()</strong>' . (isset($entry['file'], $entry['line'])
@@ -419,6 +424,27 @@ class Errors {
 						: '') . "</li>\n";
 			}
 		}
+	}
+
+	/**
+	 * Sets the function string for the debug backtrace
+	 *
+	 * @param array $error_trace
+	 * @param string[] $entry
+	 * @param boolean $not_thrown
+	 * @param int $key
+	 *
+	 * @return string
+	 */
+	private function _debug_error_func($error_trace, $entry, $not_thrown, $key)
+	{
+		// If from the error_handler, the stack is out of sync
+		if ($not_thrown)
+			$function = (isset($error_trace[$key + 1]['class']) ? $error_trace[$key + 1]['class'] . $error_trace[$key + 1]['type'] : '') . isset($error_trace[$key + 1]['function']) ? $error_trace[$key + 1]['function'] : '';
+		else
+			$function = (isset($entry['class']) ? $entry['class'] . $entry['type'] : '') . $entry['function'];
+
+		return $function;
 	}
 
 	/**
@@ -549,7 +575,7 @@ class Errors {
 				logLastDatabaseError();
 
 			// Language files aren't loaded yet :'(
-			$db_error = $db->last_error($db->connection());
+			$db_error = $db->last_error();
 			@mail($webmaster_email, $mbname . ': Database Error!', 'There has been a problem with the database!' . ($db_error == '' ? '' : "\n" . $db->db_title() . ' reported:' . "\n" . $db_error) . "\n\n" . 'This is a notice email to let you know that the system could not connect to the database, contact your host if this continues.');
 		}
 
