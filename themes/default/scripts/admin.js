@@ -483,9 +483,9 @@ elk_ViewVersions.prototype.determineVersions = function ()
 	}
 
 	// Set the column titles based on the files each contain
-	for (var i = 0, n = sSections.length; i < n; i++)
+	for (i = 0, n = sSections.length; i < n; i++)
 	{
-		if (sSections[i] == 'Templates')
+		if (sSections[i] === 'Templates')
 			continue;
 
 		document.getElementById('your' + sSections[i]).innerHTML = oLowVersion[sSections[i]] ? oLowVersion[sSections[i]] : oHighYour[sSections[i]];
