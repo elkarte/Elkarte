@@ -70,7 +70,7 @@ class ManageTopics_Controller extends Action_Controller
 	}
 
 	/**
-	 * Adminstration page for topics: allows to display and set settings related to topics.
+	 * Administration page for topics: allows to display and set settings related to topics.
 	 *
 	 * Requires the admin_forum permission.
 	 * Accessed from ?action=admin;area=postsettings;sa=topics.

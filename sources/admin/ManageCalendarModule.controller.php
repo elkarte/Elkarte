@@ -391,7 +391,7 @@ class ManageCalendarModule_Controller extends Action_Controller
 		$context['page_title'] = $txt['calendar_settings'];
 		$context['sub_template'] = 'show_settings';
 
-		// Lets start off with the premission blocks collapsed
+		// Lets start off with the permission blocks collapsed
 		addInlineJavascript('var legend = $(\'legend\');
 			legend.siblings().slideToggle("fast");
 			legend.parent().toggleClass("collapsed")', true);

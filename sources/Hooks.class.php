@@ -37,7 +37,7 @@ class Hooks
 	 *
 	 * @param object $db
 	 * @param boolean $debug
-	 * @param string[]|string|null $paths - additonal paths to add to the replacement array
+	 * @param string[]|string|null $paths - additional paths to add to the replacement array
 	 */
 	private function __construct($db, $debug, $paths = null)
 	{

@@ -158,7 +158,7 @@ class Email_Parse
 
 	/**
 	 * Holds the field/value/type report codes from DSN messages
-	 * Acessible as [$field]['type'] and [$field]['value']
+	 * Accessible as [$field]['type'] and [$field]['value']
 	 * @var mixed[]
 	 */
 	public $_dsn = null;
@@ -458,7 +458,7 @@ class Email_Parse
 			case 'text/richtext':
 				break;
 			// The following are considered multi part messages, as such they *should* contain several sections each
-			// representing the same message in various ways such as plain text (manditory), html section, and
+			// representing the same message in various ways such as plain text (mandatory), html section, and
 			// encoded section such as quoted printable as well as attachments both as files and inline
 			//
 			// multipart/alternative - the same information is presented in different body parts in different forms.

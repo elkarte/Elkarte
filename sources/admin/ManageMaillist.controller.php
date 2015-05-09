@@ -414,7 +414,7 @@ class ManageMaillist_Controller extends Action_Controller
 	 * - Reviews the data to see if the email error function fixed typical issues like key and wrong id
 	 * - Submits the fixed email to the main function which will post it or fail it again
 	 * - If successful will remove the entry from the failed log
-	 * - Accessd by ?action=admin;area=maillist;sa=approve;item=?'
+	 * - Accessed by ?action=admin;area=maillist;sa=approve;item=?'
 	 * - Redirects to action=admin;area=maillist;sa=emaillist
 	 */
 	public function action_approve_email()
@@ -488,7 +488,7 @@ class ManageMaillist_Controller extends Action_Controller
 	 *
 	 * - Uses the selected template to send a bounce notification with
 	 * details as specified by the template
-	 * - Accessd by ?action=admin;area=maillist;sa=bounce;item=?'
+	 * - Accessed by ?action=admin;area=maillist;sa=bounce;item=?'
 	 * - Redirects to action=admin;area=maillist;sa=bounced
 	 *
 	 * @uses bounce_email sub-template
@@ -595,7 +595,7 @@ class ManageMaillist_Controller extends Action_Controller
 	 * - Allows to add/edit or delete filters
 	 * - Filters are used to alter text in a post, to remove crud that comes with emails
 	 * - Filters can be defined as regex, the system will check it for valid syntax
-	 * - Accessd by ?action=admin;area=maillist;sa=emailfilters;
+	 * - Accessed by ?action=admin;area=maillist;sa=emailfilters;
 	 */
 	public function action_list_filters()
 	{

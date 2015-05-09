@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Functions to seach for a member by real name or member name, invoked
+ * Functions to search for a member by real name or member name, invoked
  * via xml form requests
  *
  * @name      ElkArte Forum
@@ -22,7 +22,7 @@ if (!defined('ELK'))
 	die('No access...');
 
 /**
- * Suggest Controler
+ * Suggest Controller
  */
 class Suggest
 {

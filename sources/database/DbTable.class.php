@@ -18,7 +18,7 @@ if (!defined('ELK'))
 	die('No access...');
 
 /**
- * This is used to create a table without worrying about schema compatabilities
+ * This is used to create a table without worrying about schema compatibilities
  * across supported database systems.
  */
 abstract class DbTable
@@ -46,7 +46,7 @@ abstract class DbTable
 
 	/**
 	 * This function can be used to create a table without worrying about schema
-	 *  compatabilities across supported database systems.
+	 *  compatibilities across supported database systems.
 	 *  - If the table exists will, by default, do nothing.
 	 *  - Builds table with columns as passed to it - at least one column must be sent.
 	 *  The columns array should have one sub-array for each column - these sub arrays contain:

@@ -1,7 +1,7 @@
 <?php
 
 /**
- * The admin screen to change the search settings.  Aloows for the creation \
+ * The admin screen to change the search settings.  Allows for the creation \
  * of search indexes and search weights
  *
  * @name      ElkArte Forum

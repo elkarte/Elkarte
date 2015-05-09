@@ -220,7 +220,7 @@ function addSubscription($id_subscribe, $id_member, $renewal = '', $forceStartTi
 		}
 	}
 
-	// Firstly, see whether it exists, and is active. If so then this is meerly an extension.
+	// Firstly, see whether it exists, and is active. If so then this is merely an extension.
 	$request = $db->query('', '
 		SELECT
 			id_sublog, end_time, start_time
@@ -300,7 +300,7 @@ function addSubscription($id_subscribe, $id_member, $renewal = '', $forceStartTi
 	require_once(SUBSDIR . '/Members.subs.php');
 	updateMemberData($id_member, array('id_group' => $id_group, 'additional_groups' => $newAddGroups));
 
-	// Now log the subscription - maybe we have a dorment subscription we can restore?
+	// Now log the subscription - maybe we have a dormant subscription we can restore?
 	$request = $db->query('', '
 		SELECT
 			id_sublog, end_time, start_time
@@ -979,7 +979,7 @@ function updateSubscriptionItem($item)
  * When a refund is processed, this either removes it or sets a new end time to
  * reflect its no longer re-occurring
  *
- * @param mixed[] $subscription_info the susbscription information array
+ * @param mixed[] $subscription_info the subscription information array
  * @param int $member_id
  * @param int $time
  */
@@ -1274,7 +1274,7 @@ function removeSubscription($id_subscribe, $id_member, $delete = false)
 	}
 	$db->free_result($request);
 
-	// Now, for everything we are removing check they defintely are not allowed it.
+	// Now, for everything we are removing check they definitely are not allowed it.
 	$existingGroups = explode(',', $member_info['additional_groups']);
 	foreach ($existingGroups as $key => $group)
 		if (empty($group) || (in_array($group, $removals) && !in_array($group, $allowed)))

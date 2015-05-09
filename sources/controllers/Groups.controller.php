@@ -1,7 +1,7 @@
 <?php
 
 /**
- * This file currently just shows group info, and allows certain priviledged
+ * This file currently just shows group info, and allows certain privileged
  * members to add/remove members.
  *
  * @name      ElkArte Forum
@@ -86,7 +86,7 @@ class Groups_Controller extends Action_Controller
 	}
 
 	/**
-	 * This very simply lists the groups, nothing snazy.
+	 * This very simply lists the groups, nothing snazzy.
 	 */
 	public function action_list()
 	{
@@ -327,7 +327,7 @@ class Groups_Controller extends Action_Controller
 				}
 			}
 
-			// Construct the query pelements, first for adds by name
+			// Construct the query elements, first for adds by name
 			if (!empty($member_ids))
 			{
 				$member_query[] = array('or' => 'member_ids');

@@ -130,7 +130,7 @@ class Calendar_Post_Module
 	}
 
 	/**
-	 * Loads in context stuff related to the envent
+	 * Loads in context stuff related to the event
 	 *
 	 * @param int $event_id The id of the event
 	 */

@@ -25,7 +25,7 @@ if (!defined('ELK'))
  * Auth_Controller class, deals with logging in and out members,
  * and the validation of them
  *
- * @pachage Authorization
+ * @package Authorization
  */
 class Auth_Controller extends Action_Controller
 {

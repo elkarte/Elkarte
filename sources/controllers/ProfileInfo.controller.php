@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Handles the retreving and display of a users posts, attachments, stats, permissions
+ * Handles the retrieving and display of a users posts, attachments, stats, permissions
  * warnings and the like
  *
  * @name      ElkArte Forum
@@ -23,8 +23,8 @@ if (!defined('ELK'))
 
 /**
  * ProfileInfo_Controller class, access all profile summary areas for a user
- * incuding overall summary, post listing, attachment listing, user statistics
- * user permisssions, user warnings
+ * including overall summary, post listing, attachment listing, user statistics
+ * user permissions, user warnings
  */
 class ProfileInfo_Controller extends Action_Controller
 {
@@ -269,7 +269,7 @@ class ProfileInfo_Controller extends Action_Controller
 			}
 		}
 
-		// How about thier most recent posts?
+		// How about their most recent posts?
 		if (in_array('posts', $summary_areas))
 		{
 			// Is the load average too high just now, then let them know
@@ -277,7 +277,7 @@ class ProfileInfo_Controller extends Action_Controller
 				$context['loadaverage'] = true;
 			else
 			{
-				// Set up to get the last 10 psots of this member
+				// Set up to get the last 10 posts of this member
 				$msgCount = count_user_posts($memID);
 				$range_limit = '';
 				$maxIndex = 10;

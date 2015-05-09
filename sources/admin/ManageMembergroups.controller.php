@@ -420,7 +420,7 @@ class ManageMembergroups_Controller extends Action_Controller
 						Errors::instance()->fatal_lang_error('membergroup_does_not_exist');
 				}
 
-				// Don't allow copying of a real priviledged person!
+				// Don't allow copying of a real privileged person!
 				require_once(SUBSDIR . '/Permission.subs.php');
 				loadIllegalPermissions();
 

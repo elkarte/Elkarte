@@ -54,7 +54,7 @@ class ManageRegistration_Controller extends Action_Controller
 	}
 
 	/**
-	 * Entrance point for the registration center, it checks permisions and forwards
+	 * Entrance point for the registration center, it checks permissions and forwards
 	 * to the right method based on the subaction.
 	 *
 	 * - Accessed by ?action=admin;area=regcenter.

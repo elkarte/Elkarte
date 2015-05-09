@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Handles mentionf of members whose messages has been quoted.
+ * Handles mentioning of members whose messages has been quoted.
  *
  * @name      ElkArte Forum
  * @copyright ElkArte Forum contributors

@@ -80,7 +80,7 @@ function validateSession($type = 'admin')
 
 	require_once(SUBSDIR . '/Auth.subs.php');
 
-	// Comming from the login screen
+	// Coming from the login screen
 	if (isset($_POST[$type . '_pass']) || isset($_POST[$type . '_hash_pass']))
 	{
 		checkSession();
@@ -1059,7 +1059,7 @@ function allowedTo($permission, $boards = null)
  * - If they are not, it loads the Errors language file and shows an error using $txt['cannot_' . $permission].
  * - If they are a guest and cannot do it, this calls is_not_guest().
  *
- * @param string[]|string $permission array of or single string, of persmission to check
+ * @param string[]|string $permission array of or single string, of permissions to check
  * @param int[]|null $boards = null
  */
 function isAllowedTo($permission, $boards = null)

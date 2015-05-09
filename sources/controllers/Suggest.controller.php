@@ -21,7 +21,7 @@ if (!defined('ELK'))
 	die('No access...');
 
 /**
- * Suggest Controler
+ * Suggest Controller
  */
 class Suggest_Controller extends Action_Controller
 {

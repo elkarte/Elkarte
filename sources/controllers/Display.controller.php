@@ -581,7 +581,7 @@ class Display_Controller extends Action_Controller
 		// Load up the Quick ModifyTopic and Quick Reply scripts
 		loadJavascriptFile('topic.js');
 
-		// Auto video embeding enabled?
+		// Auto video embedding enabled?
 		if (!empty($modSettings['enableVideoEmbeding']))
 		{
 			addInlineJavascript('

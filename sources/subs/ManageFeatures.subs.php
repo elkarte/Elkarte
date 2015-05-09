@@ -2,7 +2,7 @@
 
 /**
  * This file provides utility functions and db function for the profile functions,
- * notably, but not exclusivly, deals with custom profile fields
+ * notably, but not exclusively, deals with custom profile fields
  *
  * @name      ElkArte Forum
  * @copyright ElkArte Forum contributors
@@ -66,7 +66,7 @@ function updateSignature($id_member, $signature)
 }
 
 /**
- * Update all signautes given a new set of constraints
+ * Update all signatures given a new set of constraints
  */
 function updateAllSignatures($applied_sigs)
 {
@@ -562,7 +562,7 @@ function updateProfileField($field_data)
  * Updates the viewing order for profile fields
  * Done as a CASE WHEN one two three ELSE 0 END in place of many updates
  *
- * @param string $replace constucted as WHEN fieldname=value THEN new viewvalue WHEN .....
+ * @param string $replace constructed as WHEN fieldname=value THEN new viewvalue WHEN .....
  */
 function updateProfileFieldOrder($replace)
 {

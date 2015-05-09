@@ -24,7 +24,7 @@ if (!defined('ELK'))
  * Joins lines back together, where needed, to undo the 78 - 80 char wrap in email
  *
  * Really this is built on a house of cards and should generally be viewed
- * as an unfortante evil if you want a post to *not* look like its an email.
+ * as an unfortunate evil if you want a post to *not* look like its an email.
  * It's always the innocent bystanders who suffer most.
  *
  * Load class

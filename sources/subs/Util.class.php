@@ -233,7 +233,7 @@ class Util
 	 * @param int $length
 	 * @param bool $cutword try to cut at a word boundary
 	 * @param string $ellipsis characters to add at the end of a cut string
-	 * @param bool $exact set true to include ellipsis in the allowed lenght, false will append instead
+	 * @param bool $exact set true to include ellipsis in the allowed length, false will append instead
 	 * @param int $buffer maximum length underflow to allow when cutting on a word boundary
 	 */
 	public static function shorten_text($string, $length = 384, $cutword = false, $ellipsis = '...', $exact = true, $buffer = 12)

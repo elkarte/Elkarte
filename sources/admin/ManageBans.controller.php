@@ -40,8 +40,8 @@ class ManageBans_Controller extends Action_Controller
 	 * Ban center. The main entrance point for all ban center functions.
 	 *
 	 * What it does:
-	 * - It is accesssed by ?action=admin;area=ban.
-	 * - It choses a function based on the 'sa' parameter, like many others.
+	 * - It is accessed by ?action=admin;area=ban.
+	 * - It chooses a function based on the 'sa' parameter, like many others.
 	 * - The default sub-action is action_list().
 	 * - It requires the ban_members permission.
 	 * - It initializes the admin tabs.
@@ -116,7 +116,7 @@ class ManageBans_Controller extends Action_Controller
 	 * Shows a list of bans currently set.
 	 *
 	 * What it does:
-	 * - It is accesssed by ?action=admin;area=ban;sa=list.
+	 * - It is accessed by ?action=admin;area=ban;sa=list.
 	 * - It removes expired bans.
 	 * - It allows sorting on different criteria.
 	 * - It also handles removal of selected ban items.
@@ -308,11 +308,11 @@ class ManageBans_Controller extends Action_Controller
 	 * This function is behind the screen for adding new bans and modifying existing ones.
 	 *
 	 * Adding new bans:
-	 *  - is accesssed by ?action=admin;area=ban;sa=add.
+	 *  - is accessed by ?action=admin;area=ban;sa=add.
 	 *  - uses the ban_edit sub template of the ManageBans template.
 	 *
 	 * Modifying existing bans:
-	 *  - is accesssed by ?action=admin;area=ban;sa=edit;bg=x
+	 *  - is accessed by ?action=admin;area=ban;sa=edit;bg=x
 	 *  - uses the ban_edit sub template of the ManageBans template.
 	 *  - shows a list of ban triggers for the specified ban.
 	 */

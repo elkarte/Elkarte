@@ -199,7 +199,7 @@ function getNewsletterRecipients($sendQuery, $sendParams, $start, $increment, $c
  * - are actually the latest posts.
  *
  * @package News
- * @param string $query_this_board passed to query, assumed raw and instered as such
+ * @param string $query_this_board passed to query, assumed raw and inserted as such
  * @param int $board
  * @param int $limit
  */
@@ -268,7 +268,7 @@ function getXMLNews($query_this_board, $board, $limit)
  * Get the recent topics to display.
  *
  * @package News
- * @param string $query_this_board passed to query, assumed raw and instered as such
+ * @param string $query_this_board passed to query, assumed raw and inserted as such
  * @param int $board
  * @param int $limit
  */

@@ -669,7 +669,7 @@ class Admin_Controller extends Action_Controller
 	 *
 	 * What it does:
 	 * - Determines the current level of support functions from the server, such as
-	 * current level of caching engine or graphics librayrs installed.
+	 * current level of caching engine or graphics library's installed.
 	 * - Accessed by ?action=admin;area=credits
 	 */
 	public function action_credits()

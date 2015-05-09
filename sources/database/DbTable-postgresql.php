@@ -21,7 +21,7 @@ if (!defined('ELK'))
 
 /**
  * Adds PostgreSQL table level functionality,
- * Table creation / droping, column adding / removing
+ * Table creation / dropping, column adding / removing
  * Most often used during install and Upgrades of the forum and addons
  */
 class DbTable_PostgreSQL extends DbTable
@@ -234,7 +234,7 @@ class DbTable_PostgreSQL extends DbTable
 			// the table
 			$table_query = 'DROP TABLE ' . $table_name;
 
-			// and the assosciated sequence, if any
+			// and the associated sequence, if any
 			$sequence_query = 'DROP SEQUENCE IF EXISTS ' . $table_name . '_seq';
 
 			// drop them

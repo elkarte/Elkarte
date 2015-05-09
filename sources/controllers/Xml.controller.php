@@ -713,7 +713,7 @@ class Xml_Controller extends Action_Controller
 	{
 		global $context, $txt;
 
-		// Initilize
+		// Initialize
 		$context['xml_data'] = array();
 		$errors = array();
 		$order = array();

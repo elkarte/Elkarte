@@ -56,13 +56,13 @@ class UnTgz
 	protected $_crc_check = false;
 
 	/**
-	 * The currnt crc value of the data
+	 * The current crc value of the data
 	 * @var string|int
 	 */
 	protected $_crc;
 
 	/**
-	 * The claimied size of the data in the tarball
+	 * The claimed size of the data in the tarball
 	 * @var int
 	 */
 	protected $_size;
@@ -149,7 +149,7 @@ class UnTgz
 		// Likely to need this
 		require_once(SUBSDIR . '/Package.subs.php');
 
-		// The destination needs exist and be writeable or we are doomed
+		// The destination needs exist and be writable or we are doomed
 		umask(0);
 		if ($this->destination !== null && !file_exists($this->destination) && !$this->single_file)
 			mktree($this->destination, 0777);

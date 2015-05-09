@@ -21,7 +21,7 @@
  * Attachment_Controller class.
  *
  * - Handles the downloading of an attachment or avatar
- * - Handles the uploadign of attachments via Ajax
+ * - Handles the uploading of attachments via Ajax
  * - increments the download count where applicable
  *
  * @package Attachments
@@ -50,7 +50,7 @@ class Attachment_Controller extends Action_Controller
 	}
 
 	/**
-	 * Function to upload attachements via ajax calls
+	 * Function to upload attachments via ajax calls
 	 *
 	 * - Currently called by drag drop attachment functionality
 	 * - Pass the form data with session vars
@@ -131,7 +131,7 @@ class Attachment_Controller extends Action_Controller
 	}
 
 	/**
-	 * Function to remove attachements which were added via ajax calls
+	 * Function to remove attachments which were added via ajax calls
 	 * Currently called by drag drop attachment functionality
 	 * Requires file name and file path
 	 * responds back with success or error

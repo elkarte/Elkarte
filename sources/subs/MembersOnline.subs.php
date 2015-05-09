@@ -25,7 +25,7 @@ if (!defined('ELK'))
  *
  * - Used by the board index and SSI.
  * - Also returns the membergroups of the users that are currently online.
- * - (optionally) hides members that chose to hide their online presense.
+ * - (optionally) hides members that chose to hide their online presence.
  *
  * @package Members
  * @param mixed[] $membersOnlineOptions

@@ -1285,7 +1285,7 @@ function reduceMailQueue($batch_size = false, $override_limit = false, $force_se
 			// If this is likely one of the last cycles for this period, then send any remaining quota
 			if (($mail_time - (time() - 60)) < $delay * 2)
 				$batch_size = $modSettings['mail_period_limit'] - $mail_number;
-			// Some batch sizes may need to be adusted to fit as we approach the end
+			// Some batch sizes may need to be adjusted to fit as we approach the end
 			elseif ($mail_number + $batch_size > $modSettings['mail_period_limit'])
 				$batch_size = $modSettings['mail_period_limit'] - $mail_number;
 

@@ -336,7 +336,7 @@ function topTopicReplies($limit = null)
 	}
 	$db->free_result($topic_reply_result);
 
-	// Calculate the percentages and final formating of the number
+	// Calculate the percentages and final formatting of the number
 	foreach ($top_topics_replies as $i => $topic)
 	{
 		$top_topics_replies[$i]['post_percent'] = round(($topic['num_replies'] * 100) / $max_num_replies);
@@ -432,7 +432,7 @@ function topTopicViews($limit = null)
 	}
 	$db->free_result($topic_view_result);
 
-	// Percentages and final formattting
+	// Percentages and final formatting
 	foreach ($top_topics_views as $i => $topic)
 	{
 		$top_topics_views[$i]['post_percent'] = round(($topic['num_views'] * 100) / $max_num_views);

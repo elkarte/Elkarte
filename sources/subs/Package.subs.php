@@ -395,7 +395,7 @@ function create_chmod_control($chmodFiles = array(), $chmodOptions = array(), $r
 		// Create the list for display.
 		createList($listOptions);
 
-		// If we just restored permissions then whereever we are, we are now done and dusted.
+		// If we just restored permissions then wherever we are, we are now done and dusted.
 		if (!empty($_POST['restore_perms']))
 			obExit();
 	}
@@ -1443,12 +1443,12 @@ function parse_path($path)
 }
 
 /**
- * Deletes all the files in a directory, and all the files in sub direcories inside it.
+ * Deletes all the files in a directory, and all the files in sub directories inside it.
  *
  * What it does:
  * - Requires access to delete these files.
- * - Recursivly goes in to all sub directories looking for files to delete
- * - Optioinaly removes the directory as well, otherwise will leave an empty tree behind
+ * - Recursively goes in to all sub directories looking for files to delete
+ * - Optionally removes the directory as well, otherwise will leave an empty tree behind
  *
  * @package Packages
  * @param string $dir
@@ -1467,7 +1467,7 @@ function deltree($dir, $delete_dir = true)
 		$entrynames = new FilesystemIterator($dir, FilesystemIterator::SKIP_DOTS);
 		foreach ($entrynames as $entryname)
 		{
-			// Recursivly dive in to each directory looking for files to delete
+			// Recursively dive in to each directory looking for files to delete
 			if ($entryname->isDir())
 				deltree($entryname->getPathname());
 			// A file, delete it by any means necessary
@@ -1599,7 +1599,7 @@ function mktree($strPath, $mode)
 	{
 		@mkdir($strPath, $mode);
 
-		// Check and retrun if we were successful
+		// Check and return if we were successful
 		$test = @opendir($strPath);
 		if ($test)
 		{
@@ -2557,7 +2557,7 @@ function package_create_backup($id = 'backup')
 			$fwrite($output, fread($fp, 16384));
 		fclose($fp);
 
-		// Pad the output so its on 512 boundarys
+		// Pad the output so its on 512 boundary's
 		$fwrite($output, pack('a' . (512 - $stat['size'] % 512), ''));
 	}
 
@@ -2568,9 +2568,9 @@ function package_create_backup($id = 'backup')
 /**
  * Get the contents of a URL, irrespective of allow_url_fopen.
  *
- * - reads the contents of an http or ftp address and retruns the page in a string
- * - will accept up to 3 page redirections (redirectio_level in the function call is private)
- * - if post_data is supplied, the value and lenght is posted to the given url as form data
+ * - reads the contents of an http or ftp address and returns the page in a string
+ * - will accept up to 3 page redirections (redirection_level in the function call is private)
+ * - if post_data is supplied, the value and length is posted to the given url as form data
  * - URL must be supplied in lowercase
  *
  * @package Packages

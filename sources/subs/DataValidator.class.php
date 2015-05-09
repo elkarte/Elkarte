@@ -135,8 +135,8 @@ class Data_Validator
 	 * Shorthand static method for simple inline validation
 	 *
 	 * @param mixed[]|object $data generally $_POST data for this method
-	 * @param mixed[] $validation_rules assoicative array of field => rules
-	 * @param mixed[] $sanitation_rules assoicative array of field => rules
+	 * @param mixed[] $validation_rules associative array of field => rules
+	 * @param mixed[] $sanitation_rules associative array of field => rules
 	 */
 	public static function is_valid(&$data = array(), $validation_rules = array(), $sanitation_rules = array())
 	{
@@ -160,7 +160,7 @@ class Data_Validator
 	/**
 	 * Set the validation rules that will be run against the data
 	 *
-	 * @param mixed[] $rules assoicative array of field => rule|rule|rule
+	 * @param mixed[] $rules associative array of field => rule|rule|rule
 	 */
 	public function validation_rules($rules = array())
 	{
@@ -178,7 +178,7 @@ class Data_Validator
 	/**
 	 * Sets the sanitation rules used to clean data
 	 *
-	 * @param mixed[] $rules assoicative array of field => rule|rule|rule
+	 * @param mixed[] $rules associative array of field => rule|rule|rule
 	 * @param boolean $strict
 	 */
 	public function sanitation_rules($rules = array(), $strict = false)
@@ -198,7 +198,7 @@ class Data_Validator
 
 	/**
 	 * Field Name Replacements
-	 * @param mixed[] $replacements assoicative array of field => txt string key
+	 * @param mixed[] $replacements associative array of field => txt string key
 	 */
 	public function text_replacements($replacements = array())
 	{

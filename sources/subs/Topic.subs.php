@@ -1251,11 +1251,11 @@ function setTopicWatch($id_member, $topic, $on = false)
  * @param mixed[]|int $topic_parameters can also accept a int value for a topic
  * @param string $full defines the values returned by the function:
  *    - if empty returns only the data from {db_prefix}topics
- *    - if 'message' returns also informations about the message (subject, body, etc.)
- *    - if 'starter' returns also informations about the topic starter (id_member and poster_name)
+ *    - if 'message' returns also information about the message (subject, body, etc.)
+ *    - if 'starter' returns also information about the topic starter (id_member and poster_name)
  *    - if 'all' returns additional infos about the read/unwatched status
- * @param string[] $selects (optional from integation)
- * @param string[] $tables (optional from integation)
+ * @param string[] $selects (optional from integration)
+ * @param string[] $tables (optional from integration)
  */
 function getTopicInfo($topic_parameters, $full = '', $selects = array(), $tables = array())
 {
@@ -1852,7 +1852,7 @@ function topicStatus($topic)
 /**
  * Set attributes for a topic, i.e. locked, sticky.
  * Parameter $attributes is an array where the key is the column name of the
- * attribut to change, and the value is... the new value of the attribute.
+ * attribute to change, and the value is... the new value of the attribute.
  * It sets the new value for the attribute as passed to it.
  * <b>It is currently limited to integer values only</b>
  *
@@ -2288,8 +2288,8 @@ function approveTopics($topics, $approve = true, $log = false)
  *
  * @param string $reason the text that will become the message body
  * @param string $subject the text that will become the message subject
- * @param mixed[] $board_info some board informations (at least id, name, if posts are counted)
- * @param string $new_topic used to buld the url for moving to a new topic
+ * @param mixed[] $board_info some board information (at least id, name, if posts are counted)
+ * @param string $new_topic used to build the url for moving to a new topic
  */
 function postSplitRedirect($reason, $subject, $board_info, $new_topic)
 {
@@ -2661,7 +2661,7 @@ function splitAttemptMove($boards, $totopic)
 }
 
 /**
- * Retrives informations of the current and destination board of a split topic
+ * Retrieves information of the current and destination board of a split topic
  *
  * @return array
  */

@@ -114,7 +114,7 @@ class Site_Combiner
 	private $_url = 'http://closure-compiler.appspot.com/compile';
 
 	/**
-	 * Base post header to send to the closure complier
+	 * Base post header to send to the closure compiler
 	 * @var string
 	 */
 	private $_post_header = 'output_info=compiled_code&output_format=text&compilation_level=SIMPLE_OPTIMIZATIONS';
@@ -140,13 +140,13 @@ class Site_Combiner
 	 */
 	public function site_js_combine($files, $do_defered)
 	{
-		// No files or missing or not writeable directory then we are done
+		// No files or missing or not writable directory then we are done
 		if (empty($files) || !file_exists($this->_archive_dir) || !is_writable($this->_archive_dir))
 			return false;
 
 		$this->_spares = array();
 
-		// Get the filenames and last modified time for this batch
+		// Get the filename's and last modified time for this batch
 		foreach ($files as $id => $file)
 		{
 			$load = (!$do_defered && empty($file['options']['defer'])) || ($do_defered && !empty($file['options']['defer']));
@@ -509,7 +509,7 @@ class Site_Combiner
 				$data = urlencode($file['content']);
 				$data_len = Util::strlen($data);
 
-				// While we can add data to the post and not acceed the post size allowed by the service
+				// While we can add data to the post and not accede the post size allowed by the service
 				if ($data_len + $post_len < 200000)
 				{
 					$post_data .= $data;

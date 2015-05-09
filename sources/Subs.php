@@ -37,7 +37,7 @@ if (!defined('ELK'))
  * 'topic' updates the total number of topics, or if parameter1 is true
  *  simply increments them.
  *
- * 'subject' updateds the log_search_subjects in the event of a topic being
+ * 'subject' updates the log_search_subjects in the event of a topic being
  *  moved, removed or split.  parameter1 is the topicid, parameter2 is the new subject
  *
  * 'postgroups' case updates those members who match condition's
@@ -370,7 +370,7 @@ function comma_format($number, $override_decimal_count = false)
  * Format a time to make it look purdy.
  *
  * What it does:
- * - returns a pretty formated version of time based on the user's format in $user_info['time_format'].
+ * - returns a pretty formatted version of time based on the user's format in $user_info['time_format'].
  * - applies all necessary time offsets to the timestamp, unless offset_type is set.
  * - if todayMod is set and show_today was not not specified or true, an
  *   alternate format string is used to show the date with something to show it is "today" or "yesterday".
@@ -531,7 +531,7 @@ function un_htmlspecialchars($string)
  * parsed properly
  *
  * @param mixed[] $array index array of values
- * @return mixed[] array representing all premutations of the supplied array
+ * @return mixed[] array representing all permutations of the supplied array
  */
 function permute($array)
 {
@@ -2569,7 +2569,7 @@ function memoryReturnBytes($val)
  * Before calling set_time_limit(), we check if this function is available
  *
  * @param int $time_limit The time limit
- * @param bool $server_reset Wether to reset the server timer or not
+ * @param bool $server_reset whether to reset the server timer or not
  */
 function setTimeLimit($time_limit, $server_reset = true)
 {
@@ -2584,7 +2584,7 @@ function setTimeLimit($time_limit, $server_reset = true)
 			// Set it to the maximum that we can, not more, not less
 			$time_limit = min($current, max($time_limit, $current));
 
-			// Still need error supression as some security addons many prevent this action
+			// Still need error suppression as some security addons many prevent this action
 			@set_time_limit($time_limit);
 		}
 	}
@@ -2999,7 +2999,7 @@ function ip2range($fullip)
 			$ip_array[$i] = array('low' => $ip_parts[$i], 'high' => $ip_parts[$i]);
 	}
 
-	// Makes it simpiler to work with.
+	// Makes it simpler to work with.
 	$ip_array[4] = array('low' => 0, 'high' => 0);
 	$ip_array[5] = array('low' => 0, 'high' => 0);
 	$ip_array[6] = array('low' => 0, 'high' => 0);
@@ -3096,7 +3096,7 @@ function text2words($text, $max_chars = 20, $encrypt = false)
 				$encrypted = substr(crypt($word, 'uk'), 2, $max_chars);
 				$total = 0;
 
-				// Create an integer reprsentation
+				// Create an integer representation
 				for ($i = 0; $i < $max_chars; $i++)
 					$total += $possible_chars[ord($encrypted{$i})] * pow(63, $i);
 
@@ -3636,7 +3636,7 @@ function sanitizeMSCutPaste($string)
 	if (empty($string))
 		return $string;
 
-	// UTF-8 occurences of MS special characters
+	// UTF-8 occurrences of MS special characters
 	$findchars_utf8 = array(
 		"\xe2\x80\x9a", // single low-9 quotation mark
 		"\xe2\x80\x9e", // double low-9 quotation mark
@@ -3697,7 +3697,7 @@ function replaceEntities__callback($matches)
 	// 0xD800 >= $num <= 0xDFFF are surrogate markers (not valid for utf8 text)
 	if ($num < 0x20 || $num > 0x10FFFF || ($num >= 0xD800 && $num <= 0xDFFF))
 		return '';
-	// <0x80 (or less than 128) are standard ascii characters a-z A-Z 0-9 and puncuation
+	// <0x80 (or less than 128) are standard ascii characters a-z A-Z 0-9 and punctuation
 	elseif ($num < 0x80)
 		return chr($num);
 	// <0x800 (2048)
@@ -3733,7 +3733,7 @@ function fixchar__callback($matches)
 	// 0xD800 >= $num <= 0xDFFF are surrogate markers (not valid for utf8 text), 0x202D-E are left to right overrides
 	if ($num < 0x20 || $num > 0x10FFFF || ($num >= 0xD800 && $num <= 0xDFFF) || $num === 0x202D || $num === 0x202E)
 		return '';
-	// <0x80 (or less than 128) are standard ascii characters a-z A-Z 0-9 and puncuation
+	// <0x80 (or less than 128) are standard ascii characters a-z A-Z 0-9 and punctuation
 	elseif ($num < 0x80)
 		return chr($num);
 	// <0x800 (2048)
@@ -3994,7 +3994,7 @@ function replaceBasicActionUrl($string)
  * This function creates a new GenericList from all the passed options.
  *
  * What it does:
- * - Calls integration hook integrate_list_"unique_list_id" to allow easy modifiying
+ * - Calls integration hook integrate_list_"unique_list_id" to allow easy modifying
  *
  * @param mixed[] $listOptions associative array of option => value
  */
@@ -4066,7 +4066,7 @@ function response_prefix()
 /**
  * A very simple function to determine if an email address is "valid" for Elkarte.
  *
- * - A valid email for ElkArte is something that resebles an email (filter_var) and
+ * - A valid email for ElkArte is something that resembles an email (filter_var) and
  * is less than 255 characters (for database limits)
  *
  * @param string $value - The string to evaluate as valid email

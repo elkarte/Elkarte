@@ -95,7 +95,7 @@ class Recent_Controller extends Action_Controller
 				);
 			}
 
-			// Find the number of posts in these categorys, exclude the recycle board.
+			// Find the number of posts in these category's, exclude the recycle board.
 			$boards_posts = boardsPosts(array(), $categories, false, false);
 			$total_posts = array_sum($boards_posts);
 			$boards = array_keys($boards_posts);

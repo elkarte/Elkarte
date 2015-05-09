@@ -96,7 +96,7 @@ require_once(SUBSDIR . '/Cache.subs.php');
 require(SOURCEDIR . '/Autoloader.class.php');
 Elk_Autoloader::getInstance()->setupAutoloader(array(SOURCEDIR, SUBSDIR, CONTROLLERDIR, ADMINDIR, ADDONSDIR));
 
-// Show lots of debug information below the page, not for producion sites
+// Show lots of debug information below the page, not for production sites
 if ($db_show_debug === true)
 	Debug::get()->rusage('start', $rusage_start);
 
@@ -127,6 +127,7 @@ if (isset($_GET['scheduled']))
 {
 	// Don't make people wait on us if we can help it.
 	fastcgi_finish_request();
+
 	$controller = new ScheduledTasks_Controller();
 	$controller->action_autotask();
 }

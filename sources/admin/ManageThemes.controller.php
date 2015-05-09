@@ -327,7 +327,7 @@ class ManageThemes_Controller extends Action_Controller
 	 * This function lists the available themes and provides an interface
 	 * to reset the paths of all the installed themes.
 	 *
-	 * @uses sub template list_themes, tempalte ManageThemes
+	 * @uses sub template list_themes, template ManageThemes
 	 */
 	public function action_list()
 	{
@@ -878,7 +878,7 @@ class ManageThemes_Controller extends Action_Controller
 			return;
 		}
 
-		// Even if you are John Smith, you still neeed a ticket
+		// Even if you are John Smith, you still need a ticket
 		if (!validateToken('admin-tr', 'request', true, false))
 		{
 			loadLanguage('Errors');
@@ -1295,7 +1295,7 @@ class ManageThemes_Controller extends Action_Controller
 	/**
 	 * Install a theme from a directory on the server
 	 *
-	 * - Expects the directroy is properly loaded with theme files
+	 * - Expects the directory is properly loaded with theme files
 	 */
 	public function installFromDir()
 	{
@@ -2031,7 +2031,7 @@ class ManageThemes_Controller extends Action_Controller
 		if (!file_exists($this->theme_dir . '/index.template.php') && !file_exists($this->theme_dir . '/css/index.css'))
 			Errors::instance()->fatal_lang_error('theme_edit_missing', false);
 
-		// Get the filename from the approriate spot
+		// Get the filename from the appropriate spot
 		$filename = isset($this->_req->post->save) ? $this->_req->getPost('filename', 'strval', '') : $this->_req->getQuery('filename', 'strval', '');
 
 		// You're editing a file: we have extra-checks coming up first.

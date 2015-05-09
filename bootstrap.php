@@ -24,7 +24,7 @@ if (defined('ELK'))
 define('ELK', 'SSI');
 
 // Shortcut for the browser cache stale
-define('CACHE_STALE', '?102');
+define('CACHE_STALE', '?R11');
 
 // We're going to want a few globals... these are all set later.
 global $time_start, $maintenance, $msubject, $mmessage, $mbname, $language;
@@ -93,13 +93,16 @@ Elk_Autoloader::getInstance()->setupAutoloader(array(SOURCEDIR, SUBSDIR, CONTROL
 
 /**
  * Set this to one of three values depending on what you want to happen in the case of a fatal error.
+ *
  *  - false: Default, will just load the error sub template and die - not putting any theme layers around it.
- *  - true: Will load the error sub template AND put the template layers around it (Not useful if on total custom pages).
- *  - string: Name of a callback function to call in the event of an error to allow you to define your own methods. Will die after function returns.
+ *  - true: Will load the error sub template AND put the template layers around it (Not useful if on total custom
+ * pages).
+ *  - string: Name of a callback function to call in the event of an error to allow you to define your own methods.
+ * Will die after function returns.
  */
 $ssi_on_error_method = false;
 
-// Don't do john didley if the forum's been shut down competely.
+// Don't do john didley if the forum's been shut down completely.
 if ($maintenance == 2 && (!isset($ssi_maintenance_off) || $ssi_maintenance_off !== true))
 	die($mmessage);
 

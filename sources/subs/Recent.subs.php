@@ -1,7 +1,7 @@
 <?php
 
 /**
- * This file contains a couple of functions for the latests posts on forum.
+ * This file contains a couple of functions for the latest posts on forum.
  *
  * @name      ElkArte Forum
  * @copyright ElkArte Forum contributors
@@ -32,7 +32,7 @@ function getLastPosts($latestPostOptions)
 
 	$db = database();
 
-	// Find all the posts. Newer ones will have higher IDs. (assuming the last 20 * number are accessable...)
+	// Find all the posts. Newer ones will have higher IDs. (assuming the last 20 * number are accessible...)
 	// @todo SLOW This query is now slow, NEEDS to be fixed.  Maybe break into two?
 	$request = $db->query('substring', '
 		SELECT

@@ -92,7 +92,7 @@ function reencodeImage($fileName, $preferred_format = 0)
 }
 
 /**
- * Searches through the file to see if there's potentialy harmful non-binary content.
+ * Searches through the file to see if there's potentially harmful non-binary content.
  *
  * - if extensiveCheck is true, searches for asp/php short tags as well.
  *
@@ -322,7 +322,7 @@ function resizeImage($src_img, $destName, $src_width, $src_height, $max_width, $
 			$dest_width = empty($max_width) ? $src_width : $max_width;
 			$dest_height = empty($max_height) ? $src_height : $max_height;
 
-			// Create a new image in our prefered format and resize it if needed
+			// Create a new image in our preferred format and resize it if needed
 			$imagick->setImageFormat($default_formats[$preferred_format]);
 			$imagick->resizeImage($dest_width, $dest_height, Imagick::FILTER_LANCZOS, 1, true);
 
@@ -478,10 +478,10 @@ function imagecopyresamplebicubic($dst_img, $src_img, $dst_x, $dst_y, $src_x, $s
 if (!function_exists('imagecreatefrombmp'))
 {
 	/**
-	 * It is set only if it doesn't already exist (for forwards compatiblity.)
+	 * It is set only if it doesn't already exist (for forwards compatibility.)
 	 *
 	 * - It only supports uncompressed bitmaps.
-	 * - It only supports standard windows bitmaps (no os/2 varients)
+	 * - It only supports standard windows bitmaps (no os/2 variants)
 	 * - Returns an image identifier representing the bitmap image
 	 * obtained from the given filename.
 	 *

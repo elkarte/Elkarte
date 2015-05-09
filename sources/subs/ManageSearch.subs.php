@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Support functions for setting up the search features and creating search indexs
+ * Support functions for setting up the search features and creating search index's
  *
  * @name      ElkArte Forum
  * @copyright ElkArte Forum contributors
@@ -88,7 +88,7 @@ function createSphinxConfig()
 {
 	global $db_server, $db_name, $db_user, $db_passwd, $db_prefix, $modSettings;
 
-	// Set up to ouput a file to the users browser
+	// Set up to output a file to the users browser
 	while (ob_get_level() > 0)
 		@ob_end_clean();
 

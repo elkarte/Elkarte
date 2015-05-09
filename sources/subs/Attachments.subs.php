@@ -224,7 +224,7 @@ function automanage_attachments_create_directory($updir)
  * Determines the current base directory and attachment directory
  *
  * What it does:
- * - Increments the above directory to the next availble slot
+ * - Increments the above directory to the next available slot
  * - Uses automanage_attachments_create_directory to create the incremental directory
  *
  * @package Attachments
@@ -362,7 +362,7 @@ function processAttachments($id_msg = null)
 
 	$context['attach_dir'] = $modSettings['attachmentUploadDir'][$modSettings['currentAttachmentUploadDir']];
 
-	// Is the attachments folder actualy there?
+	// Is the attachments folder actually there?
 	if (!empty($context['dir_creation_error']))
 		$initial_error = $context['dir_creation_error'];
 	elseif (!is_dir($context['attach_dir']))
@@ -498,7 +498,7 @@ function processAttachments($id_msg = null)
 				unlink($_FILES['attachment']['tmp_name'][$n]);
 		}
 
-		// If there were no errors to this pont, we apply some addtional checks
+		// If there were no errors to this pont, we apply some additional checks
 		if (empty($_SESSION['temp_attachments'][$attachID]['errors']))
 			attachmentChecks($attachID);
 
@@ -796,7 +796,7 @@ function attachmentChecks($attachID)
  * Create an attachment, with the given array of parameters.
  *
  * What it does:
- * - Adds any addtional or missing parameters to $attachmentOptions.
+ * - Adds any additional or missing parameters to $attachmentOptions.
  * - Renames the temporary file.
  * - Creates a thumbnail if the file is an image and the option enabled.
  *

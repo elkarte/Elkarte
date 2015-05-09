@@ -288,7 +288,7 @@ class ManageMail_Controller extends Action_Controller
 		// Prepare the config form
 		Settings_Form::prepare_db($config_vars);
 
-		// Build a litte JS so the birthday mail can be seen
+		// Build a little JS so the birthday mail can be seen
 		$javascript = '
 			var bDay = {';
 

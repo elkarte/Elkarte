@@ -619,7 +619,7 @@ function registerMember(&$regOptions, $error_context = 'register')
 	{
 		require_once(SUBSDIR . '/Membergroups.subs.php');
 
-		// Make sure the id_group will be valid, if this is an administator.
+		// Make sure the id_group will be valid, if this is an administrator.
 		$regOptions['register_vars']['id_group'] = $regOptions['memberGroup'] == 1 && !allowedTo('admin_forum') ? 0 : $regOptions['memberGroup'];
 
 		// Check if this group is assignable.
@@ -1194,7 +1194,7 @@ function list_getNumMembers($where, $where_params = array())
 }
 
 /**
- * Find potential duplicate registation members based on the same IP address
+ * Find potential duplicate registration members based on the same IP address
  *
  * @package Members
  * @param mixed[] $members
@@ -1538,7 +1538,7 @@ function prepareMembersByQuery($query, &$query_params, $only_active = true)
 		else
 			$query_where = $allowed_conditions[$query];
 	}
-	// Somthing else, be careful ;)
+	// Something else, be careful ;)
 	else
 		$query_where = $query;
 
@@ -1751,7 +1751,7 @@ function getMemberByName($name, $flexible = false)
 /**
  * Finds a member from the database using supplied string as real_name
  *
- * - Optionaly will only search/find the member in a buddy list
+ * - Optionally will only search/find the member in a buddy list
  *
  * @package Members
  * @param string $search string to search real_name for like finds
@@ -1805,7 +1805,7 @@ function getMember($search, $buddies = array())
  * @package Members
  * @param mixed[] $conditions associative array holding the conditions for the WHERE clause of the query.
  * Possible keys:
- * - activated_status (boolen) must be present
+ * - activated_status (boolean) must be present
  * - time_before (integer)
  * - members (array of integers)
  * - member_greater (integer) a member id, it will be used to filter only members with id_member greater than this
@@ -1897,7 +1897,7 @@ function retrieveMemberData($conditions)
  * @package Members
  * @param mixed[] $conditions associative array holding the conditions for the WHERE clause of the query.
  * Possible keys:
- * - activated_status (boolen) must be present
+ * - activated_status (boolean) must be present
  * - time_before (integer)
  * - members (array of integers)
  */
@@ -1941,7 +1941,7 @@ function approveMembers($conditions)
  * @param mixed[] $conditions associative array holding the conditions for the  WHERE clause of the query.
  * Possible keys:
  * - selected_member (integer) must be present
- * - activated_status (boolen) must be present
+ * - activated_status (boolean) must be present
  * - validation_code (string) must be present
  * - members (array of integers)
  * - time_before (integer)

@@ -381,7 +381,7 @@ class PersonalMessage_Controller extends Action_Controller
 			{
 				list($display_pms, $posters) = loadConversationList($lastData['head'], $recipients, $context['folder']);
 
-				// Conversation list may expose additonal PM's being displayed
+				// Conversation list may expose additional PM's being displayed
 				$all_pms = array_unique(array_merge($pms, $display_pms));
 
 				// See if any of these 'listing' PM's are in a conversation thread that has unread entries
@@ -772,7 +772,7 @@ class PersonalMessage_Controller extends Action_Controller
 						unset($namedRecipientList[$recipientType][$index]);
 				}
 
-				// Now see if we can resolove the entered name to an actual user
+				// Now see if we can resolve the entered name to an actual user
 				if (!empty($namedRecipientList[$recipientType]))
 				{
 					$foundMembers = findMembers($namedRecipientList[$recipientType]);
@@ -1713,7 +1713,7 @@ class PersonalMessage_Controller extends Action_Controller
 			}
 		}
 
-		// Set up the search criteia, type, what, age, etc
+		// Set up the search criteria, type, what, age, etc
 		if (isset($_REQUEST['search']))
 		{
 			$context['search_params']['search'] = un_htmlspecialchars($_REQUEST['search']);
@@ -1846,7 +1846,7 @@ class PersonalMessage_Controller extends Action_Controller
 			$userQuery = '';
 		else
 		{
-			// Set up so we can seach by user name, wildcards, like, etc
+			// Set up so we can search by user name, wildcards, like, etc
 			$userString = strtr(Util::htmlspecialchars($search_params['userspec'], ENT_QUOTES), array('&quot;' => '"'));
 			$userString = strtr($userString, array('%' => '\%', '_' => '\_', '*' => '%', '?' => '_'));
 
@@ -2085,7 +2085,7 @@ class PersonalMessage_Controller extends Action_Controller
 		// Get all the matching message ids, senders and head pm nodes
 		list($foundMessages, $posters, $head_pms) = loadPMSearchMessages($userQuery, $labelQuery, $timeQuery, $searchQuery, $searchq_parameters, $search_params);
 
-		// Find the real head pm when in converstaion view
+		// Find the real head pm when in conversation view
 		if ($context['display_mode'] == 2 && !empty($head_pms))
 			$real_pm_ids = loadPMSearchHeads($head_pms);
 
