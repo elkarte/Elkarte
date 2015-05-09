@@ -14,8 +14,8 @@ if (!defined('ELK'))
 	die('No access...');
 
 /**
- * Elkarte autoloader
  *
+ * ElkArte autoloader
  * What it does:
  * - Automatically finds and includes the files for a given class name
  * - Follows controller naming conventions to find the right file to load
@@ -24,70 +24,67 @@ class Elk_Autoloader
 {
 	/**
 	 * Instance manager
-	 *
 	 * @var Elk_Autoloader
 	 */
 	private static $_instance;
 
 	/**
-	* Stores whether the autoloader has been initalized
-	*
-	* @var boolean
-	*/
+	 * Stores whether the autoloader has been initialized
+	 * @var boolean
+	 */
 	protected $_setup = false;
 
 	/**
-	* Stores whether the autoloader verifies file existance or not
-	*
-	* @var boolean
-	*/
+	 * Stores whether the autoloader verifies file existence or not
+	 * @var boolean
+	 */
 	protected $_strict = false;
 
 	/**
-	* Path to directory containing elkarte
-	*
-	* @var string
-	*/
+	 * Path to directory containing ElkArte
+	 * @var string
+	 */
 	protected $_dir = '.';
 
 	/**
 	 * Holds the name of the exploded class name
-	 *
 	 * @var array
 	 */
 	protected $_name;
 
 	/**
-	 * Holds the class name ahdead of any _ if any
-	 *
+	 * Holds the class name ahead of any _ if any
 	 * @var string
 	 */
 	protected $_surname;
 
 	/**
 	 * Holds the class name after the first _ if any
-	 *
 	 * @var string
 	 */
 	protected $_givenname;
 
 	/**
+	 * The current namespace
+	 * @var string|false
+	 */
+	protected $_current_namespace;
+
+	/**
 	 * Holds the name full file name of the file to load (require)
-	 *
 	 * @var string
 	 */
 	protected $_file_name = false;
 
 	/**
 	 * Holds the pairs namespace => paths
-	 *
-	 * @var string[]
+	 * @var array
 	 */
 	protected $_paths;
 
 	/**
-	* Constructor, not used, instead use getInstance()
-	*/
+	 * Constructor, not used, instead use getInstance()
+	 */
 	protected function __construct()
 	{
 	}
@@ -106,6 +103,9 @@ class Elk_Autoloader
 
 	/**
 	 * Registers new paths for the autoloader
+	 *
+	 * @param string $dir
+	 * @param string|null $namespace
 	 */
 	public function register($dir, $namespace = null)
 	{
@@ -116,16 +116,21 @@ class Elk_Autoloader
 			$this->_paths[$namespace] = array();
 
 		$this->_paths[$namespace][] = $dir;
-		array_unique($this->_paths[$namespace]);
+		$this->_paths[$namespace] = array_unique($this->_paths[$namespace]);
 
 		$this->_buildPaths((array) $dir);
 	}
 
+	/**
+	 * Build the directory path names to search for files to autoload
+	 *
+	 * @param array $dir
+	 */
 	protected function _buildPaths($dir)
 	{
 		// Build the paths where we are going to look for files
 		foreach ($dir as $include)
-			$this->_dir .= $include .  PATH_SEPARATOR;
+			$this->_dir .= $include . PATH_SEPARATOR;
 
 		// Initialize
 		$this->_setupAutoloader();
@@ -155,8 +160,9 @@ class Elk_Autoloader
 		if (!$this->_string_to_class($class))
 			return false;
 
+		// If passed a namespace, /name/space/class
 		if ($this->_current_namespace !== false)
-			$this->_handle_nacespaces();
+			$this->_handle_namespaces();
 
 		// Basic cases like Util.class, Action.class, Request.class
 		if ($this->_file_name === false)
@@ -170,6 +176,7 @@ class Elk_Autoloader
 
 		// Start fresh for the next one
 		$this->_file_name = false;
+
 		// Well do we have something to do?
 		if (!empty($file))
 		{
@@ -188,10 +195,15 @@ class Elk_Autoloader
 	private function _string_to_class($class)
 	{
 		$namespaces = explode('\\', ltrim($class, '\\'));
-		if (count($namespaces) > 1)
+		if (isset($namespaces[1]))
 		{
 			$class = array_pop($namespaces);
-			$this->_current_namespace = '\\' . implode('\\', $namespaces);
+
+			$this->_current_namespace = strtr(implode('\\', $namespaces), '\\', DIRECTORY_SEPARATOR);
+
+			// Add the namespace to the known paths
+			$this->_paths[$this->_current_namespace][] = str_replace('ElkArte', BOARDDIR, $this->_current_namespace);
+			$this->_paths[$this->_current_namespace] = array_unique($this->_paths[$this->_current_namespace]);
 		}
 		else
 			$this->_current_namespace = false;
@@ -210,7 +222,7 @@ class Elk_Autoloader
 	/**
 	 * This handles any case where a namespace is present.
 	 */
-	protected function _handle_nacespaces()
+	protected function _handle_namespaces()
 	{
 		if (isset($this->_paths[$this->_current_namespace]))
 		{
@@ -277,9 +289,7 @@ class Elk_Autoloader
 				$this->_file_name = $this->_givenname . '.controller.php';
 
 				// Try source, controller, admin, then addons
-				if (stream_resolve_include_path($this->_file_name))
-					$this->_file_name = $this->_file_name;
-				else
+				if (!stream_resolve_include_path($this->_file_name))
 					$this->_file_name = '';
 				break;
 			// Some_Search => SearchAPI-Some.class
