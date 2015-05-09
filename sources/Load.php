@@ -1815,7 +1815,7 @@ function loadEssentialThemeData()
  * - loads a template file with the name template_name from the current, default, or base theme.
  * - detects a wrong default theme directory and tries to work around it.
  * - can be used to only load style sheets by using false as the template name
- *   loading of style sheets with this function is @deprecated, use loadCSSFile instead
+ *   loading of style sheets with this function is deprecated, use loadCSSFile instead
  * - if $settings['template_dirs'] is empty, it delays the loading of the template
  *
  * @uses the requireTemplate() function to actually load the file.
