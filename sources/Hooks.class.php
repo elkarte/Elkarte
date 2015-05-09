@@ -1,7 +1,8 @@
 <?php
 
 /**
- * This file has all the main functions in it that relate to, well, everything.
+ * This file has all the main functions in it that relate to adding
+ * removing, etc on hooks.
  *
  * @name      ElkArte Forum
  * @copyright ElkArte Forum contributors
@@ -20,6 +21,9 @@
 if (!defined('ELK'))
 	die('No access...');
 
+/**
+ * Class Hooks
+ */
 class Hooks
 {
 	/**
@@ -28,8 +32,22 @@ class Hooks
 	 */
 	private static $_instance = null;
 
+	/**
+	 * Holds our standard path replacement array
+	 * @var array
+	 */
 	protected $_path_replacements = array();
+
+	/**
+	 * Holds the database instance
+	 * @var null|database
+	 */
 	protected $_db = null;
+
+	/**
+	 * If we are in debug mode or not
+	 * @var bool|null
+	 */
 	protected $_debug = null;
 
 	/**
