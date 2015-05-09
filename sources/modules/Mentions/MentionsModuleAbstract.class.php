@@ -17,15 +17,6 @@ if (!defined('ELK'))
 abstract class Mentions_Module_Abstract
 {
 	/**
-	 * Public function called by the even manager to register the various
-	 * mentions modules.
-	 * Calls registerHooks passing the appropriate action.
-	 *
-	 * @param \Event_Manager $eventsManager
-	 */
-	abstract public static function hooks(\Event_Manager $eventsManager);
-
-	/**
 	 * Based on the $action returns the enabled mention types to register to the
 	 * event manager.
 	 *

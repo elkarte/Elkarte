@@ -2059,7 +2059,7 @@ function updatePostGroupStats($members = null, $parameter2 = null)
 
 /**
  * Get the ids of the groups that are unassignable
- * 
+ *
  * @param boolean $ignore_protected To ignore protected groups
  * @return int[]
  */

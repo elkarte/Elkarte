@@ -49,7 +49,7 @@ class TestMembers extends PHPUnit_Framework_TestCase
 
 	/**
 	 * Cleanup data we no longer need at the end of the tests in this class.
-	 * 
+	 *
 	 * tearDown() is run automatically by the testing framework after each test method.
 	 */
 	public function tearDown()

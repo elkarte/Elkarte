@@ -21,7 +21,7 @@ class Rlikemsg_Mention extends Mention_BoardAccess_Abstract
 	/**
 	 * {@inheritdoc }
 	 */
-	protected $_type = 'rlikemsg';
+	protected static $_type = 'rlikemsg';
 
 	/**
 	 * {@inheritdoc }

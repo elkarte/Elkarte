@@ -1821,6 +1821,42 @@ class InstallInstructions_install_1_1
 		);
 	}
 
+	public function insert_notifications_pref()
+	{
+		return $this->db->insert('ignore',
+			'{db_prefix}notifications_pref',
+			array('id_member' => 'int', 'notification_level' => 'int', 'mention_type' => 'string-12'),
+			array(
+				array(
+					0,
+					1,
+					'buddy'
+				),
+				array(
+					0,
+					1,
+					'likemsg'
+				),
+				array(
+					0,
+					1,
+					'quotedmem'
+				),
+				array(
+					0,
+					1,
+					'rlikemsg'
+				),
+				array(
+					0,
+					1,
+					'mentionmem'
+				),
+			),
+			array('id_server')
+		);
+	}
+
 	public function table_openid_assoc()
 	{
 		return $this->table->db_create_table('{db_prefix}openid_assoc',
@@ -2413,6 +2449,7 @@ class InstallInstructions_install_1_1
 				array('badbehavior_ip_wl_desc', 'a:3:{i:2;s:18:"RFC 1918 addresses";i:5;s:18:"RFC 1918 addresses";i:6;s:18:"RFC 1918 addresses";}'),
 				array('badbehavior_url_wl', 'a:1:{i:0;s:18:"/subscriptions.php";}'),
 				array('badbehavior_url_wl_desc', 'a:1:{i:0;s:15:"Payment Gateway";}'),
+				array('notification_methods', 'a:4:{s:5:"buddy";a:4:{s:12:"notification";s:1:"1";s:5:"email";s:1:"1";s:11:"email_daily";s:1:"1";s:12:"email_weekly";s:1:"1";}s:7:"likemsg";a:1:{s:12:"notification";s:1:"1";}s:10:"mentionmem";a:4:{s:12:"notification";s:1:"1";s:5:"email";s:1:"1";s:11:"email_daily";s:1:"1";s:12:"email_weekly";s:1:"1";}s:9:"quotedmem";a:4:{s:12:"notification";s:1:"1";s:5:"email";s:1:"1";s:11:"email_daily";s:1:"1";s:12:"email_weekly";s:1:"1";}}'),
 			),
 			array('variable')
 		);

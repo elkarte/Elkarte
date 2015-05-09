@@ -327,7 +327,7 @@ class ProfileOptions_Controller extends Action_Controller
 				'email_address', 'hide_email', 'show_online', 'hr',
 				'passwrd1', 'passwrd2', 'hr',
 				'secret_question', 'secret_answer', 'hr',
-				'enable_otp', 'otp_secret', 'hr' 
+				'enable_otp', 'otp_secret', 'hr'
 			),
 			'account'
 		);
@@ -337,7 +337,7 @@ class ProfileOptions_Controller extends Action_Controller
 			if (secret)
 			{
 				var qrcode = new QRCode("qrcode", {
-					text: "otpauth://totp/' . $context['forum_name'] . '?secret=" + secret, 
+					text: "otpauth://totp/' . $context['forum_name'] . '?secret=" + secret,
 					width: 80,
 					height: 80,
 					colorDark : "#000000",
@@ -362,7 +362,7 @@ class ProfileOptions_Controller extends Action_Controller
 					qr.removeChild(qr.firstChild);
 				}
 				var qrcode = new QRCode("qrcode", {
-				text: "otpauth://totp/' . $context['forum_name'] . '?secret=" + text, 
+				text: "otpauth://totp/' . $context['forum_name'] . '?secret=" + text,
 				width: 80,
 				height: 80,
 				colorDark : "#000000",
@@ -557,6 +557,9 @@ class ProfileOptions_Controller extends Action_Controller
 		// Going to need this for the list.
 		require_once(SUBSDIR . '/Boards.subs.php');
 		require_once(SUBSDIR . '/Topic.subs.php');
+		require_once(SUBSDIR . '/Profile.subs.php');
+
+		$context['mention_types'] = getMemberNotificationsProfile($this->_memID);
 
 		// Fine, start with the board list.
 		$listOptions = array(

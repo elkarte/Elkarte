@@ -1213,6 +1213,8 @@ function saveProfileChanges(&$profile_vars, $memID)
 		'ignore_boards',
 	);
 
+	call_integration_hook('integrate_save_profile_changes', array(&$profile_bools, &$profile_ints, &$profile_floats, &$profile_strings));
+
 	if (isset($_POST['sa']) && $_POST['sa'] == 'ignoreboards' && empty($_POST['ignore_brd']))
 		$_POST['ignore_brd'] = array();
 
@@ -1372,6 +1374,21 @@ function makeThemeChanges($memID, $id_theme)
 function makeNotificationChanges($memID)
 {
 	$db = database();
+
+	if (isset($_POST['notify_submit']))
+	{
+		$to_save = array();
+		foreach (getMemberNotificationsProfile($memID) as $mention => $data)
+		{
+			if (isset($_POST['notify'][$mention]) && !empty($_POST['notify'][$mention]['status']) && isset($data['data'][$_POST['notify'][$mention]['method']]))
+			{
+				$to_save[$mention] = (int) $_POST['notify'][$mention]['method'];
+			}
+			else
+				$to_save[$mention] = 0;
+		}
+		saveUserNotificationsPreferences($memID, $to_save);
+	}
 
 	// Update the boards they are being notified on.
 	if (isset($_POST['edit_notify_boards']))
@@ -3289,4 +3306,42 @@ function getMembersInRange($ips, $memID)
 	}
 
 	return $members_in_range;
+}
+
+/**
+ * Return a detailed situation of the notification methods for a certain member.
+ * Used in the profile page to load the defaults and validate the new
+ * settings.
+ *
+ * @param int $memID the id of a member
+ */
+function getMemberNotificationsProfile($member_id)
+{
+	global $modSettings;
+
+	require_once(SUBSDIR . '/Notification.subs.php');
+	Elk_Autoloader::getInstance()->register(SUBSDIR . '/MentionType', '\\ElkArte\\sources\\subs\\MentionType');
+
+	$mention_methods = Notifications::getInstance()->getNotifiers();
+	$enabled_mentions = explode(',', $modSettings['enabled_mentions']);
+	$user_preferences = getUsersNotificationsPreferences($enabled_mentions, $member_id);
+	$mention_types = array();
+
+	foreach ($enabled_mentions as $type)
+	{
+		$type_on = false;
+		$notif = filterNotificationMethods($mention_methods, $type);
+
+		foreach ($notif as $key => $val)
+		{
+			$notif[$key] = array('id' => $val, 'enabled' => $user_preferences[$member_id][$type] === $key);
+			if ($user_preferences[$member_id][$type] > 0)
+				$type_on = true;
+		}
+
+		if (!empty($notif))
+			$mention_types[$type] = array('data' => $notif, 'enabled' => $type_on);
+	}
+
+	return $mention_types;
 }

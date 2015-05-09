@@ -852,3 +852,154 @@ function validateNotificationAccess($row, $maillist, &$email_perm = true)
 
 	return $email_perm;
 }
+
+/**
+ * Queries the database for notification preferences of a set of members.
+ *
+ * @param string[]|string $notification_types
+ * @param int[]|int $members
+ */
+function getUsersNotificationsPreferences($notification_types, $members)
+{
+	$db = database();
+
+	$notification_types = (array) $notification_types;
+	$query_members = (array) $members;
+	$query_members[] = 0;
+
+	$request = $db->query('', '
+		SELECT id_member, notification_level, mention_type
+		FROM {db_prefix}notifications_pref
+		WHERE id_member IN ({array_int:members_to})
+			AND mention_type IN ({array_string:mention_types})',
+		array(
+			'members_to' => $query_members,
+			'mention_types' => $notification_types,
+		)
+	);
+	$results = array();
+
+	while ($row = $db->fetch_assoc($request))
+	{
+		if (!isset($results[$row['id_member']]))
+			$results[$row['id_member']] = array();
+
+		$results[$row['id_member']][$row['mention_type']] = (int) $row['notification_level'];
+	}
+
+	$db->free_result($request);
+
+	$defaults = array();
+	foreach ($notification_types as $val)
+	{
+		$defaults[$val] = 0;
+	}
+	if (isset($results[0]))
+	{
+		$defaults = array_merge($defaults, $results[0]);
+	}
+
+	$preferences = array();
+	foreach ((array) $members as $member)
+	{
+		$preferences[$member] = $defaults;
+		if (isset($results[$member]))
+		$preferences[$member] = array_merge($preferences[$member], $results[$member]);
+	}
+
+	return $preferences;
+}
+
+/**
+ * Saves into the database the notification preferences of a certain member.
+ *
+ * @param int $member The member id
+ * @param int[] $notification_types The array of notifications ('type' => 'level')
+ */
+function saveUserNotificationsPreferences($member, $notification_data)
+{
+	$db = database();
+
+	// First drop the existing settings
+	$db->query('', '
+		DELETE FROM {db_prefix}notifications_pref
+		WHERE id_member = {int:member}
+			AND mention_type IN ({array_string:mention_types})',
+		array(
+			'member' => $member,
+			'mention_types' => array_keys($notification_data),
+		)
+	);
+
+	$inserts = array();
+	foreach ($notification_data as $type => $level)
+	{
+		$inserts[] = array(
+			$member,
+			$type,
+			$level,
+		);
+	}
+
+	if (empty($inserts))
+		return;
+
+	$db->insert('',
+		'{db_prefix}notifications_pref',
+		array(
+			'id_member' => 'int',
+			'mention_type' => 'string-12',
+			'notification_level' => 'int',
+		),
+		$inserts,
+		array('id_member', 'mention_type')
+	);
+}
+
+/**
+ * From the list of all possible notification methods available, only those
+ * enabled are returned.
+ *
+ * @param string[] $possible_methods The array of notifications ('type' => 'level')
+ * @param string $type The type of notification (mentionmem, likemsg, etc.)
+ */
+function filterNotificationMethods($possible_methods, $type)
+{
+	$unserialized = getConfiguredNotificationMethods($type);
+
+	if (empty($unserialized))
+		return array();
+
+	$allowed = array();
+	foreach ($possible_methods as $key => $val)
+	{
+		if (isset($unserialized[$val]))
+			$allowed[$key] = $val;
+	}
+
+	return $allowed;
+}
+
+/**
+ * Returns all the enabled methods of notification for a specific
+ * type of notification.
+ *
+ * @param string $type The type of notification (mentionmem, likemsg, etc.)
+ */
+function getConfiguredNotificationMethods($type)
+{
+	global $modSettings;
+	static $unserialized = null;
+
+	if ($unserialized === null)
+		$unserialized = unserialize($modSettings['notification_methods']);
+
+	if (isset($unserialized[$type]))
+	{
+		return $unserialized[$type];
+	}
+	else
+	{
+		return array();
+	}
+}

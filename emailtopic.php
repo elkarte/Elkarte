@@ -3,7 +3,7 @@
 
 /**
  * Handles the creating of new topics by email
- * 
+ *
  * Note the shebang #!/usr/local/bin/php -q needs to point to the installed
  * location of php, this is the typical location but yours may be different.
  *

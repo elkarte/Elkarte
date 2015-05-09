@@ -62,7 +62,7 @@ class ManageFeatures_Controller extends Action_Controller
 	 * Mentions settings form
 	 * @var Settings_Form
 	 */
-	protected $_mentionSettings;
+	protected $_notificationsSettings;
 
 	/**
 	 * Mentions settings form
@@ -82,6 +82,9 @@ class ManageFeatures_Controller extends Action_Controller
 	public function pre_dispatch()
 	{
 		$this->_req = HttpReq::instance();
+
+		// We need this in few places so it's easier to have it loaded here
+		require_once(SUBSDIR . '/ManageFeatures.subs.php');
 	}
 
 	/**
@@ -98,6 +101,7 @@ class ManageFeatures_Controller extends Action_Controller
 		// Often Helpful
 		loadLanguage('Help');
 		loadLanguage('ManageSettings');
+		loadLanguage('Mentions');
 
 		// All the actions we know about
 		$subActions = array(
@@ -130,7 +134,7 @@ class ManageFeatures_Controller extends Action_Controller
 			),
 			'mention' => array(
 				'controller' => $this,
-				'function' => 'action_mentionSettings_display',
+				'function' => 'action_notificationsSettings_display',
 				'permission' => 'admin_forum'
 			),
 			'sig' => array(
@@ -394,7 +398,7 @@ class ManageFeatures_Controller extends Action_Controller
 	 *
 	 * - Accessed from ?action=admin;area=featuresettings;sa=mentions;
 	 */
-	public function action_mentionSettings_display()
+	public function action_notificationsSettings_display()
 	{
 		global $context, $scripturl, $modSettings;
 
@@ -402,54 +406,67 @@ class ManageFeatures_Controller extends Action_Controller
 		$this->_initMentionSettingsForm();
 
 		// Initialize it with our settings
-		$config_vars = $this->_mentionSettings->settings();
+		$config_vars = $this->_notificationsSettings->settings();
 
 		// Saving the settings?
 		if (isset($this->_req->query->save))
 		{
 			checkSession();
 
-			$enabled_mentions = !empty($modSettings['enabled_mentions']) ? explode(',', $modSettings['enabled_mentions']) : array();
-
-			if ((!isset($this->_req->post->mentions_dont_notify_rlike) && !empty($modSettings['mentions_dont_notify_rlike'])) || (isset($this->_req->post->mentions_dont_notify_rlike) && $this->_req->post->mentions_dont_notify_rlike != $modSettings['mentions_dont_notify_rlike']))
+			if (empty($this->_req->post->notifications))
+				$notification_methods = serialize(array());
+			else
 			{
-				require_once(SUBSDIR . '/Mentions.subs.php');
-				toggleMentionsVisibility('rlike', empty($this->_req->post->mentions_dont_notify_rlike));
+				$notification_methods = serialize($this->_req->post->notifications);
 			}
 
-			if ((!isset($this->_req->post->mentions_buddy) && !empty($modSettings['mentions_buddy'])) || (isset($this->_req->post->mentions_buddy) && $this->_req->post->mentions_buddy != $modSettings['mentions_buddy']))
-			{
-				require_once(SUBSDIR . '/Mentions.subs.php');
-				toggleMentionsVisibility('buddy', !empty($this->_req->post->mentions_buddy));
+			require_once(SUBSDIR . '/Mentions.subs.php');
+			$enabled_mentions = array();
+			$current_settings = unserialize($modSettings['notification_methods']);
 
-				if (!empty($this->_req->post->mentions_buddy))
-					$enabled_mentions[] = 'buddy';
-				else
-					$enabled_mentions = array_diff($enabled_mentions, array('buddy'));
+			// Fist hide what was visible
+			$modules_toggle = array('enable' => array(), 'disable' => array());
+			foreach ($current_settings as $type => $val)
+			{
+				if (!isset($this->_req->post->notifications[$type]))
+				{
+					toggleMentionsVisibility($type, 0);
+					$modules_toggle['disable'][] = $type;
+				}
 			}
 
-			// If mentions are enabled, the related task should be enabled as well, otherwise should be disabled.
+			// Then make visible what was hidden, but only if there is anything
+			if (!empty($this->_req->post->notifications))
+			{
+				foreach ($this->_req->post->notifications as $type => $val)
+				{
+					if (!isset($current_settings[$type]))
+					{
+						toggleMentionsVisibility($type, 1);
+						$modules_toggle['enable'][] = $type;
+					}
+				}
+
+				$enabled_mentions = array_keys($this->_req->post->notifications);
+			}
+
+			// Let's just keep it active, there are too many reasons it should be.
 			require_once(SUBSDIR . '/ScheduledTasks.subs.php');
-			toggleTaskStatusByName('user_access_mentions', !empty($this->_req->post->mentions_enabled));
+			toggleTaskStatusByName('user_access_mentions', 1);
 
-			if (!empty($this->_req->post->mentions_dont_notify_rlike))
-				$enabled_mentions = array_diff($enabled_mentions, array('rlikemsg'));
-			else
-				$enabled_mentions[] = 'rlikemsg';
+			foreach ($modules_toggle as $action => $toggles)
+			{
+				if (!empty($toggles))
+				{
+					$modules = getMentionsModules($toggles);
+					$function = $action . 'Modules';
 
-			$modules = array('post', 'display');
-			if (!empty($this->_req->post->mentions_enabled))
-			{
-				enableModules('mentions', $modules);
-				$enabled_mentions[] = 'mentionmem';
-			}
-			else
-			{
-				disableModules('mentions', $modules);
-				$enabled_mentions = array_diff($enabled_mentions, array('mentionmem'));
+					foreach ($modules as $key => $val)
+						$function($key, $val);
+				}
 			}
 
-			updateSettings(array('enabled_mentions' => implode(',', array_unique($enabled_mentions))));
+			updateSettings(array('enabled_mentions' => implode(',', array_unique($enabled_mentions)), 'notification_methods' => $notification_methods));
 			Settings_Form::save_db($config_vars, $this->_req->post);
 			redirectexit('action=admin;area=featuresettings;sa=mention');
 		}
@@ -469,16 +486,16 @@ class ManageFeatures_Controller extends Action_Controller
 		loadLanguage('Mentions');
 
 		// Instantiate the form
-		$this->_mentionSettings = new Settings_Form();
+		$this->_notificationsSettings = new Settings_Form();
 
 		// Initialize it with our settings
-		$config_vars = $this->_mentionSettings();
+		$config_vars = $this->_notificationsSettings();
 
 		// Some context stuff
 		$context['page_title'] = $txt['mentions_settings'];
 		$context['sub_template'] = 'show_settings';
 
-		return $this->_mentionSettings->settings($config_vars);
+		return $this->_notificationsSettings->settings($config_vars);
 	}
 
 	/**
@@ -515,7 +532,6 @@ class ManageFeatures_Controller extends Action_Controller
 			// Security!
 			checkSession('get');
 
-			require_once(SUBSDIR . '/ManageFeatures.subs.php');
 			$sig_start = time();
 
 			// This is horrid - but I suppose some people will want the option to do it.
@@ -669,8 +685,6 @@ class ManageFeatures_Controller extends Action_Controller
 		}
 
 		createToken('admin-scp');
-
-		require_once(SUBSDIR . '/ManageFeatures.subs.php');
 
 		// Create a listing for all our standard fields
 		$listOptions = array(
@@ -896,7 +910,6 @@ class ManageFeatures_Controller extends Action_Controller
 	{
 		global $txt, $scripturl, $context;
 
-		require_once(SUBSDIR . '/ManageFeatures.subs.php');
 		loadTemplate('ManageFeatures');
 
 		// Sort out the context!
@@ -1431,15 +1444,37 @@ class ManageFeatures_Controller extends Action_Controller
 	/**
 	 * Return mentions settings.
 	 */
-	private function _mentionSettings()
+	private function _notificationsSettings()
 	{
+		global $txt, $modSettings;
+
+		loadLanguage('Profile');
+
 		// The mentions settings
 		$config_vars = array(
 			array('title', 'mentions_settings'),
 				array('check', 'mentions_enabled'),
-				array('check', 'mentions_buddy'),
-				array('check', 'mentions_dont_notify_rlike'),
 		);
+
+		$notification_methods = Notifications::getInstance()->getNotifiers();
+		$notification_types = getNotificationTypes();
+		$current_settings = unserialize($modSettings['notification_methods']);
+
+		foreach ($notification_types as $title)
+		{
+			$config_vars[] = array('title', 'setting_' . $title);
+
+			foreach ($notification_methods as $method)
+			{
+				if ($method === 'notification')
+					$text_label = $txt['setting_notify_enable_this'];
+				else
+					$text_label = $txt['notify_' . $method];
+
+				$config_vars[] = array('check', 'notifications[' . $title . '][' . $method . ']', 'text_label' => $text_label);
+				$modSettings['notifications[' . $title . '][' . $method . ']'] = !empty($current_settings[$title][$method]);
+			}
+		}
 
 		call_integration_hook('integrate_modify_mention_settings', array(&$config_vars));
 
@@ -1451,7 +1486,7 @@ class ManageFeatures_Controller extends Action_Controller
 	 */
 	public function mentionSettings_search()
 	{
-		return $this->_mentionSettings();
+		return $this->_notificationsSettings();
 	}
 
 	/**

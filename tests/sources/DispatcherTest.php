@@ -2,7 +2,7 @@
 
 /**
  * TestCase class for dispatching.
- * 
+ *
  * The few tests here test that for the actions known to us,
  * things can be found, and all expected methods exist.
  * Potentially useful during refactoring, as it will fail on us and

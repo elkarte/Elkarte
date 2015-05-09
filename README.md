@@ -6,7 +6,7 @@ ElkArte is a modern, free, powerful community building forum software. It is com
 
 Initially based on the well known Simple Machines Forum (SMF), it began by an overall of the code in order to modernise, implement new features and make a forum software be relevant in a time of unprecedented social interaction. It has grown to become a modern and feature rich forum package to meet the demands of today's forum user.
 
-Enjoy the benefits of enthusiasts from around the world who spend time making ElkArte what it is today. 
+Enjoy the benefits of enthusiasts from around the world who spend time making ElkArte what it is today.
 
 Test ElkArte yourself by [visiting ElkArte.net](http://www.elkarte.net).
 
@@ -41,7 +41,7 @@ Contributions to documentation are licensed under [CC-by-SA 3](http://creativeco
 
 On the client side, ElkArte will run & look good in just about any modern browser.  Using IE?, well we support that too! You'll want IE8 or greater but some visual enhancements will not be present with IE versions < IE9
 
-We've had a responsive theme from the start, so your forum will look great on your smartphone and tablet as well. 
+We've had a responsive theme from the start, so your forum will look great on your smartphone and tablet as well.
 
 ## Setting up an ElkArte Forum:
 
@@ -78,7 +78,7 @@ Browse the collections of Themes and Addons created by our [awesome community](h
 Please see our [How to contribute](https://github.com/elkarte/Elkarte/blob/master/CONTRIBUTING.md) section for more information on how to contribute to the ElkArte Project.
 
 ## Class / Method / Function documentation
-ElkArte utilizes inline docblocks to provide descriptions for all of its classes, methods and functions.  This [API Documentation](http://elkarte.github.io/Doc/) is available online for viewing and searching.   
+ElkArte utilizes inline docblocks to provide descriptions for all of its classes, methods and functions.  This [API Documentation](http://elkarte.github.io/Doc/) is available online for viewing and searching.
 
 ## Site and IRC
 

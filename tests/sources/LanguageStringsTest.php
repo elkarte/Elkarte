@@ -7,7 +7,7 @@ class TestLanguageStrings extends PHPUnit_Framework_TestCase
 {
 	/**
 	 * Prepare what is necessary to use in these tests.
-	 * 
+	 *
 	 * setUp() is run automatically by the testing framework before each test method.
 	 */
 	public function setUp()

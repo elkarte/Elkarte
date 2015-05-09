@@ -21,7 +21,7 @@ class Buddy_Mention extends Mention_Message_Abstract
 	/**
 	 * {@inheritdoc }
 	 */
-	protected $_type = 'buddy';
+	protected static $_type = 'buddy';
 
 	/**
 	 * {@inheritdoc }
@@ -43,21 +43,12 @@ class Buddy_Mention extends Mention_Message_Abstract
 	/**
 	 * {@inheritdoc }
 	 */
-	public function getNotificationBody($frequency, $members)
+	public function getNotificationBody($lang_data, $members)
 	{
-		switch ($frequency)
-		{
-			case 'email_weekly':
-			case 'email_daily':
-				$keys = array('subject' => 'notify_new_buddy_digest', 'body' => 'notify_new_buddy_snippet');
-				break;
-			case 'email':
-				$keys = array('subject' => 'notify_new_buddy_subject', 'body' => 'notify_new_buddy_body');
-				break;
-			case 'notification':
-			default:
-				return $this->_getNotificationStrings('', array('subject' => $this->_type, 'body' => $this->_type), $members, $this->_task);
-		}
+		if (empty($lang_data['subject']))
+			return $this->_getNotificationStrings('', array('subject' => static::$_type, 'body' => static::$_type), $members, $this->_task);
+		else
+			$keys = array('subject' => 'notify_new_buddy_' . $lang_data['subject'], 'body' => 'notify_new_buddy_' . $lang_data['body']);
 
 		$notifier = $this->_task->getNotifierData();
 		$replacements = array(

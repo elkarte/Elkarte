@@ -923,7 +923,7 @@ function template_show_settings()
 		{
 			$is_open = true;
 			echo '
-			<div class="windowbg2">
+			<div ', isset($context['current_subaction']) ? 'id="' . $context['current_subaction'] . '" ' : '', 'class="windowbg2">
 				<div class="content">
 					<dl class="settings">';
 		}

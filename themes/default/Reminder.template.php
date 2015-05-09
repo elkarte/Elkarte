@@ -122,7 +122,7 @@ function template_set_password()
 		echo '
 					<dt><label for="otp">', $txt['disable_otp'], '</label>: </dt>
 					<dd><input type="checkbox" id="otp" name="otp" /></dd>';
-	
+
 	echo '
 				</dl>
 				<div class="centertext">
@@ -207,7 +207,7 @@ function template_ask()
 		"password_no_match": "', $txt['registration_password_no_match'], '",
 		"password_valid": "', $txt['registration_password_valid'], '"
 	};
-	
+
 	var verificationHandle = new elkRegister("creator", ', empty($modSettings['password_strength']) ? 0 : $modSettings['password_strength'], ', regTextStrings);
 // ]]></script>';
 }

@@ -730,3 +730,31 @@ function loadAllCustomFields()
 
 	return $custom_field_titles;
 }
+
+function getNotificationTypes()
+{
+	Elk_Autoloader::getInstance()->register(SUBSDIR . '/MentionType', '\\ElkArte\\sources\\subs\\MentionType');
+
+	$glob = new GlobIterator(SUBSDIR . '/MentionType/*Mention.php', FilesystemIterator::SKIP_DOTS);
+	$types = array();
+	foreach ($glob as $file)
+	{
+		$class_name = '\\ElkArte\\sources\\subs\\MentionType\\' . preg_replace('~([^^])((?<=)[A-Z](?=[a-z]))~', '$1_$2', $file->getBasename('.php'));
+		$types[] = $class_name::getType();
+	}
+
+	return $types;
+}
+
+function getMentionsModules($enabled_mentions)
+{
+	$modules = array();
+
+	foreach ($enabled_mentions as $mention)
+	{
+		$class_name = '\\ElkArte\\sources\\subs\\MentionType\\' . ucfirst($mention) . '_Mention';
+		$modules = $class_name::getModules($modules);
+	}
+
+	return $modules;
+}
