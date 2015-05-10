@@ -32,7 +32,7 @@ abstract class Database_Abstract implements Database
 
 	/**
 	 * Number of queries run (may include queries from $_SESSION if is a redirect)
-	 * @var resource
+	 * @var int
 	 */
 	protected $_query_count = 0;
 

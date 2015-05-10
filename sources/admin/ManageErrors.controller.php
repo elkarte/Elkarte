@@ -254,7 +254,7 @@ class ManageErrors_Controller extends Action_Controller
 			'line' => $txt['line'],
 		);
 
-		$filter = null;
+		$filter = array();
 
 		// Set up the filtering...
 		if (isset($this->_req->query->value, $this->_req->query->filter) && isset($filters[$this->_req->query->filter]))
