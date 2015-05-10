@@ -53,8 +53,8 @@ class Hooks
 	/**
 	 * The class constructor, loads globals in to the class object
 	 *
-	 * @param object $db
-	 * @param boolean $debug
+	 * @param Database $db
+	 * @param Debug $debug
 	 * @param string[]|string|null $paths - additional paths to add to the replacement array
 	 */
 	private function __construct($db, $debug, $paths = null)
@@ -280,6 +280,7 @@ class Hooks
 	 *
 	 * @param string $basepath
 	 * @param string $ext
+	 *
 	 */
 	public function discoverIntegrations($basepath, $ext = '.integrate.php')
 	{
