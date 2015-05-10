@@ -740,6 +740,13 @@ class Admin_Controller extends Action_Controller
 
 	/**
 	 * This function allocates out all the search stuff.
+	 *
+	 * What it does:
+	 * - Accessed with /index.php?action=admin;area=search[;search_type=x]
+	 * - Sets up an array of applicable sub-actions (search types) and the function that goes with each
+	 * - Search type specified by "search_type" request variable (either from a
+	 * form or from the query string) Defaults to 'internal'
+	 * 	Calls the appropriate sub action based on the search_type
 	 */
 	public function action_search()
 	{
@@ -781,6 +788,14 @@ class Admin_Controller extends Action_Controller
 
 	/**
 	 * A complicated but relatively quick internal search.
+	 *
+	 * What it does:
+	 * - Can be accessed with /index.php?action=admin;sa=search;search_term=x) or
+	 * from the admin search form ("Task/Setting" option)
+	 * - Polls the controllers for their configuration settings
+	 * - Calls integrate_admin_search to allow addons to add search configs
+	 * - Loads up the "Help" language file and all of the "Manage" language files
+	 * - Loads up information about each item it found for the template
 	 */
 	public function action_search_internal()
 	{
