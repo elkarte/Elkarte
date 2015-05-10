@@ -369,7 +369,7 @@ function destroyMenu($menu_id = 'last')
  * If it is not set, then $selectedMenu['function'] is
  * simply a function to call.
  *
- * @param mixed[] $selectedMenu
+ * @param array $selectedMenu
  */
 function callMenu($selectedMenu)
 {

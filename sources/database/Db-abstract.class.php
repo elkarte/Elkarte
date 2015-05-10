@@ -219,7 +219,7 @@ abstract class Database_Abstract implements Database
 					$combined[$key] = $values[$key];
 			}
 
-			// @todo should throws an E_WARNING if count($combined) != count($keys)
+			// @todo should throw an E_WARNING if count($combined) != count($keys)
 			return $combined;
 		}
 	}

@@ -45,8 +45,8 @@ class Hooks
 	protected $_db = null;
 
 	/**
-	 * If we are in debug mode or not
-	 * @var bool|null
+	 * If holds instance of debug class
+	 * @var object|null
 	 */
 	protected $_debug = null;
 
