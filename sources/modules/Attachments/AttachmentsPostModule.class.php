@@ -232,7 +232,7 @@ class Attachments_Post_Module
 						$context['files_in_session_warning'] = $txt['attached_files_in_session'];
 
 					$context['attachments']['current'][] = array(
-						'name' => '<u>' . htmlspecialchars($attachment['name'], ENT_COMPAT, 'UTF-8') . '</u>',
+						'name' => '<span class="underline">' . htmlspecialchars($attachment['name'], ENT_COMPAT, 'UTF-8') . '</span>',
 						'size' => $attachment['size'],
 						'id' => $attachID,
 						'unchecked' => false,

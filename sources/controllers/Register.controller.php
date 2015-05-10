@@ -721,7 +721,7 @@ class Register_Controller extends Action_Controller
 			if (!isset($_GET['dl']))
 			{
 				// Shortcut for producing underlines.
-				$context['ul'] = '<u>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</u>';
+				$context['ul'] = '<span class="underline">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>;
 				Template_Layers::getInstance()->removeAll();
 				$context['sub_template'] = 'coppa_form';
 				$context['page_title'] = replaceBasicActionUrl($txt['coppa_form_title']);
