@@ -187,7 +187,7 @@ class RemoveTopic_Controller extends Action_Controller
 
 		// Didn't find some things?
 		if ($restorer->unfoundRestoreMessages())
-			Errors::instance()->fatal_lang_error('restore_not_found', false, array('<ul style="margin-top: 0px;"><li>' . implode('</li><li>', $restorer->unfoundRestoreMessages(true)) . '</li></ul>'));
+			Errors::instance()->fatal_lang_error('restore_not_found', false, array('<ul style="margin-top: 0;"><li>' . implode('</li><li>', $restorer->unfoundRestoreMessages(true)) . '</li></ul>'));
 
 		// Lets send them back somewhere that may make sense
 		if (count($actioned_messages) == 1 && empty($topics_to_restore))
