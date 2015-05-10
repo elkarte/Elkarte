@@ -528,6 +528,7 @@ class ManageMembergroups_Controller extends Action_Controller
 		global $context, $txt, $modSettings;
 
 		$current_group_id = isset($this->_req->query->group) ? (int) $this->_req->query->group : 0;
+		$current_group = array();
 
 		if (!empty($modSettings['deny_boards_access']))
 			loadLanguage('ManagePermissions');
@@ -593,6 +594,7 @@ class ManageMembergroups_Controller extends Action_Controller
 			$our_post = array_replace((array) $this->_req->post, $validator->validation_data());
 
 			// Can they really inherit from this group?
+			$inherit_type  = array();
 			if ($our_post['group_inherit'] != -2 && !allowedTo('admin_forum'))
 				$inherit_type = membergroupById($our_post['group_inherit']);
 
