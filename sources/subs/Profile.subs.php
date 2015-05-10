@@ -701,7 +701,7 @@ function loadProfileFields($force_reload = false)
 			'enabled' => empty($cur_profile['openid_uri']),
 			'size' => 20,
 			'value' => empty($cur_profile['otp_secret']) ? '' : $cur_profile['otp_secret'],
-			'postinput' => '<span class="smalltext" style="margin-left: 4ex;"><input type="button" value="' . $txt['otp_generate'] . '" onclick="generateSecret();"><div id="qrcode"></div>',
+			'postinput' => '<div style="margin-left: 4ex;display: inline-block"><input class="button_submit" type="button" value="' . $txt['otp_generate'] . '" onclick="generateSecret();"></div><div id="qrcode"></div>',
 			'permission' => 'profile_identity',
 		),
 		'personal_text' => array(
