@@ -147,7 +147,7 @@ class Xml_Controller extends Action_Controller
 
 		// You have to be allowed to do this of course
 		$validation = validateSession();
-		if ($validation !== true))
+		if ($validation === true)
 		{
 			$controller = new CoreFeatures_Controller(new Event_Manager());
 			$controller->pre_dispatch();
