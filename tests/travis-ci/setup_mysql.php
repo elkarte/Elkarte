@@ -37,7 +37,7 @@ class DbTable_MySQL_Install extends DbTable_MySQL
 	{
 		global $db_prefix;
 
-		// We are doing install, of course we want to do any remove on these
+		// We are installing, of course we want to do any remove on these
 		$this->_reservedTables = array();
 
 		foreach ($this->_reservedTables as $k => $table_name)
@@ -54,12 +54,14 @@ class DbTable_MySQL_Install extends DbTable_MySQL
 	 * Static method that allows to retrieve or create an instance of this class.
 	 *
 	 * @param object $db - A Database_MySQL object
+	 *
 	 * @return object - A DbTable_MySQL object
 	 */
 	public static function db_table($db)
 	{
 		if (is_null(self::$_tbl_inst))
 			self::$_tbl_inst = new DbTable_MySQL_Install($db);
+
 		return self::$_tbl_inst;
 	}
 }
@@ -80,6 +82,8 @@ class Elk_Testing_mysql extends Elk_Testing_Setup
 		$this->_db_user = 'root';
 		$this->_db_passwd = '';
 		$db_prefix = $this->_db_prefix = 'elkarte_';
+
+		// Start the database interface
 		Database_MySQL::initiate($this->_db_server, $this->_db_name, $this->_db_user, $this->_db_passwd, $this->_db_prefix);
 		$this->_db = Database_MySQL::db();
 		$this->_db_table = DbTable_MySQL_Install::db_table($this->_db);

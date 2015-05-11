@@ -33,15 +33,23 @@ Class Elk_Testing_Setup
 	protected $_name;
 	protected $_user;
 	protected $_passwd;
-	protected $_prefix;
+
+	// Initialized from extended class
+	protected $_boardutl;
+	protected $_db_server;
+	protected $_db_user;
+	protected $_db_passwd;
+	protected $_db_type;
+	protected $_db_name;
+	protected $_db_prefix;
+	protected $_db_table;
+	protected $_boardurl;
 
 	/**
-	 * Runs the querys defined in the install files to the db
+	 * Runs the query's defined in the install files to the db
 	 */
 	public function run_queries()
 	{
-		global $modSettings;
-
 		$exists = array();
 		foreach ($this->_queries['tables'] as $table_method)
 		{
@@ -49,7 +57,7 @@ Class Elk_Testing_Setup
 
 			// Copied from DbTable class
 			// Strip out the table name, we might not need it in some cases
-			$real_prefix = preg_match('~^("?)(.+?)\\1\\.(.*?)$~', $this->_prefix, $match) === 1 ? $match[3] : $this->_prefix;
+			$real_prefix = preg_match('~^("?)(.+?)\\1\\.(.*?)$~', $this->_db_prefix, $match) === 1 ? $match[3] : $this->_db_prefix;
 
 			// With or without the database name, the fullname looks like this.
 			$full_table_name = str_replace('{db_prefix}', $real_prefix, $table_name);
@@ -60,7 +68,7 @@ Class Elk_Testing_Setup
 				continue;
 			}
 
-			$result = $this->_install_instance->{$table_method}();
+			$this->_install_instance->{$table_method}();
 		}
 
 		foreach ($this->_queries['inserts'] as $insert_method)
@@ -72,7 +80,7 @@ Class Elk_Testing_Setup
 				continue;
 			}
 
-			$result = $this->_install_instance->{$insert_method}();
+			$this->_install_instance->{$insert_method}();
 		}
 
 		// Errors here are ignored
@@ -83,7 +91,7 @@ Class Elk_Testing_Setup
 	}
 
 	/**
-	 * Loads the querys from the supplied sql install file
+	 * Loads the query's from the supplied database install file
 	 *
 	 * @param string $sql_file
 	 */
@@ -112,23 +120,22 @@ Class Elk_Testing_Setup
 		$class_name = 'InstallInstructions_' . str_replace('-', '_', basename($sql_file, '.php'));
 		$this->_install_instance = new $class_name($db_wrapper, $db_table_wrapper);
 		$methods = get_class_methods($this->_install_instance);
-		$this->_queries['tables'] = array_filter($methods, function($method) {
+
+		$this->_queries['tables'] = array_filter($methods, function ($method) {
 			return strpos($method, 'table_') === 0;
 		});
-		$this->_queries['inserts'] = array_filter($methods, function($method) {
+
+		$this->_queries['inserts'] = array_filter($methods, function ($method) {
 			return strpos($method, 'insert_') === 0;
 		});
-		$this->_queries['others'] = array_filter($methods, function($method) {
+
+		$this->_queries['others'] = array_filter($methods, function ($method) {
 			return substr($method, 0, 2) !== '__' && strpos($method, 'insert_') !== 0 && strpos($method, 'table_') !== 0;
 		});
-
-
 	}
 
 	/**
 	 * Clear the DB for a new install
-	 *
-	 * @param string $file
 	 */
 	public function clear_tables()
 	{
@@ -154,16 +161,17 @@ Class Elk_Testing_Setup
 			'$db_user = \'root\';',
 			'$db_prefix = \'elkarte_\';',
 			'$db_passwd = \'\';',
-		),
-		array(
-			'$boardurl = \'' . $this->_boardurl . '\';',
-			'$db_type = \'' . $this->_db_type . '\';',
-			'$db_name = \'' . $this->_db_name . '\';',
-			'$db_user = \'' . $this->_db_user . '\';',
-			'$db_prefix = \'' . $this->_db_prefix . '\';',
-			'$db_passwd = \'' . $this->_db_passwd . '\';',
-		),
-		$file);
+			),
+			array(
+				'$boardurl = \'' . $this->_boardurl . '\';',
+				'$db_type = \'' . $this->_db_type . '\';',
+				'$db_name = \'' . $this->_db_name . '\';',
+				'$db_user = \'' . $this->_db_user . '\';',
+				'$db_prefix = \'' . $this->_db_prefix . '\';',
+				'$db_passwd = \'' . $this->_db_passwd . '\';',
+			),
+			$file
+		);
 
 		if (strpos($file, 'if (file_exist') !== false)
 			$file = substr($file, 0, strpos($file, 'if (file_exist'));
@@ -178,11 +186,12 @@ Class Elk_Testing_Setup
 	{
 		$this->prepare_settings();
 		$this->update();
+
 		//$this->createTests();
 	}
 
 	/**
-	 * Adds a user, sets time, prepars the forum for phpunit tests
+	 * Adds a user, sets time, prepares the forum for phpunit tests
 	 */
 	public function update()
 	{
@@ -327,6 +336,7 @@ class Test_' . $key . ' extends TestSuite
 			else
 				$files[] = $entity;
 		}
+
 		return $files;
 	}
 }

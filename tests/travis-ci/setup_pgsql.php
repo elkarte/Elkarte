@@ -81,11 +81,13 @@ class Elk_Testing_psql extends Elk_Testing_Setup
 		$this->_db_user = 'postgres';
 		$this->_db_passwd = '';
 		$db_prefix = $this->_db_prefix = 'elkarte_';
+
+		// Start the database interface
 		Database_PostgreSQL::initiate($this->_db_server, $this->_db_name, $this->_db_user, $this->_db_passwd, $this->_db_prefix);
 		$this->_db = Database_PostgreSQL::db();
 		$this->_db_table = DbTable_PostgreSQL_Install::db_table($this->_db);
 
-		// Load the postgre install queries
+		// Load the postgre install sql queries
 		$this->load_queries(BOARDDIR . '/install/install_' . DB_SCRIPT_VERSION . '_postgresql.php');
 		$this->run_queries();
 
