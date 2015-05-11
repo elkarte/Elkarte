@@ -12,8 +12,8 @@
 /**
  * ElkArteWebTest is the base class for Selenium 2 functional test case classes.
  *
- * It extends PHPUnit_Extensions_Selenium2TestCase and provides additonal functions
- * as well as sets up the common enviroments for all tests
+ * It extends PHPUnit_Extensions_Selenium2TestCase and provides additional functions
+ * as well as sets up the common environments for all tests
  *
  */
 abstract class ElkArteWebTest extends PHPUnit_Extensions_Selenium2TestCase
@@ -38,6 +38,8 @@ abstract class ElkArteWebTest extends PHPUnit_Extensions_Selenium2TestCase
 		$this->setBrowser(PHPUNIT_TESTSUITE_EXTENSION_SELENIUM2_BROWSER);
 
 		// Set the base URL for the tests.
+		if (!defined('PHPUNIT_TESTSUITE_EXTENSION_SELENIUM_HOST'))
+			DEFINE('PHPUNIT_TESTSUITE_EXTENSION_SELENIUM_HOST', 'http://127.0.0.1/');
 		$this->setBrowserUrl(PHPUNIT_TESTSUITE_EXTENSION_SELENIUM_HOST);
 
 		parent::setUp();
