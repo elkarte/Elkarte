@@ -13,9 +13,8 @@
 
 /**
  * Action class defines an action with its associated sub-actions.
- * Object-oriented controllers (with sub-actions) uses it to set
- * their action-subaction arrays, and have it call the right
- * function or method handlers.
+ * Object-oriented controllers (with sub-actions) uses it to set their action-subaction arrays, and have it call the
+ * right function or method handlers.
  *
  * Replaces the sub-actions arrays in every dispatching function.
  * (the $subactions = ... etc, and calls for $_REQUEST['sa'])
@@ -33,23 +32,23 @@ class Action
 	 *  or
 	 *    'sub_action name' => array(
 	 *    'controller' => 'controller name',
-	 *    'function' => 'method name',
-	 *    'enabled' => true/false,
-	 *    'permission' => area),
+	 *        'function' => 'method name',
+	 *        'enabled' => true/false,
+	 *        'permission' => area),
 	 *  or
 	 *    'sub_action name' => array(
-	 *    'controller object, i.e. $this',
-	 *    'method name',
-	 *    'enabled' => true/false
-	 *    'permission' => area),
+	 *        'controller object, i.e. $this',
+	 *        'method name',
+	 *        'enabled' => true/false
+	 *        'permission' => area),
 	 *  or
 	 *    'sub_action name' => array(
-	 *    'file' => 'file name',
-	 *    'dir' => 'controller file location', if not set ADMINDIR is assumed
-	 *    'controller' => 'controller name',
-	 *    'function' => 'method name',
-	 *    'enabled' => true/false,
-	 *    'permission' => area)
+	 *        'file' => 'file name',
+	 *        'dir' => 'controller file location', if not set ADMINDIR is assumed
+	 *        'controller' => 'controller name',
+	 *        'function' => 'method name',
+	 *        'enabled' => true/false,
+	 *        'permission' => area)
 	 */
 
 	/**
@@ -87,6 +86,7 @@ class Action
 	 *
 	 * @param mixed[] $subactions array of know subactions
 	 * @param string $default default action if unknown sa is requested
+	 *
 	 * @return string
 	 */
 	public function initialize(&$subactions, $default = '', $requestParam = 'sa')
@@ -116,7 +116,7 @@ class Action
 	public function dispatch($sa)
 	{
 		// for our sanity...
-		if (!key_exists($sa, $this->_subActions) || !is_array($this->_subActions[$sa]))
+		if (!array_key_exists($sa, $this->_subActions) || !is_array($this->_subActions[$sa]))
 		{
 			// send an error and get out of here
 			Errors::instance()->fatal_lang_error('error_sa_not_set');
@@ -225,10 +225,11 @@ class Action
 	 */
 	public function isAllowedTo($sa)
 	{
-		if (is_array($this->_subActions) && key_exists($sa, $this->_subActions))
+		if (is_array($this->_subActions) && array_key_exists($sa, $this->_subActions))
 		{
 			if (isset($this->_subActions[$sa]['permission']))
 				isAllowedTo($this->_subActions[$sa]['permission']);
+
 			return true;
 		}
 

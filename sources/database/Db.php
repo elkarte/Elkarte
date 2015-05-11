@@ -240,4 +240,18 @@ interface Database
 	 * @param resource|null $connection = null
 	 */
 	public function select_db($dbName = null, $connection = null);
+
+	/**
+	 * Return the number of queries executed
+	 *
+	 * @return int
+	 */
+	public function num_queries();
+
+	/**
+	 * Retrieve the connection object
+	 *
+	 * @return resource
+	 */
+	public function connection();
 }

@@ -58,7 +58,7 @@ function deleteErrors($type, $filter = null, $error_list = null)
 /**
  * Counts error log entries
  *
- * @param mixed[] $filter db query of the filter being used
+ * @param array $filter db query of the filter being used
  * @return integer
  */
 function numErrors($filter = array())
@@ -164,7 +164,7 @@ function getErrorLogData($start, $sort_direction = 'DESC', $filter = null)
 /**
  * Fetches errors and group them by error type
  *
- * @param mixed[]|null $filter
+ * @param array|null $filter
  * @param string|null $sort
  */
 function fetchErrorsByType($filter = null, $sort = null)

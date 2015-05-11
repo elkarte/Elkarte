@@ -207,7 +207,7 @@ class ManageBoards_Controller extends Action_Controller
 					'name' => &$boards[$boardid]['name'],
 					'description' => &$boards[$boardid]['description'],
 					'child_level' => &$boards[$boardid]['level'],
-					'move' => $move_cat && ($boardid == $context['move_board'] || isChildOf($boardid, $context['move_board'])),
+					'move' => $move_cat && ($boardid == $context['move_board'] || isChildOf($boardid, (int) $context['move_board'])),
 					'permission_profile' => &$boards[$boardid]['profile'],
 				);
 			}

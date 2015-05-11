@@ -15,14 +15,23 @@
 if (!defined('ELK'))
 	die('No access...');
 
+/**
+ * Class AbstractModel
+ *
+ * Abstract base class for models.
+ */
 abstract class AbstractModel
 {
 	/**
 	 * The database object
-	 * @var object
+	 * @var database
 	 */
 	protected $_db = null;
 
+	/**
+	 * Load the db to the class
+	 * @param object $db
+	 */
 	public function __construct($db)
 	{
 		$this->_db = $db;

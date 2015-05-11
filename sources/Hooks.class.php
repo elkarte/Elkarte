@@ -1,7 +1,8 @@
 <?php
 
 /**
- * This file has all the main functions in it that relate to, well, everything.
+ * This file has all the main functions in it that relate to adding
+ * removing, etc on hooks.
  *
  * @name      ElkArte Forum
  * @copyright ElkArte Forum contributors
@@ -20,6 +21,9 @@
 if (!defined('ELK'))
 	die('No access...');
 
+/**
+ * Class Hooks
+ */
 class Hooks
 {
 	/**
@@ -28,15 +32,29 @@ class Hooks
 	 */
 	private static $_instance = null;
 
+	/**
+	 * Holds our standard path replacement array
+	 * @var array
+	 */
 	protected $_path_replacements = array();
+
+	/**
+	 * Holds the database instance
+	 * @var null|database
+	 */
 	protected $_db = null;
+
+	/**
+	 * If holds instance of debug class
+	 * @var object|null
+	 */
 	protected $_debug = null;
 
 	/**
 	 * The class constructor, loads globals in to the class object
 	 *
-	 * @param object $db
-	 * @param boolean $debug
+	 * @param Database $db
+	 * @param Debug $debug
 	 * @param string[]|string|null $paths - additional paths to add to the replacement array
 	 */
 	private function __construct($db, $debug, $paths = null)
@@ -262,6 +280,7 @@ class Hooks
 	 *
 	 * @param string $basepath
 	 * @param string $ext
+	 *
 	 */
 	public function discoverIntegrations($basepath, $ext = '.integrate.php')
 	{

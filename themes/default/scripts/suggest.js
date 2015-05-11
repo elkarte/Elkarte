@@ -17,7 +17,7 @@
 /**
  * The autosuggest class, used to display a selection list of members
  *
- * @param {type} oOptions
+ * @param {object} oOptions
  */
 function smc_AutoSuggest(oOptions)
 {
@@ -47,7 +47,7 @@ function smc_AutoSuggest(oOptions)
 	// Are there any items that should be added in advance?
 	this.aListItems = 'aListItems' in this.opt ? this.opt.aListItems : [];
 
-	this.sItemTemplate = 'sItemTemplate' in this.opt ? this.opt.sItemTemplate : '<input type="hidden" name="%post_name%[]" value="%item_id%" /><a href="%item_href%" class="extern" onclick="window.open(this.href, \'_blank\'); return false;">%item_name%</a>&nbsp;<img src="%images_url%/pm_recipient_delete.png" alt="%delete_text%" title="%delete_text%" onclick="return %self%.deleteAddedItem(%item_id%);" />';
+	this.sItemTemplate = 'sItemTemplate' in this.opt ? this.opt.sItemTemplate : '<input type="hidden" name="%post_name%[]" value="%item_id%" /><a href="%item_href%" class="extern" onclick="window.open(this.href, \'_blank\'); return false;">%item_name%</a>&nbsp;<img src="%images_url%/pm_recipient_delete.png" alt="%delete_text%" title="%delete_text%" onclick="return %self%.deleteAddedItem(%item_id%)" />';
 	this.sTextDeleteItem = 'sTextDeleteItem' in this.opt ? this.opt.sTextDeleteItem : '';
 	this.oCallback = {};
 	this.bDoAutoAdd = false;
@@ -404,7 +404,7 @@ smc_AutoSuggest.prototype.deleteAddedItem = function (sItemId)
 // Hide the box.
 smc_AutoSuggest.prototype.autoSuggestHide = function ()
 {
-	// Delay to allow events to propogate through....
+	// Delay to allow events to propagate through....
 	this.oHideTimer = setTimeout(this.opt.sSelf + '.autoSuggestActualHide();', 250);
 };
 
@@ -569,7 +569,7 @@ smc_AutoSuggest.prototype.autoSuggestUpdate = function ()
 	var sRealLastSearch = this.sLastSearch;
 	this.sLastSearch = sSearchString;
 
-	// Either nothing or we've completed a sentance.
+	// Either nothing or we've completed a sentence.
 	if (sSearchString === '' || sSearchString.substr(sSearchString.length - 1) === '"')
 	{
 		this.populateDiv();

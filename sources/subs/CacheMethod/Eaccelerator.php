@@ -49,6 +49,8 @@ class Eaccelerator extends Cache_Method_Abstract
 	{
 		if (function_exists('eaccelerator_get'))
 			return eaccelerator_get($key);
+
+		return false;
 	}
 
 	/**

@@ -43,7 +43,7 @@ abstract class Action_Controller
 	 */
 	public function __construct($eventManager = null)
 	{
-		// A safety-net to remain backward compatible
+		// A safety-net to remain backward compatibility
 		if ($eventManager === null)
 			$eventManager = new Event_Manager();
 
@@ -54,9 +54,12 @@ abstract class Action_Controller
 
 	/**
 	 * Initialize the event manager for the controller
+	 *
+	 * Uses the XXX_Controller name to define the set of event hooks to load
 	 */
 	protected function _initEventManager()
 	{
+		// Use the base controller name for the hook, ie post
 		$this->_hook = str_replace('_Controller', '', get_class($this));
 
 		$classes = $this->_loadModules();
@@ -87,6 +90,7 @@ abstract class Action_Controller
 		$hook = strtolower(str_replace('_Controller', '', $this->_hook));
 		$setting_key = 'modules_' . $hook;
 
+		// For all the modules that have been registered see if we have a class to load for this hook area
 		if (!empty($modSettings[$setting_key]))
 		{
 			$modules = explode(',', $modSettings[$setting_key]);

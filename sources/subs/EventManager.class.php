@@ -64,17 +64,17 @@ class Event_Manager
 	/**
 	 * This is the function use to... trigger an event.
 	 *
-	 * @param string $position The "identifier" of the event.
+	 * Called from many areas in the code where events can be raised
+	 * $this->_events->trigger('area', args)
+	 *
+	 * @param string $position The "identifier" of the event, such as prepare_post
 	 * @param mixed[] $args The arguments passed to the methods registered
 	 */
 	public function trigger($position, $args = array())
 	{
-		// No registered events, just return
-		if (!isset($this->_registered_events[$position]))
-			return;
-
-		if (!$this->_registered_events[$position]->hasEvents())
-			return;
+		// No registered events for this area, just return
+		if (!isset($this->_registered_events[$position]) || !$this->_registered_events[$position]->hasEvents())
+			return false;
 
 		// For all events that registered here, lets trigger an event
 		foreach ($this->_registered_events[$position]->getEvents() as $event)
@@ -83,10 +83,10 @@ class Event_Manager
 			$class_name = $class[0];
 			$method_name = $class[1];
 			$deps = isset($event[2]) ? $event[2] : array();
-			unset($dependencies);
+			$dependencies = null;
 
 			if (!class_exists($class_name))
-				return;
+				return false;
 
 			// Any dependency you want? In any order you want!
 			if (!empty($deps))
@@ -205,7 +205,8 @@ class Event_Manager
 	/**
 	 * Takes care of registering the classes/methods to the different positions
 	 * of the Event_Manager.
-	 * Each classes must have a static method hooks that will return an array
+	 *
+	 * Each class must have a static method::hooks that will return an array
 	 * defining where and how the class will interact with the object that
 	 * started the Event_Manager.
 	 *
@@ -215,6 +216,7 @@ class Event_Manager
 	{
 		foreach ($classes as $class)
 		{
+			// Load the events for this area/class combination
 			$events = $class::hooks($this);
 
 			foreach ($events as $event)

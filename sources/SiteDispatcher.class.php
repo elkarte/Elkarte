@@ -253,7 +253,7 @@ class Site_Dispatcher
 				$method = $this->_function_name;
 			elseif (method_exists($this->_controller_name, 'action_index'))
 				$method = 'action_index';
-			// This should never happen, thats why its here :P
+			// This should never happen, that's why its here :P
 			else
 			{
 				$this->_file_name = $this->_default_action['file'];

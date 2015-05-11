@@ -25,6 +25,11 @@ if (!defined('ELK'))
  */
 class Calendar_Boardindex_Module
 {
+	/**
+	 * If enabled, let the system know what hooks we need to install
+	 *
+	 * @return array
+	 */
 	public static function hooks()
 	{
 		// Load the calendar?
@@ -35,8 +40,13 @@ class Calendar_Boardindex_Module
 				array('post_load', array('Calendar_BoardIndex_Module', 'post_load'), array()),
 			);
 		}
+
+		return false;
 	}
 
+	/**
+	 * Pre-load hooks as part of board index
+	 */
 	public function pre_load()
 	{
 		global $modSettings, $user_info, $context;
@@ -48,6 +58,7 @@ class Calendar_Boardindex_Module
 			'include_events' => $modSettings['cal_showevents'] > 1,
 			'num_days_shown' => empty($modSettings['cal_days_for_index']) || $modSettings['cal_days_for_index'] < 1 ? 1 : $modSettings['cal_days_for_index'],
 		);
+
 		$context += cache_quick_get('calendar_index_offset_' . ($user_info['time_offset'] + $modSettings['time_offset']), 'subs/Calendar.subs.php', 'cache_getRecentEvents', array($eventOptions));
 
 		// Whether one or multiple days are shown on the board index.
@@ -57,6 +68,11 @@ class Calendar_Boardindex_Module
 		$context['calendar_can_edit'] = allowedTo('calendar_edit_any');
 	}
 
+	/**
+	 * post load functions, load calendar events for the board index as part of BoardIndex
+	 *
+	 * @param array $callbacks
+	 */
 	public function post_load(&$callbacks)
 	{
 		global $context;

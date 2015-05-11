@@ -985,7 +985,7 @@ function template_show_settings()
 						<dt>
 							<a id="setting_', $config_var['name'], '_confirm"></a><span', ($config_var['disabled'] ? ' class="disabled"' : ($config_var['invalid'] ? ' class="error"' : '')), '><label for="', $config_var['name'], '_confirm"><em>', $txt['admin_confirm_password'], '</em></label></span>
 						</dt>
-						<dd>
+						<dd ', (!empty($config_var['force_div_id']) ? ' id="' . $config_var['force_div_id'] . '_confirm_dd"' : ''), ' >
 							<input type="password" disabled="disabled" id="', $config_var['name'], '_confirm" name="', $config_var['name'], '[1]"', ($config_var['size'] ? ' size="' . $config_var['size'] . '"' : ''), ' class="input_password" />';
 				// Show a selection box.
 				elseif ($config_var['type'] == 'select')

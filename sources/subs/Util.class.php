@@ -436,34 +436,6 @@ class Util
 	}
 
 	/**
-	 * Adds slashes to the array/variable.
-	 * What it does:
-	 * - returns the var, as an array or string, with escapes as required.
-	 * - importantly escapes all keys and values!
-	 * - calls itself recursively if necessary.
-	 *
-	 * @todo not used, consider removing
-	 * @deprecated since 1.0
-	 *
-	 * @param mixed[]|string $var
-	 * @return array|string
-	 */
-	public static function escapestring_recursive($var)
-	{
-		if (!is_array($var))
-			return addslashes($var);
-
-		// Reindex the array with slashes.
-		$new_var = array();
-
-		// Add slashes to every element, even the indexes!
-		foreach ($var as $k => $v)
-			$new_var[addslashes($k)] = Util::escapestring_recursive($v);
-
-		return $new_var;
-	}
-
-	/**
 	 * Remove slashes recursively.
 	 * What it does:
 	 * - removes slashes, recursively, from the array or string var.

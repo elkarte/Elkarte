@@ -158,7 +158,7 @@ class Site_Combiner
 
 		// Nothing to do, then we are done
 		if (count($this->_combine_files) === 0)
-			return;
+			return true;
 
 		// Create the archive name
 		$this->_buildName('.js');

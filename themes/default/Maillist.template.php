@@ -52,7 +52,7 @@ function template_bounce_email()
 		// Disable notification boxes as required.
 		function modifyWarnNotify()
 		{
-			disable = !document.getElementById(\'warn_notify\').checked;
+			var disable = !document.getElementById(\'warn_notify\').checked;
 			document.getElementById(\'warn_sub\').disabled = disable;
 			document.getElementById(\'warn_body\').disabled = disable;
 			document.getElementById(\'warn_temp\').disabled = disable;
@@ -61,7 +61,7 @@ function template_bounce_email()
 		// bounce template.
 		function populateNotifyTemplate()
 		{
-			index = document.getElementById(\'warn_temp\').value;
+			var index = document.getElementById(\'warn_temp\').value;
 			if (index == -1)
 				return false;
 

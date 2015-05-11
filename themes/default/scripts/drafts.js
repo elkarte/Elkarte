@@ -55,7 +55,7 @@ elk_DraftAutoSave.prototype.init = function()
 		};
 
 		// Prevent autosave when selecting post/save by mouse or keyboard
-		var $_button = $('#postmodify .button_submit');
+		var $_button = $('#postmodify').find('.button_submit');
 		$_button .on('mousedown', this.oDraftHandle.instanceRef, function() {
 			this.bInDraftMode = true;
 		});

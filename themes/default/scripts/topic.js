@@ -814,7 +814,7 @@ InTopicModeration.prototype.handleSubmit = function (sSubmitType)
 				return false;
 
 			oForm.action = oForm.action.replace(/;split_selection=1/, '');
-			oForm.action = oForm.action + ';restore_selected=1';
+			oForm.action += ';restore_selected=1';
 		break;
 
 		case 'split':
@@ -822,7 +822,7 @@ InTopicModeration.prototype.handleSubmit = function (sSubmitType)
 				return false;
 
 			oForm.action = oForm.action.replace(/;restore_selected=1/, '');
-			oForm.action = oForm.action + ';split_selection=1';
+			oForm.action += ';split_selection=1';
 		break;
 
 		default:

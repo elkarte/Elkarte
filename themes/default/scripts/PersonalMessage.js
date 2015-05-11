@@ -337,8 +337,8 @@ function initUpdateRulesActions()
 	});
 
 	// Trigger a change on the existing in order to let the function run
-	$('#criteria [name^="ruletype"]').change();
-	$('#actions [name^="acttype"]').change();
+	$('#criteria').find('[name^="ruletype"]').change();
+	$('#actions').find('[name^="acttype"]').change();
 
 	// Make sure the description is rebuilt every time something changes, even on elements not yet existing
 	$('#criteria').on('change keyup',

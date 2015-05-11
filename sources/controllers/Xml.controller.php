@@ -147,7 +147,7 @@ class Xml_Controller extends Action_Controller
 
 		// You have to be allowed to do this of course
 		$validation = validateSession();
-		if (empty($validation))
+		if ($validation === true)
 		{
 			$controller = new CoreFeatures_Controller(new Event_Manager());
 			$controller->pre_dispatch();
@@ -187,7 +187,7 @@ class Xml_Controller extends Action_Controller
 		}
 		// Failed session validation I'm afraid
 		else
-			$errors[] = array('value' => $txt[$validation]);
+			$errors[] = array('value' => isset($txt[$validation]) ? $txt[$validation] : $txt['error_occurred']);
 
 		// Return the response to the calling program
 		$context['sub_template'] = 'generic_xml';
@@ -228,7 +228,7 @@ class Xml_Controller extends Action_Controller
 		$validation_token = validateToken('admin-sort', 'post', true, false);
 		$validation_session = validateSession();
 
-		if (empty($validation_session) && $validation_token === true)
+		if ($validation_session === true && $validation_token === true)
 		{
 			// No questions that we are reordering
 			if (isset($_POST['order']) && $_POST['order'] == 'reorder')
@@ -320,7 +320,7 @@ class Xml_Controller extends Action_Controller
 		$validation_token = validateToken('admin-sort', 'post', true, false);
 		$validation_session = validateSession();
 
-		if (empty($validation_session) && $validation_token === true)
+		if ($validation_session === true && $validation_token === true)
 		{
 			// No question that we are doing some board reordering
 			if (isset($_POST['order']) && $_POST['order'] === 'reorder' && isset($_POST['moved']))
@@ -482,7 +482,8 @@ class Xml_Controller extends Action_Controller
 		// You have to be allowed to do this
 		$validation_token = validateToken('admin-sort', 'post', true, false);
 		$validation_session = validateSession();
-		if (empty($validation_session) && $validation_token === true)
+
+		if ($validation_session === true && $validation_token === true)
 		{
 			// Valid posting
 			if (isset($_POST['order']) && $_POST['order'] == 'reorder')
@@ -637,7 +638,7 @@ class Xml_Controller extends Action_Controller
 		$validation_token = validateToken('admin-sort', 'post', true, false);
 		$validation_session = validateSession();
 
-		if (empty($validation_session) && $validation_token === true)
+		if ($validation_session === true && $validation_token === true)
 		{
 			// No questions that we are reordering
 			if (isset($_POST['order'], $_POST['list_sort_email_fp']) && $_POST['order'] == 'reorder')
@@ -727,7 +728,7 @@ class Xml_Controller extends Action_Controller
 		$validation_token = validateToken('admin-sort', 'post', true, false);
 		$validation_session = validateSession();
 
-		if (empty($validation_session) && $validation_token === true)
+		if ($validation_session === true && $validation_token === true)
 		{
 			// No questions that we are reordering
 			if (isset($_POST['order']) && $_POST['order'] == 'reorder')

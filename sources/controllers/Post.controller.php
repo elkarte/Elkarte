@@ -29,21 +29,18 @@ class Post_Controller extends Action_Controller
 {
 	/**
 	 * The post (messages) errors object
-	 *
 	 * @var null|object
 	 */
 	protected $_post_errors = null;
 
 	/**
 	 * The template layers object
-	 *
 	 * @var null|object
 	 */
 	protected $_template_layers = null;
 
 	/**
 	 * An array of attributes of the topic (if not new)
-	 *
 	 * @var mixed[]
 	 */
 	protected $_topic_attributes = array();

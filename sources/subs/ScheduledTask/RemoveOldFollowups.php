@@ -28,7 +28,7 @@ class Remove_Old_Followups implements Scheduled_Task_Interface
 		global $modSettings;
 
 		if (empty($modSettings['enableFollowup']))
-			return;
+			return false;
 
 		$db = database();
 

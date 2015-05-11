@@ -2345,7 +2345,7 @@ function messageIndexBar($area)
 	unset($pm_areas);
 
 	// No menu means no access.
-	if (!$pm_include_data && (!$user_info['is_guest'] || validateSession()))
+	if (!$pm_include_data && (!$user_info['is_guest'] || validateSession() !== true))
 		Errors::instance()->fatal_lang_error('no_access', false);
 
 	// Make a note of the Unique ID for this menu.

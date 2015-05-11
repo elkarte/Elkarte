@@ -168,7 +168,7 @@ function changeSel(selected)
 		file.style.display = "inline";
 		file.disabled = false;
 
-		for (i = file.length; i >= 0; i = i - 1)
+		for (i = file.length; i >= 0; i -= 1)
 			file.options[i] = null;
 
 		for (i = 0; i < files.length; i++)
@@ -305,7 +305,7 @@ function modifyWarnNotify()
 			if ($(request).find("error").text() !== '')
 			{
 				$_profile_error.show();
-				var errors_html = '<span>' + $("#profile_error").find("span").html() + '</span>' + '<ul class="list_errors">';
+				var errors_html = '<span>' + $_profile_error.find("span").html() + '</span>' + '<ul class="list_errors">';
 
 				$(request).find('error').each(function() {
 					errors_html += '<li>' + $(this).text() + '</li>';

@@ -24,7 +24,6 @@ if (!defined('ELK'))
  * Set the permission level for a specific profile, group, or group for a profile.
  *
  * @package Permissions
- * @internal
  * @param string $level
  * @param integer|null $group
  * @param integer|null $profile = null, int expected
@@ -389,7 +388,6 @@ function loadPermissionProfiles()
  * Load permissions into $context['permissions'].
  *
  * @package Permissions
- * @internal
  */
 function loadAllPermissions()
 {

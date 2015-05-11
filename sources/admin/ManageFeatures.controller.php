@@ -430,7 +430,7 @@ class ManageFeatures_Controller extends Action_Controller
 			{
 				if (!isset($this->_req->post->notifications[$type]))
 				{
-					toggleMentionsVisibility($type, 0);
+					toggleMentionsVisibility($type, false);
 					$modules_toggle['disable'][] = $type;
 				}
 			}
@@ -442,7 +442,7 @@ class ManageFeatures_Controller extends Action_Controller
 				{
 					if (!isset($current_settings[$type]))
 					{
-						toggleMentionsVisibility($type, 1);
+						toggleMentionsVisibility($type, true);
 						$modules_toggle['enable'][] = $type;
 					}
 				}

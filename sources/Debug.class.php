@@ -428,6 +428,10 @@ class Debug
 		}
 	}
 
+	/**
+	 * Return the single instance of this class
+	 * @return Debug
+	 */
 	public static function get()
 	{
 		if (self::$_instance === null)

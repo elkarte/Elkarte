@@ -100,6 +100,12 @@ class ManageDraftsModule_Controller extends Action_Controller
 		);
 	}
 
+	/**
+	 * Integrate drafts in to the delete member chain
+	 * call_integration_hook('integrate_delete_members' ...)
+	 *
+	 * @param int[] $users
+	 */
 	public static function integrate_delete_members($users)
 	{
 		$db = database();
@@ -114,6 +120,16 @@ class ManageDraftsModule_Controller extends Action_Controller
 		);
 	}
 
+	/**
+	 * Integrate draft permission in to the members and board permissions
+	 * call_integration_hook('integrate_load_permissions' ...
+	 *
+	 * @param array $permissionGroups
+	 * @param array $permissionList
+	 * @param array $leftPermissionGroups
+	 * @param array $hiddenPermissions
+	 * @param array $relabelPermissions
+	 */
 	public static function integrate_load_permissions(&$permissionGroups, &$permissionList, &$leftPermissionGroups, &$hiddenPermissions, &$relabelPermissions)
 	{
 		$permissionList['board'] += array(
@@ -127,6 +143,9 @@ class ManageDraftsModule_Controller extends Action_Controller
 		);
 	}
 
+	/**
+	 * Integrate draft permission in to illegal guest permissions
+	 */
 	public static function integrate_load_illegal_guest_permissions()
 	{
 		global $context;
@@ -137,6 +156,11 @@ class ManageDraftsModule_Controller extends Action_Controller
 		);
 	}
 
+	/**
+	 * Integrate draft options in to the topics maintenance procedures
+	 *
+	 * @param array $topics_actions
+	 */
 	public static function integrate_topics_maintenance(&$topics_actions)
 	{
 		global $scripturl, $txt;
@@ -153,6 +177,11 @@ class ManageDraftsModule_Controller extends Action_Controller
 		);
 	}
 
+	/**
+	 * Drafts maintenance integration hooks
+	 *
+	 * @param array $subActions
+	 */
 	public static function integrate_sa_manage_maintenance(&$subActions)
 	{
 		$subActions['topics']['activities']['olddrafts'] = function() {
