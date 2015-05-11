@@ -17,7 +17,7 @@ mv ./Settings.sample.php ./Settings.php
 mv ./Settings_bak.sample.php ./Settings_bak.php
 mv ./db_last_error.sample.txt ./db_last_error.txt
 
-# Move everything to the www directory so apache can find it
+# Move everything to the www directory so Apache can find it
 sudo mv * /var/www/
 cd /var/www
 
@@ -33,17 +33,20 @@ sudo rm -rf /var/www/install
 
 # Load in phpunit and its dependencies via composer, note we have a lock file in place
 # composer is updated in setup-server.sh
-composer install --dev --no-interaction --prefer-source
-
-# Update the added phpunit files
-sudo chmod -R 777 /var/www/vendor
-
-# common php.ini updates (if any)
-phpenv config-add /var/www//tests/travis-ci/travis_php.ini
-
-# If this is a code coverage run, we need to enable selenium and capture its coverage results
-if [ "$SHORT_PHP" == "5.4" -a "$DB" == "mysqli" ]
+if [ "$DB" != "none" ]
 then
-	phpenv config-add /var/www//tests/travis-ci/travis_webtest_php.ini
-	sudo ./tests/travis-ci/setup-selenium.sh
+    composer install --no-interaction --prefer-source --quiet
+
+    # Update the added phpunit files
+    sudo chmod -R 777 /var/www/vendor
+
+    # common php.ini updates (if any)
+    phpenv config-add /var/www//tests/travis-ci/travis_php.ini
+
+    # If this is a code coverage run, we need to enable selenium and capture its coverage results
+    if [ "$SHORT_PHP" == "5.4" -a "$DB" == "mysqli" ]
+    then
+	    phpenv config-add /var/www//tests/travis-ci/travis_webtest_php.ini
+	    sudo ./tests/travis-ci/setup-selenium.sh
+    fi
 fi
