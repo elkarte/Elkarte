@@ -67,10 +67,12 @@ $context['forum_name_html_safe'] = $context['forum_name'];
 // Just like we are starting, almost
 cleanRequest();
 loadDatabase();
+Hooks::init(database(), Debug::get());
 reloadSettings();
 elk_seed_generator();
 loadSession();
 loadUserSettings();
+loadBoard();
 loadPermissions();
 
 // Basic language is good to have for functional tests

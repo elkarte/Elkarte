@@ -14,7 +14,11 @@ SHORT_PHP=${TRAVIS_PHP_VERSION:0:3}
 if [ "$SHORT_PHP" == "5.4" -a "$DB" == "mysqli" ]
 then
     /var/www/vendor/bin/phpunit --configuration /var/www/tests/travis-ci/phpunit-with-coverage-$DB-travis.xml
+    /var/www/vendor/bin/phpunit /var/www/tests/travis-ci/BootstrapRunTest.php
+elif [ "$DB" == "none" ]
+then
+    /var/www/vendor/bin/phpunit --configuration /var/www/tests/travis-ci/phpunit-basic-travis.xml
 else
     /var/www/vendor/bin/phpunit --configuration /var/www/tests/travis-ci/phpunit-$DB-travis.xml
+    /var/www/vendor/bin/phpunit /var/www/tests/travis-ci/BootstrapRunTest.php
 fi
-/var/www/vendor/bin/phpunit /var/www/tests/travis-ci/BootstrapRunTest.php

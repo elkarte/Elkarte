@@ -11,8 +11,8 @@
          verbose="true"
          bootstrap="/var/www/tests/travis-ci/bootstrap.php">
   <testsuites>
-      <testsuite name="ElkArte Tests">
-          <directory>/var/www/tests</directory>
+      <testsuite name="ElkArte Unit Tests">
+          <directory suffix="Test.php">/var/www/tests</directory>
       </testsuite>
   </testsuites>
   <php>
