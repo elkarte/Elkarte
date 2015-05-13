@@ -71,6 +71,9 @@ class Html_2_Md
 		// Up front, remove whitespace between html tags
 		$html = preg_replace('/(?:(?<=\>)|(?<=\/\>))(\s+)(?=\<\/?)/', '', $html);
 
+		// The XML parser will not fix these for us
+		$html = strtr($html, array('?<' => '?&LT;', '?>' => '?&GT;') );
+
 		// Using PHP built in functions ...
 		if (class_exists('DOMDocument'))
 		{
