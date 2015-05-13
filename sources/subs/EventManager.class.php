@@ -100,7 +100,10 @@ class Event_Manager
 				}
 			}
 			else
-				$dependencies = &$args;
+			{
+				foreach ($args as $key => $val)
+					$dependencies[$key] = &$args[$key];
+			}
 
 			$instance = $this->_getInstance($class_name);
 
