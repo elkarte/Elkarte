@@ -294,6 +294,9 @@ class PackageServers_Controller extends Action_Controller
 				}
 			}
 		}
+
+		// Good time to sort the categories, packages inside cats will be by last date.
+		asort($context['package_list']);
 /* @todo ... not sure we really want to do all this ... maybe ?
 		// Lets make sure we get a nice new spiffy clean $package to work with.  Otherwise we get PAIN!
 		unset($package);
