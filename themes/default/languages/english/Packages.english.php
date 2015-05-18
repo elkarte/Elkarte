@@ -54,6 +54,7 @@ $txt['bug_location'] = 'Issue tracker';
 $txt['support_location'] = 'Support';
 $txt['mod_hooks'] = 'No source edits';
 $txt['mod_date'] = 'Last updated';
+$txt['mod_section_count'] = 'Browse the (%1d) addons in this section';
 
 $txt['package_installed_key'] = 'Installed addons:';
 $txt['package_installed_current'] = 'current version';
