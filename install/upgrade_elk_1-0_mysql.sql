@@ -855,3 +855,20 @@ upgrade_query("
 	('avatar_upload_enabled', '1')");
 ---}
 ---#
+
+/******************************************************************************/
+--- Changes for 1.0.4
+/******************************************************************************/
+---# Update to new package server...
+---{
+upgrade_query("
+	UPDATE {$db_prefix}package_servers
+	SET url = {string:value}
+	WHERE name = {string:name}",
+	array(
+		'value' => 'http://addons.elkarte.net/package.json',
+		'name' => 'ElkArte Third-party Add-ons Site'
+	)
+);
+---}
+---#
