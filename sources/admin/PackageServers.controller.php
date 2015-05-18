@@ -2,7 +2,7 @@
 
 /**
  * This file handles the package servers and packages download, in Package Servers
- * area of admininstration panel.
+ * area of administration panel.
  *
  * @name      ElkArte Forum
  * @copyright ElkArte Forum contributors
@@ -30,8 +30,8 @@ if (!defined('ELK'))
 class PackageServers_Controller extends Action_Controller
 {
 	/**
-	 * Called before all other methods when comming from the dispatcher or
-	 * action class.  Loads lanaguage and templates files so they are available
+	 * Called before all other methods when coming from the dispatcher or
+	 * action class.  Loads language and templates files so they are available
 	 * to the other methods.
 	 */
 	public function pre_dispatch()
@@ -136,69 +136,16 @@ class PackageServers_Controller extends Action_Controller
 
 		// Browsing the packages from a server
 		if (isset($_GET['server']))
-		{
-			if ($_GET['server'] == '')
-				redirectexit('action=admin;area=packageservers');
-
-			$server = (int) $_GET['server'];
-
-			// Query the server list to find the current server.
-			$packageserver = fetchPackageServers($server);
-			$url = $packageserver[0]['url'];
-			$name = $packageserver[0]['name'];
-
-			// If the server does not exist, dump out.
-			if (empty($url))
-				fatal_lang_error('couldnt_connect', false);
-
-			// If there is a relative link, append to the stored server url.
-			if (isset($_GET['relative']))
-				$url = $url . (substr($url, -1) == '/' ? '' : '/') . $_GET['relative'];
-
-			// Clear any "absolute" URL.  Since "server" is present, "absolute" is garbage.
-			unset($_GET['absolute']);
-		}
-		elseif (isset($_GET['absolute']) && $_GET['absolute'] != '')
-		{
-			// Initialize the required variables.
-			$url = $_GET['absolute'];
-
-			$_GET['package'] = $url . '/packages.xml?language=' . $context['user']['language'];
-
-			// Clear any "relative" URL.  Since "server" is not present, "relative" is garbage.
-			unset($_GET['relative']);
-
-			$token = checkConfirm('get_absolute_url');
-			if ($token !== true)
-			{
-				$context['sub_template'] = 'package_confirm';
-				$context['page_title'] = $txt['package_servers'];
-				$context['confirm_message'] = sprintf($txt['package_confirm_view_package_content'], htmlspecialchars($_GET['absolute'], ENT_COMPAT, 'UTF-8'));
-				$context['proceed_href'] = $scripturl . '?action=admin;area=packageservers;sa=browse;absolute=' . urlencode($_GET['absolute']) . ';confirm=' . $token;
-
-				return;
-			}
-		}
+			list($name, $url, $server) = $this->_package_server();
 		// Minimum required parameter did not exist so dump out.
 		else
 			fatal_lang_error('couldnt_connect', false);
 
-		// Attempt to connect.  If unsuccessful... try the URL.
-		if (!isset($_GET['package']) || file_exists($_GET['package']))
-			$_GET['package'] = $url . '/packages.xml?language=' . $context['user']['language'];
-
-// @todo temp stuff here for debug, move to db
-		$_GET['package'] = 'http://addons.elkarte.net/package.json';
-
-		// Check to be sure the packages.xml file actually exists where it should be... or dump out.
-		if ((isset($_GET['absolute']) || isset($_GET['relative'])) && !url_exists($_GET['package']))
-			fatal_lang_error('packageget_unable', false, array($url . '/index.php'));
-
 		// Might take some time.
-		@set_time_limit(600);
+		@set_time_limit(60);
 
 		// Fetch the package listing from the server and json decode
-		$listing = json_decode(fetch_web_data($_GET['package']));
+		$listing = json_decode(fetch_web_data($url));
 
 		// List out the packages...
 		$context['package_list'] = array();
@@ -207,16 +154,14 @@ class PackageServers_Controller extends Action_Controller
 		$context['sub_template'] = 'package_list';
 		$context['page_title'] = $txt['package_servers'] . ($name != '' ? ' - ' . $name : '');
 		$context['package_server'] = $server;
-		$context['list_type'] = 'ol';
 
 		// If we received data
 		if (!empty($listing))
 		{
 			// Load the installed packages
-			// We'll figure out if what they select a package they already have installed.
 			$instadds = loadInstalledPackages();
 
-			// Look through the list of installed mods...
+			// Look through the list of installed mods and get version information for the compare
 			$installed_adds = array();
 			foreach ($instadds as $installed_add)
 				$installed_adds[$installed_add['package_id']] = $installed_add['version'];
@@ -225,11 +170,11 @@ class PackageServers_Controller extends Action_Controller
 			if (!empty($_SESSION['version_emulate']))
 				$the_version = $_SESSION['version_emulate'];
 
-			// Parse the json file, each section contains a group of addons
+			// Parse the json file, each section contains a category of addons
 			$packageNum = 0;
 			foreach ($listing as $packageSection => $section_items)
 			{
-				// Section title / header
+				// Section title / header for the category
 				$context['package_list'][$packageSection] = array(
 					'title' => Util::htmlspecialchars(ucwords($packageSection)),
 					'text' => '',
@@ -237,100 +182,133 @@ class PackageServers_Controller extends Action_Controller
 				);
 
 				// Load each package array as an item
+				$section_count = 0;
 				foreach ($section_items as $thisPackage)
 				{
 					// Read in the package info from the fetched data
-					$package = array(
-						// @todo need to add ID to the .yaml and have it match ID in the package.xml
-						'id' => $thisPackage->author . ':' . $thisPackage->title,
-						'type' => $packageSection,
-						'name' => Util::htmlspecialchars($thisPackage->title),
-						'date' => htmlTime(strtotime($thisPackage->date)),
-						'author' =>  Util::htmlspecialchars($thisPackage->author),
-						'description' => !empty($thisPackage->short) ? Util::htmlspecialchars($thisPackage->short) : '',
-						'version' => $thisPackage->version,
-						'elkversion' => $thisPackage->elkversion,
-						'license' => $thisPackage->license,
-						'hooks' => $thisPackage->allhooks,
-						'server' => array(
-							'download' => filter_var($thisPackage->server[0]->download, FILTER_VALIDATE_URL)
-								? $thisPackage->server[0]->download : '',
-							'support' => filter_var($thisPackage->server[0]->support, FILTER_VALIDATE_URL)
-								? $thisPackage->server[0]->support : '',
-							'bugs' => filter_var($thisPackage->server[0]->bugs, FILTER_VALIDATE_URL)
-								? $thisPackage->server[0]->bugs : '',
-							'link' => filter_var($thisPackage->server[0]->url, FILTER_VALIDATE_URL)
-								? $thisPackage->server[0]->url : '',
-						),
-					);
+					$package = $this->_load_package_json($thisPackage, $packageSection);
 
 					// Check the install status
 					$package['can_install'] = false;
-					$package['is_installed'] = isset($installed_adds[$package['id']]);
-					$package['is_current'] = $package['is_installed'] && ($installed_adds[$package['id']] == $package['version']);
-					$package['is_newer'] = $package['is_installed'] && ($installed_adds[$package['id']] > $package['version']);
+					$is_installed = array_intersect(array_keys($installed_adds), $package['id']);
+					$package['is_installed'] = !empty($is_installed);
 
-					// This package is either not installed, or installed but old.  Is it supported on this version?
+					// Set the ID from our potential list should the ID not be provided in the package .yaml
+					$package['id'] = $package['is_installed'] ? array_shift($is_installed) : $package['id'][0];
+
+					// Version installed vs version available
+					$package['is_current'] = !empty($package['is_installed']) && ($installed_adds[$package['id']] == $package['version']);
+					$package['is_newer'] = !empty($package['is_installed']) && ($installed_adds[$package['id']] > $package['version']);
+
+					// Set the package filename for downloading and pre-existence checking
+					$base_name = $this->_rename_master($package['server']['download']);
+					$package['filename'] = basename($package['server']['download']);
+
+					// This package is either not installed, or installed but old.
 					if (!$package['is_installed'] || (!$package['is_current'] && !$package['is_newer']))
 					{
-						if (!empty($thisPackage->elkversion))
-							$package['can_install'] = matchPackageVersion($the_version, $thisPackage->elkversion);
-					}
-					// Okay, it's already installed AND up to date.
-					else
-						$package['can_install'] = false;
-
-					// Determine the package filename
-					$base_name = $this->_rename_master($package['server']['download']);
-					$package['filename'] = $base_name;
-					//$context['package_list'][$packageSection]['items']['filename'] = $base_name;
-					$already_exists = getPackageInfo($base_name);
-
-					$package['download_conflict'] = is_array($already_exists) && $already_exists['id'] == $package['id'] && $already_exists['version'] != $package['version'];
-
-					$package['count'] = ++$packageNum;
-					$context['package_list'][$packageSection]['items'][$packageNum] = $package;
-
-				}
-			}
-		}
-
-		// Good time to sort the categories, packages inside cats will be by last date.
-		asort($context['package_list']);
-/* @todo ... not sure we really want to do all this ... maybe ?
-		// Lets make sure we get a nice new spiffy clean $package to work with.  Otherwise we get PAIN!
-		unset($package);
-
-		foreach ($context['package_list'] as $ps_id => $packageSection)
-		{
-			foreach ($packageSection['items'] as $i => $package)
-			{
-				if (empty($package['count']) )
-					continue;
-
-				$context['package_list'][$ps_id]['items'][$i]['can_install'] = false;
-
-				$packageInfo = getPackageInfo($url . '/' . $package['filename']);
-				if (is_array($packageInfo) && $packageInfo['xml']->exists('install'))
-				{
-					$installs = $packageInfo['xml']->set('install');
-					foreach ($installs as $install)
-					{
-						if (!$install->exists('@for') || matchPackageVersion($the_version, $install->fetch('@for')))
+						// Does it claim to install on this version of ElkArte?
+						$path_parts = pathinfo($base_name);
+						if (!empty($thisPackage->elkversion) && isset($path_parts['extension']) && in_array($path_parts['extension'], array('zip', 'tar', 'gz', 'tar.gz')))
 						{
-							// Okay, this one is good to go.
-							$context['package_list'][$ps_id]['items'][$i]['can_install'] = true;
-							break;
+							// No install range given, then set one, it will all work out in the end.
+							$for = strpos($thisPackage->elkversion, '-') === false ? $thisPackage->elkversion . '-' . $the_version : $thisPackage->elkversion;
+							$package['can_install'] = matchPackageVersion($the_version, $for);
 						}
 					}
+
+					// See if this filename already exists on the server
+					$already_exists = getPackageInfo($base_name);
+					$package['download_conflict'] = is_array($already_exists) && $already_exists['id'] == $package['id'] && $already_exists['version'] != $package['version'];
+					$package['count'] = ++$packageNum;
+
+					// Build the download to server link
+					$server_att = $server != '' ? ';server=' . $server : '';
+					$current_url = ';section=' . $packageSection . ';num=' . $section_count;
+					$package['download']['href'] = $scripturl . '?action=admin;area=packageservers;sa=download' . $server_att . $current_url . ';package=' . $package['filename'] . ($package['download_conflict'] ? ';conflict' : '') . ';' . $context['session_var'] . '=' . $context['session_id'];
+					$package['download']['link'] = '<a href="' . $package['download']['href'] . '">' . $package['name'] . '</a>';
+
+					// Add this package to the list
+					$context['package_list'][$packageSection]['items'][$packageNum] = $package;
+					$section_count++;
 				}
+
+				$context['package_list'][$packageSection]['text'] = sprintf($txt['mod_section_count'], $section_count);
 			}
 		}
-*/
+
+		// Good time to sort the categories, the packages inside each category will be by last modification date.
+		asort($context['package_list']);
+	}
+
+	/**
+	 * Returns a package array filled with the json information
+	 *
+	 * - Uses the parsed json file from the selected package server
+	 *
+	 * @param object $thisPackage
+	 * @param string $packageSection
+	 *
+	 * @return array
+	 */
+	private function _load_package_json($thisPackage, $packageSection)
+	{
+		// Populate the package info from the fetched data
+		return array(
+			'id' => !empty($thisPackage->pkid) ? array($thisPackage->pkid) : $this->_assume_id($thisPackage),
+			'type' => $packageSection,
+			'name' => Util::htmlspecialchars($thisPackage->title),
+			'date' => htmlTime(strtotime($thisPackage->date)),
+			'author' =>  Util::htmlspecialchars($thisPackage->author),
+			'description' => !empty($thisPackage->short) ? Util::htmlspecialchars($thisPackage->short) : '',
+			'version' => $thisPackage->version,
+			'elkversion' => $thisPackage->elkversion,
+			'license' => $thisPackage->license,
+			'hooks' => $thisPackage->allhooks,
+			'server' => array(
+				'download' => filter_var($thisPackage->server[0]->download, FILTER_VALIDATE_URL)
+					? $thisPackage->server[0]->download : '',
+				'support' => filter_var($thisPackage->server[0]->support, FILTER_VALIDATE_URL)
+					? $thisPackage->server[0]->support : '',
+				'bugs' => filter_var($thisPackage->server[0]->bugs, FILTER_VALIDATE_URL)
+					? $thisPackage->server[0]->bugs : '',
+				'link' => filter_var($thisPackage->server[0]->url, FILTER_VALIDATE_URL)
+					? $thisPackage->server[0]->url : '',
+			),
+		);
+	}
+
+	/**
+	 * If no ID is provided for a package, create the most
+	 * common ones based on author:package patterns
+	 *
+	 * - Should not be relied on
+	 *
+	 * @param object $thisPackage
+	 *
+	 * @return array
+	 */
+	private function _assume_id($thisPackage)
+	{
+		$under = str_replace(' ', '_', $thisPackage->title);
+		$none = str_replace(' ', '', $thisPackage->title);
+
+		return array (
+			$thisPackage->author . ':' . $under,
+			$thisPackage->author . ':' . $none,
+			strtolower($thisPackage->author) . ':' . $under,
+			strtolower($thisPackage->author) . ':' . $none,
+			ucfirst($thisPackage->author) . ':' . $under,
+			ucfirst($thisPackage->author) . ':' . $none,
+		);
 	}
 
 	/**
 	 * Determine the package file name so we can see if its been downloaded
+	 *
+	 * - Determines a unique package name given a master.xyz file
+	 * - Create the name based on the repo name
+	 * - removes invalid filename characters
 	 *
 	 * @param string $name
 	 *
@@ -338,6 +316,7 @@ class PackageServers_Controller extends Action_Controller
 	 */
 	private function _rename_master($name)
 	{
+		// Is this a "master" package from github or bitbucket?
 		if (preg_match('~^http(s)?://(www.)?(bitbucket\.org|github\.com)/(.+?(master(\.zip|\.tar\.gz)))$~', $name, $matches) == 1)
 		{
 			// Name this master.zip based on repo name in the link
@@ -346,18 +325,30 @@ class PackageServers_Controller extends Action_Controller
 
 			// Just to be safe, no invalid file characters
 			$invalid = array_merge(array_map('chr', range(0, 31)), array('<', '>', ':', '"', '/', '\\', '|', '?', '*'));
+
+			// We could read the package info and see if we have a duplicate id & version, however that is
+			// not always accurate, especially when dealing with repos.  So for now just put in in no conflict mode
+			// and do the save.
+			if (isset($_GET['area'], $_GET['sa']) && $_GET['area'] == 'packageservers' && $_GET['sa'] == 'download')
+				$_REQUEST['auto'] = true;
+
 			return str_replace($invalid, '_', $newname) . $matches[6];
 		}
 		else
-		{
 			return basename($name);
-		}
 	}
 
 	/**
 	 * Download a package.
 	 *
+	 * What it does:
 	 * - Accessed by action=admin;area=packageservers;sa=download
+	 * - If server is set, loads json file from package server
+	 *     - requires both section and num values to validate the file to download from the json file
+	 * - If $_POST['byurl']) $_POST['filename'])) are set, will download a file from the url and save it as filename
+	 * - If just $_POST['byurl']) is set will fetch that file and save it
+	 *     - github and bitbucket master files are renamed to repo name to avoid collisions
+	 * - Files are saved to the package directory and validate to be ElkArte packages
 	 */
 	public function action_download()
 	{
@@ -369,57 +360,51 @@ class PackageServers_Controller extends Action_Controller
 		$context['sub_template'] = 'downloaded';
 
 		// Security is good...
-		checkSession('get');
+		if (isset($_GET['server']))
+			checkSession('get');
+		else
+			checkSession();
 
-		// To download something, we need a valid server or url.
-		if (empty($_GET['server']) && (!empty($_GET['get']) && !empty($_REQUEST['package'])))
+		// To download something, we need either a valid server or url.
+		if (empty($_GET['server']) && (!empty($_GET['get']) && !empty($_POST['package'])))
 			fatal_lang_error('package_get_error_is_zero', false);
 
-		if (isset($_GET['server']))
+		// Start off with nothing
+		$package_name = '';
+		$server = '';
+		$url = '';
+
+		// Download from a package server?
+		if (!empty($_GET['server']))
 		{
-			$server = (int) $_GET['server'];
+			list(, $url, $server) = $this->_package_server();
 
-			// Query the server table to find the requested server.
-			$packageserver = fetchPackageServers($server);
-			$url = $packageserver[0]['url'];
+			// Fetch the package listing from the package server
+			$listing = json_decode(fetch_web_data($url));
 
-			// If server does not exist then dump out.
-			if (empty($url))
-				fatal_lang_error('couldnt_connect', false);
+			// Find the requested package by section and number, make sure it matches
+			$section = $listing->$_GET['section'];
 
-			$url = $url . '/';
+			// This is what they requested, yes?
+			if (basename($section[$_GET['num']]->server[0]->download) === $_GET['package'])
+			{
+				// Where to download it from
+				$package_name = $this->_rename_master($section[$_GET['num']]->server[0]->download);
+				$path_url = pathinfo($section[$_GET['num']]->server[0]->download);
+				$url = isset($path_url['dirname']) ? $path_url['dirname'] . '/' : '';
+			}
+			// Not found or some monkey business
+			else
+				fatal_lang_error('package_cant_download', false);
 		}
+		// Entered a url and optional filename
+		elseif (isset($_POST['byurl']) && !empty($_POST['filename']))
+			$package_name = basename($_POST['filename']);
+		// Must just be a link then
 		else
-		{
-			// Initialize the required variables.
-			$server = '';
-			$url = '';
-		}
+			$package_name = $this->_rename_master($_POST['package']);
 
-		// Entered a url and name to download?
-		if (isset($_REQUEST['byurl']) && !empty($_POST['filename']))
-			$package_name = basename($_REQUEST['filename']);
-		else
-			$package_name = basename($_REQUEST['package']);
-
-		// Is this a "master" package from github or bitbucket?
-		if (preg_match('~^http(s)?://(www.)?(bitbucket\.org|github\.com)/(.+?(master(\.zip|\.tar\.gz)))$~', $_REQUEST['package'], $matches) == 1)
-		{
-			// @todo maybe use the name/version in the package instead, although the link will be cleaner
-			// Name this master.zip based on repo name in the link
-			$path_parts = pathinfo($matches[4]);
-			list (, $newname, ) = explode('/', $path_parts['dirname']);
-
-			// Just to be safe, no invalid file characters
-			$invalid = array_merge(array_map('chr', range(0, 31)), array('<', '>', ':', '"', '/', '\\', '|', '?', '*'));
-			$package_name = str_replace($invalid, '_', $newname) . $matches[6];
-
-			// We could read the package info and see if we have a duplicate id & version, however that is
-			// not always accurate, especially when dealing with repos.  So for now just put in in no conflict mode
-			// and do the save.
-			$_REQUEST['auto'] = true;
-		}
-
+		// Avoid over writing any existing package files of the same name
 		if (isset($_REQUEST['conflict']) || (isset($_REQUEST['auto']) && file_exists(BOARDDIR . '/packages/' . $package_name)))
 		{
 			// Find the extension, change abc.tar.gz to abc_1.tar.gz...
@@ -431,7 +416,7 @@ class PackageServers_Controller extends Action_Controller
 			else
 				$ext = '';
 
-			// Find the first available.
+			// Find the first available free name
 			$i = 1;
 			while (file_exists(BOARDDIR . '/packages/' . $package_name . $i . $ext))
 				$i++;
@@ -440,11 +425,12 @@ class PackageServers_Controller extends Action_Controller
 		}
 
 		// First make sure it's a package.
+
 		$packageInfo = getPackageInfo($url . $_REQUEST['package']);
 		if (!is_array($packageInfo))
 			fatal_lang_error($packageInfo);
 
-		// Save the package to disk, use FTP if necessary
+		// Save the package to disk as $package_name, use FTP if necessary
 		create_chmod_control(array(BOARDDIR . '/packages/' . $package_name), array('destination_url' => $scripturl . '?action=admin;area=packageservers;sa=download' . (isset($_GET['server']) ? ';server=' . $_GET['server'] : '') . (isset($_REQUEST['auto']) ? ';auto' : '') . ';package=' . $_REQUEST['package'] . (isset($_REQUEST['conflict']) ? ';conflict' : '') . ';' . $context['session_var'] . '=' . $context['session_id'], 'crash_on_error' => true));
 		package_put_contents(BOARDDIR . '/packages/' . $package_name, fetch_web_data($url . $_REQUEST['package']));
 
@@ -476,6 +462,40 @@ class PackageServers_Controller extends Action_Controller
 		unset($context['package']['xml']);
 
 		$context['page_title'] = $txt['download_success'];
+	}
+
+	/**
+	 * Returns the contact details for a server
+	 *
+	 * - Reads the database to fetch the server url and name
+	 *
+	 * @return array
+	 */
+	private function _package_server()
+	{
+		// Initialize the required variables.
+		$name = '';
+		$url = '';
+		$server = '';
+
+		if (isset($_GET['server']))
+		{
+			if ($_GET['server'] == '')
+				redirectexit('action=admin;area=packageservers');
+
+			$server = (int) $_GET['server'];
+
+			// Query the server table to find the requested server.
+			$packageserver = fetchPackageServers($server);
+			$url = $packageserver[0]['url'];
+			$name = $packageserver[0]['name'];
+
+			// If server does not exist then dump out.
+			if (empty($url))
+				fatal_lang_error('couldnt_connect', false);
+		}
+
+		return array($name, $url, $server);
 	}
 
 	/**
