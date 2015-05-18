@@ -36,70 +36,72 @@ function template_servers()
 		template_ftp_form_required();
 
 	echo '
-		<div class="windowbg2">
-			<div class="content">
-				<fieldset>
-					<legend>' . $txt['package_servers'] . '</legend>
-					<ul class="package_servers">';
+		<div class="content">
+			<fieldset>
+				<legend>' . $txt['package_servers'] . '</legend>
+				<ul class="package_servers">';
 
 	foreach ($context['servers'] as $server)
 		echo '
-						<li class="flow_auto">
-							<span class="floatleft">' . $server['name'] . '</span>
-							<span class="package_server floatright"><a href="' . $scripturl . '?action=admin;area=packageservers;sa=remove;server=' . $server['id'] . ';', $context['session_var'], '=', $context['session_id'], '">[ ' . $txt['delete'] . ' ]</a></span>
-							<span class="package_server floatright"><a href="' . $scripturl . '?action=admin;area=packageservers;sa=browse;server=' . $server['id'] . '">[ ' . $txt['package_browse'] . ' ]</a></span>
-						</li>';
+					<li class="flow_auto">
+						<strong>' . $server['name'] . '</strong>
+						<span class="package_server floatright">
+							<a class="linkbutton" href="' . $scripturl . '?action=admin;area=packageservers;sa=browse;server=' . $server['id'] . '">' . $txt['package_browse'] . '</a>
+							&nbsp;<a class="linkbutton" href="' . $scripturl . '?action=admin;area=packageservers;sa=remove;server=' . $server['id'] . ';', $context['session_var'], '=', $context['session_id'], '">' . $txt['delete'] . '</a>
+						</span>
+					</li>';
 
 	echo '
-					</ul>
-				</fieldset>
-				<fieldset>
-					<legend>' . $txt['add_server'] . '</legend>
-					<form action="' . $scripturl . '?action=admin;area=packageservers;sa=add" method="post" accept-charset="UTF-8">
-						<dl class="settings">
-							<dt>
-								<strong><label for="servername">' . $txt['server_name'] . '</label>:</strong>
-							</dt>
-							<dd>
-								<input type="text" id="servername" name="servername" size="44" value="ElkArte" class="input_text" />
-							</dd>
-							<dt>
-								<strong><label for="serverurl">' . $txt['serverurl'] . '</label>:</strong>
-							</dt>
-							<dd>
-								<input type="text" id="serverurl" name="serverurl" size="44" value="http://" class="input_text" />
-							</dd>
-						</dl>
-						<div class="submitbutton">
-							<input type="submit" value="' . $txt['add_server'] . '" class="button_submit" />
-							<input type="hidden" name="' . $context['session_var'] . '" value="' . $context['session_id'] . '" />
-						</div>
-					</form>
-				</fieldset>
-				<fieldset>
-					<legend>', $txt['package_download_by_url'], '</legend>
-					<form action="', $scripturl, '?action=admin;area=packageservers;sa=download;byurl;', $context['session_var'], '=', $context['session_id'], '" method="post" accept-charset="UTF-8">
-						<dl class="settings">
-							<dt>
-								<strong><label for="package">' . $txt['serverurl'] . '</label>:</strong>
-							</dt>
-							<dd>
-								<input type="text" id="package" name="package" size="44" value="http://" class="input_text" />
-							</dd>
-							<dt>
-								<strong><label for="filename">', $txt['package_download_filename'], '</label>:</strong>
-							</dt>
-							<dd>
-								<input type="text" id="filename" name="filename" size="44" class="input_text" /><br />
-								<span class="smalltext">', $txt['package_download_filename_info'], '</span>
-							</dd>
-						</dl>
-						<div class="submitbutton">
-							<input type="submit" value="', $txt['download'], '" class="button_submit" />
-						</div>
-					</form>
-				</fieldset>
-			</div>
+				</ul>
+			</fieldset>
+			<fieldset>
+				<legend>' . $txt['add_server'] . '</legend>
+				<form action="' . $scripturl . '?action=admin;area=packageservers;sa=add" method="post" accept-charset="UTF-8">
+					<dl class="settings">
+						<dt>
+							<strong><label for="servername">' . $txt['server_name'] . '</label>:</strong>
+						</dt>
+						<dd>
+							<input type="text" id="servername" name="servername" size="44" value="ElkArte" class="input_text" />
+						</dd>
+						<dt>
+							<strong><label for="serverurl">' . $txt['serverurl'] . '</label>:</strong>
+						</dt>
+						<dd>
+							<input type="text" id="serverurl" name="serverurl" size="44" value="http://" class="input_text" />
+						</dd>
+					</dl>
+					<div class="submitbutton">
+						<input type="submit" value="' . $txt['add_server'] . '" class="button_submit" />
+						<input type="hidden" name="' . $context['session_var'] . '" value="' . $context['session_id'] . '" />
+					</div>
+				</form>
+			</fieldset>
+			<fieldset>
+				<legend>', $txt['package_download_by_url'], '</legend>
+				<form action="', $scripturl, '?action=admin;area=packageservers;sa=download" method="post" accept-charset="UTF-8">
+					<dl class="settings">
+						<dt>
+							<strong><label for="package">' . $txt['serverurl'] . '</label>:</strong>
+						</dt>
+						<dd>
+							<input type="text" id="package" name="package" size="44" value="http://" class="input_text" />
+						</dd>
+						<dt>
+							<strong><label for="filename">', $txt['package_download_filename'], '</label>:</strong>
+						</dt>
+						<dd>
+							<input type="text" id="filename" name="filename" size="44" class="input_text" /><br />
+							<span class="smalltext">', $txt['package_download_filename_info'], '</span>
+						</dd>
+					</dl>
+					<div class="submitbutton">
+						<input type="submit" value="', $txt['download'], '" class="button_submit" />
+						<input type="hidden" value="byurl" name="byurl" />
+						<input type="hidden" name="' . $context['session_var'] . '" value="' . $context['session_id'] . '" />
+					</div>
+				</form>
+			</fieldset>
 		</div>
 	</div>';
 }
@@ -152,14 +154,18 @@ function template_package_list()
 		{
 			echo '
 					<li>
-						<img id="ps_img_', $i, '" src="', $settings['images_url'], '/collapse.png" class="floatright" alt="*" style="display: none;" /><strong>', $packageSection['title'], '</strong>';
+						<span class="package_toggle">&nbsp;
+							<span id="ps_img_', $i, '" class="collapse" style="display: none;" title="', $txt['hide'], '"></span>
+						</span>
+						<a href="#" id="upshrink_link_', $i, '" class="highlight">', $packageSection['title'], '</a>';
 
 			if (!empty($packageSection['text']))
 				echo '
-						<div class="information">', $packageSection['text'], '</div>';
+						<div class="content">', $packageSection['text'], '</div>';
 
+			// List of addons available in this section
 			echo '
-						<', $context['list_type'], ' id="package_section_', $i, '" class="packages">';
+						<ol id="package_section_', $i, '" class="packages">';
 
 			$alt = false;
 
@@ -169,7 +175,9 @@ function template_package_list()
 							<li>';
 					// 1. Some addon [ Download ].
 					echo '
-							<strong><img id="ps_img_', $i, '_pkg_', $id, '" src="', $settings['images_url'], '/selected_open.png" alt="*" style="display: none;" /> ', $package['can_install'] ? '<strong>' . $package['name'] . '</strong> <a href="' . $package['download']['href'] . '">[ ' . $txt['download'] . ' ]</a>' : $package['name'];
+							<strong>
+								<img id="ps_img_', $i, '_pkg_', $id, '" src="', $settings['images_url'], '/selected_open.png" alt="*" style="display: none;" /> ',
+								$package['can_install'] ? '<strong>' . $package['name'] . '</strong> <a class="linkbutton" href="' . $package['download']['href'] . '">' . $txt['download'] . '</a>' : $package['name'];
 
 					// Mark as installed and current?
 					if ($package['is_installed'] && !$package['is_newer'])
@@ -231,7 +239,7 @@ function template_package_list()
 			}
 
 			echo '
-					</', $context['list_type'], '>
+					</ol>
 						</li>';
 		}
 
@@ -262,13 +270,20 @@ function template_package_list()
 					aSwappableContainers: [
 						\'package_section_', $section, '\'
 					],
-					aSwapImages: [
+					aSwapClasses: [
 						{
 							sId: \'ps_img_', $section, '\',
-							srcExpanded: elk_images_url + \'/collapse.png\',
-							altExpanded: \'*\',
-							srcCollapsed: elk_images_url + \'/expand.png\',
-							altCollapsed: \'*\'
+							classExpanded: \'collapse\',
+							titleExpanded: ', JavaScriptEscape($txt['hide']), ',
+							classCollapsed: \'expand\',
+							titleCollapsed: ', JavaScriptEscape($txt['show']), '
+						}
+					],
+					aSwapLinks: [
+						{
+							sId: \'upshrink_link_', $section, '\',
+							msgExpanded: ', JavaScriptEscape($ps['title']), ',
+							msgCollapsed: ', JavaScriptEscape($ps['title']), '
 						}
 					]
 				});';
