@@ -697,7 +697,7 @@ function template_display_poll_above()
 		echo '
 							</ul>
 							<div class="submitbutton">
-								<input type="submit" value="', $txt['poll_vote'], '" class="button_submit" />
+								<input type="submit" value="', $txt['poll_vote'], '" class="left_submit" />
 								<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />
 							</div>
 						</form>';

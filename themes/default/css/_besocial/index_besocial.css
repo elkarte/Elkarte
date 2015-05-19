@@ -368,6 +368,14 @@ sup.bbc_footnotes, sup.bbc_footnotes a {
 div.bbc_footnotes .meaction {
 	display: inline-block;
 }
+/* Prevent the footnote named anchor from hiding under the menu */
+.bbc_footnotes div:before {
+	display: block;
+	content: " ";
+	margin-top: -75px;
+	height: 75px;
+	visibility: hidden;
+}
 
 
 /*	$AJAX		*/
