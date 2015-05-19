@@ -2,7 +2,7 @@
 
 /**
  * This file handles the package servers and packages download, in Package Servers
- * area of admininstration panel.
+ * area of administration panel.
  *
  * @name      ElkArte Forum
  * @copyright ElkArte Forum contributors
@@ -30,8 +30,8 @@ if (!defined('ELK'))
 class PackageServers_Controller extends Action_Controller
 {
 	/**
-	 * Called before all other methods when comming from the dispatcher or
-	 * action class.  Loads lanaguage and templates files so they are available
+	 * Called before all other methods when coming from the dispatcher or
+	 * action class.  Loads language and templates files so they are available
 	 * to the other methods.
 	 */
 	public function pre_dispatch()
@@ -130,333 +130,225 @@ class PackageServers_Controller extends Action_Controller
 		// Load our subs worker.
 		require_once(SUBSDIR . '/PackageServers.subs.php');
 
+		$server = '';
+		$url = '';
+		$name = '';
+
 		// Browsing the packages from a server
 		if (isset($_GET['server']))
-		{
-			if ($_GET['server'] == '')
-				redirectexit('action=admin;area=packageservers');
-
-			$server = (int) $_GET['server'];
-
-			// Query the server list to find the current server.
-			$packageserver = fetchPackageServers($server);
-			$url = $packageserver[0]['url'];
-			$name = $packageserver[0]['name'];
-
-			// If the server does not exist, dump out.
-			if (empty($url))
-				fatal_lang_error('couldnt_connect', false);
-
-			// If there is a relative link, append to the stored server url.
-			if (isset($_GET['relative']))
-				$url = $url . (substr($url, -1) == '/' ? '' : '/') . $_GET['relative'];
-
-			// Clear any "absolute" URL.  Since "server" is present, "absolute" is garbage.
-			unset($_GET['absolute']);
-		}
-		elseif (isset($_GET['absolute']) && $_GET['absolute'] != '')
-		{
-			// Initialize the required variables.
-			$server = '';
-			$url = $_GET['absolute'];
-			$name = '';
-			$_GET['package'] = $url . '/packages.xml?language=' . $context['user']['language'];
-
-			// Clear any "relative" URL.  Since "server" is not present, "relative" is garbage.
-			unset($_GET['relative']);
-
-			$token = checkConfirm('get_absolute_url');
-			if ($token !== true)
-			{
-				$context['sub_template'] = 'package_confirm';
-				$context['page_title'] = $txt['package_servers'];
-				$context['confirm_message'] = sprintf($txt['package_confirm_view_package_content'], htmlspecialchars($_GET['absolute'], ENT_COMPAT, 'UTF-8'));
-				$context['proceed_href'] = $scripturl . '?action=admin;area=packageservers;sa=browse;absolute=' . urlencode($_GET['absolute']) . ';confirm=' . $token;
-
-				return;
-			}
-		}
+			list($name, $url, $server) = $this->_package_server();
 		// Minimum required parameter did not exist so dump out.
 		else
 			fatal_lang_error('couldnt_connect', false);
 
-		// Attempt to connect.  If unsuccessful... try the URL.
-		if (!isset($_GET['package']) || file_exists($_GET['package']))
-			$_GET['package'] = $url . '/packages.xml?language=' . $context['user']['language'];
-
-		// Check to be sure the packages.xml file actually exists where it is should be... or dump out.
-		if ((isset($_GET['absolute']) || isset($_GET['relative'])) && !url_exists($_GET['package']))
-			fatal_lang_error('packageget_unable', false, array($url . '/index.php'));
-
 		// Might take some time.
-		@set_time_limit(600);
+		@set_time_limit(60);
 
-		// Read packages.xml and parse into Xml_Array. (the true tells it to trim things ;).)
-		require_once(SUBSDIR . '/XmlArray.class.php');
-		$listing = new Xml_Array(fetch_web_data($_GET['package']), true);
-
-		// Errm.... empty file?  Try the URL....
-		if (!$listing->exists('package-list'))
-			fatal_lang_error('packageget_unable', false, array($url . '/index.php'));
+		// Fetch the package listing from the server and json decode
+		$listing = json_decode(fetch_web_data($url));
 
 		// List out the packages...
 		$context['package_list'] = array();
 
-		$listing = $listing->path('package-list[0]');
-
-		// Use the package list's name if it exists.
-		if ($listing->exists('list-title'))
-			$name = Util::htmlspecialchars($listing->fetch('list-title'));
-
 		// Pick the correct template.
 		$context['sub_template'] = 'package_list';
-
 		$context['page_title'] = $txt['package_servers'] . ($name != '' ? ' - ' . $name : '');
 		$context['package_server'] = $server;
 
-		// By default we use an unordered list, unless there are no lists with more than one package.
-		$context['list_type'] = 'ul';
-
-		// Load the installed packages
-		// We'll figure out if what they select a package they already have installed.
-		$instadds = loadInstalledPackages();
-
-		// Look through the list of installed mods...
-		$installed_adds = array();
-		foreach ($instadds as $installed_add)
-			$installed_adds[$installed_add['package_id']] = $installed_add['version'];
-
-		// Get default author and email if they exist.
-		if ($listing->exists('default-author'))
+		// If we received data
+		if (!empty($listing))
 		{
-			$default_author = Util::htmlspecialchars($listing->fetch('default-author'));
-			if ($listing->exists('default-author/@email'))
-				$default_email = Util::htmlspecialchars($listing->fetch('default-author/@email'));
-		}
+			// Load the installed packages
+			$instadds = loadInstalledPackages();
 
-		// Get default web site if it exists.
-		if ($listing->exists('default-website'))
-		{
-			$default_website = Util::htmlspecialchars($listing->fetch('default-website'));
-			if ($listing->exists('default-website/@title'))
-				$default_title = Util::htmlspecialchars($listing->fetch('default-website/@title'));
-		}
+			// Look through the list of installed mods and get version information for the compare
+			$installed_adds = array();
+			foreach ($instadds as $installed_add)
+				$installed_adds[$installed_add['package_id']] = $installed_add['version'];
 
-		$the_version = strtr($forum_version, array('ElkArte ' => ''));
-		if (!empty($_SESSION['version_emulate']))
-			$the_version = $_SESSION['version_emulate'];
+			$the_version = strtr($forum_version, array('ElkArte ' => ''));
+			if (!empty($_SESSION['version_emulate']))
+				$the_version = $_SESSION['version_emulate'];
 
-		$packageNum = 0;
-		$packageSection = 0;
-
-		$sections = $listing->set('section');
-		foreach ($sections as $i => $section)
-		{
-			$context['package_list'][$packageSection] = array(
-				'title' => '',
-				'text' => '',
-				'items' => array(),
-			);
-
-			$packages = $section->set('title|heading|text|remote|rule|modification|language|avatar-pack|theme|smiley-set');
-			foreach ($packages as $thisPackage)
+			// Parse the json file, each section contains a category of addons
+			$packageNum = 0;
+			foreach ($listing as $packageSection => $section_items)
 			{
-				$package = array(
-					'type' => $thisPackage->name(),
+				// Section title / header for the category
+				$context['package_list'][$packageSection] = array(
+					'title' => Util::htmlspecialchars(ucwords($packageSection)),
+					'text' => '',
+					'items' => array(),
 				);
 
-				if (in_array($package['type'], array('title', 'text')))
-					$context['package_list'][$packageSection][$package['type']] = Util::htmlspecialchars($thisPackage->fetch('.'));
-				// It's a Title, Heading, Rule or Text.
-				elseif (in_array($package['type'], array('heading', 'rule')))
-					$package['name'] = Util::htmlspecialchars($thisPackage->fetch('.'));
-				// It's a Remote link.
-				elseif ($package['type'] == 'remote')
+				// Load each package array as an item
+				$section_count = 0;
+				foreach ($section_items as $thisPackage)
 				{
-					$remote_type = $thisPackage->exists('@type') ? $thisPackage->fetch('@type') : 'relative';
+					// Read in the package info from the fetched data
+					$package = $this->_load_package_json($thisPackage, $packageSection);
 
-					if ($remote_type == 'relative' && (substr($thisPackage->fetch('@href'), 0, 7) !== 'http://' || substr($thisPackage->fetch('@href'), 0, 8) !== 'https://'))
-					{
-						if (isset($_GET['absolute']))
-							$current_url = $_GET['absolute'] . '/';
-						elseif (isset($_GET['relative']))
-							$current_url = $_GET['relative'] . '/';
-						else
-							$current_url = '';
+					// Check the install status
+					$package['can_install'] = false;
+					$is_installed = array_intersect(array_keys($installed_adds), $package['id']);
+					$package['is_installed'] = !empty($is_installed);
 
-						$current_url .= $thisPackage->fetch('@href');
-						if (isset($_GET['absolute']))
-							$package['href'] = $scripturl . '?action=admin;area=packageservers;sa=browse;absolute=' . $current_url;
-						else
-							$package['href'] = $scripturl . '?action=admin;area=packageservers;sa=browse;server=' . $context['package_server'] . ';relative=' . $current_url;
-					}
-					else
-					{
-						$current_url = $thisPackage->fetch('@href');
-						$package['href'] = $scripturl . '?action=admin;area=packageservers;sa=browse;absolute=' . $current_url;
-					}
+					// Set the ID from our potential list should the ID not be provided in the package .yaml
+					$package['id'] = $package['is_installed'] ? array_shift($is_installed) : $package['id'][0];
 
-					$package['name'] = Util::htmlspecialchars($thisPackage->fetch('.'));
-					$package['link'] = '<a href="' . $package['href'] . '">' . $package['name'] . '</a>';
-				}
-				// It's a package...
-				else
-				{
-					if (isset($_GET['absolute']))
-						$current_url = $_GET['absolute'] . '/';
-					elseif (isset($_GET['relative']))
-						$current_url = $_GET['relative'] . '/';
-					else
-						$current_url = '';
+					// Version installed vs version available
+					$package['is_current'] = !empty($package['is_installed']) && ($installed_adds[$package['id']] == $package['version']);
+					$package['is_newer'] = !empty($package['is_installed']) && ($installed_adds[$package['id']] > $package['version']);
 
-					$server_att = $server != '' ? ';server=' . $server : '';
+					// Set the package filename for downloading and pre-existence checking
+					$base_name = $this->_rename_master($package['server']['download']);
+					$package['filename'] = basename($package['server']['download']);
 
-					$package += $thisPackage->to_array();
-
-					if (isset($package['website']))
-						unset($package['website']);
-					$package['author'] = array();
-
-					if ($package['description'] == '')
-						$package['description'] = $txt['package_no_description'];
-					else
-						$package['description'] = parse_bbc(preg_replace('~\[[/]?html\]~i', '', Util::htmlspecialchars($package['description'])));
-
-					$package['is_installed'] = isset($installed_adds[$package['id']]);
-					$package['is_current'] = $package['is_installed'] && ($installed_adds[$package['id']] == $package['version']);
-					$package['is_newer'] = $package['is_installed'] && ($installed_adds[$package['id']] > $package['version']);
-
-					// This package is either not installed, or installed but old.  Is it supported on this version?
+					// This package is either not installed, or installed but old.
 					if (!$package['is_installed'] || (!$package['is_current'] && !$package['is_newer']))
 					{
-						if ($thisPackage->exists('version/@for'))
-							$package['can_install'] = matchPackageVersion($the_version, $thisPackage->fetch('version/@for'));
+						// Does it claim to install on this version of ElkArte?
+						$path_parts = pathinfo($base_name);
+						if (!empty($thisPackage->elkversion) && isset($path_parts['extension']) && in_array($path_parts['extension'], array('zip', 'tar', 'gz', 'tar.gz')))
+						{
+							// No install range given, then set one, it will all work out in the end.
+							$for = strpos($thisPackage->elkversion, '-') === false ? $thisPackage->elkversion . '-' . $the_version : $thisPackage->elkversion;
+							$package['can_install'] = matchPackageVersion($the_version, $for);
+						}
 					}
-					// Okay, it's already installed AND up to date.
-					else
-						$package['can_install'] = false;
 
-					$already_exists = getPackageInfo(basename($package['filename']));
+					// See if this filename already exists on the server
+					$already_exists = getPackageInfo($base_name);
 					$package['download_conflict'] = is_array($already_exists) && $already_exists['id'] == $package['id'] && $already_exists['version'] != $package['version'];
+					$package['count'] = ++$packageNum;
 
-					$package['href'] = $url . '/' . $package['filename'];
-					$package['name'] = Util::htmlspecialchars($package['name']);
-					$package['link'] = '<a href="' . $package['href'] . '">' . $package['name'] . '</a>';
-					$package['download']['href'] = $scripturl . '?action=admin;area=packageservers;sa=download' . $server_att . ';package=' . $current_url . $package['filename'] . ($package['download_conflict'] ? ';conflict' : '') . ';' . $context['session_var'] . '=' . $context['session_id'];
+					// Build the download to server link
+					$server_att = $server != '' ? ';server=' . $server : '';
+					$current_url = ';section=' . $packageSection . ';num=' . $section_count;
+					$package['download']['href'] = $scripturl . '?action=admin;area=packageservers;sa=download' . $server_att . $current_url . ';package=' . $package['filename'] . ($package['download_conflict'] ? ';conflict' : '') . ';' . $context['session_var'] . '=' . $context['session_id'];
 					$package['download']['link'] = '<a href="' . $package['download']['href'] . '">' . $package['name'] . '</a>';
 
-					// Author name, email
-					if ($thisPackage->exists('author') || isset($default_author))
-					{
-						if ($thisPackage->exists('author/@email'))
-							$package['author']['email'] = $thisPackage->fetch('author/@email');
-						elseif (isset($default_email))
-							$package['author']['email'] = $default_email;
-
-						if ($thisPackage->exists('author') && $thisPackage->fetch('author') != '')
-							$package['author']['name'] = Util::htmlspecialchars($thisPackage->fetch('author'));
-						else
-							$package['author']['name'] = $default_author;
-
-						if (!empty($package['author']['email']))
-						{
-							// Only put the "mailto:" if it looks like a valid email address.  Some may wish to put a link to an IM Form or other web mail form.
-							$package['author']['href'] = filter_var($package['author']['email'], FILTER_VALIDATE_EMAIL) ? 'mailto:' . $package['author']['email'] : $package['author']['email'];
-							$package['author']['link'] = '<a href="' . $package['author']['href'] . '">' . $package['author']['name'] . '</a>';
-						}
-					}
-
-					// Author website
-					if ($thisPackage->exists('website') || isset($default_website))
-					{
-						if ($thisPackage->exists('website') && $thisPackage->exists('website/@title'))
-							$package['author']['website']['name'] = Util::htmlspecialchars($thisPackage->fetch('website/@title'));
-						elseif (isset($default_title))
-							$package['author']['website']['name'] = $default_title;
-						elseif ($thisPackage->exists('website'))
-							$package['author']['website']['name'] = Util::htmlspecialchars($thisPackage->fetch('website'));
-						else
-							$package['author']['website']['name'] = $default_website;
-
-						if ($thisPackage->exists('website') && $thisPackage->fetch('website') != '')
-							$authorhomepage = Util::htmlspecialchars($thisPackage->fetch('website'));
-						else
-							$authorhomepage = $default_website;
-
-						if (stripos($authorhomepage, 'a href') === false)
-						{
-							$package['author']['website']['href'] = $authorhomepage;
-							$package['author']['website']['link'] = '<a href="' . $authorhomepage . '">' . $package['author']['website']['name'] . '</a>';
-						}
-						else
-						{
-							if (preg_match('/a href="(.+?)"/', $authorhomepage, $match) == 1)
-								$package['author']['website']['href'] = $match[1];
-							else
-								$package['author']['website']['href'] = '';
-							$package['author']['website']['link'] = $authorhomepage;
-						}
-					}
-					else
-					{
-						$package['author']['website']['href'] = '';
-						$package['author']['website']['link'] = '';
-					}
+					// Add this package to the list
+					$context['package_list'][$packageSection]['items'][$packageNum] = $package;
+					$section_count++;
 				}
 
-				$package['is_remote'] = $package['type'] == 'remote';
-				$package['is_title'] = $package['type'] == 'title';
-				$package['is_heading'] = $package['type'] == 'heading';
-				$package['is_text'] = $package['type'] == 'text';
-				$package['is_line'] = $package['type'] == 'rule';
-
-				$packageNum = in_array($package['type'], array('title', 'heading', 'text', 'remote', 'rule')) ? 0 : $packageNum + 1;
-				$package['count'] = $packageNum;
-
-				if (!in_array($package['type'], array('title', 'text')))
-					$context['package_list'][$packageSection]['items'][] = $package;
-
-				if ($package['count'] > 1)
-					$context['list_type'] = 'ol';
+				$context['package_list'][$packageSection]['text'] = sprintf($txt['mod_section_count'], $section_count);
 			}
-
-			$packageSection++;
 		}
 
-		// Lets make sure we get a nice new spiffy clean $package to work with.  Otherwise we get PAIN!
-		unset($package);
+		// Good time to sort the categories, the packages inside each category will be by last modification date.
+		asort($context['package_list']);
+	}
 
-		foreach ($context['package_list'] as $ps_id => $packageSection)
+	/**
+	 * Returns a package array filled with the json information
+	 *
+	 * - Uses the parsed json file from the selected package server
+	 *
+	 * @param object $thisPackage
+	 * @param string $packageSection
+	 *
+	 * @return array
+	 */
+	private function _load_package_json($thisPackage, $packageSection)
+	{
+		// Populate the package info from the fetched data
+		return array(
+			'id' => !empty($thisPackage->pkid) ? array($thisPackage->pkid) : $this->_assume_id($thisPackage),
+			'type' => $packageSection,
+			'name' => Util::htmlspecialchars($thisPackage->title),
+			'date' => htmlTime(strtotime($thisPackage->date)),
+			'author' =>  Util::htmlspecialchars($thisPackage->author),
+			'description' => !empty($thisPackage->short) ? Util::htmlspecialchars($thisPackage->short) : '',
+			'version' => $thisPackage->version,
+			'elkversion' => $thisPackage->elkversion,
+			'license' => $thisPackage->license,
+			'hooks' => $thisPackage->allhooks,
+			'server' => array(
+				'download' => filter_var($thisPackage->server[0]->download, FILTER_VALIDATE_URL)
+					? $thisPackage->server[0]->download : '',
+				'support' => filter_var($thisPackage->server[0]->support, FILTER_VALIDATE_URL)
+					? $thisPackage->server[0]->support : '',
+				'bugs' => filter_var($thisPackage->server[0]->bugs, FILTER_VALIDATE_URL)
+					? $thisPackage->server[0]->bugs : '',
+				'link' => filter_var($thisPackage->server[0]->url, FILTER_VALIDATE_URL)
+					? $thisPackage->server[0]->url : '',
+			),
+		);
+	}
+
+	/**
+	 * If no ID is provided for a package, create the most
+	 * common ones based on author:package patterns
+	 *
+	 * - Should not be relied on
+	 *
+	 * @param object $thisPackage
+	 *
+	 * @return array
+	 */
+	private function _assume_id($thisPackage)
+	{
+		$under = str_replace(' ', '_', $thisPackage->title);
+		$none = str_replace(' ', '', $thisPackage->title);
+
+		return array (
+			$thisPackage->author . ':' . $under,
+			$thisPackage->author . ':' . $none,
+			strtolower($thisPackage->author) . ':' . $under,
+			strtolower($thisPackage->author) . ':' . $none,
+			ucfirst($thisPackage->author) . ':' . $under,
+			ucfirst($thisPackage->author) . ':' . $none,
+		);
+	}
+
+	/**
+	 * Determine the package file name so we can see if its been downloaded
+	 *
+	 * - Determines a unique package name given a master.xyz file
+	 * - Create the name based on the repo name
+	 * - removes invalid filename characters
+	 *
+	 * @param string $name
+	 *
+	 * @return string
+	 */
+	private function _rename_master($name)
+	{
+		// Is this a "master" package from github or bitbucket?
+		if (preg_match('~^http(s)?://(www.)?(bitbucket\.org|github\.com)/(.+?(master(\.zip|\.tar\.gz)))$~', $name, $matches) == 1)
 		{
-			foreach ($packageSection['items'] as $i => $package)
-			{
-				if ($package['count'] == 0 || isset($package['can_install']))
-					continue;
+			// Name this master.zip based on repo name in the link
+			$path_parts = pathinfo($matches[4]);
+			list (, $newname,) = explode('/', $path_parts['dirname']);
 
-				$context['package_list'][$ps_id]['items'][$i]['can_install'] = false;
+			// Just to be safe, no invalid file characters
+			$invalid = array_merge(array_map('chr', range(0, 31)), array('<', '>', ':', '"', '/', '\\', '|', '?', '*'));
 
-				$packageInfo = getPackageInfo($url . '/' . $package['filename']);
-				if (is_array($packageInfo) && $packageInfo['xml']->exists('install'))
-				{
-					$installs = $packageInfo['xml']->set('install');
-					foreach ($installs as $install)
-					{
-						if (!$install->exists('@for') || matchPackageVersion($the_version, $install->fetch('@for')))
-						{
-							// Okay, this one is good to go.
-							$context['package_list'][$ps_id]['items'][$i]['can_install'] = true;
-							break;
-						}
-					}
-				}
-			}
+			// We could read the package info and see if we have a duplicate id & version, however that is
+			// not always accurate, especially when dealing with repos.  So for now just put in in no conflict mode
+			// and do the save.
+			if (isset($_GET['area'], $_GET['sa']) && $_GET['area'] == 'packageservers' && $_GET['sa'] == 'download')
+				$_REQUEST['auto'] = true;
+
+			return str_replace($invalid, '_', $newname) . $matches[6];
 		}
+		else
+			return basename($name);
 	}
 
 	/**
 	 * Download a package.
 	 *
+	 * What it does:
 	 * - Accessed by action=admin;area=packageservers;sa=download
+	 * - If server is set, loads json file from package server
+	 *     - requires both section and num values to validate the file to download from the json file
+	 * - If $_POST['byurl']) $_POST['filename'])) are set, will download a file from the url and save it as filename
+	 * - If just $_POST['byurl']) is set will fetch that file and save it
+	 *     - github and bitbucket master files are renamed to repo name to avoid collisions
+	 * - Files are saved to the package directory and validate to be ElkArte packages
 	 */
 	public function action_download()
 	{
@@ -468,57 +360,51 @@ class PackageServers_Controller extends Action_Controller
 		$context['sub_template'] = 'downloaded';
 
 		// Security is good...
-		checkSession('get');
+		if (isset($_GET['server']))
+			checkSession('get');
+		else
+			checkSession();
 
-		// To download something, we need a valid server or url.
-		if (empty($_GET['server']) && (!empty($_GET['get']) && !empty($_REQUEST['package'])))
+		// To download something, we need either a valid server or url.
+		if (empty($_GET['server']) && (!empty($_GET['get']) && !empty($_POST['package'])))
 			fatal_lang_error('package_get_error_is_zero', false);
 
-		if (isset($_GET['server']))
+		// Start off with nothing
+		$package_name = '';
+		$server = '';
+		$url = '';
+
+		// Download from a package server?
+		if (!empty($_GET['server']))
 		{
-			$server = (int) $_GET['server'];
+			list(, $url, $server) = $this->_package_server();
 
-			// Query the server table to find the requested server.
-			$packageserver = fetchPackageServers($server);
-			$url = $packageserver[0]['url'];
+			// Fetch the package listing from the package server
+			$listing = json_decode(fetch_web_data($url));
 
-			// If server does not exist then dump out.
-			if (empty($url))
-				fatal_lang_error('couldnt_connect', false);
+			// Find the requested package by section and number, make sure it matches
+			$section = $listing->$_GET['section'];
 
-			$url = $url . '/';
+			// This is what they requested, yes?
+			if (basename($section[$_GET['num']]->server[0]->download) === $_GET['package'])
+			{
+				// Where to download it from
+				$package_name = $this->_rename_master($section[$_GET['num']]->server[0]->download);
+				$path_url = pathinfo($section[$_GET['num']]->server[0]->download);
+				$url = isset($path_url['dirname']) ? $path_url['dirname'] . '/' : '';
+			}
+			// Not found or some monkey business
+			else
+				fatal_lang_error('package_cant_download', false);
 		}
+		// Entered a url and optional filename
+		elseif (isset($_POST['byurl']) && !empty($_POST['filename']))
+			$package_name = basename($_POST['filename']);
+		// Must just be a link then
 		else
-		{
-			// Initialize the required variables.
-			$server = '';
-			$url = '';
-		}
+			$package_name = $this->_rename_master($_POST['package']);
 
-		// Entered a url and name to download?
-		if (isset($_REQUEST['byurl']) && !empty($_POST['filename']))
-			$package_name = basename($_REQUEST['filename']);
-		else
-			$package_name = basename($_REQUEST['package']);
-
-		// Is this a "master" package from github or bitbucket?
-		if (preg_match('~^http(s)?://(www.)?(bitbucket\.org|github\.com)/(.+?(master(\.zip|\.tar\.gz)))$~', $_REQUEST['package'], $matches) == 1)
-		{
-			// @todo maybe use the name/version in the package instead, although the link will be cleaner
-			// Name this master.zip based on repo name in the link
-			$path_parts = pathinfo($matches[4]);
-			list (, $newname, ) = explode('/', $path_parts['dirname']);
-
-			// Just to be safe, no invalid file characters
-			$invalid = array_merge(array_map('chr', range(0, 31)), array('<', '>', ':', '"', '/', '\\', '|', '?', '*'));
-			$package_name = str_replace($invalid, '_', $newname) . $matches[6];
-
-			// We could read the package info and see if we have a duplicate id & version, however that is
-			// not always accurate, especially when dealing with repos.  So for now just put in in no conflict mode
-			// and do the save.
-			$_REQUEST['auto'] = true;
-		}
-
+		// Avoid over writing any existing package files of the same name
 		if (isset($_REQUEST['conflict']) || (isset($_REQUEST['auto']) && file_exists(BOARDDIR . '/packages/' . $package_name)))
 		{
 			// Find the extension, change abc.tar.gz to abc_1.tar.gz...
@@ -530,7 +416,7 @@ class PackageServers_Controller extends Action_Controller
 			else
 				$ext = '';
 
-			// Find the first available.
+			// Find the first available free name
 			$i = 1;
 			while (file_exists(BOARDDIR . '/packages/' . $package_name . $i . $ext))
 				$i++;
@@ -539,11 +425,12 @@ class PackageServers_Controller extends Action_Controller
 		}
 
 		// First make sure it's a package.
+
 		$packageInfo = getPackageInfo($url . $_REQUEST['package']);
 		if (!is_array($packageInfo))
 			fatal_lang_error($packageInfo);
 
-		// Save the package to disk, use FTP if necessary
+		// Save the package to disk as $package_name, use FTP if necessary
 		create_chmod_control(array(BOARDDIR . '/packages/' . $package_name), array('destination_url' => $scripturl . '?action=admin;area=packageservers;sa=download' . (isset($_GET['server']) ? ';server=' . $_GET['server'] : '') . (isset($_REQUEST['auto']) ? ';auto' : '') . ';package=' . $_REQUEST['package'] . (isset($_REQUEST['conflict']) ? ';conflict' : '') . ';' . $context['session_var'] . '=' . $context['session_id'], 'crash_on_error' => true));
 		package_put_contents(BOARDDIR . '/packages/' . $package_name, fetch_web_data($url . $_REQUEST['package']));
 
@@ -575,6 +462,40 @@ class PackageServers_Controller extends Action_Controller
 		unset($context['package']['xml']);
 
 		$context['page_title'] = $txt['download_success'];
+	}
+
+	/**
+	 * Returns the contact details for a server
+	 *
+	 * - Reads the database to fetch the server url and name
+	 *
+	 * @return array
+	 */
+	private function _package_server()
+	{
+		// Initialize the required variables.
+		$name = '';
+		$url = '';
+		$server = '';
+
+		if (isset($_GET['server']))
+		{
+			if ($_GET['server'] == '')
+				redirectexit('action=admin;area=packageservers');
+
+			$server = (int) $_GET['server'];
+
+			// Query the server table to find the requested server.
+			$packageserver = fetchPackageServers($server);
+			$url = $packageserver[0]['url'];
+			$name = $packageserver[0]['name'];
+
+			// If server does not exist then dump out.
+			if (empty($url))
+				fatal_lang_error('couldnt_connect', false);
+		}
+
+		return array($name, $url, $server);
 	}
 
 	/**

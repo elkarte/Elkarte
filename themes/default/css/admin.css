@@ -394,6 +394,7 @@ div.quick_tasks {
 #package_list ol ul, #package_list ol ul li {
 	margin-left: 0;
 	list-style: none;
+	border-radius: 3px;
 }
 #package_list {
 	list-style-type: none;
@@ -426,6 +427,11 @@ div.quick_tasks {
 }
 .package_server {
 	padding: 0 3em;
+}
+.package_image {
+	width: 12px;
+	height: 11px;
+	margin-left: 2ex;
 }
 ul.package_servers {
 	margin: 0;

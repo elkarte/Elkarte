@@ -484,14 +484,14 @@ h2 a.collapse {
 }
 
 /* Upshrink image in the general category headers */
-#category_toggle, #category_toggle_more, #upshrink_header {
+#category_toggle, #category_toggle_more, #upshrink_header, .package_toggle {
 	display: block;
 	float: right;
 	padding: 0 16px;
 	overflow: hidden;
 	position: relative;
 }
-#category_toggle span, #category_toggle_more span, #upshrink_header span {
+#category_toggle span, #category_toggle_more span, #upshrink_header span, .package_toggle span {
 	background-repeat: no-repeat;
 	background-image: url(../images/_light/expcol.png);
 	position: absolute;
