@@ -551,7 +551,7 @@ $.sceditor.plugins.bbcode.bbcode
 		breakStart: true,
 		isInline: false,
 		skipLastLineBreak: true,
-		allowedChildren: ['*', 'li'],
+		allowedChildren: ['#', '*', 'li'],
 		html: function(element, attrs, content) {
 			var style = '',
 				code = 'ul';
