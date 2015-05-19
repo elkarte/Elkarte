@@ -13,7 +13,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0
+ * @version 1.0.4
  *
  * This file contains functions that are specifically done by administrators.
  *
@@ -377,7 +377,6 @@ function updateDbLastError($time)
 {
 	// Write out the db_last_error file with the error timestamp
 	file_put_contents(BOARDDIR . '/db_last_error.php', '<' . '?' . "php\n" . '$db_last_error = ' . $time . ';', LOCK_EX);
-	@touch(BOARDDIR . '/Settings.php');
 }
 
 /**
