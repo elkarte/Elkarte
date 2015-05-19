@@ -13,7 +13,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0.2
+ * @version 1.0.4
  *
  *
  * Adding options to one of the setting screens isn't hard.
@@ -768,6 +768,9 @@ class Settings_Form
 				if (file_exists(BOARDDIR . '/Settings_bak.php'))
 					@copy(BOARDDIR . '/Settings_bak.php', BOARDDIR . '/Settings.php');
 			}
+			// And ensure we are going to read the correct file next time
+			if (function_exists('opcache_invalidate'))
+				opcache_invalidate(BOARDDIR . '/Settings.php');
 		}
 	}
 
