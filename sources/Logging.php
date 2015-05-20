@@ -13,7 +13,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:		BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0
+ * @version 1.0.4
  *
  */
 
@@ -195,12 +195,9 @@ function logLastDatabaseError()
 			// Oops. maybe we have no more disk space left, or some other troubles, troubles...
 			// Copy the file back and run for your life!
 			@copy(BOARDDIR . '/db_last_error_bak.php', BOARDDIR . '/db_last_error.php');
+			return false;
 		}
-		else
-		{
-			@touch(BOARDDIR . '/Settings.php');
-			return true;
-		}
+		return true;
 	}
 
 	return false;

@@ -15,7 +15,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:		BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0
+ * @version 1.0.4
  *
  */
 
@@ -421,7 +421,6 @@ function display_db_error()
 
 	if ($db_last_error < time() - 3600 * 24 * 3 && empty($maintenance) && !empty($db_error_send))
 	{
-		// Avoid writing to the Settings.php file if at all possible; use shared memory instead.
 		cache_put_data('db_last_error', time(), 600);
 		if (($temp = cache_get_data('db_last_error', 600)) === null)
 			logLastDatabaseError();
