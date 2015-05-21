@@ -355,7 +355,7 @@ class Memberlist_Controller extends Action_Controller
 
 				if ($this_letter != $last_letter && preg_match('~[a-z]~', $this_letter) === 1)
 				{
-					$context['members'][$i]['sort_letter'] = htmlspecialchars($this_letter, ENT_COMPAT, 'UTF-8');
+					$context['members'][$i]['sort_letter'] = Util::htmlspecialchars($this_letter, ENT_COMPAT, 'UTF-8');
 					$last_letter = $this_letter;
 				}
 			}
