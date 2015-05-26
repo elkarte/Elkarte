@@ -74,7 +74,7 @@ abstract class Action_Controller
 	 */
 	public function getHook()
 	{
-		return $this->_hook;
+		return strtolower($this->_hook);
 	}
 
 	/**
