@@ -454,7 +454,7 @@ class Memberlist_Controller extends Action_Controller
 
 			$customJoin = array();
 			$customCount = 10;
-			$validFields = array();
+			$validFields = isset($input_fields) ? $input_fields : array();
 
 			// Any custom fields to search for - these being tricky?
 			foreach ($input_fields as $field)
@@ -472,6 +472,7 @@ class Memberlist_Controller extends Action_Controller
 			if (empty($fields))
 				redirectexit('action=memberlist');
 
+			$validFields = array_unique($validFields);
 			$query = $search == '' ? '= {string:blank_string}' : (defined('DB_CASE_SENSITIVE') ? 'LIKE LOWER({string:search})' : 'LIKE {string:search}');
 			$where = implode(' ' . $query . ' OR ', $fields) . ' ' . $query . $condition;
 
