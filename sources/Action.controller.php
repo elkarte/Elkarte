@@ -87,8 +87,8 @@ abstract class Action_Controller
 		global $modSettings;
 
 		$classes = array();
-		$hook = strtolower(str_replace('_Controller', '', $this->_hook));
-		$setting_key = 'modules_' . $hook;
+		$hook = str_replace('_Controller', '', $this->_hook);
+		$setting_key = 'modules_' . strtolower($hook);
 
 		// For all the modules that have been registered see if we have a class to load for this hook area
 		if (!empty($modSettings[$setting_key]))
