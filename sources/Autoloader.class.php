@@ -198,12 +198,10 @@ class Elk_Autoloader
 		if (isset($namespaces[1]))
 		{
 			$class = array_pop($namespaces);
+			$namespace = implode('\\', $namespaces);
 
-			$this->_current_namespace = strtr(implode('\\', $namespaces), '\\', DIRECTORY_SEPARATOR);
-
-			// Add the namespace to the known paths
-			$this->_paths[$this->_current_namespace][] = str_replace('ElkArte', BOARDDIR, $this->_current_namespace);
-			$this->_paths[$this->_current_namespace] = array_unique($this->_paths[$this->_current_namespace]);
+			if (!isset($this->_paths[$namespace]))
+				$this->register($namespace, strtr($this->_current_namespace, array('\\' => DIRECTORY_SEPARATOR, 'ElkArte' => BOARDDIR)));
 		}
 		else
 			$this->_current_namespace = false;
