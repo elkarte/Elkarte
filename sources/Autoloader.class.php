@@ -41,6 +41,13 @@ class Elk_Autoloader
 	protected $_strict = false;
 
 	/**
+	 * Stores whether the autoloader verifies file existence or not for each
+	 * namespace separately
+	 * @var boolean
+	 */
+	protected $_strict_namespace = array();
+
+	/**
 	 * Path to directory containing ElkArte
 	 * @var string
 	 */
@@ -98,7 +105,9 @@ class Elk_Autoloader
 			$dir = array($dir);
 
 		foreach ($dir as $path)
-			$this->register($path);
+		{
+			$this->register($path, '\\' . strtr($path, array(BOARDDIR => 'ElkArte', '/' => '\\')));
+		}
 	}
 
 	/**
@@ -106,8 +115,9 @@ class Elk_Autoloader
 	 *
 	 * @param string $dir
 	 * @param string|null $namespace
+	 * @param bool $strict
 	 */
-	public function register($dir, $namespace = null)
+	public function register($dir, $namespace = null, $strict = false)
 	{
 		if ($namespace === null)
 			$namespace = 0;
@@ -117,6 +127,7 @@ class Elk_Autoloader
 
 		$this->_paths[$namespace][] = $dir;
 		$this->_paths[$namespace] = array_unique($this->_paths[$namespace]);
+		$this->_strict_namespace[$namespace] = $strict;
 
 		$this->_buildPaths((array) $dir);
 	}
@@ -180,10 +191,15 @@ class Elk_Autoloader
 		// Well do we have something to do?
 		if (!empty($file))
 		{
-			if ($this->_strict && stream_resolve_include_path($file))
-				require_once($file);
+			if ($this->_strict)
+			{
+				if (stream_resolve_include_path($file))
+					require_once($file);
+			}
 			else
 				require_once($file);
+
+			$this->_strict = false;
 		}
 	}
 
@@ -195,13 +211,33 @@ class Elk_Autoloader
 	private function _string_to_class($class)
 	{
 		$namespaces = explode('\\', ltrim($class, '\\'));
+		$prefix = '';
 		if (isset($namespaces[1]))
 		{
 			$class = array_pop($namespaces);
-			$namespace = implode('\\', $namespaces);
+			$full_namespace = '\\' . implode('\\', $namespaces);
+			$found = false;
+			do
+			{
+				$this->_current_namespace = '\\' . implode('\\', $namespaces);
 
-			if (!isset($this->_paths[$namespace]))
-				$this->register($namespace, strtr($this->_current_namespace, array('\\' => DIRECTORY_SEPARATOR, 'ElkArte' => BOARDDIR)));
+				if (isset($this->_paths[$this->_current_namespace]))
+				{
+					$found = true;
+					break;
+				}
+
+				$prefix .= array_pop($namespaces) . '/';
+			} while (!empty($namespaces));
+
+			if (!$found)
+			{
+				$this->_current_namespace = $full_namespace;
+				if (!isset($this->_paths[$this->_current_namespace]))
+					$this->register($this->_current_namespace, strtr($this->_current_namespace, array('\\' => DIRECTORY_SEPARATOR, 'ElkArte' => BOARDDIR)));
+			}
+			else
+				$prefix = $prefix;
 		}
 		else
 			$this->_current_namespace = false;
@@ -212,13 +248,14 @@ class Elk_Autoloader
 
 		$this->_name = explode('_', $class);
 		$this->_surname = array_pop($this->_name);
-		$this->_givenname = implode('', $this->_name);
+		$this->_givenname = $prefix . implode('', $this->_name);
 
 		return true;
 	}
 
 	/**
 	 * This handles any case where a namespace is present.
+	 * @return bool False if the namespace was found, but the file not, true otherwise.
 	 */
 	protected function _handle_namespaces()
 	{
@@ -231,9 +268,12 @@ class Elk_Autoloader
 				if (file_exists($file))
 				{
 					$this->_file_name = $file;
-					break;
+					return;
 				}
 			}
+
+			if ($this->_strict_namespace[$this->_current_namespace])
+				$this->_strict = true;
 		}
 	}
 
