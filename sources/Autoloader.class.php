@@ -350,7 +350,8 @@ class Elk_Autoloader
 				$this->_file_name = SUBSDIR . '/Subscriptions-' . implode('_', $this->_name) . '.class.php';
 				break;
 			case 'Module':
-				$this->_file_name = SOURCEDIR . '/modules/' . $this->_name[0] . '/' . $this->_givenname . 'Module.class.php';
+				if (file_exists(SOURCEDIR . '/modules/' . $this->_name[0] . '/' . $this->_givenname . 'Module.class.php'))
+					$this->_file_name = SOURCEDIR . '/modules/' . $this->_name[0] . '/' . $this->_givenname . 'Module.class.php';
 				break;
 			case 'Interface':
 			case 'Abstract':
