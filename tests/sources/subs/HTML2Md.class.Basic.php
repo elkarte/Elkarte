@@ -3,6 +3,7 @@
 class TestHTML2Md extends PHPUnit_Framework_TestCase
 {
 	protected $mdTestCases = array();
+	protected $restore_txt = false;
 
 	/**
 	 * Prepare what is necessary to use in these tests.
@@ -11,6 +12,14 @@ class TestHTML2Md extends PHPUnit_Framework_TestCase
 	 */
 	public function setUp()
 	{
+		global $txt;
+
+		if (!isset($txt['link']))
+		{
+			$txt['link'] = 'Link';
+			$this->restore_txt = true;
+		}
+
 		require_once(SUBSDIR . '/Html2BBC.class.php');
 
 		$this->mdTestCases = array(
@@ -50,6 +59,14 @@ class TestHTML2Md extends PHPUnit_Framework_TestCase
 				'1. **_test test_**'
 			),
 		);
+	}
+
+	public function tearDown()
+	{
+		global $txt;
+
+		if ($this->restore_txt)
+			unset($txt['link']);
 	}
 
 	/**
