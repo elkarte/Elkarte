@@ -94,7 +94,9 @@ require_once(SUBSDIR . '/Cache.subs.php');
 
 // Initialize the class Autoloader
 require(SOURCEDIR . '/Autoloader.class.php');
-Elk_Autoloader::getInstance()->setupAutoloader(array(SOURCEDIR, SUBSDIR, CONTROLLERDIR, ADMINDIR, ADDONSDIR));
+$autoloder = Elk_Autoloader::getInstance();
+$autoloder->setupAutoloader(array(SOURCEDIR, SUBSDIR, CONTROLLERDIR, ADMINDIR, ADDONSDIR));
+$autoloder->register(SOURCEDIR, '\\ElkArte');
 
 // Show lots of debug information below the page, not for production sites
 if ($db_show_debug === true)
