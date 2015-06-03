@@ -14,6 +14,9 @@
       <testsuite name="ElkArte Unit Tests">
           <directory suffix="Test.php">/var/www/tests</directory>
       </testsuite>
+      <testsuite name="ElkArte Basic Tests">
+          <directory suffix="Basic.php">/var/www/tests</directory>
+      </testsuite>
   </testsuites>
   <php>
       <const name="DBTYPE" value="PostgreSQL"/>

@@ -57,7 +57,9 @@ require_once(SUBSDIR . '/Cache.subs.php');
 
 // Get the autoloader rolling
 require(SOURCEDIR . '/Autoloader.class.php');
-Elk_Autoloader::getInstance()->setupAutoloader(array(SOURCEDIR, SUBSDIR, CONTROLLERDIR, ADMINDIR, ADDONSDIR));
+$autoloder = Elk_Autoloader::getInstance();
+$autoloder->setupAutoloader(array(SOURCEDIR, SUBSDIR, CONTROLLERDIR, ADMINDIR, ADDONSDIR));
+$autoloder->register(SOURCEDIR, '\\ElkArte');
 
 // Used by the test, add others as needed or ...
 $context = array();
