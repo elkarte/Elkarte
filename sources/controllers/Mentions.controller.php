@@ -427,6 +427,7 @@ class Mentions_Controller extends Action_Controller
 		global $txt, $scripturl, $context, $modSettings, $user_info;
 
 		$boards = array();
+		$unset_keys = array();
 		$removed = false;
 
 		foreach ($mentions as $key => $row)
@@ -437,7 +438,12 @@ class Mentions_Controller extends Action_Controller
 
 			// These things are associated to messages and require permission checks
 			if (in_array($row['mention_type'], array('men', 'like', 'rlike')))
-				$boards[$key] = $row['id_board'];
+			{
+				if (empty($row['id_board']))
+					$unset_keys[] = $key;
+				else
+					$boards[$key] = $row['id_board'];
+			}
 
 			$mentions[$key]['message'] = str_replace(
 				array(
@@ -465,15 +471,18 @@ class Mentions_Controller extends Action_Controller
 				// You can't see the board where this mention is, so we drop it from the results
 				if (!in_array($board, $accessibleBoards))
 				{
-					$removed = true;
-					unset($mentions[$key]);
+					$unset_keys[] = $key;
 				}
 			}
 		}
 
 		// If some of these mentions are no longer visable, we need to do some maintenance
-		if ($removed)
+		if (!empty($unset_keys))
 		{
+			$removed = true;
+			foreach ($unset_keys as  $key)
+				unset($mentions[$key]);
+
 			if (!empty($modSettings['user_access_mentions']))
 				$modSettings['user_access_mentions'] = @unserialize($modSettings['user_access_mentions']);
 			else

@@ -2567,7 +2567,7 @@ function censorText(&$text, $force = false)
 
 	// Censoring isn't so very complicated :P.
 	if (empty($modSettings['censorWholeWord']))
-		$text = empty($modSettings['censorIgnoreCase']) ? str_ireplace($censor_vulgar, $censor_proper, $text) : str_replace($censor_vulgar, $censor_proper, $text);
+		$text = empty($modSettings['censorIgnoreCase']) ? str_replace($censor_vulgar, $censor_proper, $text) : str_ireplace($censor_vulgar, $censor_proper, $text);
 	else
 		$text = preg_replace($censor_vulgar, $censor_proper, $text);
 
