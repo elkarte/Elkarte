@@ -2161,7 +2161,7 @@ div.core_posts {
 	vertical-align: top;
 	width: 15em;
 	word-wrap: break-word;
-	word-break: break-all;
+	word-break: normal;
 	-webkit-hyphens: auto;
 	-moz-hyphens: auto;
 	-ms-hyphens: auto;
