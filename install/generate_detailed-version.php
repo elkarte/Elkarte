@@ -139,7 +139,7 @@ function getFilesChanged($from, $to)
 	$output = shell_exec('git log --name-only --pretty=oneline --full-index ' . $from . '..' . $to . ' | grep -vE \'^[0-9a-f]{40} \' | sort | uniq');
 
 	$dirs = array(
-		str_replace(BOARDDIR . '/', '', SUBSDIR . '/database/') => 'database',
+		str_replace(BOARDDIR . '/', '', SOURCEDIR . '/database/') => 'database',
 		str_replace(BOARDDIR . '/', '', SUBSDIR . '/') => 'subs',
 		str_replace(BOARDDIR . '/', '', CONTROLLERDIR . '/') => 'controllers',
 		str_replace(BOARDDIR . '/', '', SOURCEDIR . '/') => 'sources',

@@ -177,8 +177,12 @@ function initialize_inputs()
 
 	// Add slashes, as long as they aren't already being added.
 	foreach ($_POST as $k => $v)
-		if (strpos($k, 'password') === false)
+	{
+		if (strpos($k, 'password') === false && strpos($k, 'passwd') === false)
 			$_POST[$k] = addslashes($v);
+		else
+			$_POST[$k] = addcslashes($v, '\'');
+	}
 
 	// This is really quite simple; if ?delete is on the URL, delete the installer...
 	if (isset($_GET['delete']))
