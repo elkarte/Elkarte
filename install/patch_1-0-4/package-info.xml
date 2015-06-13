@@ -9,6 +9,7 @@
 			<modification>modifications.xml</modification>
 			<require-file name="themes/PackageServers.template.php" destination="THEMEDIR" />
 			<require-file name="sources/PackageServers.controller.php" destination="ADMINDIR" />
+			<require-file name="sources/News.controller.php" destination="CONTROLLERDIR" />
 			<redirect url="$scripturl?action=admin;area=packages" timeout="5000" parsebbc="true">redirect</redirect>
 		</install>
 		<uninstall for="1.0.4">

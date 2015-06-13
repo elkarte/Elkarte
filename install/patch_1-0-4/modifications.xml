@@ -904,180 +904,6 @@ class Memberlist_Controller extends Action_Controller
 			else]]></add>
 		</operation>
 	</file>
-	<file name="CONTROLLERDIR/News.controller.php">
-		<operation>
-			<search position="replace"><![CDATA[ * copyright:	2011 Simple Machines (http://www.simplemachines.org)
- * license:		BSD, See included LICENSE.TXT for terms and conditions.
- *
- * @version 1.0.2
- *
- *
- */]]></search>
-			<add><![CDATA[ * copyright:	2011 Simple Machines (http://www.simplemachines.org)
- * license:		BSD, See included LICENSE.TXT for terms and conditions.
- *
- * @version 1.0.4
- *
- *
- */]]></add>
-		</operation>
-		<operation>
-			<search position="replace"><![CDATA[				$feed_title = ' - ' . strip_tags($feed_title);
-			}
-
-			$boards_posts = boardsPosts(array(), $categories);
-			$total_cat_posts = array_sum($boards_posts);
-			$boards = array_keys($boards_posts);]]></search>
-			<add><![CDATA[				$feed_title = ' - ' . strip_tags($feed_title);
-			}
-
-			require_once(SUBSDIR . '/Boards.subs.php');
-			$boards_posts = boardsPosts(array(), $categories);
-			$total_cat_posts = array_sum($boards_posts);
-			$boards = array_keys($boards_posts);]]></add>
-		</operation>
-		<operation>
-			<search position="replace"><![CDATA[				cache_put_data('xmlfeed-' . $xml_format . ':' . ($user_info['is_guest'] ? '' : $user_info['id'] . '-') . $cachekey, $xml, 240);
-		}
-
-		$feed_title = htmlspecialchars(strip_tags($context['forum_name']), ENT_COMPAT, 'UTF-8') . (isset($feed_title) ? $feed_title : '');
-
-		// This is an xml file....
-		@ob_end_clean();]]></search>
-			<add><![CDATA[				cache_put_data('xmlfeed-' . $xml_format . ':' . ($user_info['is_guest'] ? '' : $user_info['id'] . '-') . $cachekey, $xml, 240);
-		}
-
-		$feed_title = encode_special(strip_tags(un_htmlspecialchars($context['forum_name']) . (isset($feed_title) ? $feed_title : '')));
-
-		// This is an xml file....
-		@ob_end_clean();]]></add>
-		</operation>
-		<operation>
-			<search position="replace"><![CDATA[		<channel>
-			<title>', $feed_title, '</title>
-			<link>', $scripturl, '</link>
-			<description><![CDA' . 'TA[', strip_tags($txt['xml_rss_desc']), ']' . ']></description>
-			<generator>ElkArte</generator>
-			<ttl>30</ttl>
-			<image>]]></search>
-			<add><![CDATA[		<channel>
-			<title>', $feed_title, '</title>
-			<link>', $scripturl, '</link>
-			<description><![CDA' . 'TA[', un_htmlspecialchars(strip_tags($txt['xml_rss_desc'])), ']' . ']></description>
-			<generator>ElkArte</generator>
-			<ttl>30</ttl>
-			<image>]]></add>
-		</operation>
-		<operation>
-			<search position="replace"><![CDATA[				$data[] = array(
-					'title' => cdata_parse($row['subject']),
-					'link' => $scripturl . '?topic=' . $row['id_topic'] . '.0',
-					'description' => cdata_parse($row['body']),
-					'author' => in_array(showEmailAddress(!empty($row['hide_email']), $row['id_member']), array('yes', 'yes_permission_override')) ? $row['poster_email'] . ' (' . $row['poster_name'] . ')' : $row['poster_name'],
-					'comments' => $scripturl . '?action=post;topic=' . $row['id_topic'] . '.0',
-					'category' => '<![CDA' . 'TA[' . $row['bname'] . ']' . ']>',
-					'pubDate' => gmdate('D, d M Y H:i:s \G\M\T', $row['poster_time']),]]></search>
-			<add><![CDATA[				$data[] = array(
-					'title' => cdata_parse($row['subject']),
-					'link' => $scripturl . '?topic=' . $row['id_topic'] . '.0',
-					'description' => cdata_parse(strtr(un_htmlspecialchars($row['body']), '&', '&#x26;')),
-					'author' => in_array(showEmailAddress(!empty($row['hide_email']), $row['id_member']), array('yes', 'yes_permission_override')) ? $row['poster_email'] . ' (' . un_htmlspecialchars($row['poster_name']) . ')' : '<![CDA' . 'TA[none@noreply.net (' . un_htmlspecialchars($row['poster_name']) . ')]' . ']>',
-					'comments' => $scripturl . '?action=post;topic=' . $row['id_topic'] . '.0',
-					'category' => '<![CDA' . 'TA[' . $row['bname'] . ']' . ']>',
-					'pubDate' => gmdate('D, d M Y H:i:s \G\M\T', $row['poster_time']),]]></add>
-		</operation>
-		<operation>
-			<search position="replace"><![CDATA[
-				// Add the poster name on if we are rss2
-				if ($xml_format == 'rss2')
-					$data[count($data) - 1]['dc:creator'] = $row['poster_name'];
-			}
-			// RDF Format anyone
-			elseif ($xml_format == 'rdf')]]></search>
-			<add><![CDATA[
-				// Add the poster name on if we are rss2
-				if ($xml_format == 'rss2')
-				{
-					$data[count($data) - 1]['dc:creator'] = $row['poster_name'];
-					unset($data[count($data) - 1]['author']);
-				}
-			}
-			// RDF Format anyone
-			elseif ($xml_format == 'rdf')]]></add>
-		</operation>
-		<operation>
-			<search position="replace"><![CDATA[				$data[] = array(
-					'title' => $row['subject'],
-					'link' => $scripturl . '?topic=' . $row['id_topic'] . '.msg' . $row['id_msg'] . '#msg' . $row['id_msg'],
-					'description' => cdata_parse($row['body']),
-					'author' => in_array(showEmailAddress(!empty($row['hide_email']), $row['id_member']), array('yes', 'yes_permission_override')) ? $row['poster_email'] : $row['poster_name'],
-					'category' => cdata_parse($row['bname']),
-					'comments' => $scripturl . '?action=post;topic=' . $row['id_topic'] . '.0',
-					'pubDate' => gmdate('D, d M Y H:i:s \G\M\T', $row['poster_time']),]]></search>
-			<add><![CDATA[				$data[] = array(
-					'title' => $row['subject'],
-					'link' => $scripturl . '?topic=' . $row['id_topic'] . '.msg' . $row['id_msg'] . '#msg' . $row['id_msg'],
-					'description' => cdata_parse(strtr(un_htmlspecialchars($row['body']), '&', '&#x26;')),
-					'author' => in_array(showEmailAddress(!empty($row['hide_email']), $row['id_member']), array('yes', 'yes_permission_override')) ? $row['poster_email'] . ' (' . un_htmlspecialchars($row['poster_name']) . ')' : '<![CDA' . 'TA[none@noreply.net (' . un_htmlspecialchars($row['poster_name']) . ')]' . ']>',
-					'category' => cdata_parse($row['bname']),
-					'comments' => $scripturl . '?action=post;topic=' . $row['id_topic'] . '.0',
-					'pubDate' => gmdate('D, d M Y H:i:s \G\M\T', $row['poster_time']),]]></add>
-		</operation>
-		<operation>
-			<search position="replace"><![CDATA[
-				// Add the poster name on if we are rss2
-				if ($xml_format == 'rss2')
-					$data[count($data) - 1]['dc:creator'] = $row['poster_name'];
-			}
-			elseif ($xml_format == 'rdf')
-			{]]></search>
-			<add><![CDATA[
-				// Add the poster name on if we are rss2
-				if ($xml_format == 'rss2')
-				{
-					$data[count($data) - 1]['dc:creator'] = $row['poster_name'];
-					unset($data[count($data) - 1]['author']);
-				}
-			}
-			elseif ($xml_format == 'rdf')
-			{]]></add>
-		</operation>
-		<operation>
-			<search position="replace"><![CDATA[}
-
-/**
- * Ensures supplied data is properly encpsulated in cdata xml tags
- * Called from action_xmlprofile in News.controller.php
- *]]></search>
-			<add><![CDATA[}
-
-/**
- * For highest feed compatibility, some special characters should be provided 
- * as character entities and not html entities 
- *
- * @param string $data
- */
-function encode_special($data)
-{
-	return strtr($data, array('>' => '&#x3E;', '&' => '&#x26;', '<' => '&#x3C;'));
-}
-
-/**
- * Ensures supplied data is properly encpsulated in cdata xml tags
- * Called from action_xmlprofile in News.controller.php
- *]]></add>
-		</operation>
-		<operation>
-			<search position="replace"><![CDATA[				echo fix_possible_url($val), '</', $key, '>';
-		}
-	}
-}]]></search>
-			<add><![CDATA[				echo fix_possible_url($val), '</', $key, '>';
-		}
-	}
-}]]></add>
-		</operation>
-	</file>
 	<file name="CONTROLLERDIR/Post.controller.php">
 		<operation>
 			<search position="replace"><![CDATA[ * copyright:	2011 Simple Machines (http://www.simplemachines.org)
@@ -1172,7 +998,7 @@ function encode_special($data)
 			redirectexit('topic=' . key($actioned_messages));]]></add>
 		</operation>
 	</file>
-	<file name="BOARDDIR/Db-mysql.class.php">
+	<file name="SOURCEDIR/database/Db-mysql.class.php">
 		<operation>
 			<search position="replace"><![CDATA[ * copyright:	2004-2011, GreyWyvern - All rights reserved.
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
@@ -2204,7 +2030,7 @@ ul.package_servers {
 	}]]></add>
 		</operation>
 	</file>
-	<file name="LANGUAGEDIR/Packages.english.php">
+	<file name="LANGUAGEDIR/english/Packages.english.php">
 		<operation>
 			<search position="replace"><![CDATA[$txt['author_website'] = 'Author\'s Homepage';
 $txt['package_no_description'] = 'No description given';
@@ -2227,7 +2053,7 @@ $txt['package_installed_key'] = 'Installed addons:';
 $txt['package_installed_current'] = 'current version';]]></add>
 		</operation>
 	</file>
-	<file name="LANGUAGEDIR/index.english.php">
+	<file name="LANGUAGEDIR/english/index.english.php">
 		<operation>
 			<search position="replace"><![CDATA[$txt['mail_send_unable'] = 'Unable to send mail to the email address \'%1$s\'';
 
