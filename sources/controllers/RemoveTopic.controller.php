@@ -14,7 +14,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:		BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0.3
+ * @version 1.0.4
  *
  */
 
@@ -396,7 +396,7 @@ class RemoveTopic_Controller extends Action_Controller
 			fatal_lang_error('restore_not_found', false, array('<ul style="margin-top: 0px;"><li>' . implode('</li><li>', $unfound_messages) . '</li></ul>'));
 
 		// Lets send them back somewhere that may make sense
-		if (count($actioned_messages) == 1 && empty($topics_to_restore))
+		if (isset($actioned_messages) && count($actioned_messages) == 1 && empty($topics_to_restore))
 		{
 			reset($actioned_messages);
 			redirectexit('topic=' . key($actioned_messages));

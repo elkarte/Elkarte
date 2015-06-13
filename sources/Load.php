@@ -13,7 +13,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:		BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0.3
+ * @version 1.0.4
  *
  */
 
@@ -1794,10 +1794,6 @@ function loadEssentialThemeData()
 	$context['forum_name'] = $mbname;
 	$context['forum_name_html_safe'] = $context['forum_name'];
 
-	// Check loadLanguage actually exists!
-	if (!function_exists('loadLanguage'))
-		require_once(SOURCEDIR . '/Subs.php');
-
 	loadLanguage('index+Addons');
 }
 
@@ -2571,7 +2567,7 @@ function censorText(&$text, $force = false)
 
 	// Censoring isn't so very complicated :P.
 	if (empty($modSettings['censorWholeWord']))
-		$text = empty($modSettings['censorIgnoreCase']) ? str_ireplace($censor_vulgar, $censor_proper, $text) : str_replace($censor_vulgar, $censor_proper, $text);
+		$text = empty($modSettings['censorIgnoreCase']) ? str_replace($censor_vulgar, $censor_proper, $text) : str_ireplace($censor_vulgar, $censor_proper, $text);
 	else
 		$text = preg_replace($censor_vulgar, $censor_proper, $text);
 

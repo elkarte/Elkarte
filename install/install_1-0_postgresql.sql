@@ -2070,7 +2070,7 @@ CREATE TABLE {$db_prefix}package_servers (
 
 INSERT INTO {$db_prefix}package_servers
 	(name, url)
-VALUES ('ElkArte Third-party Add-ons Site', 'https://github.com/elkarte/addons/tree/master/packages');
+VALUES ('ElkArte Third-party Add-ons Site', 'http://addons.elkarte.net/package.json');
 # --------------------------------------------------------
 
 #

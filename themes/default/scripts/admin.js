@@ -542,10 +542,12 @@ function updateInputBoxes()
 	var curType = document.getElementById("field_type").value,
 		privStatus = document.getElementById("private").value,
 		stdText = ['text', 'textarea', 'email', 'url', 'color', 'date'],
-		stdInput = ['text', 'email', 'url', 'color', 'date'];
+		stdInput = ['text', 'email', 'url', 'color', 'date'],
+		stdSelect = ['select'];
 
 	var bIsStd = (stdInput.indexOf(curType) !== -1) ? true : false,
-		bIsText = (stdText.indexOf(curType) !== -1) ? true : false;
+		bIsText = (stdText.indexOf(curType) !== -1) ? true : false,
+		bIsSelect = (stdSelect.indexOf(curType) !== -1) ? true : false;
 
 	// Only Text like fields can see a max length input
 	document.getElementById("max_length_dt").style.display = bIsText ? "" : "none";
@@ -571,9 +573,13 @@ function updateInputBoxes()
 	document.getElementById("mask_dt").style.display = bIsStd ? "" : "none";
 	document.getElementById("mask").style.display = bIsStd ? "" : "none";
 
-	// And text like fields can be searchable
-	document.getElementById("can_search_dt").style.display = bIsText ? "" : "none";
-	document.getElementById("can_search_dd").style.display = bIsText ? "" : "none";
+	// And text and select fields are searchable
+	document.getElementById("can_search_dt").style.display = bIsText || bIsSelect ? "" : "none";
+	document.getElementById("can_search_dd").style.display = bIsText || bIsSelect ? "" : "none";
+	
+	// Moving to a non searchable field, be sure searchable is unselected.
+	if (!bIsText && !bIsSelect)
+		document.getElementById("can_search_dd").checked = false;
 
 	// Using regex in the mask, give them a place to supply the regex
 	document.getElementById("regex_div").style.display = bIsStd && document.getElementById("mask").value === "regex" ? "" : "none";

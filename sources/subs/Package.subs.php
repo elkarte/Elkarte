@@ -13,7 +13,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0.3
+ * @version 1.0.4
  *
  */
 
@@ -224,6 +224,8 @@ function loadInstalledPackages()
  */
 function getPackageInfo($gzfilename)
 {
+	$gzfilename = trim($gzfilename);
+
 	// Extract package-info.xml from downloaded file. (*/ is used because it could be in any directory.)
 	if (preg_match('~^https?://~i', $gzfilename) === 1)
 		$packageInfo = read_tgz_data(fetch_web_data($gzfilename, '', true), '*/package-info.xml', true);

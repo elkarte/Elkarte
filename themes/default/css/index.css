@@ -484,14 +484,14 @@ h2 a.collapse {
 }
 
 /* Upshrink image in the general category headers */
-#category_toggle, #category_toggle_more, #upshrink_header {
+#category_toggle, #category_toggle_more, #upshrink_header, .package_toggle {
 	display: block;
 	float: right;
 	padding: 0 16px;
 	overflow: hidden;
 	position: relative;
 }
-#category_toggle span, #category_toggle_more span, #upshrink_header span {
+#category_toggle span, #category_toggle_more span, #upshrink_header span, .package_toggle span {
 	background-repeat: no-repeat;
 	background-image: url(../images/_light/expcol.png);
 	position: absolute;
@@ -1127,6 +1127,7 @@ a.bbc_link {
 	display: block;
 	overflow: hidden;
 	max-width: 25em;
+	text-overflow: ellipsis;
 }
 .linktree a {
 	display: block;
@@ -2097,9 +2098,6 @@ img.new_posts {
 }
 /* Poll results */
 #poll_options .results {
-	display: inline;
-}
-#poll_options li {
 	position: relative;
 }
 /* Absolute positioning stops these breaking the bars on narrow screens. */
@@ -2163,7 +2161,7 @@ div.core_posts {
 	vertical-align: top;
 	width: 15em;
 	word-wrap: break-word;
-	word-break: break-all;
+	word-break: normal;
 	-webkit-hyphens: auto;
 	-moz-hyphens: auto;
 	-ms-hyphens: auto;
@@ -4645,9 +4643,6 @@ dl.no_members {
 	}
 	.linktree .board_moderators {
 		display: none;
-	}
-	.statsbar .bar {
-		max-width: 12em;
 	}
 	.signature {
 		display: none;

@@ -11,11 +11,11 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:	BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0.3
+ * @version 1.0.4
  *
  */
 
-define('CURRENT_VERSION', '1.0.3');
+define('CURRENT_VERSION', '1.0.4');
 define('DB_SCRIPT_VERSION', '1-0');
 
 $GLOBALS['required_php_version'] = '5.2.0';
@@ -177,8 +177,12 @@ function initialize_inputs()
 
 	// Add slashes, as long as they aren't already being added.
 	foreach ($_POST as $k => $v)
-		if (strpos($k, 'password') === false)
+	{
+		if (strpos($k, 'password') === false && strpos($k, 'passwd') === false)
 			$_POST[$k] = addslashes($v);
+		else
+			$_POST[$k] = addcslashes($v, '\'');
+	}
 
 	// This is really quite simple; if ?delete is on the URL, delete the installer...
 	if (isset($_GET['delete']))

@@ -17,7 +17,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0
+ * @version 1.0.4
  *
  */
 
@@ -316,6 +316,9 @@ function resizeImage($src_img, $destName, $src_width, $src_height, $max_width, $
 			// Get a new instance of Imagick for use
 			$imagick = new Imagick($destName);
 
+			// Fix image rotations for iphone cameras etc.
+			autoRotateImage($imagick);
+
 			// Set the input and output image size
 			$src_width = empty($src_width) ? $imagick->getImageWidth() : $src_width;
 			$src_height = empty($src_height) ? $imagick->getImageHeight() : $src_height;
@@ -408,6 +411,68 @@ function resizeImage($src_img, $destName, $src_width, $src_height, $max_width, $
 	// Without Imagick or GD, no image resizing at all.
 	else
 		return false;
+}
+
+/**
+ * Autorotate an image based on its EXIF Orientation tag.
+ *
+ * - ImageMagick only
+ * - Checks exif data for orientation flag and rotates image so its proper
+ * - Updates orientation flag if rotation was required
+ *
+ * @param object $image
+ */
+function autoRotateImage($image)
+{
+	// This method should exist if Imagick has been compiled against ImageMagick version
+	// 6.3.0 or higher which is forever ago, but we check anyway ;)
+	if (!method_exists($image , 'getImageOrientation'))
+		return;
+
+	$orientation = $image->getImageOrientation();
+
+	switch ($orientation)
+	{
+		// (0 & 1) Not set or Normal
+		case imagick::ORIENTATION_UNDEFINED:
+		case imagick::ORIENTATION_TOPLEFT:
+			break;
+		// (2) Mirror image, Normal orientation
+		case imagick::ORIENTATION_TOPRIGHT:
+			$image->flopImage();
+			break;
+		// (3) Normal image, rotated 180
+		case imagick::ORIENTATION_BOTTOMRIGHT:
+			$image->rotateImage("#000", 180);
+			break;
+		// (4) Mirror image, rotated 180
+		case imagick::ORIENTATION_BOTTOMLEFT:
+			$image->rotateImage("#000", 180);
+			$image->flopImage();
+			break;
+		// (5) Mirror image, rotated 90 CCW
+		case imagick::ORIENTATION_LEFTTOP:
+			$image->rotateImage("#000", 90);
+			$image->flopImage();
+			break;
+		// (6) Normal image, rotated 90 CCW
+		case imagick::ORIENTATION_RIGHTTOP:
+			$image->rotateImage("#000", 90);
+			break;
+		// (7) Mirror image, rotated 90 CW
+		case imagick::ORIENTATION_RIGHTBOTTOM:
+			$image->rotateImage("#000", -90);
+			$image->flopImage();
+			break;
+		// (8) Normal image, rotated 90 CW
+		case imagick::ORIENTATION_LEFTBOTTOM:
+			$image->rotateImage("#000", -90);
+			break;
+	}
+
+	// Now that it's auto-rotated, make sure the EXIF data is correctly updated
+	if ($orientation >= 2)
+		$image->setImageOrientation(imagick::ORIENTATION_TOPLEFT);
 }
 
 /**

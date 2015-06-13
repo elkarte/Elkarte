@@ -13,7 +13,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:		BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0
+ * @version 1.0.4
  *
  */
 
@@ -363,6 +363,20 @@ class Browser_Detector
 	{
 		if (preg_match('~(?:Firefox|Ice[wW]easel|IceCat|Shiretoko|Minefield)[\/ \(]([^ ;\)]+)~', $this->_ua, $match) === 1)
 			$this->_browsers['is_firefox' . (int) $match[1]] = true;
+
+		// Firefox mobile
+		if (strpos($this->_ua, 'Android; Mobile;') !== false)
+		{
+			$this->_browsers['is_android'] = true;
+			$this->_is_mobile = true;
+		}
+		// Tablets as well
+		elseif (strpos($this->_ua, 'Android; Tablet;') !== false)
+		{
+			$this->_browsers['is_android'] = true;
+			$this->_browsers['is_android_tablet'] = true;
+			$this->_is_tablet = true;
+		}
 	}
 
 	/**

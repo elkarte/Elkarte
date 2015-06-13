@@ -11,7 +11,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0.3
+ * @version 1.0.4
  *
  */
 
@@ -26,7 +26,7 @@ function template_mlsearch_above()
 	<form id="mlsearch" action="' . $scripturl . '?action=memberlist;sa=search" method="post" accept-charset="UTF-8">
 		<ul class="floatright">
 			<li>
-				<input id="mlsearch_input" onfocus="toggle_mlsearch_opt();" type="text" name="search" value="" class="input_text" placeholder="' . $txt['search'] . '" />&nbsp;
+				<input id="mlsearch_input" onfocus="toggle_mlsearch_opt();" type="text" name="search" value="' . $context['old_search_value'] . '" class="input_text" placeholder="' . $txt['search'] . '" />&nbsp;
 				<input type="submit" name="search2" value="' . $txt['search'] . '" class="button_submit" />
 				<ul id="mlsearch_options" class="nojs">';
 
@@ -67,9 +67,9 @@ function template_memberlist()
 		<h2 class="category_header">
 			<span class="floatleft">', $txt['members_list'], '</span>';
 
-	if (!isset($context['old_search']))
+	if (!isset($context['in_search']))
 		echo '
-				<span class="floatright" letter_links>', $context['letter_links'], '</span>';
+				<span class="floatright letter_links">', $context['letter_links'], '</span>';
 
 	echo '
 		</h2>
@@ -171,21 +171,14 @@ function template_memberlist()
 }
 
 /**
- * Shows the search again button to allow editing the parameters
+ * Shows the pagination
  */
 function template_mlsearch_below()
 {
 	global $context, $scripturl, $txt;
 
-	// If it is displaying the result of a search show a "search again" link to edit their criteria.
-	if (isset($context['old_search']))
-		$extra = '
-			<a class="linkbutton_right" href="' . $scripturl . '?action=memberlist;sa=search;search=' . $context['old_search_value'] . '">' . $txt['mlist_search_again'] . '</a>';
-	else
-		$extra = '';
-
 	// Show the page numbers again. (makes 'em easier to find!)
-	template_pagesection(false, false, array('extra' => $extra));
+	template_pagesection(false, false);
 
 	echo '
 	</div>';

@@ -7,7 +7,7 @@
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
- * @version 1.0
+ * @version 1.0.4
  *
  */
 
@@ -245,6 +245,36 @@ function changeMentionStatus($id_mention, $status = 1)
 		array(
 			'id_mention' => $id_mention,
 			'status' => $status,
+		)
+	);
+	$success = $db->affected_rows() != 0;
+
+	// Update the top level mentions count
+	if ($success)
+		updateMentionMenuCount($status, $user_info['id']);
+
+	return $success;
+}
+
+/**
+ * Completely remove from the database a set of mentions.
+ *
+ * Doesn't check permissions, access, anything. It just deletes everything.
+ *
+ * @package Mentions
+ * @param int[] $id_mentions the mention ids
+ */
+function removeMentions($id_mentions)
+{
+	global $user_info;
+
+	$db = database();
+
+	$db->query('', '
+		DELETE FROM {db_prefix}log_mentions
+		WHERE id_mention IN ({array_int:id_mentions})',
+		array(
+			'id_mentions' => $id_mentions,
 		)
 	);
 	$success = $db->affected_rows() != 0;

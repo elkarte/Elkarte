@@ -15,7 +15,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:		BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0.1
+ * @version 1.0.4
  *
  */
 
@@ -1210,7 +1210,12 @@ class Post_Controller extends Action_Controller
 			// If the number of replies has changed, if the setting is enabled, go back to action_post() - which handles the error.
 			if (empty($options['no_new_reply_warning']) && isset($_POST['last_msg']) && $topic_info['id_last_msg'] > $_POST['last_msg'])
 			{
-				$_REQUEST['preview'] = true;
+				addInlineJavascript('
+					$(document).ready(function () {
+						$("html,body").scrollTop($(\'.category_header:visible:first\').offset().top);
+					});'
+				);
+
 				return $this->action_post();
 			}
 
@@ -1475,8 +1480,11 @@ class Post_Controller extends Action_Controller
 		// Any mistakes?
 		if ($post_errors->hasErrors() || $attach_errors->hasErrors())
 		{
-			// Previewing.
-			$_REQUEST['preview'] = true;
+			addInlineJavascript('
+				$(document).ready(function () {
+					$("html,body").scrollTop($(\'.category_header:visible:first\').offset().top);
+				});'
+			);
 
 			return $this->action_post();
 		}

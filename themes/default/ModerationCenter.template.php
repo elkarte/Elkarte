@@ -11,7 +11,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0
+ * @version 1.0.4
  *
  */
 
@@ -233,7 +233,7 @@ function template_notes()
 		echo '
 									</ul>
 									<div class="pagesection notes">
-										<span class="smalltext">', $context['page_index'], '</span>
+										<ul class="pagelinks">', $context['page_index'], '</ul>
 									</div>';
 	}
 

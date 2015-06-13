@@ -13,7 +13,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:		BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0
+ * @version 1.0.4
  *
  */
 
@@ -161,7 +161,7 @@ class ManageScheduledTasks_Controller extends Action_Controller
 					'data' => array(
 						'sprintf' => array(
 							'format' => '
-								<a href="' . $scripturl . '?action=admin;area=scheduledtasks;sa=taskedit;tid=%1$d"><i class="fa fa-pencil-square-o"></i> %2$s</a><br /><span class="smalltext">%3$s</span>',
+								<a class="linkbutton" href="' . $scripturl . '?action=admin;area=scheduledtasks;sa=taskedit;tid=%1$d" title="' . $txt['scheduled_task_edit'] . ' %2$s"><i class="fa fa-pencil-square-o"></i> %2$s</a><br /><span class="smalltext">%3$s</span>',
 							'params' => array(
 								'id' => false,
 								'name' => false,

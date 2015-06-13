@@ -14,7 +14,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:		BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0.3
+ * @version 1.0.4
  *
  */
 
@@ -26,6 +26,32 @@ if (!defined('ELK'))
  */
 class Memberlist_Controller extends Action_Controller
 {
+	protected $_known_search_methods = array();
+
+	public function pre_dispatch()
+	{
+		global $context, $txt;
+
+		// These are all the possible fields.
+		$this->_search_fields = array(
+			'name' => $txt['mlist_search_name'],
+			'email' => $txt['mlist_search_email'],
+			'website' => $txt['mlist_search_website'],
+			'group' => $txt['mlist_search_group'],
+		);
+
+		// Are there custom fields they can search?
+		require_once(SUBSDIR . '/Memberlist.subs.php');
+		ml_findSearchableCustomFields();
+
+		// These are handy later
+		$context['old_search_value'] = '';
+		$context['in_search'] = !empty($_REQUEST['search']);
+
+		foreach ($context['custom_search_fields'] as $field)
+			$this->_search_fields['cust_' . $field['colname']] = sprintf($txt['mlist_search_by'], $field['name']);
+	}
+
 	/**
 	 * Sets up the context for showing a listing of registered members.
 	 * For the handlers in this file, it requires the view_mlist permission.
@@ -134,7 +160,6 @@ class Memberlist_Controller extends Action_Controller
 		);
 
 		// Add in any custom profile columns
-		require_once(SUBSDIR . '/Memberlist.subs.php');
 		if (ml_CustomProfile())
 			$context['columns'] += $context['custom_profile_fields']['columns'];
 
@@ -160,23 +185,17 @@ class Memberlist_Controller extends Action_Controller
 		$context['can_send_pm'] = allowedTo('pm_send');
 
 		// Build the memberlist button array.
-		$context['memberlist_buttons'] = array(
-			'view_all_members' => array('text' => 'view_all_members', 'image' => 'mlist.png', 'lang' => true, 'url' => $scripturl . '?action=memberlist;sa=all', 'active' => true),
-		);
+		if ($context['in_search'])
+		{
+			$context['memberlist_buttons'] = array(
+				'view_all_members' => array('text' => 'view_all_members', 'image' => 'mlist.png', 'lang' => true, 'url' => $scripturl . '?action=memberlist;sa=all', 'active' => true),
+			);
+		}
+		else
+			$context['memberlist_buttons'] = array();
 
-		// Are there custom fields they can search?
-		ml_findSearchableCustomFields();
-
-		// These are all the possible fields.
-		$context['search_fields'] = array(
-			'name' => $txt['mlist_search_name'],
-			'email' => $txt['mlist_search_email'],
-			'website' => $txt['mlist_search_website'],
-			'group' => $txt['mlist_search_group'],
-		);
-
-		foreach ($context['custom_search_fields'] as $field)
-			$context['search_fields']['cust_' . $field['colname']] = sprintf($txt['mlist_search_by'], $field['name']);
+		// Make fields available to the template
+		$context['search_fields'] = $this->_search_fields;
 
 		// What do we search for by default?
 		$context['search_defaults'] = array('name', 'email');
@@ -238,7 +257,7 @@ class Memberlist_Controller extends Action_Controller
 			$context['num_members'] = ml_memberCount();
 
 		// Set defaults for sort (real_name) and start. (0)
-		if (!isset($_REQUEST['sort']) || !isset($context['columns'][$_REQUEST['sort']]))
+		if (!isset($_REQUEST['sort']) || !isset($context['columns'][$_REQUEST['sort']]['sort']))
 			$_REQUEST['sort'] = 'real_name';
 
 		if (!is_numeric($_REQUEST['start']))
@@ -336,7 +355,7 @@ class Memberlist_Controller extends Action_Controller
 
 				if ($this_letter != $last_letter && preg_match('~[a-z]~', $this_letter) === 1)
 				{
-					$context['members'][$i]['sort_letter'] = htmlspecialchars($this_letter, ENT_COMPAT, 'UTF-8');
+					$context['members'][$i]['sort_letter'] = Util::htmlspecialchars($this_letter);
 					$last_letter = $this_letter;
 				}
 			}
@@ -355,17 +374,20 @@ class Memberlist_Controller extends Action_Controller
 		$context['page_title'] = $txt['mlist_search'];
 		$context['can_moderate_forum'] = allowedTo('moderate_forum');
 
-		// Are there custom fields they can search?
-		ml_findSearchableCustomFields();
-
 		// They're searching..
 		if (isset($_REQUEST['search']) && isset($_REQUEST['fields']))
 		{
 			$search = Util::htmlspecialchars(trim(isset($_GET['search']) ? $_GET['search'] : $_POST['search']), ENT_QUOTES);
 			$input_fields = isset($_GET['fields']) ? explode(',', $_GET['fields']) : $_POST['fields'];
 
-			$context['old_search'] = $_REQUEST['search'];
-			$context['old_search_value'] = urlencode($_REQUEST['search']);
+			$fields_key = array_keys($this->_search_fields);
+			$context['search_defaults'] = array();
+			foreach ($input_fields as $val)
+			{
+				if (in_array($val, $fields_key))
+					$context['search_defaults'] = $input_fields;
+			}
+			$context['old_search_value'] = $search;
 
 			// No fields?  Use default...
 			if (empty($input_fields))
@@ -432,7 +454,7 @@ class Memberlist_Controller extends Action_Controller
 
 			$customJoin = array();
 			$customCount = 10;
-			$validFields = array();
+			$validFields = isset($input_fields) ? $input_fields : array();
 
 			// Any custom fields to search for - these being tricky?
 			foreach ($input_fields as $field)
@@ -450,6 +472,7 @@ class Memberlist_Controller extends Action_Controller
 			if (empty($fields))
 				redirectexit('action=memberlist');
 
+			$validFields = array_unique($validFields);
 			$query = $search == '' ? '= {string:blank_string}' : (defined('DB_CASE_SENSITIVE') ? 'LIKE LOWER({string:search})' : 'LIKE {string:search}');
 			$where = implode(' ' . $query . ' OR ', $fields) . ' ' . $query . $condition;
 
