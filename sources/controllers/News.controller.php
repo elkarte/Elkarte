@@ -302,10 +302,10 @@ class News_Controller extends Action_Controller
 		<icon>', $boardurl, '/favicon.ico</icon>
 
 		<updated>', gmstrftime('%Y-%m-%dT%H:%M:%SZ'), '</updated>
-		<subtitle><![CDATA[', strip_tags($txt['xml_rss_desc']), ']]></subtitle>
+		<subtitle><![CDATA[', strip_tags(un_htmlspecialchars($txt['xml_rss_desc'])), ']]></subtitle>
 		<generator uri="http://www.elkarte.net" version="', strtr($forum_version, array('ElkArte' => '')), '">ElkArte</generator>
 		<author>
-			<name>', strip_tags($context['forum_name']), '</name>
+			<name>', strip_tags(un_htmlspecialchars($context['forum_name'])), '</name>
 		</author>';
 
 			dumpTags($xml, 2, 'entry', $xml_format);
