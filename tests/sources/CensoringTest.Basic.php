@@ -1,11 +1,9 @@
 <?php
-require_once(TESTDIR . 'simpletest/autorun.php');
-require_once(TESTDIR . '../SSI.php');
 
 /**
  * TestCase class for the censorText function
  */
-class TestCensoring extends UnitTestCase
+class CensoringTest extends PHPUnit_Framework_TestCase
 {
 	/**
 	 * prepare what is necessary to use in these tests.
