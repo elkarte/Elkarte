@@ -1013,11 +1013,19 @@ function allowedTo($permission, $boards = null)
 
 	// Are we checking the _current_ board, or some other boards?
 	if ($boards === null)
+	{
+		if (empty($user_info['permissions']))
+			return false;
+
 		// Check if they can do it, you aren't allowed, by default.
 		return count(array_intersect($permission, $user_info['permissions'])) !== 0 ? true : false;
+	}
 
 	if (!is_array($boards))
 		$boards = array($boards);
+
+	if (empty($user_info['groups']))
+		return false;
 
 	$request = $db->query('', '
 		SELECT MIN(bp.add_deny) AS add_deny

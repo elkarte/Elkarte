@@ -83,8 +83,12 @@ function initialize_inputs()
 
 	// Add slashes, as long as they aren't already being added.
 	foreach ($_POST as $k => $v)
-		if (strpos($k, 'password') === false)
+	{
+		if (strpos($k, 'password') === false && strpos($k, 'passwd') === false)
 			$_POST[$k] = addslashes($v);
+		else
+			$_POST[$k] = addcslashes($v, '\'');
+	}
 
 	// PHP 5 might cry if we don't do this now.
 	$server_offset = @mktime(0, 0, 0, 1, 1, 1970);

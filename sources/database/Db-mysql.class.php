@@ -603,6 +603,7 @@ class Database_MySQL extends Database_Abstract
 			// Check for the "lost connection" or "deadlock found" errors - and try it just one more time.
 			if (in_array($query_errno, array(1205, 1213, 2006, 2013)))
 			{
+				$new_connection = false;
 				if (in_array($query_errno, array(2006, 2013)) && $this->_connection == $connection)
 				{
 					// Are we in SSI mode?  If so try that username and password first

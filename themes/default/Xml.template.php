@@ -553,10 +553,10 @@ function template_feedatom()
 		<icon>', $boardurl, '/favicon.ico</icon>
 
 		<updated>', gmstrftime('%Y-%m-%dT%H:%M:%SZ'), '</updated>
-		<subtitle><![CDATA[', strip_tags($txt['xml_rss_desc']), ']]></subtitle>
+		<subtitle><![CDATA[', strip_tags(un_htmlspecialchars($txt['xml_rss_desc'])), ']]></subtitle>
 		<generator uri="http://www.elkarte.net" version="', strtr(FORUM_VERSION, array('ElkArte' => '')), '">ElkArte</generator>
 		<author>
-			<name>', strip_tags($context['forum_name']), '</name>
+			<name>', strip_tags(un_htmlspecialchars($context['forum_name'])), '</name>
 		</author>';
 
 			template_xml_news($context['recent_posts_data'], 2, 'entry', $context['xml_format']);
@@ -577,7 +577,7 @@ function template_feedrss()
 		<channel>
 			<title>', $context['feed_title'], '</title>
 			<link>', $scripturl, '</link>
-			<description><![CDATA[', strip_tags($txt['xml_rss_desc']), ']]></description>
+			<description><![CDATA[', un_htmlspecialchars(strip_tags($txt['xml_rss_desc'])), ']]></description>
 			<generator>ElkArte</generator>
 			<ttl>30</ttl>
 			<image>

@@ -788,6 +788,9 @@ class Settings_Form
 				if (file_exists(BOARDDIR . '/Settings_bak.php'))
 					@copy(BOARDDIR . '/Settings_bak.php', BOARDDIR . '/Settings.php');
 			}
+			// And ensure we are going to read the correct file next time
+			if (function_exists('opcache_invalidate'))
+				opcache_invalidate(BOARDDIR . '/Settings.php');
 		}
 	}
 

@@ -804,6 +804,9 @@ class ManageLanguages_Controller extends Action_Controller
 			fwrite($fp, $current_data);
 			fclose($fp);
 
+			if (function_exists('opcache_invalidate'))
+				opcache_invalidate($settings['default_theme_dir'] . '/languages/' . $context['lang_id'] . '/index.' . $context['lang_id'] . '.php');
+
 			$madeSave = true;
 		}
 
@@ -1007,6 +1010,9 @@ class ManageLanguages_Controller extends Action_Controller
 				$fp = fopen($current_file, 'w+');
 				fwrite($fp, strtr($file_contents, array("\r" => '')));
 				fclose($fp);
+
+				if (function_exists('opcache_invalidate'))
+					opcache_invalidate($current_file);
 
 				$madeSave = true;
 			}

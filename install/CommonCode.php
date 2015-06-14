@@ -655,6 +655,9 @@ function saveFileSettings($config_vars, $settingsArray)
 	}
 	fclose($fp);
 
+	if (function_exists('opcache_invalidate'))
+		opcache_invalidate(dirname(__FILE__) . '/Settings.php');
+
 	return true;
 
 	// Blank out the file - done to fix a oddity with some servers.

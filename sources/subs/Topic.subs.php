@@ -199,6 +199,8 @@ function removeTopics($topics, $decreasePostCount = true, $ignoreRecycling = fal
 	{
 		if (!isset($adjustBoards[$row['id_board']]['num_posts']))
 		{
+			cache_put_data('board-' . $row['id_board'], null, 120);
+
 			$adjustBoards[$row['id_board']] = array(
 				'num_posts' => 0,
 				'num_topics' => 0,
@@ -404,6 +406,9 @@ function removeTopics($topics, $decreasePostCount = true, $ignoreRecycling = fal
 	);
 	require_once(SUBSDIR . '/FollowUps.subs.php');
 	removeFollowUpsByTopic($topics);
+
+	foreach ($topics as $topic_id)
+		cache_put_data('topic_board-' . $topic_id, null, 120);
 
 	// Maybe there's an addon that wants to delete topic related data of its own
 	call_integration_hook('integrate_remove_topics', array($topics));

@@ -1654,8 +1654,8 @@ class ManageThemes_Controller extends Action_Controller
 				{
 					logAction('editing_theme', array('member' => $user_info['id']), 'admin');
 
-					// But the email only once every 10 minutes should be fine
-					if (!recentlyLogged('editing_theme', 600))
+					// But the email only once every 60 minutes should be fine
+					if (!recentlyLogged('editing_theme', 3600))
 					{
 						require_once(SUBSDIR . '/Themes.subs.php');
 						require_once(SUBSDIR . '/Admin.subs.php');
@@ -1686,6 +1686,9 @@ class ManageThemes_Controller extends Action_Controller
 				$fp = fopen($theme_dir . '/' . $this->_req->post->filename, 'w');
 				fwrite($fp, $entire_file);
 				fclose($fp);
+
+				if (function_exists('opcache_invalidate'))
+					opcache_invalidate($theme_dir . '/' . $_REQUEST['filename']);
 
 				// We're done here.
 				redirectexit('action=admin;area=theme;th=' . $selectedTheme . ';' . $context['session_var'] . '=' . $context['session_id'] . ';sa=browse;directory=' . dirname($this->_req->post->filename));
@@ -1912,6 +1915,9 @@ class ManageThemes_Controller extends Action_Controller
 			fwrite($fp, file_get_contents($filename));
 			fclose($fp);
 
+			if (function_exists('opcache_invalidate'))
+				opcache_invalidate($filename);
+
 			redirectexit('action=admin;area=theme;th=' . $context['theme_id'] . ';' . $context['session_var'] . '=' . $context['session_id'] . ';sa=copy');
 		}
 		elseif (isset($this->_req->query->lang_file) && preg_match('~^[^\./\\\\:\0]\.[^\./\\\\:\0]$~', $this->_req->query->lang_file) != 0)
@@ -1926,6 +1932,9 @@ class ManageThemes_Controller extends Action_Controller
 			$fp = fopen($theme_dirs['theme_dir'] . '/languages/' . $this->_req->query->lang_file . '.php', 'w');
 			fwrite($fp, file_get_contents($filename));
 			fclose($fp);
+
+			if (function_exists('opcache_invalidate'))
+				opcache_invalidate($filename);
 
 			redirectexit('action=admin;area=theme;th=' . $context['theme_id'] . ';' . $context['session_var'] . '=' . $context['session_id'] . ';sa=copy');
 		}

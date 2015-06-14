@@ -190,7 +190,7 @@ class RemoveTopic_Controller extends Action_Controller
 			Errors::instance()->fatal_lang_error('restore_not_found', false, array('<ul style="margin-top: 0;"><li>' . implode('</li><li>', $restorer->unfoundRestoreMessages(true)) . '</li></ul>'));
 
 		// Lets send them back somewhere that may make sense
-		if (count($actioned_messages) == 1 && empty($topics_to_restore))
+		if (isset($actioned_messages) && count($actioned_messages) == 1 && empty($topics_to_restore))
 		{
 			reset($actioned_messages);
 			redirectexit('topic=' . key($actioned_messages));
