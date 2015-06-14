@@ -189,7 +189,7 @@ function template_control_richedit_buttons($editor_id)
 	echo '
 			', $context['shortcuts_text'], '
 		</span>
-		<input type="submit" value="', isset($editor_context['labels']['post_button']) ? $editor_context['labels']['post_button'] : $txt['post'], '" tabindex="', $context['tabindex']++, '" onclick="return submitThisOnce(this);" accesskey="s" class="button_submit" />';
+		<input type="submit" name="', isset($editor_context['labels']['post_name']) ? $editor_context['labels']['post_name'] : 'post', '" value="', isset($editor_context['labels']['post_button']) ? $editor_context['labels']['post_button'] : $txt['post'], '" tabindex="', $context['tabindex']++, '" onclick="return submitThisOnce(this);" accesskey="s" class="button_submit" />';
 
 	if ($editor_context['preview_type'])
 		echo '

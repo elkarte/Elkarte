@@ -157,12 +157,9 @@ function logLastDatabaseError()
 			// Oops. maybe we have no more disk space left, or some other troubles, troubles...
 			// Copy the file back and run for your life!
 			@copy(BOARDDIR . '/db_last_error_bak.txt', BOARDDIR . '/db_last_error.txt');
+			return false;
 		}
-		else
-		{
-			@touch(BOARDDIR . '/Settings.php');
-			return true;
-		}
+		return true;
 	}
 
 	return false;

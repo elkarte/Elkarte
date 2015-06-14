@@ -343,7 +343,6 @@ function updateDbLastError($time)
 {
 	// Write out the db_last_error file with the error timestamp
 	file_put_contents(BOARDDIR . '/db_last_error.txt', $time, LOCK_EX);
-	@touch(BOARDDIR . '/Settings.php');
 }
 
 /**

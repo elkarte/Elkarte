@@ -24,6 +24,7 @@ abstract class Mention_BoardAccess_Abstract extends Mention_Message_Abstract
 	public function view($type, &$mentions)
 	{
 		$boards = array();
+		$unset_keys = array();
 
 		foreach ($mentions as $key => $row)
 		{
@@ -32,14 +33,16 @@ abstract class Mention_BoardAccess_Abstract extends Mention_Message_Abstract
 				continue;
 
 			// These things are associated to messages and require permission checks
-			if (!empty($row['id_board']))
+			if (empty($row['id_board']))
+				$unset_keys[] = $key;
+			else
 				$boards[$key] = $row['id_board'];
 
 			$mentions[$key]['message'] = $this->_replaceMsg($row);
 		}
 
 		if (!empty($boards))
-			return $this->_validateAccess($boards, $mentions);
+			return $this->_validateAccess($boards, $mentions, $unset_keys);
 		else
 			return false;
 	}
@@ -50,8 +53,9 @@ abstract class Mention_BoardAccess_Abstract extends Mention_Message_Abstract
 	 *
 	 * @param int[] $boards Array of board ids
 	 * @param mixed[] $mentions
+	 * @param int[] $unset_keys Array of board ids
 	 */
-	protected function _validateAccess($boards, &$mentions)
+	protected function _validateAccess($boards, &$mentions, $unset_keys)
 	{
 		global $user_info, $modSettings;
 
@@ -66,14 +70,17 @@ abstract class Mention_BoardAccess_Abstract extends Mention_Message_Abstract
 			// You can't see the board where this mention is, so we drop it from the results
 			if (!in_array($board, $accessibleBoards))
 			{
-				$removed = true;
-				unset($mentions[$key]);
+				$unset_keys[] = $key;
 			}
 		}
 
 		// If some of these mentions are no longer visible, we need to do some maintenance
-		if ($removed)
+		if (!empty($unset_keys))
 		{
+			$removed = true;
+			foreach ($unset_keys as  $key)
+				unset($mentions[$key]);
+
 			if (!empty($modSettings['user_access_mentions']))
 				$modSettings['user_access_mentions'] = @unserialize($modSettings['user_access_mentions']);
 			else

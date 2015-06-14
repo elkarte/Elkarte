@@ -192,8 +192,6 @@ class ManageSecurity_Controller extends Action_Controller
 		{
 			checkSession();
 
-			call_integration_hook('integratesave_moderation_settings', array(&$config_vars));
-
 			// Make sure these don't have an effect.
 			if ($modSettings['warning_settings'][0] != 1)
 			{

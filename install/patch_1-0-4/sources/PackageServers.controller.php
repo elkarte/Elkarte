@@ -14,7 +14,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:		BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.1 dev
+ * @version 1.0.4
  *
  */
 
@@ -30,13 +30,6 @@ if (!defined('ELK'))
 class PackageServers_Controller extends Action_Controller
 {
 	/**
-	 * Holds instance of HttpReq object
-	 * @var HttpReq
-	 */
-	protected $_req;
-
-	/**
-
 	 * Called before all other methods when coming from the dispatcher or
 	 * action class.  Loads language and templates files so they are available
 	 * to the other methods.
@@ -48,9 +41,6 @@ class PackageServers_Controller extends Action_Controller
 
 		// Use the PackageServers template.
 		loadTemplate('PackageServers', 'admin');
-
-		// Load request interface
-		$this->_req = HttpReq::instance();
 	}
 
 	/**
@@ -135,7 +125,7 @@ class PackageServers_Controller extends Action_Controller
 	 */
 	public function action_browse()
 	{
-		global $txt, $scripturl, $context;
+		global $txt, $scripturl, $forum_version, $context;
 
 		// Load our subs worker.
 		require_once(SUBSDIR . '/PackageServers.subs.php');
@@ -147,10 +137,9 @@ class PackageServers_Controller extends Action_Controller
 		// Browsing the packages from a server
 		if (isset($_GET['server']))
 			list($name, $url, $server) = $this->_package_server();
-
 		// Minimum required parameter did not exist so dump out.
 		else
-			Errors::instance()->fatal_lang_error('couldnt_connect', false);
+			fatal_lang_error('couldnt_connect', false);
 
 		// Might take some time.
 		@set_time_limit(60);
@@ -377,8 +366,8 @@ class PackageServers_Controller extends Action_Controller
 			checkSession();
 
 		// To download something, we need either a valid server or url.
-		if (empty($this->_req->query->server) && (!empty($this->_req->query->get) && !empty($this->_req->post->package)))
-			Errors::instance()->fatal_lang_error('package_get_error_is_zero', false);
+		if (empty($_GET['server']) && (!empty($_GET['get']) && !empty($_POST['package'])))
+			fatal_lang_error('package_get_error_is_zero', false);
 
 		// Start off with nothing
 		$package_name = '';
@@ -386,7 +375,7 @@ class PackageServers_Controller extends Action_Controller
 		$url = '';
 
 		// Download from a package server?
-		if (isset($this->_req->query->server))
+		if (!empty($_GET['server']))
 		{
 			list(, $url, $server) = $this->_package_server();
 
@@ -416,7 +405,7 @@ class PackageServers_Controller extends Action_Controller
 			$package_name = $this->_rename_master($_POST['package']);
 
 		// Avoid over writing any existing package files of the same name
-		if (isset($this->_req->query->conflict) || (isset($this->_req->query->auto) && file_exists(BOARDDIR . '/packages/' . $package_name)))
+		if (isset($_REQUEST['conflict']) || (isset($_REQUEST['auto']) && file_exists(BOARDDIR . '/packages/' . $package_name)))
 		{
 			// Find the extension, change abc.tar.gz to abc_1.tar.gz...
 			if (strrpos(substr($package_name, 0, -3), '.') !== false)
@@ -436,24 +425,17 @@ class PackageServers_Controller extends Action_Controller
 		}
 
 		// First make sure it's a package.
-		$packageInfo = getPackageInfo($url . $this->_req->query->package);
 
+		$packageInfo = getPackageInfo($url . $_REQUEST['package']);
 		if (!is_array($packageInfo))
-			Errors::instance()->fatal_lang_error($packageInfo);
+			fatal_lang_error($packageInfo);
 
-		// Save the package to disk, use FTP if necessary
-		create_chmod_control(
-			array(BOARDDIR . '/packages/' . $package_name),
-			array('destination_url' => $scripturl . '?action=admin;area=packageservers;sa=download' . (isset($this->_req->query->server)
-				? ';server=' . $this->_req->query->server : '') . (isset($this->_req->query->auto)
-				? ';auto' : '') . ';package=' . $this->_req->query->package . (isset($this->_req->query->conflict)
-				? ';conflict' : '') . ';' . $context['session_var'] . '=' . $context['session_id'],
-				'crash_on_error' => true)
-		);
-		package_put_contents(BOARDDIR . '/packages/' . $package_name, fetch_web_data($url . $this->_req->query->package));
+		// Save the package to disk as $package_name, use FTP if necessary
+		create_chmod_control(array(BOARDDIR . '/packages/' . $package_name), array('destination_url' => $scripturl . '?action=admin;area=packageservers;sa=download' . (isset($_GET['server']) ? ';server=' . $_GET['server'] : '') . (isset($_REQUEST['auto']) ? ';auto' : '') . ';package=' . $_REQUEST['package'] . (isset($_REQUEST['conflict']) ? ';conflict' : '') . ';' . $context['session_var'] . '=' . $context['session_id'], 'crash_on_error' => true));
+		package_put_contents(BOARDDIR . '/packages/' . $package_name, fetch_web_data($url . $_REQUEST['package']));
 
 		// Done!  Did we get this package automatically?
-		if (preg_match('~^http://[\w_\-]+\.elkarte\.net/~', $this->_req->query->package) == 1 && strpos($this->_req->query->package, 'dlattach') === false && isset($this->_req->query->auto))
+		if (preg_match('~^http://[\w_\-]+\.elkarte\.net/~', $_REQUEST['package']) == 1 && strpos($_REQUEST['package'], 'dlattach') === false && isset($_REQUEST['auto']))
 			redirectexit('action=admin;area=packages;sa=install;package=' . $package_name);
 
 		// You just downloaded a addon from SERVER_NAME_GOES_HERE.
@@ -463,7 +445,7 @@ class PackageServers_Controller extends Action_Controller
 		$context['package'] = getPackageInfo($package_name);
 
 		if (!is_array($context['package']))
-			Errors::instance()->fatal_lang_error('package_cant_download', false);
+			fatal_lang_error('package_cant_download', false);
 
 		if ($context['package']['type'] == 'modification')
 			$context['package']['install']['link'] = '<a href="' . $scripturl . '?action=admin;area=packages;sa=install;package=' . $context['package']['filename'] . '">[ ' . $txt['install_mod'] . ' ]</a>';
@@ -531,15 +513,15 @@ class PackageServers_Controller extends Action_Controller
 		// @todo Use FTP if the packages directory is not writable.
 		// Check the file was even sent!
 		if (!isset($_FILES['package']['name']) || $_FILES['package']['name'] == '')
-			Errors::instance()->fatal_lang_error('package_upload_error_nofile');
+			fatal_lang_error('package_upload_error_nofile');
 		elseif (!is_uploaded_file($_FILES['package']['tmp_name']) || (ini_get('open_basedir') == '' && !file_exists($_FILES['package']['tmp_name'])))
-			Errors::instance()->fatal_lang_error('package_upload_error_failed');
+			fatal_lang_error('package_upload_error_failed');
 
 		// Make sure it has a sane filename.
 		$_FILES['package']['name'] = preg_replace(array('/\s/', '/\.[\.]+/', '/[^\w_\.\-]/'), array('_', '.', ''), $_FILES['package']['name']);
 
 		if (strtolower(substr($_FILES['package']['name'], -4)) != '.zip' && strtolower(substr($_FILES['package']['name'], -4)) != '.tgz' && strtolower(substr($_FILES['package']['name'], -7)) != '.tar.gz')
-			Errors::instance()->fatal_lang_error('package_upload_error_supports', false, array('zip, tgz, tar.gz'));
+			fatal_lang_error('package_upload_error_supports', false, array('zip, tgz, tar.gz'));
 
 		// We only need the filename...
 		$packageName = basename($_FILES['package']['name']);
@@ -549,7 +531,7 @@ class PackageServers_Controller extends Action_Controller
 
 		// @todo Maybe just roll it like we do for downloads?
 		if (file_exists($destination))
-			Errors::instance()->fatal_lang_error('package_upload_error_exists');
+			fatal_lang_error('package_upload_error_exists');
 
 		// Now move the file.
 		move_uploaded_file($_FILES['package']['tmp_name'], $destination);
@@ -565,42 +547,31 @@ class PackageServers_Controller extends Action_Controller
 			@unlink($destination);
 			loadLanguage('Errors');
 			$txt[$context['package']] = str_replace('{MANAGETHEMEURL}', $scripturl . '?action=admin;area=theme;sa=admin;' . $context['session_var'] . '=' . $context['session_id'] . '#theme_install', $txt[$context['package']]);
-			Errors::instance()->fatal_lang_error('package_upload_error_broken', false, $txt[$context['package']]);
+			fatal_lang_error('package_upload_error_broken', false, $txt[$context['package']]);
 		}
 		// Is it already uploaded, maybe?
-		else
+		elseif ($dir = @opendir(BOARDDIR . '/packages'))
 		{
-			try
+			while ($package = readdir($dir))
 			{
-				$packages = new FilesystemIterator(BOARDDIR . '/packages', FilesystemIterator::SKIP_DOTS);
-				foreach ($packages as $package)
+				// No need to check these
+				if ($package == '.' || $package == '..' || $package == 'temp' || $package == $packageName || (!(is_dir(BOARDDIR . '/packages/' . $package) && file_exists(BOARDDIR . '/packages/' . $package . '/package-info.xml')) && substr(strtolower($package), -7) != '.tar.gz' && substr(strtolower($package), -4) != '.tgz' && substr(strtolower($package), -4) != '.zip'))
+					continue;
+
+				// Read package info for the archive we found
+				$packageInfo = getPackageInfo($package);
+				if (!is_array($packageInfo))
+					continue;
+
+				// If it was already uploaded under another name don't upload it again.
+				if ($packageInfo['id'] == $context['package']['id'] && $packageInfo['version'] == $context['package']['version'])
 				{
-					// No need to check these
-					if ($package->getFilename() === 'temp' || $package->getFilename() == $packageName ||
-						(!($package->isDir()) && file_exists($package->getPathname() . '/package-info.xml')
-							&& substr(strtolower($package->getFilename()), -7) !== '.tar.gz'
-							&& strtolower($package->getExtension()) !== 'tgz'
-							&& strtolower($package->getExtension()) !== 'zip'))
-						continue;
-
-					// Read package info for the archive we found
-					$packageInfo = getPackageInfo($package->getFilename());
-					if (!is_array($packageInfo))
-						continue;
-
-					// If it was already uploaded under another name don't upload it again.
-					if ($packageInfo['id'] == $context['package']['id'] && $packageInfo['version'] == $context['package']['version'])
-					{
-						@unlink($destination);
-						loadLanguage('Errors');
-						Errors::instance()->fatal_lang_error('package_upload_already_exists', 'general', $package->getFilename());
-					}
+					@unlink($destination);
+					loadLanguage('Errors');
+					fatal_lang_error('package_upload_already_exists', 'general', $package);
 				}
 			}
-			catch (UnexpectedValueException $e)
-			{
-				// @todo for now do nothing...
-			}
+			closedir($dir);
 		}
 
 		if ($context['package']['type'] == 'modification')
@@ -633,12 +604,12 @@ class PackageServers_Controller extends Action_Controller
 		checkSession();
 
 		// If they put a slash on the end, get rid of it.
-		if (substr($this->_req->post->serverurl, -1) == '/')
-			$this->_req->post->serverurl = substr($this->_req->post->serverurl, 0, -1);
+		if (substr($_POST['serverurl'], -1) == '/')
+			$_POST['serverurl'] = substr($_POST['serverurl'], 0, -1);
 
 		// Are they both nice and clean?
-		$servername = trim(Util::htmlspecialchars($this->_req->post->servername));
-		$serverurl = trim(Util::htmlspecialchars($this->_req->post->serverurl));
+		$servername = trim(Util::htmlspecialchars($_POST['servername']));
+		$serverurl = trim(Util::htmlspecialchars($_POST['serverurl']));
 
 		// Make sure the URL has the correct prefix.
 		if (substr($serverurl, 0, 7) !== 'http://' && substr($serverurl, 0, 8) !== 'https://')
@@ -662,8 +633,8 @@ class PackageServers_Controller extends Action_Controller
 		require_once(SUBSDIR . '/PackageServers.subs.php');
 
 		// We no longer browse this server.
-		$this->_req->query->server = (int) $this->_req->query->server;
-		deletePackageServer($this->_req->query->server);
+		$_GET['server'] = (int) $_GET['server'];
+		deletePackageServer($_GET['server']);
 
 		redirectexit('action=admin;area=packageservers');
 	}
@@ -725,17 +696,18 @@ class PackageServers_Controller extends Action_Controller
 		if ($unwritable)
 		{
 			// Are they connecting to their FTP account already?
-			if (isset($this->_req->post->ftp_username))
+			if (isset($_POST['ftp_username']))
 			{
-				$ftp = new Ftp_Connection($this->_req->post->ftp_server, $this->_req->post->ftp_port, $this->_req->post->ftp_username, $this->_req->post->ftp_password);
+				require_once(SUBSDIR . '/FtpConnection.class.php');
+				$ftp = new Ftp_Connection($_POST['ftp_server'], $_POST['ftp_port'], $_POST['ftp_username'], $_POST['ftp_password']);
 
 				if ($ftp->error === false)
 				{
 					// I know, I know... but a lot of people want to type /home/xyz/... which is wrong, but logical.
-					if (!$ftp->chdir($this->_req->post->ftp_path))
+					if (!$ftp->chdir($_POST['ftp_path']))
 					{
 						$ftp_error = $ftp->error;
-						$ftp->chdir(preg_replace('~^/home[2]?/[^/]+?~', '', $this->_req->post->ftp_path));
+						$ftp->chdir(preg_replace('~^/home[2]?/[^/]+?~', '', $_POST['ftp_path']));
 					}
 				}
 			}
@@ -746,6 +718,7 @@ class PackageServers_Controller extends Action_Controller
 				// Maybe we didn't even try yet
 				if (!isset($ftp))
 				{
+					require_once(SUBSDIR . '/FtpConnection.class.php');
 					$ftp = new Ftp_Connection(null);
 				}
 				// ...or we failed
@@ -754,18 +727,18 @@ class PackageServers_Controller extends Action_Controller
 
 				list ($username, $detect_path, $found_path) = $ftp->detect_path(BOARDDIR);
 
-				if ($found_path || !isset($this->_req->post->ftp_path))
-					$this->_req->post->ftp_path = $detect_path;
+				if ($found_path || !isset($_POST['ftp_path']))
+					$_POST['ftp_path'] = $detect_path;
 
-				if (!isset($this->_req->post->ftp_username))
-					$this->_req->post->ftp_username = $username;
+				if (!isset($_POST['ftp_username']))
+					$_POST['ftp_username'] = $username;
 
 				// Fill the boxes for a FTP connection with data from the previous attempt too, if any
 				$context['package_ftp'] = array(
-					'server' => isset($this->_req->post->ftp_server) ? $this->_req->post->ftp_server : (isset($modSettings['package_server']) ? $modSettings['package_server'] : 'localhost'),
-					'port' => isset($this->_req->post->ftp_port) ? $this->_req->post->ftp_port : (isset($modSettings['package_port']) ? $modSettings['package_port'] : '21'),
-					'username' => isset($this->_req->post->ftp_username) ? $this->_req->post->ftp_username : (isset($modSettings['package_username']) ? $modSettings['package_username'] : ''),
-					'path' => $this->_req->post->ftp_path,
+					'server' => isset($_POST['ftp_server']) ? $_POST['ftp_server'] : (isset($modSettings['package_server']) ? $modSettings['package_server'] : 'localhost'),
+					'port' => isset($_POST['ftp_port']) ? $_POST['ftp_port'] : (isset($modSettings['package_port']) ? $modSettings['package_port'] : '21'),
+					'username' => isset($_POST['ftp_username']) ? $_POST['ftp_username'] : (isset($modSettings['package_username']) ? $modSettings['package_username'] : ''),
+					'path' => $_POST['ftp_path'],
 					'error' => empty($ftp_error) ? null : $ftp_error,
 				);
 

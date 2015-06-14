@@ -85,11 +85,6 @@
 						e.preventDefault();
 					})
 				);
-
-			if (line.children().length > 0)
-				content.append(line);
-
-			$(".sceditor-toolbar").append(content);
 		},
 		storeLastState: function (){
 			this.wasSource = this.inSourceMode();
@@ -168,6 +163,11 @@
 
 			// show the standard placement icons
 			$.each(emoticons, base.appendEmoticon);
+
+			if (line.children().length > 0)
+				content.append(line);
+
+			$(".sceditor-toolbar").append(content);
 
 			// Show the more button on the editor if we have more
 			if (typeof moreButton !== "undefined")
@@ -438,6 +438,8 @@ $.sceditor.plugins.bbcode.bbcode
 				date = ' date=' + $elm.attr('date');
 			if ($elm.attr('link'))
 				link = ' link=' + $elm.attr('link');
+			if (author === '' && date === '' && link !== '')
+				link = '=' + $elm.attr('link');
 
 			return '[quote' + author + date + link + ']' + content + '[/quote]';
 		},
@@ -462,8 +464,9 @@ $.sceditor.plugins.bbcode.bbcode
 			else if (typeof attrs.defaultattr !== "undefined")
 			{
 				// Convert it to an author tag
-				attr_author = attrs.defaultattr;
-				sAuthor = bbc_quote_from + ': ' + attr_author;
+				attr_link = attrs.defaultattr;
+				sLink = attr_link.substr(0, 7) === 'http://' ? attr_link : elk_scripturl + '?' + attr_link;
+				sAuthor = '<a href="' + sLink + '">' + bbc_quote_from + ': ' + sLink + '</a>';
 			}
 
 			// Links could be in the form: link=topic=71.msg201#msg201 that would fool javascript, so we need a workaround
@@ -539,7 +542,7 @@ $.sceditor.plugins.bbcode.bbcode
 		breakStart: true,
 		isInline: false,
 		skipLastLineBreak: true,
-		allowedChildren: ['*', 'li'],
+		allowedChildren: ['#', '*', 'li'],
 		html: function(element, attrs, content) {
 			var style = '',
 				code = 'ul';

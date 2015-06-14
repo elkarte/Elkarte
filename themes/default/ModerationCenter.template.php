@@ -233,7 +233,7 @@ function template_notes()
 		echo '
 									</ul>
 									<div class="pagesection notes">
-										<span class="smalltext">', $context['page_index'], '</span>
+										<ul class="pagelinks">', $context['page_index'], '</ul>
 									</div>';
 	}
 

@@ -446,9 +446,10 @@ class ManageMaillist_Controller extends Action_Controller
 					if (in_array($temp_email[0]['error_code'], array('error_not_find_member', 'error_key_sender_match')))
 					{
 						// did we actually find a potential correct name, if so we post from the valid member
-						$check_emails = explode('=>', $temp_email[0]['from']);
-						if (isset($check_emails[1]))
-							$data = str_ireplace('From: ' . trim($check_emails[0]), 'From: ' . trim($check_emails[1]), $data);
+						$check_emails = array_pad(explode('=>', $temp_email[0]['from']), 2, '');
+
+						if (!empty($check_emails[1]))
+							$data = preg_replace('~(From: )(.*<)?(' . preg_quote(trim($check_emails[0])) . ')(>)?(\n)~i', '$1$2' . trim($check_emails[1]) . '$4$5', $data);
 					}
 
 					// Lets TRY AGAIN to make a post!
