@@ -68,7 +68,7 @@ function getMessageIcons($board_id)
 	{
 		if (($temp = cache_get_data('posting_icons-' . $board_id, 480)) == null)
 		{
-			$request = $db->query('', '
+			$icon_data = $db->fetchQuery('
 				SELECT title, filename
 				FROM {db_prefix}message_icons
 				WHERE id_board IN (0, {int:board_id})
@@ -77,10 +77,6 @@ function getMessageIcons($board_id)
 					'board_id' => $board_id,
 				)
 			);
-			$icon_data = array();
-			while ($row = $db->fetch_assoc($request))
-				$icon_data[] = $row;
-			$db->free_result($request);
 
 			$icons = array();
 			foreach ($icon_data as $icon)
@@ -416,22 +412,23 @@ function create_control_richedit($editorOptions)
 		{
 			if (($temp = cache_get_data('posting_smileys', 480)) == null)
 			{
-				$request = $db->query('', '
+				$db->fetchQueryCallback('
 					SELECT code, filename, description, smiley_row, hidden
 					FROM {db_prefix}smileys
 					WHERE hidden IN (0, 2)
 					ORDER BY smiley_row, smiley_order',
 					array(
-					)
-				);
-				while ($row = $db->fetch_assoc($request))
-				{
-					$row['filename'] = htmlspecialchars($row['filename'], ENT_COMPAT, 'UTF-8');
-					$row['description'] = htmlspecialchars($row['description'], ENT_COMPAT, 'UTF-8');
+					),
+					function($row)
+					{
+						global $context;
 
-					$context['smileys'][empty($row['hidden']) ? 'postform' : 'popup'][$row['smiley_row']]['smileys'][] = $row;
-				}
-				$db->free_result($request);
+						$row['filename'] = htmlspecialchars($row['filename'], ENT_COMPAT, 'UTF-8');
+						$row['description'] = htmlspecialchars($row['description'], ENT_COMPAT, 'UTF-8');
+
+						$context['smileys'][empty($row['hidden']) ? 'postform' : 'popup'][$row['smiley_row']]['smileys'][] = $row;
+					}
+				);
 
 				foreach ($context['smileys'] as $section => $smileyRows)
 				{

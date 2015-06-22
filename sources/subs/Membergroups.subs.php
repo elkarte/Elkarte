@@ -337,8 +337,7 @@ function removeMembersFromGroups($members, $groups = null, $permissionCheckDone 
 		return false;
 
 	// First, reset those who have this as their primary group - this is the easy one.
-	$log_inserts = array();
-	$request = $db->query('', '
+	$log_inserts = $db->fetchQueryCallback('
 		SELECT id_member, id_group
 		FROM {db_prefix}members AS members
 		WHERE id_group IN ({array_int:group_list})
@@ -346,11 +345,12 @@ function removeMembersFromGroups($members, $groups = null, $permissionCheckDone 
 		array(
 			'group_list' => $groups,
 			'member_list' => $members,
-		)
+		),
+		function($row) use ($group_names)
+		{
+			return array('group' => $group_names[$row['id_group']], 'member' => $row['id_member']);
+		}
 	);
-	while ($row = $db->fetch_assoc($request))
-		$log_inserts[] = array('group' => $group_names[$row['id_group']], 'member' => $row['id_member']);
-	$db->free_result($request);
 
 	$db->query('', '
 		UPDATE {db_prefix}members
@@ -584,7 +584,7 @@ function cache_getMembergroupList()
 
 	$db = database();
 
-	$request = $db->query('', '
+	$groupCache = $db->fetchQueryCallback('
 		SELECT id_group, group_name, online_color
 		FROM {db_prefix}membergroups
 		WHERE min_posts = {int:min_posts}
@@ -597,12 +597,12 @@ function cache_getMembergroupList()
 			'not_hidden' => 0,
 			'mod_group' => 3,
 			'blank_string' => '',
-		)
+		),
+		function($row) use ($scripturl)
+		{
+			return '<a href="' . $scripturl . '?action=groups;sa=members;group=' . $row['id_group'] . '" ' . ($row['online_color'] ? 'style="color: ' . $row['online_color'] . '"' : '') . '>' . $row['group_name'] . '</a>';
+		}
 	);
-	$groupCache = array();
-	while ($row = $db->fetch_assoc($request))
-		$groupCache[] = '<a href="' . $scripturl . '?action=groups;sa=members;group=' . $row['id_group'] . '" ' . ($row['online_color'] ? 'style="color: ' . $row['online_color'] . '"' : '') . '>' . $row['group_name'] . '</a>';
-	$db->free_result($request);
 
 	return array(
 		'data' => $groupCache,
@@ -1076,10 +1076,12 @@ function getBasicMembergroupData($includes = array(), $excludes = array(), $sort
 
 	// Include the default membergroup? the ones with id_member = 0
 	if (in_array('member', $includes) && !isset($split))
+	{
 		$groups[] = array(
 			'id' => 0,
 			'name' => $txt['membergroups_members']
 		);
+	}
 
 	if (!empty($split))
 	{
@@ -1280,28 +1282,28 @@ function copyBoardPermissions($id_group, $copy_from)
 {
 	$db = database();
 
-	$inserts = array();
-
-	$request = $db->query('', '
+	$inserts = $db->fetchQueryCallback('
 		SELECT id_profile, permission, add_deny
 		FROM {db_prefix}board_permissions
 		WHERE id_group = {int:copy_from}',
 		array(
 			'copy_from' => $copy_from,
-		)
+		),
+		function($row) use ($id_group)
+		{
+			return array($id_group, $row['id_profile'], $row['permission'], $row['add_deny']);
+		}
 	);
 
-	while ($row = $db->fetch_assoc($request))
-		$inserts[] = array($id_group, $row['id_profile'], $row['permission'], $row['add_deny']);
-	$db->free_result($request);
-
 	if (!empty($inserts))
+	{
 		$db->insert('insert',
 			'{db_prefix}board_permissions',
 			array('id_group' => 'int', 'id_profile' => 'int', 'permission' => 'string', 'add_deny' => 'int'),
 			$inserts,
 			array('id_group', 'id_profile', 'permission')
 		);
+	}
 }
 
 /**
@@ -1424,7 +1426,7 @@ function detachGroupFromBoards($id_group, $boards, $access_list)
 	$db = database();
 
 	// Find all boards in whose access list this group is in, but shouldn't be.
-	$request = $db->query('', '
+	$db->fetchQueryCallback('
 		SELECT id_board, {raw:column}
 		FROM {db_prefix}boards
 		WHERE FIND_IN_SET({string:current_group}, {raw:column}) != 0' . (empty($boards[$access_list]) ? '' : '
@@ -1433,20 +1435,21 @@ function detachGroupFromBoards($id_group, $boards, $access_list)
 			'current_group' => $id_group,
 			'board_access_list' => $boards[$access_list],
 			'column' => $access_list == 'allow' ? 'member_groups' : 'deny_member_groups',
-		)
+		),
+		function($row) use ($id_group, $access_list, $db)
+		{
+			$db->query('', '
+				UPDATE {db_prefix}boards
+				SET {raw:column} = {string:member_group_access}
+				WHERE id_board = {int:current_board}',
+				array(
+					'current_board' => $row['id_board'],
+					'member_group_access' => implode(',', array_diff(explode(',', $row['member_groups']), array($id_group))),
+					'column' => $access_list == 'allow' ? 'member_groups' : 'deny_member_groups',
+				)
+			);
+		}
 	);
-	while ($row = $db->fetch_assoc($request))
-		$db->query('', '
-			UPDATE {db_prefix}boards
-			SET {raw:column} = {string:member_group_access}
-			WHERE id_board = {int:current_board}',
-			array(
-				'current_board' => $row['id_board'],
-				'member_group_access' => implode(',', array_diff(explode(',', $row['member_groups']), array($id_group))),
-				'column' => $access_list == 'allow' ? 'member_groups' : 'deny_member_groups',
-			)
-		);
-	$db->free_result($request);
 }
 
 /**
@@ -1618,22 +1621,19 @@ function getIDMemberFromGroupModerators($moderators)
 {
 	$db = database();
 
-	$group_moderators = array();
-
-	$request = $db->query('', '
+	return $db->fetchQueryCallback('
 		SELECT id_member
 		FROM {db_prefix}members
 		WHERE member_name IN ({array_string:moderators}) OR real_name IN ({array_string:moderators})
 		LIMIT ' . count($moderators),
 		array(
 			'moderators' => $moderators,
-		)
+		),
+		function($row)
+		{
+			return $row['id_member'];
+		}
 	);
-	while ($row = $db->fetch_assoc($request))
-		$group_moderators[] = $row['id_member'];
-	$db->free_result($request);
-
-	return $group_moderators;
 }
 
 /**
@@ -1940,7 +1940,7 @@ function list_getGroupRequests($start, $items_per_page, $sort, $where, $where_pa
 
 	$db = database();
 
-	$request = $db->query('', '
+	return $db->fetchQueryCallback('
 		SELECT lgr.id_request, lgr.id_member, lgr.id_group, lgr.time_applied, lgr.reason,
 			mem.member_name, mg.group_name, mg.online_color, mem.real_name
 		FROM {db_prefix}log_group_requests AS lgr
@@ -1951,22 +1951,18 @@ function list_getGroupRequests($start, $items_per_page, $sort, $where, $where_pa
 		LIMIT ' . $start . ', ' . $items_per_page,
 		array_merge($where_parameters, array(
 			'sort' => $sort,
-		))
+		)),
+		function($row) use ($scripturl)
+		{
+			return array(
+				'id' => $row['id_request'],
+				'member_link' => '<a href="' . $scripturl . '?action=profile;u=' . $row['id_member'] . '">' . $row['real_name'] . '</a>',
+				'group_link' => '<span style="color: ' . $row['online_color'] . '">' . $row['group_name'] . '</span>',
+				'reason' => censorText($row['reason']),
+				'time_submitted' => standardTime($row['time_applied']),
+			);
+		}
 	);
-	$group_requests = array();
-	while ($row = $db->fetch_assoc($request))
-	{
-		$group_requests[] = array(
-			'id' => $row['id_request'],
-			'member_link' => '<a href="' . $scripturl . '?action=profile;u=' . $row['id_member'] . '">' . $row['real_name'] . '</a>',
-			'group_link' => '<span style="color: ' . $row['online_color'] . '">' . $row['group_name'] . '</span>',
-			'reason' => censorText($row['reason']),
-			'time_submitted' => standardTime($row['time_applied']),
-		);
-	}
-	$db->free_result($request);
-
-	return $group_requests;
 }
 
 /**
@@ -2067,8 +2063,7 @@ function getUnassignableGroups($ignore_protected)
 {
 	$db = database();
 
-	$unassignableGroups = array(-1, 3);
-	$request = $db->query('', '
+	return $db->fetchQueryCallback('
 		SELECT id_group
 		FROM {db_prefix}membergroups
 		WHERE min_posts != {int:min_posts}' . ($ignore_protected ? '' : '
@@ -2076,13 +2071,13 @@ function getUnassignableGroups($ignore_protected)
 		array(
 			'min_posts' => -1,
 			'is_protected' => 1,
-		)
+		),
+		function($row)
+		{
+			return $row['id_group'];
+		},
+		array(-1, 3)
 	);
-	while ($row = $db->fetch_assoc($request))
-		$unassignableGroups[] = $row['id_group'];
-	$db->free_result($request);
-
-	return $unassignableGroups;
 }
 
 function getGroupsList()

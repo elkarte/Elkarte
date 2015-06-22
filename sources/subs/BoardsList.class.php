@@ -433,7 +433,7 @@ class Boards_List
 
 		if (($mod_cached = cache_get_data('localmods_' . md5(implode(',', $boards)), 3600)) === null)
 		{
-			$mod_req = $this->_db->query('', '
+			$mod_cached = $this->_db->fetchQuery('
 				SELECT mods.id_board, IFNULL(mods_mem.id_member, 0) AS id_moderator, mods_mem.real_name AS mod_real_name
 				FROM {db_prefix}moderators AS mods
 					LEFT JOIN {db_prefix}members AS mods_mem ON (mods_mem.id_member = mods.id_member)
@@ -442,10 +442,6 @@ class Boards_List
 					'id_boards' => $boards,
 				)
 			);
-			$mod_cached = array();
-			while($row_mods = $this->_db->fetch_assoc($mod_req))
-				$mod_cached[] = $row_mods;
-			$this->_db->free_result($mod_req);
 			cache_put_data('localmods_' . md5(implode(',', $boards)), $mod_cached, 3600);
 		}
 

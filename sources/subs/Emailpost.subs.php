@@ -1249,10 +1249,8 @@ function query_user_keys($email)
 {
 	$db = database();
 
-	$keys = array();
-
 	// Find all keys sent to this email, sorted by date
-	$request = $db->query('', '
+	return $db->fetchQuery('
 		SELECT
 			id_email
 		FROM {db_prefix}postby_emails
@@ -1262,11 +1260,6 @@ function query_user_keys($email)
 			'email' => $email,
 		)
 	);
-	while ($row = $db->fetch_assoc($request))
-		$keys[] = $row;
-	$db->free_result($request);
-
-	return $keys;
 }
 
 /**

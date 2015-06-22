@@ -673,7 +673,7 @@ function updateDisplayCache()
 {
 	$db = database();
 
-	$request = $db->query('', '
+	$fields = $db->fetchQueryCallback('
 		SELECT col_name, field_name, field_type, bbc, enclose, placement, vieworder
 		FROM {db_prefix}custom_fields
 		WHERE show_display = {int:is_displayed}
@@ -686,22 +686,20 @@ function updateDisplayCache()
 			'active' => 1,
 			'not_owner_only' => 2,
 			'not_admin_only' => 3,
-		)
+		),
+		function($row)
+		{
+			return array(
+				'colname' => strtr($row['col_name'], array('|' => '', ';' => '')),
+				'title' => strtr($row['field_name'], array('|' => '', ';' => '')),
+				'type' => $row['field_type'],
+				'bbc' => $row['bbc'] ? 1 : 0,
+				'placement' => !empty($row['placement']) ? $row['placement'] : 0,
+				'enclose' => !empty($row['enclose']) ? $row['enclose'] : '',
+			);
+		}
 	);
 
-	$fields = array();
-	while ($row = $db->fetch_assoc($request))
-	{
-		$fields[] = array(
-			'colname' => strtr($row['col_name'], array('|' => '', ';' => '')),
-			'title' => strtr($row['field_name'], array('|' => '', ';' => '')),
-			'type' => $row['field_type'],
-			'bbc' => $row['bbc'] ? 1 : 0,
-			'placement' => !empty($row['placement']) ? $row['placement'] : 0,
-			'enclose' => !empty($row['enclose']) ? $row['enclose'] : '',
-		);
-	}
-	$db->free_result($request);
 	updateSettings(array('displayFields' => serialize($fields)));
 }
 
@@ -722,10 +720,12 @@ function loadAllCustomFields()
 	);
 	$custom_field_titles = array();
 	while ($row = $db->fetch_assoc($request))
+	{
 		$custom_field_titles['customfield_' . $row['col_name']] = array(
 			'title' => $row['field_name'],
 			'parse_bbc' => $row['bbc'],
 		);
+	}
 	$db->free_result($request);
 
 	return $custom_field_titles;

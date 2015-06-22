@@ -1428,7 +1428,7 @@ function getAvatarsDefault()
 {
 	$db = database();
 
-	$request = $db->query('', '
+	return $db->fetchQuery('
 		SELECT id_attach, id_folder, id_member, filename, file_hash
 		FROM {db_prefix}attachments
 		WHERE attachment_type = {int:attachment_type}
@@ -1438,13 +1438,6 @@ function getAvatarsDefault()
 			'guest_id_member' => 0,
 		)
 	);
-
-	$avatars = array();
-	while ($row = $db->fetch_assoc($request))
-		$avatars[] = $row;
-	$db->free_result($request);
-
-	return $avatars;
 }
 
 /**
