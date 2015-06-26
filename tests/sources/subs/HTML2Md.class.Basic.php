@@ -70,9 +70,9 @@ class TestHTML2Md extends PHPUnit_Framework_TestCase
 	}
 
 	/**
-	 * testHTML2Md, parse html to MD text and checks that the results are what we expect
+	 * testToMarkdown, parse html to MD text and checks that the results are what we expect
 	 */
-	public function testHTML2Md()
+	public function testToMarkdown()
 	{
 		foreach ($this->mdTestCases as $testcase)
 		{
