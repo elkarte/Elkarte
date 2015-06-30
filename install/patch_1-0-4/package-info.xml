@@ -1,9 +1,9 @@
 <?xml version="1.0"?>
 <!DOCTYPE package-info SYSTEM "http://www.elkarte.net/site/package-info">
 <package-info xmlns="http://www.elkarte.net/site/package-info" xmlns:elk="http://www.elkarte.net/">
-	<id>Elkarte Contributors:ElkArte_103_patch</id>
+	<id>Elkarte Contributors:ElkArte_104_patch</id>
 	<name>ElkArte 1.0.4 patch</name>
-	<version>1.0</version>
+	<version>1.0.1</version>
 	<type>modification</type>
 		<install for="1.0.3">
 			<modification>modifications.xml</modification>
