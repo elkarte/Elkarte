@@ -99,7 +99,7 @@ class ManageErrors_Controller extends Action_Controller
 
 			// Go back to where we were.
 			if ($type == 'delete')
-				redirectexit('action=admin;area=logs;sa=errorlog' . (isset($this->_req->query->desc) ? ';desc' : '') . ';start=' . $this->_req->query->start . (isset($filter) ? ';filter=' . $this->_req->query->filter . ';value=' . $this->_req->query->value : ''));
+				redirectexit('action=admin;area=logs;sa=errorlog' . (isset($this->_req->query->desc) ? ';desc' : '') . ';start=' . $this->_req->query->start . (!empty($filter) ? ';filter=' . $this->_req->query->filter . ';value=' . $this->_req->query->value : ''));
 
 			redirectexit('action=admin;area=logs;sa=errorlog' . (isset($this->_req->query->desc) ? ';desc' : ''));
 		}
@@ -108,7 +108,7 @@ class ManageErrors_Controller extends Action_Controller
 		$members = array();
 
 		// If this filter is empty...
-		if ($num_errors == 0 && isset($filter))
+		if ($num_errors == 0 && !empty($filter))
 			redirectexit('action=admin;area=logs;sa=errorlog' . (isset($this->_req->query->desc) ? ';desc' : ''));
 
 		// Clean up start.
@@ -119,7 +119,7 @@ class ManageErrors_Controller extends Action_Controller
 		$context['sort_direction'] = isset($this->_req->query->desc) ? 'down' : 'up';
 
 		// Set the page listing up.
-		$context['page_index'] = constructPageIndex($scripturl . '?action=admin;area=logs;sa=errorlog' . ($context['sort_direction'] == 'down' ? ';desc' : '') . (isset($filter) ? $filter['href'] : ''), $this->_req->query->start, $num_errors, $modSettings['defaultMaxMessages']);
+		$context['page_index'] = constructPageIndex($scripturl . '?action=admin;area=logs;sa=errorlog' . ($context['sort_direction'] == 'down' ? ';desc' : '') . (isset($filter['href']) ? $filter['href'] : ''), $this->_req->query->start, $num_errors, $modSettings['defaultMaxMessages']);
 		$context['start'] = $this->_req->query->start;
 		$context['errors'] = array();
 
@@ -162,7 +162,7 @@ class ManageErrors_Controller extends Action_Controller
 
 		// And this is pretty basic ;).
 		$context['page_title'] = $txt['errlog'];
-		$context['has_filter'] = isset($filter);
+		$context['has_filter'] = !empty($filter);
 		$context['sub_template'] = 'error_log';
 
 		createToken('admin-el');
@@ -177,7 +177,7 @@ class ManageErrors_Controller extends Action_Controller
 	{
 		global $context, $scripturl, $user_profile;
 
-		if (isset($filter))
+		if (isset($filter['variable']))
 		{
 			$context['filter'] = &$filter;
 

@@ -74,7 +74,7 @@ class TestBrowser extends PHPUnit_Framework_TestCase
 	/**
 	* Test broswer strings with BrowserDetector
 	*/
-	public function testBrowser()
+	public function testBrowserDetector()
 	{
 		global $context;
 

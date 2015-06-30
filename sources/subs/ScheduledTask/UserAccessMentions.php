@@ -61,7 +61,7 @@ class User_Access_Mentions implements Scheduled_Task_Interface
 					{
 						// Find all the mentions that this user can or cannot see
 						$request = $db->query('', '
-							SELECT mnt.id_mention
+							SELECT mnt.id_mention, m.id_board
 							FROM {db_prefix}log_mentions as mnt
 								LEFT JOIN {db_prefix}messages AS m ON (m.id_msg = mnt.id_target)
 								LEFT JOIN {db_prefix}boards AS b ON (b.id_board = m.id_board)
@@ -78,10 +78,20 @@ class User_Access_Mentions implements Scheduled_Task_Interface
 							)
 						);
 						$mentions = array();
+						$remove = array();
 						while ($row = $db->fetch_assoc($request))
-							$mentions[] = $row['id_mention'];
+						{
+							if (empty($row['id_board']))
+								$remove[] = $row['id_mention'];
+							else
+								$mentions[] = $row['id_mention'];
+						}
 						$db->free_result($request);
 
+						if (!empty($remove))
+						{
+							removeMentions($remove);
+						}
 						// If we found something toggle them and increment the start for the next round
 						if (!empty($mentions))
 							toggleMentionsAccessibility($mentions, $can == 'can');

@@ -202,7 +202,7 @@ abstract class DbTable
 	 */
 	protected function _get_column_info($table_name, $column_name)
 	{
-		$columns = $this->db_list_columns($table_name, false);
+		$columns = $this->db_list_columns($table_name, true);
 
 		foreach ($columns as $column)
 		{

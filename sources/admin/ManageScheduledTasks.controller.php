@@ -114,7 +114,7 @@ class ManageScheduledTasks_Controller extends Action_Controller
 		$context['page_title'] = $txt['maintain_tasks'];
 
 		// Saving changes?
-		if (isset($this->_req->query->save) && isset($this->_req->post->enable_task))
+		if (isset($this->_req->post->save) && isset($this->_req->post->enable_task))
 		{
 			checkSession();
 
@@ -134,7 +134,7 @@ class ManageScheduledTasks_Controller extends Action_Controller
 		}
 
 		// Want to run any of the tasks?
-		if (isset($this->_req->query->run) && isset($this->_req->post->run_task))
+		if (isset($this->_req->post->run) && isset($this->_req->post->run_task))
 		{
 			// Lets figure out which ones they want to run.
 			$tasks = array();
