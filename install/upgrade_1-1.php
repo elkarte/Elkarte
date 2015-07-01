@@ -142,6 +142,8 @@ class UpgradeInstructions_upgrade_1_1
 				'debug_title' => 'Update mention logs...',
 				'function' => function($db, $db_table)
 				{
+					global $modSettings;
+
 					$db->query('', '
 						UPDATE {db_prefix}log_mentions
 						SET is_accessible = CASE WHEN status < 0 THEN 0 ELSE 1 END',

@@ -1899,7 +1899,7 @@ class InstallInstructions_install_1_1
 			'{db_prefix}package_servers',
 			array('name' => 'string', 'url' => 'string'),
 			array(
-				array('ElkArte Third-party Add-ons Site', 'https://github.com/elkarte/addons/tree/master/packages'),
+				array('ElkArte Third-party Add-ons Site', 'http://addons.elkarte.net/package.json'),
 			),
 			array('id_server')
 		);
