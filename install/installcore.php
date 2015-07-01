@@ -23,7 +23,9 @@ function getUpgradeFiles()
 	global $db_type;
 
 	return array(
-		array('upgrade_' . DB_SCRIPT_VERSION . '.php', '1.1', CURRENT_VERSION),
-		array('upgrade_' . DB_SCRIPT_VERSION . '_' . $db_type . '.php', '1.1', CURRENT_VERSION),
+		array('upgrade_1-0.php', '1.0', CURRENT_VERSION),
+		array('upgrade_1-0_' . $db_type . '.php', '1.0', CURRENT_VERSION),
+		array('upgrade_1-1.php', '1.1', CURRENT_VERSION),
+		array('upgrade_1-1_' . $db_type . '.php', '1.1', CURRENT_VERSION),
 	);
 }

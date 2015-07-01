@@ -1117,7 +1117,7 @@ function action_databaseChanges()
 		$upcontext['cur_file_name'] = $file[0];
 
 		// @todo Do we actually need to do this still?
-		if (file_exists(__DIR__ . '/' . $file[0]) && (!isset($modSettings['elkVersion']) || version_compare($modSettings['elkVersion'], $file[1]) < 0))
+		if (file_exists(__DIR__ . '/' . $file[0]) && (!isset($modSettings['elkVersion']) || version_compare($modSettings['elkVersion'], $file[1]) <= 0))
 		{
 			$nextFile = parse_sql(__DIR__ . '/' . $file[0]);
 			if ($nextFile)
