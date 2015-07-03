@@ -470,11 +470,11 @@ class Post_Controller extends Action_Controller
 			);
 			$context['require_verification'] = create_control_verification($verificationOptions);
 			$context['visual_verification_id'] = $verificationOptions['id'];
-		}
 
-		// If they came from quick reply, and have to enter verification details, give them some notice.
-		if (!empty($_REQUEST['from_qr']) && !empty($context['require_verification']))
-			$this->_post_errors->addError('need_qr_verification');
+			// If they came from quick reply, and have to enter verification details, give them some notice.
+			if (!empty($_REQUEST['from_qr']) && $context['require_verification'] !== false)
+				$this->_post_errors->addError('need_qr_verification');
+		}
 
 		// Any errors occurred?
 		$context['post_error'] = array(
