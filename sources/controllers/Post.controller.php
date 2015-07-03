@@ -644,20 +644,6 @@ class Post_Controller extends Action_Controller
 
 		$topic_info = array();
 
-		// Wrong verification code?
-		if (!$user_info['is_admin'] && !$user_info['is_mod'] && !empty($modSettings['posts_require_captcha']) && ($user_info['posts'] < $modSettings['posts_require_captcha'] || ($user_info['is_guest'] && $modSettings['posts_require_captcha'] == -1)))
-		{
-			require_once(SUBSDIR . '/VerificationControls.class.php');
-			$verificationOptions = array(
-				'id' => 'post',
-			);
-			$context['require_verification'] = create_control_verification($verificationOptions, true);
-
-			if (is_array($context['require_verification']))
-				foreach ($context['require_verification'] as $verification_error)
-					$this->_post_errors->addError($verification_error);
-		}
-
 		require_once(SUBSDIR . '/Boards.subs.php');
 		require_once(SUBSDIR . '/Post.subs.php');
 		loadLanguage('Post');
