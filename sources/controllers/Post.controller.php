@@ -644,15 +644,15 @@ class Post_Controller extends Action_Controller
 
 		$topic_info = array();
 
+		// Previewing? Go back to start.
+		if (isset($_REQUEST['preview']))
+			return $this->action_post();
+
 		require_once(SUBSDIR . '/Boards.subs.php');
 		require_once(SUBSDIR . '/Post.subs.php');
 		loadLanguage('Post');
 
 		$this->_events->trigger('prepare_save_post', array('topic_info' => &$topic_info));
-
-		// Previewing? Go back to start.
-		if (isset($_REQUEST['preview']))
-			return $this->action_post();
 
 		// Prevent double submission of this form.
 		checkSubmitOnce('check');
