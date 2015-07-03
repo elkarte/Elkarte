@@ -1480,88 +1480,26 @@ class Post_Controller extends Action_Controller
 	 * It uses the pspell library, which MUST be installed.
 	 * It has problems with internationalization.
 	 * It is accessed via ?action=spellcheck.
+	 * @deprecated since 1.1
 	 */
 	public function action_spellcheck()
 	{
-		global $txt, $context;
+		// Initialize this controller with its own event manager
+		$controller = new Spellcheck_Controller(new Event_Manager());
 
-		// A list of "words" we know about but pspell doesn't.
-		$known_words = array('elkarte', 'php', 'mysql', 'www', 'gif', 'jpeg', 'png', 'http');
+		// Fetch controllers generic hook name from the action controller
+		$hook = $controller->getHook();
 
-		loadLanguage('Post');
-		loadTemplate('Post');
+		// Call the controllers pre dispatch method
+		$controller->pre_dispatch();
 
-		// Okay, this looks funny, but it actually fixes a weird bug.
-		ob_start();
-		$old = error_reporting(0);
+		// Call integrate_action_XYZ_before -> XYZ_controller -> integrate_action_XYZ_after
+		call_integration_hook('integrate_action_' . $hook . '_before', array('action_index'));
 
-		// See, first, some windows machines don't load pspell properly on the first try.  Dumb, but this is a workaround.
-		pspell_new('en');
+		$result = $controller->$method();
 
-		// Next, the dictionary in question may not exist. So, we try it... but...
-		$pspell_link = pspell_new($txt['lang_dictionary'], $txt['lang_spelling'], '', 'utf-8', PSPELL_FAST | PSPELL_RUN_TOGETHER);
+		call_integration_hook('integrate_action_' . $hook . '_after', array('action_index'));
 
-		// Most people don't have anything but English installed... So we use English as a last resort.
-		if (!$pspell_link)
-			$pspell_link = pspell_new('en', '', '', '', PSPELL_FAST | PSPELL_RUN_TOGETHER);
-
-		error_reporting($old);
-		@ob_end_clean();
-
-		if (!isset($_POST['spellstring']) || !$pspell_link)
-			die;
-
-		// Construct a bit of Javascript code.
-		$context['spell_js'] = '
-			var txt = {"done": "' . $txt['spellcheck_done'] . '"},
-				mispstr = ' . ($_POST['fulleditor'] === 'true' ? 'window.opener.spellCheckGetText(spell_fieldname)' : 'window.opener.document.forms[spell_formname][spell_fieldname].value') . ',
-				misps = Array(';
-
-		// Get all the words (Javascript already separated them).
-		$alphas = explode("\n", strtr($_POST['spellstring'], array("\r" => '')));
-
-		$found_words = false;
-		for ($i = 0, $n = count($alphas); $i < $n; $i++)
-		{
-			// Words are sent like 'word|offset_begin|offset_end'.
-			$check_word = explode('|', $alphas[$i]);
-
-			// If the word is a known word, or spelled right...
-			if (in_array(Util::strtolower($check_word[0]), $known_words) || pspell_check($pspell_link, $check_word[0]) || !isset($check_word[2]))
-				continue;
-
-			// Find the word, and move up the "last occurrence" to here.
-			$found_words = true;
-
-			// Add on the javascript for this misspelling.
-			$context['spell_js'] .= '
-				new misp("' . strtr($check_word[0], array('\\' => '\\\\', '"' => '\\"', '<' => '', '&gt;' => '')) . '", ' . (int) $check_word[1] . ', ' . (int) $check_word[2] . ', [';
-
-			// If there are suggestions, add them in...
-			$suggestions = pspell_suggest($pspell_link, $check_word[0]);
-			if (!empty($suggestions))
-			{
-				// But first check they aren't going to be censored - no naughty words!
-				foreach ($suggestions as $k => $word)
-					if ($suggestions[$k] != censorText($word))
-						unset($suggestions[$k]);
-
-				if (!empty($suggestions))
-					$context['spell_js'] .= '"' . implode('", "', $suggestions) . '"';
-			}
-
-			$context['spell_js'] .= ']),';
-		}
-
-		// If words were found, take off the last comma.
-		if ($found_words)
-			$context['spell_js'] = substr($context['spell_js'], 0, -1);
-
-		$context['spell_js'] .= '
-			);';
-
-		// And instruct the template system to just show the spellcheck sub template.
-		$this->_template_layers->removeAll();
-		$context['sub_template'] = 'spellcheck';
+		return $result;
 	}
 }
