@@ -242,7 +242,7 @@ class UpgradeInstructions_upgrade_1_1
 					{
 						enableModules('mentions', 'post', 'display');
 					}
-					enableModules('poll', array('display'));
+					enableModules('poll', array('display', 'post'));
 				}
 			)
 		);
