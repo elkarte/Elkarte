@@ -704,24 +704,7 @@ class Post_Controller extends Action_Controller
 
 			if (isset($_POST['lock']))
 			{
-				// Nothing is changed to the lock.
-				if ((empty($topic_info['locked']) && empty($_POST['lock'])) || (!empty($_POST['lock']) && !empty($topic_info['locked'])))
-					unset($_POST['lock']);
-				// You're have no permission to lock this topic.
-				elseif (!allowedTo(array('lock_any', 'lock_own')) || (!allowedTo('lock_any') && $user_info['id'] != $topic_info['id_member_started']))
-					unset($_POST['lock']);
-				// You are allowed to (un)lock your own topic only.
-				elseif (!allowedTo('lock_any'))
-				{
-					// You cannot override a moderator lock.
-					if ($topic_info['locked'] == 1)
-						unset($_POST['lock']);
-					else
-						$_POST['lock'] = empty($_POST['lock']) ? 0 : 2;
-				}
-				// Hail mighty moderator, (un)lock this topic immediately.
-				else
-					$_POST['lock'] = empty($_POST['lock']) ? 0 : 1;
+				$_POST['lock'] = $this->_checkEditLocked($_POST['lock'], $topic_info);
 			}
 
 			// So you wanna (un)sticky this...let's see.
@@ -761,15 +744,7 @@ class Post_Controller extends Action_Controller
 
 			if (isset($_POST['lock']))
 			{
-				// New topics are by default not locked.
-				if (empty($_POST['lock']))
-					unset($_POST['lock']);
-				// Besides, you need permission.
-				elseif (!allowedTo(array('lock_any', 'lock_own')))
-					unset($_POST['lock']);
-				// A moderator-lock (1) can override a user-lock (2).
-				else
-					$_POST['lock'] = allowedTo('lock_any') ? 1 : 2;
+				$_POST['lock'] = $this->_checkEditLocked($_POST['lock']);
 			}
 
 			if (isset($_POST['sticky']) && (empty($_POST['sticky']) || !allowedTo('make_sticky')))
@@ -795,25 +770,7 @@ class Post_Controller extends Action_Controller
 
 			if (isset($_POST['lock']))
 			{
-				// Nothing changes to the lock status.
-				if ((empty($_POST['lock']) && empty($topic_info['locked'])) || (!empty($_POST['lock']) && !empty($topic_info['locked'])))
-					unset($_POST['lock']);
-				// You're simply not allowed to (un)lock this.
-				elseif (!allowedTo(array('lock_any', 'lock_own')) || (!allowedTo('lock_any') && $user_info['id'] != $topic_info['id_member_started']))
-					unset($_POST['lock']);
-				// You're only allowed to lock your own topics.
-				elseif (!allowedTo('lock_any'))
-				{
-					// You're not allowed to break a moderator's lock.
-					if ($topic_info['locked'] == 1)
-						unset($_POST['lock']);
-					// Lock it with a soft lock or unlock it.
-					else
-						$_POST['lock'] = empty($_POST['lock']) ? 0 : 2;
-				}
-				// You must be the moderator.
-				else
-					$_POST['lock'] = empty($_POST['lock']) ? 0 : 1;
+				$_POST['lock'] = $this->_checkEditLocked($_POST['lock'], $topic_info);
 			}
 
 			// Change the sticky status of this topic?
@@ -1319,19 +1276,7 @@ class Post_Controller extends Action_Controller
 
 		if (isset($_POST['lock']))
 		{
-			if (!allowedTo(array('lock_any', 'lock_own')) || (!allowedTo('lock_any') && $user_info['id'] != $row['id_member']))
-				unset($_POST['lock']);
-			elseif (!allowedTo('lock_any'))
-			{
-				if ($row['locked'] == 1)
-					unset($_POST['lock']);
-				else
-					$_POST['lock'] = empty($_POST['lock']) ? 0 : 2;
-			}
-			elseif (!empty($row['locked']) && !empty($_POST['lock']) || $_POST['lock'] == $row['locked'])
-				unset($_POST['lock']);
-			else
-				$_POST['lock'] = empty($_POST['lock']) ? 0 : 1;
+			$_POST['lock'] = $this->_checkEditLocked($_POST['lock'], $row);
 		}
 
 		if (isset($_POST['sticky']) && !allowedTo('make_sticky'))
@@ -1473,5 +1418,46 @@ class Post_Controller extends Action_Controller
 		call_integration_hook('integrate_action_' . $hook . '_after', array('action_index'));
 
 		return $result;
+	}
+
+	protected function _checkLocked($lock, $topic_info = null)
+	{
+		global $user_info;
+
+		// A new topic
+		if ($topic_info === null)
+		{
+			// New topics are by default not locked.
+			if (empty($lock))
+				return null;
+			// Besides, you need permission.
+			elseif (!allowedTo(array('lock_any', 'lock_own')))
+				return null;
+			// A moderator-lock (1) can override a user-lock (2).
+			else
+				return allowedTo('lock_any') ? 1 : 2;
+		}
+
+		// Nothing changes to the lock status.
+		if ((empty($lock) && empty($topic_info['locked'])) || (!empty($lock) && !empty($topic_info['locked'])))
+			return null;
+		// You're simply not allowed to (un)lock this.
+		elseif (!allowedTo(array('lock_any', 'lock_own')) || (!allowedTo('lock_any') && $user_info['id'] != $topic_info['id_member_started']))
+			return null;
+		// You're only allowed to lock your own topics.
+		elseif (!allowedTo('lock_any'))
+		{
+			// You're not allowed to break a moderator's lock.
+			if ($topic_info['locked'] == 1)
+				return null;
+			// Lock it with a soft lock or unlock it.
+			else
+				$lock = empty($lock) ? 0 : 2;
+		}
+		// You must be the moderator.
+		else
+			$lock = empty($lock) ? 0 : 1;
+
+		return $lock;
 	}
 }
