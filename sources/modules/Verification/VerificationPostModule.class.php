@@ -24,10 +24,10 @@ class Verification_Post_Module
 {
 	public static function hooks()
 	{
-		return array_merge($return, array(
+		return array(
 			array('post_errors', array('Verification_Post_Module', 'post_errors'), array('_post_errors')),
 			array('prepare_save_post', array('Verification_Post_Module', 'prepare_save_post'), array('_post_errors')),
-		));
+		);
 	}
 
 	public function post_errors($_post_errors)

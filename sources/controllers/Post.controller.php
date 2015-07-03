@@ -52,6 +52,10 @@ class Post_Controller extends Action_Controller
 	{
 		$this->_post_errors = Error_Context::context('post', 1);
 		$this->_template_layers = Template_Layers::getInstance();
+
+		require_once(SUBSDIR . '/Post.subs.php');
+		require_once(SUBSDIR . '/Messages.subs.php');
+		require_once(SUBSDIR . '/Topic.subs.php');
 	}
 
 	/**
@@ -104,10 +108,6 @@ class Post_Controller extends Action_Controller
 
 		// All those wonderful modifiers and attachments
 		$this->_template_layers->add('additional_options', 200);
-
-		require_once(SUBSDIR . '/Post.subs.php');
-		require_once(SUBSDIR . '/Messages.subs.php');
-		require_once(SUBSDIR . '/Topic.subs.php');
 
 		if (isset($_REQUEST['xml']))
 		{
@@ -358,7 +358,6 @@ class Post_Controller extends Action_Controller
 			// Previewing an edit?
 			if (isset($_REQUEST['msg']) && !empty($topic))
 			{
-				require_once(SUBSDIR . '/Messages.subs.php');
 				$msg_id = (int) $_REQUEST['msg'];
 
 				// Get the existing message.
@@ -649,7 +648,6 @@ class Post_Controller extends Action_Controller
 			return $this->action_post();
 
 		require_once(SUBSDIR . '/Boards.subs.php');
-		require_once(SUBSDIR . '/Post.subs.php');
 		loadLanguage('Post');
 
 		$this->_events->trigger('prepare_save_post', array('topic_info' => &$topic_info));
@@ -660,7 +658,6 @@ class Post_Controller extends Action_Controller
 		// If this isn't a new topic load the topic info that we need.
 		if (!empty($topic))
 		{
-			require_once(SUBSDIR . '/Topic.subs.php');
 			$topic_info = getTopicInfo($topic);
 
 			// Though the topic should be there, it might have vanished.
@@ -757,7 +754,6 @@ class Post_Controller extends Action_Controller
 		{
 			$_REQUEST['msg'] = (int) $_REQUEST['msg'];
 
-			require_once(SUBSDIR . '/Messages.subs.php');
 			$msgInfo = basicMessageInfo($_REQUEST['msg'], true);
 
 			if (empty($msgInfo))
@@ -1020,7 +1016,6 @@ class Post_Controller extends Action_Controller
 			if (!empty($modSettings['enableFollowup']))
 			{
 				require_once(SUBSDIR . '/FollowUps.subs.php');
-				require_once(SUBSDIR . '/Messages.subs.php');
 
 				// Time to update the original message with a pointer to the new one
 				if (!empty($original_post) && canAccessMessage($original_post))
@@ -1125,7 +1120,6 @@ class Post_Controller extends Action_Controller
 		// Where we going if we need to?
 		$context['post_box_name'] = isset($_GET['pb']) ? $_GET['pb'] : '';
 
-		require_once(SUBSDIR . '/Messages.subs.php');
 		$row = quoteMessageInfo((int) $_REQUEST['quote'], isset($_REQUEST['modify']));
 
 		$context['sub_template'] = 'quotefast';
@@ -1201,8 +1195,6 @@ class Post_Controller extends Action_Controller
 			obExit(false);
 
 		checkSession('get');
-		require_once(SUBSDIR . '/Post.subs.php');
-		require_once(SUBSDIR . '/Topic.subs.php');
 
 		$row = getTopicInfoByMsg($topic, empty($_REQUEST['msg']) ? 0 : (int) $_REQUEST['msg']);
 
