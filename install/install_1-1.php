@@ -2271,6 +2271,7 @@ class InstallInstructions_install_1_1
 				array('pollMode', '1'),
 				array('modules_display', 'poll'),
 				array('modules_post', 'poll,attachments,verification'),
+				array('modules_personalmessage', 'verification'),
 				array('enableVBStyleLogin', '1'),
 				array('enableCompressedOutput', '{$enableCompressedOutput}'),
 				array('karmaWaitTime', '1'),

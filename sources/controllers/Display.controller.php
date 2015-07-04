@@ -261,18 +261,6 @@ class Display_Controller extends Action_Controller
 		if ($context['show_spellchecking'])
 			loadJavascriptFile('spellcheck.js', array('defer' => true));
 
-		// Do we need to show the visual verification image?
-		$context['require_verification'] = !$user_info['is_mod'] && !$user_info['is_admin'] && !empty($modSettings['posts_require_captcha']) && ($user_info['posts'] < $modSettings['posts_require_captcha'] || ($user_info['is_guest'] && $modSettings['posts_require_captcha'] == -1));
-		if ($context['require_verification'])
-		{
-			require_once(SUBSDIR . '/VerificationControls.class.php');
-			$verificationOptions = array(
-				'id' => 'post',
-			);
-			$context['require_verification'] = create_control_verification($verificationOptions);
-			$context['visual_verification_id'] = $verificationOptions['id'];
-		}
-
 		// Are we showing signatures - or disabled fields?
 		$context['signature_enabled'] = substr($modSettings['signature_settings'], 0, 1) == 1;
 		$context['disabled_fields'] = isset($modSettings['disabled_profile_fields']) ? array_flip(explode(',', $modSettings['disabled_profile_fields'])) : array();
