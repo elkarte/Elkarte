@@ -171,6 +171,10 @@ class Display_Controller extends Action_Controller
 		{
 			require_once(SUBSDIR . '/FollowUps.subs.php');
 			$context['topic_derived_from'] = topicStartedHere($topic, $includeUnapproved);
+
+			// Derived from, set the link back
+			if (!empty($context['topic_derived_from']))
+				$context['links']['derived_from'] = $scripturl . '?msg=' . $context['topic_derived_from']['derived_from'];
 		}
 
 		// If this topic has unapproved posts, we need to work out how many posts the user can see, for page indexing.
@@ -251,10 +255,6 @@ class Display_Controller extends Action_Controller
 				'go_prev' => $scripturl . '?topic=' . $topic . '.0;prev_next=prev#new',
 				'go_next' => $scripturl . '?topic=' . $topic . '.0;prev_next=next#new'
 			);
-
-		// Derived from, set the link back
-		if (!empty($context['topic_derived_from']))
-			$context['links']['derived_from'] = $scripturl . '?msg=' . $context['topic_derived_from']['derived_from'];
 
 		// Check if spellchecking is both enabled and actually working. (for quick reply.)
 		$context['show_spellchecking'] = !empty($modSettings['enableSpellChecking']) && function_exists('pspell_new');
