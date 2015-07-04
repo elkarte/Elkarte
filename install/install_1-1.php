@@ -2269,7 +2269,7 @@ class InstallInstructions_install_1_1
 				array('karmaTimeRestrictAdmins', '1'),
 				array('enablePreviousNext', '1'),
 				array('pollMode', '1'),
-				array('modules_display', 'poll'),
+				array('modules_display', 'poll,verification'),
 				array('modules_post', 'poll,attachments,verification'),
 				array('modules_personalmessage', 'verification'),
 				array('modules_register', 'verification'),
