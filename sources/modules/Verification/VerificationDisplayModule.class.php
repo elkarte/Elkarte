@@ -29,7 +29,7 @@ class Verification_Display_Module
 		);
 	}
 
-	public function topicinfo($_post_errors)
+	public function topicinfo()
 	{
 		global $context;
 
