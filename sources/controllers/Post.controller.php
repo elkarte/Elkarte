@@ -267,9 +267,8 @@ class Post_Controller extends Action_Controller
 					$_REQUEST['icon'] = 'xx';
 
 				// They are previewing if they asked to preview (i.e. came from quick reply).
-				$really_previewing = !empty($_REQUEST['preview']);
+				$really_previewing = !empty($_REQUEST['preview']) || isset($_REQUEST['xml']);
 			}
-			$really_previewing = $really_previewing === true || isset($_REQUEST['xml']);
 
 			$this->_events->trigger('prepare_modifying', array('post_errors' => $this->_post_errors, 'really_previewing' => &$really_previewing));
 
