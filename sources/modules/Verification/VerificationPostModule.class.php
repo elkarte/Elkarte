@@ -35,7 +35,7 @@ class Verification_Post_Module
 		global $context;
 
 		// Do we need to show the visual verification image?
-		$context['require_verification'] = $this->userNeedVerification();
+		$context['require_verification'] = $this->_userNeedVerification();
 		if ($context['require_verification'])
 		{
 			require_once(SUBSDIR . '/VerificationControls.class.php');
@@ -56,7 +56,7 @@ class Verification_Post_Module
 		global $context;
 
 		// Wrong verification code?
-		if ($this->userNeedVerification())
+		if ($this->_userNeedVerification())
 		{
 			require_once(SUBSDIR . '/VerificationControls.class.php');
 			$verificationOptions = array(
