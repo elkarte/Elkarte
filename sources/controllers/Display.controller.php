@@ -431,7 +431,6 @@ class Display_Controller extends Action_Controller
 			require_once(SUBSDIR . '/Attachments.subs.php');
 
 			// Fetch attachments.
-			$includeUnapproved = !$modSettings['postmod_active'] || allowedTo('approve_posts');
 			if (!empty($modSettings['attachmentEnable']) && allowedTo('view_attachments'))
 				$attachments = getAttachments($messages, $includeUnapproved, 'filter_accessible_attachment', $all_posters);
 
