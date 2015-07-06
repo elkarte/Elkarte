@@ -160,22 +160,11 @@ class Display_Controller extends Action_Controller
 			}
 		}
 
-		$this->_events->trigger('topicinfo', array('topicinfo' => &$topicinfo));
+		$this->_events->trigger('topicinfo', array('topicinfo' => &$topicinfo, 'includeUnapproved' => $includeUnapproved));
 
 		// Add up unapproved replies to get real number of replies...
 		if ($modSettings['postmod_active'] && allowedTo('approve_posts'))
 			$context['real_num_replies'] += $topicinfo['unapproved_posts'] - ($topicinfo['approved'] ? 0 : 1);
-
-		// If this topic was derived from another, set the followup details
-		if (!empty($topicinfo['derived_from']))
-		{
-			require_once(SUBSDIR . '/FollowUps.subs.php');
-			$context['topic_derived_from'] = topicStartedHere($topic, $includeUnapproved);
-
-			// Derived from, set the link back
-			if (!empty($context['topic_derived_from']))
-				$context['links']['derived_from'] = $scripturl . '?msg=' . $context['topic_derived_from']['derived_from'];
-		}
 
 		// If this topic has unapproved posts, we need to work out how many posts the user can see, for page indexing.
 		if (!$includeUnapproved && $topicinfo['unapproved_posts'] && !$user_info['is_guest'])
@@ -479,12 +468,6 @@ class Display_Controller extends Action_Controller
 
 			$messages_request = loadMessageRequest($msg_selects, $msg_tables, $msg_parameters);
 
-			if (!empty($modSettings['enableFollowup']))
-			{
-				require_once(SUBSDIR . '/FollowUps.subs.php');
-				$context['follow_ups'] = followupTopics($messages, $includeUnapproved);
-			}
-
 			// Go to the last message if the given time is beyond the time of the last message.
 			if (isset($context['start_from']) && $context['start_from'] >= $topicinfo['num_replies'])
 				$context['start_from'] = $topicinfo['num_replies'];
@@ -562,8 +545,6 @@ class Display_Controller extends Action_Controller
 		// Can restore topic?  That's if the topic is in the recycle board and has a previous restore state.
 		$context['can_restore_topic'] &= !empty($modSettings['recycle_enable']) && $modSettings['recycle_board'] == $board && !empty($topicinfo['id_previous_board']);
 		$context['can_restore_msg'] &= !empty($modSettings['recycle_enable']) && $modSettings['recycle_board'] == $board && !empty($topicinfo['id_previous_topic']);
-
-		$context['can_follow_up'] = !empty($modSettings['enableFollowup']) && boardsallowedto('post_new') !== array();
 
 		// Load up the Quick ModifyTopic and Quick Reply scripts
 		loadJavascriptFile('topic.js');

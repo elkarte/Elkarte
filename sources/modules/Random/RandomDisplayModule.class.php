@@ -22,6 +22,8 @@ if (!defined('ELK'))
 
 class Random_Display_Module
 {
+	protected static $includeUnapproved = false;
+
 	public static function hooks()
 	{
 		global $modSettings;
@@ -30,7 +32,10 @@ class Random_Display_Module
 
 		if (!empty($modSettings['enableFollowup']))
 		{
+			$return[] = array('topicinfo', array('Random_Display_Module', 'topicinfo'), array('topicinfo', 'topic', 'includeUnapproved'));
+			$return[] = array('prepare_context', array('Random_Display_Module', 'prepare_context'), array());
 			add_integration_function('integrate_topic_query', 'Random_Display_Module::followup_topic_query', '', false);
+			add_integration_function('integrate_display_message_list', 'Random_Display_Module::followup_message_list', '', false);
 		}
 
 		return $return;
@@ -40,5 +45,38 @@ class Random_Display_Module
 	{
 		$topic_selects[] = 'fu.derived_from';
 		$topic_tables[] = 'LEFT JOIN {db_prefix}follow_ups AS fu ON (fu.follow_up = t.id_topic)';
+	}
+
+	public static function followup_message_list($messages)
+	{
+		global $context;
+
+		require_once(SUBSDIR . '/FollowUps.subs.php');
+		$context['follow_ups'] = followupTopics($messages, self::$includeUnapproved);
+	}
+
+	public function topicinfo($topicinfo, $topic, $includeUnapproved)
+	{
+		global $context, $scripturl;
+
+		self::$includeUnapproved = $includeUnapproved;
+
+		// If this topic was derived from another, set the followup details
+		if (!empty($topicinfo['derived_from']))
+		{
+			require_once(SUBSDIR . '/FollowUps.subs.php');
+			$context['topic_derived_from'] = topicStartedHere($topic, $includeUnapproved);
+
+			// Derived from, set the link back
+			if (!empty($context['topic_derived_from']))
+				$context['links']['derived_from'] = $scripturl . '?msg=' . $context['topic_derived_from']['derived_from'];
+		}
+	}
+
+	public function prepare_context()
+	{
+		global $context;
+
+		$context['can_follow_up'] = boardsallowedto('post_new') !== array();
 	}
 }
