@@ -701,7 +701,7 @@ class Post_Controller extends Action_Controller
 
 			if (isset($_POST['lock']))
 			{
-				$_POST['lock'] = $this->_checkEditLocked($_POST['lock'], $topic_info);
+				$_POST['lock'] = $this->_checkLocked($_POST['lock'], $topic_info);
 			}
 
 			// So you wanna (un)sticky this...let's see.
@@ -741,7 +741,7 @@ class Post_Controller extends Action_Controller
 
 			if (isset($_POST['lock']))
 			{
-				$_POST['lock'] = $this->_checkEditLocked($_POST['lock']);
+				$_POST['lock'] = $this->_checkLocked($_POST['lock']);
 			}
 
 			if (isset($_POST['sticky']) && (empty($_POST['sticky']) || !allowedTo('make_sticky')))
@@ -766,7 +766,7 @@ class Post_Controller extends Action_Controller
 
 			if (isset($_POST['lock']))
 			{
-				$_POST['lock'] = $this->_checkEditLocked($_POST['lock'], $topic_info);
+				$_POST['lock'] = $this->_checkLocked($_POST['lock'], $topic_info);
 			}
 
 			// Change the sticky status of this topic?
@@ -1268,7 +1268,7 @@ class Post_Controller extends Action_Controller
 
 		if (isset($_POST['lock']))
 		{
-			$_POST['lock'] = $this->_checkEditLocked($_POST['lock'], $row);
+			$_POST['lock'] = $this->_checkLocked($_POST['lock'], $row);
 		}
 
 		if (isset($_POST['sticky']) && !allowedTo('make_sticky'))
