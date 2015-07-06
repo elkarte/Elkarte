@@ -244,6 +244,7 @@ class UpgradeInstructions_upgrade_1_1
 					}
 					enableModules('poll', array('display', 'post'));
 					enableModules('verification', array('post', 'personalmessage', 'register'));
+					enableModules('random', array('post', 'display'));
 				}
 			)
 		);

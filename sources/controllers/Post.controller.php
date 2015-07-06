@@ -245,25 +245,6 @@ class Post_Controller extends Action_Controller
 		$context['response_prefix'] = response_prefix();
 		$context['destination'] = 'post2;start=' . $_REQUEST['start'];
 
-		// Are we moving a discussion to its own topic?
-		if (!empty($modSettings['enableFollowup']) && !empty($_REQUEST['followup']))
-		{
-			$context['original_post'] = isset($_REQUEST['quote']) ? (int) $_REQUEST['quote'] : (int) $_REQUEST['followup'];
-			$context['show_boards_dropdown'] = true;
-			require_once(SUBSDIR . '/Boards.subs.php');
-			$context += getBoardList(array('not_redirection' => true, 'allowed_to' => 'post_new'));
-			$context['boards_current_disabled'] = false;
-			if (!empty($board))
-			{
-				foreach ($context['categories'] as $id => $values)
-					if (isset($values['boards'][$board]))
-					{
-						$context['categories'][$id]['boards'][$board]['selected'] = true;
-						break;
-					}
-			}
-		}
-
 		// Previewing, modifying, or posting?
 		// Do we have a body, but an error happened.
 		if (isset($_REQUEST['message']) || $this->_post_errors->hasErrors())
@@ -992,9 +973,6 @@ class Post_Controller extends Action_Controller
 		// This is a new topic or an already existing one. Save it.
 		else
 		{
-			if (!empty($modSettings['enableFollowup']) && !empty($_REQUEST['followup']))
-				$original_post = (int) $_REQUEST['followup'];
-
 			// We also have to fake the board:
 			// if it's valid and it's not the current, let's forget about the "current" and load the new one
 			if (!empty($new_board) && $board !== $new_board)
@@ -1012,15 +990,6 @@ class Post_Controller extends Action_Controller
 
 			if (isset($topicOptions['id']))
 				$topic = $topicOptions['id'];
-
-			if (!empty($modSettings['enableFollowup']))
-			{
-				require_once(SUBSDIR . '/FollowUps.subs.php');
-
-				// Time to update the original message with a pointer to the new one
-				if (!empty($original_post) && canAccessMessage($original_post))
-					linkMessages($original_post, $topic);
-			}
 		}
 
 		$this->_events->trigger('after_save_post', array('board' => $board, 'topic' => $topic, 'msgOptions' => $msgOptions, 'topicOptions' => $topicOptions, 'becomesApproved' => $becomesApproved, 'posterOptions' => $posterOptions));
