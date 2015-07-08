@@ -256,8 +256,8 @@ class Unread
 
 		$request = $this->_db->query('substring', '
 			SELECT
-				ms.subject AS first_subject, ms.poster_time AS first_poster_time, mf.poster_name AS first_member_name,
-				ms.id_topic, t.id_board, b.name AS bname, t.num_replies, t.num_views, t.num_likes,
+				ms.subject AS first_subject, ms.poster_time AS first_poster_time, ms.poster_name AS first_member_name,
+				ms.id_topic, t.id_board, b.name AS bname, t.num_replies, t.num_views, t.num_likes, t.approved,
 				ms.id_member AS first_id_member, ml.id_member AS last_id_member, ml.poster_name AS last_member_name,
 				ml.poster_time AS last_poster_time, IFNULL(mems.real_name, ms.poster_name) AS first_display_name,
 				IFNULL(meml.real_name, ml.poster_name) AS last_display_name, ml.subject AS last_subject,
