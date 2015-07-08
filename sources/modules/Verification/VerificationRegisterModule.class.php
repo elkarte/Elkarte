@@ -20,9 +20,9 @@
 if (!defined('ELK'))
 	die('No access...');
 
-class Verification_Register_Module
+class Verification_Register_Module implements ElkArte\sources\modules\Module_Interface
 {
-	public static function hooks()
+	public static function hooks(\Event_Manager $eventsManager)
 	{
 		return array(
 			array('prepare_context', array('Verification_Register_Module', 'prepare_context'), array('current_step')),

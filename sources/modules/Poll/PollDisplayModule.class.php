@@ -20,13 +20,13 @@
 if (!defined('ELK'))
 	die('No access...');
 
-class Poll_Display_Module
+class Poll_Display_Module implements ElkArte\sources\modules\Module_Interface
 {
 	protected static $_enabled = false;
 
 	protected $_id_poll = 0;
 
-	public static function hooks()
+	public static function hooks(\Event_Manager $eventsManager)
 	{
 		global $modSettings;
 

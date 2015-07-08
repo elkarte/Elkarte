@@ -20,9 +20,12 @@
 if (!defined('ELK'))
 	die('No access...');
 
-class Verification_Post_Module
+class Verification_Post_Module implements ElkArte\sources\modules\Module_Interface
 {
-	public static function hooks()
+	/**
+	 * {@inheritDoc}
+	 */
+	public static function hooks(\Event_Manager $eventsManager)
 	{
 		return array(
 			array('post_errors', array('Verification_Post_Module', 'post_errors'), array('_post_errors')),

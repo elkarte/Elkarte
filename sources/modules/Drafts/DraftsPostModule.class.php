@@ -20,13 +20,13 @@
 if (!defined('ELK'))
 	die('No access...');
 
-class Drafts_Post_Module
+class Drafts_Post_Module implements ElkArte\sources\modules\Module_Interface
 {
 	protected static $_autosave_enabled = false;
 	protected static $_autosave_frequency = 30000;
 	protected static $_subject_length = 24;
 
-	public static function hooks()
+	public static function hooks(\Event_Manager $eventsManager)
 	{
 		global $modSettings;
 

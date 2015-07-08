@@ -14,7 +14,7 @@
 if (!defined('ELK'))
 	die('No access...');
 
-abstract class Mentions_Module_Abstract
+abstract class Mentions_Module_Abstract implements ElkArte\sources\modules\Module_Interface
 {
 	/**
 	 * Based on the $action returns the enabled mention types to register to the

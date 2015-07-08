@@ -20,9 +20,9 @@
 if (!defined('ELK'))
 	die('No access...');
 
-class Verification_PersonalMessage_Module
+class Verification_PersonalMessage_Module implements ElkArte\sources\modules\Module_Interface
 {
-	public static function hooks()
+	public static function hooks(\Event_Manager $eventsManager)
 	{
 		return array(
 			array('prepare_send_context', array('Verification_PersonalMessage_Module', 'prepare_send_context'), array()),

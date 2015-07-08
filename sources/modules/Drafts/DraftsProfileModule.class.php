@@ -20,9 +20,9 @@
 if (!defined('ELK'))
 	die('No access...');
 
-class Drafts_Profile_Module
+class Drafts_Profile_Module implements ElkArte\sources\modules\Module_Interface
 {
-	public static function hooks()
+	public static function hooks(\Event_Manager $eventsManager)
 	{
 		global $modSettings;
 

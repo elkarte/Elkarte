@@ -1,7 +1,7 @@
 <?php
 
 /**
- * 
+ * Random module is a collection of small stuff not worth it's own module.
  *
  * @name      ElkArte Forum
  * @copyright ElkArte Forum contributors
@@ -14,9 +14,12 @@
 if (!defined('ELK'))
 	die('No access...');
 
-class Random_Post_Module
+class Random_Post_Module implements ElkArte\sources\modules\Module_Interface
 {
-	public static function hooks()
+	/**
+	 * {@inheritDoc}
+	 */
+	public static function hooks(\Event_Manager $eventsManager)
 	{
 		global $modSettings;
 

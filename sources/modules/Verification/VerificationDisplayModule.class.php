@@ -20,9 +20,9 @@
 if (!defined('ELK'))
 	die('No access...');
 
-class Verification_Display_Module
+class Verification_Display_Module implements ElkArte\sources\modules\Module_Interface
 {
-	public static function hooks()
+	public static function hooks(\Event_Manager $eventsManager)
 	{
 		return array(
 			array('topicinfo', array('Verification_Display_Module', 'topicinfo'), array()),

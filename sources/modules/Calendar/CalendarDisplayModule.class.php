@@ -23,9 +23,9 @@ if (!defined('ELK'))
 /**
  * We like to show events associated to the topics.
  */
-class Calendar_Display_Module
+class Calendar_Display_Module implements ElkArte\sources\modules\Module_Interface
 {
-	public static function hooks()
+	public static function hooks(\Event_Manager $eventsManager)
 	{
 		global $context, $modSettings;
 

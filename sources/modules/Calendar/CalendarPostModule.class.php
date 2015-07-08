@@ -24,11 +24,11 @@ if (!defined('ELK'))
  * This class's task is to bind the posting of a topic to a calendar event.
  * Used when from the calendar controller the poster is redirected to the post page.
  */
-class Calendar_Post_Module
+class Calendar_Post_Module implements ElkArte\sources\modules\Module_Interface
 {
 	protected static $_make_event = false;
 
-	public static function hooks()
+	public static function hooks(\Event_Manager $eventsManager)
 	{
 		global $context;
 

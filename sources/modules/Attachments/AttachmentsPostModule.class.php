@@ -20,7 +20,7 @@
 if (!defined('ELK'))
 	die('No access...');
 
-class Attachments_Post_Module
+class Attachments_Post_Module implements ElkArte\sources\modules\Module_Interface
 {
 	/**
 	 * The mode of attachments (disabled/enabled/show only).
@@ -46,7 +46,7 @@ class Attachments_Post_Module
 	 */
 	protected $_is_new_message = false;
 
-	public static function hooks()
+	public static function hooks(\Event_Manager $eventsManager)
 	{
 		global $modSettings;
 

@@ -14,11 +14,11 @@
 if (!defined('ELK'))
 	die('No access...');
 
-class Random_Display_Module
+class Random_Display_Module implements ElkArte\sources\modules\Module_Interface
 {
 	protected static $includeUnapproved = false;
 
-	public static function hooks()
+	public static function hooks(\Event_Manager $eventsManager)
 	{
 		global $modSettings;
 
