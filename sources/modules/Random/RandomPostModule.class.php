@@ -59,11 +59,13 @@ class Random_Post_Module
 			if (!empty($board))
 			{
 				foreach ($context['categories'] as $id => $values)
+				{
 					if (isset($values['boards'][$board]))
 					{
 						$context['categories'][$id]['boards'][$board]['selected'] = true;
 						break;
 					}
+				}
 			}
 		}
 	}
