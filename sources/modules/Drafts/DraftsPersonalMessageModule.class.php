@@ -26,6 +26,9 @@ class Drafts_PersonalMessage_Module implements ElkArte\sources\modules\Module_In
 	protected static $_autosave_frequency = 30000;
 	protected static $_subject_length = 24;
 
+	/**
+	 * {@inheritdoc }
+	 */
 	public static function hooks(\Event_Manager $eventsManager)
 	{
 		global $modSettings, $context;

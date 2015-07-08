@@ -25,6 +25,9 @@ class Drafts_Display_Module implements ElkArte\sources\modules\Module_Interface
 	protected static $_autosave_enabled = false;
 	protected static $_autosave_frequency = 30000;
 
+	/**
+	 * {@inheritdoc }
+	 */
 	public static function hooks(\Event_Manager $eventsManager)
 	{
 		global $modSettings;

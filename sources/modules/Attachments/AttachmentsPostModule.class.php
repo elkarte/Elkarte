@@ -46,6 +46,9 @@ class Attachments_Post_Module implements ElkArte\sources\modules\Module_Interfac
 	 */
 	protected $_is_new_message = false;
 
+	/**
+	 * {@inheritdoc }
+	 */
 	public static function hooks(\Event_Manager $eventsManager)
 	{
 		global $modSettings;

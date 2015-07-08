@@ -18,6 +18,9 @@ class Random_Display_Module implements ElkArte\sources\modules\Module_Interface
 {
 	protected static $includeUnapproved = false;
 
+	/**
+	 * {@inheritdoc }
+	 */
 	public static function hooks(\Event_Manager $eventsManager)
 	{
 		global $modSettings;

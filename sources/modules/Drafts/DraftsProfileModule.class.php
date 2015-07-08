@@ -22,6 +22,9 @@ if (!defined('ELK'))
 
 class Drafts_Profile_Module implements ElkArte\sources\modules\Module_Interface
 {
+	/**
+	 * {@inheritdoc }
+	 */
 	public static function hooks(\Event_Manager $eventsManager)
 	{
 		global $modSettings;

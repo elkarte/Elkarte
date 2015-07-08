@@ -26,6 +26,9 @@ class Poll_Display_Module implements ElkArte\sources\modules\Module_Interface
 
 	protected $_id_poll = 0;
 
+	/**
+	 * {@inheritdoc }
+	 */
 	public static function hooks(\Event_Manager $eventsManager)
 	{
 		global $modSettings;

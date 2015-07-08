@@ -22,6 +22,9 @@ if (!defined('ELK'))
 
 class Verification_PersonalMessage_Module implements ElkArte\sources\modules\Module_Interface
 {
+	/**
+	 * {@inheritdoc }
+	 */
 	public static function hooks(\Event_Manager $eventsManager)
 	{
 		return array(

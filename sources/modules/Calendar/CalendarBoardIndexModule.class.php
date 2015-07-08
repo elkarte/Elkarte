@@ -26,9 +26,7 @@ if (!defined('ELK'))
 class Calendar_BoardIndex_Module implements ElkArte\sources\modules\Module_Interface
 {
 	/**
-	 * If enabled, let the system know what hooks we need to install
-	 *
-	 * @return array
+	 * {@inheritdoc }
 	 */
 	public static function hooks(\Event_Manager $eventsManager)
 	{

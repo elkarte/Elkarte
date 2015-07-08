@@ -23,6 +23,8 @@ interface Module_Interface
 	 * The method called by the EventManager to find out which trigger the
 	 * module is attached to and which parameters the listener wants to receive.
 	 *
+	 * @param \Event_Manager $eventsManager an instance of the event manager
+	 *
 	 * @return mixed[]
 	 */
 	public static function hooks(\Event_Manager $eventsManager);
