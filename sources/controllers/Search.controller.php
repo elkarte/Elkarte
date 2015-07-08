@@ -31,28 +31,35 @@ class Search_Controller extends Action_Controller
 	 * Weighing factor each area, ie frequency, age, sticky, ec
 	 * @var array
 	 */
-	private $_weight = array();
+	protected $_weight = array();
 
 	/**
 	 * Holds the total of all weight factors, should be 100
 	 *
 	 * @var int
 	 */
-	private $_weight_total = 0;
+	protected $_weight_total = 0;
 
 	/**
 	 * Holds array of search result relevancy weigh factors
 	 *
 	 * @var array
 	 */
-	private $_weight_factors = array();
+	protected $_weight_factors = array();
 
 	/**
 	 * Holds the search object
 	 *
 	 * @var object
 	 */
-	private $_search = null;
+	protected $_search = null;
+
+	/**
+	 * The class that takes care of rendering the message icons (MessageTopicIcons)
+	 *
+	 * @var null|object
+	 */
+	protected $_icon_sources = null;
 
 	/**
 	 * Called before any other action method in this class.
@@ -505,13 +512,10 @@ class Search_Controller extends Action_Controller
 
 		$context['key_words'] = &$searchArray;
 
-		// Setup the default topic icons... for checking they exist and the like!
-		require_once(SUBSDIR . '/MessageIndex.subs.php');
-		$context['icon_sources'] = MessageTopicIcons();
-
 		$context['sub_template'] = 'results';
 		$context['page_title'] = $txt['search_results'];
 		$context['get_topics'] = array($this, 'prepareSearchContext_callback');
+		$this->_icon_sources = new MessageTopicIcons();
 
 		$context['jump_to'] = array(
 			'label' => addslashes(un_htmlspecialchars($txt['jump_to'])),
@@ -634,26 +638,6 @@ class Search_Controller extends Action_Controller
 		// Make sure we don't end up with a practically empty message body.
 		$message['body'] = preg_replace('~^(?:&nbsp;)+$~', '', $message['body']);
 
-		// Sadly, we need to check that the icon is not broken.
-		if (!empty($modSettings['messageIconChecks_enable']))
-		{
-			if (!isset($context['icon_sources'][$message['first_icon']]))
-				$context['icon_sources'][$message['first_icon']] = file_exists($settings['theme_dir'] . '/images/post/' . $message['first_icon'] . '.png') ? 'images_url' : 'default_images_url';
-			if (!isset($context['icon_sources'][$message['last_icon']]))
-				$context['icon_sources'][$message['last_icon']] = file_exists($settings['theme_dir'] . '/images/post/' . $message['last_icon'] . '.png') ? 'images_url' : 'default_images_url';
-			if (!isset($context['icon_sources'][$message['icon']]))
-				$context['icon_sources'][$message['icon']] = file_exists($settings['theme_dir'] . '/images/post/' . $message['icon'] . '.png') ? 'images_url' : 'default_images_url';
-		}
-		else
-		{
-			if (!isset($context['icon_sources'][$message['first_icon']]))
-				$context['icon_sources'][$message['first_icon']] = 'images_url';
-			if (!isset($context['icon_sources'][$message['last_icon']]))
-				$context['icon_sources'][$message['last_icon']] = 'images_url';
-			if (!isset($context['icon_sources'][$message['icon']]))
-				$context['icon_sources'][$message['icon']] = 'images_url';
-		}
-
 		// Do we have quote tag enabled?
 		$quote_enabled = empty($modSettings['disabledBBC']) || !in_array('quote', explode(',', $modSettings['disabledBBC']));
 
@@ -681,7 +665,7 @@ class Search_Controller extends Action_Controller
 				'href' => $scripturl . '?topic=' . $message['id_topic'] . '.0',
 				'link' => '<a href="' . $scripturl . '?topic=' . $message['id_topic'] . '.0">' . $message['first_subject'] . '</a>',
 				'icon' => $message['first_icon'],
-				'icon_url' => $settings[$context['icon_sources'][$message['first_icon']]] . '/post/' . $message['first_icon'] . '.png',
+				'icon_url' => $this->_icon_sources->{$message['first_icon']},
 				'member' => array(
 					'id' => $message['first_member_id'],
 					'name' => $message['first_member_name'],
@@ -698,7 +682,7 @@ class Search_Controller extends Action_Controller
 				'href' => $scripturl . '?topic=' . $message['id_topic'] . ($message['num_replies'] == 0 ? '.0' : '.msg' . $message['last_msg']) . '#msg' . $message['last_msg'],
 				'link' => '<a href="' . $scripturl . '?topic=' . $message['id_topic'] . ($message['num_replies'] == 0 ? '.0' : '.msg' . $message['last_msg']) . '#msg' . $message['last_msg'] . '">' . $message['last_subject'] . '</a>',
 				'icon' => $message['last_icon'],
-				'icon_url' => $settings[$context['icon_sources'][$message['last_icon']]] . '/post/' . $message['last_icon'] . '.png',
+				'icon_url' => $this->_icon_sources->{$message['last_icon']},
 				'member' => array(
 					'id' => $message['last_member_id'],
 					'name' => $message['last_member_name'],
@@ -767,7 +751,7 @@ class Search_Controller extends Action_Controller
 			'alternate' => $counter % 2,
 			'member' => &$memberContext[$message['id_member']],
 			'icon' => $message['icon'],
-			'icon_url' => $settings[$context['icon_sources'][$message['icon']]] . '/post/' . $message['icon'] . '.png',
+			'icon_url' => $this->_icon_sources->{$message['icon']},
 			'subject' => $message['subject'],
 			'subject_highlighted' => $subject_highlighted,
 			'time' => standardTime($message['poster_time']),

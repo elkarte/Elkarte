@@ -41,6 +41,13 @@ class Display_Controller extends Action_Controller
 	protected $_virtual_msg = 0;
 
 	/**
+	 * The class that takes care of rendering the message icons (MessageTopicIcons)
+	 *
+	 * @var null|object
+	 */
+	protected $_icon_sources = null;
+
+	/**
 	 * Default action handler for this controller
 	 */
 	public function action_index()
@@ -492,6 +499,7 @@ class Display_Controller extends Action_Controller
 		// Set the callback.  (do you REALIZE how much memory all the messages would take?!?)
 		// This will be called from the template.
 		$context['get_message'] = array($this, 'prepareDisplayContext_callback');
+		$this->_icon_sources = new MessageTopicIcons();
 
 		// Now set all the wonderful, wonderful permissions... like moderation ones...
 		$common_permissions = array(
@@ -736,23 +744,6 @@ class Display_Controller extends Action_Controller
 		if (!$message)
 			return false;
 
-		// $context['icon_sources'] says where each icon should come from - here we set up the ones which will always exist!
-		if (empty($context['icon_sources']))
-		{
-			require_once(SUBSDIR . '/MessageIndex.subs.php');
-			$context['icon_sources'] = MessageTopicIcons();
-		}
-
-		// Message Icon Management... check the images exist.
-		if (empty($modSettings['messageIconChecks_disable']))
-		{
-			// If the current icon isn't known, then we need to do something...
-			if (!isset($context['icon_sources'][$message['icon']]))
-				$context['icon_sources'][$message['icon']] = file_exists($settings['theme_dir'] . '/images/post/' . $message['icon'] . '.png') ? 'images_url' : 'default_images_url';
-		}
-		elseif (!isset($context['icon_sources'][$message['icon']]))
-			$context['icon_sources'][$message['icon']] = 'images_url';
-
 		// If you're a lazy bum, you probably didn't give a subject...
 		$message['subject'] = $message['subject'] != '' ? $message['subject'] : $txt['no_subject'];
 
@@ -803,7 +794,7 @@ class Display_Controller extends Action_Controller
 			'link' => '<a href="' . $scripturl . '?topic=' . $topic . '.msg' . $message['id_msg'] . '#msg' . $message['id_msg'] . '" rel="nofollow">' . $message['subject'] . '</a>',
 			'member' => &$memberContext[$message['id_member']],
 			'icon' => $message['icon'],
-			'icon_url' => $settings[$context['icon_sources'][$message['icon']]] . '/post/' . $message['icon'] . '.png',
+			'icon_url' => $this->_icon_sources->{$message['icon']},
 			'subject' => $message['subject'],
 			'time' => standardTime($message['poster_time']),
 			'html_time' => htmlTime($message['poster_time']),
