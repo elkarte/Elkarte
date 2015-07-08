@@ -33,12 +33,15 @@ class Verification_PersonalMessage_Module implements ElkArte\sources\modules\Mod
 		);
 	}
 
+	/**
+	 * Prepare $context for the PM page.
+	 */
 	public function prepare_send_context()
 	{
 		global $context;
 
 		// Verification control needed for this PM?
-		$context['require_verification'] = this->_userNeedVerification();
+		$context['require_verification'] = $this->_userNeedVerification();
 		if ($context['require_verification'])
 		{
 			require_once(SUBSDIR . '/VerificationControls.class.php');
@@ -51,6 +54,9 @@ class Verification_PersonalMessage_Module implements ElkArte\sources\modules\Mod
 		}
 	}
 
+	/**
+	 * Checks the user passed the verifications on the PM page.
+	 */
 	public function before_sending()
 	{
 		global $context;
@@ -76,6 +82,10 @@ class Verification_PersonalMessage_Module implements ElkArte\sources\modules\Mod
 		}
 	}
 
+	/**
+	 * Common method to check if the user requires verification.
+	 * @return bool
+	 */
 	protected function _userNeedVerification()
 	{
 		global $user_info, $modSettings;

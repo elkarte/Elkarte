@@ -35,6 +35,9 @@ class Verification_Register_Module implements ElkArte\sources\modules\Module_Int
 		);
 	}
 
+	/**
+	 * Prepare $context for the registration form.
+	 */
 	public function prepare_context($current_step)
 	{
 		global $context;
@@ -54,6 +57,9 @@ class Verification_Register_Module implements ElkArte\sources\modules\Module_Int
 			$context['visual_verification'] = false;
 	}
 
+	/**
+	 * Checks the user passed the verifications on the registration form.
+	 */
 	public function before_complete_register($reg_errors)
 	{
 		// Check whether the visual verification code was entered correctly.
@@ -73,6 +79,9 @@ class Verification_Register_Module implements ElkArte\sources\modules\Module_Int
 		}
 	}
 
+	/**
+	 * Checks the user passed the verifications on the contact page.
+	 */
 	protected function verify_contact()
 	{
 		global $context;
@@ -90,6 +99,9 @@ class Verification_Register_Module implements ElkArte\sources\modules\Module_Int
 		}
 	}
 
+	/**
+	 * Prepare $context for the contact page.
+	 */
 	public function setup_contact()
 	{
 		global $context;
@@ -102,6 +114,11 @@ class Verification_Register_Module implements ElkArte\sources\modules\Module_Int
 		$context['visual_verification_id'] = $verificationOptions['id'];
 	}
 
+	/**
+	 * Common method to check if the user requires verification.
+	 * @param int $current_step the registration step
+	 * @return bool
+	 */
 	protected function _userNeedVerification($current_step)
 	{
 		global $user_info, $modSettings;

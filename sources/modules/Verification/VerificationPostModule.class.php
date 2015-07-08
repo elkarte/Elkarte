@@ -33,6 +33,9 @@ class Verification_Post_Module implements ElkArte\sources\modules\Module_Interfa
 		);
 	}
 
+	/**
+	 * Prepare $context for the post page.
+	 */
 	public function post_errors($_post_errors)
 	{
 		global $context;
@@ -54,6 +57,9 @@ class Verification_Post_Module implements ElkArte\sources\modules\Module_Interfa
 		}
 	}
 
+	/**
+	 * Checks the user passed the verifications on the post page.
+	 */
 	public function prepare_save_post($_post_errors)
 	{
 		global $context;
@@ -73,6 +79,10 @@ class Verification_Post_Module implements ElkArte\sources\modules\Module_Interfa
 		}
 	}
 
+	/**
+	 * Common method to check if the user requires verification.
+	 * @return bool
+	 */
 	protected function _userNeedVerification()
 	{
 		global $user_info, $modSettings;

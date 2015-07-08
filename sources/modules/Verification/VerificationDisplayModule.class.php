@@ -32,6 +32,9 @@ class Verification_Display_Module implements ElkArte\sources\modules\Module_Inte
 		);
 	}
 
+	/**
+	 * Prepare $context for the quick reply.
+	 */
 	public function topicinfo()
 	{
 		global $context;
@@ -49,6 +52,10 @@ class Verification_Display_Module implements ElkArte\sources\modules\Module_Inte
 		}
 	}
 
+	/**
+	 * Common method to check if the user requires verification.
+	 * @return bool
+	 */
 	protected function _userNeedVerification()
 	{
 		global $user_info, $modSettings;
