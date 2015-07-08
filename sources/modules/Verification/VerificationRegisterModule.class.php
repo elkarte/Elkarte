@@ -27,12 +27,21 @@ class Verification_Register_Module implements ElkArte\sources\modules\Module_Int
 	 */
 	public static function hooks(\Event_Manager $eventsManager)
 	{
-		return array(
-			array('prepare_context', array('Verification_Register_Module', 'prepare_context'), array('current_step')),
-			array('before_complete_register', array('Verification_Register_Module', 'before_complete_register'), array('reg_errors')),
-			array('verify_contact', array('Verification_Register_Module', 'verify_contact'), array()),
-			array('setup_contact', array('Verification_Register_Module', 'setup_contact'), array()),
-		);
+		global $modSettings;
+
+		if (!empty($modSettings['reg_verification']))
+		{
+			require_once(SUBSDIR . '/VerificationControls.class.php');
+
+			return array(
+				array('prepare_context', array('Verification_Register_Module', 'prepare_context'), array('current_step')),
+				array('before_complete_register', array('Verification_Register_Module', 'before_complete_register'), array('reg_errors')),
+				array('verify_contact', array('Verification_Register_Module', 'verify_contact'), array()),
+				array('setup_contact', array('Verification_Register_Module', 'setup_contact'), array()),
+			);
+		}
+		else
+			return array();
 	}
 
 	/**
@@ -43,9 +52,8 @@ class Verification_Register_Module implements ElkArte\sources\modules\Module_Int
 		global $context;
 
 		// Generate a visual verification code to make sure the user is no bot.
-		if ($this->_userNeedVerification($current_step))
+		if ($current_step > 1)
 		{
-			require_once(SUBSDIR . '/VerificationControls.class.php');
 			$verificationOptions = array(
 				'id' => 'register',
 			);
@@ -63,19 +71,15 @@ class Verification_Register_Module implements ElkArte\sources\modules\Module_Int
 	public function before_complete_register($reg_errors)
 	{
 		// Check whether the visual verification code was entered correctly.
-		if ($this->_userNeedVerification(2))
-		{
-			require_once(SUBSDIR . '/VerificationControls.class.php');
-			$verificationOptions = array(
-				'id' => 'register',
-			);
-			$context['visual_verification'] = create_control_verification($verificationOptions, true);
+		$verificationOptions = array(
+			'id' => 'register',
+		);
+		$context['visual_verification'] = create_control_verification($verificationOptions, true);
 
-			if (is_array($context['visual_verification']))
-			{
-				foreach ($context['visual_verification'] as $error)
-					$reg_errors->addError($error);
-			}
+		if (is_array($context['visual_verification']))
+		{
+			foreach ($context['visual_verification'] as $error)
+				$reg_errors->addError($error);
 		}
 	}
 
@@ -106,23 +110,10 @@ class Verification_Register_Module implements ElkArte\sources\modules\Module_Int
 	{
 		global $context;
 
-		require_once(SUBSDIR . '/VerificationControls.class.php');
 		$verificationOptions = array(
 			'id' => 'contactform',
 		);
 		$context['require_verification'] = create_control_verification($verificationOptions);
 		$context['visual_verification_id'] = $verificationOptions['id'];
-	}
-
-	/**
-	 * Common method to check if the user requires verification.
-	 * @param int $current_step the registration step
-	 * @return bool
-	 */
-	protected function _userNeedVerification($current_step)
-	{
-		global $user_info, $modSettings;
-
-		return !empty($modSettings['reg_verification']) && $current_step > 1;
 	}
 }

@@ -27,66 +27,59 @@ class Verification_Post_Module implements ElkArte\sources\modules\Module_Interfa
 	 */
 	public static function hooks(\Event_Manager $eventsManager)
 	{
-		return array(
-			array('post_errors', array('Verification_Post_Module', 'post_errors'), array('_post_errors')),
-			array('prepare_save_post', array('Verification_Post_Module', 'prepare_save_post'), array('_post_errors')),
-		);
+		global $user_info, $modSettings;
+
+		if (!$user_info['is_admin'] && !$user_info['is_mod'] && !empty($modSettings['posts_require_captcha']) && ($user_info['posts'] < $modSettings['posts_require_captcha'] || ($user_info['is_guest'] && $modSettings['posts_require_captcha'] == -1)))
+		{
+			require_once(SUBSDIR . '/VerificationControls.class.php');
+
+			return array(
+				array('post_errors', array('Verification_Post_Module', 'post_errors'), array('_post_errors')),
+				array('prepare_save_post', array('Verification_Post_Module', 'prepare_save_post'), array('_post_errors')),
+			);
+		}
+		else
+			return array();
 	}
 
 	/**
 	 * Prepare $context for the post page.
+	 * @param \Error_Context $_post_errors
 	 */
 	public function post_errors($_post_errors)
 	{
 		global $context;
 
 		// Do we need to show the visual verification image?
-		$context['require_verification'] = $this->_userNeedVerification();
-		if ($context['require_verification'])
-		{
-			require_once(SUBSDIR . '/VerificationControls.class.php');
-			$verificationOptions = array(
-				'id' => 'post',
-			);
-			$context['require_verification'] = create_control_verification($verificationOptions);
-			$context['visual_verification_id'] = $verificationOptions['id'];
+		$verificationOptions = array(
+			'id' => 'post',
+		);
+		$context['require_verification'] = create_control_verification($verificationOptions);
+		$context['visual_verification_id'] = $verificationOptions['id'];
 
-			// If they came from quick reply, and have to enter verification details, give them some notice.
-			if (!empty($_REQUEST['from_qr']) && $context['require_verification'] !== false)
-				$_post_errors->addError('need_qr_verification');
-		}
+		// If they came from quick reply, and have to enter verification details, give them some notice.
+		if (!empty($_REQUEST['from_qr']) && $context['require_verification'] !== false)
+			$_post_errors->addError('need_qr_verification');
 	}
 
 	/**
 	 * Checks the user passed the verifications on the post page.
+	 * @param \Error_Context $_post_errors
 	 */
 	public function prepare_save_post($_post_errors)
 	{
 		global $context;
 
 		// Wrong verification code?
-		if ($this->_userNeedVerification())
+		$verificationOptions = array(
+			'id' => 'post',
+		);
+		$context['require_verification'] = create_control_verification($verificationOptions, true);
+
+		if (is_array($context['require_verification']))
 		{
-			require_once(SUBSDIR . '/VerificationControls.class.php');
-			$verificationOptions = array(
-				'id' => 'post',
-			);
-			$context['require_verification'] = create_control_verification($verificationOptions, true);
-
-			if (is_array($context['require_verification']))
-				foreach ($context['require_verification'] as $verification_error)
-					$this->_post_errors->addError($verification_error);
+			foreach ($context['require_verification'] as $verification_error)
+				$_post_errors->addError($verification_error);
 		}
-	}
-
-	/**
-	 * Common method to check if the user requires verification.
-	 * @return bool
-	 */
-	protected function _userNeedVerification()
-	{
-		global $user_info, $modSettings;
-
-		return !$user_info['is_admin'] && !$user_info['is_mod'] && !empty($modSettings['posts_require_captcha']) && ($user_info['posts'] < $modSettings['posts_require_captcha'] || ($user_info['is_guest'] && $modSettings['posts_require_captcha'] == -1));
 	}
 }

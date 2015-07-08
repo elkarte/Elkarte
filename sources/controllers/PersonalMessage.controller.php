@@ -880,7 +880,7 @@ class PersonalMessage_Controller extends Action_Controller
 
 		try
 		{
-			$this->_events->trigger('before_sending', array('namedRecipientList' => $namedRecipientList, 'recipientList' => $recipientList, 'namesNotFound' => $namesNotFound));
+			$this->_events->trigger('before_sending', array('namedRecipientList' => $namedRecipientList, 'recipientList' => $recipientList, 'namesNotFound' => $namesNotFound, 'post_errors' => $post_errors));
 		}
 		catch (Controller_Redirect_Exception $e)
 		{
