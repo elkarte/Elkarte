@@ -38,12 +38,18 @@ class Random_Display_Module implements ElkArte\sources\modules\Module_Interface
 		return $return;
 	}
 
+	/**
+	 * Adds to the display query to fetch the id of the original topic.
+	 */
 	public static function followup_topic_query(&$topic_selects, &$topic_tables, &$topic_parameters)
 	{
 		$topic_selects[] = 'fu.derived_from';
 		$topic_tables[] = 'LEFT JOIN {db_prefix}follow_ups AS fu ON (fu.follow_up = t.id_topic)';
 	}
 
+	/**
+	 * Show topics originated from the messages.
+	 */
 	public static function followup_message_list($messages)
 	{
 		global $context;
@@ -52,6 +58,9 @@ class Random_Display_Module implements ElkArte\sources\modules\Module_Interface
 		$context['follow_ups'] = followupTopics($messages, self::$includeUnapproved);
 	}
 
+	/**
+	 * Prepares the data for the droppy with "child topics".
+	 */
 	public function topicinfo($topicinfo, $topic, $includeUnapproved)
 	{
 		global $context, $scripturl;
@@ -70,6 +79,9 @@ class Random_Display_Module implements ElkArte\sources\modules\Module_Interface
 		}
 	}
 
+	/**
+	 * Can we show the button?
+	 */
 	public function prepare_context()
 	{
 		global $context;

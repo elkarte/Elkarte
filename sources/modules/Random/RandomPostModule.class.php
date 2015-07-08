@@ -34,6 +34,9 @@ class Random_Post_Module implements ElkArte\sources\modules\Module_Interface
 		return $return;
 	}
 
+	/**
+	 * Create a followup.
+	 */
 	public static function followup_create_topic($msgOptions, $topicOptions, $posterOptions)
 	{
 		if (!empty($_REQUEST['followup']))
@@ -46,6 +49,9 @@ class Random_Post_Module implements ElkArte\sources\modules\Module_Interface
 			linkMessages($original_post, $topicOptions['id']);
 	}
 
+	/**
+	 * Show followups.
+	 */
 	public function prepare_context_followup()
 	{
 		global $context;
