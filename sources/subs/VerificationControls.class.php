@@ -57,11 +57,13 @@ function create_control_verification(&$verificationOptions, $do_test = false)
 	$isNew = !isset($context['controls']['verification'][$verificationOptions['id']]);
 
 	if ($isNew)
+	{
 		$context['controls']['verification'][$verificationOptions['id']] = array(
 			'id' => $verificationOptions['id'],
 			'max_errors' => isset($verificationOptions['max_errors']) ? $verificationOptions['max_errors'] : 3,
 			'render' => false,
 		);
+	}
 	$thisVerification = &$context['controls']['verification'][$verificationOptions['id']];
 
 	if (!isset($_SESSION[$verificationOptions['id'] . '_vv']))
@@ -348,7 +350,7 @@ class Verification_Controls_Captcha implements Verification_Controls
 		if (!$this->_show_captcha)
 			return;
 
-		if ($refresh)
+		if (true || $refresh)
 		{
 			$_SESSION[$this->_options['id'] . '_vv']['code'] = '';
 

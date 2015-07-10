@@ -110,10 +110,6 @@ class Unread_Controller extends Action_Controller
 		$template_layers = Template_Layers::getInstance();
 		$template_layers->add($context['sub_template']);
 
-		// Setup the default topic icons... for checking they exist and the like ;)
-		require_once(SUBSDIR . '/MessageIndex.subs.php');
-		$context['icon_sources'] = MessageTopicIcons();
-
 		$this->_is_topics = $this->_action_unread;
 
 		// If empty, no preview at all

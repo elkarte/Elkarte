@@ -41,6 +41,13 @@ class Display_Controller extends Action_Controller
 	protected $_virtual_msg = 0;
 
 	/**
+	 * The class that takes care of rendering the message icons (MessageTopicIcons)
+	 *
+	 * @var null|object
+	 */
+	protected $_icon_sources = null;
+
+	/**
 	 * Default action handler for this controller
 	 */
 	public function action_index()
@@ -160,18 +167,11 @@ class Display_Controller extends Action_Controller
 			}
 		}
 
-		$this->_events->trigger('topicinfo', array('topicinfo' => &$topicinfo));
+		$this->_events->trigger('topicinfo', array('topicinfo' => &$topicinfo, 'includeUnapproved' => $includeUnapproved));
 
 		// Add up unapproved replies to get real number of replies...
 		if ($modSettings['postmod_active'] && allowedTo('approve_posts'))
 			$context['real_num_replies'] += $topicinfo['unapproved_posts'] - ($topicinfo['approved'] ? 0 : 1);
-
-		// If this topic was derived from another, set the followup details
-		if (!empty($topicinfo['derived_from']))
-		{
-			require_once(SUBSDIR . '/FollowUps.subs.php');
-			$context['topic_derived_from'] = topicStartedHere($topic, $includeUnapproved);
-		}
 
 		// If this topic has unapproved posts, we need to work out how many posts the user can see, for page indexing.
 		if (!$includeUnapproved && $topicinfo['unapproved_posts'] && !$user_info['is_guest'])
@@ -252,26 +252,10 @@ class Display_Controller extends Action_Controller
 				'go_next' => $scripturl . '?topic=' . $topic . '.0;prev_next=next#new'
 			);
 
-		// Derived from, set the link back
-		if (!empty($context['topic_derived_from']))
-			$context['links']['derived_from'] = $scripturl . '?msg=' . $context['topic_derived_from']['derived_from'];
-
 		// Check if spellchecking is both enabled and actually working. (for quick reply.)
 		$context['show_spellchecking'] = !empty($modSettings['enableSpellChecking']) && function_exists('pspell_new');
 		if ($context['show_spellchecking'])
 			loadJavascriptFile('spellcheck.js', array('defer' => true));
-
-		// Do we need to show the visual verification image?
-		$context['require_verification'] = !$user_info['is_mod'] && !$user_info['is_admin'] && !empty($modSettings['posts_require_captcha']) && ($user_info['posts'] < $modSettings['posts_require_captcha'] || ($user_info['is_guest'] && $modSettings['posts_require_captcha'] == -1));
-		if ($context['require_verification'])
-		{
-			require_once(SUBSDIR . '/VerificationControls.class.php');
-			$verificationOptions = array(
-				'id' => 'post',
-			);
-			$context['require_verification'] = create_control_verification($verificationOptions);
-			$context['visual_verification_id'] = $verificationOptions['id'];
-		}
 
 		// Are we showing signatures - or disabled fields?
 		$context['signature_enabled'] = substr($modSettings['signature_settings'], 0, 1) == 1;
@@ -443,7 +427,6 @@ class Display_Controller extends Action_Controller
 			require_once(SUBSDIR . '/Attachments.subs.php');
 
 			// Fetch attachments.
-			$includeUnapproved = !$modSettings['postmod_active'] || allowedTo('approve_posts');
 			if (!empty($modSettings['attachmentEnable']) && allowedTo('view_attachments'))
 				$attachments = getAttachments($messages, $includeUnapproved, 'filter_accessible_attachment', $all_posters);
 
@@ -492,12 +475,6 @@ class Display_Controller extends Action_Controller
 
 			$messages_request = loadMessageRequest($msg_selects, $msg_tables, $msg_parameters);
 
-			if (!empty($modSettings['enableFollowup']))
-			{
-				require_once(SUBSDIR . '/FollowUps.subs.php');
-				$context['follow_ups'] = followupTopics($messages, $includeUnapproved);
-			}
-
 			// Go to the last message if the given time is beyond the time of the last message.
 			if (isset($context['start_from']) && $context['start_from'] >= $topicinfo['num_replies'])
 				$context['start_from'] = $topicinfo['num_replies'];
@@ -522,6 +499,7 @@ class Display_Controller extends Action_Controller
 		// Set the callback.  (do you REALIZE how much memory all the messages would take?!?)
 		// This will be called from the template.
 		$context['get_message'] = array($this, 'prepareDisplayContext_callback');
+		$this->_icon_sources = new MessageTopicIcons();
 
 		// Now set all the wonderful, wonderful permissions... like moderation ones...
 		$common_permissions = array(
@@ -575,8 +553,6 @@ class Display_Controller extends Action_Controller
 		// Can restore topic?  That's if the topic is in the recycle board and has a previous restore state.
 		$context['can_restore_topic'] &= !empty($modSettings['recycle_enable']) && $modSettings['recycle_board'] == $board && !empty($topicinfo['id_previous_board']);
 		$context['can_restore_msg'] &= !empty($modSettings['recycle_enable']) && $modSettings['recycle_board'] == $board && !empty($topicinfo['id_previous_topic']);
-
-		$context['can_follow_up'] = !empty($modSettings['enableFollowup']) && boardsallowedto('post_new') !== array();
 
 		// Load up the Quick ModifyTopic and Quick Reply scripts
 		loadJavascriptFile('topic.js');
@@ -768,23 +744,6 @@ class Display_Controller extends Action_Controller
 		if (!$message)
 			return false;
 
-		// $context['icon_sources'] says where each icon should come from - here we set up the ones which will always exist!
-		if (empty($context['icon_sources']))
-		{
-			require_once(SUBSDIR . '/MessageIndex.subs.php');
-			$context['icon_sources'] = MessageTopicIcons();
-		}
-
-		// Message Icon Management... check the images exist.
-		if (empty($modSettings['messageIconChecks_disable']))
-		{
-			// If the current icon isn't known, then we need to do something...
-			if (!isset($context['icon_sources'][$message['icon']]))
-				$context['icon_sources'][$message['icon']] = file_exists($settings['theme_dir'] . '/images/post/' . $message['icon'] . '.png') ? 'images_url' : 'default_images_url';
-		}
-		elseif (!isset($context['icon_sources'][$message['icon']]))
-			$context['icon_sources'][$message['icon']] = 'images_url';
-
 		// If you're a lazy bum, you probably didn't give a subject...
 		$message['subject'] = $message['subject'] != '' ? $message['subject'] : $txt['no_subject'];
 
@@ -835,7 +794,7 @@ class Display_Controller extends Action_Controller
 			'link' => '<a href="' . $scripturl . '?topic=' . $topic . '.msg' . $message['id_msg'] . '#msg' . $message['id_msg'] . '" rel="nofollow">' . $message['subject'] . '</a>',
 			'member' => &$memberContext[$message['id_member']],
 			'icon' => $message['icon'],
-			'icon_url' => $settings[$context['icon_sources'][$message['icon']]] . '/post/' . $message['icon'] . '.png',
+			'icon_url' => $this->_icon_sources->{$message['icon']},
 			'subject' => $message['subject'],
 			'time' => standardTime($message['poster_time']),
 			'html_time' => htmlTime($message['poster_time']),

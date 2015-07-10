@@ -20,11 +20,14 @@
 if (!defined('ELK'))
 	die('No access...');
 
-class Poll_Post_Module
+class Poll_Post_Module implements ElkArte\sources\modules\Module_Interface
 {
 	protected static $_make_poll = false;
 
-	public static function hooks()
+	/**
+	 * {@inheritdoc }
+	 */
+	public static function hooks(\Event_Manager $eventsManager)
 	{
 		global $context, $modSettings;
 

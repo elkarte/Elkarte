@@ -677,19 +677,6 @@ class PersonalMessage_Controller extends Action_Controller
 		// No one is bcc'ed just yet
 		$context['bcc_value'] = '';
 
-		// Verification control needed for this PM?
-		$context['require_verification'] = !$user_info['is_admin'] && !empty($modSettings['pm_posts_verification']) && $user_info['posts'] < $modSettings['pm_posts_verification'];
-		if ($context['require_verification'])
-		{
-			require_once(SUBSDIR . '/VerificationControls.class.php');
-
-			$verificationOptions = array(
-				'id' => 'pm',
-			);
-			$context['require_verification'] = create_control_verification($verificationOptions);
-			$context['visual_verification_id'] = $verificationOptions['id'];
-		}
-
 		// Register this form and get a sequence number in $context.
 		checkSubmitOnce('register');
 	}
@@ -852,21 +839,6 @@ class PersonalMessage_Controller extends Action_Controller
 				$post_errors->addError('no_message');
 		}
 
-		// Wrong verification code?
-		if (!$user_info['is_admin'] && !isset($_REQUEST['xml']) && !empty($modSettings['pm_posts_verification']) && $user_info['posts'] < $modSettings['pm_posts_verification'])
-		{
-			require_once(SUBSDIR . '/VerificationControls.class.php');
-
-			$verificationOptions = array(
-				'id' => 'pm',
-			);
-			$context['require_verification'] = create_control_verification($verificationOptions, true);
-
-			if (is_array($context['require_verification']))
-				foreach ($context['require_verification'] as $error)
-					$post_errors->addError($error);
-		}
-
 		// If they made any errors, give them a chance to make amends.
 		if ($post_errors->hasErrors() && !$is_recipient_change && !isset($_REQUEST['preview']) && !isset($_REQUEST['xml']))
 			return messagePostError($namedRecipientList, $recipientList);
@@ -906,15 +878,18 @@ class PersonalMessage_Controller extends Action_Controller
 			return messagePostError($namedRecipientList, $recipientList);
 		}
 
-
 		try
 		{
-			$this->_events->trigger('before_sending', array('namedRecipientList' => $namedRecipientList, 'recipientList' => $recipientList, 'namesNotFound' => $namesNotFound));
+			$this->_events->trigger('before_sending', array('namedRecipientList' => $namedRecipientList, 'recipientList' => $recipientList, 'namesNotFound' => $namesNotFound, 'post_errors' => $post_errors));
 		}
 		catch (Controller_Redirect_Exception $e)
 		{
 			return messagePostError($namedRecipientList, $recipientList);
 		}
+
+		// Safety net, it may be a module may just add to the list of errors without actually throw the error
+		if ($post_errors->hasErrors() && !isset($_REQUEST['preview']) && !isset($_REQUEST['xml']))
+			return messagePostError($namedRecipientList, $recipientList);
 
 		// Before we send the PM, let's make sure we don't have an abuse of numbers.
 		if (!empty($modSettings['max_pm_recipients']) && count($recipientList['to']) + count($recipientList['bcc']) > $modSettings['max_pm_recipients'] && !allowedTo(array('moderate_forum', 'send_mail', 'admin_forum')))
@@ -2549,13 +2524,13 @@ function messagePostError($named_recipients, $recipient_ids = array())
 {
 	global $txt, $context, $scripturl, $modSettings, $user_info;
 
-	if (!isset($_REQUEST['xml']))
-		$context['menu_data_' . $context['pm_menu_id']]['current_area'] = 'send';
-
-	if (!isset($_REQUEST['xml']))
-		$context['sub_template'] = 'send';
-	elseif (isset($_REQUEST['xml']))
+	if (isset($_REQUEST['xml']))
 		$context['sub_template'] = 'generic_preview';
+	else
+	{
+		$context['sub_template'] = 'send';
+		$context['menu_data_' . $context['pm_menu_id']]['current_area'] = 'send';
+	}
 
 	$context['page_title'] = $txt['send_message'];
 	$error_types = Error_Context::context('pm', 1);

@@ -243,9 +243,6 @@ class MessageIndex_Controller extends Action_Controller
 		else
 			$fake_ascending = false;
 
-		// Setup the default topic icons...
-		$context['icon_sources'] = MessageTopicIcons();
-
 		$context['topics'] = array();
 
 		// Set up the query options

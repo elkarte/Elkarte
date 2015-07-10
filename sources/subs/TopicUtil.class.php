@@ -102,25 +102,7 @@ class Topic_Util
 			else
 				$pages = '';
 
-			// We need to check the topic icons exist... you can never be too sure!
-			if (!empty($modSettings['messageIconChecks_enable']))
-			{
-				// First icon first... as you'd expect.
-				if (!isset($context['icon_sources'][$row['first_icon']]))
-					$context['icon_sources'][$row['first_icon']] = file_exists($settings['theme_dir'] . '/images/post/' . $row['first_icon'] . '.png') ? 'images_url' : 'default_images_url';
-
-				// Last icon... last... duh.
-				if (!isset($context['icon_sources'][$row['last_icon']]))
-					$context['icon_sources'][$row['last_icon']] = file_exists($settings['theme_dir'] . '/images/post/' . $row['last_icon'] . '.png') ? 'images_url' : 'default_images_url';
-			}
-			else
-			{
-				if (!isset($context['icon_sources'][$row['first_icon']]))
-					$context['icon_sources'][$row['first_icon']] = 'images_url';
-
-				if (!isset($context['icon_sources'][$row['last_icon']]))
-					$context['icon_sources'][$row['last_icon']] = 'images_url';
-			}
+			$icon_sources = new MessageTopicIcons();
 
 			if ($user_info['is_guest'])
 			{
@@ -149,7 +131,7 @@ class Topic_Util
 					'subject' => $row['first_subject'],
 					'preview' => trim($row['first_body']),
 					'icon' => $row['first_icon'],
-					'icon_url' => $settings[$context['icon_sources'][$row['first_icon']]] . '/post/' . $row['first_icon'] . '.png',
+					'icon_url' => $icon_sources->{$row['first_icon']},
 					'href' => $scripturl . '?topic=' . $row['id_topic'] . '.0' . $topicseen,
 					'link' => '<a href="' . $scripturl . '?topic=' . $row['id_topic'] . '.0' . $topicseen . '">' . $row['first_subject'] . '</a>'
 				),
@@ -168,7 +150,7 @@ class Topic_Util
 					'subject' => $row['last_subject'],
 					'preview' => trim($row['last_body']),
 					'icon' => $row['last_icon'],
-					'icon_url' => $settings[$context['icon_sources'][$row['last_icon']]] . '/post/' . $row['last_icon'] . '.png',
+					'icon_url' => $icon_sources->{$row['last_icon']},
 					'href' => $scripturl . '?topic=' . $row['id_topic'] . $url_fragment,
 					'link' => '<a href="' . $scripturl . '?topic=' . $row['id_topic'] . $url_fragment . '" ' . ($row['num_replies'] == 0 ? '' : 'rel="nofollow"') . '>' . $row['last_subject'] . '</a>',
 				),
@@ -180,7 +162,7 @@ class Topic_Util
 				'is_very_hot' => !empty($modSettings['useLikesNotViews']) ? $row['num_likes'] >= $modSettings['hotTopicVeryPosts'] : $row['num_replies'] >= $modSettings['hotTopicVeryPosts'],
 				'is_posted_in' => false,
 				'icon' => $row['first_icon'],
-				'icon_url' => $settings[$context['icon_sources'][$row['first_icon']]] . '/post/' . $row['first_icon'] . '.png',
+				'icon_url' => $icon_sources->{$row['first_icon']},
 				'subject' => $row['first_subject'],
 				'new' => !empty($row['id_msg_modified']) && $row['new_from'] <= $row['id_msg_modified'],
 				'new_from' => $row['new_from'],

@@ -52,6 +52,10 @@ class Post_Controller extends Action_Controller
 	{
 		$this->_post_errors = Error_Context::context('post', 1);
 		$this->_template_layers = Template_Layers::getInstance();
+
+		require_once(SUBSDIR . '/Post.subs.php');
+		require_once(SUBSDIR . '/Messages.subs.php');
+		require_once(SUBSDIR . '/Topic.subs.php');
 	}
 
 	/**
@@ -104,10 +108,6 @@ class Post_Controller extends Action_Controller
 
 		// All those wonderful modifiers and attachments
 		$this->_template_layers->add('additional_options', 200);
-
-		require_once(SUBSDIR . '/Post.subs.php');
-		require_once(SUBSDIR . '/Messages.subs.php');
-		require_once(SUBSDIR . '/Topic.subs.php');
 
 		if (isset($_REQUEST['xml']))
 		{
@@ -245,25 +245,6 @@ class Post_Controller extends Action_Controller
 		$context['response_prefix'] = response_prefix();
 		$context['destination'] = 'post2;start=' . $_REQUEST['start'];
 
-		// Are we moving a discussion to its own topic?
-		if (!empty($modSettings['enableFollowup']) && !empty($_REQUEST['followup']))
-		{
-			$context['original_post'] = isset($_REQUEST['quote']) ? (int) $_REQUEST['quote'] : (int) $_REQUEST['followup'];
-			$context['show_boards_dropdown'] = true;
-			require_once(SUBSDIR . '/Boards.subs.php');
-			$context += getBoardList(array('not_redirection' => true, 'allowed_to' => 'post_new'));
-			$context['boards_current_disabled'] = false;
-			if (!empty($board))
-			{
-				foreach ($context['categories'] as $id => $values)
-					if (isset($values['boards'][$board]))
-					{
-						$context['categories'][$id]['boards'][$board]['selected'] = true;
-						break;
-					}
-			}
-		}
-
 		// Previewing, modifying, or posting?
 		// Do we have a body, but an error happened.
 		if (isset($_REQUEST['message']) || $this->_post_errors->hasErrors())
@@ -286,9 +267,8 @@ class Post_Controller extends Action_Controller
 					$_REQUEST['icon'] = 'xx';
 
 				// They are previewing if they asked to preview (i.e. came from quick reply).
-				$really_previewing = !empty($_REQUEST['preview']);
+				$really_previewing = !empty($_REQUEST['preview']) || isset($_REQUEST['xml']);
 			}
-			$really_previewing = $really_previewing === true || isset($_REQUEST['xml']);
 
 			$this->_events->trigger('prepare_modifying', array('post_errors' => $this->_post_errors, 'really_previewing' => &$really_previewing));
 
@@ -358,7 +338,6 @@ class Post_Controller extends Action_Controller
 			// Previewing an edit?
 			if (isset($_REQUEST['msg']) && !empty($topic))
 			{
-				require_once(SUBSDIR . '/Messages.subs.php');
 				$msg_id = (int) $_REQUEST['msg'];
 
 				// Get the existing message.
@@ -460,21 +439,7 @@ class Post_Controller extends Action_Controller
 		if (!empty($topic) && !empty($modSettings['oldTopicDays']) && $this->_topic_attributes['last_post_time'] + $modSettings['oldTopicDays'] * 86400 < time() && empty($this->_topic_attributes['is_sticky']) && !isset($_REQUEST['subject']))
 			$this->_post_errors->addError(array('old_topic', array($modSettings['oldTopicDays'])), 0);
 
-		// Do we need to show the visual verification image?
-		$context['require_verification'] = !$user_info['is_mod'] && !$user_info['is_admin'] && !empty($modSettings['posts_require_captcha']) && ($user_info['posts'] < $modSettings['posts_require_captcha'] || ($user_info['is_guest'] && $modSettings['posts_require_captcha'] == -1));
-		if ($context['require_verification'])
-		{
-			require_once(SUBSDIR . '/VerificationControls.class.php');
-			$verificationOptions = array(
-				'id' => 'post',
-			);
-			$context['require_verification'] = create_control_verification($verificationOptions);
-			$context['visual_verification_id'] = $verificationOptions['id'];
-		}
-
-		// If they came from quick reply, and have to enter verification details, give them some notice.
-		if (!empty($_REQUEST['from_qr']) && !empty($context['require_verification']))
-			$this->_post_errors->addError('need_qr_verification');
+		$this->_events->trigger('post_errors');
 
 		// Any errors occurred?
 		$context['post_error'] = array(
@@ -658,29 +623,14 @@ class Post_Controller extends Action_Controller
 
 		$topic_info = array();
 
-		// Wrong verification code?
-		if (!$user_info['is_admin'] && !$user_info['is_mod'] && !empty($modSettings['posts_require_captcha']) && ($user_info['posts'] < $modSettings['posts_require_captcha'] || ($user_info['is_guest'] && $modSettings['posts_require_captcha'] == -1)))
-		{
-			require_once(SUBSDIR . '/VerificationControls.class.php');
-			$verificationOptions = array(
-				'id' => 'post',
-			);
-			$context['require_verification'] = create_control_verification($verificationOptions, true);
-
-			if (is_array($context['require_verification']))
-				foreach ($context['require_verification'] as $verification_error)
-					$this->_post_errors->addError($verification_error);
-		}
-
-		require_once(SUBSDIR . '/Boards.subs.php');
-		require_once(SUBSDIR . '/Post.subs.php');
-		loadLanguage('Post');
-
-		$this->_events->trigger('prepare_save_post', array('topic_info' => &$topic_info));
-
 		// Previewing? Go back to start.
 		if (isset($_REQUEST['preview']))
 			return $this->action_post();
+
+		require_once(SUBSDIR . '/Boards.subs.php');
+		loadLanguage('Post');
+
+		$this->_events->trigger('prepare_save_post', array('topic_info' => &$topic_info));
 
 		// Prevent double submission of this form.
 		checkSubmitOnce('check');
@@ -688,7 +638,6 @@ class Post_Controller extends Action_Controller
 		// If this isn't a new topic load the topic info that we need.
 		if (!empty($topic))
 		{
-			require_once(SUBSDIR . '/Topic.subs.php');
 			$topic_info = getTopicInfo($topic);
 
 			// Though the topic should be there, it might have vanished.
@@ -732,24 +681,7 @@ class Post_Controller extends Action_Controller
 
 			if (isset($_POST['lock']))
 			{
-				// Nothing is changed to the lock.
-				if ((empty($topic_info['locked']) && empty($_POST['lock'])) || (!empty($_POST['lock']) && !empty($topic_info['locked'])))
-					unset($_POST['lock']);
-				// You're have no permission to lock this topic.
-				elseif (!allowedTo(array('lock_any', 'lock_own')) || (!allowedTo('lock_any') && $user_info['id'] != $topic_info['id_member_started']))
-					unset($_POST['lock']);
-				// You are allowed to (un)lock your own topic only.
-				elseif (!allowedTo('lock_any'))
-				{
-					// You cannot override a moderator lock.
-					if ($topic_info['locked'] == 1)
-						unset($_POST['lock']);
-					else
-						$_POST['lock'] = empty($_POST['lock']) ? 0 : 2;
-				}
-				// Hail mighty moderator, (un)lock this topic immediately.
-				else
-					$_POST['lock'] = empty($_POST['lock']) ? 0 : 1;
+				$_POST['lock'] = $this->_checkLocked($_POST['lock'], $topic_info);
 			}
 
 			// So you wanna (un)sticky this...let's see.
@@ -789,15 +721,7 @@ class Post_Controller extends Action_Controller
 
 			if (isset($_POST['lock']))
 			{
-				// New topics are by default not locked.
-				if (empty($_POST['lock']))
-					unset($_POST['lock']);
-				// Besides, you need permission.
-				elseif (!allowedTo(array('lock_any', 'lock_own')))
-					unset($_POST['lock']);
-				// A moderator-lock (1) can override a user-lock (2).
-				else
-					$_POST['lock'] = allowedTo('lock_any') ? 1 : 2;
+				$_POST['lock'] = $this->_checkLocked($_POST['lock']);
 			}
 
 			if (isset($_POST['sticky']) && (empty($_POST['sticky']) || !allowedTo('make_sticky')))
@@ -810,7 +734,6 @@ class Post_Controller extends Action_Controller
 		{
 			$_REQUEST['msg'] = (int) $_REQUEST['msg'];
 
-			require_once(SUBSDIR . '/Messages.subs.php');
 			$msgInfo = basicMessageInfo($_REQUEST['msg'], true);
 
 			if (empty($msgInfo))
@@ -823,25 +746,7 @@ class Post_Controller extends Action_Controller
 
 			if (isset($_POST['lock']))
 			{
-				// Nothing changes to the lock status.
-				if ((empty($_POST['lock']) && empty($topic_info['locked'])) || (!empty($_POST['lock']) && !empty($topic_info['locked'])))
-					unset($_POST['lock']);
-				// You're simply not allowed to (un)lock this.
-				elseif (!allowedTo(array('lock_any', 'lock_own')) || (!allowedTo('lock_any') && $user_info['id'] != $topic_info['id_member_started']))
-					unset($_POST['lock']);
-				// You're only allowed to lock your own topics.
-				elseif (!allowedTo('lock_any'))
-				{
-					// You're not allowed to break a moderator's lock.
-					if ($topic_info['locked'] == 1)
-						unset($_POST['lock']);
-					// Lock it with a soft lock or unlock it.
-					else
-						$_POST['lock'] = empty($_POST['lock']) ? 0 : 2;
-				}
-				// You must be the moderator.
-				else
-					$_POST['lock'] = empty($_POST['lock']) ? 0 : 1;
+				$_POST['lock'] = $this->_checkLocked($_POST['lock'], $topic_info);
 			}
 
 			// Change the sticky status of this topic?
@@ -1067,9 +972,6 @@ class Post_Controller extends Action_Controller
 		// This is a new topic or an already existing one. Save it.
 		else
 		{
-			if (!empty($modSettings['enableFollowup']) && !empty($_REQUEST['followup']))
-				$original_post = (int) $_REQUEST['followup'];
-
 			// We also have to fake the board:
 			// if it's valid and it's not the current, let's forget about the "current" and load the new one
 			if (!empty($new_board) && $board !== $new_board)
@@ -1087,16 +989,6 @@ class Post_Controller extends Action_Controller
 
 			if (isset($topicOptions['id']))
 				$topic = $topicOptions['id'];
-
-			if (!empty($modSettings['enableFollowup']))
-			{
-				require_once(SUBSDIR . '/FollowUps.subs.php');
-				require_once(SUBSDIR . '/Messages.subs.php');
-
-				// Time to update the original message with a pointer to the new one
-				if (!empty($original_post) && canAccessMessage($original_post))
-					linkMessages($original_post, $topic);
-			}
 		}
 
 		$this->_events->trigger('after_save_post', array('board' => $board, 'topic' => $topic, 'msgOptions' => $msgOptions, 'topicOptions' => $topicOptions, 'becomesApproved' => $becomesApproved, 'posterOptions' => $posterOptions));
@@ -1196,7 +1088,6 @@ class Post_Controller extends Action_Controller
 		// Where we going if we need to?
 		$context['post_box_name'] = isset($_GET['pb']) ? $_GET['pb'] : '';
 
-		require_once(SUBSDIR . '/Messages.subs.php');
 		$row = quoteMessageInfo((int) $_REQUEST['quote'], isset($_REQUEST['modify']));
 
 		$context['sub_template'] = 'quotefast';
@@ -1272,8 +1163,6 @@ class Post_Controller extends Action_Controller
 			obExit(false);
 
 		checkSession('get');
-		require_once(SUBSDIR . '/Post.subs.php');
-		require_once(SUBSDIR . '/Topic.subs.php');
 
 		$row = getTopicInfoByMsg($topic, empty($_REQUEST['msg']) ? 0 : (int) $_REQUEST['msg']);
 
@@ -1347,19 +1236,7 @@ class Post_Controller extends Action_Controller
 
 		if (isset($_POST['lock']))
 		{
-			if (!allowedTo(array('lock_any', 'lock_own')) || (!allowedTo('lock_any') && $user_info['id'] != $row['id_member']))
-				unset($_POST['lock']);
-			elseif (!allowedTo('lock_any'))
-			{
-				if ($row['locked'] == 1)
-					unset($_POST['lock']);
-				else
-					$_POST['lock'] = empty($_POST['lock']) ? 0 : 2;
-			}
-			elseif (!empty($row['locked']) && !empty($_POST['lock']) || $_POST['lock'] == $row['locked'])
-				unset($_POST['lock']);
-			else
-				$_POST['lock'] = empty($_POST['lock']) ? 0 : 1;
+			$_POST['lock'] = $this->_checkLocked($_POST['lock'], $row);
 		}
 
 		if (isset($_POST['sticky']) && !allowedTo('make_sticky'))
@@ -1480,88 +1357,67 @@ class Post_Controller extends Action_Controller
 	 * It uses the pspell library, which MUST be installed.
 	 * It has problems with internationalization.
 	 * It is accessed via ?action=spellcheck.
+	 * @deprecated since 1.1
 	 */
 	public function action_spellcheck()
 	{
-		global $txt, $context;
+		// Initialize this controller with its own event manager
+		$controller = new Spellcheck_Controller(new Event_Manager());
 
-		// A list of "words" we know about but pspell doesn't.
-		$known_words = array('elkarte', 'php', 'mysql', 'www', 'gif', 'jpeg', 'png', 'http');
+		// Fetch controllers generic hook name from the action controller
+		$hook = $controller->getHook();
 
-		loadLanguage('Post');
-		loadTemplate('Post');
+		// Call the controllers pre dispatch method
+		$controller->pre_dispatch();
 
-		// Okay, this looks funny, but it actually fixes a weird bug.
-		ob_start();
-		$old = error_reporting(0);
+		// Call integrate_action_XYZ_before -> XYZ_controller -> integrate_action_XYZ_after
+		call_integration_hook('integrate_action_' . $hook . '_before', array('action_index'));
 
-		// See, first, some windows machines don't load pspell properly on the first try.  Dumb, but this is a workaround.
-		pspell_new('en');
+		$result = $controller->$method();
 
-		// Next, the dictionary in question may not exist. So, we try it... but...
-		$pspell_link = pspell_new($txt['lang_dictionary'], $txt['lang_spelling'], '', 'utf-8', PSPELL_FAST | PSPELL_RUN_TOGETHER);
+		call_integration_hook('integrate_action_' . $hook . '_after', array('action_index'));
 
-		// Most people don't have anything but English installed... So we use English as a last resort.
-		if (!$pspell_link)
-			$pspell_link = pspell_new('en', '', '', '', PSPELL_FAST | PSPELL_RUN_TOGETHER);
+		return $result;
+	}
 
-		error_reporting($old);
-		@ob_end_clean();
+	protected function _checkLocked($lock, $topic_info = null)
+	{
+		global $user_info;
 
-		if (!isset($_POST['spellstring']) || !$pspell_link)
-			die;
-
-		// Construct a bit of Javascript code.
-		$context['spell_js'] = '
-			var txt = {"done": "' . $txt['spellcheck_done'] . '"},
-				mispstr = ' . ($_POST['fulleditor'] === 'true' ? 'window.opener.spellCheckGetText(spell_fieldname)' : 'window.opener.document.forms[spell_formname][spell_fieldname].value') . ',
-				misps = Array(';
-
-		// Get all the words (Javascript already separated them).
-		$alphas = explode("\n", strtr($_POST['spellstring'], array("\r" => '')));
-
-		$found_words = false;
-		for ($i = 0, $n = count($alphas); $i < $n; $i++)
+		// A new topic
+		if ($topic_info === null)
 		{
-			// Words are sent like 'word|offset_begin|offset_end'.
-			$check_word = explode('|', $alphas[$i]);
-
-			// If the word is a known word, or spelled right...
-			if (in_array(Util::strtolower($check_word[0]), $known_words) || pspell_check($pspell_link, $check_word[0]) || !isset($check_word[2]))
-				continue;
-
-			// Find the word, and move up the "last occurrence" to here.
-			$found_words = true;
-
-			// Add on the javascript for this misspelling.
-			$context['spell_js'] .= '
-				new misp("' . strtr($check_word[0], array('\\' => '\\\\', '"' => '\\"', '<' => '', '&gt;' => '')) . '", ' . (int) $check_word[1] . ', ' . (int) $check_word[2] . ', [';
-
-			// If there are suggestions, add them in...
-			$suggestions = pspell_suggest($pspell_link, $check_word[0]);
-			if (!empty($suggestions))
-			{
-				// But first check they aren't going to be censored - no naughty words!
-				foreach ($suggestions as $k => $word)
-					if ($suggestions[$k] != censorText($word))
-						unset($suggestions[$k]);
-
-				if (!empty($suggestions))
-					$context['spell_js'] .= '"' . implode('", "', $suggestions) . '"';
-			}
-
-			$context['spell_js'] .= ']),';
+			// New topics are by default not locked.
+			if (empty($lock))
+				return null;
+			// Besides, you need permission.
+			elseif (!allowedTo(array('lock_any', 'lock_own')))
+				return null;
+			// A moderator-lock (1) can override a user-lock (2).
+			else
+				return allowedTo('lock_any') ? 1 : 2;
 		}
 
-		// If words were found, take off the last comma.
-		if ($found_words)
-			$context['spell_js'] = substr($context['spell_js'], 0, -1);
+		// Nothing changes to the lock status.
+		if ((empty($lock) && empty($topic_info['locked'])) || (!empty($lock) && !empty($topic_info['locked'])))
+			return null;
+		// You're simply not allowed to (un)lock this.
+		elseif (!allowedTo(array('lock_any', 'lock_own')) || (!allowedTo('lock_any') && $user_info['id'] != $topic_info['id_member_started']))
+			return null;
+		// You're only allowed to lock your own topics.
+		elseif (!allowedTo('lock_any'))
+		{
+			// You're not allowed to break a moderator's lock.
+			if ($topic_info['locked'] == 1)
+				return null;
+			// Lock it with a soft lock or unlock it.
+			else
+				$lock = empty($lock) ? 0 : 2;
+		}
+		// You must be the moderator.
+		else
+			$lock = empty($lock) ? 0 : 1;
 
-		$context['spell_js'] .= '
-			);';
-
-		// And instruct the template system to just show the spellcheck sub template.
-		$this->_template_layers->removeAll();
-		$context['sub_template'] = 'spellcheck';
+		return $lock;
 	}
 }

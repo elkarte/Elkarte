@@ -208,6 +208,7 @@ function topicsParticipation($id_member, $topic_ids)
 
 /**
  * This simple function returns the message topic icon array.
+ * @deprecated since 1.1 - use the MessageTopicIcons class instead
  */
 function MessageTopicIcons()
 {

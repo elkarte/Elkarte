@@ -180,8 +180,13 @@ class Maintenance_Controller extends Action_Controller
 		{
 			if (is_string($subActions[$subAction]['activities'][$activity]) && method_exists($this, $subActions[$subAction]['activities'][$activity]))
 				$this->{$subActions[$subAction]['activities'][$activity]}();
-			else
+			elseif (is_string($subActions[$subAction]['activities'][$activity]))
 				$subActions[$subAction]['activities'][$activity]();
+			else
+			{
+				$activity_obj = new $subActions[$subAction]['activities'][$activity]['class']();
+				$activity_obj->{$subActions[$subAction]['activities'][$activity]['method']}();
+			}
 		}
 
 		// Create a maintenance token.  Kinda hard to do it any other way.

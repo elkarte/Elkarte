@@ -204,19 +204,7 @@ class Register_Controller extends Action_Controller
 			setupProfileContext($reg_fields, 'registration');
 		}
 
-		// Generate a visual verification code to make sure the user is no bot.
-		if (!empty($modSettings['reg_verification']) && $current_step > 1)
-		{
-			require_once(SUBSDIR . '/VerificationControls.class.php');
-			$verificationOptions = array(
-				'id' => 'register',
-			);
-			$context['visual_verification'] = create_control_verification($verificationOptions);
-			$context['visual_verification_id'] = $verificationOptions['id'];
-		}
-		// Otherwise we have nothing to show.
-		else
-			$context['visual_verification'] = false;
+		$this->_events->trigger('prepare_context', array('current_step' => $current_step));
 
 		// Are they coming from an OpenID login attempt?
 		if (!empty($_SESSION['openid']['verified']) && !empty($_SESSION['openid']['openid_uri']) && !empty($_SESSION['openid']['nickname']))
@@ -228,11 +216,9 @@ class Register_Controller extends Action_Controller
 		// See whether we have some pre filled values.
 		else
 		{
-			$context += array(
-				'openid' => isset($_POST['openid_identifier']) ? $_POST['openid_identifier'] : '',
-				'username' => isset($_POST['user']) ? Util::htmlspecialchars($_POST['user']) : '',
-				'email' => isset($_POST['email']) ? Util::htmlspecialchars($_POST['email']) : '',
-			);
+			$context['openid'] = isset($_POST['openid_identifier']) ? $_POST['openid_identifier'] : '';
+			$context['username'] = isset($_POST['user']) ? Util::htmlspecialchars($_POST['user']) : '';
+			$context['email'] = isset($_POST['email']) ? Util::htmlspecialchars($_POST['email']) : '';
 		}
 
 		// Were there any errors?
@@ -295,21 +281,7 @@ class Register_Controller extends Action_Controller
 			$reg_errors->addError('too_quickly');
 		}
 
-		// Check whether the visual verification code was entered correctly.
-		if (!empty($modSettings['reg_verification']))
-		{
-			require_once(SUBSDIR . '/VerificationControls.class.php');
-			$verificationOptions = array(
-				'id' => 'register',
-			);
-			$context['visual_verification'] = create_control_verification($verificationOptions, true);
-
-			if (is_array($context['visual_verification']))
-			{
-				foreach ($context['visual_verification'] as $error)
-					$reg_errors->addError($error);
-			}
-		}
+		$this->_events->trigger('before_complete_register', array('reg_errors' => $reg_errors));
 
 		$this->do_register(false);
 	}
@@ -878,17 +850,7 @@ class Register_Controller extends Action_Controller
 			if (!$validator->validate($_POST))
 				$context['errors'] = $validator->validation_errors();
 
-			// How about any verification errors
-			$verificationOptions = array(
-				'id' => 'contactform',
-			);
-			$context['require_verification'] = create_control_verification($verificationOptions, true);
-
-			if (is_array($context['require_verification']))
-			{
-				foreach ($context['require_verification'] as $error)
-					$context['errors'][] = $txt['error_' . $error];
-			}
+			$this->_events->trigger('verify_contact', array());
 
 			// No errors, then send the PM to the admins
 			if (empty($context['errors']))
@@ -917,12 +879,7 @@ class Register_Controller extends Action_Controller
 			$context['sub_template'] = 'contact_form';
 			$context['page_title'] = $txt['admin_contact_form'];
 
-			require_once(SUBSDIR . '/VerificationControls.class.php');
-			$verificationOptions = array(
-				'id' => 'contactform',
-			);
-			$context['require_verification'] = create_control_verification($verificationOptions);
-			$context['visual_verification_id'] = $verificationOptions['id'];
+			$this->_events->trigger('setup_contact', array());
 		}
 
 		createToken('contact');

@@ -23,14 +23,12 @@ if (!defined('ELK'))
 /**
  * This class's task is to show the upcoming events in the BoardIndex.
  */
-class Calendar_BoardIndex_Module
+class Calendar_BoardIndex_Module implements ElkArte\sources\modules\Module_Interface
 {
 	/**
-	 * If enabled, let the system know what hooks we need to install
-	 *
-	 * @return array
+	 * {@inheritdoc }
 	 */
-	public static function hooks()
+	public static function hooks(\Event_Manager $eventsManager)
 	{
 		// Load the calendar?
 		if (allowedTo('calendar_view'))
