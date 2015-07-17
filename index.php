@@ -128,7 +128,8 @@ elk_seed_generator();
 if (isset($_GET['scheduled']))
 {
 	// Don't make people wait on us if we can help it.
-	fastcgi_finish_request();
+	if (function_exists('fastcgi_finish_request'))
+		fastcgi_finish_request();
 
 	$controller = new ScheduledTasks_Controller();
 	$controller->action_autotask();
