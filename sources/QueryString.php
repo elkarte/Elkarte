@@ -222,7 +222,7 @@ function expandIPv6($addr, $strict_check = true)
 		$missing = array();
 
 		// Looks like this is an IPv4 address
-		if (strpos($part[1][1], '.') !== false)
+		if (isset($part[1][1]) && strpos($part[1][1], '.') !== false)
 		{
 			$ipoct = explode('.', $part[1][1]);
 			$p1 = dechex($ipoct[0]) . dechex($ipoct[1]);
