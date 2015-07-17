@@ -11,7 +11,7 @@ $databases['postgresql'] = array(
 		list ($pgl, $version) = explode(" ", $version);
 		return $version;},
 	'supported' => function_exists('pg_connect'),
-	'additional_file' => 'install_' . DB_SCRIPT_VERSION . '_postgresql.sql',
+	'additional_file' => 'install_' . DB_SCRIPT_VERSION . '_postgresql.php',
 	'utf8_support' => true,
 	'utf8_version' => '8.0',
 	'utf8_version_check' => function ($db_connection) {
