@@ -181,17 +181,13 @@ function template_ic_recent_posts()
 {
 	global $context, $txt, $scripturl, $settings;
 
-	// Show the Recent Posts title, and attach webslices feed to this section
-	// The format requires: hslice, entry-title and entry-content classes.
+	// Show the Recent Posts title
+	// hslice class is a left over from webslice support.
 	echo '
 			<li class="board_row hslice" id="recent_posts_content">
 				<h3 class="ic_section_header">
 					<a href="', $scripturl, '?action=recent"><img class="icon" src="', $settings['images_url'], '/post/xx.png" alt="" />', $txt['recent_posts'], '</a>
-				</h3>
-				<div class="entry-title" style="display: none;">', $context['forum_name_html_safe'], ' - ', $txt['recent_posts'], '</div>
-				<div class="entry-content" style="display: none;">
-					<a rel="feedurl" href="', $scripturl, '?action=.xml;type=webslice">', $txt['subscribe_webslice'], '</a>
-				</div>';
+				</h3>';
 
 	// Only show one post.
 	if ($settings['number_recent_posts'] == 1)
@@ -218,6 +214,7 @@ function template_ic_recent_posts()
 		// board (with an id, name, and link.), topic (the topic's id.), poster (with id, name, and link.),
 		// subject, short_subject (shortened with...), time, link, and href.
 		foreach ($context['latest_posts'] as $post)
+		{
 			echo '
 					<tr>
 						<td class="recentpost"><strong>', $post['link'], '</strong></td>
@@ -225,6 +222,7 @@ function template_ic_recent_posts()
 						<td class="recentboard">', $post['board']['link'], '</td>
 						<td class="recenttime">', $post['html_time'], '</td>
 					</tr>';
+		}
 
 		echo '
 				</table>';

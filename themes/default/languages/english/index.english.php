@@ -847,7 +847,7 @@ $txt['openid'] = 'OpenID';
 
 $txt['downloads'] = 'Downloads';
 $txt['filesize'] = 'File size';
-$txt['subscribe_webslice'] = 'Subscribe to Webslice';
+$txt['subscribe_webslice'] = 'Subscribe to Webslice'; // @deprecated since 1.1
 
 // Restore topic
 $txt['restore_topic'] = 'Restore Topic';
