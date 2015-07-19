@@ -238,6 +238,7 @@ class AdminSettings_Search
 			{
 				// an OOP controller: get the settings from the settings method.
 				$controller = new $setting_area[2]();
+				$controller->pre_dispatch();
 				$config_vars = $controller->{$setting_area[0]}();
 			}
 			else

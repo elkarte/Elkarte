@@ -1996,11 +1996,6 @@ class PersonalMessage_Controller extends Action_Controller
 
 		$searchArray = array_slice(array_unique($searchArray), 0, 10);
 
-		// Create an array of replacements for highlighting.
-		$context['mark'] = array();
-		foreach ($searchArray as $word)
-			$context['mark'][$word] = '<strong class="highlight">' . $word . '</strong>';
-
 		// This contains *everything*
 		$searchWords = array_merge($searchArray, $excludedWords);
 

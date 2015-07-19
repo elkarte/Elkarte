@@ -322,11 +322,6 @@ class Search_Controller extends Action_Controller
 		// This is used to remember words that will be ignored (because too short usually)
 		$context['search_ignored'] = $this->_search->getIgnored();
 
-		// Create an array of replacements for highlighting.
-		$context['mark'] = array();
-		foreach ($searchArray as $word)
-			$context['mark'][$word] = '<strong class="highlight">' . $word . '</strong>';
-
 		// Make sure at least one word is being searched for.
 		if (empty($searchArray))
 		{

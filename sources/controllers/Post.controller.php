@@ -1373,7 +1373,7 @@ class Post_Controller extends Action_Controller
 		// Call integrate_action_XYZ_before -> XYZ_controller -> integrate_action_XYZ_after
 		call_integration_hook('integrate_action_' . $hook . '_before', array('action_index'));
 
-		$result = $controller->$method();
+		$result = $controller->action_index();
 
 		call_integration_hook('integrate_action_' . $hook . '_after', array('action_index'));
 

@@ -807,7 +807,7 @@ class Admin_Controller extends Action_Controller
 		// Load a lot of language files.
 		$language_files = array(
 			'Help', 'ManageMail', 'ManageSettings', 'ManageBoards', 'ManagePaid', 'ManagePermissions', 'Search',
-			'Login', 'ManageSmileys', 'Maillist',
+			'Login', 'ManageSmileys', 'Maillist', 'Mentions'
 		);
 
 		// All the files we need to include.
@@ -820,7 +820,7 @@ class Admin_Controller extends Action_Controller
 			'ManagePosts.controller', 'ManageRegistration.controller', 'ManageSearch.controller',
 			'ManageSearchEngines.controller', 'ManageSecurity.controller', 'ManageServer.controller',
 			'ManageSmileys.controller', 'ManageTopics.controller', 'ManageMaillist.controller',
-			'ManageMembergroups.controller',
+			'ManageMembergroups.controller'
 		);
 
 		// This is a special array of functions that contain setting data
