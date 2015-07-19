@@ -321,6 +321,7 @@ class ManagePermissions_Controller extends Action_Controller
 		// The second list shows the post count based groups...if enabled
 		if (!empty($modSettings['permission_enable_postgroups']))
 		{
+			$_pid = isset($this->_pid) ? $this->_pid : null;
 			$listOptions = array(
 				'id' => 'post_count_membergroups_list',
 				'title' => $txt['membergroups_post'],
@@ -423,15 +424,15 @@ class ManagePermissions_Controller extends Action_Controller
 							'class' => 'grid17',
 						),
 						'data' => array(
-							'function' => function($rowData) {
+							'function' => function($rowData) use ($_pid) {
 								global $scripturl, $txt;
 
 								if ($rowData['id_parent'] == -2)
-										return '<a href="' . $scripturl . '?action=admin;area=permissions;sa=modify;group=' . $rowData['id_group'] . (isset($this->_pid) ? ';pid=' . $this->_pid : '') . '">' . $txt['membergroups_modify'] . '</a>';
+										return '<a href="' . $scripturl . '?action=admin;area=permissions;sa=modify;group=' . $rowData['id_group'] . (isset($_pid) ? ';pid=' . $_pid : '') . '">' . $txt['membergroups_modify'] . '</a>';
 									else
 										return '<span class="smalltext">' . $txt['permissions_includes_inherited_from'] . '&quot;' .  $rowData['parent_name'] . '&quot;</span>
 											<br />
-											<a href="' . $scripturl . '?action=admin;area=permissions;sa=modify;group=' . $rowData['id_parent'] . (isset($this->_pid) ? ';pid=' . $this->_pid : '') . '">' . $txt['membergroups_modify_parent'] . '</a>';
+											<a href="' . $scripturl . '?action=admin;area=permissions;sa=modify;group=' . $rowData['id_parent'] . (isset($_pid) ? ';pid=' . $_pid : '') . '">' . $txt['membergroups_modify_parent'] . '</a>';
 							}
 						),
 					),
