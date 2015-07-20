@@ -160,7 +160,7 @@ class News_Controller extends Action_Controller
 		}
 
 		// If format isn't set, rss2 is default
-		$xml_format = isset($_GET['type']) && in_array($_GET['type'], array('rss', 'rss2', 'atom', 'rdf', 'webslice')) ? $_GET['type'] : 'rss2';
+		$xml_format = isset($_GET['type']) && in_array($_GET['type'], array('rss', 'rss2', 'atom', 'rdf')) ? $_GET['type'] : 'rss2';
 
 		// List all the different types of data they can pull.
 		$subActions = array(
@@ -174,17 +174,6 @@ class News_Controller extends Action_Controller
 		call_integration_hook('integrate_xmlfeeds', array(&$subActions));
 
 		$subAction = isset($_GET['sa']) && isset($subActions[$_GET['sa']]) ? $_GET['sa'] : 'recent';
-
-		// Webslices doesn't do everything (yet? ever?) so for now only recent posts is allowed in that format
-		if ($xml_format == 'webslice' && $subAction != 'recent')
-			$xml_format = 'rss2';
-		// If this is webslices we kinda cheat - we allow a template that we call direct for the HTML, and we override the CDATA.
-		elseif ($xml_format == 'webslice')
-		{
-			$context['user'] += $user_info;
-			$cdata_override = true;
-			loadTemplate('Xml');
-		}
 
 		// We only want some information, not all of it.
 		$cachekey = array($xml_format, $_GET['action'], $this->_limit, $subAction);
@@ -224,7 +213,7 @@ class News_Controller extends Action_Controller
 
 		if (isset($_REQUEST['debug']))
 			header('Content-Type: text/xml; charset=UTF-8');
-		elseif ($xml_format == 'rss' || $xml_format == 'rss2' || $xml_format == 'webslice')
+		elseif ($xml_format == 'rss' || $xml_format == 'rss2')
 			header('Content-Type: application/rss+xml; charset=UTF-8');
 		elseif ($xml_format == 'atom')
 			header('Content-Type: application/atom+xml; charset=UTF-8');
@@ -238,12 +227,6 @@ class News_Controller extends Action_Controller
 		if ($xml_format == 'rss' || $xml_format == 'rss2')
 		{
 			$context['sub_template'] = 'feedrss';
-		}
-		elseif ($xml_format == 'webslice')
-		{
-			$context['can_pm_read'] = allowedTo('pm_read');
-
-			$context['sub_template'] = 'webslice';
 		}
 		elseif ($xml_format == 'atom')
 		{
