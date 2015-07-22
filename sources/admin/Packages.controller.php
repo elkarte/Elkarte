@@ -1276,26 +1276,8 @@ class Packages_Controller extends Action_Controller
 					'params' => array('type' => $type, 'installed' => $installed),
 				),
 				'base_href' => $scripturl . '?action=admin;area=packages;sa=' . $context['sub_action'] . ';type=' . $type,
-				'default_sort_col' => 'id' . $type,
+				'default_sort_col' => 'mod_name' . $type,
 				'columns' => array(
-					'id' . $type => array(
-						'header' => array(
-							'value' => $txt['package_id'],
-							'style' => 'width: 40px;',
-						),
-						'data' => array(
-							'function' => create_function('$package_md5', '
-								global $context;
-
-								if (isset($context[\'available_' . $type . '\'][$package_md5]))
-									return $context[\'available_' . $type . '\'][$package_md5][\'sort_id\'];
-							'),
-						),
-						'sort' => array(
-							'default' => 'sort_id',
-							'reverse' => 'sort_id'
-						),
-					),
 					'mod_name' . $type => array(
 						'header' => array(
 							'value' => $txt['mod_name'],
@@ -2367,13 +2349,10 @@ class Packages_Controller extends Action_Controller
 			closedir($dir);
 		}
 
-		if (isset($_GET['type']) && $_GET['type'] == $params)
-		{
-			if (isset($_GET['desc']))
-				krsort($packages[$params]);
-			else
-				ksort($packages[$params]);
-		}
+		if (isset($_GET['desc']))
+			krsort($packages[$params]);
+		else
+			ksort($packages[$params]);
 
 		return $packages[$params];
 	}

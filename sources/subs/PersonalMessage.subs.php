@@ -1837,8 +1837,7 @@ function loadConversationUnreadStatus($pms)
 	// Find any unread PM's this member has under these head pm id's
 	$request = $db->query('', '
 		SELECT
-			MAX(pm.id_pm) AS id_pm, pm.id_member_from, pm.deleted_by_sender, pm.id_pm_head,
-			pmr.id_member, pmr.deleted, pmr.is_read
+			MAX(pm.id_pm) AS id_pm, pm.id_pm_head
 		FROM {db_prefix}personal_messages AS pm
 			INNER JOIN {db_prefix}pm_recipients AS pmr ON (pmr.id_pm = pm.id_pm)
 		WHERE pm.id_pm_head IN ({array_int:id_pm_head})
