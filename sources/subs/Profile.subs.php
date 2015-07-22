@@ -708,8 +708,8 @@ function loadProfileFields($force_reload = false)
 			'options' => array(
 				$txt['receive_from_everyone'],
 				$txt['receive_from_ignore'],
-				$txt['receive_from_admins'],
 				$txt['receive_from_buddies'],
+				$txt['receive_from_admins'],
 			),
 			'subtext' => $txt['receive_from_description'],
 			'value' => empty($cur_profile['receive_from']) ? 0 : $cur_profile['receive_from'],
