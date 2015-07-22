@@ -418,7 +418,7 @@ function template_quickreply_below()
 							</dl>';
 
 		// Is visual verification enabled?
-		if ($context['require_verification'])
+		if (!empty($context['require_verification']))
 			template_verification_controls($context['visual_verification_id'], '
 							<strong>' . $txt['verification'] . ':</strong>', '<br />');
 
