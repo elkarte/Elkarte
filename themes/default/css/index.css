@@ -4653,7 +4653,7 @@ dl.no_members {
 	#moderationbuttons, a.linklevel1.button_strip_notify,
 	a.linklevel1.button_strip_print, a.linklevel1.button_strip_send, .inline_mod_check,
 	a.linklevel1.quotetonew_button, a.linklevel1.button_strip_post_poll,
-	a.linklevel1.post_options, .keyinfo .post_subject, li.listlevel1.quickmod_select_all,
+	.keyinfo .post_subject, li.listlevel1.quickmod_select_all,
 	#collapse_button, p.inline.membergroups {
 		display: none !important;
 	}
