@@ -466,14 +466,26 @@ class ManageFeatures_Controller extends Action_Controller
 				}
 			}
 
+			$to_save = $this->_cleanFaviconSettings();
+
 			updateSettings(array('enabled_mentions' => implode(',', array_unique($enabled_mentions)), 'notification_methods' => $notification_methods));
-			Settings_Form::save_db($config_vars, $this->_req->post);
+			Settings_Form::save_db($config_vars, $to_save);
 			redirectexit('action=admin;area=featuresettings;sa=mention');
 		}
 
 		// Prepare the settings for display
 		$context['post_url'] = $scripturl . '?action=admin;area=featuresettings;save;sa=mention';
 		Settings_Form::prepare_db($config_vars);
+	}
+
+	protected function _cleanFaviconSettings()
+	{
+		global $modSettings;
+
+		$post = $this->_req->post;
+
+		$favicon = new Favicon_Notification($modSettings);
+		return $favicon->validate($post);
 	}
 
 	/**
@@ -1449,12 +1461,16 @@ class ManageFeatures_Controller extends Action_Controller
 		global $txt, $modSettings;
 
 		loadLanguage('Profile');
+		loadLanguage('Notifications');
 
 		// The mentions settings
 		$config_vars = array(
 			array('title', 'mentions_settings'),
 				array('check', 'mentions_enabled'),
 		);
+
+		$favicon = new Favicon_Notification($modSettings);
+		$config_vars = $favicon->addConfig($config_vars);
 
 		$notification_methods = Notifications::getInstance()->getNotifiers();
 		$notification_types = getNotificationTypes();

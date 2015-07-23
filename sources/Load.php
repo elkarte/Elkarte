@@ -395,6 +395,12 @@ function loadUserSettings()
 	else
 		$user_info['query_wanna_see_board'] = '(' . $user_info['query_see_board'] . ' AND b.id_board NOT IN (' . implode(',', $user_info['ignoreboards']) . '))';
 
+	if (!empty($modSettings['faviconotif_enable']))
+	{
+		$favicon = new Favicon_Notification($modSettings);
+		$favicon->present();
+	}
+
 	call_integration_hook('integrate_user_info');
 }
 
