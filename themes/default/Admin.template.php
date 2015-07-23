@@ -1033,6 +1033,10 @@ function template_show_settings()
 				elseif ($config_var['type'] == 'var_message')
 					echo '
 							<div', !empty($config_var['name']) ? ' id="' . $config_var['name'] . '"' : '', '>', $config_var['var_message'], '</div>';
+				// Color picker?
+				elseif ($config_var['type'] == 'color')
+					echo '
+							<input type="color"', $javascript, $disabled, ' name="', $config_var['name'], '" id="', $config_var['name'], '" value="', $config_var['value'], '"', ($config_var['size'] ? ' size="' . $config_var['size'] . '"' : ''), ' class="input_text" />';
 				// Assume it must be a text box.
 				else
 					echo '
