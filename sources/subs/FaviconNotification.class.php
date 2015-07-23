@@ -115,7 +115,8 @@ class Favicon_Notification
 		$validator->validate($post);
 		foreach ($validation_rules as $key => $val)
 		{
-			if (empty($validator->validation_errors($key)))
+			$validation_errors = $validator->validation_errors($key);
+			if (empty($validation_errors))
 				$post[$key] = $validator->{$key};
 			else
 				$post[$key] = !empty($post[$key]) && isset($this->_modSettings[$key]) ? $this->_modSettings[$key] : '';
