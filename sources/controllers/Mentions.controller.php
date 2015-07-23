@@ -171,6 +171,12 @@ class Mentions_Controller extends Action_Controller
 	 */
 	public function action_index()
 	{
+		$req = HttpReq::instance();
+		if (isset($req->query->sa) && $req->query->sa == 'fetch')
+		{
+			return $this->action_fetch();
+		}
+
 		// default action to execute
 		$this->action_list();
 	}
@@ -332,6 +338,23 @@ class Mentions_Controller extends Action_Controller
 				'url' => $scripturl . '?action=mentions;type=' . $this->_type,
 				'name' => $txt['mentions_type_' . $this->_type],
 			);
+	}
+
+	public function action_fetch()
+	{
+		global $user_info, $context;
+
+		loadTemplate('Json');
+		$context['sub_template'] = 'send_json';
+		$template_layers = Template_Layers::getInstance();
+		$template_layers->removeAll();
+		require_once(SUBSDIR . '/Mentions.subs.php');
+
+		// We only know AJAX for this particular action
+		$context['json_data'] = array(
+			'mentions' => !empty($user_info['mentions']) ? $user_info['mentions'] : 0,
+			'timelast' => getTimeLastMention($user_info['id']),
+		);
 	}
 
 	/**

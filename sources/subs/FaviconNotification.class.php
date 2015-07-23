@@ -54,12 +54,14 @@ class Favicon_Notification
 		if (!empty($this->_modSettings['mentions_enabled']) && !empty($this->_modSettings['faviconotif_enable']) && !empty($user_info['mentions']))
 		{
 			addInlineJavascript('
+			var mentions;
 			$(document).ready(function() {
-				var mentions = new Favico({
+				mentions = new Favico({
 					fontStyle: \'bolder\',
 					animation: \'none\'' . (!empty($notif_opt) ? ',' . implode(',', $notif_opt) : '') . '
 				});
 				mentions.badge(' . $user_info['mentions'] . ');
+				elk_fetch_menstions();
 			});', true);
 		}
 	}

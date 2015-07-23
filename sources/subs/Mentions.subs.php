@@ -482,3 +482,20 @@ function updateMentionMenuCount($status, $member_id)
 	else
 		countUserMentions(false, '', $member_id);
 }
+
+function getTimeLastMention($id_member)
+{
+	$db = database();
+
+	list ($request) = $db->fetchQuery('
+		SELECT log_time
+		FROM {db_prefix}log_mentions
+		WHERE status = {int:status}
+		ORDER BY id_mention DESC
+		LIMIT 1',
+		array(
+			'status' => 0,
+		)
+	);
+	return $request['log_time'];
+}

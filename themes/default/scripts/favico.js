@@ -849,3 +849,39 @@
 	}
 
 })();
+
+/**
+ * @name      ElkArte Forum
+ * @copyright ElkArte Forum contributors
+ * @license   BSD http://opensource.org/licenses/BSD-3-Clause
+ *
+ * @version 1.1 dev
+ *
+ * This file contains the javascript to start the Favico class above with ElkArte data
+ */
+function elk_fetch_menstions(delay)
+{
+	var start = true;
+
+	if (typeof delay == 'undefined')
+	{
+		start = false;
+		delay = 10000;
+	}
+
+	if (start)
+	{
+		$.ajax({
+			url: elk_scripturl + "?action=mentions;sa=fetch;api=json",
+		})
+		.done(function(request) {
+			if (request.mentions > 0)
+			{
+				mentions.badge(request.mentions);
+			}
+			else
+				mentions.reset();
+		});
+	}
+	setTimeout('elk_fetch_menstions(' + delay + ')', delay);
+}
