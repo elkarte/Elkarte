@@ -167,6 +167,10 @@ class Display_Controller extends Action_Controller
 			}
 		}
 
+		// Did this user start the topic or not?
+		$context['user']['started'] = $user_info['id'] == $topicinfo['id_member_started'] && !$user_info['is_guest'];
+		$context['topic_starter_id'] = $topicinfo['id_member_started'];
+
 		$this->_events->trigger('topicinfo', array('topicinfo' => &$topicinfo, 'includeUnapproved' => $includeUnapproved));
 
 		// Add up unapproved replies to get real number of replies...
@@ -335,10 +339,6 @@ class Display_Controller extends Action_Controller
 		$context['is_approved'] = $topicinfo['approved'];
 
 		determineTopicClass($context);
-
-		// Did this user start the topic or not?
-		$context['user']['started'] = $user_info['id'] == $topicinfo['id_member_started'] && !$user_info['is_guest'];
-		$context['topic_starter_id'] = $topicinfo['id_member_started'];
 
 		// Set the topic's information for the template.
 		$context['subject'] = $topicinfo['subject'];
