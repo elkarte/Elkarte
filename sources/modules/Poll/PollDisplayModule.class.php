@@ -59,7 +59,7 @@ class Poll_Display_Module implements ElkArte\sources\modules\Module_Interface
 			'can_remove_poll' => 'poll_remove',
 		);
 		foreach ($anyown_permissions as $contextual => $perm)
-			$context[$contextual] = allowedTo($perm . '_any') || ($context['user']['started'] && allowedTo($perm . '_own'));
+			$context[$contextual] = allowedTo($perm . '_any') || (allowedTo($perm . '_own') && $context['user']['started']);
 
 		$context['can_add_poll'] &= self::$_enabled && $topicinfo['id_poll'] <= 0;
 		$context['can_remove_poll'] &= self::$_enabled && $topicinfo['id_poll'] > 0;
