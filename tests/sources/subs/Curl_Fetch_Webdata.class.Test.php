@@ -24,10 +24,10 @@ class TestCurl_Fetch_Webdata extends PHPUnit_Framework_TestCase
 				'all we know',
 			),
 			array(
-				'https://duckduckgo.com',
+				'https://duckduckgo.com/html',
 				array('q' => 'elkarte', 'ia' => 'about'),
 				200,
-				'Software description: development workspace for Elkarte',
+				'Software description: ElkArte Forum. A free, open source, PHP-based discussion forum (PHP).',
 			),
 		);
 
