@@ -56,7 +56,7 @@ $(document).ready(function() {
 	$(document).on('click', 'legend', function(){
 		$(this).siblings().slideToggle("fast");
 		$(this).parent().toggleClass("collapsed");
-	})
+	});
 	$(document).on('ready', 'legend', function () {
 		if ($(this).data('collapsed'))
 			$(this).click();
