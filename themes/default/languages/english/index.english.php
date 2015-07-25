@@ -349,6 +349,7 @@ $txt['members_list'] = 'Members List';
 $txt['new_posts'] = 'New Posts';
 $txt['old_posts'] = 'No New Posts';
 $txt['redirect_board'] = 'Redirect Board';
+$txt['redirect_board_to'] = 'Redirecting to %1$s';
 
 $txt['sendtopic_send'] = 'Send';
 $txt['report_sent'] = 'Your report has been sent successfully.';
