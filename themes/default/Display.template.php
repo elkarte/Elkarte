@@ -593,7 +593,13 @@ function template_quickreply_below()
 					sTemplateSubjectNormal: ', JavaScriptEscape('%subject%'), ',
 					sTemplateTopSubject: ', JavaScriptEscape($txt['topic'] . ': %subject% &nbsp;(' . $context['num_views_text'] . ')'), ',
 					sTemplateInfoNormal: ', JavaScriptEscape('<a href="' . $scripturl . '?topic=' . $context['current_topic'] . '.msg%msg_id%#msg%msg_id%" rel="nofollow">%subject%</a><span class="smalltext modified" id="modified_%msg_id%"></span>'), ($context['can_reply'] && !empty($options['display_quick_reply'])) ? ',
-					sFormRemoveAccessKeys: \'postmodify\'' : '', '
+					sFormRemoveAccessKeys: \'postmodify\'' : '', ',
+					funcOnAfterCreate: function () {
+						// Attach AtWho to the quick edit box
+						add_elk_mention(\'#quick_edit_body_container textarea\');
+						var i = all_elk_mentions.length - 1;
+						all_elk_mentions[i].oMention = new elk_mentions(all_elk_mentions[i].oOptions);
+					}
 				});
 
 				aIconLists[aIconLists.length] = new IconList({

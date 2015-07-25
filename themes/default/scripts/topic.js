@@ -536,7 +536,8 @@ QuickModify.prototype.modifyCancel = function ()
 QuickModify.prototype.modifySave = function (sSessionId, sSessionVar)
 {
 	var i = 0,
-		x = [];
+		x = [],
+		uIds = [];
 
 	// We cannot save if we weren't in edit mode.
 	if (!this.bInEditMode)
@@ -558,10 +559,21 @@ QuickModify.prototype.modifySave = function (sSessionId, sSessionVar)
 		}
 	}
 
+	var oInputs = document.forms.quickModForm.getElementsByTagName('input');
+	for (i = 0; i < oInputs.length; i++)
+	{
+		if (oInputs[i].name == 'uid[]')
+		{
+			uIds.push('uid[' + i + ']=' + parseInt(oInputs[i].value));
+		}
+	}
+
 	x[x.length] = 'subject=' + escape(document.forms.quickModForm.subject.value.replace(/&#/g, "&#38;#").php_to8bit()).replace(/\+/g, "%2B");
 	x[x.length] = 'message=' + escape(document.forms.quickModForm.message.value.replace(/&#/g, "&#38;#").php_to8bit()).replace(/\+/g, "%2B");
 	x[x.length] = 'topic=' + parseInt(document.forms.quickModForm.elements.topic.value);
 	x[x.length] = 'msg=' + parseInt(document.forms.quickModForm.elements.msg.value);
+	if (uIds.length > 0)
+		x[x.length] = uIds.join("&");
 
 	// Send in the XMLhttp request and let's hope for the best.
 	ajax_indicator(true);
