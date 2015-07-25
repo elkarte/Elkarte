@@ -135,12 +135,14 @@ function addMentions($member_from, $members_to, $msg, $type, $time = null, $stat
 		WHERE id_member IN ({array_int:members_to})
 			AND mention_type = {string:type}
 			AND id_member_from = {int:member_from}
-			AND id_msg = {int:msg}',
+			AND id_msg = {int:msg}
+			AND log_time = {int:log_time}',
 		array(
 			'members_to' => $members_to,
 			'type' => $type,
 			'member_from' => $member_from,
 			'msg' => $msg,
+			'log_time' => $time === null ? time() : $time,
 		)
 	);
 	$existing = array();
