@@ -476,6 +476,14 @@ QuickModify.prototype.onMessageReceived = function (XMLDoc)
 	// Position the editor in the window
 	location.hash = '#info_' + this.sCurMessageId.substr(this.sCurMessageId.lastIndexOf("_") + 1);
 
+	// Handle custom function hook before showing the new select.
+	if ('funcOnAfterCreate' in this.opt)
+	{
+		this.tmpMethod = this.opt.funcOnAfterCreate;
+		this.tmpMethod(this);
+		delete this.tmpMethod;
+	}
+
 	return true;
 };
 
