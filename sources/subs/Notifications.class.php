@@ -154,6 +154,7 @@ class Notifications extends AbstractModel
 		$obj = new $class($this->_db);
 		$obj->setTask($task);
 
+		require_once(SUBSDIR . '/Notification.subs.php');
 		$notification_frequencies = filterNotificationMethods($this->_notification_frequencies, $class::getType());
 
 		// Cleanup the list of members to notify,
