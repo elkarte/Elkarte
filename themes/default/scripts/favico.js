@@ -857,31 +857,52 @@
  *
  * @version 1.1 dev
  *
- * This file contains the javascript to start the Favico class above with ElkArte data
+ * This bits acts as middle-man between the Favico and the ElkNotifications
+ * providing the interface required by the latter.
  */
-function elk_fetch_menstions(delay)
-{
-	var start = true;
 
-	if (typeof delay == 'undefined')
-	{
-		start = false;
-		delay = 10000;
-	}
+(function() {
+	var ElkFavicon = (function(opt) {
+		'use strict';
+		opt = (opt) ? opt : {};
+		var mentions;
 
-	if (start)
-	{
-		$.ajax({
-			url: elk_scripturl + "?action=mentions;sa=fetch;api=json",
-		})
-		.done(function(request) {
+		var init = function(opt) {
+			mentions = new Favico(opt);
+			if (opt.number > 0)
+				mentions.badge(opt.number);
+		};
+
+		var send = function(request) {
 			if (request.mentions > 0)
 			{
 				mentions.badge(request.mentions);
 			}
 			else
+			{
 				mentions.reset();
+			}
+		};
+
+		init(opt);
+		return {
+			send: send
+		}
+	});
+
+	// AMD / RequireJS
+	if ( typeof define !== 'undefined' && define.amd) {
+		define([], function() {
+			return ElkFavicon;
 		});
 	}
-	setTimeout('elk_fetch_menstions(' + delay + ')', delay);
-}
+	// CommonJS
+	else if ( typeof module !== 'undefined' && module.exports) {
+		module.exports = ElkFavicon;
+	}
+	// included directly via <script> tag
+	else {
+		this.ElkFavicon = ElkFavicon;
+	}
+
+})();

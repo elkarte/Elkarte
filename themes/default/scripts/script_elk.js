@@ -1445,3 +1445,73 @@ function disableAutoComplete()
 		}, 1);
 	};
 }
+
+/**
+ * A sistem to collect notifications from a single AJAX call and redistribute them
+ * among notifiers
+ */
+(function() {
+	var ElkNotifications = (function(opt) {
+		'use strict';
+		opt = (opt) ? opt : {};
+		var _notifiers = [],
+			start = true;
+
+		var init = function(opt) {
+			if (typeof opt.delay == 'undefined')
+			{
+				start = false;
+				opt.delay = 10000;
+			}
+
+			setTimeout(function() {
+				fetch();
+			}, opt.delay);
+		};
+
+		var add = function(notif) {
+			_notifiers.push(notif);
+		};
+
+		var send = function(request) {
+			for (var i = 0; i < _notifiers.length; i++) {
+				_notifiers[i].send(request);
+			}
+		};
+
+		var fetch = function() {
+			$.ajax({
+				url: elk_scripturl + "?action=mentions;sa=fetch;api=json",
+			})
+			.done(function(request) {
+				send(request);
+
+				setTimeout(function() {
+					fetch();
+				}, opt.delay);
+			});
+		};
+
+		init(opt);
+		return {
+			add: add
+		}
+	});
+
+	// AMD / RequireJS
+	if ( typeof define !== 'undefined' && define.amd) {
+		define([], function() {
+			return ElkNotifications;
+		});
+	}
+	// CommonJS
+	else if ( typeof module !== 'undefined' && module.exports) {
+		module.exports = ElkNotifications;
+	}
+	// included directly via <script> tag
+	else {
+		this.ElkNotifications = ElkNotifications;
+	}
+
+})();
+var ElkNotifier = new ElkNotifications();

@@ -59,13 +59,11 @@ class Favicon_Notification
 		addInlineJavascript('
 			var mentions;
 			$(document).ready(function() {
-				mentions = new Favico({
+				ElkNotifier.add(new ElkFavicon({
+					number: ' . $number . ',
 					fontStyle: \'bolder\',
 					animation: \'none\'' . (!empty($notif_opt) ? ',' . implode(',', $notif_opt) : '') . '
-				});
-				if (' . $number . ' > 0)
-					mentions.badge(' . $number . ');
-				elk_fetch_menstions();
+				}));
 			});', true);
 	}
 
