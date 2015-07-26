@@ -1,7 +1,9 @@
 <?php
 
 /**
- * Show number of notifications in the favicon.
+ * Notifies the user about mentions and alike.
+ * The version provided shows the number of notifications in the favicon
+ * and sends a desktop notification if a new notification is present.
  *
  * @name      ElkArte Forum
  * @copyright ElkArte Forum contributors
@@ -11,7 +13,7 @@
  *
  */
 
-class Favicon_Notification
+class User_Notification
 {
 	protected $_valid_types = array(
 		'circle',
@@ -28,12 +30,27 @@ class Favicon_Notification
 	{
 		$this->_modSettings = $modSettings;
 
-		loadLanguage('Faviconotif');
+		loadLanguage('UserNotifications');
 	}
 
 	public function present()
 	{
 		global $user_info;
+
+		if (!empty($this->_modSettings['usernotif_favicon_enable']))
+		{
+			$this->_addFaviconNumbers($user_info['mentions']);
+		}
+
+		if (!empty($this->_modSettings['usernotif_desktop_enable']))
+		{
+			$this->_addDesktopNotifications();
+		}
+	}
+
+	protected function _addFaviconNumbers($number)
+	{
+		call_integration_hook('integrate_adjust_favicon_number', array(&$number));
 
 		loadJavascriptFile('favico.js');
 
@@ -53,9 +70,6 @@ class Favicon_Notification
 			}
 		}
 
-		$number = $user_info['mentions'];
-		call_integration_hook('integrate_adjust_favicon_number', array(&$number));
-
 		addInlineJavascript('
 			$(document).ready(function() {
 				ElkNotifier.add(new ElkFavicon({
@@ -64,15 +78,16 @@ class Favicon_Notification
 					animation: \'none\'' . (!empty($notif_opt) ? ',' . implode(',', $notif_opt) : '') . '
 				}));
 			});', true);
+	}
 
-		if (!empty($this->_modSettings['usernotif_desktop_enable']))
-		{
-			loadJavascriptFile('desktop-notify.js');
-			addInlineJavascript('
-				$(document).ready(function() {
-					ElkNotifier.add(new ElkDesktop());
-				});', true);
-		}
+	protected function _addDesktopNotifications()
+	{
+		$this->_addDesktopNotifications();
+		loadJavascriptFile('desktop-notify.js');
+		addInlineJavascript('
+			$(document).ready(function() {
+				ElkNotifier.add(new ElkDesktop());
+			});', true);
 	}
 
 	protected function settingExists($key)

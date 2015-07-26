@@ -1451,7 +1451,7 @@ class ManageFeatures_Controller extends Action_Controller
 		global $txt, $modSettings;
 
 		loadLanguage('Profile');
-		loadLanguage('Notifications');
+		loadLanguage('UserNotifications');
 
 		// The mentions settings
 		$config_vars = array(
