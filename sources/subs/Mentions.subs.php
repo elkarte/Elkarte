@@ -491,10 +491,12 @@ function getTimeLastMention($id_member)
 		SELECT log_time
 		FROM {db_prefix}log_mentions
 		WHERE status = {int:status}
+			AND id_member = {int:member}
 		ORDER BY id_mention DESC
 		LIMIT 1',
 		array(
 			'status' => 0,
+			'member' => $id_member
 		)
 	);
 	return $request['log_time'];
