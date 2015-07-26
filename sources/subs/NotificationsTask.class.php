@@ -59,9 +59,9 @@ class Notifications_Task extends \ElkArte\ValuesContainer
 			$this->data['source_data']['status'] = 'new';
 
 		if (isset($this->data['source_data']['id_members']))
-			$this->data['source_data']['id_members'] = (array) $this->data['source_data']['id_members'];
+			$this->setMembers($this->data['source_data']['id_members']);
 		else
-			$this->data['source_data']['id_members'] = array();
+			$this->setMembers(array());
 	}
 
 	/**
