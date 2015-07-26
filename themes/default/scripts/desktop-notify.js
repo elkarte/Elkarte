@@ -211,7 +211,7 @@
  *
  * @version 1.1 dev
  *
- * This bits acts as middle-man between the Favico and the ElkNotifications
+ * This bits acts as middle-man between the notify (above) and the ElkNotifications
  * providing the interface required by the latter.
  */
 
