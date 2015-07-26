@@ -2099,6 +2099,38 @@ class Post_Controller extends Action_Controller
 
 		if (!$post_errors->hasErrors())
 		{
+			if (!empty($modSettings['mentions_enabled']))
+			{
+				if (!empty($_REQUEST['uid']))
+				{
+					$query_params = array();
+					$query_params['member_ids'] = array_unique(array_map('intval', $_REQUEST['uid']));
+					require_once(SUBSDIR . '/Members.subs.php');
+					$mentioned_members = membersBy('member_ids', $query_params, true);
+					$replacements = 0;
+					$actually_mentioned = array();
+					foreach ($mentioned_members as $member)
+					{
+						$_POST['message'] = str_replace('@' . $member['real_name'], '[member=' . $member['id_member'] . ']' . $member['real_name'] . '[/member]', $_POST['message'], $replacements);
+						if ($replacements > 0)
+							$actually_mentioned[] = $member['id_member'];
+					}
+				}
+
+				if (!empty($actually_mentioned))
+				{
+					require_once(CONTROLLERDIR . '/Mentions.controller.php');
+					$mentions = new Mentions_Controller();
+					$mentions->setData(array(
+						'id_member' => $actually_mentioned,
+						'type' => 'men',
+						'id_msg' => $row['id_msg'],
+						'status' => $row['approved'] ? 'new' : 'unapproved',
+					));
+					$mentions->action_add();
+				}
+			}
+
 			$msgOptions = array(
 				'id' => $row['id_msg'],
 				'subject' => isset($_POST['subject']) ? $_POST['subject'] : null,

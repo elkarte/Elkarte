@@ -43,7 +43,12 @@
 
 				// Set the subAction to what they are doing
 				if (check.indexOf('unlike_button') >= 0)
+				{
+					if (!confirm(likemsg_are_you_sure))
+						return;
+
 					subAction = 'unlikepost';
+				}
 				else
 					subAction = 'likepost';
 

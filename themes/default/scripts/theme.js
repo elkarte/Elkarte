@@ -53,10 +53,11 @@ $(document).ready(function() {
 	$('.expand_pages').expand_pages();
 
 	// Collapsabile fieldsets, pure candy
-	$('legend').click(function(){
+	$(document).on('click', 'legend', function(){
 		$(this).siblings().slideToggle("fast");
 		$(this).parent().toggleClass("collapsed");
-	}).each(function () {
+	});
+	$(document).on('ready', 'legend', function () {
 		if ($(this).data('collapsed'))
 			$(this).click();
 	});
