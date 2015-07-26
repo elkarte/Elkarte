@@ -15,10 +15,21 @@
 
 class User_Notification
 {
+	/**
+	 * All the shapes the icon can be.
+	 *
+	 * @var string[]
+	 */
 	protected $_valid_types = array(
 		'circle',
 		'rectangle',
 	);
+
+	/**
+	 * The positions the icon can be placed at.
+	 *
+	 * @var string[]
+	 */
 	protected $_valid_positions = array(
 		'up',
 		'down',
@@ -26,6 +37,11 @@ class User_Notification
 		'upleft',
 	);
 
+	/**
+	 * Construct, just load the language file.
+	 *
+	 * @param mixed[] $modSettings
+	 */
 	public function __construct($modSettings)
 	{
 		$this->_modSettings = $modSettings;
@@ -33,6 +49,9 @@ class User_Notification
 		loadLanguage('UserNotifications');
 	}
 
+	/**
+	 * Loads up the needed interfaces (favicon or desktop notifications).
+	 */
 	public function present()
 	{
 		global $user_info;
@@ -48,6 +67,11 @@ class User_Notification
 		}
 	}
 
+	/**
+	 * Prepares the javascript for adding the nice number to the favicon.
+	 *
+	 * @param int $number the number to show
+	 */
 	protected function _addFaviconNumbers($number)
 	{
 		call_integration_hook('integrate_adjust_favicon_number', array(&$number));
@@ -80,6 +104,9 @@ class User_Notification
 			});', true);
 	}
 
+	/**
+	 * Prepares the javascript for desktop notifications.
+	 */
 	protected function _addDesktopNotifications()
 	{
 		$this->_addDesktopNotifications();
@@ -90,11 +117,22 @@ class User_Notification
 			});', true);
 	}
 
+	/**
+	 * Validates if a setting exists.
+	 * @todo Really needed?
+	 *
+	 * @param string $key modSettings key
+	 */
 	protected function settingExists($key)
 	{
 		return isset($this->_modSettings[$key]) && $this->_modSettings[$key] !== '';
 	}
 
+	/**
+	 * Returns the configurations for the feature.
+	 *
+	 * @return mixed[]
+	 */
 	public function addConfig()
 	{
 		global $txt;
@@ -127,6 +165,11 @@ class User_Notification
 		return $config_vars;
 	}
 
+	/**
+	 * Validates the input when saving the settings.
+	 *
+	 * @param mixed[] $post An array containing the settings (usually $_POST)
+	 */
 	public function validate($post)
 	{
 		$validator = new Data_Validator();

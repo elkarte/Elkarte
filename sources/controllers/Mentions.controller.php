@@ -340,6 +340,11 @@ class Mentions_Controller extends Action_Controller
 			);
 	}
 
+	/**
+	 * Fetches number of notifications and number of recently added ones for use
+	 * in favicon and desktop notifications.
+	 * @todo probably should be placed somewhere else.
+	 */
 	public function action_fetch()
 	{
 		global $user_info, $context, $txt;
