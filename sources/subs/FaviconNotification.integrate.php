@@ -17,7 +17,7 @@ class Favicon_Notification_Integrate
 	{
 		global $modSettings;
 
-		if (empty($modSettings['faviconotif_enable']))
+		if (empty($modSettings['usernotif_favicon_enable']))
 			return array();
 
 		// $hook, $function, $file

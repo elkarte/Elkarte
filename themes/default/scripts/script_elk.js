@@ -1455,7 +1455,8 @@ function disableAutoComplete()
 		'use strict';
 		opt = (opt) ? opt : {};
 		var _notifiers = [],
-			start = true;
+			start = true,
+			lastTime = 0;
 
 		var init = function(opt) {
 			if (typeof opt.delay == 'undefined')
@@ -1481,10 +1482,11 @@ function disableAutoComplete()
 
 		var fetch = function() {
 			$.ajax({
-				url: elk_scripturl + "?action=mentions;sa=fetch;api=json",
+				url: elk_scripturl + "?action=mentions;sa=fetch;api=json;lastsent=" + lastTime,
 			})
 			.done(function(request) {
 				send(request);
+				lastTime = request.timelast;
 
 				setTimeout(function() {
 					fetch();

@@ -342,7 +342,7 @@ class Mentions_Controller extends Action_Controller
 
 	public function action_fetch()
 	{
-		global $user_info, $context;
+		global $user_info, $context, $txt;
 
 		loadTemplate('Json');
 		$context['sub_template'] = 'send_json';
@@ -350,11 +350,23 @@ class Mentions_Controller extends Action_Controller
 		$template_layers->removeAll();
 		require_once(SUBSDIR . '/Mentions.subs.php');
 
+		$lastsent = isset($_GET['lastsent']) ? (int) $_GET['lastsent'] : 0;
+		if (empty($lastsent) && !empty($_SESSION['notifications_lastseen']))
+			$lastsent = (int) $_SESSION['notifications_lastseen'];
+
 		// We only know AJAX for this particular action
 		$context['json_data'] = array(
 			'mentions' => !empty($user_info['mentions']) ? $user_info['mentions'] : 0,
 			'timelast' => getTimeLastMention($user_info['id']),
+			'desktop_notifications' => array(
+				'new_from_last' => getNewMentions($user_info['id'], $lastsent),
+				'title' => sprintf($txt['forum_notification'], $context['forum_name']),
+				'dbg' => $lastsent,
+			)
 		);
+		$_SESSION['notifications_lastseen'] = $context['json_data']['timelast'];
+
+		$context['json_data']['desktop_notifications']['message'] = sprintf($txt[$lastsent == 0 ? 'unread_notifications' : 'new_from_last_notifications'], $context['json_data']['desktop_notifications']['new_from_last']);
 	}
 
 	/**

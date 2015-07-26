@@ -501,3 +501,39 @@ function getTimeLastMention($id_member)
 	);
 	return $request['log_time'];
 }
+
+function getNewMentions($id_member, $timestamp)
+{
+	$db = database();
+
+	if (empty($timestamp))
+	{
+		list ($result) = $db->fetchQuery('
+			SELECT COUNT(*) AS c
+			FROM {db_prefix}log_mentions
+			WHERE status = {int:status}
+				AND id_member = {int:member}',
+			array(
+				'status' => 0,
+				'member' => $id_member
+			)
+		);
+	}
+	else
+	{
+		list ($result) = $db->fetchQuery('
+			SELECT COUNT(*) AS c
+			FROM {db_prefix}log_mentions
+			WHERE status = {int:status}
+				AND log_time > {int:last_seen}
+				AND id_member = {int:member}',
+			array(
+				'status' => 0,
+				'last_seen' => $timestamp,
+				'member' => $id_member
+			)
+		);
+	}
+
+	return $result['c'];
+}

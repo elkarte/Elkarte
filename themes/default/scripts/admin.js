@@ -1748,7 +1748,7 @@ function ajax_getCensorPreview()
 }
 
 $(document).ready(function() {
-	var $headers = $("#mention dd:nth-child(2) input");
+	var $headers = $("#mention input[id^='notifications'][id$='[notification]']");
 
 	$headers.change(function() {
 		var $top = $(this).closest('dl'),

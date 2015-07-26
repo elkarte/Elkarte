@@ -877,6 +877,7 @@
 			if (request.mentions > 0)
 			{
 				mentions.badge(request.mentions);
+				$('#button_mentions .pm_indicator').html(request.mentions);
 			}
 			else
 			{

@@ -39,17 +39,17 @@ class Favicon_Notification
 
 		$notif_opt = array();
 		$rules = array(
-			'faviconotif_bgColor',
-			'faviconotif_textColor',
-			'faviconotif_type',
-			'faviconotif_position',
+			'usernotif_favicon_bgColor',
+			'usernotif_favicon_textColor',
+			'usernotif_favicon_type',
+			'usernotif_favicon_position',
 		);
 		foreach ($rules as $key)
 		{
 			if ($this->settingExists($key))
 			{
 				$notif_opt[] = '
-					' . JavaScriptEscape(str_replace('faviconotif_', '', $key)) . ': ' . JavaScriptEscape($this->_modSettings[$key]);
+					' . JavaScriptEscape(str_replace('usernotif_favicon_', '', $key)) . ': ' . JavaScriptEscape($this->_modSettings[$key]);
 			}
 		}
 
@@ -57,7 +57,6 @@ class Favicon_Notification
 		call_integration_hook('integrate_adjust_favicon_number', array(&$number));
 
 		addInlineJavascript('
-			var mentions;
 			$(document).ready(function() {
 				ElkNotifier.add(new ElkFavicon({
 					number: ' . $number . ',
@@ -65,6 +64,15 @@ class Favicon_Notification
 					animation: \'none\'' . (!empty($notif_opt) ? ',' . implode(',', $notif_opt) : '') . '
 				}));
 			});', true);
+
+		if (!empty($this->_modSettings['usernotif_desktop_enable']))
+		{
+			loadJavascriptFile('desktop-notify.js');
+			addInlineJavascript('
+				$(document).ready(function() {
+					ElkNotifier.add(new ElkDesktop());
+				});', true);
+		}
 	}
 
 	protected function settingExists($key)
@@ -78,27 +86,28 @@ class Favicon_Notification
 
 		$types = array();
 		foreach ($this->_valid_types as $val)
-			$types[$val] = $txt['faviconotif_shape_' . $val];
+			$types[$val] = $txt['usernotif_favicon_shape_' . $val];
 		$positions = array();
 		foreach ($this->_valid_positions as $val)
-			$positions[$val] = $txt['faviconotif_' . $val];
+			$positions[$val] = $txt['usernotif_favicon_' . $val];
 
 		$config_vars = array(
-			array('title', 'faviconotif_title'),
-			array('check', 'faviconotif_enable'),
+			array('title', 'usernotif_title'),
+			array('check', 'usernotif_desktop_enable'),
+			array('check', 'usernotif_favicon_enable'),
 		);
 		$config_vars[] = array(
 			'select',
-			'faviconotif_type',
+			'usernotif_favicon_type',
 			$types
 		);
 		$config_vars[] = array(
 			'select',
-			'faviconotif_position',
+			'usernotif_favicon_position',
 			$positions
 		);
-		$config_vars[] = array('color', 'faviconotif_bgColor');
-		$config_vars[] = array('color', 'faviconotif_textColor');
+		$config_vars[] = array('color', 'usernotif_favicon_bgColor');
+		$config_vars[] = array('color', 'usernotif_favicon_textColor');
 
 		return $config_vars;
 	}
@@ -107,10 +116,10 @@ class Favicon_Notification
 	{
 		$validator = new Data_Validator();
 		$validation_rules = array(
-			'faviconotif_bgColor' => 'valid_color',
-			'faviconotif_textColor' => 'valid_color',
-			'faviconotif_type' => 'contains[' . implode(',', $this->_valid_types) . ']',
-			'faviconotif_position' => 'contains[' . implode(',', $this->_valid_positions) . ']',
+			'usernotif_favicon_bgColor' => 'valid_color',
+			'usernotif_favicon_textColor' => 'valid_color',
+			'usernotif_favicon_type' => 'contains[' . implode(',', $this->_valid_types) . ']',
+			'usernotif_favicon_position' => 'contains[' . implode(',', $this->_valid_positions) . ']',
 		);
 
 		// Cleanup the inputs! :D
