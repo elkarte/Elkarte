@@ -1,12 +1,14 @@
 <?php
 
 /**
- * Favicon notifications
+ * Show number of notifications in the favicon.
  *
- * @author emanuele
+ * @name      ElkArte Forum
+ * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
- * @version 0.0.1
+ * @version 1.1 dev
+ *
  */
 
 class Favicon_Notification
@@ -51,19 +53,20 @@ class Favicon_Notification
 			}
 		}
 
-		if (!empty($this->_modSettings['mentions_enabled']) && !empty($this->_modSettings['faviconotif_enable']) && !empty($user_info['mentions']))
-		{
-			addInlineJavascript('
+		$number = $user_info['mentions'];
+		call_integration_hook('integrate_adjust_favicon_number', array(&$number));
+
+		addInlineJavascript('
 			var mentions;
 			$(document).ready(function() {
 				mentions = new Favico({
 					fontStyle: \'bolder\',
 					animation: \'none\'' . (!empty($notif_opt) ? ',' . implode(',', $notif_opt) : '') . '
 				});
-				mentions.badge(' . $user_info['mentions'] . ');
+				if (' . $number . ' > 0)
+					mentions.badge(' . $number . ');
 				elk_fetch_menstions();
 			});', true);
-		}
 	}
 
 	protected function settingExists($key)
@@ -71,7 +74,7 @@ class Favicon_Notification
 		return isset($this->_modSettings[$key]) && $this->_modSettings[$key] !== '';
 	}
 
-	public function addConfig($config_vars)
+	public function addConfig()
 	{
 		global $txt;
 
@@ -82,8 +85,10 @@ class Favicon_Notification
 		foreach ($this->_valid_positions as $val)
 			$positions[$val] = $txt['faviconotif_' . $val];
 
-		$config_vars[] = array('title', 'faviconotif_title');
-		$config_vars[] = array('check', 'faviconotif_enable');
+		$config_vars = array(
+			array('title', 'faviconotif_title'),
+			array('check', 'faviconotif_enable'),
+		);
 		$config_vars[] = array(
 			'select',
 			'faviconotif_type',
