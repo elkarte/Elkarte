@@ -22,13 +22,13 @@
 #admin_content .windowbg, #admin_content .windowbg2 {
 	margin-bottom: 5px;
 }
-#admincenter {
+.admincenter {
 	overflow: auto;
 }
-#admincenter .content {
+.admincenter .content {
 	padding: 12px;
 }
-#admincenter .content .settings {
+.admincenter .content .settings {
 	padding: 0 0 0 8px;
 }
 
@@ -163,7 +163,7 @@ fieldset dl {
 	margin: 8px 0 0 0;
 }
 /* @todo - The welcome thingy. */
-#admincenter .roundframe, #modcenter .roundframe {
+.admincenter .roundframe, #modcenter .roundframe {
 	background: none;
 	border: none;
 	box-shadow: none;

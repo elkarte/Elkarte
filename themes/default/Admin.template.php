@@ -843,7 +843,7 @@ function template_show_settings()
 		echo $context['settings_insert_above'];
 
 	echo '
-	<div id="admincenter">
+	<div id="', isset($context['current_subaction']) ? $context['current_subaction'] : 'admincenter', '" class="admincenter">
 		<form id="admin_form_wrapper" action="', $context['post_url'], '" method="post" accept-charset="UTF-8"', !empty($context['force_form_onsubmit']) ? ' onsubmit="' . $context['force_form_onsubmit'] . '"' : '', '>';
 
 	// Is there a custom title, maybe even with an icon?
@@ -923,7 +923,7 @@ function template_show_settings()
 		{
 			$is_open = true;
 			echo '
-			<div ', isset($context['current_subaction']) ? 'id="' . $context['current_subaction'] . '" ' : '', 'class="windowbg2">
+			<div class="windowbg2">
 				<div class="content">
 					<dl class="settings">';
 		}

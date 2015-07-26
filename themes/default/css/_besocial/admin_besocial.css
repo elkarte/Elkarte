@@ -12,10 +12,10 @@
 #support_resources, #credits_sections {
 	margin: 0;
 }
-#manage_boards, #admincenter, h3 + .infobox {
+#manage_boards, .admincenter, h3 + .infobox {
 	margin-top: 12px;
 }
-#admincenter>#admin_form_wrapper {
+.admincenter>#admin_form_wrapper {
 	margin-top: 0;
 }
 

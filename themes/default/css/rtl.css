@@ -1039,7 +1039,7 @@ div.labels {
 	margin: 1px -25px 0 0 !important;
     position: absolute !important;
 }
-#admincenter .content .settings {
+.admincenter .content .settings {
     padding: 0 8px 0 0 !important;
 }
 
