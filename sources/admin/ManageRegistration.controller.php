@@ -235,7 +235,7 @@ class ManageRegistration_Controller extends Action_Controller
 			}
 		}
 
-		if (isset($_POST['agreement']))
+		if (isset($_POST['save']) && isset($_POST['agreement']))
 		{
 			checkSession();
 			validateToken('admin-rega');
