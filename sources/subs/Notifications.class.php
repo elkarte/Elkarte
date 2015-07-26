@@ -322,8 +322,11 @@ class Notifications extends AbstractModel
 			if (isset($this->_notification_frequencies[1]))
 				$notification_types[$this->_notification_frequencies[1]][] = $member;
 
-			if (isset($this->_notification_frequencies[$this_pref]) && isset($notification_types[$this->_notification_frequencies[$this_pref]]))
-				$notification_types[$this->_notification_frequencies[$this_pref]][] = $member;
+			if ($this_pref > 1)
+			{
+				if (isset($this->_notification_frequencies[$this_pref]) && isset($notification_types[$this->_notification_frequencies[$this_pref]]))
+					$notification_types[$this->_notification_frequencies[$this_pref]][] = $member;
+			}
 		}
 
 		return $notification_types;
