@@ -859,13 +859,14 @@ div.bbc_footnotes .meaction{
 	border-top: 1px solid #bbb;
 	background-image: linear-gradient(to bottom, #fcfcfc 0%, #e5e5e5 100%);
 	color: #555;
+	box-shadow: 1px 1px 2px #E5E5E5;
 }
 .pagelinks .navPages:hover, .pagelinks .current_page {
 	border: 1px solid #ccc;
 	border-top: 1px solid #afafaf;
 	border-left: 1px solid #afafaf;
 	background: #f0f0f0;
-	box-shadow: 2px 1px 1px rgba(0,0,0,0.07) inset;
+	box-shadow:  1px 1px 2px #E5E5E5, 2px 1px 1px rgba(0,0,0,0.07) inset;
 	/* @todo - Simplify. */
 	color: #555;
 	text-decoration: none;
