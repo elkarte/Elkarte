@@ -561,7 +561,7 @@ class Settings_Form
 			elseif ($var[0] == 'float')
 				$setArray[$var[1]] = (float) $_POST[$var[1]];
 			// Text!
-			elseif ($var[0] == 'text' || $var[0] == 'large_text')
+			elseif ($var[0] == 'text' || $var[0] == 'color' || $var[0] == 'large_text')
 			{
 				if (isset($var['mask']))
 				{

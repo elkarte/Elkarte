@@ -482,3 +482,73 @@ function updateMentionMenuCount($status, $member_id)
 	else
 		countUserMentions(false, '', $member_id);
 }
+
+/**
+ * Retrieves the time the last notification of a certain member was added.
+ *
+ * @package Mentions
+ * @param int $id_member
+ * @return int A timestamp (log_time)
+ */
+function getTimeLastMention($id_member)
+{
+	$db = database();
+
+	list ($request) = $db->fetchQuery('
+		SELECT log_time
+		FROM {db_prefix}log_mentions
+		WHERE status = {int:status}
+			AND id_member = {int:member}
+		ORDER BY id_mention DESC
+		LIMIT 1',
+		array(
+			'status' => 0,
+			'member' => $id_member
+		)
+	);
+	return $request['log_time'];
+}
+
+/**
+ * Counts all the notifications received by a certain member after a certain time.
+ *
+ * @package Mentions
+ * @param int $id_member
+ * @param int $timestamp
+ * @return int Number of new mentions
+ */
+function getNewMentions($id_member, $timestamp)
+{
+	$db = database();
+
+	if (empty($timestamp))
+	{
+		list ($result) = $db->fetchQuery('
+			SELECT COUNT(*) AS c
+			FROM {db_prefix}log_mentions
+			WHERE status = {int:status}
+				AND id_member = {int:member}',
+			array(
+				'status' => 0,
+				'member' => $id_member
+			)
+		);
+	}
+	else
+	{
+		list ($result) = $db->fetchQuery('
+			SELECT COUNT(*) AS c
+			FROM {db_prefix}log_mentions
+			WHERE status = {int:status}
+				AND log_time > {int:last_seen}
+				AND id_member = {int:member}',
+			array(
+				'status' => 0,
+				'last_seen' => $timestamp,
+				'member' => $id_member
+			)
+		);
+	}
+
+	return $result['c'];
+}

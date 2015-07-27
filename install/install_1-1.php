@@ -2434,9 +2434,6 @@ class InstallInstructions_install_1_1
 				array('visual_verification_num_chars', '6'),
 				array('enable_buddylist', '1'),
 				array('birthday_email', 'happy_birthday'),
-				array('dont_repeat_theme_core', '1'),
-				array('dont_repeat_smileys_20', '1'),
-				array('dont_repeat_buddylists', '1'),
 				array('attachment_image_reencode', '1'),
 				array('attachment_image_paranoid', '0'),
 				array('attachment_thumb_png', '1'),
@@ -2453,6 +2450,11 @@ class InstallInstructions_install_1_1
 				array('badbehavior_url_wl', 'a:1:{i:0;s:18:"/subscriptions.php";}'),
 				array('badbehavior_url_wl_desc', 'a:1:{i:0;s:15:"Payment Gateway";}'),
 				array('notification_methods', 'a:4:{s:5:"buddy";a:4:{s:12:"notification";s:1:"1";s:5:"email";s:1:"1";s:11:"email_daily";s:1:"1";s:12:"email_weekly";s:1:"1";}s:7:"likemsg";a:1:{s:12:"notification";s:1:"1";}s:10:"mentionmem";a:4:{s:12:"notification";s:1:"1";s:5:"email";s:1:"1";s:11:"email_daily";s:1:"1";s:12:"email_weekly";s:1:"1";}s:9:"quotedmem";a:4:{s:12:"notification";s:1:"1";s:5:"email";s:1:"1";s:11:"email_daily";s:1:"1";s:12:"email_weekly";s:1:"1";}}'),
+				array('autoload_integrate', 'User_Notification_Integrate'),
+				array('usernotif_favicon_bgColor', '#ff0000'),
+				array('usernotif_favicon_position', 'up'),
+				array('usernotif_favicon_textColor', '#ffff00'),
+				array('usernotif_favicon_type', 'circle'),
 			),
 			array('variable')
 		);

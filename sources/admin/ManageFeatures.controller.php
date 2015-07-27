@@ -413,6 +413,8 @@ class ManageFeatures_Controller extends Action_Controller
 		{
 			checkSession();
 
+			call_integration_hook('integrate_save_modify_mention_settings', array(&$config_vars));
+
 			if (empty($this->_req->post->notifications))
 				$notification_methods = serialize(array());
 			else
@@ -1449,6 +1451,7 @@ class ManageFeatures_Controller extends Action_Controller
 		global $txt, $modSettings;
 
 		loadLanguage('Profile');
+		loadLanguage('UserNotifications');
 
 		// The mentions settings
 		$config_vars = array(

@@ -245,6 +245,13 @@ class UpgradeInstructions_upgrade_1_1
 					enableModules('poll', array('display', 'post'));
 					enableModules('verification', array('post', 'personalmessage', 'register'));
 					enableModules('random', array('post', 'display'));
+					Hooks::get()->enableIntegration('User_Notification_Integrate');
+					updateSettings(array(
+						'usernotif_favicon_bgColor' => '#ff0000',
+						'usernotif_favicon_position' => 'up',
+						'usernotif_favicon_textColor' => '#ffff00',
+						'usernotif_favicon_type' => 'circle',
+					));
 				}
 			)
 		);
@@ -289,6 +296,8 @@ class UpgradeInstructions_upgrade_1_1
 						array(),
 						'ignore'
 					);
+
+					updateSettings(array('notification_methods' => 'a:4:{s:5:"buddy";a:4:{s:12:"notification";s:1:"1";s:5:"email";s:1:"1";s:11:"email_daily";s:1:"1";s:12:"email_weekly";s:1:"1";}s:7:"likemsg";a:1:{s:12:"notification";s:1:"1";}s:10:"mentionmem";a:4:{s:12:"notification";s:1:"1";s:5:"email";s:1:"1";s:11:"email_daily";s:1:"1";s:12:"email_weekly";s:1:"1";}s:9:"quotedmem";a:4:{s:12:"notification";s:1:"1";s:5:"email";s:1:"1";s:11:"email_daily";s:1:"1";s:12:"email_weekly";s:1:"1";}}'));
 				}
 			)
 		);

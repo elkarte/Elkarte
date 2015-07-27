@@ -843,7 +843,7 @@ function template_show_settings()
 		echo $context['settings_insert_above'];
 
 	echo '
-	<div id="admincenter">
+	<div id="', isset($context['current_subaction']) ? $context['current_subaction'] : 'admincenter', '" class="admincenter">
 		<form id="admin_form_wrapper" action="', $context['post_url'], '" method="post" accept-charset="UTF-8"', !empty($context['force_form_onsubmit']) ? ' onsubmit="' . $context['force_form_onsubmit'] . '"' : '', '>';
 
 	// Is there a custom title, maybe even with an icon?
@@ -923,7 +923,7 @@ function template_show_settings()
 		{
 			$is_open = true;
 			echo '
-			<div ', isset($context['current_subaction']) ? 'id="' . $context['current_subaction'] . '" ' : '', 'class="windowbg2">
+			<div class="windowbg2">
 				<div class="content">
 					<dl class="settings">';
 		}
@@ -1033,6 +1033,10 @@ function template_show_settings()
 				elseif ($config_var['type'] == 'var_message')
 					echo '
 							<div', !empty($config_var['name']) ? ' id="' . $config_var['name'] . '"' : '', '>', $config_var['var_message'], '</div>';
+				// Color picker?
+				elseif ($config_var['type'] == 'color')
+					echo '
+							<input type="color"', $javascript, $disabled, ' name="', $config_var['name'], '" id="', $config_var['name'], '" value="', $config_var['value'], '"', ($config_var['size'] ? ' size="' . $config_var['size'] . '"' : ''), ' class="input_text" />';
 				// Assume it must be a text box.
 				else
 					echo '

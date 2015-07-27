@@ -359,6 +359,9 @@ $txt['or'] = 'or';
 
 $txt['mention'] = 'Notifications';
 $txt['notifications'] = 'Notifications';
+$txt['unread_notifications'] = 'You have %1$s unread notifications since your last visit.';
+$txt['new_from_last_notifications'] = 'You have %1$s new notifications.';
+$txt['forum_notification'] = 'Notifications from %1$s.';
 
 $txt['your_ban'] = 'Sorry %1$s, you are banned from using this forum!';
 $txt['your_ban_expires'] = 'This ban is set to expire %1$s.';
