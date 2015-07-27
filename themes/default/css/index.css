@@ -1186,6 +1186,9 @@ a.bbc_link {
 	font-size: 0.786em;
 	line-height: 2em;
 }
+.fa.hamburger_30 {
+	display: none;
+}
 
 /* The quick buttons. */
 /* ------------------------------------------------------- */
@@ -4654,7 +4657,7 @@ dl.no_members {
 	.forumposts .windowbg, .forumposts .windowbg2 {
 		margin-bottom: 6px;
 	}
-	#moderationbuttons, a.linklevel1.button_strip_notify,
+	a.linklevel1.button_strip_notify,
 	a.linklevel1.button_strip_print, a.linklevel1.button_strip_send, .inline_mod_check,
 	a.linklevel1.quotetonew_button, a.linklevel1.button_strip_post_poll,
 	.keyinfo .post_subject, li.listlevel1.quickmod_select_all,
@@ -4797,5 +4800,27 @@ dl.no_members {
 	#confirm_buttons .button_submit {
 		height: inherit;
 		max-height: none;
+	}
+	.fa.hamburger_30 {
+		padding-top: 0.1em;
+		display: inline-block;
+		vertical-align: middle;
+	}
+	.fa.hamburger_30:before {
+		margin: 0.2em;
+	}
+	#display_jump_to {
+		display: inline-block;
+	}
+	.hide_30.hamburger_30 {
+		left: -9999px;
+		position: absolute;
+	}
+	.fa.hamburger_30.visible {
+		display: none;
+	}
+	.hide_30.hamburger_30.visible {
+		left: auto;
+		position: relative;
 	}
 }
