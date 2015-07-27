@@ -109,7 +109,6 @@ class User_Notification
 	 */
 	protected function _addDesktopNotifications()
 	{
-		$this->_addDesktopNotifications();
 		loadJavascriptFile('desktop-notify.js');
 		addInlineJavascript('
 			$(document).ready(function() {

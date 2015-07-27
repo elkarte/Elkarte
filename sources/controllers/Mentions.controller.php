@@ -347,7 +347,10 @@ class Mentions_Controller extends Action_Controller
 	 */
 	public function action_fetch()
 	{
-		global $user_info, $context, $txt;
+		global $user_info, $context, $txt, $modSettings;
+
+		if (empty($modSettings['usernotif_favicon_enable']) && empty($modSettings['usernotif_desktop_enable']))
+			die();
 
 		loadTemplate('Json');
 		$context['sub_template'] = 'send_json';
@@ -361,17 +364,24 @@ class Mentions_Controller extends Action_Controller
 
 		// We only know AJAX for this particular action
 		$context['json_data'] = array(
-			'mentions' => !empty($user_info['mentions']) ? $user_info['mentions'] : 0,
-			'timelast' => getTimeLastMention($user_info['id']),
-			'desktop_notifications' => array(
+			'timelast' => getTimeLastMention($user_info['id'])
+		);
+
+		if (!empty($modSettings['usernotif_favicon_enable']))
+		{
+			$context['json_data']['mentions'] = !empty($user_info['mentions']) ? $user_info['mentions'] : 0;
+		}
+
+		if (!empty($modSettings['usernotif_desktop_enable']))
+		{
+			$context['json_data']['desktop_notifications'] = array(
 				'new_from_last' => getNewMentions($user_info['id'], $lastsent),
 				'title' => sprintf($txt['forum_notification'], $context['forum_name']),
-				'dbg' => $lastsent,
-			)
+			);
+			$context['json_data']['desktop_notifications']['message'] = sprintf($txt[$lastsent == 0 ? 'unread_notifications' : 'new_from_last_notifications'], $context['json_data']['desktop_notifications']['new_from_last']);
 		);
-		$_SESSION['notifications_lastseen'] = $context['json_data']['timelast'];
 
-		$context['json_data']['desktop_notifications']['message'] = sprintf($txt[$lastsent == 0 ? 'unread_notifications' : 'new_from_last_notifications'], $context['json_data']['desktop_notifications']['new_from_last']);
+		$_SESSION['notifications_lastseen'] = $context['json_data']['timelast'];
 	}
 
 	/**
