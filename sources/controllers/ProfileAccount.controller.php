@@ -530,7 +530,7 @@ class ProfileAccount_Controller extends Action_Controller
 			}
 
 			// Actually update this member now, as it guarantees the unapproved count can't get corrupted.
-			approveMembers(array('members' => array($context['id_member']), 'activated_status' => $user_profile[$memID]['is_activated']))
+			approveMembers(array('members' => array($context['id_member']), 'activated_status' => $user_profile[$memID]['is_activated']));
 
 			// Log what we did?
 			logAction('approve_member', array('member' => $memID), 'admin');

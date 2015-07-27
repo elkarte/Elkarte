@@ -719,7 +719,7 @@ class Register_Controller extends Action_Controller
 		require_once(SUBSDIR . '/Members.subs.php');
 
 		// Validation complete - update the database!
-		approveMembers(array('members' => array($row['id_member'], array('activated_status' => 0)));
+		approveMembers(array('members' => array($row['id_member']), 'activated_status' => 0));
 
 		// Also do a proper member stat re-evaluation.
 		updateStats('member', false);
