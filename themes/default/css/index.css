@@ -1353,9 +1353,10 @@ a.bbc_link {
 /* Necessary for some browsers to keep the pages all on the same line */
 .linavPages {
 	float: left;
+	margin: 0px 4px 0px 0px;
 }
 .selectbox, .pagelinks {
-	margin: 5px 0 0 0;
+	margin: 5px 5px 0px;
 	font-size: 0.857em;
 }
 /* @todo - Styling will need a bit more thought here. */
