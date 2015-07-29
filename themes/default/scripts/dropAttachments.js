@@ -10,12 +10,10 @@
  */
 
 /**
- * Simply invoke the constructor by calling dragDropAttachment
+ * Simply invoke the constructor by calling new dragDropAttachment
  */
 (function() {
-	function dragDropAttachment() {}
-
-	dragDropAttachment.prototype = function() {
+	var dragDropAttachment = (function(params) {
 
 		// Few internal global vars
 		var allowedExtensions = [],
@@ -29,18 +27,19 @@
 			attachmentQueue = [],
 			board = 0,
 			oTxt = {},
+			oEvents = {},
 
 			/**
-			 * public function, accessible with prototype chain
-			 * @param {object} params
-			 *
-			 *    allowedExtensions - types of attachments allowed
-			 *    totalSizeAllowed - maximum size of total attachments allowed
-			 *    individualSizeAllowed - maximum individual file size allowed
-			 *    numOfAttachmentAllowed - number of files that can be attached in a post
-			 *    totalAttachSizeUploaded - total size of already attached files(modifying post)
-			 *    numAttachUploaded - number of already attached files(modifying post)
-			 */
+			* public function, accessible with prototype chain
+			* @param {object} params
+			*
+			*    allowedExtensions - types of attachments allowed
+			*    totalSizeAllowed - maximum size of total attachments allowed
+			*    individualSizeAllowed - maximum individual file size allowed
+			*    numOfAttachmentAllowed - number of files that can be attached in a post
+			*    totalAttachSizeUploaded - total size of already attached files(modifying post)
+			*    numAttachUploaded - number of already attached files(modifying post)
+			*/
 			init = function(params) {
 				allowedExtensions = (params.allowedExtensions === '') ? [] : params.allowedExtensions.toLowerCase().replace(/\s/g, '').split(',');
 				totalSizeAllowed = (params.totalSizeAllowed === '') ? null : params.totalSizeAllowed;
@@ -54,15 +53,15 @@
 			},
 
 			/**
-			 * private function
-			 *
-			 * Uploads the file to server and updates the UI
-			 *
-			 * @param {object} formData current file with data to upload
-			 * @param {object} status current progress bar UI instance
-			 * @param {int} fileSize current progress bar UI instance
-			 * @param {string} fileName current progress bar UI instance
-			 */
+			* private function
+			*
+			* Uploads the file to server and updates the UI
+			*
+			* @param {object} formData current file with data to upload
+			* @param {object} status current progress bar UI instance
+			* @param {int} fileSize current progress bar UI instance
+			* @param {string} fileName current progress bar UI instance
+			*/
 			sendFileToServer = function(formData, status, fileSize, fileName) {
 				var jqXHR = $.ajax({
 					xhr: function() {
@@ -150,15 +149,15 @@
 					runAttachmentQueue();
 				});
 				status.setAbort(jqXHR);
-			};
+			},
 
 		/**
-		 * private function
-		 *
-		 * Removes the file from the server that was successfully uploaded
-		 *
-		 * @param {object} options
-		 */
+		* private function
+		*
+		* Removes the file from the server that was successfully uploaded
+		*
+		* @param {object} options
+		*/
 		removeFileFromServer = function(options) {
 			var dataToSend = filesUploadedSuccessfully[options.fileNum];
 
@@ -180,6 +179,7 @@
 					// Update our counters, number of files allowed and total data payload
 					totalAttachSizeUploaded -= filesUploadedSuccessfully[options.fileNum].size / 1024;
 					numAttachUploaded--;
+					triggerEvt('RemoveSuccess', $(this.str), [dataToSend.attachid]);
 
 					// Done with this one, so remove it from existence
 					$('#' + dataToSend.attachid).unbind().remove();
@@ -190,21 +190,21 @@
 				console.log(textStatus);
 				console.log(errorThrown);
 			});
-		};
+		},
 
 		/**
-		 * private function
-		 *
-		 * Creates the status UI for each file dropped
-		 * Initiate as new createStatusbar
-		 * Has the following methods available to it
-		 *  - setFileNameSize
-		 *  - setProgress
-		 *  - setAbort
-		 *  - setServerFail
-		 *  - onUploadSuccess
-		 * @param {object} obj options
-		 */
+		* private function
+		*
+		* Creates the status UI for each file dropped
+		* Initiate as new createStatusbar
+		* Has the following methods available to it
+		*  - setFileNameSize
+		*  - setProgress
+		*  - setAbort
+		*  - setServerFail
+		*  - onUploadSuccess
+		* @param {object} obj options
+		*/
 		createStatusbar = function(obj) {
 			this.str = $('<div class="statusbar"><div class="info"></div><div class="progressBar"><div></div></div><div class="abort fa fa-times-circle"></div></div>');
 
@@ -276,17 +276,18 @@
 						'fileNum': fileNum
 					});
 				});
+				triggerEvt('UploadSuccess', $(this.str), [data]);
 			};
 		},
 
 		/**
-		 * public function
-		 *
-		 * Handle the functionality when file(s) are dropped
-		 *
-		 * @param {object} files what files to upload
-		 * @param {object} obj parent object in which file progress is shown
-		 */
+		* public function
+		*
+		* Handle the functionality when file(s) are dropped
+		*
+		* @param {object} files what files to upload
+		* @param {object} obj parent object in which file progress is shown
+		*/
 		handleFileUpload = function(files, obj) {
 			var errorMsgs = {},
 				extnErrorFiles = [],
@@ -357,10 +358,10 @@
 		},
 
 		/**
-		 * private function
-		 *
-		 * Checks if there are any files pending upload
-		 */
+		* private function
+		*
+		* Checks if there are any files pending upload
+		*/
 		runAttachmentQueue = function() {
 			if (attachmentQueue.length > 0 && uploadInProgress === false) {
 				var currentData = attachmentQueue[0];
@@ -372,15 +373,15 @@
 		},
 
 		/**
-		 * private function
-		 *
-		 * Populates the warning box when something does not go as expected
-		 *
-		 * @param {object} params
-		 *    error messages to show
-		 *    file names having extension error
-		 *    file names having size error
-		 */
+		* private function
+		*
+		* Populates the warning box when something does not go as expected
+		*
+		* @param {object} params
+		*    error messages to show
+		*    file names having extension error
+		*    file names having size error
+		*/
 		populateErrors = function(params) {
 			var $drop_attachments_error = $('.drop_attachments_error');
 
@@ -413,12 +414,12 @@
 		},
 
 		/**
-		 * private function
-		 *
-		 * Used to check if a value exists in an array
-		 *
-		 * @param {string} needle
-		 */
+		* private function
+		*
+		* Used to check if a value exists in an array
+		*
+		* @param {string} needle
+		*/
 		indexOf = function(needle) {
 			if (typeof Array.prototype.indexOf === 'function')
 				indexOf = Array.prototype.indexOf;
@@ -437,69 +438,114 @@
 					return index;
 				};
 			}
+		},
 
-			return indexOf.call(this, needle);
+		/**
+		* public function
+		*
+		* Used to extend the code
+		*
+		* @param {string} event
+		* @param {object} listener
+		*/
+		addEventListener = function(event, listener) {
+			if (!oEvents.hasOwnProperty(event))
+				oEvents[event] = [];
+
+			oEvents[event].push(listener);
+		},
+
+		/**
+		* private function
+		*
+		* Runs all the listeners on a certain event
+		*
+		* @param {string} event
+		* @param {object} aThis
+		* @param {object} args
+		*/
+		triggerEvt = function(event, aThis, args) {
+			if (!oEvents.hasOwnProperty(event))
+				return;
+
+			for (var i = 0; i < oEvents[event].length; i++) {
+				oEvents[event][i].apply(aThis, args);
+			}
 		};
 
+		/**
+		* Initialize the drag and drop function!
+		*/
+		$(document).ready(function() {
+			var obj = $(".drop_area");
+
+			// Make sure the browser supports this
+			if (!(window.FormData && ("onprogress" in $.ajaxSettings.xhr())))
+				return;
+
+			// Don't attach D&D on small screens
+			if (!window.matchMedia || window.matchMedia('(max-width: 33.750em)').matches)
+				return;
+
+			// All clear, show the drop zone
+			obj.toggle();
+			$('.drop_attachments_no_js').hide();
+
+			// Entering the dropzone, show it
+			obj.on('dragenter', function(e) {
+				e.stopPropagation();
+				e.preventDefault();
+				$(this).css('opacity', '1');
+			});
+
+			// Hovering over, waiting waiting waiting, show we are waiting
+			obj.on('dragover', function(e) {
+				e.stopPropagation();
+				e.preventDefault();
+			});
+
+			// Catch what you dropped, and send it off to be processed
+			obj.on('drop', function(e) {
+				var files = e.originalEvent.dataTransfer.files;
+
+				e.preventDefault();
+				$(this).css('opacity', '0.6');
+				handleFileUpload(files, obj);
+			});
+
+			// Wait, where are you going?  Lets show you are outside the zone
+			obj.on('dragexit', function(e) {
+				e.preventDefault();
+				$(this).css('opacity', '0.6');
+			});
+
+			// Rather click and select?
+			obj.find('#attachment_click').change(function(e) {
+				e.preventDefault();
+				var files = $(this)[0].files;
+				handleFileUpload(files, obj);
+			});
+		});
+		init(params);
 		return {
 			init: init,
+			addEventListener: addEventListener,
 			handleFileUpload: handleFileUpload
 		};
-	}();
-
-	/**
-	 * Initialize the drag and drop function!
-	 */
-	$(document).ready(function() {
-		var obj = $(".drop_area");
-
-		// Make sure the browser supports this
-		if (!(window.FormData && ("onprogress" in $.ajaxSettings.xhr())))
-			return;
-
-		// Don't attach D&D on small screens
-		if (!window.matchMedia || window.matchMedia('(max-width: 33.750em)').matches)
-			return;
-
-		// All clear, show the drop zone
-		obj.toggle();
-		$('.drop_attachments_no_js').hide();
-
-		// Entering the dropzone, show it
-		obj.on('dragenter', function(e) {
-			e.stopPropagation();
-			e.preventDefault();
-			$(this).css('opacity', '1');
-		});
-
-		// Hovering over, waiting waiting waiting, show we are waiting
-		obj.on('dragover', function(e) {
-			e.stopPropagation();
-			e.preventDefault();
-		});
-
-		// Catch what you dropped, and send it off to be processed
-		obj.on('drop', function(e) {
-			var files = e.originalEvent.dataTransfer.files;
-
-			e.preventDefault();
-			$(this).css('opacity', '0.6');
-			dragDropAttachment.prototype.handleFileUpload(files, obj);
-		});
-
-		// Wait, where are you going?  Lets show you are outside the zone
-		obj.on('dragexit', function(e) {
-			e.preventDefault();
-			$(this).css('opacity', '0.6');
-		});
-
-		// Rather click and select?
-		obj.find('#attachment_click').change(function(e) {
-			e.preventDefault();
-			var files = $(this)[0].files;
-			dragDropAttachment.prototype.handleFileUpload(files, obj);
-		});
 	});
 
-	this.dragDropAttachment = dragDropAttachment;
+	// AMD / RequireJS
+	if ( typeof define !== 'undefined' && define.amd) {
+		define([], function() {
+			return dragDropAttachment;
+		});
+	}
+	// CommonJS
+	else if ( typeof module !== 'undefined' && module.exports) {
+		module.exports = dragDropAttachment;
+	}
+	// included directly via <script> tag
+	else {
+		this.dragDropAttachment = dragDropAttachment;
+	}
 }());
