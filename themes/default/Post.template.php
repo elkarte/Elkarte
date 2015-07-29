@@ -625,7 +625,7 @@ function template_postarea_below()
 	global $context, $txt, $counter, $settings;
 
 	// Is visual verification enabled?
-	if ($context['require_verification'])
+	if (!empty($context['require_verification']))
 	{
 		template_verification_controls($context['visual_verification_id'], '
 						<div class="post_verification">
