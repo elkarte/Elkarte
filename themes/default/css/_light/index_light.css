@@ -245,8 +245,8 @@ strong {
 /* Custom highlighted text style for modern browsers. */
 /* Nicer than default blue. Needs two separate rules. */
 ::-moz-selection {
-	background: #d8ffdf;
-	color: #444;
+	color: rgb(255, 253, 253);
+    background: rgb(130, 187, 66) none repeat scroll 0% 0%;
 }
 ::selection {
 	background: #d8ffdf;
@@ -1755,16 +1755,20 @@ div.bbc_footnotes .meaction{
 }
 #top_row .stats dd, .statsbar {
 	border: 1px solid #aaa;
+    border-radius: 5px;
 	background: #fff;
+    box-shadow: 0px -1px 0px rgba(177, 171, 171, 0.2) inset, 0px 0px 0px 1px rgba(222, 222, 222, 0.1) inset;
+text-shadow: 0px -1px 0px rgba(234, 234, 234, 0.2);
 }
 /* Methinks topic links, etc need a little more oomph next to the orange bars. */
 #top_row .stats dd {
-	border: 1px solid transparent;
+	border: 1px solid #E4E4E4;
 	background: none;
 }
+
+/* Status Bar Green */
 .statsbar .bar {
-	background: #47b263;
-	background-image: linear-gradient(to bottom, #60bc78 0%, #27a348 100%);
+	background: linear-gradient(to bottom, #9FD256, #6FAC34);
 }
 /* Absolute positioning stops these breaking the bars on narrow screens. */
 .statsbar .righttext {
