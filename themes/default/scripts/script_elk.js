@@ -505,7 +505,6 @@ function revalidateMentions(sForm, sInput)
 				for (var l = 0, ncount = names.length; l < ncount; l++)
 				{
 					if(checkWordOccurrence(body, names[l].name)) {
-						// alert(names[l].name);
 						pos = body.indexOf(' @' + names[l].name);
 
 						// If there is something like "{space}@username" AND the following char is a space or a punctuation mark
@@ -1517,3 +1516,100 @@ function disableAutoComplete()
 
 })();
 var ElkNotifier = new ElkNotifications();
+
+
+/**
+ * Initialize the inline attachments posting interface
+ */
+(function() {
+	var attid = 1;
+	var ElkInlineAttachments = (function(selector, editor, opt) {
+		'use strict';
+		$.extend(opt, {inlineSelector: '.inline_insert', data: 'attachid', addAfter: 'label'});
+		var $container, listAttachs = [];
+
+		var init = function(opt) {
+			$container = $(selector);
+
+			$container.find(opt.inlineSelector).each(function() {
+				var id = $(this).data(opt.data),
+					$before;
+
+				if (opt.addAfter == false)
+					$before = $(this);
+				else
+					$before = $(this).closest(opt.addAfter);
+
+				addInterface($before, id);
+			});
+		},
+		addInterface = function($before, attachId) {
+			var $trigger;
+
+			if (typeof opt.trigger !== 'undefined')
+				$trigger = opt.trigger.clone();
+			else
+			{
+				$trigger = $('<a />');
+
+				if (typeof opt.triggerClass !== 'undefined')
+					$trigger.addClass(opt.triggerClass);
+			}
+
+			$trigger.click(function(e) {
+				e.preventDefault;
+
+				var ila_text = '[attach=' + $(this).data('attid') + ']';
+				$editor_data[editor].insertText(ila_text, false, true);
+			}).attr('id', 'inline_attach_' + attachId)
+			.data('attid', attid++)
+			.data('attachid', attachId);
+
+			$before.after($trigger);
+			listAttachs.push($trigger);
+		},
+		removeAttach = function(attachId) {
+			var tmpList = [], i;
+
+			for (i = 0; i < listAttachs.length; i++)
+			{
+				if (listAttachs[i].data('attachid') == attachId)
+					break;
+
+				tmpList.push(listAttachs[i]);
+			}
+
+			i++;
+			for (; i < listAttachs.length; i++)
+			{
+				listAttachs[i].data('attid', listAttachs[i].data('attid') - 1);
+				tmpList.push(listAttachs[i]);
+			}
+
+			listAttachs = tmpList;
+			attid--;
+			$('#inline_attach_' + attachId).remove();
+		};
+
+		init(opt);
+		return {
+			addInterface: addInterface,
+			removeAttach: removeAttach
+		}
+	});
+
+	// AMD / RequireJS
+	if ( typeof define !== 'undefined' && define.amd) {
+		define([], function() {
+			return ElkInlineAttachments;
+		});
+	}
+	// CommonJS
+	else if ( typeof module !== 'undefined' && module.exports) {
+		module.exports = ElkInlineAttachments;
+	}
+	// included directly via <script> tag
+	else {
+		this.ElkInlineAttachments = ElkInlineAttachments;
+	}
+})();

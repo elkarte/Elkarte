@@ -2582,11 +2582,15 @@ ul.post_options li {
 	float: left;
 	text-align: center;
 }
-.abort, .remove {
+.abort, .remove, .share {
 	float: right;
 	overflow: hidden;
 	font-size: 1em;
 	padding: 4px 6px;
+}
+.share {
+	float: left;
+	margin: auto 5px;
 }
 .drop_attachmnts_error {
 	padding: 10px 0;

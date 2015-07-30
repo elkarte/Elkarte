@@ -398,6 +398,10 @@ $txt['attachmentThumbHeight'] = 'Maximum height of thumbnails';
 $txt['attachment_thumbnail_settings'] = 'Thumbnail Settings';
 $txt['attachment_security_settings'] = 'Attachment security settings';
 
+$txt['attachment_inline_title'] = 'Inline attachment settings';
+$txt['attachment_inline_enabled'] = 'Enable the display of in line attachments';
+$txt['attachment_inline_basicmenu'] = 'Only show basic menu';
+
 $txt['attach_dir_does_not_exist'] = 'Does Not Exist';
 $txt['attach_dir_not_writable'] = 'Not Writable';
 $txt['attach_dir_files_missing'] = 'Files Missing (<a href="{repair_url}">Repair</a>)';

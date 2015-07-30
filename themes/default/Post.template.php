@@ -381,11 +381,20 @@ function template_show_existing_attachments()
 							</dd>';
 
 	foreach ($context['attachments']['current'] as $attachment)
+	{
+		$label = $attachment['name'];
+		if (empty($attachment['approved']))
+			$label .= ' (' . $txt['awaiting_approval'] . ')';
+		if (!empty($modSettings['attachmentPostLimit']) || !empty($modSettings['attachmentSizeLimit']))
+			$label .= sprintf($txt['attach_kb'], comma_format(round(max($attachment['size'], 1028) / 1028), 0));
+
 		echo '
 							<dd class="smalltext">
-								<label for="attachment_', $attachment['id'], '"><input type="checkbox" id="attachment_', $attachment['id'], '" name="attach_del[]" value="', $attachment['id'], '"', empty($attachment['unchecked']) ? ' checked="checked"' : '', ' class="input_check" /> ', $attachment['name'], (empty($attachment['approved']) ? ' (' . $txt['awaiting_approval'] . ')' : ''),
-		!empty($modSettings['attachmentPostLimit']) || !empty($modSettings['attachmentSizeLimit']) ? sprintf($txt['attach_kb'], comma_format(round(max($attachment['size'], 1028) / 1028), 0)) : '', '</label>
+								<label for="attachment_', $attachment['id'], '">
+									<input type="checkbox" id="attachment_', $attachment['id'], '" name="attach_del[]" value="', $attachment['id'], '"', empty($attachment['unchecked']) ? ' checked="checked"' : '', ' class="input_check inline_insert" data-attachid="', $attachment['id'], '"/> ', $label, '
+								</label>
 							</dd>';
+	}
 
 	echo '
 						</dl>';
@@ -462,6 +471,17 @@ function template_add_new_attachments()
 	echo '
 							</dd>
 						</dl>';
+	addInlineJavascript('
+		var inlineAttach = ElkInlineAttachments(\'#postAttachment2,#postAttachment\', \'' . $context['post_box_name'] . '\', {
+			trigger: $(\'<div class="fa share fa-share-alt-square" />\')
+		});
+		dropAttach.addEventListener(\'UploadSuccess\', function(data) {
+			var $base = $(this).find(\'.progressBar\');
+			inlineAttach.addInterface($base, data.attachid);
+		});
+		dropAttach.addEventListener(\'RemoveSuccess\', function(attachid) {
+			inlineAttach.removeAttach(attachid);
+		});', true);
 }
 
 /**

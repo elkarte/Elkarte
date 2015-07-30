@@ -233,6 +233,15 @@ $txt['post_awaiting_approval'] = 'Note: This message is awaiting approval by a m
 $txt['there_are_unapproved_topics'] = 'There are %1$s topics and %2$s posts awaiting approval in this board. <a href="%3$s">Click here to view them</a>.';
 $txt['send_message'] = 'Send message';
 
+// ILA message viewing
+$txt['ila_invalid'] = ' [ Attachment Invalid Or Does Not Exist ] ';
+$txt['ila_disabled'] = ' [ Attachments Disabled ] ';
+$txt['ila_forbidden_for_guest'] = ' [ Guests cannot view attachments ] ';
+$txt['ila_nopermission'] = ' [ You are not authorized to view attachments ] ';
+$txt['ila_attachment_missing'] = ' [ Specified attachment is not available ]';
+$txt['ila_quote_link'] = ' (Attachment Link) ';
+$txt['ila_quote_nolink'] = ' (Attachment) ';
+
 $txt['msg_alert_no_messages'] = 'you don\'t have any message';
 $txt['msg_alert_one_message'] = 'you have <a href="%1$s">1 message</a>';
 $txt['msg_alert_many_message'] = 'you have <a href="%1$s">%2$d messages</a>';

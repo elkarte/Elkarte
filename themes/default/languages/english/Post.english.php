@@ -177,3 +177,19 @@ $txt['ran_out_of_space'] = 'The upload directory is full. Please contact an admi
 $txt['attachments_no_write'] = 'The attachments upload directory is not writable.  Your attachment or avatar cannot be saved.';
 $txt['attachments_no_create'] = 'Unable to create a new attachment directory.  Your attachment or avatar cannot be saved.';
 $txt['attachments_limit_per_post'] = 'You may not upload more than %1$d attachments per post';
+
+// Post settings (when I implement the post interface)
+$txt['ila_insert'] = 'Insert Attachment %1$d in the message';
+$txt['ila_title'] = 'End-of-post expandable thumbnail ';
+$txt['ila_option1'] = 'Inline expandable thumbnail';
+$txt['ila_option2'] = 'Inline full-size image';
+$txt['ila_option3'] = 'Inline text link';
+$txt['ila_option4'] = 'Inline short text link';
+/*
+$txt['ila_thereare'] = 'There are only';
+$txt['ila_attachment'] = 'attachment(s)';
+$txt['ila_none'] = 'as expandable thumbnail';
+$txt['ila_img'] = 'as full-size graphic';
+$txt['ila_url'] = 'as a link';
+$txt['ila_mini'] = 'as a compact link';
+*/
