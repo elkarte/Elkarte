@@ -462,6 +462,7 @@ function template_add_new_attachments()
 			individualSizeAllowed : ' . JavaScriptEscape(sprintf($txt['file_too_big'], comma_format($modSettings['attachmentSizeLimit'], 0))) . ',
 			numOfAttachmentAllowed : ' . JavaScriptEscape(sprintf($txt['attachments_limit_per_post'], $modSettings['attachmentNumPerPostLimit'])) . ',
 			postUploadError : ' . JavaScriptEscape($txt['post_upload_error']) . ',
+			areYouSure: ' . JavaScriptEscape($txt['ila_confirm_removal']) . '
 		},
 		existingSelector: \'.inline_insert\',
 		events: {
