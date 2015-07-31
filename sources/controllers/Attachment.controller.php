@@ -37,6 +37,7 @@ class Attachment_Controller extends Action_Controller
 		// add an subaction array to act accordingly
 		$subActions = array(
 			'dlattach' => array($this, 'action_dlattach'),
+			'tmpattach' => array($this, 'action_tmpattach'),
 			'ulattach' => array($this, 'action_ulattach'),
 			'rmattach' => array($this, 'action_rmattach'),
 		);
@@ -354,6 +355,123 @@ class Attachment_Controller extends Action_Controller
 		}
 		// On some of the less-bright hosts, readfile() is disabled.  It's just a faster, more byte safe, version of what's in the if.
 		elseif (isset($callback) || @readfile($filename) === null)
+			echo isset($callback) ? $callback(file_get_contents($filename)) : file_get_contents($filename);
+
+		obExit(false);
+	}
+
+	/**
+	 * Simplified version of action_dlattach to send out thumbnails while creating
+	 * or editing a message.
+	 */
+	public function action_tmpattach()
+	{
+		global $txt, $modSettings, $user_info, $context, $topic, $settings;
+
+		// Make sure some attachment was requested!
+		if (!isset($_REQUEST['attach']))
+			Errors::instance()->fatal_lang_error('no_access', false);
+
+		// We need to do some work on attachments and avatars.
+		require_once(SUBSDIR . '/Attachments.subs.php');
+
+		try
+		{
+			$attach_data = getTempAttachById($_REQUEST['attach']);
+		}
+		catch (\Exception $e)
+		{
+			Errors::instance()->fatal_lang_error($e->getMessage(), false);
+		}
+		$file_ext = pathinfo($attach_data['name'], PATHINFO_EXTENSION);
+		$filename = $attach_data['tmp_name'];
+		$id_attach = $attach_data['attachid'];
+		$real_filename = $attach_data['name'];
+		$mime_type = $attach_data['type'];
+
+// _debug($attach_data,$file_ext,0,1);
+		// This is done to clear any output that was made before now.
+		while (ob_get_level() > 0)
+			@ob_end_clean();
+
+		if (in_array($file_ext, array('txt', 'html', 'htm', 'js', 'doc', 'docx', 'rtf', 'css', 'php', 'log', 'xml', 'sql', 'c', 'java')))
+		{
+			$mime_type = 'image/png';
+			$filename = $settings['theme_dir'] . '/images/mime_images/' . $file_ext . '.png';
+			if (!file_exists($filename))
+				$filename = $settings['theme_dir'] . '/images/mime_images/default.png';
+		}
+
+		ob_start();
+		header('Content-Encoding: none');
+
+		// No point in a nicer message, because this is supposed to be an attachment anyway...
+		if (!file_exists($filename))
+		{
+			loadLanguage('Errors');
+
+			header((preg_match('~HTTP/1\.[01]~i', $_SERVER['SERVER_PROTOCOL']) ? $_SERVER['SERVER_PROTOCOL'] : 'HTTP/1.0') . ' 404 Not Found');
+			header('Content-Type: text/plain; charset=UTF-8');
+
+			// We need to die like this *before* we send any anti-caching headers as below.
+			die('404 - ' . $txt['attachment_not_found']);
+		}
+
+		// If it hasn't been modified since the last time this attachment was retrieved, there's no need to display it again.
+		if (!empty($_SERVER['HTTP_IF_MODIFIED_SINCE']))
+		{
+			list ($modified_since) = explode(';', $_SERVER['HTTP_IF_MODIFIED_SINCE']);
+			if (strtotime($modified_since) >= filemtime($filename))
+			{
+				@ob_end_clean();
+
+				// Answer the question - no, it hasn't been modified ;).
+				header('HTTP/1.1 304 Not Modified');
+				exit;
+			}
+		}
+
+		// Check whether the ETag was sent back, and cache based on that...
+		$eTag = '"' . substr($id_attach . $real_filename . filemtime($filename), 0, 64) . '"';
+		if (!empty($_SERVER['HTTP_IF_NONE_MATCH']) && strpos($_SERVER['HTTP_IF_NONE_MATCH'], $eTag) !== false)
+		{
+			@ob_end_clean();
+
+			header('HTTP/1.1 304 Not Modified');
+			exit;
+		}
+
+		// Send the attachment headers.
+		header('Pragma: ');
+		if (!isBrowser('gecko'))
+			header('Content-Transfer-Encoding: binary');
+		header('Expires: ' . gmdate('D, d M Y H:i:s', time() + 525600 * 60) . ' GMT');
+		header('Last-Modified: ' . gmdate('D, d M Y H:i:s', filemtime($filename)) . ' GMT');
+		header('Accept-Ranges: bytes');
+		header('Connection: close');
+		header('ETag: ' . $eTag);
+
+		header('Content-Type: ' . strtr($mime_type, array('image/bmp' => 'image/x-ms-bmp')));
+
+		// Different browsers like different standards...
+		if (isBrowser('firefox'))
+			header('Content-Disposition: inline; filename*=UTF-8\'\'' . rawurlencode(preg_replace_callback('~&#(\d{3,8});~', 'fixchar__callback', $real_filename)));
+		elseif (isBrowser('opera'))
+			header('Content-Disposition: inline; filename="' . preg_replace_callback('~&#(\d{3,8});~', 'fixchar__callback', $real_filename) . '"');
+		elseif (isBrowser('ie'))
+			header('Content-Disposition: inline; filename="' . urlencode(preg_replace_callback('~&#(\d{3,8});~', 'fixchar__callback', $real_filename)) . '"');
+		else
+			header('Content-Disposition: inline; filename="' . $real_filename . '"');
+
+		header('Cache-Control: max-age=' . (525600 * 60) . ', private');
+
+		if (empty($modSettings['enableCompressedOutput']) || filesize($filename) > 4194304)
+			header('Content-Length: ' . filesize($filename));
+
+		// Try to buy some time...
+		@set_time_limit(600);
+
+		if (isset($callback) || @readfile($filename) === null)
 			echo isset($callback) ? $callback(file_get_contents($filename)) : file_get_contents($filename);
 
 		obExit(false);

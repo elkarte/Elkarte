@@ -566,6 +566,45 @@ function removeTempAttachById($attach_id)
 }
 
 /**
+ * Finds and return a temporary attachment by its id
+ *
+ * @package Attachments
+ * @param string $attach_id the temporary name generated when a file is uploaded
+ *               and used in $_SESSION to help identify the attachment itself
+ */
+function getTempAttachById($attach_id)
+{
+	global $modSettings, $user_info;
+
+	// The common name form is "post_tmp_123_0ac9a0b1fc18604e8704084656ed5f09"
+	$id_attach = preg_replace('~[^0-9a-zA-Z_]~', '', $attach_id);
+
+	// Permissions: only temporary attachments
+	if (substr($id_attach, 0, 8) !== 'post_tmp')
+		throw new \Exception('no_access');
+
+	// Permissions: only author is allowed.
+	$pieces = explode('_', substr($id_attach, 9));
+
+	if (!isset($pieces[0]) || $pieces[0] != $user_info['id'])
+		throw new \Exception('no_access');
+
+	if (is_array($modSettings['attachmentUploadDir']))
+		$dirs = $modSettings['attachmentUploadDir'];
+	else
+		$dirs = unserialize($modSettings['attachmentUploadDir']);
+
+	$attach_dir = $dirs[$modSettings['currentAttachmentUploadDir']];
+
+	if (file_exists($attach_dir . '/' . $attach_id) && isset($_SESSION['temp_attachments'][$attach_id]))
+	{
+		return $_SESSION['temp_attachments'][$attach_id];
+	}
+
+	throw new \Exception('no_access');
+}
+
+/**
  * Checks if an uploaded file produced any appropriate error code
  *
  * What it does:
