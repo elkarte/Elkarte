@@ -241,6 +241,7 @@ $txt['ila_nopermission'] = ' [ You are not authorized to view attachments ] ';
 $txt['ila_attachment_missing'] = ' [ Specified attachment is not available ]';
 $txt['ila_quote_link'] = ' (Attachment Link) ';
 $txt['ila_quote_nolink'] = ' (Attachment) ';
+$txt['ila_confirm_removal'] = 'Are you sure you want to remove permanently this attachment?';
 
 $txt['msg_alert_no_messages'] = 'you don\'t have any message';
 $txt['msg_alert_one_message'] = 'you have <a href="%1$s">1 message</a>';

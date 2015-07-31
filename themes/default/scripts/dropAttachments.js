@@ -334,9 +334,12 @@
 
 				var fileNum = e.target.id;
 
-				removeFileFromServer({
-					'fileNum': fileNum
-				});
+				if (confirm(oTxt.areYouSure))
+				{
+					removeFileFromServer({
+						'fileNum': fileNum
+					});
+				}
 			});
 		},
 
