@@ -27,7 +27,9 @@
 			attachmentQueue = [],
 			board = 0,
 			oTxt = {},
+			fileDisplayTemplate = '<div class="statusbar"><div class="info"></div><div class="progressBar"><div></div></div><div class="control fa fa-times-circle"></div></div>',
 			oEvents = {},
+			$str,
 
 			/**
 			* public function, accessible with prototype chain
@@ -48,6 +50,8 @@
 				totalAttachSizeUploaded = params.totalAttachSizeUploaded / 1024;
 				numAttachUploaded = params.numAttachUploaded;
 				filesUploadedSuccessfully = [];
+				if (typeof params.fileDisplayTemplate !== 'undefined')
+					fileDisplayTemplate = params.fileDisplayTemplate;
 				board = params.board;
 				oTxt = params.oTxt;
 			},
@@ -179,7 +183,7 @@
 					// Update our counters, number of files allowed and total data payload
 					totalAttachSizeUploaded -= filesUploadedSuccessfully[options.fileNum].size / 1024;
 					numAttachUploaded--;
-					triggerEvt('RemoveSuccess', $(this.str), [dataToSend.attachid]);
+					triggerEvt('RemoveSuccess', $($str), [dataToSend.attachid]);
 
 					// Done with this one, so remove it from existence
 					$('#' + dataToSend.attachid).unbind().remove();
@@ -206,9 +210,11 @@
 		* @param {object} obj options
 		*/
 		createStatusbar = function(obj) {
-			this.str = $('<div class="statusbar"><div class="info"></div><div class="progressBar"><div></div></div><div class="abort fa fa-times-circle"></div></div>');
+			$str = $(fileDisplayTemplate);
+			var $button = $str.find('.control');
+			$button.addClass('abort');
 
-			$('.progress_tracker').append(this.str);
+			$('.progress_tracker').append($str);
 
 			// Provide the file size in something more legible, like 100KB or 1.1MB
 			this.setFileNameSize = function(name, size) {
@@ -221,23 +227,23 @@
 				else
 					sizeStr = sizeKB.toFixed(2) + " KB";
 
-				$(this.str).find('.info').html(name + ' (' + sizeStr + ')');
+				$($str).find('.info').html(name + ' (' + sizeStr + ')');
 			};
 
 			// Set the progress bar position
 			this.setProgress = function(progress) {
-				var progressBarWidth = progress * $(this.str).find('.progressBar').width() / 100;
+				var progressBarWidth = progress * $($str).find('.progressBar').width() / 100;
 
-				$(this.str).find('.progressBar div').animate({
+				$($str).find('.progressBar div').animate({
 					width: progressBarWidth
 				}, 10).html(progress + "% ");
 			};
 
 			// Provide a way to stop the upload before its done
 			this.setAbort = function(jqxhr) {
-				var sb = $(this.str);
+				var sb = $($str);
 
-				$(this.str).find('.abort').bind('click', function(e) {
+				$button.bind('click', function(e) {
 					e.preventDefault();
 					jqxhr.abort();
 					sb.hide();
@@ -247,27 +253,27 @@
 			// Server Failure is always an option when sending files
 			this.setServerFail = function(data) {
 				this.setProgress(0);
-				$(this.str).find('.abort').removeClass('fa-times-circle').addClass(' fa-exclamation-triangle');
+				$button.removeClass('fa-times-circle').addClass('fa-exclamation-triangle');
 			};
 
 			// The file upload is successful, remove our abort event and swap the class
 			this.onUploadSuccess = function(data) {
-				$(this.str).find('.abort').unbind('click');
-				$(this.str).find('.abort').removeClass('abort fa-times-circle').addClass('remove fa-minus-circle');
+				$button.unbind('click');
+				$button.removeClass('abort fa-times-circle').addClass('remove fa-minus-circle');
 
 				// Update the uploaded file with its ID
-				$(this.str).find('.remove').attr('id', data.curFileNum);
-				$(this.str).attr('id', data.attachid);
-				$(this.str).attr('data-size', data.size);
+				$button.attr('id', data.curFileNum);
+				$($str).attr('id', data.attachid);
+				$($str).attr('data-size', data.size);
 
 				// We need to tell Elk that the file should not be deleted
-				$(this.str).find('.remove').after($('<input />')
+				$button.after($('<input />')
 					.attr('type', 'hidden')
 					.attr('name', 'attach_del[]')
 					.attr('value', data.attachid));
 
 				// Provide a way to remove a file that has been sent by mistake
-				$(this.str).find('.remove').bind('click', function(e) {
+				$button.bind('click', function(e) {
 					e.preventDefault();
 
 					var fileNum = e.target.id;
@@ -276,7 +282,7 @@
 						'fileNum': fileNum
 					});
 				});
-				triggerEvt('UploadSuccess', $(this.str), [data]);
+				triggerEvt('UploadSuccess', $($str), [data]);
 			};
 		},
 

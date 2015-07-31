@@ -471,6 +471,25 @@ function template_add_new_attachments()
 	echo '
 							</dd>
 						</dl>';
+
+	// Load up the drag and drop attachment magic
+	addInlineJavascript('
+	var dropAttach = new dragDropAttachment({
+		board: ' . $context['current_board'] . ',
+		allowedExtensions: ' . JavaScriptEscape($context['attachments']['allowed_extensions']) . ',
+		totalSizeAllowed: ' . JavaScriptEscape(empty($modSettings['attachmentPostLimit']) ? '' : $modSettings['attachmentPostLimit']) . ',
+		individualSizeAllowed: ' . JavaScriptEscape(empty($modSettings['attachmentSizeLimit']) ? '' : $modSettings['attachmentSizeLimit']) . ',
+		numOfAttachmentAllowed: ' . $context['attachments']['num_allowed'] . ',
+		totalAttachSizeUploaded: ' . (isset($context['attachments']['total_size']) && !empty($context['attachments']['total_size']) ? $context['attachments']['total_size'] : 0) . ',
+		numAttachUploaded: ' . (isset($context['attachments']['quantity']) && !empty($context['attachments']['quantity']) ? $context['attachments']['quantity'] : 0) . ',
+		oTxt: {
+			allowedExtensions : ' . JavaScriptEscape(sprintf($txt['cant_upload_type'], $context['attachments']['allowed_extensions'])) . ',
+			totalSizeAllowed : ' . JavaScriptEscape($txt['attach_max_total_file_size']) . ',
+			individualSizeAllowed : ' . JavaScriptEscape(sprintf($txt['file_too_big'], comma_format($modSettings['attachmentSizeLimit'], 0))) . ',
+			numOfAttachmentAllowed : ' . JavaScriptEscape(sprintf($txt['attachments_limit_per_post'], $modSettings['attachmentNumPerPostLimit'])) . ',
+			postUploadError : ' . JavaScriptEscape($txt['post_upload_error']) . ',
+		},
+	});', true);
 	addInlineJavascript('
 		var inlineAttach = ElkInlineAttachments(\'#postAttachment2,#postAttachment\', \'' . $context['post_box_name'] . '\', {
 			trigger: $(\'<div class="fa share fa-share-alt-square" />\')
