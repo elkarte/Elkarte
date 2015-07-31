@@ -367,6 +367,7 @@ function template_add_new_attachments()
 	global $context, $txt, $modSettings;
 
 	echo '
+						<span id="postAttachment"></span>
 						<dl id="postAttachment2">';
 
 	// But, only show them if they haven't reached a limit. Or a mod author hasn't hidden them.
