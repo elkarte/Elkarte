@@ -151,8 +151,6 @@ class Ila_Integrate
 	{
 		global $txt, $scripturl, $context;
 
-		loadLanguage('ILA');
-
 		$config_vars[] = array('title', 'attachment_inline_title');
 		$config_vars[] = array('check', 'attachment_inline_enabled');
 		$config_vars[] = array('check', 'attachment_inline_basicmenu');
