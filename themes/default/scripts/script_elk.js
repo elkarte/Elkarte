@@ -1529,19 +1529,19 @@ var ElkNotifier = new ElkNotifications();
 		var $container, listAttachs = [];
 
 		var init = function(opt) {
-			$container = $(selector);
+// 			$container = $(selector);
 
-			$container.find(opt.inlineSelector).each(function() {
-				var id = $(this).data(opt.data),
-					$before;
-
-				if (opt.addAfter == false)
-					$before = $(this);
-				else
-					$before = $(this).closest(opt.addAfter);
-
-				addInterface($before, id);
-			});
+// 			$container.find(opt.inlineSelector).each(function() {
+// 				var id = $(this).data(opt.data),
+// 					$before;
+// 
+// 				if (opt.addAfter == false)
+// 					$before = $(this);
+// 				else
+// 					$before = $(this).closest(opt.addAfter);
+// 
+// 				addInterface($before, id);
+// 			});
 		},
 		addInterface = function($before, attachId) {
 			var $trigger;

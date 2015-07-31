@@ -17,6 +17,7 @@
 
 		// Few internal global vars
 		var allowedExtensions = [],
+			curFileNum = 0,
 			totalSizeAllowed = null,
 			individualSizeAllowed = null,
 			numOfAttachmentAllowed = null,
@@ -27,6 +28,7 @@
 			attachmentQueue = [],
 			board = 0,
 			oTxt = {},
+			// @deprecated since 1.1 - here just for backward compatibility
 			fileDisplayTemplate = '<div class="statusbar"><div class="info"></div><div class="progressBar"><div></div></div><div class="control fa fa-times-circle"></div></div>',
 			oEvents = {},
 			$str,
@@ -43,6 +45,14 @@
 			*    numAttachUploaded - number of already attached files(modifying post)
 			*/
 			init = function(params) {
+				if (typeof params.events !== 'undefined')
+				{
+					for (var event in params.events) {
+							if (params.events.hasOwnProperty(event)) {
+								addEventListener(event, params.events[event]);
+							}
+					}
+				}
 				allowedExtensions = (params.allowedExtensions === '') ? [] : params.allowedExtensions.toLowerCase().replace(/\s/g, '').split(',');
 				totalSizeAllowed = (params.totalSizeAllowed === '') ? null : params.totalSizeAllowed;
 				individualSizeAllowed = (params.individualSizeAllowed === '') ? null : params.individualSizeAllowed;
@@ -54,6 +64,37 @@
 					fileDisplayTemplate = params.fileDisplayTemplate;
 				board = params.board;
 				oTxt = params.oTxt;
+				if (typeof params.existingSelector !== 'undefined')
+					processExisting($(params.existingSelector));
+			},
+
+			/**
+			* private function
+			*
+			* Takes already uploaded files (e.g. when editing a message)
+			* and creates the "D&D" interface
+			*
+			* @param {object} $files Array of elements of existing input files
+			*/
+			processExisting = function ($files) {
+				$files.each(function(idx, value) {
+					var status = new createStatusbar({}),
+						$file = $(this);
+
+					status.setFileNameSize($file.parent().text(), $file.data('size'));
+					status.setProgress(100);
+
+					var $button = $str.find('.control'),
+						data = {
+							curFileNum: curFileNum++,
+							attachid: $file.data('attachid'),
+							size: $file.data('size')
+						};
+					$button.addClass('abort');
+					status.onUploadSuccess(data);
+					filesUploadedSuccessfully.push(data);
+					$file.closest('dd').remove();
+				});
 			},
 
 			/**
@@ -183,7 +224,7 @@
 					// Update our counters, number of files allowed and total data payload
 					totalAttachSizeUploaded -= filesUploadedSuccessfully[options.fileNum].size / 1024;
 					numAttachUploaded--;
-					triggerEvt('RemoveSuccess', $($str), [dataToSend.attachid]);
+					triggerEvt('RemoveSuccess', $str, [dataToSend.attachid]);
 
 					// Done with this one, so remove it from existence
 					$('#' + dataToSend.attachid).unbind().remove();
@@ -227,21 +268,22 @@
 				else
 					sizeStr = sizeKB.toFixed(2) + " KB";
 
-				$($str).find('.info').html(name + ' (' + sizeStr + ')');
+				$str.find('.info').html(name + ' (' + sizeStr + ')');
 			};
 
 			// Set the progress bar position
 			this.setProgress = function(progress) {
-				var progressBarWidth = progress * $($str).find('.progressBar').width() / 100;
+				var $progressbar = $str.find('.progressBar'),
+					progressBarWidth = progress * $progressbar.width() / 100;
 
-				$($str).find('.progressBar div').animate({
+				$progressbar.find('div').animate({
 					width: progressBarWidth
 				}, 10).html(progress + "% ");
 			};
 
 			// Provide a way to stop the upload before its done
 			this.setAbort = function(jqxhr) {
-				var sb = $($str);
+				var sb = $str;
 
 				$button.bind('click', function(e) {
 					e.preventDefault();
@@ -258,32 +300,44 @@
 
 			// The file upload is successful, remove our abort event and swap the class
 			this.onUploadSuccess = function(data) {
-				$button.unbind('click');
-				$button.removeClass('abort fa-times-circle').addClass('remove fa-minus-circle');
-
-				// Update the uploaded file with its ID
-				$button.attr('id', data.curFileNum);
-				$($str).attr('id', data.attachid);
-				$($str).attr('data-size', data.size);
-
-				// We need to tell Elk that the file should not be deleted
-				$button.after($('<input />')
-					.attr('type', 'hidden')
-					.attr('name', 'attach_del[]')
-					.attr('value', data.attachid));
-
-				// Provide a way to remove a file that has been sent by mistake
-				$button.bind('click', function(e) {
-					e.preventDefault();
-
-					var fileNum = e.target.id;
-
-					removeFileFromServer({
-						'fileNum': fileNum
-					});
-				});
-				triggerEvt('UploadSuccess', $($str), [data]);
+				fileUploadedInterface($button, data);
+				triggerEvt('UploadSuccess', $str, [data]);
 			};
+		},
+
+		/**
+		* private function
+		*
+		* Prepares the uploaded file area
+		*
+		* @param {object} files what files to upload
+		* @param {object} obj parent object in which file progress is shown
+		*/
+		fileUploadedInterface = function($button, data) {
+			$button.unbind('click');
+			$button.removeClass('abort fa-times-circle').addClass('remove fa-minus-circle');
+
+			// Update the uploaded file with its ID
+			$button.attr('id', data.curFileNum);
+			$str.attr('id', data.attachid);
+			$str.attr('data-size', data.size);
+
+			// We need to tell Elk that the file should not be deleted
+			$button.after($('<input />')
+				.attr('type', 'hidden')
+				.attr('name', 'attach_del[]')
+				.attr('value', data.attachid));
+
+			// Provide a way to remove a file that has been sent by mistake
+			$button.bind('click', function(e) {
+				e.preventDefault();
+
+				var fileNum = e.target.id;
+
+				removeFileFromServer({
+					'fileNum': fileNum
+				});
+			});
 		},
 
 		/**

@@ -270,10 +270,7 @@ class Attachments_Post_Module implements ElkArte\sources\modules\Module_Interfac
 				$context['attachments']['allowed_extensions'] = strtr(strtolower($modSettings['attachmentExtensions']), array(',' => ', '));
 			else
 				$context['attachments']['allowed_extensions'] = '';
-			$context['attachments']['templates'] = array(
-				'add_new' => 'template_add_new_attachments',
-				'existing' => 'template_show_existing_attachments',
-			);
+			$context['attachments']['template'] = 'template_add_new_attachments';
 
 			$attachmentRestrictionTypes = array('attachmentNumPerPostLimit', 'attachmentPostLimit', 'attachmentSizeLimit');
 			foreach ($attachmentRestrictionTypes as $type)
