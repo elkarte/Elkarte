@@ -467,22 +467,15 @@ function template_add_new_attachments()
 		existingSelector: \'.inline_insert\',
 		events: {
 			UploadSuccess: function(data) {
-				var $base = $(this).find(\'.progressBar\');
+				var $base = $(this).find(\'.control\');
 				inlineAttach.addInterface($base, data.attachid);
 			},
 			RemoveSuccess: function(attachid) {
 				inlineAttach.removeAttach(attachid);
 			}
-		}
+		}' . (isset($context['current_topic']) ? ',
+			topic: ' . $context['current_topic'] : '') . '
 	});', true);
-// 	addInlineJavascript('
-// 		dropAttach.addEventListener(\'UploadSuccess\', function(data) {
-// 			var $base = $(this).find(\'.progressBar\');
-// 			inlineAttach.addInterface($base, data.attachid);
-// 		});
-// 		dropAttach.addEventListener(\'RemoveSuccess\', function(attachid) {
-// 			inlineAttach.removeAttach(attachid);
-// 		});', true);
 }
 
 /**

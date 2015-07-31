@@ -374,22 +374,43 @@ class Attachment_Controller extends Action_Controller
 
 		// We need to do some work on attachments and avatars.
 		require_once(SUBSDIR . '/Attachments.subs.php');
+		require_once(SUBSDIR . '/Graphics.subs.php');
 
 		try
 		{
-			$attach_data = getTempAttachById($_REQUEST['attach']);
+			if (empty($topic) || (string) (int) $_REQUEST['attach'] !== (string) $_REQUEST['attach'])
+			{
+				$attach_data = getTempAttachById($_REQUEST['attach']);
+				$file_ext = pathinfo($attach_data['name'], PATHINFO_EXTENSION);
+				$filename = $attach_data['tmp_name'];
+				$id_attach = $attach_data['attachid'];
+				$real_filename = $attach_data['name'];
+				$mime_type = $attach_data['type'];
+			}
+			else
+			{
+				$id_attach = (int) $_REQUEST['attach'];
+
+				isAllowedTo('view_attachments');
+				$attachment = getAttachmentFromTopic($id_attach, $topic);
+
+				if (empty($attachment))
+					Errors::instance()->fatal_lang_error('no_access', false);
+				list ($id_folder, $real_filename, $file_hash, $file_ext, $id_attach, $attachment_type, $mime_type, $is_approved, $id_member) = $attachment;
+
+				// If it isn't yet approved, do they have permission to view it?
+				if (!$is_approved && ($id_member == 0 || $user_info['id'] != $id_member) && ($attachment_type == 0 || $attachment_type == 3))
+					isAllowedTo('approve_posts');
+
+				$filename = getAttachmentFilename($real_filename, $id_attach, $id_folder, false, $file_hash);
+			}
 		}
 		catch (\Exception $e)
 		{
 			Errors::instance()->fatal_lang_error($e->getMessage(), false);
 		}
-		$file_ext = pathinfo($attach_data['name'], PATHINFO_EXTENSION);
-		$filename = $attach_data['tmp_name'];
-		$id_attach = $attach_data['attachid'];
-		$real_filename = $attach_data['name'];
-		$mime_type = $attach_data['type'];
+		$resize = true;
 
-// _debug($attach_data,$file_ext,0,1);
 		// This is done to clear any output that was made before now.
 		while (ob_get_level() > 0)
 			@ob_end_clean();
@@ -397,6 +418,7 @@ class Attachment_Controller extends Action_Controller
 		if (in_array($file_ext, array('txt', 'html', 'htm', 'js', 'doc', 'docx', 'rtf', 'css', 'php', 'log', 'xml', 'sql', 'c', 'java')))
 		{
 			$mime_type = 'image/png';
+			$resize = false;
 			$filename = $settings['theme_dir'] . '/images/mime_images/' . $file_ext . '.png';
 			if (!file_exists($filename))
 				$filename = $settings['theme_dir'] . '/images/mime_images/default.png';
@@ -470,6 +492,9 @@ class Attachment_Controller extends Action_Controller
 
 		// Try to buy some time...
 		@set_time_limit(600);
+
+		if ($resize && resizeImageFile($filename, $filename . '_thumb', 0, 0, 100, 100, true))
+			$filename = $filename . '_thumb';
 
 		if (isset($callback) || @readfile($filename) === null)
 			echo isset($callback) ? $callback(file_get_contents($filename)) : file_get_contents($filename);

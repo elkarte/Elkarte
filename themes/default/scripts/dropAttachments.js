@@ -27,6 +27,7 @@
 			uploadInProgress = false,
 			attachmentQueue = [],
 			board = 0,
+			topic = 0,
 			oTxt = {},
 			// @deprecated since 1.1 - here just for backward compatibility
 			fileDisplayTemplate = '<div class="statusbar"><div class="info"></div><div class="progressBar"><div></div></div><div class="control fa fa-times-circle"></div></div>',
@@ -60,6 +61,8 @@
 				totalAttachSizeUploaded = params.totalAttachSizeUploaded / 1024;
 				numAttachUploaded = params.numAttachUploaded;
 				filesUploadedSuccessfully = [];
+				if (typeof params.topic !== 'undefined')
+					topic = params.topic;
 				if (typeof params.fileDisplayTemplate !== 'undefined')
 					fileDisplayTemplate = params.fileDisplayTemplate;
 				board = params.board;
@@ -327,6 +330,11 @@
 				.attr('type', 'hidden')
 				.attr('name', 'attach_del[]')
 				.attr('value', data.attachid));
+
+			var $img = $('<img />').attr('src', elk_scripturl + '?action=dlattach;sa=tmpattach;attach=' + $str.attr('id') + ';topic=' + topic),
+				$progressbar = $str.find('.progressBar');
+			$progressbar.after($('<div class="postattach_thumb" />').append($img));
+			$progressbar.remove();
 
 			// Provide a way to remove a file that has been sent by mistake
 			$button.bind('click', function(e) {
