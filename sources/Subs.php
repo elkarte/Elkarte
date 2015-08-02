@@ -677,35 +677,50 @@ function un_htmlspecialchars($string)
  * Calculates all the possible permutations (orders) of an array.
  *
  * What it does:
- * - should not be called on arrays bigger than 10 elements as this function is memory hungry
+ * - Caution: should not be called on arrays bigger than 8 elements as this function is memory hungry
  * - returns an array containing each permutation.
  * - e.g. (1,2,3) returns (1,2,3), (1,3,2), (2,1,3), (2,3,1), (3,1,2), and (3,2,1)
- * - really a combinations without repetition N! function so 3! = 6 and 10! = 4098 combinations
+ * - A combinations without repetition N! function so 3! = 6 and 10! = 3,628,800 combinations
  * - Used by parse_bbc to allow bbc tag parameters to be in any order and still be
  * parsed properly
+ * - Caution: If passed > 8 (default) elements, will only permute the first 8 and append on the remaining elements
+ * as such it will not return a proper N!
  *
  * @param mixed[] $array index array of values
+ * @param int $max maximum sized array to allow, 9 will require ~ 225M, 10 ~ 2G of memory
+ *
  * @return mixed[] array representing all premutations of the supplied array
  */
-function permute($array)
+function permute($array, $max = 8)
 {
 	$orders = array($array);
+	$append = false;
 
+	// Check if this will require more memory than available
 	$n = count($array);
+	if ($n > $max)
+	{
+		// Only permute the first "max" array elements and then append on the remaining
+		// @todo temporary measure to prevent wsod, needs to be properly handled
+		$append = array_slice($array, $max, $n);
+		$array = array_slice($array, 0, $max);
+		$n = $max;
+	}
+
 	$p = range(0, $n);
 	for ($i = 1; $i < $n; null)
 	{
 		$p[$i]--;
-		$j = $i % 2 != 0 ? $p[$i] : 0;
+		$j = ($i % 2 !== 0) ? $p[$i] : 0;
 
 		$temp = $array[$i];
 		$array[$i] = $array[$j];
 		$array[$j] = $temp;
 
-		for ($i = 1; $p[$i] == 0; $i++)
-			$p[$i] = 1;
+		for ($i = 1; $p[$i] === 0; $i++)
+			$p[$i] = $i;
 
-		$orders[] = $array;
+		$orders[] = $append ? array_merge($array, $append) : $array;
 	}
 
 	return $orders;
