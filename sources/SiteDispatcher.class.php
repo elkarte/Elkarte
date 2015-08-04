@@ -208,7 +208,7 @@ class Site_Dispatcher
 			// sa=upload => action_upload()
 			if (file_exists($path . '/' . ucfirst($_GET['action']) . '.controller.php'))
 			{
-				$this->_controller_name = ucfirst($_GET['action']);
+				$this->_controller_name = ucfirst($_GET['action']) . '_Controller';
 				if (isset($_GET['sa']) && preg_match('~^\w+$~', $_GET['sa']) && !isset($_GET['area']))
 					$this->_function_name = 'action_' . $_GET['sa'];
 				else
@@ -287,7 +287,7 @@ class Site_Dispatcher
 	{
 		if (!empty($this->_controller_name))
 		{
-			$action  = strtolower($this->_controller_name);
+			$action  = strtolower(str_replace('_Controller', '', $this->_controller_name));
 			$action = substr($action, -1) == 2 ? substr($action, 0, -1) : $action;
 		}
 
