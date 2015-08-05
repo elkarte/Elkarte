@@ -648,6 +648,9 @@ class Register_Controller extends Action_Controller
 			return;
 		}
 
+		// Let's assume it's an email change until proven otherwise
+		$email_change = true;
+
 		// Change their email address? (they probably tried a fake one first :P.)
 		if (isset($_POST['new_email'], $_REQUEST['passwd']) && validateLoginPassword($_REQUEST['passwd'], $row['passwd'], $row['member_name'], true) && ($row['is_activated'] == 0 || $row['is_activated'] == 2))
 		{
@@ -670,7 +673,8 @@ class Register_Controller extends Action_Controller
 			updateMemberData($row['id_member'], array('email_address' => $_POST['new_email']));
 			$row['email_address'] = $_POST['new_email'];
 
-			$email_change = true;
+			// If we are here, it's not an email change, but it will use the rest of the controller
+			$email_change = false;
 		}
 
 		// Resend the password, but only if the account wasn't activated yet.
@@ -696,7 +700,7 @@ class Register_Controller extends Action_Controller
 			// This will ensure we don't actually get an error message if it works!
 			$context['error_title'] = '';
 
-			fatal_lang_error(!empty($email_change) ? 'change_email_success' : 'resend_email_success', false);
+			fatal_lang_error($email_change ? 'change_email_success' : 'resend_email_success', false);
 		}
 
 		// Quit if this code is not right.
@@ -724,7 +728,7 @@ class Register_Controller extends Action_Controller
 		// Also do a proper member stat re-evaluation.
 		updateStats('member', false);
 
-		if (!isset($_POST['new_email']))
+		if (!isset($_POST['new_email']) && !$email_change)
 		{
 			require_once(SUBSDIR . '/Notification.subs.php');
 			sendAdminNotifications('activation', $row['id_member'], $row['member_name']);
