@@ -189,8 +189,9 @@ class Site_Dispatcher
 
 			$this->_controller_name = $actionArray[$_GET['action']][0];
 
+
 			// If the method is coded in, use it
-			if (!empty($actionArray[$_GET['action']][2]))
+			if (!empty($actionArray[$_GET['action']][1]))
 				$this->_function_name = $actionArray[$_GET['action']][1];
 			// Otherwise fall back to naming patterns
 			elseif (isset($_GET['sa']) && preg_match('~^\w+$~', $_GET['sa']))

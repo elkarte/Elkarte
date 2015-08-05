@@ -32,8 +32,6 @@ class DispatcherTest extends PHPUnit_Framework_TestCase
 
 		foreach (array_keys($auto_actions) as $action)
 		{
-			$file_name = ucfirst($action) . '.controller.php';
-			require_once(CONTROLLERDIR . '/' . $file_name);
 			$controller_name = ucfirst($action) . '_Controller';
 			$controller = new $controller_name();
 			foreach ($auto_actions[$action] as $subaction)
@@ -73,8 +71,6 @@ class DispatcherTest extends PHPUnit_Framework_TestCase
 
 		foreach (array_keys($actions) as $action)
 		{
-			$file_name = ucfirst($actions[$action]) . '.controller.php';
-			require_once(CONTROLLERDIR . '/' . $file_name);
 			$controller_name = ucfirst($actions[$action]) . '_Controller';
 			$controller = new $controller_name();
 			$this->assertTrue(method_exists($controller, 'action_' . $action));
@@ -94,7 +90,6 @@ class DispatcherTest extends PHPUnit_Framework_TestCase
 			array(
 				'test_name' => 'no action',
 				'result' => array(
-					'file_name' => CONTROLLERDIR . '/BoardIndex.controller.php',
 					'function_name' => 'action_boardindex',
 					'controller_name' => 'BoardIndex_Controller',
 				),
@@ -105,7 +100,6 @@ class DispatcherTest extends PHPUnit_Framework_TestCase
 				'board' => 1,
 				'topic' => 1,
 				'result' => array(
-					'file_name' => CONTROLLERDIR . '/Display.controller.php',
 					'function_name' => 'action_display',
 					'controller_name' => 'Display_Controller',
 				),
@@ -115,7 +109,6 @@ class DispatcherTest extends PHPUnit_Framework_TestCase
 				'test_name' => 'a board',
 				'board' => 1,
 				'result' => array(
-					'file_name' => CONTROLLERDIR . '/MessageIndex.controller.php',
 					'function_name' => 'action_messageindex',
 					'controller_name' => 'MessageIndex_Controller',
 				),
@@ -125,7 +118,6 @@ class DispatcherTest extends PHPUnit_Framework_TestCase
 				'test_name' => 'non-existing action',
 				'action' => 'qwerty',
 				'result' => array(
-					'file_name' => CONTROLLERDIR . '/BoardIndex.controller.php',
 					'function_name' => 'action_boardindex',
 					'controller_name' => 'BoardIndex_Controller',
 				),
@@ -135,7 +127,6 @@ class DispatcherTest extends PHPUnit_Framework_TestCase
 				'test_name' => 'existing action without sub-action',
 				'action' => 'announce',
 				'result' => array(
-					'file_name' => CONTROLLERDIR . '/Announce.controller.php',
 					'function_name' => 'action_index',
 					'controller_name' => 'Announce_Controller',
 				),
@@ -146,7 +137,6 @@ class DispatcherTest extends PHPUnit_Framework_TestCase
 				'action' => 'announce',
 				'sa' => 'test',
 				'result' => array(
-					'file_name' => CONTROLLERDIR . '/Announce.controller.php',
 					'function_name' => 'action_test',
 					'controller_name' => 'Announce_Controller',
 				),
@@ -156,7 +146,6 @@ class DispatcherTest extends PHPUnit_Framework_TestCase
 				'test_name' => 'existing action using ADMINDIR',
 				'action' => 'admin',
 				'result' => array(
-					'file_name' => ADMINDIR . '/Admin.controller.php',
 					'function_name' => 'action_index',
 					'controller_name' => 'Admin_Controller',
 				),
@@ -166,7 +155,6 @@ class DispatcherTest extends PHPUnit_Framework_TestCase
 				'test_name' => 'action from actionarray',
 				'action' => 'removetopic2',
 				'result' => array(
-					'file_name' => CONTROLLERDIR . '/RemoveTopic.controller.php',
 					'function_name' => 'action_removetopic2',
 					'controller_name' => 'RemoveTopic_Controller',
 				),
@@ -208,24 +196,22 @@ class DispatcherTest extends PHPUnit_Framework_TestCase
 
 /**
  * A small variation of Site_Dispatcher that provides a method to expose the
- * otherwise hidden results of the dispaching (_file_name, _function_name and _controller_name)
+ * otherwise hidden results of the dispaching (_function_name and _controller_name)
  */
 class Site_Dispatcher_Tester extends Site_Dispatcher
 {
 	/**
-	 * This method compares the values of _file_name, _function_name and
+	 * This method compares the values of _function_name and
 	 * _controller_name obtained from the Site_Dispatcher and the expected values
 	 *
 	 * @param array An array containing the expected results of a dispaching in the form:
-	 *              'file_name' => 'file_name',
 	 *              'function_name' => 'function_name',
 	 *              'controller_name' => 'controller_name',
 	 * @return true if exactly the same, false otherwise
 	 */
 	public function compare($action)
 	{
-		return (empty($this->_file_name) || $this->_file_name == $action['file_name']) &&
-		       $this->_controller_name == $action['controller_name'] &&
+		return $this->_controller_name == $action['controller_name'] &&
 		       $this->_function_name == $action['function_name'];
 	}
 }
