@@ -809,21 +809,20 @@ a.bbc_link {
 }
 /* The main title. */
 #forumtitle, .rightheader #forumtitle {
-	float: left;
 	padding: 10px 10px 6px 13px;
 	font-size: 2.357em;
 	line-height: 1.455em;
 }
-.centerheader #forumtitle {
+.centerheader .forumlink {
 	display: none;
 }
-.rightheader #forumtitle {
+.rightheader #forumtitle .forumlink {
 	float: right;
 }
 /* Float these items to the right. @todo - Simplify. */
 #logobox, .rightheader #logobox {
 	float: right;
-	padding: 0.95em 12px 0 12px;
+	padding: 0 12px 0 12px;
 	max-width: 40%;
 }
 .centerheader #logobox {
