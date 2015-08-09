@@ -195,6 +195,10 @@ select#cat, select#suggestions, select#file , input[type="file"] {
 	height: auto;
 	max-height: none;
 }
+.select_multiple {
+	min-height: 10em;
+	height: auto;
+}
 input[type="number"] {
 	padding: 0 0 0 6px;
 }
@@ -809,21 +813,20 @@ a.bbc_link {
 }
 /* The main title. */
 #forumtitle, .rightheader #forumtitle {
-	float: left;
 	padding: 10px 10px 6px 13px;
 	font-size: 2.357em;
 	line-height: 1.455em;
 }
-.centerheader #forumtitle {
+.centerheader .forumlink {
 	display: none;
 }
-.rightheader #forumtitle {
+.rightheader #forumtitle .forumlink {
 	float: right;
 }
 /* Float these items to the right. @todo - Simplify. */
 #logobox, .rightheader #logobox {
 	float: right;
-	padding: 0.95em 12px 0 12px;
+	padding: 0 12px 0 12px;
 	max-width: 40%;
 }
 .centerheader #logobox {
@@ -1182,6 +1185,9 @@ a.bbc_link {
 	padding: 0 6px;
 	font-size: 0.786em;
 	line-height: 2em;
+}
+.fa.hamburger_30 {
+	display: none;
 }
 
 /* The quick buttons. */
@@ -4651,7 +4657,7 @@ dl.no_members {
 	.forumposts .windowbg, .forumposts .windowbg2 {
 		margin-bottom: 6px;
 	}
-	#moderationbuttons, a.linklevel1.button_strip_notify,
+	a.linklevel1.button_strip_notify,
 	a.linklevel1.button_strip_print, a.linklevel1.button_strip_send, .inline_mod_check,
 	a.linklevel1.quotetonew_button, a.linklevel1.button_strip_post_poll,
 	.keyinfo .post_subject, li.listlevel1.quickmod_select_all,
@@ -4794,5 +4800,27 @@ dl.no_members {
 	#confirm_buttons .button_submit {
 		height: inherit;
 		max-height: none;
+	}
+	.fa.hamburger_30 {
+		padding-top: 0.1em;
+		display: inline-block;
+		vertical-align: middle;
+	}
+	.fa.hamburger_30:before {
+		margin: 0.2em;
+	}
+	#display_jump_to {
+		display: inline-block;
+	}
+	.hide_30.hamburger_30 {
+		left: -9999px;
+		position: absolute;
+	}
+	.fa.hamburger_30.visible {
+		display: none;
+	}
+	.hide_30.hamburger_30.visible {
+		left: auto;
+		position: relative;
 	}
 }

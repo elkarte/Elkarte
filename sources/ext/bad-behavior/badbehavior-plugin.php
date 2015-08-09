@@ -10,7 +10,7 @@
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
- * @version 1.0
+ * @version 1.0.5
  *
  */
 
@@ -190,16 +190,35 @@ function bb2_insert($settings, $package, $key)
 		foreach ($package['request_entity'] as $h => $v)
 		{
 			if (is_array($v))
-				$v = implode(' | ', $v);
+				$v = bb2_multi_implode(' | ', $v);
 
 			$request_entity .= bb2_db_escape("$h: $v\n");
 		}
+		$request_entity = substr($request_entity, 0, 254);
 	}
 
 	// Add it
 	return "INSERT INTO {db_prefix}log_badbehavior
 		(`ip`, `date`, `request_method`, `request_uri`, `server_protocol`, `http_headers`, `user_agent`, `request_entity`, `valid`, `id_member`, `session`) VALUES
 		('$ip', '$date', '$request_method', '$request_uri', '$server_protocol', '$headers', '$user_agent', '$request_entity', '$key', '$member_id' , '$session')";
+}
+
+/**
+ * Recursive implode for multi-dimensional arrays
+ *
+ * @param string $glue
+ * @param mixed[] $array
+ * @return string
+ */
+function bb2_multi_implode($glue, $array)
+{
+	foreach ($array as $h => $v)
+	{
+		if (is_array($v))
+			$array[$h] = bb2_multi_implode($v);
+	}
+
+	return implode($glue, $array);
 }
 
 /**

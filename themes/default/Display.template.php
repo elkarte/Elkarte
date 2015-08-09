@@ -11,7 +11,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0.4
+ * @version 1.0.5
  *
  */
 
@@ -782,7 +782,8 @@ function template_pages_and_buttons_below()
 	theme_linktree();
 
 	echo '
-			<div id="moderationbuttons">', template_button_strip($context['mod_buttons'], 'bottom', array('id' => 'moderationbuttons_strip')), '</div>';
+			<i class="fa fa-2x fa-bars hamburger_30" data-id="moderationbuttons"></i>
+			<div id="moderationbuttons" class="hide_30 hamburger_30">', template_button_strip($context['mod_buttons'], 'bottom', array('id' => 'moderationbuttons_strip')), '</div>';
 
 	// Show the jump-to box, or actually...let Javascript do it.
 	echo '

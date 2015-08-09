@@ -11,7 +11,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0.3
+ * @version 1.0.5
  *
  */
 
@@ -991,7 +991,7 @@ function template_show_settings()
 				elseif ($config_var['type'] == 'select')
 				{
 					echo '
-							<select name="', $config_var['name'], '" id="', $config_var['name'], '" ', $javascript, $disabled, (!empty($config_var['multiple']) ? ' multiple="multiple"' : ''), '>';
+							<select name="', $config_var['name'], '" id="', $config_var['name'], '" ', $javascript, $disabled, (!empty($config_var['multiple']) ? ' multiple="multiple" class="select_multiple"' : ''), '>';
 
 					foreach ($config_var['data'] as $option)
 						echo '

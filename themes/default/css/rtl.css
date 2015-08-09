@@ -181,10 +181,9 @@ h2 a.collapse {
 }
 /* The main title. */
 #forumtitle, .rightheader #forumtitle {
-	float: right;
 	padding: 10px 13px 6px 10px;
 }
-.rightheader #forumtitle {
+.rightheader #forumtitle .forumlink {
 	float: left;
 }
 /* Float these items to the right. @todo - Simplify. */

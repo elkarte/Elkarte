@@ -14,7 +14,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0
+ * @version 1.0.5
  *
  */
 
@@ -1044,7 +1044,7 @@ function getBoardList($boardListOptions = array(), $simple = false)
 			);
 
 			// Do we want access informations?
-			if (!empty($boardListOptions['access']))
+			if (isset($boardListOptions['access']) && $boardListOptions['access'] !== false)
 			{
 				$return_value[$row['id_board']]['allow'] = !(empty($row['can_access']) || $row['can_access'] == 'f');
 				$return_value[$row['id_board']]['deny'] = !(empty($row['cannot_access']) || $row['cannot_access'] == 'f');
