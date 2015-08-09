@@ -336,13 +336,9 @@ function template_additional_options_below()
 	echo '
 					<div id="', empty($settings['additional_options_collapsible']) ? 'postAdditionalOptionsNC"' : 'postAdditionalOptions"', empty($settings['additional_options_collapsible']) || empty($context['minmax_preferences']['post']) ? '' : ' style="display: none;"', '>';
 
-	// If this post already has attachments on it - give information about them.
-	if (!empty($context['attachments']['current']))
-		$context['attachments']['templates']['existing']();
-
-	// Is the user allowed to post any additional ones? If so give them the boxes to do it!
-	if ($context['attachments']['can']['post'])
-		$context['attachments']['templates']['add_new']();
+	// Is the user allowed to post or if this post already has attachments on it give them the boxes.
+	if ($context['attachments']['can']['post'] || !empty($context['attachments']['current']))
+		$context['attachments']['template']();
 
 	// Display the check boxes for all the standard options - if they are available to the user!
 	echo '
@@ -364,38 +360,6 @@ function template_additional_options_below()
 }
 
 /**
- * Creates a list of attachments already attached to this message
- */
-function template_show_existing_attachments()
-{
-	global $context, $txt, $modSettings;
-
-	echo '
-						<dl id="postAttachment">
-							<dt>
-								', $txt['attached'], ':
-							</dt>
-							<dd class="smalltext" style="width: 100%;">
-								<input type="hidden" name="attach_del[]" value="0" />
-								', $txt['uncheck_unwatchd_attach'], ':
-							</dd>';
-
-	foreach ($context['attachments']['current'] as $attachment)
-		echo '
-							<dd class="smalltext">
-								<label for="attachment_', $attachment['id'], '"><input type="checkbox" id="attachment_', $attachment['id'], '" name="attach_del[]" value="', $attachment['id'], '"', empty($attachment['unchecked']) ? ' checked="checked"' : '', ' class="input_check" /> ', $attachment['name'], (empty($attachment['approved']) ? ' (' . $txt['awaiting_approval'] . ')' : ''),
-		!empty($modSettings['attachmentPostLimit']) || !empty($modSettings['attachmentSizeLimit']) ? sprintf($txt['attach_kb'], comma_format(round(max($attachment['size'], 1028) / 1028), 0)) : '', '</label>
-							</dd>';
-
-	echo '
-						</dl>';
-
-	if (!empty($context['files_in_session_warning']))
-		echo '
-						<div class="smalltext">', $context['files_in_session_warning'], '</div>';
-}
-
-/**
  * Creates the interface to upload attachments
  */
 function template_add_new_attachments()
@@ -403,6 +367,7 @@ function template_add_new_attachments()
 	global $context, $txt, $modSettings;
 
 	echo '
+						<span id="postAttachment"></span>
 						<dl id="postAttachment2">';
 
 	// But, only show them if they haven't reached a limit. Or a mod author hasn't hidden them.
@@ -439,6 +404,22 @@ function template_add_new_attachments()
 							</dd>';
 	}
 
+	foreach ($context['attachments']['current'] as $attachment)
+	{
+		$label = $attachment['name'];
+		if (empty($attachment['approved']))
+			$label .= ' (' . $txt['awaiting_approval'] . ')';
+		if (!empty($modSettings['attachmentPostLimit']) || !empty($modSettings['attachmentSizeLimit']))
+			$label .= sprintf($txt['attach_kb'], comma_format(round(max($attachment['size'], 1028) / 1028), 0));
+
+		echo '
+							<dd class="smalltext">
+								<label for="attachment_', $attachment['id'], '">
+									<input type="checkbox" id="attachment_', $attachment['id'], '" name="attach_del[]" value="', $attachment['id'], '"', empty($attachment['unchecked']) ? ' checked="checked"' : '', ' class="input_check inline_insert" data-attachid="', $attachment['id'], '" data-size="', $attachment['size'], '"/> ', $label, '
+								</label>
+							</dd>';
+	}
+
 	echo '
 							<dd class="smalltext">';
 
@@ -462,6 +443,40 @@ function template_add_new_attachments()
 	echo '
 							</dd>
 						</dl>';
+
+	// Load up the drag and drop attachment magic
+	addInlineJavascript('
+	var inlineAttach = ElkInlineAttachments(\'#postAttachment2,#postAttachment\', \'' . $context['post_box_name'] . '\', {
+		trigger: $(\'<div class="fa share fa-share-alt-square" />\')
+	});
+	var dropAttach = new dragDropAttachment({
+		board: ' . $context['current_board'] . ',
+		allowedExtensions: ' . JavaScriptEscape($context['attachments']['allowed_extensions']) . ',
+		totalSizeAllowed: ' . JavaScriptEscape(empty($modSettings['attachmentPostLimit']) ? '' : $modSettings['attachmentPostLimit']) . ',
+		individualSizeAllowed: ' . JavaScriptEscape(empty($modSettings['attachmentSizeLimit']) ? '' : $modSettings['attachmentSizeLimit']) . ',
+		numOfAttachmentAllowed: ' . $context['attachments']['num_allowed'] . ',
+		totalAttachSizeUploaded: ' . (isset($context['attachments']['total_size']) && !empty($context['attachments']['total_size']) ? $context['attachments']['total_size'] : 0) . ',
+		numAttachUploaded: ' . (isset($context['attachments']['quantity']) && !empty($context['attachments']['quantity']) ? $context['attachments']['quantity'] : 0) . ',
+		oTxt: {
+			allowedExtensions : ' . JavaScriptEscape(sprintf($txt['cant_upload_type'], $context['attachments']['allowed_extensions'])) . ',
+			totalSizeAllowed : ' . JavaScriptEscape($txt['attach_max_total_file_size']) . ',
+			individualSizeAllowed : ' . JavaScriptEscape(sprintf($txt['file_too_big'], comma_format($modSettings['attachmentSizeLimit'], 0))) . ',
+			numOfAttachmentAllowed : ' . JavaScriptEscape(sprintf($txt['attachments_limit_per_post'], $modSettings['attachmentNumPerPostLimit'])) . ',
+			postUploadError : ' . JavaScriptEscape($txt['post_upload_error']) . ',
+			areYouSure: ' . JavaScriptEscape($txt['ila_confirm_removal']) . '
+		},
+		existingSelector: \'.inline_insert\',
+		events: {
+			UploadSuccess: function(data) {
+				var $base = $(this).find(\'.control\');
+				inlineAttach.addInterface($base, data.attachid);
+			},
+			RemoveSuccess: function(attachid) {
+				inlineAttach.removeAttach(attachid);
+			}
+		}' . (isset($context['current_topic']) ? ',
+			topic: ' . $context['current_topic'] : '') . '
+	});', true);
 }
 
 /**
@@ -625,7 +640,7 @@ function template_postarea_below()
 	global $context, $txt, $counter, $settings;
 
 	// Is visual verification enabled?
-	if ($context['require_verification'])
+	if (!empty($context['require_verification']))
 	{
 		template_verification_controls($context['visual_verification_id'], '
 						<div class="post_verification">

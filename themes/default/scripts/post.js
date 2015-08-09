@@ -289,10 +289,6 @@ function onDocSent(XMLDoc)
 		if ('last_msg' in document.forms[form_name])
 			document.forms[form_name].last_msg.value = XMLDoc.getElementsByTagName('elk')[0].getElementsByTagName('last_msg')[0].firstChild.nodeValue;
 
-		// Remove the new image from old-new replies!
-		for (i = 0; i < new_replies.length; i++)
-			document.getElementById('image_new_' + new_replies[i]).style.display = 'none';
-
 		var new_replies = [],
 			ignored_replies = [],
 			ignoring = null,
@@ -326,6 +322,10 @@ function onDocSent(XMLDoc)
 			}
 			setOuterHTML(document.getElementById('new_replies'), newPostsHTML);
 		}
+
+		// Remove the new image from old-new replies!
+		for (i = 0; i < new_replies.length; i++)
+			document.getElementById('image_new_' + new_replies[i]).style.display = 'none';
 
 		var numIgnoredReplies = ignored_replies.length;
 		if (numIgnoredReplies !== 0)

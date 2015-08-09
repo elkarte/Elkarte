@@ -1362,11 +1362,14 @@ div.bbc_footnotes .meaction{
 	background-color: green;
 }
 
-.abort, .remove {
+.abort, .remove, .share {
 	background-color: #A8352F;
 	border-radius: 5px;
 	color: #fff;
 	cursor: pointer;
+}
+.share {
+	background-color: green;
 }
 .drop_attachments_error {
 	color: #ff0000;

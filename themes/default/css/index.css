@@ -2570,7 +2570,8 @@ ul.post_options li {
 	overflow: hidden;
 }
 .info {
-	float: left;
+	display: inline-block;
+	vertical-align: middle;
 	position: relative;
 	overflow: hidden;
 	width: 60%;
@@ -2578,15 +2579,32 @@ ul.post_options li {
 }
 .progressBar {
 	width: 20%;
+	display: inline-block;
+	vertical-align: middle;
 	border-radius: 5px;
-	float: left;
 	text-align: center;
 }
-.abort, .remove {
+.postattach_thumb img {
+	max-height: 100%;
+	max-width: 100%;
+}
+.postattach_thumb {
+	display: inline-block;
+	vertical-align: middle;
+	max-height: 50px;
+	max-width: 50px;
+}
+.abort, .remove, .share {
 	float: right;
 	overflow: hidden;
 	font-size: 1em;
 	padding: 4px 6px;
+}
+.share {
+	float: none;
+	vertical-align: middle;
+	display: inline-block;
+	margin: auto 5px;
 }
 .drop_attachmnts_error {
 	padding: 10px 0;

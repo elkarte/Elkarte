@@ -246,6 +246,7 @@ class UpgradeInstructions_upgrade_1_1
 					enableModules('verification', array('post', 'personalmessage', 'register'));
 					enableModules('random', array('post', 'display'));
 					Hooks::get()->enableIntegration('User_Notification_Integrate');
+					Hooks::get()->enableIntegration('Ila_Integrate');
 					updateSettings(array(
 						'usernotif_favicon_bgColor' => '#ff0000',
 						'usernotif_favicon_position' => 'up',

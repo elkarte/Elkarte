@@ -1047,7 +1047,7 @@ a.active {
 	background-color: #43a8da;
 }
 
-.abort, .remove {
+.abort, .remove .share {
 	background-color: #a8352f;
 	border-radius: 5px;
 	color: #fff;
