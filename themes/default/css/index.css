@@ -195,6 +195,10 @@ select#cat, select#suggestions, select#file , input[type="file"] {
 	height: auto;
 	max-height: none;
 }
+.select_multiple {
+	min-height: 10em;
+	height: auto;
+}
 input[type="number"] {
 	padding: 0 0 0 6px;
 }
