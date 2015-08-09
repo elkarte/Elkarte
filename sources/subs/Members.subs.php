@@ -1978,13 +1978,29 @@ function approveMembers($conditions)
 	);
 
 	// @todo maybe an hook here?
-
 	$query_cond = array();
+	$query = false;
 	foreach ($conditions as $key => $dummy)
+	{
 		if (isset($available_conditions[$key]))
+		{
+			if ($key === 'time_before')
+				$query = true;
 			$query_cond[] = $available_conditions[$key];
+		}
+	}
 
-	$conditions['is_activated'] = 1;
+	if ($query)
+	{
+		$data = retrieveMemberData($conditions);
+		$members_id = $data['members'];
+	}
+	else
+	{
+		$members_id = $conditions['members'];
+	}
+
+	$conditions['is_activated'] = $conditions['activated_status'] >= 10 ? 11 : 1;
 	$conditions['blank_string'] = '';
 
 	// Approve/activate this member.
@@ -1994,6 +2010,12 @@ function approveMembers($conditions)
 		WHERE is_activated = {int:activated_status}' . implode('', $query_cond),
 		$conditions
 	);
+
+	// Let the integration know that they've been activated!
+	foreach ($members_id as $member_id)
+		call_integration_hook('integrate_activate', array($member_id, $conditions['activated_status'], $conditions['is_activated']));
+
+	return $conditions['is_activated'];
 }
 
 /**
