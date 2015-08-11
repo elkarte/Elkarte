@@ -4805,6 +4805,7 @@ dl.no_members {
 		padding-top: 0.1em;
 		display: inline-block;
 		vertical-align: middle;
+		cursor: pointer;
 	}
 	.fa.hamburger_30:before {
 		margin: 0.2em;
@@ -4812,14 +4813,14 @@ dl.no_members {
 	#display_jump_to {
 		display: inline-block;
 	}
-	.hide_30.hamburger_30 {
+	.hide_30.hamburger_30_target {
 		left: -9999px;
 		position: absolute;
 	}
 	.fa.hamburger_30.visible {
 		display: none;
 	}
-	.hide_30.hamburger_30.visible {
+	.hide_30.hamburger_30_target.visible {
 		left: auto;
 		position: relative;
 	}
