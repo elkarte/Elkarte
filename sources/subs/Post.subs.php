@@ -219,11 +219,10 @@ function preparsetable($message)
 
 	// Define the allowable tags after a give tag
 	$table_order = array(
-		'table' => 'td',
-		'table' => 'th',
-		'tr' => 'table',
-		'td' => 'tr',
-		'th' => 'tr',
+		'table' => array('tr'),
+		'tr' => array('td', 'th'),
+		'td' => array('table'),
+		'th' => array(''),
 	);
 
 	// Find all closing tags (/table /tr /td etc)
@@ -237,7 +236,7 @@ function preparsetable($message)
 		if ($matches[1] != '/')
 		{
 			// If the previous table tag isn't correct simply remove it.
-			if ((!empty($table_array) && $table_array[0] != $table_order[$matches[2]]) || (empty($table_array) && $matches[2] != 'table'))
+			if ((!empty($table_array) && !in_array($matches[2], $table_order[$table_array[0]])) || (empty($table_array) && $matches[2] != 'table'))
 				$remove_tag = true;
 			// Record this was the last tag.
 			else
