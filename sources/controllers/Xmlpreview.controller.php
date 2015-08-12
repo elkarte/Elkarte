@@ -141,13 +141,14 @@ class XmlPreview_Controller extends Action_Controller
 			$member['signature'] = parse_bbc($member['signature'], true, 'sig' . $user);
 
 			// And now what they want it to be
-			$preview_signature = !empty($_POST['signature']) ? $_POST['signature'] : '';
+			$preview_signature = !empty($_POST['signature']) ? Util::htmlspecialchars($_POST['signature']) : '';
 			$validation = profileValidateSignature($preview_signature);
 
 			// An odd check for errors to be sure
 			if ($validation !== true && $validation !== false)
 				$errors[] = array('value' => $txt['profile_error_' . $validation], 'attributes' => array('type' => 'error'));
 
+			preparsecode($preview_signature);
 			censorText($preview_signature);
 			$preview_signature = parse_bbc($preview_signature, true, 'sig' . $user);
 		}
