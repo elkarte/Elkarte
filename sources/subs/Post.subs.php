@@ -168,8 +168,6 @@ function preparsecode(&$message, $previewing = false)
 				'~\[_(li|/li|td|tr|/tr)_\]~' => '[$1]',
 				// Images with no real url.
 				'~\[img\]https?://.{0,7}\[/img\]~' => '',
-				// Font tags with multiple fonts (copy&paste in the WYSIWYG by some browsers).
-				'~\[font=\\\'?(.*?)\\\'?(?=\,[ \'\"A-Za-z]*\]).*?\](.*?(?:\[/font\]))~s'  => '[font=$1]$2'
 			);
 
 			// Fix up some use of tables without [tr]s, etc. (it has to be done more than once to catch it all.)
@@ -182,6 +180,9 @@ function preparsecode(&$message, $previewing = false)
 
 			// Fix color tags of many forms so they parse properly
 			$parts[$i] = preg_replace('~\[color=(?:#[\da-fA-F]{3}|#[\da-fA-F]{6}|[A-Za-z]{1,20}|rgb\(\d{1,3}, ?\d{1,3}, ?\d{1,3}\))\]\s*\[/color\]~', '', $parts[$i]);
+
+			// Font tags with multiple fonts (copy&paste in the WYSIWYG by some browsers).
+			$parts[$i] = preg_replace_callback('~\[font=([^\]]*)\](.*?(?:\[/font\]))~s', 'preparsecode_font_callback', $parts[$i]);
 		}
 
 		call_integration_hook('integrate_preparse_code', array(&$parts[$i], $i, $previewing));
@@ -271,6 +272,20 @@ function preparsetable($message)
 		$message .= '[/' . $tag . ']';
 
 	return $message;
+}
+
+/**
+ * Use only the primary (first) font face when multiple are supplied
+ *
+ * @package Posts
+ * @param string[] $matches
+ */
+function preparsecode_font_callback($matches)
+{
+	$fonts = explode(',', $matches[1]);
+	$font = trim(un_htmlspecialchars($fonts[0]), ' "\'');
+
+	return '[font=' . $font . ']' . $matches[2];
 }
 
 /**
