@@ -311,6 +311,10 @@ function removeTopics($topics, $decreasePostCount = true, $ignoreRecycling = fal
 	// If there are messages left in this topic
 	if (!empty($messages))
 	{
+		// Decrease / Update the member like counts
+		require_once(SUBSDIR . '/Likes.subs.php');
+		decreaseLikeCounts($messages);
+
 		// Remove all likes now that the topic is gone
 		$db->query('', '
 			DELETE FROM {db_prefix}message_likes

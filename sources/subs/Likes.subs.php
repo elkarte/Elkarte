@@ -500,3 +500,110 @@ function messageLikeCount($message)
 
 	return (int) $total;
 }
+
+/**
+ * Utility function to decrease member like counts when a message is removed
+ *
+ * When a message is removed, we need update the like counts for those who liked the message
+ * as well as those who posted the message
+ *  - Members who liked the message have likes given decreased
+ *  - The member who posted has the likes received decreased by the number of likers
+ * for that message.
+ *
+ * @param int[]|int $messages
+ */
+function decreaseLikeCounts($messages)
+{
+	$db = database();
+
+	// Start off with no changes
+	$posters = array();
+	$likers = array();
+	$update_given = array();
+	$update_received = array();
+
+	// Only a single message
+	if (is_numeric($messages))
+		$messages = array($messages);
+
+	// Load the members who liked and who posted for this group of messages
+	$request = $db->query('', '
+		SELECT
+			DISTINCT(id_member) AS id_member, id_poster
+		FROM {db_prefix}message_likes
+		WHERE id_msg IN ({array_int:messages})',
+		array(
+			'messages' => $messages,
+		)
+	);
+	while ($row = $db->fetch_assoc($request))
+	{
+		$posters[$row['id_poster']] = $row['id_poster'];
+		$likers[$row['id_member']] = $row['id_member'];
+	}
+	$db->free_result($request);
+
+	// No one?
+	if (empty($posters) && empty($likers))
+		return;
+
+	// Re-count the "likes given" totals for the likers
+	if (!empty($likers))
+	{
+		$request = $db->query('', '
+		SELECT
+			COUNT(id_msg) AS likes, id_member
+		FROM {db_prefix}message_likes
+		WHERE id_member IN ({array_int:members})
+		GROUP BY id_member',
+			array(
+				'members' => $likers,
+			)
+		);
+		// All who liked these messages have their "likes given" reduced by 1
+		while ($row = $db->fetch_assoc($request))
+			$update_given[$row['id_member']] = $row['likes'] - 1;
+		$db->free_result($request);
+	}
+
+	// Count the "likes received" totals for the message posters
+	if (!empty($posters))
+	{
+		$request = $db->query('', '
+		SELECT
+			COUNT(id_msg) AS likes, id_poster
+		FROM {db_prefix}message_likes
+		WHERE id_poster IN ({array_int:members})
+		GROUP BY id_poster',
+			array(
+				'members' => $posters,
+			)
+		);
+		while ($row = $db->fetch_assoc($request))
+			$update_received[$row['id_poster']] = $row['likes'];
+		$db->free_result($request);
+	}
+
+	// Determine how many likes were given to each message
+	$request = $db->query('', '
+		SELECT
+			COUNT(id_msg) AS likes, id_poster, id_msg
+		FROM {db_prefix}message_likes
+		WHERE id_msg IN ({array_int:messages})
+		GROUP BY id_msg',
+		array(
+			'messages' => $messages,
+		)
+	);
+	// All the likes they received for these messages are removed from the total
+	while ($row = $db->fetch_assoc($request))
+		$update_received[$row['id_poster']] = $update_received[$row['id_poster']] - $row['likes'];
+	$db->free_result($request);
+
+	// Update the totals for these members
+	foreach ($update_given as $id_member => $total)
+		updateMemberData($id_member, array('likes_given' => (int) $total));
+
+	foreach ($update_received as $id_member => $total)
+		updateMemberData($id_member, array('likes_received' => (int) $total));
+}
