@@ -333,7 +333,7 @@ function likesCount($memberID, $given = true)
  */
 function likesPostsGiven($start, $items_per_page, $sort, $memberID)
 {
-	global $scripturl, $context;
+	global $scripturl, $context, $modSettings;
 
 	$db = database();
 	$likes = array();
@@ -347,7 +347,8 @@ function likesPostsGiven($start, $items_per_page, $sort, $memberID)
 		FROM {db_prefix}message_likes AS l
 			LEFT JOIN {db_prefix}messages AS m ON (m.id_msg = l.id_msg)
 			LEFT JOIN {db_prefix}boards AS b ON (b.id_board = m.id_board)
-		WHERE l.id_member = {int:id_member}
+		WHERE l.id_member = {int:id_member}' . (!empty($modSettings['recycle_enable']) ? ('
+			AND b.id_board != ' . $modSettings['recycle_board']) : '') . '
 		ORDER BY {raw:sort}
 		LIMIT {int:start}, {int:per_page}',
 		array(
@@ -384,7 +385,7 @@ function likesPostsGiven($start, $items_per_page, $sort, $memberID)
  */
 function likesPostsReceived($start, $items_per_page, $sort, $memberID)
 {
-	global $scripturl;
+	global $scripturl, $modSettings;
 
 	$db = database();
 	$likes = array();
@@ -397,7 +398,8 @@ function likesPostsReceived($start, $items_per_page, $sort, $memberID)
 		FROM {db_prefix}message_likes AS l
 			LEFT JOIN {db_prefix}messages AS m ON (m.id_msg = l.id_msg)
 			LEFT JOIN {db_prefix}boards AS b ON (b.id_board = m.id_board)
-		WHERE l.id_poster = {int:id_member}
+		WHERE l.id_poster = {int:id_member}' . (!empty($modSettings['recycle_enable']) ? ('
+			AND b.id_board != ' . $modSettings['recycle_board']) : '') . '
 		GROUP BY (l.id_msg)
 		ORDER BY {raw:sort}
 		LIMIT {int:start}, {int:per_page}',
