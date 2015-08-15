@@ -531,7 +531,8 @@ function decreaseLikeCounts($messages)
 		SELECT
 			DISTINCT(id_member) AS id_member, id_poster
 		FROM {db_prefix}message_likes
-		WHERE id_msg IN ({array_int:messages})',
+		WHERE id_msg IN ({array_int:messages})
+		GROUP BY id_member, id_poster',
 		array(
 			'messages' => $messages,
 		)
@@ -550,12 +551,12 @@ function decreaseLikeCounts($messages)
 	// Re-count the "likes given" totals for the likers
 	if (!empty($likers))
 	{
-		$request = $db->query('', '
-		SELECT
-			COUNT(id_msg) AS likes, id_member
-		FROM {db_prefix}message_likes
-		WHERE id_member IN ({array_int:members})
-		GROUP BY id_member',
+ 		$request = $db->query('', '
+			SELECT
+				COUNT(id_msg) AS likes, id_member
+			FROM {db_prefix}message_likes
+			WHERE id_member IN ({array_int:members})
+			GROUP BY id_member',
 			array(
 				'members' => $likers,
 			)
@@ -570,11 +571,11 @@ function decreaseLikeCounts($messages)
 	if (!empty($posters))
 	{
 		$request = $db->query('', '
-		SELECT
-			COUNT(id_msg) AS likes, id_poster
-		FROM {db_prefix}message_likes
-		WHERE id_poster IN ({array_int:members})
-		GROUP BY id_poster',
+			SELECT
+				COUNT(id_msg) AS likes, id_poster
+			FROM {db_prefix}message_likes
+			WHERE id_poster IN ({array_int:members})
+			GROUP BY id_poster',
 			array(
 				'members' => $posters,
 			)
@@ -590,7 +591,7 @@ function decreaseLikeCounts($messages)
 			COUNT(id_msg) AS likes, id_poster, id_msg
 		FROM {db_prefix}message_likes
 		WHERE id_msg IN ({array_int:messages})
-		GROUP BY id_msg',
+		GROUP BY id_msg, id_poster',
 		array(
 			'messages' => $messages,
 		)
