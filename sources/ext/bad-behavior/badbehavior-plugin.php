@@ -190,10 +190,13 @@ function bb2_insert($settings, $package, $key)
 		foreach ($package['request_entity'] as $h => $v)
 		{
 			if (is_array($v))
-				$v = bb2_multi_implode(' | ', $v);
+				$v = bb2_multi_implode($v, ' | ');
 
 			$request_entity .= bb2_db_escape("$h: $v\n");
 		}
+
+		// Only such much space in this column, so brutally cut it
+		// @todo in 1.1 improve logging or drop this?
 		$request_entity = substr($request_entity, 0, 254);
 	}
 
@@ -204,19 +207,27 @@ function bb2_insert($settings, $package, $key)
 }
 
 /**
- * Recursive implode for multi-dimensional arrays
+ * Implode that is multi dimensional array aware
  *
- * @param string $glue
- * @param mixed[] $array
+ * - Recursively calls itself to return a single string from a multi dimensional
+ * array
+ *
+ * @param mixed[] $array array to recursively implode
+ * @param string $glue value that glues elements together
+ * @param bool $trim_all trim ALL whitespace from string
+ *
  * @return string
  */
-function bb2_multi_implode($glue, $array)
+function bb2_multi_implode($array, $glue = ',', $trim_all = false)
 {
-	foreach ($array as $h => $v)
+	foreach ($array as $key => $value)
 	{
-		if (is_array($v))
-			$array[$h] = bb2_multi_implode($v);
+		if (is_array($value))
+			$array[$key] = bb2_multi_implode($value, $glue, $trim_all);
 	}
+
+	if ($trim_all)
+		$array = array_map('trim', $array);
 
 	return implode($glue, $array);
 }

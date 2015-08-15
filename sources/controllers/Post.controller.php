@@ -391,7 +391,7 @@ class Post_Controller extends Action_Controller
 
 			// Set up the inputs for the form.
 			$form_subject = strtr(Util::htmlspecialchars($_REQUEST['subject']), array("\r" => '', "\n" => '', "\t" => ''));
-			$form_message = Util::htmlspecialchars($_REQUEST['message'], ENT_QUOTES);
+			$form_message = Util::htmlspecialchars($_REQUEST['message'], ENT_QUOTES, 'UTF-8', true);
 
 			// Make sure the subject isn't too long - taking into account special characters.
 			if (Util::strlen($form_subject) > 100)
@@ -1398,7 +1398,7 @@ class Post_Controller extends Action_Controller
 		else
 		{
 			// Prepare the message a bit for some additional testing.
-			$_POST['message'] = Util::htmlspecialchars($_POST['message'], ENT_QUOTES);
+			$_POST['message'] = Util::htmlspecialchars($_POST['message'], ENT_QUOTES, 'UTF-8', true);
 
 			// Preparse code. (Zef)
 			if ($user_info['is_guest'])
@@ -2065,7 +2065,7 @@ class Post_Controller extends Action_Controller
 			}
 			else
 			{
-				$_POST['message'] = Util::htmlspecialchars($_POST['message'], ENT_QUOTES);
+				$_POST['message'] = Util::htmlspecialchars($_POST['message'], ENT_QUOTES, 'UTF-8', true);
 
 				preparsecode($_POST['message']);
 
