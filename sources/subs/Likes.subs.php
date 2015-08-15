@@ -517,8 +517,6 @@ function decreaseLikeCounts($messages)
 	$db = database();
 
 	// Start off with no changes
-	$posters = array();
-	$likers = array();
 	$update_given = array();
 	$update_received = array();
 
@@ -529,18 +527,20 @@ function decreaseLikeCounts($messages)
 	// Load the members who liked and who posted for this group of messages
 	$request = $db->query('', '
 		SELECT
-			DISTINCT(id_member) AS id_member, id_poster
+			id_member, id_poster
 		FROM {db_prefix}message_likes
-		WHERE id_msg IN ({array_int:messages})
-		GROUP BY id_member, id_poster',
+		WHERE id_msg IN ({array_int:messages})',
 		array(
 			'messages' => $messages,
 		)
 	);
+	$posters = array();
+	$likers = array();
 	while ($row = $db->fetch_assoc($request))
 	{
-		$posters[$row['id_poster']] = $row['id_poster'];
-		$likers[$row['id_member']] = $row['id_member'];
+		// Track how many likes each member gave and how many were received
+		$posters[$row['id_poster']] = isset($posters[$row['id_poster']]) ? $posters[$row['id_poster']]++ : 1;
+		$likers[$row['id_member']] = isset($likers[$row['id_member']]) ? $likers[$row['id_member']]++ : 1;
 	}
 	$db->free_result($request);
 
@@ -558,12 +558,12 @@ function decreaseLikeCounts($messages)
 			WHERE id_member IN ({array_int:members})
 			GROUP BY id_member',
 			array(
-				'members' => $likers,
+				'members' => array_keys($likers),
 			)
 		);
-		// All who liked these messages have their "likes given" reduced by 1
+		// All who liked these messages have their "likes given" reduced
 		while ($row = $db->fetch_assoc($request))
-			$update_given[$row['id_member']] = $row['likes'] - 1;
+			$update_given[$row['id_member']] = $row['likes'] - $likers[$row['id_member']];
 		$db->free_result($request);
 	}
 
@@ -577,29 +577,14 @@ function decreaseLikeCounts($messages)
 			WHERE id_poster IN ({array_int:members})
 			GROUP BY id_poster',
 			array(
-				'members' => $posters,
+				'members' => array_keys($posters),
 			)
 		);
+		// The message posters have their "likes received" reduced
 		while ($row = $db->fetch_assoc($request))
-			$update_received[$row['id_poster']] = $row['likes'];
+			$update_received[$row['id_poster']] = $row['likes'] - $posters[$row['id_poster']];
 		$db->free_result($request);
 	}
-
-	// Determine how many likes were given to each message
-	$request = $db->query('', '
-		SELECT
-			COUNT(id_msg) AS likes, id_poster, id_msg
-		FROM {db_prefix}message_likes
-		WHERE id_msg IN ({array_int:messages})
-		GROUP BY id_msg, id_poster',
-		array(
-			'messages' => $messages,
-		)
-	);
-	// All the likes they received for these messages are removed from the total
-	while ($row = $db->fetch_assoc($request))
-		$update_received[$row['id_poster']] = $update_received[$row['id_poster']] - $row['likes'];
-	$db->free_result($request);
 
 	// Update the totals for these members
 	foreach ($update_given as $id_member => $total)
