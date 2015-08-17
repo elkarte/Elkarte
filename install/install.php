@@ -11,11 +11,12 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:	BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0.2
+ * @version 1.1 dev
  *
  */
 
 require('installcore.php');
+require('CommonCode.php');
 
 // Don't have PHP support, do you?
 // ><html dir="ltr"><head><title>Error!</title></head><body>Sorry, this installer requires PHP!<div style="display: none;">
@@ -45,20 +46,6 @@ $incontext['overall_percent'] = $action->overall_percent;
 
 // Actually do the template stuff.
 installExit();
-
-/**
- * Grabs all the files with db definitions and loads them.
- * That's the easy way, in the future we can make it as complex as possible. :P
- */
-function load_possible_databases()
-{
-	global $databases;
-
-	$files = glob(__DIR__ . '/Db-check-*.php');
-
-	foreach ($files as $file)
-		require($file);
-}
 
 /**
  * Initialization step. Called at each request.
@@ -96,8 +83,12 @@ function initialize_inputs()
 
 	// Add slashes, as long as they aren't already being added.
 	foreach ($_POST as $k => $v)
-		if (strpos($k, 'password') === false)
+	{
+		if (strpos($k, 'password') === false && strpos($k, 'passwd') === false)
 			$_POST[$k] = addslashes($v);
+		else
+			$_POST[$k] = addcslashes($v, '\'');
+	}
 
 	// PHP 5 might cry if we don't do this now.
 	$server_offset = @mktime(0, 0, 0, 1, 1, 1970);
@@ -105,6 +96,11 @@ function initialize_inputs()
 
 	// Force an integer step, defaulting to 0.
 	$_GET['step'] = isset($_GET['step']) ? (int) $_GET['step'] : 0;
+
+	require_once(__DIR__ . '/CommonCode.php');
+	require_once(__DIR__ . '/LegacyCode.php');
+	require_once(__DIR__ . '/ToRefactorCode.php');
+	require_once(__DIR__ . '/TemplateInstall.php');
 }
 
 /**
@@ -177,33 +173,6 @@ function load_lang_file()
 
 	// And now include the actual language file itself.
 	require_once(TMP_BOARDDIR . '/themes/default/languages/' . substr($_SESSION['installer_temp_lang'], 8, strlen($_SESSION['installer_temp_lang']) - 12) . '/' . $_SESSION['installer_temp_lang']);
-}
-
-/**
- * This handy function loads some settings and the like.
- */
-function load_database()
-{
-	global $db_prefix, $db_connection, $modSettings, $db_type, $db_name, $db_user, $db_persist;
-
-	if (!defined('SOURCEDIR'))
-		define('SOURCEDIR', TMP_BOARDDIR . '/sources');
-
-	// Need this to check whether we need the database password.
-	require(TMP_BOARDDIR . '/Settings.php');
-	if (!defined('ELK'))
-		define('ELK', 1);
-
-	// Connect the database.
-	if (!$db_connection)
-	{
-		require_once(SOURCEDIR . '/database/Database.subs.php');
-
-		if (!$db_connection)
-			$db_connection = elk_db_initiate($db_server, $db_name, $db_user, $db_passwd, $db_prefix, array('persist' => $db_persist, 'port' => $db_port), $db_type);
-	}
-
-	return database();
 }
 
 /**
@@ -299,7 +268,7 @@ class Install_Controller
 	 */
 	private function action_welcome()
 	{
-		global $incontext, $txt, $databases, $installurl;
+		global $incontext, $txt, $databases, $installurl, $db_type;
 
 		$incontext['page_title'] = $txt['install_welcome'];
 		$incontext['sub_template'] = 'welcome_message';
@@ -320,7 +289,7 @@ class Install_Controller
 			$probably_installed = 0;
 			foreach (file(TMP_BOARDDIR . '/Settings.php') as $line)
 			{
-				if (preg_match('~^\$db_passwd\s=\s\'([^\']+)\';$~', $line))
+				if (preg_match('~^\$boarddir\s=\s\'([^\']+)\';$~', $line))
 					$probably_installed++;
 				if (preg_match('~^\$boardurl\s=\s\'([^\']+)\';~', $line) && !preg_match('~^\$boardurl\s=\s\'http://127\.0\.0\.1/elkarte\';~', $line))
 					$probably_installed++;
@@ -406,7 +375,7 @@ class Install_Controller
 	 */
 	private function action_checkFilesExist()
 	{
-		global $incontext, $txt, $databases, $installurl;
+		global $incontext, $txt;
 
 		$incontext['page_title'] = $txt['install_welcome'];
 		$incontext['sub_template'] = 'welcome_message';
@@ -466,7 +435,7 @@ class Install_Controller
 			'smileys',
 			'themes',
 			'agreement.txt',
-			'db_last_error.php',
+			'db_last_error.txt',
 			'Settings.php',
 			'Settings_bak.php'
 		);
@@ -649,7 +618,7 @@ class Install_Controller
 	 */
 	private function action_databaseSettings()
 	{
-		global $txt, $databases, $incontext, $db_type, $db_connection, $modSettings;
+		global $txt, $databases, $incontext, $db_type, $db_connection, $modSettings, $db_server, $db_name, $db_user, $db_passwd;
 
 		$incontext['sub_template'] = 'database_settings';
 		$incontext['page_title'] = $txt['db_settings'];
@@ -803,7 +772,7 @@ class Install_Controller
 
 			// Do they meet the install requirements?
 			// @todo Old client, new server?
-			if (version_compare($databases[$db_type]['version'], preg_replace('~^\D*|\-.+?$~', '', eval($databases[$db_type]['version_check']))) > 0)
+			if (!db_version_check())
 			{
 				$incontext['error'] = $txt['error_db_too_low'];
 				return false;
@@ -917,7 +886,7 @@ class Install_Controller
 			require(TMP_BOARDDIR . '/Settings.php');
 
 			// UTF-8 requires a setting to override any language charset.
-			if (!empty($databases[$db_type]['utf8_version_check']) && version_compare($databases[$db_type]['utf8_version'], preg_replace('~\-.+?$~', '', eval($databases[$db_type]['utf8_version_check'])), '>'))
+			if (!empty($databases[$db_type]['utf8_version_check']) && version_compare($databases[$db_type]['utf8_version'], preg_replace('~\-.+?$~', '', $databases[$db_type]['utf8_version_check']($db_connection)), '>'))
 			{
 				// our uft-8 check support on the db failed ....
 				$incontext['error'] = sprintf($txt['error_utf8_version'], $databases[$db_type]['utf8_version']);
@@ -941,7 +910,7 @@ class Install_Controller
 	 */
 	private function action_databasePopulation()
 	{
-		global $txt, $db_connection, $databases, $modSettings, $db_type, $db_prefix, $incontext, $db_name, $boardurl;
+		global $txt, $databases, $modSettings, $db_type, $db_prefix, $incontext, $db_name, $boardurl;
 
 		$incontext['sub_template'] = 'populate_database';
 		$incontext['page_title'] = $txt['db_populate'];
@@ -1014,7 +983,6 @@ class Install_Controller
 			$replaces[') ENGINE=MyISAM;'] = ') ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci;';
 
 		// Execute the SQL.
-		$current_statement = '';
 		$exists = array();
 		$incontext['failures'] = array();
 		$incontext['sql_results'] = array(
@@ -1026,13 +994,11 @@ class Install_Controller
 
 		if (!empty($databases[$db_type]['additional_file']))
 		{
-			$sql_lines = explode("\n", strtr(implode(' ', file(__DIR__ . '/' . $databases[$db_type]['additional_file'])), $replaces));
-			parse_sqlLines($sql_lines);
+			parse_sqlLines(__DIR__ . '/' . $databases[$db_type]['additional_file'], $replaces);
 		}
 
 		// Read in the SQL.  Turn this on and that off... internationalize... etc.
-		$sql_lines = explode("\n", strtr(implode(' ', file(__DIR__ . '/install_' . DB_SCRIPT_VERSION . '.sql')), $replaces));
-		parse_sqlLines($sql_lines);
+		parse_sqlLines(__DIR__ . '/install_' . DB_SCRIPT_VERSION . '.php', $replaces);
 
 		// Make sure UTF will be used globally.
 		$db->insert('replace',
@@ -1129,7 +1095,7 @@ class Install_Controller
 	 */
 	private function action_adminAccount()
 	{
-		global $txt, $db_type, $db_connection, $databases, $incontext, $db_prefix, $db_passwd;
+		global $txt, $db_type, $db_connection, $databases, $incontext, $db_prefix, $db_passwd, $webmaster_email;
 
 		$incontext['sub_template'] = 'admin_account';
 		$incontext['page_title'] = $txt['user_settings'];
@@ -1330,7 +1296,7 @@ class Install_Controller
 
 		chdir(TMP_BOARDDIR);
 
-		require_once(SOURCEDIR . '/Errors.php');
+		require_once(SOURCEDIR . '/Errors.class.php');
 		require_once(SOURCEDIR . '/Logging.php');
 		require_once(SOURCEDIR . '/Subs.php');
 		require_once(SOURCEDIR . '/Load.php');
@@ -1338,6 +1304,8 @@ class Install_Controller
 		require_once(SOURCEDIR . '/Security.php');
 		require_once(SUBSDIR . '/Auth.subs.php');
 		require_once(SUBSDIR . '/Util.class.php');
+		require_once(SOURCEDIR . '/Autoloader.class.php');
+		Elk_Autoloader::getInstance()->setupAutoloader(array(SOURCEDIR, SUBSDIR, CONTROLLERDIR, ADMINDIR));
 
 		// Bring a warning over.
 		if (!empty($incontext['account_existed']))
@@ -1432,9 +1400,6 @@ class Install_Controller
 			updateStats('subject', 1, htmlspecialchars($txt['default_topic_subject']));
 		$db->free_result($request);
 
-		// Now is the perfect time to fetch remote files.
-		require_once(SUBSDIR . '/ScheduledTask.class.php');
-
 		// Sanity check that they loaded earlier!
 		if (isset($modSettings['recycle_board']))
 		{
@@ -1461,471 +1426,13 @@ class Install_Controller
 }
 
 /**
- * FTP connection class.
- * The installer will try to use this when it needs writable files
- *  and it fails to make them writable otherwise.
- *
- * Credit: http://www.faqs.org/rfcs/rfc959.html
- */
-class Ftp_Connection
-{
-	/**
-	 * holds the connection response
-	 * @var resource
-	 */
-	public $connection;
-
-	/**
-	 * holds any errors
-	 * @var string|boolean
-	 */
-	public $error;
-
-	/**
-	 * holds last message from the server
-	 * @var string
-	 */
-	public $last_message;
-
-	/**
-	 * Passive connection
-	 * @var mixed[]
-	 */
-	public $pasv;
-
-	/**
-	 * Create a new FTP connection...
-	 *
-	 * @param string $ftp_server
-	 * @param int $ftp_port
-	 * @param string $ftp_user
-	 * @param string $ftp_pass
-	 */
-	public function __construct($ftp_server, $ftp_port = 21, $ftp_user = 'anonymous', $ftp_pass = 'ftpclient@yourdomain.org')
-	{
-		// Initialize variables.
-		$this->connection = 'no_connection';
-		$this->error = false;
-		$this->pasv = array();
-
-		if ($ftp_server !== null)
-			$this->connect($ftp_server, $ftp_port, $ftp_user, $ftp_pass);
-	}
-
-	/**
-	 * Connects to a server
-	 *
-	 * @param string $ftp_server
-	 * @param int $ftp_port
-	 * @param string $ftp_user
-	 * @param string $ftp_pass
-	 */
-	public function connect($ftp_server, $ftp_port = 21, $ftp_user = 'anonymous', $ftp_pass = 'ftpclient@yourdomain.org')
-	{
-		if (strpos($ftp_server, 'ftp://') === 0)
-			$ftp_server = substr($ftp_server, 6);
-		elseif (strpos($ftp_server, 'ftps://') === 0)
-			$ftp_server = 'ssl://' . substr($ftp_server, 7);
-		if (strpos($ftp_server, 'http://') === 0)
-			$ftp_server = substr($ftp_server, 7);
-		$ftp_server = strtr($ftp_server, array('/' => '', ':' => '', '@' => ''));
-
-		// Connect to the FTP server.
-		$this->connection = @fsockopen($ftp_server, $ftp_port, $err, $err, 5);
-		if (!$this->connection)
-		{
-			$this->error = 'bad_server';
-			return;
-		}
-
-		// Get the welcome message...
-		if (!$this->check_response(220))
-		{
-			$this->error = 'bad_response';
-			return;
-		}
-
-		// Send the username, it should ask for a password.
-		fwrite($this->connection, 'USER ' . $ftp_user . "\r\n");
-		if (!$this->check_response(331))
-		{
-			$this->error = 'bad_username';
-			return;
-		}
-
-		// Now send the password... and hope it goes okay.
-		fwrite($this->connection, 'PASS ' . $ftp_pass . "\r\n");
-		if (!$this->check_response(230))
-		{
-			$this->error = 'bad_password';
-			return;
-		}
-	}
-
-	/**
-	 * Changes to a directory (chdir) via the ftp connection
-	 *
-	 * @param string $ftp_path
-	 * @return boolean
-	 */
-	public function chdir($ftp_path)
-	{
-		if (!is_resource($this->connection))
-			return false;
-
-		// No slash on the end, please...
-		if ($ftp_path !== '/' && substr($ftp_path, -1) === '/')
-			$ftp_path = substr($ftp_path, 0, -1);
-
-		fwrite($this->connection, 'CWD ' . $ftp_path . "\r\n");
-		if (!$this->check_response(250))
-		{
-			$this->error = 'bad_path';
-			return false;
-		}
-
-		return true;
-	}
-
-	/**
-	 * Changes a files atrributes (chmod)
-	 *
-	 * @param string $ftp_file
-	 * @param int $chmod
-	 * @return boolean
-	 */
-	public function chmod($ftp_file, $chmod)
-	{
-		if (!is_resource($this->connection))
-			return false;
-
-		if ($ftp_file == '')
-			$ftp_file = '.';
-
-		// Convert the chmod value from octal (0777) to text ("777").
-		fwrite($this->connection, 'SITE CHMOD ' . decoct($chmod) . ' ' . $ftp_file . "\r\n");
-		if (!$this->check_response(200))
-		{
-			$this->error = 'bad_file';
-			return false;
-		}
-
-		return true;
-	}
-
-	/**
-	 * Deletes a file
-	 *
-	 * @param string $ftp_file
-	 * @return boolean
-	 */
-	public function unlink($ftp_file)
-	{
-		// We are actually connected, right?
-		if (!is_resource($this->connection))
-			return false;
-
-		// Delete file X.
-		fwrite($this->connection, 'DELE ' . $ftp_file . "\r\n");
-		if (!$this->check_response(250))
-		{
-			fwrite($this->connection, 'RMD ' . $ftp_file . "\r\n");
-
-			// Still no love?
-			if (!$this->check_response(250))
-			{
-				$this->error = 'bad_file';
-				return false;
-			}
-		}
-
-		return true;
-	}
-
-	/**
-	 * Reads the response to the command from the server
-	 *
-	 * @param string[]|string $desired string or array of acceptable return values
-	 */
-	public function check_response($desired)
-	{
-		// Wait for a response that isn't continued with -, but don't wait too long.
-		$time = time();
-		do
-			$this->last_message = fgets($this->connection, 1024);
-		while ((strlen($this->last_message) < 4 || strpos($this->last_message, ' ') === 0 || strpos($this->last_message, ' ', 3) !== 3) && time() - $time < 5);
-
-		// Was the desired response returned?
-		return is_array($desired) ? in_array(substr($this->last_message, 0, 3), $desired) : substr($this->last_message, 0, 3) == $desired;
-	}
-
-	/**
-	 * Used to create a passive connection
-	 *
-	 * @return boolean
-	 */
-	public function passive()
-	{
-		// We can't create a passive data connection without a primary one first being there.
-		if (!is_resource($this->connection))
-			return false;
-
-		// Request a passive connection - this means, we'll talk to you, you don't talk to us.
-		@fwrite($this->connection, 'PASV' . "\r\n");
-		$time = time();
-		do
-			$response = fgets($this->connection, 1024);
-		while (substr($response, 3, 1) !== ' ' && time() - $time < 5);
-
-		// If it's not 227, we weren't given an IP and port, which means it failed.
-		if (strpos($response, '227 ') !== 0)
-		{
-			$this->error = 'bad_response';
-			return false;
-		}
-
-		// Snatch the IP and port information, or die horribly trying...
-		if (preg_match('~\((\d+),\s*(\d+),\s*(\d+),\s*(\d+),\s*(\d+)(?:,\s*(\d+))\)~', $response, $match) == 0)
-		{
-			$this->error = 'bad_response';
-			return false;
-		}
-
-		// This is pretty simple - store it for later use ;).
-		$this->pasv = array('ip' => $match[1] . '.' . $match[2] . '.' . $match[3] . '.' . $match[4], 'port' => $match[5] * 256 + $match[6]);
-
-		return true;
-	}
-
-	/**
-	 * Creates a new file on the server
-	 *
-	 * @param string $ftp_file
-	 * @return boolean
-	 */
-	public function create_file($ftp_file)
-	{
-		// First, we have to be connected... very important.
-		if (!is_resource($this->connection))
-			return false;
-
-		// I'd like one passive mode, please!
-		if (!$this->passive())
-			return false;
-
-		// Seems logical enough, so far...
-		fwrite($this->connection, 'STOR ' . $ftp_file . "\r\n");
-
-		// Okay, now we connect to the data port.  If it doesn't work out, it's probably "file already exists", etc.
-		$fp = @fsockopen($this->pasv['ip'], $this->pasv['port'], $err, $err, 5);
-		if (!$fp || !$this->check_response(150))
-		{
-			$this->error = 'bad_file';
-			@fclose($fp);
-			return false;
-		}
-
-		// This may look strange, but we're just closing it to indicate a zero-byte upload.
-		fclose($fp);
-		if (!$this->check_response(226))
-		{
-			$this->error = 'bad_response';
-			return false;
-		}
-
-		return true;
-	}
-
-	/**
-	 * Generates a direcotry listing for the current directory
-	 *
-	 * @param string $ftp_path
-	 * @param string|boolean $search
-	 * @return false|string
-	 */
-	public function list_dir($ftp_path = '', $search = false)
-	{
-		// Are we even connected...?
-		if (!is_resource($this->connection))
-			return false;
-
-		// Passive... non-aggressive...
-		if (!$this->passive())
-			return false;
-
-		// Get the listing!
-		fwrite($this->connection, 'LIST -1' . ($search ? 'R' : '') . ($ftp_path == '' ? '' : ' ' . $ftp_path) . "\r\n");
-
-		// Connect, assuming we've got a connection.
-		$fp = @fsockopen($this->pasv['ip'], $this->pasv['port'], $err, $err, 5);
-		if (!$fp || !$this->check_response(array(150, 125)))
-		{
-			$this->error = 'bad_response';
-			@fclose($fp);
-			return false;
-		}
-
-		// Read in the file listing.
-		$data = '';
-		while (!feof($fp))
-			$data .= fread($fp, 4096);
-		fclose($fp);
-
-		// Everything go okay?
-		if (!$this->check_response(226))
-		{
-			$this->error = 'bad_response';
-			return false;
-		}
-
-		return $data;
-	}
-
-	/**
-	 * Determins the current dirctory we are in
-	 *
-	 * @param string $file
-	 * @param string|null $listing
-	 * @return string|false
-	 */
-	public function locate($file, $listing = null)
-	{
-		if ($listing === null)
-			$listing = $this->list_dir('', true);
-		$listing = explode("\n", $listing);
-
-		@fwrite($this->connection, 'PWD' . "\r\n");
-		$time = time();
-		do
-			$response = fgets($this->connection, 1024);
-		while (substr($response, 3, 1) !== ' ' && time() - $time < 5);
-
-		// Check for 257!
-		if (preg_match('~^257 "(.+?)" ~', $response, $match) != 0)
-			$current_dir = strtr($match[1], array('""' => '"'));
-		else
-			$current_dir = '';
-
-		for ($i = 0, $n = count($listing); $i < $n; $i++)
-		{
-			if (trim($listing[$i]) == '' && isset($listing[$i + 1]))
-			{
-				$current_dir = substr(trim($listing[++$i]), 0, -1);
-				$i++;
-			}
-
-			// Okay, this file's name is:
-			$listing[$i] = $current_dir . '/' . trim(strlen($listing[$i]) > 30 ? strrchr($listing[$i], ' ') : $listing[$i]);
-
-			if ($file[0] == '*' && substr($listing[$i], -(strlen($file) - 1)) == substr($file, 1))
-				return $listing[$i];
-			if (substr($file, -1) == '*' && substr($listing[$i], 0, strlen($file) - 1) == substr($file, 0, -1))
-				return $listing[$i];
-			if (basename($listing[$i]) == $file || $listing[$i] == $file)
-				return $listing[$i];
-		}
-
-		return false;
-	}
-
-	/**
-	 * Creates a new directory on the server
-	 *
-	 * @param string $ftp_dir
-	 * @return boolean
-	 */
-	public function create_dir($ftp_dir)
-	{
-		// We must be connected to the server to do something.
-		if (!is_resource($this->connection))
-			return false;
-
-		// Make this new beautiful directory!
-		fwrite($this->connection, 'MKD ' . $ftp_dir . "\r\n");
-		if (!$this->check_response(257))
-		{
-			$this->error = 'bad_file';
-			return false;
-		}
-
-		return true;
-	}
-
-	/**
-	 * Detects the current path
-	 *
-	 * @param string $filesystem_path
-	 * @param string|null $lookup_file
-	 * @return string[] $username, $path, found_path
-	 */
-	public function detect_path($filesystem_path, $lookup_file = null)
-	{
-		$username = '';
-
-		if (isset($_SERVER['DOCUMENT_ROOT']))
-		{
-			if (preg_match('~^/home[2]?/([^/]+?)/public_html~', $_SERVER['DOCUMENT_ROOT'], $match))
-			{
-				$username = $match[1];
-
-				$path = strtr($_SERVER['DOCUMENT_ROOT'], array('/home/' . $match[1] . '/' => '', '/home2/' . $match[1] . '/' => ''));
-
-				if (substr($path, -1) == '/')
-					$path = substr($path, 0, -1);
-
-				if (strlen(dirname($_SERVER['PHP_SELF'])) > 1)
-					$path .= dirname($_SERVER['PHP_SELF']);
-			}
-			elseif (strpos($filesystem_path, '/var/www/') === 0)
-				$path = substr($filesystem_path, 8);
-			else
-				$path = strtr(strtr($filesystem_path, array('\\' => '/')), array($_SERVER['DOCUMENT_ROOT'] => ''));
-		}
-		else
-			$path = '';
-
-		if (is_resource($this->connection) && $this->list_dir($path) == '')
-		{
-			$data = $this->list_dir('', true);
-
-			if ($lookup_file === null)
-				$lookup_file = $_SERVER['PHP_SELF'];
-
-			$found_path = dirname($this->locate('*' . basename(dirname($lookup_file)) . '/' . basename($lookup_file), $data));
-			if ($found_path == false)
-				$found_path = dirname($this->locate(basename($lookup_file)));
-			if ($found_path != false)
-				$path = $found_path;
-		}
-		elseif (is_resource($this->connection))
-			$found_path = true;
-
-		return array($username, $path, isset($found_path));
-	}
-
-	/**
-	 * Close the ftp connection
-	 *
-	 * @return boolean
-	 */
-	public function close()
-	{
-		// Goodbye!
-		fwrite($this->connection, 'QUIT' . "\r\n");
-		fclose($this->connection);
-
-		return true;
-	}
-}
-
-/**
  * Write out the contents of Settings.php file.
- * This function will add the variables passed to it in $vars,
+ * This function will add the variables passed to it in $config_vars,
  * to the Settings.php file.
  *
- * @param array $vars the configuration variables to write out.
+ * @param array $config_vars the configuration variables to write out.
  */
-function updateSettingsFile($vars)
+function updateSettingsFile($config_vars)
 {
 	// Modify Settings.php.
 	$settingsArray = file(TMP_BOARDDIR . '/Settings.php');
@@ -1934,224 +1441,89 @@ function updateSettingsFile($vars)
 	if (count($settingsArray) == 1)
 		$settingsArray = preg_split('~[\r\n]~', $settingsArray[0]);
 
-	for ($i = 0, $n = count($settingsArray); $i < $n; $i++)
-	{
-		// Don't trim or bother with it if it's not a variable.
-		if (substr($settingsArray[$i], 0, 1) != '$')
-			continue;
-
-		$settingsArray[$i] = rtrim($settingsArray[$i]) . "\n";
-
-		foreach ($vars as $var => $val)
-			if (strncasecmp($settingsArray[$i], '$' . $var, 1 + strlen($var)) == 0)
-			{
-				$comment = strstr($settingsArray[$i], '#');
-				$settingsArray[$i] = '$' . $var . ' = \'' . $val . '\';' . ($comment != '' ? "\t\t" . $comment : "\n");
-				unset($vars[$var]);
-			}
-	}
-
-	// Uh oh... the file wasn't empty... was it?
-	if (!empty($vars))
-	{
-		$settingsArray[$i++] = '';
-		foreach ($vars as $var => $val)
-			$settingsArray[$i++] = '$' . $var . ' = \'' . $val . '\';' . "\n";
-	}
-
-	// Blank out the file - done to fix a oddity with some servers.
-	$fp = @fopen(TMP_BOARDDIR . '/Settings.php', 'w');
-	if (!$fp)
-		return false;
-	fclose($fp);
-
-	$fp = fopen(TMP_BOARDDIR . '/Settings.php', 'r+');
-
-	// Gotta have one of these ;)
-	if (trim($settingsArray[0]) != '<?php')
-		fwrite($fp, "<?php\n");
-
-	$lines = count($settingsArray);
-	for ($i = 0; $i < $lines; $i++)
-	{
-		// Don't just write a bunch of blank lines.
-		if ($settingsArray[$i] != '' || @$settingsArray[$i - 1] != '')
-			fwrite($fp, strtr($settingsArray[$i], "\r", ''));
-	}
-	fclose($fp);
-
-	return true;
+	return saveFileSettings($config_vars, $settingsArray);
 }
 
-/**
- * Write the db_last_error file.
- */
-function updateDbLastError()
+function parse_sqlLines($sql_file, $replaces)
 {
-	// Write out the db_last_error file with the error timestamp
-	file_put_contents(TMP_BOARDDIR . '/db_last_error.txt', '0');
-	return true;
-}
-
-/**
- * The normal DbTable disallows to delete/create "core" tables
- */
-function db_table_install()
-{
-	global $db_type;
-
-	$db = load_database();
-
-	require_once(SOURCEDIR . '/database/DbTable.class.php');
-	require_once(SOURCEDIR . '/database/DbTable-' . $db_type . '.php');
-
-	// @todo UGLY!!!
-	// Once the install dir will be kept for install, create a file for that
-	if (class_exists('DbTable_MySQL') && !class_exists('DbTable_MySQL_Install'))
-	{
-		class DbTable_MySQL_Install extends DbTable_MySQL
-		{
-			public static $_tbl_inst = null;
-			/**
-			* DbTable_MySQL::construct
-			*
-			* @param object $db - A Database_MySQL object
-			*/
-			private function __construct($db)
-			{
-				global $db_prefix;
-
-				// We are doing install, of course we want to do any remove on these
-				$this->_reservedTables = array();
-
-				foreach ($this->_reservedTables as $k => $table_name)
-					$this->_reservedTables[$k] = strtolower($db_prefix . $table_name);
-
-				// let's be sure.
-				$this->_package_log = array();
-
-				// This executes queries and things
-				$this->_db = $db;
-			}
-
-			/**
-			* Static method that allows to retrieve or create an instance of this class.
-			*
-			* @param object $db - A Database_MySQL object
-			* @return object - A DbTable_MySQL object
-			*/
-			public static function db_table($db)
-			{
-				if (is_null(self::$_tbl_inst))
-					self::$_tbl_inst = new DbTable_MySQL_Install($db);
-				return self::$_tbl_inst;
-			}
-		}
-	}
-	elseif (class_exists('DbTable_PostgreSQL') && !class_exists('DbTable_PostgreSQL_Install'))
-	{
-		class DbTable_PostgreSQL_Install extends DbTable_PostgreSQL
-		{
-			public static $_tbl_inst = null;
-			/**
-			* DbTable_MySQL::construct
-			*
-			* @param object $db - A Database_MySQL object
-			*/
-			private function __construct($db)
-			{
-				global $db_prefix;
-
-				// We are doing install, of course we want to do any remove on these
-				$this->_reservedTables = array();
-
-				foreach ($this->_reservedTables as $k => $table_name)
-					$this->_reservedTables[$k] = strtolower($db_prefix . $table_name);
-
-				// let's be sure.
-				$this->_package_log = array();
-
-				// This executes queries and things
-				$this->_db = $db;
-			}
-
-			/**
-			* Static method that allows to retrieve or create an instance of this class.
-			*
-			* @param object $db - A Database_MySQL object
-			* @return object - A DbTable_MySQL object
-			*/
-			public static function db_table($db)
-			{
-				if (is_null(self::$_tbl_inst))
-					self::$_tbl_inst = new DbTable_PostgreSQL_Install($db);
-				return self::$_tbl_inst;
-			}
-		}
-	}
-	return call_user_func(array('DbTable_' . DB_TYPE . '_Install', 'db_table'), $db);
-}
-
-function parse_sqlLines($sql_lines)
-{
-	global $incontext, $txt;
+	global $incontext, $txt, $db_prefix;
 
 	$db = load_database();
 	$db_table = db_table_install();
+	$db_wrapper = new DbWrapper($db, $replaces);
+	$db_table_wrapper = new DbTableWrapper($db_table);
 
-	$current_statement = '';
 	$exists = array();
 
-	foreach ($sql_lines as $count => $line)
+	require_once($sql_file);
+
+	$class_name = 'InstallInstructions_' . str_replace('-', '_', basename($sql_file, '.php'));
+	$install_instance = new $class_name($db_wrapper, $db_table_wrapper);
+
+	$methods = get_class_methods($install_instance);
+	$tables = array_filter($methods, function($method) {
+		return strpos($method, 'table_') === 0;
+	});
+	$inserts = array_filter($methods, function($method) {
+		return strpos($method, 'insert_') === 0;
+	});
+	$others = array_filter($methods, function($method) {
+		return substr($method, 0, 2) !== '__' && strpos($method, 'insert_') !== 0 && strpos($method, 'table_') !== 0;
+	});
+
+	foreach ($tables as $table_method)
 	{
-		// No comments allowed!
-		if (substr(trim($line), 0, 1) != '#')
-			$current_statement .= "\n" . rtrim($line);
+		$table_name = substr($table_method, 6);
 
-		// Is this the end of the query string?
-		if (empty($current_statement) || (preg_match('~;[\s]*$~s', $line) == 0 && $count != count($sql_lines)))
-			continue;
+		// Copied from DbTable class
+		// Strip out the table name, we might not need it in some cases
+		$real_prefix = preg_match('~^("?)(.+?)\\1\\.(.*?)$~', $db_prefix, $match) === 1 ? $match[3] : $db_prefix;
 
-		// Does this table already exist? If so, don't insert more data into it!
-		if (preg_match('~^\s*\$db->insert\(.*(\{db_prefix\}\w+)~s', $current_statement, $match) != 0 && in_array($match[1], $exists))
+		// With or without the database name, the fullname looks like this.
+		$full_table_name = str_replace('{db_prefix}', $real_prefix, $table_name);
+
+		if ($db_table->table_exists($full_table_name))
 		{
-			$incontext['sql_results']['insert_dups']++;
-			$current_statement = '';
+			$incontext['sql_results']['table_dups']++;
+			$exists[] = $table_method;
 			continue;
 		}
 
-		$result = eval('return ' . $current_statement);
+		$result = $install_instance->{$table_method}();
 
 		if ($result === false)
 		{
-			// Error 1050: Table already exists!
-			// @todo Needs to be made better!
-			if (($db_type != 'mysql' || mysqli_errno($db_connection) === 1050) && preg_match('~^\s*\$db_table->db_create_table\(.*(\{db_prefix\}\w+)~s', $current_statement, $match) == 1)
-			{
-				$exists[] = $match[1];
-				$incontext['sql_results']['table_dups']++;
-			}
-			// Don't error on duplicate indexes (or duplicate operators in PostgreSQL.)
-			elseif (!preg_match('~^\s*\$db->query\(.*CREATE( UNIQUE)? INDEX ([^\n\r]+?)~s', $current_statement) && !($db_type == 'postgresql' && preg_match('~^\s*\$db->query\(.*CREATE OPERATOR (^\n\r]+?)~s', $current_statement)))
-			{
-				$incontext['failures'][$count] = $db->last_error();
-			}
+			$incontext['failures'][$table_method] = $db->last_error();
 		}
-		else
+	}
+
+	foreach ($inserts as $insert_method)
+	{
+		$table_name = substr($insert_method, 6);
+
+		if (in_array($table_name, $exists))
 		{
-			if (preg_match('~^\s*\$db_table->db_create_table\(.*(\{db_prefix\}\w+)~s', $current_statement, $match) == 1)
-				$incontext['sql_results']['tables']++;
-			else
-			{
-				preg_match_all('~^\s*array\(.+\),$~m', $current_statement, $matches);
-				if (!empty($matches[0]))
-					$incontext['sql_results']['inserts'] += (count($matches[0]) - 1);
-				else
-					$incontext['sql_results']['inserts']++;
-			}
+			$db_wrapper->countMode();
+			$incontext['sql_results']['insert_dups'] += $install_instance->{$insert_method}();
+			$db_wrapper->countMode(false);
+
+			continue;
 		}
 
-		$current_statement = '';
+		$result = $install_instance->{$insert_method}();
+
+		if ($result === false)
+		{
+			$incontext['failures'][] = $db->last_error();
+		}
+		else
+			$incontext['sql_results']['inserts'] += $result;
+	}
+
+	// Errors here are ignored
+	foreach ($others as $other_method)
+	{
+		$install_instance->{$other_method}();
 	}
 
 	// Sort out the context for the SQL.
@@ -2297,609 +1669,4 @@ function action_testCompression()
 	</body>
 </html>';
 		exit;
-}
-
-/**
- * Delete the installer and its additional files.
- * Called by ?delete
- */
-function action_deleteInstaller()
-{
-	global $databases, $package_ftp;
-
-	definePaths();
-	define('ELK', 'SSI');
-	require_once(SUBSDIR . '/Package.subs.php');
-
-	if (isset($_SESSION['installer_temp_ftp']))
-	{
-		$_SESSION['pack_ftp']['root'] = BOARDDIR;
-		$package_ftp = new Ftp_Connection($_SESSION['installer_temp_ftp']['server'], $_SESSION['installer_temp_ftp']['port'], $_SESSION['installer_temp_ftp']['username'], $_SESSION['installer_temp_ftp']['password']);
-		$package_ftp->chdir($_SESSION['installer_temp_ftp']['path']);
-	}
-
-	deltree(__DIR__);
-
-	if (isset($_SESSION['installer_temp_ftp']))
-	{
-		$package_ftp->close();
-
-		unset($_SESSION['installer_temp_ftp']);
-	}
-
-	// Now just redirect to a blank.png...
-	header('Location: http://' . (isset($_SERVER['HTTP_HOST']) ? $_SERVER['HTTP_HOST'] : $_SERVER['SERVER_NAME'] . ':' . $_SERVER['SERVER_PORT']) . dirname($_SERVER['PHP_SELF']) . '/../themes/default/images/blank.png');
-	exit;
-}
-
-function template_install_above()
-{
-	global $incontext, $txt, $installurl;
-
-	echo '<!DOCTYPE html>
-<html ', !empty($txt['lang_rtl']) ? 'dir="rtl"' : '', '>
-	<head>
-		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-		<meta name="robots" content="noindex" />
-		<title>', $txt['installer'], '</title>
-		<link rel="stylesheet" href="../themes/default/css/index.css?10RC1" />
-		<link rel="stylesheet" href="../themes/default/css/_light/index_light.css?10RC1" />
-		<link rel="stylesheet" href="../themes/default/css/install.css?10RC1" />
-		<script src="../themes/default/scripts/script.js"></script>
-		<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js" id="jquery"></script>
-		<script><!-- // --><![CDATA[
-			window.jQuery || document.write(\'<script src="../themes/default/scripts/jquery-1.11.1.min.js"><\/script>\');
-			var elk_scripturl = ', JavaScriptEscape(str_replace('/install/install.php', '/index.php', $installurl)), ';
-		// ]]></script>
-
-	</head>
-	<body>
-		<div id="header">
-			<div class="frame">
-				<h1 class="forumtitle">', $txt['installer'], '</h1>
-				<img id="logo" src="../themes/default/images/logo.png" alt="ElkArte Community" title="ElkArte Community" />
-			</div>
-		</div>
-		<div id="wrapper" class="wrapper">
-			<div id="upper_section">
-				<div id="inner_section">
-					<div id="inner_wrap">';
-
-	// Have we got a language drop down - if so do it on the first step only.
-	if (!empty($incontext['detected_languages']) && count($incontext['detected_languages']) > 1 && $incontext['current_step'] == 0)
-	{
-		echo '
-						<div class="news">
-							<form action="', $installurl, '" method="get">
-								<label for="installer_language">', $txt['installer_language'], ':</label>
-								<select id="installer_language" name="lang_file" onchange="location.href = \'', $installurl, '?lang_file=\' + this.options[this.selectedIndex].value;">';
-
-		foreach ($incontext['detected_languages'] as $lang => $name)
-			echo '
-									<option', isset($_SESSION['installer_temp_lang']) && $_SESSION['installer_temp_lang'] == $lang ? ' selected="selected"' : '', ' value="', $lang, '">', $name, '</option>';
-
-		echo '
-								</select>
-								<noscript><input type="submit" value="', $txt['installer_language_set'], '" class="button_submit" /></noscript>
-							</form>
-						</div>
-						<hr class="clear" />';
-	}
-
-	echo '
-					</div>
-				</div>
-			</div>
-			<div id="content_section">
-				<div id="main_content_section">
-					<div id="main_steps">
-						<h2>', $txt['upgrade_progress'], '</h2>
-						<ul>';
-
-	foreach ($incontext['steps'] as $num => $step)
-		echo '
-							<li class="', $num < $incontext['current_step'] ? 'stepdone' : ($num == $incontext['current_step'] ? 'stepcurrent' : 'stepwaiting'), '">', $txt['upgrade_step'], ' ', $step[0], ': ', $step[1], '</li>';
-
-	echo '
-						</ul>
-					</div>
-					<div id="progress_bar">
-						<div id="overall_text">', $incontext['overall_percent'], '%</div>
-						<div id="overall_progress" style="width: ', $incontext['overall_percent'], '%;">&nbsp;</div>
-						<div class="overall_progress">', $txt['upgrade_overall_progress'], '</div>
-					</div>
-					<div id="main_screen" class="clear">
-						<h2>', $incontext['page_title'], '</h2>
-						<div class="panel">';
-}
-
-function template_install_below()
-{
-	global $incontext, $txt;
-
-	if (!empty($incontext['continue']) || !empty($incontext['retry']))
-	{
-		echo '
-								<div class="clear righttext">';
-
-		if (!empty($incontext['continue']))
-			echo '
-									<input type="submit" id="contbutt" name="contbutt" value="', $txt['upgrade_continue'], '" onclick="return submitThisOnce(this);" class="button_submit" />';
-
-		if (!empty($incontext['retry']))
-			echo '
-									<input type="submit" id="contbutt" name="contbutt" value="', $txt['upgrade_retry'], '" onclick="return submitThisOnce(this);" class="button_submit" />';
-		echo '
-								</div>';
-	}
-
-	// Show the closing form tag and other data only if not in the last step
-	if (count($incontext['steps']) - 1 !== (int) $incontext['current_step'])
-		echo '
-							</form>';
-
-	echo '
-						</div>
-					</div>
-				</div>
-			</div>
-		</div>
-		<div id="footer_section">
-			<div class="frame">
-				<ul>
-					<li class="copyright"><a href="', SITE_SOFTWARE, '" title="ElkArte Community" target="_blank" class="new_win">ElkArte &copy; 2012 - 2014, ElkArte Community</a></li>
-				</ul>
-			</div>
-		</div>
-	</body>
-</html>';
-}
-
-/**
- * Welcome them to the wonderful world of ElkArte!
- */
-function template_welcome_message()
-{
-	global $incontext, $txt;
-
-	echo '
-	<script src="../themes/default/scripts/admin.js"></script>
-		<script><!-- // --><![CDATA[
-			var oUpgradeCenter = new elk_AdminIndex({
-				bLoadAnnouncements: false,
-				bLoadVersions: true,
-				slatestVersionContainerId: \'latestVersion\',
-				sinstalledVersionContainerId: \'version_warning\',
-				sVersionOutdatedTemplate: ', JavaScriptEscape('
-			<strong style="text-decoration: underline;">' . $txt['error_warning_notice'] . '</strong><p>
-				' . sprintf($txt['error_script_outdated'], '<em id="elkVersion" style="white-space: nowrap;">??</em>', '<em style="white-space: nowrap;">' . CURRENT_VERSION . '</em>') . '
-				</p>'), ',
-
-				bLoadUpdateNotification: false
-			});
-		// ]]></script>
-	<form action="', $incontext['form_url'], '" method="post">
-		<p>', sprintf($txt['install_welcome_desc'], CURRENT_VERSION), '</p>
-		<div id="version_warning" class="warningbox" style="display: none;">',CURRENT_VERSION, '</div>
-		<div id="latestVersion" style="display: none;">???</div>';
-
-	// Show the warnings, or not.
-	if (template_warning_divs())
-		echo '
-		<h3>', $txt['install_all_lovely'], '</h3>';
-
-	// Say we want the continue button!
-	if (empty($incontext['error']))
-		$incontext['continue'] = 1;
-
-	// For the latest version stuff.
-	echo '
-		<script><!-- // --><![CDATA[
-			var currentVersionRounds = 0;
-
-			// Latest version?
-			function ourCurrentVersion()
-			{
-				var latestVer,
-					setLatestVer;
-
-				// After few many tries let the use run the script
-				if (currentVersionRounds > 9)
-					document.getElementById(\'contbutt\').disabled = 0;
-
-				latestVer = document.getElementById(\'latestVersion\');
-				setLatestVer = document.getElementById(\'elkVersion\');
-
-				if (latestVer.innerHTML == \'???\')
-				{
-					setTimeout(\'ourCurrentVersion()\', 50);
-					return;
-				}
-
-				if (setLatestVer !== null)
-				{
-					setLatestVer.innerHTML = latestVer.innerHTML.replace(\'ElkArte \', \'\');
-					document.getElementById(\'version_warning\').style.display = \'\';
-				}
-
-				document.getElementById(\'contbutt\').disabled = 0;
-			}
-			addLoadEvent(ourCurrentVersion);
-		// ]]></script>';
-}
-
-/**
- * A shortcut for any warning stuff.
- */
-function template_warning_divs()
-{
-	global $txt, $incontext;
-
-	// Errors are very serious..
-	if (!empty($incontext['error']))
-		echo '
-		<div class="errorbox">
-			<strong style="text-decoration: underline;">', $txt['upgrade_critical_error'], '</strong><br />
-			<div>
-				', $incontext['error'], '
-			</div>
-		</div>';
-	// A warning message?
-	elseif (!empty($incontext['warning']))
-		echo '
-		<div class="warningbox">
-			<strong style="text-decoration: underline;">', $txt['upgrade_warning'], '</strong><br />
-			<div>
-				', $incontext['warning'], '
-			</div>
-		</div>';
-
-	return empty($incontext['error']) && empty($incontext['warning']);
-}
-
-function template_chmod_files()
-{
-	global $txt, $incontext;
-
-	echo '
-		<p>', $txt['ftp_setup_why_info'], '</p>
-		<ul style="margin: 2.5ex; font-family: monospace;">
-			<li>', implode('</li>
-			<li>', $incontext['failed_files']), '</li>
-		</ul>';
-
-	// This is serious!
-	if (!template_warning_divs())
-		return;
-
-	echo '
-		<hr />
-		<p>', $txt['ftp_setup_info'], '</p>';
-
-	if (!empty($incontext['ftp_errors']))
-		echo '
-		<div class="errorbox">
-			<div style="color: red;">
-				', $txt['error_ftp_no_connect'], '<br />
-				<br />
-				<code>', implode('<br />', $incontext['ftp_errors']), '</code>
-			</div>
-		</div>
-		<br />';
-
-	echo '
-		<form action="', $incontext['form_url'], '" method="post">
-			<table style="width: 520px; margin: 1em 0; border-collapse:collapse; border-spacing: 0; padding: 0">
-				<tr>
-					<td style="width: 26%; vertical-align: top;" class="textbox"><label for="ftp_server">', $txt['ftp_server'], ':</label></td>
-					<td>
-						<div style="float: ', empty($txt['lang_rtl']) ? 'right' : 'left', '; margin-', empty($txt['lang_rtl']) ? 'right' : 'left', ': 1px;"><label for="ftp_port" class="textbox"><strong>', $txt['ftp_port'], ':&nbsp;</strong></label> <input type="text" size="3" name="ftp_port" id="ftp_port" value="', $incontext['ftp']['port'], '" class="input_text" /></div>
-						<input type="text" size="30" name="ftp_server" id="ftp_server" value="', $incontext['ftp']['server'], '" style="width: 70%;" class="input_text" />
-						<div style="font-size: smaller; margin-bottom: 2ex;">', $txt['ftp_server_info'], '</div>
-					</td>
-				</tr><tr>
-					<td style="width: 26%; vertical-align: top;" class="textbox"><label for="ftp_username">', $txt['ftp_username'], ':</label></td>
-					<td>
-						<input type="text" size="50" name="ftp_username" id="ftp_username" value="', $incontext['ftp']['username'], '" style="width: 99%;" class="input_text" />
-						<div style="font-size: smaller; margin-bottom: 2ex;">', $txt['ftp_username_info'], '</div>
-					</td>
-				</tr><tr>
-					<td style="width: 26%; vertical-align: top;" class="textbox"><label for="ftp_password">', $txt['ftp_password'], ':</label></td>
-					<td>
-						<input type="password" size="50" name="ftp_password" id="ftp_password" style="width: 99%;" class="input_password" />
-						<div style="font-size: smaller; margin-bottom: 3ex;">', $txt['ftp_password_info'], '</div>
-					</td>
-				</tr><tr>
-					<td style="width: 26%; vertical-align: top;" class="textbox"><label for="ftp_path">', $txt['ftp_path'], ':</label></td>
-					<td style="padding-bottom: 1ex;">
-						<input type="text" size="50" name="ftp_path" id="ftp_path" value="', $incontext['ftp']['path'], '" style="width: 99%;" class="input_text" />
-						<div style="font-size: smaller; margin-bottom: 2ex;">', $incontext['ftp']['path_msg'], '</div>
-					</td>
-				</tr>
-			</table>
-			<div style="margin: 1ex; margin-top: 1ex; text-align: ', empty($txt['lang_rtl']) ? 'right' : 'left', ';"><input type="submit" value="', $txt['ftp_connect'], '" onclick="return submitThisOnce(this);" class="button_submit" /></div>
-		</form>
-		<a href="', $incontext['form_url'], '">', $txt['error_message_click'], '</a> ', $txt['ftp_setup_again'];
-}
-
-/**
- * Template for the database settings form.
- */
-function template_database_settings()
-{
-	global $incontext, $txt;
-
-	echo '
-	<form action="', $incontext['form_url'], '" method="post">
-		<p>', $txt['db_settings_info'], '</p>';
-
-	template_warning_divs();
-
-	echo '
-		<table style="width: 100%; margin: 1em 0; border-collapse:collapse; border-spacing: 0; padding: 0">';
-
-	// More than one database type?
-	if (count($incontext['supported_databases']) > 1)
-	{
-		echo '
-			<tr>
-				<td style="width: 20%; vertical-align: top;" class="textbox"><label for="db_type_input">', $txt['db_settings_type'], ':</label></td>
-				<td>
-					<select name="db_type" id="db_type_input">';
-
-	foreach ($incontext['supported_databases'] as $key => $db)
-			echo '
-						<option value="', $key, '"', isset($_POST['db_type']) && $_POST['db_type'] == $key ? ' selected="selected"' : '', '>', $db['name'], '</option>';
-
-	echo '
-					</select>
-					<div style="font-size: smaller; margin-bottom: 2ex;">', $txt['db_settings_type_info'], '</div>
-				</td>
-			</tr>';
-	}
-	else
-	{
-		echo '
-			<tr style="display: none;">
-				<td>
-					<input type="hidden" name="db_type" value="', $incontext['db']['type'], '" />
-				</td>
-			</tr>';
-	}
-
-	echo '
-			<tr id="db_server_contain">
-				<td style="width: 20%; vertical-align: top;" class="textbox"><label for="db_server_input">', $txt['db_settings_server'], ':</label></td>
-				<td>
-					<input type="text" name="db_server" id="db_server_input" value="', $incontext['db']['server'], '" size="30" class="input_text" /><br />
-					<div style="font-size: smaller; margin-bottom: 2ex;">', $txt['db_settings_server_info'], '</div>
-				</td>
-			</tr><tr id="db_user_contain">
-				<td style="vertical-align: top;" class="textbox"><label for="db_user_input">', $txt['db_settings_username'], ':</label></td>
-				<td>
-					<input type="text" name="db_user" id="db_user_input" value="', $incontext['db']['user'], '" size="30" class="input_text" /><br />
-					<div style="font-size: smaller; margin-bottom: 2ex;">', $txt['db_settings_username_info'], '</div>
-				</td>
-			</tr><tr id="db_passwd_contain">
-				<td style="vertical-align: top;" class="textbox"><label for="db_passwd_input">', $txt['db_settings_password'], ':</label></td>
-				<td>
-					<input type="password" name="db_passwd" id="db_passwd_input" value="', $incontext['db']['pass'], '" size="30" class="input_password" /><br />
-					<div style="font-size: smaller; margin-bottom: 2ex;">', $txt['db_settings_password_info'], '</div>
-				</td>
-			</tr><tr id="db_name_contain">
-				<td style="vertical-align: top;" class="textbox"><label for="db_name_input">', $txt['db_settings_database'], ':</label></td>
-				<td>
-					<input type="text" name="db_name" id="db_name_input" value="', empty($incontext['db']['name']) ? 'elkarte' : $incontext['db']['name'], '" size="30" class="input_text" /><br />
-					<div style="font-size: smaller; margin-bottom: 2ex;">', $txt['db_settings_database_info'], '
-					<span id="db_name_info_warning">', $txt['db_settings_database_info_note'], '</span></div>
-				</td>
-			</tr>
-			</tr><tr>
-				<td style="vertical-align: top;" class="textbox"><label for="db_prefix_input">', $txt['db_settings_prefix'], ':</label></td>
-				<td>
-					<input type="text" name="db_prefix" id="db_prefix_input" value="', $incontext['db']['prefix'], '" size="30" class="input_text" /><br />
-					<div style="font-size: smaller; margin-bottom: 2ex;">', $txt['db_settings_prefix_info'], '</div>
-				</td>
-			</tr>
-		</table>';
-
-	// Allow the toggling of input boxes for Postgresql
-	echo '
-	<script><!-- // --><![CDATA[
-		function validatePgsql()
-		{
-			var dbtype = document.getElementById(\'db_type_input\');
-
-			if (dbtype !== null && dbtype.value == \'postgresql\')
-				document.getElementById(\'db_name_info_warning\').style.display = \'none\';
-			else
-				document.getElementById(\'db_name_info_warning\').style.display = \'\';
-		}
-		validatePgsql();
-	// ]]></script>';
-}
-
-/**
- * Stick in their forum settings.
- */
-function template_forum_settings()
-{
-	global $incontext, $txt;
-
-	echo '
-	<form action="', $incontext['form_url'], '" method="post">
-		<h3>', $txt['install_settings_info'], '</h3>';
-
-	template_warning_divs();
-
-	echo '
-		<table style="width: 100%; margin: 1em 0; border-collapse:collapse; border-spacing: 0; padding: 0;">
-			<tr>
-				<td style="width: 20%; vertical-align: top;" class="textbox"><label for="mbname_input">', $txt['install_settings_name'], ':</label></td>
-				<td>
-					<input type="text" name="mbname" id="mbname_input" value="', $txt['install_settings_name_default'], '" size="65" class="input_text" />
-					<div style="font-size: smaller; margin-bottom: 2ex;">', $txt['install_settings_name_info'], '</div>
-				</td>
-			</tr>
-			<tr>
-				<td style="vertical-align: top;" class="textbox"><label for="boardurl_input">', $txt['install_settings_url'], ':</label></td>
-				<td>
-					<input type="text" name="boardurl" id="boardurl_input" value="', $incontext['detected_url'], '" size="65" class="input_text" /><br />
-					<div style="font-size: smaller; margin-bottom: 2ex;">', $txt['install_settings_url_info'], '</div>
-				</td>
-			</tr>
-			<tr>
-				<td style="vertical-align: top;" class="textbox">', $txt['install_settings_compress'], ':</td>
-				<td>
-					<input type="checkbox" name="compress" id="compress_check" checked="checked" class="input_check" /> <label for="compress_check">', $txt['install_settings_compress_title'], '</label><br />
-					<div style="font-size: smaller; margin-bottom: 2ex;">', $txt['install_settings_compress_info'], '</div>
-				</td>
-			</tr>
-			<tr>
-				<td style="vertical-align: top;" class="textbox">', $txt['install_settings_dbsession'], ':</td>
-				<td>
-					<input type="checkbox" name="dbsession" id="dbsession_check" checked="checked" class="input_check" /> <label for="dbsession_check">', $txt['install_settings_dbsession_title'], '</label><br />
-					<div style="font-size: smaller; margin-bottom: 2ex;">', $incontext['test_dbsession'] ? $txt['install_settings_dbsession_info1'] : $txt['install_settings_dbsession_info2'], '</div>
-				</td>
-			</tr>
-		</table>';
-}
-
-/**
- * Show results of the database population.
- */
-function template_populate_database()
-{
-	global $incontext, $txt;
-
-	echo '
-	<form action="', $incontext['form_url'], '" method="post">
-		<p>', !empty($incontext['was_refresh']) ? $txt['user_refresh_install_desc'] : $txt['db_populate_info'], '</p>';
-
-	if (!empty($incontext['sql_results']))
-	{
-		echo '
-		<ul>
-			<li>', implode('</li><li>', $incontext['sql_results']), '</li>
-		</ul>';
-	}
-
-	if (!empty($incontext['failures']))
-	{
-		echo '
-				<div class="errorbox">', $txt['error_db_queries'], '
-					<ul>';
-
-		foreach ($incontext['failures'] as $line => $fail)
-			echo '
-						<li><strong>', $txt['error_db_queries_line'], $line + 1, ':</strong> ', nl2br(htmlspecialchars($fail, ENT_COMPAT, 'UTF-8')), '</li>';
-
-		echo '
-					</ul>
-				</div>';
-	}
-
-	echo '
-		<p>', $txt['db_populate_info2'], '</p>';
-
-	template_warning_divs();
-
-	echo '
-	<input type="hidden" name="pop_done" value="1" />';
-}
-
-/**
- * Template for the form to create the admin account.
- */
-function template_admin_account()
-{
-	global $incontext, $txt;
-
-	echo '
-	<form action="', $incontext['form_url'], '" method="post">
-		<p>', $txt['user_settings_info'], '</p>';
-
-	template_warning_divs();
-
-	echo '
-		<table style="width: 100%; margin: 2em 0; border-collapse:collapse; border-spacing: 0; padding: 0">
-			<tr>
-				<td style="width: 18%; vertical-align: top;" class="textbox"><label for="username">', $txt['user_settings_username'], ':</label></td>
-				<td>
-					<input type="text" name="username" id="username" value="', $incontext['username'], '" size="40" class="input_text" />
-					<div style="font-size: smaller; margin-bottom: 2ex;">', $txt['user_settings_username_info'], '</div>
-				</td>
-			</tr><tr>
-				<td style="vertical-align: top;" class="textbox"><label for="password1">', $txt['user_settings_password'], ':</label></td>
-				<td>
-					<input type="password" name="password1" id="password1" size="40" class="input_password" />
-					<div style="font-size: smaller; margin-bottom: 2ex;">', $txt['user_settings_password_info'], '</div>
-				</td>
-			</tr><tr>
-				<td style="vertical-align: top;" class="textbox"><label for="password2">', $txt['user_settings_again'], ':</label></td>
-				<td>
-					<input type="password" name="password2" id="password2" size="40" class="input_password" />
-					<div style="font-size: smaller; margin-bottom: 2ex;">', $txt['user_settings_again_info'], '</div>
-				</td>
-			</tr><tr>
-				<td style="vertical-align: top;" class="textbox"><label for="email">', $txt['user_settings_email'], ':</label></td>
-				<td>
-					<input type="text" name="email" id="email" value="', $incontext['email'], '" size="40" class="input_text" />
-					<div style="font-size: smaller; margin-bottom: 2ex;">', $txt['user_settings_email_info'], '</div>
-				</td>
-			</tr>
-		</table>';
-
-	if ($incontext['require_db_confirm'])
-		echo '
-		<h2>', $txt['user_settings_database'], '</h2>
-		<p>', $txt['user_settings_database_info'], '</p>
-
-		<div style="padding-bottom: 2ex; padding-', empty($txt['lang_rtl']) ? 'left' : 'right', ': 50px;">
-			<input type="password" name="password3" size="30" class="input_password" />
-		</div>';
-}
-
-/**
- * Tell them it's done, and to delete.
- */
-function template_delete_install()
-{
-	global $incontext, $installurl, $txt, $boardurl;
-
-	echo '
-		<p>', $txt['congratulations_help'], '</p>';
-
-	template_warning_divs();
-
-	// Install directory still writable?
-	if ($incontext['dir_still_writable'])
-		echo '
-		<em>', $txt['still_writable'], '</em><br />
-		<br />';
-
-	// Don't show the box if it's like 99% sure it won't work :P.
-	if ($incontext['probably_delete_install'])
-		echo '
-		<div id="delete_label" style="margin: 1ex; font-weight: bold; display: none">
-			<label for="delete_self"><input type="checkbox" id="delete_self" onclick="doTheDelete();" class="input_check" /> ', $txt['delete_installer'], !isset($_SESSION['installer_temp_ftp']) ? ' ' . $txt['delete_installer_maybe'] : '', '</label>
-		</div>
-		<script><!-- // --><![CDATA[
-			function doTheDelete()
-			{
-				var theCheck = document.getElementById ? document.getElementById("delete_self") : document.all.delete_self,
-					tempImage = new Image();
-
-				tempImage.src = "', $installurl, '?delete=1&ts_" + (new Date().getTime());
-				tempImage.width = 0;
-				theCheck.disabled = true;
-			}
-			document.getElementById(\'delete_label\').style.display = \'block\';
-		// ]]></script>
-		<br />';
-
-	echo '
-		', sprintf($txt['go_to_your_forum'], $boardurl . '/index.php'), '<br />
-		<br />
-		', $txt['good_luck'];
 }

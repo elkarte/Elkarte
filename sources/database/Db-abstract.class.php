@@ -12,7 +12,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0 Release Candidate 1
+ * @version 1.1 dev Release Candidate 1
  *
  */
 
@@ -20,19 +20,19 @@ if (!defined('ELK'))
 	die('No access...');
 
 /**
- * PostgreSQL database class, implements database class to control mysql functions
+ * Abstract database class, implements database to control functions
  */
 abstract class Database_Abstract implements Database
 {
 	/**
-	 * Current connetcion to the database
+	 * Current connection to the database
 	 * @var resource
 	 */
 	protected $_connection = null;
 
 	/**
 	 * Number of queries run (may include queries from $_SESSION if is a redirect)
-	 * @var resource
+	 * @var int
 	 */
 	protected $_query_count = 0;
 
@@ -74,7 +74,7 @@ abstract class Database_Abstract implements Database
 
 		// Connection gone???  This should *never* happen at this point, yet it does :'(
 		if (!$this->_validConnection($connection))
-			display_db_error();
+			Errors::instance()->display_db_error();
 
 		if ($matches[1] === 'db_prefix')
 			return $db_prefix;
@@ -198,6 +198,39 @@ abstract class Database_Abstract implements Database
 	}
 
 	/**
+	 * {@inheritDoc}
+	 */
+	public function fetchQuery($db_string, $db_values = array(), $seeds = null)
+	{
+		$request = $this->query('', $db_string, $db_values);
+
+		$results = $seeds !== null ? $seeds : array();
+		while ($row = $this->fetch_assoc($request))
+			$results[] = $row;
+		$this->free_result($request);
+
+		return $results;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	public function fetchQueryCallback($db_string, $db_values = array(), $callback = null, $seeds = null)
+	{
+		if ($callback === null)
+			return $this->fetchQuery($db_string, $db_values);
+
+		$request = $this->query('', $db_string, $db_values);
+
+		$results = $seeds !== null ? $seeds : array();
+		while ($row = $this->fetch_assoc($request))
+			$results[] = $callback($row);
+		$this->free_result($request);
+
+		return $results;
+	}
+
+	/**
 	 * This function combines the keys and values of the data passed to db::insert.
 	 *
 	 * @param mixed[] $keys
@@ -207,7 +240,8 @@ abstract class Database_Abstract implements Database
 	protected function _array_combine($keys, $values)
 	{
 		$is_numeric = array_filter(array_keys($values), 'is_numeric');
-		if ($is_numeric)
+
+		if (!empty($is_numeric))
 			return array_combine($keys, $values);
 		else
 		{
@@ -218,7 +252,7 @@ abstract class Database_Abstract implements Database
 					$combined[$key] = $values[$key];
 			}
 
-			// @todo should throws an E_WARNING if count($combined) != count($keys)
+			// @todo should throw an E_WARNING if count($combined) != count($keys)
 			return $combined;
 		}
 	}
@@ -259,11 +293,11 @@ abstract class Database_Abstract implements Database
 
 		// Is always a critical error.
 		if (function_exists('log_error'))
-			log_error($log_message, 'critical', $file, $line);
+			Errors::instance()->log_error($log_message, 'critical', $file, $line);
 
 		if (function_exists('fatal_error'))
 		{
-			fatal_error($error_message, false);
+			Errors::instance()->fatal_error($error_message, false);
 
 			// Cannot continue...
 			exit;
@@ -333,7 +367,7 @@ abstract class Database_Abstract implements Database
 	 *
 	 * @return int
 	 */
-	function num_queries()
+	public function num_queries()
 	{
 		return $this->_query_count;
 	}

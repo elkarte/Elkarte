@@ -9,7 +9,7 @@
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
- * @version 1.0
+ * @version 1.1 dev
  *
  */
 
@@ -23,9 +23,10 @@ global $boarddir, $sourcedir;
 global $ssi_db_user, $ssi_db_passwd;
 
 // Done to allow the option to runInSeparateProcess for phpunit
+// as done in Auth.subs.Test
 if (!defined('ELK'))
 {
-	DEFINE('ELK', 1);
+	DEFINE('ELK', '1');
 	DEFINE('CACHE_STALE', '?R11');
 
 	// Get the forum's settings for database and file paths.
@@ -40,6 +41,7 @@ if (!defined('ELK'))
 	DEFINE('ADMINDIR', $sourcedir . '/admin');
 	DEFINE('CONTROLLERDIR', $sourcedir . '/controllers');
 	DEFINE('SUBSDIR', $sourcedir . '/subs');
+	DEFINE('ADDONSDIR', $sourcedir . '/addons');
 }
 else
 	require_once('/var/www/Settings.php');
@@ -48,15 +50,16 @@ else
 require_once(SOURCEDIR . '/QueryString.php');
 require_once(SOURCEDIR . '/Session.php');
 require_once(SOURCEDIR . '/Subs.php');
-require_once(SOURCEDIR . '/Errors.php');
 require_once(SOURCEDIR . '/Logging.php');
 require_once(SOURCEDIR . '/Load.php');
 require_once(SOURCEDIR . '/Security.php');
+require_once(SUBSDIR . '/Cache.subs.php');
 
 // Get the autoloader rolling
-spl_autoload_register('elk_autoloader');
-
-require_once(SUBSDIR . '/Cache.subs.php');
+require(SOURCEDIR . '/Autoloader.class.php');
+$autoloder = Elk_Autoloader::getInstance();
+$autoloder->setupAutoloader(array(SOURCEDIR, SUBSDIR, CONTROLLERDIR, ADMINDIR, ADDONSDIR));
+$autoloder->register(SOURCEDIR, '\\ElkArte');
 
 // Used by the test, add others as needed or ...
 $context = array();
@@ -66,10 +69,12 @@ $context['forum_name_html_safe'] = $context['forum_name'];
 // Just like we are starting, almost
 cleanRequest();
 loadDatabase();
+Hooks::init(database(), Debug::get());
 reloadSettings();
 elk_seed_generator();
 loadSession();
 loadUserSettings();
+loadBoard();
 loadPermissions();
 
 // Basic language is good to have for functional tests
@@ -81,3 +86,4 @@ if (defined('PHPUNIT_SELENIUM'))
 	require_once('/var/www/tests/sources/controllers/ElkArteWebTest.php');
 	PHPUnit_Extensions_Selenium2TestCase::shareSession(true);
 }
+file_put_contents('/var/www/bootstrapcompleted.lock', '1');

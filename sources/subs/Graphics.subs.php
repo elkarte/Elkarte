@@ -17,7 +17,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0
+ * @version 1.1 dev
  *
  */
 
@@ -92,7 +92,7 @@ function reencodeImage($fileName, $preferred_format = 0)
 }
 
 /**
- * Searches through the file to see if there's potentialy harmful non-binary content.
+ * Searches through the file to see if there's potentially harmful non-binary content.
  *
  * - if extensiveCheck is true, searches for asp/php short tags as well.
  *
@@ -104,7 +104,7 @@ function checkImageContents($fileName, $extensiveCheck = false)
 {
 	$fp = fopen($fileName, 'rb');
 	if (!$fp)
-		fatal_lang_error('attach_timeout');
+		Errors::instance()->fatal_lang_error('attach_timeout');
 
 	$prev_chunk = '';
 	while (!feof($fp))
@@ -316,13 +316,16 @@ function resizeImage($src_img, $destName, $src_width, $src_height, $max_width, $
 			// Get a new instance of Imagick for use
 			$imagick = new Imagick($destName);
 
+			// Fix image rotations for iphone cameras etc.
+			autoRotateImage($imagick);
+
 			// Set the input and output image size
 			$src_width = empty($src_width) ? $imagick->getImageWidth() : $src_width;
 			$src_height = empty($src_height) ? $imagick->getImageHeight() : $src_height;
 			$dest_width = empty($max_width) ? $src_width : $max_width;
 			$dest_height = empty($max_height) ? $src_height : $max_height;
 
-			// Create a new image in our prefered format and resize it if needed
+			// Create a new image in our preferred format and resize it if needed
 			$imagick->setImageFormat($default_formats[$preferred_format]);
 			$imagick->resizeImage($dest_width, $dest_height, Imagick::FILTER_LANCZOS, 1, true);
 
@@ -411,6 +414,68 @@ function resizeImage($src_img, $destName, $src_width, $src_height, $max_width, $
 }
 
 /**
+ * Autorotate an image based on its EXIF Orientation tag.
+ *
+ * - ImageMagick only
+ * - Checks exif data for orientation flag and rotates image so its proper
+ * - Updates orientation flag if rotation was required
+ *
+ * @param object $image
+ */
+function autoRotateImage($image)
+{
+	// This method should exist if Imagick has been compiled against ImageMagick version
+	// 6.3.0 or higher which is forever ago, but we check anyway ;)
+	if (!method_exists($image , 'getImageOrientation'))
+		return;
+
+	$orientation = $image->getImageOrientation();
+
+	switch ($orientation)
+	{
+		// (0 & 1) Not set or Normal
+		case imagick::ORIENTATION_UNDEFINED:
+		case imagick::ORIENTATION_TOPLEFT:
+			break;
+		// (2) Mirror image, Normal orientation
+		case imagick::ORIENTATION_TOPRIGHT:
+			$image->flopImage();
+			break;
+		// (3) Normal image, rotated 180
+		case imagick::ORIENTATION_BOTTOMRIGHT:
+			$image->rotateImage("#000", 180);
+			break;
+		// (4) Mirror image, rotated 180
+		case imagick::ORIENTATION_BOTTOMLEFT:
+			$image->rotateImage("#000", 180);
+			$image->flopImage();
+			break;
+		// (5) Mirror image, rotated 90 CCW
+		case imagick::ORIENTATION_LEFTTOP:
+			$image->rotateImage("#000", 90);
+			$image->flopImage();
+			break;
+		// (6) Normal image, rotated 90 CCW
+		case imagick::ORIENTATION_RIGHTTOP:
+			$image->rotateImage("#000", 90);
+			break;
+		// (7) Mirror image, rotated 90 CW
+		case imagick::ORIENTATION_RIGHTBOTTOM:
+			$image->rotateImage("#000", -90);
+			$image->flopImage();
+			break;
+		// (8) Normal image, rotated 90 CW
+		case imagick::ORIENTATION_LEFTBOTTOM:
+			$image->rotateImage("#000", -90);
+			break;
+	}
+
+	// Now that it's auto-rotated, make sure the EXIF data is correctly updated
+	if ($orientation >= 2)
+		$image->setImageOrientation(imagick::ORIENTATION_TOPLEFT);
+}
+
+/**
  * Copy / resize an image using GD bicubic methods
  *
  * - Used when imagecopyresample() is not available
@@ -478,10 +543,10 @@ function imagecopyresamplebicubic($dst_img, $src_img, $dst_x, $dst_y, $src_x, $s
 if (!function_exists('imagecreatefrombmp'))
 {
 	/**
-	 * It is set only if it doesn't already exist (for forwards compatiblity.)
+	 * It is set only if it doesn't already exist (for forwards compatibility.)
 	 *
 	 * - It only supports uncompressed bitmaps.
-	 * - It only supports standard windows bitmaps (no os/2 varients)
+	 * - It only supports standard windows bitmaps (no os/2 variants)
 	 * - Returns an image identifier representing the bitmap image
 	 * obtained from the given filename.
 	 *

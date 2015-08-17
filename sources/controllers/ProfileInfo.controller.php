@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Handles the retreving and display of a users posts, attachments, stats, permissions
+ * Handles the retrieving and display of a users posts, attachments, stats, permissions
  * warnings and the like
  *
  * @name      ElkArte Forum
@@ -14,7 +14,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:		BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0
+ * @version 1.1 dev
  *
  */
 
@@ -23,8 +23,8 @@ if (!defined('ELK'))
 
 /**
  * ProfileInfo_Controller class, access all profile summary areas for a user
- * incuding overall summary, post listing, attachment listing, user statistics
- * user permisssions, user warnings
+ * including overall summary, post listing, attachment listing, user statistics
+ * user permissions, user warnings
  */
 class ProfileInfo_Controller extends Action_Controller
 {
@@ -50,7 +50,7 @@ class ProfileInfo_Controller extends Action_Controller
 
 		// Attempt to load the member's profile data.
 		if (!loadMemberContext($memID) || !isset($memberContext[$memID]))
-			fatal_lang_error('not_a_user', false);
+			Errors::instance()->fatal_lang_error('not_a_user', false);
 
 		loadTemplate('ProfileInfo');
 
@@ -269,7 +269,7 @@ class ProfileInfo_Controller extends Action_Controller
 			}
 		}
 
-		// How about thier most recent posts?
+		// How about their most recent posts?
 		if (in_array('posts', $summary_areas))
 		{
 			// Is the load average too high just now, then let them know
@@ -277,7 +277,7 @@ class ProfileInfo_Controller extends Action_Controller
 				$context['loadaverage'] = true;
 			else
 			{
-				// Set up to get the last 10 psots of this member
+				// Set up to get the last 10 posts of this member
 				$msgCount = count_user_posts($memID);
 				$range_limit = '';
 				$maxIndex = 10;
@@ -424,7 +424,7 @@ class ProfileInfo_Controller extends Action_Controller
 
 		// Is the load average too high to allow searching just now?
 		if (!empty($modSettings['loadavg_show_posts']) && $modSettings['current_load'] >= $modSettings['loadavg_show_posts'])
-			fatal_lang_error('loadavg_show_posts_disabled', false);
+			Errors::instance()->fatal_lang_error('loadavg_show_posts_disabled', false);
 
 		// If we're specifically dealing with attachments use that function!
 		if (isset($_GET['sa']) && $_GET['sa'] == 'attach')
@@ -443,7 +443,7 @@ class ProfileInfo_Controller extends Action_Controller
 
 			// We can be lazy, since removeMessage() will check the permissions for us.
 			$remover = new MessagesDelete($modSettings['recycle_enable'], $modSettings['recycle_board']);
-			$remover->removeMessage((int) $_GET['delete'], $decreasePostCount, true);
+			$remover->removeMessage((int) $_GET['delete']);
 
 			// Back to... where we are now ;).
 			redirectexit('action=profile;u=' . $memID . ';area=showposts;start=' . $context['start']);
@@ -540,7 +540,7 @@ class ProfileInfo_Controller extends Action_Controller
 				'buttons' => array(
 					// How about... even... remove it entirely?!
 					'remove' => array(
-						'href' => $scripturl . '?action=deletemsg;msg=' . $row['id_msg'] . ';topic=' . $row['id_topic'] . ';profile;u=' . $context['member']['id'] . ';start=' . $context['start'],
+						'href' => $scripturl . '?action=deletemsg;msg=' . $row['id_msg'] . ';topic=' . $row['id_topic'] . ';profile;u=' . $context['member']['id'] . ';start=' . $context['start'] . ';'.  $context['session_var'] . '=' . $context['session_id'],
 						'text' => $txt['remove'],
 						'test' => 'can_delete',
 						'custom' => 'onclick="return confirm(' . JavaScriptEscape($txt['remove_message'] . '?') . ');"',
@@ -878,7 +878,7 @@ class ProfileInfo_Controller extends Action_Controller
 
 		// Is the load average too high to allow searching just now?
 		if (!empty($modSettings['loadavg_userstats']) && $modSettings['current_load'] >= $modSettings['loadavg_userstats'])
-			fatal_lang_error('loadavg_userstats_disabled', false);
+			Errors::instance()->fatal_lang_error('loadavg_userstats_disabled', false);
 
 		loadTemplate('ProfileInfo');
 
@@ -1012,7 +1012,7 @@ class ProfileInfo_Controller extends Action_Controller
 
 		// Firstly, can we actually even be here?
 		if (!allowedTo('issue_warning') && (empty($modSettings['warning_show']) || ($modSettings['warning_show'] == 1 && !$context['user']['is_owner'])))
-			fatal_lang_error('no_access', false);
+			Errors::instance()->fatal_lang_error('no_access', false);
 
 		loadTemplate('ProfileInfo');
 

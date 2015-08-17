@@ -13,7 +13,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0
+ * @version 1.1 dev
  *
  * This file contains functions that are specifically done by administrators.
  *
@@ -30,7 +30,7 @@ if (!defined('ELK'))
  */
 function getServerVersions($checkFor)
 {
-	global $txt, $modSettings;
+	global $txt;
 
 	$db = database();
 
@@ -102,7 +102,7 @@ function getServerVersions($checkFor)
 }
 
 /**
- * Builds the availalble tasks for this admin / moderator
+ * Builds the available tasks for this admin / moderator
  *
  * What it does:
  * - Sets up the support resource txt stings
@@ -217,7 +217,7 @@ function getFileVersions(&$versionOptions)
 	if (!empty($versionOptions['include_subscriptions']) && file_exists(BOARDDIR . '/subscriptions.php'))
 		readFileVersions($version_info, array('file_versions' => BOARDDIR), 'subscriptions.php');
 
-	// Load all the files in the sources and its sub directorys
+	// Load all the files in the sources and its sub directory's
 	$directories = array(
 		'file_versions' => SOURCEDIR,
 		'file_versions_admin' => ADMINDIR,
@@ -292,13 +292,13 @@ function getFileVersions(&$versionOptions)
 /**
  * Read a directory searching for files with a certain pattern in the name
  *
- * @param mixed[] $version_info - 
+ * @param mixed[] $version_info -
  * @param string[] $directories - an array of directories to loop
  * @param string $pattern - how the name of the files should end
  */
 function readFileVersions(&$version_info, $directories, $pattern)
 {
-	// The comment looks rougly like... that.
+	// The comment looks roughly like... that.
 	$version_regex = '~\*\s@version\s+(.+)[\s]{2}~i';
 	$unknown_version = '??';
 
@@ -343,7 +343,6 @@ function updateDbLastError($time)
 {
 	// Write out the db_last_error file with the error timestamp
 	file_put_contents(BOARDDIR . '/db_last_error.txt', $time, LOCK_EX);
-	@touch(BOARDDIR . '/Settings.php');
 }
 
 /**
@@ -396,7 +395,7 @@ function emailAdmins($template, $replacements = array(), $additional_recipients 
 	require_once(SUBSDIR . '/Mail.subs.php');
 
 	// Load all groups which are effectively admins.
-	$request = $db->query('', '
+	$groups = $db->fetchQuery('
 		SELECT id_group
 		FROM {db_prefix}permissions
 		WHERE permission = {string:admin_forum}
@@ -408,12 +407,10 @@ function emailAdmins($template, $replacements = array(), $additional_recipients 
 			'admin_forum' => 'admin_forum',
 		)
 	);
-	$groups = array(1);
-	while ($row = $db->fetch_assoc($request))
-		$groups[] = $row['id_group'];
-	$db->free_result($request);
+	$groups[] = 1;
+	$groups = array_unique($groups);
 
-	$request = $db->query('', '
+	$emails_sent = $db->fetchQueryCallback('
 		SELECT id_member, member_name, real_name, lngfile, email_address
 		FROM {db_prefix}members
 		WHERE (id_group IN ({array_int:group_list}) OR FIND_IN_SET({raw:group_array_implode}, additional_groups) != 0)
@@ -423,29 +420,28 @@ function emailAdmins($template, $replacements = array(), $additional_recipients 
 			'group_list' => $groups,
 			'notify_types' => 4,
 			'group_array_implode' => implode(', additional_groups) != 0 OR FIND_IN_SET(', $groups),
-		)
+		),
+		function($row) use($replacements, $modSettings, $language)
+		{
+			// Stick their particulars in the replacement data.
+			$replacements['IDMEMBER'] = $row['id_member'];
+			$replacements['REALNAME'] = $row['member_name'];
+			$replacements['USERNAME'] = $row['real_name'];
+
+			// Load the data from the template.
+			$emaildata = loadEmailTemplate($template, $replacements, empty($row['lngfile']) || empty($modSettings['userLanguage']) ? $language : $row['lngfile']);
+
+			// Then send the actual email.
+			sendmail($row['email_address'], $emaildata['subject'], $emaildata['body'], null, null, false, 1);
+
+			// Track who we emailed so we don't do it twice.
+			return $row['email_address'];
+		}
 	);
-	$emails_sent = array();
-	while ($row = $db->fetch_assoc($request))
-	{
-		// Stick their particulars in the replacement data.
-		$replacements['IDMEMBER'] = $row['id_member'];
-		$replacements['REALNAME'] = $row['member_name'];
-		$replacements['USERNAME'] = $row['real_name'];
-
-		// Load the data from the template.
-		$emaildata = loadEmailTemplate($template, $replacements, empty($row['lngfile']) || empty($modSettings['userLanguage']) ? $language : $row['lngfile']);
-
-		// Then send the actual email.
-		sendmail($row['email_address'], $emaildata['subject'], $emaildata['body'], null, null, false, 1);
-
-		// Track who we emailed so we don't do it twice.
-		$emails_sent[] = $row['email_address'];
-	}
-	$db->free_result($request);
 
 	// Any additional users we must email this to?
 	if (!empty($additional_recipients))
+	{
 		foreach ($additional_recipients as $recipient)
 		{
 			if (in_array($recipient['email'], $emails_sent))
@@ -461,6 +457,7 @@ function emailAdmins($template, $replacements = array(), $additional_recipients 
 			// Send off the email.
 			sendmail($recipient['email'], $emaildata['subject'], $emaildata['body'], null, null, false, 1);
 		}
+	}
 }
 
 /**
@@ -482,24 +479,6 @@ function custom_profiles_toggle_callback($value)
 			SET active = 0'
 		);
 	}
-}
-
-/**
- * Callback used in the core features page when the drafts
- * are enabled or disabled.
- *
- * @package Admin
- * @param bool $value the "new" status of the drafts
- * (true => enabled, false => disabled)
- */
-function drafts_toggle_callback($value)
-{
-	require_once(SUBSDIR . '/ScheduledTasks.subs.php');
-	toggleTaskStatusByName('remove_old_drafts', $value);
-
-	// Should we calculate next trigger?
-	if ($value)
-		calculateNextTrigger('remove_old_drafts');
 }
 
 /**
@@ -536,4 +515,71 @@ function postbyemail_toggle_callback($value)
 	// Should we calculate next trigger?
 	if ($value)
 		calculateNextTrigger('maillist_fetch_IMAP');
+}
+
+/**
+ * Enables a certain module on a set of controllers
+ *
+ * @package Admin
+ * @param string $module the name of the module (e.g. drafts)
+ * @param string[] $controllers list of controllers on which the module is
+ *                 activated
+ */
+function enableModules($module, $controllers)
+{
+	global $modSettings;
+
+	foreach ((array) $controllers as $controller)
+	{
+		if (!empty($modSettings['modules_' . $controller]))
+			$existing = explode(',', $modSettings['modules_' . $controller]);
+		else
+			$existing = array();
+
+		$existing[] = $module;
+		$existing = array_filter(array_unique($existing));
+		updateSettings(array('modules_' . $controller => implode(',', $existing)));
+	}
+}
+
+/**
+ * Disable a certain module on a set of controllers
+ *
+ * @package Admin
+ * @param string $module the name of the module (e.g. drafts)
+ * @param string[] $controllers list of controllers on which the module is
+ *                 activated
+ */
+function disableModules($module, $controllers)
+{
+	global $modSettings;
+
+	foreach ((array) $controllers as $controller)
+	{
+		if (!empty($modSettings['modules_' . $controller]))
+			$existing = explode(',', $modSettings['modules_' . $controller]);
+		else
+			$existing = array();
+
+		$existing = array_diff($existing, (array) $module);
+		updateSettings(array('modules_' . $controller => implode(',', $existing)));
+	}
+}
+
+function isModuleEnabled($module)
+{
+	global $modSettings;
+
+	$module = strtolower($module);
+	foreach ($modSettings as $key => $val)
+	{
+		if (substr($key, 0, 8) === 'modules_')
+		{
+			$modules = explode(',', $val);
+			if (in_array($module, $modules))
+				return true;
+		}
+	}
+
+	return false;
 }

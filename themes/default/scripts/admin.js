@@ -9,7 +9,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:		BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0.2
+ * @version 1.1 dev
  *
  * Handle the JavaScript surrounding the admin and moderation center.
  */
@@ -36,7 +36,7 @@ function elk_AdminIndex(oOptions)
 	this.init();
 }
 
-// Initialize the admin index to handle annoucment, currentversion and updates
+// Initialize the admin index to handle announcement, current version and updates
 elk_AdminIndex.prototype.init = function ()
 {
 	window.adminIndexInstanceRef = this;
@@ -288,7 +288,7 @@ elk_ViewVersions.prototype.compareVersions = function (sCurrent, sTarget)
 {
 	var aVersions = [],
 		aParts = [],
-		aCompare = new Array(sCurrent, sTarget),
+		aCompare = [sCurrent, sTarget],
 		aDevConvert = {'dev': 0, 'alpha': 1, 'beta': 2, 'rc': 3};
 
 	for (var i = 0; i < 2; i++)
@@ -483,9 +483,9 @@ elk_ViewVersions.prototype.determineVersions = function ()
 	}
 
 	// Set the column titles based on the files each contain
-	for (var i = 0, n = sSections.length; i < n; i++)
+	for (i = 0, n = sSections.length; i < n; i++)
 	{
-		if (sSections[i] == 'Templates')
+		if (sSections[i] === 'Templates')
 			continue;
 
 		document.getElementById('your' + sSections[i]).innerHTML = oLowVersion[sSections[i]] ? oLowVersion[sSections[i]] : oHighYour[sSections[i]];
@@ -542,10 +542,12 @@ function updateInputBoxes()
 	var curType = document.getElementById("field_type").value,
 		privStatus = document.getElementById("private").value,
 		stdText = ['text', 'textarea', 'email', 'url', 'color', 'date'],
-		stdInput = ['text', 'email', 'url', 'color', 'date'];
+		stdInput = ['text', 'email', 'url', 'color', 'date'],
+		stdSelect = ['select'];
 
-	var bIsStd = (stdInput.indexOf(curType) !== -1) ? true : false,
-		bIsText = (stdText.indexOf(curType) !== -1) ? true : false;
+	var bIsStd = (stdInput.indexOf(curType) !== -1),
+		bIsText = (stdText.indexOf(curType) !== -1),
+		bIsSelect = (stdSelect.indexOf(curType) !== -1);
 
 	// Only Text like fields can see a max length input
 	document.getElementById("max_length_dt").style.display = bIsText ? "" : "none";
@@ -571,9 +573,13 @@ function updateInputBoxes()
 	document.getElementById("mask_dt").style.display = bIsStd ? "" : "none";
 	document.getElementById("mask").style.display = bIsStd ? "" : "none";
 
-	// And text like fields can be searchable
-	document.getElementById("can_search_dt").style.display = bIsText ? "" : "none";
-	document.getElementById("can_search_dd").style.display = bIsText ? "" : "none";
+	// And text and select fields are searchable
+	document.getElementById("can_search_dt").style.display = bIsText || bIsSelect ? "" : "none";
+	document.getElementById("can_search_dd").style.display = bIsText || bIsSelect ? "" : "none";
+	
+	// Moving to a non searchable field, be sure searchable is unselected.
+	if (!bIsText && !bIsSelect)
+		document.getElementById("can_search_dd").checked = false;
 
 	// Using regex in the mask, give them a place to supply the regex
 	document.getElementById("regex_div").style.display = bIsStd && document.getElementById("mask").value === "regex" ? "" : "none";
@@ -614,7 +620,7 @@ function addAnotherQuestion()
 /**
  * Every question should have an answer, even if its a lie
  *
- * @param {string} elem
+ * @param {HTMLElement} elem
  * @param {string} question_name
  */
 function addAnotherAnswer(elem, question_name)
@@ -688,7 +694,8 @@ function addAnotherSearch(txt_name, txt_url, txt_word_sep)
  */
 function addAnotherNews()
 {
-	var $new_item = $("#list_news_lists_last").clone();
+	var last = $("#list_news_lists_last"),
+		$new_item = last.clone();
 
 	last_preview++;
 	$new_item.attr('id', 'list_news_lists_' + last_preview);
@@ -696,7 +703,7 @@ function addAnotherNews()
 	$new_item.find('#preview_last').attr('id', 'preview_' + last_preview);
 	$new_item.find('#box_preview_last').attr('id', 'box_preview_' + last_preview);
 
-	$("#list_news_lists_last").before($new_item);
+	last.before($new_item);
 	$new_item.toggle();
 	make_preview_btn(last_preview);
 }
@@ -795,7 +802,7 @@ function switchType()
 }
 
 /**
- * Toggle visibility of smiley set should the user want differnt images in a set (add smiley)
+ * Toggle visibility of smiley set should the user want different images in a set (add smiley)
  */
 function swapUploads()
 {
@@ -852,7 +859,7 @@ function testFTP()
 
 	var sPostData = "";
 	for (var i = 0; i < 5; i++)
-		sPostData = sPostData + (sPostData.length === 0 ? "" : "&") + oPostData[i] + "=" + escape(document.getElementById(oPostData[i]).value);
+		sPostData = sPostData + (sPostData.length === 0 ? "" : "&") + oPostData[i] + "=" + document.getElementById(oPostData[i]).value.php_urlencode();
 
 	// Post the data out.
 	sendXMLDocument(elk_prepareScriptUrl(elk_scripturl) + 'action=admin;area=packages;sa=ftptest;xml;' + elk_session_var + '=' + elk_session_id, sPostData, testFTPResults);
@@ -952,7 +959,7 @@ function expandFolder(folderIdent, folderReal)
 	else
 	{
 		ajax_indicator(true);
-		getXMLDocument(elk_prepareScriptUrl(elk_scripturl) + 'action=admin;area=packages;onlyfind=' + escape(folderReal) + ';sa=perms;xml;' + elk_session_var + '=' + elk_session_id, onNewFolderReceived);
+		getXMLDocument(elk_prepareScriptUrl(elk_scripturl) + 'action=admin;area=packages;onlyfind=' + folderReal.php_urlencode() + ';sa=perms;xml;' + elk_session_var + '=' + elk_session_id, onNewFolderReceived);
 	}
 
 	return false;
@@ -987,7 +994,7 @@ function select_in_category(operation, brd_list)
 $(document).ready(function() {
 	$('#cache_accelerator').change(function() {
 		// Hide all the settings
-		$('#cache_accelerator option').each(function() {
+		$('#cache_accelerator').find('option').each(function() {
 			$('[id^=' + $(this).val() + '_]').hide();
 		});
 
@@ -1019,7 +1026,7 @@ function hideGlobalCookies()
 		$("#globalCookies").parent().slideUp();
 	}
 
-	// Global selected means we need to reveil the domain input box
+	// Global selected means we need to reveal the domain input box
 	if (bUseGlobal)
 	{
 		$("#setting_globalCookiesDomain").closest("dt").slideDown();
@@ -1078,9 +1085,9 @@ function toggleBaseDir ()
 
 
 /**
- * Called from purgeinactive users maintance task, used to show or hide
+ * Called from purgeinactive users maintenance task, used to show or hide
  * the membergroup list.  If collapsed will select all the member groups if expanded
- * unslect them so the user can choose.
+ * unselect them so the user can choose.
  */
 function swapMembers()
 {
@@ -1144,34 +1151,7 @@ function checkAttributeValidity()
 }
 
 /**
- * Function for showing which boards to prune in an otherwise hidden list.
- * Used by topic maintenance task, will select all boards when collapsed or allow
- * specific boards to be chosen when expanded
- */
-function swapRot()
-{
-	rotSwap = !rotSwap;
-
-	// Toggle icon
-	document.getElementById("rotIcon").src = elk_images_url + (rotSwap ? "/selected_open.png" : "/selected.png");
-	document.getElementById("rotText").innerHTML = rotSwap ? maintain_old_choose : maintain_old_all;
-
-	// Toggle panel
-	$("#rotPanel").slideToggle(300);
-
-	// Toggle checkboxes
-	var rotPanel = document.getElementById("rotPanel"),
-		oBoardCheckBoxes = rotPanel.getElementsByTagName("input");
-
-	for (var i = 0; i < oBoardCheckBoxes.length; i++)
-	{
-		if (oBoardCheckBoxes[i].type.toLowerCase() === "checkbox")
-			oBoardCheckBoxes[i].checked = !rotSwap;
-	}
-}
-
-/**
- * Enable/disable fields when transfering attachments
+ * Enable/disable fields when transferring attachments
  *
  * @returns {undefined}
  */
@@ -1182,8 +1162,8 @@ function transferAttachOptions()
 		toSelect = document.getElementById("to"),
 		toValue = parseInt(toSelect.options[toSelect.selectedIndex].value, 10);
 
-		toSelect.disabled = autoValue !== 0 ? true : false;
-		autoSelect.disabled = toValue !== 0 ?  true : false;
+		toSelect.disabled = autoValue !== 0;
+		autoSelect.disabled = toValue !== 0;
 }
 
 /**
@@ -1222,8 +1202,6 @@ function showhideSearchMethod()
 /**
  * Used in manageFeatures to show / hide custom level input elements based on the checkbox choices
  * Will show or hide the jquery and jqueryui custom input fields for admins that like to roll the dice
- *
- * @param {boolean} isChecked
  */
 function showhideJqueryOptions()
 {
@@ -1262,7 +1240,7 @@ function showhideJqueryOptions()
 
 /**
  * Used in manageMembergroups to enable disable form elements based on allowable choices
- * If post based group is selected, it will disable moderation selection, visability, group description
+ * If post based group is selected, it will disable moderation selection, visibility, group description
  * and enable post count input box
  *
  * @param {boolean} isChecked
@@ -1288,7 +1266,7 @@ function swapPostGroup(isChecked)
 
 	// Disable the moderator autosuggest box as well
 	if (typeof(oModeratorSuggest) !== 'undefined')
-		oModeratorSuggest.oTextHandle.disabled = isChecked ? true : false;
+		oModeratorSuggest.oTextHandle.disabled = !!isChecked;
 }
 
 /**
@@ -1656,7 +1634,7 @@ var fUpdateStatus = function ()
 
 /**
  * Used when setting up subscriptions, used to toggle the currency code divs
- * based on which currencys are chosen.
+ * based on which currencies are chosen.
  */
 function toggleCurrencyOther()
 {
@@ -1703,7 +1681,7 @@ function ajax_getEmailTemplatePreview()
 		context: document.body
 	})
 	.done(function(request) {
-		// Show the preivew section, populated with the response
+		// Show the preview section, populated with the response
 		$("#preview_section").css({display: ""});
 		$("#template_preview").html($(request).find('body').text());
 		$("#preview_subject").html($(request).find('subject').text());
@@ -1711,7 +1689,8 @@ function ajax_getEmailTemplatePreview()
 		// Any error we need to let them know about?
 		if ($(request).find("error").text() !== '')
 		{
-			var errors_html = '';
+			var errors_html = '',
+				$_errors = $("#errors");
 
 			// Build the error string
 			errors = $(request).find('error').each(function() {
@@ -1720,8 +1699,8 @@ function ajax_getEmailTemplatePreview()
 
 			// Add it to the error div, set the class level, and show it
 			$(document).find("#error_list").html(errors_html);
-			$("#errors").css({display: ""});
-			$("#errors").attr('class', parseInt($(request).find('errors').attr('serious')) === 0 ? 'warningbox' : 'errorbox');
+			$_errors.css({display: ""});
+			$_errors.attr('class', parseInt($(request).find('errors').attr('serious')) === 0 ? 'warningbox' : 'errorbox');
 
 			// Navigate to the preview
 			location.hash = '#' + 'preview_section';
@@ -1767,3 +1746,33 @@ function ajax_getCensorPreview()
 
 	return false;
 }
+
+$(document).ready(function() {
+	var $headers = $("#mention input[id^='notifications'][id$='[notification]']");
+
+	$headers.change(function() {
+		var $top = $(this).closest('dl'),
+			$hparent = $(this).parent();
+
+		if (this.checked)
+		{
+			$top.find('dt:not(:first-child)').fadeIn();
+			$top.find('dd:not(:nth-child(2))').each(function() {
+				$(this).fadeIn();
+				$(this).find('input').prop('disabled', false);
+			});
+		}
+		else
+		{
+			$top.find('dt:not(:first-child)').hide();
+			$top.find('dd:not(:nth-child(2))').each(function() {
+				$(this).hide();
+				$(this).find('input').prop('disabled', true);
+			});
+		}
+
+		$hparent.show();
+		$hparent.prev().show();
+	});
+	$headers.change();
+});

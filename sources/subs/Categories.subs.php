@@ -13,7 +13,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0
+ * @version 1.1 dev
  *
  */
 
@@ -299,7 +299,7 @@ function collapseCategories($categories, $new_status, $members = null, $check_co
 			'insert' => array(),
 			'remove' => array(),
 		);
-		$request = $db->query('', '
+		$db->fetchQueryCallback('
 			SELECT mem.id_member, c.id_cat, IFNULL(cc.id_cat, 0) AS is_collapsed, c.can_collapse
 			FROM {db_prefix}members AS mem
 				INNER JOIN {db_prefix}categories AS c ON (c.id_cat IN ({array_int:category_list}))
@@ -309,16 +309,15 @@ function collapseCategories($categories, $new_status, $members = null, $check_co
 			array(
 				'category_list' => $categories,
 				'member_list' => $members,
-			)
+			),
+			function($row) use (&$updates, $check_collapsable)
+			{
+				if (empty($row['is_collapsed']) && (!empty($row['can_collapse']) || !$check_collapsable))
+					$updates['insert'][] = array($row['id_member'], $row['id_cat']);
+				elseif (!empty($row['is_collapsed']))
+					$updates['remove'][] = '(id_member = ' . $row['id_member'] . ' AND id_cat = ' . $row['id_cat'] . ')';
+			}
 		);
-		while ($row = $db->fetch_assoc($request))
-		{
-			if (empty($row['is_collapsed']) && (!empty($row['can_collapse']) || !$check_collapsable))
-				$updates['insert'][] = array($row['id_member'], $row['id_cat']);
-			elseif (!empty($row['is_collapsed']))
-				$updates['remove'][] = '(id_member = ' . $row['id_member'] . ' AND id_cat = ' . $row['id_cat'] . ')';
-		}
-		$db->free_result($request);
 
 		// Collapse the ones that were originally expanded...
 		if (!empty($updates['insert']))

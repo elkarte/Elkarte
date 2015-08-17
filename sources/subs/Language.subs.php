@@ -7,7 +7,7 @@
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
- * @version 1.0
+ * @version 1.1 dev
  *
  */
 
@@ -143,7 +143,7 @@ function cleanLangString($string, $to_display = true)
 		$str_len = strlen($string);
 		for ($i = 0; $i < $str_len; $i++)
 		{
-			// Handle ecapes first.
+			// Handle escapes first.
 			if ($string[$i] == '\\')
 			{
 				// Toggle the escape.
@@ -344,11 +344,11 @@ function cleanLangString($string, $to_display = true)
  */
 function list_getLanguagesList()
 {
-	global $forum_version, $context, $txt, $scripturl;
+	global $context, $txt, $scripturl;
 
 	// We're going to use this URL.
 	// @todo no we are not, this needs to be changed - again
-	$url = 'http://download.elkarte.net/fetch_language.php?version=' . urlencode(strtr($forum_version, array('ElkArte ' => '')));
+	$url = 'http://download.elkarte.net/fetch_language.php?version=' . urlencode(strtr(FORUM_VERSION, array('ElkArte ' => '')));
 
 	// Load the class file and stick it into an array.
 	$language_list = new Xml_Array(fetch_web_data($url), true);

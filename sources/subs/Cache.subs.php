@@ -13,7 +13,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0
+ * @version 1.1 dev
  *
  */
 
@@ -80,7 +80,7 @@ function cache_get_data($key, $ttl = 120)
  * Type can be user, data or left blank
  *  - user clears out user data
  *  - data clears out system / opcode data
- *  - If no type is specified will perfom a complete cache clearing
+ *  - If no type is specified will perform a complete cache clearing
  * For cache engines that do not distinguish on types, a full cache flush will be done
  *
  * @param string $type = ''
@@ -112,6 +112,9 @@ function cache_get_key($key)
  * Finds all the caching engines available and loads some details depending on
  * parameters.
  *
+ * - Caching engines must follow the naming convention of XyzCache.class.php and
+ * have a class name of Xyz_Cache
+ *
  * @param bool $supported_only If true, for each engine supported by the server
  *             an array with 'title' and 'version' is returned.
  *             If false, for each engine available an array with 'title' (string)
@@ -120,18 +123,18 @@ function cache_get_key($key)
  */
 function loadCacheEngines($supported_only = true)
 {
-	global $modSettings, $txt;
-
 	$engines = array();
 
-	$classes = glob(SUBSDIR . '/cache/*.php');
+	$classes = new GlobIterator(SUBSDIR . '/CacheMethod/*.php', FilesystemIterator::SKIP_DOTS);
 
 	foreach ($classes as $file_path)
 	{
-		$parts = explode('.', basename($file_path));
-		$engine_name = substr($parts[0], 0, -5);
-		$class = $engine_name . '_Cache';
+		// Get the engine name from the file name
+		$parts = explode('.', $file_path->getBasename());
+		$engine_name = $parts[0];
+		$class = '\\ElkArte\\sources\\subs\\CacheMethod\\' . $parts[0];
 
+		// Validate the class name exists
 		if (class_exists($class))
 		{
 			if ($supported_only && $class::available())

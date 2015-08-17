@@ -7,7 +7,7 @@
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
- * @version 1.0
+ * @version 1.1 dev
  *
  */
 
@@ -71,7 +71,7 @@ function deleteBadBehavior($type, $filter)
  * Get the number of badbehavior log entries.
  *
  * What it does:
- * - Will take in to acount any current filter value in its count result
+ * - Will take in to account any current filter value in its count result
  *
  * @package BadBehavior
  * @param mixed[] $filter

@@ -13,7 +13,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:		BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0
+ * @version 1.1 dev
  *
  */
 
@@ -93,7 +93,7 @@ class ProfileSubscriptions_Controller extends Action_Controller
 
 		// No gateways yet, no way to pay then!
 		if (empty($gateways))
-			fatal_error($txt['paid_admin_not_setup_gateway']);
+			Errors::instance()->fatal_error($txt['paid_admin_not_setup_gateway']);
 
 		// Get the members current subscriptions.
 		$context['current'] = loadMemberSubscriptions($memID, $context['subscriptions']);
@@ -132,8 +132,8 @@ class ProfileSubscriptions_Controller extends Action_Controller
 			$id_sub = (int) $k;
 
 		// Selecting a subscription that does not exist or is not active?
-		if (!isset($context['subscriptions'][$id_sub]) || $context['subscriptions'][$id_sub]['active'] == 0)
-			fatal_lang_error('paid_sub_not_active');
+		if (!isset($id_sub, $context['subscriptions'][$id_sub]) || $context['subscriptions'][$id_sub]['active'] == 0)
+			Errors::instance()->fatal_lang_error('paid_sub_not_active');
 
 		// Simplify...
 		$order = $context['subscriptions'][$id_sub];
@@ -144,7 +144,7 @@ class ProfileSubscriptions_Controller extends Action_Controller
 
 		// Check we have a valid cost.
 		if ($order['flexible'] && $period == 'xx')
-			fatal_lang_error('paid_sub_not_active');
+			Errors::instance()->fatal_lang_error('paid_sub_not_active');
 
 		// Sort out the cost/currency.
 		$context['currency'] = $modSettings['paid_currency_code'];
@@ -189,7 +189,7 @@ class ProfileSubscriptions_Controller extends Action_Controller
 
 		// No active payment gateways, then no way to pay, time to bail out, blame the admin
 		if (empty($context['gateways']))
-			fatal_error($txt['paid_admin_not_setup_gateway']);
+			Errors::instance()->fatal_error($txt['paid_admin_not_setup_gateway']);
 
 		// Now we are going to assume they want to take this out ;)
 		$new_data = array($order['id'], $context['value'], $period, 'prepay');

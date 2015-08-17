@@ -22,13 +22,13 @@
 #admin_content .windowbg, #admin_content .windowbg2 {
 	margin-bottom: 5px;
 }
-#admincenter {
+.admincenter {
 	overflow: auto;
 }
-#admincenter .content {
+.admincenter .content {
 	padding: 12px;
 }
-#admincenter .content .settings {
+.admincenter .content .settings {
 	padding: 0 0 0 8px;
 }
 
@@ -163,7 +163,7 @@ fieldset dl {
 	margin: 8px 0 0 0;
 }
 /* @todo - The welcome thingy. */
-#admincenter .roundframe, #modcenter .roundframe {
+.admincenter .roundframe, #modcenter .roundframe {
 	background: none;
 	border: none;
 	box-shadow: none;
@@ -394,6 +394,7 @@ div.quick_tasks {
 #package_list ol ul, #package_list ol ul li {
 	margin-left: 0;
 	list-style: none;
+	border-radius: 3px;
 }
 #package_list {
 	list-style-type: none;
@@ -426,6 +427,11 @@ div.quick_tasks {
 }
 .package_server {
 	padding: 0 3em;
+}
+.package_image {
+	width: 12px;
+	height: 11px;
+	margin-left: 2ex;
 }
 ul.package_servers {
 	margin: 0;

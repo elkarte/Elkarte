@@ -13,7 +13,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0 Release Candidate 1
+ * @version 1.1 dev Release Candidate 1
  *
  */
 
@@ -23,7 +23,7 @@ if (!defined('ELK'))
 class TopicsMerge
 {
 	/**
-	 * For each topic a set of informations (id, board, subject, poll, etc.)
+	 * For each topic a set of information (id, board, subject, poll, etc.)
 	 *
 	 * @var mixed[]
 	 */
@@ -128,12 +128,12 @@ class TopicsMerge
 				$this->_topics[] = $topic;
 		}
 
-		// Find out some preliminary informations
+		// Find out some preliminary information
 		$this->_loadTopicDetails();
 	}
 
 	/**
-	 * If errors occured while working
+	 * If errors occurred while working
 	 *
 	 * @return bool
 	 */
@@ -344,7 +344,7 @@ class TopicsMerge
 		$notifications = is_array($details['notifications']) ? array_intersect($this->_topics, $details['notifications']) : array();
 		fixMergedTopics($first_msg, $this->_topics, $id_topic, $target_board, $target_subject, $enforce_subject, $notifications);
 
-		// Asssign the properties of the newly merged topic.
+		// Assign the properties of the newly merged topic.
 		setTopicAttribute($id_topic, array(
 			'id_board' => $target_board,
 			'is_sticky' => $this->_is_sticky,

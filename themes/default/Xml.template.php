@@ -11,7 +11,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0
+ * @version 1.1 dev
  *
  */
 
@@ -510,7 +510,7 @@ function template_xml_news($data, $i, $tag = null, $xml_format = 'rss')
  */
 function template_rdf()
 {
-	global $context, $scripturl, $txt, $boardurl, $forum_version;
+	global $context, $scripturl, $txt;
 
 	echo '<?xml version="1.0" encoding="UTF-8"?' . '>
 	<rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns="http://purl.org/rss/1.0/">
@@ -542,7 +542,7 @@ function template_rdf()
  */
 function template_feedatom()
 {
-	global $context, $scripturl, $txt, $boardurl, $forum_version;
+	global $context, $scripturl, $txt, $boardurl;
 
 	echo '<?xml version="1.0" encoding="UTF-8"?' . '>
 	<feed xmlns="http://www.w3.org/2005/Atom">
@@ -553,10 +553,10 @@ function template_feedatom()
 		<icon>', $boardurl, '/favicon.ico</icon>
 
 		<updated>', gmstrftime('%Y-%m-%dT%H:%M:%SZ'), '</updated>
-		<subtitle><![CDATA[', strip_tags($txt['xml_rss_desc']), ']]></subtitle>
-		<generator uri="http://www.elkarte.net" version="', strtr($forum_version, array('ElkArte' => '')), '">ElkArte</generator>
+		<subtitle><![CDATA[', strip_tags(un_htmlspecialchars($txt['xml_rss_desc'])), ']]></subtitle>
+		<generator uri="http://www.elkarte.net" version="', strtr(FORUM_VERSION, array('ElkArte' => '')), '">ElkArte</generator>
 		<author>
-			<name>', strip_tags($context['forum_name']), '</name>
+			<name>', strip_tags(un_htmlspecialchars($context['forum_name'])), '</name>
 		</author>';
 
 			template_xml_news($context['recent_posts_data'], 2, 'entry', $context['xml_format']);
@@ -577,7 +577,7 @@ function template_feedrss()
 		<channel>
 			<title>', $context['feed_title'], '</title>
 			<link>', $scripturl, '</link>
-			<description><![CDATA[', strip_tags($txt['xml_rss_desc']), ']]></description>
+			<description><![CDATA[', un_htmlspecialchars(strip_tags($txt['xml_rss_desc'])), ']]></description>
 			<generator>ElkArte</generator>
 			<ttl>30</ttl>
 			<image>
@@ -593,88 +593,6 @@ function template_feedrss()
 			echo '
 		</channel>
 	</rss>';
-}
-
-/**
- * Main template for webslice content
- */
-function template_webslice()
-{
-	global $context, $scripturl, $txt;
-
-	// Format specification http://msdn.microsoft.com/en-us/library/cc304073%28VS.85%29.aspx
-	// Known browsers to support webslices: IE8, IE9, Firefox with Webchunks addon.
-	// It uses RSS 2.
-
-	echo '<?xml version="1.0" encoding="UTF-8"?' . '>
-	<rss version="2.0" xmlns:mon="http://www.microsoft.com/schemas/rss/monitoring/2007" xml:lang="', strtr($txt['lang_locale'], '_', '-'), '">
-		<channel>
-			<title>', $context['feed_title'], ' - ', $txt['recent_posts'], '</title>
-			<link>', $scripturl, '?action=recent</link>
-			<description><![CDATA[', strip_tags($txt['xml_rss_desc']), ']]></description>
-			<item>
-				<title>', $context['feed_title'], ' - ', $txt['recent_posts'], '</title>
-				<link>', $scripturl, '?action=recent</link>
-				<description><![CDATA[
-					', template_webslice_header_above(), '
-					', template_webslice_recent_posts(), '
-				]]></description>
-			</item>
-		</channel>
-	</rss>';
-}
-
-/**
- * Output before webslices content
- */
-function template_webslice_header_above()
-{
-	global $settings;
-
-	echo '
-	<link rel="stylesheet" href="', $settings['default_theme_url'], '/css/wireless.css" />';
-}
-
-/**
- * This shows a webslice of the recent posts.
- */
-function template_webslice_recent_posts()
-{
-	global $context, $scripturl, $txt;
-
-	// @todo test if this works
-	echo '
-	<div style="width: 100%; height: 100%; border: 1px solid black; padding: 0; margin: 0 0 0 0; font: 100.01%/100% Verdana, Helvetica, sans-serif;">
-		<div style="background: #080436; color: #ffffff; padding: 4px;">
-			', cleanXml($txt['recent_posts']), '
-		</div>';
-
-	// Recent posts bit
-	$alternate = 0;
-	foreach ($context['recent_posts_data'] as $item)
-	{
-		echo '
-		<div style="background: ', $alternate ? '#ECEDF3' : '#F6F6F6', '; font-size: 90%; padding: 2px;">
-			<strong><a href="', $item['link'], '">', cleanXml($item['subject']), '</a></strong> ', cleanXml($txt['by']), ' ', cleanXml(!empty($item['poster']['link']) ? '<a href="' . $item['poster']['link'] . '">' . $item['poster']['name'] . '</a>' : $item['poster']['name']), '
-		</div>';
-		$alternate = !$alternate;
-	}
-
-	echo '
-	</div>
-	<div style="width: 100%; height: 100%; border: 0; padding: 0; margin: 0 0 0 0; font: 100.01%/100% Verdana, Helvetica, sans-serif;">
-		<div style="font-size: xx-small;" class="righttext">';
-
-	// Send alerts for the logged in user if they have new PMs
-	if ($context['user']['is_guest'])
-		echo '
-			<a href="', $scripturl, '?action=login">', $txt['login'], '</a>';
-	else
-		echo '
-			', cleanXml($context['user']['name']), cleanXml(!empty($context['can_pm_read']) ? ', ' . (empty($context['user']['messages']) ? $txt['msg_alert_no_messages'] : (($context['user']['messages'] == 1 ? sprintf($txt['msg_alert_one_message'], $scripturl . '?action=pm') : sprintf($txt['msg_alert_many_message'], $scripturl . '?action=pm', $context['user']['messages'])) . ', ' . ($context['user']['unread_messages'] == 1 ? $txt['msg_alert_one_new'] : sprintf($txt['msg_alert_many_new'], $context['user']['unread_messages'])))) : '');
-	echo '
-		</div>
-	</div>';
 }
 
 /**

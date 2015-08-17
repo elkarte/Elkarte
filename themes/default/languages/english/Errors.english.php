@@ -1,5 +1,5 @@
 <?php
-// Version: 1.0; Errors
+// Version: 1.1; Errors
 
 $txt['no_access'] = 'Sorry, we can\'t let you access this section. We can\'t even tell you if it exists. You\'re welcome to visit the main page and choose your way from there.';
 $txt['not_guests'] = 'Sorry, this action is not available to guests.';
@@ -426,3 +426,5 @@ $txt['error_sa_not_set'] = 'The Sub-action you requested is not defined';
 
 // Drag / Drop sort errors
 $txt['no_sortable_items'] = 'No sortable items were found';
+
+$txt['error_invalid_notification_id'] = 'An addons tries to register a notification method with ID lower than 5. These ID are protected and cannot be used by addons.';

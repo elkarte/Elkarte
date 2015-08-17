@@ -7,18 +7,19 @@
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
- * @version 1.0
+ * @version 1.1 dev
  *
  */
 
 // Lots of needs
 require_once(BOARDDIR . '/sources/database/Db.php');
 require_once(BOARDDIR . '/sources/database/Db-abstract.class.php');
-require_once(BOARDDIR . '/sources/Errors.php');
+require_once(BOARDDIR . '/sources/Errors.class.php');
 require_once(BOARDDIR . '/sources/Subs.php');
 require_once(BOARDDIR . '/sources/subs/Cache.class.php');
 require_once(BOARDDIR . '/sources/subs/Cache.subs.php');
 require_once(BOARDDIR . '/sources/database/Database.subs.php');
+require_once(BOARDDIR . '/install/installcore.php');
 
 /**
  * Used to install ElkArte SQL files to a database scheme
@@ -26,62 +27,115 @@ require_once(BOARDDIR . '/sources/database/Database.subs.php');
 Class Elk_Testing_Setup
 {
 	protected $_db;
-	protected $_queries_parts;
-	protected $_clean_queries_parts;
+	protected $_install_instance;
 	protected $_queries;
 	protected $_dbserver;
 	protected $_name;
 	protected $_user;
 	protected $_passwd;
-	protected $_prefix;
+
+	// Initialized from extended class
+	protected $_boardutl;
+	protected $_db_server;
+	protected $_db_user;
+	protected $_db_passwd;
+	protected $_db_type;
+	protected $_db_name;
+	protected $_db_prefix;
+	protected $_db_table;
+	protected $_boardurl;
 
 	/**
-	 * Runs the querys defined in the install files to the db
+	 * Runs the query's defined in the install files to the db
 	 */
 	public function run_queries()
 	{
-		global $modSettings;
-
-		$modSettings['disableQueryCheck'] = true;
-		$query = '';
-		$db = $this->_db;
-		$db->skip_error();
-		$db_table = $this->_db_table;
-
-		if (empty($this->_clean_queries_parts))
-			$this->_clean_queries_parts = $this->_queries_parts;
-
-		foreach ($this->_clean_queries_parts as $part)
+		$exists = array();
+		foreach ($this->_queries['tables'] as $table_method)
 		{
-			if (substr($part, -1) == ';')
-			{
-				$result = eval('return ' . $query . $part);
-				if ($result === false)
-					echo 'Query failed: ' . "\n" . $query . "\n" . substr($part, 0, -1) . "\n";
+			$table_name = substr($table_method, 6);
 
-				$query = '';
+			// Copied from DbTable class
+			// Strip out the table name, we might not need it in some cases
+			$real_prefix = preg_match('~^("?)(.+?)\\1\\.(.*?)$~', $this->_db_prefix, $match) === 1 ? $match[3] : $this->_db_prefix;
+
+			// With or without the database name, the fullname looks like this.
+			$full_table_name = str_replace('{db_prefix}', $real_prefix, $table_name);
+
+			if ($this->_db_table->table_exists($full_table_name))
+			{
+				$exists[] = $table_method;
+				continue;
 			}
-			else
-				$query .= "\n" . $part;
+
+			$this->_install_instance->{$table_method}();
+		}
+
+		foreach ($this->_queries['inserts'] as $insert_method)
+		{
+			$table_name = substr($insert_method, 6);
+
+			if (in_array($table_name, $exists))
+			{
+				continue;
+			}
+
+			$this->_install_instance->{$insert_method}();
+		}
+
+		// Errors here are ignored
+		foreach ($this->_queries['others'] as $other_method)
+		{
+			$this->_install_instance->{$other_method}();
 		}
 	}
 
 	/**
-	 * Loads the querys from the supplied sql install file
+	 * Loads the query's from the supplied database install file
 	 *
-	 * @param string $file
+	 * @param string $sql_file
 	 */
-	public function load_queries($file)
+	public function load_queries($sql_file)
 	{
-		$this->_queries = str_replace('{$db_prefix}', $this->_db_prefix, file_get_contents($file));
-		$this->_queries_parts = explode("\n", $this->_queries);
-		$this->_fix_query_string();
+		$replaces = array(
+			'{$db_prefix}' => $this->_db_prefix,
+			'{BOARDDIR}' => BOARDDIR,
+			'{$boardurl}' => $this->_boardurl,
+			'{$enableCompressedOutput}' => 0,
+			'{$databaseSession_enable}' => 1,
+			'{$current_version}' => CURRENT_VERSION,
+			'{$current_time}' => time(),
+			'{$sched_task_offset}' => 82800 + mt_rand(0, 86399),
+		);
+
+		$this->_db->skip_error();
+		$db_wrapper = new DbWrapper($this->_db, $replaces);
+		$db_table_wrapper = new DbTableWrapper($this->_db_table);
+
+		$current_statement = '';
+		$exists = array();
+
+		require_once($sql_file);
+
+		$class_name = 'InstallInstructions_' . str_replace('-', '_', basename($sql_file, '.php'));
+		$this->_install_instance = new $class_name($db_wrapper, $db_table_wrapper);
+		$methods = get_class_methods($this->_install_instance);
+
+		$this->_queries['tables'] = array_filter($methods, function ($method) {
+			return strpos($method, 'table_') === 0;
+		});
+
+		$this->_queries['inserts'] = array_filter($methods, function ($method) {
+			return strpos($method, 'insert_') === 0;
+		});
+
+		$this->_queries['others'] = array_filter($methods, function ($method) {
+			return substr($method, 0, 2) !== '__' && strpos($method, 'insert_') !== 0 && strpos($method, 'table_') !== 0;
+		});
 	}
 
 	/**
 	 * Clear the DB for a new install
-	 *
-	 * @param string $file
 	 */
 	public function clear_tables()
 	{
@@ -91,30 +145,6 @@ Class Elk_Testing_Setup
 		// Bu-bye
 		foreach ($tables as $table)
 			$this->_db_table->db_drop_table($table);
-	}
-
-	/**
-	 * Does the variable replacements in the query strings {X} => data
-	 */
-	private function _fix_query_string()
-	{
-		foreach ($this->_queries_parts as $line)
-		{
-			if (!empty($line[0]) && $line[0] != '#')
-			{
-				$this->_clean_queries_parts[] = str_replace(
-					array(
-						'{$current_time}', '{$sched_task_offset}',
-						'{BOARDDIR}', '{$boardurl}'
-					),
-					array(
-						time(), '1',
-						BOARDDIR, $this->_boardurl
-					),
-					$line
-				);
-			}
-		}
 	}
 
 	/**
@@ -131,16 +161,17 @@ Class Elk_Testing_Setup
 			'$db_user = \'root\';',
 			'$db_prefix = \'elkarte_\';',
 			'$db_passwd = \'\';',
-		),
-		array(
-			'$boardurl = \'' . $this->_boardurl . '\';',
-			'$db_type = \'' . $this->_db_type . '\';',
-			'$db_name = \'' . $this->_db_name . '\';',
-			'$db_user = \'' . $this->_db_user . '\';',
-			'$db_prefix = \'' . $this->_db_prefix . '\';',
-			'$db_passwd = \'' . $this->_db_passwd . '\';',
-		),
-		$file);
+			),
+			array(
+				'$boardurl = \'' . $this->_boardurl . '\';',
+				'$db_type = \'' . $this->_db_type . '\';',
+				'$db_name = \'' . $this->_db_name . '\';',
+				'$db_user = \'' . $this->_db_user . '\';',
+				'$db_prefix = \'' . $this->_db_prefix . '\';',
+				'$db_passwd = \'' . $this->_db_passwd . '\';',
+			),
+			$file
+		);
 
 		if (strpos($file, 'if (file_exist') !== false)
 			$file = substr($file, 0, strpos($file, 'if (file_exist'));
@@ -155,11 +186,12 @@ Class Elk_Testing_Setup
 	{
 		$this->prepare_settings();
 		$this->update();
+
 		//$this->createTests();
 	}
 
 	/**
-	 * Adds a user, sets time, prepars the forum for phpunit tests
+	 * Adds a user, sets time, prepares the forum for phpunit tests
 	 */
 	public function update()
 	{
@@ -171,16 +203,22 @@ Class Elk_Testing_Setup
 		global $ssi_db_user, $scripturl, $ssi_db_passwd, $db_passwd;
 		global $sourcedir, $boarddir;
 
-		define('SUBSDIR', BOARDDIR . '/sources/subs');
-		define('EXTDIR', BOARDDIR . '/sources/ext');
+		DEFINE('SUBSDIR', BOARDDIR . '/sources/subs');
+		DEFINE('EXTDIR', BOARDDIR . '/sources/ext');
+		DEFINE('SOURCEDIR', BOARDDIR . '/sources');
+		DEFINE('LANGUAGEDIR', BOARDDIR . '/themes/default/languages');
+		DEFINE('ADMINDIR', SOURCEDIR . '/admin');
+		DEFINE('CONTROLLERDIR', SOURCEDIR . '/controllers');
+		DEFINE('ADDONSDIR', SOURCEDIR . '/addons');
 
 		require_once(BOARDDIR . '/Settings.php');
-		require_once(BOARDDIR . '/sources/Subs.php');
-		require_once(BOARDDIR . '/sources/Load.php');
+		require_once(SOURCEDIR . '/Subs.php');
+		require_once(SOURCEDIR . '/Load.php');
 		require_once(SUBSDIR . '/Util.class.php');
 		require_once(SUBSDIR . '/Auth.subs.php');
 
-		spl_autoload_register('elk_autoloader');
+		require(SOURCEDIR . '/Autoloader.class.php');
+		Elk_Autoloader::getInstance()->setupAutoloader(array(SOURCEDIR, SUBSDIR, CONTROLLERDIR, ADMINDIR, ADDONSDIR));
 
 		$settings['theme_dir'] = $settings['default_theme_dir'] = BOARDDIR . '/Themes/default';
 		$settings['theme_url'] = $settings['default_theme_url'] = $boardurl . '/themes/default';
@@ -298,6 +336,75 @@ class Test_' . $key . ' extends TestSuite
 			else
 				$files[] = $entity;
 		}
+
 		return $files;
+	}
+}
+
+class DbWrapper
+{
+	protected $db = null;
+	protected $count_mode = false;
+	protected $replaces = array();
+
+	public function __construct($db, $replaces)
+	{
+		$this->db = $db;
+		$this->replaces = $replaces;
+	}
+
+	public function __call($name, $args)
+	{
+		return call_user_func_array(array($this->db, $name), $args);
+	}
+
+	public function insert()
+	{
+		$args = func_get_args();
+
+		if ($this->count_mode)
+			return count($args[3]);
+
+		foreach ($args[3] as $key => $data)
+		{
+			foreach ($data as $k => $v)
+			{
+				$args[3][$key][$k] = strtr($v, $this->replaces);
+			}
+		}
+
+		call_user_func_array(array($this->db, 'insert'), $args);
+
+		return $this->db->affected_rows();
+	}
+
+	public function countMode($on = true)
+	{
+		$this->count_mode = (bool) $on;
+	}
+}
+
+class DbTableWrapper
+{
+	protected $db = null;
+
+	public function __construct($db)
+	{
+		$this->db = $db;
+	}
+
+	public function __call($name, $args)
+	{
+		return call_user_func_array(array($this->db, $name), $args);
+	}
+
+	public function db_add_index()
+	{
+		$args = func_get_args();
+
+		// In this case errors are ignored, so the return is always true
+		call_user_func_array(array($this->db, 'db_create_table'), $args);
+
+		return true;
 	}
 }

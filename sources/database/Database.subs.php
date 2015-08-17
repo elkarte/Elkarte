@@ -8,7 +8,7 @@
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
- * @version 1.0
+ * @version 1.1 dev
  *
  */
 
@@ -62,13 +62,11 @@ function database()
  */
 function db_table($db = null)
 {
-	global $db_type;
-
 	if ($db === null)
 		$db = database();
 
 	require_once(SOURCEDIR . '/database/DbTable.class.php');
-	require_once(SOURCEDIR . '/database/DbTable-' . $db_type . '.php');
+	require_once(SOURCEDIR . '/database/DbTable-' . strtolower(DB_TYPE) . '.php');
 
 	return call_user_func(array('DbTable_' . DB_TYPE, 'db_table'), $db);
 }
@@ -82,10 +80,8 @@ function db_table($db = null)
  */
 function db_search()
 {
-	global $db_type;
-
 	require_once(SOURCEDIR . '/database/DbSearch.php');
-	require_once(SOURCEDIR . '/database/DbSearch-' . $db_type . '.php');
+	require_once(SOURCEDIR . '/database/DbSearch-' . strtolower(DB_TYPE) . '.php');
 
 	return call_user_func(array('DbSearch_' . DB_TYPE, 'db_search'));
 }

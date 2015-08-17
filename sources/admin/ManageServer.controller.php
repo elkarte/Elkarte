@@ -15,7 +15,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:		BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0
+ * @version 1.1 dev
  *
  */
 
@@ -60,6 +60,20 @@ class ManageServer_Controller extends Action_Controller
 	 * @var Settings_Form
 	 */
 	protected $_balancingSettingsForm;
+
+	/**
+	 * Holds instance of HttpReq object
+	 * @var HttpReq
+	 */
+	protected $_req;
+
+	/**
+	 * Pre Dispatch, called before other methods.  Loads HttpReq
+	 */
+	public function pre_dispatch()
+	{
+		$this->_req = HttpReq::instance();
+	}
 
 	/**
 	 * This is the main dispatcher. Sets up all the available sub-actions, all the tabs and selects
@@ -110,7 +124,7 @@ class ManageServer_Controller extends Action_Controller
 		$context['sub_template'] = 'show_settings';
 
 		// Any messages to speak of?
-		$context['settings_message'] = (isset($_REQUEST['msg']) && isset($txt[$_REQUEST['msg']])) ? $txt[$_REQUEST['msg']] : '';
+		$context['settings_message'] = (isset($this->_req->query->msg) && isset($txt[$this->_req->query->msg])) ? $txt[$this->_req->query->msg] : '';
 
 		// Warn the user if there's any relevant information regarding Settings.php.
 		if ($subAction != 'cache')
@@ -162,7 +176,7 @@ class ManageServer_Controller extends Action_Controller
 		$context['settings_title'] = $txt['general_settings'];
 
 		// Saving settings?
-		if (isset($_REQUEST['save']))
+		if (isset($this->_req->query->save))
 		{
 			call_integration_hook('integrate_save_general_settings');
 
@@ -215,7 +229,7 @@ class ManageServer_Controller extends Action_Controller
 		$context['save_disabled'] = $context['settings_not_writable'];
 
 		// Saving settings?
-		if (isset($_REQUEST['save']))
+		if (isset($this->_req->query->save))
 		{
 			call_integration_hook('integrate_save_database_settings');
 
@@ -257,22 +271,22 @@ class ManageServer_Controller extends Action_Controller
 		$context['settings_title'] = $txt['cookies_sessions_settings'];
 
 		// Saving settings?
-		if (isset($_REQUEST['save']))
+		if (isset($this->_req->query->save))
 		{
 			call_integration_hook('integrate_save_cookie_settings');
 
 			// Its either local or global cookies
-			if (!empty($_POST['localCookies']) && empty($_POST['globalCookies']))
-				unset($_POST['globalCookies']);
+			if (!empty($this->_req->post->localCookies) && empty($this->_req->post->globalCookies))
+				unset($this->_req->post->globalCookies);
 
-			if (!empty($_POST['globalCookiesDomain']) && strpos($boardurl, $_POST['globalCookiesDomain']) === false)
-				fatal_lang_error('invalid_cookie_domain', false);
+			if (!empty($this->_req->post->globalCookiesDomain) && strpos($boardurl, $this->_req->post->globalCookiesDomain) === false)
+				Errors::instance()->fatal_lang_error('invalid_cookie_domain', false);
 
 			//Settings_Form::save_db($config_vars);
 			$this->_cookieSettingsForm->save();
 
 			// If the cookie name was changed, reset the cookie.
-			if ($cookiename != $_POST['cookiename'])
+			if ($cookiename != $this->_req->post->cookiename)
 			{
 				require_once(SUBSDIR . '/Auth.subs.php');
 
@@ -282,7 +296,7 @@ class ManageServer_Controller extends Action_Controller
 				setLoginCookie(-3600, 0);
 
 				// Set the new one.
-				$cookiename = $_POST['cookiename'];
+				$cookiename = $this->_req->post->cookiename;
 				setLoginCookie(60 * $modSettings['cookieTime'], $user_settings['id_member'], hash('sha256', $user_settings['passwd'] . $user_settings['password_salt']));
 
 				redirectexit('action=admin;area=serversettings;sa=cookie;' . $context['session_var'] . '=' . $original_session_id, $context['server']['needs_login_fix']);
@@ -345,14 +359,14 @@ class ManageServer_Controller extends Action_Controller
 		}
 
 		// Saving again?
-		if (isset($_GET['save']))
+		if (isset($this->_req->query->save))
 		{
 			call_integration_hook('integrate_save_cache_settings');
 
 			$this->_cacheSettingsForm->save();
 
 			// we need to save the $cache_enable to $modSettings as well
-			updatesettings(array('cache_enable' => (int) $_POST['cache_enable']));
+			updatesettings(array('cache_enable' => (int) $this->_req->post->cache_enable));
 
 			// exit so we reload our new settings on the page
 			redirectexit('action=admin;area=serversettings;sa=cache;' . $context['session_var'] . '=' . $context['session_id']);
@@ -409,24 +423,24 @@ class ManageServer_Controller extends Action_Controller
 		$context['settings_title'] = $txt['load_balancing_settings'];
 
 		// Saving?
-		if (isset($_GET['save']))
+		if (isset($this->_req->query->save))
 		{
 			// Stupidity is not allowed.
-			foreach ($_POST as $key => $value)
+			foreach ($this->_req->post as $key => $value)
 			{
 				if (strpos($key, 'loadavg') === 0 || $key === 'loadavg_enable')
 					continue;
 				elseif ($key == 'loadavg_auto_opt' && $value <= 1)
-					$_POST['loadavg_auto_opt'] = '1.0';
+					$this->_req->post->loadavg_auto_opt = '1.0';
 				elseif ($key == 'loadavg_forum' && $value < 10)
-					$_POST['loadavg_forum'] = '10.0';
+					$this->_req->post->loadavg_forum = '10.0';
 				elseif ($value < 2)
-					$_POST[$key] = '2.0';
+					$this->_req->$key = '2.0';
 			}
 
 			call_integration_hook('integrate_save_loadavg_settings');
 
-			Settings_Form::save_db($config_vars);
+			Settings_Form::save_db($config_vars, $this->_req->post);
 			redirectexit('action=admin;area=serversettings;sa=loads;' . $context['session_var'] . '=' . $context['session_id']);
 		}
 
@@ -521,7 +535,6 @@ class ManageServer_Controller extends Action_Controller
 				array('webmaster_email', $txt['admin_webmaster_email'], 'file', 'text', 30),
 			'',
 				array('enableCompressedOutput', $txt['enableCompressedOutput'], 'db', 'check', null, 'enableCompressedOutput'),
-				array('disableTemplateEval', $txt['disableTemplateEval'], 'db', 'check', null, 'disableTemplateEval'),
 				array('disableHostnameLookup', $txt['disableHostnameLookup'], 'db', 'check', null, 'disableHostnameLookup'),
 		);
 
@@ -596,7 +609,7 @@ class ManageServer_Controller extends Action_Controller
 				array('localCookies', $txt['localCookies'], 'subtext' => $txt['localCookies_note'], 'db', 'check', false, 'localCookies'),
 				array('globalCookies', $txt['globalCookies'], 'subtext' => $txt['globalCookies_note'], 'db', 'check', false, 'globalCookies'),
 				array('globalCookiesDomain', $txt['globalCookiesDomain'], 'subtext' => $txt['globalCookiesDomain_note'], 'db', 'text', false, 'globalCookiesDomain'),
-				array('secureCookies', $txt['secureCookies'], 'subtext' => $txt['secureCookies_note'], 'db', 'check', false, 'secureCookies', 'disabled' => !isset($_SERVER['HTTPS']) || !(strtolower($_SERVER['HTTPS']) == 'on' || strtolower($_SERVER['HTTPS']) == '1')),
+				array('secureCookies', $txt['secureCookies'], 'subtext' => $txt['secureCookies_note'], 'db', 'check', false, 'secureCookies', 'disabled' => !isset($this->_req->server->HTTPS) || !(strtolower($this->_req->server->HTTPS) == 'on' || strtolower($this->_req->server->HTTPS) == '1')),
 				array('httponlyCookies', $txt['httponlyCookies'], 'subtext' => $txt['httponlyCookies_note'], 'db', 'check', false, 'httponlyCookies'),
 			'',
 				// Sessions
@@ -626,8 +639,6 @@ class ManageServer_Controller extends Action_Controller
 	private function _cacheSettings()
 	{
 		global $txt;
-
-		require_once (SUBSDIR . '/Cache.subs.php');
 
 		// Detect all available optimizers
 		$detected = loadCacheEngines(false);

@@ -13,7 +13,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0
+ * @version 1.1 dev
  *
  */
 
@@ -859,7 +859,7 @@ function checkExistingTriggerIP($ip_array, $fullip = '')
 		return $return;
 
 	if ($return['error'] === 'ban_trigger_already_exists')
-		fatal_lang_error($return['error'][0], false, $return['error'][1]);
+		Errors::instance()->fatal_lang_error($return['error'][0], false, $return['error'][1]);
 
 	return false;
 }
@@ -878,9 +878,12 @@ function updateBanMembers()
 	$updates = array();
 	$allMembers = array();
 	$newMembers = array();
+	$memberIDs = array();
+	$memberEmails = array();
+	$memberEmailWild = array();
 
 	// Start by getting all active bans - it's quicker doing this in parts...
-	$request = $db->query('', '
+	$db->fetchQueryCallback('
 		SELECT bi.id_member, bi.email_address
 		FROM {db_prefix}ban_items AS bi
 			INNER JOIN {db_prefix}ban_groups AS bg ON (bg.id_ban_group = bi.id_ban_group)
@@ -892,25 +895,21 @@ function updateBanMembers()
 			'cannot_access_on' => 1,
 			'current_time' => time(),
 			'blank_string' => '',
-		)
-	);
-	$memberIDs = array();
-	$memberEmails = array();
-	$memberEmailWild = array();
-	while ($row = $db->fetch_assoc($request))
-	{
-		if ($row['id_member'])
-			$memberIDs[$row['id_member']] = $row['id_member'];
-		if ($row['email_address'])
+		),
+		function($row) use (&$memberIDs, &$memberEmails, &$memberEmailWild)
 		{
-			// Does it have a wildcard - if so we can't do a IN on it.
-			if (strpos($row['email_address'], '%') !== false)
-				$memberEmailWild[$row['email_address']] = $row['email_address'];
-			else
-				$memberEmails[$row['email_address']] = $row['email_address'];
+			if ($row['id_member'])
+				$memberIDs[$row['id_member']] = $row['id_member'];
+			if ($row['email_address'])
+			{
+				// Does it have a wildcard - if so we can't do a IN on it.
+				if (strpos($row['email_address'], '%') !== false)
+					$memberEmailWild[$row['email_address']] = $row['email_address'];
+				else
+					$memberEmails[$row['email_address']] = $row['email_address'];
+			}
 		}
-	}
-	$db->free_result($request);
+	);
 
 	// Build up the query.
 	$queryPart = array();
@@ -937,26 +936,25 @@ function updateBanMembers()
 	// Find all banned members.
 	if (!empty($queryPart))
 	{
-		$request = $db->query('', '
+		$db->fetchQueryCallback('
 			SELECT mem.id_member, mem.is_activated
 			FROM {db_prefix}members AS mem
 			WHERE ' . implode( ' OR ', $queryPart),
-			$queryValues
-		);
-		while ($row = $db->fetch_assoc($request))
-		{
-			if (!in_array($row['id_member'], $allMembers))
+			$queryValues,
+			function($row) use (&$allMembers, &$updates, &$newMembers)
 			{
-				$allMembers[] = $row['id_member'];
-				// Do they need an update?
-				if ($row['is_activated'] < 10)
+				if (!in_array($row['id_member'], $allMembers))
 				{
-					$updates[($row['is_activated'] + 10)][] = $row['id_member'];
-					$newMembers[] = $row['id_member'];
+					$allMembers[] = $row['id_member'];
+					// Do they need an update?
+					if ($row['is_activated'] < 10)
+					{
+						$updates[($row['is_activated'] + 10)][] = $row['id_member'];
+						$newMembers[] = $row['id_member'];
+					}
 				}
 			}
-		}
-		$db->free_result($request);
+		);
 	}
 
 	// We welcome our new members in the realm of the banned.
@@ -967,7 +965,7 @@ function updateBanMembers()
 	}
 
 	// Find members that are wrongfully marked as banned.
-	$request = $db->query('', '
+	$db->fetchQueryCallback('
 		SELECT mem.id_member, mem.is_activated - 10 AS new_value
 		FROM {db_prefix}members AS mem
 			LEFT JOIN {db_prefix}ban_items AS bi ON (bi.id_member = mem.id_member OR mem.email_address LIKE bi.email_address)
@@ -978,18 +976,17 @@ function updateBanMembers()
 			'cannot_access_activated' => 1,
 			'current_time' => time(),
 			'ban_flag' => 10,
-		)
-	);
-	while ($row = $db->fetch_assoc($request))
-	{
-		// Don't do this twice!
-		if (!in_array($row['id_member'], $allMembers))
+		),
+		function($row) use (&$allMembers, &$updates)
 		{
-			$updates[$row['new_value']][] = $row['id_member'];
-			$allMembers[] = $row['id_member'];
+			// Don't do this twice!
+			if (!in_array($row['id_member'], $allMembers))
+			{
+				$updates[$row['new_value']][] = $row['id_member'];
+				$allMembers[] = $row['id_member'];
+			}
 		}
-	}
-	$db->free_result($request);
+	);
 
 	if (!empty($updates))
 	{
@@ -1050,7 +1047,7 @@ function list_getBanTriggers($start, $items_per_page, $sort, $trigger_type)
 		'email' => 'bi.email_address != {string:blank_string}',
 	);
 
-	$request = $db->query('', '
+	return $db->fetchQuery('
 		SELECT
 			bi.id_ban, bi.ip_low1, bi.ip_high1, bi.ip_low2, bi.ip_high2, bi.ip_low3, bi.ip_high3, bi.ip_low4, bi.ip_high4, bi.ip_low5, bi.ip_high5, bi.ip_low6, bi.ip_high6, bi.ip_low7, bi.ip_high7, bi.ip_low8, bi.ip_high8, bi.hostname, bi.email_address, bi.hits,
 			bg.id_ban_group, bg.name' . ($trigger_type === 'member' ? ',
@@ -1065,12 +1062,6 @@ function list_getBanTriggers($start, $items_per_page, $sort, $trigger_type)
 			'blank_string' => '',
 		)
 	);
-	$ban_triggers = array();
-	while ($row = $db->fetch_assoc($request))
-		$ban_triggers[] = $row;
-	$db->free_result($request);
-
-	return $ban_triggers;
 }
 
 /**
@@ -1205,7 +1196,7 @@ function list_getBanLogEntries($start, $items_per_page, $sort)
 {
 	$db = database();
 
-	$request = $db->query('', '
+	return $db->fetchQuery('
 		SELECT lb.id_ban_log, lb.id_member, IFNULL(lb.ip, {string:dash}) AS ip, IFNULL(lb.email, {string:dash}) AS email, lb.log_time, IFNULL(mem.real_name, {string:blank_string}) AS real_name
 		FROM {db_prefix}log_banned AS lb
 			LEFT JOIN {db_prefix}members AS mem ON (mem.id_member = lb.id_member)
@@ -1216,12 +1207,6 @@ function list_getBanLogEntries($start, $items_per_page, $sort)
 			'dash' => '-',
 		)
 	);
-	$log_entries = array();
-	while ($row = $db->fetch_assoc($request))
-		$log_entries[] = $row;
-	$db->free_result($request);
-
-	return $log_entries;
 }
 
 /**
@@ -1303,7 +1288,7 @@ function list_getBanItems($start = 0, $items_per_page = 0, $sort = 0, $ban_group
 		)
 	);
 	if ($db->num_rows($request) == 0)
-		fatal_lang_error('ban_not_found', false);
+		Errors::instance()->fatal_lang_error('ban_not_found', false);
 	while ($row = $db->fetch_assoc($request))
 	{
 		if (!isset($context['ban']))
@@ -1386,7 +1371,7 @@ function list_getBans($start, $items_per_page, $sort)
 {
 	$db = database();
 
-	$request = $db->query('', '
+	return $db->fetchQuery('
 		SELECT bg.id_ban_group, bg.name, bg.ban_time, bg.expire_time, bg.reason, bg.notes, COUNT(bi.id_ban) AS num_triggers
 		FROM {db_prefix}ban_groups AS bg
 			LEFT JOIN {db_prefix}ban_items AS bi ON (bi.id_ban_group = bg.id_ban_group)
@@ -1399,13 +1384,6 @@ function list_getBans($start, $items_per_page, $sort)
 			'limit' => $items_per_page,
 		)
 	);
-	$bans = array();
-	while ($row = $db->fetch_assoc($request))
-		$bans[] = $row;
-
-	$db->free_result($request);
-
-	return $bans;
 }
 
 /**

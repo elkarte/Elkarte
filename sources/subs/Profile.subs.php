@@ -13,7 +13,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0.2
+ * @version 1.1 dev
  *
  */
 
@@ -54,7 +54,7 @@ function currentMemberID($fatal = true, $reload_id = false)
 		is_not_guest('', $fatal);
 
 		if ($fatal)
-			fatal_lang_error('not_a_user', false);
+			Errors::instance()->fatal_lang_error('not_a_user', false);
 		else
 			return false;
 	}
@@ -251,7 +251,7 @@ function loadCustomFields($memID, $area = 'summary', array $custom_fields = arra
 			}
 			$input_html .= '</fieldset>';
 		}
-		// A standard input field, including some html5 varients
+		// A standard input field, including some html5 variants
 		elseif (in_array($row['field_type'], array('text', 'url', 'search', 'date', 'email', 'color')))
 		{
 			$input_html = '<input id="' . $row['col_name'] . '" type="' . $row['field_type'] . '" name="customfield[' . $row['col_name'] . ']" ' . ($row['field_length'] != 0 ? 'maxlength="' . $row['field_length'] . '"' : '') . ' size="' . ($row['field_length'] == 0 || $row['field_length'] >= 50 ? 50 : ($row['field_length'] > 30 ? 30 : ($row['field_length'] > 10 ? 20 : 10))) . '" value="' . $value . '" class="input_text" />';
@@ -636,7 +636,7 @@ function loadProfileFields($force_reload = false)
 							// Otherwise grab all of them and do not log anything
 							$error_severity = $errors->hasErrors(1) && !$user_info['is_admin'] ? 1 : null;
 							foreach ($errors->prepareErrors($error_severity) as $error)
-								fatal_error($error, $error_severity === null ? false : 'general');
+								Errors::instance()->fatal_error($error, $error_severity === null ? false : 'general');
 						}
 					}
 				}
@@ -701,7 +701,7 @@ function loadProfileFields($force_reload = false)
 			'enabled' => empty($cur_profile['openid_uri']),
 			'size' => 20,
 			'value' => empty($cur_profile['otp_secret']) ? '' : $cur_profile['otp_secret'],
-			'postinput' => '<span class="smalltext" style="margin-left: 4ex;"><input type="button" value="' . $txt['otp_generate'] . '" onclick="generateSecret();"><div id="qrcode"></div>',
+			'postinput' => '<div style="margin-left: 4ex;display: inline-block"><input class="button_submit" type="button" value="' . $txt['otp_generate'] . '" onclick="generateSecret();"></div><div id="qrcode"></div>',
 			'permission' => 'profile_identity',
 		),
 		'personal_text' => array(
@@ -980,7 +980,7 @@ function loadProfileFields($force_reload = false)
 
 	$disabled_fields = !empty($modSettings['disabled_profile_fields']) ? explode(',', $modSettings['disabled_profile_fields']) : array();
 
-	// Hard to imagine this won't be neccessary
+	// Hard to imagine this won't be necessary
 	require_once(SUBSDIR . '/Members.subs.php');
 
 	// For each of the above let's take out the bits which don't apply - to save memory and security!
@@ -1213,6 +1213,8 @@ function saveProfileChanges(&$profile_vars, $memID)
 		'ignore_boards',
 	);
 
+	call_integration_hook('integrate_save_profile_changes', array(&$profile_bools, &$profile_ints, &$profile_floats, &$profile_strings));
+
 	if (isset($_POST['sa']) && $_POST['sa'] == 'ignoreboards' && empty($_POST['ignore_brd']))
 		$_POST['ignore_brd'] = array();
 
@@ -1292,7 +1294,7 @@ function makeThemeChanges($memID, $id_theme)
 
 	// Can't change reserved vars.
 	if ((isset($_POST['options']) && count(array_intersect(array_keys($_POST['options']), $reservedVars)) != 0) || (isset($_POST['default_options']) && count(array_intersect(array_keys($_POST['default_options']), $reservedVars)) != 0))
-		fatal_lang_error('no_access', false);
+		Errors::instance()->fatal_lang_error('no_access', false);
 
 	// Don't allow any overriding of custom fields with default or non-default options.
 	$request = $db->query('', '
@@ -1372,6 +1374,21 @@ function makeThemeChanges($memID, $id_theme)
 function makeNotificationChanges($memID)
 {
 	$db = database();
+
+	if (isset($_POST['notify_submit']))
+	{
+		$to_save = array();
+		foreach (getMemberNotificationsProfile($memID) as $mention => $data)
+		{
+			if (isset($_POST['notify'][$mention]) && !empty($_POST['notify'][$mention]['status']) && isset($data['data'][$_POST['notify'][$mention]['method']]))
+			{
+				$to_save[$mention] = (int) $_POST['notify'][$mention]['method'];
+			}
+			else
+				$to_save[$mention] = 0;
+		}
+		saveUserNotificationsPreferences($memID, $to_save);
+	}
 
 	// Update the boards they are being notified on.
 	if (isset($_POST['edit_notify_boards']))
@@ -1797,11 +1814,11 @@ function profileLoadAvatarData()
 
 /**
  * Loads all the member groups that this member can assign
- * Places the result in context for tempate use
+ * Places the result in context for template use
  */
 function profileLoadGroups()
 {
-	global $cur_profile, $txt, $context, $user_settings;
+	global $cur_profile, $context, $user_settings;
 
 	require_once(SUBSDIR . '/Membergroups.subs.php');
 
@@ -2089,7 +2106,7 @@ function profileSaveAvatarData(&$value)
 	{
 		loadLanguage('Post');
 		if (!is_writable($uploadDir))
-			fatal_lang_error('attachments_no_write', 'critical');
+			Errors::instance()->fatal_lang_error('attachments_no_write', 'critical');
 
 		require_once(SUBSDIR . '/Package.subs.php');
 
@@ -2198,12 +2215,12 @@ function profileSaveAvatarData(&$value)
 				if (!is_writable($uploadDir))
 				{
 					loadLanguage('Post');
-					fatal_lang_error('attachments_no_write', 'critical');
+					Errors::instance()->fatal_lang_error('attachments_no_write', 'critical');
 				}
 
 				$new_avatar_name = $uploadDir . '/' . getAttachmentFilename('avatar_tmp_' . $memID, false, null, true);
 				if (!move_uploaded_file($_FILES['attachment']['tmp_name'], $new_avatar_name))
-					fatal_lang_error('attach_timeout', 'critical');
+					Errors::instance()->fatal_lang_error('attach_timeout', 'critical');
 
 				$_FILES['attachment']['tmp_name'] = $new_avatar_name;
 			}
@@ -2331,7 +2348,7 @@ function profileSaveAvatarData(&$value)
 				{
 					// I guess a man can try.
 					removeAttachments(array('id_member' => $memID));
-					fatal_lang_error('attach_timeout', 'critical');
+					Errors::instance()->fatal_lang_error('attach_timeout', 'critical');
 				}
 
 				// Attempt to chmod it.
@@ -2442,7 +2459,7 @@ function profileSaveGroups(&$value)
 			$db->free_result($request);
 
 			if (empty($another))
-				fatal_lang_error('at_least_one_admin', 'critical');
+				Errors::instance()->fatal_lang_error('at_least_one_admin', 'critical');
 		}
 	}
 
@@ -2857,7 +2874,7 @@ function findMinMaxUserMessage($memID, $board = null)
 }
 
 /**
- * Determins a members minimum and maximum topic id
+ * Determines a members minimum and maximum topic id
  *
  * - Can limit the results to a particular board
  * - Used to help limit queries by proving start/stop points
@@ -3289,4 +3306,42 @@ function getMembersInRange($ips, $memID)
 	}
 
 	return $members_in_range;
+}
+
+/**
+ * Return a detailed situation of the notification methods for a certain member.
+ * Used in the profile page to load the defaults and validate the new
+ * settings.
+ *
+ * @param int $memID the id of a member
+ */
+function getMemberNotificationsProfile($member_id)
+{
+	global $modSettings;
+
+	require_once(SUBSDIR . '/Notification.subs.php');
+	Elk_Autoloader::getInstance()->register(SUBSDIR . '/MentionType', '\\ElkArte\\sources\\subs\\MentionType');
+
+	$mention_methods = Notifications::getInstance()->getNotifiers();
+	$enabled_mentions = explode(',', $modSettings['enabled_mentions']);
+	$user_preferences = getUsersNotificationsPreferences($enabled_mentions, $member_id);
+	$mention_types = array();
+
+	foreach ($enabled_mentions as $type)
+	{
+		$type_on = false;
+		$notif = filterNotificationMethods($mention_methods, $type);
+
+		foreach ($notif as $key => $val)
+		{
+			$notif[$key] = array('id' => $val, 'enabled' => $user_preferences[$member_id][$type] === $key);
+			if ($user_preferences[$member_id][$type] > 0)
+				$type_on = true;
+		}
+
+		if (!empty($notif))
+			$mention_types[$type] = array('data' => $notif, 'enabled' => $type_on);
+	}
+
+	return $mention_types;
 }

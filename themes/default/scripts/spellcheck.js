@@ -9,7 +9,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:		BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0
+ * @version 1.1 dev
  *
  * This file contains javascript associated with the spellchecking ((pspell)
  */
@@ -22,28 +22,25 @@ var spell_formname,
 /**
  * Spell check the specified field in the specified form.
  *
- * @param {string} formName
+ * @param {string|boolean} formName only used when on a plain text box
  * @param {string} fieldName
  * @param {boolean} bFull
  */
 function spellCheck(formName, fieldName, bFull)
 {
-	// Grab the (hidden) spell checking form.
-	var spellform = document.forms.spell_form;
-
 	// Register the name of the editing form for future reference.
 	spell_formname = formName;
 	spell_fieldname = fieldName;
-	spell_full = typeof(bFull) !== 'undefined' ? bFull : (typeof($editor_data) !== 'undefined' ? true : false);
+	spell_full = typeof(bFull) !== 'undefined' ? bFull : (typeof($editor_data) !== 'undefined');
 
 	// This should match a word (most of the time).
-	var regexpWordMatch = /(?:<[^>]+>)|(?:\[[^ ][^\]]*\])|(?:&[^; ]+;)|(?:[^0-9\s\]\[{};:"\\|,<.>\/?`~!@#$%^&*()_+=]+)/g;
+	var regexpWordMatch = /(?:<[^>]+>)|(?:\[[^ ][^\]]*])|(?:&[^; ]+;)|(?:[^0-9\s\]\[{};:"\\|,<.>\/?`~!@#$%^&*()_+=]+)/g;
 
 	// These characters can appear within words.
 	var aWordCharacters = ['-', '\''];
 
 	var aWords = [],
-		aResult = [],
+		aResult,
 		sText = (spell_full) ? $editor_data[spell_fieldname].getText() : document.forms[spell_formname][spell_fieldname].value,
 		bInCode = false,
 		iOffset1,
@@ -99,7 +96,6 @@ function spellCheck(formName, fieldName, bFull)
 var wordindex = -1,
 	offsetindex = 0,
 	ignoredWords = [];
-
 
 /**
  * A "misspelled word" object.
@@ -242,7 +238,7 @@ function highlightWord()
 /**
  * Display the next misspelled word to the user and populate the suggested spellings box.
  *
- * @param {string} ignoreall
+ * @param {boolean} ignoreall
  */
 function nextWord(ignoreall)
 {
@@ -340,9 +336,9 @@ function nextWord(ignoreall)
 function htmlspecialchars(thetext)
 {
 	thetext = thetext.replace(/</g, "&lt;");
-	thetext = thetext.replace(/\>/g, "&gt;");
+	thetext = thetext.replace(/>/g, "&gt;");
 	thetext = thetext.replace(/\n/g, "<br />");
-	thetext = thetext.replace(/\ \ /g, "&nbsp; ");
+	thetext = thetext.replace(/  /g, "&nbsp; ");
 
 	return thetext;
 }
@@ -386,7 +382,7 @@ function spellCheckSetText(text, editorID)
  * Used to enable the spellcheck on the editor box, switch to text mode so the
  * spellcheck works
  *
- * @param {type} fieldName
+ * @param {string} fieldName
  */
 function spellCheckStart(fieldName)
 {
@@ -398,7 +394,7 @@ function spellCheckStart(fieldName)
 	// If we're in HTML mode we need to get the non-HTML text.
 	$editor_data[post_box_name].setTextMode();
 
-	spellCheck(false, post_box_name);
+	spellCheck(false, post_box_name, true);
 
 	return true;
 }

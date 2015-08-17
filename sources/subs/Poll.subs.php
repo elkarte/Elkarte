@@ -8,7 +8,7 @@
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
- * @version 1.0
+ * @version 1.1 dev
  *
  * This file contains functions for dealing with polls.
  *
@@ -38,6 +38,8 @@ function associatedPoll($topicID, $pollID = null)
 	{
 		setTopicAttribute($topicID, array('id_poll' => $pollID));
 	}
+
+	return false;
 }
 
 /**
@@ -804,7 +806,7 @@ function getPollStarter($id_topic)
 		)
 	);
 	if ($db->num_rows($request) == 0)
-		fatal_lang_error('no_board');
+		Errors::instance()->fatal_lang_error('no_board');
 	$bcinfo = $db->fetch_assoc($request);
 	$db->free_result($request);
 

@@ -1,5 +1,5 @@
 <?php
-// Version: 1.0; EmailTemplates
+// Version: 1.1; EmailTemplates
 
 // Since all of these strings are being used in emails, numeric entities should be used.
 
@@ -1025,6 +1025,65 @@ The message they sent you was:
 {MESSAGE}
 
 Reply to this Personal Message (to the sender only) here: {REPLYLINK}';
+
+/**
+	@additional_params: notify_new_buddy
+		ACTIONNAME:  The user name of the member adding as buddy.
+	@description: A notification email sent to the members that are set as buddy by someone
+*/
+$txt['notify_new_buddy_subject'] = '{ACTIONNAME} added you as buddy';
+$txt['notify_new_buddy_body'] = '{REALNAME},
+
+this email is to to inform you that {ACTIONNAME} has just has added you as buddy at {FORUMNAME}.
+
+{REGARDS}';
+$txt['notify_new_buddy_digest'] = 'You have been added as buddy by:';
+$txt['notify_new_buddy_snippet'] = '{ACTIONNAME}';
+
+/**
+	@additional_params: notify_new_likemsg
+		ACTIONNAME:  The user name of the member that liked the message.
+		MSGLINK:  The url to the message liked.
+	@description: A notification email sent to the members whose message has been liked
+*/
+$txt['notify_new_likemsg_subject'] = 'A message received a like';
+$txt['notify_new_likemsg_body'] = '{REALNAME},
+
+this email is to to inform you that {ACTIONNAME} has just has liked the message {MSGLINK} at {FORUMNAME}.
+
+{REGARDS}';
+$txt['notify_new_likemsg_digest'] = 'The following messages has been liked:';
+$txt['notify_new_likemsg_snippet'] = '{MSGLINK}';
+
+/**
+	@additional_params: notify_mentionmem
+		ACTIONNAME:  The user name of the member that mentioned someone.
+		MSGLINK:  The url to the message where someone has been mentioned.
+	@description: A notification email sent to the members mentioned by someone else in a message
+*/
+$txt['notify_mentionmem_subject'] = 'You have been mentioned';
+$txt['notify_mentionmem_body'] = '{REALNAME},
+
+this email is to to inform you that {ACTIONNAME} has just mentioned you in the message {MSGLINK} at {FORUMNAME}.
+
+{REGARDS}';
+$txt['notify_mentionmem_digest'] = 'You have been mentioned in the followin messages:';
+$txt['notify_mentionmem_snippet'] = '{MSGLINK}';
+
+/**
+	@additional_params: notify_quotedmem
+		ACTIONNAME:  The user name of the member that quoted someone's message.
+		MSGLINK:  The url to the message where someone has been quoted.
+	@description: A notification email sent to the members quoted in someone else message
+*/
+$txt['notify_quotedmem_subject'] = 'A message has been quoted';
+$txt['notify_quotedmem_body'] = '{REALNAME},
+
+this email is to to inform you that {ACTIONNAME} has just quoted one of your messages in {MSGLINK} at {FORUMNAME}.
+
+{REGARDS}';
+$txt['notify_quotedmem_digest'] = 'Your messages have been quoted in:';
+$txt['notify_quotedmem_snippet'] = '{MSGLINK}';
 
 /**
 	@additional_params: happy_birthday

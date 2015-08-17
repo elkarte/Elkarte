@@ -13,7 +13,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:		BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0
+ * @version 1.1 dev
  *
  */
 
@@ -53,7 +53,7 @@ class Announce_Controller extends Action_Controller
 		validateSession();
 
 		if (empty($topic))
-			fatal_lang_error('topic_gone', false);
+			Errors::instance()->fatal_lang_error('topic_gone', false);
 
 		loadLanguage('Post');
 		loadTemplate('Announce');
@@ -105,7 +105,7 @@ class Announce_Controller extends Action_Controller
 	 */
 	public function action_send()
 	{
-		global $topic, $board, $board_info, $context, $modSettings, $language, $scripturl;
+		global $topic, $board, $board_info, $context, $modSettings;
 
 		checkSession();
 
@@ -119,7 +119,7 @@ class Announce_Controller extends Action_Controller
 
 		// Check that at least one membergroup was selected (set from announce sub template)
 		if (empty($_POST['who']))
-			fatal_lang_error('no_membergroup_selected');
+			Errors::instance()->fatal_lang_error('no_membergroup_selected');
 
 		// Make sure all membergroups are integers and can access the board of the announcement.
 		foreach ($_POST['who'] as $id => $mg)

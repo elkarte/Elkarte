@@ -7,7 +7,7 @@
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
- * @version 1.0.2
+ * @version 1.1 dev
  *
  */
 
@@ -29,6 +29,20 @@ class ManageAvatars_Controller extends Action_Controller
 	 * @var Settings_Form
 	 */
 	protected $_avatarSettings;
+
+	/**
+	 * Holds instance of HttpReq object
+	 * @var HttpReq
+	 */
+	protected $_req;
+
+	/**
+	 * Pre Dispatch, called before other methods.  Loads HttpReq
+	 */
+	public function pre_dispatch()
+	{
+		$this->_req = HttpReq::instance();
+	}
 
 	/**
 	 * The Avatars admin area
@@ -83,17 +97,17 @@ class ManageAvatars_Controller extends Action_Controller
 		$config_vars = $this->_avatarSettings->settings();
 
 		// Saving avatar settings?
-		if (isset($_GET['save']))
+		if (isset($this->_req->query->save))
 		{
 			checkSession();
 
 			call_integration_hook('integrate_save_avatar_settings');
 
 			// Disable if invalid values would result
-			if (isset($_POST['custom_avatar_enabled']) && $_POST['custom_avatar_enabled'] == 1 && (empty($_POST['custom_avatar_dir']) || empty($_POST['custom_avatar_url'])))
-				$_POST['custom_avatar_enabled'] = 0;
+			if (isset($this->_req->post->custom_avatar_enabled) && $this->_req->post->custom_avatar_enabled == 1 && (empty($this->_req->post->custom_avatar_dir) || empty($this->_req->post->custom_avatar_url)))
+				$this->_req->post->custom_avatar_enabled = 0;
 
-			Settings_Form::save_db($config_vars);
+			Settings_Form::save_db($config_vars, $this->_req->post);
 			redirectexit('action=admin;area=manageattachments;sa=avatars');
 		}
 

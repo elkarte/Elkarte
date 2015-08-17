@@ -14,7 +14,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:		BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0
+ * @version 1.1 dev
  *
  */
 
@@ -72,15 +72,15 @@ function validateSession($type = 'admin')
 	// Is the security option off?
 	// @todo remove the exception (means update the db as well)
 	if (!empty($modSettings['securityDisable' . ($type != 'admin' ? '_' . $type : '')]))
-		return;
+		return true;
 
 	// If their admin or moderator session hasn't expired yet, let it pass, let the admin session trump a moderation one as well
 	if ((!empty($_SESSION[$type . '_time']) && $_SESSION[$type . '_time'] + $refreshTime >= time()) || (!empty($_SESSION['admin_time']) && $_SESSION['admin_time'] + $refreshTime >= time()))
-		return;
+		return true;
 
 	require_once(SUBSDIR . '/Auth.subs.php');
 
-	// Comming from the login screen
+	// Coming from the login screen
 	if (isset($_POST[$type . '_pass']) || isset($_POST[$type . '_hash_pass']))
 	{
 		checkSession();
@@ -98,7 +98,7 @@ function validateSession($type = 'admin')
 				$_SESSION[$type . '_time'] = time();
 				unset($_SESSION['request_referer']);
 
-				return;
+				return true;
 			}
 		}
 
@@ -115,7 +115,7 @@ function validateSession($type = 'admin')
 				$_SESSION[$type . '_time'] = time();
 				unset($_SESSION['request_referer']);
 
-				return;
+				return true;
 			}
 		}
 	}
@@ -129,7 +129,8 @@ function validateSession($type = 'admin')
 
 		$_SESSION[$type . '_time'] = time();
 		unset($_SESSION['request_referer']);
-		return;
+
+		return true;
 	}
 
 	// Better be sure to remember the real referer
@@ -141,8 +142,8 @@ function validateSession($type = 'admin')
 	// Need to type in a password for that, man.
 	if (!isset($_GET['xml']))
 		adminLogin($type);
-	else
-		return 'session_verify_fail';
+
+	return 'session_verify_fail';
 }
 
 /**
@@ -288,33 +289,32 @@ function is_not_banned($forceCheck = false)
 				'cannot_post',
 				'cannot_register',
 			);
-			$request = $db->query('', '
+			$db->fetchQueryCallback('
 				SELECT bi.id_ban, bi.email_address, bi.id_member, bg.cannot_access, bg.cannot_register,
 					bg.cannot_post, bg.cannot_login, bg.reason, IFNULL(bg.expire_time, 0) AS expire_time
 				FROM {db_prefix}ban_items AS bi
 					INNER JOIN {db_prefix}ban_groups AS bg ON (bg.id_ban_group = bi.id_ban_group AND (bg.expire_time IS NULL OR bg.expire_time > {int:current_time}))
 				WHERE
 					(' . implode(' OR ', $ban_query) . ')',
-				$ban_query_vars
-			);
-			// Store every type of ban that applies to you in your session.
-			while ($row = $db->fetch_assoc($request))
-			{
-				foreach ($restrictions as $restriction)
+				$ban_query_vars,
+				function($row) use($user_info, $restrictions, &$flag_is_activated)
 				{
-					if (!empty($row[$restriction]))
+					// Store every type of ban that applies to you in your session.
+					foreach ($restrictions as $restriction)
 					{
-						$_SESSION['ban'][$restriction]['reason'] = $row['reason'];
-						$_SESSION['ban'][$restriction]['ids'][] = $row['id_ban'];
-						if (!isset($_SESSION['ban']['expire_time']) || ($_SESSION['ban']['expire_time'] != 0 && ($row['expire_time'] == 0 || $row['expire_time'] > $_SESSION['ban']['expire_time'])))
-							$_SESSION['ban']['expire_time'] = $row['expire_time'];
+						if (!empty($row[$restriction]))
+						{
+							$_SESSION['ban'][$restriction]['reason'] = $row['reason'];
+							$_SESSION['ban'][$restriction]['ids'][] = $row['id_ban'];
+							if (!isset($_SESSION['ban']['expire_time']) || ($_SESSION['ban']['expire_time'] != 0 && ($row['expire_time'] == 0 || $row['expire_time'] > $_SESSION['ban']['expire_time'])))
+								$_SESSION['ban']['expire_time'] = $row['expire_time'];
 
-						if (!$user_info['is_guest'] && $restriction == 'cannot_access' && ($row['id_member'] == $user_info['id'] || $row['email_address'] == $user_info['email']))
-							$flag_is_activated = true;
+							if (!$user_info['is_guest'] && $restriction == 'cannot_access' && ($row['id_member'] == $user_info['id'] || $row['email_address'] == $user_info['email']))
+								$flag_is_activated = true;
+						}
 					}
 				}
-			}
-			$db->free_result($request);
+			);
 		}
 
 		// Mark the cannot_access and cannot_post bans as being 'hit'.
@@ -337,7 +337,7 @@ function is_not_banned($forceCheck = false)
 		foreach ($bans as $key => $value)
 			$bans[$key] = (int) $value;
 
-		$request = $db->query('', '
+		$db->fetchQueryCallback('
 			SELECT bi.id_ban, bg.reason
 			FROM {db_prefix}ban_items AS bi
 				INNER JOIN {db_prefix}ban_groups AS bg ON (bg.id_ban_group = bi.id_ban_group)
@@ -349,14 +349,13 @@ function is_not_banned($forceCheck = false)
 				'cannot_access' => 1,
 				'ban_list' => $bans,
 				'current_time' => time(),
-			)
+			),
+			function($row)
+			{
+				$_SESSION['ban']['cannot_access']['ids'][] = $row['id_ban'];
+				$_SESSION['ban']['cannot_access']['reason'] = $row['reason'];
+			}
 		);
-		while ($row = $db->fetch_assoc($request))
-		{
-			$_SESSION['ban']['cannot_access']['ids'][] = $row['id_ban'];
-			$_SESSION['ban']['cannot_access']['reason'] = $row['reason'];
-		}
-		$db->free_result($request);
 
 		// My mistake. Next time better.
 		if (!isset($_SESSION['ban']['cannot_access']))
@@ -410,7 +409,7 @@ function is_not_banned($forceCheck = false)
 		writeLog(true);
 
 		// You banned, sucka!
-		fatal_error(sprintf($txt['your_ban'], $old_name) . (empty($_SESSION['ban']['cannot_access']['reason']) ? '' : '<br />' . $_SESSION['ban']['cannot_access']['reason']) . '<br />' . (!empty($_SESSION['ban']['expire_time']) ? sprintf($txt['your_ban_expires'], standardTime($_SESSION['ban']['expire_time'], false)) : $txt['your_ban_expires_never']), 'user');
+		Errors::instance()->fatal_error(sprintf($txt['your_ban'], $old_name) . (empty($_SESSION['ban']['cannot_access']['reason']) ? '' : '<br />' . $_SESSION['ban']['cannot_access']['reason']) . '<br />' . (!empty($_SESSION['ban']['expire_time']) ? sprintf($txt['your_ban_expires'], standardTime($_SESSION['ban']['expire_time'], false)) : $txt['your_ban_expires_never']), 'user');
 
 		// If we get here, something's gone wrong.... but let's try anyway.
 		trigger_error('Hacking attempt...', E_USER_ERROR);
@@ -453,7 +452,7 @@ function is_not_banned($forceCheck = false)
 		$controller->action_logout(true, false);
 
 		// Tell them thanks
-		fatal_error(sprintf($txt['your_ban'], $old_name) . (empty($_SESSION['ban']['cannot_login']['reason']) ? '' : '<br />' . $_SESSION['ban']['cannot_login']['reason']) . '<br />' . (!empty($_SESSION['ban']['expire_time']) ? sprintf($txt['your_ban_expires'], standardTime($_SESSION['ban']['expire_time'], false)) : $txt['your_ban_expires_never']) . '<br />' . $txt['ban_continue_browse'], 'user');
+		Errors::instance()->fatal_error(sprintf($txt['your_ban'], $old_name) . (empty($_SESSION['ban']['cannot_login']['reason']) ? '' : '<br />' . $_SESSION['ban']['cannot_login']['reason']) . '<br />' . (!empty($_SESSION['ban']['expire_time']) ? sprintf($txt['your_ban_expires'], standardTime($_SESSION['ban']['expire_time'], false)) : $txt['your_ban_expires_never']) . '<br />' . $txt['ban_continue_browse'], 'user');
 	}
 
 	// Fix up the banning permissions.
@@ -649,14 +648,14 @@ function isBannedEmail($email, $restriction, $error)
 		log_ban($_SESSION['ban']['cannot_access']['ids']);
 		$_SESSION['ban']['last_checked'] = time();
 
-		fatal_error(sprintf($txt['your_ban'], $txt['guest_title']) . $_SESSION['ban']['cannot_access']['reason'], false);
+		Errors::instance()->fatal_error(sprintf($txt['your_ban'], $txt['guest_title']) . $_SESSION['ban']['cannot_access']['reason'], false);
 	}
 
 	if (!empty($ban_ids))
 	{
 		// Log this ban for future reference.
 		log_ban($ban_ids, $email);
-		fatal_error($error . $ban_reason, false);
+		Errors::instance()->fatal_error($error . $ban_reason, false);
 	}
 }
 
@@ -773,7 +772,7 @@ function checkSession($type = 'post', $from_action = '', $is_fatal = true)
 			die;
 		}
 		else
-			fatal_lang_error($error, isset($log_error) ? 'user' : false);
+			Errors::instance()->fatal_lang_error($error, isset($log_error) ? 'user' : false);
 	}
 	// A session error occurred, return the error to the calling function.
 	else
@@ -884,7 +883,7 @@ function validateToken($action, $type = 'post', $reset = true, $fatal = true)
 		createToken($action, $type);
 
 		if ($fatal)
-			fatal_lang_error('token_verify_fail', false);
+			Errors::instance()->fatal_lang_error('token_verify_fail', false);
 		else
 			return false;
 	}
@@ -941,7 +940,7 @@ function cleanTokens($complete = false, $suffix = '')
  * @param string $action
  * @param bool $is_fatal = true
  */
-function checkSubmitOnce($action, $is_fatal = true)
+function checkSubmitOnce($action, $is_fatal = false)
 {
 	global $context;
 
@@ -966,7 +965,7 @@ function checkSubmitOnce($action, $is_fatal = true)
 			return true;
 		}
 		elseif ($is_fatal)
-			fatal_lang_error('error_form_already_submitted', false);
+			Errors::instance()->fatal_lang_error('error_form_already_submitted', false);
 		else
 			return false;
 	}
@@ -1012,11 +1011,19 @@ function allowedTo($permission, $boards = null)
 
 	// Are we checking the _current_ board, or some other boards?
 	if ($boards === null)
+	{
+		if (empty($user_info['permissions']))
+			return false;
+
 		// Check if they can do it, you aren't allowed, by default.
 		return count(array_intersect($permission, $user_info['permissions'])) !== 0 ? true : false;
+	}
 
 	if (!is_array($boards))
 		$boards = array($boards);
+
+	if (empty($user_info['groups']))
+		return false;
 
 	$request = $db->query('', '
 		SELECT MIN(bp.add_deny) AS add_deny
@@ -1059,7 +1066,7 @@ function allowedTo($permission, $boards = null)
  * - If they are not, it loads the Errors language file and shows an error using $txt['cannot_' . $permission].
  * - If they are a guest and cannot do it, this calls is_not_guest().
  *
- * @param string[]|string $permission array of or single string, of persmission to check
+ * @param string[]|string $permission array of or single string, of permissions to check
  * @param int[]|null $boards = null
  */
 function isAllowedTo($permission, $boards = null)
@@ -1100,7 +1107,7 @@ function isAllowedTo($permission, $boards = null)
 		$_GET['topic'] = '';
 		writeLog(true);
 
-		fatal_lang_error('cannot_' . $error_permission, false);
+		Errors::instance()->fatal_lang_error('cannot_' . $error_permission, false);
 
 		// Getting this far is a really big problem, but let's try our best to prevent any cases...
 		trigger_error('Hacking attempt...', E_USER_ERROR);
@@ -1315,7 +1322,7 @@ function spamProtection($error_type, $fatal = true)
 		// Spammer!  You only have to wait a *few* seconds!
 		if ($fatal)
 		{
-			fatal_lang_error($error_type . '_WaitTime_broken', false, array($timeLimit));
+			Errors::instance()->fatal_lang_error($error_type . '_WaitTime_broken', false, array($timeLimit));
 			return true;
 		}
 		else
@@ -1507,7 +1514,7 @@ function validatePasswordFlood($id_member, $password_flood_value = false, $was_c
 		redirectexit();
 
 		// Probably not needed, but still make sure...
-		fatal_lang_error('no_access', false);
+		Errors::instance()->fatal_lang_error('no_access', false);
 	}
 
 	// Let's just initialize to something (and 0 is better than nothing)
@@ -1530,7 +1537,7 @@ function validatePasswordFlood($id_member, $password_flood_value = false, $was_c
 
 	// Broken the law?
 	if ($number_tries > 5)
-		fatal_lang_error('login_threshold_brute_fail', 'critical');
+		Errors::instance()->fatal_lang_error('login_threshold_brute_fail', 'critical');
 
 	// Otherwise set the members data. If they correct on their first attempt then we actually clear it, otherwise we set it!
 	require_once(SUBSDIR . '/Members.subs.php');

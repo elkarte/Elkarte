@@ -13,7 +13,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0
+ * @version 1.1 dev
  *
  */
 
@@ -361,15 +361,12 @@ function destroyMenu($menu_id = 'last')
 
 /**
  * Call the function or method for the selected menu item.
- * $selectedMenu is the array of menu information,
- *  with the format as retrieved from createMenu()
+ * $selectedMenu is the array of menu information, with the format as retrieved from createMenu()
  *
- * If $selectedMenu['controller'] is set, then it is a class,
- * and $selectedMenu['function'] will be a method of it.
- * If it is not set, then $selectedMenu['function'] is
- * simply a function to call.
+ * If $selectedMenu['controller'] is set, then it is a class, and $selectedMenu['function'] will be a method of it.
+ * If it is not set, then $selectedMenu['function'] is simply a function to call.
  *
- * @param mixed[] $selectedMenu
+ * @param array|string $selectedMenu
  */
 function callMenu($selectedMenu)
 {
@@ -380,11 +377,10 @@ function callMenu($selectedMenu)
 	{
 		// 'controller' => 'ManageAttachments_Controller'
 		// 'function' => 'action_avatars'
-		$controller = new $selectedMenu['controller']();
+		$controller = new $selectedMenu['controller'](new Event_Manager());
 
 		// always set up the environment
-		if (method_exists($controller, 'pre_dispatch'))
-			$controller->pre_dispatch();
+		$controller->pre_dispatch();
 		// and go!
 		$controller->{$selectedMenu['function']}();
 	}

@@ -13,7 +13,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0.2
+ * @version 1.1 dev
  *
  */
 
@@ -34,7 +34,7 @@ if (!defined('ELK'))
  * error logs, ban logs and moderation logs.
  * - removes these members' personal messages (only the inbox)
  * - rmoves avatars, ban entries, theme settings, moderator positions, poll votes,
- * drafts, likes, mentions, notifications
+ * likes, mentions, notifications
  * - removes custom field data associated with them
  * - updates member statistics afterwards.
  *
@@ -49,7 +49,7 @@ function deleteMembers($users, $check_not_admin = false)
 	$db = database();
 
 	// Try give us a while to sort this out...
-	@set_time_limit(600);
+	setTimeLimit(600);
 
 	// Try to get some more memory.
 	setMemoryLimit('128M');
@@ -216,15 +216,6 @@ function deleteMembers($users, $check_not_admin = false)
 	// Delete the member.
 	$db->query('', '
 		DELETE FROM {db_prefix}members
-		WHERE id_member IN ({array_int:users})',
-		array(
-			'users' => $users,
-		)
-	);
-
-	// Delete any drafts...
-	$db->query('', '
-		DELETE FROM {db_prefix}user_drafts
 		WHERE id_member IN ({array_int:users})',
 		array(
 			'users' => $users,
@@ -425,21 +416,22 @@ function deleteMembers($users, $check_not_admin = false)
 	);
 
 	// These users are nobody's buddy nomore.
-	$request = $db->query('', '
+	$db->fetchQueryCallback('
 		SELECT id_member, pm_ignore_list, buddy_list
 		FROM {db_prefix}members
 		WHERE FIND_IN_SET({raw:pm_ignore_list}, pm_ignore_list) != 0 OR FIND_IN_SET({raw:buddy_list}, buddy_list) != 0',
 		array(
 			'pm_ignore_list' => implode(', pm_ignore_list) != 0 OR FIND_IN_SET(', $users),
 			'buddy_list' => implode(', buddy_list) != 0 OR FIND_IN_SET(', $users),
-		)
+		),
+		function($row) use ($users)
+		{
+			updateMemberData($row['id_member'], array(
+				'pm_ignore_list' => implode(',', array_diff(explode(',', $row['pm_ignore_list']), $users)),
+				'buddy_list' => implode(',', array_diff(explode(',', $row['buddy_list']), $users))
+			));
+		}
 	);
-	while ($row = $db->fetch_assoc($request))
-		updateMemberData($row['id_member'], array(
-			'pm_ignore_list' => implode(',', array_diff(explode(',', $row['pm_ignore_list']), $users)),
-			'buddy_list' => implode(',', array_diff(explode(',', $row['buddy_list']), $users))
-		));
-	$db->free_result($request);
 
 	// Make sure no member's birthday is still sticking in the calendar...
 	updateSettings(array(
@@ -570,7 +562,7 @@ function registerMember(&$regOptions, $error_context = 'register')
 
 	// Can't change reserved vars.
 	if (isset($regOptions['theme_vars']) && count(array_intersect(array_keys($regOptions['theme_vars']), $reservedVars)) != 0)
-		fatal_lang_error('no_theme');
+		Errors::instance()->fatal_lang_error('no_theme');
 
 	// Some of these might be overwritten. (the lower ones that are in the arrays below.)
 	$regOptions['register_vars'] = array(
@@ -628,7 +620,7 @@ function registerMember(&$regOptions, $error_context = 'register')
 	{
 		require_once(SUBSDIR . '/Membergroups.subs.php');
 
-		// Make sure the id_group will be valid, if this is an administator.
+		// Make sure the id_group will be valid, if this is an administrator.
 		$regOptions['register_vars']['id_group'] = $regOptions['memberGroup'] == 1 && !allowedTo('admin_forum') ? 0 : $regOptions['memberGroup'];
 
 		// Check if this group is assignable.
@@ -847,7 +839,7 @@ function isReservedName($name, $current_ID_MEMBER = 0, $is_name = true, $fatal =
 			// If it's not just entire word, check for it in there somewhere...
 			if ($checkMe == $reservedCheck || (Util::strpos($checkMe, $reservedCheck) !== false && empty($modSettings['reserveWord'])))
 				if ($fatal)
-					fatal_lang_error('username_reserved', 'password', array($reserved));
+					Errors::instance()->fatal_lang_error('username_reserved', 'password', array($reserved));
 				else
 					return true;
 		}
@@ -855,7 +847,7 @@ function isReservedName($name, $current_ID_MEMBER = 0, $is_name = true, $fatal =
 		$censor_name = $name;
 		if (censorText($censor_name) != $name)
 			if ($fatal)
-				fatal_lang_error('name_censored', 'password', array($name));
+				Errors::instance()->fatal_lang_error('name_censored', 'password', array($name));
 			else
 				return true;
 	}
@@ -864,7 +856,7 @@ function isReservedName($name, $current_ID_MEMBER = 0, $is_name = true, $fatal =
 	foreach (array('*') as $char)
 		if (strpos($checkName, $char) !== false)
 			if ($fatal)
-				fatal_lang_error('username_reserved', 'password', array($char));
+				Errors::instance()->fatal_lang_error('username_reserved', 'password', array($char));
 			else
 				return true;
 
@@ -965,7 +957,7 @@ function groupsAllowedTo($permission, $board_id = null)
 			$board_data = fetchBoardsInfo(array('boards' => $board_id), array('selects' => 'permissions'));
 
 			if (empty($board_data))
-				fatal_lang_error('no_board');
+				Errors::instance()->fatal_lang_error('no_board');
 			$profile_id = $board_data[$board_id]['id_profile'];
 		}
 		else
@@ -1016,7 +1008,7 @@ function membersAllowedTo($permission, $board_id = null)
 	$exclude_moderators = in_array(3, $member_groups['denied']) && $board_id !== null;
 	$member_groups['denied'] = array_diff($member_groups['denied'], array(3));
 
-	$request = $db->query('', '
+	return $db->fetchQueryCallback('
 		SELECT mem.id_member
 		FROM {db_prefix}members AS mem' . ($include_moderators || $exclude_moderators ? '
 			LEFT JOIN {db_prefix}moderators AS mods ON (mods.id_member = mem.id_member AND mods.id_board = {int:board_id})' : '') . '
@@ -1028,14 +1020,12 @@ function membersAllowedTo($permission, $board_id = null)
 			'board_id' => $board_id,
 			'member_group_allowed_implode' => implode(', mem.additional_groups) != 0 OR FIND_IN_SET(', $member_groups['allowed']),
 			'member_group_denied_implode' => implode(', mem.additional_groups) != 0 OR FIND_IN_SET(', $member_groups['denied']),
-		)
+		),
+		function($row)
+		{
+			return $row['id_member'];
+		}
 	);
-	$members = array();
-	while ($row = $db->fetch_assoc($request))
-		$members[] = $row['id_member'];
-	$db->free_result($request);
-
-	return $members;
 }
 
 /**
@@ -1140,7 +1130,7 @@ function list_getMembers($start, $items_per_page, $sort, $where, $where_params =
 {
 	$db = database();
 
-	$request = $db->query('', '
+	$members = $db->fetchQuery('
 		SELECT
 			mem.id_member, mem.member_name, mem.real_name, mem.email_address, mem.member_ip, mem.member_ip2, mem.last_login,
 			mem.posts, mem.is_activated, mem.date_registered, mem.id_group, mem.additional_groups, mg.group_name
@@ -1155,11 +1145,6 @@ function list_getMembers($start, $items_per_page, $sort, $where, $where_params =
 			'per_page' => $items_per_page,
 		))
 	);
-
-	$members = array();
-	while ($row = $db->fetch_assoc($request))
-		$members[] = $row;
-	$db->free_result($request);
 
 	// If we want duplicates pass the members array off.
 	if ($get_duplicates)
@@ -1203,7 +1188,7 @@ function list_getNumMembers($where, $where_params = array())
 }
 
 /**
- * Find potential duplicate registation members based on the same IP address
+ * Find potential duplicate registration members based on the same IP address
  *
  * @package Members
  * @param mixed[] $members
@@ -1362,20 +1347,13 @@ function membersByIP($ip1, $match = 'exact', $ip2 = false)
 			OR member_ip2 ' . implode(' OR member_ip', $ip_query);
 	}
 
-	$request = $db->query('', '
+	return $db->fetchQuery('
 		SELECT
 			id_member, member_name, email_address, member_ip, member_ip2, is_activated
 		FROM {db_prefix}members
 		WHERE ' . $where,
 		$ip_params
 	);
-
-	$return = array();
-	while ($row = $db->fetch_assoc($request))
-		$return[] = $row;
-	$db->free_result($request);
-
-	return $return;
 }
 
 /**
@@ -1547,7 +1525,7 @@ function prepareMembersByQuery($query, &$query_params, $only_active = true)
 		else
 			$query_where = $allowed_conditions[$query];
 	}
-	// Somthing else, be careful ;)
+	// Something else, be careful ;)
 	else
 		$query_where = $query;
 
@@ -1637,7 +1615,7 @@ function maxMemberID()
  */
 function getBasicMemberData($member_ids, $options = array())
 {
-	global $txt;
+	global $txt, $language;
 
 	$db = database();
 
@@ -1683,6 +1661,9 @@ function getBasicMemberData($member_ids, $options = array())
 	);
 	while ($row = $db->fetch_assoc($request))
 	{
+		if (empty($row['lngfile']))
+			$row['lngfile'] = $language;
+
 		if (!empty($single))
 			$members = $row;
 		else
@@ -1757,7 +1738,7 @@ function getMemberByName($name, $flexible = false)
 /**
  * Finds a member from the database using supplied string as real_name
  *
- * - Optionaly will only search/find the member in a buddy list
+ * - Optionally will only search/find the member in a buddy list
  *
  * @package Members
  * @param string $search string to search real_name for like finds
@@ -1767,8 +1748,14 @@ function getMember($search, $buddies = array())
 {
 	$db = database();
 
+	$xml_data = array(
+		'items' => array(
+			'identifier' => 'item',
+			'children' => array(),
+		),
+	);
 	// Find the member.
-	$request = $db->query('', '
+	$xml_data['items']['children'] = $db->fetchQueryCallback('
 		SELECT id_member, real_name
 		FROM {db_prefix}members
 		WHERE {raw:real_name} LIKE {string:search}' . (!empty($buddies) ? '
@@ -1781,26 +1768,19 @@ function getMember($search, $buddies = array())
 			'search' => Util::strtolower($search),
 			'activation_status' => array(1, 12),
 			'limit' => Util::strlen($search) <= 2 ? 100 : 800,
-		)
-	);
-	$xml_data = array(
-		'items' => array(
-			'identifier' => 'item',
-			'children' => array(),
 		),
-	);
-	while ($row = $db->fetch_assoc($request))
-	{
-		$row['real_name'] = strtr($row['real_name'], array('&amp;' => '&#038;', '&lt;' => '&#060;', '&gt;' => '&#062;', '&quot;' => '&#034;'));
+		function($row)
+		{
+			$row['real_name'] = strtr($row['real_name'], array('&amp;' => '&#038;', '&lt;' => '&#060;', '&gt;' => '&#062;', '&quot;' => '&#034;'));
 
-		$xml_data['items']['children'][] = array(
-			'attributes' => array(
-				'id' => $row['id_member'],
-			),
-			'value' => $row['real_name'],
-		);
-	}
-	$db->free_result($request);
+			return array(
+				'attributes' => array(
+					'id' => $row['id_member'],
+				),
+				'value' => $row['real_name'],
+			);
+		}
+	);
 
 	return $xml_data;
 }
@@ -1811,7 +1791,7 @@ function getMember($search, $buddies = array())
  * @package Members
  * @param mixed[] $conditions associative array holding the conditions for the WHERE clause of the query.
  * Possible keys:
- * - activated_status (boolen) must be present
+ * - activated_status (boolean) must be present
  * - time_before (integer)
  * - members (array of integers)
  * - member_greater (integer) a member id, it will be used to filter only members with id_member greater than this
@@ -1903,7 +1883,7 @@ function retrieveMemberData($conditions)
  * @package Members
  * @param mixed[] $conditions associative array holding the conditions for the WHERE clause of the query.
  * Possible keys:
- * - activated_status (boolen) must be present
+ * - activated_status (boolean) must be present
  * - time_before (integer)
  * - members (array of integers)
  */
@@ -1947,7 +1927,7 @@ function approveMembers($conditions)
  * @param mixed[] $conditions associative array holding the conditions for the  WHERE clause of the query.
  * Possible keys:
  * - selected_member (integer) must be present
- * - activated_status (boolen) must be present
+ * - activated_status (boolean) must be present
  * - validation_code (string) must be present
  * - members (array of integers)
  * - time_before (integer)
@@ -2049,9 +2029,8 @@ function onlineMembers($conditions, $sort_method, $sort_direction, $start)
 	global $modSettings;
 
 	$db = database();
-	$members = array();
 
-	$request = $db->query('', '
+	return $db->fetchQuery('
 		SELECT
 			lo.log_time, lo.id_member, lo.url, INET_NTOA(lo.ip) AS ip, mem.real_name,
 			lo.session, mg.online_color, IFNULL(mem.show_online, 1) AS show_online,
@@ -2070,13 +2049,6 @@ function onlineMembers($conditions, $sort_method, $sort_direction, $start)
 			'limit' => $modSettings['defaultMaxMembers'],
 		)
 	);
-
-	while ($row = $db->fetch_assoc($request))
-		$members[] = $row;
-
-	$db->free_result($request);
-
-	return $members;
 }
 
 /**
@@ -2115,7 +2087,7 @@ function recentMembers($limit)
 	$db = database();
 
 	// Find the most recent members.
-	$request = $db->query('', '
+	return $db->fetchQuery('
 		SELECT id_member, member_name, real_name, date_registered, last_login
 		FROM {db_prefix}members
 		ORDER BY id_member DESC
@@ -2124,14 +2096,6 @@ function recentMembers($limit)
 			'limit' => $limit,
 		)
 	);
-
-	$members = array();
-	while ($row = $db->fetch_assoc($request))
-		$members[] = $row;
-
-	$db->free_result($request);
-
-	return $members;
 }
 
 /**
@@ -2454,16 +2418,16 @@ function updateMemberData($members, $data)
 				$member_names = array($user_info['username']);
 			else
 			{
-				$member_names = array();
-				$request = $db->query('', '
+				$member_names = $db->fetchQueryCallback('
 					SELECT member_name
 					FROM {db_prefix}members
 					WHERE ' . $condition,
-					$parameters
+					$parameters,
+					function($row)
+					{
+						return $row['member_name'];
+					}
 				);
-				while ($row = $db->fetch_assoc($request))
-					$member_names[] = $row['member_name'];
-				$db->free_result($request);
 			}
 
 			if (!empty($member_names))

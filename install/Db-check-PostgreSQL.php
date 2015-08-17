@@ -5,12 +5,21 @@ $databases['postgresql'] = array(
 	'extension' => 'PostgreSQL (PgSQL)',
 	'version' => '8.3',
 	'function_check' => 'pg_connect',
-	'version_check' => '$request = pg_query(\'SELECT version()\'); list ($version) = pg_fetch_row($request); list ($pgl, $version) = explode(" ", $version); return $version;',
+	'version_check' => function($db_connection) {
+		$request = pg_query('SELECT version()');
+		list ($version) = pg_fetch_row($request);
+		list ($pgl, $version) = explode(" ", $version);
+		return $version;},
 	'supported' => function_exists('pg_connect'),
-	'additional_file' => 'install_' . DB_SCRIPT_VERSION . '_postgresql.sql',
+	'additional_file' => 'install_' . DB_SCRIPT_VERSION . '_postgresql.php',
 	'utf8_support' => true,
 	'utf8_version' => '8.0',
-	'utf8_version_check' => '$request = pg_query(\'SELECT version()\'); list ($version) = pg_fetch_row($request); list ($pgl, $version) = explode(" ", $version); return $version;',
+	'utf8_version_check' => function ($db_connection) {
+		$request = pg_query('SELECT version()');
+		list ($version) = pg_fetch_row($request);
+		list ($pgl, $version) = explode(" ", $version);
+		return $version;
+	},
 	'validate_prefix' => function (&$value) {
 		global $txt;
 

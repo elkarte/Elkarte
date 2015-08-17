@@ -13,7 +13,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0
+ * @version 1.1 dev
  *
  */
 
@@ -146,7 +146,7 @@ class Ftp_Connection
 	}
 
 	/**
-	 * Changes a files atrributes (chmod)
+	 * Changes a files attributes (chmod)
 	 *
 	 * @param string $ftp_file
 	 * @param int $chmod
@@ -295,7 +295,7 @@ class Ftp_Connection
 	}
 
 	/**
-	 * Generates a direcotry listing for the current directory
+	 * Generates a directory listing for the current directory
 	 *
 	 * @param string $ftp_path
 	 * @param string|boolean $search
@@ -340,7 +340,7 @@ class Ftp_Connection
 	}
 
 	/**
-	 * Determins the current dirctory we are in
+	 * Determines the current directory we are in
 	 *
 	 * @param string $file
 	 * @param string|null $listing

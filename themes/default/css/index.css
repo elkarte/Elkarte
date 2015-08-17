@@ -484,14 +484,14 @@ h2 a.collapse {
 }
 
 /* Upshrink image in the general category headers */
-#category_toggle, #category_toggle_more, #upshrink_header {
+#category_toggle, #category_toggle_more, #upshrink_header, .package_toggle {
 	display: block;
 	float: right;
 	padding: 0 16px;
 	overflow: hidden;
 	position: relative;
 }
-#category_toggle span, #category_toggle_more span, #upshrink_header span {
+#category_toggle span, #category_toggle_more span, #upshrink_header span, .package_toggle span {
 	background-repeat: no-repeat;
 	background-image: url(../images/_light/expcol.png);
 	position: absolute;
@@ -1127,6 +1127,7 @@ a.bbc_link {
 	display: block;
 	overflow: hidden;
 	max-width: 25em;
+	text-overflow: ellipsis;
 }
 .linktree a {
 	display: block;
@@ -2097,9 +2098,6 @@ img.new_posts {
 }
 /* Poll results */
 #poll_options .results {
-	display: inline;
-}
-#poll_options li {
 	position: relative;
 }
 /* Absolute positioning stops these breaking the bars on narrow screens. */
@@ -2163,7 +2161,7 @@ div.core_posts {
 	vertical-align: top;
 	width: 15em;
 	word-wrap: break-word;
-	word-break: break-all;
+	word-break: normal;
 	-webkit-hyphens: auto;
 	-moz-hyphens: auto;
 	-ms-hyphens: auto;
@@ -2572,7 +2570,8 @@ ul.post_options li {
 	overflow: hidden;
 }
 .info {
-	float: left;
+	display: inline-block;
+	vertical-align: middle;
 	position: relative;
 	overflow: hidden;
 	width: 60%;
@@ -2580,15 +2579,32 @@ ul.post_options li {
 }
 .progressBar {
 	width: 20%;
+	display: inline-block;
+	vertical-align: middle;
 	border-radius: 5px;
-	float: left;
 	text-align: center;
 }
-.abort, .remove {
+.postattach_thumb img {
+	max-height: 100%;
+	max-width: 100%;
+}
+.postattach_thumb {
+	display: inline-block;
+	vertical-align: middle;
+	max-height: 50px;
+	max-width: 50px;
+}
+.abort, .remove, .share {
 	float: right;
 	overflow: hidden;
 	font-size: 1em;
 	padding: 4px 6px;
+}
+.share {
+	float: none;
+	vertical-align: middle;
+	display: inline-block;
+	margin: auto 5px;
 }
 .drop_attachmnts_error {
 	padding: 10px 0;
@@ -3129,7 +3145,6 @@ dl.merge_topic dd {
 .topic .post {
 	margin: 0 12px;
 	min-height: 80px;
-	height: auto;
 	height: 80px;
 }
 .topic .mod_icons {
@@ -3798,9 +3813,14 @@ dl.no_members {
 	width: 20px;
 }
 #memberlist .avatar.avatarresize {
-	width: 2.4em;
-	heigth: 2.4em;
-	margin: -4px -1.5em -8px 0;
+	max-width: 2.4em;
+	max-height: 3.4em;
+}
+.mlist li div {
+	margin: 0 auto;
+	height: 2.4em;
+	padding: 3px 8px 0;
+	vertical-align: middle;
 }
 #memberlist .selected {
 	width: auto;
@@ -4644,9 +4664,6 @@ dl.no_members {
 	.linktree .board_moderators {
 		display: none;
 	}
-	.statsbar .bar {
-		max-width: 12em;
-	}
 	.signature {
 		display: none;
 	}
@@ -4888,7 +4905,7 @@ dl.no_members {
 	height: 100px;
 	border: 5px solid #fff;
 	border-radius: 10px;
-	box-shadow: 0px 0px 10px 1px #777;
+	box-shadow: 0 0 10px 1px #777;
 	margin: 20px 0;
 }
 
@@ -4987,7 +5004,7 @@ dl.no_members {
 	margin: 10px 10px 10px 0;
 	border: 5px solid #FFF;
 	border-radius: 5px;
-	box-shadow: 0px 0px 4px 2px #C4C4C4;
+	box-shadow: 0 0 4px 2px #C4C4C4;
 }
 
 .like_post_topic_data .message_body .poster_details .poster_avatar,
@@ -5013,7 +5030,7 @@ dl.no_members {
 	border-top: none;
 	border-left: none;
 	background: #C4C4C4;
-	box-shadow: 0px 0px 2px 1px #8D9EC0;
+	box-shadow: 0 0 2px 1px #8D9EC0;
 }
 
 .content_encapsulate {

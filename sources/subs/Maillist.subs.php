@@ -7,7 +7,7 @@
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
- * @version 1.0
+ * @version 1.1 dev
  *
  */
 
@@ -286,7 +286,7 @@ function maillist_load_filter_parser($id, $style)
 
 	// Check that the filter does exist
 	if (empty($row))
-		fatal_lang_error('email_error_no_filter');
+		Errors::instance()->fatal_lang_error('email_error_no_filter');
 
 	return $row;
 }
@@ -380,7 +380,7 @@ function maillist_templates($template_type, $subject = null)
 
 	$notification_templates = array();
 
-	$request = $db->query('', '
+	return $db->fetchQueryCallback('
 		SELECT recipient_name AS template_title, body
 		FROM {db_prefix}log_comments
 		WHERE comment_type = {string:tpltype}
@@ -389,23 +389,20 @@ function maillist_templates($template_type, $subject = null)
 			'tpltype' => $template_type,
 			'generic' => 0,
 			'current_member' => $user_info['id'],
-		)
+		),
+		function($row)
+		{
+			$template = array(
+				'title' => $row['template_title'],
+				'body' => $row['body'],
+			);
+
+			if ($subject !== null)
+				$template['subject'] = $subject;
+
+			return $template;
+		}
 	);
-	while ($row = $db->fetch_assoc($request))
-	{
-		$template = array(
-			'title' => $row['template_title'],
-			'body' => $row['body'],
-		);
-
-		if ($subject !== null)
-			$template['subject'] = $subject;
-
-		$notification_templates[] = $template;
-	}
-	$db->free_result($request);
-
-	return $notification_templates;
 }
 
 /**
@@ -435,7 +432,7 @@ function log_email($sent)
  * - Called by Xmlcontroller as part of drag sort event
  *
  * @package Maillist
- * @param string $replace constucted as WHEN fieldname=value THEN new viewvalue WHEN .....
+ * @param string $replace constructed as WHEN fieldname=value THEN new viewvalue WHEN .....
  * @param int[] $filters list of ids in the WHEN clause to keep from updating the entire table
  */
 function updateParserFilterOrder($replace, $filters)

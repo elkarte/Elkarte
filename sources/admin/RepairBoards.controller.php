@@ -13,7 +13,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:		BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0
+ * @version 1.1 dev
  *
  */
 
@@ -26,6 +26,20 @@ if (!defined('ELK'))
  */
 class RepairBoards_Controller extends Action_Controller
 {
+	/**
+	 * Holds instance of HttpReq object
+	 * @var HttpReq
+	 */
+	protected $_req;
+
+	/**
+	 * Pre Dispatch, called before other methods.  Loads HttpReq
+	 */
+	public function pre_dispatch()
+	{
+		$this->_req = HttpReq::instance();
+	}
+
 	/**
 	 * Default method.
 	 *
@@ -74,7 +88,7 @@ class RepairBoards_Controller extends Action_Controller
 		);
 
 		// Start displaying errors without fixing them.
-		if (isset($_GET['fixErrors']))
+		if (isset($this->_req->query->fixErrors))
 			checkSession('get');
 
 		// Will want this.
@@ -82,7 +96,7 @@ class RepairBoards_Controller extends Action_Controller
 
 		// Giant if/else. The first displays the forum errors if a variable is not set and asks
 		// if you would like to continue, the other fixes the errors.
-		if (!isset($_GET['fixErrors']))
+		if (!isset($this->_req->query->fixErrors))
 		{
 			$context['error_search'] = true;
 			$context['repair_errors'] = array();
@@ -108,7 +122,7 @@ class RepairBoards_Controller extends Action_Controller
 		else
 		{
 			$context['error_search'] = false;
-			$context['to_fix'] = isset($_SESSION['repairboards_to_fix']) ? $_SESSION['repairboards_to_fix'] : array();
+			$context['to_fix'] = isset($this->_req->session->repairboards_to_fix) ? $this->_req->session->repairboards_to_fix : array();
 
 			require_once(SUBSDIR . '/Boards.subs.php');
 
@@ -126,18 +140,19 @@ class RepairBoards_Controller extends Action_Controller
 			updateSettings(array(
 				'settings_updated' => time(),
 			));
+
 			require_once(SUBSDIR . '/Messages.subs.php');
 			updateMessageStats();
+
 			require_once(SUBSDIR . '/Topic.subs.php');
 			updateTopicStats();
+
 			updateSettings(array(
 				'calendar_updated' => time(),
 			));
 
 			if (!empty($salvageBoardID))
-			{
 				$context['redirect_to_recount'] = true;
-			}
 
 			$_SESSION['repairboards_to_fix'] = null;
 			$_SESSION['repairboards_to_fix2'] = null;

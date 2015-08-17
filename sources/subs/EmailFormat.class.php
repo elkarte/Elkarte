@@ -7,7 +7,7 @@
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
- * @version 1.0.2
+ * @version 1.1 dev
  *
  */
 
@@ -24,7 +24,7 @@ if (!defined('ELK'))
  * Joins lines back together, where needed, to undo the 78 - 80 char wrap in email
  *
  * Really this is built on a house of cards and should generally be viewed
- * as an unfortante evil if you want a post to *not* look like its an email.
+ * as an unfortunate evil if you want a post to *not* look like its an email.
  * It's always the innocent bystanders who suffer most.
  *
  * Load class
@@ -159,6 +159,7 @@ class Email_Format
 	 * in a quote (&depth) code (&depth) or list (bbc or plain) etc.
 	 *
 	 * @param string $data
+	 * @param boolean $bbc_br
 	 */
 	private function _prep_data($data, $bbc_br)
 	{

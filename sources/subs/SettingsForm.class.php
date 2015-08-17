@@ -13,7 +13,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0.2
+ * @version 1.1 dev
  *
  *
  * Adding options to one of the setting screens isn't hard.
@@ -515,9 +515,13 @@ class Settings_Form
 	 *
 	 * @param mixed[] $config_vars
 	 */
-	public static function save_db(&$config_vars)
+	public static function save_db(&$config_vars, $post_object = null)
 	{
 		static $known_rules = null;
+
+		// Just look away if you have a weak stomach
+		if ($post_object !== null && is_object($post_object))
+			$_POST = array_replace($_POST, (array) $post_object);
 
 		if ($known_rules === null)
 			$known_rules = array(
@@ -557,7 +561,7 @@ class Settings_Form
 			elseif ($var[0] == 'float')
 				$setArray[$var[1]] = (float) $_POST[$var[1]];
 			// Text!
-			elseif ($var[0] == 'text' || $var[0] == 'large_text')
+			elseif ($var[0] == 'text' || $var[0] == 'color' || $var[0] == 'large_text')
 			{
 				if (isset($var['mask']))
 				{
@@ -784,6 +788,9 @@ class Settings_Form
 				if (file_exists(BOARDDIR . '/Settings_bak.php'))
 					@copy(BOARDDIR . '/Settings_bak.php', BOARDDIR . '/Settings.php');
 			}
+			// And ensure we are going to read the correct file next time
+			if (function_exists('opcache_invalidate'))
+				opcache_invalidate(BOARDDIR . '/Settings.php');
 		}
 	}
 

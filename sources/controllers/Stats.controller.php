@@ -13,7 +13,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:		BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0
+ * @version 1.1 dev
  *
  */
 
@@ -58,7 +58,7 @@ class Stats_Controller extends Action_Controller
 
 		// Page disabled - redirect them out
 		if (empty($modSettings['trackStats']))
-			fatal_lang_error('feature_disabled', true);
+			Errors::instance()->fatal_lang_error('feature_disabled', true);
 
 		if (!empty($_REQUEST['expand']))
 		{

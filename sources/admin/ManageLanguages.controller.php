@@ -13,7 +13,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:		BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0.2
+ * @version 1.1 dev
  *
  */
 
@@ -32,6 +32,20 @@ class ManageLanguages_Controller extends Action_Controller
 	 * @var Settings_Form
 	 */
 	protected $_languageSettings;
+
+	/**
+	 * Holds instance of HttpReq object
+	 * @var HttpReq
+	 */
+	protected $_req;
+
+	/**
+	 * Pre Dispatch, called before other methods.  Loads HttpReq
+	 */
+	public function pre_dispatch()
+	{
+		$this->_req = HttpReq::instance();
+	}
 
 	/**
 	 * This is the main function for the languages area.
@@ -88,13 +102,13 @@ class ManageLanguages_Controller extends Action_Controller
 		global $context, $txt;
 
 		// Are we searching for new languages on the site?
-		if (!empty($_POST['lang_add_sub']))
+		if (!empty($this->_req->post->lang_add_sub))
 		{
 			// Need fetch_web_data.
 			require_once(SUBSDIR . '/Package.subs.php');
 			require_once(SUBSDIR . '/Language.subs.php');
 
-			$context['elk_search_term'] = htmlspecialchars(trim($_POST['lang_add']), ENT_COMPAT, 'UTF-8');
+			$context['elk_search_term'] = $this->_req->getPost('lang_add', 'trim|htmlspecialchars[ENT_COMPAT]');
 
 			$listOptions = array(
 				'id' => 'languages',
@@ -163,7 +177,7 @@ class ManageLanguages_Controller extends Action_Controller
 		require_once(SUBSDIR . '/Language.subs.php');
 
 		// Setting a new default?
-		if (!empty($_POST['set_default']) && !empty($_POST['def_language']))
+		if (!empty($this->_req->post->set_default) && !empty($this->_req->post->def_language))
 		{
 			checkSession();
 			validateToken('admin-lang');
@@ -172,17 +186,17 @@ class ManageLanguages_Controller extends Action_Controller
 			$available_langs = getLanguages();
 			foreach ($available_langs as $lang)
 			{
-				if ($_POST['def_language'] == $lang['filename'])
+				if ($this->_req->post->def_language == $lang['filename'])
 				{
 					$lang_exists = true;
 					break;
 				}
 			}
 
-			if ($_POST['def_language'] != $language && $lang_exists)
+			if ($this->_req->post->def_language != $language && $lang_exists)
 			{
-				Settings_Form::save_file(array('language' => '\'' . $_POST['def_language'] . '\''));
-				$language = $_POST['def_language'];
+				Settings_Form::save_file(array('language' => '\'' . $this->_req->post->def_language . '\''));
+				$language = $this->_req->post->def_language;
 			}
 		}
 
@@ -297,25 +311,25 @@ class ManageLanguages_Controller extends Action_Controller
 	 */
 	public function action_downloadlang()
 	{
-		global $context, $forum_version, $txt, $scripturl, $modSettings;
+		global $context, $txt, $scripturl, $modSettings;
 
 		// @todo for the moment there is no facility to download packages, so better kill it here
-		fatal_lang_error('no_access', false);
+		Errors::instance()->fatal_lang_error('no_access', false);
 
 		loadLanguage('ManageSettings');
 		require_once(SUBSDIR . '/Package.subs.php');
 
 		// Clearly we need to know what to request.
-		if (!isset($_GET['did']))
-			fatal_lang_error('no_access', false);
+		if (!isset($this->_req->query->did))
+			Errors::instance()->fatal_lang_error('no_access', false);
 
 		// Some lovely context.
-		$context['download_id'] = $_GET['did'];
+		$context['download_id'] = $this->_req->query->did;
 		$context['sub_template'] = 'download_language';
 		$context['menu_data_' . $context['admin_menu_id']]['current_subsection'] = 'add';
 
 		// Can we actually do the installation - and do they want to?
-		if (!empty($_POST['do_install']) && !empty($_POST['copy_file']))
+		if (!empty($this->_req->post->do_install) && !empty($this->_req->post->copy_file))
 		{
 			checkSession('get');
 			validateToken('admin-dlang');
@@ -324,11 +338,11 @@ class ManageLanguages_Controller extends Action_Controller
 			$install_files = array();
 
 			// Check writable status.
-			foreach ($_POST['copy_file'] as $file)
+			foreach ($this->_req->post->copy_file as $file)
 			{
 				// Check it's not very bad.
 				if (strpos($file, '..') !== false || (strpos($file, 'themes') !== 0 && !preg_match('~agreement\.[A-Za-z-_0-9]+\.txt$~', $file)))
-					fatal_error($txt['languages_download_illegal_paths']);
+					Errors::instance()->fatal_error($txt['languages_download_illegal_paths']);
 
 				$chmod_files[] = BOARDDIR . '/' . $file;
 				$install_files[] = $file;
@@ -345,7 +359,7 @@ class ManageLanguages_Controller extends Action_Controller
 			elseif (!empty($install_files))
 			{
 				// @todo retrieve the language pack per naming pattern from our sites
-				read_tgz_file('http://download.elkarte.net/fetch_language.php?version=' . urlencode(strtr($forum_version, array('ElkArte ' => ''))) . ';fetch=' . urlencode($_GET['did']), BOARDDIR, false, true, $install_files);
+				read_tgz_file('http://download.elkarte.net/fetch_language.php?version=' . urlencode(strtr(FORUM_VERSION, array('ElkArte ' => ''))) . ';fetch=' . urlencode($this->_req->query->did), BOARDDIR, false, true, $install_files);
 
 				// Make sure the files aren't stuck in the cache.
 				package_flush_cache();
@@ -357,10 +371,10 @@ class ManageLanguages_Controller extends Action_Controller
 
 		// @todo Open up the old china.
 		if (!isset($archive_content))
-			$archive_content = read_tgz_file('http://download.elkarte.net/fetch_language.php?version=' . urlencode(strtr($forum_version, array('ElkArte ' => ''))) . ';fetch=' . urlencode($_GET['did']), null);
+			$archive_content = read_tgz_file('http://download.elkarte.net/fetch_language.php?version=' . urlencode(strtr(FORUM_VERSION, array('ElkArte ' => ''))) . ';fetch=' . urlencode($this->_req->query->did), null);
 
 		if (empty($archive_content))
-			fatal_error($txt['add_language_error_no_response']);
+			Errors::instance()->fatal_error($txt['add_language_error_no_response']);
 
 		// Now for each of the files, let's do some *stuff*
 		$context['files'] = array(
@@ -430,7 +444,7 @@ class ManageLanguages_Controller extends Action_Controller
 					'version_compare' => 'newer',
 				);
 
-				list ($name, $language) = explode('.', $filename);
+				list ($name,) = explode('.', $filename);
 
 				// Let's get the new version, I like versions, they tell me that I'm up to date.
 				if (preg_match('~\s*Version:\s+(.+?);\s*' . preg_quote($name, '~') . '~i', $file['preview'], $match) == 1)
@@ -635,8 +649,8 @@ class ManageLanguages_Controller extends Action_Controller
 		$context['page_title'] = $txt['edit_languages'];
 		$context['sub_template'] = 'modify_language_entries';
 
-		$context['lang_id'] = $_GET['lid'];
-		list ($theme_id, $file_id) = empty($_REQUEST['tfid']) || strpos($_REQUEST['tfid'], '+') === false ? array(1, '') : explode('+', $_REQUEST['tfid']);
+		$context['lang_id'] = $this->_req->query->lid;
+		list ($theme_id, $file_id) = empty($this->_req->post->tfid) || strpos($this->_req->post->tfid, '+') === false ? array(1, '') : explode('+', $this->_req->post->tfid);
 
 		// Clean the ID - just in case.
 		preg_match('~([A-Za-z0-9_-]+)~', $context['lang_id'], $matches);
@@ -709,7 +723,7 @@ class ManageLanguages_Controller extends Action_Controller
 		// @todo - languages have been moved to packages
 		// this may or may not be used in the future, for now it's not used at all
 		// @deprecated since 1.0
-		if (!empty($_POST['delete_main']) && $context['lang_id'] != 'english')
+		if (!empty($this->_req->post->delete_main) && $context['lang_id'] != 'english')
 		{
 			checkSession();
 			validateToken('admin-mlang');
@@ -718,7 +732,7 @@ class ManageLanguages_Controller extends Action_Controller
 			require_once(SUBSDIR . '/Package.subs.php');
 
 			// First, Make a backup?
-			if (!empty($modSettings['package_make_backups']) && (!isset($_SESSION['last_backup_for']) || $_SESSION['last_backup_for'] != $context['lang_id'] . '$$$'))
+			if (!empty($modSettings['package_make_backups']) && (!isset($this->_req->session->last_backup_for) || $this->_req->session->last_backup_for != $context['lang_id'] . '$$$'))
 			{
 				$_SESSION['last_backup_for'] = $context['lang_id'] . '$$$';
 				package_create_backup('backup_lang_' . $context['lang_id']);
@@ -770,7 +784,7 @@ class ManageLanguages_Controller extends Action_Controller
 
 		// Saving primary settings?
 		$madeSave = false;
-		if (!empty($_POST['save_main']) && !$current_file)
+		if (!empty($this->_req->post->save_main) && !$current_file)
 		{
 			checkSession();
 			validateToken('admin-mlang');
@@ -780,15 +794,18 @@ class ManageLanguages_Controller extends Action_Controller
 
 			// These are the replacements. old => new
 			$replace_array = array(
-				'~\$txt\[\'lang_locale\'\]\s=\s(\'|")[^\r\n]+~' => '$txt[\'lang_locale\'] = \'' . addslashes($_POST['locale']) . '\';',
-				'~\$txt\[\'lang_dictionary\'\]\s=\s(\'|")[^\r\n]+~' => '$txt[\'lang_dictionary\'] = \'' . addslashes($_POST['dictionary']) . '\';',
-				'~\$txt\[\'lang_spelling\'\]\s=\s(\'|")[^\r\n]+~' => '$txt[\'lang_spelling\'] = \'' . addslashes($_POST['spelling']) . '\';',
-				'~\$txt\[\'lang_rtl\'\]\s=\s[A-Za-z0-9]+;~' => '$txt[\'lang_rtl\'] = ' . (!empty($_POST['rtl']) ? 'true' : 'false') . ';',
+				'~\$txt\[\'lang_locale\'\]\s=\s(\'|")[^\r\n]+~' => '$txt[\'lang_locale\'] = \'' . addslashes($this->_req->post->locale) . '\';',
+				'~\$txt\[\'lang_dictionary\'\]\s=\s(\'|")[^\r\n]+~' => '$txt[\'lang_dictionary\'] = \'' . addslashes($this->_req->post->dictionary) . '\';',
+				'~\$txt\[\'lang_spelling\'\]\s=\s(\'|")[^\r\n]+~' => '$txt[\'lang_spelling\'] = \'' . addslashes($this->_req->post->spelling) . '\';',
+				'~\$txt\[\'lang_rtl\'\]\s=\s[A-Za-z0-9]+;~' => '$txt[\'lang_rtl\'] = ' . (!empty($this->_req->post->rtl) ? 'true' : 'false') . ';',
 			);
 			$current_data = preg_replace(array_keys($replace_array), array_values($replace_array), $current_data);
 			$fp = fopen($settings['default_theme_dir'] . '/languages/' . $context['lang_id'] . '/index.' . $context['lang_id'] . '.php', 'w+');
 			fwrite($fp, $current_data);
 			fclose($fp);
+
+			if (function_exists('opcache_invalidate'))
+				opcache_invalidate($settings['default_theme_dir'] . '/languages/' . $context['lang_id'] . '/index.' . $context['lang_id'] . '.php');
 
 			$madeSave = true;
 		}
@@ -812,16 +829,16 @@ class ManageLanguages_Controller extends Action_Controller
 
 		// Are we saving?
 		$save_strings = array();
-		if (isset($_POST['save_entries']) && !empty($_POST['entry']))
+		if (isset($this->_req->post->save_entries) && !empty($this->_req->post->entry))
 		{
 			checkSession();
 			validateToken('admin-mlang');
 
 			// Clean each entry!
-			foreach ($_POST['entry'] as $k => $v)
+			foreach ($this->_req->post->entry as $k => $v)
 			{
 				// Only try to save if it's changed!
-				if ($_POST['entry'][$k] != $_POST['comp'][$k])
+				if ($this->_req->post->entry[$k] != $this->_req->post->comp[$k])
 					$save_strings[$k] = cleanLangString($v, false);
 			}
 		}
@@ -994,6 +1011,9 @@ class ManageLanguages_Controller extends Action_Controller
 				fwrite($fp, strtr($file_contents, array("\r" => '')));
 				fclose($fp);
 
+				if (function_exists('opcache_invalidate'))
+					opcache_invalidate($current_file);
+
 				$madeSave = true;
 			}
 
@@ -1027,7 +1047,7 @@ class ManageLanguages_Controller extends Action_Controller
 		$settings_backup_fail = !@is_writable(BOARDDIR . '/Settings_bak.php') || !@copy(BOARDDIR . '/Settings.php', BOARDDIR . '/Settings_bak.php');
 
 		// Saving settings?
-		if (isset($_REQUEST['save']))
+		if (isset($this->_req->query->save))
 		{
 			checkSession();
 

@@ -15,7 +15,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:		BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0
+ * @version 1.1 dev
  *
  */
 
@@ -52,10 +52,12 @@ class PersonalMessage_Controller extends Action_Controller
 		require_once(SUBSDIR . '/PersonalMessage.subs.php');
 
 		// Templates, language, javascripts
-		loadLanguage('PersonalMessage+Drafts');
+		loadLanguage('PersonalMessage');
 		loadJavascriptFile(array('PersonalMessage.js', 'suggest.js'));
 		if (!isset($_REQUEST['xml']))
 			loadTemplate('PersonalMessage');
+
+		$this->_events->trigger('pre_dispatch', array('xml' => isset($_REQUEST['xml'])));
 
 		// Load up the members maximum message capacity.
 		loadMessageLimit();
@@ -144,10 +146,6 @@ class PersonalMessage_Controller extends Action_Controller
 		$context['current_label_redirect'] = 'action=pm;f=' . $context['folder'] . (isset($_GET['start']) ? ';start=' . $_GET['start'] : '') . (isset($_REQUEST['l']) ? ';l=' . $_REQUEST['l'] : '');
 		$context['can_issue_warning'] = in_array('w', $context['admin_features']) && allowedTo('issue_warning') && !empty($modSettings['warning_enable']);
 
-		// Are PM drafts enabled?
-		$context['drafts_pm_save'] = !empty($modSettings['drafts_enabled']) && !empty($modSettings['drafts_pm_enabled']) && allowedTo('pm_draft');
-		$context['drafts_autosave'] = !empty($context['drafts_pm_save']) && !empty($modSettings['drafts_autosave_enabled']) && allowedTo('pm_autosave_draft');
-
 		// Build the linktree for all the actions...
 		$context['linktree'][] = array(
 			'url' => $scripturl . '?action=pm',
@@ -187,12 +185,11 @@ class PersonalMessage_Controller extends Action_Controller
 			'send' => array($this, 'action_send', 'permission' => 'pm_read'),
 			'send2' => array($this, 'action_send2', 'permission' => 'pm_read'),
 			'settings' => array($this, 'action_settings', 'permission' => 'pm_read'),
-			'showpmdrafts' => array('controller' => 'Draft_Controller', 'function' => 'action_showPMDrafts', 'permission' => 'pm_read'),
 			'inbox' => array($this, 'action_folder', 'permission' => 'pm_read'),
 		);
 
 		// Set up our action array
-		$action = new Action();
+		$action = new Action('pm_index');
 
 		// Known action, go to it, otherwise the inbox for you
 		$subAction = $action->initialize($subActions, 'inbox');
@@ -309,7 +306,7 @@ class PersonalMessage_Controller extends Action_Controller
 
 			// Make sure you have access to this PM.
 			if (!isAccessiblePM($pmID, $context['folder'] == 'sent' ? 'outbox' : 'inbox'))
-				fatal_lang_error('no_access', false);
+				Errors::instance()->fatal_lang_error('no_access', false);
 
 			$context['current_pm'] = $pmID;
 
@@ -333,7 +330,7 @@ class PersonalMessage_Controller extends Action_Controller
 			$pmsg = (int) $_GET['pmsg'];
 
 			if (!isAccessiblePM($pmsg, $context['folder'] === 'sent' ? 'outbox' : 'inbox'))
-				fatal_lang_error('no_access', false);
+				Errors::instance()->fatal_lang_error('no_access', false);
 		}
 
 		// Determine the navigation context
@@ -362,7 +359,7 @@ class PersonalMessage_Controller extends Action_Controller
 
 		// Make sure that we have been given a correct head pm id if we are in converstation mode
 		if ($context['display_mode'] == 2 && !empty($pmID) && $pmID != $lastData['id'])
-			fatal_lang_error('no_access', false);
+			Errors::instance()->fatal_lang_error('no_access', false);
 
 		// If loadPMs returned results, lets show the pm subject list
 		if (!empty($pms))
@@ -384,7 +381,7 @@ class PersonalMessage_Controller extends Action_Controller
 			{
 				list($display_pms, $posters) = loadConversationList($lastData['head'], $recipients, $context['folder']);
 
-				// Conversation list may expose additonal PM's being displayed
+				// Conversation list may expose additional PM's being displayed
 				$all_pms = array_unique(array_merge($pms, $display_pms));
 
 				// See if any of these 'listing' PM's are in a conversation thread that has unread entries
@@ -516,7 +513,7 @@ class PersonalMessage_Controller extends Action_Controller
 			$pmCount = pmCount($user_info['id'], 3600);
 
 			if (!empty($pmCount) && $pmCount >= $modSettings['pm_posts_per_hour'])
-				fatal_lang_error('pm_too_many_per_hour', true, array($modSettings['pm_posts_per_hour']));
+				Errors::instance()->fatal_lang_error('pm_too_many_per_hour', true, array($modSettings['pm_posts_per_hour']));
 		}
 
 		// Quoting / Replying to a message?
@@ -526,7 +523,7 @@ class PersonalMessage_Controller extends Action_Controller
 
 			// Make sure this is accessible (not deleted)
 			if (!isAccessiblePM($pmsg))
-				fatal_lang_error('no_access', false);
+				Errors::instance()->fatal_lang_error('no_access', false);
 
 			// Validate that this is one has been received?
 			$isReceived = checkPMReceived($pmsg);
@@ -534,7 +531,7 @@ class PersonalMessage_Controller extends Action_Controller
 			// Get the quoted message (and make sure you're allowed to see this quote!).
 			$row_quoted = loadPMQuote($pmsg, $isReceived);
 			if ($row_quoted === false)
-				fatal_lang_error('pm_not_yours', false);
+				Errors::instance()->fatal_lang_error('pm_not_yours', false);
 
 			// Censor the message.
 			censorText($row_quoted['subject']);
@@ -658,13 +655,6 @@ class PersonalMessage_Controller extends Action_Controller
 			'name' => $txt['new_message']
 		);
 
-		// If drafts are enabled, lets generate a list of drafts that they can load in to the editor
-		if (!empty($context['drafts_pm_save']))
-		{
-			$pm_seed = isset($_REQUEST['pmsg']) ? $_REQUEST['pmsg'] : (isset($_REQUEST['quote']) ? $_REQUEST['quote'] : 0);
-			prepareDraftsContext($user_info['id'], $pm_seed);
-		}
-
 		// Needed for the editor.
 		require_once(SUBSDIR . '/Editor.subs.php');
 
@@ -679,23 +669,13 @@ class PersonalMessage_Controller extends Action_Controller
 			),
 			'preview_type' => 2,
 		);
+
+		$this->_events->trigger('prepare_send_context', array('pmsg' => isset($_REQUEST['pmsg']) ? $_REQUEST['pmsg'] : (isset($_REQUEST['quote']) ? $_REQUEST['quote'] : 0), 'editorOptions' => &$editorOptions));
+
 		create_control_richedit($editorOptions);
 
 		// No one is bcc'ed just yet
 		$context['bcc_value'] = '';
-
-		// Verification control needed for this PM?
-		$context['require_verification'] = !$user_info['is_admin'] && !empty($modSettings['pm_posts_verification']) && $user_info['posts'] < $modSettings['pm_posts_verification'];
-		if ($context['require_verification'])
-		{
-			require_once(SUBSDIR . '/VerificationControls.class.php');
-
-			$verificationOptions = array(
-				'id' => 'pm',
-			);
-			$context['require_verification'] = create_control_verification($verificationOptions);
-			$context['visual_verification_id'] = $verificationOptions['id'];
-		}
 
 		// Register this form and get a sequence number in $context.
 		checkSubmitOnce('register');
@@ -711,10 +691,6 @@ class PersonalMessage_Controller extends Action_Controller
 		// All the helpers we need
 		require_once(SUBSDIR . '/Auth.subs.php');
 		require_once(SUBSDIR . '/Post.subs.php');
-
-		// PM Drafts enabled and needed?
-		if ($context['drafts_pm_save'] && (isset($_POST['save_draft']) || isset($_POST['id_pm_draft'])))
-			require_once(SUBSDIR . '/Drafts.subs.php');
 
 		loadLanguage('PersonalMessage', '', false);
 
@@ -733,7 +709,7 @@ class PersonalMessage_Controller extends Action_Controller
 			if (!empty($pmCount) && $pmCount >= $modSettings['pm_posts_per_hour'])
 			{
 				if (!isset($_REQUEST['xml']))
-					fatal_lang_error('pm_too_many_per_hour', true, array($modSettings['pm_posts_per_hour']));
+					Errors::instance()->fatal_lang_error('pm_too_many_per_hour', true, array($modSettings['pm_posts_per_hour']));
 				else
 					$post_errors->addError('pm_too_many_per_hour');
 			}
@@ -783,7 +759,7 @@ class PersonalMessage_Controller extends Action_Controller
 						unset($namedRecipientList[$recipientType][$index]);
 				}
 
-				// Now see if we can resolove the entered name to an actual user
+				// Now see if we can resolve the entered name to an actual user
 				if (!empty($namedRecipientList[$recipientType]))
 				{
 					$foundMembers = findMembers($namedRecipientList[$recipientType]);
@@ -863,21 +839,6 @@ class PersonalMessage_Controller extends Action_Controller
 				$post_errors->addError('no_message');
 		}
 
-		// Wrong verification code?
-		if (!$user_info['is_admin'] && !isset($_REQUEST['xml']) && !empty($modSettings['pm_posts_verification']) && $user_info['posts'] < $modSettings['pm_posts_verification'])
-		{
-			require_once(SUBSDIR . '/VerificationControls.class.php');
-
-			$verificationOptions = array(
-				'id' => 'pm',
-			);
-			$context['require_verification'] = create_control_verification($verificationOptions, true);
-
-			if (is_array($context['require_verification']))
-				foreach ($context['require_verification'] as $error)
-					$post_errors->addError($error);
-		}
-
 		// If they made any errors, give them a chance to make amends.
 		if ($post_errors->hasErrors() && !$is_recipient_change && !isset($_REQUEST['preview']) && !isset($_REQUEST['xml']))
 			return messagePostError($namedRecipientList, $recipientList);
@@ -917,14 +878,21 @@ class PersonalMessage_Controller extends Action_Controller
 			return messagePostError($namedRecipientList, $recipientList);
 		}
 
-		// Want to save this as a draft and think about it some more?
-		if ($context['drafts_pm_save'] && isset($_POST['save_draft']))
+		try
 		{
-			savePMDraft($recipientList);
+			$this->_events->trigger('before_sending', array('namedRecipientList' => $namedRecipientList, 'recipientList' => $recipientList, 'namesNotFound' => $namesNotFound, 'post_errors' => $post_errors));
+		}
+		catch (Controller_Redirect_Exception $e)
+		{
 			return messagePostError($namedRecipientList, $recipientList);
 		}
+
+		// Safety net, it may be a module may just add to the list of errors without actually throw the error
+		if ($post_errors->hasErrors() && !isset($_REQUEST['preview']) && !isset($_REQUEST['xml']))
+			return messagePostError($namedRecipientList, $recipientList);
+
 		// Before we send the PM, let's make sure we don't have an abuse of numbers.
-		elseif (!empty($modSettings['max_pm_recipients']) && count($recipientList['to']) + count($recipientList['bcc']) > $modSettings['max_pm_recipients'] && !allowedTo(array('moderate_forum', 'send_mail', 'admin_forum')))
+		if (!empty($modSettings['max_pm_recipients']) && count($recipientList['to']) + count($recipientList['bcc']) > $modSettings['max_pm_recipients'] && !allowedTo(array('moderate_forum', 'send_mail', 'admin_forum')))
 		{
 			$context['send_log'] = array(
 				'sent' => array(),
@@ -956,21 +924,21 @@ class PersonalMessage_Controller extends Action_Controller
 			setPMRepliedStatus($user_info['id'], (int) $_REQUEST['replied_to'] );
 		}
 
+		$failed = !empty($context['send_log']['failed']);
+		$this->_events->trigger('message_sent', array('failed' => $failed));
+
 		// If one or more of the recipients were invalid, go back to the post screen with the failed usernames.
-		if (!empty($context['send_log']['failed']))
+		if ($failed)
+		{
 			return messagePostError($namesNotFound, array(
 				'to' => array_intersect($recipientList['to'], $context['send_log']['failed']),
 				'bcc' => array_intersect($recipientList['bcc'], $context['send_log']['failed'])
 			));
-
+		}
 		// Message sent successfully?
-		if (!empty($context['send_log']) && empty($context['send_log']['failed']))
+		else
 		{
 			$context['current_label_redirect'] = $context['current_label_redirect'] . ';done=sent';
-
-			// If we had a PM draft for this one, then its time to remove it since it was just sent
-			if ($context['drafts_pm_save'] && !empty($_POST['id_pm_draft']))
-				deleteDrafts($_POST['id_pm_draft'], $user_info['id']);
 		}
 
 		// Go back to the where they sent from, if possible...
@@ -1056,7 +1024,7 @@ class PersonalMessage_Controller extends Action_Controller
 
 			// Any errors?
 			if (!empty($updateErrors))
-				fatal_lang_error('labels_too_many', true, array($updateErrors));
+				Errors::instance()->fatal_lang_error('labels_too_many', true, array($updateErrors));
 		}
 
 		// Back to the folder.
@@ -1357,7 +1325,8 @@ class PersonalMessage_Controller extends Action_Controller
 		}
 
 		// Load up the fields.
-		$controller = new ProfileOptions_Controller();
+		$controller = new ProfileOptions_Controller(new Event_Manager());
+		$controller->pre_dispatch();
 		$controller->action_pmprefs();
 	}
 
@@ -1377,12 +1346,12 @@ class PersonalMessage_Controller extends Action_Controller
 
 		// Check that this feature is even enabled!
 		if (empty($modSettings['enableReportPM']) || empty($_REQUEST['pmsg']))
-			fatal_lang_error('no_access', false);
+			Errors::instance()->fatal_lang_error('no_access', false);
 
 		$pmsg = (int) $_REQUEST['pmsg'];
 
 		if (!isAccessiblePM($pmsg, 'inbox'))
-			fatal_lang_error('no_access', false);
+			Errors::instance()->fatal_lang_error('no_access', false);
 
 		$context['pm_id'] = $pmsg;
 		$context['page_title'] = $txt['pm_report_title'];
@@ -1423,7 +1392,7 @@ class PersonalMessage_Controller extends Action_Controller
 
 			// Maybe we shouldn't advertise this?
 			if (empty($admins))
-				fatal_lang_error('no_access', false);
+				Errors::instance()->fatal_lang_error('no_access', false);
 
 			$memberFromName = un_htmlspecialchars($memberFromName);
 
@@ -1609,11 +1578,11 @@ class PersonalMessage_Controller extends Action_Controller
 			// Name is easy!
 			$ruleName = Util::htmlspecialchars(trim($_POST['rule_name']));
 			if (empty($ruleName))
-				fatal_lang_error('pm_rule_no_name', false);
+				Errors::instance()->fatal_lang_error('pm_rule_no_name', false);
 
 			// Sanity check...
 			if (empty($_POST['ruletype']) || empty($_POST['acttype']))
-				fatal_lang_error('pm_rule_no_criteria', false);
+				Errors::instance()->fatal_lang_error('pm_rule_no_criteria', false);
 
 			// Let's do the criteria first - it's also hardest!
 			$criteria = array();
@@ -1662,7 +1631,7 @@ class PersonalMessage_Controller extends Action_Controller
 			}
 
 			if (empty($criteria) || (empty($actions) && !$doDelete))
-				fatal_lang_error('pm_rule_no_criteria', false);
+				Errors::instance()->fatal_lang_error('pm_rule_no_criteria', false);
 
 			// What are we storing?
 			$criteria = serialize($criteria);
@@ -1714,12 +1683,12 @@ class PersonalMessage_Controller extends Action_Controller
 			$context['search_params'] = array();
 			foreach ($temp_params as $i => $data)
 			{
-				@list ($k, $v) = explode('|\'|', $data);
+				list ($k, $v) = array_pad(explode('|\'|', $data), 2, '');
 				$context['search_params'][$k] = $v;
 			}
 		}
 
-		// Set up the search criteia, type, what, age, etc
+		// Set up the search criteria, type, what, age, etc
 		if (isset($_REQUEST['search']))
 		{
 			$context['search_params']['search'] = un_htmlspecialchars($_REQUEST['search']);
@@ -1796,7 +1765,7 @@ class PersonalMessage_Controller extends Action_Controller
 
 		// Make sure the server is able to do this right now
 		if (!empty($modSettings['loadavg_search']) && $modSettings['current_load'] >= $modSettings['loadavg_search'])
-			fatal_lang_error('loadavg_search_disabled', false);
+			Errors::instance()->fatal_lang_error('loadavg_search_disabled', false);
 
 		// Some useful general permissions.
 		$context['can_send_pm'] = allowedTo('pm_send');
@@ -1811,7 +1780,7 @@ class PersonalMessage_Controller extends Action_Controller
 			$temp_params = explode('|"|', base64_decode(strtr($_REQUEST['params'], array(' ' => '+'))));
 			foreach ($temp_params as $i => $data)
 			{
-				@list ($k, $v) = explode('|\'|', $data);
+				list ($k, $v) = array_pad(explode('|\'|', $data), 2, '');
 				$search_params[$k] = $v;
 			}
 		}
@@ -1852,7 +1821,7 @@ class PersonalMessage_Controller extends Action_Controller
 			$userQuery = '';
 		else
 		{
-			// Set up so we can seach by user name, wildcards, like, etc
+			// Set up so we can search by user name, wildcards, like, etc
 			$userString = strtr(Util::htmlspecialchars($search_params['userspec'], ENT_QUOTES), array('&quot;' => '"'));
 			$userString = strtr($userString, array('%' => '\%', '_' => '\_', '*' => '%', '?' => '_'));
 
@@ -2027,11 +1996,6 @@ class PersonalMessage_Controller extends Action_Controller
 
 		$searchArray = array_slice(array_unique($searchArray), 0, 10);
 
-		// Create an array of replacements for highlighting.
-		$context['mark'] = array();
-		foreach ($searchArray as $word)
-			$context['mark'][$word] = '<strong class="highlight">' . $word . '</strong>';
-
 		// This contains *everything*
 		$searchWords = array_merge($searchArray, $excludedWords);
 
@@ -2091,7 +2055,7 @@ class PersonalMessage_Controller extends Action_Controller
 		// Get all the matching message ids, senders and head pm nodes
 		list($foundMessages, $posters, $head_pms) = loadPMSearchMessages($userQuery, $labelQuery, $timeQuery, $searchQuery, $searchq_parameters, $search_params);
 
-		// Find the real head pm when in converstaion view
+		// Find the real head pm when in conversation view
 		if ($context['display_mode'] == 2 && !empty($head_pms))
 			$real_pm_ids = loadPMSearchHeads($head_pms);
 
@@ -2216,7 +2180,7 @@ class PersonalMessage_Controller extends Action_Controller
 		{
 			// Make sure this is accessible, should be of course
 			if (!isAccessiblePM($pmsg, 'inbox'))
-				fatal_lang_error('no_access', false);
+				Errors::instance()->fatal_lang_error('no_access', false);
 
 			// Well then, you get to hear about it all over again
 			markMessagesUnread($pmsg);
@@ -2256,12 +2220,6 @@ function messageIndexBar($area)
 				'sent' => array(
 					'label' => $txt['sent_items'],
 					'custom_url' => $scripturl . '?action=pm;f=sent',
-				),
-				'drafts' => array(
-					'label' => $txt['drafts_show'],
-					'custom_url' => $scripturl . '?action=pm;sa=showpmdrafts',
-					'permission' => 'pm_draft',
-					'enabled' => !empty($modSettings['drafts_enabled']) && !empty($modSettings['drafts_pm_enabled']),
 				),
 			),
 		),
@@ -2357,8 +2315,8 @@ function messageIndexBar($area)
 	unset($pm_areas);
 
 	// No menu means no access.
-	if (!$pm_include_data && (!$user_info['is_guest'] || validateSession()))
-		fatal_lang_error('no_access', false);
+	if (!$pm_include_data && (!$user_info['is_guest'] || validateSession() !== true))
+		Errors::instance()->fatal_lang_error('no_access', false);
 
 	// Make a note of the Unique ID for this menu.
 	$context['pm_menu_id'] = $context['max_menu_id'];
@@ -2454,7 +2412,7 @@ function preparePMContext_callback($type = 'subject', $reset = false)
 		return false;
 
 	// Reset the data?
-	if ($reset == true)
+	if ($reset === true)
 		return $db->data_seek($messages_request, 0);
 
 	// Get the next one... bail if anything goes wrong.
@@ -2561,13 +2519,13 @@ function messagePostError($named_recipients, $recipient_ids = array())
 {
 	global $txt, $context, $scripturl, $modSettings, $user_info;
 
-	if (!isset($_REQUEST['xml']))
-		$context['menu_data_' . $context['pm_menu_id']]['current_area'] = 'send';
-
-	if (!isset($_REQUEST['xml']))
-		$context['sub_template'] = 'send';
-	elseif (isset($_REQUEST['xml']))
+	if (isset($_REQUEST['xml']))
 		$context['sub_template'] = 'generic_preview';
+	else
+	{
+		$context['sub_template'] = 'send';
+		$context['menu_data_' . $context['pm_menu_id']]['current_area'] = 'send';
+	}
 
 	$context['page_title'] = $txt['send_message'];
 	$error_types = Error_Context::context('pm', 1);
@@ -2610,7 +2568,7 @@ function messagePostError($named_recipients, $recipient_ids = array())
 		if ($row_quoted === false)
 		{
 			if (!isset($_REQUEST['xml']))
-				fatal_lang_error('pm_not_yours', false);
+				Errors::instance()->fatal_lang_error('pm_not_yours', false);
 			else
 				$error_types->addError('pm_not_yours');
 		}
@@ -2687,50 +2645,4 @@ function messagePostError($named_recipients, $recipient_ids = array())
 
 	// Acquire a new form sequence number.
 	checkSubmitOnce('register');
-}
-
-/**
- * Loads in a group of PM drafts for the user.
- *
- * What it does:
- * - Loads a specific draft for current use in pm editing box if selected.
- * - Used in the posting screens to allow draft selection
- * - Will load a draft if selected is supplied via post
- *
- * @param int $member_id
- * @param int|false $id_pm = false if set, it will try to load drafts for this id
- * @return false|null
- */
-function prepareDraftsContext($member_id, $id_pm = false)
-{
-	global $scripturl, $context, $txt, $modSettings;
-
-	$context['drafts'] = array();
-
-	// Permissions
-	if (empty($member_id))
-		return false;
-
-	// We haz drafts
-	loadLanguage('Drafts');
-	require_once(SUBSDIR . '/Drafts.subs.php');
-
-	// Has a specific draft has been selected?  Load it up if there is not already a message already in the editor
-	if (isset($_REQUEST['id_draft']) && empty($_POST['subject']) && empty($_POST['message']))
-		loadDraft((int) $_REQUEST['id_draft'], 1, true, true);
-
-	// Load all the drafts for this user that meet the criteria
-	$order = 'poster_time DESC';
-	$user_drafts = load_user_drafts($member_id, 1, $id_pm, $order);
-
-	// Add them to the context draft array for template display
-	foreach ($user_drafts as $draft)
-	{
-		$short_subject = empty($draft['subject']) ? $txt['drafts_none'] : Util::shorten_text(stripslashes($draft['subject']), !empty($modSettings['draft_subject_length']) ? $modSettings['draft_subject_length'] : 24);
-		$context['drafts'][] = array(
-			'subject' => censorText($short_subject),
-			'poster_time' => standardTime($draft['poster_time']),
-				'link' => '<a href="' . $scripturl . '?action=pm;sa=send;id_draft=' . $draft['id_draft'] . '">' . (!empty($draft['subject']) ? $draft['subject'] : $txt['drafts_none']) . '</a>',
-			);
-	}
 }

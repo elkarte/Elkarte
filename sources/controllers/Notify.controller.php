@@ -14,7 +14,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:		BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0
+ * @version 1.1 dev
  *
  */
 
@@ -57,7 +57,7 @@ class Notify_Controller extends Action_Controller
 
 		// Make sure the topic has been specified.
 		if (empty($topic))
-			fatal_lang_error('not_a_topic', false);
+			Errors::instance()->fatal_lang_error('not_a_topic', false);
 
 		// Our topic functions are here
 		require_once(SUBSDIR . '/Topic.subs.php');
@@ -170,7 +170,7 @@ class Notify_Controller extends Action_Controller
 
 		// You have to specify a board to turn notifications on!
 		if (empty($board))
-			fatal_lang_error('no_board', false);
+			Errors::instance()->fatal_lang_error('no_board', false);
 
 		// No subaction: find out what to do.
 		if (empty($_GET['sa']))

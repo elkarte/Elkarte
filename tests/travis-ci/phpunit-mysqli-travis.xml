@@ -11,11 +11,14 @@
          verbose="true"
          bootstrap="/var/www/tests/travis-ci/bootstrap.php">
   <testsuites>
-      <testsuite name="ElkArte Tests">
-          <directory>/var/www/tests</directory>
+      <testsuite name="ElkArte Unit Tests">
+          <directory suffix="Test.php">/var/www/tests</directory>
+      </testsuite>
+      <testsuite name="ElkArte Basic Tests">
+          <directory suffix="Basic.php">/var/www/tests</directory>
       </testsuite>
   </testsuites>
   <php>
-      <const name="DB_TYPE" value="MySQL"/>
+      <const name="DBTYPE" value="MySQL"/>
   </php>
 </phpunit>

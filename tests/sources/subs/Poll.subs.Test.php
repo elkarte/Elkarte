@@ -2,7 +2,7 @@
 
 /**
  * TestCase class for poll subs.
- * 
+ *
  * WARNING. These tests work directly with the local database. Don't run
  * them if you need to keep your data untouched!
  */
@@ -39,7 +39,7 @@ class TestPoll extends PHPUnit_Framework_TestCase
 			'name' => 'test',
 			'email' => 'noemail@test.tes',
 			'update_post_count' => false,
-			'ip' => ''
+			'ip' => '127.0.0.1'
 		);
 
 		// Attempt to make the new topic.

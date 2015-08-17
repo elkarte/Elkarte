@@ -17,12 +17,14 @@ then
     sudo wget -nv -O "$SELENIUM_JAR" "$SELENIUM_DOWNLOAD_URL"
 fi
 
-# Update/Install firefox
-sudo apt-get install firefox -y --no-install-recommends
+# Update/Install Fx or chrome
+#sudo apt-get install firefox -y --no-install-recommends
+wget http://chromedriver.googlecode.com/files/chromedriver_linux32_23.0.1240.0.zip && unzip chromedriver_linux32_23.0.1240.0.zip && sudo mv chromedriver /usr/bin
 
 # Start Selenium
-sudo xvfb-run java -Dwebdriver.firefox.bin=/usr/bin/firefox -jar "$SELENIUM_JAR" > /tmp/selenium.log &
-wget --retry-connrefused --tries=60 --waitretry=2 --output-file=/dev/null "$SELENIUM_HUB_URL/wd/hub/status" -O /dev/null
+export DISPLAY=:99.0
+sudo xvfb-run java -Dwebdriver.chromedriver.bin=/usr/bin/chromedriver -jar "$SELENIUM_JAR" > /tmp/selenium.log &
+wget --retry-connrefused --tries=120 --waitretry=3 --output-file=/dev/null "$SELENIUM_HUB_URL/wd/hub/status" -O /dev/null
 
 # Test to see if the selenium server really did start
 if [ ! $? -eq 0 ]

@@ -13,7 +13,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:		BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0
+ * @version 1.1 dev
  *
  */
 
@@ -62,7 +62,7 @@ class Members_Controller extends Action_Controller
 
 		// You have to give a user
 		if (empty($_REQUEST['u']))
-			fatal_lang_error('no_access', false);
+			Errors::instance()->fatal_lang_error('no_access', false);
 
 		// Always an int
 		$user = (int) $_REQUEST['u'];
@@ -77,15 +77,13 @@ class Members_Controller extends Action_Controller
 			// Do we want a mention for our newly added buddy?
 			if (!empty($modSettings['mentions_enabled']) && !empty($modSettings['mentions_buddy']))
 			{
-				$mentions = new Mentions_Controller();
-
-				// Set a mention for our buddy.
-				$mentions->setData(array(
-					'id_member' => $user,
-					'type' => 'buddy',
-					'id_msg' => 0,
-					));
-				$mentions->action_add();
+				$notifier = Notifications::getInstance();
+				$notifier->add(new Notifications_Task(
+					'buddy',
+					$user,
+					$user_info['id'],
+					array('id_members' => array($user))
+				));
 			}
 		}
 
@@ -114,7 +112,7 @@ class Members_Controller extends Action_Controller
 
 		// You have to give a user
 		if (empty($_REQUEST['u']))
-			fatal_lang_error('no_access', false);
+			Errors::instance()->fatal_lang_error('no_access', false);
 
 		// Always an int
 		$user = (int) $_REQUEST['u'];

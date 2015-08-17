@@ -13,7 +13,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0
+ * @version 1.1 dev
  *
  */
 
@@ -188,7 +188,7 @@ function adminLogin($type = 'admin')
 		// log some info along with it! referer, user agent
 		$req = request();
 		$txt['security_wrong'] = sprintf($txt['security_wrong'], isset($_SERVER['HTTP_REFERER']) ? $_SERVER['HTTP_REFERER'] : $txt['unknown'], $req->user_agent(), $user_info['ip']);
-		log_error($txt['security_wrong'], 'critical');
+		Errors::instance()->log_error($txt['security_wrong'], 'critical');
 
 		if (isset($_POST[$type . '_hash_pass']))
 			unset($_POST[$type . '_hash_pass']);
@@ -300,7 +300,7 @@ function construct_query_string($get)
  *
  * @package Authorization
  * @param string[]|string $names
- * @param bool $use_wildcards = false, accepts wildcards ? and * in the patern if true
+ * @param bool $use_wildcards = false, accepts wildcards ? and * in the pattern if true
  * @param bool $buddies_only = false,
  * @param int $max = 500 retrieves a maximum of max members, if passed
  * @return array containing information about the matching members
@@ -436,7 +436,7 @@ function resetPassword($memID, $username = null)
 		// Otherwise grab all of them and don't log anything
 		$error_severity = $errors->hasErrors(1) && !$user_info['is_admin'] ? 1 : null;
 		foreach ($errors->prepareErrors($error_severity) as $error)
-			fatal_error($error, $error_severity === null ? false : 'general');
+			Errors::instance()->fatal_error($error, $error_severity === null ? false : 'general');
 
 		// Update the database...
 		updateMemberData($memID, array('member_name' => $user, 'passwd' => $db_hash));
@@ -621,18 +621,18 @@ function rebuildModCache()
 
 	if ($group_query == '0=1')
 	{
-		$request = $db->query('', '
+		$groups = $db->fetchQueryCallback('
 			SELECT id_group
 			FROM {db_prefix}group_moderators
 			WHERE id_member = {int:current_member}',
 			array(
 				'current_member' => $user_info['id'],
-			)
+			),
+			function($row)
+			{
+				return $row['id_group'];
+			}
 		);
-		$groups = array();
-		while ($row = $db->fetch_assoc($request))
-			$groups[] = $row['id_group'];
-		$db->free_result($request);
 
 		if (empty($groups))
 			$group_query = '0=1';
@@ -726,7 +726,7 @@ function isFirstLogin($id_member)
 }
 
 /**
- * Search for a member by given criterias
+ * Search for a member by given criteria
  *
  * @package Authorization
  * @param string $where
@@ -764,7 +764,7 @@ function findUser($where, $where_params, $fatal = true)
 		if ($db->num_rows($request) == 0)
 		{
 			if ($fatal)
-				fatal_lang_error('no_user_with_email', false);
+				Errors::instance()->fatal_lang_error('no_user_with_email', false);
 			else
 				return false;
 		}

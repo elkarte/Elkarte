@@ -1,5 +1,5 @@
 <?php
-// Version: 1.0; Admin
+// Version: 1.1; Admin
 
 $txt['admin_boards'] = 'Boards';
 $txt['admin_back_to'] = 'Back to admin panel';
@@ -398,6 +398,10 @@ $txt['attachmentThumbHeight'] = 'Maximum height of thumbnails';
 $txt['attachment_thumbnail_settings'] = 'Thumbnail Settings';
 $txt['attachment_security_settings'] = 'Attachment security settings';
 
+$txt['attachment_inline_title'] = 'Inline attachment settings';
+$txt['attachment_inline_enabled'] = 'Enable the display of in line attachments';
+$txt['attachment_inline_basicmenu'] = 'Only show basic menu';
+
 $txt['attach_dir_does_not_exist'] = 'Does Not Exist';
 $txt['attach_dir_not_writable'] = 'Not Writable';
 $txt['attach_dir_files_missing'] = 'Files Missing (<a href="{repair_url}">Repair</a>)';
@@ -618,7 +622,6 @@ $txt['bbcTagsToUse'] = 'Enabled BBC tags';
 $txt['bbcTagsToUse_select'] = 'Select the tags allowed to be used';
 $txt['bbcTagsToUse_select_all'] = 'Select all tags';
 
-$txt['enableStickyTopics'] = 'Enable pinned topics';
 $txt['enableParticipation'] = 'Enable participation icons';
 $txt['enableFollowup'] = 'Enable followups';
 $txt['oldTopicDays'] = 'Time before topic is warned as old on reply';
@@ -697,7 +700,6 @@ $txt['badbehavior_title'] = 'Bad Behavior';
 $txt['mods_cat_modifications_misc'] = 'Miscellaneous';
 $txt['mods_cat_layout'] = 'Layout';
 $txt['karma'] = 'Karma';
-$txt['mentions_settings_desc'] = 'Mentioning allow members of your community to be alerted when they are @mentioned in a post, added as a buddy or if one of their posts is liked by another member.';
 $txt['moderation_settings_short'] = 'Moderation';
 $txt['signature_settings_short'] = 'Signatures';
 $txt['custom_profile_shorttitle'] = 'Profile Fields';

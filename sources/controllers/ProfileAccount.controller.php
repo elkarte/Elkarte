@@ -13,7 +13,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:		BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0
+ * @version 1.1 dev
  *
  */
 
@@ -66,7 +66,7 @@ class ProfileAccount_Controller extends Action_Controller
 
 		// Doesn't hurt to be overly cautious.
 		if (empty($modSettings['warning_enable']) || ($context['user']['is_owner'] && !$cur_profile['warning']) || !allowedTo('issue_warning'))
-			fatal_lang_error('no_access', false);
+			Errors::instance()->fatal_lang_error('no_access', false);
 
 		// Get the base (errors related) stuff done.
 		loadLanguage('Errors');
@@ -313,7 +313,7 @@ class ProfileAccount_Controller extends Action_Controller
 							</div>';
 
 							return $ret;
-						
+
 						},
 					),
 				),
@@ -358,7 +358,7 @@ class ProfileAccount_Controller extends Action_Controller
 		foreach ($notification_templates as $row)
 		{
 			// If we're not warning for a message skip any that are.
-			if (!$warning_for_message && strpos($row['body'], '{MESSAGE}') !== false)
+			if ($warning_for_message === false && strpos($row['body'], '{MESSAGE}') !== false)
 				continue;
 
 			$context['notification_templates'][] = array(
@@ -421,7 +421,7 @@ class ProfileAccount_Controller extends Action_Controller
 		global $user_info, $context, $cur_profile, $user_profile, $modSettings;
 
 		// Try get more time...
-		@set_time_limit(600);
+		setTimeLimit(600);
 
 		// @todo Add a way to delete pms as well?
 		if (!$context['user']['is_owner'])
@@ -435,7 +435,7 @@ class ProfileAccount_Controller extends Action_Controller
 
 		// Check we got here as we should have!
 		if ($cur_profile != $user_profile[$memID])
-			fatal_lang_error('no_access', false);
+			Errors::instance()->fatal_lang_error('no_access', false);
 
 		$old_profile = &$cur_profile;
 
@@ -451,7 +451,7 @@ class ProfileAccount_Controller extends Action_Controller
 			$another = isAnotherAdmin($memID);
 
 			if (empty($another))
-				fatal_lang_error('at_least_one_admin', 'critical');
+				Errors::instance()->fatal_lang_error('at_least_one_admin', 'critical');
 		}
 
 		// Do you have permission to delete others profiles, or is that your profile you wanna delete?
@@ -492,6 +492,7 @@ class ProfileAccount_Controller extends Action_Controller
 			// Setup their account for deletion ;)
 			require_once(SUBSDIR . '/Members.subs.php');
 			updateMemberData($memID, array('is_activated' => 4));
+
 			// Another account needs approval...
 			updateSettings(array('unapprovedMembers' => true), true);
 		}

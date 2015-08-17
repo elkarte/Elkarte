@@ -3,7 +3,7 @@
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
- * @version 1.0
+ * @version 1.1 dev
  *
  * This file contains javascript associated with the atwho function as it
  * relates to an sceditor invocation
@@ -150,18 +150,20 @@ var disableDrafts = false;
 			// Init the mention instance, load in the options
 			oMentions = new elk_Mentions(this.opts.mentionOptions);
 
+			var $option_eid = $('#' + oMentions.opts.editor_id);
+
 			// Adds the selector to the list of known "mentioner"
 			add_elk_mention(oMentions.opts.editor_id, {isPlugin: true});
-			oMentions.attachAtWho(oMentions, $('#' + oMentions.opts.editor_id).parent().find('textarea'));
+			oMentions.attachAtWho(oMentions, $option_eid.parent().find('textarea'));
 
 			// Using wysiwyg, then lets attach atwho to it
-			var instance = $('#' + oMentions.opts.editor_id).sceditor('instance');
+			var instance = $option_eid.sceditor('instance');
 			if (!instance.opts.runWithoutWysiwygSupport)
 			{
 				// We need to monitor the iframe window and body to text input
-				var oIframe = $('#' + oMentions.opts.editor_id).parent().find('iframe')[0],
+				var oIframe = $option_eid.parent().find('iframe')[0],
 					oIframeWindow = oIframe.contentWindow,
-					oIframeBody = $('#' + oMentions.opts.editor_id).parent().find('iframe').contents().find('body')[0];
+					oIframeBody = $option_eid.parent().find('iframe').contents().find('body')[0];
 
 					oMentions.attachAtWho(oMentions, $(oIframeBody), oIframeWindow);
 			}

@@ -1,7 +1,7 @@
 <?php
 
 /**
- * This file currently just shows group info, and allows certain priviledged
+ * This file currently just shows group info, and allows certain privileged
  * members to add/remove members.
  *
  * @name      ElkArte Forum
@@ -14,7 +14,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:		BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0
+ * @version 1.1 dev
  *
  */
 
@@ -69,7 +69,8 @@ class Groups_Controller extends Action_Controller
 		if (allowedTo('access_mod_center') || $user_info['mod_cache']['bq'] != '0=1' || $user_info['mod_cache']['gq'] != '0=1' || allowedTo('manage_membergroups'))
 		{
 			$_GET['area'] = (!empty($_REQUEST['sa']) && $_REQUEST['sa'] == 'requests') ? 'groups' : 'viewgroups';
-			$controller = new ModerationCenter_Controller();
+			$controller = new ModerationCenter_Controller(new Event_Manager());
+			$controller->pre_dispatch();
 			$controller->prepareModcenter();
 		}
 		// Otherwise add something to the link tree, for normal people.
@@ -85,7 +86,7 @@ class Groups_Controller extends Action_Controller
 	}
 
 	/**
-	 * This very simply lists the groups, nothing snazy.
+	 * This very simply lists the groups, nothing snazzy.
 	 */
 	public function action_list()
 	{
@@ -226,7 +227,7 @@ class Groups_Controller extends Action_Controller
 
 		// No browsing of guests, membergroup 0 or moderators.
 		if (in_array($current_group, array(-1, 0, 3)))
-			fatal_lang_error('membergroup_does_not_exist', false);
+			Errors::instance()->fatal_lang_error('membergroup_does_not_exist', false);
 
 		// These will be needed
 		require_once(SUBSDIR . '/Membergroups.subs.php');
@@ -270,7 +271,7 @@ class Groups_Controller extends Action_Controller
 
 		// If this group is hidden then it can only "exist" if the user can moderate it!
 		if ($context['group']['hidden'] && !$context['group']['can_moderate'])
-			fatal_lang_error('membergroup_does_not_exist', false);
+			Errors::instance()->fatal_lang_error('membergroup_does_not_exist', false);
 
 		// You can only assign membership if you are the moderator and/or can manage groups!
 		if (!$context['group']['can_moderate'])
@@ -326,7 +327,7 @@ class Groups_Controller extends Action_Controller
 				}
 			}
 
-			// Construct the query pelements, first for adds by name
+			// Construct the query elements, first for adds by name
 			if (!empty($member_ids))
 			{
 				$member_query[] = array('or' => 'member_ids');

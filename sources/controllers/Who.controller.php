@@ -14,7 +14,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:		BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0
+ * @version 1.1 dev
  *
  */
 
@@ -55,7 +55,7 @@ class Who_Controller extends Action_Controller
 
 		// You can't do anything if this is off.
 		if (empty($modSettings['who_enabled']))
-			fatal_lang_error('who_off', false);
+			Errors::instance()->fatal_lang_error('who_off', false);
 
 		// Load the 'Who' template.
 		loadTemplate('Who');

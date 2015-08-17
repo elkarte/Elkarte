@@ -12,7 +12,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0 Beta 2
+ * @version 1.1 dev Beta 2
  *
  */
 
@@ -38,7 +38,7 @@ class Debug
 		'templates' => array(),
 		'sub_templates' => array(),
 		'language_files' => array(),
-		'stylesheets' => array(),
+		'sheets' => array(),
 		'javascript' => array(),
 		'hooks' => array(),
 		'files_included' => array(),
@@ -428,6 +428,10 @@ class Debug
 		}
 	}
 
+	/**
+	 * Return the single instance of this class
+	 * @return Debug
+	 */
 	public static function get()
 	{
 		if (self::$_instance === null)

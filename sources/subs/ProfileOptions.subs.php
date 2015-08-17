@@ -13,7 +13,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0.1
+ * @version 1.1 dev
  *
  */
 
@@ -31,7 +31,7 @@ if (!defined('ELK'))
  */
 function getBuddiesID($buddies, $adding = true)
 {
-	global $modSettings;
+	global $modSettings, $user_info;
 
 	$db = database();
 
@@ -49,7 +49,9 @@ function getBuddiesID($buddies, $adding = true)
 
 	// If we are mentioning buddies, then let them know who's their buddy.
 	if ($adding && !empty($modSettings['mentions_enabled']) && !empty($modSettings['mentions_buddy']))
-		$mentions = new Mentions_Controller();
+	{
+		$notifier = Notifications::getInstance();
+	}
 
 	// Add the new member(s) to the buddies array.
 	$buddiesArray = array();
@@ -58,15 +60,14 @@ function getBuddiesID($buddies, $adding = true)
 		$buddiesArray[] = (int) $row['id_member'];
 
 		// Let them know they have been added as a buddy
-		if (isset($mentions))
+		if (isset($notifier))
 		{
-			// Set a mentions for our buddy.
-			$mentions->setData(array(
-				'id_member' => $row['id_member'],
-				'type' => 'buddy',
-				'id_msg' => 0,
+			$notifier->add(new Notifications_Task(
+				'buddy',
+				$row['id_member'],
+				$user_info['id'],
+				array('id_members' => array($row['id_member']))
 			));
-			$mentions->action_add();
 		}
 	}
 	$db->free_result($request);
@@ -116,7 +117,7 @@ function loadMembergroupsJoin($groups, $memID)
 		if (($row['id_group'] == $context['primary_group'] && $row['group_type'] > 1) || ($row['hidden'] != 2 && $context['primary_group'] == 0 && in_array($row['id_group'], $groups)))
 			$context['can_edit_primary'] = true;
 
-		// If they can't manage (protected) groups, and it's not publically joinable or already assigned, they can't see it.
+		// If they can't manage (protected) groups, and it's not publicly joinable or already assigned, they can't see it.
 		if (((!$context['can_manage_protected'] && $row['group_type'] == 1) || (!$context['can_manage_membergroups'] && $row['group_type'] == 0)) && $row['id_group'] != $context['primary_group'])
 			continue;
 
@@ -148,7 +149,7 @@ function checkMembergroupChange($group_id)
 {
 	$db = database();
 
-	// Chck if non admin users are trying to promote themselves to admin.
+	// Check if non admin users are trying to promote themselves to admin.
 	$request = $db->query('', '
 		SELECT COUNT(permission)
 		FROM {db_prefix}permissions

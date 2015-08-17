@@ -7,7 +7,7 @@
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
- * @version 1.0.2
+ * @version 1.1 dev
  *
  */
 
@@ -74,6 +74,32 @@ class Emailpost_Controller extends Action_Controller
 		$email_message->read_email(true, $email_message->raw_message);
 		$email_message->load_address();
 		$email_message->load_key($key);
+
+		// Check if it's a DSN, and handle it
+		if ($email_message->_is_dsn)
+		{
+			if (!empty($modSettings['pbe_bounce_detect']))
+			{
+				pbe_disable_user_notify($email_message);
+
+				// @todo Notify the user
+				if (!empty($modSettings['pbe_bounce_record']))
+				{
+					// They can record the message anyway, if they so wish
+					return pbe_emailError('error_bounced', $email_message);
+				}
+
+				// If they don't wish, then return false like recording the failure
+				// would do
+				return false;
+			}
+			else
+			{
+				// When the auto-disable function is not turned on, record the DSN
+				// In the failed email table for the admins to handle however
+				return pbe_emailError('error_bounced', $email_message);
+			}
+		}
 
 		// If the feature is on but the post/pm function is not enabled, just log the message.
 		if (empty($modSettings['pbe_post_enabled']) && empty($modSettings['pbe_pm_enabled']))
@@ -177,7 +203,7 @@ class Emailpost_Controller extends Action_Controller
 			// We have now posted or PM'ed .. lets do some database maintenance cause maintenance is fun :'(
 			query_key_maintenance($email_message);
 
-			// Update this user so the log shows they were/are active, no luking in the email ether
+			// Update this user so the log shows they were/are active, no lurking in the email ether
 			query_update_member_stats($pbe, $email_message, $email_message->message_type === 'p' ? $pm_info : $topic_info);
 		}
 
@@ -224,6 +250,34 @@ class Emailpost_Controller extends Action_Controller
 		$email_message->message_type = 'x';
 		$email_message->message_key_id = '';
 		$email_message->message_id = 0;
+
+		// Check if it's a DSN
+		// Hopefully, this will eventually DO something but for now
+		// we'll just add it with a more specific error reason
+		if ($email_message->_is_dsn)
+		{
+			if (!empty($modSettings['pbe_bounce_detect']))
+			{
+				pbe_disable_user_notify($email_message);
+
+				// @todo Notify the user
+				if (!empty($modSettings['pbe_bounce_record']))
+				{
+					// They can record the message anyway, if they so wish
+					return pbe_emailError('error_bounced', $email_message);
+				}
+
+				// If they don't wish, then return false like recording the failure
+				// would do
+				return false;
+			}
+			else
+			{
+				// When the auto-disable function is not turned on, record the DSN
+				// In the failed email table for the admins to handle however
+				return pbe_emailError('error_bounced', $email_message);
+			}
+		}
 
 		// If the feature is on but the post/pm function is not enabled, just log the message.
 		if (empty($modSettings['pbe_post_enabled']))
@@ -595,7 +649,7 @@ function pbe_create_topic($pbe, $email_message, $board_info)
  * Calls the necessary functions to extract and format the message so its ready for posting
  *
  * What it does:
- * - Converts an email response (text or html) to a BBC equivalant via pbe_Email_to_bbc
+ * - Converts an email response (text or html) to a BBC equivalent via pbe_Email_to_bbc
  * - Formats the email response so it looks structured and not chopped up (via pbe_fix_email_body)
  *
  * @package Maillist

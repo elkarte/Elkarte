@@ -12,20 +12,16 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0
+ * @version 1.1 dev
  *
  */
 
 if (!defined('ELK'))
 	die('No access...');
 
-// It should be already defined in Db-type.class.php, but better have it twice
-if (!defined('DB_TYPE'))
-	define('DB_TYPE', 'MySQL');
-
 /**
  * Adds MySQL table level functionality,
- * Table creation / droping, column adding / removing
+ * Table creation / dropping, column adding / removing
  * Most often used during install and Upgrades of the forum and addons
  */
 class DbTable_MySQL extends DbTable
@@ -35,20 +31,6 @@ class DbTable_MySQL extends DbTable
 	 * @var DbTable_MySQL
 	 */
 	private static $_tbl = null;
-
-	/**
-	 * Array of table names we don't allow to be removed by addons.
-	 * @var array
-	 */
-	protected $_reservedTables = null;
-
-	/**
-	 * Keeps a (reverse) log of changes to the table structure, to be undone.
-	 * This is used by Packages admin installation/uninstallation/upgrade.
-	 *
-	 * @var array
-	 */
-	private $_package_log = null;
 
 	/**
 	 * DbTable_MySQL::construct
@@ -83,7 +65,7 @@ class DbTable_MySQL extends DbTable
 
 	/**
 	 * This function can be used to create a table without worrying about schema
-	 *  compatabilities across supported database systems.
+	 *  compatibilities across supported database systems.
 	 *  - If the table exists will, by default, do nothing.
 	 *  - Builds table with columns as passed to it - at least one column must be sent.
 	 *  The columns array should have one sub-array for each column - these sub arrays contain:
@@ -236,27 +218,18 @@ class DbTable_MySQL extends DbTable
 		$this->_package_log[] = array('remove_column', $table_name, $column_info['name']);
 
 		// Does it exist - if so don't add it again!
-		$columns = $this->db_list_columns($table_name, false);
-		foreach ($columns as $column)
-			if ($column == $column_info['name'])
-			{
-				// If we're going to overwrite then use change column.
-				if ($if_exists == 'update')
-					return $this->db_change_column($table_name, $column_info['name'], $column_info);
-				else
-					return false;
-			}
+		if ($this->_get_column_info($table_name, $column_info['name']))
+		{
+			// If we're going to overwrite then use change column.
+			if ($if_exists == 'update')
+				return $this->db_change_column($table_name, $column_info['name'], $column_info);
+			else
+				return false;
+		}
 
 		// Now add the thing!
-		$query = '
-			ALTER TABLE ' . $table_name . '
-			ADD ' . $this->_db_create_query_column($column_info) . (empty($column_info['auto']) ? '' : ' primary key');
-
-		$this->_db->query('', $query,
-			array(
-				'security_override' => true,
-			)
-		);
+		$this->_alter_table($table_name, '
+			ADD ' . $this->_db_create_query_column($column_info) . (empty($column_info['auto']) ? '' : ' primary key'));
 
 		return true;
 	}
@@ -276,20 +249,14 @@ class DbTable_MySQL extends DbTable
 		$table_name = str_replace('{db_prefix}', $db_prefix, $table_name);
 
 		// Does it exist?
-		$columns = $this->db_list_columns($table_name, true);
-		foreach ($columns as $column)
-			if ($column['name'] == $column_name)
-			{
-				$this->_db->query('', '
-					ALTER TABLE ' . $table_name . '
-					DROP COLUMN ' . $column_name,
-					array(
-						'security_override' => true,
-					)
-				);
+		$column = $this->_get_column_info($table_name, $column_name);
+		if ($column !== false)
+		{
+			$this->_alter_table($table_name, '
+				DROP COLUMN ' . $column_name);
 
-				return true;
-			}
+			return true;
+		}
 
 		// If here we didn't have to work - joy!
 		return false;
@@ -311,14 +278,10 @@ class DbTable_MySQL extends DbTable
 		$table_name = str_replace('{db_prefix}', $db_prefix, $table_name);
 
 		// Check it does exist!
-		$columns = $this->db_list_columns($table_name, true);
-		$old_info = null;
-		foreach ($columns as $column)
-			if ($column['name'] == $old_column)
-				$old_info = $column;
+		$old_info = $this->_get_column_info($table_name, $old_column);
 
 		// Nothing?
-		if ($old_info == null)
+		if ($old_info === false)
 			return false;
 
 		// Get the right bits.
@@ -337,13 +300,8 @@ class DbTable_MySQL extends DbTable
 		if (!isset($column_info['unsigned']) || !in_array($column_info['type'], array('int', 'tinyint', 'smallint', 'mediumint', 'bigint')))
 			$column_info['unsigned'] = '';
 
-		$this->_db->query('', '
-			ALTER TABLE ' . $table_name . '
-			CHANGE COLUMN `' . $old_column . '` ' . $this->_db_create_query_column($column_info),
-			array(
-				'security_override' => true,
-			)
-		);
+		$this->_alter_table($table_name, '
+			CHANGE COLUMN `' . $old_column . '` ' . $this->_db_create_query_column($column_info));
 	}
 
 	/**
@@ -400,23 +358,13 @@ class DbTable_MySQL extends DbTable
 		// If we're here we know we don't have the index - so just add it.
 		if (!empty($index_info['type']) && $index_info['type'] == 'primary')
 		{
-			$this->_db->query('', '
-				ALTER TABLE ' . $table_name . '
-				ADD PRIMARY KEY (' . $columns . ')',
-				array(
-					'security_override' => true,
-				)
-			);
+			$this->_alter_table($table_name, '
+				ADD PRIMARY KEY (' . $columns . ')');
 		}
 		else
 		{
-			$this->_db->query('', '
-				ALTER TABLE ' . $table_name . '
-				ADD ' . (isset($index_info['type']) && $index_info['type'] == 'unique' ? 'UNIQUE' : 'INDEX') . ' ' . $index_info['name'] . ' (' . $columns . ')',
-				array(
-					'security_override' => true,
-				)
-			);
+			$this->_alter_table($table_name, '
+				ADD ' . (isset($index_info['type']) && $index_info['type'] == 'unique' ? 'UNIQUE' : 'INDEX') . ' ' . $index_info['name'] . ' (' . $columns . ')');
 		}
 	}
 
@@ -443,13 +391,8 @@ class DbTable_MySQL extends DbTable
 			if ($index['type'] == 'primary' && $index_name == 'primary')
 			{
 				// Dropping primary key?
-				$this->_db->query('', '
-					ALTER TABLE ' . $table_name . '
-					DROP PRIMARY KEY',
-					array(
-						'security_override' => true,
-					)
-				);
+				$this->_alter_table($table_name, '
+					DROP PRIMARY KEY');
 
 				return true;
 			}
@@ -457,13 +400,8 @@ class DbTable_MySQL extends DbTable
 			if ($index['name'] == $index_name)
 			{
 				// Drop the bugger...
-				$this->_db->query('', '
-					ALTER TABLE ' . $table_name . '
-					DROP INDEX ' . $index_name,
-					array(
-						'security_override' => true,
-					)
-				);
+				$this->_alter_table($table_name, '
+					DROP INDEX ' . $index_name);
 
 				return true;
 			}

@@ -13,7 +13,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:		BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0
+ * @version 1.1 dev
  *
  */
 
@@ -91,7 +91,7 @@ class Help_Controller extends Action_Controller
 		global $txt, $helptxt, $context, $scripturl;
 
 		if (!isset($_GET['help']) || !is_string($_GET['help']))
-			fatal_lang_error('no_access', false);
+			Errors::instance()->fatal_lang_error('no_access', false);
 
 		if (!isset($helptxt))
 			$helptxt = array();

@@ -13,7 +13,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:		BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0.2
+ * @version 1.1 dev
  *
  */
 
@@ -29,8 +29,26 @@ if (!defined('ELK'))
  *
  * @package Admin
  */
+
 class Admin_Controller extends Action_Controller
 {
+	/**
+	 * Holds instance of HttpReq object
+	 * @var HttpReq
+	 */
+	private $_req;
+
+	/**
+	 * Pre Dispatch, called before other methods.  Loads integration hooks
+	 * and HttpReq instance.
+	 */
+	public function pre_dispatch()
+	{
+		Hooks::get()->loadIntegrationsSettings();
+
+		$this->_req = HttpReq::instance();
+	}
+
 	/**
 	 * The main admin handling function.
 	 *
@@ -60,6 +78,7 @@ class Admin_Controller extends Action_Controller
 
 		// Need these to do much
 		require_once(SUBSDIR . '/Menu.subs.php');
+		require_once(SUBSDIR . '/Admin.subs.php');
 
 		// Define the menu structure - see subs/Menu.subs.php for details!
 		$admin_areas = array(
@@ -331,28 +350,6 @@ class Admin_Controller extends Action_Controller
 							'settings' => array($txt['settings']),
 						),
 					),
-					'managecalendar' => array(
-						'label' => $txt['manage_calendar'],
-						'controller' => 'ManageCalendar_Controller',
-						'function' => 'action_index',
-						'icon' => 'transparent.png',
-						'class' => 'admin_img_calendar',
-						'permission' => array('admin_forum'),
-						'enabled' => in_array('cd', $context['admin_features']),
-						'subsections' => array(
-							'holidays' => array($txt['manage_holidays'], 'admin_forum', 'enabled' => !empty($modSettings['cal_enabled'])),
-							'settings' => array($txt['calendar_settings'], 'admin_forum'),
-						),
-					),
-					'managedrafts' => array(
-						'label' => $txt['manage_drafts'],
-						'controller' => 'ManageDrafts_Controller',
-						'function' => 'action_index',
-						'icon' => 'transparent.png',
-						'class' => 'admin_img_logs',
-						'permission' => array('admin_forum'),
-						'enabled' => in_array('dr', $context['admin_features']),
-					),
 				),
 			),
 			'members' => array(
@@ -534,6 +531,8 @@ class Admin_Controller extends Action_Controller
 			),
 		);
 
+		$this->_getModulesMenu($admin_areas);
+
 		// Any files to include for administration?
 		call_integration_include_hook('integrate_admin_include');
 
@@ -545,7 +544,7 @@ class Admin_Controller extends Action_Controller
 
 		// Nothing valid?
 		if ($admin_include_data == false)
-			fatal_lang_error('no_access', false);
+			Errors::instance()->fatal_lang_error('no_access', false);
 
 		// Build the link tree.
 		$context['linktree'][] = array(
@@ -580,6 +579,27 @@ class Admin_Controller extends Action_Controller
 	}
 
 	/**
+	 * Searches the ADMINDIR looking for module managers and load the corresponding
+	 * admin menu entry.
+	 *
+	 * @param mixed[] $admin_areas The admin menu array
+	 */
+	protected function _getModulesMenu(&$admin_areas)
+	{
+		$glob = new GlobIterator(ADMINDIR . '/Manage*Module.controller.php', FilesystemIterator::SKIP_DOTS);
+
+		foreach ($glob as $file)
+		{
+			$name = $file->getBasename('.controller.php');
+			$class = $name . '_Controller';
+			$module = strtolower(substr($name, 6, -6));
+
+			if (isModuleEnabled($module) && method_exists($class, 'addAdminMenu') )
+				$class::addAdminMenu($admin_areas);
+		}
+	}
+
+	/**
 	 * The main administration section.
 	 *
 	 * What it does:
@@ -593,11 +613,10 @@ class Admin_Controller extends Action_Controller
 	 */
 	public function action_home()
 	{
-		global $forum_version, $txt, $scripturl, $context, $user_info, $settings;
+		global $txt, $scripturl, $context, $user_info, $settings;
 
 		// We need a little help
 		require_once(SUBSDIR . '/Membergroups.subs.php');
-		require_once(SUBSDIR . '/Admin.subs.php');
 
 		// You have to be able to do at least one of the below to see this page.
 		isAllowedTo(array('admin_forum', 'manage_permissions', 'moderate_forum', 'manage_membergroups', 'manage_bans', 'send_mail', 'edit_news', 'manage_boards', 'manage_smileys', 'manage_attachments'));
@@ -611,7 +630,7 @@ class Admin_Controller extends Action_Controller
 
 		// This makes it easier to get the latest news with your time format.
 		$context['time_format'] = urlencode($user_info['time_format']);
-		$context['forum_version'] = $forum_version;
+		$context['forum_version'] = FORUM_VERSION;
 
 		// Get a list of current server versions.
 		$checkFor = array(
@@ -650,12 +669,12 @@ class Admin_Controller extends Action_Controller
 	 *
 	 * What it does:
 	 * - Determines the current level of support functions from the server, such as
-	 * current level of caching engine or graphics librayrs installed.
+	 * current level of caching engine or graphics library's installed.
 	 * - Accessed by ?action=admin;area=credits
 	 */
 	public function action_credits()
 	{
-		global $forum_version, $txt, $scripturl, $context, $user_info, $modSettings;
+		global $txt, $scripturl, $context, $user_info;
 
 		// We need a little help from our friends
 		require_once(SUBSDIR . '/Membergroups.subs.php');
@@ -683,7 +702,7 @@ class Admin_Controller extends Action_Controller
 
 		// This makes it easier to get the latest news with your time format.
 		$context['time_format'] = urlencode($user_info['time_format']);
-		$context['forum_version'] = $forum_version;
+		$context['forum_version'] = FORUM_VERSION;
 
 		// Get a list of current server versions.
 		$checkFor = array(
@@ -721,6 +740,13 @@ class Admin_Controller extends Action_Controller
 
 	/**
 	 * This function allocates out all the search stuff.
+	 *
+	 * What it does:
+	 * - Accessed with /index.php?action=admin;area=search[;search_type=x]
+	 * - Sets up an array of applicable sub-actions (search types) and the function that goes with each
+	 * - Search type specified by "search_type" request variable (either from a
+	 * form or from the query string) Defaults to 'internal'
+	 * 	Calls the appropriate sub action based on the search_type
 	 */
 	public function action_search()
 	{
@@ -749,12 +775,12 @@ class Admin_Controller extends Action_Controller
 
 		// Setup for the template
 		$context['search_type'] = $subAction;
-		$context['search_term'] = isset($_REQUEST['search_term']) ? Util::htmlspecialchars($_REQUEST['search_term'], ENT_QUOTES) : '';
+		$context['search_term'] = $this->_req->getPost('search_term', 'trim|Util::htmlspecialchars[ENT_QUOTES]');
 		$context['sub_template'] = 'admin_search_results';
 		$context['page_title'] = $txt['admin_search_results'];
 
 		// You did remember to enter something to search for, otherwise its easy
-		if (trim($context['search_term']) == '')
+		if ($context['search_term'] === '')
 			$context['search_results'] = array();
 		else
 			$action->dispatch($subAction);
@@ -762,6 +788,14 @@ class Admin_Controller extends Action_Controller
 
 	/**
 	 * A complicated but relatively quick internal search.
+	 *
+	 * What it does:
+	 * - Can be accessed with /index.php?action=admin;sa=search;search_term=x) or
+	 * from the admin search form ("Task/Setting" option)
+	 * - Polls the controllers for their configuration settings
+	 * - Calls integrate_admin_search to allow addons to add search configs
+	 * - Loads up the "Help" language file and all of the "Manage" language files
+	 * - Loads up information about each item it found for the template
 	 */
 	public function action_search_internal()
 	{
@@ -772,21 +806,21 @@ class Admin_Controller extends Action_Controller
 
 		// Load a lot of language files.
 		$language_files = array(
-			'Help', 'ManageMail', 'ManageSettings', 'ManageCalendar', 'ManageBoards', 'ManagePaid', 'ManagePermissions', 'Search',
-			'Login', 'ManageSmileys', 'Maillist',
+			'Help', 'ManageMail', 'ManageSettings', 'ManageBoards', 'ManagePaid', 'ManagePermissions', 'Search',
+			'Login', 'ManageSmileys', 'Maillist', 'Mentions'
 		);
 
 		// All the files we need to include.
 		$include_files = array(
 			'AddonSettings.controller', 'AdminLog.controller', 'CoreFeatures.controller',
 			'ManageAttachments.controller', 'ManageAvatars.controller', 'ManageBBC.controller',
-			'ManageBoards.controller', 'ManageCalendar.controller', 'ManageDrafts.controller',
+			'ManageBoards.controller',
 			'ManageFeatures.controller', 'ManageLanguages.controller', 'ManageMail.controller',
 			'ManageNews.controller', 'ManagePaid.controller', 'ManagePermissions.controller',
 			'ManagePosts.controller', 'ManageRegistration.controller', 'ManageSearch.controller',
 			'ManageSearchEngines.controller', 'ManageSecurity.controller', 'ManageServer.controller',
 			'ManageSmileys.controller', 'ManageTopics.controller', 'ManageMaillist.controller',
-			'ManageMembergroups.controller',
+			'ManageMembergroups.controller'
 		);
 
 		// This is a special array of functions that contain setting data
@@ -805,8 +839,6 @@ class Admin_Controller extends Action_Controller
 			array('settings_search', 'area=manageattachments;sa=avatars', 'ManageAvatars_Controller'),
 			array('settings_search', 'area=postsettings;sa=bbc', 'ManageBBC_Controller'),
 			array('settings_search', 'area=manageboards;sa=settings', 'ManageBoards_Controller'),
-			array('settings_search', 'area=managecalendar;sa=settings', 'ManageCalendar_Controller'),
-			array('settings_search', 'area=managedrafts', 'ManageDrafts_Controller'),
 			array('settings_search', 'area=languages;sa=settings', 'ManageLanguages_Controller'),
 			array('settings_search', 'area=mailqueue;sa=settings', 'ManageMail_Controller'),
 			array('settings_search', 'area=maillist;sa=emailsettings', 'ManageMaillist_Controller'),
@@ -836,7 +868,7 @@ class Admin_Controller extends Action_Controller
 		// Go through all the search data trying to find this text!
 		$search_term = strtolower(un_htmlspecialchars($context['search_term']));
 
-		$search = new Settings_Search($language_files, $include_files, $settings_search);
+		$search = new AdminSettings_Search($language_files, $include_files, $settings_search);
 		$search->initSearch($context['admin_menu_name'], array(
 			array('COPPA', 'area=regcenter;sa=settings'),
 			array('CAPTCHA', 'area=securitysettings;sa=spam'),
@@ -857,7 +889,8 @@ class Admin_Controller extends Action_Controller
 		$_POST['membername'] = un_htmlspecialchars($context['search_term']);
 		$_POST['types'] = '';
 
-		$managemembers = new ManageMembers_Controller();
+		$managemembers = new ManageMembers_Controller(new Event_manager());
+		$managemembers->pre_dispatch();
 		$managemembers->action_index();
 	}
 
@@ -889,10 +922,10 @@ class Admin_Controller extends Action_Controller
 		$search_results = fetch_web_data($context['doc_apiurl'] . '?action=query&list=search&srprop=timestamp|snippet&format=xml&srwhat=text&srsearch=' . $postVars);
 
 		// If we didn't get any xml back we are in trouble - perhaps the doc site is overloaded?
-		if (!$search_results || preg_match('~<' . '\?xml\sversion="\d+\.\d+"\?>\s*(<api>.+?</api>)~is', $search_results, $matches) != true)
-			fatal_lang_error('cannot_connect_doc_site');
+		if (!$search_results || preg_match('~<' . '\?xml\sversion="\d+\.\d+"\?>\s*(<api>.+?</api>)~is', $search_results, $matches) !== 1)
+			Errors::instance()->fatal_lang_error('cannot_connect_doc_site');
 
-		$search_results = $matches[1];
+		$search_results = !empty($matches[1]) ? $matches[1] : '';
 
 		// Otherwise we simply walk through the XML and stick it in context for display.
 		$context['search_results'] = array();
@@ -902,7 +935,7 @@ class Admin_Controller extends Action_Controller
 
 		// Move through the api layer.
 		if (!$results->exists('api'))
-			fatal_lang_error('cannot_connect_doc_site');
+			Errors::instance()->fatal_lang_error('cannot_connect_doc_site');
 
 		// Are there actually some results?
 		if ($results->exists('api/query/search/p'))
@@ -930,7 +963,7 @@ class Admin_Controller extends Action_Controller
 		// Clean any admin tokens as well.
 		cleanTokens(false, '-admin');
 
-		if (isset($_GET['redir']) && isset($_SERVER['HTTP_REFERER']))
+		if (isset($this->_req->query->redir, $this->_req->server->HTTP_REFERER))
 			redirectexit($_SERVER['HTTP_REFERER']);
 		else
 			redirectexit();

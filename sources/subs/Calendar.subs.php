@@ -13,7 +13,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0
+ * @version 1.1 dev
  *
  */
 
@@ -268,6 +268,7 @@ function getHolidayRange($low_date, $high_date)
  * - if the user doesn't have proper permissions, an error will be shown.
  *
  * @package Calendar
+ * @todo pass $board, $topic and $user_info['id'] as arguments with fallback for 1.1
  */
 function canLinkEvent()
 {
@@ -278,9 +279,9 @@ function canLinkEvent()
 
 	// No board?  No topic?!?
 	if (empty($board))
-		fatal_lang_error('missing_board_id', false);
+		Errors::instance()->fatal_lang_error('missing_board_id', false);
 	if (empty($topic))
-		fatal_lang_error('missing_topic_id', false);
+		Errors::instance()->fatal_lang_error('missing_topic_id', false);
 
 	// Administrator, Moderator, or owner.  Period.
 	if (!allowedTo('admin_forum') && !allowedTo('moderate_board'))
@@ -291,11 +292,11 @@ function canLinkEvent()
 		{
 			// Not the owner of the topic.
 			if ($row['id_member_started'] != $user_info['id'])
-				fatal_lang_error('not_your_topic', 'user');
+				Errors::instance()->fatal_lang_error('not_your_topic', 'user');
 		}
 		// Topic/Board doesn't exist.....
 		else
-			fatal_lang_error('calendar_no_topic', 'general');
+			Errors::instance()->fatal_lang_error('calendar_no_topic', 'general');
 	}
 }
 
@@ -552,7 +553,7 @@ function getCalendarWeek($month, $year, $day, $calendarOptions)
 
 		$calendarGrid['week_number'] = (int) strftime('%U', mktime(0, 0, 0, $month, $day, $year)) + $nWeekAdjust;
 
-		// If this crosses a year boundry and includes january it should be week one.
+		// If this crosses a year boundary and includes january it should be week one.
 		if ((int) strftime('%Y', $curTimestamp + 518400) != $year && $calendarGrid['week_number'] > 53 && $first_day_of_next_year < 5)
 			$calendarGrid['week_number'] = 1;
 	}
@@ -1016,10 +1017,8 @@ function eventInfoForTopic($id_topic)
 {
 	$db = database();
 
-	$events = array();
-
 	// Get event for this topic. If we have one.
-	$request = $db->query('', '
+	return $db->fetchQuery('
 		SELECT cal.id_event, cal.start_date, cal.end_date, cal.title, cal.id_member, mem.real_name
 		FROM {db_prefix}calendar AS cal
 			LEFT JOIN {db_prefix}members AS mem ON (mem.id_member = cal.id_member)
@@ -1029,12 +1028,6 @@ function eventInfoForTopic($id_topic)
 			'current_topic' => $id_topic,
 		)
 	);
-
-	while ($row = $db->fetch_assoc($request))
-		$events[] = $row;
-	$db->free_result($request);
-
-	return $events;
 }
 
 /**
@@ -1050,7 +1043,7 @@ function list_getHolidays($start, $items_per_page, $sort)
 {
 	$db = database();
 
-	$request = $db->query('', '
+	return $db->fetchQuery('
 		SELECT id_holiday, YEAR(event_date) AS year, MONTH(event_date) AS month, DAYOFMONTH(event_date) AS day, title
 		FROM {db_prefix}calendar_holidays
 		ORDER BY {raw:sort}
@@ -1059,12 +1052,6 @@ function list_getHolidays($start, $items_per_page, $sort)
 			'sort' => $sort,
 		)
 	);
-	$holidays = array();
-	while ($row = $db->fetch_assoc($request))
-		$holidays[] = $row;
-	$db->free_result($request);
-
-	return $holidays;
 }
 
 /**
@@ -1093,11 +1080,14 @@ function list_getNumHolidays()
  * Remove a holiday from the calendar.
  *
  * @package Calendar
- * @param int[] $holiday_ids An array of ids for holidays.
+ * @param int|int[] $holiday_ids An array of ids for holidays.
  */
 function removeHolidays($holiday_ids)
 {
 	$db = database();
+
+	if (!is_array($holiday_ids))
+		$holiday_ids = array($holiday_ids);
 
 	$db->query('', '
 		DELETE FROM {db_prefix}calendar_holidays
@@ -1215,7 +1205,7 @@ function getHoliday($id_holiday)
  */
 function build_ical_content($event)
 {
-	global $forum_version, $webmaster_email, $mbname;
+	global $webmaster_email, $mbname;
 
 	// Check the title isn't too long - iCal requires some formatting if so.
 	$title = str_split($event['title'], 30);
@@ -1242,7 +1232,7 @@ function build_ical_content($event)
 	$filecontents = '';
 	$filecontents .= 'BEGIN:VCALENDAR' . "\n";
 	$filecontents .= 'METHOD:PUBLISH' . "\n";
-	$filecontents .= 'PRODID:-//ElkArteCommunity//ElkArte ' . (empty($forum_version) ? 2.0 : strtr($forum_version, array('ElkArte ' => ''))) . '//EN' . "\n";
+	$filecontents .= 'PRODID:-//ElkArteCommunity//ElkArte ' . (!defined('FORUM_VERSION') ? 2.0 : strtr(FORUM_VERSION, array('ElkArte ' => ''))) . '//EN' . "\n";
 	$filecontents .= 'VERSION:2.0' . "\n";
 	$filecontents .= 'BEGIN:VEVENT' . "\n";
 	$filecontents .= 'ORGANIZER;CN="' . $event['realname'] . '":MAILTO:' . $webmaster_email . "\n";

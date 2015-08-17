@@ -15,7 +15,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:		BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0.2
+ * @version 1.1 dev
  *
  */
 
@@ -46,8 +46,10 @@ class Profile_Controller extends Action_Controller
 
 		// Don't reload this as we may have processed error strings.
 		if (empty($post_errors))
-			loadLanguage('Profile+Drafts');
+			loadLanguage('Profile');
 		loadTemplate('Profile');
+
+		$this->_events->trigger('pre_load', array('post_errors' => $post_errors));
 
 		require_once(SUBSDIR . '/Menu.subs.php');
 		require_once(SUBSDIR . '/Profile.subs.php');
@@ -123,16 +125,6 @@ class Profile_Controller extends Action_Controller
 						'permission' => array(
 							'own' => 'profile_view_own',
 							'any' => 'profile_view_any',
-						),
-					),
-					'showdrafts' => array(
-						'label' => $txt['drafts_show'],
-						'controller' => 'Draft_Controller',
-						'function' => 'action_showProfileDrafts',
-						'enabled' => !empty($modSettings['drafts_enabled']) && $context['user']['is_owner'],
-						'permission' => array(
-							'own' => 'profile_view_own',
-							'any' => array(),
 						),
 					),
 					'showlikes' => array(
@@ -401,7 +393,7 @@ class Profile_Controller extends Action_Controller
 
 		// No menu means no access.
 		if (!$profile_include_data || (isset($profile_include_data['enabled']) && $profile_include_data['enabled'] === false))
-			fatal_lang_error('no_access', false);
+			Errors::instance()->fatal_lang_error('no_access', false);
 
 		// Make a note of the Unique ID for this menu.
 		$context['profile_menu_id'] = $context['max_menu_id'];
@@ -424,7 +416,7 @@ class Profile_Controller extends Action_Controller
 		}
 
 		// Does this require session validating?
-		if (!empty($area['validate']) || (isset($_REQUEST['save']) && !$context['user']['is_owner']))
+		if (!empty($profile_include_data['validate']) || (isset($_REQUEST['save']) && !$context['user']['is_owner']))
 			validateSession();
 
 		// Do we need to perform a token check?
@@ -541,7 +533,8 @@ class Profile_Controller extends Action_Controller
 			{
 				if (empty($post_errors))
 				{
-					$controller = new ProfileAccount_Controller();
+					$controller = new ProfileAccount_Controller(new Event_Manager());
+					$controller->pre_dispatch();
 					$controller->action_activateaccount();
 				}
 			}
@@ -549,14 +542,16 @@ class Profile_Controller extends Action_Controller
 			{
 				if (empty($post_errors))
 				{
-					$controller = new ProfileAccount_Controller();
+					$controller = new ProfileAccount_Controller(new Event_Manager());
+					$controller->pre_dispatch();
 					$controller->action_deleteaccount2();
 					redirectexit();
 				}
 			}
 			elseif ($current_area == 'groupmembership' && empty($post_errors))
 			{
-				$controller = new Profileoptions_Controller();
+				$controller = new Profileoptions_Controller(new Event_Manager());
+				$controller->pre_dispatch();
 				$msg = $controller->action_groupMembership2();
 
 				// Whatever we've done, we have nothing else to do here...
@@ -565,7 +560,8 @@ class Profile_Controller extends Action_Controller
 			// Authentication changes?
 			elseif ($current_area == 'authentication')
 			{
-				$controller = new ProfileOptions_Controller();
+				$controller = new Profileoptions_Controller(new Event_Manager());
+				$controller->pre_dispatch();
 				$controller->action_authentication(true);
 			}
 			elseif (in_array($current_area, array('account', 'forumprofile', 'theme', 'contactprefs')))

@@ -14,7 +14,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:		BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0.1
+ * @version 1.1 dev
  *
  */
 
@@ -33,6 +33,26 @@ class ManagePermissions_Controller extends Action_Controller
 	 * @var Settings_Form
 	 */
 	protected $_permSettings;
+
+	/**
+	 * The profile ID that we are working with
+	 * @var int|null
+	 */
+	protected $_pid = null;
+
+	/**
+	 * Holds instance of HttpReq object
+	 * @var HttpReq
+	 */
+	protected $_req;
+
+	/**
+	 * Pre Dispatch, called before other methods.  Loads HttpReq
+	 */
+	public function pre_dispatch()
+	{
+		$this->_req = HttpReq::instance();
+	}
 
 	/**
 	 * Dispaches to the right function based on the given subaction.
@@ -119,7 +139,7 @@ class ManagePermissions_Controller extends Action_Controller
 		);
 
 		// Set the subAction, taking permissions in to account
-		$subAction = isset($_REQUEST['sa']) && isset($subActions[$_REQUEST['sa']]) && empty($subActions[$_REQUEST['sa']]['disabled']) ? $_REQUEST['sa'] : (allowedTo('manage_permissions') ? 'index' : 'settings');
+		$subAction = isset($this->_req->query->sa) && isset($subActions[$this->_req->query->sa]) && empty($subActions[$this->_req->query->sa]['disabled']) ? $this->_req->query->sa : (allowedTo('manage_permissions') ? 'index' : 'settings');
 
 		// Load the subactions, call integrate_sa_manage_permissions
 		$action->initialize($subActions);
@@ -153,11 +173,11 @@ class ManagePermissions_Controller extends Action_Controller
 		$context['page_title'] = $txt['permissions_title'];
 
 		// pid = profile id
-		if (!empty($_REQUEST['pid']))
-			$_REQUEST['pid'] = (int) $_REQUEST['pid'];
+		if (!empty($this->_req->query->pid))
+			$this->_pid = (int) $this->_req->query->pid;
 
 		// We can modify any permission set apart from the read only, reply only and no polls ones as they are redefined.
-		$context['can_modify'] = empty($_REQUEST['pid']) || $_REQUEST['pid'] == 1 || $_REQUEST['pid'] > 4;
+		$context['can_modify'] = empty($this->_pid) || $this->_pid == 1 || $this->_pid > 4;
 
 		// Load all the permissions. We'll need them in the template.
 		loadAllPermissions();
@@ -168,7 +188,7 @@ class ManagePermissions_Controller extends Action_Controller
 		$listOptions = array(
 			'id' => 'regular_membergroups_list',
 			'title' => $txt['membergroups_regular'],
-			'base_href' => $scripturl . '?action=admin;area=permissions;sa=index' . (isset($_REQUEST['sort2']) ? ';sort2=' . urlencode($_REQUEST['sort2']) : '') . (isset($_REQUEST['pid']) ? ';pid=' . $_REQUEST['pid'] : ''),
+			'base_href' => $scripturl . '?action=admin;area=permissions;sa=index' . (isset($this->_req->query->sort2) ? ';sort2=' . urlencode($this->_req->query->sort2) : '') . (isset($this->_pid) ? ';pid=' . $this->_pid : ''),
 			'default_sort_col' => 'name',
 			'get_items' => array(
 				'file' => SUBSDIR . '/Membergroups.subs.php',
@@ -180,7 +200,7 @@ class ManagePermissions_Controller extends Action_Controller
 					allowedTo('admin_forum'),
 					true,
 					true,
-					isset($_REQUEST['pid']) ? $_REQUEST['pid'] : null,
+					$this->_pid,
 				),
 			),
 			'columns' => array(
@@ -275,7 +295,7 @@ class ManagePermissions_Controller extends Action_Controller
 							global $scripturl, $txt;
 
 							if ($rowData['id_group'] != 1)
-								return '<a href="' . $scripturl . '?action=admin;area=permissions;sa=modify;group=' . $rowData['id_group'] . '' . (isset($_REQUEST['pid']) ? ';pid=' . $_REQUEST['pid'] : '') . '">' . $txt['membergroups_modify'] . '</a>';
+								return '<a href="' . $scripturl . '?action=admin;area=permissions;sa=modify;group=' . $rowData['id_group'] . '' . (isset($this->_pid) ? ';pid=' . $this->_pid : '') . '">' . $txt['membergroups_modify'] . '</a>';
 						},
 					),
 				),
@@ -301,10 +321,11 @@ class ManagePermissions_Controller extends Action_Controller
 		// The second list shows the post count based groups...if enabled
 		if (!empty($modSettings['permission_enable_postgroups']))
 		{
+			$_pid = isset($this->_pid) ? $this->_pid : null;
 			$listOptions = array(
 				'id' => 'post_count_membergroups_list',
 				'title' => $txt['membergroups_post'],
-				'base_href' => $scripturl . '?action=admin;area=permissions;sa=index' . (isset($_REQUEST['sort2']) ? ';sort2=' . urlencode($_REQUEST['sort2']) : '') . (isset($_REQUEST['pid']) ? ';pid=' . $_REQUEST['pid'] : ''),
+				'base_href' => $scripturl . '?action=admin;area=permissions;sa=index' . (isset($this->_req->query->sort2) ? ';sort2=' . urlencode($this->_req->query->sort2) : '') . (isset($this->_pid) ? ';pid=' . $this->_pid : ''),
 				'default_sort_col' => 'required_posts',
 				'request_vars' => array(
 					'sort' => 'sort2',
@@ -320,7 +341,7 @@ class ManagePermissions_Controller extends Action_Controller
 						allowedTo('admin_forum'),
 						false,
 						true,
-						isset($_REQUEST['pid']) ? $_REQUEST['pid'] : null,
+						$this->_pid,
 					),
 				),
 				'columns' => array(
@@ -403,14 +424,16 @@ class ManagePermissions_Controller extends Action_Controller
 							'class' => 'grid17',
 						),
 						'data' => array(
-							'function' => create_function('$rowData', '
+							'function' => function($rowData) use ($_pid) {
 								global $scripturl, $txt;
 
-								if ($rowData[\'id_parent\'] == -2)
-										return \'<a href="\' . $scripturl . \'?action=admin;area=permissions;sa=modify;group=\' . $rowData[\'id_group\'] . (isset($_REQUEST[\'pid\']) ? \';pid=\' . $_REQUEST[\'pid\'] : \'\') . \'">\' . $txt[\'membergroups_modify\'] . \'</a>\';
+								if ($rowData['id_parent'] == -2)
+										return '<a href="' . $scripturl . '?action=admin;area=permissions;sa=modify;group=' . $rowData['id_group'] . (isset($_pid) ? ';pid=' . $_pid : '') . '">' . $txt['membergroups_modify'] . '</a>';
 									else
-										return \'<span class="smalltext">\' . $txt[\'permissions_includes_inherited_from\'] . \'&quot;\' .  $rowData[\'parent_name\'] . \'&quot;\' . \'</span><br /><a href="\' . $scripturl . \'?action=admin;area=permissions;sa=modify;group=\' . $rowData[\'id_parent\'] . (isset($_REQUEST[\'pid\']) ? \';pid=\' . $_REQUEST[\'pid\'] : \'\') . \'">\' . $txt[\'membergroups_modify_parent\'] . \'</a>\';
-							'),
+										return '<span class="smalltext">' . $txt['permissions_includes_inherited_from'] . '&quot;' .  $rowData['parent_name'] . '&quot;</span>
+											<br />
+											<a href="' . $scripturl . '?action=admin;area=permissions;sa=modify;group=' . $rowData['id_parent'] . (isset($_pid) ? ';pid=' . $_pid : '') . '">' . $txt['membergroups_modify_parent'] . '</a>';
+							}
 						),
 					),
 					'check' => array(
@@ -436,17 +459,17 @@ class ManagePermissions_Controller extends Action_Controller
 		}
 
 		// pid = profile id
-		if (!empty($_REQUEST['pid']))
+		if (!empty($this->_pid))
 		{
-			if (!isset($context['profiles'][$_REQUEST['pid']]))
-				fatal_lang_error('no_access', false);
+			if (!isset($context['profiles'][$this->_pid]))
+				Errors::instance()->fatal_lang_error('no_access', false);
 
 			// Change the selected tab to better reflect that this really is a board profile.
 			$context[$context['admin_menu_name']]['current_subsection'] = 'profiles';
 
 			$context['profile'] = array(
-				'id' => $_REQUEST['pid'],
-				'name' => $context['profiles'][$_REQUEST['pid']]['name'],
+				'id' => $this->_pid,
+				'name' => $context['profiles'][$this->_pid]['name'],
 			);
 		}
 
@@ -467,19 +490,17 @@ class ManagePermissions_Controller extends Action_Controller
 		require_once(SUBSDIR . '/ManagePermissions.subs.php');
 
 		$context['page_title'] = $txt['permissions_boards'];
-		$context['edit_all'] = isset($_GET['edit']);
+		$context['edit_all'] = isset($this->_req->query->edit);
 
 		// Saving?
-		if (!empty($_POST['save_changes']) && !empty($_POST['boardprofile']))
+		if (!empty($this->_req->post->save_changes) && !empty($this->_req->post->boardprofile))
 		{
 			checkSession('request');
 			validateToken('admin-mpb');
 
 			$changes = array();
-			foreach ($_POST['boardprofile'] as $board => $profile)
-			{
+			foreach ($this->_req->post->boardprofile as $board => $profile)
 				$changes[(int) $profile][] = (int) $board;
-			}
 
 			if (!empty($changes))
 			{
@@ -557,97 +578,94 @@ class ManagePermissions_Controller extends Action_Controller
 		loadIllegalGuestPermissions();
 
 		// Make sure only one of the quick options was selected.
-		if ((!empty($_POST['predefined']) && ((isset($_POST['copy_from']) && $_POST['copy_from'] != 'empty') || !empty($_POST['permissions']))) || (!empty($_POST['copy_from']) && $_POST['copy_from'] != 'empty' && !empty($_POST['permissions'])))
-			fatal_lang_error('permissions_only_one_option', false);
+		if ((!empty($this->_req->post->predefined) && ((isset($this->_req->post->copy_from) && $this->_req->post->copy_from != 'empty') || !empty($this->_req->post->permissions))) || (!empty($this->_req->post->copy_from) && $this->_req->post->copy_from != 'empty' && !empty($this->_req->post->permissions)))
+			Errors::instance()->fatal_lang_error('permissions_only_one_option', false);
 
-		if (empty($_POST['group']) || !is_array($_POST['group']))
-			$_POST['group'] = array();
+		if (empty($this->_req->post->group) || !is_array($this->_req->post->group))
+			$this->_req->post->group = array();
 
 		// Only accept numeric values for selected membergroups.
-		foreach ($_POST['group'] as $id => $group_id)
-			$_POST['group'][$id] = (int) $group_id;
-		$_POST['group'] = array_unique($_POST['group']);
+		foreach ($this->_req->post->group as $id => $group_id)
+			$this->_req->post->group[$id] = (int) $group_id;
+		$this->_req->post->group = array_unique($this->_req->post->group);
 
-		if (empty($_REQUEST['pid']))
-			$_REQUEST['pid'] = 0;
-		else
-			$_REQUEST['pid'] = (int) $_REQUEST['pid'];
+		$this->_pid = $this->_req->getQuery('pid', 'intval', 0);
 
 		// Fix up the old global to the new default!
-		$bid = max(1, $_REQUEST['pid']);
+		$bid = max(1, $this->_pid);
 
 		// No modifying the predefined profiles.
-		if ($_REQUEST['pid'] > 1 && $_REQUEST['pid'] < 5)
-			fatal_lang_error('no_access', false);
+		if ($this->_pid > 1 && $this->_pid < 5)
+			Errors::instance()->fatal_lang_error('no_access', false);
 
 		// Clear out any cached authority.
 		updateSettings(array('settings_updated' => time()));
 
 		// No groups where selected.
-		if (empty($_POST['group']))
-			redirectexit('action=admin;area=permissions;pid=' . $_REQUEST['pid']);
+		if (empty($this->_req->post->group))
+			redirectexit('action=admin;area=permissions;pid=' . $this->_pid);
 
 		// Set a predefined permission profile.
-		if (!empty($_POST['predefined']))
+		if (!empty($this->_req->post->predefined))
 		{
 			// Make sure it's a predefined permission set we expect.
-			if (!in_array($_POST['predefined'], array('restrict', 'standard', 'moderator', 'maintenance')))
-				redirectexit('action=admin;area=permissions;pid=' . $_REQUEST['pid']);
+			if (!in_array($this->_req->post->predefined, array('restrict', 'standard', 'moderator', 'maintenance')))
+				redirectexit('action=admin;area=permissions;pid=' . $this->_pid);
 
-			foreach ($_POST['group'] as $group_id)
+			foreach ($this->_req->post->group as $group_id)
 			{
-				if (!empty($_REQUEST['pid']))
-					setPermissionLevel($_POST['predefined'], $group_id, $_REQUEST['pid']);
+				if (!empty($this->_pid))
+					setPermissionLevel($this->_req->post->predefined, $group_id, $this->_pid);
 				else
-					setPermissionLevel($_POST['predefined'], $group_id);
+					setPermissionLevel($this->_req->post->predefined, $group_id);
 			}
 		}
 		// Set a permission profile based on the permissions of a selected group.
-		elseif ($_POST['copy_from'] != 'empty')
+		elseif ($this->_req->post->copy_from != 'empty')
 		{
 			// Just checking the input.
-			if (!is_numeric($_POST['copy_from']))
-				redirectexit('action=admin;area=permissions;pid=' . $_REQUEST['pid']);
+			if (!is_numeric($this->_req->post->copy_from))
+				redirectexit('action=admin;area=permissions;pid=' . $this->_pid);
 
 			// Make sure the group we're copying to is never included.
-			$_POST['group'] = array_diff($_POST['group'], array($_POST['copy_from']));
+			$this->_req->post->group = array_diff($this->_req->post->group, array($this->_req->post->copy_from));
 
 			// No groups left? Too bad.
-			if (empty($_POST['group']))
-				redirectexit('action=admin;area=permissions;pid=' . $_REQUEST['pid']);
+			if (empty($this->_req->post->group))
+				redirectexit('action=admin;area=permissions;pid=' . $this->_pid);
 
-			if (empty($_REQUEST['pid']))
-				copyPermission($_POST['copy_from'], $_POST['group'], $context['illegal_permissions'], $context['non_guest_permissions']);
+			if (empty($this->_pid))
+				copyPermission($this->_req->post->copy_from, $this->_req->post->group, $context['illegal_permissions'], $context['non_guest_permissions']);
 
 			// Now do the same for the board permissions.
-			copyBoardPermission($_POST['copy_from'], $_POST['group'], $bid, $context['non_guest_permissions']);
+			copyBoardPermission($this->_req->post->copy_from, $this->_req->post->group, $bid, $context['non_guest_permissions']);
 
 			// Update any children out there!
-			updateChildPermissions($_POST['group'], $_REQUEST['pid']);
+			updateChildPermissions($this->_req->post->group, $this->_pid);
 		}
 		// Set or unset a certain permission for the selected groups.
-		elseif (!empty($_POST['permissions']))
+		elseif (!empty($this->_req->post->permissions))
 		{
 			// Unpack two variables that were transported.
-			list ($permissionType, $permission) = explode('/', $_POST['permissions']);
+			list ($permissionType, $permission) = explode('/', $this->_req->post->permissions);
 
 			// Check whether our input is within expected range.
-			if (!in_array($_POST['add_remove'], array('add', 'clear', 'deny')) || !in_array($permissionType, array('membergroup', 'board')))
-				redirectexit('action=admin;area=permissions;pid=' . $_REQUEST['pid']);
+			if (!in_array($this->_req->post->add_remove, array('add', 'clear', 'deny')) || !in_array($permissionType, array('membergroup', 'board')))
+				redirectexit('action=admin;area=permissions;pid=' . $this->_pid);
 
-			if ($_POST['add_remove'] == 'clear')
+			if ($this->_req->post->add_remove == 'clear')
 			{
 				if ($permissionType == 'membergroup')
-					deletePermission($_POST['group'], $permission, $context['illegal_permissions']);
+					deletePermission($this->_req->post->group, $permission, $context['illegal_permissions']);
 				else
-					deleteBoardPermission($_POST['group'], $bid, $permission);
+					deleteBoardPermission($this->_req->post->group, $bid, $permission);
 			}
 			// Add a permission (either 'set' or 'deny').
 			else
 			{
-				$add_deny = $_POST['add_remove'] == 'add' ? '1' : '0';
+				$add_deny = $this->_req->post->add_remove == 'add' ? '1' : '0';
 				$permChange = array();
-				foreach ($_POST['group'] as $groupID)
+				foreach ($this->_req->post->group as $groupID)
 				{
 					if ($groupID == -1 && in_array($permission, $context['non_guest_permissions']))
 						continue;
@@ -669,10 +687,10 @@ class ManagePermissions_Controller extends Action_Controller
 			}
 
 			// Another child update!
-			updateChildPermissions($_POST['group'], $_REQUEST['pid']);
+			updateChildPermissions($this->_req->post->group, $this->_pid);
 		}
 
-		redirectexit('action=admin;area=permissions;pid=' . $_REQUEST['pid']);
+		redirectexit('action=admin;area=permissions;pid=' . $this->_pid);
 	}
 
 	/**
@@ -682,14 +700,14 @@ class ManagePermissions_Controller extends Action_Controller
 	{
 		global $context, $txt;
 
-		if (!isset($_GET['group']))
-			fatal_lang_error('no_access', false);
+		if (!isset($this->_req->query->group))
+			Errors::instance()->fatal_lang_error('no_access', false);
 
 		require_once(SUBSDIR . '/ManagePermissions.subs.php');
-		$context['group']['id'] = (int) $_GET['group'];
+		$context['group']['id'] = (int) $this->_req->query->group;
 
 		// It's not likely you'd end up here with this setting disabled.
-		if ($_GET['group'] == 1)
+		if ($this->_req->query->group == 1)
 			redirectexit('action=admin;area=permissions');
 
 		loadAllPermissions();
@@ -705,14 +723,14 @@ class ManagePermissions_Controller extends Action_Controller
 
 			// Cannot edit an inherited group!
 			if ($parent != -2)
-				fatal_lang_error('cannot_edit_permissions_inherited');
+				Errors::instance()->fatal_lang_error('cannot_edit_permissions_inherited');
 		}
 		elseif ($context['group']['id'] == -1)
 			$context['group']['name'] = $txt['membergroups_guests'];
 		else
 			$context['group']['name'] = $txt['membergroups_members'];
 
-		$context['profile']['id'] = empty($_GET['pid']) ? 0 : (int) $_GET['pid'];
+		$context['profile']['id'] = $this->_req->getQuery('pid', 'intval', 0);
 
 		// If this is a moderator and they are editing "no profile" then we only do boards.
 		if ($context['group']['id'] == 3 && empty($context['profile']['id']))
@@ -741,7 +759,7 @@ class ManagePermissions_Controller extends Action_Controller
 
 		// General permissions?
 		if ($context['permission_type'] == 'membergroup')
-			$permissions['membergroup'] = fetchPermissions($_GET['group']);
+			$permissions['membergroup'] = fetchPermissions($this->_req->query->group);
 
 		// Fetch current board permissions...
 		$permissions['board'] = fetchBoardPermissions( $context['group']['id'], $context['permission_type'], $context['profile']['id']);
@@ -791,12 +809,12 @@ class ManagePermissions_Controller extends Action_Controller
 
 		loadIllegalPermissions();
 
-		$current_group_id = (int) $_GET['group'];
-		$_GET['pid'] = (int) $_GET['pid'];
+		$current_group_id = (int) $this->_req->query->group;
+		$this->_pid = $this->_req->getQuery('pid', 'intval');
 
 		// Cannot modify predefined profiles.
-		if ($_GET['pid'] > 1 && $_GET['pid'] < 5)
-			fatal_lang_error('no_access', false);
+		if ($this->_pid > 1 && $this->_pid < 5)
+			Errors::instance()->fatal_lang_error('no_access', false);
 
 		// Verify this isn't inherited.
 		if ($current_group_id == -1 || $current_group_id == 0)
@@ -809,7 +827,7 @@ class ManagePermissions_Controller extends Action_Controller
 		}
 
 		if ($parent != -2)
-			fatal_lang_error('cannot_edit_permissions_inherited');
+			Errors::instance()->fatal_lang_error('cannot_edit_permissions_inherited');
 
 		$givePerms = array('membergroup' => array(), 'board' => array());
 
@@ -821,9 +839,9 @@ class ManagePermissions_Controller extends Action_Controller
 		}
 
 		// Prepare all permissions that were set or denied for addition to the DB.
-		if (isset($_POST['perm']) && is_array($_POST['perm']))
+		if (isset($this->_req->post->perm) && is_array($this->_req->post->perm))
 		{
-			foreach ($_POST['perm'] as $perm_type => $perm_array)
+			foreach ($this->_req->post->perm as $perm_type => $perm_array)
 			{
 				if (is_array($perm_array))
 				{
@@ -841,7 +859,7 @@ class ManagePermissions_Controller extends Action_Controller
 		}
 
 		// Insert the general permissions.
-		if ($current_group_id != 3 && empty($_GET['pid']))
+		if ($current_group_id != 3 && empty($this->_pid))
 		{
 			deleteInvalidPermissions($current_group_id, $context['illegal_permissions']);
 
@@ -850,7 +868,7 @@ class ManagePermissions_Controller extends Action_Controller
 		}
 
 		// Insert the boardpermissions.
-		$profileid = max(1, $_GET['pid']);
+		$profileid = max(1, $this->_pid);
 		deleteAllBoardPermissions($current_group_id, $profileid);
 
 		if (!empty($givePerms['board']))
@@ -861,12 +879,12 @@ class ManagePermissions_Controller extends Action_Controller
 		}
 
 		// Update any inherited permissions as required.
-		updateChildPermissions($current_group_id, $_GET['pid']);
+		updateChildPermissions($current_group_id, $this->_pid);
 
 		// Clear cached privs.
 		updateSettings(array('settings_updated' => time()));
 
-		redirectexit('action=admin;area=permissions;pid=' . $_GET['pid']);
+		redirectexit('action=admin;area=permissions;pid=' . $this->_pid);
 	}
 
 	/**
@@ -892,11 +910,11 @@ class ManagePermissions_Controller extends Action_Controller
 		$context['permissions_excluded'] = array(-1);
 
 		// Saving the settings?
-		if (isset($_GET['save']))
+		if (isset($this->_req->query->save))
 		{
 			checkSession('post');
 			call_integration_hook('integrate_save_permission_settings');
-			Settings_Form::save_db($config_vars);
+			Settings_Form::save_db($config_vars, $this->_req->post);
 
 			// Clear all deny permissions...if we want that.
 			if (empty($modSettings['permission_enable_deny']))
@@ -975,35 +993,35 @@ class ManagePermissions_Controller extends Action_Controller
 		$context['sub_template'] = 'edit_profiles';
 
 		// If we're creating a new one do it first.
-		if (isset($_POST['create']) && trim($_POST['profile_name']) != '')
+		if (isset($this->_req->post->create) && trim($this->_req->post->profile_name) != '')
 		{
 			checkSession();
 			validateToken('admin-mpp');
-			copyPermissionProfile($_POST['profile_name'], (int) $_POST['copy_from']);
+			copyPermissionProfile($this->_req->post->profile_name, (int) $this->_req->post->copy_from);
 		}
 		// Renaming?
-		elseif (isset($_POST['rename']))
+		elseif (isset($this->_req->post->rename))
 		{
 			checkSession();
 			validateToken('admin-mpp');
 
 			// Just showing the boxes?
-			if (!isset($_POST['rename_profile']))
+			if (!isset($this->_req->post->rename_profile))
 				$context['show_rename_boxes'] = true;
 			else
 			{
-				foreach ($_POST['rename_profile'] as $id => $name)
+				foreach ($this->_req->post->rename_profile as $id => $name)
 					renamePermissionProfile($id, $name);
 			}
 		}
 		// Deleting?
-		elseif (isset($_POST['delete']) && !empty($_POST['delete_profile']))
+		elseif (isset($this->_req->post->delete) && !empty($this->_req->post->delete_profile))
 		{
 			checkSession('post');
 			validateToken('admin-mpp');
 
 			$profiles = array();
-			foreach ($_POST['delete_profile'] as $profile)
+			foreach ($this->_req->post->delete_profile as $profile)
 				if ($profile > 4)
 					$profiles[] = (int) $profile;
 
@@ -1050,7 +1068,7 @@ class ManagePermissions_Controller extends Action_Controller
 
 		$context['page_title'] = $txt['permissions_post_moderation'];
 		$context['sub_template'] = 'postmod_permissions';
-		$context['current_profile'] = isset($_REQUEST['pid']) ? (int) $_REQUEST['pid'] : 1;
+		$context['current_profile'] = $this->_req->getQuery('pid', 'intval', 1);
 
 		// Load all the permission profiles.
 		loadPermissionProfiles();
@@ -1075,7 +1093,7 @@ class ManagePermissions_Controller extends Action_Controller
 			$all_permissions = array_merge($all_permissions, $perm_set);
 
 		// If we're saving the changes then do just that - save them.
-		if (!empty($_POST['save_changes']) && ($context['current_profile'] == 1 || $context['current_profile'] > 4))
+		if (!empty($this->_req->post->save_changes) && ($context['current_profile'] == 1 || $context['current_profile'] > 4))
 		{
 			validateToken('admin-mppm');
 

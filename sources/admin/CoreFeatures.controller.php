@@ -1,7 +1,7 @@
 <?php
 
 /**
- * This controller allows to choose the features activated and disactivate them.
+ * This controller allows to choose features to activated and deactivate them.
  *
  * @name      ElkArte Forum
  * @copyright ElkArte Forum contributors
@@ -13,7 +13,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:		BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0.2
+ * @version 1.1 dev
  *
  */
 
@@ -26,11 +26,26 @@ if (!defined('ELK'))
  * What it does:
  * - It sets up the context, initializes the features info for display
  * - updates the settings for enabled/disabled core features as requested.
+ * - loads in module core features
  *
  * @package CoreFeatures
  */
 class CoreFeatures_Controller extends Action_Controller
 {
+	/**
+	 * Holds instance of HttpReq object
+	 * @var HttpReq
+	 */
+	private $_req;
+
+	/**
+	 * Pre Dispatch, called before other methods.  Loads HttpReq
+	 */
+	public function pre_dispatch()
+	{
+		$this->_req = HttpReq::instance();
+	}
+
 	/**
 	 * Default handler.
 	 *
@@ -69,11 +84,11 @@ class CoreFeatures_Controller extends Action_Controller
 		$this->loadGeneralSettingParameters();
 
 		// Are we saving?
-		if (isset($_POST['save']))
+		if (isset($this->_req->post->save))
 		{
 			checkSession();
 
-			if (isset($_GET['xml']))
+			if (isset($this->_req->query->xml))
 			{
 				$tokenValidation = validateToken('admin-core', 'post', false);
 
@@ -85,7 +100,7 @@ class CoreFeatures_Controller extends Action_Controller
 
 			$this->_save_core_features($core_features);
 
-			if (!isset($_REQUEST['xml']))
+			if (!isset($this->_req->query->xml))
 				redirectexit('action=admin;area=corefeatures;' . $context['session_var'] . '=' . $context['session_id']);
 		}
 
@@ -101,7 +116,7 @@ class CoreFeatures_Controller extends Action_Controller
 			updateSettings(array('admin_features' => ''));
 
 		// sub_template is already generic_xml and the token is created somewhere else
-		if (isset($_REQUEST['xml']))
+		if (isset($this->_req->query->xml))
 			return;
 
 		$context['sub_template'] = 'core_features';
@@ -122,13 +137,6 @@ class CoreFeatures_Controller extends Action_Controller
 	public function settings()
 	{
 		$core_features = array(
-			// cd = calendar.
-			'cd' => array(
-				'url' => 'action=admin;area=managecalendar',
-				'settings' => array(
-					'cal_enabled' => 1,
-				),
-			),
 			// cp = custom profile fields.
 			'cp' => array(
 				'url' => 'action=admin;area=featuresettings;sa=profile',
@@ -143,18 +151,6 @@ class CoreFeatures_Controller extends Action_Controller
 					else
 						return array();
 				},
-			),
-			// dr = drafts
-			'dr' => array(
-				'url' => 'action=admin;area=managedrafts',
-				'settings' => array(
-					'drafts_enabled' => 1,
-					'drafts_post_enabled' => 2,
-					'drafts_pm_enabled' => 2,
-					'drafts_autosave_enabled' => 2,
-					'drafts_show_saved_enabled' => 2,
-				),
-				'setting_callback' => 'drafts_toggle_callback',
 			),
 			// ih = Integration Hooks Handling.
 			'ih' => array(
@@ -177,11 +173,20 @@ class CoreFeatures_Controller extends Action_Controller
 					'likes_enabled' => 1,
 				),
 				'setting_callback' => function ($value) {
+					global $modSettings;
+
 					require_once(SUBSDIR . '/Mentions.subs.php');
 
 					// Makes all the like/rlike mentions invisible (or visible)
-					toggleMentionsVisibility('like', !empty($value));
-					toggleMentionsVisibility('rlike', !empty($value));
+					toggleMentionsVisibility('likemsg', !empty($value));
+					toggleMentionsVisibility('rlikemsg', !empty($value));
+
+					$current = !empty($modSettings['enabled_mentions']) ? explode(',', $modSettings['enabled_mentions']) : array();
+
+					if (!empty($value))
+						return array('enabled_mentions' => implode(',', array_merge($current, array('likemsg', 'rlikemsg'))));
+					else
+						return array('enabled_mentions' => implode(',', array_diff($current, array('likemsg', 'rlikemsg'))));
 				},
 			),
 			// ml = moderation log.
@@ -277,10 +282,57 @@ class CoreFeatures_Controller extends Action_Controller
 			),
 		);
 
+		$this->_getModulesConfig($core_features);
+
 		// Anyone who would like to add a core feature?
 		call_integration_hook('integrate_core_features', array(&$core_features));
 
 		return $core_features;
+	}
+
+	/**
+	 * Searches the ADMINDIR looking for module managers and load the "Core Feature"
+	 * if existing.
+	 *
+	 * @param mixed[] $core_features The core features array
+	 */
+	protected function _getModulesConfig(&$core_features)
+	{
+		// Find appropriately named core feature files in the admin directory
+		$glob = new GlobIterator(ADMINDIR . '/Manage*Module.controller.php', FilesystemIterator::SKIP_DOTS);
+
+		foreach ($glob as $file)
+		{
+			$class = $file->getBasename('.controller.php') . '_Controller';
+
+			if (method_exists($class, 'addCoreFeature'))
+				$class::addCoreFeature($core_features);
+		}
+
+		$integrations = Hooks::get()->discoverIntegrations(ADDONSDIR);
+
+		foreach ($integrations as $integration)
+		{
+			$core_features[$integration['id']] = array(
+				'url' => empty($integration['details']->extra->setting_url) ? '?action=admin;area=addonsettings' : $integration['details']->extra->setting_url,
+				'title' => $integration['title'],
+				'desc' => $integration['description'],
+			);
+
+			if (method_exists($integration['class'], 'setting_callback'))
+			{
+				$core_features[$integration['id']]['setting_callback'] = function ($value) use ($integration) {
+					$integration['class']::setting_callback($value);
+				};
+			}
+
+			if (method_exists($integration['class'], 'on_save'))
+			{
+				$core_features[$integration['id']]['on_save'] = function () use ($integration) {
+					$integration['class']::on_save();
+				};
+			}
+		}
 	}
 
 	/**
@@ -325,12 +377,15 @@ class CoreFeatures_Controller extends Action_Controller
 		$context['sub_template'] = 'show_settings';
 
 		// By default do the basic settings.
-		if (isset($_REQUEST['sa']) && isset($subActions[$_REQUEST['sa']]))
-			$context['sub_action'] = $_REQUEST['sa'];
+		if (isset($this->_req->query->sa, $subActions[$this->_req->query->sa]))
+			$context['sub_action'] = $this->_req->query->sa;
 		elseif (!empty($defaultAction))
 			$context['sub_action'] = $defaultAction;
 		else
-			$context['sub_action'] = array_pop($temp = array_keys($subActions));
+		{
+			$temp = array_keys($subActions);
+			$context['sub_action'] = array_pop($temp);
+		}
 	}
 
 	/**
@@ -348,8 +403,10 @@ class CoreFeatures_Controller extends Action_Controller
 		// Cycle each feature and change things as required!
 		foreach ($core_features as $id => $feature)
 		{
+			$feature_id = $this->_req->getPost('feature_' . $id);
+
 			// Enabled?
-			if (!empty($_POST['feature_' . $id]))
+			if (!empty($feature_id))
 				$setting_changes['admin_features'][] = $id;
 
 			// Setting values to change?
@@ -357,15 +414,15 @@ class CoreFeatures_Controller extends Action_Controller
 			{
 				foreach ($feature['settings'] as $key => $value)
 				{
-					if (empty($_POST['feature_' . $id]) || (!empty($_POST['feature_' . $id]) && ($value < 2 || empty($modSettings[$key]))))
-						$setting_changes[$key] = !empty($_POST['feature_' . $id]) ? $value : !$value;
+					if (empty($feature_id) || (!empty($feature_id) && ($value < 2 || empty($modSettings[$key]))))
+						$setting_changes[$key] = !empty($feature_id) ? $value : !$value;
 				}
 			}
 
 			// Is there a call back for settings?
 			if (isset($feature['setting_callback']))
 			{
-				$returned_settings = $feature['setting_callback'](!empty($_POST['feature_' . $id]));
+				$returned_settings = $feature['setting_callback'](!empty($feature_id));
 				if (!empty($returned_settings))
 					$setting_changes = array_merge($setting_changes, $returned_settings);
 			}
@@ -416,6 +473,11 @@ class CoreFeatures_Controller extends Action_Controller
 				'image' => (file_exists($settings['theme_dir'] . '/images/admin/feature_' . $id . '.png') ? $settings['images_url'] : $settings['default_images_url']) . '/admin/feature_' . $id . '.png',
 			);
 		}
+
+		// Sort by title attribute
+		uasort($features, function($a, $b) {
+			return strcmp(strtolower($a['title']), strtolower($b['title']));
+		});
 
 		return $features;
 	}

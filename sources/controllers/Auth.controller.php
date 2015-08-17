@@ -14,7 +14,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:		BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0
+ * @version 1.1 dev
  *
  */
 
@@ -25,7 +25,7 @@ if (!defined('ELK'))
  * Auth_Controller class, deals with logging in and out members,
  * and the validation of them
  *
- * @pachage Authorization
+ * @package Authorization
  */
 class Auth_Controller extends Action_Controller
 {
@@ -123,7 +123,7 @@ class Auth_Controller extends Action_Controller
 
 		// Been guessing a lot, haven't we?
 		if (isset($_SESSION['failed_login']) && $_SESSION['failed_login'] >= $modSettings['failed_login_threshold'] * 3)
-			fatal_lang_error('login_threshold_fail', 'critical');
+			Errors::instance()->fatal_lang_error('login_threshold_fail', 'critical');
 
 		// Set up the cookie length.  (if it's invalid, just fall through and use the default.)
 		if (isset($_POST['cookieneverexp']) || (!empty($_POST['cookielength']) && $_POST['cookielength'] == -1))
@@ -228,7 +228,7 @@ class Auth_Controller extends Action_Controller
 				$context['login_errors'] = array($txt['invalid_otptoken']);
 				return;
 			}
-			
+
 		}
 		// Let them try again, it didn't match anything...
 		if (empty($user_settings))
@@ -272,7 +272,7 @@ class Auth_Controller extends Action_Controller
 					redirectexit('action=reminder');
 				else
 				{
-					log_error($txt['incorrect_password'] . ' - <span class="remove">' . $user_settings['member_name'] . '</span>', 'user');
+					Errors::instance()->log_error($txt['incorrect_password'] . ' - <span class="remove">' . $user_settings['member_name'] . '</span>', 'user');
 
 					// Wrong password, lets enable plain text responses in case form hashing is causing problems
 					$context['disable_login_hashing'] = true;
@@ -323,7 +323,7 @@ class Auth_Controller extends Action_Controller
 				else
 				{
 					// Log an error so we know that it didn't go well in the error log.
-					log_error($txt['incorrect_password'] . ' - <span class="remove">' . $user_settings['member_name'] . '</span>', 'user');
+					Errors::instance()->log_error($txt['incorrect_password'] . ' - <span class="remove">' . $user_settings['member_name'] . '</span>', 'user');
 
 					$context['login_errors'] = array($txt['incorrect_password']);
 					return;
@@ -497,7 +497,7 @@ class Auth_Controller extends Action_Controller
 		{
 			// Strike!  You're outta there!
 			if ($_GET['member'] != $user_info['id'])
-				fatal_lang_error('login_cookie_error', false);
+				Errors::instance()->fatal_lang_error('login_cookie_error', false);
 
 			$user_info['can_mod'] = allowedTo('access_mod_center') || (!$user_info['is_guest'] && ($user_info['mod_cache']['gq'] != '0=1' || $user_info['mod_cache']['bq'] != '0=1' || ($modSettings['postmod_active'] && !empty($user_info['mod_cache']['ap']))));
 			if ($user_info['can_mod'] && isset($user_settings['openid_uri']) && empty($user_settings['openid_uri']))
@@ -680,7 +680,7 @@ function checkActivation()
 	}
 	// Awaiting approval still?
 	elseif ($activation_status == 3)
-		fatal_lang_error('still_awaiting_approval', 'user');
+		Errors::instance()->fatal_lang_error('still_awaiting_approval', 'user');
 	// Awaiting deletion, changed their mind?
 	elseif ($activation_status == 4)
 	{
@@ -701,7 +701,7 @@ function checkActivation()
 	// Standard activation?
 	elseif ($activation_status != 1)
 	{
-		log_error($txt['activate_not_completed1'] . ' - <span class="remove">' . $user_settings['member_name'] . '</span>', false);
+		Errors::instance()->log_error($txt['activate_not_completed1'] . ' - <span class="remove">' . $user_settings['member_name'] . '</span>', false);
 
 		$context['login_errors'][] = $txt['activate_not_completed1'] . ' <a href="' . $scripturl . '?action=activate;sa=resend;u=' . $user_settings['id_member'] . '">' . $txt['activate_not_completed2'] . '</a>';
 		return false;

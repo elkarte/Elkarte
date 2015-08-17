@@ -13,7 +13,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:		BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0.2
+ * @version 1.1 dev
  *
  */
 
@@ -63,7 +63,7 @@ class Topic_Controller extends Action_Controller
 
 		// Just quit if there's no topic to lock.
 		if (empty($topic))
-			fatal_lang_error('not_a_topic', false);
+			Errors::instance()->fatal_lang_error('not_a_topic', false);
 
 		checkSession('get');
 
@@ -93,7 +93,7 @@ class Topic_Controller extends Action_Controller
 			$locked = '0';
 		// You cannot unlock this!
 		else
-			fatal_lang_error('locked_by_admin', 'user');
+			Errors::instance()->fatal_lang_error('locked_by_admin', 'user');
 
 		// Lock the topic!
 		setTopicAttribute($topic, array('locked' => $locked));
@@ -121,18 +121,14 @@ class Topic_Controller extends Action_Controller
 	 */
 	public function action_sticky()
 	{
-		global $modSettings, $topic, $board;
+		global $topic, $board;
 
 		// Make sure the user can sticky it, and they are stickying *something*.
 		isAllowedTo('make_sticky');
 
-		// You shouldn't be able to (un)sticky a topic if the setting is disabled.
-		if (empty($modSettings['enableStickyTopics']))
-			fatal_lang_error('cannot_make_sticky', false);
-
 		// You can't sticky a board or something!
 		if (empty($topic))
-			fatal_lang_error('not_a_topic', false);
+			Errors::instance()->fatal_lang_error('not_a_topic', false);
 
 		checkSession('get');
 
@@ -143,7 +139,8 @@ class Topic_Controller extends Action_Controller
 		require_once(SUBSDIR . '/Topic.subs.php');
 
 		// Is this topic already stickied, or no?
-		$is_sticky = topicAttribute($topic, 'sticky');
+		$sticky = topicAttribute($topic, 'is_sticky');
+		$is_sticky = $sticky['is_sticky'];
 
 		// Toggle the sticky value.
 		setTopicAttribute($topic, array('is_sticky' => (empty($is_sticky) ? 1 : 0)));
@@ -182,7 +179,7 @@ class Topic_Controller extends Action_Controller
 		{
 			unset($_REQUEST['action']);
 			$context['theme_loaded'] = false;
-			fatal_lang_error('feature_disabled', false);
+			Errors::instance()->fatal_lang_error('feature_disabled', false);
 		}
 
 		require_once(SUBSDIR . '/Topic.subs.php');

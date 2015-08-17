@@ -13,7 +13,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:		BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0.2
+ * @version 1.1 dev
  *
  */
 
@@ -24,7 +24,7 @@ if (defined('ELK'))
 define('ELK', 'SSI');
 
 // Shortcut for the browser cache stale
-define('CACHE_STALE', '?102');
+define('CACHE_STALE', '?R11');
 
 // We're going to want a few globals... these are all set later.
 global $time_start, $maintenance, $msubject, $mmessage, $mbname, $language;
@@ -35,6 +35,12 @@ global $ssi_db_user, $scripturl, $ssi_db_passwd, $db_passwd;
 global $boarddir, $sourcedir;
 
 $ssi_error_reporting = error_reporting(E_ALL | E_STRICT);
+
+// Directional only script time usage for display
+if (function_exists('getrusage'))
+	$rusage_start = getrusage();
+else
+	$rusage_start = array();
 
 $time_start = microtime(true);
 $db_show_debug = false;
@@ -70,30 +76,33 @@ DEFINE('SOURCEDIR', $sourcedir);
 DEFINE('ADMINDIR', $sourcedir . '/admin');
 DEFINE('CONTROLLERDIR', $sourcedir . '/controllers');
 DEFINE('SUBSDIR', $sourcedir . '/subs');
+DEFINE('ADDONSDIR', $boarddir . '/addons');
 unset($boarddir, $cachedir, $sourcedir, $languagedir, $extdir);
 
 // Files we cannot live without.
 require_once(SOURCEDIR . '/QueryString.php');
 require_once(SOURCEDIR . '/Session.php');
 require_once(SOURCEDIR . '/Subs.php');
-require_once(SOURCEDIR . '/Errors.php');
 require_once(SOURCEDIR . '/Logging.php');
 require_once(SOURCEDIR . '/Load.php');
 require_once(SOURCEDIR . '/Security.php');
-
-spl_autoload_register('elk_autoloader');
-
 require_once(SUBSDIR . '/Cache.subs.php');
+
+require(SOURCEDIR . '/Autoloader.class.php');
+Elk_Autoloader::getInstance()->setupAutoloader(array(SOURCEDIR, SUBSDIR, CONTROLLERDIR, ADMINDIR, ADDONSDIR));
 
 /**
  * Set this to one of three values depending on what you want to happen in the case of a fatal error.
+ *
  *  - false: Default, will just load the error sub template and die - not putting any theme layers around it.
- *  - true: Will load the error sub template AND put the template layers around it (Not useful if on total custom pages).
- *  - string: Name of a callback function to call in the event of an error to allow you to define your own methods. Will die after function returns.
+ *  - true: Will load the error sub template AND put the template layers around it (Not useful if on total custom
+ * pages).
+ *  - string: Name of a callback function to call in the event of an error to allow you to define your own methods.
+ * Will die after function returns.
  */
 $ssi_on_error_method = false;
 
-// Don't do john didley if the forum's been shut down competely.
+// Don't do john didley if the forum's been shut down completely.
 if ($maintenance == 2 && (!isset($ssi_maintenance_off) || $ssi_maintenance_off !== true))
 	die($mmessage);
 

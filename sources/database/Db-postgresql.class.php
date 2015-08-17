@@ -11,7 +11,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0
+ * @version 1.1 dev
  *
  */
 
@@ -87,7 +87,7 @@ class Database_PostgreSQL extends Database_Abstract
 			if (!empty($db_options['non_fatal']))
 				return null;
 			else
-				display_db_error();
+				Errors::instance()->display_db_error();
 		}
 
 		self::$_db->_connection = $connection;
@@ -224,6 +224,7 @@ class Database_PostgreSQL extends Database_Abstract
 		if ($db_show_debug === true)
 		{
 			$debug = Debug::get();
+
 			// Get the file and line number this function was called.
 			list ($file, $line) = $this->error_backtrace('', '', 'return', __FILE__, __LINE__);
 
@@ -237,6 +238,7 @@ class Database_PostgreSQL extends Database_Abstract
 
 			// Don't overload it.
 			$st = microtime(true);
+			$db_cache = array();
 			$db_cache['q'] = $this->_query_count < 50 ? $db_string : '...';
 			$db_cache['f'] = $file;
 			$db_cache['l'] = $line;
@@ -496,7 +498,7 @@ class Database_PostgreSQL extends Database_Abstract
 
 		// Log the error.
 		if (function_exists('log_error'))
-			log_error($txt['database_error'] . ': ' . $query_error . (!empty($modSettings['enableErrorQueryLogging']) ? "\n\n" .$db_string : ''), 'database', $file, $line);
+			Errors::instance()->log_error($txt['database_error'] . ': ' . $query_error . (!empty($modSettings['enableErrorQueryLogging']) ? "\n\n" .$db_string : ''), 'database', $file, $line);
 
 		// Nothing's defined yet... just die with it.
 		if (empty($context) || empty($txt))
@@ -517,7 +519,7 @@ class Database_PostgreSQL extends Database_Abstract
 			$context['error_message'] .= '<br /><br />' . nl2br($db_string);
 
 		// It's already been logged... don't log it again.
-		fatal_error($context['error_message'], false);
+		Errors::instance()->fatal_error($context['error_message'], false);
 	}
 
 	/**

@@ -13,7 +13,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0
+ * @version 1.1 dev
  *
  */
 
@@ -218,7 +218,7 @@ class OpenID
 			$assoc_data[$match] = $matches[2][$key];
 
 		if (!isset($assoc_data['assoc_type']) || (empty($assoc_data['mac_key']) && empty($assoc_data['enc_mac_key'])))
-			fatal_lang_error('openid_server_bad_response');
+			Errors::instance()->fatal_lang_error('openid_server_bad_response');
 
 		// Clean things up a bit.
 		$handle = isset($assoc_data['assoc_handle']) ? $assoc_data['assoc_handle'] : '';
@@ -421,7 +421,7 @@ class OpenID
 
 		// Some OpenID servers have strange but still valid HTML which makes our job hard.
 		if (preg_match_all('~<link([\s\S]*?)/?>~i', $webdata, $link_matches) == 0)
-			fatal_lang_error('openid_server_bad_response');
+			Errors::instance()->fatal_lang_error('openid_server_bad_response');
 
 		foreach ($link_matches[1] as $link_match)
 		{
@@ -477,7 +477,7 @@ function long_to_binary($value)
 {
 	$cmp = bccomp($value, 0);
 	if ($cmp < 0)
-		fatal_error('Only non-negative integers allowed.');
+		Errors::instance()->fatal_error('Only non-negative integers allowed.');
 
 	if ($cmp == 0)
 		return "\x00";

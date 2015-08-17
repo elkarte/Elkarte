@@ -1,5 +1,5 @@
 <?php
-// Version: 1.0; Help
+// Version: 1.1; Help
 
 global $helptxt;
 
@@ -239,8 +239,6 @@ $helptxt['manage_files'] = '
 
 $helptxt['topicSummaryPosts'] = 'This allows you to set the number of previous posts shown in the topic summary at the reply screen.';
 $helptxt['enableAllMessages'] = 'Set this to the <em>maximum</em> number of posts a topic can have to show the all link.  Setting this lower than &quot;Maximum messages to display in a topic page&quot; will simply mean it never gets shown, and setting it too high could slow down your forum.';
-$helptxt['enableStickyTopics'] = 'Pinned are topics that remain on top of the topic list. They are mostly used for important
-		messages. Although you can change this with permissions, by default only moderators and administrators can pin topics.';
 $helptxt['allow_guestAccess'] = 'Unchecking this box will stop guests from doing anything but very basic actions - login, register, password reminder, etc. - on your forum.  This is not the same as disallowing guest access to boards.';
 $helptxt['userLanguage'] = 'Turning this option on will allow users to select which language file they use. It will not affect the default selection.';
 $helptxt['trackStats'] = 'Stats:<br />This will allow users to see the latest posts and the most popular topics on your forum.
@@ -268,8 +266,6 @@ $helptxt['pollMode'] = 'This selects whether polls are enabled or not. If polls 
 <br /><br />To choose who can post polls, view polls, and similar, you can allow and disallow those permissions. Remember this if polls don\'t seem to be working.';
 $helptxt['enableVBStyleLogin'] = 'This will show a more compact login on every page of the forum for guests.';
 $helptxt['enableCompressedOutput'] = 'This option will compress output to lower bandwidth consumption, but it requires zlib to be installed.';
-$helptxt['disableTemplateEval'] = 'By default, templates are evaluated instead of just included. This helps with showing more useful debug information in case a template contains an error.<br /><br />
-		On large forums however, this customised inclusion process may be significantly slower. Therefore, advanced users may wish to disable it.';
 $helptxt['databaseSession_enable'] = 'This option makes use of the database for session storage - it is best for load balanced servers, but helps with all timeout issues and can make the forum faster.';
 $helptxt['databaseSession_loose'] = 'Turning this on will decrease the bandwidth your forum uses, and make it so clicking back will not reload the page - the downside is that the (new) icons won\'t update, among other things. (unless you click to that page instead of going back to it.)';
 $helptxt['databaseSession_lifetime'] = 'This is the number of seconds for sessions to last after they haven\'t been accessed.  If a session is not accessed for too long, it is said to have &quot;timed out&quot;.  Anything higher than 2400 is recommended.';
@@ -654,3 +650,51 @@ $helptxt['maillist_help_short'] = 'This feature allows users of your forum to re
 $helptxt['frame_security'] = 'The X-Frame-Options HTTP response header can be used to indicate whether or not a browser should be allowed to render a page in a frame or an iframe. You can use this additional security restriction on your site against attempts at clickjacking attacks, by ensuring that the content of your site is not embedded into other sites.
 	<br />
 	More information about this header may be found on the internet.';
+
+$helptxt['attachmentInLine'] = '<b>Add an inline attachment</b><br />
+		Example:
+		<br /><b>[attachimg=1 align=left width=400]</b>
+		<br />This will show a left-aligned image resized to 400 pixels wide with the post text flowing around it. Execpt for the attachment tag and its number all other parameters are optional
+		<br /><b>[attach=1]</b>
+		<br />This will show the attachment as a thumbnail if available, if no thumbnail is available it will use a full sized image.  The image will be in line with the text of your post.
+		<br /><br />
+		<b>Options:</b>
+		<br />attach=x, attachimg=x, attachurl=x, attachmini=x where x is the attachment number
+		<br />align=left, center, right
+		<br />width=### (number in pixels)
+		<br />
+			<h3>Modes available</h3>
+			<p>
+				You can choose the inline mode you want for your attachment:
+				<ul>
+					<li><u>Thumbnail [attach=x]</u> Your image will be shown as a thumbnail</li>
+					<li><u>Full-size Image [attachimg=x]</u> Your image will be shown using its full dimensions up to the viewing size allowed by the forum.  Images larger than the viewing size allowed by the forum will be displayed at the forum maximum and be click-able to full size</li>
+					<li><u>Text Link [attachurl=x]</u> Only a link is show with size and view details. By clicking on it, the image is displayed.</li>
+					<li><u>Short Text Link [attachmini=x]</u> Only a link is shown without any details. By clicking on it, the image is displayed.</li>
+				</ul>
+			</p><br />
+		<p>
+			You can choose how to align the inline image:
+			<ul>
+				<li><u>align=left</u> The image is aligned to the left and the text will flow around it</li>
+				<li><u>align=right</u> The image is aligned to the right and the text will flow around it</li>
+				<li><u>align=center</u> The image is centered and the text will be below it</li>
+			</ul>
+		</p><br />
+		<p>
+			You can choose how wide to show the image:
+			<ul>
+				<li><u>width=123</u> The image is displayed 123pixels wide</li>
+				<li>If the width specified is larger than the image or larger than the forum allows the largest allowable width will be used</li>
+				<li>Can be used to shrink a thumbnail as well [attach=1 width=50] will display a 50px wide thumbnail
+			</ul>
+		</p><br />
+			<h3>How to use it?</h3>
+			<p>
+				<h4>Step 1 :</h4>
+				In the file selection, select the attachment file you want to upload;
+				<h4>Step 2 :</h4>
+				Select the inline mode, if any, you want using the list box "Inline modes";
+				<h4>Step 3 :</h4>
+				Repeat the steps for each attachment you want to upload. Move and edit the tags in the message body to suit your needs.
+			</p>';

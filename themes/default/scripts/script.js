@@ -9,7 +9,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:		BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0.2
+ * @version 1.1 dev
  *
  * This file contains javascript utility functions
  */
@@ -42,8 +42,9 @@ if (!('getElementsByClassName' in document))
 /**
  * Load an XML document using XMLHttpRequest.
  *
+ * @callback xmlCallback
  * @param {string} sUrl
- * @param {string} funcCallback
+ * @param {function} funcCallback
  */
 function getXMLDocument(sUrl, funcCallback)
 {
@@ -197,7 +198,7 @@ String.prototype.php_strtolower = function ()
  */
 String.prototype.php_urlencode = function()
 {
-	return escape(this).replace(/\+/g, '%2b').replace('*', '%2a').replace('/', '%2f').replace('@', '%40');
+	return encodeURIComponent(this).replace(/!/g, '%21').replace(/'/g, '%27').replace(/\(/g, '%28').replace(/\)/g, '%29').replace(/\*/g, '%2A').replace(/%20/g, '+');
 };
 
 /**
@@ -443,10 +444,7 @@ function isEmptyText(theField)
 	while (theValue.length > 0 && (theValue.charAt(theValue.length - 1) === ' ' || theValue.charAt(theValue.length - 1) === '\t'))
 		theValue = theValue.substring(0, theValue.length - 1);
 
-	if (theValue === '')
-		return true;
-	else
-		return false;
+	return theValue === '';
 }
 
 // Only allow form submission ONCE.
@@ -487,8 +485,8 @@ function getInnerHTML(oElement)
 /**
  * Set the "outer" HTML of an element.
  *
- * @param {type} oElement
- * @param {type} sToValue
+ * @param {HTMLElement} oElement
+ * @param {string} sToValue
  */
 function setOuterHTML(oElement, sToValue)
 {
@@ -506,7 +504,7 @@ function setOuterHTML(oElement, sToValue)
  * Checks for variable in theArray, returns true or false
  *
  * @param {string} variable
- * @param {array} theArray
+ * @param {string[]} theArray
  */
 function in_array(variable, theArray)
 {
@@ -550,6 +548,14 @@ function selectRadioByName(oRadioGroup, sName)
 	return false;
 }
 
+/**
+ * Selects all the form objects with a single click
+ *
+ * @param {object} oInvertCheckbox
+ * @param {object} oForm
+ * @param {string} sMask
+ * @param {string} sValue
+ */
 function selectAllRadio(oInvertCheckbox, oForm, sMask, sValue)
 {
 	for (var i = 0; i < oForm.length; i++)
@@ -560,10 +566,10 @@ function selectAllRadio(oInvertCheckbox, oForm, sMask, sValue)
 /**
  * Invert all check boxes at once by clicking a single checkbox.
  *
- * @param {type} oInvertCheckbox
- * @param {type} oForm
- * @param {type} sMask
- * @param {type} bIgnoreDisabled
+ * @param {object} oInvertCheckbox
+ * @param {string} oForm
+ * @param {string} sMask
+ * @param {boolean} bIgnoreDisabled
  */
 function invertAll(oInvertCheckbox, oForm, sMask, bIgnoreDisabled)
 {
@@ -580,7 +586,6 @@ function invertAll(oInvertCheckbox, oForm, sMask, bIgnoreDisabled)
 /**
  * Keep the session alive - always!
  */
-var lastKeepAliveCheck = new Date().getTime();
 function elk_sessionKeepAlive()
 {
 	var curTime = new Date().getTime();
@@ -987,7 +992,7 @@ elk_Toggle.prototype.toggle = function()
 /**
  * Creates and shows or hides the sites ajax in progress indicator
  *
- * @param {type} turn_on
+ * @param {boolean} turn_on
  * @returns {undefined}
  */
 function ajax_indicator(turn_on)
@@ -1576,7 +1581,7 @@ function smc_saveEntities(sFormName, aElementNames, sMask)
 /**
  * Make sure the window backgrounds (zebra stripes) are correct for lists.
  *
- * @param {type} oList
+ * @param {HTMLElement} oList
  */
 function applyWindowClasses(oList)
 {

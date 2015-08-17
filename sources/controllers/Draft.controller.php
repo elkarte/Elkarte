@@ -7,7 +7,7 @@
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
- * @version 1.0
+ * @version 1.1 dev
  *
  */
 
@@ -46,6 +46,7 @@ class Draft_Controller extends Action_Controller
 		// Language and helper functions
 		loadLanguage('Drafts');
 		require_once(SUBSDIR . '/Drafts.subs.php');
+		require_once(SUBSDIR . '/Profile.subs.php');
 
 		$this->_memID = currentMemberID();
 	}
@@ -61,7 +62,7 @@ class Draft_Controller extends Action_Controller
 
 		// Safe is safe.
 		if ($this->_memID != $user_info['id'])
-			fatal_lang_error('no_access', false);
+			Errors::instance()->fatal_lang_error('no_access', false);
 
 		require_once(SUBSDIR . '/Drafts.subs.php');
 
@@ -157,13 +158,12 @@ class Draft_Controller extends Action_Controller
 	{
 		global $txt, $user_info, $scripturl, $modSettings, $context;
 
-		require_once(SUBSDIR . '/Profile.subs.php');
 		require_once(SUBSDIR . '/Drafts.subs.php');
 
 		// Quick check how we got here.
 		if ($this->_memID != $user_info['id'])
 			// empty($modSettings['drafts_enabled']) || empty($modSettings['drafts_pm_enabled']))
-			fatal_lang_error('no_access', false);
+			Errors::instance()->fatal_lang_error('no_access', false);
 
 		// Set up what we will need
 		$context['start'] = isset($_REQUEST['start']) ? (int) $_REQUEST['start'] : 0;

@@ -13,7 +13,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:		BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0.2
+ * @version 1.1 dev
  *
  */
 
@@ -37,7 +37,7 @@ if (!defined('ELK'))
  * 'topic' updates the total number of topics, or if parameter1 is true
  *  simply increments them.
  *
- * 'subject' updateds the log_search_subjects in the event of a topic being
+ * 'subject' updates the log_search_subjects in the event of a topic being
  *  moved, removed or split.  parameter1 is the topicid, parameter2 is the new subject
  *
  * 'postgroups' case updates those members who match condition's
@@ -158,7 +158,7 @@ function updateSettings($changeArray, $update = false, $debug = false)
 /**
  * Deletes one setting from the settings table and takes care of $modSettings as well
  *
- * @param string $toRemove the setting or the settings to be removed
+ * @param string|string[] $toRemove the setting or the settings to be removed
  */
 function removeSettings($toRemove)
 {
@@ -370,7 +370,7 @@ function comma_format($number, $override_decimal_count = false)
  * Format a time to make it look purdy.
  *
  * What it does:
- * - returns a pretty formated version of time based on the user's format in $user_info['time_format'].
+ * - returns a pretty formatted version of time based on the user's format in $user_info['time_format'].
  * - applies all necessary time offsets to the timestamp, unless offset_type is set.
  * - if todayMod is set and show_today was not not specified or true, an
  *   alternate format string is used to show the date with something to show it is "today" or "yesterday".
@@ -531,7 +531,7 @@ function un_htmlspecialchars($string)
  * parsed properly
  *
  * @param mixed[] $array index array of values
- * @return mixed[] array representing all premutations of the supplied array
+ * @return mixed[] array representing all permutations of the supplied array
  */
 function permute($array)
 {
@@ -748,8 +748,6 @@ function parse_bbc($message, $smileys = true, $cache_id = '', $parse_tags = arra
 				'type' => 'unparsed_content',
 				'content' => '<div class="codeheader">' . $txt['code'] . ': <a href="javascript:void(0);" onclick="return elkSelectText(this);" class="codeoperation">' . $txt['code_select'] . '</a></div><pre class="bbc_code prettyprint">$1</pre>',
 				'validate' => isset($disabled['code']) ? null : function(&$tag, &$data, $disabled) {
-					global $context;
-
 					if (!isset($disabled['code']))
 						$data = str_replace("\t", "<span class=\"tab\">\t</span>", $data);
 				},
@@ -760,8 +758,6 @@ function parse_bbc($message, $smileys = true, $cache_id = '', $parse_tags = arra
 				'type' => 'unparsed_equals_content',
 				'content' => '<div class="codeheader">' . $txt['code'] . ': ($2) <a href="#" onclick="return elkSelectText(this);" class="codeoperation">' . $txt['code_select'] . '</a></div><pre class="bbc_code prettyprint">$1</pre>',
 				'validate' => isset($disabled['code']) ? null : function(&$tag, &$data, $disabled) {
-					global $context;
-
 					if (!isset($disabled['code']))
 						$data[0] = str_replace("\t", "<span class=\"tab\">\t</span>", $data[0]);
 				},
@@ -810,21 +806,21 @@ function parse_bbc($message, $smileys = true, $cache_id = '', $parse_tags = arra
 				'tag' => 'ftp',
 				'type' => 'unparsed_content',
 				'content' => '<a href="$1" class="bbc_ftp new_win" target="_blank">$1</a>',
-				'validate' => create_function('&$tag, &$data, $disabled', '
-					$data = strtr($data, array(\'<br />\' => \'\'));
-					if (strpos($data, \'ftp://\') !== 0 && strpos($data, \'ftps://\') !== 0)
-						$data = \'ftp://\' . $data;
-				'),
+				'validate' => function(&$tag, &$data, $disabled) {
+					$data = strtr($data, array('<br />' => ''));
+					if (strpos($data, 'ftp://') !== 0 && strpos($data, 'ftps://') !== 0)
+						$data = 'ftp://' . $data;
+				},
 			),
 			array(
 				'tag' => 'ftp',
 				'type' => 'unparsed_equals',
 				'before' => '<a href="$1" class="bbc_ftp new_win" target="_blank">',
 				'after' => '</a>',
-				'validate' => create_function('&$tag, &$data, $disabled', '
-					if (strpos($data, \'ftp://\') !== 0 && strpos($data, \'ftps://\') !== 0)
-						$data = \'ftp://\' . $data;
-				'),
+				'validate' => function(&$tag, &$data, $disabled) {
+					if (strpos($data, 'ftp://') !== 0 && strpos($data, 'ftps://') !== 0)
+						$data = 'ftp://' . $data;
+				},
 				'disallow_children' => array('email', 'ftp', 'url', 'iurl'),
 				'disabled_after' => ' ($1)',
 			),
@@ -1909,7 +1905,12 @@ function parse_bbc($message, $smileys = true, $cache_id = '', $parse_tags = arra
 
 			// For parsed content, we must recurse to avoid security problems.
 			if ($tag['type'] !== 'unparsed_equals')
+			{
 				$data = parse_bbc($data, !empty($tag['parsed_tags_allowed']) ? false : true, '', !empty($tag['parsed_tags_allowed']) ? $tag['parsed_tags_allowed'] : array());
+
+				// Unfortunately after we recurse, we must manually reset the static disabled tags to what they were
+				parse_bbc('dummy');
+			}
 
 			$tag['after'] = strtr($tag['after'], array('$1' => $data));
 
@@ -2052,23 +2053,23 @@ function parsesmileys(&$message)
 			// Load the smileys in reverse order by length so they don't get parsed wrong.
 			if (($temp = cache_get_data('parsing_smileys', 480)) == null)
 			{
-				$result = $db->query('', '
+				$smileysfrom = array();
+				$smileysto = array();
+				$smileysdescs = array();
+
+				$db->fetchQueryCallback('
 					SELECT code, filename, description
 					FROM {db_prefix}smileys
 					ORDER BY LENGTH(code) DESC',
 					array(
-					)
+					),
+					function($row) use (&$smileysfrom, &$smileysto, &$smileysdescs)
+					{
+						$smileysfrom[] = $row['code'];
+						$smileysto[] = htmlspecialchars($row['filename']);
+						$smileysdescs[] = $row['description'];
+					}
 				);
-				$smileysfrom = array();
-				$smileysto = array();
-				$smileysdescs = array();
-				while ($row = $db->fetch_assoc($result))
-				{
-					$smileysfrom[] = $row['code'];
-					$smileysto[] = htmlspecialchars($row['filename']);
-					$smileysdescs[] = $row['description'];
-				}
-				$db->free_result($result);
 
 				cache_put_data('parsing_smileys', array($smileysfrom, $smileysto, $smileysdescs), 480);
 			}
@@ -2153,6 +2154,8 @@ function redirectexit($setLocation = '', $refresh = false)
 	if (!empty($context['flush_mail']))
 		// @todo this relies on 'flush_mail' being only set in AddMailQueue itself... :\
 		AddMailQueue(true);
+
+	Notifications::getInstance()->send();
 
 	$add = preg_match('~^(ftp|http)[s]?://~', $setLocation) == 0 && substr($setLocation, 0, 6) != 'about:';
 
@@ -2243,6 +2246,8 @@ function obExit($header = null, $do_footer = null, $from_index = false, $from_fa
 		// @todo this relies on 'flush_mail' being only set in AddMailQueue itself... :\
 		AddMailQueue(true);
 
+	Notifications::getInstance()->send();
+
 	$do_header = $header === null ? !$header_done : $header;
 	if ($do_footer === null)
 		$do_footer = $do_header;
@@ -2287,7 +2292,23 @@ function obExit($header = null, $do_footer = null, $from_index = false, $from_fa
 	$req = request();
 
 	// Remember this URL in case someone doesn't like sending HTTP_REFERER.
-	if (strpos($_SERVER['REQUEST_URL'], 'action=dlattach') === false && strpos($_SERVER['REQUEST_URL'], 'action=viewadminfile') === false && strpos($_SERVER['REQUEST_URL'], ';xml') === false)
+	$invalid_old_url = array(
+		'action=dlattach',
+		'action=jsoption',
+		'action=viewadminfile',
+		';xml',
+		';api',
+	);
+	$make_old = true;
+	foreach ($invalid_old_url as $url)
+	{
+		if (strpos($_SERVER['REQUEST_URL'], $url) !== false)
+		{
+			$make_old = false;
+			break;
+		}
+	}
+	if ($make_old === true)
 		$_SESSION['old_url'] = $_SERVER['REQUEST_URL'];
 
 	// For session check verification.... don't switch browsers...
@@ -2316,7 +2337,7 @@ function determineTopicClass(&$topic_context)
 	else
 		$topic_context['class'] = 'normal';
 
-	$topic_context['class'] .= $topic_context['is_poll'] ? '_poll' : '_post';
+	$topic_context['class'] .= !empty($topic_context['is_poll']) ? '_poll' : '_post';
 
 	if ($topic_context['is_locked'])
 		$topic_context['class'] .= '_locked';
@@ -2337,12 +2358,11 @@ function determineTopicClass(&$topic_context)
 function setupThemeContext($forceload = false)
 {
 	global $modSettings, $user_info, $scripturl, $context, $settings, $options, $txt;
-	global $user_settings;
 
 	static $loaded = false;
 
 	// Under SSI this function can be called more then once.  That can cause some problems.
-	//   So only run the function once unless we are forced to run it again.
+	// So only run the function once unless we are forced to run it again.
 	if ($loaded && !$forceload)
 		return;
 
@@ -2382,31 +2402,18 @@ function setupThemeContext($forceload = false)
 			$context['user']['popup_messages'] = false;
 		$_SESSION['unread_messages'] = $user_info['unread_messages'];
 
-		$context['user']['avatar'] = array();
+		$context['user']['avatar'] = array(
+			'href' => !empty($user_info['avatar']['href']) ? $user_info['avatar']['href'] : '',
+			'image' => !empty($user_info['avatar']['image']) ? $user_info['avatar']['image'] : '',
+		);
 
-		// Figure out the avatar... uploaded?
-		if ($user_info['avatar']['url'] == '' && !empty($user_info['avatar']['id_attach']))
-			$context['user']['avatar']['href'] = $user_info['avatar']['custom_dir'] ? $modSettings['custom_avatar_url'] . '/' . $user_info['avatar']['filename'] : $scripturl . '?action=dlattach;attach=' . $user_info['avatar']['id_attach'] . ';type=avatar';
-		// Full URL?
-		elseif (substr($user_info['avatar']['url'], 0, 7) == 'http://' || substr($user_info['avatar']['url'], 0, 8) == 'https://')
-		{
-			$context['user']['avatar']['href'] = $user_info['avatar']['url'];
+		// @deprecated since 1.0.2
+		if (!empty($modSettings['avatar_max_width']))
+			$context['user']['avatar']['width'] = $modSettings['avatar_max_width'];
 
-			if (!empty($modSettings['avatar_max_width']))
-				$context['user']['avatar']['width'] = $modSettings['avatar_max_width'];
-
-			if (!empty($modSettings['avatar_max_height']))
-				$context['user']['avatar']['height'] = $modSettings['avatar_max_height'];
-		}
-		// Gravatars URL.
-		elseif ($user_info['avatar']['url'] === 'gravatar')
-			$context['user']['avatar']['href'] = '//www.gravatar.com/avatar/' . md5(strtolower($user_settings['email_address'])) . 'd=' . $modSettings['avatar_max_height'] . (!empty($modSettings['gravatar_rating']) ? ('&amp;r=' . $modSettings['gravatar_rating']) : '');
-		// Otherwise we assume it's server stored?
-		elseif ($user_info['avatar']['url'] !== '')
-			$context['user']['avatar']['href'] = $modSettings['avatar_url'] . '/' . htmlspecialchars($user_info['avatar']['url']);
-
-		if (!empty($context['user']['avatar']))
-			$context['user']['avatar']['image'] = '<img src="' . $context['user']['avatar']['href'] . '" style="' . (isset($context['user']['avatar']['width']) ? 'width: ' . $context['user']['avatar']['width'] . 'px;' : '') . (isset($context['user']['avatar']['height']) ? 'height: ' . $context['user']['avatar']['height'] . 'px' : '') . '" alt="" class="avatar" />';
+		// @deprecated since 1.0.2
+		if (!empty($modSettings['avatar_max_height']))
+			$context['user']['avatar']['height'] = $modSettings['avatar_max_height'];
 
 		// Figure out how long they've been logged in.
 		$context['user']['total_time_logged_in'] = array(
@@ -2557,6 +2564,55 @@ function memoryReturnBytes($val)
 }
 
 /**
+ * Wrapper function for set_time_limit
+ *
+ * When called, attempts to restart the timeout counter from zero.
+ *
+ * This sets the maximum time in seconds a script is allowed to run before it is terminated by the parser.
+ * You can not change this setting with ini_set() when running in safe mode.
+ * Your web server can have other timeout configurations that may also interrupt PHP execution.
+ * Apache has a Timeout directive and IIS has a CGI timeout function.
+ * Security extension may also disable this function, such as Suhosin
+ * Hosts may add this to the disabled_functions list in php.ini
+ *
+ * If the current time limit is not unlimited it is possible to decrease the
+ * total time limit if the sum of the new time limit and the current time spent
+ * running the script is inferior to the original time limit. It is inherent to
+ * the way set_time_limit() works, it should rather be called with an
+ * appropriate value every time you need to allocate a certain amount of time
+ * to execute a task than only once at the beginning of the script.
+ *
+ * Before calling set_time_limit(), we check if this function is available
+ *
+ * @param int $time_limit The time limit
+ * @param bool $server_reset whether to reset the server timer or not
+ */
+function setTimeLimit($time_limit, $server_reset = true)
+{
+	// Make sure the function exists, it may be in the ini disable_functions list
+	if (function_exists('set_time_limit'))
+	{
+		$current = (int) ini_get('max_execution_time');
+
+		// Do not set a limit if it is currently unlimited.
+		if ($current !== 0)
+		{
+			// Set it to the maximum that we can, not more, not less
+			$time_limit = min($current, max($time_limit, $current));
+
+			// Still need error suppression as some security addons many prevent this action
+			@set_time_limit($time_limit);
+		}
+	}
+
+	// Don't let apache close the connection
+	if ($server_reset && function_exists('apache_reset_timeout'))
+		@apache_reset_timeout();
+
+	return ini_get('max_execution_time');
+}
+
+/**
  * This is the only template included in the sources.
  */
 function template_rawdata()
@@ -2614,14 +2670,14 @@ function template_header()
  */
 function theme_copyright()
 {
-	global $forum_copyright, $forum_version;
+	global $forum_copyright;
 
 	// Don't display copyright for things like SSI.
-	if (!isset($forum_version))
+	if (!defined('FORUM_VERSION'))
 		return;
 
 	// Put in the version...
-	$forum_copyright = replaceBasicActionUrl(sprintf($forum_copyright, $forum_version));
+	$forum_copyright = replaceBasicActionUrl(sprintf($forum_copyright, FORUM_VERSION));
 
 	echo '
 					', $forum_copyright;
@@ -2959,7 +3015,7 @@ function ip2range($fullip)
 			$ip_array[$i] = array('low' => $ip_parts[$i], 'high' => $ip_parts[$i]);
 	}
 
-	// Makes it simpiler to work with.
+	// Makes it simpler to work with.
 	$ip_array[4] = array('low' => 0, 'high' => 0);
 	$ip_array[5] = array('low' => 0, 'high' => 0);
 	$ip_array[6] = array('low' => 0, 'high' => 0);
@@ -3056,7 +3112,7 @@ function text2words($text, $max_chars = 20, $encrypt = false)
 				$encrypted = substr(crypt($word, 'uk'), 2, $max_chars);
 				$total = 0;
 
-				// Create an integer reprsentation
+				// Create an integer representation
 				for ($i = 0; $i < $max_chars; $i++)
 					$total += $possible_chars[ord($encrypted{$i})] * pow(63, $i);
 
@@ -3530,56 +3586,7 @@ function elk_seed_generator()
  */
 function call_integration_hook($hook, $parameters = array())
 {
-	global $modSettings, $settings, $db_show_debug;
-
-	static $path_replacements = array(
-		'BOARDDIR' => BOARDDIR,
-		'SOURCEDIR' => SOURCEDIR,
-		'EXTDIR' => EXTDIR,
-		'LANGUAGEDIR' => LANGUAGEDIR,
-		'ADMINDIR' => ADMINDIR,
-		'CONTROLLERDIR' => CONTROLLERDIR,
-		'SUBSDIR' => SUBSDIR,
-	);
-
-	if ($db_show_debug === true)
-		Debug::get()->add('hooks', $hook);
-
-	$results = array();
-	if (empty($modSettings[$hook]))
-		return $results;
-
-	if (!empty($settings['theme_dir']))
-		$path_replacements['$themedir'] = $settings['theme_dir'];
-
-	// Loop through each function.
-	$functions = explode(',', $modSettings[$hook]);
-	foreach ($functions as $function)
-	{
-		$function = trim($function);
-		if (strpos($function, '|') !== false)
-			list ($call, $file) = explode('|', $function);
-		else
-			$call = $function;
-
-		// OOP static method
-		if (strpos($call, '::') !== false)
-			$call = explode('::', $call);
-
-		if (!empty($file))
-		{
-			$absPath = strtr(trim($file), $path_replacements);
-
-			if (file_exists($absPath))
-				require_once($absPath);
-		}
-
-		// Is it valid?
-		if (is_callable($call))
-			$results[$function] = call_user_func_array($call, $parameters);
-	}
-
-	return $results;
+	return Hooks::get()->hook($hook, $parameters);
 }
 
 /**
@@ -3589,36 +3596,7 @@ function call_integration_hook($hook, $parameters = array())
  */
 function call_integration_include_hook($hook)
 {
-	global $modSettings, $settings, $db_show_debug;
-
-	static $path_replacements = array(
-		'BOARDDIR' => BOARDDIR,
-		'SOURCEDIR' => SOURCEDIR,
-		'EXTDIR' => EXTDIR,
-		'LANGUAGEDIR' => LANGUAGEDIR,
-		'ADMINDIR' => ADMINDIR,
-		'CONTROLLERDIR' => CONTROLLERDIR,
-		'SUBSDIR' => SUBSDIR,
-	);
-
-	if ($db_show_debug === true)
-		Debug::get()->add('hooks', $hook);
-
-	// Any file to include?
-	if (!empty($modSettings[$hook]))
-	{
-		if (!empty($settings['theme_dir']))
-			$path_replacements['$themedir'] = $settings['theme_dir'];
-
-		$pre_includes = explode(',', $modSettings[$hook]);
-		foreach ($pre_includes as $include)
-		{
-			$include = strtr(trim($include), $path_replacements);
-
-			if (file_exists($include))
-				require_once($include);
-		}
-	}
+	Hooks::get()->include_hook($hook);
 }
 
 /**
@@ -3626,57 +3604,7 @@ function call_integration_include_hook($hook)
  */
 function call_integration_buffer()
 {
-	global $modSettings, $settings, $db_show_debug;
-
-	static $path_replacements = array(
-		'BOARDDIR' => BOARDDIR,
-		'SOURCEDIR' => SOURCEDIR,
-		'EXTDIR' => EXTDIR,
-		'LANGUAGEDIR' => LANGUAGEDIR,
-		'ADMINDIR' => ADMINDIR,
-		'CONTROLLERDIR' => CONTROLLERDIR,
-		'SUBSDIR' => SUBSDIR,
-	);
-
-	if ($db_show_debug === true)
-		Debug::get()->add('hooks', 'integrate_buffer');
-
-	if (!empty($settings['theme_dir']))
-		$path_replacements['$themedir'] = $settings['theme_dir'];
-
-	if (isset($modSettings['integrate_buffer']))
-		$buffers = explode(',', $modSettings['integrate_buffer']);
-
-	if (empty($buffers))
-		return;
-
-	foreach ($buffers as $function)
-	{
-		$function = trim($function);
-
-		if (strpos($function, '|') !== false)
-			list($call, $file) = explode('|', $function);
-		else
-			$call = $function;
-
-		// OOP static method
-		if (strpos($call, '::') !== false)
-		{
-			$call = explode('::', $call);
-		}
-
-		if (!empty($file))
-		{
-			$absPath = strtr(trim($file), $path_replacements);
-
-			if (file_exists($absPath))
-				require_once($absPath);
-		}
-
-		// Is it valid?
-		if (is_callable($call))
-			ob_start($call);
-	}
+	Hooks::get()->buffer_hook();
 }
 
 /**
@@ -3691,49 +3619,7 @@ function call_integration_buffer()
  */
 function add_integration_function($hook, $function, $file = '', $permanent = true)
 {
-	global $modSettings;
-
-	$db = database();
-
-	$integration_call = (!empty($file) && $file !== true) ? $function . '|' . $file : $function;
-
-	// Is it going to be permanent?
-	if ($permanent)
-	{
-		$request = $db->query('', '
-			SELECT value
-			FROM {db_prefix}settings
-			WHERE variable = {string:variable}',
-			array(
-				'variable' => $hook,
-			)
-		);
-		list ($current_functions) = $db->fetch_row($request);
-		$db->free_result($request);
-
-		if (!empty($current_functions))
-		{
-			$current_functions = explode(',', $current_functions);
-			if (in_array($integration_call, $current_functions))
-				return;
-
-			$permanent_functions = array_merge($current_functions, array($integration_call));
-		}
-		else
-			$permanent_functions = array($integration_call);
-
-		updateSettings(array($hook => implode(',', $permanent_functions)));
-	}
-
-	// Make current function list usable.
-	$functions = empty($modSettings[$hook]) ? array() : explode(',', $modSettings[$hook]);
-
-	// Do nothing, if it's already there.
-	if (in_array($integration_call, $functions))
-		return;
-
-	$functions[] = $integration_call;
-	$modSettings[$hook] = implode(',', $functions);
+	Hooks::get()->add($hook, $function, $file, $permanent);
 }
 
 /**
@@ -3749,45 +3635,7 @@ function add_integration_function($hook, $function, $file = '', $permanent = tru
  */
 function remove_integration_function($hook, $function, $file = '')
 {
-	global $modSettings;
-
-	$db = database();
-	$integration_call = (!empty($file) && $file !== true) ? $function . '|' . $file : $function;
-
-	// Get the permanent functions.
-	$request = $db->query('', '
-		SELECT value
-		FROM {db_prefix}settings
-		WHERE variable = {string:variable}',
-		array(
-			'variable' => $hook,
-		)
-	);
-	list ($current_functions) = $db->fetch_row($request);
-	$db->free_result($request);
-
-	// If we found entries for this hook
-	if (!empty($current_functions))
-	{
-		$current_functions = explode(',', $current_functions);
-
-		if (in_array($integration_call, $current_functions))
-		{
-			updateSettings(array($hook => implode(',', array_diff($current_functions, array($integration_call)))));
-			if (empty($modSettings[$hook]))
-				removeSettings($hook);
-		}
-	}
-
-	// Turn the function list into something usable.
-	$functions = empty($modSettings[$hook]) ? array() : explode(',', $modSettings[$hook]);
-
-	// You can only remove it if it's available.
-	if (!in_array($integration_call, $functions))
-		return;
-
-	$functions = array_diff($functions, array($integration_call));
-	$modSettings[$hook] = implode(',', $functions);
+	Hooks::get()->remove($hook, $function, $file);
 }
 
 /**
@@ -3804,7 +3652,7 @@ function sanitizeMSCutPaste($string)
 	if (empty($string))
 		return $string;
 
-	// UTF-8 occurences of MS special characters
+	// UTF-8 occurrences of MS special characters
 	$findchars_utf8 = array(
 		"\xe2\x80\x9a", // single low-9 quotation mark
 		"\xe2\x80\x9e", // double low-9 quotation mark
@@ -3865,7 +3713,7 @@ function replaceEntities__callback($matches)
 	// 0xD800 >= $num <= 0xDFFF are surrogate markers (not valid for utf8 text)
 	if ($num < 0x20 || $num > 0x10FFFF || ($num >= 0xD800 && $num <= 0xDFFF))
 		return '';
-	// <0x80 (or less than 128) are standard ascii characters a-z A-Z 0-9 and puncuation
+	// <0x80 (or less than 128) are standard ascii characters a-z A-Z 0-9 and punctuation
 	elseif ($num < 0x80)
 		return chr($num);
 	// <0x800 (2048)
@@ -3901,7 +3749,7 @@ function fixchar__callback($matches)
 	// 0xD800 >= $num <= 0xDFFF are surrogate markers (not valid for utf8 text), 0x202D-E are left to right overrides
 	if ($num < 0x20 || $num > 0x10FFFF || ($num >= 0xD800 && $num <= 0xDFFF) || $num === 0x202D || $num === 0x202E)
 		return '';
-	// <0x80 (or less than 128) are standard ascii characters a-z A-Z 0-9 and puncuation
+	// <0x80 (or less than 128) are standard ascii characters a-z A-Z 0-9 and punctuation
 	elseif ($num < 0x80)
 		return chr($num);
 	// <0x800 (2048)
@@ -4159,96 +4007,10 @@ function replaceBasicActionUrl($string)
 }
 
 /**
- * Elkarte autoloader
- *
- * What it does:
- * - Automatically includes the required files for a given class
- * - Follows controller naming conventions to find the right file to load
- *
- * @param string $class The name of the class
- */
-function elk_autoloader($class)
-{
-	// Break the class name in to its parts
-	$name = explode('_', $class);
-	$surname = array_pop($name);
-	$givenname = implode('', $name);
-
-	switch ($givenname)
-	{
-		case 'VerificationControls':
-			$file_name = SUBSDIR . '/VerificationControls.class.php';
-			break;
-		// We don't handle these
-		case 'Database':
-		case 'DbSearch':
-		case 'DbTable':
-			$file_name = '';
-			break;
-		// Simple names like Util.class, Action.class, Request.class ...
-		case '':
-			$file_name = $surname;
-
-			if (file_exists(SUBSDIR . '/' . $file_name . '.class.php'))
-				$file_name = SUBSDIR . '/' . $file_name . '.class.php';
-			elseif (file_exists(SOURCEDIR . '/' . $file_name . '.class.php'))
-				$file_name = SOURCEDIR . '/' . $file_name . '.class.php';
-			elseif (file_exists(SOURCEDIR . '/' . $file_name . '.php'))
-				$file_name = SOURCEDIR . '/' . $file_name . '.php';
-			else
-				$file_name = '';
-			break;
-		// Some_Other
-		default:
-			switch ($surname)
-			{
-				// Some_Controller => Some.controller.php
-				case 'Controller':
-					$file_name = $givenname . '.controller.php';
-
-					// Try controller dir first, then admin
-					if (file_exists(CONTROLLERDIR . '/' . $file_name))
-						$file_name = CONTROLLERDIR . '/' . $file_name;
-					elseif (file_exists(ADMINDIR . '/' . $file_name))
-						$file_name = ADMINDIR . '/' . $file_name;
-					break;
-				// Some_Search => SearchAPI-Some.class
-				case 'Search':
-					$file_name = SUBSDIR . '/SearchAPI-' . $givenname . '.class.php';
-					break;
-				// Some_Cache => SomeCache.class.php
-				case 'Cache':
-					$file_name = SUBSDIR . '/cache/' . $givenname . $surname . '.class.php';
-					break;
-				// Some_Display => Subscriptions-Some.class.php
-				case 'Display':
-				case 'Payment':
-					$file_name = SUBSDIR . '/Subscriptions-' . implode('_', $name) . '.class.php';
-					break;
-				// All the rest, like Browser_Detector, Template_Layers, Site_Dispatcher ...
-				default:
-					$file_name = $givenname . $surname;
-
-					if (file_exists(SUBSDIR . '/' . $file_name . '.class.php'))
-						$file_name = SUBSDIR . '/' . $file_name . '.class.php';
-					elseif (file_exists(SOURCEDIR . '/' . $file_name . '.class.php'))
-						$file_name = SOURCEDIR . '/' . $file_name . '.class.php';
-					elseif (file_exists(SOURCEDIR . '/' . $file_name . '.php'))
-						$file_name = SOURCEDIR . '/' . $file_name . '.php';
-					else
-						$file_name = '';
-			}
-	}
-
-	if (!empty($file_name))
-		require_once($file_name);
-}
-
-/**
  * This function creates a new GenericList from all the passed options.
  *
  * What it does:
- * - Calls integration hook integrate_list_"unique_list_id" to allow easy modifiying
+ * - Calls integration hook integrate_list_"unique_list_id" to allow easy modifying
  *
  * @param mixed[] $listOptions associative array of option => value
  */
@@ -4320,7 +4082,7 @@ function response_prefix()
 /**
  * A very simple function to determine if an email address is "valid" for Elkarte.
  *
- * - A valid email for ElkArte is something that resebles an email (filter_var) and
+ * - A valid email for ElkArte is something that resembles an email (filter_var) and
  * is less than 255 characters (for database limits)
  *
  * @param string $value - The string to evaluate as valid email

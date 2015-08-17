@@ -7,7 +7,7 @@
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
- * @version 1.0
+ * @version 1.1 dev
  *
  */
 
@@ -233,7 +233,7 @@ class Util
 	 * @param int $length
 	 * @param bool $cutword try to cut at a word boundary
 	 * @param string $ellipsis characters to add at the end of a cut string
-	 * @param bool $exact set true to include ellipsis in the allowed lenght, false will append instead
+	 * @param bool $exact set true to include ellipsis in the allowed length, false will append instead
 	 * @param int $buffer maximum length underflow to allow when cutting on a word boundary
 	 */
 	public static function shorten_text($string, $length = 384, $cutword = false, $ellipsis = '...', $exact = true, $buffer = 12)
@@ -433,34 +433,6 @@ class Util
 			$ent_list = '&(#021|quot|amp|lt|gt|nbsp);';
 			return strlen(preg_replace('~' . $ent_list . '|.~u', '_', $string));
 		}
-	}
-
-	/**
-	 * Adds slashes to the array/variable.
-	 * What it does:
-	 * - returns the var, as an array or string, with escapes as required.
-	 * - importantly escapes all keys and values!
-	 * - calls itself recursively if necessary.
-	 *
-	 * @todo not used, consider removing
-	 * @deprecated since 1.0
-	 *
-	 * @param mixed[]|string $var
-	 * @return array|string
-	 */
-	public static function escapestring_recursive($var)
-	{
-		if (!is_array($var))
-			return addslashes($var);
-
-		// Reindex the array with slashes.
-		$new_var = array();
-
-		// Add slashes to every element, even the indexes!
-		foreach ($var as $k => $v)
-			$new_var[addslashes($k)] = Util::escapestring_recursive($v);
-
-		return $new_var;
 	}
 
 	/**

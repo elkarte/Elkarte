@@ -7,7 +7,7 @@
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
- * @version 1.0
+ * @version 1.1 dev
  *
  */
 
@@ -33,7 +33,7 @@ interface Database
 	 * Callback for preg_replace_callback on the query.
 	 * It allows to replace on the fly a few pre-defined strings, for convenience ('query_see_board', 'query_wanna_see_board'), with
 	 * their current values from $user_info.
-	 * In addition, it performs checks and sanitization on the values sent to the database.
+	 * In addition, it performs checks and sanitation on the values sent to the database.
 	 *
 	 * @param mixed[] $matches
 	 */
@@ -59,6 +59,30 @@ interface Database
 	 * @param resource|null $connection = null
 	 */
 	public function query($identifier, $db_string, $db_values = array(), $connection = null);
+
+	/**
+	 * Do a query, and returns the results.
+	 *
+	 * @param string $db_string
+	 * @param mixed[] $db_values = array()
+	 * @param mixed[]|null
+	 * @return array
+	 */
+	public function fetchQuery($db_string, $db_values = array(), $seeds = null);
+
+	/**
+	 * Do a query and returns the results calling a callback on each row.
+	 *
+	 * The callback is supposed to accept as argument the row of data fetched
+	 * by the query from the database.
+	 *
+	 * @param string $db_string
+	 * @param mixed[] $db_values = array()
+	 * @param object|null $callback
+	 * @param mixed[]|null
+	 * @return array
+	 */
+	public function fetchQueryCallback($db_string, $db_values = array(), $callback = null, $seeds = null);
 
 	/**
 	 * Fetch next result as association.
@@ -164,7 +188,7 @@ interface Database
 	 *
 	 * @param string $error_message
 	 * @param string $log_message
-	 * @param string|false $error_type
+	 * @param string|boolean $error_type
 	 * @param string|null $file
 	 * @param int|null $line
 	 */
@@ -240,4 +264,18 @@ interface Database
 	 * @param resource|null $connection = null
 	 */
 	public function select_db($dbName = null, $connection = null);
+
+	/**
+	 * Return the number of queries executed
+	 *
+	 * @return int
+	 */
+	public function num_queries();
+
+	/**
+	 * Retrieve the connection object
+	 *
+	 * @return resource
+	 */
+	public function connection();
 }

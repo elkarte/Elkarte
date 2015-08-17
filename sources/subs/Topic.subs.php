@@ -16,7 +16,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0.2
+ * @version 1.1 dev
  *
  */
 
@@ -131,8 +131,7 @@ function removeTopics($topics, $decreasePostCount = true, $ignoreRecycling = fal
 				if ($row['id_board'] == $modSettings['recycle_board'])
 					continue;
 
-				if (function_exists('apache_reset_timeout'))
-					@apache_reset_timeout();
+				setTimeLimit(300);
 
 				$recycleTopics[] = $row['id_topic'];
 
@@ -200,6 +199,8 @@ function removeTopics($topics, $decreasePostCount = true, $ignoreRecycling = fal
 	{
 		if (!isset($adjustBoards[$row['id_board']]['num_posts']))
 		{
+			cache_put_data('board-' . $row['id_board'], null, 120);
+
 			$adjustBoards[$row['id_board']] = array(
 				'num_posts' => 0,
 				'num_topics' => 0,
@@ -221,11 +222,9 @@ function removeTopics($topics, $decreasePostCount = true, $ignoreRecycling = fal
 	$db->free_result($request);
 
 	// Decrease number of posts and topics for each board.
+	setTimeLimit(300);
 	foreach ($adjustBoards as $stats)
 	{
-		if (function_exists('apache_reset_timeout'))
-			@apache_reset_timeout();
-
 		$db->query('', '
 			UPDATE {db_prefix}boards
 			SET
@@ -303,8 +302,7 @@ function removeTopics($topics, $decreasePostCount = true, $ignoreRecycling = fal
 		$messages = array();
 		while ($row = $db->fetch_assoc($request))
 		{
-			if (function_exists('apache_reset_timeout'))
-				@apache_reset_timeout();
+			setTimeLimit(300);
 
 			$words = array_merge($words, text2words($row['body'], $customIndexSettings['bytes_per_word'], true));
 			$messages[] = $row['id_msg'];
@@ -343,9 +341,11 @@ function removeTopics($topics, $decreasePostCount = true, $ignoreRecycling = fal
 		// Remove all mentions now that the topic is gone
 		$db->query('', '
 			DELETE FROM {db_prefix}log_mentions
-			WHERE id_msg IN ({array_int:messages})',
+			WHERE id_target IN ({array_int:messages})
+				AND mention_type IN ({array_string:mension_types})',
 			array(
 				'messages' => $messages,
+				'mension_types' => array('mentionmem', 'likemsg', 'rlikemsg'),
 			)
 		);
 	}
@@ -406,6 +406,9 @@ function removeTopics($topics, $decreasePostCount = true, $ignoreRecycling = fal
 	);
 	require_once(SUBSDIR . '/FollowUps.subs.php');
 	removeFollowUpsByTopic($topics);
+
+	foreach ($topics as $topic_id)
+		cache_put_data('topic_board-' . $topic_id, null, 120);
 
 	// Maybe there's an addon that wants to delete topic related data of its own
 	call_integration_hook('integrate_remove_topics', array($topics));
@@ -882,7 +885,7 @@ function moveTopicConcurrence($move_from = null, $id_board = null, $id_topic = n
 
 		$board_link = '<a href="' . $scripturl . '?board=' . $id_board . '.0">' . $board_name . '</a>';
 		$topic_link = '<a href="' . $scripturl . '?topic=' . $id_topic . '.0">' . $topic_subject . '</a>';
-		fatal_lang_error('topic_already_moved', false, array($topic_link, $board_link));
+		Errors::instance()->fatal_lang_error('topic_already_moved', false, array($topic_link, $board_link));
 	}
 }
 
@@ -911,7 +914,7 @@ function removeDeleteConcurrence()
 	else
 		$confirm_url = $scripturl . '?action=removetopic2;confirm_delete;topic=' . $context['current_topic'] . '.0;' . $context['session_var'] . '=' . $context['session_id'];
 
-		fatal_lang_error('post_already_deleted', false, array($confirm_url));
+		Errors::instance()->fatal_lang_error('post_already_deleted', false, array($confirm_url));
 }
 
 /**
@@ -1253,11 +1256,11 @@ function setTopicWatch($id_member, $topic, $on = false)
  * @param mixed[]|int $topic_parameters can also accept a int value for a topic
  * @param string $full defines the values returned by the function:
  *    - if empty returns only the data from {db_prefix}topics
- *    - if 'message' returns also informations about the message (subject, body, etc.)
- *    - if 'starter' returns also informations about the topic starter (id_member and poster_name)
+ *    - if 'message' returns also information about the message (subject, body, etc.)
+ *    - if 'starter' returns also information about the topic starter (id_member and poster_name)
  *    - if 'all' returns additional infos about the read/unwatched status
- * @param string[] $selects (optional from integation)
- * @param string[] $tables (optional from integation)
+ * @param string[] $selects (optional from integration)
+ * @param string[] $tables (optional from integration)
  */
 function getTopicInfo($topic_parameters, $full = '', $selects = array(), $tables = array())
 {
@@ -1279,7 +1282,6 @@ function getTopicInfo($topic_parameters, $full = '', $selects = array(), $tables
 
 	$messages_table = $full === 'message' || $full === 'all' || $full === 'starter';
 	$members_table = $full === 'starter';
-	$follow_ups_table = !empty($modSettings['enableFollowup']) && $full === 'follow_up' || $full === 'all';
 	$logs_table = $full === 'all';
 
 	// Create the query, taking full and integration in to account
@@ -1290,17 +1292,14 @@ function getTopicInfo($topic_parameters, $full = '', $selects = array(), $tables
 			t.num_replies, t.num_views, t.num_likes, t.locked, t.redirect_expires,
 			t.id_redirect_topic, t.unapproved_posts, t.approved' . ($messages_table ? ',
 			ms.subject, ms.body, ms.id_member, ms.poster_time, ms.approved as msg_approved' : '') . ($members_table ? ',
-			IFNULL(mem.real_name, ms.poster_name) AS poster_name' : '') . ($follow_ups_table ? ',
-			fu.derived_from' : '') .
-			($logs_table ? ',
+			IFNULL(mem.real_name, ms.poster_name) AS poster_name' : '') . ($logs_table ? ',
 			' . ($user_info['is_guest'] ? 't.id_last_msg + 1' : 'IFNULL(lt.id_msg, IFNULL(lmr.id_msg, -1)) + 1') . ' AS new_from
 			' . (!empty($modSettings['recycle_board']) && $modSettings['recycle_board'] == $board ? ', t.id_previous_board, t.id_previous_topic' : '') . '
 			' . (!$user_info['is_guest'] ? ', IFNULL(lt.unwatched, 0) as unwatched' : '') : '') .
 			(!empty($selects) ? ', ' . implode(', ', $selects) : '') . '
 		FROM {db_prefix}topics AS t' . ($messages_table ? '
 			INNER JOIN {db_prefix}messages AS ms ON (ms.id_msg = t.id_first_msg)' : '') . ($members_table ? '
-			LEFT JOIN {db_prefix}members as mem ON (mem.id_member = ms.id_member)' : '') . ($follow_ups_table ? '
-			LEFT JOIN {db_prefix}follow_ups AS fu ON (fu.follow_up = t.id_topic)' : '') . ($logs_table && !$user_info['is_guest'] ? '
+			LEFT JOIN {db_prefix}members as mem ON (mem.id_member = ms.id_member)' : '') . ($logs_table && !$user_info['is_guest'] ? '
 			LEFT JOIN {db_prefix}log_topics AS lt ON (lt.id_topic = {int:topic} AND lt.id_member = {int:member})
 			LEFT JOIN {db_prefix}log_mark_read AS lmr ON (lmr.id_board = {int:board} AND lmr.id_member = {int:member})' : '') . (!empty($tables) ? '
 			' . implode("\n\t\t\t", $tables) : '') . '
@@ -1364,7 +1363,7 @@ function getTopicInfoByMsg($topic, $msg = null)
 /**
  * So long as you are sure... all old posts will be gone.
  * Used in Maintenance.controller.php to prune old topics.
- * 
+ *
  * @param int[] $boards
  * @param string $delete_type
  * @param boolean $exclude_stickies
@@ -1854,7 +1853,7 @@ function topicStatus($topic)
 /**
  * Set attributes for a topic, i.e. locked, sticky.
  * Parameter $attributes is an array where the key is the column name of the
- * attribut to change, and the value is... the new value of the attribute.
+ * attribute to change, and the value is... the new value of the attribute.
  * It sets the new value for the attribute as passed to it.
  * <b>It is currently limited to integer values only</b>
  *
@@ -1962,8 +1961,8 @@ function topicUserAttributes($id_topic, $user)
 
 	$request = $db->query('', '
 		SELECT
-			t.locked, IFNULL(ln.id_topic, 0) AS notify, t.is_sticky, t.id_poll, t.id_last_msg, mf.id_member,
-			t.id_first_msg, mf.subject,
+			t.locked, IFNULL(ln.id_topic, 0) AS notify, t.is_sticky, t.id_poll,
+			t.id_last_msg, mf.id_member, t.id_first_msg, mf.subject,
 			CASE WHEN ml.poster_time > ml.modified_time THEN ml.poster_time ELSE ml.modified_time END AS last_post_time
 		FROM {db_prefix}topics AS t
 			LEFT JOIN {db_prefix}log_notify AS ln ON (ln.id_topic = t.id_topic AND ln.id_member = {int:current_member})
@@ -2290,8 +2289,8 @@ function approveTopics($topics, $approve = true, $log = false)
  *
  * @param string $reason the text that will become the message body
  * @param string $subject the text that will become the message subject
- * @param mixed[] $board_info some board informations (at least id, name, if posts are counted)
- * @param string $new_topic used to buld the url for moving to a new topic
+ * @param mixed[] $board_info some board information (at least id, name, if posts are counted)
+ * @param string $new_topic used to build the url for moving to a new topic
  */
 function postSplitRedirect($reason, $subject, $board_info, $new_topic)
 {
@@ -2353,7 +2352,7 @@ function splitTopic($split1_ID_TOPIC, $splitMessages, $new_subject)
 
 	// Nothing to split?
 	if (empty($splitMessages))
-		fatal_lang_error('no_posts_selected', false);
+		Errors::instance()->fatal_lang_error('no_posts_selected', false);
 
 	// Get some board info.
 	$topicAttribute = topicAttribute($split1_ID_TOPIC, array('id_board', 'approved'));
@@ -2378,7 +2377,7 @@ function splitTopic($split1_ID_TOPIC, $splitMessages, $new_subject)
 	);
 	// You can't select ALL the messages!
 	if ($db->num_rows($request) == 0)
-		fatal_lang_error('selected_all_posts', false);
+		Errors::instance()->fatal_lang_error('selected_all_posts', false);
 
 	$split1_first_msg = null;
 	$split1_last_msg = null;
@@ -2464,11 +2463,11 @@ function splitTopic($split1_ID_TOPIC, $splitMessages, $new_subject)
 
 	// No database changes yet, so let's double check to see if everything makes at least a little sense.
 	if ($split1_first_msg <= 0 || $split1_last_msg <= 0 || $split2_first_msg <= 0 || $split2_last_msg <= 0 || $split1_replies < 0 || $split2_replies < 0 || $split1_unapprovedposts < 0 || $split2_unapprovedposts < 0 || !isset($split1_approved) || !isset($split2_approved))
-		fatal_lang_error('cant_find_messages');
+		Errors::instance()->fatal_lang_error('cant_find_messages');
 
 	// You cannot split off the first message of a topic.
 	if ($split1_first_msg > $split2_first_msg)
-		fatal_lang_error('split_first_post', false);
+		Errors::instance()->fatal_lang_error('split_first_post', false);
 
 	// We're off to insert the new topic!  Use 0 for now to avoid UNIQUE errors.
 	$db->insert('',
@@ -2492,7 +2491,7 @@ function splitTopic($split1_ID_TOPIC, $splitMessages, $new_subject)
 	);
 	$split2_ID_TOPIC = $db->insert_id('{db_prefix}topics', 'id_topic');
 	if ($split2_ID_TOPIC <= 0)
-		fatal_lang_error('cant_insert_topic');
+		Errors::instance()->fatal_lang_error('cant_insert_topic');
 
 	// Move the messages over to the other topic.
 	$new_subject = strtr(Util::htmltrim(Util::htmlspecialchars($new_subject)), array("\r" => '', "\n" => '', "\t" => ''));
@@ -2663,7 +2662,7 @@ function splitAttemptMove($boards, $totopic)
 }
 
 /**
- * Retrives informations of the current and destination board of a split topic
+ * Retrieves information of the current and destination board of a split topic
  *
  * @return array
  */
@@ -2673,13 +2672,13 @@ function splitDestinationBoard($toboard = 0)
 
 	$current_board = boardInfo($board, $topic);
 	if (empty($current_board))
-		fatal_lang_error('no_board');
+		Errors::instance()->fatal_lang_error('no_board');
 
 	if (!empty($toboard) && $board !== $toboard)
 	{
 		$destination_board = boardInfo($toboard);
 		if (empty($destination_board))
-			fatal_lang_error('no_board');
+			Errors::instance()->fatal_lang_error('no_board');
 	}
 
 	if (!isset($destination_board))
@@ -2877,12 +2876,11 @@ function mergeableTopics($id_board, $id_topic, $approved, $offset)
 		WHERE t.id_board = {int:id_board}
 			AND t.id_topic != {int:id_topic}' . (empty($approved) ? '
 			AND t.approved = {int:is_approved}' : '') . '
-		ORDER BY {raw:sort}
+		ORDER BY t.is_sticky DESC, t.id_last_msg DESC
 		LIMIT {int:offset}, {int:limit}',
 		array(
 			'id_board' => $id_board,
 			'id_topic' => $id_topic,
-			'sort' => (!empty($modSettings['enableStickyTopics']) ? 't.is_sticky DESC, ' : '') . 't.id_last_msg DESC',
 			'offset' => $offset,
 			'limit' => $modSettings['defaultMaxTopics'],
 			'is_approved' => 1,
@@ -2975,8 +2973,6 @@ function topicsPosters($topics)
  */
 function fixMergedTopics($first_msg, $topics, $id_topic, $target_board, $target_subject, $enforce_subject, $notifications)
 {
-	global $context;
-
 	$db = database();
 
 	// Delete the remaining topics.
@@ -3149,7 +3145,7 @@ function getSubject($id_topic)
 	);
 
 	if ($db->num_rows($request) == 0)
-		fatal_lang_error('topic_gone', false);
+		Errors::instance()->fatal_lang_error('topic_gone', false);
 
 	list ($subject) = $db->fetch_row($request);
 	$db->free_result($request);

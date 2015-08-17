@@ -13,7 +13,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0.2
+ * @version 1.1 dev
  *
  */
 
@@ -24,7 +24,6 @@ if (!defined('ELK'))
  * Set the permission level for a specific profile, group, or group for a profile.
  *
  * @package Permissions
- * @internal
  * @param string $level
  * @param integer|null $group
  * @param integer|null $profile = null, int expected
@@ -345,7 +344,7 @@ function setPermissionLevel($level, $group = null, $profile = null)
 	}
 	// $profile and $group are both null!
 	else
-		fatal_lang_error('no_access', false);
+		Errors::instance()->fatal_lang_error('no_access', false);
 }
 
 /**
@@ -389,7 +388,6 @@ function loadPermissionProfiles()
  * Load permissions into $context['permissions'].
  *
  * @package Permissions
- * @internal
  */
 function loadAllPermissions()
 {
@@ -436,8 +434,6 @@ function loadAllPermissions()
 			'disable_censor' => array(false, 'general'),
 			'pm_read' => array(false, 'pm'),
 			'pm_send' => array(false, 'pm'),
-			'pm_draft' => array(false, 'pm'),
-			'pm_autosave_draft' => array(false, 'pm'),
 			'send_email_to_members' => array(false, 'pm'),
 			'calendar_view' => array(false, 'calendar'),
 			'calendar_post' => array(false, 'calendar'),
@@ -469,8 +465,6 @@ function loadAllPermissions()
 			'post_unapproved_topics' => array(false, 'topic'),
 			'post_unapproved_replies' => array(true, 'topic'),
 			'post_reply' => array(true, 'topic'),
-			'post_draft' => array(false, 'topic'),
-			'post_autosave_draft' => array(false, 'topic'),
 			'merge_any' => array(false, 'topic'),
 			'split_any' => array(false, 'topic'),
 			'send_topic' => array(false, 'topic'),
@@ -537,13 +531,6 @@ function loadAllPermissions()
 	{
 		$hiddenPermissions[] = 'approve_emails';
 		$hiddenPermissions[] = 'postby_email';
-	}
-	if (!in_array('dr', $context['admin_features']))
-	{
-		$hiddenPermissions[] = 'post_draft';
-		$hiddenPermissions[] = 'pm_draft';
-		$hiddenPermissions[] = 'post_autosave_draft';
-		$hiddenPermissions[] = 'pm_autosave_draft';
 	}
 
 	// Post moderation?
@@ -1139,18 +1126,18 @@ function clearPostgroupPermissions()
 {
 	$db = database();
 
-	$post_groups = array();
-	$request = $db->query('', '
+	$post_groups = $db->fetchQueryCallback('
 		SELECT id_group
 		FROM {db_prefix}membergroups
 		WHERE min_posts != {int:min_posts}',
 		array(
 			'min_posts' => -1,
-		)
+		),
+		function($row)
+		{
+			return $row['id_group'];
+		}
 	);
-	while ($row = $db->fetch_assoc($request))
-		$post_groups[] = $row['id_group'];
-	$db->free_result($request);
 
 	// Remove'em.
 	$db->query('', '
@@ -1204,26 +1191,28 @@ function copyPermissionProfile($profile_name, $copy_from)
 	$profile_id = $db->insert_id('{db_prefix}permission_profiles', 'id_profile');
 
 	// Load the permissions from the one it's being copied from.
-	$request = $db->query('', '
+	$inserts = $db->fetchQueryCallback('
 		SELECT id_group, permission, add_deny
 		FROM {db_prefix}board_permissions
 		WHERE id_profile = {int:copy_from}',
 		array(
 			'copy_from' => $copy_from,
-		)
+		),
+		function($row) use ($profile_id)
+		{
+			return array($profile_id, $row['id_group'], $row['permission'], $row['add_deny']);
+		}
 	);
-	$inserts = array();
-	while ($row = $db->fetch_assoc($request))
-		$inserts[] = array($profile_id, $row['id_group'], $row['permission'], $row['add_deny']);
-	$db->free_result($request);
 
 	if (!empty($inserts))
+	{
 		$db->insert('insert',
 			'{db_prefix}board_permissions',
 			array('id_profile' => 'int', 'id_group' => 'int', 'permission' => 'string', 'add_deny' => 'int'),
 			$inserts,
 			array('id_profile', 'id_group', 'permission')
 		);
+	}
 }
 
 /**
@@ -1271,7 +1260,7 @@ function deletePermissionProfiles($profiles)
 		)
 	);
 	if ($db->num_rows($request) != 0)
-		fatal_lang_error('no_access', false);
+		Errors::instance()->fatal_lang_error('no_access', false);
 	$db->free_result($request);
 
 	// Oh well, delete.

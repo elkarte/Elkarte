@@ -17,7 +17,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0
+ * @version 1.1 dev
  *
  */
 
@@ -302,7 +302,7 @@ function deleteMessages($personal_messages, $folder = null, $owner = null)
  * Mark the specified personal messages read.
  *
  * @package PersonalMessage
- * @param int[]|null $personal_messages null or array of pm ids
+ * @param int[]|int|null $personal_messages null or array of pm ids
  * @param string|null $label = null, if label is set, only marks messages with that label
  * @param int|null $owner = null, if owner is set, marks messages owned by that member id
  */
@@ -635,7 +635,7 @@ function sendpm($recipients, $subject, $message, $store_outbox = true, $from = n
 	}
 	$db->free_result($request);
 
-	// Load the membergrounp message limits.
+	// Load the membergroup message limits.
 	static $message_limit_cache = array();
 	if (!allowedTo('moderate_forum') && empty($message_limit_cache))
 	{
@@ -1842,8 +1842,7 @@ function loadConversationUnreadStatus($pms)
 	// Find any unread PM's this member has under these head pm id's
 	$request = $db->query('', '
 		SELECT
-			MAX(pm.id_pm) AS id_pm, pm.id_member_from, pm.deleted_by_sender, pm.id_pm_head,
-			pmr.id_member, pmr.deleted, pmr.is_read
+			MAX(pm.id_pm) AS id_pm, pm.id_pm_head
 		FROM {db_prefix}personal_messages AS pm
 			INNER JOIN {db_prefix}pm_recipients AS pmr ON (pmr.id_pm = pm.id_pm)
 		WHERE pm.id_pm_head IN ({array_int:id_pm_head})
@@ -1948,7 +1947,7 @@ function loadPMSubjectRequest($pms, $orderBy)
 {
 	$db = database();
 
-	// Seperate query for these bits!
+	// Separate query for these bits!
 	$subjects_request = $db->query('', '
 		SELECT
 			pm.id_pm, pm.subject, pm.id_member_from, pm.msgtime, IFNULL(mem.real_name, pm.from_name) AS from_name,
@@ -2073,7 +2072,7 @@ function loadPMQuote($pmsg, $isReceived)
 /**
  * For a given PM ID, loads all "other" recipients, (excludes the current member)
  *
- * - Will optionaly count the number of bcc recipients and return that count
+ * - Will optionally count the number of bcc recipients and return that count
  *
  * @package PersonalMessage
  * @param int $pmsg
@@ -2160,7 +2159,7 @@ function loadPersonalMessage($pm_id)
 	);
 	// Can only be a hacker here!
 	if ($db->num_rows($request) == 0)
-		fatal_lang_error('no_access', false);
+		Errors::instance()->fatal_lang_error('no_access', false);
 	$pm_details = $db->fetch_row($request);
 	$db->free_result($request);
 

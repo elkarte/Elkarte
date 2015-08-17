@@ -7,7 +7,7 @@
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
- * @version 1.0
+ * @version 1.1 dev
  *
  */
 
@@ -24,6 +24,20 @@ class ManageTopics_Controller extends Action_Controller
 	 * @var Settings_Form
 	 */
 	protected $_topicSettings;
+
+	/**
+	 * Holds instance of HttpReq object
+	 * @var HttpReq
+	 */
+	protected $_req;
+
+	/**
+	 * Pre Dispatch, called before other methods.  Loads HttpReq
+	 */
+	public function pre_dispatch()
+	{
+		$this->_req = HttpReq::instance();
+	}
 
 	/**
 	 * Check permissions and forward to the right method.
@@ -56,7 +70,7 @@ class ManageTopics_Controller extends Action_Controller
 	}
 
 	/**
-	 * Adminstration page for topics: allows to display and set settings related to topics.
+	 * Administration page for topics: allows to display and set settings related to topics.
 	 *
 	 * Requires the admin_forum permission.
 	 * Accessed from ?action=admin;area=postsettings;sa=topics.
@@ -77,7 +91,7 @@ class ManageTopics_Controller extends Action_Controller
 		$context['sub_template'] = 'show_settings';
 
 		// Are we saving them - are we??
-		if (isset($_GET['save']))
+		if (isset($this->_req->query->save))
 		{
 			// Security checks
 			checkSession();
@@ -86,7 +100,7 @@ class ManageTopics_Controller extends Action_Controller
 			call_integration_hook('integrate_save_topic_settings');
 
 			// Save the result!
-			Settings_Form::save_db($config_vars);
+			Settings_Form::save_db($config_vars, $this->_req->post);
 
 			// We're done here, pal.
 			redirectexit('action=admin;area=postsettings;sa=topics');
@@ -124,7 +138,6 @@ class ManageTopics_Controller extends Action_Controller
 		// initialize it with our settings
 		$config_vars = array(
 				// Some simple big bools...
-				array('check', 'enableStickyTopics'),
 				array('check', 'enableParticipation'),
 				array('check', 'enableFollowup'),
 				array('check', 'pollMode'),

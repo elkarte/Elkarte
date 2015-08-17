@@ -13,7 +13,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0
+ * @version 1.1 dev
  *
  */
 
@@ -220,7 +220,7 @@ function addSubscription($id_subscribe, $id_member, $renewal = '', $forceStartTi
 		}
 	}
 
-	// Firstly, see whether it exists, and is active. If so then this is meerly an extension.
+	// Firstly, see whether it exists, and is active. If so then this is merely an extension.
 	$request = $db->query('', '
 		SELECT
 			id_sublog, end_time, start_time
@@ -300,7 +300,7 @@ function addSubscription($id_subscribe, $id_member, $renewal = '', $forceStartTi
 	require_once(SUBSDIR . '/Members.subs.php');
 	updateMemberData($id_member, array('id_group' => $id_group, 'additional_groups' => $newAddGroups));
 
-	// Now log the subscription - maybe we have a dorment subscription we can restore?
+	// Now log the subscription - maybe we have a dormant subscription we can restore?
 	$request = $db->query('', '
 		SELECT
 			id_sublog, end_time, start_time
@@ -384,23 +384,25 @@ function addSubscription($id_subscribe, $id_member, $renewal = '', $forceStartTi
 function loadPaymentGateways()
 {
 	$gateways = array();
-	if ($dh = opendir(SUBSDIR))
+
+	try
 	{
-		while (($file = readdir($dh)) !== false)
+		$files = new FilesystemIterator(SUBSDIR, FilesystemIterator::SKIP_DOTS);
+		foreach ($files as $file)
 		{
-			if (is_file(SUBSDIR .'/'. $file) && preg_match('~^Subscriptions-([A-Za-z\d]+)\.class\.php$~', $file, $matches))
+			if ($file->isFile() && preg_match('~^Subscriptions-([A-Za-z\d]+)\.class\.php$~', $file->getFilename(), $matches))
 			{
 				// Check this is definitely a valid gateway!
-				$fp = fopen(SUBSDIR . '/' . $file, 'rb');
+				$fp = fopen($file->getPathname(), 'rb');
 				$header = fread($fp, 4096);
 				fclose($fp);
 
 				if (strpos($header, 'Payment Gateway: ' . $matches[1]) !== false)
 				{
-					require_once(SUBSDIR . '/' . $file);
+					require_once($file->getPathname());
 
 					$gateways[] = array(
-						'filename' => $file,
+						'filename' => $file->getFilename(),
 						'code' => strtolower($matches[1]),
 						// Don't need anything snazzier than this yet.
 						'valid_version' => class_exists($matches[1] . '_Payment') && class_exists($matches[1] . '_Display'),
@@ -411,7 +413,10 @@ function loadPaymentGateways()
 			}
 		}
 	}
-	closedir($dh);
+	catch (UnexpectedValueException $e)
+	{
+		// @todo
+	}
 
 	return $gateways;
 }
@@ -881,7 +886,7 @@ function validateSubscriptionID($id)
 
 	// Humm this should not happen, if it does, boom
 	if ($sub_id === null)
-		fatal_lang_error('no_access', false);
+		Errors::instance()->fatal_lang_error('no_access', false);
 
 	return $sub_id;
 }
@@ -943,7 +948,7 @@ function getSubscriptionStatus($log_id)
 
 	// Nothing found?
 	if (empty($status))
-		fatal_lang_error('no_access', false);
+		Errors::instance()->fatal_lang_error('no_access', false);
 
 	return $status;
 }
@@ -974,7 +979,7 @@ function updateSubscriptionItem($item)
  * When a refund is processed, this either removes it or sets a new end time to
  * reflect its no longer re-occurring
  *
- * @param mixed[] $subscription_info the susbscription information array
+ * @param mixed[] $subscription_info the subscription information array
  * @param int $member_id
  * @param int $time
  */
@@ -1269,7 +1274,7 @@ function removeSubscription($id_subscribe, $id_member, $delete = false)
 	}
 	$db->free_result($request);
 
-	// Now, for everything we are removing check they defintely are not allowed it.
+	// Now, for everything we are removing check they definitely are not allowed it.
 	$existingGroups = explode(',', $member_info['additional_groups']);
 	foreach ($existingGroups as $key => $group)
 		if (empty($group) || (in_array($group, $removals) && !in_array($group, $allowed)))

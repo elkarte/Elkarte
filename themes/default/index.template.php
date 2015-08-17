@@ -11,7 +11,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0.2
+ * @version 1.1 dev
  *
  */
 
@@ -60,8 +60,15 @@ function template_init()
 		// This is used for the color variants.
 		'theme_variants' => array('light', 'besocial'),
 
-		// If the following variable is set to true, the avatar of the last poster will be displayed on the boardindex and message index.
-		'avatars_on_indexes' => true,
+		// Provides avatars for use on various indexes.
+		// Possible values:
+		//   * 0 or not set, no avatars are available
+		//   * 1 avatar of the poster of the last message
+		//   * 2 avatar of the poster of the first message
+		//   * 3 both avatars
+		// Since grabbing the avatar requires some work, it is better to
+		// set the variable to a sensible value depending on the needs of the theme
+		'avatars_on_indexes' => 1,
 
 		// This is used in the main menus to create a number next to the title of the menu to indicate the number of unread messages,
 		// moderation reports, etc. You can style each menu level indicator as desired.
@@ -696,8 +703,8 @@ function template_basicicons_legend()
 			' . (!empty($modSettings['pollMode']) ? '<span class="topicicon img_poll"> </span>' . $txt['poll'] : '') . '
 		</p>
 		<p>
-			<span class="topicicon img_locked"> </span>' . $txt['locked_topic'] . '<br />' . ($modSettings['enableStickyTopics'] == '1' ? '
-			<span class="topicicon img_sticky"> </span>' . $txt['sticky_topic'] . '<br />' : '') . '
+			<span class="topicicon img_locked"> </span>' . $txt['locked_topic'] . '<br />
+			<span class="topicicon img_sticky"> </span>' . $txt['sticky_topic'] . '<br />
 		</p>';
 }
 

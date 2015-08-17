@@ -15,7 +15,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0.2
+ * @version 1.1 dev
  *
  */
 
@@ -23,7 +23,7 @@ if (!defined('ELK'))
 	die('No access...');
 
 /**
- * Takes a message and parses it, returning the prepared message as a referance.
+ * Takes a message and parses it, returning the prepared message as a reference.
  *
  * - Cleans up links (javascript, etc.) and code/quote sections.
  * - Won't convert \n's and a few other things if previewing is true.
@@ -574,6 +574,7 @@ function createPost(&$msgOptions, &$topicOptions, &$posterOptions)
 	// Set optional parameters to the default value.
 	$msgOptions['icon'] = empty($msgOptions['icon']) ? 'xx' : $msgOptions['icon'];
 	$msgOptions['smileys_enabled'] = !empty($msgOptions['smileys_enabled']);
+	// @todo 2015/03/02 - The following line should probably be moved to a module
 	$msgOptions['attachments'] = empty($msgOptions['attachments']) ? array() : $msgOptions['attachments'];
 	$msgOptions['approved'] = isset($msgOptions['approved']) ? (int) $msgOptions['approved'] : 1;
 	$topicOptions['id'] = empty($topicOptions['id']) ? 0 : (int) $topicOptions['id'];
@@ -681,18 +682,6 @@ function createPost(&$msgOptions, &$topicOptions, &$posterOptions)
 	if (empty($msgOptions['id']))
 		return false;
 
-	// Fix the attachments.
-	if (!empty($msgOptions['attachments']))
-		$db->query('', '
-			UPDATE {db_prefix}attachments
-			SET id_msg = {int:id_msg}
-			WHERE id_attach IN ({array_int:attachment_list})',
-			array(
-				'attachment_list' => $msgOptions['attachments'],
-				'id_msg' => $msgOptions['id'],
-			)
-		);
-
 	// What if we want to export new posts out to a CMS?
 	call_integration_hook('integrate_create_post', array($msgOptions, $topicOptions, $posterOptions, $message_columns, $message_parameters));
 
@@ -710,12 +699,17 @@ function createPost(&$msgOptions, &$topicOptions, &$posterOptions)
 			'id_redirect_topic' => 'int',
 		);
 		$topic_parameters = array(
-			'id_board' => $topicOptions['board'], 'id_member_started' => $posterOptions['id'],
-			'id_member_updated' => $posterOptions['id'], 'id_first_msg' => $msgOptions['id'],
-			'id_last_msg' => $msgOptions['id'], 'locked' => $topicOptions['lock_mode'] === null ? 0 : $topicOptions['lock_mode'],
-			'is_sticky' => $topicOptions['sticky_mode'] === null ? 0 : $topicOptions['sticky_mode'], 'num_views' => 0,
+			'id_board' => $topicOptions['board'],
+			'id_member_started' => $posterOptions['id'],
+			'id_member_updated' => $posterOptions['id'],
+			'id_first_msg' => $msgOptions['id'],
+			'id_last_msg' => $msgOptions['id'],
+			'locked' => $topicOptions['lock_mode'] === null ? 0 : $topicOptions['lock_mode'],
+			'is_sticky' => $topicOptions['sticky_mode'] === null ? 0 : $topicOptions['sticky_mode'],
+			'num_views' => 0,
 			'id_poll' => $topicOptions['poll'] === null ? 0 : $topicOptions['poll'],
-			'unapproved_posts' =>  $msgOptions['approved'] ? 0 : 1, 'approved' => $msgOptions['approved'],
+			'unapproved_posts' =>  $msgOptions['approved'] ? 0 : 1,
+			'approved' => $msgOptions['approved'],
 			'redirect_expires' => $topicOptions['redirect_expires'] === null ? 0 : $topicOptions['redirect_expires'],
 			'id_redirect_topic' => $topicOptions['redirect_topic'] === null ? 0 : $topicOptions['redirect_topic'],
 		);
@@ -1074,7 +1068,7 @@ function modifyPost(&$msgOptions, &$topicOptions, &$posterOptions)
  * Approve (or not) some posts... without permission checks...
  *
  * @package Posts
- * @param int[] $msgs - array of message ids
+ * @param int|int[] $msgs - array of message ids
  * @param bool $approve = true
  */
 function approvePosts($msgs, $approve = true)
@@ -1514,7 +1508,7 @@ function lastPost()
 /**
  * Prepares a post subject for the post form
  *
- * - Will add the approriate Re: to the post subject if its a reply to an existing post
+ * - Will add the appropriate Re: to the post subject if its a reply to an existing post
  * - If quoting a post, or editing a post, this function also prepares the message body
  * - if editing is true, returns $message|$message[errors], else returns array($subject, $message)
  *
@@ -1528,7 +1522,7 @@ function lastPost()
  */
 function getFormMsgSubject($editing, $topic, $first_subject = '', $msg_id = 0)
 {
-	global $modSettings, $context;
+	global $modSettings;
 
 	$db = database();
 
@@ -1574,12 +1568,12 @@ function getFormMsgSubject($editing, $topic, $first_subject = '', $msg_id = 0)
 				)
 			);
 			if ($db->num_rows($request) == 0)
-				fatal_lang_error('quoted_post_deleted', false);
+				Errors::instance()->fatal_lang_error('quoted_post_deleted', false);
 			list ($form_subject, $mname, $mdate, $form_message) = $db->fetch_row($request);
 			$db->free_result($request);
 
-			$response_prefix = response_prefix();
 			// Add 'Re: ' to the front of the quoted subject.
+			$response_prefix = response_prefix();
 			if (trim($response_prefix) != '' && Util::strpos($form_subject, trim($response_prefix)) !== 0)
 				$form_subject = $response_prefix . $form_subject;
 
@@ -1603,9 +1597,9 @@ function getFormMsgSubject($editing, $topic, $first_subject = '', $msg_id = 0)
 		{
 			// Get the first message's subject.
 			$form_subject = $first_subject;
-			$response_prefix = response_prefix();
 
 			// Add 'Re: ' to the front of the subject.
+			$response_prefix = response_prefix();
 			if (trim($response_prefix) != '' && $form_subject != '' && Util::strpos($form_subject, trim($response_prefix)) !== 0)
 				$form_subject = $response_prefix . $form_subject;
 

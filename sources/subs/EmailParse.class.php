@@ -7,7 +7,7 @@
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
- * @version 1.0
+ * @version 1.1 dev
  *
  */
 
@@ -150,6 +150,20 @@ class Email_Parse
 	public $_converted_utf8 = false;
 
 	/**
+	 * Whether the message is a DSN (Delivery Status Notification - aka "bounce"),
+	 * indicating failed delivery
+	 * @var boolean
+	 */
+	public $_is_dsn = false;
+
+	/**
+	 * Holds the field/value/type report codes from DSN messages
+	 * Accessible as [$field]['type'] and [$field]['value']
+	 * @var mixed[]
+	 */
+	public $_dsn = null;
+
+	/**
 	 * Holds the current email address, to, from, cc
 	 * @var mixed[]
 	 */
@@ -267,6 +281,7 @@ class Email_Parse
 			$this->_parse_content_headers();
 			$this->_parse_body($html);
 			$this->load_subject();
+			$this->_is_dsn = $this->_check_dsn();
 		}
 	}
 
@@ -443,7 +458,7 @@ class Email_Parse
 			case 'text/richtext':
 				break;
 			// The following are considered multi part messages, as such they *should* contain several sections each
-			// representing the same message in various ways such as plain text (manditory), html section, and
+			// representing the same message in various ways such as plain text (mandatory), html section, and
 			// encoded section such as quoted printable as well as attachments both as files and inline
 			//
 			// multipart/alternative - the same information is presented in different body parts in different forms.
@@ -503,6 +518,41 @@ class Email_Parse
 						// Plain section
 						elseif ($this->_boundary_section[$i]->headers['content-type'] === 'text/plain')
 							$text_ids[] = $i;
+						//Message is a DSN
+						elseif ($this->_boundary_section[$i]->headers['content-type'] === 'message/delivery-status')
+						{
+							// These sections often have extra blank lines, so cannot be counted on to be
+							// fully accessible in ->headers. The "body" of this section contains values
+							// formatted by FIELD: [TYPE;] VALUE
+							$dsn_body = array();
+							foreach (explode("\n", str_replace("\r\n", "\n", $this->_boundary_section[$i]->body)) as $l)
+							{
+								$field = $type = $val = "";
+								list($field, $rest) = explode(':', $l);
+
+								if (strpos($l, ';'))
+									list ($type, $val) = explode(';', $rest);
+								else
+									$val = $rest;
+
+								$dsn_body[trim(strtolower($field))] = array('type' => trim($type), 'value' => trim($val));
+							}
+
+							switch ($dsn_body['action']['value'])
+							{
+								case 'delayed':
+								// Remove this if we don't want to flag delayed delivery addresses as "dirty"
+								// May be caused by temporary net failures, e.g. DNS outage
+								// Lack of break is intentional
+								case 'failed':
+									// The email failed to be delivered.
+									$this->_is_dsn = true;
+									$this->_dsn = array('headers' => $this->_boundary_section[$i]->headers, 'body' => $dsn_body);
+									break;
+								default:
+									$this->_is_dsn = false;
+							}
+						}
 
 						// Attachments, we love em
 						if ($this->_boundary_section[$i]->headers['content-disposition'] === 'attachment' || $this->_boundary_section[$i]->headers['content-disposition'] === 'inline' || isset($this->_boundary_section[$i]->headers['content-id']))
@@ -730,6 +780,27 @@ class Email_Parse
 			$val = $this->_decode_string($val, 'quoted-printable');
 
 		return $val;
+	}
+
+	/**
+	 * Checks the message components to determine if the message is a DSN
+	 *
+	 * What it does:
+	 * 	Checks the content of the message, looking for headers and values that
+	 * 	correlate with the message being a DSN. _parse_body checks for the existence
+	 * 	of a "message/delivery-status" header
+	 * 	As many, many daemons and providers do not adhere to the RFC 3464
+	 *	standard, this function will hold the "special cases"
+	 *
+	 * @return boolean
+	 */
+	private function _check_dsn()
+	{
+		// If we already know it's a DSN, bug out
+		if ($this->_is_dsn)
+			return true;
+
+		/** Add non-header-based detection **/
 	}
 
 	/**

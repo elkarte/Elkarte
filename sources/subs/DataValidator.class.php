@@ -7,7 +7,7 @@
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
- * @version 1.0
+ * @version 1.1 dev
  *
  */
 
@@ -134,9 +134,9 @@ class Data_Validator
 	/**
 	 * Shorthand static method for simple inline validation
 	 *
-	 * @param mixed[] $data generally $_POST data for this method
-	 * @param mixed[] $validation_rules assoicative array of field => rules
-	 * @param mixed[] $sanitation_rules assoicative array of field => rules
+	 * @param mixed[]|object $data generally $_POST data for this method
+	 * @param mixed[] $validation_rules associative array of field => rules
+	 * @param mixed[] $sanitation_rules associative array of field => rules
 	 */
 	public static function is_valid(&$data = array(), $validation_rules = array(), $sanitation_rules = array())
 	{
@@ -151,7 +151,7 @@ class Data_Validator
 
 		// Replace the data
 		if (!empty($sanitation_rules))
-			$data = $validator->_array_replace($data, $validator->validation_data());
+			$data = array_replace($data, $validator->validation_data());
 
 		// Return true or false on valid data
 		return $result;
@@ -160,7 +160,7 @@ class Data_Validator
 	/**
 	 * Set the validation rules that will be run against the data
 	 *
-	 * @param mixed[] $rules assoicative array of field => rule|rule|rule
+	 * @param mixed[] $rules associative array of field => rule|rule|rule
 	 */
 	public function validation_rules($rules = array())
 	{
@@ -178,7 +178,7 @@ class Data_Validator
 	/**
 	 * Sets the sanitation rules used to clean data
 	 *
-	 * @param mixed[] $rules assoicative array of field => rule|rule|rule
+	 * @param mixed[] $rules associative array of field => rule|rule|rule
 	 * @param boolean $strict
 	 */
 	public function sanitation_rules($rules = array(), $strict = false)
@@ -198,7 +198,7 @@ class Data_Validator
 
 	/**
 	 * Field Name Replacements
-	 * @param mixed[] $replacements assoicative array of field => txt string key
+	 * @param mixed[] $replacements associative array of field => txt string key
 	 */
 	public function text_replacements($replacements = array())
 	{
@@ -225,13 +225,17 @@ class Data_Validator
 	/**
 	 * Run the sanitation and validation on the data
 	 *
-	 * @param mixed[] $input associative array of data to process name => value
+	 * @param mixed[]|object $input associative array or object of data to process name => value
 	 */
 	public function validate($input)
 	{
+		// If its an object, convert it to an array
+		if (is_object($input))
+			$input = (array) $input;
+
 		// @todo this won't work, $input[$field] will be undefined
 		if (!is_array($input))
-			$input = array($input);
+			$input[$input] = array($input);
 
 		// Clean em
 		$this->_data = $this->_sanitize($input, $this->_sanitation_rules);
@@ -269,21 +273,6 @@ class Data_Validator
 			return $this->_data;
 
 		return isset($this->_data[$key]) ? $this->_data[$key] : null;
-	}
-
-	/**
-	 * array_replace is a php 5.3+ function, this is needed to support the oldies
-	 */
-	private function _array_replace()
-	{
-		$array = array();
-		$n = func_num_args();
-
-		// Union each array passed
-		while ($n-- > 0)
-			$array += func_get_arg($n);
-
-		return $array;
 	}
 
 	/**
@@ -450,7 +439,7 @@ class Data_Validator
 						$sanitation_method = '_sanitation_' . $match[1];
 						$sanitation_parameters = $match[2];
 						$sanitation_function = $match[1];
-						$sanitation_parameters_function = explode(',', $match[2]);
+						$sanitation_parameters_function = explode(',', defined($match[2]) ? constant($match[2]) : $match[2]);
 					}
 					// Or just a predefined rule e.g. trim
 					else

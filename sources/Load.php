@@ -13,7 +13,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:		BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0.2
+ * @version 1.1 dev
  *
  */
 
@@ -24,7 +24,7 @@ if (!defined('ELK'))
  * Load the $modSettings array and many necessary forum settings.
  *
  * What it does:
- * - load the settings from cache if available, otherwse from the database.
+ * - load the settings from cache if available, otherwise from the database.
  * - sets the timezone
  * - checks the load average settings if available.
  * - check whether post moderation is enabled.
@@ -39,6 +39,7 @@ function reloadSettings()
 
 	$db = database();
 	$cache = Cache::instance();
+	$hooks = Hooks::get();
 
 	// Try to load it from the cache first; it'll never get cached if the setting is off.
 	if (($modSettings = $cache->get('modSettings', 90)) == null)
@@ -51,7 +52,7 @@ function reloadSettings()
 		);
 		$modSettings = array();
 		if (!$request)
-			display_db_error();
+			Errors::instance()->display_db_error();
 		while ($row = $db->fetch_row($request))
 			$modSettings[$row[0]] = $row[1];
 		$db->free_result($request);
@@ -71,6 +72,8 @@ function reloadSettings()
 		if (!empty($modSettings['cache_enable']))
 			$cache->put('modSettings', $modSettings, 90);
 	}
+
+	$hooks->loadIntegrations();
 
 	// Setting the timezone is a requirement for some functions in PHP >= 5.1.
 	if (isset($modSettings['default_timezone']))
@@ -96,7 +99,7 @@ function reloadSettings()
 			$modSettings['current_load'] = $modSettings['load_average'];
 
 		if (!empty($modSettings['loadavg_forum']) && $modSettings['current_load'] >= $modSettings['loadavg_forum'])
-			display_loadavg_error();
+			Errors::instance()->display_loadavg_error();
 	}
 	else
 		$modSettings['current_load'] = 0;
@@ -106,7 +109,7 @@ function reloadSettings()
 
 	// Here to justify the name of this function. :P
 	// It should be added to the install and upgrade scripts.
-	// But since the convertors need to be updated also. This is easier.
+	// But since the converters need to be updated also. This is easier.
 	if (empty($modSettings['currentAttachmentUploadDir']))
 	{
 		updateSettings(array(
@@ -194,7 +197,7 @@ function loadUserSettings()
 		// Is the member data cached?
 		if (empty($modSettings['cache_enable']) || $modSettings['cache_enable'] < 2 || ($user_settings = $cache->get('user_settings-' . $id_member, 60)) == null)
 		{
-			$request = $db->query('', '
+			list ($user_settings) = $db->fetchQuery('
 				SELECT mem.*, IFNULL(a.id_attach, 0) AS id_attach, a.filename, a.attachment_type
 				FROM {db_prefix}members AS mem
 					LEFT JOIN {db_prefix}attachments AS a ON (a.id_member = {int:id_member})
@@ -204,8 +207,6 @@ function loadUserSettings()
 					'id_member' => $id_member,
 				)
 			);
-			$user_settings = $db->fetch_assoc($request);
-			$db->free_result($request);
 
 			// Make the ID specifically an integer
 			$user_settings['id_member'] = (int) $user_settings['id_member'];
@@ -451,7 +452,7 @@ function loadBoard()
 		{
 			loadPermissions();
 			loadTheme();
-			fatal_lang_error('topic_gone', false);
+			Errors::instance()->fatal_lang_error('topic_gone', false);
 		}
 	}
 
@@ -654,17 +655,15 @@ function loadBoard()
 		);
 
 		// If it's a prefetching agent or we're requesting an attachment.
-		if ((isset($_SERVER['HTTP_X_MOZ']) && $_SERVER['HTTP_X_MOZ'] == 'prefetch') || (!empty($_REQUEST['action']) && $_REQUEST['action'] === 'dlattach'))
-		{
+		if ((isset($_SERVER['HTTP_X_MOZ']) && $_SERVER['HTTP_X_MOZ'] === 'prefetch') || (!empty($_REQUEST['action']) && $_REQUEST['action'] === 'dlattach'))
 			stop_prefetching();
-		}
 		elseif ($user_info['is_guest'])
 		{
 			loadLanguage('Errors');
 			is_not_guest($txt['topic_gone']);
 		}
 		else
-			fatal_lang_error('topic_gone', false);
+			Errors::instance()->fatal_lang_error('topic_gone', false);
 	}
 
 	if ($user_info['is_mod'])
@@ -750,7 +749,7 @@ function loadPermissions()
 	{
 		// Make sure the board (if any) has been loaded by loadBoard().
 		if (!isset($board_info['profile']))
-			fatal_lang_error('no_board');
+			Errors::instance()->fatal_lang_error('no_board');
 
 		$request = $db->query('', '
 			SELECT permission, add_deny
@@ -1166,11 +1165,11 @@ function isBrowser($browser)
  * What it does:
  * - identify the theme to be loaded.
  * - validate that the theme is valid and that the user has permission to use it
- * - load the users theme settings and site setttings into $options.
+ * - load the users theme settings and site settings into $options.
  * - prepares the list of folders to search for template loading.
  * - identify what smiley set to use.
  * - sets up $context['user']
- * - detects the users browser and sets a mobile friendly enviroment if needed
+ * - detects the users browser and sets a mobile friendly environment if needed
  * - loads default JS variables for use in every theme
  * - loads default JS scripts for use in every theme
  *
@@ -1227,7 +1226,7 @@ function loadTheme($id_theme = 0, $initialize = true)
 
 	$member = empty($user_info['id']) ? -1 : $user_info['id'];
 
-	// Do we already have this members theme data and specific options loaded (for agressive cache settings)
+	// Do we already have this members theme data and specific options loaded (for aggressive cache settings)
 	if (!empty($modSettings['cache_enable']) && $modSettings['cache_enable'] >= 2 && ($temp = cache_get_data('theme_settings-' . $id_theme . ':' . $member, 60)) != null && time() - 60 > $modSettings['settings_updated'])
 	{
 		$themeData = $temp;
@@ -1546,6 +1545,9 @@ function loadTheme($id_theme = 0, $initialize = true)
 			$template_layers->addBegin($layer);
 	}
 
+	// Defaults in case of odd things
+	$settings['avatars_on_indexes'] = 0;
+
 	// Initialize the theme.
 	if (function_exists('template_init'))
 		$settings = array_merge($settings, template_init());
@@ -1650,7 +1652,7 @@ function loadTheme($id_theme = 0, $initialize = true)
 		'todayMod' => !empty($modSettings['todayMod']) ? (int) $modSettings['todayMod'] : 0)
 	);
 
-	// Auto video embeding enabled, then load the needed JS
+	// Auto video embedding enabled, then load the needed JS
 	if (!empty($modSettings['enableVideoEmbeding']))
 	{
 		addInlineJavascript('
@@ -1734,6 +1736,8 @@ function loadTheme($id_theme = 0, $initialize = true)
 		}
 	}
 
+	Hooks::get()->newPath(array('$themedir' => $settings['theme_dir']));
+
 	// Any files to include at this point?
 	call_integration_include_hook('integrate_theme_include');
 
@@ -1757,7 +1761,7 @@ function loadEssentialThemeData()
 	$db = database();
 
 	// Get all the default theme variables.
-	$result = $db->query('', '
+	$db->fetchQueryCallback('
 		SELECT id_theme, variable, value
 		FROM {db_prefix}themes
 		WHERE id_member = {int:no_member}
@@ -1765,17 +1769,18 @@ function loadEssentialThemeData()
 		array(
 			'no_member' => 0,
 			'theme_guests' => $modSettings['theme_guests'],
-		)
-	);
-	while ($row = $db->fetch_assoc($result))
-	{
-		$settings[$row['variable']] = $row['value'];
+		),
+		function($row)
+		{
+			global $settings;
 
-		// Is this the default theme?
-		if (in_array($row['variable'], array('theme_dir', 'theme_url', 'images_url')) && $row['id_theme'] == '1')
-			$settings['default_' . $row['variable']] = $row['value'];
-	}
-	$db->free_result($result);
+			$settings[$row['variable']] = $row['value'];
+
+			// Is this the default theme?
+			if (in_array($row['variable'], array('theme_dir', 'theme_url', 'images_url')) && $row['id_theme'] == '1')
+				$settings['default_' . $row['variable']] = $row['value'];
+		}
+	);
 
 	// Check we have some directories setup.
 	if (empty($settings['template_dirs']))
@@ -1795,10 +1800,6 @@ function loadEssentialThemeData()
 	$context['forum_name'] = $mbname;
 	$context['forum_name_html_safe'] = $context['forum_name'];
 
-	// Check loadLanguage actually exists!
-	if (!function_exists('loadLanguage'))
-		require_once(SOURCEDIR . '/Subs.php');
-
 	loadLanguage('index+Addons');
 }
 
@@ -1809,7 +1810,7 @@ function loadEssentialThemeData()
  * - loads a template file with the name template_name from the current, default, or base theme.
  * - detects a wrong default theme directory and tries to work around it.
  * - can be used to only load style sheets by using false as the template name
- *   loading of style sheets with this function is @deprecated, use loadCSSFile instead
+ *   loading of style sheets with this function is deprecated, use loadCSSFile instead
  * - if $settings['template_dirs'] is empty, it delays the loading of the template
  *
  * @uses the requireTemplate() function to actually load the file.
@@ -1821,7 +1822,7 @@ function loadEssentialThemeData()
  */
 function loadTemplate($template_name, $style_sheets = array(), $fatal = true)
 {
-	global $context, $settings;
+	global $settings;
 	static $delay = array();
 
 	// If we don't know yet the default theme directory, let's wait a bit.
@@ -1854,7 +1855,7 @@ function loadTemplate($template_name, $style_sheets = array(), $fatal = true)
  * - loads a template file with the name template_name from the current, default, or base theme.
  * - detects a wrong default theme directory and tries to work around it.
  * - can be used to only load style sheets by using false as the template name
- *   loading of style sheets with this function is @deprecated, use loadCSSFile instead
+ *   loading of style sheets with this function is deprecated, use loadCSSFile instead
  *
  * @uses the template_include() function to include the file.
  * @param string|false $template_name
@@ -1932,9 +1933,9 @@ function requireTemplate($template_name, $style_sheets, $fatal)
 	}
 	// Cause an error otherwise.
 	elseif ($template_name != 'Errors' && $template_name != 'index' && $fatal)
-		fatal_lang_error('theme_template_error', 'template', array((string) $template_name));
+		Errors::instance()->fatal_lang_error('theme_template_error', 'template', array((string) $template_name));
 	elseif ($fatal)
-		die(log_error(sprintf(isset($txt['theme_template_error']) ? $txt['theme_template_error'] : 'Unable to load themes/default/%s.template.php!', (string) $template_name), 'template'));
+		die(Errors::instance()->log_error(sprintf(isset($txt['theme_template_error']) ? $txt['theme_template_error'] : 'Unable to load themes/default/%s.template.php!', (string) $template_name), 'template'));
 	else
 		return false;
 }
@@ -1954,7 +1955,7 @@ function requireTemplate($template_name, $style_sheets, $fatal)
  */
 function loadSubTemplate($sub_template_name, $fatal = false)
 {
-	global $context, $txt, $db_show_debug;
+	global $txt, $db_show_debug;
 
 	if ($db_show_debug === true)
 		Debug::get()->add('sub_templates', $sub_template_name);
@@ -1965,9 +1966,9 @@ function loadSubTemplate($sub_template_name, $fatal = false)
 	if (function_exists($theme_function))
 		$theme_function();
 	elseif ($fatal === false)
-		fatal_lang_error('theme_template_error', 'template', array((string) $sub_template_name));
+		Errors::instance()->fatal_lang_error('theme_template_error', 'template', array((string) $sub_template_name));
 	elseif ($fatal !== 'ignore')
-		die(log_error(sprintf(isset($txt['theme_template_error']) ? $txt['theme_template_error'] : 'Unable to load the %s sub template!', (string) $sub_template_name), 'template'));
+		die(Errors::instance()->log_error(sprintf(isset($txt['theme_template_error']) ? $txt['theme_template_error'] : 'Unable to load the %s sub template!', (string) $sub_template_name), 'template'));
 
 	// Are we showing debugging for templates?  Just make sure not to do it before the doctype...
 	if (allowedTo('admin_forum') && isset($_REQUEST['debug']) && !in_array($sub_template_name, array('init')) && ob_get_length() > 0 && !isset($_REQUEST['xml']))
@@ -2217,7 +2218,7 @@ function addInlineJavascript($javascript, $defer = false)
  */
 function loadLanguage($template_name, $lang = '', $fatal = true, $force_reload = false)
 {
-	global $user_info, $language, $settings, $context, $modSettings;
+	global $user_info, $language, $settings, $modSettings;
 	global $db_show_debug, $txt;
 	static $already_loaded = array();
 
@@ -2302,7 +2303,7 @@ function loadLanguage($template_name, $lang = '', $fatal = true, $force_reload =
 		// That couldn't be found!  Log the error, but *try* to continue normally.
 		if (!$found && $fatal)
 		{
-			log_error(sprintf($txt['theme_language_error'], $template_name . '.' . $lang, 'template'));
+			Errors::instance()->log_error(sprintf($txt['theme_language_error'], $template_name . '.' . $lang, 'template'));
 			break;
 		}
 	}
@@ -2421,7 +2422,7 @@ function getBoardParents($id_parent)
 			);
 			// In the EXTREMELY unlikely event this happens, give an error message.
 			if ($db->num_rows($result) == 0)
-				fatal_lang_error('parent_not_found', 'critical');
+				Errors::instance()->fatal_lang_error('parent_not_found', 'critical');
 			while ($row = $db->fetch_assoc($result))
 			{
 				if (!isset($boards[$row['id_board']]))
@@ -2571,7 +2572,7 @@ function censorText(&$text, $force = false)
 
 	// Censoring isn't so very complicated :P.
 	if (empty($modSettings['censorWholeWord']))
-		$text = empty($modSettings['censorIgnoreCase']) ? str_ireplace($censor_vulgar, $censor_proper, $text) : str_replace($censor_vulgar, $censor_proper, $text);
+		$text = empty($modSettings['censorIgnoreCase']) ? str_replace($censor_vulgar, $censor_proper, $text) : str_ireplace($censor_vulgar, $censor_proper, $text);
 	else
 		$text = preg_replace($censor_vulgar, $censor_proper, $text);
 
@@ -2606,21 +2607,12 @@ function template_include($filename, $once = false)
 	else
 		$templates[] = $filename;
 
-	// Are we going to use eval?
-	if (empty($modSettings['disableTemplateEval']))
-	{
-		$file_found = file_exists($filename) && eval('?' . '>' . rtrim(file_get_contents($filename))) !== false;
-		$settings['current_include_filename'] = $filename;
-	}
-	else
-	{
-		$file_found = file_exists($filename);
-
-		if ($once && $file_found)
-			require_once($filename);
-		elseif ($file_found)
-			require($filename);
-	}
+	// Load it if we find it
+	$file_found = file_exists($filename);
+	if ($once && $file_found)
+		require_once($filename);
+	elseif ($file_found)
+		require($filename);
 
 	if ($file_found !== true)
 	{
@@ -2796,20 +2788,20 @@ function loadDatabase()
 		$db_type = 'mysql';
 
 	// If we are in SSI try them first, but don't worry if it doesn't work, we have the normal username and password we can use.
-	if (ELK == 'SSI' && !empty($ssi_db_user) && !empty($ssi_db_passwd))
+	if (ELK === 'SSI' && !empty($ssi_db_user) && !empty($ssi_db_passwd))
 		$connection = elk_db_initiate($db_server, $db_name, $ssi_db_user, $ssi_db_passwd, $db_prefix, array('persist' => $db_persist, 'non_fatal' => true, 'dont_select_db' => true, 'port' => $db_port), $db_type);
 
 	// Either we aren't in SSI mode, or it failed.
 	if (empty($connection))
-		$connection = elk_db_initiate($db_server, $db_name, $db_user, $db_passwd, $db_prefix, array('persist' => $db_persist, 'dont_select_db' => ELK == 'SSI', 'port' => $db_port), $db_type);
+		$connection = elk_db_initiate($db_server, $db_name, $db_user, $db_passwd, $db_prefix, array('persist' => $db_persist, 'dont_select_db' => ELK === 'SSI', 'port' => $db_port), $db_type);
 
 	// Safe guard here, if there isn't a valid connection lets put a stop to it.
 	if (!$connection)
-		display_db_error();
+		Errors::instance()->display_db_error();
 
 	// If in SSI mode fix up the prefix.
 	$db = database();
-	if (ELK == 'SSI')
+	if (ELK === 'SSI')
 		$db_prefix = $db->fix_prefix($db_prefix, $db_name);
 
 	// Case sensitive database? Let's define a constant.
@@ -2888,7 +2880,7 @@ function determineAvatar($profile)
 	elseif (!empty($profile['avatar']) && $profile['avatar'] === 'gravatar')
 	{
 		// Gravatars URL.
-		$gravatar_url = '//www.gravatar.com/avatar/' . md5(strtolower($profile['email_address'])) . 'd=' . $modSettings['avatar_max_height'] . (!empty($modSettings['gravatar_rating']) ? ('&amp;r=' . $modSettings['gravatar_rating']) : '');
+		$gravatar_url = '//www.gravatar.com/avatar/' . md5(strtolower($profile['email_address'])) . ';s=' . $modSettings['avatar_max_height'] . (!empty($modSettings['gravatar_rating']) ? ('&amp;r=' . $modSettings['gravatar_rating']) : '');
 
 		$avatar = array(
 			'name' => $profile['avatar'],
@@ -2907,7 +2899,7 @@ function determineAvatar($profile)
 			'url' => $modSettings['avatar_url'] . '/' . $profile['avatar'],
 		);
 	}
-	// no custon avatar found yet, maybe a default avatar?
+	// no custom avatar found yet, maybe a default avatar?
 	elseif (!empty($modSettings['avatar_default']) && empty($profile['avatar']) && empty($profile['filename']))
 	{
 		// $settings not initialized? We can't do anything further..
@@ -2932,7 +2924,9 @@ function determineAvatar($profile)
 		);
 
 	// Make sure there's a preview for gravatars available.
-	$avatar['gravatar_preview'] = '//www.gravatar.com/avatar/' . md5(strtolower($profile['email_address'])) . 'd=' . $modSettings['avatar_max_height'] . (!empty($modSettings['gravatar_rating']) ? ('&amp;r=' . $modSettings['gravatar_rating']) : '');
+	$avatar['gravatar_preview'] = '//www.gravatar.com/avatar/' . md5(strtolower($profile['email_address'])) . ';s=' . $modSettings['avatar_max_height'] . (!empty($modSettings['gravatar_rating']) ? ('&amp;r=' . $modSettings['gravatar_rating']) : '');
+
+	call_integration_hook('integrate_avatar', array(&$avatar));
 
 	return $avatar;
 }
@@ -2967,7 +2961,7 @@ function detectServer()
  * - checks for an active admin session.
  * - checks cache directory is writable.
  * - calls secureDirectory to protect attachments & cache.
- * - checks if the forum is in maintance mode.
+ * - checks if the forum is in maintenance mode.
  */
 function doSecurityChecks()
 {
@@ -2985,7 +2979,7 @@ function doSecurityChecks()
 			$show_warnings = true;
 		}
 
-		// Cache directory writeable?
+		// Cache directory writable?
 		if (!empty($modSettings['cache_enable']) && !is_writable(CACHEDIR))
 		{
 			$context['security_controls_files']['title'] = $txt['generic_warning'];

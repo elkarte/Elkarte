@@ -16,7 +16,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0
+ * @version 1.1 dev
  *
  */
 
@@ -106,7 +106,7 @@ function automanage_attachments_check_directory()
 		case 5:
 			$updir = $basedirectory . DIRECTORY_SEPARATOR . (empty($modSettings['use_subdirectories_for_attachments']) ? 'attachments-' : 'random_') . $rand . DIRECTORY_SEPARATOR . $rand1;
 			break;
-		default :
+		default:
 			$updir = '';
 	}
 
@@ -224,7 +224,7 @@ function automanage_attachments_create_directory($updir)
  * Determines the current base directory and attachment directory
  *
  * What it does:
- * - Increments the above directory to the next availble slot
+ * - Increments the above directory to the next available slot
  * - Uses automanage_attachments_create_directory to create the incremental directory
  *
  * @package Attachments
@@ -362,13 +362,13 @@ function processAttachments($id_msg = null)
 
 	$context['attach_dir'] = $modSettings['attachmentUploadDir'][$modSettings['currentAttachmentUploadDir']];
 
-	// Is the attachments folder actualy there?
+	// Is the attachments folder actually there?
 	if (!empty($context['dir_creation_error']))
 		$initial_error = $context['dir_creation_error'];
 	elseif (!is_dir($context['attach_dir']))
 	{
 		$initial_error = 'attach_folder_warning';
-		log_error(sprintf($txt['attach_folder_admin_warning'], $context['attach_dir']), 'critical');
+		Errors::instance()->log_error(sprintf($txt['attach_folder_admin_warning'], $context['attach_dir']), 'critical');
 	}
 
 	if (!isset($initial_error) && !isset($context['attachments']['quantity']))
@@ -498,7 +498,7 @@ function processAttachments($id_msg = null)
 				unlink($_FILES['attachment']['tmp_name'][$n]);
 		}
 
-		// If there were no errors to this pont, we apply some addtional checks
+		// If there were no errors to this pont, we apply some additional checks
 		if (empty($_SESSION['temp_attachments'][$attachID]['errors']))
 			attachmentChecks($attachID);
 
@@ -514,7 +514,7 @@ function processAttachments($id_msg = null)
 				{
 					$attach_errors->addError($error);
 					if (in_array($error, $log_these))
-						log_error($_SESSION['temp_attachments'][$attachID]['name'] . ': ' . $txt[$error], 'critical');
+						Errors::instance()->log_error($_SESSION['temp_attachments'][$attachID]['name'] . ': ' . $txt[$error], 'critical');
 				}
 				else
 					$attach_errors->addError(array($error[0], $error[1]));
@@ -566,6 +566,45 @@ function removeTempAttachById($attach_id)
 }
 
 /**
+ * Finds and return a temporary attachment by its id
+ *
+ * @package Attachments
+ * @param string $attach_id the temporary name generated when a file is uploaded
+ *               and used in $_SESSION to help identify the attachment itself
+ */
+function getTempAttachById($attach_id)
+{
+	global $modSettings, $user_info;
+
+	// The common name form is "post_tmp_123_0ac9a0b1fc18604e8704084656ed5f09"
+	$id_attach = preg_replace('~[^0-9a-zA-Z_]~', '', $attach_id);
+
+	// Permissions: only temporary attachments
+	if (substr($id_attach, 0, 8) !== 'post_tmp')
+		throw new \Exception('no_access');
+
+	// Permissions: only author is allowed.
+	$pieces = explode('_', substr($id_attach, 9));
+
+	if (!isset($pieces[0]) || $pieces[0] != $user_info['id'])
+		throw new \Exception('no_access');
+
+	if (is_array($modSettings['attachmentUploadDir']))
+		$dirs = $modSettings['attachmentUploadDir'];
+	else
+		$dirs = unserialize($modSettings['attachmentUploadDir']);
+
+	$attach_dir = $dirs[$modSettings['currentAttachmentUploadDir']];
+
+	if (file_exists($attach_dir . '/' . $attach_id) && isset($_SESSION['temp_attachments'][$attach_id]))
+	{
+		return $_SESSION['temp_attachments'][$attach_id];
+	}
+
+	throw new \Exception('no_access');
+}
+
+/**
  * Checks if an uploaded file produced any appropriate error code
  *
  * What it does:
@@ -592,10 +631,10 @@ function attachmentUploadChecks($attachID)
 			$errors[] = array('file_too_big', array($modSettings['attachmentSizeLimit']));
 		// Missing or a full a temp directory on the server
 		elseif ($_FILES['attachment']['error'][$attachID] == 6)
-			log_error($_FILES['attachment']['name'][$attachID] . ': ' . $txt['php_upload_error_6'], 'critical');
+			Errors::instance()->log_error($_FILES['attachment']['name'][$attachID] . ': ' . $txt['php_upload_error_6'], 'critical');
 		// One of many errors such as (3)partially uploaded, (4)empty file,
 		else
-			log_error($_FILES['attachment']['name'][$attachID] . ': ' . $txt['php_upload_error_' . $_FILES['attachment']['error'][$attachID]]);
+			Errors::instance()->log_error($_FILES['attachment']['name'][$attachID] . ': ' . $txt['php_upload_error_' . $_FILES['attachment']['error'][$attachID]]);
 
 		// If we did not set an user error (3,4,6,7,8) to show then give them a generic one as there is
 		// no need to provide back specifics of a server error, those are logged
@@ -633,7 +672,7 @@ function attachmentChecks($attachID)
 
 	// Let's get their attention.
 	if (!empty($error))
-		fatal_lang_error('attach_check_nag', 'debug', array($error));
+		Errors::instance()->fatal_lang_error('attach_check_nag', 'debug', array($error));
 
 	// These are the only valid image types.
 	$validImageTypes = array(
@@ -796,7 +835,7 @@ function attachmentChecks($attachID)
  * Create an attachment, with the given array of parameters.
  *
  * What it does:
- * - Adds any addtional or missing parameters to $attachmentOptions.
+ * - Adds any additional or missing parameters to $attachmentOptions.
  * - Renames the temporary file.
  * - Creates a thumbnail if the file is an image and the option enabled.
  *
@@ -1428,7 +1467,7 @@ function getAvatarsDefault()
 {
 	$db = database();
 
-	$request = $db->query('', '
+	return $db->fetchQuery('
 		SELECT id_attach, id_folder, id_member, filename, file_hash
 		FROM {db_prefix}attachments
 		WHERE attachment_type = {int:attachment_type}
@@ -1438,13 +1477,6 @@ function getAvatarsDefault()
 			'guest_id_member' => 0,
 		)
 	);
-
-	$avatars = array();
-	while ($row = $db->fetch_assoc($request))
-		$avatars[] = $row;
-	$db->free_result($request);
-
-	return $avatars;
 }
 
 /**
@@ -1823,7 +1855,7 @@ function getLegacyAttachmentFilename($filename, $attachment_id, $dir = null, $ne
 	$enc_name = $attachment_id . '_' . strtr($clean_name, '.', '_') . md5($clean_name);
 	$clean_name = preg_replace('~\.[\.]+~', '.', $clean_name);
 
-	if ($attachment_id == false || ($new && empty($modSettings['attachmentEncryptFilenames'])))
+	if (empty($attachment_id) || ($new && empty($modSettings['attachmentEncryptFilenames'])))
 		return $clean_name;
 	elseif ($new)
 		return $enc_name;
@@ -1844,4 +1876,26 @@ function getLegacyAttachmentFilename($filename, $attachment_id, $dir = null, $ne
 		$filename = $path . '/' . $clean_name;
 
 	return $filename;
+}
+
+/**
+ * Binds a set of attachments to a message.
+ *
+ * @package Attachments
+ * @param int $id_msg
+ * @param int[] $attachment_ids
+ */
+function bindMessageAttachments($id_msg, $attachment_ids)
+{
+	$db = database();
+
+	$db->query('', '
+		UPDATE {db_prefix}attachments
+		SET id_msg = {int:id_msg}
+		WHERE id_attach IN ({array_int:attachment_list})',
+		array(
+			'attachment_list' => $attachment_ids,
+			'id_msg' => $id_msg,
+		)
+	);
 }

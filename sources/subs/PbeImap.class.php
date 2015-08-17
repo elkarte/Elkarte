@@ -8,7 +8,7 @@
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
- * @version 1.0
+ * @version 1.1 dev
  *
  */
 
@@ -92,7 +92,7 @@ class Pbe_Imap
 		$this->_delete = !empty($modSettings['maillist_imap_delete']);
 		$this->_is_gmail = strpos($this->_hostname, '.gmail.') !== false;
 
-		// I suppose that without these informations we can't do anything.
+		// I suppose that without this information we can't do anything.
 		if (empty($this->_hostname) || empty($this->_username) || empty($this->_password))
 			return false;
 		else

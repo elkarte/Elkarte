@@ -7,7 +7,7 @@
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
- * @version 1.0.3
+ * @version 1.1 dev
  *
  */
 
@@ -56,13 +56,13 @@ class UnTgz
 	protected $_crc_check = false;
 
 	/**
-	 * The currnt crc value of the data
+	 * The current crc value of the data
 	 * @var string|int
 	 */
 	protected $_crc;
 
 	/**
-	 * The claimied size of the data in the tarball
+	 * The claimed size of the data in the tarball
 	 * @var int
 	 */
 	protected $_size;
@@ -141,7 +141,7 @@ class UnTgz
 
 		// This class sorta needs gzinflate!
 		if (!function_exists('gzinflate'))
-			fatal_lang_error('package_no_zlib', 'critical');
+			Errors::instance()->fatal_lang_error('package_no_zlib', 'critical');
 
 		// Make sure we have this loaded.
 		loadLanguage('Packages');
@@ -149,7 +149,7 @@ class UnTgz
 		// Likely to need this
 		require_once(SUBSDIR . '/Package.subs.php');
 
-		// The destination needs exist and be writeable or we are doomed
+		// The destination needs exist and be writable or we are doomed
 		umask(0);
 		if ($this->destination !== null && !file_exists($this->destination) && !$this->single_file)
 			mktree($this->destination, 0777);

@@ -11,7 +11,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0.2
+ * @version 1.1 dev
  */
 
 /**
@@ -291,125 +291,91 @@ function template_maintain_members()
  */
 function template_maintain_topics()
 {
-	global $scripturl, $txt, $context, $settings, $modSettings;
+	global $context;
 
 	// If maintenance has finished tell the user.
 	template_show_error('maintenance_finished');
 
-	// Bit of javascript for showing which boards to prune in an otherwise hidden list.
 	echo '
-	<script><!-- // --><![CDATA[
-		var rotSwap = false;
-			maintain_old_choose = ', JavaScriptEscape($txt['maintain_old_choose']), ',
-			maintain_old_all = ', JavaScriptEscape($txt['maintain_old_all']), ';
-	// ]]></script>';
+	<div id="manage_maintenance">';
 
-	echo '
-	<div id="manage_maintenance">
-		<h2 class="category_header">', $txt['maintain_old'], '</h2>
+	foreach ($context['topics_actions'] as $key => $maintenace)
+	{
+		echo '
+		<h2 class="category_header">', $maintenace['title'], '</h2>
 		<div class="windowbg">
 			<div class="content flow_auto">
-				<form action="', $scripturl, '?action=admin;area=maintain;sa=topics;activity=pruneold" method="post" accept-charset="UTF-8">';
+				<form name="', $key,' " action="', $maintenace['url'], '" method="post" accept-charset="UTF-8">';
+
+		$function = 'template_maintain_topics_' . $key;
+		$function();
+
+		echo '
+					<div class="submitbutton">
+						<input type="submit" value="', $maintenace['submit'], '" ', !empty($maintenace['confirm']) ? 'onclick="return confirm(\'' . $maintenace['confirm'] . '\');"' : '', ' class="button_submit" />';
+
+		if (!empty($maintenace['hidden']))
+			foreach ($maintenace['hidden'] as $name => $val)
+				echo '
+						<input type="hidden" name="', $context[$name], '" value="', $context[$val], '" />';
+
+		echo '
+					</div>
+				</form>
+			</div>
+		</div>';
+	}
+	echo '
+	</div>';
+}
+
+function template_maintain_topics_pruneold()
+{
+	global $context, $txt, $modSettings;
 
 	// The otherwise hidden "choose which boards to prune".
 	echo '
 					<p>
-						<a id="rotLink"></a><label for="maxdays">', sprintf($txt['maintain_old_since_days'], '<input type="text" id="maxdays" name="maxdays" value="30" size="3" />'), '</label>
+						<label for="maxdays">', sprintf($txt['maintain_old_since_days'], '<input type="text" id="maxdays" name="maxdays" value="30" size="3" />'), '</label>
 					</p>
 					<p>
 						<label for="delete_type_nothing"><input type="radio" name="delete_type" id="delete_type_nothing" value="nothing" class="input_radio" /> ', $txt['maintain_old_nothing_else'], '</label><br />
 						<label for="delete_type_moved"><input type="radio" name="delete_type" id="delete_type_moved" value="moved" class="input_radio" checked="checked" /> ', $txt['maintain_old_are_moved'], '</label><br />
 						<label for="delete_type_locked"><input type="radio" name="delete_type" id="delete_type_locked" value="locked" class="input_radio" /> ', $txt['maintain_old_are_locked'], '</label><br />
-					</p>';
-
-	if (!empty($modSettings['enableStickyTopics']))
-		echo '
+					</p>
 					<p>
 						<label for="delete_old_not_sticky"><input type="checkbox" name="delete_old_not_sticky" id="delete_old_not_sticky" class="input_check" checked="checked" /> ', $txt['maintain_old_are_not_stickied'], '</label><br />
-					</p>';
-
-	echo '
-					<p>
-						<a href="#rotLink" onclick="swapRot();"><img src="', $settings['images_url'], '/selected.png" alt="+" id="rotIcon" /></a> <a href="#rotLink" onclick="swapRot();" id="rotText">', $txt['maintain_old_all'], '</a>
 					</p>
-					<div style="display: none;" id="rotPanel" class="flow_hidden">
-						<div class="floatleft grid50">';
+					<fieldset id="pick_boards" class="content">';
 
-	// This is the "middle" of the list.
-	$middle = ceil(count($context['categories']) / 2);
-
-	$i = 0;
-	foreach ($context['categories'] as $category)
-	{
-		echo '
-							<fieldset>
-								<legend>', $category['name'], '</legend>
-								<ul>';
-
-		// Display a checkbox with every board.
-		foreach ($category['boards'] as $board)
-			echo '
-									<li style="margin-', $context['right_to_left'] ? 'right' : 'left', ': ', $board['child_level'] * 1.5, 'em;">
-										<label for="boards_', $board['id'], '"><input type="checkbox" name="boards[', $board['id'], ']" id="boards_', $board['id'], '" checked="checked" class="input_check" />', $board['name'], '</label>
-									</li>';
-
-		echo '
-								</ul>
-							</fieldset>';
-
-		// Increase $i, and check if we're at the middle yet.
-		if (++$i == $middle)
-			echo '
-						</div>
-						<div class="floatright grid50">';
-	}
+	template_pick_boards('pruneold', 'boards');
 
 	echo '
-						</div>
-					</div>
-					<div class="submitbutton">
-						<input type="submit" value="', $txt['maintain_old_remove'], '" onclick="return confirm(\'', $txt['maintain_old_confirm'], '\');" class="button_submit" />
-						<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />
-						<input type="hidden" name="', $context['admin-maint_token_var'], '" value="', $context['admin-maint_token'], '" />
-					</div>
-				</form>
-			</div>
-		</div>
-		<h3 class="category_header">', $txt['maintain_old_drafts'], '</h3>
-		<div class="windowbg">
-			<div class="content">
-				<form action="', $scripturl, '?action=admin;area=maintain;sa=topics;activity=olddrafts" method="post" accept-charset="UTF-8">
+					</fieldset>';
+}
+
+function template_maintain_topics_olddrafts()
+{
+	global $context, $txt, $modSettings;
+
+	echo '
 					<p>
 						<label for="draftdays">', sprintf($txt['maintain_old_drafts_days'], ' <input type="text" id="draftdays" name="draftdays" value="' . (!empty($modSettings['drafts_keep_days']) ? $modSettings['drafts_keep_days'] : 30) . '" size="3" /> '), '</label>
-					</p>
-					<div class="submitbutton">
-						<input type="submit" value="', $txt['maintain_old_remove'], '" onclick="return confirm(\'', $txt['maintain_old_drafts_confirm'], '\');" class="button_submit" />
-						<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />
-						<input type="hidden" name="', $context['admin-maint_token_var'], '" value="', $context['admin-maint_token'], '" />
-					</div>
-				</form>
-			</div>
-		</div>
-		<h3 class="category_header">', $txt['move_topics_maintenance'], '</h3>
-		<div class="windowbg">
-			<div class="content">
-				<form action="', $scripturl, '?action=admin;area=maintain;sa=topics;activity=massmove" method="post" accept-charset="UTF-8">
+					</p>';
+}
+
+function template_maintain_topics_massmove()
+{
+	global $context, $txt;
+
+	echo '
 					<p>';
 
 	template_select_boards('id_board_from', $txt['move_topics_from']);
 	template_select_boards('id_board_to', $txt['move_topics_to']);
 
 	echo '
-					</p>
-					<div class="submitbutton">
-						<input type="submit" value="', $txt['move_topics_now'], '" onclick="return confirmMoveTopics(', JavaScriptEscape($txt['move_topics_confirm']), ');" class="button_submit" />
-						<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />
-						<input type="hidden" name="', $context['admin-maint_token_var'], '" value="', $context['admin-maint_token'], '" />
-					</div>
-				</form>
-			</div>
-		</div>
-	</div>';
+					</p>';
 }
 
 /**

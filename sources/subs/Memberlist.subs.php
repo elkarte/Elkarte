@@ -13,7 +13,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0
+ * @version 1.1 dev
  *
  */
 
@@ -282,13 +282,14 @@ function ml_findSearchableCustomFields()
 		WHERE active = {int:active}
 			' . (allowedTo('admin_forum') ? '' : ' AND private < {int:private_level}') . '
 			AND can_search = {int:can_search}
-			AND (field_type = {string:field_type_text} OR field_type = {string:field_type_textarea})',
+			AND (field_type IN ({string:field_type_text}, {string:field_type_textarea}, {string:field_type_select}))',
 		array(
 			'active' => 1,
 			'can_search' => 1,
 			'private_level' => 2,
 			'field_type_text' => 'text',
 			'field_type_textarea' => 'textarea',
+			'field_type_select' => 'select',
 		)
 	);
 	$context['custom_search_fields'] = array();
@@ -344,7 +345,7 @@ function printMemberListRows($request)
 		$context['members'][$member]['post_percent'] = round(($context['members'][$member]['real_posts'] * 100) / $most_posts);
 		$context['members'][$member]['registered_date'] = strftime('%Y-%m-%d', $context['members'][$member]['registered_timestamp']);
 		$context['members'][$member]['real_name'] = $context['members'][$member]['link'];
-		$context['members'][$member]['avatar'] = '<a href="' . $context['members'][$member]['href'] . '" target="_blank" class="new_win">' . $context['members'][$member]['avatar']['image'] . '</a>';
+		$context['members'][$member]['avatar'] = '<a href="' . $context['members'][$member]['href'] . '">' . $context['members'][$member]['avatar']['image'] . '</a>';
 		$context['members'][$member]['email_address'] = $context['members'][$member]['email'];
 		$context['members'][$member]['website_url'] = $context['members'][$member]['website']['url'] != '' ? '<a href="' . $context['members'][$member]['website']['url'] . '" target="_blank" class="new_win"><img src="' . $settings['images_url'] . '/profile/www.png" alt="' . $context['members'][$member]['website']['title'] . '" title="' . $context['members'][$member]['website']['title'] . '" /></a>' : '';
 		$context['members'][$member]['id_group'] = empty($context['members'][$member]['group']) ? $context['members'][$member]['post_group'] : $context['members'][$member]['group'];

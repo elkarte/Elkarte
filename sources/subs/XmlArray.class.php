@@ -13,7 +13,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0
+ * @version 1.1 dev
  *
  */
 
@@ -237,7 +237,7 @@ class Xml_Array
 	}
 
 	/**
-	 * Count the number of occurences of a path.
+	 * Count the number of occurrences of a path.
 	 * Example use:
 	 *  echo $xml->count('html/head/meta');
 	 * @param string $path - the path to search for.
@@ -420,7 +420,7 @@ class Xml_Array
 					}
 				}
 
-				// Wait for an actual occurance of an element.
+				// Wait for an actual occurrence of an element.
 				continue;
 			}
 
@@ -530,7 +530,7 @@ class Xml_Array
 		$inside_elements = false;
 		$output_el = '';
 
-		// Run through and recurively output all the elements or attrbutes inside this.
+		// Run through and recursively output all the elements or attributes inside this.
 		foreach ($array as $k => $v)
 		{
 			if (substr($k, 0, 1) === '@')

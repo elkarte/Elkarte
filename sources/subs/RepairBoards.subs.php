@@ -16,7 +16,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0
+ * @version 1.1 dev
  *
  */
 
@@ -1279,7 +1279,7 @@ function createSalvageArea()
 		if ($db->affected_rows() <= 0)
 		{
 			loadLanguage('Admin');
-			fatal_lang_error('salvaged_category_error', false);
+			Errors::instance()->fatal_lang_error('salvaged_category_error', false);
 		}
 
 		$salvageCatID = $db->insert_id('{db_prefix}categories', 'id_cat');
@@ -1313,7 +1313,7 @@ function createSalvageArea()
 		if ($db->affected_rows() <= 0)
 		{
 			loadLanguage('Admin');
-			fatal_lang_error('salvaged_board_error', false);
+			Errors::instance()->fatal_lang_error('salvaged_board_error', false);
 		}
 
 		$salvageBoardID = $db->insert_id('{db_prefix}boards', 'id_board');
@@ -1344,15 +1344,13 @@ function createSalvageArea()
  */
 function pauseRepairProcess($to_fix, $current_step_description, $max_substep = 0, $force = false)
 {
-	global $context, $txt, $time_start, $db_temp_cache, $db_show_debug;
+	global $context, $txt, $time_start, $db_show_debug;
 
 	// More time, I need more time!
-	@set_time_limit(600);
-	if (function_exists('apache_reset_timeout'))
-		@apache_reset_timeout();
+	setTimeLimit(600);
 
 	// Errr, wait.  How much time has this taken already?
-	if (!$force && time() - array_sum(explode(' ', $time_start)) < 3)
+	if (!$force && microtime(true) - $time_start > 3)
 		return;
 
 	// Restore the query cache if interested.
@@ -1391,18 +1389,18 @@ function pauseRepairProcess($to_fix, $current_step_description, $max_substep = 0
  * - It keeps track of the errors it did find, so that the actual repair
  * won't have to recheck everything.
  * - returns the errors found.
- * 
+ *
  * @param boolean $do_fix
  * @return mixed[]
  */
 function findForumErrors($do_fix = false)
 {
-	global $context, $txt, $errorTests, $db_show_debug, $db_temp_cache;
+	global $context, $txt, $errorTests, $db_show_debug;
 
 	$db = database();
 
 	// This may take some time...
-	@set_time_limit(600);
+	setTimeLimit(600);
 
 	$to_fix = !empty($_SESSION['repairboards_to_fix']) ? $_SESSION['repairboards_to_fix'] : array();
 	$context['repair_errors'] = isset($_SESSION['repairboards_to_fix2']) ? $_SESSION['repairboards_to_fix2'] : array();
@@ -1419,6 +1417,7 @@ function findForumErrors($do_fix = false)
 	// For all the defined error types do the necessary tests.
 	$current_step = -1;
 	$total_queries = 0;
+
 	foreach ($errorTests as $error_type => $test)
 	{
 		$current_step++;

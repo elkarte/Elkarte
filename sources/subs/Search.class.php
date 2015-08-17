@@ -13,7 +13,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0 Release Candidate 1
+ * @version 1.1 dev Release Candidate 1
  *
  */
 
@@ -23,7 +23,7 @@ if (!defined('ELK'))
 // This defines two version types for checking the API's are compatible with this version of the software.
 $GLOBALS['search_versions'] = array(
 	// This is the forum version but is repeated due to some people rewriting $forum_version.
-	'forum_version' => 'ElkArte 1.0 Release Candidate 1',
+	'forum_version' => 'ElkArte 1.1',
 
 	// This is the minimum version of ElkArte that an API could have been written for to work.
 	// (strtr to stop accidentally updating version on release)
@@ -121,7 +121,7 @@ class Search
 		// Load up the search API we are going to use.
 		$modSettings['search_index'] = empty($modSettings['search_index']) ? 'standard' : $modSettings['search_index'];
 		if (!file_exists(SUBSDIR . '/SearchAPI-' . ucwords($modSettings['search_index']) . '.class.php'))
-			fatal_lang_error('search_api_missing');
+			Errors::instance()->fatal_lang_error('search_api_missing');
 
 		// Create an instance of the search API and check it is valid for this version of the software.
 		$search_class_name = ucwords($modSettings['search_index']) . '_Search';
@@ -132,7 +132,7 @@ class Search
 		{
 			// Log the error.
 			loadLanguage('Errors');
-			log_error(sprintf($txt['search_api_not_compatible'], 'SearchAPI-' . ucwords($modSettings['search_index']) . '.class.php'), 'critical');
+			Errors::instance()->log_error(sprintf($txt['search_api_not_compatible'], 'SearchAPI-' . ucwords($modSettings['search_index']) . '.class.php'), 'critical');
 
 			$this->_searchAPI = new Standard_Search();
 		}
@@ -610,7 +610,7 @@ class Search
 			);
 
 			if ($this->_db->num_rows($request) == 0)
-				fatal_lang_error('topic_gone', false);
+				Errors::instance()->fatal_lang_error('topic_gone', false);
 
 			$this->_search_params['brd'] = array();
 			list ($this->_search_params['brd'][0]) = $this->_db->fetch_row($request);
@@ -1425,7 +1425,7 @@ class Search
 	 *
 	 * @param int $id_search - the id of the search to delete from logs
 	 * @param int $maxMessageResults - the maximum number of messages to index
-	 * @return int - the number of indexed results 
+	 * @return int - the number of indexed results
 	 */
 	private function _prepare_word_index($id_search, $maxMessageResults)
 	{

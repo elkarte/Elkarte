@@ -15,7 +15,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:		BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0.2
+ * @version 1.1 dev
  *
  */
 
@@ -23,7 +23,7 @@ if (!defined('ELK'))
 	die('No access...');
 
 /**
- * Register Controller Class, It registers new members, and it alows
+ * Register Controller Class, It registers new members, and it allows
  * the administrator moderate member registration
  */
 class Register_Controller extends Action_Controller
@@ -57,7 +57,7 @@ class Register_Controller extends Action_Controller
 
 		// Check if the administrator has it disabled.
 		if (!empty($modSettings['registration_method']) && $modSettings['registration_method'] == '3')
-			fatal_lang_error('registration_disabled', false);
+			Errors::instance()->fatal_lang_error('registration_disabled', false);
 
 		// If this user is an admin - redirect them to the admin registration page.
 		if (allowedTo('moderate_forum') && !$user_info['is_guest'])
@@ -105,7 +105,7 @@ class Register_Controller extends Action_Controller
 				if (empty($modSettings['coppaType']) && empty($_SESSION['skip_coppa']))
 				{
 					loadLanguage('Login');
-					fatal_lang_error('under_age_registration_prohibited', false, array($modSettings['coppaAge']));
+					Errors::instance()->fatal_lang_error('under_age_registration_prohibited', false, array($modSettings['coppaAge']));
 				}
 			}
 		}
@@ -150,8 +150,8 @@ class Register_Controller extends Action_Controller
 			if (empty($context['agreement']))
 			{
 				// No file found or a blank file, log the error so the admin knows there is a problem!
-				log_error($txt['registration_agreement_missing'], 'critical');
-				fatal_lang_error('registration_disabled', false);
+				Errors::instance()->log_error($txt['registration_agreement_missing'], 'critical');
+				Errors::instance()->fatal_lang_error('registration_disabled', false);
 			}
 		}
 
@@ -204,19 +204,7 @@ class Register_Controller extends Action_Controller
 			setupProfileContext($reg_fields, 'registration');
 		}
 
-		// Generate a visual verification code to make sure the user is no bot.
-		if (!empty($modSettings['reg_verification']) && $current_step > 1)
-		{
-			require_once(SUBSDIR . '/VerificationControls.class.php');
-			$verificationOptions = array(
-				'id' => 'register',
-			);
-			$context['visual_verification'] = create_control_verification($verificationOptions);
-			$context['visual_verification_id'] = $verificationOptions['id'];
-		}
-		// Otherwise we have nothing to show.
-		else
-			$context['visual_verification'] = false;
+		$this->_events->trigger('prepare_context', array('current_step' => $current_step));
 
 		// Are they coming from an OpenID login attempt?
 		if (!empty($_SESSION['openid']['verified']) && !empty($_SESSION['openid']['openid_uri']) && !empty($_SESSION['openid']['nickname']))
@@ -225,14 +213,12 @@ class Register_Controller extends Action_Controller
 			$context['username'] = !empty($_POST['user']) ? Util::htmlspecialchars($_POST['user']) : $_SESSION['openid']['nickname'];
 			$context['email'] = !empty($_POST['email']) ? Util::htmlspecialchars($_POST['email']) : $_SESSION['openid']['email'];
 		}
-		// See whether we have some prefiled values.
+		// See whether we have some pre filled values.
 		else
 		{
-			$context += array(
-				'openid' => isset($_POST['openid_identifier']) ? $_POST['openid_identifier'] : '',
-				'username' => isset($_POST['user']) ? Util::htmlspecialchars($_POST['user']) : '',
-				'email' => isset($_POST['email']) ? Util::htmlspecialchars($_POST['email']) : '',
-			);
+			$context['openid'] = isset($_POST['openid_identifier']) ? $_POST['openid_identifier'] : '';
+			$context['username'] = isset($_POST['user']) ? Util::htmlspecialchars($_POST['user']) : '';
+			$context['email'] = isset($_POST['email']) ? Util::htmlspecialchars($_POST['email']) : '';
 		}
 
 		// Were there any errors?
@@ -281,35 +267,21 @@ class Register_Controller extends Action_Controller
 		if (!empty($modSettings['coppaAge']) && empty($modSettings['coppaType']) && empty($_SESSION['skip_coppa']))
 		{
 			loadLanguage('Login');
-			fatal_lang_error('under_age_registration_prohibited', false, array($modSettings['coppaAge']));
+			Errors::instance()->fatal_lang_error('under_age_registration_prohibited', false, array($modSettings['coppaAge']));
 		}
 
 		// Check the time gate for miscreants. First make sure they came from somewhere that actually set it up.
 		if (empty($_SESSION['register']['timenow']) || empty($_SESSION['register']['limit']))
 			redirectexit('action=register');
 
-		// Failing that, check the time limit for exessive speed.
+		// Failing that, check the time limit for excessive speed.
 		if (time() - $_SESSION['register']['timenow'] < $_SESSION['register']['limit'])
 		{
 			loadLanguage('Login');
 			$reg_errors->addError('too_quickly');
 		}
 
-		// Check whether the visual verification code was entered correctly.
-		if (!empty($modSettings['reg_verification']))
-		{
-			require_once(SUBSDIR . '/VerificationControls.class.php');
-			$verificationOptions = array(
-				'id' => 'register',
-			);
-			$context['visual_verification'] = create_control_verification($verificationOptions, true);
-
-			if (is_array($context['visual_verification']))
-			{
-				foreach ($context['visual_verification'] as $error)
-					$reg_errors->addError($error);
-			}
-		}
+		$this->_events->trigger('before_complete_register', array('reg_errors' => $reg_errors));
 
 		$this->do_register(false);
 	}
@@ -323,11 +295,11 @@ class Register_Controller extends Action_Controller
 
 		// You can't register if it's disabled.
 		if (!empty($modSettings['registration_method']) && $modSettings['registration_method'] == 3)
-			fatal_lang_error('registration_disabled', false);
+			Errors::instance()->fatal_lang_error('registration_disabled', false);
 
 		// Make sure they didn't just register with this session.
 		if (!empty($_SESSION['just_registered']) && empty($modSettings['disableRegisterCheck']))
-			fatal_lang_error('register_only_once', false);
+			Errors::instance()->fatal_lang_error('register_only_once', false);
 	}
 
 	/**
@@ -495,7 +467,7 @@ class Register_Controller extends Action_Controller
 		// Otherwise grab all of them and don't log anything
 		if ($reg_errors->hasErrors(1) && !$user_info['is_admin'])
 			foreach ($reg_errors->prepareErrors(1) as $error)
-				fatal_error($error, 'general');
+				Errors::instance()->fatal_error($error, 'general');
 
 		// Was there actually an error of some kind dear boy?
 		if ($reg_errors->hasErrors())
@@ -560,7 +532,7 @@ class Register_Controller extends Action_Controller
 		if (empty($_REQUEST['u']) && empty($_POST['user']))
 		{
 			if (empty($modSettings['registration_method']) || $modSettings['registration_method'] == '3')
-				fatal_lang_error('no_access', false);
+				Errors::instance()->fatal_lang_error('no_access', false);
 
 			$context['member_id'] = 0;
 			$context['sub_template'] = 'resend';
@@ -596,11 +568,11 @@ class Register_Controller extends Action_Controller
 		if (isset($_POST['new_email'], $_REQUEST['passwd']) && validateLoginPassword($_REQUEST['passwd'], $row['passwd'], $row['member_name'], true) && ($row['is_activated'] == 0 || $row['is_activated'] == 2))
 		{
 			if (empty($modSettings['registration_method']) || $modSettings['registration_method'] == 3)
-				fatal_lang_error('no_access', false);
+				Errors::instance()->fatal_lang_error('no_access', false);
 
 			// @todo Separate the sprintf?
 			if (!Data_Validator::is_valid($_POST, array('new_email' => 'valid_email|required|max_length[255]'), array('new_email' => 'trim')))
-				fatal_error(sprintf($txt['valid_email_needed'], htmlspecialchars($_POST['new_email'], ENT_COMPAT, 'UTF-8')), false);
+				Errors::instance()->fatal_error(sprintf($txt['valid_email_needed'], htmlspecialchars($_POST['new_email'], ENT_COMPAT, 'UTF-8')), false);
 
 			// Make sure their email isn't banned.
 			isBannedEmail($_POST['new_email'], 'cannot_register', $txt['ban_register_prohibited']);
@@ -608,7 +580,7 @@ class Register_Controller extends Action_Controller
 			// Ummm... don't even dare try to take someone else's email!!
 			// @todo Separate the sprintf?
 			if (userByEmail($_POST['new_email']))
-				fatal_lang_error('email_in_use', false, array(htmlspecialchars($_POST['new_email'], ENT_COMPAT, 'UTF-8')));
+				Errors::instance()->fatal_lang_error('email_in_use', false, array(htmlspecialchars($_POST['new_email'], ENT_COMPAT, 'UTF-8')));
 
 			require_once(SUBSDIR . '/Members.subs.php');
 			updateMemberData($row['id_member'], array('email_address' => $_POST['new_email']));
@@ -640,18 +612,18 @@ class Register_Controller extends Action_Controller
 			// This will ensure we don't actually get an error message if it works!
 			$context['error_title'] = '';
 
-			fatal_lang_error(!empty($email_change) ? 'change_email_success' : 'resend_email_success', false);
+			Errors::instance()->fatal_lang_error(!empty($email_change) ? 'change_email_success' : 'resend_email_success', false);
 		}
 
 		// Quit if this code is not right.
 		if (empty($_REQUEST['code']) || $row['validation_code'] != $_REQUEST['code'])
 		{
 			if (!empty($row['is_activated']))
-				fatal_lang_error('already_activated', false);
+				Errors::instance()->fatal_lang_error('already_activated', false);
 			elseif ($row['validation_code'] == '')
 			{
 				loadLanguage('Profile');
-				fatal_error($txt['registration_not_approved'] . ' <a href="' . $scripturl . '?action=activate;user=' . $row['member_name'] . '">' . $txt['here'] . '</a>.', false);
+				Errors::instance()->fatal_error($txt['registration_not_approved'] . ' <a href="' . $scripturl . '?action=activate;user=' . $row['member_name'] . '">' . $txt['here'] . '</a>.', false);
 			}
 
 			$context['sub_template'] = 'retry_activate';
@@ -701,7 +673,7 @@ class Register_Controller extends Action_Controller
 
 		// No User ID??
 		if (!isset($_GET['member']))
-			fatal_lang_error('no_access', false);
+			Errors::instance()->fatal_lang_error('no_access', false);
 
 		// Get the user details...
 		require_once(SUBSDIR . '/Members.subs.php');
@@ -709,7 +681,7 @@ class Register_Controller extends Action_Controller
 
 		// If doesn't exist or not pending coppa
 		if (empty($member) || $member['is_activated'] != 5)
-			fatal_lang_error('no_access', false);
+			Errors::instance()->fatal_lang_error('no_access', false);
 
 		if (isset($_GET['form']))
 		{
@@ -721,7 +693,7 @@ class Register_Controller extends Action_Controller
 			if (!isset($_GET['dl']))
 			{
 				// Shortcut for producing underlines.
-				$context['ul'] = '<u>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</u>';
+				$context['ul'] = '<span class="underline">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>';
 				Template_Layers::getInstance()->removeAll();
 				$context['sub_template'] = 'coppa_form';
 				$context['page_title'] = replaceBasicActionUrl($txt['coppa_form_title']);
@@ -878,17 +850,7 @@ class Register_Controller extends Action_Controller
 			if (!$validator->validate($_POST))
 				$context['errors'] = $validator->validation_errors();
 
-			// How about any verification errors
-			$verificationOptions = array(
-				'id' => 'contactform',
-			);
-			$context['require_verification'] = create_control_verification($verificationOptions, true);
-
-			if (is_array($context['require_verification']))
-			{
-				foreach ($context['require_verification'] as $error)
-					$context['errors'][] = $txt['error_' . $error];
-			}
+			$this->_events->trigger('verify_contact', array());
 
 			// No errors, then send the PM to the admins
 			if (empty($context['errors']))
@@ -917,12 +879,7 @@ class Register_Controller extends Action_Controller
 			$context['sub_template'] = 'contact_form';
 			$context['page_title'] = $txt['admin_contact_form'];
 
-			require_once(SUBSDIR . '/VerificationControls.class.php');
-			$verificationOptions = array(
-				'id' => 'contactform',
-			);
-			$context['require_verification'] = create_control_verification($verificationOptions);
-			$context['visual_verification_id'] = $verificationOptions['id'];
+			$this->_events->trigger('setup_contact', array());
 		}
 
 		createToken('contact');

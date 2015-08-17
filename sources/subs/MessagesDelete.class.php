@@ -14,7 +14,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0 Release Candidate 1
+ * @version 1.1 dev Release Candidate 1
  *
  */
 
@@ -447,7 +447,7 @@ class MessagesDelete
 				)
 			);
 			if ($db->num_rows($request) == 0)
-				fatal_lang_error('recycle_no_valid_board');
+				Errors::instance()->fatal_lang_error('recycle_no_valid_board');
 			list ($isRead, $last_board_msg) = $db->fetch_row($request);
 			$db->free_result($request);
 
@@ -616,9 +616,11 @@ class MessagesDelete
 			// Remove the mentions!
 			$db->query('', '
 				DELETE FROM {db_prefix}log_mentions
-				WHERE id_msg = {int:id_msg}',
+				WHERE id_target = {int:id_msg}
+				AND mention_type IN ({array_string:mension_types})',
 				array(
 					'id_msg' => $message,
+					'mension_types' => array('mentionmem', 'likemsg', 'rlikemsg'),
 				)
 			);
 
@@ -735,21 +737,21 @@ class MessagesDelete
 						if ($row['id_member_poster'] == $user_info['id'])
 						{
 							if (!$delete_replies)
-								fatal_lang_error('cannot_delete_replies', 'permission');
+								Errors::instance()->fatal_lang_error('cannot_delete_replies', 'permission');
 						}
 						else
-							fatal_lang_error('cannot_delete_own', 'permission');
+							Errors::instance()->fatal_lang_error('cannot_delete_own', 'permission');
 					}
 					elseif (($row['id_member_poster'] != $user_info['id'] || !$delete_replies) && !empty($modSettings['edit_disable_time']) && $row['poster_time'] + $modSettings['edit_disable_time'] * 60 < time())
-						fatal_lang_error('modify_post_time_passed', false);
+						Errors::instance()->fatal_lang_error('modify_post_time_passed', false);
 				}
 				elseif ($row['id_member_poster'] == $user_info['id'])
 				{
 					if (!$delete_replies)
-						fatal_lang_error('cannot_delete_replies', 'permission');
+						Errors::instance()->fatal_lang_error('cannot_delete_replies', 'permission');
 				}
 				else
-					fatal_lang_error('cannot_delete_any', 'permission');
+					Errors::instance()->fatal_lang_error('cannot_delete_any', 'permission');
 			}
 
 			// Can't delete an unapproved message, if you can't see it!
@@ -773,7 +775,7 @@ class MessagesDelete
 						isAllowedTo('delete_own');
 				}
 				elseif (!allowedTo('delete_any') && ($row['id_member_poster'] != $user_info['id'] || !allowedTo('delete_replies')) && !empty($modSettings['edit_disable_time']) && $row['poster_time'] + $modSettings['edit_disable_time'] * 60 < time())
-					fatal_lang_error('modify_post_time_passed', false);
+					Errors::instance()->fatal_lang_error('modify_post_time_passed', false);
 			}
 			elseif ($row['id_member_poster'] == $user_info['id'] && !allowedTo('delete_any'))
 				isAllowedTo('delete_replies');
@@ -798,9 +800,9 @@ class MessagesDelete
 				}
 
 				if ($row['id_member'] != $user_info['id'] && !$remove_any)
-					fatal_lang_error('cannot_remove_any', 'permission');
+					Errors::instance()->fatal_lang_error('cannot_remove_any', 'permission');
 				elseif (!$remove_any && !$remove_own)
-					fatal_lang_error('cannot_remove_own', 'permission');
+					Errors::instance()->fatal_lang_error('cannot_remove_own', 'permission');
 			}
 			else
 			{
@@ -813,7 +815,7 @@ class MessagesDelete
 
 			// ...if there is only one post.
 			if (!empty($row['num_replies']))
-				fatal_lang_error('delFirstPost', false);
+				Errors::instance()->fatal_lang_error('delFirstPost', false);
 
 			return true;
 		}

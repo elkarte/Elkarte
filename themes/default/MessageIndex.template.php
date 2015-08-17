@@ -11,7 +11,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0.1
+ * @version 1.1 dev
  *
  */
 
@@ -125,7 +125,7 @@ function template_topic_listing_above()
  */
 function template_topic_listing()
 {
-	global $context, $settings, $options, $scripturl, $txt, $modSettings;
+	global $context, $options, $scripturl, $txt, $modSettings;
 
 	if (!$context['no_topic_listing'])
 	{
@@ -223,7 +223,7 @@ function template_topic_listing()
 					</p>
 					<p class="topic_lastpost">';
 
-			if (!empty($settings['avatars_on_indexes']))
+			if (!empty($topic['last_post']['member']['avatar']))
 				echo '
 						<span class="board_avatar"><a href="', $topic['last_post']['member']['href'], '"><img class="avatar" src="', $topic['last_post']['member']['avatar']['href'], '" alt="" /></a></span>';
 

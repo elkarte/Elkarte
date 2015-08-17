@@ -17,7 +17,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:		BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0
+ * @version 1.1 dev
  *
  */
 
@@ -31,6 +31,20 @@ if (!defined('ELK'))
  */
 class Reports_Controller extends Action_Controller
 {
+		/**
+	 * Holds instance of HttpReq object
+	 * @var HttpReq
+	 */
+	protected $_req;
+
+	/**
+	 * Pre Dispatch, called before other methods.  Loads HttpReq
+	 */
+	public function pre_dispatch()
+	{
+		$this->_req = HttpReq::instance();
+	}
+
 	/**
 	 * Handling function for generating reports.
 	 *  - Requires the admin_forum permission.
@@ -88,14 +102,14 @@ class Reports_Controller extends Action_Controller
 				'is_first' => $is_first++ == 0,
 			);
 
-		// If they haven't choosen a report type which is valid, send them off to the report type chooser!
-		if (empty($_REQUEST['rt']) || !isset($context['report_types'][$_REQUEST['rt']]))
+		// If they haven't chosen a report type which is valid, send them off to the report type chooser!
+		if (empty($this->_req->post->rt) || !isset($context['report_types'][$this->_req->post->rt]))
 		{
 			$context['sub_template'] = 'report_type';
 			return;
 		}
 
-		$context['report_type'] = $_REQUEST['rt'];
+		$context['report_type'] = $this->_req->post->rt;
 		$context['sub_template'] = 'generate_report';
 
 		// What are valid templates for showing reports?
@@ -109,16 +123,16 @@ class Reports_Controller extends Action_Controller
 		);
 
 		// Specific template? Use that instead of main!
-		if (isset($_REQUEST['st']) && isset($reportTemplates[$_REQUEST['st']]))
+		if (isset($this->_req->post->st) && isset($reportTemplates[$this->_req->post->st]))
 		{
-			$context['sub_template'] = $_REQUEST['st'];
+			$context['sub_template'] = $this->_req->post->st;
 
 			// Are we disabling the other layers - print friendly for example?
-			if ($reportTemplates[$_REQUEST['st']]['layers'] !== null)
+			if ($reportTemplates[$this->_req->post->st]['layers'] !== null)
 			{
 				$template_layers = Template_Layers::getInstance();
 				$template_layers->removeAll();
-				foreach ($reportTemplates[$_REQUEST['st']]['layers'] as $layer)
+				foreach ($reportTemplates[$this->_req->post->st]['layers'] as $layer)
 					$template_layers->add($layer);
 			}
 		}
@@ -275,12 +289,12 @@ class Reports_Controller extends Action_Controller
 		// Lets get started
 		$query_boards = array();
 
-		if (isset($_REQUEST['boards']))
+		if (isset($this->_req->post->boards))
 		{
-			if (!is_array($_REQUEST['boards']))
-				$query_boards['boards'] = array_map('intval', explode(',', $_REQUEST['boards']));
+			if (!is_array($this->_req->post->boards))
+				$query_boards['boards'] = array_map('intval', explode(',', $this->_req->post->boards));
 			else
-				$query_boards['boards'] = array_map('intval', $_REQUEST['boards']);
+				$query_boards['boards'] = array_map('intval', $this->_req->post->boards);
 		}
 		else
 			$query_boards = 'all';
@@ -294,12 +308,12 @@ class Reports_Controller extends Action_Controller
 
 		// Groups, next.
 		$query_groups = array();
-		if (isset($_REQUEST['groups']))
+		if (isset($this->_req->post->groups))
 		{
-			if (!is_array($_REQUEST['groups']))
-				$query_groups = array_map('intval', explode(',', $_REQUEST['groups']));
+			if (!is_array($this->_req->post->groups))
+				$query_groups = array_map('intval', explode(',', $this->_req->post->groups));
 			else
-				$query_groups = array_map('intval', $_REQUEST['groups']);
+				$query_groups = array_map('intval', $this->_req->post->groups);
 
 			$group_clause = 'id_group IN ({array_int:groups})';
 		}
@@ -485,12 +499,12 @@ class Reports_Controller extends Action_Controller
 	{
 		global $txt;
 
-		if (isset($_REQUEST['groups']))
+		if (isset($this->_req->post->groups))
 		{
-			if (!is_array($_REQUEST['groups']))
-				$_REQUEST['groups'] = explode(',', $_REQUEST['groups']);
+			if (!is_array($this->_req->post->groups))
+				$this->_req->post->groups = explode(',', $this->_req->post->groups);
 
-			$query_groups = array_diff(array_map('intval', $_REQUEST['groups']), array(3));
+			$query_groups = array_diff(array_map('intval', $this->_req->post->groups), array(3));
 			$group_clause = 'id_group IN ({array_int:groups})';
 		}
 		else
@@ -503,7 +517,7 @@ class Reports_Controller extends Action_Controller
 		require_once(SUBSDIR . '/Reports.subs.php');
 		$all_groups = allMembergroups($group_clause, $query_groups);
 
-		if (!isset($_REQUEST['groups']) || in_array(-1, $_REQUEST['groups']) || in_array(0, $_REQUEST['groups']))
+		if (!isset($this->_req->post->groups) || in_array(-1, $this->_req->post->groups) || in_array(0, $this->_req->post->groups))
 			$groups = array('col' => '', -1 => $txt['membergroups_guests'], 0 => $txt['membergroups_members']) + $all_groups;
 		else
 			$groups = array('col' => '') + $all_groups;
@@ -521,7 +535,7 @@ class Reports_Controller extends Action_Controller
 		addSeparator($txt['board_perms_permission']);
 
 		// Now the big permission fetch!
-		$perms = boardPermissionsByGroup($group_clause, isset($_REQUEST['groups']) ? $_REQUEST['groups'] : array());
+		$perms = boardPermissionsByGroup($group_clause, isset($this->_req->post->groups) ? $this->_req->post->groups : array());
 		$lastPermission = null;
 		$curData = array();
 		foreach ($perms as $row)
@@ -585,7 +599,7 @@ class Reports_Controller extends Action_Controller
 
 		// This is a bit of a cop out - but we're protecting their forum, really!
 		if (count($allStaff) > 300)
-			fatal_lang_error('report_error_too_many_staff');
+			Errors::instance()->fatal_lang_error('report_error_too_many_staff');
 
 		// Get all the possible membergroups!
 		$all_groups = getBasicMembergroupData(array('all'), array(), null, false);
@@ -700,7 +714,7 @@ function newTable($title = '', $default_value = '', $shading = 'all', $width_nor
  * required key is present in the incoming data. If this data is missing
  * the current tables default value will be used.
  * - if any key in the incoming data begins with '#sep#', the function
- * will add a separator accross the table at this point.
+ * will add a separator across the table at this point.
  * once the incoming data has been sanitized, it is added to the table.
  *
  * @param mixed[] $inc_data
@@ -840,7 +854,7 @@ function finishTables()
  * column, or a new row.
  * - keys is an array whose keys are the keys for data being passed to addData().
  * - if reverse is set to true, then the values of the variable "keys"
- * are used as oppossed to the keys(!
+ * are used as opposed to the keys(!
  *
  * @param string $method = 'rows' rows or cols
  * @param mixed[] $keys = array()

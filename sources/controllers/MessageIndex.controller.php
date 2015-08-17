@@ -14,7 +14,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:		BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0
+ * @version 1.1 dev
  *
  */
 
@@ -243,17 +243,13 @@ class MessageIndex_Controller extends Action_Controller
 		else
 			$fake_ascending = false;
 
-		// Setup the default topic icons...
-		$context['icon_sources'] = MessageTopicIcons();
-
 		$context['topics'] = array();
 
 		// Set up the query options
 		$indexOptions = array(
-			'include_sticky' => !empty($modSettings['enableStickyTopics']),
 			'only_approved' => $modSettings['postmod_active'] && !allowedTo('approve_posts'),
 			'previews' => !empty($modSettings['message_index_preview']) ? (empty($modSettings['preview_characters']) ? -1 : $modSettings['preview_characters']) : 0,
-			'include_avatars' => !empty($settings['avatars_on_indexes']),
+			'include_avatars' => $settings['avatars_on_indexes'],
 			'ascending' => $ascending,
 			'fake_ascending' => $fake_ascending
 		);
@@ -263,7 +259,7 @@ class MessageIndex_Controller extends Action_Controller
 
 		$topics_info = messageIndexTopics($board, $user_info['id'], $start, $maxindex, $context['sort_by'], $sort_column, $indexOptions);
 
-		$context['topics'] = processMessageIndexTopicList($topics_info);
+		$context['topics'] = Topic_Util::prepareContext($topics_info);
 
 		// Allow addons to add to the $context['topics']
 		call_integration_hook('integrate_messageindex_listing', array($topics_info));
@@ -295,7 +291,7 @@ class MessageIndex_Controller extends Action_Controller
 		{
 			$context['can_markread'] = $context['user']['is_logged'];
 			$context['can_lock'] = allowedTo('lock_any');
-			$context['can_sticky'] = allowedTo('make_sticky') && !empty($modSettings['enableStickyTopics']);
+			$context['can_sticky'] = allowedTo('make_sticky');
 			$context['can_move'] = allowedTo('move_any');
 			$context['can_remove'] = allowedTo('remove_any');
 			$context['can_merge'] = allowedTo('merge_any');
@@ -312,7 +308,7 @@ class MessageIndex_Controller extends Action_Controller
 				$started = $topic['first_post']['member']['id'] == $user_info['id'];
 				$context['topics'][$t]['quick_mod'] = array(
 					'lock' => allowedTo('lock_any') || ($started && allowedTo('lock_own')),
-					'sticky' => allowedTo('make_sticky') && !empty($modSettings['enableStickyTopics']),
+					'sticky' => allowedTo('make_sticky'),
 					'move' => allowedTo('move_any') || ($started && allowedTo('move_own')),
 					'modify' => allowedTo('modify_any') || ($started && allowedTo('modify_own')),
 					'remove' => allowedTo('remove_any') || ($started && allowedTo('remove_own')),
@@ -367,8 +363,6 @@ class MessageIndex_Controller extends Action_Controller
 	public function action_quickmod()
 	{
 		global $board, $user_info, $modSettings, $context;
-
-		$db = database();
 
 		// Check the session = get or post.
 		checkSession('request');
@@ -425,7 +419,7 @@ class MessageIndex_Controller extends Action_Controller
 
 		if (!$user_info['is_guest'])
 			$possibleActions[] = 'markread';
-		if (!empty($boards_can['make_sticky']) && !empty($modSettings['enableStickyTopics']))
+		if (!empty($boards_can['make_sticky']))
 			$possibleActions[] = 'sticky';
 		if (!empty($boards_can['move_any']) || !empty($boards_can['move_own']))
 			$possibleActions[] = 'move';
@@ -451,7 +445,8 @@ class MessageIndex_Controller extends Action_Controller
 				if (empty($_REQUEST['topics']) || count($_REQUEST['topics']) < 2)
 					redirectexit($redirect_url);
 
-				$controller = new MergeTopics_Controller();
+				$controller = new MergeTopics_Controller(new Event_Manager());
+				$controller->pre_dispatch();
 				return $controller->action_mergeExecute($_REQUEST['topics']);
 			}
 
@@ -472,7 +467,6 @@ class MessageIndex_Controller extends Action_Controller
 				$all_actions[(int) $topic] = $action;
 		}
 
-		$real_actions = array();
 		$stickyCache = array();
 		$moveCache = array(0 => array(), 1 => array());
 		$removeCache = array();

@@ -1039,7 +1039,7 @@ div.labels {
 	margin: 1px -25px 0 0 !important;
     position: absolute !important;
 }
-#admincenter .content .settings {
+.admincenter .content .settings {
     padding: 0 8px 0 0 !important;
 }
 
@@ -1084,7 +1084,7 @@ div.labels {
 
 .search_results_posts .quick_mod {
 	right: auto;
-	left: 0px;
+	left: 0;
 }
 
 /* The memberlist. */

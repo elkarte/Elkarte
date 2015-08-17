@@ -11,7 +11,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0.2
+ * @version 1.1 dev
  *
  */
 
@@ -418,7 +418,7 @@ function template_quickreply_below()
 							</dl>';
 
 		// Is visual verification enabled?
-		if ($context['require_verification'])
+		if (!empty($context['require_verification']))
 			template_verification_controls($context['visual_verification_id'], '
 							<strong>' . $txt['verification'] . ':</strong>', '<br />');
 
@@ -450,7 +450,7 @@ function template_quickreply_below()
 		if (!empty($context['drafts_save']))
 			echo '
 								<input type="submit" name="save_draft" value="', $txt['draft_save'], '" onclick="return confirm(' . JavaScriptEscape($txt['draft_save_note']) . ') && submitThisOnce(this);" accesskey="d" tabindex="', $context['tabindex']++, '" class="button_submit" />
-								<input type="hidden" id="id_draft" name="id_draft" value="', empty($context['id_draft']) ? 0 : $context['id_draft'], '" />';
+								';
 
 		echo '
 							</div>';
@@ -474,17 +474,6 @@ function template_quickreply_below()
 		{
 			echo '
 			<script><!-- // --><![CDATA[';
-
-			// Draft autosave available and the user has it enabled?
-			if (!empty($context['drafts_autosave']) && !empty($options['drafts_autosave_enabled']))
-				echo '
-				var oDraftAutoSave = new elk_DraftAutoSave({
-					sSelf: \'oDraftAutoSave\',
-					sLastNote: \'draft_lastautosave\',
-					sLastID: \'id_draft\',
-					iBoard: ', (empty($context['current_board']) ? 0 : $context['current_board']), ',
-					iFreq: ', isset($context['drafts_autosave_frequency']) ? $context['drafts_autosave_frequency'] : 30000, '
-				});';
 
 			// Mentions enabled
 			if (!empty($modSettings['mentions_enabled']))
@@ -697,7 +686,7 @@ function template_display_poll_above()
 		echo '
 							</ul>
 							<div class="submitbutton">
-								<input type="submit" value="', $txt['poll_vote'], '" class="button_submit" />
+								<input type="submit" value="', $txt['poll_vote'], '" class="left_submit" />
 								<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />
 							</div>
 						</form>';

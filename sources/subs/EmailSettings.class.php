@@ -8,7 +8,7 @@
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
- * @version 1.0
+ * @version 1.1 dev
  *
  * Handles saving of config vars in another table than settings
  */
@@ -34,13 +34,18 @@ class Email_Settings extends Settings_Form
 	 *
 	 * @param mixed[] $config_vars the key names of the vars are the table cols
 	 * @param string $tablename name of the table the values will be saved in
-	 * @param string[] $index for compatability
+	 * @param string[] $index for compatibility
 	 * @param integer $editid -1 add a row, otherwise edit a row with the supplied key value
 	 * @param string $editname used when editing a row, needs to be the name of the col to find $editid key value
 	 */
-	public static function saveTableSettings($config_vars, $tablename, $index = array(), $editid = -1, $editname = '')
+	public static function saveTableSettings($config_vars, $tablename, $config_values = null, $index = array(), $editid = -1, $editname = '')
 	{
 		$db = database();
+
+		if ($config_values === null)
+			$config_values = $_POST;
+		elseif (is_object($config_values))
+			$config_values = (array) $config_values;
 
 		// Init
 		$insert_type = array();
@@ -50,26 +55,26 @@ class Email_Settings extends Settings_Form
 		// Cast all the config vars as defined
 		foreach ($config_vars as $var)
 		{
-			if (!isset($var[1]) || (!isset($_POST[$var[1]]) && $var[0] !== 'check'))
+			if (!isset($var[1]) || (!isset($config_values[$var[1]]) && $var[0] !== 'check'))
 				continue;
 
 			// Checkboxes ...
 			elseif ($var[0] === 'check')
 			{
 				$insert_type[$var[1]] = 'int';
-				$insert_value[] = !empty($_POST[$var[1]]) ? 1 : 0;
+				$insert_value[] = !empty($config_values[$var[1]]) ? 1 : 0;
 			}
 			// Or maybe even select boxes
-			elseif ($var[0] === 'select' && in_array($_POST[$var[1]], array_keys($var[2])))
+			elseif ($var[0] === 'select' && in_array($config_values[$var[1]], array_keys($var[2])))
 			{
 				$insert_type[$var[1]] = 'string';
-				$insert_value[] = $_POST[$var[1]];
+				$insert_value[] = $config_values[$var[1]];
 			}
-			elseif ($var[0] === 'select' && !empty($var['multiple']) && array_intersect($_POST[$var[1]], array_keys($var[2])) != array())
+			elseif ($var[0] === 'select' && !empty($var['multiple']) && array_intersect($config_values[$var[1]], array_keys($var[2])) != array())
 			{
 				// For security purposes we need to validate this line by line.
 				$options = array();
-				foreach ($_POST[$var[1]] as $invar)
+				foreach ($config_values[$var[1]] as $invar)
 				{
 					if (in_array($invar, array_keys($var[2])))
 						$options[] = $invar;
@@ -82,19 +87,19 @@ class Email_Settings extends Settings_Form
 			elseif ($var[0] == 'int')
 			{
 				$insert_type[$var[1]] = 'int';
-				$insert_value[] = (int) $_POST[$var[1]];
+				$insert_value[] = (int) $config_values[$var[1]];
 			}
 			// Floating points are easy
 			elseif ($var[0] === 'float')
 			{
 				$insert_type[$var[1]] = 'float';
-				$insert_value[] = (float) $_POST[$var[1]];
+				$insert_value[] = (float) $config_values[$var[1]];
 			}
 			// Text is fine too!
 			elseif ($var[0] === 'text' || $var[0] === 'large_text')
 			{
 				$insert_type[$var[1]] = 'string';
-				$insert_value[] = $_POST[$var[1]];
+				$insert_value[] = $config_values[$var[1]];
 			}
 		}
 

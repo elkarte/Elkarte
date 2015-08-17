@@ -16,7 +16,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:		BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0.1
+ * @version 1.1 dev
  *
  */
 
@@ -198,17 +198,21 @@ function sessionWrite($session_id, $data)
 			'session_id' => $session_id,
 		)
 	);
+	$result = $db->affected_rows();
 
 	// If that didn't work, try inserting a new one.
-	if ($db->affected_rows() == 0)
+	if (empty($result))
+	{
 		$result = $db->insert('ignore',
 			'{db_prefix}sessions',
 			array('session_id' => 'string', 'data' => 'string', 'last_update' => 'int'),
 			array($session_id, $data, time()),
 			array('session_id')
 		);
+		$result = $db->affected_rows();
+	}
 
-	return $result;
+	return !empty($result);
 }
 
 /**

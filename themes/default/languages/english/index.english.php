@@ -1,5 +1,5 @@
 <?php
-// Version: 1.0; index
+// Version: 1.1; index
 
 global $forum_copyright;
 
@@ -233,6 +233,16 @@ $txt['post_awaiting_approval'] = 'Note: This message is awaiting approval by a m
 $txt['there_are_unapproved_topics'] = 'There are %1$s topics and %2$s posts awaiting approval in this board. <a href="%3$s">Click here to view them</a>.';
 $txt['send_message'] = 'Send message';
 
+// ILA message viewing
+$txt['ila_invalid'] = ' [ Attachment Invalid Or Does Not Exist ] ';
+$txt['ila_disabled'] = ' [ Attachments Disabled ] ';
+$txt['ila_forbidden_for_guest'] = ' [ Guests cannot view attachments ] ';
+$txt['ila_nopermission'] = ' [ You are not authorized to view attachments ] ';
+$txt['ila_attachment_missing'] = ' [ Specified attachment is not available ]';
+$txt['ila_quote_link'] = ' (Attachment Link) ';
+$txt['ila_quote_nolink'] = ' (Attachment) ';
+$txt['ila_confirm_removal'] = 'Are you sure you want to remove permanently this attachment?';
+
 $txt['msg_alert_no_messages'] = 'you don\'t have any message';
 $txt['msg_alert_one_message'] = 'you have <a href="%1$s">1 message</a>';
 $txt['msg_alert_many_message'] = 'you have <a href="%1$s">%2$d messages</a>';
@@ -357,8 +367,11 @@ $txt['topic_sent'] = 'Your email has been sent successfully.';
 $txt['time_offset'] = 'Time Offset';
 $txt['or'] = 'or';
 
-$txt['mention'] = 'Mentions';
+$txt['mention'] = 'Notifications';
 $txt['notifications'] = 'Notifications';
+$txt['unread_notifications'] = 'You have %1$s unread notifications since your last visit.';
+$txt['new_from_last_notifications'] = 'You have %1$s new notifications.';
+$txt['forum_notification'] = 'Notifications from %1$s.';
 
 $txt['your_ban'] = 'Sorry %1$s, you are banned from using this forum!';
 $txt['your_ban_expires'] = 'This ban is set to expire %1$s.';
@@ -645,7 +658,7 @@ $txt['smtp_error'] = 'Ran into problems sending Mail. Error: ';
 $txt['mail_send_unable'] = 'Unable to send mail to the email address \'%1$s\'';
 
 $txt['mlist_search'] = 'Search For Members';
-$txt['mlist_search_again'] = 'Search again';
+$txt['mlist_search_again'] = 'Search again'; // @deprecated since 1.0.4
 $txt['mlist_search_email'] = 'Search by email address';
 $txt['mlist_search_group'] = 'Search by position';
 $txt['mlist_search_name'] = 'Search by name';
@@ -847,7 +860,7 @@ $txt['openid'] = 'OpenID';
 
 $txt['downloads'] = 'Downloads';
 $txt['filesize'] = 'File size';
-$txt['subscribe_webslice'] = 'Subscribe to Webslice';
+$txt['subscribe_webslice'] = 'Subscribe to Webslice'; // @deprecated since 1.1
 
 // Restore topic
 $txt['restore_topic'] = 'Restore Topic';
@@ -871,7 +884,7 @@ $txt['debug_templates'] = 'Templates: ';
 $txt['debug_subtemplates'] = 'Sub templates: '; // @deprecated since 1.1
 $txt['debug_sub_templates'] = 'Sub templates: ';
 $txt['debug_language_files'] = 'Language files: ';
-$txt['debug_stylesheets'] = 'Style sheets: ';
+$txt['debug_sheets'] = 'Style sheets: ';
 $txt['debug_javascript'] = 'Scripts: ';
 $txt['debug_files_included'] = 'Files included: ';
 $txt['debug_kb'] = 'KB.';

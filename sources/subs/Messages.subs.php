@@ -16,7 +16,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0
+ * @version 1.1 dev
  *
  */
 
@@ -186,7 +186,7 @@ function checkMessagePermissions($message)
 	{
 		// Give an extra five minutes over the disable time threshold, so they can type - assuming the post is public.
 		if ($message['approved'] && !empty($modSettings['edit_disable_time']) && $message['poster_time'] + ($modSettings['edit_disable_time'] + 5) * 60 < time())
-			fatal_lang_error('modify_post_time_passed', false);
+			Errors::instance()->fatal_lang_error('modify_post_time_passed', false);
 		elseif ($message['id_member_poster'] == $user_info['id'] && !allowedTo('modify_own'))
 			isAllowedTo('modify_replies');
 		else
@@ -265,9 +265,7 @@ function removeNonTopicMessages($memID)
 	// This could take a while... but ya know it's gonna be worth it in the end.
 	while ($row = $db->fetch_assoc($request))
 	{
-		if (function_exists('apache_reset_timeout'))
-			@apache_reset_timeout();
-
+		setTimeLimit(300);
 		removeMessage($row['id_msg']);
 	}
 	$db->free_result($request);
@@ -427,7 +425,7 @@ function nextMessage($id_msg, $id_topic)
  * @param int $id_topic the id of the topic
  * @param mixed[] $params an (optional) array of params, includes:
  *      - 'not_in' => array - of messages to exclude
- *      - 'include' => array - of messages to explicitely include
+ *      - 'include' => array - of messages to explicitly include
  *      - 'only_approved' => true/false - include or exclude the unapproved messages
  *      - 'limit' => mixed - the number of values to return (if false, no limits applied)
  * @todo very similar to selectMessages in Topics.subs.php
@@ -602,8 +600,6 @@ function countNewPosts($topic, $topicinfo, $timestamp)
  */
 function loadMessageRequest($msg_selects, $msg_tables, $msg_parameters, $optional = array())
 {
-	global $options;
-
 	$db = database();
 
 	$request = $db->query('', '

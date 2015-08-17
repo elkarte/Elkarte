@@ -13,7 +13,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0 Release Candidate 1
+ * @version 1.1 dev Release Candidate 1
  *
  */
 
@@ -26,35 +26,36 @@ class Cache
 	 * Holds our static instance of the class
 	 * @var object
 	 */
-	private static $_instance = null;
+	protected static $_instance = null;
 
 	/**
 	 * Array of options for the methods (if needed)
 	 * @var mixed[]
 	 */
-	private $_options = array();
+	protected $_options = array();
 
 	/**
 	 * If the cache is enabled or not.
 	 * Set in __construct based on the global $cache_enable
 	 * @var int
 	 */
-	private $_cache_enable = false;
+	protected $_cache_enable = false;
 
 	/**
 	 * The prefix to append to the cache key
 	 * @var string
 	 */
-	private $_key_prefix = null;
+	protected $_key_prefix = null;
 
 	/**
-	 * The cacheing object
+	 * The caching object
 	 * @var object
 	 */
-	private $_cache_obj = null;
+	protected $_cache_obj = null;
 
 	/**
 	 * Initialize the class, defines the options and the caching method to use
+	 *
 	 * @param int $enabled The level of caching
 	 * @param string $accelerator The accelerator used
 	 * @param mixed[] $options Any setting necessary to the caching engine
@@ -72,14 +73,13 @@ class Cache
 		if (empty($accelerator))
 			$accelerator = 'filebased';
 
-		$cache_class = ucfirst($accelerator) . '_Cache';
+		$cache_class = '\\ElkArte\\sources\\subs\\CacheMethod\\' . ucfirst($accelerator);
 		$this->_cache_obj = new $cache_class($this->_options);
 
 		if ($this->_cache_obj !== null)
 			$this->_cache_enable = $this->_cache_obj->init();
 
-		if ($this->_cache_enable)
-			$this->_key_prefix = $this->_build_prefix();
+		$this->_build_prefix();
 	}
 
 	/**
@@ -218,7 +218,7 @@ class Cache
 	 * Type can be user, data or left blank
 	 *  - user clears out user data
 	 *  - data clears out system / opcode data
-	 *  - If no type is specified will perfom a complete cache clearing
+	 *  - If no type is specified will perform a complete cache clearing
 	 * For cache engines that do not distinguish on types, a full cache flush will be done
 	 *
 	 * @param string $type = ''
@@ -272,17 +272,16 @@ class Cache
 			global $cache_accelerator, $cache_enable, $cache_uid, $cache_password;
 
 			$options = array();
-			if ($cache_accelerator == 'xcache')
+			if ($cache_accelerator === 'xcache')
 			{
 				$options = array(
 					'cache_uid' => $cache_uid,
 					'cache_password' => $cache_password,
 				);
 			}
-			elseif ($cache_accelerator == 'acpu')
-				self::$_instance = new Cache($cache_enable, 'acp', $options);
-			else
-				self::$_instance = new Cache($cache_enable, $cache_accelerator, $options);
+			Elk_Autoloader::getInstance()->register(SUBSDIR . '/CacheMethod', '\\ElkArte\\sources\\subs\\CacheMethod');
+
+			self::$_instance = new Cache($cache_enable, $cache_accelerator, $options);
 		}
 
 		return self::$_instance;

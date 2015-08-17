@@ -10,7 +10,7 @@
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
- * @version 1.0.2
+ * @version 1.1 dev
  *
  */
 
@@ -328,9 +328,9 @@ function get_file_listing($path, $relative)
 
 	// Is it even a directory?
 	if (!is_dir($path))
-		fatal_lang_error('error_invalid_dir', 'critical');
+		Errors::instance()->fatal_lang_error('error_invalid_dir', 'critical');
 
-	// Read this directorys contents
+	// Read this directory's contents
 	$entries = array();
 	$dir = dir($path);
 	while ($entry = $dir->read())
@@ -735,7 +735,7 @@ function deleteTheme($id)
 
 	// Make sure we never ever delete the default theme!
 	if ($id === 1)
-		fatal_lang_error('no_access', false);
+		Errors::instance()->fatal_lang_error('no_access', false);
 
 	$db->query('', '
 		DELETE FROM {db_prefix}themes

@@ -13,7 +13,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:		BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0
+ * @version 1.1 dev
  *
  */
 
@@ -28,31 +28,38 @@ if (!defined('ELK'))
 class Search_Controller extends Action_Controller
 {
 	/**
-	 * Weighing factor each area, ie frequncy, age, sticky, ec
+	 * Weighing factor each area, ie frequency, age, sticky, ec
 	 * @var array
 	 */
-	private $_weight = array();
+	protected $_weight = array();
 
 	/**
 	 * Holds the total of all weight factors, should be 100
 	 *
 	 * @var int
 	 */
-	private $_weight_total = 0;
+	protected $_weight_total = 0;
 
 	/**
 	 * Holds array of search result relevancy weigh factors
 	 *
 	 * @var array
 	 */
-	private $_weight_factors = array();
+	protected $_weight_factors = array();
 
 	/**
 	 * Holds the search object
 	 *
 	 * @var object
 	 */
-	private $_search = null;
+	protected $_search = null;
+
+	/**
+	 * The class that takes care of rendering the message icons (MessageTopicIcons)
+	 *
+	 * @var null|object
+	 */
+	protected $_icon_sources = null;
 
 	/**
 	 * Called before any other action method in this class.
@@ -64,7 +71,7 @@ class Search_Controller extends Action_Controller
 	{
 		global $modSettings, $scripturl;
 
-		// Coming from quick search box and going to some custome place?
+		// Coming from quick search box and going to some custom place?
 		if (isset($_REQUEST['search_selection']) && !empty($modSettings['additional_search_engines']))
 		{
 			$engines = prepareSearchEngines();
@@ -75,13 +82,13 @@ class Search_Controller extends Action_Controller
 			}
 		}
 
-		// if comming from the quick search box, and we want to search on members, well we need to do that ;)
+		// if coming from the quick search box, and we want to search on members, well we need to do that ;)
 		if (isset($_REQUEST['search_selection']) && $_REQUEST['search_selection'] === 'members')
 			redirectexit($scripturl . '?action=memberlist;sa=search;fields=name,email;search=' . urlencode($_REQUEST['search']));
 
 		// If load balancing is on and the load is high, no need to even show the form.
 		if (!empty($modSettings['loadavg_search']) && $modSettings['current_load'] >= $modSettings['loadavg_search'])
-			fatal_lang_error('loadavg_search_disabled', false);
+			Errors::instance()->fatal_lang_error('loadavg_search_disabled', false);
 
 	}
 
@@ -118,7 +125,7 @@ class Search_Controller extends Action_Controller
 
 		// Is the load average too high to allow searching just now?
 		if (!empty($modSettings['loadavg_search']) && $modSettings['current_load'] >= $modSettings['loadavg_search'])
-			fatal_lang_error('loadavg_search_disabled', false);
+			Errors::instance()->fatal_lang_error('loadavg_search_disabled', false);
 
 		loadLanguage('Search');
 
@@ -315,11 +322,6 @@ class Search_Controller extends Action_Controller
 		// This is used to remember words that will be ignored (because too short usually)
 		$context['search_ignored'] = $this->_search->getIgnored();
 
-		// Create an array of replacements for highlighting.
-		$context['mark'] = array();
-		foreach ($searchArray as $word)
-			$context['mark'][$word] = '<strong class="highlight">' . $word . '</strong>';
-
 		// Make sure at least one word is being searched for.
 		if (empty($searchArray))
 		{
@@ -464,7 +466,7 @@ class Search_Controller extends Action_Controller
 				$boards_can = array_merge($boards_can, boardsAllowedTo(array('lock_any', 'lock_own', 'make_sticky', 'move_any', 'move_own', 'remove_any', 'remove_own', 'merge_any'), true, false));
 
 				$context['can_lock'] = in_array(0, $boards_can['lock_any']);
-				$context['can_sticky'] = in_array(0, $boards_can['make_sticky']) && !empty($modSettings['enableStickyTopics']);
+				$context['can_sticky'] = in_array(0, $boards_can['make_sticky']);
 				$context['can_move'] = in_array(0, $boards_can['move_any']);
 				$context['can_remove'] = in_array(0, $boards_can['remove_any']);
 				$context['can_merge'] = in_array(0, $boards_can['merge_any']);
@@ -505,13 +507,10 @@ class Search_Controller extends Action_Controller
 
 		$context['key_words'] = &$searchArray;
 
-		// Setup the default topic icons... for checking they exist and the like!
-		require_once(SUBSDIR . '/MessageIndex.subs.php');
-		$context['icon_sources'] = MessageTopicIcons();
-
 		$context['sub_template'] = 'results';
 		$context['page_title'] = $txt['search_results'];
 		$context['get_topics'] = array($this, 'prepareSearchContext_callback');
+		$this->_icon_sources = new MessageTopicIcons();
 
 		$context['jump_to'] = array(
 			'label' => addslashes(un_htmlspecialchars($txt['jump_to'])),
@@ -634,32 +633,12 @@ class Search_Controller extends Action_Controller
 		// Make sure we don't end up with a practically empty message body.
 		$message['body'] = preg_replace('~^(?:&nbsp;)+$~', '', $message['body']);
 
-		// Sadly, we need to check that the icon is not broken.
-		if (!empty($modSettings['messageIconChecks_enable']))
-		{
-			if (!isset($context['icon_sources'][$message['first_icon']]))
-				$context['icon_sources'][$message['first_icon']] = file_exists($settings['theme_dir'] . '/images/post/' . $message['first_icon'] . '.png') ? 'images_url' : 'default_images_url';
-			if (!isset($context['icon_sources'][$message['last_icon']]))
-				$context['icon_sources'][$message['last_icon']] = file_exists($settings['theme_dir'] . '/images/post/' . $message['last_icon'] . '.png') ? 'images_url' : 'default_images_url';
-			if (!isset($context['icon_sources'][$message['icon']]))
-				$context['icon_sources'][$message['icon']] = file_exists($settings['theme_dir'] . '/images/post/' . $message['icon'] . '.png') ? 'images_url' : 'default_images_url';
-		}
-		else
-		{
-			if (!isset($context['icon_sources'][$message['first_icon']]))
-				$context['icon_sources'][$message['first_icon']] = 'images_url';
-			if (!isset($context['icon_sources'][$message['last_icon']]))
-				$context['icon_sources'][$message['last_icon']] = 'images_url';
-			if (!isset($context['icon_sources'][$message['icon']]))
-				$context['icon_sources'][$message['icon']] = 'images_url';
-		}
-
 		// Do we have quote tag enabled?
 		$quote_enabled = empty($modSettings['disabledBBC']) || !in_array('quote', explode(',', $modSettings['disabledBBC']));
 
 		$output = array_merge($context['topics'][$message['id_msg']], array(
 			'id' => $message['id_topic'],
-			'is_sticky' => !empty($modSettings['enableStickyTopics']) && !empty($message['is_sticky']),
+			'is_sticky' => !empty($message['is_sticky']),
 			'is_locked' => !empty($message['locked']),
 			'is_poll' => !empty($modSettings['pollMode']) && $message['id_poll'] > 0,
 			'is_hot' => !empty($modSettings['useLikesNotViews']) ? $message['num_likes'] >= $modSettings['hotTopicPosts'] : $message['num_replies'] >= $modSettings['hotTopicPosts'],
@@ -681,7 +660,7 @@ class Search_Controller extends Action_Controller
 				'href' => $scripturl . '?topic=' . $message['id_topic'] . '.0',
 				'link' => '<a href="' . $scripturl . '?topic=' . $message['id_topic'] . '.0">' . $message['first_subject'] . '</a>',
 				'icon' => $message['first_icon'],
-				'icon_url' => $settings[$context['icon_sources'][$message['first_icon']]] . '/post/' . $message['first_icon'] . '.png',
+				'icon_url' => $this->_icon_sources->{$message['first_icon']},
 				'member' => array(
 					'id' => $message['first_member_id'],
 					'name' => $message['first_member_name'],
@@ -698,7 +677,7 @@ class Search_Controller extends Action_Controller
 				'href' => $scripturl . '?topic=' . $message['id_topic'] . ($message['num_replies'] == 0 ? '.0' : '.msg' . $message['last_msg']) . '#msg' . $message['last_msg'],
 				'link' => '<a href="' . $scripturl . '?topic=' . $message['id_topic'] . ($message['num_replies'] == 0 ? '.0' : '.msg' . $message['last_msg']) . '#msg' . $message['last_msg'] . '">' . $message['last_subject'] . '</a>',
 				'icon' => $message['last_icon'],
-				'icon_url' => $settings[$context['icon_sources'][$message['last_icon']]] . '/post/' . $message['last_icon'] . '.png',
+				'icon_url' => $this->_icon_sources->{$message['last_icon']},
 				'member' => array(
 					'id' => $message['last_member_id'],
 					'name' => $message['last_member_name'],
@@ -733,7 +712,7 @@ class Search_Controller extends Action_Controller
 
 			$output['quick_mod'] = array(
 				'lock' => in_array(0, $boards_can['lock_any']) || in_array($output['board']['id'], $boards_can['lock_any']) || ($started && (in_array(0, $boards_can['lock_own']) || in_array($output['board']['id'], $boards_can['lock_own']))),
-				'sticky' => (in_array(0, $boards_can['make_sticky']) || in_array($output['board']['id'], $boards_can['make_sticky'])) && !empty($modSettings['enableStickyTopics']),
+				'sticky' => (in_array(0, $boards_can['make_sticky']) || in_array($output['board']['id'], $boards_can['make_sticky'])),
 				'move' => in_array(0, $boards_can['move_any']) || in_array($output['board']['id'], $boards_can['move_any']) || ($started && (in_array(0, $boards_can['move_own']) || in_array($output['board']['id'], $boards_can['move_own']))),
 				'remove' => in_array(0, $boards_can['remove_any']) || in_array($output['board']['id'], $boards_can['remove_any']) || ($started && (in_array(0, $boards_can['remove_own']) || in_array($output['board']['id'], $boards_can['remove_own']))),
 			);
@@ -767,7 +746,7 @@ class Search_Controller extends Action_Controller
 			'alternate' => $counter % 2,
 			'member' => &$memberContext[$message['id_member']],
 			'icon' => $message['icon'],
-			'icon_url' => $settings[$context['icon_sources'][$message['icon']]] . '/post/' . $message['icon'] . '.png',
+			'icon_url' => $this->_icon_sources->{$message['icon']},
 			'subject' => $message['subject'],
 			'subject_highlighted' => $subject_highlighted,
 			'time' => standardTime($message['poster_time']),
@@ -880,10 +859,10 @@ class Search_Controller extends Action_Controller
 		{
 			// Admins can be bothered with a failure
 			if ($user_info['is_admin'])
-				fatal_lang_error('search_invalid_weights');
+				Errors::instance()->fatal_lang_error('search_invalid_weights');
 
 			// Even if users will get an answer, the admin should know something is broken
-			log_lang_error('search_invalid_weights');
+			Errors::instance()->log_lang_error('search_invalid_weights');
 
 			// Instead is better to give normal users and guests some kind of result
 			// using our defaults.

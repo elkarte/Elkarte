@@ -15,7 +15,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:		BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0
+ * @version 1.1 dev
  *
  */
 
@@ -24,7 +24,7 @@ if (!defined('ELK'))
 
 /**
  * ProfileOptions_Controller class. Does the job of showing and editing people's profiles.
- * Interface to buddy list, ignore list, notifications, authenitcation options, forum profile
+ * Interface to buddy list, ignore list, notifications, authentication options, forum profile
  * account settings, etc
  */
 class ProfileOptions_Controller extends Action_Controller
@@ -36,7 +36,7 @@ class ProfileOptions_Controller extends Action_Controller
 	private $_memID = 0;
 
 	/**
-	 * Called before all other methods when comming from the dispatcher or
+	 * Called before all other methods when coming from the dispatcher or
 	 * action class.  If you initiate the class outside of those methods, call this method.
 	 * or setup the class.
 	 */
@@ -67,7 +67,7 @@ class ProfileOptions_Controller extends Action_Controller
 
 		// Do a quick check to ensure people aren't getting here illegally!
 		if (!$context['user']['is_owner'] || empty($modSettings['enable_buddylist']))
-			fatal_lang_error('no_access', false);
+			Errors::instance()->fatal_lang_error('no_access', false);
 
 		loadTemplate('ProfileOptions');
 
@@ -275,7 +275,7 @@ class ProfileOptions_Controller extends Action_Controller
 				updateMemberData($this->_memID, array('pm_ignore_list' => $user_profile[$this->_memID]['pm_ignore_list']));
 			}
 
-			// Back to the list of pityful people!
+			// Back to the list of pitiful people!
 			redirectexit('action=profile;area=lists;sa=ignore;u=' . $this->_memID);
 		}
 
@@ -327,7 +327,7 @@ class ProfileOptions_Controller extends Action_Controller
 				'email_address', 'hide_email', 'show_online', 'hr',
 				'passwrd1', 'passwrd2', 'hr',
 				'secret_question', 'secret_answer', 'hr',
-				'enable_otp', 'otp_secret', 'hr' 
+				'enable_otp', 'otp_secret', 'hr'
 			),
 			'account'
 		);
@@ -337,7 +337,7 @@ class ProfileOptions_Controller extends Action_Controller
 			if (secret)
 			{
 				var qrcode = new QRCode("qrcode", {
-					text: "otpauth://totp/' . $context['forum_name'] . '?secret=" + secret, 
+					text: "otpauth://totp/' . $context['forum_name'] . '?secret=" + secret,
 					width: 80,
 					height: 80,
 					colorDark : "#000000",
@@ -362,7 +362,7 @@ class ProfileOptions_Controller extends Action_Controller
 					qr.removeChild(qr.firstChild);
 				}
 				var qrcode = new QRCode("qrcode", {
-				text: "otpauth://totp/' . $context['forum_name'] . '?secret=" + text, 
+				text: "otpauth://totp/' . $context['forum_name'] . '?secret=" + text,
 				width: 80,
 				height: 80,
 				colorDark : "#000000",
@@ -557,6 +557,9 @@ class ProfileOptions_Controller extends Action_Controller
 		// Going to need this for the list.
 		require_once(SUBSDIR . '/Boards.subs.php');
 		require_once(SUBSDIR . '/Topic.subs.php');
+		require_once(SUBSDIR . '/Profile.subs.php');
+
+		$context['mention_types'] = getMemberNotificationsProfile($this->_memID);
 
 		// Fine, start with the board list.
 		$listOptions = array(
@@ -822,7 +825,7 @@ class ProfileOptions_Controller extends Action_Controller
 
 		// Have the admins enabled this option?
 		if (empty($modSettings['allow_ignore_boards']))
-			fatal_lang_error('ignoreboards_disallowed', 'user');
+			Errors::instance()->fatal_lang_error('ignoreboards_disallowed', 'user');
 
 		loadTemplate('ProfileOptions');
 
@@ -909,7 +912,7 @@ class ProfileOptions_Controller extends Action_Controller
 			isAllowedTo('manage_membergroups');
 
 		if (!isset($_REQUEST['gid']) && !isset($_POST['primary']))
-			fatal_lang_error('no_access', false);
+			Errors::instance()->fatal_lang_error('no_access', false);
 
 		checkSession(isset($_GET['gid']) ? 'get' : 'post');
 
@@ -950,12 +953,12 @@ class ProfileOptions_Controller extends Action_Controller
 
 				// Does the group type match what we're doing - are we trying to request a non-requestable group?
 				if ($changeType == 'request' && $row['group_type'] != 2)
-					fatal_lang_error('no_access', false);
+					Errors::instance()->fatal_lang_error('no_access', false);
 				// What about leaving a requestable group we are not a member of?
 				elseif ($changeType == 'free' && $row['group_type'] == 2 && $old_profile['id_group'] != $row['id_group'] && !isset($addGroups[$row['id_group']]))
-					fatal_lang_error('no_access', false);
+					Errors::instance()->fatal_lang_error('no_access', false);
 				elseif ($changeType == 'free' && $row['group_type'] != 3 && $row['group_type'] != 2)
-					fatal_lang_error('no_access', false);
+					Errors::instance()->fatal_lang_error('no_access', false);
 
 				// We can't change the primary group if this is hidden!
 				if ($row['hidden'] == 2)
@@ -977,7 +980,7 @@ class ProfileOptions_Controller extends Action_Controller
 
 		// Didn't find the target?
 		if (!$foundTarget)
-			fatal_lang_error('no_access', false);
+			Errors::instance()->fatal_lang_error('no_access', false);
 
 		// Final security check, don't allow users to promote themselves to admin.
 		require_once(SUBSDIR . '/ProfileOptions.subs.php');
@@ -992,7 +995,7 @@ class ProfileOptions_Controller extends Action_Controller
 		if ($changeType == 'request')
 		{
 			if (logMembergroupRequest($group_id, $this->_memID))
-				fatal_lang_error('profile_error_already_requested_group');
+				Errors::instance()->fatal_lang_error('profile_error_already_requested_group');
 
 			// Send an email to all group moderators etc.
 			require_once(SUBSDIR . '/Mail.subs.php');

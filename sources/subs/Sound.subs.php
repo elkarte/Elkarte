@@ -2,7 +2,7 @@
 
 /**
  * Handles sound processing. In order to make sure the visual
- * verification is still accessible for all users, a sound clip is being addded
+ * verification is still accessible for all users, a sound clip is being added
  * that reads the letters that are being shown.
  *
  * @name      ElkArte Forum
@@ -15,7 +15,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0
+ * @version 1.1 dev
  *
  */
 

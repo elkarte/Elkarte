@@ -13,7 +13,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0.2
+ * @version 1.1 dev
  *
  */
 
@@ -21,7 +21,7 @@ if (!defined('ELK'))
 	die('No access...');
 
 /**
- * Gets all of the files in a directory and its chidren directories
+ * Gets all of the files in a directory and its children directories
  *
  * @package AddonSettings
  * @param string $dir_path
@@ -31,20 +31,24 @@ function get_files_recursive($dir_path)
 {
 	$files = array();
 
-	if ($dh = opendir($dir_path))
+	try
 	{
-		while (($file = readdir($dh)) !== false)
+		$iterator = new RecursiveIteratorIterator(
+			new RecursiveDirectoryIterator($dir_path, RecursiveDirectoryIterator::SKIP_DOTS),
+			RecursiveIteratorIterator::SELF_FIRST,
+			RecursiveIteratorIterator::CATCH_GET_CHILD
+		);
+
+		foreach ($iterator as $file)
 		{
-			if ($file != '.' && $file != '..')
-			{
-				if (is_dir($dir_path . '/' . $file))
-					$files = array_merge($files, get_files_recursive($dir_path . '/' . $file));
-				else
-					$files[] = array('dir' => $dir_path, 'name' => $file);
-			}
+			if ($file->isFile())
+				$files[] = array('dir' => $file->getPath(), 'name' => $file->getFilename());
 		}
 	}
-	closedir($dh);
+	catch (UnexpectedValueException $e)
+	{
+		// @todo, give them a prize
+	}
 
 	return $files;
 }

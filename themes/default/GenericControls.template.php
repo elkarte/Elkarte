@@ -11,7 +11,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0.1
+ * @version 1.1 dev
  *
  */
 
@@ -28,7 +28,7 @@ function template_control_richedit($editor_id, $smileyContainer = null, $bbcCont
 
 	$editor_context = &$context['controls']['richedit'][$editor_id];
 
-	$plugins = array_filter(array('bbcode', 'splittag', (!empty($context['mentions_enabled']) ? 'mention' : ''), (!empty($context['drafts_autosave']) && !empty($options['drafts_autosave_enabled']) ? 'draft' : '')));
+	$plugins = array_filter(array('bbcode', 'splittag', (!empty($context['mentions_enabled']) ? 'mention' : '')));
 
 	// Allow addons to insert additional editor plugin scripts
 	if (!empty($editor_context['plugin_addons']) && is_array($editor_context['plugin_addons']))
@@ -39,18 +39,6 @@ function template_control_richedit($editor_id, $smileyContainer = null, $bbcCont
 	$plugin_options[] = '
 					parserOptions: {
 						quoteType: $.sceditor.BBCodeParser.QuoteType.auto
-					}';
-
-	// Drafts?
-	if (!empty($context['drafts_autosave']) && !empty($options['drafts_autosave_enabled']))
-			$plugin_options[] = '
-					draftOptions: {
-						sLastNote: \'draft_lastautosave\',
-						sSceditorID: \'' . $editor_id . '\',
-						sType: \'post\',
-						iBoard: ' . (empty($context['current_board']) ? 0 : $context['current_board']) . ',
-						iFreq: ' . $context['drafts_autosave_frequency'] . ',' . (!empty($context['drafts_save']) ?
-						'sLastID: \'id_draft\'' : 'sLastID: \'id_pm_draft\', bPM: true') . '
 					}';
 
 	if (!empty($context['mentions_enabled']))
@@ -179,7 +167,7 @@ function template_control_richedit($editor_id, $smileyContainer = null, $bbcCont
 }
 
 /**
- * Shows the buttons that the user can see .. preview, spellchecker, drafts, etc
+ * Shows the buttons that the user can see .. preview, spellchecker, etc
  *
  * @param string $editor_id
  */
@@ -201,7 +189,7 @@ function template_control_richedit_buttons($editor_id)
 	echo '
 			', $context['shortcuts_text'], '
 		</span>
-		<input type="submit" value="', isset($editor_context['labels']['post_button']) ? $editor_context['labels']['post_button'] : $txt['post'], '" tabindex="', $context['tabindex']++, '" onclick="return submitThisOnce(this);" accesskey="s" class="button_submit" />';
+		<input type="submit" name="', isset($editor_context['labels']['post_name']) ? $editor_context['labels']['post_name'] : 'post', '" value="', isset($editor_context['labels']['post_button']) ? $editor_context['labels']['post_button'] : $txt['post'], '" tabindex="', $context['tabindex']++, '" onclick="return submitThisOnce(this);" accesskey="s" class="button_submit" />';
 
 	if ($editor_context['preview_type'])
 		echo '
@@ -212,20 +200,16 @@ function template_control_richedit_buttons($editor_id)
 		echo '
 		<input type="button" value="', $txt['spell_check'], '" tabindex="', $context['tabindex']++, '" onclick="spellCheckStart();" class="button_submit" />';
 
-	// Maybe drafts are enabled?
-	if (!empty($context['drafts_save']))
+	foreach ($editor_context['buttons'] as $button)
 	{
 		echo '
-		<input type="submit" name="save_draft" value="', $txt['draft_save'], '" tabindex="', $context['tabindex']++, '" onclick="return confirm(' . JavaScriptEscape($txt['draft_save_note']) . ') && submitThisOnce(this);" accesskey="d" class="button_submit" />
-		<input type="hidden" id="id_draft" name="id_draft" value="', empty($context['id_draft']) ? 0 : $context['id_draft'], '" />';
+		<input type="submit" name="', $button['name'], '" value="', $button['value'], '" tabindex="', $context['tabindex']++, '" ', $button['options'], ' class="button_submit" />';
 	}
 
-	// The PM draft save button
-	if (!empty($context['drafts_pm_save']))
+	foreach ($editor_context['hidden_fields'] as $hidden)
 	{
 		echo '
-		<input type="submit" name="save_draft" value="', $txt['draft_save'], '" tabindex="', $context['tabindex']++, '" onclick="submitThisOnce(this);" accesskey="d" class="button_submit" />
-		<input type="hidden" id="id_pm_draft" name="id_pm_draft" value="', empty($context['id_pm_draft']) ? 0 : $context['id_pm_draft'], '" />';
+		<input type="hidden" id="', $hidden['name'], '" name="', $hidden['name'], '" value="', $hidden['value'], '" />';
 	}
 
 	// Create an area to show the draft last saved on text

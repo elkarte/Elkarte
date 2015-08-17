@@ -14,8 +14,8 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:	BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0
- * 
+ * @version 1.1 dev
+ *
  */
 
 // Start things rolling by getting the forum alive...
@@ -73,7 +73,7 @@ foreach ($gatewayHandles as $gateway)
 if (empty($txnType))
 	generateSubscriptionError($txt['paid_unknown_transaction_type']);
 
-// Get the subscription and member ID amoungst others...
+// Get the subscription and member ID amongst others...
 @list($subscription_id, $member_id) = $gatewayClass->precheck();
 
 // Integer these just in case.
@@ -270,7 +270,7 @@ function generateSubscriptionError($text)
 	}
 
 	// Then just log and die.
-	log_error($text);
+	Errors::instance()->log_error($text);
 
 	exit;
 }

@@ -7,7 +7,7 @@
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
- * @version 1.0
+ * @version 1.1 dev
  */
 
 if (!defined('ELK'))
@@ -21,7 +21,7 @@ if (!defined('ELK'))
  * Redirects back to the error log when done.
  *
  * @param string $type action
- * @param mixed[]|null $filter db query of the view filter being used
+ * @param array|null $filter db query of the view filter being used
  * @param int[]|null $error_list int list of error ID's to work on
  */
 function deleteErrors($type, $filter = null, $error_list = null)
@@ -29,19 +29,19 @@ function deleteErrors($type, $filter = null, $error_list = null)
 	$db = database();
 
 	// Delete all or just some?
-	if ($type == 'delall' && !isset($filter))
+	if ($type == 'delall' && empty($filter))
 		$db->query('truncate_table', '
 			TRUNCATE {db_prefix}log_errors',
 			array(
 			)
 		);
 	// Deleting all with a filter?
-	elseif ($type == 'delall' && isset($filter))
+	elseif ($type == 'delall' && !empty($filter))
 		$db->query('', '
 			DELETE FROM {db_prefix}log_errors
 			WHERE ' . $filter['variable'] . ' LIKE {string:filter}',
 			array(
-				'filter' => $filter['value']['sql'],
+				'filter' => !empty($filter) ? $filter['value']['sql'] : '',
 			)
 		);
 	// Just specific errors?
@@ -58,7 +58,7 @@ function deleteErrors($type, $filter = null, $error_list = null)
 /**
  * Counts error log entries
  *
- * @param mixed[] $filter db query of the filter being used
+ * @param array $filter db query of the filter being used
  * @return integer
  */
 function numErrors($filter = array())
@@ -68,10 +68,10 @@ function numErrors($filter = array())
 	// Just how many errors are there?
 	$result = $db->query('', '
 		SELECT COUNT(*)
-		FROM {db_prefix}log_errors' . (isset($filter) ? '
+		FROM {db_prefix}log_errors' . (!empty($filter) ? '
 		WHERE ' . $filter['variable'] . ' LIKE {string:filter}' : ''),
 		array(
-			'filter' => isset($filter) ? $filter['value']['sql'] : '',
+			'filter' => !empty($filter) ? $filter['value']['sql'] : '',
 		)
 	);
 	list ($num_errors) = $db->fetch_row($result);
@@ -86,7 +86,7 @@ function numErrors($filter = array())
  *
  * @param int $start
  * @param string $sort_direction
- * @param mixed[]|null $filter
+ * @param array|null $filter
  */
 function getErrorLogData($start, $sort_direction = 'DESC', $filter = null)
 {
@@ -97,12 +97,12 @@ function getErrorLogData($start, $sort_direction = 'DESC', $filter = null)
 	// Find and sort out the errors.
 	$request = $db->query('', '
 		SELECT id_error, id_member, ip, url, log_time, message, session, error_type, file, line
-		FROM {db_prefix}log_errors' . (isset($filter) ? '
+		FROM {db_prefix}log_errors' . (!empty($filter) ? '
 		WHERE ' . $filter['variable'] . ' LIKE {string:filter}' : '') . '
 		ORDER BY id_error ' . ($sort_direction == 'down' ? 'DESC' : '') . '
 		LIMIT ' . $start . ', ' . $modSettings['defaultMaxMessages'],
 		array(
-			'filter' => isset($filter) ? $filter['value']['sql'] : '',
+			'filter' => !empty($filter) ? $filter['value']['sql'] : '',
 		)
 	);
 
@@ -111,7 +111,7 @@ function getErrorLogData($start, $sort_direction = 'DESC', $filter = null)
 	for ($i = 0; $row = $db->fetch_assoc($request); $i ++)
 	{
 		$search_message = preg_replace('~&lt;span class=&quot;remove&quot;&gt;(.+?)&lt;/span&gt;~', '%', $db->escape_wildcard_string($row['message']));
-		if ($search_message == $filter['value']['sql'])
+		if (!empty($filter) && $search_message == $filter['value']['sql'])
 			$search_message = $db->escape_wildcard_string($row['message']);
 		$show_message = strtr(strtr(preg_replace('~&lt;span class=&quot;remove&quot;&gt;(.+?)&lt;/span&gt;~', '$1', $row['message']), array("\r" => '', '<br />' => "\n", '<' => '&lt;', '>' => '&gt;', '"' => '&quot;')), array("\n" => '<br />'));
 
@@ -164,7 +164,7 @@ function getErrorLogData($start, $sort_direction = 'DESC', $filter = null)
 /**
  * Fetches errors and group them by error type
  *
- * @param mixed[]|null $filter
+ * @param array|null $filter
  * @param string|null $sort
  */
 function fetchErrorsByType($filter = null, $sort = null)
@@ -195,7 +195,7 @@ function fetchErrorsByType($filter = null, $sort = null)
 			'label' => (isset($txt['errortype_' . $row['error_type']]) ? $txt['errortype_' . $row['error_type']] : $row['error_type']) . ' (' . $row['num_errors'] . ')',
 			'description' => isset($txt['errortype_' . $row['error_type'] . '_desc']) ? $txt['errortype_' . $row['error_type'] . '_desc'] : '',
 			'url' => $scripturl . '?action=admin;area=logs;sa=errorlog' . ($sort == 'down' ? ';desc' : '') . ';filter=error_type;value=' . $row['error_type'],
-			'is_selected' => isset($filter) && $filter['value']['sql'] == $db->escape_wildcard_string($row['error_type']),
+			'is_selected' => !empty($filter) && $filter['value']['sql'] == $db->escape_wildcard_string($row['error_type']),
 		);
 	}
 	$db->free_result($request);

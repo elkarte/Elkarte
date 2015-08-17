@@ -8,7 +8,7 @@
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
- * @version 1.0.2
+ * @version 1.1 dev
  *
  */
 
@@ -987,6 +987,50 @@ function pbe_prepare_text(&$message, &$subject = '', &$signature = '')
 }
 
 /**
+ * When a DSN (bounce) is received and the feature is enabled, update the settings
+ * For the user in question to disable Board and Post notifications. Do not clear
+ * Notification subscriptions.
+ *
+ * @package Maillist
+ * @param Email_Parse $email_message
+ */
+function pbe_disable_user_notify($email_message)
+{
+	$db = database();
+
+	$email = $email_message->_dsn['body']['original-recipient']['value'];
+
+	$request = $db->query('', '
+		SELECT
+			id_member
+		FROM {db_prefix}members
+		WHERE email_address = {string:email}
+		LIMIT 1',
+		array(
+			'email' => $email
+		)
+	);
+
+	if ($db->num_rows($request) !== 0)
+	{
+		list ($id_member) = $db->fetch_row($request);
+		$db->free_result($request);
+
+		// Once we have the member's ID, we can turn off notifications
+		// by setting notify_regularity->99 ("Never")
+		$db->query('', '
+			UPDATE {db_prefix}members
+			SET
+				notify_regularity = 99
+			WHERE id_member = {int:id_member}',
+			array(
+				'id_member' => $id_member
+			)
+		);
+	}
+}
+
+/**
  * Replace full bbc quote tags with an html blockquote version
  *
  * - Callback for pbe_prepare_text
@@ -1023,8 +1067,8 @@ function quote_callback_2($matches)
  *
  * - Similar to loadMemberData, loadPermissions, loadUserSettings, but only loads a
  * subset of that data, enough to validate that a user can make a post to a given board.
- * - Done this way to avoid over-writting user_info etc for those who are running
- * this function (on behalf of the email owner, simliar to profile views etc)
+ * - Done this way to avoid over-writing user_info etc for those who are running
+ * this function (on behalf of the email owner, similar to profile views etc)
  *
  * Sets:
  * - pbe['profile']
@@ -1205,10 +1249,8 @@ function query_user_keys($email)
 {
 	$db = database();
 
-	$keys = array();
-
 	// Find all keys sent to this email, sorted by date
-	$request = $db->query('', '
+	return $db->fetchQuery('
 		SELECT
 			id_email
 		FROM {db_prefix}postby_emails
@@ -1218,11 +1260,6 @@ function query_user_keys($email)
 			'email' => $email,
 		)
 	);
-	while ($row = $db->fetch_assoc($request))
-		$keys[] = $row;
-	$db->free_result($request);
-
-	return $keys;
 }
 
 /**

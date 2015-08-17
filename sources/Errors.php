@@ -15,7 +15,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:		BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0
+ * @version 1.0.4
  *
  */
 
@@ -259,7 +259,7 @@ function error_handler($error_level, $error_string, $file, $line)
 			$file = realpath($settings['current_include_filename']) . ' (eval?)';
 	}
 
-	if ($db_show_debug === true)
+	if (isset($db_show_debug) && $db_show_debug === true)
 	{
 		// Commonly, undefined indexes will occur inside attributes; try to show them anyway!
 		if ($error_level % 255 != E_ERROR)
@@ -403,10 +403,9 @@ function display_maintenance_message()
 function display_db_error()
 {
 	global $mbname, $modSettings, $maintenance;
-	global $webmaster_email, $db_error_send;
+	global $webmaster_email, $db_last_error, $db_error_send;
 
 	$db = database();
-	$cache = Cache::instance();
 
 	// Just check we're not in any buffers, just in case.
 	while (@ob_get_level() > 0)
@@ -414,19 +413,16 @@ function display_db_error()
 
 	set_fatal_error_headers();
 
-	$db_last_error = db_last_error();
-
 	// For our purposes, we're gonna want this on if at all possible.
 	$modSettings['cache_enable'] = 1;
 
-	if (($temp = $cache->get('db_last_error', 600)) !== null)
+	if (($temp = cache_get_data('db_last_error', 600)) !== null)
 		$db_last_error = max($db_last_error, $temp);
 
 	if ($db_last_error < time() - 3600 * 24 * 3 && empty($maintenance) && !empty($db_error_send))
 	{
-		// Avoid writing to the Settings.php file if at all possible; use shared memory instead.
-		$cache->put('db_last_error', time(), 600);
-		if (($temp = $cache->get('db_last_error', 600)) === null)
+		cache_put_data('db_last_error', time(), 600);
+		if (($temp = cache_get_data('db_last_error', 600)) === null)
 			logLastDatabaseError();
 
 		// Language files aren't loaded yet :(.

@@ -13,7 +13,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:		BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0 Release Candidate 1
+ * @version 1.1 dev Release Candidate 1
  *
  */
 
@@ -78,11 +78,11 @@ class Unread_Controller extends Action_Controller
 			$context['page_title'] = $txt['unread_replies'];
 
 		if ($context['showing_all_topics'] && !empty($modSettings['loadavg_allunread']) && $modSettings['current_load'] >= $modSettings['loadavg_allunread'])
-			fatal_lang_error('loadavg_allunread_disabled', false);
+			Errors::instance()->fatal_lang_error('loadavg_allunread_disabled', false);
 		elseif ($this->_action_unreadreplies && !empty($modSettings['loadavg_unreadreplies']) && $modSettings['current_load'] >= $modSettings['loadavg_unreadreplies'])
-			fatal_lang_error('loadavg_unreadreplies_disabled', false);
+			Errors::instance()->fatal_lang_error('loadavg_unreadreplies_disabled', false);
 		elseif (!$context['showing_all_topics'] && $this->_action_unread && !empty($modSettings['loadavg_unread']) && $modSettings['current_load'] >= $modSettings['loadavg_unread'])
-			fatal_lang_error('loadavg_unread_disabled', false);
+			Errors::instance()->fatal_lang_error('loadavg_unread_disabled', false);
 
 		// Are we specifying any specific board?
 		$this->_wanted_boards();
@@ -109,10 +109,6 @@ class Unread_Controller extends Action_Controller
 
 		$template_layers = Template_Layers::getInstance();
 		$template_layers->add($context['sub_template']);
-
-		// Setup the default topic icons... for checking they exist and the like ;)
-		require_once(SUBSDIR . '/MessageIndex.subs.php');
-		$context['icon_sources'] = MessageTopicIcons();
 
 		$this->_is_topics = $this->_action_unread;
 
@@ -191,7 +187,7 @@ class Unread_Controller extends Action_Controller
 			return;
 		}
 
-		$context['topics'] = $this->_grabber->getUnreads($type, $_REQUEST['start'], $context['topics_per_page'], !empty($settings['avatars_on_indexes']));
+		$context['topics'] = $this->_grabber->getUnreads($type, $_REQUEST['start'], $context['topics_per_page'], $settings['avatars_on_indexes']);
 
 		$this->_exiting_unread();
 	}
@@ -231,7 +227,7 @@ class Unread_Controller extends Action_Controller
 			'num_pages' => floor(($this->_num_topics - 1) / $context['topics_per_page']) + 1
 		);
 
-		$context['topics'] = $this->_grabber->getUnreads(null, $_REQUEST['start'], $context['topics_per_page'], !empty($settings['avatars_on_indexes']));
+		$context['topics'] = $this->_grabber->getUnreads(null, $_REQUEST['start'], $context['topics_per_page'], $settings['avatars_on_indexes']);
 
 		if ($context['topics'] === false)
 		{
@@ -306,7 +302,7 @@ class Unread_Controller extends Action_Controller
 		}
 
 		if (empty($this->_boards))
-			fatal_lang_error('error_no_boards_selected');
+			Errors::instance()->fatal_lang_error('error_no_boards_selected');
 
 		$this->_grabber->setBoards($this->_boards);
 	}
@@ -449,7 +445,7 @@ class Unread_Controller extends Action_Controller
 		elseif (!$this->_is_topics && isset($topics_to_mark))
 		{
 			$context['recent_buttons'] = array(
-				'markread' => array('text' => 'mark_as_read', 'image' => 'markread.png', 'lang' => true, 'url' => $scripturl . '?action=markasread;sa=unreadreplies;topics=' . $topics_to_mark . ';' . $context['session_var'] . '=' . $context['session_id']),
+				'markread' => array('text' => 'mark_these_as_read', 'image' => 'markread.png', 'lang' => true, 'url' => $scripturl . '?action=markasread;sa=unreadreplies;topics=' . $topics_to_mark . ';' . $context['session_var'] . '=' . $context['session_id']),
 			);
 
 			if ($context['showCheckboxes'])

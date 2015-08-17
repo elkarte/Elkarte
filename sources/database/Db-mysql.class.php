@@ -14,7 +14,7 @@
  * copyright:	2004-2011, GreyWyvern - All rights reserved.
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0
+ * @version 1.1 dev
  *
  */
 
@@ -75,7 +75,7 @@ class Database_MySQL extends Database_Abstract
 			if (!empty($db_options['non_fatal']))
 				return null;
 			else
-				display_db_error();
+				Errors::instance()->display_db_error();
 		}
 
 		// This makes it possible to automatically change the sql_mode and autocommit if needed.
@@ -175,6 +175,7 @@ class Database_MySQL extends Database_Abstract
 		if ($db_show_debug === true)
 		{
 			$debug = Debug::get();
+
 			// Get the file and line number this function was called.
 			list ($file, $line) = $this->error_backtrace('', '', 'return', __FILE__, __LINE__);
 
@@ -188,6 +189,7 @@ class Database_MySQL extends Database_Abstract
 
 			// Don't overload it.
 			$st = microtime(true);
+			$db_cache = array();
 			$db_cache['q'] = $this->_query_count < 50 ? $db_string : '...';
 			$db_cache['f'] = $file;
 			$db_cache['l'] = $line;
@@ -275,7 +277,7 @@ class Database_MySQL extends Database_Abstract
 	 * Checks if the string contains any 4byte chars and if so,
 	 * converts them into HTML entities.
 	 *
-	 * This is necessary because MySQL utf8 doesn't knw how to store such
+	 * This is necessary because MySQL utf8 doesn't know how to store such
 	 * characters and would generate an error any time one is used.
 	 * The 4byte chars are used by emoji
 	 *
@@ -330,7 +332,7 @@ class Database_MySQL extends Database_Abstract
 	 * http://www.greywyvern.com/code/php/utf8_html.phps
 	 *
 	 * @param string $c
-	 * @return string|false
+	 * @return integer|false
 	 */
 	private function _uniord($c)
 	{
@@ -511,7 +513,7 @@ class Database_MySQL extends Database_Abstract
 
 				// Let the admin know there is a command denied issue
 				if (function_exists('log_error'))
-					log_error($txt['database_error'] . ': ' . $query_error . (!empty($modSettings['enableErrorQueryLogging']) ? "\n\n$db_string" : ''), 'database', $file, $line);
+					Errors::instance()->log_error($txt['database_error'] . ': ' . $query_error . (!empty($modSettings['enableErrorQueryLogging']) ? "\n\n$db_string" : ''), 'database', $file, $line);
 
 				return false;
 			}
@@ -519,7 +521,7 @@ class Database_MySQL extends Database_Abstract
 
 		// Log the error.
 		if ($query_errno != 1213 && $query_errno != 1205 && function_exists('log_error'))
-			log_error($txt['database_error'] . ': ' . $query_error . (!empty($modSettings['enableErrorQueryLogging']) ? "\n\n$db_string" : ''), 'database', $file, $line);
+			Errors::instance()->log_error($txt['database_error'] . ': ' . $query_error . (!empty($modSettings['enableErrorQueryLogging']) ? "\n\n$db_string" : ''), 'database', $file, $line);
 
 		// Database error auto fixing ;).
 		if (function_exists('cache_get_data') && (!isset($modSettings['autoFixDatabase']) || $modSettings['autoFixDatabase'] == '1'))
@@ -601,6 +603,7 @@ class Database_MySQL extends Database_Abstract
 			// Check for the "lost connection" or "deadlock found" errors - and try it just one more time.
 			if (in_array($query_errno, array(1205, 1213, 2006, 2013)))
 			{
+				$new_connection = false;
 				if (in_array($query_errno, array(2006, 2013)) && $this->_connection == $connection)
 				{
 					// Are we in SSI mode?  If so try that username and password first
@@ -665,7 +668,7 @@ class Database_MySQL extends Database_Abstract
 			$context['error_message'] .= '<br /><br />' . nl2br($db_string);
 
 		// It's already been logged... don't log it again.
-		fatal_error($context['error_message'], false);
+		Errors::instance()->fatal_error($context['error_message'], false);
 	}
 
 	/**

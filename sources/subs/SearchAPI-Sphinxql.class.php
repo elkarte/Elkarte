@@ -14,7 +14,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0.2
+ * @version 1.1 dev
  *
  */
 
@@ -37,7 +37,7 @@ class Sphinxql_Search extends SearchAPI
 	 * This is the last version of ElkArte that this was tested on, to protect against API changes.
 	 * @var string
 	 */
-	public $version_compatible = 'ElkArte 1.0';
+	public $version_compatible = 'ElkArte 1.1';
 
 	/**
 	 * This won't work with versions of ElkArte less than this.
@@ -73,17 +73,17 @@ class Sphinxql_Search extends SearchAPI
 	 * What databases are supported?
 	 * @var array
 	 */
-	protected $supported_databases = array('mysql');
+	protected $supported_databases = array('MySQL');
 
 	/**
 	 * Nothing to do ...
 	 */
 	public function __construct()
 	{
-		global $db_type, $modSettings;
+		global $modSettings;
 
 		// Is this database supported?
-		if (!in_array($db_type, $this->supported_databases))
+		if (!in_array(DB_TYPE, $this->supported_databases))
 		{
 			$this->is_supported = false;
 			return;
@@ -193,7 +193,7 @@ class Sphinxql_Search extends SearchAPI
 
 			// No connection, daemon not running?  log the error
 			if ($mySphinx === false)
-				fatal_lang_error('error_no_search_daemon');
+				Errors::instance()->fatal_lang_error('error_no_search_daemon');
 
 			// Compile different options for our query
 			$query = 'SELECT *' . (empty($search_params['topic']) ? ', COUNT(*) num' : '') . ', WEIGHT() weights, (weights + (relevance/1000)) rank FROM elkarte_index';
@@ -251,9 +251,9 @@ class Sphinxql_Search extends SearchAPI
 			{
 				// Just log the error.
 				if (mysqli_error($mySphinx))
-					log_error(mysqli_error($mySphinx));
+					Errors::instance()->log_error(mysqli_error($mySphinx));
 
-				fatal_lang_error('error_no_search_daemon');
+				Errors::instance()->fatal_lang_error('error_no_search_daemon');
 			}
 
 			// Get the relevant information from the search results.

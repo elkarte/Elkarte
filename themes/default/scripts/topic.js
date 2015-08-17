@@ -9,7 +9,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:		BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0
+ * @version 1.1 dev
  *
  * This file contains javascript associated with the topic viewing including
  * Quick Modify, Quick Reply, In Topic Moderation, thumbnail expansion etc
@@ -30,7 +30,6 @@ function QuickModifyTopic(oOptions)
 	this.sCurMessageId = '';
 	this.sBuffSubject = '';
 	this.oSavetipElem = false;
-	this.sSavetipText = '';
 	this.oCurSubjectDiv = null;
 	this.oTopicModHandle = document;
 	this.bInEditMode = false;
@@ -54,10 +53,6 @@ QuickModifyTopic.prototype.init = function ()
 // called from the double click in the div
 QuickModifyTopic.prototype.modify_topic = function (topic_id, first_msg_id)
 {
-	// Add backwards compatibility with old themes.
-	if (typeof(cur_session_var) === 'undefined')
-		cur_session_var = 'sesc';
-
 	// already editing
 	if (this.bInEditMode)
 	{
@@ -149,14 +144,9 @@ QuickModifyTopic.prototype.modify_topic_save = function (cur_session_id, cur_ses
 	if (!this.bInEditMode)
 		return true;
 
-	// Add backwards compatibility with old themes.
-	if (typeof(cur_session_var) === 'undefined')
-		cur_session_var = 'sesc';
+	var x = [];
 
-	var i,
-		x = [];
-
-	x[x.length] = 'subject=' + document.forms.quickModForm.subject.value.replace(/&#/g, "&#38;#").php_to8bit().php_urlencode();
+	x[x.length] = 'subject=' + document.forms.quickModForm.subject.value.replace(/&#/g, "&#38;#").php_urlencode();
 	x[x.length] = 'topic=' + parseInt(document.forms.quickModForm.elements.topic.value);
 	x[x.length] = 'msg=' + parseInt(document.forms.quickModForm.elements.msg.value);
 
@@ -317,10 +307,10 @@ QuickReply.prototype.swap = function (bInit, bSavestate)
 		bIsFull = this.opt.bIsFull;
 
 	// Default bInit to false and bSavestate to true
-	bInit = typeof(bInit) === 'undefined' ? false : true;
-	bSavestate = typeof(bSavestate) === 'undefined' ? true : false;
+	bInit = typeof(bInit) !== 'undefined';
+	bSavestate = typeof(bSavestate) === 'undefined';
 
-	// Flip our current state if not responding to an intial loading
+	// Flip our current state if not responding to an initial loading
 	if (!bInit)
 		this.bCollapsed = !this.bCollapsed;
 
@@ -346,7 +336,7 @@ QuickReply.prototype.swap = function (bInit, bSavestate)
 	if (bSavestate && 'oCookieOptions' in this.opt && this.opt.oCookieOptions.bUseCookie)
 		this.oCookie.set(this.opt.oCookieOptions.sCookieName, this.bCollapsed ? '1' : '0');
 
-	// Save the expand /collapse preferance
+	// Save the expand /collapse preference
 	if (!bInit && bSavestate && 'oThemeOptions' in this.opt && this.opt.oThemeOptions.bUseThemeSettings)
 		elk_setThemeOption(this.opt.oThemeOptions.sOptionName, this.bCollapsed ? '1' : '0', 'sThemeId' in this.opt.oThemeOptions ? this.opt.oThemeOptions.sThemeId : null, 'sAdditionalVars' in this.opt.oThemeOptions ? this.opt.oThemeOptions.sAdditionalVars : null);
 };
@@ -380,10 +370,6 @@ function QuickModify(oOptions)
 // Function called when a user presses the edit button.
 QuickModify.prototype.modifyMsg = function (iMessageId)
 {
-	// Add backwards compatibility with old themes.
-	if (typeof(sSessionVar) === 'undefined')
-		sSessionVar = 'sesc';
-
 	// Removes the accesskeys from the quickreply inputs and saves them in an array to use them later
 	if (typeof(this.opt.sFormRemoveAccessKeys) !== 'undefined')
 	{
@@ -417,7 +403,7 @@ QuickModify.prototype.modifyMsg = function (iMessageId)
 QuickModify.prototype.onMessageReceived = function (XMLDoc)
 {
 	var sBodyText = '',
-		sSubjectText = '';
+		sSubjectText;
 
 	// No longer show the 'loading...' sign.
 	ajax_indicator(false);
@@ -498,6 +484,7 @@ QuickModify.prototype.modifyCancel = function ()
 	if (this.opt.sIconHide)
 	{
 		var oCurrentMsgIcon = document.getElementById('msg_icon_' + this.sCurMessageId.replace("msg_", ""));
+
 		if (oCurrentMsgIcon !== null && oCurrentMsgIcon.src.indexOf(this.opt.sIconHide) > 0)
 			this.oMsgIcon.style.display = 'none';
 	}
@@ -550,8 +537,8 @@ QuickModify.prototype.modifySave = function (sSessionId, sSessionVar)
 		}
 	}
 
-	x[x.length] = 'subject=' + escape(document.forms.quickModForm.subject.value.replace(/&#/g, "&#38;#").php_to8bit()).replace(/\+/g, "%2B");
-	x[x.length] = 'message=' + escape(document.forms.quickModForm.message.value.replace(/&#/g, "&#38;#").php_to8bit()).replace(/\+/g, "%2B");
+	x[x.length] = 'subject=' + document.forms.quickModForm.subject.value.replace(/&#/g, "&#38;#").php_urlencode();
+	x[x.length] = 'message=' + document.forms.quickModForm.message.value.replace(/&#/g, "&#38;#").php_urlencode();
 	x[x.length] = 'topic=' + parseInt(document.forms.quickModForm.elements.topic.value);
 	x[x.length] = 'msg=' + parseInt(document.forms.quickModForm.elements.msg.value);
 
@@ -588,6 +575,7 @@ QuickModify.prototype.onModifyDone = function (XMLDoc)
 	var message = XMLDoc.getElementsByTagName('elk')[0].getElementsByTagName('message')[0],
 		body = message.getElementsByTagName('body')[0],
 		error = message.getElementsByTagName('error')[0];
+
 	$(document.forms.quickModForm.message).removeClass('border_error');
 	$(document.forms.quickModForm.subject).removeClass('border_error');
 
@@ -826,7 +814,7 @@ InTopicModeration.prototype.handleSubmit = function (sSubmitType)
 				return false;
 
 			oForm.action = oForm.action.replace(/;split_selection=1/, '');
-			oForm.action = oForm.action + ';restore_selected=1';
+			oForm.action += ';restore_selected=1';
 		break;
 
 		case 'split':
@@ -834,7 +822,7 @@ InTopicModeration.prototype.handleSubmit = function (sSubmitType)
 				return false;
 
 			oForm.action = oForm.action.replace(/;restore_selected=1/, '');
-			oForm.action = oForm.action + ';split_selection=1';
+			oForm.action += ';split_selection=1';
 		break;
 
 		default:
@@ -877,7 +865,7 @@ function expandThumb(thumbID)
 /**
  * Provides a way to toggle an ignored message(s) visibility
  *
- * @param {array} msgids
+ * @param {object} msgids
  * @param {string} text
  */
 function ignore_toggles(msgids, text)
@@ -925,7 +913,7 @@ function sendtopicOverlayDiv(desktopURL, sHeader, sIcon)
 	sIcon = elk_images_url + '/' + (typeof(sIcon) === 'string' ? sIcon : 'helptopics.png');
 	sHeader = typeof(sHeader) === 'string' ? sHeader : help_popup_heading_text;
 
-	// Load the help page content (we just want the text to show)
+	// Load the send topic overlay div
 	$.ajax({
 		url: desktopURL,
 		type: "GET",
@@ -941,11 +929,7 @@ function sendtopicOverlayDiv(desktopURL, sHeader, sIcon)
 			});
 
 			var form = $base_obj.find('form'),
-				url = $base_obj.find('form').attr('action'),
-				this_body,
-				send_comment,
-				recipient_name,
-				recipient_mail;
+				url = $base_obj.find('form').attr('action');
 
 			// Create the div that we are going to load
 			var oContainer = new smc_Popup({heading: (title !== '' ? title : sHeader), content: sAjax_indicator, icon: sIcon});
@@ -969,8 +953,8 @@ function sendtopicOverlayDiv(desktopURL, sHeader, sIcon)
  * be filled in in order to send the topic
  *
  * @param {type} $this_form
- * @param {type} classname
- * @param {type} focused
+ * @param {string} classname
+ * @param {boolean} focused
  */
 function addRequiredElem($this_form, classname, focused)
 {
@@ -994,9 +978,9 @@ function addRequiredElem($this_form, classname, focused)
 /**
  * Send in the send topic form
  *
- * @param {type} oPopup_body
- * @param {type} url
- * @param {type} oContainer
+ * @param {object} oPopup_body
+ * @param {string} url
+ * @param {object} oContainer
  */
 function sendtopicForm(oPopup_body, url, oContainer)
 {
@@ -1017,17 +1001,14 @@ function sendtopicForm(oPopup_body, url, oContainer)
 	oPopup_body.find('input[name="send"]').on('click', function (event) {
 		event.preventDefault();
 
-		this_body = $(oPopup_body).html();
-
-		data = $this_form.serialize() + '&send=1';
-
-		var send_comment = $this_form.find('input[name="comment"]').val(),
+		var data = $this_form.serialize() + '&send=1',
 			sender_name = $this_form.find('input[name="y_name"]').val(),
 			sender_mail = $this_form.find('input[name="y_email"]').val,
 			recipient_name = $this_form.find('input[name="r_name"]').val(),
-			recipient_mail = $this_form.find('input[name="r_email"]').val();
+			recipient_mail = $this_form.find('input[name="r_email"]').val(),
+			missing_elems = false;
 
-		var missing_elems = false;
+		// Check for any input fields that were not filled in
 		if (sender_name === '')
 		{
 			addRequiredElem($this_form, 'y_name', missing_elems);
@@ -1052,9 +1033,11 @@ function sendtopicForm(oPopup_body, url, oContainer)
 			missing_elems = true;
 		}
 
+		// Missing required elements, back we go
 		if (missing_elems)
 			return;
 
+		// Send it to the server to validate the input
 		$.ajax({
 			type: 'post',
 			url: url + ';api',
@@ -1064,12 +1047,15 @@ function sendtopicForm(oPopup_body, url, oContainer)
 			var oElement = $(request).find('elk')[0],
 				text = null;
 
+			// No errors in the response, lets say it sent.
 			if (oElement.getElementsByTagName('error').length === 0)
 			{
 				text = oElement.getElementsByTagName('text')[0].firstChild.nodeValue.removeEntities();
 				text += '<br /><br /><input type="submit" name="send" value="' + sendtopic_back + '" class="button_submit"/><input type="submit" name="cancel" value="' + sendtopic_close + '" class="button_submit"/>';
 
 				oPopup_body.html(text);
+
+				// Setup the cancel button to end this entire process
 				oPopup_body.find('input[name="cancel"]').each(function () {
 					$(this).on('click', function (event) {
 						event.preventDefault();
@@ -1077,6 +1063,7 @@ function sendtopicForm(oPopup_body, url, oContainer)
 					});
 				});
 			}
+			// Invalid data in the form, like a bad email etc, show the message text
 			else
 			{
 				if (oElement.getElementsByTagName('text').length !== 0)
@@ -1092,6 +1079,8 @@ function sendtopicForm(oPopup_body, url, oContainer)
 							sendtopicForm(oPopup_body, url, oContainer);
 						});
 					});
+
+					// Cancel means cancel
 					oPopup_body.find('input[name="cancel"]').each(function () {
 						$(this).on('click', function (event) {
 							event.preventDefault();
@@ -1108,7 +1097,7 @@ function sendtopicForm(oPopup_body, url, oContainer)
 			}
 		})
 		.fail(function() {
-				oPopup_body.html(sendtopic_error.replace('{href}', url));
+			oPopup_body.html(sendtopic_error.replace('{href}', url));
 		});
 	});
 }
@@ -1131,7 +1120,7 @@ function topicSplitselect(direction, msg_id)
 /**
  * Callback function for topicSplitselect
  *
- * @param {object} XMLDoc
+ * @param {xmlCallback} XMLDoc
  */
 function onTopicSplitReceived(XMLDoc)
 {
@@ -1155,9 +1144,9 @@ function onTopicSplitReceived(XMLDoc)
 		curAction,
 		curId,
 		curList,
-		curData,
 		newItem,
-		sInsertBeforeId;
+		sInsertBeforeId,
+		oListItems;
 
 	// Loop through all of the changes returned in the xml response
 	for (i = 0; i < numChanges; i++)

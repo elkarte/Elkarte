@@ -14,7 +14,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:		BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0
+ * @version 1.1 dev
  *
  */
 
@@ -40,7 +40,21 @@ class ManageRegistration_Controller extends Action_Controller
 	protected $_registerSettings;
 
 	/**
-	 * Entrance point for the registration center, it checks permisions and forwards
+	 * Holds instance of HttpReq object
+	 * @var HttpReq
+	 */
+	protected $_req;
+
+	/**
+	 * Pre Dispatch, called before other methods.  Loads HttpReq
+	 */
+	public function pre_dispatch()
+	{
+		$this->_req = HttpReq::instance();
+	}
+
+	/**
+	 * Entrance point for the registration center, it checks permissions and forwards
 	 * to the right method based on the subaction.
 	 *
 	 * - Accessed by ?action=admin;area=regcenter.
@@ -130,39 +144,39 @@ class ManageRegistration_Controller extends Action_Controller
 	{
 		global $txt, $context, $scripturl, $user_info;
 
-		if (!empty($_POST['regSubmit']))
+		if (!empty($this->_req->post->regSubmit))
 		{
 			checkSession();
 			validateToken('admin-regc');
 
 			// @todo move this to a filter/sanitzation class
-			foreach ($_POST as $key => $value)
+			foreach ($this->_req->post as $key => $value)
 				if (!is_array($value))
-					$_POST[$key] = htmltrim__recursive(str_replace(array("\n", "\r"), '', $value));
+					$this->_req->post[$key] = htmltrim__recursive(str_replace(array("\n", "\r"), '', $value));
 
 			// Generate a password
-			if (empty($_POST['password']) || !is_string($_POST['password']) || trim($_POST['password']) === '')
+			if (empty($this->_req->post->password) || !is_string($this->_req->post->password) || trim($this->_req->post->password) === '')
 			{
 				mt_srand(time() + 1277);
 				$password = generateValidationCode();
 			}
 			else
 			{
-				$password = $_POST['password'];
+				$password = $this->_req->post->password;
 			}
 
 			$regOptions = array(
 				'interface' => 'admin',
-				'username' => $_POST['user'],
-				'email' => $_POST['email'],
+				'username' => $this->_req->post->user,
+				'email' => $this->_req->post->email,
 				'password' => $password,
 				'password_check' => $password,
 				'check_reserved_name' => true,
 				'check_password_strength' => true,
 				'check_email_ban' => false,
-				'send_welcome_email' => isset($_POST['emailPassword']),
-				'require' => isset($_POST['emailActivate']) ? 'activation' : 'nothing',
-				'memberGroup' => empty($_POST['group']) || !allowedTo('manage_membergroups') ? 0 : (int) $_POST['group'],
+				'send_welcome_email' => isset($this->_req->post->emailPassword),
+				'require' => isset($this->_req->post->emailActivate) ? 'activation' : 'nothing',
+				'memberGroup' => empty($this->_req->post->group) || !allowedTo('manage_membergroups') ? 0 : (int) $this->_req->post->group,
 				'ip' => '127.0.0.1',
 				'ip2' => '127.0.0.1',
 				'auth_method' => 'password',
@@ -176,15 +190,15 @@ class ManageRegistration_Controller extends Action_Controller
 			// Otherwise grab all of them and don't log anything
 			$error_severity = $reg_errors->hasErrors(1) && !$user_info['is_admin'] ? 1 : null;
 			foreach ($reg_errors->prepareErrors($error_severity) as $error)
-				fatal_error($error, $error_severity === null ? false : 'general');
+				Errors::instance()->fatal_error($error, $error_severity === null ? false : 'general');
 
 			if (!empty($memberID))
 			{
 				$context['new_member'] = array(
 					'id' => $memberID,
-					'name' => $_POST['user'],
+					'name' => $this->_req->post->user,
 					'href' => $scripturl . '?action=profile;u=' . $memberID,
-					'link' => '<a href="' . $scripturl . '?action=profile;u=' . $memberID . '">' . $_POST['user'] . '</a>',
+					'link' => '<a href="' . $scripturl . '?action=profile;u=' . $memberID . '">' . $this->_req->post->user . '</a>',
 				);
 				$context['registration_done'] = sprintf($txt['admin_register_done'], $context['new_member']['link']);
 			}
@@ -248,23 +262,24 @@ class ManageRegistration_Controller extends Action_Controller
 			if (file_exists(BOARDDIR . '/agreement.' . $lang['filename'] . '.txt'))
 			{
 				$context['editable_agreements']['.' . $lang['filename']] = $lang['name'];
+
 				// Are we editing this?
-				if (isset($_POST['agree_lang']) && $_POST['agree_lang'] == '.' . $lang['filename'])
+				if (isset($this->_req->post->agree_lang) && $this->_req->post->agree_lang == '.' . $lang['filename'])
 					$context['current_agreement'] = '.' . $lang['filename'];
 			}
 		}
 
-		if (isset($_POST['agreement']))
+		if (isset($this->_req->post->agreement))
 		{
 			checkSession();
 			validateToken('admin-rega');
 
 			// Off it goes to the agreement file.
 			$fp = fopen(BOARDDIR . '/agreement' . $context['current_agreement'] . '.txt', 'w');
-			fwrite($fp, str_replace("\r", '', $_POST['agreement']));
+			fwrite($fp, str_replace("\r", '', $this->_req->post->agreement));
 			fclose($fp);
 
-			updateSettings(array('requireAgreement' => !empty($_POST['requireAgreement']), 'checkboxAgreement' => !empty($_POST['checkboxAgreement'])));
+			updateSettings(array('requireAgreement' => !empty($this->_req->post->requireAgreement), 'checkboxAgreement' => !empty($this->_req->post->checkboxAgreement)));
 		}
 
 		$context['agreement'] = file_exists(BOARDDIR . '/agreement' . $context['current_agreement'] . '.txt') ? htmlspecialchars(file_get_contents(BOARDDIR . '/agreement' . $context['current_agreement'] . '.txt'), ENT_COMPAT, 'UTF-8') : '';
@@ -290,18 +305,18 @@ class ManageRegistration_Controller extends Action_Controller
 		global $txt, $context, $modSettings;
 
 		// Submitting new reserved words.
-		if (!empty($_POST['save_reserved_names']))
+		if (!empty($this->_req->post->save_reserved_names))
 		{
 			checkSession();
 			validateToken('admin-regr');
 
 			// Set all the options....
 			updateSettings(array(
-				'reserveWord' => (isset($_POST['matchword']) ? '1' : '0'),
-				'reserveCase' => (isset($_POST['matchcase']) ? '1' : '0'),
-				'reserveUser' => (isset($_POST['matchuser']) ? '1' : '0'),
-				'reserveName' => (isset($_POST['matchname']) ? '1' : '0'),
-				'reserveNames' => str_replace("\r", '', $_POST['reserved'])
+				'reserveWord' => (isset($this->_req->post->matchword) ? '1' : '0'),
+				'reserveCase' => (isset($this->_req->post->matchcase) ? '1' : '0'),
+				'reserveUser' => (isset($this->_req->post->matchuser) ? '1' : '0'),
+				'reserveName' => (isset($this->_req->post->matchname) ? '1' : '0'),
+				'reserveNames' => str_replace("\r", '', $this->_req->post->reserved)
 			));
 		}
 
@@ -340,20 +355,20 @@ class ManageRegistration_Controller extends Action_Controller
 		$context['sub_template'] = 'show_settings';
 		$context['page_title'] = $txt['registration_center'];
 
-		if (isset($_GET['save']))
+		if (isset($this->_req->query->save))
 		{
 			checkSession();
 
 			// Are there some contacts missing?
-			if (!empty($_POST['coppaAge']) && !empty($_POST['coppaType']) && empty($_POST['coppaPost']) && empty($_POST['coppaFax']))
-				fatal_lang_error('admin_setting_coppa_require_contact');
+			if (!empty($this->_req->post->coppaAge) && !empty($this->_req->post->coppaType) && empty($this->_req->post->coppaPost) && empty($this->_req->post->coppaFax))
+				Errors::instance()->fatal_lang_error('admin_setting_coppa_require_contact');
 
 			// Post needs to take into account line breaks.
-			$_POST['coppaPost'] = str_replace("\n", '<br />', empty($_POST['coppaPost']) ? '' : $_POST['coppaPost']);
+			$this->_req->post->coppaPost = str_replace("\n", '<br />', empty($this->_req->post->coppaPost) ? '' : $this->_req->post->coppaPost);
 
 			call_integration_hook('integrate_save_registration_settings');
 
-			Settings_Form::save_db($config_vars);
+			Settings_Form::save_db($config_vars, $this->_req->post);
 
 			redirectexit('action=admin;area=regcenter;sa=settings');
 		}

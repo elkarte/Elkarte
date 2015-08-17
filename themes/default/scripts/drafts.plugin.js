@@ -3,7 +3,7 @@
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
- * @version 1.0
+ * @version 1.1 dev
  *
  * This file contains javascript associated with the drafts auto function as it
  * relates to an sceditor invocation
@@ -50,9 +50,9 @@
 		var aSections = [
 			'topic=' + parseInt(document.forms.postmodify.elements['topic'].value),
 			'id_draft=' + (('id_draft' in document.forms.postmodify.elements) ? parseInt(document.forms.postmodify.elements['id_draft'].value) : 0),
-			'subject=' + escape(document.forms.postmodify['subject'].value.replace(/&#/g, "&#38;#").php_to8bit()).replace(/\+/g, "%2B"),
-			'message=' + escape(sPostdata.replace(/&#/g, "&#38;#").php_to8bit()).replace(/\+/g, "%2B"),
-			'icon=' + escape(document.forms.postmodify['icon'].value.replace(/&#/g, "&#38;#").php_to8bit()).replace(/\+/g, "%2B"),
+			'subject=' + document.forms.postmodify['subject'].value.replace(/&#/g, "&#38;#").php_urlencode(),
+			'message=' + sPostdata.replace(/&#/g, "&#38;#").php_urlencode(),
+			'icon=' + document.forms.postmodify['icon'].value.replace(/&#/g, "&#38;#").php_urlencode(),
 			'save_draft=true',
 			elk_session_var + '=' + elk_session_id
 		];
@@ -114,8 +114,8 @@
 		var aSections = [
 			'replied_to=' + parseInt(document.forms.pmFolder.elements['replied_to'].value),
 			'id_pm_draft=' + (('id_pm_draft' in document.forms.pmFolder.elements) ? parseInt(document.forms.pmFolder.elements['id_pm_draft'].value) : 0),
-			'subject=' + escape(document.forms.pmFolder['subject'].value.replace(/&#/g, "&#38;#").php_to8bit()).replace(/\+/g, "%2B"),
-			'message=' + escape(sPostdata.replace(/&#/g, "&#38;#").php_to8bit()).replace(/\+/g, "%2B"),
+			'subject=' + document.forms.pmFolder['subject'].value.replace(/&#/g, "&#38;#").php_urlencode(),
+			'message=' + sPostdata.replace(/&#/g, "&#38;#").php_urlencode(),
 			'recipient_to=' + aTo,
 			'recipient_bcc=' + aBcc,
 			'save_draft=true',
@@ -138,7 +138,9 @@
 	 * - hides the ajax saving icon
 	 * - turns off _bInDraftMode so another save request can fire
 	 *
-	 * @param {xml object} XMLDoc
+	 * @type {xmlCallback}
+	 * @param {string[]} post
+	 * @param {string} action
 	 */
 	elk_Drafts.prototype.draftAjax = function(post, action)
 	{
@@ -234,13 +236,27 @@
 	 */
 	elk_Drafts.prototype.formCheck = function() {
 		var oInstance = this,
-			formID = $('#id_draft').closest("form").attr('id');
+			formID = $('#' + this.opts.sTextareaID).closest("form").attr('id');
+
+		// @deprecated since 1.1 - the check on #id_draft existence is for backward compatibility with 1.0
+		if ($('#id_draft').length === 0)
+		{
+			$('#' + formID).append(
+				$('<input />').attr({
+					type: 'hidden',
+					id: this.opts.sLastID,
+					name: 'id_draft',
+					value: this.opts.id_draft
+				})
+			);
+		}
 
 		// Prevent autosave on post/save selection by mouse or keyboard
-		$('#' + formID + ' .button_submit').on('mousedown', oInstance, function() {
+		var $_form_submitt =  $('#' + formID + ' .button_submit');
+		$_form_submitt.on('mousedown', oInstance, function() {
 			oInstance.opts._bInDraftMode = true;
 		});
-		$('#' + formID + ' .button_submit').on('keydown', oInstance, function() {
+		$_form_submitt.on('keydown', oInstance, function() {
 			oInstance.opts._bInDraftMode = true;
 		});
 	};

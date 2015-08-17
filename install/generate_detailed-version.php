@@ -5,7 +5,7 @@
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
- * @version 1.0
+ * @version 1.1 dev
  *
  */
 
@@ -139,7 +139,7 @@ function getFilesChanged($from, $to)
 	$output = shell_exec('git log --name-only --pretty=oneline --full-index ' . $from . '..' . $to . ' | grep -vE \'^[0-9a-f]{40} \' | sort | uniq');
 
 	$dirs = array(
-		str_replace(BOARDDIR . '/', '', SUBSDIR . '/database/') => 'database',
+		str_replace(BOARDDIR . '/', '', SOURCEDIR . '/database/') => 'database',
 		str_replace(BOARDDIR . '/', '', SUBSDIR . '/') => 'subs',
 		str_replace(BOARDDIR . '/', '', CONTROLLERDIR . '/') => 'controllers',
 		str_replace(BOARDDIR . '/', '', SOURCEDIR . '/') => 'sources',
@@ -159,6 +159,8 @@ function getFilesChanged($from, $to)
 		if (strpos($file, 'tests') !== false)
 			continue;
 		if (strpos($file, '/scripts') !== false)
+			continue;
+		if (strpos($file, '/images') !== false)
 			continue;
 		if (strpos($file, '/css') !== false)
 			continue;

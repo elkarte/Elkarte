@@ -15,22 +15,23 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:		BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0.2
+ * @version 1.1 dev
  *
  */
 
 $time_start = microtime(true);
 
-$forum_version = 'ElkArte 1.0.2';
-define('FORUM_VERSION', $forum_version);
+// The software version
+const FORUM_VERSION = 'ElkArte 1.1';
 
 // First things first, but not necessarily in that order.
-define('ELK', 1);
+const ELK = '1';
 
 // Shortcut for the browser cache stale
-define('CACHE_STALE', '?102');
+const CACHE_STALE = '?R11';
 
-error_reporting(E_ALL | E_STRICT);
+// Report errors but not depreciated ones
+error_reporting(E_ALL | E_STRICT & ~8192);
 
 // Directional only script time usage for display
 if (function_exists('getrusage'))
@@ -79,35 +80,40 @@ DEFINE('SOURCEDIR', $sourcedir);
 DEFINE('ADMINDIR', $sourcedir . '/admin');
 DEFINE('CONTROLLERDIR', $sourcedir . '/controllers');
 DEFINE('SUBSDIR', $sourcedir . '/subs');
+DEFINE('ADDONSDIR', $boarddir . '/addons');
 unset($boarddir, $cachedir, $sourcedir, $languagedir, $extdir);
 
 // Files we cannot live without.
 require_once(SOURCEDIR . '/QueryString.php');
 require_once(SOURCEDIR . '/Session.php');
 require_once(SOURCEDIR . '/Subs.php');
-require_once(SOURCEDIR . '/Errors.php');
 require_once(SOURCEDIR . '/Logging.php');
 require_once(SOURCEDIR . '/Load.php');
 require_once(SOURCEDIR . '/Security.php');
-
-spl_autoload_register('elk_autoloader');
-
 require_once(SUBSDIR . '/Cache.subs.php');
 
+// Initialize the class Autoloader
+require(SOURCEDIR . '/Autoloader.class.php');
+$autoloder = Elk_Autoloader::getInstance();
+$autoloder->setupAutoloader(array(SOURCEDIR, SUBSDIR, CONTROLLERDIR, ADMINDIR, ADDONSDIR));
+$autoloder->register(SOURCEDIR, '\\ElkArte');
+
+// Show lots of debug information below the page, not for production sites
 if ($db_show_debug === true)
-{
 	Debug::get()->rusage('start', $rusage_start);
-}
 
 // Forum in extended maintenance mode? Our trip ends here with a bland message.
 if (!empty($maintenance) && $maintenance == 2)
-	display_maintenance_message();
+	Errors::instance()->display_maintenance_message();
 
 // Clean the request.
 cleanRequest();
 
 // Initiate the database connection and define some database functions to use.
 loadDatabase();
+
+// Let's set up out shiny new hooks handler.
+Hooks::init(database(), Debug::get());
 
 // It's time for settings loaded from the database.
 reloadSettings();
@@ -122,7 +128,9 @@ elk_seed_generator();
 if (isset($_GET['scheduled']))
 {
 	// Don't make people wait on us if we can help it.
-	fastcgi_finish_request();
+	if (function_exists('fastcgi_finish_request'))
+		fastcgi_finish_request();
+
 	$controller = new ScheduledTasks_Controller();
 	$controller->action_autotask();
 }
@@ -140,8 +148,8 @@ if (!empty($modSettings['enableCompressedOutput']) && !headers_sent())
 	}
 }
 
-// Register an error handler.
-set_error_handler('error_handler');
+// Register error & exception handlers.
+Errors::instance()->register_handlers();
 
 // Start the session. (assuming it hasn't already been.)
 loadSession();
@@ -202,7 +210,7 @@ function elk_main()
 
 	// If we are in a topic and don't have permission to approve it then duck out now.
 	if (!empty($topic) && empty($board_info['cur_topic_approved']) && !allowedTo('approve_posts') && ($user_info['id'] != $board_info['cur_topic_starter'] || $user_info['is_guest']))
-		fatal_lang_error('not_a_topic', false);
+		Errors::instance()->fatal_lang_error('not_a_topic', false);
 
 	$no_stat_actions = array('dlattach', 'findmember', 'jsoption', 'requestmembers', 'jslocale', 'xmlpreview', 'suggest', '.xml', 'xmlhttp', 'verificationcode', 'viewquery', 'viewadminfile');
 	call_integration_hook('integrate_pre_log_stats', array(&$no_stat_actions));

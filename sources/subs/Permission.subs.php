@@ -7,7 +7,7 @@
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
- * @version 1.0.2
+ * @version 1.1 dev
  */
 
 if (!defined('ELK'))
@@ -67,8 +67,6 @@ function loadIllegalGuestPermissions()
 		'modify_replies',
 		'send_mail',
 		'approve_posts',
-		'post_draft',
-		'post_autosave_draft',
 		'postby_email',
 		'approve_emails',
 		'like_posts',

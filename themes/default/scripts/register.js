@@ -9,7 +9,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:		BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0
+ * @version 1.1 dev
  *
  * This file contains javascript associated with the registration screen
  */
@@ -177,7 +177,7 @@ elkRegister.prototype.refreshMainPassword = function(called_from_verify)
 		}
 	}
 
-	var isValid = stringIndex === '' ? true : false;
+	var isValid = stringIndex === '';
 	if (stringIndex === '')
 		stringIndex = 'password_valid';
 
@@ -250,7 +250,7 @@ elkRegister.prototype.checkUsername = function(is_auto)
 		ajax_indicator(true);
 
 	// Request a search on that username.
-	checkName = curUsername.php_to8bit().php_urlencode();
+	var checkName = curUsername.php_urlencode();
 	sendXMLDocument.call(this, elk_prepareScriptUrl(elk_scripturl) + 'action=register;sa=usernamecheck;xml;username=' + checkName, null, this.checkUsernameCallback);
 
 	return true;
@@ -259,10 +259,10 @@ elkRegister.prototype.checkUsername = function(is_auto)
 // Callback for getting the username data.
 elkRegister.prototype.checkUsernameCallback = function(XMLDoc)
 {
+	var isValid = true;
+
 	if (XMLDoc.getElementsByTagName("username"))
 		isValid = parseInt(XMLDoc.getElementsByTagName("username")[0].getAttribute("valid"));
-	else
-		isValid = true;
 
 	// What to alt?
 	var alt = this.textStrings[isValid === 1 ? 'username_valid' : 'username_invalid'] ? this.textStrings[isValid === 1 ? 'username_valid' : 'username_invalid'] : '';
@@ -296,6 +296,10 @@ elkRegister.prototype.setVerificationImage = function(imageHandle, imageIcon, al
  */
 function updateAuthMethod()
 {
+	var currentAuthMethod,
+		currentForm,
+		verificationHandle;
+
 	// What authentication method is being used?
 	if (!document.getElementById('auth_openid') || !document.getElementById('auth_openid').checked)
 		currentAuthMethod = 'passwd';
@@ -308,9 +312,9 @@ function updateAuthMethod()
 
 	currentForm = document.getElementById('auth_openid').form.id;
 
-	document.forms[currentForm].openid_url.disabled = currentAuthMethod === 'openid' ? false : true;
-	document.forms[currentForm].elk_autov_pwmain.disabled = currentAuthMethod === 'passwd' ? false : true;
-	document.forms[currentForm].elk_autov_pwverify.disabled = currentAuthMethod === 'passwd' ? false : true;
+	document.forms[currentForm].openid_url.disabled = currentAuthMethod !== 'openid';
+	document.forms[currentForm].elk_autov_pwmain.disabled = currentAuthMethod !== 'passwd';
+	document.forms[currentForm].elk_autov_pwverify.disabled = currentAuthMethod !== 'passwd';
 	document.getElementById('elk_autov_pwmain_div').style.display = currentAuthMethod === 'passwd' ? '' : 'none';
 	document.getElementById('elk_autov_pwverify_div').style.display = currentAuthMethod === 'passwd' ? '' : 'none';
 

@@ -11,7 +11,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0.2
+ * @version 1.1 dev
  *
  */
 
@@ -611,6 +611,13 @@ function template_profile_theme_settings()
 							<dd>
 								<input type="hidden" name="default_options[no_new_reply_warning]" value="0" />
 								<input type="checkbox" name="default_options[no_new_reply_warning]" id="no_new_reply_warning" value="1"', !empty($context['member']['options']['no_new_reply_warning']) ? ' checked="checked"' : '', ' class="input_check" />
+							</dd>
+							<dt>
+								<label for="wysiwyg_default">', $txt['wysiwyg_default'], '</label>
+							</dt>
+							<dd>
+								<input type="hidden" name="default_options[wysiwyg_default]" value="0" />
+								<input type="checkbox" name="default_options[wysiwyg_default]" id="wysiwyg_default" value="1"', !empty($context['member']['options']['wysiwyg_default']) ? ' checked="checked"' : '', ' class="input_check" />
 							</dd>';
 
 	if (empty($modSettings['disableCustomPerPage']))
@@ -710,6 +717,30 @@ function template_action_notification()
 				<div class="content">
 					<dl class="settings">';
 
+	foreach ($context['mention_types'] as $type => $mentions)
+	{
+		echo '
+						<dt><label for="notify_', $type, '">', $txt['notify_type_' . $type], '</label></dt>
+						<dd>
+							<input id="notify_', $type, '" name="notify[', $type, '][status]" class="toggle_notify" type="checkbox" value="1" ', $mentions['enabled'] ? 'checked="checked"' : '', '/>
+							<label id="notify_', $type, '_method" for="notify_', $type, '_method">', $txt['notify_method'], '
+							<select name="notify[', $type, '][method]">';
+
+		foreach ($mentions['data'] as $key => $method)
+		{
+			echo '
+								<option value="', $key, '"', $method['enabled'] ? ' selected="selected"' : '', '>', $txt['notify_' . $method['id']], '</option>';
+		}
+		echo '
+							</select>
+							</label>
+						</dd>';
+	}
+
+	echo '
+					</dl>
+					<dl class="settings">';
+
 	// Allow notification on announcements to be disabled?
 	if (!empty($modSettings['allow_disableAnnounce']))
 		echo '
@@ -751,10 +782,11 @@ function template_action_notification()
 						</dt>
 						<dd>
 							<select name="notify_regularity" id="notify_regularity">
-								<option value="0"', $context['member']['notify_regularity'] == 0 ? ' selected="selected"' : '', '>', $txt['notify_regularity_instant'], '</option>
-								<option value="1"', $context['member']['notify_regularity'] == 1 ? ' selected="selected"' : '', '>', $txt['notify_regularity_first_only'], '</option>
-								<option value="2"', $context['member']['notify_regularity'] == 2 ? ' selected="selected"' : '', '>', $txt['notify_regularity_daily'], '</option>
-								<option value="3"', $context['member']['notify_regularity'] == 3 ? ' selected="selected"' : '', '>', $txt['notify_regularity_weekly'], '</option>
+								<option value="0"',  $context['member']['notify_regularity'] ==  0 ? ' selected="selected"' : '', '>', $txt['notify_regularity_instant'], '</option>
+								<option value="1"',  $context['member']['notify_regularity'] ==  1 ? ' selected="selected"' : '', '>', $txt['notify_regularity_first_only'], '</option>
+								<option value="2"',  $context['member']['notify_regularity'] ==  2 ? ' selected="selected"' : '', '>', $txt['notify_regularity_daily'], '</option>
+								<option value="3"',  $context['member']['notify_regularity'] ==  3 ? ' selected="selected"' : '', '>', $txt['notify_regularity_weekly'], '</option>
+								<option value="99"', $context['member']['notify_regularity'] == 99 ? ' selected="selected"' : '', '>', $txt['notify_regularity_none'], '</option>
 							</select>
 						</dd>
 						<dt>
@@ -779,7 +811,7 @@ function template_action_notification()
 					</dl>
 					<hr />
 					<div class="submitbutton">
-						<input id="notify_submit" type="submit" value="', $txt['notify_save'], '" class="button_submit" />
+						<input id="notify_submit" name="notify_submit" type="submit" value="', $txt['notify_save'], '" class="button_submit" />
 						<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />', !empty($context['token_check']) ? '
 						<input type="hidden" name="' . $context[$context['token_check'] . '_token_var'] . '" value="' . $context[$context['token_check'] . '_token'] . '" />' : '', '
 						<input type="hidden" name="u" value="', $context['id_member'], '" />

@@ -7,7 +7,7 @@
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
- * @version 1.0
+ * @version 1.1 dev
  *
  */
 
@@ -54,7 +54,7 @@ class Likes_Controller extends Action_Controller
 
 		// If likes are disabled, we don't go any further
 		if (empty($modSettings['likes_enabled']))
-			fatal_lang_error('feature_disabled', true);
+			Errors::instance()->fatal_lang_error('feature_disabled', true);
 	}
 
 	/**
@@ -67,7 +67,7 @@ class Likes_Controller extends Action_Controller
 		global $txt;
 
 		// An error if not possible to like.
-		if (!$this->_doLikePost('+', 'like'))
+		if (!$this->_doLikePost('+', 'likemsg'))
 		{
 			loadLanguage('Errors');
 			$this->_likes_response = array('result' => false, 'data' => $txt['like_unlike_error']);
@@ -85,7 +85,7 @@ class Likes_Controller extends Action_Controller
 		global $txt;
 
 		// An error if not possible to like.
-		if (!$this->_doLikePost('-', 'rlike'))
+		if (!$this->_doLikePost('-', 'rlikemsg'))
 		{
 			loadLanguage('Errors');
 			$this->_likes_response = array('result' => false, 'data' => $txt['like_unlike_error']);
@@ -104,7 +104,7 @@ class Likes_Controller extends Action_Controller
 	{
 		global $topic;
 
-		$this->_doLikePost('+', 'like');
+		$this->_doLikePost('+', 'likemsg');
 
 		redirectexit('topic=' . $topic . '.msg' . $this->_id_liked . '#msg' . $this->_id_liked);
 	}
@@ -115,7 +115,7 @@ class Likes_Controller extends Action_Controller
 	 * Fills $_likes_response that can be used by likeResponse() in order to
 	 * return a JSON response
 	 * @param string $sign '+' or '-'
-	 * @param string $type the type of like 'like' or 'rlike'
+	 * @param string $type the type of like 'likemsg' or 'rlikemsg'
 	 *
 	 * @return bool
 	 */
@@ -142,18 +142,13 @@ class Likes_Controller extends Action_Controller
 					// Lets add in a mention to the member that just had their post liked
 					if (!empty($modSettings['mentions_enabled']))
 					{
-						$mentions = new Mentions_Controller();
-						$mentions->setData(array(
-							'id_member' => $liked_message['id_member'],
-							'type' => $type,
-							'id_msg' => $this->_id_liked,
+						$notifier = Notifications::getInstance();
+						$notifier->add(new Notifications_Task(
+							$type,
+							$this->_id_liked,
+							$user_info['id'],
+							array('id_members' => array($liked_message['id_member']), 'rlike_notif' => empty($modSettings['mentions_dont_notify_rlike']))
 						));
-
-						// Notifying that likes were removed ?
-						if ($type === 'rlike' && !empty($modSettings['mentions_dont_notify_rlike']))
-							$mentions->action_rlike();
-						else
-							$mentions->action_add();
 					}
 				}
 				return true;
@@ -169,9 +164,9 @@ class Likes_Controller extends Action_Controller
 	 */
 	public function action_unlikepost()
 	{
-		global $user_info, $topic, $txt, $modSettings;
+		global $user_info, $topic;
 
-		$this->_doLikePost('-', 'rlike');
+		$this->_doLikePost('-', 'rlikemsg');
 
 		if (!isset($_REQUEST['profile']))
 			redirectexit('topic=' . $topic . '.msg' . $this->_id_liked . '#msg' . $this->_id_liked);
@@ -568,7 +563,7 @@ class Likes_Controller extends Action_Controller
 
 	/**
 	 * Callback for createList()
-	 * Returns a list of liked posts for a memmber
+	 * Returns a list of liked posts for a member
 	 *
 	 * @param int $start
 	 * @param int $items_per_page
@@ -619,12 +614,12 @@ class Likes_Controller extends Action_Controller
 	 */
 	public function action_likestats_api()
 	{
-		global $context, $user_info, $topic, $txt, $modSettings;
+		global $context, $modSettings;
 
 		require_once(SUBSDIR . '/Likes.subs.php');
 
 		if (empty($modSettings['likes_enabled']))
-			fatal_lang_error('feature_disabled', true);
+			Errors::instance()->fatal_lang_error('feature_disabled', true);
 
 		isAllowedTo('like_posts_stats');
 
@@ -658,12 +653,12 @@ class Likes_Controller extends Action_Controller
 	 */
 	public function action_likestats()
 	{
-		global $context, $user_info, $topic, $txt, $modSettings;
+		global $context, $txt, $modSettings;
 
 		require_once(SUBSDIR . '/Likes.subs.php');
 
 		if (empty($modSettings['likes_enabled']))
-			fatal_lang_error('feature_disabled', true);
+			Errors::instance()->fatal_lang_error('feature_disabled', true);
 
 		isAllowedTo('like_posts_stats');
 
@@ -711,13 +706,9 @@ class Likes_Controller extends Action_Controller
 		$data = dbMostLikedMessage();
 
 		if ($data)
-		{
 			$this->_likes_response = array('result' => true, 'data' => $data);
-		}
 		else
-		{
 			$this->_likes_response = array('result' => false, 'error' => $txt['like_post_error_something_wrong']);
-		}
 
 		$this->likeResponse();
 	}
@@ -733,13 +724,9 @@ class Likes_Controller extends Action_Controller
 		$data = dbMostLikedTopic();
 
 		if ($data)
-		{
 			$this->_likes_response = array('result' => true, 'data' => $data);
-		}
 		else
-		{
 			$this->_likes_response = array('result' => false, 'error' => $txt['like_post_error_something_wrong']);
-		}
 
 		$this->likeResponse();
 	}
@@ -755,13 +742,9 @@ class Likes_Controller extends Action_Controller
 		$data = dbMostLikedBoard();
 
 		if ($data)
-		{
 			$this->_likes_response = array('result' => true, 'data' => $data);
-		}
 		else
-		{
 			$this->_likes_response = array('result' => false, 'error' => $txt['like_post_error_something_wrong']);
-		}
 
 		$this->likeResponse();
 	}
@@ -777,13 +760,9 @@ class Likes_Controller extends Action_Controller
 		$data = dbMostLikesReceivedUser();
 
 		if ($data)
-		{
 			$this->_likes_response = array('result' => true, 'data' => $data);
-		}
 		else
-		{
 			$this->_likes_response = array('result' => false, 'error' => $txt['like_post_error_something_wrong']);
-		}
 
 		$this->likeResponse();
 	}
@@ -799,13 +778,9 @@ class Likes_Controller extends Action_Controller
 		$data = dbMostLikesGivenUser();
 
 		if ($data)
-		{
 			$this->_likes_response = array('result' => true, 'data' => $data);
-		}
 		else
-		{
 			$this->_likes_response = array('result' => false, 'error' => $txt['like_post_error_something_wrong']);
-		}
 		$this->likeResponse();
 	}
 }

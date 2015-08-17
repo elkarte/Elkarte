@@ -13,7 +13,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:		BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0
+ * @version 1.1 dev
  *
  */
 
@@ -21,7 +21,7 @@ if (!defined('ELK'))
 	die('No access...');
 
 /**
- * Suggest Controler
+ * Suggest Controller
  */
 class Suggest_Controller extends Action_Controller
 {
@@ -33,6 +33,7 @@ class Suggest_Controller extends Action_Controller
 	public function action_index()
 	{
 		// Call the right method for this user request.
+		return $this->action_suggest();
 	}
 
 	/**

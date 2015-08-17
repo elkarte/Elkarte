@@ -7,7 +7,7 @@
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
- * @version 1.0
+ * @version 1.1 dev
  *
  */
 
@@ -340,7 +340,7 @@ function loadTaskDetails($id_task)
 	);
 	// Should never, ever, happen!
 	if ($db->num_rows($request) == 0)
-		fatal_lang_error('no_access', false);
+		Errors::instance()->fatal_lang_error('no_access', false);
 	while ($row = $db->fetch_assoc($request))
 	{
 		$task = array(
@@ -569,47 +569,21 @@ function run_this_task($id_task, $task_name)
 {
 	global $time_start, $modSettings;
 
+	Elk_Autoloader::getInstance()->register(SUBSDIR . '/ScheduledTask', '\\ElkArte\\sources\\subs\\ScheduledTask');
+
 	// Let's start logging the task and saying we failed it
 	$log_task_id = logTask(0, $id_task);
 
-	// The method must exist in ScheduledTask class, or we are wasting our time.
-	// Actually for extendability sake, we need to have other ways, so:
-	// A simple procedural function?
-	if (strpos($task_name, '::') === false && function_exists($task_name))
-	{
-		$method = $task_name;
+	$class = '\\ElkArte\\sources\\subs\\ScheduledTask\\' . implode('_', array_map('ucfirst', explode('_', $task_name)));
 
-		// Do the task...
-		$completed = $method();
+	if (class_exists($class))
+	{
+		$task = new $class();
+
+		$completed = $task->run();
 	}
-	// It may be a class (no static, sorry)
 	else
-	{
-		// It may be a custom one
-		if (strpos($task_name, '::') !== false)
-		{
-			$call = explode('::', $task_name);
-			$task_object = new $call[0];
-			$method = $call[1];
-		}
-		// Otherwise we try with the ScheduledTask class
-		else
-		{
-			$task_object = new Scheduled_Task();
-			$method = $task_name;
-		}
-
-		if (method_exists($task_object, $method))
-		{
-			// Try to stop a timeout, this would be bad...
-			@set_time_limit(300);
-			if (function_exists('apache_reset_timeout'))
-				@apache_reset_timeout();
-
-			// Do the task...
-			$completed = $task_object->{$method}();
-		}
-	}
+		$completed = run_this_task_compat($task_name);
 
 	// Log that we did it ;)
 	if ($completed)
@@ -631,6 +605,49 @@ function run_this_task($id_task, $task_name)
 		// If the task ended successfully, then log the proper time taken to complete
 		logTask($log_task_id, $id_task, $total_time);
 	}
+}
+
+/**
+ * 1.0 compatibility function, used to maintain compatibility with naming
+ * scheme used in ElkArte 1.0
+ *
+ * @package ScheduledTasks
+ * @param string $task_name name of the task, class name, function name, method in ScheduledTask.class
+ * @return mixed bool
+ * @deprecated since 1.1 - Deprecated in favour of naming scheme
+ */
+function run_this_task_compat($task_name)
+{
+	$completed = false;
+
+	// The method must exist in ScheduledTask class, or we are wasting our time.
+	// Actually for extendability sake, we need to have other ways, so:
+	// A simple procedural function?
+	if (strpos($task_name, '::') === false && function_exists($task_name))
+	{
+		$method = $task_name;
+
+		// Do the task...
+		$completed = $method();
+	}
+	// It may be a class (no static, sorry)
+	elseif (strpos($task_name, '::') !== false)
+	{
+		$call = explode('::', $task_name);
+		$task_object = new $call[0];
+		$method = $call[1];
+
+		if (method_exists($task_object, $method))
+		{
+			// Try to stop a timeout, this would be bad...
+			setTimeLimit(300);
+
+			// Do the task...
+			$completed = $task_object->{$method}();
+		}
+	}
+
+	return $completed;
 }
 
 /**

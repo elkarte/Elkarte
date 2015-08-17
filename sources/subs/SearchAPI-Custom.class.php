@@ -14,7 +14,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0
+ * @version 1.1 dev
  *
  */
 
@@ -32,7 +32,7 @@ class Custom_Search extends SearchAPI
 	 *This is the last version of ElkArte that this was tested on, to protect against API changes.
 	 * @var string
 	 */
-	public $version_compatible = 'ElkArte 1.0';
+	public $version_compatible = 'ElkArte 1.1';
 
 	/**
 	 *This won't work with versions of ElkArte less than this.
@@ -74,17 +74,17 @@ class Custom_Search extends SearchAPI
 	 * What databases support the custom index?
 	 * @var array
 	 */
-	protected $supported_databases = array('mysql', 'postgresql');
+	protected $supported_databases = array('MySQL', 'PostgreSQL');
 
 	/**
 	 * Custom_Search::__construct()
 	 */
 	public function __construct()
 	{
-		global $modSettings, $db_type;
+		global $modSettings;
 
 		// Is this database supported?
-		if (!in_array($db_type, $this->supported_databases))
+		if (!in_array(DB_TYPE, $this->supported_databases))
 		{
 			$this->is_supported = false;
 			return;
