@@ -220,6 +220,9 @@ function bb2_insert($settings, $package, $key)
  */
 function bb2_multi_implode($array, $glue = ',', $trim_all = false)
 {
+	if (!is_array($array))
+		$array = array($array);
+
 	foreach ($array as $key => $value)
 	{
 		if (is_array($value))
