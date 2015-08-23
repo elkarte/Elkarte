@@ -599,6 +599,10 @@ function removeMessage($message, $decreasePostCount = true)
 	// Only remove posts if they're not recycled.
 	if (!$recycle)
 	{
+		// Update the like counts
+		require_once(SUBSDIR . '/Likes.subs.php');
+		decreaseLikeCounts($message);
+
 		// Remove the likes!
 		$db->query('', '
 			DELETE FROM {db_prefix}message_likes
