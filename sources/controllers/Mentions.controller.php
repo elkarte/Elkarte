@@ -379,7 +379,7 @@ class Mentions_Controller extends Action_Controller
 				'title' => sprintf($txt['forum_notification'], $context['forum_name']),
 			);
 			$context['json_data']['desktop_notifications']['message'] = sprintf($txt[$lastsent == 0 ? 'unread_notifications' : 'new_from_last_notifications'], $context['json_data']['desktop_notifications']['new_from_last']);
-		);
+		}
 
 		$_SESSION['notifications_lastseen'] = $context['json_data']['timelast'];
 	}
