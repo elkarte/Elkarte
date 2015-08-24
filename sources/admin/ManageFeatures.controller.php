@@ -260,7 +260,7 @@ class ManageFeatures_Controller extends Action_Controller
 	 */
 	public function action_layoutSettings_display()
 	{
-		global $txt, $scripturl, $context;
+		global $txt, $scripturl, $context, $modSettings;
 
 		// Initialize the form
 		$this->_initLayoutSettingsForm();
@@ -271,6 +271,19 @@ class ManageFeatures_Controller extends Action_Controller
 		// Saving?
 		if (isset($this->_req->query->save))
 		{
+			if (!empty($modSettings['front_page']))
+			{
+				Hooks::get()->remove('integrate_action_frontpage', $modSettings['front_page'] . '::frontPageHook');
+			}
+			if (!empty($this->_req->post->front_page))
+			{
+				$front_page = (string) $this->_req->post->front_page;
+				if ($front_page::validateFrontPageOptions($this->_req->post))
+				{
+					Hooks::get()->add('integrate_action_frontpage', $front_page . '::frontPageHook');
+				}
+			}
+
 			checkSession();
 
 			call_integration_hook('integrate_save_layout_settings');
@@ -1339,7 +1352,17 @@ class ManageFeatures_Controller extends Action_Controller
 	{
 		global $txt;
 
-		$config_vars = array(
+		$config_vars = getFrontPageControllers();
+
+		if (!empty($front_page))
+		{
+			$config_vars = array(
+					array('select', 'front_page', $front_page),
+				'',
+			);
+		}
+
+		$config_vars += array(
 				// Pagination stuff.
 				array('check', 'compactTopicPagesEnable'),
 				array('int', 'compactTopicPagesContiguous', null, $txt['contiguous_page_display'] . '<div class="smalltext">' . str_replace(' ', '&nbsp;', '"3" ' . $txt['to_display'] . ': <strong>1 ... 4 [5] 6 ... 9</strong>') . '<br />' . str_replace(' ', '&nbsp;', '"5" ' . $txt['to_display'] . ': <strong>1 ... 3 4 [5] 6 7 ... 9</strong>') . '</div>'),

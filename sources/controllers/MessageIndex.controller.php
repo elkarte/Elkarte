@@ -27,6 +27,74 @@ if (!defined('ELK'))
 class MessageIndex_Controller extends Action_Controller
 {
 	/**
+	 * {@inheritdoc }
+	 */
+	public static function canFrontPage()
+	{
+		return true;
+	}
+
+	/**
+	 * {@inheritdoc }
+	 */
+	public static function frontPageHook(&$default_action)
+	{
+		$default_action = array(
+			'controller' => 'MessageIndex_Controller',
+			'function' => 'action_messageindex_fp'
+		);
+	}
+
+	/**
+	 * {@inheritdoc }
+	 */
+	public static function frontPageOptions()
+	{
+		addInlineJavascript('
+			$(\'#front_page\').on(\'change\', function() {
+				var $base = $(\'#message_index_frontpage\').parent();
+				if ($(this).val() == \'MessageIndex_Controller\')
+				{
+					$base.fadeIn();
+					$base.next().fadeIn();
+				}
+				else
+				{
+					$base.fadeOut();
+					$base.next().fadeOut();
+				}
+			}).change();', true);
+		return array(array('select', 'message_index_frontpage', self::_getBoardsList()));
+	}
+
+	/**
+	 * {@inheritdoc }
+	 */
+	public static function validateFrontPageOptions($post)
+	{
+		$boards = self::_getBoardsList();
+
+		if (empty($post->message_index_frontpage) || !isset($boards[$post->message_index_frontpage]))
+		{
+			$post->front_page = null;
+			return false;
+		}
+		return true;
+	}
+
+	protected static function _getBoardsList()
+	{
+		// Load the boards list.
+		require_once(SUBSDIR . '/Boards.subs.php');
+		$boards_list = getBoardList(array('override_permissions' => true, 'not_redirection' => true), true);
+
+		foreach ($boards_list as $board)
+			$boards[$board['id_board']] = $board['cat_name'] . ' - ' . $board['board_name'];
+
+		return $boards;
+	}
+
+	/**
 	 * Dispatches forward to message index handler.
 	 *
 	 * @see Action_Controller::action_index()
@@ -35,6 +103,20 @@ class MessageIndex_Controller extends Action_Controller
 	{
 		// Forward to message index, it's not like we know much more :P
 		$this->action_messageindex();
+	}
+
+	/**
+	 * Show the list of topics in this board, along with any sub-boards.
+	 * @uses MessageIndex template topic_listing sub template
+	 */
+	public function action_messageindex_fp()
+	{
+		global $modSettings, $board;
+
+		$board = $modSettings['message_index_frontpage'];
+		loadBoard();
+
+		return $this->action_messageindex();
 	}
 
 	/**

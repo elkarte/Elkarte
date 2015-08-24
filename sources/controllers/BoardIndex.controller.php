@@ -26,6 +26,25 @@ if (!defined('ELK'))
 class BoardIndex_Controller extends Action_Controller
 {
 	/**
+	 * {@inheritdoc }
+	 */
+	public static function canFrontPage()
+	{
+		return true;
+	}
+
+	/**
+	 * {@inheritdoc }
+	 */
+	public static function frontPageHook(&$default_action)
+	{
+		$default_action = array(
+			'controller' => 'BoardIndex_Controller',
+			'function' => 'action_boardindex'
+		);
+	}
+
+	/**
 	 * Forwards to the action to execute here by default.
 	 *
 	 * @see Action_Controller::action_index()

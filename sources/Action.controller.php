@@ -53,6 +53,48 @@ abstract class Action_Controller
 	}
 
 	/**
+	 * Tells if the controller can be displayed as front page.
+	 *
+	 * @return boolean
+	 */
+	public static function canFrontPage()
+	{
+		return false;
+	}
+
+	/**
+	 * Used to attach to the integrate_action_frontpage hook, to change
+	 * the default action.
+	 *
+	 * @param string[] $default_action
+	 */
+	public static function frontPageHook(&$default_action)
+	{
+	}
+
+	/**
+	 * Used to defin the parameters the controller may need for the front page
+	 * action to work (e.g. specify a topic ID).
+	 *
+	 * @return mixed[]
+	 */
+	public static function frontPageOptions()
+	{
+		return array();
+	}
+
+	/**
+	 * Used to defin the parameters the controller may need for the front page
+	 * action to work (e.g. specify a topic ID).
+	 *
+	 * @param Object $post
+	 */
+	public static function validateFrontPageOptions($post)
+	{
+		return true;
+	}
+
+	/**
 	 * Initialize the event manager for the controller
 	 *
 	 * Uses the XXX_Controller name to define the set of event hooks to load
