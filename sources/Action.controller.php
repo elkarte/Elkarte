@@ -59,24 +59,11 @@ abstract class Action_Controller
 	 */
 	public static function canFrontPage()
 	{
-		return false;
+		return in_array('ElkArte\\sources\\Frontpage_Interface', class_implements(get_called_class()));
 	}
 
 	/**
-	 * Used to attach to the integrate_action_frontpage hook, to change
-	 * the default action.
-	 *
-	 * @param string[] $default_action
-	 */
-	public static function frontPageHook(&$default_action)
-	{
-	}
-
-	/**
-	 * Used to defin the parameters the controller may need for the front page
-	 * action to work (e.g. specify a topic ID).
-	 *
-	 * @return mixed[]
+	 * {@inheritdoc }
 	 */
 	public static function frontPageOptions()
 	{
@@ -84,10 +71,7 @@ abstract class Action_Controller
 	}
 
 	/**
-	 * Used to defin the parameters the controller may need for the front page
-	 * action to work (e.g. specify a topic ID).
-	 *
-	 * @param Object $post
+	 * {@inheritdoc }
 	 */
 	public static function validateFrontPageOptions($post)
 	{

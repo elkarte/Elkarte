@@ -18,22 +18,16 @@
  *
  */
 
+use ElkArte\sources\Frontpage_Interface;
+
 if (!defined('ELK'))
 	die('No access...');
 
 /**
  * Message Index Controller
  */
-class MessageIndex_Controller extends Action_Controller
+class MessageIndex_Controller extends Action_Controller implements Frontpage_Interface
 {
-	/**
-	 * {@inheritdoc }
-	 */
-	public static function canFrontPage()
-	{
-		return true;
-	}
-
 	/**
 	 * {@inheritdoc }
 	 */

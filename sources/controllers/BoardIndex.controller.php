@@ -17,22 +17,16 @@
  *
  */
 
+use ElkArte\sources\Frontpage_Interface;
+
 if (!defined('ELK'))
 	die('No access...');
 
 /**
  * BoardIndex_Controller class, displays the main board index
  */
-class BoardIndex_Controller extends Action_Controller
+class BoardIndex_Controller extends Action_Controller implements Frontpage_Interface
 {
-	/**
-	 * {@inheritdoc }
-	 */
-	public static function canFrontPage()
-	{
-		return true;
-	}
-
 	/**
 	 * {@inheritdoc }
 	 */
