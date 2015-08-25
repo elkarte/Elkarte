@@ -1305,7 +1305,9 @@ class Install_Controller
 		require_once(SUBSDIR . '/Auth.subs.php');
 		require_once(SUBSDIR . '/Util.class.php');
 		require_once(SOURCEDIR . '/Autoloader.class.php');
-		Elk_Autoloader::getInstance()->setupAutoloader(array(SOURCEDIR, SUBSDIR, CONTROLLERDIR, ADMINDIR));
+		$autoloder = Elk_Autoloader::getInstance();
+		$autoloder->setupAutoloader(array(SOURCEDIR, SUBSDIR, CONTROLLERDIR, ADMINDIR, ADDONSDIR));
+		$autoloder->register(SOURCEDIR, '\\ElkArte');
 
 		// Bring a warning over.
 		if (!empty($incontext['account_existed']))
