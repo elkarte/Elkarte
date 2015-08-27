@@ -648,9 +648,6 @@ class Register_Controller extends Action_Controller
 			return;
 		}
 
-		// Let's assume it's an email change until proven otherwise
-		$email_change = true;
-
 		// Change their email address? (they probably tried a fake one first :P.)
 		if (isset($_POST['new_email'], $_REQUEST['passwd']) && validateLoginPassword($_REQUEST['passwd'], $row['passwd'], $row['member_name'], true) && ($row['is_activated'] == 0 || $row['is_activated'] == 2))
 		{
@@ -673,8 +670,7 @@ class Register_Controller extends Action_Controller
 			updateMemberData($row['id_member'], array('email_address' => $_POST['new_email']));
 			$row['email_address'] = $_POST['new_email'];
 
-			// If we are here, it's not an email change, but it will use the rest of the controller
-			$email_change = false;
+			$email_change = true;
 		}
 
 		// Resend the password, but only if the account wasn't activated yet.
@@ -700,13 +696,13 @@ class Register_Controller extends Action_Controller
 			// This will ensure we don't actually get an error message if it works!
 			$context['error_title'] = '';
 
-			fatal_lang_error($email_change ? 'change_email_success' : 'resend_email_success', false);
+			fatal_lang_error(!empty($email_change) ? 'change_email_success' : 'resend_email_success', false);
 		}
 
 		// Quit if this code is not right.
 		if (empty($_REQUEST['code']) || $row['validation_code'] != $_REQUEST['code'])
 		{
-			if (!empty($row['is_activated']))
+			if (!empty($row['is_activated']) && $row['is_activated'] == 1)
 				fatal_lang_error('already_activated', false);
 			elseif ($row['validation_code'] == '')
 			{
@@ -723,12 +719,12 @@ class Register_Controller extends Action_Controller
 		require_once(SUBSDIR . '/Members.subs.php');
 
 		// Validation complete - update the database!
-		approveMembers(array('members' => array($row['id_member']), 'activated_status' => 0));
+		approveMembers(array('members' => array($row['id_member']), 'activated_status' => $row['is_activated']));
 
 		// Also do a proper member stat re-evaluation.
 		updateStats('member', false);
 
-		if (!isset($_POST['new_email']) && !$email_change)
+		if (!isset($_POST['new_email']) && empty($row['is_activated']))
 		{
 			require_once(SUBSDIR . '/Notification.subs.php');
 			sendAdminNotifications('activation', $row['id_member'], $row['member_name']);
