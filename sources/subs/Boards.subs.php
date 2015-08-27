@@ -1567,7 +1567,8 @@ function getBoardModerators($idboard, $only_id = false)
  * Get a list of all the board moderators (every board)
  *
  * @package Boards
- * @param bool $only_id return only the id of the moderators instead of id and name (default false)
+ * @param bool $only_id return array with key of id_member of the moderator(s)
+ * otherwise array with key of id_board id (default false)
  * @return array
  */
 function allBoardModerators($only_id = false)
@@ -1593,7 +1594,12 @@ function allBoardModerators($only_id = false)
 		);
 
 	while ($row = $db->fetch_assoc($request))
-		$moderators[$row['id_member']] = $row;
+	{
+		if ($only_id)
+			$moderators[$row['id_member']][] = $row;
+		else
+			$moderators[$row['id_board']][] = $row;
+	}
 	$db->free_result($request);
 
 	return $moderators;
