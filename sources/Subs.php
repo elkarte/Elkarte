@@ -1548,13 +1548,15 @@ function parse_bbc($message, $smileys = true, $cache_id = '', $parse_tags = arra
 						// Switch out quotes really quick because they can cause problems.
 						$data = strtr($data, array('&#039;' => '\'', '&nbsp;' => "\xC2\xA0", '&quot;' => '>">', '"' => '<"<', '&lt;' => '<lt<'));
 
+						// Check for links with special () checking to allow links with ) in them
+						if (is_string($result = preg_replace_callback('~(?<=([\s>\.(;\'"])|^)((?:http|https)://[\w\-_%@:|]+(?:\.[\w\-_%]+)*(?::\d+)?(?:/[\p{L}\w\-_\~%\.@!,\?&;=#(){}+:\'\\\\]*)*[/\w\-_\~%@\?;=#}\\\\]?)~ui', 'parse_autolink', $data)));
+							$data = $result;
+
 						// Only do this if the preg survives.
 						if (is_string($result = preg_replace(array(
-							'~(?<=[\s>\.(;\'"]|^)((?:http|https)://[\w\-_%@:|]+(?:\.[\w\-_%]+)*(?::\d+)?(?:/[\p{L}\w\-_\~%\.@!,\?&;=#(){}+:\'\\\\]*)*[/\w\-_\~%@\?;=#}\\\\]?)~ui',
 							'~(?<=[\s>\.(;\'"]|^)((?:ftp|ftps)://[\w\-_%@:|]+(?:\.[\w\-_%]+)*(?::\d+)?(?:/[\w\-_\~%\.@,\?&;=#(){}+:\'\\\\]*)*[/\w\-_\~%@\?;=#}\\\\]?)~i',
 							'~(?<=[\s>(\'<]|^)(www(?:\.[\w\-_]+)+(?::\d+)?(?:/[\p{L}\w\-_\~%\.@!,\?&;=#(){}+:\'\\\\]*)*[/\w\-_\~%@\?;=#}\\\\])~ui'
 						), array(
-							'[url]$1[/url]',
 							'[ftp]$1[/ftp]',
 							'[url=http://$1]$1[/url]'
 						), $data)))
@@ -2234,6 +2236,22 @@ function footnote_callback($matches)
 	$fn_content[] = '<div class="target" id="fn' . $fn_num . '_' . $fn_count . '"><sup>' . $fn_num . '&nbsp;</sup>' . $matches[2] . '<a class="footnote_return" href="#ref' . $fn_num . '_' . $fn_count . '">&crarr;</a></div>';
 
 	return '<a class="target" href="#fn' . $fn_num . '_' . $fn_count . '" id="ref' . $fn_num . '_' . $fn_count . '">[' . $fn_num . ']</a>';
+}
+
+/**
+ * Callback function for autolinking.
+ * - If the look behind contains ( then it will trim any trailing ) from the link
+ * this to allow (link/path) where the path contains ) characters as allowed by RFC
+ *
+ * @param mixed[] $matches
+ * @return string
+ */
+function parse_autolink($matches)
+{
+ 	if ($matches[1] === '(' && substr($matches[2], -1) === ')')
+		return '[url]' . rtrim($matches[2], ')') . '[/url])';
+	else
+		return '[url]' . $matches[2] . '[/url]';
 }
 
 /**
