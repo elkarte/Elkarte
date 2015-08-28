@@ -13,3 +13,4 @@ nbproject/*
 .*.swp
 /vendor/*
 /build/*
+.idea
