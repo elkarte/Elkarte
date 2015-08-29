@@ -303,7 +303,7 @@ function template_post_page()
 							', template_control_richedit_buttons($context['post_box_name']);
 
 	// Option to delete an event if user is editing one.
-	if ($context['make_event'] && !$context['event']['new'])
+	if (!empty($context['make_event']) && !$context['event']['new'])
 		echo '
 							<input type="submit" name="deleteevent" value="', $txt['event_delete'], '" onclick="return confirm(\'', $txt['event_delete_confirm'], '\');" class="button_submit" />';
 
@@ -625,7 +625,7 @@ function template_postarea_below()
 	global $context, $txt, $counter, $settings;
 
 	// Is visual verification enabled?
-	if ($context['require_verification'])
+	if (!empty($context['require_verification']) && isset($context['visual_verification_id']))
 	{
 		template_verification_controls($context['visual_verification_id'], '
 						<div class="post_verification">
