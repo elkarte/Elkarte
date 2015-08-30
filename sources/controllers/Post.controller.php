@@ -175,7 +175,7 @@ class Post_Controller extends Action_Controller
 		{
 			$this->_topic_attributes['id_member'] = 0;
 			$context['becomes_approved'] = true;
-			if ((!$context['make_event'] || !empty($board)))
+			if ($context['make_event'] && !$context['event']['new'])
 			{
 				if ($modSettings['postmod_active'] && !allowedTo('post_new') && allowedTo('post_unapproved_topics'))
 					$context['becomes_approved'] = false;
