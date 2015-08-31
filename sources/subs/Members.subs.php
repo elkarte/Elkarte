@@ -1830,13 +1830,14 @@ function getMember($search, $buddies = array())
 		WHERE {raw:real_name} LIKE {string:search}' . (!empty($buddies) ? '
 			AND id_member IN ({array_int:buddy_list})' : '') . '
 			AND is_activated IN ({array_int:activation_status})
+		ORDER BY LENGTH(real_name), real_name
 		LIMIT {int:limit}',
 		array(
 			'real_name' => defined('DB_CASE_SENSITIVE') ? 'LOWER(real_name)' : 'real_name',
 			'buddy_list' => $buddies,
 			'search' => Util::strtolower($search),
 			'activation_status' => array(1, 12),
-			'limit' => Util::strlen($search) <= 2 ? 100 : 800,
+			'limit' => Util::strlen($search) <= 2 ? 100 : 200,
 		)
 	);
 	$xml_data = array(

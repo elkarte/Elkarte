@@ -78,7 +78,7 @@ fieldset {
 	margin: 5px 0;
 }
 legend {
-	background: url(../../images/selected_open.png) no-repeat scroll left center transparent;
+	background: url(../../images/selected_open.png) 0 50% no-repeat;
 	cursor: pointer;
 	padding: 0 0 2px 20px;
 	color: #333;
@@ -86,7 +86,7 @@ legend {
 	margin-left: 15px;
 }
 .collapsed legend {
-	background: url(../../images/selected.png) no-repeat scroll left center transparent;
+	background: url(../../images/selected.png) 0 50% no-repeat;
 }
 
 input, button, select, textarea, .editor {

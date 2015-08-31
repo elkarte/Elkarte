@@ -297,7 +297,7 @@ smc_AutoSuggest.prototype.positionDiv = function()
 
 	this.oSuggestDivHandle.style.left = aParentPos[0] + 'px';
 	this.oSuggestDivHandle.style.top = (aParentPos[1] + this.oTextHandle.offsetHeight) + 'px';
-	this.oSuggestDivHandle.style.width = this.oTextHandle.style.width;
+	this.oSuggestDivHandle.style.width = this.oTextHandle.clientWidth + 'px';
 
 	return true;
 };
