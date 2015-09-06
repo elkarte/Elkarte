@@ -562,7 +562,7 @@ $.sceditor.plugins.bbcode.bbcode
 		}
 	})
 	.set('li', {
-		breakAfter: true
+		breakAfter: false
 	})
 	.set('ul', {
 		tags: {

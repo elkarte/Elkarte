@@ -106,6 +106,7 @@ input:hover, textarea:hover, button:hover, select:hover {
 }
 textarea:hover, .editor:hover {
 	background: #fbfbfb;
+	color: #444;
 }
 input:focus, textarea:focus, button:focus, select:focus, .editor:focus {
 	border: 1px solid #999;

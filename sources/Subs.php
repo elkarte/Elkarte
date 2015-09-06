@@ -1746,8 +1746,8 @@ function parse_bbc($message, $smileys = true, $cache_id = '', $parse_tags = arra
 			{
 				if (!isset($possible['disallow_before'], $possible['disallow_after']))
 					continue;
-				$possible['before'] = isset($possible['disallow_before']) ? $tag['disallow_before'] : $possible['before'];
-				$possible['after'] = isset($possible['disallow_after']) ? $tag['disallow_after'] : $possible['after'];
+				$possible['before'] = isset($possible['disallow_before']) ? $possible['disallow_before'] : $possible['before'];
+				$possible['after'] = isset($possible['disallow_after']) ? $possible['disallow_after'] : $possible['after'];
 			}
 
 			$pos1 = $pos + 1 + $pt_strlen + 1;

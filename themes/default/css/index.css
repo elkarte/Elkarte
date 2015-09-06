@@ -1115,6 +1115,10 @@ a.bbc_link {
 	border: none;
 	white-space: nowrap;
 }
+.linktree:first-child a {
+	height: 2em;
+	padding: 0 6px;
+}
 .linktree:last-child {
 	max-width: 25em;
 }
