@@ -972,6 +972,7 @@ a.active {
 	display: block;
 	margin-top: -45px;
 	padding-top: 45px;
+	visibility: hidden;
 }
 .windowbg {
 	background-color: #f6f6f6;

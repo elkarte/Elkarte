@@ -1018,14 +1018,14 @@ a.bbc_link {
 .listlevel2, .listlevel3 {
 	position: relative;
 	float: none;
-	padding: 1px 0;
+	padding: 0;
 	width: 17em;
 }
 /* Levels 2 and 3 drop menus: link or button. */
 .linklevel2, .linklevel3 {
 	position: relative;
 	display: block;
-	padding: 0 7px;
+	padding: 1px 7px;
 }
 /* @todo - Note: The next declarations are for keyboard access with js disabled. */
 /* Hmm. These are tricky with the new Superfish/Superclick combo. */
