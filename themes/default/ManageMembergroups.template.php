@@ -74,7 +74,7 @@ function template_new_group()
 	if ($context['post_group'] || $context['undefined_group'])
 		echo '
 						<dt id="min_posts_text">
-							<strong><label for="min_posts_input">', $txt['membergroups_min_posts'], '</label>:</strong>
+							<label for="min_posts_input">', $txt['membergroups_min_posts'], ':</label>
 						</dt>
 						<dd>
 							<input type="text" name="min_posts" id="min_posts_input" size="5" class="input_text" />
@@ -679,7 +679,7 @@ function template_group_members()
 					<div class="content">
 						<dl class="settings">
 							<dt>
-								<strong><label for="toAdd">', $txt['membergroups_members_add_desc'], ':</label></strong>
+								<label for="toAdd">', $txt['membergroups_members_add_desc'], ':</label>
 							</dt>
 							<dd>
 								<input type="text" name="toAdd" id="toAdd" value="" class="input_text" />
@@ -735,7 +735,7 @@ function template_group_request_reason()
 	foreach ($context['group_requests'] as $request)
 		echo '
 						<dt>
-							<strong><label for="groupreason">', sprintf($txt['mc_groupr_reason_desc'], $request['member_link'], $request['group_link']), '</label>:</strong>
+							<label for="groupreason">', sprintf($txt['mc_groupr_reason_desc'], $request['member_link'], $request['group_link']), ':</label>
 						</dt>
 						<dd>
 							<input type="hidden" name="groupr[]" value="', $request['id'], '" />

@@ -97,7 +97,7 @@ function template_merge()
 					<hr />
 					<dl class="settings merge_topic">
 						<dt>
-							<strong><label for="topics">', $txt['merge_to_topic_id'], '</label>: </strong>
+							<label for="topics">', $txt['merge_to_topic_id'], '</label>: </strong>
 						</dt>
 						<dd>
 							<form action="', $scripturl, '?action=mergetopics;sa=options" method="post" accept-charset="UTF-8">

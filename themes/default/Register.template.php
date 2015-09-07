@@ -123,7 +123,7 @@ function template_registration_form()
 				<fieldset class="content">
 					<dl class="register_form">
 						<dt>
-							<strong><label for="elk_autov_username">', $txt['username'], ':</label></strong>
+							<label for="elk_autov_username">', $txt['username'], ':</label>
 						</dt>
 						<dd>
 							<input type="text" name="user" id="elk_autov_username" size="30" tabindex="', $context['tabindex']++, '" maxlength="25" value="', isset($context['username']) ? $context['username'] : '', '" class="input_text" placeholder="', $txt['username'], '" required="required" autofocus="autofocus" />
@@ -134,13 +134,13 @@ function template_registration_form()
 							</span>
 						</dd>
 						<dt>
-							<strong><label for="elk_autov_reserve1">', $txt['user_email_address'], ':</label></strong>
+							<label for="elk_autov_reserve1">', $txt['user_email_address'], ':</label>
 						</dt>
 						<dd>
 							<input type="email" name="email" id="elk_autov_reserve1" size="30" tabindex="', $context['tabindex']++, '" value="', isset($context['email']) ? $context['email'] : '', '" class="input_text" placeholder="', $txt['user_email_address'], '" required="required" />
 						</dd>
 						<dt>
-							<strong><label for="allow_email">', $txt['allow_user_email'], ':</label></strong>
+							<label for="allow_email">', $txt['allow_user_email'], ':</label>
 						</dt>
 						<dd>
 							<input type="checkbox" name="allow_email" id="allow_email" tabindex="', $context['tabindex']++, '" class="input_check" />
@@ -171,7 +171,7 @@ function template_registration_form()
 
 	echo '
 					<dl class="register_form" id="password1_group">
-						<dt><strong><label for="elk_autov_pwmain">', $txt['choose_pass'], ':</label></strong></dt>
+						<dt><label for="elk_autov_pwmain">', $txt['choose_pass'], ':</label></dt>
 						<dd>
 							<input type="password" name="passwrd1" id="elk_autov_pwmain" size="30" tabindex="', $context['tabindex']++, '" class="input_password" placeholder="', $txt['choose_pass'], '" required="required" />
 							<span id="elk_autov_pwmain_div" style="display: none;">
@@ -180,7 +180,7 @@ function template_registration_form()
 						</dd>
 					</dl>
 					<dl class="register_form" id="password2_group">
-						<dt><strong><label for="elk_autov_pwverify">', $txt['verify_pass'], ':</label></strong></dt>
+						<dt><label for="elk_autov_pwverify">', $txt['verify_pass'], ':</label></dt>
 						<dd>
 							<input type="password" name="passwrd2" id="elk_autov_pwverify" size="30" tabindex="', $context['tabindex']++, '" class="input_password" placeholder="', $txt['verify_pass'], '" required="required" />
 							<span id="elk_autov_pwverify_div" style="display: none;">
@@ -213,7 +213,7 @@ function template_registration_form()
 			{
 				echo '
 						<dt>
-							<strong', !empty($field['is_error']) ? ' class="error"' : '', '><label for="', $field['colname'], '">', $field['name'], ':</label></strong>
+							<strong', !empty($field['is_error']) ? ' class="error"' : '', '><label for="', $field['colname'], '">', $field['name'], ':</label>
 							<span class="smalltext">', $field['desc'], '</span>
 						</dt>
 						<dd>', preg_replace_callback('~<(input|select|textarea) ~', function ($matches) {
@@ -595,14 +595,14 @@ function template_admin_register()
 					<div class="flow_auto">
 					<dl class="register_form" id="admin_register_form">
 						<dt>
-							<strong><label for="user_input">', $txt['admin_register_username'], ':</label></strong>
+							<label for="user_input">', $txt['admin_register_username'], ':</label>
 							<span class="smalltext">', $txt['admin_register_username_desc'], '</span>
 						</dt>
 						<dd>
 							<input type="text" name="user" id="user_input" tabindex="', $context['tabindex']++, '" size="30" maxlength="25" class="input_text" />
 						</dd>
 						<dt>
-							<strong><label for="email_input">', $txt['admin_register_email'], ':</label></strong>
+							<label for="email_input">', $txt['admin_register_email'], ':</label>
 							<span class="smalltext">', $txt['admin_register_email_desc'], '</span>
 						</dt>
 						<dd>
@@ -610,7 +610,7 @@ function template_admin_register()
 							<input type="email" name="email" id="email_input" tabindex="', $context['tabindex']++, '" size="30" class="input_text" />
 						</dd>
 						<dt>
-							<strong><label for="password_input">', $txt['admin_register_password'], ':</label></strong>
+							<label for="password_input">', $txt['admin_register_password'], ':</label>
 							<span class="smalltext">', $txt['admin_register_password_desc'], '</span>
 						</dt>
 						<dd>
@@ -621,7 +621,7 @@ function template_admin_register()
 	{
 		echo '
 						<dt>
-							<strong><label for="group_select">', $txt['admin_register_group'], ':</label></strong>
+							<label for="group_select">', $txt['admin_register_group'], ':</label>
 							<span class="smalltext">', $txt['admin_register_group_desc'], '</span>
 						</dt>
 						<dd>
@@ -638,14 +638,14 @@ function template_admin_register()
 
 	echo '
 						<dt>
-							<strong><label for="emailPassword_check">', $txt['admin_register_email_detail'], ':</label></strong>
+							<label for="emailPassword_check">', $txt['admin_register_email_detail'], ':</label>
 							<span class="smalltext">', $txt['admin_register_email_detail_desc'], '</span>
 						</dt>
 						<dd>
 							<input type="checkbox" name="emailPassword" id="emailPassword_check" tabindex="', $context['tabindex']++, '" checked="checked" disabled="disabled" class="input_check" />
 						</dd>
 						<dt>
-							<strong><label for="emailActivate_check">', $txt['admin_register_email_activate'], ':</label></strong>
+							<label for="emailActivate_check">', $txt['admin_register_email_activate'], ':</label>
 						</dt>
 						<dd>
 							<input type="checkbox" name="emailActivate" id="emailActivate_check" tabindex="', $context['tabindex']++, '"', !empty($modSettings['registration_method']) && $modSettings['registration_method'] == 1 ? ' checked="checked"' : '', ' onclick="onCheckChange();" class="input_check" />

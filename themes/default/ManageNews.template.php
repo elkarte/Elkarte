@@ -57,14 +57,14 @@ function template_email_members()
 	echo '
 						</dd>
 						<dt>
-							<strong><label for="emails">', $txt['admin_news_select_email'], '</label>:</strong><br />
+							<label for="emails">', $txt['admin_news_select_email'], ':</label><br />
 							<span class="smalltext">', $txt['admin_news_select_email_desc'], '</span>
 						</dt>
 						<dd>
 							<textarea id="emails" name="emails" rows="5" cols="30" style="' . (isBrowser('is_ie8') ? 'width: 635px; max-width: 98%; min-width: 98%' : 'width: 98%') . ';"></textarea>
 						</dd>
 						<dt>
-							<strong><label for="members">', $txt['admin_news_select_members'], '</label>:</strong><br />
+							<label for="members">', $txt['admin_news_select_members'], ':</label><br />
 							<span class="smalltext">', $txt['admin_news_select_members_desc'], '</span>
 						</dt>
 						<dd>

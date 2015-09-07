@@ -65,13 +65,13 @@ function template_modifyset()
 				<div class="content">
 					<dl class="settings">
 						<dt>
-							<strong><label for="smiley_sets_name">', $txt['smiley_sets_name'], '</label>: </strong>
+							<label for="smiley_sets_name">', $txt['smiley_sets_name'], '</label>: </strong>
 						</dt>
 						<dd>
 							<input type="text" name="smiley_sets_name" id="smiley_sets_name" value="', $context['current_set']['name'], '" class="input_text" />
 						</dd>
 						<dt>
-							<strong><label for="smiley_sets_path">', $txt['smiley_sets_url'], '</label>: </strong>
+							<label for="smiley_sets_path">', $txt['smiley_sets_url'], '</label>: </strong>
 						</dt>
 						<dd>
 							', $modSettings['smileys_url'], '/';
@@ -99,7 +99,7 @@ function template_modifyset()
 							/..
 						</dd>
 						<dt>
-							<strong><label for="smiley_sets_default">', $txt['smiley_set_select_default'], '</label>: </strong>
+							<label for="smiley_sets_default">', $txt['smiley_set_select_default'], '</label>: </strong>
 						</dt>
 						<dd>
 							<input type="checkbox" name="smiley_sets_default" id="smiley_sets_default" value="1"', $context['current_set']['selected'] ? ' checked="checked"' : '', ' class="input_check" />
@@ -109,7 +109,7 @@ function template_modifyset()
 	if ($context['current_set']['is_new'] && !empty($modSettings['smiley_enable']))
 		echo '
 						<dt>
-							<strong><label for="smiley_sets_import">', $txt['smiley_set_import_directory'], '</label>: </strong>
+							<label for="smiley_sets_import">', $txt['smiley_set_import_directory'], '</label>: </strong>
 						</dt>
 						<dd>
 							<input type="checkbox" name="smiley_sets_import" id="smiley_sets_import" value="1" class="input_check" />
@@ -156,13 +156,13 @@ function template_modifysmiley()
 							</select>)
 						</dd>
 						<dt>
-							<strong><label for="smiley_code">', $txt['smileys_code'], '</label>: </strong>
+							<label for="smiley_code">', $txt['smileys_code'], '</label>: </strong>
 						</dt>
 						<dd>
 							<input type="text" name="smiley_code" id="smiley_code" value="', $context['current_smiley']['code'], '" class="input_text" />
 						</dd>
 						<dt>
-							<strong><label for="smiley_filename">', $txt['smileys_filename'], '</label>: </strong>
+							<label for="smiley_filename">', $txt['smileys_filename'], '</label>: </strong>
 						</dt>
 						<dd>';
 
@@ -185,13 +185,13 @@ function template_modifysmiley()
 	echo '
 						</dd>
 						<dt>
-							<strong><label for="smiley_description">', $txt['smileys_description'], '</label>: </strong>
+							<label for="smiley_description">', $txt['smileys_description'], '</label>: </strong>
 						</dt>
 						<dd>
 							<input type="text" name="smiley_description" id="smiley_description" value="', $context['current_smiley']['description'], '" class="input_text" />
 						</dd>
 						<dt>
-							<strong><label for="smiley_location">', $txt['smileys_location'], '</label>: </strong>
+							<label for="smiley_location">', $txt['smileys_location'], '</label>: </strong>
 						</dt>
 						<dd>
 							<select name="smiley_location" id="smiley_location">
@@ -268,7 +268,7 @@ function template_addsmiley()
 								</select>
 							</dd>
 							<dt>
-								<strong><label for="smiley_filename">', $txt['smileys_filename'], '</label>: </strong>
+								<label for="smiley_filename">', $txt['smileys_filename'], '</label>: </strong>
 							</dt>
 							<dd>';
 
@@ -302,7 +302,7 @@ function template_addsmiley()
 								<input type="file" name="uploadSmiley" id="uploadSmiley" onchange="selectMethod(\'upload\');" class="input_file" />
 							</dd>
 							<dt>
-								<strong><label for="sameall">', $txt['smileys_add_upload_all'], ':</label></strong>
+								<label for="sameall">', $txt['smileys_add_upload_all'], ':</label>
 							</dt>
 							<dd>
 								<input type="checkbox" name="sameall" id="sameall" checked="checked" class="input_check" onclick="swapUploads(); selectMethod(\'upload\');" />
@@ -330,19 +330,19 @@ function template_addsmiley()
 				<div class="content">
 					<dl class="settings">
 						<dt>
-							<strong><label for="smiley_code">', $txt['smileys_code'], '</label>: </strong>
+							<label for="smiley_code">', $txt['smileys_code'], '</label>: </strong>
 						</dt>
 						<dd>
 							<input type="text" name="smiley_code" id="smiley_code" value="" class="input_text" />
 						</dd>
 						<dt>
-							<strong><label for="smiley_description">', $txt['smileys_description'], '</label>: </strong>
+							<label for="smiley_description">', $txt['smileys_description'], '</label>: </strong>
 						</dt>
 						<dd>
 							<input type="text" name="smiley_description" id="smiley_description" value="" class="input_text" />
 						</dd>
 						<dt>
-							<strong><label for="smiley_location">', $txt['smileys_location'], '</label>: </strong>
+							<label for="smiley_location">', $txt['smileys_location'], '</label>: </strong>
 						</dt>
 						<dd>
 							<select name="smiley_location" id="smiley_location">
@@ -476,24 +476,24 @@ function template_editicon()
 
 	echo '
 						<dt>
-							<strong><label for="icon_filename">', $txt['smileys_filename'], '</label>: </strong><br /><span class="smalltext">', $txt['icons_filename_all_png'], '</span>
+							<label for="icon_filename">', $txt['smileys_filename'], '</label>: </strong><br /><span class="smalltext">', $txt['icons_filename_all_png'], '</span>
 						</dt>
 						<dd>
 							<input type="text" name="icon_filename" id="icon_filename" value="', !empty($context['icon']['filename']) ? $context['icon']['filename'] . '.png' : '', '" class="input_text" />
 						</dd>
 						<dt>
-							<strong><label for="icon_description">', $txt['smileys_description'], '</label>: </strong>
+							<label for="icon_description">', $txt['smileys_description'], '</label>: </strong>
 						</dt>
 						<dd>
 							<input type="text" name="icon_description" id="icon_description" value="', !empty($context['icon']['title']) ? $context['icon']['title'] : '', '" class="input_text" />
 						</dd>
 						<dt>
-							<strong><label for="icon_board_select">', $txt['icons_board'], '</label>: </strong>
+							<label for="icon_board_select">', $txt['icons_board'], '</label>: </strong>
 						</dt>
 						<dd>', template_select_boards('icon_board', '', '', true), '
 						</dd>
 						<dt>
-							<strong><label for="icon_location">', $txt['smileys_location'], '</label>: </strong>
+							<label for="icon_location">', $txt['smileys_location'], '</label>: </strong>
 						</dt>
 						<dd>
 							<select name="icon_location" id="icon_location">

@@ -84,7 +84,7 @@ function template_issueWarning()
 
 	echo '
 					<dt>
-						<strong><label for="warning_level">', $txt['profile_warning_level'], '</label>:</strong>
+						<label for="warning_level">', $txt['profile_warning_level'], ':</label>
 							<div class="smalltext">', $txt['profile_warning_impact'], ':<br />';
 
 	// For non-javascript give a better list.
@@ -117,7 +117,7 @@ function template_issueWarning()
 	{
 		echo '
 					<dt>
-						<strong><label for="warn_reason">', $txt['profile_warning_reason'], '</label>:</strong><br />
+						<label for="warn_reason">', $txt['profile_warning_reason'], ':</label><br />
 						<span class="smalltext">', $txt['profile_warning_reason_desc'], '</span>
 					</dt>
 					<dd>
@@ -138,19 +138,19 @@ function template_issueWarning()
 				</div>
 				<dl class="settings">
 					<dt>
-						<strong><label for="warn_notify">', $txt['profile_warning_notify'], ':</label></strong>
+						<label for="warn_notify">', $txt['profile_warning_notify'], ':</label>
 					</dt>
 					<dd>
 						<input type="checkbox" name="warn_notify" id="warn_notify" onclick="modifyWarnNotify();" ', $context['warning_data']['notify'] ? 'checked="checked"' : '', ' class="input_check" />
 					</dd>
 					<dt>
-						<strong><label for="warn_sub">', $txt['profile_warning_notify_subject'], ':</label></strong>
+						<label for="warn_sub">', $txt['profile_warning_notify_subject'], ':</label>
 					</dt>
 					<dd>
 						<input type="text" name="warn_sub" id="warn_sub" value="', empty($context['warning_data']['notify_subject']) ? $txt['profile_warning_notify_template_subject'] : $context['warning_data']['notify_subject'], '" size="50" style="width: 80%;" class="input_text" />
 					</dd>
 					<dt>
-						<strong><label for="warn_temp">', $txt['profile_warning_notify_body'], ':</label></strong>
+						<label for="warn_temp">', $txt['profile_warning_notify_body'], ':</label>
 					</dt>
 					<dd>
 						<div class="padding">

@@ -245,7 +245,7 @@ function template_modify_user_subscription()
 	if ($context['action_type'] == 'add')
 		echo '
 						<dt>
-							<strong><label for="name_control">', $txt['paid_username'], '</label>:</strong><br />
+							<label for="name_control">', $txt['paid_username'], ':</label><br />
 							<span class="smalltext">', $txt['one_username'], '</span>
 						</dt>
 						<dd>
@@ -254,7 +254,7 @@ function template_modify_user_subscription()
 
 	echo '
 						<dt>
-							<strong><label for="status">', $txt['paid_status'], '</label>:</strong>
+							<label for="status">', $txt['paid_status'], ':</label>
 						</dt>
 						<dd>
 							<select id="status" name="status">
@@ -437,7 +437,7 @@ function template_user_subscription()
 			if ($context['user']['is_owner'])
 			{
 				echo '
-					<strong><label for="cur', $subscription['id'], '">', $txt['paid_cost'], '</label>:</strong>';
+					<label for="cur', $subscription['id'], '">', $txt['paid_cost'], ':</label>';
 
 				if ($subscription['flexible'])
 				{

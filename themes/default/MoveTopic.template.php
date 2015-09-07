@@ -50,7 +50,7 @@ function template_move_topic()
 						<label for="reset_subject"><input type="checkbox" name="reset_subject" id="reset_subject" onclick="document.getElementById(\'subjectArea\').style.display = this.checked ? \'block\' : \'none\';" class="input_check" /> ', $txt['moveTopic2'], '.</label><br />
 						<fieldset id="subjectArea" style="display: none;">
 							<dl class="settings">
-								<dt><strong><label for="custom_subject">', $txt['moveTopic3'], '</label>:</strong></dt>
+								<dt><label for="custom_subject">', $txt['moveTopic3'], ':</label></dt>
 								<dd><input type="text" id="custom_subject" name="custom_subject" size="30" value="', $context['subject'], '" class="input_text" /></dd>
 							</dl>
 							<label for="enforce_subject"><input type="checkbox" name="enforce_subject" id="enforce_subject" class="input_check" /> ', $txt['moveTopic4'], '.</label>

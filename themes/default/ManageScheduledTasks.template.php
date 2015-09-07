@@ -81,7 +81,7 @@ function template_edit_scheduled_tasks()
 							<span class="smalltext">', $context['task']['desc'], '</span>
 						</dd>
 						<dt>
-							<strong><label for="regularity">', $txt['scheduled_task_edit_interval'], ':</label></strong>
+							<label for="regularity">', $txt['scheduled_task_edit_interval'], ':</label>
 						</dt>
 						<dd>
 							', $txt['scheduled_task_edit_repeat'], '
@@ -96,14 +96,14 @@ function template_edit_scheduled_tasks()
 							</select>
 						</dd>
 						<dt>
-							<strong><label for="start_time">', $txt['scheduled_task_edit_start_time'], ':</label></strong><br />
+							<label for="start_time">', $txt['scheduled_task_edit_start_time'], ':</label><br />
 							<span class="smalltext">', $txt['scheduled_task_edit_start_time_desc'], '</span>
 						</dt>
 						<dd>
 							<input type="text" name="offset" id="start_time" value="', $context['task']['offset_formatted'], '" size="6" maxlength="5" class="input_text" />
 						</dd>
 						<dt>
-							<strong><label for="enabled">', $txt['scheduled_tasks_enabled'], ':</label></strong>
+							<label for="enabled">', $txt['scheduled_tasks_enabled'], ':</label>
 						</dt>
 						<dd>
 							<input type="checkbox" name="enabled" id="enabled" ', !$context['task']['disabled'] ? 'checked="checked"' : '', ' class="input_check" />

@@ -419,7 +419,7 @@ function template_edit_options()
 		echo '
 					<dl>
 						<dt>
-							<strong', isset($context['modify_error']['bad_password']) || isset($context['modify_error']['no_password']) ? ' class="error"' : '', '><label for="oldpasswrd">', $txt['current_password'], '</label></strong><br />
+							<strong', isset($context['modify_error']['bad_password']) || isset($context['modify_error']['no_password']) ? ' class="error"' : '', '><label for="oldpasswrd">', $txt['current_password'], '</label><br />
 							<span class="smalltext">', $txt['required_security_reasons'], '</span>
 						</dt>
 						<dd>
@@ -1296,7 +1296,7 @@ function template_profile_timeformat_modify()
 
 	echo '
 							<dt>
-								<strong><label for="easyformat">', $txt['time_format'], '</label></strong><br />
+								<label for="easyformat">', $txt['time_format'], '</label><br />
 								<a href="', $scripturl, '?action=quickhelp;help=time_format" onclick="return reqOverlayDiv(this.href);" class="help"><img src="', $settings['images_url'], '/helptopics.png" alt="', $txt['help'], '" class="icon" /></a>
 								<span>&nbsp;<label for="time_format">', $txt['date_format'], '</label></span>
 							</dt>
@@ -1324,7 +1324,7 @@ function template_profile_timeoffset_modify()
 
 	echo '
 							<dt>
-								<strong', (isset($context['modify_error']['bad_offset']) ? ' class="error"' : ''), '><label for="time_offset">', $txt['time_offset'], '</label></strong><br />
+								<strong', (isset($context['modify_error']['bad_offset']) ? ' class="error"' : ''), '><label for="time_offset">', $txt['time_offset'], '</label><br />
 								<span>', $txt['personal_time_offset'], '</span>
 							</dt>
 							<dd>
@@ -1357,7 +1357,7 @@ function template_profile_smiley_pick()
 
 	echo '
 							<dt>
-								<strong><label for="smiley_set">', $txt['smileys_current'], '</label></strong>
+								<label for="smiley_set">', $txt['smileys_current'], '</label>
 							</dt>
 							<dd>
 								<select name="smiley_set" id="smiley_set" onchange="document.getElementById(\'smileypr\').src = this.selectedIndex == 0 ? \'', $settings['images_url'], '/blank.png\' : \'', $modSettings['smileys_url'], '/\' + (this.selectedIndex != 1 ? this.options[this.selectedIndex].value : \'', !empty($settings['smiley_sets_default']) ? $settings['smiley_sets_default'] : $modSettings['smiley_sets_default'], '\') + \'/smiley.gif\';">';
@@ -1391,13 +1391,13 @@ function template_authentication_method()
 					<dl>
 						<dt>
 							<input type="radio" onclick="updateAuthMethod();" name="authenticate" value="openid" id="auth_openid"', $context['auth_method'] == 'openid' ? ' checked="checked"' : '', ' class="input_radio" />
-							<strong><label for="auth_openid">', $txt['authenticate_openid'], '</label></strong>
+							<label for="auth_openid">', $txt['authenticate_openid'], '</label>
 							<a href="', $scripturl, '?action=quickhelp;help=register_openid" onclick="return reqOverlayDiv(this.href);" class="help">
 								<img class="icon" src="', $settings['images_url'], '/helptopics.png" alt="(?)" />
 							</a>
 							<br />
 							<input type="radio" onclick="updateAuthMethod();" name="authenticate" value="passwd" id="auth_pass"', $context['auth_method'] == 'password' ? ' checked="checked"' : '', ' class="input_radio" />
-							<strong><label for="auth_pass">', $txt['authenticate_password'], '</label></strong>
+							<label for="auth_pass">', $txt['authenticate_password'], '</label>
 						</dt>
 						<dd>
 							<dl id="openid_group">
@@ -1434,7 +1434,7 @@ function template_authentication_method()
 					<hr class="clear" />
 					<dl>
 						<dt>
-							<strong', isset($context['modify_error']['bad_password']) || isset($context['modify_error']['no_password']) ? ' class="error"' : '', '><label for="oldpasswrd">', $txt['current_password'], '</label></strong><br />
+							<strong', isset($context['modify_error']['bad_password']) || isset($context['modify_error']['no_password']) ? ' class="error"' : '', '><label for="oldpasswrd">', $txt['current_password'], '</label><br />
 							<span class="smalltext">', $txt['required_security_reasons'], '</span>
 						</dt>
 						<dd>

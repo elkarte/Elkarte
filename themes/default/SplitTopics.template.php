@@ -39,7 +39,7 @@ function template_ask()
 				<div class="content">
 					<div class="split_topics">
 						<p>
-							<strong><label for="subname">', $txt['subject_new_topic'], '</label>:</strong>
+							<label for="subname">', $txt['subject_new_topic'], ':</label>
 							<input type="text" name="subname" id="subname" value="', $context['message']['subject'], '" size="25" class="input_text" autofocus="autofocus" />
 						</p>
 						<ul class="split_topics">

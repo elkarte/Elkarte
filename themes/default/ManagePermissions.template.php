@@ -386,13 +386,13 @@ function template_edit_profiles()
 				<div class="content">
 					<dl class="settings">
 						<dt>
-							<strong><label for="profile_name">', $txt['permissions_profile_name'], '</label>:</strong>
+							<label for="profile_name">', $txt['permissions_profile_name'], ':</label>
 						</dt>
 						<dd>
 							<input type="text" id="profile_name" name="profile_name" value="" class="input_text" />
 						</dd>
 						<dt>
-							<strong><label for="copy_from">', $txt['permissions_profile_copy_from'], '</label>:</strong>
+							<label for="copy_from">', $txt['permissions_profile_copy_from'], ':</label>
 						</dt>
 						<dd>
 							<select id="copy_from" name="copy_from">';

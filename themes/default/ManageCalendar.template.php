@@ -31,13 +31,13 @@ function template_edit_holiday()
 				<div class="content">
 					<dl class="settings">
 						<dt class="small_caption">
-							<strong><label for="title">', $txt['holidays_title_label'], '</label>:</strong>
+							<label for="title">', $txt['holidays_title_label'], ':</label>
 						</dt>
 						<dd class="small_caption">
 							<input type="text" id="title" name="title" value="', $context['holiday']['title'], '" size="55" maxlength="60" />
 						</dd>
 						<dt class="small_caption">
-							<strong><label for="year">', $txt['calendar_year'], '</label></strong>
+							<label for="year">', $txt['calendar_year'], '</label>
 						</dt>
 						<dd class="small_caption">
 							<select name="year" id="year" onchange="generateDays();">
@@ -50,7 +50,7 @@ function template_edit_holiday()
 
 	echo '
 							</select>
-							<strong>&nbsp;<label for="month">', $txt['calendar_month'], '</label></strong>
+							<strong>&nbsp;<label for="month">', $txt['calendar_month'], '</label>
 							<select name="month" id="month" onchange="generateDays();">';
 
 	// There are 12 months per year - ensure that they all get listed.
@@ -60,7 +60,7 @@ function template_edit_holiday()
 
 	echo '
 							</select>
-							<strong>&nbsp;<label for="day">', $txt['calendar_day'], '</label></strong>
+							<strong>&nbsp;<label for="day">', $txt['calendar_day'], '</label>
 							<select name="day" id="day" onchange="generateDays();">';
 
 	// This prints out all the days in the current month - this changes dynamically as we switch months.

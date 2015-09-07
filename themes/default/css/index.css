@@ -1524,25 +1524,23 @@ a.bbc_link {
 }
 
 
-/* $SETTINGS	*/
+/* $SETTINGS                                               */
 /* ------------------------------------------------------- */
-
-/* Lists - settings use these a lot.
-/* @todo - Inefficient selector. Should not need dl tag. */
-dl.settings {
+/* Lists - settings use these a lot.                       */
+.settings {
 	clear: right;
 	overflow: auto;
 	margin: 0 0 10px 0;
 	padding: 0;
 }
-dl.settings dt {
+.settings dt {
 	float: left;
 	clear: both;
 	margin: 0 0 10px 0;
 	padding: 0;
 	width: 40%;
 }
-dl.settings .settings_title {
+.settings .settings_title {
 	float: none;
 	clear: both;
 	margin: 0 0 10px 0;
@@ -1550,15 +1548,7 @@ dl.settings .settings_title {
 	width: 100%;
 	font-weight: bold;
 }
-/* @todo -Inefficient selector. Should not need dl or dt tags. */
-dl.settings dt.windowbg {
-	float: left;
-	clear: both;
-	margin: 0 0 3px 0;
-	padding: 0 0 5px 0;
-	width: 98%;
-}
-dl.settings dd {
+.settings dd {
 	float: right;
 	overflow: auto;
 	margin: 0 0 3px 0;
@@ -1571,21 +1561,23 @@ dl.settings dd {
 .settings dd>fieldset dd, .settings dd>fieldset dt {
 	margin: 0;
 }
-dl.settings img {
+.settings img {
 	margin: 0 10px 0 0;
 	vertical-align: middle;
 }
 /* help icons */
-dl.settings dt a img {
+.settings dt a img {
 	position: relative;
 	vertical-align: top;
 }
-dl.settings textarea {
+.settings textarea {
 	width: 85%;
 	padding: 0 0.5em;
 }
-dl.settings label {
+.settings label {
 	vertical-align: top;
+	font-weight: 600;
+	color: #666;
 }
 .settings .smalldescription {
 	padding-left: 1em;

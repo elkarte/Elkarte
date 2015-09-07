@@ -198,7 +198,7 @@ function template_modify_category()
 	if (count($context['category_order']) > 1)
 	{
 		echo '
-						<dt><strong><label for="cat_order">', $txt['order'], '</label>:</strong></dt>
+						<dt><label for="cat_order">', $txt['order'], ':</label></dt>
 						<dd>
 							<select id="cat_order" name="cat_order">';
 
@@ -215,7 +215,7 @@ function template_modify_category()
 	// Allow the user to edit the category name and/or choose whether you can collapse the category.
 	echo '
 						<dt>
-							<strong><label for="cat_name">', $txt['full_name'], '</label>:</strong><br />
+							<label for="cat_name">', $txt['full_name'], ':</label><br />
 							<span class="smalltext">', $txt['name_on_display'], '</span>
 						</dt>
 						<dd>
@@ -343,7 +343,7 @@ function template_modify_board()
 	echo '
 
 						<dt>
-							<strong><label for="new_cat">', $txt['mboards_category'], '</label>:</strong>
+							<label for="new_cat">', $txt['mboards_category'], ':</label>
 						</dt>
 						<dd>
 							<select id="new_cat" name="new_cat" onchange="if (this.form.order) {this.form.order.disabled = this.options[this.selectedIndex].value != 0; this.form.board_order.disabled = this.options[this.selectedIndex].value != 0 || this.form.order.options[this.form.order.selectedIndex].value == \'\';}">';
@@ -361,7 +361,7 @@ function template_modify_board()
 	{
 		echo '
 						<dt>
-							<strong><label for="order">', $txt['order'], '</label>:</strong>
+							<label for="order">', $txt['order'], ':</label>
 						</dt>
 						<dd>';
 
@@ -391,21 +391,21 @@ function template_modify_board()
 	// Options for board name and description.
 	echo '
 						<dt>
-							<strong><label for="board_name">', $txt['full_name'], '</label>:</strong><br />
+							<label for="board_name">', $txt['full_name'], ':</label><br />
 							<span class="smalltext">', $txt['name_on_display'], '</span>
 						</dt>
 						<dd>
 							<input type="text" id="board_name" name="board_name" value="', $context['board']['name'], '" size="30" class="input_text" />
 						</dd>
 						<dt>
-							<strong><label for="desc">', $txt['mboards_description'], '</label>:</strong><br />
+							<label for="desc">', $txt['mboards_description'], ':</label><br />
 							<span class="smalltext">', $txt['mboards_description_desc'], '</span>
 						</dt>
 						<dd>
 							<textarea id="desc" name="desc" rows="3" cols="35" style="' . (isBrowser('is_ie8') ? 'width: 635px; max-width: 99%; min-width: 99%' : 'width: 99%') . ';">', $context['board']['description'], '</textarea>
 						</dd>
 						<dt>
-							<strong><label for="profile">', $txt['permission_profile'], '</label>:</strong><br />
+							<label for="profile">', $txt['permission_profile'], ':</label><br />
 							<span class="smalltext">', $context['can_manage_permissions'] ? sprintf($txt['permission_profile_desc'], $scripturl . '?action=admin;area=permissions;sa=profiles;' . $context['session_var'] . '=' . $context['session_id']) : strip_tags($txt['permission_profile_desc']), '</span>
 						</dt>
 						<dd>
@@ -504,7 +504,7 @@ function template_modify_board()
 	// Options to choose moderators, specify as announcement board and choose whether to count posts here.
 	echo '
 						<dt>
-							<strong><label for="moderators">', $txt['mboards_moderators'], '</label>:</strong><br />
+							<label for="moderators">', $txt['mboards_moderators'], ':</label><br />
 							<span class="smalltext">', $txt['mboards_moderators_desc'], '</span><br />
 						</dt>
 						<dd>
@@ -528,7 +528,7 @@ function template_modify_board()
 		echo '
 					<dl class="settings">
 						<dt>
-							<strong><label for="redirect_enable">', $txt['mboards_redirect'], '</label>:</strong><br />
+							<label for="redirect_enable">', $txt['mboards_redirect'], ':</label><br />
 							<span class="smalltext">', $txt['mboards_redirect_desc'], '</span><br />
 						</dt>
 						<dd>
@@ -553,7 +553,7 @@ function template_modify_board()
 					<div id="redirect_address_div">
 						<dl class="settings">
 							<dt>
-								<strong><label for="redirect_address">', $txt['mboards_redirect_url'], '</label>:</strong><br />
+								<label for="redirect_address">', $txt['mboards_redirect_url'], ':</label><br />
 								<span class="smalltext">', $txt['mboards_redirect_url_desc'], '</span><br />
 							</dt>
 							<dd>
@@ -567,7 +567,7 @@ function template_modify_board()
 					<div id="reset_redirect_div">
 						<dl class="settings">
 							<dt>
-								<strong><label for="reset_redirect">', $txt['mboards_redirect_reset'], '</label>:</strong><br />
+								<label for="reset_redirect">', $txt['mboards_redirect_reset'], ':</label><br />
 								<span class="smalltext">', $txt['mboards_redirect_reset_desc'], '</span><br />
 							</dt>
 							<dd>
@@ -582,7 +582,7 @@ function template_modify_board()
 					<div id="count_posts_div">
 						<dl class="settings">
 							<dt>
-								<strong><label for="count">', $txt['mboards_count_posts'], '</label>:</strong><br />
+								<label for="count">', $txt['mboards_count_posts'], ':</label><br />
 								<span class="smalltext">', $txt['mboards_count_posts_desc'], '</span><br />
 							</dt>
 							<dd>
@@ -596,7 +596,7 @@ function template_modify_board()
 					<div id="board_theme_div">
 						<dl class="settings">
 							<dt>
-								<strong><label for="boardtheme">', $txt['mboards_theme'], '</label>:</strong><br />
+								<label for="boardtheme">', $txt['mboards_theme'], ':</label><br />
 								<span class="smalltext">', $txt['mboards_theme_desc'], '</span><br />
 							</dt>
 							<dd>
@@ -615,7 +615,7 @@ function template_modify_board()
 					<div id="override_theme_div">
 						<dl class="settings">
 							<dt>
-								<strong><label for="override_theme">', $txt['mboards_override_theme'], '</label>:</strong><br />
+								<label for="override_theme">', $txt['mboards_override_theme'], ':</label><br />
 								<span class="smalltext">', $txt['mboards_override_theme_desc'], '</span><br />
 							</dt>
 							<dd>

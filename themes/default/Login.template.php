@@ -259,7 +259,7 @@ function template_admin_login()
 			<div class="errorbox">', $txt['admin_incorrect_password'], '</div>';
 
 	echo '
-			<strong><label for="', $context['sessionCheckType'], '_pass">', $txt['password'], '</label>:</strong>
+			<label for="', $context['sessionCheckType'], '_pass">', $txt['password'], ':</label>
 			<input type="password" name="', $context['sessionCheckType'], '_pass" id="', $context['sessionCheckType'], '_pass" size="24" class="input_password" autofocus="autofocus" placeholder="', $txt['password'], '"/>
 			<a href="', $scripturl, '?action=quickhelp;help=securityDisable_why" onclick="return reqOverlayDiv(this.href);" class="help">
 				<img class="icon" src="', $settings['images_url'], '/helptopics.png" alt="', $txt['help'], '" />

@@ -510,13 +510,13 @@ function template_moderation_settings()
 	{
 		echo '
 						<dt>
-							<strong><label for="mod_show_reports">', $txt['mc_prefs_show_reports'], '</label>:</strong>
+							<label for="mod_show_reports">', $txt['mc_prefs_show_reports'], ':</label>
 						</dt>
 						<dd>
 							<input type="checkbox" id="mod_show_reports" name="mod_show_reports" ', $context['mod_settings']['show_reports'] ? 'checked="checked"' : '', ' class="input_check" />
 						</dd>
 						<dt>
-							<strong><label for="mod_notify_report">', $txt['mc_prefs_notify_report'], '</label>:</strong>
+							<label for="mod_notify_report">', $txt['mc_prefs_notify_report'], ':</label>
 						</dt>
 						<dd>
 							<select id="mod_notify_report" name="mod_notify_report">
@@ -531,7 +531,7 @@ function template_moderation_settings()
 	{
 		echo '
 						<dt>
-							<strong><label for="mod_notify_approval">', $txt['mc_prefs_notify_approval'], '</label>:</strong>
+							<label for="mod_notify_approval">', $txt['mc_prefs_notify_approval'], ':</label>
 						</dt>
 						<dd>
 							<input type="checkbox" id="mod_notify_approval" name="mod_notify_approval" ', $context['mod_settings']['notify_approval'] ? 'checked="checked"' : '', ' class="input_check" />
@@ -623,13 +623,13 @@ function template_warn_template()
 					</div>
 					<dl class="settings">
 						<dt>
-							<strong><label for="template_title">', $txt['mc_warning_template_title'], '</label>:</strong>
+							<label for="template_title">', $txt['mc_warning_template_title'], ':</label>
 						</dt>
 						<dd>
 							<input type="text" id="template_title" name="template_title" value="', $context['template_data']['title'], '" size="30" class="input_text" />
 						</dd>
 						<dt>
-							<strong><label for="template_body">', $txt['profile_warning_notify_body'], '</label>:</strong><br />
+							<label for="template_body">', $txt['profile_warning_notify_body'], ':</label><br />
 							<span class="smalltext">', $txt['mc_warning_template_body_desc'], '</span>
 						</dt>
 						<dd>

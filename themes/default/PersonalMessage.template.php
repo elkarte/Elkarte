@@ -1205,7 +1205,7 @@ function template_labels()
 			<div class="content">
 				<dl class="settings">
 					<dt>
-						<strong><label for="add_label">', $txt['pm_label_name'], '</label>:</strong>
+						<label for="add_label">', $txt['pm_label_name'], ':</label>
 					</dt>
 					<dd>
 						<input type="text" id="add_label" name="label" value="" size="30" maxlength="30" class="input_text" />
@@ -1380,7 +1380,7 @@ function template_add_rule()
 			<div class="content">
 				<dl class="addrules">
 					<dt class="floatleft">
-						<strong><label for="rule_name">', $txt['pm_rule_name'], '</label>:</strong><br />
+						<label for="rule_name">', $txt['pm_rule_name'], ':</label><br />
 						<span class="smalltext">', $txt['pm_rule_name_desc'], '</span>
 					</dt>
 					<dd class="floatleft">

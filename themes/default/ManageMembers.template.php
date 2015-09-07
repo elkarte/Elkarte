@@ -36,7 +36,7 @@ function template_search_members()
 						<div class="msearch_details floatleft">
 							<dl class="settings right">
 								<dt class="righttext">
-									<strong><label for="mem_id">', $txt['member_id'], ':</label></strong>
+									<label for="mem_id">', $txt['member_id'], ':</label>
 									<select name="types[mem_id]">
 										<option value="--">&lt;</option>
 										<option value="-">&lt;=</option>
@@ -49,7 +49,7 @@ function template_search_members()
 									<input type="text" name="mem_id" id="mem_id" value="" size="6" class="input_text" />
 								</dd>
 								<dt class="righttext">
-									<strong><label for="age">', $txt['age'], ':</label></strong>
+									<label for="age">', $txt['age'], ':</label>
 									<select name="types[age]">
 										<option value="--">&lt;</option>
 										<option value="-">&lt;=</option>
@@ -62,7 +62,7 @@ function template_search_members()
 									<input type="text" name="age" id="age" value="" size="6" class="input_text" />
 								</dd>
 								<dt class="righttext">
-									<strong><label for="posts">', $txt['member_postcount'], ':</label></strong>
+									<label for="posts">', $txt['member_postcount'], ':</label>
 									<select name="types[posts]">
 										<option value="--">&lt;</option>
 										<option value="-">&lt;=</option>
@@ -75,7 +75,7 @@ function template_search_members()
 									<input type="text" name="posts" id="posts" value="" size="6" class="input_text" />
 								</dd>
 								<dt class="righttext">
-									<strong><label for="reg_date">', $txt['date_registered'], ':</label></strong>
+									<label for="reg_date">', $txt['date_registered'], ':</label>
 									<select name="types[reg_date]">
 										<option value="--">&lt;</option>
 										<option value="-">&lt;=</option>
@@ -88,7 +88,7 @@ function template_search_members()
 									<input type="text" name="reg_date" id="reg_date" value="" size="10" class="input_text" /><span class="smalltext">', $txt['date_format'], '</span>
 								</dd>
 								<dt class="righttext">
-									<strong><label for="last_online">', $txt['viewmembers_online'], ':</label></strong>
+									<label for="last_online">', $txt['viewmembers_online'], ':</label>
 									<select name="types[last_online]">
 										<option value="--">&lt;</option>
 										<option value="-">&lt;=</option>
@@ -105,31 +105,31 @@ function template_search_members()
 						<div class="msearch_details floatright">
 							<dl class="settings right">
 								<dt class="righttext">
-									<strong><label for="membername">', $txt['username'], ':</label></strong>
+									<label for="membername">', $txt['username'], ':</label>
 								</dt>
 								<dd>
 									<input type="text" name="membername" id="membername" value="" class="input_text" />
 								</dd>
 								<dt class="righttext">
-									<strong><label for="email">', $txt['email_address'], ':</label></strong>
+									<label for="email">', $txt['email_address'], ':</label>
 								</dt>
 								<dd>
 									<input type="text" name="email" id="email" value="" class="input_text" />
 								</dd>
 								<dt class="righttext">
-									<strong><label for="website">', $txt['website'], ':</label></strong>
+									<label for="website">', $txt['website'], ':</label>
 								</dt>
 								<dd>
 									<input type="text" name="website" id="website" value="" class="input_text" />
 								</dd>
 								<dt class="righttext">
-									<strong><label for="location">', $txt['location'], ':</label></strong>
+									<label for="location">', $txt['location'], ':</label>
 								</dt>
 								<dd>
 									<input type="text" name="location" id="location" value="" class="input_text" />
 								</dd>
 								<dt class="righttext">
-									<strong><label for="ip">', $txt['ip_address'], ':</label></strong>
+									<label for="ip">', $txt['ip_address'], ':</label>
 								</dt>
 								<dd>
 									<input type="text" name="ip" id="ip" value="" class="input_text" />

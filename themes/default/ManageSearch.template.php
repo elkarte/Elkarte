@@ -358,21 +358,21 @@ function template_spider_edit()
 				<div class="content">
 					<dl class="settings">
 						<dt>
-							<strong><label for="spider_name">', $txt['spider_name'], ':</label></strong><br />
+							<label for="spider_name">', $txt['spider_name'], ':</label><br />
 							<span class="smalltext">', $txt['spider_name_desc'], '</span>
 						</dt>
 						<dd>
 							<input type="text" name="spider_name" id="spider_name" value="', $context['spider']['name'], '" class="input_text" />
 						</dd>
 						<dt>
-							<strong><label for="spider_agent">', $txt['spider_agent'], ':</label></strong><br />
+							<label for="spider_agent">', $txt['spider_agent'], ':</label><br />
 							<span class="smalltext">', $txt['spider_agent_desc'], '</span>
 						</dt>
 						<dd>
 							<input type="text" name="spider_agent" id="spider_agent" value="', $context['spider']['agent'], '" class="input_text" />
 						</dd>
 						<dt>
-							<strong><label for="spider_ip">', $txt['spider_ip_info'], ':</label></strong><br />
+							<label for="spider_ip">', $txt['spider_ip_info'], ':</label><br />
 							<span class="smalltext">', $txt['spider_ip_info_desc'], '</span>
 						</dt>
 						<dd>
