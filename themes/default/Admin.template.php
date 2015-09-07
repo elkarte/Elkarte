@@ -39,10 +39,8 @@ function template_admin()
 								<h3 class="category_header">
 									<a href="', $scripturl, '?action=quickhelp;help=live_news" onclick="return reqOverlayDiv(this.href);" class="hdicon cat_img_helptopics help"></a>', $txt['live'], '
 								</h3>
-								<div class="windowbg">
-									<div class="content">
-										<div id="ourAnnouncements">', $txt['lfyi'], '</div>
-									</div>
+								<div class="content">
+									<div id="ourAnnouncements">', $txt['lfyi'], '</div>
 								</div>
 							</div>';
 
@@ -52,36 +50,34 @@ function template_admin()
 								<h3 class="category_header">
 									<a class="hdicon cat_img_plus" href="', $scripturl, '?action=admin;area=credits">', $txt['support_title'], '</a>
 								</h3>
-								<div class="windowbg">
 									<div class="content">
-										<div id="version_details">
-											<strong>', $txt['support_versions'], ':</strong><br />
-											', $txt['support_versions_forum'], ':
-											<em id="installedVersion">', $context['forum_version'], '</em><br />
-											', $txt['support_versions_current'], ':
-											<em id="latestVersion">??</em><br />
-											', $context['can_admin'] ? '<a href="' . $scripturl . '?action=admin;area=maintain;sa=routine;activity=version">' . $txt['version_check_more'] . '</a>' : '', '<br />';
+									<div id="version_details">
+										<strong>', $txt['support_versions'], ':</strong><br />
+										', $txt['support_versions_forum'], ':
+										<em id="installedVersion">', $context['forum_version'], '</em><br />
+										', $txt['support_versions_current'], ':
+										<em id="latestVersion">??</em><br />
+										', $context['can_admin'] ? '<a href="' . $scripturl . '?action=admin;area=maintain;sa=routine;activity=version">' . $txt['version_check_more'] . '</a>' : '', '<br />';
 
 	// Display all the members who can administrate the forum.
 	echo '
-											<br />
-											<strong>', $txt['administrators'], ':</strong>
-											', implode(', ', $context['administrators']);
+										<br />
+										<strong>', $txt['administrators'], ':</strong>
+										', implode(', ', $context['administrators']);
 
 	// If we have lots of admins... don't show them all.
 	if (!empty($context['more_admins_link']))
 		echo '
-											(', $context['more_admins_link'], ')';
+										(', $context['more_admins_link'], ')';
 
 	echo '
-										</div>
 									</div>
 								</div>
 							</div>
 						</div>';
 
 	echo '
-						<div class="windowbg2 quick_tasks">
+						<div class="quick_tasks">
 							<div class="content">
 								<ul id="quick_tasks" class="flow_hidden">';
 
@@ -132,13 +128,11 @@ function template_admin()
 									<h3 id="update_title" class="category_header">
 										%title%
 									</h3>
-								<div class="windowbg">
 									<div class="content">
 										<div id="update_message" class="smalltext">
 											%message%
 										</div>
 									</div>
-								</div>
 							'), ',
 							sUpdateNotificationLink: elk_scripturl + ', JavaScriptEscape('?action=admin;area=packageservers;sa=download;auto;package=%package%;' . $context['session_var'] . '=' . $context['session_id']), '
 
@@ -160,20 +154,19 @@ function template_credits()
 							<h3 class="category_header">
 								', $txt['support_title'], ' <img src="', $settings['images_url'], '/', $context['theme_variant_url'], 'logo_elk.png" id="credits_logo" alt="" />
 							</h3>
-							<div class="windowbg">
-								<div class="content">
-									<strong>', $txt['support_versions'], ':</strong><br />
-										', $txt['support_versions_forum'], ':
-									<em id="installedVersion">', $context['forum_version'], '</em>', $context['can_admin'] ? ' <a href="' . $scripturl . '?action=admin;area=maintain;sa=routine;activity=version">' . $txt['version_check_more'] . '</a>' : '', '<br />
-										', $txt['support_versions_current'], ':
-									<em id="latestVersion">??</em><br />';
+							<div class="content">
+								<strong>', $txt['support_versions'], ':</strong><br />
+									', $txt['support_versions_forum'], ':
+								<em id="installedVersion">', $context['forum_version'], '</em>', $context['can_admin'] ? ' <a href="' . $scripturl . '?action=admin;area=maintain;sa=routine;activity=version">' . $txt['version_check_more'] . '</a>' : '', '<br />
+									', $txt['support_versions_current'], ':
+								<em id="latestVersion">??</em><br />';
 
 	// Display all the variables we have server information for.
 	foreach ($context['current_versions'] as $version)
 	{
 		echo '
-										', $version['title'], ':
-									<em>', $version['version'], '</em>';
+									', $version['title'], ':
+								<em>', $version['version'], '</em>';
 
 		// More details for this item, show them a link
 		if ($context['can_admin'] && isset($version['more']))
@@ -181,11 +174,10 @@ function template_credits()
 			' <a href="', $scripturl, $version['more'], ';', $context['session_var'], '=', $context['session_id'], '">', $txt['version_check_more'], '</a>';
 
 		echo '
-									<br />';
+								<br />';
 	}
 
 	echo '
-								</div>
 							</div>';
 
 	// Display latest important updates
@@ -194,10 +186,8 @@ function template_credits()
 							<h3 id="latest_updates" class="category_header">
 								', $txt['latest_updates'], '
 							</h3>
-							<div class="windowbg2">
-								<div class="content">
-									', $context['latest_updates'], '
-								</div>
+							<div class="content">
+								', $context['latest_updates'], '
 							</div>';
 
 	// Point the admin to common support resources.
@@ -207,11 +197,9 @@ function template_credits()
 									', $txt['support_resources'], '
 								</h3>
 							</div>
-							<div class="windowbg2">
-								<div class="content">
-									<p>', $txt['support_resources_p1'], '</p>
-									<p>', $txt['support_resources_p2'], '</p>
-								</div>
+							<div class="content">
+								<p>', $txt['support_resources_p1'], '</p>
+								<p>', $txt['support_resources_p2'], '</p>
 							</div>';
 
 	// The most important part - the credits :P.
@@ -221,41 +209,39 @@ function template_credits()
 									', $txt['admin_credits'], '
 								</h3>
 							</div>
-							<div class="windowbg2">
-								<div class="content">';
+							<div class="content">';
 
 	foreach ($context['credits'] as $section)
 	{
 		if (isset($section['pretext']))
 			echo '
-									<p>', $section['pretext'], '</p><hr />';
+								<p>', $section['pretext'], '</p><hr />';
 
 		echo '
-									<dl>';
+								<dl>';
 
 		foreach ($section['groups'] as $group)
 		{
 			if (isset($group['title']))
 				echo '
-										<dt>
-											<strong>', $group['title'], ':</strong>
-										</dt>';
+									<dt>
+										<strong>', $group['title'], ':</strong>
+									</dt>';
 
 			echo '
-										<dd>', implode(', ', $group['members']), '</dd>';
+									<dd>', implode(', ', $group['members']), '</dd>';
 		}
 
 		echo '
-									</dl>';
+								</dl>';
 
 		if (isset($section['posttext']))
 			echo '
-									<hr />
-									<p>', $section['posttext'], '</p>';
+								<hr />
+								<p>', $section['posttext'], '</p>';
 	}
 
 	echo '
-								</div>
 							</div>
 						</div>
 					</div>';
@@ -322,13 +308,13 @@ function template_view_versions()
 	// The current version of the core package.
 	echo '
 									<tr>
-										<td class="windowbg">
+										<td>
 											', $txt['admin_elkpackage'], '
 										</td>
-										<td class="windowbg">
+										<td>
 											<em id="yourVersion">', $context['forum_version'], '</em>
 										</td>
-										<td class="windowbg">
+										<td>
 											<em id="ourVersion">??</em>
 										</td>
 									</tr>';
@@ -336,13 +322,13 @@ function template_view_versions()
 	// Now list all the source file versions, starting with the overall version (if all match!).
 	echo '
 									<tr>
-										<td class="windowbg">
+										<td>
 											<a href="#" id="sources-link">', $txt['dvc_sources'], '</a>
 										</td>
-										<td class="windowbg">
+										<td>
 											<em id="yoursources">??</em>
 										</td>
-										<td class="windowbg">
+										<td>
 											<em id="oursources">??</em>
 										</td>
 									</tr>
@@ -356,13 +342,13 @@ function template_view_versions()
 	foreach ($context['file_versions'] as $filename => $version)
 		echo '
 								<tr>
-									<td class="windowbg2 versionFilePad">
+									<td class="versionFilePad">
 										', $filename, '
 									</td>
-									<td class="windowbg2 versionNumber">
+									<td class="versionNumber">
 										<em id="yoursources', $filename, '">', $version, '</em>
 									</td>
-									<td class="windowbg2 versionNumber">
+									<td class="versionNumber">
 										<em id="oursources', $filename, '">??</em>
 									</td>
 								</tr>';
@@ -377,13 +363,13 @@ function template_view_versions()
 							<table class="table_grid">
 								<tbody>
 									<tr>
-										<td class="windowbg versionFile">
+										<td class="versionFile">
 											<a href="#" id="admin-link">', $txt['dvc_admin'], '</a>
 										</td>
-										<td class="windowbg versionNumber">
+										<td class="versionNumber">
 											<em id="youradmin">??</em>
 										</td>
-										<td class="windowbg versionNumber">
+										<td class="versionNumber">
 											<em id="ouradmin">??</em>
 										</td>
 									</tr>
@@ -397,13 +383,13 @@ function template_view_versions()
 	foreach ($context['file_versions_admin'] as $filename => $version)
 		echo '
 								<tr>
-									<td class="windowbg2 versionFilePad">
+									<td class="versionFilePad">
 										', $filename, '
 									</td>
-									<td class="windowbg2 versionNumber">
+									<td class="versionNumber">
 										<em id="youradmin', $filename, '">', $version, '</em>
 									</td>
-									<td class="windowbg2 versionNumber">
+									<td class="versionNumber">
 										<em id="ouradmin', $filename, '">??</em>
 									</td>
 								</tr>';
@@ -418,13 +404,13 @@ function template_view_versions()
 							<table class="table_grid">
 								<tbody>
 									<tr>
-										<td class="windowbg versionFile">
+										<td class="versionFile">
 											<a href="#" id="controllers-link">', $txt['dvc_controllers'], '</a>
 										</td>
-										<td class="windowbg versionNumber">
+										<td class="versionNumber">
 											<em id="yourcontrollers">??</em>
 										</td>
-										<td class="windowbg versionNumber">
+										<td class="versionNumber">
 											<em id="ourcontrollers">??</em>
 										</td>
 									</tr>
@@ -438,13 +424,13 @@ function template_view_versions()
 	foreach ($context['file_versions_controllers'] as $filename => $version)
 		echo '
 								<tr>
-									<td class="windowbg2 versionFilePad">
+									<td class="versionFilePad">
 										', $filename, '
 									</td>
-									<td class="windowbg2 versionNumber">
+									<td class="versionNumber">
 										<em id="yourcontrollers', $filename, '">', $version, '</em>
 									</td>
-									<td class="windowbg2 versionNumber">
+									<td class="versionNumber">
 										<em id="ourcontrollers', $filename, '">??</em>
 									</td>
 								</tr>';
@@ -459,13 +445,13 @@ function template_view_versions()
 							<table class="table_grid">
 								<tbody>
 									<tr>
-										<td class="windowbg versionFile">
+										<td class="versionFile">
 											<a href="#" id="database-link">', $txt['dvc_database'], '</a>
 										</td>
-										<td class="windowbg versionNumber">
+										<td class="versionNumber">
 											<em id="yourdatabase">??</em>
 										</td>
-										<td class="windowbg versionNumber">
+										<td class="versionNumber">
 											<em id="ourdatabase">??</em>
 										</td>
 									</tr>
@@ -479,13 +465,13 @@ function template_view_versions()
 	foreach ($context['file_versions_database'] as $filename => $version)
 		echo '
 								<tr>
-									<td class="windowbg2 versionFilePad">
+									<td class="versionFilePad">
 										', $filename, '
 									</td>
-									<td class="windowbg2 versionNumber">
+									<td class="versionNumber">
 										<em id="yourdatabase', $filename, '">', $version, '</em>
 									</td>
-									<td class="windowbg2 versionNumber">
+									<td class="versionNumber">
 										<em id="ourdatabase', $filename, '">??</em>
 									</td>
 								</tr>';
@@ -500,13 +486,13 @@ function template_view_versions()
 							<table class="table_grid">
 								<tbody>
 									<tr>
-										<td class="windowbg versionFile">
+										<td class="versionFile">
 											<a href="#" id="subs-link">', $txt['dvc_subs'], '</a>
 										</td>
-										<td class="windowbg versionNumber">
+										<td class="versionNumber">
 											<em id="yoursubs">??</em>
 										</td>
-										<td class="windowbg versionNumber">
+										<td class="versionNumber">
 											<em id="oursubs">??</em>
 										</td>
 									</tr>
@@ -520,13 +506,13 @@ function template_view_versions()
 	foreach ($context['file_versions_subs'] as $filename => $version)
 		echo '
 								<tr>
-									<td class="windowbg2 versionFilePad">
+									<td class="versionFilePad">
 										', $filename, '
 									</td>
-									<td class="windowbg2 versionNumber">
+									<td class="versionNumber">
 										<em id="yoursubs', $filename, '">', $version, '</em>
 									</td>
-									<td class="windowbg2 versionNumber">
+									<td class="versionNumber">
 										<em id="oursubs', $filename, '">??</em>
 									</td>
 								</tr>';
@@ -541,13 +527,13 @@ function template_view_versions()
 							<table class="table_grid">
 								<tbody>
 									<tr>
-										<td class="windowbg versionFile">
+										<td class="versionFile">
 											<a href="#" id="default-link">', $txt['dvc_default'], '</a>
 										</td>
-										<td class="windowbg versionNumber">
+										<td class="versionNumber">
 											<em id="yourdefault">??</em>
 										</td>
-										<td class="windowbg versionNumber">
+										<td class="versionNumber">
 											<em id="ourdefault">??</em>
 										</td>
 									</tr>
@@ -560,13 +546,13 @@ function template_view_versions()
 	foreach ($context['default_template_versions'] as $filename => $version)
 		echo '
 									<tr>
-										<td class="windowbg2 versionFilePad">
+										<td class="versionFilePad">
 											', $filename, '
 										</td>
-										<td class="windowbg2 versionNumber">
+										<td class="versionNumber">
 											<em id="yourdefault', $filename, '">', $version, '</em>
 										</td>
-										<td class="windowbg2 versionNumber">
+										<td class="versionNumber">
 											<em id="ourdefault', $filename, '">??</em>
 										</td>
 									</tr>';
@@ -579,13 +565,13 @@ function template_view_versions()
 							<table class="table_grid">
 								<tbody>
 									<tr>
-										<td class="windowbg versionFile">
+										<td class="versionFile">
 											<a href="#" id="Languages-link">', $txt['dvc_languages'], '</a>
 										</td>
-										<td class="windowbg versionNumber">
+										<td class="versionNumber">
 											<em id="yourLanguages">??</em>
 										</td>
-										<td class="windowbg versionNumber">
+										<td class="versionNumber">
 											<em id="ourLanguages">??</em>
 										</td>
 									</tr>
@@ -599,20 +585,20 @@ function template_view_versions()
 	{
 		echo '
 									<tr>
-										<td colspan=3" class="windowbg2 versionFilePad">
+										<td colspan=3" class="versionFilePad">
 											<strong>', $language, '</strong>
 										</td>
 									</tr>';
 		foreach ($files as $filename => $version)
 			echo '
 									<tr>
-										<td class="windowbg2 versionFilePad">
+										<td class="versionFilePad">
 											', $filename, '.<em>', $language, '</em>.php
 										</td>
-										<td class="windowbg2 versionNumber">
+										<td class="versionNumber">
 											<em id="your', $filename, '.', $language, '">', $version, '</em>
 										</td>
-										<td class="windowbg2 versionNumber">
+										<td class="versionNumber">
 											<em id="our', $filename, '.', $language, '">??</em>
 										</td>
 									</tr>';
@@ -629,13 +615,13 @@ function template_view_versions()
 							<table class="table_grid">
 								<tbody>
 									<tr>
-										<td class="windowbg versionFile">
+										<td class="versionFile">
 											<a href="#" id="Templates-link">', $txt['dvc_templates'], '</a>
 										</td>
-										<td class="windowbg versionNumber">
+										<td class="versionNumber">
 											<em id="yourTemplates">??</em>
 										</td>
-										<td class="windowbg versionNumber">
+										<td class="versionNumber">
 											<em id="ourTemplates">??</em>
 										</td>
 									</tr>
@@ -648,13 +634,13 @@ function template_view_versions()
 		foreach ($context['template_versions'] as $filename => $version)
 			echo '
 									<tr>
-										<td class="windowbg2 versionFilePad">
+										<td class="versionFilePad">
 											', $filename, '
 										</td>
-										<td class="windowbg2 versionNumber">
+										<td class="versionNumber">
 											<em id="yourTemplates', $filename, '">', $version, '</em>
 										</td>
-										<td class="windowbg2 versionNumber">
+										<td class="versionNumber">
 											<em id="ourTemplates', $filename, '">??</em>
 										</td>
 									</tr>';
@@ -716,51 +702,49 @@ function template_edit_censored()
 			<h3 class="category_header">
 				', $txt['admin_censored_words'], '
 			</h3>
-			<div class="windowbg2">
-				<div class="content">
-					<div class="information">', $txt['admin_censored_where'],'</div>';
+			<div class="content">
+				<div class="information">', $txt['admin_censored_where'],'</div>';
 
 	// Show text boxes for censoring [bad] => [good].
 	foreach ($context['censored_words'] as $vulgar => $proper)
 		echo '
-					<div class="censorWords">
-						<input type="text" name="censor_vulgar[]" value="', $vulgar, '" size="30" /> <i class="fa  fa-arrow-circle-right"></i> <input type="text" name="censor_proper[]" value="', $proper, '" size="30" />
-					</div>';
+				<div class="censorWords">
+					<input type="text" name="censor_vulgar[]" value="', $vulgar, '" size="30" /> <i class="fa  fa-arrow-circle-right"></i> <input type="text" name="censor_proper[]" value="', $proper, '" size="30" />
+				</div>';
 
 	// Now provide a way to censor more words.
 	echo '
-					<div class="censorWords">
-						<input type="text" name="censor_vulgar[]" size="30" class="input_text" /> <i class="fa  fa-arrow-circle-right"></i> <input type="text" name="censor_proper[]" size="30" class="input_text" />
-					</div>
-					<div id="moreCensoredWords"></div><div class="censorWords" style="display: none;" id="moreCensoredWords_link">
-						<a class="linkbutton_left" href="#;" onclick="addNewWord(); return false;">', $txt['censor_clickadd'], '</a><br />
-					</div>
-					<script><!-- // --><![CDATA[
-						document.getElementById("moreCensoredWords_link").style.display = "";
-					// ]]></script>
-					<hr class="clear" />
-					<dl class="settings">
-						<dt>
-							<label for="censorWholeWord_check">', $txt['censor_whole_words'], '</label>
-						</dt>
-						<dd>
-							<input type="checkbox" name="censorWholeWord" value="1" id="censorWholeWord_check"', empty($modSettings['censorWholeWord']) ? '' : ' checked="checked"', ' class="input_check" />
-						</dd>
-						<dt>
-							<label for="censorIgnoreCase_check">', $txt['censor_case'], '</label>
-						</dt>
-						<dd>
-							<input type="checkbox" name="censorIgnoreCase" value="1" id="censorIgnoreCase_check"', empty($modSettings['censorIgnoreCase']) ? '' : ' checked="checked"', ' class="input_check" />
-						</dd>
-						<dt>
-							<a href="' . $scripturl . '?action=quickhelp;help=allow_no_censored" onclick="return reqOverlayDiv(this.href);" class="help"><img src="' . $settings['images_url'] . '/helptopics.png" class="icon" alt="' . $txt['help'] . '" /></a><label for="allow_no_censored">', $txt['censor_allow'], '</label></a></dt>
-						</dt>
-						<dd>
-							<input type="checkbox" name="censorAllow" value="1" id="allow_no_censored"', empty($modSettings['allow_no_censored']) ? '' : ' checked="checked"', ' class="input_check" />
-						</dd>
-					</dl>
-					<input type="submit" name="save_censor" value="', $txt['save'], '" class="right_submit" />
+				<div class="censorWords">
+					<input type="text" name="censor_vulgar[]" size="30" class="input_text" /> <i class="fa  fa-arrow-circle-right"></i> <input type="text" name="censor_proper[]" size="30" class="input_text" />
 				</div>
+				<div id="moreCensoredWords"></div><div class="censorWords" style="display: none;" id="moreCensoredWords_link">
+					<a class="linkbutton_left" href="#;" onclick="addNewWord(); return false;">', $txt['censor_clickadd'], '</a><br />
+				</div>
+				<script><!-- // --><![CDATA[
+					document.getElementById("moreCensoredWords_link").style.display = "";
+				// ]]></script>
+				<hr class="clear" />
+				<dl class="settings">
+					<dt>
+						<label for="censorWholeWord_check">', $txt['censor_whole_words'], '</label>
+					</dt>
+					<dd>
+						<input type="checkbox" name="censorWholeWord" value="1" id="censorWholeWord_check"', empty($modSettings['censorWholeWord']) ? '' : ' checked="checked"', ' class="input_check" />
+					</dd>
+					<dt>
+						<label for="censorIgnoreCase_check">', $txt['censor_case'], '</label>
+					</dt>
+					<dd>
+						<input type="checkbox" name="censorIgnoreCase" value="1" id="censorIgnoreCase_check"', empty($modSettings['censorIgnoreCase']) ? '' : ' checked="checked"', ' class="input_check" />
+					</dd>
+					<dt>
+						<a href="' . $scripturl . '?action=quickhelp;help=allow_no_censored" onclick="return reqOverlayDiv(this.href);" class="help"><img src="' . $settings['images_url'] . '/helptopics.png" class="icon" alt="' . $txt['help'] . '" /></a><label for="allow_no_censored">', $txt['censor_allow'], '</label></a></dt>
+					</dt>
+					<dd>
+						<input type="checkbox" name="censorAllow" value="1" id="allow_no_censored"', empty($modSettings['allow_no_censored']) ? '' : ' checked="checked"', ' class="input_check" />
+					</dd>
+				</dl>
+				<input type="submit" name="save_censor" value="', $txt['save'], '" class="right_submit" />
 			</div>
 			<br />';
 
@@ -799,7 +783,7 @@ function template_not_done()
 	echo '
 	<div id="admincenter">
 		<h3 class="category_header">', empty($context['not_done_title']) ? $txt['not_done_title'] : $context['not_done_title'], '</h3>
-		<div class="windowbg">
+		<div class="content">
 			<div class="infobox">
 				', $txt['not_done_reason'], '
 			</div>
@@ -923,9 +907,8 @@ function template_show_settings()
 		{
 			$is_open = true;
 			echo '
-			<div class="windowbg2">
-				<div class="content">
-					<dl class="settings">';
+			<div class="content">
+				<dl class="settings">';
 		}
 
 		// Hang about? Are you pulling my leg - a callback?!
@@ -943,16 +926,16 @@ function template_show_settings()
 			if (in_array($config_var['type'], array('message', 'warning')))
 			{
 				echo '
-						<dt></dt>
-						<dd', $config_var['type'] == 'warning' ? ' class="alert"' : '', (!empty($config_var['force_div_id']) ? ' id="' . $config_var['force_div_id'] . '_dd"' : ''), '>
-							', $config_var['label'], '
-						</dd>';
+					<dt></dt>
+					<dd', $config_var['type'] == 'warning' ? ' class="alert"' : '', (!empty($config_var['force_div_id']) ? ' id="' . $config_var['force_div_id'] . '_dd"' : ''), '>
+						', $config_var['label'], '
+					</dd>';
 			}
 			// Otherwise it's an input box of some kind.
 			else
 			{
 				echo '
-						<dt', is_array($config_var) && !empty($config_var['force_div_id']) ? ' id="' . $config_var['force_div_id'] . '"' : '', '>';
+					<dt', is_array($config_var) && !empty($config_var['force_div_id']) ? ' id="' . $config_var['force_div_id'] . '"' : '', '>';
 
 				// Some quick helpers...
 				$javascript = $config_var['javascript'];
@@ -962,48 +945,48 @@ function template_show_settings()
 				// Show the [?] button.
 				if ($config_var['help'])
 					echo '
-							<a id="setting_', $config_var['name'], '" href="', $scripturl, '?action=quickhelp;help=', $config_var['help'], '" onclick="return reqOverlayDiv(this.href);" class="help"><img src="', $settings['images_url'], '/helptopics.png" class="icon" alt="', $txt['help'], '" /></a><span', ($config_var['disabled'] ? ' class="disabled"' : ($config_var['invalid'] ? ' class="error"' : '')), '><label for="', $config_var['name'], '">', $config_var['label'], '</label>', $subtext, '</span>
-						</dt>';
+						<a id="setting_', $config_var['name'], '" href="', $scripturl, '?action=quickhelp;help=', $config_var['help'], '" onclick="return reqOverlayDiv(this.href);" class="help"><img src="', $settings['images_url'], '/helptopics.png" class="icon" alt="', $txt['help'], '" /></a><span', ($config_var['disabled'] ? ' class="disabled"' : ($config_var['invalid'] ? ' class="error"' : '')), '><label for="', $config_var['name'], '">', $config_var['label'], '</label>', $subtext, '</span>
+					</dt>';
 				else
 					echo '
-							<a id="setting_', $config_var['name'], '"></a> <span', ($config_var['disabled'] ? ' class="disabled"' : ($config_var['invalid'] ? ' class="error"' : '')), '><label for="', $config_var['name'], '">', $config_var['label'], '</label>', $subtext, '</span>
-						</dt>';
+						<a id="setting_', $config_var['name'], '"></a> <span', ($config_var['disabled'] ? ' class="disabled"' : ($config_var['invalid'] ? ' class="error"' : '')), '><label for="', $config_var['name'], '">', $config_var['label'], '</label>', $subtext, '</span>
+					</dt>';
 
 				echo '
-						<dd', (!empty($config_var['force_div_id']) ? ' id="' . $config_var['force_div_id'] . '_dd"' : ''), '>',
+					<dd', (!empty($config_var['force_div_id']) ? ' id="' . $config_var['force_div_id'] . '_dd"' : ''), '>',
 				$config_var['preinput'];
 
 				// Show a check box.
 				if ($config_var['type'] == 'check')
 					echo '
-							<input type="checkbox"', $javascript, $disabled, ' name="', $config_var['name'], '" id="', $config_var['name'], '"', ($config_var['value'] ? ' checked="checked"' : ''), ' value="1" class="input_check" />';
+						<input type="checkbox"', $javascript, $disabled, ' name="', $config_var['name'], '" id="', $config_var['name'], '"', ($config_var['value'] ? ' checked="checked"' : ''), ' value="1" class="input_check" />';
 				// Escape (via htmlspecialchars.) the text box.
 				elseif ($config_var['type'] == 'password')
 					echo '
-							<input type="password"', $disabled, $javascript, ' name="', $config_var['name'], '[0]" id="', $config_var['name'], '"', ($config_var['size'] ? ' size="' . $config_var['size'] . '"' : ''), ' value="*#fakepass#*" onfocus="this.value = \'\'; this.form.', $config_var['name'], '_confirm.disabled = false;" class="input_password" />
-						</dd>
-						<dt>
-							<a id="setting_', $config_var['name'], '_confirm"></a><span', ($config_var['disabled'] ? ' class="disabled"' : ($config_var['invalid'] ? ' class="error"' : '')), '><label for="', $config_var['name'], '_confirm"><em>', $txt['admin_confirm_password'], '</em></label></span>
-						</dt>
-						<dd ', (!empty($config_var['force_div_id']) ? ' id="' . $config_var['force_div_id'] . '_confirm_dd"' : ''), ' >
-							<input type="password" disabled="disabled" id="', $config_var['name'], '_confirm" name="', $config_var['name'], '[1]"', ($config_var['size'] ? ' size="' . $config_var['size'] . '"' : ''), ' class="input_password" />';
+						<input type="password"', $disabled, $javascript, ' name="', $config_var['name'], '[0]" id="', $config_var['name'], '"', ($config_var['size'] ? ' size="' . $config_var['size'] . '"' : ''), ' value="*#fakepass#*" onfocus="this.value = \'\'; this.form.', $config_var['name'], '_confirm.disabled = false;" class="input_password" />
+					</dd>
+					<dt>
+						<a id="setting_', $config_var['name'], '_confirm"></a><span', ($config_var['disabled'] ? ' class="disabled"' : ($config_var['invalid'] ? ' class="error"' : '')), '><label for="', $config_var['name'], '_confirm"><em>', $txt['admin_confirm_password'], '</em></label></span>
+					</dt>
+					<dd ', (!empty($config_var['force_div_id']) ? ' id="' . $config_var['force_div_id'] . '_confirm_dd"' : ''), ' >
+						<input type="password" disabled="disabled" id="', $config_var['name'], '_confirm" name="', $config_var['name'], '[1]"', ($config_var['size'] ? ' size="' . $config_var['size'] . '"' : ''), ' class="input_password" />';
 				// Show a selection box.
 				elseif ($config_var['type'] == 'select')
 				{
 					echo '
-							<select name="', $config_var['name'], '" id="', $config_var['name'], '" ', $javascript, $disabled, (!empty($config_var['multiple']) ? ' multiple="multiple"' : ''), '>';
+						<select name="', $config_var['name'], '" id="', $config_var['name'], '" ', $javascript, $disabled, (!empty($config_var['multiple']) ? ' multiple="multiple"' : ''), '>';
 
 					foreach ($config_var['data'] as $option)
 						echo '
-								<option value="', $option[0], '"', (!empty($config_var['value']) && ($option[0] == $config_var['value'] || (!empty($config_var['multiple']) && in_array($option[0], $config_var['value']))) ? ' selected="selected"' : ''), '>', $option[1], '</option>';
+							<option value="', $option[0], '"', (!empty($config_var['value']) && ($option[0] == $config_var['value'] || (!empty($config_var['multiple']) && in_array($option[0], $config_var['value']))) ? ' selected="selected"' : ''), '>', $option[1], '</option>';
 
 					echo '
-							</select>';
+						</select>';
 				}
 				// Text area?
 				elseif ($config_var['type'] == 'large_text')
 					echo '
-							<textarea rows="', (!empty($config_var['size']) ? $config_var['size'] : (!empty($config_var['rows']) ? $config_var['rows'] : 4)), '" cols="', (!empty($config_var['cols']) ? $config_var['cols'] : 30), '" name="', $config_var['name'], '" id="', $config_var['name'], '">', $config_var['value'], '</textarea>';
+						<textarea rows="', (!empty($config_var['size']) ? $config_var['size'] : (!empty($config_var['rows']) ? $config_var['rows'] : 4)), '" cols="', (!empty($config_var['cols']) ? $config_var['cols'] : 30), '" name="', $config_var['name'], '" id="', $config_var['name'], '">', $config_var['value'], '</textarea>';
 				// Permission group?
 				elseif ($config_var['type'] == 'permissions')
 					theme_inline_permissions($config_var['name']);
@@ -1011,43 +994,43 @@ function template_show_settings()
 				elseif ($config_var['type'] == 'bbc')
 				{
 					echo '
-							<fieldset id="', $config_var['name'], '">
-								<legend>', $txt['bbcTagsToUse_select'], '</legend>
-								<ul>';
+						<fieldset id="', $config_var['name'], '">
+							<legend>', $txt['bbcTagsToUse_select'], '</legend>
+							<ul>';
 
 					foreach ($context['bbc_columns'] as $bbcColumn)
 					{
 						foreach ($bbcColumn as $bbcTag)
 							echo '
-									<li class="list_bbc floatleft">
-										<input type="checkbox" name="', $config_var['name'], '_enabledTags[]" id="tag_', $config_var['name'], '_', $bbcTag['tag'], '" value="', $bbcTag['tag'], '"', !in_array($bbcTag['tag'], $context['bbc_sections'][$config_var['name']]['disabled']) ? ' checked="checked"' : '', ' class="input_check" /> <label for="tag_', $config_var['name'], '_', $bbcTag['tag'], '">', $bbcTag['tag'], '</label>', $bbcTag['show_help'] ? ' (<a href="' . $scripturl . '?action=quickhelp;help=tag_' . $bbcTag['tag'] . '" onclick="return reqOverlayDiv(this.href);">?</a>)' : '', '
-									</li>';
+								<li class="list_bbc floatleft">
+									<input type="checkbox" name="', $config_var['name'], '_enabledTags[]" id="tag_', $config_var['name'], '_', $bbcTag['tag'], '" value="', $bbcTag['tag'], '"', !in_array($bbcTag['tag'], $context['bbc_sections'][$config_var['name']]['disabled']) ? ' checked="checked"' : '', ' class="input_check" /> <label for="tag_', $config_var['name'], '_', $bbcTag['tag'], '">', $bbcTag['tag'], '</label>', $bbcTag['show_help'] ? ' (<a href="' . $scripturl . '?action=quickhelp;help=tag_' . $bbcTag['tag'] . '" onclick="return reqOverlayDiv(this.href);">?</a>)' : '', '
+								</li>';
 					}
 
 					echo '
-								</ul>
-								<input type="checkbox" id="bbc_', $config_var['name'], '_select_all" onclick="invertAll(this, this.form, \'', $config_var['name'], '_enabledTags\');"', $context['bbc_sections'][$config_var['name']]['all_selected'] ? ' checked="checked"' : '', ' class="input_check" /> <label for="bbc_', $config_var['name'], '_select_all"><em>', $txt['bbcTagsToUse_select_all'], '</em></label>
-							</fieldset>';
+							</ul>
+							<input type="checkbox" id="bbc_', $config_var['name'], '_select_all" onclick="invertAll(this, this.form, \'', $config_var['name'], '_enabledTags\');"', $context['bbc_sections'][$config_var['name']]['all_selected'] ? ' checked="checked"' : '', ' class="input_check" /> <label for="bbc_', $config_var['name'], '_select_all"><em>', $txt['bbcTagsToUse_select_all'], '</em></label>
+						</fieldset>';
 				}
 				// A simple message?
 				elseif ($config_var['type'] == 'var_message')
 					echo '
-							<div', !empty($config_var['name']) ? ' id="' . $config_var['name'] . '"' : '', '>', $config_var['var_message'], '</div>';
+						<div', !empty($config_var['name']) ? ' id="' . $config_var['name'] . '"' : '', '>', $config_var['var_message'], '</div>';
 				// Color picker?
 				elseif ($config_var['type'] == 'color')
 					echo '
-							<input type="color"', $javascript, $disabled, ' name="', $config_var['name'], '" id="', $config_var['name'], '" value="', $config_var['value'], '"', ($config_var['size'] ? ' size="' . $config_var['size'] . '"' : ''), ' class="input_text" />';
+						<input type="color"', $javascript, $disabled, ' name="', $config_var['name'], '" id="', $config_var['name'], '" value="', $config_var['value'], '"', ($config_var['size'] ? ' size="' . $config_var['size'] . '"' : ''), ' class="input_text" />';
 				// Assume it must be a text box.
 				else
 					echo '
-							<input type="text"', $javascript, $disabled, ' name="', $config_var['name'], '" id="', $config_var['name'], '" value="', $config_var['value'], '"', ($config_var['size'] ? ' size="' . $config_var['size'] . '"' : ''), ' class="input_text" />';
+						<input type="text"', $javascript, $disabled, ' name="', $config_var['name'], '" id="', $config_var['name'], '" value="', $config_var['value'], '"', ($config_var['size'] ? ' size="' . $config_var['size'] . '"' : ''), ' class="input_text" />';
 
 				echo ($config_var['invalid']) ? '
-							<img class="icon" src="' . $settings['images_url'] . '/icons/field_invalid.png" />' : '';
+						<img class="icon" src="' . $settings['images_url'] . '/icons/field_invalid.png" />' : '';
 
 				echo isset($config_var['postinput']) && $config_var['postinput'] !== '' ? '
 							' . $config_var['postinput'] : '', '
-						</dd>';
+					</dd>';
 			}
 		}
 		else
@@ -1055,20 +1038,20 @@ function template_show_settings()
 			// Just show a separator.
 			if ($config_var == '')
 				echo '
-					</dl>
-					<hr class="clear" />
-					<dl class="settings">';
+				</dl>
+				<hr class="clear" />
+				<dl class="settings">';
 			else
 				echo '
-						<dd>
-							<strong>' . $config_var . '</strong>
-						</dd>';
+					<dd>
+						<strong>' . $config_var . '</strong>
+					</dd>';
 		}
 	}
 
 	if ($is_open)
 		echo '
-					</dl>';
+				</dl>';
 
 	if (empty($context['settings_save_dont_show']))
 		echo '
@@ -1076,7 +1059,6 @@ function template_show_settings()
 
 	if ($is_open)
 		echo '
-				</div>
 			</div>';
 
 	// At least one token has to be used!
@@ -1119,7 +1101,7 @@ function template_admin_search_results()
 							<input type="submit" name="search_go" value="', $txt['admin_search_results_again'], '" class="button_submit" />
 						</form>
 					</div>
-					<div class="windowbg2 generic_list_wrapper">
+					<div class="generic_list_wrapper">
 						<div class="content">';
 
 	if (empty($context['search_results']))
@@ -1151,7 +1133,7 @@ function template_admin_search_results()
 			else
 			{
 				echo '
-								<li class="windowbg2">
+								<li>
 									<a href="', $result['url'], '"><strong>', $result['name'], '</strong></a> [', isset($txt['admin_search_section_' . $result['type']]) ? $txt['admin_search_section_' . $result['type']] : $result['type'], ']';
 
 				if ($result['help'])
@@ -1283,8 +1265,7 @@ function template_repair_boards()
 	echo '
 	<div id="admincenter">
 		<h3 class="category_header">', $context['error_search'] ? $txt['errors_list'] : $txt['errors_fixing'], '</h3>
-		<div class="windowbg">
-			<div class="content">';
+		<div class="content">';
 
 	// Are we actually fixing them, or is this just a prompt?
 	if ($context['error_search'])
@@ -1293,55 +1274,54 @@ function template_repair_boards()
 		{
 			echo '
 				', $txt['errors_found'], ':
-				<ul>';
+			<ul>';
 
 			foreach ($context['repair_errors'] as $error)
 				echo '
-					<li>
-						', $error, '
-					</li>';
+				<li>
+					', $error, '
+				</li>';
 
 			echo '
-				</ul>
-				<p class="noticebox">
-					', $txt['errors_fix'], '
-				</p>
-				<p>
-					<strong><a class="linkbutton" href="', $scripturl, '?action=admin;area=repairboards;fixErrors;', $context['session_var'], '=', $context['session_id'], '">', $txt['yes'], '</a> - <a href="', $scripturl, '?action=admin;area=maintain">', $txt['no'], '</a></strong>
-				</p>';
+			</ul>
+			<p class="noticebox">
+				', $txt['errors_fix'], '
+			</p>
+			<p>
+				<strong><a class="linkbutton" href="', $scripturl, '?action=admin;area=repairboards;fixErrors;', $context['session_var'], '=', $context['session_id'], '">', $txt['yes'], '</a> - <a href="', $scripturl, '?action=admin;area=maintain">', $txt['no'], '</a></strong>
+			</p>';
 		}
 		else
 			echo '
-				<p class="infobox">', $txt['maintain_no_errors'], '</p>
-				<p>
-					<a class="linkbutton" href="', $scripturl, '?action=admin;area=maintain;sa=routine">', $txt['maintain_return'], '</a>
-				</p>';
+			<p class="infobox">', $txt['maintain_no_errors'], '</p>
+			<p>
+				<a class="linkbutton" href="', $scripturl, '?action=admin;area=maintain;sa=routine">', $txt['maintain_return'], '</a>
+			</p>';
 	}
 	else
 	{
 		if (!empty($context['redirect_to_recount']))
 		{
 			echo '
-				<p>
-					', $txt['errors_do_recount'], '
-				</p>
-				<form action="', $scripturl, '?action=admin;area=maintain;sa=routine;activity=recount" id="recount_form" method="post">
-					<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />
-					<input type="submit" name="cont" id="cont" value="', $txt['errors_recount_now'], '" />
-				</form>';
+			<p>
+				', $txt['errors_do_recount'], '
+			</p>
+			<form action="', $scripturl, '?action=admin;area=maintain;sa=routine;activity=recount" id="recount_form" method="post">
+				<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />
+				<input type="submit" name="cont" id="cont" value="', $txt['errors_recount_now'], '" />
+			</form>';
 		}
 		else
 		{
 			echo '
-				<p class="successbox">', $txt['errors_fixed'], '</p>
-				<p>
-					<a class="linkbutton" href="', $scripturl, '?action=admin;area=maintain;sa=routine">', $txt['maintain_return'], '</a>
-				</p>';
+		<p class="successbox">', $txt['errors_fixed'], '</p>
+		<p>
+			<a class="linkbutton" href="', $scripturl, '?action=admin;area=maintain;sa=routine">', $txt['maintain_return'], '</a>
+		</p>';
 		}
 	}
 
 	echo '
-			</div>
 		</div>
 	</div>';
 
@@ -1379,7 +1359,6 @@ function template_php_info()
 			</thead>
 			<tbody>';
 
-		$alternate = true;
 		$localmaster = true;
 
 		// and for each setting in this category
@@ -1402,11 +1381,11 @@ function template_php_info()
 
 				echo '
 			<tr>
-				<td class="windowbg', $alternate ? '2' : '', '">', $key, '</td>';
+				<td>', $key, '</td>';
 
 				foreach ($setting as $key_lm => $value)
 					echo '
-				<td class="windowbg', $alternate ? '2' : '', ' centertext">', $value, '</td>';
+				<td class="centertext">', $value, '</td>';
 
 				echo '
 			</tr>';
@@ -1416,12 +1395,10 @@ function template_php_info()
 			{
 				echo '
 			<tr>
-				<td class="windowbg', $alternate ? '2' : '', '">', $key, '</td>
-				<td class=" windowbg', $alternate ? '2' : '', '" colspan="2">', $setting, '</td>
+				<td>', $key, '</td>
+				<td colspan="2">', $setting, '</td>
 			</tr>';
 			}
-
-			$alternate = !$alternate;
 		}
 		echo '
 			</tbody>

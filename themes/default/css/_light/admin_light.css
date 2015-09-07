@@ -46,7 +46,7 @@
 .search_results li a strong {
 	color: #346;
 }
-#admin_main_section .windowbg {
+#admin_main_section .content {
 	border: 1px solid #ccc;
 	border-top: 1px solid #bbb;
 	border-bottom: 1px solid #ddd;
@@ -130,7 +130,7 @@
 
 /* Styles for the manage maintenance section.
 ------------------------------------------------- */
-#manage_maintenance div.windowbg, #manage_maintenance div.windowbg2 {
+#manage_maintenance div.content {
 	background: none;
 	border-bottom: 1px solid #ccc;
 	box-shadow: 0 1px 0 #fff;
@@ -160,12 +160,12 @@
 	border-radius: 5px 5px 0 0;
 	box-shadow: 1px 2px 3px #eee;
 }
-#modcenter .windowbg, #modcenter .windowbg2, #modcenter .generic_list_wrapper {
+#modcenter .content, #modcenter .generic_list_wrapper {
 	border: 1px solid #ddd;
 	border-bottom: 1px solid #ccc;
 	background: #fff;
 }
-#mod_main_section .windowbg {
+#mod_main_section .content {
 	border: 1px solid #ccc;
 	border-top: 1px solid #bbb;
 	border-bottom: 1px solid #ddd;
@@ -224,12 +224,13 @@
 }
 
 /* alternate row colors on Modify Themes,Copy a template */
-.theme_options .windowbg2 {
+/* @todo n:th this */
+.theme_options .content {
 	background: #fcfcfc;
 	border-top: 1px solid #ccc;
 	border-bottom: 1px solid #ccc;
 }
-.theme_options .windowbg {
+.theme_options .content {
 	background: #efefef;
 	border-top: 1px solid #ccc;
 	border-bottom: 1px solid #ccc;

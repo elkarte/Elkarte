@@ -69,12 +69,12 @@
 }
 
 /* alternate row colors on Modify Themes,Copy a template */
-.theme_options .windowbg2 {
+.theme_options .content {
 	background: #fcfcfc;
 	border-top: 1px solid #ccc;
 	border-bottom: 1px solid #ccc;
 }
-.theme_options .windowbg {
+.theme_options .content {
 	border-top: 1px solid #ccc;
 	border-bottom: 1px solid #ccc;
 }

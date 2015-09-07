@@ -19,7 +19,7 @@
 .action_admin .generic_list {
 	overflow: auto;
 }
-#admin_content .windowbg, #admin_content .windowbg2 {
+#admin_content .content {
 	margin-bottom: 5px;
 }
 .admincenter {
@@ -42,9 +42,9 @@
 	padding: 8px 8px 16px 8px;
 	overflow: auto;
 }
-#admin_form_wrapper div.windowbg, #support_credits div.windowbg,
-#generate_reports_type div.windowbg, #new_group div.windowbg,
-#view_group div.windowbg, #admin_newsletters .windowbg {
+#admin_form_wrapper div.content, #support_credits div.content,
+#generate_reports_type div.content, #new_group div.content,
+#view_group div.content, #admin_newsletters .content {
 	background: none;
 	padding: 0;
 	margin: 0 4px;
@@ -52,11 +52,11 @@
 #mailqueue_stats {
 	padding: 8px 8px 0 8px;
 }
-#mailqueue_stats .windowbg {
+#mailqueue_stats .content {
 	background: none;
 	padding: 0;
 }
-#mailqueue_stats .windowbg .content {
+#mailqueue_stats .content {
 	padding: 12px 9px 0 9px;
 }
 #view_group .table_grid {
@@ -115,11 +115,11 @@ h3.category_header form {
 .category_header>h3 {
 	white-space: nowrap;
 }
-.windowbg.nopadding {
+.content.nopadding {
 	margin: 4px 0 0 0;
 	padding: 0;
 }
-.windowbg ol {
+.content ol {
 	margin-top: 0;
 	margin-bottom: 0;
 }
@@ -225,7 +225,7 @@ fieldset dl {
 	width: 30%;
 	padding-left: 6px;
 }
-#admin_main_section .windowbg {
+#admin_main_section .content {
 	padding: 6px 0;
 	height: 12em;
 	overflow: auto;
@@ -511,7 +511,7 @@ dl.settings dd.questions input {
 
 /* Styles for the manage boards section.
 ------------------------------------------------- */
-#manage_boards .windowbg {
+#manage_boards .content {
 	margin: 0;
 	padding: 0;
 }
@@ -539,7 +539,7 @@ dl.settings dd.questions input {
 	height: 25px;
 	cursor: move;
 }
-#manage_boards li, #manage_boards li.windowbg, #manage_boards li.windowbg2 {
+#manage_boards li, #manage_boards li.content {
 	list-style: none;
 	margin: 0;
 	padding-top: 12px;
@@ -628,7 +628,7 @@ dl.settings dd.questions input {
 
 /* Styles for the manage maintenance section.
 ------------------------------------------------- */
-#manage_maintenance div.windowbg, #manage_maintenance div.windowbg2 {
+#manage_maintenance div.content {
 	padding: 0;
 	margin: 0 0 4px 0;
 }
@@ -857,14 +857,14 @@ dl.themes_list dd {
 	display: block;
 	width: 100%;
 }
-#modcenter .windowbg, #modcenter .windowbg2, #modcenter .generic_list_wrapper {
+#modcenter .content, #modcenter .generic_list_wrapper {
 	overflow: visible;
 	margin: 4px 0 0 0;
 }
 #modcenter .content {
 	padding: 12px;
 }
-#mod_main_section .windowbg {
+#mod_main_section .content {
 	padding: 6px 0;
 	height: 14em;
 	overflow: auto;
@@ -917,7 +917,7 @@ ul.moderation_notes li {
 #error_log {
 	width: 100%;
 }
-#error_log tr.windowbg td, #error_log tr.windowbg2 td {
+#error_log tr.content td {
 	padding: 8px;
 	line-height: 160%;
 }
@@ -1159,7 +1159,7 @@ ul.moderation_notes li {
 		max-height: 5em;
 		overflow: auto;
 	}
-	#manage_boards .windowbg {
+	#manage_boards .content {
 		line-height: 3.2em;
 	}
 	#manage_boards ul {

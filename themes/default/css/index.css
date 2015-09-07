@@ -96,7 +96,7 @@ p, fieldset, form, input, button, select, .input_text, textarea, .editor {
 	font-size: 1em;
 }
 /* Declarations for specific elements. @todo - Maybe simplify - test. */
-.wrapper, div.windowbg, div.windowbg2,
+.wrapper, div.content,
 .roundframe, .description, .information, .successbox, .warningbox,
 .category_header, .generic_list_wrapper, .submitbutton,
 .grid8, .grid17, .grid20, .grid25, .grid30, .grid33, .grid50, #description_board .generalinfo {
@@ -512,15 +512,13 @@ h2 a.collapse {
 .collapse {background-position: 0 -25px;}
 .expand {background-position: -116px -25px;}
 
-/* Alternating backgrounds for posts, and several other sections of the forum. */
-.windowbg, #preview_body, .windowbg2 {}
-
 /* General code for generic divs. Should make them behave. */
-/* @todo - Not keen on this. Do no-tag-names solution instead? */
-/* @todo - When sorted out take care of div.core_posts too */
-div.windowbg, div.windowbg2 {
+.content {
+	padding: 0.5em 1em;
 	overflow: auto;
-	padding: 10px 0;
+}
+.content p {
+	margin: 0 0 6px 0;
 }
 
 /* Other highlighted text, such as search results. */
@@ -592,14 +590,6 @@ div.windowbg, div.windowbg2 {
 	margin: 0;
 	padding: 0;
 	border: none;
-}
-
-/* @todo - Ha. Just another silly bunch of divs. */
-.content {
-	padding: 0.2em 1em;
-}
-.content p {
-	margin: 0 0 6px 0;
 }
 
 /* Styles used by the auto suggest control. */
@@ -2129,7 +2119,7 @@ img.new_posts {
 	display: inline-block;
 }
 /* Poster and postarea + moderation area underneath */
-.forumposts .windowbg, .forumposts .windowbg2,
+.forumposts .content,
 .forumposts .approvebg, .forumposts .approvebg2, .core_posts {
 	overflow: visible;
 	margin: 4px 0 0 0;
@@ -2767,7 +2757,7 @@ ul.post_options li {
 #selected, #not_selected {
 	width: 49%;
 }
-.split_messages .windowbg, .split_messages .windowbg2 {
+.split_messages .content {
 	margin: 1px;
 }
 .split_messages .split_icon {
@@ -2843,9 +2833,9 @@ dl.merge_topic dd {
 #profilecenter div.core_posts {
 	padding: 0.2em 1em;
 }
-#profilecenter .windowbg, #profilecenter .windowbg2,
-#profile_attachments .windowbg, #profile_attachments .windowbg2,
-#unwatched_topics .windowbg, #unwatched_topics .windowbg2 {
+#profilecenter .content,
+#profile_attachments .content,
+#unwatched_topics .content {
 	overflow: visible;
 	padding: 0 0 4px;
 }
@@ -2918,7 +2908,7 @@ dl.merge_topic dd {
 	float: left;
 	width: 30%;
 }
-#basicinfo .windowbg .content {
+#basicinfo .content {
 	padding-left: 30px;
 }
 .profileblock .cf_icon {
@@ -3360,7 +3350,7 @@ div.labels {
 	padding: 4px;
 	width: 14%;
 }
-#main_grid .windowbg.days {
+#main_grid .content.days {
 	height: 100px;
 }
 #main_grid .weeks {
@@ -3388,7 +3378,7 @@ div.labels {
 	font-size: 1.143em;
 }
 /* Use the old one true layout trick here. */
-.weeklist .windowbg2, .weeklist .calendar_today {
+.weeklist .content, .weeklist .calendar_today {
 	margin: 0 0 -95px 11.5em;
 	padding: 8px 8px 100px 8px;
 }
@@ -4470,7 +4460,7 @@ dl.no_members {
 		display: block;
 		margin: 0;
 	}
-	#forumposts .windowbg {
+	#forumposts .content {
 		padding: 5px;
 	}
 	#forumposts h2 img {
@@ -4651,7 +4641,7 @@ dl.no_members {
 	.signature {
 		display: none;
 	}
-	.forumposts .windowbg, .forumposts .windowbg2 {
+	.forumposts .content {
 		margin-bottom: 6px;
 	}
 	#moderationbuttons, a.linklevel1.button_strip_notify,
