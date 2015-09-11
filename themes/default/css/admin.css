@@ -270,8 +270,6 @@ fieldset dl {
 
 #live_news, #supportVersionsTable {
 	width: 70%;
-	-moz-box-sizing: border-box;
-	-webkit-box-sizing: border-box;
 	box-sizing: border-box;
 }
 
@@ -1094,8 +1092,6 @@ ul.moderation_notes li {
 }
 
 #error_log td div {
-	-moz-box-sizing: border-box;
-	-webkit-box-sizing: border-box;
 	box-sizing: border-box;
 	/* The next bits should fix https://github.com/elkarte/Elkarte/issues/567 */
 	word-wrap: break-word;

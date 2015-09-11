@@ -90,8 +90,6 @@ table {
 /* Declare these separately to divs to avoid padding and margin problems. */
 h1, h2, h3, h4, h5, h6, ul, ol, li, dl, dd, dt,
 p, fieldset, form, input, button, select, .input_text, textarea, .editor {
-	-webkit-box-sizing: border-box;
-	-moz-box-sizing: border-box;
 	box-sizing: border-box;
 	margin: 0;
 	padding: 0;
@@ -104,8 +102,6 @@ p, fieldset, form, input, button, select, .input_text, textarea, .editor {
 .roundframe, .description, .information, .successbox, .warningbox, .well,
 .category_header, .generic_list_wrapper, .submitbutton,
 .grid8, .grid17, .grid20, .grid25, .grid30, .grid33, .grid50, #description_board .generalinfo {
-	-webkit-box-sizing: border-box;
-	-moz-box-sizing: border-box;
 	box-sizing: border-box;
 }
 
@@ -517,7 +513,7 @@ em {
 }
 
 .cat_img_config:before {
-	background-position: 0 -48px
+	background-position: 0 -48px;
 }
 
 .cat_img_contacts:before {
@@ -1125,8 +1121,7 @@ a.bbc_link {
 .listlevel1#button_profile img {
 	position: relative;
 	top: 4px;
-	margin: 0;
-	margin-right: 0.6em;
+	margin: 0 0.6em 0 0;
 	max-width: 1.5em;
 	max-height: 1.5em;
 }
@@ -2351,7 +2346,7 @@ img.new_posts {
 }
 
 .img_profile:before {
-	background-position: 0 -37px
+	background-position: 0 -37px;
 }
 
 .img_locked:before {
@@ -2396,7 +2391,7 @@ img.new_posts {
 }
 
 .img_poll:before {
-	background-position: -18px -36px
+	background-position: -18px -36px;
 }
 
 .img_question:before {
@@ -2480,8 +2475,6 @@ img.new_posts {
 }
 
 .jump_to_header {
-	-webkit-box-sizing: border-box;
-	-moz-box-sizing: border-box;
 	box-sizing: border-box;
 	padding: 0 4px;
 	border: none;
@@ -4579,7 +4572,7 @@ dl.no_members {
 
 #memberlist .selected {
 	width: auto;
-	white-space: nowrap
+	white-space: nowrap;
 }
 
 #memberlist_search, #memberlist > .content > .submitbutton {
@@ -5955,7 +5948,7 @@ dl.no_members {
 		display: none;
 	}
 
-	.whos online dd, .whos_online dd div {
+	.whos_online dd, .whos_online dd div {
 		display: block;
 	}
 }
