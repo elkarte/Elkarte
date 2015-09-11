@@ -25,11 +25,11 @@ function template_trackActivity()
 	// The first table shows IP information about the user.
 	echo '
 		<div class="generic_list_wrapper">
-			<h3 class="category_header"><strong>', $txt['view_ips_by'], ' ', $context['member']['name'], '</strong></h3>';
+			<h2 class="category_header"><strong>', $txt['view_ips_by'], ' ', $context['member']['name'], '</strong></h2>';
 
 	// The last IP the user used.
 	echo '
-			<div id="tracking" class="windowbg2">
+			<div id="tracking">
 				<div class="content">
 					<dl class="noborder">
 						<dt>', $txt['most_recent_ip'], ':
@@ -85,8 +85,8 @@ function template_trackIP()
 	// The first table in the template gives an input box to allow the admin to enter another IP to track.
 	echo '
 	<div>
-		<h3 class="category_header">', $txt['trackIP'], '</h3>
-		<div class="roundframe">
+		<h2 class="category_header">', $txt['trackIP'], '</h2>
+		<div class="well">
 			<form action="', $context['base_url'], '" method="post" accept-charset="UTF-8">
 				<dl class="settings">
 					<dt>
@@ -107,8 +107,8 @@ function template_trackIP()
 	if ($context['single_ip'])
 	{
 		echo '
-			<h3 class="category_header">', $txt['whois_title'], ' ', $context['ip'], '</h3>
-			<div class="windowbg2">';
+			<h2 class="category_header">', $txt['whois_title'], ' ', $context['ip'], '</h2>
+			<div class="content">';
 
 		foreach ($context['whois_servers'] as $server)
 			echo '
@@ -120,11 +120,11 @@ function template_trackIP()
 
 	// The second table lists all the members who have been logged as using this IP address.
 	echo '
-		<h3 class="category_header">', $txt['members_from_ip'], ' ', $context['ip'], '</h3>';
+		<h2 class="category_header">', $txt['members_from_ip'], ' ', $context['ip'], '</h2>';
 
 	if (empty($context['ips']))
 		echo '
-		<p class="windowbg2 description"><em>', $txt['no_members_from_ip'], '</em></p>';
+		<p class="description"><em>', $txt['no_members_from_ip'], '</em></p>';
 	else
 	{
 		echo '
@@ -141,8 +141,8 @@ function template_trackIP()
 		foreach ($context['ips'] as $ip => $memberlist)
 			echo '
 				<tr>
-					<td class="windowbg2"><a href="', $context['base_url'], ';searchip=', $ip, '">', $ip, '</a></td>
-					<td class="windowbg2">', implode(', ', $memberlist), '</td>
+					<td><a href="', $context['base_url'], ';searchip=', $ip, '">', $ip, '</a></td>
+					<td>', implode(', ', $memberlist), '</td>
 				</tr>';
 
 		echo '

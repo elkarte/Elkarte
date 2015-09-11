@@ -28,7 +28,7 @@ function template_login()
 			<h2 class="category_header hdicon cat_img_login">
 				', $txt['login'], '
 			</h2>
-			<div class="roundframe">';
+			<div class="well">';
 
 	// Did they make a mistake last time?
 	if (!empty($context['login_errors']))
@@ -134,10 +134,10 @@ function template_kick_guest()
 
 	// And now the login information.
 	echo '
-			<h3 class="category_header hdicon cat_img_login">
+			<h2 class="category_header hdicon cat_img_login">
 				', $txt['login'], '
-			</h3>
-			<div class="roundframe">
+			</h2>
+			<div class="well">
 				<dl>
 					<dt><label for="user">', $txt['username'], '</label>:</dt>
 					<dd>
@@ -207,8 +207,8 @@ function template_maintenance()
 			<img class="floatleft" src="', $settings['images_url'], '/construction.png" alt="', $txt['in_maintain_mode'], '" />
 			', $context['description'], '
 		</p>
-		<h3 class="category_header">', $txt['admin_login'], '</h3>
-		<div class="roundframe">
+		<h2 class="category_header">', $txt['admin_login'], '</h2>
+		<div class="well">
 			<dl>
 				<dt><label for="user">', $txt['username'], '</label>:</dt>
 				<dd>
@@ -252,7 +252,7 @@ function template_admin_login()
 		<h2 class="category_header hdicon cat_img_login">
 			', $txt['login'], '
 		</h2>
-		<div class="roundframe centertext">';
+		<div class="well centertext">';
 
 	if (!empty($context['incorrect_password']))
 		echo '
@@ -295,7 +295,7 @@ function template_retry_activate()
 	echo '
 		<form action="', $scripturl, '?action=activate;u=', $context['member_id'], '" method="post" accept-charset="UTF-8">
 			<h2 class="category_header">', $context['page_title'], '</h2>
-			<div class="roundframe">
+			<div class="well">
 				<dl>';
 
 	// You didn't even have an ID?
@@ -330,7 +330,7 @@ function template_resend()
 	echo '
 		<form action="', $scripturl, '?action=activate;sa=resend" method="post" accept-charset="UTF-8">
 			<h2 class="category_header">', $context['page_title'], '</h2>
-			<div class="roundframe">
+			<div class="well">
 				<dl>
 					<dt><label for="user">', $txt['invalid_activation_username'], '</label>:</dt>
 					<dd><input type="text" name="user" id="user" size="40" value="', $context['default_username'], '" class="input_text" /></dd>

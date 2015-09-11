@@ -27,7 +27,7 @@ function template_reminder()
 	<form action="', $scripturl, '?action=reminder;sa=picktype" method="post" accept-charset="UTF-8">
 		<div class="login">
 			<h2 class="category_header">', $txt['authentication_reminder'], '</h2>
-			<div class="roundframe">
+			<div class="well">
 				<p class="smalltext centertext">', $txt['password_reminder_desc'], '</p>
 				<dl>
 					<dt><label for="user">', $txt['user_email'], '</label>:</dt>
@@ -53,7 +53,7 @@ function template_reminder_pick()
 	<form action="', $scripturl, '?action=reminder;sa=picktype" method="post" accept-charset="UTF-8">
 		<div class="login">
 			<h2 class="category_header">', $txt['authentication_reminder'], '</h2>
-			<div class="roundframe">
+			<div class="well">
 				<p><strong>', $txt['authentication_options'], ':</strong></p>
 				<p>
 					<input type="radio" name="reminder_type" id="reminder_type_email" value="email" checked="checked" class="input_radio" /></dt>
@@ -101,7 +101,7 @@ function template_set_password()
 	<form action="', $scripturl, '?action=reminder;sa=setpassword2" name="reminder_form" id="reminder_form" method="post" accept-charset="UTF-8">
 		<div class="login">
 			<h2 class="category_header">', $context['page_title'], '</h2>
-			<div class="roundframe">
+			<div class="well">
 				<dl>
 					<dt><label for="elk_autov_pwmain">', $txt['choose_pass'], '</label>: </dt>
 					<dd>
@@ -160,7 +160,7 @@ function template_ask()
 	<form action="', $scripturl, '?action=reminder;sa=secret2" method="post" accept-charset="UTF-8" name="creator" id="creator">
 		<div class="login">
 			<h2 class="category_header">', $txt['authentication_reminder'], '</h2>
-			<div class="roundframe">
+			<div class="well">
 				<p class="smalltext">', $context['account_type'] == 'password' ? $txt['enter_new_password'] : $txt['openid_secret_reminder'], '</p>
 				<dl>
 					<dt>', $txt['secret_question'], ':</dt>

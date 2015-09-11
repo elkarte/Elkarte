@@ -68,7 +68,6 @@ function template_whos_online()
 	// For every member display their name, time and action (and more for admin).
 	foreach ($context['members'] as $member)
 	{
-		// $alternate will either be true or false. If it's true, use "windowbg2" and otherwise use "windowbg".
 		echo '
 					<dd class="online_row">
 						<div class="online_member">
@@ -145,29 +144,26 @@ function template_credits()
 	{
 		if (isset($section['pretext']))
 			echo '
-		<div class="windowbg">
-			<div class="content">
-				<p>', $section['pretext'], '</p>
-			</div>
+		<div class="content">
+			', $section['pretext'], '
 		</div>';
 
 		if (isset($section['title']))
 			echo '
-			<h3 class="category_header">', $section['title'], '</h3>';
+			<h2 class="category_header">', $section['title'], '</h2>';
 
 		echo '
-		<div class="windowbg2">
-			<div class="content">
-				<dl>';
+		<div class="content">
+			<dl>';
 
 		foreach ($section['groups'] as $group)
 		{
 			if (isset($group['title']))
 				echo '
-					<dt>
-						<strong>', $group['title'], '</strong>
-					</dt>
-					<dd>';
+				<dt>
+					<strong>', $group['title'], '</strong>
+				</dt>
+				<dd>';
 
 			// Try to make this read nicely.
 			if (count($group['members']) <= 2)
@@ -179,18 +175,17 @@ function template_credits()
 			}
 
 			echo '
-					</dd>';
+				</dd>';
 		}
 
 		echo '
-				</dl>';
+			</dl>';
 
 		if (isset($section['posttext']))
 			echo '
-				<p class="posttext">', $section['posttext'], '</p>';
+			<p class="posttext">', $section['posttext'], '</p>';
 
 		echo '
-			</div>
 		</div>';
 	}
 
@@ -198,19 +193,19 @@ function template_credits()
 	if (!empty($context['credits_software_graphics']))
 	{
 		echo '
-		<h3 class="category_header">', $txt['credits_software_graphics'], '</h3>
-		<div class="windowbg">
-			<div class="content">';
+		<h2 class="category_header">', $txt['credits_software_graphics'], '</h2>
+		<div class="content">';
 
 		foreach ($context['credits_software_graphics'] as $section => $credits)
 			echo '
-				<dl>
-					<dt><strong>', $txt['credits_' . $section], '</strong></dt>
-					<dd>', implode('</dd><dd>', $credits), '</dd>
-				</dl>';
+			<dl>
+				<dt>
+					<strong>', $txt['credits_' . $section], '</strong>
+				</dt>
+				<dd>', implode('</dd><dd>', $credits), '</dd>
+			</dl>';
 
 		echo '
-			</div>
 		</div>';
 	}
 
@@ -218,45 +213,47 @@ function template_credits()
 	if (!empty($context['credits_addons']))
 	{
 		echo '
-		<h3 class="category_header">', $txt['credits_addons'], '</h3>
-		<div class="windowbg">
-			<div class="content">';
+		<h2 class="category_header">', $txt['credits_addons'], '</h2>
+		<div class="content">';
 
 		echo '
-				<dl>
-					<dt><strong>', $txt['credits_addons'], '</strong></dt>
-					<dd>', implode('</dd><dd>', $context['credits_addons']), '</dd>
-				</dl>';
+			<dl>
+				<dt>
+					<strong>', $txt['credits_addons'], '</strong>
+				</dt>
+				<dd>', implode('</dd><dd>', $context['credits_addons']), '</dd>
+			</dl>';
 
 		echo '
-			</div>
 		</div>';
 	}
 
 	// ElkArte !
 	echo '
-		<h3 class="category_header">', $txt['credits_copyright'], '</h3>
-		<div class="windowbg">
-			<div class="content">
-				<dl>
-					<dt><strong>', $txt['credits_forum'], '</strong></dt>', '
-					<dd>', $context['copyrights']['elkarte'];
+		<h2 class="category_header">', $txt['credits_copyright'], '</h2>
+		<div class="content">
+			<dl>
+				<dt>
+					<strong>', $txt['credits_forum'], '</strong>
+				</dt>
+				<dd>', $context['copyrights']['elkarte'];
 
 	echo '
-					</dd>
-				</dl>';
+				</dd>
+			</dl>';
 
 	if (!empty($context['copyrights']['addons']))
 	{
 		echo '
-				<dl>
-					<dt><strong>', $txt['credits_addons'], '</strong></dt>
-					<dd>', implode('</dd><dd>', $context['copyrights']['addons']), '</dd>
-				</dl>';
+			<dl>
+				<dt>
+					<strong>', $txt['credits_addons'], '</strong>
+				</dt>
+				<dd>', implode('</dd><dd>', $context['copyrights']['addons']), '</dd>
+			</dl>';
 	}
 
 	echo '
-			</div>
 		</div>
 	</div>';
 }

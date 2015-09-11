@@ -487,7 +487,6 @@ class ManageSearchEngines_Controller extends Action_Controller
 				array(
 					'position' => 'after_title',
 					'value' => $txt['spider_logs_info'],
-					'class' => 'windowbg2',
 				),
 				array(
 					'position' => 'below_table_data',

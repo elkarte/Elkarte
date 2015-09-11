@@ -204,9 +204,9 @@ function template_results()
 	if (!empty($context['search_ignored']))
 		echo '
 		<div id="search_results">
-			<h3 class="category_header">
+			<h2 class="category_header">
 				', $txt['generic_warning'], '
-			</h3>
+			</h2>
 			<p class="warningbox">', $txt['search_warning_ignored_word' . (count($context['search_ignored']) == 1 ? '' : 's')], ': ', implode(', ', $context['search_ignored']), '</p>
 		</div>';
 
@@ -216,7 +216,7 @@ function template_results()
 		echo '
 			<div id="search_results">
 				<h2 class="category_header">', $txt['search_adjust_query'], '</h2>
-				<div class="roundframe">';
+				<div class="well">';
 
 		// Did they make any typos or mistakes, perhaps?
 		if (isset($context['did_you_mean']))
@@ -262,7 +262,7 @@ function template_results()
 			<form action="', $scripturl, '?action=quickmod" method="post" accept-charset="UTF-8" name="topicForm" id="topicForm" class="search_results_posts', $context['compact'] ? ' compact_view' : '', '">';
 
 	echo '
-				<h3 class="category_header hdicon cat_img_search">
+				<h2 class="category_header hdicon cat_img_search">
 					<span class="floatright">';
 
 	if (!empty($options['display_quick_mod']) && $options['display_quick_mod'] == 1)
@@ -279,7 +279,7 @@ function template_results()
 		template_pagesection();
 	else
 		echo '
-				<div class="roundframe">', $txt['find_no_results'], '</div>';
+				<div class="well">', $txt['find_no_results'], '</div>';
 
 	if ($context['compact'])
 		echo '
@@ -308,7 +308,7 @@ function template_results()
 				$color_class = 'basic_row';
 		}
 		else
-			$color_class = $message['alternate'] == 0 ? 'windowbg' : 'windowbg2';
+			$color_class = 'basic_row';
 
 		foreach ($topic['matches'] as $message)
 		{

@@ -918,7 +918,7 @@ function ssi_login($redirect_to = '', $output_method = 'echo')
 
 		<form action="', $scripturl, '?action=login2" name="frmLogin" id="frmLogin" method="post" accept-charset="UTF-8" ', empty($context['disable_login_hashing']) ? ' onsubmit="hashLoginPassword(this, \'' . $context['session_id'] . '\');"' : '', '>
 		<div class="login">
-			<div class="roundframe">';
+			<div class="well">';
 
 	// Did they make a mistake last time?
 	if (!empty($context['login_errors']))

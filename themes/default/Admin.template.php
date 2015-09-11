@@ -24,120 +24,120 @@ function template_admin()
 
 	// Welcome message for the admin.
 	echo '
-					<div id="admincenter">';
+		<div id="admincenter">';
 
 	// Is there an update available?
 	echo '
-						<div id="update_section"></div>';
+			<div id="update_section"></div>';
 
 	echo '
-						<div id="admin_main_section">';
+			<div id="admin_main_section">';
 
 	// Display the "live news"
 	echo '
-							<div id="live_news" class="floatleft">
-								<h3 class="category_header">
-									<a href="', $scripturl, '?action=quickhelp;help=live_news" onclick="return reqOverlayDiv(this.href);" class="hdicon cat_img_helptopics help"></a>', $txt['live'], '
-								</h3>
-								<div class="content">
-									<div id="ourAnnouncements">', $txt['lfyi'], '</div>
-								</div>
-							</div>';
+				<div id="live_news" class="floatleft">
+					<h2 class="category_header">
+						<a href="', $scripturl, '?action=quickhelp;help=live_news" onclick="return reqOverlayDiv(this.href);" class="hdicon cat_img_helptopics help"></a>', $txt['live'], '
+					</h2>
+					<div class="content">
+						<div id="ourAnnouncements">', $txt['lfyi'], '</div>
+					</div>
+				</div>';
 
 	// Show the user version information from their server.
 	echo '
-							<div id="supportVersionsTable" class="floatright">
-								<h3 class="category_header">
-									<a class="hdicon cat_img_plus" href="', $scripturl, '?action=admin;area=credits">', $txt['support_title'], '</a>
-								</h3>
-									<div class="content">
-									<div id="version_details">
-										<strong>', $txt['support_versions'], ':</strong><br />
-										', $txt['support_versions_forum'], ':
-										<em id="installedVersion">', $context['forum_version'], '</em><br />
-										', $txt['support_versions_current'], ':
-										<em id="latestVersion">??</em><br />
-										', $context['can_admin'] ? '<a href="' . $scripturl . '?action=admin;area=maintain;sa=routine;activity=version">' . $txt['version_check_more'] . '</a>' : '', '<br />';
+				<div id="supportVersionsTable" class="floatright">
+					<h2 class="category_header">
+						<a class="hdicon cat_img_plus" href="', $scripturl, '?action=admin;area=credits">', $txt['support_title'], '</a>
+					</h2>
+						<div class="content">
+						<div id="version_details">
+							<strong>', $txt['support_versions'], ':</strong><br />
+							', $txt['support_versions_forum'], ':
+							<em id="installedVersion">', $context['forum_version'], '</em><br />
+							', $txt['support_versions_current'], ':
+							<em id="latestVersion">??</em><br />
+							', $context['can_admin'] ? '<a href="' . $scripturl . '?action=admin;area=maintain;sa=routine;activity=version">' . $txt['version_check_more'] . '</a>' : '', '<br />';
 
 	// Display all the members who can administrate the forum.
 	echo '
-										<br />
-										<strong>', $txt['administrators'], ':</strong>
-										', implode(', ', $context['administrators']);
+							<br />
+							<strong>', $txt['administrators'], ':</strong>
+							', implode(', ', $context['administrators']);
 
 	// If we have lots of admins... don't show them all.
 	if (!empty($context['more_admins_link']))
 		echo '
-										(', $context['more_admins_link'], ')';
+							(', $context['more_admins_link'], ')';
 
 	echo '
-									</div>
-								</div>
-							</div>
-						</div>';
+						</div>
+					</div>
+				</div>
+			</div>';
 
 	echo '
-						<div class="quick_tasks">
-							<div class="content">
-								<ul id="quick_tasks" class="flow_hidden">';
+			<div class="quick_tasks">
+				<div class="content">
+					<ul id="quick_tasks" class="flow_hidden">';
 
 	foreach ($context['quick_admin_tasks'] as $task)
 		echo '
-									<li>
-										', !empty($task['icon']) ? '<a href="' . $task['href'] . '"><img src="' . $settings['default_images_url'] . '/admin/' . $task['icon'] . '" alt="" class="home_image" /></a>' : '', '
-										<h5>', $task['link'], '</h5>
-										<span class="task">', $task['description'], '</span>
-									</li>';
+						<li>
+							', !empty($task['icon']) ? '<a href="' . $task['href'] . '"><img src="' . $settings['default_images_url'] . '/admin/' . $task['icon'] . '" alt="" class="home_image" /></a>' : '', '
+							<h5>', $task['link'], '</h5>
+							<span class="task">', $task['description'], '</span>
+						</li>';
 
 	echo '
-								</ul>
-							</div>
-						</div>
-					</div>';
+					</ul>
+				</div>
+			</div>
+		</div>';
 
 	// This sets the announcements and current versions themselves ;).
 	echo '
-					<script><!-- // --><![CDATA[
-						var oAdminCenter = new elk_AdminIndex({
-							bLoadAnnouncements: true,
-							sAnnouncementTemplate: ', JavaScriptEscape('
-								<dl>
-									%content%
-								</dl>
-							'), ',
-							sAnnouncementMessageTemplate: ', JavaScriptEscape('
-								<dt><a href="%href%">%subject%</a> ' . $txt['on'] . ' %time%</dt>
-								<dd>
-									%message%
-								</dd>
-							'), ',
-							sAnnouncementContainerId: \'ourAnnouncements\',
+		<script><!-- // --><![CDATA[
+			var oAdminCenter = new elk_AdminIndex({
+				bLoadAnnouncements: true,
+				sAnnouncementTemplate: ', JavaScriptEscape('
+					<dl>
+						%content%
+					</dl>
+				'), ',
+				sAnnouncementMessageTemplate: ', JavaScriptEscape('
+					<dt><a href="%href%">%subject%</a> ' . $txt['on'] . ' %time%</dt>
+					<dd>
+						%message%
+					</dd>
+				'), ',
+				sAnnouncementContainerId: \'ourAnnouncements\',
 
-							bLoadVersions: true,
-							slatestVersionContainerId: \'latestVersion\',
-							sinstalledVersionContainerId: \'installedVersion\',
-							sVersionOutdatedTemplate: ', JavaScriptEscape('
-								<span class="alert">%currentVersion%</span>
-							'), ',
+				bLoadVersions: true,
+				slatestVersionContainerId: \'latestVersion\',
+				sinstalledVersionContainerId: \'installedVersion\',
+				sVersionOutdatedTemplate: ', JavaScriptEscape('
+					<span class="alert">%currentVersion%</span>
+				'), ',
 
-							bLoadUpdateNotification: true,
-							sUpdateNotificationContainerId: \'update_section\',
-							sUpdateNotificationDefaultTitle: ', JavaScriptEscape($txt['update_available']), ',
-							sUpdateNotificationDefaultMessage: ', JavaScriptEscape($txt['update_message']), ',
-							sUpdateNotificationTemplate: ', JavaScriptEscape('
-									<h3 id="update_title" class="category_header">
-										%title%
-									</h3>
-									<div class="content">
-										<div id="update_message" class="smalltext">
-											%message%
-										</div>
-									</div>
-							'), ',
-							sUpdateNotificationLink: elk_scripturl + ', JavaScriptEscape('?action=admin;area=packageservers;sa=download;auto;package=%package%;' . $context['session_var'] . '=' . $context['session_id']), '
+				bLoadUpdateNotification: true,
+				sUpdateNotificationContainerId: \'update_section\',
+				sUpdateNotificationDefaultTitle: ', JavaScriptEscape($txt['update_available']), ',
+				sUpdateNotificationDefaultMessage: ', JavaScriptEscape($txt['update_message']), ',
+				sUpdateNotificationTemplate: ', JavaScriptEscape('
+						<h3 id="update_title" class="category_header">
+							%title%
+						</h3>
+						<div class="content">
+							<div id="update_message" class="smalltext">
+								%message%
+							</div>
+						</div>
+				'), ',
+				sUpdateNotificationLink: elk_scripturl + ', JavaScriptEscape('?action=admin;area=packageservers;sa=download;auto;package=%package%;' . $context['session_var'] . '=' . $context['session_id']), '
 
-						});
-					// ]]></script>';
+			});
+		// ]]></script>';
 }
 
 /**
@@ -151,9 +151,9 @@ function template_credits()
 	echo '
 					<div id="admincenter">
 						<div id="support_credits">
-							<h3 class="category_header">
+							<h2 class="category_header">
 								', $txt['support_title'], ' <img src="', $settings['images_url'], '/', $context['theme_variant_url'], 'logo_elk.png" id="credits_logo" alt="" />
-							</h3>
+							</h2>
 							<div class="content">
 								<strong>', $txt['support_versions'], ':</strong><br />
 									', $txt['support_versions_forum'], ':
@@ -193,9 +193,9 @@ function template_credits()
 	// Point the admin to common support resources.
 	echo '
 							<div id="support_resources">
-								<h3 class="category_header">
+								<h2 class="category_header">
 									', $txt['support_resources'], '
-								</h3>
+								</h2>
 							</div>
 							<div class="content">
 								<p>', $txt['support_resources_p1'], '</p>
@@ -205,9 +205,9 @@ function template_credits()
 	// The most important part - the credits :P.
 	echo '
 							<div id="credits_sections">
-								<h3 class="category_header">
+								<h2 class="category_header">
 									', $txt['admin_credits'], '
-								</h3>
+								</h2>
 							</div>
 							<div class="content">';
 
@@ -285,9 +285,9 @@ function template_view_versions()
 
 	echo '
 					<div id="admincenter">
-						<h3 class="category_header">
+						<h2 class="category_header">
 							', $txt['admin_version_check'], '
-						</h3>
+						</h2>
 						<div class="information">', $txt['version_check_desc'], '</div>
 							<table class="table_grid">
 								<thead>
@@ -699,9 +699,9 @@ function template_edit_censored()
 	echo '
 	<div id="admincenter">
 		<form id="admin_form_wrapper" action="', $scripturl, '?action=admin;area=postsettings;sa=censor" method="post" accept-charset="UTF-8">
-			<h3 class="category_header">
+			<h2 class="category_header">
 				', $txt['admin_censored_words'], '
-			</h3>
+			</h2>
 			<div class="content">
 				<div class="information">', $txt['admin_censored_where'],'</div>';
 
@@ -750,7 +750,7 @@ function template_edit_censored()
 
 	// This lets you test out your filters by typing in rude words and seeing what comes out.
 	echo '
-			<h3 class="category_header">', $txt['censor_test'], '</h3>
+			<h2 class="category_header">', $txt['censor_test'], '</h2>
 			<div class="content">
 				<div class="centertext">
 					<p id="censor_result" style="display:none" class="information">', empty($context['censor_test']) ? '' : $context['censor_test'], '</p>
@@ -782,7 +782,7 @@ function template_not_done()
 
 	echo '
 	<div id="admincenter">
-		<h3 class="category_header">', empty($context['not_done_title']) ? $txt['not_done_title'] : $context['not_done_title'], '</h3>
+		<h2 class="category_header">', empty($context['not_done_title']) ? $txt['not_done_title'] : $context['not_done_title'], '</h2>
 		<div class="content">
 			<div class="infobox">
 				', $txt['not_done_reason'], '
@@ -833,7 +833,7 @@ function template_show_settings()
 	// Is there a custom title, maybe even with an icon?
 	if (isset($context['settings_title']))
 		echo '
-			<h3 class="category_header', !empty($context['settings_icon']) ? ' hdicon cat_img_' . $context['settings_icon'] : '', '">', $context['settings_title'], '</h3>';
+			<h2 class="category_header', !empty($context['settings_icon']) ? ' hdicon cat_img_' . $context['settings_icon'] : '', '">', $context['settings_title'], '</h2>';
 
 	// any messages or errors to show?
 	if (!empty($context['settings_message']))
@@ -862,8 +862,7 @@ function template_show_settings()
 				$is_open = false;
 				echo '
 					</dl>
-				</div>
-			</div>';
+				</div>';
 			}
 
 			// A title, maybe even with an icon or a help icon?
@@ -1264,7 +1263,7 @@ function template_repair_boards()
 
 	echo '
 	<div id="admincenter">
-		<h3 class="category_header">', $context['error_search'] ? $txt['errors_list'] : $txt['errors_fixing'], '</h3>
+		<h2 class="category_header">', $context['error_search'] ? $txt['errors_list'] : $txt['errors_fixing'], '</h2>
 		<div class="content">';
 
 	// Are we actually fixing them, or is this just a prompt?
@@ -1343,7 +1342,7 @@ function template_php_info()
 
 	echo '
 	<div id="admin_form_wrapper">
-		<h3 class="category_header">', $txt['phpinfo_settings'], '</h3>';
+		<h2 class="category_header">', $txt['phpinfo_settings'], '</h2>';
 
 	// for each php info area
 	foreach ($context['pinfo'] as $area => $php_area)
@@ -1351,10 +1350,10 @@ function template_php_info()
 		echo '
 		<table id="', str_replace(' ', '_', $area), '" class="table_grid wordbreak">
 			<thead>
-			<tr class="table_head three_column">
-				<th scope="col"></th>
-				<th scope="col" class="centertext"><strong>', $area, '</strong></th>
-				<th scope="col" class="centertext"></th>
+			<tr class="table_head">
+				<th class="grid33" scope="col"></th>
+				<th class="centertext grid33" scope="col"><strong>', $area, '</strong></th>
+				<th class="centertext grid33" scope="col"></th>
 			</tr>
 			</thead>
 			<tbody>';
@@ -1419,7 +1418,7 @@ function template_clean_cache_button_below()
 
 	echo '
 	<div class="generic_list_wrapper">
-		<h3 class="category_header">', $txt['maintain_cache'], '</h3>
+		<h2 class="category_header">', $txt['maintain_cache'], '</h2>
 		<div class="content">
 			<form action="', $scripturl, '?action=admin;area=maintain;sa=routine;activity=cleancache" method="post" accept-charset="UTF-8">
 				<p>', $txt['maintain_cache_info'], '</p>

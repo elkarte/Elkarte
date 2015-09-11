@@ -252,7 +252,6 @@ class ManageScheduledTasks_Controller extends Action_Controller
 				array(
 					'position' => 'after_title',
 					'value' => $txt['scheduled_tasks_time_offset'],
-					'class' => 'windowbg2',
 				),
 			),
 		);
@@ -443,7 +442,6 @@ class ManageScheduledTasks_Controller extends Action_Controller
 				array(
 					'position' => 'after_title',
 					'value' => $txt['scheduled_tasks_time_offset'],
-					'class' => 'windowbg2',
 				),
 			),
 		);
