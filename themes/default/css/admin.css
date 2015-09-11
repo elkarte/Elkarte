@@ -36,7 +36,11 @@
 }
 
 .admincenter .content .settings {
-	padding: 0 0 0 8px;
+	padding: 5px 0 0 8px;
+}
+
+.admincenter .content hr.clear {
+	margin-left: 12px;
 }
 
 /* @todo - A general admin wrapper class. */
@@ -50,11 +54,13 @@
 	overflow: auto;
 }
 
-#admin_form_wrapper div.content, #support_credits div.content,
-#generate_reports_type div.content, #new_group div.content,
-#view_group div.content, #admin_newsletters .content {
+#support_credits div.content,
+#generate_reports_type div.content,
+#new_group div.content,
+#view_group div.content,
+#admin_newsletters .content {
 	background: none;
-	padding: 0;
+	padding: 2px 0 0 8px;
 	margin: 0 4px;
 }
 
@@ -195,7 +201,7 @@ fieldset dl {
 }
 
 /* @todo - The welcome thingy. */
-.admincenter .roundframe, #modcenter .roundframe {
+.admincenter .well, #modcenter .well {
 	background: none;
 	border: none;
 	box-shadow: none;
@@ -365,8 +371,8 @@ div.quick_tasks {
 	padding: 6px 12px 12px 12px;
 }
 
-#support_resources {
-	margin: 16px 0 -24px 0;
+#support_resources, #credits_sections {
+	margin: 16px 0 0 0;
 }
 
 #credits_logo {
@@ -384,10 +390,6 @@ div.quick_tasks {
 #support_credits .content p {
 	margin: 12px 0 0 0;
 	padding: 0;
-}
-
-#credits_sections {
-	margin: 0 0 -24px 0;
 }
 
 #support_credits dl {
@@ -508,10 +510,6 @@ div.quick_tasks {
 	resize: vertical;
 }
 
-.package_server {
-	padding: 0 3em;
-}
-
 .package_image {
 	width: 12px;
 	height: 11px;
@@ -587,6 +585,7 @@ ul.package_servers li {
 ------------------------------------------------------- */
 dl.settings dt.questions {
 	width: 65%;
+	margin: 0;
 }
 
 dl.settings dd.questions {
@@ -621,7 +620,7 @@ dl.settings dd.questions input {
 }
 
 #manage_attachments .content {
-	margin: -10px 0 0;
+	margin: 0;
 	padding: 6px 8px;
 }
 
@@ -684,6 +683,7 @@ dl.settings dd.questions input {
 	border-radius: 3px;
 	padding: 3px 6px;
 	font-size: 1em;
+	text-transform: capitalize;
 }
 
 #manage_boards span.modify_boards a:hover {
@@ -749,15 +749,6 @@ dl.settings dd.questions input {
 
 /* Styles for the manage maintenance section.
 ------------------------------------------------- */
-#manage_maintenance div.content {
-	padding: 0;
-	margin: 0 0 4px 0;
-}
-
-#manage_maintenance .button_submit {
-	margin: 4px 10px 10px 10px;
-}
-
 #membersText, #rotText {
 	font-weight: bold;
 }
@@ -830,12 +821,17 @@ dl.admin_permissions dd {
 
 /* Styles for the manage search section.
 ------------------------------------------------- */
-dl.settings dt.large_caption {
+.large_caption > dt {
 	width: 70%;
 }
 
-dl.settings dd.large_caption {
+.large_caption > dd {
 	width: 29%;
+}
+
+.large_caption > dt a img {
+	vertical-align: middle;
+	margin-top: -1px;
 }
 
 .search_weight {
@@ -979,11 +975,13 @@ dl.themes_list {
 
 dl.themes_list dt {
 	margin-bottom: 3px;
+	margin-top: 5px;
 }
 
 dl.themes_list dd {
 	font-style: italic;
 	white-space: nowrap;
+	margin-top: 5px;
 }
 
 .theme_options dt {
@@ -1019,7 +1017,7 @@ dl.themes_list dd {
 
 #modcenter .content, #modcenter .generic_list_wrapper {
 	overflow: visible;
-	margin: 4px 0 0 0;
+	margin: 2px 0 0 0;
 }
 
 #modcenter .content {
@@ -1027,22 +1025,24 @@ dl.themes_list dd {
 }
 
 #mod_main_section .content {
-	padding: 6px 0;
+	padding: 6px;
 	height: 14em;
 	overflow: auto;
 }
 
 .modblock_left {
-	width: 49%;
+	width: 50%;
 	float: left;
 	clear: right;
-	margin: 0 0 1em 0;
+	padding: 0 5px 0 0;
+	box-sizing: border-box;
 }
 
 .modblock_right {
-	width: 49%;
+	width: 50%;
 	float: right;
-	margin: 0 0 1em 0;
+	margin: 0 0 5px 0;
+	box-sizing: border-box;
 }
 
 .modblock_left #ourAnnouncements {

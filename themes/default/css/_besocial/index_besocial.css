@@ -258,6 +258,38 @@ strong {
 	color: #FF7200;
 }
 
+/* Sometimes there will be an error when you post */
+.error {
+	color: #FF0000;
+}
+
+.border_error {
+	border: 1px solid #FF0000 !important;
+}
+
+/* Messages that somehow need to attract the attention. */
+.alert {
+	color: #FF0000;
+}
+
+/* Colors for warnings. */
+.warn_mute {
+	color: #FF0000;
+}
+
+.warn_moderate, .softalert {
+	color: #FFA500;
+}
+
+.warn_watch, .success {
+	color: #008000;
+}
+
+.moderation_link, .moderation_link:visited {
+	color: #FF0000;
+	font-weight: bold;
+}
+
 /* Legacy highlight color, for selected membergroups etc. */
 /* Used by JS to show a selected item. Still used in manage languages */
 .table_grid .standard_row.highlight2 {
@@ -428,6 +460,7 @@ div.bbc_footnotes .meaction {
 }
 
 #ajax_in_progress a {
+	color: #FFA500;
 	text-decoration: underline;
 }
 
