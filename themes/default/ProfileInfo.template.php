@@ -343,6 +343,7 @@ function template_action_statPanel()
 
 	// This next section draws a graph showing what times of day they post the most.
 	echo '
+		<div class="separator"></div>
 		<div id="activitytime" class="flow_hidden">
 			<h2 class="category_header hdicon cat_img_clock">
 				', $txt['statPanel_activityTime'], '

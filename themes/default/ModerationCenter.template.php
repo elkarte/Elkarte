@@ -206,9 +206,9 @@ function template_notes()
 						<form action="', $scripturl, '?action=moderate;area=index" method="post">
 							<h2 class="category_header hdicon cat_img_write">', $txt['mc_notes'], '</h2>
 							<div class="content modbox">
-								<div class="flow_auto">
+								<div class="submitbutton">
 									<input type="text" name="new_note" placeholder="', $txt['mc_click_add_note'], '" style="width: 89%" class="floatleft input_text" />
-									<input type="submit" name="makenote" value="', $txt['mc_add_note'], '" class="right_submit submitgo" />
+									<input type="submit" name="makenote" value="', $txt['mc_add_note'], '" />
 								</div>';
 
 	if (!empty($context['notes']))
@@ -323,7 +323,7 @@ function template_unapproved_posts()
 	// No posts?
 	if (empty($context['unapproved_items']))
 		echo '
-						<div class="content core_posts">
+						<div class="content">
 							<p class="centertext">', $txt['mc_unapproved_' . $context['current_view'] . '_none_found'], '</p>
 						</div>';
 	else
@@ -347,11 +347,11 @@ function template_unapproved_posts()
 						<select name="do" onchange="if (this.value != 0 &amp;&amp; confirm(\'' . $txt['mc_unapproved_sure'] . '\')) submit();">
 							<option value="0">' . $txt['with_selected'] . ':</option>
 							<option value="0" disabled="disabled">' . str_repeat('&#8212;', strlen($txt['approve'])) . '</option>
-							<option value="approve">' . (isBrowser('ie8') ? '&#187;' : '&#10148;') . '&nbsp;' . $txt['approve'] . '</option>
-							<option value="delete">' . (isBrowser('ie8') ? '&#187;' : '&#10148;') . '&nbsp;' . $txt['remove'] . '</option>
+							<option value="approve">&#10148;&nbsp;' . $txt['approve'] . '</option>
+							<option value="delete">&#10148;&nbsp;' . $txt['remove'] . '</option>
 						</select>
 						<noscript>
-							<input type="submit" name="mc_go" value="' . $txt['go'] . '" class="button_submit submitgo" />
+							<input type="submit" name="mc_go" value="' . $txt['go'] . '" />
 						</noscript>
 					</div>';
 
@@ -412,7 +412,7 @@ function template_viewmodreport()
 		'<p>', $comment['member']['link'], ': ', $comment['message'], ' <em class="smalltext">(', $comment['time'], ')</em></p>';
 
 	echo '
-								<textarea rows="2" cols="60" style="' . (isBrowser('is_ie8') ? 'width: 635px; max-width: 60%; min-width: 60%' : 'width: 100%') . ';" name="mod_comment"></textarea>
+								<textarea rows="2" cols="60" style="width: 100%;" name="mod_comment"></textarea>
 								<div class="submitbutton">
 									<input type="submit" name="add_comment" value="', $txt['mc_modreport_add_mod_comment'], '" class="button_submit" />
 								</div>

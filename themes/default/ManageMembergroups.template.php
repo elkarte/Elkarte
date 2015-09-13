@@ -648,28 +648,14 @@ function template_group_members()
 
 	echo '
 				</tbody>
-			</table>
-			<div class="flow_auto">
-				<div class="floatleft">';
+			</table>';
 
-	template_pagesection();
-
-	echo '
-				</div>
-				<div class="additional_row floatright">';
-
-	if (!empty($context['group']['assignable']))
-		echo '
-					<input type="submit" name="remove" value="', $txt['membergroups_members_remove'], '" class="button_submit " />';
-
-	echo '
-				</div>
-			</div>';
+			template_pagesection(false, '', array('extra' => '<div class="floatright"><input type="submit" name="remove" value="' . $txt['membergroups_members_remove'] . '" /></div>'));
 
 	if (!empty($context['group']['assignable']))
 	{
 		echo '
-			<div class="additional_row">
+			<div class="separator">
 				<h2 class="category_header">', $txt['membergroups_members_add_title'], '</h2>
 				<div class="content">
 					<dl class="settings">
@@ -734,7 +720,7 @@ function template_group_request_reason()
 					</dt>
 					<dd>
 						<input type="hidden" name="groupr[]" value="', $request['id'], '" />
-						<textarea id="groupreason" name="groupreason[', $request['id'], ']" rows="3" cols="40" style="' . (isBrowser('is_ie8') ? 'width: 635px; min-width: 96%; max-width: 96%' : 'min-width: 80%; max-width: 99%') . ';"></textarea>
+						<textarea id="groupreason" name="groupreason[', $request['id'], ']" rows="3" cols="40" style="min-width: 80%; max-width: 99%;"></textarea>
 					</dd>';
 
 	echo '

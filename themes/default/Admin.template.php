@@ -78,20 +78,18 @@ function template_admin()
 
 	echo '
 			<div class="quick_tasks">
-				<div class="content">
-					<ul id="quick_tasks" class="flow_hidden">';
+				<ul id="quick_tasks" class="flow_hidden">';
 
 	foreach ($context['quick_admin_tasks'] as $task)
 		echo '
-						<li>
-							', !empty($task['icon']) ? '<a href="' . $task['href'] . '"><img src="' . $settings['default_images_url'] . '/admin/' . $task['icon'] . '" alt="" class="home_image" /></a>' : '', '
-							<h5>', $task['link'], '</h5>
-							<span class="task">', $task['description'], '</span>
-						</li>';
+					<li>
+						', !empty($task['icon']) ? '<a href="' . $task['href'] . '"><img src="' . $settings['default_images_url'] . '/admin/' . $task['icon'] . '" alt="" class="home_image" /></a>' : '', '
+						<h5>', $task['link'], '</h5>
+						<span class="task">', $task['description'], '</span>
+					</li>';
 
 	echo '
-					</ul>
-				</div>
+				</ul>
 			</div>
 		</div>';
 
@@ -152,7 +150,7 @@ function template_credits()
 					<div id="admincenter">
 						<div id="support_credits">
 							<h2 class="category_header">
-								', $txt['support_title'], ' <img src="', $settings['images_url'], '/', $context['theme_variant_url'], 'logo_elk.png" id="credits_logo" alt="" />
+								', $txt['support_title'], ' <img id="credits_logo" src="', $settings['images_url'], '/', $context['theme_variant_url'], 'logo_elk.png"alt="" />
 							</h2>
 							<div class="content">
 								<strong>', $txt['support_versions'], ':</strong><br />
@@ -939,7 +937,7 @@ function template_show_settings()
 				// Some quick helpers...
 				$javascript = $config_var['javascript'];
 				$disabled = !empty($config_var['disabled']) ? ' disabled="disabled"' : '';
-				$subtext = !empty($config_var['subtext']) ? '<br /><span class="smalldescription"> ' . $config_var['subtext'] . '</span>' : '';
+				$subtext = !empty($config_var['subtext']) ? '<br /><span class="smalltext"> ' . $config_var['subtext'] . '</span>' : '';
 
 				// Show the [?] button.
 				if ($config_var['help'])

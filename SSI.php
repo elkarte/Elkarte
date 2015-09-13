@@ -1345,7 +1345,7 @@ function ssi_todaysBirthdays($output_method = 'echo')
 
 	foreach ($return['calendar_birthdays'] as $member)
 		echo '
-			<a href="', $scripturl, '?action=profile;u=', $member['id'], '"><span class="fix_rtl_names">' . $member['name'] . '</span>' . (isset($member['age']) ? ' (' . $member['age'] . ')' : '') . '</a>' . (!$member['is_last'] ? ', ' : '');
+			<a href="', $scripturl, '?action=profile;u=', $member['id'], '">' . $member['name'] . (isset($member['age']) ? ' (' . $member['age'] . ')' : '') . '</a>' . (!$member['is_last'] ? ', ' : '');
 }
 
 /**
@@ -1437,7 +1437,7 @@ function ssi_todaysCalendar($output_method = 'echo')
 			<span class="birthday">' . $txt['birthdays_upcoming'] . '</span> ';
 		foreach ($return['calendar_birthdays'] as $member)
 			echo '
-			<a href="', $scripturl, '?action=profile;u=', $member['id'], '"><span class="fix_rtl_names">', $member['name'], '</span>', isset($member['age']) ? ' (' . $member['age'] . ')' : '', '</a>', !$member['is_last'] ? ', ' : '';
+			<a href="', $scripturl, '?action=profile;u=', $member['id'], '">', $member['name'], isset($member['age']) ? ' (' . $member['age'] . ')' : '', '</a>', !$member['is_last'] ? ', ' : '';
 		echo '
 			<br />';
 	}

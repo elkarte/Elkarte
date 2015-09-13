@@ -160,7 +160,7 @@ function template_issueWarning()
 
 		foreach ($context['notification_templates'] as $id_template => $template)
 			echo '
-							<option value="', $id_template, '">' . (isBrowser('ie8') ? '&#187;' : '&#10148;') . '&nbsp;', $template['title'], '</option>';
+							<option value="', $id_template, '">&#10148;&nbsp;', $template['title'], '</option>';
 
 		echo '
 						</select>
@@ -238,7 +238,7 @@ function template_deleteAccount()
 				<div class="submitbutton">
 					<strong', (isset($context['modify_error']['bad_password']) || isset($context['modify_error']['no_password']) ? ' class="error"' : ''), '><label for="oldpasswrd">', $txt['current_password'], '</label>: </strong>
 					<input type="password" id="oldpasswrd" name="oldpasswrd" size="20" class="input_password" />&nbsp;&nbsp;&nbsp;&nbsp;
-					<input type="submit" value="', $txt['delete'], '" class="submitgo" />';
+					<input type="submit" value="', $txt['delete'], '" />';
 
 		if (!empty($context['token_check']))
 			echo '

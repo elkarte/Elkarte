@@ -189,13 +189,7 @@ strong {
 }
 
 /* @todo - Test this everywhere. */
-.standard_category {
-	border-radius: 4px 4px 0 0;
-	background: #E4E4E4;
-}
-
-/* @todo - Test this everywhere. */
-.standard_category > .content {
+.content {
 	border: 1px solid #DDDDDD;
 	background: #FFFFFF;
 }
@@ -1344,8 +1338,6 @@ a.help .icon {
 
 /* The darkened background for help pop-ups. */
 .popup_container {
-	/* Flat colour fallback will be bad (visually), ie8 only though. */
-	background: rgb(0, 0, 0);
 	background: rgba(0, 0, 0, 0.4);
 }
 

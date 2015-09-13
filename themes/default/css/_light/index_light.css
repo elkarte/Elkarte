@@ -121,14 +121,9 @@ input[disabled].input_text, input[disabled].input_password {
 }
 
 /* Common button styling. */
-/* It is being replaced with three classes: */
-/*    .button_submit is not floated */
-/*    .right_submit is right floated */
-/*    .left_submit is left floated */
-/* The button_reset class may need attention too. */
-.button_submit, .right_submit, .left_submit, .button_reset, .drop_area_fileselect_text, input[type="submit"],
-	/* Anchors styled to look like buttons. */
-	/* These have standard body text size. Can be chained with smalltext class. */
+input[type="submit"], .drop_area_fileselect_text, button[type="submit"], input[type="button"],
+/* Anchors styled to look like buttons. */
+/* These have standard body text size. Can be chained with smalltext class. */
 .linkbutton:link, .linkbutton_right:link, .linkbutton_left:link,
 .linkbutton:visited, .linkbutton_right:visited, .linkbutton_left:visited {
 	border: 1px solid #AFAFAF;
@@ -142,8 +137,7 @@ input[disabled].input_text, input[disabled].input_password {
 }
 
 /* Hover effects. */
-.button_submit:hover, .right_submit:hover, .left_submit:hover,
-.button_reset:hover,
+input[type="submit"]:hover, button[type="submit"]:hover, input[type="button"]:hover,
 .linkbutton:hover, .linkbutton_right:hover, .linkbutton_left:hover {
 	border: 1px solid #CCCCCC;
 	border-top: 1px solid #AFAFAF;
@@ -197,16 +191,10 @@ strong, .bbc_strong {
 }
 
 /* @todo - Test this everywhere. */
-.standard_category {
-	border-radius: 4px 4px 0 0;
-	background: #E4E4E4;
-	box-shadow: 1px 2px 4px #EEEEEE;
-}
-
-/* @todo - Test this everywhere. */
-.standard_category > .content {
-	border: 1px solid #DDDDDD;
+.content {
 	background: #FEFEFE;
+	box-shadow: 1px 2px 4px #EBEBEB;
+	border: 1px solid #CCCCCC;
 }
 
 /* Styles for main headers. */
@@ -468,7 +456,7 @@ div.bbc_footnotes .meaction {
 	border-radius: 2px 0 0 2px;
 }
 
-#search_form .button_submit {
+#search_form input[type="submit"] {
 	border-radius: 0 2px 2px 0;
 	color: #333333;
 	font-variant: small-caps;
@@ -1799,10 +1787,6 @@ div.bbc_footnotes .meaction {
 	background: #FEFEFE;
 }
 
-.weekdays {
-	border-left: 2px solid #DDDDDD;
-}
-
 .weeklist h4 a:hover {
 	text-decoration: none;
 }
@@ -1841,8 +1825,6 @@ div.bbc_footnotes .meaction {
 
 /* The darkened background for help pop-ups. */
 .popup_container {
-	/* Flat colour fallback will be bad (visually), ie8 only though. */
-	background: #000000;
 	background: rgba(0, 0, 0, 0.4);
 }
 
@@ -1890,7 +1872,7 @@ div.bbc_footnotes .meaction {
 	box-shadow: 0 1px 0 #FEFEFE inset;
 }
 
-.search_results_posts > li {
+.search_results_posts > li:not(:last-child) {
 	border-bottom: 4px solid #DDDDDD;
 }
 

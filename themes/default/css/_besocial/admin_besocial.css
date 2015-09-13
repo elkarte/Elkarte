@@ -24,6 +24,12 @@
 	margin-top: 0;
 }
 
+#admin_content .content  {
+	background: #EFEFEF;
+	border: none;
+	box-shadow: none;
+}
+
 /* Styles for the manage boards section.
 ------------------------------------------------- */
 #manage_boards h2 {

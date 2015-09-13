@@ -122,7 +122,7 @@ function template_bounce_email()
 
 	foreach ($context['bounce_templates'] as $id_template => $template)
 		echo '
-							<option value="', $id_template, '">' . (isBrowser('ie8') ? '&#187;' : '&#10148;') . '&nbsp;', $template['title'], '</option>';
+							<option value="', $id_template, '">&#10148;&nbsp;', $template['title'], '</option>';
 
 	echo '
 					</select>

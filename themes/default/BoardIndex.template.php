@@ -241,7 +241,9 @@ function template_ic_show_events()
 	echo '
 			<li class="board_row">
 				<h3 class="ic_section_header">
-					<a href="', $scripturl, '?action=calendar"><img class="icon" src="', $settings['images_url'], '/icons/calendar.png', '" alt="" /> ', $context['calendar_only_today'] ? $txt['calendar_today'] : $txt['calendar_upcoming'], '</a>
+					<a href="', $scripturl, '?action=calendar">
+						<img class="icon" src="', $settings['images_url'], '/icons/calendar.png', '" alt="" /> ', $context['calendar_only_today'] ? $txt['calendar_today'] : $txt['calendar_upcoming'], '
+					</a>
 				</h3>';
 
 	// Holidays like "Christmas", "Hanukkah", and "We Love [Unknown] Day" :P.
@@ -259,7 +261,7 @@ function template_ic_show_events()
 		// Each member in calendar_birthdays has: id, name (person), age (if they have one set?), is_last. (last in list?), and is_today (birthday is today?)
 		foreach ($context['calendar_birthdays'] as $member)
 			echo '
-					<a href="', $scripturl, '?action=profile;u=', $member['id'], '">', $member['is_today'] ? '<strong class="fix_rtl_names">' : '', $member['name'], $member['is_today'] ? '</strong>' : '', isset($member['age']) ? ' (' . $member['age'] . ')' : '', '</a>', $member['is_last'] ? '' : ', ';
+					<a href="', $scripturl, '?action=profile;u=', $member['id'], '">', $member['is_today'] ? '<strong>' : '', $member['name'], $member['is_today'] ? '</strong>' : '', isset($member['age']) ? ' (' . $member['age'] . ')' : '', '</a>', $member['is_last'] ? '' : ', ';
 
 		echo '
 				</p>';

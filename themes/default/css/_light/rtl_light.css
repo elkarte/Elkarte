@@ -494,11 +494,6 @@ legend {
 
 /* $CALENDAR	*/
 /* ------------------------------------------------------- */
-/* Used to indicate the current day. */
-.weekdays {
-	border-right: 0;
-	border-left: 2px solid #ddd;
-}
 
 /*	$HELP		*/
 /* ------------------------------------------------------- */

@@ -861,7 +861,7 @@ function template_groupMembership()
 				<h2 class="category_header">', $txt['request_group_membership'], '</h2>
 				<div class="well">
 					', $txt['request_group_membership_desc'], ':
-					<textarea name="reason" rows="4" style="' . (isBrowser('is_ie8') ? 'width: 635px; max-width: 100%; min-width: 100%' : 'width: 99%') . ';"></textarea>
+					<textarea name="reason" rows="4" style="width: 99%;"></textarea>
 					<div class="submitbutton">
 						<input type="hidden" name="gid" value="', $context['group_request']['id'], '" />
 						<input type="submit" name="req" value="', $txt['submit_request'], '" class="button_submit" />

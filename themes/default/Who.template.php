@@ -38,7 +38,7 @@ function template_whos_selection_above()
 	$extra .= '
 				</select>
 				<noscript>
-					<input type="submit" name="submit_top" value="' . $txt['go'] . '" class="button_submit submitgo" />
+					<input type="submit" name="submit_top" value="' . $txt['go'] . '" />
 				</noscript>
 			</div>';
 
@@ -117,7 +117,7 @@ function template_whos_selection_below()
 	$extra .= '
 				</select>
 				<noscript>
-					<input type="submit" name="submit_top" value="' . $txt['go'] . '" class="button_submit submitgo" />
+					<input type="submit" name="submit_top" value="' . $txt['go'] . '" />
 				</noscript>
 			</div>';
 
@@ -183,7 +183,7 @@ function template_credits()
 
 		if (isset($section['posttext']))
 			echo '
-			<p class="posttext">', $section['posttext'], '</p>';
+			<p><em>', $section['posttext'], '</em></p>';
 
 		echo '
 		</div>';

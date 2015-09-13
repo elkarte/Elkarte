@@ -54,7 +54,6 @@
 	overflow: auto;
 }
 
-#support_credits div.content,
 #generate_reports_type div.content,
 #new_group div.content,
 #view_group div.content,
@@ -328,13 +327,6 @@ fieldset dl {
 /* and the advantage is that a clean layout is always maintained.
 /* The <li>'s could be set to auto overflow instead, but that just clutters things up with scrollbars.
 /* Scrollbars here look worse, take up space, and don't really add anything useful in this context. */
-div.quick_tasks {
-	margin: -8px 0 0 0;
-	border-radius: 7px;
-	box-shadow: none;
-	padding: 0 0 16px 0;
-}
-
 #quick_tasks li {
 	list-style: none;
 	padding: 10px 6px 10px 6px;
@@ -381,7 +373,7 @@ div.quick_tasks {
 }
 
 #support_credits .content {
-	padding: 0 18px;
+	padding: 5px 18px;
 	line-height: 1.6em;
 }
 
@@ -416,7 +408,7 @@ div.quick_tasks {
 	margin: 4px 0 12px 0;
 }
 
-#core_features .content {
+#core_features .features {
 	padding: 0 12px;
 	overflow: auto;
 }
@@ -581,20 +573,20 @@ ul.package_servers li {
 
 /* Styles for anti-spam questions.
 ------------------------------------------------------- */
-dl.settings dt.questions {
+.settings dt.questions {
 	width: 65%;
 	margin: 0;
 }
 
-dl.settings dd.questions {
+.settings dd.questions {
 	width: 35%;
 }
 
-dl.settings dt.questions input {
+.settings dt.questions input {
 	width: 80%;
 }
 
-dl.settings dd.questions input {
+.settings dd.questions input {
 	width: 90%;
 }
 
@@ -661,7 +653,7 @@ dl.settings dd.questions input {
 }
 
 #manage_boards li .floatleft:before {
-	font-family: "Segoe UI Symbol", "DejaVu Sans", "GNU Unifont";
+	font-family: "Segoe UI Symbol", "DejaVu Sans", "GNU Unifont", serif;
 	content: "\21f3";
 	padding-right: 5px;
 	font-size: 1.286em;
@@ -751,7 +743,7 @@ dl.settings dd.questions input {
 	font-weight: bold;
 }
 
-/* Styles for the badbehaviour section.
+/* Styles for the bad behaviour section.
 ------------------------------------------------- */
 .bbfilter {
 	display: table-cell;
@@ -987,7 +979,7 @@ dl.themes_list dd {
 }
 
 .theme_options dd {
-	width: 40%
+	width: 40%;
 }
 
 .theme_settings .input_text {
@@ -1093,7 +1085,6 @@ ul.moderation_notes li {
 
 #error_log td div {
 	box-sizing: border-box;
-	/* The next bits should fix https://github.com/elkarte/Elkarte/issues/567 */
 	word-wrap: break-word;
 	-webkit-hyphens: auto;
 	-moz-hyphens: auto;
@@ -1140,10 +1131,8 @@ ul.moderation_notes li {
 	padding: 3px 0;
 }
 
-/* Admin menu icons as sprites @todo - Can clean this up some more. */
+/* Admin menu icons as sprites
 /* Use some longhand declarations to cut the length of the entire list. */
-/* ------------------------------------------------- */
-
 /* Admin menu icons as sprites
 ------------------------------------------------- */
 .linklevel2 > img {
@@ -1151,121 +1140,37 @@ ul.moderation_notes li {
 	background-repeat: no-repeat;
 }
 
-.admin_img_administration {
-	background-position: 0 0;
-}
-
-.admin_img_attachment {
-	background-position: -16px 0;
-}
-
-.admin_img_ban {
-	background-position: -32px 0;
-}
-
-.admin_img_boards {
-	background-position: -48px 0;
-}
-
-.admin_img_calendar {
-	background-position: -64px 0;
-}
-
-.admin_img_corefeatures {
-	background-position: -80px 0;
-}
-
-.admin_img_current_theme {
-	background-position: -96px 0;
-}
-
-.admin_img_engines {
-	background-position: -112px 0;
-}
-
-.admin_img_exit {
-	background-position: -128px 0;
-}
-
-.admin_img_features {
-	background-position: -144px 0;
-}
-
-.admin_img_languages {
-	background-position: -160px 0;
-}
-
-.admin_img_logs {
-	background-position: -176px 0;
-}
-
-.admin_img_mail {
-	background-position: -192px 0;
-}
-
-.admin_img_maintain {
-	background-position: -208px 0;
-}
-
-.admin_img_membergroups {
-	background-position: -224px 0;
-}
-
-.admin_img_members {
-	background-position: -240px 0;
-}
-
-.admin_img_modifications {
-	background-position: -256px 0;
-}
-
-.admin_img_news {
-	background-position: -272px 0;
-}
-
-.admin_img_packages {
-	background-position: -288px 0;
-}
-
-.admin_img_paid {
-	background-position: -304px 0;
-}
-
-.admin_img_permissions {
-	background-position: -320px 0;
-}
-
-.admin_img_posts {
-	background-position: -336px 0;
-}
-
-.admin_img_regcenter {
-	background-position: -352px 0;
-}
-
-.admin_img_reports {
-	background-position: -368px 0;
-}
-
-.admin_img_scheduled {
-	background-position: -384px 0;
-}
-
-.admin_img_search {
-	background-position: -400px 0;
-}
-
-.admin_img_security {
-	background-position: -416px 0;
-}
-
-.admin_img_server {
-	background-position: -432px 0;
-}
-
-.admin_img_smiley {
-	background-position: -448px 0;
-}
+.admin_img_administration {background-position: 0 0;}
+.admin_img_attachment     {background-position: -16px 0;}
+.admin_img_ban            {background-position: -32px 0;}
+.admin_img_boards         {background-position: -48px 0;}
+.admin_img_calendar       {background-position: -64px 0;}
+.admin_img_corefeatures   {background-position: -80px 0;}
+.admin_img_current_theme  {background-position: -96px 0;}
+.admin_img_engines        {background-position: -112px 0;}
+.admin_img_exit           {background-position: -128px 0;}
+.admin_img_features       {background-position: -144px 0;}
+.admin_img_languages      {background-position: -160px 0;}
+.admin_img_logs           {background-position: -176px 0;}
+.admin_img_mail           {background-position: -192px 0;}
+.admin_img_maintain       {background-position: -208px 0;}
+.admin_img_membergroups   {background-position: -224px 0;}
+.admin_img_members        {background-position: -240px 0;}
+.admin_img_modifications  {background-position: -256px 0;}
+.admin_img_news           {background-position: -272px 0;}
+.admin_img_packages       {background-position: -288px 0;}
+.admin_img_paid           {background-position: -304px 0;}
+.admin_img_permissions    {background-position: -320px 0;}
+.admin_img_posts          {background-position: -336px 0;}
+.admin_img_regcenter      {background-position: -352px 0;}
+.admin_img_reports        {background-position: -368px 0;}
+.admin_img_scheduled      {background-position: -384px 0;}
+.admin_img_search         {background-position: -400px 0;}
+.admin_img_security       {background-position: -416px 0;}
+.admin_img_server         {background-position: -432px 0;}
+.admin_img_smiley         {background-position: -448px 0;}
+.admin_img_support        {background-position: -464px 0;}
+.admin_img_themes         {background-position: -480px 0;}
 
 .sortable_smiley li {
 	display: inline;
@@ -1274,14 +1179,6 @@ ul.moderation_notes li {
 
 .ui-sortable li > a {
 	cursor: move;
-}
-
-.admin_img_support {
-	background-position: -464px 0;
-}
-
-.admin_img_themes {
-	background-position: -480px 0;
 }
 
 .pagelink, .current_page, .expand_pages {
@@ -1297,16 +1194,6 @@ ul.moderation_notes li {
 	margin: 2px 8px 2px 0;
 }
 
-/* Try out some nifty small screen friendliness, for the cost of a few more bytes. */
-/*@media screen and (max-width: 85em) {
-	.features p {
-		margin: 0;
-		padding: 0;
-		min-height: 10em;
-		max-height: 10em;
-	}
-
-}*/
 @media screen and (max-width: 33.750em) {
 	body {
 		padding: 0;

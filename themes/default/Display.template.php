@@ -140,12 +140,15 @@ function template_messages()
 		{
 			echo '
 							<ul class="quickbuttons follow_ups">
-								<li class="listlevel1 subsections" aria-haspopup="true"><a class="linklevel1">', $txt['follow_ups'], '</a>
+								<li class="listlevel1 subsections" aria-haspopup="true">
+									<a class="linklevel1">', $txt['follow_ups'], '</a>
 									<ul class="menulevel2">';
 
 			foreach ($context['follow_ups'][$message['id']] as $follow_up)
 				echo '
-										<li class="listlevel2"><a class="linklevel2" href="', $scripturl, '?topic=', $follow_up['follow_up'], '.0">', $follow_up['subject'], '</a></li>';
+										<li class="listlevel2">
+											<a class="linklevel2" href="', $scripturl, '?topic=', $follow_up['follow_up'], '.0">', $follow_up['subject'], '</a>
+										</li>';
 
 			echo '
 									</ul>
@@ -802,7 +805,7 @@ function template_pages_and_buttons_below()
 					iCurBoardChildLevel: ', $context['jump_to']['child_level'], ',
 					sCurBoardName: "', $context['jump_to']['board_name'], '",
 					sBoardChildLevelIndicator: "&#8195;",
-					sBoardPrefix: "', isBrowser('ie8') ? '&#187; ' : '&#10148; ', '",
+					sBoardPrefix: "&#10148;",
 					sCatClass: "jump_to_header",
 					sCatPrefix: "",
 					sGoButtonLabel: "', $txt['go'], '"
@@ -870,7 +873,9 @@ function template_display_attachments($message, $ignoring)
 
 		echo '
 										<div class="attachment_name">
-											<a href="' . $attachment['href'] . '"><img src="' . $settings['images_url'] . '/icons/clip.png" class="centericon" alt="*" />&nbsp;' . $attachment['name'] . '</a> ';
+											<a href="' . $attachment['href'] . '">
+												<img src="' . $settings['images_url'] . '/icons/clip.png" class="centericon" alt="*" />&nbsp;' . $attachment['name'] . '
+											</a> ';
 
 		if (!$attachment['is_approved'] && $context['can_approve'])
 			echo '

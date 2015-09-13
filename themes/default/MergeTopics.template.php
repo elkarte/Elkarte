@@ -84,7 +84,7 @@ function template_merge()
 
 		echo '
 							</select>
-							<input type="submit" value="', $txt['go'], '" class="button_submit submitgo" />
+							<input type="submit" value="', $txt['go'], '" />
 						</form>
 					</dd>';
 	}
@@ -101,7 +101,7 @@ function template_merge()
 							<input type="hidden" name="topics[]" value="', $context['origin_topic'], '" />
 							<input type="text" id="topics" name="topics[]" class="input_text" />
 							<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />
-							<input type="submit" value="', $txt['merge'], '" class="button_submit submitgo" />
+							<input type="submit" value="', $txt['merge'], '" />
 						</form>
 					</dd>';
 

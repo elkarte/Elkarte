@@ -95,19 +95,12 @@ function template_showDrafts()
 	// Show page numbers
 	if (!empty($context['drafts']))
 	{
-		echo '
-				<div class="flow_auto">
-					<div class="floatleft">';
-
-		template_pagesection();
-
-		echo '
-					</div>
-					<div class="additional_row below_table_data">
-						<input type="submit" name="delete_selected" value="' . $txt['quick_mod_remove'] . '" class="right_submit" onclick="return confirm(' . JavaScriptEscape($txt['draft_remove_selected'] . '?') . ');" />
-						<input type="hidden" name="' . $context['session_var'] . '" value="' . $context['session_id'] . '" />
-					</div>
-				</div>';
+		template_pagesection(false, false, array('extra' => '
+			<div class="floatright">
+				<input type="submit" name="delete_selected" value="' . $txt['quick_mod_remove'] . '" class="right_submit" onclick="return confirm(' . JavaScriptEscape($txt['draft_remove_selected'] . '?') . ');" />
+				<input type="hidden" name="' . $context['session_var'] . '" value="' . $context['session_id'] . '" />
+			</div>'
+		));
 	}
 
 	echo '

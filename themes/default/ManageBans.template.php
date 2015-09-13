@@ -85,8 +85,7 @@ function template_ban_edit()
 					<input type="checkbox" name="cannot_post" id="cannot_post" value="1"', $context['ban']['cannot']['post'] ? ' checked="checked"' : '', ' class="ban_restriction input_radio" /> <label for="cannot_post">', $txt['ban_cannot_post'], '</label><a href="', $scripturl, '?action=quickhelp;help=ban_cannot_post" onclick="return reqOverlayDiv(this.href);" class="help">&nbsp;<img src="', $settings['images_url'], '/helptopics.png" class="icon" alt="', $txt['help'], '" /></a><br />
 					<input type="checkbox" name="cannot_register" id="cannot_register" value="1"', $context['ban']['cannot']['register'] ? ' checked="checked"' : '', ' class="ban_restriction input_radio" /> <label for="cannot_register">', $txt['ban_cannot_register'], '</label><br />
 					<input type="checkbox" name="cannot_login" id="cannot_login" value="1"', $context['ban']['cannot']['login'] ? ' checked="checked"' : '', ' class="ban_restriction input_radio" /> <label for="cannot_login">', $txt['ban_cannot_login'], '</label><br />
-				</fieldset>
-				<br class="clear_right" />';
+				</fieldset>';
 
 	if (!empty($context['ban_suggestions']))
 	{
@@ -162,7 +161,7 @@ function template_ban_edit()
 	}
 
 	echo '
-				<div class="submitbutton">
+				<div class="submitbutton clear">
 					<input type="submit" name="', $context['ban']['is_new'] ? 'add_ban' : 'modify_ban', '" value="', $context['ban']['is_new'] ? $txt['ban_add'] : $txt['ban_modify'], '" />
 					<input type="hidden" name="old_expire" value="', $context['ban']['expiration']['days'], '" />
 					<input type="hidden" name="bg" value="', $context['ban']['id'], '" />', isset($context['ban']['from_user']) ? '

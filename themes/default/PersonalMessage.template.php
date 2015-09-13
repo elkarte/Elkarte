@@ -486,7 +486,7 @@ function template_subject_list()
 			{
 				if ($label['id'] != $context['current_label_id'])
 					$extra .= '
-								<option value="add_' . $label['id'] . '">' . (isBrowser('ie8') ? '&#187;' : '&#10148;') . '&nbsp;' . $label['name'] . '</option>';
+								<option value="add_' . $label['id'] . '">&#10148;&nbsp;' . $label['name'] . '</option>';
 			}
 
 			$extra .= '
@@ -495,7 +495,7 @@ function template_subject_list()
 			foreach ($context['labels'] as $label)
 			{
 				$extra .= '
-								<option value="rem_' . $label['id'] . '">' . (isBrowser('ie8') ? '&#187;' : '&#10148;') . '&nbsp;' . $label['name'] . '</option>';
+								<option value="rem_' . $label['id'] . '">&#10148;&nbsp;' . $label['name'] . '</option>';
 			}
 
 			$extra .= '
@@ -1248,7 +1248,7 @@ function template_report_message()
 					', $txt['pm_report_reason'], ':
 				</dt>
 				<dd>
-					<textarea id="reason" name="reason" rows="4" cols="70" style="' . (isBrowser('is_ie8') ? 'width: 635px; max-width: 95%; min-width: 95%' : 'width: 95%') . ';"></textarea>
+					<textarea id="reason" name="reason" rows="4" cols="70" style="width: 95%;"></textarea>
 				</dd>
 			</dl>
 			<div class="submitbutton">
@@ -1529,7 +1529,7 @@ function template_showPMDrafts()
 		foreach ($context['drafts'] as $draft)
 		{
 			echo '
-		<div class="content core_posts">
+		<div class="content">
 			<div class="counter">', $draft['counter'], '</div>
 			<div class="topic_details">
 				<h5>

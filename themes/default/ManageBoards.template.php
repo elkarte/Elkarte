@@ -389,7 +389,7 @@ function template_modify_board()
 						<span class="smalltext">', $txt['mboards_description_desc'], '</span>
 					</dt>
 					<dd>
-						<textarea id="desc" name="desc" rows="3" cols="35" style="' . (isBrowser('is_ie8') ? 'width: 635px; max-width: 99%; min-width: 99%' : 'width: 99%') . ';">', $context['board']['description'], '</textarea>
+						<textarea id="desc" name="desc" rows="3" cols="35" style="width: 99%;">', $context['board']['description'], '</textarea>
 					</dd>
 					<dt>
 						<label for="profile">', $txt['permission_profile'], ':</label><br />

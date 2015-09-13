@@ -580,7 +580,9 @@ function template_topic_replies_below()
 			if ($context['can_quote'])
 				echo '
 						<ul class="quickbuttons" id="msg_', $post['id'], '_quote">
-							<li class="listlevel1"><a href="#postmodify" onmousedown="return insertQuoteFast(', $post['id'], ');" class="linklevel1 quote_button">', $txt['bbc_quote'], '</a></li>
+							<li class="listlevel1">
+								<a href="#postmodify" onmousedown="return insertQuoteFast(', $post['id'], ');" class="linklevel1 quote_button">', $txt['bbc_quote'], '</a>
+							</li>
 						</ul>';
 
 			echo '

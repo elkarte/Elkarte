@@ -310,7 +310,7 @@ function template_modify_language_entries()
 					</select>
 					<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />
 					<input type="hidden" name="', $context['admin-mlang_token_var'], '" value="', $context['admin-mlang_token'], '" />
-					<noscript><input type="submit" value="', $txt['go'], '" class="submitgo" /></noscript>
+					<noscript><input type="submit" value="', $txt['go'], '" /></noscript>
 				</div>
 			</div>';
 
@@ -335,7 +335,7 @@ function template_modify_language_entries()
 					<li>
 						<label for="entry_', $entry['key'], '" class="smalltext">', $entry['display_key'], '</label>
 						<input type="hidden" name="comp[', $entry['key'], ']" value="', $entry['value'], '" />
-						<textarea id="entry_', $entry['key'], '" name="entry[', $entry['key'], ']" cols="40" rows="', $entry['rows'] < 2 ? 2 : $entry['rows'], '" style="' . (isBrowser('is_ie8') ? 'width: 635px; max-width: 96%; min-width: 96%' : '') . ';">', $entry['value'], '</textarea>
+						<textarea id="entry_', $entry['key'], '" name="entry[', $entry['key'], ']" cols="40" rows="', $entry['rows'] < 2 ? 2 : $entry['rows'], '">', $entry['value'], '</textarea>
 					</li>';
 		}
 
