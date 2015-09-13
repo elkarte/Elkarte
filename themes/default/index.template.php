@@ -152,8 +152,7 @@ function template_html_above()
 	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 	<meta name="viewport" content="width=device-width" />
 	<meta name="mobile-web-app-capable" content="yes" />
-	<meta name="description" content="', $context['page_title_html_safe'], '" />', !empty($context['meta_keywords']) ? '
-	<meta name="keywords" content="' . $context['meta_keywords'] . '" />' : '';
+	<meta name="description" content="', $context['page_title_html_safe'], '" />';
 
 	// OpenID enabled? Advertise the location of our endpoint using YADIS protocol.
 	if (!empty($modSettings['enableOpenID']))

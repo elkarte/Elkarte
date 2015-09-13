@@ -1288,7 +1288,6 @@ class ManageFeatures_Controller extends Action_Controller
 			'',
 				// SEO stuff
 				array('check', 'queryless_urls', 'subtext' => '<strong>' . $txt['queryless_urls_note'] . '</strong><br />' . ($context['server']['is_apache'] || $context['server']['is_lighttpd'] ? $txt['queryless_urls_work'] : '<span class="error">' . $txt['queryless_urls_notwork'] . '</span>')),
-				array('text', 'meta_keywords', 'subtext' => $txt['meta_keywords_note'], 'size' => 50),
 			'',
 				// Number formatting, timezones.
 				array('text', 'time_format'),
