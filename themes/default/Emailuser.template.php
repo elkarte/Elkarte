@@ -167,7 +167,7 @@ function template_custom_email()
 						<label for="email_body"><strong>', $txt['message'], ':</strong></label>
 					</dt>
 					<dd>
-						<textarea id="email_body" name="email_body" rows="10" cols="20" style="width: 90%;"></textarea>
+						<textarea id="email_body" name="email_body" rows="10" cols="20"></textarea>
 					</dd>
 				</dl>
 				<hr />

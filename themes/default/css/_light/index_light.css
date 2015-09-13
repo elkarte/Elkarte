@@ -258,6 +258,9 @@ strong, .bbc_strong {
 .alert {
 	color: #FF0000;
 }
+.selected {
+	font-weight: bold;
+}
 
 /* Colors for warnings. */
 .warn_mute {

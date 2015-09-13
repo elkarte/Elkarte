@@ -1091,7 +1091,7 @@ ul.moderation_notes li {
 	-ms-hyphens: auto;
 }
 
-#error_log .error_who, #error_log .error_type {
+#error_log .error_who, #error_log .error_type, #error_log .error_where {
 	float: left;
 	width: 50%;
 	line-height: 1.8em;
@@ -1100,17 +1100,13 @@ ul.moderation_notes li {
 }
 
 #error_log .error_where {
-	float: left;
 	width: 100%;
-	padding: 4px 0;
-	line-height: 1.6em;
+	padding-top: 4px;
 }
 
-.error_where .scope {
+#error_log .error_who li>a, #error_log .error_type li>a, #error_log .error_where li>a,
+#error_log .error_who span, #error_log .error_type span, #error_log .error_where span {
 	display: table-cell;
-	padding: 4px;
-	width: 20px;
-	vertical-align: top;
 }
 
 #error_log .checkbox_column {

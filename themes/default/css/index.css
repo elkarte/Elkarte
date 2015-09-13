@@ -765,6 +765,9 @@ a.bbc_link {
 	width: 100%;
 	margin-bottom: 10px
 }
+#quick_edit_body_container .input_text {
+	width: 85%;
+}
 
 /* ------------------------------------------------------- */
 /*	$MAIN.		                                           */
