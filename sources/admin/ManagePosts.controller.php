@@ -13,7 +13,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:		BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0
+ * @version 1.0.5
  *
  */
 
@@ -161,6 +161,7 @@ class ManagePosts_Controller extends Action_Controller
 				'censor_proper' => implode("\n", $censored_proper),
 				'censorWholeWord' => empty($_POST['censorWholeWord']) ? '0' : '1',
 				'censorIgnoreCase' => empty($_POST['censorIgnoreCase']) ? '0' : '1',
+				'allow_no_censored' => empty($_POST['allow_no_censored']) ? '0' : '1',
 			);
 
 			call_integration_hook('integrate_save_censors', array(&$updates));

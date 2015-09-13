@@ -11,7 +11,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0.1
+ * @version 1.0.5
  *
  */
 
@@ -759,6 +759,7 @@ function template_confirm_board_delete()
 					<input type="submit" name="cancel" value="', $txt['mboards_delete_cancel'], '" class="button_submit" />
 					<input type="hidden" name="confirmation" value="1" />
 					<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />
+					<input type="hidden" name="', $context['admin-be-' . $context['board']['id'] . '_token_var'], '" value="', $context['admin-be-' . $context['board']['id'] . '_token'], '" />
 				</div>
 			</div>
 		</form>

@@ -11,7 +11,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0.4
+ * @version 1.0.5
  *
  */
 
@@ -593,7 +593,13 @@ function template_quickreply_below()
 					sTemplateSubjectNormal: ', JavaScriptEscape('%subject%'), ',
 					sTemplateTopSubject: ', JavaScriptEscape($txt['topic'] . ': %subject% &nbsp;(' . $context['num_views_text'] . ')'), ',
 					sTemplateInfoNormal: ', JavaScriptEscape('<a href="' . $scripturl . '?topic=' . $context['current_topic'] . '.msg%msg_id%#msg%msg_id%" rel="nofollow">%subject%</a><span class="smalltext modified" id="modified_%msg_id%"></span>'), ($context['can_reply'] && !empty($options['display_quick_reply'])) ? ',
-					sFormRemoveAccessKeys: \'postmodify\'' : '', '
+					sFormRemoveAccessKeys: \'postmodify\'' : '', ',
+					funcOnAfterCreate: function () {
+						// Attach AtWho to the quick edit box
+						add_elk_mention(\'#quick_edit_body_container textarea\');
+						var i = all_elk_mentions.length - 1;
+						all_elk_mentions[i].oMention = new elk_mentions(all_elk_mentions[i].oOptions);
+					}
 				});
 
 				aIconLists[aIconLists.length] = new IconList({
@@ -776,7 +782,8 @@ function template_pages_and_buttons_below()
 	theme_linktree();
 
 	echo '
-			<div id="moderationbuttons">', template_button_strip($context['mod_buttons'], 'bottom', array('id' => 'moderationbuttons_strip')), '</div>';
+			<i class="fa fa-2x fa-bars hamburger_30" data-id="moderationbuttons"></i>
+			<div id="moderationbuttons" class="hide_30 hamburger_30_target">', template_button_strip($context['mod_buttons'], 'bottom', array('id' => 'moderationbuttons_strip')), '</div>';
 
 	// Show the jump-to box, or actually...let Javascript do it.
 	echo '

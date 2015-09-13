@@ -13,7 +13,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0
+ * @version 1.0.5
  *
  */
 
@@ -320,16 +320,16 @@ function get_memcached_server($level = 3)
 	if (empty($db_persist))
 	{
 		if ($cache === 'memcached')
-			$memcached = memcached_connect($server[0], empty($server[1]) ? 11211 : $server[1]);
+			$memcached = memcached_connect($server[0], !isset($server[1]) ? 11211 : $server[1]);
 		if ($cache === 'memcache')
-			$memcached = memcache_connect($server[0], empty($server[1]) ? 11211 : $server[1]);
+			$memcached = memcache_connect($server[0], !isset($server[1]) ? 11211 : $server[1]);
 	}
 	else
 	{
 		if ($cache === 'memcached')
-			$memcached = memcached_pconnect($server[0], empty($server[1]) ? 11211 : $server[1]);
+			$memcached = memcached_pconnect($server[0], !isset($server[1]) ? 11211 : $server[1]);
 		if ($cache === 'memcache')
-			$memcached = memcache_pconnect($server[0], empty($server[1]) ? 11211 : $server[1]);
+			$memcached = memcache_pconnect($server[0], !isset($server[1]) ? 11211 : $server[1]);
 	}
 
 	if (!$memcached && $level > 0)

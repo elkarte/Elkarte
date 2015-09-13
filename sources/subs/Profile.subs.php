@@ -13,7 +13,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0.3
+ * @version 1.0.5
  *
  */
 
@@ -708,8 +708,8 @@ function loadProfileFields($force_reload = false)
 			'options' => array(
 				$txt['receive_from_everyone'],
 				$txt['receive_from_ignore'],
-				$txt['receive_from_admins'],
 				$txt['receive_from_buddies'],
+				$txt['receive_from_admins'],
 			),
 			'subtext' => $txt['receive_from_description'],
 			'value' => empty($cur_profile['receive_from']) ? 0 : $cur_profile['receive_from'],
@@ -805,6 +805,26 @@ function loadProfileFields($force_reload = false)
 			'value' => '',
 			'permission' => 'profile_identity',
 			'input_validate' => create_function('&$value', '
+				global $cur_profile;
+
+				if (empty($value))
+				{
+					require_once(SUBSDIR . \'/Members.subs.php\');
+					$member = getBasicMemberData($cur_profile[\'id_member\'], array(\'authentication\' => true));
+
+					// No previous answer was saved, so that\'s all good
+					if (empty($member[\'secret_answer\']))
+					{
+						return true;
+					}
+					// There is a previous secret answer to the secret question, so let\'s put it back in the db...
+					else
+					{
+						$value = $member[\'secret_answer\'];
+						// We have to tell the code is an error otherwise an empty value will go into the db
+						return false;
+					}
+				}
 				$value = $value != \'\' ? md5($value) : \'\';
 				return true;
 			'),

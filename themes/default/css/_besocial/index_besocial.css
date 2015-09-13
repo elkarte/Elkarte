@@ -77,7 +77,7 @@ fieldset {
 	border-radius: 5px;
 }
 legend {
-	background: url(../../images/selected_open.png) no-repeat scroll left center transparent;
+	background: url(../../images/selected_open.png) 0 50% no-repeat;
 	cursor: pointer;
 	padding: 0 0 2px 20px;
 	color: #333;
@@ -85,7 +85,7 @@ legend {
 	margin-left: 15px;
 }
 .collapsed legend {
-	background: url(../../images/selected.png) no-repeat scroll left center transparent;
+	background: url(../../images/selected.png) 0 50% no-repeat;
 }
 
 input, button, select, textarea, .editor {
@@ -106,6 +106,7 @@ input:hover, textarea:hover, button:hover, select:hover {
 }
 textarea:hover, .editor:hover {
 	background: #fbfbfb;
+	color: #444;
 }
 input:focus, textarea:focus, button:focus, select:focus, .editor:focus {
 	border: 1px solid #999;
@@ -492,7 +493,7 @@ div.bbc_footnotes .meaction {
 	color: #555;
 	text-decoration: none;
 }
-.listlevel1.subsections {
+#main_menu .listlevel1.subsections {
 	top: -1px;
 }
 .poster .listlevel1 a.linklevel1 {
@@ -972,6 +973,7 @@ a.active {
 	display: block;
 	margin-top: -45px;
 	padding-top: 45px;
+	visibility: hidden;
 }
 .windowbg {
 	background-color: #f6f6f6;

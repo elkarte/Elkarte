@@ -13,7 +13,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:		BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0
+ * @version 1.0.5
  *
  */
 
@@ -1035,13 +1035,6 @@ class ManageMembers_Controller extends Action_Controller
 		{
 			// Approve / activate this member.
 			approveMembers($conditions);
-
-			// Do we have to let the integration code know about the activations?
-			if (!empty($modSettings['integrate_activate']))
-			{
-				foreach ($member_info as $member)
-					call_integration_hook('integrate_activate', array($member['username']));
-			}
 
 			// Check for email.
 			if ($_POST['todo'] == 'okemail')

@@ -3,7 +3,7 @@
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
- * @version 1.0
+ * @version 1.0.5
  *
  * Functions to provide ajax capability to the like / unlike button
  * Makes the appropriate call in the background and updates the button text
@@ -43,7 +43,12 @@
 
 				// Set the subAction to what they are doing
 				if (check.indexOf('unlike_button') >= 0)
+				{
+					if (!confirm(likemsg_are_you_sure))
+						return;
+
 					subAction = 'unlikepost';
+				}
 				else
 					subAction = 'likepost';
 

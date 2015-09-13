@@ -11,7 +11,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0
+ * @version 1.0.5
  *
  */
 
@@ -114,7 +114,7 @@ function template_list_boards($boards, $id)
 		// Is it a redirection board?
 		elseif ($board['is_redirect'])
 			echo '
-							<span class="board_icon redirect_board" title="*"></span>';
+							<span class="board_icon redirect_board" title="', sprintf($txt['redirect_board_to'], Util::htmlspecialchars($board['name'])), '"></span>';
 
 		// No new posts at all! The agony!!
 		else

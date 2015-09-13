@@ -13,7 +13,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:		BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0.2
+ * @version 1.0.5
  *
  */
 
@@ -263,7 +263,7 @@ class Display_Controller
 			loadJavascriptFile('spellcheck.js', array('defer' => true));
 
 		// Do we need to show the visual verification image?
-		$context['require_verification'] = !$user_info['is_mod'] && !$user_info['is_admin'] && !empty($modSettings['posts_require_captcha']) && ($user_info['posts'] < $modSettings['posts_require_captcha'] || ($user_info['is_guest'] && $modSettings['posts_require_captcha'] == -1));
+		$context['require_verification'] = !$user_info['is_moderator'] && !$user_info['is_admin'] && !empty($modSettings['posts_require_captcha']) && ($user_info['posts'] < $modSettings['posts_require_captcha'] || ($user_info['is_guest'] && $modSettings['posts_require_captcha'] == -1));
 		if ($context['require_verification'])
 		{
 			require_once(SUBSDIR . '/VerificationControls.class.php');
@@ -539,6 +539,9 @@ class Display_Controller
 
 				// ajax controller for likes
 				loadJavascriptFile('like_posts.js', array('defer' => true));
+				addJavascriptVar(array(
+					'likemsg_are_you_sure' => JavaScriptEscape($txt['likemsg_are_you_sure']),
+				));
 				loadLanguage('Errors');
 
 				// Initiate likes and the tooltips for likes

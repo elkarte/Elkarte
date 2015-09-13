@@ -16,7 +16,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0.3
+ * @version 1.0.5
  *
  */
 
@@ -599,6 +599,10 @@ function removeMessage($message, $decreasePostCount = true)
 	// Only remove posts if they're not recycled.
 	if (!$recycle)
 	{
+		// Update the like counts
+		require_once(SUBSDIR . '/Likes.subs.php');
+		decreaseLikeCounts($message);
+
 		// Remove the likes!
 		$db->query('', '
 			DELETE FROM {db_prefix}message_likes

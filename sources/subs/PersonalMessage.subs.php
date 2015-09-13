@@ -17,7 +17,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0
+ * @version 1.0.5
  *
  */
 
@@ -526,7 +526,7 @@ function sendpm($recipients, $subject, $message, $store_outbox = true, $from = n
 		$user_info['name'] = $from['name'];
 
 	// This is the one that will go in their inbox.
-	$htmlmessage = Util::htmlspecialchars($message, ENT_QUOTES);
+	$htmlmessage = Util::htmlspecialchars($message, ENT_QUOTES, 'UTF-8', true);
 	preparsecode($htmlmessage);
 	$htmlsubject = strtr(Util::htmlspecialchars($subject), array("\r" => '', "\n" => '', "\t" => ''));
 	if (Util::strlen($htmlsubject) > 100)
@@ -1837,8 +1837,7 @@ function loadConversationUnreadStatus($pms)
 	// Find any unread PM's this member has under these head pm id's
 	$request = $db->query('', '
 		SELECT
-			MAX(pm.id_pm) AS id_pm, pm.id_member_from, pm.deleted_by_sender, pm.id_pm_head,
-			pmr.id_member, pmr.deleted, pmr.is_read
+			MAX(pm.id_pm) AS id_pm, pm.id_pm_head
 		FROM {db_prefix}personal_messages AS pm
 			INNER JOIN {db_prefix}pm_recipients AS pmr ON (pmr.id_pm = pm.id_pm)
 		WHERE pm.id_pm_head IN ({array_int:id_pm_head})

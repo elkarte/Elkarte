@@ -11,7 +11,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0.4
+ * @version 1.0.5
  *
  */
 
@@ -67,7 +67,7 @@ function template_memberlist()
 		<h2 class="category_header">
 			<span class="floatleft">', $txt['members_list'], '</span>';
 
-	if (!isset($context['in_search']))
+	if (empty($context['in_search']))
 		echo '
 				<span class="floatright letter_links">', $context['letter_links'], '</span>';
 

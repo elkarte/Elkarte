@@ -9,7 +9,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:		BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0.3
+ * @version 1.0.5
  *
  * This file contains javascript utility functions
  */
@@ -1240,7 +1240,7 @@ JumpTo.prototype.fillSelect = function (aBoardsAndCategories)
 		};
 
 	// Handle custom function hook before showing the new select.
-	if ('funcOnAfterFill' in this.opt)
+	if ('funcOnBeforeCollapse' in this.opt)
 	{
 		this.tmpMethod = this.opt.funcOnBeforeCollapse;
 		this.tmpMethod(this);

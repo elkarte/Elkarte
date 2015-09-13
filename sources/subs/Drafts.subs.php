@@ -7,7 +7,7 @@
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
- * @version 1.0
+ * @version 1.0.5
  *
  */
 
@@ -462,7 +462,7 @@ function saveDraft()
 		'locked' => isset($_POST['lock']) ? (int) $_POST['lock'] : 0,
 		'sticky' => isset($_POST['sticky']) && !empty($modSettings['enableStickyTopics']) ? (int) $_POST['sticky'] : 0,
 		'subject' => strtr(Util::htmlspecialchars($_POST['subject']), array("\r" => '', "\n" => '', "\t" => '')),
-		'body' => Util::htmlspecialchars($_POST['message'], ENT_QUOTES),
+		'body' => Util::htmlspecialchars($_POST['message'], ENT_QUOTES, 'UTF-8', true),
 		'id_member' => $user_info['id'],
 	);
 
@@ -566,7 +566,7 @@ function savePMDraft($recipientList)
 	$draft = array(
 		'id_pm_draft' => $id_pm_draft,
 		'reply_id' => empty($_POST['replied_to']) ? 0 : (int) $_POST['replied_to'],
-		'body' => Util::htmlspecialchars($_POST['message'], ENT_QUOTES),
+		'body' => Util::htmlspecialchars($_POST['message'], ENT_QUOTES, 'UTF-8', true),
 		'subject' => strtr(Util::htmlspecialchars($_POST['subject']), array("\r" => '', "\n" => '', "\t" => '')),
 		'id_member' => $user_info['id'],
 	);

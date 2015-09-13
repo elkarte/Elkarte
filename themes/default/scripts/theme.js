@@ -9,7 +9,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:		BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0.3
+ * @version 1.0.5
  *
  * This file contains javascript associated with the current theme
  */
@@ -53,10 +53,11 @@ $(document).ready(function() {
 	$('.expand_pages').expand_pages();
 
 	// Collapsabile fieldsets, pure candy
-	$('legend').click(function(){
+	$(document).on('click', 'legend', function(){
 		$(this).siblings().slideToggle("fast");
 		$(this).parent().toggleClass("collapsed");
-	}).each(function () {
+	});
+	$(document).on('ready', 'legend', function () {
 		if ($(this).data('collapsed'))
 			$(this).click();
 	});
@@ -105,6 +106,12 @@ $(document).ready(function() {
 
 			}
 		});
+	});
+	$('.hamburger_30').click(function(e) {
+		e.preventDefault();
+		var id = $(this).data('id');
+		$('#' + id).addClass('visible');
+		$(this).addClass('visible');
 	});
 });
 

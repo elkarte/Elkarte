@@ -15,7 +15,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:		BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0.2
+ * @version 1.0.5
  *
  */
 
@@ -589,7 +589,7 @@ class Register_Controller extends Action_Controller
 		}
 		else
 		{
-			call_integration_hook('integrate_activate', array($regOptions['username']));
+			call_integration_hook('integrate_activate', array($regOptions['username'], 1, 1));
 
 			setLoginCookie(60 * $modSettings['cookieTime'], $memberID, hash('sha256', Util::strtolower($regOptions['username']) . $regOptions['password'] . $regOptions['register_vars']['password_salt']));
 
@@ -649,8 +649,6 @@ class Register_Controller extends Action_Controller
 		}
 
 		// Change their email address? (they probably tried a fake one first :P.)
-		require_once(SUBSDIR . '/Auth.subs.php');
-
 		if (isset($_POST['new_email'], $_REQUEST['passwd']) && validateLoginPassword($_REQUEST['passwd'], $row['passwd'], $row['member_name'], true) && ($row['is_activated'] == 0 || $row['is_activated'] == 2))
 		{
 			if (empty($modSettings['registration_method']) || $modSettings['registration_method'] == 3)
@@ -704,7 +702,7 @@ class Register_Controller extends Action_Controller
 		// Quit if this code is not right.
 		if (empty($_REQUEST['code']) || $row['validation_code'] != $_REQUEST['code'])
 		{
-			if (!empty($row['is_activated']))
+			if (!empty($row['is_activated']) && $row['is_activated'] == 1)
 				fatal_lang_error('already_activated', false);
 			elseif ($row['validation_code'] == '')
 			{
@@ -718,17 +716,15 @@ class Register_Controller extends Action_Controller
 
 			return;
 		}
-
-		// Let the integration know that they've been activated!
-		call_integration_hook('integrate_activate', array($row['member_name']));
+		require_once(SUBSDIR . '/Members.subs.php');
 
 		// Validation complete - update the database!
-		updateMemberData($row['id_member'], array('is_activated' => 1, 'validation_code' => ''));
+		approveMembers(array('members' => array($row['id_member']), 'activated_status' => $row['is_activated']));
 
 		// Also do a proper member stat re-evaluation.
 		updateStats('member', false);
 
-		if (!isset($_POST['new_email']))
+		if (!isset($_POST['new_email']) && empty($row['is_activated']))
 		{
 			require_once(SUBSDIR . '/Notification.subs.php');
 			sendAdminNotifications('activation', $row['id_member'], $row['member_name']);

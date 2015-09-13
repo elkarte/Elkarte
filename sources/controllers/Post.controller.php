@@ -15,7 +15,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:		BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0.4
+ * @version 1.0.5
  *
  */
 
@@ -391,7 +391,7 @@ class Post_Controller extends Action_Controller
 
 			// Set up the inputs for the form.
 			$form_subject = strtr(Util::htmlspecialchars($_REQUEST['subject']), array("\r" => '', "\n" => '', "\t" => ''));
-			$form_message = Util::htmlspecialchars($_REQUEST['message'], ENT_QUOTES);
+			$form_message = Util::htmlspecialchars($_REQUEST['message'], ENT_QUOTES, 'UTF-8', true);
 
 			// Make sure the subject isn't too long - taking into account special characters.
 			if (Util::strlen($form_subject) > 100)
@@ -736,7 +736,7 @@ class Post_Controller extends Action_Controller
 		}
 
 		// Do we need to show the visual verification image?
-		$context['require_verification'] = !$user_info['is_mod'] && !$user_info['is_admin'] && !empty($modSettings['posts_require_captcha']) && ($user_info['posts'] < $modSettings['posts_require_captcha'] || ($user_info['is_guest'] && $modSettings['posts_require_captcha'] == -1));
+		$context['require_verification'] = !$user_info['is_moderator'] && !$user_info['is_admin'] && !empty($modSettings['posts_require_captcha']) && ($user_info['posts'] < $modSettings['posts_require_captcha'] || ($user_info['is_guest'] && $modSettings['posts_require_captcha'] == -1));
 		if ($context['require_verification'])
 		{
 			require_once(SUBSDIR . '/VerificationControls.class.php');
@@ -1049,7 +1049,7 @@ class Post_Controller extends Action_Controller
 		}
 
 		// Wrong verification code?
-		if (!$user_info['is_admin'] && !$user_info['is_mod'] && !empty($modSettings['posts_require_captcha']) && ($user_info['posts'] < $modSettings['posts_require_captcha'] || ($user_info['is_guest'] && $modSettings['posts_require_captcha'] == -1)))
+		if (!$user_info['is_admin'] && !$user_info['is_moderator'] && !empty($modSettings['posts_require_captcha']) && ($user_info['posts'] < $modSettings['posts_require_captcha'] || ($user_info['is_guest'] && $modSettings['posts_require_captcha'] == -1)))
 		{
 			require_once(SUBSDIR . '/VerificationControls.class.php');
 			$verificationOptions = array(
@@ -1398,7 +1398,7 @@ class Post_Controller extends Action_Controller
 		else
 		{
 			// Prepare the message a bit for some additional testing.
-			$_POST['message'] = Util::htmlspecialchars($_POST['message'], ENT_QUOTES);
+			$_POST['message'] = Util::htmlspecialchars($_POST['message'], ENT_QUOTES, 'UTF-8', true);
 
 			// Preparse code. (Zef)
 			if ($user_info['is_guest'])
@@ -2065,7 +2065,7 @@ class Post_Controller extends Action_Controller
 			}
 			else
 			{
-				$_POST['message'] = Util::htmlspecialchars($_POST['message'], ENT_QUOTES);
+				$_POST['message'] = Util::htmlspecialchars($_POST['message'], ENT_QUOTES, 'UTF-8', true);
 
 				preparsecode($_POST['message']);
 
@@ -2099,6 +2099,38 @@ class Post_Controller extends Action_Controller
 
 		if (!$post_errors->hasErrors())
 		{
+			if (!empty($modSettings['mentions_enabled']))
+			{
+				if (!empty($_REQUEST['uid']))
+				{
+					$query_params = array();
+					$query_params['member_ids'] = array_unique(array_map('intval', $_REQUEST['uid']));
+					require_once(SUBSDIR . '/Members.subs.php');
+					$mentioned_members = membersBy('member_ids', $query_params, true);
+					$replacements = 0;
+					$actually_mentioned = array();
+					foreach ($mentioned_members as $member)
+					{
+						$_POST['message'] = str_replace('@' . $member['real_name'], '[member=' . $member['id_member'] . ']' . $member['real_name'] . '[/member]', $_POST['message'], $replacements);
+						if ($replacements > 0)
+							$actually_mentioned[] = $member['id_member'];
+					}
+				}
+
+				if (!empty($actually_mentioned))
+				{
+					require_once(CONTROLLERDIR . '/Mentions.controller.php');
+					$mentions = new Mentions_Controller();
+					$mentions->setData(array(
+						'id_member' => $actually_mentioned,
+						'type' => 'men',
+						'id_msg' => $row['id_msg'],
+						'status' => $row['approved'] ? 'new' : 'unapproved',
+					));
+					$mentions->action_add();
+				}
+			}
+
 			$msgOptions = array(
 				'id' => $row['id_msg'],
 				'subject' => isset($_POST['subject']) ? $_POST['subject'] : null,

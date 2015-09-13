@@ -13,7 +13,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:		BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0.1
+ * @version 1.0.5
  *
  */
 
@@ -95,10 +95,8 @@ class ManageNews_Controller extends Action_Controller
 		);
 
 		// Default to sub action 'editnews' or 'mailingmembers' or 'settings' depending on permissions.
-		$subAction = isset($_REQUEST['sa']) && isset($subActions[$_REQUEST['sa']]) ? $_REQUEST['sa'] : (allowedTo('edit_news') ? 'editnews' : (allowedTo('send_mail') ? 'mailingmembers' : 'settings'));
-
 		// Give integration its shot via integrate_sa_manage_news
-		$action->initialize($subActions, 'settings');
+		$subAction = $action->initialize($subActions, (allowedTo('edit_news') ? 'editnews' : (allowedTo('send_mail') ? 'mailingmembers' : 'settings')));
 
 		// Some bits for the tempalte
 		$context['page_title'] = $txt['news_title'];
