@@ -90,7 +90,8 @@ h1, h2, h3, h4, h5, h6,
 ul, ol, li,
 dl, dd, dt,
 p, fieldset,
-form, input, button, select, .input_text, textarea, .editor {
+form, input, button, select, .input_text, textarea, input[type="checkbox"], input[type="radio"],
+.editor {
 	box-sizing: border-box;
 	margin: 0;
 	padding: 0;
@@ -98,18 +99,23 @@ form, input, button, select, .input_text, textarea, .editor {
 	font-size: 1em;
 }
 
-/* Declarations for specific elements. @todo - Maybe simplify - test. */
+/* Specific box-sizing declarations */
+/* @todo - Simplify - test. */
 .wrapper, div.content, .category_header, .generic_list_wrapper, #description_board,
 .description, .information, .successbox, .warningbox, .well,
-.submitbutton,
+.submitbutton, .generalinfo, .topic_stats, .jump_to_header,
+#popularposts, #popularactivity,
 .grid8, .grid17, .grid20, .grid25, .grid30, .grid33, .grid50 {
 	box-sizing: border-box;
 }
 
 /* Collection of pseudo element clearfixes. */
-.category_header:after, .wrapper:after,
-#main_content_section:after, #main_container:after,
-.attachment_name:after, .editor_wrapper:after {
+.category_header:after,
+.wrapper:after,
+#main_content_section:after,
+#main_container:after,
+.attachment_name:after,
+.editor_wrapper:after {
 	display: block;
 	clear: both;
 	content: "";
@@ -175,11 +181,6 @@ textarea, .editor {
 }
 
 /* Declarations for inputs, selects and buttons */
-input[type="checkbox"],
-input[type="radio"] {
-	box-sizing: border-box;
-}
-
 input,
 .input_text,
 button,
@@ -2052,7 +2053,6 @@ img.new_posts {
 .topic_stats {
 	display: table-cell;
 	float: right;
-	box-sizing: border-box;
 	padding: 0 16px 0 16px;
 	min-width: 14em;
 	text-align: right;
@@ -2200,7 +2200,6 @@ img.new_posts {
 }
 
 .jump_to_header {
-	box-sizing: border-box;
 	padding: 0 4px;
 	border: none;
 }
@@ -2286,9 +2285,9 @@ img.new_posts {
 }
 
 /* On to the posts */
-.forumposts {
+#forumposts {
 	clear: both;
-	margin: 8px 0 0 0;
+	margin: 6px 0 0 0;
 }
 
 /* Topic information */
@@ -2452,7 +2451,6 @@ img.new_posts {
 .post_wrapper {
 	display: block;
 	clear: both;
-	margin-top: 2px;
 	padding: 10px 0;
 	width: 100%;
 }
@@ -2627,6 +2625,7 @@ img.new_posts {
 /* @todo - Markup and CSS could be tweaked here. */
 #quickreplybox {
 	clear: both;
+	margin: 6px 0 0 0;
 }
 
 .editor_wrapper {
@@ -3433,14 +3432,12 @@ dl.merge_topic dd {
 	float: left;
 	width: 50%;
 	padding: 6px 3px 0 0;
-	box-sizing: border-box;
 }
 
 #popularactivity {
 	float: right;
 	width: 50%;
 	padding: 6px 0 0 3px;
-	box-sizing: border-box;
 }
 
 #popularposts div.content dt, #popularactivity div.content dt {
