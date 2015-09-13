@@ -184,7 +184,7 @@ _debug(1);
 
 	echo '
 				<tr class="secondary_header">
-					<td colspan="3" class="righttext" style="padding-right: 1.2ex">
+					<td colspan="3" class="righttext">
 						<label for="check_all2"><strong>', $txt['check_all'], '</strong></label>&nbsp;
 						<input type="checkbox" id="check_all2" onclick="invertAll(this, this.form, \'delete[]\'); this.form.check_all1.checked = this.checked;" class="input_check" />
 					</td>
@@ -234,11 +234,10 @@ function template_show_file()
 	foreach ($context['file_data']['contents'] as $index => $line)
 	{
 		$line_num = $index + $context['file_data']['min'];
-		$is_target = $line_num == $context['file_data']['target'];
 		echo '
-			<tr>
-				<td', $is_target ? ' class="righttext current">==&gt;' : '>', $line_num, ':</td>
-				<td style="white-space: nowrap;', $is_target ? ' border: 1px solid black;border-width: 1px 1px 1px 0;' : '', '">', $line, '</td>
+			<tr', $line_num == $context['file_data']['target'] ? ' class="current"' : '', '>
+				<td class="linenumber">', $line_num, ':</td>
+				<td class="linetext">', $line, '</td>
 			</tr>';
 	}
 

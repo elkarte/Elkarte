@@ -1120,6 +1120,17 @@ ul.moderation_notes li {
 	margin: 0 8px 0 0;
 }
 
+#errorfile_table .current .linenumber:before {
+	content: '==>';
+}
+#errorfile_table .linetext {
+	white-space: nowrap;
+}
+#errorfile_table .current .linetext {
+	border: 1px solid black;
+	border-width: 1px 1px 1px 0;
+}
+
 /* Styles for the Report generation
 ------------------------------------------------- */
 #report_buttons {
