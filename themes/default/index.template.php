@@ -102,8 +102,7 @@ function template_init()
 /**
  * Simplify the use of callbacks in the templates.
  * @param string $id - A prefix for the template functions the final name
- *                     should look like:
- *                     template_{$id}_{$array[n]}
+ *                     should look like: template_{$id}_{$array[n]}
  * @param string[] $array - The array of function suffixes
  */
 function call_template_callbacks($id, $array)
@@ -203,12 +202,6 @@ function template_html_above()
 
 	// Output any remaining HTML headers. (from addons, maybe?)
 	echo $context['html_headers'];
-
-	// A little help for our friends
-	echo '
-	<!--[if lt IE 9]>
-		<script src="//html5shim.googlecode.com/svn/trunk/html5.js"></script>
-	<![endif]-->';
 
 	echo '
 </head>
