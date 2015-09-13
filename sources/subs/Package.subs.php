@@ -587,7 +587,7 @@ function list_restoreFiles($dummy1, $dummy2, $dummy3, $do_change)
 			'cur_perms' => substr(sprintf('%o', $file_permissions), -4),
 			'new_perms' => isset($new_permissions) ? substr(sprintf('%o', $new_permissions), -4) : '',
 			'result' => isset($result) ? $result : '',
-			'writable_message' => '<span style="color: ' . (@is_writable($file) ? 'green' : 'red') . '">' . (@is_writable($file) ? $txt['package_file_perms_writable'] : $txt['package_file_perms_not_writable']) . '</span>',
+			'writable_message' => '<span class="' . (@is_writable($file) ? 'success' : 'alert') . '">' . (@is_writable($file) ? $txt['package_file_perms_writable'] : $txt['package_file_perms_not_writable']) . '</span>',
 		);
 	}
 
