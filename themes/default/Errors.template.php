@@ -47,9 +47,9 @@ function template_error_log()
 
 	echo '
 		<form class="generic_list_wrapper" action="', $scripturl, '?action=admin;area=logs;sa=errorlog', $context['sort_direction'] == 'down' ? ';desc' : '', ';start=', $context['start'], $context['has_filter'] ? $context['filter']['href'] : '', '" method="post" accept-charset="UTF-8">
-			<h3 class="category_header">
+			<h2 class="category_header">
 				<a class="hdicon cat_img_helptopics help" href="', $scripturl, '?action=quickhelp;help=error_log" onclick="return reqOverlayDiv(this.href);" title="', $txt['help'], '"></a> ', $txt['errlog'], '
-			</h3>
+			</h2>
 			<div class="flow_auto">
 				<div class="floatleft">';
 
@@ -57,16 +57,16 @@ function template_error_log()
 
 	echo '
 				</div>
-				<div class="additional_row floatright">
-					<input type="submit" name="removeSelection" value="' . $txt['remove_selection'] . '" onclick="return confirm(\'' . $txt['remove_selection_confirm'] . '\');" class="button_submit" />
-					<input type="submit" name="delall" value="', $context['has_filter'] ? $txt['remove_filtered_results'] : $txt['remove_all'], '" onclick="return confirm(\'', $context['has_filter'] ? $txt['remove_filtered_results_confirm'] : $txt['sure_about_errorlog_remove'], '\');" class="button_submit" />
+				<div class="submitbutton">
+					<input type="submit" name="removeSelection" value="' . $txt['remove_selection'] . '" onclick="return confirm(\'' . $txt['remove_selection_confirm'] . '\');" />
+					<input type="submit" name="delall" value="', $context['has_filter'] ? $txt['remove_filtered_results'] : $txt['remove_all'], '" onclick="return confirm(\'', $context['has_filter'] ? $txt['remove_filtered_results_confirm'] : $txt['sure_about_errorlog_remove'], '\');" />
 				</div>
 			</div>';
 
 	echo '
 			<table class="table_grid" id="error_log">
 				<tr>
-					<td colspan="3" class="windowbg">
+					<td colspan="3">
 						&nbsp;&nbsp;', $txt['apply_filter_of_type'], ':';
 
 	$error_types = array();
@@ -81,7 +81,7 @@ function template_error_log()
 	if ($context['has_filter'])
 		echo '
 				<tr>
-					<td colspan="3" class="windowbg">
+					<td colspan="3">
 						<strong>&nbsp;&nbsp;', $txt['applying_filter'], ':</strong> ', $context['filter']['entity'], ' ', $context['filter']['value']['html'], '&nbsp;&nbsp;[<a href="', $scripturl, '?action=admin;area=logs;sa=errorlog', $context['sort_direction'] == 'down' ? ';desc' : '', '">', $txt['clear_filter'], '</a>]
 					</td>
 				</tr>';
@@ -97,7 +97,7 @@ function template_error_log()
 	// No errors, then show a message
 	if (count($context['errors']) == 0)
 		echo '
-				<tr class="windowbg">
+				<tr>
 					<td class="centertext" colspan="2">', $txt['errlog_no_entries'], '</td>
 				</tr>';
 
@@ -105,9 +105,8 @@ function template_error_log()
 	foreach ($context['errors'] as $error)
 	{
 		echo '
-				<tr class="windowbg', $error['alternate'] ? '2' : '', '">
+				<tr>
 					<td>
-
 						<div class="error_who">
 							<a href="', $scripturl, '?action=admin;area=logs;sa=errorlog', $context['sort_direction'] == 'down' ? ';desc' : '', ';filter=id_member;value=', $error['member']['id'], '" title="', $txt['apply_filter'], ': ', $txt['filter_only_member'], '"><img src="', $settings['images_url'], '/filter.png" alt="', $txt['apply_filter'], ': ', $txt['filter_only_member'], '" /></a>
 							<strong>', $error['member']['link'], '</strong><br />
@@ -170,20 +169,20 @@ function template_error_log()
 
 	echo '
 				</div>
-				<div class="additional_row floatright">
-					<input type="submit" name="removeSelection" value="' . $txt['remove_selection'] . '" onclick="return confirm(\'' . $txt['remove_selection_confirm'] . '\');" class="button_submit" />
-					<input type="submit" name="delall" value="', $context['has_filter'] ? $txt['remove_filtered_results'] : $txt['remove_all'], '" onclick="return confirm(\'', $context['has_filter'] ? $txt['remove_filtered_results_confirm'] : $txt['sure_about_errorlog_remove'], '\');" class="button_submit" />
-				</div>
-			</div>';
+				<div class="submitbutton">
+					<input type="submit" name="removeSelection" value="' . $txt['remove_selection'] . '" onclick="return confirm(\'' . $txt['remove_selection_confirm'] . '\');" />
+					<input type="submit" name="delall" value="', $context['has_filter'] ? $txt['remove_filtered_results'] : $txt['remove_all'], '" onclick="return confirm(\'', $context['has_filter'] ? $txt['remove_filtered_results_confirm'] : $txt['sure_about_errorlog_remove'], '\');" />';
 
 	if ($context['sort_direction'] == 'down')
 		echo '
-			<input type="hidden" name="desc" value="1" />';
+					<input type="hidden" name="desc" value="1" />';
 
 	echo '
-			<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />
-			<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />
-			<input type="hidden" name="', $context['admin-el_token_var'], '" value="', $context['admin-el_token'], '" />
+					<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />
+					<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />
+					<input type="hidden" name="', $context['admin-el_token_var'], '" value="', $context['admin-el_token'], '" />
+				</div>
+			</div>
 		</form>';
 }
 
@@ -232,10 +231,10 @@ function template_attachment_errors()
 	echo '
 	<div>
 		<h2 class="category_header">', $txt['attach_error_title'], '</h2>
-		<div class="windowbg">';
+		<div class="content">';
 
 	foreach ($context['attachment_error_keys'] as $key)
-		template_show_error($key);
+			template_show_error($key);
 
 	echo '
 		</div>

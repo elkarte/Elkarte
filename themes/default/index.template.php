@@ -271,7 +271,7 @@ function template_body_above()
 	// Show the navigation tree.
 	theme_linktree();
 
-	// The main content should go here. @todo - Skip nav link.
+	// The main content should go here.
 	echo '
 		<div id="main_content_section"><a id="skipnav"></a>';
 }
@@ -300,17 +300,19 @@ function template_th_login_bar()
 							<option value="43200">', $txt['one_month'], '</option>
 							<option value="-1" selected="selected">', $txt['forever'], '</option>
 						</select>
-						<input type="submit" value="', $txt['login'], '" class="button_submit" />
-					</div>
-					<input type="hidden" name="hash_passwrd" value="" />
-					<input type="hidden" name="old_hash_passwrd" value="" />
-					<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />
-					<input type="hidden" name="', $context['login_token_var'], '" value="', $context['login_token'], '" />';
+						<input type="submit" value="', $txt['login'], '" />
+						<input type="hidden" name="hash_passwrd" value="" />
+						<input type="hidden" name="old_hash_passwrd" value="" />
+						<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />
+						<input type="hidden" name="', $context['login_token_var'], '" value="', $context['login_token'], '" />';
 
 		if (!empty($modSettings['enableOpenID']))
 			echo '
-					<a class="button_submit top_button" href="', $scripturl, '?action=login;openid"><img src="' . $settings['images_url'] . '/openid.png" title="' . $txt['openid'] . '" alt="' . $txt['openid'] . '" /></a>';
+						<a class="linkbutton top_button" href="', $scripturl, '?action=login;openid">
+							<img src="' . $settings['images_url'] . '/openid.png" title="' . $txt['openid'] . '" alt="' . $txt['openid'] . '" />
+						</a>';
 		echo '
+					</div>
 				</form>
 			</div>';
 }
@@ -369,7 +371,7 @@ function template_th_search_bar()
 				<input type="hidden" name="', (!empty($modSettings['search_dropdown']) ? 'sd_brd[' : 'brd['), $context['current_board'], ']"', ' value="', $context['current_board'], '" />';
 
 	echo '
-				<input type="submit" name="search;sa=results" value="', $txt['search'], '" class="button_submit', (!empty($modSettings['search_dropdown'])) ? ' with_select' : '', '" />
+				<button type="submit" name="search;sa=results" class="', (!empty($modSettings['search_dropdown'])) ? 'with_select' : '', '" /><i class="fa fa-lg fa-search"></i></button>
 				<input type="hidden" name="advanced" value="0" />
 			</form>';
 }

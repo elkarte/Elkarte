@@ -44,7 +44,7 @@ function template_pm_above()
 	// Show the capacity bar, if available. @todo - This needs work.
 	if (!empty($context['limit_bar']))
 		echo '
-						<h3 class="category_header">
+						<h2 class="category_header">
 							<span class="floatleft">', $txt['pm_capacity'], ':</span>
 							<span class="floatleft capacity_bar">
 								<span class="', $context['limit_bar']['percent'] > 85 ? 'full' : ($context['limit_bar']['percent'] > 40 ? 'filled' : 'empty'), '" style="width: ', $context['limit_bar']['percent'] / 10, 'em;"></span>
@@ -104,7 +104,7 @@ function template_folder()
 				$start = false;
 			}
 
-			$window_class = $message['alternate'] === 0 ? 'windowbg' : 'windowbg2';
+			$window_class ='content';
 
 			echo '
 						<a class="pm_anchor" id="msg_', $message['id'], '"></a><div class="', $window_class, '">';
@@ -486,7 +486,7 @@ function template_subject_list()
 			{
 				if ($label['id'] != $context['current_label_id'])
 					$extra .= '
-								<option value="add_' . $label['id'] . '">' . (isBrowser('ie8') ? '&#187;' : '&#10148;') . '&nbsp;' . $label['name'] . '</option>';
+								<option value="add_' . $label['id'] . '">&#10148;&nbsp;' . $label['name'] . '</option>';
 			}
 
 			$extra .= '
@@ -495,7 +495,7 @@ function template_subject_list()
 			foreach ($context['labels'] as $label)
 			{
 				$extra .= '
-								<option value="rem_' . $label['id'] . '">' . (isBrowser('ie8') ? '&#187;' : '&#10148;') . '&nbsp;' . $label['name'] . '</option>';
+								<option value="rem_' . $label['id'] . '">&#10148;&nbsp;' . $label['name'] . '</option>';
 			}
 
 			$extra .= '
@@ -732,8 +732,6 @@ function template_search_results()
 				</thead>
 				<tbody>';
 
-	$alternate = true;
-
 	// Print each message out...
 	foreach ($context['personal_messages'] as $message)
 	{
@@ -742,7 +740,7 @@ function template_search_results()
 		if (!empty($context['search_params']['show_complete']))
 		{
 			echo '
-			<div class="windowbg', $alternate ? '2' : '', '">
+			<div class="content">
 				<div class="postarea2">
 					<h5>
 						<span class="floatright">', $txt['search_on'], ': ', $message['time'], '</span>
@@ -791,14 +789,12 @@ function template_search_results()
 		{
 			// @todo No context at all of the search?
 			echo '
-			<tr class="', $alternate ? 'windowbg' : 'windowbg2', '" style="vertical-align: top;">
+			<tr style="vertical-align: top;">
 				<td>', $message['time'], '</td>
 				<td>', $message['link'], '</td>
 				<td>', $message['member']['link'], '</td>
 			</tr>';
 		}
-
-		$alternate = !$alternate;
 	}
 
 	// Finish off the page...
@@ -810,8 +806,8 @@ function template_search_results()
 	// No results?
 	if (empty($context['personal_messages']))
 		echo '
-			<div class="windowbg">
-				<p class="content centertext">', $txt['pm_search_none_found'], '</p>
+			<div class="content centertext">
+				<p>', $txt['pm_search_none_found'], '</p>
 			</div>';
 
 	echo '
@@ -833,20 +829,20 @@ function template_send()
 	{
 		echo '
 			<div class="forumposts">
-				<h3 class="category_header">', $txt['pm_send_report'], '</h3>
-				<div class="windowbg">
-					<div class="content">';
+				<h2 class="category_header">', $txt['pm_send_report'], '</h2>
+				<div class="content">';
 
 		if (!empty($context['send_log']['sent']))
 			foreach ($context['send_log']['sent'] as $log_entry)
-				echo '<span class="error">', $log_entry, '</span><br />';
+				echo '
+					<span class="error">', $log_entry, '</span><br />';
 
 		if (!empty($context['send_log']['failed']))
 			foreach ($context['send_log']['failed'] as $log_entry)
-				echo '<span class="error">', $log_entry, '</span><br />';
+				echo '
+					<span class="error">', $log_entry, '</span><br />';
 
 		echo '
-					</div>
 				</div>
 			</div>';
 	}
@@ -854,10 +850,10 @@ function template_send()
 	// Show the preview of the personal message.
 	echo '
 		<div id="preview_section" class="forumposts"', isset($context['preview_message']) ? '' : ' style="display: none;"', '>
-			<h3 class="category_header">
+			<h2 class="category_header">
 				<span id="preview_subject">', empty($context['preview_subject']) ? '' : $context['preview_subject'], '</span>
-			</h3>
-			<div class="post" id="preview_body">
+			</h2>
+			<div class="post content" id="preview_body">
 				', empty($context['preview_message']) ? '<br />' : $context['preview_message'], '
 			</div>
 		</div>';
@@ -866,12 +862,12 @@ function template_send()
 	echo '
 	<form action="', $scripturl, '?action=pm;sa=send2" method="post" accept-charset="UTF-8" name="pmFolder" id="pmFolder" class="flow_hidden" onsubmit="submitonce(this);smc_saveEntities(\'pmFolder\', [\'subject\', \'message\']);">
 		<div class="forumposts">
-			<h3 class="category_header hdicon cat_img_write">
+			<h2 class="category_header hdicon cat_img_write">
 				', $txt['new_message'], '
-			</h3>';
+			</h2>';
 
 	echo '
-			<div class="windowbg">
+			<div class="content">
 				<div class="editor_wrapper">';
 
 	// If there were errors for sending the PM, show them.
@@ -1033,16 +1029,14 @@ function template_send()
 		echo '
 
 	<div class="forumposts">
-		<h3 class="category_header">', $txt['subject'], ': ', $context['quoted_message']['subject'], '</h3>
-		<div class="windowbg2">
-			<div class="content">
-				<div class="clear">
-					<span class="smalltext floatright">', $txt['on'], ': ', $context['quoted_message']['time'], '</span>
-					<strong>', $txt['from'], ': ', $context['quoted_message']['member']['name'], '</strong>
-				</div>
-				<hr />
-				', $context['quoted_message']['body'], '
+		<h2 class="category_header">', $txt['subject'], ': ', $context['quoted_message']['subject'], '</h2>
+		<div class="content">
+			<div class="clear">
+				<span class="smalltext floatright">', $txt['on'], ': ', $context['quoted_message']['time'], '</span>
+				<strong>', $txt['from'], ': ', $context['quoted_message']['member']['name'], '</strong>
 			</div>
+			<hr />
+			', $context['quoted_message']['body'], '
 		</div>
 	</div>';
 
@@ -1098,11 +1092,9 @@ function template_ask_delete()
 
 	echo '
 		<h2 class="category_header">', ($context['delete_all'] ? $txt['delete_message'] : $txt['delete_all']), '</h2>
-		<div class="windowbg">
-			<div class="content">
-				<p>', $txt['delete_all_confirm'], '</p><br />
-				<strong><a href="', $scripturl, '?action=pm;sa=removeall2;f=', $context['folder'], ';', $context['current_label_id'] != -1 ? ';l=' . $context['current_label_id'] : '', ';', $context['session_var'], '=', $context['session_id'], '">', $txt['yes'], '</a> - <a href="javascript:window.location.assign(document.referrer);">', $txt['no'], '</a></strong>
-			</div>
+		<div class="content">
+			<p>', $txt['delete_all_confirm'], '</p><br />
+			<strong><a href="', $scripturl, '?action=pm;sa=removeall2;f=', $context['folder'], ';', $context['current_label_id'] != -1 ? ';l=' . $context['current_label_id'] : '', ';', $context['session_var'], '=', $context['session_id'], '">', $txt['yes'], '</a> - <a href="javascript:window.location.assign(document.referrer);">', $txt['no'], '</a></strong>
 		</div>';
 }
 
@@ -1116,13 +1108,13 @@ function template_prune()
 	echo '
 	<form id="prune_pm" action="', $scripturl, '?action=pm;sa=prune" method="post" accept-charset="UTF-8" onsubmit="return confirm(\'', $txt['pm_prune_warning'], '\');">
 		<h2 class="category_header">', $txt['pm_prune'], '</h2>
-		<div class="windowbg">
-			<div class="content">
-				<p><label for="age">', sprintf($txt['pm_prune_desc'], '<input type="text" id="age" name="age" size="3" value="14" class="input_text" />'), '</label></p>
-				<input type="submit" value="', $txt['delete'], '" class="right_submit" />
+		<div class="content">
+			<p><label for="age">', sprintf($txt['pm_prune_desc'], '<input type="text" id="age" name="age" size="3" value="14" class="input_text" />'), '</label></p>
+			<div class="submitbutton">
+				<input type="submit" value="', $txt['delete'], '" />
+				<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />
 			</div>
 		</div>
-		<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />
 	</form>';
 }
 
@@ -1159,19 +1151,18 @@ function template_labels()
 
 	if (count($context['labels']) < 2)
 		echo '
-			<tr class="windowbg2">
+			<tr>
 				<td colspan="2" class="centertext">', $txt['pm_labels_no_exist'], '</td>
 			</tr>';
 	else
 	{
-		$alternate = true;
 		foreach ($context['labels'] as $label)
 		{
 			if ($label['id'] == -1)
 				continue;
 
 			echo '
-			<tr class="', $alternate ? 'windowbg2' : 'windowbg', '">
+			<tr>
 				<td>
 					<input type="text" name="label_name[', $label['id'], ']" value="', $label['name'], '" size="30" maxlength="30" class="input_text" />
 				</td>
@@ -1179,8 +1170,6 @@ function template_labels()
 					<input type="checkbox" class="input_check" name="delete_label[', $label['id'], ']" />
 				</td>
 			</tr>';
-
-			$alternate = !$alternate;
 		}
 	}
 
@@ -1200,21 +1189,19 @@ function template_labels()
 	</form>
 	<br />
 	<form class="flow_auto" action="', $scripturl, '?action=pm;sa=manlabels" method="post" accept-charset="UTF-8" style="margin-top: 1ex;">
-		<h3 class="category_header">', $txt['pm_label_add_new'], '</h3>
-		<div class="windowbg">
-			<div class="content">
-				<dl class="settings">
-					<dt>
-						<strong><label for="add_label">', $txt['pm_label_name'], '</label>:</strong>
-					</dt>
-					<dd>
-						<input type="text" id="add_label" name="label" value="" size="30" maxlength="30" class="input_text" />
-					</dd>
-				</dl>
-				<div class="submitbutton">
-					<input type="submit" name="add" value="', $txt['pm_label_add_new'], '" class="button_submit" />
-					<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />
-				</div>
+		<h2 class="category_header">', $txt['pm_label_add_new'], '</h2>
+		<div class="content">
+			<dl class="settings">
+				<dt>
+					<label for="add_label">', $txt['pm_label_name'], ':</label>
+				</dt>
+				<dd>
+					<input type="text" id="add_label" name="label" value="" size="30" maxlength="30" class="input_text" />
+				</dd>
+			</dl>
+			<div class="submitbutton">
+				<input type="submit" name="add" value="', $txt['pm_label_add_new'], '" />
+				<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />
 			</div>
 		</div>
 	</form>';
@@ -1233,45 +1220,43 @@ function template_report_message()
 		<div class="description">
 			', $txt['pm_report_desc'], '
 		</div>
-		<div class="windowbg">
-			<div class="content">
-				<dl class="settings">';
+		<div class="content">
+			<dl class="settings">';
 
 	// If there is more than one admin on the forum (like language based), allow the user to choose the one they want to direct to.
 	if ($context['admin_count'] > 1)
 	{
 		echo '
-					<dt>
-						', $txt['pm_report_admins'], ':
-					</dt>
-					<dd>
-						<select name="id_admin">
-							<option value="0">', $txt['pm_report_all_admins'], '</option>';
+				<dt>
+					', $txt['pm_report_admins'], ':
+				</dt>
+				<dd>
+					<select name="id_admin">
+						<option value="0">', $txt['pm_report_all_admins'], '</option>';
 
 		foreach ($context['admins'] as $id => $details)
 			echo '
 							<option value="', $id, '">', $details[0], !empty($details[1]) ? ' (' . $details[1] . ')' : '', '</option>';
 
 		echo '
-						</select>
-					</dd>';
+					</select>
+				</dd>';
 	}
 
 	echo '
-					<dt>
-						', $txt['pm_report_reason'], ':
-					</dt>
-					<dd>
-						<textarea id="reason" name="reason" rows="4" cols="70" style="' . (isBrowser('is_ie8') ? 'width: 635px; max-width: 95%; min-width: 95%' : 'width: 95%') . ';"></textarea>
-					</dd>
-				</dl>
-				<div class="submitbutton">
-					<input type="submit" name="report" value="', $txt['pm_report_message'], '" class="button_submit" />
-				</div>
+				<dt>
+					', $txt['pm_report_reason'], ':
+				</dt>
+				<dd>
+					<textarea id="reason" name="reason" rows="4" cols="70" style="width: 95%;"></textarea>
+				</dd>
+			</dl>
+			<div class="submitbutton">
+				<input type="submit" name="report" value="', $txt['pm_report_message'], '" />
+				<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />
+				<input type="hidden" name="pmsg" value="', $context['pm_id'], '" />
 			</div>
 		</div>
-		<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />
-		<input type="hidden" name="pmsg" value="', $context['pm_id'], '" />
 	</form>';
 }
 
@@ -1284,7 +1269,7 @@ function template_report_message_complete()
 
 	echo '
 		<h2 class="category_header hdicon cat_img_moderation">', $txt['pm_report_title'], '</h2>
-		<div class="windowbg roundframe">
+		<div class="well">
 			<div class="content">
 				<p>', $txt['pm_report_done'], '</p>
 				<a class="linkbutton_right" href="', $scripturl, '?action=pm;l=', $context['current_label_id'], '">', $txt['pm_report_return'], '</a>
@@ -1325,17 +1310,16 @@ function template_rules()
 
 	if (empty($context['rules']))
 		echo '
-			<tr class="windowbg2">
+			<tr>
 				<td colspan="2" class="centertext">
 					', $txt['pm_rules_none'], '
 				</td>
 			</tr>';
 
-	$alternate = false;
 	foreach ($context['rules'] as $rule)
 	{
 		echo '
-			<tr class="', $alternate ? 'windowbg' : 'windowbg2', '">
+			<tr>
 				<td>
 					<a href="', $scripturl, '?action=pm;sa=manrules;add;rid=', $rule['id'], '">', $rule['name'], '</a>
 				</td>
@@ -1343,7 +1327,6 @@ function template_rules()
 					<input type="checkbox" name="delrule[', $rule['id'], ']" class="input_check" />
 				</td>
 			</tr>';
-		$alternate = !$alternate;
 	}
 
 	echo '
@@ -1359,7 +1342,7 @@ function template_rules()
 	if (!empty($context['rules']))
 		echo '
 			<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />
-			<input type="submit" name="delselected" value="', $txt['pm_delete_selected_rule'], '" onclick="return confirm(\'', $txt['pm_js_delete_rule_confirm'], '\');" class="button_submit" />';
+			<input type="submit" name="delselected" value="', $txt['pm_delete_selected_rule'], '" onclick="return confirm(\'', $txt['pm_js_delete_rule_confirm'], '\');" />';
 
 	echo '
 		</div>
@@ -1376,28 +1359,29 @@ function template_add_rule()
 	echo '
 	<form action="', $scripturl, '?action=pm;sa=manrules;save;rid=', $context['rid'], '" method="post" accept-charset="UTF-8" name="addrule" id="addrule" class="flow_hidden">
 		<h2 class="category_header">', $context['rid'] == 0 ? $txt['pm_add_rule'] : $txt['pm_edit_rule'], '</h2>
-		<div class="windowbg">
-			<div class="content">
-				<dl class="addrules">
-					<dt class="floatleft">
-						<strong><label for="rule_name">', $txt['pm_rule_name'], '</label>:</strong><br />
-						<span class="smalltext">', $txt['pm_rule_name_desc'], '</span>
-					</dt>
-					<dd class="floatleft">
-						<input type="text" id="rule_name" name="rule_name" value="', empty($context['rule']['name']) ? $txt['pm_rule_name_default'] : $context['rule']['name'], '" size="50" class="input_text" />
-					</dd>
-				</dl>
-				<fieldset id="criteria">
-					<legend>', $txt['pm_rule_criteria'], '</legend>';
+		<div class="content">
+			<dl class="addrules">
+				<dt class="floatleft">
+					<label for="rule_name">', $txt['pm_rule_name'], ':</label><br />
+					<span class="smalltext">', $txt['pm_rule_name_desc'], '</span>
+				</dt>
+				<dd class="floatleft">
+					<input type="text" id="rule_name" name="rule_name" value="', empty($context['rule']['name']) ? $txt['pm_rule_name_default'] : $context['rule']['name'], '" size="50" class="input_text" />
+				</dd>
+			</dl>
+			<fieldset id="criteria">
+				<legend>', $txt['pm_rule_criteria'], '</legend>';
 
 	// For each criteria print it out.
 	$isFirst = true;
 	foreach ($context['rule']['criteria'] as $k => $criteria)
 	{
 		if (!$isFirst && $criteria['t'] == '')
-			echo '<div id="removeonjs1">';
+			echo '
+				<div id="removeonjs1">';
 		elseif (!$isFirst)
-			echo '<br />';
+			echo '
+				<br />';
 
 		echo '
 					<select name="ruletype[', $k, ']" id="ruletype', $k, '" data-optnum="', $k, '">
@@ -1428,21 +1412,23 @@ function template_add_rule()
 		if ($isFirst)
 			$isFirst = false;
 		elseif ($criteria['t'] == '')
-			echo '</div>';
+			echo '
+				</div>';
 	}
 
 	echo '
-					<span id="criteriaAddHere"></span><br />
-					<a id="addonjs1" class="linkbutton" href="#" onclick="addCriteriaOption(); return false;" style="display: none;">', $txt['pm_rule_criteria_add'], '</a>
-					<br /><br />
-					', $txt['pm_rule_logic'], ':
-					<select name="rule_logic" id="logic"">
-						<option value="and" ', $context['rule']['logic'] == 'and' ? 'selected="selected"' : '', '>', $txt['pm_rule_logic_and'], '</option>
-						<option value="or" ', $context['rule']['logic'] == 'or' ? 'selected="selected"' : '', '>', $txt['pm_rule_logic_or'], '</option>
-					</select>
-				</fieldset>
-				<fieldset id="actions">
-					<legend>', $txt['pm_rule_actions'], '</legend>';
+				<span id="criteriaAddHere"></span>
+				<br />
+				<a id="addonjs1" class="linkbutton" href="#" onclick="addCriteriaOption(); return false;" style="display: none;">', $txt['pm_rule_criteria_add'], '</a>
+				<br /><br />
+				', $txt['pm_rule_logic'], ':
+				<select name="rule_logic" id="logic"">
+					<option value="and" ', $context['rule']['logic'] == 'and' ? 'selected="selected"' : '', '>', $txt['pm_rule_logic_and'], '</option>
+					<option value="or" ', $context['rule']['logic'] == 'or' ? 'selected="selected"' : '', '>', $txt['pm_rule_logic_or'], '</option>
+				</select>
+			</fieldset>
+			<fieldset id="actions">
+				<legend>', $txt['pm_rule_actions'], '</legend>';
 
 	// As with criteria - add a dummy action for "expansion".
 	$context['rule']['actions'][] = array('t' => '', 'v' => '');
@@ -1452,9 +1438,11 @@ function template_add_rule()
 	foreach ($context['rule']['actions'] as $k => $action)
 	{
 		if (!$isFirst && $action['t'] == '')
-			echo '<div id="removeonjs2">';
+			echo '
+				<div id="removeonjs2">';
 		elseif (!$isFirst)
-			echo '<br />';
+			echo '
+				<br />';
 
 		echo '
 					<select name="acttype[', $k, ']" id="acttype', $k, '" data-actnum="', $k, '">
@@ -1483,18 +1471,17 @@ function template_add_rule()
 	}
 
 	echo '
-					<span id="actionAddHere"></span><br />
-					<a href="#" id="addonjs2" class="linkbutton" onclick="addActionOption(); return false;" style="display: none;">', $txt['pm_rule_add_action'], '</a>
-				</fieldset>
-			</div>
-			<h3 class="category_header">', $txt['pm_rule_description'], '</h3>
-			<div class="information">
-				<div id="ruletext">', $txt['pm_rule_js_disabled'], '</div>
-			</div>
-			<div class="submitbutton">
-				<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />
-				<input type="submit" name="save" value="', $txt['pm_rule_save'], '" class="button_submit" />
-			</div>
+				<span id="actionAddHere"></span><br />
+				<a href="#" id="addonjs2" class="linkbutton" onclick="addActionOption(); return false;" style="display: none;">', $txt['pm_rule_add_action'], '</a>
+			</fieldset>
+		</div>
+		<h2 class="category_header">', $txt['pm_rule_description'], '</h2>
+		<div class="information">
+			<div id="ruletext">', $txt['pm_rule_js_disabled'], '</div>
+		</div>
+		<div class="submitbutton">
+			<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />
+			<input type="submit" name="save" value="', $txt['pm_rule_save'], '" />
 		</div>
 	</form>';
 
@@ -1542,7 +1529,7 @@ function template_showPMDrafts()
 		foreach ($context['drafts'] as $draft)
 		{
 			echo '
-		<div class="', $draft['alternate'] === 0 ? 'windowbg2' : 'windowbg', ' core_posts">
+		<div class="content">
 			<div class="counter">', $draft['counter'], '</div>
 			<div class="topic_details">
 				<h5>

@@ -34,11 +34,11 @@ function template_recent()
 
 	echo '
 		<div id="recentposts" class="forumposts">
-			<h3 class="category_header hdicon cat_img_posts">', $txt['recent_posts'], '</h3>';
+			<h2 class="category_header hdicon cat_img_posts">', $txt['recent_posts'], '</h2>';
 
 	foreach ($context['posts'] as $post)
 	{
-		$post['class'] = $post['alternate'] == 0 ? 'windowbg' : 'windowbg2';
+		$post['class'] = 'content';
 		$post['title'] = $post['board']['link'] . ' / ' . $post['link'];
 		$post['date'] = $txt['last_post'] . ' ' . $txt['by'] . ' <strong>' . $post['poster']['link'] . ' </strong> - ' . $post['html_time'];
 

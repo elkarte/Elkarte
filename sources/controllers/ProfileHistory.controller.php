@@ -171,7 +171,6 @@ class ProfileHistory_Controller extends Action_Controller
 				array(
 					'position' => 'after_title',
 					'value' => $txt['errors_desc'],
-					'class' => 'windowbg2',
 					'style' => 'padding: 1ex 2ex;',
 				),
 			),
@@ -334,7 +333,6 @@ class ProfileHistory_Controller extends Action_Controller
 				array(
 					'position' => 'after_title',
 					'value' => $txt['messages_from_ip_desc'],
-					'class' => 'windowbg2',
 					'style' => 'padding: 1ex 2ex;',
 				),
 			),
@@ -423,7 +421,6 @@ class ProfileHistory_Controller extends Action_Controller
 				array(
 					'position' => 'after_title',
 					'value' => $txt['errors_from_ip_desc'],
-					'class' => 'windowbg2',
 					'style' => 'padding: 1ex 2ex;',
 				),
 			),
@@ -528,7 +525,6 @@ class ProfileHistory_Controller extends Action_Controller
 				array(
 					'position' => 'after_title',
 					'value' => $txt['trackLogins_desc'],
-					'class' => 'windowbg2',
 					'style' => 'padding: 1ex 2ex;',
 				),
 			),

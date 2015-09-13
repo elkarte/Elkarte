@@ -38,7 +38,7 @@ function template_poll_edit()
 		<form action="', $context['form_url'], '" method="post" accept-charset="UTF-8" onsubmit="submitonce(this); smc_saveEntities(\'postmodify\', [\'question\'], \'options-\');" name="postmodify" id="postmodify">
 			<h2 class="category_header">', $context['page_title'], '</h2>
 			<div>
-				<div class="roundframe">';
+				<div class="well">';
 
 	template_show_error('poll_error');
 

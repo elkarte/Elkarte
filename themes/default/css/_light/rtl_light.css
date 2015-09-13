@@ -82,7 +82,7 @@ legend {
 .linkbutton:link, .linkbutton_right:link, .linkbutton_left:link,
 .linkbutton:visited, .linkbutton_right:visited, .linkbutton_left:visited {
 	border-left: 1px solid #afafaf;
-	border-right: 1px solid #bfbfbf;
+	border-right: 1px solid #BFBFBF;
 	box-shadow: -1px 1px 2px #e5e5e5;
 }
 
@@ -153,7 +153,7 @@ legend {
 /* Level 1 Menu bar: link or button. General styling. */
 .linklevel1, .linklevel1:link, .linklevel1:visited {
 	border-left: 1px solid #afafaf;
-	border-right: 1px solid #bfbfbf;
+	border-right: 1px solid #BFBFBF;
 	box-shadow: -1px 1px 2px #e5e5e5;
 }
 /* Level 1 button hover and focus effects. */
@@ -173,7 +173,7 @@ legend {
 }
 .poster li.poster_online .nolink {
 	border-left: 1px solid #afafaf;
-	border-right: 1px solid #bfbfbf;
+	border-right: 1px solid #BFBFBF;
 	box-shadow: -1px 1px 2px #e5e5e5;
 }
 /* Level 1 active buttons. */
@@ -193,7 +193,7 @@ legend {
 /* Levels 2 and 3: drop menu wrapper. */
 .menulevel2, .menulevel3 {
 	border-left: 1px solid #afafaf;
-	border-right: 1px solid #bfbfbf;
+	border-right: 1px solid #BFBFBF;
 	box-shadow: -3px 3px 3px rgba(0,0,0,0.2);
 }
 /* Tricky PM indicator. Define it carefully,
@@ -438,7 +438,7 @@ legend {
 /* @todo - Save code by amalgamating common button background declarations. */
 .poster_online .linklevel1 {
 	border-left: 1px solid #afafaf;
-	border-right: 1px solid #bfbfbf;
+	border-right: 1px solid #BFBFBF;
 	box-shadow: -1px 1px 2px #eee;
 }
 .poster_online .linklevel1:hover {
@@ -494,11 +494,6 @@ legend {
 
 /* $CALENDAR	*/
 /* ------------------------------------------------------- */
-/* Used to indicate the current day. */
-.weekdays {
-	border-right: 0;
-	border-left: 2px solid #ddd;
-}
 
 /*	$HELP		*/
 /* ------------------------------------------------------- */

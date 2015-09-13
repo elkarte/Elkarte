@@ -65,7 +65,7 @@ function template_show_calendar()
 
 	echo '
 					</select>
-					<input type="submit" class="button_submit" value="', $txt['view'], '" />
+					<input type="submit" value="', $txt['view'], '" />
 				</form>
 			</div>
 		</div>';
@@ -107,7 +107,7 @@ function template_unlinked_event_post()
 	}
 
 	echo '
-				<div id="event_main" class="roundframe">
+				<div id="event_main" class="well">
 					<label for="evtitle"', isset($context['post_error']['no_event']) ? ' class="error"' : '', ' id="caption_evtitle">', $txt['calendar_event_title'], '</label>
 					<input type="text" id="evtitle" name="evtitle" maxlength="255" size="55" value="', $context['event']['title'], '" tabindex="', $context['tabindex']++, '" class="input_text" />
 					<div id="datepicker">
@@ -182,17 +182,18 @@ function template_unlinked_event_post()
 					</ul>';
 
 	echo '
-					<input type="submit" value="', empty($context['event']['new']) ? $txt['save'] : $txt['post'], '" class="right_submit" />';
+					<div class="submitbutton">
+						<input type="submit" value="', empty($context['event']['new']) ? $txt['save'] : $txt['post'], '" />';
 
 	// Delete button?
 	if (empty($context['event']['new']))
 		echo '
-					<input type="submit" name="deleteevent" value="', $txt['event_delete'], '" onclick="return confirm(\'', $txt['calendar_confirm_delete'], '\');" class="right_submit" />';
+						<input type="submit" name="deleteevent" value="', $txt['event_delete'], '" onclick="return confirm(\'', $txt['calendar_confirm_delete'], '\');" />';
 
 	echo '
-					<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />
-					<input type="hidden" name="eventid" value="', $context['event']['eventid'], '" />
-
+						<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />
+						<input type="hidden" name="eventid" value="', $context['event']['eventid'], '" />
+					</div>
 				</div>
 			</div>
 		</form>';
@@ -273,7 +274,7 @@ function template_show_month_grid($grid_name)
 
 		if (!empty($calendar_data['show_week_links']))
 			echo '
-						<td class="windowbg2 weeks">
+						<td class="weeks">
 							<a href="', $scripturl, '?action=calendar;viewweek;year=', $calendar_data['current_year'], ';month=', $calendar_data['current_month'], ';day=', $week['days'][0]['day'], '"><i class="fa fa-angle-double-right fa-lg"></i></a>
 						</td>';
 
@@ -284,7 +285,7 @@ function template_show_month_grid($grid_name)
 		{
 			// If this is today, make it a different color and show a border.
 			echo '
-						<td class="', $day['is_today'] ? 'calendar_today' : 'windowbg', ' days">';
+						<td class="', $day['is_today'] ? 'calendar_today' : '', ' days">';
 
 			// Skip it if it should be blank - it's not a day if it has no number.
 			if (!empty($day['day']))
@@ -320,11 +321,15 @@ function template_show_month_grid($grid_name)
 					foreach ($day['birthdays'] as $member)
 					{
 						echo '
-									<a href="', $scripturl, '?action=profile;u=', $member['id'], '"><span class="fix_rtl_names">', $member['name'], '</span>', isset($member['age']) ? ' (' . $member['age'] . ')' : '', '</a>', $member['is_last'] || ($count == 10 && $use_js_hide) ? '' : ', ';
+									<a href="', $scripturl, '?action=profile;u=', $member['id'], '">', $member['name'], isset($member['age']) ? ' (' . $member['age'] . ')' : '', '</a>', $member['is_last'] || ($count == 10 && $use_js_hide) ? '' : ', ';
 
 						// Stop at ten?
 						if ($count == 10 && $use_js_hide)
-							echo '<span class="hidelink" id="bdhidelink_', $day['day'], '">...<br /><a href="', $scripturl, '?action=calendar;month=', $calendar_data['current_month'], ';year=', $calendar_data['current_year'], ';showbd" onclick="document.getElementById(\'bdhide_', $day['day'], '\').style.display = \'\'; document.getElementById(\'bdhidelink_', $day['day'], '\').style.display = \'none\'; return false;">(', sprintf($txt['calendar_click_all'], count($day['birthdays'])), ')</a></span><span id="bdhide_', $day['day'], '" style="display: none;">, ';
+							echo '
+									<span class="hidelink" id="bdhidelink_', $day['day'], '">...<br />
+										<a href="', $scripturl, '?action=calendar;month=', $calendar_data['current_month'], ';year=', $calendar_data['current_year'], ';showbd" onclick="document.getElementById(\'bdhide_', $day['day'], '\').style.display = \'\'; document.getElementById(\'bdhidelink_', $day['day'], '\').style.display = \'none\'; return false;">(', sprintf($txt['calendar_click_all'], count($day['birthdays'])), ')</a>
+									</span>
+									<span id="bdhide_', $day['day'], '" style="display: none;">, ';
 
 						$count++;
 					}
@@ -417,7 +422,7 @@ function template_show_week_grid($grid_name)
 
 		echo '
 					<a href="', $scripturl, '?action=calendar;month=', $month_data['current_month'], ';year=', $month_data['current_year'], '">', $txt['months_titles'][$month_data['current_month']], ' ', $month_data['current_year'], '</a>', empty($done_title) && !empty($calendar_data['week_number']) ? (' - ' . $txt['calendar_week'] . ' ' . $calendar_data['week_number']) : '', '
-				</h2>';
+				</h3>';
 
 		$done_title = true;
 
@@ -427,7 +432,7 @@ function template_show_week_grid($grid_name)
 		foreach ($month_data['days'] as $day)
 		{
 			echo '
-					<li class="windowbg">
+					<li>
 						<h4>';
 
 			// Should the day number be a link?
@@ -440,7 +445,7 @@ function template_show_week_grid($grid_name)
 
 			echo '
 						</h4>
-						<div class="', $day['is_today'] ? 'calendar_today' : 'windowbg2', ' weekdays">';
+						<div class="', $day['is_today'] ? 'calendar_today' : '', ' weekdays">';
 
 			// Are there any holidays?
 			if (!empty($day['holidays']))
@@ -458,7 +463,7 @@ function template_show_week_grid($grid_name)
 				// id, name (person), age (if they have one set?), and is_last. (last in list?)
 				foreach ($day['birthdays'] as $member)
 					echo '
-								<a href="', $scripturl, '?action=profile;u=', $member['id'], '"><span class="fix_rtl_names">', $member['name'], '</span>', isset($member['age']) ? ' (' . $member['age'] . ')' : '', '</a>', $member['is_last'] ? '' : ', ';
+								<a href="', $scripturl, '?action=profile;u=', $member['id'], '">', $member['name'], isset($member['age']) ? ' (' . $member['age'] . ')' : '', '</a>', $member['is_last'] ? '' : ', ';
 
 				echo '
 							</div>';

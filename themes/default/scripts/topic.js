@@ -1182,7 +1182,7 @@ function onTopicSplitReceived(XMLDoc)
 
 			// Let's create a nice container for the message.
 			newItem = document.createElement("li");
-			newItem.className = "windowbg2";
+			newItem.className = "content";
 			newItem.id = curSection + "_" + curId;
 			newItem.innerHTML = '' +
 				'<div class="content">' +

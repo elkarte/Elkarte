@@ -60,10 +60,10 @@ function template_postarea_above()
 	// If the user wants to see how their message looks - the preview section is where it's at!
 	echo '
 			<div id="preview_section" class="forumposts"', isset($context['preview_message']) ? '' : ' style="display: none;"', '>
-				<h3 class="category_header">
+				<h2 class="category_header">
 					<span id="preview_subject">', empty($context['preview_subject']) ? '' : $context['preview_subject'], '</span>
-				</h3>
-				<div class="post" id="preview_body">
+				</h2>
+				<div class="post content" id="preview_body">
 					', empty($context['preview_message']) ? '<br />' : $context['preview_message'], '
 				</div>
 			</div>';
@@ -71,9 +71,8 @@ function template_postarea_above()
 	// Start the main table.
 	echo '
 			<div class="forumposts">', isset($context['current_topic']) ? '<input type="hidden" name="topic" value="' . $context['current_topic'] . '" />' : '', '
-				<h3 class="category_header">', $context['page_title'], '</h3>
-				<div class="windowbg">
-					<div class="editor_wrapper">';
+				<h2 class="category_header">', $context['page_title'], '</h2>
+				<div class="editor_wrapper">';
 
 	// If an error occurred, explain what happened.
 	template_show_error('post_error');
@@ -85,84 +84,84 @@ function template_postarea_above()
 	if (!$context['becomes_approved'])
 	{
 		echo '
-						<div class="successbox">
-							', $txt['wait_for_approval'], '
-							<input type="hidden" name="not_approved" value="1" />
-						</div>';
+					<div class="successbox">
+						', $txt['wait_for_approval'], '
+						<input type="hidden" name="not_approved" value="1" />
+					</div>';
 	}
 
 	// If it's locked, show a message to warn the replyer.
 	// @todo why not output it only for locked topics and why not use the template_show_error above?
 	echo '
-						<p class="information"', $context['locked'] ? '' : ' style="display: none"', ' id="lock_warning">
-							', $txt['topic_locked_no_reply'], '
-						</p>';
+					<p class="information"', $context['locked'] ? '' : ' style="display: none"', ' id="lock_warning">
+						', $txt['topic_locked_no_reply'], '
+					</p>';
 
 	if (!empty($context['drafts_autosave']))
 		echo '
-						<div id="draft_section" class="successbox"', isset($context['draft_saved']) ? '' : ' style="display: none;"', '>
-							', sprintf($txt['draft_saved'], $scripturl . '?action=profile;u=' . $context['user']['id'] . ';area=showdrafts'), '
-						</div>';
+					<div id="draft_section" class="successbox"', isset($context['draft_saved']) ? '' : ' style="display: none;"', '>
+						', sprintf($txt['draft_saved'], $scripturl . '?action=profile;u=' . $context['user']['id'] . ';area=showdrafts'), '
+					</div>';
 
 	// The post header... important stuff
 	echo '
-						<dl id="post_header">';
+					<dl id="post_header">';
 
 	// Guests have to put in their name and email...
 	if (isset($context['name']) && isset($context['email']))
 	{
 		echo '
-							<dt>
-								<label for="guestname"', isset($context['post_error']['long_name']) || isset($context['post_error']['no_name']) || isset($context['post_error']['bad_name']) ? ' class="error"' : '', ' id="caption_guestname">', $txt['name'], ':</label>
-							</dt>
-							<dd>
-								<input type="text" id="guestname" name="guestname" size="25" value="', $context['name'], '" tabindex="', $context['tabindex']++, '" class="input_text" required="required" />
-							</dd>';
+						<dt>
+							<label for="guestname"', isset($context['post_error']['long_name']) || isset($context['post_error']['no_name']) || isset($context['post_error']['bad_name']) ? ' class="error"' : '', ' id="caption_guestname">', $txt['name'], ':</label>
+						</dt>
+						<dd>
+							<input type="text" id="guestname" name="guestname" size="25" value="', $context['name'], '" tabindex="', $context['tabindex']++, '" class="input_text" required="required" />
+						</dd>';
 
 		if (empty($modSettings['guest_post_no_email']))
 			echo '
-							<dt>
-								<label for="email"', isset($context['post_error']['no_email']) || isset($context['post_error']['bad_email']) ? ' class="error"' : '', ' id="caption_email">', $txt['email'], ':</label>
-							</dt>
-							<dd>
-								<input type="email" id="email" name="email" size="25" value="', $context['email'], '" tabindex="', $context['tabindex']++, '" class="input_text" required="required" />
-							</dd>';
+						<dt>
+							<label for="email"', isset($context['post_error']['no_email']) || isset($context['post_error']['bad_email']) ? ' class="error"' : '', ' id="caption_email">', $txt['email'], ':</label>
+						</dt>
+						<dd>
+							<input type="email" id="email" name="email" size="25" value="', $context['email'], '" tabindex="', $context['tabindex']++, '" class="input_text" required="required" />
+						</dd>';
 	}
 
 	// Now show the subject box for this post.
 	echo '
-							<dt class="clear">
-								<label for="post_subject"', isset($context['post_error']['no_subject']) ? ' class="error"' : '', ' id="caption_subject">', $txt['subject'], ':</label>
-							</dt>
-							<dd>
-								<input id="post_subject" type="text" name="subject"', $context['subject'] == '' ? '' : ' value="' . $context['subject'] . '"', ' tabindex="', $context['tabindex']++, '" size="80" maxlength="80"', isset($context['post_error']['no_subject']) ? ' class="error"' : ' class="input_text"', ' placeholder="', $txt['subject'], '" required="required" />
-							</dd>
-							<dt class="clear_left">
-								<label for="icon">', $txt['message_icon'], '</label>:
-							</dt>
-							<dd>
-								<select name="icon" id="icon" onchange="showimage()">';
+						<dt class="clear">
+							<label for="post_subject"', isset($context['post_error']['no_subject']) ? ' class="error"' : '', ' id="caption_subject">', $txt['subject'], ':</label>
+						</dt>
+						<dd>
+							<input id="post_subject" type="text" name="subject"', $context['subject'] == '' ? '' : ' value="' . $context['subject'] . '"', ' tabindex="', $context['tabindex']++, '" size="80" maxlength="80"', isset($context['post_error']['no_subject']) ? ' class="error"' : ' class="input_text"', ' placeholder="', $txt['subject'], '" required="required" />
+						</dd>
+						<dt class="clear_left">
+							<label for="icon">', $txt['message_icon'], '</label>:
+						</dt>
+						<dd>
+							<select name="icon" id="icon" onchange="showimage()">';
 
 	// Loop through each message icon allowed, adding it to the drop down list.
 	foreach ($context['icons'] as $icon)
 		echo '
-									<option value="', $icon['value'], '"', $icon['value'] == $context['icon'] ? ' selected="selected"' : '', '>', $icon['name'], '</option>';
+								<option value="', $icon['value'], '"', $icon['value'] == $context['icon'] ? ' selected="selected"' : '', '>', $icon['name'], '</option>';
 
 	echo '
-								</select>
-								<img src="', $context['icon_url'], '" id="icons" alt="" />
-							</dd>';
+							</select>
+							<img src="', $context['icon_url'], '" id="icons" alt="" />
+						</dd>';
 
 	if (!empty($context['show_boards_dropdown']))
 		echo '
-							<dt class="clear_left">
-								<label for="post_in_board">', $txt['post_in_board'], '</label>:
-							</dt>
-							<dd>', template_select_boards('post_in_board'), '
-							</dd>';
+						<dt class="clear_left">
+							<label for="post_in_board">', $txt['post_in_board'], '</label>:
+						</dt>
+						<dd>', template_select_boards('post_in_board'), '
+						</dd>';
 
 	echo '
-						</dl>';
+					</dl>';
 }
 
 /**
@@ -171,7 +170,7 @@ function template_postarea_above()
 function template_poll_edit_above()
 {
 	echo '
-					<hr class="clear" />
+					<div class="separator"></div>
 					<div id="edit_poll">';
 
 	template_poll_edit();
@@ -317,7 +316,7 @@ function template_post_page()
 }
 
 /**
- * Show the additonal options section, allowing locking, sticky, adding of attachments, etc
+ * Show the additional options section, allowing locking, sticky, adding of attachments, etc
  */
 function template_additional_options_below()
 {
@@ -560,7 +559,7 @@ function template_topic_replies_below()
 	{
 		echo '
 		<div id="topic_summary" class="forumposts">
-			<h3 class="category_header">', $txt['topic_summary'], '</h3>
+			<h2 class="category_header">', $txt['topic_summary'], '</h2>
 			<span id="new_replies"></span>';
 
 		$ignored_posts = array();
@@ -571,7 +570,7 @@ function template_topic_replies_below()
 				$ignored_posts[] = $ignoring = $post['id'];
 
 			echo '
-			<div class="', $post['alternate'] == 0 ? 'windowbg' : 'windowbg2', '">
+			<div class="content">
 				<div class="postarea2" id="msg', $post['id'], '">
 					<div class="keyinfo">
 						<h5 class="floatleft">
@@ -581,7 +580,9 @@ function template_topic_replies_below()
 			if ($context['can_quote'])
 				echo '
 						<ul class="quickbuttons" id="msg_', $post['id'], '_quote">
-							<li class="listlevel1"><a href="#postmodify" onmousedown="return insertQuoteFast(', $post['id'], ');" class="linklevel1 quote_button">', $txt['bbc_quote'], '</a></li>
+							<li class="listlevel1">
+								<a href="#postmodify" onmousedown="return insertQuoteFast(', $post['id'], ');" class="linklevel1 quote_button">', $txt['bbc_quote'], '</a>
+							</li>
 						</ul>';
 
 			echo '
@@ -653,8 +654,7 @@ function template_postarea_below()
 
 	echo '
 					</div>
-				</div>
-			</div>';
+				</div>';
 
 	// Assuming this isn't a new topic pass across the last message id.
 	if (isset($context['topic_last_message']))
@@ -794,7 +794,7 @@ function template_spellcheck()
 		<form action="#" method="post" accept-charset="UTF-8" name="spellingForm" id="spellingForm" onsubmit="return false;" style="margin: 0;">
 			<div id="spellview">&nbsp;</div>
 			<table class="table_grid">
-				<tr class="windowbg">
+				<tr>
 					<td style="width: 50%;vertical-align: top;">
 						<label for="changeto">', $txt['spellcheck_change_to'], '</label><br />
 						<input type="text" id="changeto" name="changeto" style="width: 98%;" class="input_text" />

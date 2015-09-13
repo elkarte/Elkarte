@@ -39,7 +39,7 @@ function template_show_list($list_id = null)
 	// Show the title of the table (if any), with an icon (if defined)
 	if (!empty($cur_list['title']))
 		echo '
-			<h3 class="category_header', !empty($cur_list['icon']) ? ' hdicon cat_img_' . $cur_list['icon'] : '', '">', $cur_list['title'], '</h3>';
+			<h2 class="category_header', !empty($cur_list['icon']) ? ' hdicon cat_img_' . $cur_list['icon'] : '', '">', $cur_list['title'], '</h2>';
 
 	// Show any data right after the title
 	if (isset($cur_list['additional_rows']['after_title']))
@@ -131,13 +131,14 @@ function template_show_list($list_id = null)
 			<tbody', empty($cur_list['sortable']) ? '' : ' id="table_grid_sortable"', '>';
 
 	// Show a nice message informing there are no items in this list.
-	// @todo - Nasty having styles and aligns still in the markup (IE6 stuffz).
-	// @todo - Should be done via the class.
 	if (empty($cur_list['rows']) && !empty($cur_list['no_items_label']))
 		echo '
 				<tr>
-					<td class="windowbg" colspan="', $cur_list['num_columns'], '" style="text-align:', !empty($cur_list['no_items_align']) ? $cur_list['no_items_align'] : 'center', '"><div class="padding">', $cur_list['no_items_label'], '</div></td>
+					<td colspan="', $cur_list['num_columns'], '">
+						<div class="', !empty($cur_list['no_items_align']) ? $cur_list['no_items_align'] : 'centertext', '">', $cur_list['no_items_label'], '</div>
+					</td>
 				</tr>';
+
 	// Show the list rows.
 	elseif (!empty($cur_list['rows']))
 	{

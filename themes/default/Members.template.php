@@ -56,7 +56,7 @@ function template_find_members()
 	</head>
 	<body id="help_popup">
 		<form action="', $scripturl, '?action=findmember;', $context['session_var'], '=', $context['session_id'], '" method="post" accept-charset="UTF-8">
-			<div class="roundframe">
+			<div class="well">
 				<h2 class="category_header">', $txt['find_members'], '</h2>
 				<div>
 					<strong>', $txt['find_username'], ':</strong><br />
@@ -74,8 +74,8 @@ function template_find_members()
 				</div>
 			</div>
 			<br />
-			<div class="roundframe">
-				<h3 class="category_header">', $txt['find_results'], '</h3>';
+			<div class="well">
+				<h2 class="category_header">', $txt['find_results'], '</h2>';
 
 	if (empty($context['results']))
 		echo '
@@ -85,16 +85,13 @@ function template_find_members()
 		echo '
 				<ul>';
 
-		$alternate = true;
 		foreach ($context['results'] as $result)
 		{
 			echo '
-					<li class="', $alternate ? 'windowbg2' : 'windowbg', '">
+					<li>
 						<a href="', $result['href'], '" target="_blank" class="new_win"><img src="', $settings['images_url'], '/icons/profile_sm.png" alt="', $txt['view_profile'], '" title="', $txt['view_profile'], '" /></a>
 						<a href="javascript:void(0);" onclick="addMember(this.innerHTML); return false;">', $result['name'], '</a>
 					</li>';
-
-			$alternate = !$alternate;
 		}
 
 		echo '

@@ -179,7 +179,7 @@ class ManageMaillist_Controller extends Action_Controller
 						'function' => function($rowData) {
 							$error = $rowData['error_code'];
 							if ($error === 'error_pm_not_found')
-								return '<span class="errorbox">' . $rowData['error'] . '<span>';
+								return '<span class="error">' . $rowData['error'] . '<span>';
 							else
 								return $rowData['error'];
 						},
@@ -307,7 +307,6 @@ class ManageMaillist_Controller extends Action_Controller
 				array(
 					'position' => 'top_of_list',
 					'value' => isset($this->_req->session->email_error) ? '<div class="' . (isset($this->_req->session->email_error_type) ? 'successbox' : 'errorbox') . '">' . $this->_req->session->email_error . '</div>' : $txt['heading'],
-					'class' => 'windowbg2',
 				),
 			),
 		);
@@ -711,7 +710,6 @@ class ManageMaillist_Controller extends Action_Controller
 				array(
 					'position' => isset($this->_req->query->saved) ? 'top_of_list' : 'after_title',
 					'value' => isset($this->_req->query->saved) ? '<div class="successbox">' . $txt['saved'] . '</div>' : $txt['filters_title'],
-					'class' => 'windowbg2',
 				),
 				array(
 					'position' => 'below_table_data',
@@ -819,7 +817,6 @@ class ManageMaillist_Controller extends Action_Controller
 				array(
 					'position' => 'after_title',
 					'value' => $txt['filter_sort_description'],
-					'class' => 'windowbg',
 				),
 			),
 			'javascript' => '
@@ -1140,7 +1137,6 @@ class ManageMaillist_Controller extends Action_Controller
 				array(
 					'position' => isset($this->_req->query->saved) ? 'top_of_list' : 'after_title',
 					'value' => isset($this->_req->query->saved) ? '<div class="successbox">' . $txt['saved'] . '</div>' : $txt['parsers_title'],
-					'class' => 'windowbg2',
 				),
 				array(
 					'position' => 'below_table_data',
@@ -1241,7 +1237,6 @@ class ManageMaillist_Controller extends Action_Controller
 				array(
 					'position' => 'after_title',
 					'value' => $txt['parser_sort_description'],
-					'class' => 'windowbg',
 				),
 			),
 			'javascript' => '
@@ -1561,7 +1556,7 @@ class ManageMaillist_Controller extends Action_Controller
 	}
 
 	/**
-	 * Initialize Mailist settings form.
+	 * Initialize Maillist settings form.
 	 */
 	private function _initMaillistSettingsForm()
 	{

@@ -34,7 +34,7 @@ function template_move_topic()
 	<div id="move_topic">
 		<form action="', $scripturl, '?action=movetopic2;current_board=' . $context['current_board'] . ';topic=', $context['current_topic'], '.0" method="post" accept-charset="UTF-8" onsubmit="submitonce(this);">
 			<h2 class="category_header">', $txt['move_topic'], '</h2>
-			<div class="windowbg centertext">
+			<div class="centertext">
 				<div class="content">
 					<div class="move_topic">
 						<dl class="settings">
@@ -50,7 +50,7 @@ function template_move_topic()
 						<label for="reset_subject"><input type="checkbox" name="reset_subject" id="reset_subject" onclick="document.getElementById(\'subjectArea\').style.display = this.checked ? \'block\' : \'none\';" class="input_check" /> ', $txt['moveTopic2'], '.</label><br />
 						<fieldset id="subjectArea" style="display: none;">
 							<dl class="settings">
-								<dt><strong><label for="custom_subject">', $txt['moveTopic3'], '</label>:</strong></dt>
+								<dt><label for="custom_subject">', $txt['moveTopic3'], ':</label></dt>
 								<dd><input type="text" id="custom_subject" name="custom_subject" size="30" value="', $context['subject'], '" class="input_text" /></dd>
 							</dl>
 							<label for="enforce_subject"><input type="checkbox" name="enforce_subject" id="enforce_subject" class="input_check" /> ', $txt['moveTopic4'], '.</label>
@@ -85,7 +85,9 @@ function template_move_topic()
 								</dd>
 							</dl>
 						</fieldset>
-						<input type="submit" value="', $txt['move_topic'], '" onclick="return submitThisOnce(this);" accesskey="s" class="right_submit" />
+						<div class="submitbutton">
+							<input type="submit" value="', $txt['move_topic'], '" onclick="return submitThisOnce(this);" accesskey="s" />
+						</div>
 					</div>
 				</div>
 			</div>';

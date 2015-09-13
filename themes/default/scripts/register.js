@@ -297,8 +297,7 @@ elkRegister.prototype.setVerificationImage = function(imageHandle, imageIcon, al
 function updateAuthMethod()
 {
 	var currentAuthMethod,
-		currentForm,
-		verificationHandle;
+		currentForm;
 
 	// What authentication method is being used?
 	if (!document.getElementById('auth_openid') || !document.getElementById('auth_openid').checked)

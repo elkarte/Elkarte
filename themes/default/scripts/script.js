@@ -347,8 +347,8 @@ function smc_Popup(oOptions)
 // Show the popup div & prepare the close events
 smc_Popup.prototype.show = function ()
 {
-	var popup_class = 'popup_window ' + (this.opt.custom_class ? this.opt.custom_class : 'description');
-	var icon = this.opt.icon ? '<img src="' + this.opt.icon + '" class="icon" alt="" /> ' : '';
+	var popup_class = 'popup_window ' + (this.opt.custom_class ? this.opt.custom_class : 'content'),
+		icon = this.opt.icon ? '<img src="' + this.opt.icon + '" class="icon" alt="" /> ' : '';
 
 	// Create the div that will be shown - max-height added here - essential anyway,
 	// so better here than in the CSS.
@@ -359,6 +359,9 @@ smc_Popup.prototype.show = function ()
 	// Show it
 	this.popup_body = $('#' + this.popup_id).children('.popup_window');
 	this.popup_body.parent().fadeIn(300);
+
+	// Let the css know its now available
+	this.popup_body.addClass("in");
 
 	// Trigger hide on escape or mouse click
 	var popup_instance = this;
@@ -1307,7 +1310,7 @@ IconList.prototype.initIcons = function ()
 {
 	for (var i = document.images.length - 1, iPrefixLength = this.opt.sIconIdPrefix.length; i >= 0; i--)
 		if (document.images[i].id.substr(0, iPrefixLength) === this.opt.sIconIdPrefix)
-			setOuterHTML(document.images[i], '<div title="' + this.opt.sLabelIconList + '" onclick="' + this.opt.sBackReference + '.openPopup(this, ' + document.images[i].id.substr(iPrefixLength) + ')" onmouseover="' + this.opt.sBackReference + '.onBoxHover(this, true)" onmouseout="' + this.opt.sBackReference + '.onBoxHover(this, false)" style="background: ' + this.opt.sBoxBackground + '; cursor: pointer; padding: 0 2px; margin: 0 auto; vertical-align: top"><img src="' + document.images[i].src + '" alt="' + document.images[i].alt + '" id="' + document.images[i].id + '" style="vertical-align: top; margin: 0 auto; padding: ' + (is_ie ? '0 2px' : '0 2px') + ';" /></div>');
+			setOuterHTML(document.images[i], '<div title="' + this.opt.sLabelIconList + '" onclick="' + this.opt.sBackReference + '.openPopup(this, ' + document.images[i].id.substr(iPrefixLength) + ')" onmouseover="' + this.opt.sBackReference + '.onBoxHover(this, true)" onmouseout="' + this.opt.sBackReference + '.onBoxHover(this, false)" style="background: ' + this.opt.sBoxBackground + '; cursor: pointer; padding: 2px; margin: 0 auto; vertical-align: top"><img src="' + document.images[i].src + '" alt="' + document.images[i].alt + '" id="' + document.images[i].id + '" style="vertical-align: top; margin: 0 auto; padding: 0 2px;" /></div>');
 };
 
 // Event for the mouse hovering over the original icon.
@@ -1580,13 +1583,11 @@ function smc_saveEntities(sFormName, aElementNames, sMask)
 
 /**
  * Make sure the window backgrounds (zebra stripes) are correct for lists.
- *
+ * @todo is this still needed with odd/even?
  * @param {HTMLElement} oList
  */
 function applyWindowClasses(oList)
 {
-	var bAlternate = false;
-
 	oListItems = oList.getElementsByTagName("li");
 
 	for (var i = 0; i < oListItems.length; i++)
@@ -1595,8 +1596,7 @@ function applyWindowClasses(oList)
 		if (oListItems[i].id === "")
 			continue;
 
-		oListItems[i].className = "windowbg" + (bAlternate ? "2" : "");
-		bAlternate = !bAlternate;
+		oListItems[i].className = "content";
 	}
 }
 

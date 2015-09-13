@@ -31,7 +31,7 @@ function template_searchform()
 	global $context, $settings, $txt, $scripturl, $modSettings;
 
 	echo '
-				<form action="', $scripturl, '?action=search;sa=results" method="post" accept-charset="UTF-8" name="searchform" id="searchform" class="standard_category">
+				<form id="searchform" action="', $scripturl, '?action=search;sa=results" method="post" accept-charset="UTF-8" name="searchform">
 					<h2 class="category_header', !empty($settings['use_buttons']) ? ' hdicon cat_img_search' : '', '">
 						', $txt['set_parameters'], '
 					</h2>';
@@ -68,7 +68,7 @@ function template_searchform()
 
 	// All of the advanced options, this div is collapsed by the JS when available
 	echo '
-						<div id="advanced_search" class="content">
+						<div id="advanced_search">
 							<dl id="search_options">
 								<dt class="righttext"><label for="searchtype">
 									', $txt['search_match'], ':</label>
@@ -204,9 +204,9 @@ function template_results()
 	if (!empty($context['search_ignored']))
 		echo '
 		<div id="search_results">
-			<h3 class="category_header">
+			<h2 class="category_header">
 				', $txt['generic_warning'], '
-			</h3>
+			</h2>
 			<p class="warningbox">', $txt['search_warning_ignored_word' . (count($context['search_ignored']) == 1 ? '' : 's')], ': ', implode(', ', $context['search_ignored']), '</p>
 		</div>';
 
@@ -216,7 +216,7 @@ function template_results()
 		echo '
 			<div id="search_results">
 				<h2 class="category_header">', $txt['search_adjust_query'], '</h2>
-				<div class="roundframe">';
+				<div class="well">';
 
 		// Did they make any typos or mistakes, perhaps?
 		if (isset($context['did_you_mean']))
@@ -262,7 +262,7 @@ function template_results()
 			<form action="', $scripturl, '?action=quickmod" method="post" accept-charset="UTF-8" name="topicForm" id="topicForm" class="search_results_posts', $context['compact'] ? ' compact_view' : '', '">';
 
 	echo '
-				<h3 class="category_header hdicon cat_img_search">
+				<h2 class="category_header hdicon cat_img_search">
 					<span class="floatright">';
 
 	if (!empty($options['display_quick_mod']) && $options['display_quick_mod'] == 1)
@@ -279,7 +279,7 @@ function template_results()
 		template_pagesection();
 	else
 		echo '
-				<div class="roundframe">', $txt['find_no_results'], '</div>';
+				<div class="well">', $txt['find_no_results'], '</div>';
 
 	if ($context['compact'])
 		echo '
@@ -308,7 +308,7 @@ function template_results()
 				$color_class = 'basic_row';
 		}
 		else
-			$color_class = $message['alternate'] == 0 ? 'windowbg' : 'windowbg2';
+			$color_class = 'basic_row';
 
 		foreach ($topic['matches'] as $message)
 		{
@@ -381,33 +381,28 @@ function template_results()
 	if (!empty($context['topics']) && !empty($options['display_quick_mod']) && $options['display_quick_mod'] == 1)
 	{
 		echo '
-				<div class="search_controls floatright">
-					<div class="additional_row">
-						<select class="qaction" name="qaction"', $context['can_move'] ? ' onchange="this.form.move_to.disabled = (this.options[this.selectedIndex].value != \'move\');"' : '', '>
-							<option value="">&nbsp;</option>';
+				<div class="pagesection floatright">
+					<select class="qaction" name="qaction"', $context['can_move'] ? ' onchange="this.form.move_to.disabled = (this.options[this.selectedIndex].value != \'move\');"' : '', '>
+						<option value="">&nbsp;</option>';
 
 		foreach ($context['qmod_actions'] as $qmod_action)
 			if ($context['can_' . $qmod_action])
 				echo '
-							<option value="' . $qmod_action . '">' . (isBrowser('ie8') ? '&#187;' : '&#10148;') . '&nbsp;', $txt['quick_mod_' . $qmod_action] . '</option>';
+						<option value="' . $qmod_action . '">&#10148;&nbsp;', $txt['quick_mod_' . $qmod_action] . '</option>';
 
 		echo '
-						</select>';
+					</select>';
 
 		// Show a list of boards they can move the topic to.
 		if ($context['can_move'])
 			echo '
-						<span id="quick_mod_jump_to">&nbsp;</span>';
+					<span id="quick_mod_jump_to">&nbsp;</span>';
 
 		echo '
-						<input type="hidden" name="redirect_url" value="', $scripturl . '?action=search;sa=results;params=' . $context['params'], '" />
-						<input class="button_submit" type="submit" value="', $txt['quick_mod_go'], '" onclick="return document.forms.topicForm.qaction.value != \'\' &amp;&amp; confirm(\'', $txt['quickmod_confirm'], '\');" />
-
-					</div>
-				</div>';
-
-		echo '
-				<input type="hidden" name="' . $context['session_var'] . '" value="' . $context['session_id'] . '" />
+					<input type="hidden" name="redirect_url" value="', $scripturl . '?action=search;sa=results;params=' . $context['params'], '" />
+					<input type="submit" value="', $txt['quick_mod_go'], '" onclick="return document.forms.topicForm.qaction.value != \'\' &amp;&amp; confirm(\'', $txt['quickmod_confirm'], '\');" />
+					<input type="hidden" name="' . $context['session_var'] . '" value="' . $context['session_id'] . '" />
+				</div>
 			</form>';
 	}
 
@@ -423,7 +418,7 @@ function template_results()
 			sJumpToTemplate: "%dropdown_list%",
 			sCurBoardName: "' . $context['jump_to']['board_name'] . '",
 			sBoardChildLevelIndicator: "&#8195;",
-			sBoardPrefix: "' . (isBrowser('ie8') ? '&#187;' : '&#10148;') . '&nbsp;",
+			sBoardPrefix: "&#10148;&nbsp;",
 			sCatClass: "jump_to_header",
 			sCatPrefix: "",
 			bNoRedirect: true,
@@ -439,7 +434,7 @@ function template_results()
 			iCurBoardChildLevel: 0,
 			sCurBoardName: "' . $context['jump_to']['board_name'] . '",
 			sBoardChildLevelIndicator: "&#8195;",
-			sBoardPrefix: "' . (isBrowser('ie8') ? '&#187;' : '&#10148;') . '&nbsp;",
+			sBoardPrefix: "&#10148;&nbsp;",
 			sCatClass: "jump_to_header",
 			sCatPrefix: "",
 			sGoButtonLabel: "' . $txt['quick_mod_go'] . '"
