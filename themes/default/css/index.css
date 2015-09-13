@@ -99,8 +99,8 @@ form, input, button, select, .input_text, textarea, .editor {
 }
 
 /* Declarations for specific elements. @todo - Maybe simplify - test. */
-.wrapper, div.content, .category_header, .generic_list_wrapper, #description_board .generalinfo,
-.roundframe, .description, .information, .successbox, .warningbox, .well,
+.wrapper, div.content, .category_header, .generic_list_wrapper, #description_board,
+.description, .information, .successbox, .warningbox, .well,
 .submitbutton,
 .grid8, .grid17, .grid20, .grid25, .grid30, .grid33, .grid50 {
 	box-sizing: border-box;
@@ -282,13 +282,8 @@ input[type=submit][disabled]:hover, button[disabled], button[disabled]:hover {
 /* @todo - Might add extra fallbacks. Possibly monospace. */
 /* @todo - Also, look at deprecating spans here. */
 .new_posts, .require_approval {
-	font-weight: bold;
-	line-height: 1.12px;
-}
-
-.new_posts, .require_approval {
-	display: inline;
 	padding: 1px 4px 2px 4px;
+	font-weight: bold;
 	font-size: .643em;
 	font-family: verdana, sans-serif;
 }
@@ -494,8 +489,8 @@ em {
 .cat_img_piechart:before    {background-position: 0 -552px;}
 .cat_img_talk:before        {background-position: 0 -576px;}
 
-/* Upshrink image in the general category headers */
-#category_toggle, #category_toggle_more, #upshrink_header, .package_toggle {
+/* Expand/Collapse image in the various headers */
+.panel_toggle span {
 	position: relative;
 	display: block;
 	float: right;
@@ -503,7 +498,11 @@ em {
 	padding: 0 16px;
 }
 
-#category_toggle span, #category_toggle_more span, #upshrink_header span, .package_toggle span {
+.panel_toggle :after {
+	content: "\00a0";
+}
+
+.panel_toggle span span {
 	position: absolute;
 	top: 50%;
 	left: 50%;

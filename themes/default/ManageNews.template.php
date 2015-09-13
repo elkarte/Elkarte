@@ -83,8 +83,8 @@ function template_email_members()
 				</dl>
 			</div>
 			<div id="exclude_panel_header">
-				<h2 class="category_header">
-					<span id="category_toggle">&nbsp;
+				<h2 class="category_header panel_toggle">
+					<span>
 						<span id="upshrink_ic" class="', empty($context['admin_preferences']['apn']) ? 'collapse' : 'expand', '" style="display: none;" title="', $txt['hide'], '"></span>
 					</span>
 					<a href="#" id="exclude_panel_link" >', $txt['exclude_these'], '</a>

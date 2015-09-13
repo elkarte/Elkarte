@@ -120,8 +120,8 @@ function template_info_center()
 	// Here's where the "Info Center" starts...
 	echo '
 	<div id="info_center" class="forum_category">
-		<h2 class="category_header">
-			<span id="category_toggle">&nbsp;
+		<h2 class="category_header panel_toggle">
+			<span>
 				<span id="upshrink_ic" class="', empty($context['minmax_preferences']['info']) ? 'collapse' : 'expand', '" style="display: none;" title="', $txt['hide'], '"></span>
 			</span>
 			<a href="#" id="upshrink_link">', sprintf($txt['info_center_title'], $context['forum_name_html_safe']), '</a>

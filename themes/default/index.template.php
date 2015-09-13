@@ -508,8 +508,8 @@ function template_menu()
 	// The upshrink image, right-floated.
 	echo '
 						<li id="collapse_button" class="listlevel1">
-							<a class="linklevel1">
-								<span id="upshrink_header">&nbsp;
+							<a class="linklevel1 panel_toggle">
+								<span>
 									<span id="upshrink" class="collapse" style="display: none;" title="', $txt['upshrink_description'], '"></span>
 								</span>
 							</a>

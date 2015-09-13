@@ -606,13 +606,13 @@ function template_search()
 	{
 		echo '
 		<fieldset class="content">
-			<h3 class="secondary_header">
-				<span id="category_toggle">&nbsp;
+			<h3 class="secondary_header panel_toggle">
+				<span>
 					<span id="advanced_panel_toggle" class="', empty($context['minmax_preferences']['pm']) ? 'collapse' : 'expand', '" style="display: none;" title="', $txt['hide'], '"></span>
 				</span>
 				<a href="#" id="advanced_panel_link">', $txt['pm_search_choose_label'], '</a>
 			</h3>
-			<div id="advanced_panel_div"', empty($context['minmax_preferences']['pm']) ? '' : ' style="display: none;"', '>
+			<div id="advanced_panel_div" class="well"', empty($context['minmax_preferences']['pm']) ? '' : ' style="display: none;"', '>
 				<ul id="searchLabelsExpand">';
 
 			foreach ($context['search_labels'] as $label)
@@ -625,7 +625,7 @@ function template_search()
 			echo '
 				</ul>
 			</div>
-			<div class="submitbuttons content">
+			<div class="submitbuttons">
 				<input type="checkbox" name="all" id="check_all" value="" ', $context['check_all'] ? 'checked="checked"' : '', ' onclick="invertAll(this, this.form, \'searchlabel\');" class="input_check" /><em> <label for="check_all">', $txt['check_all'], '</label></em>
 			</div>
 		</fieldset>';
@@ -952,8 +952,8 @@ function template_send()
 	if (!empty($context['drafts_pm_save']) && !empty($context['drafts']))
 	{
 		echo '
-			<h3 id="postDraftOptionsHeader" class="category_header">
-				<span id="category_toggle">&nbsp;
+			<h3 id="postDraftOptionsHeader" class="category_header panel_toggle">
+				<span>
 					<span id="postDraftExpand" class="', empty($context['minmax_preferences']['pmdraft']) ? 'collapse' : 'expand', '" style="display: none;" title="', $txt['hide'], '"></span>
 				</span>
 				<a href="#" id="postDraftExpandLink">', $txt['draft_load'], '</a>

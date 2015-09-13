@@ -406,14 +406,14 @@ function template_quickreply_below()
 		echo '
 			<a id="quickreply"></a>
 			<div class="forumposts" id="quickreplybox">
-				<h2 class="category_header">
-					<span id="category_toggle">&nbsp;
+				<h2 class="category_header category_toggle">
+					<span>
 						<a href="javascript:oQuickReply.swap();">
 							<span id="quickReplyExpand" class="', empty($context['minmax_preferences']['qreply']) ? 'collapse' : 'expand', '" title="', $txt['hide'], '"></span>
 						</a>
 					</span>
 					<a href="javascript:oQuickReply.swap();">', $txt['quick_reply'], '</a>
-				</h3>
+				</h2>
 				<div id="quickReplyOptions"', empty($context['minmax_preferences']['qreply']) ? '' : ' style="display: none"', '>
 					<div class="editor_wrapper">
 						', $context['is_locked'] ? '<p class="alert smalltext">' . $txt['quick_reply_warning'] . '</p>' : '',

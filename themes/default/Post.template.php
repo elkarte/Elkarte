@@ -325,8 +325,8 @@ function template_additional_options_below()
 	// If the admin has enabled the hiding of the additional options - show a link and image for it.
 	if (!empty($settings['additional_options_collapsible']))
 		echo '
-					<h3 id="postAdditionalOptionsHeader" class="category_header">
-						<span id="category_toggle">&nbsp;
+					<h3 id="postAdditionalOptionsHeader" class="category_header panel_toggle">
+						<span>
 							<span id="postMoreExpand" class="', empty($context['minmax_preferences']['pmdraft']) ? 'collapse' : 'expand', '" style="display: none;" title="', $txt['hide'], '"></span>
 						</span>
 						<a href="#" id="postMoreExpandLink">', $context['attachments']['can']['post'] ? $txt['post_additionalopt_attach'] : $txt['post_additionalopt'], '</a>
@@ -487,8 +487,8 @@ function template_load_drafts_below()
 
 	// Show a draft selection box
 	echo '
-					<h3 id="postDraftOptionsHeader" class="category_header">
-						<span id="category_toggle_more">&nbsp;
+					<h3 id="postDraftOptionsHeader" class="category_header panel_toggle">
+						<span>
 							<span id="postDraftExpand" class="', empty($context['minmax_preferences']['draft']) ? 'collapse' : 'expand', '" style="display: none;" title="', $txt['hide'], '"></span>
 						</span>
 						<a href="#" id="postDraftExpandLink">', $txt['draft_load'], '</a>
@@ -580,9 +580,7 @@ function template_topic_replies_below()
 			if ($context['can_quote'])
 				echo '
 						<ul class="quickbuttons" id="msg_', $post['id'], '_quote">
-							<li class="listlevel1">
-								<a href="#postmodify" onmousedown="return insertQuoteFast(', $post['id'], ');" class="linklevel1 quote_button">', $txt['bbc_quote'], '</a>
-							</li>
+							<li class="listlevel1"><a href="#postmodify" onmousedown="return insertQuoteFast(', $post['id'], ');" class="linklevel1 quote_button">', $txt['bbc_quote'], '</a></li>
 						</ul>';
 
 			echo '
