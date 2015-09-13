@@ -135,7 +135,7 @@ function validateSession($type = 'admin')
 
 	// Better be sure to remember the real referer
 	if (empty($_SESSION['request_referer']))
-		$_SESSION['request_referer'] = isset($_SERVER['HTTP_REFERER']) ? @parse_url($_SERVER['HTTP_REFERER']) : array();
+		$_SESSION['request_referer'] = isset($_SERVER['HTTP_REFERER']) ? $_SERVER['HTTP_REFERER'] : '';
 	elseif (empty($_POST))
 		unset($_SESSION['request_referer']);
 
@@ -718,9 +718,11 @@ function checkSession($type = 'post', $from_action = '', $is_fatal = true)
 
 	// Check the referring site - it should be the same server at least!
 	if (isset($_SESSION['request_referer']))
-		$referrer = $_SESSION['request_referer'];
+		$referrer_url = $_SESSION['request_referer'];
 	else
-		$referrer = isset($_SERVER['HTTP_REFERER']) ? @parse_url($_SERVER['HTTP_REFERER']) : array();
+		$referrer_url = isset($_SERVER['HTTP_REFERER']) ? $_SERVER['HTTP_REFERER'] : '';
+
+	$referrer = @parse_url($referrer_url);
 
 	if (!empty($referrer['host']))
 	{
@@ -749,6 +751,7 @@ function checkSession($type = 'post', $from_action = '', $is_fatal = true)
 		{
 			$error = 'verify_url_fail';
 			$log_error = true;
+			$sprintf = array(Util::htmlspecialchars($referrer_url));
 		}
 	}
 
@@ -757,6 +760,7 @@ function checkSession($type = 'post', $from_action = '', $is_fatal = true)
 	{
 		$error = 'verify_url_fail';
 		$log_error = true;
+		$sprintf = array(Util::htmlspecialchars($referrer_url));
 	}
 
 	// Everything is ok, return an empty string.
@@ -772,7 +776,7 @@ function checkSession($type = 'post', $from_action = '', $is_fatal = true)
 			die;
 		}
 		else
-			Errors::instance()->fatal_lang_error($error, isset($log_error) ? 'user' : false);
+			Errors::instance()->fatal_lang_error($error, isset($log_error) ? 'user' : false, isset($sprintf) ? $sprintf : array());
 	}
 	// A session error occurred, return the error to the calling function.
 	else

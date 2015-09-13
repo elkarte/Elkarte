@@ -587,7 +587,7 @@ function list_restoreFiles($dummy1, $dummy2, $dummy3, $do_change)
 			'cur_perms' => substr(sprintf('%o', $file_permissions), -4),
 			'new_perms' => isset($new_permissions) ? substr(sprintf('%o', $new_permissions), -4) : '',
 			'result' => isset($result) ? $result : '',
-			'writable_message' => '<span style="color: ' . (@is_writable($file) ? 'green' : 'red') . '">' . (@is_writable($file) ? $txt['package_file_perms_writable'] : $txt['package_file_perms_not_writable']) . '</span>',
+			'writable_message' => '<span class="' . (@is_writable($file) ? 'success' : 'alert') . '">' . (@is_writable($file) ? $txt['package_file_perms_writable'] : $txt['package_file_perms_not_writable']) . '</span>',
 		);
 	}
 
@@ -870,6 +870,7 @@ function parsePackageInfo(&$packageXML, $testing_only = true, $method = 'install
 
 	$context['readmes'] = array();
 	$context['licences'] = array();
+	$has_redirect = false;
 
 	// This is the testing phase... nothing shall be done yet.
 	foreach ($actions as $action)
@@ -878,6 +879,11 @@ function parsePackageInfo(&$packageXML, $testing_only = true, $method = 'install
 
 		if (in_array($actionType, array('readme', 'code', 'database', 'modification', 'redirect', 'license')))
 		{
+			if ($actionType == 'redirect')
+			{
+				$has_redirect = true;
+			}
+
 			// Allow for translated readme and license files.
 			if ($actionType == 'readme' || $actionType == 'license')
 			{
@@ -930,7 +936,7 @@ function parsePackageInfo(&$packageXML, $testing_only = true, $method = 'install
 				'description' => '',
 				'reverse' => $action->exists('@reverse') && $action->fetch('@reverse') == 'true',
 				'redirect_url' => $action->exists('@url') ? $action->fetch('@url') : '',
-				'redirect_timeout' => $action->exists('@timeout') ? (int) $action->fetch('@timeout') : '',
+				'redirect_timeout' => $action->exists('@timeout') ? (int) $action->fetch('@timeout') : 5000,
 				'parse_bbc' => $action->exists('@parsebbc') && $action->fetch('@parsebbc') == 'true',
 				'language' => (($actionType == 'readme' || $actionType == 'license') && $action->exists('@lang') && $action->fetch('@lang') == $language) ? $language : '',
 			);
@@ -1134,6 +1140,20 @@ function parsePackageInfo(&$packageXML, $testing_only = true, $method = 'install
 				'error_var' => $actionType
 			);
 		}
+	}
+
+	if (!$has_redirect)
+	{
+		$return[] = array(
+			'type' => 'redirect',
+			'filename' => '',
+			'description' => '',
+			'reverse' => false,
+			'redirect_url' => '$scripturl?action=admin;area=packages',
+			'redirect_timeout' => 5000,
+			'parse_bbc' => false,
+			'language' => '',
+		);
 	}
 
 	// Only testing - just return a list of things to be done.

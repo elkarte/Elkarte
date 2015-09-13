@@ -99,8 +99,6 @@ $txt['displayMemberNames'] = 'Display the member\'s name instead of "My Account"
 $txt['timeLoadPageEnable'] = 'Display time taken to create every page';
 $txt['disableHostnameLookup'] = 'Disable hostname lookups';
 $txt['who_enabled'] = 'Enable who\'s online list';
-$txt['meta_keywords'] = 'Meta keywords associated with forum';
-$txt['meta_keywords_note'] = 'For search engines. Leave blank for default.';
 $txt['settings_error'] = 'Warning: Updating of Settings.php failed, the settings cannot be saved.';
 $txt['core_settings_saved'] = 'The settings were successfully saved';
 

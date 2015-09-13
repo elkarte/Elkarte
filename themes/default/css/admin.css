@@ -1091,7 +1091,7 @@ ul.moderation_notes li {
 	-ms-hyphens: auto;
 }
 
-#error_log .error_who, #error_log .error_type {
+#error_log .error_who, #error_log .error_type, #error_log .error_where {
 	float: left;
 	width: 50%;
 	line-height: 1.8em;
@@ -1100,17 +1100,13 @@ ul.moderation_notes li {
 }
 
 #error_log .error_where {
-	float: left;
 	width: 100%;
-	padding: 4px 0;
-	line-height: 1.6em;
+	padding-top: 4px;
 }
 
-.error_where .scope {
+#error_log .error_who li>a, #error_log .error_type li>a, #error_log .error_where li>a,
+#error_log .error_who span, #error_log .error_type span, #error_log .error_where span {
 	display: table-cell;
-	padding: 4px;
-	width: 20px;
-	vertical-align: top;
 }
 
 #error_log .checkbox_column {
@@ -1122,6 +1118,17 @@ ul.moderation_notes li {
 #error_log a img {
 	vertical-align: middle;
 	margin: 0 8px 0 0;
+}
+
+#errorfile_table .current .linenumber:before {
+	content: '==>';
+}
+#errorfile_table .linetext {
+	white-space: nowrap;
+}
+#errorfile_table .current .linetext {
+	border: 1px solid black;
+	border-width: 1px 1px 1px 0;
 }
 
 /* Styles for the Report generation

@@ -758,6 +758,17 @@ a.bbc_link {
 	font-size: 1.571em;
 }
 
+#quick_edit_body_container {
+	width: 90%;
+}
+#quick_edit_body_container .editor {
+	width: 100%;
+	margin-bottom: 10px
+}
+#quick_edit_body_container .input_text {
+	width: 85%;
+}
+
 /* ------------------------------------------------------- */
 /*	$MAIN.		                                           */
 /* ------------------------------------------------------- */

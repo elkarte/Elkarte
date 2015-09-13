@@ -89,7 +89,7 @@ function template_messages_informations_above()
 	}
 
 	echo '
-			<form action="', $scripturl, '?action=quickmod2;topic=', $context['current_topic'], '.', $context['start'], '" method="post" accept-charset="UTF-8" name="quickModForm" id="quickModForm" style="margin: 0;" onsubmit="return oQuickModify.bInEditMode ? oQuickModify.modifySave(\'' . $context['session_id'] . '\', \'' . $context['session_var'] . '\') : false">';
+			<form action="', $scripturl, '?action=quickmod2;topic=', $context['current_topic'], '.', $context['start'], '" method="post" accept-charset="UTF-8" name="quickModForm" id="quickModForm" onsubmit="return oQuickModify.bInEditMode ? oQuickModify.modifySave(\'' . $context['session_id'] . '\', \'' . $context['session_var'] . '\') : false">';
 }
 
 /**
@@ -594,9 +594,9 @@ function template_quickreply_below()
 					bShowModify: ', $settings['show_modify'] ? 'true' : 'false', ',
 					iTopicId: ', $context['current_topic'], ',
 					sTemplateBodyEdit: ', JavaScriptEscape('
-						<div id="quick_edit_body_container" style="width: 90%;">
+						<div id="quick_edit_body_container">
 							<div id="error_box" class="errorbox" style="display:none;"></div>
-							<textarea class="editor" name="message" rows="12" style="' . (isBrowser('is_ie8') ? 'width: 635px; max-width: 100%; min-width: 100%' : 'width: 100%') . '; margin-bottom: 10px;" tabindex="' . $context['tabindex']++ . '">%body%</textarea><br />
+							<textarea class="editor" name="message" rows="12" tabindex="' . $context['tabindex']++ . '">%body%</textarea><br />
 							<div class="submitbutton">
 								<input type="hidden" name="\' + elk_session_var + \'" value="\' + elk_session_id + \'" />
 								<input type="hidden" name="topic" value="' . $context['current_topic'] . '" />

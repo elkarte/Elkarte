@@ -397,7 +397,7 @@ class ManageBoards_Controller extends Action_Controller
 	public function action_cat2()
 	{
 		checkSession();
-		validateToken('admin-bc-' . $this->_req->query->cat);
+		validateToken('admin-bc-' . $this->_req->post->cat);
 
 		require_once(SUBSDIR . '/Categories.subs.php');
 
@@ -635,7 +635,7 @@ class ManageBoards_Controller extends Action_Controller
 
 		$board_id = $this->_req->getPost('boardid', 'intval', 0);
 		checkSession();
-		validateToken('admin-be-' . $this->_req->query->boardid);
+		validateToken('admin-be-' . $this->_req->post->boardid);
 
 		require_once(SUBSDIR . '/Boards.subs.php');
 
