@@ -1412,11 +1412,6 @@ class Install_Controller
 			logAction('install', array('version' => $forum_version), 'admin');
 		}
 
-		// Check if we need some stupid MySQL fix.
-		$server_version = $db->db_server_info();
-		if ($db_type == 'mysql' && in_array(substr($server_version, 0, 6), array('5.0.50', '5.0.51')))
-			updateSettings(array('db_mysql_group_by_fix' => '1'));
-
 		// Some final context for the template.
 		$incontext['dir_still_writable'] = is_writable(__DIR__) && substr(__FILE__, 1, 2) != ':\\';
 		$incontext['probably_delete_install'] = isset($_SESSION['installer_temp_ftp']) || is_writable(__DIR__) || is_writable(__FILE__);

@@ -3,7 +3,7 @@
 $databases['mysql'] = array(
 	'name' => 'MySQL',
 	'extension' => 'MySQL Improved (MySQLi)',
-	'version' => '5.0.19',
+	'version' => '5.0.52',
 	'version_check' => function($db_connection) {
 		return min(
 			mysqli_get_server_info($db_connection),

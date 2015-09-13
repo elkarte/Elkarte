@@ -1250,10 +1250,8 @@ function action_deleteUpgrade()
 
 	$user_info['id'] = 0;
 
-	// Save the current database version.
-	$server_version = $db->db_server_info();
-	if ($db_type == 'mysql' && in_array(substr($server_version, 0, 6), array('5.0.50', '5.0.51')))
-		updateSettings(array('db_mysql_group_by_fix' => '1'));
+	// Drop old check for MySQL 5.0.50 and 5.0.51 bug.
+	removeSettings('db_mysql_group_by_fix');
 
 	// Set jquery to auto if its not already set
 	if (!isset($modSettings['jquery_source']))
