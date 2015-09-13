@@ -910,27 +910,6 @@ function sendpm($recipients, $subject, $message, $store_outbox = true, $from = n
 }
 
 /**
- * Mark personal messages as read (no new messages) for a particular member.
- *
- * @package PersonalMessage
- * @param int $memberID member id
- */
-function markPMsRead($memberID)
-{
-	$db = database();
-
-	$db->query('', '
-		UPDATE {db_prefix}pm_recipients
-		SET is_new = {int:not_new}
-		WHERE id_member = {int:current_member}',
-		array(
-			'current_member' => $memberID,
-			'not_new' => 0,
-		)
-	);
-}
-
-/**
  * Load personal messages.
  *
  * This function loads messages considering the options given, an array of:
