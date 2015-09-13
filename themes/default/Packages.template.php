@@ -404,7 +404,7 @@ function template_extract_package()
 	{
 		echo '
 	<script><!-- // --><![CDATA[
-		setTimeout(function() {doRedirect();}, ', empty($context['redirect_timeout']) ? 5000 : $context['redirect_timeout'], ');
+		setTimeout(function() {doRedirect();}, ', $context['redirect_timeout'], ');
 
 		function doRedirect()
 		{
