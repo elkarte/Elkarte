@@ -761,6 +761,10 @@ a.bbc_link {
 #quick_edit_body_container {
 	width: 90%;
 }
+#quick_edit_body_container .editor {
+	width: 100%;
+	margin-bottom: 10px
+}
 
 /* ------------------------------------------------------- */
 /*	$MAIN.		                                           */

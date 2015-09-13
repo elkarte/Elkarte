@@ -596,7 +596,7 @@ function template_quickreply_below()
 					sTemplateBodyEdit: ', JavaScriptEscape('
 						<div id="quick_edit_body_container">
 							<div id="error_box" class="errorbox" style="display:none;"></div>
-							<textarea class="editor" name="message" rows="12" style="' . (isBrowser('is_ie8') ? 'width: 635px; max-width: 100%; min-width: 100%' : 'width: 100%') . '; margin-bottom: 10px;" tabindex="' . $context['tabindex']++ . '">%body%</textarea><br />
+							<textarea class="editor" name="message" rows="12" tabindex="' . $context['tabindex']++ . '">%body%</textarea><br />
 							<div class="submitbutton">
 								<input type="hidden" name="\' + elk_session_var + \'" value="\' + elk_session_id + \'" />
 								<input type="hidden" name="topic" value="' . $context['current_topic'] . '" />
