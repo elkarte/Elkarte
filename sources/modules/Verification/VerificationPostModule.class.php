@@ -29,7 +29,7 @@ class Verification_Post_Module implements ElkArte\sources\modules\Module_Interfa
 	{
 		global $user_info, $modSettings;
 
-		if (!$user_info['is_admin'] && !$user_info['is_mod'] && !empty($modSettings['posts_require_captcha']) && ($user_info['posts'] < $modSettings['posts_require_captcha'] || ($user_info['is_guest'] && $modSettings['posts_require_captcha'] == -1)))
+		if (!$user_info['is_admin'] && !$user_info['is_moderator'] && !empty($modSettings['posts_require_captcha']) && ($user_info['posts'] < $modSettings['posts_require_captcha'] || ($user_info['is_guest'] && $modSettings['posts_require_captcha'] == -1)))
 		{
 			require_once(SUBSDIR . '/VerificationControls.class.php');
 

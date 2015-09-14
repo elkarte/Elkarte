@@ -81,7 +81,7 @@ fieldset {
 }
 
 legend {
-	background: url(../../images/selected_open.png) no-repeat scroll left center transparent;
+	background: url(../../images/selected_open.png) 0 50% no-repeat;
 	cursor: pointer;
 	padding: 0 0 2px 20px;
 	color: #333333;
@@ -90,7 +90,7 @@ legend {
 }
 
 .collapsed legend {
-	background: url(../../images/selected.png) no-repeat scroll left center transparent;
+	background: url(../../images/selected.png) 0 50% no-repeat;
 }
 
 input, button, select, textarea, .editor {
@@ -115,6 +115,7 @@ input:hover, textarea:hover, button:hover, select:hover {
 
 textarea:hover, .editor:hover {
 	background: #FBFBFB;
+	color: #444444;
 }
 
 input:focus, textarea:focus, button:focus, select:focus, .editor:focus {
@@ -570,7 +571,7 @@ div.bbc_footnotes .meaction {
 	text-decoration: none;
 }
 
-.listlevel1.subsections {
+#main_menu .listlevel1.subsections {
 	top: -1px;
 }
 
@@ -1104,6 +1105,7 @@ a.active {
 	display: block;
 	margin-top: -45px;
 	padding-top: 45px;
+	visibility: hidden;
 }
 
 .windowbg {

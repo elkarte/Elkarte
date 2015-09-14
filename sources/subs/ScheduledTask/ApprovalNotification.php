@@ -124,8 +124,9 @@ class Approval_Notification implements Scheduled_Task_Interface
 
 			// Make sure they get included in the big loop.
 			$members = array_keys($all_mods);
-			foreach ($all_mods as $row)
-				$mods[$row['id_member']][$row['id_board']] = true;
+			foreach ($all_mods as $rows)
+				foreach ($rows as $row)
+					$mods[$row['id_member']][$row['id_board']] = true;
 		}
 
 		// Come along one and all... until we reject you ;)

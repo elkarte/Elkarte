@@ -120,7 +120,6 @@ foreach ($version_info['default_language_versions'] as $lang => $files)
 fwrite($handle, '};');
 
 fclose($handle);
-
 if (count(array_diff($update_files, $changed_files_list)) !== 0)
 {
 	echo "Something is wrong: at least one of the files updated is not in the list of those changed since the lastest version.\nThis is a list of the files affected by the problem:\n";
@@ -157,6 +156,8 @@ function getFilesChanged($from, $to)
 		if (strpos($file, '/ext') !== false)
 			continue;
 		if (strpos($file, 'tests') !== false)
+			continue;
+		if (strpos($file, 'fonts') !== false)
 			continue;
 		if (strpos($file, '/scripts') !== false)
 			continue;

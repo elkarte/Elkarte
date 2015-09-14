@@ -318,6 +318,7 @@ class Memberlist_Controller extends Action_Controller
 		{
 			$first_offset = $_REQUEST['start'] - ($_REQUEST['start'] % $cache_step_size);
 			$second_offset = ceil(($_REQUEST['start'] + $modSettings['defaultMaxMembers']) / $cache_step_size) * $cache_step_size;
+			$second_offset = min(max(array_keys($memberlist_cache['index'])), $second_offset);
 
 			$where = 'mem.real_name BETWEEN {string:real_name_low} AND {string:real_name_high}';
 			$query_parameters['real_name_low'] = $memberlist_cache['index'][$first_offset];

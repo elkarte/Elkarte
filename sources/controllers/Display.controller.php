@@ -450,6 +450,9 @@ class Display_Controller extends Action_Controller
 
 				// ajax controller for likes
 				loadJavascriptFile('like_posts.js', array('defer' => true));
+				addJavascriptVar(array(
+					'likemsg_are_you_sure' => JavaScriptEscape($txt['likemsg_are_you_sure']),
+				));
 				loadLanguage('Errors');
 
 				// Initiate likes and the tooltips for likes

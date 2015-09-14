@@ -88,7 +88,7 @@ class Memcached extends Cache_Method_Abstract
 
 		$servers = explode(',', $cache_memcached);
 		$server = explode(':', trim($servers[array_rand($servers)]));
-		$port = empty($server[1]) ? 11211 : $server[1];
+		$port = !isset($server[1]) ? 11211 : $server[1];
 
 		// Don't try more times than we have servers!
 		$level = min(count($servers), $level);

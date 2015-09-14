@@ -1384,7 +1384,7 @@ class ManageFeatures_Controller extends Action_Controller
 				array('select', 'karmaMode', explode('|', $txt['karma_options'])),
 			'',
 				// Who can do it.... and who is restricted by time limits?
-				array('int', 'karmaMinPosts', 6, 'postinput' => strtolower($txt['posts'])),
+				array('int', 'karmaMinPosts', 6, 'postinput' => $txt['manageposts_posts']),
 				array('float', 'karmaWaitTime', 6, 'postinput' => $txt['hours']),
 				array('check', 'karmaTimeRestrictAdmins'),
 				array('check', 'karmaDisableSmite'),
@@ -1420,7 +1420,7 @@ class ManageFeatures_Controller extends Action_Controller
 				array('check', 'likes_enabled'),
 			'',
 				// Who can do it.... and who is restricted by count limits?
-				array('int', 'likeMinPosts', 6, 'postinput' => strtolower($txt['posts'])),
+				array('int', 'likeMinPosts', 6, 'postinput' => $txt['manageposts_posts']),
 				array('int', 'likeWaitTime', 6, 'postinput' => $txt['minutes']),
 				array('int', 'likeWaitCount', 6),
 				array('check', 'likeRestrictAdmins'),

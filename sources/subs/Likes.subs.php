@@ -335,7 +335,7 @@ function likesCount($memberID, $given = true)
  */
 function likesPostsGiven($start, $items_per_page, $sort, $memberID)
 {
-	global $scripturl, $context;
+	global $scripturl, $context, $modSettings;
 
 	$db = database();
 
@@ -348,7 +348,8 @@ function likesPostsGiven($start, $items_per_page, $sort, $memberID)
 		FROM {db_prefix}message_likes AS l
 			LEFT JOIN {db_prefix}messages AS m ON (m.id_msg = l.id_msg)
 			LEFT JOIN {db_prefix}boards AS b ON (b.id_board = m.id_board)
-		WHERE l.id_member = {int:id_member}
+		WHERE l.id_member = {int:id_member}' . (!empty($modSettings['recycle_enable']) ? ('
+			AND b.id_board != ' . $modSettings['recycle_board']) : '') . '
 		ORDER BY {raw:sort}
 		LIMIT {int:start}, {int:per_page}',
 		array(
@@ -383,7 +384,7 @@ function likesPostsGiven($start, $items_per_page, $sort, $memberID)
  */
 function likesPostsReceived($start, $items_per_page, $sort, $memberID)
 {
-	global $scripturl;
+	global $scripturl, $modSettings;
 
 	$db = database();
 
@@ -395,7 +396,8 @@ function likesPostsReceived($start, $items_per_page, $sort, $memberID)
 		FROM {db_prefix}message_likes AS l
 			LEFT JOIN {db_prefix}messages AS m ON (m.id_msg = l.id_msg)
 			LEFT JOIN {db_prefix}boards AS b ON (b.id_board = m.id_board)
-		WHERE l.id_poster = {int:id_member}
+		WHERE l.id_poster = {int:id_member}' . (!empty($modSettings['recycle_enable']) ? ('
+			AND b.id_board != ' . $modSettings['recycle_board']) : '') . '
 		GROUP BY (l.id_msg)
 		ORDER BY {raw:sort}
 		LIMIT {int:start}, {int:per_page}',
@@ -922,4 +924,97 @@ function dbMostLikesGivenUser()
 	);
 
 	return $mostLikeGivingMember;
+}
+
+/**
+ * Utility function to decrease member like counts when a message is removed
+ *
+ * When a message is removed, we need update the like counts for those who liked the message
+ * as well as those who posted the message
+ *  - Members who liked the message have likes given decreased
+ *  - The member who posted has the likes received decreased by the number of likers
+ * for that message.
+ *
+ * @param int[]|int $messages
+ */
+function decreaseLikeCounts($messages)
+{
+	$db = database();
+
+	// Start off with no changes
+	$update_given = array();
+	$update_received = array();
+
+	// Only a single message
+	if (is_numeric($messages))
+		$messages = array($messages);
+
+	// Load the members who liked and who posted for this group of messages
+	$request = $db->query('', '
+		SELECT
+			id_member, id_poster
+		FROM {db_prefix}message_likes
+		WHERE id_msg IN ({array_int:messages})',
+		array(
+			'messages' => $messages,
+		)
+	);
+	$posters = array();
+	$likers = array();
+	while ($row = $db->fetch_assoc($request))
+	{
+		// Track how many likes each member gave and how many were received
+		$posters[$row['id_poster']] = isset($posters[$row['id_poster']]) ? $posters[$row['id_poster']]++ : 1;
+		$likers[$row['id_member']] = isset($likers[$row['id_member']]) ? $likers[$row['id_member']]++ : 1;
+	}
+	$db->free_result($request);
+
+	// No one?
+	if (empty($posters) && empty($likers))
+		return;
+
+	// Re-count the "likes given" totals for the likers
+	if (!empty($likers))
+	{
+ 		$request = $db->query('', '
+			SELECT
+				COUNT(id_msg) AS likes, id_member
+			FROM {db_prefix}message_likes
+			WHERE id_member IN ({array_int:members})
+			GROUP BY id_member',
+			array(
+				'members' => array_keys($likers),
+			)
+		);
+		// All who liked these messages have their "likes given" reduced
+		while ($row = $db->fetch_assoc($request))
+			$update_given[$row['id_member']] = $row['likes'] - $likers[$row['id_member']];
+		$db->free_result($request);
+	}
+
+	// Count the "likes received" totals for the message posters
+	if (!empty($posters))
+	{
+		$request = $db->query('', '
+			SELECT
+				COUNT(id_msg) AS likes, id_poster
+			FROM {db_prefix}message_likes
+			WHERE id_poster IN ({array_int:members})
+			GROUP BY id_poster',
+			array(
+				'members' => array_keys($posters),
+			)
+		);
+		// The message posters have their "likes received" reduced
+		while ($row = $db->fetch_assoc($request))
+			$update_received[$row['id_poster']] = $row['likes'] - $posters[$row['id_poster']];
+		$db->free_result($request);
+	}
+
+	// Update the totals for these members
+	foreach ($update_given as $id_member => $total)
+		updateMemberData($id_member, array('likes_given' => (int) $total));
+
+	foreach ($update_received as $id_member => $total)
+		updateMemberData($id_member, array('likes_received' => (int) $total));
 }

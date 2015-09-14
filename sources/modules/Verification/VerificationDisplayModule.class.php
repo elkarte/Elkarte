@@ -29,7 +29,7 @@ class Verification_Display_Module implements ElkArte\sources\modules\Module_Inte
 	{
 		global $user_info, $modSettings;
 
-		if (!$user_info['is_admin'] && !$user_info['is_mod'] && !empty($modSettings['posts_require_captcha']) && ($user_info['posts'] < $modSettings['posts_require_captcha'] || ($user_info['is_guest'] && $modSettings['posts_require_captcha'] == -1)))
+		if (!$user_info['is_admin'] && !$user_info['is_moderator'] && !empty($modSettings['posts_require_captcha']) && ($user_info['posts'] < $modSettings['posts_require_captcha'] || ($user_info['is_guest'] && $modSettings['posts_require_captcha'] == -1)))
 		{
 			return array(
 				array('topicinfo', array('Verification_Display_Module', 'topicinfo'), array()),

@@ -462,6 +462,14 @@ QuickModify.prototype.onMessageReceived = function (XMLDoc)
 	// Position the editor in the window
 	location.hash = '#info_' + this.sCurMessageId.substr(this.sCurMessageId.lastIndexOf("_") + 1);
 
+	// Handle custom function hook before showing the new select.
+	if ('funcOnAfterCreate' in this.opt)
+	{
+		this.tmpMethod = this.opt.funcOnAfterCreate;
+		this.tmpMethod(this);
+		delete this.tmpMethod;
+	}
+
 	return true;
 };
 
@@ -515,7 +523,8 @@ QuickModify.prototype.modifyCancel = function ()
 QuickModify.prototype.modifySave = function (sSessionId, sSessionVar)
 {
 	var i = 0,
-		x = [];
+		x = [],
+		uIds = [];
 
 	// We cannot save if we weren't in edit mode.
 	if (!this.bInEditMode)
@@ -537,10 +546,21 @@ QuickModify.prototype.modifySave = function (sSessionId, sSessionVar)
 		}
 	}
 
+	var oInputs = document.forms.quickModForm.getElementsByTagName('input');
+	for (i = 0; i < oInputs.length; i++)
+	{
+		if (oInputs[i].name == 'uid[]')
+		{
+			uIds.push('uid[' + i + ']=' + parseInt(oInputs[i].value));
+		}
+	}
+
 	x[x.length] = 'subject=' + document.forms.quickModForm.subject.value.replace(/&#/g, "&#38;#").php_urlencode();
 	x[x.length] = 'message=' + document.forms.quickModForm.message.value.replace(/&#/g, "&#38;#").php_urlencode();
 	x[x.length] = 'topic=' + parseInt(document.forms.quickModForm.elements.topic.value);
 	x[x.length] = 'msg=' + parseInt(document.forms.quickModForm.elements.msg.value);
+	if (uIds.length > 0)
+		x[x.length] = uIds.join("&");
 
 	// Send in the XMLhttp request and let's hope for the best.
 	ajax_indicator(true);

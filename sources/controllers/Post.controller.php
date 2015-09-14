@@ -279,7 +279,7 @@ class Post_Controller extends Action_Controller
 
 			// Set up the inputs for the form.
 			$form_subject = strtr(Util::htmlspecialchars($_REQUEST['subject']), array("\r" => '', "\n" => '', "\t" => ''));
-			$form_message = Util::htmlspecialchars($_REQUEST['message'], ENT_QUOTES);
+			$form_message = Util::htmlspecialchars($_REQUEST['message'], ENT_QUOTES, 'UTF-8', true);
 
 			// Make sure the subject isn't too long - taking into account special characters.
 			if (Util::strlen($form_subject) > 100)
@@ -852,7 +852,7 @@ class Post_Controller extends Action_Controller
 		else
 		{
 			// Prepare the message a bit for some additional testing.
-			$_POST['message'] = Util::htmlspecialchars($_POST['message'], ENT_QUOTES);
+			$_POST['message'] = Util::htmlspecialchars($_POST['message'], ENT_QUOTES, 'UTF-8', true);
 
 			// Preparse code. (Zef)
 			if ($user_info['is_guest'])
@@ -1222,7 +1222,7 @@ class Post_Controller extends Action_Controller
 			}
 			else
 			{
-				$_POST['message'] = Util::htmlspecialchars($_POST['message'], ENT_QUOTES);
+				$_POST['message'] = Util::htmlspecialchars($_POST['message'], ENT_QUOTES, 'UTF-8', true);
 
 				preparsecode($_POST['message']);
 
@@ -1244,6 +1244,38 @@ class Post_Controller extends Action_Controller
 
 		if (!$this->_post_errors->hasErrors())
 		{
+			if (!empty($modSettings['mentions_enabled']))
+			{
+				if (!empty($_REQUEST['uid']))
+				{
+					$query_params = array();
+					$query_params['member_ids'] = array_unique(array_map('intval', $_REQUEST['uid']));
+					require_once(SUBSDIR . '/Members.subs.php');
+					$mentioned_members = membersBy('member_ids', $query_params, true);
+					$replacements = 0;
+					$actually_mentioned = array();
+					foreach ($mentioned_members as $member)
+					{
+						$_POST['message'] = str_replace('@' . $member['real_name'], '[member=' . $member['id_member'] . ']' . $member['real_name'] . '[/member]', $_POST['message'], $replacements);
+						if ($replacements > 0)
+							$actually_mentioned[] = $member['id_member'];
+					}
+				}
+
+				if (!empty($actually_mentioned))
+				{
+					require_once(CONTROLLERDIR . '/Mentions.controller.php');
+					$mentions = new Mentions_Controller();
+					$mentions->setData(array(
+						'id_member' => $actually_mentioned,
+						'type' => 'men',
+						'id_msg' => $row['id_msg'],
+						'status' => $row['approved'] ? 'new' : 'unapproved',
+					));
+					$mentions->action_add();
+				}
+			}
+
 			$msgOptions = array(
 				'id' => $row['id_msg'],
 				'subject' => isset($_POST['subject']) ? $_POST['subject'] : null,
