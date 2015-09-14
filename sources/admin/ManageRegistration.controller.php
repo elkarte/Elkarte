@@ -269,7 +269,7 @@ class ManageRegistration_Controller extends Action_Controller
 			}
 		}
 
-		if (isset($this->_req->post->agreement))
+		if (isset($this->_req->post->save) && isset($this->_req->post->agreement))
 		{
 			checkSession();
 			validateToken('admin-rega');

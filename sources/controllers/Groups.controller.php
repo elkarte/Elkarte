@@ -225,16 +225,17 @@ class Groups_Controller extends Action_Controller
 
 		$current_group = isset($_REQUEST['group']) ? (int) $_REQUEST['group'] : 0;
 
-		// No browsing of guests, membergroup 0 or moderators.
-		if (in_array($current_group, array(-1, 0, 3)))
-			Errors::instance()->fatal_lang_error('membergroup_does_not_exist', false);
-
 		// These will be needed
 		require_once(SUBSDIR . '/Membergroups.subs.php');
 		require_once(SUBSDIR . '/Members.subs.php');
 
 		// Load up the group details.
 		$context['group'] = membergroupById($current_group, true, true);
+
+		// No browsing of guests, membergroup 0 or moderators or non-existing groups.
+		if ($context['group'] === false || in_array($current_group, array(-1, 0, 3)))
+			Errors::instance()->fatal_lang_error('membergroup_does_not_exist', false);
+
 		$context['group']['id'] = $context['group']['id_group'];
 		$context['group']['name'] = $context['group']['group_name'];
 

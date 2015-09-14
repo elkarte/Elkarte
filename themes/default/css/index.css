@@ -205,7 +205,10 @@ input[type="file"] {
 	max-height: none;
 	height: auto;
 }
-
+.select_multiple {
+	min-height: 10em;
+	height: auto;
+}
 input[type="number"] {
 	padding: 0 0 0 6px;
 }
@@ -818,24 +821,21 @@ a.bbc_link {
 
 /* The main title. */
 #forumtitle, .rightheader #forumtitle {
-	float: left;
 	padding: 10px 10px 6px 13px;
 	font-size: 2.357em;
 	line-height: 1.455em;
 }
-
-.centerheader #forumtitle {
+.centerheader .forumlink {
 	display: none;
 }
-
-.rightheader #forumtitle {
+.rightheader #forumtitle .forumlink {
 	float: right;
 }
 
 /* Float these items to the right. @todo - Simplify. */
 #logobox, .rightheader #logobox {
 	float: right;
-	padding: 0.95em 12px 0 12px;
+	padding: 0 12px 0 12px;
 	max-width: 40%;
 }
 
@@ -1043,7 +1043,7 @@ a.bbc_link {
 .listlevel2, .listlevel3 {
 	position: relative;
 	float: none;
-	padding: 1px 0;
+	padding: 0;
 	width: 17em;
 }
 
@@ -1051,7 +1051,7 @@ a.bbc_link {
 .linklevel2, .linklevel3 {
 	position: relative;
 	display: block;
-	padding: 0 7px;
+	padding: 1px 7px;
 }
 
 /* @todo - Note: The next declarations are for keyboard access with js disabled. */
@@ -1150,7 +1150,10 @@ a.bbc_link {
 	font-size: 0.929em;
 	line-height: 2em;
 }
-
+.linktree:first-child a {
+	height: 2em;
+	padding: 0 6px;
+}
 .linktree:last-child {
 	max-width: 25em;
 }
@@ -1224,6 +1227,9 @@ a.bbc_link {
 	padding: 0 6px;
 	font-size: 0.786em;
 	line-height: 2em;
+}
+.fa.hamburger_30 {
+	display: none;
 }
 
 /* The quick buttons. */
@@ -1416,10 +1422,11 @@ a.bbc_link {
 /* Necessary for some browsers to keep the pages all on the same line */
 .linavPages {
 	float: left;
+	margin: 0px 4px 0px 0px;
 }
 
 .selectbox, .pagelinks {
-	margin: 5px 0 0 0;
+	margin: 5px 5px 0px;
 	font-size: 0.857em;
 }
 
@@ -5532,10 +5539,10 @@ dl.no_members {
 		margin-bottom: 6px;
 	}
 
-	#moderationbuttons, a.linklevel1.button_strip_notify,
+	a.linklevel1.button_strip_notify,
 	a.linklevel1.button_strip_print, a.linklevel1.button_strip_send, .inline_mod_check,
 	a.linklevel1.quotetonew_button, a.linklevel1.button_strip_post_poll,
-	a.linklevel1.post_options, .keyinfo .post_subject, li.listlevel1.quickmod_select_all,
+	.keyinfo .post_subject, li.listlevel1.quickmod_select_all,
 	#collapse_button, p.inline.membergroups {
 		display: none !important;
 	}
@@ -5710,5 +5717,28 @@ dl.no_members {
 	#confirm_buttons .button_submit {
 		max-height: none;
 		height: inherit;
+	}
+	.fa.hamburger_30 {
+		padding-top: 0.1em;
+		display: inline-block;
+		vertical-align: middle;
+		cursor: pointer;
+	}
+	.fa.hamburger_30:before {
+		margin: 0.2em;
+	}
+	#display_jump_to {
+		display: inline-block;
+	}
+	.hide_30.hamburger_30_target {
+		left: -9999px;
+		position: absolute;
+	}
+	.fa.hamburger_30.visible {
+		display: none;
+	}
+	.hide_30.hamburger_30_target.visible {
+		left: auto;
+		position: relative;
 	}
 }

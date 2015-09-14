@@ -679,7 +679,8 @@ function template_edit_agreement()
 
 	echo '
 			<div id="registration_agreement">
-				<div class="content">';
+				<div class="content">
+					<input type="hidden" name="agree_lang" value="', $context['current_agreement'], '" />';
 
 	// Is there more than one language to choose from?
 	if (count($context['editable_agreements']) > 1)
@@ -687,22 +688,20 @@ function template_edit_agreement()
 		echo '
 					<h2 class="category_header">', $txt['language_configuration'], '</h2>
 					<div class="information">
-						<form action="', $scripturl, '?action=admin;area=regcenter" id="change_reg" method="post" accept-charset="UTF-8" style="display: inline;">
-							<strong>', $txt['admin_agreement_select_language'], ':</strong>&nbsp;
-							<select name="agree_lang" onchange="document.getElementById(\'change_reg\').submit();" tabindex="', $context['tabindex']++, '">';
+						<strong>', $txt['admin_agreement_select_language'], ':</strong>&nbsp;
+						<select name="agree_lang" onchange="document.getElementById(\'admin_form_wrapper\').submit();" tabindex="', $context['tabindex']++, '">';
 
 		foreach ($context['editable_agreements'] as $file => $name)
 			echo '
-								<option value="', $file, '" ', $context['current_agreement'] == $file ? 'selected="selected"' : '', '>', $name, '</option>';
+							<option value="', $file, '" ', $context['current_agreement'] == $file ? 'selected="selected"' : '', '>', $name, '</option>';
 
 		echo '
-							</select>
-							<div class="submitbutton">
-								<input type="hidden" name="sa" value="agreement" />
-								<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />
-								<input type="submit" name="change" value="', $txt['admin_agreement_select_language_change'], '" tabindex="', $context['tabindex']++, '" class="button_submit" />
-							</div>
-						</form>
+						</select>
+						<div class="submitbutton">
+							<input type="hidden" name="sa" value="agreement" />
+							<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />
+							<input type="submit" name="change" value="', $txt['admin_agreement_select_language_change'], '" tabindex="', $context['tabindex']++, '" class="button_submit" />
+						</div>
 					</div>';
 	}
 
@@ -717,8 +716,7 @@ function template_edit_agreement()
 						<label for="checkboxAgreement"><input type="checkbox" name="checkboxAgreement" id="checkboxAgreement"', $context['checkbox_agreement'] ? ' checked="checked"' : '', ' tabindex="', $context['tabindex']++, '" value="1" class="input_check" /> ', $txt['admin_checkbox_agreement'], '.</label>
 					</p>
 					<div class="submitbutton" >
-						<input type="submit" value="', $txt['save'], '" tabindex="', $context['tabindex']++, '" class="button_submit" />
-						<input type="hidden" name="agree_lang" value="', $context['current_agreement'], '" />
+						<input type="submit" name="save" value="', $txt['save'], '" tabindex="', $context['tabindex']++, '" class="button_submit" />
 						<input type="hidden" name="sa" value="agreement" />
 						<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />
 						<input type="hidden" name="', $context['admin-rega_token_var'], '" value="', $context['admin-rega_token'], '" />

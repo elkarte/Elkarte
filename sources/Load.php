@@ -421,6 +421,10 @@ function loadBoard()
 	// Assume they are not a moderator.
 	$user_info['is_mod'] = false;
 	$context['user']['is_mod'] = &$user_info['is_mod'];
+	// @since 1.0.5 - is_mod takes into account only local (board) moderators,
+	// and not global moderators, is_moderator is meant to take into account both.
+	$user_info['is_moderator'] = false;
+	$context['user']['is_moderator'] = &$user_info['is_moderator'];
 
 	// Start the linktree off empty..
 	$context['linktree'] = array();
@@ -610,6 +614,7 @@ function loadBoard()
 	{
 		// Now check if the user is a moderator.
 		$user_info['is_mod'] = isset($board_info['moderators'][$user_info['id']]);
+		$user_info['is_moderator'] = $user_info['is_mod'] || allowedTo('moderate_board');
 
 		if (count(array_intersect($user_info['groups'], $board_info['groups'])) == 0 && !$user_info['is_admin'])
 			$board_info['error'] = 'access';
@@ -633,11 +638,12 @@ function loadBoard()
 
 	// Set the template contextual information.
 	$context['user']['is_mod'] = &$user_info['is_mod'];
+	$context['user']['is_moderator'] = &$user_info['is_moderator'];
 	$context['current_topic'] = $topic;
 	$context['current_board'] = $board;
 
 	// Hacker... you can't see this topic, I'll tell you that. (but moderators can!)
-	if (!empty($board_info['error']) && (!empty($modSettings['deny_boards_access']) || $board_info['error'] != 'access' || !$user_info['is_mod']))
+	if (!empty($board_info['error']) && (!empty($modSettings['deny_boards_access']) || $board_info['error'] != 'access' || !$user_info['is_moderator']))
 	{
 		// The permissions and theme need loading, just to make sure everything goes smoothly.
 		loadPermissions();
@@ -1397,6 +1403,7 @@ function loadTheme($id_theme = 0, $initialize = true)
 		'is_guest' => &$user_info['is_guest'],
 		'is_admin' => &$user_info['is_admin'],
 		'is_mod' => &$user_info['is_mod'],
+		'is_moderator' => &$user_info['is_moderator'],
 		// A user can mod if they have permission to see the mod center, or they are a board/group/approval moderator.
 		'can_mod' => allowedTo('access_mod_center') || (!$user_info['is_guest'] && ($user_info['mod_cache']['gq'] != '0=1' || $user_info['mod_cache']['bq'] != '0=1' || ($modSettings['postmod_active'] && !empty($user_info['mod_cache']['ap'])))),
 		'username' => $user_info['username'],
@@ -1564,7 +1571,7 @@ function loadTheme($id_theme = 0, $initialize = true)
 		loadLanguage('ThemeStrings', '', false);
 
 	// Load font Awesome fonts
-	loadCSSFile('font-awesome.css');
+	loadCSSFile('font-awesome.min.css');
 
 	// We allow theme variants, because we're cool.
 	$context['theme_variant'] = '';

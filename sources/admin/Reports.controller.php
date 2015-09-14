@@ -179,9 +179,11 @@ class Reports_Controller extends Action_Controller
 
 		// Get every moderator.
 		$moderators = allBoardModerators();
+
 		$boards_moderated = array();
-		foreach ($moderators as $id_member => $row)
-			$boards_moderated[$id_member][] = $row['id_board'];
+		foreach ($moderators as $id_board => $rows)
+			foreach ($rows as $row)
+				$boards_moderated[$id_board][] = $row['real_name'];
 
 		// Get all the possible membergroups!
 		$all_groups = getBasicMembergroupData(array('all'), array(), null, false);
@@ -582,11 +584,12 @@ class Reports_Controller extends Action_Controller
 
 		// Fetch all the board names.
 		$boards = fetchBoardsInfo('all');
-		$moderators = allBoardModerators();
+		$moderators = allBoardModerators(true);
 		$boards_moderated = array();
 
-		foreach ($moderators as $id_member => $row)
-			$boards_moderated[$id_member][] = $row['id_board'];
+		foreach ($moderators as $id_member => $rows)
+			foreach ($rows as $row)
+				$boards_moderated[$id_member][] = $row['id_board'];
 
 		// Get a list of global moderators (i.e. members with moderation powers).
 		$global_mods = array_intersect(membersAllowedTo('moderate_board', 0), membersAllowedTo('approve_posts', 0), membersAllowedTo('remove_any', 0), membersAllowedTo('modify_any', 0));
@@ -644,7 +647,7 @@ class Reports_Controller extends Action_Controller
 				// Get the names
 				foreach ($boards_moderated[$row['id_member']] as $board)
 					if (isset($boards[$board]))
-						$staffData['moderates'][] = $boards[$board];
+						$staffData['moderates'][] = $boards[$board]['name'];
 
 				$staffData['moderates'] = implode(', ', $staffData['moderates']);
 			}

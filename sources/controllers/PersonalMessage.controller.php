@@ -848,7 +848,7 @@ class PersonalMessage_Controller extends Action_Controller
 		{
 			// Set everything up to be displayed.
 			$context['preview_subject'] = Util::htmlspecialchars($_REQUEST['subject']);
-			$context['preview_message'] = Util::htmlspecialchars($_REQUEST['message'], ENT_QUOTES);
+			$context['preview_message'] = Util::htmlspecialchars($_REQUEST['message'], ENT_QUOTES, 'UTF-8', true);
 			preparsecode($context['preview_message'], true);
 
 			// Parse out the BBC if it is enabled.
@@ -2556,7 +2556,7 @@ function messagePostError($named_recipients, $recipient_ids = array())
 
 	// Set everything up like before....
 	$context['subject'] = isset($_REQUEST['subject']) ? Util::htmlspecialchars($_REQUEST['subject']) : '';
-	$context['message'] = isset($_REQUEST['message']) ? str_replace(array('  '), array('&nbsp; '), Util::htmlspecialchars($_REQUEST['message'])) : '';
+	$context['message'] = isset($_REQUEST['message']) ? str_replace(array('  '), array('&nbsp; '), Util::htmlspecialchars($_REQUEST['message'], ENT_QUOTES, 'UTF-8', true)) : '';
 	$context['reply'] = !empty($_REQUEST['replied_to']);
 
 	// If this is a reply to message, we need to reload the quote

@@ -1248,7 +1248,7 @@ JumpTo.prototype.fillSelect = function (aBoardsAndCategories)
 		};
 
 	// Handle custom function hook before showing the new select.
-	if ('funcOnAfterFill' in this.opt)
+	if ('funcOnBeforeCollapse' in this.opt)
 	{
 		this.tmpMethod = this.opt.funcOnBeforeCollapse;
 		this.tmpMethod(this);

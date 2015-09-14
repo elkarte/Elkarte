@@ -170,6 +170,7 @@ class ManagePosts_Controller extends Action_Controller
 				'censor_proper' => implode("\n", $censored_proper),
 				'censorWholeWord' => empty($this->_req->post->censorWholeWord) ? '0' : '1',
 				'censorIgnoreCase' => empty($this->_req->post->censorIgnoreCase) ? '0' : '1',
+				'allow_no_censored' => empty($this->_req->post->allow_no_censored) ? '0' : '1',
 			);
 
 			call_integration_hook('integrate_save_censors', array(&$updates));

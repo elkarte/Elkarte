@@ -79,15 +79,15 @@ fieldset {
 
 legend {
 	margin-left: 15px;
+	background: url(../../images/selected_open.png) 0 50% no-repeat;
 	padding: 0 0 2px 20px;
-	background: url(../../images/selected_open.png) no-repeat scroll left center transparent;
 	color: #333333;
 	font-size: 1.071em;
 	cursor: pointer;
 }
 
 .collapsed legend {
-	background: url(../../images/selected.png) no-repeat scroll left center transparent;
+	background: url(../../images/selected.png) 0 50% no-repeat;
 }
 
 input, button, select, textarea, .editor {
@@ -103,6 +103,7 @@ input:hover, textarea:hover, button:hover, select:hover {
 
 textarea:hover, .editor:hover {
 	background: #FAFAFA;
+	color: #444444;
 }
 
 input:focus, textarea:focus, button:focus, select:focus, .editor:focus {

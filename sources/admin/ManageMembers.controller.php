@@ -1154,6 +1154,7 @@ class ManageMembers_Controller extends Action_Controller
 		// What do we want to do with this application?
 		switch ($this->_req->post->todo)
 		{
+<<<<<<< HEAD
 			// Are we activating or approving the members?
 			case 'ok':
 			case 'okemail':
@@ -1280,13 +1281,6 @@ class ManageMembers_Controller extends Action_Controller
 
 		// Approve / activate this member.
 		approveMembers($this->conditions);
-
-		// Do we have to let the integration code know about the activations?
-		if (!empty($modSettings['integrate_activate']))
-		{
-			foreach ($this->member_info as $member)
-				call_integration_hook('integrate_activate', array($member['username']));
-		}
 
 		// Check for email.
 		if ($this->_req->post->todo == 'okemail')

@@ -30,6 +30,7 @@ const ELK = '1';
 // Shortcut for the browser cache stale
 const CACHE_STALE = '?R11';
 
+
 // Report errors but not depreciated ones
 error_reporting(E_ALL | E_STRICT & ~8192);
 
