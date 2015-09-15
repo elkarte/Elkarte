@@ -50,12 +50,12 @@ class MessageIndex_Controller extends Action_Controller implements Frontpage_Int
 				if ($(this).val() == \'MessageIndex_Controller\')
 				{
 					$base.fadeIn();
-					$base.next().fadeIn();
+					$base.prev().fadeIn();
 				}
 				else
 				{
 					$base.fadeOut();
-					$base.next().fadeOut();
+					$base.prev().fadeOut();
 				}
 			}).change();', true);
 		return array(array('select', 'message_index_frontpage', self::_getBoardsList()));
