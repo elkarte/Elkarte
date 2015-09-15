@@ -3339,6 +3339,9 @@ function getMemberNotificationsProfile($member_id)
 {
 	global $modSettings;
 
+	if (empty($modSettings['enabled_mentions']))
+		return array();
+
 	require_once(SUBSDIR . '/Notification.subs.php');
 	Elk_Autoloader::getInstance()->register(SUBSDIR . '/MentionType', '\\ElkArte\\sources\\subs\\MentionType');
 
