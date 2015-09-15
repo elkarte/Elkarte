@@ -156,9 +156,9 @@ class Drafts_Post_Module implements ElkArte\sources\modules\Module_Interface
 
 				// Cleanup
 				unset($_POST['save_draft']);
-			}
 
-			throw new Controller_Redirect_Exception('Post_Controller', 'action_post');
+				throw new Controller_Redirect_Exception('Post_Controller', 'action_post');
+			}
 		}
 	}
 

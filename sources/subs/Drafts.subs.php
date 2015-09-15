@@ -160,8 +160,8 @@ function modify_post_draft($draft)
 			body = {string:body},
 			icon = {string:icon},
 			locked = {int:locked},
-			is_sticky = {int:is_sticky}
-			is_usersaved = {int:is_usersaved},
+			is_sticky = {int:is_sticky},
+			is_usersaved = {int:is_usersaved}
 		WHERE id_draft = {int:id_draft}',
 		array(
 			'id_topic' => $draft['topic_id'],
@@ -410,6 +410,9 @@ function getOldDrafts($days)
  * - Determines if this is a new or an existing draft
  *
  * @package Drafts
+ * @param mixed[] $draft
+ * @param boolean $check_last_save
+ * @param int $id_topic
  */
 function saveDraft($draft, $check_last_save = false, $id_topic = 0)
 {
@@ -493,26 +496,20 @@ function saveDraft($draft, $check_last_save = false, $id_topic = 0)
  *
  * @package Drafts
  * @param mixed[] $recipientList
+ * @param mixed[] $draft
+ * @param boolean $check_last_save
  */
-function savePMDraft($recipientList)
+function savePMDraft($recipientList, $draft, $check_last_save = false)
 {
 	global $context, $user_info, $modSettings;
 
-	// Ajax calling
-	if (!isset($context['drafts_pm_save']))
-		$context['drafts_pm_save'] = !empty($modSettings['drafts_enabled']) && !empty($modSettings['drafts_pm_enabled']) && allowedTo('pm_draft');
-
-	// PM survey says ... can you stay or must you go
-	if (empty($context['drafts_pm_save']) || !isset($_POST['save_draft']) || !isset($_POST['id_pm_draft']))
-		return false;
-
 	// Read in what was sent
-	$id_pm_draft = empty($_POST['id_pm_draft']) ? 0 : (int) $_POST['id_pm_draft'];
+	$id_pm_draft = $draft['id_pm_draft'];
 	$draft_info = loadDraft($id_pm_draft, 1);
 	$post_errors = Error_Context::context('pm', 1);
 
 	// 5 seconds is the same limit we have for posting
-	if (isset($_REQUEST['xml']) && !empty($draft_info['poster_time']) && time() < $draft_info['poster_time'] + 5)
+	if ($check_last_save && !empty($draft_info['poster_time']) && time() < $draft_info['poster_time'] + 5)
 	{
 		// Send something back to the javascript caller
 		if (!empty($id_pm_draft))
@@ -528,27 +525,16 @@ function savePMDraft($recipientList)
 	}
 
 	// Determine who this is being sent to
-	if (isset($_REQUEST['xml']))
-	{
-		$recipientList['to'] = isset($_POST['recipient_to']) ? explode(',', $_POST['recipient_to']) : array();
-		$recipientList['bcc'] = isset($_POST['recipient_bcc']) ? explode(',', $_POST['recipient_bcc']) : array();
-	}
-	elseif (!empty($draft_info['to_list']) && empty($recipientList))
+	if (!$check_last_save && !empty($draft_info['to_list']) && empty($recipientList))
 		$recipientList = unserialize($draft_info['to_list']);
-
-	// Prepare the data
-	$draft = array(
-		'id_pm_draft' => $id_pm_draft,
-		'reply_id' => empty($_POST['replied_to']) ? 0 : (int) $_POST['replied_to'],
-		'body' => Util::htmlspecialchars($_POST['message'], ENT_QUOTES, 'UTF-8', true),
-		'subject' => strtr(Util::htmlspecialchars($_POST['subject']), array("\r" => '', "\n" => '', "\t" => '')),
-		'id_member' => $user_info['id'],
-	);
 
 	// message and subject always need a bit more work
 	preparsecode($draft['body']);
 	if (Util::strlen($draft['subject']) > 100)
 		$draft['subject'] = Util::substr($draft['subject'], 0, 100);
+
+	if (!isset($draft['is_usersaved']))
+		$draft['is_usersaved'] = 0;
 
 	// Modifying an existing PM draft?
 	if (!empty($id_pm_draft) && !empty($draft_info))
@@ -575,7 +561,7 @@ function savePMDraft($recipientList)
 	}
 
 	// if we were called from the autosave function, send something back
-	if (!empty($id_pm_draft) && isset($_REQUEST['xml']) && !$post_errors->hasError('session_timeout'))
+	if (!empty($id_pm_draft) && $check_last_save && !$post_errors->hasError('session_timeout'))
 	{
 		loadTemplate('Xml');
 		$context['sub_template'] = 'xml_draft';

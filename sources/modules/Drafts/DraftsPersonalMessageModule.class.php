@@ -140,13 +140,37 @@ class Drafts_PersonalMessage_Module implements ElkArte\sources\modules\Module_In
 
 	public function before_sending($recipientList)
 	{
-		global $context;
+		global $context, $user_info;
 
 		// Want to save this as a draft and think about it some more?
 		if ($context['drafts_pm_save'] && isset($_POST['save_draft']))
 		{
-			savePMDraft($recipientList);
-			throw new Controller_Redirect_Exception('', '');
+			// Ajax calling
+			if (!isset($context['drafts_pm_save']))
+				$context['drafts_pm_save'] = !empty($modSettings['drafts_enabled']) && !empty($modSettings['drafts_pm_enabled']) && allowedTo('pm_draft');
+
+			// PM survey says ... can you stay or must you go
+			if (!empty($context['drafts_pm_save']) && isset($_POST['id_pm_draft']))
+			{
+				// Prepare the data
+				$draft = array(
+					'id_pm_draft' => empty($_POST['id_pm_draft']) ? 0 : (int) $_POST['id_pm_draft'],
+					'reply_id' => empty($_POST['replied_to']) ? 0 : (int) $_POST['replied_to'],
+					'body' => Util::htmlspecialchars($_POST['message'], ENT_QUOTES, 'UTF-8', true),
+					'subject' => strtr(Util::htmlspecialchars($_POST['subject']), array("\r" => '', "\n" => '', "\t" => '')),
+					'id_member' => $user_info['id'],
+					'is_usersaved' => 1,
+				);
+
+				if (isset($_REQUEST['xml']))
+				{
+					$recipientList['to'] = isset($_POST['recipient_to']) ? explode(',', $_POST['recipient_to']) : array();
+					$recipientList['bcc'] = isset($_POST['recipient_bcc']) ? explode(',', $_POST['recipient_bcc']) : array();
+				}
+
+				savePMDraft($recipientList, $draft, isset($_REQUEST['xml']));
+				throw new Controller_Redirect_Exception('', '');
+			}
 		}
 	}
 
