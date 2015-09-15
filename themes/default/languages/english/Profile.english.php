@@ -119,7 +119,7 @@ $txt['notify_send_body_pbe'] = 'When sending email notifications, send the full 
 $txt['notify_send_body_pbe_post'] = '<strong>NOT</strong> available with Daily / Weekly summary';
 
 $txt['notify_method'] = 'Notification and:';
-$txt['notify_notification'] = 'no emai (only mention/alert)';
+$txt['notify_notification'] = 'no email (only mention/alert)';
 $txt['notify_email'] = 'Immediate email';
 $txt['notify_email_daily'] = 'Daily email';
 $txt['notify_email_weekly'] = 'Weekly email';
