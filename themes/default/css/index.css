@@ -3767,9 +3767,10 @@ div.labels {
 #main_grid .days {
 	padding: 4px;
 	width: 14%;
+	vertical-align: top;
 }
 
-#main_grid .content.days {
+#main_grid td.days {
 	height: 100px;
 }
 
@@ -3782,12 +3783,8 @@ div.labels {
 	text-decoration: none;
 }
 
-#main_grid .days {
-	vertical-align: top;
-}
-
 .weeklist {
-	padding: 2px 0;
+	padding: 2px 0 0;
 	text-align: left;
 }
 
