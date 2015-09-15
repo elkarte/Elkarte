@@ -841,7 +841,7 @@ class PersonalMessage_Controller extends Action_Controller
 
 		// If they made any errors, give them a chance to make amends.
 		if ($post_errors->hasErrors() && !$is_recipient_change && !isset($_REQUEST['preview']) && !isset($_REQUEST['xml']))
-			return messagePostError($namedRecipientList, $recipientList);
+			return $this->messagePostError($namedRecipientList, $recipientList);
 
 		// Want to take a second glance before you send?
 		if (isset($_REQUEST['preview']))
@@ -862,7 +862,7 @@ class PersonalMessage_Controller extends Action_Controller
 			$context['page_title'] = $txt['preview'] . ' - ' . $context['preview_subject'];
 
 			// Pretend they messed up but don't ignore if they really did :P.
-			return messagePostError($namedRecipientList, $recipientList);
+			return $this->messagePostError($namedRecipientList, $recipientList);
 		}
 		// Adding a recipient cause javascript ain't working?
 		elseif ($is_recipient_change)
@@ -875,7 +875,7 @@ class PersonalMessage_Controller extends Action_Controller
 					$context['send_log']['failed'][] = sprintf($txt['pm_error_user_not_found'], $name);
 			}
 
-			return messagePostError($namedRecipientList, $recipientList);
+			return $this->messagePostError($namedRecipientList, $recipientList);
 		}
 
 		try
@@ -884,12 +884,12 @@ class PersonalMessage_Controller extends Action_Controller
 		}
 		catch (Controller_Redirect_Exception $e)
 		{
-			return messagePostError($namedRecipientList, $recipientList);
+			return $this->messagePostError($namedRecipientList, $recipientList);
 		}
 
 		// Safety net, it may be a module may just add to the list of errors without actually throw the error
 		if ($post_errors->hasErrors() && !isset($_REQUEST['preview']) && !isset($_REQUEST['xml']))
-			return messagePostError($namedRecipientList, $recipientList);
+			return $this->messagePostError($namedRecipientList, $recipientList);
 
 		// Before we send the PM, let's make sure we don't have an abuse of numbers.
 		if (!empty($modSettings['max_pm_recipients']) && count($recipientList['to']) + count($recipientList['bcc']) > $modSettings['max_pm_recipients'] && !allowedTo(array('moderate_forum', 'send_mail', 'admin_forum')))
@@ -899,7 +899,7 @@ class PersonalMessage_Controller extends Action_Controller
 				'failed' => array(sprintf($txt['pm_too_many_recipients'], $modSettings['max_pm_recipients'])),
 			);
 
-			return messagePostError($namedRecipientList, $recipientList);
+			return $this->messagePostError($namedRecipientList, $recipientList);
 		}
 
 		// Protect from message spamming.
@@ -930,7 +930,7 @@ class PersonalMessage_Controller extends Action_Controller
 		// If one or more of the recipients were invalid, go back to the post screen with the failed usernames.
 		if ($failed)
 		{
-			return messagePostError($namesNotFound, array(
+			return $this->messagePostError($namesNotFound, array(
 				'to' => array_intersect($recipientList['to'], $context['send_log']['failed']),
 				'bcc' => array_intersect($recipientList['bcc'], $context['send_log']['failed'])
 			));
@@ -2189,6 +2189,147 @@ class PersonalMessage_Controller extends Action_Controller
 		// Back to the folder.
 		redirectexit($context['current_label_redirect']);
 	}
+
+	/**
+	 * An error in the message...
+	 *
+	 * @param mixed[] $named_recipients
+	 * @param int[] $recipient_ids
+	 */
+	public function messagePostError($named_recipients, $recipient_ids = array())
+	{
+		global $txt, $context, $scripturl, $modSettings, $user_info;
+
+		if (isset($_REQUEST['xml']))
+			$context['sub_template'] = 'generic_preview';
+		else
+		{
+			$context['sub_template'] = 'send';
+			$context['menu_data_' . $context['pm_menu_id']]['current_area'] = 'send';
+		}
+
+		$context['page_title'] = $txt['send_message'];
+		$error_types = Error_Context::context('pm', 1);
+
+		// Got some known members?
+		$context['recipients'] = array(
+			'to' => array(),
+			'bcc' => array(),
+		);
+
+		if (!empty($recipient_ids['to']) || !empty($recipient_ids['bcc']))
+		{
+			$allRecipients = array_merge($recipient_ids['to'], $recipient_ids['bcc']);
+
+			require_once(SUBSDIR . '/Members.subs.php');
+
+			// Get the latest activated member's display name.
+			$result = getBasicMemberData($allRecipients);
+			foreach ($result as $row)
+			{
+				$recipientType = in_array($row['id_member'], $recipient_ids['bcc']) ? 'bcc' : 'to';
+				$context['recipients'][$recipientType][] = array(
+					'id' => $row['id_member'],
+					'name' => $row['real_name'],
+				);
+			}
+		}
+
+		// Set everything up like before....
+		$context['subject'] = isset($_REQUEST['subject']) ? Util::htmlspecialchars($_REQUEST['subject']) : '';
+		$context['message'] = isset($_REQUEST['message']) ? str_replace(array('  '), array('&nbsp; '), Util::htmlspecialchars($_REQUEST['message'], ENT_QUOTES, 'UTF-8', true)) : '';
+		$context['reply'] = !empty($_REQUEST['replied_to']);
+
+		// If this is a reply to message, we need to reload the quote
+		if ($context['reply'])
+		{
+			$pmsg = (int) $_REQUEST['replied_to'];
+			$isReceived = $context['folder'] !== 'sent';
+			$row_quoted = loadPMQuote($pmsg, $isReceived);
+			if ($row_quoted === false)
+			{
+				if (!isset($_REQUEST['xml']))
+					Errors::instance()->fatal_lang_error('pm_not_yours', false);
+				else
+					$error_types->addError('pm_not_yours');
+			}
+			else
+			{
+				censorText($row_quoted['subject']);
+				censorText($row_quoted['body']);
+
+				$context['quoted_message'] = array(
+					'id' => $row_quoted['id_pm'],
+					'pm_head' => $row_quoted['pm_head'],
+					'member' => array(
+						'name' => $row_quoted['real_name'],
+						'username' => $row_quoted['member_name'],
+						'id' => $row_quoted['id_member'],
+						'href' => !empty($row_quoted['id_member']) ? $scripturl . '?action=profile;u=' . $row_quoted['id_member'] : '',
+						'link' => !empty($row_quoted['id_member']) ? '<a href="' . $scripturl . '?action=profile;u=' . $row_quoted['id_member'] . '">' . $row_quoted['real_name'] . '</a>' : $row_quoted['real_name'],
+					),
+					'subject' => $row_quoted['subject'],
+					'time' => standardTime($row_quoted['msgtime']),
+					'html_time' => htmlTime($row_quoted['msgtime']),
+					'timestamp' => forum_time(true, $row_quoted['msgtime']),
+					'body' => parse_bbc($row_quoted['body'], true, 'pm' . $row_quoted['id_pm']),
+				);
+			}
+		}
+
+		// Build the link tree....
+		$context['linktree'][] = array(
+			'url' => $scripturl . '?action=pm;sa=send',
+			'name' => $txt['new_message']
+		);
+
+		// Set each of the errors for the template.
+		$context['post_error'] = array(
+			'errors' => $error_types->prepareErrors(),
+			'type' => $error_types->getErrorType() == 0 ? 'minor' : 'serious',
+			'title' => $txt['error_while_submitting'],
+		);
+
+		// We need to load the editor once more.
+		require_once(SUBSDIR . '/Editor.subs.php');
+
+		// Create it...
+		$editorOptions = array(
+			'id' => 'message',
+			'value' => $context['message'],
+			'width' => '90%',
+			'height' => '250px',
+			'labels' => array(
+				'post_button' => $txt['send_message'],
+			),
+			'preview_type' => 2,
+		);
+
+		$this->_events->trigger('prepare_send_context', array('pmsg' => isset($_REQUEST['pmsg']) ? $_REQUEST['pmsg'] : (isset($_REQUEST['quote']) ? $_REQUEST['quote'] : 0), 'editorOptions' => &$editorOptions));
+
+		create_control_richedit($editorOptions);
+
+		// Check whether we need to show the code again.
+		$context['require_verification'] = !$user_info['is_admin'] && !empty($modSettings['pm_posts_verification']) && $user_info['posts'] < $modSettings['pm_posts_verification'];
+		if ($context['require_verification'] && !isset($_REQUEST['xml']))
+		{
+			require_once(SUBSDIR . '/VerificationControls.class.php');
+			$verificationOptions = array(
+				'id' => 'pm',
+			);
+			$context['require_verification'] = create_control_verification($verificationOptions);
+			$context['visual_verification_id'] = $verificationOptions['id'];
+		}
+
+		$context['to_value'] = empty($named_recipients['to']) ? '' : '&quot;' . implode('&quot;, &quot;', $named_recipients['to']) . '&quot;';
+		$context['bcc_value'] = empty($named_recipients['bcc']) ? '' : '&quot;' . implode('&quot;, &quot;', $named_recipients['bcc']) . '&quot;';
+
+		// No check for the previous submission is needed.
+		checkSubmitOnce('free');
+
+		// Acquire a new form sequence number.
+		checkSubmitOnce('register');
+	}
 }
 
 /**
@@ -2507,142 +2648,4 @@ function preparePMContext_callback($type = 'subject', $reset = false)
 	$counter++;
 
 	return $output;
-}
-
-/**
- * An error in the message...
- *
- * @param mixed[] $named_recipients
- * @param int[] $recipient_ids
- */
-function messagePostError($named_recipients, $recipient_ids = array())
-{
-	global $txt, $context, $scripturl, $modSettings, $user_info;
-
-	if (isset($_REQUEST['xml']))
-		$context['sub_template'] = 'generic_preview';
-	else
-	{
-		$context['sub_template'] = 'send';
-		$context['menu_data_' . $context['pm_menu_id']]['current_area'] = 'send';
-	}
-
-	$context['page_title'] = $txt['send_message'];
-	$error_types = Error_Context::context('pm', 1);
-
-	// Got some known members?
-	$context['recipients'] = array(
-		'to' => array(),
-		'bcc' => array(),
-	);
-
-	if (!empty($recipient_ids['to']) || !empty($recipient_ids['bcc']))
-	{
-		$allRecipients = array_merge($recipient_ids['to'], $recipient_ids['bcc']);
-
-		require_once(SUBSDIR . '/Members.subs.php');
-
-		// Get the latest activated member's display name.
-		$result = getBasicMemberData($allRecipients);
-		foreach ($result as $row)
-		{
-			$recipientType = in_array($row['id_member'], $recipient_ids['bcc']) ? 'bcc' : 'to';
-			$context['recipients'][$recipientType][] = array(
-				'id' => $row['id_member'],
-				'name' => $row['real_name'],
-			);
-		}
-	}
-
-	// Set everything up like before....
-	$context['subject'] = isset($_REQUEST['subject']) ? Util::htmlspecialchars($_REQUEST['subject']) : '';
-	$context['message'] = isset($_REQUEST['message']) ? str_replace(array('  '), array('&nbsp; '), Util::htmlspecialchars($_REQUEST['message'], ENT_QUOTES, 'UTF-8', true)) : '';
-	$context['reply'] = !empty($_REQUEST['replied_to']);
-
-	// If this is a reply to message, we need to reload the quote
-	if ($context['reply'])
-	{
-		$pmsg = (int) $_REQUEST['replied_to'];
-		$isReceived = $context['folder'] !== 'sent';
-		$row_quoted = loadPMQuote($pmsg, $isReceived);
-		if ($row_quoted === false)
-		{
-			if (!isset($_REQUEST['xml']))
-				Errors::instance()->fatal_lang_error('pm_not_yours', false);
-			else
-				$error_types->addError('pm_not_yours');
-		}
-		else
-		{
-			censorText($row_quoted['subject']);
-			censorText($row_quoted['body']);
-
-			$context['quoted_message'] = array(
-				'id' => $row_quoted['id_pm'],
-				'pm_head' => $row_quoted['pm_head'],
-				'member' => array(
-					'name' => $row_quoted['real_name'],
-					'username' => $row_quoted['member_name'],
-					'id' => $row_quoted['id_member'],
-					'href' => !empty($row_quoted['id_member']) ? $scripturl . '?action=profile;u=' . $row_quoted['id_member'] : '',
-					'link' => !empty($row_quoted['id_member']) ? '<a href="' . $scripturl . '?action=profile;u=' . $row_quoted['id_member'] . '">' . $row_quoted['real_name'] . '</a>' : $row_quoted['real_name'],
-				),
-				'subject' => $row_quoted['subject'],
-				'time' => standardTime($row_quoted['msgtime']),
-				'html_time' => htmlTime($row_quoted['msgtime']),
-				'timestamp' => forum_time(true, $row_quoted['msgtime']),
-				'body' => parse_bbc($row_quoted['body'], true, 'pm' . $row_quoted['id_pm']),
-			);
-		}
-	}
-
-	// Build the link tree....
-	$context['linktree'][] = array(
-		'url' => $scripturl . '?action=pm;sa=send',
-		'name' => $txt['new_message']
-	);
-
-	// Set each of the errors for the template.
-	$context['post_error'] = array(
-		'errors' => $error_types->prepareErrors(),
-		'type' => $error_types->getErrorType() == 0 ? 'minor' : 'serious',
-		'title' => $txt['error_while_submitting'],
-	);
-
-	// We need to load the editor once more.
-	require_once(SUBSDIR . '/Editor.subs.php');
-
-	// Create it...
-	$editorOptions = array(
-		'id' => 'message',
-		'value' => $context['message'],
-		'width' => '90%',
-		'height' => '250px',
-		'labels' => array(
-			'post_button' => $txt['send_message'],
-		),
-		'preview_type' => 2,
-	);
-	create_control_richedit($editorOptions);
-
-	// Check whether we need to show the code again.
-	$context['require_verification'] = !$user_info['is_admin'] && !empty($modSettings['pm_posts_verification']) && $user_info['posts'] < $modSettings['pm_posts_verification'];
-	if ($context['require_verification'] && !isset($_REQUEST['xml']))
-	{
-		require_once(SUBSDIR . '/VerificationControls.class.php');
-		$verificationOptions = array(
-			'id' => 'pm',
-		);
-		$context['require_verification'] = create_control_verification($verificationOptions);
-		$context['visual_verification_id'] = $verificationOptions['id'];
-	}
-
-	$context['to_value'] = empty($named_recipients['to']) ? '' : '&quot;' . implode('&quot;, &quot;', $named_recipients['to']) . '&quot;';
-	$context['bcc_value'] = empty($named_recipients['bcc']) ? '' : '&quot;' . implode('&quot;, &quot;', $named_recipients['bcc']) . '&quot;';
-
-	// No check for the previous submission is needed.
-	checkSubmitOnce('free');
-
-	// Acquire a new form sequence number.
-	checkSubmitOnce('register');
 }
