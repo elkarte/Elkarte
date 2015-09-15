@@ -53,6 +53,32 @@ abstract class Action_Controller
 	}
 
 	/**
+	 * Tells if the controller can be displayed as front page.
+	 *
+	 * @return boolean
+	 */
+	public static function canFrontPage()
+	{
+		return in_array('ElkArte\\sources\\Frontpage_Interface', class_implements(get_called_class()));
+	}
+
+	/**
+	 * {@inheritdoc }
+	 */
+	public static function frontPageOptions()
+	{
+		return array();
+	}
+
+	/**
+	 * {@inheritdoc }
+	 */
+	public static function validateFrontPageOptions($post)
+	{
+		return true;
+	}
+
+	/**
 	 * Initialize the event manager for the controller
 	 *
 	 * Uses the XXX_Controller name to define the set of event hooks to load

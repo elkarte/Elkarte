@@ -89,7 +89,9 @@ require_once(SOURCEDIR . '/Security.php');
 require_once(SUBSDIR . '/Cache.subs.php');
 
 require(SOURCEDIR . '/Autoloader.class.php');
-Elk_Autoloader::getInstance()->setupAutoloader(array(SOURCEDIR, SUBSDIR, CONTROLLERDIR, ADMINDIR, ADDONSDIR));
+$autoloder = Elk_Autoloader::getInstance();
+$autoloder->setupAutoloader(array(SOURCEDIR, SUBSDIR, CONTROLLERDIR, ADMINDIR, ADDONSDIR));
+$autoloder->register(SOURCEDIR, '\\ElkArte');
 
 /**
  * Set this to one of three values depending on what you want to happen in the case of a fatal error.

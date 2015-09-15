@@ -758,3 +758,59 @@ function getMentionsModules($enabled_mentions)
 
 	return $modules;
 }
+
+function getFrontPageControllers()
+{
+	global $txt;
+
+	$classes = array();
+
+	$glob = new GlobIterator(CONTROLLERDIR . '/*.controller.php', FilesystemIterator::SKIP_DOTS);
+	$classes += scanFileSystemForControllers($glob);
+
+	$glob = new GlobIterator(ADDONSDIR . '/*/controllers/*.controller.php', FilesystemIterator::SKIP_DOTS);
+	$classes += scanFileSystemForControllers($glob, '\\ElkArte\\Addon\\');
+
+	$config_vars = array(array('select', 'front_page', $classes));
+	array_unshift($config_vars[0][2], $txt['default']);
+
+	foreach (array_keys($classes) as $class_name)
+	{
+		$options = $class_name::frontPageOptions();
+		if (!empty($options))
+			$config_vars = array_merge($config_vars, $options);
+	}
+
+	return $config_vars;
+}
+
+function scanFileSystemForControllers($iterator, $namespace = '')
+{
+	global $txt;
+
+	$types = array();
+
+	foreach ($iterator as $file)
+	{
+		$class_name = $namespace . preg_replace('~([^^])((?<=)[A-Z](?=[a-z]))~', '$1_$2', $file->getBasename('.controller.php')) . '_Controller';
+
+		if (!class_exists($class_name))
+		{
+			$class_name = $file->getBasename('.controller.php') . '_Controller';
+
+			if (!class_exists($class_name))
+				continue;
+		}
+
+		if ($class_name::canFrontPage())
+		{
+			// Temporary
+			if (!isset($txt[$class_name]))
+				continue;
+
+			$types[$class_name] = $txt[$class_name];
+		}
+	}
+
+	return $types;
+}
