@@ -234,7 +234,7 @@ function template_report()
 						<textarea id="report_comment" name="comment">', $context['comment_body'], '</textarea>
 					</dd>';
 
-	if ($context['require_verification'])
+	if (!empty($context['require_verification']))
 	{
 		template_verification_controls($context['visual_verification_id'], '
 					<dt>

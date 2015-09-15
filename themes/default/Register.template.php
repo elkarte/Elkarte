@@ -808,7 +808,7 @@ function template_contact_form()
 						<textarea id="contactmessage" name="contactmessage" cols="50" rows="10" tabindex="', $context['tabindex']++, '">', !empty($context['contactmessage']) ? $context['contactmessage'] : '', '</textarea>
 					</dd>';
 
-	if ($context['require_verification'])
+	if (!empty($context['require_verification']))
 	{
 		template_verification_controls($context['visual_verification_id'], '
 					<dt>

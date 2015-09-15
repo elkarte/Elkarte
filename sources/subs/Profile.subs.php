@@ -1622,7 +1622,7 @@ function isCustomFieldValid($field, $value)
 		return 'custom_field_too_long';
 
 	// Any masks to apply?
-	if ($field['type'] == 'text' && !empty($field['mask']) && $field['mask'] != 'none')
+	if ($field['field_type'] == 'text' && !empty($field['mask']) && $field['mask'] != 'none')
 	{
 		// @todo We never error on this - just ignore it at the moment...
 		if ($field['mask'] == 'email' && !isValidEmail($value))
