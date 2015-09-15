@@ -47,7 +47,8 @@ class PackageServers_Controller extends Action_Controller
 		loadLanguage('Packages');
 
 		// Use the PackageServers template.
-		loadTemplate('PackageServers', 'admin');
+		loadTemplate('PackageServers');
+		loadCSSFile('admin.css');
 
 		// Load request interface
 		$this->_req = HttpReq::instance();
@@ -75,7 +76,8 @@ class PackageServers_Controller extends Action_Controller
 		loadLanguage('Packages');
 
 		// Use the PackageServers template.
-		loadTemplate('PackageServers', 'admin');
+		loadTemplate('PackageServers');
+		loadCSSFile('admin.css');
 
 		$context['page_title'] = $txt['package_servers'];
 

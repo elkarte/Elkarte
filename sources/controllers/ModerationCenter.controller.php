@@ -75,7 +75,7 @@ class ModerationCenter_Controller extends Action_Controller
 
 		// Load the language, and the template.
 		loadLanguage('ModerationCenter');
-		loadTemplate(false, 'admin');
+		loadCSSFile('admin.css');
 
 		$context['admin_preferences'] = !empty($options['admin_preferences']) ? unserialize($options['admin_preferences']) : array();
 		$context['robot_no_index'] = true;
