@@ -90,7 +90,8 @@ h1, h2, h3, h4, h5, h6,
 ul, ol, li,
 dl, dd, dt,
 p, fieldset,
-form, input, button, select, .input_text, textarea, .editor {
+form, input, button, select, .input_text, textarea, input[type="checkbox"], input[type="radio"],
+.editor {
 	box-sizing: border-box;
 	margin: 0;
 	padding: 0;
@@ -98,18 +99,23 @@ form, input, button, select, .input_text, textarea, .editor {
 	font-size: 1em;
 }
 
-/* Declarations for specific elements. @todo - Maybe simplify - test. */
-.wrapper, div.content, .category_header, .generic_list_wrapper, #description_board .generalinfo,
-.roundframe, .description, .information, .successbox, .warningbox, .well,
-.submitbutton,
+/* Specific box-sizing declarations */
+/* @todo - Simplify - test. */
+.wrapper, div.content, .category_header, .generic_list_wrapper, #description_board,
+.description, .information, .successbox, .warningbox, .well,
+.submitbutton, .generalinfo, .topic_stats, .jump_to_header,
+#popularposts, #popularactivity,
 .grid8, .grid17, .grid20, .grid25, .grid30, .grid33, .grid50 {
 	box-sizing: border-box;
 }
 
 /* Collection of pseudo element clearfixes. */
-.category_header:after, .wrapper:after,
-#main_content_section:after, #main_container:after,
-.attachment_name:after, .editor_wrapper:after {
+.category_header:after,
+.wrapper:after,
+#main_content_section:after,
+#main_container:after,
+.attachment_name:after,
+.editor_wrapper:after {
 	display: block;
 	clear: both;
 	content: "";
@@ -175,11 +181,6 @@ textarea, .editor {
 }
 
 /* Declarations for inputs, selects and buttons */
-input[type="checkbox"],
-input[type="radio"] {
-	box-sizing: border-box;
-}
-
 input,
 .input_text,
 button,
@@ -282,13 +283,8 @@ input[type=submit][disabled]:hover, button[disabled], button[disabled]:hover {
 /* @todo - Might add extra fallbacks. Possibly monospace. */
 /* @todo - Also, look at deprecating spans here. */
 .new_posts, .require_approval {
-	font-weight: bold;
-	line-height: 1.12px;
-}
-
-.new_posts, .require_approval {
-	display: inline;
 	padding: 1px 4px 2px 4px;
+	font-weight: bold;
 	font-size: .643em;
 	font-family: verdana, sans-serif;
 }
@@ -494,8 +490,8 @@ em {
 .cat_img_piechart:before    {background-position: 0 -552px;}
 .cat_img_talk:before        {background-position: 0 -576px;}
 
-/* Upshrink image in the general category headers */
-#category_toggle, #category_toggle_more, #upshrink_header, .package_toggle {
+/* Expand/Collapse image in the various headers */
+.panel_toggle span {
 	position: relative;
 	display: block;
 	float: right;
@@ -503,7 +499,11 @@ em {
 	padding: 0 16px;
 }
 
-#category_toggle span, #category_toggle_more span, #upshrink_header span, .package_toggle span {
+.panel_toggle :after {
+	content: "\00a0";
+}
+
+.panel_toggle span span {
 	position: absolute;
 	top: 50%;
 	left: 50%;
@@ -998,7 +998,7 @@ a.bbc_link {
 	position: relative;
 	top: 4px;
 	margin: 0 0.6em 0 0;
-	max-width: 1.5em;
+	max-width: 2.0em;
 	max-height: 1.5em;
 }
 
@@ -1433,11 +1433,11 @@ a.bbc_link {
 /* Necessary for some browsers to keep the pages all on the same line */
 .linavPages {
 	float: left;
-	margin: 0px 4px 0px 0px;
+	margin: 0 4px 0 0;
 }
 
 .selectbox, .pagelinks {
-	margin: 5px 5px 0px;
+	margin: 5px 5px 0;
 	font-size: 0.857em;
 }
 
@@ -2053,7 +2053,6 @@ img.new_posts {
 .topic_stats {
 	display: table-cell;
 	float: right;
-	box-sizing: border-box;
 	padding: 0 16px 0 16px;
 	min-width: 14em;
 	text-align: right;
@@ -2201,7 +2200,6 @@ img.new_posts {
 }
 
 .jump_to_header {
-	box-sizing: border-box;
 	padding: 0 4px;
 	border: none;
 }
@@ -2287,9 +2285,9 @@ img.new_posts {
 }
 
 /* On to the posts */
-.forumposts {
+#forumposts {
 	clear: both;
-	margin: 8px 0 0 0;
+	margin: 6px 0 0 0;
 }
 
 /* Topic information */
@@ -2312,7 +2310,7 @@ img.new_posts {
 }
 
 /* Poster and postarea + moderation area underneath */
-.forumposts .content, .forumposts .approvebg, .core_posts {
+.forumposts .content, .forumposts .approvebg {
 	overflow: visible;
 	margin: 2px 0 0 0;
 }
@@ -2453,7 +2451,6 @@ img.new_posts {
 .post_wrapper {
 	display: block;
 	clear: both;
-	margin-top: 2px;
 	padding: 10px 0;
 	width: 100%;
 }
@@ -2628,6 +2625,7 @@ img.new_posts {
 /* @todo - Markup and CSS could be tweaked here. */
 #quickreplybox {
 	clear: both;
+	margin: 6px 0 0 0;
 }
 
 .editor_wrapper {
@@ -3434,14 +3432,12 @@ dl.merge_topic dd {
 	float: left;
 	width: 50%;
 	padding: 6px 3px 0 0;
-	box-sizing: border-box;
 }
 
 #popularactivity {
 	float: right;
 	width: 50%;
 	padding: 6px 0 0 3px;
-	box-sizing: border-box;
 }
 
 #popularposts div.content dt, #popularactivity div.content dt {
@@ -3771,9 +3767,10 @@ div.labels {
 #main_grid .days {
 	padding: 4px;
 	width: 14%;
+	vertical-align: top;
 }
 
-#main_grid .content.days {
+#main_grid td.days {
 	height: 100px;
 }
 
@@ -3786,12 +3783,8 @@ div.labels {
 	text-decoration: none;
 }
 
-#main_grid .days {
-	vertical-align: top;
-}
-
 .weeklist {
-	padding: 2px 0;
+	padding: 2px 0 0;
 	text-align: left;
 }
 

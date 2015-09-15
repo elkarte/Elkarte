@@ -277,7 +277,7 @@ function template_simple_message($msg)
 {
 	// @todo find a better name for $msg['date']
 	echo '
-			<div class="', $msg['class'], ' core_posts">', !empty($msg['counter']) ? '
+			<div class="', $msg['class'], ' forumposts">', !empty($msg['counter']) ? '
 				<div class="counter">' . $msg['counter'] . '</div>' : '', '
 				<div class="topic_details">
 					<h5>

@@ -226,8 +226,8 @@ function template_pick_boards($form_name, $input_names = 'brd', $select_all = tr
 
 	if ($select_all)
 		echo '
-						<h3 class="secondary_header">
-							<span id="category_toggle">&nbsp;
+						<h3 class="secondary_header panel_toggle">
+							<span>
 								<span id="advanced_panel_toggle" class="', $context['boards_check_all'] ? 'expand' : 'collapse', '" style="display: none;" title="', $txt['hide'], '"></span>
 							</span>
 							<a href="#" id="advanced_panel_link">', $txt['choose_board'], '</a>

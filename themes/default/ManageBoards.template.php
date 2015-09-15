@@ -51,7 +51,7 @@ function template_manage_boards()
 			<h2 class="category_header">
 				<a href="' . $scripturl . '?action=admin;area=manageboards;sa=cat;cat=' . $category['id'] . '">', $category['name'], '</a>
 				<a href="' . $scripturl . '?action=admin;area=manageboards;sa=cat;cat=' . $category['id'] . '">', $txt['catModify'], '</a>
-			</h3>';
+			</h2>';
 
 		// Boards table header.
 		echo '

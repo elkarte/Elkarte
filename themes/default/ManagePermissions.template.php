@@ -52,12 +52,12 @@ function template_permission_index()
 	if ($context['can_modify'])
 	{
 		echo '
-			<h2 class="category_header">
-				<span id="category_toggle">&nbsp;
+			<h2 class="category_header panel_toggle">
+				<span>
 					<span id="upshrink_ic" class="', empty($context['admin_preferences']['app']) ? 'collapse' : 'expand', '" style="display: none;" title="', $txt['hide'], '"></span>
 				</span>
 				<a href="#" id="permissions_panel_link">', $txt['permissions_advanced_options'], '</a>
-			</h3>
+			</h2>
 			<div id="permissions_panel_advanced">
 				<div class="content">
 					<fieldset>
@@ -463,7 +463,7 @@ function template_modify_group()
 				', $context['permission_type'] == 'membergroup' ? $txt['permissions_general'] : $txt['permissions_board'], ' - &quot;', $context['group']['name'], '&quot;';
 
 	echo '
-			</h3>
+			</h2>
 			<div class="flow_hidden">';
 
 	// Draw out the main bits.

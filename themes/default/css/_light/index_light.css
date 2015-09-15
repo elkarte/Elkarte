@@ -211,7 +211,7 @@ strong, .bbc_strong {
 }
 
 /* Single ones a bit darker than board index ones. */
-.forumposts .category_header, .content_category .category_header {
+.category_header, .content_category .category_header {
 	border-top: 1px solid #CFCFCF;
 	border-bottom: 1px solid #BBBBBB;
 	background: #E9E9E9;
@@ -1120,14 +1120,17 @@ div.bbc_footnotes .meaction {
 /* All styled the same in default variant, but available for fun and games. */
 
 /* The board categories and newsfader - some shared styling. */
-.forum_category, .forumposts, .content_category {
+.forum_category, .content_category {
 	border-radius: 4px 4px 0 0;
 	background: #DEEDDA;
 	box-shadow: 1px 2px 3px #EEEEEE;
 }
 
-.board_row, .childboard_row, .forumposts > li, .post_wrapper,
-.content_category > div, .content_category > li {
+.board_row,
+.childboard_row,
+.forumposts > li,
+.content_category > div,
+.content_category > li {
 	border: 1px solid #CFCFCF;
 	background: #FEFEFE;
 }
@@ -1269,7 +1272,7 @@ div.bbc_footnotes .meaction {
 	background: #FFFFE0;
 }
 
-.locked_row, .locked_row.core_posts {
+.locked_row {
 	background: #F4F4F4;
 }
 
@@ -1393,14 +1396,17 @@ div.bbc_footnotes .meaction {
 }
 
 /* On to the posts */
-.forumposts {
-	padding: 10px 0px;
-	border-radius: 4px 4px 0 0;
+#quickreplybox, #forumposts, #searchform, #recentposts {
+	background: #E5E5E5;
 	box-shadow: 1px 2px 4px #EEEEEE;
+	border-radius: 2px 2px 0 0;
+}
+.forumposts {
+	margin-top: 2px;
 }
 
 /* Poster and postarea + moderation area underneath */
-.forumposts, .forumposts .approvebg, .core_posts {
+.forumposts, .forumposts .approvebg {
 	border: 1px solid #DDDDDD;
 	border-bottom: 1px solid #CCCCCC;
 	background: #FEFEFE;
@@ -1910,6 +1916,8 @@ div.bbc_footnotes .meaction {
 .letter_row h3 {
 	border: 1px solid #CCCCCC;
 	border-radius: 6px 6px 0 0;
+	background: #EBEBEB;
+	background-image: linear-gradient(to bottom, #FAFAFA, #EAEAEA);
 }
 
 /* ------------------------------------------------------- */
@@ -2209,7 +2217,6 @@ div.bbc_footnotes .meaction {
 		border: 1px solid #BFBFBF;
 		border-radius: 3px;
 		background-color: #FAFAFA;
-		box-shadow: 3px 3px 6px #E4E4E4;
 	}
 
 	.forum_category, .forumposts, .content_category {

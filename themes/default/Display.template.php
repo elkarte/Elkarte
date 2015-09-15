@@ -46,7 +46,7 @@ function template_messages_informations_above()
 
 	// Show the topic information - icon, subject, etc.
 	echo '
-		<div id="forumposts" class="forumposts">
+		<div id="forumposts">
 			<h2 class="category_header">
 				<img src="', $settings['images_url'], '/topic/', $context['class'], '.png" alt="" />
 				', $txt['topic'], ': ', $context['subject'], '&nbsp;<span class="views_text">(', $context['num_views_text'], ')</span>
@@ -55,7 +55,7 @@ function template_messages_informations_above()
 					!empty($context['links']['go_next']) ? ' - <a href="' . $context['links']['go_next'] . '">' . $txt['previous_next_forward'] . '</a>' : '',
 					!empty($context['links']['derived_from']) ? ' - <a href="' . $context['links']['derived_from'] . '">' . sprintf($txt['topic_derived_from'], '<em>' . Util::shorten_text($context['topic_derived_from']['subject'], $modSettings['subject_length'])) . '</em></a>' : '',
 				'</span>
-			</h3>';
+			</h2>';
 
 	if (!empty($settings['display_who_viewing']) || !empty($context['topic_redirected_from']))
 	{
@@ -89,7 +89,7 @@ function template_messages_informations_above()
 	}
 
 	echo '
-			<form action="', $scripturl, '?action=quickmod2;topic=', $context['current_topic'], '.', $context['start'], '" method="post" accept-charset="UTF-8" name="quickModForm" id="quickModForm" onsubmit="return oQuickModify.bInEditMode ? oQuickModify.modifySave(\'' . $context['session_id'] . '\', \'' . $context['session_var'] . '\') : false">';
+			<form class="forumposts" action="', $scripturl, '?action=quickmod2;topic=', $context['current_topic'], '.', $context['start'], '" method="post" accept-charset="UTF-8" name="quickModForm" id="quickModForm" onsubmit="return oQuickModify.bInEditMode ? oQuickModify.modifySave(\'' . $context['session_id'] . '\', \'' . $context['session_var'] . '\') : false">';
 }
 
 /**
@@ -405,16 +405,16 @@ function template_quickreply_below()
 	{
 		echo '
 			<a id="quickreply"></a>
-			<div class="forumposts" id="quickreplybox">
-				<h2 class="category_header">
-					<span id="category_toggle">&nbsp;
+			<div id="quickreplybox">
+				<h2 class="category_header category_toggle">
+					<span>
 						<a href="javascript:oQuickReply.swap();">
 							<span id="quickReplyExpand" class="', empty($context['minmax_preferences']['qreply']) ? 'collapse' : 'expand', '" title="', $txt['hide'], '"></span>
 						</a>
 					</span>
 					<a href="javascript:oQuickReply.swap();">', $txt['quick_reply'], '</a>
-				</h3>
-				<div id="quickReplyOptions"', empty($context['minmax_preferences']['qreply']) ? '' : ' style="display: none"', '>
+				</h2>
+				<div id="quickReplyOptions" class="forumposts content"', empty($context['minmax_preferences']['qreply']) ? '' : ' style="display: none"', '>
 					<div class="editor_wrapper">
 						', $context['is_locked'] ? '<p class="alert smalltext">' . $txt['quick_reply_warning'] . '</p>' : '',
 						$context['oldTopicError'] ? '<p class="alert smalltext">' . sprintf($txt['error_old_topic'], $modSettings['oldTopicDays']) . '</p>' : '', '

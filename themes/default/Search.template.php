@@ -272,7 +272,7 @@ function template_results()
 	echo '
 					</span>
 					', $txt['mlist_search_results'], ':&nbsp;', $context['search_params']['search'], '
-				</h3>';
+				</h2>';
 
 	// Was anything even found?
 	if (!empty($context['topics']))
@@ -286,7 +286,7 @@ function template_results()
 				<ul class="topic_listing compact_view search_results_posts">';
 	else
 		echo '
-				<ul class="core_posts topic_listing search_results_posts">';
+				<ul class="forumposts topic_listing search_results_posts">';
 
 	// While we have results to show ...
 	$controller = $context['get_topics'][0];

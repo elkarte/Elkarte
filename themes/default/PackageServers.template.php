@@ -152,10 +152,12 @@ function template_package_list()
 		{
 			echo '
 					<li>
-						<span class="package_toggle">&nbsp;
-							<span id="ps_img_', $i, '" class="collapse" style="display: none;" title="', $txt['hide'], '"></span>
-						</span>
-						<a href="#" id="upshrink_link_', $i, '" class="highlight">', $packageSection['title'], '</a>';
+						<p class="panel_toggle">
+							<span>
+								<span id="ps_img_', $i, '" class="collapse" style="display: none;" title="', $txt['hide'], '"></span>
+							</span>
+							<a href="#" id="upshrink_link_', $i, '" class="highlight">', $packageSection['title'], '</a>
+						</p>';
 
 			if (!empty($packageSection['text']))
 				echo '
