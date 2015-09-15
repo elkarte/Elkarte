@@ -109,7 +109,8 @@ function create_post_draft($draft)
 		'body' => (!empty($modSettings['max_messageLength']) && $modSettings['max_messageLength'] > 65534 ? 'string-' . $modSettings['max_messageLength'] : 'string-65534'),
 		'icon' => 'string-16',
 		'locked' => 'int',
-		'is_sticky' => 'int'
+		'is_sticky' => 'int',
+		'is_usersaved' => 'int'
 	);
 	$draft_parameters = array(
 		$draft['topic_id'],
@@ -122,7 +123,8 @@ function create_post_draft($draft)
 		$draft['body'],
 		$draft['icon'],
 		$draft['locked'],
-		$draft['sticky']
+		$draft['sticky'],
+		$draft['is_usersaved']
 	);
 	$db->insert('',
 		'{db_prefix}user_drafts',
@@ -159,6 +161,7 @@ function modify_post_draft($draft)
 			icon = {string:icon},
 			locked = {int:locked},
 			is_sticky = {int:is_sticky}
+			is_usersaved = {int:is_usersaved},
 		WHERE id_draft = {int:id_draft}',
 		array(
 			'id_topic' => $draft['topic_id'],
@@ -171,6 +174,7 @@ function modify_post_draft($draft)
 			'locked' => $draft['locked'],
 			'is_sticky' => $draft['sticky'],
 			'id_draft' => $draft['id_draft'],
+			'is_usersaved' => $draft['is_usersaved'],
 		)
 	);
 }
@@ -407,24 +411,17 @@ function getOldDrafts($days)
  *
  * @package Drafts
  */
-function saveDraft()
+function saveDraft($draft, $check_last_save = false, $id_topic = 0)
 {
 	global $context, $user_info, $modSettings, $board;
 
-	// Ajax calling
-	if (!isset($context['drafts_save']))
-		$context['drafts_save'] = !empty($modSettings['drafts_enabled']) && !empty($modSettings['drafts_post_enabled']) && allowedTo('post_draft');
-
-	// Can you be, should you be ... here?
-	if (empty($context['drafts_save']) || !isset($_POST['save_draft']) || !isset($_POST['id_draft']))
-		return false;
+	$id_draft = $draft['id_draft'];
 
 	// Read in what they sent, if anything
-	$id_draft = empty($_POST['id_draft']) ? 0 : (int) $_POST['id_draft'];
 	$draft_info = loadDraft($id_draft);
 
 	// If a draft has been saved less than 5 seconds ago, let's not do the autosave again
-	if (isset($_REQUEST['xml']) && !empty($draft_info['poster_time']) && time() < $draft_info['poster_time'] + 5)
+	if (!empty($check_last_save) && !empty($draft_info['poster_time']) && time() < $draft_info['poster_time'] + 5)
 	{
 		// Since we were called from the autosave function, send something back
 		if (!empty($id_draft))
@@ -443,24 +440,13 @@ function saveDraft()
 	// Be ready for surprises
 	$post_errors = Error_Context::context('post', 1);
 
-	// Prepare and clean the data, load the draft array
-	$draft = array(
-		'id_draft' => $id_draft,
-		'topic_id' => empty($_REQUEST['topic']) ? 0 : (int) $_REQUEST['topic'],
-		'board' => $board,
-		'icon' => empty($_POST['icon']) ? 'xx' : preg_replace('~[\./\\\\*:"\'<>]~', '', $_POST['icon']),
-		'smileys_enabled' => isset($_POST['ns']) ? 0 : 1,
-		'locked' => isset($_POST['lock']) ? (int) $_POST['lock'] : 0,
-		'sticky' => isset($_POST['sticky']) ? (int) $_POST['sticky'] : 0,
-		'subject' => strtr(Util::htmlspecialchars($_POST['subject']), array("\r" => '', "\n" => '', "\t" => '')),
-		'body' => Util::htmlspecialchars($_POST['message'], ENT_QUOTES, 'UTF-8', true),
-		'id_member' => $user_info['id'],
-	);
-
 	// The message and subject still need a bit more work
 	preparsecode($draft['body']);
 	if (Util::strlen($draft['subject']) > 100)
 		$draft['subject'] = Util::substr($draft['subject'], 0, 100);
+
+	if (!isset($draft['is_usersaved']))
+		$draft['is_usersaved'] = 0;
 
 	// Modifying an existing draft, like hitting the save draft button or autosave enabled?
 	if (!empty($id_draft) && !empty($draft_info))
@@ -486,11 +472,8 @@ function saveDraft()
 			$post_errors->addError('draft_not_saved');
 	}
 
-	// Cleanup
-	unset($_POST['save_draft']);
-
 	// If we were called from the autosave function, send something back
-	if (!empty($id_draft) && isset($_REQUEST['xml']) && !$post_errors->hasError('session_timeout'))
+	if (!empty($id_draft) && $check_last_save && !$post_errors->hasError('session_timeout'))
 	{
 		loadTemplate('Xml');
 		$context['sub_template'] = 'xml_draft';

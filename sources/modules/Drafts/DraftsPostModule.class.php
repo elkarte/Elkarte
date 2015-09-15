@@ -125,10 +125,39 @@ class Drafts_Post_Module implements ElkArte\sources\modules\Module_Interface
 
 	public function before_save_post()
 	{
+		global $context, $modSettings, $board, $user_info;
+
 		// If drafts are enabled, then pass this off
 		if (isset($_POST['save_draft']))
 		{
-			saveDraft();
+			// Ajax calling
+			if (!isset($context['drafts_save']))
+				$context['drafts_save'] = !empty($modSettings['drafts_enabled']) && !empty($modSettings['drafts_post_enabled']) && allowedTo('post_draft');
+
+			// Can you be, should you be ... here?
+			if (!empty($context['drafts_save']) && isset($_POST['id_draft']))
+			{
+				// Prepare and clean the data, load the draft array
+				$draft = array(
+					'id_draft' => empty($_POST['id_draft']) ? 0 : (int) $_POST['id_draft'],
+					'topic_id' => empty($_REQUEST['topic']) ? 0 : (int) $_REQUEST['topic'],
+					'board' => $board,
+					'icon' => empty($_POST['icon']) ? 'xx' : preg_replace('~[\./\\\\*:"\'<>]~', '', $_POST['icon']),
+					'smileys_enabled' => isset($_POST['ns']) ? 0 : 1,
+					'locked' => isset($_POST['lock']) ? (int) $_POST['lock'] : 0,
+					'sticky' => isset($_POST['sticky']) ? (int) $_POST['sticky'] : 0,
+					'subject' => strtr(Util::htmlspecialchars($_POST['subject']), array("\r" => '', "\n" => '', "\t" => '')),
+					'body' => Util::htmlspecialchars($_POST['message'], ENT_QUOTES, 'UTF-8', true),
+					'id_member' => $user_info['id'],
+					'is_usersaved' => 1,
+				);
+
+				saveDraft($draft, isset($_REQUEST['xml']));
+
+				// Cleanup
+				unset($_POST['save_draft']);
+			}
+
 			throw new Controller_Redirect_Exception('Post_Controller', 'action_post');
 		}
 	}

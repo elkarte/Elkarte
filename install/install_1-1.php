@@ -2746,6 +2746,7 @@ class InstallInstructions_install_1_1
 				array('name' => 'locked',          'type' => 'tinyint', 'size' => 4, 'default' => 0),
 				array('name' => 'is_sticky',       'type' => 'tinyint', 'size' => 4, 'default' => 0),
 				array('name' => 'to_list',         'type' => 'varchar', 'size' => 255, 'default' => ''),
+				array('name' => 'is_usersaved',    'type' => 'tinyint', 'size' => 4, 'default' => 0),
 			),
 			array(
 				array('name' => 'id_draft',  'columns' => array('id_draft'), 'type' => 'primary'),
