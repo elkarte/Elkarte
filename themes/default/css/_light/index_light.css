@@ -1915,6 +1915,8 @@ div.bbc_footnotes .meaction {
 .letter_row h3 {
 	border: 1px solid #CCCCCC;
 	border-radius: 6px 6px 0 0;
+	background: #EBEBEB;
+	background-image: linear-gradient(to bottom, #FAFAFA, #EAEAEA);
 }
 
 /* ------------------------------------------------------- */
