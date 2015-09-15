@@ -982,7 +982,8 @@ class ManageMaillist_Controller extends Action_Controller
 
 		// Load and show
 		Email_Settings::prepare_db($config_vars);
-		loadTemplate('Admin', 'admin');
+		loadTemplate('Admin');
+		loadCSSFile('admin.css');
 		$context['sub_template'] = 'show_settings';
 	}
 
@@ -1371,7 +1372,8 @@ class ManageMaillist_Controller extends Action_Controller
 
 		// prep it, load it, show it
 		Email_Settings::prepare_db($config_vars);
-		loadTemplate('Admin', 'admin');
+		loadTemplate('Admin');
+		loadCSSFile('admin.css');
 		$context['sub_template'] = 'show_settings';
 	}
 
@@ -1433,7 +1435,8 @@ class ManageMaillist_Controller extends Action_Controller
 
 		// Templates and language
 		loadLanguage('Admin');
-		loadTemplate('Admin', 'admin');
+		loadTemplate('Admin');
+		loadCSSFile('admin.css');
 
 		// Load any existing email => board values used for new topic creation
 		$context['maillist_from_to_board'] = array();

@@ -1888,6 +1888,7 @@ function requireTemplate($template_name, $style_sheets, $fatal)
 	// Any specific template style sheets to load?
 	if (!empty($style_sheets))
 	{
+		trigger_error('Use of loadTemplate to add style sheets to the head is deprecated.', E_USER_DEPRECATED);
 		$sheets = array();
 		foreach ($style_sheets as $sheet)
 		{

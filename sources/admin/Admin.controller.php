@@ -67,7 +67,8 @@ class Admin_Controller extends Action_Controller
 
 		// Load the language and templates....
 		loadLanguage('Admin');
-		loadTemplate('Admin', 'admin');
+		loadTemplate('Admin');
+		loadCSSFile('admin.css');
 		loadJavascriptFile('admin.js', array(), 'admin_script');
 
 		// The Admin functions require Jquery UI ....

@@ -108,7 +108,8 @@ class Packages_Controller extends Action_Controller
 
 		// Load all the basic stuff.
 		loadLanguage('Packages');
-		loadTemplate('Packages', 'admin');
+		loadTemplate('Packages');
+		loadCSSFile('admin.css');
 		$context['page_title'] = $txt['package'];
 
 		// Delegation makes the world... that is, the package manager go 'round.
