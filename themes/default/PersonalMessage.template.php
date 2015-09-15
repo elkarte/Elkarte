@@ -929,7 +929,7 @@ function template_send()
 					', template_control_richedit($context['post_box_name'], 'smileyBox_message', 'bbcBox_message');
 
 	// Require an image to be typed to save spamming?
-	if ($context['require_verification'])
+	if (!empty($context['require_verification']))
 		template_verification_controls($context['visual_verification_id'], '
 					<div class="post_verification">
 						<strong>' . $txt['pm_visual_verification_label'] . ':</strong>
