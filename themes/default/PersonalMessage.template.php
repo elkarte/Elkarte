@@ -50,7 +50,7 @@ function template_pm_above()
 								<span class="', $context['limit_bar']['percent'] > 85 ? 'full' : ($context['limit_bar']['percent'] > 40 ? 'filled' : 'empty'), '" style="width: ', $context['limit_bar']['percent'] / 10, 'em;"></span>
 							</span>
 							<span class="floatright', $context['limit_bar']['percent'] > 90 ? ' alert' : '', '">', $context['limit_bar']['text'], '</span>
-						</h3>';
+						</h2>';
 
 	// Message sent? Show a small indication.
 	if (isset($context['pm_sent']))

@@ -191,7 +191,7 @@ function template_list_themes()
 						<a class="hdicon cat_img_helptopics help floatleft" href="'. $scripturl . '?action=quickhelp;help=themeadmin_delete_help" onclick="return reqOverlayDiv(this.href);" id="themeadmin_delete_help" title="' . $txt['help'] . '"></a>';
 
 		echo '
-				</h3>
+				</h2>
 				<dl class="content settings themes_list">
 					<dt><a href="', $scripturl, '?action=admin;area=theme;th=', $theme['id'], ';', $context['session_var'], '=', $context['session_id'], ';sa=list" class="linkbutton floatleft">', $txt['theme_edit_settings'], '</a></dt>
 					<dt>', $txt['themeadmin_list_theme_dir'], '</dt>

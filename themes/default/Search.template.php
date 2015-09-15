@@ -272,7 +272,7 @@ function template_results()
 	echo '
 					</span>
 					', $txt['mlist_search_results'], ':&nbsp;', $context['search_params']['search'], '
-				</h3>';
+				</h2>';
 
 	// Was anything even found?
 	if (!empty($context['topics']))

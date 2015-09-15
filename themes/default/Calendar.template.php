@@ -422,7 +422,7 @@ function template_show_week_grid($grid_name)
 
 		echo '
 					<a href="', $scripturl, '?action=calendar;month=', $month_data['current_month'], ';year=', $month_data['current_year'], '">', $txt['months_titles'][$month_data['current_month']], ' ', $month_data['current_year'], '</a>', empty($done_title) && !empty($calendar_data['week_number']) ? (' - ' . $txt['calendar_week'] . ' ' . $calendar_data['week_number']) : '', '
-				</h3>';
+				</h2>';
 
 		$done_title = true;
 
