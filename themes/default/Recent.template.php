@@ -33,7 +33,7 @@ function template_recent()
 	template_pagesection();
 
 	echo '
-		<div id="recentposts" class="forumposts">
+		<div id="recentposts" >
 			<h2 class="category_header hdicon cat_img_posts">', $txt['recent_posts'], '</h2>';
 
 	foreach ($context['posts'] as $post)

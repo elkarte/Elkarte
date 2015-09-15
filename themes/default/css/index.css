@@ -1433,11 +1433,11 @@ a.bbc_link {
 /* Necessary for some browsers to keep the pages all on the same line */
 .linavPages {
 	float: left;
-	margin: 0px 4px 0px 0px;
+	margin: 0 4px 0 0;
 }
 
 .selectbox, .pagelinks {
-	margin: 5px 5px 0px;
+	margin: 5px 5px 0;
 	font-size: 0.857em;
 }
 
@@ -2310,7 +2310,7 @@ img.new_posts {
 }
 
 /* Poster and postarea + moderation area underneath */
-.forumposts .content, .forumposts .approvebg, .core_posts {
+.forumposts .content, .forumposts .approvebg {
 	overflow: visible;
 	margin: 2px 0 0 0;
 }

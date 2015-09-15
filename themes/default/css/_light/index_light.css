@@ -1272,7 +1272,7 @@ div.bbc_footnotes .meaction {
 	background: #FFFFE0;
 }
 
-.locked_row, .locked_row.core_posts {
+.locked_row {
 	background: #F4F4F4;
 }
 
@@ -1396,16 +1396,17 @@ div.bbc_footnotes .meaction {
 }
 
 /* On to the posts */
-#quickreplybox, #forumposts, #searchform {
+#quickreplybox, #forumposts, #searchform, #recentposts {
 	background: #E5E5E5;
 	box-shadow: 1px 2px 4px #EEEEEE;
+	border-radius: 2px 2px 0 0;
 }
-.forumposts{
+.forumposts {
 	margin-top: 2px;
 }
 
 /* Poster and postarea + moderation area underneath */
-.forumposts, .forumposts .approvebg, .core_posts {
+.forumposts, .forumposts .approvebg {
 	border: 1px solid #DDDDDD;
 	border-bottom: 1px solid #CCCCCC;
 	background: #FEFEFE;
