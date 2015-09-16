@@ -180,12 +180,6 @@ function template_unread()
 		if ($context['showCheckboxes'])
 			echo '
 					</form>';
-
-		template_pagesection('recent_buttons', 'right');
-
-		echo '
-					<div id="topic_icons" class="description">', template_basicicons_legend(), '
-					</div>';
 	}
 	else
 		echo '
