@@ -90,7 +90,7 @@ function template_folder()
 	if ($context['get_pmessage']('message', true))
 	{
 		echo '
-					<div class="forumposts">';
+					<div id="forumposts">';
 
 		while ($message = $context['get_pmessage']('message'))
 		{
@@ -104,10 +104,9 @@ function template_folder()
 				$start = false;
 			}
 
-			$window_class ='content';
-
 			echo '
-						<a class="pm_anchor" id="msg_', $message['id'], '"></a><div class="', $window_class, '">';
+						<a class="pm_anchor" id="msg_', $message['id'], '"></a>
+						<div class="forumposts">';
 
 			// Showing the sidebar posting area?
 			if (empty($options['hide_poster_area']))
