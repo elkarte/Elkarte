@@ -1569,7 +1569,7 @@ a.bbc_link {
 	font-size: 1em;
 }
 
-.table_head > th.centertext {
+.table_head > th.centertext, .table_head > td.centertext {
 	text-align: center;
 }
 
@@ -1585,10 +1585,6 @@ a.bbc_link {
 
 .table_grid .statsbar div {
 	display: none;
-}
-
-.table_grid textarea {
-	width: 100%;
 }
 
 .sort_by_item .sort, .sort {
@@ -2552,18 +2548,17 @@ img.new_posts {
 
 .attachments .attachment {
 	display: inline-block;
+	box-sizing: border-box;
 	padding: 6px 8px;
-	min-width: 22%;
+	width: 24%;
 }
 
-.attachment_thumb {
+.attachment_thumb, .attachment_name {
+	display: block;
 	margin: 0 auto;
 	text-align: center;
-}
-
-/* @todo - Look at deprecating this hr. */
-.attachments hr {
-	clear: both;
+	word-break: break-all;
+	word-wrap: break-word;
 }
 
 /* Separator of posts. More useful in the print stylesheet. */
@@ -3160,15 +3155,13 @@ dl.merge_topic dd {
 	padding-top: 8px;
 }
 
-#profilecenter, #unwatched_topics, #profile_attachments {
+#profile_attachments, .profile_center {
 	overflow: auto;
 	margin: 12px 0 0 0;
 	padding: 8px 8px 16px 8px;
 }
 
-#profilecenter .content,
-#profile_attachments .content,
-#unwatched_topics .content {
+#profile_attachments .content {
 	overflow: visible;
 	padding: 0.2em 1em;
 }
@@ -3213,29 +3206,10 @@ dl.merge_topic dd {
 	margin-right: 5px;
 }
 
-.profile_attachments {
-	margin: 0 auto;
-	width: 95%;
-	border: 0;
-	border-spacing: 1em;
-	table-layout: fixed;
-	font-size: 0.857em;
-}
-
-.profile_attachments td, .profile_attachments th {
-	padding: 5px 4px;
-	vertical-align: top;
-	text-align: center;
-}
-
-.profile_attachment a img {
-	max-width: 120px;
-	max-height: 120px;
-}
-
 .vcard .avatar {
 	max-width: 40px;
 	max-height: 40px;
+	padding-top: 4px;
 }
 
 .attach_title {
@@ -4892,23 +4866,6 @@ dl.no_members {
 	.elk_previewvideo {
 		max-width: 100%;
 	}
-
-	.profile_attachments {
-		margin: 0 0.5em;
-		width: auto;
-		text-align: center;
-	}
-
-	.profile_attachments tr {
-		display: inline;
-	}
-
-	.profile_attachments .profile_attachment {
-		display: inline-block;
-		margin: 5px;
-		width: 129px;
-		height: 149px;
-	}
 }
 
 /* This one does 800 screens at default font size. */
@@ -5581,15 +5538,6 @@ dl.no_members {
 		float: none;
 		overflow: auto;
 		width: 100%;
-	}
-
-	.profile_attachments .profile_attachment {
-		width: 100px;
-	}
-
-	.profile_attachment a img {
-		max-width: 100px;
-		max-height: 100px;
 	}
 
 	.pagesection div.floatright {
