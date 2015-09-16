@@ -178,7 +178,7 @@ class Drafts_PersonalMessage_Module implements ElkArte\sources\modules\Module_In
 					'body' => Util::htmlspecialchars($_POST['message'], ENT_QUOTES, 'UTF-8', true),
 					'subject' => strtr(Util::htmlspecialchars($_POST['subject']), array("\r" => '', "\n" => '', "\t" => '')),
 					'id_member' => $user_info['id'],
-					'is_usersaved' => 1,
+					'is_usersaved' => (int) empty($_REQUEST['autosave']),
 				);
 
 				if (isset($_REQUEST['xml']))

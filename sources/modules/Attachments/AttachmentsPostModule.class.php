@@ -65,10 +65,17 @@ class Attachments_Post_Module implements ElkArte\sources\modules\Module_Interfac
 				array('prepare_save_post', array('Attachments_Post_Module', 'prepare_save_post'), array('post_errors')),
 				array('pre_save_post', array('Attachments_Post_Module', 'pre_save_post'), array('msgOptions')),
 				array('after_save_post', array('Attachments_Post_Module', 'after_save_post'), array('msgOptions')),
+
+				array('before_save_draft', array('Attachments_Post_Module', 'before_save_draft'), array('draft')),
 			);
 		}
 		else
 			return array();
+	}
+
+	public function before_save_draft($draft)
+	{
+		$this->saveAttachments(isset($_REQUEST['id_draft']) ? (int) $_REQUEST['id_draft'] : 0);
 	}
 
 	public function prepare_post()
@@ -293,6 +300,11 @@ class Attachments_Post_Module implements ElkArte\sources\modules\Module_Interfac
 
 	public function prepare_save_post($post_errors)
 	{
+		$this->saveAttachments(isset($_REQUEST['msg']) ? $_REQUEST['msg'] : 0);
+	}
+
+	protected function saveAttachments($msg)
+	{
 		global $user_info, $context, $modSettings;
 
 		$this->_attach_errors = Attachment_Error_Context::context();
@@ -324,12 +336,12 @@ class Attachments_Post_Module implements ElkArte\sources\modules\Module_Interfac
 				}
 			}
 
-			if (!empty($_REQUEST['msg']))
+			if (!empty($msg))
 			{
 				require_once(SUBSDIR . '/ManageAttachments.subs.php');
 				$attachmentQuery = array(
 					'attachment_type' => 0,
-					'id_msg' => (int) $_REQUEST['msg'],
+					'id_msg' => (int) $msg,
 					'not_id_attach' => $keep_ids,
 				);
 				removeAttachments($attachmentQuery);
@@ -341,8 +353,8 @@ class Attachments_Post_Module implements ElkArte\sources\modules\Module_Interfac
 		if ($context['attachments']['can']['post'] && empty($_POST['from_qr']))
 		{
 			require_once(SUBSDIR . '/Attachments.subs.php');
-			if (isset($_REQUEST['msg']))
-				processAttachments((int) $_REQUEST['msg']);
+			if (!empty($msg))
+				processAttachments((int) $msg);
 			else
 				processAttachments();
 		}

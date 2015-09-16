@@ -200,7 +200,7 @@ function load_draft($id_draft, $uid, $type = 0, $drafts_keep_days = 0, $check = 
 	// Load in a draft from the DB
 	$request = $db->query('', '
 		SELECT id_draft, id_topic, id_board, id_reply, type, poster_time, id_member, subject,
-			smileys_enabled, body, icon, locked, is_sticky, to_list
+			smileys_enabled, body, icon, locked, is_sticky, to_list, is_usersaved
 		FROM {db_prefix}user_drafts
 		WHERE id_draft = {int:id_draft}' . ($check ? '
 			AND id_member = {int:id_member}' : '') . '
@@ -452,6 +452,9 @@ function saveDraft($draft, $check_last_save = false, $id_topic = 0)
 	if (!isset($draft['is_usersaved']))
 		$draft['is_usersaved'] = 0;
 
+	if ($draft_info['is_usersaved'] == 1)
+		$draft['is_usersaved'] = 1;
+
 	// Modifying an existing draft, like hitting the save draft button or autosave enabled?
 	if (!empty($id_draft) && !empty($draft_info))
 	{
@@ -536,6 +539,9 @@ function savePMDraft($recipientList, $draft, $check_last_save = false)
 
 	if (!isset($draft['is_usersaved']))
 		$draft['is_usersaved'] = 0;
+
+	if ($draft_info['is_usersaved'] == 1)
+		$draft['is_usersaved'] = 1;
 
 	// Modifying an existing PM draft?
 	if (!empty($id_pm_draft) && !empty($draft_info))

@@ -152,7 +152,7 @@ class Drafts_Post_Module implements ElkArte\sources\modules\Module_Interface
 					'subject' => strtr(Util::htmlspecialchars($_POST['subject']), array("\r" => '', "\n" => '', "\t" => '')),
 					'body' => Util::htmlspecialchars($_POST['message'], ENT_QUOTES, 'UTF-8', true),
 					'id_member' => $user_info['id'],
-					'is_usersaved' => 1,
+					'is_usersaved' => (int) empty($_REQUEST['autosave']),
 				);
 
 				self::$_eventsManager->trigger('before_save_draft', array('draft' => &$draft));

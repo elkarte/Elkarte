@@ -134,6 +134,7 @@ elk_DraftAutoSave.prototype.draftSave = function()
 		'message=' + sPostdata.replace(/&#/g, "&#38;#").php_urlencode(),
 		'icon=' + document.forms.postmodify['icon'].value.replace(/&#/g, "&#38;#").php_urlencode(),
 		'save_draft=true',
+		'autosave=true',
 		elk_session_var + '=' + elk_session_id
 	];
 
