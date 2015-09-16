@@ -2567,7 +2567,7 @@ img.new_posts {
 }
 
 /* Separator of posts. More useful in the print stylesheet. */
-.forumposts .post_separator {
+.post_separator {
 	display: none;
 }
 
@@ -4086,7 +4086,7 @@ a.help .icon {
 
 /* The basic search section. */
 #simple_search, #advanced_search {
-	margin: 4px 0 0 0;
+	margin: 2px 0 0 0;
 	padding: 8px 0;
 	text-align: center;
 }
@@ -4131,6 +4131,7 @@ a.help .icon {
 #pick_boards .submitbutton {
 	width: 100%;
 }
+
 
 /* The search results page. @todo - Duplicated in the .table_grid code? */
 

@@ -860,169 +860,167 @@ function template_send()
 
 	// Main message editing box.
 	echo '
-	<form action="', $scripturl, '?action=pm;sa=send2" method="post" accept-charset="UTF-8" name="pmFolder" id="pmFolder" class="flow_hidden" onsubmit="submitonce(this);smc_saveEntities(\'pmFolder\', [\'subject\', \'message\']);">
-		<div class="forumposts">
-			<h2 class="category_header hdicon cat_img_write">
-				', $txt['new_message'], '
-			</h2>';
+	<form id="pmFolder" action="', $scripturl, '?action=pm;sa=send2" method="post" accept-charset="UTF-8" name="pmFolder" onsubmit="submitonce(this);smc_saveEntities(\'pmFolder\', [\'subject\', \'message\']);">
+		<h2 class="category_header hdicon cat_img_write">
+			', $txt['new_message'], '
+		</h2>';
 
 	echo '
-			<div class="content">
-				<div class="editor_wrapper">';
+		<div class="content forumposts">
+			<div class="editor_wrapper">';
 
 	// If there were errors for sending the PM, show them.
 	template_show_error('post_error');
 
 	if (!empty($modSettings['drafts_pm_enabled']))
 		echo '
-					<div id="draft_section" class="successbox"', isset($context['draft_saved']) ? '' : ' style="display: none;"', '>',
-		sprintf($txt['draft_pm_saved'], $scripturl . '?action=pm;sa=showpmdrafts'), '
-					</div>';
+				<div id="draft_section" class="successbox"', isset($context['draft_saved']) ? '' : ' style="display: none;"', '>',
+					sprintf($txt['draft_pm_saved'], $scripturl . '?action=pm;sa=showpmdrafts'), '
+				</div>';
 
 	echo '
-					<dl id="post_header">';
+				<dl id="post_header">';
 
 	// To and bcc. Include a button to search for members.
 	echo '
-						<dt>
-							<label for="to_control"', (isset($context['post_error']['no_to']) || isset($context['post_error']['bad_to']) ? ' class="error"' : ''), ' id="caption_to">', $txt['pm_to'], ':</label>
-						</dt>';
+					<dt>
+						<label for="to_control"', (isset($context['post_error']['no_to']) || isset($context['post_error']['bad_to']) ? ' class="error"' : ''), ' id="caption_to">', $txt['pm_to'], ':</label>
+					</dt>';
 
 	// Autosuggest will be added by the javascript later on.
 	echo '
-						<dd id="pm_to" class="clear_right">
-							<input type="text" name="to" id="to_control" value="', $context['to_value'], '" tabindex="', $context['tabindex']++, '" size="40" style="width: 130px;" class="input_text" />';
+					<dd id="pm_to" class="clear_right">
+						<input type="text" name="to" id="to_control" value="', $context['to_value'], '" tabindex="', $context['tabindex']++, '" size="40" style="width: 130px;" class="input_text" />';
 
 	// A link to add BCC, only visible with javascript enabled.
 	echo '
-							<span class="smalltext" id="bcc_link_container" style="display: none;"></span>';
+						<span class="smalltext" id="bcc_link_container" style="display: none;"></span>';
 
 	// A div that'll contain the items found by the autosuggest.
 	echo '
-							<div id="to_item_list_container"></div>';
+						<div id="to_item_list_container"></div>';
 
 	echo '
-						</dd>';
+					</dd>';
 
 	// This BCC row will be hidden by default if javascript is enabled.
 	echo '
-						<dt  class="clear_left" id="bcc_div">
-							<label for="bcc_control"', (isset($context['post_error']['no_to']) || isset($context['post_error']['bad_bcc']) ? ' class="error"' : ''), ' id="caption_bbc">', $txt['pm_bcc'], ':</label>
-						</dt>
-						<dd id="bcc_div2">
-							<input type="text" name="bcc" id="bcc_control" value="', $context['bcc_value'], '" tabindex="', $context['tabindex']++, '" size="40" style="width: 130px;" class="input_text" />
-							<div id="bcc_item_list_container"></div>
-						</dd>';
+					<dt  class="clear_left" id="bcc_div">
+						<label for="bcc_control"', (isset($context['post_error']['no_to']) || isset($context['post_error']['bad_bcc']) ? ' class="error"' : ''), ' id="caption_bbc">', $txt['pm_bcc'], ':</label>
+					</dt>
+					<dd id="bcc_div2">
+						<input type="text" name="bcc" id="bcc_control" value="', $context['bcc_value'], '" tabindex="', $context['tabindex']++, '" size="40" style="width: 130px;" class="input_text" />
+						<div id="bcc_item_list_container"></div>
+					</dd>';
 
 	// The subject of the PM.
 	echo '
-						<dt class="clear_left">
-							<label for="subject"', (isset($context['post_error']['no_subject']) ? ' class="error"' : ''), ' id="caption_subject">', $txt['subject'], ':</label>
-						</dt>
-						<dd id="pm_subject">
-							<input type="text" id="subject" name="subject" value="', $context['subject'], '" tabindex="', $context['tabindex']++, '" size="80" maxlength="80"', isset($context['post_error']['no_subject']) ? ' class="error"' : ' class="input_text"', ' placeholder="', $txt['subject'], '" required="required" />
-						</dd>
-					</dl>';
+					<dt class="clear_left">
+						<label for="subject"', (isset($context['post_error']['no_subject']) ? ' class="error"' : ''), ' id="caption_subject">', $txt['subject'], ':</label>
+					</dt>
+					<dd id="pm_subject">
+						<input type="text" id="subject" name="subject" value="', $context['subject'], '" tabindex="', $context['tabindex']++, '" size="80" maxlength="80"', isset($context['post_error']['no_subject']) ? ' class="error"' : ' class="input_text"', ' placeholder="', $txt['subject'], '" required="required" />
+					</dd>
+				</dl>';
 
 	// Show BBC buttons, smileys and textbox.
 	echo '
-					', template_control_richedit($context['post_box_name'], 'smileyBox_message', 'bbcBox_message');
+				', template_control_richedit($context['post_box_name'], 'smileyBox_message', 'bbcBox_message');
 
 	// Require an image to be typed to save spamming?
 	if (!empty($context['require_verification']))
 		template_verification_controls($context['visual_verification_id'], '
-					<div class="post_verification">
-						<strong>' . $txt['pm_visual_verification_label'] . ':</strong>
-						', '
-					</div>');
+				<div class="post_verification">
+					<strong>' . $txt['pm_visual_verification_label'] . ':</strong>
+					', '
+				</div>');
 
 	// Send, Preview, spellchecker buttons.
 	echo '
-					<div id="post_confirm_buttons" class="submitbutton">
-						', template_control_richedit_buttons($context['post_box_name']), '
-					</div>
-					<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />
-					<input type="hidden" name="seqnum" value="', $context['form_sequence_number'], '" />
-					<input type="hidden" name="replied_to" value="', !empty($context['quoted_message']['id']) ? $context['quoted_message']['id'] : 0, '" />
-					<input type="hidden" name="pm_head" value="', !empty($context['quoted_message']['pm_head']) ? $context['quoted_message']['pm_head'] : 0, '" />
-					<input type="hidden" name="f" value="', isset($context['folder']) ? $context['folder'] : '', '" />
-					<input type="hidden" name="l" value="', isset($context['current_label_id']) ? $context['current_label_id'] : -1, '" />';
+				<div id="post_confirm_buttons" class="submitbutton">
+					', template_control_richedit_buttons($context['post_box_name']), '
+				</div>
+				<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />
+				<input type="hidden" name="seqnum" value="', $context['form_sequence_number'], '" />
+				<input type="hidden" name="replied_to" value="', !empty($context['quoted_message']['id']) ? $context['quoted_message']['id'] : 0, '" />
+				<input type="hidden" name="pm_head" value="', !empty($context['quoted_message']['pm_head']) ? $context['quoted_message']['pm_head'] : 0, '" />
+				<input type="hidden" name="f" value="', isset($context['folder']) ? $context['folder'] : '', '" />
+				<input type="hidden" name="l" value="', isset($context['current_label_id']) ? $context['current_label_id'] : -1, '" />';
 
 	// If the admin enabled the pm drafts feature, show a draft selection box
 	if (!empty($context['drafts_pm_save']) && !empty($context['drafts']))
 	{
 		echo '
-			<h3 id="postDraftOptionsHeader" class="category_header panel_toggle">
-				<span>
-					<span id="postDraftExpand" class="', empty($context['minmax_preferences']['pmdraft']) ? 'collapse' : 'expand', '" style="display: none;" title="', $txt['hide'], '"></span>
-				</span>
-				<a href="#" id="postDraftExpandLink">', $txt['draft_load'], '</a>
-			</h3>
-			<div id="postDraftOptions" class="load_drafts padding"', empty($context['minmax_preferences']['pmdraft']) ? '' : ' style="display: none;"', '>
-				<dl class="settings">
-					<dt><strong>', $txt['subject'], '</strong></dt>
-					<dd><strong>', $txt['draft_saved_on'], '</strong></dd>';
+				<h3 id="postDraftOptionsHeader" class="category_header panel_toggle">
+					<span>
+						<span id="postDraftExpand" class="', empty($context['minmax_preferences']['pmdraft']) ? 'collapse' : 'expand', '" style="display: none;" title="', $txt['hide'], '"></span>
+					</span>
+					<a href="#" id="postDraftExpandLink">', $txt['draft_load'], '</a>
+				</h3>
+				<div id="postDraftOptions" class="load_drafts padding"', empty($context['minmax_preferences']['pmdraft']) ? '' : ' style="display: none;"', '>
+					<dl class="settings">
+						<dt><strong>', $txt['subject'], '</strong></dt>
+						<dd><strong>', $txt['draft_saved_on'], '</strong></dd>';
 
 		foreach ($context['drafts'] as $draft)
 			echo '
-					<dt>', $draft['link'], '</dt>
-					<dd>', $draft['poster_time'], '</dd>';
+						<dt>', $draft['link'], '</dt>
+						<dd>', $draft['poster_time'], '</dd>';
 
 		echo '
-				</dl>
-			</div>';
+					</dl>
+				</div>';
 	}
 
 	echo '
-				</div>
 			</div>
 		</div>
 	</form>';
 
 	// The vars used to preview a personal message without loading a new page.
 	echo '
-		<script><!-- // --><![CDATA[
-			var form_name = "pmFolder",
-				preview_area = "pm",
-				txt_preview_title = "', $txt['preview_title'], '",
-				txt_preview_fetch = "', $txt['preview_fetch'], '";';
+	<script><!-- // --><![CDATA[
+		var form_name = "pmFolder",
+			preview_area = "pm",
+			txt_preview_title = "', $txt['preview_title'], '",
+			txt_preview_fetch = "', $txt['preview_fetch'], '";';
 
 	// Code for showing and hiding drafts
 	if (!empty($context['drafts']))
 		echo '
-			var oSwapDraftOptions = new elk_Toggle({
-				bToggleEnabled: true,
-				bCurrentlyCollapsed: ', empty($context['minmax_preferences']['pmdraft']) ? 'false' : 'true', ',
-				aSwappableContainers: [
-					\'postDraftOptions\',
-				],
-				aSwapClasses: [
-					{
-						sId: \'postDraftExpand\',
-						classExpanded: \'collapse\',
-						titleExpanded: ', JavaScriptEscape($txt['hide']), ',
-						classCollapsed: \'expand\',
-						titleCollapsed: ', JavaScriptEscape($txt['show']), '
-					}
-				],
-				aSwapLinks: [
-					{
-						sId: \'postDraftExpandLink\',
-						msgExpanded: ', JavaScriptEscape($txt['draft_hide']), ',
-						msgCollapsed: ', JavaScriptEscape($txt['draft_load']), '
-					}
-				],
-				oThemeOptions: {
-					bUseThemeSettings: ', $context['user']['is_guest'] ? 'false' : 'true', ',
-					sOptionName: \'minmax_preferences\',
-					sSessionId: elk_session_id,
-					sSessionVar: elk_session_var,
-					sAdditionalVars: \';minmax_key=pmdraft\'
-				},
-			});';
+		var oSwapDraftOptions = new elk_Toggle({
+			bToggleEnabled: true,
+			bCurrentlyCollapsed: ', empty($context['minmax_preferences']['pmdraft']) ? 'false' : 'true', ',
+			aSwappableContainers: [
+				\'postDraftOptions\',
+			],
+			aSwapClasses: [
+				{
+					sId: \'postDraftExpand\',
+					classExpanded: \'collapse\',
+					titleExpanded: ', JavaScriptEscape($txt['hide']), ',
+					classCollapsed: \'expand\',
+					titleCollapsed: ', JavaScriptEscape($txt['show']), '
+				}
+			],
+			aSwapLinks: [
+				{
+					sId: \'postDraftExpandLink\',
+					msgExpanded: ', JavaScriptEscape($txt['draft_hide']), ',
+					msgCollapsed: ', JavaScriptEscape($txt['draft_load']), '
+				}
+			],
+			oThemeOptions: {
+				bUseThemeSettings: ', $context['user']['is_guest'] ? 'false' : 'true', ',
+				sOptionName: \'minmax_preferences\',
+				sSessionId: elk_session_id,
+				sSessionVar: elk_session_var,
+				sAdditionalVars: \';minmax_key=pmdraft\'
+			},
+		});';
 
 	echo '
-		// ]]></script>';
+	// ]]></script>';
 
 	// Show the message you're replying to.
 	if ($context['reply'])

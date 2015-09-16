@@ -55,7 +55,7 @@ function template_postarea_above()
 
 	// Start the form and display the link tree.
 	echo '
-		<form action="', $scripturl, '?action=', $context['destination'], ';', empty($context['current_board']) ? '' : 'board=' . $context['current_board'], '" method="post" accept-charset="UTF-8" name="postmodify" id="postmodify" class="flow_hidden" onsubmit="', ($context['becomes_approved'] ? '' : 'alert(\'' . $txt['js_post_will_require_approval'] . '\');'), 'submitonce(this);smc_saveEntities(\'postmodify\', [\'subject\', \'', $context['post_box_name'], '\', \'guestname\', \'evtitle\', \'question\'], \'options\');revalidateMentions(\'postmodify\', \'', $context['post_box_name'], '\');" enctype="multipart/form-data">';
+		<form id="postmodify" action="', $scripturl, '?action=', $context['destination'], ';', empty($context['current_board']) ? '' : 'board=' . $context['current_board'], '" method="post" accept-charset="UTF-8" name="postmodify" class="flow_hidden" onsubmit="', ($context['becomes_approved'] ? '' : 'alert(\'' . $txt['js_post_will_require_approval'] . '\');'), 'submitonce(this);smc_saveEntities(\'postmodify\', [\'subject\', \'', $context['post_box_name'], '\', \'guestname\', \'evtitle\', \'question\'], \'options\');revalidateMentions(\'postmodify\', \'', $context['post_box_name'], '\');" enctype="multipart/form-data">';
 
 	// If the user wants to see how their message looks - the preview section is where it's at!
 	echo '
@@ -70,9 +70,10 @@ function template_postarea_above()
 
 	// Start the main table.
 	echo '
-			<div class="forumposts">', isset($context['current_topic']) ? '<input type="hidden" name="topic" value="' . $context['current_topic'] . '" />' : '', '
+			<div id="forumposts">', isset($context['current_topic']) ? '<input type="hidden" name="topic" value="' . $context['current_topic'] . '" />' : '', '
 				<h2 class="category_header">', $context['page_title'], '</h2>
-				<div class="editor_wrapper">';
+				<div class="forumposts">
+					<div class="editor_wrapper">';
 
 	// If an error occurred, explain what happened.
 	template_show_error('post_error');
@@ -84,84 +85,84 @@ function template_postarea_above()
 	if (!$context['becomes_approved'])
 	{
 		echo '
-					<div class="successbox">
-						', $txt['wait_for_approval'], '
-						<input type="hidden" name="not_approved" value="1" />
-					</div>';
+						<div class="successbox">
+							', $txt['wait_for_approval'], '
+							<input type="hidden" name="not_approved" value="1" />
+						</div>';
 	}
 
 	// If it's locked, show a message to warn the replyer.
 	// @todo why not output it only for locked topics and why not use the template_show_error above?
 	echo '
-					<p class="information"', $context['locked'] ? '' : ' style="display: none"', ' id="lock_warning">
-						', $txt['topic_locked_no_reply'], '
-					</p>';
+						<p class="information"', $context['locked'] ? '' : ' style="display: none"', ' id="lock_warning">
+							', $txt['topic_locked_no_reply'], '
+						</p>';
 
 	if (!empty($context['drafts_autosave']))
 		echo '
-					<div id="draft_section" class="successbox"', isset($context['draft_saved']) ? '' : ' style="display: none;"', '>
-						', sprintf($txt['draft_saved'], $scripturl . '?action=profile;u=' . $context['user']['id'] . ';area=showdrafts'), '
-					</div>';
+						<div id="draft_section" class="successbox"', isset($context['draft_saved']) ? '' : ' style="display: none;"', '>
+							', sprintf($txt['draft_saved'], $scripturl . '?action=profile;u=' . $context['user']['id'] . ';area=showdrafts'), '
+						</div>';
 
 	// The post header... important stuff
 	echo '
-					<dl id="post_header">';
+						<dl id="post_header">';
 
 	// Guests have to put in their name and email...
 	if (isset($context['name']) && isset($context['email']))
 	{
 		echo '
-						<dt>
-							<label for="guestname"', isset($context['post_error']['long_name']) || isset($context['post_error']['no_name']) || isset($context['post_error']['bad_name']) ? ' class="error"' : '', ' id="caption_guestname">', $txt['name'], ':</label>
-						</dt>
-						<dd>
-							<input type="text" id="guestname" name="guestname" size="25" value="', $context['name'], '" tabindex="', $context['tabindex']++, '" class="input_text" required="required" />
-						</dd>';
+							<dt>
+								<label for="guestname"', isset($context['post_error']['long_name']) || isset($context['post_error']['no_name']) || isset($context['post_error']['bad_name']) ? ' class="error"' : '', ' id="caption_guestname">', $txt['name'], ':</label>
+							</dt>
+							<dd>
+								<input type="text" id="guestname" name="guestname" size="25" value="', $context['name'], '" tabindex="', $context['tabindex']++, '" class="input_text" required="required" />
+							</dd>';
 
 		if (empty($modSettings['guest_post_no_email']))
 			echo '
-						<dt>
-							<label for="email"', isset($context['post_error']['no_email']) || isset($context['post_error']['bad_email']) ? ' class="error"' : '', ' id="caption_email">', $txt['email'], ':</label>
-						</dt>
-						<dd>
-							<input type="email" id="email" name="email" size="25" value="', $context['email'], '" tabindex="', $context['tabindex']++, '" class="input_text" required="required" />
-						</dd>';
+							<dt>
+								<label for="email"', isset($context['post_error']['no_email']) || isset($context['post_error']['bad_email']) ? ' class="error"' : '', ' id="caption_email">', $txt['email'], ':</label>
+							</dt>
+							<dd>
+								<input type="email" id="email" name="email" size="25" value="', $context['email'], '" tabindex="', $context['tabindex']++, '" class="input_text" required="required" />
+							</dd>';
 	}
 
 	// Now show the subject box for this post.
 	echo '
-						<dt class="clear">
-							<label for="post_subject"', isset($context['post_error']['no_subject']) ? ' class="error"' : '', ' id="caption_subject">', $txt['subject'], ':</label>
-						</dt>
-						<dd>
-							<input id="post_subject" type="text" name="subject"', $context['subject'] == '' ? '' : ' value="' . $context['subject'] . '"', ' tabindex="', $context['tabindex']++, '" size="80" maxlength="80"', isset($context['post_error']['no_subject']) ? ' class="error"' : ' class="input_text"', ' placeholder="', $txt['subject'], '" required="required" />
-						</dd>
-						<dt class="clear_left">
-							<label for="icon">', $txt['message_icon'], '</label>:
-						</dt>
-						<dd>
-							<select name="icon" id="icon" onchange="showimage()">';
+							<dt class="clear">
+								<label for="post_subject"', isset($context['post_error']['no_subject']) ? ' class="error"' : '', ' id="caption_subject">', $txt['subject'], ':</label>
+							</dt>
+							<dd>
+								<input id="post_subject" type="text" name="subject"', $context['subject'] == '' ? '' : ' value="' . $context['subject'] . '"', ' tabindex="', $context['tabindex']++, '" size="80" maxlength="80"', isset($context['post_error']['no_subject']) ? ' class="error"' : ' class="input_text"', ' placeholder="', $txt['subject'], '" required="required" />
+							</dd>
+							<dt class="clear_left">
+								<label for="icon">', $txt['message_icon'], '</label>:
+							</dt>
+							<dd>
+								<select name="icon" id="icon" onchange="showimage()">';
 
 	// Loop through each message icon allowed, adding it to the drop down list.
 	foreach ($context['icons'] as $icon)
 		echo '
-								<option value="', $icon['value'], '"', $icon['value'] == $context['icon'] ? ' selected="selected"' : '', '>', $icon['name'], '</option>';
+									<option value="', $icon['value'], '"', $icon['value'] == $context['icon'] ? ' selected="selected"' : '', '>', $icon['name'], '</option>';
 
 	echo '
-							</select>
-							<img src="', $context['icon_url'], '" id="icons" alt="" />
-						</dd>';
+								</select>
+								<img src="', $context['icon_url'], '" id="icons" alt="" />
+							</dd>';
 
 	if (!empty($context['show_boards_dropdown']))
 		echo '
-						<dt class="clear_left">
-							<label for="post_in_board">', $txt['post_in_board'], '</label>:
-						</dt>
-						<dd>', template_select_boards('post_in_board'), '
-						</dd>';
+							<dt class="clear_left">
+								<label for="post_in_board">', $txt['post_in_board'], '</label>:
+							</dt>
+							<dd>', template_select_boards('post_in_board'), '
+							</dd>';
 
 	echo '
-					</dl>';
+						</dl>';
 }
 
 /**
@@ -170,13 +171,13 @@ function template_postarea_above()
 function template_poll_edit_above()
 {
 	echo '
-					<div class="separator"></div>
-					<div id="edit_poll">';
+						<div class="separator"></div>
+						<div id="edit_poll">';
 
-	template_poll_edit();
+							template_poll_edit();
 
 	echo '
-					</div>';
+						</div>';
 }
 
 /**
@@ -188,88 +189,88 @@ function template_make_event_above()
 
 	// Are you posting a calendar event?
 	echo '
-					<hr class="clear" />
-					<div id="post_event">
-						<fieldset id="event_main">
-							<legend>', $txt['calendar_event_options'], '</legend>
-							<label for="evtitle"', isset($context['post_error']['no_event']) ? ' class="error"' : '', ' id="caption_evtitle">', $txt['calendar_event_title'], ':</label>
-							<input type="text" id="evtitle" name="evtitle" maxlength="255" size="55" value="', $context['event']['title'], '" tabindex="', $context['tabindex']++, '" class="input_text" />
-							<div id="datepicker">
-								<input type="hidden" name="calendar" value="1" /><label for="year">', $txt['calendar_year'], '</label>
-								<select name="year" id="year" tabindex="', $context['tabindex']++, '" onchange="generateDays();">';
+						<hr class="clear" />
+						<div id="post_event">
+							<fieldset id="event_main">
+								<legend>', $txt['calendar_event_options'], '</legend>
+								<label for="evtitle"', isset($context['post_error']['no_event']) ? ' class="error"' : '', ' id="caption_evtitle">', $txt['calendar_event_title'], ':</label>
+								<input type="text" id="evtitle" name="evtitle" maxlength="255" size="55" value="', $context['event']['title'], '" tabindex="', $context['tabindex']++, '" class="input_text" />
+								<div id="datepicker">
+									<input type="hidden" name="calendar" value="1" /><label for="year">', $txt['calendar_year'], '</label>
+									<select name="year" id="year" tabindex="', $context['tabindex']++, '" onchange="generateDays();">';
 
 	// Show a list of all the years we allow...
 	for ($year = $modSettings['cal_minyear']; $year <= $modSettings['cal_maxyear']; $year++)
 		echo '
-									<option value="', $year, '"', $year == $context['event']['year'] ? ' selected="selected"' : '', '>', $year, '&nbsp;</option>';
+										<option value="', $year, '"', $year == $context['event']['year'] ? ' selected="selected"' : '', '>', $year, '&nbsp;</option>';
 
 	echo '
-								</select>
-								<label for="month">', $txt['calendar_month'], '</label>
-								<select name="month" id="month" onchange="generateDays();">';
+									</select>
+									<label for="month">', $txt['calendar_month'], '</label>
+									<select name="month" id="month" onchange="generateDays();">';
 
 	// There are 12 months per year - ensure that they all get listed.
 	for ($month = 1; $month <= 12; $month++)
 		echo '
-									<option value="', $month, '"', $month == $context['event']['month'] ? ' selected="selected"' : '', '>', $txt['months'][$month], '&nbsp;</option>';
+										<option value="', $month, '"', $month == $context['event']['month'] ? ' selected="selected"' : '', '>', $txt['months'][$month], '&nbsp;</option>';
 
 	echo '
-								</select>
-								<label for="day">', $txt['calendar_day'], '</label>
-								<select name="day" id="day">';
+									</select>
+									<label for="day">', $txt['calendar_day'], '</label>
+									<select name="day" id="day">';
 
 	// This prints out all the days in the current month - this changes dynamically as we switch months.
 	for ($day = 1; $day <= $context['event']['last_day']; $day++)
 		echo '
-									<option value="', $day, '"', $day == $context['event']['day'] ? ' selected="selected"' : '', '>', $day, '&nbsp;</option>';
+										<option value="', $day, '"', $day == $context['event']['day'] ? ' selected="selected"' : '', '>', $day, '&nbsp;</option>';
 
 	echo '
-								</select>
-							</div>';
+									</select>
+								</div>';
 
 	if (!empty($modSettings['cal_allowspan']) || ($context['event']['new'] && $context['is_new_post']))
 	{
 		echo '
-							<ul class="event_options">';
+								<ul class="event_options">';
 
 		// If events can span more than one day then allow the user to select how long it should last.
 		if (!empty($modSettings['cal_allowspan']))
 		{
 			echo '
-								<li>
-									<label for="span">', $txt['calendar_numb_days'], '</label>
-									<select id="span" name="span">';
+									<li>
+										<label for="span">', $txt['calendar_numb_days'], '</label>
+										<select id="span" name="span">';
 
 			for ($days = 1; $days <= $modSettings['cal_maxspan']; $days++)
 				echo '
-										<option value="', $days, '"', $days == $context['event']['span'] ? ' selected="selected"' : '', '>', $days, '&nbsp;</option>';
+											<option value="', $days, '"', $days == $context['event']['span'] ? ' selected="selected"' : '', '>', $days, '&nbsp;</option>';
 
 			echo '
-									</select>
-								</li>';
+										</select>
+									</li>';
 		}
 
 		// If this is a new event let the user specify which board they want the linked post to be put into.
 		if ($context['event']['new'] && $context['is_new_post'])
 		{
 			echo '
-								<li>
-									', template_select_boards('board', $txt['calendar_post_in']), '
-								</li>';
+									<li>
+										', template_select_boards('board', $txt['calendar_post_in']), '
+									</li>';
 		}
 
 		echo '
-							</ul>';
+								</ul>';
 	}
 
 	if ($context['make_event'] && (!$context['event']['new'] || !empty($context['current_board'])))
 		echo '
-							<input type="hidden" name="eventid" value="', $context['event']['id'], '" />';
+								<input type="hidden" name="eventid" value="', $context['event']['id'], '" />';
 
 	echo '
-						</fieldset>
-					</div>';
-}
+							</fieldset>
+						</div>';
+	}
 
 /**
  * The main template for the post page.
@@ -588,10 +589,10 @@ function template_topic_replies_below()
 
 			if ($ignoring)
 				echo '
-						<div id="msg_', $post['id'], '_ignored_prompt">
-							', $txt['ignoring_user'], '
-							<a href="#" id="msg_', $post['id'], '_ignored_link" style="display: none;">', $txt['show_ignore_user_post'], '</a>
-						</div>';
+					<div id="msg_', $post['id'], '_ignored_prompt">
+						', $txt['ignoring_user'], '
+						<a href="#" id="msg_', $post['id'], '_ignored_link" style="display: none;">', $txt['show_ignore_user_post'], '</a>
+					</div>';
 
 			echo '
 					<div class="inner" id="msg_', $post['id'], '_body">', $post['body'], '</div>
@@ -651,6 +652,7 @@ function template_postarea_below()
 	}
 
 	echo '
+						</div>
 					</div>
 				</div>';
 

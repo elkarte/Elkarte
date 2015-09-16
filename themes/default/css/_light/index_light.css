@@ -1396,12 +1396,13 @@ div.bbc_footnotes .meaction {
 }
 
 /* On to the posts */
-#quickreplybox, #forumposts, #searchform, #recentposts {
+#quickreplybox, #forumposts, #searchform, #recentposts, #pmFolder {
 	background: #E5E5E5;
 	box-shadow: 1px 2px 4px #EEEEEE;
-	border-radius: 2px 2px 0 0;
+	border-radius: 4px 4px 0 0;
 }
-.forumposts {
+
+.forumposts{
 	margin-top: 2px;
 }
 
