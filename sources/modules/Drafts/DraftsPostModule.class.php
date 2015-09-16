@@ -25,6 +25,7 @@ class Drafts_Post_Module implements ElkArte\sources\modules\Module_Interface
 	protected static $_autosave_enabled = false;
 	protected static $_autosave_frequency = 30000;
 	protected static $_subject_length = 24;
+	protected static $_eventsManager = null;
 
 	/**
 	 * {@inheritdoc }
@@ -35,6 +36,8 @@ class Drafts_Post_Module implements ElkArte\sources\modules\Module_Interface
 
 		if (!empty($modSettings['drafts_enabled']) && !empty($modSettings['drafts_post_enabled']))
 		{
+			self::$_eventsManager = $eventsManager;
+
 			self::$_autosave_enabled = !empty($modSettings['drafts_autosave_enabled']);
 
 			if (!empty($modSettings['drafts_autosave_frequency']))
@@ -151,6 +154,8 @@ class Drafts_Post_Module implements ElkArte\sources\modules\Module_Interface
 					'id_member' => $user_info['id'],
 					'is_usersaved' => 1,
 				);
+
+				self::$_eventsManager->trigger('before_save_draft', array('draft' => &$draft));
 
 				saveDraft($draft, isset($_REQUEST['xml']));
 
