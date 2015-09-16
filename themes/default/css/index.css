@@ -2463,6 +2463,10 @@ img.new_posts {
 	padding: 0 1em;
 }
 
+#topic_summary {
+	margin-top: .25em;
+}
+
 #topic_summary .postarea2 {
 	font-size: 0.857em;
 }
@@ -2918,8 +2922,9 @@ ul.post_options li {
 
 .drop_area_fileselect {
 	position: absolute;
-	margin-left: -160px;
-	width: 160px;
+	margin-left: -8em;
+	margin-top: -.5em;
+	width: 8em;
 	opacity: 0.0001;
 	cursor: pointer;
 }

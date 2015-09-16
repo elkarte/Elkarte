@@ -559,7 +559,7 @@ function template_topic_replies_below()
 	if (isset($context['previous_posts']) && count($context['previous_posts']) > 0)
 	{
 		echo '
-		<div id="topic_summary" class="forumposts">
+		<div id="topic_summary">
 			<h2 class="category_header">', $txt['topic_summary'], '</h2>
 			<span id="new_replies"></span>';
 
@@ -571,7 +571,7 @@ function template_topic_replies_below()
 				$ignored_posts[] = $ignoring = $post['id'];
 
 			echo '
-			<div class="content">
+			<div class="content forumposts">
 				<div class="postarea2" id="msg', $post['id'], '">
 					<div class="keyinfo">
 						<h5 class="floatleft">
