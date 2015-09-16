@@ -1285,7 +1285,6 @@ class ManageFeatures_Controller extends Action_Controller
 				// Basic stuff, titles, permissions...
 				array('check', 'allow_guestAccess'),
 				array('check', 'enable_buddylist'),
-				array('check', 'enable_unwatch'),
 				array('check', 'allow_editDisplayName'),
 				array('check', 'allow_hideOnline'),
 				array('check', 'titlesEnable'),
