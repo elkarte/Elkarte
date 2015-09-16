@@ -285,8 +285,7 @@ class OpenID
 	{
 		// @todo Add in discovery.
 
-		if (substr($uri, 0, 7) !== 'http://' && substr($uri, 0, 8) !== 'https://')
-			$uri = 'http://' . $uri;
+		$uri = addProtocol($uri, array('http://', 'https://'));
 
 		// Strip http:// and https:// and if there is no / in what is left, add one
 		if (strpos(strtr($uri, array('http://' => '', 'https://' => '')), '/') === false)
