@@ -1252,4 +1252,18 @@ class Data_Validator
 
 		return $local_name . '@' . $domain_name;
 	}
+
+	/**
+	 * Uses Util::htmlspecialchars to sanitize any html in the intput
+	 *
+	 * @param string $input
+	 * @param string|null $sanitation_parameters
+	 */
+	protected function _sanitation_cleanhtml($input, $sanitation_parameters = null)
+	{
+		if (!isset($input))
+			return;
+
+		return Util::htmlspecialchars($input);
+	}
 }
