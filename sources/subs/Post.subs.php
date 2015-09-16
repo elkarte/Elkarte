@@ -1597,9 +1597,7 @@ function getFormMsgSubject($editing, $topic, $first_subject = '', $msg_id = 0)
 
 			$form_message = un_preparsecode($form_message);
 
-			// Remove any nested quotes, if necessary.
-			if (!empty($modSettings['removeNestedQuotes']))
-				$form_message = preg_replace(array('~\n?\[quote.*?\].+?\[/quote\]\n?~is', '~^\n~', '~\[/quote\]~'), '', $form_message);
+			$form_message = removeNestedQuotes($form_message);
 
 			// Add a quote string on the front and end.
 			$form_message = '[quote author=' . $mname . ' link=msg=' . (int) $msg_id . ' date=' . $mdate . ']' . "\n" . rtrim($form_message) . "\n" . '[/quote]';

@@ -4190,3 +4190,24 @@ function addProtocol($url, $protocols = array('http://', 'https://'))
 
 	return $protocols[0] . $url;
 }
+
+/**
+ * Removes nested quotes from a text string.
+ *
+ * @param string $text - The body we want to remove nested quotes from
+ * @return string - The same body, just without nested quotes
+ */
+function removeNestedQuotes($text)
+{
+	global $modSettings;
+
+	// Remove any nested quotes, if necessary.
+	if (!empty($modSettings['removeNestedQuotes']))
+	{
+		return preg_replace(array('~\n?\[quote.*?\].+?\[/quote\]\n?~is', '~^\n~', '~\[/quote\]~'), '', $text);
+	}
+	else
+	{
+		return $text;
+	}
+}
