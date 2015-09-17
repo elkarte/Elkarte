@@ -1397,7 +1397,7 @@ div.bbc_footnotes .meaction {
 }
 
 /* On to the posts */
-#quickreplybox, #forumposts, #searchform, #recentposts, #pmFolder, #topic_summary {
+#quickreplybox, #forumposts, #searchform, #recentposts, #pmFolder, #topic_summary, #preview_section {
 	background: #E5E5E5;
 	box-shadow: 1px 2px 4px #EEEEEE;
 	border-radius: 4px 4px 0 0;
@@ -1561,7 +1561,7 @@ div.bbc_footnotes .meaction {
 	color: #A80000;
 }
 
-#postMoreOptions, #postAttachment, #postAttachment2 {
+#postMoreOptions, #postAttachment {
 	border-top: 1px solid #CCCCCC;
 }
 

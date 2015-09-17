@@ -848,11 +848,11 @@ function template_send()
 
 	// Show the preview of the personal message.
 	echo '
-		<div id="preview_section" class="forumposts"', isset($context['preview_message']) ? '' : ' style="display: none;"', '>
+		<div id="preview_section"', isset($context['preview_message']) ? '' : ' style="display: none;"', '>
 			<h2 class="category_header">
 				<span id="preview_subject">', empty($context['preview_subject']) ? '' : $context['preview_subject'], '</span>
 			</h2>
-			<div class="post content" id="preview_body">
+			<div id="preview_body">
 				', empty($context['preview_message']) ? '<br />' : $context['preview_message'], '
 			</div>
 		</div>';

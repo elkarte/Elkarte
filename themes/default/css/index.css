@@ -2215,31 +2215,37 @@ img.new_posts {
 	vertical-align: middle;
 }
 
-/* Poll question */
-#poll {
+#poll, #edit_poll {
 	overflow: hidden;
+}
+
+#poll_main #question, #poll_main .poll_main input {
+	margin-left: 2em;
+}
+
+#poll_main .poll_main li {
+	margin: 2px 0;
+	padding-left: 2em;
+}
+
+#poll_main .poll_main, dl.poll_options {
+	overflow: hidden;
+	padding: 0 0 8px 8px;
 }
 
 #poll_main ul {
 	margin-top: 8px;
 }
 
-#poll .content {
-	padding: 0 12px;
-}
-
-#pollquestion {
-	padding: 0 0 6px 25px;
-}
-
-/* Poll vote options */
-#poll_options .statsbar {
-	padding: 0;
+#poll_main, #poll_options, #poll_reset {
+	clear: both;
+	overflow: hidden;
+	padding: 6px;
 }
 
 #poll_options .options {
 	overflow: auto;
-	margin: 0 0 12px 0;
+	margin: 0 0 2em;
 	padding: 12px 30px 0 25px;
 }
 
@@ -2249,29 +2255,22 @@ img.new_posts {
 	content: "";
 }
 
-/* Poll results */
-#poll_options .results {
-	position: relative;
+#poll_options .poll_options dd {
+	width: 65%;
 }
 
-/* Absolute positioning stops these breaking the bars on narrow screens. */
-#poll_options .options .percentage {
-	position: absolute;
-	top: 0;
-	right: 0;
-	z-index: 2;
-	display: block;
-	float: right;
-	margin: 3px;
-	padding: 0 2px;
-	white-space: pre;
-	line-height: 1.2em;
+#poll_options .poll_options dd input {
+	margin-left: 0;
 }
 
-/* Poll notices */
-#poll_options p {
-	margin: 0 18px 2px 18px;
-	padding: 0 6px 6px 6px;
+#poll_options .poll_options dt {
+	padding: 0 0 0 12px;
+	width: 33%;
+}
+
+#poll_options > dl.stats {
+	width: 100%;
+	border: none;
 }
 
 #pollmoderation {
@@ -2280,10 +2279,18 @@ img.new_posts {
 	padding: 0;
 }
 
+#pollquestion {
+	padding: 0 0 6px 16px;
+}
+
 /* On to the posts */
 #forumposts {
 	clear: both;
 	margin: 6px 0 0 0;
+}
+
+#preview_section {
+	margin-bottom: .5em;
 }
 
 /* Topic information */
@@ -2863,50 +2870,6 @@ ul.post_options li {
 	white-space: nowrap;
 }
 
-/* The poll editor section. */
-#edit_poll {
-	overflow: hidden;
-}
-
-#poll_main, #poll_options, #poll_reset {
-	clear: both;
-	overflow: hidden;
-	padding: 6px;
-}
-
-#poll_main #question {
-	margin-left: 2em;
-}
-
-#poll_main .poll_main li {
-	padding-left: 12px;
-}
-
-#poll_main .poll_main input {
-	margin-left: 12px;
-}
-
-#poll_main .poll_main, dl.poll_options {
-	overflow: hidden;
-	padding: 0 0 8px 8px;
-}
-
-#poll_main .poll_main li {
-	margin: 2px 0;
-}
-
-#poll_options .poll_options dt {
-	padding: 0 0 0 12px;
-	width: 33%;
-}
-
-#poll_options .poll_options dd {
-	width: 65%;
-}
-
-#poll_options .poll_options dd input {
-	margin-left: 0;
-}
 
 /* ------------------------------------------------------- */
 /*	$DRAG-N-DROP                                           */

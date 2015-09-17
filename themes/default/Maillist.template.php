@@ -234,14 +234,15 @@ function template_bounce_template()
 
 	echo '
 	<form id="admin_form_wrapper" action="', $scripturl, '?action=admin;area=maillist;sa=emailtemplates;tid=', $context['id_template'], '" method="post" accept-charset="UTF-8">
-		<div id="preview_section" class="forumposts"', isset($context['template_preview']) ? '' : ' style="display: none;"', '>
+		<div id="preview_section"', isset($context['template_preview']) ? '' : ' style="display: none;"', '>
 			<h2 class="category_header">
 				<span id="preview_subject">', $txt['preview'], '</span>
 			</h2>
-			<div class="post" id="template_preview">
+			<div id="preview_body">
 				', empty($context['template_preview']) ? '<br />' : $context['template_preview'], '
 			</div>
 		</div>
+
 		<h2 class="category_header">', $context['page_title'], '</h2>
 		<div class="information">
 			', $txt['ml_bounce_template_desc'], '

@@ -351,7 +351,7 @@ function onDocSent(XMLDoc)
 		}
 	}
 
-	location.hash = '#' + 'preview_section';
+	$('html, body').animate({ scrollTop: $('#preview_section').offset().top }, 'slow');
 
 	// Preview video links if the feature is available
 	if ($.isFunction($.fn.linkifyvideo))
