@@ -90,15 +90,22 @@ class In_Line_Attachment
 	protected $_curr_tag = array();
 
 	/**
+	 * Type of message we are looking at, that means type of attachment to load.
+	 * @var int
+	 */
+	protected $_attach_source = 0;
+
+	/**
 	 * Constructor, loads the message an id in to the class
 	 *
 	 * @param string $message
 	 * @param int|null $id_msg
 	 */
-	public function __construct($message, $id_msg)
+	public function __construct($message, $id_msg, $attach_source)
 	{
 		$this->_message = $message;
 		$this->_id_msg = $id_msg;
+		$this->_attach_source = $attach_source;
 	}
 
 	/**
@@ -688,7 +695,7 @@ class In_Line_Attachment
 
 		// With a message id and the topic we can fetch the attachments
 		if (!empty($modSettings['attachmentEnable']) && allowedTo('view_attachments', $this->_board) && $this->_topic != -1)
-			$attachments = getAttachments($msg_id);
+			$attachments = getAttachments($msg_id, false, null, array(), $this->_attach_source);
 
 		return $attachments;
 	}

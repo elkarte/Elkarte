@@ -154,10 +154,13 @@ class Drafts_Post_Module implements ElkArte\sources\modules\Module_Interface
 					'id_member' => $user_info['id'],
 					'is_usersaved' => (int) empty($_REQUEST['autosave']),
 				);
+				$error = Error_Context::context('post', 1);
 
-				self::$_eventsManager->trigger('before_save_draft', array('draft' => &$draft));
+				self::$_eventsManager->trigger('before_save_draft', array('draft' => &$draft, 'is_usersaved' => empty($_REQUEST['autosave']), 'error_context' => $error));
 
 				saveDraft($draft, isset($_REQUEST['xml']));
+
+				self::$_eventsManager->trigger('after_save_draft', array('id_draft' => $context['id_draft']));
 
 				// Cleanup
 				unset($_POST['save_draft']);

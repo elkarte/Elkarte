@@ -215,7 +215,9 @@ class Attachment_Controller extends Action_Controller
 		else
 		{
 			isAllowedTo('view_attachments');
-			$attachment = getAttachmentFromTopic($id_attach, $topic);
+			$attach_source = 0;
+			$this->_events->trigger('get_attachment_data', array('attach_source' => &$attach_source));
+			$attachment = getAttachmentFromTopic($id_attach, $topic, $attach_source);
 		}
 
 		if (empty($attachment))

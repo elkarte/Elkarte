@@ -66,16 +66,26 @@ class Attachments_Post_Module implements ElkArte\sources\modules\Module_Interfac
 				array('pre_save_post', array('Attachments_Post_Module', 'pre_save_post'), array('msgOptions')),
 				array('after_save_post', array('Attachments_Post_Module', 'after_save_post'), array('msgOptions')),
 
-				array('before_save_draft', array('Attachments_Post_Module', 'before_save_draft'), array('draft')),
+				array('before_save_draft', array('Attachments_Post_Module', 'before_save_draft'), array()),
+				array('after_save_draft', array('Attachments_Post_Module', 'after_save_draft'), array()),
 			);
 		}
 		else
 			return array();
 	}
 
-	public function before_save_draft($draft)
+	public function before_save_draft($draft, $is_usersaved, $error_context)
 	{
 		$this->saveAttachments(isset($_REQUEST['id_draft']) ? (int) $_REQUEST['id_draft'] : 0);
+
+		if ($this->_attach_errors->hasErrors())
+		{
+			$error_context->add(array('attachments_errors' => $this->_attach_errors));
+		}
+		else
+		{
+			$this->createAttachment($draft['id_draft'], 1);
+		}
 	}
 
 	public function prepare_post()
@@ -300,7 +310,17 @@ class Attachments_Post_Module implements ElkArte\sources\modules\Module_Interfac
 
 	public function prepare_save_post($post_errors)
 	{
-		$this->saveAttachments(isset($_REQUEST['msg']) ? $_REQUEST['msg'] : 0);
+		$msg = isset($_REQUEST['msg']) ? $_REQUEST['msg'] : 0;
+		$this->saveAttachments($msg);
+
+		if ($this->_attach_errors->hasErrors())
+		{
+			$post_errors->add(array('attachments_errors' => $this->_attach_errors));
+		}
+		else
+		{
+			$this->createAttachment($msg);
+		}
 	}
 
 	protected function saveAttachments($msg)
@@ -358,16 +378,23 @@ class Attachments_Post_Module implements ElkArte\sources\modules\Module_Interfac
 			else
 				processAttachments();
 		}
-
-		if ($this->_attach_errors->hasErrors())
-			$post_errors->add(array('attachments_errors' => $this->_attach_errors));
 	}
 
 	public function pre_save_post(&$msgOptions)
 	{
-		global $ignore_temp, $context, $user_info, $modSettings;
+		$msg = isset($_REQUEST['msg']) ? $_REQUEST['msg'] : 0;
 
 		$this->_is_new_message = empty($msgOptions['id']);
+
+		$this->createAttachment($msg);
+
+		if (!empty($this->_saved_attach_id) && $msgOptions['icon'] === 'xx')
+			$msgOptions['icon'] = 'clip';
+	}
+
+	protected function createAttachment($msg, $attach_source = 1)
+	{
+		global $ignore_temp, $context, $user_info, $modSettings;
 
 		// ...or attach a new file...
 		if (empty($ignore_temp) && $context['attachments']['can']['post'] && !empty($_SESSION['temp_attachments']) && empty($_POST['from_qr']))
@@ -391,7 +418,7 @@ class Attachments_Post_Module implements ElkArte\sources\modules\Module_Interfac
 				{
 					// Load the attachmentOptions array with the data needed to create an attachment
 					$attachmentOptions = array(
-						'post' => isset($_REQUEST['msg']) ? $_REQUEST['msg'] : 0,
+						'post' => $msg,
 						'poster' => $user_info['id'],
 						'name' => $attachment['name'],
 						'tmp_name' => $attachment['tmp_name'],
@@ -400,6 +427,7 @@ class Attachments_Post_Module implements ElkArte\sources\modules\Module_Interfac
 						'id_folder' => isset($attachment['id_folder']) ? $attachment['id_folder'] : 0,
 						'approved' => !$modSettings['postmod_active'] || allowedTo('post_attachment'),
 						'errors' => array(),
+						'attach_source' => $attach_source,
 					);
 
 					if (createAttachment($attachmentOptions))
@@ -415,14 +443,17 @@ class Attachments_Post_Module implements ElkArte\sources\modules\Module_Interfac
 			}
 			unset($_SESSION['temp_attachments']);
 		}
-
-		if (!empty($this->_saved_attach_id) && $msgOptions['icon'] === 'xx')
-			$msgOptions['icon'] = 'clip';
 	}
 
 	public function after_save_post($msgOptions)
 	{
 		if ($this->_is_new_message && !empty($this->_saved_attach_id))
 			bindMessageAttachments($msgOptions['id'], $this->_saved_attach_id);
+	}
+
+	public function after_save_draft($id_draft)
+	{
+		if ($this->_is_new_message && !empty($this->_saved_attach_id))
+			bindMessageAttachments($id_draft, $this->_saved_attach_id, 1);
 	}
 }
