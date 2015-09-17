@@ -59,11 +59,11 @@ function template_postarea_above()
 
 	// If the user wants to see how their message looks - the preview section is where it's at!
 	echo '
-			<div id="preview_section" class="forumposts"', isset($context['preview_message']) ? '' : ' style="display: none;"', '>
+			<div id="preview_section"', isset($context['preview_message']) ? '' : ' style="display: none;"', '>
 				<h2 class="category_header">
 					<span id="preview_subject">', empty($context['preview_subject']) ? '' : $context['preview_subject'], '</span>
 				</h2>
-				<div class="post content" id="preview_body">
+				<div id="preview_body">
 					', empty($context['preview_message']) ? '<br />' : $context['preview_message'], '
 				</div>
 			</div>';
@@ -559,7 +559,7 @@ function template_topic_replies_below()
 	if (isset($context['previous_posts']) && count($context['previous_posts']) > 0)
 	{
 		echo '
-		<div id="topic_summary" class="forumposts">
+		<div id="topic_summary">
 			<h2 class="category_header">', $txt['topic_summary'], '</h2>
 			<span id="new_replies"></span>';
 
@@ -571,7 +571,7 @@ function template_topic_replies_below()
 				$ignored_posts[] = $ignoring = $post['id'];
 
 			echo '
-			<div class="content">
+			<div class="content forumposts">
 				<div class="postarea2" id="msg', $post['id'], '">
 					<div class="keyinfo">
 						<h5 class="floatleft">

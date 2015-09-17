@@ -1569,7 +1569,7 @@ a.bbc_link {
 	font-size: 1em;
 }
 
-.table_head > th.centertext {
+.table_head > th.centertext, .table_head > td.centertext {
 	text-align: center;
 }
 
@@ -1585,10 +1585,6 @@ a.bbc_link {
 
 .table_grid .statsbar div {
 	display: none;
-}
-
-.table_grid textarea {
-	width: 100%;
 }
 
 .sort_by_item .sort, .sort {
@@ -2219,31 +2215,37 @@ img.new_posts {
 	vertical-align: middle;
 }
 
-/* Poll question */
-#poll {
+#poll, #edit_poll {
 	overflow: hidden;
+}
+
+#poll_main #question, #poll_main .poll_main input {
+	margin-left: 2em;
+}
+
+#poll_main .poll_main li {
+	margin: 2px 0;
+	padding-left: 2em;
+}
+
+#poll_main .poll_main, dl.poll_options {
+	overflow: hidden;
+	padding: 0 0 8px 8px;
 }
 
 #poll_main ul {
 	margin-top: 8px;
 }
 
-#poll .content {
-	padding: 0 12px;
-}
-
-#pollquestion {
-	padding: 0 0 6px 25px;
-}
-
-/* Poll vote options */
-#poll_options .statsbar {
-	padding: 0;
+#poll_main, #poll_options, #poll_reset {
+	clear: both;
+	overflow: hidden;
+	padding: 6px;
 }
 
 #poll_options .options {
 	overflow: auto;
-	margin: 0 0 12px 0;
+	margin: 0 0 2em;
 	padding: 12px 30px 0 25px;
 }
 
@@ -2253,29 +2255,22 @@ img.new_posts {
 	content: "";
 }
 
-/* Poll results */
-#poll_options .results {
-	position: relative;
+#poll_options .poll_options dd {
+	width: 65%;
 }
 
-/* Absolute positioning stops these breaking the bars on narrow screens. */
-#poll_options .options .percentage {
-	position: absolute;
-	top: 0;
-	right: 0;
-	z-index: 2;
-	display: block;
-	float: right;
-	margin: 3px;
-	padding: 0 2px;
-	white-space: pre;
-	line-height: 1.2em;
+#poll_options .poll_options dd input {
+	margin-left: 0;
 }
 
-/* Poll notices */
-#poll_options p {
-	margin: 0 18px 2px 18px;
-	padding: 0 6px 6px 6px;
+#poll_options .poll_options dt {
+	padding: 0 0 0 12px;
+	width: 33%;
+}
+
+#poll_options > dl.stats {
+	width: 100%;
+	border: none;
 }
 
 #pollmoderation {
@@ -2284,10 +2279,18 @@ img.new_posts {
 	padding: 0;
 }
 
+#pollquestion {
+	padding: 0 0 6px 16px;
+}
+
 /* On to the posts */
 #forumposts {
 	clear: both;
 	margin: 6px 0 0 0;
+}
+
+#preview_section {
+	margin-bottom: .5em;
 }
 
 /* Topic information */
@@ -2467,6 +2470,10 @@ img.new_posts {
 	padding: 0 1em;
 }
 
+#topic_summary {
+	margin-top: .25em;
+}
+
 #topic_summary .postarea2 {
 	font-size: 0.857em;
 }
@@ -2552,18 +2559,18 @@ img.new_posts {
 
 .attachments .attachment {
 	display: inline-block;
+	box-sizing: border-box;
+	margin-top: 2px;
 	padding: 6px 8px;
-	min-width: 22%;
+	width: 24%;
 }
 
-.attachment_thumb {
+.attachment_thumb, .attachment_name {
+	display: block;
 	margin: 0 auto;
 	text-align: center;
-}
-
-/* @todo - Look at deprecating this hr. */
-.attachments hr {
-	clear: both;
+	word-break: break-all;
+	word-wrap: break-word;
 }
 
 /* Separator of posts. More useful in the print stylesheet. */
@@ -2864,50 +2871,6 @@ ul.post_options li {
 	white-space: nowrap;
 }
 
-/* The poll editor section. */
-#edit_poll {
-	overflow: hidden;
-}
-
-#poll_main, #poll_options, #poll_reset {
-	clear: both;
-	overflow: hidden;
-	padding: 6px;
-}
-
-#poll_main #question {
-	margin-left: 2em;
-}
-
-#poll_main .poll_main li {
-	padding-left: 12px;
-}
-
-#poll_main .poll_main input {
-	margin-left: 12px;
-}
-
-#poll_main .poll_main, dl.poll_options {
-	overflow: hidden;
-	padding: 0 0 8px 8px;
-}
-
-#poll_main .poll_main li {
-	margin: 2px 0;
-}
-
-#poll_options .poll_options dt {
-	padding: 0 0 0 12px;
-	width: 33%;
-}
-
-#poll_options .poll_options dd {
-	width: 65%;
-}
-
-#poll_options .poll_options dd input {
-	margin-left: 0;
-}
 
 /* ------------------------------------------------------- */
 /*	$DRAG-N-DROP                                           */
@@ -2923,8 +2886,9 @@ ul.post_options li {
 
 .drop_area_fileselect {
 	position: absolute;
-	margin-left: -160px;
-	width: 160px;
+	margin-left: -8em;
+	margin-top: -.5em;
+	width: 8em;
 	opacity: 0.0001;
 	cursor: pointer;
 }
@@ -3160,15 +3124,13 @@ dl.merge_topic dd {
 	padding-top: 8px;
 }
 
-#profilecenter, #unwatched_topics, #profile_attachments {
+#profile_attachments, .profile_center {
 	overflow: auto;
 	margin: 12px 0 0 0;
 	padding: 8px 8px 16px 8px;
 }
 
-#profilecenter .content,
-#profile_attachments .content,
-#unwatched_topics .content {
+#profile_attachments .content {
 	overflow: visible;
 	padding: 0.2em 1em;
 }
@@ -3189,6 +3151,15 @@ dl.merge_topic dd {
 .profile_content {
 	overflow: auto;
 	padding: 0 8px;
+}
+
+.profile_content.attachment_thumb {
+	height: 120px;
+	overflow: hidden;
+}
+
+.profile_content > a > img {
+	max-height: 100%;
 }
 
 .profileblock_left {
@@ -3213,29 +3184,10 @@ dl.merge_topic dd {
 	margin-right: 5px;
 }
 
-.profile_attachments {
-	margin: 0 auto;
-	width: 95%;
-	border: 0;
-	border-spacing: 1em;
-	table-layout: fixed;
-	font-size: 0.857em;
-}
-
-.profile_attachments td, .profile_attachments th {
-	padding: 5px 4px;
-	vertical-align: top;
-	text-align: center;
-}
-
-.profile_attachment a img {
-	max-width: 120px;
-	max-height: 120px;
-}
-
-.vcard .avatar {
+.generic_border .avatar {
 	max-width: 40px;
 	max-height: 40px;
+	padding-top: 4px;
 }
 
 .attach_title {
@@ -4892,23 +4844,6 @@ dl.no_members {
 	.elk_previewvideo {
 		max-width: 100%;
 	}
-
-	.profile_attachments {
-		margin: 0 0.5em;
-		width: auto;
-		text-align: center;
-	}
-
-	.profile_attachments tr {
-		display: inline;
-	}
-
-	.profile_attachments .profile_attachment {
-		display: inline-block;
-		margin: 5px;
-		width: 129px;
-		height: 149px;
-	}
 }
 
 /* This one does 800 screens at default font size. */
@@ -5581,15 +5516,6 @@ dl.no_members {
 		float: none;
 		overflow: auto;
 		width: 100%;
-	}
-
-	.profile_attachments .profile_attachment {
-		width: 100px;
-	}
-
-	.profile_attachment a img {
-		max-width: 100px;
-		max-height: 100px;
 	}
 
 	.pagesection div.floatright {

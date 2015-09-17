@@ -264,7 +264,7 @@ fieldset dl {
 /* Live news from elkarte.net and support information. */
 #admin_main_section {
 	margin: 12px 0 20px 0;
-	padding: 8px 12px 4px 12px;
+	padding: 8px 0 4px 0;
 }
 
 #live_news, #supportVersionsTable {

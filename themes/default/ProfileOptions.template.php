@@ -53,7 +53,7 @@ function template_editBuddies()
 	if (empty($context['buddies']))
 		echo '
 			<tr>
-				<td colspan="8" class="centertext">
+				<td colspan="5" class="centertext">
 					<strong>', $txt['no_buddies'], '</strong>
 				</td>
 			</tr>';
@@ -75,16 +75,17 @@ function template_editBuddies()
 				<td>', ($buddy['show_email'] == 'no' ? '' : '<a href="' . $scripturl . '?action=emailuser;sa=email;uid=' . $buddy['id'] . '" rel="nofollow"><img src="' . $settings['images_url'] . '/profile/email_sm.png" alt="' . $txt['email'] . '" title="' . $txt['email'] . ' ' . $buddy['name'] . '" /></a>'), '</td>';
 
 		//  Any custom profile (with icon) fields to show
+		$im = array();
 		if (!empty($buddy['custom_fields']))
 		{
-			$im = array();
+
 			foreach ($buddy['custom_fields'] as $key => $cpf)
 				if ($cpf['placement'] == 1)
 					$im[] = $cpf['value'];
-
-			echo '
-				<td>' . implode(' | ', $im) . '</td>';
 		}
+
+		echo '
+				<td>' . implode(' | ', $im) . '</td>';
 
 		echo '
 				<td class="righttext">

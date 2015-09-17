@@ -90,7 +90,7 @@ function template_folder()
 	if ($context['get_pmessage']('message', true))
 	{
 		echo '
-					<div class="forumposts">';
+					<div id="forumposts">';
 
 		while ($message = $context['get_pmessage']('message'))
 		{
@@ -104,10 +104,9 @@ function template_folder()
 				$start = false;
 			}
 
-			$window_class ='content';
-
 			echo '
-						<a class="pm_anchor" id="msg_', $message['id'], '"></a><div class="', $window_class, '">';
+						<a class="pm_anchor" id="msg_', $message['id'], '"></a>
+						<div class="forumposts">';
 
 			// Showing the sidebar posting area?
 			if (empty($options['hide_poster_area']))
@@ -849,11 +848,11 @@ function template_send()
 
 	// Show the preview of the personal message.
 	echo '
-		<div id="preview_section" class="forumposts"', isset($context['preview_message']) ? '' : ' style="display: none;"', '>
+		<div id="preview_section"', isset($context['preview_message']) ? '' : ' style="display: none;"', '>
 			<h2 class="category_header">
 				<span id="preview_subject">', empty($context['preview_subject']) ? '' : $context['preview_subject'], '</span>
 			</h2>
-			<div class="post content" id="preview_body">
+			<div id="preview_body">
 				', empty($context['preview_message']) ? '<br />' : $context['preview_message'], '
 			</div>
 		</div>';

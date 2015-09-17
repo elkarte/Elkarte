@@ -57,7 +57,7 @@ function template_showDrafts()
 		template_pagesection();
 
 	echo '
-		<div id="profilecenter">
+		<div id="recentposts" class="profile_center">
 			<form action="', $scripturl, '?action=profile;u=' . $context['member']['id'] . ';area=showdrafts;delete" method="post" accept-charset="UTF-8" name="draftForm" id="draftForm" >
 				<h2 class="category_header">
 					<span class="floatright">
@@ -139,7 +139,7 @@ function template_profile_save()
 						<input type="hidden" name="', $context[$context['token_check'] . '_token_var'], '" value="', $context[$context['token_check'] . '_token'], '" />';
 
 	echo '
-						<input type="submit" value="', $txt['change_profile'], '" class="button_submit" />
+						<input type="submit" value="', $txt['change_profile'], '" />
 						<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />
 						<input type="hidden" name="u" value="', $context['id_member'], '" />
 						<input type="hidden" name="sa" value="', $context['menu_item_selected'], '" />

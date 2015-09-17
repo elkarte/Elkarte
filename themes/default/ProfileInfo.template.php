@@ -48,7 +48,7 @@ function template_action_summary()
 
 		// Start with the naviagtion ul, its converted to the tab navigation by jquery
 		echo '
-			<div id="profilecenter">
+			<div class="profile_center">
 				<div id="tabs">
 					<ul>';
 
@@ -57,7 +57,9 @@ function template_action_summary()
 		{
 			$tab_num++;
 			echo '
-						<li><a href="#tab_', $tab_num, '">', $context['summarytabs'][$tab]['name'], '</a></li>';
+						<li>
+							<a href="#tab_', $tab_num, '">', $context['summarytabs'][$tab]['name'], '</a>
+						</li>';
 		}
 
 		echo '
@@ -76,8 +78,7 @@ function template_action_summary()
 			foreach ($context['summarytabs'][$tab]['templates'] as $templates)
 			{
 				echo '
-						<div class="content">
-							<div class="profile_content">';
+						<div class="profile_content">';
 
 				// This container has multiple templates in it (like side x side)
 				if (is_array($templates))
@@ -96,7 +97,6 @@ function template_action_summary()
 				}
 
 				echo '
-							</div>
 						</div>';
 			}
 
@@ -120,7 +120,7 @@ function template_action_showPosts()
 	global $context, $txt;
 
 	echo '
-		<div id="profilecenter">
+		<div id="recentposts" class="profile_center">
 			<h2 class="category_header">
 				', empty($context['is_topics']) ? $txt['showMessages'] : $txt['showTopics'], $context['user']['is_owner'] ? '' : ' - ' . $context['member']['name'], '
 			</h2>';
@@ -325,7 +325,7 @@ function template_action_statPanel()
 	echo '
 	<div id="profileview">
 		<div id="generalstats">
-			<div class="content">
+			<div class="content content_noframe">
 				<dl>
 					<dt>', $txt['statPanel_total_time_online'], ':</dt>
 					<dd>', $context['time_logged_in'], '</dd>
@@ -348,7 +348,7 @@ function template_action_statPanel()
 			<h2 class="category_header hdicon cat_img_clock">
 				', $txt['statPanel_activityTime'], '
 			</h2>
-			<div class="content">';
+			<div class="content content_noframe">';
 
 	// If they haven't post at all, don't draw the graph.
 	if (empty($context['posts_by_time']))
@@ -390,7 +390,7 @@ function template_action_statPanel()
 				<h2 class="category_header hdicon cat_img_write">
 					', $txt['statPanel_topBoards'], '
 				</h2>
-				<div class="content">';
+				<div class="content content_noframe">';
 
 	if (empty($context['popular_boards']))
 		echo '
@@ -425,7 +425,7 @@ function template_action_statPanel()
 				<h2 class="category_header hdicon cat_img_piechart">
 					', $txt['statPanel_topBoardsActivity'], '
 				</h2>
-				<div class="content">';
+				<div class="content content_noframe">';
 
 	if (empty($context['board_activity']))
 		echo '
@@ -1019,10 +1019,6 @@ function template_profile_block_buddies()
 {
 	global $context, $settings, $scripturl, $txt, $modSettings;
 
-	// Init
-	$i = 0;
-	$per_line = 5;
-
 	// Set the div height to about 4 lines of buddies w/avatars
 	if (isset($context['buddies']))
 		$div_height = 120 + (4 * max(empty($modSettings['avatar_max_height']) ? 0 : $modSettings['avatar_max_height'], empty($modSettings['avatar_max_height']) ? 0 : $modSettings['avatar_max_height'], 65));
@@ -1033,20 +1029,17 @@ function template_profile_block_buddies()
 		<h2 class="category_header hdicon cat_img_buddies">
 			<a href="', $scripturl, '?action=profile;area=lists;sa=buddies;u=', $context['member']['id'], '">', $txt['buddies'], '</a>
 		</h2>
-		<div class="content flow_auto" ', (isset($div_height) ? 'style="max-height: ' . $div_height . 'px;"' : ''), '>
-			<table class="profile_attachments">';
+		<div class="flow_auto" ', (isset($div_height) ? 'style="max-height: ' . $div_height . 'px;"' : ''), '>
+			<div class="attachments">';
 
 		// Now show them all
 		if (isset($context['buddies']))
 		{
 			foreach ($context['buddies'] as $buddy_id => $data)
 			{
-				if ($i % $per_line === 0)
-					echo '
-				<tr>';
-
 				echo '
-					<td class="vcard">
+				<div class="attachment">
+					<div class="generic_border centertext">
 						', $data['avatar']['image'], '<br />
 						<a href="', $scripturl, '?action=profile;u=', $data['id'], '">', $data['name'], '</a><br />
 						<em>', $settings['use_image_buttons'] ? '<img src="' . $settings['images_url'] . '/profile/buddy_' . ($data['online']['is_online'] ? 'useron' : 'useroff') . '.png" alt="' . $txt[$data['online']['is_online'] ? 'online' : 'offline'] . '" class="icon"/>' : $txt[$data['online']['is_online'] ? 'online' : 'offline'], $settings['use_image_buttons'] ? '<span class="smalltext"> ' . $txt[$data['online']['is_online'] ? 'online' : 'offline'] . '</span>' : '', '</em>';
@@ -1076,29 +1069,21 @@ function template_profile_block_buddies()
 				}
 				// Done with the contact information
 				echo '
-					</td>';
-
-				if (++$i % $per_line === 0)
-					echo '
-				</tr>';
+					</div>
+				</div>';
 			}
-
-			// Close this final row
-			if ($i % $per_line !== 0)
-				echo '
-			</tr>';
 		}
 		// Buddyless how sad :'(
 		else
 			echo '
-			<tr>
-				<td>', $txt['profile_buddies_no'], '</td>
-			</tr>';
+				<div class="infobox">
+						', $txt['profile_buddies_no'], '
+				</div>';
 
 		// All done
 		echo '
-		</table>
-	</div>';
+			</div>
+		</div>';
 	}
 }
 
@@ -1111,59 +1096,38 @@ function template_profile_block_attachments()
 {
 	global $txt, $context, $scripturl;
 
-	// Init
-	$i = 0;
-	$per_line = 5;
-
 	// The attachment div
 	echo '
 	<h2 class="category_header hdicon cat_img_attachments">
 		<a href="', $scripturl, '?action=profile;area=showposts;sa=attach;u=', $context['member']['id'], '">', $txt['profile_attachments'], '</a>
 	</h2>
-	<div class="content">
-		<table class="profile_attachments">';
+	<div class="attachments">';
 
 	// Show the thumbnails
 	if (!empty($context['thumbs']))
 	{
 		foreach ($context['thumbs'] as $picture)
 		{
-			if ($i % $per_line === 0)
-				echo '
-			<tr>';
-
 			echo '
-				<td class="profile_attachment">
-					<span class="attach_title">', $picture['subject'], '</span>
-					<a id="link_', $picture['id'], '" href="', $picture['url'], '">', $picture['img'], '</a>
-				</td>';
-
-			if (++$i % $per_line === 0)
-				echo '
-			</tr>';
-		}
-
-		// Close this final row
-		while ($i++ % $per_line !== 0)
-		{
-			echo '
-				<td></td>';
-
-			if ($i % $per_line === 0)
-				echo '
-			</tr>';
+		<div class="attachment generic_border">
+			<div class="profile_content attachment_thumb">
+				<a id="link_', $picture['id'], '" href="', $picture['url'], '">', $picture['img'], '</a>
+			</div>
+			<div class="attachment_name">
+				', $picture['subject'], '
+			</div>
+		</div>';
 		}
 	}
 	// No data for this member
 	else
 		echo '
-			<tr>
-				<td>', $txt['profile_attachments_no'], '</td>
-			</tr>';
+		<div class="infobox">
+			', $txt['profile_attachments_no'], '
+		</div>';
 
 	// All done
 	echo '
-		</table>
 	</div>';
 }
 
@@ -1181,7 +1145,7 @@ function template_profile_block_posts()
 	<h2 class="category_header hdicon cat_img_posts">
 		<a href="', $scripturl, '?action=profile;area=showposts;sa=messages;u=', $context['member']['id'], '">', $txt['profile_recent_posts'], '</a>
 	</h2>
-	<div class="content">
+	<div class="flow_auto">
 		<table id="ps_recentposts">';
 
 	if (!empty($context['posts']))
@@ -1230,7 +1194,7 @@ function template_profile_block_topics()
 	<h2 class="category_header hdicon cat_img_topics">
 		<a href="', $scripturl, '?action=profile;area=showposts;sa=topics;u=', $context['member']['id'], '">', $txt['profile_topics'], '</a>
 	</h2>
-	<div class="content">
+	<div class="flow_auto">
 		<table id="ps_recenttopics">';
 
 	if (!empty($context['topics']))

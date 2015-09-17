@@ -462,7 +462,7 @@ function template_user_subscription()
 
 	echo '
 		</form>
-		<div id="profilecenter">
+		<div class="profile_center">
 			<h2 class="category_header">', $txt['paid_current'], '</h2>
 			<div class="infobox">
 				', $txt['paid_current_desc'], '

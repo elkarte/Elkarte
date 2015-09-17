@@ -576,7 +576,7 @@ function updateInputBoxes()
 	// And text and select fields are searchable
 	document.getElementById("can_search_dt").style.display = bIsText || bIsSelect ? "" : "none";
 	document.getElementById("can_search_dd").style.display = bIsText || bIsSelect ? "" : "none";
-	
+
 	// Moving to a non searchable field, be sure searchable is unselected.
 	if (!bIsText && !bIsSelect)
 		document.getElementById("can_search_dd").checked = false;
@@ -1683,7 +1683,7 @@ function ajax_getEmailTemplatePreview()
 	.done(function(request) {
 		// Show the preview section, populated with the response
 		$("#preview_section").css({display: ""});
-		$("#template_preview").html($(request).find('body').text());
+		$("#preview_body").html($(request).find('body').text());
 		$("#preview_subject").html($(request).find('subject').text());
 
 		// Any error we need to let them know about?
@@ -1701,15 +1701,15 @@ function ajax_getEmailTemplatePreview()
 			$(document).find("#error_list").html(errors_html);
 			$_errors.css({display: ""});
 			$_errors.attr('class', parseInt($(request).find('errors').attr('serious')) === 0 ? 'warningbox' : 'errorbox');
-
-			// Navigate to the preview
-			location.hash = '#' + 'preview_section';
 		}
 		else
 		{
 			$("#errors").css({display: "none"});
 			$("#error_list").html('');
 		}
+
+		// Navigate to the preview
+		$('html, body').animate({ scrollTop: $('#preview_section').offset().top }, 'slow');
 
 		return false;
 	});

@@ -52,7 +52,7 @@ $(document).ready(function() {
 	// Enable the ... page expansion
 	$('.expand_pages').expand_pages();
 
-	// Collapsabile fieldsets, pure candy
+	// Collapsible fieldsets, pure candy
 	$(document).on('click', 'legend', function(){
 		$(this).siblings().slideToggle("fast");
 		$(this).parent().toggleClass("collapsed");
@@ -87,7 +87,7 @@ $(document).ready(function() {
 				$this.css({'width': $this.css('width') === 'auto' ? null : 'auto'});
 				$this.css({'height': $this.css('width') === 'auto' ? null : 'auto'});
 
-				// Overide default css to allow the image to expand fully, add a div to exand in
+				// Override default css to allow the image to expand fully, add a div to expand in
 				$this.css({'max-width': 'none'});
 				$this.wrap('<div style="overflow: auto"></div>');
 			}

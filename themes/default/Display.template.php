@@ -672,31 +672,32 @@ function template_display_poll_above()
 	if ($context['poll']['show_results'] || !$context['allow_vote'])
 	{
 		echo '
-					<ul class="options">';
+					<dl class="stats floatleft">';
 
 		// Show each option with its corresponding percentage bar.
 		foreach ($context['poll']['options'] as $option)
 		{
 			echo '
-						<li', $option['voted_this'] ? ' class="voted"' : '', '>', $option['option'], '
-							<div class="results">';
+						<dt', $option['voted_this'] ? ' class="voted"' : '', '>', $option['option'], '</dt>
+						<dd class="statsbar">';
 
 			if ($context['allow_poll_view'])
 				echo '
-								<div class="statsbar"> ', $option['bar_ndt'], '</div>
-								<span class="percentage">', $option['votes'], ' (', $option['percent'], '%)</span>';
+							', $option['bar_ndt'], '
+							<span class="righttext">[ ', $option['votes'], ' ] (', $option['percent'], '%)</span>';
 
 			echo '
-							</div>
-						</li>';
+						</dd>';
 		}
 
 		echo '
-					</ul>';
+					</dl>';
 
 		if ($context['allow_poll_view'])
 			echo '
-					<p><strong>', $txt['poll_total_voters'], ':</strong> ', $context['poll']['total_votes'], '</p>';
+					<p>
+						<strong>', $txt['poll_total_voters'], ':</strong> ', $context['poll']['total_votes'], '
+					</p>';
 	}
 	// They are allowed to vote! Go to it!
 	else
@@ -872,7 +873,7 @@ function template_display_attachments($message, $ignoring)
 											<a href="', $attachment['href'], ';image" id="link_', $attachment['id'], '" onclick="', $attachment['thumbnail']['javascript'], '"><img src="', $attachment['thumbnail']['href'], '" alt="" id="thumb_', $attachment['id'], '" /></a>';
 			else
 				echo '
-											<img src="' . $attachment['href'] . ';image" alt="" style="width:' . $attachment['width'] . 'px; height:' . $attachment['height'] . 'px;"/>';
+											<img src="' . $attachment['href'] . ';image" alt="" style="max-width:100%; max-height:' . $attachment['height'] . 'px;"/>';
 
 			echo '
 										</div>';
