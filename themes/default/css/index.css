@@ -2560,6 +2560,7 @@ img.new_posts {
 .attachments .attachment {
 	display: inline-block;
 	box-sizing: border-box;
+	margin-top: 2px;
 	padding: 6px 8px;
 	width: 24%;
 }
@@ -3152,6 +3153,15 @@ dl.merge_topic dd {
 	padding: 0 8px;
 }
 
+.profile_content.attachment_thumb {
+	height: 120px;
+	overflow: hidden;
+}
+
+.profile_content > a > img {
+	max-height: 100%;
+}
+
 .profileblock_left {
 	float: left;
 	margin: 0 0 4px 4px;
@@ -3174,7 +3184,7 @@ dl.merge_topic dd {
 	margin-right: 5px;
 }
 
-.vcard .avatar {
+.generic_border .avatar {
 	max-width: 40px;
 	max-height: 40px;
 	padding-top: 4px;

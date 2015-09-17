@@ -1692,7 +1692,7 @@ div.bbc_footnotes .meaction {
 	text-decoration: none;
 }
 
-.vcard {
+.generic_border {
 	border: 1px solid #CCCCCC;
 	border-radius: 6px;
 }

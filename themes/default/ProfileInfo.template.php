@@ -1037,10 +1037,9 @@ function template_profile_block_buddies()
 		{
 			foreach ($context['buddies'] as $buddy_id => $data)
 			{
-
 				echo '
 				<div class="attachment">
-					<div class="vcard centertext">
+					<div class="generic_border centertext">
 						', $data['avatar']['image'], '<br />
 						<a href="', $scripturl, '?action=profile;u=', $data['id'], '">', $data['name'], '</a><br />
 						<em>', $settings['use_image_buttons'] ? '<img src="' . $settings['images_url'] . '/profile/buddy_' . ($data['online']['is_online'] ? 'useron' : 'useroff') . '.png" alt="' . $txt[$data['online']['is_online'] ? 'online' : 'offline'] . '" class="icon"/>' : $txt[$data['online']['is_online'] ? 'online' : 'offline'], $settings['use_image_buttons'] ? '<span class="smalltext"> ' . $txt[$data['online']['is_online'] ? 'online' : 'offline'] . '</span>' : '', '</em>';
@@ -1110,8 +1109,8 @@ function template_profile_block_attachments()
 		foreach ($context['thumbs'] as $picture)
 		{
 			echo '
-		<div class="attachment">
-			<div class="attachment_thumb">
+		<div class="attachment generic_border">
+			<div class="profile_content attachment_thumb">
 				<a id="link_', $picture['id'], '" href="', $picture['url'], '">', $picture['img'], '</a>
 			</div>
 			<div class="attachment_name">
