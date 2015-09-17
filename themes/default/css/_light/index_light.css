@@ -93,16 +93,17 @@ legend {
 input, button, select, textarea, .editor {
 	border: 1px solid #CCCCCC;
 	border-radius: 2px;
-	background: #FEFEFE;
+	background: #FAFAFA;
 	color: #585858;
 }
 
 input:hover, textarea:hover, button:hover, select:hover {
 	border: 1px solid #999999;
+	background: #FEFEFE;
 }
 
 textarea:hover, .editor:hover {
-	background: #FAFAFA;
+	background: #FEFEFE;
 	color: #444444;
 }
 
