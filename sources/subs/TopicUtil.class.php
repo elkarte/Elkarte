@@ -51,16 +51,16 @@ class Topic_Util
 			if (isset($row['first_body']))
 			{
 				// Limit them to $preview_length characters - do this FIRST because it's a lot of wasted censoring otherwise.
-				$row['first_body'] = strip_tags(strtr(parse_bbc($row['first_body'], $row['first_smileys'], $row['id_first_msg']), array('<br />' => "\n", '&nbsp;' => ' ')));
-				$row['first_body'] = Util::shorten_text($row['first_body'], $preview_length, true);
+				$row['first_body'] = strtr(parse_bbc($row['first_body'], $row['first_smileys'], $row['id_first_msg']), array('<br />' => "\n", '&nbsp;' => ' '));
+				$row['first_body'] = Util::htmlspecialchars(Util::shorten_html($row['first_body'], $preview_length, true));
 
 				// No reply then they are the same, no need to process it again
 				if ($row['num_replies'] == 0)
 					$row['last_body'] == $row['first_body'];
 				else
 				{
-					$row['last_body'] = strip_tags(strtr(parse_bbc($row['last_body'], $row['last_smileys'], $row['id_last_msg']), array('<br />' => "\n", '&nbsp;' => ' ')));
-					$row['last_body'] = Util::shorten_text($row['last_body'], $preview_length, true);
+					$row['last_body'] = strtr(parse_bbc($row['last_body'], $row['last_smileys'], $row['id_last_msg']), array('<br />' => "\n", '&nbsp;' => ' '));
+					$row['last_body'] = Util::htmlspecialchars(Util::shorten_html($row['last_body'], $preview_length, true));
 				}
 
 				// Censor the subject and message preview.

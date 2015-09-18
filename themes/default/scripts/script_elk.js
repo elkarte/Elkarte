@@ -928,7 +928,7 @@ function setBoardIds() {
 		// Move passed selector titles to a hidden span, then remove the selector title to prevent any default browser actions
 		$(this).each(function()
 		{
-			var sTitle = $('<span class="' + oSettings.tooltipSwapClass + '">' + htmlspecialchars(this.title) + '</span>').hide();
+			var sTitle = $('<span class="' + oSettings.tooltipSwapClass + '">' + this.title + '</span>').hide();
 			$(this).append(sTitle).attr('title', '');
 		});
 
