@@ -27,13 +27,13 @@ class In_Line_Attachment
 	 * Holds attach id's that have been inlined so they can be excluded from display below
 	 * @var int[]
 	 */
-	protected $_ila_dont_show_attach_below = array();
+	protected $_dont_show_attach_below = array();
 
 	/**
 	 * This loads an attachment's contextual data from loadAttachmentContext()
 	 * @var mixed[]
 	 */
-	protected $_ila_attachments_context = array();
+	protected $_attachments_context = array();
 
 	/**
 	 * The singular attachment context we are working on for a given ila tag
@@ -45,13 +45,13 @@ class In_Line_Attachment
 	 * Holds if we feel this is a preview so blocks are rendered
 	 * @var boolean
 	 */
-	protected $_ila_new_msg_preview = array();
+	protected $_new_msg_preview = array();
 
 	/**
 	 * a simple array of elements use it to keep track of attachment number usage in the message
 	 * @var int[]
 	 */
-	protected $_ila_attachments = array();
+	protected $_attachments = array();
 
 	/**
 	 * The board that the message is on, used for permission check
@@ -109,14 +109,14 @@ class In_Line_Attachment
 	}
 
 	/**
-	 * ila_parse_bbc()
+	 * parse_bbc()
 	 *
 	 * - Traffic cop
 	 * - Checks availability
 	 * - Finds all [attach tags, determines msg number, inits values
 	 * - Calls needed functions to render ila tags
 	 */
-	public function ila_parse_bbc()
+	public function parse_bbc()
 	{
 		global $modSettings, $context, $txt, $attachments, $topic;
 
@@ -131,12 +131,12 @@ class In_Line_Attachment
 		if ($this->_id_msg === -1 && !isset($_REQUEST['ila']))
 		{
 			// Make sure block quotes are cleaned up, then return
-			$this->_ila_find_nested();
+			$this->_find_nested();
 			return $this->_message;
 		}
 
 		// Can't trust the $topic global due to portals and other integration
-		list($this->_topic, $this->_board) = $this->_ila_get_topic($this->_id_msg);
+		list($this->_topic, $this->_board) = $this->_get_topic($this->_id_msg);
 		$save_topic = !empty($topic) ? $topic : '';
 		$topic = $this->_topic;
 
@@ -145,13 +145,13 @@ class In_Line_Attachment
 		if (!isset($attachments[$this->_id_msg]))
 		{
 			if (is_array($attachments))
-				$attachments += $this->ila_load_attachments();
+				$attachments += $this->load_attachments();
 			else
-				$attachments = $this->ila_load_attachments();
+				$attachments = $this->load_attachments();
 		}
 
 		// Get the rest of the details for the message attachments, this uses the global topic
-		$this->_ila_attachments_context = loadAttachmentContext($this->_id_msg);
+		$this->_attachments_context = loadAttachmentContext($this->_id_msg);
 
 		// Put back the topic, whatever it was
 		$topic = $save_topic;
@@ -166,12 +166,12 @@ class In_Line_Attachment
 			foreach ($ila_temp as $new_attach)
 			{
 				$this->_start_num++;
-				$this->_ila_new_msg_preview[$this->_start_num] = $new_attach;
+				$this->_new_msg_preview[$this->_start_num] = $new_attach;
 			}
 		}
 
 		// Take care of any attach links that reside in quote blocks, we must render these first
-		$this->_ila_find_nested();
+		$this->_find_nested();
 
 		// Find all of the inline attach tags in this message
 		// [attachimg=xx] [attach=xx] [attachurl=xx] [attachmini=xx] [attach] or
@@ -181,7 +181,7 @@ class In_Line_Attachment
 		if (preg_match_all('~\[attach\s*?(.*?(?:".+?")?.*?|.*?)\][\r\n]?~i', $this->_message, $ila_tags))
 		{
 			// Load a simple array of elements.  We use it to keep track of attachment number usage in the message body
-			$this->_ila_attachments = !empty($this->_start_num) ? range(1, $this->_start_num) : range(1, isset($attachments[$this->_id_msg]) ? count($attachments[$this->_id_msg]) : 0);
+			$this->_attachments = !empty($this->_start_num) ? range(1, $this->_start_num) : range(1, isset($attachments[$this->_id_msg]) ? count($attachments[$this->_id_msg]) : 0);
 			$ila_num = 0;
 
 			// If they have no permissions to view attachments then we sub out the tag with the appropriate message
@@ -195,11 +195,11 @@ class In_Line_Attachment
 			{
 				// If we have attachments, and ILA tags then go through each ILA tag,
 				// one by one, and resolve it back to the correct ELK attachment
-				if (!empty($ila_tags) && ((count($this->_ila_attachments_context) > 0) || (isset($_REQUEST['ila']))))
+				if (!empty($ila_tags) && ((count($this->_attachments_context) > 0) || (isset($_REQUEST['ila']))))
 				{
 					foreach ($ila_tags[1] as $id => $ila_replace)
 					{
-						$this->_message = $this->ila_str_replace_once($ila_tags[0][$id], $this->ila_parse_bbc_tag($ila_replace, $ila_num), $this->_message);
+						$this->_message = $this->str_replace_once($ila_tags[0][$id], $this->parse_bbc_tag($ila_replace, $ila_num), $this->_message);
 						$ila_num++;
 					}
 				}
@@ -213,19 +213,19 @@ class In_Line_Attachment
 					// just kidding, really the help is not that good.
 					// - They don't have permission to view attachments in that board or the admin has disable attachments
 					foreach ($ila_tags[1] as $id => $ila_replace)
-						$this->_message = $this->ila_str_replace_once($ila_tags[0][$id], $txt['ila_invalid'], $this->_message);
+						$this->_message = $this->str_replace_once($ila_tags[0][$id], $txt['ila_invalid'], $this->_message);
 				}
 			}
 		}
 
 		// Keep track of what we have used inline so its not shown below
-		$context['ila_dont_show_attach_below'][$this->_id_msg] = $this->_ila_dont_show_attach_below;
+		$context['ila_dont_show_attach_below'][$this->_id_msg] = $this->_dont_show_attach_below;
 
 		return $this->_message;
 	}
 
 	/**
-	 * ila_parse_bbc_tag()
+	 * parse_bbc_tag()
 	 *
 	 * - Breaks up the components of the [attach tag getting id, width, align
 	 * - Fixes some common usage errors
@@ -234,7 +234,7 @@ class In_Line_Attachment
 	 * @param int $ila_num
 	 * @return string
 	 */
-	private function ila_parse_bbc_tag($data, $ila_num)
+	private function parse_bbc_tag($data, $ila_num)
 	{
 		$this->_curr_tag = array('id' => '', 'type' => '', 'align' => '', 'width' => '');
 		$data = trim($data);
@@ -279,17 +279,17 @@ class In_Line_Attachment
 		if (!is_numeric($this->_curr_tag['id']))
 		{
 			// Take the first un-used attach number and use it
-			$this->_curr_tag['id'] = array_shift($this->_ila_attachments);
+			$this->_curr_tag['id'] = array_shift($this->_attachments);
 
 			// Stick it back on the end in case we need to loop around
-			array_push($this->_ila_attachments, $this->_curr_tag['id']);
+			array_push($this->_attachments, $this->_curr_tag['id']);
 		}
 		// Standard =x, Remove this from the [attach] choice since we have used it
 		else
-			$this->_ila_attachments = array_diff($this->_ila_attachments, array($this->_curr_tag['id']));
+			$this->_attachments = array_diff($this->_attachments, array($this->_curr_tag['id']));
 
 		// Replace this tag with the inlined attachment
-		$result = $this->ila_showInline($ila_num);
+		$result = $this->showInline($ila_num);
 
 		return !empty($result) ? $result : '[attach' . $data . ']';
 	}
@@ -305,7 +305,7 @@ class In_Line_Attachment
 	 *
 	 * - Is painfully complicated as is, should consider other approaches me thinks
 	 */
-	private function _ila_find_nested()
+	private function _find_nested()
 	{
 		global $modSettings, $context, $txt, $scripturl;
 
@@ -374,7 +374,7 @@ class In_Line_Attachment
 					if (!empty($quoted_msg_id))
 					{
 						if (!isset($context['current_topic']))
-							list($quote_topic,) = $this->_ila_get_topic(str_replace('msg', '', $quoted_msg_id));
+							list($quote_topic, ) = $this->_get_topic(str_replace('msg', '', $quoted_msg_id));
 						else
 							$quote_topic = $context['current_topic'];
 
@@ -396,7 +396,7 @@ class In_Line_Attachment
 
 						// Replace the ila attach tag with the link back to the message that was quoted
 						foreach ($ila_tags[0] as $id => $ila_replace)
-							$ila_string = $this->ila_str_replace_once($ila_replace, $linktoquotedmsg, $ila_string);
+							$ila_string = $this->str_replace_once($ila_replace, $linktoquotedmsg, $ila_string);
 
 						// At last the final step, sub in the attachment link
 						$this->_message = str_replace($quotes[$i], $ila_string, $this->_message);
@@ -413,20 +413,20 @@ class In_Line_Attachment
 	}
 
 	/**
-	 * ila_showInline()
+	 * showInline()
 	 *
 	 * - Does the actual replacement of the [attach tag with the img tag
 	 *
 	 * @param int $ila_num
 	 */
-	private function ila_showInline($ila_num)
+	private function showInline($ila_num)
 	{
 		global $txt, $modSettings;
 
 		$images = array('none', 'img', 'thumb');
 
 		// Find the text of the attachment being referred to
-		$this->_attachment = isset($this->_ila_attachments_context[$this->_curr_tag['id'] - 1]) ? $this->_ila_attachments_context[$this->_curr_tag['id'] - 1] : '';
+		$this->_attachment = isset($this->_attachments_context[$this->_curr_tag['id'] - 1]) ? $this->_attachments_context[$this->_curr_tag['id'] - 1] : '';
 
 		// We found an attachment that matches our attach id in the message
 		if ($this->_attachment != '')
@@ -467,14 +467,14 @@ class In_Line_Attachment
 				$this->_curr_tag['type'] = 'url';
 
 			// Create the image tag based off the type given
-			$inlinedtext = $this->ila_build_img_tag($uniqueID);
+			$inlinedtext = $this->build_img_tag($uniqueID);
 
 			// Handle the align tag if it was supplied.
 			if ($this->_curr_tag['align'] == 'left' || $this->_curr_tag['align'] == 'right' || $this->_curr_tag['align'] == 'center')
 				$inlinedtext = '<div class="ila_align_' . $this->_curr_tag['align'] . '">' . $inlinedtext . '</div>';
 
 			// Keep track of the attachments we have in-lined so we can exclude them from being displayed in the post footers
-			$this->_ila_dont_show_attach_below[$this->_attachment['id']] = 1;
+			$this->_dont_show_attach_below[$this->_attachment['id']] = 1;
 		}
 		else
 		{
@@ -488,8 +488,8 @@ class In_Line_Attachment
 			if (allowedTo('view_attachments'))
 			{
 				// Check to see if the preview flag, via attach number, is set, if so try to render a preview ILA
-				if (isset($this->_ila_new_msg_preview[$this->_curr_tag['id']]))
-					$inlinedtext = $this->ila_preview_inline($this->_ila_new_msg_preview[$this->_curr_tag['id']], $this->_curr_tag['type'], $this->_curr_tag['id'], $this->_curr_tag['align'], $this->_curr_tag['width']);
+				if (isset($this->_new_msg_preview[$this->_curr_tag['id']]))
+					$inlinedtext = $this->preview_inline($this->_new_msg_preview[$this->_curr_tag['id']], $this->_curr_tag['type'], $this->_curr_tag['id'], $this->_curr_tag['align'], $this->_curr_tag['width']);
 				else
 					$inlinedtext = $txt['ila_attachment_missing'];
 			}
@@ -506,7 +506,7 @@ class In_Line_Attachment
 	 * @param string $uniqueID
 	 * @return string
 	 */
-	private function ila_build_img_tag($uniqueID)
+	private function build_img_tag($uniqueID)
 	{
 		global $txt, $context, $modSettings, $settings;
 
@@ -555,7 +555,7 @@ class In_Line_Attachment
 							<img src="' . $this->_attachment['thumbnail']['href'] . '" alt="' . $uniqueID . '" title="' . $ila_title . '" id="thumb_' . $uniqueID . '"  style="width:' . $this->_curr_tag['width'] . 'px;" />
 						</a>';
 				else
-					$inlinedtext = $this->ila_create_html_thumb($uniqueID);
+					$inlinedtext = $this->create_html_thumb($uniqueID);
 				break;
 			// [attachurl=xx] -- no image, just a link with size/view details type = url
 			case 'url':
@@ -583,7 +583,7 @@ class In_Line_Attachment
 	 *
 	 * @param int $uniqueID
 	 */
-	private function ila_create_html_thumb($uniqueID)
+	private function create_html_thumb($uniqueID)
 	{
 		global $modSettings, $context;
 
@@ -624,7 +624,7 @@ class In_Line_Attachment
 	}
 
 	/**
-	 * ila_preview_inline()
+	 * preview_inline()
 	 *
 	 * Renders a preview box for attachments that have not been uploaded, used in preview message
 	 *
@@ -634,7 +634,7 @@ class In_Line_Attachment
 	 * @param string $align
 	 * @param int $width
 	 */
-	private function ila_preview_inline($attachname, $type, $id, $align, $width)
+	private function preview_inline($attachname, $type, $id, $align, $width)
 	{
 		global $txt, $modSettings;
 
@@ -681,12 +681,12 @@ class In_Line_Attachment
 	}
 
 	/**
-	 * ila_load_attachments()
+	 * load_attachments()
 	 *
 	 * - Loads attachments for a given msg if they have not yet been loaded
 	 * - Attachments must be enabled and user allowed to see attachments
 	 */
-	private function ila_load_attachments()
+	private function load_attachments()
 	{
 		global $modSettings;
 
@@ -708,7 +708,7 @@ class In_Line_Attachment
 	 *
 	 * @param int $msg_id
 	 */
-	private function _ila_get_topic($msg_id)
+	private function _get_topic($msg_id)
 	{
 		$db = database();
 
@@ -738,7 +738,7 @@ class In_Line_Attachment
 	}
 
 	/**
-	 * ila_str_replace_once()
+	 * str_replace_once()
 	 *
 	 * - Looks for the first occurrence of $needle in $haystack and replaces it with $replace,
 	 * this is a single replace
@@ -747,7 +747,7 @@ class In_Line_Attachment
 	 * @param string $replace
 	 * @param string $haystack
 	 */
-	private function ila_str_replace_once($needle, $replace, $haystack)
+	private function str_replace_once($needle, $replace, $haystack)
 	{
 		$pos = strpos($haystack, $needle);
 		if ($pos === false)
@@ -758,39 +758,38 @@ class In_Line_Attachment
 
 		return substr_replace($haystack, $replace, $pos, strlen($needle));
 	}
-}
 
-/**
- * ila_hide_bbc()
- *
- * Makes [attach tags invisible inside for certain bbc blocks like code, nobbc, etc
- *
- * @param string $message
- * @param string[] $hide_tags
- */
-function ila_hide_bbc(&$message, $hide_tags = array())
-{
-	global $modSettings;
-
-	// Not using BBC no need to do anything
-	if (empty($modSettings['enableBBC']))
-		return;
-
-	// If our ila attach tags are nested inside of these tags we need to hide them so they don't execute
-	if (empty($hide_tags))
-		$hide_tags = array('code', 'html', 'php', 'noembed', 'nobbc');
-
-	// Look for each tag, if attach is found inside then replace its '[' with a hex
-	// so parse bbc does not try to render them
-	foreach ($hide_tags as $tag)
+	/**
+	 * ila_hide_bbc()
+	 *
+	 * Makes [attach tags invisible inside for certain bbc blocks like code, nobbc, etc
+	 *
+	 * @param string[] $hide_tags
+	 */
+	public function hide_bbc($hide_tags = array())
 	{
-		if (stripos($message, '[' . $tag . ']') !== false)
-		{
-			$message = preg_replace_callback('~\[' . $tag . ']((?>[^[]|\[(?!/?' . $tag . ']))+?)\[/' . $tag . ']~i',
-			function($matches) use($tag) {return "[" . $tag . "]" . str_ireplace("[attach", "&#91;attach", $matches[1]) . "[/" . $tag . "]";},
-			$message);
-		}
-	}
+		global $modSettings;
 
-	return;
+		// Not using BBC no need to do anything
+		if (empty($modSettings['enableBBC']))
+			return $this->_message;
+
+		// If our ila attach tags are nested inside of these tags we need to hide them so they don't execute
+		if (empty($hide_tags))
+			$hide_tags = array('code', 'html', 'php', 'noembed', 'nobbc');
+
+		// Look for each tag, if attach is found inside then replace its '[' with a hex
+		// so parse bbc does not try to render them
+		foreach ($hide_tags as $tag)
+		{
+			if (stripos($this->_message, '[' . $tag . ']') !== false)
+			{
+				$this->_message = preg_replace_callback('~\[' . $tag . ']((?>[^[]|\[(?!/?' . $tag . ']))+?)\[/' . $tag . ']~i',
+				function($matches) use($tag) {return "[" . $tag . "]" . str_ireplace("[attach", "&#91;attach", $matches[1]) . "[/" . $tag . "]";},
+				$this->_message);
+			}
+		}
+
+		return $this->_message;
+	}
 }
