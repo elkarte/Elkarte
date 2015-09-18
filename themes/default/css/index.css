@@ -4185,6 +4185,7 @@ a.help .icon {
 	text-transform: uppercase;
 	font-weight: bold;
 	line-height: 2em;
+	min-width: 4em;
 }
 
 .mlist_header {
