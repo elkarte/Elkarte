@@ -45,6 +45,8 @@ class Topic_Util
 		$messages_per_page = empty($modSettings['disableCustomPerPage']) && !empty($options['messages_per_page']) ? $options['messages_per_page'] : $modSettings['defaultMaxMessages'];
 		$topicseen = $topicseen ? ';topicseen' : '';
 
+		$icon_sources = new MessageTopicIcons();
+
 		foreach ($topics_info as $row)
 		{
 			// Is there a body to preview? (If not the preview is disabled.)
@@ -106,8 +108,6 @@ class Topic_Util
 			}
 			else
 				$pages = '';
-
-			$icon_sources = new MessageTopicIcons();
 
 			if ($user_info['is_guest'])
 			{
