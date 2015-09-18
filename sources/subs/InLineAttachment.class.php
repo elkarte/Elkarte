@@ -307,11 +307,7 @@ class In_Line_Attachment
 	 */
 	private function _find_nested()
 	{
-		global $modSettings, $context, $txt, $scripturl;
-
-		// Should not get to this point but ....
-		if (empty($modSettings['enableBBC']))
-			return;
+		global $context, $txt, $scripturl;
 
 		// Regexs to search the message for quotes, nested quotes and quoted text, and tags
 		$regex = array();
