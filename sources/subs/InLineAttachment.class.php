@@ -124,9 +124,6 @@ class In_Line_Attachment
 		if (empty($modSettings['enableBBC']) || (isset($context['site_action']) && in_array($context['site_action'], array('boardindex', 'messageindex'))))
 			return $this->_message;
 
-		// Previewing a modified message, check for a value in $_REQUEST['msg']
-		$this->_id_msg = empty($this->_id_msg) ? (isset($_REQUEST['msg']) ? (int) $_REQUEST['msg'] : -1) : $this->_id_msg;
-
 		// No message id and not previewing a new message ($_REQUEST['ila'] will be set)
 		if ($this->_id_msg === -1 && !isset($_REQUEST['ila']))
 		{
