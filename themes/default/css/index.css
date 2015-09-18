@@ -2903,10 +2903,6 @@ ul.post_options li {
 	white-space: nowrap;
 }
 
-#postAttachment > dd.progress_tracker {
-	margin: 0;
-}
-
 .progress_tracker {
 	overflow: hidden;
 	width: 97%;
@@ -2966,25 +2962,20 @@ ul.post_options li {
 	width: 97%;
 }
 
-#postMoreOptions, #postAttachment, #postAttachment2 {
+#postMoreOptions, #postAttachment2 {
 	margin: -1px 0 0 0;
 	padding: 10px;
 }
 
-#postAttachment, #postAttachment2 {
+#postAttachment2 {
 	overflow: hidden;
 }
 
-#postAttachment dd, #postAttachment2 dd {
+#postAttachment2 dd {
 	margin: 4px 12px;
 }
 
-#postAttachment dd {
-	float: left;
-	width: 45%;
-}
-
-#postAttachment dt, #postAttachment2 dt {
+#postAttachment2 dt {
 	font-weight: bold;
 }
 
@@ -5638,11 +5629,11 @@ dl.no_members {
 		width: 50%;
 	}
 
-	#postAttachment dd, #postAttachment2 dd {
+	#postAttachment2 dd {
 		margin: 2px 1px;
 	}
 
-	#postMoreOptions, #postAttachment, #postAttachment2 {
+	#postMoreOptions, #postAttachment2 {
 		padding: 4px;
 	}
 
