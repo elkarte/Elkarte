@@ -185,7 +185,12 @@ class In_Line_Attachment
 			if (!allowedTo('view_attachments', $this->_board))
 			{
 				$this->_message = preg_replace_callback('~\[attach\s*?(.*?(?:".+?")?.*?|.*?)\][\r\n]?~i',
-				function() use($context, $txt) {return $context['user']['is_guest'] ? $txt['ila_forbidden_for_guest'] : $txt['ila_nopermission'];},
+				function() use($context, $txt) {
+					if ($context['user']['is_guest'])
+						return $txt['ila_forbidden_for_guest'];
+					else
+						return $txt['ila_nopermission'];
+				},
 				$this->_message);
 			}
 			else
