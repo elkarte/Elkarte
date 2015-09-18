@@ -389,7 +389,7 @@ function template_modify_board()
 						<span class="smalltext">', $txt['mboards_description_desc'], '</span>
 					</dt>
 					<dd>
-						<textarea id="desc" name="desc" rows="3" cols="35" style="width: 99%;">', $context['board']['description'], '</textarea>
+						<textarea id="desc" name="desc" rows="3" cols="35">', $context['board']['description'], '</textarea>
 					</dd>
 					<dt>
 						<label for="profile">', $txt['permission_profile'], ':</label><br />
@@ -632,7 +632,7 @@ function template_modify_board()
 
 	if (!isset($context['board']['is_new']) && empty($context['board']['is_recycle']))
 		echo '
-					<span', $context['board']['is_recycle'] ? ' style="visibility:hidden">' : '>', '<input type="submit" name="delete" value="', $txt['mboards_delete_board'], '" onclick="return confirm(\'', $txt['boardConfirm'], '\');" /></span>';
+					<input type="submit" name="delete" value="', $txt['mboards_delete_board'], '" onclick="return confirm(\'', $txt['boardConfirm'], '\');" />';
 
 	echo '
 				</div>
