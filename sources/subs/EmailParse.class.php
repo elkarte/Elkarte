@@ -44,7 +44,7 @@ if (!defined('ELK'))
  * Optional functions:
  * - $email_message->load_address(); // Returns array with to/from/cc addresses
  * - $email_message->load_key(); // Returns the security key is found, also sets
- * message_key_id, message_type and message_id
+ * message_key, message_type and message_id
  * - $email_message->load_spam(); // Returns boolean on if spam headers are set
  * - $email_message->load_ip(); // Set ip origin of the email if available
  * - $email_message->load_returnpath(); // Load the message return path
@@ -94,6 +94,12 @@ class Email_Parse
 	 * @var string
 	 */
 	public $message_key_id = null;
+
+	/**
+	 * Message hex-code
+	 * @var string
+	 */
+	public $message_key = null;
 
 	/**
 	 * Message type of the key p, m or t
@@ -853,7 +859,7 @@ class Email_Parse
 	 */
 	public function load_key($key = '')
 	{
-		$regex_key = '~([a-z0-9]{32}\-(p|t|m)(\d+))~i';
+		$regex_key = '~(([a-z0-9]{32})\-(p|t|m)(\d+))~i';
 		$match = array();
 		$found_key = false;
 
@@ -907,8 +913,9 @@ class Email_Parse
 		if (!empty($match[1]))
 		{
 			$this->message_key_id = $match[1];
-			$this->message_type = $match[2];
-			$this->message_id = (int) $match[3];
+			$this->message_key = $match[2];
+			$this->message_type = $match[3];
+			$this->message_id = (int) $match[4];
 			return $match[1];
 		}
 

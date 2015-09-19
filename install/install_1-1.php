@@ -2133,12 +2133,14 @@ class InstallInstructions_install_1_1
 	{
 		return $this->table->db_create_table('{db_prefix}postby_emails',
 			array(
-				array('name' => 'id_email',  'type' => 'varchar', 'size' => 50, 'default' => ''),
+				array('name' => 'email_key',  'type' => 'varchar', 'size' => 32, 'default' => ''),
+				array('name' => 'email_type',       'type' => 'varchar', 'size' => 1, 'default' => ''),
+				array('name' => 'message',  'type' => 'mediumint', 'size' => 8, 'default' => ''),
 				array('name' => 'time_sent', 'type' => 'int', 'size' => 10, 'default' => 0),
 				array('name' => 'email_to',  'type' => 'varchar', 'size' => 50, 'default' => ''),
 			),
 			array(
-				array('name' => 'id_email', 'columns' => array('id_email'), 'type' => 'primary'),
+				array('name' => 'id_email', 'columns' => array('email_key', 'email_type', 'message'), 'type' => 'primary'),
 			),
 			array(),
 			'ignore'

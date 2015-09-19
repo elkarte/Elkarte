@@ -647,7 +647,7 @@ function pbe_emailError($error, $email_message)
 	// First up is the old, wrong email address, lets see who this should have come from if its not a new topic request
 	if ($error === 'error_not_find_member' && $email_message->message_type !== 'x')
 	{
-		$key_owner = query_key_owner($email_message->message_key_id);
+		$key_owner = query_key_owner($email_message);
 		if (!empty($key_owner))
 		{
 			// Valid key so show who should have sent this key in? email aggravaters :P often mess this up
@@ -663,7 +663,7 @@ function pbe_emailError($error, $email_message)
 	// A valid key but it was not sent to this user ... but we did get the email from a valid site user
 	if ($error === 'error_key_sender_match')
 	{
-		$key_owner = query_key_owner($email_message->message_key_id);
+		$key_owner = query_key_owner($email_message);
 		if (!empty($key_owner))
 		{
 			// Valid key so show who should have sent this key in
@@ -1252,7 +1252,7 @@ function query_user_keys($email)
 	// Find all keys sent to this email, sorted by date
 	return $db->fetchQuery('
 		SELECT
-			id_email
+			email_key, email_type, message
 		FROM {db_prefix}postby_emails
 		WHERE email_to = {string:email}
 		ORDER BY time_sent DESC',
@@ -1266,10 +1266,10 @@ function query_user_keys($email)
  * Return the email that a given key was sent to
  *
  * @package Maillist
- * @param string $key security key
+ * @param Email_Parse $email_message
  * @return string email address the key was sent to
  */
-function query_key_owner($key)
+function query_key_owner($email_message)
 {
 	$db = database();
 
@@ -1283,10 +1283,14 @@ function query_key_owner($key)
 		SELECT
 			email_to
 		FROM {db_prefix}postby_emails
-		WHERE id_email = {string:database_id}
+		WHERE email_key = {string:key}
+			AND email_type = {string:type}
+			AND message = {string:message}
 		LIMIT 1',
 		array(
-			'database_id' => $key
+			'key' => $email_message->message_key,
+			'type' => $email_message->message_type,
+			'message' => $email_message->message_id,
 		)
 	);
 	list ($email_to) = $db->fetch_row($request);
@@ -1722,9 +1726,13 @@ function query_key_maintenance($email_message)
 	{
 		$db->query('', '
 			DELETE FROM {db_prefix}postby_emails
-			WHERE id_email = {string:message_key_id}',
+			WHERE email_key = {string:key}
+				AND email_type = {string:type}
+				AND message = {string:message}',
 			array(
-				'message_key_id' => $email_message->message_key_id,
+				'key' => $email_message->message_key,
+				'type' => $email_message->message_type,
+				'message' => $email_message->message_id,
 			)
 		);
 	}

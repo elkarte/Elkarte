@@ -418,7 +418,8 @@ function log_email($sent)
 	$db->insert('ignore',
 		'{db_prefix}postby_emails',
 		array(
-			'id_email' => 'string', 'time_sent' => 'int', 'email_to' => 'string'
+			'email_key' => 'string', 'email_type' => 'string',
+			'message' => 'string', 'time_sent' => 'int', 'email_to' => 'string'
 		),
 		$sent,
 		array('id_email')
