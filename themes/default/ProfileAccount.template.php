@@ -121,7 +121,7 @@ function template_issueWarning()
 					<span class="smalltext">', $txt['profile_warning_reason_desc'], '</span>
 				</dt>
 				<dd>
-					<input type="text" name="warn_reason" id="warn_reason" value="', $context['warning_data']['reason'], '" size="50" style="width: 80%;" class="input_text" />
+					<input id="warn_reason" class="warn_input" type="text" name="warn_reason"  value="', $context['warning_data']['reason'], '" size="50" class="input_text" />
 				</dd>
 			</dl>
 			<hr />
@@ -147,26 +147,24 @@ function template_issueWarning()
 					<label for="warn_sub">', $txt['profile_warning_notify_subject'], ':</label>
 				</dt>
 				<dd>
-					<input type="text" name="warn_sub" id="warn_sub" value="', empty($context['warning_data']['notify_subject']) ? $txt['profile_warning_notify_template_subject'] : $context['warning_data']['notify_subject'], '" size="50" style="width: 80%;" class="input_text" />
+					<input id="warn_sub" class="warn_input" type="text" name="warn_sub" value="', empty($context['warning_data']['notify_subject']) ? $txt['profile_warning_notify_template_subject'] : $context['warning_data']['notify_subject'], '" size="50" class="input_text" />
 				</dd>
 				<dt>
 					<label for="warn_temp">', $txt['profile_warning_notify_body'], ':</label>
 				</dt>
 				<dd>
-					<div class="padding">
-						<select name="warn_temp" id="warn_temp" disabled="disabled" onchange="populateNotifyTemplate();">
-							<option value="-1">', $txt['profile_warning_notify_template'], '</option>
-							<option value="-1" disabled="disabled">', str_repeat('&#8212;', strlen($txt['profile_warning_notify_template'])), '</option>';
+					<select name="warn_temp" id="warn_temp" disabled="disabled" onchange="populateNotifyTemplate();">
+						<option value="-1">', $txt['profile_warning_notify_template'], '</option>
+						<option value="-1" disabled="disabled">', str_repeat('&#8212;', strlen($txt['profile_warning_notify_template'])), '</option>';
 
 		foreach ($context['notification_templates'] as $id_template => $template)
 			echo '
-							<option value="', $id_template, '">&#10148;&nbsp;', $template['title'], '</option>';
+						<option value="', $id_template, '">&#10148;&nbsp;', $template['title'], '</option>';
 
 		echo '
-						</select>
-						<span id="new_template_link" style="display: none;"><a class="linkbutton new_win" href="', $scripturl, '?action=moderate;area=warnings;sa=templateedit;tid=0" target="_blank">', $txt['profile_warning_new_template'], '</a></span>
-					</div>
-					<textarea name="warn_body" id="warn_body" cols="40" rows="8" style="min-width: 50%; max-width: 99%;">', $context['warning_data']['notify_body'], '</textarea>
+					</select>
+					<span id="new_template_link" style="display: none;"><a class="linkbutton new_win" href="', $scripturl, '?action=moderate;area=warnings;sa=templateedit;tid=0" target="_blank">', $txt['profile_warning_new_template'], '</a></span>
+					<textarea id="warn_body" class="warn_input" name="warn_body" cols="40" rows="8">', $context['warning_data']['notify_body'], '</textarea>
 				</dd>';
 	}
 

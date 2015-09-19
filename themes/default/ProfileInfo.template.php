@@ -485,13 +485,9 @@ function template_viewWarning()
 					<strong>', $txt['profile_warning_level'], ':</strong>
 				</dt>
 				<dd>
-					<div>
-						<div>
-							<div style="font-size: 8pt; height: 12pt; width: ', $context['warningBarWidth'], 'px; border: 1px solid black; background: white; padding: 1px; position: relative;">
-								<div id="warning_text" class="centertext">', $context['member']['warning'], '%</div>
-								<div id="warning_progress" style="width: ', $context['member']['warning'], '%; height: 12pt; z-index: 1; background: ', $context['current_color'], ';">&nbsp;</div>
-							</div>
-						</div>
+					<div class="progress_bar progress_bar_compact">
+						<div class="full_bar full_bar_compact">', $context['member']['warning'], '%</div>
+						<div class="green_percent green_percent_compact" style="width: ', $context['member']['warning'], '%;">&nbsp;</div>
 					</div>
 				</dd>';
 

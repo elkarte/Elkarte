@@ -3541,30 +3541,22 @@ dl.merge_topic dd {
 }
 
 /* Issue a warning */
-#warn_body {
+#warn_body, .warn_input {
 	width: 80%;
 	font-size: 0.857em;
-}
-
-#warning_text {
-	position: absolute;
-	z-index: 2;
-	padding-top: 1pt;
-	width: 100%;
-	font-weight: bold;
 }
 
 #new_template_link a {
 	margin-bottom: 2px;
 }
 
-#warndiv {
-	margin: 0 0 1em 5%;
+#warning_bar {
+	margin: 0;
 }
 
 #slider-range-min {
-	margin-top: 1em;
-	width: 90%;
+	margin: 1em 0;
+	width: 80%;
 }
 
 #qrcode {
@@ -4483,6 +4475,19 @@ dl.no_members {
 .green_percent, .blue_percent {
 	z-index: 1;
 	height: 2em;
+}
+
+.green_percent_compact, .blue_percent_compact, .full_bar_compact, .progress_bar_compact {
+	height: 1em;
+}
+
+.progress_bar_compact {
+	margin: 0 auto 0 0;
+}
+
+.full_bar_compact {
+	padding: 0;
+	line-height: 1em;
 }
 
 .loading {
@@ -5550,10 +5555,6 @@ dl.no_members {
 
 	#month_grid {
 		display: none;
-	}
-
-	#warning_level {
-		max-width: 5em !important;
 	}
 
 	/* mentions */
