@@ -363,7 +363,7 @@ function template_th_search_bar()
 				<input type="hidden" name="', (!empty($modSettings['search_dropdown']) ? 'sd_brd[' : 'brd['), $context['current_board'], ']"', ' value="', $context['current_board'], '" />';
 
 	echo '
-				<button type="submit" name="search;sa=results" class="', (!empty($modSettings['search_dropdown'])) ? 'with_select' : '', '" /><i class="fa fa-lg fa-search"></i></button>
+				<button type="submit" name="search;sa=results" class="', (!empty($modSettings['search_dropdown'])) ? 'with_select' : '', '"><i class="fa fa-lg fa-search"></i></button>
 				<input type="hidden" name="advanced" value="0" />
 			</form>';
 }
