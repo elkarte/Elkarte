@@ -26,6 +26,27 @@ if (!defined('ELK'))
 class Spellcheck_Controller extends Action_Controller
 {
 	/**
+	 * Known words that pspell will not now
+	 *
+	 * @var array
+	 */
+	public $known_words = array('elkarte', 'php', 'mysql', 'www', 'gif', 'jpeg', 'png', 'http');
+
+	/**
+	 * The object that holds our initialized pspell
+	 *
+	 * @var object
+	 */
+	public $pspell_link;
+
+	/**
+	 * The template layers object
+	 *
+	 * @var null|object
+	 */
+	protected $_template_layers = null;
+
+	/**
 	 * Spell checks the post for typos ;).
 	 * It uses the pspell library, which MUST be installed.
 	 * It has problems with internationalization.
@@ -36,9 +57,7 @@ class Spellcheck_Controller extends Action_Controller
 		global $txt, $context;
 
 		// A list of "words" we know about but pspell doesn't.
-		$known_words = array('elkarte', 'php', 'mysql', 'www', 'gif', 'jpeg', 'png', 'http');
-
-		$this->_events->trigger('prepare_spellcheck', array('known_words' => &$known_words));
+		$this->_events->trigger('prepare_spellcheck', array('$this->known_words' => &$this->known_words));
 
 		loadLanguage('Post');
 		loadTemplate('Post');
@@ -51,16 +70,16 @@ class Spellcheck_Controller extends Action_Controller
 		pspell_new('en');
 
 		// Next, the dictionary in question may not exist. So, we try it... but...
-		$pspell_link = pspell_new($txt['lang_dictionary'], $txt['lang_spelling'], '', 'utf-8', PSPELL_FAST | PSPELL_RUN_TOGETHER);
+		$this->pspell_link = pspell_new($txt['lang_dictionary'], $txt['lang_spelling'], '', 'utf-8', PSPELL_FAST | PSPELL_RUN_TOGETHER);
 
 		// Most people don't have anything but English installed... So we use English as a last resort.
-		if (!$pspell_link)
-			$pspell_link = pspell_new('en', '', '', '', PSPELL_FAST | PSPELL_RUN_TOGETHER);
+		if (!$this->pspell_link)
+			$this->pspell_link = pspell_new('en', '', '', '', PSPELL_FAST | PSPELL_RUN_TOGETHER);
 
 		error_reporting($old);
 		@ob_end_clean();
 
-		if (!isset($_POST['spellstring']) || !$pspell_link)
+		if (!isset($_POST['spellstring']) || !$this->pspell_link)
 			die;
 
 		// Get all the words (Javascript already separated them).
@@ -74,6 +93,7 @@ class Spellcheck_Controller extends Action_Controller
 			);';
 
 		// And instruct the template system to just show the spellcheck sub template.
+		$this->_template_layers = Template_Layers::getInstance();
 		$this->_template_layers->removeAll();
 		$context['sub_template'] = 'spellcheck';
 	}
@@ -89,7 +109,7 @@ class Spellcheck_Controller extends Action_Controller
 			$check_word = explode('|', $alpha);
 
 			// If the word is a known word, or spelled right...
-			if (in_array(Util::strtolower($check_word[0]), $known_words) || pspell_check($pspell_link, $check_word[0]) || !isset($check_word[2]))
+			if (in_array(Util::strtolower($check_word[0]), $this->known_words) || pspell_check($this->pspell_link, $check_word[0]) || !isset($check_word[2]))
 				continue;
 
 			// Find the word, and move up the "last occurrence" to here.
@@ -100,7 +120,7 @@ class Spellcheck_Controller extends Action_Controller
 				new misp("' . strtr($check_word[0], array('\\' => '\\\\', '"' => '\\"', '<' => '', '&gt;' => '')) . '", ' . (int) $check_word[1] . ', ' . (int) $check_word[2] . ', [';
 
 			// If there are suggestions, add them in...
-			$suggestions = pspell_suggest($pspell_link, $check_word[0]);
+			$suggestions = pspell_suggest($this->pspell_link, $check_word[0]);
 			if (!empty($suggestions))
 			{
 				// But first check they aren't going to be censored - no naughty words!
@@ -112,7 +132,7 @@ class Spellcheck_Controller extends Action_Controller
 					$array .= '"' . implode('", "', $suggestions) . '"';
 			}
 
-			$array .= '])';
+			$array .= ']),';
 		}
 
 		// If words were found, take off the last comma.
