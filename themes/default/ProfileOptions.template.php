@@ -422,7 +422,7 @@ function template_edit_options()
 						<span class="smalltext">', $txt['required_security_reasons'], '</span>
 					</dt>
 					<dd>
-						<input type="password" name="oldpasswrd" id="oldpasswrd" size="20" style="margin-right: 4ex;" class="input_password" required="required" />
+						<input type="password" name="oldpasswrd" id="oldpasswrd" size="20" class="input_password" required="required" />
 					</dd>
 				</dl>';
 
