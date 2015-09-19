@@ -293,7 +293,7 @@ function template_edit_options()
 		{
 			echo '
 				</dl>
-				<hr class="clear" />
+				<hr class="separator" />
 				<dl>';
 		}
 		elseif ($field['type'] == 'callback')
@@ -387,7 +387,7 @@ function template_edit_options()
 	{
 		if ($lastItem != 'hr')
 			echo '
-				<hr class="clear" />';
+				<hr class="separator" />';
 
 		echo '
 				<dl>';
@@ -414,38 +414,9 @@ function template_edit_options()
 				<div>', $context['profile_posthtml'], '</div>';
 
 	// Only show the password box if it's actually needed.
-	if ($context['require_password'])
-		echo '
-				<dl>
-					<dt>
-						<strong', isset($context['modify_error']['bad_password']) || isset($context['modify_error']['no_password']) ? ' class="error"' : '', '><label for="oldpasswrd">', $txt['current_password'], '</label><br />
-						<span class="smalltext">', $txt['required_security_reasons'], '</span>
-					</dt>
-					<dd>
-						<input type="password" name="oldpasswrd" id="oldpasswrd" size="20" class="input_password" required="required" />
-					</dd>
-				</dl>';
+	template_profile_save();
 
 	echo '
-			</div>
-			<div class="submitbutton">';
-
-	// The button shouldn't say "Change profile" unless we're changing the profile...
-	if (!empty($context['submit_button_text']))
-		echo '
-				<input type="submit" name="save" value="', $context['submit_button_text'], '" />';
-	else
-		echo '
-				<input type="submit" name="save" value="', $txt['change_profile'], '" />';
-
-	if (!empty($context['token_check']))
-		echo '
-				<input type="hidden" name="', $context[$context['token_check'] . '_token_var'], '" value="', $context[$context['token_check'] . '_token'], '" />';
-
-	echo '
-				<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />
-				<input type="hidden" name="u" value="', $context['id_member'], '" />
-				<input type="hidden" name="sa" value="', $context['menu_item_selected'], '" />
 			</div>
 		</form>';
 
@@ -1066,7 +1037,7 @@ function template_profile_group_manage()
 }
 
 /**
- * Callback function for entering a birthdate!
+ * Callback function for entering a birth date!
  */
 function template_profile_birthdate()
 {
@@ -1427,32 +1398,9 @@ function template_authentication_method()
 					</dd>
 				</dl>';
 
-	if ($context['require_password'])
-		echo '
-				<hr class="clear" />
-				<dl>
-					<dt>
-						<strong', isset($context['modify_error']['bad_password']) || isset($context['modify_error']['no_password']) ? ' class="error"' : '', '><label for="oldpasswrd">', $txt['current_password'], '</label><br />
-						<span class="smalltext">', $txt['required_security_reasons'], '</span>
-					</dt>
-					<dd>
-						<input type="password" id="oldpasswrd" name="oldpasswrd" tabindex="', $context['tabindex']++, '" size="20" style="margin-right: 4ex;" class="input_password" placeholder="', $txt['current_password'], '" required="required" />
-					</dd>
-				</dl>';
+				template_profile_save();
 
 	echo '
-			</div>';
-
-	if (!empty($context['token_check']))
-		echo '
-				<input type="hidden" name="', $context[$context['token_check'] . '_token_var'], '" value="', $context[$context['token_check'] . '_token'], '" />';
-
-	echo '
-			<div class="submitbutton">
-				<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />
-				<input type="hidden" name="u" value="', $context['id_member'], '" />
-				<input type="hidden" name="sa" value="', $context['menu_item_selected'], '" />
-				<input type="submit" value="', $txt['change_profile'], '" />
 			</div>
 		</form>';
 

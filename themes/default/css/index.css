@@ -270,6 +270,7 @@ input[type=submit][disabled]:hover, button[disabled], button[disabled]:hover {
 	overflow: auto;
 	padding: 6px 0;
 	text-align: right;
+	clear: both;
 }
 
 .submitbutton input[type="submit"] {
