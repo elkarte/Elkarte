@@ -4056,14 +4056,14 @@ a.help .icon {
 #advanced_search dt {
 	float: left;
 	clear: both;
-	padding: 5px 4px 0 4px;
+	padding: 4px 4px 0 4px;
 	width: 35%;
 	text-align: right;
 }
 
 #advanced_search dd {
 	float: left;
-	padding: 3px 2px;
+	padding: 4px 2px;
 	width: 65%;
 	text-align: left;
 }
@@ -4103,6 +4103,7 @@ a.help .icon {
 
 .search_results_posts .quickbuttons {
 	margin-left: 1em;
+	margin-right: 1em;
 }
 
 .search_results_posts .topic_body {

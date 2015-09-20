@@ -101,18 +101,19 @@ function template_searchform()
 									', $txt['search_options'], ':
 								</dt>
 								<dd class="options">
-									<label for="show_complete">', $txt['search_show_complete_messages'], '
-										<input type="checkbox" name="show_complete" id="show_complete" value="1"', !empty($context['search_params']['show_complete']) ? ' checked="checked"' : '', ' class="input_check" />
-									</label><br />
-									<label for="subject_only">', $txt['search_subject_only'], '
-										<input type="checkbox" name="subject_only" id="subject_only" value="1"', !empty($context['search_params']['subject_only']) ? ' checked="checked"' : '', ' class="input_check" />
-									</label>
+									<input type="checkbox" name="show_complete" id="show_complete" value="1"', !empty($context['search_params']['show_complete']) ? ' checked="checked"' : '', ' class="input_check" />
+									<label for="show_complete">', $txt['search_show_complete_messages'], '</label><br />
+									<input type="checkbox" name="subject_only" id="subject_only" value="1"', !empty($context['search_params']['subject_only']) ? ' checked="checked"' : '', ' class="input_check" />
+									<label for="subject_only">', $txt['search_subject_only'], '</label>
 								</dd>
 								<dt class="righttext between">
 									', $txt['search_post_age'], ':
 								</dt>
-								<dd><label for="minage">
-									', $txt['search_between'], '</label><input type="text" name="minage" id="minage" value="', $context['search_params']['minage'], '" size="5" maxlength="4" class="input_text" />&nbsp;<label for="maxage">', $txt['search_and'], '&nbsp;</label><input type="text" name="maxage" id="maxage" value="', $context['search_params']['maxage'], '" size="5" maxlength="4" class="input_text" /> ', $txt['days_word'], '
+								<dd>
+									<label for="minage">', $txt['search_between'], '</label>&nbsp;
+									<input type="text" name="minage" id="minage" value="', $context['search_params']['minage'], '" size="5" maxlength="4" class="input_text" />&nbsp;
+									<label for="maxage">', $txt['search_and'], '&nbsp;</label>
+									<input type="text" name="maxage" id="maxage" value="', $context['search_params']['maxage'], '" size="5" maxlength="4" class="input_text" /> ', $txt['days_word'], '
 								</dd>
 							</dl>
 						</div>
@@ -259,7 +260,7 @@ function template_results()
 	// Quick moderation set to checkboxes? Oh, how fun :/.
 	if (!empty($options['display_quick_mod']) && $options['display_quick_mod'] == 1)
 		echo '
-			<form action="', $scripturl, '?action=quickmod" method="post" accept-charset="UTF-8" name="topicForm" id="topicForm" class="search_results_posts', $context['compact'] ? ' compact_view' : '', '">';
+			<form id="topicForm" class="search_results_posts', $context['compact'] ? ' compact_view' : '', '" action="', $scripturl, '?action=quickmod" method="post" accept-charset="UTF-8" name="topicForm">';
 
 	echo '
 				<h2 class="category_header hdicon cat_img_search">
@@ -365,7 +366,7 @@ function template_results()
 						</p>';
 			}
 
-		echo '
+			echo '
 					</li>';
 		}
 	}
