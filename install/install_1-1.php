@@ -2137,7 +2137,7 @@ class InstallInstructions_install_1_1
 			array(
 				array('name' => 'message_key',  'type' => 'varchar', 'size' => 32, 'default' => ''),
 				array('name' => 'message_type', 'type' => 'varchar', 'size' => 10, 'default' => ''),
-				array('name' => 'message_id',   'type' => 'mediumint', 'size' => 8, 'default' => ''),
+				array('name' => 'message_id',   'type' => 'mediumint', 'size' => 8, 'default' => 0),
 				array('name' => 'time_sent',    'type' => 'int', 'size' => 10, 'default' => 0),
 				array('name' => 'email_to',     'type' => 'varchar', 'size' => 50, 'default' => ''),
 			),
