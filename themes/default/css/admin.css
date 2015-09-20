@@ -46,7 +46,7 @@
 /* @todo - A general admin wrapper class. */
 #admin_main_section, div.quick_tasks, #mod_main_section,
 #support_credits, #admin_newsletters,
-#core_features, #generate_reports_type,
+#core_features,
 #groupForm, #mailqueue_stats, #manage_maintenance,
 #new_group, #view_group, #admin_form_wrapper, .action_admin .generic_list_wrapper {
 	margin: 12px 0 0 0;
@@ -54,7 +54,6 @@
 	overflow: auto;
 }
 
-#generate_reports_type div.content,
 #new_group div.content,
 #view_group div.content,
 #admin_newsletters .content {

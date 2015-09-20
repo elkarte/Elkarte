@@ -523,13 +523,13 @@ function template_search()
 	global $context, $scripturl, $txt;
 
 	echo '
-	<form action="', $scripturl, '?action=pm;sa=search2" method="post" accept-charset="UTF-8" name="searchform" id="searchform">
+	<form id="searchform" action="', $scripturl, '?action=pm;sa=search2" method="post" accept-charset="UTF-8" name="searchform" >
 		<h2 class="category_header">', $txt['pm_search_title'], '</h2>';
 
 	// Any search errors we need to let them know about
 	if (!empty($context['search_errors']))
 		echo '
-		<div class="errorbox">', implode('<br />', $context['search_errors']['messages']), '</div>';
+		<p class="errorbox">', implode('<br />', $context['search_errors']['messages']), '</p>';
 
 	// Start with showing the basic search input box
 	echo '
@@ -544,10 +544,10 @@ function template_search()
 
 	// Now all the advanced options, hidden or shown by JS based on the users minmax choices
 	echo '
-			<div id="advanced_search" class="content">
+			<div id="advanced_search">
 				<dl id="search_options">
-					<dt class="righttext"><label for="searchtype">
-						', $txt['search_match'], ':</label>
+					<dt class="righttext">
+						<label for="searchtype">', $txt['search_match'], ':</label>
 					</dt>
 					<dd>
 						<select name="searchtype">
@@ -575,21 +575,21 @@ function template_search()
 						', $txt['pm_search_options'], ':
 					</dt>
 					<dd class="options">
-						<label for="show_complete">
-							<input type="checkbox" name="show_complete" id="show_complete" value="1"', !empty($context['search_params']['show_complete']) ? ' checked="checked"' : '', ' class="input_check" /> ', $txt['pm_search_show_complete'], '
-						</label><br />
-						<label for="subject_only">
-							<input type="checkbox" name="subject_only" id="subject_only" value="1"', !empty($context['search_params']['subject_only']) ? ' checked="checked"' : '', ' class="input_check" /> ', $txt['pm_search_subject_only'], '
-						</label><br />
-						<label for="sent_only">
-							<input type="checkbox" name="sent_only" id="sent_only" value="1"', !empty($context['search_params']['sent_only']) ? ' checked="checked"' : '', ' class="input_check" /> ', $txt['pm_search_sent_only'], '
-						</label>
+						<input type="checkbox" name="show_complete" id="show_complete" value="1"', !empty($context['search_params']['show_complete']) ? ' checked="checked"' : '', ' />
+						<label for="show_complete">', $txt['pm_search_show_complete'], '</label><br />
+						<input type="checkbox" name="subject_only" id="subject_only" value="1"', !empty($context['search_params']['subject_only']) ? ' checked="checked"' : '', ' />
+						<label for="subject_only">', $txt['pm_search_subject_only'], '</label><br />
+						<input type="checkbox" name="sent_only" id="sent_only" value="1"', !empty($context['search_params']['sent_only']) ? ' checked="checked"' : '', ' />
+						<label for="sent_only">', $txt['pm_search_sent_only'], '</label>
 					</dd>
-					<dt class="between">
+					<dt class="righttext between">
 						', $txt['pm_search_post_age'], ':
 					</dt>
 					<dd>
-						<label for="minage">', $txt['pm_search_between'], ' <input type="text" id="minage" name="minage" value="', empty($context['search_params']['minage']) ? '0' : $context['search_params']['minage'], '" size="5" maxlength="5" class="input_text" /></label>&nbsp;<label for="maxage">', $txt['pm_search_between_and'], '&nbsp;<input type="text" name="maxage" id="maxage" value="', empty($context['search_params']['maxage']) ? '9999' : $context['search_params']['maxage'], '" size="5" maxlength="5" class="input_text" /></label> ', $txt['pm_search_between_days'], '
+						<label for="minage">', $txt['pm_search_between'], '</label>&nbsp;
+						 <input type="text" id="minage" name="minage" value="', empty($context['search_params']['minage']) ? '0' : $context['search_params']['minage'], '" size="5" maxlength="5" class="input_text" />
+						<label for="maxage">', $txt['pm_search_between_and'], '&nbsp;</label>
+						<input type="text" name="maxage" id="maxage" value="', empty($context['search_params']['maxage']) ? '9999' : $context['search_params']['maxage'], '" size="5" maxlength="5" class="input_text" />', $txt['pm_search_between_days'], '
 					</dd>
 				</dl>
 			</div>
@@ -712,14 +712,20 @@ function template_search_results()
 	global $context, $scripturl, $txt;
 
 	echo '
-		', template_pagesection(), '
-		<div class="forumposts">
-			<h2 class="category_header">
-				', $txt['pm_search_results'], '
+		<div class="search_results_posts', empty($context['search_params']['show_complete']) ? ' compact_view' : '', '">
+			<h2 class="category_header hdicon cat_img_search">
+				', $txt['mlist_search_results'], ':&nbsp;', $context['search_params']['search'], '
 			</h2>';
 
-	// complete results ?
-	if (empty($context['search_params']['show_complete']) && !empty($context['personal_messages']))
+	// Was anything even found?
+	if (!empty($context['personal_messages']))
+		template_pagesection();
+	else
+		echo '
+			<div class="well">', $txt['find_no_results'], '</div>';
+
+	// Showing complete results?
+	if (empty($context['search_params']['show_complete']))
 		echo '
 			<table class="table_grid">
 				<thead>
@@ -730,34 +736,34 @@ function template_search_results()
 					</tr>
 				</thead>
 				<tbody>';
+	else
+		echo '
+			<ul class="forumposts topic_listing search_results_posts">';
 
 	// Print each message out...
 	foreach ($context['personal_messages'] as $message)
 	{
-		// We showing it all?
-		// @todo - Needs markup rewrite here.
 		if (!empty($context['search_params']['show_complete']))
 		{
 			echo '
-			<div class="content">
-				<div class="postarea2">
-					<h5>
-						<span class="floatright">', $txt['search_on'], ': ', $message['time'], '</span>
-						<span class="floatleft">', $message['counter'], '&nbsp;&nbsp;<a href="', $message['href'], '">', $message['subject'], '</a></span>
-					</h5>
-					<h5 class="clear">', $txt['from'], ': ', $message['member']['link'], ', ', $txt['to'], ': ';
+				<li class="basic_row">
+					<div class="topic_details">
+						<div class="counter">', $message['counter'], '</div>
+						<h5><a href="', $message['href'], '">', $message['subject'], '</a>&nbsp;<span class="smalltext">&#171;&nbsp;', $txt['search_on'], ': ', $message['time'], '&nbsp;&#187;</h5>
+						<span class="smalltext">', $txt['from'], ': ', $message['member']['link'], ', ', $txt['to'], ': ';
 
 			// Show the recipients.
 			// @todo This doesn't deal with the sent item searching quite right for bcc.
 			if (!empty($message['recipients']['to']))
 				echo implode(', ', $message['recipients']['to']);
 			// Otherwise, we're just going to say "some people"...
-			elseif ($context['folder'] != 'sent')
+			elseif ($context['folder'] !== 'sent')
 				echo '(', $txt['pm_undisclosed_recipients'], ')';
 
 			echo '
-					</h5>
-					<div class="inner">
+						</span>
+					</div>
+					<div class="topic_body">
 						', $message['body'], '
 					</div>';
 
@@ -780,39 +786,35 @@ function template_search_results()
 			}
 
 			echo '
-				</div>
-			</div>';
+				</li>';
 		}
 		// Otherwise just a simple list!
 		else
 		{
 			// @todo No context at all of the search?
 			echo '
-			<tr style="vertical-align: top;">
-				<td>', $message['time'], '</td>
-				<td>', $message['link'], '</td>
-				<td>', $message['member']['link'], '</td>
-			</tr>';
+					<tr>
+						<td>', $message['time'], '</td>
+						<td>', $message['link'], '</td>
+						<td>', $message['member']['link'], '</td>
+					</tr>';
 		}
 	}
 
-	// Finish off the page...
-	if (empty($context['search_params']['show_complete']) && !empty($context['personal_messages']))
+	if (!empty($context['search_params']['show_complete']))
+		echo '
+			</ul>';
+	else
 		echo '
 				</tbody>
 			</table>';
 
-	// No results?
-	if (empty($context['personal_messages']))
-		echo '
-			<div class="content centertext">
-				<p>', $txt['pm_search_none_found'], '</p>
-			</div>';
+	// If we have results show a page index
+	if (!empty($context['personal_messages']))
+		template_pagesection();
 
 	echo '
 		</div>';
-
-	template_pagesection();
 }
 
 /**

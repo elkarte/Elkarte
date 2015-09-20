@@ -115,19 +115,16 @@ function template_profile_save()
 {
 	global $context, $txt;
 
-	echo '
-					<hr class="clear" />';
-
 	// Only show the password box if it's actually needed.
 	if ($context['require_password'])
 		echo '
-					<dl>
+					<dl class="clear">
 						<dt>
 							<strong', isset($context['modify_error']['bad_password']) || isset($context['modify_error']['no_password']) ? ' class="error"' : '', '><label for="oldpasswrd">', $txt['current_password'], '</label>: </strong><br />
 							<span class="smalltext">', $txt['required_security_reasons'], '</span>
 						</dt>
 						<dd>
-							<input type="password" id="oldpasswrd" name="oldpasswrd" size="20" style="margin-right: 4ex;" class="input_password" placeholder="', $txt['current_password'], '" />
+							<input type="password" id="oldpasswrd" name="oldpasswrd" size="20" class="input_password" placeholder="', $txt['current_password'], '" />
 						</dd>
 					</dl>';
 
@@ -138,8 +135,15 @@ function template_profile_save()
 		echo '
 						<input type="hidden" name="', $context[$context['token_check'] . '_token_var'], '" value="', $context[$context['token_check'] . '_token'], '" />';
 
+	// The button shouldn't say "Change profile" unless we're changing the profile...
+	if (!empty($context['submit_button_text']))
+		echo '
+						<input type="submit" name="save" value="', $context['submit_button_text'], '" />';
+	else
+		echo '
+						<input type="submit" name="save" value="', $txt['change_profile'], '" />';
+
 	echo '
-						<input type="submit" value="', $txt['change_profile'], '" />
 						<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />
 						<input type="hidden" name="u" value="', $context['id_member'], '" />
 						<input type="hidden" name="sa" value="', $context['menu_item_selected'], '" />

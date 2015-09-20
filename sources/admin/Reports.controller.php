@@ -31,7 +31,7 @@ if (!defined('ELK'))
  */
 class Reports_Controller extends Action_Controller
 {
-		/**
+	/**
 	 * Holds instance of HttpReq object
 	 * @var HttpReq
 	 */
@@ -102,14 +102,15 @@ class Reports_Controller extends Action_Controller
 				'is_first' => $is_first++ == 0,
 			);
 
+		$report_type = !empty($this->_req->post->rt) ? $this->_req->post->rt : (!empty($this->_req->query->rt) ? $this->_req->query->rt : null);
 		// If they haven't chosen a report type which is valid, send them off to the report type chooser!
-		if (empty($this->_req->post->rt) || !isset($context['report_types'][$this->_req->post->rt]))
+		if (empty($report_type) || !isset($context['report_types'][$report_type]))
 		{
 			$context['sub_template'] = 'report_type';
 			return;
 		}
 
-		$context['report_type'] = $this->_req->post->rt;
+		$context['report_type'] = $report_type;
 		$context['sub_template'] = 'generate_report';
 
 		// What are valid templates for showing reports?
@@ -123,16 +124,17 @@ class Reports_Controller extends Action_Controller
 		);
 
 		// Specific template? Use that instead of main!
-		if (isset($this->_req->post->st) && isset($reportTemplates[$this->_req->post->st]))
+		$set_template = isset($this->_req->query->st) ? $this->_req->query->st : null;
+		if (isset($set_template) && isset($reportTemplates[$set_template]))
 		{
-			$context['sub_template'] = $this->_req->post->st;
+			$context['sub_template'] = $set_template;
 
 			// Are we disabling the other layers - print friendly for example?
-			if ($reportTemplates[$this->_req->post->st]['layers'] !== null)
+			if ($reportTemplates[$set_template]['layers'] !== null)
 			{
 				$template_layers = Template_Layers::getInstance();
 				$template_layers->removeAll();
-				foreach ($reportTemplates[$this->_req->post->st]['layers'] as $layer)
+				foreach ($reportTemplates[$set_template]['layers'] as $layer)
 					$template_layers->add($layer);
 			}
 		}
@@ -359,7 +361,7 @@ class Reports_Controller extends Action_Controller
 		foreach ($board_permissions as $board => $groups)
 		{
 			// Create the table for this board first.
-			newTable($boards[$board]['name'], 'x', 'all', 100, 'center', 200, 'left');
+			newTable($boards[$board]['name'], 'x', 'all', 'auto', 'center', 200, 'left');
 
 			// Add the header row - shows all the membergroups.
 			addData($member_groups);
@@ -463,7 +465,7 @@ class Reports_Controller extends Action_Controller
 		setKeys('cols', $mgSettings);
 
 		// Only one table this time!
-		newTable($txt['gr_type_member_groups'], '-', 'all', 100, 'center', 200, 'left');
+		newTable($txt['gr_type_member_groups'], '-', 'all', 'auto', 'center', 200, 'left');
 
 		// Get the shaded column in.
 		addData($mgSettings);
@@ -528,7 +530,7 @@ class Reports_Controller extends Action_Controller
 		setKeys('rows', $groups);
 
 		// Create the table first.
-		newTable($txt['gr_type_group_perms'], '-', 'all', 100, 'center', 200, 'left');
+		newTable($txt['gr_type_group_perms'], '-', 'all', 'auto', 'center', 200, 'left');
 
 		// Show all the groups
 		addData($groups);

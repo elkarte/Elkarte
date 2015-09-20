@@ -72,7 +72,7 @@ function template_unread()
 
 		if ($context['showCheckboxes'])
 			echo '
-					<form action="', $scripturl, '?action=quickmod" method="post" accept-charset="UTF-8" name="quickModForm" id="quickModForm" style="margin: 0;">
+					<form id="quickModForm" action="', $scripturl, '?action=quickmod" method="post" accept-charset="UTF-8" name="quickModForm">
 						<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />
 						<input type="hidden" name="qaction" value="markread" />
 						<input type="hidden" name="redirect_url" value="', $context['querystring_board_limits'], '" />';

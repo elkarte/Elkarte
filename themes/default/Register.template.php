@@ -576,7 +576,7 @@ function template_admin_register()
 	echo '
 	<div id="admincenter">
 		<div id="admin_form_wrapper">
-			<form id="postForm" class="content" action="', $scripturl, '?action=admin;area=regcenter" method="post" autocomplete="off" accept-charset="UTF-8" name="postForm">
+			<form id="postForm" action="', $scripturl, '?action=admin;area=regcenter" method="post" autocomplete="off" accept-charset="UTF-8" name="postForm">
 				<h2 class="category_header">', $txt['admin_browse_register_new'], '</h2>
 				<div id="register_screen" class="content">';
 

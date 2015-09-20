@@ -90,7 +90,7 @@ h1, h2, h3, h4, h5, h6,
 ul, ol, li,
 dl, dd, dt,
 p, fieldset,
-form, input, button, select, .input_text, textarea, input[type="checkbox"], input[type="radio"],
+form, input, button, select, .input_text, textarea,
 .editor {
 	box-sizing: border-box;
 	margin: 0;
@@ -215,8 +215,12 @@ input[type="number"] {
 }
 
 /* No borders around checkboxes or radio buttons, and middle aligned. */
-.input_check, .input_radio {
-	margin: 0 2px 2px;
+input[type="checkbox"], input[type="radio"] {
+	box-sizing: border-box;
+	font-weight: normal;
+	font-size: 1em;
+	margin: -2px 2px 0;
+	padding: 0;
 	border: none;
 	background: none;
 	vertical-align: middle;
@@ -266,6 +270,7 @@ input[type=submit][disabled]:hover, button[disabled], button[disabled]:hover {
 	overflow: auto;
 	padding: 6px 0;
 	text-align: right;
+	clear: both;
 }
 
 .submitbutton input[type="submit"] {
@@ -2903,10 +2908,6 @@ ul.post_options li {
 	white-space: nowrap;
 }
 
-#postAttachment > dd.progress_tracker {
-	margin: 0;
-}
-
 .progress_tracker {
 	overflow: hidden;
 	width: 97%;
@@ -2966,25 +2967,20 @@ ul.post_options li {
 	width: 97%;
 }
 
-#postMoreOptions, #postAttachment, #postAttachment2 {
+#postMoreOptions, #postAttachment2 {
 	margin: -1px 0 0 0;
 	padding: 10px;
 }
 
-#postAttachment, #postAttachment2 {
+#postAttachment2 {
 	overflow: hidden;
 }
 
-#postAttachment dd, #postAttachment2 dd {
+#postAttachment2 dd {
 	margin: 4px 12px;
 }
 
-#postAttachment dd {
-	float: left;
-	width: 45%;
-}
-
-#postAttachment dt, #postAttachment2 dt {
+#postAttachment2 dt {
 	font-weight: bold;
 }
 
@@ -3546,30 +3542,22 @@ dl.merge_topic dd {
 }
 
 /* Issue a warning */
-#warn_body {
+#warn_body, .warn_input {
 	width: 80%;
 	font-size: 0.857em;
-}
-
-#warning_text {
-	position: absolute;
-	z-index: 2;
-	padding-top: 1pt;
-	width: 100%;
-	font-weight: bold;
 }
 
 #new_template_link a {
 	margin-bottom: 2px;
 }
 
-#warndiv {
-	margin: 0 0 1em 5%;
+#warning_bar {
+	margin: 0;
 }
 
 #slider-range-min {
-	margin-top: 1em;
-	width: 90%;
+	margin: 1em 0;
+	width: 80%;
 }
 
 #qrcode {
@@ -4068,14 +4056,14 @@ a.help .icon {
 #advanced_search dt {
 	float: left;
 	clear: both;
-	padding: 5px 4px 0 4px;
+	padding: 4px 4px 0 4px;
 	width: 35%;
 	text-align: right;
 }
 
 #advanced_search dd {
 	float: left;
-	padding: 3px 2px;
+	padding: 4px 2px;
 	width: 65%;
 	text-align: left;
 }
@@ -4115,6 +4103,7 @@ a.help .icon {
 
 .search_results_posts .quickbuttons {
 	margin-left: 1em;
+	margin-right: 1em;
 }
 
 .search_results_posts .topic_body {
@@ -4185,6 +4174,7 @@ a.help .icon {
 	text-transform: uppercase;
 	font-weight: bold;
 	line-height: 2em;
+	min-width: 4em;
 }
 
 .mlist_header {
@@ -4487,6 +4477,19 @@ dl.no_members {
 .green_percent, .blue_percent {
 	z-index: 1;
 	height: 2em;
+}
+
+.green_percent_compact, .blue_percent_compact, .full_bar_compact, .progress_bar_compact {
+	height: 1em;
+}
+
+.progress_bar_compact {
+	margin: 0 auto 0 0;
+}
+
+.full_bar_compact {
+	padding: 0;
+	line-height: 1em;
 }
 
 .loading {
@@ -5556,10 +5559,6 @@ dl.no_members {
 		display: none;
 	}
 
-	#warning_level {
-		max-width: 5em !important;
-	}
-
 	/* mentions */
 	.mentionavatar .avatar {
 		max-width: 40px;
@@ -5637,11 +5636,11 @@ dl.no_members {
 		width: 50%;
 	}
 
-	#postAttachment dd, #postAttachment2 dd {
+	#postAttachment2 dd {
 		margin: 2px 1px;
 	}
 
-	#postMoreOptions, #postAttachment, #postAttachment2 {
+	#postMoreOptions, #postAttachment2 {
 		padding: 4px;
 	}
 

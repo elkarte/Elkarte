@@ -368,7 +368,7 @@ function template_upload()
 
 	echo '
 		<div class="content">
-			<form action="' . $scripturl . '?action=admin;area=packageservers;sa=upload2" method="post" accept-charset="UTF-8" enctype="multipart/form-data" style="margin-bottom: 0;">
+			<form action="' . $scripturl . '?action=admin;area=packageservers;sa=upload2" method="post" accept-charset="UTF-8" enctype="multipart/form-data">
 				<dl class="settings">
 					<dt>
 						<label for="package">' . $txt['package_upload_select'] . ':</label>
@@ -377,7 +377,6 @@ function template_upload()
 						<input type="file" id="package" name="package" size="38" class="input_file" />
 					</dd>
 				</dl>
-				<hr />
 				<div class="submitbutton">
 					<input type="submit" value="' . $txt['package_upload'] . '" />
 					<input type="hidden" name="' . $context['session_var'] . '" value="' . $context['session_id'] . '" />

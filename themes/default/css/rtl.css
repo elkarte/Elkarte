@@ -724,11 +724,8 @@ ul.post_options {
 ul.post_options li {
 	float: right;
 }
-#postAttachment dd, #postAttachment2 dd {
+#postAttachment2 dd {
 	margin: 4px 12px 4px 0;
-}
-#postAttachment dd {
-	float: right;
 }
 .draftautosave {
 	text-align: left;

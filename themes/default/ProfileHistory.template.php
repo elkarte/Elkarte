@@ -25,7 +25,7 @@ function template_trackActivity()
 	// The first table shows IP information about the user.
 	echo '
 		<div class="generic_list_wrapper">
-			<h2 class="category_header"><strong>', $txt['view_ips_by'], ' ', $context['member']['name'], '</strong></h2>';
+			<h2 class="category_header">', $txt['view_ips_by'], ' ', $context['member']['name'], '</h2>';
 
 	// The last IP the user used.
 	echo '
