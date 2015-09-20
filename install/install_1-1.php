@@ -2133,14 +2133,14 @@ class InstallInstructions_install_1_1
 	{
 		return $this->table->db_create_table('{db_prefix}postby_emails',
 			array(
-				array('name' => 'email_key',  'type' => 'varchar', 'size' => 32, 'default' => ''),
-				array('name' => 'email_type',       'type' => 'varchar', 'size' => 1, 'default' => ''),
-				array('name' => 'message',  'type' => 'mediumint', 'size' => 8, 'default' => ''),
-				array('name' => 'time_sent', 'type' => 'int', 'size' => 10, 'default' => 0),
-				array('name' => 'email_to',  'type' => 'varchar', 'size' => 50, 'default' => ''),
+				array('name' => 'message_key',  'type' => 'varchar', 'size' => 32, 'default' => ''),
+				array('name' => 'message_type', 'type' => 'varchar', 'size' => 10, 'default' => ''),
+				array('name' => 'message_id',   'type' => 'mediumint', 'size' => 8, 'default' => ''),
+				array('name' => 'time_sent',    'type' => 'int', 'size' => 10, 'default' => 0),
+				array('name' => 'email_to',     'type' => 'varchar', 'size' => 50, 'default' => ''),
 			),
 			array(
-				array('name' => 'id_email', 'columns' => array('email_key', 'email_type', 'message'), 'type' => 'primary'),
+				array('name' => 'id_email', 'columns' => array('message_key', 'message_type', 'message_id'), 'type' => 'primary'),
 			),
 			array(),
 			'ignore'
@@ -2153,9 +2153,9 @@ class InstallInstructions_install_1_1
 			array(
 				array('name' => 'id_email',     'type' => 'int', 'size' => 10, 'auto' => true),
 				array('name' => 'error',        'type' => 'varchar', 'size' => 255, 'default' => ''),
-				array('name' => 'data_id',      'type' => 'varchar', 'size' => 255, 'default' => 0),
+				array('name' => 'message_key',  'type' => 'varchar', 'size' => 32, 'default' => ''),
 				array('name' => 'subject',      'type' => 'varchar', 'size' => 255, 'default' => ''),
-				array('name' => 'id_message',   'type' => 'int', 'size' => 10, 'default' => 0),
+				array('name' => 'message_id',   'type' => 'int', 'size' => 10, 'default' => 0),
 				array('name' => 'id_board',     'type' => 'smallint', 'size' => 5, 'default' => 0),
 				array('name' => 'email_from',   'type' => 'varchar', 'size' => 50, 'default' => ''),
 				array('name' => 'message_type', 'type' => 'char', 'size' => 10, 'default' => ''),

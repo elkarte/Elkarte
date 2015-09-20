@@ -721,8 +721,14 @@ function pbe_emailError($error, $email_message)
 	$id = isset($_REQUEST['item']) ? (int) $_REQUEST['item'] : 0;
 	$db->insert(!empty($id) ? 'replace' : 'ignore',
 		'{db_prefix}postby_emails_error',
-		array('id_email' => 'int', 'error' => 'string', 'data_id' => 'string', 'subject' => 'string', 'id_message' => 'int', 'id_board' => 'int', 'email_from' => 'string', 'message_type' => 'string', 'message' => 'string'),
-		array($id, $error, $message_key, $subject, $message_id, $board_id, $email_message->email['from'], $message_type, $email_message->raw_message),
+		array(
+			'id_email' => 'int', 'error' => 'string', 'message_key' => 'string',
+			'subject' => 'string', 'message_id' => 'int', 'id_board' => 'int',
+			'email_from' => 'string', 'message_type' => 'string', 'message' => 'string'),
+		array(
+			$id, $error, $message_key,
+			$subject, $message_id, $board_id,
+			$email_message->email['from'], $message_type, $email_message->raw_message),
 		array('id_email')
 	);
 
@@ -1252,7 +1258,7 @@ function query_user_keys($email)
 	// Find all keys sent to this email, sorted by date
 	return $db->fetchQuery('
 		SELECT
-			email_key, email_type, message
+			message_key, message_type, message_id
 		FROM {db_prefix}postby_emails
 		WHERE email_to = {string:email}
 		ORDER BY time_sent DESC',
@@ -1283,9 +1289,9 @@ function query_key_owner($email_message)
 		SELECT
 			email_to
 		FROM {db_prefix}postby_emails
-		WHERE email_key = {string:key}
-			AND email_type = {string:type}
-			AND message = {string:message}
+		WHERE message_key = {string:key}
+			AND message_type = {string:type}
+			AND message_id = {string:message}
 		LIMIT 1',
 		array(
 			'key' => $email_message->message_key,
@@ -1726,13 +1732,13 @@ function query_key_maintenance($email_message)
 	{
 		$db->query('', '
 			DELETE FROM {db_prefix}postby_emails
-			WHERE email_key = {string:key}
-				AND email_type = {string:type}
-				AND message = {string:message}',
+			WHERE message_key = {string:key}
+				AND message_type = {string:type}
+				AND message_id = {string:message_id}',
 			array(
 				'key' => $email_message->message_key,
 				'type' => $email_message->message_type,
-				'message' => $email_message->message_id,
+				'message_id' => $email_message->message_id,
 			)
 		);
 	}

@@ -210,8 +210,8 @@ class ManageMaillist_Controller extends Action_Controller
 						'class' => 'wordbreak'
 					),
 					'sort' => array(
-						'default' => 'data_id',
-						'reverse' => 'data_id DESC',
+						'default' => 'message_key',
+						'reverse' => 'message_key DESC',
 					),
 				),
 				'message' => array(
