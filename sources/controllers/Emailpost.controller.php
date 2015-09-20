@@ -122,7 +122,7 @@ class Emailpost_Controller extends Action_Controller
 			return pbe_emailError('error_missing_key', $email_message);
 
 		// Good we have a key, who was it sent to?
-		$key_owner = query_key_owner($email_message->message_key_id);
+		$key_owner = query_key_owner($email_message);
 
 		// Can't find this key in the database, either
 		// a) spam attempt or b) replying with an expired/consumed key
@@ -249,6 +249,7 @@ class Emailpost_Controller extends Action_Controller
 		// No key for this, so set some blanks for the error function (if needed)
 		$email_message->message_type = 'x';
 		$email_message->message_key_id = '';
+		$email_message->message_key = '';
 		$email_message->message_id = 0;
 
 		// Check if it's a DSN

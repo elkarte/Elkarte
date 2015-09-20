@@ -243,11 +243,15 @@ function sendmail($to, $subject, $message, $from = null, $message_id = null, $se
 		{
 			$unq_id = '';
 			$unq_head = '';
+			$unq_head_array = array();
 
 			// If we are using the post by email functions, then we generate "reply to mail" security keys
 			if ($maillist)
 			{
-				$unq_head = md5($boardurl . microtime() . rand()) . '-' . $message_id;
+				$unq_head_array[0] = md5($boardurl . microtime() . rand());
+				$unq_head_array[1] = '';
+				$unq_head_array[2] = $message_id;
+				$unq_head = $unq_head_array[0] . '-' . $unq_head_array[2];
 				$encoded_unq_head = base64_encode($line_break . $line_break . '[' . $unq_head . ']' . $line_break);
 				$unq_id = ($need_break ? $line_break : '') . 'Message-ID: <' . $unq_head . strstr(empty($modSettings['maillist_mail_from']) ? $webmaster_email : $modSettings['maillist_mail_from'], '@') . '>';
 				$message = mail_insert_key($message, $unq_head, $encoded_unq_head, $line_break);
@@ -267,7 +271,11 @@ function sendmail($to, $subject, $message, $from = null, $message_id = null, $se
 			{
 				// Keep our post via email log
 				if (!empty($unq_head))
-					$sent[] = array($unq_head, time(), $to);
+				{
+					$unq_head_array[] = time();
+					$unq_head_array[] = $to;
+					$sent[] = $unq_head_array;
+				}
 
 				// Track total emails sent
 				if (!empty($modSettings['trackStats']))
@@ -618,12 +626,16 @@ function smtp_mail($mail_to_array, $subject, $message, $headers, $priority, $mes
 		// the keys are must unique for every mail you see
 		$unq_id = '';
 		$unq_head = '';
+		$unq_head_array = array();
 
 		// Using the post by email functions, and not a digest (priority 4)
 		// then generate "reply to mail" keys and place them in the message
 		if (!empty($modSettings['maillist_enabled']) && $message_id !== null && $priority != 4)
 		{
-			$unq_head = md5($scripturl . microtime() . rand()) . '-' . $message_id;
+			$unq_head_array[0] = md5($scripturl . microtime() . rand());
+			$unq_head_array[1] = '';
+			$unq_head_array[2] = $message_id;
+			$unq_head = $unq_head_array[0] . '-' . $unq_head_array[2];
 			$encoded_unq_head = base64_encode($line_break . $line_break . '[' . $unq_head . ']' . $line_break);
 			$unq_id = ($need_break ? $line_break : '') . 'Message-ID: <' . $unq_head . strstr(empty($modSettings['maillist_mail_from']) ? $webmaster_email : $modSettings['maillist_mail_from'], '@') . '>';
 			$message = mail_insert_key($message, $unq_head, $encoded_unq_head, $line_break);
@@ -663,7 +675,11 @@ function smtp_mail($mail_to_array, $subject, $message, $headers, $priority, $mes
 
 		// Keep our post via email log
 		if (!empty($unq_head))
-			$sent[] = array($unq_head, time(), $mail_to);
+		{
+			$unq_head_array[] = time();
+			$unq_head_array[] = $mail_to;
+			$sent[] = $unq_head_array;
+		}
 
 		// Almost done, almost done... don't stop me just yet!
 		setTimeLimit(300);
@@ -1336,9 +1352,13 @@ function reduceMailQueue($batch_size = false, $override_limit = false, $force_se
 			// Create our unique reply to email header if this message needs one
 			$unq_id = '';
 			$unq_head = '';
+			$unq_head_array = array();
 			if (!empty($modSettings['maillist_enabled']) && $email['message_id'] !== null && strpos($email['headers'], 'List-Id: <') !== false)
 			{
-				$unq_head = md5($scripturl . microtime() . rand()) . '-' . $email['message_id'];
+				$unq_head_array[0] = md5($scripturl . microtime() . rand());
+				$unq_head_array[1] = '';
+				$unq_head_array[2] = $message_id;
+				$unq_head = $unq_head_array[0] . '-' . $email['message_id'];
 				$encoded_unq_head = base64_encode($line_break . $line_break . '[' . $unq_head . ']' . $line_break);
 				$unq_id = ($need_break ? $line_break : '') . 'Message-ID: <' . $unq_head . strstr(empty($modSettings['maillist_mail_from']) ? $webmaster_email : $modSettings['maillist_mail_from'], '@') . '>';
 				$email['body_fail'] = $email['body'];

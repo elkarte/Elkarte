@@ -237,4 +237,15 @@ abstract class DbTable
 		$filter = $db->db_list_tables(false, $table_name);
 		return !empty($filter);
 	}
+
+	/**
+	 * Checks if a column exists in a table
+	 *
+	 * @param string $table_name
+	 * @return bool
+	 */
+	public function column_exists($table_name, $column_name)
+	{
+		return $this->_get_column_info($table_name, $column_name) !== false;
+	}
 }

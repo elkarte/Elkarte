@@ -1789,10 +1789,12 @@ function updateSplitTopics($options, $id_board)
 	$db->query('', '
 		UPDATE {db_prefix}log_reported
 		SET id_topic = {int:id_topic}
-		WHERE id_msg IN ({array_int:split_msgs})',
+		WHERE id_msg IN ({array_int:split_msgs})
+			AND type = {string:a_message}',
 		array(
 			'split_msgs' => $options['splitMessages'],
 			'id_topic' => $options['split2_ID_TOPIC'],
+			'a_message' => 'msg',
 		)
 	);
 

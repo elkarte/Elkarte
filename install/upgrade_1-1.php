@@ -303,4 +303,132 @@ class UpgradeInstructions_upgrade_1_1
 			)
 		);
 	}
+
+	public function preparing_postbyemail_title()
+	{
+		return 'Doing changes to post-by-email handling...';
+	}
+
+	public function preparing_postbyemail()
+	{
+		return array(
+			array(
+				'debug_title' => 'Splitting email_id into it\'s components in postby_emails...',
+				'function' => function($db, $db_table)
+				{
+					if ($db_table->column_exists('{db_prefix}postby_emails', 'id_email') === true)
+					{
+						// Add the new columns
+						$db_table->db_add_column('{db_prefix}postby_emails',
+							array(
+								'name' => 'message_key',
+								'type' => 'varchar',
+								'size' => 32,
+								'default' => ''
+							),
+							array(),
+							'ignore'
+						);
+						$db_table->db_add_column('{db_prefix}postby_emails',
+							array(
+								'name' => 'message_type',
+								'type' => 'varchar',
+								'size' => 10,
+								'default' => ''
+							),
+							array(),
+							'ignore'
+						);
+						$db_table->db_add_column('{db_prefix}postby_emails',
+							array(
+								'name' => 'message_id',
+								'type' => 'mediumint',
+								'size' => 8,
+								'default' => ''
+							),
+							array(),
+							'ignore'
+						);
+
+						// Move the data from the single column to the new three
+						$db->query('',
+							'UPDATE {db_prefix}postby_emails
+							SET
+								message_key = SUBSTRING(id_email FROM 1 FOR 32),
+								message_type = SUBSTRING(id_email FROM 34 FOR 1),
+								message_id = SUBSTRING(id_email FROM 35)'
+						);
+
+						// Do the cleanup
+						$db_table->db_remove_column('{db_prefix}postby_emails', 'id_email');
+						$db_table->db_remove_index('{db_prefix}postby_emails', 'id_email');
+						$db_table->db_add_index('{db_prefix}postby_emails', array('name' => 'id_email', 'columns' => array('id_email'), 'type' => 'primary'));
+					}
+				}
+			),
+			array(
+				'debug_title' => 'Naming consistency for postby_emails_error table columns...',
+				'function' => function($db, $db_table)
+				{
+					if ($db_table->column_exists('{db_prefix}postby_emails_error', 'data_id') === true)
+					{
+						// Rename some columns
+						$db_table->db_change_column('{db_prefix}postby_emails_error',
+							'data_id'
+							array(
+								'name' => 'message_key',
+							)
+						);
+						$db_table->db_change_column('{db_prefix}postby_emails_error',
+							'id_message'
+							array(
+								'name' => 'message_id',
+							)
+						);
+					}
+				}
+			),
+		);
+	}
+
+	public function pm_reporting_title()
+	{
+		return 'Enhancing PM reporting...';
+	}
+
+	public function pm_reporting()
+	{
+		return array(
+			array(
+				'debug_title' => 'Adding new columns...',
+				'function' => function($db, $db_table)
+				{
+					if ($db_table->column_exists('{db_prefix}log_reported', 'type') === true)
+					{
+						$db_table->db_add_column('{db_prefix}log_reported',
+							array(
+								'name' => 'type',
+								'type' => 'varchar',
+								'size' => 5,
+								'unsigned' => true,
+								'default' => 0
+							),
+							array(),
+							'ignore'
+						);
+						$db_table->db_add_column('{db_prefix}log_reported',
+							array(
+								'name' => 'time_message',
+								'type' => 'int',
+								'size' => 10,
+								'default' => 0
+							),
+							array(),
+							'ignore'
+						);
+					}
+				}
+			)
+		);
+	}
 }
