@@ -323,7 +323,7 @@ fieldset {
 }
 
 /*...and em as italics */
-em {
+em, .em {
 	font-style: italic;
 }
 
@@ -353,7 +353,7 @@ em {
 }
 
 .grid50 {
-	width: 49.5%;
+	width: 49.5% !important;
 }
 
 /* ------------------------------------------------------- */
@@ -3028,8 +3028,6 @@ ul.post_options li {
 }
 
 #report_comment {
-	padding: 5px;
-	width: 75%;
 	height: 10em;
 }
 

@@ -33,11 +33,11 @@ function template_list_groups_collapsible($group = 'default_groups_list')
 
 	foreach ($current_group_list['member_groups'] as $group)
 	{
-		$all_selected &= $group['status'] == 'on';
+		$all_selected &= $group['status'] === 'on';
 		echo '
 				<li>
 					<input type="checkbox" id="', $current_group_list['id'], '_', $group['id'], '" name="', $current_group_list['id'], '[', $group['id'], ']" value="on"', $group['status'] == 'on' ? ' checked="checked"' : '', ' class="input_check" />
-					<label for="', $current_group_list['id'], '_', $group['id'], '"', $group['is_postgroup'] ? ' style="font-style: italic;"' : '', '>', $group['name'], '</label> <em>(', $group['member_count'], ')</em>
+					<label for="', $current_group_list['id'], '_', $group['id'], '"', $group['is_postgroup'] ? ' class="em"' : '', '>', $group['name'], '</label> <em>(', $group['member_count'], ')</em>
 				</li>';
 	}
 

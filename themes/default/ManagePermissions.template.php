@@ -740,11 +740,11 @@ function template_inline_permissions()
 			echo '
 				</dt>
 				<dd>
-					<span', $group['is_postgroup'] ? ' style="font-style: italic;"' : '', '>', $group['name'], '</span>
+					<span', $group['is_postgroup'] ? ' class="em"' : '', '>', $group['name'], '</span>
 				</dd>';
 		else
 			echo '
-					<span', $group['is_postgroup'] ? ' style="font-style: italic;"' : '', '>', $group['name'], '</span>
+					<span', $group['is_postgroup'] ? ' class="em"' : '', '>', $group['name'], '</span>
 				</li>';
 	}
 
@@ -808,7 +808,7 @@ function template_postmod_permissions()
 						</th>
 					</tr>
 					<tr class="secondary_header">
-						<th style="width: 30%;">
+						<th class="grid30">
 							', $txt['permissions_post_moderation_group'], '
 						</th>
 						<th><img src="', $settings['default_images_url'], '/admin/post_moderation_allow.png" alt="', $txt['permissions_post_moderation_allow'], '" title="', $txt['permissions_post_moderation_allow'], '" /></th>

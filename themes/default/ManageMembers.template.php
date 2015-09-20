@@ -157,7 +157,7 @@ function template_search_members()
 			</div>
 			<h2 class="category_header">', $txt['member_part_of_these_membergroups'], '</h2>
 			<div class="flow_hidden">
-				<table style="width: 49%;" class="table_grid floatleft">
+				<table class="table_grid floatleft grid50">
 					<thead>
 						<tr class="table_head">
 							<th scope="col">', $txt['membergroups'], '</th>
@@ -194,7 +194,7 @@ function template_search_members()
 					</tbody>
 				</table>
 
-				<table style="width: 49%;" class="table_grid floatright">
+				<table class="table_grid floatright grid50">
 					<thead>
 						<tr class="table_head">
 							<th scope="col">
