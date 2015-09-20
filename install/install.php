@@ -1612,6 +1612,8 @@ function definePaths()
 		DEFINE('EXTDIR', $extdir);
 	if (!DEFINED('LANGUAGEDIR'))
 		DEFINE('LANGUAGEDIR', $languagedir);
+	if (!DEFINED('ADDONSDIR'))
+		DEFINE('ADDONSDIR', $boarddir . '/addons');
 	if (!DEFINED('SOURCEDIR'))
 		DEFINE('SOURCEDIR', $sourcedir);
 	if (!DEFINED('ADMINDIR'))
