@@ -279,7 +279,7 @@ function template_reported_posts()
 	foreach ($context['reports'] as $report)
 	{
 		$report['class'] = 'content';
-		$report['title'] = '<strong>' . (!empty($report['board_name']) ? '<a href="' . $scripturl . '?board=' . $report['board'] . '.0">' . $report['board_name'] . '</a>' : '??') . ' / <a href="' . $report['topic_href'] . '">' . $report['subject'] . '</a></strong> ' . $txt['mc_reportedp_by'] . ' <strong>' . $report['author']['link'] . '</strong>';
+		$report['title'] = '<strong>' . (!empty($report['board_name']) ? '<a href="' . $scripturl . '?board=' . $report['board'] . '.0">' . $report['board_name'] . '</a> / ' : '') . '<a href="' . $report['topic_href'] . '">' . $report['subject'] . '</a></strong> ' . $txt['mc_reportedp_by'] . ' <strong>' . $report['author']['link'] . '</strong>';
 
 		// Prepare the comments...
 		$comments = array();
@@ -374,10 +374,10 @@ function template_viewmodreport()
 					<div id="modcenter">
 						<form action="', $scripturl, '?action=moderate;area=', $context['admin_area'], ';report=', $context['report']['id'], '" method="post" accept-charset="UTF-8">
 							<h2 class="category_header">
-								', sprintf($txt['mc_viewmodreport'], $context['report']['message_link'], $context['report']['author']['link']), '
+								', $context['section_title'], '
 							</h2>
 							<div class="content">
-								<p class="warningbox">', sprintf($txt['mc_modreport_summary'], $context['report']['num_reports'], $context['report']['last_updated']), '</p>
+								<p class="warningbox">', $context['section_descripion'], '</p>
 								<div class="content">
 									', $context['report']['body'], '
 								</div>

@@ -2122,7 +2122,9 @@ function loadPersonalMessage($pm_id)
 	// First, pull out the message contents, and verify it actually went to them!
 	$request = $db->query('', '
 		SELECT
-			pm.subject, pm.body, pm.msgtime, pm.id_member_from, IFNULL(m.real_name, pm.from_name) AS sender_name, pm.from_name AS poster_name
+			pm.subject, pm.body, pm.msgtime, pm.id_member_from,
+			IFNULL(m.real_name, pm.from_name) AS sender_name,
+			pm.from_name AS poster_name, msgtime
 		FROM {db_prefix}personal_messages AS pm
 			INNER JOIN {db_prefix}pm_recipients AS pmr ON (pmr.id_pm = pm.id_pm)
 			LEFT JOIN {db_prefix}members AS m ON (m.id_member = pm.id_member_from)
