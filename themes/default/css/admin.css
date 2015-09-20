@@ -453,36 +453,30 @@ fieldset dl {
 /* Styles for the package manager.
 /* Haven't got here yet. :P
 ------------------------------------------------- */
-#package_list ol, #package_list ol li {
+#package_list ol {
 	list-style: decimal;
-	margin-left: 50px;
+	margin-left: 20px;
 	border: none;
 }
 
-#package_list ol ul, #package_list ol ul li {
-	margin-left: 0;
-	list-style: none;
-	border-radius: 3px;
+#package_list, .package_section {
+	list-style-type: none;
 }
 
-#package_list {
-	list-style-type: none;
+.package_section > ul {
+	margin-left: 5em;
 }
 
 #package_list li {
 	padding: 0.2em;
 	margin: 1px;
+	font-weight: 600;
 }
 
 .description, .information {
 	max-height: 16em;
 	overflow: auto;
 	padding-bottom: .5em;
-}
-
-.packages {
-	border: none !important;
-	list-style: none;
 }
 
 #find_code, #replace_code {
