@@ -554,8 +554,7 @@ class PersonalMessage_Controller extends Action_Controller
 			{
 				// Remove any nested quotes and <br />...
 				$form_message = preg_replace('~<br ?/?' . '>~i', "\n", $row_quoted['body']);
-				if (!empty($modSettings['removeNestedQuotes']))
-					$form_message = preg_replace(array('~\n?\[quote.*?\].+?\[/quote\]\n?~is', '~^\n~', '~\[/quote\]~'), '', $form_message);
+				$form_message = removeNestedQuotes($form_message);
 
 				if (empty($row_quoted['id_member']))
 					$form_message = '[quote author=&quot;' . $row_quoted['real_name'] . '&quot;]' . "\n" . $form_message . "\n" . '[/quote]';

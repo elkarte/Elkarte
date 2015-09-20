@@ -1120,8 +1120,7 @@ class Post_Controller extends Action_Controller
 			}
 
 			// Remove any nested quotes.
-			if (!empty($modSettings['removeNestedQuotes']))
-				$row['body'] = preg_replace(array('~\n?\[quote.*?\].+?\[/quote\]\n?~is', '~^\n~', '~\[/quote\]~'), '', $row['body']);
+			$row['body'] = removeNestedQuotes($row['body']);
 
 			// Add a quote string on the front and end.
 			$context['quote']['xml'] = '[quote author=' . $row['poster_name'] . ' link=msg=' . (int) $_REQUEST['quote'] . ' date=' . $row['poster_time'] . "]\n" . $row['body'] . "\n[/quote]";

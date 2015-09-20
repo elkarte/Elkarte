@@ -643,8 +643,7 @@ class PackageServers_Controller extends Action_Controller
 		$serverurl = trim(Util::htmlspecialchars($this->_req->post->serverurl));
 
 		// Make sure the URL has the correct prefix.
-		if (substr($serverurl, 0, 7) !== 'http://' && substr($serverurl, 0, 8) !== 'https://')
-			$serverurl = 'http://' . $serverurl;
+		$serverurl = addProtocol($serverurl, array('http://', 'https://'));
 
 		// Add it to the list of package servers.
 		addPackageServer($servername, $serverurl);

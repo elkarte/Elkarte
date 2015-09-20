@@ -986,9 +986,8 @@ function loadProfileFields($force_reload = false)
 			// Fix the URL...
 			'input_validate' => function (&$value) {
 
-				if (strlen(trim($value)) > 0 && strpos($value, '://') === false)
-					$value = 'http://' . $value;
-				if (strlen($value) < 8 || (substr($value, 0, 7) !== 'http://' && substr($value, 0, 8) !== 'https://'))
+				$value = addProtocol($value, array('http://', 'https://', 'ftp://', 'ftps://'));
+				if (strlen($value) < 8)
 					$value = '';
 				return true;
 			},

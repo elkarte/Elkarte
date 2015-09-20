@@ -959,10 +959,11 @@ function parsePackageInfo(&$packageXML, $testing_only = true, $method = 'install
 		{
 			// quick check of any supplied url
 			$url = $action->exists('@url') ? $action->fetch('@url') : '';
-			if (strlen(trim($url)) > 0 && substr($url, 0, 7) !== 'http://' && substr($url, 0, 8) !== 'https://')
+			if (strlen(trim($url)) > 0)
 			{
-				$url = 'http://' . $url;
-				if (strlen($url) < 8 || (substr($url, 0, 7) !== 'http://' && substr($url, 0, 8) !== 'https://'))
+				$url = addProtocol($data, array('http://', 'https://'));
+
+				if (strlen($url) < 8)
 					$url = '';
 			}
 

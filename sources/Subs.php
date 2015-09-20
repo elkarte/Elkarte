@@ -862,8 +862,7 @@ function parse_bbc($message, $smileys = true, $cache_id = '', $parse_tags = arra
 				'content' => '<a href="$1" class="bbc_ftp new_win" target="_blank">$1</a>',
 				'validate' => function(&$tag, &$data, $disabled) {
 					$data = strtr($data, array('<br />' => ''));
-					if (strpos($data, 'ftp://') !== 0 && strpos($data, 'ftps://') !== 0)
-						$data = 'ftp://' . $data;
+					$data = addProtocol($data, array('ftp://', 'ftps://'));
 				},
 			),
 			array(
@@ -872,8 +871,7 @@ function parse_bbc($message, $smileys = true, $cache_id = '', $parse_tags = arra
 				'before' => '<a href="$1" class="bbc_ftp new_win" target="_blank">',
 				'after' => '</a>',
 				'validate' => function(&$tag, &$data, $disabled) {
-					if (strpos($data, 'ftp://') !== 0 && strpos($data, 'ftps://') !== 0)
-						$data = 'ftp://' . $data;
+					$data = addProtocol($data, array('ftp://', 'ftps://'));
 				},
 				'disallow_children' => array('email', 'ftp', 'url', 'iurl'),
 				'disabled_after' => ' ($1)',
@@ -900,8 +898,7 @@ function parse_bbc($message, $smileys = true, $cache_id = '', $parse_tags = arra
 				'content' => '<img src="$1" alt="{alt}" style="{width}{height}" class="bbc_img resized" />',
 				'validate' => function(&$tag, &$data, $disabled) {
 					$data = strtr($data, array('<br />' => ''));
-					if (strpos($data, 'http://') !== 0 && strpos($data, 'https://') !== 0)
-						$data = 'http://' . $data;
+					$data = addProtocol($data, array('http://', 'https://'));
 				},
 				'disabled_content' => '($1)',
 			),
@@ -911,8 +908,7 @@ function parse_bbc($message, $smileys = true, $cache_id = '', $parse_tags = arra
 				'content' => '<img src="$1" alt="" class="bbc_img" />',
 				'validate' => function(&$tag, &$data, $disabled) {
 					$data = strtr($data, array('<br />' => ''));
-					if (strpos($data, 'http://') !== 0 && strpos($data, 'https://') !== 0)
-						$data = 'http://' . $data;
+					$data = addProtocol($data, array('http://', 'https://'));
 				},
 				'disabled_content' => '($1)',
 			),
@@ -922,8 +918,7 @@ function parse_bbc($message, $smileys = true, $cache_id = '', $parse_tags = arra
 				'content' => '<a href="$1" class="bbc_link">$1</a>',
 				'validate' => function(&$tag, &$data, $disabled) {
 					$data = strtr($data, array('<br />' => ''));
-					if (strpos($data, 'http://') !== 0 && strpos($data, 'https://') !== 0)
-						$data = 'http://' . $data;
+					$data = addProtocol($data, array('http://', 'https://'));
 				},
 			),
 			array(
@@ -934,8 +929,8 @@ function parse_bbc($message, $smileys = true, $cache_id = '', $parse_tags = arra
 				'validate' => function(&$tag, &$data, $disabled) {
 					if ($data[0] === '#')
 						$data = '#post_' . substr($data, 1);
-					elseif (strpos($data, 'http://') !== 0 && strpos($data, 'https://') !== 0)
-						$data = 'http://' . $data;
+					else
+						$data = addProtocol($data, array('http://', 'https://'));
 				},
 				'disallow_children' => array('email', 'ftp', 'url', 'iurl'),
 				'disabled_after' => ' ($1)',
@@ -1155,8 +1150,7 @@ function parse_bbc($message, $smileys = true, $cache_id = '', $parse_tags = arra
 				'content' => '<a href="$1" class="bbc_link" target="_blank">$1</a>',
 				'validate' => function(&$tag, &$data, $disabled) {
 					$data = strtr($data, array('<br />' => ''));
-					if (strpos($data, 'http://') !== 0 && strpos($data, 'https://') !== 0)
-						$data = 'http://' . $data;
+					$data = addProtocol($data, array('http://', 'https://'));
 				},
 			),
 			array(
@@ -1165,8 +1159,7 @@ function parse_bbc($message, $smileys = true, $cache_id = '', $parse_tags = arra
 				'before' => '<a href="$1" class="bbc_link" target="_blank">',
 				'after' => '</a>',
 				'validate' => function(&$tag, &$data, $disabled) {
-					if (strpos($data, 'http://') !== 0 && strpos($data, 'https://') !== 0)
-						$data = 'http://' . $data;
+					$data = addProtocol($data, array('http://', 'https://'));
 				},
 				'disallow_children' => array('email', 'ftp', 'url', 'iurl'),
 				'disabled_after' => ' ($1)',
@@ -4177,4 +4170,44 @@ function isValidEmail($value)
 		return $value;
 	else
 		return false;
+}
+
+/**
+ * Adds a protocol (http/s, ftp/mailto) to the beginning of an url if missing
+ *
+ * @param string $url - The url
+ * @param string[] $protocols - A list of protocols to check, the first is
+ *                 added if none is found (optional, default array('http://', 'https://'))
+ * @return string - The url with the protocol
+ */
+function addProtocol($url, $protocols = array('http://', 'https://'))
+{
+	foreach ($protocols as $protocol)
+	{
+		if (substr($url, 0, strlen($protocol)) === $protocol)
+			return $url;
+	}
+
+	return $protocols[0] . $url;
+}
+
+/**
+ * Removes nested quotes from a text string.
+ *
+ * @param string $text - The body we want to remove nested quotes from
+ * @return string - The same body, just without nested quotes
+ */
+function removeNestedQuotes($text)
+{
+	global $modSettings;
+
+	// Remove any nested quotes, if necessary.
+	if (!empty($modSettings['removeNestedQuotes']))
+	{
+		return preg_replace(array('~\n?\[quote.*?\].+?\[/quote\]\n?~is', '~^\n~', '~\[/quote\]~'), '', $text);
+	}
+	else
+	{
+		return $text;
+	}
 }
