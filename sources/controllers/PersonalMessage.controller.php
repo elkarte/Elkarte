@@ -1355,29 +1355,39 @@ class PersonalMessage_Controller extends Action_Controller
 
 		$context['pm_id'] = $pmsg;
 		$context['page_title'] = $txt['pm_report_title'];
+		$context['sub_template'] = 'report_message';
 
 		// We'll query some members, we will.
 		require_once(SUBSDIR . '/Members.subs.php');
 
 		// If we're here, just send the user to the template, with a few useful context bits.
-		if (!isset($_POST['report']))
+		if (isset($_POST['report']))
 		{
-			$context['sub_template'] = 'report_message';
+			$poster_comment = strtr(Util::htmlspecialchars($_POST['reason']), array("\r" => '', "\t" => ''));
 
-			// Now, get all the administrators.
-			$context['admins'] = admins();
+			if (Util::strlen($poster_comment) > 254)
+				Errors::instance()->fatal_lang_error('post_too_long', false);
 
-			// How many admins in total?
-			$context['admin_count'] = count($context['admins']);
-		}
-		// Otherwise, let's get down to the sending stuff.
-		else
-		{
 			// Check the session before proceeding any further!
 			checkSession('post');
 
 			// First, load up the message they want to file a complaint against, and verify it actually went to them!
-			list ($subject, $body, $time, $memberFromID, $memberFromName) = loadPersonalMessage($context['pm_id']);
+			list ($subject, $body, $time, $memberFromID, $memberFromName, $poster_name, $time_message) = loadPersonalMessage($pmsg);
+
+			require_once(SUBSDIR . '/Messages.subs.php');
+
+			$id_report = recordReport(array(
+				'id_msg' => $pmsg,
+				'id_topic' => 0,
+				'id_board' => 0,
+				'type' => 'pm',
+				'id_poster' => $memberFromID,
+				'real_name' => $memberFromName,
+				'poster_name' => $poster_name,
+				'subject' => $subject,
+				'body' => $body,
+				'time_message' => $time_message,
+			), $poster_comment);
 
 			// Remove the line breaks...
 			$body = preg_replace('~<br ?/?' . '>~i', "\n", $body);

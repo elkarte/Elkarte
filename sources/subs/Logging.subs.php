@@ -177,7 +177,7 @@ function logLoginHistory($id_member, $ip, $ip2)
  * @param string $msg_id
  * @param string $topic_id
  */
-function loadLogReported($msg_id, $topic_id)
+function loadLogReported($msg_id, $topic_id, $type = 'msg')
 {
 	$db = database();
 
@@ -185,10 +185,12 @@ function loadLogReported($msg_id, $topic_id)
 		SELECT id_report
 		FROM {db_prefix}log_reported
 		WHERE {raw:column_name} = {int:reported}
+			AND type = {string:type}
 		LIMIT 1',
 		array(
 			'column_name' => !empty($msg_id) ? 'id_msg' : 'id_topic',
 			'reported' => !empty($msg_id) ? $msg_id : $topic_id,
+			'type' => $type,
 		)
 	);
 	$num = $db->num_rows($request);

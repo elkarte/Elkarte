@@ -191,6 +191,16 @@ class ModerationCenter_Controller extends Action_Controller
 							'closed' => array($txt['mc_reportedp_closed']),
 						),
 					),
+					'pm_reports' => array(
+						'label' => $txt['mc_reported_pms'],
+						'enabled' => $user_info['is_admin'],
+						'controller' => 'ModerationCenter_Controller',
+						'function' => 'action_reportedPosts',
+						'subsections' => array(
+							'open' => array($txt['mc_reportedp_active']),
+							'closed' => array($txt['mc_reportedp_closed']),
+						),
+					),
 				),
 			),
 			'groups' => array(
@@ -406,6 +416,14 @@ class ModerationCenter_Controller extends Action_Controller
 		if (!empty($_REQUEST['report']))
 			return $this->action_modReport();
 
+		// This should not be needed...
+		$show_pms = false;
+		if ($context['admin_area'] == 'pm_reports')
+		{
+			$show_pms = true;
+			isAllowedTo('admin_forum');
+		}
+
 		// Set up the comforting bits...
 		$context['page_title'] = $txt['mc_reported_posts'];
 		$context['sub_template'] = 'reported_posts';
@@ -427,7 +445,7 @@ class ModerationCenter_Controller extends Action_Controller
 
 			// Time to update.
 			updateSettings(array('last_mod_report_action' => time()));
-			recountOpenReports();
+			recountOpenReports(true, $show_pms);
 		}
 		elseif (isset($_POST['close']) && isset($_POST['close_selected']))
 		{
@@ -444,19 +462,19 @@ class ModerationCenter_Controller extends Action_Controller
 
 				// Time to update.
 				updateSettings(array('last_mod_report_action' => time()));
-				recountOpenReports();
+				recountOpenReports(true, $show_pms);
 			}
 		}
 
 		// How many entries are we viewing?
-		$context['total_reports'] = totalReports($context['view_closed']);
+		$context['total_reports'] = totalReports($context['view_closed'], $show_pms);
 
 		// So, that means we can page index, yes?
-		$context['page_index'] = constructPageIndex($scripturl . '?action=moderate;area=reports' . ($context['view_closed'] ? ';sa=closed' : ''), $_GET['start'], $context['total_reports'], 10);
+		$context['page_index'] = constructPageIndex($scripturl . '?action=moderate;area=' . $context['admin_area'] . ($context['view_closed'] ? ';sa=closed' : ''), $_GET['start'], $context['total_reports'], 10);
 		$context['start'] = $_GET['start'];
 
 		// By George, that means we in a position to get the reports, golly good.
-		$context['reports'] = getModReports($context['view_closed'], $context['start'], 10);
+		$context['reports'] = getModReports($context['view_closed'], $context['start'], 10, $show_pms);
 		$report_ids = array_keys($context['reports']);
 		$report_boards_ids = array();
 		foreach ($context['reports'] as $row)
@@ -465,7 +483,7 @@ class ModerationCenter_Controller extends Action_Controller
 				'board' => $row['id_board'],
 				'id' => $row['id_report'],
 				'topic_href' => $scripturl . '?topic=' . $row['id_topic'] . '.msg' . $row['id_msg'] . '#msg' . $row['id_msg'],
-				'report_href' => $scripturl . '?action=moderate;area=reports;report=' . $row['id_report'],
+				'report_href' => $scripturl . '?action=moderate;area=' . $context['admin_area'] . ';report=' . $row['id_report'],
 				'author' => array(
 					'id' => $row['id_author'],
 					'name' => $row['author_name'],
@@ -487,16 +505,16 @@ class ModerationCenter_Controller extends Action_Controller
 						'value' => $row['id_report'],
 					),
 					'details' => array(
-						'href' => $scripturl . '?action=moderate;area=reports;report=' . $row['id_report'],
+						'href' => $scripturl . '?action=moderate;area=' . $context['admin_area'] . ';report=' . $row['id_report'],
 						'text' => $txt['mc_reportedp_details'],
 					),
 					'ignore' => array(
-						'href' => $scripturl . '?action=moderate;area=reports' . ($context['view_closed'] ? ';sa=closed' : '') . ';ignore=' . ((int) !$row['ignore_all']) . ';rid=' . $row['id_report'] . ';start=' . $context['start'] . ';' . $context['session_var'] . '=' . $context['session_id'],
+						'href' => $scripturl . '?action=moderate;area=' . $context['admin_area'] . '' . ($context['view_closed'] ? ';sa=closed' : '') . ';ignore=' . ((int) !$row['ignore_all']) . ';rid=' . $row['id_report'] . ';start=' . $context['start'] . ';' . $context['session_var'] . '=' . $context['session_id'],
 						'text' => $row['ignore_all'] ? $txt['mc_reportedp_unignore'] : $txt['mc_reportedp_ignore'],
 						'custom' => $row['ignore_all'] ? '' : 'onclick="return confirm(' . JavaScriptEscape($txt['mc_reportedp_ignore_confirm']) . ');"',
 					),
 					'close' => array(
-						'href' => $scripturl . '?action=moderate;area=reports' . ($context['view_closed'] ? ';sa=closed' : '') . ';close=' . ((int) !$row['closed']) . ';rid=' . $row['id_report'] . ';start=' . $context['start'] . ';' . $context['session_var'] . '=' . $context['session_id'],
+						'href' => $scripturl . '?action=moderate;area=' . $context['admin_area'] . '' . ($context['view_closed'] ? ';sa=closed' : '') . ';close=' . ((int) !$row['closed']) . ';rid=' . $row['id_report'] . ';start=' . $context['start'] . ';' . $context['session_var'] . '=' . $context['session_id'],
 						'text' => $context['view_closed'] ? $txt['mc_reportedp_open'] : $txt['mc_reportedp_close'],
 					),
 				),
@@ -761,8 +779,16 @@ class ModerationCenter_Controller extends Action_Controller
 		// Integers only please
 		$report = (int) $_REQUEST['report'];
 
+		// This should not be needed...
+		$show_pms = false;
+		if ($context['admin_area'] == 'pm_reports')
+		{
+			$show_pms = true;
+			isAllowedTo('admin_forum');
+		}
+
 		// Get the report details, need this so we can limit access to a particular board
-		$row = modReportDetails($report);
+		$row = modReportDetails($report, $show_pms);
 
 		// So did we find anything?
 		if ($row === false)
@@ -782,7 +808,7 @@ class ModerationCenter_Controller extends Action_Controller
 				addReportComment($report, $newComment);
 
 				// Redirect to prevent double submission.
-				redirectexit($scripturl . '?action=moderate;area=reports;report=' . $report);
+				redirectexit($scripturl . '?action=moderate;area=' . $context['admin_area'] . ';report=' . $report);
 			}
 		}
 
@@ -793,7 +819,7 @@ class ModerationCenter_Controller extends Action_Controller
 			'message_id' => $row['id_msg'],
 			'message_href' => $scripturl . '?msg=' . $row['id_msg'],
 			'message_link' => '<a href="' . $scripturl . '?msg=' . $row['id_msg'] . '">' . $row['subject'] . '</a>',
-			'report_href' => $scripturl . '?action=moderate;area=reports;report=' . $row['id_report'],
+			'report_href' => $scripturl . '?action=moderate;area=' . $context['admin_area'] . ';' . $context['admin_area'] . '=' . $row['id_report'],
 			'author' => array(
 				'id' => $row['id_author'],
 				'name' => $row['author_name'],
@@ -860,7 +886,7 @@ class ModerationCenter_Controller extends Action_Controller
 			'title' => $txt['mc_modreport_modactions'],
 			'items_per_page' => 15,
 			'no_items_label' => $txt['modlog_no_entries_found'],
-			'base_href' => $scripturl . '?action=moderate;area=reports;report=' . $context['report']['id'],
+			'base_href' => $scripturl . '?action=moderate;area=' . $context['admin_area'] . ';report=' . $context['report']['id'],
 			'default_sort_col' => 'time',
 			'get_items' => array(
 				'function' => 'list_getModLogEntries',
@@ -1772,14 +1798,14 @@ class ModerationCenter_Controller extends Action_Controller
 
 		$context['reported_posts'] = array();
 
-		$reported_posts = reportedPosts();
+		$reported_posts = reportedPosts(allowedTo('admin_forum'));
 		foreach ($reported_posts as $i => $row)
 		{
 			$context['reported_posts'][] = array(
 				'id' => $row['id_report'],
 				'alternate' => $i % 2,
 				'topic_href' => $scripturl . '?topic=' . $row['id_topic'] . '.msg' . $row['id_msg'] . '#msg' . $row['id_msg'],
-				'report_href' => $scripturl . '?action=moderate;area=reports;report=' . $row['id_report'],
+				'report_href' => $scripturl . '?action=moderate;area=' . $context['admin_area'] . ';report=' . $row['id_report'],
 				'author' => array(
 					'id' => $row['id_author'],
 					'name' => $row['author_name'],

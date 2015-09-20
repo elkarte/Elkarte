@@ -306,7 +306,7 @@ function logActions($logs)
 			{
 				require_once(SUBSDIR . '/Moderation.subs.php');
 				updateSettings(array('last_mod_report_action' => time()));
-				recountOpenReports();
+				recountOpenReports(true, allowedTo('admin_forum'));
 			}
 		}
 

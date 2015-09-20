@@ -390,4 +390,45 @@ class UpgradeInstructions_upgrade_1_1
 			),
 		);
 	}
+
+	public function pm_reporting_title()
+	{
+		return 'Enhancing PM reporting...';
+	}
+
+	public function pm_reporting()
+	{
+		return array(
+			array(
+				'debug_title' => 'Adding new columns...',
+				'function' => function($db, $db_table)
+				{
+					if ($db_table->column_exists('{db_prefix}log_reported', 'type') === true)
+					{
+						$db_table->db_add_column('{db_prefix}log_reported',
+							array(
+								'name' => 'type',
+								'type' => 'varchar',
+								'size' => 5,
+								'unsigned' => true,
+								'default' => 0
+							),
+							array(),
+							'ignore'
+						);
+						$db_table->db_add_column('{db_prefix}log_reported',
+							array(
+								'name' => 'time_message',
+								'type' => 'int',
+								'size' => 10,
+								'default' => 0
+							),
+							array(),
+							'ignore'
+						);
+					}
+				}
+			)
+		);
+	}
 }

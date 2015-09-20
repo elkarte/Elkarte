@@ -101,6 +101,7 @@ $txt['moderate'] = 'Moderate';
 $txt['modlog_view'] = 'Moderation Log';
 $txt['mc_emailerror'] = 'Unapproved Emails';
 $txt['mc_reported_posts'] = 'Reported Posts';
+$txt['mc_reported_pms'] = 'Reported Personal Messages';
 $txt['mc_unapproved_attachments'] = 'Unapproved Attachments';
 $txt['mc_unapproved_poststopics'] = 'Unapproved Posts and Topics';
 

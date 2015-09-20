@@ -140,7 +140,7 @@ function template_reported_posts_block()
 
 	echo '
 								<h2 class="category_header hdicon cat_img_talk">
-									<a href="', $scripturl, '?action=moderate;area=reports">', $txt['mc_recent_reports'], '</a>
+									<a href="', $scripturl, '?action=moderate;area=', $context['admin_area'], '">', $txt['mc_recent_reports'], '</a>
 								</h2>
 								<div class="content modbox">
 									<ul>';
@@ -268,7 +268,7 @@ function template_reported_posts()
 	global $context, $txt, $scripturl, $options;
 
 	echo '
-					<form id="reported_posts" action="', $scripturl, '?action=moderate;area=reports', $context['view_closed'] ? ';sa=closed' : '', ';start=', $context['start'], '" method="post" accept-charset="UTF-8">
+					<form id="reported_posts" action="', $scripturl, '?action=moderate;area=', $context['admin_area'], $context['view_closed'] ? ';sa=closed' : '', ';start=', $context['start'], '" method="post" accept-charset="UTF-8">
 						<h2 class="category_header">
 							', $context['view_closed'] ? $txt['mc_reportedp_closed'] : $txt['mc_reportedp_active'], '
 						</h2>';
@@ -372,7 +372,7 @@ function template_viewmodreport()
 
 	echo '
 					<div id="modcenter">
-						<form action="', $scripturl, '?action=moderate;area=reports;report=', $context['report']['id'], '" method="post" accept-charset="UTF-8">
+						<form action="', $scripturl, '?action=moderate;area=', $context['admin_area'], ';report=', $context['report']['id'], '" method="post" accept-charset="UTF-8">
 							<h2 class="category_header">
 								', sprintf($txt['mc_viewmodreport'], $context['report']['message_link'], $context['report']['author']['link']), '
 							</h2>
@@ -383,10 +383,10 @@ function template_viewmodreport()
 								</div>
 								<ul class="quickbuttons">
 									<li class="listlevel1">
-										<a class="linklevel1 close_button" href="', $scripturl, '?action=moderate;area=reports;close=', (int) !$context['report']['closed'], ';rid=', $context['report']['id'], ';', $context['session_var'], '=', $context['session_id'], '">', $context['report']['closed'] ? $txt['mc_reportedp_open'] : $txt['mc_reportedp_close'], '</a>
+										<a class="linklevel1 close_button" href="', $scripturl, '?action=moderate;area=', $context['admin_area'], ';close=', (int) !$context['report']['closed'], ';rid=', $context['report']['id'], ';', $context['session_var'], '=', $context['session_id'], '">', $context['report']['closed'] ? $txt['mc_reportedp_open'] : $txt['mc_reportedp_close'], '</a>
 									</li>
 									<li class="listlevel1">
-										<a class="linklevel1 ignore_button" href="', $scripturl, '?action=moderate;area=reports;ignore=', (int) !$context['report']['ignore'], ';rid=', $context['report']['id'], ';', $context['session_var'], '=', $context['session_id'], '" ', !$context['report']['ignore'] ? 'onclick="return confirm(' . JavaScriptEscape($txt['mc_reportedp_ignore_confirm']) . ');"' : '', '>', $context['report']['ignore'] ? $txt['mc_reportedp_unignore'] : $txt['mc_reportedp_ignore'], '</a>
+										<a class="linklevel1 ignore_button" href="', $scripturl, '?action=moderate;area=', $context['admin_area'], ';ignore=', (int) !$context['report']['ignore'], ';rid=', $context['report']['id'], ';', $context['session_var'], '=', $context['session_id'], '" ', !$context['report']['ignore'] ? 'onclick="return confirm(' . JavaScriptEscape($txt['mc_reportedp_ignore_confirm']) . ');"' : '', '>', $context['report']['ignore'] ? $txt['mc_reportedp_unignore'] : $txt['mc_reportedp_ignore'], '</a>
 									</li>
 								</ul>
 							</div>

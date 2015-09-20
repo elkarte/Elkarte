@@ -489,10 +489,12 @@ function recordReport($message, $poster_comment)
 		SELECT id_report, ignore_all
 		FROM {db_prefix}log_reported
 		WHERE id_msg = {int:id_msg}
+			AND type = {string:type}
 			AND (closed = {int:not_closed} OR ignore_all = {int:ignored})
 		ORDER BY ignore_all DESC',
 		array(
 			'id_msg' => $message['id_msg'],
+			'type' => isset($message['type']) ? $message['type'] : 'msg',
 			'not_closed' => 0,
 			'ignored' => 1,
 		)
@@ -507,6 +509,7 @@ function recordReport($message, $poster_comment)
 
 	// Already reported? My god, we could be dealing with a real rogue here...
 	if (!empty($id_report))
+	{
 		$db->query('', '
 			UPDATE {db_prefix}log_reported
 			SET num_reports = num_reports + 1, time_updated = {int:current_time}
@@ -516,6 +519,7 @@ function recordReport($message, $poster_comment)
 				'id_report' => $id_report,
 			)
 		);
+	}
 	// Otherwise, we shall make one!
 	else
 	{
@@ -528,10 +532,12 @@ function recordReport($message, $poster_comment)
 				'id_msg' => 'int', 'id_topic' => 'int', 'id_board' => 'int', 'id_member' => 'int', 'membername' => 'string',
 				'subject' => 'string', 'body' => 'string', 'time_started' => 'int', 'time_updated' => 'int',
 				'num_reports' => 'int', 'closed' => 'int',
+				'type' => 'string-5', 'time_message' => 'int'
 			),
 			array(
 				$message['id_msg'], $message['id_topic'], $message['id_board'], $message['id_poster'], $message['real_name'],
-				$message['subject'], $message['body'] , time(), time(), 1, 0,
+				$message['subject'], $message['body'], time(), time(), 1, 0,
+				$message['type'], isset($message['time_message']) ? $message['time_message'] : 0
 			),
 			array('id_report')
 		);

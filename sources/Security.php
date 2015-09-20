@@ -543,7 +543,7 @@ function banPermissions()
 	elseif ($_SESSION['mc']['bq'] != '0=1')
 	{
 		require_once(SUBSDIR . '/Moderation.subs.php');
-		recountOpenReports();
+		recountOpenReports(true, allowedTo('admin_forum'));
 	}
 	else
 		$context['open_mod_reports'] = 0;

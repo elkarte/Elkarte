@@ -28,7 +28,7 @@ if (!defined('ELK'))
  *
  * @param boolean $flush = true if moderator menu count will be cleared
  */
-function recountOpenReports($flush = true)
+function recountOpenReports($flush = true, $count_pms = false)
 {
 	global $user_info, $context;
 
@@ -37,12 +37,14 @@ function recountOpenReports($flush = true)
 	$request = $db->query('', '
 		SELECT COUNT(*)
 		FROM {db_prefix}log_reported
-		WHERE ' . $user_info['mod_cache']['bq'] . '
+		WHERE ' . $user_info['mod_cache']['bq'] . ($count_pms ? '' : '
+			AND type IN ({array_string:not_a_pm})') . '
 			AND closed = {int:not_closed}
 			AND ignore_all = {int:not_ignored}',
 		array(
 			'not_closed' => 0,
 			'not_ignored' => 0,
+			'not_a_pm' => array('msg'),
 		)
 	);
 	list ($open_reports) = $db->fetch_row($request);
@@ -150,7 +152,7 @@ function recountFailedEmails($approve_query = null)
  *
  * @param int $status
  */
-function totalReports($status = 0)
+function totalReports($status = 0, $show_pms = false)
 {
 	global $user_info;
 
@@ -159,10 +161,12 @@ function totalReports($status = 0)
 	$request = $db->query('', '
 		SELECT COUNT(*)
 		FROM {db_prefix}log_reported AS lr
-		WHERE lr.closed = {int:view_closed}
+		WHERE lr.closed = {int:view_closed}' . ($show_pms ? '' : '
+			AND lr.type IN ({array_string:not_a_pm})') . '
 			AND ' . ($user_info['mod_cache']['bq'] == '1=1' || $user_info['mod_cache']['bq'] == '0=1' ? $user_info['mod_cache']['bq'] : 'lr.' . $user_info['mod_cache']['bq']),
 		array(
 			'view_closed' => $status,
+			'not_a_pm' => array('msg'),
 		)
 	);
 	list ($total_reports) = $db->fetch_row($request);
@@ -281,7 +285,7 @@ function loadModeratorMenuCounts($brd = null)
 
 		// Reported posts
 		if (!empty($user_info['mod_cache']) && $user_info['mod_cache']['bq'] != '0=1')
-			$menu_errors[$cache_key]['reports'] = recountOpenReports(false);
+			$menu_errors[$cache_key]['reports'] = recountOpenReports(false, allowedTo('admin_forum'));
 
 		// Email failures that require attention
 		if (!empty($modSettings['maillist_enabled']) && allowedTo('approve_emails'))
@@ -687,7 +691,7 @@ function modAddUpdateTemplate($recipient_id, $template_title, $template_body, $i
  *
  * @param int $id_report
  */
-function modReportDetails($id_report)
+function modReportDetails($id_report, $show_pms = false)
 {
 	global $user_info;
 
@@ -699,11 +703,13 @@ function modReportDetails($id_report)
 			IFNULL(mem.real_name, lr.membername) AS author_name, IFNULL(mem.id_member, 0) AS id_author
 		FROM {db_prefix}log_reported AS lr
 			LEFT JOIN {db_prefix}members AS mem ON (mem.id_member = lr.id_member)
-		WHERE lr.id_report = {int:id_report}
+		WHERE lr.id_report = {int:id_report}' . ($show_pms ? '' : '
+			AND lr.type IN array({array_string:not_a_pm})') . '
 			AND ' . ($user_info['mod_cache']['bq'] == '1=1' || $user_info['mod_cache']['bq'] == '0=1' ? $user_info['mod_cache']['bq'] : 'lr.' . $user_info['mod_cache']['bq']) . '
 		LIMIT 1',
 		array(
 			'id_report' => $id_report,
+			'not_a_pm' => array('msg'),
 		)
 	);
 
@@ -727,7 +733,7 @@ function modReportDetails($id_report)
  *
  * @todo move to createList?
  */
-function getModReports($status = 0, $start = 0, $limit = 10)
+function getModReports($status = 0, $start = 0, $limit = 10, $show_pms = false)
 {
 	global $user_info;
 
@@ -739,7 +745,8 @@ function getModReports($status = 0, $start = 0, $limit = 10)
 				IFNULL(mem.real_name, lr.membername) AS author_name, IFNULL(mem.id_member, 0) AS id_author
 			FROM {db_prefix}log_reported AS lr
 				LEFT JOIN {db_prefix}members AS mem ON (mem.id_member = lr.id_member)
-			WHERE lr.closed = {int:view_closed}
+			WHERE lr.closed = {int:view_closed}' . ($show_pms ? '' : '
+				AND lr.type IN ({array_string:not_a_pm})') . '
 				AND ' . ($user_info['mod_cache']['bq'] == '1=1' || $user_info['mod_cache']['bq'] == '0=1' ? $user_info['mod_cache']['bq'] : 'lr.' . $user_info['mod_cache']['bq']) . '
 			ORDER BY lr.time_updated DESC
 			LIMIT {int:start}, {int:limit}',
@@ -747,6 +754,7 @@ function getModReports($status = 0, $start = 0, $limit = 10)
 				'view_closed' => $status,
 				'start' => $start,
 				'limit' => $limit,
+				'not_a_pm' => array('msg'),
 			)
 		);
 
@@ -1179,7 +1187,7 @@ function basicWatchedUsers()
  *
  * @return array
  */
-function reportedPosts()
+function reportedPosts($show_pms = false)
 {
 	global $user_info;
 
@@ -1198,13 +1206,15 @@ function reportedPosts()
 			FROM {db_prefix}log_reported AS lr
 				LEFT JOIN {db_prefix}members AS mem ON (mem.id_member = lr.id_member)
 			WHERE ' . ($user_info['mod_cache']['bq'] == '1=1' || $user_info['mod_cache']['bq'] == '0=1' ? $user_info['mod_cache']['bq'] : 'lr.' . $user_info['mod_cache']['bq']) . '
-				AND lr.closed = {int:not_closed}
+				AND lr.closed = {int:not_closed}' . ($show_pms ? '' : '
+				AND lr.type IN ({array_string:not_a_pm})') . '
 				AND lr.ignore_all = {int:not_ignored}
 			ORDER BY lr.time_updated DESC
 			LIMIT 10',
 			array(
 				'not_closed' => 0,
 				'not_ignored' => 0,
+				'not_a_pm' => array('msg'),
 			)
 		);
 		$reported_posts = array();
