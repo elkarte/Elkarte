@@ -200,7 +200,7 @@ function template_maintain_members()
 				</dl>
 				<dl class="settings">
 					<dt>
-						<label for="to"><strong>', $txt['reattribute_current_member'], ':</strong></label>
+						<label for="to">', $txt['reattribute_current_member'], ':</label>
 					</dt>
 					<dd>
 						<input type="text" name="to" id="to" value="" class="input_text" />

@@ -90,7 +90,7 @@ function template_trackIP()
 			<form action="', $context['base_url'], '" method="post" accept-charset="UTF-8">
 				<dl class="settings">
 					<dt>
-						<label for="searchip"><strong>', $txt['enter_ip'], ':</strong></label>
+						<label for="searchip">', $txt['enter_ip'], ':</label>
 					</dt>
 					<dd>
 						<input type="text" id="searchip" name="searchip" value="', $context['ip'], '" class="input_text" />

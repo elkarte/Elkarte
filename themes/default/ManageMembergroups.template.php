@@ -41,7 +41,7 @@ function template_new_group()
 			<div class="content">
 				<dl class="settings">
 					<dt>
-						<label for="group_name_input"><strong>', $txt['membergroups_group_name'], ':</strong></label>
+						<label for="group_name_input">', $txt['membergroups_group_name'], ':</label>
 					</dt>
 					<dd>
 						<input type="text" name="group_name" id="group_name_input" size="30" class="input_text" />
@@ -51,7 +51,7 @@ function template_new_group()
 	{
 		echo '
 					<dt>
-						<label for="group_type"><strong>', $txt['membergroups_edit_group_type'], '</strong>:</label>
+						<label for="group_type">', $txt['membergroups_edit_group_type'], ':</label>
 					</dt>
 					<dd>
 						<fieldset id="group_type">
@@ -90,7 +90,7 @@ function template_new_group()
 	{
 		echo '
 					<dt>
-						<label for="permission_base"><strong>', $txt['membergroups_permissions'], ':</strong></label><br />
+						<label for="permission_base">', $txt['membergroups_permissions'], ':</label><br />
 						<span class="smalltext">', $txt['membergroups_can_edit_later'], '</span>
 					</dt>
 					<dd>
@@ -136,7 +136,7 @@ function template_new_group()
 
 	echo '
 					<dt>
-						<strong>', $txt['membergroups_new_board'], ':</strong>', $context['post_group'] ? '<br />
+						<label>', $txt['membergroups_new_board'], ':</label>', $context['post_group'] ? '<br />
 						<span class="smalltext" style="font-weight: normal">' . $txt['membergroups_new_board_post_groups'] . '</span>' : '', '
 					</dt>
 					<dd>';
@@ -189,7 +189,7 @@ function template_edit_group()
 			<div class="content">
 				<dl class="settings">
 					<dt>
-						<label for="group_name_input"><strong>', $txt['membergroups_edit_name'], ':</strong></label>
+						<label for="group_name_input">', $txt['membergroups_edit_name'], ':</label>
 					</dt>
 					<dd>
 						<input type="text" name="group_name" id="group_name_input" value="', $context['group']['editable_name'], '" size="30" class="input_text" />
@@ -198,7 +198,7 @@ function template_edit_group()
 	if ($context['group']['id'] != 3 && $context['group']['id'] != 4)
 		echo '
 					<dt id="group_desc_text">
-						<label for="group_desc_input"><strong>', $txt['membergroups_edit_desc'], ':</strong></label>
+						<label for="group_desc_input">', $txt['membergroups_edit_desc'], ':</label>
 					</dt>
 					<dd>
 						<textarea name="group_desc" id="group_desc_input" rows="4" cols="40">', $context['group']['description'], '</textarea>
@@ -209,7 +209,7 @@ function template_edit_group()
 	{
 		echo '
 					<dt>
-						<label for="group_type"><strong>', $txt['membergroups_edit_group_type'], ':</strong></label>
+						<label for="group_type">', $txt['membergroups_edit_group_type'], ':</label>
 					</dt>
 					<dd>
 						<fieldset id="group_type">
@@ -238,14 +238,14 @@ function template_edit_group()
 	if ($context['group']['id'] != 3 && $context['group']['id'] != 4)
 		echo '
 					<dt id="group_moderators_text">
-						<label for="group_moderators"><strong>', $txt['moderators'], ':</strong></label>
+						<label for="group_moderators">', $txt['moderators'], ':</label>
 					</dt>
 					<dd>
 						<input type="text" name="group_moderators" id="group_moderators" value="', $context['group']['moderator_list'], '" size="30" class="input_text" />
 						<div id="moderator_container"></div>
 					</dd>
 					<dt id="group_hidden_text">
-						<label for="group_hidden_input"><strong>', $txt['membergroups_edit_hidden'], ':</strong></label>
+						<label for="group_hidden_input">', $txt['membergroups_edit_hidden'], ':</label>
 					</dt>
 					<dd>
 						<select name="group_hidden" id="group_hidden_input" onchange="if (this.value == 2 &amp;&amp; !confirm(\'', $txt['membergroups_edit_hidden_warning'], '\')) this.value = 0;">
@@ -260,7 +260,7 @@ function template_edit_group()
 	{
 		echo '
 					<dt id="group_inherit_text">
-						<label for="group_inherit_input"><strong>', $txt['membergroups_edit_inherit_permissions'], '</strong></label>:<br />
+						<label for="group_inherit_input">', $txt['membergroups_edit_inherit_permissions'], '</label>:<br />
 						<span class="smalltext">', $txt['membergroups_edit_inherit_permissions_desc'], '</span>
 					</dt>
 					<dd>
@@ -283,7 +283,7 @@ function template_edit_group()
 	if ($context['group']['allow_post_group'])
 		echo '
 					<dt id="min_posts_text">
-						<label for="min_posts_input"><strong>', $txt['membergroups_min_posts'], ':</strong></label>
+						<label for="min_posts_input">', $txt['membergroups_min_posts'], ':</label>
 					</dt>
 					<dd>
 						<input type="text" name="min_posts" id="min_posts_input"', $context['group']['is_post_group'] ? ' value="' . $context['group']['min_posts'] . '"' : '', ' size="6" class="input_text" />
@@ -293,20 +293,20 @@ function template_edit_group()
 	if ($context['group']['id'] != 3)
 		echo '
 					<dt>
-						<label for="online_color_input"><strong>', $txt['membergroups_online_color'], ':</strong></label>
+						<label for="online_color_input">', $txt['membergroups_online_color'], ':</label>
 					</dt>
 					<dd>
 						<input type="text" name="online_color" id="online_color_input" value="', $context['group']['color'], '" size="20" class="input_text" />
 					</dd>';
 	echo '
 					<dt>
-						<label for="icon_count_input"><strong>', $txt['membergroups_icon_count'], ':</strong></label>
+						<label for="icon_count_input">', $txt['membergroups_icon_count'], ':</label>
 					</dt>
 					<dd>
 						<input type="number" min="0" max="10" step="1" name="icon_count" id="icon_count_input" value="', $context['group']['icon_count'], '" size="4" onkeyup="if (parseInt(this.value, 10) > 10) this.value = 10;" onchange="this.value = Math.floor(this.value);this.form.icon_image.onchange();" class="input_text" />
 					</dd>
 					<dt>
-						<label for="icon_image_input"><strong>', $txt['membergroups_icon_image'], ':</strong></label>
+						<label for="icon_image_input">', $txt['membergroups_icon_image'], ':</label>
 						<br />
 						<span class="smalltext">', $txt['membergroups_icon_image_note'], '</span>
 					</dt>
@@ -320,7 +320,7 @@ function template_edit_group()
 						</span>
 					</dd>
 					<dt>
-						<label for="max_messages_input"><strong>', $txt['membergroups_max_messages'], ':</strong></label><br />
+						<label for="max_messages_input">', $txt['membergroups_max_messages'], ':</label><br />
 						<span class="smalltext">', $txt['membergroups_max_messages_note'], '</span>
 					</dt>
 					<dd>
@@ -331,7 +331,7 @@ function template_edit_group()
 	{
 		echo '
 					<dt>
-						<strong>', $txt['membergroups_new_board'], ':</strong>', $context['group']['is_post_group'] ? '<br />
+						<label>', $txt['membergroups_new_board'], ':</label>', $context['group']['is_post_group'] ? '<br />
 						<span class="smalltext">' . $txt['membergroups_new_board_post_groups'] . '</span>' : '', '
 					</dt>
 					<dd>';

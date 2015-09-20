@@ -106,7 +106,7 @@ function template_editBuddies()
 			<div class="well">
 				<dl class="settings">
 					<dt>
-						<label for="new_buddy"><strong>', $txt['who_member'], '</strong></label>
+						<label for="new_buddy">', $txt['who_member'], '</label>
 					</dt>
 					<dd>
 						<input type="text" name="new_buddy" id="new_buddy" size="30" class="input_text" />
@@ -209,7 +209,7 @@ function template_editIgnoreList()
 			<div class="well">
 				<dl class="settings">
 					<dt>
-						<label for="new_ignore"><strong>', $txt['who_member'], '</strong></label>
+						<label for="new_ignore">', $txt['who_member'], '</label>
 					</dt>
 					<dd>
 						<input type="text" name="new_ignore" id="new_ignore" size="25" class="input_text" />
