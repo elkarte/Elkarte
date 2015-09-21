@@ -293,7 +293,7 @@ function template_edit_options()
 		{
 			echo '
 				</dl>
-				<hr class="separator" />
+				<hr class="clear" />
 				<dl>';
 		}
 		elseif ($field['type'] === 'callback')
@@ -386,7 +386,7 @@ function template_edit_options()
 	{
 		if ($lastItem !== 'hr')
 			echo '
-				<hr class="separator" />';
+				<hr class="clear" />';
 
 		echo '
 				<dl>';
