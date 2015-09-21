@@ -20,32 +20,32 @@ function template_lp_stats()
 
 		<div class="category_header">
 			<h3 class="floatleft">
-			', $txt['like_post_stats'] ,'
+				', $txt['like_post_stats'], '
 			</h3>
 		</div>
 
 		<p class="description">
-			', $context['like_posts']['tab_desc'] ,'
+			', $context['like_posts']['tab_desc'], '
 		</p>';
 
-		echo '
+	echo '
 		<ul class="like_post_stats_menu buttonlist" role="menubar">';
 
-		// Print out all the items in this tab.
-		foreach ($context['lp_stats_tabs'] as $tab)
-		{
-			echo '
+	// Print out all the items in this tab.
+	foreach ($context['lp_stats_tabs'] as $tab)
+	{
+		echo '
 			<li role="menuitem">
-				<a class="linklevel1 button_strip_markread" href="" id="', $tab['id'],'">
+				<a class="linklevel1 button_strip_markread" href="" id="', $tab['id'], '">
 					', $tab['label'], '
 				</a>
 			</li>';
-		}
+	}
 
-		echo '
+	echo '
 		</ul>';
 
-		echo '
+	echo '
 		<div class="forum_category">
 			<h2 class="category_header" id="like_post_current_tab">
 			</h2>
@@ -61,7 +61,7 @@ function template_lp_stats()
 			</div>
 		</div>';
 
-		echo '
+	echo '
 			<div id="like_post_stats_overlay"></div>
 			<div id="lp_preloader"></div>';
 

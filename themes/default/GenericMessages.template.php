@@ -20,6 +20,7 @@
  *
  * @param mixed[] $message
  * @param boolean $ignoring
+ *
  * @return string
  */
 function template_build_poster_div($message, $ignoring = false)
@@ -251,9 +252,9 @@ function template_build_poster_div($message, $ignoring = false)
 		// Not allowed to send a PM, online status disabled and not from a guest.
 		elseif (!$context['can_send_pm'] && !empty($modSettings['onlineEnable']) && !$message['member']['is_guest'])
 
-		// Are we showing the warning status?
-		if (!$message['member']['is_guest'] && $message['member']['can_see_warning'])
-			$poster_div .= '
+			// Are we showing the warning status?
+			if (!$message['member']['is_guest'] && $message['member']['can_see_warning'])
+				$poster_div .= '
 							<li class="listlevel1 warning">' . ($context['can_issue_warning'] ? '<a class="linklevel1" href="' . $scripturl . '?action=profile;area=issuewarning;u=' . $message['member']['id'] . '">' : '') . '<img src="' . $settings['images_url'] . '/profile/warning_' . $message['member']['warning_status'] . '.png" alt="' . $txt['user_warn_' . $message['member']['warning_status']] . '" />' . ($context['can_issue_warning'] ? '</a>' : '') . '<span class="warn_' . $message['member']['warning_status'] . '">' . $txt['warn_' . $message['member']['warning_status']] . '</span></li>';
 	}
 

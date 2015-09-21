@@ -15,7 +15,7 @@
  *
  */
 
- /**
+/**
  * This template is, perhaps, the most important template in the theme. It
  * contains the main template layer that displays the header and footer of
  * the forum, namely with body_above and body_below. It also contains the
@@ -101,6 +101,7 @@ function template_init()
 
 /**
  * Simplify the use of callbacks in the templates.
+ *
  * @param string $id - A prefix for the template functions the final name
  *                     should look like: template_{$id}_{$array[n]}
  * @param string[] $array - The array of function suffixes
@@ -206,7 +207,8 @@ function template_html_above()
 	echo '
 </head>
 <body id="', $context['browser_body_id'], '" class="action_', !empty($context['current_action']) ? htmlspecialchars($context['current_action'], ENT_COMPAT, 'UTF-8') : (!empty($context['current_board']) ?
-					'messageindex' : (!empty($context['current_topic']) ? 'display' : 'home')), !empty($context['current_board']) ? ' board_' . htmlspecialchars($context['current_board'], ENT_COMPAT, 'UTF-8') : '', '">';
+	'messageindex' : (!empty($context['current_topic']) ? 'display' : 'home')),
+	!empty($context['current_board']) ? ' board_' . htmlspecialchars($context['current_board'], ENT_COMPAT, 'UTF-8') : '', '">';
 }
 
 /**
@@ -269,17 +271,18 @@ function template_body_above()
 }
 
 /**
- If the user is logged in, display the time, or a maintenance warning for admins.
- @todo - TBH I always intended the time/date to be more or less a place holder for more important things.
- The maintenance mode warning for admins is an obvious one, but this could also be used for moderation notifications.
- I also assumed this would be an obvious place for sites to put a string of icons to link to their FB, Twitter, etc.
- This could still be done via conditional, so that administration and moderation notices were still active when applicable.
+ * If the user is logged in, display the time, or a maintenance warning for admins.
+ * @todo - TBH I always intended the time/date to be more or less a place holder for more important things.
+ * The maintenance mode warning for admins is an obvious one, but this could also be used for moderation notifications.
+ * I also assumed this would be an obvious place for sites to put a string of icons to link to their FB, Twitter, etc.
+ * This could still be done via conditional, so that administration and moderation notices were still active when
+ * applicable.
  */
 function template_th_login_bar()
 {
 	global $context, $modSettings, $txt, $scripturl, $settings;
 
-		echo '
+	echo '
 			<div id="top_section_notice" class="user">
 				<form action="', $scripturl, '?action=login2;quicklogin" method="post" accept-charset="UTF-8" ', empty($context['disable_login_hashing']) ? ' onsubmit="hashLoginPassword(this, \'' . $context['session_id'] . '\');"' : '', '>
 					<div id="password_login">
@@ -298,12 +301,12 @@ function template_th_login_bar()
 						<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />
 						<input type="hidden" name="', $context['login_token_var'], '" value="', $context['login_token'], '" />';
 
-		if (!empty($modSettings['enableOpenID']))
-			echo '
+	if (!empty($modSettings['enableOpenID']))
+		echo '
 						<a class="linkbutton top_button" href="', $scripturl, '?action=login;openid">
 							<img src="' . $settings['images_url'] . '/openid.png" title="' . $txt['openid'] . '" alt="' . $txt['openid'] . '" />
 						</a>';
-		echo '
+	echo '
 					</div>
 				</form>
 			</div>';
@@ -443,6 +446,7 @@ function template_html_below()
 /**
  * Show a linktree. This is that thing that shows
  * "My Community | General Category | General Discussion"..
+ *
  * @param string $default a string representing the index in $context where
  *               the linktree is stored (default value is 'linktree')
  */
@@ -512,7 +516,7 @@ function template_menu()
 	{
 		echo '
 						<li id="button_', $act, '" class="listlevel1', !empty($button['sub_buttons']) ? ' subsections" aria-haspopup="true"' : '"', ' role="menuitem">
-							<a ', (!empty($button['data-icon']) ? 'data-icon="' . $button['data-icon'] . '" ' : ''), 'class="linklevel1', !empty($button['active_button']) ? ' active' : '', (!empty($button['indicator']) ? ' indicator' : '' ), '" href="', $button['href'], '" ', isset($button['target']) ? 'target="' . $button['target'] . '"' : '', '><span class="button_title">', $button['title'], '</span></a>';
+							<a ', (!empty($button['data-icon']) ? 'data-icon="' . $button['data-icon'] . '" ' : ''), 'class="linklevel1', !empty($button['active_button']) ? ' active' : '', (!empty($button['indicator']) ? ' indicator' : ''), '" href="', $button['href'], '" ', isset($button['target']) ? 'target="' . $button['target'] . '"' : '', '><span class="button_title">', $button['title'], '</span></a>';
 
 		// Any 2nd level menus?
 		if (!empty($button['sub_buttons']))
@@ -637,14 +641,15 @@ function template_button_strip($button_strip, $direction = '', $strip_options = 
  * What it does:
  * - Create a quick button, pass an array of the button name with key values
  * - array('somename' => array(href => text => custom => test =>))
- *		- href => link to call when button is pressed
- *		- text => text to display in the button
- *		- custom => custom action to perform, generally used to add 'onclick' events (optional)
- *		- test => key to check in the $tests array before showing the button (optional)
- *	- checkboxes can be shown as well as buttons, use array('check' => array(checkbox => (true | always), name => value =>)
- *		- if true follows show moderation as checkbox setting, always will always show
- *		- name => name of the checkbox array, like delete, will have [] added for the form
- *		- value => value for the checkbox to return in the post
+ *        - href => link to call when button is pressed
+ *        - text => text to display in the button
+ *        - custom => custom action to perform, generally used to add 'onclick' events (optional)
+ *        - test => key to check in the $tests array before showing the button (optional)
+ *    - checkboxes can be shown as well as buttons, use array('check' => array(checkbox => (true | always), name =>
+ * value =>)
+ *        - if true follows show moderation as checkbox setting, always will always show
+ *        - name => name of the checkbox array, like delete, will have [] added for the form
+ *        - value => value for the checkbox to return in the post
  *
  * @param string $strip - the $context index where the strip is stored
  * @param bool[] $tests - an array of tests to determine if the button should
@@ -766,10 +771,10 @@ function template_show_error($error_id)
  * @param string|boolean $button_strip index of $context to create the button strip
  * @param string $strip_direction direction of the button strip (see template_button_strip for details)
  * @param array $options array of optional values, possible values:
- *                - 'page_index' (string) index of $context where is located the pages index generated by constructPageIndex
- *                - 'page_index_markup' (string) markup for the page index, overrides 'page_index' and can be used if
- *                   the page index code is not in the first level of $context
- *                - 'extra' (string) used to add html markup at the end of the template
+ *     - 'page_index' (string) index of $context where is located the pages index generated by constructPageIndex
+ *     - 'page_index_markup' (string) markup for the page index, overrides 'page_index' and can be used if
+ *        the page index code is not in the first level of $context
+ *     - 'extra' (string) used to add html markup at the end of the template
  */
 function template_pagesection($button_strip = false, $strip_direction = '', $options = array())
 {

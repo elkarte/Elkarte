@@ -614,14 +614,14 @@ function template_search()
 			<div id="advanced_panel_div" class="well"', empty($context['minmax_preferences']['pm']) ? '' : ' style="display: none;"', '>
 				<ul id="searchLabelsExpand">';
 
-			foreach ($context['search_labels'] as $label)
-				echo '
+		foreach ($context['search_labels'] as $label)
+			echo '
 					<li>
 						<label for="searchlabel_', $label['id'], '"><input type="checkbox" id="searchlabel_', $label['id'], '" name="searchlabel[', $label['id'], ']" value="', $label['id'], '" ', $label['checked'] ? 'checked="checked"' : '', ' class="input_check" />
 						', $label['name'], '</label>
 					</li>';
 
-			echo '
+		echo '
 				</ul>
 			</div>
 			<div class="submitbuttons">
@@ -636,7 +636,7 @@ function template_search()
 
 			var oAdvancedPanelToggle = new elk_Toggle({
 				bToggleEnabled: true,
-				bCurrentlyCollapsed: ' .(empty($context['minmax_preferences']['pm']) ? 'false' : 'true') . ',
+				bCurrentlyCollapsed: ' . (empty($context['minmax_preferences']['pm']) ? 'false' : 'true') . ',
 				aSwappableContainers: [
 					\'advanced_panel_div\'
 				],

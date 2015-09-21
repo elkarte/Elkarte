@@ -428,8 +428,8 @@ function template_after()
 	echo '
 		<div id="registration_success">
 			<h2 class="category_header">', $context['title'], '</h2>
-			<div class="content">',
-				$context['description'], '
+			<div class="content">
+				', $context['description'], '
 			</div>
 		</div>';
 }

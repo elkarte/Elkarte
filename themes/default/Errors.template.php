@@ -261,7 +261,7 @@ function template_attachment_errors()
 		<div class="content">';
 
 	foreach ($context['attachment_error_keys'] as $key)
-			template_show_error($key);
+		template_show_error($key);
 
 	echo '
 		</div>

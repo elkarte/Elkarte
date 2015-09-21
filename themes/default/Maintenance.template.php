@@ -164,7 +164,7 @@ function template_maintain_members()
 
 	echo '
 	<script><!-- // --><![CDATA[
-		var maintain_members_choose = \'' , $txt['maintain_members_choose'], '\',
+		var maintain_members_choose = \'', $txt['maintain_members_choose'], '\',
 			maintain_members_all = \'', $txt['maintain_members_all'], '\',
 			reattribute_confirm = \'', addcslashes($txt['reattribute_confirm'], "'"), '\',
 			reattribute_confirm_email = \'', addcslashes($txt['reattribute_confirm_email'], "'"), '\',
@@ -250,8 +250,8 @@ function template_maintain_members()
 		</form>
 		<h2 class="category_header">', $txt['maintain_recountposts'], '</h2>
 		<form action="', $scripturl, '?action=admin;area=maintain;sa=members;activity=recountposts" method="post" accept-charset="UTF-8" id="membersRecountForm">
-			<div class="content">',
-				$txt['maintain_recountposts_info'], '
+			<div class="content">
+				', $txt['maintain_recountposts_info'], '
 			</div>
 			<div class="submitbutton">
 				<input type="submit" value="', $txt['maintain_run_now'], '" />
@@ -292,11 +292,11 @@ function template_maintain_topics()
 	{
 		echo '
 		<h2 class="category_header">', $maintenace['title'], '</h2>
-		<form name="', $key,' " action="', $maintenace['url'], '" method="post" accept-charset="UTF-8">
+		<form name="', $key, ' " action="', $maintenace['url'], '" method="post" accept-charset="UTF-8">
 			<div class="content">';
 
-				$function = 'template_maintain_topics_' . $key;
-				$function();
+		$function = 'template_maintain_topics_' . $key;
+		$function();
 
 		echo '
 			</div>

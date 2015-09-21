@@ -49,7 +49,7 @@ function template_edit_profile_field()
 	// any errors messages to show?
 	if (!empty($context['custom_option__error']))
 	{
-			echo '
+		echo '
 	<div class="errorbox">
 		', $context['custom_option__error'], '
 	</div>';

@@ -188,7 +188,7 @@ function template_list_themes()
 						</a>';
 		else
 			echo '
-						<a class="hdicon cat_img_helptopics help floatleft" href="'. $scripturl . '?action=quickhelp;help=themeadmin_delete_help" onclick="return reqOverlayDiv(this.href);" id="themeadmin_delete_help" title="' . $txt['help'] . '"></a>';
+						<a class="hdicon cat_img_helptopics help floatleft" href="' . $scripturl . '?action=quickhelp;help=themeadmin_delete_help" onclick="return reqOverlayDiv(this.href);" id="themeadmin_delete_help" title="' . $txt['help'] . '"></a>';
 
 		echo '
 				</h2>
@@ -290,7 +290,7 @@ function template_set_options()
 	echo '
 		<form id="admin_form_wrapper" action="', $scripturl, '?action=admin;area=theme;th=', $context['theme_settings']['theme_id'], ';sa=reset" method="post" accept-charset="UTF-8">
 			<input type="hidden" name="who" value="', $context['theme_options_reset'] ? 1 : 0, '" />
-			<h2 class="category_header">', $context['theme_settings']['name'],'</h2>
+			<h2 class="category_header">', $context['theme_settings']['name'], '</h2>
 			<div class="content">
 				<dl class="settings', $context['theme_options_reset'] ? ' theme_options' : '', '">';
 
@@ -737,7 +737,7 @@ function template_themelist()
 {
 	global $context, $scripturl, $txt;
 
-echo '
+	echo '
 	<div id="admincenter">
 		<h2 class="category_header">', $txt['themeadmin_edit_title'], '</h2>
 		<div class="information">
@@ -843,7 +843,7 @@ function template_browse()
 						<a href="', $file['href'], '" class="is_directory">', $file['filename'], '</a>', ($file['is_writable']) ? '' : ' (' . $txt['theme_edit_not_writable'] . ')';
 		else
 			echo
-						$file['filename'];
+			$file['filename'];
 
 		echo '
 					</td>

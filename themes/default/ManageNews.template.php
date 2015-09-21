@@ -230,7 +230,7 @@ function template_email_members_compose()
 				</div>';
 
 	// Show the editor area
-	echo'
+	echo '
 				<div class="editor_wrapper">
 					<dl id="post_header">
 						<dt class="clear_left">

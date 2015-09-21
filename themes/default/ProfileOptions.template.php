@@ -755,10 +755,10 @@ function template_action_notification()
 					</dt>
 					<dd>
 						<select name="notify_regularity" id="notify_regularity">
-							<option value="0"',  $context['member']['notify_regularity'] ==  0 ? ' selected="selected"' : '', '>', $txt['notify_regularity_instant'], '</option>
-							<option value="1"',  $context['member']['notify_regularity'] ==  1 ? ' selected="selected"' : '', '>', $txt['notify_regularity_first_only'], '</option>
-							<option value="2"',  $context['member']['notify_regularity'] ==  2 ? ' selected="selected"' : '', '>', $txt['notify_regularity_daily'], '</option>
-							<option value="3"',  $context['member']['notify_regularity'] ==  3 ? ' selected="selected"' : '', '>', $txt['notify_regularity_weekly'], '</option>
+							<option value="0"', $context['member']['notify_regularity'] == 0 ? ' selected="selected"' : '', '>', $txt['notify_regularity_instant'], '</option>
+							<option value="1"', $context['member']['notify_regularity'] == 1 ? ' selected="selected"' : '', '>', $txt['notify_regularity_first_only'], '</option>
+							<option value="2"', $context['member']['notify_regularity'] == 2 ? ' selected="selected"' : '', '>', $txt['notify_regularity_daily'], '</option>
+							<option value="3"', $context['member']['notify_regularity'] == 3 ? ' selected="selected"' : '', '>', $txt['notify_regularity_weekly'], '</option>
 							<option value="99"', $context['member']['notify_regularity'] == 99 ? ' selected="selected"' : '', '>', $txt['notify_regularity_none'], '</option>
 						</select>
 					</dd>
@@ -1398,7 +1398,7 @@ function template_authentication_method()
 					</dd>
 				</dl>';
 
-				template_profile_save();
+	template_profile_save();
 
 	echo '
 			</div>

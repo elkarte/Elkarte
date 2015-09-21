@@ -171,62 +171,62 @@ function template_package_list()
 			{
 				echo '
 							<li>';
-					// 1. Some addon [ Download ].
-					echo '
+				// 1. Some addon [ Download ].
+				echo '
 								<img id="ps_img_', $i, '_pkg_', $id, '" src="', $settings['images_url'], '/selected_open.png" alt="*" style="display: none;" />
-								<a id="ps_link_', $i, '_pkg_', $id, '" href="#">', $package['name'], '</a>' ,
-								$package['can_install'] ? ' <a class="linkbutton" href="' . $package['download']['href'] . '">' . $txt['download'] . '</a>' : '';
+								<a id="ps_link_', $i, '_pkg_', $id, '" href="#">', $package['name'], '</a>',
+				$package['can_install'] ? ' <a class="linkbutton" href="' . $package['download']['href'] . '">' . $txt['download'] . '</a>' : '';
 
-					// Mark as installed and current?
-					if ($package['is_installed'] && !$package['is_newer'])
-						echo '
+				// Mark as installed and current?
+				if ($package['is_installed'] && !$package['is_newer'])
+					echo '
 								<img src="', $settings['images_url'], '/icons/package_', $package['is_current'] ? 'installed' : 'old', '.png" class="centericon package_img" alt="', $package['is_current'] ? $txt['package_installed_current'] : $txt['package_installed_old'], '" />';
 
-					echo '
+				echo '
 							<ul id="package_section_', $i, '_pkg_', $id, '" class="package_section">';
 
-					// Show the addon type?
-					if ($package['type'] != '')
-						echo '
+				// Show the addon type?
+				if ($package['type'] != '')
+					echo '
 								<li>', $txt['package_type'], ':&nbsp; ', Util::ucwords(Util::strtolower($package['type'])), '</li>';
 
-					// Show the version number?
-					if ($package['version'] != '')
-						echo '
+				// Show the version number?
+				if ($package['version'] != '')
+					echo '
 								<li>', $txt['mod_version'], ':&nbsp; ', $package['version'], '</li>';
 
-					// Show the last date?
-					if ($package['date'] != '')
-						echo '
+				// Show the last date?
+				if ($package['date'] != '')
+					echo '
 								<li>', $txt['mod_date'], ':&nbsp; ', $package['date'], '</li>';
 
-					// How 'bout the author?
-					if (!empty($package['author']))
-						echo '
+				// How 'bout the author?
+				if (!empty($package['author']))
+					echo '
 								<li>', $txt['mod_author'], ':&nbsp; ', $package['author'], '</li>';
 
-					// Nothing but hooks ?
-					if ($package['hooks'] != '' && in_array($package['hooks'] , array('yes', 'true')))
-						echo '
+				// Nothing but hooks ?
+				if ($package['hooks'] != '' && in_array($package['hooks'], array('yes', 'true')))
+					echo '
 								<li>', $txt['mod_hooks'], ' <i class="fa fa-check-circle-o"></i></li>';
 
-					// Location of file: http://someplace/.
-					echo '
+				// Location of file: http://someplace/.
+				echo '
 								<ul>
 									<li><i class="fa fa-cloud-download"></i> ', $txt['file_location'], ':&nbsp; <a href="', $package['server']['download'], '">', $package['server']['download'], '</a></li>';
 
-					// Location of issues?
-					if (!empty($package['server']['bugs']))
-						echo '
+				// Location of issues?
+				if (!empty($package['server']['bugs']))
+					echo '
 									<li><i class="fa fa-bug"></i> ', $txt['bug_location'], ':&nbsp; <a href="', $package['server']['bugs'], '">', $package['server']['bugs'], '</a></li>';
 
-					// Location of support?
-					if (!empty($package['server']['support']))
-						echo '
+				// Location of support?
+				if (!empty($package['server']['support']))
+					echo '
 									<li><i class="fa fa-support"></i> ', $txt['support_location'], ':&nbsp; <a href="', $package['server']['support'], '">', $package['server']['support'], '</a></li>';
 
-					// Description: bleh bleh!
-					echo '
+				// Description: bleh bleh!
+				echo '
 								</ul>
 								<li>
 									<div class="infobox">', $txt['package_description'], ':&nbsp; ', $package['description'], '</div>

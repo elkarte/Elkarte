@@ -298,7 +298,7 @@ function template_confirm_category_delete()
 					<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />
 				</div>';
 
-		if (!empty($context['token_check']))
+	if (!empty($context['token_check']))
 		echo '
 				<input type="hidden" name="', $context[$context['token_check'] . '_token_var'], '" value="', $context[$context['token_check'] . '_token'], '" />';
 
@@ -525,7 +525,7 @@ function template_modify_board()
 
 	if (!empty($context['board']['is_recycle']))
 		echo '
-				<div class="infobox">', $txt['mboards_redirect_disabled_recycle'], '<br />', $txt['mboards_recycle_disabled_delete'] ,'</div>';
+				<div class="infobox">', $txt['mboards_redirect_disabled_recycle'], '<br />', $txt['mboards_recycle_disabled_delete'], '</div>';
 
 	if (empty($context['board']['is_recycle']) && !empty($context['board']['topics']))
 		echo '

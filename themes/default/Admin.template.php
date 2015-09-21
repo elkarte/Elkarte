@@ -701,7 +701,7 @@ function template_edit_censored()
 				', $txt['admin_censored_words'], '
 			</h2>
 			<div class="content">
-				<div class="information">', $txt['admin_censored_where'],'</div>';
+				<div class="information">', $txt['admin_censored_where'], '</div>';
 
 	// Show text boxes for censoring [bad] => [good].
 	foreach ($context['censored_words'] as $vulgar => $proper)
@@ -867,24 +867,24 @@ function template_show_settings()
 			if ($config_var['type'] == 'title')
 			{
 				echo
-					(isset($config_var['name']) ? '<a href="#" id="' . $config_var['name'] . '"></a>' : ''), '
+				(isset($config_var['name']) ? '<a href="#" id="' . $config_var['name'] . '"></a>' : ''), '
 					<h3 class="', !empty($config_var['class']) ? $config_var['class'] : 'category_header', '"', !empty($config_var['force_div_id']) ? ' id="' . $config_var['force_div_id'] . '"' : '', '>';
 
-					if ($config_var['help'])
-					{
-						if (empty($config_var['class']))
-							echo '
+				if ($config_var['help'])
+				{
+					if (empty($config_var['class']))
+						echo '
 						<a href="' . $scripturl . '?action=quickhelp;help=' . $config_var['help'] . '" onclick="return reqOverlayDiv(this.href);" class="hdicon cat_img_helptopics help" alt="' . $txt['help'] . '"></a>';
-						else
-							echo '
+					else
+						echo '
 						<a href="' . $scripturl . '?action=quickhelp;help=' . $config_var['help'] . '" onclick="return reqOverlayDiv(this.href);" class="' . $config_var['class'] . ' help"><img src="' . $settings['images_url'] . '/icons/helptopics_hd.png" class="icon" alt="' . $txt['help'] . '" /></a>';
-					}
-					elseif ($config_var['icon'])
-						echo
+				}
+				elseif ($config_var['icon'])
+					echo
 						'<span class="hdicon cat_img_' . $config_var['icon'] . '"></span>';
 
-					echo
-						$config_var['label'], '
+				echo
+				$config_var['label'], '
 					</h3>';
 			}
 			// A description?
@@ -1240,7 +1240,7 @@ function template_callback_question_answer_list()
 				var add_question_template = ' . JavaScriptEscape('
 			<dt class="questions">
 				<input type="text" name="question[b-%question_last_blank%]" size="40" class="input_text verification_question" />' .
-					$lang_dropdown . '
+			$lang_dropdown . '
 			</dt>
 			<dd class="questions">
 				<input type="text" name="answer[b-%question_last_blank%][]" size="40" class="input_text verification_answer" /><br />

@@ -31,7 +31,7 @@ function template_editsets()
 	echo '
 	<div id="admincenter">';
 
-		template_show_list('smiley_set_list');
+	template_show_list('smiley_set_list');
 
 	echo '
 	</div>';

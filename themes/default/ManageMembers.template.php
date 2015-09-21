@@ -337,7 +337,7 @@ function template_users_multiactions($groups)
 					</select>
 					<select onchange="if(this.value==-1){if(!confirm(\'' . $txt['confirm_remove_membergroup'] . '\')){this.value=0;}}" name="new_membergroup" id="new_membergroup" disabled="disabled">';
 
-	foreach($groups as $member_group)
+	foreach ($groups as $member_group)
 	{
 		$select .= '
 			<option value="' . $member_group['id'] . '"' . ($member_group['is_primary'] ? ' selected="selected"' : '') . '>

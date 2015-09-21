@@ -42,7 +42,7 @@ function template_control_richedit($editor_id, $smileyContainer = null, $bbcCont
 					}';
 
 	if (!empty($context['mentions_enabled']))
-			$plugin_options[] = '
+		$plugin_options[] = '
 					mentionOptions: {
 						editor_id: \'' . $editor_id . '\',
 						cache: {

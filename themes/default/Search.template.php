@@ -59,7 +59,7 @@ function template_searchform()
 	// Does the search require a visual verification screen to annoy them?
 	if (!empty($context['require_verification']))
 	{
-			template_verification_controls($context['visual_verification_id'], '
+		template_verification_controls($context['visual_verification_id'], '
 						<div class="verification">
 							<strong>' . $txt['search_visual_verification_label'] . ':</strong>
 							<br />', '
@@ -119,30 +119,30 @@ function template_searchform()
 						</div>
 						<a id="upshrink_link" href="', $scripturl, '?action=search;advanced" class="linkbutton" style="display:none">', $txt['search_simple'], '</a>';
 
-		// Set the initial search style for the form
-		echo '
+	// Set the initial search style for the form
+	echo '
 						<input id="advanced" type="hidden" name="advanced" value="1" />';
 
-		// If $context['search_params']['topic'] is set, that means we're searching just one topic.
-		if (!empty($context['search_params']['topic']))
-			echo '
+	// If $context['search_params']['topic'] is set, that means we're searching just one topic.
+	if (!empty($context['search_params']['topic']))
+		echo '
 						<p>', $txt['search_specific_topic'], ' &quot;', $context['search_topic']['link'], '&quot;.</p>
 						<input type="hidden" name="topic" value="', $context['search_topic']['id'], '" />';
 
-		echo '
+	echo '
 					</fieldset>';
 
-		// This starts our selection area to allow searching by specific boards
-		if (empty($context['search_params']['topic']))
-		{
-			echo '
+	// This starts our selection area to allow searching by specific boards
+	if (empty($context['search_params']['topic']))
+	{
+		echo '
 					<fieldset id="pick_boards" class="content">';
 
-			template_pick_boards('searchform');
+		template_pick_boards('searchform');
 
-			echo '
+		echo '
 					</fieldset>';
-		}
+	}
 
 	echo '
 				</form>';

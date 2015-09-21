@@ -174,7 +174,7 @@ function template_poll_edit_above()
 						<div class="separator"></div>
 						<div id="edit_poll">';
 
-							template_poll_edit();
+	template_poll_edit();
 
 	echo '
 						</div>';
@@ -270,7 +270,7 @@ function template_make_event_above()
 	echo '
 							</fieldset>
 						</div>';
-	}
+}
 
 /**
  * The main template for the post page.
