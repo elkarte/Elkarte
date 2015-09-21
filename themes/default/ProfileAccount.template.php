@@ -210,7 +210,7 @@ function template_deleteAccount()
 
 	// The main containing header.
 	echo '
-		<form action="', $scripturl, '?action=profile;area=deleteaccount;save" method="post" accept-charset="UTF-8" name="creator" id="creator">
+		<form id="creator" action="', $scripturl, '?action=profile;area=deleteaccount;save" method="post" accept-charset="UTF-8" name="creator">
 			<h2 class="category_header hdicon cat_img_profile">
 				', $txt['deleteAccount'], '
 			</h2>';

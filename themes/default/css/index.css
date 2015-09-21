@@ -3460,7 +3460,12 @@ dl.merge_topic dd {
 	border-bottom: 0;
 }
 
+/* Definition lists, mostly used in profile */
 #creator dl {
+	margin: 4px 0 0;
+}
+
+#creator dl:first-child {
 	margin: 0;
 }
 
@@ -3468,6 +3473,10 @@ dl.merge_topic dd {
 	float: left;
 	clear: both;
 	width: 40%;
+}
+
+#creator dt label {
+	font-weight: 600;
 }
 
 #creator dd {
