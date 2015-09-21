@@ -136,6 +136,9 @@ class Mentions_Controller extends Action_Controller
 	{
 		global $modSettings;
 
+		if (empty($modSettings['enabled_mentions']))
+			return array();
+
 		return array_filter(array_unique(explode(',', $modSettings['enabled_mentions'])));
 	}
 
