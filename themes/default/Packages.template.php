@@ -1002,11 +1002,11 @@ function template_file_permissions()
 						<span style="color: ', ($dir['perms']['chmod'] ? 'green' : 'red'), '">', ($dir['perms']['chmod'] ? $txt['package_file_perms_writable'] : $txt['package_file_perms_not_writable']), '</span>
 						', ($dir['perms']['perms'] ? '&nbsp;(' . $txt['package_file_perms_chmod'] . ': ' . substr(sprintf('%o', $dir['perms']['perms']), -4) . ')' : ''), '
 					</td>
-					<td class="perm_read centertext grid8"><input type="radio" name="permStatus[', $name, ']" value="read" class="input_radio" /></td>
-					<td class="perm_write centertext grid8"><input type="radio" name="permStatus[', $name, ']" value="writable" class="input_radio" /></td>
-					<td class="perm_execute centertext grid8"><input type="radio" name="permStatus[', $name, ']" value="execute" class="input_radio" /></td>
-					<td class="perm_custom centertext grid8"><input type="radio" name="permStatus[', $name, ']" value="custom" class="input_radio" /></td>
-					<td class="perm_nochange centertext grid8"><input type="radio" name="permStatus[', $name, ']" value="no_change" checked="checked" class="input_radio" /></td>
+					<td class="perm_read centertext grid8"><input type="radio" name="permStatus[', $name, ']" value="read" /></td>
+					<td class="perm_write centertext grid8"><input type="radio" name="permStatus[', $name, ']" value="writable" /></td>
+					<td class="perm_execute centertext grid8"><input type="radio" name="permStatus[', $name, ']" value="execute" /></td>
+					<td class="perm_custom centertext grid8"><input type="radio" name="permStatus[', $name, ']" value="custom" /></td>
+					<td class="perm_nochange centertext grid8"><input type="radio" name="permStatus[', $name, ']" value="no_change" checked="checked" /></td>
 				</tr>
 			';
 
@@ -1023,14 +1023,14 @@ function template_file_permissions()
 			<fieldset>
 				<dl>
 					<dt>
-						<input type="radio" name="method" value="individual" checked="checked" id="method_individual" class="input_radio" />
+						<input type="radio" name="method" value="individual" checked="checked" id="method_individual" />
 						<label for="method_individual"><strong>', $txt['package_file_perms_apply'], '</strong></label>
 					</dt>
 					<dd>
 						<em class="smalltext">', $txt['package_file_perms_custom'], ': <input type="text" name="custom_value" value="0755" maxlength="4" size="5" class="input_text" />&nbsp;<a href="', $scripturl, '?action=quickhelp;help=chmod_flags" onclick="return reqOverlayDiv(this.href);" class="help"><img src="' . $settings['images_url'] . '/helptopics.png" alt="(?)" /></a></em>
 					</dd>
 					<dt>
-						<input type="radio" name="method" value="predefined" id="method_predefined" class="input_radio" />
+						<input type="radio" name="method" value="predefined" id="method_predefined" />
 						<label for="method_predefined"><strong>', $txt['package_file_perms_predefined'], ':</strong></label>
 						<select name="predefined" onchange="document.getElementById(\'method_predefined\').checked = \'checked\';">
 							<option value="restricted" selected="selected">', $txt['package_file_perms_pre_restricted'], '</option>
@@ -1118,11 +1118,11 @@ function template_permission_show_contents($ident, $contents, $level, $has_more 
 						<span class="', ($dir['perms']['chmod'] ? 'success' : 'error'), '">', ($dir['perms']['chmod'] ? $txt['package_file_perms_writable'] : $txt['package_file_perms_not_writable']), '</span>
 						', ($dir['perms']['perms'] ? '&nbsp;(' . $txt['package_file_perms_chmod'] . ': ' . substr(sprintf('%o', $dir['perms']['perms']), -4) . ')' : ''), '
 					</td>
-					<td class="perm_read centertext grid8"><input type="radio" name="permStatus[', $ident . '/' . $name, ']" value="read" class="input_radio" /></td>
-					<td class="perm_write centertext grid8"><input type="radio" name="permStatus[', $ident . '/' . $name, ']" value="writable" class="input_radio" /></td>
-					<td class="perm_execute centertext grid8"><input type="radio" name="permStatus[', $ident . '/' . $name, ']" value="execute" class="input_radio" /></td>
-					<td class="perm_custom centertext grid8"><input type="radio" name="permStatus[', $ident . '/' . $name, ']" value="custom" class="input_radio" /></td>
-					<td class="perm_nochange centertext grid8"><input type="radio" name="permStatus[', $ident . '/' . $name, ']" value="no_change" checked="checked" class="input_radio" /></td>
+					<td class="perm_read centertext grid8"><input type="radio" name="permStatus[', $ident . '/' . $name, ']" value="read" /></td>
+					<td class="perm_write centertext grid8"><input type="radio" name="permStatus[', $ident . '/' . $name, ']" value="writable" /></td>
+					<td class="perm_execute centertext grid8"><input type="radio" name="permStatus[', $ident . '/' . $name, ']" value="execute" /></td>
+					<td class="perm_custom centertext grid8"><input type="radio" name="permStatus[', $ident . '/' . $name, ']" value="custom" /></td>
+					<td class="perm_nochange centertext grid8"><input type="radio" name="permStatus[', $ident . '/' . $name, ']" value="no_change" checked="checked" /></td>
 				</tr>
 				<tr id="insert_div_loc_' . $cur_ident . '" style="display: none;"><td colspan="7"></td></tr>';
 

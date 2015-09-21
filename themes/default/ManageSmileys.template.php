@@ -240,10 +240,10 @@ function template_addsmiley()
 			<div class="content">
 				<ul>
 					<li>
-						<label for="method-existing"><input type="radio" onclick="switchType();" name="method" id="method-existing" value="existing" checked="checked" class="input_radio" /> ', $txt['smileys_add_existing'], '</label>
+						<label for="method-existing"><input type="radio" onclick="switchType();" name="method" id="method-existing" value="existing" checked="checked" /> ', $txt['smileys_add_existing'], '</label>
 					</li>
 					<li>
-						<label for="method-upload"><input type="radio" onclick="switchType();" name="method" id="method-upload" value="upload" class="input_radio" /> ', $txt['smileys_add_upload'], '</label>
+						<label for="method-upload"><input type="radio" onclick="switchType();" name="method" id="method-upload" value="upload" /> ', $txt['smileys_add_upload'], '</label>
 					</li>
 				</ul>
 				<br />

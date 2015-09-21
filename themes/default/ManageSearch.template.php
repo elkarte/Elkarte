@@ -148,7 +148,7 @@ function template_select_search_method()
 					<legend>', $txt['search_index'], '</legend>
 					<dl>
 						<dt>
-							<input type="radio" id="search_index_none" name="search_index" value="none"', empty($modSettings['search_index']) ? ' checked="checked"' : '', ' class="input_radio" />
+							<input type="radio" id="search_index_none" name="search_index" value="none"', empty($modSettings['search_index']) ? ' checked="checked"' : '', ' />
 							<label for="search_index_none">', $txt['search_index_none'], '</label>
 						</dt>';
 
@@ -156,7 +156,7 @@ function template_select_search_method()
 	{
 		echo '
 						<dt>
-							<input type="radio" id="search_index_full" name="search_index" value="fulltext"', !empty($modSettings['search_index']) && $modSettings['search_index'] == 'fulltext' ? ' checked="checked"' : '', empty($context['fulltext_index']) ? ' onclick="alert(\'' . $txt['search_method_fulltext_warning'] . '\'); selectRadioByName(this.form.search_index, \'none\');"' : '', ' class="input_radio" />
+							<input type="radio" id="search_index_full" name="search_index" value="fulltext"', !empty($modSettings['search_index']) && $modSettings['search_index'] == 'fulltext' ? ' checked="checked"' : '', empty($context['fulltext_index']) ? ' onclick="alert(\'' . $txt['search_method_fulltext_warning'] . '\'); selectRadioByName(this.form.search_index, \'none\');"' : '', ' />
 							<label for="search_index_full">', $txt['search_method_fulltext_index'], '</label>
 						</dt>
 						<dd>
@@ -180,7 +180,7 @@ function template_select_search_method()
 
 	echo '
 						<dt>
-							<input type="radio" id="search_index_custom" name="search_index" value="custom"', !empty($modSettings['search_index']) && $modSettings['search_index'] == 'custom' ? ' checked="checked"' : '', $context['custom_index'] ? '' : ' onclick="alert(\'' . $txt['search_index_custom_warning'] . '\'); selectRadioByName(this.form.search_index, \'none\');"', ' class="input_radio" />
+							<input type="radio" id="search_index_custom" name="search_index" value="custom"', !empty($modSettings['search_index']) && $modSettings['search_index'] == 'custom' ? ' checked="checked"' : '', $context['custom_index'] ? '' : ' onclick="alert(\'' . $txt['search_index_custom_warning'] . '\'); selectRadioByName(this.form.search_index, \'none\');"', ' />
 							<label for="search_index_custom">', $txt['search_index_custom'], '</label>
 						</dt>
 						<dd>
@@ -210,7 +210,7 @@ function template_select_search_method()
 
 		echo '
 						<dt>
-							<input type="radio" id="search_index_', $api['setting_index'], '" name="search_index" value="', $api['setting_index'], '"', !empty($modSettings['search_index']) && $modSettings['search_index'] == $api['setting_index'] ? ' checked="checked"' : '', ' class="input_radio" />
+							<input type="radio" id="search_index_', $api['setting_index'], '" name="search_index" value="', $api['setting_index'], '"', !empty($modSettings['search_index']) && $modSettings['search_index'] == $api['setting_index'] ? ' checked="checked"' : '', ' />
 							<label for="search_index_', $api['setting_index'], '">', $api['label'], '</label>
 						</dt>';
 

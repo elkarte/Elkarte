@@ -279,7 +279,7 @@ function template_confirm_category_delete()
 			<h2 class="category_header">', $txt['mboards_delete_what_do'], '</h2>
 			<div class="content">
 				<p>
-					<label for="delete_action0"><input type="radio" id="delete_action0" name="delete_action" value="0" class="input_radio" checked="checked" />', $txt['mboards_delete_option1'], '</label><br />
+					<label for="delete_action0"><input type="radio" id="delete_action0" name="delete_action" value="0" checked="checked" />', $txt['mboards_delete_option1'], '</label><br />
 					<label for="delete_action1"><input type="radio" id="delete_action1" name="delete_action" value="1" class="input_radio"', count($context['category_order']) == 1 ? ' disabled="disabled"' : '', ' />', $txt['mboards_delete_option2'], '</label>:
 					<select name="cat_to" ', count($context['category_order']) == 1 ? 'disabled="disabled"' : '', '>';
 
@@ -448,13 +448,13 @@ function template_modify_board()
 									</span>
 								</td>
 								<td>
-									<input type="radio" name="groups[', $group['id'], ']" value="allow" id="groups_', $group['id'], '_a"', $group['allow'] ? ' checked="checked"' : '', ' class="input_radio" />
+									<input type="radio" name="groups[', $group['id'], ']" value="allow" id="groups_', $group['id'], '_a"', $group['allow'] ? ' checked="checked"' : '', ' />
 								</td>
 								<td>
-									<input type="radio" name="groups[', $group['id'], ']" value="ignore" id="groups_', $group['id'], '_x"', !$group['allow'] && !$group['deny'] ? ' checked="checked"' : '', ' class="input_radio" />
+									<input type="radio" name="groups[', $group['id'], ']" value="ignore" id="groups_', $group['id'], '_x"', !$group['allow'] && !$group['deny'] ? ' checked="checked"' : '', ' />
 								</td>
 								<td>
-									<input type="radio" name="groups[', $group['id'], ']" value="deny" id="groups_', $group['id'], '_d"', $group['deny'] ? ' checked="checked"' : '', ' class="input_radio" />
+									<input type="radio" name="groups[', $group['id'], ']" value="deny" id="groups_', $group['id'], '_d"', $group['deny'] ? ' checked="checked"' : '', ' />
 								</td>
 								<td></td>
 							</tr>';
@@ -473,13 +473,13 @@ function template_modify_board()
 								<td>
 								</td>
 								<td>
-									<input type="radio" name="select_all" class="input_radio" onclick="selectAllRadio(this, this.form, \'groups\', \'allow\');" />
+									<input type="radio" name="select_all" onclick="selectAllRadio(this, this.form, \'groups\', \'allow\');" />
 								</td>
 								<td>
-									<input type="radio" name="select_all" class="input_radio" onclick="selectAllRadio(this, this.form, \'groups\', \'ignore\');" />
+									<input type="radio" name="select_all" onclick="selectAllRadio(this, this.form, \'groups\', \'ignore\');" />
 								</td>
 								<td>
-									<input type="radio" name="select_all" class="input_radio" onclick="selectAllRadio(this, this.form, \'groups\', \'deny\');" />
+									<input type="radio" name="select_all" onclick="selectAllRadio(this, this.form, \'groups\', \'deny\');" />
 								</td>
 								<td>
 									<em>', $txt['check_all'], '</em>
@@ -726,7 +726,7 @@ function template_confirm_board_delete()
 			<h2 class="category_header">', $txt['mboards_delete_what_do'], '</h2>
 			<div class="content">
 				<p>
-					<label for="delete_action0"><input type="radio" id="delete_action0" name="delete_action" value="0" class="input_radio" checked="checked" />', $txt['mboards_delete_board_option1'], '</label><br />
+					<label for="delete_action0"><input type="radio" id="delete_action0" name="delete_action" value="0" checked="checked" />', $txt['mboards_delete_board_option1'], '</label><br />
 					<label for="delete_action1"><input type="radio" id="delete_action1" name="delete_action" value="1" class="input_radio"', empty($context['can_move_children']) ? ' disabled="disabled"' : '', ' />', $txt['mboards_delete_board_option2'], '</label>:
 					<select name="board_to" ', empty($context['can_move_children']) ? 'disabled="disabled"' : '', '>';
 

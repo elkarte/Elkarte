@@ -186,13 +186,13 @@ function template_maintain_members()
 				<p><strong>', $txt['reattribute_guest_posts'], '</strong></p>
 				<dl class="settings">
 					<dt>
-						<label for="type_email"><input type="radio" name="type" id="type_email" value="email" checked="checked" class="input_radio" />', $txt['reattribute_email'], '</label>
+						<label for="type_email"><input type="radio" name="type" id="type_email" value="email" checked="checked" />', $txt['reattribute_email'], '</label>
 					</dt>
 					<dd>
 						<input type="text" name="from_email" id="from_email" value="" onclick="document.getElementById(\'type_email\').checked = \'checked\'; document.getElementById(\'from_name\').value = \'\';" />
 					</dd>
 					<dt>
-						<label for="type_name"><input type="radio" name="type" id="type_name" value="name" class="input_radio" />', $txt['reattribute_username'], '</label>
+						<label for="type_name"><input type="radio" name="type" id="type_name" value="name" />', $txt['reattribute_username'], '</label>
 					</dt>
 					<dd>
 						<input type="text" name="from_name" id="from_name" value="" onclick="document.getElementById(\'type_name\').checked = \'checked\'; document.getElementById(\'from_email\').value = \'\';" class="input_text" />
@@ -326,9 +326,9 @@ function template_maintain_topics_pruneold()
 						<label for="maxdays">', sprintf($txt['maintain_old_since_days'], '<input type="text" id="maxdays" name="maxdays" value="30" size="3" />'), '</label>
 					</p>
 					<p>
-						<label for="delete_type_nothing"><input type="radio" name="delete_type" id="delete_type_nothing" value="nothing" class="input_radio" /> ', $txt['maintain_old_nothing_else'], '</label><br />
-						<label for="delete_type_moved"><input type="radio" name="delete_type" id="delete_type_moved" value="moved" class="input_radio" checked="checked" /> ', $txt['maintain_old_are_moved'], '</label><br />
-						<label for="delete_type_locked"><input type="radio" name="delete_type" id="delete_type_locked" value="locked" class="input_radio" /> ', $txt['maintain_old_are_locked'], '</label><br />
+						<label for="delete_type_nothing"><input type="radio" name="delete_type" id="delete_type_nothing" value="nothing" /> ', $txt['maintain_old_nothing_else'], '</label><br />
+						<label for="delete_type_moved"><input type="radio" name="delete_type" id="delete_type_moved" value="moved" checked="checked" /> ', $txt['maintain_old_are_moved'], '</label><br />
+						<label for="delete_type_locked"><input type="radio" name="delete_type" id="delete_type_locked" value="locked" /> ', $txt['maintain_old_are_locked'], '</label><br />
 					</p>
 					<p>
 						<label for="delete_old_not_sticky"><input type="checkbox" name="delete_old_not_sticky" id="delete_old_not_sticky" class="input_check" checked="checked" /> ', $txt['maintain_old_are_not_stickied'], '</label><br />

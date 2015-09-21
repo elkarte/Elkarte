@@ -158,11 +158,11 @@ function template_registration_form()
 						</dt>
 						<dd>
 							<label for="auth_pass" id="option_auth_pass">
-								<input type="radio" name="authenticate" value="passwd" id="auth_pass" tabindex="', $context['tabindex']++, '" ', empty($context['openid']) ? 'checked="checked" ' : '', ' onclick="updateAuthMethod();" class="input_radio" />
+								<input type="radio" name="authenticate" value="passwd" id="auth_pass" tabindex="', $context['tabindex']++, '" ', empty($context['openid']) ? 'checked="checked" ' : '', ' onclick="updateAuthMethod();" />
 								', $txt['authenticate_password'], '
 							</label>
 							<label for="auth_openid" id="option_auth_openid">
-								<input type="radio" name="authenticate" value="openid" id="auth_openid" tabindex="', $context['tabindex']++, '" ', !empty($context['openid']) ? 'checked="checked" ' : '', ' onclick="updateAuthMethod();" class="input_radio" />
+								<input type="radio" name="authenticate" value="openid" id="auth_openid" tabindex="', $context['tabindex']++, '" ', !empty($context['openid']) ? 'checked="checked" ' : '', ' onclick="updateAuthMethod();" />
 								', $txt['authenticate_openid'], '
 							</label>
 						</dd>
