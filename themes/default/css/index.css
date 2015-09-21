@@ -127,9 +127,10 @@ form, input, button, select, .input_text, textarea,
 	content: "";
 }
 
+/* simple spacer for between sections */
 .separator {
 	clear: both;
-	margin: 3px 0;
+	margin: 4px 0;
 }
 
 /* Set list-style to none by default. Best in most places.*/
@@ -206,10 +207,12 @@ input[type="file"] {
 	max-height: none;
 	height: auto;
 }
+
 .select_multiple {
 	min-height: 10em;
 	height: auto;
 }
+
 input[type="number"] {
 	padding: 0 0 0 6px;
 }
@@ -325,6 +328,11 @@ fieldset {
 /*...and em as italics */
 em, .em {
 	font-style: italic;
+}
+
+/* We use this alot */
+.hide {
+	display: none;
 }
 
 /* Some grid helpers for tables and divs */
@@ -811,7 +819,6 @@ a.bbc_link {
 #password_login {
 	display: inline-block;
 	vertical-align: middle;
-	-webkit-appearance: caps-lock-indicator;
 }
 
 #search_form {
@@ -4196,7 +4203,7 @@ a.help .icon {
 	font-weight: bold;
 }
 
-dl.no_members {
+.no_members {
 	display: none;
 }
 

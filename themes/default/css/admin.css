@@ -255,7 +255,7 @@ fieldset dl {
 }
 
 .censorWords {
-	margin-top: 1ex;
+	margin: 1em 0 0 1em;
 }
 
 /* Cleaned this up a bit for less clutter.

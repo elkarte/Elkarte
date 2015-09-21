@@ -695,7 +695,7 @@ function template_edit_censored()
 
 	// First section is for adding/removing words from the censored list.
 	echo '
-	<div id="admincenter">
+	<div id="admincenter" class="admincenter">
 		<form id="admin_form_wrapper" action="', $scripturl, '?action=admin;area=postsettings;sa=censor" method="post" accept-charset="UTF-8">
 			<h2 class="category_header">
 				', $txt['admin_censored_words'], '
@@ -715,11 +715,12 @@ function template_edit_censored()
 				<div class="censorWords">
 					<input type="text" name="censor_vulgar[]" size="30" class="input_text" /> <i class="fa  fa-arrow-circle-right"></i> <input type="text" name="censor_proper[]" size="30" class="input_text" />
 				</div>
-				<div id="moreCensoredWords"></div><div class="censorWords" style="display: none;" id="moreCensoredWords_link">
-					<a class="linkbutton_left" href="#;" onclick="addNewWord(); return false;">', $txt['censor_clickadd'], '</a><br />
+				<div id="moreCensoredWords"></div>
+				<div class="censorWords hide" id="moreCensoredWords_link">
+					<a class="linkbutton_left" href="#" onclick="addNewWord(); return false;">', $txt['censor_clickadd'], '</a><br />
 				</div>
 				<script><!-- // --><![CDATA[
-					document.getElementById("moreCensoredWords_link").style.display = "";
+					document.getElementById("moreCensoredWords_link").style.display = "block";
 				// ]]></script>
 				<hr class="clear" />
 				<dl class="settings">
@@ -1228,13 +1229,14 @@ function template_callback_question_answer_list()
 	}
 
 	echo '
-		<dt id="add_more_question_placeholder" style="display: none;"></dt><dd></dd>
-		<dt id="add_more_link_div" style="display: none;">
+		<dt id="add_more_question_placeholder" class="hide"></dt>
+		<dd></dd>
+		<dt id="add_more_link_div" class="hide">
 			<a href="#" onclick="addAnotherQuestion(); return false;">&#171; ', $txt['setup_verification_add_more'], ' &#187;</a>
 		</dt><dd></dd>';
 
 	addInlineJavascript('
-				document.getElementById(\'add_more_link_div\').style.display = \'\';
+				document.getElementById(\'add_more_link_div\').style.display = \'block\';
 				var question_last_blank = ' . $count . ';
 				var txt_add_another_answer = ' . JavaScriptEscape('&#171; ' . $txt['setup_verification_add_more_answers'] . ' &#187;') . ';
 				var add_question_template = ' . JavaScriptEscape('
@@ -1246,7 +1248,7 @@ function template_callback_question_answer_list()
 				<input type="text" name="answer[b-%question_last_blank%][]" size="40" class="input_text verification_answer" /><br />
 				<a href="#" onclick="addAnotherAnswer(this, \'b-%question_last_blank%\'); return false;">%setup_verification_add_more_answers%</a>
 			</dd>
-			<dt id="add_more_question_placeholder" style="display: none;"></dt>') . ';
+			<dt id="add_more_question_placeholder" class="hide"></dt>') . ';
 				var add_answer_template = ' . JavaScriptEscape('
 				<input type="text" name="answer[%question_last_blank%][]" size="40" class="input_text verification_answer" /><br />
 				<a href="#" onclick="addAnotherAnswer(this, \'%question_last_blank%\'); return false;">&#171; ' . $txt['setup_verification_add_more_answers'] . ' &#187;</a>') . ';', true);
@@ -1468,15 +1470,15 @@ function template_callback_external_search_engines()
 			</dd>';
 
 	echo '
-		<dt id="add_more_searches" style="display: none;"></dt>
+		<dt id="add_more_searches" class="hide"></dt>
 		<dd></dd>
-		<dt id="add_more_link_div" style="display: none;">
+		<dt id="add_more_link_div" class="hide">
 			<a class="linkbutton" href="#" onclick="addAnotherSearch(', JavaScriptEscape($txt['name']), ', ', JavaScriptEscape($txt['url']), ', ', JavaScriptEscape($txt['words_sep']), '); return false;">', $txt['setup_search_engine_add_more'], '</a>
 		</dt>
 		<dd></dd>';
 
 	addInlineJavascript('
-				document.getElementById(\'add_more_link_div\').style.display = \'\';', true);
+				document.getElementById(\'add_more_link_div\').style.display = \'block\';', true);
 }
 
 /**
