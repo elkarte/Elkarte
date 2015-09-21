@@ -160,21 +160,21 @@ function template_select_search_method()
 							<label for="search_index_full">', $txt['search_method_fulltext_index'], '</label>
 						</dt>
 						<dd>
-							<span class="smalltext">';
+							<p>';
 
 		if (empty($context['fulltext_index']) && empty($context['cannot_create_fulltext']))
 			echo '
-								<strong>', $txt['search_index_label'], ':</strong> ', $txt['search_method_no_index_exists'], ' [<a href="', $scripturl, '?action=admin;area=managesearch;sa=createfulltext;', $context['session_var'], '=', $context['session_id'], ';', $context['admin-msm_token_var'], '=', $context['admin-msm_token'], '">', $txt['search_method_fulltext_create'], '</a>]';
+								<strong>', $txt['search_index_label'], ':</strong> ', $txt['search_method_no_index_exists'], ' <a class="linkbutton" href="', $scripturl, '?action=admin;area=managesearch;sa=createfulltext;', $context['session_var'], '=', $context['session_id'], ';', $context['admin-msm_token_var'], '=', $context['admin-msm_token'], '">', $txt['search_method_fulltext_create'], '</a>';
 		elseif (empty($context['fulltext_index']) && !empty($context['cannot_create_fulltext']))
 			echo '
 								<strong>', $txt['search_index_label'], ':</strong> ', $txt['search_method_fulltext_cannot_create'];
 		else
 			echo '
-								<strong>', $txt['search_index_label'], ':</strong> ', $txt['search_method_index_already_exists'], ' [<a href="', $scripturl, '?action=admin;area=managesearch;sa=removefulltext;', $context['session_var'], '=', $context['session_id'], ';', $context['admin-msm_token_var'], '=', $context['admin-msm_token'], '">', $txt['search_method_fulltext_remove'], '</a>]<br />
+								<strong>', $txt['search_index_label'], ':</strong> ', $txt['search_method_index_already_exists'], ' <a class="linkbutton" href="', $scripturl, '?action=admin;area=managesearch;sa=removefulltext;', $context['session_var'], '=', $context['session_id'], ';', $context['admin-msm_token_var'], '=', $context['admin-msm_token'], '">', $txt['search_method_fulltext_remove'], '</a><br />
 								<strong>', $txt['search_index_size'], ':</strong> ', $context['table_info']['fulltext_length'];
 
 		echo '
-							</span>
+							</p>
 						</dd>';
 	}
 
@@ -184,22 +184,22 @@ function template_select_search_method()
 							<label for="search_index_custom">', $txt['search_index_custom'], '</label>
 						</dt>
 						<dd>
-							<span class="smalltext">';
+							<p>';
 
 	if ($context['custom_index'])
 		echo '
-								<strong>', $txt['search_index_label'], ':</strong> ', $txt['search_method_index_already_exists'], ' [<a href="', $scripturl, '?action=admin;area=managesearch;sa=removecustom;', $context['session_var'], '=', $context['session_id'], ';', $context['admin-msm_token_var'], '=', $context['admin-msm_token'], '">', $txt['search_index_custom_remove'], '</a>]<br />
+								<strong>', $txt['search_index_label'], ':</strong> ', $txt['search_method_index_already_exists'], ' <a class="linkbutton" href="', $scripturl, '?action=admin;area=managesearch;sa=removecustom;', $context['session_var'], '=', $context['session_id'], ';', $context['admin-msm_token_var'], '=', $context['admin-msm_token'], '">', $txt['search_index_custom_remove'], '</a><br />
 								<strong>', $txt['search_index_size'], ':</strong> ', $context['table_info']['custom_index_length'];
 	elseif ($context['partial_custom_index'])
 		echo '
-								<strong>', $txt['search_index_label'], ':</strong> ', $txt['search_method_index_partial'], ' [<a href="', $scripturl, '?action=admin;area=managesearch;sa=removecustom;', $context['session_var'], '=', $context['session_id'], ';', $context['admin-msm_token_var'], '=', $context['admin-msm_token'], '">', $txt['search_index_custom_remove'], '</a>] [<a href="', $scripturl, '?action=admin;area=managesearch;sa=createmsgindex;resume;', $context['session_var'], '=', $context['session_id'], ';', $context['admin-msm_token_var'], '=', $context['admin-msm_token'], '">', $txt['search_index_custom_resume'], '</a>]<br />
+								<strong>', $txt['search_index_label'], ':</strong> ', $txt['search_method_index_partial'], ' <a class="linkbutton" href="', $scripturl, '?action=admin;area=managesearch;sa=removecustom;', $context['session_var'], '=', $context['session_id'], ';', $context['admin-msm_token_var'], '=', $context['admin-msm_token'], '">', $txt['search_index_custom_remove'], '</a>] [<a href="', $scripturl, '?action=admin;area=managesearch;sa=createmsgindex;resume;', $context['session_var'], '=', $context['session_id'], ';', $context['admin-msm_token_var'], '=', $context['admin-msm_token'], '">', $txt['search_index_custom_resume'], '</a><br />
 								<strong>', $txt['search_index_size'], ':</strong> ', $context['table_info']['custom_index_length'];
 	else
 		echo '
-								<strong>', $txt['search_index_label'], ':</strong> ', $txt['search_method_no_index_exists'], ' [<a href="', $scripturl, '?action=admin;area=managesearch;sa=createmsgindex">', $txt['search_index_create_custom'], '</a>]';
+								<strong>', $txt['search_index_label'], ':</strong> ', $txt['search_method_no_index_exists'], ' <a class="linkbutton" href="', $scripturl, '?action=admin;area=managesearch;sa=createmsgindex">', $txt['search_index_create_custom'], '</a>';
 
 	echo '
-							</span>
+							</p>
 						</dd>';
 
 	// Any search API's to include
@@ -217,7 +217,7 @@ function template_select_search_method()
 		if ($api['desc'])
 			echo '
 						<dd>
-							<span class="smalltext">', $api['desc'], '</span>
+							<p>', $api['desc'], '</p>
 						</dd>';
 	}
 
