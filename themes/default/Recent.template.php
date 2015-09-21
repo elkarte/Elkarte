@@ -87,7 +87,7 @@ function template_unread()
 		if ($context['showCheckboxes'])
 			echo '
 							<li class="listlevel1 quickmod_select_all">
-								<input type="checkbox" onclick="invertAll(this, document.getElementById(\'quickModForm\'), \'topics[]\');" class="input_check" />
+								<input type="checkbox" onclick="invertAll(this, document.getElementById(\'quickModForm\'), \'topics[]\');" />
 							</li>';
 
 		$current_header = $context['topics_headers'][$context['sort_by']];
@@ -167,7 +167,7 @@ function template_unread()
 			if ($context['showCheckboxes'])
 				echo '
 								<p class="topic_moderation" >
-									<input type="checkbox" name="topics[]" value="', $topic['id'], '" class="input_check" />
+									<input type="checkbox" name="topics[]" value="', $topic['id'], '" />
 								</p>';
 
 			echo '

@@ -254,7 +254,7 @@ function template_pick_boards($form_name, $input_names = 'brd', $select_all = tr
 				echo '
 										<li class="board" style="margin-', $context['right_to_left'] ? 'right' : 'left', ': ', $board['child_level'], 'em;">
 											<label for="', $input_names, $board['id'], '">
-												<input type="checkbox" id="', $input_names, $board['id'], '" name="', $input_names, '[', $board['id'], ']" value="', $board['id'], '"', $board['selected'] ? ' checked="checked"' : '', ' class="input_check" /> ', $board['name'], '
+												<input type="checkbox" id="', $input_names, $board['id'], '" name="', $input_names, '[', $board['id'], ']" value="', $board['id'], '"', $board['selected'] ? ' checked="checked"' : '', ' /> ', $board['name'], '
 											</label>
 										</li>';
 			}
@@ -274,7 +274,7 @@ function template_pick_boards($form_name, $input_names = 'brd', $select_all = tr
 						</div>
 						<div class="submitbutton">
 							<span class="floatleft">
-								<input type="checkbox" name="all" id="check_all" value=""', $context['boards_check_all'] ? ' checked="checked"' : '', ' onclick="invertAll(this, this.form, \'', $input_names, '\');" class="input_check" />
+								<input type="checkbox" name="all" id="check_all" value=""', $context['boards_check_all'] ? ' checked="checked"' : '', ' onclick="invertAll(this, this.form, \'', $input_names, '\');" />
 								<label for="check_all">
 									<em> ', $txt['check_all'], '</em>
 								</label>

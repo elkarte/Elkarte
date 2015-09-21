@@ -102,7 +102,7 @@ function template_modifyset()
 						<label for="smiley_sets_default">', $txt['smiley_set_select_default'], '</label>: </strong>
 					</dt>
 					<dd>
-						<input type="checkbox" name="smiley_sets_default" id="smiley_sets_default" value="1"', $context['current_set']['selected'] ? ' checked="checked"' : '', ' class="input_check" />
+						<input type="checkbox" name="smiley_sets_default" id="smiley_sets_default" value="1"', $context['current_set']['selected'] ? ' checked="checked"' : '', ' />
 					</dd>';
 
 	// If this is a new smiley set they have the option to import smileys already in the directory.
@@ -112,7 +112,7 @@ function template_modifyset()
 						<label for="smiley_sets_import">', $txt['smiley_set_import_directory'], '</label>: </strong>
 					</dt>
 					<dd>
-						<input type="checkbox" name="smiley_sets_import" id="smiley_sets_import" value="1" class="input_check" />
+						<input type="checkbox" name="smiley_sets_import" id="smiley_sets_import" value="1" />
 					</dd>';
 
 	echo '
@@ -302,7 +302,7 @@ function template_addsmiley()
 							<label for="sameall">', $txt['smileys_add_upload_all'], ':</label>
 						</dt>
 						<dd>
-							<input type="checkbox" name="sameall" id="sameall" checked="checked" class="input_check" onclick="swapUploads(); selectMethod(\'upload\');" />
+							<input type="checkbox" name="sameall" id="sameall" checked="checked" onclick="swapUploads(); selectMethod(\'upload\');" />
 						</dd>
 					</dl>
 				</fieldset>

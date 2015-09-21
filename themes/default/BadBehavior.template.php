@@ -39,7 +39,7 @@ function template_badbehavior_log()
 				<tr class="secondary_header">
 					<td class="righttext" colspan="3">
 						<label for="check_all_1"><strong>', $txt['check_all'], '</strong></label>&nbsp;
-						<input type="checkbox" id="check_all_1" onclick="invertAll(this, this.form, \'delete[]\'); this.form.check_all_2.checked = this.checked;" class="input_check" />
+						<input type="checkbox" id="check_all_1" onclick="invertAll(this, this.form, \'delete[]\'); this.form.check_all_2.checked = this.checked;" />
 					</td>
 				</tr>';
 
@@ -88,7 +88,7 @@ function template_badbehavior_log()
 						</div>
 					</td>
 					<td class="checkbox_column">
-						<input type="checkbox" name="delete[]" value="', $entries['id'], '" class="input_check" />
+						<input type="checkbox" name="delete[]" value="', $entries['id'], '" />
 					</td>
 				</tr>';
 	}
@@ -97,7 +97,7 @@ function template_badbehavior_log()
 				<tr class="secondary_header">
 					<td colspan="3" class="righttext">
 						<label for="check_all_2"><strong>', $txt['check_all'], '</strong></label>&nbsp;
-						<input type="checkbox" id="check_all_2" onclick="invertAll(this, this.form, \'delete[]\'); this.form.check_all_1.checked = this.checked;" class="input_check" />
+						<input type="checkbox" id="check_all_2" onclick="invertAll(this, this.form, \'delete[]\'); this.form.check_all_1.checked = this.checked;" />
 					</td>
 				</tr>
 			</table>

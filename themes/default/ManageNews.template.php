@@ -78,7 +78,7 @@ function template_email_members()
 						<span class="smalltext">', $txt['email_force'], '</span>
 					</dt>
 					<dd>
-						<input type="checkbox" name="email_force" id="email_force" value="1" class="input_check" />
+						<input type="checkbox" name="email_force" id="email_force" value="1" />
 					</dd>
 				</dl>
 			</div>
@@ -250,17 +250,17 @@ function template_email_members_compose()
 					<ul>
 						<li>
 							<label for="send_pm">
-								<input type="checkbox" name="send_pm" id="send_pm" ', !empty($context['send_pm']) ? 'checked="checked"' : '', 'class="input_check" onclick="checkboxes_status(this);" /> ', $txt['email_as_pms'], '
+								<input type="checkbox" name="send_pm" id="send_pm" ', !empty($context['send_pm']) ? 'checked="checked"' : '', 'onclick="checkboxes_status(this);" /> ', $txt['email_as_pms'], '
 							</label>
 						</li>
 						<li>
 							<label for="send_html">
-								<input type="checkbox" name="send_html" id="send_html" ', !empty($context['send_html']) ? 'checked="checked"' : '', 'class="input_check" onclick="checkboxes_status(this);" /> ', $txt['email_as_html'], '
+								<input type="checkbox" name="send_html" id="send_html" ', !empty($context['send_html']) ? 'checked="checked"' : '', 'onclick="checkboxes_status(this);" /> ', $txt['email_as_html'], '
 							</label>
 						</li>
 						<li>
 							<label for="parse_html">
-								<input type="checkbox" name="parse_html" id="parse_html" checked="checked" disabled="disabled" class="input_check" /> ', $txt['email_parsed_html'], '
+								<input type="checkbox" name="parse_html" id="parse_html" checked="checked" disabled="disabled" /> ', $txt['email_parsed_html'], '
 							</label>
 						</li>
 					</ul>

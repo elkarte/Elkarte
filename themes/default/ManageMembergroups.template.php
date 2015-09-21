@@ -446,13 +446,13 @@ function template_add_edit_group_boards_list($form_id, $collapse = true)
 											', $txt['all_boards_in_cat'], ':
 											<span class="floatright">
 												<label for="all_sel_', $category['id'], '">
-													<input type="radio" onchange="select_in_category(\'allow\', [', implode(',', array_keys($category['boards'])), ']);" id="all_sel_', $category['id'], '" name="all_', $category['id'], '" class="input_check" /> ', $txt['board_perms_allow'], '
+													<input type="radio" onchange="select_in_category(\'allow\', [', implode(',', array_keys($category['boards'])), ']);" id="all_sel_', $category['id'], '" name="all_', $category['id'], '" /> ', $txt['board_perms_allow'], '
 												</label>
 												<label for="all_ign_', $category['id'], '">
-													<input type="radio" onchange="select_in_category(\'ignore\', [', implode(',', array_keys($category['boards'])), ']);" id="all_ign_', $category['id'], '" name="all_', $category['id'], '" class="input_check" /> ', $txt['board_perms_ignore'], '
+													<input type="radio" onchange="select_in_category(\'ignore\', [', implode(',', array_keys($category['boards'])), ']);" id="all_ign_', $category['id'], '" name="all_', $category['id'], '" /> ', $txt['board_perms_ignore'], '
 												</label>
 												<label for="all_den_', $category['id'], '">
-													<input type="radio" onchange="select_in_category(\'deny\', [', implode(',', array_keys($category['boards'])), ']);" id="all_den_', $category['id'], '" name="all_', $category['id'], '" class="input_check" /> ', $txt['board_perms_deny'], '
+													<input type="radio" onchange="select_in_category(\'deny\', [', implode(',', array_keys($category['boards'])), ']);" id="all_den_', $category['id'], '" name="all_', $category['id'], '" /> ', $txt['board_perms_deny'], '
 												</label>
 											</span>
 										</li>';
@@ -462,7 +462,7 @@ function template_add_edit_group_boards_list($form_id, $collapse = true)
 			if (empty($deny))
 				echo '
 										<li class="board" style="margin-', $context['right_to_left'] ? 'right' : 'left', ': ', $board['child_level'], 'em;">
-											<input name="boardaccess[', $board['id'], ']" id="brd', $board['id'], '" value="allow" ', $board['allow'] ? ' checked="checked"' : '', ' class="input_check" /> <label for="brd', $board['id'], '">', $board['name'], '</label>
+											<input name="boardaccess[', $board['id'], ']" id="brd', $board['id'], '" value="allow" ', $board['allow'] ? ' checked="checked"' : '', ' /> <label for="brd', $board['id'], '">', $board['name'], '</label>
 										</li>';
 			else
 				echo '
@@ -470,13 +470,13 @@ function template_add_edit_group_boards_list($form_id, $collapse = true)
 											<span style="margin-', $context['right_to_left'] ? 'right' : 'left', ': ', $board['child_level'], 'em;">', $board['name'], ': </span>
 											<span class="floatright">
 												<label for="allow_brd', $board['id'], '">
-													<input type="radio" name="boardaccess[', $board['id'], ']" id="allow_brd', $board['id'], '" value="allow" ', $board['allow'] ? ' checked="checked"' : '', ' class="input_check" /> ', $txt['permissions_option_on'], '
+													<input type="radio" name="boardaccess[', $board['id'], ']" id="allow_brd', $board['id'], '" value="allow" ', $board['allow'] ? ' checked="checked"' : '', ' /> ', $txt['permissions_option_on'], '
 												</label>
 												<label for="ignore_brd', $board['id'], '">
-													<input type="radio" name="boardaccess[', $board['id'], ']" id="ignore_brd', $board['id'], '" value="ignore" ', !$board['allow'] && !$board['deny'] ? ' checked="checked"' : '', ' class="input_check" /> ', $txt['permissions_option_off'], '
+													<input type="radio" name="boardaccess[', $board['id'], ']" id="ignore_brd', $board['id'], '" value="ignore" ', !$board['allow'] && !$board['deny'] ? ' checked="checked"' : '', ' /> ', $txt['permissions_option_off'], '
 												</label>
 												<label for="deny_brd', $board['id'], '">
-													<input type="radio" name="boardaccess[', $board['id'], ']" id="deny_brd', $board['id'], '" value="deny" ', $board['deny'] ? ' checked="checked"' : '', ' class="input_check" /> ', $txt['permissions_option_deny'], '
+													<input type="radio" name="boardaccess[', $board['id'], ']" id="deny_brd', $board['id'], '" value="deny" ', $board['deny'] ? ' checked="checked"' : '', ' /> ', $txt['permissions_option_deny'], '
 												</label>
 											</span>
 										</li>';
@@ -494,7 +494,7 @@ function template_add_edit_group_boards_list($form_id, $collapse = true)
 		echo '
 								<br />
 								<div class="select_all_box">
-									<input id="checkall_check" class="input_check" onclick="invertAll(this, this.form, \'boardaccess\');" /> <label for="checkall_check"><em>', $txt['check_all'], '</em></label>
+									<input id="checkall_check" onclick="invertAll(this, this.form, \'boardaccess\');" /> <label for="checkall_check"><em>', $txt['check_all'], '</em></label>
 								</div>';
 	else
 		echo '
@@ -600,7 +600,7 @@ function template_group_members()
 
 	if (!empty($context['group']['assignable']))
 		echo '
-						<th style="width: 4%;"><input class="input_check" onclick="invertAll(this, this.form);" /></th>';
+						<th style="width: 4%;"><input onclick="invertAll(this, this.form);" /></th>';
 
 	echo '
 					</tr>
@@ -653,7 +653,7 @@ function template_group_members()
 		if (!empty($context['group']['assignable']))
 			echo '
 						<td class="centertext" style="width: 4%;">
-							<input name="rem[]" value="', $member['id'], '" class="input_check" ', ($context['user']['id'] == $member['id'] && $context['group']['id'] == 1 ? 'onclick="if (this.checked) return confirm(\'' . $txt['membergroups_members_deadmin_confirm'] . '\')" ' : ''), '/>
+							<input name="rem[]" value="', $member['id'], '" ', ($context['user']['id'] == $member['id'] && $context['group']['id'] == 1 ? 'onclick="if (this.checked) return confirm(\'' . $txt['membergroups_members_deadmin_confirm'] . '\')" ' : ''), '/>
 						</td>';
 
 		echo '

@@ -101,9 +101,9 @@ function template_searchform()
 									', $txt['search_options'], ':
 								</dt>
 								<dd class="options">
-									<input type="checkbox" name="show_complete" id="show_complete" value="1"', !empty($context['search_params']['show_complete']) ? ' checked="checked"' : '', ' class="input_check" />
+									<input type="checkbox" name="show_complete" id="show_complete" value="1"', !empty($context['search_params']['show_complete']) ? ' checked="checked"' : '', ' />
 									<label for="show_complete">', $txt['search_show_complete_messages'], '</label><br />
-									<input type="checkbox" name="subject_only" id="subject_only" value="1"', !empty($context['search_params']['subject_only']) ? ' checked="checked"' : '', ' class="input_check" />
+									<input type="checkbox" name="subject_only" id="subject_only" value="1"', !empty($context['search_params']['subject_only']) ? ' checked="checked"' : '', ' />
 									<label for="subject_only">', $txt['search_subject_only'], '</label>
 								</dd>
 								<dt class="righttext between">
@@ -268,7 +268,7 @@ function template_results()
 
 	if (!empty($options['display_quick_mod']) && $options['display_quick_mod'] == 1)
 		echo '
-						<input type="checkbox" onclick="invertAll(this, this.form, \'topics[]\');" class="input_check" />';
+						<input type="checkbox" onclick="invertAll(this, this.form, \'topics[]\');" />';
 
 	echo '
 					</span>
@@ -337,7 +337,7 @@ function template_results()
 				if ($options['display_quick_mod'] == 1)
 				{
 					echo '
-							<input type="checkbox" name="topics[]" value="', $topic['id'], '" class="input_check" />';
+							<input type="checkbox" name="topics[]" value="', $topic['id'], '" />';
 				}
 				else
 				{

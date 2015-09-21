@@ -343,7 +343,7 @@ function template_edit_options()
 			// You "checking" me out? ;)
 			elseif ($field['type'] == 'check')
 				echo '
-						<input type="hidden" name="', $key, '" value="0" /><input type="checkbox" name="', $key, '" id="', $key, '" ', !empty($field['value']) ? ' checked="checked"' : '', ' value="1" class="input_check" ', $field['input_attr'], ' />';
+						<input type="hidden" name="', $key, '" value="0" /><input type="checkbox" name="', $key, '" id="', $key, '" ', !empty($field['value']) ? ' checked="checked"' : '', ' value="1" ', $field['input_attr'], ' />';
 
 			// Always fun - select boxes!
 			elseif ($field['type'] == 'select')
@@ -477,7 +477,7 @@ function template_profile_pm_settings()
 							</dt>
 							<dd>
 								<input type="hidden" name="default_options[view_newest_pm_first]" value="0" />
-								<input type="checkbox" name="default_options[view_newest_pm_first]" id="view_newest_pm_first" value="1"', !empty($context['member']['options']['view_newest_pm_first']) ? ' checked="checked"' : '', ' class="input_check" />
+								<input type="checkbox" name="default_options[view_newest_pm_first]" id="view_newest_pm_first" value="1"', !empty($context['member']['options']['view_newest_pm_first']) ? ' checked="checked"' : '', ' />
 							</dd>
 						</dl>
 						<dl>
@@ -501,7 +501,7 @@ function template_profile_pm_settings()
 								</dt>
 								<dd>
 										<input type="hidden" name="default_options[popup_messages]" value="0" />
-										<input type="checkbox" name="default_options[popup_messages]" id="popup_messages" value="1"', !empty($context['member']['options']['popup_messages']) ? ' checked="checked"' : '', ' class="input_check" />
+										<input type="checkbox" name="default_options[popup_messages]" id="popup_messages" value="1"', !empty($context['member']['options']['popup_messages']) ? ' checked="checked"' : '', ' />
 								</dd>
 						</dl>
 						<dl>
@@ -510,7 +510,7 @@ function template_profile_pm_settings()
 								</dt>
 								<dd>
 										<input type="hidden" name="default_options[pm_remove_inbox_label]" value="0" />
-										<input type="checkbox" name="default_options[pm_remove_inbox_label]" id="pm_remove_inbox_label" value="1"', !empty($context['member']['options']['pm_remove_inbox_label']) ? ' checked="checked"' : '', ' class="input_check" />
+										<input type="checkbox" name="default_options[pm_remove_inbox_label]" id="pm_remove_inbox_label" value="1"', !empty($context['member']['options']['pm_remove_inbox_label']) ? ' checked="checked"' : '', ' />
 								</dd>';
 }
 
@@ -527,35 +527,35 @@ function template_profile_theme_settings()
 							</dt>
 							<dd>
 								<input type="hidden" name="default_options[use_sidebar_menu]" value="0" />
-								<input type="checkbox" name="default_options[use_sidebar_menu]" id="use_sidebar_menu" value="1"', !empty($context['member']['options']['use_sidebar_menu']) ? ' checked="checked"' : '', ' class="input_check" />
+								<input type="checkbox" name="default_options[use_sidebar_menu]" id="use_sidebar_menu" value="1"', !empty($context['member']['options']['use_sidebar_menu']) ? ' checked="checked"' : '', ' />
 							</dd>
 							<dt>
 								<label for="use_click_menu">', $txt['use_click_menu'], '</label>
 							</dt>
 							<dd>
 								<input type="hidden" name="default_options[use_click_menu]" value="0" />
-								<input type="checkbox" name="default_options[use_click_menu]" id="use_click_menu" value="1"', !empty($context['member']['options']['use_click_menu']) ? ' checked="checked"' : '', ' class="input_check" />
+								<input type="checkbox" name="default_options[use_click_menu]" id="use_click_menu" value="1"', !empty($context['member']['options']['use_click_menu']) ? ' checked="checked"' : '', ' />
 							</dd>
 							<dt>
 								<label for="show_no_avatars">', $txt['show_no_avatars'], '</label>
 							</dt>
 							<dd>
 								<input type="hidden" name="default_options[show_no_avatars]" value="0" />
-								<input type="checkbox" name="default_options[show_no_avatars]" id="show_no_avatars" value="1"', !empty($context['member']['options']['show_no_avatars']) ? ' checked="checked"' : '', ' class="input_check" />
+								<input type="checkbox" name="default_options[show_no_avatars]" id="show_no_avatars" value="1"', !empty($context['member']['options']['show_no_avatars']) ? ' checked="checked"' : '', ' />
 							</dd>
 							<dt>
 								<label for="hide_poster_area">', $txt['hide_poster_area'], '</label>
 							</dt>
 							<dd>
 								<input type="hidden" name="default_options[hide_poster_area]" value="0" />
-								<input type="checkbox" name="default_options[hide_poster_area]" id="hide_poster_area" value="1"', !empty($context['member']['options']['hide_poster_area']) ? ' checked="checked"' : '', ' class="input_check" />
+								<input type="checkbox" name="default_options[hide_poster_area]" id="hide_poster_area" value="1"', !empty($context['member']['options']['hide_poster_area']) ? ' checked="checked"' : '', ' />
 							</dd>
 							<dt>
 								<label for="show_no_signatures">', $txt['show_no_signatures'], '</label>
 							</dt>
 							<dd>
 								<input type="hidden" name="default_options[show_no_signatures]" value="0" />
-								<input type="checkbox" name="default_options[show_no_signatures]" id="show_no_signatures" value="1"', !empty($context['member']['options']['show_no_signatures']) ? ' checked="checked"' : '', ' class="input_check" />
+								<input type="checkbox" name="default_options[show_no_signatures]" id="show_no_signatures" value="1"', !empty($context['member']['options']['show_no_signatures']) ? ' checked="checked"' : '', ' />
 							</dd>';
 
 	if ($context['allow_no_censored'])
@@ -565,7 +565,7 @@ function template_profile_theme_settings()
 							</dt>
 							<dd>
 								<input type="hidden" name="default_options[show_no_censored]" value="0" />
-								<input type="checkbox" name="default_options[show_no_censored]" id="show_no_censored" value="1"' . (!empty($context['member']['options']['show_no_censored']) ? ' checked="checked"' : '') . ' class="input_check" />
+								<input type="checkbox" name="default_options[show_no_censored]" id="show_no_censored" value="1"' . (!empty($context['member']['options']['show_no_censored']) ? ' checked="checked"' : '') . ' />
 							</dd>';
 
 	echo '
@@ -574,21 +574,21 @@ function template_profile_theme_settings()
 							</dt>
 							<dd>
 								<input type="hidden" name="default_options[return_to_post]" value="0" />
-								<input type="checkbox" name="default_options[return_to_post]" id="return_to_post" value="1"', !empty($context['member']['options']['return_to_post']) ? ' checked="checked"' : '', ' class="input_check" />
+								<input type="checkbox" name="default_options[return_to_post]" id="return_to_post" value="1"', !empty($context['member']['options']['return_to_post']) ? ' checked="checked"' : '', ' />
 							</dd>
 							<dt>
 								<label for="no_new_reply_warning">', $txt['no_new_reply_warning'], '</label>
 							</dt>
 							<dd>
 								<input type="hidden" name="default_options[no_new_reply_warning]" value="0" />
-								<input type="checkbox" name="default_options[no_new_reply_warning]" id="no_new_reply_warning" value="1"', !empty($context['member']['options']['no_new_reply_warning']) ? ' checked="checked"' : '', ' class="input_check" />
+								<input type="checkbox" name="default_options[no_new_reply_warning]" id="no_new_reply_warning" value="1"', !empty($context['member']['options']['no_new_reply_warning']) ? ' checked="checked"' : '', ' />
 							</dd>
 							<dt>
 								<label for="wysiwyg_default">', $txt['wysiwyg_default'], '</label>
 							</dt>
 							<dd>
 								<input type="hidden" name="default_options[wysiwyg_default]" value="0" />
-								<input type="checkbox" name="default_options[wysiwyg_default]" id="wysiwyg_default" value="1"', !empty($context['member']['options']['wysiwyg_default']) ? ' checked="checked"' : '', ' class="input_check" />
+								<input type="checkbox" name="default_options[wysiwyg_default]" id="wysiwyg_default" value="1"', !empty($context['member']['options']['wysiwyg_default']) ? ' checked="checked"' : '', ' />
 							</dd>';
 
 	if (empty($modSettings['disableCustomPerPage']))
@@ -640,7 +640,7 @@ function template_profile_theme_settings()
 							</dt>
 							<dd>
 								<input type="hidden" name="default_options[drafts_autosave_enabled]" value="0" />
-								<label for="drafts_autosave_enabled"><input type="checkbox" name="default_options[drafts_autosave_enabled]" id="drafts_autosave_enabled" value="1"', !empty($context['member']['options']['drafts_autosave_enabled']) ? ' checked="checked"' : '', ' class="input_check" /></label>
+								<label for="drafts_autosave_enabled"><input type="checkbox" name="default_options[drafts_autosave_enabled]" id="drafts_autosave_enabled" value="1"', !empty($context['member']['options']['drafts_autosave_enabled']) ? ' checked="checked"' : '', ' /></label>
 							</dd>';
 
 	echo '
@@ -649,14 +649,14 @@ function template_profile_theme_settings()
 							</dt>
 							<dd>
 								<input type="hidden" name="default_options[display_quick_reply]" value="0" />
-								<input type="checkbox" name="default_options[display_quick_reply]" id="display_quick_reply" value="1"', !empty($context['member']['options']['display_quick_reply']) ? ' checked="checked"' : '', ' class="input_check" />
+								<input type="checkbox" name="default_options[display_quick_reply]" id="display_quick_reply" value="1"', !empty($context['member']['options']['display_quick_reply']) ? ' checked="checked"' : '', ' />
 							</dd>
 							<dt>
 								<label for="use_editor_quick_reply">', $txt['use_editor_quick_reply'], '</label>
 							</dt>
 							<dd>
 								<input type="hidden" name="default_options[use_editor_quick_reply]" value="0" />
-								<input type="checkbox" name="default_options[use_editor_quick_reply]" id="use_editor_quick_reply" value="1"', !empty($context['member']['options']['use_editor_quick_reply']) ? ' checked="checked"' : '', ' class="input_check" />
+								<input type="checkbox" name="default_options[use_editor_quick_reply]" id="use_editor_quick_reply" value="1"', !empty($context['member']['options']['use_editor_quick_reply']) ? ' checked="checked"' : '', ' />
 							</dd>
 							<dt>
 								<label for="display_quick_mod">', $txt['display_quick_mod'], '</label>
@@ -722,7 +722,7 @@ function template_action_notification()
 					</dt>
 					<dd>
 						<input type="hidden" name="notify_announcements" value="0" />
-						<input type="checkbox" id="notify_announcements" name="notify_announcements"', !empty($context['member']['notify_announcements']) ? ' checked="checked"' : '', ' class="input_check" />
+						<input type="checkbox" id="notify_announcements" name="notify_announcements"', !empty($context['member']['notify_announcements']) ? ' checked="checked"' : '', ' />
 					</dd>';
 
 	// Auto notification when you reply / start a topic?
@@ -732,7 +732,7 @@ function template_action_notification()
 					</dt>
 					<dd>
 						<input type="hidden" name="default_options[auto_notify]" value="0" />
-						<input type="checkbox" id="auto_notify" name="default_options[auto_notify]" value="1"', !empty($context['member']['options']['auto_notify']) ? ' checked="checked"' : '', ' class="input_check" />
+						<input type="checkbox" id="auto_notify" name="default_options[auto_notify]" value="1"', !empty($context['member']['options']['auto_notify']) ? ' checked="checked"' : '', ' />
 						', (!empty($modSettings['maillist_enabled']) ? $txt['auto_notify_pbe_post'] : ''), '
 					</dd>';
 
@@ -744,7 +744,7 @@ function template_action_notification()
 					</dt>
 					<dd>
 						<input type="hidden" name="notify_send_body" value="0" />
-						<input type="checkbox" id="notify_send_body" name="notify_send_body"', !empty($context['member']['notify_send_body']) ? ' checked="checked"' : '', ' class="input_check" />
+						<input type="checkbox" id="notify_send_body" name="notify_send_body"', !empty($context['member']['notify_send_body']) ? ' checked="checked"' : '', ' />
 						', (!empty($modSettings['maillist_enabled']) ? $txt['notify_send_body_pbe_post'] : ''), '
 					</dd>';
 
@@ -1027,7 +1027,7 @@ function template_profile_group_manage()
 		if ($member_group['can_be_additional'])
 			echo '
 										<li>
-											<label for="additional_groups-', $member_group['id'], '"><input type="checkbox" name="additional_groups[]" value="', $member_group['id'], '" id="additional_groups-', $member_group['id'], '"', $member_group['is_additional'] ? ' checked="checked"' : '', ' class="input_check" /> ', $member_group['name'], '</label>
+											<label for="additional_groups-', $member_group['id'], '"><input type="checkbox" name="additional_groups[]" value="', $member_group['id'], '" id="additional_groups-', $member_group['id'], '"', $member_group['is_additional'] ? ' checked="checked"' : '', ' /> ', $member_group['name'], '</label>
 										</li>';
 
 	echo '

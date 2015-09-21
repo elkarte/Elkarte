@@ -69,9 +69,9 @@ function template_maintain_database()
 					' . $txt['enable_maintenance' . $context['use_maintenance']] : '', '
 				</div>
 				<p>
-					<label for="struct"><input type="checkbox" name="struct" id="struct" onclick="document.getElementById(\'submitDump\').disabled = !document.getElementById(\'struct\').checked &amp;&amp; !document.getElementById(\'data\').checked;" class="input_check" checked="checked" /> ', $txt['maintain_backup_struct'], '</label><br />
-					<label for="data"><input type="checkbox" name="data" id="data" onclick="document.getElementById(\'submitDump\').disabled = !document.getElementById(\'struct\').checked &amp;&amp; !document.getElementById(\'data\').checked;" checked="checked" class="input_check" /> ', $txt['maintain_backup_data'], '</label><br />
-					<label for="compress"><input type="checkbox" name="compress" id="compress" value="gzip"', $context['suggested_method'] == 'zipped_file' ? ' checked="checked"' : '', ' class="input_check" /> ', $txt['maintain_backup_gz'], '</label>
+					<label for="struct"><input type="checkbox" name="struct" id="struct" onclick="document.getElementById(\'submitDump\').disabled = !document.getElementById(\'struct\').checked &amp;&amp; !document.getElementById(\'data\').checked;" checked="checked" /> ', $txt['maintain_backup_struct'], '</label><br />
+					<label for="data"><input type="checkbox" name="data" id="data" onclick="document.getElementById(\'submitDump\').disabled = !document.getElementById(\'struct\').checked &amp;&amp; !document.getElementById(\'data\').checked;" checked="checked" /> ', $txt['maintain_backup_data'], '</label><br />
+					<label for="compress"><input type="checkbox" name="compress" id="compress" value="gzip"', $context['suggested_method'] == 'zipped_file' ? ' checked="checked"' : '', ' /> ', $txt['maintain_backup_gz'], '</label>
 					</p>';
 
 	if (empty($context['skip_security']))
@@ -207,7 +207,7 @@ function template_maintain_members()
 					</dd>
 				</dl>
 				<p class="maintain_members">
-					<input type="checkbox" name="posts" id="posts" checked="checked" class="input_check" />
+					<input type="checkbox" name="posts" id="posts" checked="checked" />
 					<label for="posts">', $txt['reattribute_increase_posts'], '</label>
 				</p>
 				<div class="submitbutton">
@@ -238,7 +238,7 @@ function template_maintain_members()
 
 	foreach ($context['membergroups'] as $group)
 		echo '
-				<label for="groups', $group['id'], '"><input type="checkbox" name="groups[', $group['id'], ']" id="groups', $group['id'], '" checked="checked" class="input_check" /> ', $group['name'], '</label><br />';
+				<label for="groups', $group['id'], '"><input type="checkbox" name="groups[', $group['id'], ']" id="groups', $group['id'], '" checked="checked" /> ', $group['name'], '</label><br />';
 
 	echo '
 			</fieldset>
@@ -331,7 +331,7 @@ function template_maintain_topics_pruneold()
 						<label for="delete_type_locked"><input type="radio" name="delete_type" id="delete_type_locked" value="locked" /> ', $txt['maintain_old_are_locked'], '</label><br />
 					</p>
 					<p>
-						<label for="delete_old_not_sticky"><input type="checkbox" name="delete_old_not_sticky" id="delete_old_not_sticky" class="input_check" checked="checked" /> ', $txt['maintain_old_are_not_stickied'], '</label><br />
+						<label for="delete_old_not_sticky"><input type="checkbox" name="delete_old_not_sticky" id="delete_old_not_sticky" checked="checked" /> ', $txt['maintain_old_are_not_stickied'], '</label><br />
 					</p>
 					<fieldset id="pick_boards" class="content">';
 

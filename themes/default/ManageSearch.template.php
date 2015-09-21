@@ -226,8 +226,8 @@ function template_select_search_method()
 				</fieldset>
 				<fieldset id="search_method" class="search_settings">
 				<legend>', $txt['search_method'], '</legend>
-					<input type="checkbox" name="search_force_index" id="search_force_index_check" value="1"', empty($modSettings['search_force_index']) ? '' : ' checked="checked"', ' class="input_check" /><label for="search_force_index_check">', $txt['search_force_index'], '</label><br />
-					<input type="checkbox" name="search_match_words" id="search_match_words_check" value="1"', empty($modSettings['search_match_words']) ? '' : ' checked="checked"', ' class="input_check" /><label for="search_match_words_check">', $txt['search_match_words'], '</label>
+					<input type="checkbox" name="search_force_index" id="search_force_index_check" value="1"', empty($modSettings['search_force_index']) ? '' : ' checked="checked"', ' /><label for="search_force_index_check">', $txt['search_force_index'], '</label><br />
+					<input type="checkbox" name="search_match_words" id="search_match_words_check" value="1"', empty($modSettings['search_match_words']) ? '' : ' checked="checked"', ' /><label for="search_match_words_check">', $txt['search_match_words'], '</label>
 				</fieldset>
 			</div>
 			<div class="submitbutton">

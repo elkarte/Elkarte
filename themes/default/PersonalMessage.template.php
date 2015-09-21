@@ -162,7 +162,7 @@ function template_folder()
 			if (empty($context['display_mode']))
 				echo '
 									<li class="listlevel1 quickmod_check">
-										<input type="checkbox" name="pms[]" id="deletedisplay', $message['id'], '" value="', $message['id'], '" onclick="document.getElementById(\'deletelisting', $message['id'], '\').checked = this.checked;" class="input_check" />
+										<input type="checkbox" name="pms[]" id="deletedisplay', $message['id'], '" value="', $message['id'], '" onclick="document.getElementById(\'deletelisting', $message['id'], '\').checked = this.checked;" />
 									</li>';
 
 			// Maybe there is something...more :P (this is the more button)
@@ -406,7 +406,7 @@ function template_subject_list()
 									<a href="', $scripturl, '?action=pm;f=', $context['folder'], ';start=', $context['start'], ';sort=name', $context['sort_by'] == 'name' && $context['sort_direction'] == 'up' ? ';desc' : '', $context['current_label_id'] != -1 ? ';l=' . $context['current_label_id'] : '', '">', ($context['from_or_to'] == 'from' ? $txt['from'] : $txt['to']), $context['sort_by'] == 'name' ? ' <img class="sort" src="' . $settings['images_url'] . '/sort_' . $context['sort_direction'] . '.png" alt="" />' : '', '</a>
 								</th>
 								<th class="pm_quickmod">
-									<input type="checkbox" onclick="invertAll(this, this.form);" class="input_check" />
+									<input type="checkbox" onclick="invertAll(this, this.form);" />
 								</th>
 							</tr>
 						</thead>
@@ -456,7 +456,7 @@ function template_subject_list()
 									', ($context['from_or_to'] == 'from' ? $message['member']['link'] : (empty($message['recipients']['to']) ? '' : implode(', ', $message['recipients']['to']))), '
 								</td>
 								<td class="pm_quickmod">
-									<input type="checkbox" name="pms[]" id="deletelisting', $message['id'], '" value="', $message['id'], '"', $message['is_selected'] ? ' checked="checked"' : '', ' onclick="if (document.getElementById(\'deletedisplay', $message['id'], '\')) document.getElementById(\'deletedisplay', $message['id'], '\').checked = this.checked;" class="input_check" />
+									<input type="checkbox" name="pms[]" id="deletelisting', $message['id'], '" value="', $message['id'], '"', $message['is_selected'] ? ' checked="checked"' : '', ' onclick="if (document.getElementById(\'deletedisplay', $message['id'], '\')) document.getElementById(\'deletedisplay', $message['id'], '\').checked = this.checked;" />
 								</td>
 							</tr>';
 	}
@@ -617,7 +617,7 @@ function template_search()
 		foreach ($context['search_labels'] as $label)
 			echo '
 					<li>
-						<label for="searchlabel_', $label['id'], '"><input type="checkbox" id="searchlabel_', $label['id'], '" name="searchlabel[', $label['id'], ']" value="', $label['id'], '" ', $label['checked'] ? 'checked="checked"' : '', ' class="input_check" />
+						<label for="searchlabel_', $label['id'], '"><input type="checkbox" id="searchlabel_', $label['id'], '" name="searchlabel[', $label['id'], ']" value="', $label['id'], '" ', $label['checked'] ? 'checked="checked"' : '', ' />
 						', $label['name'], '</label>
 					</li>';
 
@@ -625,7 +625,7 @@ function template_search()
 				</ul>
 			</div>
 			<div class="submitbuttons">
-				<input type="checkbox" name="all" id="check_all" value="" ', $context['check_all'] ? 'checked="checked"' : '', ' onclick="invertAll(this, this.form, \'searchlabel\');" class="input_check" /><em> <label for="check_all">', $txt['check_all'], '</label></em>
+				<input type="checkbox" name="all" id="check_all" value="" ', $context['check_all'] ? 'checked="checked"' : '', ' onclick="invertAll(this, this.form, \'searchlabel\');" /><em> <label for="check_all">', $txt['check_all'], '</label></em>
 			</div>
 		</fieldset>';
 
@@ -1140,7 +1140,7 @@ function template_labels()
 
 	if (count($context['labels']) > 2)
 		echo '
-					<input type="checkbox" class="input_check" onclick="invertAll(this, this.form);" />';
+					<input type="checkbox" onclick="invertAll(this, this.form);" />';
 
 	echo '
 				</th>
@@ -1166,7 +1166,7 @@ function template_labels()
 					<input type="text" name="label_name[', $label['id'], ']" value="', $label['name'], '" size="30" maxlength="30" class="input_text" />
 				</td>
 				<td style="width: 4%;">
-					<input type="checkbox" class="input_check" name="delete_label[', $label['id'], ']" />
+					<input type="checkbox" name="delete_label[', $label['id'], ']" />
 				</td>
 			</tr>';
 		}
@@ -1277,7 +1277,7 @@ function template_rules()
 
 	if (!empty($context['rules']))
 		echo '
-					<input type="checkbox" onclick="invertAll(this, this.form);" class="input_check" />';
+					<input type="checkbox" onclick="invertAll(this, this.form);" />';
 
 	echo '
 				</th>
@@ -1301,7 +1301,7 @@ function template_rules()
 					<a href="', $scripturl, '?action=pm;sa=manrules;add;rid=', $rule['id'], '">', $rule['name'], '</a>
 				</td>
 				<td style="width: 4%;">
-					<input type="checkbox" name="delrule[', $rule['id'], ']" class="input_check" />
+					<input type="checkbox" name="delrule[', $rule['id'], ']" />
 				</td>
 			</tr>';
 	}

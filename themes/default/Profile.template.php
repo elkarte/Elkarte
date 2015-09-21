@@ -61,7 +61,7 @@ function template_showDrafts()
 			<form action="', $scripturl, '?action=profile;u=' . $context['member']['id'] . ';area=showdrafts;delete" method="post" accept-charset="UTF-8" name="draftForm" id="draftForm" >
 				<h2 class="category_header">
 					<span class="floatright">
-						<input type="checkbox" onclick="invertAll(this, this.form, \'delete[]\');" class="input_check" />
+						<input type="checkbox" onclick="invertAll(this, this.form, \'delete[]\');" />
 					</span>
 					', $txt['drafts'], '
 				</h2>';

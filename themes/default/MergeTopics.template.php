@@ -156,7 +156,7 @@ function template_merge_extra_options()
 		echo '
 					<tr>
 						<td class="centertext">
-							<input type="checkbox" class="input_check" name="topics[]" value="', $topic['id'], '" checked="checked" />
+							<input type="checkbox" name="topics[]" value="', $topic['id'], '" checked="checked" />
 						</td>
 						<td>
 							<a href="', $scripturl, '?topic=', $topic['id'], '.0" target="_blank" class="new_win">', $topic['subject'] . '</a>
@@ -170,7 +170,7 @@ function template_merge_extra_options()
 							<span class="smalltext">', $topic['updated']['time'], '</span>
 						</td>
 						<td class="centertext">
-							<input type="checkbox" class="input_check" name="notifications[]" value="' . $topic['id'] . '" checked="checked" />
+							<input type="checkbox" name="notifications[]" value="' . $topic['id'] . '" checked="checked" />
 						</td>
 					</tr>';
 
@@ -194,7 +194,7 @@ function template_merge_extra_options()
 					<br />
 					<input type="text" name="custom_subject" size="60" id="custom_subject" class="input_text custom_subject" style="display: none;" />
 					<br />
-					<label for="enforce_subject"><input type="checkbox" class="input_check" name="enforce_subject" id="enforce_subject" value="1" /> ', $txt['merge_enforce_subject'], '</label>
+					<label for="enforce_subject"><input type="checkbox" name="enforce_subject" id="enforce_subject" value="1" /> ', $txt['merge_enforce_subject'], '</label>
 				</fieldset>';
 
 	if (!empty($context['boards']) && count($context['boards']) > 1)

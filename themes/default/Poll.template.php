@@ -97,7 +97,7 @@ function template_poll_edit()
 									<label for="poll_change_vote">', $txt['poll_do_change_vote'], ':</label>
 								</dt>
 								<dd>
-									<input type="checkbox" id="poll_change_vote" name="poll_change_vote"', !empty($context['poll']['change_vote']) ? ' checked="checked"' : '', ' class="input_check" />
+									<input type="checkbox" id="poll_change_vote" name="poll_change_vote"', !empty($context['poll']['change_vote']) ? ' checked="checked"' : '', ' />
 								</dd>';
 
 		if ($context['poll']['guest_vote_allowed'])
@@ -106,7 +106,7 @@ function template_poll_edit()
 									<label for="poll_guest_vote">', $txt['poll_guest_vote'], ':</label>
 								</dt>
 								<dd>
-									<input type="checkbox" id="poll_guest_vote" name="poll_guest_vote"', !empty($context['poll']['guest_vote']) ? ' checked="checked"' : '', ' class="input_check" />
+									<input type="checkbox" id="poll_guest_vote" name="poll_guest_vote"', !empty($context['poll']['guest_vote']) ? ' checked="checked"' : '', ' />
 								</dd>';
 	}
 
@@ -134,7 +134,7 @@ function template_poll_edit()
 		echo '
 					<fieldset id="poll_reset">
 						<legend>', $txt['reset_votes'], '</legend>
-						<input type="checkbox" id="resetVoteCount" name="resetVoteCount" value="on" class="input_check" /> <label for="resetVoteCount">' . $txt['reset_votes_check'] . '</label>
+						<input type="checkbox" id="resetVoteCount" name="resetVoteCount" value="on" /> <label for="resetVoteCount">' . $txt['reset_votes_check'] . '</label>
 					</fieldset>';
 
 	if (!empty($context['form_url']))

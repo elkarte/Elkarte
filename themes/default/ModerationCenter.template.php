@@ -448,7 +448,7 @@ function template_user_watch_post_callback($post)
 		$output_html .= '
 						<ul class="quickbuttons">
 							<li class="listlevel1">
-								<input type="checkbox" name="delete[]" value="' . $post['id'] . '" class="input_check" />
+								<input type="checkbox" name="delete[]" value="' . $post['id'] . '" />
 							</li>
 							<li class="listlevel1">
 								<a class="linklevel1 remove_button" href="' . $scripturl . '?action=moderate;area=userwatch;sa=post;delete=' . $post['id'] . ';start=' . $context['start'] . ';' . $context['session_var'] . '=' . $context['session_id'] . '" onclick="return confirm(\'' . $txt['mc_watched_users_delete_post'] . '\');">' . $txt['remove'] . '</a>
@@ -480,7 +480,7 @@ function template_moderation_settings()
 
 	foreach ($context['homepage_blocks'] as $k => $v)
 		echo '
-						<label for="mod_homepage_', $k, '"><input type="checkbox" id="mod_homepage_', $k, '" name="mod_homepage[', $k, ']"', in_array($k, $context['mod_settings']['user_blocks']) ? ' checked="checked"' : '', ' class="input_check" /> ', $v, '</label><br />';
+						<label for="mod_homepage_', $k, '"><input type="checkbox" id="mod_homepage_', $k, '" name="mod_homepage[', $k, ']"', in_array($k, $context['mod_settings']['user_blocks']) ? ' checked="checked"' : '', ' /> ', $v, '</label><br />';
 
 	echo '
 					</dd>';
@@ -493,7 +493,7 @@ function template_moderation_settings()
 						<label for="mod_show_reports">', $txt['mc_prefs_show_reports'], ':</label>
 					</dt>
 					<dd>
-						<input type="checkbox" id="mod_show_reports" name="mod_show_reports" ', $context['mod_settings']['show_reports'] ? 'checked="checked"' : '', ' class="input_check" />
+						<input type="checkbox" id="mod_show_reports" name="mod_show_reports" ', $context['mod_settings']['show_reports'] ? 'checked="checked"' : '', ' />
 					</dd>
 					<dt>
 						<label for="mod_notify_report">', $txt['mc_prefs_notify_report'], ':</label>
@@ -514,7 +514,7 @@ function template_moderation_settings()
 						<label for="mod_notify_approval">', $txt['mc_prefs_notify_approval'], ':</label>
 					</dt>
 					<dd>
-						<input type="checkbox" id="mod_notify_approval" name="mod_notify_approval" ', $context['mod_settings']['notify_approval'] ? 'checked="checked"' : '', ' class="input_check" />
+						<input type="checkbox" id="mod_notify_approval" name="mod_notify_approval" ', $context['mod_settings']['notify_approval'] ? 'checked="checked"' : '', ' />
 					</dd>';
 	}
 
@@ -618,7 +618,7 @@ function template_warn_template()
 
 	if ($context['template_data']['can_edit_personal'])
 		echo '
-				<input type="checkbox" name="make_personal" id="make_personal" ', $context['template_data']['personal'] ? 'checked="checked"' : '', ' class="input_check" />
+				<input type="checkbox" name="make_personal" id="make_personal" ', $context['template_data']['personal'] ? 'checked="checked"' : '', ' />
 				<label for="make_personal">
 					<strong>', $txt['mc_warning_template_personal'], '</strong>
 				</label>

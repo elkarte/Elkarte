@@ -217,7 +217,7 @@ function template_modify_category()
 						<span class="smalltext">' . $txt['collapse_desc'] . '</span>
 					</dt>
 					<dd>
-						<input type="checkbox" name="collapse"', $context['category']['can_collapse'] ? ' checked="checked"' : '', ' tabindex="', $context['tabindex']++, '" class="input_check" />
+						<input type="checkbox" name="collapse"', $context['category']['can_collapse'] ? ' checked="checked"' : '', ' tabindex="', $context['tabindex']++, '" />
 					</dd>';
 
 	// Table footer.
@@ -433,7 +433,7 @@ function template_modify_board()
 		if (empty($modSettings['deny_boards_access']))
 			echo '
 						<label for="groups_', $group['id'], '">
-							<input type="checkbox" name="groups[', $group['id'], ']" value="allow" id="groups_', $group['id'], '"', $group['allow'] ? ' checked="checked"' : '', ' class="input_check" />
+							<input type="checkbox" name="groups[', $group['id'], ']" value="allow" id="groups_', $group['id'], '"', $group['allow'] ? ' checked="checked"' : '', ' />
 							<span', $group['is_post_group'] ? ' class="post_group" title="' . $txt['mboards_groups_post_group'] . '"' : '', $group['id'] == 0 ? ' class="regular_members" title="' . $txt['mboards_groups_regular_members'] . '"' : '', '>
 								', $group['name'], '
 							</span>
@@ -462,7 +462,7 @@ function template_modify_board()
 	if (empty($modSettings['deny_boards_access']))
 		echo '
 						<span class="select_all_box">
-							<em><label for="check_all">', $txt['check_all'], '</label></em> <input type="checkbox" id="check_all" class="input_check" onclick="invertAll(this, this.form, \'groups[\');" />
+							<em><label for="check_all">', $txt['check_all'], '</label></em> <input type="checkbox" id="check_all" onclick="invertAll(this, this.form, \'groups[\');" />
 						</span>
 						<br />
 						<br />
@@ -519,7 +519,7 @@ function template_modify_board()
 						<span class="smalltext">', $txt['mboards_redirect_desc'], '</span><br />
 					</dt>
 					<dd>
-						<input type="checkbox" id="redirect_enable" name="redirect_enable"', $context['board']['redirect'] != '' ? ' checked="checked"' : '', ' onclick="refreshOptions();" class="input_check" />
+						<input type="checkbox" id="redirect_enable" name="redirect_enable"', $context['board']['redirect'] != '' ? ' checked="checked"' : '', ' onclick="refreshOptions();" />
 					</dd>
 				</dl>';
 
@@ -558,7 +558,7 @@ function template_modify_board()
 							<span class="smalltext">', $txt['mboards_redirect_reset_desc'], '</span><br />
 						</dt>
 						<dd>
-							<input type="checkbox" id="reset_redirect" name="reset_redirect" class="input_check" />
+							<input type="checkbox" id="reset_redirect" name="reset_redirect" />
 							<em>(', sprintf($txt['mboards_current_redirects'], $context['board']['posts']), ')</em>
 						</dd>
 					</dl>
@@ -573,7 +573,7 @@ function template_modify_board()
 							<span class="smalltext">', $txt['mboards_count_posts_desc'], '</span><br />
 						</dt>
 						<dd>
-							<input type="checkbox" id="count" name="count" ', $context['board']['count_posts'] ? ' checked="checked"' : '', ' class="input_check" />
+							<input type="checkbox" id="count" name="count" ', $context['board']['count_posts'] ? ' checked="checked"' : '', ' />
 						</dd>
 					</dl>
 				</div>';
@@ -606,7 +606,7 @@ function template_modify_board()
 							<span class="smalltext">', $txt['mboards_override_theme_desc'], '</span><br />
 						</dt>
 						<dd>
-							<input type="checkbox" id="override_theme" name="override_theme"', $context['board']['override_theme'] ? ' checked="checked"' : '', ' class="input_check" />
+							<input type="checkbox" id="override_theme" name="override_theme"', $context['board']['override_theme'] ? ' checked="checked"' : '', ' />
 						</dd>
 					</dl>
 				</div>';

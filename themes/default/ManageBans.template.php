@@ -96,7 +96,7 @@ function template_ban_edit()
 					</legend>
 					<dl class="settings">
 						<dt>
-							<input type="checkbox" name="ban_suggestions[]" id="main_ip_check" value="main_ip" class="input_check" ', !empty($context['ban_suggestions']['main_ip']) ? 'checked="checked" ' : '', '/>
+							<input type="checkbox" name="ban_suggestions[]" id="main_ip_check" value="main_ip" ', !empty($context['ban_suggestions']['main_ip']) ? 'checked="checked" ' : '', '/>
 							<label for="main_ip_check">', $txt['ban_on_ip'], '</label>
 						</dt>
 						<dd>
@@ -106,7 +106,7 @@ function template_ban_edit()
 		if (empty($modSettings['disableHostnameLookup']))
 			echo '
 						<dt>
-							<input type="checkbox" name="ban_suggestions[]" id="hostname_check" value="hostname" class="input_check" ', !empty($context['ban_suggestions']['hostname']) ? 'checked="checked" ' : '', '/>
+							<input type="checkbox" name="ban_suggestions[]" id="hostname_check" value="hostname" ', !empty($context['ban_suggestions']['hostname']) ? 'checked="checked" ' : '', '/>
 							<label for="hostname_check">', $txt['ban_on_hostname'], '</label>
 						</dt>
 						<dd>
@@ -115,14 +115,14 @@ function template_ban_edit()
 
 		echo '
 						<dt>
-							<input type="checkbox" name="ban_suggestions[]" id="email_check" value="email" class="input_check" ', !empty($context['ban_suggestions']['email']) ? 'checked="checked" ' : '', '/>
+							<input type="checkbox" name="ban_suggestions[]" id="email_check" value="email" ', !empty($context['ban_suggestions']['email']) ? 'checked="checked" ' : '', '/>
 							<label for="email_check">', $txt['ban_on_email'], '</label>
 						</dt>
 						<dd>
 							<input type="text" name="email" value="', $context['ban_suggestions']['email'], '" size="44" onfocus="document.getElementById(\'email_check\').checked = true;" class="input_text" />
 						</dd>
 						<dt>
-							<input type="checkbox" name="ban_suggestions[]" id="user_check" value="user" class="input_check" ', !empty($context['ban_suggestions']['user']) || isset($context['ban']['from_user']) ? 'checked="checked" ' : '', '/>
+							<input type="checkbox" name="ban_suggestions[]" id="user_check" value="user" ', !empty($context['ban_suggestions']['user']) || isset($context['ban']['from_user']) ? 'checked="checked" ' : '', '/>
 							<label for="user_check">', $txt['ban_on_username'], '</label>:
 						</dt>
 						<dd>
@@ -144,7 +144,7 @@ function template_ban_edit()
 					foreach ($ban_ips as $ip)
 						echo '
 						<dt>
-							<input type="checkbox" id="suggestions_', $key, '_', $count, '" name="ban_suggestions[', $key, '][]" ', !empty($context['ban_suggestions']['saved_triggers'][$key]) && in_array($ip, $context['ban_suggestions']['saved_triggers'][$key]) ? 'checked="checked" ' : '', 'value="', $ip, '" class="input_check" />
+							<input type="checkbox" id="suggestions_', $key, '_', $count, '" name="ban_suggestions[', $key, '][]" ', !empty($context['ban_suggestions']['saved_triggers'][$key]) && in_array($ip, $context['ban_suggestions']['saved_triggers'][$key]) ? 'checked="checked" ' : '', 'value="', $ip, '" />
 						</dt>
 						<dd>
 							<label for="suggestions_', $key, '_', $count++, '">', $ip, '</label>
@@ -222,7 +222,7 @@ function template_ban_edit_trigger()
 					</legend>
 					<dl class="settings">
 						<dt>
-							<input type="checkbox" name="ban_suggestions[]" id="main_ip_check" value="main_ip" class="input_check" ', $context['ban_trigger']['ip']['selected'] ? 'checked="checked" ' : '', '/>
+							<input type="checkbox" name="ban_suggestions[]" id="main_ip_check" value="main_ip" ', $context['ban_trigger']['ip']['selected'] ? 'checked="checked" ' : '', '/>
 							<label for="main_ip_check">', $txt['ban_on_ip'], '</label>
 						</dt>
 						<dd>
@@ -232,7 +232,7 @@ function template_ban_edit_trigger()
 	if (empty($modSettings['disableHostnameLookup']))
 		echo '
 						<dt>
-							<input type="checkbox" name="ban_suggestions[]" id="hostname_check" value="hostname" class="input_check" ', $context['ban_trigger']['hostname']['selected'] ? 'checked="checked" ' : '', '/>
+							<input type="checkbox" name="ban_suggestions[]" id="hostname_check" value="hostname" ', $context['ban_trigger']['hostname']['selected'] ? 'checked="checked" ' : '', '/>
 							<label for="hostname_check">', $txt['ban_on_hostname'], '</label>
 						</dt>
 						<dd>
@@ -241,14 +241,14 @@ function template_ban_edit_trigger()
 
 	echo '
 						<dt>
-							<input type="checkbox" name="ban_suggestions[]" id="email_check" value="email" class="input_check" ', $context['ban_trigger']['email']['selected'] ? 'checked="checked" ' : '', '/>
+							<input type="checkbox" name="ban_suggestions[]" id="email_check" value="email" ', $context['ban_trigger']['email']['selected'] ? 'checked="checked" ' : '', '/>
 							<label for="email_check">', $txt['ban_on_email'], '</label>
 						</dt>
 						<dd>
 							<input type="text" name="email" value="', $context['ban_trigger']['email']['value'], '" size="44" onfocus="document.getElementById(\'email_check\').checked = true;" class="input_text" />
 						</dd>
 						<dt>
-							<input type="checkbox" name="ban_suggestions[]" id="user_check" value="user" class="input_check" ', $context['ban_trigger']['banneduser']['selected'] ? 'checked="checked" ' : '', '/>
+							<input type="checkbox" name="ban_suggestions[]" id="user_check" value="user" ', $context['ban_trigger']['banneduser']['selected'] ? 'checked="checked" ' : '', '/>
 							<label for="user_check">', $txt['ban_on_username'], '</label>:
 						</dt>
 						<dd>

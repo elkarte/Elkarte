@@ -240,7 +240,7 @@ function template_attachment_repair()
 		{
 			if (!empty($number))
 				echo '
-			<input type="checkbox" name="to_fix[]" id="', $error, '" value="', $error, '" class="input_check" />
+			<input type="checkbox" name="to_fix[]" id="', $error, '" value="', $error, '" />
 			<label for="', $error, '">', sprintf($txt['attach_repair_' . $error], $number), '</label>
 			<br />';
 		}

@@ -53,7 +53,7 @@ function template_ask()
 						</li>
 					</ul>
 					<hr />
-					<label for="messageRedirect"><input type="checkbox" name="messageRedirect" id="messageRedirect" onclick="document.getElementById(\'reasonArea\').style.display = this.checked ? \'block\' : \'none\';" class="input_check" /> ', $txt['splittopic_notification'], '.</label>
+					<label for="messageRedirect"><input type="checkbox" name="messageRedirect" id="messageRedirect" onclick="document.getElementById(\'reasonArea\').style.display = this.checked ? \'block\' : \'none\';" /> ', $txt['splittopic_notification'], '.</label>
 					<fieldset id="reasonArea" style="display: none;', '">
 						<dl class="settings">
 							<dt>
@@ -68,7 +68,7 @@ function template_ask()
 	if (!empty($context['can_move']))
 		echo '
 					<p>
-						<label for="move_new_topic"><input type="checkbox" name="move_new_topic" id="move_new_topic" onclick="document.getElementById(\'board_list\').style.display = this.checked ? \'\' : \'none\';" class="input_check" /> ', $txt['splittopic_move'], '.</label>', template_select_boards('move_to_board'), '
+						<label for="move_new_topic"><input type="checkbox" name="move_new_topic" id="move_new_topic" onclick="document.getElementById(\'board_list\').style.display = this.checked ? \'\' : \'none\';" /> ', $txt['splittopic_move'], '.</label>', template_select_boards('move_to_board'), '
 						<script><!-- // --><![CDATA[
 							document.getElementById(\'board_list\').style.display = \'none\';
 						// ]]></script>
