@@ -151,7 +151,7 @@ class ManagePosts_Controller extends Action_Controller
 					foreach ($this->_req->post->censor_vulgar as $i => $value)
 					{
 						if (trim(strtr($value, '*', ' ')) == '')
-							unset($this->_req->post->censor_vulgar[$i], $this->_req->POST->censor_proper[$i]);
+							unset($this->_req->post->censor_vulgar[$i], $this->_req->post->censor_proper[$i]);
 					}
 
 					$censored_vulgar = $this->_req->post->censor_vulgar;
