@@ -49,7 +49,7 @@ function template_edit_profile_field()
 	// any errors messages to show?
 	if (!empty($context['custom_option__error']))
 	{
-			echo '
+		echo '
 	<div class="errorbox">
 		', $context['custom_option__error'], '
 	</div>';
@@ -101,13 +101,13 @@ function template_edit_profile_field()
 							<label for="display">', $txt['custom_edit_display'], ':</label>
 						</dt>
 						<dd>
-							<input type="checkbox" name="display" id="display"', $context['field']['display'] ? ' checked="checked"' : '', ' class="input_check" />
+							<input type="checkbox" name="display" id="display"', $context['field']['display'] ? ' checked="checked"' : '', ' />
 						</dd>
 						<dt>
 							<label for="memberlist">', $txt['custom_edit_memberlist'], ':</label>
 						</dt>
 						<dd>
-							<input type="checkbox" name="memberlist" id="memberlist"', $context['field']['memberlist'] ? ' checked="checked"' : '', ' class="input_check" />
+							<input type="checkbox" name="memberlist" id="memberlist"', $context['field']['memberlist'] ? ' checked="checked"' : '', ' />
 						</dd>
 						<dt>
 							<label for="placement">', $txt['custom_edit_placement'], ':</label>
@@ -168,7 +168,7 @@ function template_edit_profile_field()
 							<label for="bbc_dd">', $txt['custom_edit_bbc'], '</label>
 						</dt>
 						<dd >
-							<input type="checkbox" name="bbc" id="bbc_dd"', $context['field']['bbc'] ? ' checked="checked"' : '', ' class="input_check" />
+							<input type="checkbox" name="bbc" id="bbc_dd"', $context['field']['bbc'] ? ' checked="checked"' : '', ' />
 						</dd>
 						<dt id="options_dt">
 							<a href="', $scripturl, '?action=quickhelp;help=customoptions" onclick="return reqOverlayDiv(this.href);" class="help">
@@ -182,7 +182,7 @@ function template_edit_profile_field()
 
 	foreach ($context['field']['options'] as $k => $option)
 		echo '
-							', $k == 0 ? '' : '<br />', '<input type="radio" name="default_select" value="', $k, '"', $context['field']['default_select'] == $option ? ' checked="checked"' : '', ' class="input_radio" /><input type="text" name="select_option[', $k, ']" value="', $option, '" class="input_text" />';
+							', $k == 0 ? '' : '<br />', '<input type="radio" name="default_select" value="', $k, '"', $context['field']['default_select'] == $option ? ' checked="checked"' : '', ' /><input type="text" name="select_option[', $k, ']" value="', $option, '" class="input_text" />';
 
 	echo '
 							<span id="addopt"></span>
@@ -193,7 +193,7 @@ function template_edit_profile_field()
 							<label for="default_dd">', $txt['custom_edit_default'], ':</label>
 						</dt>
 						<dd>
-							<input type="checkbox" name="default_check" id="default_dd"', $context['field']['default_check'] ? ' checked="checked"' : '', ' class="input_check" />
+							<input type="checkbox" name="default_check" id="default_dd"', $context['field']['default_check'] ? ' checked="checked"' : '', ' />
 						</dd>
 					</dl>
 				</fieldset>
@@ -236,14 +236,14 @@ function template_edit_profile_field()
 							<span class="smalltext">', $txt['custom_edit_can_search_desc'], '</span>
 						</dt>
 						<dd>
-							<input type="checkbox" name="can_search" id="can_search_dd"', $context['field']['can_search'] ? ' checked="checked"' : '', ' class="input_check" />
+							<input type="checkbox" name="can_search" id="can_search_dd"', $context['field']['can_search'] ? ' checked="checked"' : '', ' />
 						</dd>
 						<dt>
 							<label for="can_search_check">', $txt['custom_edit_active'], ':</label><br />
 							<span class="smalltext">', $txt['custom_edit_active_desc'], '</span>
 						</dt>
 						<dd>
-							<input type="checkbox" name="active" id="can_search_check"', $context['field']['active'] ? ' checked="checked"' : '', ' class="input_check" />
+							<input type="checkbox" name="active" id="can_search_check"', $context['field']['active'] ? ' checked="checked"' : '', ' />
 						</dd>
 					</dl>
 				</fieldset>

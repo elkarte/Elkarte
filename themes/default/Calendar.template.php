@@ -170,7 +170,7 @@ function template_unlinked_event_post()
 		echo '
 						<li>
 							<label for="link_to_board">', $txt['calendar_link_event'], '</label>
-							<input type="checkbox" class="input_check" id="link_to_board" name="link_to_board" checked="checked" onclick="toggleLinked(this.form);" />
+							<input type="checkbox" id="link_to_board" name="link_to_board" checked="checked" onclick="toggleLinked(this.form);" />
 						</li>
 						<li>
 							', template_select_boards('board', $txt['calendar_post_in'], 'onchange="this.form.submit();"'), '

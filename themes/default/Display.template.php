@@ -202,8 +202,8 @@ function template_messages()
 		// Show "Last Edit: Time by Person" if this post was edited.
 		if ($settings['show_modify'])
 			echo '
-							<li class="listlevel1 modified" id="modified_', $message['id'], '"',  !empty($message['modified']['name']) ? '' : ' style="display:none"', '>
-								',  !empty($message['modified']['name']) ? $message['modified']['last_edit_text'] : '', '
+							<li class="listlevel1 modified" id="modified_', $message['id'], '"', !empty($message['modified']['name']) ? '' : ' style="display:none"', '>
+								', !empty($message['modified']['name']) ? $message['modified']['last_edit_text'] : '', '
 							</li>';
 
 		// Maybe they can modify the post (this is the more button)
@@ -293,8 +293,8 @@ function template_messages()
 			// Can they like/unlike this post?
 			if ($message['can_like'] || $message['can_unlike'])
 				echo '
-							<li class="listlevel1', !empty($message['like_counter']) ? ' liked"' : '"' ,'>
-								<a class="linklevel1 ', $message['can_unlike'] ? 'unlike_button' : 'like_button', '" href="javascript:void(0)" title="', !empty($message['like_counter']) ? $txt['liked_by'] . ' ' . implode(', ', $context['likes'][$message['id']]['member']) : '', '" onclick="likePosts.prototype.likeUnlikePosts(event,', $message['id'],', ',$context['current_topic'],'); return false;">',
+							<li class="listlevel1', !empty($message['like_counter']) ? ' liked"' : '"', '>
+								<a class="linklevel1 ', $message['can_unlike'] ? 'unlike_button' : 'like_button', '" href="javascript:void(0)" title="', !empty($message['like_counter']) ? $txt['liked_by'] . ' ' . implode(', ', $context['likes'][$message['id']]['member']) : '', '" onclick="likePosts.prototype.likeUnlikePosts(event,', $message['id'], ', ', $context['current_topic'], '); return false;">',
 									!empty($message['like_counter']) ? '<span class="likes_indicator">' . $message['like_counter'] . '</span>&nbsp;' . $txt['likes'] : $txt['like_post'], '
 								</a>
 							</li>';

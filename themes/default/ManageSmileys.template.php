@@ -31,7 +31,7 @@ function template_editsets()
 	echo '
 	<div id="admincenter">';
 
-		template_show_list('smiley_set_list');
+	template_show_list('smiley_set_list');
 
 	echo '
 	</div>';
@@ -102,7 +102,7 @@ function template_modifyset()
 						<label for="smiley_sets_default">', $txt['smiley_set_select_default'], '</label>: </strong>
 					</dt>
 					<dd>
-						<input type="checkbox" name="smiley_sets_default" id="smiley_sets_default" value="1"', $context['current_set']['selected'] ? ' checked="checked"' : '', ' class="input_check" />
+						<input type="checkbox" name="smiley_sets_default" id="smiley_sets_default" value="1"', $context['current_set']['selected'] ? ' checked="checked"' : '', ' />
 					</dd>';
 
 	// If this is a new smiley set they have the option to import smileys already in the directory.
@@ -112,7 +112,7 @@ function template_modifyset()
 						<label for="smiley_sets_import">', $txt['smiley_set_import_directory'], '</label>: </strong>
 					</dt>
 					<dd>
-						<input type="checkbox" name="smiley_sets_import" id="smiley_sets_import" value="1" class="input_check" />
+						<input type="checkbox" name="smiley_sets_import" id="smiley_sets_import" value="1" />
 					</dd>';
 
 	echo '
@@ -240,10 +240,10 @@ function template_addsmiley()
 			<div class="content">
 				<ul>
 					<li>
-						<label for="method-existing"><input type="radio" onclick="switchType();" name="method" id="method-existing" value="existing" checked="checked" class="input_radio" /> ', $txt['smileys_add_existing'], '</label>
+						<label for="method-existing"><input type="radio" onclick="switchType();" name="method" id="method-existing" value="existing" checked="checked" /> ', $txt['smileys_add_existing'], '</label>
 					</li>
 					<li>
-						<label for="method-upload"><input type="radio" onclick="switchType();" name="method" id="method-upload" value="upload" class="input_radio" /> ', $txt['smileys_add_upload'], '</label>
+						<label for="method-upload"><input type="radio" onclick="switchType();" name="method" id="method-upload" value="upload" /> ', $txt['smileys_add_upload'], '</label>
 					</li>
 				</ul>
 				<br />
@@ -302,7 +302,7 @@ function template_addsmiley()
 							<label for="sameall">', $txt['smileys_add_upload_all'], ':</label>
 						</dt>
 						<dd>
-							<input type="checkbox" name="sameall" id="sameall" checked="checked" class="input_check" onclick="swapUploads(); selectMethod(\'upload\');" />
+							<input type="checkbox" name="sameall" id="sameall" checked="checked" onclick="swapUploads(); selectMethod(\'upload\');" />
 						</dd>
 					</dl>
 				</fieldset>
@@ -396,12 +396,16 @@ function template_setorder()
 				if (empty($context['move_smiley']))
 					echo '
 					<li id="smile_' . $smiley['id'] . '">
-						<a href="', $scripturl, '?action=admin;area=smileys;sa=setorder;move=', $smiley['id'], '"><img src="', $modSettings['smileys_url'], '/', $modSettings['smiley_sets_default'], '/', $smiley['filename'], '" style="padding: 2px; border: 0px solid black;" alt="', $smiley['description'], '" /></a>
+						<a href="', $scripturl, '?action=admin;area=smileys;sa=setorder;move=', $smiley['id'], '">
+							<img src="', $modSettings['smileys_url'], '/', $modSettings['smiley_sets_default'], '/', $smiley['filename'], '" style="padding: 2px; border: 0px solid black;" alt="', $smiley['description'], '" />
+						</a>
 					</li>';
 				else
 					echo '
 					<img src="', $modSettings['smileys_url'], '/', $modSettings['smiley_sets_default'], '/', $smiley['filename'], '" style="padding: 2px; border: ', $smiley['selected'] ? '2px solid red' : '0px solid black', ';" alt="', $smiley['description'], '" />
-					<a href="', $scripturl, '?action=admin;area=smileys;sa=setorder;location=', $location['id'], ';source=', $context['move_smiley'], ';after=', $smiley['id'], ';reorder=1;', $context['session_var'], '=', $context['session_id'], '" title="', $txt['smileys_move_here'], '"><img src="', $settings['images_url'], '/smiley_select_spot.png" alt="', $txt['smileys_move_here'], '" /></a>';
+					<a href="', $scripturl, '?action=admin;area=smileys;sa=setorder;location=', $location['id'], ';source=', $context['move_smiley'], ';after=', $smiley['id'], ';reorder=1;', $context['session_var'], '=', $context['session_id'], '" title="', $txt['smileys_move_here'], '">
+						<img src="', $settings['images_url'], '/smiley_select_spot.png" alt="', $txt['smileys_move_here'], '" />
+					</a>';
 			}
 
 			echo '

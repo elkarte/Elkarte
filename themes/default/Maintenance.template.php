@@ -69,9 +69,9 @@ function template_maintain_database()
 					' . $txt['enable_maintenance' . $context['use_maintenance']] : '', '
 				</div>
 				<p>
-					<label for="struct"><input type="checkbox" name="struct" id="struct" onclick="document.getElementById(\'submitDump\').disabled = !document.getElementById(\'struct\').checked &amp;&amp; !document.getElementById(\'data\').checked;" class="input_check" checked="checked" /> ', $txt['maintain_backup_struct'], '</label><br />
-					<label for="data"><input type="checkbox" name="data" id="data" onclick="document.getElementById(\'submitDump\').disabled = !document.getElementById(\'struct\').checked &amp;&amp; !document.getElementById(\'data\').checked;" checked="checked" class="input_check" /> ', $txt['maintain_backup_data'], '</label><br />
-					<label for="compress"><input type="checkbox" name="compress" id="compress" value="gzip"', $context['suggested_method'] == 'zipped_file' ? ' checked="checked"' : '', ' class="input_check" /> ', $txt['maintain_backup_gz'], '</label>
+					<label for="struct"><input type="checkbox" name="struct" id="struct" onclick="document.getElementById(\'submitDump\').disabled = !document.getElementById(\'struct\').checked &amp;&amp; !document.getElementById(\'data\').checked;" checked="checked" /> ', $txt['maintain_backup_struct'], '</label><br />
+					<label for="data"><input type="checkbox" name="data" id="data" onclick="document.getElementById(\'submitDump\').disabled = !document.getElementById(\'struct\').checked &amp;&amp; !document.getElementById(\'data\').checked;" checked="checked" /> ', $txt['maintain_backup_data'], '</label><br />
+					<label for="compress"><input type="checkbox" name="compress" id="compress" value="gzip"', $context['suggested_method'] == 'zipped_file' ? ' checked="checked"' : '', ' /> ', $txt['maintain_backup_gz'], '</label>
 					</p>';
 
 	if (empty($context['skip_security']))
@@ -164,7 +164,7 @@ function template_maintain_members()
 
 	echo '
 	<script><!-- // --><![CDATA[
-		var maintain_members_choose = \'' , $txt['maintain_members_choose'], '\',
+		var maintain_members_choose = \'', $txt['maintain_members_choose'], '\',
 			maintain_members_all = \'', $txt['maintain_members_all'], '\',
 			reattribute_confirm = \'', addcslashes($txt['reattribute_confirm'], "'"), '\',
 			reattribute_confirm_email = \'', addcslashes($txt['reattribute_confirm_email'], "'"), '\',
@@ -186,13 +186,13 @@ function template_maintain_members()
 				<p><strong>', $txt['reattribute_guest_posts'], '</strong></p>
 				<dl class="settings">
 					<dt>
-						<label for="type_email"><input type="radio" name="type" id="type_email" value="email" checked="checked" class="input_radio" />', $txt['reattribute_email'], '</label>
+						<label for="type_email"><input type="radio" name="type" id="type_email" value="email" checked="checked" />', $txt['reattribute_email'], '</label>
 					</dt>
 					<dd>
 						<input type="text" name="from_email" id="from_email" value="" onclick="document.getElementById(\'type_email\').checked = \'checked\'; document.getElementById(\'from_name\').value = \'\';" />
 					</dd>
 					<dt>
-						<label for="type_name"><input type="radio" name="type" id="type_name" value="name" class="input_radio" />', $txt['reattribute_username'], '</label>
+						<label for="type_name"><input type="radio" name="type" id="type_name" value="name" />', $txt['reattribute_username'], '</label>
 					</dt>
 					<dd>
 						<input type="text" name="from_name" id="from_name" value="" onclick="document.getElementById(\'type_name\').checked = \'checked\'; document.getElementById(\'from_email\').value = \'\';" class="input_text" />
@@ -200,14 +200,14 @@ function template_maintain_members()
 				</dl>
 				<dl class="settings">
 					<dt>
-						<label for="to"><strong>', $txt['reattribute_current_member'], ':</strong></label>
+						<label for="to">', $txt['reattribute_current_member'], ':</label>
 					</dt>
 					<dd>
 						<input type="text" name="to" id="to" value="" class="input_text" />
 					</dd>
 				</dl>
 				<p class="maintain_members">
-					<input type="checkbox" name="posts" id="posts" checked="checked" class="input_check" />
+					<input type="checkbox" name="posts" id="posts" checked="checked" />
 					<label for="posts">', $txt['reattribute_increase_posts'], '</label>
 				</p>
 				<div class="submitbutton">
@@ -238,7 +238,7 @@ function template_maintain_members()
 
 	foreach ($context['membergroups'] as $group)
 		echo '
-				<label for="groups', $group['id'], '"><input type="checkbox" name="groups[', $group['id'], ']" id="groups', $group['id'], '" checked="checked" class="input_check" /> ', $group['name'], '</label><br />';
+				<label for="groups', $group['id'], '"><input type="checkbox" name="groups[', $group['id'], ']" id="groups', $group['id'], '" checked="checked" /> ', $group['name'], '</label><br />';
 
 	echo '
 			</fieldset>
@@ -250,8 +250,8 @@ function template_maintain_members()
 		</form>
 		<h2 class="category_header">', $txt['maintain_recountposts'], '</h2>
 		<form action="', $scripturl, '?action=admin;area=maintain;sa=members;activity=recountposts" method="post" accept-charset="UTF-8" id="membersRecountForm">
-			<div class="content">',
-				$txt['maintain_recountposts_info'], '
+			<div class="content">
+				', $txt['maintain_recountposts_info'], '
 			</div>
 			<div class="submitbutton">
 				<input type="submit" value="', $txt['maintain_run_now'], '" />
@@ -292,11 +292,11 @@ function template_maintain_topics()
 	{
 		echo '
 		<h2 class="category_header">', $maintenace['title'], '</h2>
-		<form name="', $key,' " action="', $maintenace['url'], '" method="post" accept-charset="UTF-8">
+		<form name="', $key, ' " action="', $maintenace['url'], '" method="post" accept-charset="UTF-8">
 			<div class="content">';
 
-				$function = 'template_maintain_topics_' . $key;
-				$function();
+		$function = 'template_maintain_topics_' . $key;
+		$function();
 
 		echo '
 			</div>
@@ -326,12 +326,12 @@ function template_maintain_topics_pruneold()
 						<label for="maxdays">', sprintf($txt['maintain_old_since_days'], '<input type="text" id="maxdays" name="maxdays" value="30" size="3" />'), '</label>
 					</p>
 					<p>
-						<label for="delete_type_nothing"><input type="radio" name="delete_type" id="delete_type_nothing" value="nothing" class="input_radio" /> ', $txt['maintain_old_nothing_else'], '</label><br />
-						<label for="delete_type_moved"><input type="radio" name="delete_type" id="delete_type_moved" value="moved" class="input_radio" checked="checked" /> ', $txt['maintain_old_are_moved'], '</label><br />
-						<label for="delete_type_locked"><input type="radio" name="delete_type" id="delete_type_locked" value="locked" class="input_radio" /> ', $txt['maintain_old_are_locked'], '</label><br />
+						<label for="delete_type_nothing"><input type="radio" name="delete_type" id="delete_type_nothing" value="nothing" /> ', $txt['maintain_old_nothing_else'], '</label><br />
+						<label for="delete_type_moved"><input type="radio" name="delete_type" id="delete_type_moved" value="moved" checked="checked" /> ', $txt['maintain_old_are_moved'], '</label><br />
+						<label for="delete_type_locked"><input type="radio" name="delete_type" id="delete_type_locked" value="locked" /> ', $txt['maintain_old_are_locked'], '</label><br />
 					</p>
 					<p>
-						<label for="delete_old_not_sticky"><input type="checkbox" name="delete_old_not_sticky" id="delete_old_not_sticky" class="input_check" checked="checked" /> ', $txt['maintain_old_are_not_stickied'], '</label><br />
+						<label for="delete_old_not_sticky"><input type="checkbox" name="delete_old_not_sticky" id="delete_old_not_sticky" checked="checked" /> ', $txt['maintain_old_are_not_stickied'], '</label><br />
 					</p>
 					<fieldset id="pick_boards" class="content">';
 

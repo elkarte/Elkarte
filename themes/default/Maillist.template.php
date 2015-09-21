@@ -110,7 +110,7 @@ function template_bounce_email()
 					<label for="warn_notify">', $txt['bounce_notify'], ':</label>
 				</dt>
 				<dd>
-					<input type="checkbox" name="warn_notify" id="warn_notify" onclick="modifyWarnNotify();" ', $context['warning_data']['notify'] ? 'checked="checked"' : '', ' class="input_check" />
+					<input type="checkbox" name="warn_notify" id="warn_notify" onclick="modifyWarnNotify();" ', $context['warning_data']['notify'] ? 'checked="checked"' : '', ' />
 				</dd>
 				<dt>
 					<label for="warn_temp">', $txt['bounce_notify_template'], ':</label>
@@ -283,7 +283,7 @@ function template_bounce_template()
 
 	if ($context['template_data']['can_edit_personal'])
 		echo '
-			<input type="checkbox" name="make_personal" id="make_personal" ', $context['template_data']['personal'] ? 'checked="checked"' : '', ' class="input_check" />
+			<input type="checkbox" name="make_personal" id="make_personal" ', $context['template_data']['personal'] ? 'checked="checked"' : '', ' />
 				<label for="make_personal">
 					', $txt['ml_bounce_template_personal'], '
 				</label>

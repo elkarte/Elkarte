@@ -1154,7 +1154,6 @@ class ManageMembers_Controller extends Action_Controller
 		// What do we want to do with this application?
 		switch ($this->_req->post->todo)
 		{
-<<<<<<< HEAD
 			// Are we activating or approving the members?
 			case 'ok':
 			case 'okemail':

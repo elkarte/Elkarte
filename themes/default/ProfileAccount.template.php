@@ -141,7 +141,7 @@ function template_issueWarning()
 					<label for="warn_notify">', $txt['profile_warning_notify'], ':</label>
 				</dt>
 				<dd>
-					<input type="checkbox" name="warn_notify" id="warn_notify" onclick="modifyWarnNotify();" ', $context['warning_data']['notify'] ? 'checked="checked"' : '', ' class="input_check" />
+					<input type="checkbox" name="warn_notify" id="warn_notify" onclick="modifyWarnNotify();" ', $context['warning_data']['notify'] ? 'checked="checked"' : '', ' />
 				</dd>
 				<dt>
 					<label for="warn_sub">', $txt['profile_warning_notify_subject'], ':</label>
@@ -210,7 +210,7 @@ function template_deleteAccount()
 
 	// The main containing header.
 	echo '
-		<form action="', $scripturl, '?action=profile;area=deleteaccount;save" method="post" accept-charset="UTF-8" name="creator" id="creator">
+		<form id="creator" action="', $scripturl, '?action=profile;area=deleteaccount;save" method="post" accept-charset="UTF-8" name="creator">
 			<h2 class="category_header hdicon cat_img_profile">
 				', $txt['deleteAccount'], '
 			</h2>';
@@ -275,7 +275,7 @@ function template_deleteAccount()
 						<label for="deleteAccount">', $txt['deleteAccount_member'], '</label>
 					</dt>
 					<dd>
-						<input type="checkbox" name="deleteAccount" id="deleteAccount" value="1" class="input_check" onclick="if (this.checked) return confirm(\'', $txt['deleteAccount_confirm'], '\');" />
+						<input type="checkbox" name="deleteAccount" id="deleteAccount" value="1" onclick="if (this.checked) return confirm(\'', $txt['deleteAccount_confirm'], '\');" />
 					</dd>
 				</dl>
 				<input type="submit" value="', $txt['delete'], '" class="right_submit" />';

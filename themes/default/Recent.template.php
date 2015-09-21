@@ -87,7 +87,7 @@ function template_unread()
 		if ($context['showCheckboxes'])
 			echo '
 							<li class="listlevel1 quickmod_select_all">
-								<input type="checkbox" onclick="invertAll(this, document.getElementById(\'quickModForm\'), \'topics[]\');" class="input_check" />
+								<input type="checkbox" onclick="invertAll(this, document.getElementById(\'quickModForm\'), \'topics[]\');" />
 							</li>';
 
 		$current_header = $context['topics_headers'][$context['sort_by']];
@@ -130,11 +130,11 @@ function template_unread()
 								<div class="topic_info">
 									<p class="topic_icons', isset($message_icon_sprite[$topic['first_post']['icon']]) ? ' topicicon img_' . $topic['first_post']['icon'] : '', '">';
 
-							if (!isset($message_icon_sprite[$topic['first_post']['icon']]))
-								echo '
+			if (!isset($message_icon_sprite[$topic['first_post']['icon']]))
+				echo '
 										<img src="', $topic['first_post']['icon_url'], '" alt="" />';
 
-							echo '
+			echo '
 										', $topic['is_posted_in'] ? '<span class="fred topicicon img_profile"></span>' : '', '
 									</p>
 									<div class="topic_name">';
@@ -167,7 +167,7 @@ function template_unread()
 			if ($context['showCheckboxes'])
 				echo '
 								<p class="topic_moderation" >
-									<input type="checkbox" name="topics[]" value="', $topic['id'], '" class="input_check" />
+									<input type="checkbox" name="topics[]" value="', $topic['id'], '" />
 								</p>';
 
 			echo '
@@ -204,7 +204,7 @@ function template_unread_below()
 		echo '
 		<div id="topic_icons" class="description">';
 
-			template_basicicons_legend();
+		template_basicicons_legend();
 
 		if (!empty($context['using_relative_time']))
 			echo '
@@ -215,5 +215,4 @@ function template_unread_below()
 		echo '
 		</div>';
 	}
-
 }

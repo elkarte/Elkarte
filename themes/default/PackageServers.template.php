@@ -165,75 +165,74 @@ function template_package_list()
 
 			// List of addons available in this section
 			echo '
-						<ol id="package_section_', $i, '" class="packages">';
-
-			$alt = false;
+						<ol id="package_section_', $i, '">';
 
 			foreach ($packageSection['items'] as $id => $package)
 			{
 				echo '
 							<li>';
-					// 1. Some addon [ Download ].
-					echo '
-							<strong>
-								<img id="ps_img_', $i, '_pkg_', $id, '" src="', $settings['images_url'], '/selected_open.png" alt="*" style="display: none;" /> ',
-								$package['can_install'] ? '<strong>' . $package['name'] . '</strong> <a class="linkbutton" href="' . $package['download']['href'] . '">' . $txt['download'] . '</a>' : $package['name'];
+				// 1. Some addon [ Download ].
+				echo '
+								<img id="ps_img_', $i, '_pkg_', $id, '" src="', $settings['images_url'], '/selected_open.png" alt="*" style="display: none;" />
+								<a id="ps_link_', $i, '_pkg_', $id, '" href="#">', $package['name'], '</a>',
+				$package['can_install'] ? ' <a class="linkbutton" href="' . $package['download']['href'] . '">' . $txt['download'] . '</a>' : '';
 
-					// Mark as installed and current?
-					if ($package['is_installed'] && !$package['is_newer'])
-						echo '<img src="', $settings['images_url'], '/icons/package_', $package['is_current'] ? 'installed' : 'old', '.png" class="centericon package_img" alt="', $package['is_current'] ? $txt['package_installed_current'] : $txt['package_installed_old'], '" />';
-
+				// Mark as installed and current?
+				if ($package['is_installed'] && !$package['is_newer'])
 					echo '
-							</strong>
+								<img src="', $settings['images_url'], '/icons/package_', $package['is_current'] ? 'installed' : 'old', '.png" class="centericon package_img" alt="', $package['is_current'] ? $txt['package_installed_current'] : $txt['package_installed_old'], '" />';
+
+				echo '
 							<ul id="package_section_', $i, '_pkg_', $id, '" class="package_section">';
 
-					// Show the addon type?
-					if ($package['type'] != '')
-						echo '
-								<li class="package_section">', $txt['package_type'], ':&nbsp; ', Util::ucwords(Util::strtolower($package['type'])), '</li>';
-
-					// Show the version number?
-					if ($package['version'] != '')
-						echo '
-								<li class="package_section">', $txt['mod_version'], ':&nbsp; ', $package['version'], '</li>';
-
-					// Show the last date?
-					if ($package['date'] != '')
-						echo '
-								<li class="package_section">', $txt['mod_date'], ':&nbsp; ', $package['date'], '</li>';
-
-					// How 'bout the author?
-					if (!empty($package['author']))
-						echo '
-								<li class="package_section">', $txt['mod_author'], ':&nbsp; ', $package['author'], '</li>';
-
-					// Nothing but hooks ?
-					if ($package['hooks'] != '' && in_array($package['hooks'] , array('yes', 'true')))
-						echo '
-								<li class="package_section">', $txt['mod_hooks'], ' <i class="fa fa-check-circle-o"></i></li>';
-
-					// Location of file: http://someplace/.
+				// Show the addon type?
+				if ($package['type'] != '')
 					echo '
-								<ul style="margin-left: 5em">
-									<li class="package_section"><i class="fa fa-cloud-download"></i> ', $txt['file_location'], ':&nbsp; <a href="', $package['server']['download'], '">', $package['server']['download'], '</a></li>';
+								<li>', $txt['package_type'], ':&nbsp; ', Util::ucwords(Util::strtolower($package['type'])), '</li>';
 
-					// Location of issues?
-					if (!empty($package['server']['bugs']))
-						echo '
-									<li class="package_section"><i class="fa fa-bug"></i> ', $txt['bug_location'], ':&nbsp; <a href="', $package['server']['bugs'], '">', $package['server']['bugs'], '</a></li>';
-
-					// Location of support?
-					if (!empty($package['server']['support']))
-						echo '
-									<li class="package_section"><i class="fa fa-support"></i> ', $txt['support_location'], ':&nbsp; <a href="', $package['server']['support'], '">', $package['server']['support'], '</a></li>';
-
-					// Description: bleh bleh!
+				// Show the version number?
+				if ($package['version'] != '')
 					echo '
+								<li>', $txt['mod_version'], ':&nbsp; ', $package['version'], '</li>';
+
+				// Show the last date?
+				if ($package['date'] != '')
+					echo '
+								<li>', $txt['mod_date'], ':&nbsp; ', $package['date'], '</li>';
+
+				// How 'bout the author?
+				if (!empty($package['author']))
+					echo '
+								<li>', $txt['mod_author'], ':&nbsp; ', $package['author'], '</li>';
+
+				// Nothing but hooks ?
+				if ($package['hooks'] != '' && in_array($package['hooks'], array('yes', 'true')))
+					echo '
+								<li>', $txt['mod_hooks'], ' <i class="fa fa-check-circle-o"></i></li>';
+
+				// Location of file: http://someplace/.
+				echo '
+								<ul>
+									<li><i class="fa fa-cloud-download"></i> ', $txt['file_location'], ':&nbsp; <a href="', $package['server']['download'], '">', $package['server']['download'], '</a></li>';
+
+				// Location of issues?
+				if (!empty($package['server']['bugs']))
+					echo '
+									<li><i class="fa fa-bug"></i> ', $txt['bug_location'], ':&nbsp; <a href="', $package['server']['bugs'], '">', $package['server']['bugs'], '</a></li>';
+
+				// Location of support?
+				if (!empty($package['server']['support']))
+					echo '
+									<li><i class="fa fa-support"></i> ', $txt['support_location'], ':&nbsp; <a href="', $package['server']['support'], '">', $package['server']['support'], '</a></li>';
+
+				// Description: bleh bleh!
+				echo '
 								</ul>
-								<li class="package_section"><div class="infobox">', $txt['package_description'], ':&nbsp; ', $package['description'], '</div></li>
+								<li>
+									<div class="infobox">', $txt['package_description'], ':&nbsp; ', $package['description'], '</div>
+								</li>
 							</ul>';
 
-				$alt = !$alt;
 				echo '
 						</li>';
 			}
@@ -304,6 +303,13 @@ function template_package_list()
 							altExpanded: \'*\',
 							srcCollapsed: elk_images_url + \'/selected_open.png\',
 							altCollapsed: \'*\'
+						}
+					],
+					aSwapLinks: [
+						{
+							sId: \'ps_link_', $section, '_pkg_', $id, '\',
+							msgExpanded: ' . JavaScriptEscape($package['name']) . ',
+							msgCollapsed: ' . JavaScriptEscape($package['name']) . '
 						}
 					]
 				});';

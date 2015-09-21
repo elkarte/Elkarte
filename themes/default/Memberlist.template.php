@@ -35,7 +35,7 @@ function template_mlsearch_above()
 		$extra .= '
 					<li class="mlsearch_option">
 						<label for="fields-' . $id . '">
-							<input type="checkbox" name="fields[]" id="fields-' . $id . '" value="' . $id . '" ' . (in_array($id, $context['search_defaults']) ? 'checked="checked"' : '') . ' class="input_check" />' . $title . '
+							<input type="checkbox" name="fields[]" id="fields-' . $id . '" value="' . $id . '" ' . (in_array($id, $context['search_defaults']) ? 'checked="checked"' : '') . ' />' . $title . '
 						</label>
 					</li>';
 	}

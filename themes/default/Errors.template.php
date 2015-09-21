@@ -90,7 +90,7 @@ function template_error_log()
 				<tr class="secondary_header">
 					<td colspan="3" class="righttext">
 						<label for="check_all1"><strong>', $txt['check_all'], '</strong></label>&nbsp;
-						<input type="checkbox" id="check_all1" onclick="invertAll(this, this.form, \'delete[]\'); this.form.check_all2.checked = this.checked;" class="input_check" />
+						<input type="checkbox" id="check_all1" onclick="invertAll(this, this.form, \'delete[]\'); this.form.check_all2.checked = this.checked;" />
 					</td>
 				</tr>';
 
@@ -176,7 +176,7 @@ function template_error_log()
 		echo '
 					</td>
 					<td class="checkbox_column">
-						<input type="checkbox" name="delete[]" value="', $error['id'], '" class="input_check" />
+						<input type="checkbox" name="delete[]" value="', $error['id'], '" />
 					</td>
 					<td></td>
 				</tr>';
@@ -186,7 +186,7 @@ function template_error_log()
 				<tr class="secondary_header">
 					<td colspan="3" class="righttext">
 						<label for="check_all2"><strong>', $txt['check_all'], '</strong></label>&nbsp;
-						<input type="checkbox" id="check_all2" onclick="invertAll(this, this.form, \'delete[]\'); this.form.check_all1.checked = this.checked;" class="input_check" />
+						<input type="checkbox" id="check_all2" onclick="invertAll(this, this.form, \'delete[]\'); this.form.check_all1.checked = this.checked;" />
 					</td>
 				</tr>
 			</table>
@@ -261,7 +261,7 @@ function template_attachment_errors()
 		<div class="content">';
 
 	foreach ($context['attachment_error_keys'] as $key)
-			template_show_error($key);
+		template_show_error($key);
 
 	echo '
 		</div>

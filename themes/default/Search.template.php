@@ -59,7 +59,7 @@ function template_searchform()
 	// Does the search require a visual verification screen to annoy them?
 	if (!empty($context['require_verification']))
 	{
-			template_verification_controls($context['visual_verification_id'], '
+		template_verification_controls($context['visual_verification_id'], '
 						<div class="verification">
 							<strong>' . $txt['search_visual_verification_label'] . ':</strong>
 							<br />', '
@@ -101,9 +101,9 @@ function template_searchform()
 									', $txt['search_options'], ':
 								</dt>
 								<dd class="options">
-									<input type="checkbox" name="show_complete" id="show_complete" value="1"', !empty($context['search_params']['show_complete']) ? ' checked="checked"' : '', ' class="input_check" />
+									<input type="checkbox" name="show_complete" id="show_complete" value="1"', !empty($context['search_params']['show_complete']) ? ' checked="checked"' : '', ' />
 									<label for="show_complete">', $txt['search_show_complete_messages'], '</label><br />
-									<input type="checkbox" name="subject_only" id="subject_only" value="1"', !empty($context['search_params']['subject_only']) ? ' checked="checked"' : '', ' class="input_check" />
+									<input type="checkbox" name="subject_only" id="subject_only" value="1"', !empty($context['search_params']['subject_only']) ? ' checked="checked"' : '', ' />
 									<label for="subject_only">', $txt['search_subject_only'], '</label>
 								</dd>
 								<dt class="righttext between">
@@ -119,30 +119,30 @@ function template_searchform()
 						</div>
 						<a id="upshrink_link" href="', $scripturl, '?action=search;advanced" class="linkbutton" style="display:none">', $txt['search_simple'], '</a>';
 
-		// Set the initial search style for the form
-		echo '
+	// Set the initial search style for the form
+	echo '
 						<input id="advanced" type="hidden" name="advanced" value="1" />';
 
-		// If $context['search_params']['topic'] is set, that means we're searching just one topic.
-		if (!empty($context['search_params']['topic']))
-			echo '
+	// If $context['search_params']['topic'] is set, that means we're searching just one topic.
+	if (!empty($context['search_params']['topic']))
+		echo '
 						<p>', $txt['search_specific_topic'], ' &quot;', $context['search_topic']['link'], '&quot;.</p>
 						<input type="hidden" name="topic" value="', $context['search_topic']['id'], '" />';
 
-		echo '
+	echo '
 					</fieldset>';
 
-		// This starts our selection area to allow searching by specific boards
-		if (empty($context['search_params']['topic']))
-		{
-			echo '
+	// This starts our selection area to allow searching by specific boards
+	if (empty($context['search_params']['topic']))
+	{
+		echo '
 					<fieldset id="pick_boards" class="content">';
 
-			template_pick_boards('searchform');
+		template_pick_boards('searchform');
 
-			echo '
+		echo '
 					</fieldset>';
-		}
+	}
 
 	echo '
 				</form>';
@@ -268,7 +268,7 @@ function template_results()
 
 	if (!empty($options['display_quick_mod']) && $options['display_quick_mod'] == 1)
 		echo '
-						<input type="checkbox" onclick="invertAll(this, this.form, \'topics[]\');" class="input_check" />';
+						<input type="checkbox" onclick="invertAll(this, this.form, \'topics[]\');" />';
 
 	echo '
 					</span>
@@ -337,7 +337,7 @@ function template_results()
 				if ($options['display_quick_mod'] == 1)
 				{
 					echo '
-							<input type="checkbox" name="topics[]" value="', $topic['id'], '" class="input_check" />';
+							<input type="checkbox" name="topics[]" value="', $topic['id'], '" />';
 				}
 				else
 				{

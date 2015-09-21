@@ -701,7 +701,7 @@ function template_edit_censored()
 				', $txt['admin_censored_words'], '
 			</h2>
 			<div class="content">
-				<div class="information">', $txt['admin_censored_where'],'</div>';
+				<div class="information">', $txt['admin_censored_where'], '</div>';
 
 	// Show text boxes for censoring [bad] => [good].
 	foreach ($context['censored_words'] as $vulgar => $proper)
@@ -727,19 +727,19 @@ function template_edit_censored()
 						<label for="censorWholeWord_check">', $txt['censor_whole_words'], '</label>
 					</dt>
 					<dd>
-						<input type="checkbox" name="censorWholeWord" value="1" id="censorWholeWord_check"', empty($modSettings['censorWholeWord']) ? '' : ' checked="checked"', ' class="input_check" />
+						<input type="checkbox" name="censorWholeWord" value="1" id="censorWholeWord_check"', empty($modSettings['censorWholeWord']) ? '' : ' checked="checked"', ' />
 					</dd>
 					<dt>
 						<label for="censorIgnoreCase_check">', $txt['censor_case'], '</label>
 					</dt>
 					<dd>
-						<input type="checkbox" name="censorIgnoreCase" value="1" id="censorIgnoreCase_check"', empty($modSettings['censorIgnoreCase']) ? '' : ' checked="checked"', ' class="input_check" />
+						<input type="checkbox" name="censorIgnoreCase" value="1" id="censorIgnoreCase_check"', empty($modSettings['censorIgnoreCase']) ? '' : ' checked="checked"', ' />
 					</dd>
 					<dt>
 						<a href="' . $scripturl . '?action=quickhelp;help=allow_no_censored" onclick="return reqOverlayDiv(this.href);" class="help"><img src="' . $settings['images_url'] . '/helptopics.png" class="icon" alt="' . $txt['help'] . '" /></a><label for="allow_no_censored">', $txt['censor_allow'], '</label></dt>
 					</dt>
 					<dd>
-						<input type="checkbox" name="allow_no_censored" value="1" id="allow_no_censored"', empty($modSettings['allow_no_censored']) ? '' : ' checked="checked"', ' class="input_check" />
+						<input type="checkbox" name="allow_no_censored" value="1" id="allow_no_censored"', empty($modSettings['allow_no_censored']) ? '' : ' checked="checked"', ' />
 					</dd>
 				</dl>
 				<input type="submit" name="save_censor" value="', $txt['save'], '" class="right_submit" />
@@ -867,24 +867,24 @@ function template_show_settings()
 			if ($config_var['type'] == 'title')
 			{
 				echo
-					(isset($config_var['name']) ? '<a href="#" id="' . $config_var['name'] . '"></a>' : ''), '
+				(isset($config_var['name']) ? '<a href="#" id="' . $config_var['name'] . '"></a>' : ''), '
 					<h3 class="', !empty($config_var['class']) ? $config_var['class'] : 'category_header', '"', !empty($config_var['force_div_id']) ? ' id="' . $config_var['force_div_id'] . '"' : '', '>';
 
-					if ($config_var['help'])
-					{
-						if (empty($config_var['class']))
-							echo '
+				if ($config_var['help'])
+				{
+					if (empty($config_var['class']))
+						echo '
 						<a href="' . $scripturl . '?action=quickhelp;help=' . $config_var['help'] . '" onclick="return reqOverlayDiv(this.href);" class="hdicon cat_img_helptopics help" alt="' . $txt['help'] . '"></a>';
-						else
-							echo '
+					else
+						echo '
 						<a href="' . $scripturl . '?action=quickhelp;help=' . $config_var['help'] . '" onclick="return reqOverlayDiv(this.href);" class="' . $config_var['class'] . ' help"><img src="' . $settings['images_url'] . '/icons/helptopics_hd.png" class="icon" alt="' . $txt['help'] . '" /></a>';
-					}
-					elseif ($config_var['icon'])
-						echo
+				}
+				elseif ($config_var['icon'])
+					echo
 						'<span class="hdicon cat_img_' . $config_var['icon'] . '"></span>';
 
-					echo
-						$config_var['label'], '
+				echo
+				$config_var['label'], '
 					</h3>';
 			}
 			// A description?
@@ -956,7 +956,7 @@ function template_show_settings()
 				// Show a check box.
 				if ($config_var['type'] == 'check')
 					echo '
-						<input type="checkbox"', $javascript, $disabled, ' name="', $config_var['name'], '" id="', $config_var['name'], '"', ($config_var['value'] ? ' checked="checked"' : ''), ' value="1" class="input_check" />';
+						<input type="checkbox"', $javascript, $disabled, ' name="', $config_var['name'], '" id="', $config_var['name'], '"', ($config_var['value'] ? ' checked="checked"' : ''), ' value="1" />';
 				// Escape (via htmlspecialchars.) the text box.
 				elseif ($config_var['type'] == 'password')
 					echo '
@@ -1000,13 +1000,13 @@ function template_show_settings()
 						foreach ($bbcColumn as $bbcTag)
 							echo '
 								<li class="list_bbc floatleft">
-									<input type="checkbox" name="', $config_var['name'], '_enabledTags[]" id="tag_', $config_var['name'], '_', $bbcTag['tag'], '" value="', $bbcTag['tag'], '"', !in_array($bbcTag['tag'], $context['bbc_sections'][$config_var['name']]['disabled']) ? ' checked="checked"' : '', ' class="input_check" /> <label for="tag_', $config_var['name'], '_', $bbcTag['tag'], '">', $bbcTag['tag'], '</label>', $bbcTag['show_help'] ? ' (<a href="' . $scripturl . '?action=quickhelp;help=tag_' . $bbcTag['tag'] . '" onclick="return reqOverlayDiv(this.href);">?</a>)' : '', '
+									<input type="checkbox" name="', $config_var['name'], '_enabledTags[]" id="tag_', $config_var['name'], '_', $bbcTag['tag'], '" value="', $bbcTag['tag'], '"', !in_array($bbcTag['tag'], $context['bbc_sections'][$config_var['name']]['disabled']) ? ' checked="checked"' : '', ' /> <label for="tag_', $config_var['name'], '_', $bbcTag['tag'], '">', $bbcTag['tag'], '</label>', $bbcTag['show_help'] ? ' (<a href="' . $scripturl . '?action=quickhelp;help=tag_' . $bbcTag['tag'] . '" onclick="return reqOverlayDiv(this.href);">?</a>)' : '', '
 								</li>';
 					}
 
 					echo '
 							</ul>
-							<input type="checkbox" id="bbc_', $config_var['name'], '_select_all" onclick="invertAll(this, this.form, \'', $config_var['name'], '_enabledTags\');"', $context['bbc_sections'][$config_var['name']]['all_selected'] ? ' checked="checked"' : '', ' class="input_check" /> <label for="bbc_', $config_var['name'], '_select_all"><em>', $txt['bbcTagsToUse_select_all'], '</em></label>
+							<input type="checkbox" id="bbc_', $config_var['name'], '_select_all" onclick="invertAll(this, this.form, \'', $config_var['name'], '_enabledTags\');"', $context['bbc_sections'][$config_var['name']]['all_selected'] ? ' checked="checked"' : '', ' /> <label for="bbc_', $config_var['name'], '_select_all"><em>', $txt['bbcTagsToUse_select_all'], '</em></label>
 						</fieldset>';
 				}
 				// A simple message?
@@ -1240,7 +1240,7 @@ function template_callback_question_answer_list()
 				var add_question_template = ' . JavaScriptEscape('
 			<dt class="questions">
 				<input type="text" name="question[b-%question_last_blank%]" size="40" class="input_text verification_question" />' .
-					$lang_dropdown . '
+			$lang_dropdown . '
 			</dt>
 			<dd class="questions">
 				<input type="text" name="answer[b-%question_last_blank%][]" size="40" class="input_text verification_answer" /><br />

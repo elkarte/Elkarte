@@ -323,7 +323,7 @@ fieldset {
 }
 
 /*...and em as italics */
-em {
+em, .em {
 	font-style: italic;
 }
 
@@ -353,7 +353,7 @@ em {
 }
 
 .grid50 {
-	width: 49.5%;
+	width: 49.5% !important;
 }
 
 /* ------------------------------------------------------- */
@@ -1487,6 +1487,10 @@ a.bbc_link {
 .small_pagelinks li {
 	float: left;
 	display: inline;
+}
+
+.small_pagelinks li:last-child {
+	margin-right: 0;
 }
 
 .small_pagelinks .navPages {
@@ -3028,8 +3032,6 @@ ul.post_options li {
 }
 
 #report_comment {
-	padding: 5px;
-	width: 75%;
 	height: 10em;
 }
 
@@ -3458,7 +3460,12 @@ dl.merge_topic dd {
 	border-bottom: 0;
 }
 
+/* Definition lists, mostly used in profile */
 #creator dl {
+	margin: 4px 0 0;
+}
+
+#creator dl:first-child {
 	margin: 0;
 }
 
@@ -3466,6 +3473,10 @@ dl.merge_topic dd {
 	float: left;
 	clear: both;
 	width: 40%;
+}
+
+#creator dt label {
+	font-weight: 600;
 }
 
 #creator dd {

@@ -40,7 +40,7 @@ function template_manage_themes()
 						</dt>
 						<dd>
 							<input type="hidden" value="0" name="options[theme_allow]">
-							<input type="checkbox" name="options[theme_allow]" id="options-theme_allow" value="1"', !empty($modSettings['theme_allow']) ? ' checked="checked"' : '', ' class="input_check" />
+							<input type="checkbox" name="options[theme_allow]" id="options-theme_allow" value="1"', !empty($modSettings['theme_allow']) ? ' checked="checked"' : '', ' />
 						</dd>
 						<dt>
 							<label for="known_themes_list">', $txt['themeadmin_selectable'], '</label>
@@ -53,7 +53,7 @@ function template_manage_themes()
 	foreach ($context['themes'] as $theme)
 		echo '
 									<li>
-										<label for="options-known_themes_', $theme['id'], '"><input type="checkbox" name="options[known_themes][]" id="options-known_themes_', $theme['id'], '" value="', $theme['id'], '"', $theme['known'] ? ' checked="checked"' : '', ' class="input_check" /> ', $theme['name'], '</label>
+										<label for="options-known_themes_', $theme['id'], '"><input type="checkbox" name="options[known_themes][]" id="options-known_themes_', $theme['id'], '" value="', $theme['id'], '"', $theme['known'] ? ' checked="checked"' : '', ' /> ', $theme['name'], '</label>
 									</li>';
 
 	echo '
@@ -188,7 +188,7 @@ function template_list_themes()
 						</a>';
 		else
 			echo '
-						<a class="hdicon cat_img_helptopics help floatleft" href="'. $scripturl . '?action=quickhelp;help=themeadmin_delete_help" onclick="return reqOverlayDiv(this.href);" id="themeadmin_delete_help" title="' . $txt['help'] . '"></a>';
+						<a class="hdicon cat_img_helptopics help floatleft" href="' . $scripturl . '?action=quickhelp;help=themeadmin_delete_help" onclick="return reqOverlayDiv(this.href);" id="themeadmin_delete_help" title="' . $txt['help'] . '"></a>';
 
 		echo '
 				</h2>
@@ -290,7 +290,7 @@ function template_set_options()
 	echo '
 		<form id="admin_form_wrapper" action="', $scripturl, '?action=admin;area=theme;th=', $context['theme_settings']['theme_id'], ';sa=reset" method="post" accept-charset="UTF-8">
 			<input type="hidden" name="who" value="', $context['theme_options_reset'] ? 1 : 0, '" />
-			<h2 class="category_header">', $context['theme_settings']['name'],'</h2>
+			<h2 class="category_header">', $context['theme_settings']['name'], '</h2>
 			<div class="content">
 				<dl class="settings', $context['theme_options_reset'] ? ' theme_options' : '', '">';
 
@@ -466,7 +466,7 @@ function template_set_settings()
 					</dt>
 					<dd>
 						<input type="hidden" name="options[disable_user_variant]" value="0" />
-						<input type="checkbox" name="options[disable_user_variant]" id="disable_user_variant"', !empty($context['theme_settings']['disable_user_variant']) ? ' checked="checked"' : '', ' value="1" class="input_check" />
+						<input type="checkbox" name="options[disable_user_variant]" id="disable_user_variant"', !empty($context['theme_settings']['disable_user_variant']) ? ' checked="checked"' : '', ' value="1" />
 					</dd>
 				</dl>
 				<img src="', $context['theme_variants'][$context['default_variant']]['thumbnail'], '" id="variant_preview" alt="" />
@@ -505,7 +505,7 @@ function template_set_settings()
 					</dt>
 					<dd id="dd_', $setting['id'], '">
 						<input type="hidden" name="', !empty($setting['default']) ? 'default_' : '', 'options[', $setting['id'], ']" value="0" />
-						<input type="checkbox" name="', !empty($setting['default']) ? 'default_' : '', 'options[', $setting['id'], ']" id="', $setting['id'], '"', !empty($setting['value']) ? ' checked="checked"' : '', ' value="1" class="input_check" />
+						<input type="checkbox" name="', !empty($setting['default']) ? 'default_' : '', 'options[', $setting['id'], ']" id="', $setting['id'], '"', !empty($setting['value']) ? ' checked="checked"' : '', ' value="1" />
 					</dd>';
 		}
 		// A textarea?
@@ -737,7 +737,7 @@ function template_themelist()
 {
 	global $context, $scripturl, $txt;
 
-echo '
+	echo '
 	<div id="admincenter">
 		<h2 class="category_header">', $txt['themeadmin_edit_title'], '</h2>
 		<div class="information">
@@ -843,7 +843,7 @@ function template_browse()
 						<a href="', $file['href'], '" class="is_directory">', $file['filename'], '</a>', ($file['is_writable']) ? '' : ' (' . $txt['theme_edit_not_writable'] . ')';
 		else
 			echo
-						$file['filename'];
+			$file['filename'];
 
 		echo '
 					</td>

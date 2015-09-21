@@ -53,13 +53,13 @@ function template_modify_subscription()
 						<label for="repeatable_check">', $txt['paid_mod_repeatable'], '</label>:
 					</dt>
 					<dd>
-						<input type="checkbox" name="repeatable" id="repeatable_check"', empty($context['sub']['repeatable']) ? '' : ' checked="checked"', ' class="input_check" />
+						<input type="checkbox" name="repeatable" id="repeatable_check"', empty($context['sub']['repeatable']) ? '' : ' checked="checked"', ' />
 					</dd>
 					<dt>
 						<label for="activated_check">', $txt['paid_mod_active'], '</label>:<br /><span class="smalltext">', $txt['paid_mod_active_desc'], '</span>
 					</dt>
 					<dd>
-						<input type="checkbox" name="active" id="activated_check"', empty($context['sub']['active']) ? '' : ' checked="checked"', ' class="input_check" />
+						<input type="checkbox" name="active" id="activated_check"', empty($context['sub']['active']) ? '' : ' checked="checked"', ' />
 					</dd>
 				</dl>
 				<hr />
@@ -87,7 +87,7 @@ function template_modify_subscription()
 	// Put a checkbox in for each group
 	foreach ($context['groups'] as $groups)
 		echo '
-						<input type="checkbox" id="addgroup_', $groups['id'], '" name="addgroup[', $groups['id'], ']"', in_array($groups['id'], $context['sub']['add_groups']) ? ' checked="checked"' : '', ' ', !empty($context['disable_groups']) ? ' disabled="disabled"' : '', ' class="input_check" />&nbsp;<label for="addgroup_', $groups['id'], '" class="smalltext">', $groups['name'], '</label><br />';
+						<input type="checkbox" id="addgroup_', $groups['id'], '" name="addgroup[', $groups['id'], ']"', in_array($groups['id'], $context['sub']['add_groups']) ? ' checked="checked"' : '', ' ', !empty($context['disable_groups']) ? ' disabled="disabled"' : '', ' />&nbsp;<label for="addgroup_', $groups['id'], '" class="smalltext">', $groups['name'], '</label><br />';
 
 	echo '
 					</dd>
@@ -105,7 +105,7 @@ function template_modify_subscription()
 					</dd>
 				</dl>
 				<hr />
-				<input type="radio" name="duration_type" id="duration_type_fixed" value="fixed" ', empty($context['sub']['duration']) || $context['sub']['duration'] == 'fixed' ? 'checked="checked"' : '', ' class="input_radio" onclick="toggleDuration(\'fixed\');" />
+				<input type="radio" name="duration_type" id="duration_type_fixed" value="fixed" ', empty($context['sub']['duration']) || $context['sub']['duration'] == 'fixed' ? 'checked="checked"' : '', ' onclick="toggleDuration(\'fixed\');" />
 				<strong>', $txt['paid_mod_fixed_price'], '</strong>
 				<br />
 				<div id="fixed_area" ', empty($context['sub']['duration']) || $context['sub']['duration'] == 'fixed' ? '' : 'style="display: none;"', '>
@@ -132,7 +132,7 @@ function template_modify_subscription()
 						</dl>
 					</fieldset>
 				</div>
-				<input type="radio" name="duration_type" id="duration_type_flexible" value="flexible" ', !empty($context['sub']['duration']) && $context['sub']['duration'] == 'flexible' ? 'checked="checked"' : '', ' class="input_radio" onclick="toggleDuration(\'flexible\');" />
+				<input type="radio" name="duration_type" id="duration_type_flexible" value="flexible" ', !empty($context['sub']['duration']) && $context['sub']['duration'] == 'flexible' ? 'checked="checked"' : '', ' onclick="toggleDuration(\'flexible\');" />
 				<strong>', $txt['paid_mod_flexible_price'], '</strong>
 				<br />
 				<div id="flexible_area" ', !empty($context['sub']['duration']) && $context['sub']['duration'] == 'flexible' ? '' : 'style="display: none;"', '>
@@ -146,7 +146,7 @@ function template_modify_subscription()
 	  <label for="allow_partial_check">', $txt['paid_mod_allow_partial'], '</label>:<br /><span class="smalltext">', $txt['paid_mod_allow_partial_desc'], '</span>
 	  </dt>
 	  <dd>
-	  <input type="checkbox" name="allow_partial" id="allow_partial_check"', empty($context['sub']['allow_partial']) ? '' : ' checked="checked"', ' class="input_check" />
+	  <input type="checkbox" name="allow_partial" id="allow_partial_check"', empty($context['sub']['allow_partial']) ? '' : ' checked="checked"', ' />
 	  </dd>
 	  </dl>';
 	 */

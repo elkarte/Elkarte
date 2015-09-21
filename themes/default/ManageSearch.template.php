@@ -148,7 +148,7 @@ function template_select_search_method()
 					<legend>', $txt['search_index'], '</legend>
 					<dl>
 						<dt>
-							<input type="radio" id="search_index_none" name="search_index" value="none"', empty($modSettings['search_index']) ? ' checked="checked"' : '', ' class="input_radio" />
+							<input type="radio" id="search_index_none" name="search_index" value="none"', empty($modSettings['search_index']) ? ' checked="checked"' : '', ' />
 							<label for="search_index_none">', $txt['search_index_none'], '</label>
 						</dt>';
 
@@ -156,7 +156,7 @@ function template_select_search_method()
 	{
 		echo '
 						<dt>
-							<input type="radio" id="search_index_full" name="search_index" value="fulltext"', !empty($modSettings['search_index']) && $modSettings['search_index'] == 'fulltext' ? ' checked="checked"' : '', empty($context['fulltext_index']) ? ' onclick="alert(\'' . $txt['search_method_fulltext_warning'] . '\'); selectRadioByName(this.form.search_index, \'none\');"' : '', ' class="input_radio" />
+							<input type="radio" id="search_index_full" name="search_index" value="fulltext"', !empty($modSettings['search_index']) && $modSettings['search_index'] == 'fulltext' ? ' checked="checked"' : '', empty($context['fulltext_index']) ? ' onclick="alert(\'' . $txt['search_method_fulltext_warning'] . '\'); selectRadioByName(this.form.search_index, \'none\');"' : '', ' />
 							<label for="search_index_full">', $txt['search_method_fulltext_index'], '</label>
 						</dt>
 						<dd>
@@ -180,7 +180,7 @@ function template_select_search_method()
 
 	echo '
 						<dt>
-							<input type="radio" id="search_index_custom" name="search_index" value="custom"', !empty($modSettings['search_index']) && $modSettings['search_index'] == 'custom' ? ' checked="checked"' : '', $context['custom_index'] ? '' : ' onclick="alert(\'' . $txt['search_index_custom_warning'] . '\'); selectRadioByName(this.form.search_index, \'none\');"', ' class="input_radio" />
+							<input type="radio" id="search_index_custom" name="search_index" value="custom"', !empty($modSettings['search_index']) && $modSettings['search_index'] == 'custom' ? ' checked="checked"' : '', $context['custom_index'] ? '' : ' onclick="alert(\'' . $txt['search_index_custom_warning'] . '\'); selectRadioByName(this.form.search_index, \'none\');"', ' />
 							<label for="search_index_custom">', $txt['search_index_custom'], '</label>
 						</dt>
 						<dd>
@@ -210,7 +210,7 @@ function template_select_search_method()
 
 		echo '
 						<dt>
-							<input type="radio" id="search_index_', $api['setting_index'], '" name="search_index" value="', $api['setting_index'], '"', !empty($modSettings['search_index']) && $modSettings['search_index'] == $api['setting_index'] ? ' checked="checked"' : '', ' class="input_radio" />
+							<input type="radio" id="search_index_', $api['setting_index'], '" name="search_index" value="', $api['setting_index'], '"', !empty($modSettings['search_index']) && $modSettings['search_index'] == $api['setting_index'] ? ' checked="checked"' : '', ' />
 							<label for="search_index_', $api['setting_index'], '">', $api['label'], '</label>
 						</dt>';
 
@@ -226,8 +226,8 @@ function template_select_search_method()
 				</fieldset>
 				<fieldset id="search_method" class="search_settings">
 				<legend>', $txt['search_method'], '</legend>
-					<input type="checkbox" name="search_force_index" id="search_force_index_check" value="1"', empty($modSettings['search_force_index']) ? '' : ' checked="checked"', ' class="input_check" /><label for="search_force_index_check">', $txt['search_force_index'], '</label><br />
-					<input type="checkbox" name="search_match_words" id="search_match_words_check" value="1"', empty($modSettings['search_match_words']) ? '' : ' checked="checked"', ' class="input_check" /><label for="search_match_words_check">', $txt['search_match_words'], '</label>
+					<input type="checkbox" name="search_force_index" id="search_force_index_check" value="1"', empty($modSettings['search_force_index']) ? '' : ' checked="checked"', ' /><label for="search_force_index_check">', $txt['search_force_index'], '</label><br />
+					<input type="checkbox" name="search_match_words" id="search_match_words_check" value="1"', empty($modSettings['search_match_words']) ? '' : ' checked="checked"', ' /><label for="search_match_words_check">', $txt['search_match_words'], '</label>
 				</fieldset>
 			</div>
 			<div class="submitbutton">
@@ -470,56 +470,56 @@ function template_manage_sphinx()
 			<div class="content">
 				<dl class="settings">
 					<dt>
-						<label for="sphinx_data_path_input"><strong>', $txt['sphinx_index_data_path'], '</strong></label><br />
+						<label for="sphinx_data_path_input">', $txt['sphinx_index_data_path'], '</label><br />
 						<span class="smalltext">', $txt['sphinx_index_data_path_desc'], '</span>
 					</dt>
 					<dd>
 						<input type="text" name="sphinx_data_path" id="sphinx_data_path_input" value="', isset($modSettings['sphinx_data_path']) ? $modSettings['sphinx_data_path'] : '/var/sphinx/data', '" size="65" />
 					</dd>
 					<dt>
-						<label for="sphinx_log_path_input"><strong>', $txt['sphinx_log_file_path'], '</strong></label><br />
+						<label for="sphinx_log_path_input">', $txt['sphinx_log_file_path'], '</label><br />
 						<span class="smalltext">', $txt['sphinx_log_file_path_desc'], '</span>
 					</dt>
 					<dd>
 						<input type="text" name="sphinx_log_path" id="sphinx_log_path_input" value="', isset($modSettings['sphinx_log_path']) ? $modSettings['sphinx_log_path'] : '/var/sphinx/log', '" size="65" />
 					</dd>
 					<dt>
-						<label for="sphinx_stopword_path_input"><strong>', $txt['sphinx_stop_word_path'], '</strong></label><br />
+						<label for="sphinx_stopword_path_input">', $txt['sphinx_stop_word_path'], '</label><br />
 						<span class="smalltext">', $txt['sphinx_stop_word_path_desc'], '</span>
 					</dt>
 					<dd>
 						<input type="text" name="sphinx_stopword_path" id="sphinx_stopword_path_input" value="', isset($modSettings['sphinx_stopword_path']) ? $modSettings['sphinx_stopword_path'] : '', '" size="65" />
 					</dd>
 					<dt>
-						<label for="sphinx_indexer_mem_input"><strong>', $txt['sphinx_memory_limit'], '</strong></label><br />
+						<label for="sphinx_indexer_mem_input">', $txt['sphinx_memory_limit'], '</label><br />
 						<span class="smalltext">', $txt['sphinx_memory_limit_desc'], '</span>
 					</dt>
 					<dd>
 						<input type="text" name="sphinx_indexer_mem" id="sphinx_indexer_mem_input" value="', isset($modSettings['sphinx_indexer_mem']) ? $modSettings['sphinx_indexer_mem'] : '128', '" size="4" /> MB
 					</dd>
 					<dt>
-						<label for="sphinx_searchd_server_input"><strong>', $txt['sphinx_searchd_server'], '</strong></label><br />
+						<label for="sphinx_searchd_server_input">', $txt['sphinx_searchd_server'], '</label><br />
 						<span class="smalltext">', $txt['sphinx_searchd_server_desc'], '</span>
 					</dt>
 					<dd>
 						<input type="text" name="sphinx_searchd_server" id="sphinx_searchd_server_input" value="', isset($modSettings['sphinx_searchd_server']) ? $modSettings['sphinx_searchd_server'] : 'localhost', '" size="65" />
 					</dd>
 					<dt>
-						<label for="sphinx_searchd_port_input"><strong>', $txt['sphinx_searchd_port'], '</strong></label><br />
+						<label for="sphinx_searchd_port_input">', $txt['sphinx_searchd_port'], '</label><br />
 						<span class="smalltext">', $txt['sphinx_searchd_port_desc'], '</span>
 					</dt>
 					<dd>
 						<input type="text" name="sphinx_searchd_port" id="sphinx_searchd_port_input" value="', isset($modSettings['sphinx_searchd_port']) ? $modSettings['sphinx_searchd_port'] : '9312', '" size="4" />
 					</dd>
 					<dt>
-						<label for="sphinxql_searchd_port_input"><strong>', $txt['sphinx_searchd_qlport'], '</strong></label><br />
+						<label for="sphinxql_searchd_port_input">', $txt['sphinx_searchd_qlport'], '</label><br />
 						<span class="smalltext">', $txt['sphinx_searchd_qlport_desc'], '</span>
 					</dt>
 					<dd>
 						<input type="text" name="sphinxql_searchd_port" id="sphinxql_searchd_port_input" value="', isset($modSettings['sphinxql_searchd_port']) ? $modSettings['sphinxql_searchd_port'] : '9306', '" size="4" />
 					</dd>
 					<dt>
-						<label for="sphinx_max_results_input"><strong>', $txt['sphinx_max_matches'], '</strong></label><br />
+						<label for="sphinx_max_results_input">', $txt['sphinx_max_matches'], '</label><br />
 						<span class="smalltext">', $txt['sphinx_max_matches_desc'], '</span>
 					</dt>
 					<dd>
