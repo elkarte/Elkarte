@@ -1489,6 +1489,10 @@ a.bbc_link {
 	display: inline;
 }
 
+.small_pagelinks li:last-child {
+	margin-right: 0;
+}
+
 .small_pagelinks .navPages {
 	padding: 2px 3px 0 3px;
 	font-size: 0.857em;
