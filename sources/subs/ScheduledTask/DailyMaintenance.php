@@ -111,7 +111,7 @@ class Daily_Maintenance implements Scheduled_Task_Interface
 		if (!empty($modSettings['enableOpenID']))
 		{
 			require_once(SUBSDIR . '/OpenID.subs.php');
-			$openID = new OpenID();
+			$openID = new \OpenID();
 			$openID->setup_DH(true);
 		}
 		elseif (!empty($modSettings['dh_keys']))
