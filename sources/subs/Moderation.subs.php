@@ -37,14 +37,14 @@ function recountOpenReports($flush = true, $count_pms = false)
 	$request = $db->query('', '
 		SELECT COUNT(*)
 		FROM {db_prefix}log_reported
-		WHERE ' . $user_info['mod_cache']['bq'] . ($count_pms ? '' : '
-			AND type IN ({array_string:not_a_pm})') . '
+		WHERE ' . $user_info['mod_cache']['bq'] . '
+			AND type IN ({array_string:rep_type})
 			AND closed = {int:not_closed}
 			AND ignore_all = {int:not_ignored}',
 		array(
 			'not_closed' => 0,
 			'not_ignored' => 0,
-			'not_a_pm' => array('msg'),
+			'rep_type' => $count_pms ? array('pm') : array('msg'),
 		)
 	);
 	list ($open_reports) = $db->fetch_row($request);
@@ -161,12 +161,12 @@ function totalReports($status = 0, $show_pms = false)
 	$request = $db->query('', '
 		SELECT COUNT(*)
 		FROM {db_prefix}log_reported AS lr
-		WHERE lr.closed = {int:view_closed}' . ($show_pms ? '' : '
-			AND lr.type IN ({array_string:not_a_pm})') . '
+		WHERE lr.closed = {int:view_closed}
+			AND lr.type IN ({array_string:type})
 			AND ' . ($user_info['mod_cache']['bq'] == '1=1' || $user_info['mod_cache']['bq'] == '0=1' ? $user_info['mod_cache']['bq'] : 'lr.' . $user_info['mod_cache']['bq']),
 		array(
 			'view_closed' => $status,
-			'not_a_pm' => array('msg'),
+			'type' => $show_pms ? array('pm') : array('msg'),
 		)
 	);
 	list ($total_reports) = $db->fetch_row($request);
@@ -703,13 +703,13 @@ function modReportDetails($id_report, $show_pms = false)
 			IFNULL(mem.real_name, lr.membername) AS author_name, IFNULL(mem.id_member, 0) AS id_author
 		FROM {db_prefix}log_reported AS lr
 			LEFT JOIN {db_prefix}members AS mem ON (mem.id_member = lr.id_member)
-		WHERE lr.id_report = {int:id_report}' . ($show_pms ? '' : '
-			AND lr.type IN array({array_string:not_a_pm})') . '
+		WHERE lr.id_report = {int:id_report}
+			AND lr.type IN ({array_string:rep_type})
 			AND ' . ($user_info['mod_cache']['bq'] == '1=1' || $user_info['mod_cache']['bq'] == '0=1' ? $user_info['mod_cache']['bq'] : 'lr.' . $user_info['mod_cache']['bq']) . '
 		LIMIT 1',
 		array(
 			'id_report' => $id_report,
-			'not_a_pm' => array('msg'),
+			'rep_type' => $show_pms ? array('pm') : array('msg'),
 		)
 	);
 
@@ -745,8 +745,8 @@ function getModReports($status = 0, $start = 0, $limit = 10, $show_pms = false)
 				IFNULL(mem.real_name, lr.membername) AS author_name, IFNULL(mem.id_member, 0) AS id_author
 			FROM {db_prefix}log_reported AS lr
 				LEFT JOIN {db_prefix}members AS mem ON (mem.id_member = lr.id_member)
-			WHERE lr.closed = {int:view_closed}' . ($show_pms ? '' : '
-				AND lr.type IN ({array_string:not_a_pm})') . '
+			WHERE lr.closed = {int:view_closed}
+				AND lr.type IN ({array_string:rep_type})
 				AND ' . ($user_info['mod_cache']['bq'] == '1=1' || $user_info['mod_cache']['bq'] == '0=1' ? $user_info['mod_cache']['bq'] : 'lr.' . $user_info['mod_cache']['bq']) . '
 			ORDER BY lr.time_updated DESC
 			LIMIT {int:start}, {int:limit}',
@@ -754,7 +754,7 @@ function getModReports($status = 0, $start = 0, $limit = 10, $show_pms = false)
 				'view_closed' => $status,
 				'start' => $start,
 				'limit' => $limit,
-				'not_a_pm' => array('msg'),
+				'rep_type' => $show_pms ? array('pm') : array('msg'),
 			)
 		);
 
@@ -1206,15 +1206,15 @@ function reportedPosts($show_pms = false)
 			FROM {db_prefix}log_reported AS lr
 				LEFT JOIN {db_prefix}members AS mem ON (mem.id_member = lr.id_member)
 			WHERE ' . ($user_info['mod_cache']['bq'] == '1=1' || $user_info['mod_cache']['bq'] == '0=1' ? $user_info['mod_cache']['bq'] : 'lr.' . $user_info['mod_cache']['bq']) . '
-				AND lr.closed = {int:not_closed}' . ($show_pms ? '' : '
-				AND lr.type IN ({array_string:not_a_pm})') . '
+				AND lr.closed = {int:not_closed}
+				AND lr.type IN ({array_string:rep_type})
 				AND lr.ignore_all = {int:not_ignored}
 			ORDER BY lr.time_updated DESC
 			LIMIT 10',
 			array(
 				'not_closed' => 0,
 				'not_ignored' => 0,
-				'not_a_pm' => array('msg'),
+				'rep_type' => $show_pms ? array('pm') : array('msg'),
 			)
 		);
 		$reported_posts = array();

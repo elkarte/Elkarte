@@ -410,8 +410,7 @@ class UpgradeInstructions_upgrade_1_1
 								'name' => 'type',
 								'type' => 'varchar',
 								'size' => 5,
-								'unsigned' => true,
-								'default' => 0
+								'default' => 'msg'
 							),
 							array(),
 							'ignore'
@@ -426,6 +425,8 @@ class UpgradeInstructions_upgrade_1_1
 							array(),
 							'ignore'
 						);
+						$db_table->db_remove_index('{db_prefix}log_reported', 'id_msg');
+						$db_table->db_add_index('{db_prefix}log_reported', array('name' => 'msg_type', 'columns' => array('type', 'id_msg'), 'type' => 'key'));
 					}
 				}
 			)

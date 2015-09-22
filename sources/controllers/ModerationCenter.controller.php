@@ -408,6 +408,10 @@ class ModerationCenter_Controller extends Action_Controller
 			'description' => $txt['mc_reported_posts_desc'],
 		);
 
+		// Set up the comforting bits...
+		$context['page_title'] = $txt['mc_reported_posts'];
+		$context['sub_template'] = 'reported_posts';
+
 		// This comes under the umbrella of moderating posts.
 		if ($user_info['mod_cache']['bq'] == '0=1')
 			isAllowedTo('moderate_forum');
@@ -422,11 +426,15 @@ class ModerationCenter_Controller extends Action_Controller
 		{
 			$show_pms = true;
 			isAllowedTo('admin_forum');
-		}
 
-		// Set up the comforting bits...
-		$context['page_title'] = $txt['mc_reported_posts'];
-		$context['sub_template'] = 'reported_posts';
+			// Put the open and closed options into tabs, because we can...
+			$context[$context['moderation_menu_name']]['tab_data'] = array(
+				'title' => $txt['mc_reported_pms'],
+				'help' => '',
+				'description' => $txt['mc_reported_pms_desc'],
+			);
+			$context['page_title'] = $txt['mc_reported_pms'];
+		}
 
 		// Are we viewing open or closed reports?
 		$context['view_closed'] = isset($_GET['sa']) && $_GET['sa'] == 'closed' ? 1 : 0;
@@ -983,7 +991,19 @@ class ModerationCenter_Controller extends Action_Controller
 
 		// Finally we are done :P
 		loadTemplate('ModerationCenter');
-		$context['page_title'] = sprintf($txt['mc_viewmodreport'], $context['report']['subject'], $context['report']['author']['name']);
+		if ($context['admin_area'] == 'pm_reports')
+		{
+			$context['page_title'] = sprintf($txt['mc_view_pmreport'], $context['report']['author']['name']);
+			$context['section_title'] = sprintf($txt['mc_view_pmreport'], $context['report']['author']['link']);
+			$context['section_descripion'] = sprintf($txt['mc_pmreport_summary'], $context['report']['num_reports'], $context['report']['last_updated']);
+		}
+		else
+		{
+			$context['page_title'] = sprintf($txt['mc_viewmodreport'], $context['report']['subject'], $context['report']['author']['name']);
+			$context['section_title'] = sprintf($txt['mc_viewmodreport'], $context['report']['message_link'], $context['report']['author']['link']);
+			$context['section_descripion'] = sprintf($txt['mc_modreport_summary'], $context['report']['num_reports'], $context['report']['last_updated']);
+		}
+
 		$context['sub_template'] = 'viewmodreport';
 	}
 

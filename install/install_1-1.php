@@ -1285,7 +1285,7 @@ class InstallInstructions_install_1_1
 			array(
 				array('name' => 'id_report',    'type' => 'mediumint', 'size' => 8, 'unsigned' => true, 'auto' => true),
 				array('name' => 'id_msg',       'type' => 'int', 'size' => 10, 'unsigned' => true, 'default' => 0),
-				array('name' => 'type',         'type' => 'varchar', 'size' => 5, 'unsigned' => true, 'default' => 0),
+				array('name' => 'type',         'type' => 'varchar', 'size' => 5, 'default' => ''),
 				array('name' => 'id_topic',     'type' => 'mediumint', 'size' => 8, 'unsigned' => true, 'default' => 0),
 				array('name' => 'id_board',     'type' => 'smallint', 'size' => 5, 'unsigned' => true, 'default' => 0),
 				array('name' => 'id_member',    'type' => 'mediumint', 'size' => 8, 'unsigned' => true, 'default' => 0),
@@ -1305,7 +1305,7 @@ class InstallInstructions_install_1_1
 				array('name' => 'id_topic',     'columns' => array('id_topic'), 'type' => 'key'),
 				array('name' => 'closed',       'columns' => array('closed'), 'type' => 'key'),
 				array('name' => 'time_started', 'columns' => array('time_started'), 'type' => 'key'),
-				array('name' => 'msg_type',       'columns' => array('type', ), 'type' => 'key'),
+				array('name' => 'msg_type',     'columns' => array('type', 'id_msg'), 'type' => 'key'),
 			),
 			array(),
 			'ignore'
