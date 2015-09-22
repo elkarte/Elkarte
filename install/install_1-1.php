@@ -1220,7 +1220,7 @@ class InstallInstructions_install_1_1
 				array('name' => 'log_time',  'type' => 'int', 'size' => 10, 'default' => 0),
 				array('name' => 'id_member', 'type' => 'mediumint', 'size' => 8, 'unsigned' => true, 'default' => 0),
 				array('name' => 'id_spider', 'type' => 'smallint', 'size' => 5, 'unsigned' => true, 'default' => 0),
-				array('name' => 'ip',        'type' => 'int', 'size' => 10, 'unsigned' => true, 'default' => 0),
+				array('name' => 'ip',        'type' => 'varchar', 'size' => 255, 'default' => ''),
 				array('name' => 'url',       'type' => 'text'),
 			),
 			array(

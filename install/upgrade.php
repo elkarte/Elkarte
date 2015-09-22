@@ -413,6 +413,8 @@ function loadEssentialData()
 
 	@session_start();
 
+	definePaths();
+
 	// Initialize everything...
 	initialize_inputs();
 

@@ -531,8 +531,8 @@ class ManageMembers_Controller extends Action_Controller
 						),
 					),
 					'sort' => array(
-						'default' => 'INET_ATON(member_ip)',
-						'reverse' => 'INET_ATON(member_ip) DESC',
+						'default' => 'member_ip',
+						'reverse' => 'member_ip DESC',
 					),
 				),
 				'last_active' => array(
@@ -969,8 +969,8 @@ class ManageMembers_Controller extends Action_Controller
 						),
 					),
 					'sort' => array(
-						'default' => 'INET_ATON(member_ip)',
-						'reverse' => 'INET_ATON(member_ip) DESC',
+						'default' => 'member_ip',
+						'reverse' => 'member_ip DESC',
 					),
 				),
 				'hostname' => array(

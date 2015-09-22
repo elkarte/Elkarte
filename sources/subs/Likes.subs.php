@@ -611,8 +611,8 @@ function dbMostLikedMessagesByTopic($topic)
 			INNER JOIN {db_prefix}topics AS t ON (t.id_topic = m.id_topic)
 			LEFT JOIN {db_prefix}attachments AS a ON (a.id_member = m.id_member)
 		WHERE t.id_topic = {int:id_topic}
-		LIMIT {int:limit}
-		ORDER BY lp.like_count DESC',
+		ORDER BY lp.like_count DESC
+		LIMIT {int:limit}',
 		array(
 			'id_topic' => $topic,
 			'limit' => 5,

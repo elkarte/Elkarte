@@ -432,4 +432,43 @@ class UpgradeInstructions_upgrade_1_1
 			)
 		);
 	}
+
+	public function fix_ipv6_title()
+	{
+		return 'Fix database for some IPv6 issues...';
+	}
+
+	public function fix_ipv6()
+	{
+		return array(
+			array(
+				'debug_title' => 'Converting IP columns to varchar instead of int...',
+				'function' => function($db, $db_table)
+				{
+					$columns = $this->db_list_columns('{db_prefix}log_online', true);
+					$column_name = 'ip';
+
+					foreach ($columns as $column)
+					{
+						if ($column_name == $column['name'] && $column['type'] == 'varchar')
+						{
+							return true;
+						}
+					}
+
+					$db->query('','
+						TRUNCATE TABLE {db_prefix}log_online');
+
+					$db_table->db_change_column('{db_prefix}log_online',
+						$column_name,
+						array(
+							'type' => 'varchar',
+							'size' => 255,
+							'default' => ''
+						)
+					);
+				}
+			)
+		);
+	}
 }

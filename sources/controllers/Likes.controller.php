@@ -612,7 +612,7 @@ class Likes_Controller extends Action_Controller
 	 * Validates whether user is allowed to see stats or not.
 	 * Decides which tab data to fetch and shown to user.
 	 */
-	public function action_likestats_api()
+	public function action_index_api()
 	{
 		global $context, $modSettings;
 
