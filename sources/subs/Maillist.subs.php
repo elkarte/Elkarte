@@ -50,9 +50,9 @@ function list_maillist_unapproved($id = 0, $start = 0, $chunk_size = 0, $sort = 
 		$approve_query = ' AND 0';
 
 	if ($id === 0)
-		$where_query = 'id_email > {int:id} AND (({query_see_board}' . $approve_query . ') OR e.id_board = -1)';
+		$where_query = 'e.id_email > {int:id} AND (({query_see_board}' . $approve_query . ') OR e.id_board = -1)';
 	else
-		$where_query = 'id_email = {int:id} AND (({query_see_board}' . $approve_query . ') OR e.id_board = -1)';
+		$where_query = 'e.id_email = {int:id} AND (({query_see_board}' . $approve_query . ') OR e.id_board = -1)';
 
 	// Load them errors
 	$request = $db->query('', '
