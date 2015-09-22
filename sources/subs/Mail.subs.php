@@ -976,7 +976,7 @@ function list_getMailQueue($start, $items_per_page, $sort)
 			'sort' => $sort,
 			'items_per_page' => $items_per_page,
 		),
-		function($row)
+		function($row) use ($txt)
 		{
 			// Private PM/email subjects and similar shouldn't be shown in the mailbox area.
 			if (!empty($row['private']))
