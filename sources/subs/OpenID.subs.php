@@ -158,11 +158,13 @@ class OpenID
 		$request = $db->query('openid_select_assoc', '
 			SELECT server_url, handle, secret, issued, expires, assoc_type
 			FROM {db_prefix}openid_assoc
-			WHERE server_url = {string:server_url}' . ($handle === null ? '' : '
+			WHERE (server_url = {string:https_server_url} OR server_url = {string:http_server_url})
+			' . ($handle === null ? '' : '
 				AND handle = {string:handle}') . '
 			ORDER BY expires DESC',
 			array(
-				'server_url' => $server,
+				'http_server_url' => strtr($server, array('https://' => 'http://')),
+				'https_server_url' => strtr($server, array('http://' => 'https://')),
 				'handle' => $handle,
 			)
 		);
@@ -171,6 +173,7 @@ class OpenID
 			return null;
 
 		$return = $db->fetch_assoc($request);
+		$return['server_url'] = $server;
 		$db->free_result($request);
 
 		return $return;
