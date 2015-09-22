@@ -2055,7 +2055,7 @@ function onlineMembers($conditions, $sort_method, $sort_direction, $start)
 
 	return $db->fetchQuery('
 		SELECT
-			lo.log_time, lo.id_member, lo.url, INET_NTOA(lo.ip) AS ip, mem.real_name,
+			lo.log_time, lo.id_member, lo.url, lo.ip, mem.real_name,
 			lo.session, mg.online_color, IFNULL(mem.show_online, 1) AS show_online,
 			lo.id_spider
 		FROM {db_prefix}log_online AS lo
