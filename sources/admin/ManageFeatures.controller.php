@@ -569,6 +569,8 @@ class ManageFeatures_Controller extends Action_Controller
 			'max_image_width' => isset($sig_limits[5]) ? $sig_limits[5] : 0,
 			'max_image_height' => isset($sig_limits[6]) ? $sig_limits[6] : 0,
 			'max_font_size' => isset($sig_limits[7]) ? $sig_limits[7] : 0,
+			'repetition_guests' => isset($sig_limits[8]) ? $sig_limits[8] : 0,
+			'repetition_members' => isset($sig_limits[9]) ? $sig_limits[9] : 0,
 		);
 
 		// Temporarily make each setting a modSetting!
@@ -1535,6 +1537,20 @@ class ManageFeatures_Controller extends Action_Controller
 				array('int', 'signature_max_font_size', 'subtext' => $txt['zero_for_no_limit']),
 				array('check', 'signature_allow_smileys', 'onclick' => 'document.getElementById(\'signature_max_smileys\').disabled = !this.checked;'),
 				array('int', 'signature_max_smileys', 'subtext' => $txt['zero_for_no_limit']),
+				array('select', 'signature_repetition_guests',
+					array(
+						$txt['signature_always'],
+						$txt['signature_onlyfirst'],
+						$txt['signature_never'],
+					),
+				),
+				array('select', 'signature_repetition_members',
+					array(
+						$txt['signature_always'],
+						$txt['signature_onlyfirst'],
+						$txt['signature_never'],
+					),
+				),
 			'',
 				// Image settings.
 				array('int', 'signature_max_images', 'subtext' => $txt['signature_max_images_note']),

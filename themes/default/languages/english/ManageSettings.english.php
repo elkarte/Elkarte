@@ -258,6 +258,11 @@ $txt['signature_settings_desc'] = 'Use the settings on this page to decide how m
 $txt['signature_settings_warning'] = 'Note that settings are not applied to existing signatures by default.<br /><a class="button_submit" href="%1$s">Run the process now</a>';
 $txt['signature_settings_applied'] = 'The updated rules have been applied to the existing signatures.';
 $txt['signature_enable'] = 'Enable signatures';
+$txt['signature_repetition_guests'] = 'Show signatures to guests:';
+$txt['signature_repetition_members'] = 'Show signatures to members:';
+$txt['signature_always'] = 'Always';
+$txt['signature_onlyfirst'] = 'Only the first of each member';
+$txt['signature_never'] = 'Never';
 $txt['signature_max_length'] = 'Maximum allowed characters';
 $txt['signature_max_lines'] = 'Maximum amount of lines';
 $txt['signature_max_images'] = 'Maximum image count';
