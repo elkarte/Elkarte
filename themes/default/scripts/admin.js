@@ -797,8 +797,8 @@ function calculateNewValues()
  */
 function switchType()
 {
-	document.getElementById("ul_settings").style.display = document.getElementById("method-existing").checked ? "none" : "";
-	document.getElementById("ex_settings").style.display = document.getElementById("method-upload").checked ? "none" : "";
+	document.getElementById("ul_settings").style.display = document.getElementById("method-existing").checked ? "none" : "block";
+	document.getElementById("ex_settings").style.display = document.getElementById("method-upload").checked ? "none" : "block";
 }
 
 /**
@@ -806,7 +806,7 @@ function switchType()
  */
 function swapUploads()
 {
-	document.getElementById("uploadMore").style.display = document.getElementById("uploadSmiley").disabled ? "none" : "";
+	document.getElementById("uploadMore").style.display = document.getElementById("uploadSmiley").disabled ? "none" : "block";
 	document.getElementById("uploadSmiley").disabled = !document.getElementById("uploadSmiley").disabled;
 }
 
@@ -1286,22 +1286,27 @@ function ajax_getTemplatePreview()
 		context: document.body
 	})
 	.done(function(request) {
-		$("#box_preview").css({display:""});
+		$("#box_preview").css({display:"block"});
 		$("#template_preview").html($(request).find('body').text());
+
+		var $_errors = $("#errors");
 		if ($(request).find("error").text() !== '')
 		{
-			$("#errors").css({display:""});
+			$_errors.css({display:"block"});
+
 			var errors_html = '',
-				errors = $(request).find('error').each(function() {
+			errors = $(request).find('error').each(function() {
 				errors_html += $(this).text() + '<br />';
 			});
 
 			$(document).find("#error_list").html(errors_html);
+			$('html, body').animate({ scrollTop: $_errors.offset().top }, 'slow');
 		}
 		else
 		{
-			$("#errors").css({display:"none"});
+			$_errors.css({display:"none"});
 			$("#error_list").html('');
+			$('html, body').animate({ scrollTop: $("#box_preview").offset().top }, 'slow');
 		}
 
 		return false;
@@ -1682,7 +1687,7 @@ function ajax_getEmailTemplatePreview()
 	})
 	.done(function(request) {
 		// Show the preview section, populated with the response
-		$("#preview_section").css({display: ""});
+		$("#preview_section").css({display: "block"});
 		$("#preview_body").html($(request).find('body').text());
 		$("#preview_subject").html($(request).find('subject').text());
 
