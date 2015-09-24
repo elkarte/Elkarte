@@ -119,12 +119,13 @@ function ajax_getSignaturePreview(showPreview)
 			var signatures = ["current", "preview"];
 			for (i = 0; i < signatures.length; i++)
 			{
-				$("#" + signatures[i] + "_signature").css({display:""});
-				$("#" + signatures[i] + "_signature_display").css({display:""}).html($(request).find('[type="' + signatures[i] + '"]').text() + '<hr />');
+				$("#" + signatures[i] + "_signature").css({display:"block"});
+				$("#" + signatures[i] + "_signature_display").css({display:"block"}).html($(request).find('[type="' + signatures[i] + '"]').text() + '<hr />');
 			}
 		}
 
 		var $_profile_error = $("#profile_error");
+
 		if ($(request).find("error").text() !== '')
 		{
 			if (!$_profile_error.is(":visible"))
@@ -144,6 +145,7 @@ function ajax_getSignaturePreview(showPreview)
 			$_profile_error.css({display:"none"});
 			$_profile_error.html('');
 		}
+
 		return false;
 	});
 

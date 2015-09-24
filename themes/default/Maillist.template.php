@@ -248,7 +248,7 @@ function template_bounce_template()
 			', $txt['ml_bounce_template_desc'], '
 		</div>
 		<div class="content">
-			<div class="errorbox"', empty($context['warning_errors']) ? ' style="display: none"' : '', ' id="errors">
+			<div id="errors" class="errorbox', empty($context['warning_errors']) ? ' hide"' : '"', '>
 				<dl>
 					<dt>
 						<strong id="error_serious">', $txt['error_while_submitting'], '</strong>

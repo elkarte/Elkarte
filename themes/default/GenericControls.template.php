@@ -216,7 +216,7 @@ function template_control_richedit_buttons($editor_id)
 	if (!empty($context['drafts_autosave']) && !empty($options['drafts_autosave_enabled']))
 		echo '
 		<div class="draftautosave">
-			<span id="throbber" style="display:none"><i class="fa fa-spinner fa-spin"></i>&nbsp;</span>
+			<span id="throbber" class="hide"><i class="fa fa-spinner fa-spin"></i>&nbsp;</span>
 			<span id="draft_lastautosave"></span>
 		</div>';
 }

@@ -43,7 +43,7 @@
 			return false;
 
 		// Flag that we are saving a draft
-		document.getElementById('throbber').style.display = '';
+		document.getElementById('throbber').style.display = 'inline';
 		this.opts._bInDraftMode = true;
 
 		// Get all the form elements that we want to save
@@ -103,7 +103,7 @@
 			return false;
 
 		// Flag that we are saving the PM
-		document.getElementById('throbber').style.display = '';
+		document.getElementById('throbber').style.display = 'inline';
 		this.opts._bInDraftMode = true;
 
 		// Get the to and bcc values

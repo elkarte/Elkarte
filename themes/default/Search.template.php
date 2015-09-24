@@ -117,7 +117,7 @@ function template_searchform()
 								</dd>
 							</dl>
 						</div>
-						<a id="upshrink_link" href="', $scripturl, '?action=search;advanced" class="linkbutton" style="display:none">', $txt['search_simple'], '</a>';
+						<a id="upshrink_link" href="', $scripturl, '?action=search;advanced" class="linkbutton hide">', $txt['search_simple'], '</a>';
 
 	// Set the initial search style for the form
 	echo '

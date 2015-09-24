@@ -765,11 +765,11 @@ class ManageMaillist_Controller extends Action_Controller
 				'filterorder' => array(
 					'header' => array(
 						'value' => '',
-						'style' => 'display: none',
+						'class' => 'hide',
 					),
 					'data' => array(
 						'db' => 'filter_order',
-						'style' => 'display: none',
+						'class' => 'hide',
 					),
 				),
 				'name' => array(
@@ -1195,11 +1195,11 @@ class ManageMaillist_Controller extends Action_Controller
 				'filterorder' => array(
 					'header' => array(
 						'value' => '',
-						'style' => 'display: none',
+						'class' => 'hide',
 					),
 					'data' => array(
 						'db' => 'filter_order',
-						'style' => 'display: none',
+						'class' => 'hide',
 					),
 				),
 				'name' => array(

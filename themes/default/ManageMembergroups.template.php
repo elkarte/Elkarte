@@ -413,6 +413,8 @@ function template_edit_group()
 /**
  * Template to edit the boards and groups access to them
  *
+ * Accessed with ?action=admin;area=membergroups;sa=add
+ *
  * @param int $form_id
  * @param bool $collapse
  */
@@ -462,7 +464,8 @@ function template_add_edit_group_boards_list($form_id, $collapse = true)
 			if (empty($deny))
 				echo '
 										<li class="board" style="margin-', $context['right_to_left'] ? 'right' : 'left', ': ', $board['child_level'], 'em;">
-											<input name="boardaccess[', $board['id'], ']" id="brd', $board['id'], '" value="allow" ', $board['allow'] ? ' checked="checked"' : '', ' /> <label for="brd', $board['id'], '">', $board['name'], '</label>
+											<input id="brd', $board['id'], '"  name="boardaccess[', $board['id'], ']" type="checkbox" value="allow" ', $board['allow'] ? ' checked="checked"' : '', ' />
+											<label for="brd', $board['id'], '">', $board['name'], '</label>
 										</li>';
 			else
 				echo '
@@ -494,7 +497,8 @@ function template_add_edit_group_boards_list($form_id, $collapse = true)
 		echo '
 								<br />
 								<div class="select_all_box">
-									<input id="checkall_check" onclick="invertAll(this, this.form, \'boardaccess\');" /> <label for="checkall_check"><em>', $txt['check_all'], '</em></label>
+									<input id="checkall_check" type="checkbox" onclick="invertAll(this, this.form, \'boardaccess\');" />
+									<label for="checkall_check"><em>', $txt['check_all'], '</em></label>
 								</div>';
 	else
 		echo '
@@ -513,7 +517,7 @@ function template_add_edit_group_boards_list($form_id, $collapse = true)
 									</span>
 								</div>';
 
-	// select_all_box is display:none and it\'s removed if js is enabled
+	// select_all_box is hidden and it's made available only if js is enabled
 	echo '
 							</fieldset>
 							<script><!-- // --><![CDATA[

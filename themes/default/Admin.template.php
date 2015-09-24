@@ -752,7 +752,7 @@ function template_edit_censored()
 			<h2 class="category_header">', $txt['censor_test'], '</h2>
 			<div class="content">
 				<div class="centertext">
-					<p id="censor_result" style="display:none" class="information">', empty($context['censor_test']) ? '' : $context['censor_test'], '</p>
+					<p id="censor_result" class="information hide">', empty($context['censor_test']) ? '' : $context['censor_test'], '</p>
 					<input id="censortest" type="text" name="censortest" value="', empty($context['censor_test']) ? '' : $context['censor_test'], '" class="input_text" />
 					<input id="preview_button" type="submit" value="', $txt['censor_test_save'], '" class="button_submit" />
 				</div>

@@ -51,6 +51,7 @@ elk_AdminIndex.prototype.init = function ()
 elk_AdminIndex.prototype.loadAdminIndex = function ()
 {
 	// Load the current master and your version numbers.
+	console.log(this.opt.bLoadVersions);
 	if (this.opt.bLoadVersions)
 		this.showCurrentVersion();
 
@@ -1495,7 +1496,7 @@ function navigatePreview(url)
 		if (myDoc.responseText !== null && myDoc.status === 200)
 		{
 			previewData = myDoc.responseText;
-			document.getElementById('css_preview_box').style.display = "";
+			document.getElementById('css_preview_box').style.display = "block";
 
 			// Revert to the theme they actually use ;).
 			var tempImage = new Image();
@@ -1739,7 +1740,7 @@ function ajax_getCensorPreview()
 	.done(function(request) {
 		if (request.result === true) {
 			// Show the censored text section, populated with the response
-			$("#censor_result").css({display: ""}).html(request.censor);
+			$("#censor_result").css({display: "block"}).html(request.censor);
 
 			// Update the token
 			$("#token").attr({name:request.token_val, value:request.token});

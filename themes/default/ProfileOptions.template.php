@@ -1062,17 +1062,17 @@ function template_profile_signature_modify()
 	global $txt, $context;
 
 	echo '
-							<dt id="current_signature"', !isset($context['member']['current_signature']) ? ' style="display:none"' : '', '>
+							<dt id="current_signature"', !isset($context['member']['current_signature']) ? ' class="hide"' : '', '>
 								<label>', $txt['current_signature'], ':</label>
 							</dt>
-							<dd id="current_signature_display"', !isset($context['member']['current_signature']) ? ' style="display:none"' : '', '>
+							<dd id="current_signature_display"', !isset($context['member']['current_signature']) ? ' class="hide"' : '', '>
 								', isset($context['member']['current_signature']) ? $context['member']['current_signature'] : '', '<hr />
 							</dd>
 
-							<dt id="preview_signature"', !isset($context['member']['signature_preview']) ? ' style="display:none"' : '', '>
+							<dt id="preview_signature"', !isset($context['member']['signature_preview']) ? ' class="hide"' : '', '>
 								<label>', $txt['signature_preview'], ':</label>
 							</dt>
-							<dd id="preview_signature_display"', !isset($context['member']['signature_preview']) ? ' style="display:none"' : '', '>
+							<dd id="preview_signature_display"', !isset($context['member']['signature_preview']) ? ' class="hide"' : '', '>
 								', isset($context['member']['signature_preview']) ? $context['member']['signature_preview'] : '', '<hr />
 							</dd>
 							<dt>

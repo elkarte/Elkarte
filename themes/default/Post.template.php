@@ -94,7 +94,7 @@ function template_postarea_above()
 	// If it's locked, show a message to warn the replyer.
 	// @todo why not output it only for locked topics and why not use the template_show_error above?
 	echo '
-						<p class="information"', $context['locked'] ? '' : ' style="display: none"', ' id="lock_warning">
+						<p id="lock_warning" class="information', $context['locked'] ? '"' : ' hide"', '>
 							', $txt['topic_locked_no_reply'], '
 						</p>';
 
@@ -287,7 +287,7 @@ function template_post_page()
 	if (!empty($context['member_ids']))
 	{
 		echo '
-							<div id="mentioned" style="display:none">';
+							<div id="mentioned" class="hide">';
 
 		foreach ($context['member_ids'] as $id)
 			echo '

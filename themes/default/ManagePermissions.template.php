@@ -331,7 +331,7 @@ function template_edit_profiles()
 					<tr class="table_head">
 						<th>', $txt['permissions_profile_name'], '</th>
 						<th>', $txt['permissions_profile_used_by'], '</th>
-						<th class="perm_profile_delete" style="', !empty($context['show_rename_boxes']) ? ';display:none"' : '"', ' >', $txt['delete'], '</th>
+						<th class="perm_profile_delete', !empty($context['show_rename_boxes']) ? ' hide"' : '"', ' >', $txt['delete'], '</th>
 					</tr>
 				</thead>
 				<tbody>';
@@ -354,7 +354,7 @@ function template_edit_profiles()
 						<td>
 							', !empty($profile['boards_text']) ? $profile['boards_text'] : $txt['permissions_profile_used_by_none'], '
 						</td>
-						<td class="centertext perm_profile_delete" ', !empty($context['show_rename_boxes']) ? 'style="display:none"' : '', '>
+						<td class="centertext perm_profile_delete', !empty($context['show_rename_boxes']) ? ' hide"' : '"', '>
 							<input type="checkbox" name="delete_profile[]" value="', $profile['id'], '" ', $profile['can_delete'] ? '' : 'disabled="disabled"', ' />
 						</td>
 					</tr>';
@@ -369,10 +369,12 @@ function template_edit_profiles()
 
 	if ($context['can_edit_something'])
 		echo '
-				<input type="submit" id="rename" name="rename" value="', empty($context['show_rename_boxes']) ? $txt['permissions_profile_rename'] : $txt['permissions_commit'], '" class="button_submit" />';
+				<input  id="rename" type="submit" name="rename" value="', empty($context['show_rename_boxes']) ? $txt['permissions_profile_rename'] : $txt['permissions_commit'], '" />';
 
 	echo '
-				<input type="submit" id="delete" name="delete" value="', $txt['quickmod_delete_selected'], '" class="button_submit" ', !empty($context['show_rename_boxes']) ? ' style="display:none"' : '', '/>
+				<span', !empty($context['show_rename_boxes']) ? ' class="hide"' : '', '>
+					<input id="delete" type="submit" name="delete" value="', $txt['quickmod_delete_selected'], '" />
+				</span>
 			</div>
 		</form>
 		<br />

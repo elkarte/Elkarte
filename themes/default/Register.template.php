@@ -119,7 +119,7 @@ function template_registration_form()
 			<h2 class="category_header">', $txt['registration_form'], '</h2>
 			<h2 class="category_header">', $txt['required_info'], '</h2>
 			<div class="content">
-				<input type="password" name="autofill_honey_pot" style="display:none" />
+				<input type="password" name="autofill_honey_pot" class="hide" />
 				<fieldset class="content">
 					<dl class="settings">
 						<dt>
@@ -587,7 +587,7 @@ function template_admin_register()
 					</div>';
 
 	echo '
-					<input type="password" name="autofill_honey_pot" style="display:none" />
+					<input type="password" name="autofill_honey_pot" class="hide" />
 					<div class="flow_auto">
 					<dl class="settings" id="admin_register_form">
 						<dt>

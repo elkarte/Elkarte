@@ -624,7 +624,7 @@ function template_control_chmod()
 	}
 
 	echo '
-				<div id="ftp_error_div" class="errorbox" style="', (!empty($context['package_ftp']['error']) ? '' : 'display:none;'), '">
+				<div id="ftp_error_div" class="errorbox', !empty($context['package_ftp']['error']) ? '"' : ' hide"', '>
 					<span id="ftp_error_message">', !empty($context['package_ftp']['error']) ? $context['package_ftp']['error'] : '', '</span>
 				</div>';
 

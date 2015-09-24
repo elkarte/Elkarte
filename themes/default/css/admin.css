@@ -693,7 +693,7 @@ ul.package_servers li {
 .visible_boards .board label,
 .select_all_box label,
 .select_category label {
-	width: 30%;
+	width: 32%;
 	display: inline-block;
 }
 
@@ -978,6 +978,14 @@ dl.themes_list dd {
 .theme_settings .input_text {
 	max-width: 100%;
 	width: 30em;
+}
+
+#css_preview_box {
+	display: none;
+	margin-bottom: 2ex;
+	width: 99%;
+	height: 300px;
+	border: 1px solid black;
 }
 
 /* Styles for the registration center.

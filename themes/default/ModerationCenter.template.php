@@ -71,8 +71,8 @@ function template_latest_news()
 
 	// This requires a lot of javascript...
 	echo '
-								<span style="display:none" id="installedVersion">??</span>
-								<span style="display:none" id="latestVersion">??</span>
+								<span class="hide" id="installedVersion">??</span>
+								<span class="hide" id="latestVersion">??</span>
 								<script><!-- // --><![CDATA[
 						var oAdminCenter = new elk_AdminIndex({
 							bLoadAnnouncements: true,
@@ -580,7 +580,7 @@ function template_warn_template()
 		</div>
 		<div id="modcenter">
 			<div class="content">
-				<div class="errorbox"', empty($context['warning_errors']) ? ' style="display: none"' : '', ' id="errors">
+				<div class="errorbox', empty($context['warning_errors']) ? ' hide"' : '"', ' id="errors">
 					<dl>
 						<dt>
 							<strong id="error_serious">', $txt['error_while_submitting'], '</strong>
@@ -590,7 +590,7 @@ function template_warn_template()
 						</dd>
 					</dl>
 				</div>
-				<div id="box_preview"', !empty($context['template_preview']) ? '' : ' style="display:none"', '>
+				<div id="box_preview"', !empty($context['template_preview']) ? '' : ' class="hide"', '>
 					<dl class="settings">
 						<dt>
 							<strong>', $txt['preview'], '</strong>
