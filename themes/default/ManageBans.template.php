@@ -90,7 +90,7 @@ function template_ban_edit()
 	if (!empty($context['ban_suggestions']))
 	{
 		echo '
-				<fieldset>
+				<fieldset class="clear">
 					<legend>
 						<input type="checkbox" onclick="invertAll(this, this.form, \'ban_suggestion\');" class="input_check"> ', $txt['ban_triggers'], '
 					</legend>
