@@ -316,7 +316,7 @@ function template_show_month_grid($grid_name)
 
 					// Each of the birthdays has:
 					// id, name (person), age (if they have one set?), and is_last. (last in list?)
-					$use_js_hide = empty($context['show_all_birthdays']) && count($day['birthdays']) > 15;
+					$use_js_hide = empty($context['show_all_birthdays']) && count($day['birthdays']) > 10;
 					$count = 0;
 					foreach ($day['birthdays'] as $member)
 					{
@@ -327,9 +327,9 @@ function template_show_month_grid($grid_name)
 						if ($count == 10 && $use_js_hide)
 							echo '
 									<span class="hidelink" id="bdhidelink_', $day['day'], '">...<br />
-										<a href="', $scripturl, '?action=calendar;month=', $calendar_data['current_month'], ';year=', $calendar_data['current_year'], ';showbd" onclick="document.getElementById(\'bdhide_', $day['day'], '\').style.display = \'\'; document.getElementById(\'bdhidelink_', $day['day'], '\').style.display = \'none\'; return false;">(', sprintf($txt['calendar_click_all'], count($day['birthdays'])), ')</a>
+										<a href="', $scripturl, '?action=calendar;month=', $calendar_data['current_month'], ';year=', $calendar_data['current_year'], ';showbd" onclick="document.getElementById(\'bdhide_', $day['day'], '\').style.display = \'block\'; document.getElementById(\'bdhidelink_', $day['day'], '\').style.display = \'none\'; return false;">(', sprintf($txt['calendar_click_all'], count($day['birthdays'])), ')</a>
 									</span>
-									<span id="bdhide_', $day['day'], '" style="display: none;">, ';
+									<span id="bdhide_', $day['day'], '" class="hide">, ';
 
 						$count++;
 					}

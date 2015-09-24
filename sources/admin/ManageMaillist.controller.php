@@ -714,9 +714,9 @@ class ManageMaillist_Controller extends Action_Controller
 				array(
 					'position' => 'below_table_data',
 					'class' => 'submitbutton',
-					'value' => '<input type="submit" name="addfilter" value="' . $txt['add_filter'] . '" class="right_submit" />
+					'value' => '<input type="submit" name="addfilter" value="' . $txt['add_filter'] . '" />
 						<a class="linkbutton" href="' . $scripturl . '?action=admin;area=maillist;sa=sortfilters">' . $txt['sort_filter'] . '</a>',
-					),
+				),
 			),
 		);
 
@@ -1547,7 +1547,7 @@ class ManageMaillist_Controller extends Action_Controller
 			oEmailOptionsdd = {size: \'1\', type: \'select\', name: \'boardto[]\', class: \'input_select\'},
 			oEmailSelectData = {' . $script . '};
 
-			document.getElementById(\'add_more_board_div\').style.display = \'\';', true
+			document.getElementById(\'add_more_board_div\').style.display = \'block\';', true
 		);
 
 		$context['boards'] = $board_list;

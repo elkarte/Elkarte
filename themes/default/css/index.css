@@ -53,11 +53,11 @@
 .wrapper {
 	margin: 0 auto;
 	/* Next controls forum width, when it is not set in admin. */
-	max-width: 90em;
+	width: 90%;
 	/* Next limits maximum width on wide screens. */
 	/* Sized in em, since some people require larger text. */
 	/* For ease of reading, content really should not be too wide. */
-	width: 90%;
+	max-width: 90em;
 }
 
 /* Cursor declared here.Should not be required anywhere else. */
@@ -264,8 +264,9 @@ input[type=submit][disabled]:hover, button[disabled], button[disabled]:hover {
 .linkbutton:link, .linkbutton_right:link, .linkbutton_left:link,
 .linkbutton:visited, .linkbutton_right:visited, .linkbutton_left:visited {
 	font-size: 0.857em;
-	line-height: 1em;
-	padding: 0.3em;
+	line-height: 1.929em;
+	/*padding: 0.4em 0.5em 0.5em 0.5em;*/
+
 }
 
 /* Use new class that is defined to suit, and with a sensible name. */
@@ -506,7 +507,6 @@ em, .em {
 /* Expand/Collapse image in the various headers */
 .panel_toggle span {
 	position: relative;
-	display: block;
 	float: right;
 	overflow: hidden;
 	padding: 0 16px;
@@ -1292,13 +1292,8 @@ a.bbc_link {
 }
 
 .quickbuttons .inline_mod_check {
-	margin: 4px 0 0;
+	margin: 4px;
 	padding: 0 4px;
-}
-
-.inline_mod_check .input_check {
-	margin: 0 0 2px;
-	height: auto;
 }
 
 /* @todo - Save code by amalgamating common button background declarations. */
@@ -3574,7 +3569,7 @@ dl.merge_topic dd {
 }
 
 #slider-range-min {
-	margin: 1em 0;
+	margin: 1em 0 1em .6em;
 	width: 80%;
 }
 
@@ -4411,8 +4406,8 @@ a.help .icon {
 
 /* Lotsa boxes. */
 .description, .information, .warningbox, .successbox, .infobox, .errorbox {
-	margin: 0 0 12px 0;
-	padding: 6px 12px;
+	margin: 0 0 16px 0;
+	padding: 4px 12px;
 	font-size: 0.929em;
 }
 

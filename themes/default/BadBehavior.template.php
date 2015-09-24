@@ -134,8 +134,9 @@ function template_callback_badbehavior_add_ip()
 	// Whitelist by IP
 	echo '
 		</dl>
-		<hr />
-		<a href="' . $scripturl . '?action=quickhelp;help=badbehavior_ip_wl" onclick="return reqOverlayDiv(this.href);" class="help"><img src="' . $settings['images_url'] . '/helptopics.png" class="icon" alt="' . $txt['help'] . '" /></a>', $txt['badbehavior_ip_wl'], '
+		<h3 class="secondary_header">
+			<a class="help" href="' . $scripturl . '?action=quickhelp;help=badbehavior_ip_wl" onclick="return reqOverlayDiv(this.href);" class="help"><img src="' . $settings['images_url'] . '/helptopics.png" class="icon" alt="' . $txt['help'] . '" /></a>', $txt['badbehavior_ip_wl'], '
+		</h3>
 		<dl class="settings">
 			<dt>',
 				$txt['badbehavior_wl_comment'], '
@@ -171,9 +172,11 @@ function template_callback_badbehavior_add_ip()
 
 	// And a link so they can add more
 	echo '
-			<dt id="add_more_ip_placeholder" style="display: none;"></dt>
+			<dt id="add_more_ip_placeholder" class="hide"></dt>
 			<dd></dd>
-			<dt id="add_more_ip_div"><a href="#" onclick="addAnotherOption(sIpParent, oIpOptionsdt, oIpOptionsdd); return false;" class="linkbutton_left">', $txt['badbehavior_ip_wl_add'], '</a></dt>
+			<dt id="add_more_ip_div">
+				<a href="#" onclick="addAnotherOption(sIpParent, oIpOptionsdt, oIpOptionsdd); return false;" class="linkbutton_left">', $txt['badbehavior_ip_wl_add'], '</a>
+			</dt>
 			<dd></dd>';
 }
 
@@ -187,9 +190,10 @@ function template_callback_badbehavior_add_url()
 	// whitelist by URL
 	echo '
 		</dl>
-		<hr />
-		<a href="' . $scripturl . '?action=quickhelp;help=badbehavior_url_wl" onclick="return reqOverlayDiv(this.href);" class="help"><img src="' . $settings['images_url'] . '/helptopics.png" class="icon" alt="' . $txt['help'] . '" /></a>', $txt['badbehavior_url_wl'], '
-		<dl class="settings">
+		<h3 class="secondary_header">
+			<a class="help" href="' . $scripturl . '?action=quickhelp;help=badbehavior_url_wl" onclick="return reqOverlayDiv(this.href);" class="help"><img src="' . $settings['images_url'] . '/helptopics.png" class="icon" alt="' . $txt['help'] . '" /></a>', $txt['badbehavior_url_wl'], '
+		</h3>
+			<dl class="settings">
 			<dt>',
 				$txt['badbehavior_wl_comment'], '
 			</dt>
@@ -224,9 +228,11 @@ function template_callback_badbehavior_add_url()
 
 	// And a link so they can add more
 	echo '
-			<dt id="add_more_url_placeholder" style="display: none;"></dt>
+			<dt id="add_more_url_placeholder" class="hide"></dt>
 			<dd></dd>
-			<dt id="add_more_url_div"><a href="#" onclick="addAnotherOption(sUrlParent, oUrlOptionsdt, oUrlOptionsdd); return false;" class="linkbutton_left">', $txt['badbehavior_url_wl_add'], '</a></dt>
+			<dt id="add_more_url_div">
+				<a href="#" onclick="addAnotherOption(sUrlParent, oUrlOptionsdt, oUrlOptionsdd); return false;" class="linkbutton_left">', $txt['badbehavior_url_wl_add'], '</a>
+			</dt>
 			<dd></dd>';
 }
 
@@ -241,9 +247,10 @@ function template_callback_badbehavior_add_useragent()
 	// whitelist by User Agent String
 	echo '
 		</dl>
-		<hr />
-		<a href="' . $scripturl . '?action=quickhelp;help=badbehavior_useragent_wl" onclick="return reqOverlayDiv(this.href);" class="help"><img src="' . $settings['images_url'] . '/helptopics.png" class="icon" alt="' . $txt['help'] . '" /></a>', $txt['badbehavior_useragent_wl'], '
-		<dl class="settings">
+		<h3 class="secondary_header">
+			<a class="help" href="' . $scripturl . '?action=quickhelp;help=badbehavior_useragent_wl" onclick="return reqOverlayDiv(this.href);" class="help"><img src="' . $settings['images_url'] . '/helptopics.png" class="icon" alt="' . $txt['help'] . '" /></a>', $txt['badbehavior_useragent_wl'], '
+		</h3>
+			<dl class="settings">
 			<dt>',
 				$txt['badbehavior_wl_comment'], '
 			</dt>
@@ -276,8 +283,10 @@ function template_callback_badbehavior_add_useragent()
 
 	// And a link so they can add more
 	echo '
-			<dt id="add_more_useragent_placeholder" style="display: none;"></dt>
+			<dt id="add_more_useragent_placeholder" class="hide"></dt>
 			<dd></dd>
-			<dt id="add_more_useragent_div"><a href="#" onclick="addAnotherOption(sUseragentParent, oUseragentOptionsdt, oUseragentOptionsdd); return false;" class="linkbutton_left">', $txt['badbehavior_useragent_wl_add'], '</a></dt>
+			<dt id="add_more_useragent_div">
+				<a href="#" onclick="addAnotherOption(sUseragentParent, oUseragentOptionsdt, oUseragentOptionsdd); return false;" class="linkbutton_left">', $txt['badbehavior_useragent_wl_add'], '</a>
+			</dt>
 			<dd></dd>';
 }

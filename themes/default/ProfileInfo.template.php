@@ -976,14 +976,19 @@ function template_profile_block_moderation()
 			// If the person looking at the summary has permission, and the account isn't activated, give the viewer the ability to do it themselves.
 			if (!empty($context['activate_message']))
 				echo '
-					<dt class="clear"><span class="alert">', $context['activate_message'], '</span>&nbsp;(<a href="' . $context['activate_url'] . '"', ($context['activate_type'] == 4 ? ' onclick="return confirm(\'' . $txt['profileConfirm'] . '\');"' : ''), '>', $context['activate_link_text'], '</a>)</dt>';
+					<dt class="clear">
+						<span class="alert">', $context['activate_message'], '</span>&nbsp;(<a href="' . $context['activate_url'] . '"', ($context['activate_type'] == 4 ? ' onclick="return confirm(\'' . $txt['profileConfirm'] . '\');"' : ''), '>', $context['activate_link_text'], '</a>)
+					</dt>';
 
 			// If the current member is banned, show a message and possibly a link to the ban.
 			if (!empty($context['member']['bans']))
 			{
 				echo '
-					<dt class="clear"><span class="alert">', $txt['user_is_banned'], '</span>&nbsp;[<a href="#" onclick="document.getElementById(\'ban_info\').style.display = document.getElementById(\'ban_info\').style.display == \'none\' ? \'\' : \'none\';return false;">' . $txt['view_ban'] . '</a>]</dt>
-					<dt class="clear" id="ban_info" style="display: none;">
+					<dt class="clear">
+						<span class="alert">', $txt['user_is_banned'], '</span>&nbsp;
+						[<a href="#" onclick="document.getElementById(\'ban_info\').style.display = document.getElementById(\'ban_info\').getComputedStyle().getPropertyValue("display") === \'none\' ? \'inline\' : \'none\';return false;">' . $txt['view_ban'] . '</a>]
+					</dt>
+					<dt class="clear hide" id="ban_info">
 						<strong>', $txt['user_banned_by_following'], ':</strong>';
 
 				foreach ($context['member']['bans'] as $ban)

@@ -108,7 +108,7 @@ function template_set_password()
  					</dt>
 					<dd>
 						<input type="password" name="passwrd1" id="elk_autov_pwmain" size="22" class="input_password" />
-						<span id="elk_autov_pwmain_div" style="display: none;">
+						<span id="elk_autov_pwmain_div" class="hide">
 							<img id="elk_autov_pwmain_img" src="', $settings['images_url'], '/icons/field_invalid.png" alt="*" />
 						</span>
 					</dd>
@@ -117,7 +117,7 @@ function template_set_password()
 					</dt>
 					<dd>
 						<input type="password" name="passwrd2" id="elk_autov_pwverify" size="22" class="input_password" />
-						<span id="elk_autov_pwverify_div" style="display: none;">
+						<span id="elk_autov_pwverify_div" class="hide">
 							<img id="elk_autov_pwverify_img" src="', $settings['images_url'], '/icons/field_invalid.png" alt="*" />
 						</span>
 					</dd>';
@@ -185,7 +185,7 @@ function template_ask()
  					</dt>
 					<dd>
 						<input type="password" name="passwrd1" id="elk_autov_pwmain" size="22" class="input_password" />
-						<span id="elk_autov_pwmain_div" style="display: none;">
+						<span id="elk_autov_pwmain_div" class="hide">
 							<img id="elk_autov_pwmain_img" src="', $settings['images_url'], '/icons/field_invalid.png" alt="*" />
 						</span>
 					</dd>
@@ -194,7 +194,7 @@ function template_ask()
 					</dt>
 					<dd>
 						<input type="password" name="passwrd2" id="elk_autov_pwverify" size="22" class="input_password" />
-						<span id="elk_autov_pwverify_div" style="display: none;">
+						<span id="elk_autov_pwverify_div" class="hide">
 							<img id="elk_autov_pwverify_img" src="', $settings['images_url'], '/icons/field_valid.png" alt="*" />
 						</span>
 					</dd>';

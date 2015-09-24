@@ -182,7 +182,7 @@ function template_merge_extra_options()
 	echo '
 				<fieldset id="merge_subject" class="merge_options">
 					<legend>', $txt['merge_select_subject'], '</legend>
-					<select name="subject" onchange="this.form.custom_subject.style.display = (this.options[this.selectedIndex].value != 0) ? \'none\': \'\' ;">';
+					<select name="subject" onchange="this.form.custom_subject.style.display = (this.options[this.selectedIndex].value != 0) ? \'none\': \'block\' ;">';
 
 	foreach ($context['topics'] as $topic)
 		echo '
@@ -192,9 +192,10 @@ function template_merge_extra_options()
 						<option value="0">', $txt['merge_custom_subject'], ':</option>
 					</select>
 					<br />
-					<input type="text" name="custom_subject" size="60" id="custom_subject" class="input_text custom_subject" style="display: none;" />
+					<input type="text" name="custom_subject" size="50" id="custom_subject" class="input_text custom_subject hide" />
 					<br />
-					<label for="enforce_subject"><input type="checkbox" name="enforce_subject" id="enforce_subject" value="1" /> ', $txt['merge_enforce_subject'], '</label>
+					<input type="checkbox" name="enforce_subject" id="enforce_subject" value="1" />
+					<label for="enforce_subject">', $txt['merge_enforce_subject'], '</label>
 				</fieldset>';
 
 	if (!empty($context['boards']) && count($context['boards']) > 1)

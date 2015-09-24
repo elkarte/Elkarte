@@ -829,8 +829,8 @@ elk_Toggle.prototype.init = function()
 			if (typeof(oImage) === 'object' && oImage !== null)
 			{
 				// Display the image in case it was hidden.
-				if (oImage.style.display === 'none')
-					oImage.style.display = '';
+				if (getComputedStyle(oImage).getPropertyValue("display") === 'none')
+					oImage.style.display = 'inline';
 
 				oImage.instanceRef = this;
 				oImage.onclick = function () {this.instanceRef.toggle();this.blur();};
@@ -850,8 +850,8 @@ elk_Toggle.prototype.init = function()
 			if (typeof(oContainer) === 'object' && oContainer !== null)
 			{
 				// Display the image in case it was hidden.
-				if (oContainer.style.display === 'none')
-					oContainer.style.display = '';
+				if (getComputedStyle(oContainer).getPropertyValue("display") === 'none')
+					oContainer.style.display = 'block';
 
 				oContainer.instanceRef = this;
 				oContainer.onclick = function () {
@@ -872,8 +872,8 @@ elk_Toggle.prototype.init = function()
 			if (typeof(oLink) === 'object' && oLink !== null)
 			{
 				// Display the link in case it was hidden.
-				if (oLink.style.display === 'none')
-					oLink.style.display = '';
+				if (getComputedStyle(oLink).getPropertyValue("display") === 'none')
+					oLink.style.display = 'inline-block';
 
 				oLink.instanceRef = this;
 				oLink.onclick = function () {

@@ -54,7 +54,7 @@ function template_permission_index()
 		echo '
 			<h2 class="category_header panel_toggle">
 				<span>
-					<span id="upshrink_ic" class="', empty($context['admin_preferences']['app']) ? 'collapse' : 'expand', '" style="display: none;" title="', $txt['hide'], '"></span>
+					<span id="upshrink_ic" class="', empty($context['admin_preferences']['app']) ? 'collapse' : 'expand', ' hide" title="', $txt['hide'], '"></span>
 				</span>
 				<a href="#" id="permissions_panel_link">', $txt['permissions_advanced_options'], '</a>
 			</h2>
@@ -562,7 +562,7 @@ function template_modify_group_classic($type)
 				if ($permission['hidden'] || $permissionGroup['hidden'])
 				{
 					echo '
-						<tr style="display: none;">
+						<tr class="hide">
 							<td>';
 
 					if ($permission['has_own_any'])

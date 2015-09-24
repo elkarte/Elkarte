@@ -415,7 +415,7 @@ QuickModify.prototype.onMessageReceived = function (XMLDoc)
 	if (this.opt.sIconHide !== null)
 	{
 		this.oMsgIcon = document.getElementById('messageicon_' + this.sCurMessageId.replace("msg_", ""));
-		if (this.oMsgIcon !== null && this.oMsgIcon.style.display === 'none')
+		if (this.oMsgIcon !== null && getComputedStyle(oMsgIcon).getPropertyValue("display") === 'none')
 			this.oMsgIcon.style.display = '';
 	}
 

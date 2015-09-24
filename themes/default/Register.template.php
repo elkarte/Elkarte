@@ -127,7 +127,7 @@ function template_registration_form()
 						</dt>
 						<dd>
 							<input type="text" name="user" id="elk_autov_username" size="30" tabindex="', $context['tabindex']++, '" maxlength="25" value="', isset($context['username']) ? $context['username'] : '', '" class="input_text" placeholder="', $txt['username'], '" required="required" autofocus="autofocus" />
-							<span id="elk_autov_username_div" style="display: none;">
+							<span id="elk_autov_username_div" class="hide">
 								<a id="elk_autov_username_link" href="#">
 									<img id="elk_autov_username_img" src="', $settings['images_url'], '/icons/field_check.png" alt="*" />
 								</a>
@@ -174,7 +174,7 @@ function template_registration_form()
 						<dt><label for="elk_autov_pwmain">', $txt['choose_pass'], ':</label></dt>
 						<dd>
 							<input type="password" name="passwrd1" id="elk_autov_pwmain" size="30" tabindex="', $context['tabindex']++, '" class="input_password" placeholder="', $txt['choose_pass'], '" required="required" />
-							<span id="elk_autov_pwmain_div" style="display: none;">
+							<span id="elk_autov_pwmain_div" class="hide">
 								<img id="elk_autov_pwmain_img" src="', $settings['images_url'], '/icons/field_invalid.png" alt="*" />
 							</span>
 						</dd>
@@ -183,7 +183,7 @@ function template_registration_form()
 						<dt><label for="elk_autov_pwverify">', $txt['verify_pass'], ':</label></dt>
 						<dd>
 							<input type="password" name="passwrd2" id="elk_autov_pwverify" size="30" tabindex="', $context['tabindex']++, '" class="input_password" placeholder="', $txt['verify_pass'], '" required="required" />
-							<span id="elk_autov_pwverify_div" style="display: none;">
+							<span id="elk_autov_pwverify_div" class="hide">
 								<img id="elk_autov_pwverify_img" src="', $settings['images_url'], '/icons/field_valid.png" alt="*" />
 							</span>
 						</dd>

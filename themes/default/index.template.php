@@ -233,7 +233,7 @@ function template_body_above()
 
 	echo '
 		</div>
-		<div id="header" class="wrapper', !empty($settings['header_layout']) ? ($settings['header_layout'] == 1 ? ' centerheader' : ' rightheader') : '', '"', empty($context['minmax_preferences']['upshrink']) ? '' : ' style="display: none;" aria-hidden="true"', '>
+		<div id="header" class="wrapper', !empty($settings['header_layout']) ? ($settings['header_layout'] == 1 ? ' centerheader' : ' rightheader') : '', empty($context['minmax_preferences']['upshrink']) ? '"' : ' hide" aria-hidden="true"', '>
 			<h1 id="forumtitle">
 				<a class="forumlink" href="', $scripturl, '">', $context['forum_name'], '</a>';
 
@@ -255,7 +255,7 @@ function template_body_above()
 		</div>
 	</div>
 	<div id="wrapper" class="wrapper">
-		<div id="upper_section"', empty($context['minmax_preferences']['upshrink']) ? '' : ' style="display: none;" aria-hidden="true"', '>';
+		<div id="upper_section"', empty($context['minmax_preferences']['upshrink']) ? '' : ' class="hide" aria-hidden="true"', '>';
 
 	call_template_callbacks('uc', $context['upper_content_callbacks']);
 
@@ -507,7 +507,7 @@ function template_menu()
 						<li id="collapse_button" class="listlevel1">
 							<a class="linklevel1 panel_toggle">
 								<span>
-									<span id="upshrink" class="collapse" style="display: none;" title="', $txt['upshrink_description'], '"></span>
+									<span id="upshrink" class="collapse hide" title="', $txt['upshrink_description'], '"></span>
 								</span>
 							</a>
 						</li>';
@@ -630,7 +630,7 @@ function template_button_strip($button_strip, $direction = '', $strip_options = 
 		return;
 
 	echo '
-							<ul role="menubar" class="buttonlist', !empty($direction) ? ' float' . $direction : '', '"', (empty($buttons) ? ' style="display: none;"' : ''), (!empty($strip_options['id']) ? ' id="' . $strip_options['id'] . '"' : ''), '>
+							<ul role="menubar" class="buttonlist', !empty($direction) ? ' float' . $direction : '', (empty($buttons) ? ' hide"' : '"'), (!empty($strip_options['id']) ? ' id="' . $strip_options['id'] . '"' : ''), '>
 								', implode('', $buttons), '
 							</ul>';
 }

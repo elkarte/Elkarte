@@ -158,13 +158,13 @@ function template_messages()
 
 		echo '
 							<span id="post_subject_', $message['id'], '" class="post_subject">', $message['subject'], '</span>
-							<span id="messageicon_', $message['id'], '" class="messageicon"  ', ($message['icon_url'] !== $settings['images_url'] . '/post/xx.png') ? '' : 'style="display:none;"', '>
+							<span id="messageicon_', $message['id'], '" class="messageicon', ($message['icon_url'] !== $settings['images_url'] . '/post/xx.png') ? '"' : ' hide"', '>
 								<img src="', $message['icon_url'] . '" alt=""', $message['can_modify'] ? ' id="msg_icon_' . $message['id'] . '"' : '', ' />
 							</span>
 							<h5 id="info_', $message['id'], '">
 								<a href="', $message['href'], '" rel="nofollow">', !empty($message['counter']) ? sprintf($txt['reply_number'], $message['counter']) : '', '</a>', !empty($message['counter']) ? ' &ndash; ' : '', $message['html_time'], '
 							</h5>
-							<div id="msg_', $message['id'], '_quick_mod"', $ignoring ? ' style="display:none;"' : '', '></div>
+							<div id="msg_', $message['id'], '_quick_mod"', $ignoring ? ' class="hide"' : '', '></div>
 						</div>';
 
 		// Ignoring this user? Hide the post.
@@ -172,7 +172,7 @@ function template_messages()
 			echo '
 						<div id="msg_', $message['id'], '_ignored_prompt">
 							', $txt['ignoring_user'], '
-							<a href="#" id="msg_', $message['id'], '_ignored_link" style="display: none;">', $txt['show_ignore_user_post'], '</a>
+							<a href="#" id="msg_', $message['id'], '_ignored_link" class="hide">', $txt['show_ignore_user_post'], '</a>
 						</div>';
 
 		// Awaiting moderation?
@@ -184,7 +184,7 @@ function template_messages()
 
 		// Show the post itself, finally!
 		echo '
-						<div class="inner" id="msg_', $message['id'], '"', $ignoring ? ' style="display:none;"' : '', '>', $message['body'], '</div>';
+						<div id="msg_', $message['id'], '" class="inner', $ignoring ? ' hide"' : '""', '>', $message['body'], '</div>';
 
 		// Assuming there are attachments...
 		if (!empty($message['attachment']))
@@ -197,7 +197,7 @@ function template_messages()
 		// Show a checkbox for quick moderation?
 		if (!empty($options['display_quick_mod']) && $options['display_quick_mod'] == 1 && $message['can_remove'])
 			echo '
-							<li class="listlevel1 inline_mod_check" style="display: none;" id="in_topic_mod_check_', $message['id'], '"></li>';
+							<li class="listlevel1 inline_mod_check none" id="in_topic_mod_check_', $message['id'], '"></li>';
 
 		// Show "Last Edit: Time by Person" if this post was edited.
 		if ($settings['show_modify'])
@@ -371,7 +371,7 @@ function template_messages()
 		// Show the member's signature?
 		if (!empty($message['member']['signature']) && empty($options['show_no_signatures']) && $context['signature_enabled'])
 			echo '
-						<div class="signature" id="msg_', $message['id'], '_signature"', $ignoring ? ' style="display:none;"' : '', '>', $message['member']['signature'], '</div>';
+						<div id="msg_', $message['id'], '_signature" class="signature', $ignoring ? ' hide"' : '"', '>', $message['member']['signature'], '</div>';
 
 		echo '
 					</div>
@@ -595,7 +595,7 @@ function template_quickreply_below()
 					iTopicId: ', $context['current_topic'], ',
 					sTemplateBodyEdit: ', JavaScriptEscape('
 						<div id="quick_edit_body_container">
-							<div id="error_box" class="errorbox" style="display:none;"></div>
+							<div id="error_box" class="errorbox hide"></div>
 							<textarea class="editor" name="message" rows="12" tabindex="' . $context['tabindex']++ . '">%body%</textarea><br />
 							<div class="submitbutton">
 								<input type="hidden" name="\' + elk_session_var + \'" value="\' + elk_session_id + \'" />
@@ -838,7 +838,7 @@ function template_display_attachments($message, $ignoring)
 	global $context, $txt, $scripturl, $settings;
 
 	echo '
-							<div id="msg_', $message['id'], '_footer" class="attachments"', $ignoring ? ' style="display:none;"' : '', '>';
+							<div id="msg_', $message['id'], '_footer" class="attachments', $ignoring ? ' hide"' : '""', '>';
 
 	$last_approved_state = 1;
 

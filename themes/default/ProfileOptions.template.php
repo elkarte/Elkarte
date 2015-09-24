@@ -1175,7 +1175,7 @@ function template_profile_avatar_select()
 										</select>
 									</div>
 									<div>
-										<select name="file" id="file" size="10" style="display: none;" onchange="showAvatar()" disabled="disabled">
+										<select id="file" name="file" size="10" class="hide" onchange="showAvatar()" disabled="disabled">
 											<option> </option>
 										</select>
 									</div>
@@ -1372,7 +1372,7 @@ function template_authentication_method()
 					<dd>
 						<dl id="openid_group">
 							<dt>
-								<em><label for="openid_url">', $txt['authenticate_openid_url'], '</label></em>
+								<label for="openid_url">', $txt['authenticate_openid_url'], '</label>
 							</dt>
 							<dd>
 								<input type="text" name="openid_identifier" id="openid_url" size="30" tabindex="', $context['tabindex']++, '" value="', $context['member']['openid_uri'], '" class="input_text openid_login" />
@@ -1384,7 +1384,9 @@ function template_authentication_method()
 							</dt>
 							<dd>
 								<input type="password" name="passwrd1" id="elk_autov_pwmain" size="30" tabindex="', $context['tabindex']++, '" class="input_password" placeholder="', $txt['choose_pass'], '" />
-								<span id="elk_autov_pwmain_div" style="display: none;"><img id="elk_autov_pwmain_img" class="centericon" src="', $settings['images_url'], '/icons/field_invalid.png" alt="*" /></span>
+								<span id="elk_autov_pwmain_div" class="hide">
+									<img id="elk_autov_pwmain_img" class="centericon" src="', $settings['images_url'], '/icons/field_invalid.png" alt="*" />
+								</span>
 							</dd>
 						</dl>
 						<dl id="password2_group">
@@ -1393,7 +1395,9 @@ function template_authentication_method()
 							</dt>
 							<dd>
 								<input type="password" name="passwrd2" id="elk_autov_pwverify" size="30" tabindex="', $context['tabindex']++, '" class="input_password" placeholder="', $txt['verify_pass'], '" />
-								<span id="elk_autov_pwverify_div" style="display: none;"><img id="elk_autov_pwverify_img" class="centericon" src="', $settings['images_url'], '/icons/field_valid.png" alt="*" /></span>
+								<span id="elk_autov_pwverify_div" class="hide">
+									<img id="elk_autov_pwverify_img" class="centericon" src="', $settings['images_url'], '/icons/field_valid.png" alt="*" />
+								</span>
 							</dd>
 						</dl>
 					</dd>

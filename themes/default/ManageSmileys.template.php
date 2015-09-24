@@ -289,10 +289,10 @@ function template_addsmiley()
 						</dd>
 					</dl>
 				</fieldset>
-				<fieldset id="ul_settings" style="display: none;">
+				<fieldset id="ul_settings" class="hide">
 					<dl class="settings">
 						<dt>
-							<strong>', $txt['smileys_add_upload_choose'], ':</strong><br />
+							<label>', $txt['smileys_add_upload_choose'], ':</label><br />
 							<span class="smalltext">', $txt['smileys_add_upload_choose_desc'], '</span>
 						</dt>
 						<dd>
@@ -306,7 +306,7 @@ function template_addsmiley()
 						</dd>
 					</dl>
 				</fieldset>
-				<dl id="uploadMore" style="display: none;" class="settings">';
+				<dl id="uploadMore" class="settings hide">';
 
 	foreach ($context['smiley_sets'] as $smiley_set)
 		echo '

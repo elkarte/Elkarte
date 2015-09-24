@@ -59,7 +59,7 @@ function template_postarea_above()
 
 	// If the user wants to see how their message looks - the preview section is where it's at!
 	echo '
-			<div id="preview_section"', isset($context['preview_message']) ? '' : ' style="display: none;"', '>
+			<div id="preview_section"', isset($context['preview_message']) ? '' : ' class="hide"', '>
 				<h2 class="category_header">
 					<span id="preview_subject">', empty($context['preview_subject']) ? '' : $context['preview_subject'], '</span>
 				</h2>
@@ -100,7 +100,7 @@ function template_postarea_above()
 
 	if (!empty($context['drafts_autosave']))
 		echo '
-						<div id="draft_section" class="successbox"', isset($context['draft_saved']) ? '' : ' style="display: none;"', '>
+						<div id="draft_section" class="successbox', isset($context['draft_saved']) ? '"' : ' hide"', '>
 							', sprintf($txt['draft_saved'], $scripturl . '?action=profile;u=' . $context['user']['id'] . ';area=showdrafts'), '
 						</div>';
 
@@ -328,13 +328,13 @@ function template_additional_options_below()
 		echo '
 					<h3 id="postAdditionalOptionsHeader" class="category_header panel_toggle">
 						<span>
-							<span id="postMoreExpand" class="', empty($context['minmax_preferences']['pmdraft']) ? 'collapse' : 'expand', '" style="display: none;" title="', $txt['hide'], '"></span>
+							<span id="postMoreExpand" class="', empty($context['minmax_preferences']['post']) ? 'collapse' : 'expand', ' hide" title="', $txt['hide'], '"></span>
 						</span>
 						<a href="#" id="postMoreExpandLink">', $context['attachments']['can']['post'] ? $txt['post_additionalopt_attach'] : $txt['post_additionalopt'], '</a>
 					</h3>';
 
 	echo '
-					<div id="', empty($settings['additional_options_collapsible']) ? 'postAdditionalOptionsNC"' : 'postAdditionalOptions"', empty($settings['additional_options_collapsible']) || empty($context['minmax_preferences']['post']) ? '' : ' style="display: none;"', '>';
+					<div id="', empty($settings['additional_options_collapsible']) ? 'postAdditionalOptionsNC"' : 'postAdditionalOptions"', empty($settings['additional_options_collapsible']) || empty($context['minmax_preferences']['post']) ? '' : ' class="hide"', '>';
 
 	// Is the user allowed to post or if this post already has attachments on it give them the boxes.
 	if ($context['attachments']['can']['post'] || !empty($context['attachments']['current']))
@@ -490,11 +490,11 @@ function template_load_drafts_below()
 	echo '
 					<h3 id="postDraftOptionsHeader" class="category_header panel_toggle">
 						<span>
-							<span id="postDraftExpand" class="', empty($context['minmax_preferences']['draft']) ? 'collapse' : 'expand', '" style="display: none;" title="', $txt['hide'], '"></span>
+							<span id="postDraftExpand" class="', empty($context['minmax_preferences']['draft']) ? 'collapse' : 'expand', ' hide" title="', $txt['hide'], '"></span>
 						</span>
 						<a href="#" id="postDraftExpandLink">', $txt['draft_load'], '</a>
 					</h3>
-					<div id="postDraftOptions"', empty($context['minmax_preferences']['draft']) ? '' : ' style="display: none;"', '>
+					<div id="postDraftOptions"', empty($context['minmax_preferences']['draft']) ? '' : ' class="hide"', '>
 						<dl class="settings">
 							<dt>
 								<strong>', $txt['subject'], '</strong>
@@ -591,7 +591,7 @@ function template_topic_replies_below()
 				echo '
 					<div id="msg_', $post['id'], '_ignored_prompt">
 						', $txt['ignoring_user'], '
-						<a href="#" id="msg_', $post['id'], '_ignored_link" style="display: none;">', $txt['show_ignore_user_post'], '</a>
+						<a href="#" id="msg_', $post['id'], '_ignored_link" class="hide">', $txt['show_ignore_user_post'], '</a>
 					</div>';
 
 			echo '

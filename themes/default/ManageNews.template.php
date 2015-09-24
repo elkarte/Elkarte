@@ -85,7 +85,7 @@ function template_email_members()
 			<div id="exclude_panel_header">
 				<h2 class="category_header panel_toggle">
 					<span>
-						<span id="upshrink_ic" class="', empty($context['admin_preferences']['apn']) ? 'collapse' : 'expand', '" style="display: none;" title="', $txt['hide'], '"></span>
+						<span id="upshrink_ic" class="', empty($context['admin_preferences']['apn']) ? 'collapse' : 'expand', ' hide" title="', $txt['hide'], '"></span>
 					</span>
 					<a href="#" id="exclude_panel_link" >', $txt['exclude_these'], '</a>
 				</h2>
@@ -204,7 +204,7 @@ function template_email_members_compose()
 
 	// The preview section
 	echo '
-			<div id="preview_section"', isset($context['preview_message']) ? '' : ' style="display: none;"', '>
+			<div id="preview_section"', isset($context['preview_message']) ? '' : ' class="hide"', '>
 				<h2 class="category_header">
 					<span id="preview_subject">', empty($context['preview_subject']) ? '' : $context['preview_subject'], '</span>
 				</h2>

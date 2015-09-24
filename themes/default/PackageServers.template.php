@@ -152,9 +152,9 @@ function template_package_list()
 		{
 			echo '
 					<li>
-						<p class="panel_toggle">
+						<p class="panel_toggle secondary_header">
 							<span>
-								<span id="ps_img_', $i, '" class="collapse" style="display: none;" title="', $txt['hide'], '"></span>
+								<span id="ps_img_', $i, '" class="collapse hide" title="', $txt['hide'], '"></span>
 							</span>
 							<a href="#" id="upshrink_link_', $i, '" class="highlight">', $packageSection['title'], '</a>
 						</p>';
@@ -173,7 +173,7 @@ function template_package_list()
 							<li>';
 				// 1. Some addon [ Download ].
 				echo '
-								<img id="ps_img_', $i, '_pkg_', $id, '" src="', $settings['images_url'], '/selected_open.png" alt="*" style="display: none;" />
+								<img id="ps_img_', $i, '_pkg_', $id, '" src="', $settings['images_url'], '/selected_open.png" alt="*" class="hide" />
 								<a id="ps_link_', $i, '_pkg_', $id, '" href="#">', $package['name'], '</a>',
 				$package['can_install'] ? ' <a class="linkbutton" href="' . $package['download']['href'] . '">' . $txt['download'] . '</a>' : '';
 
