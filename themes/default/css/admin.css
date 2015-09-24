@@ -50,7 +50,7 @@
 #groupForm, #mailqueue_stats, #manage_maintenance,
 #new_group, #view_group, #admin_form_wrapper, .action_admin .generic_list_wrapper {
 	margin: 12px 0 0 0;
-	padding: 8px 8px 16px 8px;
+	padding: 8px;
 	overflow: auto;
 }
 
@@ -263,7 +263,7 @@ fieldset dl {
 /* Live news from elkarte.net and support information. */
 #admin_main_section {
 	margin: 12px 0 20px 0;
-	padding: 8px 0 4px 0;
+	padding: 8px 8px 4px 8px;
 }
 
 #live_news, #supportVersionsTable {
