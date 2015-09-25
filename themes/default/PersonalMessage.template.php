@@ -273,7 +273,7 @@ function template_folder()
 					echo '
 									</select>
 									<noscript>
-										<input type="submit" value="', $txt['pm_apply'], '" class="button_submit" />
+										<input type="submit" value="', $txt['pm_apply'], '" />
 									</noscript>';
 				}
 
@@ -539,7 +539,7 @@ function template_search()
 					<strong>', $txt['pm_search_text'], ':</strong>
 				</label>
 				<input type="search" id="search" class="input_text" name="search"', !empty($context['search_params']['search']) ? ' value="' . $context['search_params']['search'] . '"' : '', ' size="40" placeholder="', $txt['search'], '" required="required" autofocus="autofocus" />
-				<input type="submit" name="pm_search" value="', $txt['pm_search_go'], '" class="button_submit" />
+				<input type="submit" name="pm_search" value="', $txt['pm_search_go'], '" />
 			</div>';
 
 	// Now all the advanced options, hidden or shown by JS based on the users minmax choices
@@ -1179,8 +1179,8 @@ function template_labels()
 	if (!count($context['labels']) < 2)
 		echo '
 		<div class="submitbutton">
-			<input type="submit" name="save" value="', $txt['save'], '" class="button_submit" />
-			<input type="submit" name="delete" value="', $txt['quickmod_delete_selected'], '" onclick="return confirm(\'', $txt['pm_labels_delete'], '\');" class="button_submit" />
+			<input type="submit" name="save" value="', $txt['save'], '" />
+			<input type="submit" name="delete" value="', $txt['quickmod_delete_selected'], '" onclick="return confirm(\'', $txt['pm_labels_delete'], '\');" />
 		</div>';
 
 	echo '

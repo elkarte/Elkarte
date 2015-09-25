@@ -277,9 +277,10 @@ input[type=submit][disabled]:hover, button[disabled], button[disabled]:hover {
 	clear: both;
 }
 
-.submitbutton input[type="submit"] {
-	margin-right: 0.2em;
-	margin-left: 0.2em;
+.submitbutton input[type="submit"],
+.submitbutton input[type="button"]{
+	margin-right: 0.1em;
+	margin-left: 0.1em;
 	padding: 0 6px;
 }
 
@@ -1875,7 +1876,7 @@ a.bbc_link {
 	min-height: 2.2em;
 }
 
-#sort_by .input_check {
+#sort_by input[type="checkbox"] {
 	margin-bottom: 0;
 }
 
@@ -2875,7 +2876,7 @@ ul.post_options li {
 }
 
 #event_main select, .event_options li select,
-#event_main ul.event_options li .input_check {
+#event_main ul.event_options li input[type="checkbox"] {
 	margin: 0 12px 0 0;
 }
 
@@ -4055,10 +4056,6 @@ a.help .icon {
 	font-size: 1.071em;
 }
 
-#search_term_input .button_submit {
-	margin: 0 0 2px;
-}
-
 /* The advanced search section. */
 #search_options {
 	overflow: hidden;
@@ -4257,7 +4254,7 @@ a.help .icon {
 	width: 20em;
 }
 
-#memberlist_search .input_check {
+#memberlist_search input[type="checkbox"] {
 	margin: 4px 0 0 0;
 }
 
@@ -4290,7 +4287,7 @@ a.help .icon {
 	float: right;
 }
 
-#mlsearch_options .mlsearch_option .input_check {
+#mlsearch_options .mlsearch_option input[type="checkbox"] {
 	float: right;
 	margin: 0 0 0 0.5em;
 }
@@ -4345,15 +4342,6 @@ a.help .icon {
 	text-align: center;
 }
 
-#confirm_buttons {
-	padding: 12px 0;
-	text-align: center;
-}
-
-#confirm_buttons .button_submit {
-	white-space: normal;
-}
-
 .coppa_contact {
 	margin-left: 5ex;
 	padding: 4px;
@@ -4367,17 +4355,6 @@ a.help .icon {
 	height: 180px;
 	border: 1px solid;
 	text-align: justify;
-}
-
-/* Styles for maintenance mode. */
-#maintenance_mode {
-	min-width: 35em;
-	width: 75%;
-	text-align: left;
-}
-
-#maintenance_mode .floatleft {
-	margin-right: 12px;
 }
 
 /* Common for all admin sections. */
@@ -4866,15 +4843,15 @@ a.help .icon {
 /* This one does 800 screens at default font size. */
 @media screen and (max-width: 50em) {
 	dd input, dd select, dd textarea {
-		max-width: 100% !important;
-		width: 100% !important;
+		max-width: 85% !important;
+		width: 85% !important;
 	}
 
 	#post_header dd select {
 		max-width: 30% !important;
 	}
 
-	dd .input_check, dd .input_radio {
+	dd input[type="checkbox"], dd input[type="radio"] {
 		display: inline !important;
 		width: 1.5em !important;
 	}
@@ -5126,8 +5103,8 @@ a.help .icon {
 	}
 
 	dd input, dd select, dd textarea {
-		max-width: 90% !important;
-		width: 90% !important;
+		max-width: 89% !important;
+		width: 89% !important;
 	}
 
 	#postAttachment2 dt {
@@ -5636,6 +5613,7 @@ a.help .icon {
 
 	dt, dd, dd label, .login dt, #advanced_search dt {
 		width: 100% !important;
+		margin: 0 !important
 	}
 
 	dd {
@@ -5658,10 +5636,12 @@ a.help .icon {
 		padding: 4px;
 	}
 
-	#confirm_buttons .button_submit {
+	#confirm_buttons input[type="submit"] {
 		max-height: none;
 		height: inherit;
+		white-space: normal;
 	}
+
 	.fa.hamburger_30 {
 		padding-top: 0.1em;
 		display: inline-block;

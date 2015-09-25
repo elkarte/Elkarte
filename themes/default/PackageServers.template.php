@@ -72,7 +72,7 @@ function template_servers()
 						</dd>
 					</dl>
 					<div class="submitbutton">
-						<input type="submit" value="' . $txt['add_server'] . '" class="button_submit" />
+						<input type="submit" value="' . $txt['add_server'] . '" />
 						<input type="hidden" name="' . $context['session_var'] . '" value="' . $context['session_id'] . '" />
 					</div>
 				</form>
@@ -96,7 +96,7 @@ function template_servers()
 						</dd>
 					</dl>
 					<div class="submitbutton">
-						<input type="submit" value="', $txt['download'], '" class="button_submit" />
+						<input type="submit" value="', $txt['download'], '" />
 						<input type="hidden" value="byurl" name="byurl" />
 						<input type="hidden" name="' . $context['session_var'] . '" value="' . $context['session_id'] . '" />
 					</div>

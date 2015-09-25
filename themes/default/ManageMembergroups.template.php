@@ -345,8 +345,8 @@ function template_edit_group()
 	echo '
 				</dl>
 				<div class="submitbutton">
-					<input type="submit" name="save" value="', $txt['membergroups_edit_save'], '" class="button_submit" />', $context['group']['allow_delete'] ? '
-					<input type="submit" name="delete" value="' . $txt['membergroups_delete'] . '" onclick="return confirm(\'' . $txt['membergroups_confirm_delete'] . '\');" class="button_submit" />' : '', '
+					<input type="submit" name="save" value="', $txt['membergroups_edit_save'], '" />', $context['group']['allow_delete'] ? '
+					<input type="submit" name="delete" value="' . $txt['membergroups_delete'] . '" onclick="return confirm(\'' . $txt['membergroups_confirm_delete'] . '\');" />' : '', '
 					<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />
 					<input type="hidden" name="', $context['admin-mmg_token_var'], '" value="', $context['admin-mmg_token'], '" />
 				</div>

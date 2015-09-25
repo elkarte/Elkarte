@@ -414,7 +414,7 @@ function template_viewmodreport()
 	echo '
 								<textarea rows="2" cols="60" style="width: 100%;" name="mod_comment"></textarea>
 								<div class="submitbutton">
-									<input type="submit" name="add_comment" value="', $txt['mc_modreport_add_mod_comment'], '" class="button_submit" />
+									<input type="submit" name="add_comment" value="', $txt['mc_modreport_add_mod_comment'], '" />
 								</div>
 							</div>';
 

@@ -471,12 +471,12 @@ function template_quickreply_below()
 		// Spellcheck button?
 		if ($context['show_spellchecking'])
 			echo '
-								<input class="button_submit" type="button" value="', $txt['spell_check'], '" onclick="spellCheck(\'postmodify\', \'message\', ', (empty($options['use_editor_quick_reply']) ? 'false' : 'true'), ')" tabindex="', $context['tabindex']++, '" />';
+								<input type="button" value="', $txt['spell_check'], '" onclick="spellCheck(\'postmodify\', \'message\', ', (empty($options['use_editor_quick_reply']) ? 'false' : 'true'), ')" tabindex="', $context['tabindex']++, '" />';
 
 		// Draft save button?
 		if (!empty($context['drafts_save']))
 			echo '
-								<input type="submit" name="save_draft" value="', $txt['draft_save'], '" onclick="return confirm(' . JavaScriptEscape($txt['draft_save_note']) . ') && submitThisOnce(this);" accesskey="d" tabindex="', $context['tabindex']++, '" />
+								<input type="button" name="save_draft" value="', $txt['draft_save'], '" onclick="return confirm(' . JavaScriptEscape($txt['draft_save_note']) . ') && submitThisOnce(this);" accesskey="d" tabindex="', $context['tabindex']++, '" />
 								';
 
 		echo '
@@ -602,7 +602,7 @@ function template_quickreply_below()
 								<input type="hidden" name="topic" value="' . $context['current_topic'] . '" />
 								<input type="hidden" name="msg" value="%msg_id%" />
 								<input type="submit" name="post" value="' . $txt['save'] . '" tabindex="' . $context['tabindex']++ . '" onclick="return oQuickModify.modifySave(\'' . $context['session_id'] . '\', \'' . $context['session_var'] . '\');" accesskey="s" />' . ($context['show_spellchecking'] ? '
-								<input class="button_submit" type="button" value="' . $txt['spell_check'] . '" tabindex="' . $context['tabindex']++ . '" onclick="spellCheck(\'quickModForm\', \'message\', false);" />' : '') . '
+								<input type="button" value="' . $txt['spell_check'] . '" tabindex="' . $context['tabindex']++ . '" onclick="spellCheck(\'quickModForm\', \'message\', false);" />' : '') . '
 								<input type="submit" name="cancel" value="' . $txt['modify_cancel'] . '" tabindex="' . $context['tabindex']++ . '" onclick="return oQuickModify.modifyCancel();" />
 							</div>
 						</div>'), ',

@@ -1127,15 +1127,6 @@ div.labels {
 	margin-right: 5ex;
 }
 
-/* Styles for maintenance mode. */
-#maintenance_mode {
-	text-align: right;
-}
-#maintenance_mode .floatleft {
-	margin-right: 0;
-	margin-left: 12px;
-}
-
 /*	$ERRORS		*/
 /* ------------------------------------------------------- */
 

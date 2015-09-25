@@ -49,7 +49,7 @@ function template_searchform()
 								<strong>', $txt['search_for'], '</strong>
 							</label>:
 							<input type="search" id="search" class="input_text" name="search" value="', $context['search_params']['search'], '" maxlength="', $context['search_string_limit'], '" size="40" placeholder="' . $txt['search'] . '" required="required" autofocus="autofocus" />', '
-							<input id="submit" type="submit" name="s_search" value="' . $txt['search'] . '" class="button_submit"/>
+							<input id="submit" type="submit" name="s_search" value="' . $txt['search'] . '" />
 						</div>';
 
 	if (empty($modSettings['search_simple_fulltext']))
@@ -235,7 +235,7 @@ function template_results()
 							</dd>
 						</dl>
 						<div class="submitbutton" >
-							<input type="submit" name="edit_search" value="', $txt['search_adjust_submit'], '" class="button_submit" />
+							<input type="submit" name="edit_search" value="', $txt['search_adjust_submit'], '" />
 							<input type="hidden" name="searchtype" value="', $context['search_params']['searchtype'], '" />
 							<input type="hidden" name="userspec" value="', $context['search_params']['userspec'], '" />
 							<input type="hidden" name="show_complete" value="', $context['search_params']['show_complete'], '" />

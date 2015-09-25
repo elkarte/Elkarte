@@ -345,7 +345,7 @@ function template_users_multiactions($groups)
 			</option>';
 	}
 	$select .= '</select>
-					<input type="submit" name="maction_on_members" value="' . $txt['quick_mod_go'] . '" onclick="return confirm(\'' . $txt['quickmod_confirm'] . '\');" class="button_submit" />';
+					<input type="submit" name="maction_on_members" value="' . $txt['quick_mod_go'] . '" onclick="return confirm(\'' . $txt['quickmod_confirm'] . '\');" />';
 
 	return $select;
 }

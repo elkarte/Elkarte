@@ -754,7 +754,7 @@ function template_edit_censored()
 				<div class="centertext">
 					<p id="censor_result" class="information hide">', empty($context['censor_test']) ? '' : $context['censor_test'], '</p>
 					<input id="censortest" type="text" name="censortest" value="', empty($context['censor_test']) ? '' : $context['censor_test'], '" class="input_text" />
-					<input id="preview_button" type="submit" value="', $txt['censor_test_save'], '" class="button_submit" />
+					<input id="preview_button" type="submit" value="', $txt['censor_test_save'], '" />
 				</div>
 			</div>
 			<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />
@@ -1092,15 +1092,15 @@ function template_admin_search_results()
 	global $context, $txt, $settings, $scripturl;
 
 	echo '
-					<div class="category_header">
-						<h3 class="floatleft hdicon cat_img_search">', sprintf($txt['admin_search_results_desc'], $context['search_term']), '</h3>
+					<h2 class="category_header hdicon cat_img_search">
+						', sprintf($txt['admin_search_results_desc'], $context['search_term']), '
 						<form id="quick_search" class="floatright" action="', $scripturl, '?action=admin;area=search" method="post" accept-charset="UTF-8">
 							<img class="icon" src="', $settings['images_url'], '/filter.png" alt="" />
 							<input type="text" name="search_term" value="', $context['search_term'], '" class="input_text" />
 							<input type="hidden" name="sa" value="', $context['search_type'], '" />
-							<input type="submit" name="search_go" value="', $txt['admin_search_results_again'], '" class="button_submit" />
+							<input type="submit" name="search_go" value="', $txt['admin_search_results_again'], '" />
 						</form>
-					</div>
+					</h2>
 					<div class="generic_list_wrapper">
 						<div class="content">';
 
@@ -1449,7 +1449,7 @@ function template_admin_quick_search()
 					<option value="member"', (!empty($context['admin_preferences']['sb']) && $context['admin_preferences']['sb'] == 'member' ? ' selected="selected"' : ''), '>', $txt['admin_search_type_member'], '</option>
 					<option value="online"', (!empty($context['admin_preferences']['sb']) && $context['admin_preferences']['sb'] == 'online' ? ' selected="selected"' : ''), '>', $txt['admin_search_type_online'], '</option>
 				</select>
-				<input type="submit" name="search_go" id="search_go" value="', $txt['admin_search_go'], '" class="button_submit" />
+				<input type="submit" name="search_go" id="search_go" value="', $txt['admin_search_go'], '" />
 			</form>';
 }
 

@@ -861,7 +861,7 @@ function template_postmod_permissions()
 				</tbody>
 			</table>
 			<div class="submitbutton">
-				<input type="submit" name="save_changes" value="', $txt['permissions_commit'], '" class="button_submit" />
+				<input type="submit" name="save_changes" value="', $txt['permissions_commit'], '" />
 				<input type="hidden" name="', $context['admin-mppm_token_var'], '" value="', $context['admin-mppm_token'], '" />
 			</div>
 		</form>

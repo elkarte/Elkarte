@@ -305,12 +305,12 @@ function template_post_page()
 	// Option to delete an event if user is editing one.
 	if (!empty($context['make_event']) && !$context['event']['new'])
 		echo '
-							<input type="submit" name="deleteevent" value="', $txt['event_delete'], '" onclick="return confirm(\'', $txt['event_delete_confirm'], '\');" class="button_submit" />';
+							<input type="submit" name="deleteevent" value="', $txt['event_delete'], '" onclick="return confirm(\'', $txt['event_delete_confirm'], '\');" />';
 
 	// Option to add a poll (javascript if enabled, otherwise preview with poll)
 	if (!$context['make_poll'] && $context['can_add_poll'])
 		echo '
-							<input type="submit" name="poll" value="', $txt['add_poll'], '" onclick="return loadAddNewPoll(this, ', empty($context['current_board']) ? '0' : $context['current_board'], ', \'postmodify\');" class="button_submit" />';
+							<input type="submit" name="poll" value="', $txt['add_poll'], '" onclick="return loadAddNewPoll(this, ', empty($context['current_board']) ? '0' : $context['current_board'], ', \'postmodify\');" />';
 
 	echo '
 						</div>';
@@ -807,10 +807,10 @@ function template_spellcheck()
 				</tr>
 			</table>
 			<div class="submitbutton">
-				<input type="button" name="change" value="', $txt['spellcheck_change'], '" onclick="replaceWord();" class="button_submit" />
-				<input type="button" name="changeall" value="', $txt['spellcheck_change_all'], '" onclick="replaceAll();" class="button_submit" />
-				<input type="button" name="ignore" value="', $txt['spellcheck_ignore'], '" onclick="nextWord(false);" class="button_submit" />
-				<input type="button" name="ignoreall" value="', $txt['spellcheck_ignore_all'], '" onclick="nextWord(true);" class="button_submit" />
+				<input type="button" name="change" value="', $txt['spellcheck_change'], '" onclick="replaceWord();" />
+				<input type="button" name="changeall" value="', $txt['spellcheck_change_all'], '" onclick="replaceAll();" />
+				<input type="button" name="ignore" value="', $txt['spellcheck_ignore'], '" onclick="nextWord(false);" />
+				<input type="button" name="ignoreall" value="', $txt['spellcheck_ignore_all'], '" onclick="nextWord(true);" />
 			</div>
 		</form>
 	</body>

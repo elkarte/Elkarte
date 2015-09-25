@@ -186,16 +186,11 @@ fieldset dl {
 /* @todo - Admin quick search bar, and results page. */
 #quick_search {
 	font-size: 0.857em;
-}
-
-#quick_search .icon, #quick_search .input_text,
-#quick_search select, #quick_search .button_submit {
-	float: left;
-	margin: 3px 0 0 4px;
+	margin-top: -2px;
 }
 
 #quick_search .icon {
-	margin: 8px 0 0 0;
+	margin: 4px 0 0 0;
 }
 
 /* @todo - The welcome thingy. */

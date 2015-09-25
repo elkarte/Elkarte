@@ -1374,11 +1374,9 @@ class ModerationCenter_Controller extends Action_Controller
 					'class' => 'submitbutton',
 					'position' => 'below_table_data',
 					'value' => '
-						<div id="quick_log_search">
-							' . $txt['modlog_search'] . ' (' . $txt['modlog_by'] . ': ' . $context['search']['label'] . ')
-							<input type="text" name="search" size="18" value="' . Util::htmlspecialchars($context['search']['string']) . '" class="input_text" />
-							<input type="submit" name="is_search" value="' . $txt['modlog_go'] . '" class="button_submit" />
-						</div>',
+						' . $txt['modlog_search'] . ' (' . $txt['modlog_by'] . ': ' . $context['search']['label'] . ')
+						<input type="text" name="search" size="18" value="' . Util::htmlspecialchars($context['search']['string']) . '" class="input_text" />
+						<input type="submit" name="is_search" value="' . $txt['modlog_go'] . '" />',
 				),
 			),
 		);

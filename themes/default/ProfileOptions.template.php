@@ -110,7 +110,7 @@ function template_editBuddies()
 					</dt>
 					<dd>
 						<input type="text" name="new_buddy" id="new_buddy" size="30" class="input_text" />
-						<input type="submit" value="', $txt['buddy_add_button'], '" class="button_submit" />
+						<input type="submit" value="', $txt['buddy_add_button'], '" />
 					</dd>
 				</dl>';
 
@@ -213,7 +213,7 @@ function template_editIgnoreList()
 					</dt>
 					<dd>
 						<input type="text" name="new_ignore" id="new_ignore" size="25" class="input_text" />
-						<input type="submit" value="', $txt['ignore_add_button'], '" class="button_submit" />
+						<input type="submit" value="', $txt['ignore_add_button'], '" />
 					</dd>
 				</dl>';
 
@@ -782,7 +782,7 @@ function template_action_notification()
 					</dd>
 				</dl>
 				<div class="submitbutton">
-					<input id="notify_submit" name="notify_submit" type="submit" value="', $txt['notify_save'], '" class="button_submit" />
+					<input id="notify_submit" name="notify_submit" type="submit" value="', $txt['notify_save'], '" />
 					<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />', !empty($context['token_check']) ? '
 					<input type="hidden" name="' . $context[$context['token_check'] . '_token_var'] . '" value="' . $context[$context['token_check'] . '_token'] . '" />' : '', '
 					<input type="hidden" name="u" value="', $context['id_member'], '" />
@@ -834,7 +834,7 @@ function template_groupMembership()
 					<textarea name="reason" rows="4" style="width: 99%;"></textarea>
 					<div class="submitbutton">
 						<input type="hidden" name="gid" value="', $context['group_request']['id'], '" />
-						<input type="submit" name="req" value="', $txt['submit_request'], '" class="button_submit" />
+						<input type="submit" name="req" value="', $txt['submit_request'], '" />
 					</div>
 				</div>
 			</div>';
@@ -884,7 +884,7 @@ function template_groupMembership()
 		if ($context['can_edit_primary'])
 			echo '
 			<div class="submitbutton">
-				<input type="submit" value="', $txt['make_primary'], '" class="button_submit" />
+				<input type="submit" value="', $txt['make_primary'], '" />
 			</div>';
 
 		// Any groups they can join?
