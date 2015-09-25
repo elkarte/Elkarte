@@ -43,7 +43,7 @@ class TestAuth_Controller extends ElkArteWebTest
 		$this->assertEquals($password, $passwordInput->value());
 
 		// Submit it
-        $this->byCssSelector('input[type="submit"]')->click();
+        $this->byCssSelector('.login > div > input[type="submit"]')->click();
 
 		// Nope, huh? I hope :P
 		$this->assertEquals('That username does not exist.', $this->byClassName('errorbox')->text());
