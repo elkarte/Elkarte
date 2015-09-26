@@ -217,9 +217,9 @@ function template_callback_maillist_receive_email_list()
 	}
 
 	echo '
-		<dt id="add_more_email_placeholder" style="display: none;"></dt>
+		<dt id="add_more_email_placeholder" class="hide"></dt>
 		<dd></dd>
-		<dt id="add_more_board_div" style="display: none;">
+		<dt id="add_more_board_div" class="hide">
 			<a href="#" onclick="addAnotherOption(sEmailParent, oEmailOptionsdt, oEmailOptionsdd, oEmailSelectData); return false;" class="linkbutton_left">', $txt['reply_add_more'], '</a>
 		</dt>
 		<dd></dd>';
@@ -234,7 +234,7 @@ function template_bounce_template()
 
 	echo '
 	<form id="admin_form_wrapper" action="', $scripturl, '?action=admin;area=maillist;sa=emailtemplates;tid=', $context['id_template'], '" method="post" accept-charset="UTF-8">
-		<div id="preview_section"', isset($context['template_preview']) ? '' : ' style="display: none;"', '>
+		<div id="preview_section"', isset($context['template_preview']) ? '' : ' class="hide"', '>
 			<h2 class="category_header">
 				<span id="preview_subject">', $txt['preview'], '</span>
 			</h2>
@@ -248,7 +248,7 @@ function template_bounce_template()
 			', $txt['ml_bounce_template_desc'], '
 		</div>
 		<div class="content">
-			<div class="errorbox"', empty($context['warning_errors']) ? ' style="display: none"' : '', ' id="errors">
+			<div id="errors" class="errorbox', empty($context['warning_errors']) ? ' hide"' : '"', '>
 				<dl>
 					<dt>
 						<strong id="error_serious">', $txt['error_while_submitting'], '</strong>

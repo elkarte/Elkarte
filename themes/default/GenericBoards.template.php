@@ -228,11 +228,11 @@ function template_pick_boards($form_name, $input_names = 'brd', $select_all = tr
 		echo '
 						<h3 class="secondary_header panel_toggle">
 							<span>
-								<span id="advanced_panel_toggle" class="', $context['boards_check_all'] ? 'expand' : 'collapse', '" style="display: none;" title="', $txt['hide'], '"></span>
+								<span id="advanced_panel_toggle" class="', $context['boards_check_all'] ? 'expand' : 'collapse', ' hide" title="', $txt['hide'], '"></span>
 							</span>
 							<a href="#" id="advanced_panel_link">', $txt['choose_board'], '</a>
 						</h3>
-						<div id="advanced_panel_div"', $context['boards_check_all'] ? ' style="display: none;"' : '', '>';
+						<div id="advanced_panel_div"', $context['boards_check_all'] ? ' class="hide"' : '', '>';
 
 	// Make two nice columns of boards, link each category header to toggle select all boards in each
 	$group_cats = optimizeBoardsSubdivision($context['boards_in_category'], $context['num_boards']);

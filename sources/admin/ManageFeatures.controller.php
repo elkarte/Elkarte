@@ -790,11 +790,11 @@ class ManageFeatures_Controller extends Action_Controller
 				'vieworder' => array(
 					'header' => array(
 						'value' => '',
-						'style' => 'display: none',
+						'class' => 'hide',
 					),
 					'data' => array(
 						'db' => 'vieworder',
-						'style' => 'display: none',
+						'class' => 'hide',
 					),
 					'sort' => array(
 						'default' => 'vieworder',

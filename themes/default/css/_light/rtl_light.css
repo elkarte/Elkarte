@@ -130,7 +130,7 @@ legend {
 	border-radius: 0 2px 2px 0;
 	border-right: 1px solid #ccc;
 }
-#search_form .button_submit {
+#search_form input[type="submit"] {
 	border-radius: 2px 0 0 2px;
 }
 #search_form select {

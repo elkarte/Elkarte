@@ -110,7 +110,7 @@ function template_editBuddies()
 					</dt>
 					<dd>
 						<input type="text" name="new_buddy" id="new_buddy" size="30" class="input_text" />
-						<input type="submit" value="', $txt['buddy_add_button'], '" class="button_submit" />
+						<input type="submit" value="', $txt['buddy_add_button'], '" />
 					</dd>
 				</dl>';
 
@@ -213,7 +213,7 @@ function template_editIgnoreList()
 					</dt>
 					<dd>
 						<input type="text" name="new_ignore" id="new_ignore" size="25" class="input_text" />
-						<input type="submit" value="', $txt['ignore_add_button'], '" class="button_submit" />
+						<input type="submit" value="', $txt['ignore_add_button'], '" />
 					</dd>
 				</dl>';
 
@@ -293,7 +293,7 @@ function template_edit_options()
 		{
 			echo '
 				</dl>
-				<hr class="separator" />
+				<hr class="clear" />
 				<dl>';
 		}
 		elseif ($field['type'] === 'callback')
@@ -386,7 +386,7 @@ function template_edit_options()
 	{
 		if ($lastItem !== 'hr')
 			echo '
-				<hr class="separator" />';
+				<hr class="clear" />';
 
 		echo '
 				<dl>';
@@ -782,7 +782,7 @@ function template_action_notification()
 					</dd>
 				</dl>
 				<div class="submitbutton">
-					<input id="notify_submit" name="notify_submit" type="submit" value="', $txt['notify_save'], '" class="button_submit" />
+					<input id="notify_submit" name="notify_submit" type="submit" value="', $txt['notify_save'], '" />
 					<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />', !empty($context['token_check']) ? '
 					<input type="hidden" name="' . $context[$context['token_check'] . '_token_var'] . '" value="' . $context[$context['token_check'] . '_token'] . '" />' : '', '
 					<input type="hidden" name="u" value="', $context['id_member'], '" />
@@ -834,7 +834,7 @@ function template_groupMembership()
 					<textarea name="reason" rows="4" style="width: 99%;"></textarea>
 					<div class="submitbutton">
 						<input type="hidden" name="gid" value="', $context['group_request']['id'], '" />
-						<input type="submit" name="req" value="', $txt['submit_request'], '" class="button_submit" />
+						<input type="submit" name="req" value="', $txt['submit_request'], '" />
 					</div>
 				</div>
 			</div>';
@@ -884,7 +884,7 @@ function template_groupMembership()
 		if ($context['can_edit_primary'])
 			echo '
 			<div class="submitbutton">
-				<input type="submit" value="', $txt['make_primary'], '" class="button_submit" />
+				<input type="submit" value="', $txt['make_primary'], '" />
 			</div>';
 
 		// Any groups they can join?
@@ -1062,17 +1062,17 @@ function template_profile_signature_modify()
 	global $txt, $context;
 
 	echo '
-							<dt id="current_signature"', !isset($context['member']['current_signature']) ? ' style="display:none"' : '', '>
+							<dt id="current_signature"', !isset($context['member']['current_signature']) ? ' class="hide"' : '', '>
 								<label>', $txt['current_signature'], ':</label>
 							</dt>
-							<dd id="current_signature_display"', !isset($context['member']['current_signature']) ? ' style="display:none"' : '', '>
+							<dd id="current_signature_display"', !isset($context['member']['current_signature']) ? ' class="hide"' : '', '>
 								', isset($context['member']['current_signature']) ? $context['member']['current_signature'] : '', '<hr />
 							</dd>
 
-							<dt id="preview_signature"', !isset($context['member']['signature_preview']) ? ' style="display:none"' : '', '>
+							<dt id="preview_signature"', !isset($context['member']['signature_preview']) ? ' class="hide"' : '', '>
 								<label>', $txt['signature_preview'], ':</label>
 							</dt>
-							<dd id="preview_signature_display"', !isset($context['member']['signature_preview']) ? ' style="display:none"' : '', '>
+							<dd id="preview_signature_display"', !isset($context['member']['signature_preview']) ? ' class="hide"' : '', '>
 								', isset($context['member']['signature_preview']) ? $context['member']['signature_preview'] : '', '<hr />
 							</dd>
 							<dt>
@@ -1175,7 +1175,7 @@ function template_profile_avatar_select()
 										</select>
 									</div>
 									<div>
-										<select name="file" id="file" size="10" style="display: none;" onchange="showAvatar()" disabled="disabled">
+										<select id="file" name="file" size="10" class="hide" onchange="showAvatar()" disabled="disabled">
 											<option> </option>
 										</select>
 									</div>
@@ -1372,7 +1372,7 @@ function template_authentication_method()
 					<dd>
 						<dl id="openid_group">
 							<dt>
-								<em><label for="openid_url">', $txt['authenticate_openid_url'], '</label></em>
+								<label for="openid_url">', $txt['authenticate_openid_url'], '</label>
 							</dt>
 							<dd>
 								<input type="text" name="openid_identifier" id="openid_url" size="30" tabindex="', $context['tabindex']++, '" value="', $context['member']['openid_uri'], '" class="input_text openid_login" />
@@ -1384,7 +1384,9 @@ function template_authentication_method()
 							</dt>
 							<dd>
 								<input type="password" name="passwrd1" id="elk_autov_pwmain" size="30" tabindex="', $context['tabindex']++, '" class="input_password" placeholder="', $txt['choose_pass'], '" />
-								<span id="elk_autov_pwmain_div" style="display: none;"><img id="elk_autov_pwmain_img" class="centericon" src="', $settings['images_url'], '/icons/field_invalid.png" alt="*" /></span>
+								<span id="elk_autov_pwmain_div" class="hide">
+									<img id="elk_autov_pwmain_img" class="centericon" src="', $settings['images_url'], '/icons/field_invalid.png" alt="*" />
+								</span>
 							</dd>
 						</dl>
 						<dl id="password2_group">
@@ -1393,7 +1395,9 @@ function template_authentication_method()
 							</dt>
 							<dd>
 								<input type="password" name="passwrd2" id="elk_autov_pwverify" size="30" tabindex="', $context['tabindex']++, '" class="input_password" placeholder="', $txt['verify_pass'], '" />
-								<span id="elk_autov_pwverify_div" style="display: none;"><img id="elk_autov_pwverify_img" class="centericon" src="', $settings['images_url'], '/icons/field_valid.png" alt="*" /></span>
+								<span id="elk_autov_pwverify_div" class="hide">
+									<img id="elk_autov_pwverify_img" class="centericon" src="', $settings['images_url'], '/icons/field_valid.png" alt="*" />
+								</span>
 							</dd>
 						</dl>
 					</dd>

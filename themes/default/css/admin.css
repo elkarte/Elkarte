@@ -50,7 +50,7 @@
 #groupForm, #mailqueue_stats, #manage_maintenance,
 #new_group, #view_group, #admin_form_wrapper, .action_admin .generic_list_wrapper {
 	margin: 12px 0 0 0;
-	padding: 8px 8px 16px 8px;
+	padding: 8px;
 	overflow: auto;
 }
 
@@ -186,16 +186,11 @@ fieldset dl {
 /* @todo - Admin quick search bar, and results page. */
 #quick_search {
 	font-size: 0.857em;
-}
-
-#quick_search .icon, #quick_search .input_text,
-#quick_search select, #quick_search .button_submit {
-	float: left;
-	margin: 3px 0 0 4px;
+	margin-top: -2px;
 }
 
 #quick_search .icon {
-	margin: 8px 0 0 0;
+	margin: 4px 0 0 0;
 }
 
 /* @todo - The welcome thingy. */
@@ -255,7 +250,7 @@ fieldset dl {
 }
 
 .censorWords {
-	margin-top: 1ex;
+	margin: 1em 0 0 1em;
 }
 
 /* Cleaned this up a bit for less clutter.
@@ -263,7 +258,7 @@ fieldset dl {
 /* Live news from elkarte.net and support information. */
 #admin_main_section {
 	margin: 12px 0 20px 0;
-	padding: 8px 0 4px 0;
+	padding: 8px 8px 4px 8px;
 }
 
 #live_news, #supportVersionsTable {
@@ -693,7 +688,7 @@ ul.package_servers li {
 .visible_boards .board label,
 .select_all_box label,
 .select_category label {
-	width: 30%;
+	width: 32%;
 	display: inline-block;
 }
 
@@ -978,6 +973,14 @@ dl.themes_list dd {
 .theme_settings .input_text {
 	max-width: 100%;
 	width: 30em;
+}
+
+#css_preview_box {
+	display: none;
+	margin-bottom: 2ex;
+	width: 99%;
+	height: 300px;
+	border: 1px solid black;
 }
 
 /* Styles for the registration center.

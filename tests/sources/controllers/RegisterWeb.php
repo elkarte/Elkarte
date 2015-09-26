@@ -58,7 +58,7 @@ class TestRegister_Controller extends ElkArteWebTest
 		$this->assertEquals('Registration Agreement', $this->title());
 
 		// Accept the agreement, we should see the Registration form
-		$this->byCssSelector('#confirm_buttons input.button_submit')->click();
+		$this->byCssSelector('#confirm_buttons input[type="submit"]')->click();
 		$this->assertEquals('Registration Form', $this->title());
 
 		// Fill out the registration form
@@ -89,7 +89,7 @@ class TestRegister_Controller extends ElkArteWebTest
 		$this->assertEquals('Registration Agreement', $this->title());
 
 		// Accept the agreement, we should see the Registration form
-		$this->byCssSelector('#confirm_buttons input.button_submit')->click();
+		$this->byCssSelector('#confirm_buttons input[type="submit"]')->click();
 		$this->assertEquals('Registration Form', $this->title());
 
 		// Fill out the registration form

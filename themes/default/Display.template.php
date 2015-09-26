@@ -158,13 +158,13 @@ function template_messages()
 
 		echo '
 							<span id="post_subject_', $message['id'], '" class="post_subject">', $message['subject'], '</span>
-							<span id="messageicon_', $message['id'], '" class="messageicon"  ', ($message['icon_url'] !== $settings['images_url'] . '/post/xx.png') ? '' : 'style="display:none;"', '>
+							<span id="messageicon_', $message['id'], '" class="messageicon', ($message['icon_url'] !== $settings['images_url'] . '/post/xx.png') ? '"' : ' hide"', '>
 								<img src="', $message['icon_url'] . '" alt=""', $message['can_modify'] ? ' id="msg_icon_' . $message['id'] . '"' : '', ' />
 							</span>
 							<h5 id="info_', $message['id'], '">
 								<a href="', $message['href'], '" rel="nofollow">', !empty($message['counter']) ? sprintf($txt['reply_number'], $message['counter']) : '', '</a>', !empty($message['counter']) ? ' &ndash; ' : '', $message['html_time'], '
 							</h5>
-							<div id="msg_', $message['id'], '_quick_mod"', $ignoring ? ' style="display:none;"' : '', '></div>
+							<div id="msg_', $message['id'], '_quick_mod"', $ignoring ? ' class="hide"' : '', '></div>
 						</div>';
 
 		// Ignoring this user? Hide the post.
@@ -172,7 +172,7 @@ function template_messages()
 			echo '
 						<div id="msg_', $message['id'], '_ignored_prompt">
 							', $txt['ignoring_user'], '
-							<a href="#" id="msg_', $message['id'], '_ignored_link" style="display: none;">', $txt['show_ignore_user_post'], '</a>
+							<a href="#" id="msg_', $message['id'], '_ignored_link" class="hide">', $txt['show_ignore_user_post'], '</a>
 						</div>';
 
 		// Awaiting moderation?
@@ -184,7 +184,7 @@ function template_messages()
 
 		// Show the post itself, finally!
 		echo '
-						<div class="inner" id="msg_', $message['id'], '"', $ignoring ? ' style="display:none;"' : '', '>', $message['body'], '</div>';
+						<div id="msg_', $message['id'], '" class="inner', $ignoring ? ' hide"' : '""', '>', $message['body'], '</div>';
 
 		// Assuming there are attachments...
 		if (!empty($message['attachment']))
@@ -197,12 +197,12 @@ function template_messages()
 		// Show a checkbox for quick moderation?
 		if (!empty($options['display_quick_mod']) && $options['display_quick_mod'] == 1 && $message['can_remove'])
 			echo '
-							<li class="listlevel1 inline_mod_check" style="display: none;" id="in_topic_mod_check_', $message['id'], '"></li>';
+							<li class="listlevel1 inline_mod_check none" id="in_topic_mod_check_', $message['id'], '"></li>';
 
 		// Show "Last Edit: Time by Person" if this post was edited.
 		if ($settings['show_modify'])
 			echo '
-							<li class="listlevel1 modified" id="modified_', $message['id'], '"', !empty($message['modified']['name']) ? '' : ' style="display:none"', '>
+							<li id="modified_', $message['id'], '" class="listlevel1 modified', !empty($message['modified']['name']) ? '"' : ' hide"', '>
 								', !empty($message['modified']['name']) ? $message['modified']['last_edit_text'] : '', '
 							</li>';
 
@@ -312,7 +312,7 @@ function template_messages()
 		// Can the user quick modify the contents of this post?  Show the quick (inline) modify button.
 		if ($message['can_modify'])
 			echo '
-							<li class="listlevel1 quick_edit" id="modify_button_', $message['id'], '" style="display: none">
+							<li id="modify_button_', $message['id'], '" class="listlevel1 quick_edit hide">
 								<a class="linklevel1 quick_edit" onclick="oQuickModify.modifyMsg(\'', $message['id'], '\')">', $txt['quick_edit'], '</a>
 							</li>';
 
@@ -371,7 +371,7 @@ function template_messages()
 		// Show the member's signature?
 		if (!empty($message['member']['signature']) && empty($options['show_no_signatures']) && $context['signature_enabled'])
 			echo '
-						<div class="signature" id="msg_', $message['id'], '_signature"', $ignoring ? ' style="display:none;"' : '', '>', $message['member']['signature'], '</div>';
+						<div id="msg_', $message['id'], '_signature" class="signature', $ignoring ? ' hide"' : '"', '>', $message['member']['signature'], '</div>';
 
 		echo '
 					</div>
@@ -414,7 +414,7 @@ function template_quickreply_below()
 					</span>
 					<a href="javascript:oQuickReply.swap();">', $txt['quick_reply'], '</a>
 				</h2>
-				<div id="quickReplyOptions" class="forumposts content"', empty($context['minmax_preferences']['qreply']) ? '' : ' style="display: none"', '>
+				<div id="quickReplyOptions" class="forumposts content', empty($context['minmax_preferences']['qreply']) ? '"' : ' hide"', '>
 					<div class="editor_wrapper">
 						', $context['is_locked'] ? '<p class="alert smalltext">' . $txt['quick_reply_warning'] . '</p>' : '',
 						$context['oldTopicError'] ? '<p class="alert smalltext">' . sprintf($txt['error_old_topic'], $modSettings['oldTopicDays']) . '</p>' : '', '
@@ -471,12 +471,12 @@ function template_quickreply_below()
 		// Spellcheck button?
 		if ($context['show_spellchecking'])
 			echo '
-								<input class="button_submit" type="button" value="', $txt['spell_check'], '" onclick="spellCheck(\'postmodify\', \'message\', ', (empty($options['use_editor_quick_reply']) ? 'false' : 'true'), ')" tabindex="', $context['tabindex']++, '" />';
+								<input type="button" value="', $txt['spell_check'], '" onclick="spellCheck(\'postmodify\', \'message\', ', (empty($options['use_editor_quick_reply']) ? 'false' : 'true'), ')" tabindex="', $context['tabindex']++, '" />';
 
 		// Draft save button?
 		if (!empty($context['drafts_save']))
 			echo '
-								<input type="submit" name="save_draft" value="', $txt['draft_save'], '" onclick="return confirm(' . JavaScriptEscape($txt['draft_save_note']) . ') && submitThisOnce(this);" accesskey="d" tabindex="', $context['tabindex']++, '" />
+								<input type="button" name="save_draft" value="', $txt['draft_save'], '" onclick="return confirm(' . JavaScriptEscape($txt['draft_save_note']) . ') && submitThisOnce(this);" accesskey="d" tabindex="', $context['tabindex']++, '" />
 								';
 
 		echo '
@@ -486,7 +486,7 @@ function template_quickreply_below()
 		if (!empty($context['drafts_autosave']) && !empty($options['drafts_autosave_enabled']))
 			echo '
 							<div class="draftautosave">
-								<span id="throbber" style="display:none"><i class="fa fa-spinner fa-spin"></i>&nbsp;</span>
+								<span id="throbber" class="hide"><i class="fa fa-spinner fa-spin"></i>&nbsp;</span>
 								<span id="draft_lastautosave"></span>
 							</div>';
 
@@ -595,14 +595,14 @@ function template_quickreply_below()
 					iTopicId: ', $context['current_topic'], ',
 					sTemplateBodyEdit: ', JavaScriptEscape('
 						<div id="quick_edit_body_container">
-							<div id="error_box" class="errorbox" style="display:none;"></div>
+							<div id="error_box" class="errorbox hide"></div>
 							<textarea class="editor" name="message" rows="12" tabindex="' . $context['tabindex']++ . '">%body%</textarea><br />
 							<div class="submitbutton">
 								<input type="hidden" name="\' + elk_session_var + \'" value="\' + elk_session_id + \'" />
 								<input type="hidden" name="topic" value="' . $context['current_topic'] . '" />
 								<input type="hidden" name="msg" value="%msg_id%" />
 								<input type="submit" name="post" value="' . $txt['save'] . '" tabindex="' . $context['tabindex']++ . '" onclick="return oQuickModify.modifySave(\'' . $context['session_id'] . '\', \'' . $context['session_var'] . '\');" accesskey="s" />' . ($context['show_spellchecking'] ? '
-								<input class="button_submit" type="button" value="' . $txt['spell_check'] . '" tabindex="' . $context['tabindex']++ . '" onclick="spellCheck(\'quickModForm\', \'message\', false);" />' : '') . '
+								<input type="button" value="' . $txt['spell_check'] . '" tabindex="' . $context['tabindex']++ . '" onclick="spellCheck(\'quickModForm\', \'message\', false);" />' : '') . '
 								<input type="submit" name="cancel" value="' . $txt['modify_cancel'] . '" tabindex="' . $context['tabindex']++ . '" onclick="return oQuickModify.modifyCancel();" />
 							</div>
 						</div>'), ',
@@ -838,7 +838,7 @@ function template_display_attachments($message, $ignoring)
 	global $context, $txt, $scripturl, $settings;
 
 	echo '
-							<div id="msg_', $message['id'], '_footer" class="attachments"', $ignoring ? ' style="display:none;"' : '', '>';
+							<div id="msg_', $message['id'], '_footer" class="attachments', $ignoring ? ' hide"' : '""', '>';
 
 	$last_approved_state = 1;
 

@@ -59,7 +59,7 @@ function template_postarea_above()
 
 	// If the user wants to see how their message looks - the preview section is where it's at!
 	echo '
-			<div id="preview_section"', isset($context['preview_message']) ? '' : ' style="display: none;"', '>
+			<div id="preview_section"', isset($context['preview_message']) ? '' : ' class="hide"', '>
 				<h2 class="category_header">
 					<span id="preview_subject">', empty($context['preview_subject']) ? '' : $context['preview_subject'], '</span>
 				</h2>
@@ -94,13 +94,13 @@ function template_postarea_above()
 	// If it's locked, show a message to warn the replyer.
 	// @todo why not output it only for locked topics and why not use the template_show_error above?
 	echo '
-						<p class="information"', $context['locked'] ? '' : ' style="display: none"', ' id="lock_warning">
+						<p id="lock_warning" class="information', $context['locked'] ? '"' : ' hide"', '>
 							', $txt['topic_locked_no_reply'], '
 						</p>';
 
 	if (!empty($context['drafts_autosave']))
 		echo '
-						<div id="draft_section" class="successbox"', isset($context['draft_saved']) ? '' : ' style="display: none;"', '>
+						<div id="draft_section" class="successbox', isset($context['draft_saved']) ? '"' : ' hide"', '>
 							', sprintf($txt['draft_saved'], $scripturl . '?action=profile;u=' . $context['user']['id'] . ';area=showdrafts'), '
 						</div>';
 
@@ -287,7 +287,7 @@ function template_post_page()
 	if (!empty($context['member_ids']))
 	{
 		echo '
-							<div id="mentioned" style="display:none">';
+							<div id="mentioned" class="hide">';
 
 		foreach ($context['member_ids'] as $id)
 			echo '
@@ -305,12 +305,12 @@ function template_post_page()
 	// Option to delete an event if user is editing one.
 	if (!empty($context['make_event']) && !$context['event']['new'])
 		echo '
-							<input type="submit" name="deleteevent" value="', $txt['event_delete'], '" onclick="return confirm(\'', $txt['event_delete_confirm'], '\');" class="button_submit" />';
+							<input type="submit" name="deleteevent" value="', $txt['event_delete'], '" onclick="return confirm(\'', $txt['event_delete_confirm'], '\');" />';
 
 	// Option to add a poll (javascript if enabled, otherwise preview with poll)
 	if (!$context['make_poll'] && $context['can_add_poll'])
 		echo '
-							<input type="submit" name="poll" value="', $txt['add_poll'], '" onclick="return loadAddNewPoll(this, ', empty($context['current_board']) ? '0' : $context['current_board'], ', \'postmodify\');" class="button_submit" />';
+							<input type="submit" name="poll" value="', $txt['add_poll'], '" onclick="return loadAddNewPoll(this, ', empty($context['current_board']) ? '0' : $context['current_board'], ', \'postmodify\');" />';
 
 	echo '
 						</div>';
@@ -328,13 +328,13 @@ function template_additional_options_below()
 		echo '
 					<h3 id="postAdditionalOptionsHeader" class="category_header panel_toggle">
 						<span>
-							<span id="postMoreExpand" class="', empty($context['minmax_preferences']['pmdraft']) ? 'collapse' : 'expand', '" style="display: none;" title="', $txt['hide'], '"></span>
+							<span id="postMoreExpand" class="', empty($context['minmax_preferences']['post']) ? 'collapse' : 'expand', ' hide" title="', $txt['hide'], '"></span>
 						</span>
 						<a href="#" id="postMoreExpandLink">', $context['attachments']['can']['post'] ? $txt['post_additionalopt_attach'] : $txt['post_additionalopt'], '</a>
 					</h3>';
 
 	echo '
-					<div id="', empty($settings['additional_options_collapsible']) ? 'postAdditionalOptionsNC"' : 'postAdditionalOptions"', empty($settings['additional_options_collapsible']) || empty($context['minmax_preferences']['post']) ? '' : ' style="display: none;"', '>';
+					<div id="', empty($settings['additional_options_collapsible']) ? 'postAdditionalOptionsNC"' : 'postAdditionalOptions"', empty($settings['additional_options_collapsible']) || empty($context['minmax_preferences']['post']) ? '' : ' class="hide"', '>';
 
 	// Is the user allowed to post or if this post already has attachments on it give them the boxes.
 	if ($context['attachments']['can']['post'] || !empty($context['attachments']['current']))
@@ -490,11 +490,11 @@ function template_load_drafts_below()
 	echo '
 					<h3 id="postDraftOptionsHeader" class="category_header panel_toggle">
 						<span>
-							<span id="postDraftExpand" class="', empty($context['minmax_preferences']['draft']) ? 'collapse' : 'expand', '" style="display: none;" title="', $txt['hide'], '"></span>
+							<span id="postDraftExpand" class="', empty($context['minmax_preferences']['draft']) ? 'collapse' : 'expand', ' hide" title="', $txt['hide'], '"></span>
 						</span>
 						<a href="#" id="postDraftExpandLink">', $txt['draft_load'], '</a>
 					</h3>
-					<div id="postDraftOptions"', empty($context['minmax_preferences']['draft']) ? '' : ' style="display: none;"', '>
+					<div id="postDraftOptions"', empty($context['minmax_preferences']['draft']) ? '' : ' class="hide"', '>
 						<dl class="settings">
 							<dt>
 								<strong>', $txt['subject'], '</strong>
@@ -591,7 +591,7 @@ function template_topic_replies_below()
 				echo '
 					<div id="msg_', $post['id'], '_ignored_prompt">
 						', $txt['ignoring_user'], '
-						<a href="#" id="msg_', $post['id'], '_ignored_link" style="display: none;">', $txt['show_ignore_user_post'], '</a>
+						<a href="#" id="msg_', $post['id'], '_ignored_link" class="hide">', $txt['show_ignore_user_post'], '</a>
 					</div>';
 
 			echo '
@@ -807,10 +807,10 @@ function template_spellcheck()
 				</tr>
 			</table>
 			<div class="submitbutton">
-				<input type="button" name="change" value="', $txt['spellcheck_change'], '" onclick="replaceWord();" class="button_submit" />
-				<input type="button" name="changeall" value="', $txt['spellcheck_change_all'], '" onclick="replaceAll();" class="button_submit" />
-				<input type="button" name="ignore" value="', $txt['spellcheck_ignore'], '" onclick="nextWord(false);" class="button_submit" />
-				<input type="button" name="ignoreall" value="', $txt['spellcheck_ignore_all'], '" onclick="nextWord(true);" class="button_submit" />
+				<input type="button" name="change" value="', $txt['spellcheck_change'], '" onclick="replaceWord();" />
+				<input type="button" name="changeall" value="', $txt['spellcheck_change_all'], '" onclick="replaceAll();" />
+				<input type="button" name="ignore" value="', $txt['spellcheck_ignore'], '" onclick="nextWord(false);" />
+				<input type="button" name="ignoreall" value="', $txt['spellcheck_ignore_all'], '" onclick="nextWord(true);" />
 			</div>
 		</form>
 	</body>

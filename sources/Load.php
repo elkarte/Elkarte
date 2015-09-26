@@ -1599,7 +1599,7 @@ function loadTheme($id_theme = 0, $initialize = true)
 			loadCSSFile($context['theme_variant'] . '/index' . $context['theme_variant'] . '.css');
 	}
 
-	// A bit lonely maybe, though I think it should be set up *after* teh theme variants detection
+	// A bit lonely maybe, though I think it should be set up *after* the theme variants detection
 	$context['header_logo_url_html_safe'] = empty($settings['header_logo_url']) ? $settings['images_url'] . '/' . $context['theme_variant_url'] .  'logo_elk.png' : Util::htmlspecialchars($settings['header_logo_url']);
 
 	// Allow overriding the board wide time/number formats.
@@ -2001,8 +2001,16 @@ function loadSubTemplate($sub_template_name, $fatal = false)
  */
 function loadCSSFile($filenames, $params = array(), $id = '')
 {
+	global $context;
+
 	if (empty($filenames))
 		return;
+
+	if (!is_array($filenames))
+		$filenames = array($filenames);
+
+	if (in_array('admin.css', $filenames))
+		$filenames[] = $context['theme_variant'] . '/admin' . $context['theme_variant'] . '.css';
 
 	$params['subdir'] = 'css';
 	$params['extension'] = 'css';
@@ -2129,7 +2137,6 @@ function loadAssetFile($filenames, $params = array(), $id = '')
 			if ($has_cache_staler)
 			{
 				$cache_staler = $staler_string;
-
 				$params['basename'] = substr($filename, 0, $has_cache_staler + strlen($params['extension']) + 1);
 			}
 			else
@@ -2167,6 +2174,7 @@ function loadAssetFile($filenames, $params = array(), $id = '')
 			if (!empty($filename))
 			{
 				$this_build[$this_id] = $context[$params['index_name']][$this_id] = array('filename' => $filename, 'options' => $params);
+
 				if ($db_show_debug === true)
 					Debug::get()->add($params['debug_index'], $params['basename'] . '(' . (!empty($params['local']) ? (!empty($params['url']) ? basename($params['url']) : basename($params['dir'])) : '') . ')');
 			}

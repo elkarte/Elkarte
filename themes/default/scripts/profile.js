@@ -119,12 +119,13 @@ function ajax_getSignaturePreview(showPreview)
 			var signatures = ["current", "preview"];
 			for (i = 0; i < signatures.length; i++)
 			{
-				$("#" + signatures[i] + "_signature").css({display:""});
-				$("#" + signatures[i] + "_signature_display").css({display:""}).html($(request).find('[type="' + signatures[i] + '"]').text() + '<hr />');
+				$("#" + signatures[i] + "_signature").css({display:"block"});
+				$("#" + signatures[i] + "_signature_display").css({display:"block"}).html($(request).find('[type="' + signatures[i] + '"]').text() + '<hr />');
 			}
 		}
 
 		var $_profile_error = $("#profile_error");
+
 		if ($(request).find("error").text() !== '')
 		{
 			if (!$_profile_error.is(":visible"))
@@ -144,6 +145,7 @@ function ajax_getSignaturePreview(showPreview)
 			$_profile_error.css({display:"none"});
 			$_profile_error.html('');
 		}
+
 		return false;
 	});
 
@@ -225,7 +227,7 @@ function swap_avatar()
 		var choice_id = $(this).attr('id');
 
 		if ($(this).is(':checked'))
-			$('#' + choice_id.replace('_choice', '')).css({display: ''});
+			$('#' + choice_id.replace('_choice', '')).css({display: 'block'});
 		else
 			$('#' + choice_id.replace('_choice', '')).css({display: 'none'});
 	});
@@ -281,8 +283,8 @@ function modifyWarnNotify()
 	document.getElementById('warn_sub').disabled = disable;
 	document.getElementById('warn_body').disabled = disable;
 	document.getElementById('warn_temp').disabled = disable;
-	document.getElementById('new_template_link').style.display = disable ? 'none' : '';
-	document.getElementById('preview_button').style.display = disable ? 'none' : '';
+	document.getElementById('new_template_link').style.display = disable ? 'none' : 'inline-block';
+	document.getElementById('preview_button').style.display = disable ? 'none' : 'inline-block';
 
 	$("#preview_button").click(function() {
 		$.ajax({
@@ -312,15 +314,18 @@ function modifyWarnNotify()
 				});
 				errors_html += '</ul>';
 				$_profile_error.html(errors_html);
+				$('html, body').animate({ scrollTop: $_profile_error.offset().top }, 'slow');
 			}
 			else
 			{
 				$_profile_error.hide();
 				$("#error_list").html('');
+				$('html, body').animate({ scrollTop: $("#box_preview").offset().top }, 'slow');
 			}
 
 			return false;
 		});
+
 		return false;
 	});
 }

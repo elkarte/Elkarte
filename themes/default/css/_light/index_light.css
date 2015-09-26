@@ -970,6 +970,10 @@ div.bbc_footnotes .meaction {
 	color: #585858;
 }
 
+.quickbuttons .inline_mod_check {
+	margin-left: 0;
+}
+
 /* Radius left end of the first (Quote) button. */
 .linklevel1.quote_button {
 	border-radius: 2px 0 0 2px;

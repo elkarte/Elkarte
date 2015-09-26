@@ -125,7 +125,7 @@ function template_issueWarning()
 				</dd>
 			</dl>
 			<hr />
-			<div id="box_preview"', !empty($context['warning_data']['body_preview']) ? '' : ' style="display:none"', '>
+			<div id="box_preview"', !empty($context['warning_data']['body_preview']) ? '' : ' class="hide"', '>
 				<dl class="settings">
 					<dt>
 						<strong>', $txt['preview'], '</strong>
@@ -163,7 +163,9 @@ function template_issueWarning()
 
 		echo '
 					</select>
-					<span id="new_template_link" style="display: none;"><a class="linkbutton new_win" href="', $scripturl, '?action=moderate;area=warnings;sa=templateedit;tid=0" target="_blank">', $txt['profile_warning_new_template'], '</a></span>
+					<span id="new_template_link" class="hide">
+						<a class="linkbutton new_win" href="', $scripturl, '?action=moderate;area=warnings;sa=templateedit;tid=0" target="_blank">', $txt['profile_warning_new_template'], '</a>
+					</span>
 					<textarea id="warn_body" class="warn_input" name="warn_body" cols="40" rows="8">', $context['warning_data']['notify_body'], '</textarea>
 				</dd>';
 	}

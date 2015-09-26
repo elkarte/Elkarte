@@ -296,7 +296,7 @@ class Debug
 			if (in_array($key, $expandable))
 			{
 				$expand_id[] = 'debug_' . $key;
-				$pre = ' (<a id="debug_' . $key . '" href="#">' . $txt['debug_show'] . '</a><span style="display: none;">';
+				$pre = ' (<a id="debug_' . $key . '" href="#">' . $txt['debug_show'] . '</a><span class="hide">';
 				$post = '</span>)';
 			}
 			else
@@ -323,7 +323,7 @@ class Debug
 			$expand_id[] = 'debug_cache_info';
 
 			echo '
-				', $txt['debug_cache_hits'], $this->cache_count(), ': ', sprintf($txt['debug_cache_seconds_bytes_total'], comma_format($total_t, 5), comma_format($total_s)), ' (<a id="debug_cache_info" href="#">', $txt['debug_show'], '</a><span style="display: none;"><em>', implode('</em>, <em>', $entries), '</em></span>)<br />';
+				', $txt['debug_cache_hits'], $this->cache_count(), ': ', sprintf($txt['debug_cache_seconds_bytes_total'], comma_format($total_t, 5), comma_format($total_s)), ' (<a id="debug_cache_info" href="#">', $txt['debug_show'], '</a><span class="hide"><em>', implode('</em>, <em>', $entries), '</em></span>)<br />';
 		}
 
 		// Want to see the querys in a new windows?

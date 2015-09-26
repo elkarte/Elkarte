@@ -151,12 +151,12 @@ function template_view_package()
 		$js_operations = array();
 		foreach ($context['actions'] as $packageaction)
 		{
-			// Did we pass or fail?  Need to now for later on.
+			// Did we pass or fail?  Need to know for later on.
 			$js_operations[$action_num] = isset($packageaction['failed']) ? $packageaction['failed'] : 0;
 
 			echo '
 				<tr>
-					<td>', isset($packageaction['operations']) ? '<img id="operation_img_' . $action_num . '" src="' . $settings['images_url'] . '/selected_open.png" alt="*" style="display: none;" />' : '', '</td>
+					<td>', isset($packageaction['operations']) ? '<img id="operation_img_' . $action_num . '" src="' . $settings['images_url'] . '/selected_open.png" alt="*" class="hide" />' : '', '</td>
 					<td>', $i++, '.</td>
 					<td>', $packageaction['type'], '</td>
 					<td>', $packageaction['action'], '</td>
@@ -251,7 +251,7 @@ function template_view_package()
 				{
 					echo '
 					<tr>
-						<td>', isset($packageaction['operations']) ? '<img id="operation_img_' . $action_num . '" src="' . $settings['images_url'] . '/selected_open.png" alt="*" style="display: none;" />' : '', '</td>
+						<td>', isset($packageaction['operations']) ? '<img id="operation_img_' . $action_num . '" src="' . $settings['images_url'] . '/selected_open.png" alt="*" class="hide" />' : '', '</td>
 						<td class="centertext" style="width: 30px;">
 							<input type="checkbox" name="theme_changes[]" value="', !empty($action['value']) ? $action['value'] : '', '" id="dummy_theme_', $id, '" ', (!empty($action['not_mod']) ? '' : 'disabled="disabled"'), ' ', !empty($context['themes_locked']) ? 'checked="checked"' : '', '/>
 						</td>
@@ -312,7 +312,7 @@ function template_view_package()
 	{
 		echo '
 			<div class="submitbutton">
-				<input type="submit" value="', $context['uninstalling'] ? $txt['package_uninstall_now'] : $txt['package_install_now'], '" onclick="return ', !empty($context['has_failure']) ? '(submitThisOnce(this) &amp;&amp; confirm(\'' . ($context['uninstalling'] ? $txt['package_will_fail_popup_uninstall'] : $txt['package_will_fail_popup']) . '\'))' : 'submitThisOnce(this)', ';" class="button_submit" />
+				<input type="submit" value="', $context['uninstalling'] ? $txt['package_uninstall_now'] : $txt['package_install_now'], '" onclick="return ', !empty($context['has_failure']) ? '(submitThisOnce(this) &amp;&amp; confirm(\'' . ($context['uninstalling'] ? $txt['package_will_fail_popup_uninstall'] : $txt['package_will_fail_popup']) . '\'))' : 'submitThisOnce(this)', ';" />
 			</div>';
 	}
 	// If we need ftp information then demand it!
@@ -624,7 +624,7 @@ function template_control_chmod()
 	}
 
 	echo '
-				<div id="ftp_error_div" class="errorbox" style="', (!empty($context['package_ftp']['error']) ? '' : 'display:none;'), '">
+				<div id="ftp_error_div" class="errorbox', !empty($context['package_ftp']['error']) ? '"' : ' hide"', '>
 					<span id="ftp_error_message">', !empty($context['package_ftp']['error']) ? $context['package_ftp']['error'] : '', '</span>
 				</div>';
 
@@ -823,13 +823,11 @@ function template_file_permissions()
 					tableHandle = document.getElementById("insert_div_loc_" + fileItems[i].getAttribute(\'ident\'));
 
 					var curRow = document.createElement("tr");
-					curRow.className = "content";
 					curRow.id = "content_" + my_ident;
-					curRow.style.display = "";
+					curRow.style.display = "table-row";
 
 					var curCol = document.createElement("td");
-					curCol.className = "smalltext";
-					curCol.width = "40%";
+					curCol.className = "smalltext grid30";
 
 					// This is the name.
 					var fileName = document.createTextNode(fileItems[i].firstChild.nodeValue);
@@ -862,7 +860,7 @@ function template_file_permissions()
 
 					// Right, the permissions.
 					curCol = document.createElement("td");
-					curCol.className = "smalltext";
+					curCol.className = "smalltext grid30";
 
 					var writeSpan = document.createElement("span");
 					writeSpan.style.color = fileItems[i].getAttribute(\'writable\') ? "green" : "red";
@@ -882,7 +880,7 @@ function template_file_permissions()
 					{
 						curCol = document.createElement("td");
 						curCol.style.backgroundColor = oRadioColors[j];
-						curCol.align = "center";
+						curCol.className = "centertext grid8";
 
 						var curInput = document.createElement("input");
 						curInput.name = "permStatus[" + curPath + "/" + fileItems[i].firstChild.nodeValue + "]";
@@ -931,7 +929,6 @@ function template_file_permissions()
 				linkData.appendChild(document.createTextNode(\'', $txt['package_file_perms_more_files'], '\'));
 
 				curRow = document.createElement("tr");
-				curRow.className = "content";
 				curRow.id = "content_" + ident + "_more";
 				tableHandle.parentNode.insertBefore(curRow, tableHandle);
 				curCol = document.createElement("td");
@@ -1124,7 +1121,9 @@ function template_permission_show_contents($ident, $contents, $level, $has_more 
 					<td class="perm_custom centertext grid8"><input type="radio" name="permStatus[', $ident . '/' . $name, ']" value="custom" /></td>
 					<td class="perm_nochange centertext grid8"><input type="radio" name="permStatus[', $ident . '/' . $name, ']" value="no_change" checked="checked" /></td>
 				</tr>
-				<tr id="insert_div_loc_' . $cur_ident . '" style="display: none;"><td colspan="7"></td></tr>';
+				<tr id="insert_div_loc_' . $cur_ident . '" class="hide">
+					<td colspan="7"></td>
+				</tr>';
 
 			if (!empty($dir['contents']))
 				template_permission_show_contents($ident . '/' . $name, $dir['contents'], $level + 1, !empty($dir['more_files']));
@@ -1159,7 +1158,9 @@ function template_permission_show_contents($ident, $contents, $level, $has_more 
 		// ]]></script>
 		<table class="table_grid">
 			<tbody>
-			<tr style="display: none;"><td colspan="7"></td></tr>';
+			<tr class="hide">
+				<td colspan="7"></td>
+			</tr>';
 	}
 }
 

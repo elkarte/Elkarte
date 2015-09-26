@@ -270,7 +270,7 @@ class Modlog_Controller extends Action_Controller
 					),
 					'data' => array(
 						'function' => function ($entry) {
-							return '<input type="checkbox" class="input_check" name="delete[]" value="' . $entry['id'] . '"' . ($entry['editable'] ? '' : ' disabled="disabled"') . ' />';
+							return '<input type="checkbox" name="delete[]" value="' . $entry['id'] . '"' . ($entry['editable'] ? '' : ' disabled="disabled"') . ' />';
 						},
 						'class' => 'centertext',
 					),
@@ -291,14 +291,12 @@ class Modlog_Controller extends Action_Controller
 					'class' => 'submitbutton',
 					'position' => 'below_table_data',
 					'value' => '
-						<div id="quick_log_search">
-							' . $txt['modlog_search'] . ' (' . $txt['modlog_by'] . ': ' . $context['search']['label'] . ')
-							<input type="text" name="search" size="18" value="' . Util::htmlspecialchars($context['search']['string']) . '" class="input_text" />
-							<input type="submit" name="is_search" value="' . $txt['modlog_go'] . '" class="button_submit" />
-							' . ($context['can_delete'] ? '|&nbsp;
-							<input type="submit" name="remove" value="' . $txt['modlog_remove'] . '" onclick="return confirm(\'' . $txt['modlog_remove_selected_confirm'] . '\');" class="right_submit" />
-							<input type="submit" name="removeall" value="' . $txt['modlog_removeall'] . '" onclick="return confirm(\'' . $txt['modlog_remove_all_confirm'] . '\');" class="right_submit" />' : '') . '
-						</div>',
+						' . $txt['modlog_search'] . ' (' . $txt['modlog_by'] . ': ' . $context['search']['label'] . ')
+						<input type="text" name="search" size="18" value="' . Util::htmlspecialchars($context['search']['string']) . '" class="input_text" />
+						<input type="submit" name="is_search" value="' . $txt['modlog_go'] . '" />
+						' . ($context['can_delete'] ? '|&nbsp;
+						<input type="submit" name="remove" value="' . $txt['modlog_remove'] . '" onclick="return confirm(\'' . $txt['modlog_remove_selected_confirm'] . '\');" />
+						<input type="submit" name="removeall" value="' . $txt['modlog_removeall'] . '" onclick="return confirm(\'' . $txt['modlog_remove_all_confirm'] . '\');"/>' : ''),
 				),
 			),
 		);

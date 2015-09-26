@@ -415,8 +415,8 @@ QuickModify.prototype.onMessageReceived = function (XMLDoc)
 	if (this.opt.sIconHide !== null)
 	{
 		this.oMsgIcon = document.getElementById('messageicon_' + this.sCurMessageId.replace("msg_", ""));
-		if (this.oMsgIcon !== null && this.oMsgIcon.style.display === 'none')
-			this.oMsgIcon.style.display = '';
+		if (this.oMsgIcon !== null && getComputedStyle(this.oMsgIcon).getPropertyValue("display") === 'none')
+			this.oMsgIcon.style.display = 'inline';
 	}
 
 	// If this is not valid then simply give up.
@@ -627,7 +627,7 @@ QuickModify.prototype.onModifyDone = function (XMLDoc)
 			modified_element.innerHTML = message.getElementsByTagName('modified')[0].childNodes[0].nodeValue;
 
 			// Just in case it's the first time the message is modified and the element is hidden
-			modified_element.style.display = '';
+			modified_element.style.display = 'block';
 		}
 
 		// Hide the icon if we were told to

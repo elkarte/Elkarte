@@ -250,15 +250,6 @@
 	opacity: 0.3;
 }
 
-/* Styles for the admin quick search bar */
-#quick_search .input_text, #quick_search select, #quick_search .button_submit {
-	margin: 2px 0 0 4px;
-}
-
-#quick_search select {
-	padding: 0 0 0 2px;
-}
-
 /* alternate row colors on Modify Themes,Copy a template */
 .theme_options .content:nth-child(even), .theme_options li:nth-child(even) {
 	border-top: 1px solid #CCCCCC;

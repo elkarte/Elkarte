@@ -1503,21 +1503,18 @@ class PersonalMessage_Controller extends Action_Controller
 			// Any known rule
 			$js_rules = '';
 			foreach ($context['known_rules'] as $rule)
-				$js_rules .= JavaScriptEscape($rule) . ': ' . JavaScriptEscape($txt['pm_rule_' . $rule]) . ',';
-			$js_rules = '{' . substr($js_rules, 0, -1) . '}';
+				$js_rules[$rule] = $txt['pm_rule_' . $rule];
+			$js_rules = json_encode($js_rules);
 
 			// Any known label
 			$js_labels = '';
 			foreach ($context['labels'] as $label)
 				if ($label['id'] != -1)
-					$js_labels .= JavaScriptEscape($label['id'] + 1) . ': ' . JavaScriptEscape($label['name']) . ',';
-			$js_labels = '{' . substr($js_labels, 0, -1) . '}';
+					$js_labels[$label['id'] + 1] = $label['name'];
+			$js_labels = json_encode($js_labels);
 
 			// And all of the groups as well
-			$js_groups = '';
-			foreach ($context['groups'] as $id => $title)
-				$js_groups .= JavaScriptEscape($id) . ': ' . JavaScriptEscape($title) . ',';
-			$js_groups = '{' . substr($js_groups, 0, -1) . '}';
+			$js_groups = json_encode($context['groups']);
 
 			// Oh my, we have a lot of text strings for this
 			addJavascriptVar(array(

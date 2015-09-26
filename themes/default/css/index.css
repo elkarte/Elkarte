@@ -53,11 +53,11 @@
 .wrapper {
 	margin: 0 auto;
 	/* Next controls forum width, when it is not set in admin. */
-	max-width: 90em;
+	width: 90%;
 	/* Next limits maximum width on wide screens. */
 	/* Sized in em, since some people require larger text. */
 	/* For ease of reading, content really should not be too wide. */
-	width: 90%;
+	max-width: 90em;
 }
 
 /* Cursor declared here.Should not be required anywhere else. */
@@ -127,9 +127,10 @@ form, input, button, select, .input_text, textarea,
 	content: "";
 }
 
+/* simple spacer for between sections */
 .separator {
 	clear: both;
-	margin: 3px 0;
+	margin: 4px 0;
 }
 
 /* Set list-style to none by default. Best in most places.*/
@@ -206,10 +207,12 @@ input[type="file"] {
 	max-height: none;
 	height: auto;
 }
+
 .select_multiple {
 	min-height: 10em;
 	height: auto;
 }
+
 input[type="number"] {
 	padding: 0 0 0 6px;
 }
@@ -261,8 +264,9 @@ input[type=submit][disabled]:hover, button[disabled], button[disabled]:hover {
 .linkbutton:link, .linkbutton_right:link, .linkbutton_left:link,
 .linkbutton:visited, .linkbutton_right:visited, .linkbutton_left:visited {
 	font-size: 0.857em;
-	line-height: 1em;
-	padding: 0.3em;
+	line-height: 1.929em;
+	/*padding: 0.4em 0.5em 0.5em 0.5em;*/
+
 }
 
 /* Use new class that is defined to suit, and with a sensible name. */
@@ -273,9 +277,10 @@ input[type=submit][disabled]:hover, button[disabled], button[disabled]:hover {
 	clear: both;
 }
 
-.submitbutton input[type="submit"] {
-	margin-right: 0.2em;
-	margin-left: 0.2em;
+.submitbutton input[type="submit"],
+.submitbutton input[type="button"]{
+	margin-right: 0.1em;
+	margin-left: 0.1em;
 	padding: 0 6px;
 }
 
@@ -325,6 +330,11 @@ fieldset {
 /*...and em as italics */
 em, .em {
 	font-style: italic;
+}
+
+/* We use this alot */
+.hide {
+	display: none;
 }
 
 /* Some grid helpers for tables and divs */
@@ -498,7 +508,6 @@ em, .em {
 /* Expand/Collapse image in the various headers */
 .panel_toggle span {
 	position: relative;
-	display: block;
 	float: right;
 	overflow: hidden;
 	padding: 0 16px;
@@ -811,7 +820,6 @@ a.bbc_link {
 #password_login {
 	display: inline-block;
 	vertical-align: middle;
-	-webkit-appearance: caps-lock-indicator;
 }
 
 #search_form {
@@ -1244,6 +1252,7 @@ a.bbc_link {
 	font-size: 0.786em;
 	line-height: 2em;
 }
+
 .fa.hamburger_30 {
 	display: none;
 }
@@ -1285,13 +1294,8 @@ a.bbc_link {
 }
 
 .quickbuttons .inline_mod_check {
-	margin: 4px 0 0;
+	margin: 4px;
 	padding: 0 4px;
-}
-
-.inline_mod_check .input_check {
-	margin: 0 0 2px;
-	height: auto;
 }
 
 /* @todo - Save code by amalgamating common button background declarations. */
@@ -1872,7 +1876,7 @@ a.bbc_link {
 	min-height: 2.2em;
 }
 
-#sort_by .input_check {
+#sort_by input[type="checkbox"] {
 	margin-bottom: 0;
 }
 
@@ -2872,7 +2876,7 @@ ul.post_options li {
 }
 
 #event_main select, .event_options li select,
-#event_main ul.event_options li .input_check {
+#event_main ul.event_options li input[type="checkbox"] {
 	margin: 0 12px 0 0;
 }
 
@@ -3567,7 +3571,7 @@ dl.merge_topic dd {
 }
 
 #slider-range-min {
-	margin: 1em 0;
+	margin: 1em 0 1em .6em;
 	width: 80%;
 }
 
@@ -4052,10 +4056,6 @@ a.help .icon {
 	font-size: 1.071em;
 }
 
-#search_term_input .button_submit {
-	margin: 0 0 2px;
-}
-
 /* The advanced search section. */
 #search_options {
 	overflow: hidden;
@@ -4196,7 +4196,7 @@ a.help .icon {
 	font-weight: bold;
 }
 
-dl.no_members {
+.no_members {
 	display: none;
 }
 
@@ -4254,7 +4254,7 @@ dl.no_members {
 	width: 20em;
 }
 
-#memberlist_search .input_check {
+#memberlist_search input[type="checkbox"] {
 	margin: 4px 0 0 0;
 }
 
@@ -4287,7 +4287,7 @@ dl.no_members {
 	float: right;
 }
 
-#mlsearch_options .mlsearch_option .input_check {
+#mlsearch_options .mlsearch_option input[type="checkbox"] {
 	float: right;
 	margin: 0 0 0 0.5em;
 }
@@ -4342,15 +4342,6 @@ dl.no_members {
 	text-align: center;
 }
 
-#confirm_buttons {
-	padding: 12px 0;
-	text-align: center;
-}
-
-#confirm_buttons .button_submit {
-	white-space: normal;
-}
-
 .coppa_contact {
 	margin-left: 5ex;
 	padding: 4px;
@@ -4364,17 +4355,6 @@ dl.no_members {
 	height: 180px;
 	border: 1px solid;
 	text-align: justify;
-}
-
-/* Styles for maintenance mode. */
-#maintenance_mode {
-	min-width: 35em;
-	width: 75%;
-	text-align: left;
-}
-
-#maintenance_mode .floatleft {
-	margin-right: 12px;
 }
 
 /* Common for all admin sections. */
@@ -4404,8 +4384,8 @@ dl.no_members {
 
 /* Lotsa boxes. */
 .description, .information, .warningbox, .successbox, .infobox, .errorbox {
-	margin: 0 0 12px 0;
-	padding: 6px 12px;
+	margin: 0 0 16px 0;
+	padding: 4px 12px;
 	font-size: 0.929em;
 }
 
@@ -4863,15 +4843,15 @@ dl.no_members {
 /* This one does 800 screens at default font size. */
 @media screen and (max-width: 50em) {
 	dd input, dd select, dd textarea {
-		max-width: 100% !important;
-		width: 100% !important;
+		max-width: 85% !important;
+		width: 85% !important;
 	}
 
 	#post_header dd select {
 		max-width: 30% !important;
 	}
 
-	dd .input_check, dd .input_radio {
+	dd input[type="checkbox"], dd input[type="radio"] {
 		display: inline !important;
 		width: 1.5em !important;
 	}
@@ -5123,8 +5103,8 @@ dl.no_members {
 	}
 
 	dd input, dd select, dd textarea {
-		max-width: 90% !important;
-		width: 90% !important;
+		max-width: 89% !important;
+		width: 89% !important;
 	}
 
 	#postAttachment2 dt {
@@ -5633,6 +5613,7 @@ dl.no_members {
 
 	dt, dd, dd label, .login dt, #advanced_search dt {
 		width: 100% !important;
+		margin: 0 !important
 	}
 
 	dd {
@@ -5655,10 +5636,12 @@ dl.no_members {
 		padding: 4px;
 	}
 
-	#confirm_buttons .button_submit {
+	#confirm_buttons input[type="submit"] {
 		max-height: none;
 		height: inherit;
+		white-space: normal;
 	}
+
 	.fa.hamburger_30 {
 		padding-top: 0.1em;
 		display: inline-block;

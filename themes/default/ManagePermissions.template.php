@@ -54,7 +54,7 @@ function template_permission_index()
 		echo '
 			<h2 class="category_header panel_toggle">
 				<span>
-					<span id="upshrink_ic" class="', empty($context['admin_preferences']['app']) ? 'collapse' : 'expand', '" style="display: none;" title="', $txt['hide'], '"></span>
+					<span id="upshrink_ic" class="', empty($context['admin_preferences']['app']) ? 'collapse' : 'expand', ' hide" title="', $txt['hide'], '"></span>
 				</span>
 				<a href="#" id="permissions_panel_link">', $txt['permissions_advanced_options'], '</a>
 			</h2>
@@ -331,7 +331,7 @@ function template_edit_profiles()
 					<tr class="table_head">
 						<th>', $txt['permissions_profile_name'], '</th>
 						<th>', $txt['permissions_profile_used_by'], '</th>
-						<th class="perm_profile_delete" style="', !empty($context['show_rename_boxes']) ? ';display:none"' : '"', ' >', $txt['delete'], '</th>
+						<th class="perm_profile_delete', !empty($context['show_rename_boxes']) ? ' hide"' : '"', ' >', $txt['delete'], '</th>
 					</tr>
 				</thead>
 				<tbody>';
@@ -354,7 +354,7 @@ function template_edit_profiles()
 						<td>
 							', !empty($profile['boards_text']) ? $profile['boards_text'] : $txt['permissions_profile_used_by_none'], '
 						</td>
-						<td class="centertext perm_profile_delete" ', !empty($context['show_rename_boxes']) ? 'style="display:none"' : '', '>
+						<td class="centertext perm_profile_delete', !empty($context['show_rename_boxes']) ? ' hide"' : '"', '>
 							<input type="checkbox" name="delete_profile[]" value="', $profile['id'], '" ', $profile['can_delete'] ? '' : 'disabled="disabled"', ' />
 						</td>
 					</tr>';
@@ -369,10 +369,12 @@ function template_edit_profiles()
 
 	if ($context['can_edit_something'])
 		echo '
-				<input type="submit" id="rename" name="rename" value="', empty($context['show_rename_boxes']) ? $txt['permissions_profile_rename'] : $txt['permissions_commit'], '" class="button_submit" />';
+				<input  id="rename" type="submit" name="rename" value="', empty($context['show_rename_boxes']) ? $txt['permissions_profile_rename'] : $txt['permissions_commit'], '" />';
 
 	echo '
-				<input type="submit" id="delete" name="delete" value="', $txt['quickmod_delete_selected'], '" class="button_submit" ', !empty($context['show_rename_boxes']) ? ' style="display:none"' : '', '/>
+				<span', !empty($context['show_rename_boxes']) ? ' class="hide"' : '', '>
+					<input id="delete" type="submit" name="delete" value="', $txt['quickmod_delete_selected'], '" />
+				</span>
 			</div>
 		</form>
 		<br />
@@ -562,7 +564,7 @@ function template_modify_group_classic($type)
 				if ($permission['hidden'] || $permissionGroup['hidden'])
 				{
 					echo '
-						<tr style="display: none;">
+						<tr class="hide">
 							<td>';
 
 					if ($permission['has_own_any'])
@@ -859,7 +861,7 @@ function template_postmod_permissions()
 				</tbody>
 			</table>
 			<div class="submitbutton">
-				<input type="submit" name="save_changes" value="', $txt['permissions_commit'], '" class="button_submit" />
+				<input type="submit" name="save_changes" value="', $txt['permissions_commit'], '" />
 				<input type="hidden" name="', $context['admin-mppm_token_var'], '" value="', $context['admin-mppm_token'], '" />
 			</div>
 		</form>

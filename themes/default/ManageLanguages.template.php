@@ -340,7 +340,7 @@ function template_add_language()
 	}
 
 	echo '
-				</fieldset>', isBrowser('is_ie') ? '<input type="text" name="ie_fix" style="display: none;" class="input_text" /> ' : '', '
+				</fieldset>
 				<div class="submitbutton">
 					<input type="submit" name="lang_add_sub" value="', $txt['search'], '" />
 				</div>

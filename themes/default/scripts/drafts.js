@@ -121,7 +121,7 @@ elk_DraftAutoSave.prototype.draftSave = function()
 		return false;
 
 	// Flag that we are saving a draft
-	document.getElementById('throbber').style.display = '';
+	document.getElementById('throbber').style.display = 'inline';
 	this.bInDraftMode = true;
 
 	// Get the form elements that we want to save

@@ -695,7 +695,7 @@ function template_edit_censored()
 
 	// First section is for adding/removing words from the censored list.
 	echo '
-	<div id="admincenter">
+	<div id="admincenter" class="admincenter">
 		<form id="admin_form_wrapper" action="', $scripturl, '?action=admin;area=postsettings;sa=censor" method="post" accept-charset="UTF-8">
 			<h2 class="category_header">
 				', $txt['admin_censored_words'], '
@@ -715,11 +715,12 @@ function template_edit_censored()
 				<div class="censorWords">
 					<input type="text" name="censor_vulgar[]" size="30" class="input_text" /> <i class="fa  fa-arrow-circle-right"></i> <input type="text" name="censor_proper[]" size="30" class="input_text" />
 				</div>
-				<div id="moreCensoredWords"></div><div class="censorWords" style="display: none;" id="moreCensoredWords_link">
-					<a class="linkbutton_left" href="#;" onclick="addNewWord(); return false;">', $txt['censor_clickadd'], '</a><br />
+				<div id="moreCensoredWords"></div>
+				<div class="censorWords hide" id="moreCensoredWords_link">
+					<a class="linkbutton_left" href="#" onclick="addNewWord(); return false;">', $txt['censor_clickadd'], '</a><br />
 				</div>
 				<script><!-- // --><![CDATA[
-					document.getElementById("moreCensoredWords_link").style.display = "";
+					document.getElementById("moreCensoredWords_link").style.display = "block";
 				// ]]></script>
 				<hr class="clear" />
 				<dl class="settings">
@@ -751,9 +752,9 @@ function template_edit_censored()
 			<h2 class="category_header">', $txt['censor_test'], '</h2>
 			<div class="content">
 				<div class="centertext">
-					<p id="censor_result" style="display:none" class="information">', empty($context['censor_test']) ? '' : $context['censor_test'], '</p>
+					<p id="censor_result" class="information hide">', empty($context['censor_test']) ? '' : $context['censor_test'], '</p>
 					<input id="censortest" type="text" name="censortest" value="', empty($context['censor_test']) ? '' : $context['censor_test'], '" class="input_text" />
-					<input id="preview_button" type="submit" value="', $txt['censor_test_save'], '" class="button_submit" />
+					<input id="preview_button" type="submit" value="', $txt['censor_test_save'], '" />
 				</div>
 			</div>
 			<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />
@@ -1052,7 +1053,9 @@ function template_show_settings()
 
 	if (empty($context['settings_save_dont_show']))
 		echo '
-					<input type="submit" value="', $txt['save'], '"', (!empty($context['save_disabled']) ? ' disabled="disabled"' : ''), (!empty($context['settings_save_onclick']) ? ' onclick="' . $context['settings_save_onclick'] . '"' : ''), ' class="right_submit" />';
+				<div class="submitbutton">
+					<input type="submit" value="', $txt['save'], '"', (!empty($context['save_disabled']) ? ' disabled="disabled"' : ''), (!empty($context['settings_save_onclick']) ? ' onclick="' . $context['settings_save_onclick'] . '"' : ''), ' />
+				</div>';
 
 	if ($is_open)
 		echo '
@@ -1089,15 +1092,15 @@ function template_admin_search_results()
 	global $context, $txt, $settings, $scripturl;
 
 	echo '
-					<div class="category_header">
-						<h3 class="floatleft hdicon cat_img_search">', sprintf($txt['admin_search_results_desc'], $context['search_term']), '</h3>
+					<h2 class="category_header hdicon cat_img_search">
+						', sprintf($txt['admin_search_results_desc'], $context['search_term']), '
 						<form id="quick_search" class="floatright" action="', $scripturl, '?action=admin;area=search" method="post" accept-charset="UTF-8">
 							<img class="icon" src="', $settings['images_url'], '/filter.png" alt="" />
 							<input type="text" name="search_term" value="', $context['search_term'], '" class="input_text" />
 							<input type="hidden" name="sa" value="', $context['search_type'], '" />
-							<input type="submit" name="search_go" value="', $txt['admin_search_results_again'], '" class="button_submit" />
+							<input type="submit" name="search_go" value="', $txt['admin_search_results_again'], '" />
 						</form>
-					</div>
+					</h2>
 					<div class="generic_list_wrapper">
 						<div class="content">';
 
@@ -1228,13 +1231,14 @@ function template_callback_question_answer_list()
 	}
 
 	echo '
-		<dt id="add_more_question_placeholder" style="display: none;"></dt><dd></dd>
-		<dt id="add_more_link_div" style="display: none;">
+		<dt id="add_more_question_placeholder" class="hide"></dt>
+		<dd></dd>
+		<dt id="add_more_link_div" class="hide">
 			<a href="#" onclick="addAnotherQuestion(); return false;">&#171; ', $txt['setup_verification_add_more'], ' &#187;</a>
 		</dt><dd></dd>';
 
 	addInlineJavascript('
-				document.getElementById(\'add_more_link_div\').style.display = \'\';
+				document.getElementById(\'add_more_link_div\').style.display = \'block\';
 				var question_last_blank = ' . $count . ';
 				var txt_add_another_answer = ' . JavaScriptEscape('&#171; ' . $txt['setup_verification_add_more_answers'] . ' &#187;') . ';
 				var add_question_template = ' . JavaScriptEscape('
@@ -1246,7 +1250,7 @@ function template_callback_question_answer_list()
 				<input type="text" name="answer[b-%question_last_blank%][]" size="40" class="input_text verification_answer" /><br />
 				<a href="#" onclick="addAnotherAnswer(this, \'b-%question_last_blank%\'); return false;">%setup_verification_add_more_answers%</a>
 			</dd>
-			<dt id="add_more_question_placeholder" style="display: none;"></dt>') . ';
+			<dt id="add_more_question_placeholder" class="hide"></dt>') . ';
 				var add_answer_template = ' . JavaScriptEscape('
 				<input type="text" name="answer[%question_last_blank%][]" size="40" class="input_text verification_answer" /><br />
 				<a href="#" onclick="addAnotherAnswer(this, \'%question_last_blank%\'); return false;">&#171; ' . $txt['setup_verification_add_more_answers'] . ' &#187;</a>') . ';', true);
@@ -1445,7 +1449,7 @@ function template_admin_quick_search()
 					<option value="member"', (!empty($context['admin_preferences']['sb']) && $context['admin_preferences']['sb'] == 'member' ? ' selected="selected"' : ''), '>', $txt['admin_search_type_member'], '</option>
 					<option value="online"', (!empty($context['admin_preferences']['sb']) && $context['admin_preferences']['sb'] == 'online' ? ' selected="selected"' : ''), '>', $txt['admin_search_type_online'], '</option>
 				</select>
-				<input type="submit" name="search_go" id="search_go" value="', $txt['admin_search_go'], '" class="button_submit" />
+				<input type="submit" name="search_go" id="search_go" value="', $txt['admin_search_go'], '" />
 			</form>';
 }
 
@@ -1468,15 +1472,15 @@ function template_callback_external_search_engines()
 			</dd>';
 
 	echo '
-		<dt id="add_more_searches" style="display: none;"></dt>
+		<dt id="add_more_searches" class="hide"></dt>
 		<dd></dd>
-		<dt id="add_more_link_div" style="display: none;">
+		<dt id="add_more_link_div" class="hide">
 			<a class="linkbutton" href="#" onclick="addAnotherSearch(', JavaScriptEscape($txt['name']), ', ', JavaScriptEscape($txt['url']), ', ', JavaScriptEscape($txt['words_sep']), '); return false;">', $txt['setup_search_engine_add_more'], '</a>
 		</dt>
 		<dd></dd>';
 
 	addInlineJavascript('
-				document.getElementById(\'add_more_link_div\').style.display = \'\';', true);
+				document.getElementById(\'add_more_link_div\').style.display = \'block\';', true);
 }
 
 /**

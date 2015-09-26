@@ -64,7 +64,7 @@ function template_reminder_pick()
 					<label for="reminder_type_secret">', $txt['authentication_' . $context['account_type'] . '_secret'], '</label>
 				</p>
 				<div class="submitbutton">
-					<input type="submit" value="', $txt['reminder_continue'], '" class="button_submit" />
+					<input type="submit" value="', $txt['reminder_continue'], '" />
 					<input type="hidden" name="uid" value="', $context['current_member']['id'], '" />
 					<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />
 					<input type="hidden" name="', $context['remind_token_var'], '" value="', $context['remind_token'], '" />
@@ -108,7 +108,7 @@ function template_set_password()
  					</dt>
 					<dd>
 						<input type="password" name="passwrd1" id="elk_autov_pwmain" size="22" class="input_password" />
-						<span id="elk_autov_pwmain_div" style="display: none;">
+						<span id="elk_autov_pwmain_div" class="hide">
 							<img id="elk_autov_pwmain_img" src="', $settings['images_url'], '/icons/field_invalid.png" alt="*" />
 						</span>
 					</dd>
@@ -117,7 +117,7 @@ function template_set_password()
 					</dt>
 					<dd>
 						<input type="password" name="passwrd2" id="elk_autov_pwverify" size="22" class="input_password" />
-						<span id="elk_autov_pwverify_div" style="display: none;">
+						<span id="elk_autov_pwverify_div" class="hide">
 							<img id="elk_autov_pwverify_img" src="', $settings['images_url'], '/icons/field_invalid.png" alt="*" />
 						</span>
 					</dd>';
@@ -130,7 +130,7 @@ function template_set_password()
 	echo '
 				</dl>
 				<div class="centertext">
-					<input type="submit" value="', $txt['save'], '" class="button_submit" />
+					<input type="submit" value="', $txt['save'], '" />
 				</div>
 			</div>
 		</div>
@@ -185,7 +185,7 @@ function template_ask()
  					</dt>
 					<dd>
 						<input type="password" name="passwrd1" id="elk_autov_pwmain" size="22" class="input_password" />
-						<span id="elk_autov_pwmain_div" style="display: none;">
+						<span id="elk_autov_pwmain_div" class="hide">
 							<img id="elk_autov_pwmain_img" src="', $settings['images_url'], '/icons/field_invalid.png" alt="*" />
 						</span>
 					</dd>
@@ -194,7 +194,7 @@ function template_ask()
 					</dt>
 					<dd>
 						<input type="password" name="passwrd2" id="elk_autov_pwverify" size="22" class="input_password" />
-						<span id="elk_autov_pwverify_div" style="display: none;">
+						<span id="elk_autov_pwverify_div" class="hide">
 							<img id="elk_autov_pwverify_img" src="', $settings['images_url'], '/icons/field_valid.png" alt="*" />
 						</span>
 					</dd>';
@@ -202,7 +202,7 @@ function template_ask()
 	echo '
 				</dl>
 				<div class="submitbutton">
-					<input type="submit" value="', $txt['save'], '" class="button_submit" />
+					<input type="submit" value="', $txt['save'], '" />
 					<input type="hidden" name="uid" value="', $context['remind_user'], '" />
 					<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />
 					<input type="hidden" name="', $context['remind-sai_token_var'], '" value="', $context['remind-sai_token'], '" />

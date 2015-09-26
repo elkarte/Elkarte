@@ -39,7 +39,7 @@ function template_move_topic()
 					<div class="move_topic">
 						<dl class="settings">
 							<dt>
-								<strong>', $txt['move_to'], ':</strong>
+								<label>', $txt['move_to'], ':</label>
 							</dt>
 							<dd>', template_select_boards('toboard'), '
 							</dd>';
@@ -48,15 +48,19 @@ function template_move_topic()
 	echo '
 						</dl>
 						<label for="reset_subject"><input type="checkbox" name="reset_subject" id="reset_subject" onclick="document.getElementById(\'subjectArea\').style.display = this.checked ? \'block\' : \'none\';" /> ', $txt['moveTopic2'], '.</label><br />
-						<fieldset id="subjectArea" style="display: none;">
+						<fieldset id="subjectArea" class="hide">
 							<dl class="settings">
-								<dt><label for="custom_subject">', $txt['moveTopic3'], ':</label></dt>
-								<dd><input type="text" id="custom_subject" name="custom_subject" size="30" value="', $context['subject'], '" class="input_text" /></dd>
+								<dt>
+									<label for="custom_subject">', $txt['moveTopic3'], ':</label>
+								</dt>
+								<dd>
+									<input type="text" id="custom_subject" name="custom_subject" size="80" value="', $context['subject'], '" class="input_text" />
+								</dd>
 							</dl>
 							<label for="enforce_subject"><input type="checkbox" name="enforce_subject" id="enforce_subject" /> ', $txt['moveTopic4'], '.</label>
 						</fieldset>
 						<label for="postRedirect"><input type="checkbox" name="postRedirect" id="postRedirect" ', $context['is_approved'] ? 'checked="checked"' : '', ' onclick="', $context['is_approved'] ? '' : 'if (this.checked && !confirm(\'' . $txt['move_topic_unapproved_js'] . '\')) return false; ', 'document.getElementById(\'reasonArea\').style.display = this.checked ? \'block\' : \'none\';" /> ', $txt['moveTopic1'], '.</label>
-						<fieldset id="reasonArea" style="', $context['is_approved'] ? '' : 'display: none;', '">
+						<fieldset id="reasonArea" class="', $context['is_approved'] ? '' : 'hide', '">
 							<dl class="settings">
 								<dt>
 									<label for="reason">', $txt['moved_why'], '</label>

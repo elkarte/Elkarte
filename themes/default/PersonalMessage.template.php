@@ -273,7 +273,7 @@ function template_folder()
 					echo '
 									</select>
 									<noscript>
-										<input type="submit" value="', $txt['pm_apply'], '" class="button_submit" />
+										<input type="submit" value="', $txt['pm_apply'], '" />
 									</noscript>';
 				}
 
@@ -539,7 +539,7 @@ function template_search()
 					<strong>', $txt['pm_search_text'], ':</strong>
 				</label>
 				<input type="search" id="search" class="input_text" name="search"', !empty($context['search_params']['search']) ? ' value="' . $context['search_params']['search'] . '"' : '', ' size="40" placeholder="', $txt['search'], '" required="required" autofocus="autofocus" />
-				<input type="submit" name="pm_search" value="', $txt['pm_search_go'], '" class="button_submit" />
+				<input type="submit" name="pm_search" value="', $txt['pm_search_go'], '" />
 			</div>';
 
 	// Now all the advanced options, hidden or shown by JS based on the users minmax choices
@@ -593,7 +593,7 @@ function template_search()
 					</dd>
 				</dl>
 			</div>
-			<a id="upshrink_link" href="', $scripturl, '?action=search;advanced" class="linkbutton" style="display:none">', $txt['pm_search_simple'], '</a>';
+			<a id="upshrink_link" href="', $scripturl, '?action=search;advanced" class="linkbutton hide">', $txt['pm_search_simple'], '</a>';
 
 	// Set the initial search style for the form
 	echo '
@@ -607,11 +607,11 @@ function template_search()
 		<fieldset class="content">
 			<h3 class="secondary_header panel_toggle">
 				<span>
-					<span id="advanced_panel_toggle" class="', empty($context['minmax_preferences']['pm']) ? 'collapse' : 'expand', '" style="display: none;" title="', $txt['hide'], '"></span>
+					<span id="advanced_panel_toggle" class="', empty($context['minmax_preferences']['pm']) ? 'collapse' : 'expand', ' hide" title="', $txt['hide'], '"></span>
 				</span>
 				<a href="#" id="advanced_panel_link">', $txt['pm_search_choose_label'], '</a>
 			</h3>
-			<div id="advanced_panel_div" class="well"', empty($context['minmax_preferences']['pm']) ? '' : ' style="display: none;"', '>
+			<div id="advanced_panel_div" class="well', empty($context['minmax_preferences']['pm']) ? '"' : ' hide"', '>
 				<ul id="searchLabelsExpand">';
 
 		foreach ($context['search_labels'] as $label)
@@ -850,7 +850,7 @@ function template_send()
 
 	// Show the preview of the personal message.
 	echo '
-		<div id="preview_section"', isset($context['preview_message']) ? '' : ' style="display: none;"', '>
+		<div id="preview_section"', isset($context['preview_message']) ? '' : ' class="hide"', '>
 			<h2 class="category_header">
 				<span id="preview_subject">', empty($context['preview_subject']) ? '' : $context['preview_subject'], '</span>
 			</h2>
@@ -875,7 +875,7 @@ function template_send()
 
 	if (!empty($modSettings['drafts_pm_enabled']))
 		echo '
-				<div id="draft_section" class="successbox"', isset($context['draft_saved']) ? '' : ' style="display: none;"', '>',
+				<div id="draft_section" class="successbox', isset($context['draft_saved']) ? '"' : ' hide"', '>',
 					sprintf($txt['draft_pm_saved'], $scripturl . '?action=pm;sa=showpmdrafts'), '
 				</div>';
 
@@ -895,7 +895,7 @@ function template_send()
 
 	// A link to add BCC, only visible with javascript enabled.
 	echo '
-						<span class="smalltext" id="bcc_link_container" style="display: none;"></span>';
+						<span id="bcc_link_container" class="smalltext hide"></span>';
 
 	// A div that'll contain the items found by the autosuggest.
 	echo '
@@ -906,7 +906,7 @@ function template_send()
 
 	// This BCC row will be hidden by default if javascript is enabled.
 	echo '
-					<dt  class="clear_left" id="bcc_div">
+					<dt id="bcc_div" class="clear_left" >
 						<label for="bcc_control"', (isset($context['post_error']['no_to']) || isset($context['post_error']['bad_bcc']) ? ' class="error"' : ''), ' id="caption_bbc">', $txt['pm_bcc'], ':</label>
 					</dt>
 					<dd id="bcc_div2">
@@ -954,11 +954,11 @@ function template_send()
 		echo '
 				<h3 id="postDraftOptionsHeader" class="category_header panel_toggle">
 					<span>
-						<span id="postDraftExpand" class="', empty($context['minmax_preferences']['pmdraft']) ? 'collapse' : 'expand', '" style="display: none;" title="', $txt['hide'], '"></span>
+						<span id="postDraftExpand" class="', empty($context['minmax_preferences']['pmdraft']) ? 'collapse' : 'expand', ' hide" title="', $txt['hide'], '"></span>
 					</span>
 					<a href="#" id="postDraftExpandLink">', $txt['draft_load'], '</a>
 				</h3>
-				<div id="postDraftOptions" class="load_drafts padding"', empty($context['minmax_preferences']['pmdraft']) ? '' : ' style="display: none;"', '>
+				<div id="postDraftOptions" class="load_drafts padding', empty($context['minmax_preferences']['pmdraft']) ? '"' : ' hide"', '>
 					<dl class="settings">
 						<dt><strong>', $txt['subject'], '</strong></dt>
 						<dd><strong>', $txt['draft_saved_on'], '</strong></dd>';
@@ -1179,8 +1179,8 @@ function template_labels()
 	if (!count($context['labels']) < 2)
 		echo '
 		<div class="submitbutton">
-			<input type="submit" name="save" value="', $txt['save'], '" class="button_submit" />
-			<input type="submit" name="delete" value="', $txt['quickmod_delete_selected'], '" onclick="return confirm(\'', $txt['pm_labels_delete'], '\');" class="button_submit" />
+			<input type="submit" name="save" value="', $txt['save'], '" />
+			<input type="submit" name="delete" value="', $txt['quickmod_delete_selected'], '" onclick="return confirm(\'', $txt['pm_labels_delete'], '\');" />
 		</div>';
 
 	echo '
@@ -1361,7 +1361,7 @@ function template_add_rule()
 				<br />';
 
 		echo '
-					<select name="ruletype[', $k, ']" id="ruletype', $k, '" data-optnum="', $k, '">
+					<select class="criteria" name="ruletype[', $k, ']" id="ruletype', $k, '" data-optnum="', $k, '">
 						<option value="">', $txt['pm_rule_criteria_pick'], ':</option>';
 
 		foreach ($context['known_rules'] as $rule)
@@ -1370,10 +1370,10 @@ function template_add_rule()
 
 		echo '
 					</select>
-					<span id="defdiv', $k, '" ', !in_array($criteria['t'], array('gid', 'bud')) ? '' : 'style="display: none;"', '>
+					<span id="defdiv', $k, '" ', !in_array($criteria['t'], array('gid', 'bud')) ? '' : 'class="hide"', '>
 						<input type="text" name="ruledef[', $k, ']" id="ruledef', $k, '" value="', in_array($criteria['t'], array('mid', 'sub', 'msg')) ? $criteria['v'] : '', '" class="input_text" />
 					</span>
-					<span id="defseldiv', $k, '" ', $criteria['t'] == 'gid' ? '' : 'style="display: none;"', '>
+					<span id="defseldiv', $k, '" ', $criteria['t'] == 'gid' ? '' : 'class="hide"', '>
 						<select class="criteria" name="ruledefgroup[', $k, ']" id="ruledefgroup', $k, '">
 							<option value="">', $txt['pm_rule_sel_group'], '</option>';
 
@@ -1396,7 +1396,7 @@ function template_add_rule()
 	echo '
 				<span id="criteriaAddHere"></span>
 				<br />
-				<a id="addonjs1" class="linkbutton" href="#" onclick="addCriteriaOption(); return false;" style="display: none;">', $txt['pm_rule_criteria_add'], '</a>
+				<a id="addonjs1" class="linkbutton hide" href="#" onclick="addCriteriaOption(); return false;">', $txt['pm_rule_criteria_add'], '</a>
 				<br /><br />
 				', $txt['pm_rule_logic'], ':
 				<select name="rule_logic" id="logic"">
@@ -1449,7 +1449,7 @@ function template_add_rule()
 
 	echo '
 				<span id="actionAddHere"></span><br />
-				<a href="#" id="addonjs2" class="linkbutton" onclick="addActionOption(); return false;" style="display: none;">', $txt['pm_rule_add_action'], '</a>
+				<a href="#" id="addonjs2" class="linkbutton hide" onclick="addActionOption(); return false;">', $txt['pm_rule_add_action'], '</a>
 			</fieldset>
 		</div>
 		<h2 class="category_header">', $txt['pm_rule_description'], '</h2>
@@ -1470,8 +1470,8 @@ function template_add_rule()
 	// If this isn't a new rule and we have JS enabled remove the JS compatibility stuff.
 	if ($context['rid'])
 		echo '
-			document.getElementById("removeonjs1").style.display = "none";
-			document.getElementById("removeonjs2").style.display = "none";';
+			document.getElementById("removeonjs1").className = "hide";
+			document.getElementById("removeonjs2").className = "hide";';
 
 	echo '
 			document.getElementById("addonjs1").style.display = "";

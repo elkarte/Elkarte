@@ -90,7 +90,7 @@ function template_ban_edit()
 	if (!empty($context['ban_suggestions']))
 	{
 		echo '
-				<fieldset>
+				<fieldset class="clear">
 					<legend>
 						<input type="checkbox" onclick="invertAll(this, this.form, \'ban_suggestion\');" class="input_check"> ', $txt['ban_triggers'], '
 					</legend>
@@ -257,7 +257,7 @@ function template_ban_edit_trigger()
 					</dl>
 				</fieldset>
 				<div class="submitbutton">
-					<input type="submit" name="', $context['ban_trigger']['is_new'] ? 'add_new_trigger' : 'edit_trigger', '" value="', $context['ban_trigger']['is_new'] ? $txt['ban_add_trigger_submit'] : $txt['ban_edit_trigger_submit'], '" class="button_submit" />
+					<input type="submit" name="', $context['ban_trigger']['is_new'] ? 'add_new_trigger' : 'edit_trigger', '" value="', $context['ban_trigger']['is_new'] ? $txt['ban_add_trigger_submit'] : $txt['ban_edit_trigger_submit'], '" />
 				</div>
 			</div>
 			<input type="hidden" name="bi" value="' . $context['ban_trigger']['id'] . '" />

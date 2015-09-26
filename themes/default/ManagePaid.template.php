@@ -80,7 +80,7 @@ function template_modify_subscription()
 						</select>
 					</dd>
 					<dt>
-						', $txt['paid_mod_add_groups'], ':<br /><span class="smalltext">', $txt['paid_mod_add_groups_desc'], '</span>
+						<label>', $txt['paid_mod_add_groups'], ':</label><br /><span class="smalltext">', $txt['paid_mod_add_groups_desc'], '</span>
 					</dt>
 					<dd>';
 
@@ -108,7 +108,7 @@ function template_modify_subscription()
 				<input type="radio" name="duration_type" id="duration_type_fixed" value="fixed" ', empty($context['sub']['duration']) || $context['sub']['duration'] == 'fixed' ? 'checked="checked"' : '', ' onclick="toggleDuration(\'fixed\');" />
 				<strong>', $txt['paid_mod_fixed_price'], '</strong>
 				<br />
-				<div id="fixed_area" ', empty($context['sub']['duration']) || $context['sub']['duration'] == 'fixed' ? '' : 'style="display: none;"', '>
+				<div id="fixed_area" ', empty($context['sub']['duration']) || $context['sub']['duration'] == 'fixed' ? '' : 'class="hide"', '>
 					<fieldset>
 						<dl class="settings">
 							<dt>
@@ -135,7 +135,7 @@ function template_modify_subscription()
 				<input type="radio" name="duration_type" id="duration_type_flexible" value="flexible" ', !empty($context['sub']['duration']) && $context['sub']['duration'] == 'flexible' ? 'checked="checked"' : '', ' onclick="toggleDuration(\'flexible\');" />
 				<strong>', $txt['paid_mod_flexible_price'], '</strong>
 				<br />
-				<div id="flexible_area" ', !empty($context['sub']['duration']) && $context['sub']['duration'] == 'flexible' ? '' : 'style="display: none;"', '>
+				<div id="flexible_area" ', !empty($context['sub']['duration']) && $context['sub']['duration'] == 'flexible' ? '' : 'class="hide"', '>
 					<fieldset>';
 
 	/** Removed until implemented

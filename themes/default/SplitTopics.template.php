@@ -53,8 +53,10 @@ function template_ask()
 						</li>
 					</ul>
 					<hr />
-					<label for="messageRedirect"><input type="checkbox" name="messageRedirect" id="messageRedirect" onclick="document.getElementById(\'reasonArea\').style.display = this.checked ? \'block\' : \'none\';" /> ', $txt['splittopic_notification'], '.</label>
-					<fieldset id="reasonArea" style="display: none;', '">
+					<label for="messageRedirect">
+						<input type="checkbox" name="messageRedirect" id="messageRedirect" onclick="document.getElementById(\'reasonArea\').style.display = this.checked ? \'block\' : \'none\';" /> ', $txt['splittopic_notification'], '.
+					</label>
+					<fieldset id="reasonArea" class="hide">
 						<dl class="settings">
 							<dt>
 								', $txt['moved_why'], '
@@ -178,7 +180,7 @@ function template_select()
 				</div>
 				<div class="submitbutton clear_right">
 					<input type="hidden" name="topic" value="', $context['current_topic'], '" />
-					<input type="submit" value="', $txt['split_topic'], '" class="button_submit" />
+					<input type="submit" value="', $txt['split_topic'], '" />
 					<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />
 				</div>
 			</div>

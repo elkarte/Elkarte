@@ -158,7 +158,7 @@ function template_error_message()
 	global $context, $txt;
 
 	echo '
-		<div class="errorbox" ', empty($context['post_errors']) ? 'style="display:none" ' : '', 'id="profile_error">';
+		<div id="profile_error" class="errorbox', empty($context['post_errors']) ? ' hide"' : '"', '>';
 
 	if (!empty($context['post_errors']))
 	{

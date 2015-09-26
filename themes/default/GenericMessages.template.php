@@ -47,7 +47,7 @@ function template_build_poster_div($message, $ignoring = false)
 
 	// The new member info dropdown starts here. Note that conditionals have not been fully checked yet.
 	$poster_div .= '
-								<ul class="menulevel2" id="msg_' . $message['id'] . '_extra_info"' . ($ignoring ? ' style="display:none;"' : ' aria-haspopup="true"') . '>';
+								<ul id="msg_' . $message['id'] . '_extra_info" class="menulevel2' . ($ignoring ? ' hide"' : '" aria-haspopup="true"') . '>';
 
 	// Don't show these things for guests.
 	if (!$message['member']['is_guest'])
