@@ -210,26 +210,29 @@ class Auth_Controller extends Action_Controller
 		// Find them... if we can
 		$user_settings = loadExistingMember($_POST['user']);
 
-		//User using 2FA for login? Let's validate the token...
+		// User using 2FA for login? Let's validate the token...
 		if (!empty($user_settings['enable_otp']) && empty($_POST['otp_token']))
 		{
 			$context['login_errors'] = array($txt['otp_required']);
+
 			return;
 		}
+
 		if (!empty($_POST['otp_token']))
 		{
 			require_once(EXTDIR . '/GoogleAuthenticator.php');
 			$ga = New GoogleAuthenticator();
-			$oneCode = $ga->GetCode($user_settings['otp_secret'], $_POST['otp_timestamp']);
-			$checkResult =$ga->verifyCode($user_settings['otp_secret'], $_POST['otp_token'], 2);
 
-			if(!$checkResult)
+			$ga->GetCode($user_settings['otp_secret'], $_POST['otp_timestamp']);
+			$checkResult = $ga->verifyCode($user_settings['otp_secret'], $_POST['otp_token'], 2);
+			if (!$checkResult)
 			{
 				$context['login_errors'] = array($txt['invalid_otptoken']);
+
 				return;
 			}
-
 		}
+
 		// Let them try again, it didn't match anything...
 		if (empty($user_settings))
 		{

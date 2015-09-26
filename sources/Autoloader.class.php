@@ -236,7 +236,7 @@ class Elk_Autoloader
 	{
 		$namespaces = explode('\\', ltrim($class, '\\'));
 		$prefix = '';
-		
+
 		if (isset($namespaces[1]))
 		{
 			$class = array_pop($namespaces);
