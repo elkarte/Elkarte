@@ -147,7 +147,7 @@ class PackageServers_Controller extends Action_Controller
 		$name = '';
 
 		// Browsing the packages from a server
-		if (isset($_GET['server']))
+		if (isset($this->_req->query->server))
 			list($name, $url, $server) = $this->_package_server();
 
 		// Minimum required parameter did not exist so dump out.
@@ -229,7 +229,7 @@ class PackageServers_Controller extends Action_Controller
 							$package['can_install'] = matchPackageVersion($the_version, $for);
 						}
 					}
-
+					$package['can_install'] = true;
 					// See if this filename already exists on the server
 					$already_exists = getPackageInfo($base_name);
 					$package['download_conflict'] = is_array($already_exists) && $already_exists['id'] == $package['id'] && $already_exists['version'] != $package['version'];
@@ -342,8 +342,8 @@ class PackageServers_Controller extends Action_Controller
 			// We could read the package info and see if we have a duplicate id & version, however that is
 			// not always accurate, especially when dealing with repos.  So for now just put in in no conflict mode
 			// and do the save.
-			if (isset($_GET['area'], $_GET['sa']) && $_GET['area'] == 'packageservers' && $_GET['sa'] == 'download')
-				$_REQUEST['auto'] = true;
+			if ($this->_req->getQuery('area') === 'packageservers' && $this->_req->getQuery('sa') === 'download')
+				$this->_req->query->auto = true;
 
 			return str_replace($invalid, '_', $newname) . $matches[6];
 		}
@@ -373,7 +373,7 @@ class PackageServers_Controller extends Action_Controller
 		$context['sub_template'] = 'downloaded';
 
 		// Security is good...
-		if (isset($_GET['server']))
+		if (isset($this->_req->query->server))
 			checkSession('get');
 		else
 			checkSession();
@@ -396,14 +396,15 @@ class PackageServers_Controller extends Action_Controller
 			$listing = json_decode(fetch_web_data($url));
 
 			// Find the requested package by section and number, make sure it matches
-			$section = $listing->$_GET['section'];
+			$section = $this->_req->query->section;
+			$section = $listing->$section;
 
 			// This is what they requested, yes?
-			if (basename($section[$_GET['num']]->server[0]->download) === $_GET['package'])
+			if (basename($section[$this->_req->query->num]->server[0]->download) === $this->_req->query->package)
 			{
 				// Where to download it from
-				$package_name = $this->_rename_master($section[$_GET['num']]->server[0]->download);
-				$path_url = pathinfo($section[$_GET['num']]->server[0]->download);
+				$package_name = $this->_rename_master($section[$this->_req->query->num]->server[0]->download);
+				$path_url = pathinfo($section[$this->_req->query->num]->server[0]->download);
 				$url = isset($path_url['dirname']) ? $path_url['dirname'] . '/' : '';
 			}
 			// Not found or some monkey business
@@ -411,11 +412,11 @@ class PackageServers_Controller extends Action_Controller
 				fatal_lang_error('package_cant_download', false);
 		}
 		// Entered a url and optional filename
-		elseif (isset($_POST['byurl']) && !empty($_POST['filename']))
-			$package_name = basename($_POST['filename']);
+		elseif (isset($this->_req->post->byurl) && !empty($this->_req->post->filename))
+			$package_name = basename($this->_req->post->filename);
 		// Must just be a link then
 		else
-			$package_name = $this->_rename_master($_POST['package']);
+			$package_name = $this->_rename_master($this->_req->post->package);
 
 		// Avoid over writing any existing package files of the same name
 		if (isset($this->_req->query->conflict) || (isset($this->_req->query->auto) && file_exists(BOARDDIR . '/packages/' . $package_name)))
@@ -438,7 +439,7 @@ class PackageServers_Controller extends Action_Controller
 		}
 
 		// First make sure it's a package.
-		$packageInfo = getPackageInfo($url . $this->_req->query->package);
+		$packageInfo = getPackageInfo($url . $this->_req->post->package);
 
 		if (!is_array($packageInfo))
 			Errors::instance()->fatal_lang_error($packageInfo);
@@ -448,14 +449,14 @@ class PackageServers_Controller extends Action_Controller
 			array(BOARDDIR . '/packages/' . $package_name),
 			array('destination_url' => $scripturl . '?action=admin;area=packageservers;sa=download' . (isset($this->_req->query->server)
 				? ';server=' . $this->_req->query->server : '') . (isset($this->_req->query->auto)
-				? ';auto' : '') . ';package=' . $this->_req->query->package . (isset($this->_req->query->conflict)
+				? ';auto' : '') . ';package=' . $this->_req->post->package . (isset($this->_req->query->conflict)
 				? ';conflict' : '') . ';' . $context['session_var'] . '=' . $context['session_id'],
 				'crash_on_error' => true)
 		);
-		package_put_contents(BOARDDIR . '/packages/' . $package_name, fetch_web_data($url . $this->_req->query->package));
+		package_put_contents(BOARDDIR . '/packages/' . $package_name, fetch_web_data($url . $this->_req->post->package));
 
 		// Done!  Did we get this package automatically?
-		if (preg_match('~^http://[\w_\-]+\.elkarte\.net/~', $this->_req->query->package) == 1 && strpos($this->_req->query->package, 'dlattach') === false && isset($this->_req->query->auto))
+		if (preg_match('~^http://[\w_\-]+\.elkarte\.net/~', $this->_req->post->package) == 1 && strpos($this->_req->post->package, 'dlattach') === false && isset($this->_req->query->auto))
 			redirectexit('action=admin;area=packages;sa=install;package=' . $package_name);
 
 		// You just downloaded a addon from SERVER_NAME_GOES_HERE.
@@ -498,12 +499,12 @@ class PackageServers_Controller extends Action_Controller
 		$url = '';
 		$server = '';
 
-		if (isset($_GET['server']))
+		if (isset($this->_req->query->server))
 		{
-			if ($_GET['server'] == '')
+			if ($this->_req->query->server == '')
 				redirectexit('action=admin;area=packageservers');
 
-			$server = (int) $_GET['server'];
+			$server = $this->_req->getQuery('server', 'intval');
 
 			// Query the server table to find the requested server.
 			$packageserver = fetchPackageServers($server);

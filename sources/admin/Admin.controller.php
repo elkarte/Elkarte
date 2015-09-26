@@ -886,9 +886,13 @@ class Admin_Controller extends Action_Controller
 	{
 		global $context;
 
+		// @todo once Action.class is changed
 		$_REQUEST['sa'] = 'query';
-		$_POST['membername'] = un_htmlspecialchars($context['search_term']);
-		$_POST['types'] = '';
+
+		// Set the query values
+		$this->_req->post->sa = 'query';
+		$this->_req->post->membername = un_htmlspecialchars($context['search_term']);
+		$this->_req->post->types = '';
 
 		$managemembers = new ManageMembers_Controller(new Event_manager());
 		$managemembers->pre_dispatch();

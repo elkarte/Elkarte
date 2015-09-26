@@ -35,6 +35,20 @@ class ManageSearchEngines_Controller extends Action_Controller
 	protected $_engineSettings;
 
 	/**
+	 * Holds instance of HttpReq object
+	 * @var HttpReq
+	 */
+	protected $_req;
+
+	/**
+	 * Pre Dispatch, called before other methods.  Loads HttpReq
+	 */
+	public function pre_dispatch()
+	{
+		$this->_req = HttpReq::instance();
+	}
+
+	/**
 	* Entry point for this section.
 	*
 	* @see Action_Controller::action_index()
@@ -103,15 +117,15 @@ class ManageSearchEngines_Controller extends Action_Controller
 		}
 
 		// Make sure it's valid - note that regular members are given id_group = 1 which is reversed in Load.php - no admins here!
-		if (isset($_POST['spider_group']) && !isset($config_vars['spider_group'][2][$_POST['spider_group']]))
-			$_POST['spider_group'] = 0;
+		if (isset($this->_req->post->spider_group) && !isset($config_vars['spider_group'][2][$this->_req->post->spider_group]))
+			$this->_req->post->spider_group = 0;
 
 		// Setup the template.
 		$context['page_title'] = $txt['settings'];
 		$context['sub_template'] = 'show_settings';
 
 		// Are we saving them - are we??
-		if (isset($_GET['save']))
+		if (isset($this->_req->query->save))
 		{
 			// security checks
 			checkSession();
@@ -215,16 +229,16 @@ class ManageSearchEngines_Controller extends Action_Controller
 		}
 
 		// Are we adding a new one?
-		if (!empty($_POST['addSpider']))
+		if (!empty($this->_req->post->addSpider))
 			return $this->action_editspiders();
 		// User pressed the 'remove selection button'.
-		elseif (!empty($_POST['removeSpiders']) && !empty($_POST['remove']) && is_array($_POST['remove']))
+		elseif (!empty($this->_req->post->removeSpiders) && !empty($this->_req->post->remove) && is_array($this->_req->post->remove))
 		{
 			checkSession();
 			validateToken('admin-ser');
 
 			// Make sure every entry is a proper integer.
-			$toRemove = array_map('intval', $_POST['remove']);
+			$toRemove = array_map('intval', $this->_req->post->remove);
 
 			// Delete them all!
 			removeSpiders($toRemove);
@@ -354,20 +368,20 @@ class ManageSearchEngines_Controller extends Action_Controller
 		global $context, $txt;
 
 		// Some standard stuff.
-		$context['id_spider'] = !empty($_GET['sid']) ? (int) $_GET['sid'] : 0;
+		$context['id_spider'] = $this->_req->getQuery('sid', 'intval', 0);
 		$context['page_title'] = $context['id_spider'] ? $txt['spiders_edit'] : $txt['spiders_add'];
 		$context['sub_template'] = 'spider_edit';
 		require_once(SUBSDIR . '/SearchEngines.subs.php');
 
 		// Are we saving?
-		if (!empty($_POST['save']))
+		if (!empty($this->_req->post->save))
 		{
 			checkSession();
 			validateToken('admin-ses');
 
 			// Check the IP range is valid.
 			$ips = array();
-			$ip_sets = explode(',', $_POST['spider_ip']);
+			$ip_sets = explode(',', $this->_req->post->spider_ip);
 			foreach ($ip_sets as $set)
 			{
 				$test = ip2range(trim($set));
@@ -377,7 +391,7 @@ class ManageSearchEngines_Controller extends Action_Controller
 			$ips = implode(',', $ips);
 
 			// Goes in as it is...
-			updateSpider($context['id_spider'], $_POST['spider_name'], $_POST['spider_agent'], $ips);
+			updateSpider($context['id_spider'], $this->_req->post->spider_name, $this->_req->post->spider_agent, $ips);
 
 			// Order by user agent length.
 			sortSpiderTable();
@@ -415,12 +429,12 @@ class ManageSearchEngines_Controller extends Action_Controller
 		loadTemplate('ManageSearch');
 
 		// Did they want to delete some or all entries?
-		if ((!empty($_POST['delete_entries']) && isset($_POST['older'])) || !empty($_POST['removeAll']))
+		if ((!empty($this->_req->post->delete_entries) && isset($this->_req->post->older)) || !empty($this->_req->post->removeAll))
 		{
 			checkSession();
 			validateToken('admin-sl');
 
-			$since = isset($_POST['older']) ? (int) $_POST['older'] : 0;
+			$since = $this->_req->getPost('older', 'intval', 0);
 			$deleteTime = time() - ($since * 24 * 60 * 60);
 
 			// Delete the entries.
@@ -542,12 +556,12 @@ class ManageSearchEngines_Controller extends Action_Controller
 		}
 
 		// Are we cleaning up some old stats?
-		if (!empty($_POST['delete_entries']) && isset($_POST['older']))
+		if (!empty($this->_req->post->delete_entries) && isset($this->_req->post->older))
 		{
 			checkSession();
 			validateToken('admin-ss');
 
-			$deleteTime = time() - (((int) $_POST['older']) * 24 * 60 * 60);
+			$deleteTime = time() - (((int) $this->_req->post->older) * 24 * 60 * 60);
 
 			// Delete the entries.
 			removeSpiderOldStats($deleteTime);
@@ -559,7 +573,7 @@ class ManageSearchEngines_Controller extends Action_Controller
 		$max_date = key($date_choices);
 
 		// What are we currently viewing?
-		$current_date = isset($_REQUEST['new_date']) && isset($date_choices[$_REQUEST['new_date']]) ? $_REQUEST['new_date'] : $max_date;
+		$current_date = isset($this->_req->post->new_date) && isset($date_choices[$this->_req->post->new_date]) ? $this->_req->post->new_date : $max_date;
 
 		// Prepare the HTML.
 		$date_select = '
@@ -581,7 +595,7 @@ class ManageSearchEngines_Controller extends Action_Controller
 			</noscript>';
 
 		// If we manually jumped to a date work out the offset.
-		if (isset($_REQUEST['new_date']))
+		if (isset($this->_req->post->new_date))
 		{
 			$date_query = sprintf('%04d-%02d-01', substr($current_date, 0, 4), substr($current_date, 4));
 
