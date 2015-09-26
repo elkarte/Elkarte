@@ -79,7 +79,7 @@ class Elk_Autoloader
 
 	/**
 	 * Holds the name full file name of the file to load (require)
-	 * @var string
+	 * @var string|boolean
 	 */
 	protected $_file_name = false;
 
@@ -157,7 +157,8 @@ class Elk_Autoloader
 		set_include_path($this->_dir . '.' . (!@ini_get('open_basedir') ? PATH_SEPARATOR . get_include_path() : ''));
 
 		// The autoload "magic"
-		spl_autoload_register(array($this, 'elk_autoloader'));
+		if (!$this->_setup)
+			spl_autoload_register(array($this, 'elk_autoloader'));
 	}
 
 	/**
@@ -191,6 +192,7 @@ class Elk_Autoloader
 		// Well do we have something to do?
 		if (!empty($file))
 		{
+			// Are we going to validate the file exists?
 			if ($this->_strict)
 			{
 				if (stream_resolve_include_path($file))
@@ -255,7 +257,8 @@ class Elk_Autoloader
 
 	/**
 	 * This handles any case where a namespace is present.
-	 * @return bool False if the namespace was found, but the file not, true otherwise.
+	 *
+	 * @return bool false if the namespace was found, but not the file, true otherwise.
 	 */
 	protected function _handle_namespaces()
 	{
