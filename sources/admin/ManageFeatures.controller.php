@@ -467,7 +467,7 @@ class ManageFeatures_Controller extends Action_Controller
 
 			// Let's just keep it active, there are too many reasons it should be.
 			require_once(SUBSDIR . '/ScheduledTasks.subs.php');
-			toggleTaskStatusByName('user_access_mentions', 1);
+			toggleTaskStatusByName('user_access_mentions', true);
 
 			foreach ($modules_toggle as $action => $toggles)
 			{
