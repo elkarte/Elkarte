@@ -28,24 +28,41 @@ class Display_Controller extends Action_Controller
 {
 	/**
 	 * The template layers object
-	 *
 	 * @var null|object
 	 */
 	protected $_template_layers = null;
 
 	/**
 	 * The message id when in the form msg123
-	 *
 	 * @var int
 	 */
 	protected $_virtual_msg = 0;
 
 	/**
 	 * The class that takes care of rendering the message icons (MessageTopicIcons)
-	 *
 	 * @var null|object
 	 */
 	protected $_icon_sources = null;
+
+	/**
+	 * Start viewing the topics from ... (page, all, other)
+	 * @var int|string
+	 */
+	private $_start;
+
+	/**
+	 * Holds instance of HttpReq object
+	 * @var HttpReq
+	 */
+	private $_req;
+
+	/**
+	 * Pre Dispatch, called before other methods.  Loads HttpReq instance.
+	 */
+	public function pre_dispatch()
+	{
+		$this->_req = HttpReq::instance();
+	}
 
 	/**
 	 * Default action handler for this controller
@@ -97,30 +114,33 @@ class Display_Controller extends Action_Controller
 		$includeUnapproved = !$modSettings['postmod_active'] || allowedTo('approve_posts');
 
 		// Let's do some work on what to search index.
-		if (count($_GET) > 2)
+		if (count($this->_req->query) > 2)
 		{
-			foreach ($_GET as $k => $v)
+			foreach ($this->_req->query as $k => $v)
 			{
 				if (!in_array($k, array('topic', 'board', 'start', session_name())))
 					$context['robot_no_index'] = true;
 			}
 		}
 
-		if (!empty($_REQUEST['start']) && (!is_numeric($_REQUEST['start']) || $_REQUEST['start'] % $context['messages_per_page'] != 0))
+		$this->_start = $this->_req->getQuery('start');
+		if (!empty($this->_start) && (!is_numeric($this->_start) || $this->_start % $context['messages_per_page'] !== 0))
 			$context['robot_no_index'] = true;
 
 		// Find the previous or next topic.  Make a fuss if there are no more.
-		if (isset($_REQUEST['prev_next']) && ($_REQUEST['prev_next'] == 'prev' || $_REQUEST['prev_next'] == 'next'))
+		if ($this->_req->getQuery('prev_next') === 'prev' || $this->_req->getQuery('prev_next') === 'next')
 		{
 			// No use in calculating the next topic if there's only one.
 			if ($board_info['num_topics'] > 1)
 			{
-				$topic = $_REQUEST['prev_next'] === 'prev' ? previousTopic($topic, $board, $user_info['id'], $includeUnapproved) : nextTopic($topic, $board, $user_info['id'], $includeUnapproved);
+				$topic = $this->_req->query->prev_next === 'prev'
+					? previousTopic($topic, $board, $user_info['id'], $includeUnapproved)
+					: nextTopic($topic, $board, $user_info['id'], $includeUnapproved);
 				$context['current_topic'] = $topic;
 			}
 
 			// Go to the newest message on this topic.
-			$_REQUEST['start'] = 'new';
+			$this->_start = 'new';
 		}
 
 		// Add 1 to the number of views of this topic (except for robots).
@@ -147,7 +167,7 @@ class Display_Controller extends Action_Controller
 			Errors::instance()->fatal_lang_error('not_a_topic', false);
 
 		// Is this a moved topic that we are redirecting to?
-		if (!empty($topicinfo['id_redirect_topic']) && !isset($_GET['noredir']))
+		if (!empty($topicinfo['id_redirect_topic']) && !isset($this->_req->query->noredir))
 		{
 			markTopicsRead(array($user_info['id'], $topic, $topicinfo['id_last_msg'], 0), $topicinfo['new_from'] !== 0);
 			redirectexit('topic=' . $topicinfo['id_redirect_topic'] . '.0;redirfrom=' . $topicinfo['id_topic']);
@@ -157,12 +177,13 @@ class Display_Controller extends Action_Controller
 		$context['topic_first_message'] = $topicinfo['id_first_msg'];
 		$context['topic_last_message'] = $topicinfo['id_last_msg'];
 		$context['topic_unwatched'] = isset($topicinfo['unwatched']) ? $topicinfo['unwatched'] : 0;
-		if (isset($_GET['redirfrom']))
+		if (isset($this->_req->query->redirfrom))
 		{
-			$redir_topics = topicsList(array((int) $_GET['redirfrom']));
-			if (!empty($redir_topics[(int) $_GET['redirfrom']]))
+			$redirfrom = $this->_req->getQuery('redirfrom', 'intval');
+			$redir_topics = topicsList(array($redirfrom));
+			if (!empty($redir_topics[$redirfrom]))
 			{
-				$context['topic_redirected_from'] = $redir_topics[(int) $_GET['redirfrom']];
+				$context['topic_redirected_from'] = $redir_topics[$redirfrom];
 				$context['topic_redirected_from']['redir_href'] = $scripturl . '?topic=' . $context['topic_redirected_from']['id_topic'] . '.0;noredir';
 			}
 		}
@@ -199,41 +220,41 @@ class Display_Controller extends Action_Controller
 			$context['oldTopicError'] = false;
 
 		// The start isn't a number; it's information about what to do, where to go.
-		if (!is_numeric($_REQUEST['start']))
+		if (!is_numeric($this->_start))
 		{
 			// Redirect to the page and post with new messages, originally by Omar Bazavilvazo.
-			if ($_REQUEST['start'] == 'new')
+			if ($this->_start === 'new')
 			{
 				// Guests automatically go to the last post.
 				if ($user_info['is_guest'])
 				{
 					$context['start_from'] = $total_visible_posts - 1;
-					$_REQUEST['start'] = $context['start_from'];
+					$this->_start = $context['start_from'];
 				}
 				else
 				{
 					// Fall through to the next if statement.
-					$_REQUEST['start'] = 'msg' . $topicinfo['new_from'];
+					$this->_start = 'msg' . $topicinfo['new_from'];
 				}
 			}
 
 			// Start from a certain time index, not a message.
-			if (substr($_REQUEST['start'], 0, 4) == 'from')
+			if (substr($this->_start, 0, 4) === 'from')
 			{
-				$timestamp = (int) substr($_REQUEST['start'], 4);
+				$timestamp = (int) substr($this->_start, 4);
 				if ($timestamp === 0)
-					$_REQUEST['start'] = 0;
+					$this->_start = 0;
 				else
 				{
 					// Find the number of messages posted before said time...
 					$context['start_from'] = countNewPosts($topic, $topicinfo, $timestamp);
-					$_REQUEST['start'] = $context['start_from'];
+					$this->_start = $context['start_from'];
 				}
 			}
 			// Link to a message...
-			elseif (substr($_REQUEST['start'], 0, 3) == 'msg')
+			elseif (substr($this->_start, 0, 3) === 'msg')
 			{
-				$this->_virtual_msg = (int) substr($_REQUEST['start'], 3);
+				$this->_virtual_msg = (int) substr($this->_start, 3);
 				if (!$topicinfo['unapproved_posts'] && $this->_virtual_msg >= $topicinfo['id_last_msg'])
 					$context['start_from'] = $total_visible_posts - 1;
 				elseif (!$topicinfo['unapproved_posts'] && $this->_virtual_msg <= $topicinfo['id_first_msg'])
@@ -245,7 +266,7 @@ class Display_Controller extends Action_Controller
 				}
 
 				// We need to reverse the start as well in this case.
-				$_REQUEST['start'] = $context['start_from'];
+				$this->_start = $context['start_from'];
 			}
 		}
 
@@ -276,7 +297,7 @@ class Display_Controller extends Action_Controller
 		$context['is_marked_notify'] = false;
 
 		// Did we report a post to a moderator just now?
-		$context['report_sent'] = isset($_GET['reportsent']);
+		$context['report_sent'] = isset($this->_req->query->reportsent);
 		if ($context['report_sent'])
 			$this->_template_layers->add('report_sent');
 
@@ -289,36 +310,36 @@ class Display_Controller extends Action_Controller
 
 		// If all is set, but not allowed... just unset it.
 		$can_show_all = !empty($modSettings['enableAllMessages']) && $total_visible_posts > $context['messages_per_page'] && $total_visible_posts < $modSettings['enableAllMessages'];
-		if (isset($_REQUEST['all']) && !$can_show_all)
-			unset($_REQUEST['all']);
+		if (isset($this->_req->query->all) && !$can_show_all)
+			unset($this->_req->query->all);
 		// Otherwise, it must be allowed... so pretend start was -1.
-		elseif (isset($_REQUEST['all']))
-			$_REQUEST['start'] = -1;
+		elseif (isset($this->_req->query->all))
+			$this->_start = -1;
 
 		// Construct the page index, allowing for the .START method...
-		$context['page_index'] = constructPageIndex($scripturl . '?topic=' . $topic . '.%1$d', $_REQUEST['start'], $total_visible_posts, $context['messages_per_page'], true, array('all' => $can_show_all, 'all_selected' => isset($_REQUEST['all'])));
-		$context['start'] = $_REQUEST['start'];
+		$context['page_index'] = constructPageIndex($scripturl . '?topic=' . $topic . '.%1$d', $this->_start, $total_visible_posts, $context['messages_per_page'], true, array('all' => $can_show_all, 'all_selected' => isset($this->_req->query->all)));
+		$context['start'] = $this->_start;
 
 		// This is information about which page is current, and which page we're on - in case you don't like the constructed page index. (again, wireles..)
 		$context['page_info'] = array(
-			'current_page' => $_REQUEST['start'] / $context['messages_per_page'] + 1,
+			'current_page' => $this->_start / $context['messages_per_page'] + 1,
 			'num_pages' => floor(($total_visible_posts - 1) / $context['messages_per_page']) + 1,
 		);
 
 		// Figure out all the link to the next/prev
 		$context['links'] += array(
-			'prev' => $_REQUEST['start'] >= $context['messages_per_page'] ? $scripturl . '?topic=' . $topic . '.' . ($_REQUEST['start'] - $context['messages_per_page']) : '',
-			'next' => $_REQUEST['start'] + $context['messages_per_page'] < $total_visible_posts ? $scripturl . '?topic=' . $topic. '.' . ($_REQUEST['start'] + $context['messages_per_page']) : '',
+			'prev' => $this->_start >= $context['messages_per_page'] ? $scripturl . '?topic=' . $topic . '.' . ($this->_start - $context['messages_per_page']) : '',
+			'next' => $this->_start + $context['messages_per_page'] < $total_visible_posts ? $scripturl . '?topic=' . $topic. '.' . ($this->_start + $context['messages_per_page']) : '',
 		);
 
 		// If they are viewing all the posts, show all the posts, otherwise limit the number.
-		if ($can_show_all && isset($_REQUEST['all']))
+		if ($can_show_all && isset($this->_req->query->all))
 		{
 			// No limit! (actually, there is a limit, but...)
 			$context['messages_per_page'] = -1;
 
 			// Set start back to 0...
-			$_REQUEST['start'] = 0;
+			$this->_start = 0;
 		}
 
 		// Build the link tree.
@@ -354,7 +375,7 @@ class Display_Controller extends Action_Controller
 
 		// Calculate the fastest way to get the messages!
 		$ascending = true;
-		$start = $_REQUEST['start'];
+		$start = $this->_start;
 		$limit = $context['messages_per_page'];
 		$firstIndex = 0;
 		if ($start >= $total_visible_posts / 2 && $context['messages_per_page'] != -1)
@@ -393,17 +414,17 @@ class Display_Controller extends Action_Controller
 			updateReadNotificationsFor($topic, $board);
 
 			// Have we recently cached the number of new topics in this board, and it's still a lot?
-			if (isset($_REQUEST['topicseen']) && isset($_SESSION['topicseen_cache'][$board]) && $_SESSION['topicseen_cache'][$board] > 5)
+			if (isset($this->_req->query->topicseen) && isset($_SESSION['topicseen_cache'][$board]) && $_SESSION['topicseen_cache'][$board] > 5)
 				$_SESSION['topicseen_cache'][$board]--;
 			// Mark board as seen if this is the only new topic.
-			elseif (isset($_REQUEST['topicseen']))
+			elseif (isset($this->_req->query->topicseen))
 			{
 				// Use the mark read tables... and the last visit to figure out if this should be read or not.
 				$numNewTopics = getUnreadCountSince($board, empty($_SESSION['id_msg_last_visit']) ? 0 : $_SESSION['id_msg_last_visit']);
 
 				// If there're no real new topics in this board, mark the board as seen.
 				if (empty($numNewTopics))
-					$_REQUEST['boardseen'] = true;
+					$this->_req->query->boardseen = true;
 				else
 					$_SESSION['topicseen_cache'][$board] = $numNewTopics;
 			}
@@ -412,7 +433,7 @@ class Display_Controller extends Action_Controller
 				$_SESSION['topicseen_cache'][$board]--;
 
 			// Mark board as seen if we came using last post link from BoardIndex. (or other places...)
-			if (isset($_REQUEST['boardseen']))
+			if (isset($this->_req->query->boardseen))
 			{
 				require_once(SUBSDIR . '/Boards.subs.php');
 				markBoardsRead($board, false, false);
@@ -484,7 +505,7 @@ class Display_Controller extends Action_Controller
 
 			// Since the anchor information is needed on the top of the page we load these variables beforehand.
 			$context['first_message'] = isset($messages[$firstIndex]) ? $messages[$firstIndex] : $messages[0];
-			$context['first_new_message'] = isset($context['start_from']) && $_REQUEST['start'] == $context['start_from'];
+			$context['first_new_message'] = isset($context['start_from']) && $this->_start == $context['start_from'];
 		}
 		else
 		{
@@ -657,18 +678,16 @@ class Display_Controller extends Action_Controller
 
 		require_once(SUBSDIR . '/Messages.subs.php');
 
-		if (empty($_REQUEST['msgs']))
-			redirectexit('topic=' . $topic . '.' . (int) $_REQUEST['start']);
+		if (empty($this->_req->post->msgs))
+			redirectexit('topic=' . $topic . '.' . $this->_req->getQuery('start', 'intval'));
 
-		$messages = array();
-		foreach ($_REQUEST['msgs'] as $dummy)
-			$messages[] = (int) $dummy;
+		$messages = array_map('intval', $this->_req->post->msgs);
 
 		// We are restoring messages. We handle this in another place.
-		if (isset($_REQUEST['restore_selected']))
+		if (isset($this->_req->query->restore_selected))
 			redirectexit('action=restoretopic;msgs=' . implode(',', $messages) . ';' . $context['session_var'] . '=' . $context['session_id']);
 
-		if (isset($_REQUEST['split_selection']))
+		if (isset($this->_req->query->split_selection))
 		{
 			$mgsOptions = basicMessageInfo(min($messages), true);
 
@@ -713,7 +732,7 @@ class Display_Controller extends Action_Controller
 			$remover->removeMessage($message);
 		}
 
-		redirectexit(!empty($topicGone) ? 'board=' . $board : 'topic=' . $topic . '.' . (int) $_REQUEST['start']);
+		redirectexit(!empty($topicGone) ? 'board=' . $board : 'topic=' . $topic . '.' . (int) $this->_req->query->start);
 	}
 
 	/**

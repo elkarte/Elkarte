@@ -28,6 +28,20 @@ if (!defined('ELK'))
 class BoardIndex_Controller extends Action_Controller implements Frontpage_Interface
 {
 	/**
+	 * Holds instance of HttpReq object
+	 * @var HttpReq
+	 */
+	private $_req;
+
+	/**
+	 * Pre Dispatch, called before other methods.  Loads HttpReq instance.
+	 */
+	public function pre_dispatch()
+	{
+		$this->_req = HttpReq::instance();
+	}
+
+	/**
 	 * {@inheritdoc }
 	 */
 	public static function frontPageHook(&$default_action)
@@ -68,7 +82,7 @@ class BoardIndex_Controller extends Action_Controller implements Frontpage_Inter
 		Template_Layers::getInstance()->add('boardindex_outer');
 
 		// Do not let search engines index anything if there is a random thing in $_GET.
-		if (!empty($_GET))
+		if (!empty($this->_req->query))
 			$context['robot_no_index'] = true;
 
 		// Retrieve the categories and boards.
@@ -157,15 +171,15 @@ class BoardIndex_Controller extends Action_Controller implements Frontpage_Inter
 
 		checkSession('request');
 
-		if (!isset($_GET['sa']))
+		if (!isset($this->_req->query->sa))
 			Errors::instance()->fatal_lang_error('no_access', false);
 
 		// Check if the input values are correct.
-		if (in_array($_REQUEST['sa'], array('expand', 'collapse', 'toggle')) && isset($_REQUEST['c']))
+		if (in_array($this->_req->query->sa, array('expand', 'collapse', 'toggle')) && isset($this->_req->query->c))
 		{
 			// And collapse/expand/toggle the category.
 			require_once(SUBSDIR . '/Categories.subs.php');
-			collapseCategories(array((int) $_REQUEST['c']), $_REQUEST['sa'], array($user_info['id']));
+			collapseCategories(array((int) $this->_req->query->c), $this->_req->query->sa, array($user_info['id']));
 		}
 
 		// And go back to the board index.
