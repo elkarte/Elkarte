@@ -66,9 +66,10 @@ class Calendar_Post_Module implements ElkArte\sources\modules\Module_Interface
 	{
 		global $user_info, $modSettings;
 
-		$_REQUEST['eventid'] = (int) $_REQUEST['eventid'];
+		$req = HttpReq::instance();
+		$eventid = $req->getPost('eventid', 'intval', -1);
 
-		$event = new Calendar_Event($_REQUEST['eventid'], $modSettings);
+		$event = new Calendar_Event($eventid, $modSettings);
 
 		try
 		{
@@ -90,11 +91,10 @@ class Calendar_Post_Module implements ElkArte\sources\modules\Module_Interface
 		}
 		else
 		{
-
 			// If you're not allowed to edit any events, you have to be the poster.
 			if (!allowedTo('calendar_edit_any'))
 			{
-				$event_poster = getEventPoster($_REQUEST['eventid']);
+				$event_poster = getEventPoster($eventid);
 
 				// Silly hacker, Trix are for kids. ...probably trademarked somewhere, this is FAIR USE! (parody...)
 				isAllowedTo('calendar_edit_' . ($event_poster == $user_info['id'] ? 'own' : 'any'));
