@@ -104,7 +104,7 @@ class HttpReq
 	{
 		// Any that were born in cleanRequest, like start from topic=xyz.START
 		// are added to the other supers
-		$derived = array_diff($_REQUEST, $_POST, $_GET);
+		$derived = array_diff_key($_REQUEST, $_POST, $_GET);
 		$derived_get = array_merge($_GET, $derived);
 		$derived_post = array_merge($_POST, $derived);
 
