@@ -64,7 +64,7 @@ class Calendar_Post_Module implements ElkArte\sources\modules\Module_Interface
 
 	public function after_save_post()
 	{
-		global $user_info, $modSettings;
+		global $user_info, $modSettings, $board, $topic;
 
 		$req = HttpReq::instance();
 		$eventid = $req->getPost('eventid', 'intval', -1);
@@ -85,6 +85,9 @@ class Calendar_Post_Module implements ElkArte\sources\modules\Module_Interface
 		{
 			// Make sure they can link an event to this post.
 			canLinkEvent();
+
+			$save_data['id_board'] = $board;
+			$save_data['id_topic'] = $topic;
 
 			// Insert the event.
 			$event->insert($save_data, $user_info['id']);
