@@ -233,7 +233,7 @@ abstract class Database_Abstract implements Database
 	/**
 	 * This function combines the keys and values of the data passed to db::insert.
 	 *
-	 * @param mixed[] $keys
+	 * @param integer[] $keys
 	 * @param mixed[] $values
 	 * @return mixed[]
 	 */

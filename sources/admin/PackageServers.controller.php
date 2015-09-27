@@ -299,7 +299,7 @@ class PackageServers_Controller extends Action_Controller
 	 *
 	 * @param object $thisPackage
 	 *
-	 * @return array
+	 * @return string[]
 	 */
 	private function _assume_id($thisPackage)
 	{

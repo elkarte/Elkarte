@@ -285,7 +285,7 @@ class Elk_Autoloader
 	/**
 	 * This handles any case where a namespace is present.
 	 *
-	 * @return bool false if the namespace was found, but not the file, true otherwise.
+	 * @return boolean|null false if the namespace was found, but the file not, true otherwise
 	 */
 	protected function _handle_namespaces()
 	{
