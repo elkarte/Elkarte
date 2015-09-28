@@ -204,7 +204,6 @@ function template_report()
 	echo '
 	<div id="report_topic">
 		<form action="', $scripturl, '?action=reporttm;topic=', $context['current_topic'], '.', $context['start'], '" method="post" accept-charset="UTF-8">
-			<input type="hidden" name="msg" value="' . $context['message_id'] . '" />
 			<h2 class="category_header">', $txt['report_to_mod'], '</h2>
 			<div class="content">';
 
@@ -248,6 +247,7 @@ function template_report()
 	echo '
 				</dl>
 				<div class="submitbutton">
+					<input type="hidden" name="msg" value="' . $context['message_id'] . '" />
 					<input type="submit" name="save" value="', $txt['rtm10'], '" />
 					<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />
 				</div>

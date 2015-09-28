@@ -27,6 +27,12 @@ if (!defined('ELK'))
 class Emailuser_Controller extends Action_Controller
 {
 	/**
+	 * Holds instance of HttpReq object
+	 * @var HttpReq
+	 */
+	private $_req;
+
+	/**
 	 * This function initializes or sets up the necessary, for the other actions
 	 */
 	public function pre_dispatch()
@@ -38,6 +44,9 @@ class Emailuser_Controller extends Action_Controller
 
 		// Load the template.
 		loadTemplate('Emailuser');
+
+		// Interact with the sent data
+		$this->_req = HttpReq::instance();
 	}
 
 	/**
@@ -84,10 +93,10 @@ class Emailuser_Controller extends Action_Controller
 		censorText($row['subject']);
 
 		// Sending yet, or just getting prepped?
-		if (empty($_POST['send']))
+		if (empty($this->_req->post->send))
 		{
 			$context['page_title'] = sprintf($txt['sendtopic_title'], $row['subject']);
-			$context['start'] = $_REQUEST['start'];
+			$context['start'] = $this->_req->query->start;
 			$context['sub_template'] = 'send_topic';
 
 			return;
@@ -118,7 +127,7 @@ class Emailuser_Controller extends Action_Controller
 		Template_Layers::getInstance()->removeAll();
 		$context['sub_template'] = 'generic_xml_buttons';
 
-		if (empty($_POST['send']))
+		if (empty($this->_req->post->send))
 			die();
 
 		// We need at least a topic... go away if you don't have one.
@@ -182,6 +191,7 @@ class Emailuser_Controller extends Action_Controller
 		// Censor the subject....
 		censorText($row['subject']);
 
+		// Actually send it off
 		$result = $this->_sendTopic($row);
 		if ($result !== true)
 		{
@@ -228,7 +238,7 @@ class Emailuser_Controller extends Action_Controller
 		));
 
 		// Any errors or are we good to go?
-		if (!$validator->validate($_POST))
+		if (!$validator->validate($this->_req->post))
 		{
 			$errors = $validator->validation_errors();
 
@@ -254,10 +264,10 @@ class Emailuser_Controller extends Action_Controller
 
 		$emailtemplate = 'send_topic';
 
-		if (!empty($_POST['comment']))
+		if (!empty($this->_req->post->comment))
 		{
 			$emailtemplate .= '_comment';
-			$replacements['COMMENT'] = $_POST['comment'];
+			$replacements['COMMENT'] = $this->_req->post->comment;
 		}
 
 		$emaildata = loadEmailTemplate($emailtemplate, $replacements);
@@ -274,7 +284,7 @@ class Emailuser_Controller extends Action_Controller
 	 * - Send an email to the user - allow the sender to write the message.
 	 * - Can either be passed a user ID as uid or a message id as msg.
 	 * - Does not check permissions for a message ID as there is no information disclosed.
-	 * - accessed by ?action=emailuser;sa=email
+	 * - accessed by ?action=emailuser;sa=email from the message list, profile view or message view
 	 */
 	public function action_email()
 	{
@@ -288,20 +298,25 @@ class Emailuser_Controller extends Action_Controller
 
 		// Are we sending to a user?
 		$context['form_hidden_vars'] = array();
-		if (isset($_REQUEST['uid']))
+		$uid = '';
+		$mid = '';
+		if (isset($this->_req->post->uid) || isset($this->_req->query->uid))
 		{
 			require_once(SUBSDIR . '/Members.subs.php');
-			// Get the latest activated member's display name.
-			$row = getBasicMemberData((int) $_REQUEST['uid']);
 
-			$context['form_hidden_vars']['uid'] = (int) $_REQUEST['uid'];
+			// Get the latest activated member's display name.
+			$uid = $this->_req->getPost('uid', 'intval', isset($this->_req->query->uid) ? (int) $this->_req->query->uid : 0);
+			$row = getBasicMemberData($uid);
+
+			$context['form_hidden_vars']['uid'] = $uid;
 		}
-		elseif (isset($_REQUEST['msg']))
+		elseif (isset($this->_req->post->msg) || isset($this->_req->query->msg))
 		{
 			require_once(SUBSDIR . '/Messages.subs.php');
-			$row = mailFromMessage((int) $_REQUEST['msg']);
+			$mid = $this->_req->getPost('msg', 'intval', isset($this->_req->query->msg) ? (int) $this->_req->query->msg : 0);
+			$row = mailFromMessage($mid);
 
-			$context['form_hidden_vars']['msg'] = (int) $_REQUEST['msg'];
+			$context['form_hidden_vars']['msg'] = $mid;
 		}
 
 		// Are you sure you got the address or any data?
@@ -335,7 +350,7 @@ class Emailuser_Controller extends Action_Controller
 		$context['page_title'] = $txt['send_email'];
 
 		// Are we actually sending it?
-		if (isset($_POST['send']) && isset($_POST['email_body']))
+		if (isset($this->_req->post->send, $this->_req->post->email_body))
 		{
 			checkSession();
 
@@ -363,7 +378,7 @@ class Emailuser_Controller extends Action_Controller
 				'email_body' => $txt['message'],
 				'email_subject' => $txt['send_email_subject']
 			));
-			$validator->validate($_POST);
+			$validator->validate($this->_req->post);
 
 			// If it's a guest sort out their names.
 			if ($user_info['is_guest'])
@@ -413,10 +428,10 @@ class Emailuser_Controller extends Action_Controller
 			sendmail($context['recipient']['email'], $emaildata['subject'], $emaildata['body'], $from_email, null, false, 1, null, true);
 
 			// Now work out where to go!
-			if (isset($_REQUEST['uid']))
-				redirectexit('action=profile;u=' . (int) $_REQUEST['uid']);
-			elseif (isset($_REQUEST['msg']))
-				redirectexit('msg=' . (int) $_REQUEST['msg']);
+			if (!empty($uid))
+				redirectexit('action=profile;u=' . $uid);
+			elseif (!empty($mid))
+				redirectexit('msg=' . $mid);
 			else
 				redirectexit();
 		}
@@ -451,18 +466,17 @@ class Emailuser_Controller extends Action_Controller
 		);
 
 		// If they're posting, it should be processed by action_reporttm2.
-		if ((isset($_POST[$context['session_var']]) || isset($_POST['save'])) && !$report_errors->hasErrors())
+		if ((isset($this->_req->post->$context['session_var']) || isset($this->_req->post->save)) && !$report_errors->hasErrors())
 			$this->action_reporttm2();
 
 		// We need a message ID to check!
-		if (empty($_REQUEST['msg']))
+		if (empty($this->_req->query->msg) && empty($this->_req->post->msg))
 			Errors::instance()->fatal_lang_error('no_access', false);
 
 		// Check the message's ID - don't want anyone reporting a post that does not exist
 		require_once(SUBSDIR . '/Messages.subs.php');
-		$message_id = (int) $_REQUEST['msg'];
-		$message_info = basicMessageInfo($message_id, true, true);
-		if ($message_info === false)
+		$message_id = $this->_req->getPost('msg', 'intval', isset($this->_req->query->msg) ? (int) $this->_req->query->msg : 0);
+		if (basicMessageInfo($message_id, true, true) === false)
 			Errors::instance()->fatal_lang_error('no_board', false);
 
 		// Do we need to show the visual verification image?
@@ -500,13 +514,12 @@ class Emailuser_Controller extends Action_Controller
 			check_id: "report_comment"
 		});', true);
 
-		$context['comment_body'] = !isset($_POST['comment']) ? '' : trim($_POST['comment']);
-		$context['email_address'] = !isset($_POST['email']) ? '' : trim($_POST['email']);
+		$context['comment_body'] = $this->_req->getPost('comment', 'trim', '');
+		$context['email_address'] =  $this->_req->getPost('email', 'trim', '');
 
 		// This is here so that the user could, in theory, be redirected back to the topic.
-		$context['start'] = $_REQUEST['start'];
+		$context['start'] = $this->_req->query->start;
 		$context['message_id'] = $message_id;
-
 		$context['page_title'] = $txt['report_to_mod'];
 		$context['sub_template'] = 'report';
 	}
@@ -539,9 +552,9 @@ class Emailuser_Controller extends Action_Controller
 			$report_errors->addError('session_timeout');
 
 		// Make sure we have a comment and it's clean.
-		if (!isset($_POST['comment']) || Util::htmltrim($_POST['comment']) === '')
+		if ($this->_req->getPost('comment', 'Util::htmltrim', '') === '')
 			$report_errors->addError('no_comment');
-		$poster_comment = strtr(Util::htmlspecialchars($_POST['comment']), array("\r" => '', "\t" => ''));
+		$poster_comment = strtr(Util::htmlspecialchars($this->_req->post->comment), array("\r" => '', "\t" => ''));
 
 		if (Util::strlen($poster_comment) > 254)
 			$report_errors->addError('post_too_long');
@@ -549,12 +562,12 @@ class Emailuser_Controller extends Action_Controller
 		// Guests need to provide their address!
 		if ($user_info['is_guest'])
 		{
-			if (!Data_Validator::is_valid($_POST, array('email' => 'valid_email'), array('email' => 'trim')))
-				empty($_POST['email']) ? $report_errors->addError('no_email') : $report_errors->addError('bad_email');
+			if (!Data_Validator::is_valid($this->_req->post, array('email' => 'valid_email'), array('email' => 'trim')))
+				empty($this->_req->post->email) ? $report_errors->addError('no_email') : $report_errors->addError('bad_email');
 
-			isBannedEmail($_POST['email'], 'cannot_post', sprintf($txt['you_are_post_banned'], $txt['guest_title']));
+			isBannedEmail($this->_req->post->email, 'cannot_post', sprintf($txt['you_are_post_banned'], $txt['guest_title']));
 
-			$user_info['email'] = htmlspecialchars($_POST['email'], ENT_COMPAT, 'UTF-8');
+			$user_info['email'] = htmlspecialchars($this->_req->post->email, ENT_COMPAT, 'UTF-8');
 		}
 
 		// Could they get the right verification code?
@@ -575,10 +588,13 @@ class Emailuser_Controller extends Action_Controller
 
 		// Any errors?
 		if ($report_errors->hasErrors())
-			return $this->action_reporttm();
+		{
+			$this->action_reporttm();
+			return true;
+		}
 
 		// Get the basic topic information, and make sure they can see it.
-		$msg_id = (int) $_POST['msg'];
+		$msg_id = (int) $this->_req->post->msg;
 		$message = posterDetails($msg_id, $topic);
 
 		if (empty($message))
@@ -607,6 +623,7 @@ class Emailuser_Controller extends Action_Controller
 		if (empty($modSettings['disable_log_report']))
 		{
 			require_once(SUBSDIR . '/Messages.subs.php');
+			$message['type'] = 'msg';
 			$id_report = recordReport($message, $poster_comment);
 
 			// If we're just going to ignore these, then who gives a monkeys...
@@ -635,7 +652,7 @@ class Emailuser_Controller extends Action_Controller
 				'REPORTERNAME' => $reporterName,
 				'TOPICLINK' => $scripturl . '?topic=' . $topic . '.msg' . $msg_id . '#msg' . $msg_id,
 				'REPORTLINK' => !empty($id_report) ? $scripturl . '?action=moderate;area=reports;report=' . $id_report : '',
-				'COMMENT' => $_POST['comment'],
+				'COMMENT' => $this->_req->post->comment,
 			);
 
 			$emaildata = loadEmailTemplate('report_to_moderator', $replacements, empty($row['lngfile']) || empty($modSettings['userLanguage']) ? $language : $row['lngfile']);

@@ -448,8 +448,8 @@ class CoreFeatures_Controller extends Action_Controller
 			// Standard save callback?
 			if (isset($feature['save_callback']))
 			{
-				$status = !empty($this->_req->getPost('feature_' . $id));
-				$feature['save_callback']($status);
+				$status = $this->_req->getPost('feature_' . $id);
+				$feature['save_callback'](!empty($status));
 			}
 		}
 	}
