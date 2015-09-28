@@ -27,15 +27,10 @@ class Draft_Controller extends Action_Controller
 	private $_memID = 0;
 
 	/**
-	 * Default method, just forwards, if we ever get here.
-	 *
-	 * @see Action_Controller::action_index()
+	 * Holds instance of HttpReq object
+	 * @var HttpReq
 	 */
-	public function action_index()
-	{
-		// Where do you want to go today? :P
-		$this->action_showProfileDrafts();
-	}
+	private $_req;
 
 	/**
 	 * This method is executed before any action handler.
@@ -49,11 +44,23 @@ class Draft_Controller extends Action_Controller
 		require_once(SUBSDIR . '/Profile.subs.php');
 
 		$this->_memID = currentMemberID();
+		$this->_req = HttpReq::instance();
+	}
+
+	/**
+	 * Default method, just forwards, if we ever get here.
+	 *
+	 * @see Action_Controller::action_index()
+	 */
+	public function action_index()
+	{
+		// Where do you want to go today? :P
+		$this->action_showProfileDrafts();
 	}
 
 	/**
 	 * Show all drafts of a given type by the current user
-	 * Uses the showdraft template
+	 * Uses the showdrafts template
 	 * Allows for the deleting and loading/editing of drafts
 	 */
 	public function action_showProfileDrafts()
@@ -67,12 +74,12 @@ class Draft_Controller extends Action_Controller
 		require_once(SUBSDIR . '/Drafts.subs.php');
 
 		// Some initial context.
-		$context['start'] = isset($_REQUEST['start']) ? (int) $_REQUEST['start'] : 0;
+		$context['start'] = $this->_req->getQuery('start', 'intval', 0);
 		$context['current_member'] = $this->_memID;
 
 		// If just deleting a draft, do it and then redirect back.
-		if (!empty($_REQUEST['delete']))
-			return $this->_action_delete('action=profile;u=' . $this->_memID . ';area=showdrafts;start=' . $context['start']);
+		if (!empty($this->_req->query->delete) || !empty($this->_req->post->delete))
+			$this->_action_delete('action=profile;u=' . $this->_memID . ';area=showdrafts;start=' . $context['start']);
 
 		// Get things started
 		$msgCount = draftsCount($this->_memID, 0);
@@ -92,7 +99,7 @@ class Draft_Controller extends Action_Controller
 		{
 			$this->_prepare_body_subject($row['body'], $row['subject'], $row['id_draft'], $txt['drafts_none'], $row['smileys_enabled']);
 
-			// And the array...
+			// And the data used by the template
 			$context['drafts'][$counter += $reverse ? -1 : 1] = array(
 				'body' => $row['body'],
 				'counter' => $counter,
@@ -151,7 +158,7 @@ class Draft_Controller extends Action_Controller
 
 	/**
 	 * Show all PM drafts of the current user
-	 * Uses the showpmdraft template
+	 * Uses the showPMDrafts template
 	 * Allows for the deleting and loading/editing of PM drafts
 	 */
 	public function action_showPMDrafts()
@@ -166,18 +173,17 @@ class Draft_Controller extends Action_Controller
 			Errors::instance()->fatal_lang_error('no_access', false);
 
 		// Set up what we will need
-		$context['start'] = isset($_REQUEST['start']) ? (int) $_REQUEST['start'] : 0;
+		$context['start'] = $this->_req->getQuery('start', 'intval', 0);
 
 		// If just deleting a draft, do it and then redirect back.
-		if (!empty($_REQUEST['delete']))
+		if (!empty($this->_req->query->delete) || !empty($this->_req->post->delete))
 			return $this->_action_delete('action=pm;sa=showpmdrafts;start=' . $context['start']);
 
 		// Perhaps a draft was selected for editing? if so pass this off
-		if (!empty($_REQUEST['id_draft']) && !empty($context['drafts_pm_save']))
+		if (!empty($this->_req->query->id_draft) && !empty($context['drafts_pm_save']))
 		{
 			checkSession('get');
-			$id_draft = (int) $_REQUEST['id_draft'];
-			redirectexit('action=pm;sa=send;id_draft=' . $id_draft);
+			redirectexit('action=pm;sa=send;id_draft=' . $this->_req->getQuery('id_draft', 'intval'));
 		}
 
 		// Get the count of applicable drafts
@@ -252,16 +258,18 @@ class Draft_Controller extends Action_Controller
 	 */
 	private function _action_delete($redirect = '')
 	{
-		checkSession(empty($_POST) ? 'get' : '');
+
+		checkSession(empty($this->_req->post) ? 'get' : '');
 
 		// Lets see what we have been sent, one or many to delete
 		$toDelete = array();
-		if (!is_array($_REQUEST['delete']))
-			$toDelete[] = (int) $_REQUEST['delete'];
+		if (!empty($this->_req->query->delete))
+		{
+			$toDelete[] = (int) $this->_req->query->delete;
+		}
 		else
 		{
-			foreach ($_REQUEST['delete'] as $delete_id)
-				$toDelete[] = (int) $delete_id;
+			$toDelete[] = array_map('intval', $this->_req->post->delete);
 		}
 
 		if (!empty($toDelete))
