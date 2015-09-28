@@ -517,7 +517,7 @@ class Attachment_Controller extends Action_Controller
 		// Try to buy some time...
 		@set_time_limit(600);
 
-		if ($resize && resizeImageFile($filename, $filename . '_thumb', 100, 100, true))
+		if ($resize && resizeImageFile($filename, $filename . '_thumb', 100, 100))
 			$filename = $filename . '_thumb';
 
 		if (isset($callback) || @readfile($filename) === null)

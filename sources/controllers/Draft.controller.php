@@ -269,7 +269,7 @@ class Draft_Controller extends Action_Controller
 		}
 		else
 		{
-			$toDelete[] = array_map('intval', $this->_req->post->delete);
+			$toDelete = array_map('intval', $this->_req->post->delete);
 		}
 
 		if (!empty($toDelete))

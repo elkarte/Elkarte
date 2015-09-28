@@ -474,7 +474,7 @@ function messageAt($start, $id_topic, $params = array())
 /**
  * Finds an open report for a certain message if it exists and increase the
  * number of reports for that message, otherwise it creates one
-
+ *
  * @param mixed[] $message array of several message details (id_msg, id_topic, etc.)
  * @param string $poster_comment the comment made by the reporter
  *
