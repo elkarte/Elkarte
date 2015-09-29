@@ -604,7 +604,7 @@ function template_group_members()
 
 	if (!empty($context['group']['assignable']))
 		echo '
-						<th style="width: 4%;"><input onclick="invertAll(this, this.form);" /></th>';
+						<th style="width: 4%;"><input type="checkbox" onclick="invertAll(this, this.form);" /></th>';
 
 	echo '
 					</tr>
@@ -657,7 +657,7 @@ function template_group_members()
 		if (!empty($context['group']['assignable']))
 			echo '
 						<td class="centertext" style="width: 4%;">
-							<input name="rem[]" value="', $member['id'], '" ', ($context['user']['id'] == $member['id'] && $context['group']['id'] == 1 ? 'onclick="if (this.checked) return confirm(\'' . $txt['membergroups_members_deadmin_confirm'] . '\')" ' : ''), '/>
+							<input type="checkbox" name="rem[]" value="', $member['id'], '" ', ($context['user']['id'] == $member['id'] && $context['group']['id'] == 1 ? 'onclick="if (this.checked) return confirm(\'' . $txt['membergroups_members_deadmin_confirm'] . '\')" ' : ''), '/>
 						</td>';
 
 		echo '
