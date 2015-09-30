@@ -67,7 +67,7 @@ class Karma_Controller extends Action_Controller
 	{
 		global $user_info;
 
-		$id_target = $this->_req->query('uid', 'intval', 0);
+		$id_target = $this->_req->getQuery('uid', 'intval', 0);
 
 		// Start off with no change in karma.
 		$action = $this->_prepare_karma($id_target);
@@ -89,7 +89,7 @@ class Karma_Controller extends Action_Controller
 			$this->_redirect_karma();
 
 		// The user ID _must_ be a number, no matter what.
-		$id_target = $this->_req->query('uid', 'intval', 0);
+		$id_target = $this->_req->getQuery('uid', 'intval', 0);
 
 		// Start off with no change in karma.
 		$action = $this->_prepare_karma($id_target);
