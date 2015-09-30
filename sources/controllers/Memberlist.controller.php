@@ -26,11 +26,23 @@ if (!defined('ELK'))
  */
 class Memberlist_Controller extends Action_Controller
 {
-	protected $_known_search_methods = array();
+	/**
+	 * The fields that we can search
+	 * @var array
+	 */
+	public $_search_fields;
+
+	/**
+	 * Holds instance of HttpReq object
+	 * @var HttpReq
+	 */
+	private $_req;
 
 	public function pre_dispatch()
 	{
 		global $context, $txt;
+
+		$this->_req = HttpReq::instance();
 
 		// These are all the possible fields.
 		$this->_search_fields = array(
@@ -46,7 +58,7 @@ class Memberlist_Controller extends Action_Controller
 
 		// These are handy later
 		$context['old_search_value'] = '';
-		$context['in_search'] = !empty($_REQUEST['search']);
+		$context['in_search'] = !empty($this->_req->post->search);
 
 		foreach ($context['custom_search_fields'] as $field)
 			$this->_search_fields['cust_' . $field['colname']] = sprintf($txt['mlist_search_by'], $field['name']);
@@ -71,7 +83,7 @@ class Memberlist_Controller extends Action_Controller
 		$context['sub_template'] = 'memberlist';
 		Template_Layers::getInstance()->add('mlsearch');
 
-		$context['listing_by'] = !empty($_GET['sa']) ? $_GET['sa'] : 'all';
+		$context['listing_by'] = $this->_req->getQuery('sa', 'trim', 'all');
 
 		// $subActions array format:
 		// 'subaction' => array('label', 'function', 'is_selected')
@@ -229,14 +241,24 @@ class Memberlist_Controller extends Action_Controller
 
 		// The chunk size for the cached index.
 		$cache_step_size = 500;
+		$memberlist_cache = '';
 
 		require_once(SUBSDIR . '/Memberlist.subs.php');
+
+		// Some handy short cuts
+		$start = $this->_req->getQuery('start', '', null);
+		$desc = $this->_req->getQuery('desc', '', null);
+		$sort = $this->_req->getQuery('sort', '', null);
 
 		// Only use caching if:
 		// 1. there are at least 2k members,
 		// 2. the default sorting method (real_name) is being used,
-		// 3. the page shown is high enough to make a DB filesort unprofitable.
-		$use_cache = $modSettings['totalMembers'] > 2000 && (!isset($_REQUEST['sort']) || $_REQUEST['sort'] === 'real_name') && isset($_REQUEST['start']) && $_REQUEST['start'] > $cache_step_size;
+		// 3. the page shown is high enough to make a DB file sort unprofitable.
+		$use_cache = $modSettings['totalMembers'] > 2000
+			&& (!isset($sort) || $sort === 'real_name')
+			&& isset($start)
+			&& $start > $cache_step_size;
+
 		if ($use_cache)
 		{
 			// Maybe there's something cached already.
@@ -256,16 +278,17 @@ class Memberlist_Controller extends Action_Controller
 		else
 			$context['num_members'] = ml_memberCount();
 
-		// Set defaults for sort (real_name) and start. (0)
-		if (!isset($_REQUEST['sort']) || !isset($context['columns'][$_REQUEST['sort']]['sort']))
-			$_REQUEST['sort'] = 'real_name';
+		// Set defaults for sort (real_name)
+		if (!isset($sort) || !isset($context['columns'][$sort]['sort']))
+			$sort = 'real_name';
 
-		if (!is_numeric($_REQUEST['start']))
+		// Looking at a specific rolodex letter?
+		if (!is_numeric($start))
 		{
-			if (preg_match('~^[^\'\\\\/]~u', Util::strtolower($_REQUEST['start']), $match) === 0)
+			if (preg_match('~^[^\'\\\\/]~u', Util::strtolower($start), $match) === 0)
 				Errors::instance()->fatal_error('Hacker?', false);
 
-			$_REQUEST['start'] = ml_alphaStart($match[0]);
+			$start = ml_alphaStart($match[0]);
 		}
 
 		// Build out the letter selection link bar
@@ -278,46 +301,49 @@ class Memberlist_Controller extends Action_Controller
 		{
 			$context['columns'][$col]['href'] = $scripturl . '?action=memberlist;sort=' . $col . ';start=0';
 
-			if ((!isset($_REQUEST['desc']) && $col == $_REQUEST['sort']) || ($col != $_REQUEST['sort'] && !empty($column_details['default_sort_rev'])))
+			if ((!isset($desc) && $col == $sort)
+				|| ($col != $sort && !empty($column_details['default_sort_rev'])))
+			{
 				$context['columns'][$col]['href'] .= ';desc';
+			}
 
 			$context['columns'][$col]['link'] = '<a href="' . $context['columns'][$col]['href'] . '" rel="nofollow">' . $context['columns'][$col]['label'] . '</a>';
-			$context['columns'][$col]['selected'] = $_REQUEST['sort'] == $col;
+			$context['columns'][$col]['selected'] = $sort == $col;
 			if ($context['columns'][$col]['selected'])
 				$context['columns'][$col]['class'] .= ' selected';
 		}
 
 		// Are we sorting the results
-		$context['sort_by'] = $_REQUEST['sort'];
-		$context['sort_direction'] = !isset($_REQUEST['desc']) ? 'up' : 'down';
+		$context['sort_by'] = $sort;
+		$context['sort_direction'] = !isset($desc) ? 'up' : 'down';
 
 		// Construct the page index.
-		$context['page_index'] = constructPageIndex($scripturl . '?action=memberlist;sort=' . $_REQUEST['sort'] . (isset($_REQUEST['desc']) ? ';desc' : ''), $_REQUEST['start'], $context['num_members'], $modSettings['defaultMaxMembers']);
+		$context['page_index'] = constructPageIndex($scripturl . '?action=memberlist;sort=' . $sort . (isset($desc) ? ';desc' : ''), $start, $context['num_members'], $modSettings['defaultMaxMembers']);
 
 		// Send the data to the template.
-		$context['start'] = $_REQUEST['start'] + 1;
-		$context['end'] = min($_REQUEST['start'] + $modSettings['defaultMaxMembers'], $context['num_members']);
+		$context['start'] = $start + 1;
+		$context['end'] = min($start + $modSettings['defaultMaxMembers'], $context['num_members']);
 		$context['can_moderate_forum'] = allowedTo('moderate_forum');
 		$context['page_title'] = sprintf($txt['viewing_members'], $context['start'], $context['end']);
 		$context['linktree'][] = array(
-			'url' => $scripturl . '?action=memberlist;sort=' . $_REQUEST['sort'] . ';start=' . $_REQUEST['start'],
+			'url' => $scripturl . '?action=memberlist;sort=' .$sort . ';start=' . $start,
 			'name' => &$context['page_title'],
 			'extra_after' => ' (' . sprintf($txt['of_total_members'], $context['num_members']) . ')'
 		);
 
-		$limit = $_REQUEST['start'];
+		$limit = $start;
 		$where = '';
 		$query_parameters = array(
 			'regular_id_group' => 0,
 			'is_activated' => 1,
-			'sort' => $context['columns'][$_REQUEST['sort']]['sort'][$context['sort_direction']],
+			'sort' => $context['columns'][$sort]['sort'][$context['sort_direction']],
 		);
 
 		// Using cache allows to narrow down the list to be retrieved.
-		if ($use_cache && $_REQUEST['sort'] === 'real_name' && !isset($_REQUEST['desc']))
+		if ($use_cache &&$sort === 'real_name' && !isset($desc))
 		{
-			$first_offset = $_REQUEST['start'] - ($_REQUEST['start'] % $cache_step_size);
-			$second_offset = ceil(($_REQUEST['start'] + $modSettings['defaultMaxMembers']) / $cache_step_size) * $cache_step_size;
+			$first_offset = $start - ($start % $cache_step_size);
+			$second_offset = ceil(($start + $modSettings['defaultMaxMembers']) / $cache_step_size) * $cache_step_size;
 			$second_offset = min(max(array_keys($memberlist_cache['index'])), $second_offset);
 
 			$where = 'mem.real_name BETWEEN {string:real_name_low} AND {string:real_name_high}';
@@ -326,17 +352,17 @@ class Memberlist_Controller extends Action_Controller
 			$limit -= $first_offset;
 		}
 		// Reverse sorting is a bit more complicated...
-		elseif ($use_cache && $_REQUEST['sort'] === 'real_name')
+		elseif ($use_cache && $sort === 'real_name')
 		{
-			$first_offset = floor(($memberlist_cache['num_members'] - $modSettings['defaultMaxMembers'] - $_REQUEST['start']) / $cache_step_size) * $cache_step_size;
+			$first_offset = floor(($memberlist_cache['num_members'] - $modSettings['defaultMaxMembers'] - $start) / $cache_step_size) * $cache_step_size;
 			if ($first_offset < 0)
 				$first_offset = 0;
-			$second_offset = ceil(($memberlist_cache['num_members'] - $_REQUEST['start']) / $cache_step_size) * $cache_step_size;
+			$second_offset = ceil(($memberlist_cache['num_members'] - $start) / $cache_step_size) * $cache_step_size;
 
 			$where = 'mem.real_name BETWEEN {string:real_name_low} AND {string:real_name_high}';
 			$query_parameters['real_name_low'] = $memberlist_cache['index'][$first_offset];
 			$query_parameters['real_name_high'] = $memberlist_cache['index'][$second_offset];
-			$limit = $second_offset - ($memberlist_cache['num_members'] - $_REQUEST['start']) - ($second_offset > $memberlist_cache['num_members'] ? $cache_step_size - ($memberlist_cache['num_members'] % $cache_step_size) : 0);
+			$limit = $second_offset - ($memberlist_cache['num_members'] - $start) - ($second_offset > $memberlist_cache['num_members'] ? $cache_step_size - ($memberlist_cache['num_members'] % $cache_step_size) : 0);
 		}
 
 		// Add custom fields parameters too.
@@ -344,10 +370,10 @@ class Memberlist_Controller extends Action_Controller
 			$query_parameters += $context['custom_profile_fields']['parameters'];
 
 		// Select the members from the database.
-		ml_selectMembers($query_parameters, $where, $limit, $_REQUEST['sort']);
+		ml_selectMembers($query_parameters, $where, $limit, $sort);
 
 		// Add anchors at the start of each letter.
-		if ($_REQUEST['sort'] === 'real_name')
+		if ($sort === 'real_name')
 		{
 			$last_letter = '';
 			foreach ($context['members'] as $i => $dummy)
@@ -376,10 +402,15 @@ class Memberlist_Controller extends Action_Controller
 		$context['can_moderate_forum'] = allowedTo('moderate_forum');
 
 		// They're searching..
-		if (isset($_REQUEST['search']) && isset($_REQUEST['fields']))
+		if (isset($this->_req->query->search, $this->_req->query->fields)
+			|| isset($this->_req->post->search, $this->_req->post->fields))
 		{
-			$search = Util::htmlspecialchars(trim(isset($_GET['search']) ? $_GET['search'] : $_POST['search']), ENT_QUOTES);
-			$input_fields = isset($_GET['fields']) ? explode(',', $_GET['fields']) : $_POST['fields'];
+			// Some handy short cuts
+			$start = $this->_req->getQuery('start', '', null);
+			$desc = $this->_req->getQuery('desc', '', null);
+			$sort = $this->_req->getQuery('sort', '', null);
+			$search = Util::htmlspecialchars(trim(isset($this->_req->query->search) ? $this->_req->query->search : $this->_req->post->search), ENT_QUOTES);
+			$input_fields = isset($this->_req->query->fields) ? explode(',', $this->_req->query->fields) : $this->_req->post->fields;
 
 			$fields_key = array_keys($this->_search_fields);
 			$context['search_defaults'] = array();
@@ -395,33 +426,35 @@ class Memberlist_Controller extends Action_Controller
 				$input_fields = array('name');
 
 			// Set defaults for how the results are sorted
-			if (!isset($_REQUEST['sort']) || !isset($context['columns'][$_REQUEST['sort']]))
-				$_REQUEST['sort'] = 'real_name';
+			if (!isset($sort) || !isset($context['columns'][$sort]))
+				$sort = 'real_name';
 
 			// Build the column link / sort information.
 			foreach ($context['columns'] as $col => $column_details)
 			{
 				$context['columns'][$col]['href'] = $scripturl . '?action=memberlist;sa=search;start=0;sort=' . $col;
 
-				if ((!isset($_REQUEST['desc']) && $col == $_REQUEST['sort']) || ($col != $_REQUEST['sort'] && !empty($column_details['default_sort_rev'])))
+				if ((!isset($desc) && $col == $sort) || ($col != $sort && !empty($column_details['default_sort_rev'])))
 					$context['columns'][$col]['href'] .= ';desc';
 
 				$context['columns'][$col]['href'] .= ';search=' . $search . ';fields=' . implode(',', $input_fields);
-
 				$context['columns'][$col]['link'] = '<a href="' . $context['columns'][$col]['href'] . '" rel="nofollow">' . $context['columns'][$col]['label'] . '</a>';
-				$context['columns'][$col]['selected'] = $_REQUEST['sort'] == $col;
+				$context['columns'][$col]['selected'] = $sort == $col;
 			}
 
 			// set up some things for use in the template
-			$context['sort_direction'] = !isset($_REQUEST['desc']) ? 'up' : 'down';
-			$context['sort_by'] = $_REQUEST['sort'];
+			$context['sort_direction'] = !isset($desc) ? 'up' : 'down';
+			$context['sort_by'] = $sort;
+			$context['memberlist_buttons'] = array(
+				'view_all_members' => array('text' => 'view_all_members', 'image' => 'mlist.png', 'lang' => true, 'url' => $scripturl . '?action=memberlist;sa=all', 'active' => true),
+			);
 
 			$query_parameters = array(
 				'regular_id_group' => 0,
 				'is_activated' => 1,
 				'blank_string' => '',
 				'search' => '%' . strtr($search, array('_' => '\\_', '%' => '\\%', '*' => '%')) . '%',
-				'sort' => $context['columns'][$_REQUEST['sort']]['sort'][$context['sort_direction']],
+				'sort' => $context['columns'][$sort]['sort'][$context['sort_direction']],
 			);
 
 			// Search for a name
@@ -478,8 +511,9 @@ class Memberlist_Controller extends Action_Controller
 			$where = implode(' ' . $query . ' OR ', $fields) . ' ' . $query . $condition;
 
 			// Find the members from the database.
-			$numResults = ml_searchMembers($query_parameters, $customJoin, $where, $_REQUEST['start']);
-			$context['page_index'] = constructPageIndex($scripturl . '?action=memberlist;sa=search;search=' . $search . ';fields=' . implode(',', $validFields), $_REQUEST['start'], $numResults, $modSettings['defaultMaxMembers']);
+			$numResults = ml_searchMembers($query_parameters, $customJoin, $where, $start);
+			$context['letter_links'] = '';
+			$context['page_index'] = constructPageIndex($scripturl . '?action=memberlist;sa=search;search=' . $search . ';fields=' . implode(',', $validFields), $start, $numResults, $modSettings['defaultMaxMembers']);
 		}
 		else
 			redirectexit('action=memberlist');
