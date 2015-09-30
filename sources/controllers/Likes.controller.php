@@ -23,7 +23,7 @@ class Likes_Controller extends Action_Controller
 {
 	/**
 	 * Holds the ajax response
-	 * @var string[]
+	 * @var array
 	 */
 	protected $_likes_response = array();
 
@@ -32,6 +32,26 @@ class Likes_Controller extends Action_Controller
 	 * @var int
 	 */
 	protected $_id_liked = null;
+
+	/**
+	 * Holds instance of HttpReq object
+	 * @var HttpReq
+	 */
+	private $_req;
+
+	/**
+	 * Entry point function for likes, permission checks, just makes sure its on
+	 */
+	public function pre_dispatch()
+	{
+		global $modSettings;
+
+		// If likes are disabled, we don't go any further
+		if (empty($modSettings['likes_enabled']))
+			Errors::instance()->fatal_lang_error('feature_disabled', true);
+
+		$this->_req = HttpReq::instance();
+	}
 
 	/**
 	 * Default action method, if a specific methods wasn't
@@ -46,18 +66,6 @@ class Likes_Controller extends Action_Controller
 	}
 
 	/**
-	 * Entry point function for likes, permission checks, just makes sure its on
-	 */
-	public function pre_dispatch()
-	{
-		global $modSettings;
-
-		// If likes are disabled, we don't go any further
-		if (empty($modSettings['likes_enabled']))
-			Errors::instance()->fatal_lang_error('feature_disabled', true);
-	}
-
-	/**
 	 * Liking a post via ajax, then _api will be added to the sa=
 	 * and this method will be called
 	 * Calls the standard like method and then the api return method
@@ -69,9 +77,12 @@ class Likes_Controller extends Action_Controller
 		// An error if not possible to like.
 		if (!$this->_doLikePost('+', 'likemsg'))
 		{
-			loadLanguage('Errors');
-			$this->_likes_response = array('result' => false, 'data' => $txt['like_unlike_error']);
-		}
+			if (empty($this->_likes_response))
+			{
+				loadLanguage('Errors');
+				$this->_likes_response = array('result' => false, 'data' => $txt['like_unlike_error']);
+			}
+	}
 
 		$this->likeResponse();
 	}
@@ -87,8 +98,11 @@ class Likes_Controller extends Action_Controller
 		// An error if not possible to like.
 		if (!$this->_doLikePost('-', 'rlikemsg'))
 		{
-			loadLanguage('Errors');
-			$this->_likes_response = array('result' => false, 'data' => $txt['like_unlike_error']);
+			if (empty($this->_likes_response))
+			{
+				loadLanguage('Errors');
+				$this->_likes_response = array('result' => false, 'data' => $txt['like_unlike_error']);
+			}
 		}
 
 		$this->likeResponse();
@@ -123,7 +137,7 @@ class Likes_Controller extends Action_Controller
 	{
 		global $user_info, $modSettings;
 
-		$this->_id_liked = !empty($_REQUEST['msg']) ? (int) $_REQUEST['msg'] : 0;
+		$this->_id_liked = $this->_req->getPost('msg', 'intval', (isset($this->_req->query->msg) ? (int) $this->_req->query->msg : 0));
 
 		// We like these
 		require_once(SUBSDIR . '/Likes.subs.php');
@@ -151,9 +165,11 @@ class Likes_Controller extends Action_Controller
 						));
 					}
 				}
+
 				return true;
 			}
 		}
+
 		return false;
 	}
 
@@ -168,7 +184,8 @@ class Likes_Controller extends Action_Controller
 
 		$this->_doLikePost('-', 'rlikemsg');
 
-		if (!isset($_REQUEST['profile']))
+		// No longer liked, return to whence you came
+		if (!isset($this->_req->query->profile))
 			redirectexit('topic=' . $topic . '.msg' . $this->_id_liked . '#msg' . $this->_id_liked);
 		else
 			redirectexit('action=profile;area=showlikes;sa=given;u=' .$user_info['id']);
@@ -239,7 +256,7 @@ class Likes_Controller extends Action_Controller
 			$check = false;
 
 		// If they have exceeded their limits, provide a message for the ajax response
-		if ($check === false && $this->_api)
+		if ($check === false)
 		{
 			loadLanguage('Errors');
 			$wait = $modSettings['likeWaitTime'] > 60 ? round($modSettings['likeWaitTime'] / 60, 2) : $modSettings['likeWaitTime'];
@@ -258,7 +275,7 @@ class Likes_Controller extends Action_Controller
 		// Load in our helper functions
 		require_once(SUBSDIR . '/Likes.subs.php');
 
-		if (isset($_REQUEST['sa']) && $_REQUEST['sa'] === 'received')
+		if ($this->_req->getQuery('sa') === 'received')
 			$this->_action_showReceived();
 		else
 			$this->_action_showGiven();
@@ -482,7 +499,7 @@ class Likes_Controller extends Action_Controller
 		loadLanguage('Profile');
 
 		// Get the message in question
-		$message = isset($_REQUEST['msg']) ? $_REQUEST['msg'] : 0;
+		$message = $this->_req->getQuery('msg', 'intval', 0);
 
 		// Build the listoption array to display the data
 		$listOptions = array(
@@ -705,7 +722,7 @@ class Likes_Controller extends Action_Controller
 
 		$data = dbMostLikedMessage();
 
-		if ($data)
+		if (!empty($data))
 			$this->_likes_response = array('result' => true, 'data' => $data);
 		else
 			$this->_likes_response = array('result' => false, 'error' => $txt['like_post_error_something_wrong']);
@@ -723,7 +740,7 @@ class Likes_Controller extends Action_Controller
 
 		$data = dbMostLikedTopic();
 
-		if ($data)
+		if (!empty($data))
 			$this->_likes_response = array('result' => true, 'data' => $data);
 		else
 			$this->_likes_response = array('result' => false, 'error' => $txt['like_post_error_something_wrong']);
@@ -741,7 +758,7 @@ class Likes_Controller extends Action_Controller
 
 		$data = dbMostLikedBoard();
 
-		if ($data)
+		if (!empty($data))
 			$this->_likes_response = array('result' => true, 'data' => $data);
 		else
 			$this->_likes_response = array('result' => false, 'error' => $txt['like_post_error_something_wrong']);
@@ -759,7 +776,7 @@ class Likes_Controller extends Action_Controller
 
 		$data = dbMostLikesReceivedUser();
 
-		if ($data)
+		if (!empty($data))
 			$this->_likes_response = array('result' => true, 'data' => $data);
 		else
 			$this->_likes_response = array('result' => false, 'error' => $txt['like_post_error_something_wrong']);
@@ -777,7 +794,7 @@ class Likes_Controller extends Action_Controller
 
 		$data = dbMostLikesGivenUser();
 
-		if ($data)
+		if (!empty($data))
 			$this->_likes_response = array('result' => true, 'data' => $data);
 		else
 			$this->_likes_response = array('result' => false, 'error' => $txt['like_post_error_something_wrong']);
