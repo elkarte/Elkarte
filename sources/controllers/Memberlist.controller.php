@@ -38,6 +38,9 @@ class Memberlist_Controller extends Action_Controller
 	 */
 	private $_req;
 
+	/**
+	 * Entry point function, called before all others
+	 */
 	public function pre_dispatch()
 	{
 		global $context, $txt;
