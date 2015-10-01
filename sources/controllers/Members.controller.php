@@ -26,6 +26,20 @@ if (!defined('ELK'))
 class Members_Controller extends Action_Controller
 {
 	/**
+	 * Holds instance of HttpReq object
+	 * @var HttpReq
+	 */
+	private $_req;
+
+	/**
+	 * Class entry point function, called before all others
+	 */
+	public function pre_dispatch()
+	{
+		$this->_req = HttpReq::instance();
+	}
+
+	/**
 	 * Forwards to an action method.
 	 *
 	 * @see Action_Controller::action_index()
@@ -60,12 +74,12 @@ class Members_Controller extends Action_Controller
 		checkSession('get');
 		is_not_guest();
 
-		// You have to give a user
-		if (empty($_REQUEST['u']))
-			Errors::instance()->fatal_lang_error('no_access', false);
+		// Who's going to be your buddy
+		$user = $this->_req->getQuery('u', 'intval', '');
 
-		// Always an int
-		$user = (int) $_REQUEST['u'];
+		// You have to give a user
+		if (empty($user))
+			Errors::instance()->fatal_lang_error('no_access', false);
 
 		call_integration_hook('integrate_add_buddies', array($user_info['id'], &$user));
 
@@ -110,12 +124,12 @@ class Members_Controller extends Action_Controller
 
 		call_integration_hook('integrate_remove_buddy', array($user_info['id']));
 
-		// You have to give a user
-		if (empty($_REQUEST['u']))
-			Errors::instance()->fatal_lang_error('no_access', false);
+		// Yeah, they are no longer cool
+		$user = $this->_req->getQuery('u', 'intval', '');
 
-		// Always an int
-		$user = (int) $_REQUEST['u'];
+		// You have to give a user
+		if (empty($user))
+			Errors::instance()->fatal_lang_error('no_access', false);
 
 		// Remove this user, assuming we can find them
 		if (in_array($user, $user_info['buddies']))
@@ -148,34 +162,32 @@ class Members_Controller extends Action_Controller
 		Template_Layers::getInstance()->removeAll();
 		$context['sub_template'] = 'find_members';
 
-		if (isset($_REQUEST['search']))
-			$context['last_search'] = Util::htmlspecialchars($_REQUEST['search'], ENT_QUOTES);
-		else
-			$_REQUEST['start'] = 0;
+		// Assume a beginning
+		$search = $this->_req->getPost('search', 'trim|Util::htmlspecialchars[ENT_QUOTES]', $this->_req->getQuery('search', 'trim|Util::htmlspecialchars[ENT_QUOTES]', null));
+		$context['last_search'] = $search;
 
 		// Allow the user to pass the input to be added to to the box.
-		$context['input_box_name'] = isset($_REQUEST['input']) && preg_match('~^[\w-]+$~', $_REQUEST['input']) === 1 ? $_REQUEST['input'] : 'to';
+		$input = $this->_req->getPost('input', '', $this->_req->getQuery('input', '', null));
+		$context['input_box_name'] = isset($input) && preg_match('~^[\w-]+$~', $input) === 1 ? $input : 'to';
 
 		// Take the delimiter over GET in case it's \n or something.
-		$context['delimiter'] = isset($_REQUEST['delim']) ? ($_REQUEST['delim'] == 'LB' ? "\n" : $_REQUEST['delim']) : ', ';
-		$context['quote_results'] = !empty($_REQUEST['quote']);
+		$context['delimiter'] = isset($this->_req->post->delim) ? ($this->_req->post->delim == 'LB' ? "\n" : $this->_req->post->delim) : ', ';
+		$context['quote_results'] = !empty($this->_req->post->quote) && !empty($this->_req->query->quote);
 
 		// List all the results.
 		$context['results'] = array();
 
 		// Some buddy related settings ;)
 		$context['show_buddies'] = !empty($user_info['buddies']);
-		$context['buddy_search'] = isset($_REQUEST['buddies']);
+		$context['buddy_search'] = isset($this->_req->post->buddies) || isset($this->_req->query->buddies);
 
 		// If the user has done a search, well - search.
-		if (isset($_REQUEST['search']))
+		if (isset($search))
 		{
 			require_once(SUBSDIR . '/Auth.subs.php');
-			$_REQUEST['search'] = Util::htmlspecialchars($_REQUEST['search'], ENT_QUOTES);
-
-			$context['results'] = findMembers(array($_REQUEST['search']), true, $context['buddy_search']);
+			$context['results'] = findMembers(array($search), true, $context['buddy_search']);
 			$total_results = count($context['results']);
-			$_REQUEST['start'] = (int) $_REQUEST['start'];
+			$start = (int) $this->_req->query->start;
 
 			// This is a bit hacky, but its defined in index template, and this is a popup
 			$settings['page_index_template'] = array(
@@ -186,21 +198,21 @@ class Members_Controller extends Action_Controller
 				'expand_pages' => '<li class="linavPages expand_pages" role="menuitem" {custom}> <a href="#">...</a> </li>',
 				'all' => '<li class="linavPages all_pages" role="menuitem">{all_txt}</li>',
 			);
-			$context['page_index'] = constructPageIndex($scripturl . '?action=findmember;search=' . $context['last_search'] . ';' . $context['session_var'] . '=' . $context['session_id'] . ';input=' . $context['input_box_name'] . ($context['quote_results'] ? ';quote=1' : '') . ($context['buddy_search'] ? ';buddies' : ''), $_REQUEST['start'], $total_results, 7);
+			$context['page_index'] = constructPageIndex($scripturl . '?action=findmember;search=' . $context['last_search'] . ';' . $context['session_var'] . '=' . $context['session_id'] . ';input=' . $context['input_box_name'] . ($context['quote_results'] ? ';quote=1' : '') . ($context['buddy_search'] ? ';buddies' : ''), $start, $total_results, 7);
 
 			// Determine the navigation context
 			$base_url = $scripturl . '?action=findmember;search=' . urlencode($context['last_search']) . (empty($_REQUEST['u']) ? '' : ';u=' . $_REQUEST['u']) . ';' . $context['session_var'] . '=' . $context['session_id'];
 			$context['links'] += array(
-				'prev' => $_REQUEST['start'] >= 7 ? $base_url . ';start=' . ($_REQUEST['start'] - 7) : '',
-				'next' => $_REQUEST['start'] + 7 < $total_results ? $base_url . ';start=' . ($_REQUEST['start'] + 7) : '',
+				'prev' => $start >= 7 ? $base_url . ';start=' . ($start - 7) : '',
+				'next' => $start + 7 < $total_results ? $base_url . ';start=' . ($start + 7) : '',
 			);
 
 			$context['page_info'] = array(
-				'current_page' => $_REQUEST['start'] / 7 + 1,
+				'current_page' => $start / 7 + 1,
 				'num_pages' => floor(($total_results - 1) / 7) + 1
 			);
 
-			$context['results'] = array_slice($context['results'], $_REQUEST['start'], 7);
+			$context['results'] = array_slice($context['results'], $start, 7);
 		}
 	}
 }
