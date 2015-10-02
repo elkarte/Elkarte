@@ -378,8 +378,6 @@ function maillist_templates($template_type, $subject = null)
 
 	$db = database();
 
-	$notification_templates = array();
-
 	return $db->fetchQueryCallback('
 		SELECT recipient_name AS template_title, body
 		FROM {db_prefix}log_comments
@@ -390,7 +388,7 @@ function maillist_templates($template_type, $subject = null)
 			'generic' => 0,
 			'current_member' => $user_info['id'],
 		),
-		function($row)
+		function($row) use ($subject)
 		{
 			$template = array(
 				'title' => $row['template_title'],
