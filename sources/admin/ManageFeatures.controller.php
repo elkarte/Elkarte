@@ -271,10 +271,13 @@ class ManageFeatures_Controller extends Action_Controller
 		// Saving?
 		if (isset($this->_req->query->save))
 		{
+			// Remove and reset if needed
 			if (!empty($modSettings['front_page']))
 			{
 				Hooks::get()->remove('integrate_action_frontpage', $modSettings['front_page'] . '::frontPageHook');
 			}
+
+			// Setting a custom frontpage, set the hook to the FrontpageInterface of the controller
 			if (!empty($this->_req->post->front_page))
 			{
 				$front_page = (string) $this->_req->post->front_page;

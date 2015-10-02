@@ -435,7 +435,7 @@ function removeTopics($topics, $decreasePostCount = true, $ignoreRecycling = fal
 /**
  * Moves lots of topics to a specific board and checks if the user can move them
  *
- * @param int[] $moveCache
+ * @param array $moveCache [0] => int[] is the topic, [1] => int[]  is the board to move to.
  */
 function moveTopicsPermissions($moveCache)
 {

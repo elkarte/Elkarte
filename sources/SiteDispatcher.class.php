@@ -52,14 +52,16 @@ class Site_Dispatcher
 
 	/**
 	 * Create an instance and initialize it.
-	 * This does all the work to figure out which controller and method needs called.
+	 *
+	 * This does all the work to figure out which controller and method need
+	 * to be called.
 	 */
 	public function __construct()
 	{
 		global $board, $topic, $modSettings, $user_info, $maintenance;
 
 		// Default action of the forum: board index
-		// Everytime we don't know what to do, we'll do this :P
+		// Every time we don't know what to do, we'll do this :P
 		$this->_default_action = array(
 			'controller' => 'BoardIndex_Controller',
 			'function' => 'action_boardindex'

@@ -8,7 +8,7 @@
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
- * @version 1.0.3
+ * @version 1.1 dev
  *
  */
 
@@ -23,26 +23,31 @@ if (!defined('ELK'))
  */
 interface Frontpage_Interface
 {
-
 	/**
-	 * Used to attach to the integrate_action_frontpage hook, to change
-	 * the default action.
+	 * Used to attach integrate_action_frontpage hook, to change the default action.
+	 *
+	 * - e.g. Hooks::get()->add('integrate_action_frontpage', 'ControllerName::frontPageHook');
 	 *
 	 * @param string[] $default_action
 	 */
 	public static function frontPageHook(&$default_action);
 
 	/**
-	 * Used to defin the parameters the controller may need for the front page
-	 * action to work (e.g. specify a topic ID).
+	 * Used to define the parameters the controller may need for the front page
+	 * action to work
+	 *
+	 * - e.g. specify a topic ID or a board listing
 	 *
 	 * @return mixed[]
 	 */
 	public static function frontPageOptions();
 
 	/**
-	 * Used to defin the parameters the controller may need for the front page
-	 * action to work (e.g. specify a topic ID).
+	 * Used to define the parameters the controller may need for the front page
+	 * action to work
+	 *
+	 * - e.g. specify a topic ID
+	 * - should return true or false based on if its able to show the front page
 	 *
 	 * @param Object $post
 	 */
