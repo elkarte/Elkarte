@@ -1021,6 +1021,8 @@ function watchedUsers($start, $items_per_page, $sort, $approve_query, $dummy)
  */
 function watchedUserPostsCount($approve_query, $warning_watch)
 {
+	global $modSettings;
+
 	$db = database();
 
 	// @todo $approve_query is not used in the function
@@ -1031,10 +1033,12 @@ function watchedUserPostsCount($approve_query, $warning_watch)
 				INNER JOIN {db_prefix}members AS mem ON (mem.id_member = m.id_member)
 				INNER JOIN {db_prefix}boards AS b ON (b.id_board = m.id_board)
 			WHERE mem.warning >= {int:warning_watch}
-				AND {query_see_board}
-				' . $approve_query,
+				AND {query_see_board}' . (!empty($modSettings['recycle_enable']) && $modSettings['recycle_board'] > 0 ? '
+				AND b.id_board != {int:recycle}' : '') .
+				$approve_query,
 		array(
 			'warning_watch' => $warning_watch,
+			'recycle' => $modSettings['recycle_board'],
 		)
 	);
 	list ($totalMemberPosts) = $db->fetch_row($request);
@@ -1066,12 +1070,14 @@ function watchedUserPosts($start, $items_per_page, $sort, $approve_query, $delet
 			INNER JOIN {db_prefix}members AS mem ON (mem.id_member = m.id_member)
 			INNER JOIN {db_prefix}boards AS b ON (b.id_board = m.id_board)
 		WHERE mem.warning >= {int:warning_watch}
-			AND {query_see_board}
-			' . $approve_query . '
+			AND {query_see_board}' . (!empty($modSettings['recycle_enable']) && $modSettings['recycle_board'] > 0 ? '
+			AND b.id_board != {int:recycle}' : '') .
+			$approve_query . '
 		ORDER BY m.id_msg DESC
 		LIMIT ' . $start . ', ' . $items_per_page,
 		array(
 			'warning_watch' => $modSettings['warning_watch'],
+			'recycle' => $modSettings['recycle_board'],
 		)
 	);
 	$member_posts = array();
