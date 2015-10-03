@@ -325,6 +325,8 @@ class MoveTopic_Controller extends Action_Controller
 	 */
 	private function _rename_topic()
 	{
+		global $context;
+
 		// Rename the topic...
 		if (isset($this->_req->post->reset_subject, $this->_req->post->custom_subject) && $this->_req->post->custom_subject != '')
 		{
