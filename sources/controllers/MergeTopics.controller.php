@@ -54,6 +54,8 @@ class MergeTopics_Controller extends Action_Controller
 	 */
 	public function action_index()
 	{
+		global $context;
+
 		// Load the template....
 		loadTemplate('MergeTopics');
 
