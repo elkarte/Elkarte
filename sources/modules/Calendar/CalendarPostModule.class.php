@@ -185,17 +185,17 @@ class Calendar_Post_Module implements ElkArte\sources\modules\Module_Interface
 			if (isset($_REQUEST['month']))
 				$context['event']['month'] = (int) $_REQUEST['month'];
 			else
-				$_REQUEST['month'] = $today['mon'];
+				$context['event']['month'] = $today['mon'];
 
 			if (isset($_REQUEST['year']))
 				$context['event']['year'] = (int) $_REQUEST['year'];
 			else
-				$_REQUEST['year'] = $today['year'];
+				$context['event']['year'] = $today['year'];
 
 			if (isset($_REQUEST['day']))
 				$context['event']['day'] = (int) $_REQUEST['day'];
 			else
-				$context['event']['day'] = $_REQUEST['month'] == $today['mon'] ? $today['mday'] : 0;
+				$context['event']['day'] = $context['event']['month'] == $today['mon'] ? $today['mday'] : 0;
 
 			$context['event']['span'] = isset($_REQUEST['span']) ? $_REQUEST['span'] : 1;
 
