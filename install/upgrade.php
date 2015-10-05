@@ -553,7 +553,7 @@ function action_welcomeLogin()
 	// Do a quick version spot check.
 	$temp = substr(@implode('', @file(BOARDDIR . '/index.php')), 0, 4096);
 	preg_match('~\*\s@version\s+(.+)~i', $temp, $match);
-	if (empty($match[1]) || trim(str_replace('Release Candidate', 'RC', $match[1])) != CURRENT_VERSION)
+	if (empty($match[1]) || compareVersions(trim(str_replace('Release Candidate', 'RC', $match[1])), CURRENT_VERSION) != 0)
 		return throw_error('The upgrader found some old or outdated files.<br /><br />Please make certain you uploaded the new versions of all the files included in the package.');
 
 	// What absolutely needs to be writable?
