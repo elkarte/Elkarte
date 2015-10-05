@@ -38,6 +38,7 @@ $GLOBALS['search_versions'] = array(
  */
 function findSearchAPI()
 {
+	Elk_Autoloader::getInstance()->register(SUBSDIR . '/Search', '\\ElkArte\\Search');
 	$search = new Search();
 	return $search->findSearchAPI();
 }

@@ -647,23 +647,19 @@ class ManageSearch_Controller extends Action_Controller
 		global $txt, $scripturl;
 
 		$apis = array();
+		Elk_Autoloader::getInstance()->register(SUBSDIR . '/Search', '\\ElkArte\\Search');
 
 		try
 		{
-			$files = new FilesystemIterator(SUBSDIR, FilesystemIterator::SKIP_DOTS);
+			$files = new GlobIterator(SUBSDIR . '/Search/API/*Search.class.php', FilesystemIterator::SKIP_DOTS);
 			foreach ($files as $file)
 			{
-				if ($file->isFile() && preg_match('~^SearchAPI-([A-Za-z\d_]+)\.class\.php$~', $file->getFilename(), $matches))
+				if ($file->isFile())
 				{
-					// Check that this is definitely a valid API!
-					$fp = fopen($file->getPathname(), 'rb');
-					$header = fread($fp, 4096);
-					fclose($fp);
-
-					if (strpos($header, '* SearchAPI-' . $matches[1] . '.class.php') !== false)
+					$index_name = str_replace('Search', '_Search', $file->getBasename('.class.php'));
+					$search_class_name = 'ElkArte\\Search\\API\\' . $index_name;
+					if (class_implements($search_class_name, 'Search_Interface'))
 					{
-						$index_name = strtolower($matches[1]);
-						$search_class_name = ucwords($index_name) . '_Search';
 						$searchAPI = new $search_class_name();
 
 						// No Support?  NEXT!
