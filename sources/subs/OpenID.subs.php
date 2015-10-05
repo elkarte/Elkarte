@@ -26,11 +26,14 @@ if (!defined('ELK'))
 class OpenID
 {
 	/**
-	 * Openid_uri is the URI given by the user
-	 * Validates the URI and changes it to a fully canonical URL
-	 * Determines the IDP server and delegation
-	 * Optional array of fields to restore when validation complete.
-	 * Redirects the user to the IDP for validation
+	 * Validate the supplied OpenID, redirects to the IDP server
+	 *
+	 * What it does:
+	 * - Openid_uri is the URI given by the user
+	 * - Validates the URI and changes it to a fully canonical URL
+	 * - Determines the IDP server and delegation
+	 * - Optional array of fields to restore when validation complete.
+	 * - Redirects the user to the IDP for validation
 	 *
 	 * @param string $openid_uri
 	 * @param bool $return = false
@@ -110,7 +113,8 @@ class OpenID
 
 	/**
 	 * Revalidate a user using OpenID.
-	 * Note that this function will not return when authentication is required.
+	 *
+	 * - Note that this function will not return when authentication is required.
 	 *
 	 * @return boolean|null
 	 */
@@ -299,6 +303,7 @@ class OpenID
 
 	/**
 	 * Prepare for a Diffie-Hellman key exchange.
+	 *
 	 * @param bool $regenerate = false
 	 * @return string return false on failure or an array() on success
 	 */
@@ -322,7 +327,8 @@ class OpenID
 
 	/**
 	 * Retrieve DH keys from the store.
-	 * It generates them if they're not stored or $regerate parameter is true.
+	 *
+	 * - It generates them if they're not stored or $regerate parameter is true.
 	 *
 	 * @param bool $regenerate
 	 */
@@ -446,8 +452,7 @@ class OpenID
 }
 
 /**
- * Given a binary string, returns the binary string converted to a
- * long number.
+ * Given a binary string, returns the binary string converted to a long number.
  *
  * @param string $str
  * @return string
@@ -469,7 +474,9 @@ function binary_to_long($str)
 
 /**
  * Given a long integer, returns the number converted to a binary
- * string. This function accepts long integer values of arbitrary
+ * string.
+ *
+ * This function accepts long integer values of arbitrary
  * magnitude.
  *
  * @param string $value
@@ -503,11 +510,11 @@ function long_to_binary($value)
 }
 
 /**
- * Performs an exclusive or (^ bitwise operator) character for character on
- * two stings.  The result of the biwise operator is 1 if and only if
- * both bits differ.
+ * Performs an exclusive or (^ bitwise operator) character for character on two stings.
  *
- * Returns a binary string representing the per character positon comparison results.
+ * - The result of the biwise operator is 1 if and only if both bits differ.
+ *
+ * Returns a binary string representing the per character position comparison results.
  *
  * @param int $num1
  * @param int $num2

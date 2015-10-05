@@ -1108,7 +1108,9 @@ function template_prune()
 	<form id="prune_pm" action="', $scripturl, '?action=pm;sa=prune" method="post" accept-charset="UTF-8" onsubmit="return confirm(\'', $txt['pm_prune_warning'], '\');">
 		<h2 class="category_header">', $txt['pm_prune'], '</h2>
 		<div class="content">
-			<p><label for="age">', sprintf($txt['pm_prune_desc'], '<input type="text" id="age" name="age" size="3" value="14" class="input_text" />'), '</label></p>
+			<p>
+				<label for="age">', sprintf($txt['pm_prune_desc'], '<input type="text" id="age" name="age" size="3" value="14" class="input_text" />'), '</label>
+			</p>
 			<div class="submitbutton">
 				<input type="submit" value="', $txt['delete'], '" />
 				<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />

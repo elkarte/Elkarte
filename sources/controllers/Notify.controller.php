@@ -387,7 +387,7 @@ class Notify_Controller extends Action_Controller
 	}
 
 	/**
-	 * Toggle a board notification on/off
+	 * Toggle a watch topic on/off
 	 */
 	private function _toggle_topic_watch()
 	{
