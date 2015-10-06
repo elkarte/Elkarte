@@ -17,6 +17,8 @@
  *
  */
 
+namespace ElkArte\Search\API;
+
 if (!defined('ELK'))
 	die('No access...');
 

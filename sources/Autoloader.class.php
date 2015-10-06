@@ -371,10 +371,6 @@ class Elk_Autoloader
 					$this->_file_name = '';
 				}
 				break;
-			// Some_Search => SearchAPI-Some.class
-			case 'Search':
-				$this->_file_name = SUBSDIR . '/SearchAPI-' . $this->_givenname . '.class.php';
-				break;
 			// Some_Thing_Exception => /Exception/SomeThingException.class.php
 			case 'Exception':
 				$this->_file_name = SUBSDIR . '/Exception/' . $this->_givenname . $this->_surname . '.class.php';

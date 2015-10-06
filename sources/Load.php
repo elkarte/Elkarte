@@ -1030,6 +1030,7 @@ function loadMemberContext($user, $display_custom_fields = false)
 
 	// If the set isn't minimal then load the monstrous array.
 	if ($context['loadMemberContext_set'] !== 'minimal')
+	{
 		$memberContext[$user] += array(
 			'username_color' => '<span '. (!empty($profile['member_group_color']) ? 'style="color:'. $profile['member_group_color'] .';"' : '') .'>'. $profile['member_name'] .'</span>',
 			'name_color' => '<span '. (!empty($profile['member_group_color']) ? 'style="color:'. $profile['member_group_color'] .';"' : '') .'>'. $profile['real_name'] .'</span>',
@@ -1092,6 +1093,7 @@ function loadMemberContext($user, $display_custom_fields = false)
 			'local_time' => standardTime(time() + ($profile['time_offset'] - $user_info['time_offset']) * 3600, false),
 			'custom_fields' => array(),
 		);
+	}
 
 	// Are we also loading the members custom fields into context?
 	if ($display_custom_fields && !empty($modSettings['displayFields']))

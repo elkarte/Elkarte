@@ -1377,14 +1377,14 @@ function compareVersions($version1, $version2)
 	{
 		// Clean the version and extract the version parts.
 		$clean = str_replace(' ', '', strtolower($version));
-		preg_match('~(\d+)(?:\.(\d+|))?(?:\.)?(\d+|)(?:(alpha|beta|rc)(\d+|)(?:\.)?(\d+|))?(?:(dev))?(\d+|)~', $clean, $parts);
+		preg_match('~(\d+)(?:\.(\d+|))?(?:\.)?(\d+|)(?:(alpha|beta|rc)(\d+|)(?:\.)?(\d+|))?(?:\s(dev))?(\d+|)~', $clean, $parts);
 
 		// Build an array of parts.
 		$versions[$id] = array(
 			'major' => !empty($parts[1]) ? (int) $parts[1] : 0,
 			'minor' => !empty($parts[2]) ? (int) $parts[2] : 0,
 			'patch' => !empty($parts[3]) ? (int) $parts[3] : 0,
-			'type' => empty($parts[4]) ? 'stable' : $parts[4],
+			'type' => empty($parts[4]) && empty($parts[7]) ? 'stable' : (!empty($parts[7]) ? 'alpha' : $parts[4]),
 			'type_major' => !empty($parts[6]) ? (int) $parts[5] : 0,
 			'type_minor' => !empty($parts[6]) ? (int) $parts[6] : 0,
 			'dev' => !empty($parts[7]),

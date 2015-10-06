@@ -32,7 +32,7 @@ function template_core_features()
 
 		$(document).ready(function() {
 			$(".core_features_hide").css(\'display\', \'none\');
-			$(".core_features_img").css({\'cursor\': \'pointer\', \'display\': \'block\'}).each(function() {
+			$(".core_features_img").show().css({\'cursor\': \'pointer\'}).each(function() {
 				var sImageText = $(this).hasClass(\'on\') ? feature_on_text : feature_off_text;
 				$(this).attr({ title: sImageText, alt: sImageText });
 			});

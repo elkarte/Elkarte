@@ -45,6 +45,13 @@ class Display_Controller extends Action_Controller
 	protected $_icon_sources = null;
 
 	/**
+	 * Show signatures?
+	 *
+	 * @var int
+	 */
+	protected $_show_signatures = 0;
+
+	/**
 	 * Start viewing the topics from ... (page, all, other)
 	 * @var int|string
 	 */
@@ -524,6 +531,17 @@ class Display_Controller extends Action_Controller
 		// This will be called from the template.
 		$context['get_message'] = array($this, 'prepareDisplayContext_callback');
 		$this->_icon_sources = new MessageTopicIcons();
+		list ($sig_limits, $sig_bbc) = explode(':', $modSettings['signature_settings']);
+		$signature_settings = explode(',', $sig_limits);
+
+		if ($user_info['is_guest'])
+		{
+			$this->_show_signatures = !empty($signature_settings[8]) ? (int) $signature_settings[8] : 0;
+		}
+		else
+		{
+			$this->_show_signatures = !empty($signature_settings[9]) ? (int) $signature_settings[9] : 0;
+		}
 
 		// Now set all the wonderful, wonderful permissions... like moderation ones...
 		$common_permissions = array(
@@ -748,6 +766,7 @@ class Display_Controller extends Action_Controller
 		global $settings, $txt, $modSettings, $scripturl, $user_info;
 		global $memberContext, $context, $messages_request, $topic;
 		static $counter = null;
+		static $signature_shown = null;
 
 		// If the query returned false, bail.
 		if ($messages_request == false)
@@ -797,6 +816,22 @@ class Display_Controller extends Action_Controller
 			$memberContext[$message['id_member']]['can_view_profile'] = allowedTo('profile_view_any') || ($message['id_member'] == $user_info['id'] && allowedTo('profile_view_own'));
 			$memberContext[$message['id_member']]['is_topic_starter'] = $message['id_member'] == $context['topic_starter_id'];
 			$memberContext[$message['id_member']]['can_see_warning'] = !isset($context['disabled_fields']['warning_status']) && $memberContext[$message['id_member']]['warning_status'] && ($context['user']['can_mod'] || (!$user_info['is_guest'] && !empty($modSettings['warning_show']) && ($modSettings['warning_show'] > 1 || $message['id_member'] == $user_info['id'])));
+
+			if ($this->_show_signatures === 1)
+			{
+				if (empty($signature_shown[$message['id_member']]))
+				{
+					$signature_shown[$message['id_member']] = true;
+				}
+				else
+				{
+					$memberContext[$message['id_member']]['signature'] = '';
+				}
+			}
+			elseif ($this->_show_signatures === 2)
+			{
+				$memberContext[$message['id_member']]['signature'] = '';
+			}
 		}
 
 		$memberContext[$message['id_member']]['ip'] = $message['poster_ip'];

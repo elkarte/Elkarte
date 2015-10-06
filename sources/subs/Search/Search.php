@@ -17,6 +17,8 @@
  *
  */
 
+namespace ElkArte\Search;
+
 if (!defined('ELK'))
 	die('No access...');
 
@@ -119,12 +121,13 @@ class Search
 		require_once(SUBSDIR . '/Package.subs.php');
 
 		// Load up the search API we are going to use.
-		$modSettings['search_index'] = empty($modSettings['search_index']) ? 'standard' : $modSettings['search_index'];
-		if (!file_exists(SUBSDIR . '/SearchAPI-' . ucwords($modSettings['search_index']) . '.class.php'))
-			Errors::instance()->fatal_lang_error('search_api_missing');
+		$modSettings['search_index'] = empty($modSettings['search_index']) ? 'Standard_Search' : $modSettings['search_index'];
+
+		$search_class_name = '\\ElkArte\\Search\\API\\' . $modSettings['search_index'];
+		if (!class_implements($search_class_name, 'Search_Interface'))
+			\Errors::instance()->fatal_lang_error('search_api_missing');
 
 		// Create an instance of the search API and check it is valid for this version of the software.
-		$search_class_name = ucwords($modSettings['search_index']) . '_Search';
 		$this->_searchAPI = new $search_class_name();
 
 		// An invalid Search API.
@@ -132,9 +135,9 @@ class Search
 		{
 			// Log the error.
 			loadLanguage('Errors');
-			Errors::instance()->log_error(sprintf($txt['search_api_not_compatible'], 'SearchAPI-' . ucwords($modSettings['search_index']) . '.class.php'), 'critical');
+			\Errors::instance()->log_error(sprintf($txt['search_api_not_compatible'], $search_class_name), 'critical');
 
-			$this->_searchAPI = new Standard_Search();
+			$this->_searchAPI = new \ElkArte\Search\API\Standard_Search();
 		}
 
 		return $this->_searchAPI;
@@ -231,7 +234,7 @@ class Search
 		$stripped_query = preg_replace('~(?:[\x0B\0\x{A0}\t\r\s\n(){}\\[\\]<>!@$%^*.,:+=`\~\?/\\\\]+|&(?:amp|lt|gt|quot);)+~u', ' ', $this->param('search'));
 
 		// Make the query lower case. It's gonna be case insensitive anyway.
-		$stripped_query = un_htmlspecialchars(Util::strtolower($stripped_query));
+		$stripped_query = un_htmlspecialchars(\Util::strtolower($stripped_query));
 
 		// This option will do fulltext searching in the most basic way.
 		if ($search_simple_fulltext)
@@ -245,7 +248,7 @@ class Search
 
 		// Remove the phrase parts and extract the words.
 		$wordArray = preg_replace('~(?:^|\s)(?:[-]?)"(?:[^"]+)"(?:$|\s)~u', ' ', $this->param('search'));
-		$wordArray = explode(' ', Util::htmlspecialchars(un_htmlspecialchars($wordArray), ENT_QUOTES));
+		$wordArray = explode(' ', \Util::htmlspecialchars(un_htmlspecialchars($wordArray), ENT_QUOTES));
 
 		// A minus sign in front of a word excludes the word.... so...
 		// .. first, we check for things like -"some words", but not "-some words".
@@ -286,7 +289,7 @@ class Search
 				unset($this->_searchArray[$index]);
 			}
 			// Don't allow very, very short words.
-			elseif (Util::strlen($value) < 2)
+			elseif (\Util::strlen($value) < 2)
 			{
 				$this->_ignored[] = $value;
 				unset($this->_searchArray[$index]);
@@ -515,7 +518,7 @@ class Search
 			$this->_userQuery = '';
 		else
 		{
-			$userString = strtr(Util::htmlspecialchars($this->_search_params['userspec'], ENT_QUOTES), array('&quot;' => '"'));
+			$userString = strtr(\Util::htmlspecialchars($this->_search_params['userspec'], ENT_QUOTES), array('&quot;' => '"'));
 			$userString = strtr($userString, array('%' => '\%', '_' => '\_', '*' => '%', '?' => '_'));
 
 			preg_match_all('~"([^"]+)"~', $userString, $matches);
@@ -610,7 +613,7 @@ class Search
 			);
 
 			if ($this->_db->num_rows($request) == 0)
-				Errors::instance()->fatal_lang_error('topic_gone', false);
+				\Errors::instance()->fatal_lang_error('topic_gone', false);
 
 			$this->_search_params['brd'] = array();
 			list ($this->_search_params['brd'][0]) = $this->_db->fetch_row($request);
@@ -738,14 +741,14 @@ class Search
 			if (preg_match('~^\w+$~', $word) === 0)
 			{
 				$did_you_mean['search'][] = '"' . $word . '"';
-				$did_you_mean['display'][] = '&quot;' . Util::htmlspecialchars($word) . '&quot;';
+				$did_you_mean['display'][] = '&quot;' . \Util::htmlspecialchars($word) . '&quot;';
 				continue;
 			}
 			// For some strange reason spell check can crash PHP on decimals.
 			elseif (preg_match('~\d~', $word) === 1)
 			{
 				$did_you_mean['search'][] = $word;
-				$did_you_mean['display'][] = Util::htmlspecialchars($word);
+				$did_you_mean['display'][] = \Util::htmlspecialchars($word);
 				continue;
 			}
 			elseif (pspell_check($pspell_link, $word))
@@ -759,7 +762,7 @@ class Search
 			foreach ($suggestions as $i => $s)
 			{
 				// Search is case insensitive.
-				if (Util::strtolower($s) == Util::strtolower($word))
+				if (\Util::strtolower($s) == \Util::strtolower($word))
 					unset($suggestions[$i]);
 				// Plus, don't suggest something the user thinks is rude!
 				elseif ($suggestions[$i] != censorText($s))
@@ -771,13 +774,13 @@ class Search
 			{
 				$suggestions = array_values($suggestions);
 				$did_you_mean['search'][] = $suggestions[0];
-				$did_you_mean['display'][] = str_replace('{word}', Util::htmlspecialchars($suggestions[0]), $display_highlight);
+				$did_you_mean['display'][] = str_replace('{word}', \Util::htmlspecialchars($suggestions[0]), $display_highlight);
 				$found_misspelling = true;
 			}
 			else
 			{
 				$did_you_mean['search'][] = $word;
-				$did_you_mean['display'][] = Util::htmlspecialchars($word);
+				$did_you_mean['display'][] = \Util::htmlspecialchars($word);
 			}
 		}
 
@@ -790,12 +793,12 @@ class Search
 				if (preg_match('~^\w+$~', $word) == 0)
 				{
 					$temp_excluded['search'][] = '-"' . $word . '"';
-					$temp_excluded['display'][] = '-&quot;' . Util::htmlspecialchars($word) . '&quot;';
+					$temp_excluded['display'][] = '-&quot;' . \Util::htmlspecialchars($word) . '&quot;';
 				}
 				else
 				{
 					$temp_excluded['search'][] = '-' . $word;
-					$temp_excluded['display'][] = '-' . Util::htmlspecialchars($word);
+					$temp_excluded['display'][] = '-' . \Util::htmlspecialchars($word);
 				}
 			}
 

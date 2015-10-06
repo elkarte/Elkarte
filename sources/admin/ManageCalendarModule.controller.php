@@ -63,13 +63,11 @@ class ManageCalendarModule_Controller extends Action_Controller
 			'setting_callback' => function ($value) {
 				if ($value)
 				{
-					enableModules('calendar', array('post', 'boardindex'));
-					Hooks::get()->enableIntegration('Calendar_Integrate');
+					enableModules('calendar', array('post', 'boardindex', 'display'));
 				}
 				else
 				{
-					disableModules('calendar', array('post', 'boardindex'));
-					Hooks::get()->disableIntegration('Calendar_Integrate');
+					disableModules('calendar', array('post', 'boardindex', 'display'));
 				}
 			},
 		);
