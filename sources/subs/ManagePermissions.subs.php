@@ -667,7 +667,8 @@ function loadAllPermissions()
  * @package Permissions
  * @param int[] $groups
  * @param string[]|null $hidden_permissions
- * @return integer[]
+ *
+ * @return int[]
  */
 function countPermissions($groups, $hidden_permissions = null)
 {
@@ -697,7 +698,8 @@ function countPermissions($groups, $hidden_permissions = null)
  * @param int[] $groups
  * @param string[]|null $hidden_permissions
  * @param integer|null $profile_id
- * @return integer[]
+ *
+ * @return int[]
  */
 function countBoardPermissions($groups, $hidden_permissions = null , $profile_id = null)
 {
@@ -1278,7 +1280,8 @@ function deletePermissionProfiles($profiles)
  *
  * @package Permissions
  * @param int[] $profiles
- * @return integer[]
+ *
+ * @return int[]
  */
 function permProfilesInUse($profiles)
 {

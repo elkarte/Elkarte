@@ -45,7 +45,7 @@ function associatedPoll($topicID, $pollID = null)
 /**
  * Remove a poll.
  *
- * @param int[]|int $pollID
+ * @param int[]|int $pollID The id of the poll to remove
  */
 function removePoll($pollID)
 {
@@ -84,7 +84,7 @@ function removePoll($pollID)
 /**
  * Reset votes for the poll.
  *
- * @param int $pollID
+ * @param int $pollID The ID of the poll to reset the votes on
  */
 function resetVotes($pollID)
 {
@@ -122,9 +122,10 @@ function resetVotes($pollID)
 
 /**
  * Get all poll information you wanted to know.
- * Only returns info on the poll, not its options.
  *
- * @param int $id_poll
+ * - Only returns info on the poll, not its options.
+ *
+ * @param int $id_poll The id of the poll to load
  * @param bool $ignore_permissions if true permissions are not checked.
  *             If false, {query_see_board} boardsAllowedTo('poll_view') and
  *             $modSettings['postmod_active'] will be considered in the query.
@@ -266,12 +267,14 @@ function topicFromPoll($pollID)
 
 /**
  * Return poll options, customized for a given member.
- * The function adds to poll options the information if the user
- * has voted in this poll.
- * It censors the label in the result array.
  *
- * @param int $id_poll
- * @param int $id_member
+ * What it does:
+ * - The function adds to poll options the information if the user
+ * has voted in this poll.
+ * - It censors the label in the result array.
+ *
+ * @param int $id_poll The id of the poll to query
+ * @param int $id_member The id of the member
  */
 function pollOptionsForMember($id_poll, $id_member)
 {
@@ -304,7 +307,7 @@ function pollOptionsForMember($id_poll, $id_member)
  * Returns poll options.
  * It censors the label in the result array.
  *
- * @param int $id_poll
+ * @param int $id_poll The id of the poll to load its options
  */
 function pollOptions($id_poll)
 {
@@ -384,7 +387,7 @@ function createPoll($question, $id_member, $poster_name, $max_votes = 1, $hide_r
  */
 function modifyPoll($id_poll, $question, $max_votes = 1, $hide_results = 1, $expire = 0, $can_change_vote = 0, $can_guest_vote = 0)
 {
-	$expire = empty($expire) ? 0 : time() + $expire * 3600 * 24;
+	$expire = $expire <= 0 ? 0 : ($expire <= 9999 ? time() + $expire * 3600 * 24 : $expire);
 
 	$db = database();
 
@@ -509,7 +512,7 @@ function deletePollOptions($id_poll, $id_options)
  * Retrieves the topic and, if different, poll starter
  * for the poll associated with the $id_topic.
  *
- * @param int $id_topic
+ * @param int $id_topic The id of the topic
  */
 function pollStarters($id_topic)
 {
@@ -539,7 +542,7 @@ function pollStarters($id_topic)
 /**
  * Check if they have already voted, or voting is locked.
  *
- * @param int $topic
+ * @param int $topic the topic with an associated poll
  */
 function checkVote($topic)
 {
@@ -571,8 +574,8 @@ function checkVote($topic)
 /**
  * Removes the member's vote from a poll.
  *
- * @param int $id_member
- * @param int $id_poll
+ * @param int $id_member The id of the member
+ * @param int $id_poll The topic with an associated poll.
  */
 function removeVote($id_member, $id_poll)
 {
@@ -592,8 +595,8 @@ function removeVote($id_member, $id_poll)
 /**
  * Used to decrease the vote counter for the given poll.
  *
- * @param int $id_poll
- * @param int[] $options
+ * @param int $id_poll The id of the poll to lower the vote count
+ * @param int[] $options The available poll options
  */
 function decreaseVoteCounter($id_poll, $options)
 {
@@ -616,8 +619,8 @@ function decreaseVoteCounter($id_poll, $options)
 /**
  * Increase the vote counter for the given poll.
  *
- * @param int $id_poll
- * @param int[] $options
+ * @param int $id_poll The id of the poll to increase the vote count
+ * @param int[] $options The available poll options
  */
 function increaseVoteCounter($id_poll, $options)
 {
@@ -638,7 +641,7 @@ function increaseVoteCounter($id_poll, $options)
 /**
  * Add a vote to a poll.
  *
- * @param mixed[] $insert
+ * @param mixed[] $insert array of vote details, includes member and their choice
  */
 function addVote($insert)
 {
@@ -655,7 +658,7 @@ function addVote($insert)
 /**
  * Increase the vote counter for guest votes.
  *
- * @param int $id_poll
+ * @param int $id_poll The id of the poll to increase
  */
 function increaseGuestVote($id_poll)
 {
@@ -674,9 +677,10 @@ function increaseGuestVote($id_poll)
 /**
  * Determines who voted what.
  *
- * @param int $id_member
- * @param int $id_poll
- * @return integer[]
+ * @param int $id_member id of the member who's vote choice we want
+ * @param int $id_poll id fo the poll the member voted in
+ *
+ * @return int[]
  */
 function determineVote($id_member, $id_poll)
 {
@@ -730,8 +734,8 @@ function pollStatus($id_topic)
 /**
  * Update the locked status from a given poll.
  *
- * @param int $id_poll
- * @param int $locked
+ * @param int $id_poll The id of the poll to check
+ * @param int $locked the value to set in voting_locked
  */
 function lockPoll($id_poll, $locked)
 {
@@ -751,7 +755,7 @@ function lockPoll($id_poll, $locked)
 /**
  * Gets poll choices from a given poll.
  *
- * @param int $id_poll
+ * @param int $id_poll The id of the poll
  * @return array
  */
 function getPollChoices($id_poll)
@@ -788,7 +792,7 @@ function getPollChoices($id_poll)
 /**
  * Get the poll starter from a given poll.
  *
- * @param int $id_topic
+ * @param int $id_topic The id of the topic that has an associated poll
  * @return array
  */
 function getPollStarter($id_topic)

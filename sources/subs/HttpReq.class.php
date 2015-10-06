@@ -13,7 +13,7 @@
  */
 
 /**
- * Class used to interact with super globals, POST, GET, SERVER, COOKEIS, SESSION
+ * Class used to interact with super globals, POST, GET, SERVER, COOKIES, SESSION
  *
  * - Currently only a 'getter' of values
  * - Can be passed DataValidation sanitation values to return sanitized values

@@ -237,7 +237,7 @@ function logTask($id_log, $task_id, $total_time = null)
  * enabled, while the remaining are disabled
  *
  * @package ScheduledTasks
- * @param integer[] $enablers array od task IDs
+ * @param int[] $enablers array od task IDs
  */
 function updateTaskStatus($enablers)
 {

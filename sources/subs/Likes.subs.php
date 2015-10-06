@@ -87,12 +87,15 @@ function loadLikes($messages, $prepare = true)
 
 /**
  * Prepares the like array for use in the template
- * Replaces the current member id with 'You' if they like a post and makes it first
- * Truncates the like list at a given number and adds in +x others
+ *
+ * What it does:
+ * - Replaces the current member id with 'You' if they like a post and makes it first
+ * - Truncates the like list at a given number and adds in +x others
  *
  * @package Likes
  * @param int[] $likes array of like ids to process
- * @return integer[]
+ *
+ * @return int[]
  */
 function prepareLikes($likes)
 {

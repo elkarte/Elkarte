@@ -1615,7 +1615,8 @@ function detachGroupModerators($id_group)
  *
  * @package Membergroups
  * @param string[] $moderators
- * @return integer[]
+ *
+ * @return int[]
  */
 function getIDMemberFromGroupModerators($moderators)
 {
