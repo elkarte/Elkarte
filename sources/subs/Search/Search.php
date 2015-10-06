@@ -121,7 +121,7 @@ class Search
 		require_once(SUBSDIR . '/Package.subs.php');
 
 		// Load up the search API we are going to use.
-		$modSettings['search_index'] = empty($modSettings['search_index']) ? 'standard' : $modSettings['search_index'];
+		$modSettings['search_index'] = empty($modSettings['search_index']) ? 'Standard_Search' : $modSettings['search_index'];
 
 		$search_class_name = 'ElkArte\\Search\\API\\' . $modSettings['search_index'];
 		if (!class_implements($search_class_name, 'Search_Interface'))
