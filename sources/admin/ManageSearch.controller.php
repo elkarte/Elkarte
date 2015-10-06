@@ -657,7 +657,7 @@ class ManageSearch_Controller extends Action_Controller
 				if ($file->isFile())
 				{
 					$index_name = str_replace('Search', '_Search', $file->getBasename('.class.php'));
-					$search_class_name = 'ElkArte\\Search\\API\\' . $index_name;
+					$search_class_name = '\\ElkArte\\Search\\API\\' . $index_name;
 					if (class_implements($search_class_name, 'Search_Interface'))
 					{
 						$searchAPI = new $search_class_name();

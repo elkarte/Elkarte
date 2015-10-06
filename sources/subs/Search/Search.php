@@ -123,7 +123,7 @@ class Search
 		// Load up the search API we are going to use.
 		$modSettings['search_index'] = empty($modSettings['search_index']) ? 'Standard_Search' : $modSettings['search_index'];
 
-		$search_class_name = 'ElkArte\\Search\\API\\' . $modSettings['search_index'];
+		$search_class_name = '\\ElkArte\\Search\\API\\' . $modSettings['search_index'];
 		if (!class_implements($search_class_name, 'Search_Interface'))
 			\Errors::instance()->fatal_lang_error('search_api_missing');
 
@@ -137,7 +137,7 @@ class Search
 			loadLanguage('Errors');
 			\Errors::instance()->log_error(sprintf($txt['search_api_not_compatible'], $search_class_name), 'critical');
 
-			$this->_searchAPI = new ElkArte\Search\API\Standard_Search();
+			$this->_searchAPI = new \ElkArte\Search\API\Standard_Search();
 		}
 
 		return $this->_searchAPI;

@@ -59,7 +59,7 @@ abstract class Action_Controller
 	 */
 	public static function canFrontPage()
 	{
-		return in_array('ElkArte\\sources\\Frontpage_Interface', class_implements(get_called_class()));
+		return in_array('\\ElkArte\\sources\\Frontpage_Interface', class_implements(get_called_class()));
 	}
 
 	/**
