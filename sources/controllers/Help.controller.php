@@ -26,6 +26,23 @@ if (!defined('ELK'))
 class Help_Controller extends Action_Controller
 {
 	/**
+	 * Holds instance of HttpReq object
+	 * @var HttpReq
+	 */
+	private $_req;
+
+	/**
+	 * Pre Dispatch, called before other methods.  Loads integration hooks
+	 * and HttpReq instance.
+	 */
+	public function pre_dispatch()
+	{
+		Hooks::get()->loadIntegrationsSettings();
+
+		$this->_req = HttpReq::instance();
+	}
+
+	/**
 	 * Default action handler: just help.
 	 *
 	 * @see Action_Controller::action_index()
@@ -90,13 +107,13 @@ class Help_Controller extends Action_Controller
 	{
 		global $txt, $helptxt, $context, $scripturl;
 
-		if (!isset($_GET['help']) || !is_string($_GET['help']))
+		if (!isset($this->_req->query->help) || !is_string($this->_req->query->help))
 			Errors::instance()->fatal_lang_error('no_access', false);
 
 		if (!isset($helptxt))
 			$helptxt = array();
 
-		$help_str = Util::htmlspecialchars($_GET['help']);
+		$help_str = Util::htmlspecialchars($this->_req->query->help);
 
 		// Load the admin help language file and template.
 		loadLanguage('Help');

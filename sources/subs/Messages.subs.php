@@ -93,6 +93,8 @@ function messageDetails($id_msg, $id_topic = 0, $attachment_type = 0)
  * @param int $id_msg
  * @param boolean $override_permissions
  * @param boolean $detailed
+ *
+ * @return mixed[]|false array of message details or false if no message found.
  */
 function basicMessageInfo($id_msg, $override_permissions = false, $detailed = false)
 {
@@ -474,7 +476,7 @@ function messageAt($start, $id_topic, $params = array())
 /**
  * Finds an open report for a certain message if it exists and increase the
  * number of reports for that message, otherwise it creates one
-
+ *
  * @param mixed[] $message array of several message details (id_msg, id_topic, etc.)
  * @param string $poster_comment the comment made by the reporter
  *

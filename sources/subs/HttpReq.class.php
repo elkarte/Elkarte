@@ -81,15 +81,45 @@ class HttpReq
 		$this->_dataValidator = $dataValidator === null ? new Data_Validator : $dataValidator;
 
 		// Make the superglobals available as R/W properties
-		$this->post = new ArrayObject($_POST, ArrayObject::ARRAY_AS_PROPS);
-		$this->query = new ArrayObject($_GET, ArrayObject::ARRAY_AS_PROPS);
 		$this->cookie = new ArrayObject($_COOKIE, ArrayObject::ARRAY_AS_PROPS);
 		$this->session = new ArrayObject($_SESSION, ArrayObject::ARRAY_AS_PROPS);
 		$this->server = new ArrayObject($_SERVER, ArrayObject::ARRAY_AS_PROPS);
+
+		$this->_loadParsed();
 	}
 
 	/**
-	 * Generic fetch access for values contained in the superglobals
+	 * Certain variables are born in Request, others are sanitized, and stored in
+	 * $_REQUEST, its a awful mess really.
+	 * Once that mess is cleaned up this should not be needed.  But the basis is due to
+	 * what function cleanRequest() does.
+	 *
+	 * What it does:
+	 * - finds items added by cleanRequest to $_REQUEST
+	 * - adds the above to both $_POST and $_GET
+	 * - looks for duplicate items in $_REQUEST and $_POST and used the $_REQUEST
+	 *   values, being they are "sanitized"  $_GET ones are re-stuffed by cleanRequest
+	 */
+	private function _loadParsed()
+	{
+		// Any that were born in cleanRequest, like start from topic=xyz.START
+		// are added to the other supers
+		$derived = array_diff_key($_REQUEST, $_POST, $_GET);
+		$derived_get = array_merge($_GET, $derived);
+		$derived_post = array_merge($_POST, $derived);
+
+		// Others may have been "sanitized" from either get or post and saved in request
+		// these values replace existing ones in $_POST
+		$cleaned = array_intersect_key($_REQUEST, $derived_post);
+		$derived_post = array_merge($derived_post, $cleaned);
+
+		// Make the $_GET $_POST super globals available as R/W properties
+		$this->post = new ArrayObject($derived_post, ArrayObject::ARRAY_AS_PROPS);
+		$this->query = new ArrayObject($derived_get, ArrayObject::ARRAY_AS_PROPS);
+	}
+
+	/**
+	 * Generic fetch access for values contained in the super globals
 	 * - gets in order of param, get and post
 	 *
 	 * - $instance->keyanme will check cleaned params, get then post for values

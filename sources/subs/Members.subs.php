@@ -994,7 +994,8 @@ function groupsAllowedTo($permission, $board_id = null)
  * @package Members
  * @param string $permission
  * @param integer|null $board_id = null
- * @return an array containing member ID's.
+ *
+ * @return int[] an array containing member ID's.
  */
 function membersAllowedTo($permission, $board_id = null)
 {

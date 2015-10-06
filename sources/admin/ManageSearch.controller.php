@@ -131,8 +131,9 @@ class ManageSearch_Controller extends Action_Controller
 		$config_vars = $this->_searchSettings->settings();
 
 		// Perhaps the search method wants to add some settings?
-		require_once(SUBSDIR . '/Search.subs.php');
-		$searchAPI = findSearchAPI();
+		$search = new Search();
+		$searchAPI = $search->findSearchAPI();
+
 		if (is_callable(array($searchAPI, 'searchSettings')))
 			call_user_func_array($searchAPI->searchSettings, array(&$config_vars));
 
@@ -278,7 +279,8 @@ class ManageSearch_Controller extends Action_Controller
 
 			$changes = array();
 			foreach ($factors as $factor)
-				$changes[$factor] = (int) $_POST[$factor];
+				$changes[$factor] = (int) $this->_req->post->$factor;
+
 			updateSettings($changes);
 		}
 

@@ -41,6 +41,8 @@ function createMenu($menuData, $menuOptions = array())
 {
 	global $context, $settings, $options, $txt, $scripturl, $user_info;
 
+	$_req = HttpReq::instance();
+
 	// Work out where we should get our images from.
 	$context['menu_image_path'] = file_exists($settings['theme_dir'] . '/images/admin/change_menu.png') ? $settings['images_url'] . '/admin' : $settings['default_images_url'] . '/admin';
 
@@ -90,8 +92,8 @@ function createMenu($menuData, $menuOptions = array())
 	$menu_context['current_action'] = isset($menuOptions['action']) ? $menuOptions['action'] : $context['current_action'];
 
 	// What is the current area selected?
-	if (isset($menuOptions['current_area']) || isset($_REQUEST['area']))
-		$menu_context['current_area'] = isset($menuOptions['current_area']) ? $menuOptions['current_area'] : $_REQUEST['area'];
+	if (isset($menuOptions['current_area']) || isset($_req->query->area))
+		$menu_context['current_area'] = isset($menuOptions['current_area']) ? $menuOptions['current_area'] : $_req->query->area;
 
 	// Build a list of additional parameters that should go in the URL.
 	$menu_context['extra_parameters'] = '';
@@ -216,10 +218,10 @@ function createMenu($menuData, $menuOptions = array())
 											$first_sa = $sa;
 
 										// Is this the current subsection?
-										if (isset($_REQUEST['sa']) && $_REQUEST['sa'] == $sa)
+										if (isset($_req->query->sa) && $_req->query->sa == $sa)
 											$menu_context['current_subsection'] = $sa;
 
-										elseif (isset($sub['active']) && isset($_REQUEST['sa']) && in_array($_REQUEST['sa'], $sub['active']))
+										elseif (isset($sub['active']) && isset($_req->query->sa) && in_array($_req->query->sa, $sub['active']))
 											$menu_context['current_subsection'] = $sa;
 
 										// Otherwise is it the default?

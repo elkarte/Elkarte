@@ -3891,7 +3891,7 @@ function prepareSearchEngines()
  *
  * @param resource $messages_request holds a query result
  * @param bool $reset
- * @return integer|null
+ * @return integer|boolean
  */
 function currentContext($messages_request, $reset = false)
 {

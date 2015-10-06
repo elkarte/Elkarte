@@ -566,6 +566,7 @@ class MessagesDelete
 				$recycle = true;
 
 				// Make sure we update the search subject index.
+				require_once(SUBSDIR . '/Messages.subs.php');
 				updateSubjectStats($topicID, $row['subject']);
 			}
 

@@ -123,7 +123,7 @@ class AdminLog_Controller extends Action_Controller
 
 		// If it's not got a sa set it must have come here for first time, pretend error log should be reversed.
 		if (!isset($this->_req->query->sa))
-			$_REQUEST['desc'] = true;
+			$this->_req->query->desc = true;
 
 		// figure out what to call
 		if (isset($log_functions[$sub_action]['file']))

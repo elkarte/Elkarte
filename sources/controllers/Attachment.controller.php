@@ -29,6 +29,20 @@
 class Attachment_Controller extends Action_Controller
 {
 	/**
+	 * Holds instance of HttpReq object
+	 * @var HttpReq
+	 */
+	private $_req;
+
+	/**
+	 * Pre Dispatch, called before other methods.  Loads HttpReq instance.
+	 */
+	public function pre_dispatch()
+	{
+		$this->_req = HttpReq::instance();
+	}
+
+	/**
 	 * The default action is to download an attachment.
 	 * This allows ?action=attachment to be forwarded to action_dlattach()
 	 */
@@ -86,14 +100,12 @@ class Attachment_Controller extends Action_Controller
 			$attach_errors = Attachment_Error_Context::context();
 			$attach_errors->activate();
 
-			if ($context['attachments']['can']['post'] && empty($_POST['from_qr']))
+			if ($context['attachments']['can']['post'] && empty($this->_req->post->from_qr))
 			{
 				require_once(SUBSDIR . '/Attachments.subs.php');
 
-				if (isset($_REQUEST['msg']))
-					processAttachments((int) $_REQUEST['msg']);
-				else
-					processAttachments();
+				$process = $this->_req->getPost('msg', 'intval', '');
+				processAttachments($process);
 			}
 
 			// Any mistakes?
@@ -133,9 +145,10 @@ class Attachment_Controller extends Action_Controller
 
 	/**
 	 * Function to remove attachments which were added via ajax calls
-	 * Currently called by drag drop attachment functionality
-	 * Requires file name and file path
-	 * responds back with success or error
+	 *
+	 * - Currently called by drag drop attachment functionality
+	 * - Requires file name and file path
+	 * - Responds back with success or error
 	 */
 	public function action_rmattach()
 	{
@@ -157,10 +170,11 @@ class Attachment_Controller extends Action_Controller
 		}
 
 		// We need a filename and path or we are not going any further
-		if (isset($_REQUEST['attachid']))
+		if (isset($this->_req->query->attachid))
 		{
 			require_once(SUBSDIR . '/Attachments.subs.php');
-			$result = removeTempAttachById($_REQUEST['attachid']);
+
+			$result = removeTempAttachById($this->_req->query->attachid);
 			if ($result === true)
 				$context['json_data'] = array('result' => true);
 			else
@@ -178,10 +192,12 @@ class Attachment_Controller extends Action_Controller
 
 	/**
 	 * Downloads an attachment or avatar, and increments the download count.
-	 * It requires the view_attachments permission. (not for avatars!)
-	 * It disables the session parser, and clears any previous output.
-	 * It is accessed via the query string ?action=dlattach.
-	 * Views to attachments and avatars do not increase hits and are not logged in the "Who's Online" log.
+	 *
+	 * - It requires the view_attachments permission. (not for avatars!)
+	 * - It disables the session parser, and clears any previous output.
+	 * - It is accessed via the query string ?action=dlattach.
+	 * - Views to attachments and avatars do not increase hits and are not logged
+	 *   in the "Who's Online" log.
 	 */
 	public function action_dlattach()
 	{
@@ -191,20 +207,22 @@ class Attachment_Controller extends Action_Controller
 		$context['no_last_modified'] = true;
 
 		// Make sure some attachment was requested!
-		if (!isset($_REQUEST['attach']) && !isset($_REQUEST['id']))
+		if (!isset($this->_req->query->attach) && !isset($this->_req->query->id))
 			Errors::instance()->fatal_lang_error('no_access', false);
 
 		// We need to do some work on attachments and avatars.
 		require_once(SUBSDIR . '/Attachments.subs.php');
 
-		$id_attach = isset($_REQUEST['attach']) ? (int) $_REQUEST['attach'] : (int) $_REQUEST['id'];
+		$id_attach = isset($this->_req->query->attach)
+			? (int) $this->_req->query->attach
+			: (int) $this->_req->query->id;
 
-		if (isset($_REQUEST['type']) && $_REQUEST['type'] == 'avatar')
+		if ($this->_req->getQuery('type') === 'avatar')
 		{
 			$attachment = getAvatar($id_attach);
 
 			$is_avatar = true;
-			$_REQUEST['image'] = true;
+			$this->_req->query->image = true;
 		}
 		// This is just a regular attachment...
 		else
@@ -215,6 +233,7 @@ class Attachment_Controller extends Action_Controller
 
 		if (empty($attachment))
 			Errors::instance()->fatal_lang_error('no_access', false);
+
 		list ($id_folder, $real_filename, $file_hash, $file_ext, $id_attach, $attachment_type, $mime_type, $is_approved, $id_member) = $attachment;
 
 		// If it isn't yet approved, do they have permission to view it?
@@ -244,7 +263,7 @@ class Attachment_Controller extends Action_Controller
 		{
 			loadLanguage('Errors');
 
-			header((preg_match('~HTTP/1\.[01]~i', $_SERVER['SERVER_PROTOCOL']) ? $_SERVER['SERVER_PROTOCOL'] : 'HTTP/1.0') . ' 404 Not Found');
+			header((preg_match('~HTTP/1\.[01]~i', $this->_req->server->SERVER_PROTOCOL) ? $this->_req->server->SERVER_PROTOCOL : 'HTTP/1.0') . ' 404 Not Found');
 			header('Content-Type: text/plain; charset=UTF-8');
 
 			// We need to die like this *before* we send any anti-caching headers as below.
@@ -252,9 +271,9 @@ class Attachment_Controller extends Action_Controller
 		}
 
 		// If it hasn't been modified since the last time this attachment was retrieved, there's no need to display it again.
-		if (!empty($_SERVER['HTTP_IF_MODIFIED_SINCE']))
+		if (!empty($this->_req->server->HTTP_IF_MODIFIED_SINCE))
 		{
-			list ($modified_since) = explode(';', $_SERVER['HTTP_IF_MODIFIED_SINCE']);
+			list ($modified_since) = explode(';', $this->_req->server->HTTP_IF_MODIFIED_SINCE);
 			if (strtotime($modified_since) >= filemtime($filename))
 			{
 				@ob_end_clean();
@@ -267,7 +286,7 @@ class Attachment_Controller extends Action_Controller
 
 		// Check whether the ETag was sent back, and cache based on that...
 		$eTag = '"' . substr($id_attach . $real_filename . filemtime($filename), 0, 64) . '"';
-		if (!empty($_SERVER['HTTP_IF_NONE_MATCH']) && strpos($_SERVER['HTTP_IF_NONE_MATCH'], $eTag) !== false)
+		if (!empty($this->_req->server->HTTP_IF_NONE_MATCH) && strpos($this->_req->server->HTTP_IF_NONE_MATCH, $eTag) !== false)
 		{
 			@ob_end_clean();
 
@@ -286,19 +305,19 @@ class Attachment_Controller extends Action_Controller
 		header('ETag: ' . $eTag);
 
 		// Make sure the mime type warrants an inline display.
-		if (isset($_REQUEST['image']) && !empty($mime_type) && strpos($mime_type, 'image/') !== 0)
-			unset($_REQUEST['image']);
+		if (isset($this->_req->query->image) && !empty($mime_type) && strpos($mime_type, 'image/') !== 0)
+			unset($this->_req->query->image);
 		// Does this have a mime type?
-		elseif (!empty($mime_type) && (isset($_REQUEST['image']) || !in_array($file_ext, array('jpg', 'gif', 'jpeg', 'x-ms-bmp', 'png', 'psd', 'tiff', 'iff'))))
+		elseif (!empty($mime_type) && (isset($this->_req->query->image) || !in_array($file_ext, array('jpg', 'gif', 'jpeg', 'x-ms-bmp', 'png', 'psd', 'tiff', 'iff'))))
 			header('Content-Type: ' . strtr($mime_type, array('image/bmp' => 'image/x-ms-bmp')));
 		else
 		{
 			header('Content-Type: ' . (isBrowser('ie') || isBrowser('opera') ? 'application/octetstream' : 'application/octet-stream'));
-			if (isset($_REQUEST['image']))
-				unset($_REQUEST['image']);
+			if (isset($this->_req->query->image))
+				unset($this->_req->query->image);
 		}
 
-		$disposition = !isset($_REQUEST['image']) ? 'attachment' : 'inline';
+		$disposition = !isset($this->_req->query->image) ? 'attachment' : 'inline';
 
 		// Different browsers like different standards...
 		if (isBrowser('firefox'))
@@ -311,7 +330,7 @@ class Attachment_Controller extends Action_Controller
 			header('Content-Disposition: ' . $disposition . '; filename="' . $real_filename . '"');
 
 		// If this has an "image extension" - but isn't actually an image - then ensure it isn't cached cause of silly IE.
-		if (!isset($_REQUEST['image']) && in_array($file_ext, array('gif', 'jpg', 'bmp', 'png', 'jpeg', 'tiff')))
+		if (!isset($this->_req->query->image) && in_array($file_ext, array('gif', 'jpg', 'bmp', 'png', 'jpeg', 'tiff')))
 			header('Cache-Control: no-cache');
 		else
 			header('Cache-Control: max-age=' . (525600 * 60) . ', private');
@@ -323,7 +342,7 @@ class Attachment_Controller extends Action_Controller
 		@set_time_limit(600);
 
 		// Recode line endings for text files, if enabled.
-		if (!empty($modSettings['attachmentRecodeLineEndings']) && !isset($_REQUEST['image']) && in_array($file_ext, array('txt', 'css', 'htm', 'html', 'php', 'xml')))
+		if (!empty($modSettings['attachmentRecodeLineEndings']) && !isset($this->_req->query->image) && in_array($file_ext, array('txt', 'css', 'htm', 'html', 'php', 'xml')))
 		{
 			$req = request();
 			if (strpos($req->user_agent(), 'Windows') !== false)
@@ -369,7 +388,7 @@ class Attachment_Controller extends Action_Controller
 		global $txt, $modSettings, $user_info, $context, $topic, $settings;
 
 		// Make sure some attachment was requested!
-		if (!isset($_REQUEST['attach']))
+		if (!isset($this->_req->query->attach))
 			Errors::instance()->fatal_lang_error('no_access', false);
 
 		// We need to do some work on attachments and avatars.
@@ -378,9 +397,9 @@ class Attachment_Controller extends Action_Controller
 
 		try
 		{
-			if (empty($topic) || (string) (int) $_REQUEST['attach'] !== (string) $_REQUEST['attach'])
+			if (empty($topic) || (string) (int) $this->_req->query->attach !== (string) $this->_req->query->attach)
 			{
-				$attach_data = getTempAttachById($_REQUEST['attach']);
+				$attach_data = getTempAttachById($this->_req->query->attach);
 				$file_ext = pathinfo($attach_data['name'], PATHINFO_EXTENSION);
 				$filename = $attach_data['tmp_name'];
 				$id_attach = $attach_data['attachid'];
@@ -389,7 +408,7 @@ class Attachment_Controller extends Action_Controller
 			}
 			else
 			{
-				$id_attach = (int) $_REQUEST['attach'];
+				$id_attach = $this->_req->getQuery('attach', 'intval', -1);
 
 				isAllowedTo('view_attachments');
 				$attachment = getAttachmentFromTopic($id_attach, $topic);
@@ -415,10 +434,15 @@ class Attachment_Controller extends Action_Controller
 		while (ob_get_level() > 0)
 			@ob_end_clean();
 
-		if (in_array($file_ext, array('txt', 'html', 'htm', 'js', 'doc', 'docx', 'rtf', 'css', 'php', 'log', 'xml', 'sql', 'c', 'java')))
+		if (in_array($file_ext, array(
+			'c', 'cpp', 'css', 'csv', 'doc', 'docx', 'flv', 'html', 'htm', 'java', 'js', 'log', 'mp3',
+			'mp4', 'mgp', 'pdf', 'php', 'ppt', 'rtf', 'sql', 'tgz', 'txt', 'wav', 'xls', 'xml', 'zip'
+		)))
 		{
 			$mime_type = 'image/png';
 			$resize = false;
+
+			// Show the mine thumbnail if it exists or just the default
 			$filename = $settings['theme_dir'] . '/images/mime_images/' . $file_ext . '.png';
 			if (!file_exists($filename))
 				$filename = $settings['theme_dir'] . '/images/mime_images/default.png';
@@ -432,7 +456,7 @@ class Attachment_Controller extends Action_Controller
 		{
 			loadLanguage('Errors');
 
-			header((preg_match('~HTTP/1\.[01]~i', $_SERVER['SERVER_PROTOCOL']) ? $_SERVER['SERVER_PROTOCOL'] : 'HTTP/1.0') . ' 404 Not Found');
+			header((preg_match('~HTTP/1\.[01]~i',$this->_req->server->SERVER_PROTOCOL) ? $this->_req->server->SERVER_PROTOCOL : 'HTTP/1.0') . ' 404 Not Found');
 			header('Content-Type: text/plain; charset=UTF-8');
 
 			// We need to die like this *before* we send any anti-caching headers as below.
@@ -440,9 +464,9 @@ class Attachment_Controller extends Action_Controller
 		}
 
 		// If it hasn't been modified since the last time this attachment was retrieved, there's no need to display it again.
-		if (!empty($_SERVER['HTTP_IF_MODIFIED_SINCE']))
+		if (!empty($this->_req->server->HTTP_IF_MODIFIED_SINCE))
 		{
-			list ($modified_since) = explode(';', $_SERVER['HTTP_IF_MODIFIED_SINCE']);
+			list ($modified_since) = explode(';', $this->_req->server->HTTP_IF_MODIFIED_SINCE);
 			if (strtotime($modified_since) >= filemtime($filename))
 			{
 				@ob_end_clean();
@@ -455,7 +479,7 @@ class Attachment_Controller extends Action_Controller
 
 		// Check whether the ETag was sent back, and cache based on that...
 		$eTag = '"' . substr($id_attach . $real_filename . filemtime($filename), 0, 64) . '"';
-		if (!empty($_SERVER['HTTP_IF_NONE_MATCH']) && strpos($_SERVER['HTTP_IF_NONE_MATCH'], $eTag) !== false)
+		if (!empty($this->_req->server->HTTP_IF_NONE_MATCH) && strpos($this->_req->server->HTTP_IF_NONE_MATCH, $eTag) !== false)
 		{
 			@ob_end_clean();
 
@@ -493,7 +517,7 @@ class Attachment_Controller extends Action_Controller
 		// Try to buy some time...
 		@set_time_limit(600);
 
-		if ($resize && resizeImageFile($filename, $filename . '_thumb', 0, 0, 100, 100, true))
+		if ($resize && resizeImageFile($filename, $filename . '_thumb', 100, 100))
 			$filename = $filename . '_thumb';
 
 		if (isset($callback) || @readfile($filename) === null)

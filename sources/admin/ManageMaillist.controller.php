@@ -1503,7 +1503,7 @@ class ManageMaillist_Controller extends Action_Controller
 						continue;
 					}
 
-					// Decipher as [0]emailaddress and [1]board id
+					// Decipher as [0] emailaddress and [1] board id
 					$maillist_receiving_address[] = array($checkme, $boardtocheck[$key]);
 				}
 			}
@@ -1869,7 +1869,7 @@ class ManageMaillist_Controller extends Action_Controller
 				$context['warning_errors'] = array();
 				$context['template_data']['title'] = !empty($template_title) ? $template_title : '';
 				$context['template_data']['body'] = !empty($template_body) ? $template_body : $txt['ml_bounce_template_body_default'];
-				$context['template_data']['personal'] = !empty($recipient_id);
+				$context['template_data']['personal'] = !empty($this->_req->post->make_personal);
 
 				if (empty($template_title))
 					$context['warning_errors'][] = $txt['ml_bounce_template_error_no_title'];

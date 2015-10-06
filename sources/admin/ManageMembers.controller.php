@@ -847,12 +847,9 @@ class ManageMembers_Controller extends Action_Controller
 				<option selected="selected" value="">' . $txt['admin_browse_with_selected'] . ':</option>
 				<option value="" disabled="disabled">' . str_repeat('&#8212;', strlen($txt['admin_browse_with_selected'])) . '</option>';
 
-		// ie8 fonts don't have the glyph coverage we desire
-		$arrow = isBrowser('ie8') ? '&#187;&nbsp;' : '&#10148;&nbsp;';
-
 		foreach ($context['allowed_actions'] as $key => $desc)
 			$allowed_actions .= '
-				<option value="' . $key . '">' . $arrow . $desc . '</option>';
+				<option value="' . $key . '">' . '&#10148;&nbsp;' . $desc . '</option>';
 
 		// Setup the Javascript function for selecting an action for the list.
 		$javascript = '

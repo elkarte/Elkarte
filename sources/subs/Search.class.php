@@ -423,7 +423,7 @@ class Search
 	}
 
 	/**
-	 * Extract search parames from a string
+	 * Extract search params from a string
 	 *
 	 * @param string $string - the string containing encoded search params
 	 */
@@ -438,7 +438,7 @@ class Search
 
 		foreach ($temp_params as $i => $data)
 		{
-			@list($k, $v) = explode('|\'|', $data);
+			list($k, $v) = array_pad(explode('|\'|', $data), 2, '');
 			$this->_search_params[$k] = $v;
 		}
 

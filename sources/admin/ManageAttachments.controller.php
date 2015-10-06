@@ -1037,7 +1037,7 @@ class ManageAttachments_Controller extends Action_Controller
 							}
 						}
 						$current_check++;
-						$this->substep = $current_check;
+						$this->substep = (int) $current_check;
 
 						if ($current_check - $files_checked >= $max_checks)
 							$this->_pauseAttachmentMaintenance($to_fix);

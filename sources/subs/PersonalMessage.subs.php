@@ -31,13 +31,13 @@ if (!defined('ELK'))
  */
 function loadMessageLimit()
 {
-	global $user_info, $context;
+	global $user_info;
 
 	$db = database();
 
 	if ($user_info['is_admin'])
-		$context['message_limit'] = 0;
-	elseif (($context['message_limit'] = cache_get_data('msgLimit:' . $user_info['id'], 360)) === null)
+		$message_limit = 0;
+	elseif (($message_limit = cache_get_data('msgLimit:' . $user_info['id'], 360)) === null)
 	{
 		$request = $db->query('', '
 			SELECT
@@ -51,21 +51,24 @@ function loadMessageLimit()
 		list ($maxMessage, $minMessage) = $db->fetch_row($request);
 		$db->free_result($request);
 
-		$context['message_limit'] = $minMessage == 0 ? 0 : $maxMessage;
+		$message_limit = $minMessage == 0 ? 0 : $maxMessage;
 
 		// Save us doing it again!
-		cache_put_data('msgLimit:' . $user_info['id'], $context['message_limit'], 360);
+		cache_put_data('msgLimit:' . $user_info['id'], $message_limit, 360);
 	}
+
+	return $message_limit;
 }
 
 /**
- * Loads the list of PM labels.
+ * Loads the count of messages on a per label basis.
  *
+ * @param $labels mixed[] array of labels that we are calculating the message count
  * @package PersonalMessage
  */
-function loadPMLabels()
+function loadPMLabels($labels)
 {
-	global $user_info, $context;
+	global $user_info;
 
 	$db = database();
 
@@ -87,15 +90,20 @@ function loadPMLabels()
 		$this_labels = explode(',', $row['labels']);
 		foreach ($this_labels as $this_label)
 		{
-			$context['labels'][(int) $this_label]['messages'] += $row['num'];
+			$labels[(int) $this_label]['messages'] += $row['num'];
+
 			if (!($row['is_read'] & 1))
-				$context['labels'][(int) $this_label]['unread_messages'] += $row['num'];
+			{
+				$labels[(int) $this_label]['unread_messages'] += $row['num'];
+			}
 		}
 	}
 	$db->free_result($result);
 
 	// Store it please!
-	cache_put_data('labelCounts:' . $user_info['id'], $context['labels'], 720);
+	cache_put_data('labelCounts:' . $user_info['id'], $labels, 720);
+
+	return $labels;
 }
 
 /**
@@ -1863,7 +1871,7 @@ function loadConversationUnreadStatus($pms)
  */
 function loadPMRecipientInfo($all_pms, &$recipients, $folder = '', $search = false)
 {
-	global $txt, $user_info, $scripturl;
+	global $txt, $user_info, $scripturl, $context;
 
 	$db = database();
 
@@ -1899,8 +1907,8 @@ function loadPMRecipientInfo($all_pms, &$recipients, $folder = '', $search = fal
 			$row['labels'] = $row['labels'] == '' ? array() : explode(',', $row['labels']);
 			foreach ($row['labels'] as $v)
 			{
-				if (isset($message_labels[(int) $v]))
-					$message_labels[$row['id_pm']][(int) $v] = array('id' => $v, 'name' => $message_labels[(int) $v]['name']);
+				if (isset($context['labels'][(int) $v]))
+					$message_labels[$row['id_pm']][(int) $v] = array('id' => $v, 'name' => $context['labels'][(int) $v]['name']);
 
 				// Here we find the first label on a message - used for linking to posts
 				if ($search && (!isset($message_first_label[$row['id_pm']]) && !in_array('-1', $row['labels'])))

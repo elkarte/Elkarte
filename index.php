@@ -193,8 +193,10 @@ function elk_main()
 {
 	global $modSettings, $user_info, $topic, $board_info, $context;
 
+	$_req = HttpReq::instance();
+
 	// Special case: session keep-alive, output a transparent pixel.
-	if (isset($_GET['action']) && $_GET['action'] == 'keepalive')
+	if ($_req->getQuery('action') === 'keepalive')
 	{
 		header('Content-Type: image/gif');
 		die("\x47\x49\x46\x38\x39\x61\x01\x00\x01\x00\x80\x00\x00\x00\x00\x00\x00\x00\x00\x21\xF9\x04\x01\x00\x00\x00\x00\x2C\x00\x00\x00\x00\x01\x00\x01\x00\x00\x02\x02\x44\x01\x00\x3B");
@@ -217,7 +219,7 @@ function elk_main()
 	loadBadBehavior();
 
 	// Attachments don't require the entire theme to be loaded.
-	if (isset($_REQUEST['action']) && $_REQUEST['action'] == 'dlattach' && (!empty($modSettings['allow_guestAccess']) && $user_info['is_guest']))
+	if ($_req->getQuery('action') === 'dlattach' && (!empty($modSettings['allow_guestAccess']) && $user_info['is_guest']))
 		detectBrowser();
 	// Load the current theme.  (note that ?theme=1 will also work, may be used for guest theming.)
 	else

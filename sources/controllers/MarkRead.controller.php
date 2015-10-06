@@ -34,7 +34,21 @@ class MarkRead_Controller extends Action_Controller
 	private $_querystring_sort_limits = '';
 
 	/**
-	 * This is the main function for markasread file.
+	 * Holds instance of HttpReq object
+	 * @var HttpReq
+	 */
+	private $_req;
+
+	/**
+	 * Entry point function
+	 */
+	public function pre_dispatch()
+	{
+		$this->_req = HttpReq::instance();
+	}
+
+	/**
+	 * This is the main function for markasread file if not using API
 	 *
 	 * @see Action_Controller::action_index()
 	 */
@@ -55,11 +69,12 @@ class MarkRead_Controller extends Action_Controller
 
 	/**
 	 * This function forwards the request to the appropriate function.
+	 *
 	 * @return string
 	 */
 	private function _dispatch()
 	{
-		$subAction = isset($_REQUEST['sa']) ? $_REQUEST['sa'] : 'action_markasread';
+		$subAction = $this->_req->getQuery('sa', 'trim', 'action_markasread');
 
 		switch ($subAction)
 		{
@@ -86,6 +101,7 @@ class MarkRead_Controller extends Action_Controller
 
 	/**
 	 * This is the main method for markasread controller when using APIs.
+	 *
 	 * @uses Xml template generic_xml_buttons sub template
 	 */
 	public function action_index_api()
@@ -105,13 +121,14 @@ class MarkRead_Controller extends Action_Controller
 				'error' => 1,
 				'text' => $txt['not_guests']
 			);
+
 			return;
 		}
 
 		if (checkSession('get', '', false))
 		{
 			// Again, this is a special case, someone will deal with the others later :P
-			if (isset($_REQUEST['sa']) && $_REQUEST['sa'] == 'all')
+			if ($this->_req->getQuery('sa') === 'all')
 			{
 				loadLanguage('Errors');
 				$context['xml_data'] = array(
@@ -128,21 +145,22 @@ class MarkRead_Controller extends Action_Controller
 		$this->_dispatch();
 
 		// For the time being this is a special case, but in BoardIndex no, we don't want it
-		if (isset($_REQUEST['sa']) && ($_REQUEST['sa'] == 'all' || $_REQUEST['sa'] == 'board') && !isset($_REQUEST['bi']))
+		if ($this->_req->getQuery('sa') === 'all' || $this->_req->getQuery('sa') === 'board' && !isset($this->_req->query->bi))
 		{
 			$context['xml_data'] = array(
 				'text' => $txt['topic_alert_none'],
 				'body' => str_replace('{unread_all_url}', $scripturl . '?action=unread;all' . sprintf($this->_querystring_board_limits, 0) . $this->_querystring_sort_limits, $txt['unread_topics_visit_none']),
 			);
 		}
-		// No need to do anything, just die
+		// No need to do anything, just die :'(
 		else
 			obExit(false);
 	}
 
 	/**
-	 * Marks boards as read (or unread).
-	 * Accessed by action=markasread;sa=all
+	 * Marks boards as read (or unread)
+	 *
+	 * - Accessed by action=markasread;sa=all
 	 */
 	public function action_markboards()
 	{
@@ -155,7 +173,7 @@ class MarkRead_Controller extends Action_Controller
 
 		// Mark boards as read
 		if (!empty($boards))
-			markBoardsRead($boards, isset($_REQUEST['unread']), true);
+			markBoardsRead($boards, isset($this->_req->query->unread), true);
 
 		$_SESSION['id_msg_last_visit'] = $modSettings['maxMsgID'];
 		if (!empty($_SESSION['old_url']) && strpos($_SESSION['old_url'], 'action=unread') !== false)
@@ -176,7 +194,7 @@ class MarkRead_Controller extends Action_Controller
 		global $user_info, $modSettings;
 
 		// Make sure all the topics are integers!
-		$topics = array_map('intval', explode('-', $_REQUEST['topics']));
+		$topics = array_map('intval', explode('-', $this->_req->query->topics));
 
 		require_once(SUBSDIR . '/Topic.subs.php');
 		$logged_topics = getLoggedTopics($user_info['id'], $topics);
@@ -207,7 +225,7 @@ class MarkRead_Controller extends Action_Controller
 		// Mark a topic unread.
 		// First, let's figure out what the latest message is.
 		$topicinfo = getTopicInfo($topic, 'all');
-		$topic_msg_id = (int) $_GET['t'];
+		$topic_msg_id = $this->_req->getQuery('t', 'intval');
 
 		if (!empty($topic_msg_id))
 		{
@@ -222,11 +240,11 @@ class MarkRead_Controller extends Action_Controller
 				$earlyMsg = previousMessage($topic_msg_id, $topic);
 		}
 		// Marking read from first page?  That's the whole topic.
-		elseif ($_REQUEST['start'] == 0)
+		elseif ($this->_req->query->start == 0)
 			$earlyMsg = 0;
 		else
 		{
-			list ($earlyMsg) = messageAt((int) $_REQUEST['start'], $topic);
+			list ($earlyMsg) = messageAt((int) $this->_req->query->start, $topic);
 			$earlyMsg--;
 		}
 
@@ -245,31 +263,27 @@ class MarkRead_Controller extends Action_Controller
 	{
 		global $board, $board_info;
 
-		checkSession('get');
+		//checkSession('get');
 
 		require_once(SUBSDIR . '/Boards.subs.php');
 
 		$categories = array();
 		$boards = array();
 
-		if (isset($_REQUEST['c']))
+		if (isset($this->_req->query->c))
 		{
-			$_REQUEST['c'] = explode(',', $_REQUEST['c']);
-			foreach ($_REQUEST['c'] as $c)
-				$categories[] = (int) $c;
+			$categories = array_map('intval', explode(',', $this->_req->query->c));
 		}
 
-		if (isset($_REQUEST['boards']))
+		if (isset($this->_req->query->boards))
 		{
-			$_REQUEST['boards'] = explode(',', $_REQUEST['boards']);
-			foreach ($_REQUEST['boards'] as $b)
-				$boards[] = (int) $b;
+			$boards = array_map('intval', explode(',', $this->_req->query->boards));
 		}
 
 		if (!empty($board))
 			$boards[] = (int) $board;
 
-		if (isset($_REQUEST['children']) && !empty($boards))
+		if (isset($this->_req->query->children) && !empty($boards))
 		{
 			// Mark all children of the boards we got (selected by the user).
 			$boards = addChildBoards($boards);
@@ -281,7 +295,7 @@ class MarkRead_Controller extends Action_Controller
 			return '';
 
 		// Mark boards as read.
-		markBoardsRead($boards, isset($_REQUEST['unread']), true);
+		markBoardsRead($boards, isset($this->_req->query->unread), true);
 
 		foreach ($boards as $b)
 		{
@@ -289,7 +303,7 @@ class MarkRead_Controller extends Action_Controller
 				$_SESSION['topicseen_cache'][$b] = array();
 		}
 
-		$this->_querystring_board_limits = $_REQUEST['sa'] == 'board' ? ';boards=' . implode(',', $boards) . ';start=%d' : '';
+		$this->_querystring_board_limits = $this->_req->getQuery('sa') === 'board' ? ';boards=' . implode(',', $boards) . ';start=%d' : '';
 
 		$sort_methods = array(
 			'subject',
@@ -301,13 +315,13 @@ class MarkRead_Controller extends Action_Controller
 		);
 
 		// The default is the most logical: newest first.
-		if (!isset($_REQUEST['sort']) || !in_array($_REQUEST['sort'], $sort_methods))
-			$this->_querystring_sort_limits = isset($_REQUEST['asc']) ? ';asc' : '';
+		if (!isset($this->_req->query->sort) || !in_array($this->_req->query->sort, $sort_methods))
+			$this->_querystring_sort_limits = isset($this->_req->query->asc) ? ';asc' : '';
 		// But, for other methods the default sort is ascending.
 		else
-			$this->_querystring_sort_limits = ';sort=' . $_REQUEST['sort'] . (isset($_REQUEST['desc']) ? ';desc' : '');
+			$this->_querystring_sort_limits = ';sort=' . $this->_req->query->sort . (isset($this->_req->query->desc) ? ';desc' : '');
 
-		if (!isset($_REQUEST['unread']))
+		if (!isset($this->_req->query->unread))
 		{
 			// Find all boards with the parents in the board list
 			$boards_to_add = accessibleBoards(null, $boards);

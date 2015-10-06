@@ -450,7 +450,7 @@ class Mentions_Controller extends Action_Controller
 	/**
 	 * Register the listeners for a mention type or for all the mentions.
 	 *
-	 * @param string|string[] $type
+	 * @param string|null $type Specific mention type
 	 */
 	protected function _registerEvents($type)
 	{

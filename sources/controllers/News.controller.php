@@ -39,6 +39,20 @@ class News_Controller extends Action_Controller
 	private $_limit;
 
 	/**
+	 * Holds instance of HttpReq object
+	 * @var HttpReq
+	 */
+	private $_req;
+
+	/**
+	 * Pre Dispatch, called before other methods.  Loads HttpReq instance.
+	 */
+	public function pre_dispatch()
+	{
+		$this->_req = HttpReq::instance();
+	}
+
+	/**
 	 * Dispatcher. Forwards to the action to execute.
 	 *
 	 * @see Action_Controller::action_index()
@@ -54,21 +68,28 @@ class News_Controller extends Action_Controller
 	 *
 	 * What it does:
 	 * - Can be passed 4 subactions which decide what is output:
-	 *   'recent' for recent posts,
-	 *   'news' for news topics,
-	 *   'members' for recently registered members,
-	 *   'profile' for a member's profile.
+	 *     * 'recent' for recent posts,
+	 *     * 'news' for news topics,
+	 *     * 'members' for recently registered members,
+	 *     * 'profile' for a member's profile.
 	 * - To display a member's profile, a user id has to be given. (;u=1) e.g. ?action=.xml;sa=profile;u=1;type=atom
-	 * - Outputs an rss feed instead of a proprietary one if the 'type' $_GET
-	 * parameter is 'rss' or 'rss2'.
+	 * - Outputs an feed based on the the 'type'
+	 * 	   * parameter is 'rss', 'rss2', 'rdf', 'atom'.
+	 * - Several sub action options are respected
+	 *     * limit=x - display the "x" most recent posts
+	 *     * board=y - display only the recent posts from board "y"
+	 *     * boards=x,y,z - display only the recent posts from the specified boards
+	 *     * c=x or c=x,y,z - display only the recent posts from boards in the specified category/categories
+	 *     * action=.xml;sa=recent;board=2;limit=10
 	 * - Accessed via ?action=.xml
 	 * - Does not use any templates, sub templates, or template layers.
+	 * - Use ;debug to view output for debugging feeds
 	 *
 	 * @uses Stats language file.
 	 */
 	public function action_showfeed()
 	{
-		global $board, $board_info, $context, $txt, $modSettings, $user_info, $cdata_override;
+		global $board, $board_info, $context, $txt, $modSettings, $user_info;
 
 		// If it's not enabled, die.
 		if (empty($modSettings['xmlnews_enable']))
@@ -79,7 +100,7 @@ class News_Controller extends Action_Controller
 
 		// Default to latest 5.  No more than whats defined in the ACP or 255
 		$limit = empty($modSettings['xmlnews_limit']) ? 5 : min($modSettings['xmlnews_limit'], 255);
-		$this->_limit = empty($_GET['limit']) || (int) $_GET['limit'] < 1 ? $limit : min((int) $_GET['limit'], $limit);
+		$this->_limit = empty($this->_req->query->limit) || (int) $this->_req->query->limit < 1 ? $limit : min((int) $this->_req->query->limit, $limit);
 
 		// Handle the cases where a board, boards, or category is asked for.
 		$this->_query_this_board = '1=1';
@@ -87,15 +108,15 @@ class News_Controller extends Action_Controller
 			'highest' => 'm.id_msg <= b.id_last_msg',
 		);
 
-		if (!empty($_REQUEST['c']) && empty($board))
+		// Specifying specific categories only?
+		if (!empty($this->_req->query->c) && empty($board))
 		{
-			$categories = array_map('intval', explode(',', $_REQUEST['c']));
+			$categories = array_map('intval', explode(',', $this->_req->query->c));
 
 			if (count($categories) == 1)
 			{
 				require_once(SUBSDIR . '/Categories.subs.php');
 				$feed_title = categoryName($categories[0]);
-
 				$feed_title = ' - ' . strip_tags($feed_title);
 			}
 
@@ -111,10 +132,11 @@ class News_Controller extends Action_Controller
 			if ($total_cat_posts > 100 && $total_cat_posts > $modSettings['totalMessages'] / 15)
 				$context['optimize_msg']['lowest'] = 'm.id_msg >= ' . max(0, $modSettings['maxMsgID'] - 400 - $this->_limit * 5);
 		}
-		elseif (!empty($_REQUEST['boards']))
+		// Maybe they only want to see feeds form some certain boards?
+		elseif (!empty($this->_req->query->boards))
 		{
 			require_once(SUBSDIR . '/Boards.subs.php');
-			$query_boards = array_map('intval', explode(',', $_REQUEST['boards']));
+			$query_boards = array_map('intval', explode(',', $this->_req->query->boards));
 
 			$boards_data = fetchBoardsInfo(array('boards' => $query_boards), array('selects' => 'detailed'));
 
@@ -139,6 +161,7 @@ class News_Controller extends Action_Controller
 			if ($total_posts > 100 && $total_posts > $modSettings['totalMessages'] / 12)
 				$context['optimize_msg']['lowest'] = 'm.id_msg >= ' . max(0, $modSettings['maxMsgID'] - 500 - $this->_limit * 5);
 		}
+		// Just a single board
 		elseif (!empty($board))
 		{
 			require_once(SUBSDIR . '/Boards.subs.php');
@@ -159,8 +182,10 @@ class News_Controller extends Action_Controller
 			$context['optimize_msg']['lowest'] = 'm.id_msg >= ' . max(0, $modSettings['maxMsgID'] - 100 - $this->_limit * 5);
 		}
 
-		// If format isn't set, rss2 is default
-		$xml_format = isset($_GET['type']) && in_array($_GET['type'], array('rss', 'rss2', 'atom', 'rdf')) ? $_GET['type'] : 'rss2';
+		// If format isn't set, or is wrong, rss2 is default
+		$xml_format = $this->_req->getQuery('type', 'trim', 'rss2');
+		if (!in_array($xml_format, array('rss', 'rss2', 'atom', 'rdf')))
+			$xml_format = 'rss2';
 
 		// List all the different types of data they can pull.
 		$subActions = array(
@@ -173,14 +198,14 @@ class News_Controller extends Action_Controller
 		// Easy adding of sub actions
 		call_integration_hook('integrate_xmlfeeds', array(&$subActions));
 
-		$subAction = isset($_GET['sa']) && isset($subActions[$_GET['sa']]) ? $_GET['sa'] : 'recent';
+		$subAction = isset($this->_req->query->sa) && isset($subActions[$this->_req->query->sa]) ? $this->_req->query->sa : 'recent';
 
 		// We only want some information, not all of it.
-		$cachekey = array($xml_format, $_GET['action'], $this->_limit, $subAction);
+		$cachekey = array($xml_format, $this->_req->query->action, $this->_limit, $subAction);
 		foreach (array('board', 'boards', 'c') as $var)
 		{
-			if (isset($_REQUEST[$var]))
-				$cachekey[] = $_REQUEST[$var];
+			if (isset($this->_req->query->$var))
+				$cachekey[] = $this->_req->query->$var;
 		}
 
 		$cachekey = md5(serialize($cachekey) . (!empty($this->_query_this_board) ? $this->_query_this_board : ''));
@@ -211,29 +236,33 @@ class News_Controller extends Action_Controller
 		else
 			ob_start();
 
-		if (isset($_REQUEST['debug']))
+		if (isset($this->_req->query->debug))
 			header('Content-Type: text/xml; charset=UTF-8');
-		elseif ($xml_format == 'rss' || $xml_format == 'rss2')
+		elseif ($xml_format === 'rss' || $xml_format === 'rss2')
 			header('Content-Type: application/rss+xml; charset=UTF-8');
-		elseif ($xml_format == 'atom')
+		elseif ($xml_format === 'atom')
 			header('Content-Type: application/atom+xml; charset=UTF-8');
-		elseif ($xml_format == 'rdf')
+		elseif ($xml_format === 'rdf')
 			header('Content-Type: ' . (isBrowser('ie') ? 'text/xml' : 'application/rdf+xml') . '; charset=UTF-8');
 
 		loadTemplate('Xml');
 		Template_Layers::getInstance()->removeAll();
 
 		// Are we outputting an rss feed or one with more information?
-		if ($xml_format == 'rss' || $xml_format == 'rss2')
+		if ($xml_format === 'rss' || $xml_format === 'rss2')
 		{
 			$context['sub_template'] = 'feedrss';
 		}
-		elseif ($xml_format == 'atom')
+		elseif ($xml_format === 'atom')
 		{
 			$url_parts = array();
 			foreach (array('board', 'boards', 'c') as $var)
-				if (isset($_REQUEST[$var]))
-					$url_parts[] = $var . '=' . (is_array($_REQUEST[$var]) ? implode(',', $_REQUEST[$var]) : $_REQUEST[$var]);
+			{
+				if (isset( $this->_req->query->$var))
+				{
+					$url_parts[] = $var . '=' . (is_array( $this->_req->query->$var) ? implode(',',  $this->_req->query->$var) :  $this->_req->query->$var);
+				}
+			}
 
 			$context['url_parts'] = !empty($url_parts) ? implode(';', $url_parts) : '';
 			$context['sub_template'] = 'feedatom';
@@ -269,7 +298,7 @@ class News_Controller extends Action_Controller
 		foreach ($members as $member)
 		{
 			// Make the data look rss-ish.
-			if ($xml_format == 'rss' || $xml_format == 'rss2')
+			if ($xml_format === 'rss' || $xml_format === 'rss2')
 				$data[] = array(
 					'title' => cdata_parse($member['real_name']),
 					'link' => $scripturl . '?action=profile;u=' . $member['id_member'],
@@ -277,12 +306,12 @@ class News_Controller extends Action_Controller
 					'pubDate' => gmdate('D, d M Y H:i:s \G\M\T', $member['date_registered']),
 					'guid' => $scripturl . '?action=profile;u=' . $member['id_member'],
 				);
-			elseif ($xml_format == 'rdf')
+			elseif ($xml_format === 'rdf')
 				$data[] = array(
 					'title' => cdata_parse($member['real_name']),
 					'link' => $scripturl . '?action=profile;u=' . $member['id_member'],
 				);
-			elseif ($xml_format == 'atom')
+			elseif ($xml_format === 'atom')
 				$data[] = array(
 					'title' => cdata_parse($member['real_name']),
 					'link' => $scripturl . '?action=profile;u=' . $member['id_member'],
@@ -333,7 +362,7 @@ class News_Controller extends Action_Controller
 			censorText($row['subject']);
 
 			// Being news, this actually makes sense in rss format.
-			if ($xml_format == 'rss' || $xml_format == 'rss2')
+			if ($xml_format === 'rss' || $xml_format === 'rss2')
 			{
 				$data[] = array(
 					'title' => cdata_parse($row['subject']),
@@ -347,14 +376,14 @@ class News_Controller extends Action_Controller
 				);
 
 				// Add the poster name on if we are rss2
-				if ($xml_format == 'rss2')
+				if ($xml_format === 'rss2')
 				{
 					$data[count($data) - 1]['dc:creator'] = $row['poster_name'];
 					unset($data[count($data) - 1]['author']);
 				}
 			}
 			// RDF Format anyone
-			elseif ($xml_format == 'rdf')
+			elseif ($xml_format === 'rdf')
 			{
 				$data[] = array(
 					'title' => cdata_parse($row['subject']),
@@ -363,7 +392,7 @@ class News_Controller extends Action_Controller
 				);
 			}
 			// Atom feed
-			elseif ($xml_format == 'atom')
+			elseif ($xml_format === 'atom')
 			{
 				$data[] = array(
 					'title' => cdata_parse($row['subject']),
@@ -437,7 +466,7 @@ class News_Controller extends Action_Controller
 			censorText($row['subject']);
 
 			// Doesn't work as well as news, but it kinda does..
-			if ($xml_format == 'rss' || $xml_format == 'rss2')
+			if ($xml_format === 'rss' || $xml_format === 'rss2')
 			{
 				$data[] = array(
 					'title' => $row['subject'],
@@ -451,13 +480,13 @@ class News_Controller extends Action_Controller
 				);
 
 				// Add the poster name on if we are rss2
-				if ($xml_format == 'rss2')
+				if ($xml_format === 'rss2')
 				{
 					$data[count($data) - 1]['dc:creator'] = $row['poster_name'];
 					unset($data[count($data) - 1]['author']);
 				}
 			}
-			elseif ($xml_format == 'rdf')
+			elseif ($xml_format === 'rdf')
 			{
 				$data[] = array(
 					'title' => $row['subject'],
@@ -465,7 +494,7 @@ class News_Controller extends Action_Controller
 					'description' => cdata_parse($row['body']),
 				);
 			}
-			elseif ($xml_format == 'atom')
+			elseif ($xml_format === 'atom')
 			{
 				$data[] = array(
 					'title' => $row['subject'],
@@ -530,11 +559,11 @@ class News_Controller extends Action_Controller
 		global $scripturl, $memberContext, $user_profile, $modSettings, $user_info;
 
 		// You must input a valid user....
-		if (empty($_GET['u']) || loadMemberData((int) $_GET['u']) === false)
+		if (empty($this->_req->query->u) || loadMemberData((int) $this->_req->query->u) === false)
 			return array();
 
 		// Make sure the id is a number and not "I like trying to hack the database".
-		$uid = (int) $_GET['u'];
+		$uid = (int) $this->_req->query->u;
 
 		// Load the member's contextual information!
 		if (!loadMemberContext($uid) || !allowedTo('profile_view_any'))
@@ -545,7 +574,7 @@ class News_Controller extends Action_Controller
 		// No feed data yet
 		$data = array();
 
-		if ($xml_format == 'rss' || $xml_format == 'rss2')
+		if ($xml_format === 'rss' || $xml_format === 'rss2')
 			$data = array(array(
 				'title' => cdata_parse($profile['name']),
 				'link' => $scripturl . '?action=profile;u=' . $profile['id'],
@@ -554,13 +583,13 @@ class News_Controller extends Action_Controller
 				'pubDate' => gmdate('D, d M Y H:i:s \G\M\T', $user_profile[$profile['id']]['date_registered']),
 				'guid' => $scripturl . '?action=profile;u=' . $profile['id'],
 			));
-		elseif ($xml_format == 'rdf')
+		elseif ($xml_format === 'rdf')
 			$data = array(array(
 				'title' => cdata_parse($profile['name']),
 				'link' => $scripturl . '?action=profile;u=' . $profile['id'],
 				'description' => cdata_parse(isset($profile['group']) ? $profile['group'] : $profile['post_group']),
 			));
-		elseif ($xml_format == 'atom')
+		elseif ($xml_format === 'atom')
 			$data[] = array(
 				'title' => cdata_parse($profile['name']),
 				'link' => $scripturl . '?action=profile;u=' . $profile['id'],
@@ -646,7 +675,7 @@ class News_Controller extends Action_Controller
 
 /**
  * Called from dumpTags to convert data to xml
- * Finds urls for local site and santizes them
+ * Finds urls for local site and sanitizes them
  *
  * @param string $val
  */
@@ -681,8 +710,8 @@ function fix_possible_url_callback($matches)
 }
 
 /**
- * For highest feed compatibility, some special characters should be provided 
- * as character entities and not html entities 
+ * For highest feed compatibility, some special characters should be provided
+ * as character entities and not html entities
  *
  * @param string $data
  */
@@ -692,7 +721,7 @@ function encode_special($data)
 }
 
 /**
- * Ensures supplied data is properly encpsulated in cdata xml tags
+ * Ensures supplied data is properly encapsulated in cdata xml tags
  * Called from action_xmlprofile in News.controller.php
  *
  * @param string $data
@@ -733,25 +762,25 @@ function cdata_parse($data, $ns = '')
 		if ($pos >= $n)
 			break;
 
-		if (Util::substr($data, $pos, 1) == '<')
+		if (Util::substr($data, $pos, 1) === '<')
 		{
 			$pos2 = Util::strpos($data, '>', $pos);
 			if ($pos2 === false)
 				$pos2 = $n;
 
-			if (Util::substr($data, $pos + 1, 1) == '/')
+			if (Util::substr($data, $pos + 1, 1) === '/')
 				$cdata .= ']]></' . $ns . ':' . Util::substr($data, $pos + 2, $pos2 - $pos - 1) . '<![CDATA[';
 			else
 				$cdata .= ']]><' . $ns . ':' . Util::substr($data, $pos + 1, $pos2 - $pos) . '<![CDATA[';
 
 			$pos = $pos2 + 1;
 		}
-		elseif (Util::substr($data, $pos, 1) == ']')
+		elseif (Util::substr($data, $pos, 1) === ']')
 		{
 			$cdata .= ']]>&#093;<![CDATA[';
 			$pos++;
 		}
-		elseif (Util::substr($data, $pos, 1) == '&')
+		elseif (Util::substr($data, $pos, 1) === '&')
 		{
 			$pos2 = Util::strpos($data, ';', $pos);
 
@@ -760,7 +789,7 @@ function cdata_parse($data, $ns = '')
 
 			$ent = Util::substr($data, $pos + 1, $pos2 - $pos - 1);
 
-			if (Util::substr($data, $pos + 1, 1) == '#')
+			if (Util::substr($data, $pos + 1, 1) === '#')
 				$cdata .= ']]>' . Util::substr($data, $pos, $pos2 - $pos + 1) . '<![CDATA[';
 			elseif (in_array($ent, array('amp', 'lt', 'gt', 'quot')))
 				$cdata .= ']]>' . Util::substr($data, $pos, $pos2 - $pos + 1) . '<![CDATA[';

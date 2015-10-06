@@ -1106,15 +1106,16 @@ class ManagePermissions_Controller extends Action_Controller
 			{
 				foreach ($mappings as $index => $data)
 				{
-					if (isset($_POST[$index][$group['id']]))
+					$temp = $this->_req->post->$index;
+					if (isset($temp[$group['id']]))
 					{
-						if ($_POST[$index][$group['id']] == 'allow')
+						if ($temp[$group['id']] == 'allow')
 						{
 							// Give them both sets for fun.
 							$new_permissions[] = array($context['current_profile'], $group['id'], $data[0], 1);
 							$new_permissions[] = array($context['current_profile'], $group['id'], $data[1], 1);
 						}
-						elseif ($_POST[$index][$group['id']] == 'moderate')
+						elseif ($temp[$group['id']] == 'moderate')
 							$new_permissions[] = array($context['current_profile'], $group['id'], $data[1], 1);
 					}
 				}
