@@ -21,6 +21,20 @@ if (!defined('ELK'))
 class Xml_Controller extends Action_Controller
 {
 	/**
+	 * Holds instance of HttpReq object
+	 * @var HttpReq
+	 */
+	private $_req;
+
+	/**
+	 * Pre Dispatch, called before other methods.  Loads HttpReq instance.
+	 */
+	public function pre_dispatch()
+	{
+		$this->_req = HttpReq::instance();
+	}
+
+	/**
 	 * Main dispatcher for action=xmlhttp.
 	 *
 	 * @see Action_Controller::action_index()
@@ -156,14 +170,15 @@ class Xml_Controller extends Action_Controller
 			// Load up the core features of the system
 			if (empty($result))
 			{
-				$id = isset($_POST['feature_id']) ? $_POST['feature_id'] : '';
+				$id = $this->_req->getPost('feature_id', 'trim', '');
 
 				// The feature being enabled does exist, no messing about
 				if (!empty($id) && isset($context['features'][$id]))
 				{
 					$feature = $context['features'][$id];
+					$feature_id = 'feature_' . $id;
 					$returns[] = array(
-						'value' => (!empty($_POST['feature_' . $id]) && $feature['url'] ? '<a href="' . $feature['url'] . '">' . $feature['title'] . '</a>' : $feature['title']),
+						'value' => (!empty($this->_req->post->$feature_id) && $feature['url'] ? '<a href="' . $feature['url'] . '">' . $feature['title'] . '</a>' : $feature['title']),
 					);
 
 					createToken('admin-core', 'post');
@@ -231,13 +246,13 @@ class Xml_Controller extends Action_Controller
 		if ($validation_session === true && $validation_token === true)
 		{
 			// No questions that we are reordering
-			if (isset($_POST['order']) && $_POST['order'] == 'reorder')
+			if ($this->_req->getPost('order', 'trim', '') === 'reorder')
 			{
 				$view_order = 1;
 				$replace = '';
 
 				// The field ids arrive in 1-n view order ...
-				foreach ($_POST['list_custom_profile_fields'] as $id)
+				foreach ($this->_req->post->list_custom_profile_fields as $id)
 				{
 					$id = (int) $id;
 					$replace .= '
@@ -323,17 +338,17 @@ class Xml_Controller extends Action_Controller
 		if ($validation_session === true && $validation_token === true)
 		{
 			// No question that we are doing some board reordering
-			if (isset($_POST['order']) && $_POST['order'] === 'reorder' && isset($_POST['moved']))
+			if ($this->_req->getPost('order', 'trim', '') === 'reorder' && isset($this->_req->post->moved))
 			{
 				$list_order = 0;
 				$moved_key = 0;
 
 				// What board was drag and dropped?
-				list (, $board_moved,) = explode(',', $_POST['moved']);
+				list (, $board_moved,) = explode(',', $this->_req->post->moved);
 				$board_moved = (int) $board_moved;
 
 				// The board ids arrive in 1-n view order ...
-				foreach ($_POST['cbp'] as $id)
+				foreach ($this->_req->post->cbp as $id)
 				{
 					list ($category, $board, $childof) = explode(',', $id);
 
@@ -486,23 +501,23 @@ class Xml_Controller extends Action_Controller
 		if ($validation_session === true && $validation_token === true)
 		{
 			// Valid posting
-			if (isset($_POST['order']) && $_POST['order'] == 'reorder')
+			if ($this->_req->getPost('order', 'trim', '') === 'reorder')
 			{
 				// Get the details on the moved smile
-				list (, $smile_moved) = explode('_', $_POST['moved']);
+				list (, $smile_moved) = explode('_', $this->_req->post->moved);
 				$smile_moved = (int) $smile_moved;
 				$smile_moved_details = getSmiley($smile_moved);
 
 				// Check if we moved rows or locations
 				$smile_received_location = null;
 				$smile_received_row = null;
-				if (!empty($_POST['received']))
+				if (!empty($this->_req->post->received))
 				{
 					$displayTypes = array(
 						'postform' => 0,
 						'popup' => 2
 					);
-					list ($smile_received_location, $smile_received_row) = explode('|', $_POST['received']);
+					list ($smile_received_location, $smile_received_row) = explode('|', $this->_req->post->received);
 					$smile_received_location = $displayTypes[substr($smile_received_location, 7)];
 				}
 
@@ -514,7 +529,7 @@ class Xml_Controller extends Action_Controller
 					$moved_key = 0;
 					$smiley_tree = array();
 
-					foreach ($_POST['smile'] as $smile_id)
+					foreach ($this->_req->post->smile as $smile_id)
 					{
 						$smiley_tree[] = $smile_id;
 
@@ -641,14 +656,14 @@ class Xml_Controller extends Action_Controller
 		if ($validation_session === true && $validation_token === true)
 		{
 			// No questions that we are reordering
-			if (isset($_POST['order'], $_POST['list_sort_email_fp']) && $_POST['order'] == 'reorder')
+			if (isset($this->_req->post->order, $this->_req->post->list_sort_email_fp) && $this->_req->post->order === 'reorder')
 			{
 				$filters = array();
 				$filter_order = 1;
 				$replace = '';
 
 				// The field ids arrive in 1-n view order ...
-				foreach ($_POST['list_sort_email_fp'] as $id)
+				foreach ($this->_req->post->list_sort_email_fp as $id)
 				{
 					$filters[] = (int) $id;
 					$replace .= '
@@ -731,7 +746,7 @@ class Xml_Controller extends Action_Controller
 		if ($validation_session === true && $validation_token === true)
 		{
 			// No questions that we are reordering
-			if (isset($_POST['order']) && $_POST['order'] == 'reorder')
+			if ($this->_req->getPost('order', 'trim', '') === 'reorder')
 			{
 				// Get the current list of icons.
 				$message_icons = fetchMessageIconsDetails();
@@ -740,7 +755,7 @@ class Xml_Controller extends Action_Controller
 				$iconInsert = array();
 
 				// The field ids arrive in 1-n view order, so we simply build an update array
-				foreach ($_POST['list_message_icon_list'] as $id)
+				foreach ($this->_req->post->list_message_icon_list as $id)
 				{
 						$iconInsert[] = array($id, $message_icons[$id]['board_id'], $message_icons[$id]['title'], $message_icons[$id]['filename'], $view_order);
 						$view_order++;
