@@ -42,7 +42,7 @@ function template_control_richedit($editor_id, $smileyContainer = null, $bbcCont
 					}';
 
 	if (!empty($context['mentions_enabled']))
-			$plugin_options[] = '
+		$plugin_options[] = '
 					mentionOptions: {
 						editor_id: \'' . $editor_id . '\',
 						cache: {
@@ -189,21 +189,21 @@ function template_control_richedit_buttons($editor_id)
 	echo '
 			', $context['shortcuts_text'], '
 		</span>
-		<input type="submit" name="', isset($editor_context['labels']['post_name']) ? $editor_context['labels']['post_name'] : 'post', '" value="', isset($editor_context['labels']['post_button']) ? $editor_context['labels']['post_button'] : $txt['post'], '" tabindex="', $context['tabindex']++, '" onclick="return submitThisOnce(this);" accesskey="s" class="button_submit" />';
+		<input type="submit" name="', isset($editor_context['labels']['post_name']) ? $editor_context['labels']['post_name'] : 'post', '" value="', isset($editor_context['labels']['post_button']) ? $editor_context['labels']['post_button'] : $txt['post'], '" tabindex="', $context['tabindex']++, '" onclick="return submitThisOnce(this);" accesskey="s" />';
 
 	if ($editor_context['preview_type'])
 		echo '
-		<input type="submit" name="preview" value="', isset($editor_context['labels']['preview_button']) ? $editor_context['labels']['preview_button'] : $txt['preview'], '" tabindex="', $context['tabindex']++, '" onclick="', $editor_context['preview_type'] == 2 ? 'return event.ctrlKey || previewControl();' : 'return submitThisOnce(this);', '" accesskey="p" class="button_submit" />';
+		<input type="submit" name="preview" value="', isset($editor_context['labels']['preview_button']) ? $editor_context['labels']['preview_button'] : $txt['preview'], '" tabindex="', $context['tabindex']++, '" onclick="', $editor_context['preview_type'] == 2 ? 'return event.ctrlKey || previewControl();' : 'return submitThisOnce(this);', '" accesskey="p" />';
 
 	// Show the spellcheck button?
 	if ($context['show_spellchecking'])
 		echo '
-		<input type="button" value="', $txt['spell_check'], '" tabindex="', $context['tabindex']++, '" onclick="spellCheckStart();" class="button_submit" />';
+		<input type="button" value="', $txt['spell_check'], '" tabindex="', $context['tabindex']++, '" onclick="spellCheckStart();" />';
 
 	foreach ($editor_context['buttons'] as $button)
 	{
 		echo '
-		<input type="submit" name="', $button['name'], '" value="', $button['value'], '" tabindex="', $context['tabindex']++, '" ', $button['options'], ' class="button_submit" />';
+		<input type="submit" name="', $button['name'], '" value="', $button['value'], '" tabindex="', $context['tabindex']++, '" ', $button['options'], ' />';
 	}
 
 	foreach ($editor_context['hidden_fields'] as $hidden)
@@ -216,7 +216,7 @@ function template_control_richedit_buttons($editor_id)
 	if (!empty($context['drafts_autosave']) && !empty($options['drafts_autosave_enabled']))
 		echo '
 		<div class="draftautosave">
-			<span id="throbber" style="display:none"><i class="fa fa-spinner fa-spin"></i>&nbsp;</span>
+			<span id="throbber" class="hide"><i class="fa fa-spinner fa-spin"></i>&nbsp;</span>
 			<span id="draft_lastautosave"></span>
 		</div>';
 }

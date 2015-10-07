@@ -34,7 +34,7 @@ function template_popup()
 		<script src="', $settings['default_theme_url'], '/scripts/script.js"></script>
 	</head>
 	<body id="help_popup">
-		<div class="windowbg description">
+		<div class="description">
 			', $context['help_text'], '<br />
 			<br />
 			<a href="javascript:self.close();">', $txt['close_window'], '</a>
@@ -53,7 +53,7 @@ function template_manual()
 	echo '
 			<h2 class="category_header">', $txt['manual_elkarte_user_help'], '</h2>
 			<div id="help_container">
-				<div id="helpmain" class="windowbg2 content">
+				<div id="helpmain" class="content">
 					<p>', sprintf($txt['manual_welcome'], $context['forum_name']), '</p>
 					<p>', $txt['manual_introduction'], '</p>
 					<ul>';

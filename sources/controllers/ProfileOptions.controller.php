@@ -871,8 +871,7 @@ class ProfileOptions_Controller extends Action_Controller
 			$groups = array(0);
 
 		// Just to be sure...
-		foreach ($groups as $k => $v)
-			$groups[$k] = (int) $v;
+		$groups = array_map('intval', $groups);
 
 		// Get all the membergroups they can join.
 		require_once(SUBSDIR . '/ProfileOptions.subs.php');
@@ -992,7 +991,7 @@ class ProfileOptions_Controller extends Action_Controller
 		}
 
 		// If we're requesting, add the note then return.
-		if ($changeType == 'request')
+		if ($changeType === 'request')
 		{
 			if (logMembergroupRequest($group_id, $this->_memID))
 				Errors::instance()->fatal_lang_error('profile_error_already_requested_group');

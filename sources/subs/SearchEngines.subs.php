@@ -371,10 +371,10 @@ function getNumSpiders()
  * (used by createList() callbacks)
  *
  * @package SearchEngines
- * @param int $start
- * @param int $items_per_page
- * @param string $sort
- * @return array
+ * @param int $start The item to start with (for pagination purposes)
+ * @param int $items_per_page The number of items to show per page
+ * @param string $sort A string indicating how to sort the results
+ * @return array An array of spider hits
  */
 function getSpiderLogs($start, $items_per_page, $sort)
 {
@@ -402,7 +402,7 @@ function getSpiderLogs($start, $items_per_page, $sort)
  * (used by createList() callbacks)
  *
  * @package SearchEngines
- * @return int
+ * @return int The number of rows in the log_spider_hits table
  */
 function getNumSpiderLogs()
 {
@@ -426,10 +426,9 @@ function getNumSpiderLogs()
  * (used by createList() callbacks)
  *
  * @package SearchEngines
- * @param int $start
- * @param int $items_per_page
- * @param string $sort
- * @return array
+ * @param int $start The item to start with (for pagination purposes)
+ * @param int $items_per_page The number of items to show per page
+ * @param string $sort A string indicating how to sort the results
  */
 function getSpiderStats($start, $items_per_page, $sort)
 {
@@ -458,7 +457,7 @@ function getSpiderStats($start, $items_per_page, $sort)
  *
  * @package SearchEngines
  * @param int|null $time (optional) if specified counts only the entries before that date
- * @return int
+ * @return int The number of rows in the log_spider_stats table
  */
 function getNumSpiderStats($time = null)
 {

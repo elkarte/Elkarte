@@ -140,6 +140,7 @@ class ManageTopics_Controller extends Action_Controller
 				// Some simple big bools...
 				array('check', 'enableParticipation'),
 				array('check', 'enableFollowup'),
+				array('check', 'enable_unwatch'),
 				array('check', 'pollMode'),
 			'',
 				// Pagination etc...

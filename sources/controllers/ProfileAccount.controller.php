@@ -522,20 +522,17 @@ class ProfileAccount_Controller extends Action_Controller
 
 		if (isset($_REQUEST['save']) && isset($user_profile[$memID]['is_activated']) && $user_profile[$memID]['is_activated'] != 1)
 		{
+			require_once(SUBSDIR . '/Members.subs.php');
+
 			// If we are approving the deletion of an account, we do something special ;)
 			if ($user_profile[$memID]['is_activated'] == 4)
 			{
-				require_once(SUBSDIR . '/Members.subs.php');
 				deleteMembers($context['id_member']);
 				redirectexit();
 			}
 
-			// Let the integrations know of the activation.
-			call_integration_hook('integrate_activate', array($user_profile[$memID]['member_name']));
-
 			// Actually update this member now, as it guarantees the unapproved count can't get corrupted.
-			require_once(SUBSDIR . '/Members.subs.php');
-			updateMemberData($context['id_member'], array('is_activated' => $user_profile[$memID]['is_activated'] >= 10 ? 11 : 1, 'validation_code' => ''));
+			approveMembers(array('members' => array($context['id_member']), 'activated_status' => $user_profile[$memID]['is_activated']));
 
 			// Log what we did?
 			logAction('approve_member', array('member' => $memID), 'admin');

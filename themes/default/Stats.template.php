@@ -65,9 +65,9 @@ function template_general_statistics()
 
 	echo '
 			<li class="flow_hidden" id="top_row">
-				<h3 class="category_header hdicon cat_img_stats_info">
+				<h2 class="category_header hdicon cat_img_stats_info">
 					', $txt['general_stats'], '
-				</h3>
+				</h2>
 				<dl class="stats floatleft">';
 
 	foreach ($context['general_statistics']['left'] as $key => $value)
@@ -118,9 +118,9 @@ function template_top_statistics()
 
 	echo '
 			<li class="flow_hidden">
-				<h3 class="category_header floatleft hdicon cat_img_star">
+				<h2 class="category_header floatleft hdicon cat_img_star">
 					', $txt['top_posters'], '
-				</h3>
+				</h2>
 				<dl class="stats floatleft">';
 
 	foreach ($context['top']['posters'] as $poster)
@@ -137,9 +137,9 @@ function template_top_statistics()
 
 	echo '
 				</dl>
-				<h3 class="category_header hdicon cat_img_topics">
+				<h2 class="category_header hdicon cat_img_topics">
 					', $txt['top_boards'], '
-				</h3>
+				</h2>
 				<dl class="stats">';
 
 	foreach ($context['top']['boards'] as $board)
@@ -158,9 +158,9 @@ function template_top_statistics()
 				</dl>
 			</li>
 			<li class="flow_hidden">
-				<h3 class="category_header floatleft hdicon cat_img_talk">
+				<h2 class="category_header floatleft hdicon cat_img_talk">
 					', $txt['top_topics_replies'], '
-				</h3>
+				</h2>
 				<dl class="stats floatleft">';
 
 	foreach ($context['top']['topics_replies'] as $topic)
@@ -177,9 +177,9 @@ function template_top_statistics()
 
 	echo '
 				</dl>
-				<h3 class="category_header hdicon cat_img_eye">
+				<h2 class="category_header hdicon cat_img_eye">
 					', $txt['top_topics_views'], '
-				</h3>
+				</h2>
 				<dl class="stats">';
 
 	foreach ($context['top']['topics_views'] as $topic)
@@ -196,9 +196,9 @@ function template_top_statistics()
 				</dl>
 			</li>
 			<li class="flow_hidden">
-				<h3 class="category_header floatleft hdicon cat_img_write">
+				<h2 class="category_header floatleft hdicon cat_img_write">
 					', $txt['top_starters'], '
-				</h3>
+				</h2>
 				<dl class="stats floatleft">';
 
 	foreach ($context['top']['starters'] as $poster)
@@ -215,9 +215,9 @@ function template_top_statistics()
 
 	echo '
 				</dl>
-				<h3 class="category_header hdicon cat_img_clock">
+				<h2 class="category_header hdicon cat_img_clock">
 					', $txt['most_time_online'], '
-				</h3>
+				</h2>
 				<dl class="stats">';
 
 	foreach ($context['top']['time_online'] as $poster)
@@ -355,7 +355,7 @@ function template_forum_history()
 			sMonthLinkIdPrefix: \'m\',
 
 			reDayPattern: /tr_day_(\d+-\d+-\d+)/,
-			sDayRowClassname: \'windowbg2\',
+			sDayRowClassname: \'\',
 			sDayRowIdPrefix: \'tr_day_\',
 
 			aCollapsedYears: [';

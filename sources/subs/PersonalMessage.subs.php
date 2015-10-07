@@ -31,13 +31,13 @@ if (!defined('ELK'))
  */
 function loadMessageLimit()
 {
-	global $user_info, $context;
+	global $user_info;
 
 	$db = database();
 
 	if ($user_info['is_admin'])
-		$context['message_limit'] = 0;
-	elseif (($context['message_limit'] = cache_get_data('msgLimit:' . $user_info['id'], 360)) === null)
+		$message_limit = 0;
+	elseif (($message_limit = cache_get_data('msgLimit:' . $user_info['id'], 360)) === null)
 	{
 		$request = $db->query('', '
 			SELECT
@@ -51,21 +51,24 @@ function loadMessageLimit()
 		list ($maxMessage, $minMessage) = $db->fetch_row($request);
 		$db->free_result($request);
 
-		$context['message_limit'] = $minMessage == 0 ? 0 : $maxMessage;
+		$message_limit = $minMessage == 0 ? 0 : $maxMessage;
 
 		// Save us doing it again!
-		cache_put_data('msgLimit:' . $user_info['id'], $context['message_limit'], 360);
+		cache_put_data('msgLimit:' . $user_info['id'], $message_limit, 360);
 	}
+
+	return $message_limit;
 }
 
 /**
- * Loads the list of PM labels.
+ * Loads the count of messages on a per label basis.
  *
+ * @param $labels mixed[] array of labels that we are calculating the message count
  * @package PersonalMessage
  */
-function loadPMLabels()
+function loadPMLabels($labels)
 {
-	global $user_info, $context;
+	global $user_info;
 
 	$db = database();
 
@@ -87,15 +90,20 @@ function loadPMLabels()
 		$this_labels = explode(',', $row['labels']);
 		foreach ($this_labels as $this_label)
 		{
-			$context['labels'][(int) $this_label]['messages'] += $row['num'];
+			$labels[(int) $this_label]['messages'] += $row['num'];
+
 			if (!($row['is_read'] & 1))
-				$context['labels'][(int) $this_label]['unread_messages'] += $row['num'];
+			{
+				$labels[(int) $this_label]['unread_messages'] += $row['num'];
+			}
 		}
 	}
 	$db->free_result($result);
 
 	// Store it please!
-	cache_put_data('labelCounts:' . $user_info['id'], $context['labels'], 720);
+	cache_put_data('labelCounts:' . $user_info['id'], $labels, 720);
+
+	return $labels;
 }
 
 /**
@@ -528,7 +536,7 @@ function sendpm($recipients, $subject, $message, $store_outbox = true, $from = n
 		$user_info['name'] = $from['name'];
 
 	// This is the one that will go in their inbox.
-	$htmlmessage = Util::htmlspecialchars($message, ENT_QUOTES);
+	$htmlmessage = Util::htmlspecialchars($message, ENT_QUOTES, 'UTF-8', true);
 	preparsecode($htmlmessage);
 	$htmlsubject = strtr(Util::htmlspecialchars($subject), array("\r" => '', "\n" => '', "\t" => ''));
 	if (Util::strlen($htmlsubject) > 100)
@@ -907,27 +915,6 @@ function sendpm($recipients, $subject, $message, $store_outbox = true, $from = n
 	}
 
 	return $log;
-}
-
-/**
- * Mark personal messages as read (no new messages) for a particular member.
- *
- * @package PersonalMessage
- * @param int $memberID member id
- */
-function markPMsRead($memberID)
-{
-	$db = database();
-
-	$db->query('', '
-		UPDATE {db_prefix}pm_recipients
-		SET is_new = {int:not_new}
-		WHERE id_member = {int:current_member}',
-		array(
-			'current_member' => $memberID,
-			'not_new' => 0,
-		)
-	);
 }
 
 /**
@@ -1884,7 +1871,7 @@ function loadConversationUnreadStatus($pms)
  */
 function loadPMRecipientInfo($all_pms, &$recipients, $folder = '', $search = false)
 {
-	global $txt, $user_info, $scripturl;
+	global $txt, $user_info, $scripturl, $context;
 
 	$db = database();
 
@@ -1920,8 +1907,8 @@ function loadPMRecipientInfo($all_pms, &$recipients, $folder = '', $search = fal
 			$row['labels'] = $row['labels'] == '' ? array() : explode(',', $row['labels']);
 			foreach ($row['labels'] as $v)
 			{
-				if (isset($message_labels[(int) $v]))
-					$message_labels[$row['id_pm']][(int) $v] = array('id' => $v, 'name' => $message_labels[(int) $v]['name']);
+				if (isset($context['labels'][(int) $v]))
+					$message_labels[$row['id_pm']][(int) $v] = array('id' => $v, 'name' => $context['labels'][(int) $v]['name']);
 
 				// Here we find the first label on a message - used for linking to posts
 				if ($search && (!isset($message_first_label[$row['id_pm']]) && !in_array('-1', $row['labels'])))
@@ -2143,7 +2130,9 @@ function loadPersonalMessage($pm_id)
 	// First, pull out the message contents, and verify it actually went to them!
 	$request = $db->query('', '
 		SELECT
-			pm.subject, pm.body, pm.msgtime, pm.id_member_from, IFNULL(m.real_name, pm.from_name) AS sender_name
+			pm.subject, pm.body, pm.msgtime, pm.id_member_from,
+			IFNULL(m.real_name, pm.from_name) AS sender_name,
+			pm.from_name AS poster_name, msgtime
 		FROM {db_prefix}personal_messages AS pm
 			INNER JOIN {db_prefix}pm_recipients AS pmr ON (pmr.id_pm = pm.id_pm)
 			LEFT JOIN {db_prefix}members AS m ON (m.id_member = pm.id_member_from)

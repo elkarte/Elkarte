@@ -120,11 +120,8 @@ class ManageNews_Controller extends Action_Controller
 			),
 		);
 
-		// Default to sub action 'editnews' or 'mailingmembers' or 'settings' depending on permissions.
-		$subAction = isset($this->_req->query->sa) && isset($subActions[$this->_req->query->sa]) ? $this->_req->query->sa : (allowedTo('edit_news') ? 'editnews' : (allowedTo('send_mail') ? 'mailingmembers' : 'settings'));
-
 		// Give integration its shot via integrate_sa_manage_news
-		$action->initialize($subActions, 'settings');
+		$subAction = $action->initialize($subActions, (allowedTo('edit_news') ? 'editnews' : (allowedTo('send_mail') ? 'mailingmembers' : 'settings')));
 
 		// Some bits for the tempalte
 		$context['page_title'] = $txt['news_title'];
@@ -260,14 +257,14 @@ class ManageNews_Controller extends Action_Controller
 					'value' => '
 					<input type="submit" name="save_items" value="' . $txt['save'] . '" class="right_submit" />
 					<input type="submit" name="delete_selection" value="' . $txt['editnews_remove_selected'] . '" onclick="return confirm(\'' . $txt['editnews_remove_confirm'] . '\');" class="right_submit" />
-					<span id="moreNewsItems_link" style="display: none;">
+					<span id="moreNewsItems_link" class="hide">
 						<a class="linkbutton" href="javascript:void(0);" onclick="addAnotherNews(); return false;">' . $txt['editnews_clickadd'] . '</a>
 					</span>',
 				),
 			),
 			'javascript' => '
 			document.getElementById(\'list_news_lists_last\').style.display = "none";
-			document.getElementById("moreNewsItems_link").style.display = "";
+			document.getElementById("moreNewsItems_link").style.display = "inline";
 			var last_preview = 0;
 			var txt_preview = ' . javaScriptEscape($txt['preview']) . ';
 			var txt_news_error_no_news = ' . javaScriptEscape($txt['news_error_no_news']) . ';

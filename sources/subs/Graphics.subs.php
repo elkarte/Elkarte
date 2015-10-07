@@ -30,9 +30,9 @@ if (!defined('ELK'))
  * @uses resizeImageFile() function to achieve the resize.
  *
  * @package Graphics
- * @param string $source
- * @param int $max_width
- * @param int $max_height
+ * @param string $source The name of the source image
+ * @param int $max_width The maximum allowed width
+ * @param int $max_height The maximum allowed height
  * @return boolean whether the thumbnail creation was successful.
  */
 function createThumbnail($source, $max_width, $max_height)
@@ -61,15 +61,17 @@ function createThumbnail($source, $max_width, $max_height)
 }
 
 /**
- * Used to re-econodes an image to a specifed image format
+ * Used to re-encodes an image to a specified image format
  *
  * - creates a copy of the file at the same location as fileName.
  * - the file would have the format preferred_format if possible, otherwise the default format is jpeg.
  * - the function makes sure that all non-essential image contents are disposed.
  *
  * @package Graphics
- * @param string $fileName
- * @param int $preferred_format = 0
+ * @param string $fileName The path to the file
+ * @param int $preferred_format The preferred format, 0 to automatically determine, 1 for gif, 2 for jpg,
+ * 3 for png, 6 for bmp and 15 for wbmp
+ *
  * @return boolean true on success, false on failure.
  */
 function reencodeImage($fileName, $preferred_format = 0)
@@ -97,8 +99,10 @@ function reencodeImage($fileName, $preferred_format = 0)
  * - if extensiveCheck is true, searches for asp/php short tags as well.
  *
  * @package Graphics
- * @param string $fileName
- * @param bool $extensiveCheck = false
+ * @param string $fileName The path to the file
+ * @param bool $extensiveCheck = false if it should perform extensive checks
+ *
+ * @return bool Whether the image appears to be safe
  */
 function checkImageContents($fileName, $extensiveCheck = false)
 {
@@ -142,6 +146,8 @@ function checkImageContents($fileName, $extensiveCheck = false)
  * whether the GD2 library is present.
  *
  * @package Graphics
+ *
+ * @return bool Whether or not GD is available.
  */
 function checkGD()
 {
@@ -161,6 +167,8 @@ function checkGD()
  * Checks whether the Imagick class is present.
  *
  * @package Graphics
+ *
+ * @return bool Whether or not the Imagick extension is available.
  */
 function checkImagick()
 {
@@ -172,6 +180,8 @@ function checkImagick()
  *
  * @package Graphics
  * @param int[] $sizes image size
+ *
+ * @return bool Whether or not the memory is available.
  */
 function imageMemoryCheck($sizes)
 {
@@ -196,18 +206,21 @@ function imageMemoryCheck($sizes)
 }
 
 /**
- * Resizes an image from a remote location or a local file.
+ * Resize an image from a remote location or a local file.
  *
  * - Puts the resized image at the destination location.
  * - The file would have the format preferred_format if possible,
  * otherwise the default format is jpeg.
  *
  * @package Graphics
- * @param string $source
- * @param string $destination
- * @param int $max_width
- * @param int $max_height
- * @param int $preferred_format = 0
+ *
+ * @param string $source The name of the source image
+ * @param string $destination The name of the destination image
+ * @param int $max_width The maximum allowed width
+ * @param int $max_height The maximum allowed height
+ * @param int $preferred_format Used by Imagick/resizeImage
+ *
+ * @return boolean Whether the thumbnail creation was successful.
  */
 function resizeImageFile($source, $destination, $max_width, $max_height, $preferred_format = 0)
 {
@@ -287,12 +300,15 @@ function resizeImageFile($source, $destination, $max_width, $max_height, $prefer
  * @package Graphics
  * @param resource|null $src_img null for Imagick images, resource form imagecreatefrom for GD
  * @param string $destName
- * @param int $src_width
- * @param int $src_height
- * @param int $max_width
- * @param int $max_height
- * @param bool $force_resize = false
- * @param int $preferred_format = 0
+ * @param int $src_width The width of the source image
+ * @param int $src_height The height of the source image
+ * @param int $max_width The maximum allowed width
+ * @param int $max_height The maximum allowed height
+ * @param bool $force_resize = false Whether to override defaults and resize it
+ * @param int $preferred_format - The preferred format
+ *         - 0 to use jpeg, 1 for gif, 2 to force jpeg, 3 for png, 6 for bmp and 15 for wbmp
+ *
+ * @return bool Whether resize was successful.
  */
 function resizeImage($src_img, $destName, $src_width, $src_height, $max_width, $max_height, $force_resize = false, $preferred_format = 0)
 {
@@ -482,16 +498,16 @@ function autoRotateImage($image)
  * - Uses bicubic resizing methods which are lower quality then imagecopyresample
  *
  * @package Graphics
- * @param resource $dst_img
- * @param resource $src_img
- * @param int $dst_x
- * @param int $dst_y
- * @param int $src_x
- * @param int $src_y
- * @param int $dst_w
- * @param int $dst_h
- * @param int $src_w
- * @param int $src_h
+ * @param resource $dst_img The destination image - a GD image resource
+ * @param resource $src_img The source image - a GD image resource
+ * @param int $dst_x The "x" coordinate of the destination image
+ * @param int $dst_y The "y" coordinate of the destination image
+ * @param int $src_x The "x" coordinate of the source image
+ * @param int $src_y The "y" coordinate of the source image
+ * @param int $dst_w The width of the destination image
+ * @param int $dst_h The height of the destination image
+ * @param int $src_w The width of the destination image
+ * @param int $src_h The height of the destination image
  */
 function imagecopyresamplebicubic($dst_img, $src_img, $dst_x, $dst_y, $src_x, $src_y, $dst_w, $dst_h, $src_w, $src_h)
 {
@@ -551,8 +567,8 @@ if (!function_exists('imagecreatefrombmp'))
 	 * obtained from the given filename.
 	 *
 	 * @package Graphics
-	 * @param string $filename
-	 * @return resource
+	 * @param string $filename The name of the file
+	 * @return resource An image identifier representing the bitmap image
 	 */
 	function imagecreatefrombmp($filename)
 	{
@@ -565,7 +581,7 @@ if (!function_exists('imagecreatefrombmp'))
 		// Unpack the general information about the Bitmap Image File, first 14 Bytes
 		$header = unpack('vtype/Vsize/Vreserved/Voffset', fread($fp, 14));
 
-		// Upack the DIB header, it stores detailed information about the bitmap image the pixel format, 40 Bytes long
+		// Unpack the DIB header, it stores detailed information about the bitmap image the pixel format, 40 Bytes long
 		$info = unpack('Vsize/Vwidth/Vheight/vplanes/vbits/Vcompression/Vimagesize/Vxres/Vyres/Vncolor/Vcolorimportant', fread($fp, 40));
 
 		// Not a standard bitmap, bail out
@@ -579,6 +595,7 @@ if (!function_exists('imagecreatefrombmp'))
 			$dst_img = imagecreate($info['width'], $info['height']);
 
 		// Color bitCounts 1,4,8 have palette information we use
+		$palette = array();
 		if ($info['bits'] == 1 || $info['bits'] == 4 || $info['bits'] == 8)
 		{
 			$palette_size = $header['offset'] - 54;
@@ -587,7 +604,6 @@ if (!function_exists('imagecreatefrombmp'))
 			$palettedata = fread($fp, $palette_size);
 
 			// Create the rgb color array
-			$palette = array();
 			$n = 0;
 			for ($j = 0; $j < $palette_size; $j++)
 			{
@@ -740,8 +756,9 @@ if (!function_exists('imagecreatefrombmp'))
  * - Outputs a png if possible, otherwise a gif.
  *
  * @package Graphics
- * @param string $code
- * @return false|null if something goes wrong.
+ * @param string $code The code to display
+ *
+ * @return false|null false if something goes wrong.
  */
 function showCodeImage($code)
 {
@@ -784,7 +801,7 @@ function showCodeImage($code)
 	// Give the image a border?
 	$hasBorder = $simpleBGColor;
 
-	// The amount of pixels inbetween characters.
+	// The amount of pixels in between characters.
 	$character_spacing = 1;
 
 	// What color is the background - generally white unless we're on "hard".
@@ -903,7 +920,7 @@ function showCodeImage($code)
 		$dotbgcolor[$i] = $background_color[$i] < $foreground_color[$i] ? mt_rand(0, max($foreground_color[$i] - 20, 0)) : mt_rand(min($foreground_color[$i] + 20, 255), 255);
 	$randomness_color = imagecolorallocate($code_image, $dotbgcolor[0], $dotbgcolor[1], $dotbgcolor[2]);
 
-	// Some squares/rectanges for new extreme level
+	// Some squares/rectangles for new extreme level
 	if ($noiseType == 'extreme')
 	{
 		for ($i = 0; $i < rand(1, 5); $i++)
@@ -1088,7 +1105,9 @@ function showCodeImage($code)
  * - Includes an image from a random sub directory of default_theme_dir/fonts.
  *
  * @package Graphics
- * @param string $letter
+ * @param string $letter A letter to show as an image
+ *
+ * @return false|null false if something goes wrong.
  */
 function showLetterImage($letter)
 {

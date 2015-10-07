@@ -52,7 +52,7 @@ template_ssi_above();
 <h2>Additional Guides &amp; FAQ</h2>
 <p>Need more information on using SSI.php? Check out <a href="https://github.com/elkarte/Elkarte/wiki/SSI">Using SSI.php article</a> or <a href="http://www.elkarte.net/index.php">ask on the forum</a>.</p>
 
-<div id="sidenav" class="windowbg">
+<div id="sidenav" class="content">
 	<div class="content">
 		<h2 id="functionlist">Function List</h2>
 		<h3>Recent Items</h3>
@@ -140,7 +140,7 @@ template_ssi_above();
 	</div>
 </div>
 
-<div id="preview" class="windowbg2">
+<div id="preview" class="content">
 	<div class="content">
 
 		<!-- RECENT ITEMS -->

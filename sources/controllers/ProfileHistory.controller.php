@@ -171,7 +171,6 @@ class ProfileHistory_Controller extends Action_Controller
 				array(
 					'position' => 'after_title',
 					'value' => $txt['errors_desc'],
-					'class' => 'windowbg2',
 					'style' => 'padding: 1ex 2ex;',
 				),
 			),
@@ -290,8 +289,8 @@ class ProfileHistory_Controller extends Action_Controller
 						),
 					),
 					'sort' => array(
-						'default' => 'INET_ATON(m.poster_ip)',
-						'reverse' => 'INET_ATON(m.poster_ip) DESC',
+						'default' => 'm.poster_ip',
+						'reverse' => 'm.poster_ip DESC',
 					),
 				),
 				'poster' => array(
@@ -334,7 +333,6 @@ class ProfileHistory_Controller extends Action_Controller
 				array(
 					'position' => 'after_title',
 					'value' => $txt['messages_from_ip_desc'],
-					'class' => 'windowbg2',
 					'style' => 'padding: 1ex 2ex;',
 				),
 			),
@@ -380,8 +378,8 @@ class ProfileHistory_Controller extends Action_Controller
 						),
 					),
 					'sort' => array(
-						'default' => 'INET_ATON(le.ip)',
-						'reverse' => 'INET_ATON(le.ip) DESC',
+						'default' => 'le.ip',
+						'reverse' => 'le.ip DESC',
 					),
 				),
 				'display_name' => array(
@@ -423,7 +421,6 @@ class ProfileHistory_Controller extends Action_Controller
 				array(
 					'position' => 'after_title',
 					'value' => $txt['errors_from_ip_desc'],
-					'class' => 'windowbg2',
 					'style' => 'padding: 1ex 2ex;',
 				),
 			),
@@ -528,7 +525,6 @@ class ProfileHistory_Controller extends Action_Controller
 				array(
 					'position' => 'after_title',
 					'value' => $txt['trackLogins_desc'],
-					'class' => 'windowbg2',
 					'style' => 'padding: 1ex 2ex;',
 				),
 			),

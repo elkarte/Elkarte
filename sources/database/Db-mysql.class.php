@@ -749,7 +749,7 @@ class Database_MySQL extends Database_Abstract
 	/**
 	 * Returns whether the database system supports ignore.
 	 *
-	 * @return true
+	 * @return boolean
 	 */
 	public function support_ignore()
 	{

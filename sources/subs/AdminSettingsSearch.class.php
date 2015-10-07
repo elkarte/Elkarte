@@ -64,7 +64,7 @@ class AdminSettings_Search
 	 * Initialize the search populating the array to search in
 	 *
 	 * @param string $menu_name - The name of the menu to look into
-	 * @param string[] $additional_settings - Possible additional settings
+	 * @param array $additional_settings - Possible additional settings
 	 *                 (see _load_settings for the array structure)
 	 */
 	public function initSearch($menu_name, $additional_settings = array())

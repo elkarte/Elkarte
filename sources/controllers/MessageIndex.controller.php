@@ -18,14 +18,100 @@
  *
  */
 
+use ElkArte\sources\Frontpage_Interface;
+
 if (!defined('ELK'))
 	die('No access...');
 
 /**
  * Message Index Controller
  */
-class MessageIndex_Controller extends Action_Controller
+class MessageIndex_Controller extends Action_Controller implements Frontpage_Interface
 {
+	/**
+	 * {@inheritdoc}
+	 */
+	public static function frontPageHook(&$default_action)
+	{
+		$default_action = array(
+			'controller' => 'MessageIndex_Controller',
+			'function' => 'action_messageindex_fp'
+		);
+	}
+
+	/**
+	 * {@inheritdoc}
+	 */
+	public static function frontPageOptions()
+	{
+		addInlineJavascript('
+			$(\'#front_page\').on(\'change\', function() {
+				var $base = $(\'#message_index_frontpage\').parent();
+				if ($(this).val() == \'MessageIndex_Controller\')
+				{
+					$base.fadeIn();
+					$base.prev().fadeIn();
+				}
+				else
+				{
+					$base.fadeOut();
+					$base.prev().fadeOut();
+				}
+			}).change();', true);
+
+		return array(array('select', 'message_index_frontpage', self::_getBoardsList()));
+	}
+
+	/**
+	 * {@inheritdoc}
+	 */
+	public static function validateFrontPageOptions($post)
+	{
+		$boards = self::_getBoardsList();
+
+		if (empty($post->message_index_frontpage) || !isset($boards[$post->message_index_frontpage]))
+		{
+			$post->front_page = null;
+
+			return false;
+		}
+
+		return true;
+	}
+
+	/**
+	 * Return the board listing for use in this class
+	 *
+	 * @uses getBoardList()
+	 * @return string[] list of boards with key = id and value = cat + name
+	 */
+	protected static function _getBoardsList()
+	{
+		// Load the boards list.
+		require_once(SUBSDIR . '/Boards.subs.php');
+		$boards_list = getBoardList(array('override_permissions' => true, 'not_redirection' => true), true);
+
+		$boards = array();
+		foreach ($boards_list as $board)
+			$boards[$board['id_board']] = $board['cat_name'] . ' - ' . $board['board_name'];
+
+		return $boards;
+	}
+
+	/**
+	 * Holds instance of HttpReq object
+	 * @var HttpReq
+	 */
+	private $_req;
+
+	/**
+	 * Pre Dispatch, called before other methods.  Loads HttpReq instance.
+	 */
+	public function pre_dispatch()
+	{
+		$this->_req = HttpReq::instance();
+	}
+
 	/**
 	 * Dispatches forward to message index handler.
 	 *
@@ -39,7 +125,23 @@ class MessageIndex_Controller extends Action_Controller
 
 	/**
 	 * Show the list of topics in this board, along with any sub-boards.
-	 * @uses MessageIndex template topic_listing sub template
+	 *
+	 * @uses template_topic_listing() sub template of the MessageIndex template
+	 */
+	public function action_messageindex_fp()
+	{
+		global $modSettings, $board;
+
+		$board = $modSettings['message_index_frontpage'];
+		loadBoard();
+
+		$this->action_messageindex();
+	}
+
+	/**
+	 * Show the list of topics in this board, along with any sub-boards.
+	 *
+	 * @uses template_topic_listing() sub template of the MessageIndex template
 	 */
 	public function action_messageindex()
 	{
@@ -70,21 +172,21 @@ class MessageIndex_Controller extends Action_Controller
 		// View all the topics, or just a few?
 		$context['topics_per_page'] = empty($modSettings['disableCustomPerPage']) && !empty($options['topics_per_page']) ? $options['topics_per_page'] : $modSettings['defaultMaxTopics'];
 		$context['messages_per_page'] = empty($modSettings['disableCustomPerPage']) && !empty($options['messages_per_page']) ? $options['messages_per_page'] : $modSettings['defaultMaxMessages'];
-		$maxindex = isset($_REQUEST['all']) && !empty($modSettings['enableAllMessages']) ? $board_info['total_topics'] : $context['topics_per_page'];
+		$maxindex = isset($this->_req->query->all) && !empty($modSettings['enableAllMessages']) ? $board_info['total_topics'] : $context['topics_per_page'];
 
 		// Right, let's only index normal stuff!
-		if (count($_GET) > 1)
+		$session_name = session_name();
+		foreach ($this->_req->query as $k => $v)
 		{
-			$session_name = session_name();
-			foreach ($_GET as $k => $v)
-			{
-				if (!in_array($k, array('board', 'start', $session_name)))
-					$context['robot_no_index'] = true;
-			}
+			// Don't index a sort result etc.
+			if (!in_array($k, array('board', 'start', $session_name)))
+				$context['robot_no_index'] = true;
 		}
 
-		if (!empty($_REQUEST['start']) && (!is_numeric($_REQUEST['start']) || $_REQUEST['start'] % $context['messages_per_page'] != 0))
+		if (!empty($this->_req->query->start) && (!is_numeric($this->_req->query->start) || $this->_req->query->start % $context['messages_per_page'] != 0))
+		{
 			$context['robot_no_index'] = true;
+		}
 
 		// If we can view unapproved messages and there are some build up a list.
 		if (allowedTo('approve_posts') && ($board_info['unapproved_topics'] || $board_info['unapproved_posts']))
@@ -95,35 +197,35 @@ class MessageIndex_Controller extends Action_Controller
 		}
 
 		// We only know these.
-		if (isset($_REQUEST['sort']) && !in_array($_REQUEST['sort'], array('subject', 'starter', 'last_poster', 'replies', 'views', 'likes', 'first_post', 'last_post')))
-			$_REQUEST['sort'] = 'last_post';
+		if (isset($this->_req->query->sort) && !in_array($this->_req->query->sort, array('subject', 'starter', 'last_poster', 'replies', 'views', 'likes', 'first_post', 'last_post')))
+			$this->_req->query->sort = 'last_post';
 
 		// Make sure the starting place makes sense and construct the page index.
-		if (isset($_REQUEST['sort']))
-			$sort_string = ';sort=' . $_REQUEST['sort'] . (isset($_REQUEST['desc']) ? ';desc' : '');
+		if (isset($this->_req->query->sort))
+			$sort_string = ';sort=' . $this->_req->query->sort . (isset($this->_req->query->desc) ? ';desc' : '');
 		else
 			$sort_string = '';
-		$context['page_index'] = constructPageIndex($scripturl . '?board=' . $board . '.%1$d' . $sort_string, $_REQUEST['start'], $board_info['total_topics'], $maxindex, true);
+		$context['page_index'] = constructPageIndex($scripturl . '?board=' . $board . '.%1$d' . $sort_string, $this->_req->query->start, $board_info['total_topics'], $maxindex, true);
 
-		$context['start'] = &$_REQUEST['start'];
+		$context['start'] = &$this->_req->query->start;
 
 		// Set a canonical URL for this page.
 		$context['canonical_url'] = $scripturl . '?board=' . $board . '.' . $context['start'];
 
 		$context['links'] += array(
-			'prev' => $_REQUEST['start'] >= $context['topics_per_page'] ? $scripturl . '?board=' . $board . '.' . ($_REQUEST['start'] - $context['topics_per_page']) : '',
-			'next' => $_REQUEST['start'] + $context['topics_per_page'] < $board_info['total_topics'] ? $scripturl . '?board=' . $board . '.' . ($_REQUEST['start'] + $context['topics_per_page']) : '',
+			'prev' => $this->_req->query->start >= $context['topics_per_page'] ? $scripturl . '?board=' . $board . '.' . ($this->_req->query->start - $context['topics_per_page']) : '',
+			'next' => $this->_req->query->start + $context['topics_per_page'] < $board_info['total_topics'] ? $scripturl . '?board=' . $board . '.' . ($this->_req->query->start + $context['topics_per_page']) : '',
 		);
 
 		$context['page_info'] = array(
-			'current_page' => $_REQUEST['start'] / $context['topics_per_page'] + 1,
+			'current_page' => $this->_req->query->start / $context['topics_per_page'] + 1,
 			'num_pages' => floor(($board_info['total_topics'] - 1) / $context['topics_per_page']) + 1
 		);
 
-		if (isset($_REQUEST['all']) && !empty($modSettings['enableAllMessages']) && $maxindex > $modSettings['enableAllMessages'])
+		if (isset($this->_req->query->all) && !empty($modSettings['enableAllMessages']) && $maxindex > $modSettings['enableAllMessages'])
 		{
 			$maxindex = $modSettings['enableAllMessages'];
-			$_REQUEST['start'] = 0;
+			$this->_req->query->start = 0;
 		}
 
 		// Build a list of the board's moderators.
@@ -206,17 +308,18 @@ class MessageIndex_Controller extends Action_Controller
 		$sort_methods = messageIndexSort();
 
 		// They didn't pick one, default to by last post descending.
-		if (!isset($_REQUEST['sort']) || !isset($sort_methods[$_REQUEST['sort']]))
+		if (!isset($this->_req->query->sort) || !isset($sort_methods[$this->_req->query->sort]))
 		{
 			$context['sort_by'] = 'last_post';
-			$ascending = isset($_REQUEST['asc']);
+			$ascending = isset($this->_req->query->asc);
 		}
-		// Otherwise default to ascending.
+		// Otherwise sort by user selection and default to ascending.
 		else
 		{
-			$context['sort_by'] = $_REQUEST['sort'];
-			$ascending = !isset($_REQUEST['desc']);
+			$context['sort_by'] = $this->_req->query->sort;
+			$ascending = !isset($this->_req->query->desc);
 		}
+
 		$sort_column = $sort_methods[$context['sort_by']];
 
 		$context['sort_direction'] = $ascending ? 'up' : 'down';
@@ -227,12 +330,12 @@ class MessageIndex_Controller extends Action_Controller
 
 		foreach ($sort_methods as $key => $val)
 			$context['topics_headers'][$key] = array(
-				'url' => $scripturl . '?board=' . $context['current_board'] . '.' . $context['start'] . ';sort=' . $key . ($context['sort_by'] == $key && $context['sort_direction'] == 'up' ? ';desc' : ''),
+				'url' => $scripturl . '?board=' . $context['current_board'] . '.' . $context['start'] . ';sort=' . $key . ($context['sort_by'] == $key && $context['sort_direction'] === 'up' ? ';desc' : ''),
 				'sort_dir_img' => $context['sort_by'] == $key ? '<img class="sort" src="' . $settings['images_url'] . '/sort_' . $context['sort_direction'] . '.png" alt="" title="' . $context['sort_title'] . '" />' : '',
 			);
 
 		// Calculate the fastest way to get the topics.
-		$start = (int) $_REQUEST['start'];
+		$start = (int) $this->_req->query->start;
 		if ($start > ($board_info['total_topics'] - 1) / 2)
 		{
 			$ascending = !$ascending;
@@ -259,7 +362,7 @@ class MessageIndex_Controller extends Action_Controller
 
 		$topics_info = messageIndexTopics($board, $user_info['id'], $start, $maxindex, $context['sort_by'], $sort_column, $indexOptions);
 
-		$context['topics'] = Topic_Util::prepareContext($topics_info);
+		$context['topics'] = Topic_Util::prepareContext($topics_info, false, !empty($modSettings['preview_characters']) ? $modSettings['preview_characters'] : 128);
 
 		// Allow addons to add to the $context['topics']
 		call_integration_hook('integrate_messageindex_listing', array($topics_info));
@@ -358,6 +461,7 @@ class MessageIndex_Controller extends Action_Controller
 
 	/**
 	 * Allows for moderation from the message index.
+	 *
 	 * @todo refactor this...
 	 */
 	public function action_quickmod()
@@ -368,8 +472,8 @@ class MessageIndex_Controller extends Action_Controller
 		checkSession('request');
 
 		// Lets go straight to the restore area.
-		if (isset($_REQUEST['qaction']) && $_REQUEST['qaction'] == 'restore' && !empty($_REQUEST['topics']))
-			redirectexit('action=restoretopic;topics=' . implode(',', $_REQUEST['topics']) . ';' . $context['session_var'] . '=' . $context['session_id']);
+		if ($this->_req->getPost('qaction') === 'restore' && !empty($this->_req->post->topics))
+			redirectexit('action=restoretopic;topics=' . implode(',', $this->_req->post->topics) . ';' . $context['session_var'] . '=' . $context['session_id']);
 
 		if (isset($_SESSION['topicseen_cache']))
 			$_SESSION['topicseen_cache'] = array();
@@ -382,18 +486,19 @@ class MessageIndex_Controller extends Action_Controller
 		require_once(SUBSDIR . '/Topic.subs.php');
 
 		// Remember the last board they moved things to.
-		if (isset($_REQUEST['move_to']))
+		if (isset($this->_req->post->move_to))
 		{
 			$_SESSION['move_to_topic'] = array(
-				'move_to' => $_REQUEST['move_to'],
+				'move_to' => $this->_req->post->move_to,
 				// And remember the last expiry period too.
-				'redirect_topic' => !empty($_REQUEST['redirect_topic']) ? (int) $_REQUEST['redirect_topic'] : 0,
-				'redirect_expires' => !empty($_REQUEST['redirect_expires']) ? (int) $_REQUEST['redirect_expires'] : 0,
+				'redirect_topic' => $this->_req->getPost('redirect_topic', 'intval', 0),
+				'redirect_expires' => $this->_req->getPost('redirect_expires', 'intval', 0),
 			);
 		}
 
 		// Only a few possible actions.
 		$possibleActions = array();
+		$actions = array();
 
 		if (!empty($board))
 		{
@@ -409,12 +514,12 @@ class MessageIndex_Controller extends Action_Controller
 				'approve_posts' => allowedTo('approve_posts') ? array($board) : array(),
 			);
 
-			$redirect_url = 'board=' . $board . '.' . $_REQUEST['start'];
+			$redirect_url = 'board=' . $board . '.' . $this->_req->query->start;
 		}
 		else
 		{
 			$boards_can = boardsAllowedTo(array('make_sticky', 'move_any', 'move_own', 'remove_any', 'remove_own', 'lock_any', 'lock_own', 'merge_any', 'approve_posts'), true, false);
-			$redirect_url = isset($_POST['redirect_url']) ? $_POST['redirect_url'] : (isset($_SESSION['old_url']) ? $_SESSION['old_url'] : '');
+			$redirect_url = isset($this->_req->post->redirect_url) ? $this->_req->post->redirect_url : (isset($_SESSION['old_url']) ? $_SESSION['old_url'] : '');
 		}
 
 		if (!$user_info['is_guest'])
@@ -430,38 +535,38 @@ class MessageIndex_Controller extends Action_Controller
 		if (!empty($boards_can['merge_any']))
 			$possibleActions[] = 'merge';
 
-		// Two methods: $_REQUEST['actions'] (id_topic => action), and $_REQUEST['topics'] and $_REQUEST['qaction'].
+		// Two methods: $_REQUEST['actions'] (id_topic => action), and $_REQUEST['topics'] and $this->_req->post->qaction.
 		// (if action is 'move', $_REQUEST['move_to'] or $_REQUEST['move_tos'][$topic] is used.)
-		if (!empty($_REQUEST['topics']))
+		if (!empty($this->_req->post->topics))
 		{
 			// If the action isn't valid, just quit now.
-			if (empty($_REQUEST['qaction']) || !in_array($_REQUEST['qaction'], $possibleActions))
+			if (empty($this->_req->post->qaction) || !in_array($this->_req->post->qaction, $possibleActions))
 				redirectexit($redirect_url);
 
 			// Merge requires all topics as one parameter and can be done at once.
-			if ($_REQUEST['qaction'] == 'merge')
+			if ($this->_req->post->qaction === 'merge')
 			{
 				// Merge requires at least two topics.
-				if (empty($_REQUEST['topics']) || count($_REQUEST['topics']) < 2)
+				if (empty($this->_req->post->topics) || count($this->_req->post->topics) < 2)
 					redirectexit($redirect_url);
 
 				$controller = new MergeTopics_Controller(new Event_Manager());
 				$controller->pre_dispatch();
-				return $controller->action_mergeExecute($_REQUEST['topics']);
+				return $controller->action_mergeExecute($this->_req->post->topics);
 			}
 
 			// Just convert to the other method, to make it easier.
-			foreach ($_REQUEST['topics'] as $topic)
-				$_REQUEST['actions'][(int) $topic] = $_REQUEST['qaction'];
+			foreach ($this->_req->post->topics as $topic)
+				$actions[(int) $topic] = $this->_req->post->qaction;
 		}
 
 		// Weird... how'd you get here?
-		if (empty($_REQUEST['actions']))
+		if (empty($actions))
 			redirectexit($redirect_url);
 
 		// Validate each action.
 		$all_actions = array();
-		foreach ($_REQUEST['actions'] as $topic => $action)
+		foreach ($actions as $topic => $action)
 		{
 			if (in_array($action, $possibleActions))
 				$all_actions[(int) $topic] = $action;
@@ -491,13 +596,13 @@ class MessageIndex_Controller extends Action_Controller
 					if ($modSettings['postmod_active'] && !$row['approved'] && !in_array(0, $boards_can['approve_posts']) && !in_array($row['id_board'], $boards_can['approve_posts']))
 						continue;
 					// Goodness, this is fun.  We need to validate the action.
-					elseif ($all_actions[$row['id_topic']] == 'sticky' && !in_array(0, $boards_can['make_sticky']) && !in_array($row['id_board'], $boards_can['make_sticky']))
+					elseif ($all_actions[$row['id_topic']] === 'sticky' && !in_array(0, $boards_can['make_sticky']) && !in_array($row['id_board'], $boards_can['make_sticky']))
 						continue;
-					elseif ($all_actions[$row['id_topic']] == 'move' && !in_array(0, $boards_can['move_any']) && !in_array($row['id_board'], $boards_can['move_any']) && ($row['id_member_started'] != $user_info['id'] || (!in_array(0, $boards_can['move_own']) && !in_array($row['id_board'], $boards_can['move_own']))))
+					elseif ($all_actions[$row['id_topic']] === 'move' && !in_array(0, $boards_can['move_any']) && !in_array($row['id_board'], $boards_can['move_any']) && ($row['id_member_started'] != $user_info['id'] || (!in_array(0, $boards_can['move_own']) && !in_array($row['id_board'], $boards_can['move_own']))))
 						continue;
-					elseif ($all_actions[$row['id_topic']] == 'remove' && !in_array(0, $boards_can['remove_any']) && !in_array($row['id_board'], $boards_can['remove_any']) && ($row['id_member_started'] != $user_info['id'] || (!in_array(0, $boards_can['remove_own']) && !in_array($row['id_board'], $boards_can['remove_own']))))
+					elseif ($all_actions[$row['id_topic']] === 'remove' && !in_array(0, $boards_can['remove_any']) && !in_array($row['id_board'], $boards_can['remove_any']) && ($row['id_member_started'] != $user_info['id'] || (!in_array(0, $boards_can['remove_own']) && !in_array($row['id_board'], $boards_can['remove_own']))))
 						continue;
-					elseif ($all_actions[$row['id_topic']] == 'lock' && !in_array(0, $boards_can['lock_any']) && !in_array($row['id_board'], $boards_can['lock_any']) && ($row['id_member_started'] != $user_info['id'] || $row['locked'] == 1 || (!in_array(0, $boards_can['lock_own']) && !in_array($row['id_board'], $boards_can['lock_own']))))
+					elseif ($all_actions[$row['id_topic']] === 'lock' && !in_array(0, $boards_can['lock_any']) && !in_array($row['id_board'], $boards_can['lock_any']) && ($row['id_member_started'] != $user_info['id'] || $row['locked'] == 1 || (!in_array(0, $boards_can['lock_own']) && !in_array($row['id_board'], $boards_can['lock_own']))))
 						continue;
 				}
 
@@ -511,11 +616,11 @@ class MessageIndex_Controller extends Action_Controller
 						$stickyCache[] = $row['id_topic'];
 						break;
 					case 'move':
-						if (isset($_GET['current_board']))
-							moveTopicConcurrence((int) $_GET['current_board']);
+						if (isset($this->_req->query->current_board))
+							moveTopicConcurrence((int) $this->_req->query->current_board);
 
 						// $moveCache[0] is the topic, $moveCache[1] is the board to move to.
-						$moveCache[1][$row['id_topic']] = (int) (isset($_REQUEST['move_tos'][$row['id_topic']]) ? $_REQUEST['move_tos'][$row['id_topic']] : $_REQUEST['move_to']);
+						$moveCache[1][$row['id_topic']] = (int) (isset($this->_req->post->move_tos[$row['id_topic']]) ? $this->_req->post->move_tos[$row['id_topic']] : $this->_req->post->move_to);
 
 						if (empty($moveCache[1][$row['id_topic']]))
 							continue;

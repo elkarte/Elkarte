@@ -30,6 +30,7 @@ const ELK = '1';
 // Shortcut for the browser cache stale
 const CACHE_STALE = '?R11';
 
+
 // Report errors but not depreciated ones
 error_reporting(E_ALL | E_STRICT & ~8192);
 
@@ -50,12 +51,29 @@ foreach (array('db_character_set', 'cachedir') as $variable)
 	if (isset($GLOBALS[$variable]))
 		unset($GLOBALS[$variable], $GLOBALS[$variable]);
 
+// Where the Settings.php file is located
+$settings_loc = __DIR__ . '/Settings.php';
+
 // First thing: if the install dir exists, just send anybody there
 if (file_exists(__DIR__ . '/install'))
-	header('Location: http' . (!empty($_SERVER['HTTPS']) && strtolower($_SERVER['HTTPS']) == 'on' ? 's' : '') . '://' . (empty($_SERVER['HTTP_HOST']) ? $_SERVER['SERVER_NAME'] . (empty($_SERVER['SERVER_PORT']) || $_SERVER['SERVER_PORT'] == '80' ? '' : ':' . $_SERVER['SERVER_PORT']) : $_SERVER['HTTP_HOST']) . (strtr(dirname($_SERVER['PHP_SELF']), '\\', '/') == '/' ? '' : strtr(dirname($_SERVER['PHP_SELF']), '\\', '/')) . '/install/install.php');
+{
+	if (file_exists($settings_loc))
+	{
+		require_once($settings_loc);
+	}
 
-// Get the forum's settings for database and file paths.
-require_once(__DIR__ . '/Settings.php');
+	// The ignore_install_dir var is for developers only. Do not add it on production sites
+	if (empty($ignore_install_dir))
+	{
+		header('Location: http' . (!empty($_SERVER['HTTPS']) && strtolower($_SERVER['HTTPS']) == 'on' ? 's' : '') . '://' . (empty($_SERVER['HTTP_HOST']) ? $_SERVER['SERVER_NAME'] . (empty($_SERVER['SERVER_PORT']) || $_SERVER['SERVER_PORT'] == '80' ? '' : ':' . $_SERVER['SERVER_PORT']) : $_SERVER['HTTP_HOST']) . (strtr(dirname($_SERVER['PHP_SELF']), '\\', '/') == '/' ? '' : strtr(dirname($_SERVER['PHP_SELF']), '\\', '/')) . '/install/install.php');
+		die;
+	}
+}
+else
+{
+	require_once($settings_loc);
+}
+
 
 // Make sure the paths are correct... at least try to fix them.
 if (!file_exists($boarddir) && file_exists(__DIR__ . '/agreement.txt'))
@@ -175,8 +193,10 @@ function elk_main()
 {
 	global $modSettings, $user_info, $topic, $board_info, $context;
 
+	$_req = HttpReq::instance();
+
 	// Special case: session keep-alive, output a transparent pixel.
-	if (isset($_GET['action']) && $_GET['action'] == 'keepalive')
+	if ($_req->getQuery('action') === 'keepalive')
 	{
 		header('Content-Type: image/gif');
 		die("\x47\x49\x46\x38\x39\x61\x01\x00\x01\x00\x80\x00\x00\x00\x00\x00\x00\x00\x00\x21\xF9\x04\x01\x00\x00\x00\x00\x2C\x00\x00\x00\x00\x01\x00\x01\x00\x00\x02\x02\x44\x01\x00\x3B");
@@ -199,7 +219,7 @@ function elk_main()
 	loadBadBehavior();
 
 	// Attachments don't require the entire theme to be loaded.
-	if (isset($_REQUEST['action']) && $_REQUEST['action'] == 'dlattach' && (!empty($modSettings['allow_guestAccess']) && $user_info['is_guest']))
+	if ($_req->getQuery('action') === 'dlattach' && (!empty($modSettings['allow_guestAccess']) && $user_info['is_guest']))
 		detectBrowser();
 	// Load the current theme.  (note that ?theme=1 will also work, may be used for guest theming.)
 	else

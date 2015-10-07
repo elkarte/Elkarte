@@ -58,7 +58,7 @@ function updateLogOnline($session_id, $serialized)
 		UPDATE {db_prefix}log_online
 		SET
 			log_time = {int:log_time},
-			ip = IFNULL(INET_ATON({string:ip}), 0),
+			ip = {string:ip},
 			url = {string:url}
 		WHERE session = {string:session}',
 		array(
@@ -100,10 +100,10 @@ function insertdeleteLogOnline($session_id, $serialized, $do_delete = false)
 	$db->insert($do_delete ? 'ignore' : 'replace',
 		'{db_prefix}log_online',
 		array(
-			'session' => 'string', 'id_member' => 'int', 'id_spider' => 'int', 'log_time' => 'int', 'ip' => 'raw', 'url' => 'string'
+			'session' => 'string', 'id_member' => 'int', 'id_spider' => 'int', 'log_time' => 'int', 'ip' => 'string', 'url' => 'string'
 		),
 		array(
-			$session_id, $user_info['id'], empty($_SESSION['id_robot']) ? 0 : $_SESSION['id_robot'], time(), 'IFNULL(INET_ATON(\'' . $user_info['ip'] . '\'), 0)', $serialized
+			$session_id, $user_info['id'], empty($_SESSION['id_robot']) ? 0 : $_SESSION['id_robot'], time(), $user_info['ip'], $serialized
 		),
 		array(
 			'session'
@@ -177,7 +177,7 @@ function logLoginHistory($id_member, $ip, $ip2)
  * @param string $msg_id
  * @param string $topic_id
  */
-function loadLogReported($msg_id, $topic_id)
+function loadLogReported($msg_id, $topic_id, $type = 'msg')
 {
 	$db = database();
 
@@ -185,10 +185,12 @@ function loadLogReported($msg_id, $topic_id)
 		SELECT id_report
 		FROM {db_prefix}log_reported
 		WHERE {raw:column_name} = {int:reported}
+			AND type = {string:type}
 		LIMIT 1',
 		array(
 			'column_name' => !empty($msg_id) ? 'id_msg' : 'id_topic',
 			'reported' => !empty($msg_id) ? $msg_id : $topic_id,
+			'type' => $type,
 		)
 	);
 	$num = $db->num_rows($request);

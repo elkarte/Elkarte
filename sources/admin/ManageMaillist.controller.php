@@ -179,7 +179,7 @@ class ManageMaillist_Controller extends Action_Controller
 						'function' => function($rowData) {
 							$error = $rowData['error_code'];
 							if ($error === 'error_pm_not_found')
-								return '<span class="errorbox">' . $rowData['error'] . '<span>';
+								return '<span class="error">' . $rowData['error'] . '<span>';
 							else
 								return $rowData['error'];
 						},
@@ -210,8 +210,8 @@ class ManageMaillist_Controller extends Action_Controller
 						'class' => 'wordbreak'
 					),
 					'sort' => array(
-						'default' => 'data_id',
-						'reverse' => 'data_id DESC',
+						'default' => 'message_key',
+						'reverse' => 'message_key DESC',
 					),
 				),
 				'message' => array(
@@ -307,7 +307,6 @@ class ManageMaillist_Controller extends Action_Controller
 				array(
 					'position' => 'top_of_list',
 					'value' => isset($this->_req->session->email_error) ? '<div class="' . (isset($this->_req->session->email_error_type) ? 'successbox' : 'errorbox') . '">' . $this->_req->session->email_error . '</div>' : $txt['heading'],
-					'class' => 'windowbg2',
 				),
 			),
 		);
@@ -711,14 +710,13 @@ class ManageMaillist_Controller extends Action_Controller
 				array(
 					'position' => isset($this->_req->query->saved) ? 'top_of_list' : 'after_title',
 					'value' => isset($this->_req->query->saved) ? '<div class="successbox">' . $txt['saved'] . '</div>' : $txt['filters_title'],
-					'class' => 'windowbg2',
 				),
 				array(
 					'position' => 'below_table_data',
 					'class' => 'submitbutton',
-					'value' => '<input type="submit" name="addfilter" value="' . $txt['add_filter'] . '" class="right_submit" />
+					'value' => '<input type="submit" name="addfilter" value="' . $txt['add_filter'] . '" />
 						<a class="linkbutton" href="' . $scripturl . '?action=admin;area=maillist;sa=sortfilters">' . $txt['sort_filter'] . '</a>',
-					),
+				),
 			),
 		);
 
@@ -767,11 +765,11 @@ class ManageMaillist_Controller extends Action_Controller
 				'filterorder' => array(
 					'header' => array(
 						'value' => '',
-						'style' => 'display: none',
+						'class' => 'hide',
 					),
 					'data' => array(
 						'db' => 'filter_order',
-						'style' => 'display: none',
+						'class' => 'hide',
 					),
 				),
 				'name' => array(
@@ -819,7 +817,6 @@ class ManageMaillist_Controller extends Action_Controller
 				array(
 					'position' => 'after_title',
 					'value' => $txt['filter_sort_description'],
-					'class' => 'windowbg',
 				),
 			),
 			'javascript' => '
@@ -985,7 +982,8 @@ class ManageMaillist_Controller extends Action_Controller
 
 		// Load and show
 		Email_Settings::prepare_db($config_vars);
-		loadTemplate('Admin', 'admin');
+		loadTemplate('Admin');
+		loadCSSFile('admin.css');
 		$context['sub_template'] = 'show_settings';
 	}
 
@@ -1140,7 +1138,6 @@ class ManageMaillist_Controller extends Action_Controller
 				array(
 					'position' => isset($this->_req->query->saved) ? 'top_of_list' : 'after_title',
 					'value' => isset($this->_req->query->saved) ? '<div class="successbox">' . $txt['saved'] . '</div>' : $txt['parsers_title'],
-					'class' => 'windowbg2',
 				),
 				array(
 					'position' => 'below_table_data',
@@ -1198,11 +1195,11 @@ class ManageMaillist_Controller extends Action_Controller
 				'filterorder' => array(
 					'header' => array(
 						'value' => '',
-						'style' => 'display: none',
+						'class' => 'hide',
 					),
 					'data' => array(
 						'db' => 'filter_order',
-						'style' => 'display: none',
+						'class' => 'hide',
 					),
 				),
 				'name' => array(
@@ -1241,7 +1238,6 @@ class ManageMaillist_Controller extends Action_Controller
 				array(
 					'position' => 'after_title',
 					'value' => $txt['parser_sort_description'],
-					'class' => 'windowbg',
 				),
 			),
 			'javascript' => '
@@ -1376,7 +1372,8 @@ class ManageMaillist_Controller extends Action_Controller
 
 		// prep it, load it, show it
 		Email_Settings::prepare_db($config_vars);
-		loadTemplate('Admin', 'admin');
+		loadTemplate('Admin');
+		loadCSSFile('admin.css');
 		$context['sub_template'] = 'show_settings';
 	}
 
@@ -1438,7 +1435,8 @@ class ManageMaillist_Controller extends Action_Controller
 
 		// Templates and language
 		loadLanguage('Admin');
-		loadTemplate('Admin', 'admin');
+		loadTemplate('Admin');
+		loadCSSFile('admin.css');
 
 		// Load any existing email => board values used for new topic creation
 		$context['maillist_from_to_board'] = array();
@@ -1505,7 +1503,7 @@ class ManageMaillist_Controller extends Action_Controller
 						continue;
 					}
 
-					// Decipher as [0]emailaddress and [1]board id
+					// Decipher as [0] emailaddress and [1] board id
 					$maillist_receiving_address[] = array($checkme, $boardtocheck[$key]);
 				}
 			}
@@ -1549,7 +1547,7 @@ class ManageMaillist_Controller extends Action_Controller
 			oEmailOptionsdd = {size: \'1\', type: \'select\', name: \'boardto[]\', class: \'input_select\'},
 			oEmailSelectData = {' . $script . '};
 
-			document.getElementById(\'add_more_board_div\').style.display = \'\';', true
+			document.getElementById(\'add_more_board_div\').style.display = \'block\';', true
 		);
 
 		$context['boards'] = $board_list;
@@ -1561,7 +1559,7 @@ class ManageMaillist_Controller extends Action_Controller
 	}
 
 	/**
-	 * Initialize Mailist settings form.
+	 * Initialize Maillist settings form.
 	 */
 	private function _initMaillistSettingsForm()
 	{
@@ -1871,7 +1869,7 @@ class ManageMaillist_Controller extends Action_Controller
 				$context['warning_errors'] = array();
 				$context['template_data']['title'] = !empty($template_title) ? $template_title : '';
 				$context['template_data']['body'] = !empty($template_body) ? $template_body : $txt['ml_bounce_template_body_default'];
-				$context['template_data']['personal'] = !empty($recipient_id);
+				$context['template_data']['personal'] = !empty($this->_req->post->make_personal);
 
 				if (empty($template_title))
 					$context['warning_errors'][] = $txt['ml_bounce_template_error_no_title'];

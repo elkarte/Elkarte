@@ -1220,7 +1220,7 @@ class InstallInstructions_install_1_1
 				array('name' => 'log_time',  'type' => 'int', 'size' => 10, 'default' => 0),
 				array('name' => 'id_member', 'type' => 'mediumint', 'size' => 8, 'unsigned' => true, 'default' => 0),
 				array('name' => 'id_spider', 'type' => 'smallint', 'size' => 5, 'unsigned' => true, 'default' => 0),
-				array('name' => 'ip',        'type' => 'int', 'size' => 10, 'unsigned' => true, 'default' => 0),
+				array('name' => 'ip',        'type' => 'varchar', 'size' => 255, 'default' => ''),
 				array('name' => 'url',       'type' => 'text'),
 			),
 			array(
@@ -1285,12 +1285,14 @@ class InstallInstructions_install_1_1
 			array(
 				array('name' => 'id_report',    'type' => 'mediumint', 'size' => 8, 'unsigned' => true, 'auto' => true),
 				array('name' => 'id_msg',       'type' => 'int', 'size' => 10, 'unsigned' => true, 'default' => 0),
+				array('name' => 'type',         'type' => 'varchar', 'size' => 5, 'default' => ''),
 				array('name' => 'id_topic',     'type' => 'mediumint', 'size' => 8, 'unsigned' => true, 'default' => 0),
 				array('name' => 'id_board',     'type' => 'smallint', 'size' => 5, 'unsigned' => true, 'default' => 0),
 				array('name' => 'id_member',    'type' => 'mediumint', 'size' => 8, 'unsigned' => true, 'default' => 0),
 				array('name' => 'membername',   'type' => 'varchar', 'size' => 255, 'default' => ''),
 				array('name' => 'subject',      'type' => 'varchar', 'size' => 255, 'default' => ''),
 				array('name' => 'body',         'type' => 'mediumtext'),
+				array('name' => 'time_message', 'type' => 'int', 'size' => 10, 'default' => 0),
 				array('name' => 'time_started', 'type' => 'int', 'size' => 10, 'default' => 0),
 				array('name' => 'time_updated', 'type' => 'int', 'size' => 10, 'default' => 0),
 				array('name' => 'num_reports',  'type' => 'mediumint', 'size' => 6, 'default' => 0),
@@ -1303,7 +1305,7 @@ class InstallInstructions_install_1_1
 				array('name' => 'id_topic',     'columns' => array('id_topic'), 'type' => 'key'),
 				array('name' => 'closed',       'columns' => array('closed'), 'type' => 'key'),
 				array('name' => 'time_started', 'columns' => array('time_started'), 'type' => 'key'),
-				array('name' => 'id_msg',       'columns' => array('id_msg'), 'type' => 'key'),
+				array('name' => 'msg_type',     'columns' => array('type', 'id_msg'), 'type' => 'key'),
 			),
 			array(),
 			'ignore'
@@ -2133,12 +2135,14 @@ class InstallInstructions_install_1_1
 	{
 		return $this->table->db_create_table('{db_prefix}postby_emails',
 			array(
-				array('name' => 'id_email',  'type' => 'varchar', 'size' => 50, 'default' => ''),
-				array('name' => 'time_sent', 'type' => 'int', 'size' => 10, 'default' => 0),
-				array('name' => 'email_to',  'type' => 'varchar', 'size' => 50, 'default' => ''),
+				array('name' => 'message_key',  'type' => 'varchar', 'size' => 32, 'default' => ''),
+				array('name' => 'message_type', 'type' => 'varchar', 'size' => 10, 'default' => ''),
+				array('name' => 'message_id',   'type' => 'mediumint', 'size' => 8, 'default' => 0),
+				array('name' => 'time_sent',    'type' => 'int', 'size' => 10, 'default' => 0),
+				array('name' => 'email_to',     'type' => 'varchar', 'size' => 50, 'default' => ''),
 			),
 			array(
-				array('name' => 'id_email', 'columns' => array('id_email'), 'type' => 'primary'),
+				array('name' => 'id_email', 'columns' => array('message_key', 'message_type', 'message_id'), 'type' => 'primary'),
 			),
 			array(),
 			'ignore'
@@ -2151,9 +2155,9 @@ class InstallInstructions_install_1_1
 			array(
 				array('name' => 'id_email',     'type' => 'int', 'size' => 10, 'auto' => true),
 				array('name' => 'error',        'type' => 'varchar', 'size' => 255, 'default' => ''),
-				array('name' => 'data_id',      'type' => 'varchar', 'size' => 255, 'default' => 0),
+				array('name' => 'message_key',  'type' => 'varchar', 'size' => 32, 'default' => ''),
 				array('name' => 'subject',      'type' => 'varchar', 'size' => 255, 'default' => ''),
-				array('name' => 'id_message',   'type' => 'int', 'size' => 10, 'default' => 0),
+				array('name' => 'message_id',   'type' => 'int', 'size' => 10, 'default' => 0),
 				array('name' => 'id_board',     'type' => 'smallint', 'size' => 5, 'default' => 0),
 				array('name' => 'email_from',   'type' => 'varchar', 'size' => 50, 'default' => ''),
 				array('name' => 'message_type', 'type' => 'char', 'size' => 10, 'default' => ''),
@@ -2746,6 +2750,7 @@ class InstallInstructions_install_1_1
 				array('name' => 'locked',          'type' => 'tinyint', 'size' => 4, 'default' => 0),
 				array('name' => 'is_sticky',       'type' => 'tinyint', 'size' => 4, 'default' => 0),
 				array('name' => 'to_list',         'type' => 'varchar', 'size' => 255, 'default' => ''),
+				array('name' => 'is_usersaved',    'type' => 'tinyint', 'size' => 4, 'default' => 0),
 			),
 			array(
 				array('name' => 'id_draft',  'columns' => array('id_draft'), 'type' => 'primary'),

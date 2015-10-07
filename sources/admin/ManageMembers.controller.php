@@ -531,8 +531,8 @@ class ManageMembers_Controller extends Action_Controller
 						),
 					),
 					'sort' => array(
-						'default' => 'INET_ATON(member_ip)',
-						'reverse' => 'INET_ATON(member_ip) DESC',
+						'default' => 'member_ip',
+						'reverse' => 'member_ip DESC',
 					),
 				),
 				'last_active' => array(
@@ -847,12 +847,9 @@ class ManageMembers_Controller extends Action_Controller
 				<option selected="selected" value="">' . $txt['admin_browse_with_selected'] . ':</option>
 				<option value="" disabled="disabled">' . str_repeat('&#8212;', strlen($txt['admin_browse_with_selected'])) . '</option>';
 
-		// ie8 fonts don't have the glyph coverage we desire
-		$arrow = isBrowser('ie8') ? '&#187;&nbsp;' : '&#10148;&nbsp;';
-
 		foreach ($context['allowed_actions'] as $key => $desc)
 			$allowed_actions .= '
-				<option value="' . $key . '">' . $arrow . $desc . '</option>';
+				<option value="' . $key . '">' . '&#10148;&nbsp;' . $desc . '</option>';
 
 		// Setup the Javascript function for selecting an action for the list.
 		$javascript = '
@@ -969,8 +966,8 @@ class ManageMembers_Controller extends Action_Controller
 						),
 					),
 					'sort' => array(
-						'default' => 'INET_ATON(member_ip)',
-						'reverse' => 'INET_ATON(member_ip) DESC',
+						'default' => 'member_ip',
+						'reverse' => 'member_ip DESC',
 					),
 				),
 				'hostname' => array(
@@ -1053,15 +1050,16 @@ class ManageMembers_Controller extends Action_Controller
 				array(
 					'position' => 'below_table_data',
 					'value' => '
-						<a class="linkbutton" href="' . $scripturl . '?action=admin;area=viewmembers;sa=browse;showdupes=' . ($context['show_duplicates'] ? 0 : 1) . ';type=' . $context['browse_type'] . (!empty($context['show_filter']) ? ';filter=' . $context['current_filter'] : '') . ';' . $context['session_var'] . '=' . $context['session_id'] . '">' . ($context['show_duplicates'] ? $txt['dont_check_for_duplicate'] : $txt['check_for_duplicate']) . '</a>
-						<select name="todo" onchange="onSelectChange();">
-							' . $allowed_actions . '
-						</select>
-						<noscript>
-							<input type="submit" value="' . $txt['go'] . '" class="right_submit" /><br class="clear_right" />
-						</noscript>
+						<div class="submitbutton">
+							<a class="linkbutton" href="' . $scripturl . '?action=admin;area=viewmembers;sa=browse;showdupes=' . ($context['show_duplicates'] ? 0 : 1) . ';type=' . $context['browse_type'] . (!empty($context['show_filter']) ? ';filter=' . $context['current_filter'] : '') . ';' . $context['session_var'] . '=' . $context['session_id'] . '">' . ($context['show_duplicates'] ? $txt['dont_check_for_duplicate'] : $txt['check_for_duplicate']) . '</a>
+							<select name="todo" onchange="onSelectChange();">
+								' . $allowed_actions . '
+							</select>
+							<noscript>
+								<input type="submit" value="' . $txt['go'] . '" />
+							</noscript>
+						</div>
 					',
-					'class' => 'floatright',
 				),
 			),
 		);
@@ -1279,13 +1277,6 @@ class ManageMembers_Controller extends Action_Controller
 
 		// Approve / activate this member.
 		approveMembers($this->conditions);
-
-		// Do we have to let the integration code know about the activations?
-		if (!empty($modSettings['integrate_activate']))
-		{
-			foreach ($this->member_info as $member)
-				call_integration_hook('integrate_activate', array($member['username']));
-		}
 
 		// Check for email.
 		if ($this->_req->post->todo == 'okemail')

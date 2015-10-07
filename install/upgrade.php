@@ -413,6 +413,8 @@ function loadEssentialData()
 
 	@session_start();
 
+	definePaths();
+
 	// Initialize everything...
 	initialize_inputs();
 
@@ -425,7 +427,9 @@ function loadEssentialData()
 		require_once(SUBSDIR . '/Cache.subs.php');
 		require_once(SOURCEDIR . '/Security.php');
 		require_once(SOURCEDIR . '/Autoloader.class.php');
-		Elk_Autoloader::getInstance()->setupAutoloader(array(SOURCEDIR, SUBSDIR, CONTROLLERDIR, ADMINDIR));
+		$autoloder = Elk_Autoloader::getInstance();
+		$autoloder->setupAutoloader(array(SOURCEDIR, SUBSDIR, CONTROLLERDIR, ADMINDIR, ADDONSDIR));
+		$autoloder->register(SOURCEDIR, '\\ElkArte');
 		load_possible_databases($db_type);
 
 		$db = load_database();
@@ -548,8 +552,8 @@ function action_welcomeLogin()
 
 	// Do a quick version spot check.
 	$temp = substr(@implode('', @file(BOARDDIR . '/index.php')), 0, 4096);
-	preg_match('~\*\s@version\s+(.+)[\s]{2}~i', $temp, $match);
-	if (empty($match[1]) || trim(str_replace('Release Candidate', 'RC', $match[1])) != CURRENT_VERSION)
+	preg_match('~\*\s@version\s+(.+)~i', $temp, $match);
+	if (empty($match[1]) || compareVersions(trim(str_replace('Release Candidate', 'RC', $match[1])), CURRENT_VERSION) != 0)
 		return throw_error('The upgrader found some old or outdated files.<br /><br />Please make certain you uploaded the new versions of all the files included in the package.');
 
 	// What absolutely needs to be writable?
@@ -1250,10 +1254,8 @@ function action_deleteUpgrade()
 
 	$user_info['id'] = 0;
 
-	// Save the current database version.
-	$server_version = $db->db_server_info();
-	if ($db_type == 'mysql' && in_array(substr($server_version, 0, 6), array('5.0.50', '5.0.51')))
-		updateSettings(array('db_mysql_group_by_fix' => '1'));
+	// Drop old check for MySQL 5.0.50 and 5.0.51 bug.
+	removeSettings('db_mysql_group_by_fix');
 
 	// Set jquery to auto if its not already set
 	if (!isset($modSettings['jquery_source']))
@@ -1623,7 +1625,7 @@ Usage: /path/to/php -f ' . basename(__FILE__) . ' -- [OPTION]...
 
 	// Do a quick version spot check.
 	$temp = substr(@implode('', @file(BOARDDIR . '/index.php')), 0, 4096);
-	preg_match('~\*\s@version\s+(.+)[\s]{2}~i', $temp, $match);
+	preg_match('~\*\s@version\s+(.+)~i', $temp, $match);
 	if (empty($match[1]) || $match[1] != CURRENT_VERSION)
 		print_error('Error: Some files have not yet been updated properly.');
 

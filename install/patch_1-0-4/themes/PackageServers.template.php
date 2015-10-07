@@ -59,13 +59,13 @@ function template_servers()
 				<form action="' . $scripturl . '?action=admin;area=packageservers;sa=add" method="post" accept-charset="UTF-8">
 					<dl class="settings">
 						<dt>
-							<strong><label for="servername">' . $txt['server_name'] . '</label>:</strong>
+							<strong><label for="servername">' . $txt['server_name'] . ':</label>
 						</dt>
 						<dd>
 							<input type="text" id="servername" name="servername" size="44" value="ElkArte" class="input_text" />
 						</dd>
 						<dt>
-							<strong><label for="serverurl">' . $txt['serverurl'] . '</label>:</strong>
+							<strong><label for="serverurl">' . $txt['serverurl'] . ':</label>
 						</dt>
 						<dd>
 							<input type="text" id="serverurl" name="serverurl" size="44" value="http://" class="input_text" />
@@ -82,13 +82,13 @@ function template_servers()
 				<form action="', $scripturl, '?action=admin;area=packageservers;sa=download" method="post" accept-charset="UTF-8">
 					<dl class="settings">
 						<dt>
-							<strong><label for="package">' . $txt['serverurl'] . '</label>:</strong>
+							<strong><label for="package">' . $txt['serverurl'] . ':</label>
 						</dt>
 						<dd>
 							<input type="text" id="package" name="package" size="44" value="http://" class="input_text" />
 						</dd>
 						<dt>
-							<strong><label for="filename">', $txt['package_download_filename'], '</label>:</strong>
+							<strong><label for="filename">', $txt['package_download_filename'], ':</label>
 						</dt>
 						<dd>
 							<input type="text" id="filename" name="filename" size="44" class="input_text" /><br />
@@ -375,7 +375,7 @@ function template_upload()
 				<form action="' . $scripturl . '?action=admin;area=packageservers;sa=upload2" method="post" accept-charset="UTF-8" enctype="multipart/form-data" style="margin-bottom: 0;">
 					<dl class="settings">
 						<dt>
-							<strong><label for="package">' . $txt['package_upload_select'] . '</label>:</strong>
+							<strong><label for="package">' . $txt['package_upload_select'] . ':</label>
 						</dt>
 						<dd>
 							<input type="file" id="package" name="package" size="38" class="input_file" />

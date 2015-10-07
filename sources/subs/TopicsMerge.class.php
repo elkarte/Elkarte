@@ -20,6 +20,12 @@
 if (!defined('ELK'))
 	die('No access...');
 
+/**
+ * This class has functions to handle merging of two or more topics
+ * in to a single new or existing topic.
+ *
+ * Class TopicsMerge
+ */
 class TopicsMerge
 {
 	/**
@@ -108,25 +114,11 @@ class TopicsMerge
 	public function __construct($topics)
 	{
 		// Prepare the vars
-		$this->_topics = array();
 		$this->_db = database();
-		$this->_num_views = 0;
-		$this->_is_sticky = 0;
-		$this->_boardTotals = array();
-		$this->topic_data = array();
-		$this->boards = array();
-		$this->_polls = array();
-		$this->firstTopic = 0;
-		$this->firstBoard = 0;
-		$this->_errors = array();
 
-		// Ensure all the id are integers
-		foreach ($topics as $topic)
-		{
-			$topic = (int) $topic;
-			if (!empty($topic))
-				$this->_topics[] = $topic;
-		}
+		// Ensure all the id's are integers
+		$topics = array_map('intval', $topics);
+		$this->_topics = array_filter($topics);
 
 		// Find out some preliminary information
 		$this->_loadTopicDetails();
@@ -150,9 +142,15 @@ class TopicsMerge
 	public function firstError()
 	{
 		if (!empty($this->_errors))
-			return array_shift(array_values($this->_errors));
+		{
+			$errors = array_values($this->_errors);
+
+			return array_shift($errors);
+		}
 		else
+		{
 			return false;
+		}
 	}
 
 	/**
@@ -212,7 +210,7 @@ class TopicsMerge
 		if (!in_array($target_board, $details['accessible_boards']))
 		{
 			$this->_errors[] = array('no_board', true);
-			return;
+			return false;
 		}
 
 		// Determine which poll will survive and which polls won't.
@@ -220,7 +218,7 @@ class TopicsMerge
 		if ($target_poll > 0 && !in_array($target_poll, $this->_polls))
 		{
 			$this->_errors[] = array('no_access', false);
-			return;
+			return false;
 		}
 
 		$deleted_polls = empty($target_poll) ? $this->_polls : array_diff($this->_polls, array($target_poll));
@@ -449,9 +447,9 @@ class TopicsMerge
 			$this->_db->free_result($request);
 
 			$this->_errors[] = 'no_topic_id';
-			return;
-		}
 
+			return false;
+		}
 		while ($row = $this->_db->fetch_assoc($request))
 		{
 			// Make a note for the board counts...
@@ -515,10 +513,12 @@ class TopicsMerge
 		}
 		$this->_db->free_result($request);
 
-		$this->boards = array_values(array_unique($this->boards));
+		$this->boards = array_map('intval', array_values(array_unique($this->boards)));
 
 		// If we didn't get any topics then they've been messing with unapproved stuff.
 		if (empty($this->topic_data))
 			$this->_errors[] = 'no_topic_id';
+
+		return true;
 	}
 }

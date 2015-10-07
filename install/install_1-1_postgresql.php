@@ -181,9 +181,4 @@ class InstallInstructions_install_1_1_postgresql
 		$this->db->query('', '
 		CREATE OPERATOR != (PROCEDURE = bool_not_eq_int, LEFTARG = boolean, RIGHTARG = integer);');
 	}
-
-	public function fix_bigint()
-	{
-		$this->table->db_change_column('{db_prefix}log_online', 'ip', array('type' => 'bigint'));
-	}
 }

@@ -1305,7 +1305,9 @@ class Install_Controller
 		require_once(SUBSDIR . '/Auth.subs.php');
 		require_once(SUBSDIR . '/Util.class.php');
 		require_once(SOURCEDIR . '/Autoloader.class.php');
-		Elk_Autoloader::getInstance()->setupAutoloader(array(SOURCEDIR, SUBSDIR, CONTROLLERDIR, ADMINDIR));
+		$autoloder = Elk_Autoloader::getInstance();
+		$autoloder->setupAutoloader(array(SOURCEDIR, SUBSDIR, CONTROLLERDIR, ADMINDIR, ADDONSDIR));
+		$autoloder->register(SOURCEDIR, '\\ElkArte');
 
 		// Bring a warning over.
 		if (!empty($incontext['account_existed']))
@@ -1411,11 +1413,6 @@ class Install_Controller
 			$user_info['id'] = isset($incontext['member_id']) ? $incontext['member_id'] : 0;
 			logAction('install', array('version' => $forum_version), 'admin');
 		}
-
-		// Check if we need some stupid MySQL fix.
-		$server_version = $db->db_server_info();
-		if ($db_type == 'mysql' && in_array(substr($server_version, 0, 6), array('5.0.50', '5.0.51')))
-			updateSettings(array('db_mysql_group_by_fix' => '1'));
 
 		// Some final context for the template.
 		$incontext['dir_still_writable'] = is_writable(__DIR__) && substr(__FILE__, 1, 2) != ':\\';
@@ -1587,42 +1584,6 @@ function fixModSecurity()
 	}
 	else
 		return false;
-}
-
-function definePaths()
-{
-	global $boarddir, $cachedir, $extdir, $languagedir, $sourcedir;
-
-	// Make sure the paths are correct... at least try to fix them.
-	if (!file_exists($boarddir) && file_exists(TMP_BOARDDIR . '/agreement.txt'))
-		$boarddir = TMP_BOARDDIR;
-	if (!file_exists($sourcedir . '/SiteDispatcher.class.php') && file_exists($boarddir . '/sources'))
-		$sourcedir = $boarddir . '/sources';
-
-	// Check that directories which didn't exist in past releases are initialized.
-	if ((empty($cachedir) || !file_exists($cachedir)) && file_exists($boarddir . '/cache'))
-		$cachedir = $boarddir . '/cache';
-	if ((empty($extdir) || !file_exists($extdir)) && file_exists($sourcedir . '/ext'))
-		$extdir = $sourcedir . '/ext';
-	if ((empty($languagedir) || !file_exists($languagedir)) && file_exists($boarddir . '/themes/default/languages'))
-		$languagedir = $boarddir . '/themes/default/languages';
-
-	if (!DEFINED('BOARDDIR'))
-		DEFINE('BOARDDIR', $boarddir);
-	if (!DEFINED('CACHEDIR'))
-		DEFINE('CACHEDIR', $cachedir);
-	if (!DEFINED('EXTDIR'))
-		DEFINE('EXTDIR', $extdir);
-	if (!DEFINED('LANGUAGEDIR'))
-		DEFINE('LANGUAGEDIR', $languagedir);
-	if (!DEFINED('SOURCEDIR'))
-		DEFINE('SOURCEDIR', $sourcedir);
-	if (!DEFINED('ADMINDIR'))
-		DEFINE('ADMINDIR', $sourcedir . '/admin');
-	if (!DEFINED('CONTROLLERDIR'))
-		DEFINE('CONTROLLERDIR', $sourcedir . '/controllers');
-	if (!DEFINED('SUBSDIR'))
-		DEFINE('SUBSDIR', $sourcedir . '/subs');
 }
 
 /**

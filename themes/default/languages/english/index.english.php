@@ -101,6 +101,7 @@ $txt['moderate'] = 'Moderate';
 $txt['modlog_view'] = 'Moderation Log';
 $txt['mc_emailerror'] = 'Unapproved Emails';
 $txt['mc_reported_posts'] = 'Reported Posts';
+$txt['mc_reported_pms'] = 'Reported Personal Messages';
 $txt['mc_unapproved_attachments'] = 'Unapproved Attachments';
 $txt['mc_unapproved_poststopics'] = 'Unapproved Posts and Topics';
 
@@ -359,6 +360,7 @@ $txt['members_list'] = 'Members List';
 $txt['new_posts'] = 'New Posts';
 $txt['old_posts'] = 'No New Posts';
 $txt['redirect_board'] = 'Redirect Board';
+$txt['redirect_board_to'] = 'Redirecting to %1$s';
 
 $txt['sendtopic_send'] = 'Send';
 $txt['report_sent'] = 'Your report has been sent successfully.';
@@ -721,6 +723,7 @@ $txt['likes'] = 'Likes';
 $txt['liked_by'] = 'Liked by:';
 $txt['liked_you'] = 'You';
 $txt['liked_more'] = 'more';
+$txt['likemsg_are_you_sure'] = 'You already liked this message, are you sure you want to remove your like?';
 
 $txt['unread_topics_visit'] = 'Recent Unread Topics';
 $txt['unread_topics_visit_none'] = 'No unread topics found since your last visit. <a href="{unread_all_url}" class="linkbutton">Click here to try all unread topics</a>';

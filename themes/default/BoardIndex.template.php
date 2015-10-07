@@ -120,13 +120,13 @@ function template_info_center()
 	// Here's where the "Info Center" starts...
 	echo '
 	<div id="info_center" class="forum_category">
-		<h2 class="category_header">
-			<span id="category_toggle">&nbsp;
-				<span id="upshrink_ic" class="', empty($context['minmax_preferences']['info']) ? 'collapse' : 'expand', '" style="display: none;" title="', $txt['hide'], '"></span>
+		<h2 class="category_header panel_toggle">
+			<span>
+				<span id="upshrink_ic" class="', empty($context['minmax_preferences']['info']) ? 'collapse' : 'expand', ' hide" title="', $txt['hide'], '"></span>
 			</span>
 			<a href="#" id="upshrink_link">', sprintf($txt['info_center_title'], $context['forum_name_html_safe']), '</a>
 		</h2>
-		<ul id="upshrinkHeaderIC" class="category_boards"', empty($context['minmax_preferences']['info']) ? '' : ' style="display: none;"', '>';
+		<ul id="upshrinkHeaderIC" class="category_boards', empty($context['minmax_preferences']['info']) ? '' : ' hide', '">';
 
 	call_template_callbacks('ic', $context['info_center_callbacks']);
 
@@ -241,7 +241,9 @@ function template_ic_show_events()
 	echo '
 			<li class="board_row">
 				<h3 class="ic_section_header">
-					<a href="', $scripturl, '?action=calendar"><img class="icon" src="', $settings['images_url'], '/icons/calendar.png', '" alt="" /> ', $context['calendar_only_today'] ? $txt['calendar_today'] : $txt['calendar_upcoming'], '</a>
+					<a href="', $scripturl, '?action=calendar">
+						<img class="icon" src="', $settings['images_url'], '/icons/calendar.png', '" alt="" /> ', $context['calendar_only_today'] ? $txt['calendar_today'] : $txt['calendar_upcoming'], '
+					</a>
 				</h3>';
 
 	// Holidays like "Christmas", "Hanukkah", and "We Love [Unknown] Day" :P.
@@ -259,7 +261,7 @@ function template_ic_show_events()
 		// Each member in calendar_birthdays has: id, name (person), age (if they have one set?), is_last. (last in list?), and is_today (birthday is today?)
 		foreach ($context['calendar_birthdays'] as $member)
 			echo '
-					<a href="', $scripturl, '?action=profile;u=', $member['id'], '">', $member['is_today'] ? '<strong class="fix_rtl_names">' : '', $member['name'], $member['is_today'] ? '</strong>' : '', isset($member['age']) ? ' (' . $member['age'] . ')' : '', '</a>', $member['is_last'] ? '' : ', ';
+					<a href="', $scripturl, '?action=profile;u=', $member['id'], '">', $member['is_today'] ? '<strong>' : '', $member['name'], $member['is_today'] ? '</strong>' : '', isset($member['age']) ? ' (' . $member['age'] . ')' : '', '</a>', $member['is_last'] ? '' : ', ';
 
 		echo '
 				</p>';

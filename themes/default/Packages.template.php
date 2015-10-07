@@ -53,21 +53,19 @@ function template_view_package()
 	if (isset($context['package_readme']))
 	{
 		echo '
-			<h3 class="category_header">', $txt['package_' . ($context['uninstalling'] ? 'un' : '') . 'install_readme'], '</h3>
-			<div class="windowbg2">
-				<div class="content">
-					', $context['package_readme'], '
-					<span class="floatright">', $txt['package_available_readme_language'], '
-						<select name="readme_language" id="readme_language" onchange="if (this.options[this.selectedIndex].value) window.location.href = elk_prepareScriptUrl(elk_scripturl + \'', '?action=admin;area=packages;sa=', $context['uninstalling'] ? 'uninstall' : 'install', ';package=', $context['filename'], ';readme=\' + this.options[this.selectedIndex].value + \';license=\' + get_selected(\'license_language\'));">';
+			<h2 class="category_header">', $txt['package_' . ($context['uninstalling'] ? 'un' : '') . 'install_readme'], '</h2>
+			<div class="content">
+				', $context['package_readme'], '
+				<span class="floatright">', $txt['package_available_readme_language'], '
+					<select name="readme_language" id="readme_language" onchange="if (this.options[this.selectedIndex].value) window.location.href = elk_prepareScriptUrl(elk_scripturl + \'', '?action=admin;area=packages;sa=', $context['uninstalling'] ? 'uninstall' : 'install', ';package=', $context['filename'], ';readme=\' + this.options[this.selectedIndex].value + \';license=\' + get_selected(\'license_language\'));">';
 
 		foreach ($context['readmes'] as $a => $b)
 			echo '
-							<option value="', $b, '"', $a === 'selected' ? ' selected="selected"' : '', '>', $b == 'default' ? $txt['package_readme_default'] : ucfirst($b), '</option>';
+						<option value="', $b, '"', $a === 'selected' ? ' selected="selected"' : '', '>', $b == 'default' ? $txt['package_readme_default'] : ucfirst($b), '</option>';
 
 		echo '
-						</select>
-					</span>
-				</div>
+					</select>
+				</span>
 			</div>
 			<br />';
 	}
@@ -76,21 +74,19 @@ function template_view_package()
 	if (isset($context['package_license']))
 	{
 		echo '
-			<h3 class="category_header">', $txt['package_install_license'], '</h3>
-			<div class="windowbg2">
-				<div class="content">
-					', $context['package_license'], '
-					<span class="floatright">', $txt['package_available_license_language'], '
-						<select name="license_language" id="license_language" onchange="if (this.options[this.selectedIndex].value) window.location.href = elk_prepareScriptUrl(elk_scripturl + \'', '?action=admin;area=packages;sa=install', ';package=', $context['filename'], ';license=\' + this.options[this.selectedIndex].value + \';readme=\' + get_selected(\'readme_language\'));">';
+			<h2 class="category_header">', $txt['package_install_license'], '</h2>
+			<div class="content">
+				', $context['package_license'], '
+				<span class="floatright">', $txt['package_available_license_language'], '
+					<select name="license_language" id="license_language" onchange="if (this.options[this.selectedIndex].value) window.location.href = elk_prepareScriptUrl(elk_scripturl + \'', '?action=admin;area=packages;sa=install', ';package=', $context['filename'], ';license=\' + this.options[this.selectedIndex].value + \';readme=\' + get_selected(\'readme_language\'));">';
 
 		foreach ($context['licenses'] as $a => $b)
 			echo '
-							<option value="', $b, '"', $a === 'selected' ? ' selected="selected"' : '', '>', $b == 'default' ? $txt['package_license_default'] : ucfirst($b), '</option>';
+						<option value="', $b, '"', $a === 'selected' ? ' selected="selected"' : '', '>', $b == 'default' ? $txt['package_license_default'] : ucfirst($b), '</option>';
 
 		echo '
-						</select>
-					</span>
-				</div>
+					</select>
+				</span>
 			</div>
 			<br />';
 	}
@@ -99,28 +95,26 @@ function template_view_package()
 		echo '
 		<form action="', $context['post_url'], '" onsubmit="submitonce(this);" method="post" accept-charset="UTF-8">';
 	echo '
-			<h3 class="category_header">
+			<h2 class="category_header">
 				', $context['uninstalling'] ? $txt['package_uninstall_actions'] : $txt['package_install_actions'], ' &quot;', $context['package_name'], '&quot;
-			</h3>';
+			</h2>';
 
 	// Are there data changes to be removed?
 	if ($context['uninstalling'] && !empty($context['database_changes']))
 	{
 		echo '
-			<div class="windowbg2">
-				<div class="content">
-					<label for="do_db_changes"><input type="checkbox" name="do_db_changes" id="do_db_changes" class="input_check" />', $txt['package_db_uninstall'], '</label> [<a href="#" onclick="return swap_database_changes();">', $txt['package_db_uninstall_details'], '</a>]
-					<div id="db_changes_div">
-						', $txt['package_db_uninstall_actions'], ':
-						<ul>';
+			<div class="content">
+				<label for="do_db_changes"><input type="checkbox" name="do_db_changes" id="do_db_changes" />', $txt['package_db_uninstall'], '</label> [<a href="#" onclick="return swap_database_changes();">', $txt['package_db_uninstall_details'], '</a>]
+				<div id="db_changes_div">
+					', $txt['package_db_uninstall_actions'], ':
+					<ul>';
 
 		foreach ($context['database_changes'] as $change)
 			echo '
-							<li>', $change, '</li>';
+						<li>', $change, '</li>';
 
 		echo '
-						</ul>
-					</div>
+					</ul>
 				</div>
 			</div>';
 	}
@@ -146,24 +140,23 @@ function template_view_package()
 					<th scope="col" style="width: 20px;"></th>
 					<th scope="col" style="width: 30px;"></th>
 					<th scope="col" class="lefttext">', $txt['package_install_type'], '</th>
-					<th scope="col" class="lefttext" style="width: 50%;">', $txt['package_install_action'], '</th>
-					<th scope="col" class="lefttext" style="width: 20%;">', $txt['package_install_desc'], '</th>
+					<th scope="col" class="lefttext grid50">', $txt['package_install_action'], '</th>
+					<th scope="col" class="lefttext grid20">', $txt['package_install_desc'], '</th>
 				</tr>
 			</thead>
 			<tbody>';
 
-		$alternate = true;
 		$i = 1;
 		$action_num = 1;
 		$js_operations = array();
 		foreach ($context['actions'] as $packageaction)
 		{
-			// Did we pass or fail?  Need to now for later on.
+			// Did we pass or fail?  Need to know for later on.
 			$js_operations[$action_num] = isset($packageaction['failed']) ? $packageaction['failed'] : 0;
 
 			echo '
-				<tr class="windowbg', $alternate ? '' : '2', '">
-					<td>', isset($packageaction['operations']) ? '<img id="operation_img_' . $action_num . '" src="' . $settings['images_url'] . '/selected_open.png" alt="*" style="display: none;" />' : '', '</td>
+				<tr>
+					<td>', isset($packageaction['operations']) ? '<img id="operation_img_' . $action_num . '" src="' . $settings['images_url'] . '/selected_open.png" alt="*" class="hide" />' : '', '</td>
 					<td>', $i++, '.</td>
 					<td>', $packageaction['type'], '</td>
 					<td>', $packageaction['action'], '</td>
@@ -179,7 +172,6 @@ function template_view_package()
 						<table class="table_grid">';
 
 				// Show the operations.
-				$alternate2 = true;
 				$operation_num = 1;
 				foreach ($packageaction['operations'] as $operation)
 				{
@@ -187,7 +179,7 @@ function template_view_package()
 					$operation_text = $operation['position'] == 'replace' ? 'operation_replace' : ($operation['position'] == 'before' ? 'operation_after' : 'operation_before');
 
 					echo '
-							<tr class="windowbg', $alternate2 ? '' : '2', '">
+							<tr>
 								<td style="width:0;"></td>
 								<td style="width: 30px;" class="smalltext">
 									<a href="' . $scripturl . '?action=admin;area=packages;sa=showoperations;operation_key=', $operation['operation_key'], ';package=', $context['filename'], ';filename=', $operation['filename'], (!empty($context['uninstalling']) ? ';reverse' : ''), '" onclick="return reqWin(this.href, 680, 400, false);">
@@ -195,13 +187,12 @@ function template_view_package()
 									</a>
 								</td>
 								<td style="width: 30px;" class="smalltext">', $operation_num, '.</td>
-								<td style="width: 23%;" class="smalltext">', $txt[$operation_text], '</td>
-								<td style="width: 50%;" class="smalltext">', $operation['action'], '</td>
-								<td style="width: 20%;" class="smalltext">', $operation['description'], !empty($operation['ignore_failure']) ? ' (' . $txt['operation_ignore'] . ')' : '', '</td>
+								<td class="smalltext">', $txt[$operation_text], '</td>
+								<td class="smalltext grid50">', $operation['action'], '</td>
+								<td class="smalltext grid20">', $operation['description'], !empty($operation['ignore_failure']) ? ' (' . $txt['operation_ignore'] . ')' : '', '</td>
 							</tr>';
 
 					$operation_num++;
-					$alternate2 = !$alternate2;
 				}
 
 				echo '
@@ -212,7 +203,6 @@ function template_view_package()
 				// Increase it.
 				$action_num++;
 			}
-			$alternate = !$alternate;
 		}
 
 		echo '
@@ -225,9 +215,9 @@ function template_view_package()
 		{
 			echo '
 			<br />
-			<h3 class="category_header">
+			<h2 class="category_header">
 				', $context['uninstalling'] ? $txt['package_other_themes_uninstall'] : $txt['package_other_themes'], '
-			</h3>
+			</h2>
 			<div id="custom_changes">
 				<div class="information">
 					', $txt['package_other_themes_desc'], '
@@ -250,7 +240,7 @@ function template_view_package()
 							<input type="hidden" name="custom_theme[]" value="', $id, '" />';
 
 				echo '
-							<input type="checkbox" name="custom_theme[]" id="custom_theme_', $id, '" value="', $id, '" class="input_check" onclick="', (!empty($theme['has_failure']) ? 'if (this.form.custom_theme_' . $id . '.checked && !confirm(\'' . $txt['package_theme_failure_warning'] . '\')) return false;' : ''), 'invertAll(this, this.form, \'dummy_theme_', $id, '\', true);" ', !empty($context['themes_locked']) ? 'disabled="disabled" checked="checked"' : '', '/>
+							<input type="checkbox" name="custom_theme[]" id="custom_theme_', $id, '" value="', $id, '" onclick="', (!empty($theme['has_failure']) ? 'if (this.form.custom_theme_' . $id . '.checked && !confirm(\'' . $txt['package_theme_failure_warning'] . '\')) return false;' : ''), 'invertAll(this, this.form, \'dummy_theme_', $id, '\', true);" ', !empty($context['themes_locked']) ? 'disabled="disabled" checked="checked"' : '', '/>
 						</td>
 						<td colspan="3">
 							', $theme['name'], '
@@ -260,14 +250,14 @@ function template_view_package()
 				foreach ($theme['actions'] as $action)
 				{
 					echo '
-					<tr class="windowbg', $alternate ? '' : '2', '">
-						<td>', isset($packageaction['operations']) ? '<img id="operation_img_' . $action_num . '" src="' . $settings['images_url'] . '/selected_open.png" alt="*" style="display: none;" />' : '', '</td>
+					<tr>
+						<td>', isset($packageaction['operations']) ? '<img id="operation_img_' . $action_num . '" src="' . $settings['images_url'] . '/selected_open.png" alt="*" class="hide" />' : '', '</td>
 						<td class="centertext" style="width: 30px;">
-							<input type="checkbox" name="theme_changes[]" value="', !empty($action['value']) ? $action['value'] : '', '" id="dummy_theme_', $id, '" class="input_check" ', (!empty($action['not_mod']) ? '' : 'disabled="disabled"'), ' ', !empty($context['themes_locked']) ? 'checked="checked"' : '', '/>
+							<input type="checkbox" name="theme_changes[]" value="', !empty($action['value']) ? $action['value'] : '', '" id="dummy_theme_', $id, '" ', (!empty($action['not_mod']) ? '' : 'disabled="disabled"'), ' ', !empty($context['themes_locked']) ? 'checked="checked"' : '', '/>
 						</td>
 						<td>', $action['type'], '</td>
-						<td style="width: 50%;">', $action['action'], '</td>
-						<td style="width: 20%;"><strong>', $action['description'], '</strong></td>
+						<td class="grid50">', $action['action'], '</td>
+						<td class="grid20"><strong>', $action['description'], '</strong></td>
 					</tr>';
 
 					// Is there water on the knee? Operation!
@@ -278,7 +268,6 @@ function template_view_package()
 						<td colspan="5" class="standard_row">
 							<table class="table_grid">';
 
-						$alternate2 = true;
 						$operation_num = 1;
 						foreach ($action['operations'] as $operation)
 						{
@@ -286,7 +275,7 @@ function template_view_package()
 							$operation_text = $operation['position'] == 'replace' ? 'operation_replace' : ($operation['position'] == 'before' ? 'operation_after' : 'operation_before');
 
 							echo '
-								<tr class="windowbg', $alternate2 ? '' : '2', '">
+								<tr>
 									<td style="width:0"></td>
 									<td style="width: 30px;" class="smalltext">
 										<a href="' . $scripturl . '?action=admin;area=packages;sa=showoperations;operation_key=', $operation['operation_key'], ';package=', $context['filename'], ';filename=', $operation['filename'], (!empty($context['uninstalling']) ? ';reverse' : ''), '" onclick="return reqWin(this.href, 600, 400, false);">
@@ -294,12 +283,11 @@ function template_view_package()
 										</a>
 									</td>
 									<td style="width: 30px;" class="smalltext">', $operation_num, '.</td>
-									<td style="width: 23%;" class="smalltext">', $txt[$operation_text], '</td>
-									<td style="width: 50%;" class="smalltext">', $operation['action'], '</td>
-									<td style="width: 20%;" class="smalltext">', $operation['description'], !empty($operation['ignore_failure']) ? ' (' . $txt['operation_ignore'] . ')' : '', '</td>
+									<td class="smalltext">', $txt[$operation_text], '</td>
+									<td class="smalltext grid50">', $operation['action'], '</td>
+									<td class="smalltext grid20">', $operation['description'], !empty($operation['ignore_failure']) ? ' (' . $txt['operation_ignore'] . ')' : '', '</td>
 								</tr>';
 							$operation_num++;
-							$alternate2 = !$alternate2;
 						}
 
 						echo '
@@ -311,8 +299,6 @@ function template_view_package()
 						$action_num++;
 					}
 				}
-
-				$alternate = !$alternate;
 			}
 
 			echo '
@@ -326,14 +312,14 @@ function template_view_package()
 	{
 		echo '
 			<div class="submitbutton">
-				<input type="submit" value="', $context['uninstalling'] ? $txt['package_uninstall_now'] : $txt['package_install_now'], '" onclick="return ', !empty($context['has_failure']) ? '(submitThisOnce(this) &amp;&amp; confirm(\'' . ($context['uninstalling'] ? $txt['package_will_fail_popup_uninstall'] : $txt['package_will_fail_popup']) . '\'))' : 'submitThisOnce(this)', ';" class="button_submit" />
+				<input type="submit" value="', $context['uninstalling'] ? $txt['package_uninstall_now'] : $txt['package_install_now'], '" onclick="return ', !empty($context['has_failure']) ? '(submitThisOnce(this) &amp;&amp; confirm(\'' . ($context['uninstalling'] ? $txt['package_will_fail_popup_uninstall'] : $txt['package_will_fail_popup']) . '\'))' : 'submitThisOnce(this)', ';" />
 			</div>';
 	}
 	// If we need ftp information then demand it!
 	elseif ($context['ftp_needed'])
 	{
 		echo '
-			<h3 class="category_header">', $txt['package_ftp_necessary'], '</h3>
+			<h2 class="category_header">', $txt['package_ftp_necessary'], '</h2>
 
 			<div>
 				', template_control_chmod(), '
@@ -418,7 +404,7 @@ function template_extract_package()
 	{
 		echo '
 	<script><!-- // --><![CDATA[
-		setTimeout(function() {doRedirect();}, ', empty($context['redirect_timeout']) ? 5000 : $context['redirect_timeout'], ');
+		setTimeout(function() {doRedirect();}, ', $context['redirect_timeout'], ');
 
 		function doRedirect()
 		{
@@ -432,14 +418,14 @@ function template_extract_package()
 
 	if (empty($context['redirect_url']))
 		echo '
-			<h3 class="category_header">', ($context['uninstalling'] ? $txt['uninstall'] : $txt['extracting']), '</h3>', ($context['uninstalling'] ? '' : '<div class="information">' . $txt['package_installed_extract'] . '</div>');
+			<h2 class="category_header">', ($context['uninstalling'] ? $txt['uninstall'] : $txt['extracting']), '</h2>', ($context['uninstalling'] ? '' : '<div class="information">' . $txt['package_installed_extract'] . '</div>');
 	else
 		echo '
-			<h3 class="category_header">', $txt['package_installed_redirecting'], '</h3>';
+			<h2 class="category_header">', $txt['package_installed_redirecting'], '</h2>';
 
 	echo '
 		<div class="generic_list_wrapper">
-			<div class="windowbg">';
+			<div class="content">';
 
 	// If we are going to redirect we have a slightly different agenda.
 	if (!empty($context['redirect_url']))
@@ -492,20 +478,18 @@ function template_list()
 	echo '
 	<div id="admincenter">
 		<h2 class="category_header">', $txt['list_file'], '</h2>
-		<h3 class="category_header">', $txt['files_archive'], ' ', $context['filename'], ':</h3>
-		<div class="windowbg">
-			<div class="content">
-				<ol>';
+		<h2 class="category_header">', $txt['files_archive'], ' ', $context['filename'], ':</h2>
+		<div class="content">
+			<ol>';
 
 	foreach ($context['files'] as $fileinfo)
 		echo '
-					<li><a href="', $scripturl, '?action=admin;area=packages;sa=examine;package=', $context['filename'], ';file=', $fileinfo['filename'], '" title="', $txt['view'], '">', $fileinfo['filename'], '</a> (', $fileinfo['size'], ' ', $txt['package_bytes'], ')</li>';
+				<li><a href="', $scripturl, '?action=admin;area=packages;sa=examine;package=', $context['filename'], ';file=', $fileinfo['filename'], '" title="', $txt['view'], '">', $fileinfo['filename'], '</a> (', $fileinfo['size'], ' ', $txt['package_bytes'], ')</li>';
 
 	echo '
-				</ol>
-				<br />
-				<a class="linkbutton_right" href="', $scripturl, '?action=admin;area=packages">', $txt['back'], '</a>
-			</div>
+			</ol>
+			<br />
+			<a class="linkbutton_right" href="', $scripturl, '?action=admin;area=packages">', $txt['back'], '</a>
 		</div>
 	</div>';
 }
@@ -520,12 +504,10 @@ function template_examine()
 	echo '
 	<div id="admincenter">
 		<h2 class="category_header">', $txt['package_examine_file'], '</h2>
-		<h3 class="category_header">', $txt['package_file_contents'], ' ', $context['filename'], ':</h3>
-		<div class="windowbg">
-			<div class="content">
-				<pre class="file_content">', $context['filedata'], '</pre>
-				<a href="', $scripturl, '?action=admin;area=packages;sa=list;package=', $context['package'], '">[ ', $txt['list_files'], ' ]</a>
-			</div>
+		<h2 class="category_header">', $txt['package_file_contents'], ' ', $context['filename'], ':</h2>
+		<div class="content">
+			<pre class="file_content">', $context['filedata'], '</pre>
+			<a href="', $scripturl, '?action=admin;area=packages;sa=list;package=', $context['package'], '">[ ', $txt['list_files'], ' ]</a>
 		</div>
 	</div>';
 }
@@ -574,19 +556,19 @@ function template_install_options()
 		<form id="admin_form_wrapper" action="', $scripturl, '?action=admin;area=packages;sa=options" method="post" accept-charset="UTF-8">
 			<dl class="settings">
 				<dt>
-					<label for="pack_server"><strong>', $txt['package_install_options_ftp_server'], ':</strong></label>
+					<label for="pack_server">', $txt['package_install_options_ftp_server'], ':</label>
 				</dt>
 				<dd>
 					<input type="text" name="pack_server" id="pack_server" value="', $context['package_ftp_server'], '" size="30" class="input_text" />
 				</dd>
 				<dt>
-					<label for="pack_port"><strong>', $txt['package_install_options_ftp_port'], ':</strong></label>
+					<label for="pack_port">', $txt['package_install_options_ftp_port'], ':</label>
 				</dt>
 				<dd>
 					<input type="text" name="pack_port" id="pack_port" size="3" value="', $context['package_ftp_port'], '" class="input_text" />
 				</dd>
 				<dt>
-					<label for="pack_user"><strong>', $txt['package_install_options_ftp_user'], ':</strong></label>
+					<label for="pack_user">', $txt['package_install_options_ftp_user'], ':</label>
 				</dt>
 				<dd>
 					<input type="text" name="pack_user" id="pack_user" value="', $context['package_ftp_username'], '" size="30" class="input_text" />
@@ -604,8 +586,10 @@ function template_install_options()
 					<input type="checkbox" name="package_make_full_backups" id="package_make_full_backups" value="1" class="input_check"', $context['package_make_full_backups'] ? ' checked="checked"' : '', ' />
 				</dd>
 			</dl>
-			<input type="submit" name="save" value="', $txt['save'], '" class="right_submit" />
-			<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />
+			<div class="submitbutton">
+				<input type="submit" name="save" value="', $txt['save'], '" />
+				<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />
+			</div>
 		</form>
 	</div>';
 }
@@ -640,7 +624,7 @@ function template_control_chmod()
 	}
 
 	echo '
-				<div id="ftp_error_div" class="errorbox" style="', (!empty($context['package_ftp']['error']) ? '' : 'display:none;'), '">
+				<div id="ftp_error_div" class="errorbox', !empty($context['package_ftp']['error']) ? '"' : ' hide"', '>
 					<span id="ftp_error_message">', !empty($context['package_ftp']['error']) ? $context['package_ftp']['error'] : '', '</span>
 				</div>';
 
@@ -748,7 +732,7 @@ function template_view_operations()
 		<script src="', $settings['default_theme_url'], '/scripts/theme.js', CACHE_STALE, '"></script>
 	</head>
 	<body>
-		<div class="windowbg">
+		<div class="content">
 			', $context['operations']['search'], '
 			<br />
 				', $context['operations']['replace'], '
@@ -839,13 +823,11 @@ function template_file_permissions()
 					tableHandle = document.getElementById("insert_div_loc_" + fileItems[i].getAttribute(\'ident\'));
 
 					var curRow = document.createElement("tr");
-					curRow.className = "windowbg";
 					curRow.id = "content_" + my_ident;
-					curRow.style.display = "";
+					curRow.style.display = "table-row";
 
 					var curCol = document.createElement("td");
-					curCol.className = "smalltext";
-					curCol.width = "40%";
+					curCol.className = "smalltext grid30";
 
 					// This is the name.
 					var fileName = document.createTextNode(fileItems[i].firstChild.nodeValue);
@@ -878,7 +860,7 @@ function template_file_permissions()
 
 					// Right, the permissions.
 					curCol = document.createElement("td");
-					curCol.className = "smalltext";
+					curCol.className = "smalltext grid30";
 
 					var writeSpan = document.createElement("span");
 					writeSpan.style.color = fileItems[i].getAttribute(\'writable\') ? "green" : "red";
@@ -898,7 +880,7 @@ function template_file_permissions()
 					{
 						curCol = document.createElement("td");
 						curCol.style.backgroundColor = oRadioColors[j];
-						curCol.align = "center";
+						curCol.className = "centertext grid8";
 
 						var curInput = document.createElement("input");
 						curInput.name = "permStatus[" + curPath + "/" + fileItems[i].firstChild.nodeValue + "]";
@@ -947,7 +929,6 @@ function template_file_permissions()
 				linkData.appendChild(document.createTextNode(\'', $txt['package_file_perms_more_files'], '\'));
 
 				curRow = document.createElement("tr");
-				curRow.className = "windowbg";
 				curRow.id = "content_" + ident + "_more";
 				tableHandle.parentNode.insertBefore(curRow, tableHandle);
 				curCol = document.createElement("td");
@@ -1004,7 +985,7 @@ function template_file_permissions()
 	foreach ($context['file_tree'] as $name => $dir)
 	{
 		echo '
-				<tr class="windowbg2">
+				<tr>
 					<td class="grid30"><strong>';
 
 		if (!empty($dir['type']) && ($dir['type'] == 'dir' || $dir['type'] == 'dir_recursive'))
@@ -1018,11 +999,11 @@ function template_file_permissions()
 						<span style="color: ', ($dir['perms']['chmod'] ? 'green' : 'red'), '">', ($dir['perms']['chmod'] ? $txt['package_file_perms_writable'] : $txt['package_file_perms_not_writable']), '</span>
 						', ($dir['perms']['perms'] ? '&nbsp;(' . $txt['package_file_perms_chmod'] . ': ' . substr(sprintf('%o', $dir['perms']['perms']), -4) . ')' : ''), '
 					</td>
-					<td class="perm_read centertext grid8"><input type="radio" name="permStatus[', $name, ']" value="read" class="input_radio" /></td>
-					<td class="perm_write centertext grid8"><input type="radio" name="permStatus[', $name, ']" value="writable" class="input_radio" /></td>
-					<td class="perm_execute centertext grid8"><input type="radio" name="permStatus[', $name, ']" value="execute" class="input_radio" /></td>
-					<td class="perm_custom centertext grid8"><input type="radio" name="permStatus[', $name, ']" value="custom" class="input_radio" /></td>
-					<td class="perm_nochange centertext grid8"><input type="radio" name="permStatus[', $name, ']" value="no_change" checked="checked" class="input_radio" /></td>
+					<td class="perm_read centertext grid8"><input type="radio" name="permStatus[', $name, ']" value="read" /></td>
+					<td class="perm_write centertext grid8"><input type="radio" name="permStatus[', $name, ']" value="writable" /></td>
+					<td class="perm_execute centertext grid8"><input type="radio" name="permStatus[', $name, ']" value="execute" /></td>
+					<td class="perm_custom centertext grid8"><input type="radio" name="permStatus[', $name, ']" value="custom" /></td>
+					<td class="perm_nochange centertext grid8"><input type="radio" name="permStatus[', $name, ']" value="no_change" checked="checked" /></td>
 				</tr>
 			';
 
@@ -1034,46 +1015,46 @@ function template_file_permissions()
 			</tbody>
 		</table>
 		<br />
-		<h3 class="category_header">', $txt['package_file_perms_change'], '</h3>
-		<div class="windowbg">
-			<div class="content">
-				<fieldset>
-					<dl>
-						<dt>
-							<input type="radio" name="method" value="individual" checked="checked" id="method_individual" class="input_radio" />
-							<label for="method_individual"><strong>', $txt['package_file_perms_apply'], '</strong></label>
-						</dt>
-						<dd>
-							<em class="smalltext">', $txt['package_file_perms_custom'], ': <input type="text" name="custom_value" value="0755" maxlength="4" size="5" class="input_text" />&nbsp;<a href="', $scripturl, '?action=quickhelp;help=chmod_flags" onclick="return reqOverlayDiv(this.href);" class="help"><img src="' . $settings['images_url'] . '/helptopics.png" alt="(?)" /></a></em>
-						</dd>
-						<dt>
-							<input type="radio" name="method" value="predefined" id="method_predefined" class="input_radio" />
-							<label for="method_predefined"><strong>', $txt['package_file_perms_predefined'], ':</strong></label>
-							<select name="predefined" onchange="document.getElementById(\'method_predefined\').checked = \'checked\';">
-								<option value="restricted" selected="selected">', $txt['package_file_perms_pre_restricted'], '</option>
-								<option value="standard">', $txt['package_file_perms_pre_standard'], '</option>
-								<option value="free">', $txt['package_file_perms_pre_free'], '</option>
-							</select>
-						</dt>
-						<dd>
-							<em class="smalltext">', $txt['package_file_perms_predefined_note'], '</em>
-						</dd>
-					</dl>
-				</fieldset>';
+		<h2 class="category_header">', $txt['package_file_perms_change'], '</h2>
+		<div class="content">
+			<fieldset>
+				<dl>
+					<dt>
+						<input type="radio" name="method" value="individual" checked="checked" id="method_individual" />
+						<label for="method_individual"><strong>', $txt['package_file_perms_apply'], '</strong></label>
+					</dt>
+					<dd>
+						<em class="smalltext">', $txt['package_file_perms_custom'], ': <input type="text" name="custom_value" value="0755" maxlength="4" size="5" class="input_text" />&nbsp;<a href="', $scripturl, '?action=quickhelp;help=chmod_flags" onclick="return reqOverlayDiv(this.href);" class="help"><img src="' . $settings['images_url'] . '/helptopics.png" alt="(?)" /></a></em>
+					</dd>
+					<dt>
+						<input type="radio" name="method" value="predefined" id="method_predefined" />
+						<label for="method_predefined"><strong>', $txt['package_file_perms_predefined'], ':</strong></label>
+						<select name="predefined" onchange="document.getElementById(\'method_predefined\').checked = \'checked\';">
+							<option value="restricted" selected="selected">', $txt['package_file_perms_pre_restricted'], '</option>
+							<option value="standard">', $txt['package_file_perms_pre_standard'], '</option>
+							<option value="free">', $txt['package_file_perms_pre_free'], '</option>
+						</select>
+					</dt>
+					<dd>
+						<em class="smalltext">', $txt['package_file_perms_predefined_note'], '</em>
+					</dd>
+				</dl>
+			</fieldset>';
 
 	// Likely to need FTP?
 	if (empty($context['ftp_connected']))
 		echo '
-				<p>
-					', $txt['package_file_perms_ftp_details'], ':
-				</p>
-				', template_control_chmod(), '
-				<div class="information">', $txt['package_file_perms_ftp_retain'], '</div>';
+			<p>
+				', $txt['package_file_perms_ftp_details'], ':
+			</p>
+			', template_control_chmod(), '
+			<div class="information">', $txt['package_file_perms_ftp_retain'], '</div>';
 
 	echo '
-				<span id="test_ftp_placeholder_full" class="submitbutton"></span>
+			<div class="submitbutton">
+				<span id="test_ftp_placeholder_full"></span>
 				<input type="hidden" name="action_changes" value="1" />
-				<input type="submit" value="', $txt['package_file_perms_go'], '" name="go" class="right_submit" />
+				<input type="submit" value="', $txt['package_file_perms_go'], '" name="go" />
 			</div>
 		</div>';
 
@@ -1118,7 +1099,7 @@ function template_permission_show_contents($ident, $contents, $level, $has_more 
 
 			$cur_ident = preg_replace('~[^A-Za-z0-9_\-=:]~', ':-:', $ident . '/' . $name);
 			echo '
-				<tr class="windowbg" id="content_', $cur_ident, '">
+				<tr id="content_', $cur_ident, '">
 					<td class="smalltext grid30">' . str_repeat('&nbsp;', $level * 5), '
 						', (!empty($dir['type']) && $dir['type'] == 'dir_recursive') || !empty($dir['list_contents']) ? '<a id="link_' . $cur_ident . '" href="' . $scripturl . '?action=admin;area=packages;sa=perms;find=' . base64_encode($ident . '/' . $name) . ';back_look=' . $context['back_look_data'] . ';' . $context['session_var'] . '=' . $context['session_id'] . '#fol_' . $cur_ident . '" onclick="return expandFolder(\'' . $cur_ident . '\', \'' . addcslashes($ident . '/' . $name, "'\\") . '\');">' : '';
 
@@ -1134,13 +1115,15 @@ function template_permission_show_contents($ident, $contents, $level, $has_more 
 						<span class="', ($dir['perms']['chmod'] ? 'success' : 'error'), '">', ($dir['perms']['chmod'] ? $txt['package_file_perms_writable'] : $txt['package_file_perms_not_writable']), '</span>
 						', ($dir['perms']['perms'] ? '&nbsp;(' . $txt['package_file_perms_chmod'] . ': ' . substr(sprintf('%o', $dir['perms']['perms']), -4) . ')' : ''), '
 					</td>
-					<td class="perm_read centertext grid8"><input type="radio" name="permStatus[', $ident . '/' . $name, ']" value="read" class="input_radio" /></td>
-					<td class="perm_write centertext grid8"><input type="radio" name="permStatus[', $ident . '/' . $name, ']" value="writable" class="input_radio" /></td>
-					<td class="perm_execute centertext grid8"><input type="radio" name="permStatus[', $ident . '/' . $name, ']" value="execute" class="input_radio" /></td>
-					<td class="perm_custom centertext grid8"><input type="radio" name="permStatus[', $ident . '/' . $name, ']" value="custom" class="input_radio" /></td>
-					<td class="perm_nochange centertext grid8"><input type="radio" name="permStatus[', $ident . '/' . $name, ']" value="no_change" checked="checked" class="input_radio" /></td>
+					<td class="perm_read centertext grid8"><input type="radio" name="permStatus[', $ident . '/' . $name, ']" value="read" /></td>
+					<td class="perm_write centertext grid8"><input type="radio" name="permStatus[', $ident . '/' . $name, ']" value="writable" /></td>
+					<td class="perm_execute centertext grid8"><input type="radio" name="permStatus[', $ident . '/' . $name, ']" value="execute" /></td>
+					<td class="perm_custom centertext grid8"><input type="radio" name="permStatus[', $ident . '/' . $name, ']" value="custom" /></td>
+					<td class="perm_nochange centertext grid8"><input type="radio" name="permStatus[', $ident . '/' . $name, ']" value="no_change" checked="checked" /></td>
 				</tr>
-				<tr id="insert_div_loc_' . $cur_ident . '" style="display: none;"><td colspan="7"></td></tr>';
+				<tr id="insert_div_loc_' . $cur_ident . '" class="hide">
+					<td colspan="7"></td>
+				</tr>';
 
 			if (!empty($dir['contents']))
 				template_permission_show_contents($ident . '/' . $name, $dir['contents'], $level + 1, !empty($dir['more_files']));
@@ -1150,9 +1133,9 @@ function template_permission_show_contents($ident, $contents, $level, $has_more 
 	// We have more files to show?
 	if ($has_more)
 		echo '
-	<tr class="windowbg" id="content_', $js_ident, '_more">
-		<td class="smalltext" style="width: 40%;">' . str_repeat('&nbsp;', $level * 5), '
-			&#171; <a href="' . $scripturl . '?action=admin;area=packages;sa=perms;find=' . base64_encode($ident) . ';fileoffset=', ($context['file_offset'] + $context['file_limit']), ';' . $context['session_var'] . '=' . $context['session_id'] . '#fol_' . preg_replace('~[^A-Za-z0-9_\-=:]~', ':-:', $ident) . '">', $txt['package_file_perms_more_files'], '</a> &#187;
+	<tr id="content_', $js_ident, '_more">
+		<td class="smalltext" style="width: 40%;">', str_repeat('&nbsp;', $level * 5), '
+			&#171; <a href="', $scripturl, '?action=admin;area=packages;sa=perms;find=', base64_encode($ident), ';fileoffset=', ($context['file_offset'] + $context['file_limit']), ';', $context['session_var'], '=', $context['session_id'], '#fol_', preg_replace('~[^A-Za-z0-9_\-=:]~', ':-:', $ident), '">', $txt['package_file_perms_more_files'], '</a> &#187;
 		</td>
 		<td colspan="6"></td>
 	</tr>';
@@ -1175,7 +1158,9 @@ function template_permission_show_contents($ident, $contents, $level, $has_more 
 		// ]]></script>
 		<table class="table_grid">
 			<tbody>
-			<tr style="display: none;"><td colspan="7"></td></tr>';
+			<tr class="hide">
+				<td colspan="7"></td>
+			</tr>';
 	}
 }
 
@@ -1201,32 +1186,32 @@ function template_pause_action_permissions()
 
 	// First progress bar for the number of directories we are working
 	echo '
-		<div class="windowbg">
-			<div class="content">
-				<div>
-					<strong>', $context['progress_message'], '</strong>
-					<div class="progress_bar">
-						<div class="full_bar">', $context['progress_percent'], '%</div>
-						<div class="blue_percent" style="width: ', $context['progress_percent'], '%;">&nbsp;</div>
-					</div>
-				</div>';
+		<div class="content">
+			<div>
+				<strong>', $context['progress_message'], '</strong>
+				<div class="progress_bar">
+					<div class="full_bar">', $context['progress_percent'], '%</div>
+					<div class="blue_percent" style="width: ', $context['progress_percent'], '%;">&nbsp;</div>
+				</div>
+			</div>';
 
 	// Second progress bar for progress in a specific directory?
 	if ($context['method'] != 'individual' && !empty($context['total_files']))
 	{
 		echo '
-				<br />
-				<div>
-					<strong>', $context['file_progress_message'], '</strong>
-					<div class="progress_bar">
-						<div class="full_bar">', $context['file_progress_percent'], '%</div>
-						<div class="green_percent" style="width: ', $context['file_progress_percent'], '%;">&nbsp;</div>
-					</div>
-				</div>';
+			<br />
+			<div>
+				<strong>', $context['file_progress_message'], '</strong>
+				<div class="progress_bar">
+					<div class="full_bar">', $context['file_progress_percent'], '%</div>
+					<div class="green_percent" style="width: ', $context['file_progress_percent'], '%;">&nbsp;</div>
+				</div>
+			</div>';
 	}
 
 	echo '
-				<form action="', $scripturl, '?action=admin;area=packages;sa=perms;', $context['session_var'], '=', $context['session_id'], '" id="autoSubmit" name="autoSubmit" method="post" accept-charset="UTF-8">';
+			<form action="', $scripturl, '?action=admin;area=packages;sa=perms;', $context['session_var'], '=', $context['session_id'], '" id="autoSubmit" name="autoSubmit" method="post" accept-charset="UTF-8">
+				<div class="submitbutton">';
 
 	// Put out the right hidden data.
 	if ($context['method'] === 'individual')
@@ -1257,9 +1242,9 @@ function template_pause_action_permissions()
 					<input type="hidden" name="method" value="', $context['method'], '" />
 					<input type="hidden" name="action_changes" value="1" />
 					<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />
-					<input type="submit" name="go" id="cont" value="', $txt['not_done_continue'], '" class="right_submit" />
-				</form>
-			</div>
+					<input type="submit" name="go" id="cont" value="', $txt['not_done_continue'], '" />
+				</div>
+			</form>
 		</div>
 	</div>';
 

@@ -50,13 +50,13 @@ function list_maillist_unapproved($id = 0, $start = 0, $chunk_size = 0, $sort = 
 		$approve_query = ' AND 0';
 
 	if ($id === 0)
-		$where_query = 'id_email > {int:id} AND (({query_see_board}' . $approve_query . ') OR e.id_board = -1)';
+		$where_query = 'e.id_email > {int:id} AND (({query_see_board}' . $approve_query . ') OR e.id_board = -1)';
 	else
-		$where_query = 'id_email = {int:id} AND (({query_see_board}' . $approve_query . ') OR e.id_board = -1)';
+		$where_query = 'e.id_email = {int:id} AND (({query_see_board}' . $approve_query . ') OR e.id_board = -1)';
 
 	// Load them errors
 	$request = $db->query('', '
-		SELECT e.id_email, e.error, e.data_id, e.subject, e.id_message, e.email_from, e.message_type, e.message, e.id_board
+		SELECT e.id_email, e.error, e.message_key, e.subject, e.message_id, e.email_from, e.message_type, e.message, e.id_board
 		FROM {db_prefix}postby_emails_error e
 			LEFT JOIN {db_prefix}boards AS b ON (b.id_board = e.id_board)
 		WHERE ' . $where_query . '
@@ -75,9 +75,9 @@ function list_maillist_unapproved($id = 0, $start = 0, $chunk_size = 0, $sort = 
 			'id_email' => $row['id_email'],
 			'error' => $txt[$row['error'] . '_short'],
 			'error_code' => $row['error'],
-			'key' => $row['data_id'],
+			'key' => $row['message_key'],
 			'subject' => $row['subject'],
-			'message' => $row['id_message'],
+			'message' => $row['message_id'],
 			'from' => $row['email_from'],
 			'type' => $row['message_type'],
 			'body' => $row['message'],
@@ -91,9 +91,9 @@ function list_maillist_unapproved($id = 0, $start = 0, $chunk_size = 0, $sort = 
 
 		// Build a link to the topic or message in case someone wants to take a look at that thread
 		if ($row['message_type'] === 't')
-			$postemail[$i]['link'] = $boardurl . '?topic=' . $row['id_message'];
+			$postemail[$i]['link'] = $boardurl . '?topic=' . $row['message_id'];
 		elseif ($row['message_type'] === 'm')
-			$postemail[$i]['link'] = $boardurl . '?msg=' . $row['id_message'];
+			$postemail[$i]['link'] = $boardurl . '?msg=' . $row['message_id'];
 		elseif ($row['message_type'] === 'p')
 			$postemail[$i]['subject'] = $txt['private'];
 
@@ -378,8 +378,6 @@ function maillist_templates($template_type, $subject = null)
 
 	$db = database();
 
-	$notification_templates = array();
-
 	return $db->fetchQueryCallback('
 		SELECT recipient_name AS template_title, body
 		FROM {db_prefix}log_comments
@@ -390,7 +388,7 @@ function maillist_templates($template_type, $subject = null)
 			'generic' => 0,
 			'current_member' => $user_info['id'],
 		),
-		function($row)
+		function($row) use ($subject)
 		{
 			$template = array(
 				'title' => $row['template_title'],
@@ -418,7 +416,8 @@ function log_email($sent)
 	$db->insert('ignore',
 		'{db_prefix}postby_emails',
 		array(
-			'id_email' => 'string', 'time_sent' => 'int', 'email_to' => 'string'
+			'message_key' => 'string', 'message_type' => 'string',
+			'message_id' => 'string', 'time_sent' => 'int', 'email_to' => 'string'
 		),
 		$sent,
 		array('id_email')

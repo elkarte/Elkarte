@@ -523,13 +523,14 @@ function un_htmlspecialchars($string)
  * Calculates all the possible permutations (orders) of an array.
  *
  * What it does:
- * - should not be called on arrays bigger than 10 elements as this function is memory hungry
+ * - Caution: should not be called on arrays bigger than 8 elements as this function is memory hungry
  * - returns an array containing each permutation.
  * - e.g. (1,2,3) returns (1,2,3), (1,3,2), (2,1,3), (2,3,1), (3,1,2), and (3,2,1)
- * - really a combinations without repetition N! function so 3! = 6 and 10! = 4098 combinations
+ * - A combinations without repetition N! function so 3! = 6 and 10! = 3,628,800 combinations
  * - Used by parse_bbc to allow bbc tag parameters to be in any order and still be
  * parsed properly
  *
+ * @deprecated since 1.0.5
  * @param mixed[] $array index array of values
  * @return mixed[] array representing all permutations of the supplied array
  */
@@ -549,12 +550,65 @@ function permute($array)
 		$array[$j] = $temp;
 
 		for ($i = 1; $p[$i] == 0; $i++)
-			$p[$i] = 1;
+			$p[$i] = $i;
 
 		$orders[] = $array;
 	}
 
 	return $orders;
+}
+
+/**
+ * Lexicographic permutation function.
+ *
+ * This is a special type of permutation which involves the order of the set. The next
+ * lexicographic permutation of '32541' is '34125'. Numerically, it is simply the smallest
+ * set larger than the current one.
+ *
+ * The benefit of this over a recursive solution is that the whole list does NOT need
+ * to be held in memory. So it's actually possible to run 30! permutations without
+ * causing a memory overflow.
+ *
+ * Source: O'Reilly PHP Cookbook
+ *
+ * @param mixed[] $p
+ * @param int $size
+ *
+ * @return mixed[] the next permutation of the passed array $p
+ */
+function pc_next_permutation($p, $size)
+{
+	// Slide down the array looking for where we're smaller than the next guy
+	for ($i = $size - 1; isset($p[$i]) && $p[$i] >= $p[$i + 1]; --$i)
+	{
+	}
+
+	// If this doesn't occur, we've finished our permutations
+	// the array is reversed: (1, 2, 3, 4) => (4, 3, 2, 1)
+	if ($i === -1)
+	{
+		return false;
+	}
+
+	// Slide down the array looking for a bigger number than what we found before
+	for ($j = $size; $p[$j] <= $p[$i]; --$j)
+	{
+	}
+
+	// Swap them
+	$tmp = $p[$i];
+	$p[$i] = $p[$j];
+	$p[$j] = $tmp;
+
+	// Now reverse the elements in between by swapping the ends
+	for (++$i, $j = $size; $i < $j; ++$i, --$j)
+	{
+		$tmp = $p[$i];
+		$p[$i] = $p[$j];
+		$p[$j] = $tmp;
+	}
+
+	return $p;
 }
 
 /**
@@ -739,9 +793,9 @@ function parse_bbc($message, $smileys = true, $cache_id = '', $parse_tags = arra
 			),
 			array(
 				'tag' => 'center',
-				'before' => '<div class="centertext">',
-				'after' => '</div>',
-				'block_level' => true,
+				'before' => '<span style="display:block" class="centertext">',
+				'after' => '</span>',
+				'block_level' => false,
 			),
 			array(
 				'tag' => 'code',
@@ -808,8 +862,7 @@ function parse_bbc($message, $smileys = true, $cache_id = '', $parse_tags = arra
 				'content' => '<a href="$1" class="bbc_ftp new_win" target="_blank">$1</a>',
 				'validate' => function(&$tag, &$data, $disabled) {
 					$data = strtr($data, array('<br />' => ''));
-					if (strpos($data, 'ftp://') !== 0 && strpos($data, 'ftps://') !== 0)
-						$data = 'ftp://' . $data;
+					$data = addProtocol($data, array('ftp://', 'ftps://'));
 				},
 			),
 			array(
@@ -818,8 +871,7 @@ function parse_bbc($message, $smileys = true, $cache_id = '', $parse_tags = arra
 				'before' => '<a href="$1" class="bbc_ftp new_win" target="_blank">',
 				'after' => '</a>',
 				'validate' => function(&$tag, &$data, $disabled) {
-					if (strpos($data, 'ftp://') !== 0 && strpos($data, 'ftps://') !== 0)
-						$data = 'ftp://' . $data;
+					$data = addProtocol($data, array('ftp://', 'ftps://'));
 				},
 				'disallow_children' => array('email', 'ftp', 'url', 'iurl'),
 				'disabled_after' => ' ($1)',
@@ -846,8 +898,7 @@ function parse_bbc($message, $smileys = true, $cache_id = '', $parse_tags = arra
 				'content' => '<img src="$1" alt="{alt}" style="{width}{height}" class="bbc_img resized" />',
 				'validate' => function(&$tag, &$data, $disabled) {
 					$data = strtr($data, array('<br />' => ''));
-					if (strpos($data, 'http://') !== 0 && strpos($data, 'https://') !== 0)
-						$data = 'http://' . $data;
+					$data = addProtocol($data, array('http://', 'https://'));
 				},
 				'disabled_content' => '($1)',
 			),
@@ -857,8 +908,7 @@ function parse_bbc($message, $smileys = true, $cache_id = '', $parse_tags = arra
 				'content' => '<img src="$1" alt="" class="bbc_img" />',
 				'validate' => function(&$tag, &$data, $disabled) {
 					$data = strtr($data, array('<br />' => ''));
-					if (strpos($data, 'http://') !== 0 && strpos($data, 'https://') !== 0)
-						$data = 'http://' . $data;
+					$data = addProtocol($data, array('http://', 'https://'));
 				},
 				'disabled_content' => '($1)',
 			),
@@ -868,8 +918,7 @@ function parse_bbc($message, $smileys = true, $cache_id = '', $parse_tags = arra
 				'content' => '<a href="$1" class="bbc_link">$1</a>',
 				'validate' => function(&$tag, &$data, $disabled) {
 					$data = strtr($data, array('<br />' => ''));
-					if (strpos($data, 'http://') !== 0 && strpos($data, 'https://') !== 0)
-						$data = 'http://' . $data;
+					$data = addProtocol($data, array('http://', 'https://'));
 				},
 			),
 			array(
@@ -880,8 +929,8 @@ function parse_bbc($message, $smileys = true, $cache_id = '', $parse_tags = arra
 				'validate' => function(&$tag, &$data, $disabled) {
 					if ($data[0] === '#')
 						$data = '#post_' . substr($data, 1);
-					elseif (strpos($data, 'http://') !== 0 && strpos($data, 'https://') !== 0)
-						$data = 'http://' . $data;
+					else
+						$data = addProtocol($data, array('http://', 'https://'));
 				},
 				'disallow_children' => array('email', 'ftp', 'url', 'iurl'),
 				'disabled_after' => ' ($1)',
@@ -989,7 +1038,7 @@ function parse_bbc($message, $smileys = true, $cache_id = '', $parse_tags = arra
 			array(
 				'tag' => 'quote',
 				'parameters' => array(
-					'author' => array('match' => '(.{1,192}?)'),
+					'author' => array('match' => '(.{1,192}?\]?)'),
 				),
 				'before' => '<div class="quoteheader">' . $txt['quote_from'] . ': {author}</div><blockquote>',
 				'after' => '</blockquote>',
@@ -1032,7 +1081,7 @@ function parse_bbc($message, $smileys = true, $cache_id = '', $parse_tags = arra
 			),
 			array(
 				'tag' => 'spoiler',
-				'before' => '<span class="spoilerheader">' . $txt['spoiler'] . '</span><div class="spoiler"><div class="bbc_spoiler" style="display: none;">',
+				'before' => '<span class="spoilerheader">' . $txt['spoiler'] . '</span><div class="spoiler"><div class="bbc_spoiler hide">',
 				'after' => '</div></div>',
 				'block_level' => true,
 			),
@@ -1101,8 +1150,7 @@ function parse_bbc($message, $smileys = true, $cache_id = '', $parse_tags = arra
 				'content' => '<a href="$1" class="bbc_link" target="_blank">$1</a>',
 				'validate' => function(&$tag, &$data, $disabled) {
 					$data = strtr($data, array('<br />' => ''));
-					if (strpos($data, 'http://') !== 0 && strpos($data, 'https://') !== 0)
-						$data = 'http://' . $data;
+					$data = addProtocol($data, array('http://', 'https://'));
 				},
 			),
 			array(
@@ -1111,8 +1159,7 @@ function parse_bbc($message, $smileys = true, $cache_id = '', $parse_tags = arra
 				'before' => '<a href="$1" class="bbc_link" target="_blank">',
 				'after' => '</a>',
 				'validate' => function(&$tag, &$data, $disabled) {
-					if (strpos($data, 'http://') !== 0 && strpos($data, 'https://') !== 0)
-						$data = 'http://' . $data;
+					$data = addProtocol($data, array('http://', 'https://'));
 				},
 				'disallow_children' => array('email', 'ftp', 'url', 'iurl'),
 				'disabled_after' => ' ($1)',
@@ -1338,13 +1385,15 @@ function parse_bbc($message, $smileys = true, $cache_id = '', $parse_tags = arra
 						// Switch out quotes really quick because they can cause problems.
 						$data = strtr($data, array('&#039;' => '\'', '&nbsp;' => "\xC2\xA0", '&quot;' => '>">', '"' => '<"<', '&lt;' => '<lt<'));
 
+						// Check for links with special () checking to allow links with ) in them
+						if (is_string($result = preg_replace_callback('~(?<=([\s>\.(;\'"])|^)((?:http|https)://[\w\-_%@:|]+(?:\.[\w\-_%]+)*(?::\d+)?(?:/[\p{L}\w\-_\~%\.@!,\?&;=#(){}+:\'\\\\]*)*[/\w\-_\~%@\?;=#}\\\\]?)~ui', 'parse_autolink', $data)));
+							$data = $result;
+
 						// Only do this if the preg survives.
 						if (is_string($result = preg_replace(array(
-							'~(?<=[\s>\.(;\'"]|^)((?:http|https)://[\w\-_%@:|]+(?:\.[\w\-_%]+)*(?::\d+)?(?:/[\p{L}\p{N}\-_\~%\.@!,\?&;=#(){}+:\'\\\\]*)*[/\p{L}\p{N}\-_\~%@\?;=#}\\\\])~ui',
-							'~(?<=[\s>\.(;\'"]|^)((?:ftp|ftps)://[\w\-_%@:|]+(?:\.[\w\-_%]+)*(?::\d+)?(?:/[\w\-_\~%\.@,\?&;=#(){}+:\'\\\\]*)*[/\w\-_\~%@\?;=#}\\\\])~i',
-							'~(?<=[\s>(\'<]|^)(www(?:\.[\w\-_]+)+(?::\d+)?(?:/[\p{L}\p{N}\-_\~%\.@!,\?&;=#(){}+:\'\\\\]*)*[/\p{L}\p{N}\-_\~%@\?;=#}\\\\])~ui'
+							'~(?<=[\s>\.(;\'"]|^)((?:ftp|ftps)://[\w\-_%@:|]+(?:\.[\w\-_%]+)*(?::\d+)?(?:/[\w\-_\~%\.@,\?&;=#(){}+:\'\\\\]*)*[/\w\-_\~%@\?;=#}\\\\]?)~i',
+							'~(?<=[\s>(\'<]|^)(www(?:\.[\w\-_]+)+(?::\d+)?(?:/[\p{L}\w\-_\~%\.@!,\?&;=#(){}+:\'\\\\]*)*[/\w\-_\~%@\?;=#}\\\\])~ui'
 						), array(
-							'[url]$1[/url]',
 							'[ftp]$1[/ftp]',
 							'[url=http://$1]$1[/url]'
 						), $data)))
@@ -1534,8 +1583,8 @@ function parse_bbc($message, $smileys = true, $cache_id = '', $parse_tags = arra
 			{
 				if (!isset($possible['disallow_before'], $possible['disallow_after']))
 					continue;
-				$possible['before'] = isset($possible['disallow_before']) ? $tag['disallow_before'] : $possible['before'];
-				$possible['after'] = isset($possible['disallow_after']) ? $tag['disallow_after'] : $possible['after'];
+				$possible['before'] = isset($possible['disallow_before']) ? $possible['disallow_before'] : $possible['before'];
+				$possible['after'] = isset($possible['disallow_after']) ? $possible['disallow_after'] : $possible['after'];
 			}
 
 			$pos1 = $pos + 1 + $pt_strlen + 1;
@@ -1567,20 +1616,31 @@ function parse_bbc($message, $smileys = true, $cache_id = '', $parse_tags = arra
 			// This is long, but it makes things much easier and cleaner.
 			if (!empty($possible['parameters']))
 			{
+				// Build a regular expression for each parameter for the current tag
 				$preg = array();
 				foreach ($possible['parameters'] as $p => $info)
 					$preg[] = '(\s+' . $p . '=' . (empty($info['quoted']) ? '' : '&quot;') . (isset($info['match']) ? $info['match'] : '(.+?)') . (empty($info['quoted']) ? '' : '&quot;') . ')' . (empty($info['optional']) ? '' : '?');
 
 				// Okay, this may look ugly and it is, but it's not going to happen much and it is the best way
 				// of allowing any order of parameters but still parsing them right.
-				$match = false;
-				$orders = permute($preg);
-				foreach ($orders as $p)
-					if (preg_match('~^' . implode('', $p) . '\]~i', substr($message, $pos1 - 1), $matches) != 0)
-					{
-						$match = true;
-						break;
-					}
+				$param_size = count($preg) - 1;
+				$preg_keys = range(0, $param_size);
+				$message_stub = substr($message, $pos1 - 1);
+
+				// If an addon adds many parameters we can exceed max_execution time, lets prevent that
+				// 5040 = 7, 40,320 = 8, (N!) etc
+				$max_iterations = 5040;
+
+				// Step, one by one, through all possible permutations of the parameters until we have a match
+				do {
+					$match_preg = '~^';
+					foreach ($preg_keys as $key)
+						$match_preg .= $preg[$key];
+					$match_preg .= '\]~i';
+
+					// Check if this combination of parameters matches the user input
+					$match = preg_match($match_preg, $message_stub, $matches) !== 0;
+				} while (!$match && --$max_iterations && ($preg_keys = pc_next_permutation($preg_keys, $param_size)));
 
 				// Didn't match our parameter list, try the next possible.
 				if (!$match)
@@ -2013,6 +2073,22 @@ function footnote_callback($matches)
 	$fn_content[] = '<div class="target" id="fn' . $fn_num . '_' . $fn_count . '"><sup>' . $fn_num . '&nbsp;</sup>' . $matches[2] . '<a class="footnote_return" href="#ref' . $fn_num . '_' . $fn_count . '">&crarr;</a></div>';
 
 	return '<a class="target" href="#fn' . $fn_num . '_' . $fn_count . '" id="ref' . $fn_num . '_' . $fn_count . '">[' . $fn_num . ']</a>';
+}
+
+/**
+ * Callback function for autolinking.
+ * - If the look behind contains ( then it will trim any trailing ) from the link
+ * this to allow (link/path) where the path contains ) characters as allowed by RFC
+ *
+ * @param mixed[] $matches
+ * @return string
+ */
+function parse_autolink($matches)
+{
+ 	if ($matches[1] === '(' && substr($matches[2], -1) === ')')
+		return '[url]' . rtrim($matches[2], ')') . '[/url])';
+	else
+		return '[url]' . $matches[2] . '[/url]';
 }
 
 /**
@@ -2488,7 +2564,6 @@ function setupThemeContext($forceload = false)
 
 	// Set some specific vars.
 	$context['page_title_html_safe'] = Util::htmlspecialchars(un_htmlspecialchars($context['page_title'])) . (!empty($context['current_page']) ? ' - ' . $txt['page'] . ' ' . ($context['current_page'] + 1) : '');
-	$context['meta_keywords'] = !empty($modSettings['meta_keywords']) ? Util::htmlspecialchars($modSettings['meta_keywords']) : '';
 
 	// Load a custom CSS file?
 	if (file_exists($settings['theme_dir'] . '/css/custom.css'))
@@ -3816,7 +3891,7 @@ function prepareSearchEngines()
  *
  * @param resource $messages_request holds a query result
  * @param bool $reset
- * @return integer|null
+ * @return integer|boolean
  */
 function currentContext($messages_request, $reset = false)
 {
@@ -4095,4 +4170,44 @@ function isValidEmail($value)
 		return $value;
 	else
 		return false;
+}
+
+/**
+ * Adds a protocol (http/s, ftp/mailto) to the beginning of an url if missing
+ *
+ * @param string $url - The url
+ * @param string[] $protocols - A list of protocols to check, the first is
+ *                 added if none is found (optional, default array('http://', 'https://'))
+ * @return string - The url with the protocol
+ */
+function addProtocol($url, $protocols = array('http://', 'https://'))
+{
+	foreach ($protocols as $protocol)
+	{
+		if (substr($url, 0, strlen($protocol)) === $protocol)
+			return $url;
+	}
+
+	return $protocols[0] . $url;
+}
+
+/**
+ * Removes nested quotes from a text string.
+ *
+ * @param string $text - The body we want to remove nested quotes from
+ * @return string - The same body, just without nested quotes
+ */
+function removeNestedQuotes($text)
+{
+	global $modSettings;
+
+	// Remove any nested quotes, if necessary.
+	if (!empty($modSettings['removeNestedQuotes']))
+	{
+		return preg_replace(array('~\n?\[quote.*?\].+?\[/quote\]\n?~is', '~^\n~', '~\[/quote\]~'), '', $text);
+	}
+	else
+	{
+		return $text;
+	}
 }

@@ -260,7 +260,7 @@ class ManageFeatures_Controller extends Action_Controller
 	 */
 	public function action_layoutSettings_display()
 	{
-		global $txt, $scripturl, $context;
+		global $txt, $scripturl, $context, $modSettings;
 
 		// Initialize the form
 		$this->_initLayoutSettingsForm();
@@ -271,6 +271,22 @@ class ManageFeatures_Controller extends Action_Controller
 		// Saving?
 		if (isset($this->_req->query->save))
 		{
+			// Remove and reset if needed
+			if (!empty($modSettings['front_page']))
+			{
+				Hooks::get()->remove('integrate_action_frontpage', $modSettings['front_page'] . '::frontPageHook');
+			}
+
+			// Setting a custom frontpage, set the hook to the FrontpageInterface of the controller
+			if (!empty($this->_req->post->front_page))
+			{
+				$front_page = (string) $this->_req->post->front_page;
+				if ($front_page::validateFrontPageOptions($this->_req->post))
+				{
+					Hooks::get()->add('integrate_action_frontpage', $front_page . '::frontPageHook');
+				}
+			}
+
 			checkSession();
 
 			call_integration_hook('integrate_save_layout_settings');
@@ -454,7 +470,7 @@ class ManageFeatures_Controller extends Action_Controller
 
 			// Let's just keep it active, there are too many reasons it should be.
 			require_once(SUBSDIR . '/ScheduledTasks.subs.php');
-			toggleTaskStatusByName('user_access_mentions', 1);
+			toggleTaskStatusByName('user_access_mentions', true);
 
 			foreach ($modules_toggle as $action => $toggles)
 			{
@@ -553,6 +569,8 @@ class ManageFeatures_Controller extends Action_Controller
 			'max_image_width' => isset($sig_limits[5]) ? $sig_limits[5] : 0,
 			'max_image_height' => isset($sig_limits[6]) ? $sig_limits[6] : 0,
 			'max_font_size' => isset($sig_limits[7]) ? $sig_limits[7] : 0,
+			'repetition_guests' => isset($sig_limits[8]) ? $sig_limits[8] : 0,
+			'repetition_members' => isset($sig_limits[9]) ? $sig_limits[9] : 0,
 		);
 
 		// Temporarily make each setting a modSetting!
@@ -777,11 +795,11 @@ class ManageFeatures_Controller extends Action_Controller
 				'vieworder' => array(
 					'header' => array(
 						'value' => '',
-						'style' => 'display: none',
+						'class' => 'hide',
 					),
 					'data' => array(
 						'db' => 'vieworder',
-						'style' => 'display: none',
+						'class' => 'hide',
 					),
 					'sort' => array(
 						'default' => 'vieworder',
@@ -1272,7 +1290,6 @@ class ManageFeatures_Controller extends Action_Controller
 				// Basic stuff, titles, permissions...
 				array('check', 'allow_guestAccess'),
 				array('check', 'enable_buddylist'),
-				array('check', 'enable_unwatch'),
 				array('check', 'allow_editDisplayName'),
 				array('check', 'allow_hideOnline'),
 				array('check', 'titlesEnable'),
@@ -1288,7 +1305,6 @@ class ManageFeatures_Controller extends Action_Controller
 			'',
 				// SEO stuff
 				array('check', 'queryless_urls', 'subtext' => '<strong>' . $txt['queryless_urls_note'] . '</strong><br />' . ($context['server']['is_apache'] || $context['server']['is_lighttpd'] ? $txt['queryless_urls_work'] : '<span class="error">' . $txt['queryless_urls_notwork'] . '</span>')),
-				array('text', 'meta_keywords', 'subtext' => $txt['meta_keywords_note'], 'size' => 50),
 			'',
 				// Number formatting, timezones.
 				array('text', 'time_format'),
@@ -1340,7 +1356,17 @@ class ManageFeatures_Controller extends Action_Controller
 	{
 		global $txt;
 
-		$config_vars = array(
+		$config_vars = getFrontPageControllers();
+
+		if (!empty($front_page))
+		{
+			$config_vars = array(
+					array('select', 'front_page', $front_page),
+				'',
+			);
+		}
+
+		$config_vars += array(
 				// Pagination stuff.
 				array('check', 'compactTopicPagesEnable'),
 				array('int', 'compactTopicPagesContiguous', null, $txt['contiguous_page_display'] . '<div class="smalltext">' . str_replace(' ', '&nbsp;', '"3" ' . $txt['to_display'] . ': <strong>1 ... 4 [5] 6 ... 9</strong>') . '<br />' . str_replace(' ', '&nbsp;', '"5" ' . $txt['to_display'] . ': <strong>1 ... 3 4 [5] 6 7 ... 9</strong>') . '</div>'),
@@ -1385,7 +1411,7 @@ class ManageFeatures_Controller extends Action_Controller
 				array('select', 'karmaMode', explode('|', $txt['karma_options'])),
 			'',
 				// Who can do it.... and who is restricted by time limits?
-				array('int', 'karmaMinPosts', 6, 'postinput' => strtolower($txt['posts'])),
+				array('int', 'karmaMinPosts', 6, 'postinput' => $txt['manageposts_posts']),
 				array('float', 'karmaWaitTime', 6, 'postinput' => $txt['hours']),
 				array('check', 'karmaTimeRestrictAdmins'),
 				array('check', 'karmaDisableSmite'),
@@ -1421,7 +1447,7 @@ class ManageFeatures_Controller extends Action_Controller
 				array('check', 'likes_enabled'),
 			'',
 				// Who can do it.... and who is restricted by count limits?
-				array('int', 'likeMinPosts', 6, 'postinput' => strtolower($txt['posts'])),
+				array('int', 'likeMinPosts', 6, 'postinput' => $txt['manageposts_posts']),
 				array('int', 'likeWaitTime', 6, 'postinput' => $txt['minutes']),
 				array('int', 'likeWaitCount', 6),
 				array('check', 'likeRestrictAdmins'),
@@ -1511,6 +1537,20 @@ class ManageFeatures_Controller extends Action_Controller
 				array('int', 'signature_max_font_size', 'subtext' => $txt['zero_for_no_limit']),
 				array('check', 'signature_allow_smileys', 'onclick' => 'document.getElementById(\'signature_max_smileys\').disabled = !this.checked;'),
 				array('int', 'signature_max_smileys', 'subtext' => $txt['zero_for_no_limit']),
+				array('select', 'signature_repetition_guests',
+					array(
+						$txt['signature_always'],
+						$txt['signature_onlyfirst'],
+						$txt['signature_never'],
+					),
+				),
+				array('select', 'signature_repetition_members',
+					array(
+						$txt['signature_always'],
+						$txt['signature_onlyfirst'],
+						$txt['signature_never'],
+					),
+				),
 			'',
 				// Image settings.
 				array('int', 'signature_max_images', 'subtext' => $txt['signature_max_images_note']),

@@ -53,7 +53,7 @@ $txt['search_method_messages_index_space'] = 'Space used to index messages in th
 $txt['search_method_kilobytes'] = 'KB';
 $txt['search_method_fulltext_index'] = 'Fulltext index';
 $txt['search_method_no_index_exists'] = 'doesn\'t currently exist';
-$txt['search_method_fulltext_create'] = 'create a fulltext index';
+$txt['search_method_fulltext_create'] = 'Create a fulltext index';
 $txt['search_method_fulltext_cannot_create'] = 'cannot be created because the max message length is above 65,535 or table type is not MyISAM';
 $txt['search_method_index_already_exists'] = 'already created';
 $txt['search_method_fulltext_remove'] = 'remove fulltext index';
@@ -69,13 +69,13 @@ $txt['search_index_none'] = 'No index';
 $txt['search_index_custom'] = 'Custom index';
 $txt['search_index_label'] = 'Index';
 $txt['search_index_size'] = 'Size';
-$txt['search_index_create_custom'] = 'create custom index';
-$txt['search_index_custom_remove'] = 'remove custom index';
+$txt['search_index_create_custom'] = 'Create custom index';
+$txt['search_index_custom_remove'] = 'Remove custom index';
 
 $txt['search_index_sphinx'] = 'Sphinx';
-$txt['search_index_sphinx_desc'] = 'To adjust Sphinx settings, use [<a href="{managesearch_url}">Configure Sphinx</a>]';
+$txt['search_index_sphinx_desc'] = 'To adjust Sphinx settings, use <a class="linkbutton" href="{managesearch_url}">Configure Sphinx</a>';
 $txt['search_index_sphinxql'] = 'SphinxQL';
-$txt['search_index_sphinxql_desc'] = 'To adjust SphinxQL settings, use [<a href="{managesearch_url}">Configure Sphinx</a>]';
+$txt['search_index_sphinxql_desc'] = 'To adjust SphinxQL settings, use <a class="linkbutton" href="{managesearch_url}">Configure Sphinx</a>';
 
 $txt['search_force_index'] = 'Force the use of a search index';
 $txt['search_match_words'] = 'Match whole words only';

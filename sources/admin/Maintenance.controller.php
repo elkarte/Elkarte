@@ -704,6 +704,7 @@ class Maintenance_Controller extends Action_Controller
 
 		// Functions
 		require_once(SUBSDIR . '/Maintenance.subs.php');
+		require_once(SUBSDIR . '/Topic.subs.php');
 
 		// Validate the request or the loop
 		if (!isset($this->_req->query->step))

@@ -136,6 +136,9 @@ class Mentions_Controller extends Action_Controller
 	{
 		global $modSettings;
 
+		if (empty($modSettings['enabled_mentions']))
+			return array();
+
 		return array_filter(array_unique(explode(',', $modSettings['enabled_mentions'])));
 	}
 
@@ -379,7 +382,7 @@ class Mentions_Controller extends Action_Controller
 				'title' => sprintf($txt['forum_notification'], $context['forum_name']),
 			);
 			$context['json_data']['desktop_notifications']['message'] = sprintf($txt[$lastsent == 0 ? 'unread_notifications' : 'new_from_last_notifications'], $context['json_data']['desktop_notifications']['new_from_last']);
-		);
+		}
 
 		$_SESSION['notifications_lastseen'] = $context['json_data']['timelast'];
 	}
@@ -447,7 +450,7 @@ class Mentions_Controller extends Action_Controller
 	/**
 	 * Register the listeners for a mention type or for all the mentions.
 	 *
-	 * @param string|string[] $type
+	 * @param string|null $type Specific mention type
 	 */
 	protected function _registerEvents($type)
 	{

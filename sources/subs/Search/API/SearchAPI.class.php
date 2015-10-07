@@ -10,6 +10,10 @@
  * @version 1.1 dev Release Candidate 1
  */
 
+namespace ElkArte\Search\API;
+
+use ElkArte\Search\Search_Interface;
+
 if (!defined('ELK'))
 	die('No access...');
 
@@ -19,7 +23,7 @@ if (!defined('ELK'))
  *
  * @package Search
  */
-abstract class SearchAPI
+abstract class SearchAPI implements Search_Interface
 {
 	/**
 	 * This is the last version of ElkArte that this was tested on, to protect against API changes.

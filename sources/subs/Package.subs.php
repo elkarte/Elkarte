@@ -375,7 +375,6 @@ function create_chmod_control($chmodFiles = array(), $chmodOptions = array(), $r
 				array(
 					'position' => 'after_title',
 					'value' => '<span class="smalltext">' . $txt['package_restore_permissions_desc'] . '</span>',
-					'class' => 'windowbg2',
 				),
 			),
 		);
@@ -588,7 +587,7 @@ function list_restoreFiles($dummy1, $dummy2, $dummy3, $do_change)
 			'cur_perms' => substr(sprintf('%o', $file_permissions), -4),
 			'new_perms' => isset($new_permissions) ? substr(sprintf('%o', $new_permissions), -4) : '',
 			'result' => isset($result) ? $result : '',
-			'writable_message' => '<span style="color: ' . (@is_writable($file) ? 'green' : 'red') . '">' . (@is_writable($file) ? $txt['package_file_perms_writable'] : $txt['package_file_perms_not_writable']) . '</span>',
+			'writable_message' => '<span class="' . (@is_writable($file) ? 'success' : 'alert') . '">' . (@is_writable($file) ? $txt['package_file_perms_writable'] : $txt['package_file_perms_not_writable']) . '</span>',
 		);
 	}
 
@@ -871,6 +870,7 @@ function parsePackageInfo(&$packageXML, $testing_only = true, $method = 'install
 
 	$context['readmes'] = array();
 	$context['licences'] = array();
+	$has_redirect = false;
 
 	// This is the testing phase... nothing shall be done yet.
 	foreach ($actions as $action)
@@ -879,6 +879,11 @@ function parsePackageInfo(&$packageXML, $testing_only = true, $method = 'install
 
 		if (in_array($actionType, array('readme', 'code', 'database', 'modification', 'redirect', 'license')))
 		{
+			if ($actionType == 'redirect')
+			{
+				$has_redirect = true;
+			}
+
 			// Allow for translated readme and license files.
 			if ($actionType == 'readme' || $actionType == 'license')
 			{
@@ -931,7 +936,7 @@ function parsePackageInfo(&$packageXML, $testing_only = true, $method = 'install
 				'description' => '',
 				'reverse' => $action->exists('@reverse') && $action->fetch('@reverse') == 'true',
 				'redirect_url' => $action->exists('@url') ? $action->fetch('@url') : '',
-				'redirect_timeout' => $action->exists('@timeout') ? (int) $action->fetch('@timeout') : '',
+				'redirect_timeout' => $action->exists('@timeout') ? (int) $action->fetch('@timeout') : 5000,
 				'parse_bbc' => $action->exists('@parsebbc') && $action->fetch('@parsebbc') == 'true',
 				'language' => (($actionType == 'readme' || $actionType == 'license') && $action->exists('@lang') && $action->fetch('@lang') == $language) ? $language : '',
 			);
@@ -954,10 +959,11 @@ function parsePackageInfo(&$packageXML, $testing_only = true, $method = 'install
 		{
 			// quick check of any supplied url
 			$url = $action->exists('@url') ? $action->fetch('@url') : '';
-			if (strlen(trim($url)) > 0 && substr($url, 0, 7) !== 'http://' && substr($url, 0, 8) !== 'https://')
+			if (strlen(trim($url)) > 0)
 			{
-				$url = 'http://' . $url;
-				if (strlen($url) < 8 || (substr($url, 0, 7) !== 'http://' && substr($url, 0, 8) !== 'https://'))
+				$url = addProtocol($data, array('http://', 'https://'));
+
+				if (strlen($url) < 8)
 					$url = '';
 			}
 
@@ -1135,6 +1141,20 @@ function parsePackageInfo(&$packageXML, $testing_only = true, $method = 'install
 				'error_var' => $actionType
 			);
 		}
+	}
+
+	if (!$has_redirect)
+	{
+		$return[] = array(
+			'type' => 'redirect',
+			'filename' => '',
+			'description' => '',
+			'reverse' => false,
+			'redirect_url' => '$scripturl?action=admin;area=packages',
+			'redirect_timeout' => 5000,
+			'parse_bbc' => false,
+			'language' => '',
+		);
 	}
 
 	// Only testing - just return a list of things to be done.
@@ -1357,14 +1377,14 @@ function compareVersions($version1, $version2)
 	{
 		// Clean the version and extract the version parts.
 		$clean = str_replace(' ', '', strtolower($version));
-		preg_match('~(\d+)(?:\.(\d+|))?(?:\.)?(\d+|)(?:(alpha|beta|rc)(\d+|)(?:\.)?(\d+|))?(?:(dev))?(\d+|)~', $clean, $parts);
+		preg_match('~(\d+)(?:\.(\d+|))?(?:\.)?(\d+|)(?:(alpha|beta|rc)(\d+|)(?:\.)?(\d+|))?(?:\s(dev))?(\d+|)~', $clean, $parts);
 
 		// Build an array of parts.
 		$versions[$id] = array(
 			'major' => !empty($parts[1]) ? (int) $parts[1] : 0,
 			'minor' => !empty($parts[2]) ? (int) $parts[2] : 0,
 			'patch' => !empty($parts[3]) ? (int) $parts[3] : 0,
-			'type' => empty($parts[4]) ? 'stable' : $parts[4],
+			'type' => empty($parts[4]) && empty($parts[7]) ? 'stable' : (!empty($parts[7]) ? 'alpha' : $parts[4]),
 			'type_major' => !empty($parts[6]) ? (int) $parts[5] : 0,
 			'type_minor' => !empty($parts[6]) ? (int) $parts[6] : 0,
 			'dev' => !empty($parts[7]),

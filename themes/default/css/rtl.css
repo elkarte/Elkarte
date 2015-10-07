@@ -54,7 +54,7 @@
 /* Dont show disabled buttons as active on hover */
 input[type=submit][disabled]:hover, button[disabled], button[disabled]:hover {
 	border-left: 1px solid #afafaf;
-	border-right: 1px solid #bfbfbf;
+	border-right: 1px solid #BFBFBF;
 }
 
 /* @todo - A common, tag-agnostic class to hold submit buttons, etc. */
@@ -181,10 +181,9 @@ h2 a.collapse {
 }
 /* The main title. */
 #forumtitle, .rightheader #forumtitle {
-	float: right;
 	padding: 10px 13px 6px 10px;
 }
-.rightheader #forumtitle {
+.rightheader #forumtitle .forumlink {
 	float: left;
 }
 /* Float these items to the right. @todo - Simplify. */
@@ -725,11 +724,8 @@ ul.post_options {
 ul.post_options li {
 	float: right;
 }
-#postAttachment dd, #postAttachment2 dd {
+#postAttachment2 dd {
 	margin: 4px 12px 4px 0;
-}
-#postAttachment dd {
-	float: right;
 }
 .draftautosave {
 	text-align: left;
@@ -1129,15 +1125,6 @@ div.labels {
 .coppa_contact {
 	margin-left: 0;
 	margin-right: 5ex;
-}
-
-/* Styles for maintenance mode. */
-#maintenance_mode {
-	text-align: right;
-}
-#maintenance_mode .floatleft {
-	margin-right: 0;
-	margin-left: 12px;
 }
 
 /*	$ERRORS		*/

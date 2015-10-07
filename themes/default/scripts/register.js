@@ -297,8 +297,7 @@ elkRegister.prototype.setVerificationImage = function(imageHandle, imageIcon, al
 function updateAuthMethod()
 {
 	var currentAuthMethod,
-		currentForm,
-		verificationHandle;
+		currentForm;
 
 	// What authentication method is being used?
 	if (!document.getElementById('auth_openid') || !document.getElementById('auth_openid').checked)
@@ -315,16 +314,16 @@ function updateAuthMethod()
 	document.forms[currentForm].openid_url.disabled = currentAuthMethod !== 'openid';
 	document.forms[currentForm].elk_autov_pwmain.disabled = currentAuthMethod !== 'passwd';
 	document.forms[currentForm].elk_autov_pwverify.disabled = currentAuthMethod !== 'passwd';
-	document.getElementById('elk_autov_pwmain_div').style.display = currentAuthMethod === 'passwd' ? '' : 'none';
-	document.getElementById('elk_autov_pwverify_div').style.display = currentAuthMethod === 'passwd' ? '' : 'none';
+	document.getElementById('elk_autov_pwmain_div').style.display = currentAuthMethod === 'passwd' ? 'inline' : 'none';
+	document.getElementById('elk_autov_pwverify_div').style.display = currentAuthMethod === 'passwd' ? 'inline' : 'none';
 
 	if (currentAuthMethod === 'passwd')
 	{
 		verificationHandle.refreshMainPassword();
 		verificationHandle.refreshVerifyPassword();
 		document.forms[currentForm].openid_url.style.backgroundColor = '';
-		document.getElementById('password1_group').style.display = '';
-		document.getElementById('password2_group').style.display = '';
+		document.getElementById('password1_group').style.display = 'block';
+		document.getElementById('password2_group').style.display = 'block';
 		document.getElementById('openid_group').style.display = 'none';
 	}
 	else
@@ -334,7 +333,7 @@ function updateAuthMethod()
 		document.forms[currentForm].openid_url.style.backgroundColor = '#FFF0F0';
 		document.getElementById('password1_group').style.display = 'none';
 		document.getElementById('password2_group').style.display = 'none';
-		document.getElementById('openid_group').style.display = '';
+		document.getElementById('openid_group').style.display = 'block';
 	}
 
 	return true;

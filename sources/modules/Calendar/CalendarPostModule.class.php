@@ -64,11 +64,12 @@ class Calendar_Post_Module implements ElkArte\sources\modules\Module_Interface
 
 	public function after_save_post()
 	{
-		global $user_info, $modSettings;
+		global $user_info, $modSettings, $board, $topic;
 
-		$_REQUEST['eventid'] = (int) $_REQUEST['eventid'];
+		$req = HttpReq::instance();
+		$eventid = $req->getPost('eventid', 'intval', -1);
 
-		$event = new Calendar_Event($_REQUEST['eventid'], $modSettings);
+		$event = new Calendar_Event($eventid, $modSettings);
 
 		try
 		{
@@ -85,16 +86,18 @@ class Calendar_Post_Module implements ElkArte\sources\modules\Module_Interface
 			// Make sure they can link an event to this post.
 			canLinkEvent();
 
+			$save_data['id_board'] = $board;
+			$save_data['id_topic'] = $topic;
+
 			// Insert the event.
 			$event->insert($save_data, $user_info['id']);
 		}
 		else
 		{
-
 			// If you're not allowed to edit any events, you have to be the poster.
 			if (!allowedTo('calendar_edit_any'))
 			{
-				$event_poster = getEventPoster($_REQUEST['eventid']);
+				$event_poster = getEventPoster($eventid);
 
 				// Silly hacker, Trix are for kids. ...probably trademarked somewhere, this is FAIR USE! (parody...)
 				isAllowedTo('calendar_edit_' . ($event_poster == $user_info['id'] ? 'own' : 'any'));
@@ -182,17 +185,17 @@ class Calendar_Post_Module implements ElkArte\sources\modules\Module_Interface
 			if (isset($_REQUEST['month']))
 				$context['event']['month'] = (int) $_REQUEST['month'];
 			else
-				$_REQUEST['month'] = $today['mon'];
+				$context['event']['month'] = $today['mon'];
 
 			if (isset($_REQUEST['year']))
 				$context['event']['year'] = (int) $_REQUEST['year'];
 			else
-				$_REQUEST['year'] = $today['year'];
+				$context['event']['year'] = $today['year'];
 
 			if (isset($_REQUEST['day']))
 				$context['event']['day'] = (int) $_REQUEST['day'];
 			else
-				$context['event']['day'] = $_REQUEST['month'] == $today['mon'] ? $today['mday'] : 0;
+				$context['event']['day'] = $context['event']['month'] == $today['mon'] ? $today['mday'] : 0;
 
 			$context['event']['span'] = isset($_REQUEST['span']) ? $_REQUEST['span'] : 1;
 

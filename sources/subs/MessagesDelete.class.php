@@ -509,11 +509,13 @@ class MessagesDelete
 					SET
 						id_topic = {int:id_topic},
 						id_board = {int:recycle_board}
-					WHERE id_msg = {int:id_msg}',
+					WHERE id_msg = {int:id_msg}
+						AND type = {string:msg}',
 					array(
 						'id_topic' => $topicID,
 						'recycle_board' => $this->_recycle_board,
 						'id_msg' => $message,
+						'msg' => 'msg',
 					)
 				);
 
@@ -564,6 +566,7 @@ class MessagesDelete
 				$recycle = true;
 
 				// Make sure we update the search subject index.
+				require_once(SUBSDIR . '/Messages.subs.php');
 				updateSubjectStats($topicID, $row['subject']);
 			}
 
@@ -604,6 +607,10 @@ class MessagesDelete
 		// Only remove posts if they're not recycled.
 		if (!$recycle)
 		{
+			// Update the like counts
+			require_once(SUBSDIR . '/Likes.subs.php');
+			decreaseLikeCounts($message);
+
 			// Remove the likes!
 			$db->query('', '
 				DELETE FROM {db_prefix}message_likes
@@ -697,7 +704,7 @@ class MessagesDelete
 		if ($updated_reports != 0)
 		{
 			updateSettings(array('last_mod_report_action' => time()));
-			recountOpenReports();
+			recountOpenReports(true, allowedTo('admin_forum'));
 		}
 
 		// Add it to the mod log.

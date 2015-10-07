@@ -77,7 +77,6 @@ class BadBehavior_Controller extends Action_Controller
 		if ($filter === false)
 		{
 			// Bad filter or something else going on, back to the start you go
-			unset($_GET['filter'], $_GET['value']);
 			redirectexit('action=admin;area=logs;sa=badbehaviorlog' . (isset($this->_req->query->desc) ? ';desc' : ''));
 		}
 

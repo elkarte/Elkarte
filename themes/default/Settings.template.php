@@ -186,7 +186,7 @@ function template_settings()
 			'type' => 'text',
 			'size' => 8,
 		),
-	'',
+		'',
 		array(
 			'id' => 'linktree_link',
 			'label' => $txt['current_pos_text_img'],
@@ -218,7 +218,7 @@ function template_settings()
 			'label' => $txt['admin_fader_delay'],
 			'type' => 'number',
 		),
-	'',
+		'',
 		array(
 			'id' => 'number_recent_posts',
 			'label' => $txt['number_recent_posts'],
@@ -247,7 +247,7 @@ function template_settings()
 			),
 			'type' => 'number',
 		),
-	'',
+		'',
 		array(
 			'id' => 'show_modify',
 			'label' => $txt['last_modification'],
@@ -273,7 +273,7 @@ function template_settings()
 			'label' => $txt['hide_post_group'],
 			'description' => $txt['hide_post_group_desc'],
 		),
-	'',
+		'',
 		array(
 			'id' => 'show_bbc',
 			'label' => $txt['admin_bbc'],

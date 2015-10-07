@@ -141,12 +141,14 @@ function addMentions($member_from, $members_to, $target, $type, $time = null, $s
 		WHERE id_member IN ({array_int:members_to})
 			AND mention_type = {string:type}
 			AND id_member_from = {int:member_from}
-			AND id_target = {int:target}',
+			AND id_target = {int:target}
+			AND log_time = {int:log_time}',
 		array(
 			'members_to' => $members_to,
 			'type' => $type,
 			'member_from' => $member_from,
 			'target' => $target,
+			'log_time' => $time === null ? time() : $time,
 		),
 		function($row)
 		{

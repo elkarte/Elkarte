@@ -987,7 +987,7 @@ class ManageThemes_Controller extends Action_Controller
 			checkSession('get');
 
 			$th = $this->_req->getQuery('th', 'intval');
-			$vrt = $this->_req->getQuery('vrt', 'intval');
+			$vrt = $this->_req->getQuery('vrt', 'cleanhtml');
 			$u = $this->_req->getQuery('u', 'intval');
 
 			// Save for this user.

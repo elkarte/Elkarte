@@ -27,6 +27,22 @@ if (!defined('ELK'))
  */
 class Karma_Controller extends Action_Controller
 {
+	/**
+	 * Holds instance of HttpReq object
+	 * @var HttpReq
+	 */
+	private $_req;
+
+	/**
+	 * Pre Dispatch, called before other methods.  Loads integration hooks
+	 * and HttpReq instance.
+	 */
+	public function pre_dispatch()
+	{
+		Hooks::get()->loadIntegrationsSettings();
+
+		$this->_req = HttpReq::instance();
+	}
 
 	/**
 	 * Default entry point, in case action methods aren't directly
@@ -51,7 +67,7 @@ class Karma_Controller extends Action_Controller
 	{
 		global $user_info;
 
-		$id_target = !empty($_REQUEST['uid']) ? (int) $_REQUEST['uid'] : 0;
+		$id_target = $this->_req->getQuery('uid', 'intval', 0);
 
 		// Start off with no change in karma.
 		$action = $this->_prepare_karma($id_target);
@@ -73,13 +89,13 @@ class Karma_Controller extends Action_Controller
 			$this->_redirect_karma();
 
 		// The user ID _must_ be a number, no matter what.
-		$id_target = !empty($_REQUEST['uid']) ? (int) $_REQUEST['uid'] : 0;
+		$id_target = $this->_req->getQuery('uid', 'intval', 0);
 
 		// Start off with no change in karma.
 		$action = $this->_prepare_karma($id_target);
 
 		// Give em a wack and run away
-		$this->_give_karma($user_info['id'], $_REQUEST['uid'], $action, -1);
+		$this->_give_karma($user_info['id'], $this->_req->query->uid, $action, -1);
 		$this->_redirect_karma();
 	}
 

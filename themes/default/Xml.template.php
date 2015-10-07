@@ -182,7 +182,7 @@ function template_generic_preview()
 		<caption name="bbc" class="', isset($context['post_error']['no_bbc']) ? 'error' : '', '" />
 		<caption name="subject" class="', isset($context['post_error']['no_subject']) ? 'error' : '', '" />
 		<caption name="question" class="', isset($context['post_error']['no_question']) ? 'error' : '', '" />',
-		isset($context['post_error']['no_message']) || isset($context['post_error']['long_message']) ? '<post_error />' : '', '
+	isset($context['post_error']['no_message']) || isset($context['post_error']['long_message']) ? '<post_error />' : '', '
 	</errors>';
 
 	echo '
@@ -442,11 +442,11 @@ function template_generic_xml_recursive($xml_data, $parent_ident, $child_ident, 
  * Formats data retrieved in other functions into xml format.
  * Additionally formats data based on the specific format passed.
  * This function is recursively called to handle sub arrays of data.
-
+ *
  * @param mixed[] $data the array to output as xml data
  * @param int $i the amount of indentation to use.
  * @param string|null $tag if specified, it will be used instead of the keys of data.
- * @param string $xml_format  one of rss, rss2, rdf, atom
+ * @param string $xml_format one of rss, rss2, rdf, atom
  */
 function template_xml_news($data, $i, $tag = null, $xml_format = 'rss')
 {
@@ -521,19 +521,19 @@ function template_rdf()
 			<items>
 				<rdf:Seq>';
 
-			foreach ($context['recent_posts_data'] as $item)
-				echo '
+	foreach ($context['recent_posts_data'] as $item)
+		echo '
 					<rdf:li rdf:resource="', $item['link'], '" />';
 
-			echo '
+	echo '
 				</rdf:Seq>
 			</items>
 		</channel>
 	';
 
-			template_xml_news($context['recent_posts_data'], 1, 'item', $context['xml_format']);
+	template_xml_news($context['recent_posts_data'], 1, 'item', $context['xml_format']);
 
-			echo '
+	echo '
 	</rdf:RDF>';
 }
 
@@ -559,9 +559,9 @@ function template_feedatom()
 			<name>', strip_tags(un_htmlspecialchars($context['forum_name'])), '</name>
 		</author>';
 
-			template_xml_news($context['recent_posts_data'], 2, 'entry', $context['xml_format']);
+	template_xml_news($context['recent_posts_data'], 2, 'entry', $context['xml_format']);
 
-			echo '
+	echo '
 	</feed>';
 }
 
@@ -586,11 +586,11 @@ function template_feedrss()
 				<link>', $scripturl, '</link>
 			</image>';
 
-			// Output all of the associative array, start indenting with 2 tabs, and name everything "item".
-			template_xml_news($context['recent_posts_data'], 2, 'item', $context['xml_format']);
+	// Output all of the associative array, start indenting with 2 tabs, and name everything "item".
+	template_xml_news($context['recent_posts_data'], 2, 'item', $context['xml_format']);
 
-			// Output the footer of the xml.
-			echo '
+	// Output the footer of the xml.
+	echo '
 		</channel>
 	</rss>';
 }

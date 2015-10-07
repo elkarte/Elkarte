@@ -415,7 +415,7 @@ class ManageMembergroups_Controller extends Action_Controller
 				{
 					$copy_type = membergroupById($copy_id);
 
-					// Protected groups are... well, protected!
+					// Keep protected groups ... well, protected!
 					if ($copy_type['group_type'] == 1)
 						Errors::instance()->fatal_lang_error('membergroup_does_not_exist');
 				}
@@ -664,7 +664,7 @@ class ManageMembergroups_Controller extends Action_Controller
 				updateChildPermissions($group_inherit);
 			}
 
-			// Finally, moderators!
+			// Lastly, moderators!
 			$moderator_string = isset($this->_req->post->group_moderators) ? trim($this->_req->post->group_moderators) : '';
 			detachGroupModerators($current_group['id_group']);
 

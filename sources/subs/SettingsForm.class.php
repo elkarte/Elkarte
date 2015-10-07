@@ -416,8 +416,7 @@ class Settings_Form
 			elseif (substr($_POST['boardurl'], -1) == '/')
 				$_POST['boardurl'] = substr($_POST['boardurl'], 0, -1);
 
-			if (substr($_POST['boardurl'], 0, 7) != 'http://' && substr($_POST['boardurl'], 0, 7) != 'file://' && substr($_POST['boardurl'], 0, 8) != 'https://')
-				$_POST['boardurl'] = 'http://' . $_POST['boardurl'];
+			$_POST['boardurl'] = addProtocol($_POST['boardurl'], array('http://', 'https://', 'file://'));
 		}
 
 		// Any passwords?

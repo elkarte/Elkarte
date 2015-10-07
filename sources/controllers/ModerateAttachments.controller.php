@@ -26,6 +26,20 @@ if (!defined('ELK'))
 class ModerateAttachments_Controller extends Action_Controller
 {
 	/**
+	 * Holds instance of HttpReq object
+	 * @var HttpReq
+	 */
+	private $_req;
+
+	/**
+	 * Pre Dispatch, called before other methods.  Loads HttpReq instance.
+	 */
+	public function pre_dispatch()
+	{
+		$this->_req = HttpReq::instance();
+	}
+
+	/**
 	 * Forward to attachments approval method, the only responsibility
 	 * of this controller.
 	 *
@@ -33,14 +47,16 @@ class ModerateAttachments_Controller extends Action_Controller
 	 */
 	public function action_index()
 	{
-		// forward to our method(s) to do the job
+		// Forward to our method(s) to do the job
 		$this->action_attachapprove();
 	}
 
 	/**
-	 * Called from a mouse click,
-	 * works out what we want to do with attachments and actions it.
-	 * Accessed by ?action=attachapprove
+	 * Approve an attachment
+	 *
+	 * - Called from a mouse click,
+	 * - works out what we want to do with attachments and actions it.
+	 * - Accessed by ?action=attachapprove
 	 */
 	public function action_attachapprove()
 	{
@@ -49,20 +65,20 @@ class ModerateAttachments_Controller extends Action_Controller
 		// Security is our primary concern...
 		checkSession('get');
 
-		// If it approve or delete?
-		$is_approve = !isset($_GET['sa']) || $_GET['sa'] != 'reject' ? true : false;
+		// Is it approve or delete?
+		$is_approve = !isset($this->_req->query->sa) || $this->_req->query->sa !== 'reject' ? true : false;
 
 		$attachments = array();
 		require_once(SUBSDIR . '/ManageAttachments.subs.php');
 
-		// If we are approving all ID's in a message , get the ID's.
-		if ($_GET['sa'] == 'all' && !empty($_GET['mid']))
+		// If we are approving all ID's in a message, get the ID's.
+		if ($this->_req->query->sa === 'all' && !empty($this->_req->query->mid))
 		{
-			$id_msg = (int) $_GET['mid'];
+			$id_msg = (int) $this->_req->query->mid;
 			$attachments = attachmentsOfMessage($id_msg);
 		}
-		elseif (!empty($_GET['aid']))
-			$attachments[] = (int) $_GET['aid'];
+		elseif (!empty($this->_req->query->aid))
+			$attachments[] = (int) $this->_req->query->aid;
 
 		if (empty($attachments))
 			Errors::instance()->fatal_lang_error('no_access', false);

@@ -302,11 +302,12 @@ function logActions($logs)
 		// Is there an associated report on this?
 		if (in_array($log['action'], array('move', 'remove', 'split', 'merge')))
 		{
+			require_once(SUBSDIR . '/Logging.subs.php');
 			if (loadLogReported($msg_id, $topic_id))
 			{
 				require_once(SUBSDIR . '/Moderation.subs.php');
 				updateSettings(array('last_mod_report_action' => time()));
-				recountOpenReports();
+				recountOpenReports(true, allowedTo('admin_forum'));
 			}
 		}
 

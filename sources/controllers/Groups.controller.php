@@ -27,6 +27,49 @@ if (!defined('ELK'))
 class Groups_Controller extends Action_Controller
 {
 	/**
+	 * Holds instance of HttpReq object
+	 * @var HttpReq
+	 */
+	private $_req;
+
+	/**
+	 * Set up templates and pre-requisites for any request processed by this class.
+	 *
+	 * - Called automagically before any action_() call.
+	 * - It handles permission checks, and puts the moderation bar on as required.
+	 */
+	public function pre_dispatch()
+	{
+		global $context, $txt, $scripturl, $user_info;
+
+		$this->_req = HttpReq::instance();
+
+		// Get the template stuff up and running.
+		loadLanguage('ManageMembers');
+		loadLanguage('ModerationCenter');
+		loadTemplate('ManageMembergroups');
+
+		// If we can see the moderation center, and this has a mod bar entry, add the mod center bar.
+		if (allowedTo('access_mod_center') || $user_info['mod_cache']['bq'] != '0=1' || $user_info['mod_cache']['gq'] != '0=1' || allowedTo('manage_membergroups'))
+		{
+			$this->_req->query->area = $this->_req->getQuery('sa') === 'requests' ? 'groups' : 'viewgroups';
+			$controller = new ModerationCenter_Controller(new Event_Manager());
+			$controller->pre_dispatch();
+			$controller->prepareModcenter();
+		}
+		// Otherwise add something to the link tree, for normal people.
+		else
+		{
+			isAllowedTo('view_mlist');
+
+			$context['linktree'][] = array(
+				'url' => $scripturl . '?action=groups',
+				'name' => $txt['groups'],
+			);
+		}
+	}
+
+	/**
 	 * Entry point to groups.
 	 * It allows moderators and users to access the group showing functions.
 	 *
@@ -48,41 +91,6 @@ class Groups_Controller extends Action_Controller
 		$subAction = $action->initialize($subActions, 'list');
 		$context['sub_action'] = $subAction;
 		$action->dispatch($subAction);
-	}
-
-	/**
-	 * Set up templates and pre-requisites for any request processed by this class.
-	 *
-	 * - Called automagically before any action_() call.
-	 * - It handles permission checks, and puts the moderation bar on as required.
-	 */
-	public function pre_dispatch()
-	{
-		global $context, $txt, $scripturl, $user_info;
-
-		// Get the template stuff up and running.
-		loadLanguage('ManageMembers');
-		loadLanguage('ModerationCenter');
-		loadTemplate('ManageMembergroups');
-
-		// If we can see the moderation center, and this has a mod bar entry, add the mod center bar.
-		if (allowedTo('access_mod_center') || $user_info['mod_cache']['bq'] != '0=1' || $user_info['mod_cache']['gq'] != '0=1' || allowedTo('manage_membergroups'))
-		{
-			$_GET['area'] = (!empty($_REQUEST['sa']) && $_REQUEST['sa'] == 'requests') ? 'groups' : 'viewgroups';
-			$controller = new ModerationCenter_Controller(new Event_Manager());
-			$controller->pre_dispatch();
-			$controller->prepareModcenter();
-		}
-		// Otherwise add something to the link tree, for normal people.
-		else
-		{
-			isAllowedTo('view_mlist');
-
-			$context['linktree'][] = array(
-				'url' => $scripturl . '?action=groups',
-				'name' => $txt['groups'],
-			);
-		}
 	}
 
 	/**
@@ -223,11 +231,7 @@ class Groups_Controller extends Action_Controller
 	{
 		global $txt, $scripturl, $context, $modSettings, $user_info, $settings;
 
-		$current_group = isset($_REQUEST['group']) ? (int) $_REQUEST['group'] : 0;
-
-		// No browsing of guests, membergroup 0 or moderators.
-		if (in_array($current_group, array(-1, 0, 3)))
-			Errors::instance()->fatal_lang_error('membergroup_does_not_exist', false);
+		$current_group = $this->_req->getQuery('group', 'intval', 0);
 
 		// These will be needed
 		require_once(SUBSDIR . '/Membergroups.subs.php');
@@ -235,6 +239,11 @@ class Groups_Controller extends Action_Controller
 
 		// Load up the group details.
 		$context['group'] = membergroupById($current_group, true, true);
+
+		// No browsing of guests, membergroup 0 or moderators or non-existing groups.
+		if ($context['group'] === false || in_array($current_group, array(-1, 0, 3)))
+			Errors::instance()->fatal_lang_error('membergroup_does_not_exist', false);
+
 		$context['group']['id'] = $context['group']['id_group'];
 		$context['group']['name'] = $context['group']['group_name'];
 
@@ -249,8 +258,8 @@ class Groups_Controller extends Action_Controller
 			'name' => $context['group']['name'],
 		);
 		$context['can_send_email'] = allowedTo('send_email_to_members');
-		$context['sort_direction'] = isset($_REQUEST['desc']) ? 'down' : 'up';
-		$context['start'] = $_REQUEST['start'];
+		$context['sort_direction'] = isset($this->_req->query->desc) ? 'down' : 'up';
+		$context['start'] = $this->_req->query->start;
 		$context['can_moderate_forum'] = allowedTo('moderate_forum');
 
 		// @todo: use createList
@@ -281,20 +290,22 @@ class Groups_Controller extends Action_Controller
 			$context['group']['assignable'] = 0;
 
 		// Removing member from group?
-		if (isset($_POST['remove']) && !empty($_REQUEST['rem']) && is_array($_REQUEST['rem']) && $context['group']['assignable'])
+		if (isset($this->_req->post->remove)
+			&& !empty($this->_req->post->rem)
+			&& is_array($this->_req->post->rem)
+			&& $context['group']['assignable'])
 		{
 			// Security first
 			checkSession();
 			validateToken('mod-mgm');
 
 			// Make sure we're dealing with integers only.
-			foreach ($_REQUEST['rem'] as $key => $group)
-				$_REQUEST['rem'][$key] = (int) $group;
-
-			removeMembersFromGroups($_REQUEST['rem'], $current_group, true);
+			$to_remove = array_map('intval', $this->_req->post->rem);
+			removeMembersFromGroups($to_remove, $current_group, true);
 		}
 		// Must be adding new members to the group...
-		elseif (isset($_REQUEST['add']) && (!empty($_REQUEST['toAdd']) || !empty($_REQUEST['member_add'])) && $context['group']['assignable'])
+		elseif (isset($this->_req->post->add)
+			&& (!empty($this->_req->post->toAdd) || !empty($this->_req->post->member_add)) && $context['group']['assignable'])
 		{
 			// Make sure you can do this
 			checkSession();
@@ -304,9 +315,9 @@ class Groups_Controller extends Action_Controller
 			$member_parameters = array('not_in_group' => $current_group);
 
 			// Get all the members to be added... taking into account names can be quoted ;)
-			$_REQUEST['toAdd'] = strtr(Util::htmlspecialchars($_REQUEST['toAdd'], ENT_QUOTES), array('&quot;' => '"'));
-			preg_match_all('~"([^"]+)"~', $_REQUEST['toAdd'], $matches);
-			$member_names = array_unique(array_merge($matches[1], explode(',', preg_replace('~"[^"]+"~', '', $_REQUEST['toAdd']))));
+			$toAdd = strtr(Util::htmlspecialchars($this->_req->post->toAdd, ENT_QUOTES), array('&quot;' => '"'));
+			preg_match_all('~"([^"]+)"~', $toAdd, $matches);
+			$member_names = array_unique(array_merge($matches[1], explode(',', preg_replace('~"[^"]+"~', '', $toAdd))));
 
 			foreach ($member_names as $index => $member_name)
 			{
@@ -318,9 +329,9 @@ class Groups_Controller extends Action_Controller
 
 			// Any members passed by ID?
 			$member_ids = array();
-			if (!empty($_REQUEST['member_add']))
+			if (!empty($this->_req->post->member_add))
 			{
-				foreach ($_REQUEST['member_add'] as $id)
+				foreach ($this->_req->post->member_add as $id)
 				{
 					if ($id > 0)
 						$member_ids[] = (int) $id;
@@ -352,23 +363,23 @@ class Groups_Controller extends Action_Controller
 		// Sort out the sorting!
 		$sort_methods = array(
 			'name' => 'real_name',
-			'email' => allowedTo('moderate_forum') ? 'email_address' : 'hide_email ' . (isset($_REQUEST['desc']) ? 'DESC' : 'ASC') . ', email_address',
+			'email' => allowedTo('moderate_forum') ? 'email_address' : 'hide_email ' . (isset($this->_req->query->desc) ? 'DESC' : 'ASC') . ', email_address',
 			'active' => 'last_login',
 			'registered' => 'date_registered',
 			'posts' => 'posts',
 		);
 
 		// They didn't pick one, or tried a wrong one, so default to by name..
-		if (!isset($_REQUEST['sort']) || !isset($sort_methods[$_REQUEST['sort']]))
+		if (!isset($this->_req->query->sort) || !isset($sort_methods[$this->_req->query->sort]))
 		{
 			$context['sort_by'] = 'name';
-			$querySort = 'real_name' . (isset($_REQUEST['desc']) ? ' DESC' : ' ASC');
+			$querySort = 'real_name' . (isset($this->_req->query->desc) ? ' DESC' : ' ASC');
 		}
 		// Otherwise sort by what they asked
 		else
 		{
-			$context['sort_by'] = $_REQUEST['sort'];
-			$querySort = $sort_methods[$_REQUEST['sort']] . (isset($_REQUEST['desc']) ? ' DESC' : ' ASC');
+			$context['sort_by'] = $this->_req->query->sort;
+			$querySort = $sort_methods[$this->_req->query->sort] . (isset($this->_req->query->desc) ? ' DESC' : ' ASC');
 		}
 
 		// The where on the query is interesting. Non-moderators should only see people who are in this group as primary.
@@ -382,7 +393,7 @@ class Groups_Controller extends Action_Controller
 		$context['total_members'] = comma_format($context['total_members']);
 
 		// Create the page index.
-		$context['page_index'] = constructPageIndex($scripturl . '?action=' . ($context['group']['can_moderate'] ? 'moderate;area=viewgroups' : 'groups') . ';sa=members;group=' . $current_group . ';sort=' . $context['sort_by'] . (isset($_REQUEST['desc']) ? ';desc' : ''), $_REQUEST['start'], $context['total_members'], $modSettings['defaultMaxMembers']);
+		$context['page_index'] = constructPageIndex($scripturl . '?action=' . ($context['group']['can_moderate'] ? 'moderate;area=viewgroups' : 'groups') . ';sa=members;group=' . $current_group . ';sort=' . $context['sort_by'] . (isset($this->_req->query->desc) ? ';desc' : ''), $this->_req->query->start, $context['total_members'], $modSettings['defaultMaxMembers']);
 
 		// Fetch the members that meet the where criteria
 		$context['members'] = membersBy($where, array($where => $current_group, 'order' => $querySort), true);
@@ -439,7 +450,9 @@ class Groups_Controller extends Action_Controller
 		$where_parameters = array();
 
 		// We've submitted?
-		if (isset($_POST[$context['session_var']]) && !empty($_POST['groupr']) && !empty($_POST['req_action']))
+		if (isset($this->_req->post->$context['session_var'])
+			&& !empty($this->_req->post->groupr)
+			&& !empty($this->_req->post->req_action))
 		{
 			checkSession('post');
 			validateToken('mod-gr');
@@ -447,18 +460,17 @@ class Groups_Controller extends Action_Controller
 			require_once(SUBSDIR . '/Membergroups.subs.php');
 
 			// Clean the values.
-			foreach ($_POST['groupr'] as $k => $request)
-				$_POST['groupr'][$k] = (int) $request;
+			$this->_req->post->groupr = array_map('intval', $this->_req->post->groupr);
 
 			// If we are giving a reason (And why shouldn't we?), then we don't actually do much.
-			if ($_POST['req_action'] == 'reason')
+			if ($this->_req->post->req_action === 'reason')
 			{
 				// Different sub template...
 				$context['sub_template'] = 'group_request_reason';
 
 				// And a limitation. We don't care that the page number bit makes no sense, as we don't need it!
 				$where .= ' AND lgr.id_request IN ({array_int:request_ids})';
-				$where_parameters['request_ids'] = $_POST['groupr'];
+				$where_parameters['request_ids'] = $this->_req->post->groupr;
 
 				$context['group_requests'] = list_getGroupRequests(0, $modSettings['defaultMaxMessages'], 'lgr.id_request', $where, $where_parameters);
 				createToken('mod-gr');
@@ -471,10 +483,10 @@ class Groups_Controller extends Action_Controller
 			{
 				// Get the details of all the members concerned...
 				require_once(SUBSDIR . '/Members.subs.php');
-				$concerned = getConcernedMembers($_POST['groupr'], $where, $_POST['req_action'] === 'approve');
+				$concerned = getConcernedMembers($this->_req->post->groupr, $where, $this->_req->post->req_action === 'approve');
 
 				// Cleanup old group requests..
-				deleteGroupRequests($_POST['groupr']);
+				deleteGroupRequests($this->_req->post->groupr);
 
 				// Ensure everyone who is online gets their changes right away.
 				updateSettings(array('settings_updated' => time()));
@@ -484,7 +496,7 @@ class Groups_Controller extends Action_Controller
 					require_once(SUBSDIR . '/Mail.subs.php');
 
 					// They are being approved?
-					if ($_POST['req_action'] == 'approve')
+					if ($this->_req->post->req_action === 'approve')
 					{
 						// Make the group changes.
 						foreach ($concerned['group_changes'] as $id => $groups)
@@ -515,7 +527,7 @@ class Groups_Controller extends Action_Controller
 						// Same as for approving, kind of.
 						foreach ($concerned['email_details'] as $email)
 						{
-							$custom_reason = isset($_POST['groupreason']) && isset($_POST['groupreason'][$email['rid']]) ? $_POST['groupreason'][$email['rid']] : '';
+							$custom_reason = isset($this->_req->post->groupreason) && isset($this->_req->post->groupreason[$email['rid']]) ? $this->_req->post->groupreason[$email['rid']] : '';
 
 							$replacements = array(
 								'USERNAME' => $email['member_name'],
@@ -636,11 +648,11 @@ class Groups_Controller extends Action_Controller
 						<select name="req_action" onchange="if (this.value != 0 &amp;&amp; (this.value == \'reason\' || confirm(\'' . $txt['mc_groupr_warning'] . '\'))) this.form.submit();">
 							<option value="0">' . $txt['with_selected'] . ':</option>
 							<option value="0" disabled="disabled">' . str_repeat('&#8212;', strlen($txt['mc_groupr_approve'])) . '</option>
-							<option value="approve">' . (isBrowser('ie8') ? '&#187;' : '&#10148;') . '&nbsp;' . $txt['mc_groupr_approve'] . '</option>
-							<option value="reject">' . (isBrowser('ie8') ? '&#187;' : '&#10148;') . '&nbsp;' . $txt['mc_groupr_reject'] . '</option>
-							<option value="reason">' . (isBrowser('ie8') ? '&#187;' : '&#10148;') . '&nbsp;' . $txt['mc_groupr_reject_w_reason'] . '</option>
+							<option value="approve">&#10148;&nbsp;' . $txt['mc_groupr_approve'] . '</option>
+							<option value="reject">&#10148;&nbsp;' . $txt['mc_groupr_reject'] . '</option>
+							<option value="reason">&#10148;&nbsp;' . $txt['mc_groupr_reject_w_reason'] . '</option>
 						</select>
-						<input type="submit" name="go" value="' . $txt['go'] . '" onclick="var sel = document.getElementById(\'req_action\'); if (sel.value != 0 &amp;&amp; sel.value != \'reason\' &amp;&amp; !confirm(\'' . $txt['mc_groupr_warning'] . '\')) return false;" class="right_submit" />',
+						<input type="submit" name="go" value="' . $txt['go'] . '" onclick="var sel = document.getElementById(\'req_action\'); if (sel.value != 0 &amp;&amp; sel.value != \'reason\' &amp;&amp; !confirm(\'' . $txt['mc_groupr_warning'] . '\')) return false;" />',
 					'class' => 'floatright',
 				),
 			),

@@ -11,11 +11,13 @@
  */
 
 if (!defined('ELK'))
+{
 	die('No access...');
+}
 
 /**
- *
  * ElkArte autoloader
+ *
  * What it does:
  * - Automatically finds and includes the files for a given class name
  * - Follows controller naming conventions to find the right file to load
@@ -79,7 +81,7 @@ class Elk_Autoloader
 
 	/**
 	 * Holds the name full file name of the file to load (require)
-	 * @var string
+	 * @var string|boolean
 	 */
 	protected $_file_name = false;
 
@@ -102,7 +104,9 @@ class Elk_Autoloader
 	public function setupAutoloader($dir)
 	{
 		if (!is_array($dir))
+		{
 			$dir = array($dir);
+		}
 
 		foreach ($dir as $path)
 		{
@@ -120,10 +124,14 @@ class Elk_Autoloader
 	public function register($dir, $namespace = null, $strict = false)
 	{
 		if ($namespace === null)
+		{
 			$namespace = 0;
+		}
 
 		if (!isset($this->_paths[$namespace]))
+		{
 			$this->_paths[$namespace] = array();
+		}
 
 		$this->_paths[$namespace][] = $dir;
 		$this->_paths[$namespace] = array_unique($this->_paths[$namespace]);
@@ -157,7 +165,10 @@ class Elk_Autoloader
 		set_include_path($this->_dir . '.' . (!@ini_get('open_basedir') ? PATH_SEPARATOR . get_include_path() : ''));
 
 		// The autoload "magic"
-		spl_autoload_register(array($this, 'elk_autoloader'));
+		if (!$this->_setup)
+		{
+			spl_autoload_register(array($this, 'elk_autoloader'));
+		}
 	}
 
 	/**
@@ -169,19 +180,27 @@ class Elk_Autoloader
 	{
 		// Break the class name in to its parts
 		if (!$this->_string_to_class($class))
+		{
 			return false;
+		}
 
 		// If passed a namespace, /name/space/class
 		if ($this->_current_namespace !== false)
+		{
 			$this->_handle_namespaces();
+		}
 
 		// Basic cases like Util.class, Action.class, Request.class
 		if ($this->_file_name === false)
+		{
 			$this->_handle_basic_cases();
+		}
 
 		// All the rest
 		if ($this->_file_name === false)
+		{
 			$this->_handle_other_cases();
+		}
 
 		$file = $this->_file_name;
 
@@ -191,13 +210,18 @@ class Elk_Autoloader
 		// Well do we have something to do?
 		if (!empty($file))
 		{
+			// Are we going to validate the file exists?
 			if ($this->_strict)
 			{
 				if (stream_resolve_include_path($file))
+				{
 					require_once($file);
+				}
 			}
 			else
+			{
 				require_once($file);
+			}
 
 			$this->_strict = false;
 		}
@@ -212,6 +236,7 @@ class Elk_Autoloader
 	{
 		$namespaces = explode('\\', ltrim($class, '\\'));
 		$prefix = '';
+
 		if (isset($namespaces[1]))
 		{
 			$class = array_pop($namespaces);
@@ -234,17 +259,21 @@ class Elk_Autoloader
 			{
 				$this->_current_namespace = $full_namespace;
 				if (!isset($this->_paths[$this->_current_namespace]))
+				{
 					$this->register($this->_current_namespace, strtr($this->_current_namespace, array('\\' => DIRECTORY_SEPARATOR, 'ElkArte' => BOARDDIR)));
+				}
 			}
-			else
-				$prefix = $prefix;
 		}
 		else
+		{
 			$this->_current_namespace = false;
+		}
 
 		// The name must be letters, numbers and _ only
 		if (preg_match('~[^a-z0-9_]~i', $class))
+		{
 			return false;
+		}
 
 		$this->_name = explode('_', $class);
 		$this->_surname = array_pop($this->_name);
@@ -255,7 +284,8 @@ class Elk_Autoloader
 
 	/**
 	 * This handles any case where a namespace is present.
-	 * @return bool False if the namespace was found, but the file not, true otherwise.
+	 *
+	 * @return boolean|null false if the namespace was found, but the file not, true otherwise
 	 */
 	protected function _handle_namespaces()
 	{
@@ -268,12 +298,15 @@ class Elk_Autoloader
 				if (file_exists($file))
 				{
 					$this->_file_name = $file;
+
 					return;
 				}
 			}
 
 			if ($this->_strict_namespace[$this->_current_namespace])
+			{
 				$this->_strict = true;
+			}
 		}
 	}
 
@@ -304,11 +337,17 @@ class Elk_Autoloader
 
 				// validate the file since it can vary
 				if (stream_resolve_include_path($this->_file_name . '.class.php'))
+				{
 					$this->_file_name = $this->_file_name . '.class.php';
+				}
 				elseif (stream_resolve_include_path($this->_file_name . '.php'))
+				{
 					$this->_file_name = $this->_file_name . '.php';
+				}
 				else
+				{
 					$this->_file_name = '';
+				}
 				break;
 			default:
 				$this->_file_name = false;
@@ -328,11 +367,9 @@ class Elk_Autoloader
 
 				// Try source, controller, admin, then addons
 				if (!stream_resolve_include_path($this->_file_name))
+				{
 					$this->_file_name = '';
-				break;
-			// Some_Search => SearchAPI-Some.class
-			case 'Search':
-				$this->_file_name = SUBSDIR . '/SearchAPI-' . $this->_givenname . '.class.php';
+				}
 				break;
 			// Some_Thing_Exception => /Exception/SomeThingException.class.php
 			case 'Exception':
@@ -342,7 +379,9 @@ class Elk_Autoloader
 			case 'Integrate':
 				$this->_file_name = SUBSDIR . '/' . $this->_givenname . '.integrate.php';
 				if (!stream_resolve_include_path($this->_file_name))
+				{
 					$this->_file_name = '';
+				}
 				break;
 			// Some_Display => Subscriptions-Some.class.php
 			case 'Display':
@@ -351,28 +390,42 @@ class Elk_Autoloader
 				break;
 			case 'Module':
 				if (file_exists(SOURCEDIR . '/modules/' . $this->_name[0] . '/' . $this->_givenname . 'Module.class.php'))
+				{
 					$this->_file_name = SOURCEDIR . '/modules/' . $this->_name[0] . '/' . $this->_givenname . 'Module.class.php';
+				}
 				break;
 			case 'Interface':
 			case 'Abstract':
 				if ($this->_surname == 'Interface')
+				{
 					$this->_file_name = $this->_givenname . '.interface.php';
+				}
 				else
+				{
 					$this->_file_name = $this->_givenname . 'Abstract.class.php';
+				}
 
 				if (file_exists(SUBSDIR . '/' . $this->_file_name))
+				{
 					$this->_file_name = SUBSDIR . '/' . $this->_file_name;
+				}
 				else
 				{
 					$dir = SUBSDIR . '/' . $this->_givenname;
 
 					if (file_exists($dir . '/' . $this->_file_name))
+					{
 						$this->_file_name = $dir . '/' . $this->_file_name;
+					}
 					elseif (!empty($this->_name[1]) && $this->_name[1] == 'Module')
+					{
 						$this->_file_name = SOURCEDIR . '/modules/' . $this->_name[0] . '/' . $this->_file_name;
+					}
 					// Not knowing what it is, better leave it empty
 					else
+					{
 						$this->_file_name = '';
+					}
 				}
 				break;
 			// All the rest, like Browser_Detector, Template_Layers, Site_Dispatcher ...
@@ -380,11 +433,17 @@ class Elk_Autoloader
 				$this->_file_name = $this->_givenname . $this->_surname;
 
 				if (stream_resolve_include_path($this->_file_name . '.class.php'))
+				{
 					$this->_file_name = $this->_file_name . '.class.php';
+				}
 				elseif (stream_resolve_include_path($this->_file_name . '.php'))
+				{
 					$this->_file_name = $this->_file_name . '.php';
+				}
 				else
+				{
 					$this->_file_name = '';
+				}
 		}
 	}
 
@@ -393,10 +452,12 @@ class Elk_Autoloader
 	 *
 	 * - Uses final definition to prevent child classes from overriding this method
 	 */
-	public static final function getInstance()
+	final public static function getInstance()
 	{
 		if (!self::$_instance)
+		{
 			self::$_instance = new self();
+		}
 
 		return self::$_instance;
 	}

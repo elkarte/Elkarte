@@ -647,7 +647,7 @@ function pbe_emailError($error, $email_message)
 	// First up is the old, wrong email address, lets see who this should have come from if its not a new topic request
 	if ($error === 'error_not_find_member' && $email_message->message_type !== 'x')
 	{
-		$key_owner = query_key_owner($email_message->message_key_id);
+		$key_owner = query_key_owner($email_message);
 		if (!empty($key_owner))
 		{
 			// Valid key so show who should have sent this key in? email aggravaters :P often mess this up
@@ -663,7 +663,7 @@ function pbe_emailError($error, $email_message)
 	// A valid key but it was not sent to this user ... but we did get the email from a valid site user
 	if ($error === 'error_key_sender_match')
 	{
-		$key_owner = query_key_owner($email_message->message_key_id);
+		$key_owner = query_key_owner($email_message);
 		if (!empty($key_owner))
 		{
 			// Valid key so show who should have sent this key in
@@ -721,8 +721,14 @@ function pbe_emailError($error, $email_message)
 	$id = isset($_REQUEST['item']) ? (int) $_REQUEST['item'] : 0;
 	$db->insert(!empty($id) ? 'replace' : 'ignore',
 		'{db_prefix}postby_emails_error',
-		array('id_email' => 'int', 'error' => 'string', 'data_id' => 'string', 'subject' => 'string', 'id_message' => 'int', 'id_board' => 'int', 'email_from' => 'string', 'message_type' => 'string', 'message' => 'string'),
-		array($id, $error, $message_key, $subject, $message_id, $board_id, $email_message->email['from'], $message_type, $email_message->raw_message),
+		array(
+			'id_email' => 'int', 'error' => 'string', 'message_key' => 'string',
+			'subject' => 'string', 'message_id' => 'int', 'id_board' => 'int',
+			'email_from' => 'string', 'message_type' => 'string', 'message' => 'string'),
+		array(
+			$id, $error, $message_key,
+			$subject, $message_id, $board_id,
+			$email_message->email['from'], $message_type, $email_message->raw_message),
 		array('id_email')
 	);
 
@@ -1252,7 +1258,7 @@ function query_user_keys($email)
 	// Find all keys sent to this email, sorted by date
 	return $db->fetchQuery('
 		SELECT
-			id_email
+			message_key, message_type, message_id
 		FROM {db_prefix}postby_emails
 		WHERE email_to = {string:email}
 		ORDER BY time_sent DESC',
@@ -1266,10 +1272,10 @@ function query_user_keys($email)
  * Return the email that a given key was sent to
  *
  * @package Maillist
- * @param string $key security key
+ * @param Email_Parse $email_message
  * @return string email address the key was sent to
  */
-function query_key_owner($key)
+function query_key_owner($email_message)
 {
 	$db = database();
 
@@ -1283,10 +1289,14 @@ function query_key_owner($key)
 		SELECT
 			email_to
 		FROM {db_prefix}postby_emails
-		WHERE id_email = {string:database_id}
+		WHERE message_key = {string:key}
+			AND message_type = {string:type}
+			AND message_id = {string:message}
 		LIMIT 1',
 		array(
-			'database_id' => $key
+			'key' => $email_message->message_key,
+			'type' => $email_message->message_type,
+			'message' => $email_message->message_id,
 		)
 	);
 	list ($email_to) = $db->fetch_row($request);
@@ -1722,9 +1732,13 @@ function query_key_maintenance($email_message)
 	{
 		$db->query('', '
 			DELETE FROM {db_prefix}postby_emails
-			WHERE id_email = {string:message_key_id}',
+			WHERE message_key = {string:key}
+				AND message_type = {string:type}
+				AND message_id = {string:message_id}',
 			array(
-				'message_key_id' => $email_message->message_key_id,
+				'key' => $email_message->message_key,
+				'type' => $email_message->message_type,
+				'message_id' => $email_message->message_id,
 			)
 		);
 	}
@@ -1796,10 +1810,11 @@ function query_update_member_stats($pbe, $email_message, $topic_info = array())
 	// Place the entry in to the online log so the who's online can use it
 	$serialized = serialize($get_temp);
 	$session_id = 'ip' . $pbe['profile']['member_ip'];
+	$member_ip = empty($pbe['profile']['member_ip']) ? 0 : $pbe['profile']['member_ip'];
 	$db->insert($do_delete ? 'ignore' : 'replace',
 		'{db_prefix}log_online',
-		array('session' => 'string', 'id_member' => 'int', 'id_spider' => 'int', 'log_time' => 'int', 'ip' => 'raw', 'url' => 'string'),
-		array($session_id, $pbe['profile']['id_member'], 0, $last_login, 'IFNULL(INET_ATON(\'' . $pbe['profile']['member_ip'] . '\'), 0)', $serialized),
+		array('session' => 'string', 'id_member' => 'int', 'id_spider' => 'int', 'log_time' => 'int', 'ip' => 'string', 'url' => 'string'),
+		array($session_id, $pbe['profile']['id_member'], 0, $last_login, $member_ip, $serialized),
 		array('session')
 	);
 }

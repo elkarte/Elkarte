@@ -190,16 +190,49 @@ function bb2_insert($settings, $package, $key)
 		foreach ($package['request_entity'] as $h => $v)
 		{
 			if (is_array($v))
-				$v = implode(' | ', $v);
+				$v = bb2_multi_implode($v, ' | ');
 
 			$request_entity .= bb2_db_escape("$h: $v\n");
 		}
+
+		// Only such much space in this column, so brutally cut it
+		// @todo in 1.1 improve logging or drop this?
+		$request_entity = substr($request_entity, 0, 254);
 	}
 
 	// Add it
 	return "INSERT INTO {db_prefix}log_badbehavior
 		(`ip`, `date`, `request_method`, `request_uri`, `server_protocol`, `http_headers`, `user_agent`, `request_entity`, `valid`, `id_member`, `session`) VALUES
 		('$ip', '$date', '$request_method', '$request_uri', '$server_protocol', '$headers', '$user_agent', '$request_entity', '$key', '$member_id' , '$session')";
+}
+
+/**
+ * Implode that is multi dimensional array aware
+ *
+ * - Recursively calls itself to return a single string from a multi dimensional
+ * array
+ *
+ * @param mixed[] $array array to recursively implode
+ * @param string $glue value that glues elements together
+ * @param bool $trim_all trim ALL whitespace from string
+ *
+ * @return string
+ */
+function bb2_multi_implode($array, $glue = ',', $trim_all = false)
+{
+	if (!is_array($array))
+		$array = array($array);
+
+	foreach ($array as $key => $value)
+	{
+		if (is_array($value))
+			$array[$key] = bb2_multi_implode($value, $glue, $trim_all);
+	}
+
+	if ($trim_all)
+		$array = array_map('trim', $array);
+
+	return implode($glue, $array);
 }
 
 /**

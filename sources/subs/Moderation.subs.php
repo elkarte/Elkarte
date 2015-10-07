@@ -28,7 +28,7 @@ if (!defined('ELK'))
  *
  * @param boolean $flush = true if moderator menu count will be cleared
  */
-function recountOpenReports($flush = true)
+function recountOpenReports($flush = true, $count_pms = false)
 {
 	global $user_info, $context;
 
@@ -38,11 +38,13 @@ function recountOpenReports($flush = true)
 		SELECT COUNT(*)
 		FROM {db_prefix}log_reported
 		WHERE ' . $user_info['mod_cache']['bq'] . '
+			AND type IN ({array_string:rep_type})
 			AND closed = {int:not_closed}
 			AND ignore_all = {int:not_ignored}',
 		array(
 			'not_closed' => 0,
 			'not_ignored' => 0,
+			'rep_type' => $count_pms ? array('pm') : array('msg'),
 		)
 	);
 	list ($open_reports) = $db->fetch_row($request);
@@ -150,7 +152,7 @@ function recountFailedEmails($approve_query = null)
  *
  * @param int $status
  */
-function totalReports($status = 0)
+function totalReports($status = 0, $show_pms = false)
 {
 	global $user_info;
 
@@ -160,9 +162,11 @@ function totalReports($status = 0)
 		SELECT COUNT(*)
 		FROM {db_prefix}log_reported AS lr
 		WHERE lr.closed = {int:view_closed}
+			AND lr.type IN ({array_string:type})
 			AND ' . ($user_info['mod_cache']['bq'] == '1=1' || $user_info['mod_cache']['bq'] == '0=1' ? $user_info['mod_cache']['bq'] : 'lr.' . $user_info['mod_cache']['bq']),
 		array(
 			'view_closed' => $status,
+			'type' => $show_pms ? array('pm') : array('msg'),
 		)
 	);
 	list ($total_reports) = $db->fetch_row($request);
@@ -281,7 +285,7 @@ function loadModeratorMenuCounts($brd = null)
 
 		// Reported posts
 		if (!empty($user_info['mod_cache']) && $user_info['mod_cache']['bq'] != '0=1')
-			$menu_errors[$cache_key]['reports'] = recountOpenReports(false);
+			$menu_errors[$cache_key]['reports'] = recountOpenReports(false, allowedTo('admin_forum'));
 
 		// Email failures that require attention
 		if (!empty($modSettings['maillist_enabled']) && allowedTo('approve_emails'))
@@ -687,7 +691,7 @@ function modAddUpdateTemplate($recipient_id, $template_title, $template_body, $i
  *
  * @param int $id_report
  */
-function modReportDetails($id_report)
+function modReportDetails($id_report, $show_pms = false)
 {
 	global $user_info;
 
@@ -700,10 +704,12 @@ function modReportDetails($id_report)
 		FROM {db_prefix}log_reported AS lr
 			LEFT JOIN {db_prefix}members AS mem ON (mem.id_member = lr.id_member)
 		WHERE lr.id_report = {int:id_report}
+			AND lr.type IN ({array_string:rep_type})
 			AND ' . ($user_info['mod_cache']['bq'] == '1=1' || $user_info['mod_cache']['bq'] == '0=1' ? $user_info['mod_cache']['bq'] : 'lr.' . $user_info['mod_cache']['bq']) . '
 		LIMIT 1',
 		array(
 			'id_report' => $id_report,
+			'rep_type' => $show_pms ? array('pm') : array('msg'),
 		)
 	);
 
@@ -727,7 +733,7 @@ function modReportDetails($id_report)
  *
  * @todo move to createList?
  */
-function getModReports($status = 0, $start = 0, $limit = 10)
+function getModReports($status = 0, $start = 0, $limit = 10, $show_pms = false)
 {
 	global $user_info;
 
@@ -740,6 +746,7 @@ function getModReports($status = 0, $start = 0, $limit = 10)
 			FROM {db_prefix}log_reported AS lr
 				LEFT JOIN {db_prefix}members AS mem ON (mem.id_member = lr.id_member)
 			WHERE lr.closed = {int:view_closed}
+				AND lr.type IN ({array_string:rep_type})
 				AND ' . ($user_info['mod_cache']['bq'] == '1=1' || $user_info['mod_cache']['bq'] == '0=1' ? $user_info['mod_cache']['bq'] : 'lr.' . $user_info['mod_cache']['bq']) . '
 			ORDER BY lr.time_updated DESC
 			LIMIT {int:start}, {int:limit}',
@@ -747,6 +754,7 @@ function getModReports($status = 0, $start = 0, $limit = 10)
 				'view_closed' => $status,
 				'start' => $start,
 				'limit' => $limit,
+				'rep_type' => $show_pms ? array('pm') : array('msg'),
 			)
 		);
 
@@ -1013,6 +1021,8 @@ function watchedUsers($start, $items_per_page, $sort, $approve_query, $dummy)
  */
 function watchedUserPostsCount($approve_query, $warning_watch)
 {
+	global $modSettings;
+
 	$db = database();
 
 	// @todo $approve_query is not used in the function
@@ -1023,10 +1033,12 @@ function watchedUserPostsCount($approve_query, $warning_watch)
 				INNER JOIN {db_prefix}members AS mem ON (mem.id_member = m.id_member)
 				INNER JOIN {db_prefix}boards AS b ON (b.id_board = m.id_board)
 			WHERE mem.warning >= {int:warning_watch}
-				AND {query_see_board}
-				' . $approve_query,
+				AND {query_see_board}' . (!empty($modSettings['recycle_enable']) && $modSettings['recycle_board'] > 0 ? '
+				AND b.id_board != {int:recycle}' : '') .
+				$approve_query,
 		array(
 			'warning_watch' => $warning_watch,
+			'recycle' => $modSettings['recycle_board'],
 		)
 	);
 	list ($totalMemberPosts) = $db->fetch_row($request);
@@ -1058,12 +1070,14 @@ function watchedUserPosts($start, $items_per_page, $sort, $approve_query, $delet
 			INNER JOIN {db_prefix}members AS mem ON (mem.id_member = m.id_member)
 			INNER JOIN {db_prefix}boards AS b ON (b.id_board = m.id_board)
 		WHERE mem.warning >= {int:warning_watch}
-			AND {query_see_board}
-			' . $approve_query . '
+			AND {query_see_board}' . (!empty($modSettings['recycle_enable']) && $modSettings['recycle_board'] > 0 ? '
+			AND b.id_board != {int:recycle}' : '') .
+			$approve_query . '
 		ORDER BY m.id_msg DESC
 		LIMIT ' . $start . ', ' . $items_per_page,
 		array(
 			'warning_watch' => $modSettings['warning_watch'],
+			'recycle' => $modSettings['recycle_board'],
 		)
 	);
 	$member_posts = array();
@@ -1179,7 +1193,7 @@ function basicWatchedUsers()
  *
  * @return array
  */
-function reportedPosts()
+function reportedPosts($show_pms = false)
 {
 	global $user_info;
 
@@ -1199,12 +1213,14 @@ function reportedPosts()
 				LEFT JOIN {db_prefix}members AS mem ON (mem.id_member = lr.id_member)
 			WHERE ' . ($user_info['mod_cache']['bq'] == '1=1' || $user_info['mod_cache']['bq'] == '0=1' ? $user_info['mod_cache']['bq'] : 'lr.' . $user_info['mod_cache']['bq']) . '
 				AND lr.closed = {int:not_closed}
+				AND lr.type IN ({array_string:rep_type})
 				AND lr.ignore_all = {int:not_ignored}
 			ORDER BY lr.time_updated DESC
 			LIMIT 10',
 			array(
 				'not_closed' => 0,
 				'not_ignored' => 0,
+				'rep_type' => $show_pms ? array('pm') : array('msg'),
 			)
 		);
 		$reported_posts = array();

@@ -192,7 +192,7 @@ function logMembergroupRequest($group_id, $memID)
 	$db->free_result($request);
 
 	// Log the request.
-	if ($num != 0)
+	if ($num == 0)
 	{
 		$db->insert('',
 			'{db_prefix}log_group_requests',

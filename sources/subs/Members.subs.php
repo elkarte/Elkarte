@@ -994,7 +994,8 @@ function groupsAllowedTo($permission, $board_id = null)
  * @package Members
  * @param string $permission
  * @param integer|null $board_id = null
- * @return an array containing member ID's.
+ *
+ * @return int[] an array containing member ID's.
  */
 function membersAllowedTo($permission, $board_id = null)
 {
@@ -1761,13 +1762,14 @@ function getMember($search, $buddies = array())
 		WHERE {raw:real_name} LIKE {string:search}' . (!empty($buddies) ? '
 			AND id_member IN ({array_int:buddy_list})' : '') . '
 			AND is_activated IN ({array_int:activation_status})
+		ORDER BY LENGTH(real_name), real_name
 		LIMIT {int:limit}',
 		array(
 			'real_name' => defined('DB_CASE_SENSITIVE') ? 'LOWER(real_name)' : 'real_name',
 			'buddy_list' => $buddies,
 			'search' => Util::strtolower($search),
 			'activation_status' => array(1, 12),
-			'limit' => Util::strlen($search) <= 2 ? 100 : 800,
+			'limit' => Util::strlen($search) <= 2 ? 100 : 200,
 		),
 		function($row)
 		{
@@ -1902,13 +1904,29 @@ function approveMembers($conditions)
 	);
 
 	// @todo maybe an hook here?
-
 	$query_cond = array();
+	$query = false;
 	foreach ($conditions as $key => $dummy)
+	{
 		if (isset($available_conditions[$key]))
+		{
+			if ($key === 'time_before')
+				$query = true;
 			$query_cond[] = $available_conditions[$key];
+		}
+	}
 
-	$conditions['is_activated'] = 1;
+	if ($query)
+	{
+		$data = retrieveMemberData($conditions);
+		$members_id = $data['members'];
+	}
+	else
+	{
+		$members_id = $conditions['members'];
+	}
+
+	$conditions['is_activated'] = $conditions['activated_status'] >= 10 ? 11 : 1;
 	$conditions['blank_string'] = '';
 
 	// Approve/activate this member.
@@ -1918,6 +1936,12 @@ function approveMembers($conditions)
 		WHERE is_activated = {int:activated_status}' . implode('', $query_cond),
 		$conditions
 	);
+
+	// Let the integration know that they've been activated!
+	foreach ($members_id as $member_id)
+		call_integration_hook('integrate_activate', array($member_id, $conditions['activated_status'], $conditions['is_activated']));
+
+	return $conditions['is_activated'];
 }
 
 /**
@@ -2032,7 +2056,7 @@ function onlineMembers($conditions, $sort_method, $sort_direction, $start)
 
 	return $db->fetchQuery('
 		SELECT
-			lo.log_time, lo.id_member, lo.url, INET_NTOA(lo.ip) AS ip, mem.real_name,
+			lo.log_time, lo.id_member, lo.url, lo.ip, mem.real_name,
 			lo.session, mg.online_color, IFNULL(mem.show_online, 1) AS show_online,
 			lo.id_spider
 		FROM {db_prefix}log_online AS lo

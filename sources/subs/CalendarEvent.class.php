@@ -79,6 +79,7 @@ class Calendar_Event
 				throw new Elk_Exception('invalid_days_numb', false);
 		}
 
+
 		// There is no need to validate the following values if we are just deleting the event.
 		if (!isset($event['deleteevent']))
 		{
@@ -127,8 +128,8 @@ class Calendar_Event
 	public function insert($options, $member_id)
 	{
 		$eventOptions = array(
-			'id_board' => 0,
-			'id_topic' => 0,
+			'id_board' => isset($options['id_board']) ? $options['id_board'] : 0,
+			'id_topic' => isset($options['id_topic']) ? $options['id_topic'] : 0,
 			'title' => Util::substr($options['evtitle'], 0, 100),
 			'member' => $member_id,
 			'start_date' => sprintf('%04d-%02d-%02d', $options['year'], $options['month'], $options['day']),

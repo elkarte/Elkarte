@@ -123,6 +123,8 @@ function removeTopics($topics, $decreasePostCount = true, $ignoreRecycling = fal
 
 		if (!empty($possible_recycle))
 		{
+			setTimeLimit(300);
+
 			// Get topics that will be recycled.
 			$recycleTopics = array();
 			foreach ($possible_recycle as $row)
@@ -130,8 +132,6 @@ function removeTopics($topics, $decreasePostCount = true, $ignoreRecycling = fal
 				// If it's already in the recycle board do nothing
 				if ($row['id_board'] == $modSettings['recycle_board'])
 					continue;
-
-				setTimeLimit(300);
 
 				$recycleTopics[] = $row['id_topic'];
 
@@ -142,39 +142,42 @@ function removeTopics($topics, $decreasePostCount = true, $ignoreRecycling = fal
 				));
 			}
 
-			// Mark recycled topics as recycled.
-			$db->query('', '
+			if (!empty($recycleTopics))
+			{
+				// Mark recycled topics as recycled.
+				$db->query('', '
 				UPDATE {db_prefix}messages
 				SET icon = {string:recycled}
 				WHERE id_topic IN ({array_int:recycle_topics})',
-				array(
-					'recycle_topics' => $recycleTopics,
-					'recycled' => 'recycled',
-				)
-			);
+					array(
+						'recycle_topics' => $recycleTopics,
+						'recycled' => 'recycled',
+					)
+				);
 
-			// Move the topics to the recycle board.
-			require_once(SUBSDIR . '/Topic.subs.php');
-			moveTopics($recycleTopics, $modSettings['recycle_board']);
+				// Move the topics to the recycle board.
+				require_once(SUBSDIR . '/Topic.subs.php');
+				moveTopics($recycleTopics, $modSettings['recycle_board']);
 
-			// Close reports that are being recycled.
-			require_once(SUBSDIR . '/Moderation.subs.php');
+				// Close reports that are being recycled.
+				require_once(SUBSDIR . '/Moderation.subs.php');
 
-			$db->query('', '
+				$db->query('', '
 				UPDATE {db_prefix}log_reported
 				SET closed = {int:is_closed}
 				WHERE id_topic IN ({array_int:recycle_topics})',
-				array(
-					'recycle_topics' => $recycleTopics,
-					'is_closed' => 1,
-				)
-			);
+					array(
+						'recycle_topics' => $recycleTopics,
+						'is_closed' => 1,
+					)
+				);
 
-			updateSettings(array('last_mod_report_action' => time()));
-			recountOpenReports();
+				updateSettings(array('last_mod_report_action' => time()));
+				recountOpenReports();
 
-			// Topics that were recycled don't need to be deleted, so subtract them.
-			$topics = array_diff($topics, $recycleTopics);
+				// Topics that were recycled don't need to be deleted, so subtract them.
+				$topics = array_diff($topics, $recycleTopics);
+			}
 		}
 	}
 
@@ -329,6 +332,10 @@ function removeTopics($topics, $decreasePostCount = true, $ignoreRecycling = fal
 	// If there are messages left in this topic
 	if (!empty($messages))
 	{
+		// Decrease / Update the member like counts
+		require_once(SUBSDIR . '/Likes.subs.php');
+		decreaseLikeCounts($messages);
+
 		// Remove all likes now that the topic is gone
 		$db->query('', '
 			DELETE FROM {db_prefix}message_likes
@@ -431,7 +438,7 @@ function removeTopics($topics, $decreasePostCount = true, $ignoreRecycling = fal
 /**
  * Moves lots of topics to a specific board and checks if the user can move them
  *
- * @param int[] $moveCache
+ * @param array $moveCache [0] => int[] is the topic, [1] => int[]  is the board to move to.
  */
 function moveTopicsPermissions($moveCache)
 {
@@ -1785,10 +1792,12 @@ function updateSplitTopics($options, $id_board)
 	$db->query('', '
 		UPDATE {db_prefix}log_reported
 		SET id_topic = {int:id_topic}
-		WHERE id_msg IN ({array_int:split_msgs})',
+		WHERE id_msg IN ({array_int:split_msgs})
+			AND type = {string:a_message}',
 		array(
 			'split_msgs' => $options['splitMessages'],
 			'id_topic' => $options['split2_ID_TOPIC'],
+			'a_message' => 'msg',
 		)
 	);
 
@@ -2137,8 +2146,8 @@ function getTopicsPostsAndPoster($topic, $limit, $sort)
 	$request = $db->query('display_get_post_poster', '
 		SELECT id_msg, id_member, approved
 		FROM {db_prefix}messages
-		WHERE id_topic = {int:current_topic}' . (!$modSettings['postmod_active'] || allowedTo('approve_posts') ? '' : (!empty($modSettings['db_mysql_group_by_fix']) ? '' : '
-		GROUP BY id_msg') . '
+		WHERE id_topic = {int:current_topic}' . (!$modSettings['postmod_active'] || allowedTo('approve_posts') ? '' : '
+		GROUP BY id_msg
 		HAVING (approved = {int:is_approved}' . ($user_info['is_guest'] ? '' : ' OR id_member = {int:current_member}') . ')') . '
 		ORDER BY id_msg ' . ($sort ? '' : 'DESC') . ($limit['messages_per_page'] == -1 ? '' : '
 		LIMIT ' . $limit['start'] . ', ' . $limit['offset']),

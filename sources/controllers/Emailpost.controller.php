@@ -29,8 +29,8 @@ class Emailpost_Controller extends Action_Controller
 	 */
 	public function action_index()
 	{
-		// default, default, by default... preview
-		$this->action_pbe_preview('');
+		// By default we go to preview
+		$this->action_pbe_preview();
 	}
 
 	/**
@@ -55,7 +55,7 @@ class Emailpost_Controller extends Action_Controller
 
 		// The function is not even on ...
 		if (empty($modSettings['maillist_enabled']))
-			return;
+			return false;
 
 		// Our mail parser and our main subs
 		require_once(SUBSDIR . '/Emailpost.subs.php');
@@ -89,8 +89,7 @@ class Emailpost_Controller extends Action_Controller
 					return pbe_emailError('error_bounced', $email_message);
 				}
 
-				// If they don't wish, then return false like recording the failure
-				// would do
+				// If they don't wish, then return false like recording the failure would do
 				return false;
 			}
 			else
@@ -122,7 +121,7 @@ class Emailpost_Controller extends Action_Controller
 			return pbe_emailError('error_missing_key', $email_message);
 
 		// Good we have a key, who was it sent to?
-		$key_owner = query_key_owner($email_message->message_key_id);
+		$key_owner = query_key_owner($email_message);
 
 		// Can't find this key in the database, either
 		// a) spam attempt or b) replying with an expired/consumed key
@@ -139,6 +138,8 @@ class Emailpost_Controller extends Action_Controller
 
 		// The email looks valid, now on to check the actual user trying to make the post/pm
 		// lets load the topic/message info and any additional permissions we need
+		$topic_info = array();
+		$pm_info = array();
 		if ($email_message->message_type === 't' || $email_message->message_type === 'm')
 		{
 			// Load the message/topic details
@@ -227,7 +228,7 @@ class Emailpost_Controller extends Action_Controller
 
 		// The function is not even on ...
 		if (empty($modSettings['maillist_enabled']))
-			return;
+			return false;
 
 		// Our mail parser and our main subs
 		require_once(SUBSDIR . '/Emailpost.subs.php');
@@ -249,7 +250,8 @@ class Emailpost_Controller extends Action_Controller
 		// No key for this, so set some blanks for the error function (if needed)
 		$email_message->message_type = 'x';
 		$email_message->message_key_id = '';
-		$email_message->message_id = 0;
+		$email_message->message_key = '';
+		$email_message->message_id = '0';
 
 		// Check if it's a DSN
 		// Hopefully, this will eventually DO something but for now
@@ -333,7 +335,7 @@ class Emailpost_Controller extends Action_Controller
 	 * @param string $data raw email string, including headers
 	 * @return boolean
 	 */
-	public function action_pbe_preview($data)
+	public function action_pbe_preview($data = '')
 	{
 		global $txt, $modSettings;
 

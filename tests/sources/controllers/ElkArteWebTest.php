@@ -87,7 +87,7 @@ abstract class ElkArteWebTest extends PHPUnit_Extensions_Selenium2TestCase
 		// Quick login
 		$this->byName('user')->value($this->adminuser);
 		$this->byName('passwrd')->value($this->adminpass);
-		$this->byCssSelector("#password_login > input.button_submit")->click();
+		$this->byCssSelector('#password_login > input[type="submit"]')->click();
 
 		// Should see the admin button now
 		$this->assertContains('Admin', $this->byCssSelector('#button_admin > a')->text());
@@ -102,7 +102,7 @@ abstract class ElkArteWebTest extends PHPUnit_Extensions_Selenium2TestCase
 		$this->byCssSelector("#button_admin > a")->click();
 		$this->assertEquals('Administration Log in', $this->title());
 		$this->byId('admin_pass')->value($this->adminpass);
-		$this->byCssSelector("p > input.button_submit")->click();
+		$this->byCssSelector('input[type="submit"]')->click();
 
 		// Validate we are there
 		$this->assertEquals("Administration Center", $this->title());

@@ -43,7 +43,12 @@
 
 				// Set the subAction to what they are doing
 				if (check.indexOf('unlike_button') >= 0)
+				{
+					if (!confirm(likemsg_are_you_sure))
+						return;
+
 					subAction = 'unlikepost';
+				}
 				else
 					subAction = 'likepost';
 
@@ -166,10 +171,7 @@
 	// instead of this, we can use namespace too
 	this.likePosts = likePosts;
 
-
-
 	// Class for like posts stats
-
 	function likePostStats() {}
 
 	likePostStats.prototype = function() {
@@ -285,7 +287,7 @@
 					$like_post_message_data = $('.like_post_message_data');
 
 				$like_post_message_data.html('');
-				htmlContent += '<a class="message_title" href="' + messageUrl + '">' + txtStrings.topic + ': ' + data.subject + '</a>' + '<span style="display: none;">' + data.body + '</span>';
+				htmlContent += '<a class="message_title" href="' + messageUrl + '">' + txtStrings.topic + ': ' + data.subject + '</a>' + '<span class="hide">' + data.body + '</span>';
 
 				htmlContent += '<div class="poster_avatar"><div class="avatar" style="background-image: url(' + encodeURI(data.member_received.avatar) + ')"></div></div>' + '<div class="poster_data">' + '<a class="poster_details" href="' + data.member_received.href + '" style="font-size: 20px;">' + data.member_received.name + '</a>' + '<div class="poster_details">' + txtStrings.totalPosts + ': ' + data.member_received.total_posts + '</div>' + '</div>';
 

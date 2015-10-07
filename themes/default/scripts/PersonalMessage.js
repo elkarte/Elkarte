@@ -58,7 +58,7 @@ elk_PersonalMessageSend.prototype.init = function()
 
 		// Show the link to bet the BCC control back.
 		var oBccLinkContainer = document.getElementById(this.opt.sBccLinkContainerId);
-		oBccLinkContainer.style.display = '';
+		oBccLinkContainer.style.display = 'inline';
 		oBccLinkContainer.innerHTML = this.opt.sShowBccLinkTemplate;
 
 		// Make the link show the BCC control.
@@ -108,8 +108,8 @@ elk_PersonalMessageSend.prototype.init = function()
 elk_PersonalMessageSend.prototype.showBcc = function()
 {
 	// No longer hide it, show it to the world!
-	this.oBccDiv.style.display = '';
-	this.oBccDiv2.style.display = '';
+	this.oBccDiv.style.display = 'block';
+	this.oBccDiv2.style.display = 'block';
 };
 
 // Prevent items to be added twice or to both the 'To' and 'Bcc'.
@@ -221,6 +221,14 @@ function rebuildRuleDesc()
 		curVal,
 		curDef;
 
+	// Global strings, convert to objects
+	if (typeof groups === "string")
+		groups = JSON.parse(groups);
+	if (typeof labels === "string")
+		labels = JSON.parse(labels);
+	if (typeof rules === "string")
+		rules = JSON.parse(rules);
+
 	for (var i = 0; i < document.forms.addrule.elements.length; i++)
 	{
 		if (document.forms.addrule.elements[i].id.substr(0, 8) === "ruletype")
@@ -305,7 +313,7 @@ function initUpdateRulesActions()
 		if (document.getElementById("ruletype" + optNum).value === "gid")
 		{
 			document.getElementById("defdiv" + optNum).style.display = "none";
-			document.getElementById("defseldiv" + optNum).style.display = "";
+			document.getElementById("defseldiv" + optNum).style.display = "inline";
 		}
 		else if (document.getElementById("ruletype" + optNum).value === "bud" || document.getElementById("ruletype" + optNum).value === "")
 		{
@@ -314,7 +322,7 @@ function initUpdateRulesActions()
 		}
 		else
 		{
-			document.getElementById("defdiv" + optNum).style.display = "";
+			document.getElementById("defdiv" + optNum).style.display = "inline";
 			document.getElementById("defseldiv" + optNum).style.display = "none";
 		}
 	});
@@ -328,7 +336,7 @@ function initUpdateRulesActions()
 
 		if (document.getElementById("acttype" + optNum).value === "lab")
 		{
-			document.getElementById("labdiv" + optNum).style.display = "";
+			document.getElementById("labdiv" + optNum).style.display = "inline";
 		}
 		else
 		{
@@ -371,17 +379,43 @@ function addCriteriaOption()
 	}
 	criteriaNum++;
 
+	// Global strings, convert to objects
+	if (typeof groups === "string")
+		groups = JSON.parse(groups);
+	if (typeof labels === "string")
+		labels = JSON.parse(labels);
+	if (typeof rules === "string")
+		rules = JSON.parse(rules);
+
 	// rules select
-	var rules_option = '';
-	for (var index in rules)
-		rules_option += '<option value="' + index + '">' + rules[index] + '</option>';
+	var rules_option = '',
+		index = '';
+
+	for (index in rules)
+	{
+		if (rules.hasOwnProperty(index))
+			rules_option += '<option value="' + index + '">' + rules[index] + '</option>';
+	}
 
 	// group selections
 	var group_option = '';
+
 	for (index in groups)
 		group_option += '<option value="' + index + '">' + groups[index] + '</option>';
 
-	setOuterHTML(document.getElementById("criteriaAddHere"), '<br /><select name="ruletype[' + criteriaNum + ']" id="ruletype' + criteriaNum + '" data-optnum="' + criteriaNum + '"><option value="">' + txt_pm_rule_criteria_pick + ':</option>' + rules_option + '</select>&nbsp;<span id="defdiv' + criteriaNum + '" style="display: none;"><input type="text" name="ruledef[' + criteriaNum + ']" id="ruledef' + criteriaNum + '" value="" class="input_text" /></span><span id="defseldiv' + criteriaNum + '" style="display: none;"><select name="ruledefgroup[' + criteriaNum + ']" id="ruledefgroup' + criteriaNum + '"><option value="">' + txt_pm_rule_sel_group + '</option>' + group_option + '</select></span><span id="criteriaAddHere"></span>');
+	setOuterHTML(document.getElementById("criteriaAddHere"), '<br />' +
+		'<select class="criteria" name="ruletype[' + criteriaNum + ']" id="ruletype' + criteriaNum + '" data-optnum="' + criteriaNum + '">' +
+			'<option value="">' + txt_pm_rule_criteria_pick + ':</option>' + rules_option + '' +
+		'</select>&nbsp;' +
+		'<span id="defdiv' + criteriaNum + '" class="hide">' +
+			'<input type="text" name="ruledef[' + criteriaNum + ']" id="ruledef' + criteriaNum + '" value="" class="input_text" />' +
+		'</span>' +
+		'<span id="defseldiv' + criteriaNum + '" class="hide">' +
+			'<select class="criteria" name="ruledefgroup[' + criteriaNum + ']" id="ruledefgroup' + criteriaNum + '">' +
+				'<option value="">' + txt_pm_rule_sel_group + '</option>' + group_option +
+			'</select>' +
+		'</span>' +
+		'<span id="criteriaAddHere"></span>');
 
 	return false;
 }
@@ -400,9 +434,22 @@ function addActionOption()
 	actionNum++;
 
 	// Label selections
-	var label_option = '';
-	for (var index in labels)
+	var label_option = '',
+		index = '';
+
+	labels = JSON.parse(labels);
+	for (index in labels)
 		label_option += '<option value="' + index + '">' + labels[index] + '</option>';
 
-	setOuterHTML(document.getElementById("actionAddHere"), '<br /><select name="acttype[' + actionNum + ']" id="acttype' + actionNum + '" data-actnum="' + actionNum + '"><option value="">' + txt_pm_rule_sel_action + ':</option><option value="lab">' + txt_pm_rule_label + '</option><option value="del">' + txt_pm_rule_delete + '</option></select>&nbsp;<span id="labdiv' + actionNum + '" style="display: none;"><select name="labdef[' + actionNum + ']" id="labdef' + actionNum + '"><option value="">' + txt_pm_rule_sel_label + '</option>' + label_option + '</select></span><span id="actionAddHere"></span>');
+	setOuterHTML(document.getElementById("actionAddHere"), '<br />' +
+		'<select name="acttype[' + actionNum + ']" id="acttype' + actionNum + '" data-actnum="' + actionNum + '">' +
+			'<option value="">' + txt_pm_rule_sel_action + ':</option>' +
+			'<option value="lab">' + txt_pm_rule_label + '</option>' +
+			'<option value="del">' + txt_pm_rule_delete + '</option>' +
+		'</select>&nbsp;' +
+		'<span id="labdiv' + actionNum + '" class="hide">' +
+		'<select name="labdef[' + actionNum + ']" id="labdef' + actionNum + '">' +
+			'<option value="">' + txt_pm_rule_sel_label + '</option>' + label_option +
+		'</select></span>' +
+		'<span id="actionAddHere"></span>');
 }

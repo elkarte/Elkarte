@@ -88,7 +88,7 @@ function markBoardsRead($boards, $unread = false, $resetTopics = false)
 	// @todo look at this...
 	// The call to markBoardsRead() in Display() used to be simply
 	// marking log_boards (the previous query only)
-	// I'm adding a bool to control the processing of log_topics. We might want to just disociate it from boards,
+	// I'm adding a bool to control the processing of log_topics. We might want to just dissociate it from boards,
 	// and call the log_topics clear-up only from the controller that needs it..
 
 	// Notes (for read/unread rework)
@@ -1042,7 +1042,7 @@ function getBoardList($boardListOptions = array(), $simple = false)
 			);
 
 			// Do we want access information?
-			if (!empty($boardListOptions['access']))
+			if (isset($boardListOptions['access']) && $boardListOptions['access'] !== false)
 			{
 				$return_value[$row['id_board']]['allow'] = !(empty($row['can_access']) || $row['can_access'] == 'f');
 				$return_value[$row['id_board']]['deny'] = !(empty($row['cannot_access']) || $row['cannot_access'] == 'f');
@@ -1129,8 +1129,8 @@ function getBoardList($boardListOptions = array(), $simple = false)
  * - Used by getBoardTree
  *
  * @package Boards
- * @param int[] $_boardList
- * @param int[] $_tree
+ * @param int[] $_boardList The board list
+ * @param array $_tree the board tree
  */
 function recursiveBoards(&$_boardList, &$_tree)
 {
@@ -1148,9 +1148,10 @@ function recursiveBoards(&$_boardList, &$_tree)
  * Returns whether the sub-board id is actually a child of the parent (recursive).
  *
  * @package Boards
- * @param int $child
- * @param int $parent
- * @return boolean
+ * @param int $child The ID of the child board
+ * @param int $parent The ID of a parent board
+ *
+ * @return boolean if the specified child board is a child of the specified parent board.
  */
 function isChildOf($child, $parent)
 {
@@ -1168,9 +1169,9 @@ function isChildOf($child, $parent)
 /**
  * Returns whether this member has notification turned on for the specified board.
  *
- * @param int $id_member
- * @param int $id_board
- * @return bool
+ * @param int $id_member the member id
+ * @param int $id_board the board to check
+ * @return bool if they have notifications turned on for the board
  */
 function hasBoardNotification($id_member, $id_board)
 {
@@ -1564,7 +1565,8 @@ function getBoardModerators($idboard, $only_id = false)
  * Get a list of all the board moderators (every board)
  *
  * @package Boards
- * @param bool $only_id return only the id of the moderators instead of id and name (default false)
+ * @param bool $only_id return array with key of id_member of the moderator(s)
+ * otherwise array with key of id_board id (default false)
  * @return array
  */
 function allBoardModerators($only_id = false)
@@ -1590,7 +1592,12 @@ function allBoardModerators($only_id = false)
 		);
 
 	while ($row = $db->fetch_assoc($request))
-		$moderators[$row['id_member']] = $row;
+	{
+		if ($only_id)
+			$moderators[$row['id_member']][] = $row;
+		else
+			$moderators[$row['id_board']][] = $row;
+	}
 	$db->free_result($request);
 
 	return $moderators;
@@ -1870,8 +1877,7 @@ function fetchBoardsInfo($conditions = 'all', $params = array())
  * Retrieve the all the sub-boards of an array of boards and add the ids to the same array
  *
  * @package Boards
- * @param int[]|int $boards an array of board IDs (it accepts a single board
- *              too).
+ * @param int[]|int $boards an array of board IDs (it accepts a single board too).
  * @deprecated since 1.1 - The param is passed by ref in 1.0 and the result
  *                         is returned through the param itself, starting from
  *                         1.1 the expected behaviour is that the result is
@@ -1884,7 +1890,7 @@ function addChildBoards(&$boards)
 	$db = database();
 
 	if (empty($boards))
-		return;
+		return false;
 
 	if (!is_array($boards))
 		$boards = array($boards);
@@ -1959,7 +1965,7 @@ function incrementBoard($id_board, $values)
  *
  * @package Boards
  * @param int $id_board
- * @param mixed[] $values an array of index => value of a string representing the index to decrement
+ * @param mixed[]|string $values an array of index => value of a string representing the index to decrement
  */
 function decrementBoard($id_board, $values)
 {

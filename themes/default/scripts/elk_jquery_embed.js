@@ -135,23 +135,19 @@
 		 */
 		function embedOrIMG(embed, a, src, eURL, eURLa)
 		{
-			eURL = eURL.substring(7) === 'http://' ? eURL : 'http://' + eURL;
-			eURLa = eURLa.substring(7) === 'http://' ? eURLa : 'http://' + eURLa;
-			src = src.substring(7) === 'http://' ? src : 'http://' + src;
-
 			return embed ? getEmbed(eURL) : getIMG(a, src, eURL, eURLa);
 		}
 
 		var domain_regex = /^[^:]*:\/\/(?:www\.)?([^\/]+)(\/.*)$/,
-			embed_html = '<div class="elk_video"><embed width="640px" height="385px" style="max-width: 98%; max-height: auto;" allowscriptaccess="never" allowfullscreen="true" quality="high" wmode="transparent" src="{src}" type="application/x-shockwave-flash"/></div>',
+			embed_html = '<div class="elk_video"><iframe width="640px" height="385px" style="max-width: 98%; max-height: auto;" src="{src}" frameborder="0" allowfullscreen></iframe></div>',
 			handlers = {
 			'youtube.com': function(path, a, embed) {
 				var videoID = path.match(/\bv[=/]([^&#?$]+)/i) || path.match(/#p\/(?:a\/)?[uf]\/\d+\/([^?$]+)/i);
 				if (!videoID || !(videoID = videoID[1]))
 					return;
 
-				var embedURL = 'youtube.com/v/' + videoID,
-					tag = embedOrIMG(embed, a, 'img.youtube.com/vi/' + videoID + '/0.jpg', embedURL + '&amprel=0', embedURL + '&amprel=0;&amp;autoplay=1');
+				var embedURL = '//youtube.com/embed/' + videoID,
+					tag = embedOrIMG(embed, a, '//img.youtube.com/vi/' + videoID + '/0.jpg', embedURL + '?amprel=0', embedURL + '?amprel=0&autoplay=1');
 
 				return [oSettings.youtube, tag];
 			},
@@ -160,8 +156,8 @@
 				if (!videoID || !(videoID = videoID[1]))
 					return;
 
-				var embedURL = 'youtube.com/v/' + videoID,
-					tag = embedOrIMG(embed, a, 'img.youtube.com/vi/' + videoID + '/0.jpg', embedURL + '&amprel=0', embedURL + '&amprel=0;&amp;autoplay=1');
+				var embedURL = '//youtube.com/embed/' + videoID,
+					tag = embedOrIMG(embed, a, '//img.youtube.com/vi/' + videoID + '/0.jpg', embedURL + '?amprel=0', embedURL + '?amprel=0&autoplay=1');
 
 				return [oSettings.youtube, tag];
 			},
@@ -170,9 +166,9 @@
 				if (!videoID || !(videoID = videoID[1]))
 					return;
 
-				var embedURL = 'vimeo.com/moogaloop.swf?clip_id=' + videoID,
+				var embedURL = '//player.vimeo.com/video/' + videoID,
 					tag = null,
-					img = 'assets.vimeo.com/images/logo_vimeo_land.png';
+					img = '//assets.vimeo.com/images/logo_vimeo_land.png';
 
 				// Get the preview image or embed tag
 				if (!embed)
@@ -183,10 +179,10 @@
 					});
 
 					// This is to show something while we wait for our callback to return
-					tag = embedOrIMG(embed, a, img, embedURL, embedURL + '&amp;autoplay=1');
+					tag = embedOrIMG(embed, a, img, embedURL, embedURL + '?autoplay=1');
 				}
 				else
-					tag = embedOrIMG(embed, a, img, embedURL, embedURL + '&amp;autoplay=1');
+					tag = embedOrIMG(embed, a, img, embedURL, embedURL + '?autoplay=1');
 
 				return [oSettings.vimeo, tag];
 			},
@@ -195,9 +191,9 @@
 				if (!videoID || !(videoID = videoID[1]))
 					return;
 
-				var embedURL = 'dailymotion.com/swf/' + videoID,
+				var embedURL = '//dailymotion.com/embed/video/' + videoID,
 					tag = null,
-					img = 'dailymotion.com/thumbnail/video/' + videoID;
+					img = '//dailymotion.com/thumbnail/video/' + videoID;
 
 				// Get the preview image or embed tag
 				if (!embed)
@@ -208,10 +204,10 @@
 					});
 
 					// This is to show something while we wait for our callback to return
-					tag = embedOrIMG(embed, a, img, embedURL, embedURL + '&amp;related=0&amp;autoplay=1');
+					tag = embedOrIMG(embed, a, img, embedURL, embedURL + '?related=0&autoplay=1');
 				}
 				else
-					tag = embedOrIMG(embed, a, img, embedURL + '&amp;related=0', embedURL + '&amp;related=0&amp;autoplay=1');
+					tag = embedOrIMG(embed, a, img, embedURL + '?related=0', embedURL + '?related=0&autoplay=1');
 
 				return [oSettings.dailymotion, tag];
 			}

@@ -298,7 +298,7 @@ class Unread
 			$topics[] = $row;
 		$this->_db->free_result($request);
 
-		return Topic_Util::prepareContext($topics, true);
+		return Topic_Util::prepareContext($topics, true, ((int) $this->_preview_bodies) + 128);
 	}
 
 	/**
@@ -512,7 +512,7 @@ class Unread
 			$return[] = $row;
 		$this->_db->free_result($request);
 
-		return Topic_Util::prepareContext($return, true);
+		return Topic_Util::prepareContext($topics, true, ((int) $this->_preview_bodies) + 128);
 	}
 
 	/**

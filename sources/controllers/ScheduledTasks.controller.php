@@ -18,8 +18,13 @@ if (!defined('ELK'))
  * This controller class action handlers are automatically called.
  * It handles execution of scheduled tasks, mail queue scheduling included.
  */
-class ScheduledTasks_Controller
+class ScheduledTasks_Controller extends Action_Controller
 {
+	public function action_index()
+	{
+		return $this->action_autotask();
+	}
+
 	/**
 	 * This method works out what to run:
 	 *  - it checks if it's time for the next tasks

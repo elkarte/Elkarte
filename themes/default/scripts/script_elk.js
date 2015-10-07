@@ -928,7 +928,7 @@ function setBoardIds() {
 		// Move passed selector titles to a hidden span, then remove the selector title to prevent any default browser actions
 		$(this).each(function()
 		{
-			var sTitle = $('<span class="' + oSettings.tooltipSwapClass + '">' + htmlspecialchars(this.title) + '</span>').hide();
+			var sTitle = $('<span class="' + oSettings.tooltipSwapClass + '">' + this.title + '</span>').hide();
 			$(this).append(sTitle).attr('title', '');
 		});
 
@@ -1035,7 +1035,7 @@ function setBoardIds() {
 				if ($(this).children('.' + oSettings.tooltipSwapClass).text())
 				{
 					// Create a ID'ed div with our style class that holds the tooltip info, hidden for now
-					$('body').append('<div id="' + oSettings.tooltipID + '" class="' + oSettings.tooltipClass + '"><div id="' + oSettings.tooltipTextID + '" style="display:none;"></div></div>');
+					$('body').append('<div id="' + oSettings.tooltipID + '" class="' + oSettings.tooltipClass + '"><div id="' + oSettings.tooltipTextID + '" class="hide"></div></div>');
 
 					// Load information in to our newly created div
 					var ttContent = $('#' + oSettings.tooltipTextID);

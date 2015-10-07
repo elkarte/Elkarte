@@ -566,6 +566,11 @@ function disableModules($module, $controllers)
 	}
 }
 
+/**
+ * @param string $module the name of the module
+ *
+ * @return boolean
+ */
 function isModuleEnabled($module)
 {
 	global $modSettings;

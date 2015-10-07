@@ -135,7 +135,7 @@ function validateSession($type = 'admin')
 
 	// Better be sure to remember the real referer
 	if (empty($_SESSION['request_referer']))
-		$_SESSION['request_referer'] = isset($_SERVER['HTTP_REFERER']) ? @parse_url($_SERVER['HTTP_REFERER']) : array();
+		$_SESSION['request_referer'] = isset($_SERVER['HTTP_REFERER']) ? $_SERVER['HTTP_REFERER'] : '';
 	elseif (empty($_POST))
 		unset($_SESSION['request_referer']);
 
@@ -394,6 +394,7 @@ function is_not_banned($forceCheck = false)
 			'is_logged' => false,
 			'is_admin' => false,
 			'is_mod' => false,
+			'is_moderator' => false,
 			'can_mod' => false,
 			'language' => $user_info['language'],
 		);
@@ -437,6 +438,7 @@ function is_not_banned($forceCheck = false)
 			'is_logged' => false,
 			'is_admin' => false,
 			'is_mod' => false,
+			'is_moderator' => false,
 			'can_mod' => false,
 			'language' => $user_info['language'],
 		);
@@ -541,7 +543,7 @@ function banPermissions()
 	elseif ($_SESSION['mc']['bq'] != '0=1')
 	{
 		require_once(SUBSDIR . '/Moderation.subs.php');
-		recountOpenReports();
+		recountOpenReports(true, allowedTo('admin_forum'));
 	}
 	else
 		$context['open_mod_reports'] = 0;
@@ -718,9 +720,11 @@ function checkSession($type = 'post', $from_action = '', $is_fatal = true)
 
 	// Check the referring site - it should be the same server at least!
 	if (isset($_SESSION['request_referer']))
-		$referrer = $_SESSION['request_referer'];
+		$referrer_url = $_SESSION['request_referer'];
 	else
-		$referrer = isset($_SERVER['HTTP_REFERER']) ? @parse_url($_SERVER['HTTP_REFERER']) : array();
+		$referrer_url = isset($_SERVER['HTTP_REFERER']) ? $_SERVER['HTTP_REFERER'] : '';
+
+	$referrer = @parse_url($referrer_url);
 
 	if (!empty($referrer['host']))
 	{
@@ -749,6 +753,7 @@ function checkSession($type = 'post', $from_action = '', $is_fatal = true)
 		{
 			$error = 'verify_url_fail';
 			$log_error = true;
+			$sprintf = array(Util::htmlspecialchars($referrer_url));
 		}
 	}
 
@@ -757,6 +762,7 @@ function checkSession($type = 'post', $from_action = '', $is_fatal = true)
 	{
 		$error = 'verify_url_fail';
 		$log_error = true;
+		$sprintf = array(Util::htmlspecialchars($referrer_url));
 	}
 
 	// Everything is ok, return an empty string.
@@ -772,7 +778,7 @@ function checkSession($type = 'post', $from_action = '', $is_fatal = true)
 			die;
 		}
 		else
-			Errors::instance()->fatal_lang_error($error, isset($log_error) ? 'user' : false);
+			Errors::instance()->fatal_lang_error($error, isset($log_error) ? 'user' : false, isset($sprintf) ? $sprintf : array());
 	}
 	// A session error occurred, return the error to the calling function.
 	else
@@ -1468,7 +1474,7 @@ function loadBadBehavior()
 		// We may want to give some folks a hallway pass
 		if (!$user_info['is_guest'])
 		{
-			if (!empty($user_info['is_mod']) || !empty($user_info['is_admin']))
+			if (!empty($user_info['is_moderator']) || !empty($user_info['is_admin']))
 				$bb_run = false;
 			elseif (!empty($modSettings['badbehavior_postcount_wl']) && $modSettings['badbehavior_postcount_wl'] < 0)
 				$bb_run = false;

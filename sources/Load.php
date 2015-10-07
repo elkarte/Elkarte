@@ -421,6 +421,10 @@ function loadBoard()
 	// Assume they are not a moderator.
 	$user_info['is_mod'] = false;
 	$context['user']['is_mod'] = &$user_info['is_mod'];
+	// @since 1.0.5 - is_mod takes into account only local (board) moderators,
+	// and not global moderators, is_moderator is meant to take into account both.
+	$user_info['is_moderator'] = false;
+	$context['user']['is_moderator'] = &$user_info['is_moderator'];
 
 	// Start the linktree off empty..
 	$context['linktree'] = array();
@@ -610,6 +614,7 @@ function loadBoard()
 	{
 		// Now check if the user is a moderator.
 		$user_info['is_mod'] = isset($board_info['moderators'][$user_info['id']]);
+		$user_info['is_moderator'] = $user_info['is_mod'] || allowedTo('moderate_board');
 
 		if (count(array_intersect($user_info['groups'], $board_info['groups'])) == 0 && !$user_info['is_admin'])
 			$board_info['error'] = 'access';
@@ -633,11 +638,12 @@ function loadBoard()
 
 	// Set the template contextual information.
 	$context['user']['is_mod'] = &$user_info['is_mod'];
+	$context['user']['is_moderator'] = &$user_info['is_moderator'];
 	$context['current_topic'] = $topic;
 	$context['current_board'] = $board;
 
 	// Hacker... you can't see this topic, I'll tell you that. (but moderators can!)
-	if (!empty($board_info['error']) && (!empty($modSettings['deny_boards_access']) || $board_info['error'] != 'access' || !$user_info['is_mod']))
+	if (!empty($board_info['error']) && (!empty($modSettings['deny_boards_access']) || $board_info['error'] != 'access' || !$user_info['is_moderator']))
 	{
 		// The permissions and theme need loading, just to make sure everything goes smoothly.
 		loadPermissions();
@@ -1024,6 +1030,7 @@ function loadMemberContext($user, $display_custom_fields = false)
 
 	// If the set isn't minimal then load the monstrous array.
 	if ($context['loadMemberContext_set'] !== 'minimal')
+	{
 		$memberContext[$user] += array(
 			'username_color' => '<span '. (!empty($profile['member_group_color']) ? 'style="color:'. $profile['member_group_color'] .';"' : '') .'>'. $profile['member_name'] .'</span>',
 			'name_color' => '<span '. (!empty($profile['member_group_color']) ? 'style="color:'. $profile['member_group_color'] .';"' : '') .'>'. $profile['real_name'] .'</span>',
@@ -1086,6 +1093,7 @@ function loadMemberContext($user, $display_custom_fields = false)
 			'local_time' => standardTime(time() + ($profile['time_offset'] - $user_info['time_offset']) * 3600, false),
 			'custom_fields' => array(),
 		);
+	}
 
 	// Are we also loading the members custom fields into context?
 	if ($display_custom_fields && !empty($modSettings['displayFields']))
@@ -1397,6 +1405,7 @@ function loadTheme($id_theme = 0, $initialize = true)
 		'is_guest' => &$user_info['is_guest'],
 		'is_admin' => &$user_info['is_admin'],
 		'is_mod' => &$user_info['is_mod'],
+		'is_moderator' => &$user_info['is_moderator'],
 		// A user can mod if they have permission to see the mod center, or they are a board/group/approval moderator.
 		'can_mod' => allowedTo('access_mod_center') || (!$user_info['is_guest'] && ($user_info['mod_cache']['gq'] != '0=1' || $user_info['mod_cache']['bq'] != '0=1' || ($modSettings['postmod_active'] && !empty($user_info['mod_cache']['ap'])))),
 		'username' => $user_info['username'],
@@ -1564,7 +1573,7 @@ function loadTheme($id_theme = 0, $initialize = true)
 		loadLanguage('ThemeStrings', '', false);
 
 	// Load font Awesome fonts
-	loadCSSFile('font-awesome.css');
+	loadCSSFile('font-awesome.min.css');
 
 	// We allow theme variants, because we're cool.
 	$context['theme_variant'] = '';
@@ -1592,7 +1601,7 @@ function loadTheme($id_theme = 0, $initialize = true)
 			loadCSSFile($context['theme_variant'] . '/index' . $context['theme_variant'] . '.css');
 	}
 
-	// A bit lonely maybe, though I think it should be set up *after* teh theme variants detection
+	// A bit lonely maybe, though I think it should be set up *after* the theme variants detection
 	$context['header_logo_url_html_safe'] = empty($settings['header_logo_url']) ? $settings['images_url'] . '/' . $context['theme_variant_url'] .  'logo_elk.png' : Util::htmlspecialchars($settings['header_logo_url']);
 
 	// Allow overriding the board wide time/number formats.
@@ -1881,6 +1890,7 @@ function requireTemplate($template_name, $style_sheets, $fatal)
 	// Any specific template style sheets to load?
 	if (!empty($style_sheets))
 	{
+		trigger_error('Use of loadTemplate to add style sheets to the head is deprecated.', E_USER_DEPRECATED);
 		$sheets = array();
 		foreach ($style_sheets as $sheet)
 		{
@@ -1974,7 +1984,7 @@ function loadSubTemplate($sub_template_name, $fatal = false)
 	if (allowedTo('admin_forum') && isset($_REQUEST['debug']) && !in_array($sub_template_name, array('init')) && ob_get_length() > 0 && !isset($_REQUEST['xml']))
 	{
 		echo '
-<div style="font-size: 8pt; border: 1px dashed red; background: orange; text-align: center; font-weight: bold;">---- ', $sub_template_name, ' ends ----</div>';
+<div class="warningbox">---- ', $sub_template_name, ' ends ----</div>';
 	}
 }
 
@@ -1993,8 +2003,16 @@ function loadSubTemplate($sub_template_name, $fatal = false)
  */
 function loadCSSFile($filenames, $params = array(), $id = '')
 {
+	global $context;
+
 	if (empty($filenames))
 		return;
+
+	if (!is_array($filenames))
+		$filenames = array($filenames);
+
+	if (in_array('admin.css', $filenames))
+		$filenames[] = $context['theme_variant'] . '/admin' . $context['theme_variant'] . '.css';
 
 	$params['subdir'] = 'css';
 	$params['extension'] = 'css';
@@ -2121,7 +2139,6 @@ function loadAssetFile($filenames, $params = array(), $id = '')
 			if ($has_cache_staler)
 			{
 				$cache_staler = $staler_string;
-
 				$params['basename'] = substr($filename, 0, $has_cache_staler + strlen($params['extension']) + 1);
 			}
 			else
@@ -2159,6 +2176,7 @@ function loadAssetFile($filenames, $params = array(), $id = '')
 			if (!empty($filename))
 			{
 				$this_build[$this_id] = $context[$params['index_name']][$this_id] = array('filename' => $filename, 'options' => $params);
+
 				if ($db_show_debug === true)
 					Debug::get()->add($params['debug_index'], $params['basename'] . '(' . (!empty($params['local']) ? (!empty($params['url']) ? basename($params['url']) : basename($params['dir'])) : '') . ')');
 			}

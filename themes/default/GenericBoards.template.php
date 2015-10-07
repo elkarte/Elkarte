@@ -114,7 +114,7 @@ function template_list_boards($boards, $id)
 		// Is it a redirection board?
 		elseif ($board['is_redirect'])
 			echo '
-							<span class="board_icon redirect_board" title="*"></span>';
+							<span class="board_icon redirect_board" title="', sprintf($txt['redirect_board_to'], Util::htmlspecialchars($board['name'])), '"></span>';
 
 		// No new posts at all! The agony!!
 		else
@@ -226,13 +226,13 @@ function template_pick_boards($form_name, $input_names = 'brd', $select_all = tr
 
 	if ($select_all)
 		echo '
-						<h3 class="secondary_header">
-							<span id="category_toggle">&nbsp;
-								<span id="advanced_panel_toggle" class="', $context['boards_check_all'] ? 'expand' : 'collapse', '" style="display: none;" title="', $txt['hide'], '"></span>
+						<h3 class="secondary_header panel_toggle">
+							<span>
+								<span id="advanced_panel_toggle" class="', $context['boards_check_all'] ? 'expand' : 'collapse', ' hide" title="', $txt['hide'], '"></span>
 							</span>
 							<a href="#" id="advanced_panel_link">', $txt['choose_board'], '</a>
 						</h3>
-						<div id="advanced_panel_div"', $context['boards_check_all'] ? ' style="display: none;"' : '', '>';
+						<div id="advanced_panel_div"', $context['boards_check_all'] ? ' class="hide"' : '', '>';
 
 	// Make two nice columns of boards, link each category header to toggle select all boards in each
 	$group_cats = optimizeBoardsSubdivision($context['boards_in_category'], $context['num_boards']);
@@ -254,7 +254,7 @@ function template_pick_boards($form_name, $input_names = 'brd', $select_all = tr
 				echo '
 										<li class="board" style="margin-', $context['right_to_left'] ? 'right' : 'left', ': ', $board['child_level'], 'em;">
 											<label for="', $input_names, $board['id'], '">
-												<input type="checkbox" id="', $input_names, $board['id'], '" name="', $input_names, '[', $board['id'], ']" value="', $board['id'], '"', $board['selected'] ? ' checked="checked"' : '', ' class="input_check" /> ', $board['name'], '
+												<input type="checkbox" id="', $input_names, $board['id'], '" name="', $input_names, '[', $board['id'], ']" value="', $board['id'], '"', $board['selected'] ? ' checked="checked"' : '', ' /> ', $board['name'], '
 											</label>
 										</li>';
 			}
@@ -274,7 +274,7 @@ function template_pick_boards($form_name, $input_names = 'brd', $select_all = tr
 						</div>
 						<div class="submitbutton">
 							<span class="floatleft">
-								<input type="checkbox" name="all" id="check_all" value=""', $context['boards_check_all'] ? ' checked="checked"' : '', ' onclick="invertAll(this, this.form, \'', $input_names, '\');" class="input_check" />
+								<input type="checkbox" name="all" id="check_all" value=""', $context['boards_check_all'] ? ' checked="checked"' : '', ' onclick="invertAll(this, this.form, \'', $input_names, '\');" />
 								<label for="check_all">
 									<em> ', $txt['check_all'], '</em>
 								</label>

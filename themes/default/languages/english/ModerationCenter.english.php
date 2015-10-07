@@ -40,6 +40,7 @@ $txt['mc_seen_never'] = '%1$s never seen';
 $txt['mc_groupr_by'] = 'by';
 
 $txt['mc_reported_posts_desc'] = 'Here you can review all the post reports raised by members of the community.';
+$txt['mc_reported_pms_desc'] = 'Here you can review all the personal message reports raised by members of the community.';
 $txt['mc_reportedp_active'] = 'Active Reports';
 $txt['mc_reportedp_closed'] = 'Old Reports';
 $txt['mc_reportedp_by'] = 'by';
@@ -85,9 +86,11 @@ $txt['mc_unapproved_attach_name'] = 'Attachment name';
 $txt['mc_unapproved_attach_size'] = 'File size';
 $txt['mc_unapproved_attach_poster'] = 'Poster';
 $txt['mc_viewmodreport'] = 'Moderation report for %1$s by %2$s';
-$txt['mc_modreport_summary'] = 'There have been %1$d report(s) concerning this post.  The last report was %2$s.';
+$txt['mc_modreport_summary'] = 'There have been %1$d report(s) concerning this post. The last report was %2$s.';
+$txt['mc_view_pmreport'] = 'Moderation report for Personal Message sent by %1$s';
+$txt['mc_pmreport_summary'] = 'There have been %1$d report(s) concerning this Personale Message. The last report was %2$s.';
 $txt['mc_modreport_whoreported_title'] = 'Members who have reported this post';
-$txt['mc_modreport_whoreported_data'] = 'Reported by %1$s on %2$s.  They left the following message:';
+$txt['mc_modreport_whoreported_data'] = 'Reported by %1$s on %2$s. They left the following message:';
 $txt['mc_modreport_modactions'] = 'Actions taken by other moderators';
 $txt['mc_modreport_mod_comments'] = 'Moderator Comments';
 $txt['mc_modreport_no_mod_comment'] = 'There are not currently any moderator comments';
@@ -130,7 +133,7 @@ $txt['mc_warning_template_delete_confirm'] = 'Are you sure you want to delete th
 
 $txt['mc_warning_template_desc'] = 'Use this page to fill in the details of the template. Note that the subject for the email is not part of the template. Note that as the notification is sent by PM you can use BBC within the template. If you use the {MESSAGE} variable then this template will not be available when issuing a generic warning (i.e. A warning not linked to a post).';
 $txt['mc_warning_template_title'] = 'Template Title';
-$txt['mc_warning_template_body_desc'] = 'The content of the notification message. You can use the following shortcuts in this template.<ul style="margin-top: 0;"><li>{MEMBER} - Member Name.</li><li>{MESSAGE} - Link to Offending Post. (If Applicable)</li><li>{FORUMNAME} - Forum Name.</li><li>{SCRIPTURL} - Web address of the forum.</li><li>{REGARDS} - Standard email sign-off.</li></ul>';
+$txt['mc_warning_template_body_desc'] = 'The content of the notification message. You can use the following shortcuts in this template.<ul><li>{MEMBER} - Member Name.</li><li>{MESSAGE} - Link to Offending Post. (If Applicable)</li><li>{FORUMNAME} - Forum Name.</li><li>{SCRIPTURL} - Web address of the forum.</li><li>{REGARDS} - Standard email sign-off.</li></ul>';
 $txt['mc_warning_template_body_default'] = '{MEMBER},
 
 You have received a warning for inappropriate activity. Please cease these activities and abide by the forum rules otherwise we will take further action.

@@ -107,18 +107,11 @@ class Daily_Maintenance implements Scheduled_Task_Interface
 			consolidateSpiderStats();
 		}
 
-		// Check the database version - for some buggy MySQL version.
-		$server_version = $db->db_server_info();
-		if (DB_TYPE === 'MySQL' && in_array(substr($server_version, 0, 6), array('5.0.50', '5.0.51')))
-			updateSettings(array('db_mysql_group_by_fix' => '1'));
-		elseif (!empty($modSettings['db_mysql_group_by_fix']))
-			removeSettings('db_mysql_group_by_fix');
-
 		// Regenerate the Diffie-Hellman keys if OpenID is enabled.
 		if (!empty($modSettings['enableOpenID']))
 		{
 			require_once(SUBSDIR . '/OpenID.subs.php');
-			$openID = new OpenID();
+			$openID = new \OpenID();
 			$openID->setup_DH(true);
 		}
 		elseif (!empty($modSettings['dh_keys']))

@@ -67,7 +67,7 @@ function previewPost()
 	sendXMLDocument(elk_prepareScriptUrl(elk_scripturl) + 'action=post2' + (current_board ? ';board=' + current_board : '') + (make_poll ? ';poll' : '') + ';preview;' + elk_session_var + '=' + elk_session_id + ';xml', x.join('&'), onDocSent);
 
 	// Show the preview section and load it with "pending results" text, onDocSent will finish things off
-	document.getElementById('preview_section').style.display = '';
+	document.getElementById('preview_section').style.display = 'block';
 	document.getElementById('preview_subject').innerHTML = txt_preview_title;
 	document.getElementById('preview_body').innerHTML = txt_preview_fetch;
 
@@ -98,7 +98,7 @@ function previewPM()
 	sendXMLDocument(elk_prepareScriptUrl(elk_scripturl) + 'action=pm;sa=send2;preview;xml', x.join('&'), onDocSent);
 
 	// Show the preview section and load it with "pending results" text, onDocSent will finish things off
-	document.getElementById('preview_section').style.display = '';
+	document.getElementById('preview_section').style.display = 'block';
 	document.getElementById('preview_subject').innerHTML = txt_preview_title;
 	document.getElementById('preview_body').innerHTML = txt_preview_fetch;
 
@@ -129,7 +129,7 @@ function previewNews()
 	sendXMLDocument(elk_prepareScriptUrl(elk_scripturl) + 'action=xmlpreview;xml', x.join('&'), onDocSent);
 
 	// Show the preview section and load it with "pending results" text, onDocSent will finish things off
-	document.getElementById('preview_section').style.display = '';
+	document.getElementById('preview_section').style.display = 'block';
 	document.getElementById('preview_subject').innerHTML = txt_preview_title;
 	document.getElementById('preview_body').innerHTML = txt_preview_fetch;
 
@@ -306,7 +306,7 @@ function onDocSent(XMLDoc)
 				if (newPosts[i].getElementsByTagName("is_ignored")[0].firstChild.nodeValue !== '0')
 					ignored_replies[ignored_replies.length] = ignoring = newPosts[i].getAttribute("id");
 
-				newPostsHTML += '<div class="windowbg' + (++reply_counter % 2 === 0 ? '2' : '') + '"><div class="postarea2" id="msg' + newPosts[i].getAttribute("id") + '"><div class="keyinfo">';
+				newPostsHTML += '<div class="content' + (++reply_counter % 2 === 0 ? '2' : '') + '"><div class="postarea2" id="msg' + newPosts[i].getAttribute("id") + '"><div class="keyinfo">';
 				newPostsHTML += '<h5 class="floatleft"><span>' + txt_posted_by + '</span>&nbsp;' + newPosts[i].getElementsByTagName("poster")[0].firstChild.nodeValue + '&nbsp;-&nbsp;' + newPosts[i].getElementsByTagName("time")[0].firstChild.nodeValue;
 				newPostsHTML += ' <span class="new_posts" id="image_new_' + newPosts[i].getAttribute("id") + '">' + txt_new + '</span></h5>';
 
@@ -316,7 +316,7 @@ function onDocSent(XMLDoc)
 				newPostsHTML += '</div>';
 
 				if (ignoring)
-					newPostsHTML += '<div id="msg_' + newPosts[i].getAttribute("id") + '_ignored_prompt">' + txt_ignoring_user + '<a href="#" id="msg_' + newPosts[i].getAttribute("id") + '_ignored_link" style="display: none;">' + show_ignore_user_post + '</a></div>';
+					newPostsHTML += '<div id="msg_' + newPosts[i].getAttribute("id") + '_ignored_prompt">' + txt_ignoring_user + '<a href="#" id="msg_' + newPosts[i].getAttribute("id") + '_ignored_link" class="hide">' + show_ignore_user_post + '</a></div>';
 
 				newPostsHTML += '<div class="inner" id="msg_' + newPosts[i].getAttribute("id") + '_body">' + newPosts[i].getElementsByTagName("message")[0].firstChild.nodeValue + '</div></div></div>';
 			}
@@ -351,7 +351,7 @@ function onDocSent(XMLDoc)
 		}
 	}
 
-	location.hash = '#' + 'preview_section';
+	$('html, body').animate({ scrollTop: $('#preview_section').offset().top }, 'slow');
 
 	// Preview video links if the feature is available
 	if ($.isFunction($.fn.linkifyvideo))

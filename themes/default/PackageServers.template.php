@@ -59,20 +59,20 @@ function template_servers()
 				<form action="' . $scripturl . '?action=admin;area=packageservers;sa=add" method="post" accept-charset="UTF-8">
 					<dl class="settings">
 						<dt>
-							<strong><label for="servername">' . $txt['server_name'] . '</label>:</strong>
+							<label for="servername">' . $txt['server_name'] . ':</label>
 						</dt>
 						<dd>
 							<input type="text" id="servername" name="servername" size="44" value="ElkArte" class="input_text" />
 						</dd>
 						<dt>
-							<strong><label for="serverurl">' . $txt['serverurl'] . '</label>:</strong>
+							<label for="serverurl">' . $txt['serverurl'] . ':</label>
 						</dt>
 						<dd>
 							<input type="text" id="serverurl" name="serverurl" size="44" value="http://" class="input_text" />
 						</dd>
 					</dl>
 					<div class="submitbutton">
-						<input type="submit" value="' . $txt['add_server'] . '" class="button_submit" />
+						<input type="submit" value="' . $txt['add_server'] . '" />
 						<input type="hidden" name="' . $context['session_var'] . '" value="' . $context['session_id'] . '" />
 					</div>
 				</form>
@@ -82,13 +82,13 @@ function template_servers()
 				<form action="', $scripturl, '?action=admin;area=packageservers;sa=download" method="post" accept-charset="UTF-8">
 					<dl class="settings">
 						<dt>
-							<strong><label for="package">' . $txt['serverurl'] . '</label>:</strong>
+							<label for="package">' . $txt['serverurl'] . ':</label>
 						</dt>
 						<dd>
 							<input type="text" id="package" name="package" size="44" value="http://" class="input_text" />
 						</dd>
 						<dt>
-							<strong><label for="filename">', $txt['package_download_filename'], '</label>:</strong>
+							<label for="filename">', $txt['package_download_filename'], ':</label>
 						</dt>
 						<dd>
 							<input type="text" id="filename" name="filename" size="44" class="input_text" /><br />
@@ -96,7 +96,7 @@ function template_servers()
 						</dd>
 					</dl>
 					<div class="submitbutton">
-						<input type="submit" value="', $txt['download'], '" class="button_submit" />
+						<input type="submit" value="', $txt['download'], '" />
 						<input type="hidden" value="byurl" name="byurl" />
 						<input type="hidden" name="' . $context['session_var'] . '" value="' . $context['session_id'] . '" />
 					</div>
@@ -116,12 +116,10 @@ function template_package_confirm()
 	echo '
 	<div id="admincenter">
 		<h2 class="category_header">', $context['page_title'], '</h2>
-		<div class="windowbg">
-			<div class="content">
-				<p>', $context['confirm_message'], '</p>
-				<a href="', $context['proceed_href'], '">[ ', $txt['package_confirm_proceed'], ' ]</a>
-				<a href="JavaScript:window.location.assign(document.referrer);">[ ', $txt['package_confirm_go_back'], ' ]</a>
-			</div>
+		<div class="content">
+			<p>', $context['confirm_message'], '</p>
+			<a href="', $context['proceed_href'], '">[ ', $txt['package_confirm_proceed'], ' ]</a>
+			<a href="JavaScript:window.location.assign(document.referrer);">[ ', $txt['package_confirm_go_back'], ' ]</a>
 		</div>
 	</div>';
 }
@@ -154,10 +152,12 @@ function template_package_list()
 		{
 			echo '
 					<li>
-						<span class="package_toggle">&nbsp;
-							<span id="ps_img_', $i, '" class="collapse" style="display: none;" title="', $txt['hide'], '"></span>
-						</span>
-						<a href="#" id="upshrink_link_', $i, '" class="highlight">', $packageSection['title'], '</a>';
+						<p class="panel_toggle secondary_header">
+							<span>
+								<span id="ps_img_', $i, '" class="collapse hide" title="', $txt['hide'], '"></span>
+							</span>
+							<a href="#" id="upshrink_link_', $i, '" class="highlight">', $packageSection['title'], '</a>
+						</p>';
 
 			if (!empty($packageSection['text']))
 				echo '
@@ -165,75 +165,74 @@ function template_package_list()
 
 			// List of addons available in this section
 			echo '
-						<ol id="package_section_', $i, '" class="packages">';
-
-			$alt = false;
+						<ol id="package_section_', $i, '">';
 
 			foreach ($packageSection['items'] as $id => $package)
 			{
 				echo '
 							<li>';
-					// 1. Some addon [ Download ].
-					echo '
-							<strong>
-								<img id="ps_img_', $i, '_pkg_', $id, '" src="', $settings['images_url'], '/selected_open.png" alt="*" style="display: none;" /> ',
-								$package['can_install'] ? '<strong>' . $package['name'] . '</strong> <a class="linkbutton" href="' . $package['download']['href'] . '">' . $txt['download'] . '</a>' : $package['name'];
+				// 1. Some addon [ Download ].
+				echo '
+								<img id="ps_img_', $i, '_pkg_', $id, '" src="', $settings['images_url'], '/selected_open.png" alt="*" class="hide" />
+								<a id="ps_link_', $i, '_pkg_', $id, '" href="#">', $package['name'], '</a>',
+				$package['can_install'] ? ' <a class="linkbutton" href="' . $package['download']['href'] . '">' . $txt['download'] . '</a>' : '';
 
-					// Mark as installed and current?
-					if ($package['is_installed'] && !$package['is_newer'])
-						echo '<img src="', $settings['images_url'], '/icons/package_', $package['is_current'] ? 'installed' : 'old', '.png" class="centericon package_img" alt="', $package['is_current'] ? $txt['package_installed_current'] : $txt['package_installed_old'], '" />';
-
+				// Mark as installed and current?
+				if ($package['is_installed'] && !$package['is_newer'])
 					echo '
-							</strong>
+								<img src="', $settings['images_url'], '/icons/package_', $package['is_current'] ? 'installed' : 'old', '.png" class="centericon package_img" alt="', $package['is_current'] ? $txt['package_installed_current'] : $txt['package_installed_old'], '" />';
+
+				echo '
 							<ul id="package_section_', $i, '_pkg_', $id, '" class="package_section">';
 
-					// Show the addon type?
-					if ($package['type'] != '')
-						echo '
-								<li class="package_section">', $txt['package_type'], ':&nbsp; ', Util::ucwords(Util::strtolower($package['type'])), '</li>';
-
-					// Show the version number?
-					if ($package['version'] != '')
-						echo '
-								<li class="package_section">', $txt['mod_version'], ':&nbsp; ', $package['version'], '</li>';
-
-					// Show the last date?
-					if ($package['date'] != '')
-						echo '
-								<li class="package_section">', $txt['mod_date'], ':&nbsp; ', $package['date'], '</li>';
-
-					// How 'bout the author?
-					if (!empty($package['author']))
-						echo '
-								<li class="package_section">', $txt['mod_author'], ':&nbsp; ', $package['author'], '</li>';
-
-					// Nothing but hooks ?
-					if ($package['hooks'] != '' && in_array($package['hooks'] , array('yes', 'true')))
-						echo '
-								<li class="package_section">', $txt['mod_hooks'], ' <i class="fa fa-check-circle-o"></i></li>';
-
-					// Location of file: http://someplace/.
+				// Show the addon type?
+				if ($package['type'] != '')
 					echo '
-								<ul style="margin-left: 5em">
-									<li class="package_section"><i class="fa fa-cloud-download"></i> ', $txt['file_location'], ':&nbsp; <a href="', $package['server']['download'], '">', $package['server']['download'], '</a></li>';
+								<li>', $txt['package_type'], ':&nbsp; ', Util::ucwords(Util::strtolower($package['type'])), '</li>';
 
-					// Location of issues?
-					if (!empty($package['server']['bugs']))
-						echo '
-									<li class="package_section"><i class="fa fa-bug"></i> ', $txt['bug_location'], ':&nbsp; <a href="', $package['server']['bugs'], '">', $package['server']['bugs'], '</a></li>';
-
-					// Location of support?
-					if (!empty($package['server']['support']))
-						echo '
-									<li class="package_section"><i class="fa fa-support"></i> ', $txt['support_location'], ':&nbsp; <a href="', $package['server']['support'], '">', $package['server']['support'], '</a></li>';
-
-					// Description: bleh bleh!
+				// Show the version number?
+				if ($package['version'] != '')
 					echo '
+								<li>', $txt['mod_version'], ':&nbsp; ', $package['version'], '</li>';
+
+				// Show the last date?
+				if ($package['date'] != '')
+					echo '
+								<li>', $txt['mod_date'], ':&nbsp; ', $package['date'], '</li>';
+
+				// How 'bout the author?
+				if (!empty($package['author']))
+					echo '
+								<li>', $txt['mod_author'], ':&nbsp; ', $package['author'], '</li>';
+
+				// Nothing but hooks ?
+				if ($package['hooks'] != '' && in_array($package['hooks'], array('yes', 'true')))
+					echo '
+								<li>', $txt['mod_hooks'], ' <i class="fa fa-check-circle-o"></i></li>';
+
+				// Location of file: http://someplace/.
+				echo '
+								<ul>
+									<li><i class="fa fa-cloud-download"></i> ', $txt['file_location'], ':&nbsp; <a href="', $package['server']['download'], '">', $package['server']['download'], '</a></li>';
+
+				// Location of issues?
+				if (!empty($package['server']['bugs']))
+					echo '
+									<li><i class="fa fa-bug"></i> ', $txt['bug_location'], ':&nbsp; <a href="', $package['server']['bugs'], '">', $package['server']['bugs'], '</a></li>';
+
+				// Location of support?
+				if (!empty($package['server']['support']))
+					echo '
+									<li><i class="fa fa-support"></i> ', $txt['support_location'], ':&nbsp; <a href="', $package['server']['support'], '">', $package['server']['support'], '</a></li>';
+
+				// Description: bleh bleh!
+				echo '
 								</ul>
-								<li class="package_section"><div class="infobox">', $txt['package_description'], ':&nbsp; ', $package['description'], '</div></li>
+								<li>
+									<div class="infobox">', $txt['package_description'], ':&nbsp; ', $package['description'], '</div>
+								</li>
 							</ul>';
 
-				$alt = !$alt;
 				echo '
 						</li>';
 			}
@@ -305,6 +304,13 @@ function template_package_list()
 							srcCollapsed: elk_images_url + \'/selected_open.png\',
 							altCollapsed: \'*\'
 						}
+					],
+					aSwapLinks: [
+						{
+							sId: \'ps_link_', $section, '_pkg_', $id, '\',
+							msgExpanded: ' . JavaScriptEscape($package['name']) . ',
+							msgCollapsed: ' . JavaScriptEscape($package['name']) . '
+						}
 					]
 				});';
 			}
@@ -326,20 +332,17 @@ function template_downloaded()
 	<div id="admin_form_wrapper">
 		<h2 class="category_header">', $context['page_title'], '</h2>
 		<p class="infobox">', (empty($context['package_server']) ? $txt['package_uploaded_successfully'] : $txt['package_downloaded_successfully']), '</p>
-		<div class="windowbg">
-			<div class="content flow_auto">
-				<ul>
-					<li>
-						<span class="floatleft"><strong>', $context['package']['name'], '</strong></span>
-						<span class="package_server floatright">', $context['package']['list_files']['link'], '</span>
-						<span class="package_server floatright">', $context['package']['install']['link'], '</span>
-					</li>
-				</ul>
-			</div>
-			<div class="submitbutton">
-				<hr />
-				<a class="linkbutton" href="', $scripturl, '?action=admin;', (!empty($context['package_server']) ? 'area=packageservers;sa=browse;server=' . $context['package_server'] : 'area=packages;sa=browse'), '">', $txt['back'], '</a>
-			</div>
+		<div class="content flow_auto">
+			<ul>
+				<li>
+					<span class="floatleft"><strong>', $context['package']['name'], '</strong></span>
+					<span class="package_server floatright">', $context['package']['list_files']['link'], '</span>
+					<span class="package_server floatright">', $context['package']['install']['link'], '</span>
+				</li>
+			</ul>
+		</div>
+		<div class="submitbutton">
+			<a class="linkbutton" href="', $scripturl, '?action=admin;', (!empty($context['package_server']) ? 'area=packageservers;sa=browse;server=' . $context['package_server'] : 'area=packages;sa=browse'), '">', $txt['back'], '</a>
 		</div>
 	</div>';
 }
@@ -370,24 +373,21 @@ function template_upload()
 	}
 
 	echo '
-		<div class="windowbg">
-			<div class="content">
-				<form action="' . $scripturl . '?action=admin;area=packageservers;sa=upload2" method="post" accept-charset="UTF-8" enctype="multipart/form-data" style="margin-bottom: 0;">
-					<dl class="settings">
-						<dt>
-							<strong><label for="package">' . $txt['package_upload_select'] . '</label>:</strong>
-						</dt>
-						<dd>
-							<input type="file" id="package" name="package" size="38" class="input_file" />
-						</dd>
-					</dl>
-					<hr />
-					<div class="submitbutton">
-						<input type="submit" value="' . $txt['package_upload'] . '" class="button_submit" />
-						<input type="hidden" name="' . $context['session_var'] . '" value="' . $context['session_id'] . '" />
-					</div>
-				</form>
-			</div>
+		<div class="content">
+			<form action="' . $scripturl . '?action=admin;area=packageservers;sa=upload2" method="post" accept-charset="UTF-8" enctype="multipart/form-data">
+				<dl class="settings">
+					<dt>
+						<label for="package">' . $txt['package_upload_select'] . ':</label>
+					</dt>
+					<dd>
+						<input type="file" id="package" name="package" size="38" class="input_file" />
+					</dd>
+				</dl>
+				<div class="submitbutton">
+					<input type="submit" value="' . $txt['package_upload'] . '" />
+					<input type="hidden" name="' . $context['session_var'] . '" value="' . $context['session_id'] . '" />
+				</div>
+			</form>
 		</div>
 	</div>';
 }
@@ -401,44 +401,42 @@ function template_ftp_form_required()
 	global $context, $txt, $scripturl;
 
 	echo '
-		<h3 class="category_header">', $txt['package_ftp_necessary'], '</h3>
-		<div class="windowbg">
-			<div class="content">
-				<p>
-					', $txt['package_ftp_why_download'], '
-				</p>
-				<form action="', $scripturl, '?action=admin;area=packageservers" method="post" accept-charset="UTF-8">
-					<dl class="settings">
-						<dt>
-							<label for="ftp_server">', $txt['package_ftp_server'], ':</label>
-						</dt>
-						<dd>
-							<input type="text" size="30" name="ftp_server" id="ftp_server" value="', $context['package_ftp']['server'], '" class="input_text" />
-							<label for="ftp_port">', $txt['package_ftp_port'], ':&nbsp;</label> <input type="text" size="3" name="ftp_port" id="ftp_port" value="', $context['package_ftp']['port'], '" class="input_text" />
-						</dd>
-						<dt>
-							<label for="ftp_username">', $txt['package_ftp_username'], ':</label>
-						</dt>
-						<dd>
-							<input type="text" size="50" name="ftp_username" id="ftp_username" value="', $context['package_ftp']['username'], '" style="width: 99%;" class="input_text" />
-						</dd>
-						<dt>
-							<label for="ftp_password">', $txt['package_ftp_password'], ':</label>
-						</dt>
-						<dd>
-							<input type="password" size="50" name="ftp_password" id="ftp_password" style="width: 99%;" class="input_password" />
-						</dd>
-						<dt>
-							<label for="ftp_path">', $txt['package_ftp_path'], ':</label>
-						</dt>
-						<dd>
-							<input type="text" size="50" name="ftp_path" id="ftp_path" value="', $context['package_ftp']['path'], '" style="width: 99%;" class="input_text" />
-						</dd>
-					</dl>
-					<div class="submitbutton">
-						<input type="submit" value="', $txt['package_proceed'], '" class="button_submit" />
-					</div>
-				</form>
-			</div>
+		<h2 class="category_header">', $txt['package_ftp_necessary'], '</h2>
+		<div class="content">
+			<p>
+				', $txt['package_ftp_why_download'], '
+			</p>
+			<form action="', $scripturl, '?action=admin;area=packageservers" method="post" accept-charset="UTF-8">
+				<dl class="settings">
+					<dt>
+						<label for="ftp_server">', $txt['package_ftp_server'], ':</label>
+					</dt>
+					<dd>
+						<input type="text" size="30" name="ftp_server" id="ftp_server" value="', $context['package_ftp']['server'], '" class="input_text" />
+						<label for="ftp_port">', $txt['package_ftp_port'], ':&nbsp;</label> <input type="text" size="3" name="ftp_port" id="ftp_port" value="', $context['package_ftp']['port'], '" class="input_text" />
+					</dd>
+					<dt>
+						<label for="ftp_username">', $txt['package_ftp_username'], ':</label>
+					</dt>
+					<dd>
+						<input type="text" size="50" name="ftp_username" id="ftp_username" value="', $context['package_ftp']['username'], '" style="width: 99%;" class="input_text" />
+					</dd>
+					<dt>
+						<label for="ftp_password">', $txt['package_ftp_password'], ':</label>
+					</dt>
+					<dd>
+						<input type="password" size="50" name="ftp_password" id="ftp_password" style="width: 99%;" class="input_password" />
+					</dd>
+					<dt>
+						<label for="ftp_path">', $txt['package_ftp_path'], ':</label>
+					</dt>
+					<dd>
+						<input type="text" size="50" name="ftp_path" id="ftp_path" value="', $context['package_ftp']['path'], '" style="width: 99%;" class="input_text" />
+					</dd>
+				</dl>
+				<div class="submitbutton">
+					<input type="submit" value="', $txt['package_proceed'], '" />
+				</div>
+			</form>
 		</div>';
 }

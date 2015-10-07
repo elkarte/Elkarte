@@ -168,8 +168,6 @@ function preparsecode(&$message, $previewing = false)
 				'~\[_(li|/li|td|tr|/tr)_\]~' => '[$1]',
 				// Images with no real url.
 				'~\[img\]https?://.{0,7}\[/img\]~' => '',
-				// Font tags with multiple fonts (copy&paste in the WYSIWYG by some browsers).
-				'~\[font=\\\'?(.*?)\\\'?(?=\,[ \'\"A-Za-z]*\]).*?\](.*?(?:\[/font\]))~s'  => '[font=$1]$2'
 			);
 
 			// Fix up some use of tables without [tr]s, etc. (it has to be done more than once to catch it all.)
@@ -182,6 +180,9 @@ function preparsecode(&$message, $previewing = false)
 
 			// Fix color tags of many forms so they parse properly
 			$parts[$i] = preg_replace('~\[color=(?:#[\da-fA-F]{3}|#[\da-fA-F]{6}|[A-Za-z]{1,20}|rgb\(\d{1,3}, ?\d{1,3}, ?\d{1,3}\))\]\s*\[/color\]~', '', $parts[$i]);
+
+			// Font tags with multiple fonts (copy&paste in the WYSIWYG by some browsers).
+			$parts[$i] = preg_replace_callback('~\[font=([^\]]*)\](.*?(?:\[/font\]))~s', 'preparsecode_font_callback', $parts[$i]);
 		}
 
 		call_integration_hook('integrate_preparse_code', array(&$parts[$i], $i, $previewing));
@@ -219,11 +220,10 @@ function preparsetable($message)
 
 	// Define the allowable tags after a give tag
 	$table_order = array(
-		'table' => 'td',
-		'table' => 'th',
-		'tr' => 'table',
-		'td' => 'tr',
-		'th' => 'tr',
+		'table' => array('tr'),
+		'tr' => array('td', 'th'),
+		'td' => array('table'),
+		'th' => array(''),
 	);
 
 	// Find all closing tags (/table /tr /td etc)
@@ -237,7 +237,7 @@ function preparsetable($message)
 		if ($matches[1] != '/')
 		{
 			// If the previous table tag isn't correct simply remove it.
-			if ((!empty($table_array) && $table_array[0] != $table_order[$matches[2]]) || (empty($table_array) && $matches[2] != 'table'))
+			if ((!empty($table_array) && !in_array($matches[2], $table_order[$table_array[0]])) || (empty($table_array) && $matches[2] != 'table'))
 				$remove_tag = true;
 			// Record this was the last tag.
 			else
@@ -272,6 +272,20 @@ function preparsetable($message)
 		$message .= '[/' . $tag . ']';
 
 	return $message;
+}
+
+/**
+ * Use only the primary (first) font face when multiple are supplied
+ *
+ * @package Posts
+ * @param string[] $matches
+ */
+function preparsecode_font_callback($matches)
+{
+	$fonts = explode(',', $matches[1]);
+	$font = trim(un_htmlspecialchars($fonts[0]), ' "\'');
+
+	return '[font=' . $font . ']' . $matches[2];
 }
 
 /**
@@ -1583,9 +1597,7 @@ function getFormMsgSubject($editing, $topic, $first_subject = '', $msg_id = 0)
 
 			$form_message = un_preparsecode($form_message);
 
-			// Remove any nested quotes, if necessary.
-			if (!empty($modSettings['removeNestedQuotes']))
-				$form_message = preg_replace(array('~\n?\[quote.*?\].+?\[/quote\]\n?~is', '~^\n~', '~\[/quote\]~'), '', $form_message);
+			$form_message = removeNestedQuotes($form_message);
 
 			// Add a quote string on the front and end.
 			$form_message = '[quote author=' . $mname . ' link=msg=' . (int) $msg_id . ' date=' . $mdate . ']' . "\n" . rtrim($form_message) . "\n" . '[/quote]';

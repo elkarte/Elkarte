@@ -33,12 +33,12 @@ function template_recent()
 	template_pagesection();
 
 	echo '
-		<div id="recentposts" class="forumposts">
-			<h3 class="category_header hdicon cat_img_posts">', $txt['recent_posts'], '</h3>';
+		<div id="recentposts" >
+			<h2 class="category_header hdicon cat_img_posts">', $txt['recent_posts'], '</h2>';
 
 	foreach ($context['posts'] as $post)
 	{
-		$post['class'] = $post['alternate'] == 0 ? 'windowbg' : 'windowbg2';
+		$post['class'] = 'content';
 		$post['title'] = $post['board']['link'] . ' / ' . $post['link'];
 		$post['date'] = $txt['last_post'] . ' ' . $txt['by'] . ' <strong>' . $post['poster']['link'] . ' </strong> - ' . $post['html_time'];
 
@@ -72,7 +72,7 @@ function template_unread()
 
 		if ($context['showCheckboxes'])
 			echo '
-					<form action="', $scripturl, '?action=quickmod" method="post" accept-charset="UTF-8" name="quickModForm" id="quickModForm" style="margin: 0;">
+					<form id="quickModForm" action="', $scripturl, '?action=quickmod" method="post" accept-charset="UTF-8" name="quickModForm">
 						<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />
 						<input type="hidden" name="qaction" value="markread" />
 						<input type="hidden" name="redirect_url" value="', $context['querystring_board_limits'], '" />';
@@ -87,7 +87,7 @@ function template_unread()
 		if ($context['showCheckboxes'])
 			echo '
 							<li class="listlevel1 quickmod_select_all">
-								<input type="checkbox" onclick="invertAll(this, document.getElementById(\'quickModForm\'), \'topics[]\');" class="input_check" />
+								<input type="checkbox" onclick="invertAll(this, document.getElementById(\'quickModForm\'), \'topics[]\');" />
 							</li>';
 
 		$current_header = $context['topics_headers'][$context['sort_by']];
@@ -130,11 +130,11 @@ function template_unread()
 								<div class="topic_info">
 									<p class="topic_icons', isset($message_icon_sprite[$topic['first_post']['icon']]) ? ' topicicon img_' . $topic['first_post']['icon'] : '', '">';
 
-							if (!isset($message_icon_sprite[$topic['first_post']['icon']]))
-								echo '
+			if (!isset($message_icon_sprite[$topic['first_post']['icon']]))
+				echo '
 										<img src="', $topic['first_post']['icon_url'], '" alt="" />';
 
-							echo '
+			echo '
 										', $topic['is_posted_in'] ? '<span class="fred topicicon img_profile"></span>' : '', '
 									</p>
 									<div class="topic_name">';
@@ -167,7 +167,7 @@ function template_unread()
 			if ($context['showCheckboxes'])
 				echo '
 								<p class="topic_moderation" >
-									<input type="checkbox" name="topics[]" value="', $topic['id'], '" class="input_check" />
+									<input type="checkbox" name="topics[]" value="', $topic['id'], '" />
 								</p>';
 
 			echo '
@@ -180,12 +180,6 @@ function template_unread()
 		if ($context['showCheckboxes'])
 			echo '
 					</form>';
-
-		template_pagesection('recent_buttons', 'right');
-
-		echo '
-					<div id="topic_icons" class="description">', template_basicicons_legend(), '
-					</div>';
 	}
 	else
 		echo '
@@ -210,7 +204,7 @@ function template_unread_below()
 		echo '
 		<div id="topic_icons" class="description">';
 
-			template_basicicons_legend();
+		template_basicicons_legend();
 
 		if (!empty($context['using_relative_time']))
 			echo '
@@ -221,5 +215,4 @@ function template_unread_below()
 		echo '
 		</div>';
 	}
-
 }

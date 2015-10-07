@@ -696,9 +696,7 @@
 		if ($news.length > 1)
 		{
 			$.extend(settings, options);
-			$news.each(function() {
-				$(this).fadeOut();
-			});
+			$news.hide();
 			$news.eq(0).fadeIn(settings.iFadeSpeed);
 
 			setInterval(function() {

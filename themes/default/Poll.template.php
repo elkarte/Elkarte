@@ -38,7 +38,7 @@ function template_poll_edit()
 		<form action="', $context['form_url'], '" method="post" accept-charset="UTF-8" onsubmit="submitonce(this); smc_saveEntities(\'postmodify\', [\'question\'], \'options-\');" name="postmodify" id="postmodify">
 			<h2 class="category_header">', $context['page_title'], '</h2>
 			<div>
-				<div class="roundframe">';
+				<div class="well">';
 
 	template_show_error('poll_error');
 
@@ -97,7 +97,7 @@ function template_poll_edit()
 									<label for="poll_change_vote">', $txt['poll_do_change_vote'], ':</label>
 								</dt>
 								<dd>
-									<input type="checkbox" id="poll_change_vote" name="poll_change_vote"', !empty($context['poll']['change_vote']) ? ' checked="checked"' : '', ' class="input_check" />
+									<input type="checkbox" id="poll_change_vote" name="poll_change_vote"', !empty($context['poll']['change_vote']) ? ' checked="checked"' : '', ' />
 								</dd>';
 
 		if ($context['poll']['guest_vote_allowed'])
@@ -106,7 +106,7 @@ function template_poll_edit()
 									<label for="poll_guest_vote">', $txt['poll_guest_vote'], ':</label>
 								</dt>
 								<dd>
-									<input type="checkbox" id="poll_guest_vote" name="poll_guest_vote"', !empty($context['poll']['guest_vote']) ? ' checked="checked"' : '', ' class="input_check" />
+									<input type="checkbox" id="poll_guest_vote" name="poll_guest_vote"', !empty($context['poll']['guest_vote']) ? ' checked="checked"' : '', ' />
 								</dd>';
 	}
 
@@ -116,13 +116,13 @@ function template_poll_edit()
 								</dt>
 								<dd>
 									<label for="poll_results_anyone">
-										<input type="radio" name="poll_hide" id="poll_results_anyone" value="0"', $context['poll']['hide_results'] == 0 ? ' checked="checked"' : '', ' class="input_radio" /> ', $txt['poll_results_anyone'], '
+										<input type="radio" name="poll_hide" id="poll_results_anyone" value="0"', $context['poll']['hide_results'] == 0 ? ' checked="checked"' : '', ' /> ', $txt['poll_results_anyone'], '
 									</label><br />
 									<label for="poll_results_voted">
-										<input type="radio" name="poll_hide" id="poll_results_voted" value="1"', $context['poll']['hide_results'] == 1 ? ' checked="checked"' : '', ' class="input_radio" /> ', $txt['poll_results_voted'], '
+										<input type="radio" name="poll_hide" id="poll_results_voted" value="1"', $context['poll']['hide_results'] == 1 ? ' checked="checked"' : '', ' /> ', $txt['poll_results_voted'], '
 									</label><br />
 									<label for="poll_results_expire">
-										<input type="radio" name="poll_hide" id="poll_results_expire" value="2"', $context['poll']['hide_results'] == 2 ? ' checked="checked"' : '', empty($context['poll']['expiration']) ? ' disabled="disabled"' : '', ' class="input_radio" /> ', $txt['poll_results_after'], '
+										<input type="radio" name="poll_hide" id="poll_results_expire" value="2"', $context['poll']['hide_results'] == 2 ? ' checked="checked"' : '', empty($context['poll']['expiration']) ? ' disabled="disabled"' : '', ' /> ', $txt['poll_results_after'], '
 									</label>
 								</dd>
 							</dl>
@@ -134,7 +134,7 @@ function template_poll_edit()
 		echo '
 					<fieldset id="poll_reset">
 						<legend>', $txt['reset_votes'], '</legend>
-						<input type="checkbox" id="resetVoteCount" name="resetVoteCount" value="on" class="input_check" /> <label for="resetVoteCount">' . $txt['reset_votes_check'] . '</label>
+						<input type="checkbox" id="resetVoteCount" name="resetVoteCount" value="on" /> <label for="resetVoteCount">' . $txt['reset_votes_check'] . '</label>
 					</fieldset>';
 
 	if (!empty($context['form_url']))

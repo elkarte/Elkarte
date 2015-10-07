@@ -624,6 +624,7 @@ $txt['bbcTagsToUse_select_all'] = 'Select all tags';
 
 $txt['enableParticipation'] = 'Enable participation icons';
 $txt['enableFollowup'] = 'Enable followups';
+$txt['enable_unwatch'] = 'Enable unwatching of topics';
 $txt['oldTopicDays'] = 'Time before topic is warned as old on reply';
 $txt['oldTopicDays_zero'] = '0 to disable';
 $txt['defaultMaxTopics'] = 'Number of topics per page in the message index';
@@ -779,3 +780,11 @@ $txt['words_sep'] = 'Words separator';
 
 $txt['admin_order_title'] = 'Ordering Error';
 $txt['admin_order_error'] = 'An unknown error occurred while processing your request';
+
+// Known controllers that can work on the front page
+$txt['default'] = 'Default';
+$txt['front_page'] = 'Select the action to show on the front page:';
+
+$txt['BoardIndex_Controller'] = 'Board Index';
+$txt['MessageIndex_Controller'] = 'Content of a board';
+$txt['message_index_frontpage'] = 'Select the board to show on the front page:';

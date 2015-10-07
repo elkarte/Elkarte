@@ -52,11 +52,12 @@ $(document).ready(function() {
 	// Enable the ... page expansion
 	$('.expand_pages').expand_pages();
 
-	// Collapsabile fieldsets, pure candy
-	$('legend').click(function(){
+	// Collapsible fieldsets, pure candy
+	$(document).on('click', 'legend', function(){
 		$(this).siblings().slideToggle("fast");
 		$(this).parent().toggleClass("collapsed");
-	}).each(function () {
+	});
+	$(document).on('ready', 'legend', function () {
 		if ($(this).data('collapsed'))
 			$(this).click();
 	});
@@ -86,7 +87,7 @@ $(document).ready(function() {
 				$this.css({'width': $this.css('width') === 'auto' ? null : 'auto'});
 				$this.css({'height': $this.css('width') === 'auto' ? null : 'auto'});
 
-				// Overide default css to allow the image to expand fully, add a div to exand in
+				// Override default css to allow the image to expand fully, add a div to expand in
 				$this.css({'max-width': 'none'});
 				$this.wrap('<div style="overflow: auto"></div>');
 			}
@@ -105,6 +106,12 @@ $(document).ready(function() {
 
 			}
 		});
+	});
+	$('.hamburger_30').click(function(e) {
+		e.preventDefault();
+		var id = $(this).data('id');
+		$('#' + id).addClass('visible');
+		$(this).addClass('visible');
 	});
 });
 

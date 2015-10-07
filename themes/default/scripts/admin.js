@@ -51,6 +51,7 @@ elk_AdminIndex.prototype.init = function ()
 elk_AdminIndex.prototype.loadAdminIndex = function ()
 {
 	// Load the current master and your version numbers.
+	console.log(this.opt.bLoadVersions);
 	if (this.opt.bLoadVersions)
 		this.showCurrentVersion();
 
@@ -576,7 +577,7 @@ function updateInputBoxes()
 	// And text and select fields are searchable
 	document.getElementById("can_search_dt").style.display = bIsText || bIsSelect ? "" : "none";
 	document.getElementById("can_search_dd").style.display = bIsText || bIsSelect ? "" : "none";
-	
+
 	// Moving to a non searchable field, be sure searchable is unselected.
 	if (!bIsText && !bIsSelect)
 		document.getElementById("can_search_dd").checked = false;
@@ -598,7 +599,7 @@ function updateInputBoxes()
  */
 function addOption()
 {
-	setOuterHTML(document.getElementById("addopt"), '<br /><input type="radio" name="default_select" value="' + startOptID + '" id="' + startOptID + '" class="input_radio" /><input type="text" name="select_option[' + startOptID + ']" value="" class="input_text" /><span id="addopt"></span>');
+	setOuterHTML(document.getElementById("addopt"), '<br /><input type="radio" name="default_select" value="' + startOptID + '" id="' + startOptID + '" /><input type="text" name="select_option[' + startOptID + ']" value="" class="input_text" /><span id="addopt"></span>');
 	startOptID++;
 }
 
@@ -797,8 +798,8 @@ function calculateNewValues()
  */
 function switchType()
 {
-	document.getElementById("ul_settings").style.display = document.getElementById("method-existing").checked ? "none" : "";
-	document.getElementById("ex_settings").style.display = document.getElementById("method-upload").checked ? "none" : "";
+	document.getElementById("ul_settings").style.display = document.getElementById("method-existing").checked ? "none" : "block";
+	document.getElementById("ex_settings").style.display = document.getElementById("method-upload").checked ? "none" : "block";
 }
 
 /**
@@ -806,7 +807,7 @@ function switchType()
  */
 function swapUploads()
 {
-	document.getElementById("uploadMore").style.display = document.getElementById("uploadSmiley").disabled ? "none" : "";
+	document.getElementById("uploadMore").style.display = document.getElementById("uploadSmiley").disabled ? "none" : "block";
 	document.getElementById("uploadSmiley").disabled = !document.getElementById("uploadSmiley").disabled;
 }
 
@@ -1286,22 +1287,27 @@ function ajax_getTemplatePreview()
 		context: document.body
 	})
 	.done(function(request) {
-		$("#box_preview").css({display:""});
+		$("#box_preview").css({display:"block"});
 		$("#template_preview").html($(request).find('body').text());
+
+		var $_errors = $("#errors");
 		if ($(request).find("error").text() !== '')
 		{
-			$("#errors").css({display:""});
+			$_errors.css({display:"block"});
+
 			var errors_html = '',
-				errors = $(request).find('error').each(function() {
+			errors = $(request).find('error').each(function() {
 				errors_html += $(this).text() + '<br />';
 			});
 
 			$(document).find("#error_list").html(errors_html);
+			$('html, body').animate({ scrollTop: $_errors.offset().top }, 'slow');
 		}
 		else
 		{
-			$("#errors").css({display:"none"});
+			$_errors.css({display:"none"});
 			$("#error_list").html('');
+			$('html, body').animate({ scrollTop: $("#box_preview").offset().top }, 'slow');
 		}
 
 		return false;
@@ -1490,7 +1496,7 @@ function navigatePreview(url)
 		if (myDoc.responseText !== null && myDoc.status === 200)
 		{
 			previewData = myDoc.responseText;
-			document.getElementById('css_preview_box').style.display = "";
+			document.getElementById('css_preview_box').style.display = "block";
 
 			// Revert to the theme they actually use ;).
 			var tempImage = new Image();
@@ -1682,8 +1688,8 @@ function ajax_getEmailTemplatePreview()
 	})
 	.done(function(request) {
 		// Show the preview section, populated with the response
-		$("#preview_section").css({display: ""});
-		$("#template_preview").html($(request).find('body').text());
+		$("#preview_section").css({display: "block"});
+		$("#preview_body").html($(request).find('body').text());
 		$("#preview_subject").html($(request).find('subject').text());
 
 		// Any error we need to let them know about?
@@ -1701,15 +1707,15 @@ function ajax_getEmailTemplatePreview()
 			$(document).find("#error_list").html(errors_html);
 			$_errors.css({display: ""});
 			$_errors.attr('class', parseInt($(request).find('errors').attr('serious')) === 0 ? 'warningbox' : 'errorbox');
-
-			// Navigate to the preview
-			location.hash = '#' + 'preview_section';
 		}
 		else
 		{
 			$("#errors").css({display: "none"});
 			$("#error_list").html('');
 		}
+
+		// Navigate to the preview
+		$('html, body').animate({ scrollTop: $('#preview_section').offset().top }, 'slow');
 
 		return false;
 	});
@@ -1734,7 +1740,7 @@ function ajax_getCensorPreview()
 	.done(function(request) {
 		if (request.result === true) {
 			// Show the censored text section, populated with the response
-			$("#censor_result").css({display: ""}).html(request.censor);
+			$("#censor_result").css({display: "block"}).html(request.censor);
 
 			// Update the token
 			$("#token").attr({name:request.token_val, value:request.token});

@@ -63,13 +63,11 @@ class ManageCalendarModule_Controller extends Action_Controller
 			'setting_callback' => function ($value) {
 				if ($value)
 				{
-					enableModules('calendar', array('post', 'boardindex'));
-					Hooks::get()->enableIntegration('Calendar_Integrate');
+					enableModules('calendar', array('post', 'boardindex', 'display'));
 				}
 				else
 				{
-					disableModules('calendar', array('post', 'boardindex'));
-					Hooks::get()->disableIntegration('Calendar_Integrate');
+					disableModules('calendar', array('post', 'boardindex', 'display'));
 				}
 			},
 		);
@@ -293,7 +291,8 @@ class ManageCalendarModule_Controller extends Action_Controller
 		$this->_req->query->holiday = $this->_req->getQuery('holiday', 'intval');
 
 		// Submitting?
-		if (isset($_POST[$context['session_var']]) && (isset($this->_req->post->delete) || $this->_req->post->title != ''))
+
+		if (isset($this->_req->post->$context['session_var']) && (isset($this->_req->post->delete) || $this->_req->post->title != ''))
 		{
 			checkSession();
 

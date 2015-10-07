@@ -33,30 +33,36 @@ class Topic_Util
 	* @param bool $topicseen - if use the temp table or not
 	* @return mixed[] - array of data related to topics
 	*/
-	public static function prepareContext($topics_info, $topicseen = false)
+	public static function prepareContext($topics_info, $topicseen = false, $preview_length = null)
 	{
 		global $modSettings, $options, $scripturl, $context, $txt, $settings, $user_info;
 
 		$topics = array();
+		$preview_length = (int) $preview_length;
+		if (empty($preview_length))
+			$preview_length = 128;
+
 		$messages_per_page = empty($modSettings['disableCustomPerPage']) && !empty($options['messages_per_page']) ? $options['messages_per_page'] : $modSettings['defaultMaxMessages'];
 		$topicseen = $topicseen ? ';topicseen' : '';
 
+		$icon_sources = new MessageTopicIcons();
+
 		foreach ($topics_info as $row)
 		{
-			// is message previews enabled?
-			if (!empty($modSettings['message_index_preview']))
+			// Is there a body to preview? (If not the preview is disabled.)
+			if (isset($row['first_body']))
 			{
-				// Limit them to $modSettings['preview_characters'] characters - do this FIRST because it's a lot of wasted censoring otherwise.
-				$row['first_body'] = strip_tags(strtr(parse_bbc($row['first_body'], $row['first_smileys'], $row['id_first_msg']), array('<br />' => "\n", '&nbsp;' => ' ')));
-				$row['first_body'] = Util::shorten_text($row['first_body'], !empty($modSettings['preview_characters']) ? $modSettings['preview_characters'] : 128, true);
+				// Limit them to $preview_length characters - do this FIRST because it's a lot of wasted censoring otherwise.
+				$row['first_body'] = strtr(parse_bbc($row['first_body'], $row['first_smileys'], $row['id_first_msg']), array('<br />' => "\n", '&nbsp;' => ' '));
+				$row['first_body'] = Util::htmlspecialchars(Util::shorten_html($row['first_body'], $preview_length, true));
 
 				// No reply then they are the same, no need to process it again
 				if ($row['num_replies'] == 0)
 					$row['last_body'] == $row['first_body'];
 				else
 				{
-					$row['last_body'] = strip_tags(strtr(parse_bbc($row['last_body'], $row['last_smileys'], $row['id_last_msg']), array('<br />' => "\n", '&nbsp;' => ' ')));
-					$row['last_body'] = Util::shorten_text($row['last_body'], !empty($modSettings['preview_characters']) ? $modSettings['preview_characters'] : 128, true);
+					$row['last_body'] = strtr(parse_bbc($row['last_body'], $row['last_smileys'], $row['id_last_msg']), array('<br />' => "\n", '&nbsp;' => ' '));
+					$row['last_body'] = Util::htmlspecialchars(Util::shorten_html($row['last_body'], $preview_length, true));
 				}
 
 				// Censor the subject and message preview.
@@ -93,16 +99,11 @@ class Topic_Util
 			{
 				// We can't pass start by reference.
 				$start = -1;
-				$pages = constructPageIndex($scripturl . '?topic=' . $row['id_topic'] . '.%1$d' . $topicseen, $start, $topic_length, $messages_per_page, true, array('prev_next' => false, 'all' => !empty($modSettings['enableAllMessages']) && $topic_length < $modSettings['enableAllMessages']));
-
-				// If we can use all, show it.
-				if (!empty($modSettings['enableAllMessages']) && $topic_length < $modSettings['enableAllMessages'])
-					$pages .= ' &nbsp;<a href="' . $scripturl . '?topic=' . $row['id_topic'] . '.0;all">' . $txt['all'] . '</a>';
+				$show_all = !empty($modSettings['enableAllMessages']) && $topic_length < $modSettings['enableAllMessages'];
+				$pages = constructPageIndex($scripturl . '?topic=' . $row['id_topic'] . '.%1$d' . $topicseen, $start, $topic_length, $messages_per_page, true, array('prev_next' => false, 'all' => $show_all));
 			}
 			else
 				$pages = '';
-
-			$icon_sources = new MessageTopicIcons();
 
 			if ($user_info['is_guest'])
 			{

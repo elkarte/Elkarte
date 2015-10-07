@@ -917,8 +917,8 @@ function ssi_login($redirect_to = '', $output_method = 'echo')
 		<script src="', $settings['default_theme_url'], '/scripts/sha256.js"></script>
 
 		<form action="', $scripturl, '?action=login2" name="frmLogin" id="frmLogin" method="post" accept-charset="UTF-8" ', empty($context['disable_login_hashing']) ? ' onsubmit="hashLoginPassword(this, \'' . $context['session_id'] . '\');"' : '', '>
-		<div class="login">
-			<div class="roundframe">';
+		<div class="login centertext">
+			<div class="well">';
 
 	// Did they make a mistake last time?
 	if (!empty($context['login_errors']))
@@ -947,7 +947,7 @@ function ssi_login($redirect_to = '', $output_method = 'echo')
 				</dl>';
 
 	echo '
-				<p><input type="submit" value="', $txt['login'], '" class="button_submit" /></p>
+				<input type="submit" value="', $txt['login'], '" />
 				<p class="smalltext"><a href="', $scripturl, '?action=reminder">', $txt['forgot_your_password'], '</a></p>
 				<input type="hidden" name="hash_passwrd" value="" />
 				<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />
@@ -1106,7 +1106,7 @@ function ssi_recentPoll($topPollInstead = false, $output_method = 'echo')
 			<label for="', $option['id'], '">', $option['vote_button'], ' ', $option['option'], '</label><br />';
 
 		echo '
-			<input type="submit" value="', $txt['poll_vote'], '" class="button_submit" />
+			<input type="submit" value="', $txt['poll_vote'], '" />
 			<input type="hidden" name="poll" value="', $return['id'], '" />
 			<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />
 		</form>';
@@ -1200,7 +1200,7 @@ function ssi_showPoll($topicID = null, $output_method = 'echo')
 		echo '
 				</ul>
 				<div class="submitbutton">
-					<input type="submit" value="', $txt['poll_vote'], '" class="button_submit" />
+					<input type="submit" value="', $txt['poll_vote'], '" />
 					<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />
 				</div>
 			</form>';
@@ -1303,7 +1303,9 @@ function ssi_quickSearch($output_method = 'echo')
 
 	echo '
 		<form action="', $scripturl, '?action=search;sa=results" method="post" accept-charset="UTF-8">
-			<input type="hidden" name="advanced" value="0" /><input type="text" name="search" size="30" class="input_text" /> <input type="submit" value="', $txt['search'], '" class="button_submit" />
+			<input type="hidden" name="advanced" value="0" />
+			<input type="text" name="search" size="30" class="input_text" />
+			<input type="submit" value="', $txt['search'], '" />
 		</form>';
 }
 
@@ -1345,7 +1347,7 @@ function ssi_todaysBirthdays($output_method = 'echo')
 
 	foreach ($return['calendar_birthdays'] as $member)
 		echo '
-			<a href="', $scripturl, '?action=profile;u=', $member['id'], '"><span class="fix_rtl_names">' . $member['name'] . '</span>' . (isset($member['age']) ? ' (' . $member['age'] . ')' : '') . '</a>' . (!$member['is_last'] ? ', ' : '');
+			<a href="', $scripturl, '?action=profile;u=', $member['id'], '">' . $member['name'] . (isset($member['age']) ? ' (' . $member['age'] . ')' : '') . '</a>' . (!$member['is_last'] ? ', ' : '');
 }
 
 /**
@@ -1437,7 +1439,7 @@ function ssi_todaysCalendar($output_method = 'echo')
 			<span class="birthday">' . $txt['birthdays_upcoming'] . '</span> ';
 		foreach ($return['calendar_birthdays'] as $member)
 			echo '
-			<a href="', $scripturl, '?action=profile;u=', $member['id'], '"><span class="fix_rtl_names">', $member['name'], '</span>', isset($member['age']) ? ' (' . $member['age'] . ')' : '', '</a>', !$member['is_last'] ? ', ' : '';
+			<a href="', $scripturl, '?action=profile;u=', $member['id'], '">', $member['name'], isset($member['age']) ? ' (' . $member['age'] . ')' : '', '</a>', !$member['is_last'] ? ', ' : '';
 		echo '
 			<br />';
 	}

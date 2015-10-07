@@ -939,7 +939,7 @@ class Database_PostgreSQL extends Database_Abstract
 	/**
 	 * Whether the database system is case sensitive.
 	 *
-	 * @return true
+	 * @return boolean
 	 */
 	public function db_case_sensitive()
 	{
@@ -1010,7 +1010,7 @@ class Database_PostgreSQL extends Database_Abstract
 	 * @param string|null $db_name = null
 	 * @param resource|null $connection = null
 	 *
-	 * @return true
+	 * @return boolean
 	 */
 	public function select_db($db_name = null, $connection = null)
 	{

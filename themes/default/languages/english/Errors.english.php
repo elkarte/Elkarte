@@ -41,7 +41,7 @@ $txt['session_timeout'] = 'Your session timed out while posting. Please go back 
 $txt['session_timeout_file_upload'] = 'Your session timed out while uploading the file. Please try again.';
 $txt['no_files_uploaded'] = 'There are no files to upload.';
 $txt['session_verify_fail'] = 'Session verification failed. Please try logging out and back in again, and then try again.';
-$txt['verify_url_fail'] = 'Unable to verify referring URL. Please go back and try again.';
+$txt['verify_url_fail'] = 'Unable to verify referring URL: %1$s. Please go back and try again.';
 $txt['token_verify_fail'] = 'Token verification failed. Please go back and try again.';
 $txt['guest_vote_disabled'] = 'Guests cannot vote in this poll.';
 

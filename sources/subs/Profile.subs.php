@@ -601,7 +601,7 @@ function loadProfileFields($force_reload = false)
 		'member_name' => array(
 			'type' => allowedTo('admin_forum') && isset($_GET['changeusername']) ? 'text' : 'label',
 			'label' => $txt['username'],
-			'subtext' => allowedTo('admin_forum') && !isset($_GET['changeusername']) ? '[<a href="' . $scripturl . '?action=profile;u=' . $context['id_member'] . ';area=account;changeusername" style="font-style: italic;">' . $txt['username_change'] . '</a>]' : '',
+			'subtext' => allowedTo('admin_forum') && !isset($_GET['changeusername']) ? '[<a href="' . $scripturl . '?action=profile;u=' . $context['id_member'] . ';area=account;changeusername" class="em">' . $txt['username_change'] . '</a>]' : '',
 			'log_change' => true,
 			'permission' => 'profile_identity',
 			'prehtml' => allowedTo('admin_forum') && isset($_GET['changeusername']) ? '<div class="warningbox">' . $txt['username_warning'] . '</div>' : '',
@@ -701,7 +701,7 @@ function loadProfileFields($force_reload = false)
 			'enabled' => empty($cur_profile['openid_uri']),
 			'size' => 20,
 			'value' => empty($cur_profile['otp_secret']) ? '' : $cur_profile['otp_secret'],
-			'postinput' => '<div style="margin-left: 4ex;display: inline-block"><input class="button_submit" type="button" value="' . $txt['otp_generate'] . '" onclick="generateSecret();"></div><div id="qrcode"></div>',
+			'postinput' => '<div style="display: inline-block"><input type="button" value="' . $txt['otp_generate'] . '" onclick="generateSecret();"></div><div id="qrcode"></div>',
 			'permission' => 'profile_identity',
 		),
 		'personal_text' => array(
@@ -724,8 +724,8 @@ function loadProfileFields($force_reload = false)
 			'options' => array(
 				$txt['receive_from_everyone'],
 				$txt['receive_from_ignore'],
-				$txt['receive_from_admins'],
 				$txt['receive_from_buddies'],
+				$txt['receive_from_admins'],
 			),
 			'subtext' => $txt['receive_from_description'],
 			'value' => empty($cur_profile['receive_from']) ? 0 : $cur_profile['receive_from'],
@@ -821,6 +821,26 @@ function loadProfileFields($force_reload = false)
 			'value' => '',
 			'permission' => 'profile_identity',
 			'input_validate' => function (&$value) {
+				global $cur_profile;
+
+				if (empty($value))
+				{
+					require_once(SUBSDIR . '/Members.subs.php');
+					$member = getBasicMemberData($cur_profile['id_member'], array('authentication' => true));
+
+					// No previous answer was saved, so that\'s all good
+					if (empty($member['secret_answer']))
+					{
+						return true;
+					}
+					// There is a previous secret answer to the secret question, so let\'s put it back in the db...
+					else
+					{
+						$value = $member['secret_answer'];
+						// We have to tell the code is an error otherwise an empty value will go into the db
+						return false;
+					}
+				}
 				$value = $value != '' ? md5($value) : '';
 				return true;
 			},
@@ -966,9 +986,8 @@ function loadProfileFields($force_reload = false)
 			// Fix the URL...
 			'input_validate' => function (&$value) {
 
-				if (strlen(trim($value)) > 0 && strpos($value, '://') === false)
-					$value = 'http://' . $value;
-				if (strlen($value) < 8 || (substr($value, 0, 7) !== 'http://' && substr($value, 0, 8) !== 'https://'))
+				$value = addProtocol($value, array('http://', 'https://', 'ftp://', 'ftps://'));
+				if (strlen($value) < 8)
 					$value = '';
 				return true;
 			},
@@ -1602,7 +1621,7 @@ function isCustomFieldValid($field, $value)
 		return 'custom_field_too_long';
 
 	// Any masks to apply?
-	if ($field['type'] == 'text' && !empty($field['mask']) && $field['mask'] != 'none')
+	if ($field['field_type'] == 'text' && !empty($field['mask']) && $field['mask'] != 'none')
 	{
 		// @todo We never error on this - just ignore it at the moment...
 		if ($field['mask'] == 'email' && !isValidEmail($value))
@@ -3318,6 +3337,9 @@ function getMembersInRange($ips, $memID)
 function getMemberNotificationsProfile($member_id)
 {
 	global $modSettings;
+
+	if (empty($modSettings['enabled_mentions']))
+		return array();
 
 	require_once(SUBSDIR . '/Notification.subs.php');
 	Elk_Autoloader::getInstance()->register(SUBSDIR . '/MentionType', '\\ElkArte\\sources\\subs\\MentionType');

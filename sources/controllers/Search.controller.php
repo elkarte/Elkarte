@@ -163,6 +163,7 @@ class Search_Controller extends Action_Controller
 		// If you got back from search;sa=results by using the linktree, you get your original search parameters back.
 		if ($this->_search === null && isset($_REQUEST['params']))
 		{
+			Elk_Autoloader::getInstance()->register(SUBSDIR . '/Search', '\\ElkArte\\Search');
 			$this->_search = new Search();
 			$this->_search->searchParamsFromString($_REQUEST['params']);
 
@@ -292,6 +293,7 @@ class Search_Controller extends Action_Controller
 
 		require_once(SUBSDIR . '/Package.subs.php');
 
+		Elk_Autoloader::getInstance()->register(SUBSDIR . '/Search', '\\ElkArte\\Search');
 		$this->_search = new Search();
 
 		$this->_search->setWeights($this->_weight_factors, $this->_weight, $this->_weight_total);
