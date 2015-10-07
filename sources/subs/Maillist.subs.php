@@ -22,11 +22,11 @@ if (!defined('ELK'))
  *
  * @package Maillist
  * @param int $id
- * @param int $start
- * @param int $chunk_size
- * @param string $sort
+ * @param int $start The item to start with (for pagination purposes)
+ * @param int $items_per_page The number of items to show per page
+ * @param string $sort A string indicating how to sort the results
  */
-function list_maillist_unapproved($id = 0, $start = 0, $chunk_size = 0, $sort = '')
+function list_maillist_unapproved($id = 0, $start = 0, $items_per_page = 0, $sort = '')
 {
 	global $txt, $boardurl, $user_info;
 
@@ -64,7 +64,7 @@ function list_maillist_unapproved($id = 0, $start = 0, $chunk_size = 0, $sort = 
 		' . ((!empty($chunk_size)) ? 'LIMIT {int:offset}, {int:limit} ' : 'LIMIT 1'),
 		array(
 			'offset' => $start,
-			'limit' => $chunk_size,
+			'limit' => $items_per_page,
 			'sort' => $sort,
 			'id' => $id,
 		)
@@ -172,13 +172,13 @@ function maillist_delete_error_entry($id)
  * - Style defines if it will load parsers or filters
  *
  * @package Maillist
- * @param int $start
- * @param int $chunk_size
- * @param string $sort
- * @param int $id
- * @param string $style
+ * @param int $start The item to start with (for pagination purposes)
+ * @param int $items_per_page The number of items to show per page
+ * @param string $sort A string indicating how to sort the results
+ * @param int $id If fetching a specific item, 0 for all
+ * @param string $style = filter Filter to fetch filters or parsers for parsers
  */
-function list_get_filter_parser($start, $chunk_size, $sort = '', $id = 0, $style = 'filter')
+function list_get_filter_parser($start, $items_per_page, $sort = '', $id = 0, $style = 'filter')
 {
 	$db = database();
 
@@ -199,7 +199,7 @@ function list_get_filter_parser($start, $chunk_size, $sort = '', $id = 0, $style
 		' . ((!empty($chunk_size)) ? 'LIMIT {int:offset}, {int:limit} ' : ''),
 		array(
 			'offset' => $start,
-			'limit' => $chunk_size,
+			'limit' => $items_per_page,
 			'sort' => $sort,
 			'id' => $id,
 			'style' => $style

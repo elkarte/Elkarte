@@ -315,9 +315,9 @@ class Modlog_Controller extends Action_Controller
 	 * Returns a list of moderation log entries
 	 * Uses list_getModLogEntries in modlog subs
 	 *
-	 * @param int $start
-	 * @param int $items_per_page
-	 * @param string $sort
+	 * @param int $start The item to start with (for pagination purposes)
+	 * @param int $items_per_page  The number of items to show per page
+	 * @param string $sort A string indicating how to sort the results
 	 * @param string $query_string
 	 * @param mixed[] $query_params
 	 * @param int $log_type

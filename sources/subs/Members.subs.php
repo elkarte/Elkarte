@@ -1120,9 +1120,9 @@ function reattributePosts($memID, $email = false, $membername = false, $post_cou
  * Gets a listing of members, Callback for createList().
  *
  * @package Members
- * @param int $start
- * @param int $items_per_page
- * @param string $sort
+ * @param int $start The item to start with (for pagination purposes)
+ * @param int $items_per_page  The number of items to show per page
+ * @param string $sort A string indicating how to sort the results
  * @param string $where
  * @param mixed[] $where_params
  * @param boolean $get_duplicates

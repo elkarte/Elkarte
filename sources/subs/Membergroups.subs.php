@@ -1922,9 +1922,9 @@ function list_getGroupRequestCount($where, $where_parameters)
  * - Callback function for createList()
  *
  * @package Membergroups
- * @param int $start
- * @param int $items_per_page
- * @param string $sort
+ * @param int $start The item to start with (for pagination purposes)
+ * @param int $items_per_page  The number of items to show per page
+ * @param string $sort A string indicating how to sort the results
  * @param string $where
  * @param string $where_parameters
  * @return mixed[] an array of group requests

@@ -1262,7 +1262,7 @@ class Maintenance_Controller extends Action_Controller
 	 * Generates a list of integration hooks for display
 	 *
 	 * - Accessed through ?action=admin;area=maintain;sa=hooks;
-	 * - Allows for removal or disabing of selected hooks
+	 * - Allows for removal or disabling of selected hooks
 	 */
 	public function action_hooks()
 	{
@@ -1459,16 +1459,16 @@ class Maintenance_Controller extends Action_Controller
 	 * Recalculate all members post counts
 	 *
 	 * What it does:
-	 * - it requires the admin_forum permission.
-	 * - recounts all posts for members found in the message table
-	 * - updates the members post count record in the members table
-	 * - honors the boards post count flag
-	 * - does not count posts in the recycle bin
-	 * - zeros post counts for all members with no posts in the message table
-	 * - runs as a delayed loop to avoid server overload
-	 * - uses the not_done template in Admin.template
-	 * - redirects back to action=admin;area=maintain;sa=members when complete.
-	 * - accessed via ?action=admin;area=maintain;sa=members;activity=recountposts
+	 * - It requires the admin_forum permission.
+	 * - Recounts all posts for members found in the message table
+	 * - Updates the members post count record in the members table
+	 * - Honors the boards post count flag
+	 * - Does not count posts in the recycle bin
+	 * - Zeros post counts for all members with no posts in the message table
+	 * - Runs as a delayed loop to avoid server overload
+	 * - Uses the not_done template in Admin.template
+	 * - Redirects back to action=admin;area=maintain;sa=members when complete.
+	 * - Accessed via ?action=admin;area=maintain;sa=members;activity=recountposts
 	 */
 	public function action_recountposts_display()
 	{
@@ -1553,12 +1553,12 @@ class Maintenance_Controller extends Action_Controller
 	/**
 	 * Callback for createList(). Called by action_hooks
 	 *
-	 * @param int $start
-	 * @param int $per_page
-	 * @param string $sort
+	 * @param int $start The item to start with (for pagination purposes)
+	 * @param int $items_per_page The number of items to show per page
+	 * @param string $sort A string indicating how to sort the results
 	 */
-	public function list_getIntegrationHooks($start, $per_page, $sort)
+	public function list_getIntegrationHooks($start, $items_per_page, $sort)
 	{
-		return list_integration_hooks_data($start, $per_page, $sort);
+		return list_integration_hooks_data($start, $items_per_page, $sort);
 	}
 }

@@ -1572,9 +1572,9 @@ class ModerationCenter_Controller extends Action_Controller
 	 * Callback for createList() used in watched users
 	 *
 	 * @uses watchedUsers()
-	 * @param int $start
-	 * @param int $items_per_page
-	 * @param string $sort
+	 * @param int $start The item to start with (for pagination purposes)
+	 * @param int $items_per_page  The number of items to show per page
+	 * @param string $sort A string indicating how to sort the results
 	 * @param string $approve_query
 	 * @param string $dummy
 	 */
@@ -1601,9 +1601,9 @@ class ModerationCenter_Controller extends Action_Controller
 	 * Callback for createList().
 	 *
 	 * @uses watchedUserPosts()
-	 * @param int $start
-	 * @param int $items_per_page
-	 * @param string $sort
+	 * @param int $start The item to start with (for pagination purposes)
+	 * @param int $items_per_page  The number of items to show per page
+	 * @param string $sort A string indicating how to sort the results
 	 * @param string $approve_query
 	 * @param int[] $delete_boards
 	 */
@@ -1617,9 +1617,9 @@ class ModerationCenter_Controller extends Action_Controller
 	 * Callback for createList() to get all the templates of a type from the system
 	 *
 	 * @uses warningTemplates()
-	 * @param int $start
-	 * @param int $items_per_page
-	 * @param string $sort
+	 * @param int $start The item to start with (for pagination purposes)
+	 * @param int $items_per_page  The number of items to show per page
+	 * @param string $sort A string indicating how to sort the results
 	 * @param string $template_type type of template to load
 	 */
 	public function list_getWarningTemplates($start, $items_per_page, $sort, $template_type = 'warntpl')
@@ -1644,9 +1644,9 @@ class ModerationCenter_Controller extends Action_Controller
 	 * - Used to get all issued warnings in the system
 	 * @uses warnings() function in moderation.subs
 	 *
-	 * @param int $start
-	 * @param int $items_per_page
-	 * @param string $sort
+	 * @param int $start The item to start with (for pagination purposes)
+	 * @param int $items_per_page  The number of items to show per page
+	 * @param string $sort A string indicating how to sort the results
 	 * @param string $query_string
 	 * @param mixed[] $query_params
 	 */

@@ -1572,12 +1572,12 @@ function countMessagesBefore($id_topic, $id_msg, $include_current = false, $only
  * Select a part of the messages in a topic.
  *
  * @param int $topic
- * @param int $start
- * @param int $per_page
+ * @param int $start The item to start with (for pagination purposes)
+ * @param int $items_per_page  The number of items to show per page
  * @param mixed[] $messages
  * @param bool $only_approved
  */
-function selectMessages($topic, $start, $per_page, $messages = array(), $only_approved = false)
+function selectMessages($topic, $start, $items_per_page, $messages = array(), $only_approved = false)
 {
 	$db = database();
 
@@ -1600,7 +1600,7 @@ function selectMessages($topic, $start, $per_page, $messages = array(), $only_ap
 			'split_msgs' => !empty($messages['included']) ? $messages['included'] : array(),
 			'is_approved' => 1,
 			'start' => $start,
-			'messages_per_page' => $per_page,
+			'messages_per_page' => $items_per_page,
 			'msg_before' => !empty($messages['before']) ? (int) $messages['before'] : 0,
 			'msg_after' => !empty($messages['after']) ? (int) $messages['after'] : 0,
 		)
@@ -2734,9 +2734,9 @@ function topicNotificationCount($memID)
  * Retrieve all topic notifications for the given user.
  * (used by createList() callbacks)
  *
- * @param int $start
- * @param int $items_per_page
- * @param string $sort
+ * @param int $start The item to start with (for pagination purposes)
+ * @param int $items_per_page  The number of items to show per page
+ * @param string $sort A string indicating how to sort the results
  * @param int $memID id_member
  * @return array
  */

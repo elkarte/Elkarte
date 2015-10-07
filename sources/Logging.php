@@ -227,8 +227,8 @@ function trackStats($stats = array())
  * - You should use {@link logActions()} instead if you have multiple entries to add
  * @example logAction('remove', array('starter' => $id_member_started));
  *
- * @param string $action
- * @param string[] $extra = array()
+ * @param string $action The action to log
+ * @param string[] $extra = array() An array of extra data
  * @param string $log_type options: 'moderate', 'admin', ...etc.
  */
 function logAction($action, $extra = array(), $log_type = 'moderate')

@@ -1031,9 +1031,9 @@ function getMemberData($id)
  * Get ban triggers for the given parameters.
  *
  * @package Bans
- * @param int $start
- * @param int $items_per_page
- * @param string $sort
+ * @param int $start The item to start with (for pagination purposes)
+ * @param int $items_per_page  The number of items to show per page
+ * @param string $sort A string indicating how to sort the results
  * @param string $trigger_type
  * @return array
  */
@@ -1188,9 +1188,9 @@ function list_getNumBanTriggers($trigger_type)
  * - no permissions checks are done
  *
  * @package Bans
- * @param int $start
- * @param int $items_per_page
- * @param string $sort
+ * @param int $start The item to start with (for pagination purposes)
+ * @param int $items_per_page  The number of items to show per page
+ * @param string $sort A string indicating how to sort the results
  */
 function list_getBanLogEntries($start, $items_per_page, $sort)
 {
@@ -1256,9 +1256,9 @@ function list_getNumBans()
  * Retrieves all the ban items belonging to a certain ban group
  *
  * @package Bans
- * @param int $start
- * @param int $items_per_page
- * @param int $sort
+ * @param int $start The item to start with (for pagination purposes)
+ * @param int $items_per_page  The number of items to show per page
+ * @param int $sort A string indicating how to sort the results
  * @param int $ban_group_id
  * @return array
  */
@@ -1362,9 +1362,9 @@ function list_getBanItems($start = 0, $items_per_page = 0, $sort = 0, $ban_group
  * Get bans, what else? For the given options.
  *
  * @package Bans
- * @param int $start
- * @param int $items_per_page
- * @param string $sort
+ * @param int $start The item to start with (for pagination purposes)
+ * @param int $items_per_page  The number of items to show per page
+ * @param string $sort A string indicating how to sort the results
  * @return array
  */
 function list_getBans($start, $items_per_page, $sort)

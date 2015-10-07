@@ -648,9 +648,9 @@ class ProfileHistory_Controller extends Action_Controller
 	 *
 	 * Passthough to getUserErrors for createList in action_trackip() and action_trackactivity()
 	 *
-	 * @param int $start
-	 * @param int $items_per_page
-	 * @param string $sort
+	 * @param int $start The item to start with (for pagination purposes)
+	 * @param int $items_per_page  The number of items to show per page
+	 * @param string $sort A string indicating how to sort the results
 	 * @param string $where
 	 * @param mixed[] $where_vars array of values used in the where statement
 	 * @return mixed[] error messages array
@@ -685,9 +685,9 @@ class ProfileHistory_Controller extends Action_Controller
 	 *
 	 * Passthrough to getIPMessages used by createList() in TrackIP()
 	 *
-	 * @param int $start
-	 * @param int $items_per_page
-	 * @param string $sort
+	 * @param int $start The item to start with (for pagination purposes)
+	 * @param int $items_per_page  The number of items to show per page
+	 * @param string $sort A string indicating how to sort the results
 	 * @param string $where
 	 * @param mixed[] $where_vars array of values used in the where statement
 	 * @return mixed[] an array of basic messages / details
@@ -723,9 +723,9 @@ class ProfileHistory_Controller extends Action_Controller
 	 *
 	 * Passthrough to getLogins for trackLogins data.
 	 *
-	 * @param int $start
-	 * @param int $items_per_page
-	 * @param string $sort
+	 * @param int $start The item to start with (for pagination purposes)
+	 * @param int $items_per_page  The number of items to show per page
+	 * @param string $sort A string indicating how to sort the results
 	 * @param string $where
 	 * @param mixed[] $where_vars array of values used in the where statement
 	 * @return mixed[] an array of messages
@@ -759,9 +759,9 @@ class ProfileHistory_Controller extends Action_Controller
 	 *
 	 * Passthrough to  getProfileEditsfunction for createList in trackEdits().
 	 *
-	 * @param int $start
-	 * @param int $items_per_page
-	 * @param string $sort
+	 * @param int $start The item to start with (for pagination purposes)
+	 * @param int $items_per_page  The number of items to show per page
+	 * @param string $sort A string indicating how to sort the results
 	 * @param int $memID
 	 * @return mixed[] array of profile edits
 	 */
