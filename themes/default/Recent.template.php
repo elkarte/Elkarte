@@ -16,7 +16,7 @@
  */
 
 /**
- * We need some help to proprerly display things
+ * We need some help to properly display things
  */
 function template_Recent_init()
 {
@@ -102,7 +102,9 @@ function template_unread()
 
 		foreach ($context['topics_headers'] as $key => $value)
 			echo '
-									<li class="listlevel2 sort_by_item" id="sort_by_item_', $key, '"><a href="', $value['url'], '" class="linklevel2">', $txt[$key], ' ', $value['sort_dir_img'], '</a></li>';
+									<li class="listlevel2 sort_by_item" id="sort_by_item_', $key, '">
+										<a href="', $value['url'], '" class="linklevel2">', $txt[$key], ' ', $value['sort_dir_img'], '</a>
+									</li>';
 
 		echo '
 								</ul>
