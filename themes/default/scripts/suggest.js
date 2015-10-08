@@ -33,7 +33,7 @@ function smc_AutoSuggest(oOptions)
 	this.oSelectedDiv = null;
 	this.aCache = [];
 	this.aDisplayData = [];
-	this.sRetrieveURL = 'sRetrieveURL' in this.opt ? this.opt.sRetrieveURL : '%scripturl%action=suggest;suggest_type=%suggest_type%;search=%search%;%sessionVar%=%sessionID%;xml;time=%time%';
+	this.sRetrieveURL = 'sRetrieveURL' in this.opt ? this.opt.sRetrieveURL : '%scripturl%action=suggest;xml';
 
 	// How many objects can we show at once?
 	this.iMaxDisplayQuantity = 'iMaxDisplayQuantity' in this.opt ? this.opt.iMaxDisplayQuantity : 12;
@@ -109,7 +109,11 @@ smc_AutoSuggest.prototype.init = function()
 	return true;
 };
 
-// Was it an enter key - if so assume they are trying to select something.
+/**
+ * Handle keypress events for the suggest controller
+ *
+ * @param oEvent
+ */
 smc_AutoSuggest.prototype.handleKey = function(oEvent)
 {
 	// Grab the event object, one way or the other
@@ -140,7 +144,7 @@ smc_AutoSuggest.prototype.handleKey = function(oEvent)
 			return true;
 		break;
 
-		// Enter.
+		// Was it an Enter key - if so assume they are trying to select something.
 		case 13:
 			if (this.aDisplayData.length > 0 && this.oSelectedDiv !== null)
 			{
@@ -622,7 +626,17 @@ smc_AutoSuggest.prototype.autoSuggestUpdate = function ()
 	sSearchString = sSearchString.php_to8bit().php_urlencode();
 
 	// Get the document.
-	sendXMLDocument.call(this, this.sRetrieveURL.replace(/%scripturl%/g, elk_prepareScriptUrl(elk_scripturl)).replace(/%suggest_type%/g, this.opt.sSearchType).replace(/%search%/g, sSearchString).replace(/%sessionVar%/g, this.opt.sSessionVar).replace(/%sessionID%/g, this.opt.sSessionId).replace(/%time%/g, new Date().getTime()), '', this.onSuggestionReceived);
+	var obj = {
+			"suggest_type": this.opt.sSearchType,
+			"search": sSearchString,
+			"time": new Date().getTime()
+		},
+		postString;
+
+	// Post values plus session
+	postString = "jsonString=" + JSON.stringify(obj) + "&" + this.opt.sSessionVar + "=" + this.opt.sSessionId;
+
+	sendXMLDocument.call(this, this.sRetrieveURL.replace(/%scripturl%/g, elk_prepareScriptUrl(elk_scripturl)), postString, this.onSuggestionReceived);
 
 	return true;
 };

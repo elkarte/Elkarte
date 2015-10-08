@@ -26,6 +26,19 @@ if (!defined('ELK'))
  */
 class Suggest
 {
+	private $_search;
+	private $_params;
+
+	/**
+	 * @param $search
+	 * @param params
+	 */
+	public function __construct($search, $params)
+	{
+		$this->_search = trim(Util::strtolower($search)) . '*';
+		$this->_params = $params;
+	}
+
 	/**
 	 * Search for a member - by real_name or member_name by default.
 	 *
@@ -33,15 +46,14 @@ class Suggest
 	 */
 	public function member()
 	{
-		global $user_info, $context;
+		global $user_info;
 
-		$search = trim(Util::strtolower($_REQUEST['search'])) . '*';
-		$search = strtr($search, array('%' => '\%', '_' => '\_', '*' => '%', '?' => '_', '&#038;' => '&amp;'));
+		$this->_search = strtr($this->_search, array('%' => '\%', '_' => '\_', '*' => '%', '?' => '_', '&#038;' => '&amp;'));
 
 		require_once(SUBSDIR . '/Members.subs.php');
 
 		// Find the member.
-		$xml_data = getMember($search, !empty($context['search_param']['buddies']) ? $user_info['buddies'] : array());
+		$xml_data = getMember($this->_search, !empty($this->_params['buddies']) ? $user_info['buddies'] : array());
 
 		return $xml_data;
 	}
