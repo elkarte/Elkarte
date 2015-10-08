@@ -372,8 +372,10 @@ class Unread_Controller extends Action_Controller
 		{
 			Errors::instance()->fatal_lang_error('error_no_boards_selected');
 		}
-
-		$this->_grabber->setBoards($this->_boards);
+		else
+		{
+			$this->_grabber->setBoards($this->_boards);
+		}
 	}
 
 	/**
