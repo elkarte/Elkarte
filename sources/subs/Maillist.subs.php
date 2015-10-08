@@ -61,7 +61,7 @@ function list_maillist_unapproved($id = 0, $start = 0, $items_per_page = 0, $sor
 			LEFT JOIN {db_prefix}boards AS b ON (b.id_board = e.id_board)
 		WHERE ' . $where_query . '
 		ORDER BY {raw:sort}
-		' . ((!empty($chunk_size)) ? 'LIMIT {int:offset}, {int:limit} ' : 'LIMIT 1'),
+		' . ((!empty($items_per_page)) ? 'LIMIT {int:offset}, {int:limit} ' : 'LIMIT 1'),
 		array(
 			'offset' => $start,
 			'limit' => $items_per_page,
@@ -114,8 +114,6 @@ function list_maillist_count_unapproved()
 	global $user_info;
 
 	$db = database();
-
-	$total = 0;
 
 	// Where can they approve items?
 	$approve_boards = !empty($user_info['mod_cache']['ap']) ? $user_info['mod_cache']['ap'] : boardsAllowedTo('approve_posts');
@@ -196,7 +194,7 @@ function list_get_filter_parser($start, $items_per_page, $sort = '', $id = 0, $s
 		WHERE id_filter' . (($id == 0) ? ' > {int:id}' : ' = {int:id}') . '
 			AND filter_style = {string:style}
 		ORDER BY {raw:sort}, filter_type ASC, filter_order ASC
-		' . ((!empty($chunk_size)) ? 'LIMIT {int:offset}, {int:limit} ' : ''),
+		' . ((!empty($items_per_page)) ? 'LIMIT {int:offset}, {int:limit} ' : ''),
 		array(
 			'offset' => $start,
 			'limit' => $items_per_page,

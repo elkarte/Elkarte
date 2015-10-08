@@ -443,7 +443,7 @@ class Unread
 		if (empty($topics))
 			return false;
 
-		if ($this->_preview_bodies === 'all')
+		if ($this->_preview_bodies == 'all')
 			$body_query = 'ml.body AS last_body, ms.body AS first_body,';
 		else
 		{
