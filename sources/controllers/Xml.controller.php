@@ -168,7 +168,7 @@ class Xml_Controller extends Action_Controller
 			$result = $controller->action_index();
 
 			// Load up the core features of the system
-			if (empty($result))
+			if ($result === true)
 			{
 				$id = $this->_req->getPost('feature_id', 'trim', '');
 
