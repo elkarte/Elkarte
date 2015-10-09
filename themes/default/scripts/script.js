@@ -1582,25 +1582,6 @@ function smc_saveEntities(sFormName, aElementNames, sMask)
 }
 
 /**
- * Make sure the window backgrounds (zebra stripes) are correct for lists.
- * @todo is this still needed with odd/even?
- * @param {HTMLElement} oList
- */
-function applyWindowClasses(oList)
-{
-	oListItems = oList.getElementsByTagName("li");
-
-	for (var i = 0; i < oListItems.length; i++)
-	{
-		// Skip dummies.
-		if (oListItems[i].id === "")
-			continue;
-
-		oListItems[i].className = "content";
-	}
-}
-
-/**
  * Enable / Disable the "Only show the results after the poll has expired."
  * based on if they have entered a time limit or not
  *
