@@ -109,6 +109,7 @@ class Suggest_Controller extends Action_Controller
 				$context['xml_data'] = $function($this->_req->post->search, $context['search_param']);
 			}
 
+			// If we have data, return it
 			if (!empty($context['xml_data']))
 				$context['sub_template'] = 'generic_xml';
 		}

@@ -26,7 +26,16 @@ if (!defined('ELK'))
  */
 class Suggest
 {
+	/**
+	 * What we are going to search for
+	 * @var string
+	 */
 	private $_search;
+
+	/**
+	 * Any special parameters for the search
+	 * @var
+	 */
 	private $_params;
 
 	/**
@@ -48,6 +57,7 @@ class Suggest
 	{
 		global $user_info;
 
+		// Escape the search string
 		$this->_search = strtr($this->_search, array('%' => '\%', '_' => '\_', '*' => '%', '?' => '_', '&#038;' => '&amp;'));
 
 		require_once(SUBSDIR . '/Members.subs.php');
