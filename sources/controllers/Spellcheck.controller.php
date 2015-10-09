@@ -21,7 +21,7 @@ if (!defined('ELK'))
 	die('No access...');
 
 /**
- * Spellcheck Controller
+ * Spell check Controller
  */
 class Spellcheck_Controller extends Action_Controller
 {
@@ -40,6 +40,12 @@ class Spellcheck_Controller extends Action_Controller
 	public $pspell_link;
 
 	/**
+	 * List of words that will be spell checked, word|offset_begin|offset_end
+	 * @var string[]
+	 */
+	private $_alphas;
+
+	/**
 	 * The template layers object
 	 *
 	 * @var null|object
@@ -47,10 +53,26 @@ class Spellcheck_Controller extends Action_Controller
 	protected $_template_layers = null;
 
 	/**
+	 * Holds instance of HttpReq object
+	 * @var HttpReq
+	 */
+	private $_req;
+
+	/**
+	 * Pre Dispatch, called before other methods.  Loads HttpReq instance.
+	 */
+	public function pre_dispatch()
+	{
+		$this->_req = HttpReq::instance();
+	}
+
+	/**
 	 * Spell checks the post for typos ;).
-	 * It uses the pspell library, which MUST be installed.
-	 * It has problems with internationalization.
-	 * It is accessed via ?action=spellcheck.
+	 *
+	 * What it does:
+	 * - It uses the pspell library, which MUST be installed.
+	 * - It has problems with internationalization.
+	 * - It is accessed via ?action=spellcheck.
 	 */
 	public function action_index()
 	{
@@ -76,20 +98,22 @@ class Spellcheck_Controller extends Action_Controller
 		if (!$this->pspell_link)
 			$this->pspell_link = pspell_new('en', '', '', '', PSPELL_FAST | PSPELL_RUN_TOGETHER);
 
+		// Reset error reporting to what it was
 		error_reporting($old);
 		@ob_end_clean();
 
-		if (!isset($_POST['spellstring']) || !$this->pspell_link)
+		// Nothing to check or nothing to check with
+		if (!isset($this->_req->post->spellstring) || !$this->pspell_link)
 			die;
 
 		// Get all the words (Javascript already separated them).
-		$alphas = explode("\n", strtr($_POST['spellstring'], array("\r" => '')));
+		$this->_alphas = explode("\n", strtr($this->_req->post->spellstring, array("\r" => '')));
 
 		// Construct a bit of Javascript code.
 		$context['spell_js'] = '
 			var txt = {"done": "' . $txt['spellcheck_done'] . '"},
-				mispstr = ' . ($_POST['fulleditor'] === 'true' ? 'window.opener.spellCheckGetText(spell_fieldname)' : 'window.opener.document.forms[spell_formname][spell_fieldname].value') . ',
-				misps = ' . $this->_build_misps_array($alphas) . '
+				mispstr = ' . ($this->_req->post->fulleditor === 'true' ? 'window.opener.spellCheckGetText(spell_fieldname)' : 'window.opener.document.forms[spell_formname][spell_fieldname].value') . ',
+				misps = ' . $this->_build_misps_array() . '
 			);';
 
 		// And instruct the template system to just show the spellcheck sub template.
@@ -98,12 +122,21 @@ class Spellcheck_Controller extends Action_Controller
 		$context['sub_template'] = 'spellcheck';
 	}
 
-	protected function _build_misps_array($alphas)
+	/**
+	 * Builds the mis spelled words array for use in JS
+	 *
+	 * What it does:
+	 * - Examines all words passed to it, checking spelling of each
+	 * - Incorrect ones are supplied an array of possible substitutions
+	 *
+	 * @return array
+	 */
+	protected function _build_misps_array()
 	{
 		$array = 'Array(';
 
 		$found_words = false;
-		foreach ($alphas as $alpha)
+		foreach ($this->_alphas as $alpha)
 		{
 			// Words are sent like 'word|offset_begin|offset_end'.
 			$check_word = explode('|', $alpha);
@@ -125,8 +158,12 @@ class Spellcheck_Controller extends Action_Controller
 			{
 				// But first check they aren't going to be censored - no naughty words!
 				foreach ($suggestions as $k => $word)
+				{
 					if ($suggestions[$k] != censorText($word))
+					{
 						unset($suggestions[$k]);
+					}
+				}
 
 				if (!empty($suggestions))
 					$array .= '"' . implode('", "', $suggestions) . '"';
