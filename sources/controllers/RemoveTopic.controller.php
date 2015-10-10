@@ -319,7 +319,7 @@ class RemoveTopic_Controller extends Action_Controller
 	/**
 	 * Verifies the user has permissions to remove an unapproved message/topic
 	 */
-	function _checkApproval()
+	private function _checkApproval()
 	{
 		global $modSettings, $user_info;
 

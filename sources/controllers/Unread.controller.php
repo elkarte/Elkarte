@@ -29,7 +29,7 @@ class Unread_Controller extends Action_Controller
 {
 	/**
 	 * The board ids we are marking
-	 * @var int[]
+	 * @var array
 	 */
 	private $_boards = array();
 
