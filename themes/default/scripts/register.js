@@ -57,7 +57,7 @@ elkRegister.prototype.addVerificationField = function(fieldType, fieldID)
 
 	// Store this field.
 	var vFieldIndex = fieldType === 'reserved' ? fieldType + this.verificationFieldLength : fieldType;
-	this.verificationFields[vFieldIndex] = Array(6);
+	this.verificationFields[vFieldIndex] = new Array(6);
 	this.verificationFields[vFieldIndex][0] = fieldID;
 	this.verificationFields[vFieldIndex][1] = inputHandle;
 	this.verificationFields[vFieldIndex][2] = imageHandle;
@@ -82,7 +82,7 @@ elkRegister.prototype.addVerificationField = function(fieldType, fieldID)
 
 	// Make the div visible!
 	if (divHandle)
-		divHandle.style.display = '';
+		divHandle.style.display = 'inline';
 };
 
 // A button to trigger a username search
