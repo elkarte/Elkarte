@@ -97,8 +97,8 @@ class Sphinxql_Search extends SearchAPI
 	/**
 	 * Check whether the method can be performed by this API.
 	 *
-	 * @param string $methodName
-	 * @param string|null $query_params
+	 * @param string $methodName The search method
+	 * @param string|null $query_params Parameters for the query
 	 */
 	public function supportsMethod($methodName, $query_params = null)
 	{
@@ -136,7 +136,7 @@ class Sphinxql_Search extends SearchAPI
 	 *
 	 * @param string $a Word A
 	 * @param string $b Word B
-	 * @return int
+	 * @return An integer indicating how the words should be sorted (-1, 0 1)
 	 */
 	public function searchSort($a, $b)
 	{
@@ -159,9 +159,9 @@ class Sphinxql_Search extends SearchAPI
 	/**
 	 * Do we have to do some work with the words we are searching for to prepare them?
 	 *
-	 * @param string[] $word
-	 * @param mixed[] $wordsSearch
-	 * @param string[] $wordsExclude
+	 * @param string[] $word A word to index
+	 * @param mixed[] $wordsSearch The Search words
+	 * @param string[] $wordsExclude Words to exclude
 	 * @param boolean $isExcluded
 	 */
 	public function prepareIndexes($word, &$wordsSearch, &$wordsExclude, $isExcluded)
@@ -178,8 +178,8 @@ class Sphinxql_Search extends SearchAPI
 	 * This has it's own custom search.
 	 *
 	 * @param mixed[] $search_params
-	 * @param mixed[] $search_words
-	 * @param string[] $excluded_words
+	 * @param mixed[] $search_words Words to search
+	 * @param string[] $excluded_words Words to exclude, not used in this API
 	 * @param int[] $participants
 	 * @param string[] $search_results
 	 */

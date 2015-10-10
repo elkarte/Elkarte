@@ -22,11 +22,11 @@ if (!defined('ELK'))
  *
  * @package Maillist
  * @param int $id
- * @param int $start
- * @param int $chunk_size
- * @param string $sort
+ * @param int $start The item to start with (for pagination purposes)
+ * @param int $items_per_page The number of items to show per page
+ * @param string $sort A string indicating how to sort the results
  */
-function list_maillist_unapproved($id = 0, $start = 0, $chunk_size = 0, $sort = '')
+function list_maillist_unapproved($id = 0, $start = 0, $items_per_page = 0, $sort = '')
 {
 	global $txt, $boardurl, $user_info;
 
@@ -61,10 +61,10 @@ function list_maillist_unapproved($id = 0, $start = 0, $chunk_size = 0, $sort = 
 			LEFT JOIN {db_prefix}boards AS b ON (b.id_board = e.id_board)
 		WHERE ' . $where_query . '
 		ORDER BY {raw:sort}
-		' . ((!empty($chunk_size)) ? 'LIMIT {int:offset}, {int:limit} ' : 'LIMIT 1'),
+		' . ((!empty($items_per_page)) ? 'LIMIT {int:offset}, {int:limit} ' : 'LIMIT 1'),
 		array(
 			'offset' => $start,
-			'limit' => $chunk_size,
+			'limit' => $items_per_page,
 			'sort' => $sort,
 			'id' => $id,
 		)
@@ -114,8 +114,6 @@ function list_maillist_count_unapproved()
 	global $user_info;
 
 	$db = database();
-
-	$total = 0;
 
 	// Where can they approve items?
 	$approve_boards = !empty($user_info['mod_cache']['ap']) ? $user_info['mod_cache']['ap'] : boardsAllowedTo('approve_posts');
@@ -172,13 +170,13 @@ function maillist_delete_error_entry($id)
  * - Style defines if it will load parsers or filters
  *
  * @package Maillist
- * @param int $start
- * @param int $chunk_size
- * @param string $sort
- * @param int $id
- * @param string $style
+ * @param int $start The item to start with (for pagination purposes)
+ * @param int $items_per_page The number of items to show per page
+ * @param string $sort A string indicating how to sort the results
+ * @param int $id If fetching a specific item, 0 for all
+ * @param string $style = filter Filter to fetch filters or parsers for parsers
  */
-function list_get_filter_parser($start, $chunk_size, $sort = '', $id = 0, $style = 'filter')
+function list_get_filter_parser($start, $items_per_page, $sort = '', $id = 0, $style = 'filter')
 {
 	$db = database();
 
@@ -196,10 +194,10 @@ function list_get_filter_parser($start, $chunk_size, $sort = '', $id = 0, $style
 		WHERE id_filter' . (($id == 0) ? ' > {int:id}' : ' = {int:id}') . '
 			AND filter_style = {string:style}
 		ORDER BY {raw:sort}, filter_type ASC, filter_order ASC
-		' . ((!empty($chunk_size)) ? 'LIMIT {int:offset}, {int:limit} ' : ''),
+		' . ((!empty($items_per_page)) ? 'LIMIT {int:offset}, {int:limit} ' : ''),
 		array(
 			'offset' => $start,
-			'limit' => $chunk_size,
+			'limit' => $items_per_page,
 			'sort' => $sort,
 			'id' => $id,
 			'style' => $style

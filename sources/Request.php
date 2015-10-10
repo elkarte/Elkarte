@@ -175,7 +175,7 @@ class Request
 		{
 			$this->_client_ip = preg_replace('~^::ffff:(\d+\.\d+\.\d+\.\d+)~', '\1', $_SERVER['REMOTE_ADDR']);
 
-			// Just incase we have a legacy IPv4 address.
+			// Just in case we have a legacy IPv4 address.
 			// @ TODO: Convert to IPv6.
 			if (filter_var($this->_client_ip, FILTER_VALIDATE_IP, FILTER_FLAG_IPV4) === false)
 				$this->_client_ip = 'unknown';
@@ -398,7 +398,7 @@ class Request
 	 * Checks the request and abruptly stops processing if issues are found
 	 *
 	 * - No magic quotes allowed
-	 * - Don't try to set a GLOBLAS key in globals
+	 * - Don't try to set a GLOBALS key in globals
 	 * - No numeric keys in $_GET, $_POST or $_FILE
 	 * - No URL's appended to the query string
 	 */
@@ -431,7 +431,7 @@ class Request
 	/**
 	 * Check for illegal numeric keys
 	 *
-	 * - Fail on illgal keys
+	 * - Fail on illegal keys
 	 * - Clear ones that should not be allowed
 	 */
 	private function _checkNumericKeys()
@@ -474,7 +474,7 @@ class Request
 	}
 
 	/**
-	 * Helper mehtod used to clean $_GET arguments
+	 * Helper method used to clean $_GET arguments
 	 */
 	private function _cleanArg()
 	{

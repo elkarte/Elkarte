@@ -26,6 +26,20 @@ if (!defined('ELK'))
 class Suggest_Controller extends Action_Controller
 {
 	/**
+	 * Holds instance of HttpReq object
+	 * @var HttpReq
+	 */
+	private $_req;
+
+	/**
+	 * Pre Dispatch, called before other methods.  Loads HttpReq instance.
+	 */
+	public function pre_dispatch()
+	{
+		$this->_req = HttpReq::instance();
+	}
+
+	/**
 	 * Intended entry point for this class.
 	 *
 	 * @see Action_Controller::action_index()
@@ -33,14 +47,19 @@ class Suggest_Controller extends Action_Controller
 	public function action_index()
 	{
 		// Call the right method for this user request.
-		return $this->action_suggest();
+		$this->action_suggest();
 	}
 
 	/**
 	 * This keeps track of all registered handling functions for auto suggest
 	 * functionality and passes execution to them.
-	 * Accessed by action=suggest.
-	 * @uses Xml template
+	 *
+	 * What it does:
+	 * - Accessed by action=suggest.
+	 * - Passes execution to the registered handler (member)
+	 * - Allows integration to register additional handlers
+	 *
+	 * @uses template_generic_xml() in Xml.template
 	 */
 	public function action_suggest()
 	{
@@ -54,18 +73,22 @@ class Suggest_Controller extends Action_Controller
 			),
 		);
 
+		// Allow integration a way to register their own type
 		call_integration_hook('integrate_autosuggest', array(&$searchTypes));
 
-		checkSession('get');
+		// Good old session check
+		checkSession('post');
+
+		// This requires the XML template
 		loadTemplate('Xml');
 
 		// Any parameters?
-		$context['search_param'] = isset($_REQUEST['search_param']) ? unserialize(base64_decode($_REQUEST['search_param'])) : array();
+		$context['search_param'] = isset($this->_req->post->search_param) ? unserialize(base64_decode($this->_req->post->search_param)) : array();
 
-		if (isset($_REQUEST['suggest_type'], $_REQUEST['search']) && isset($searchTypes[$_REQUEST['suggest_type']]))
+		if (isset($this->_req->post->suggest_type, $this->_req->post->search) && isset($searchTypes[$this->_req->post->suggest_type]))
 		{
 			// Shortcut
-			$currentSearch = $searchTypes[$_REQUEST['suggest_type']];
+			$currentSearch = $searchTypes[$this->_req->post->suggest_type];
 
 			// Do we have a file to include?
 			if (!empty($currentSearch['file']) && file_exists($currentSearch['file']))
@@ -74,7 +97,7 @@ class Suggest_Controller extends Action_Controller
 			// If it is a class, let's instantiate it
 			if (!empty($currentSearch['class']) && class_exists($currentSearch['class']))
 			{
-				$suggest = new $currentSearch['class'];
+				$suggest = new $currentSearch['class']($this->_req->post->search, $context['search_param']);
 
 				// Okay, let's at least assume the method exists... *rolleyes*
 				$context['xml_data'] = $suggest->$currentSearch['function']();
@@ -82,10 +105,11 @@ class Suggest_Controller extends Action_Controller
 			// Let's maintain the "namespace" action_suggest_
 			elseif (function_exists('action_suggest_' . $currentSearch['function']))
 			{
-				$function = 'action_suggest_' . $searchTypes[$_REQUEST['suggest_type']];
-				$context['xml_data'] = $function();
+				$function = 'action_suggest_' . $searchTypes[$this->_req->post->suggest_type];
+				$context['xml_data'] = $function($this->_req->post->search, $context['search_param']);
 			}
 
+			// If we have data, return it
 			if (!empty($context['xml_data']))
 				$context['sub_template'] = 'generic_xml';
 		}

@@ -127,7 +127,7 @@ function resizeMessageTableBody($type)
  * Detects messages, which exceed the max message size
  *
  * @package Maintenance
- * @param int $start
+ * @param int $start The item to start with (for pagination purposes)
  * @param int $increment
  */
 function detectExceedingMessages($start, $increment)
@@ -246,7 +246,7 @@ function getMaxTopicID()
  * Recounts all approved messages
  *
  * @package Maintenance
- * @param int $start
+ * @param int $start The item to start with (for pagination purposes)
  * @param int $increment
  */
 function recountApprovedMessages($start, $increment)
@@ -279,7 +279,7 @@ function recountApprovedMessages($start, $increment)
  * Recounts all unapproved messages
  *
  * @package Maintenance
- * @param int $start
+ * @param int $start The item to start with (for pagination purposes)
  * @param int $increment
  */
 function recountUnapprovedMessages($start, $increment)
@@ -342,7 +342,7 @@ function resetBoardsCounter($column)
  *
  * @package Maintenance
  * @param string $type - can be 'posts', 'topic', 'unapproved_posts', 'unapproved_topics'
- * @param int $start
+ * @param int $start The item to start with (for pagination purposes)
  * @param int $increment
  */
 function updateBoardsCounter($type, $start, $increment)
@@ -521,7 +521,7 @@ function updatePersonalMessagesCounter()
  * Fixes the column id_board from the messages table.
  *
  * @package Maintenance
- * @param int $start
+ * @param int $start The item to start with (for pagination purposes)
  * @param int $increment
  */
 function updateMessagesBoardID($start, $increment)
@@ -710,7 +710,7 @@ function countContributors()
  * Recount the members posts.
  *
  * @package Maintenance
- * @param int $start
+ * @param int $start The item to start with (for pagination purposes)
  * @param int $increment
  * @return int
  */

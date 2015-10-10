@@ -21,7 +21,7 @@ if (!defined('ELK'))
  * @param int $id_board board to build the topic listing for
  * @param int $id_member who we are building it for so we don't show unapproved topics
  * @param int $start where to start from
- * @param int $per_page how many to return
+ * @param int $items_per_page  The number of items to show per page
  * @param string $sort_by how to sort the results asc/desc
  * @param string $sort_column which value we sort by
  * @param mixed[] $indexOptions
@@ -33,7 +33,7 @@ if (!defined('ELK'))
  *     'fake_ascending' =>
  *     'custom_selects' => loads additional values from the tables used in the query, for addon use
  */
-function messageIndexTopics($id_board, $id_member, $start, $per_page, $sort_by, $sort_column, $indexOptions)
+function messageIndexTopics($id_board, $id_member, $start, $items_per_page, $sort_by, $sort_column, $indexOptions)
 {
 	$db = database();
 
@@ -52,7 +52,7 @@ function messageIndexTopics($id_board, $id_member, $start, $per_page, $sort_by, 
 
 	// Extra-query for the pages after the first
 	$ids_query = $start > 0;
-	if ($ids_query && $per_page > 0)
+	if ($ids_query && $items_per_page > 0)
 	{
 		$request = $db->query('', '
 			SELECT t.id_topic
@@ -71,7 +71,7 @@ function messageIndexTopics($id_board, $id_member, $start, $per_page, $sort_by, 
 				'is_approved' => 1,
 				'id_member_guest' => 0,
 				'start' => $start,
-				'maxindex' => $per_page,
+				'maxindex' => $items_per_page,
 			)
 		);
 		$topic_ids = array();
@@ -138,7 +138,7 @@ function messageIndexTopics($id_board, $id_member, $start, $per_page, $sort_by, 
 				'is_approved' => 1,
 				'find_set_topics' => implode(',', $topic_ids),
 				'start' => $start,
-				'maxindex' => $per_page,
+				'maxindex' => $items_per_page,
 			)
 		);
 

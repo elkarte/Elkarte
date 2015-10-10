@@ -35,7 +35,7 @@ function template_poll_edit()
 	if (!empty($context['form_url']))
 		echo '
 	<div id="edit_poll">
-		<form action="', $context['form_url'], '" method="post" accept-charset="UTF-8" onsubmit="submitonce(this); smc_saveEntities(\'postmodify\', [\'question\'], \'options-\');" name="postmodify" id="postmodify">
+		<form id="postmodify" name="postmodify" action="', $context['form_url'], '" method="post" accept-charset="UTF-8" onsubmit="submitonce(this); smc_saveEntities(\'postmodify\', [\'question\'], \'options-\');">
 			<h2 class="category_header">', $context['page_title'], '</h2>
 			<div>
 				<div class="well">';
@@ -71,7 +71,7 @@ function template_poll_edit()
 	echo '
 								<li id="pollMoreOptions"></li>
 							</ul>
-							<strong><a href="javascript:addPollOption(); void(0);">(', $txt['poll_add_option'], ')</a></strong>
+							<a class="linkbutton" href="javascript:addPollOption(); void(0);">', $txt['poll_add_option'], '</a>
 						</fieldset>
 						<fieldset id="poll_options">
 							<legend>', $txt['poll_options'], ':</legend>
@@ -139,11 +139,13 @@ function template_poll_edit()
 
 	if (!empty($context['form_url']))
 		echo '
-					<input type="submit" name="post" value="', $txt['save'], '" onclick="return submitThisOnce(this);" accesskey="s" class="right_submit" />
+					<div class="submitbutton">
+						<input type="submit" name="post" value="', $txt['save'], '" onclick="return submitThisOnce(this);" accesskey="s" />
+						<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />
+						<input type="hidden" name="seqnum" value="', $context['form_sequence_number'], '" />
+					</div>
 				</div>
 			</div>
-			<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />
-			<input type="hidden" name="seqnum" value="', $context['form_sequence_number'], '" />
 		</form>
 	</div>';
 }

@@ -23,19 +23,24 @@ function template_reminder()
 	global $context, $txt, $scripturl;
 
 	echo '
-	<br />
 	<form action="', $scripturl, '?action=reminder;sa=picktype" method="post" accept-charset="UTF-8">
 		<div class="login">
 			<h2 class="category_header">', $txt['authentication_reminder'], '</h2>
 			<div class="well">
 				<p class="smalltext centertext">', $txt['password_reminder_desc'], '</p>
 				<dl>
-					<dt><label for="user">', $txt['user_email'], '</label>:</dt>
-					<dd><input type="text" id="user" name="user" size="30" class="input_text" /></dd>
+					<dt>
+						<label for="user">', $txt['user_email'], ':</label>
+					</dt>
+					<dd>
+						<input type="text" id="user" name="user" size="30" class="input_text" />
+					</dd>
 				</dl>
-				<input type="submit" value="', $txt['reminder_continue'], '" class="right_submit" />
-				<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />
-				<input type="hidden" name="', $context['remind_token_var'], '" value="', $context['remind_token'], '" />
+				<div class="submitbutton">
+					<input type="submit" value="', $txt['reminder_continue'], '" />
+					<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />
+					<input type="hidden" name="', $context['remind_token_var'], '" value="', $context['remind_token'], '" />
+				</div>
 			</div>
 		</div>
 	</form>';
@@ -49,15 +54,14 @@ function template_reminder_pick()
 	global $context, $txt, $scripturl;
 
 	echo '
-	<br />
 	<form action="', $scripturl, '?action=reminder;sa=picktype" method="post" accept-charset="UTF-8">
 		<div class="login">
 			<h2 class="category_header">', $txt['authentication_reminder'], '</h2>
 			<div class="well">
 				<p><strong>', $txt['authentication_options'], ':</strong></p>
 				<p>
-					<input type="radio" name="reminder_type" id="reminder_type_email" value="email" checked="checked" /></dt>
-					<label for="reminder_type_email">', $txt['authentication_' . $context['account_type'] . '_email'], '</label></dd>
+					<input type="radio" name="reminder_type" id="reminder_type_email" value="email" checked="checked" />
+					<label for="reminder_type_email">', $txt['authentication_' . $context['account_type'] . '_email'], '</label>
 				</p>
 				<p>
 					<input type="radio" name="reminder_type" id="reminder_type_secret" value="secret" />
@@ -82,7 +86,6 @@ function template_sent()
 	global $context;
 
 	echo '
-		<br />
 		<div class="login" id="reminder_sent">
 			<h2 class="category_header">' . $context['page_title'] . '</h2>
 			<p class="information">' . $context['description'] . '</p>
@@ -97,8 +100,7 @@ function template_set_password()
 	global $context, $settings, $txt, $scripturl, $modSettings;
 
 	echo '
-	<br />
-	<form action="', $scripturl, '?action=reminder;sa=setpassword2" name="reminder_form" id="reminder_form" method="post" accept-charset="UTF-8">
+	<form id="reminder_form" action="', $scripturl, '?action=reminder;sa=setpassword2" name="reminder_form" method="post" accept-charset="UTF-8">
 		<div class="login">
 			<h2 class="category_header">', $context['page_title'], '</h2>
 			<div class="well">
@@ -107,8 +109,8 @@ function template_set_password()
 						<label for="elk_autov_pwmain">', $txt['choose_pass'], ':</label>
  					</dt>
 					<dd>
-						<input type="password" name="passwrd1" id="elk_autov_pwmain" size="22" class="input_password" />
-						<span id="elk_autov_pwmain_div" class="hide">
+						<input id="elk_autov_pwmain" type="password" name="passwrd1" size="22" class="input_password" />
+						<span id="elk_autov_pwmain_div" class="hide centericon">
 							<img id="elk_autov_pwmain_img" src="', $settings['images_url'], '/icons/field_invalid.png" alt="*" />
 						</span>
 					</dd>
@@ -116,16 +118,20 @@ function template_set_password()
 						<label for="elk_autov_pwverify">', $txt['verify_pass'], ':</label>
 					</dt>
 					<dd>
-						<input type="password" name="passwrd2" id="elk_autov_pwverify" size="22" class="input_password" />
-						<span id="elk_autov_pwverify_div" class="hide">
+						<input id="elk_autov_pwverify" type="password" name="passwrd2"  size="22" class="input_password" />
+						<span id="elk_autov_pwverify_div" class="hide centericon">
 							<img id="elk_autov_pwverify_img" src="', $settings['images_url'], '/icons/field_invalid.png" alt="*" />
 						</span>
 					</dd>';
 
 	if (!empty($modSettings['enableOTP']))
 		echo '
-					<dt><label for="otp">', $txt['disable_otp'], '</label>: </dt>
-					<dd><input type="checkbox" id="otp" name="otp" /></dd>';
+					<dt>
+						<label for="otp">', $txt['disable_otp'], ':</label>
+					</dt>
+					<dd>
+						<input id="otp" type="checkbox"  name="otp" />
+					</dd>';
 
 	echo '
 				</dl>
@@ -160,12 +166,11 @@ function template_ask()
 	global $context, $settings, $txt, $scripturl, $modSettings;
 
 	echo '
-	<br />
 	<form id="creator" action="', $scripturl, '?action=reminder;sa=secret2" method="post" accept-charset="UTF-8" name="creator">
 		<div class="login">
 			<h2 class="category_header">', $txt['authentication_reminder'], '</h2>
 			<div class="well">
-				<p class="smalltext">', $context['account_type'] == 'password' ? $txt['enter_new_password'] : $txt['openid_secret_reminder'], '</p>
+				<p class="smalltext">', $context['account_type'] === 'password' ? $txt['enter_new_password'] : $txt['openid_secret_reminder'], '</p>
 				<dl>
 					<dt>
 						<label>', $txt['secret_question'], ':</label>
@@ -178,14 +183,14 @@ function template_ask()
 						<input type="text" name="secret_answer" size="22" class="input_text" />
 					</dd>';
 
-	if ($context['account_type'] == 'password')
+	if ($context['account_type'] === 'password')
 		echo '
 					<dt>
 						<label for="elk_autov_pwmain">', $txt['choose_pass'], ':</label>
  					</dt>
 					<dd>
 						<input type="password" name="passwrd1" id="elk_autov_pwmain" size="22" class="input_password" />
-						<span id="elk_autov_pwmain_div" class="hide">
+						<span id="elk_autov_pwmain_div" class="hide centericon">
 							<img id="elk_autov_pwmain_img" src="', $settings['images_url'], '/icons/field_invalid.png" alt="*" />
 						</span>
 					</dd>
@@ -194,7 +199,7 @@ function template_ask()
 					</dt>
 					<dd>
 						<input type="password" name="passwrd2" id="elk_autov_pwverify" size="22" class="input_password" />
-						<span id="elk_autov_pwverify_div" class="hide">
+						<span id="elk_autov_pwverify_div" class="hide centericon">
 							<img id="elk_autov_pwverify_img" src="', $settings['images_url'], '/icons/field_valid.png" alt="*" />
 						</span>
 					</dd>';
@@ -211,7 +216,7 @@ function template_ask()
 		</div>
 	</form>';
 
-	if ($context['account_type'] == 'password')
+	if ($context['account_type'] === 'password')
 		echo '
 <script><!-- // --><![CDATA[
 	var regTextStrings = {

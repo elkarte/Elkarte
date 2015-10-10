@@ -56,9 +56,9 @@ function list_getSubscribedUserCount($id_sub, $search_string, $search_vars = arr
  * Return the subscribed users list, for the given parameters.
  * @todo refactor outta here
  *
- * @param int $start
- * @param int $items_per_page
- * @param string $sort
+ * @param int $start The item to start with (for pagination purposes)
+ * @param int $items_per_page  The number of items to show per page
+ * @param string $sort A string indicating how to sort the results
  * @param int $id_sub
  * @param string $search_string
  * @param mixed[] $search_vars

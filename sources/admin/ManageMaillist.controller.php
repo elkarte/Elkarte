@@ -860,15 +860,15 @@ class ManageMaillist_Controller extends Action_Controller
 	 *
 	 * - Callback for createList()
 	 *
-	 * @param int $start
-	 * @param int $chunk_size
-	 * @param string $sort
+	 * @param int $start The item to start with (for pagination purposes)
+	 * @param int $items_per_page The number of items to show per page
+	 * @param string $sort A string indicating how to sort the results
 	 * @param int $id
 	 * @param string $style
 	 */
-	public function load_filter_parser($start, $chunk_size, $sort, $id, $style)
+	public function load_filter_parser($start, $items_per_page, $sort, $id, $style)
 	{
-		return list_get_filter_parser($start, $chunk_size, $sort, $id, $style);
+		return list_get_filter_parser($start, $items_per_page, $sort, $id, $style);
 	}
 
 	/**
@@ -1887,9 +1887,9 @@ class ManageMaillist_Controller extends Action_Controller
 	 *
 	 * - Callback for createList()
 	 *
-	 * @param int $start
-	 * @param int $items_per_page
-	 * @param string $sort
+	 * @param int $start The item to start with (for pagination purposes)
+	 * @param int $items_per_page  The number of items to show per page
+	 * @param string $sort A string indicating how to sort the results
 	 */
 	public function list_getBounceTemplates($start, $items_per_page, $sort)
 	{
@@ -1909,14 +1909,15 @@ class ManageMaillist_Controller extends Action_Controller
 	/**
 	 * Get the number of unapproved emails
 	 *
-	 * @param int $start
-	 * @param int $chunk_size
-	 * @param string $sort
-	 * @param int $id
 	 * - Callback for createList() to list_maillist_unapproved
+	 *
+	 * @param int $start The item to start with (for pagination purposes)
+	 * @param int $items_per_page The number of items to show per page
+	 * @param string $sort A string indicating how to sort the results
+	 * @param int $id = 0
 	 */
-	public function list_maillist_unapproved($start, $chunk_size, $sort = '', $id = 0)
+	public function list_maillist_unapproved($start, $items_per_page, $sort = '', $id = 0)
 	{
-		return list_maillist_unapproved($id, $start, $chunk_size, $sort);
+		return list_maillist_unapproved($id, $start, $items_per_page, $sort);
 	}
 }

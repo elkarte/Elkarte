@@ -94,8 +94,8 @@ class Fulltext_Search extends SearchAPI
 	 *
 	 * Check whether the method can be performed by this API.
 	 *
-	 * @param string $methodName
-	 * @param mixed[]|null $query_params
+	 * @param string $methodName The search method
+	 * @param mixed[]|null $query_params The parameters for the query
 	 */
 	public function supportsMethod($methodName, $query_params = null)
 	{
@@ -149,12 +149,13 @@ class Fulltext_Search extends SearchAPI
 
 	/**
 	 * Callback function for usort used to sort the fulltext results.
-	 * the order of sorting is: large words, small words, large words that
+	 *
+	 * - The order of sorting is: large words, small words, large words that
 	 * are excluded from the search, small words that are excluded.
 	 *
 	 * @param string $a Word A
 	 * @param string $b Word B
-	 * @return int
+	 * @return int An integer indicating how the words should be sorted (-1, 0 1)
 	 */
 	public function searchSort($a, $b)
 	{
@@ -179,10 +180,10 @@ class Fulltext_Search extends SearchAPI
 	 *
 	 * Do we have to do some work with the words we are searching for to prepare them?
 	 *
-	 * @param string $word
-	 * @param mixed[] $wordsSearch
-	 * @param string[] $wordsExclude
-	 * @param boolean $isExcluded
+	 * @param string $word A word to index
+	 * @param mixed[] $wordsSearch The Search words
+	 * @param string[] $wordsExclude Words to exclude
+	 * @param boolean $isExcluded If the $wordsSearch are those to exclude
 	 */
 	public function prepareIndexes($word, &$wordsSearch, &$wordsExclude, $isExcluded)
 	{
@@ -223,7 +224,7 @@ class Fulltext_Search extends SearchAPI
 	 *
 	 * Search for indexed words.
 	 *
-	 * @param mixed[] $words
+	 * @param mixed[] $words Words to index
 	 * @param mixed[] $search_data
 	 */
 	public function indexedWordQuery($words, $search_data)

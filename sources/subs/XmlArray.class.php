@@ -22,33 +22,35 @@ if (!defined('ELK'))
 
 /**
  * Class representing an xml array.
+ *
  * Reads in xml, allows you to access it simply.
  * Version 1.1.
  */
 class Xml_Array
 {
 	/**
-	 * holds xml parsed results
+	 * Holds xml parsed results
 	 * @var array
 	 */
 	public $array;
 
 	/**
-	 * holds debugging level
+	 * Holds debugging level
 	 * @var int|null
 	 */
 	public $debug_level;
 
 	/**
-	 * holds trim level textual data
+	 * Holds trim level textual data
 	 * @var bool
 	 */
 	public $trim;
 
 	/**
 	 * Constructor for the xml parser.
+	 *
 	 * Example use:
-	 *  $xml = new Xml_Array(file('data.xml'));
+	 *   $xml = new Xml_Array(file('data.xml'));
 	 *
 	 * @param string $data the xml data or an array of, unless is_clone is true.
 	 * @param bool $auto_trim default false, used to automatically trim textual data.
@@ -84,8 +86,9 @@ class Xml_Array
 
 	/**
 	 * Get the root element's name.
+	 *
 	 * Example use:
-	 *  echo $element->name();
+	 *   echo $element->name();
 	 */
 	public function name()
 	{
@@ -94,10 +97,13 @@ class Xml_Array
 
 	/**
 	 * Get a specified element's value or attribute by path.
-	 * Children are parsed for text, but only textual data is returned
+	 *
+	 * - Children are parsed for text, but only textual data is returned
 	 * unless get_elements is true.
+	 *
 	 * Example use:
-	 *  $data = $xml->fetch('html/head/title');
+	 *    $data = $xml->fetch('html/head/title');
+	 *
 	 * @param string $path - the path to the element to fetch
 	 * @param bool $get_elements - whether to include elements
 	 */
@@ -130,12 +136,16 @@ class Xml_Array
 		return is_string($array) ? $array : $this->_fetch($array->array);
 	}
 
-	/** Get an element, returns a new Xml_Array.
-	 * It finds any elements that match the path specified.
-	 * It will always return a set if there is more than one of the element
+	/**
+	 * Get an element, returns a new Xml_Array.
+	 *
+	 * - It finds any elements that match the path specified.
+	 * - It will always return a set if there is more than one of the element
 	 * or return_set is true.
+	 *
 	 * Example use:
-	 *  $element = $xml->path('html/body');
+	 *   $element = $xml->path('html/body');
+	 *
 	 * @param string $path  - the path to the element to get
 	 * @param bool $return_full  - always return full result set
 	 * @return Xml_Array a new Xml_Array.
@@ -198,8 +208,9 @@ class Xml_Array
 
 	/**
 	 * Check if an element exists.
+	 *
 	 * Example use,
-	 *  echo $xml->exists('html/body') ? 'y' : 'n';
+	 *   echo $xml->exists('html/body') ? 'y' : 'n';
 	 *
 	 * @param string $path - the path to the element to get.
 	 * @return boolean
@@ -238,8 +249,10 @@ class Xml_Array
 
 	/**
 	 * Count the number of occurrences of a path.
+	 *
 	 * Example use:
-	 *  echo $xml->count('html/head/meta');
+	 *   echo $xml->count('html/head/meta');
+	 *
 	 * @param string $path - the path to search for.
 	 * @return int the number of elements the path matches.
 	 */
@@ -261,10 +274,13 @@ class Xml_Array
 
 	/**
 	 * Get an array of Xml_Array's matching the specified path.
-	 * This differs from ->path(path, true) in that instead of an Xml_Array
+	 *
+	 * - This differs from ->path(path, true) in that instead of an Xml_Array
 	 * of elements, an array of Xml_Array's is returned for use with foreach.
+	 *
 	 * Example use:
-	 *  foreach ($xml->set('html/body/p') as $p)
+	 *   foreach ($xml->set('html/body/p') as $p)
+	 *
 	 * @param string $path  - the path to search for.
 	 * @return array an array of Xml_Array objects
 	 */
@@ -292,8 +308,10 @@ class Xml_Array
 
 	/**
 	 * Create an xml file from an Xml_Array, the specified path if any.
+	 *
 	 * Example use:
-	 *  echo $this->create_xml();
+	 *   echo $this->create_xml();
+	 *
 	 * @param string|null $path - the path to the element. (optional)
 	 * @return string xml-formatted string.
 	 */
@@ -320,8 +338,9 @@ class Xml_Array
 
 	/**
 	 * Output the xml in an array form.
+	 *
 	 * Example use:
-	 *  print_r($xml->to_array());
+	 *   print_r($xml->to_array());
 	 *
 	 * @param string|null $path the path to output.
 	 */
@@ -554,7 +573,7 @@ class Xml_Array
 	/**
 	 * Return an element as an array
 	 *
-	 * @param mixed[] $array
+	 * @param mixed[] $array An array of data
 	 */
 	protected function _array($array)
 	{
@@ -580,7 +599,7 @@ class Xml_Array
 	/**
 	 * Parse out CDATA tags. (htmlspecialchars them...)
 	 *
-	 * @param string $data
+	 * @param string $data The data with CDATA tags
 	 */
 	protected function _to_cdata($data)
 	{
@@ -617,7 +636,7 @@ class Xml_Array
 	/**
 	 * Turn the CDATAs back to normal text.
 	 *
-	 * @param string $data
+	 * @param string $data The data with CDATA tags
 	 */
 	protected function _from_cdata($data)
 	{
@@ -634,7 +653,7 @@ class Xml_Array
 	/**
 	 * Callback for the preg_replace in _from_cdata
 	 *
-	 * @param mixed[] $match
+	 * @param mixed[] $match An array of data
 	 */
 	protected function _from_cdata_callback($match)
 	{
@@ -644,7 +663,7 @@ class Xml_Array
 	/**
 	 * Given an array, return the text from that array. (recursive and privately used.)
 	 *
-	 * @param string[]|string $array
+	 * @param string[]|string $array An array of data
 	 */
 	protected function _fetch($array)
 	{
@@ -674,10 +693,10 @@ class Xml_Array
 	/**
 	 * Get a specific array by path, one level down. (privately used...)
 	 *
-	 * @param mixed[] $array
-	 * @param string $path
-	 * @param int $level
-	 * @param bool $no_error
+	 * @param mixed[] $array An array of data
+	 * @param string $path The path
+	 * @param int $level How far deep into the array we should go
+	 * @param bool $no_error Whether or not to ignore errors
 	 */
 	protected function _path($array, $path, $level, $no_error = false)
 	{

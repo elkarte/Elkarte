@@ -80,17 +80,17 @@ function updateStats($type, $parameter1 = null, $parameter2 = null)
  * Updates the settings table as well as $modSettings... only does one at a time if $update is true.
  *
  * What it does:
- * - updates both the settings table and $modSettings array.
- * - all of changeArray's indexes and values are assumed to have escaped apostrophes (')!
- * - if a variable is already set to what you want to change it to, that
- *   variable will be skipped over; it would be unnecessary to reset.
+ * - Updates both the settings table and $modSettings array.
+ * - All of changeArray's indexes and values are assumed to have escaped apostrophes (')!
+ * - If a variable is already set to what you want to change it to, that
+ *   Variable will be skipped over; it would be unnecessary to reset.
  * - When update is true, UPDATEs will be used instead of REPLACE.
- * - when update is true, the value can be true or false to increment
+ * - When update is true, the value can be true or false to increment
  *  or decrement it, respectively.
  *
- * @param mixed[] $changeArray associative array of variable => value
- * @param bool $update = false
- * @param bool $debug = false
+ * @param mixed[] $changeArray An associative array of what we're changing in 'setting' => 'value' format
+ * @param bool $update Use an UPDATE query instead of a REPLACE query
+ * @param bool $debug = false Not used at this time, see todo
  * @todo: add debugging features, $debug isn't used
  */
 function updateSettings($changeArray, $update = false, $debug = false)
@@ -194,24 +194,25 @@ function removeSettings($toRemove)
  * Constructs a page list.
  *
  * What it does:
- * - builds the page list, e.g. 1 ... 6 7 [8] 9 10 ... 15.
- * - flexible_start causes it to use "url.page" instead of "url;start=page".
- * - very importantly, cleans up the start value passed, and forces it to
+ * - Builds the page list, e.g. 1 ... 6 7 [8] 9 10 ... 15.
+ * - Flexible_start causes it to use "url.page" instead of "url;start=page".
+ * - Very importantly, cleans up the start value passed, and forces it to
  *   be a multiple of num_per_page.
- * - checks that start is not more than max_value.
- * - base_url should be the URL without any start parameter on it.
- * - uses the compactTopicPagesEnable and compactTopicPagesContiguous
+ * - Checks that start is not more than max_value.
+ * - Base_url should be the URL without any start parameter on it.
+ * - Uses the compactTopicPagesEnable and compactTopicPagesContiguous
  *   settings to decide how to display the menu.
  *
- * an example is available near the function definition.
- * $pageindex = constructPageIndex($scripturl . '?board=' . $board, $_REQUEST['start'], $num_messages, $maxindex, true);
+ * @example is available near the function definition.
+ * @example $pageindex = constructPageIndex($scripturl . '?board=' . $board, $_REQUEST['start'], $num_messages, $maxindex, true);
  *
- * @param string $base_url
- * @param int $start
- * @param int $max_value
- * @param int $num_per_page
- * @param bool $flexible_start = false
- * @param mixed[] $show associative array of option => boolean
+ * @param string $base_url The base URL to be used for each link.
+ * @param int &$start The start position, by reference. If this is not a multiple
+ * of the number of items per page, it is sanitized to be so and the value will persist upon the function's return.
+ * @param int $max_value The total number of items you are paginating for.
+ * @param int $num_per_page The number of items to be displayed on a given page.
+ * @param bool $flexible_start = false Use "url.page" instead of "url;start=page"
+ * @param mixed[] $show associative array of option => boolean paris
  */
 function constructPageIndex($base_url, &$start, $max_value, $num_per_page, $flexible_start = false, $show = array())
 {
@@ -337,11 +338,11 @@ function constructPageIndex($base_url, &$start, $max_value, $num_per_page, $flex
  * Formats a number.
  *
  * What it does:
- * - uses the format of number_format to decide how to format the number.
+ * - Uses the format of number_format to decide how to format the number.
  *   for example, it might display "1 234,50".
- * - caches the formatting data from the setting for optimization.
+ * - Caches the formatting data from the setting for optimization.
  *
- * @param float $number
+ * @param float $number The float value to apply comma formatting
  * @param integer|false $override_decimal_count = false or number of decimals
  */
 function comma_format($number, $override_decimal_count = false)
@@ -370,15 +371,16 @@ function comma_format($number, $override_decimal_count = false)
  * Format a time to make it look purdy.
  *
  * What it does:
- * - returns a pretty formatted version of time based on the user's format in $user_info['time_format'].
- * - applies all necessary time offsets to the timestamp, unless offset_type is set.
- * - if todayMod is set and show_today was not not specified or true, an
+ * - Returns a pretty formatted version of time based on the user's format in $user_info['time_format'].
+ * - Applies all necessary time offsets to the timestamp, unless offset_type is set.
+ * - If todayMod is set and show_today was not not specified or true, an
  *   alternate format string is used to show the date with something to show it is "today" or "yesterday".
- * - performs localization (more than just strftime would do alone.)
+ * - Performs localization (more than just strftime would do alone.)
  *
- * @param int $log_time
- * @param string|bool $show_today = true
- * @param string|bool $offset_type = false
+ * @param int $log_time A unix timestamp
+ * @param string|bool $show_today = true show "Today"/"Yesterday" or just a date
+ * @param string|bool $offset_type = false If false, uses both user time offset and forum offset.
+ *   If 'forum', uses only the forum offset. Otherwise no offset is applied.
  */
 function standardTime($log_time, $show_today = true, $offset_type = false)
 {
@@ -389,7 +391,7 @@ function standardTime($log_time, $show_today = true, $offset_type = false)
 	if (!$offset_type)
 		$time = $log_time + ($user_info['time_offset'] + $modSettings['time_offset']) * 3600;
 	// Just the forum offset?
-	elseif ($offset_type == 'forum')
+	elseif ($offset_type === 'forum')
 		$time = $log_time + $modSettings['time_offset'] * 3600;
 	else
 		$time = $log_time;
@@ -461,7 +463,7 @@ function standardTime($log_time, $show_today = true, $offset_type = false)
 /**
  * Used to render a timestamp to html5 <time> tag format.
  *
- * @param int $timestamp
+ * @param int $timestamp A unix timestamp
  * @return string
  */
 function htmlTime($timestamp)
@@ -483,10 +485,10 @@ function htmlTime($timestamp)
  * Gets the current time with offset.
  *
  * What it does:
- * - always applies the offset in the time_offset setting.
+ * - Always applies the offset in the time_offset setting.
  *
  * @param bool $use_user_offset = true if use_user_offset is true, applies the user's offset as well
- * @param int|null $timestamp = null
+ * @param int|null $timestamp = null A unix timestamp (null to use current time)
  * @return int seconds since the unix epoch
  */
 function forum_time($use_user_offset = true, $timestamp = null)
@@ -505,10 +507,10 @@ function forum_time($use_user_offset = true, $timestamp = null)
  * Removes special entities from strings.  Compatibility...
  *
  * - Faster than html_entity_decode
- * - removes the base entities ( &amp; &quot; &#039; &lt; and &gt;. ) from text with htmlspecialchars_decode
- * - additionally converts &nbsp with str_replace
+ * - Removes the base entities ( &amp; &quot; &#039; &lt; and &gt;. ) from text with htmlspecialchars_decode
+ * - Additionally converts &nbsp with str_replace
  *
- * @param string $string
+ * @param string $string The string to apply htmlspecialchars_decode
  * @return string string without entities
  */
 function un_htmlspecialchars($string)
@@ -571,8 +573,8 @@ function permute($array)
  *
  * Source: O'Reilly PHP Cookbook
  *
- * @param mixed[] $p
- * @param int $size
+ * @param mixed[] $p The array keys to apply permutation
+ * @param int $size The size of our permutation array
  *
  * @return mixed[] the next permutation of the passed array $p
  */
@@ -2059,8 +2061,9 @@ function parse_bbc($message, $smileys = true, $cache_id = '', $parse_tags = arra
 }
 
 /**
- * Call back function for footnotes, builds the unique id and to/for link
- * for each footnote in a message and page
+ * Call back function for footnotes
+ *
+ * - Builds the unique id and to/for link for each footnote in a message and page
  *
  * @param mixed[] $matches
  * @return string
@@ -2077,6 +2080,7 @@ function footnote_callback($matches)
 
 /**
  * Callback function for autolinking.
+ *
  * - If the look behind contains ( then it will trim any trailing ) from the link
  * this to allow (link/path) where the path contains ) characters as allowed by RFC
  *
@@ -2101,7 +2105,7 @@ function parse_autolink($matches)
  * - Caches the smileys from the database or array in memory.
  * - Doesn't return anything, but rather modifies message directly.
  *
- * @param string $message
+ * @param string $message The string containing smileys to parse
  */
 function parsesmileys(&$message)
 {
@@ -2194,7 +2198,7 @@ function parsesmileys(&$message)
  * - does special handling to keep the tabs in the code available.
  * - used to parse PHP code from inside [code] and [php] tags.
  *
- * @param string $code
+ * @param string $code The string containing php code
  * @return string the code with highlighted HTML.
  */
 function highlight_php_code($code)
@@ -2219,7 +2223,7 @@ function highlight_php_code($code)
  * - Calls AddMailQueue to process any mail queue items its can
  * - Calls call_integration_hook integrate_redirect before headers are sent
  *
- * @param string $setLocation = ''
+ * @param string $setLocation = '' The URL to redirect to
  * @param bool $refresh = false, enable to send a refresh header, default is a location header
  */
 function redirectexit($setLocation = '', $refresh = false)
@@ -2274,9 +2278,9 @@ function redirectexit($setLocation = '', $refresh = false)
  *
  * What it does:
  * - Similar to the callback function used in ob_sessrewrite
- * - Envoked by enabling queryless_urls for systems that support that function
+ * - Evoked by enabling queryless_urls for systems that support that function
  *
- * @param mixed[] $matches
+ * @param mixed[] $matches results from the calling preg
  */
 function redirectexit_callback($matches)
 {
@@ -2295,10 +2299,10 @@ function redirectexit_callback($matches)
  * - Takes care of template loading and remembering the previous URL.
  * - Calls ob_start() with ob_sessrewrite to fix URLs if necessary.
  *
- * @param bool|null $header = null
- * @param bool|null $do_footer = null
- * @param bool $from_index = false
- * @param bool $from_fatal_error = false
+ * @param bool|null $header = null Output the header
+ * @param bool|null $do_footer = null Output the footer
+ * @param bool $from_index = false If we're coming from index.php
+ * @param bool $from_fatal_error = false If we are exiting due to a fatal error
  */
 function obExit($header = null, $do_footer = null, $from_index = false, $from_fatal_error = false)
 {
@@ -2401,7 +2405,7 @@ function obExit($header = null, $do_footer = null, $from_index = false, $from_fa
 /**
  * Sets the class of the current topic based on is_very_hot, veryhot, hot, etc
  *
- * @param mixed[] $topic_context
+ * @param mixed[] $topic_context array of topic information
  */
 function determineTopicClass(&$topic_context)
 {
@@ -2577,7 +2581,7 @@ function setupThemeContext($forceload = false)
  *
  * What it does:
  * - If the needed memory is greater than current, will attempt to get more
- * - if in_use is set to true, will also try to take the current memory usage in to account
+ * - If in_use is set to true, will also try to take the current memory usage in to account
  *
  * @param string $needed The amount of memory to request, if needed, like 256M
  * @param bool $in_use Set to true to account for current memory usage of the script
@@ -2920,7 +2924,7 @@ function template_javascript($do_defered = false)
  * Output the CSS files
  *
  * What it does:
- *  - if the admin option to combine files is set, will use Combiner.class
+ *  - If the admin option to combine files is set, will use Combiner.class
  */
 function template_css()
 {
@@ -2999,16 +3003,21 @@ function template_admin_warning_above()
 
 /**
  * Get an attachment's encrypted filename. If $new is true, won't check for file existence.
+ *
+ * - If new is set returns a hash for the db
+ * - If no file hash is supplied, determines one and returns it
+ * - Returns the path to the file
+ *
  * @todo this currently returns the hash if new, and the full filename otherwise.
  * Something messy like that.
  * @todo and of course everything relies on this behavior and work around it. :P.
  * Converters included.
  *
- * @param string $filename
- * @param int $attachment_id
- * @param string|null $dir
- * @param bool $new
- * @param string $file_hash
+ * @param string $filename The name of the file
+ * @param int $attachment_id The ID of the attachment
+ * @param string|null $dir Which directory it should be in (null to use current)
+ * @param bool $new If this is a new attachment, if so just returns a hash
+ * @param string $file_hash The file hash
  */
 function getAttachmentFilename($filename, $attachment_id, $dir = null, $new = false, $file_hash = '')
 {
@@ -3041,9 +3050,9 @@ function getAttachmentFilename($filename, $attachment_id, $dir = null, $new = fa
 /**
  * Convert a single IP to a ranged IP.
  *
- * - internal function used to convert a user-readable format to a format suitable for the database.
+ * - Internal function used to convert a user-readable format to a format suitable for the database.
  *
- * @param string $fullip
+ * @param string $fullip A full dot notation IP address
  * @return array|string 'unknown' if the ip in the input was '255.255.255.255'
  */
 function ip2range($fullip)
@@ -3102,7 +3111,7 @@ function ip2range($fullip)
 /**
  * Lookup an IP; try shell_exec first because we can do a timeout on it.
  *
- * @param string $ip
+ * @param string $ip A full dot notation IP address
  * @return string
  */
 function host_from_ip($ip)
@@ -3157,11 +3166,11 @@ function host_from_ip($ip)
 /**
  * Chops a string into words and prepares them to be inserted into (or searched from) the database.
  *
- * @param string $text
+ * @param string $text The string to process
  * @param int|null $max_chars = 20
  *     - if encrypt = true this is the maximum number of bytes to use in integer hashes (for searching)
  *     - if encrypt = false this is the maximum number of letters in each word
- * @param bool $encrypt = false Used for custom search indexes to return an array of ints representing the words
+ * @param bool $encrypt = false Used for custom search indexes to return an int[] array representing the words
  */
 function text2words($text, $max_chars = 20, $encrypt = false)
 {
@@ -3242,8 +3251,8 @@ function create_button($name, $alt, $label = '', $custom = '', $force_use = fals
  * Sets up all of the top menu buttons
  *
  * What it does:
- * - defines every master item in the menu, as well as any sub-items
- * - ensures the chosen action is set so the menu is highlighted
+ * - Defines every master item in the menu, as well as any sub-items
+ * - Ensures the chosen action is set so the menu is highlighted
  * - Saves them in the cache if it is available and on
  * - Places the results in $context
  */
@@ -3652,11 +3661,11 @@ function elk_seed_generator()
  * Process functions of an integration hook.
  *
  * What it does:
- * - calls all functions of the given hook.
- * - supports static class method calls.
+ * - Calls all functions of the given hook.
+ * - Supports static class method calls.
  *
- * @param string $hook
- * @param mixed[] $parameters = array()
+ * @param string $hook The name of the hook to call
+ * @param mixed[] $parameters = array() Parameters to pass to the hook
  * @return mixed[] the results of the functions
  */
 function call_integration_hook($hook, $parameters = array())
@@ -3667,7 +3676,7 @@ function call_integration_hook($hook, $parameters = array())
 /**
  * Includes files for hooks that only do that (i.e. integrate_pre_include)
  *
- * @param string $hook
+ * @param string $hook The name to include
  */
 function call_integration_include_hook($hook)
 {
@@ -3685,11 +3694,11 @@ function call_integration_buffer()
 /**
  * Add a function for integration hook.
  *
- * - does nothing if the function is already added.
+ * - Does nothing if the function is already added.
  *
- * @param string $hook
- * @param string $function
- * @param string $file
+ * @param string $hook The name of the hook to add
+ * @param string $function The function associated with the hook
+ * @param string $file The file that contains the function
  * @param bool $permanent = true if true, updates the value in settings table
  */
 function add_integration_function($hook, $function, $file = '', $permanent = true)
@@ -3704,9 +3713,9 @@ function add_integration_function($hook, $function, $file = '', $permanent = tru
  * - Removes the given function from the given hook.
  * - Does nothing if the function is not available.
  *
- * @param string $hook
- * @param string $function
- * @param string $file
+ * @param string $hook The name of the hook to remove
+ * @param string $function The name of the function
+ * @param string $file The file its located in
  */
 function remove_integration_function($hook, $function, $file = '')
 {
@@ -3719,7 +3728,7 @@ function remove_integration_function($hook, $function, $file = '')
  * that are not normally displayable.  This converts the popular ones that
  * appear from a cut and paste from windows.
  *
- * @param string|false $string
+ * @param string|false $string The string to sanitize
  * @return string $string
  */
 function sanitizeMSCutPaste($string)
@@ -3843,7 +3852,7 @@ function fixchar__callback($matches)
  *
  * What it does:
  * - Callback function used of preg_replace_callback in various $ent_checks,
- * - for example strpos, strlen, substr etc
+ * - For example strpos, strlen, substr etc
  *
  * @param mixed[] $matches array of matches for a preg_match_all
  * @return string
@@ -3922,7 +3931,7 @@ function currentContext($messages_request, $reset = false)
  *
  * What it does:
  * - Intended for addon use to allow such things as
- * - adding in a new menu item to an existing menu array
+ * - Adding in a new menu item to an existing menu array
  *
  * @param mixed[] $input the array we will insert to
  * @param string $key the key in the array that we are looking to find for the insert action

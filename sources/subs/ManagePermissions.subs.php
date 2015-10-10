@@ -24,9 +24,9 @@ if (!defined('ELK'))
  * Set the permission level for a specific profile, group, or group for a profile.
  *
  * @package Permissions
- * @param string $level
- * @param integer|null $group
- * @param integer|null $profile = null, int expected
+ * @param string $level The level ('restrict', 'standard', etc.)
+ * @param integer|null $group The group to set the permission for
+ * @param integer|null $profile = null, int id of the permissions group or 'null' if we're setting it for a group
  */
 function setPermissionLevel($level, $group = null, $profile = null)
 {
@@ -665,9 +665,10 @@ function loadAllPermissions()
  * Counts membergroup permissions.
  *
  * @package Permissions
- * @param int[] $groups
- * @param string[]|null $hidden_permissions
- * @return integer[]
+ * @param int[] $groups the group ids to return permission counts
+ * @param string[]|null $hidden_permissions array of permission names to skip in the count totals
+ *
+ * @return int[] [id_group][num_permissions][denied] = count, [id_group][num_permissions][allowed] = count
  */
 function countPermissions($groups, $hidden_permissions = null)
 {
@@ -683,8 +684,12 @@ function countPermissions($groups, $hidden_permissions = null)
 		)
 	);
 	while ($row = $db->fetch_assoc($request))
+	{
 		if (isset($groups[(int) $row['id_group']]) && (!empty($row['add_deny']) || $row['id_group'] != -1))
+		{
 			$groups[$row['id_group']]['num_permissions'][empty($row['add_deny']) ? 'denied' : 'allowed'] = $row['num_permissions'];
+		}
+	}
 	$db->free_result($request);
 
 	return $groups;
@@ -697,7 +702,8 @@ function countPermissions($groups, $hidden_permissions = null)
  * @param int[] $groups
  * @param string[]|null $hidden_permissions
  * @param integer|null $profile_id
- * @return integer[]
+ *
+ * @return int[]
  */
 function countBoardPermissions($groups, $hidden_permissions = null , $profile_id = null)
 {
@@ -1278,7 +1284,8 @@ function deletePermissionProfiles($profiles)
  *
  * @package Permissions
  * @param int[] $profiles
- * @return integer[]
+ *
+ * @return int[]
  */
 function permProfilesInUse($profiles)
 {

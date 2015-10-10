@@ -104,8 +104,8 @@ class Custom_Search extends SearchAPI
 	/**
 	 * Check whether the search can be performed by this API.
 	 *
-	 * @param string $methodName
-	 * @param string|null $query_params
+	 * @param string $methodName The search method
+	 * @param string|null $query_params Parameters for the query
 	 * @return boolean|null
 	 */
 	public function supportsMethod($methodName, $query_params = null)
@@ -141,12 +141,13 @@ class Custom_Search extends SearchAPI
 
 	/**
 	 * Callback function for usort used to sort the fulltext results.
-	 * the order of sorting is: large words, small words, large words that
+	 *
+	 * - The order of sorting is: large words, small words, large words that
 	 * are excluded from the search, small words that are excluded.
 	 *
 	 * @param string $a Word A
 	 * @param string $b Word B
-	 * @return int
+	 * @return int An integer indicating how the words should be sorted (-1, 0 1)
 	 */
 	public function searchSort($a, $b)
 	{
@@ -159,7 +160,7 @@ class Custom_Search extends SearchAPI
 	/**
 	 * Adds the excluded words list
 	 *
-	 * @param string[] $words An array of words
+	 * @param string[] $words An array of words to exclude
 	 */
 	public function setExcludedWords($words)
 	{
@@ -169,9 +170,9 @@ class Custom_Search extends SearchAPI
 	/**
 	 * Do we have to do some work with the words we are searching for to prepare them?
 	 *
-	 * @param string $word
-	 * @param mixed[] $wordsSearch
-	 * @param string[] $wordsExclude
+	 * @param string $word A word to index
+	 * @param mixed[] $wordsSearch The Search words
+	 * @param string[] $wordsExclude Words to exclude
 	 * @param boolean $isExcluded
 	 */
 	public function prepareIndexes($word, &$wordsSearch, &$wordsExclude, $isExcluded)
@@ -203,8 +204,8 @@ class Custom_Search extends SearchAPI
 	/**
 	 * Search for indexed words.
 	 *
-	 * @param mixed[] $words
-	 * @param mixed[] $search_data
+	 * @param mixed[] $words An array of words
+	 * @param mixed[] $search_data An array of search data
 	 */
 	public function indexedWordQuery($words, $search_data)
 	{
@@ -298,9 +299,9 @@ class Custom_Search extends SearchAPI
 	/**
 	 * After a post is made, we update the search index database
 	 *
-	 * @param mixed[] $msgOptions
-	 * @param mixed[] $topicOptions
-	 * @param mixed[] $posterOptions
+	 * @param mixed[] $msgOptions Contains the post data
+	 * @param mixed[] $topicOptions Not used in this API
+	 * @param mixed[] $posterOptions Not used in this API
 	 */
 	public function postCreated($msgOptions, $topicOptions, $posterOptions)
 	{
@@ -326,9 +327,9 @@ class Custom_Search extends SearchAPI
 	/**
 	 * After a post is modified, we update the search index database.
 	 *
-	 * @param mixed[] $msgOptions
-	 * @param mixed[] $topicOptions
-	 * @param mixed[] $posterOptions
+	 * @param mixed[] $msgOptions The post data
+	 * @param mixed[] $topicOptions Not used in this API
+	 * @param mixed[] $posterOptions Not used in this API
 	 */
 	public function postModified($msgOptions, $topicOptions, $posterOptions)
 	{

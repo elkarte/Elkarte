@@ -2498,9 +2498,9 @@ function profileSaveGroups(&$value)
  * Get the data about a users warnings.
  * Returns an array of them
  *
- * @param int $start
- * @param int $items_per_page
- * @param string $sort
+ * @param int $start The item to start with (for pagination purposes)
+ * @param int $items_per_page  The number of items to show per page
+ * @param string $sort A string indicating how to sort the results
  * @param int $memID the member ID
  */
 function list_getUserWarnings($start, $items_per_page, $sort, $memID)
@@ -2574,9 +2574,9 @@ function list_getUserWarningCount($memID)
  * Get a list of attachments for this user
  * (used by createList() callback and others)
  *
- * @param int $start
- * @param int $items_per_page
- * @param string $sort
+ * @param int $start The item to start with (for pagination purposes)
+ * @param int $items_per_page  The number of items to show per page
+ * @param string $sort A string indicating how to sort the results
  * @param int[] $boardsAllowed
  * @param integer $memID
  * @param int[]|null|boolean $exclude_boards
@@ -2697,9 +2697,9 @@ function getNumAttachments($boardsAllowed, $memID)
  * Get the relevant topics in the unwatched list
  * (used by createList() callbacks)
  *
- * @param int $start
- * @param int $items_per_page
- * @param string $sort
+ * @param int $start The item to start with (for pagination purposes)
+ * @param int $items_per_page  The number of items to show per page
+ * @param string $sort A string indicating how to sort the results
  * @param int $memID
  */
 function getUnwatchedBy($start, $items_per_page, $sort, $memID)

@@ -29,12 +29,14 @@ function template_whos_selection_above()
 			<h2 class="category_header">', $txt['who_title'], '</h2>';
 
 	$extra = '
-			<div class="selectbox floatright"><label for="show_top">' . $txt['who_show1'] . '</label>
+			<div class="selectbox floatright">
+				<label for="show_top">' . $txt['who_show1'] . '</label>
 				<select name="show_top" id="show_top" onchange="document.forms.whoFilter.show.value = this.value; document.forms.whoFilter.submit();">';
 
 	foreach ($context['show_methods'] as $value => $label)
 		$extra .= '
 					<option value="' . $value . '" ' . ($value == $context['show_by'] ? ' selected="selected"' : '') . '>' . $label . '</option>';
+
 	$extra .= '
 				</select>
 				<noscript>
@@ -89,10 +91,10 @@ function template_whos_online()
 	echo '
 				</dl>';
 
-// No members?
+	// No members?
 	if (empty($context['members']))
 		echo '
-				<div class="centertext">
+				<div class="well centertext">
 					', $txt['who_no_online_' . ($context['show_by'] == 'guests' || $context['show_by'] == 'spiders' ? $context['show_by'] : 'members')], '
 				</div>';
 
@@ -114,6 +116,7 @@ function template_whos_selection_below()
 	foreach ($context['show_methods'] as $value => $label)
 		$extra .= '
 					<option value="' . $value . '" ' . ($value == $context['show_by'] ? ' selected="selected"' : '') . '>' . $label . '</option>';
+
 	$extra .= '
 				</select>
 				<noscript>

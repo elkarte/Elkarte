@@ -99,9 +99,9 @@ function getBadBehaviorLogEntryCount($filter)
  * Gets the badbehavior log entries that match the specified parameters.
  *
  * @package BadBehavior
- * @param int $start
- * @param int $items_per_page
- * @param string $sort
+ * @param int $start The item to start with (for pagination purposes)
+ * @param int $items_per_page  The number of items to show per page
+ * @param string $sort A string indicating how to sort the results
  * @param string|mixed[]|null $filter
  */
 function getBadBehaviorLogEntries($start, $items_per_page, $sort, $filter = '')

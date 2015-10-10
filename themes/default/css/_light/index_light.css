@@ -1633,7 +1633,7 @@ div.bbc_footnotes .meaction {
 	background: none repeat scroll 0 0 #FEFEFE;
 }
 
-#profile_attachments, .profile_center {
+#profile_attachments {
 	border: 1px solid #CCCCCC;
 	border-radius: 7px;
 	background: #EEEFEE;

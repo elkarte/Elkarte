@@ -61,12 +61,12 @@ function get_files_recursive($dir_path)
  * - Would be better documented if Ema was not lazy
  *
  * @package AddonSettings
- * @param int $start
- * @param int $per_page
- * @param string $sort
+ * @param int $start The item to start with (for pagination purposes)
+ * @param int $items_per_page  The number of items to show per page
+ * @param string $sort A string indicating how to sort the results
  * @return array
  */
-function list_integration_hooks_data($start, $per_page, $sort)
+function list_integration_hooks_data($start, $items_per_page, $sort)
 {
 	global $txt, $context, $scripturl, $modSettings;
 
@@ -246,7 +246,7 @@ function list_integration_hooks_data($start, $per_page, $sort)
 	{
 		if (++$counter < $start)
 			continue;
-		elseif ($counter == $start + $per_page)
+		elseif ($counter == $start + $items_per_page)
 			break;
 
 		$hooks_data[] = $data;

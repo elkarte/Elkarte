@@ -13,7 +13,7 @@
  */
 
 /**
- * Class used to interact with super globals, POST, GET, SERVER, COOKEIS, SESSION
+ * Class used to interact with super globals, POST, GET, SERVER, COOKIES, SESSION
  *
  * - Currently only a 'getter' of values
  * - Can be passed DataValidation sanitation values to return sanitized values
@@ -29,6 +29,12 @@ class HttpReq
 	 * @var object
 	 */
 	public $post;
+
+	/**
+	 * The compiled post values (json and cleaned from request)
+	 * @var array
+	 */
+	private $_derived_post;
 
 	/**
 	 * The returned GET values
@@ -74,6 +80,8 @@ class HttpReq
 
 	/**
 	 * Class constructor, sets PHP globals to class members
+	 *
+	 * @param $dataValidator Data_Validator|null Instance of the data validator
 	 */
 	public function __construct($dataValidator = null)
 	{
@@ -106,16 +114,46 @@ class HttpReq
 		// are added to the other supers
 		$derived = array_diff_key($_REQUEST, $_POST, $_GET);
 		$derived_get = array_merge($_GET, $derived);
-		$derived_post = array_merge($_POST, $derived);
+		$this->_derived_post = array_merge($_POST, $derived);
 
 		// Others may have been "sanitized" from either get or post and saved in request
-		// these values replace existing ones in $_POST
-		$cleaned = array_intersect_key($_REQUEST, $derived_post);
-		$derived_post = array_merge($derived_post, $cleaned);
+		// these values replace the existing ones in $_POST
+		$cleaned = array_intersect_key($_REQUEST, $this->_derived_post);
+		$this->_derived_post = array_merge($this->_derived_post, $cleaned);
+
+		// Load any json into _derived_post
+		$this->_loadJson();
 
 		// Make the $_GET $_POST super globals available as R/W properties
-		$this->post = new ArrayObject($derived_post, ArrayObject::ARRAY_AS_PROPS);
+		$this->post = new ArrayObject($this->_derived_post, ArrayObject::ARRAY_AS_PROPS);
 		$this->query = new ArrayObject($derived_get, ArrayObject::ARRAY_AS_PROPS);
+	}
+
+	/**
+	 * Looks for the post value jsonString and expands it to POST
+	 *
+	 * What it does:
+	 * - Looks for jsonString passed in post
+	 * - json decodes the string and loads its values in to POST
+	 * - Does not overwrite any existing keys
+	 */
+	private function _loadJson()
+	{
+		// Was the magic json value posted?
+		if (!empty($this->_derived_post['jsonString']))
+		{
+			$json = json_decode($this->_derived_post['jsonString'], true);
+
+			// Valid decode
+			if (!empty($json))
+			{
+				// Maintain the original keys only add new ones
+				$json = array_diff_key($json, $this->_derived_post);
+				$this->_derived_post = array_merge($this->_derived_post, $json);
+			}
+
+			unset($this->_derived_post['jsonString']);
+		}
 	}
 
 	/**

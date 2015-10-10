@@ -1115,9 +1115,9 @@ class ProfileInfo_Controller extends Action_Controller
 	 * Get a list of attachments for this user
 	 * Callback for createList()
 	 *
-	 * @param int $start
-	 * @param int $items_per_page
-	 * @param string $sort
+	 * @param int $start The item to start with (for pagination purposes)
+	 * @param int $items_per_page  The number of items to show per page
+	 * @param string $sort A string indicating how to sort the results
 	 * @param int[] $boardsAllowed
 	 * @param int $memID
 	 */
@@ -1145,9 +1145,9 @@ class ProfileInfo_Controller extends Action_Controller
 	 * Get the relevant topics in the unwatched list
 	 * Callback for createList()
 	 *
-	 * @param int $start
-	 * @param int $items_per_page
-	 * @param string $sort
+	 * @param int $start The item to start with (for pagination purposes)
+	 * @param int $items_per_page  The number of items to show per page
+	 * @param string $sort A string indicating how to sort the results
 	 * @param int $memID
 	 */
 	public function list_getUnwatched($start, $items_per_page, $sort, $memID)

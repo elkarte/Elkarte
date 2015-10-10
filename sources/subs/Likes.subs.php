@@ -87,12 +87,15 @@ function loadLikes($messages, $prepare = true)
 
 /**
  * Prepares the like array for use in the template
- * Replaces the current member id with 'You' if they like a post and makes it first
- * Truncates the like list at a given number and adds in +x others
+ *
+ * What it does:
+ * - Replaces the current member id with 'You' if they like a post and makes it first
+ * - Truncates the like list at a given number and adds in +x others
  *
  * @package Likes
  * @param int[] $likes array of like ids to process
- * @return integer[]
+ *
+ * @return int[]
  */
 function prepareLikes($likes)
 {
@@ -328,9 +331,9 @@ function likesCount($memberID, $given = true)
  * Used for action=profile;area=showlikes;sa=given
  *
  * @package Likes
- * @param int $start
- * @param int $items_per_page
- * @param string $sort
+ * @param int $start The item to start with (for pagination purposes)
+ * @param int $items_per_page  The number of items to show per page
+ * @param string $sort A string indicating how to sort the results
  * @param int $memberID
  */
 function likesPostsGiven($start, $items_per_page, $sort, $memberID)
@@ -377,9 +380,9 @@ function likesPostsGiven($start, $items_per_page, $sort, $memberID)
  * Used by action=profile;area=showlikes;sa=received
  *
  * @package Likes
- * @param int $start
- * @param int $items_per_page
- * @param string $sort
+ * @param int $start The item to start with (for pagination purposes)
+ * @param int $items_per_page  The number of items to show per page
+ * @param string $sort A string indicating how to sort the results
  * @param int $memberID
  */
 function likesPostsReceived($start, $items_per_page, $sort, $memberID)
@@ -425,9 +428,9 @@ function likesPostsReceived($start, $items_per_page, $sort, $memberID)
  * Function to load all of the likers of a message
  *
  * @package Likes
- * @param int $start
- * @param int $items_per_page
- * @param string $sort
+ * @param int $start The item to start with (for pagination purposes)
+ * @param int $items_per_page  The number of items to show per page
+ * @param string $sort A string indicating how to sort the results
  * @param int $messageID
  * @param bool $simple
  */
