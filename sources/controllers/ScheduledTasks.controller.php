@@ -20,16 +20,37 @@ if (!defined('ELK'))
  */
 class ScheduledTasks_Controller extends Action_Controller
 {
+	/**
+	 * Holds instance of HttpReq object
+	 * @var HttpReq
+	 */
+	private $_req;
+
+	/**
+	 * Pre Dispatch, called before other methods.  Loads HttpReq instance.
+	 */
+	public function pre_dispatch()
+	{
+		$this->_req = HttpReq::instance();
+	}
+
+	/**
+	 * Default method for the class, just forwards to autotask
+	 *
+	 * @return bool
+	 */
 	public function action_index()
 	{
 		return $this->action_autotask();
 	}
 
 	/**
-	 * This method works out what to run:
-	 *  - it checks if it's time for the next tasks
-	 *  - runs next tasks
-	 *  - update the database for the next round
+	 * This method works out what to run
+	 *
+	 * What it does:
+	 *  - It checks if it's time for the next tasks
+	 *  - Runs next tasks
+	 *  - Update the database for the next round
 	 */
 	public function action_autotask()
 	{
@@ -37,13 +58,14 @@ class ScheduledTasks_Controller extends Action_Controller
 		require_once(SUBSDIR . '/ScheduledTasks.subs.php');
 
 		// The mail queue is also called from here.
-		if (isset($_GET['scheduled']) && $_GET['scheduled'] == 'mailq')
+		if ($this->_req->getQuery('scheduled') === 'mailq')
 			$this->action_reducemailqueue();
 		else
 		{
 			call_integration_include_hook('integrate_autotask_include');
 
-			$ts = isset($_GET['ts']) ? (int) $_GET['ts'] : 0;
+			// Run tasks based on this time stamp
+			$ts = $this->_req->getQuery('ts', 'intval', 0);
 			processNextTasks($ts);
 
 			// Get the timestamp stored for the next task, if any.
@@ -58,7 +80,7 @@ class ScheduledTasks_Controller extends Action_Controller
 
 		// Return, if we're not explicitly called.
 		// @todo remove?
-		if (!isset($_GET['scheduled']))
+		if (!isset($this->_req->query->scheduled))
 			return true;
 
 		// Finally, send some bland image
@@ -76,13 +98,11 @@ class ScheduledTasks_Controller extends Action_Controller
 		global $modSettings;
 
 		// Lets not waste our time or resources.
-		if (!empty($modSettings['mail_queue_use_cron']))
-			return false;
-
-		// This does the hard work, it does.
-		require_once(SUBSDIR . '/Mail.subs.php');
-
-		// @todo remove these returns from actions handlers
-		return reduceMailQueue();
+		if (empty($modSettings['mail_queue_use_cron']))
+		{
+			// This does the hard work, it does.
+			require_once(SUBSDIR . '/Mail.subs.php');
+			reduceMailQueue();
+		}
 	}
 }
