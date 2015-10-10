@@ -897,31 +897,36 @@ function moveTopicConcurrence($move_from = null, $id_board = null, $id_topic = n
 }
 
 /**
- * Try to determine if the topic has already been deleted by another user.
- */
+ * Determine if the topic has already been deleted by another user.
+ *
+ * What it does:
+ *  - If the topic has been removed and resides in the recycle bin, present confirm dialog
+ *  - If recycling is not enabled, or user confirms or topic is not in recycle simply returns
+  */
 function removeDeleteConcurrence()
 {
 	global $modSettings, $board, $scripturl, $context;
 
-	// No recycle no need to go further
-	if (empty($modSettings['recycle_enable']) || empty($modSettings['recycle_board']))
-		return false;
+	$recycled_enabled = !empty($modSettings['recycle_enable']) && !empty($modSettings['recycle_board']);
 
-	// If it's confirmed go on and delete (from recycle)
-	if (isset($_GET['confirm_delete']))
-		return true;
+	if ($recycled_enabled && !empty($board))
+	{
+		// Trying to removed from the recycle bin
+		if (!isset($_GET['confirm_delete']) && $modSettings['recycle_board'] == $board)
+		{
+			if (isset($_REQUEST['msg']))
+			{
+				$confirm_url = $scripturl . '?action=deletemsg;confirm_delete;topic=' . $context['current_topic'] . '.0;msg=' . $_REQUEST['msg'] . ';' . $context['session_var'] . '=' . $context['session_id'];
+			}
+			else
+			{
+				$confirm_url = $scripturl . '?action=removetopic2;confirm_delete;topic=' . $context['current_topic'] . '.0;' . $context['session_var'] . '=' . $context['session_id'];
+			}
 
-	if (empty($board))
-		return false;
-
-	if ($modSettings['recycle_board'] != $board)
-		return true;
-	elseif (isset($_REQUEST['msg']))
-		$confirm_url = $scripturl . '?action=deletemsg;confirm_delete;topic=' . $context['current_topic'] . '.0;msg=' . $_REQUEST['msg'] . ';' . $context['session_var'] . '=' . $context['session_id'];
-	else
-		$confirm_url = $scripturl . '?action=removetopic2;confirm_delete;topic=' . $context['current_topic'] . '.0;' . $context['session_var'] . '=' . $context['session_id'];
-
-		Errors::instance()->fatal_lang_error('post_already_deleted', false, array($confirm_url));
+			// Give them a prompt before we remove the message
+			Errors::instance()->fatal_lang_error('post_already_deleted', false, array($confirm_url));
+		}
+	}
 }
 
 /**
