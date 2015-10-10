@@ -617,11 +617,11 @@ function cache_getMembergroupList()
  * @package Membergroups
  * @param int $start not used
  * @param int $items_per_page not used
- * @param string $sort
- * @param string $membergroup_type
- * @param int $user_id
- * @param bool $include_hidden
- * @param bool $include_all
+ * @param string $sort An SQL query indicating how to sort the results
+ * @param string $membergroup_type Should be 'post_count' for post groups or 'regular' for other groups
+ * @param int $user_id id of the member making the request
+ * @param bool $include_hidden If true includes hidden groups if the user has permission
+ * @param bool $include_all If true includes all groups the user can see
  * @param bool $aggregate
  * @param bool $count_permissions
  * @param int|null $pid - profile id
