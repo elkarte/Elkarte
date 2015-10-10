@@ -119,13 +119,13 @@ function template_action_showPosts()
 {
 	global $context, $txt;
 
+	template_pagesection();
+
 	echo '
 		<div id="recentposts" class="profile_center">
 			<h2 class="category_header">
 				', empty($context['is_topics']) ? $txt['showMessages'] : $txt['showTopics'], $context['user']['is_owner'] ? '' : ' - ' . $context['member']['name'], '
 			</h2>';
-
-	template_pagesection();
 
 	// No posts? Just end the table with a informative message.
 	if (empty($context['posts']))
@@ -153,11 +153,11 @@ function template_action_showPosts()
 		}
 	}
 
-	// Show more page numbers.
-	template_pagesection();
-
 	echo '
 		</div>';
+
+	// Show more page numbers.
+	template_pagesection();
 }
 
 /**
