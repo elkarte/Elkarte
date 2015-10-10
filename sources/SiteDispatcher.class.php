@@ -186,9 +186,6 @@ class Site_Dispatcher
 		// Is it in core legacy actions?
 		if (isset($actionArray[$_GET['action']]))
 		{
-			// Admin files have their own place
-			$path = in_array($_GET['action'], $adminActions) ? ADMINDIR : CONTROLLERDIR;
-
 			$this->_controller_name = $actionArray[$_GET['action']][0];
 
 			// If the method is coded in, use it
@@ -204,6 +201,7 @@ class Site_Dispatcher
 		// addons can use any of them, and it should Just Work (tm).
 		elseif (preg_match('~^[a-zA-Z_\\-]+\d*$~', $_GET['action']))
 		{
+			// Admin files have their own place
 			$path = in_array($_GET['action'], $adminActions) ? ADMINDIR : CONTROLLERDIR;
 
 			// action=gallery => Gallery.controller.php
