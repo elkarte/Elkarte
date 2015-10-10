@@ -205,6 +205,8 @@ class MessagesDelete
 				)
 			);
 		}
+
+		return $actioned_messages;
 	}
 
 	/**
