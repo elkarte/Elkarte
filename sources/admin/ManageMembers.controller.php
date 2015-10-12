@@ -1214,8 +1214,8 @@ class ManageMembers_Controller extends Action_Controller
 		{
 			$replacements = array(
 				'USERNAME' => $member['name'],
-				'ACTIVATIONLINK' => $scripturl . '?action=activate;u=' . $member['id'] . ';code=' . $member['code'],
-				'ACTIVATIONLINKWITHOUTCODE' => $scripturl . '?action=activate;u=' . $member['id'],
+				'ACTIVATIONLINK' => $scripturl . '?action=register;sa=activate;u=' . $member['id'] . ';code=' . $member['code'],
+				'ACTIVATIONLINKWITHOUTCODE' => $scripturl . '?action=register;sa=activate;u=' . $member['id'],
 				'ACTIVATIONCODE' => $member['code'],
 			);
 
@@ -1321,8 +1321,8 @@ class ManageMembers_Controller extends Action_Controller
 
 			$replacements = array(
 				'USERNAME' => $member['name'],
-				'ACTIVATIONLINK' => $scripturl . '?action=activate;u=' . $member['id'] . ';code=' . $this->conditions['validation_code'],
-				'ACTIVATIONLINKWITHOUTCODE' => $scripturl . '?action=activate;u=' . $member['id'],
+				'ACTIVATIONLINK' => $scripturl . '?action=register;sa=activate;u=' . $member['id'] . ';code=' . $this->conditions['validation_code'],
+				'ACTIVATIONLINKWITHOUTCODE' => $scripturl . '?action=register;sa=activate;u=' . $member['id'],
 				'ACTIVATIONCODE' => $this->conditions['validation_code'],
 			);
 

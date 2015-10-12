@@ -712,11 +712,11 @@ function registerMember(&$regOptions, $error_context = 'register')
 		'USERNAME' => $regOptions['username'],
 		'PASSWORD' => $regOptions['password'],
 		'FORGOTPASSWORDLINK' => $scripturl . '?action=reminder',
-		'ACTIVATIONLINK' => $scripturl . '?action=activate;u=' . $memberID . ';code=' . $validation_code,
-		'ACTIVATIONLINKWITHOUTCODE' => $scripturl . '?action=activate;u=' . $memberID,
+		'ACTIVATIONLINK' => $scripturl . '?action=register;sa=activate;u=' . $memberID . ';code=' . $validation_code,
+		'ACTIVATIONLINKWITHOUTCODE' => $scripturl . '?action=register;sa=activate;u=' . $memberID,
 		'ACTIVATIONCODE' => $validation_code,
 		'OPENID' => !empty($regOptions['openid']) ? $regOptions['openid'] : '',
-		'COPPALINK' => $scripturl . '?action=coppa;u=' . $memberID,
+		'COPPALINK' => $scripturl . '?action=register;sa=coppa;u=' . $memberID,
 	);
 
 	// Administrative registrations are a bit different...
