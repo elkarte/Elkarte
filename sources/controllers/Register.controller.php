@@ -93,8 +93,140 @@ class Register_Controller extends Action_Controller
 	}
 
 	/**
+	 * Begin the registration process.
+	 *
+	 * Accessed by ?action=register
+	 *
+	 * @uses template_registration_agreement or template_registration_form sub template in Register.template,
+	 * @uses Login language file
+	 */
+	public function action_register()
+	{
+		global $txt, $context, $modSettings, $user_info, $scripturl;
+
+		// If this user is an admin - redirect them to the admin registration page.
+		if (allowedTo('moderate_forum') && !$user_info['is_guest'])
+			redirectexit('action=admin;area=regcenter;sa=register');
+		// You are not a guest, so you are a member - and members don't get to register twice!
+		elseif (empty($user_info['is_guest']))
+			redirectexit();
+
+		// Confused and want to contact the admins instead
+		if (isset($this->_req->post->show_contact))
+			redirectexit('action=register;sa=contact');
+
+		loadLanguage('Login');
+		loadTemplate('Register');
+
+		// Do we need them to agree to the registration agreement, first?
+		$context['require_agreement'] = !empty($modSettings['requireAgreement']);
+		$context['checkbox_agreement'] = !empty($modSettings['checkboxAgreement']);
+		$context['registration_passed_agreement'] = !empty($_SESSION['registration_agreed']);
+		$context['show_coppa'] = !empty($modSettings['coppaAge']);
+		$context['show_contact_button'] = !empty($modSettings['enable_contactform']) && $modSettings['enable_contactform'] === 'registration';
+
+		// Under age restrictions?
+		if ($context['show_coppa'])
+		{
+			$context['skip_coppa'] = false;
+			$context['coppa_agree_above'] = sprintf($txt[($context['require_agreement'] ? 'agreement_' : '') . 'agree_coppa_above'], $modSettings['coppaAge']);
+			$context['coppa_agree_below'] = sprintf($txt[($context['require_agreement'] ? 'agreement_' : '') . 'agree_coppa_below'], $modSettings['coppaAge']);
+		}
+
+		// What step are we at?
+		$current_step = isset($this->_req->post->step) ? (int) $this->_req->post->step : ($context['require_agreement'] && !$context['checkbox_agreement'] ? 1 : 2);
+
+		// Does this user agree to the registration agreement?
+		if ($current_step == 1 && (isset($this->_req->post->accept_agreement) || isset($this->_req->post->accept_agreement_coppa)))
+		{
+			$context['registration_passed_agreement'] = $_SESSION['registration_agreed'] = true;
+			$current_step = 2;
+
+			// Skip the coppa procedure if the user says he's old enough.
+			if ($context['show_coppa'])
+			{
+				$_SESSION['skip_coppa'] = !empty($this->_req->post->accept_agreement);
+
+				// Are they saying they're under age, while under age registration is disabled?
+				if (empty($modSettings['coppaType']) && empty($_SESSION['skip_coppa']))
+				{
+					loadLanguage('Login');
+					Errors::instance()->fatal_lang_error('under_age_registration_prohibited', false, array($modSettings['coppaAge']));
+				}
+			}
+		}
+		// Make sure they don't squeeze through without agreeing.
+		elseif ($current_step > 1 && $context['require_agreement'] && !$context['checkbox_agreement'] && !$context['registration_passed_agreement'])
+			$current_step = 1;
+
+		// Show the user the right form.
+		$context['sub_template'] = $current_step == 1 ? 'registration_agreement' : 'registration_form';
+		$context['page_title'] = $current_step == 1 ? $txt['registration_agreement'] : $txt['registration_form'];
+		loadJavascriptFile('register.js');
+		addInlineJavascript('disableAutoComplete();', true);
+
+		// Add the register chain to the link tree.
+		$context['linktree'][] = array(
+			'url' => $scripturl . '?action=register',
+			'name' => $txt['register'],
+		);
+
+		// Prepare the time gate! Done like this to allow later steps to reset the limit for any reason
+		if (!isset($_SESSION['register']))
+			$_SESSION['register'] = array(
+				'timenow' => time(),
+				// minimum number of seconds required on this page for registration
+				'limit' => 8,
+			);
+		else
+			$_SESSION['register']['timenow'] = time();
+
+		// If you have to agree to the agreement, it needs to be fetched from the file.
+		$this->_load_require_agreement();
+
+		// If we have language support enabled then they need to be loaded
+		$this->_load_language_support();
+
+		// Any custom or standard profile fields we want filled in during registration?
+		$this->_load_profile_fields();
+
+		// Trigger the prepare_context event
+		$this->_events->trigger('prepare_context', array('current_step' => $current_step));
+
+		// Are they coming from an OpenID login attempt?
+		if (!empty($_SESSION['openid']['verified']) && !empty($_SESSION['openid']['openid_uri']) && !empty($_SESSION['openid']['nickname']))
+		{
+			$context['openid'] = $_SESSION['openid']['openid_uri'];
+			$context['username'] =  $this->_req->getPost('user', 'Util::htmlspecialchars', $_SESSION['openid']['nickname']);
+			$context['email'] = $this->_req->getPost('email', 'Util::htmlspecialchars', $_SESSION['openid']['email']);
+		}
+		// See whether we have some pre filled values.
+		else
+		{
+			$context['openid'] = $this->_req->getPost('openid_identifier', 'trim', '');
+			$context['username'] = $this->_req->getPost('user', 'Util::htmlspecialchars', '');
+			$context['email'] = $this->_req->getPost('email', 'Util::htmlspecialchars', '');
+		}
+
+		// Were there any errors?
+		$context['registration_errors'] = array();
+		$reg_errors = Error_Context::context('register', 0);
+		if ($reg_errors->hasErrors())
+			$context['registration_errors'] = $reg_errors->prepareErrors();
+
+		createToken('register');
+	}
+
+	/**
 	 * Handles the registration process for members using ElkArte registration
 	 * and not (for example) OpenID.
+	 *
+	 * What it does:
+	 * - Validates all requirements have been filled in properly
+	 * - Passes final processing to do_register
+	 * - Directs back to register on errors
+	 *
+	 * Accessed by ?action=register;sa=register2
 	 */
 	public function action_register2()
 	{
@@ -150,23 +282,10 @@ class Register_Controller extends Action_Controller
 	}
 
 	/**
-	 * Checks if registrations are enabled and the user didn't just register
-	 */
-	private function _can_register()
-	{
-		global $modSettings;
-
-		// You can't register if it's disabled.
-		if (!empty($modSettings['registration_method']) && $modSettings['registration_method'] == 3)
-			Errors::instance()->fatal_lang_error('registration_disabled', false);
-
-		// Make sure they didn't just register with this session.
-		if (!empty($_SESSION['just_registered']) && empty($modSettings['disableRegisterCheck']))
-			Errors::instance()->fatal_lang_error('register_only_once', false);
-	}
-
-	/**
 	 * Actually register the member.
+	 *
+	 * - Called from OpenID controller as well as Register controller
+	 * - Does the actual registration to the system
 	 *
 	 * @param bool $verifiedOpenID = false
 	 */
@@ -307,7 +426,7 @@ class Register_Controller extends Action_Controller
 		{
 			// What do we need to save?
 			$save_variables = array();
-			foreach ($_POST as $k => $v)
+			foreach ($this->_req->post as $k => $v)
 				if (!in_array($k, array('sc', 'sesc', $context['session_var'], 'passwrd1', 'passwrd2', 'regSubmit')))
 					$save_variables[$k] = $v;
 
@@ -383,7 +502,28 @@ class Register_Controller extends Action_Controller
 	}
 
 	/**
+	 * Checks if registrations are enabled and the user didn't just register
+	 */
+	private function _can_register()
+	{
+		global $modSettings;
+
+		// You can't register if it's disabled.
+		if (!empty($modSettings['registration_method']) && $modSettings['registration_method'] == 3)
+			Errors::instance()->fatal_lang_error('registration_disabled', false);
+
+		// Make sure they didn't just register with this session.
+		if (!empty($_SESSION['just_registered']) && empty($modSettings['disableRegisterCheck']))
+			Errors::instance()->fatal_lang_error('register_only_once', false);
+	}
+
+	/**
 	 * Collect all extra registration fields someone might have filled in.
+	 *
+	 * What it does:
+	 * - Classifies variables as possible string, int, float or bool
+	 * - Casts all posted data to the proper type (string, float, etc)
+	 * - Drops fields that we specially exclude during registration
 	 *
 	 * @param bool $has_real_name - if true adds 'real_name' as well
 	 */
@@ -391,6 +531,7 @@ class Register_Controller extends Action_Controller
 	{
 		global $modSettings;
 
+		// Define the fields that may be enabled for registration
 		$possible_strings = array(
 			'birthdate',
 			'time_format',
@@ -402,15 +543,18 @@ class Register_Controller extends Action_Controller
 			'secret_question', 'secret_answer',
 			'website_url', 'website_title',
 		);
+
 		$possible_ints = array(
 			'pm_email_notify',
 			'notify_types',
 			'id_theme',
 			'gender',
 		);
+
 		$possible_floats = array(
 			'time_offset',
 		);
+
 		$possible_bools = array(
 			'notify_announcements', 'notify_regularity', 'notify_send_body',
 			'hide_email', 'show_online',
@@ -447,147 +591,22 @@ class Register_Controller extends Action_Controller
 
 		// Include the additional options that might have been filled in.
 		foreach ($possible_strings as $var)
-			if (isset($_POST[$var]))
-				$extra_register_vars[$var] = Util::htmlspecialchars($_POST[$var], ENT_QUOTES);
+			if (isset($this->_req->post->$var))
+				$extra_register_vars[$var] = Util::htmlspecialchars($this->_req->post->$var, ENT_QUOTES);
 
 		foreach ($possible_ints as $var)
-			if (isset($_POST[$var]))
-				$extra_register_vars[$var] = (int) $_POST[$var];
+			if (isset($this->_req->post->$var))
+				$extra_register_vars[$var] = (int) $this->_req->post->$var;
 
 		foreach ($possible_floats as $var)
-			if (isset($_POST[$var]))
-				$extra_register_vars[$var] = (float) $_POST[$var];
+			if (isset($this->_req->post->$var))
+				$extra_register_vars[$var] = (float) $this->_req->post->$var;
 
 		foreach ($possible_bools as $var)
-			if (isset($_POST[$var]))
-				$extra_register_vars[$var] = empty($_POST[$var]) ? 0 : 1;
+			if (isset($this->_req->post->$var))
+				$extra_register_vars[$var] = empty($this->_req->post->$var) ? 0 : 1;
 
 		return $extra_register_vars;
-	}
-
-	/**
-	 * Begin the registration process.
-	 *
-	 * Accessed by ?action=register
-	 *
-	 * @uses template_registration_agreement or template_registration_form sub template in Register.template,
-	 * @uses Login language file
-	 */
-	public function action_register()
-	{
-		global $txt, $context, $modSettings, $user_info, $scripturl;
-
-		// If this user is an admin - redirect them to the admin registration page.
-		if (allowedTo('moderate_forum') && !$user_info['is_guest'])
-			redirectexit('action=admin;area=regcenter;sa=register');
-		// You are not a guest, so you are a member - and members don't get to register twice!
-		elseif (empty($user_info['is_guest']))
-			redirectexit();
-
-		// Confused and want to contact the admins instead
-		if (isset($this->_req->post->show_contact))
-			redirectexit('action=register;sa=contact');
-
-		loadLanguage('Login');
-		loadTemplate('Register');
-
-		// Do we need them to agree to the registration agreement, first?
-		$context['require_agreement'] = !empty($modSettings['requireAgreement']);
-		$context['checkbox_agreement'] = !empty($modSettings['checkboxAgreement']);
-		$context['registration_passed_agreement'] = !empty($_SESSION['registration_agreed']);
-		$context['show_coppa'] = !empty($modSettings['coppaAge']);
-		$context['show_contact_button'] = !empty($modSettings['enable_contactform']) && $modSettings['enable_contactform'] === 'registration';
-
-		// Under age restrictions?
-		if ($context['show_coppa'])
-		{
-			$context['skip_coppa'] = false;
-			$context['coppa_agree_above'] = sprintf($txt[($context['require_agreement'] ? 'agreement_' : '') . 'agree_coppa_above'], $modSettings['coppaAge']);
-			$context['coppa_agree_below'] = sprintf($txt[($context['require_agreement'] ? 'agreement_' : '') . 'agree_coppa_below'], $modSettings['coppaAge']);
-		}
-
-		// What step are we at?
-		$current_step = isset($this->_req->post->step) ? (int) $this->_req->post->step : ($context['require_agreement'] && !$context['checkbox_agreement'] ? 1 : 2);
-
-		// Does this user agree to the registration agreement?
-		if ($current_step == 1 && (isset($this->_req->post->accept_agreement) || isset($this->_req->post->accept_agreement_coppa)))
-		{
-			$context['registration_passed_agreement'] = $_SESSION['registration_agreed'] = true;
-			$current_step = 2;
-
-			// Skip the coppa procedure if the user says he's old enough.
-			if ($context['show_coppa'])
-			{
-				$_SESSION['skip_coppa'] = !empty($this->_req->post->accept_agreement);
-
-				// Are they saying they're under age, while under age registration is disabled?
-				if (empty($modSettings['coppaType']) && empty($_SESSION['skip_coppa']))
-				{
-					loadLanguage('Login');
-					Errors::instance()->fatal_lang_error('under_age_registration_prohibited', false, array($modSettings['coppaAge']));
-				}
-			}
-		}
-		// Make sure they don't squeeze through without agreeing.
-		elseif ($current_step > 1 && $context['require_agreement'] && !$context['checkbox_agreement'] && !$context['registration_passed_agreement'])
-			$current_step = 1;
-
-		// Show the user the right form.
-		$context['sub_template'] = $current_step == 1 ? 'registration_agreement' : 'registration_form';
-		$context['page_title'] = $current_step == 1 ? $txt['registration_agreement'] : $txt['registration_form'];
-		loadJavascriptFile('register.js');
-		addInlineJavascript('disableAutoComplete();', true);
-
-		// Add the register chain to the link tree.
-		$context['linktree'][] = array(
-			'url' => $scripturl . '?action=register',
-			'name' => $txt['register'],
-		);
-
-		// Prepare the time gate! Done like this to allow later steps to reset the limit for any reason
-		if (!isset($_SESSION['register']))
-			$_SESSION['register'] = array(
-				'timenow' => time(),
-				// minimum number of seconds required on this page for registration
-				'limit' => 8,
-			);
-		else
-			$_SESSION['register']['timenow'] = time();
-
-		// If you have to agree to the agreement, it needs to be fetched from the file.
-		$this->_load_require_agreement();
-
-		// If we have language support enabled then they need to be loaded
-		$this->_load_language_support();
-
-		// Any custom or standard profile fields we want filled in during registration?
-		$this->_load_profile_fields();
-
-		// Trigger the prepare_context event
-		$this->_events->trigger('prepare_context', array('current_step' => $current_step));
-
-		// Are they coming from an OpenID login attempt?
-		if (!empty($_SESSION['openid']['verified']) && !empty($_SESSION['openid']['openid_uri']) && !empty($_SESSION['openid']['nickname']))
-		{
-			$context['openid'] = $_SESSION['openid']['openid_uri'];
-			$context['username'] =  $this->_req->getPost('user', 'Util::htmlspecialchars', $_SESSION['openid']['nickname']);
-			$context['email'] = $this->_req->getPost('email', 'Util::htmlspecialchars', $_SESSION['openid']['email']);
-		}
-		// See whether we have some pre filled values.
-		else
-		{
-			$context['openid'] = $this->_req->getPost('openid_identifier', 'trim', '');
-			$context['username'] = $this->_req->getPost('user', 'Util::htmlspecialchars', '');
-			$context['email'] = $this->_req->getPost('email', 'Util::htmlspecialchars', '');
-		}
-
-		// Were there any errors?
-		$context['registration_errors'] = array();
-		$reg_errors = Error_Context::context('register', 0);
-		if ($reg_errors->hasErrors())
-			$context['registration_errors'] = $reg_errors->prepareErrors();
-
-		createToken('register');
 	}
 
 	/**
@@ -707,7 +726,11 @@ class Register_Controller extends Action_Controller
 	/**
 	 * Verify the activation code, and activate the user if correct.
 	 *
-	 * Accessed by ?action=register;sa=activate
+	 * What it does:
+	 * - Accessed by ?action=register;sa=activate
+	 * - Processes activation code requests
+	 * - Checks if the user is already activate and if so does nothing
+	 * - Prevents a user from using an existing email
 	 */
 	public function action_activate()
 	{
@@ -910,7 +933,7 @@ class Register_Controller extends Action_Controller
 	/**
 	 * This function will display the contact information for the forum, as well a form to fill in.
 	 *
-	 * Accessed by action=register;sa=coppa
+	 * - Accessed by action=register;sa=coppa
 	 */
 	public function action_coppa()
 	{
@@ -987,7 +1010,7 @@ class Register_Controller extends Action_Controller
 	/**
 	 * Show the verification code or let it hear.
 	 *
-	 * Accessed by ?action=register;sa=verificationcode
+	 * - Accessed by ?action=register;sa=verificationcode
 	 */
 	public function action_verificationcode()
 	{
@@ -1054,7 +1077,8 @@ class Register_Controller extends Action_Controller
 
 	/**
 	 * Shows the contact form for the user to fill out
-	 * Needs to be enabled to be used
+	 *
+	 * - Functionality needs to be enabled in the ACP for this to be used
 	 */
 	public function action_contact()
 	{
