@@ -1,7 +1,7 @@
 <?php
 
 /**
- * 
+ *
  *
  * @name      ElkArte Forum
  * @copyright ElkArte Forum contributors
@@ -46,6 +46,8 @@ class Verification_Register_Module implements ElkArte\sources\modules\Module_Int
 
 	/**
 	 * Prepare $context for the registration form.
+	 *
+	 * @param int $current_step current step of the registration process
 	 */
 	public function prepare_context($current_step)
 	{
@@ -67,6 +69,8 @@ class Verification_Register_Module implements ElkArte\sources\modules\Module_Int
 
 	/**
 	 * Checks the user passed the verifications on the registration form.
+	 *
+	 * @param Error_Context $reg_errors Errors object from the registration controller
 	 */
 	public function before_complete_register($reg_errors)
 	{
@@ -86,9 +90,9 @@ class Verification_Register_Module implements ElkArte\sources\modules\Module_Int
 	/**
 	 * Checks the user passed the verifications on the contact page.
 	 */
-	protected function verify_contact()
+	public function verify_contact()
 	{
-		global $context;
+		global $context, $txt;
 
 		// How about any verification errors
 		$verificationOptions = array(
