@@ -1271,9 +1271,12 @@ function showEmailAddress($userProfile_hideEmail, $userProfile_id)
 }
 
 /**
- * This function attempts to protect from spammed messages and the like.
+ * This function attempts to protect from carrying out specific actions repeatedly.
  *
+ * What it does:
+ * - Checks if a user is trying specific actions faster than a given minimum wait threshold.
  * - The time taken depends on error_type - generally uses the modSetting.
+ * - Generates a fatal message when triggered, suspending execution.
  *
  * @param string $error_type used also as a $txt index. (not an actual string.)
  * @param boolean $fatal is the spam check a fatal error on failure
@@ -1596,11 +1599,12 @@ function securityOptionsHeader($override = null)
 }
 
 /**
- * Stop browsers doing prefetching to prefetch pages.
+ * Stop some browsers pre fetching activity to reduce server load
  */
 function stop_prefetching()
 {
-	if (isset($_SERVER['HTTP_X_MOZ']) && $_SERVER['HTTP_X_MOZ'] == 'prefetch')
+	if  (isset($_SERVER["HTTP_X_PURPOSE"]) && in_array($_SERVER["HTTP_X_PURPOSE"], array("preview", "instant"))
+		|| (isset($_SERVER['HTTP_X_MOZ']) && $_SERVER['HTTP_X_MOZ'] === "prefetch"))
 	{
 		@ob_end_clean();
 		header('HTTP/1.1 403 Forbidden');
