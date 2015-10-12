@@ -750,7 +750,7 @@ class Register_Controller extends Action_Controller
 		);
 
 		// Does this user exist at all?
-		if (empty($row))
+		if (empty($this->_row))
 		{
 			$context['sub_template'] = 'retry_activate';
 			$context['page_title'] = $txt['invalid_userid'];
@@ -822,7 +822,7 @@ class Register_Controller extends Action_Controller
 			// Make sure their email isn't banned.
 			isBannedEmail($this->_req->post->new_email, 'cannot_register', $txt['ban_register_prohibited']);
 
-			// Ummm... don't even dare try to take someone else's email!!
+			// Ummm... don't take someone else's email during the change
 			// @todo Separate the sprintf?
 			if (userByEmail($this->_req->post->new_email))
 			{

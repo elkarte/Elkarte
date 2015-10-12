@@ -732,7 +732,8 @@ function isFirstLogin($id_member)
  * @param string $where
  * @param mixed[] $where_params array of values to used in the where statement
  * @param bool $fatal
- * @return boolean
+ *
+ * @return array of members data or false on failure
  */
 function findUser($where, $where_params, $fatal = true)
 {
