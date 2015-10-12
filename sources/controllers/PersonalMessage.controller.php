@@ -1407,27 +1407,26 @@ class PersonalMessage_Controller extends Action_Controller
 
 		checkSession('request');
 
-		$pm_actions = null;
-		$pm_action = $this->_req->getPost('pm_action', 'trim', '');
+		// Sending in the single pm choice via GET
+		$pm_actions = $this->_req->getQuery('pm_actions', null, '');
 
-		// Deleting, then set the action manually
-		if (isset($this->_req->post->del_selected))
-		{
-			$pm_action = 'delete';
-		}
+		// Set the action to apply to the pm's defined by pm_actions (yes its that brilliant)
+		$pm_action = $this->_req->getPost('pm_action', 'trim', '');
+		$pm_action = empty($pm_action) && isset($this->_req->post->del_selected) ? 'delete' : '';
 
 		// Create a list of pm's that we need to work on
-		if ($pm_action != '' && !empty($this->_req->post->pms) && is_array($this->_req->post->pms))
+		if ($pm_action != ''
+			&& !empty($this->_req->post->pms)
+			&& is_array($this->_req->post->pms))
 		{
+			$pm_actions = array();
 			foreach ($this->_req->post->pms as $pm)
 				$pm_actions[(int) $pm] = $pm_action;
 		}
 
-		// No PM's to action, bug out
+		// No messages to action then bug out
 		if (empty($pm_actions))
-		{
 			redirectexit($context['current_label_redirect']);
-		}
 
 		// If we are in conversation, we may need to apply this to every message in that conversation.
 		if ($context['display_mode'] == 2 && isset($this->_req->query->conversation))
@@ -1446,7 +1445,7 @@ class PersonalMessage_Controller extends Action_Controller
 			}
 		}
 
-		//
+		// Lets get to doing what we've been told
 		$to_delete = array();
 		$to_label = array();
 		$label_type = array();
