@@ -240,7 +240,7 @@ class Xml_Controller extends Action_Controller
 		require_once(SUBSDIR . '/ManageFeatures.subs.php');
 
 		// You have to be allowed to do this
-		$validation_token = validateToken('admin-sort', 'post', true, false);
+		$validation_token = validateToken('admin-sort', 'post', false, false);
 		$validation_session = validateSession();
 
 		if ($validation_session === true && $validation_token === true)
@@ -332,7 +332,7 @@ class Xml_Controller extends Action_Controller
 		require_once(SUBSDIR . '/Boards.subs.php');
 
 		// Validating that you can do this is always a good idea
-		$validation_token = validateToken('admin-sort', 'post', true, false);
+		$validation_token = validateToken('admin-sort', 'post', false, false);
 		$validation_session = validateSession();
 
 		if ($validation_session === true && $validation_token === true)
@@ -495,7 +495,7 @@ class Xml_Controller extends Action_Controller
 		require_once(SUBSDIR . '/Smileys.subs.php');
 
 		// You have to be allowed to do this
-		$validation_token = validateToken('admin-sort', 'post', true, false);
+		$validation_token = validateToken('admin-sort', 'post', false, false);
 		$validation_session = validateSession();
 
 		if ($validation_session === true && $validation_token === true)
@@ -650,7 +650,7 @@ class Xml_Controller extends Action_Controller
 		require_once(SUBSDIR . '/Maillist.subs.php');
 
 		// You have to be allowed to do this
-		$validation_token = validateToken('admin-sort', 'post', true, false);
+		$validation_token = validateToken('admin-sort', 'post', false, false);
 		$validation_session = validateSession();
 
 		if ($validation_session === true && $validation_token === true)
@@ -740,7 +740,7 @@ class Xml_Controller extends Action_Controller
 		require_once(SUBSDIR . '/MessageIcons.subs.php');
 
 		// You have to be allowed to do this
-		$validation_token = validateToken('admin-sort', 'post', true, false);
+		$validation_token = validateToken('admin-sort', 'post', false, false);
 		$validation_session = validateSession();
 
 		if ($validation_session === true && $validation_token === true)
