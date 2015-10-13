@@ -795,7 +795,7 @@ function parse_bbc($message, $smileys = true, $cache_id = '', $parse_tags = arra
 			),
 			array(
 				'tag' => 'center',
-				'before' => '<span style="display:block" class="centertext">',
+				'before' => '<span style="display:block;" class="centertext">',
 				'after' => '</span>',
 				'block_level' => false,
 			),
@@ -1244,7 +1244,7 @@ function parse_bbc($message, $smileys = true, $cache_id = '', $parse_tags = arra
 	if ($cache_id != '' && !empty($modSettings['cache_enable']) && (($modSettings['cache_enable'] >= 2 && isset($message[1000])) || isset($message[2400])) && empty($parse_tags))
 	{
 		// It's likely this will change if the message is modified.
-		$cache_key = 'parse:' . $cache_id . '-' . md5(md5($message) . '-' . $smileys . (empty($disabled) ? '' : implode(',', array_keys($disabled))) . serialize($context['browser']) . $txt['lang_locale'] . $user_info['time_offset'] . $user_info['time_format']);
+		$cache_key = 'parse:' . $cache_id . '-' . hash('md5', hash('md5', $message) . '-' . $smileys . (empty($disabled) ? '' : implode(',', array_keys($disabled))) . serialize($context['browser']) . $txt['lang_locale'] . $user_info['time_offset'] . $user_info['time_format']);
 
 		if (($temp = cache_get_data($cache_key, 240)) != null)
 			return $temp;
@@ -3025,7 +3025,7 @@ function getAttachmentFilename($filename, $attachment_id, $dir = null, $new = fa
 
 	// Just make up a nice hash...
 	if ($new)
-		return sha1(md5($filename . time()) . mt_rand());
+		return hash('sha1', hash('md5', $filename . time()) . mt_rand());
 
 	// In case of files from the old system, do a legacy call.
 	if (empty($file_hash))
