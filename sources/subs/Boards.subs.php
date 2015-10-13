@@ -2037,7 +2037,7 @@ function boardNotifications($start, $items_per_page, $sort, $memID)
 			'current_member' => $user_info['id'],
 			'selected_member' => $memID,
 		),
-		function($row)
+		function($row) use ($scripturl)
 		{
 			return array(
 				'id' => $row['id_board'],
