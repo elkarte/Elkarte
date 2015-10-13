@@ -488,7 +488,7 @@ class Request
 			// Do not urldecode() the querystring, unless you so much wish to break OpenID implementation. :)
 			$this->_server_query_string = substr($this->_server_query_string, 0, 5) === 'url=/' ? $_SERVER['REDIRECT_QUERY_STRING'] : $this->_server_query_string;
 
-			// Some german webmailers need a decoded string, so let's decode the string for action=activate and action=reminder
+			// Some german webmailers need a decoded string, so let's decode the string for sa=activate and action=reminder
 			if (strpos($this->_server_query_string, 'activate') !== false || strpos($this->_server_query_string, 'reminder') !== false)
 				$this->_server_query_string = urldecode($this->_server_query_string);
 

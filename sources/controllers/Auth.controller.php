@@ -652,6 +652,7 @@ class Auth_Controller extends Action_Controller
  * Check activation status of the current user.
  *
  * What it does:
+ * is_activated value key is as follows:
  * - > 10 Banned with activation status as value - 10
  * - 5 = Awaiting COPPA concent
  * - 4 = Awaiting Deletion approval
@@ -675,7 +676,7 @@ function checkActivation()
 	// Check if the account is activated - COPPA first...
 	if ($activation_status == 5)
 	{
-		$context['login_errors'][] = $txt['coppa_no_concent'] . ' <a href="' . $scripturl . '?action=coppa;member=' . $user_settings['id_member'] . '">' . $txt['coppa_need_more_details'] . '</a>';
+		$context['login_errors'][] = $txt['coppa_no_concent'] . ' <a href="' . $scripturl . '?action=register;sa=coppa;member=' . $user_settings['id_member'] . '">' . $txt['coppa_need_more_details'] . '</a>';
 		return false;
 	}
 	// Awaiting approval still?
@@ -703,7 +704,7 @@ function checkActivation()
 	{
 		Errors::instance()->log_error($txt['activate_not_completed1'] . ' - <span class="remove">' . $user_settings['member_name'] . '</span>', false);
 
-		$context['login_errors'][] = $txt['activate_not_completed1'] . ' <a href="' . $scripturl . '?action=activate;sa=resend;u=' . $user_settings['id_member'] . '">' . $txt['activate_not_completed2'] . '</a>';
+		$context['login_errors'][] = $txt['activate_not_completed1'] . ' <a href="' . $scripturl . '?action=register;sa=activate;resend;u=' . $user_settings['id_member'] . '">' . $txt['activate_not_completed2'] . '</a>';
 		return false;
 	}
 	return true;

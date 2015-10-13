@@ -282,7 +282,7 @@ function loadCustomFields($memID, $area = 'summary', array $custom_fields = arra
 		$context['custom_fields'][] = array(
 			'name' => $row['field_name'],
 			'desc' => $row['field_desc'],
-			'type' => $row['field_type'],
+			'field_type' => $row['field_type'],
 			'input_html' => $input_html,
 			'output_html' => $output_html,
 			'placement' => $row['placement'],
@@ -291,7 +291,6 @@ function loadCustomFields($memID, $area = 'summary', array $custom_fields = arra
 			'show_reg' => $row['show_reg'],
 			'field_length' => $row['field_length'],
 			'mask' => $row['mask'],
-			'show_reg' => $row['show_reg'],
 		);
 		$context['custom_fields_required'] = $context['custom_fields_required'] || $row['show_reg'];
 	}
@@ -1649,9 +1648,9 @@ function profileSendActivation()
 		return;
 
 	$replacements = array(
-		'ACTIVATIONLINK' => $scripturl . '?action=activate;u=' . $context['id_member'] . ';code=' . $profile_vars['validation_code'],
+		'ACTIVATIONLINK' => $scripturl . '?action=register;sa=activate;u=' . $context['id_member'] . ';code=' . $profile_vars['validation_code'],
 		'ACTIVATIONCODE' => $profile_vars['validation_code'],
-		'ACTIVATIONLINKWITHOUTCODE' => $scripturl . '?action=activate;u=' . $context['id_member'],
+		'ACTIVATIONLINKWITHOUTCODE' => $scripturl . '?action=register;sa=activate;u=' . $context['id_member'],
 	);
 
 	// Send off the email.

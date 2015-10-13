@@ -3540,7 +3540,7 @@ function setupMenuContext()
 			),
 			'contact' => array(
 				'title' => $txt['contact'],
-				'href' => $scripturl . '?action=contact',
+				'href' => $scripturl . '?action=register;sa=contact',
 				'data-icon' => '&#xf095;',
 				'show' => $user_info['is_guest'] && !empty($modSettings['enable_contactform']) && $modSettings['enable_contactform'] == 'menu',
 			),
@@ -3628,8 +3628,6 @@ function setupMenuContext()
 		$current_action = 'pm';
 	elseif ($context['current_action'] == 'theme')
 		$current_action = isset($_REQUEST['sa']) && $_REQUEST['sa'] == 'pick' ? 'profile' : 'admin';
-	elseif ($context['current_action'] == 'register2')
-		$current_action = 'register';
 	elseif ($context['current_action'] == 'login2' || ($user_info['is_guest'] && $context['current_action'] == 'reminder'))
 		$current_action = 'login';
 	elseif ($context['current_action'] == 'groups' && $context['allow_moderation_center'])
@@ -4072,7 +4070,7 @@ function replaceBasicActionUrl($string)
 			$boardurl,
 			$scripturl . '?action=login',
 			$scripturl . '?action=register',
-			$scripturl . '?action=activate',
+			$scripturl . '?action=register;sa=activate',
 			$scripturl . '?action=help',
 			$scripturl . '?action=admin',
 			$scripturl . '?action=moderate',

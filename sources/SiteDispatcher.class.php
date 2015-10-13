@@ -87,7 +87,7 @@ class Site_Dispatcher
 			}
 		}
 		// If guest access is disallowed, a guest is kicked out... politely. :P
-		elseif (empty($modSettings['allow_guestAccess']) && $user_info['is_guest'] && (!isset($_GET['action']) || !in_array($_GET['action'], array('coppa', 'login', 'login2', 'register', 'register2', 'reminder', 'activate', 'help', 'quickhelp', 'mailq', 'verificationcode', 'openidreturn'))))
+		elseif (empty($modSettings['allow_guestAccess']) && $user_info['is_guest'] && (!isset($_GET['action']) || !in_array($_GET['action'], array('login', 'login2', 'register', 'reminder', 'help', 'quickhelp', 'mailq', 'openidreturn'))))
 		{
 			$this->_controller_name = 'Auth_Controller';
 			$this->_function_name = 'action_kickguest';
@@ -126,12 +126,9 @@ class Site_Dispatcher
 		// Format:
 		// $_GET['action'] => array($class, $method)
 		$actionArray = array(
-			'activate' => array('Register_Controller', 'action_activate'),
 			'attachapprove' => array('ModerateAttachments_Controller', 'action_attachapprove'),
 			'buddy' => array('Members_Controller', 'action_buddy'),
 			'collapse' => array('BoardIndex_Controller', 'action_collapse'),
-			'contact' => array('Register_Controller', 'action_contact'),
-			'coppa' => array('Register_Controller', 'action_coppa'),
 			'deletemsg' => array('RemoveTopic_Controller', 'action_deletemsg'),
 			// @todo: move this to attachment action also
 			'dlattach' => array('Attachment_Controller', 'action_index'),
@@ -160,7 +157,6 @@ class Site_Dispatcher
 			'quotefast' => array('Post_Controller', 'action_quotefast'),
 			'quickmod' => array('MessageIndex_Controller', 'action_quickmod'),
 			'quickmod2' => array('Display_Controller', 'action_quickmod2'),
-			'register2' => array('Register_Controller', 'action_register2'),
 			'removetopic2' => array('RemoveTopic_Controller', 'action_removetopic2'),
 			'reporttm' => array('Emailuser_Controller', 'action_reporttm'),
 			'restoretopic' => array('RemoveTopic_Controller', 'action_restoretopic'),
@@ -169,7 +165,6 @@ class Site_Dispatcher
 			'theme' => array('ManageThemes_Controller', 'action_thememain'),
 			'trackip' => array('ProfileHistory_Controller', 'action_trackip'),
 			'unreadreplies' => array('Unread_Controller', 'action_unreadreplies'),
-			'verificationcode' => array('Register_Controller', 'action_verificationcode'),
 			'viewprofile' => array('Profile_Controller', 'action_index'),
 			'viewquery' => array('AdminDebug_Controller', 'action_viewquery'),
 			'viewadminfile' => array('AdminDebug_Controller', 'action_viewadminfile'),
