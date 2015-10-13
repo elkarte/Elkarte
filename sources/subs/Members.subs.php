@@ -564,12 +564,15 @@ function registerMember(&$regOptions, $error_context = 'register')
 	if (isset($regOptions['theme_vars']) && count(array_intersect(array_keys($regOptions['theme_vars']), $reservedVars)) != 0)
 		Errors::instance()->fatal_lang_error('no_theme');
 
+	require_once(SUBSDIR . '/TokenHash.class..php');
+	$tokenizer = new Token_Hash();
+
 	// Some of these might be overwritten. (the lower ones that are in the arrays below.)
 	$regOptions['register_vars'] = array(
 		'member_name' => $regOptions['username'],
 		'email_address' => $regOptions['email'],
 		'passwd' => validateLoginPassword($regOptions['password'], '', $regOptions['username'], true),
-		'password_salt' => substr(md5(mt_rand()), 0, 4) ,
+		'password_salt' => $tokenizer->generate_hash(4),
 		'posts' => 0,
 		'date_registered' => !empty($regOptions['time']) ? $regOptions['time'] : time(),
 		'member_ip' => $regOptions['interface'] == 'admin' ? '127.0.0.1' : $regOptions['ip'],
