@@ -2,7 +2,7 @@
 #
 # Portable PHP password hashing framework.
 #
-# Version 0.3 / genuine.
+# Version 0.3 / elkarte.
 #
 # Written by Solar Designer <solar at openwall.com> in 2004-2006 and placed in
 # the public domain.  Revised in subsequent years, still public domain.
@@ -246,6 +246,37 @@ class PasswordHash {
 		if ($hash[0] == '*')
 			$hash = crypt($password, $stored_hash);
 
-		return $hash == $stored_hash;
+		return $this->_hash_equals($hash, $stored_hash);
+	}
+
+	/**
+	 * Timing attack safe string comparison
+	 *
+	 * Unlike normal === comparisons where the function returns after the
+	 * first non match, here the time taken is independent of the number of
+	 * characters that match.
+	 *
+	 * @see http://php.net/manual/en/function.hash-equals.php#117101
+	 *
+	 * This function should be used to mitigate timing attacks; for instance,
+	 * when testing crypt() password hashes.
+	 *
+	 * @param string $a
+	 * @param string $b
+	 *
+	 * @return bool
+	 */
+	function _hash_equals($a, $b)
+	{
+		// PHP 5.6+
+		if (function_exists('hash_equals'))
+		{
+			return hash_equals($a, $b);
+		}
+
+		$ret = strlen($a) ^ strlen($b);
+		$ret |= array_sum(unpack("C*", $a ^ $b));
+
+		return !$ret;
 	}
 }
