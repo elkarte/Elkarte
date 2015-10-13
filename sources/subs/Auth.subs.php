@@ -814,20 +814,10 @@ function userByEmail($email, $username = null)
  */
 function generateValidationCode()
 {
-	global $modSettings;
+	require_once(SUBSDIR . '/TokenHash.class..php');
+	$tokenizer = new Token_Hash();
 
-	$db = database();
-
-	$request = $db->query('get_random_number', '
-		SELECT RAND()',
-		array(
-		)
-	);
-
-	list ($dbRand) = $db->fetch_row($request);
-	$db->free_result($request);
-
-	return substr(preg_replace('/\W/', '', sha1(microtime() . mt_rand() . $dbRand . $modSettings['rand_seed'])), 0, 10);
+	return $tokenizer->generate_hash();
 }
 
 /**
