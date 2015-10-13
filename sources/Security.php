@@ -789,46 +789,28 @@ function checkSession($type = 'post', $from_action = '', $is_fatal = true)
 }
 
 /**
- * Check if a specific confirm parameter was given.
- *
- * @param string $action
- */
-function checkConfirm($action)
-{
-	global $modSettings;
-
-	$req = request();
-
-	if (isset($_GET['confirm']) && isset($_SESSION['confirm_' . $action]) && md5($_GET['confirm'] . $req->user_agent()) === $_SESSION['confirm_' . $action])
-		return true;
-	else
-	{
-		$token = md5(mt_rand() . session_id() . (string) microtime() . $modSettings['rand_seed']);
-		$_SESSION['confirm_' . $action] = md5($token . $req->user_agent());
-
-		return $token;
-	}
-}
-
-/**
  * Lets give you a token of our appreciation.
  *
- * @param string $action
- * @param string $type = 'post'
- * @return string[] array of token var and token
+ * @param string $action The specific site action that a token will be generated for
+ * @param string $type = 'post' If the token will be returned via post or get
+ * @return string[] array of token var, time, csrf, token
  */
 function createToken($action, $type = 'post')
 {
-	global $modSettings, $context;
+	global $context;
 
-	// we need user agent
+	// Generate a new token token_var pair
+	require_once(SUBSDIR . '/TokenHash.class..php');
+	$tokenizer = new Token_Hash();
+	$token_var = $tokenizer->generate_hash(rand(7, 12));
+	$token = $tokenizer->generate_hash(32);
+
+	// We need user agent and the client IP
 	$req = request();
+	$csrf_hash = hash('sha1', $token . $req->client_ip() . $req->user_agent());
 
-	$token = md5(mt_rand() . session_id() . (string) microtime() . $modSettings['rand_seed'] . $type);
-	$token_var = substr(preg_replace('~^\d+~', '', md5(mt_rand() . (string) microtime() . mt_rand())), 0, rand(7, 12));
-
-	$_SESSION['token'][$type . '-' . $action] = array($token_var, md5($token . $req->user_agent()), time(), $token);
-
+	// Save the session token and make it available to the forms
+	$_SESSION['token'][$type . '-' . $action] = array($token_var, $csrf_hash, time(), $token);
 	$context[$action . '_token'] = $token;
 	$context[$action . '_token_var'] = $token_var;
 
@@ -840,40 +822,48 @@ function createToken($action, $type = 'post')
  *
  * @param string $action
  * @param string $type = 'post' (get, request, or post)
- * @param bool $reset = true
+ * @param bool $reset = true Reset the token on failure
  * @param bool $fatal if true a fatal_lang_error is issued for invalid tokens, otherwise false is returned
  * @return boolean except for $action == 'login' where the token is returned
  */
 function validateToken($action, $type = 'post', $reset = true, $fatal = true)
 {
-	$type = $type == 'get' || $type == 'request' ? $type : 'post';
+	$type = ($type === 'get' || $type === 'request') ? $type : 'post';
 	$token_index = $type . '-' . $action;
 
-	// Logins are special: the token is used to has the password with javascript before POST it
+	// Logins are special: the token is used to have the password with javascript before POST it
 	if ($action == 'login')
 	{
 		if (isset($_SESSION['token'][$token_index]))
 		{
 			$return = $_SESSION['token'][$token_index][3];
 			unset($_SESSION['token'][$token_index]);
+
 			return $return;
 		}
 		else
 			return '';
 	}
 
-	// This nasty piece of code validates a token.
+	// This code validates a supplied token.
 	// 1. The token exists in session.
 	// 2. The {$type} variable should exist.
 	// 3. We concatenate the variable we received with the user agent
 	// 4. Match that result against what is in the session.
 	// 5. If it matches, success, otherwise we fallout.
 
-	// we use user agent
+	// We need the user agent and client IP
 	$req = request();
-	if (isset($_SESSION['token'][$token_index], $GLOBALS['_' . strtoupper($type)][$_SESSION['token'][$token_index][0]]) && md5($GLOBALS['_' . strtoupper($type)][$_SESSION['token'][$token_index][0]] . $req->user_agent()) === $_SESSION['token'][$token_index][1])
+
+	// Shortcut
+	$passed_token_var = isset($GLOBALS['_' . strtoupper($type)][$_SESSION['token'][$token_index][0]]) ? $GLOBALS['_' . strtoupper($type)][$_SESSION['token'][$token_index][0]] : null;
+	$csrf_hash = hash('sha1', $passed_token_var . $req->client_ip() . $req->user_agent());
+
+	// Checked what was passed in combination with the user agent
+	if (isset($_SESSION['token'][$token_index], $passed_token_var)
+		&& $csrf_hash === $_SESSION['token'][$token_index][1])
 	{
-		// Invalidate this token now.
+		// Consume the token, let them pass
 		unset($_SESSION['token'][$token_index]);
 
 		return true;
@@ -890,16 +880,16 @@ function validateToken($action, $type = 'post', $reset = true, $fatal = true)
 
 		if ($fatal)
 			Errors::instance()->fatal_lang_error('token_verify_fail', false);
-		else
-			return false;
 	}
-	// Remove this token as its useless
+	// You don't get a new token
 	else
+	{
+		// Explicitly remove this token
 		unset($_SESSION['token'][$token_index]);
 
-	// Randomly check if we should remove some older tokens.
-	if (mt_rand(0, 138) == 23)
+		// Remove older tokens.
 		cleanTokens();
+	}
 
 	return false;
 }
@@ -956,9 +946,12 @@ function checkSubmitOnce($action, $is_fatal = false)
 	// Register a form number and store it in the session stack. (use this on the page that has the form.)
 	if ($action == 'register')
 	{
-		$context['form_sequence_number'] = 0;
+		require_once(SUBSDIR . '/TokenHash.class..php');
+		$tokenizer = new Token_Hash();
+
+		$context['form_sequence_number'] = '';
 		while (empty($context['form_sequence_number']) || in_array($context['form_sequence_number'], $_SESSION['forms']))
-			$context['form_sequence_number'] = mt_rand(1, 16000000);
+			$context['form_sequence_number'] = $tokenizer->generate_hash();
 	}
 	// Check whether the submitted number can be found in the session.
 	elseif ($action == 'check')
@@ -967,7 +960,8 @@ function checkSubmitOnce($action, $is_fatal = false)
 			return true;
 		elseif (!in_array($_REQUEST['seqnum'], $_SESSION['forms']))
 		{
-			$_SESSION['forms'][] = (int) $_REQUEST['seqnum'];
+			// Mark this one as used
+			$_SESSION['forms'][] = (string) $_REQUEST['seqnum'];
 			return true;
 		}
 		elseif ($is_fatal)
