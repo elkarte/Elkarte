@@ -71,15 +71,25 @@ class Token_Hash
 	 *  - Uses crypt to generate a hash value
 	 *  - Returns * on failure
 	 *  - Returns a A-Z a-z 0-9 string of length characters on success
+	 *  - If supplying a salt it must be min 16 characters.  It will be wrapped to indicate
+	 * its a sha512 salt and cleaned to only contain word characters
 	 *
 	 * @param int $length the number of characters to return
+	 * @param string $salt use a custom salt, leave empty to let the system generate a secure one
+	 *
 	 * @return string the random hash
 	 */
-	public function generate_hash($length = 10)
+	public function generate_hash($length = 10, $salt = '')
 	{
 		// A salt to tell cyrpt to use sha512 algos (since 5.3.2)
-		$salt = '$6$' . bin2hex($this->get_random_bytes(8)) . '$';
-		$salt_len = strlen($salt);
+		if (empty($salt) || strlen($salt) < 16)
+		{
+			$salt = '$6$' . bin2hex($this->get_random_bytes(8)) . '$';
+		}
+		else
+		{
+			$salt = '$6$' . preg_replace('~\W~', 'x', $salt) . '$';
+		}
 
 		// A random character password to hash
 		$password = bin2hex($this->get_random_bytes($length));
@@ -87,17 +97,19 @@ class Token_Hash
 		// Hash away
 		$hash = crypt($password, $salt);
 
-		// THe hash (86) + salt (20) should be 106
-		if (strlen($hash) == 86 + $salt_len)
+		// The hash (86) + salt (20) should be 106
+		if (strlen($hash) == 106)
 		{
 			// For our purposes lets stay with alphanumeric values only
 			$hash = str_replace(array('.', '/', '+'), '', $hash);
 
 			// Return up to 32 characters
-			return substr($hash, $salt_len, min($length, 32));
+			return substr($hash, 20 + mt_rand(0, 50), $length);
 		}
-
-		return '*';
+		// Something happened and its not good, so at least return the hash which
+		// is guaranteed to differ from the salt on failure.
+		else
+			return substr($hash, 0, $length);
 	}
 
 	/**
