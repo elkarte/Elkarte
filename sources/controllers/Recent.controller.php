@@ -137,7 +137,7 @@ class Recent_Controller extends Action_Controller
 
 		// Recent posts by category id's
 		if (!empty($this->_req->query->c) && empty($board))
-			$this->_recentPostsCategory();
+			$categories = $this->_recentPostsCategory();
 		// Or recent posts by board id's?
 		elseif (!empty($this->_req->query->boards))
 			$this->_recentPostsBoards();
@@ -220,7 +220,7 @@ class Recent_Controller extends Action_Controller
 	 */
 	private function _recentPostsCategory()
 	{
-		global $scripturl, $modSettings;
+		global $scripturl, $modSettings, $context;
 
 		$categories = array_map('intval', explode(',', $this->_req->query->c));
 
@@ -254,6 +254,8 @@ class Recent_Controller extends Action_Controller
 			$this->_maxMsgID = array(400, 7);
 
 		$this->_base_url = $scripturl . '?action=recent;c=' . implode(',', $categories);
+
+		return $categories;
 	}
 
 	/**
