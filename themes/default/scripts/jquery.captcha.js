@@ -10,7 +10,9 @@
  * license:		BSD, See included LICENSE.TXT for terms and conditions.
  *
  * @version 1.1 dev
- *
+ */
+
+/**
  * This file contains javascript associated with the captcha visual verification stuffs.
  */
 
