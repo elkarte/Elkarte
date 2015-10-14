@@ -167,7 +167,6 @@ class Site_Combiner
 		if ($this->_isStale())
 		{
 			// Our buddies will be needed for this to work.
-			require_once(EXTDIR . '/jsminplus.php');
 			require_once(SUBSDIR . '/Package.subs.php');
 
 			$this->_archive_header = '// ' . $this->_archive_filenames . "\n";
@@ -392,7 +391,7 @@ class Site_Combiner
 	 *
 	 * What it does:
 	 * - Attempt to use the closure-compiler API using code_url
-	 * - Failing that will use jsminplus
+	 * - Failing that will use JSqueeze
 	 * - Failing that it will use the closure-compiler API using js_code
 	 *    a) single block if it can or
 	 *    b) as multiple calls
@@ -405,15 +404,17 @@ class Site_Combiner
 		// First try the closure request using code_url param
 		$fetch_data = $this->_closure_code_url();
 
-		// Nothing returned or an error, try our internal JSMinPlus minimizer
+		// Nothing returned or an error, try our internal JSqueeze minimizer
 		if ($fetch_data === false || trim($fetch_data) == '' || preg_match('/^Error\(\d{1,2}\):\s/m', $fetch_data))
 		{
 			// To prevent a stack overflow segmentation fault, which silently kills Apache, we need to limit
-			// recursion on windows.  This may cause jsminplus to fail, but at least its then catchable.
+			// recursion on windows.  This may cause JSqueeze to fail, but at least its then catchable.
 			if ($context['server']['is_windows'])
 				@ini_set('pcre.recursion_limit', '524');
 
-			$fetch_data = JSMinPlus::minify($this->_cache);
+			require_once(EXTDIR . '/JSqueeze.php');
+			$jsqueeze = new Patchwork\JSqueeze;
+			$fetch_data = $jsqueeze->squeeze($this->_cache);
 		}
 
 		// If we still have no data, then try the post js_code method to the closure compiler

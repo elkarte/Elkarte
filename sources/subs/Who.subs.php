@@ -500,7 +500,7 @@ function prepareCreditsData()
 			'<a href="http://pajhome.org.uk/crypt/md5">Javascript Crypt</a> | &copy; Angel Marin, Paul Johnston | Licensed under <a href="http://opensource.org/licenses/BSD-3-Clause">The BSD License</a>',
 			'<a href="http://jquery.org/">JQuery</a> | &copy; jQuery Foundation and other contributors | Licensed under <a href="http://opensource.org/licenses/MIT">The MIT License (MIT)</a>',
 			'<a href="http://jqueryui.com/">JQuery UI</a> | &copy; jQuery Foundation and other contributors | Licensed under <a href="http://opensource.org/licenses/MIT">The MIT License (MIT)</a>',
-			'<a href="http://crisp.tweakblogs.net/blog/6861/jsmin%2B-version-14.html">JSMinPlus</a> | Licensed under <a href="http://opensource.org/licenses/MPL-1.1">Mozilla_Public_License, Version 1.1</a>',
+			'<a href="https://github.com/tchwork/jsqueeze">Jsqueeze</a> &copy Nicolas Grekas| Licensed under <a href="http://www.apache.org/licenses/LICENSE-2.0">Apache License, Version 2.0</a>',
 			'<a href="http://www.openwall.com/phpass/">PH Pass</a> | Author: Solar Designer | Placed in the public domain</a>',
 			'<a href="http://www.sceditor.com/">SCEditor</a> | &copy; Sam Clarke | Licensed under <a href="http://opensource.org/licenses/MIT">The MIT License (MIT)</a>',
 			'<a href="http://sourceforge.net/projects/simplehtmldom/">Simple HTML DOM</a> | Licensed under <a href="http://opensource.org/licenses/MIT">The MIT License (MIT)</a>',
