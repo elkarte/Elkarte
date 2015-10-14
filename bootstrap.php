@@ -168,9 +168,13 @@ else
 
 	if (!isset($_SESSION['session_value']))
 	{
-		$_SESSION['session_var'] = substr(md5(mt_rand() . session_id() . mt_rand()), 0, rand(7, 12));
-		$_SESSION['session_value'] = md5(session_id() . mt_rand());
+		require_once(SUBSDIR . '/TokenHash.class..php');
+		$tokenizer = new Token_Hash();
+
+		$_SESSION['session_value'] = $tokenizer->generate_hash(32, session_id());
+		$_SESSION['session_var'] = substr(preg_replace('~^\d+~', '', $tokenizer->generate_hash(16, session_id())), 0, rand(7, 12));
 	}
+
 	$sc = $_SESSION['session_value'];
 }
 
