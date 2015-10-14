@@ -418,10 +418,14 @@ function resetPassword($memID, $username = null)
 		$user = trim($username);
 	}
 
-	// Generate a random password.
+	// Generate a 10 digit random password.
+	require_once(SUBSDIR . '/TokenHash.class..php');
+	$tokenizer = new Token_Hash();
+	$newPassword = $tokenizer->generate_hash();
+
+	// Create a db hash for the generated password
 	require_once(EXTDIR . '/PasswordHash.php');
 	$t_hasher = new PasswordHash(8, false);
-	$newPassword = substr(preg_replace('/\W/', '', md5(mt_rand())), 0, 10);
 	$newPassword_sha256 = hash('sha256', strtolower($user) . $newPassword);
 	$db_hash = $t_hasher->HashPassword($newPassword_sha256);
 
