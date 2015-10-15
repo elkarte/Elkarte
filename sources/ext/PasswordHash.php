@@ -24,13 +24,14 @@
 # Obviously, since this code is in the public domain, the above are not
 # requirements (there can be none), but merely suggestions.
 #
+
 class PasswordHash {
 	var $itoa64;
 	var $iteration_count_log2;
 	var $portable_hashes;
 	var $random_state;
 
-	function PasswordHash($iteration_count_log2, $portable_hashes)
+	public function __construct( $iteration_count_log2, $portable_hashes )
 	{
 		$this->itoa64 = './0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz';
 
@@ -40,12 +41,10 @@ class PasswordHash {
 
 		$this->portable_hashes = $portable_hashes;
 
-		$this->random_state = microtime();
-		if (function_exists('getmypid'))
-			$this->random_state .= getmypid();
+		$this->random_state = microtime() . uniqid(rand(), TRUE);
 	}
 
-	function get_random_bytes($count)
+	private function get_random_bytes($count)
 	{
 		$output = '';
 		if (@is_readable('/dev/urandom') &&
@@ -68,7 +67,7 @@ class PasswordHash {
 		return $output;
 	}
 
-	function encode64($input, $count)
+	private function encode64($input, $count)
 	{
 		$output = '';
 		$i = 0;
@@ -91,7 +90,7 @@ class PasswordHash {
 		return $output;
 	}
 
-	function gensalt_private($input)
+	private function gensalt_private($input)
 	{
 		$output = '$P$';
 		$output .= $this->itoa64[min($this->iteration_count_log2 +
@@ -101,7 +100,7 @@ class PasswordHash {
 		return $output;
 	}
 
-	function crypt_private($password, $setting)
+	private function crypt_private($password, $setting)
 	{
 		$output = '*0';
 		if (substr($setting, 0, 2) == $output)
@@ -146,7 +145,7 @@ class PasswordHash {
 		return $output;
 	}
 
-	function gensalt_extended($input)
+	private function gensalt_extended($input)
 	{
 		$count_log2 = min($this->iteration_count_log2 + 8, 24);
 		# This should be odd to not reveal weak DES keys, and the
@@ -164,7 +163,7 @@ class PasswordHash {
 		return $output;
 	}
 
-	function gensalt_blowfish($input)
+	private function gensalt_blowfish($input)
 	{
 		# This one needs to use a different order of characters and a
 		# different encoding scheme from the one in encode64() above.
@@ -205,8 +204,11 @@ class PasswordHash {
 		return $output;
 	}
 
-	function HashPassword($password)
+	public function HashPassword($password)
 	{
+		if ( strlen( $password ) > 4096 )
+			return '*';
+
 		$random = '';
 
 		if (CRYPT_BLOWFISH == 1 && !$this->portable_hashes) {
@@ -240,8 +242,11 @@ class PasswordHash {
 		return '*';
 	}
 
-	function CheckPassword($password, $stored_hash)
+	public function CheckPassword($password, $stored_hash)
 	{
+		if ( strlen( $password ) > 4096 )
+			return false;
+
 		$hash = $this->crypt_private($password, $stored_hash);
 		if ($hash[0] == '*')
 			$hash = crypt($password, $stored_hash);
@@ -266,7 +271,7 @@ class PasswordHash {
 	 *
 	 * @return bool
 	 */
-	function _hash_equals($a, $b)
+	private function _hash_equals($a, $b)
 	{
 		// PHP 5.6+
 		if (function_exists('hash_equals'))
