@@ -4218,3 +4218,24 @@ function removeNestedQuotes($text)
 		return $text;
 	}
 }
+
+/**
+ * Change a \t to a span that will show a tab
+ * @param $string
+ * @return mixed
+ */
+function tabToHtmlTab($string)
+{
+	return str_replace("\t", "<span class=\"tab\">\t</span>", $string);
+}
+
+/**
+ * Remove <br />
+ *
+ * @param $string
+ * @return mixed
+ */
+function removeBr($string)
+{
+	return str_replace('<br />', '', $string);
+}
