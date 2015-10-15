@@ -62,7 +62,10 @@ function initialize_inputs()
 
 	// This is the test for support of compression
 	if (isset($_GET['obgz']))
-		return action_testCompression();
+	{
+		require('test_compression.php');
+		die;
+	}
 
 	// This is really quite simple; if ?delete is on the URL, delete the installer...
 	if (isset($_GET['delete']))
@@ -393,29 +396,4 @@ function JavaScriptEscape($string)
 		'<body>' => '<bo\'+\'dy>',
 		'<a href' => '<a hr\'+\'ef',
 	)) . '\'';
-}
-
-/**
- * Does the test to check whether compression is supported or not.
- * Called by ?obgz
- */
-function action_testCompression()
-{
-		ob_start('ob_gzhandler');
-
-		if (ini_get('session.save_handler') == 'user')
-			@ini_set('session.save_handler', 'files');
-		session_start();
-
-		if (!headers_sent())
-			echo '<!DOCTYPE html>
-<html>
-	<head>
-		<title>', htmlspecialchars($_GET['pass_string'], ENT_COMPAT, 'UTF-8'), '</title>
-	</head>
-	<body style="background: #d4d4d4; margin-top: 16%; font-size: 16pt;">
-		<strong>', htmlspecialchars($_GET['pass_string'], ENT_COMPAT, 'UTF-8'), '</strong>
-	</body>
-</html>';
-		exit;
 }
