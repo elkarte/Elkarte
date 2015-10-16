@@ -430,31 +430,7 @@ class ProfileAccount_Controller extends Action_Controller
 			require_once(SUBSDIR . '/Moderation.subs.php');
 
 			// Do we actually have to issue them with a PM?
-			$id_notice = 0;
-			if (!empty($this->_req->post->warn_notify) && empty($this->_issueErrors))
-			{
-				$warn_sub = $this->_req->getPost('warn_sub', 'trim', '');
-				$warn_body = $this->_req->getPost('warn_body', 'trim', '');
-
-				if (empty($warn_sub) || empty($warn_body))
-				{
-					$this->_issueErrors[] = 'warning_notify_blank';
-				}
-				// Send the PM?
-				else
-				{
-					require_once(SUBSDIR . '/PersonalMessage.subs.php');
-					$from = array(
-						'id' => 0,
-						'name' => $context['forum_name'],
-						'username' => $context['forum_name'],
-					);
-					sendpm(array('to' => array($this->_memID), 'bcc' => array()), $warn_sub, $warn_body, false, $from);
-
-					// Log the notice.
-					$id_notice = logWarningNotice($warn_sub, $warn_body);
-				}
-			}
+			$id_notice = $this->_issue_warning_pm();
 
 			// What have we changed?
 			$level_change = $warning_level - $cur_profile['warning'];
@@ -489,6 +465,44 @@ class ProfileAccount_Controller extends Action_Controller
 			// Show the new improved warning level.
 			$context['member']['warning'] = $warning_level;
 		}
+	}
+
+	/**
+	 * Issue a pm to the member getting the warning
+	 *
+	 * @return int
+	 */
+	private function _issue_warning_pm()
+	{
+		global $context;
+
+		$id_notice = 0;
+		if (!empty($this->_req->post->warn_notify) && empty($this->_issueErrors))
+		{
+			$warn_sub = $this->_req->getPost('warn_sub', 'trim', '');
+			$warn_body = $this->_req->getPost('warn_body', 'trim', '');
+
+			if (empty($warn_sub) || empty($warn_body))
+			{
+				$this->_issueErrors[] = 'warning_notify_blank';
+			}
+			// Send the PM?
+			else
+			{
+				require_once(SUBSDIR . '/PersonalMessage.subs.php');
+				$from = array(
+					'id' => 0,
+					'name' => $context['forum_name'],
+					'username' => $context['forum_name'],
+				);
+				sendpm(array('to' => array($this->_memID), 'bcc' => array()), $warn_sub, $warn_body, false, $from);
+
+				// Log the notice.
+				$id_notice = logWarningNotice($warn_sub, $warn_body);
+			}
+		}
+
+		return $id_notice;
 	}
 
 	/**
