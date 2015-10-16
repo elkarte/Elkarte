@@ -85,8 +85,8 @@ class ProfileOptions_Controller extends Action_Controller
 		$context['can_send_email'] = allowedTo('send_email_to_members');
 
 		$subActions = array(
-			'buddies' => array('action_editBuddies', $txt['editBuddies']),
-			'ignore' => array('action_editIgnoreList', $txt['editIgnoreList']),
+			'buddies' => array($this, 'action_editBuddies'),
+			'ignore' => array($this, 'action_editIgnoreList'),
 		);
 
 		// Set a subaction
@@ -635,7 +635,7 @@ class ProfileOptions_Controller extends Action_Controller
 				),
 			),
 			'form' => array(
-				'href' => $scripturl . '?action=profile;area=notification;save',
+				'href' => $scripturl . '?action=profile;area=notification',
 				'include_sort' => true,
 				'include_start' => true,
 				'hidden_fields' => array(
@@ -647,8 +647,11 @@ class ProfileOptions_Controller extends Action_Controller
 			),
 			'additional_rows' => array(
 				array(
+					'class' => 'submitbutton',
 					'position' => 'bottom_of_list',
-					'value' => '<input type="submit" name="edit_notify_boards" value="' . $txt['notifications_boards_update'] . '" class="right_submit" />',
+					'value' => '
+						<input type="submit" name="edit_notify_boards" value="' . $txt['notifications_boards_update'] . '" />
+						<input type="hidden" name="save" value="save" />',
 				),
 				array(
 					'position' => 'after_title',
@@ -756,7 +759,7 @@ class ProfileOptions_Controller extends Action_Controller
 				),
 			),
 			'form' => array(
-				'href' => $scripturl . '?action=profile;area=notification;save',
+				'href' => $scripturl . '?action=profile;area=notification',
 				'include_sort' => true,
 				'include_start' => true,
 				'hidden_fields' => array(
@@ -768,9 +771,11 @@ class ProfileOptions_Controller extends Action_Controller
 			),
 			'additional_rows' => array(
 				array(
+					'class' => 'submitbutton',
 					'position' => 'bottom_of_list',
-					'value' => '<input type="submit" name="edit_notify_topics" value="' . $txt['notifications_update'] . '" class="right_submit" />',
-					'align' => 'right',
+					'value' => '
+						<input type="submit" name="edit_notify_topics" value="' . $txt['notifications_update'] . '" />
+						<input type="hidden" name="save" value="save" />',
 				),
 			),
 		);
@@ -912,11 +917,11 @@ class ProfileOptions_Controller extends Action_Controller
 			$context['can_edit_primary'] = false;
 
 		// In the special case that someone is requesting membership of a group, setup some special context vars.
-		if (isset($this->_req->post->request)
-			&& isset($context['groups']['available'][(int) $this->_req->post->request])
-			&& $context['groups']['available'][(int) $this->_req->post->request]['type'] == 2)
+		if (isset($this->_req->query->request)
+			&& isset($context['groups']['available'][(int) $this->_req->query->request])
+			&& $context['groups']['available'][(int) $this->_req->query->request]['type'] == 2)
 		{
-			$context['group_request'] = $context['groups']['available'][(int) $this->_req->post->request];
+			$context['group_request'] = $context['groups']['available'][(int) $this->_req->query->request];
 		}
 	}
 
@@ -934,7 +939,8 @@ class ProfileOptions_Controller extends Action_Controller
 			isAllowedTo('manage_membergroups');
 
 		$group_id = $this->_req->getPost('gid', 'intval', $this->_req->getQuery('gid', 'intval', null));
-		if (!isset($group_id, $this->_req->post->primary))
+
+		if (!isset($group_id) && !isset($this->_req->post->primary))
 			Errors::instance()->fatal_lang_error('no_access', false);
 
 		// GID may be from a link or a form
