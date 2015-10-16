@@ -271,10 +271,11 @@ class ManageLanguages_Controller extends Action_Controller
 			),
 			'additional_rows' => array(
 				array(
+					'class' => 'submitbutton',
 					'position' => 'bottom_of_list',
 					'value' => '
 						<input type="hidden" name="' . $context['session_var'] . '" value="' . $context['session_id'] . '" />
-						<input type="submit" name="set_default" value="' . $txt['save'] . '"' . (is_writable(BOARDDIR . '/Settings.php') ? '' : ' disabled="disabled"') . ' class="right_submit" />',
+						<input type="submit" name="set_default" value="' . $txt['save'] . '"' . (is_writable(BOARDDIR . '/Settings.php') ? '' : ' disabled="disabled"') . ' />',
 				),
 			),
 			// For highlighting the default.

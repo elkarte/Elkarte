@@ -295,8 +295,9 @@ class ManageBans_Controller extends Action_Controller
 			),
 			'additional_rows' => array(
 				array(
+					'class' => 'submitbutton',
 					'position' => 'bottom_of_list',
-					'value' => '<input type="submit" name="removeBans" value="' . $txt['ban_remove_selected'] . '" onclick="return confirm(\'' . $txt['ban_remove_selected_confirm'] . '\');" class="right_submit" />',
+					'value' => '<input type="submit" name="removeBans" value="' . $txt['ban_remove_selected'] . '" onclick="return confirm(\'' . $txt['ban_remove_selected_confirm'] . '\');" />',
 				),
 			),
 		);
@@ -652,7 +653,7 @@ class ManageBans_Controller extends Action_Controller
 					'class' => 'submitbutton',
 					'position' => 'bottom_of_list',
 					'value' => '
-						<input type="submit" name="removeSelected" value="' . $txt['ban_log_remove_selected'] . '" onclick="return confirm(\'' . $txt['ban_log_remove_selected_confirm'] . '\');" class="right_submit" />
+						<input type="submit" name="removeSelected" value="' . $txt['ban_log_remove_selected'] . '" onclick="return confirm(\'' . $txt['ban_log_remove_selected_confirm'] . '\');" />
 						<input type="submit" name="removeAll" value="' . $txt['ban_log_remove_all'] . '" onclick="return confirm(\'' . $txt['ban_log_remove_all_confirm'] . '\');" class="right_submit" />',
 				),
 			),
@@ -1000,8 +1001,9 @@ class ManageBans_Controller extends Action_Controller
 			),
 			'additional_rows' => array(
 				array(
+					'class' => 'submitbutton',
 					'position' => 'bottom_of_list',
-					'value' => '<input type="submit" name="remove_triggers" value="' . $txt['ban_remove_selected_triggers'] . '" onclick="return confirm(\'' . $txt['ban_remove_selected_triggers_confirm'] . '\');" class="right_submit" />',
+					'value' => '<input type="submit" name="remove_triggers" value="' . $txt['ban_remove_selected_triggers'] . '" onclick="return confirm(\'' . $txt['ban_remove_selected_triggers_confirm'] . '\');" />',
 				),
 			),
 			'list_menu' => array(
