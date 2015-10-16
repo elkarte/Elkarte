@@ -2263,8 +2263,8 @@ function approveTopics($topics, $approve = true, $log = false)
 			SELECT t.id_topic, t.id_member_started, m.subject
 			FROM {db_prefix}topics as t
 				LEFT JOIN {db_prefix}messages AS m ON (t.id_first_msg = m.id_msg)
-			WHERE id_topic IN ({array_int:approve_topic_ids})
-				AND approved = {int:approve_type}
+			WHERE t.id_topic IN ({array_int:approve_topic_ids})
+				AND t.approved = {int:approve_type}
 			LIMIT ' . count($topics),
 			array(
 				'approve_topic_ids' => $topics,
