@@ -2326,7 +2326,7 @@ img.new_posts {
 }
 
 /* Poster and postarea + moderation area underneath */
-.forumposts .content, .forumposts .approvebg {
+.forumposts .content, .forumposts.approvebg {
 	overflow: visible;
 	margin: 2px 0 0 0;
 }
