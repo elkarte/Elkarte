@@ -711,12 +711,7 @@ function checkSession($type = 'post', $from_action = '', $is_fatal = true)
 		$error = 'session_verify_fail';
 
 	// Make sure a page with session check requirement is not being prefetched.
-	if (isset($_SERVER['HTTP_X_MOZ']) && $_SERVER['HTTP_X_MOZ'] == 'prefetch')
-	{
-		@ob_end_clean();
-		header('HTTP/1.1 403 Forbidden');
-		die;
-	}
+	stop_prefetching();
 
 	// Check the referring site - it should be the same server at least!
 	if (isset($_SESSION['request_referer']))
