@@ -863,6 +863,81 @@ InTopicModeration.prototype.handleSubmit = function (sSubmitType)
  */
 function expandThumb(thumbID)
 {
+	// For addon authors, set a global js elk_bypass_lb = true to turn off this function
+	if (typeof(elk_bypass_lb) !== 'undefined')
+		return;
+
+	var link = document.getElementById('link_' + thumbID),
+		$elk_expand_icon = $('<span id="elk_lb_expand"></span>'),
+		$elk_lightbox = $('#elk_lightbox'),
+		$elk_lb_content = $('#elk_lb_content');
+
+	// Create the lightbox container (if needed)
+	if ($elk_lightbox.length <= 0) {
+		$('body').append('<div id="elk_lightbox"><div id="elk_lb_content"></div></div>');
+		$elk_lightbox = $('#elk_lightbox');
+		$elk_lb_content = $('#elk_lb_content');
+	}
+
+	// Load and show the lightbox container div
+	$elk_lb_content.html('<div style="position:fixed;left:50%;top:50%;"><i class="fa fa-spinner fa-spin fa-4x"></i><div>');
+	$elk_lightbox.fadeIn(200);
+
+	// Fetch the image, replace the spinner with it when it arrives
+	$('<img id="elk_lb_img" src="' + link.href + '">')
+		.load(function() {
+			$(this).css({'max-height': $(window).height() - 40});
+			$elk_lb_content.html($(this)).append($elk_expand_icon);
+		})
+		.error(function() {
+			// Perhaps a message, but for now make it look like we tried and failed
+			setTimeout(function() { $("#elk_lightbox").hide();
+			$elk_lb_content.html(''); }, 1500);
+			$(window).off('resize.expandThumb');
+		});
+
+	// Provide an expand out on icon click
+	$elk_expand_icon.on('click', function(event) {
+		$('#elk_lb_content').css({'overflow':'auto', 'height':$(window).height(), 'padding':'0'});
+		$('#elk_lb_img').css({'width':'100%', 'max-height':'initial'});
+		$elk_expand_icon.hide();
+	});
+
+	// Click anywhere on the page (except the expand icon) to close the lightbox window
+	$elk_lightbox.on('click', function(event) {
+		if (event.target.id !== $elk_expand_icon.attr('id')) {
+			event.preventDefault();
+			$elk_lightbox.hide();
+			$elk_lb_content.html('').removeAttr('style');
+			$(window).off('resize.expandThumb');
+		}
+	});
+
+	// Hit escape to close it as well
+	$(window).on('keydown', function(event) {
+		if (event.keyCode === 27 ) {
+			event.preventDefault();
+			$elk_lightbox.hide();
+			$elk_lb_content.html('').removeAttr('style');
+			$(window).off('resize.expandThumb');
+		}
+	});
+
+	// Make the image size fluid as the browser window changes
+	$(window).on('resize.expandThumb', function() {
+		$('#elk_lb_img').css({'max-height':$(window).height() - 40, 'max-width':$(window).width() - 100});
+	});
+
+	return false;
+}
+
+/**
+ * Expands an attachment thumbnail when its clicked
+ *
+ * @param {string} thumbID
+ */
+function expandThumbLegacy(thumbID)
+{
 	var img = document.getElementById('thumb_' + thumbID),
 		link = document.getElementById('link_' + thumbID);
 

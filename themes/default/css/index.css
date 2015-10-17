@@ -2573,9 +2573,60 @@ img.new_posts {
 .attachments .attachment {
 	display: inline-block;
 	box-sizing: border-box;
-	margin-top: 2px;
 	padding: 6px 8px;
 	width: 24%;
+}
+
+/* Poor Mans lightbox support */
+#elk_lightbox {
+	background: rgba(0, 0, 0, .5);
+	position: fixed;
+	top: 0;
+	right: 0;
+	bottom: 0;
+	left: 0;
+	z-index: 100;
+	text-align: center;
+	overflow: hidden;
+	white-space: nowrap;
+	cursor: pointer;
+}
+
+#elk_lightbox:before {
+	content: '';
+	display: inline-block;
+	height: 100%;
+	vertical-align: middle;
+	margin-right: -0.25em;
+}
+
+#elk_lb_content {
+	display: inline-block;
+	padding: 20px;
+	min-width: 30%;
+	margin-left: 5%;
+	margin-right: 5%;
+	white-space: normal;
+	position: relative;
+}
+
+#elk_lb_expand {
+	display: inline-block;
+	width: 1.15em;
+	height: 1.15em;
+	border: 2px solid #CCCCCC;
+	border-radius: 4px;
+	line-height: 1em;
+	position: absolute;
+	top: 1%;
+	right: 1%;
+}
+
+#elk_lb_expand:before {
+	color: #CCCCCC;
+	content: "\f065";
+	font-size: 1em;
+	font-family: 'FontAwesome';
 }
 
 .attachment_thumb, .attachment_name {
@@ -2584,6 +2635,10 @@ img.new_posts {
 	text-align: center;
 	word-break: break-all;
 	word-wrap: break-word;
+}
+
+.attachment_thumb > a > img {
+	max-width: 100%;
 }
 
 /* Separator of posts. More useful in the print stylesheet. */
