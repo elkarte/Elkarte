@@ -159,7 +159,7 @@ function expandIPv6($addr, $strict_check = true)
  * - Calls itself recursively if necessary.
  * - Does not go deeper than 25 to prevent loop exhaustion
  *
- * @param string[]|string $var The string or array of strings to add entities
+ * @param array|string $var The string or array of strings to add entities
  * @param int $level = 0 The current level we're at within the array (if called recursively)
  * @return array|string The string or array of strings with entities added
  */
@@ -185,7 +185,7 @@ function htmlspecialchars__recursive($var, $level = 0)
  * - May call itself recursively if needed.
  * - Does not go deeper than 25 to prevent loop exhaustion
  *
- * @param string[]|string $var The string or array of strings to trim
+ * @param array|string $var The string or array of strings to trim
  * @param int $level = 0 How deep we're at within the array (if called recursively)
  * @return mixed[]|string The trimmed string or array of trimmed strings
  */

@@ -375,8 +375,8 @@ class ProfileAccount_Controller extends Action_Controller
 			$context['warning_data'] = array(
 				'reason' => $this->_req->post->warn_reason,
 				'notify' => !empty($this->_req->post->warn_notify),
-				'notify_subject' => isset($this->_req->post->warn_sub) ? $this->_req->post->warn_sub : '',
-				'notify_body' => isset($this->_req->post->warn_body) ? $this->_req->post->warn_body : '',
+				'notify_subject' => $this->_req->getPost('warn_sub', 'trim', ''),
+				'notify_body' => $this->_req->getPost('warn_body', 'trim', ''),
 				'body_preview' => $warning_body,
 			);
 		}
@@ -457,8 +457,8 @@ class ProfileAccount_Controller extends Action_Controller
 				$context['warning_data'] = array(
 					'reason' => $warn_reason,
 					'notify' => !empty($this->_req->post->warn_notify),
-					'notify_subject' => isset($warn_sub) ? $warn_sub : '',
-					'notify_body' => isset($warn_body) ? $warn_body : '',
+					'notify_subject' => $this->_req->getPost('warn_sub', 'trim', ''),
+					'notify_body' => $this->_req->getPost('warn_body', 'trim', ''),
 				);
 			}
 
