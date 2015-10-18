@@ -564,7 +564,6 @@ function registerMember(&$regOptions, $error_context = 'register')
 	if (isset($regOptions['theme_vars']) && count(array_intersect(array_keys($regOptions['theme_vars']), $reservedVars)) != 0)
 		Errors::instance()->fatal_lang_error('no_theme');
 
-	require_once(SUBSDIR . '/TokenHash.class..php');
 	$tokenizer = new Token_Hash();
 
 	// Some of these might be overwritten. (the lower ones that are in the arrays below.)

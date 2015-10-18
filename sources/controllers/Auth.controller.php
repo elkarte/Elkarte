@@ -303,9 +303,7 @@ class Auth_Controller extends Action_Controller
 			// Whichever encryption it was using, let's make it use ElkArte's now ;).
 			if (in_array($user_settings['passwd'], $other_passwords))
 			{
-				require_once(SUBSDIR . '/TokenHash.class..php');
 				$tokenizer = new Token_Hash();
-
 				$user_settings['passwd'] = validateLoginPassword($sha_passwd, '', '', true);
 				$user_settings['password_salt'] = $tokenizer->generate_hash(4);
 
@@ -346,9 +344,7 @@ class Auth_Controller extends Action_Controller
 		// Correct password, but they've got no salt; fix it!
 		if ($user_settings['password_salt'] == '')
 		{
-			require_once(SUBSDIR . '/TokenHash.class..php');
 			$tokenizer = new Token_Hash();
-
 			$user_settings['password_salt'] = $tokenizer->generate_hash(4);
 			updateMemberData($user_settings['id_member'], array('password_salt' => $user_settings['password_salt']));
 		}
@@ -417,9 +413,7 @@ class Auth_Controller extends Action_Controller
 		session_destroy();
 		if (!empty($user_info['id']))
 		{
-			require_once(SUBSDIR . '/TokenHash.class..php');
 			$tokenizer = new Token_Hash();
-
 			require_once(SUBSDIR . '/Members.subs.php');
 			updateMemberData($user_info['id'], array('password_salt' => $tokenizer->generate_hash(4)));
 		}

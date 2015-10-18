@@ -186,7 +186,6 @@ class OpenID_Controller extends Action_Controller
 			// Generate an ElkArte hash for the db to protect this account
 			$user_settings['passwd'] = validateLoginPassword($this->_secret, '', $user_settings['member_name'], true);
 
-			require_once(SUBSDIR . '/TokenHash.class..php');
 			$tokenizer = new Token_Hash();
 			$user_settings['password_salt'] = $tokenizer->generate_hash(4);
 

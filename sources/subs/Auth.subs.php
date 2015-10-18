@@ -419,7 +419,6 @@ function resetPassword($memID, $username = null)
 	}
 
 	// Generate a 10 digit random password.
-	require_once(SUBSDIR . '/TokenHash.class..php');
 	$tokenizer = new Token_Hash();
 	$newPassword = $tokenizer->generate_hash();
 
@@ -818,7 +817,6 @@ function userByEmail($email, $username = null)
  */
 function generateValidationCode()
 {
-	require_once(SUBSDIR . '/TokenHash.class..php');
 	$tokenizer = new Token_Hash();
 
 	return $tokenizer->generate_hash();

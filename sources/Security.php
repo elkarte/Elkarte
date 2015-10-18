@@ -800,7 +800,6 @@ function createToken($action, $type = 'post')
 	global $context;
 
 	// Generate a new token token_var pair
-	require_once(SUBSDIR . '/TokenHash.class..php');
 	$tokenizer = new Token_Hash();
 	$token_var = $tokenizer->generate_hash(rand(7, 12));
 	$token = $tokenizer->generate_hash(32);
@@ -946,9 +945,7 @@ function checkSubmitOnce($action, $is_fatal = false)
 	// Register a form number and store it in the session stack. (use this on the page that has the form.)
 	if ($action == 'register')
 	{
-		require_once(SUBSDIR . '/TokenHash.class..php');
 		$tokenizer = new Token_Hash();
-
 		$context['form_sequence_number'] = '';
 		while (empty($context['form_sequence_number']) || in_array($context['form_sequence_number'], $_SESSION['forms']))
 			$context['form_sequence_number'] = $tokenizer->generate_hash();
