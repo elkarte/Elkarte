@@ -2222,6 +2222,7 @@ function highlight_php_code($code)
  * - Should be used whenever anything is posted.
  * - Calls AddMailQueue to process any mail queue items its can
  * - Calls call_integration_hook integrate_redirect before headers are sent
+ * - Diverts final execution to obExit() which means a end to processing and sending of final output
  *
  * @param string $setLocation = '' The URL to redirect to
  * @param bool $refresh = false, enable to send a refresh header, default is a location header

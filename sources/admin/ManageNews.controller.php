@@ -255,8 +255,8 @@ class ManageNews_Controller extends Action_Controller
 					'position' => 'bottom_of_list',
 					'class' => 'submitbutton',
 					'value' => '
-					<input type="submit" name="save_items" value="' . $txt['save'] . '" class="right_submit" />
-					<input type="submit" name="delete_selection" value="' . $txt['editnews_remove_selected'] . '" onclick="return confirm(\'' . $txt['editnews_remove_confirm'] . '\');" class="right_submit" />
+					<input type="submit" name="save_items" value="' . $txt['save'] . '" />
+					<input type="submit" name="delete_selection" value="' . $txt['editnews_remove_selected'] . '" onclick="return confirm(\'' . $txt['editnews_remove_confirm'] . '\');" />
 					<span id="moreNewsItems_link" class="hide">
 						<a class="linkbutton" href="javascript:void(0);" onclick="addAnotherNews(); return false;">' . $txt['editnews_clickadd'] . '</a>
 					</span>',

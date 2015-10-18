@@ -660,9 +660,16 @@ function loadBoard()
 			)
 		);
 
-		// If it's a prefetching agent or we're requesting an attachment.
-		if ((isset($_SERVER['HTTP_X_MOZ']) && $_SERVER['HTTP_X_MOZ'] === 'prefetch') || (!empty($_REQUEST['action']) && $_REQUEST['action'] === 'dlattach'))
-			stop_prefetching();
+		// If it's a prefetching agent, stop it
+		stop_prefetching();
+
+		// If we're requesting an attachment.
+		if (!empty($_REQUEST['action']) && $_REQUEST['action'] === 'dlattach')
+		{
+			ob_end_clean();
+			header('HTTP/1.1 403 Forbidden');
+			exit;
+		}
 		elseif ($user_info['is_guest'])
 		{
 			loadLanguage('Errors');

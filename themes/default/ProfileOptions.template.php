@@ -678,7 +678,7 @@ function template_action_notification()
 
 	// The main containing header.
 	echo '
-		<form id="creator" class="flow_hidden" action="', $scripturl, '?action=profile;area=notification;save" method="post" accept-charset="UTF-8">
+		<form id="creator" class="flow_hidden" action="', $scripturl, '?action=profile;area=notification" method="post" accept-charset="UTF-8">
 			<h2 class="category_header hdicon cat_img_profile">
 				', $txt['profile'], '
 			</h2>
@@ -787,6 +787,7 @@ function template_action_notification()
 					<input type="hidden" name="' . $context[$context['token_check'] . '_token_var'] . '" value="' . $context[$context['token_check'] . '_token'] . '" />' : '', '
 					<input type="hidden" name="u" value="', $context['id_member'], '" />
 					<input type="hidden" name="sa" value="', $context['menu_item_selected'], '" />
+					<input type="hidden" name="save" value="save" />
 				</div>
 			</div>
 		</form>';
@@ -810,7 +811,7 @@ function template_groupMembership()
 
 	// The main containing header.
 	echo '
-		<form action="', $scripturl, '?action=profile;area=groupmembership;save" method="post" accept-charset="UTF-8" name="creator" id="creator">
+		<form action="', $scripturl, '?action=profile;area=groupmembership" method="post" accept-charset="UTF-8" name="creator" id="creator">
 			<h2 class="category_header hdicon cat_img_profile">
 				', $txt['profile'], '
 			</h2>
@@ -820,7 +821,7 @@ function template_groupMembership()
 	if (!empty($context['update_message']))
 		echo '
 			<div class="successbox">
-				', $context['update_message'], '.
+				', $context['update_message'], '
 			</div>';
 
 	// Requesting membership to a group?
@@ -864,14 +865,16 @@ function template_groupMembership()
 
 			echo '
 						<td>
-							<label for="primary_', $group['id'], '"><strong>', (empty($group['color']) ? $group['name'] : '<span style="color: ' . $group['color'] . '">' . $group['name'] . '</span>'), '</strong>', (!empty($group['desc']) ? '<br /><span class="smalltext">' . $group['desc'] . '</span>' : ''), '</label>
+							<label for="primary_', $group['id'], '">
+								<strong>', (empty($group['color']) ? $group['name'] : '<span style="color: ' . $group['color'] . '">' . $group['name'] . '</span>'), '</strong>', (!empty($group['desc']) ? '<br /><span class="smalltext">' . $group['desc'] . '</span>' : ''), '
+							</label>
 						</td>
 						<td class="grid17 righttext">';
 
 			// Can they leave their group?
 			if ($group['can_leave'])
 				echo '
-							<a href="' . $scripturl . '?action=profile;save;u=' . $context['id_member'] . ';area=groupmembership;' . $context['session_var'] . '=' . $context['session_id'] . ';gid=' . $group['id'] . ';', $context[$context['token_check'] . '_token_var'], '=', $context[$context['token_check'] . '_token'], '">' . $txt['leave_group'] . '</a>';
+							<a class="linkbutton" href="' . $scripturl . '?action=profile;save;u=' . $context['id_member'] . ';area=groupmembership;' . $context['session_var'] . '=' . $context['session_id'] . ';gid=' . $group['id'] . ';', $context[$context['token_check'] . '_token_var'], '=', $context[$context['token_check'] . '_token'], '">' . $txt['leave_group'] . '</a>';
 			echo '
 						</td>
 					</tr>';
@@ -920,7 +923,7 @@ function template_groupMembership()
 							', $txt['approval_pending'];
 				elseif ($group['type'] == 2)
 					echo '
-							<a class="linkbutton_right" href="', $scripturl, '?action=profile;u=', $context['id_member'], ';area=groupmembership;request=', $group['id'], '">', $txt['request_group'], '</a>';
+							<a class="linkbutton_right" href="', $scripturl, '?action=profile;u=', $context['id_member'], ';area=groupmembership;request=', $group['id'], ';', $context['session_var'], '=', $context['session_id'], '">', $txt['request_group'], '</a>';
 // @todo
 //				<input type="hidden" name="', $context[$context['token_check'] . '_token_var'], '" value="', $context[$context['token_check'] . '_token'], '" />';
 
@@ -953,6 +956,7 @@ function template_groupMembership()
 				<input type="hidden" name="', $context[$context['token_check'] . '_token_var'], '" value="', $context[$context['token_check'] . '_token'], '" />';
 
 	echo '
+				<input type="hidden" name="save" value="save" />
 				<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />
 				<input type="hidden" name="u" value="', $context['id_member'], '" />
 			</form>';
@@ -967,7 +971,7 @@ function template_ignoreboards()
 
 	// The main containing header.
 	echo '
-	<form id="creator" action="', $scripturl, '?action=profile;area=ignoreboards;save" method="post" accept-charset="UTF-8" name="creator">
+	<form id="creator" action="', $scripturl, '?action=profile;area=ignoreboards" method="post" accept-charset="UTF-8" name="creator">
 		<h2 class="category_header hdicon cat_img_profile">
 			', $txt['profile'], '
 		</h2>
@@ -980,6 +984,7 @@ function template_ignoreboards()
 	template_profile_save();
 
 	echo '
+			<input type="hidden" name="save" value="save" />
 		</div>
 	</form>
 	<br />';
@@ -1352,7 +1357,7 @@ function template_authentication_method()
 
 	// The main header!
 	echo '
-		<form action="', $scripturl, '?action=profile;area=authentication;save" method="post" accept-charset="UTF-8" name="creator" id="creator" enctype="multipart/form-data">
+		<form action="', $scripturl, '?action=profile;area=authentication" method="post" accept-charset="UTF-8" name="creator" id="creator" enctype="multipart/form-data">
 			<h2 class="category_header hdicon cat_img_profile">
 				', $txt['authentication'], '
 			</h2>
@@ -1406,6 +1411,7 @@ function template_authentication_method()
 	template_profile_save();
 
 	echo '
+				<input type="hidden" name="save" value="save" />
 			</div>
 		</form>';
 

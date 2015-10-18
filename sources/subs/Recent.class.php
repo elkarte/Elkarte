@@ -22,6 +22,7 @@ if (!defined('ELK'))
 
 /**
  * Recent Post Class, retrieve information about recent posts
+ *
  * This is used by Recent_Controller to retrieve the data
  * from the db, in particular by action_recent
  */

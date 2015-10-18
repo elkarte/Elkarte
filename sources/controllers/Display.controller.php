@@ -121,7 +121,7 @@ class Display_Controller extends Action_Controller
 		$includeUnapproved = !$modSettings['postmod_active'] || allowedTo('approve_posts');
 
 		// Let's do some work on what to search index.
-		if (count($this->_req->query) > 2)
+		if (count((array) $this->_req->query) > 2)
 		{
 			foreach ($this->_req->query as $k => $v)
 			{
