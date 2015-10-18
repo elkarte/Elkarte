@@ -42,4 +42,11 @@ abstract class Cache_Method_Abstract implements Cache_Method_Interface
 	{
 		return $key;
 	}
+
+	/**
+	 * {@inheritdoc }
+	 */
+	public static function settings(&$confing_vars)
+	{
+	}
 }
