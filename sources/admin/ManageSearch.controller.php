@@ -132,7 +132,7 @@ class ManageSearch_Controller extends Action_Controller
 		$config_vars = $this->_searchSettings->settings();
 
 		// Perhaps the search method wants to add some settings?
-		$search = new Search();
+		$search = new \ElkArte\Search\Search();
 		$searchAPI = $search->findSearchAPI();
 
 		if (is_callable(array($searchAPI, 'searchSettings')))
