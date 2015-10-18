@@ -1,4 +1,4 @@
-/**
+/*!
  * @license MIT
  * @fileOverview Favico animations
  * @author Miroslav Magda, http://blog.ejci.net

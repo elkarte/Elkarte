@@ -1,10 +1,12 @@
-/**
+/*!
  * @name      ElkArte Forum
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
  * @version 1.1 dev
- *
+ */
+
+/**
  * This file contains javascript associated with the mentioning function as it
  * relates to a plain text box (no sceditor invocation) eg quick reply no editor
  */
