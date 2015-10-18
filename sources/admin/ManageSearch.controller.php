@@ -46,6 +46,7 @@ class ManageSearch_Controller extends Action_Controller
 	public function pre_dispatch()
 	{
 		$this->_req = HttpReq::instance();
+		Elk_Autoloader::getInstance()->register(SUBSDIR . '/Search', '\\ElkArte\\Search');
 	}
 
 	/**
@@ -647,7 +648,6 @@ class ManageSearch_Controller extends Action_Controller
 		global $txt, $scripturl;
 
 		$apis = array();
-		Elk_Autoloader::getInstance()->register(SUBSDIR . '/Search', '\\ElkArte\\Search');
 
 		try
 		{
