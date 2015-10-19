@@ -164,7 +164,7 @@ class Search_Controller extends Action_Controller
 		if ($this->_search === null && isset($_REQUEST['params']))
 		{
 			Elk_Autoloader::getInstance()->register(SUBSDIR . '/Search', '\\ElkArte\\Search');
-			$this->_search = new Search();
+			$this->_search = new \ElkArte\Search\Search();
 			$this->_search->searchParamsFromString($_REQUEST['params']);
 
 			$context['search_params'] = $this->_search->getParams();
@@ -294,7 +294,7 @@ class Search_Controller extends Action_Controller
 		require_once(SUBSDIR . '/Package.subs.php');
 
 		Elk_Autoloader::getInstance()->register(SUBSDIR . '/Search', '\\ElkArte\\Search');
-		$this->_search = new Search();
+		$this->_search = new \ElkArte\Search\Search();
 
 		$this->_search->setWeights($this->_weight_factors, $this->_weight, $this->_weight_total);
 

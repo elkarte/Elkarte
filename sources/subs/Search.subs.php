@@ -17,7 +17,7 @@
  *
  */
 
-use ElkArte\Search\Search;
+use \ElkArte\Search\Search;
 
 if (!defined('ELK'))
 	die('No access...');
