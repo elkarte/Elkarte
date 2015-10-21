@@ -62,11 +62,21 @@ function previewPost()
 		'ns'
 	];
 
+	ilaAttach = "";
+	while (ilaElem = document.forms.postmodify.elements[ila++])
+	{
+		if (ilaElem.name == "attachment[]")
+			ilaAttach += ilaElem.value + ",";
+	}
+	if (ilaAttach != "")
+		ilaAttach = escape(ilaAttach.slice(0,-1));
+	ila = 0;
+
 	// Get the values from the form
 	var x = [];
 	x = getFields(textFields, numericFields, checkboxFields, form_name);
-
-	sendXMLDocument(elk_prepareScriptUrl(elk_scripturl) + 'action=post2' + (current_board ? ';board=' + current_board : '') + (make_poll ? ';poll' : '') + ';preview;' + elk_session_var + '=' + elk_session_id + ';xml', x.join('&'), onDocSent);
+alert(ilaAttach);
+	sendXMLDocument(elk_prepareScriptUrl(elk_scripturl) + 'action=post2' + (current_message ? ';msg=' + current_message : '') + (ilaAttach ? ';ila=' + ilaAttach : '') + (current_board ? ';board=' + current_board : '') + (make_poll ? ';poll' : '') + ';preview;xml', x.join('&'), onDocSent);
 
 	// Show the preview section and load it with "pending results" text, onDocSent will finish things off
 	document.getElementById('preview_section').style.display = 'block';

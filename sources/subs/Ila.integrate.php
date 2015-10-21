@@ -82,6 +82,13 @@ class Ila_Integrate
 			))
 		);
 
+		addJavascriptVar(array(
+			'current_message' => empty($_REQUEST['msg']) ? 'null' : (int) $_REQUEST['msg'],
+			'ilaAttach' => '""',
+			'ilaElem' => 'null',
+			'ila' => '0',
+		));
+
 		return;
 	}
 
