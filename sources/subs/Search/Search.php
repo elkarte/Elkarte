@@ -754,7 +754,7 @@ class Search
 			elseif (pspell_check($pspell_link, $word))
 			{
 				$did_you_mean['search'][] = $word;
-				$did_you_mean['display'][] = Util::htmlspecialchars($word);
+				$did_you_mean['display'][] = \Util::htmlspecialchars($word);
 				continue;
 			}
 
