@@ -195,7 +195,7 @@ class Sphinx_Search extends SearchAPI
 			require_once(SOURCEDIR . '/sphinxapi.php');
 
 			// Create an instance of the sphinx client and set a few options.
-			$mySphinx = new SphinxClient();
+			$mySphinx = new \SphinxClient();
 			$mySphinx->SetServer($modSettings['sphinx_searchd_server'], (int) $modSettings['sphinx_searchd_port']);
 			$mySphinx->SetLimits(0, (int) $modSettings['sphinx_max_results'], (int) $modSettings['sphinx_max_results']);
 

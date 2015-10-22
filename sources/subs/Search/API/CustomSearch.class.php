@@ -191,7 +191,7 @@ class Custom_Search extends SearchAPI
 		{
 			foreach ($subwords as $subword)
 			{
-				if (Util::strlen($subword) >= $this->min_word_length && !in_array($subword, $this->bannedWords))
+				if (\Util::strlen($subword) >= $this->min_word_length && !in_array($subword, $this->bannedWords))
 				{
 					$wordsSearch['indexed_words'][] = $subword;
 					if ($isExcluded)

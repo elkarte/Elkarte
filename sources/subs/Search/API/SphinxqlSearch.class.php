@@ -398,7 +398,7 @@ class Sphinxql_Search extends SearchAPI
 		$string = html_entity_decode($string, ENT_QUOTES, 'UTF-8');
 
 		// Lowercase string
-		$string = Util::strtolower($string);
+		$string = \Util::strtolower($string);
 
 		// Fix numbers so they search easier (phone numbers, SSN, dates, etc)
 		$string = preg_replace('~([[:digit:]]+)\pP+(?=[[:digit:]])~u', '', $string);
