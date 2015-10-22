@@ -1,4 +1,4 @@
-/**
+/*!
  * @name      ElkArte Forum
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
@@ -10,7 +10,9 @@
  * license:		BSD, See included LICENSE.TXT for terms and conditions.
  *
  * @version 1.1 dev
- *
+ */
+
+/**
  * This file contains javascript associated with the topic viewing including
  * Quick Modify, Quick Reply, In Topic Moderation, thumbnail expansion etc
  */
@@ -1166,7 +1168,9 @@ function onTopicSplitReceived(XMLDoc)
 		curList,
 		newItem,
 		sInsertBeforeId,
-		oListItems;
+		oListItems,
+		right_arrow = '<i class="fa fa-2x fa-arrow-circle-o-right"></i>',
+		left_arrow = '<i class="fa fa-2x fa-arrow-circle-o-left"></i>';
 
 	// Loop through all of the changes returned in the xml response
 	for (i = 0; i < numChanges; i++)
@@ -1202,13 +1206,13 @@ function onTopicSplitReceived(XMLDoc)
 
 			// Let's create a nice container for the message.
 			newItem = document.createElement("li");
-			newItem.className = "content";
+			newItem.className = "";
 			newItem.id = curSection + "_" + curId;
 			newItem.innerHTML = '' +
 				'<div class="content">' +
 					'<div class="message_header">' +
 						'<a class="split_icon float' + (curSection === "selected" ? "left" : "right") + '" href="' + elk_prepareScriptUrl(elk_scripturl) + 'action=splittopics;sa=selectTopics;subname=' + topic_subject + ';topic=' + topic_id + '.' + not_selected_start + ';start2=' + selected_start + ';move=' + (curSection === "selected" ? "up" : "down") + ';msg=' + curId + '" onclick="return topicSplitselect(\'' + (curSection === "selected" ? 'up' : 'down') + '\', ' + curId + ');">' +
-							'<img src="' + images_url + '/split_' + (curSection === "selected" ? "de" : "") + 'select.png" alt="' + (curSection === "selected" ? "&lt;-" : "-&gt;") + '" />' +
+							(curSection === "selected" ? left_arrow : right_arrow) +
 						'</a>' +
 						'<strong>' + curChange.getElementsByTagName("subject")[0].firstChild.nodeValue + '</strong> ' + txt_by + ' <strong>' + curChange.getElementsByTagName("poster")[0].firstChild.nodeValue + '</strong>' +
 						'<br />' +
@@ -1224,8 +1228,4 @@ function onTopicSplitReceived(XMLDoc)
 				curList.appendChild(newItem);
 		}
 	}
-
-	// After all changes, make sure the window backgrounds are still correct for both lists.
-	applyWindowClasses(document.getElementById("messages_selected"));
-	applyWindowClasses(document.getElementById("messages_not_selected"));
 }

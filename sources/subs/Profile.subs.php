@@ -61,6 +61,7 @@ function currentMemberID($fatal = true, $reload_id = false)
 
 	// If all went well, we have a valid member ID!
 	list ($memID) = $memberResult;
+
 	return $memID;
 }
 
@@ -282,7 +283,7 @@ function loadCustomFields($memID, $area = 'summary', array $custom_fields = arra
 		$context['custom_fields'][] = array(
 			'name' => $row['field_name'],
 			'desc' => $row['field_desc'],
-			'type' => $row['field_type'],
+			'field_type' => $row['field_type'],
 			'input_html' => $input_html,
 			'output_html' => $output_html,
 			'placement' => $row['placement'],
@@ -291,7 +292,6 @@ function loadCustomFields($memID, $area = 'summary', array $custom_fields = arra
 			'show_reg' => $row['show_reg'],
 			'field_length' => $row['field_length'],
 			'mask' => $row['mask'],
-			'show_reg' => $row['show_reg'],
 		);
 		$context['custom_fields_required'] = $context['custom_fields_required'] || $row['show_reg'];
 	}
@@ -334,7 +334,7 @@ function loadProfileFields($force_reload = false)
 	 * int $size:           Optional size for a text area.
 	 * array $input_attr:   An array of text strings to be added to the input box for this item.
 	 * string $value:       The value of the item. If not set $cur_profile[$key] is assumed.
-	 * string $permission:  Permission required for this item (Excluded _any/_own subfix which is applied automatically).
+	 * string $permission:  Permission required for this item (Excluded _any/_own suffix which is applied automatically).
 	 * func $input_validate: A runtime function which validates the element before going to the database. It is passed
 	 *                       the relevant $_POST element if it exists and should be treated like a reference.
 	 *
@@ -347,12 +347,12 @@ function loadProfileFields($force_reload = false)
 	 *                    true to be displayed at all.
 	 *
 	 * string $cast_type: If set casts the element to a certain type. Valid types (bool, int, float).
-	 * string $save_key:  If the index of this element isn't the database column name it can be overriden with this string.
+	 * string $save_key:  If the index of this element isn't the database column name it can be overridden with this string.
 	 * bool $is_dummy:    If set then nothing is acted upon for this element.
 	 * bool $enabled:     A test to determine whether this is even available - if not is unset.
 	 * string $link_with: Key which links this field to an overall set.
 	 *
-	 * string $js_submit: javascript to add insisde the function checkProfileSubmit() in the template
+	 * string $js_submit: javascript to add inside the function checkProfileSubmit() in the template
 	 * string $js:        javascript to add to the page in general
 	 * string $js_load:   filename of js to be loaded with loadJavasciptFile
 	 *
@@ -376,7 +376,7 @@ function loadProfileFields($force_reload = false)
 			'preload' => function () {
 				global $cur_profile, $context;
 
-				// Split up the birthdate....
+				// Split up the birth date....
 				list ($uyear, $umonth, $uday) = explode('-', empty($cur_profile['birthdate']) || $cur_profile['birthdate'] == '0001-01-01' ? '0000-00-00' : $cur_profile['birthdate']);
 				$context['member']['birth_date'] = array(
 					'year' => $uyear == '0004' ? '0000' : $uyear,
@@ -405,7 +405,7 @@ function loadProfileFields($force_reload = false)
 				return false;
 			},
 		),
-		// Setting the birthdate the old style way?
+		// Setting the birth date the old style way?
 		'birthdate' => array(
 			'type' => 'hidden',
 			'permission' => 'profile_extra',
@@ -463,7 +463,7 @@ function loadProfileFields($force_reload = false)
 
 				$isValid = profileValidateEmail($value, $context['id_member']);
 
-				// Do they need to revalidate? If so schedule the function!
+				// Do they need to re-validate? If so schedule the function!
 				if ($isValid === true && !empty($modSettings['send_validation_onChange']) && !allowedTo('moderate_forum'))
 				{
 					require_once(SUBSDIR . '/Auth.subs.php');
@@ -701,7 +701,7 @@ function loadProfileFields($force_reload = false)
 			'enabled' => empty($cur_profile['openid_uri']),
 			'size' => 20,
 			'value' => empty($cur_profile['otp_secret']) ? '' : $cur_profile['otp_secret'],
-			'postinput' => '<div style="display: inline-block"><input type="button" value="' . $txt['otp_generate'] . '" onclick="generateSecret();"></div><div id="qrcode"></div>',
+			'postinput' => '<div style="display: inline-block;"><input type="button" value="' . $txt['otp_generate'] . '" onclick="generateSecret();"></div><div id="qrcode"></div>',
 			'permission' => 'profile_identity',
 		),
 		'personal_text' => array(
@@ -1237,7 +1237,7 @@ function saveProfileChanges(&$profile_vars, $memID)
 	if (isset($_POST['sa']) && $_POST['sa'] == 'ignoreboards' && empty($_POST['ignore_brd']))
 		$_POST['ignore_brd'] = array();
 
-	// Whatever it is set to is a dirty fithy thing.  Kinda like our minds.
+	// Whatever it is set to is a dirty filthy thing.  Kinda like our minds.
 	unset($_POST['ignore_boards']);
 
 	if (isset($_POST['ignore_brd']))
@@ -1524,7 +1524,7 @@ function makeCustomFieldChanges($memID, $area, $sanitize = true)
 			- The user is NOT an admin.
 			- The data is not freely viewable and editable by users.
 			- The data is not invisible to users but editable by the owner (or if it is the user is not the owner)
-			- The area isn't registration, and if it is that the field is not suppossed to be shown there.
+			- The area isn't registration, and if it is that the field is not supposed to be shown there.
 		*/
 		if ($row['private'] != 0 && !allowedTo('admin_forum') && ($memID != $user_info['id'] || $row['private'] != 2) && ($area != 'register' || $row['show_reg'] == 0))
 			continue;
@@ -1649,9 +1649,9 @@ function profileSendActivation()
 		return;
 
 	$replacements = array(
-		'ACTIVATIONLINK' => $scripturl . '?action=activate;u=' . $context['id_member'] . ';code=' . $profile_vars['validation_code'],
+		'ACTIVATIONLINK' => $scripturl . '?action=register;sa=activate;u=' . $context['id_member'] . ';code=' . $profile_vars['validation_code'],
 		'ACTIVATIONCODE' => $profile_vars['validation_code'],
-		'ACTIVATIONLINKWITHOUTCODE' => $scripturl . '?action=activate;u=' . $context['id_member'],
+		'ACTIVATIONLINKWITHOUTCODE' => $scripturl . '?action=register;sa=activate;u=' . $context['id_member'],
 	);
 
 	// Send off the email.
@@ -2498,9 +2498,9 @@ function profileSaveGroups(&$value)
  * Get the data about a users warnings.
  * Returns an array of them
  *
- * @param int $start
- * @param int $items_per_page
- * @param string $sort
+ * @param int $start The item to start with (for pagination purposes)
+ * @param int $items_per_page  The number of items to show per page
+ * @param string $sort A string indicating how to sort the results
  * @param int $memID the member ID
  */
 function list_getUserWarnings($start, $items_per_page, $sort, $memID)
@@ -2574,9 +2574,9 @@ function list_getUserWarningCount($memID)
  * Get a list of attachments for this user
  * (used by createList() callback and others)
  *
- * @param int $start
- * @param int $items_per_page
- * @param string $sort
+ * @param int $start The item to start with (for pagination purposes)
+ * @param int $items_per_page  The number of items to show per page
+ * @param string $sort A string indicating how to sort the results
  * @param int[] $boardsAllowed
  * @param integer $memID
  * @param int[]|null|boolean $exclude_boards
@@ -2697,9 +2697,9 @@ function getNumAttachments($boardsAllowed, $memID)
  * Get the relevant topics in the unwatched list
  * (used by createList() callbacks)
  *
- * @param int $start
- * @param int $items_per_page
- * @param string $sort
+ * @param int $start The item to start with (for pagination purposes)
+ * @param int $items_per_page  The number of items to show per page
+ * @param string $sort A string indicating how to sort the results
  * @param int $memID
  */
 function getUnwatchedBy($start, $items_per_page, $sort, $memID)
@@ -3332,7 +3332,7 @@ function getMembersInRange($ips, $memID)
  * Used in the profile page to load the defaults and validate the new
  * settings.
  *
- * @param int $memID the id of a member
+ * @param int $member_id the id of a member
  */
 function getMemberNotificationsProfile($member_id)
 {

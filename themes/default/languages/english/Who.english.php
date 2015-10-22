@@ -46,7 +46,6 @@ $txt['whoall_openidreturn'] = 'Logging in using OpenID.';
 $txt['whoall_quickmod'] = 'Moderating a board.';
 $txt['whoall_recent'] = 'Viewing a <a href="{recent_url}">list of recent topics</a>.';
 $txt['whoall_register'] = 'Registering for an account on the forum.';
-$txt['whoall_register2'] = 'Registering for an account on the forum.';
 $txt['whoall_reminder'] = 'Requesting a password reminder.';
 $txt['whoall_reporttm'] = 'Reporting a topic to a moderator.';
 $txt['whoall_spellcheck'] = 'Using the spellchecker';

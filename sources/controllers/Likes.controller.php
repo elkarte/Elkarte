@@ -582,9 +582,9 @@ class Likes_Controller extends Action_Controller
 	 * Callback for createList()
 	 * Returns a list of liked posts for a member
 	 *
-	 * @param int $start
-	 * @param int $items_per_page
-	 * @param string $sort
+	 * @param int $start The item to start with (for pagination purposes)
+	 * @param int $items_per_page  The number of items to show per page
+	 * @param string $sort A string indicating how to sort the results
 	 * @param int $memberID
 	 */
 	public function list_loadLikesPosts($start, $items_per_page, $sort, $memberID)
@@ -597,9 +597,9 @@ class Likes_Controller extends Action_Controller
 	 * Callback for createList()
 	 * Returns a list of received likes based on posts
 	 *
-	 * @param int $start
-	 * @param int $items_per_page
-	 * @param string $sort
+	 * @param int $start The item to start with (for pagination purposes)
+	 * @param int $items_per_page  The number of items to show per page
+	 * @param string $sort A string indicating how to sort the results
 	 * @param int $memberID
 	 */
 	public function list_loadLikesReceived($start, $items_per_page, $sort, $memberID)
@@ -612,9 +612,9 @@ class Likes_Controller extends Action_Controller
 	 * Callback for createList()
 	 * Returns a list of members that liked a post
 	 *
-	 * @param int $start
-	 * @param int $items_per_page
-	 * @param string $sort
+	 * @param int $start The item to start with (for pagination purposes)
+	 * @param int $items_per_page  The number of items to show per page
+	 * @param string $sort A string indicating how to sort the results
 	 * @param int $messageID
 	 */
 	public function list_loadPostLikers($start, $items_per_page, $sort, $messageID)

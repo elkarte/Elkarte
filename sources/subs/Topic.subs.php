@@ -897,31 +897,36 @@ function moveTopicConcurrence($move_from = null, $id_board = null, $id_topic = n
 }
 
 /**
- * Try to determine if the topic has already been deleted by another user.
- */
+ * Determine if the topic has already been deleted by another user.
+ *
+ * What it does:
+ *  - If the topic has been removed and resides in the recycle bin, present confirm dialog
+ *  - If recycling is not enabled, or user confirms or topic is not in recycle simply returns
+  */
 function removeDeleteConcurrence()
 {
 	global $modSettings, $board, $scripturl, $context;
 
-	// No recycle no need to go further
-	if (empty($modSettings['recycle_enable']) || empty($modSettings['recycle_board']))
-		return false;
+	$recycled_enabled = !empty($modSettings['recycle_enable']) && !empty($modSettings['recycle_board']);
 
-	// If it's confirmed go on and delete (from recycle)
-	if (isset($_GET['confirm_delete']))
-		return true;
+	if ($recycled_enabled && !empty($board))
+	{
+		// Trying to removed from the recycle bin
+		if (!isset($_GET['confirm_delete']) && $modSettings['recycle_board'] == $board)
+		{
+			if (isset($_REQUEST['msg']))
+			{
+				$confirm_url = $scripturl . '?action=deletemsg;confirm_delete;topic=' . $context['current_topic'] . '.0;msg=' . $_REQUEST['msg'] . ';' . $context['session_var'] . '=' . $context['session_id'];
+			}
+			else
+			{
+				$confirm_url = $scripturl . '?action=removetopic2;confirm_delete;topic=' . $context['current_topic'] . '.0;' . $context['session_var'] . '=' . $context['session_id'];
+			}
 
-	if (empty($board))
-		return false;
-
-	if ($modSettings['recycle_board'] != $board)
-		return true;
-	elseif (isset($_REQUEST['msg']))
-		$confirm_url = $scripturl . '?action=deletemsg;confirm_delete;topic=' . $context['current_topic'] . '.0;msg=' . $_REQUEST['msg'] . ';' . $context['session_var'] . '=' . $context['session_id'];
-	else
-		$confirm_url = $scripturl . '?action=removetopic2;confirm_delete;topic=' . $context['current_topic'] . '.0;' . $context['session_var'] . '=' . $context['session_id'];
-
-		Errors::instance()->fatal_lang_error('post_already_deleted', false, array($confirm_url));
+			// Give them a prompt before we remove the message
+			Errors::instance()->fatal_lang_error('post_already_deleted', false, array($confirm_url));
+		}
+	}
 }
 
 /**
@@ -1572,12 +1577,12 @@ function countMessagesBefore($id_topic, $id_msg, $include_current = false, $only
  * Select a part of the messages in a topic.
  *
  * @param int $topic
- * @param int $start
- * @param int $per_page
+ * @param int $start The item to start with (for pagination purposes)
+ * @param int $items_per_page  The number of items to show per page
  * @param mixed[] $messages
  * @param bool $only_approved
  */
-function selectMessages($topic, $start, $per_page, $messages = array(), $only_approved = false)
+function selectMessages($topic, $start, $items_per_page, $messages = array(), $only_approved = false)
 {
 	$db = database();
 
@@ -1600,7 +1605,7 @@ function selectMessages($topic, $start, $per_page, $messages = array(), $only_ap
 			'split_msgs' => !empty($messages['included']) ? $messages['included'] : array(),
 			'is_approved' => 1,
 			'start' => $start,
-			'messages_per_page' => $per_page,
+			'messages_per_page' => $items_per_page,
 			'msg_before' => !empty($messages['before']) ? (int) $messages['before'] : 0,
 			'msg_after' => !empty($messages['after']) ? (int) $messages['after'] : 0,
 		)
@@ -2258,8 +2263,8 @@ function approveTopics($topics, $approve = true, $log = false)
 			SELECT t.id_topic, t.id_member_started, m.subject
 			FROM {db_prefix}topics as t
 				LEFT JOIN {db_prefix}messages AS m ON (t.id_first_msg = m.id_msg)
-			WHERE id_topic IN ({array_int:approve_topic_ids})
-				AND approved = {int:approve_type}
+			WHERE t.id_topic IN ({array_int:approve_topic_ids})
+				AND t.approved = {int:approve_type}
 			LIMIT ' . count($topics),
 			array(
 				'approve_topic_ids' => $topics,
@@ -2734,9 +2739,9 @@ function topicNotificationCount($memID)
  * Retrieve all topic notifications for the given user.
  * (used by createList() callbacks)
  *
- * @param int $start
- * @param int $items_per_page
- * @param string $sort
+ * @param int $start The item to start with (for pagination purposes)
+ * @param int $items_per_page  The number of items to show per page
+ * @param string $sort A string indicating how to sort the results
  * @param int $memID id_member
  * @return array
  */

@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Handles Post Moderation approvals and unapprovals
+ * Handles Post Moderation approvals and un-approvals
  *
  * @name      ElkArte Forum
  * @copyright ElkArte Forum contributors
@@ -21,14 +21,35 @@ if (!defined('ELK'))
 	die('No access...');
 
 /**
- * PostModeration Controller handles post moderation actions. (approvals, unapprovals)
+ * PostModeration Controller handles post moderation actions. (approvals, unapproved)
  */
 class PostModeration_Controller extends Action_Controller
 {
 	/**
+	 * Holds instance of HttpReq object
+	 * @var HttpReq
+	 */
+	private $_req;
+
+	/**
+	 * Holds any passed brd values, used for filtering and the like
+	 * @var array|null
+	 */
+	private $_brd = null;
+
+	/**
+	 * Called before all other methods when coming from the dispatcher or
+	 * action class.
+	 */
+	public function pre_dispatch()
+	{
+		$this->_req = HttpReq::instance();
+	}
+
+	/**
 	 * This is the entry point for all things post moderation.
 	 *
-	 * @uses ModerationCenter template
+	 * @uses ModerationCenter.template
 	 * @uses ModerationCenter language file
 	 * @see Action_Controller::action_index()
 	 */
@@ -59,18 +80,20 @@ class PostModeration_Controller extends Action_Controller
 	{
 		global $txt, $scripturl, $context, $user_info;
 
-		$context['current_view'] = isset($_GET['sa']) && $_GET['sa'] == 'topics' ? 'topics' : 'replies';
+		$context['current_view'] = $this->_req->getQuery('sa', 'trim', '') === 'topics' ? 'topics' : 'replies';
 		$context['page_title'] = $txt['mc_unapproved_posts'];
-		$context['header_title'] = $txt['mc_' . ($context['current_view'] == 'topics' ? 'topics' : 'posts')];
+		$context['header_title'] = $txt['mc_' . ($context['current_view'] === 'topics' ? 'topics' : 'posts')];
 
 		// Work out what boards we can work in!
 		$approve_boards = !empty($user_info['mod_cache']['ap']) ? $user_info['mod_cache']['ap'] : boardsAllowedTo('approve_posts');
 
+		$this->_brd = $this->_req->getPost('brd', 'intval', $this->_req->getQuery('brd', 'intval', null));
+
 		// If we filtered by board remove ones outside of this board.
 		// @todo Put a message saying we're filtered?
-		if (isset($_REQUEST['brd']))
+		if (isset($this->_brd))
 		{
-			$filter_board = array((int) $_REQUEST['brd']);
+			$filter_board = array($this->_brd);
 			$approve_boards = $approve_boards == array(0) ? $filter_board : array_intersect($approve_boards, $filter_board);
 		}
 
@@ -83,7 +106,7 @@ class PostModeration_Controller extends Action_Controller
 			$approve_query = ' AND 1=0';
 
 		// We also need to know where we can delete topics and/or replies to.
-		if ($context['current_view'] == 'topics')
+		if ($context['current_view'] === 'topics')
 		{
 			$delete_own_boards = boardsAllowedTo('remove_own');
 			$delete_any_boards = boardsAllowedTo('remove_any');
@@ -96,22 +119,23 @@ class PostModeration_Controller extends Action_Controller
 			$delete_own_replies = boardsAllowedTo('delete_own_replies');
 		}
 
+		// No action yet
 		$toAction = array();
+
 		// Check if we have something to do?
-		if (isset($_GET['approve']))
-			$toAction[] = (int) $_GET['approve'];
+		if (isset($this->_req->query->approve))
+			$toAction[] = (int) $this->_req->query->approve;
 		// Just a deletion?
-		elseif (isset($_GET['delete']))
-			$toAction[] = (int) $_GET['delete'];
+		elseif (isset($this->_req->query->delete))
+			$toAction[] = (int) $this->_req->query->delete;
 		// Lots of approvals?
-		elseif (isset($_POST['item']))
-			foreach ($_POST['item'] as $item)
-				$toAction[] = (int) $item;
+		elseif (isset($this->_req->post->item))
+			$toAction = array_map('intval', $this->_req->post->item);
 
 		// What are we actually doing.
-		if (isset($_GET['approve']) || (isset($_POST['do']) && $_POST['do'] == 'approve'))
+		if (isset($this->_req->query->approve) || (isset($this->_req->post->do) && $this->_req->post->do === 'approve'))
 			$curAction = 'approve';
-		elseif (isset($_GET['delete']) || (isset($_POST['do']) && $_POST['do'] == 'delete'))
+		elseif (isset($this->_req->query->delete) || (isset($this->_req->post->do) && $this->_req->post->do === 'delete'))
 			$curAction = 'delete';
 
 		// Right, so we have something to do?
@@ -123,7 +147,7 @@ class PostModeration_Controller extends Action_Controller
 			require_once(SUBSDIR . '/Messages.subs.php');
 
 			// Handy shortcut.
-			$any_array = $curAction == 'approve' ? $approve_boards : $delete_any_boards;
+			$any_array = $curAction === 'approve' ? $approve_boards : $delete_any_boards;
 
 			// Now for each message work out whether it's actually a topic, and what board it's on.
 			$request = loadMessageDetails(
@@ -147,16 +171,16 @@ class PostModeration_Controller extends Action_Controller
 			foreach ($request as $row)
 			{
 				// If it's not within what our view is ignore it...
-				if (($row['id_msg'] == $row['id_first_msg'] && $context['current_view'] != 'topics') || ($row['id_msg'] != $row['id_first_msg'] && $context['current_view'] != 'replies'))
+				if (($row['id_msg'] == $row['id_first_msg'] && $context['current_view'] !== 'topics') || ($row['id_msg'] != $row['id_first_msg'] && $context['current_view'] !== 'replies'))
 					continue;
 
 				$can_add = false;
 
 				// If we're approving this is simple.
-				if ($curAction == 'approve' && ($any_array == array(0) || in_array($row['id_board'], $any_array)))
+				if ($curAction === 'approve' && ($any_array == array(0) || in_array($row['id_board'], $any_array)))
 					$can_add = true;
 				// Delete requires more permission checks...
-				elseif ($curAction == 'delete')
+				elseif ($curAction === 'delete')
 				{
 					// Own post is easy!
 					if ($row['id_member'] == $user_info['id'] && ($delete_own_boards == array(0) || in_array($row['id_board'], $delete_own_boards)))
@@ -171,14 +195,14 @@ class PostModeration_Controller extends Action_Controller
 
 				if ($can_add)
 				{
-					$anItem = $context['current_view'] == 'topics' ? $row['id_topic'] : $row['id_msg'];
+					$anItem = $context['current_view'] === 'topics' ? $row['id_topic'] : $row['id_msg'];
 					$toAction[] = $anItem;
 
 					// All clear. What have we got now, what, what?
 					$details[$anItem] = array();
 					$details[$anItem]['subject'] = $row['subject'];
 					$details[$anItem]['topic'] = $row['id_topic'];
-					$details[$anItem]['member'] = ($context['current_view'] == 'topics') ? $row['id_member_started'] : $row['id_member'];
+					$details[$anItem]['member'] = ($context['current_view'] === 'topics') ? $row['id_member_started'] : $row['id_member'];
 					$details[$anItem]['board'] = $row['id_board'];
 				}
 			}
@@ -186,7 +210,7 @@ class PostModeration_Controller extends Action_Controller
 			// If we have anything left we can actually do the approving (etc).
 			if (!empty($toAction))
 			{
-				if ($curAction == 'approve')
+				if ($curAction === 'approve')
 					approveMessages($toAction, $details, $context['current_view']);
 				else
 					removeMessages($toAction, $details, $context['current_view']);
@@ -196,14 +220,13 @@ class PostModeration_Controller extends Action_Controller
 		}
 
 		// Get the moderation values for the board level
-		$brd = isset($_REQUEST['brd']) ? (int) $_REQUEST['brd'] : null;
 		require_once(SUBSDIR . '/Moderation.subs.php');
-		$mod_count = loadModeratorMenuCounts($brd);
+		$mod_count = loadModeratorMenuCounts($this->_brd);
 
 		$context['total_unapproved_topics'] = $mod_count['topics'];
 		$context['total_unapproved_posts'] = $mod_count['posts'];
-		$context['page_index'] = constructPageIndex($scripturl . '?action=moderate;area=postmod;sa=' . $context['current_view'] . (isset($_REQUEST['brd']) ? ';brd=' . (int) $_REQUEST['brd'] : ''), $_GET['start'], $context['current_view'] == 'topics' ? $context['total_unapproved_topics'] : $context['total_unapproved_posts'], 10);
-		$context['start'] = $_GET['start'];
+		$context['page_index'] = constructPageIndex($scripturl . '?action=moderate;area=postmod;sa=' . $context['current_view'] . (isset($this->_brd) ? ';brd=' . $this->_brd : ''), $this->_req->query->start, $context['current_view'] === 'topics' ? $context['total_unapproved_topics'] : $context['total_unapproved_posts'], 10);
+		$context['start'] = $this->_req->query->start;
 
 		// We have enough to make some pretty tabs!
 		$context[$context['moderation_menu_name']]['tab_data'] = array(
@@ -217,10 +240,10 @@ class PostModeration_Controller extends Action_Controller
 		$context['menu_data_' . $context['moderation_menu_id']]['sections']['posts']['areas']['postmod']['subsections']['topics']['label'] = $context['menu_data_' . $context['moderation_menu_id']]['sections']['posts']['areas']['postmod']['subsections']['topics']['label']. ' [' . $context['total_unapproved_topics'] . ']';
 
 		// If we are filtering some boards out then make sure to send that along with the links.
-		if (isset($_REQUEST['brd']))
+		if (isset($this->_brd))
 		{
-			$context['menu_data_' . $context['moderation_menu_id']]['sections']['posts']['areas']['postmod']['subsections']['posts']['add_params'] = ';brd=' . (int) $_REQUEST['brd'];
-			$context['menu_data_' . $context['moderation_menu_id']]['sections']['posts']['areas']['postmod']['subsections']['topics']['add_params'] = ';brd=' . (int) $_REQUEST['brd'];
+			$context['menu_data_' . $context['moderation_menu_id']]['sections']['posts']['areas']['postmod']['subsections']['posts']['add_params'] = ';brd=' . $this->_brd;
+			$context['menu_data_' . $context['moderation_menu_id']]['sections']['posts']['areas']['postmod']['subsections']['topics']['add_params'] = ';brd=' . $this->_brd;
 		}
 
 		// Get all unapproved posts.
@@ -277,20 +300,20 @@ class PostModeration_Controller extends Action_Controller
 
 		// Get together the array of things to act on, if any.
 		$attachments = array();
-		if (isset($_GET['approve']))
-			$attachments[] = (int) $_GET['approve'];
-		elseif (isset($_GET['delete']))
-			$attachments[] = (int) $_GET['delete'];
-		elseif (isset($_POST['item']))
+		if (isset($this->_req->query->approve))
+			$attachments[] = (int) $this->_req->query->approve;
+		elseif (isset($this->_req->query->delete))
+			$attachments[] = (int) $this->_req->query->delete;
+		elseif (isset($this->_req->post->item))
 		{
-			foreach ($_POST['item'] as $item)
+			foreach ($this->_req->post->item as $item)
 				$attachments[] = (int) $item;
 		}
 
 		// Are we approving or deleting?
-		if (isset($_GET['approve']) || (isset($_POST['do']) && $_POST['do'] == 'approve'))
+		if (isset($this->_req->query->approve) || (isset($this->_req->post->do) && $this->_req->post->do === 'approve'))
 			$curAction = 'approve';
-		elseif (isset($_GET['delete']) || (isset($_POST['do']) && $_POST['do'] == 'delete'))
+		elseif (isset($this->_req->query->delete) || (isset($this->_req->post->do) && $this->_req->post->do === 'delete'))
 			$curAction = 'delete';
 
 		// Something to do, let's do it!
@@ -307,7 +330,7 @@ class PostModeration_Controller extends Action_Controller
 			// Assuming it wasn't all like, proper illegal, we can do the approving.
 			if (!empty($attachments))
 			{
-				if ($curAction == 'approve')
+				if ($curAction === 'approve')
 					approveAttachments($attachments);
 				else
 					removeAttachments(array('id_attach' => $attachments, 'do_logging' => true));
@@ -463,7 +486,7 @@ class PostModeration_Controller extends Action_Controller
 	}
 
 	/**
-	 * Approve a post, just the one.
+	 * Approve or un-approve a post just the one or a topic if its the first post
 	 */
 	public function action_approve()
 	{
@@ -471,7 +494,7 @@ class PostModeration_Controller extends Action_Controller
 
 		checkSession('get');
 
-		$current_msg = (int) $_REQUEST['msg'];
+		$current_msg = $this->_req->getQuery('msg', 'intval', 0);
 
 		require_once(SUBSDIR . '/Topic.subs.php');
 		require_once(SUBSDIR . '/Post.subs.php');

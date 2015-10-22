@@ -28,15 +28,15 @@ if (!defined('ELK'))
  * respectively removing your own account or any account.
  * - Non-admins cannot delete admins.
  *
- * The function:
- * - changes author of messages, topics and polls to guest authors.
- * - removes all log entries concerning the deleted members, except the
+ * What id does
+ * - Changes author of messages, topics and polls to guest authors.
+ * - Removes all log entries concerning the deleted members, except the
  * error logs, ban logs and moderation logs.
- * - removes these members' personal messages (only the inbox)
- * - rmoves avatars, ban entries, theme settings, moderator positions, poll votes,
+ * - Removes these members' personal messages (only the inbox)
+ * - Removes avatars, ban entries, theme settings, moderator positions, poll votes,
  * likes, mentions, notifications
- * - removes custom field data associated with them
- * - updates member statistics afterwards.
+ * - Removes custom field data associated with them
+ * - Updates member statistics afterwards.
  *
  * @package Members
  * @param int[]|int $users
@@ -110,7 +110,7 @@ function deleteMembers($users, $check_not_admin = false)
 	if (empty($user_log_details))
 		return;
 
-	// Make sure they aren't trying to delete administrators if they aren't one.  But don't bother checking if it's just themself.
+	// Make sure they aren't trying to delete administrators if they aren't one.  But don't bother checking if it's just themselves.
 	if (!empty($admins) && ($check_not_admin || (!allowedTo('admin_forum') && (count($users) != 1 || $users[0] != $user_info['id']))))
 	{
 		$users = array_diff($users, $admins);
@@ -466,7 +466,7 @@ function deleteMembers($users, $check_not_admin = false)
  */
 function registerMember(&$regOptions, $error_context = 'register')
 {
-	global $scripturl, $txt, $modSettings, $user_info;
+	global $scripturl, $txt, $modSettings;
 
 	$db = database();
 
@@ -564,12 +564,14 @@ function registerMember(&$regOptions, $error_context = 'register')
 	if (isset($regOptions['theme_vars']) && count(array_intersect(array_keys($regOptions['theme_vars']), $reservedVars)) != 0)
 		Errors::instance()->fatal_lang_error('no_theme');
 
+	$tokenizer = new Token_Hash();
+
 	// Some of these might be overwritten. (the lower ones that are in the arrays below.)
 	$regOptions['register_vars'] = array(
 		'member_name' => $regOptions['username'],
 		'email_address' => $regOptions['email'],
 		'passwd' => validateLoginPassword($regOptions['password'], '', $regOptions['username'], true),
-		'password_salt' => substr(md5(mt_rand()), 0, 4) ,
+		'password_salt' => $tokenizer->generate_hash(4),
 		'posts' => 0,
 		'date_registered' => !empty($regOptions['time']) ? $regOptions['time'] : time(),
 		'member_ip' => $regOptions['interface'] == 'admin' ? '127.0.0.1' : $regOptions['ip'],
@@ -712,11 +714,11 @@ function registerMember(&$regOptions, $error_context = 'register')
 		'USERNAME' => $regOptions['username'],
 		'PASSWORD' => $regOptions['password'],
 		'FORGOTPASSWORDLINK' => $scripturl . '?action=reminder',
-		'ACTIVATIONLINK' => $scripturl . '?action=activate;u=' . $memberID . ';code=' . $validation_code,
-		'ACTIVATIONLINKWITHOUTCODE' => $scripturl . '?action=activate;u=' . $memberID,
+		'ACTIVATIONLINK' => $scripturl . '?action=register;sa=activate;u=' . $memberID . ';code=' . $validation_code,
+		'ACTIVATIONLINKWITHOUTCODE' => $scripturl . '?action=register;sa=activate;u=' . $memberID,
 		'ACTIVATIONCODE' => $validation_code,
 		'OPENID' => !empty($regOptions['openid']) ? $regOptions['openid'] : '',
-		'COPPALINK' => $scripturl . '?action=coppa;u=' . $memberID,
+		'COPPALINK' => $scripturl . '?action=register;sa=coppa;u=' . $memberID,
 	);
 
 	// Administrative registrations are a bit different...
@@ -1030,16 +1032,17 @@ function membersAllowedTo($permission, $board_id = null)
 }
 
 /**
- * This function is used to reassociate members with relevant posts.
+ * This function is used to re-associate members with relevant posts.
  *
- * - Reattribute guest posts to a specified member.
+ * - Re-attribute guest posts to a specified member.
  * - Does not check for any permissions.
  * - If add_to_post_count is set, the member's post count is increased.
  *
  * @package Members
+ *
  * @param int $memID
- * @param string|false $email = false
- * @param string|false $membername = false
+ * @param bool|false|string $email = false
+ * @param bool|false|string $membername = false
  * @param bool $post_count = false
  */
 function reattributePosts($memID, $email = false, $membername = false, $post_count = false)
@@ -1112,7 +1115,7 @@ function reattributePosts($memID, $email = false, $membername = false, $post_cou
 		)
 	);
 
-	// Allow mods with their own post tables to reattribute posts as well :)
+	// Allow mods with their own post tables to re-attribute posts as well :)
 	call_integration_hook('integrate_reattribute_posts', array($memID, $email, $membername, $post_count));
 }
 
@@ -1120,9 +1123,9 @@ function reattributePosts($memID, $email = false, $membername = false, $post_cou
  * Gets a listing of members, Callback for createList().
  *
  * @package Members
- * @param int $start
- * @param int $items_per_page
- * @param string $sort
+ * @param int $start The item to start with (for pagination purposes)
+ * @param int $items_per_page  The number of items to show per page
+ * @param string $sort A string indicating how to sort the results
  * @param string $where
  * @param mixed[] $where_params
  * @param boolean $get_duplicates
@@ -1600,7 +1603,7 @@ function maxMemberID()
 }
 
 /**
- * Load some basic member infos
+ * Load some basic member information
  *
  * @package Members
  * @param int[]|int $member_ids an array of member IDs or a single ID
@@ -2369,15 +2372,14 @@ function memberQuerySeeBoard($id_member)
 
 /**
  * Updates the columns in the members table.
- * Assumes the data has been htmlspecialchar'd, no sanitization is performed on the data.
- * this function should be used whenever member data needs to be updated in place of an UPDATE query.
  *
- * $data is an associative array of the columns to be updated and their respective values.
+ * What it does:
+ * - Assumes the data has been htmlspecialchar'd, no sanitation is performed on the data.
+ * - This function should be used whenever member data needs to be updated in place of an UPDATE query.
+ * - $data is an associative array of the columns to be updated and their respective values.
  * any string values updated should be quoted and slashed.
- *
- * The value of any column can be '+' or '-', which mean 'increment' and decrement, respectively.
- *
- * If the member's post number is updated, updates their post groups.
+ * - The value of any column can be '+' or '-', which mean 'increment' and decrement, respectively.
+ * - If the member's post number is updated, updates their post groups.
  *
  * @param int[]|int $members An array of member ids
  * @param mixed[] $data An associative array of the columns to be updated and their respective values.

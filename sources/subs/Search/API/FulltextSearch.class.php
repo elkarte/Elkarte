@@ -94,8 +94,8 @@ class Fulltext_Search extends SearchAPI
 	 *
 	 * Check whether the method can be performed by this API.
 	 *
-	 * @param string $methodName
-	 * @param mixed[]|null $query_params
+	 * @param string $methodName The search method
+	 * @param mixed[]|null $query_params The parameters for the query
 	 */
 	public function supportsMethod($methodName, $query_params = null)
 	{
@@ -149,17 +149,18 @@ class Fulltext_Search extends SearchAPI
 
 	/**
 	 * Callback function for usort used to sort the fulltext results.
-	 * the order of sorting is: large words, small words, large words that
+	 *
+	 * - The order of sorting is: large words, small words, large words that
 	 * are excluded from the search, small words that are excluded.
 	 *
 	 * @param string $a Word A
 	 * @param string $b Word B
-	 * @return int
+	 * @return int An integer indicating how the words should be sorted (-1, 0 1)
 	 */
 	public function searchSort($a, $b)
 	{
-		$x = Util::strlen($a) - (in_array($a, $this->_excludedWords) ? 1000 : 0);
-		$y = Util::strlen($b) - (in_array($b, $this->_excludedWords) ? 1000 : 0);
+		$x = \Util::strlen($a) - (in_array($a, $this->_excludedWords) ? 1000 : 0);
+		$y = \Util::strlen($b) - (in_array($b, $this->_excludedWords) ? 1000 : 0);
 
 		return $x < $y ? 1 : ($x > $y ? -1 : 0);
 	}
@@ -179,10 +180,10 @@ class Fulltext_Search extends SearchAPI
 	 *
 	 * Do we have to do some work with the words we are searching for to prepare them?
 	 *
-	 * @param string $word
-	 * @param mixed[] $wordsSearch
-	 * @param string[] $wordsExclude
-	 * @param boolean $isExcluded
+	 * @param string $word A word to index
+	 * @param mixed[] $wordsSearch The Search words
+	 * @param string[] $wordsExclude Words to exclude
+	 * @param boolean $isExcluded If the $wordsSearch are those to exclude
 	 */
 	public function prepareIndexes($word, &$wordsSearch, &$wordsExclude, $isExcluded)
 	{
@@ -198,13 +199,13 @@ class Fulltext_Search extends SearchAPI
 			{
 				// Using special characters that a full index would ignore and the remaining words are
 				// short which would also be ignored
-				if ((Util::strlen(current($subwords)) < $this->min_word_length) && (Util::strlen(next($subwords)) < $this->min_word_length))
+				if ((\Util::strlen(current($subwords)) < $this->min_word_length) && (\Util::strlen(next($subwords)) < $this->min_word_length))
 				{
 					$wordsSearch['words'][] = trim($word, '/*- ');
 					$wordsSearch['complex_words'][] = count($subwords) === 1 ? $word : '"' . $word . '"';
 				}
 			}
-			elseif (Util::strlen(trim($word, '/*- ')) < $this->min_word_length)
+			elseif (\Util::strlen(trim($word, '/*- ')) < $this->min_word_length)
 			{
 				// Short words have feelings too
 				$wordsSearch['words'][] = trim($word, '/*- ');
@@ -223,7 +224,7 @@ class Fulltext_Search extends SearchAPI
 	 *
 	 * Search for indexed words.
 	 *
-	 * @param mixed[] $words
+	 * @param mixed[] $words Words to index
 	 * @param mixed[] $search_data
 	 */
 	public function indexedWordQuery($words, $search_data)

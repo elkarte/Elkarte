@@ -667,6 +667,15 @@ class ManageServer_Controller extends Action_Controller
 			array('cache_accelerator', $txt['cache_accelerator'], 'file', 'select', $detected_supported),
 		);
 
+		foreach ($detected as $key => $value)
+		{
+			$cache_class = '\\ElkArte\\sources\\subs\\CacheMethod\\' . ucfirst($key);
+			if ($cache_class::available())
+			{
+				$cache_class::settings($config_vars);
+			}
+		}
+
 		// Notify the integration that we're preparing to mess up with cache settings...
 		call_integration_hook('integrate_modify_cache_settings', array(&$config_vars));
 

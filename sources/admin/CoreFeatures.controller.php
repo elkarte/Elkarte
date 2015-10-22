@@ -54,7 +54,7 @@ class CoreFeatures_Controller extends Action_Controller
 	public function action_index()
 	{
 		// just delegate to our preferred default
-		$this->action_features();
+		return $this->action_features();
 	}
 
 	/**
@@ -117,7 +117,7 @@ class CoreFeatures_Controller extends Action_Controller
 
 		// sub_template is already generic_xml and the token is created somewhere else
 		if (isset($this->_req->query->xml))
-			return;
+			return true;
 
 		$context['sub_template'] = 'core_features';
 		$context['page_title'] = $txt['core_settings_title'];
@@ -129,6 +129,8 @@ class CoreFeatures_Controller extends Action_Controller
 
 		// We love our tokens.
 		createToken('admin-core');
+
+		return true;
 	}
 
 	/**

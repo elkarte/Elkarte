@@ -1,10 +1,12 @@
-/**
+/*!
  * @name      ElkArte Forum
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
  * @version 1.1 dev
- *
+ */
+
+/**
  * Functions to provide ajax capability to the like / unlike button
  * Makes the appropriate call in the background and updates the button text
  * and button hover title text with the new like totals / likers

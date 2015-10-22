@@ -30,6 +30,12 @@ if (!defined('ELK'))
 class ProfileOptions_Controller extends Action_Controller
 {
 	/**
+	 * Holds instance of HttpReq object
+	 * @var HttpReq
+	 */
+	private $_req;
+
+	/**
 	 * Member id for the profile being viewed
 	 * @var int
 	 */
@@ -37,17 +43,20 @@ class ProfileOptions_Controller extends Action_Controller
 
 	/**
 	 * Called before all other methods when coming from the dispatcher or
-	 * action class.  If you initiate the class outside of those methods, call this method.
-	 * or setup the class.
+	 * action class.
+	 *
+	 * - If you initiate the class outside of those methods, call this method.
+	 * or setup the class yourself else a horrible fate awaits you
 	 */
 	public function pre_dispatch()
 	{
 		$this->_memID = currentMemberID();
+
+		$this->_req = HttpReq::instance();
 	}
 
 	/**
-	 * Default method, if another action is not called
-	 * by the menu.
+	 * Default method, if another action is not called by the menu.
 	 *
 	 * @see Action_Controller::action_index()
 	 */
@@ -76,12 +85,13 @@ class ProfileOptions_Controller extends Action_Controller
 		$context['can_send_email'] = allowedTo('send_email_to_members');
 
 		$subActions = array(
-			'buddies' => array('action_editBuddies', $txt['editBuddies']),
-			'ignore' => array('action_editIgnoreList', $txt['editIgnoreList']),
+			'buddies' => array($this, 'action_editBuddies'),
+			'ignore' => array($this, 'action_editIgnoreList'),
 		);
 
 		// Set a subaction
-		$subAction = isset($_GET['sa']) && isset($subActions[$_GET['sa']]) ? $_GET['sa'] : 'buddies';
+		$action = new Action();
+		$subAction = $action->initialize($subActions, 'buddies');
 
 		// Create the tabs for the template.
 		$context[$context['profile_menu_name']]['tab_data'] = array(
@@ -95,11 +105,13 @@ class ProfileOptions_Controller extends Action_Controller
 		);
 
 		// Pass on to the actual function.
-		$this->{$subActions[$subAction][0]}();
+		$action->dispatch($subAction);
 	}
 
 	/**
 	 * Show all the users buddies, as well as a add/delete interface.
+	 *
+	 * @uses template_editBuddies()
 	 */
 	public function action_editBuddies()
 	{
@@ -109,18 +121,20 @@ class ProfileOptions_Controller extends Action_Controller
 
 		// We want to view what we're doing :P
 		$context['sub_template'] = 'editBuddies';
+
+		// Use suggest to find the right buddies
 		loadJavascriptFile('suggest.js', array('defer' => true));
 
 		// For making changes!
 		$buddiesArray = explode(',', $user_profile[$this->_memID]['buddy_list']);
 		foreach ($buddiesArray as $k => $dummy)
 		{
-			if ($dummy == '')
+			if ($dummy === '')
 				unset($buddiesArray[$k]);
 		}
 
 		// Removing a buddy?
-		if (isset($_GET['remove']))
+		if (isset($this->_req->query->remove))
 		{
 			checkSession('get');
 
@@ -129,7 +143,7 @@ class ProfileOptions_Controller extends Action_Controller
 			// Heh, I'm lazy, do it the easy way...
 			foreach ($buddiesArray as $key => $buddy)
 			{
-				if ($buddy == (int) $_GET['remove'])
+				if ($buddy == (int) $this->_req->query->remove)
 					unset($buddiesArray[$key]);
 			}
 
@@ -142,14 +156,14 @@ class ProfileOptions_Controller extends Action_Controller
 			redirectexit('action=profile;area=lists;sa=buddies;u=' . $this->_memID);
 		}
 		// Or adding a new one
-		elseif (isset($_POST['new_buddy']))
+		elseif (isset($this->_req->post->new_buddy))
 		{
 			checkSession();
 
 			// Prepare the string for extraction...
-			$_POST['new_buddy'] = strtr(Util::htmlspecialchars($_POST['new_buddy'], ENT_QUOTES), array('&quot;' => '"'));
-			preg_match_all('~"([^"]+)"~', $_POST['new_buddy'], $matches);
-			$new_buddies = array_unique(array_merge($matches[1], explode(',', preg_replace('~"[^"]+"~', '', $_POST['new_buddy']))));
+			$new_buddy = strtr(Util::htmlspecialchars($this->_req->post->new_buddy, ENT_QUOTES), array('&quot;' => '"'));
+			preg_match_all('~"([^"]+)"~', $new_buddy, $matches);
+			$new_buddies = array_unique(array_merge($matches[1], explode(',', preg_replace('~"[^"]+"~', '', $new_buddy))));
 
 			foreach ($new_buddies as $k => $dummy)
 			{
@@ -206,7 +220,8 @@ class ProfileOptions_Controller extends Action_Controller
 
 	/**
 	 * Allows the user to view their ignore list,
-	 * as well as the option to manage members on it.
+	 *
+	 * - Provides the option to manage members on it.
 	 */
 	public function action_editIgnoreList()
 	{
@@ -222,19 +237,19 @@ class ProfileOptions_Controller extends Action_Controller
 		$ignoreArray = explode(',', $user_profile[$this->_memID]['pm_ignore_list']);
 		foreach ($ignoreArray as $k => $dummy)
 		{
-			if ($dummy == '')
+			if ($dummy === '')
 				unset($ignoreArray[$k]);
 		}
 
 		// Removing a member from the ignore list?
-		if (isset($_GET['remove']))
+		if (isset($this->_req->query->remove))
 		{
 			checkSession('get');
 
 			// Heh, I'm lazy, do it the easy way...
 			foreach ($ignoreArray as $key => $id_remove)
 			{
-				if ($id_remove == (int) $_GET['remove'])
+				if ($id_remove == (int) $this->_req->query->remove)
 					unset($ignoreArray[$key]);
 			}
 
@@ -246,14 +261,14 @@ class ProfileOptions_Controller extends Action_Controller
 			// Redirect off the page because we don't like all this ugly query stuff to stick in the history.
 			redirectexit('action=profile;area=lists;sa=ignore;u=' . $this->_memID);
 		}
-		elseif (isset($_POST['new_ignore']))
+		elseif (isset($this->_req->post->new_ignore))
 		{
 			checkSession();
 
 			// Prepare the string for extraction...
-			$_POST['new_ignore'] = strtr(Util::htmlspecialchars($_POST['new_ignore'], ENT_QUOTES), array('&quot;' => '"'));
-			preg_match_all('~"([^"]+)"~', $_POST['new_ignore'], $matches);
-			$new_entries = array_unique(array_merge($matches[1], explode(',', preg_replace('~"[^"]+"~', '', $_POST['new_ignore']))));
+			$new_ignore = strtr(Util::htmlspecialchars($this->_req->post->new_ignore, ENT_QUOTES), array('&quot;' => '"'));
+			preg_match_all('~"([^"]+)"~', $new_ignore, $matches);
+			$new_entries = array_unique(array_merge($matches[1], explode(',', preg_replace('~"[^"]+"~', '', $new_ignore))));
 
 			foreach ($new_entries as $k => $dummy)
 			{
@@ -331,9 +346,11 @@ class ProfileOptions_Controller extends Action_Controller
 			),
 			'account'
 		);
+
 		loadJavascriptFile('qrcode.js');
 		addInlineJavascript('
 			var secret = document.getElementById("otp_secret").value;
+
 			if (secret)
 			{
 				var qrcode = new QRCode("qrcode", {
@@ -344,31 +361,32 @@ class ProfileOptions_Controller extends Action_Controller
 					colorLight : "#ffffff",
 				});
 			}
-			/**
-			* Generate a secret key for Google Authenticator
-			*/
-			function generateSecret()
-			{
-				var text = "";
-				var possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZ234567";
 
-				for( var i=0; i < 16; i++ )
-				text += possible.charAt(Math.floor(Math.random() * possible.length));
+			/**
+			 * Generate a secret key for Google Authenticator
+			 */
+			function generateSecret() {
+				var text = "",
+					possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZ234567",
+					qr = document.getElementById("qrcode");
+
+				for (var i = 0; i < 16; i++)
+					text += possible.charAt(Math.floor(Math.random() * possible.length));
 
 				document.getElementById("otp_secret").value = text;
 
-				var qr = document.getElementById("qrcode");
 				while (qr.firstChild) {
 					qr.removeChild(qr.firstChild);
 				}
+
 				var qrcode = new QRCode("qrcode", {
-				text: "otpauth://totp/' . $context['forum_name'] . '?secret=" + text,
-				width: 80,
-				height: 80,
-				colorDark : "#000000",
-				colorLight : "#ffffff",
-			});
-		}', true);
+					text: "otpauth://totp/' . $context['forum_name'] . '?secret=" + text,
+					width: 80,
+					height: 80,
+					colorDark: "#000000",
+					colorLight: "#ffffff",
+				});
+			}', true);
 	}
 
 	/**
@@ -470,19 +488,19 @@ class ProfileOptions_Controller extends Action_Controller
 		if ($saving)
 		{
 			// Moving to password passed authentication?
-			if ($_POST['authenticate'] == 'passwd')
+			if ($this->_req->post->authenticate === 'passwd')
 			{
 				// Didn't enter anything?
-				if ($_POST['passwrd1'] == '')
+				if ($this->_req->post->passwrd1 === '')
 					$post_errors[] = 'no_password';
 				// Do the two entries for the password even match?
-				elseif (!isset($_POST['passwrd2']) || $_POST['passwrd1'] != $_POST['passwrd2'])
+				elseif (!isset($this->_req->post->passwrd2) || $this->_req->post->passwrd1 != $this->_req->post->passwrd2)
 					$post_errors[] = 'bad_new_password';
 				// Is it valid?
 				else
 				{
 					require_once(SUBSDIR . '/Auth.subs.php');
-					$passwordErrors = validatePassword($_POST['passwrd1'], $cur_profile['member_name'], array($cur_profile['real_name'], $cur_profile['email_address']));
+					$passwordErrors = validatePassword($this->_req->post->passwrd1, $cur_profile['member_name'], array($cur_profile['real_name'], $cur_profile['email_address']));
 
 					// Were there errors?
 					if ($passwordErrors != null)
@@ -492,11 +510,11 @@ class ProfileOptions_Controller extends Action_Controller
 				if (empty($post_errors))
 				{
 					// Integration?
-					call_integration_hook('integrate_reset_pass', array($cur_profile['member_name'], $cur_profile['member_name'], $_POST['passwrd1']));
+					call_integration_hook('integrate_reset_pass', array($cur_profile['member_name'], $cur_profile['member_name'], $this->_req->post->passwrd1));
 
 					// Go then.
 					require_once(SUBSDIR . '/Auth.subs.php');
-					$new_pass = $_POST['passwrd1'];
+					$new_pass = $this->_req->post->passwrd1;
 					$passwd = validateLoginPassword($new_pass, '', $cur_profile['member_name'], true);
 
 					// Do the important bits.
@@ -514,26 +532,26 @@ class ProfileOptions_Controller extends Action_Controller
 				return true;
 			}
 			// Not right yet!
-			elseif ($_POST['authenticate'] == 'openid' && !empty($_POST['openid_identifier']))
+			elseif ($this->_req->post->authenticate === 'openid' && !empty($this->_req->post->openid_identifier))
 			{
 				require_once(SUBSDIR . '/OpenID.subs.php');
 				require_once(SUBSDIR . '/Members.subs.php');
 
 				$openID = new OpenID();
-				$_POST['openid_identifier'] = $openID->canonize($_POST['openid_identifier']);
+				$this->_req->post->openid_identifier = $openID->canonize($this->_req->post->openid_identifier);
 
-				if (memberExists($_POST['openid_identifier']))
+				if (memberExists($this->_req->post->openid_identifier))
 					$post_errors[] = 'openid_in_use';
 				elseif (empty($post_errors))
 				{
 					// Authenticate using the new OpenID URI first to make sure they didn't make a mistake.
 					if ($context['user']['is_owner'])
 					{
-						$_SESSION['new_openid_uri'] = $_POST['openid_identifier'];
-						$openID->validate($_POST['openid_identifier'], false, null, 'change_uri');
+						$_SESSION['new_openid_uri'] = $this->_req->post->openid_identifier;
+						$openID->validate($this->_req->post->openid_identifier, false, null, 'change_uri');
 					}
 					else
-						updateMemberData($this->_memID, array('openid_uri' => $_POST['openid_identifier']));
+						updateMemberData($this->_memID, array('openid_uri' => $this->_req->post->openid_identifier));
 				}
 			}
 		}
@@ -600,13 +618,13 @@ class ProfileOptions_Controller extends Action_Controller
 				),
 				'delete' => array(
 					'header' => array(
-						'value' => '<input type="checkbox" class="input_check" onclick="invertAll(this, this.form);" />',
+						'value' => '<input type="checkbox" onclick="invertAll(this, this.form);" />',
 						'class' => 'centertext',
 						'style' => 'width:4%;',
 					),
 					'data' => array(
 						'sprintf' => array(
-							'format' => '<input type="checkbox" name="notify_boards[]" value="%1$d" class="input_check" %2$s />',
+							'format' => '<input type="checkbox" name="notify_boards[]" value="%1$d" %2$s />',
 							'params' => array(
 								'id' => false,
 								'checked' => false,
@@ -617,7 +635,7 @@ class ProfileOptions_Controller extends Action_Controller
 				),
 			),
 			'form' => array(
-				'href' => $scripturl . '?action=profile;area=notification;save',
+				'href' => $scripturl . '?action=profile;area=notification',
 				'include_sort' => true,
 				'include_start' => true,
 				'hidden_fields' => array(
@@ -629,8 +647,11 @@ class ProfileOptions_Controller extends Action_Controller
 			),
 			'additional_rows' => array(
 				array(
+					'class' => 'submitbutton',
 					'position' => 'bottom_of_list',
-					'value' => '<input type="submit" name="edit_notify_boards" value="' . $txt['notifications_boards_update'] . '" class="right_submit" />',
+					'value' => '
+						<input type="submit" name="edit_notify_boards" value="' . $txt['notifications_boards_update'] . '" />
+						<input type="hidden" name="save" value="save" />',
 				),
 				array(
 					'position' => 'after_title',
@@ -722,13 +743,13 @@ class ProfileOptions_Controller extends Action_Controller
 				),
 				'delete' => array(
 					'header' => array(
-						'value' => '<input type="checkbox" class="input_check" onclick="invertAll(this, this.form);" />',
+						'value' => '<input type="checkbox" onclick="invertAll(this, this.form);" />',
 						'class' => 'centertext',
 						'style' => 'width:4%;',
 					),
 					'data' => array(
 						'sprintf' => array(
-							'format' => '<input type="checkbox" name="notify_topics[]" value="%1$d" class="input_check" />',
+							'format' => '<input type="checkbox" name="notify_topics[]" value="%1$d" />',
 							'params' => array(
 								'id' => false,
 							),
@@ -738,7 +759,7 @@ class ProfileOptions_Controller extends Action_Controller
 				),
 			),
 			'form' => array(
-				'href' => $scripturl . '?action=profile;area=notification;save',
+				'href' => $scripturl . '?action=profile;area=notification',
 				'include_sort' => true,
 				'include_start' => true,
 				'hidden_fields' => array(
@@ -750,9 +771,11 @@ class ProfileOptions_Controller extends Action_Controller
 			),
 			'additional_rows' => array(
 				array(
+					'class' => 'submitbutton',
 					'position' => 'bottom_of_list',
-					'value' => '<input type="submit" name="edit_notify_topics" value="' . $txt['notifications_update'] . '" class="right_submit" />',
-					'align' => 'right',
+					'value' => '
+						<input type="submit" name="edit_notify_topics" value="' . $txt['notifications_update'] . '" />
+						<input type="hidden" name="save" value="save" />',
 				),
 			),
 		);
@@ -773,9 +796,10 @@ class ProfileOptions_Controller extends Action_Controller
 
 	/**
 	 * Callback for createList() in action_notification()
-	 * Retrieve topic notifications count.
 	 *
-	 * @param int $memID id_member
+	 * - Retrieve topic notifications count.
+	 *
+	 * @param int $memID id_member the id of the member who's notifications we are loading
 	 * @return integer
 	 */
 	public function list_getTopicNotificationCount($memID)
@@ -787,37 +811,37 @@ class ProfileOptions_Controller extends Action_Controller
 	/**
 	 * Callback for createList() in action_notification()
 	 *
-	 * @param int $start
-	 * @param int $items_per_page
-	 * @param string $sort
+	 * @param int $start The item to start with (for pagination purposes)
+	 * @param int $items_per_page  The number of items to show per page
+	 * @param string $sort A string indicating how to sort the results
 	 * @param int $memID id_member
 	 * @return mixed array of topic notifications
 	 */
 	public function list_getTopicNotifications($start, $items_per_page, $sort, $memID)
 	{
-		// topic notifications, for the list
+		// Topic notifications, for the list
 		return topicNotifications($start, $items_per_page, $sort, $memID);
 	}
 
 	/**
 	 * Callback for createList() in action_notification()
 	 *
-	 * @param int $start
-	 * @param int $items_per_page
-	 * @param string $sort
+	 * @uses template_ignoreboards()
+	 * @param int $start The item to start with (for pagination purposes)
+	 * @param int $items_per_page  The number of items to show per page
+	 * @param string $sort A string indicating how to sort the results
 	 * @param int $memID id_member
 	 * @return mixed[] array of board notifications
 	 */
 	public function list_getBoardNotifications($start, $items_per_page, $sort, $memID)
 	{
-		// return boards you see and their notification status for the list
+		// Return boards you see and their notification status for the list
 		return boardNotifications($start, $items_per_page, $sort, $memID);
 	}
 
 	/**
 	 * Allows the user to see the list of their ignored boards.
 	 * (and un-ignore them)
-	 *
 	 */
 	public function action_ignoreboards()
 	{
@@ -860,7 +884,7 @@ class ProfileOptions_Controller extends Action_Controller
 		$context['can_manage_membergroups'] = allowedTo('manage_membergroups');
 		$context['can_manage_protected'] = allowedTo('admin_forum');
 		$context['can_edit_primary'] = $context['can_manage_protected'];
-		$context['update_message'] = isset($_GET['msg']) && isset($txt['group_membership_msg_' . $_GET['msg']]) ? $txt['group_membership_msg_' . $_GET['msg']] : '';
+		$context['update_message'] = isset($this->_req->query->msg) && isset($txt['group_membership_msg_' . $this->_req->query->msg]) ? $txt['group_membership_msg_' . $this->_req->query->msg] : '';
 
 		// Get all the groups this user is a member of.
 		$groups = explode(',', $curMember['additional_groups']);
@@ -893,8 +917,12 @@ class ProfileOptions_Controller extends Action_Controller
 			$context['can_edit_primary'] = false;
 
 		// In the special case that someone is requesting membership of a group, setup some special context vars.
-		if (isset($_REQUEST['request']) && isset($context['groups']['available'][(int) $_REQUEST['request']]) && $context['groups']['available'][(int) $_REQUEST['request']]['type'] == 2)
-			$context['group_request'] = $context['groups']['available'][(int) $_REQUEST['request']];
+		if (isset($this->_req->query->request)
+			&& isset($context['groups']['available'][(int) $this->_req->query->request])
+			&& $context['groups']['available'][(int) $this->_req->query->request]['type'] == 2)
+		{
+			$context['group_request'] = $context['groups']['available'][(int) $this->_req->query->request];
+		}
 	}
 
 	/**
@@ -910,10 +938,13 @@ class ProfileOptions_Controller extends Action_Controller
 		if (!$context['user']['is_owner'] || empty($modSettings['show_group_membership']))
 			isAllowedTo('manage_membergroups');
 
-		if (!isset($_REQUEST['gid']) && !isset($_POST['primary']))
+		$group_id = $this->_req->getPost('gid', 'intval', $this->_req->getQuery('gid', 'intval', null));
+
+		if (!isset($group_id) && !isset($this->_req->post->primary))
 			Errors::instance()->fatal_lang_error('no_access', false);
 
-		checkSession(isset($_GET['gid']) ? 'get' : 'post');
+		// GID may be from a link or a form
+		checkSession(isset($this->_req->query->gid) ? 'get' : 'post');
 
 		require_once(SUBSDIR . '/Membergroups.subs.php');
 
@@ -925,11 +956,11 @@ class ProfileOptions_Controller extends Action_Controller
 		$newPrimary = $old_profile['id_group'];
 		$addGroups = array_flip(explode(',', $old_profile['additional_groups']));
 		$canChangePrimary = $old_profile['id_group'] == 0 ? 1 : 0;
-		$changeType = isset($_POST['primary']) ? 'primary' : (isset($_POST['req']) ? 'request' : 'free');
+		$changeType = isset($this->_req->post->primary) ? 'primary' : (isset($this->_req->post->req) ? 'request' : 'free');
 
 		// One way or another, we have a target group in mind...
-		$group_id = isset($_REQUEST['gid']) ? (int) $_REQUEST['gid'] : (int) $_POST['primary'];
-		$foundTarget = $changeType == 'primary' && $group_id == 0 ? true : false;
+		$group_id = isset($group_id) ? $group_id : (int) $this->_req->post->primary;
+		$foundTarget = $changeType === 'primary' && $group_id == 0 ? true : false;
 
 		// Sanity check!!
 		if ($group_id == 1)
@@ -951,12 +982,12 @@ class ProfileOptions_Controller extends Action_Controller
 				$group_name = $row['group_name'];
 
 				// Does the group type match what we're doing - are we trying to request a non-requestable group?
-				if ($changeType == 'request' && $row['group_type'] != 2)
+				if ($changeType === 'request' && $row['group_type'] != 2)
 					Errors::instance()->fatal_lang_error('no_access', false);
 				// What about leaving a requestable group we are not a member of?
-				elseif ($changeType == 'free' && $row['group_type'] == 2 && $old_profile['id_group'] != $row['id_group'] && !isset($addGroups[$row['id_group']]))
+				elseif ($changeType === 'free' && $row['group_type'] == 2 && $old_profile['id_group'] != $row['id_group'] && !isset($addGroups[$row['id_group']]))
 					Errors::instance()->fatal_lang_error('no_access', false);
-				elseif ($changeType == 'free' && $row['group_type'] != 3 && $row['group_type'] != 2)
+				elseif ($changeType === 'free' && $row['group_type'] != 3 && $row['group_type'] != 2)
 					Errors::instance()->fatal_lang_error('no_access', false);
 
 				// We can't change the primary group if this is hidden!
@@ -1032,7 +1063,7 @@ class ProfileOptions_Controller extends Action_Controller
 						'RECPNAME' => $member['member_name'],
 						'APPYNAME' => $old_profile['member_name'],
 						'GROUPNAME' => $group_name,
-						'REASON' => $_POST['reason'],
+						'REASON' => $this->_req->post->reason,
 						'MODLINK' => $scripturl . '?action=moderate;area=groups;sa=requests',
 					);
 
@@ -1044,7 +1075,7 @@ class ProfileOptions_Controller extends Action_Controller
 			return $changeType;
 		}
 		// Otherwise we are leaving/joining a group.
-		elseif ($changeType == 'free')
+		elseif ($changeType === 'free')
 		{
 			// Are we leaving?
 			if ($old_profile['id_group'] == $group_id || isset($addGroups[$group_id]))
@@ -1106,23 +1137,27 @@ class ProfileOptions_Controller extends Action_Controller
 	{
 		global $context, $options, $cur_profile;
 
-		if (isset($_POST['default_options']))
-			$_POST['options'] = isset($_POST['options']) ? $_POST['options'] + $_POST['default_options'] : $_POST['default_options'];
+		if (isset($this->_req->post->default_options))
+			$this->_req->post->options = isset($this->_req->post->options) ? $this->_req->post->options + $this->_req->post->default_options : $this->_req->post->default_options;
 
 		if ($context['user']['is_owner'])
 		{
 			$context['member']['options'] = $options;
-			if (isset($_POST['options']) && is_array($_POST['options']))
-				foreach ($_POST['options'] as $k => $v)
+
+			if (isset($this->_req->post->options) && is_array($this->_req->post->options))
+			{
+				foreach ($this->_req->post->options as $k => $v)
 					$context['member']['options'][$k] = $v;
+			}
 		}
 		else
 		{
 			require_once(SUBSDIR . '/Themes.subs.php');
 			$context['member']['options'] = loadThemeOptionsInto(array(1, (int) $cur_profile['id_theme']), array(-1, $this->_memID), $context['member']['options']);
-			if (isset($_POST['options']))
+
+			if (isset($this->_req->post->options))
 			{
-				foreach ($_POST['options'] as $var => $val)
+				foreach ($this->_req->post->options as $var => $val)
 					$context['member']['options'][$var] = $val;
 			}
 		}

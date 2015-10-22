@@ -26,6 +26,20 @@ if (!defined('ELK'))
 class Stats_Controller extends Action_Controller
 {
 	/**
+	 * Holds instance of HttpReq object
+	 * @var HttpReq
+	 */
+	private $_req;
+
+	/**
+	 * Pre Dispatch, called before other methods.  Loads HttpReq instance.
+	 */
+	public function pre_dispatch()
+	{
+		$this->_req = HttpReq::instance();
+	}
+
+	/**
 	 * Entry point for this class.
 	 *
 	 * @see Action_Controller::action_index()
@@ -47,7 +61,7 @@ class Stats_Controller extends Action_Controller
 	 * - Accessed from ?action=stats.
 	 *
 	 * @uses Stats language file
-	 * @uses Stats template, statistics sub template
+	 * @uses template_stats() sub template in Stats.template
 	 */
 	public function action_stats()
 	{
@@ -60,33 +74,17 @@ class Stats_Controller extends Action_Controller
 		if (empty($modSettings['trackStats']))
 			Errors::instance()->fatal_lang_error('feature_disabled', true);
 
-		if (!empty($_REQUEST['expand']))
-		{
-			$context['robot_no_index'] = true;
-
-			$month = (int) substr($_REQUEST['expand'], 4);
-			$year = (int) substr($_REQUEST['expand'], 0, 4);
-			if ($year > 1900 && $year < 2200 && $month >= 1 && $month <= 12)
-				$_SESSION['expanded_stats'][$year][] = $month;
-		}
-		elseif (!empty($_REQUEST['collapse']))
-		{
-			$context['robot_no_index'] = true;
-
-			$month = (int) substr($_REQUEST['collapse'], 4);
-			$year = (int) substr($_REQUEST['collapse'], 0, 4);
-			if (!empty($_SESSION['expanded_stats'][$year]))
-				$_SESSION['expanded_stats'][$year] = array_diff($_SESSION['expanded_stats'][$year], array($month));
-		}
+		// Expanding out the history summary
+		list($year, $month) = $this->_expandedStats();
 
 		// Just a lil' help from our friend :P
 		require_once(SUBSDIR . '/Stats.subs.php');
 
 		// Handle the XMLHttpRequest.
-		if (isset($_REQUEST['xml']))
+		if (isset($this->_req->query->xml))
 		{
 			// Collapsing stats only needs adjustments of the session variables.
-			if (!empty($_REQUEST['collapse']))
+			if (!empty($this->_req->query->collapse))
 				obExit(false);
 
 			$context['sub_template'] = 'stats';
@@ -96,7 +94,7 @@ class Stats_Controller extends Action_Controller
 				'year' => $year,
 			);
 
-			return;
+			return true;
 		}
 
 		// Stats it is
@@ -184,7 +182,12 @@ class Stats_Controller extends Action_Controller
 	}
 
 	/**
-	 * Top posters, boards, replies, etc.
+	 * Loads in the the "top" statistics
+	 *
+	 * What it does:
+	 * - Calls support topXXXX functions to load stats
+	 * - Places results in to context
+	 * - Uses Top posters, topBoards, topTopicReplies, topTopicViews, topTopicStarter, topTimeOnline
 	 */
 	public function loadTopStatistics()
 	{
@@ -239,22 +242,61 @@ class Stats_Controller extends Action_Controller
 
 		// Want to expand out the yearly stats
 		if (empty($_SESSION['expanded_stats']))
-			return;
+			return false;
 
 		$condition_text = array();
 		$condition_params = array();
 		foreach ($_SESSION['expanded_stats'] as $year => $months)
+		{
 			if (!empty($months))
 			{
 				$condition_text[] = 'YEAR(date) = {int:year_' . $year . '} AND MONTH(date) IN ({array_int:months_' . $year . '})';
 				$condition_params['year_' . $year] = $year;
 				$condition_params['months_' . $year] = $months;
 			}
+		}
 
 		// No daily stats to even look at?
 		if (empty($condition_text))
-			return;
+			return false;
 
 		getDailyStats(implode(' OR ', $condition_text), $condition_params);
+
+		return true;
+	}
+
+	/**
+	 * Sanitize and validate the year / month for expand / collapse stats
+	 *
+	 * @return array of year and month from expand / collapse link
+	 */
+	private function _expandedStats()
+	{
+		global $context;
+
+		$year = '';
+		$month = '';
+
+		if (!empty($this->_req->query->expand))
+		{
+			$context['robot_no_index'] = true;
+
+			$month = (int) substr($this->_req->query->expand, 4);
+			$year = (int) substr($this->_req->query->expand, 0, 4);
+			if ($year > 1900 && $year < 2200 && $month >= 1 && $month <= 12)
+				$_SESSION['expanded_stats'][$year][] = $month;
+		}
+		// Done looking at the details and want to fold it back up
+		elseif (!empty($this->_req->query->collapse))
+		{
+			$context['robot_no_index'] = true;
+
+			$month = (int) substr($this->_req->query->collapse, 4);
+			$year = (int) substr($this->_req->query->collapse, 0, 4);
+			if (!empty($_SESSION['expanded_stats'][$year]))
+				$_SESSION['expanded_stats'][$year] = array_diff($_SESSION['expanded_stats'][$year], array($month));
+		}
+
+		return array($year, $month);
 	}
 }

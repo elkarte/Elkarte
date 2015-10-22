@@ -467,9 +467,9 @@ function sortSmileyTable()
  * Callback function for createList().
  * Lists all smiley sets.
  *
- * @param int $start
- * @param int $items_per_page
- * @param string $sort
+ * @param int $start The item to start with (for pagination purposes)
+ * @param int $items_per_page  The number of items to show per page
+ * @param string $sort A string indicating how to sort the results
  */
 function list_getSmileySets($start, $items_per_page, $sort)
 {
@@ -527,9 +527,9 @@ function list_getNumSmileySets()
 /**
  * Callback function for createList().
  *
- * @param int $start
- * @param int $items_per_page
- * @param string $sort
+ * @param int $start The item to start with (for pagination purposes)
+ * @param int $items_per_page  The number of items to show per page
+ * @param string $sort A string indicating how to sort the results
  */
 function list_getSmileys($start, $items_per_page, $sort)
 {

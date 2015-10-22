@@ -97,8 +97,8 @@ class Sphinxql_Search extends SearchAPI
 	/**
 	 * Check whether the method can be performed by this API.
 	 *
-	 * @param string $methodName
-	 * @param string|null $query_params
+	 * @param string $methodName The search method
+	 * @param string|null $query_params Parameters for the query
 	 */
 	public function supportsMethod($methodName, $query_params = null)
 	{
@@ -136,7 +136,7 @@ class Sphinxql_Search extends SearchAPI
 	 *
 	 * @param string $a Word A
 	 * @param string $b Word B
-	 * @return int
+	 * @return An integer indicating how the words should be sorted (-1, 0 1)
 	 */
 	public function searchSort($a, $b)
 	{
@@ -159,9 +159,9 @@ class Sphinxql_Search extends SearchAPI
 	/**
 	 * Do we have to do some work with the words we are searching for to prepare them?
 	 *
-	 * @param string[] $word
-	 * @param mixed[] $wordsSearch
-	 * @param string[] $wordsExclude
+	 * @param string[] $word A word to index
+	 * @param mixed[] $wordsSearch The Search words
+	 * @param string[] $wordsExclude Words to exclude
 	 * @param boolean $isExcluded
 	 */
 	public function prepareIndexes($word, &$wordsSearch, &$wordsExclude, $isExcluded)
@@ -178,8 +178,8 @@ class Sphinxql_Search extends SearchAPI
 	 * This has it's own custom search.
 	 *
 	 * @param mixed[] $search_params
-	 * @param mixed[] $search_words
-	 * @param string[] $excluded_words
+	 * @param mixed[] $search_words Words to search
+	 * @param string[] $excluded_words Words to exclude, not used in this API
 	 * @param int[] $participants
 	 * @param string[] $search_results
 	 */
@@ -195,7 +195,7 @@ class Sphinxql_Search extends SearchAPI
 
 			// No connection, daemon not running?  log the error
 			if ($mySphinx === false)
-				Errors::instance()->fatal_lang_error('error_no_search_daemon');
+				\Errors::instance()->fatal_lang_error('error_no_search_daemon');
 
 			// Compile different options for our query
 			$query = 'SELECT *' . (empty($search_params['topic']) ? ', COUNT(*) num' : '') . ', WEIGHT() weights, (weights + (relevance/1000)) rank FROM elkarte_index';
@@ -253,9 +253,9 @@ class Sphinxql_Search extends SearchAPI
 			{
 				// Just log the error.
 				if (mysqli_error($mySphinx))
-					Errors::instance()->log_error(mysqli_error($mySphinx));
+					\Errors::instance()->log_error(mysqli_error($mySphinx));
 
-				Errors::instance()->fatal_lang_error('error_no_search_daemon');
+				\Errors::instance()->fatal_lang_error('error_no_search_daemon');
 			}
 
 			// Get the relevant information from the search results.
@@ -398,7 +398,7 @@ class Sphinxql_Search extends SearchAPI
 		$string = html_entity_decode($string, ENT_QUOTES, 'UTF-8');
 
 		// Lowercase string
-		$string = Util::strtolower($string);
+		$string = \Util::strtolower($string);
 
 		// Fix numbers so they search easier (phone numbers, SSN, dates, etc)
 		$string = preg_replace('~([[:digit:]]+)\pP+(?=[[:digit:]])~u', '', $string);

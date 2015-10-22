@@ -334,6 +334,7 @@ function loadModeratorMenuCounts($brd = null)
  *
  * @param string $subject
  * @param string $body
+ * @return int
  */
 function logWarningNotice($subject, $body)
 {
@@ -350,7 +351,7 @@ function logWarningNotice($subject, $body)
 		),
 		array('id_notice')
 	);
-	$id_notice = $db->insert_id('{db_prefix}log_member_notices', 'id_notice');
+	$id_notice = (int) $db->insert_id('{db_prefix}log_member_notices', 'id_notice');
 
 	return $id_notice;
 }
@@ -435,9 +436,9 @@ function removeWarningTemplate($id_tpl, $template_type = 'warntpl')
  * Returns all the templates of a type from the system.
  * (used by createList() callbacks)
  *
- * @param int $start
- * @param int $items_per_page
- * @param string $sort
+ * @param int $start The item to start with (for pagination purposes)
+ * @param int $items_per_page  The number of items to show per page
+ * @param string $sort A string indicating how to sort the results
  * @param string $template_type type of template to load
  */
 function warningTemplates($start, $items_per_page, $sort, $template_type = 'warntpl')
@@ -516,9 +517,9 @@ function warningTemplateCount($template_type = 'warntpl')
  *
  * Callback for createList() in ModerationCenter_Controller::action_viewWarningLog().
  *
- * @param int $start
- * @param int $items_per_page
- * @param string $sort
+ * @param int $start The item to start with (for pagination purposes)
+ * @param int $items_per_page  The number of items to show per page
+ * @param string $sort A string indicating how to sort the results
  * @param string|null $query_string
  * @param mixed[] $query_params
  */
@@ -910,9 +911,9 @@ function watchedUserCount($warning_watch = 0)
  * Retrieved the watched users in the system.
  * (used by createList() callbacks).
  *
- * @param int $start
- * @param int $items_per_page
- * @param string $sort
+ * @param int $start The item to start with (for pagination purposes)
+ * @param int $items_per_page  The number of items to show per page
+ * @param string $sort A string indicating how to sort the results
  * @param string $approve_query
  * @param string $dummy
  */
@@ -1051,9 +1052,9 @@ function watchedUserPostsCount($approve_query, $warning_watch)
  * Retrieve the posts of watched users.
  * (used by createList() callbacks).
  *
- * @param int $start
- * @param int $items_per_page
- * @param string $sort
+ * @param int $start The item to start with (for pagination purposes)
+ * @param int $items_per_page  The number of items to show per page
+ * @param string $sort A string indicating how to sort the results
  * @param string $approve_query
  * @param int[] $delete_boards
  */

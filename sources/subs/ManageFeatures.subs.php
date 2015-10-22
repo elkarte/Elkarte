@@ -301,9 +301,9 @@ function updateAllSignatures($applied_sigs)
  * Callback for createList() in displaying profile fields
  * Can be used to load standard or custom fields by setting the $standardFields flag
  *
- * @param int $start
- * @param int $items_per_page
- * @param string $sort
+ * @param int $start The item to start with (for pagination purposes)
+ * @param int $items_per_page  The number of items to show per page
+ * @param string $sort A string indicating how to sort the results
  * @param boolean $standardFields
  */
 function list_getProfileFields($start, $items_per_page, $sort, $standardFields)

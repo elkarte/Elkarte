@@ -1,4 +1,4 @@
-/**
+/*!
  * @name      ElkArte Forum
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
@@ -10,7 +10,9 @@
  * license:		BSD, See included LICENSE.TXT for terms and conditions.
  *
  * @version 1.1 dev
- *
+ */
+
+/**
  * This file contains javascript utility functions
  */
 
@@ -1578,25 +1580,6 @@ function smc_saveEntities(sFormName, aElementNames, sMask)
 	{
 		if (aElementNames[i] in document.forms[sFormName])
 			document.forms[sFormName][aElementNames[i]].value = document.forms[sFormName][aElementNames[i]].value.replace(/&#/g, '&#38;#');
-	}
-}
-
-/**
- * Make sure the window backgrounds (zebra stripes) are correct for lists.
- * @todo is this still needed with odd/even?
- * @param {HTMLElement} oList
- */
-function applyWindowClasses(oList)
-{
-	oListItems = oList.getElementsByTagName("li");
-
-	for (var i = 0; i < oListItems.length; i++)
-	{
-		// Skip dummies.
-		if (oListItems[i].id === "")
-			continue;
-
-		oListItems[i].className = "content";
 	}
 }
 

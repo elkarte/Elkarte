@@ -25,39 +25,84 @@ if (!defined('ELK'))
 /**
  * Register Controller Class, It registers new members, and it allows
  * the administrator moderate member registration
+ *
+ * is_activated value key is as follows, for reference again:
+ * - > 10 Banned with activation status as value - 10
+ * - 5 = Awaiting COPPA consent
+ * - 4 = Awaiting Deletion approval
+ * - 3 = Awaiting Admin approval
+ * - 2 = Awaiting reactivation from email change
+ * - 1 = Approved and active
+ * - 0 = Not active
  */
 class Register_Controller extends Action_Controller
 {
 	/**
+	 * Holds the results of a findUser() request
+	 * @var array
+	 */
+	private $_row;
+
+	/**
+	 * Holds instance of HttpReq object
+	 * @var HttpReq
+	 */
+	private $_req;
+
+	/**
+	 * Pre Dispatch, called before other methods.  Loads HttpReq instance.
+	 */
+	public function pre_dispatch()
+	{
+		global $modSettings;
+
+		// Check if the administrator has it disabled.
+		if (!empty($modSettings['registration_method']) && $modSettings['registration_method'] == '3')
+			Errors::instance()->fatal_lang_error('registration_disabled', false);
+
+		// Load in the form / url / etc values
+		$this->_req = HttpReq::instance();
+	}
+
+	/**
 	 * Intended entry point for this class.
+	 *
 	 * By default, this is called for action=register
 	 *
 	 * @see Action_Controller::action_index()
 	 */
 	public function action_index()
 	{
-		// figure out what action to do... register, what else.
-		$this->action_register();
+		// Add an subaction array to act accordingly
+		$subActions = array(
+			'register' => array($this, 'action_register'),
+			'register2' => array($this, 'action_register2'),
+			'usernamecheck' => array($this, 'action_registerCheckUsername'),
+			'activate' => array($this, 'action_activate'),
+			'contact' => array($this, 'action_contact'),
+			'verificationcode' => array($this, 'action_verificationcode'),
+			'coppa' => array($this, 'action_coppa'),
+		);
+
+		// Setup the action handler
+		$action = new Action();
+		$subAction = $action->initialize($subActions, 'register');
+
+		// Call the action
+		$action->dispatch($subAction);
 	}
 
 	/**
 	 * Begin the registration process.
+	 *
 	 * Accessed by ?action=register
 	 *
-	 * @uses Register template, registration_agreement or registration_form sub template
+	 * @uses template_registration_agreement or template_registration_form sub template in Register.template,
 	 * @uses Login language file
 	 */
 	public function action_register()
 	{
-		global $txt, $context, $modSettings, $user_info, $language, $scripturl, $cur_profile;
-
-		// Is this an incoming AJAX check?
-		if (isset($_GET['sa']) && $_GET['sa'] == 'usernamecheck')
-			return $this->_registerCheckUsername();
-
-		// Check if the administrator has it disabled.
-		if (!empty($modSettings['registration_method']) && $modSettings['registration_method'] == '3')
-			Errors::instance()->fatal_lang_error('registration_disabled', false);
+		global $txt, $context, $modSettings, $user_info, $scripturl;
 
 		// If this user is an admin - redirect them to the admin registration page.
 		if (allowedTo('moderate_forum') && !$user_info['is_guest'])
@@ -66,8 +111,9 @@ class Register_Controller extends Action_Controller
 		elseif (empty($user_info['is_guest']))
 			redirectexit();
 
-		if (isset($_POST['show_contact']))
-			redirectexit('action=contact');
+		// Confused and want to contact the admins instead
+		if (isset($this->_req->post->show_contact))
+			redirectexit('action=register;sa=contact');
 
 		loadLanguage('Login');
 		loadTemplate('Register');
@@ -77,7 +123,7 @@ class Register_Controller extends Action_Controller
 		$context['checkbox_agreement'] = !empty($modSettings['checkboxAgreement']);
 		$context['registration_passed_agreement'] = !empty($_SESSION['registration_agreed']);
 		$context['show_coppa'] = !empty($modSettings['coppaAge']);
-		$context['show_contact_button'] = !empty($modSettings['enable_contactform']) && $modSettings['enable_contactform'] == 'registration';
+		$context['show_contact_button'] = !empty($modSettings['enable_contactform']) && $modSettings['enable_contactform'] === 'registration';
 
 		// Under age restrictions?
 		if ($context['show_coppa'])
@@ -88,10 +134,10 @@ class Register_Controller extends Action_Controller
 		}
 
 		// What step are we at?
-		$current_step = isset($_REQUEST['step']) ? (int) $_REQUEST['step'] : ($context['require_agreement'] && !$context['checkbox_agreement'] ? 1 : 2);
+		$current_step = isset($this->_req->post->step) ? (int) $this->_req->post->step : ($context['require_agreement'] && !$context['checkbox_agreement'] ? 1 : 2);
 
 		// Does this user agree to the registration agreement?
-		if ($current_step == 1 && (isset($_POST['accept_agreement']) || isset($_POST['accept_agreement_coppa'])))
+		if ($current_step == 1 && (isset($this->_req->post->accept_agreement) || isset($this->_req->post->accept_agreement_coppa)))
 		{
 			$context['registration_passed_agreement'] = $_SESSION['registration_agreed'] = true;
 			$current_step = 2;
@@ -99,7 +145,7 @@ class Register_Controller extends Action_Controller
 			// Skip the coppa procedure if the user says he's old enough.
 			if ($context['show_coppa'])
 			{
-				$_SESSION['skip_coppa'] = !empty($_POST['accept_agreement']);
+				$_SESSION['skip_coppa'] = !empty($this->_req->post->accept_agreement);
 
 				// Are they saying they're under age, while under age registration is disabled?
 				if (empty($modSettings['coppaType']) && empty($_SESSION['skip_coppa']))
@@ -136,89 +182,30 @@ class Register_Controller extends Action_Controller
 			$_SESSION['register']['timenow'] = time();
 
 		// If you have to agree to the agreement, it needs to be fetched from the file.
-		if ($context['require_agreement'])
-		{
-			// Have we got a localized one?
-			if (file_exists(BOARDDIR . '/agreement.' . $user_info['language'] . '.txt'))
-				$context['agreement'] = parse_bbc(file_get_contents(BOARDDIR . '/agreement.' . $user_info['language'] . '.txt'), true, 'agreement_' . $user_info['language']);
-			elseif (file_exists(BOARDDIR . '/agreement.txt'))
-				$context['agreement'] = parse_bbc(file_get_contents(BOARDDIR . '/agreement.txt'), true, 'agreement');
-			else
-				$context['agreement'] = '';
+		$this->_load_require_agreement();
 
-			// Nothing to show, lets disable registration and inform the admin of this error
-			if (empty($context['agreement']))
-			{
-				// No file found or a blank file, log the error so the admin knows there is a problem!
-				Errors::instance()->log_error($txt['registration_agreement_missing'], 'critical');
-				Errors::instance()->fatal_lang_error('registration_disabled', false);
-			}
-		}
+		// If we have language support enabled then they need to be loaded
+		$this->_load_language_support();
 
-		if (!empty($modSettings['userLanguage']))
-		{
-			// Do we have any languages?
-			$languages = getLanguages();
+		// Any custom or standard profile fields we want filled in during registration?
+		$this->_load_profile_fields();
 
-			if (isset($_POST['lngfile']) && isset($languages[$_POST['lngfile']]))
-				$_SESSION['language'] = $_POST['lngfile'];
-
-			$selectedLanguage = empty($_SESSION['language']) ? $language : $_SESSION['language'];
-
-			// Try to find our selected language.
-			foreach ($languages as $key => $lang)
-			{
-				$context['languages'][$key]['name'] = $lang['name'];
-
-				// Found it!
-				if ($selectedLanguage == $lang['filename'])
-					$context['languages'][$key]['selected'] = true;
-			}
-		}
-
-		// Any custom fields we want filled in?
-		require_once(SUBSDIR . '/Profile.subs.php');
-		loadCustomFields(0, 'register');
-
-		// Or any standard ones?
-		if (!empty($modSettings['registration_fields']))
-		{
-			// Setup some important context.
-			loadLanguage('Profile');
-			loadTemplate('Profile');
-
-			$context['user']['is_owner'] = true;
-
-			// Here, and here only, emulate the permissions the user would have to do this.
-			$user_info['permissions'] = array_merge($user_info['permissions'], array('profile_account_own', 'profile_extra_own'));
-			$reg_fields = explode(',', $modSettings['registration_fields']);
-
-			// We might have had some submissions on this front - go check.
-			foreach ($reg_fields as $field)
-			{
-				if (isset($_POST[$field]))
-					$cur_profile[$field] = Util::htmlspecialchars($_POST[$field]);
-			}
-
-			// Load all the fields in question.
-			setupProfileContext($reg_fields, 'registration');
-		}
-
+		// Trigger the prepare_context event
 		$this->_events->trigger('prepare_context', array('current_step' => $current_step));
 
 		// Are they coming from an OpenID login attempt?
 		if (!empty($_SESSION['openid']['verified']) && !empty($_SESSION['openid']['openid_uri']) && !empty($_SESSION['openid']['nickname']))
 		{
 			$context['openid'] = $_SESSION['openid']['openid_uri'];
-			$context['username'] = !empty($_POST['user']) ? Util::htmlspecialchars($_POST['user']) : $_SESSION['openid']['nickname'];
-			$context['email'] = !empty($_POST['email']) ? Util::htmlspecialchars($_POST['email']) : $_SESSION['openid']['email'];
+			$context['username'] =  $this->_req->getPost('user', 'Util::htmlspecialchars', $_SESSION['openid']['nickname']);
+			$context['email'] = $this->_req->getPost('email', 'Util::htmlspecialchars', $_SESSION['openid']['email']);
 		}
 		// See whether we have some pre filled values.
 		else
 		{
-			$context['openid'] = isset($_POST['openid_identifier']) ? $_POST['openid_identifier'] : '';
-			$context['username'] = isset($_POST['user']) ? Util::htmlspecialchars($_POST['user']) : '';
-			$context['email'] = isset($_POST['email']) ? Util::htmlspecialchars($_POST['email']) : '';
+			$context['openid'] = $this->_req->getPost('openid_identifier', 'trim', '');
+			$context['username'] = $this->_req->getPost('user', 'Util::htmlspecialchars', '');
+			$context['email'] = $this->_req->getPost('email', 'Util::htmlspecialchars', '');
 		}
 
 		// Were there any errors?
@@ -233,10 +220,17 @@ class Register_Controller extends Action_Controller
 	/**
 	 * Handles the registration process for members using ElkArte registration
 	 * and not (for example) OpenID.
+	 *
+	 * What it does:
+	 * - Validates all requirements have been filled in properly
+	 * - Passes final processing to do_register
+	 * - Directs back to register on errors
+	 *
+	 * Accessed by ?action=register;sa=register2
 	 */
 	public function action_register2()
 	{
-		global $modSettings, $context;
+		global $modSettings;
 
 		// Start collecting together any errors.
 		$reg_errors = Error_Context::context('register', 0);
@@ -248,7 +242,7 @@ class Register_Controller extends Action_Controller
 			$reg_errors->addError('token_verification');
 
 		// If we're using an agreement checkbox, did they check it?
-		if (!empty($modSettings['checkboxAgreement']) && !empty($_POST['checkbox_agreement']))
+		if (!empty($modSettings['checkboxAgreement']) && !empty($this->_req->post->checkbox_agreement))
 			$_SESSION['registration_agreed'] = true;
 
 		// Well, if you don't agree, you can't register.
@@ -261,7 +255,7 @@ class Register_Controller extends Action_Controller
 
 		// If we don't require an agreement, we need a extra check for coppa.
 		if (empty($modSettings['requireAgreement']) && !empty($modSettings['coppaAge']))
-			$_SESSION['skip_coppa'] = !empty($_POST['accept_agreement']);
+			$_SESSION['skip_coppa'] = !empty($this->_req->post->accept_agreement);
 
 		// Are they under age, and under age users are banned?
 		if (!empty($modSettings['coppaAge']) && empty($modSettings['coppaType']) && empty($_SESSION['skip_coppa']))
@@ -281,29 +275,17 @@ class Register_Controller extends Action_Controller
 			$reg_errors->addError('too_quickly');
 		}
 
+		// Trigger any events required before we complete registration, like captcha verification
 		$this->_events->trigger('before_complete_register', array('reg_errors' => $reg_errors));
 
 		$this->do_register(false);
 	}
 
 	/**
-	 * Checks if registrations are enabled and the user didn't just register
-	 */
-	private function _can_register()
-	{
-		global $modSettings;
-
-		// You can't register if it's disabled.
-		if (!empty($modSettings['registration_method']) && $modSettings['registration_method'] == 3)
-			Errors::instance()->fatal_lang_error('registration_disabled', false);
-
-		// Make sure they didn't just register with this session.
-		if (!empty($_SESSION['just_registered']) && empty($modSettings['disableRegisterCheck']))
-			Errors::instance()->fatal_lang_error('register_only_once', false);
-	}
-
-	/**
 	 * Actually register the member.
+	 *
+	 * - Called from OpenID controller as well as Register controller
+	 * - Does the actual registration to the system
 	 *
 	 * @param bool $verifiedOpenID = false
 	 */
@@ -318,61 +300,65 @@ class Register_Controller extends Action_Controller
 		if ($verifiedOpenID)
 			$this->_can_register();
 
-		foreach ($_POST as $key => $value)
+		// Clean the form values
+		foreach ($this->_req->post as $key => $value)
 		{
 			if (!is_array($value))
-				$_POST[$key] = htmltrim__recursive(str_replace(array("\n", "\r"), '', $value));
+			{
+				$this->_req->post->$key = htmltrim__recursive(str_replace(array("\n", "\r"), '', $value));
+			}
 		}
 
-		if (isset($_POST['secret_answer']) && $_POST['secret_answer'] != '')
-			$_POST['secret_answer'] = md5($_POST['secret_answer']);
+		// A little security to any secret answer ... @todo increase?
+		if ($this->_req->getPost('secret_answer', 'trim', '') !== '')
+			$this->_req->post->secret_answer = md5($this->_req->post->secret_answer);
 
 		// Needed for isReservedName() and registerMember().
 		require_once(SUBSDIR . '/Members.subs.php');
 
 		// Validation... even if we're not a mall.
-		if (isset($_POST['real_name']) && (!empty($modSettings['allow_editDisplayName']) || allowedTo('moderate_forum')))
+		if (isset($this->_req->post->real_name) && (!empty($modSettings['allow_editDisplayName']) || allowedTo('moderate_forum')))
 		{
-			$_POST['real_name'] = trim(preg_replace('~[\t\n\r \x0B\0\x{A0}\x{AD}\x{2000}-\x{200F}\x{201F}\x{202F}\x{3000}\x{FEFF}]+~u', ' ', $_POST['real_name']));
+			$this->_req->post->real_name = trim(preg_replace('~[\t\n\r \x0B\0\x{A0}\x{AD}\x{2000}-\x{200F}\x{201F}\x{202F}\x{3000}\x{FEFF}]+~u', ' ', $this->_req->post->real_name));
 			$has_real_name = true;
 		}
 		else
 			$has_real_name = false;
 
-		// Handle a string as a birthdate...
-		if (isset($_POST['birthdate']) && $_POST['birthdate'] != '')
-			$_POST['birthdate'] = strftime('%Y-%m-%d', strtotime($_POST['birthdate']));
+		// Handle a string as a birth date...
+		if ($this->_req->getPost('birthdate', 'trim', '') !== '')
+			$this->_req->post->birthdate = strftime('%Y-%m-%d', strtotime($this->_req->post->birthdate));
 		// Or birthdate parts...
-		elseif (!empty($_POST['bday1']) && !empty($_POST['bday2']))
-			$_POST['birthdate'] = sprintf('%04d-%02d-%02d', empty($_POST['bday3']) ? 0 : (int) $_POST['bday3'], (int) $_POST['bday1'], (int) $_POST['bday2']);
+		elseif (!empty($this->_req->post->bday1) && !empty($this->_req->post->bday2))
+			$this->_req->post->birthdate = sprintf('%04d-%02d-%02d', empty($this->_req->post->bday3) ? 0 : (int) $this->_req->post->bday3, (int) $this->_req->post->bday1, (int) $this->_req->post->bday2);
 
 		// By default assume email is hidden, only show it if we tell it to.
-		$_POST['hide_email'] = !empty($_POST['allow_email']) ? 0 : 1;
+		$this->_req->post->hide_email = !empty($this->_req->post->allow_email) ? 0 : 1;
 
 		// Validate the passed language file.
-		if (isset($_POST['lngfile']) && !empty($modSettings['userLanguage']))
+		if (isset($this->_req->post->lngfile) && !empty($modSettings['userLanguage']))
 		{
 			// Do we have any languages?
 			$context['languages'] = getLanguages();
 
 			// Did we find it?
-			if (isset($context['languages'][$_POST['lngfile']]))
-				$_SESSION['language'] = $_POST['lngfile'];
+			if (isset($context['languages'][$this->_req->post->lngfile]))
+				$_SESSION['language'] = $this->_req->post->lngfile;
 			else
-				unset($_POST['lngfile']);
+				unset($this->_req->post->lngfile);
 		}
-		else
-			unset($_POST['lngfile']);
+		elseif (isset($this->_req->post->lngfile))
+			unset($this->_req->post->lngfile);
 
 		// Set the options needed for registration.
 		$regOptions = array(
 			'interface' => 'guest',
-			'username' => !empty($_POST['user']) ? $_POST['user'] : '',
-			'email' => !empty($_POST['email']) ? $_POST['email'] : '',
-			'password' => !empty($_POST['passwrd1']) ? $_POST['passwrd1'] : '',
-			'password_check' => !empty($_POST['passwrd2']) ? $_POST['passwrd2'] : '',
-			'openid' => !empty($_POST['openid_identifier']) ? $_POST['openid_identifier'] : '',
-			'auth_method' => !empty($_POST['authenticate']) ? $_POST['authenticate'] : '',
+			'username' => !empty($this->_req->post->user) ? $this->_req->post->user : '',
+			'email' => !empty($this->_req->post->email) ? $this->_req->post->email : '',
+			'password' => !empty($this->_req->post->passwrd1) ? $this->_req->post->passwrd1 : '',
+			'password_check' => !empty($this->_req->post->passwrd2) ? $this->_req->post->passwrd2 : '',
+			'openid' => !empty($this->_req->post->openid_identifier) ? $this->_req->post->openid_identifier : '',
+			'auth_method' => !empty($this->_req->post->authenticate) ? $this->_req->post->authenticate : '',
 			'check_reserved_name' => true,
 			'check_password_strength' => true,
 			'check_email_ban' => true,
@@ -383,17 +369,17 @@ class Register_Controller extends Action_Controller
 		);
 
 		// Registration options are always default options...
-		if (isset($_POST['default_options']))
-			$_POST['options'] = isset($_POST['options']) ? $_POST['options'] + $_POST['default_options'] : $_POST['default_options'];
+		if (isset($this->_req->post->default_options))
+			$this->_req->post->options = isset($this->_req->post->options) ? $this->_req->post->options + $this->_req->post->default_options : $this->_req->post->default_options;
 
-		$regOptions['theme_vars'] = isset($_POST['options']) && is_array($_POST['options']) ? $_POST['options'] : array();
+		$regOptions['theme_vars'] = isset($this->_req->post->options) && is_array($this->_req->post->options) ? $this->_req->post->options : array();
 
 		// Make sure they are clean, dammit!
 		$regOptions['theme_vars'] = htmlspecialchars__recursive($regOptions['theme_vars']);
 
 		// Check whether we have fields that simply MUST be displayed?
 		require_once(SUBSDIR . '/Profile.subs.php');
-		loadCustomFields(0, 'register', isset($_POST['customfield']) ? $_POST['customfield'] : array());
+		loadCustomFields(0, 'register', isset($this->_req->post->customfield) ? $this->_req->post->customfield : array());
 
 		foreach ($context['custom_fields'] as $row)
 		{
@@ -402,16 +388,16 @@ class Register_Controller extends Action_Controller
 				unset($regOptions['theme_vars'][$row['colname']]);
 
 			// Prepare the value!
-			$value = isset($_POST['customfield'][$row['colname']]) ? trim($_POST['customfield'][$row['colname']]) : '';
+			$value = isset($this->_req->post->customfield[$row['colname']]) ? trim($this->_req->post->customfield[$row['colname']]) : '';
 
 			// We only care for text fields as the others are valid to be empty.
-			if (!in_array($row['type'], array('check', 'select', 'radio')))
+			if (!in_array($row['field_type'], array('check', 'select', 'radio')))
 			{
 				$is_valid = isCustomFieldValid($row, $value);
 				if ($is_valid !== true)
 				{
 					$err_params = array($row['name']);
-					if ($is_valid == 'custom_field_not_number')
+					if ($is_valid === 'custom_field_not_number')
 						$err_params[] = $row['field_length'];
 
 					$reg_errors->addError(array($is_valid, $err_params));
@@ -419,41 +405,42 @@ class Register_Controller extends Action_Controller
 			}
 
 			// Is this required but not there?
-			if (trim($value) == '' && $row['show_reg'] > 1)
+			if (trim($value) === '' && $row['show_reg'] > 1)
 				$reg_errors->addError(array('custom_field_empty', array($row['name'])));
 		}
 
 		// Lets check for other errors before trying to register the member.
 		if ($reg_errors->hasErrors())
 		{
-			$_REQUEST['step'] = 2;
+			$this->_req->post->step = 2;
 
 			// If they've filled in some details but made an error then they need less time to finish
 			$_SESSION['register']['limit'] = 4;
 
-			return $this->action_register();
+			$this->action_register();
+			return false;
 		}
 
 		// If they're wanting to use OpenID we need to validate them first.
-		if (empty($_SESSION['openid']['verified']) && !empty($_POST['authenticate']) && $_POST['authenticate'] == 'openid')
+		if (empty($_SESSION['openid']['verified']) && !empty($this->_req->post->authenticate) && $this->_req->post->authenticate === 'openid')
 		{
 			// What do we need to save?
 			$save_variables = array();
-			foreach ($_POST as $k => $v)
+			foreach ($this->_req->post as $k => $v)
 				if (!in_array($k, array('sc', 'sesc', $context['session_var'], 'passwrd1', 'passwrd2', 'regSubmit')))
 					$save_variables[$k] = $v;
 
 			require_once(SUBSDIR . '/OpenID.subs.php');
 			$openID = new OpenID();
-			$openID->validate($_POST['openid_identifier'], false, $save_variables);
+			$openID->validate($this->_req->post->openid_identifier, false, $save_variables);
 		}
 		// If we've come from OpenID set up some default stuff.
-		elseif ($verifiedOpenID || ((!empty($_POST['openid_identifier']) || !empty($_SESSION['openid']['openid_uri'])) && $_POST['authenticate'] == 'openid'))
+		elseif ($verifiedOpenID || ((!empty($this->_req->post->openid_identifier) || !empty($_SESSION['openid']['openid_uri'])) && $this->_req->post->authenticate === 'openid'))
 		{
-			$regOptions['username'] = !empty($_POST['user']) && trim($_POST['user']) != '' ? $_POST['user'] : $_SESSION['openid']['nickname'];
-			$regOptions['email'] = !empty($_POST['email']) && trim($_POST['email']) != '' ? $_POST['email'] : $_SESSION['openid']['email'];
+			$regOptions['username'] = !empty($this->_req->post->user) && trim($this->_req->post->user) != '' ? $this->_req->post->user : $_SESSION['openid']['nickname'];
+			$regOptions['email'] = !empty($this->_req->post->email) && trim($this->_req->post->email) != '' ? $this->_req->post->email : $_SESSION['openid']['email'];
 			$regOptions['auth_method'] = 'openid';
-			$regOptions['openid'] = !empty($_SESSION['openid']['openid_uri']) ? $_SESSION['openid']['openid_uri'] : (!empty($_POST['openid_identifier']) ? $_POST['openid_identifier'] : '');
+			$regOptions['openid'] = !empty($_SESSION['openid']['openid_uri']) ? $_SESSION['openid']['openid_uri'] : (!empty($this->_req->post->openid_identifier) ? $this->_req->post->openid_identifier : '');
 		}
 
 		// Registration needs to know your IP
@@ -466,21 +453,24 @@ class Register_Controller extends Action_Controller
 		// If there are "important" errors and you are not an admin: log the first error
 		// Otherwise grab all of them and don't log anything
 		if ($reg_errors->hasErrors(1) && !$user_info['is_admin'])
+		{
 			foreach ($reg_errors->prepareErrors(1) as $error)
 				Errors::instance()->fatal_error($error, 'general');
+		}
 
 		// Was there actually an error of some kind dear boy?
 		if ($reg_errors->hasErrors())
 		{
-			$_REQUEST['step'] = 2;
-			return $this->action_register();
+			$this->_req->post->step = 2;
+			$this->action_register();
+			return false;
 		}
 
 		// Do our spam protection now.
 		spamProtection('register');
 
 		// We'll do custom fields after as then we get to use the helper function!
-		if (!empty($_POST['customfield']))
+		if (!empty($this->_req->post->customfield))
 		{
 			require_once(SUBSDIR . '/Profile.subs.php');
 			makeCustomFieldChanges($memberID, 'register');
@@ -488,7 +478,7 @@ class Register_Controller extends Action_Controller
 
 		// If COPPA has been selected then things get complicated, setup the template.
 		if (!empty($modSettings['coppaAge']) && empty($_SESSION['skip_coppa']))
-			redirectexit('action=coppa;member=' . $memberID);
+			redirectexit('action=register;sa=coppa;member=' . $memberID);
 		// Basic template variable setup.
 		elseif (!empty($modSettings['registration_method']))
 		{
@@ -512,12 +502,239 @@ class Register_Controller extends Action_Controller
 	}
 
 	/**
+	 * Checks if registrations are enabled and the user didn't just register
+	 */
+	private function _can_register()
+	{
+		global $modSettings;
+
+		// You can't register if it's disabled.
+		if (!empty($modSettings['registration_method']) && $modSettings['registration_method'] == 3)
+			Errors::instance()->fatal_lang_error('registration_disabled', false);
+
+		// Make sure they didn't just register with this session.
+		if (!empty($_SESSION['just_registered']) && empty($modSettings['disableRegisterCheck']))
+			Errors::instance()->fatal_lang_error('register_only_once', false);
+	}
+
+	/**
+	 * Collect all extra registration fields someone might have filled in.
+	 *
+	 * What it does:
+	 * - Classifies variables as possible string, int, float or bool
+	 * - Casts all posted data to the proper type (string, float, etc)
+	 * - Drops fields that we specially exclude during registration
+	 *
+	 * @param bool $has_real_name - if true adds 'real_name' as well
+	 */
+	private function _extra_vars($has_real_name)
+	{
+		global $modSettings;
+
+		// Define the fields that may be enabled for registration
+		$possible_strings = array(
+			'birthdate',
+			'time_format',
+			'buddy_list',
+			'pm_ignore_list',
+			'smiley_set',
+			'personal_text', 'avatar',
+			'lngfile', 'location',
+			'secret_question', 'secret_answer',
+			'website_url', 'website_title',
+		);
+
+		$possible_ints = array(
+			'pm_email_notify',
+			'notify_types',
+			'id_theme',
+			'gender',
+		);
+
+		$possible_floats = array(
+			'time_offset',
+		);
+
+		$possible_bools = array(
+			'notify_announcements', 'notify_regularity', 'notify_send_body',
+			'hide_email', 'show_online',
+		);
+
+		if ($has_real_name && trim($this->_req->post->real_name) != '' && !isReservedName($this->_req->post->real_name) && Util::strlen($this->_req->post->real_name) < 60)
+			$possible_strings[] = 'real_name';
+
+		// Some of these fields we may not want.
+		if (!empty($modSettings['registration_fields']))
+		{
+			// But we might want some of them if the admin asks for them.
+			$standard_fields = array('location', 'gender');
+			$reg_fields = explode(',', $modSettings['registration_fields']);
+
+			$exclude_fields = array_diff($standard_fields, $reg_fields);
+
+			// Website is a little different
+			if (!in_array('website', $reg_fields))
+				$exclude_fields = array_merge($exclude_fields, array('website_url', 'website_title'));
+
+			// We used to accept signature on registration but it's being abused by spammers these days, so no more.
+			$exclude_fields[] = 'signature';
+		}
+		else
+			$exclude_fields = array('signature', 'location', 'gender', 'website_url', 'website_title');
+
+		$possible_strings = array_diff($possible_strings, $exclude_fields);
+		$possible_ints = array_diff($possible_ints, $exclude_fields);
+		$possible_floats = array_diff($possible_floats, $exclude_fields);
+		$possible_bools = array_diff($possible_bools, $exclude_fields);
+
+		$extra_register_vars = array();
+
+		// Include the additional options that might have been filled in.
+		foreach ($possible_strings as $var)
+			if (isset($this->_req->post->$var))
+				$extra_register_vars[$var] = Util::htmlspecialchars($this->_req->post->$var, ENT_QUOTES);
+
+		foreach ($possible_ints as $var)
+			if (isset($this->_req->post->$var))
+				$extra_register_vars[$var] = (int) $this->_req->post->$var;
+
+		foreach ($possible_floats as $var)
+			if (isset($this->_req->post->$var))
+				$extra_register_vars[$var] = (float) $this->_req->post->$var;
+
+		foreach ($possible_bools as $var)
+			if (isset($this->_req->post->$var))
+				$extra_register_vars[$var] = empty($this->_req->post->$var) ? 0 : 1;
+
+		return $extra_register_vars;
+	}
+
+	/**
+	 * Loads the registration agreement in the users language
+	 *
+	 * What it does:
+	 * - Opens and loads the registration agreement file
+	 * - If one is available in the users language loads that version as well
+	 * - If none is found and it is required, ends the registration process and logs the error
+	 * for the admin to investigate.
+	 */
+	private function _load_require_agreement()
+	{
+		global $context, $user_info, $txt;
+
+		if ($context['require_agreement'])
+		{
+			// Have we got a localized one?
+			if (file_exists(BOARDDIR . '/agreement.' . $user_info['language'] . '.txt'))
+				$context['agreement'] = parse_bbc(file_get_contents(BOARDDIR . '/agreement.' . $user_info['language'] . '.txt'), true, 'agreement_' . $user_info['language']);
+			elseif (file_exists(BOARDDIR . '/agreement.txt'))
+				$context['agreement'] = parse_bbc(file_get_contents(BOARDDIR . '/agreement.txt'), true, 'agreement');
+			else
+				$context['agreement'] = '';
+
+			// Nothing to show, lets disable registration and inform the admin of this error
+			if (empty($context['agreement']))
+			{
+				// No file found or a blank file, log the error so the admin knows there is a problem!
+				Errors::instance()->log_error($txt['registration_agreement_missing'], 'critical');
+				Errors::instance()->fatal_lang_error('registration_disabled', false);
+			}
+		}
+	}
+
+	/**
+	 * Sets the users language file
+	 *
+	 * What it does:
+	 * - If language support is enabled, loads whats available
+	 * - Verifies the users choice is available
+	 * - Sets in in context / session
+	 */
+	private function _load_language_support()
+	{
+		global $context, $modSettings, $language;
+
+		// Language support enabled
+		if (!empty($modSettings['userLanguage']))
+		{
+			// Do we have any languages?
+			$languages = getLanguages();
+
+			if (isset($this->_req->post->lngfile) && isset($languages[$this->_req->post->lngfile]))
+			{
+				$_SESSION['language'] = $this->_req->post->lngfile;
+			}
+
+			// No selected, or not found, use the site default
+			$selectedLanguage = empty($_SESSION['language']) ? $language : $_SESSION['language'];
+
+			// Try to find our selected language.
+			foreach ($languages as $key => $lang)
+			{
+				$context['languages'][$key]['name'] = $lang['name'];
+
+				// Found it!
+				if ($selectedLanguage == $lang['filename'])
+				{
+					$context['languages'][$key]['selected'] = true;
+				}
+			}
+		}
+	}
+
+	/**
+	 * Load standard and custom registration profile fields
+	 *
+	 * @uses loadCustomFields() Loads standard fields in to context
+	 * @uses setupProfileContext() Loads supplied fields in to context
+	 */
+	private function _load_profile_fields()
+	{
+		global $context, $modSettings, $user_info, $cur_profile;
+
+		// Any custom fields to load?
+		require_once(SUBSDIR . '/Profile.subs.php');
+		loadCustomFields(0, 'register');
+
+		// Or any standard ones?
+		if (!empty($modSettings['registration_fields']))
+		{
+			// Setup some important context.
+			loadLanguage('Profile');
+			loadTemplate('Profile');
+
+			$context['user']['is_owner'] = true;
+
+			// Here, and here only, emulate the permissions the user would have to do this.
+			$user_info['permissions'] = array_merge($user_info['permissions'], array('profile_account_own', 'profile_extra_own'));
+			$reg_fields = explode(',', $modSettings['registration_fields']);
+
+			// We might have had some submissions on this front - go check.
+			foreach ($reg_fields as $field)
+			{
+				if (isset($this->_req->post->$field))
+				{
+					$cur_profile[$field] = Util::htmlspecialchars($this->_req->post->$field);
+				}
+			}
+
+			// Load all the fields in question.
+			setupProfileContext($reg_fields, 'registration');
+		}
+	}
+
+	/**
 	 * Verify the activation code, and activate the user if correct.
-	 * Accessed by ?action=activate
+	 *
+	 * What it does:
+	 * - Accessed by ?action=register;sa=activate
+	 * - Processes activation code requests
+	 * - Checks if the user is already activate and if so does nothing
+	 * - Prevents a user from using an existing email
 	 */
 	public function action_activate()
 	{
-		global $context, $txt, $modSettings, $scripturl, $language, $user_info;
+		global $context, $txt, $modSettings, $user_info;
 
 		require_once(SUBSDIR . '/Auth.subs.php');
 
@@ -529,31 +746,34 @@ class Register_Controller extends Action_Controller
 		loadTemplate('Login');
 		loadJavascriptFile('sha256.js', array('defer' => true));
 
-		if (empty($_REQUEST['u']) && empty($_POST['user']))
+		// Need a user id to activate
+		if (empty($this->_req->query->u) && empty($this->_req->post->user))
 		{
+			// Immediate 0 or disabled 3 means no need to try and activate
 			if (empty($modSettings['registration_method']) || $modSettings['registration_method'] == '3')
 				Errors::instance()->fatal_lang_error('no_access', false);
 
+			// Otherwise its simply invalid
 			$context['member_id'] = 0;
 			$context['sub_template'] = 'resend';
 			$context['page_title'] = $txt['invalid_activation_resend'];
 			$context['can_activate'] = empty($modSettings['registration_method']) || $modSettings['registration_method'] == '1';
-			$context['default_username'] = isset($_GET['user']) ? $_GET['user'] : '';
+			$context['default_username'] = $this->_req->getPost('user', 'trim', '');
 
 			return;
 		}
 
-		// Get the code from the database...
-		$row = findUser(empty($_REQUEST['u']) ? '
+		// Get the user from the database...
+		$this->_row = findUser(empty($this->_req->query->u) ? '
 			member_name = {string:email_address} OR email_address = {string:email_address}' : '
 			id_member = {int:id_member}', array(
-				'id_member' => isset($_REQUEST['u']) ? (int) $_REQUEST['u'] : 0,
-				'email_address' => isset($_POST['user']) ? $_POST['user'] : '',
+				'id_member' => $this->_req->getQuery('u', 'intval', 0),
+				'email_address' => $this->_req->getPost('user', 'trim', ''),
 			), false
 		);
 
 		// Does this user exist at all?
-		if (empty($row))
+		if (empty($this->_row))
 		{
 			$context['sub_template'] = 'retry_activate';
 			$context['page_title'] = $txt['invalid_userid'];
@@ -562,93 +782,34 @@ class Register_Controller extends Action_Controller
 			return;
 		}
 
-		// Change their email address? (they probably tried a fake one first :P.)
-		if (isset($_POST['new_email'], $_REQUEST['passwd']) && validateLoginPassword($_REQUEST['passwd'], $row['passwd'], $row['member_name'], true) && ($row['is_activated'] == 0 || $row['is_activated'] == 2))
-		{
-			if (empty($modSettings['registration_method']) || $modSettings['registration_method'] == 3)
-				Errors::instance()->fatal_lang_error('no_access', false);
+		// Change their email address if not active 0 or awaiting reactivation 2? ( they probably tried a fake one first :P )
+		$email_change = $this->_activate_change_email();
 
-			// @todo Separate the sprintf?
-			if (!Data_Validator::is_valid($_POST, array('new_email' => 'valid_email|required|max_length[255]'), array('new_email' => 'trim')))
-				Errors::instance()->fatal_error(sprintf($txt['valid_email_needed'], htmlspecialchars($_POST['new_email'], ENT_COMPAT, 'UTF-8')), false);
-
-			// Make sure their email isn't banned.
-			isBannedEmail($_POST['new_email'], 'cannot_register', $txt['ban_register_prohibited']);
-
-			// Ummm... don't even dare try to take someone else's email!!
-			// @todo Separate the sprintf?
-			if (userByEmail($_POST['new_email']))
-				Errors::instance()->fatal_lang_error('email_in_use', false, array(htmlspecialchars($_POST['new_email'], ENT_COMPAT, 'UTF-8')));
-
-			require_once(SUBSDIR . '/Members.subs.php');
-			updateMemberData($row['id_member'], array('email_address' => $_POST['new_email']));
-			$row['email_address'] = $_POST['new_email'];
-
-			$email_change = true;
-		}
-
-		// Resend the password, but only if the account wasn't activated yet.
-		if (!empty($_REQUEST['sa']) && $_REQUEST['sa'] == 'resend' && ($row['is_activated'] == 0 || $row['is_activated'] == 2) && (!isset($_REQUEST['code']) || $_REQUEST['code'] == ''))
-		{
-			require_once(SUBSDIR . '/Mail.subs.php');
-
-			$replacements = array(
-				'REALNAME' => $row['real_name'],
-				'USERNAME' => $row['member_name'],
-				'ACTIVATIONLINK' => $scripturl . '?action=activate;u=' . $row['id_member'] . ';code=' . $row['validation_code'],
-				'ACTIVATIONLINKWITHOUTCODE' => $scripturl . '?action=activate;u=' . $row['id_member'],
-				'ACTIVATIONCODE' => $row['validation_code'],
-				'FORGOTPASSWORDLINK' => $scripturl . '?action=reminder',
-			);
-
-			$emaildata = loadEmailTemplate('resend_activate_message', $replacements, empty($row['lngfile']) || empty($modSettings['userLanguage']) ? $language : $row['lngfile']);
-
-			sendmail($row['email_address'], $emaildata['subject'], $emaildata['body'], null, null, false, 0);
-
-			$context['page_title'] = $txt['invalid_activation_resend'];
-
-			// This will ensure we don't actually get an error message if it works!
-			$context['error_title'] = '';
-
-			Errors::instance()->fatal_lang_error(!empty($email_change) ? 'change_email_success' : 'resend_email_success', false);
-		}
+		// Resend the password, but only if the account wasn't activated yet (0 or 2)
+		$this->_activate_resend($email_change);
 
 		// Quit if this code is not right.
-		if (empty($_REQUEST['code']) || $row['validation_code'] != $_REQUEST['code'])
-		{
-			if (!empty($row['is_activated']) && $row['is_activated'] == 1)
-				Errors::instance()->fatal_lang_error('already_activated', false);
-			elseif ($row['validation_code'] == '')
-			{
-				loadLanguage('Profile');
-				Errors::instance()->fatal_error($txt['registration_not_approved'] . ' <a href="' . $scripturl . '?action=activate;user=' . $row['member_name'] . '">' . $txt['here'] . '</a>.', false);
-			}
-
-			$context['sub_template'] = 'retry_activate';
-			$context['page_title'] = $txt['invalid_activation_code'];
-			$context['member_id'] = $row['id_member'];
-
+		if ($this->_activate_validate_code() === false)
 			return;
-		}
-		require_once(SUBSDIR . '/Members.subs.php');
 
 		// Validation complete - update the database!
-		approveMembers(array('members' => array($row['id_member']), 'activated_status' => $row['is_activated']));
+		require_once(SUBSDIR . '/Members.subs.php');
+		approveMembers(array('members' => array($this->_row['id_member']), 'activated_status' => $this->_row['is_activated']));
 
 		// Also do a proper member stat re-evaluation.
 		require_once(SUBSDIR . '/Members.subs.php');
 		updateMemberStats();
 
-		if (!isset($_POST['new_email']) && empty($row['is_activated']))
+		if (!isset($this->_req->post->new_email) && empty($this->_row['is_activated']))
 		{
 			require_once(SUBSDIR . '/Notification.subs.php');
-			sendAdminNotifications('activation', $row['id_member'], $row['member_name']);
+			sendAdminNotifications('activation', $this->_row['id_member'], $this->_row['member_name']);
 		}
 
 		$context += array(
 			'page_title' => $txt['registration_successful'],
 			'sub_template' => 'login',
-			'default_username' => $row['member_name'],
+			'default_username' => $this->_row['member_name'],
 			'default_password' => '',
 			'never_expire' => false,
 			'description' => $txt['activate_success']
@@ -656,8 +817,123 @@ class Register_Controller extends Action_Controller
 	}
 
 	/**
+	 * Change their email address if not active
+	 *
+	 * What it does:
+	 * - Requires the user enter the id/password for the account
+	 * - The account must not be active 0 or awaiting reactivation 2
+	 */
+	private function _activate_change_email()
+	{
+		global $modSettings, $txt;
+
+		if (isset($this->_req->post->new_email, $this->_req->post->passwd)
+			&& validateLoginPassword($this->_req->post->passwd, $this->_row['passwd'], $this->_row['member_name'], true)
+			&& ($this->_row['is_activated'] == 0 || $this->_row['is_activated'] == 2))
+		{
+			if (empty($modSettings['registration_method']) || $modSettings['registration_method'] == 3)
+			{
+				Errors::instance()->fatal_lang_error('no_access', false);
+			}
+
+			// @todo Separate the sprintf?
+			if (!Data_Validator::is_valid($this->_req->post, array('new_email' => 'valid_email|required|max_length[255]'), array('new_email' => 'trim')))
+			{
+				Errors::instance()->fatal_error(sprintf($txt['valid_email_needed'], htmlspecialchars($this->_req->post->new_email, ENT_COMPAT, 'UTF-8')), false);
+			}
+
+			// Make sure their email isn't banned.
+			isBannedEmail($this->_req->post->new_email, 'cannot_register', $txt['ban_register_prohibited']);
+
+			// Ummm... don't take someone else's email during the change
+			// @todo Separate the sprintf?
+			if (userByEmail($this->_req->post->new_email))
+			{
+				Errors::instance()->fatal_lang_error('email_in_use', false, array(htmlspecialchars($this->_req->post->new_email, ENT_COMPAT, 'UTF-8')));
+			}
+
+			require_once(SUBSDIR . '/Members.subs.php');
+			updateMemberData($this->_row['id_member'], array('email_address' => $this->_req->post->new_email));
+			$this->_row['email_address'] = $this->_req->post->new_email;
+
+			return true;
+		}
+
+		return false;
+	}
+
+	/**
+	 * Resend an activation code to a user
+	 *
+	 * What it does:
+	 * - Called with action=register;sa=activate;resend
+	 * - Will resend an activation code to non-active account
+	 *
+	 * @param bool $email_change if the email was changed or not
+	 */
+	private function _activate_resend($email_change)
+	{
+		global $scripturl, $modSettings, $language, $txt, $context;
+
+		if (isset($this->_req->query->resend)
+			&& ($this->_row['is_activated'] == 0 || $this->_row['is_activated'] == 2)
+			&& $this->_req->getPost('code', 'trim', '') === '')
+		{
+			require_once(SUBSDIR . '/Mail.subs.php');
+
+			$replacements = array(
+				'REALNAME' => $this->_row['real_name'],
+				'USERNAME' => $this->_row['member_name'],
+				'ACTIVATIONLINK' => $scripturl . '?action=register;sa=activate;u=' . $this->_row['id_member'] . ';code=' . $this->_row['validation_code'],
+				'ACTIVATIONLINKWITHOUTCODE' => $scripturl . '?action=register;sa=activate;u=' . $this->_row['id_member'],
+				'ACTIVATIONCODE' => $this->_row['validation_code'],
+				'FORGOTPASSWORDLINK' => $scripturl . '?action=reminder',
+			);
+
+			$emaildata = loadEmailTemplate('resend_activate_message', $replacements, empty($this->_row['lngfile']) || empty($modSettings['userLanguage']) ? $language : $this->_row['lngfile']);
+			sendmail($this->_row['email_address'], $emaildata['subject'], $emaildata['body'], null, null, false, 0);
+
+			$context['page_title'] = $txt['invalid_activation_resend'];
+
+			// This will ensure we don't actually get an error message if it works!
+			$context['error_title'] = '';
+			Errors::instance()->fatal_lang_error(!empty($email_change) ? 'change_email_success' : 'resend_email_success', false);
+		}
+	}
+
+	/**
+	 * Validates a supplied activation code is valid
+	 */
+	private function _activate_validate_code()
+	{
+		global $txt, $scripturl, $context;
+
+		if ($this->_req->getQuery('code', 'trim', '') != $this->_row['validation_code'])
+		{
+			if (!empty($this->_row['is_activated']) && $this->_row['is_activated'] == 1)
+			{
+				Errors::instance()->fatal_lang_error('already_activated', false);
+			}
+			elseif ($this->_row['validation_code'] === '')
+			{
+				loadLanguage('Profile');
+				Errors::instance()->fatal_error($txt['registration_not_approved'] . ' <a href="' . $scripturl . '?action=register;sa=activate;user=' . $this->_row['member_name'] . '">' . $txt['here'] . '</a>.', false);
+			}
+
+			$context['sub_template'] = 'retry_activate';
+			$context['page_title'] = $txt['invalid_activation_code'];
+			$context['member_id'] = $this->_row['id_member'];
+
+			return false;
+		}
+
+		return true;
+	}
+
+	/**
 	 * This function will display the contact information for the forum, as well a form to fill in.
-	 * Accessed by action=coppa
+	 *
+	 * - Accessed by action=register;sa=coppa
 	 */
 	public function action_coppa()
 	{
@@ -667,25 +943,25 @@ class Register_Controller extends Action_Controller
 		loadTemplate('Register');
 
 		// No User ID??
-		if (!isset($_GET['member']))
+		if (!isset($this->_req->query->member))
 			Errors::instance()->fatal_lang_error('no_access', false);
 
 		// Get the user details...
 		require_once(SUBSDIR . '/Members.subs.php');
-		$member = getBasicMemberData((int) $_GET['member'], array('authentication' => true));
+		$member = getBasicMemberData((int) $this->_req->query->member, array('authentication' => true));
 
 		// If doesn't exist or not pending coppa
 		if (empty($member) || $member['is_activated'] != 5)
 			Errors::instance()->fatal_lang_error('no_access', false);
 
-		if (isset($_GET['form']))
+		if (isset($this->_req->query->form))
 		{
 			// Some simple contact stuff for the forum.
 			$context['forum_contacts'] = (!empty($modSettings['coppaPost']) ? $modSettings['coppaPost'] . '<br /><br />' : '') . (!empty($modSettings['coppaFax']) ? $modSettings['coppaFax'] . '<br />' : '');
 			$context['forum_contacts'] = !empty($context['forum_contacts']) ? $context['forum_name_html_safe'] . '<br />' . $context['forum_contacts'] : '';
 
 			// Showing template?
-			if (!isset($_GET['dl']))
+			if (!isset($this->_req->query->dl))
 			{
 				// Shortcut for producing underlines.
 				$context['ul'] = '<span class="underline">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>';
@@ -726,20 +1002,22 @@ class Register_Controller extends Action_Controller
 				'post' => empty($modSettings['coppaPost']) ? '' : $modSettings['coppaPost'],
 				'fax' => empty($modSettings['coppaFax']) ? '' : $modSettings['coppaFax'],
 				'phone' => empty($modSettings['coppaPhone']) ? '' : str_replace('{PHONE_NUMBER}', $modSettings['coppaPhone'], $txt['coppa_send_by_phone']),
-				'id' => $_GET['member'],
+				'id' => $this->_req->query->member,
 			);
 		}
 	}
 
 	/**
 	 * Show the verification code or let it hear.
-	 * Accessed by ?action=verificationcode
+	 *
+	 * - Accessed by ?action=register;sa=verificationcode
 	 */
 	public function action_verificationcode()
 	{
 		global $context, $scripturl;
+	//	vid=register;rand=ef746ef2ee7ad37a35ce512cf9aa43d2;sound
 
-		$verification_id = isset($_GET['vid']) ? $_GET['vid'] : '';
+		$verification_id = isset($this->_req->query->vid) ? $this->_req->query->vid : '';
 		$code = $verification_id && isset($_SESSION[$verification_id . '_vv']) ? $_SESSION[$verification_id . '_vv']['code'] : (isset($_SESSION['visual_verification_code']) ? $_SESSION['visual_verification_code'] : '');
 
 		// Somehow no code was generated or the session was lost.
@@ -748,30 +1026,30 @@ class Register_Controller extends Action_Controller
 			header('Content-Type: image/gif');
 			die("\x47\x49\x46\x38\x39\x61\x01\x00\x01\x00\x80\x00\x00\x00\x00\x00\x00\x00\x00\x21\xF9\x04\x01\x00\x00\x00\x00\x2C\x00\x00\x00\x00\x01\x00\x01\x00\x00\x02\x02\x44\x01\x00\x3B");
 		}
-		// Show a window that will play the verification code.
-		elseif (isset($_REQUEST['sound']))
+		// Show a window that will play the verification code (play sound)
+		elseif (isset($this->_req->query->sound))
 		{
 			loadLanguage('Login');
 			loadTemplate('Register');
 
-			$context['verification_sound_href'] = $scripturl . '?action=verificationcode;rand=' . md5(mt_rand()) . ($verification_id ? ';vid=' . $verification_id : '') . ';format=.wav';
+			$context['verification_sound_href'] = $scripturl . '?action=register;sa=verificationcode;rand=' . md5(mt_rand()) . ($verification_id ? ';vid=' . $verification_id : '') . ';format=.wav';
 			$context['sub_template'] = 'verification_sound';
 			Template_Layers::getInstance()->removeAll();
 
 			obExit();
 		}
-		// If we have GD, try the nice code.
-		elseif (empty($_REQUEST['format']))
+		// If we have GD, try the nice code. (new image)
+		elseif (empty($this->_req->query->format))
 		{
 			require_once(SUBSDIR . '/Graphics.subs.php');
 
 			if (in_array('gd', get_loaded_extensions()) && !showCodeImage($code))
 				header('HTTP/1.1 400 Bad Request');
 			// Otherwise just show a pre-defined letter.
-			elseif (isset($_REQUEST['letter']))
+			elseif (isset($this->_req->query->letter))
 			{
-				$_REQUEST['letter'] = (int) $_REQUEST['letter'];
-				if ($_REQUEST['letter'] > 0 && $_REQUEST['letter'] <= strlen($code) && !showLetterImage(strtolower($code{$_REQUEST['letter'] - 1})))
+				$this->_req->query->letter = (int) $this->_req->query->letter;
+				if ($this->_req->query->letter > 0 && $this->_req->query->letter <= strlen($code) && !showLetterImage(strtolower($code{$this->_req->query->letter - 1})))
 				{
 					header('Content-Type: image/gif');
 					die("\x47\x49\x46\x38\x39\x61\x01\x00\x01\x00\x80\x00\x00\x00\x00\x00\x00\x00\x00\x21\xF9\x04\x01\x00\x00\x00\x00\x2C\x00\x00\x00\x00\x01\x00\x01\x00\x00\x02\x02\x44\x01\x00\x3B");
@@ -784,7 +1062,8 @@ class Register_Controller extends Action_Controller
 				die("\x47\x49\x46\x38\x39\x61\x01\x00\x01\x00\x80\x00\x00\x00\x00\x00\x00\x00\x00\x21\xF9\x04\x01\x00\x00\x00\x00\x2C\x00\x00\x00\x00\x01\x00\x01\x00\x00\x02\x02\x44\x01\x00\x3B");
 			}
 		}
-		elseif ($_REQUEST['format'] === '.wav')
+		// Or direct link to the sound
+		elseif ($this->_req->query->format === '.wav')
 		{
 			require_once(SUBSDIR . '/Sound.subs.php');
 
@@ -792,30 +1071,34 @@ class Register_Controller extends Action_Controller
 				header('HTTP/1.1 400 Bad Request');
 		}
 
-		// We all die one day...
-		die();
+		// Why die when we can exit to live another day...
+		exit();
 	}
 
 	/**
 	 * Shows the contact form for the user to fill out
-	 * Needs to be enabled to be used
+	 *
+	 * - Functionality needs to be enabled in the ACP for this to be used
 	 */
 	public function action_contact()
 	{
 		global $context, $txt, $user_info, $modSettings;
 
-		// Already inside, no need to use this, just send a PM
+		// Users have no need to use this, just send a PM
 		// Disabled, you cannot enter.
-		if (!$user_info['is_guest'] || empty($modSettings['enable_contactform']) || $modSettings['enable_contactform'] == 'disabled')
+		if (!$user_info['is_guest'] || empty($modSettings['enable_contactform']) || $modSettings['enable_contactform'] === 'disabled')
 			redirectexit();
 
 		loadLanguage('Login');
 		loadTemplate('Register');
 
-		if (isset($_REQUEST['send']))
+		// Submitted the contact form?
+		if (isset($this->_req->post->send))
 		{
 			checkSession('post');
 			validateToken('contact');
+
+			// Can't send a lot of these in a row, no sir!
 			spamProtection('contact');
 
 			// No errors, yet.
@@ -826,11 +1109,11 @@ class Register_Controller extends Action_Controller
 			require_once(SUBSDIR . '/VerificationControls.class.php');
 			require_once(SUBSDIR . '/Members.subs.php');
 
-			// form validation
+			// Form validation
 			$validator = new Data_Validator();
 			$validator->sanitation_rules(array(
 				'emailaddress' => 'trim',
-				'contactmessage' => 'trim|Util::htmlspecialchars'
+				'contactmessage' => 'trim'
 			));
 			$validator->validation_rules(array(
 				'emailaddress' => 'required|valid_email',
@@ -842,9 +1125,13 @@ class Register_Controller extends Action_Controller
 			));
 
 			// Any form errors
-			if (!$validator->validate($_POST))
+			if (!$validator->validate($this->_req->post))
 				$context['errors'] = $validator->validation_errors();
 
+			// Get the clean data
+			$this->_req->post = new ArrayObject($validator->validation_data(), ArrayObject::ARRAY_AS_PROPS);
+
+			// Trigger the verify contact event for captcha checks
 			$this->_events->trigger('verify_contact', array());
 
 			// No errors, then send the PM to the admins
@@ -854,26 +1141,28 @@ class Register_Controller extends Action_Controller
 				if (!empty($admins))
 				{
 					require_once(SUBSDIR . '/PersonalMessage.subs.php');
-					sendpm(array('to' => array_keys($admins), 'bcc' => array()), $txt['contact_subject'], $_REQUEST['contactmessage'], false, array('id' => 0, 'name' => $validator->emailaddress, 'username' => $validator->emailaddress));
+					sendpm(array('to' => array_keys($admins), 'bcc' => array()), $txt['contact_subject'], $this->_req->post->contactmessage, false, array('id' => 0, 'name' => $this->_req->post->emailaddress, 'username' => $this->_req->post->emailaddress));
 				}
 
 				// Send the PM
-				redirectexit('action=contact;sa=done');
+				redirectexit('action=register;sa=contact;done');
 			}
 			else
 			{
-				$context['emailaddress'] = $validator->emailaddress;
-				$context['contactmessage'] = $validator->contactmessage;
+				$context['emailaddress'] = $this->_req->post->emailaddress;
+				$context['contactmessage'] = $this->_req->post->contactmessage;
 			}
 		}
 
-		if (isset($_GET['sa']) && $_GET['sa'] == 'done')
+		// Show the contact done form or the form itself
+		if (isset($this->_req->query->done))
 			$context['sub_template'] = 'contact_form_done';
 		else
 		{
 			$context['sub_template'] = 'contact_form';
 			$context['page_title'] = $txt['admin_contact_form'];
 
+			// Setup any contract form events, like validation
 			$this->_events->trigger('setup_contact', array());
 		}
 
@@ -882,15 +1171,17 @@ class Register_Controller extends Action_Controller
 
 	/**
 	 * See if a username already exists.
+	 *
+	 * - Used by registration template via xml request
 	 */
-	private function _registerCheckUsername()
+	public function action_registerCheckUsername()
 	{
 		global $context;
 
 		// This is XML!
 		loadTemplate('Xml');
 		$context['sub_template'] = 'check_username';
-		$context['checked_username'] = isset($_GET['username']) ? un_htmlspecialchars($_GET['username']) : '';
+		$context['checked_username'] = isset($this->_req->query->username) ? un_htmlspecialchars($this->_req->query->username) : '';
 		$context['valid_username'] = true;
 
 		// Clean it up like mother would.
@@ -902,88 +1193,5 @@ class Register_Controller extends Action_Controller
 		validateUsername(0, $context['checked_username'], 'valid_username', true, false);
 
 		$context['valid_username'] = !$errors->hasErrors();
-	}
-
-	/**
-	 * Collect all extra registration fields someone might have filled in.
-	 *
-	 * @param bool $has_real_name - if true adds 'real_name' as well
-	 */
-	private function _extra_vars($has_real_name)
-	{
-		global $modSettings;
-
-		$possible_strings = array(
-			'birthdate',
-			'time_format',
-			'buddy_list',
-			'pm_ignore_list',
-			'smiley_set',
-			'personal_text', 'avatar',
-			'lngfile', 'location',
-			'secret_question', 'secret_answer',
-			'website_url', 'website_title',
-		);
-		$possible_ints = array(
-			'pm_email_notify',
-			'notify_types',
-			'id_theme',
-			'gender',
-		);
-		$possible_floats = array(
-			'time_offset',
-		);
-		$possible_bools = array(
-			'notify_announcements', 'notify_regularity', 'notify_send_body',
-			'hide_email', 'show_online',
-		);
-
-		if ($has_real_name && trim($_POST['real_name']) != '' && !isReservedName($_POST['real_name']) && Util::strlen($_POST['real_name']) < 60)
-			$possible_strings[] = 'real_name';
-
-		// Some of these fields we may not want.
-		if (!empty($modSettings['registration_fields']))
-		{
-			// But we might want some of them if the admin asks for them.
-			$standard_fields = array('location', 'gender');
-			$reg_fields = explode(',', $modSettings['registration_fields']);
-
-			$exclude_fields = array_diff($standard_fields, $reg_fields);
-
-			// Website is a little different
-			if (!in_array('website', $reg_fields))
-				$exclude_fields = array_merge($exclude_fields, array('website_url', 'website_title'));
-
-			// We used to accept signature on registration but it's being abused by spammers these days, so no more.
-			$exclude_fields[] = 'signature';
-		}
-		else
-			$exclude_fields = array('signature', 'location', 'gender', 'website_url', 'website_title');
-
-		$possible_strings = array_diff($possible_strings, $exclude_fields);
-		$possible_ints = array_diff($possible_ints, $exclude_fields);
-		$possible_floats = array_diff($possible_floats, $exclude_fields);
-		$possible_bools = array_diff($possible_bools, $exclude_fields);
-
-		$extra_register_vars = array();
-
-		// Include the additional options that might have been filled in.
-		foreach ($possible_strings as $var)
-			if (isset($_POST[$var]))
-				$extra_register_vars[$var] = Util::htmlspecialchars($_POST[$var], ENT_QUOTES);
-
-		foreach ($possible_ints as $var)
-			if (isset($_POST[$var]))
-				$extra_register_vars[$var] = (int) $_POST[$var];
-
-		foreach ($possible_floats as $var)
-			if (isset($_POST[$var]))
-				$extra_register_vars[$var] = (float) $_POST[$var];
-
-		foreach ($possible_bools as $var)
-			if (isset($_POST[$var]))
-				$extra_register_vars[$var] = empty($_POST[$var]) ? 0 : 1;
-
-		return $extra_register_vars;
 	}
 }

@@ -1054,9 +1054,9 @@ function validateAttachID($id_attach)
  * - retrieve all the attachments waiting for approval the approver can approve
  *
  * @package Attachments
- * @param int $start
- * @param int $items_per_page
- * @param string $sort
+ * @param int $start The item to start with (for pagination purposes)
+ * @param int $items_per_page  The number of items to show per page
+ * @param string $sort A string indicating how to sort the results
  * @param string $approve_query additional restrictions based on the boards the approver can see
  * @return mixed[] an array of unapproved attachments
  */
@@ -1384,9 +1384,9 @@ function list_getNumFiles($browse_type)
  * - Callback function for createList()
  *
  * @package Attachments
- * @param int $start
- * @param int $items_per_page
- * @param string $sort
+ * @param int $start The item to start with (for pagination purposes)
+ * @param int $items_per_page  The number of items to show per page
+ * @param string $sort A string indicating how to sort the results
  * @param string $browse_type can be on eof 'avatars' or ... not. :P
  */
 function list_getFiles($start, $items_per_page, $sort, $browse_type)

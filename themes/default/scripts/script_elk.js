@@ -1,10 +1,12 @@
-/**
+/*!
  * @name      ElkArte Forum
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
  * @version 1.1 dev
- *
+ */
+
+/**
  * This file contains javascript utility functions specific to ElkArte
  */
 
@@ -1331,7 +1333,7 @@ function mlsearch_opt_hide()
  */
 function loadAddNewPoll(button, id_board, form_name)
 {
-	if (typeof id_board == 'undefined')
+	if (typeof id_board === 'undefined')
 		return true;
 
 	// Find the form and add poll to the url
@@ -1446,7 +1448,7 @@ function disableAutoComplete()
 }
 
 /**
- * A sistem to collect notifications from a single AJAX call and redistribute them
+ * A system to collect notifications from a single AJAX call and redistribute them
  * among notifiers
  */
 (function() {

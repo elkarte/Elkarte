@@ -175,7 +175,7 @@ class Request
 		{
 			$this->_client_ip = preg_replace('~^::ffff:(\d+\.\d+\.\d+\.\d+)~', '\1', $_SERVER['REMOTE_ADDR']);
 
-			// Just incase we have a legacy IPv4 address.
+			// Just in case we have a legacy IPv4 address.
 			// @ TODO: Convert to IPv6.
 			if (filter_var($this->_client_ip, FILTER_VALIDATE_IP, FILTER_FLAG_IPV4) === false)
 				$this->_client_ip = 'unknown';
@@ -398,7 +398,7 @@ class Request
 	 * Checks the request and abruptly stops processing if issues are found
 	 *
 	 * - No magic quotes allowed
-	 * - Don't try to set a GLOBLAS key in globals
+	 * - Don't try to set a GLOBALS key in globals
 	 * - No numeric keys in $_GET, $_POST or $_FILE
 	 * - No URL's appended to the query string
 	 */
@@ -431,7 +431,7 @@ class Request
 	/**
 	 * Check for illegal numeric keys
 	 *
-	 * - Fail on illgal keys
+	 * - Fail on illegal keys
 	 * - Clear ones that should not be allowed
 	 */
 	private function _checkNumericKeys()
@@ -474,7 +474,7 @@ class Request
 	}
 
 	/**
-	 * Helper mehtod used to clean $_GET arguments
+	 * Helper method used to clean $_GET arguments
 	 */
 	private function _cleanArg()
 	{
@@ -488,7 +488,7 @@ class Request
 			// Do not urldecode() the querystring, unless you so much wish to break OpenID implementation. :)
 			$this->_server_query_string = substr($this->_server_query_string, 0, 5) === 'url=/' ? $_SERVER['REDIRECT_QUERY_STRING'] : $this->_server_query_string;
 
-			// Some german webmailers need a decoded string, so let's decode the string for action=activate and action=reminder
+			// Some german webmailers need a decoded string, so let's decode the string for sa=activate and action=reminder
 			if (strpos($this->_server_query_string, 'activate') !== false || strpos($this->_server_query_string, 'reminder') !== false)
 				$this->_server_query_string = urldecode($this->_server_query_string);
 

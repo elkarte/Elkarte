@@ -78,10 +78,10 @@ function getBuddiesID($buddies, $adding = true)
 /**
  * Load group details for all groups that a member can join
  *
- * @param int[] $groups
+ * @param int[] $current_groups
  * @param int $memID
  */
-function loadMembergroupsJoin($groups, $memID)
+function loadMembergroupsJoin($current_groups, $memID)
 {
 	global $context;
 
@@ -93,13 +93,12 @@ function loadMembergroupsJoin($groups, $memID)
 			IFNULL(lgr.id_member, 0) AS pending
 		FROM {db_prefix}membergroups AS mg
 			LEFT JOIN {db_prefix}log_group_requests AS lgr ON (lgr.id_member = {int:selected_member} AND lgr.id_group = mg.id_group)
-		WHERE (mg.id_group IN ({array_int:group_list})
-			OR mg.group_type > {int:nonjoin_group_id})
+		WHERE (mg.id_group IN ({array_int:group_list}) OR mg.group_type > {int:nonjoin_group_id})
 			AND mg.min_posts = {int:min_posts}
 			AND mg.id_group != {int:moderator_group}
 		ORDER BY group_name',
 		array(
-			'group_list' => $groups,
+			'group_list' => $current_groups,
 			'selected_member' => $memID,
 			'nonjoin_group_id' => 1,
 			'min_posts' => -1,
@@ -114,14 +113,15 @@ function loadMembergroupsJoin($groups, $memID)
 	while ($row = $db->fetch_assoc($request))
 	{
 		// Can they edit their primary group?
-		if (($row['id_group'] == $context['primary_group'] && $row['group_type'] > 1) || ($row['hidden'] != 2 && $context['primary_group'] == 0 && in_array($row['id_group'], $groups)))
+		if (($row['id_group'] == $context['primary_group'] && $row['group_type'] > 1)
+			|| ($row['hidden'] != 2 && $context['primary_group'] == 0 && in_array($row['id_group'], $current_groups)))
 			$context['can_edit_primary'] = true;
 
 		// If they can't manage (protected) groups, and it's not publicly joinable or already assigned, they can't see it.
 		if (((!$context['can_manage_protected'] && $row['group_type'] == 1) || (!$context['can_manage_membergroups'] && $row['group_type'] == 0)) && $row['id_group'] != $context['primary_group'])
 			continue;
 
-		$groups[in_array($row['id_group'], $groups) ? 'member' : 'available'][$row['id_group']] = array(
+		$groups[in_array($row['id_group'], $current_groups) ? 'member' : 'available'][$row['id_group']] = array(
 			'id' => $row['id_group'],
 			'name' => $row['group_name'],
 			'desc' => $row['description'],

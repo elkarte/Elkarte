@@ -25,6 +25,7 @@ class Drafts_PersonalMessage_Module implements ElkArte\sources\modules\Module_In
 	protected static $_autosave_enabled = false;
 	protected static $_autosave_frequency = 30000;
 	protected static $_subject_length = 24;
+	protected $_loaded_draft = null;
 
 	/**
 	 * {@inheritdoc }
@@ -54,7 +55,8 @@ class Drafts_PersonalMessage_Module implements ElkArte\sources\modules\Module_In
 				self::$_subject_length = (int) $modSettings['draft_subject_length'];
 
 			return array(
-				array('prepare_send_context', array('Drafts_PersonalMessage_Module', 'prepare_send_context'), array('pmsg', 'editorOptions')),
+				array('before_set_context', array('Drafts_PersonalMessage_Module', 'before_set_context'), array()),
+				array('prepare_send_context', array('Drafts_PersonalMessage_Module', 'prepare_send_context'), array('editorOptions', 'recipientList')),
 				array('before_sending', array('Drafts_PersonalMessage_Module', 'before_sending'), array('recipientList')),
 			);
 		}
@@ -80,15 +82,29 @@ class Drafts_PersonalMessage_Module implements ElkArte\sources\modules\Module_In
 		$subActions['showpmdrafts'] = array('controller' => 'Draft_Controller', 'function' => 'action_showPMDrafts', 'permission' => 'pm_read');
 	}
 
-	public function prepare_send_context(&$pmsg, &$editorOptions)
+	public function before_set_context($pmsg)
 	{
 		global $context, $user_info, $options, $txt;
 
 		// If drafts are enabled, lets generate a list of drafts that they can load in to the editor
 		if (!empty($context['drafts_pm_save']))
 		{
-			$this->_prepareDraftsContext($user_info['id'], $pmsg);
+			// Has a specific draft has been selected?  Load it up if there is not already a message already in the editor
+			if (isset($_REQUEST['id_draft']) && empty($_POST['subject']) && empty($_POST['message']))
+			{
+				$this->_loadDraft($user_info['id'], (int) $_REQUEST['id_draft']);
+				throw new Pm_Error_Exception($this->_loaded_draft->to_list, $this->_loaded_draft);
+			}
+			else
+			{
+				$this->_prepareDraftsContext(user_info['id'], $pmsg);
+			}
 		}
+	}
+
+	public function prepare_send_context(&$editorOptions, &$recipientList)
+	{
+		global $context, $user_info, $options, $txt;
 
 		if (!empty($context['drafts_pm_save']) && !empty($options['drafts_autosave_enabled']))
 		{
@@ -99,7 +115,6 @@ class Drafts_PersonalMessage_Module implements ElkArte\sources\modules\Module_In
 
 			// @todo remove
 			$context['drafts_autosave_frequency'] = self::$_autosave_frequency;
-
 
 			$editorOptions['plugin_addons'][] = 'draft';
 			$editorOptions['plugin_options'][] = '
@@ -192,6 +207,33 @@ class Drafts_PersonalMessage_Module implements ElkArte\sources\modules\Module_In
 	 * - Will load a draft if selected is supplied via post
 	 *
 	 * @param int $member_id
+	 * @param int $id_draft The draft id
+	 * @return false|null
+	 */
+	protected function _loadDraft($member_id, $id_draft)
+	{
+		global $scripturl, $context, $txt;
+
+		// Need a member
+		if (empty($member_id) || empty($id_draft))
+			return false;
+
+		// We haz drafts
+		loadLanguage('Drafts');
+		require_once(SUBSDIR . '/Drafts.subs.php');
+
+		$this->_loaded_draft = new \ElkArte\ValuesContainer(loadDraft($id_draft, 1, true, true));
+	}
+
+	/**
+	 * Loads in a group of PM drafts for the user.
+	 *
+	 * What it does:
+	 * - Loads a specific draft for current use in pm editing box if selected.
+	 * - Used in the posting screens to allow draft selection
+	 * - Will load a draft if selected is supplied via post
+	 *
+	 * @param int $member_id
 	 * @param int|false $id_pm = false if set, it will try to load drafts for this id
 	 * @return false|null
 	 */
@@ -208,10 +250,6 @@ class Drafts_PersonalMessage_Module implements ElkArte\sources\modules\Module_In
 		// We haz drafts
 		loadLanguage('Drafts');
 		require_once(SUBSDIR . '/Drafts.subs.php');
-
-		// Has a specific draft has been selected?  Load it up if there is not already a message already in the editor
-		if (isset($_REQUEST['id_draft']) && empty($_POST['subject']) && empty($_POST['message']))
-			loadDraft((int) $_REQUEST['id_draft'], 1, true, true);
 
 		// Load all the drafts for this user that meet the criteria
 		$order = 'poster_time DESC';

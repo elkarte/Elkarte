@@ -954,9 +954,9 @@ function user_info_callback($matches)
  * This function grabs the mail queue items from the database, according to the params given.
  *
  * @package Mail
- * @param int $start
- * @param int $items_per_page
- * @param string $sort
+ * @param int $start The item to start with (for pagination purposes)
+ * @param int $items_per_page  The number of items to show per page
+ * @param string $sort A string indicating how to sort the results
  * @return array
  */
 function list_getMailQueue($start, $items_per_page, $sort)

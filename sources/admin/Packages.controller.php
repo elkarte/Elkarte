@@ -1751,9 +1751,9 @@ class Packages_Controller extends Action_Controller
 	 * - Determines if the package is a mod, avatar, language package
 	 * - Determines if the package has been installed or not
 	 *
-	 * @param int $start
-	 * @param int $items_per_page
-	 * @param string $sort
+	 * @param int $start The item to start with (for pagination purposes)
+	 * @param int $items_per_page  The number of items to show per page
+	 * @param string $sort A string indicating how to sort the results
 	 * @param string $params 'type' type of package
 	 * @param bool $installed
 	 */

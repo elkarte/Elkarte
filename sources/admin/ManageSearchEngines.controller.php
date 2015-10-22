@@ -347,7 +347,7 @@ class ManageSearchEngines_Controller extends Action_Controller
 					'class' => 'submitbutton',
 					'position' => 'bottom_of_list',
 					'value' => '
-						<input type="submit" name="removeSpiders" value="' . $txt['spiders_remove_selected'] . '" onclick="return confirm(\'' . $txt['spider_remove_selected_confirm'] . '\');" class="right_submit" />
+						<input type="submit" name="removeSpiders" value="' . $txt['spiders_remove_selected'] . '" onclick="return confirm(\'' . $txt['spider_remove_selected_confirm'] . '\');" />
 						<input type="submit" name="addSpider" value="' . $txt['spiders_add'] . '" class="right_submit" />
 					',
 				),

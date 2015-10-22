@@ -46,7 +46,7 @@ class Auth_Controller extends Action_Controller
 	 * Ask them for their login information.
 	 *
 	 * What it does:
-	 *  - shows a page for the user to type in their username and password.
+	 *  - Shows a page for the user to type in their username and password.
 	 *  - It caches the referring URL in $_SESSION['login_url'].
 	 *  - It is accessed from ?action=login.
 	 *  @uses Login template and language file with the login sub-template.
@@ -92,14 +92,13 @@ class Auth_Controller extends Action_Controller
 	 * Actually logs you in.
 	 *
 	 * What it does:
-	 * - checks credentials and checks that login was successful.
-	 * - it employs protection against a specific IP or user trying to brute force
+	 * - Checks credentials and checks that login was successful.
+	 * - It employs protection against a specific IP or user trying to brute force
 	 *   a login to an account.
-	 * - upgrades password encryption on login, if necessary.
-	 * - after successful login, redirects you to $_SESSION['login_url'].
-	 * - accessed from ?action=login2, by forms.
-	 *
-	 * On error, uses the same templates action_login() uses.
+	 * - Upgrades password encryption on login, if necessary.
+	 * - After successful login, redirects you to $_SESSION['login_url'].
+	 * - Accessed from ?action=login2, by forms.
+	 * - On error, uses the same templates action_login() uses.
 	 */
 	public function action_login2()
 	{
@@ -162,7 +161,7 @@ class Auth_Controller extends Action_Controller
 			else
 			{
 				$context['login_errors'] = array($txt['openid_not_found']);
-				return;
+				return false;
 			}
 		}
 
@@ -170,7 +169,7 @@ class Auth_Controller extends Action_Controller
 		if (!isset($_POST['user']) || $_POST['user'] == '')
 		{
 			$context['login_errors'] = array($txt['need_username']);
-			return;
+			return false;
 		}
 
 		// No one needs a username that long, plus we only support 80 chars in the db
@@ -182,21 +181,21 @@ class Auth_Controller extends Action_Controller
 		if ((isset($_POST['passwrd']) && strlen($_POST['passwrd']) > 64) || (isset($_POST['hash_passwrd']) && strlen($_POST['hash_passwrd']) > 64))
 		{
 			$context['login_errors'] = array($txt['improper_password']);
-			return;
+			return false;
 		}
 
 		// Hmm... maybe 'admin' will login with no password. Uhh... NO!
 		if ((!isset($_POST['passwrd']) || $_POST['passwrd'] == '') && (!isset($_POST['hash_passwrd']) || strlen($_POST['hash_passwrd']) != 64))
 		{
 			$context['login_errors'] = array($txt['no_password']);
-			return;
+			return false;
 		}
 
 		// No funky symbols either.
 		if (preg_match('~[<>&"\'=\\\]~', preg_replace('~(&#(\\d{1,7}|x[0-9a-fA-F]{1,6});)~', '', $_POST['user'])) != 0)
 		{
 			$context['login_errors'] = array($txt['error_invalid_characters_username']);
-			return;
+			return false;
 		}
 
 		// Are we using any sort of integration to validate the login?
@@ -204,7 +203,7 @@ class Auth_Controller extends Action_Controller
 		{
 			$context['login_errors'] = array($txt['login_hash_error']);
 			$context['disable_login_hashing'] = true;
-			return;
+			return false;
 		}
 
 		// Find them... if we can
@@ -214,8 +213,7 @@ class Auth_Controller extends Action_Controller
 		if (!empty($user_settings['enable_otp']) && empty($_POST['otp_token']))
 		{
 			$context['login_errors'] = array($txt['otp_required']);
-
-			return;
+			return false;
 		}
 
 		if (!empty($_POST['otp_token']))
@@ -228,8 +226,7 @@ class Auth_Controller extends Action_Controller
 			if (!$checkResult)
 			{
 				$context['login_errors'] = array($txt['invalid_otptoken']);
-
-				return;
+				return false;
 			}
 		}
 
@@ -237,7 +234,7 @@ class Auth_Controller extends Action_Controller
 		if (empty($user_settings))
 		{
 			$context['login_errors'] = array($txt['username_no_exist']);
-			return;
+			return false;
 		}
 
 		// Figure out if the password is using Elk's encryption - if what they typed is right.
@@ -260,7 +257,7 @@ class Auth_Controller extends Action_Controller
 				$context['disable_login_hashing'] = true;
 				unset($user_settings);
 
-				return;
+				return false;
 			}
 			// Bad password entered
 			else
@@ -282,7 +279,7 @@ class Auth_Controller extends Action_Controller
 					$context['login_errors'] = array($txt['incorrect_password']);
 					unset($user_settings);
 
-					return;
+					return false;
 				}
 			}
 		}
@@ -306,8 +303,9 @@ class Auth_Controller extends Action_Controller
 			// Whichever encryption it was using, let's make it use ElkArte's now ;).
 			if (in_array($user_settings['passwd'], $other_passwords))
 			{
+				$tokenizer = new Token_Hash();
 				$user_settings['passwd'] = validateLoginPassword($sha_passwd, '', '', true);
-				$user_settings['password_salt'] = substr(md5(mt_rand()), 0, 4);
+				$user_settings['password_salt'] = $tokenizer->generate_hash(4);
 
 				// Update the password hash and set up the salt.
 				require_once(SUBSDIR . '/Members.subs.php');
@@ -329,7 +327,7 @@ class Auth_Controller extends Action_Controller
 					Errors::instance()->log_error($txt['incorrect_password'] . ' - <span class="remove">' . $user_settings['member_name'] . '</span>', 'user');
 
 					$context['login_errors'] = array($txt['incorrect_password']);
-					return;
+					return false;
 				}
 			}
 		}
@@ -346,13 +344,14 @@ class Auth_Controller extends Action_Controller
 		// Correct password, but they've got no salt; fix it!
 		if ($user_settings['password_salt'] == '')
 		{
-			$user_settings['password_salt'] = substr(md5(mt_rand()), 0, 4);
+			$tokenizer = new Token_Hash();
+			$user_settings['password_salt'] = $tokenizer->generate_hash(4);
 			updateMemberData($user_settings['id_member'], array('password_salt' => $user_settings['password_salt']));
 		}
 
 		// Check their activation status.
 		if (!checkActivation())
-			return;
+			return false;
 
 		doLogin();
 	}
@@ -366,7 +365,7 @@ class Auth_Controller extends Action_Controller
 	 * - It is accessed via ?action=logout;session_var=...
 	 *
 	 * @param boolean $internal if true, it doesn't check the session
-	 * @param boolean $redirect
+	 * @param boolean $redirect if true, redirect to the board index
 	 */
 	public function action_logout($internal = false, $redirect = true)
 	{
@@ -414,8 +413,9 @@ class Auth_Controller extends Action_Controller
 		session_destroy();
 		if (!empty($user_info['id']))
 		{
+			$tokenizer = new Token_Hash();
 			require_once(SUBSDIR . '/Members.subs.php');
-			updateMemberData($user_info['id'], array('password_salt' => substr(md5(mt_rand()), 0, 4)));
+			updateMemberData($user_info['id'], array('password_salt' => $tokenizer->generate_hash(4)));
 		}
 
 		// Off to the merry board index we go!
@@ -655,6 +655,7 @@ class Auth_Controller extends Action_Controller
  * Check activation status of the current user.
  *
  * What it does:
+ * is_activated value key is as follows:
  * - > 10 Banned with activation status as value - 10
  * - 5 = Awaiting COPPA concent
  * - 4 = Awaiting Deletion approval
@@ -678,7 +679,7 @@ function checkActivation()
 	// Check if the account is activated - COPPA first...
 	if ($activation_status == 5)
 	{
-		$context['login_errors'][] = $txt['coppa_no_concent'] . ' <a href="' . $scripturl . '?action=coppa;member=' . $user_settings['id_member'] . '">' . $txt['coppa_need_more_details'] . '</a>';
+		$context['login_errors'][] = $txt['coppa_no_concent'] . ' <a href="' . $scripturl . '?action=register;sa=coppa;member=' . $user_settings['id_member'] . '">' . $txt['coppa_need_more_details'] . '</a>';
 		return false;
 	}
 	// Awaiting approval still?
@@ -706,7 +707,7 @@ function checkActivation()
 	{
 		Errors::instance()->log_error($txt['activate_not_completed1'] . ' - <span class="remove">' . $user_settings['member_name'] . '</span>', false);
 
-		$context['login_errors'][] = $txt['activate_not_completed1'] . ' <a href="' . $scripturl . '?action=activate;sa=resend;u=' . $user_settings['id_member'] . '">' . $txt['activate_not_completed2'] . '</a>';
+		$context['login_errors'][] = $txt['activate_not_completed1'] . ' <a href="' . $scripturl . '?action=register;sa=activate;resend;u=' . $user_settings['id_member'] . '">' . $txt['activate_not_completed2'] . '</a>';
 		return false;
 	}
 	return true;

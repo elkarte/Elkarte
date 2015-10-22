@@ -323,10 +323,10 @@ function template_retry_activate()
 
 	// Just ask them for their code so they can try it again...
 	echo '
-		<form action="', $scripturl, '?action=activate;u=', $context['member_id'], '" method="post" accept-charset="UTF-8">
+		<form action="', $scripturl, '?action=register;sa=activate;u=', $context['member_id'], '" method="post" accept-charset="UTF-8">
 			<h2 class="category_header">', $context['page_title'], '</h2>
 			<div class="well">
-				<dl>';
+				<dl class="settings">';
 
 	// You didn't even have an ID?
 	if (empty($context['member_id']))
@@ -346,7 +346,9 @@ function template_retry_activate()
 						<input type="text" name="code" id="code" size="30" class="input_text" />
 					</dd>
 				</dl>
-				<input type="submit" value="', $txt['invalid_activation_submit'], '" />
+				<div class="submitbutton">
+					<input type="submit" value="', $txt['invalid_activation_submit'], '" />
+				</div>
 			</div>
 		</form>';
 }
@@ -360,19 +362,16 @@ function template_resend()
 
 	// Just ask them for their code so they can try it again...
 	echo '
-		<form action="', $scripturl, '?action=activate;sa=resend" method="post" accept-charset="UTF-8">
+		<form action="', $scripturl, '?action=register;sa=activate;resend" method="post" accept-charset="UTF-8">
 			<h2 class="category_header">', $context['page_title'], '</h2>
-			<div class="well centertext">
-				<dl>
+			<div class="well">
+				<dl class="settings">
 					<dt>
-						<label for="user">', $txt['invalid_activation_username'], ':</label>
+						<label for="user">', $txt['invalid_activation_username'], ':</label><p>', $txt['invalid_activation_new'], '</p>
 					</dt>
 					<dd>
 						<input type="text" name="user" id="user" size="40" value="', $context['default_username'], '" class="input_text" />
 					</dd>
-				</dl>
-				<p>', $txt['invalid_activation_new'], '</p>
-				<dl>
 					<dt>
 						<label for="new_email">', $txt['invalid_activation_new_email'], ':</label>
 					</dt>
@@ -384,23 +383,23 @@ function template_resend()
 					</dt>
 					<dd>
 						<input type="password" name="passwd" id="passwd" size="30" class="input_password" />
-					</dd>
-				</dl>';
+					</dd>';
 
 	if ($context['can_activate'])
 		echo '
-				<p>', $txt['invalid_activation_known'], '</p>
-				<dl>
 					<dt>
 						<label for="code">', $txt['invalid_activation_retry'], ':</label>
+						<p>', $txt['invalid_activation_known'], '</p>
 					</dt>
 					<dd>
 						<input type="text" name="code" id="code" size="30" class="input_text" />
-					</dd>
-				</dl>';
+					</dd>';
 
 	echo '
-				<input type="submit" value="', $txt['invalid_activation_resend'], '" />
+				</dl>
+				<div class="submitbutton">
+					<input type="submit" value="', $txt['invalid_activation_resend'], '" />
+				</div>
 			</div>
 		</form>';
 }

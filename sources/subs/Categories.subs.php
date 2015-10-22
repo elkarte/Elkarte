@@ -251,9 +251,9 @@ function deleteCategories($categories, $moveBoardsTo = null)
  * allows three changes to the status: 'expand', 'collapse' and 'toggle'.
  * if check_collapsable is set, only category allowed to be collapsed, will be collapsed.
  *
- * @param integer[] $categories
+ * @param int[] $categories
  * @param string $new_status
- * @param integer[]|null $members = null
+ * @param int[]|null $members = null
  * @param bool $check_collapsable = true
  */
 function collapseCategories($categories, $new_status, $members = null, $check_collapsable = true)

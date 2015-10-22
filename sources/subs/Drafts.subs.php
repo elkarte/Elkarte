@@ -630,9 +630,7 @@ function loadDraft($id_draft, $type = 0, $check = true, $load = false)
 			$recipients['to'] = array_map('intval', $recipients['to']);
 			$recipients['bcc'] = array_map('intval', $recipients['bcc']);
 
-			// Pretend we messed up to populate the pm message form
-			messagePostError(array(), $recipients);
-			return true;
+			$draft_info['to_list'] = $recipients;
 		}
 	}
 

@@ -69,7 +69,7 @@ class Browser_Detector
 	 * The main method of this class, you know the one that does the job: detect the thing.
 	 *
 	 * What it does:
-	 *  - determines the user agent (browser) as best it can.
+	 * - Determines the user agent (browser) as best it can.
 	 * - The method fills the instance variables _is_mobile and _is_tablet,
 	 * and the _browsers array.
 	 * - When it returns, the Browser_Detector can be queried for information on client browser.

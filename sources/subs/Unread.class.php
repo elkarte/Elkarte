@@ -153,6 +153,7 @@ class Unread
 	/**
 	 * Sets if the data returned by the class will include a shorted version
 	 * of the body of the last message.
+	 *
 	 * @param bool|int $chars - The number of chars to retrieve.
 	 *                 If true it will return the entire body,
 	 *                 if 0 no preview will be generated.
@@ -175,6 +176,7 @@ class Unread
 
 	/**
 	 * Counts the number of unread topics or messages
+	 *
 	 * @param bool $first_login - If this is the first login of the user
 	 * @param int $id_msg_last_visit - highest id_msg found during the last visit
 	 */
@@ -292,7 +294,6 @@ class Unread
 				'limit' => $limit,
 			))
 		);
-
 		$topics = array();
 		while ($row = $this->_db->fetch_assoc($request))
 			$topics[] = $row;
@@ -433,7 +434,6 @@ class Unread
 				))
 			);
 		}
-
 		$topics = array();
 		while ($row = $this->_db->fetch_assoc($request))
 			$topics[] = $row['id_topic'];
@@ -506,13 +506,12 @@ class Unread
 				'limit' => count($topics),
 			)
 		);
-
 		$return = array();
 		while ($row = $this->_db->fetch_assoc($request))
 			$return[] = $row;
 		$this->_db->free_result($request);
 
-		return Topic_Util::prepareContext($topics, true, ((int) $this->_preview_bodies) + 128);
+		return Topic_Util::prepareContext($return, true, ((int) $this->_preview_bodies) + 128);
 	}
 
 	/**

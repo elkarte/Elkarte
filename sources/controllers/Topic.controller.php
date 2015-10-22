@@ -1,7 +1,10 @@
 <?php
 
 /**
- * This file takes care of actions on topics lock/unlock a topic, sticky/unsticky it
+ * This file takes care of actions on topics including
+ * - lock/unlock a topic,
+ * - sticky (pin) /unsticky (unpin) it
+ * - printing
  *
  * @name      ElkArte Forum
  * @copyright ElkArte Forum contributors
@@ -26,6 +29,20 @@ if (!defined('ELK'))
 class Topic_Controller extends Action_Controller
 {
 	/**
+	 * Holds instance of HttpReq object
+	 * @var HttpReq
+	 */
+	private $_req;
+
+	/**
+	 * Pre Dispatch, called before other methods.  Loads HttpReq instance.
+	 */
+	public function pre_dispatch()
+	{
+		$this->_req = HttpReq::instance();
+	}
+
+	/**
 	 * Entry point for this class (by default).
 	 *
 	 * @see Action_Controller::action_index()
@@ -34,9 +51,10 @@ class Topic_Controller extends Action_Controller
 	{
 		global $topic;
 
-		// Call the right method, if it ain't done yet.
-		// this is done by the dispatcher, so lets leave it alone...
-		// we don't want to assume what it means if the user doesn't
+		// Call the right method, if it is not done yet.
+		//
+		// This is done by the dispatcher, so lets leave it alone...
+		// We don't want to assume what it means if the user doesn't
 		// send us a ?sa=, do we? (lock topics out of nowhere?)
 		// Unless... we can printpage()
 
@@ -49,13 +67,14 @@ class Topic_Controller extends Action_Controller
 
 	/**
 	 * Locks a topic... either by way of a moderator or the topic starter.
+	 *
 	 * What this does:
-	 *  - locks a topic, toggles between locked/unlocked/admin locked.
-	 *  - only admins can unlock topics locked by other admins.
-	 *  - requires the lock_own or lock_any permission.
-	 *  - logs the action to the moderator log.
-	 *  - returns to the topic after it is done.
-	 *  - it is accessed via ?action=topic;sa=lock.
+	 *  - Locks a topic, toggles between locked/unlocked/admin locked.
+	 *  - Only admins can unlock topics locked by other admins.
+	 *  - Requires the lock_own or lock_any permission.
+	 *  - Logs the action to the moderator log.
+	 *  - Returns to the topic after it is done.
+	 *  - It is accessed via ?action=topic;sa=lock.
 	*/
 	public function action_lock()
 	{
@@ -71,7 +90,7 @@ class Topic_Controller extends Action_Controller
 		require_once(SUBSDIR . '/Notification.subs.php');
 		require_once(SUBSDIR . '/Topic.subs.php');
 
-		// Find out who started the topic and its lock status
+		// Find out who started the topic and its current lock status
 		list ($starter, $locked) = topicStatus($topic);
 
 		// Can you lock topics here, mister?
@@ -106,18 +125,20 @@ class Topic_Controller extends Action_Controller
 		sendNotifications($topic, empty($locked) ? 'unlock' : 'lock');
 
 		// Back to the topic!
-		redirectexit('topic=' . $topic . '.' . $_REQUEST['start']);
+		redirectexit('topic=' . $topic . '.' . $this->_req->post->start);
 	}
 
 	/**
 	 * Sticky a topic.
+	 *
 	 * Can't be done by topic starters - that would be annoying!
+	 *
 	 * What this does:
-	 *  - stickies a topic - toggles between sticky and normal.
-	 *  - requires the make_sticky permission.
-	 *  - adds an entry to the moderator log.
-	 *  - when done, sends the user back to the topic.
-	 *  - accessed via ?action=topic;sa=sticky.
+	 *  - Stickies a topic - toggles between sticky and normal.
+	 *  - Requires the make_sticky permission.
+	 *  - Adds an entry to the moderator log.
+	 *  - When done, sends the user back to the topic.
+	 *  - Accessed via ?action=topic;sa=sticky.
 	 */
 	public function action_sticky()
 	{
@@ -153,16 +174,19 @@ class Topic_Controller extends Action_Controller
 			sendNotifications($topic, 'sticky');
 
 		// Take them back to the now stickied topic.
-		redirectexit('topic=' . $topic . '.' . $_REQUEST['start']);
+		redirectexit('topic=' . $topic . '.' . $this->_req->post->start);
 	}
 
 	/**
 	 * Format a topic to be printer friendly.
-	 * Must be called with a topic specified.
-	 * Accessed via ?action=topic;sa=printpage.
 	 *
-	 * @uses Printpage template, main sub-template.
-	 * @uses print_above/print_below later without the main layer.
+	 * What id does:
+	 * - Must be called with a topic specified.
+	 * - Accessed via ?action=topic;sa=printpage.
+	 *
+	 * @uses template_print_page() in Printpage.template,
+	 * @uses template_print_above() later without the main layer.
+	 * @uses template_print_below() without the main layer
 	 */
 	public function action_printpage()
 	{
@@ -172,29 +196,30 @@ class Topic_Controller extends Action_Controller
 		if (empty($topic))
 			redirectexit();
 
-		$template_layers = Template_Layers::getInstance();
-		$template_layers->removeAll();
-
+		// Its not enabled, give them the boot
 		if (!empty($modSettings['disable_print_topic']))
 		{
-			unset($_REQUEST['action']);
+			unset($this->_req->query->action);
 			$context['theme_loaded'] = false;
 			Errors::instance()->fatal_lang_error('feature_disabled', false);
 		}
 
-		require_once(SUBSDIR . '/Topic.subs.php');
+		// Clean out the template layers
+		$template_layers = Template_Layers::getInstance();
+		$template_layers->removeAll();
 
 		// Get the topic starter information.
+		require_once(SUBSDIR . '/Topic.subs.php');
 		$topicinfo = getTopicInfo($topic, 'starter');
+
+		// Redirect to the boardindex if no valid topic id is provided.
+		if (empty($topicinfo))
+			redirectexit();
 
 		$context['user']['started'] = $user_info['id'] == $topicinfo['id_member'] && !$user_info['is_guest'];
 
 		// Whatever happens don't index this.
 		$context['robot_no_index'] = true;
-
-		// Redirect to the boardindex if no valid topic id is provided.
-		if (empty($topicinfo))
-			redirectexit();
 
 		// @todo this code is almost the same as the one in Display.controller.php
 		if ($topicinfo['id_poll'] > 0 && !empty($modSettings['pollMode']) && allowedTo('poll_view'))
@@ -227,7 +252,7 @@ class Topic_Controller extends Action_Controller
 			$context['topic_subject'] = $context['posts'][min($posts_id)]['subject'];
 
 		// Fetch attachments so we can print them if asked, enabled and allowed
-		if (isset($_REQUEST['images']) && !empty($modSettings['attachmentEnable']) && allowedTo('view_attachments'))
+		if (isset($this->_req->query->images) && !empty($modSettings['attachmentEnable']) && allowedTo('view_attachments'))
 		{
 			require_once(SUBSDIR . '/Topic.subs.php');
 			$context['printattach'] = messagesAttachments(array_keys($context['posts']));

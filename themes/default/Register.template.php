@@ -116,10 +116,9 @@ function template_registration_form()
 	}
 
 	echo '
-		<form action="', $scripturl, '?action=register2" method="post" accept-charset="UTF-8" name="registration" id="registration" onsubmit="return verifyAgree();">
+		<form action="', $scripturl, '?action=register;sa=register2" method="post" accept-charset="UTF-8" name="registration" id="registration" onsubmit="return verifyAgree();">
 			<h2 class="category_header">', $txt['registration_form'], '</h2>
 			<h2 class="category_header">', $txt['required_info'], '</h2>
-			<div class="content">
 				<input type="password" name="autofill_honey_pot" class="hide" />
 				<fieldset class="content">
 					<dl class="settings">
@@ -194,9 +193,10 @@ function template_registration_form()
 	if (!empty($modSettings['enableOpenID']))
 	{
 		echo '
-
 					<dl class="settings" id="openid_group">
-						<dt><strong>', $txt['authenticate_openid_url'], ':</strong></dt>
+						<dt>
+							<label>', $txt['authenticate_openid_url'], ':</label>
+						</dt>
 						<dd>
 							<input type="text" name="openid_identifier" id="openid_url" size="30" tabindex="', $context['tabindex']++, '" value="', isset($context['openid']) ? $context['openid'] : '', '" class="input_text openid_login" />
 						</dd>
@@ -214,7 +214,7 @@ function template_registration_form()
 			{
 				echo '
 						<dt>
-							<strong', !empty($field['is_error']) ? ' class="error"' : '', '><label for="', $field['colname'], '">', $field['name'], ':</label>
+							<label ', !empty($field['is_error']) ? ' class="error"' : '', ' for="', $field['colname'], '">', $field['name'], ':</label>
 							<span class="smalltext">', $field['desc'], '</span>
 						</dt>
 						<dd>', preg_replace_callback('~<(input|select|textarea) ~', function ($matches) {
@@ -232,13 +232,13 @@ function template_registration_form()
 	}
 
 	echo '
-				</fieldset>
-			</div>';
+				</fieldset>';
 
 	// If we have either of these, show the extra group.
 	if (!empty($context['profile_fields']) || !empty($context['custom_fields']))
 	{
 		echo '
+			<div class="separator"></div>
 			<h2 class="category_header">', $txt['additional_information'], '</h2>
 			<fieldset class="content">
 				<dl class="settings" id="custom_group">';
@@ -261,7 +261,7 @@ function template_registration_form()
 			{
 				echo '
 					<dt>
-						<strong', !empty($field['is_error']) ? ' class="error"' : '', '>', $field['label'], ':</strong>';
+						<label', !empty($field['is_error']) ? ' class="error"' : '', '>', $field['label'], ':</label>';
 
 				// Does it have any subtext to show?
 				if (!empty($field['subtext']))
@@ -339,7 +339,7 @@ function template_registration_form()
 			if ($field['show_reg'] < 2)
 				echo '
 					<dt>
-						<strong', !empty($field['is_error']) ? ' class="error"' : '', '>', $field['name'], ':</strong>
+						<label', !empty($field['is_error']) ? ' class="error"' : '', '>', $field['name'], ':</label>
 						<span class="smalltext">', $field['desc'], '</span>
 					</dt>
 					<dd>', $field['input_html'], '</dd>';
@@ -449,7 +449,7 @@ function template_coppa()
 			<div class="content">
 				<p>', $context['coppa']['body'], '</p>
 				<p>
-					<span><a href="', $scripturl, '?action=coppa;form;member=', $context['coppa']['id'], '" target="_blank" class="new_win">', $txt['coppa_form_link_popup'], '</a> | <a href="', $scripturl, '?action=coppa;form;dl;member=', $context['coppa']['id'], '">', $txt['coppa_form_link_download'], '</a></span>
+					<span><a href="', $scripturl, '?action=register;sa=coppa;form;member=', $context['coppa']['id'], '" target="_blank" class="new_win">', $txt['coppa_form_link_popup'], '</a> | <a href="', $scripturl, '?action=register;sa=coppa;form;dl;member=', $context['coppa']['id'], '">', $txt['coppa_form_link_download'], '</a></span>
 				</p>
 				<p>', $context['coppa']['many_options'] ? $txt['coppa_send_to_two_options'] : $txt['coppa_send_to_one_option'], '</p>
 				<ol>';
@@ -788,7 +788,7 @@ function template_contact_form()
 
 	echo '
 		<h2 class="category_header">', $txt['admin_contact_form'], '</h2>
-		<form id="contact_form" class="content" action="', $scripturl, '?action=contact" method="post" accept-charset="UTF-8">
+		<form id="contact_form" class="content" action="', $scripturl, '?action=register;sa=contact" method="post" accept-charset="UTF-8">
 			<div class="content">';
 
 	if (!empty($context['errors']))

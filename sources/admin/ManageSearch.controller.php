@@ -46,6 +46,7 @@ class ManageSearch_Controller extends Action_Controller
 	public function pre_dispatch()
 	{
 		$this->_req = HttpReq::instance();
+		Elk_Autoloader::getInstance()->register(SUBSDIR . '/Search', '\\ElkArte\\Search');
 	}
 
 	/**
@@ -131,7 +132,7 @@ class ManageSearch_Controller extends Action_Controller
 		$config_vars = $this->_searchSettings->settings();
 
 		// Perhaps the search method wants to add some settings?
-		$search = new Search();
+		$search = new \ElkArte\Search\Search();
 		$searchAPI = $search->findSearchAPI();
 
 		if (is_callable(array($searchAPI, 'searchSettings')))
@@ -647,7 +648,6 @@ class ManageSearch_Controller extends Action_Controller
 		global $txt, $scripturl;
 
 		$apis = array();
-		Elk_Autoloader::getInstance()->register(SUBSDIR . '/Search', '\\ElkArte\\Search');
 
 		try
 		{

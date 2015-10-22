@@ -42,13 +42,13 @@ function loadVerificationControls()
  * Create a anti-bot verification control?
  *
  * @param mixed[] $verificationOptions
- * @param bool $do_test = false
+ * @param bool $do_test = false If we are validating the input to a verification control
  */
 function create_control_verification(&$verificationOptions, $do_test = false)
 {
 	global $context;
 
-	// We need to remember this because when failing the page is realoaded and the
+	// We need to remember this because when failing the page is reloaded and the
 	// code must remain the same (unless it has to change)
 	static $all_instances = array();
 
@@ -330,7 +330,7 @@ class Verification_Controls_Captcha implements Verification_Controls
 			if ($this->_show_captcha)
 			{
 				$this->_text_value = '';
-				$this->_image_href = $scripturl . '?action=verificationcode;vid=' . $this->_options['id'] . ';rand=' . md5(mt_rand());
+				$this->_image_href = $scripturl . '?action=register;sa=verificationcode;vid=' . $this->_options['id'] . ';rand=' . md5(mt_rand());
 			}
 		}
 
@@ -350,7 +350,7 @@ class Verification_Controls_Captcha implements Verification_Controls
 		if (!$this->_show_captcha)
 			return;
 
-		if (true || $refresh)
+		if ($refresh)
 		{
 			$_SESSION[$this->_options['id'] . '_vv']['code'] = '';
 
@@ -414,7 +414,7 @@ class Verification_Controls_Captcha implements Verification_Controls
 		global $txt, $scripturl, $modSettings;
 
 		// Generate a sample registration image.
-		$verification_image = $scripturl . '?action=verificationcode;rand=' . md5(mt_rand());
+		$verification_image = $scripturl . '?action=register;sa=verificationcode;rand=' . md5(mt_rand());
 
 		// Visual verification.
 		$config_vars = array(
@@ -503,7 +503,7 @@ class Verification_Controls_Questions implements Verification_Controls
 	private $_questions_language = null;
 
 	/**
-	 * Questions that can be used given what available (trys to account for languages)
+	 * Questions that can be used given what available (try's to account for languages)
 	 *
 	 * @var int[]
 	 */
@@ -529,7 +529,7 @@ class Verification_Controls_Questions implements Verification_Controls
 
 	/**
 	 * Show the question to the user
-	 * Trys to account for languages
+	 * Try's to account for languages
 	 *
 	 * @param boolean $isNew
 	 * @param boolean $force_refresh
@@ -641,7 +641,7 @@ class Verification_Controls_Questions implements Verification_Controls
 	}
 
 	/**
-	 * Perfom the test to see if the answer is correct
+	 * Performs the test to see if the answer is correct
 	 *
 	 * @return string|boolean
 	 */
@@ -657,7 +657,7 @@ class Verification_Controls_Questions implements Verification_Controls
 	}
 
 	/**
-	 * Required by the interface, returns true for question challanges
+	 * Required by the interface, returns true for question challenges
 	 *
 	 * @return true
 	 */
@@ -678,10 +678,12 @@ class Verification_Controls_Questions implements Verification_Controls
 		// Load any question and answers!
 		$filter = null;
 		if (isset($_GET['language']))
+		{
 			$filter = array(
 				'type' => 'language',
 				'value' => $_GET['language'],
 			);
+		}
 		$context['question_answers'] = $this->_loadAntispamQuestions($filter);
 		$languages = getLanguages();
 

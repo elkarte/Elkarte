@@ -48,7 +48,7 @@ class TestSubs extends PHPUnit_Framework_TestCase
 			'{board_url}' => $boardurl,
 			'{login_url}' => $scripturl . '?action=login',
 			'{register_url}' => $scripturl . '?action=register',
-			'{activate_url}' => $scripturl . '?action=activate',
+			'{activate_url}' => $scripturl . '?action=register;sa=activate',
 			'{help_url}' => $scripturl . '?action=help',
 			'{admin_url}' => $scripturl . '?action=admin',
 			'{moderate_url}' => $scripturl . '?action=moderate',

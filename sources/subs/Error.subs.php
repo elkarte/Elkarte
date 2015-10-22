@@ -84,8 +84,8 @@ function numErrors($filter = array())
 /**
  * Gets data from the error log
  *
- * @param int $start
- * @param string $sort_direction
+ * @param int $start The item to start with (for pagination purposes)
+ * @param string $sort_direction DESC or ASC results
  * @param array|null $filter
  */
 function getErrorLogData($start, $sort_direction = 'DESC', $filter = null)

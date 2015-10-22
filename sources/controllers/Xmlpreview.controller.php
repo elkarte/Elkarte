@@ -19,6 +19,20 @@ if (!defined('ELK'))
 class XmlPreview_Controller extends Action_Controller
 {
 	/**
+	 * Holds instance of HttpReq object
+	 * @var HttpReq
+	 */
+	private $_req;
+
+	/**
+	 * Pre Dispatch, called before other methods.  Loads HttpReq instance.
+	 */
+	public function pre_dispatch()
+	{
+		$this->_req = HttpReq::instance();
+	}
+
+	/**
 	 * Calls the correct function for the action.
 	 *
 	 * @see Action_Controller::action_index()
@@ -28,17 +42,19 @@ class XmlPreview_Controller extends Action_Controller
 		global $context;
 
 		$subActions = array(
-			'newspreview' => array('action_newspreview'),
-			'newsletterpreview' => array('action_newsletterpreview'),
-			'sig_preview' => array('action_sig_preview'),
-			'warning_preview' => array('action_warning_preview'),
-			'bounce_preview' => array('action_bounce_preview'),
+			'newspreview' => array($this, 'action_newspreview'),
+			'newsletterpreview' => array($this, 'action_newsletterpreview'),
+			'sig_preview' => array($this, 'action_sig_preview'),
+			'warning_preview' => array($this, 'action_warning_preview'),
+			'bounce_preview' => array($this, 'action_bounce_preview'),
+			'invalid' => array(),
 		);
 
 		// Valid action?
-		$subAction = !isset($_REQUEST['item']) || !isset($subActions[$_REQUEST['item']]) ? null : $_REQUEST['item'];
+		$action = new Action();
+		$subAction = $action->initialize($subActions, 'invalid', 'item');
 
-		if (empty($subAction))
+		if ($subAction === 'invalid')
 			return;
 
 		// Set up the template and default sub-template.
@@ -46,11 +62,12 @@ class XmlPreview_Controller extends Action_Controller
 		$context['sub_template'] = 'generic_xml';
 
 		// A preview it is then
-		$this->{$subActions[$subAction][0]}();
+		$action->dispatch($subAction);
 	}
 
 	/**
 	 * Get a preview of the important forum news for review before use
+	 *
 	 *  - Calls parse bbc to render bbc tags for the preview
 	 */
 	public function action_newspreview()
@@ -61,7 +78,7 @@ class XmlPreview_Controller extends Action_Controller
 		require_once(SUBSDIR . '/Post.subs.php');
 
 		$errors = array();
-		$news = !isset($_POST['news']) ? '' : Util::htmlspecialchars($_POST['news'], ENT_QUOTES);
+		$news = !isset($this->_req->post->news) ? '' : Util::htmlspecialchars($this->_req->post->news, ENT_QUOTES);
 		if (empty($news))
 			$errors[] = array('value' => 'no_news');
 		else
@@ -86,24 +103,25 @@ class XmlPreview_Controller extends Action_Controller
 
 	/**
 	 * Get a preview of a news letter before its sent on to the masses
+	 *
 	 *  - Uses prepareMailingForPreview to create the actual preview
 	 */
 	public function action_newsletterpreview()
 	{
 		global $context, $txt;
 
-		// needed to create the preview
+		// Needed to create the preview
 		require_once(SUBSDIR . '/Mail.subs.php');
 		loadLanguage('Errors');
 
 		$context['post_error']['errors'] = array();
-		$context['send_pm'] = !empty($_POST['send_pm']) ? 1 : 0;
-		$context['send_html'] = !empty($_POST['send_html']) ? 1 : 0;
+		$context['send_pm'] = !empty($this->_req->post->send_pm) ? 1 : 0;
+		$context['send_html'] = !empty($this->_req->post->send_html) ? 1 : 0;
 
 		// Let them know about any mistakes
-		if (empty($_POST['subject']))
+		if (empty($this->_req->post->subject))
 			$context['post_error']['errors'][] = $txt['error_no_subject'];
-		if (empty($_POST['message']))
+		if (empty($this->_req->post->message))
 			$context['post_error']['errors'][] = $txt['error_no_message'];
 
 		prepareMailingForPreview();
@@ -122,7 +140,7 @@ class XmlPreview_Controller extends Action_Controller
 		loadLanguage('Profile');
 		loadLanguage('Errors');
 
-		$user = isset($_POST['user']) ? (int) $_POST['user'] : 0;
+		$user = isset($this->_req->post->user) ? (int) $this->_req->post->user : 0;
 		$is_owner = $user == $user_info['id'];
 
 		// @todo Temporary
@@ -141,7 +159,7 @@ class XmlPreview_Controller extends Action_Controller
 			$member['signature'] = parse_bbc($member['signature'], true, 'sig' . $user);
 
 			// And now what they want it to be
-			$preview_signature = !empty($_POST['signature']) ? Util::htmlspecialchars($_POST['signature']) : '';
+			$preview_signature = !empty($this->_req->post->signature) ? Util::htmlspecialchars($this->_req->post->signature) : '';
 			$validation = profileValidateSignature($preview_signature);
 
 			// An odd check for errors to be sure
@@ -211,19 +229,20 @@ class XmlPreview_Controller extends Action_Controller
 		// If you can't issue the warning, what are you doing here?
 		if (allowedTo('issue_warning'))
 		{
-			$warning_body = !empty($_POST['body']) ? trim(censorText($_POST['body'])) : '';
-			$context['preview_subject'] = !empty($_POST['title']) ? trim(Util::htmlspecialchars($_POST['title'])) : '';
-			if (isset($_POST['issuing']))
+			$warning_body = !empty($this->_req->post->body) ? trim(censorText($this->_req->post->body)) : '';
+			$context['preview_subject'] = !empty($this->_req->post->title) ? trim(Util::htmlspecialchars($this->_req->post->title)) : '';
+			if (isset($this->_req->post->issuing))
 			{
-				if (empty($_POST['title']) || empty($_POST['body']))
+				if (empty($this->_req->post->title) || empty($this->_req->post->body))
 					$context['post_error']['errors'][] = $txt['warning_notify_blank'];
 			}
 			else
 			{
-				if (empty($_POST['title']))
+				if (empty($this->_req->post->title))
 					$context['post_error']['errors'][] = $txt['mc_warning_template_error_no_title'];
-				if (empty($_POST['body']))
+				if (empty($this->_req->post->body))
 					$context['post_error']['errors'][] = $txt['mc_warning_template_error_no_body'];
+
 				// Add in few replacements.
 				/**
 				 * These are the defaults:
@@ -249,7 +268,7 @@ class XmlPreview_Controller extends Action_Controller
 			}
 
 			// Deal with any BBC so it looks good for the preview
-			if (!empty($_POST['body']))
+			if (!empty($this->_req->post->body))
 			{
 				preparsecode($warning_body);
 				$warning_body = parse_bbc($warning_body, true);
@@ -278,21 +297,22 @@ class XmlPreview_Controller extends Action_Controller
 		// If you can't approve emails, what are you doing here?
 		if (allowedTo('approve_emails'))
 		{
-			$body = !empty($_POST['body']) ? trim(censorText($_POST['body'])) : '';
-			$context['preview_subject'] = !empty($_POST['title']) ? trim(Util::htmlspecialchars($_POST['title'])) : '';
+			$body = !empty($this->_req->post->body) ? trim(censorText($this->_req->post->body)) : '';
+			$context['preview_subject'] = !empty($this->_req->post->title) ? trim(Util::htmlspecialchars($this->_req->post->title)) : '';
 
-			if (isset($_POST['issuing']))
+			if (isset($this->_req->post->issuing))
 			{
-				if (empty($_POST['title']) || empty($_POST['body']))
+				if (empty($this->_req->post->title) || empty($this->_req->post->body))
 					$context['post_error']['errors'][] = $txt['warning_notify_blank'];
 			}
 			else
 			{
-				if (empty($_POST['title']))
+				if (empty($this->_req->post->title))
 					$context['post_error']['errors'][] = $txt['mc_warning_template_error_no_title'];
 
-				if (empty($_POST['body']))
+				if (empty($this->_req->post->body))
 					$context['post_error']['errors'][] = $txt['mc_warning_template_error_no_body'];
+
 				// Add in few replacements.
 				/**
 				 * These are the defaults:
@@ -322,11 +342,12 @@ class XmlPreview_Controller extends Action_Controller
 			}
 
 			// Deal with any BBC so it looks good for the preview
-			if (!empty($_POST['body']))
+			if (!empty($this->_req->post->body))
 			{
 				preparsecode($body);
 				$body = parse_bbc($body, true);
 			}
+
 			$context['preview_message'] = $body;
 		}
 

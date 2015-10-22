@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Legacy utility functions, such as to handle multi byte strings
+ * Utility functions, such as to handle multi byte strings
  *
  * @name      ElkArte Forum
  * @copyright ElkArte Forum contributors
@@ -15,7 +15,7 @@ if (!defined('ELK'))
 	die('No access...');
 
 /**
- * Legacy utility functions, such as to handle multi byte strings
+ * Utility functions, such as to handle multi byte strings
  * Note: some of these might be deprecated or removed in the future.
  */
 class Util
@@ -43,7 +43,7 @@ class Util
 	 * Optionally performs an entity_fix to null any invalid character entities from the string
 	 *
 	 * @param string $string
-	 * @param string $quote_style
+	 * @param int $quote_style integer or constant representation of one
 	 * @param string $charset only UTF-8 allowed
 	 * @param bool $double true will allow double encoding, false will not encode existing html entities,
 	 */
@@ -65,7 +65,8 @@ class Util
 	/**
 	 * Trims tabs, newlines, carriage returns, spaces, vertical tabs and null bytes
 	 * and any number of space characters from the start and end of a string
-	 * Optionally performs an entity_fix to null any invalid character entities from the string
+	 *
+	 * - Optionally performs an entity_fix to null any invalid character entities from the string
 	 *
 	 * @param string $string
 	 */
@@ -86,7 +87,8 @@ class Util
 
 	/**
 	 * Perform a strpos search on a multi-byte string
-	 * Optionally performs an entity_fix to null any invalid character entities from the string before the search
+	 *
+	 * - Optionally performs an entity_fix to null any invalid character entities from the string before the search
 	 *
 	 * @param string $haystack what to search in
 	 * @param string $needle what is being looked for
@@ -137,7 +139,8 @@ class Util
 
 	/**
 	 * Perform a substr operation on multi-byte strings
-	 * Optionally performs an entity_fix to null any invalid character entities from the string before the operation
+	 *
+	 * - Optionally performs an entity_fix to null any invalid character entities from the string before the operation
 	 *
 	 * @param string $string
 	 * @param string $start
@@ -157,7 +160,8 @@ class Util
 
 	/**
 	 * Converts a multi-byte string to lowercase
-	 * prefers to use mb_ functions if available, otherwise will use charset substitution tables
+	 *
+	 * - Prefers to use mb_ functions if available, otherwise will use charset substitution tables
 	 *
 	 * @param string $string
 	 */
@@ -174,7 +178,8 @@ class Util
 
 	/**
 	 * Converts a multi-byte string to uppercase
-	 * prefers to use mb_ functions if available, otherwise will use charset substitution tables
+	 *
+	 * Prefers to use mb_ functions if available, otherwise will use charset substitution tables
 	 *
 	 * @param string $string
 	 */
@@ -191,8 +196,9 @@ class Util
 
 	/**
 	 * Cuts off a multi-byte string at a certain length
-	 * Optionally performs an entity_fix to null any invalid character entities from the string prior to the length check
-	 * Use this when the number of actual characters (&nbsp; = 6 not 1) must be <= length not the displayable,
+	 *
+	 * - Optionally performs an entity_fix to null any invalid character entities from the string prior to the length check
+	 * - Use this when the number of actual characters (&nbsp; = 6 not 1) must be <= length not the displayable,
 	 * for example db field compliance to avoid overflow
 	 *
 	 * @param string $string
@@ -220,17 +226,17 @@ class Util
 	 * Shorten a string of text
 	 *
 	 * What it does:
-	 * - shortens a text string to a given visual length
-	 * - considers certain html entities as 1 in length, &amp; &nbsp; etc
-	 * - optionally adds ending ellipsis that honor length or are appended
-	 * - optionally attempts to break the string on a word boundary approximately at the allowed length
-	 * - if using cutword and the resulting length is < len minus buffer then it is truncated to length plus an ellipsis.
-	 * - respects internationalization characters, html spacing and entities as one character.
-	 * - returns the shortened string.
-	 * - does not account for html tags, ie <b>test</b> is 11 characters not 4
+	 * - Shortens a text string to a given visual length
+	 * - Considers certain html entities as 1 in length, &amp; &nbsp; etc
+	 * - Optionally adds ending ellipsis that honor length or are appended
+	 * - Optionally attempts to break the string on a word boundary approximately at the allowed length
+	 * - If using cutword and the resulting length is < len minus buffer then it is truncated to length plus an ellipsis.
+	 * - Respects internationalization characters, html spacing and entities as one character.
+	 * - Returns the shortened string.
+	 * - Does not account for html tags, ie <b>test</b> is 11 characters not 4
 	 *
-	 * @param string $string
-	 * @param int $length
+	 * @param string $string The string to shorten
+	 * @param int $length The length to cut the string to
 	 * @param bool $cutword try to cut at a word boundary
 	 * @param string $ellipsis characters to add at the end of a cut string
 	 * @param bool $exact set true to include ellipsis in the allowed length, false will append instead
@@ -437,6 +443,7 @@ class Util
 
 	/**
 	 * Remove slashes recursively.
+	 *
 	 * What it does:
 	 * - removes slashes, recursively, from the array or string var.
 	 * - effects both keys and values of arrays.
@@ -466,6 +473,7 @@ class Util
 
 	/**
 	 * Removes url stuff from the array/variable.
+	 *
 	 * What it does:
 	 * - takes off url encoding (%20, etc.) from the array or string var.
 	 * - importantly, does it to keys too!
@@ -495,6 +503,7 @@ class Util
 
 	/**
 	 * Unescapes any array or variable.
+	 *
 	 * What it does:
 	 * - unescapes, recursively, from the array or string var.
 	 * - effects both keys and values of arrays.

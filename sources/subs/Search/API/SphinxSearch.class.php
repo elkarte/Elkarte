@@ -97,8 +97,8 @@ class Sphinx_Search extends SearchAPI
 	/**
 	 * Check whether the method can be performed by this API.
 	 *
-	 * @param string $methodName
-	 * @param mixed[]|null $query_params
+	 * @param string $methodName The search method
+	 * @param mixed[]|null $query_params Parameters for the query
 	 */
 	public function supportsMethod($methodName, $query_params = null)
 	{
@@ -131,12 +131,13 @@ class Sphinx_Search extends SearchAPI
 
 	/**
 	 * Callback function for usort used to sort the results.
-	 * the order of sorting is: large words, small words, large words that
+	 *
+	 * - The order of sorting is: large words, small words, large words that
 	 * are excluded from the search, small words that are excluded.
 	 *
 	 * @param string $a Word A
 	 * @param string $b Word B
-	 * @return int
+	 * @return int An integer indicating how the words should be sorted (-1, 0 1)
 	 */
 	public function searchSort($a, $b)
 	{
@@ -159,9 +160,9 @@ class Sphinx_Search extends SearchAPI
 	/**
 	 * Do we have to do some work with the words we are searching for to prepare them?
 	 *
-	 * @param mixed[] $word
-	 * @param mixed[] $wordsSearch
-	 * @param string[] $wordsExclude
+	 * @param mixed[] $word A word to index
+	 * @param mixed[] $wordsSearch The Search words
+	 * @param string[] $wordsExclude Words to exclude
 	 * @param boolean $isExcluded
 	 */
 	public function prepareIndexes($word, &$wordsSearch, &$wordsExclude, $isExcluded)
@@ -194,7 +195,7 @@ class Sphinx_Search extends SearchAPI
 			require_once(SOURCEDIR . '/sphinxapi.php');
 
 			// Create an instance of the sphinx client and set a few options.
-			$mySphinx = new SphinxClient();
+			$mySphinx = new \SphinxClient();
 			$mySphinx->SetServer($modSettings['sphinx_searchd_server'], (int) $modSettings['sphinx_searchd_port']);
 			$mySphinx->SetLimits(0, (int) $modSettings['sphinx_max_results'], (int) $modSettings['sphinx_max_results']);
 
@@ -276,9 +277,9 @@ class Sphinx_Search extends SearchAPI
 			{
 				// Just log the error.
 				if ($mySphinx->GetLastError())
-					Errors::instance()->log_error($mySphinx->GetLastError());
+					\Errors::instance()->log_error($mySphinx->GetLastError());
 
-				Errors::instance()->fatal_lang_error('error_no_search_daemon');
+				\Errors::instance()->fatal_lang_error('error_no_search_daemon');
 			}
 
 			// Get the relevant information from the search results.

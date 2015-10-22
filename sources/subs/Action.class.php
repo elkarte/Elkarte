@@ -81,11 +81,14 @@ class Action
 
 	/**
 	 * Initialize the instance with an array of sub-actions.
-	 * Sub-actions have to be in the format expected for Action::_subActions array,
+	 *
+	 * What it does:
+	 * - Sub-actions have to be in the format expected for Action::_subActions array,
 	 * indexed by sa.
 	 *
 	 * @param mixed[] $subactions array of know subactions
 	 * @param string $default default action if unknown sa is requested
+	 * @param string $requestParam default key to check request value, defaults to sa
 	 *
 	 * @return string
 	 */
@@ -109,34 +112,35 @@ class Action
 
 	/**
 	 * Call the function or method which corresponds to the given $sa parameter.
-	 * Must be a valid index in the _subActions array.
+	 *
+	 * - Must be a valid index in the _subActions array.
 	 *
 	 * @param string $sa
 	 */
 	public function dispatch($sa)
 	{
-		// for our sanity...
+		// For our sanity...
 		if (!array_key_exists($sa, $this->_subActions) || !is_array($this->_subActions[$sa]))
 		{
-			// send an error and get out of here
+			// Send an error and get out of here
 			Errors::instance()->fatal_lang_error('error_sa_not_set');
 		}
 
 		$subAction = $this->_subActions[$sa];
 
-		// unless it's disabled, then we redirect to the default action
+		// Unless it's disabled, then we redirect to the default action
 		if (isset($subAction['enabled']) && !$subAction['enabled'])
 			if (!empty($this->_default))
 				$subAction = $this->_subActions[$this->_default];
 			else
-				// no dice
+				// No dice
 				Errors::instance()->fatal_lang_error('error_sa_not_set');
 
-		// are you even permitted to?
+		// Are you even permitted to?
 		if (isset($subAction['permission']))
 			isAllowedTo($subAction['permission']);
 
-		// is it in a file we need to load?
+		// Is it in a file we need to load?
 		if (isset($subAction['file']))
 		{
 			if (isset($subAction['dir']))
@@ -144,7 +148,7 @@ class Action
 			else
 				require_once(ADMINDIR . '/' . $subAction['file']);
 
-			// a brand new controller... so be it.
+			// A brand new controller... so be it.
 			if (isset($subAction['controller']))
 			{
 				// 'controller'->'function'
@@ -155,16 +159,16 @@ class Action
 			}
 			elseif (isset($subAction['function']))
 			{
-				// this is just a good ole' function
+				// This is just a good ole' function
 				$subAction['function']();
 			}
 		}
 		else
 		{
-			// we still want to know if it's OOP or not. For debugging purposes. :P
+			// We still want to know if it's OOP or not. For debugging purposes. :P
 			if (isset($subAction['controller']))
 			{
-				// an OOP controller, call it over
+				// An OOP controller, call it over
 				if (is_object($subAction['controller']))
 					$subAction['controller']->{$subAction['function']}();
 				else
@@ -177,13 +181,13 @@ class Action
 			}
 			elseif (is_array($subAction) && !isset($subAction['function']))
 			{
-				// an OOP controller, without explicit 'controller' index, lazy!
+				// An OOP controller, without explicit 'controller' index, lazy!
 				$controller = $subAction[0];
 				$controller->{$subAction[1]}();
 			}
 			else
 			{
-				// a function
+				// A function
 				if (isset($subAction['function']))
 					$subAction['function']();
 				else
@@ -194,34 +198,40 @@ class Action
 
 	/**
 	 * Return the subaction.
-	 * This method checks if $sa is enabled, and falls back to default if not.
-	 * Used only to set the context for the template.
 	 *
-	 * @param string $sa
+	 * What it does:
+	 * - This method checks if $sa is enabled, and falls back to default if not.
+	 * - Used only to set the context for the template.
+	 *
+	 * @param string $sa The subaction to call
 	 */
 	public function subaction($sa)
 	{
 		$subAction = $this->_subActions[$sa];
 
-		// if it's disabled, then default action
+		// If it's disabled, then default action
 		if (isset($subAction['enabled']) && !$subAction['enabled'])
+		{
 			if (!empty($this->_default))
 				$sa = $this->_default;
 			else
-				// no dice
+				// No dice
 				Errors::instance()->fatal_lang_error('error_sa_not_set');
+		}
 
 		return $sa;
 	}
 
 	/**
 	 * Security check: verify that the user has the permission to perform the given action.
-	 * Verifies if the user has the permission set for the given action.
-	 * Return true if no permission was set for the action.
-	 * Results in a fatal_lang_error() if the user doesn't have permission,
-	 * or this instance wasn't initialized, or the action cannot be found in it.
 	 *
-	 * @param string $sa
+	 * What it does:
+	 * - Verifies if the user has the permission set for the given action.
+	 * - Return true if no permission was set for the action.
+	 * - Results in a fatal_lang_error() if the user doesn't have permission,
+	 * or this instance was not initialized, or the action cannot be found in it.
+	 *
+	 * @param string $sa The sub action
 	 */
 	public function isAllowedTo($sa)
 	{
@@ -233,10 +243,12 @@ class Action
 			return true;
 		}
 
-		// can't let you continue, sorry.
+		// Can't let you continue, sorry.
 		Errors::instance()->fatal_lang_error('error_sa_not_set');
 
 		// I said... can't.
 		trigger_error('No access...', E_USER_ERROR);
+
+		return false;
 	}
 }

@@ -26,10 +26,27 @@ if (!defined('ELK'))
 class ProfileHistory_Controller extends Action_Controller
 {
 	/**
+	 * Holds instance of HttpReq object
+	 * @var HttpReq
+	 */
+	private $_req;
+
+	/**
 	 * Member id for the history being viewed
 	 * @var int
 	 */
 	private $_memID = 0;
+
+	/**
+	 * Called before all other methods when coming from the dispatcher or
+	 * action class.
+	 */
+	public function pre_dispatch()
+	{
+		$this->_memID = currentMemberID();
+
+		$this->_req = HttpReq::instance();
+	}
 
 	/**
 	 * Profile history entry point.
@@ -40,8 +57,6 @@ class ProfileHistory_Controller extends Action_Controller
 	public function action_index()
 	{
 		global $context, $txt, $modSettings, $user_profile;
-
-		$this->_memID = currentMemberID();
 
 		$subActions = array(
 			'activity' => array('controller' => $this, 'function' => 'action_trackactivity', 'label' => $txt['trackActivity']),
@@ -88,17 +103,15 @@ class ProfileHistory_Controller extends Action_Controller
 	{
 		global $scripturl, $txt, $modSettings, $user_profile, $context;
 
-		$memID = $this->_memID;
-
 		// Verify if the user has sufficient permissions.
 		isAllowedTo('moderate_forum');
 
-		$context['last_ip'] = $user_profile[$memID]['member_ip'];
+		$context['last_ip'] = $user_profile[$this->_memID]['member_ip'];
 
-		if ($context['last_ip'] != $user_profile[$memID]['member_ip2'])
-			$context['last_ip2'] = $user_profile[$memID]['member_ip2'];
+		if ($context['last_ip'] != $user_profile[$this->_memID]['member_ip2'])
+			$context['last_ip2'] = $user_profile[$this->_memID]['member_ip2'];
 
-		$context['member']['name'] = $user_profile[$memID]['real_name'];
+		$context['member']['name'] = $user_profile[$this->_memID]['real_name'];
 
 		// Set the options for the list component.
 		$listOptions = array(
@@ -106,20 +119,20 @@ class ProfileHistory_Controller extends Action_Controller
 			'title' => $txt['errors_by'] . ' ' . $context['member']['name'],
 			'items_per_page' => $modSettings['defaultMaxMessages'],
 			'no_items_label' => $txt['no_errors_from_user'],
-			'base_href' => $scripturl . '?action=profile;area=history;sa=user;u=' . $memID,
+			'base_href' => $scripturl . '?action=profile;area=history;sa=user;u=' . $this->_memID,
 			'default_sort_col' => 'date',
 			'get_items' => array(
 				'function' => array($this, 'list_getUserErrors'),
 				'params' => array(
 					'le.id_member = {int:current_member}',
-					array('current_member' => $memID),
+					array('current_member' => $this->_memID),
 				),
 			),
 			'get_count' => array(
 				'function' => array($this, 'list_getUserErrorCount'),
 				'params' => array(
 					'id_member = {int:current_member}',
-					array('current_member' => $memID),
+					array('current_member' => $this->_memID),
 				),
 			),
 			'columns' => array(
@@ -129,7 +142,7 @@ class ProfileHistory_Controller extends Action_Controller
 					),
 					'data' => array(
 						'sprintf' => array(
-							'format' => '<a href="' . $scripturl . '?action=profile;area=history;sa=ip;searchip=%1$s;u=' . $memID. '">%1$s</a>',
+							'format' => '<a href="' . $scripturl . '?action=profile;area=history;sa=ip;searchip=%1$s;u=' . $this->_memID. '">%1$s</a>',
 							'params' => array(
 								'ip' => false,
 							),
@@ -180,15 +193,15 @@ class ProfileHistory_Controller extends Action_Controller
 		createList($listOptions);
 
 		// Get all IP addresses this user has used for his messages.
-		$ips = getMembersIPs($memID);
+		$ips = getMembersIPs($this->_memID);
 		$context['ips'] = array();
 		$context['error_ips'] = array();
 
 		foreach ($ips['message_ips'] as $ip)
-			$context['ips'][] = '<a href="' . $scripturl . '?action=profile;area=history;sa=ip;searchip=' . $ip . ';u=' . $memID . '">' . $ip . '</a>';
+			$context['ips'][] = '<a href="' . $scripturl . '?action=profile;area=history;sa=ip;searchip=' . $ip . ';u=' . $this->_memID . '">' . $ip . '</a>';
 
 		foreach ($ips['error_ips'] as $ip)
-			$context['error_ips'][] = '<a href="' . $scripturl . '?action=profile;area=history;sa=ip;searchip=' . $ip . ';u=' . $memID . '">' . $ip . '</a>';
+			$context['error_ips'][] = '<a href="' . $scripturl . '?action=profile;area=history;sa=ip;searchip=' . $ip . ';u=' . $this->_memID . '">' . $ip . '</a>';
 
 		// Find other users that might use the same IP.
 		$context['members_in_range'] = array();
@@ -196,7 +209,7 @@ class ProfileHistory_Controller extends Action_Controller
 		$all_ips = array_unique(array_merge($ips['message_ips'], $ips['error_ips']));
 		if (!empty($all_ips))
 		{
-			$members_in_range = getMembersInRange($all_ips, $memID);
+			$members_in_range = getMembersInRange($all_ips, $this->_memID);
 			foreach ($members_in_range as $row)
 				$context['members_in_range'][$row['id_member']] = '<a href="' . $scripturl . '?action=profile;u=' . $row['id_member'] . '">' . $row['real_name'] . '</a>';
 		}
@@ -214,8 +227,6 @@ class ProfileHistory_Controller extends Action_Controller
 	{
 		global $user_profile, $scripturl, $txt, $user_info, $modSettings, $context;
 
-		$memID = $this->_memID;
-
 		// Can the user do this?
 		isAllowedTo('moderate_forum');
 
@@ -223,7 +234,7 @@ class ProfileHistory_Controller extends Action_Controller
 		loadTemplate('ProfileHistory');
 		loadLanguage('Profile');
 
-		if ($memID == 0)
+		if ($this->_memID == 0)
 		{
 			$context['ip'] = $user_info['ip'];
 			$context['page_title'] = $txt['profile'];
@@ -231,16 +242,19 @@ class ProfileHistory_Controller extends Action_Controller
 		}
 		else
 		{
-			$context['ip'] = $user_profile[$memID]['member_ip'];
-			$context['base_url'] = $scripturl . '?action=profile;area=history;sa=ip;u=' . $memID;
+			$context['ip'] = $user_profile[$this->_memID]['member_ip'];
+			$context['base_url'] = $scripturl . '?action=profile;area=history;sa=ip;u=' . $this->_memID;
 		}
 
 		// Searching?
-		if (isset($_REQUEST['searchip']))
-			$context['ip'] = trim($_REQUEST['searchip']);
+		if (isset($this->_req->query->searchip))
+			$context['ip'] = trim($this->_req->query->searchip);
 
-		if (preg_match('/^\d{1,3}\.(\d{1,3}|\*)\.(\d{1,3}|\*)\.(\d{1,3}|\*)$/', $context['ip']) == 0 && isValidIPv6($context['ip']) === false)
+		if (preg_match('/^\d{1,3}\.(\d{1,3}|\*)\.(\d{1,3}|\*)\.(\d{1,3}|\*)$/', $context['ip']) == 0
+			&& isValidIPv6($context['ip']) === false)
+		{
 			Errors::instance()->fatal_lang_error('invalid_tracking_ip', false);
+		}
 
 		$ip_var = str_replace('*', '%', $context['ip']);
 		$ip_string = strpos($ip_var, '%') === false ? '= {string:ip_address}' : 'LIKE {string:ip_address}';
@@ -470,12 +484,10 @@ class ProfileHistory_Controller extends Action_Controller
 	{
 		global $scripturl, $txt, $context;
 
-		$memID = $this->_memID;
-
-		if ($memID == 0)
+		if ($this->_memID == 0)
 			$context['base_url'] = $scripturl . '?action=trackip';
 		else
-			$context['base_url'] = $scripturl . '?action=profile;area=history;sa=ip;u=' . $memID;
+			$context['base_url'] = $scripturl . '?action=profile;area=history;sa=ip;u=' . $this->_memID;
 
 		// Start with the user messages.
 		$listOptions = array(
@@ -487,14 +499,14 @@ class ProfileHistory_Controller extends Action_Controller
 				'function' => array($this, 'list_getLogins'),
 				'params' => array(
 					'id_member = {int:current_member}',
-					array('current_member' => $memID),
+					array('current_member' => $this->_memID),
 				),
 			),
 			'get_count' => array(
 				'function' => array($this, 'list_getLoginCount'),
 				'params' => array(
 					'id_member = {int:current_member}',
-					array('current_member' => $memID),
+					array('current_member' => $this->_memID),
 				),
 			),
 			'columns' => array(
@@ -544,8 +556,6 @@ class ProfileHistory_Controller extends Action_Controller
 	{
 		global $scripturl, $txt, $modSettings, $context;
 
-		$memID = $this->_memID;
-
 		// Get the names of any custom fields.
 		require_once(SUBSDIR . '/ManageFeatures.subs.php');
 		$context['custom_field_titles'] = loadAllCustomFields();
@@ -556,19 +566,13 @@ class ProfileHistory_Controller extends Action_Controller
 			'title' => $txt['trackEdits'],
 			'items_per_page' => $modSettings['defaultMaxMessages'],
 			'no_items_label' => $txt['trackEdit_no_edits'],
-			'base_href' => $scripturl . '?action=profile;area=history;sa=edits;u=' . $memID,
+			'base_href' => $scripturl . '?action=profile;area=history;sa=edits;u=' . $this->_memID,
 			'default_sort_col' => 'time',
 			'get_items' => array(
 				'function' => array($this, 'list_getProfileEdits'),
-				'params' => array(
-					$memID,
-				),
 			),
 			'get_count' => array(
 				'function' => array($this, 'list_getProfileEditCount'),
-				'params' => array(
-					$memID,
-				),
 			),
 			'columns' => array(
 				'action' => array(
@@ -628,7 +632,7 @@ class ProfileHistory_Controller extends Action_Controller
 	/**
 	 * Get the number of user errors
 	 *
-	 * Passthough for createList to getUserErrorCount
+	 * Pass though for createList to getUserErrorCount
 	 * used in action_trackip() and action_trackactivity()
 	 *
 	 * @param string $where
@@ -646,11 +650,11 @@ class ProfileHistory_Controller extends Action_Controller
 	/**
 	 * Get a list of error messages from this ip (range).
 	 *
-	 * Passthough to getUserErrors for createList in action_trackip() and action_trackactivity()
+	 * Pass though to getUserErrors for createList in action_trackip() and action_trackactivity()
 	 *
-	 * @param int $start
-	 * @param int $items_per_page
-	 * @param string $sort
+	 * @param int $start The item to start with (for pagination purposes)
+	 * @param int $items_per_page  The number of items to show per page
+	 * @param string $sort A string indicating how to sort the results
 	 * @param string $where
 	 * @param mixed[] $where_vars array of values used in the where statement
 	 * @return mixed[] error messages array
@@ -666,7 +670,7 @@ class ProfileHistory_Controller extends Action_Controller
 	/**
 	 * count of messages from a matching IP
 	 *
-	 * Passthough to getIPMessageCount for createList() in TrackIP()
+	 * Pass though to getIPMessageCount for createList() in TrackIP()
 	 *
 	 * @param string $where
 	 * @param mixed[] $where_vars array of values used in the where statement
@@ -683,11 +687,11 @@ class ProfileHistory_Controller extends Action_Controller
 	/**
 	 * Fetch a listing of messages made from a given IP
 	 *
-	 * Passthrough to getIPMessages used by createList() in TrackIP()
+	 * Pass through to getIPMessages used by createList() in TrackIP()
 	 *
-	 * @param int $start
-	 * @param int $items_per_page
-	 * @param string $sort
+	 * @param int $start The item to start with (for pagination purposes)
+	 * @param int $items_per_page  The number of items to show per page
+	 * @param string $sort A string indicating how to sort the results
 	 * @param string $where
 	 * @param mixed[] $where_vars array of values used in the where statement
 	 * @return mixed[] an array of basic messages / details
@@ -703,7 +707,7 @@ class ProfileHistory_Controller extends Action_Controller
 	/**
 	 * Get list of all times this account was logged into
 	 *
-	 * Passthrough to getLoginCount for trackLogins for counting history.
+	 * Pass through to getLoginCount for trackLogins for counting history.
 	 * (createList() in TrackLogins())
 	 *
 	 * @param string $where
@@ -721,11 +725,11 @@ class ProfileHistory_Controller extends Action_Controller
 	/**
 	 * List of login history for a user
 	 *
-	 * Passthrough to getLogins for trackLogins data.
+	 * Pass through to getLogins for trackLogins data.
 	 *
-	 * @param int $start
-	 * @param int $items_per_page
-	 * @param string $sort
+	 * @param int $start The item to start with (for pagination purposes)
+	 * @param int $items_per_page  The number of items to show per page
+	 * @param string $sort A string indicating how to sort the results
 	 * @param string $where
 	 * @param mixed[] $where_vars array of values used in the where statement
 	 * @return mixed[] an array of messages
@@ -741,15 +745,14 @@ class ProfileHistory_Controller extends Action_Controller
 	/**
 	 * How many profile edits
 	 *
-	 * Passthrough to getProfileEditCount.
+	 * Pass through to getProfileEditCount.
 	 *
-	 * @param int $memID id_member
 	 * @return string number of profile edits
 	 */
-	public function list_getProfileEditCount($memID)
+	public function list_getProfileEditCount()
 	{
 		require_once(SUBSDIR . '/ProfileHistory.subs.php');
-		$edit_count = getProfileEditCount($memID);
+		$edit_count = getProfileEditCount($this->_memID);
 
 		return $edit_count;
 	}
@@ -757,18 +760,17 @@ class ProfileHistory_Controller extends Action_Controller
 	/**
 	 * List of profile edits for display
 	 *
-	 * Passthrough to  getProfileEditsfunction for createList in trackEdits().
+	 * Pass through to getProfileEdits function for createList in trackEdits().
 	 *
-	 * @param int $start
-	 * @param int $items_per_page
-	 * @param string $sort
-	 * @param int $memID
+	 * @param int $start The item to start with (for pagination purposes)
+	 * @param int $items_per_page  The number of items to show per page
+	 * @param string $sort A string indicating how to sort the results
 	 * @return mixed[] array of profile edits
 	 */
-	public function list_getProfileEdits($start, $items_per_page, $sort, $memID)
+	public function list_getProfileEdits($start, $items_per_page, $sort)
 	{
 		require_once(SUBSDIR . '/ProfileHistory.subs.php');
-		$edits = getProfileEdits($start, $items_per_page, $sort, $memID);
+		$edits = getProfileEdits($start, $items_per_page, $sort, $this->_memID);
 
 		return $edits;
 	}

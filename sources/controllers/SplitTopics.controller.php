@@ -22,18 +22,34 @@ if (!defined('ELK'))
 	die('No access...');
 
 /**
- * SplitTopics Controller.  Allows to take a topic and split at a point or select
+ * SplitTopics Controller.
+ *
+ * - Allows to take a topic and split at a point or select
  * individual messages to split to a new topic.
- * requires the split_any permission
+ * - Requires the split_any permission
  */
 class SplitTopics_Controller extends Action_Controller
 {
 	/**
-	 * Holds the new subject for the split toic
+	 * Holds instance of HttpReq object
+	 * @var HttpReq
+	 */
+	private $_req;
+
+	/**
+	 * Holds the new subject for the split topic
 	 *
 	 * @var string
 	 */
 	private $_new_topic_subject = null;
+
+	/**
+	 * Pre Dispatch, called before other methods.  Loads HttpReq instance.
+	 */
+	public function pre_dispatch()
+	{
+		$this->_req = HttpReq::instance();
+	}
 
 	/**
 	 * Intended entry point for this class.
@@ -47,10 +63,12 @@ class SplitTopics_Controller extends Action_Controller
 
 	/**
 	 * Splits a topic into two topics.
-	 * delegates to the other functions (based on the URL parameter 'sa').
-	 * loads the SplitTopics template.
-	 * requires the split_any permission.
-	 * is accessed with ?action=splittopics.
+	 *
+	 * What it does:
+	 * - Delegates to the other functions (based on the URL parameter 'sa').
+	 * - Loads the SplitTopics template.
+	 * - Requires the split_any permission.
+	 * - Accessed with ?action=splittopics.
 	 */
 	public function action_splittopics()
 	{
@@ -61,12 +79,13 @@ class SplitTopics_Controller extends Action_Controller
 			Errors::instance()->fatal_lang_error('numbers_one_to_nine', false);
 
 		// Load up the "dependencies" - the template, getMsgMemberID().
-		if (!isset($_REQUEST['xml']))
+		if (!isset($this->_req->query->xml))
 			loadTemplate('SplitTopics');
 
 		require_once(SUBSDIR . '/Boards.subs.php');
 		require_once(SUBSDIR . '/Post.subs.php');
 
+		// The things we know to do
 		$subActions = array(
 			'selectTopics' => array($this, 'action_splitSelectTopics', 'permission' => 'split_any'),
 			'execute' => array($this, 'action_splitExecute', 'permission' => 'split_any'),
@@ -74,7 +93,7 @@ class SplitTopics_Controller extends Action_Controller
 			'splitSelection' => array($this, 'action_splitSelection', 'permission' => 'split_any'),
 		);
 
-		// ?action=splittopics;sa=LETSBREAKIT won't work, sorry.
+		// To the right sub action or index if an invalid choice was submitted
 		$action = new Action();
 		$subAction = $action->initialize($subActions, 'index');
 		$action->dispatch($subAction);
@@ -82,23 +101,26 @@ class SplitTopics_Controller extends Action_Controller
 
 	/**
 	 * Screen shown before the actual split.
-	 * is accessed with ?action=splittopics;sa=index.
-	 * default sub action for ?action=splittopics.
-	 * uses 'ask' sub template of the SplitTopics template.
-	 * redirects to action_splitSelectTopics if the message given turns out to be
+	 *
+	 * What it does:
+	 * - Is accessed with ?action=splittopics or ?action=splittopics;sa=index
+	 * - Default sub action for ?action=splittopics.
+	 * - Redirects to action_splitSelectTopics if the message given turns out to be
 	 * the first message of a topic.
-	 * shows the user three ways to split the current topic.
+	 * - Shows the user three ways to split the current topic.
+	 *
+	 * @uses template_ask() in SplitTopics.template
 	 */
 	public function action_splitIndex()
 	{
 		global $txt, $context, $modSettings;
 
-		// Validate "at".
-		if (empty($_GET['at']))
-			Errors::instance()->fatal_lang_error('numbers_one_to_nine', false);
-
 		// Split at a specific topic
-		$splitAt = (int) $_GET['at'];
+		$splitAt = $this->_req->getQuery('at', 'intval', 0);
+
+		// Validate "at".
+		if (empty($this->_req->query->at))
+			Errors::instance()->fatal_lang_error('numbers_one_to_nine', false);
 
 		// We deal with topics here.
 		require_once(SUBSDIR . '/Boards.subs.php');
@@ -120,6 +142,7 @@ class SplitTopics_Controller extends Action_Controller
 		if ($modSettings['postmod_active'] && allowedTo('approve_posts'))
 			$messageInfo['num_replies'] += $messageInfo['unapproved_posts'] - ($messageInfo['topic_approved'] ? 0 : 1);
 
+		// If they can more it as well, allow the template to give them a move to board list
 		$context['can_move'] = allowedTo('move_any') || allowedTo('move_own');
 
 		// Check if there is more than one message in the topic.  (there should be.)
@@ -131,27 +154,32 @@ class SplitTopics_Controller extends Action_Controller
 		{
 			$this->_new_topic_subject = $messageInfo['subject'];
 			$this->_set_session_values();
-			return $this->action_splitSelectTopics();
+			$this->action_splitSelectTopics();
 		}
-
-		// Basic template information....
-		$context['message'] = array(
-			'id' => $splitAt,
-			'subject' => $messageInfo['subject']
-		);
-		$context['sub_template'] = 'ask';
-		$context['page_title'] = $txt['split_topic'];
+		else
+		{
+			// Basic template information....
+			$context['message'] = array(
+				'id' => $splitAt,
+				'subject' => $messageInfo['subject']
+			);
+			$context['sub_template'] = 'ask';
+			$context['page_title'] = $txt['split_topic'];
+		}
 	}
 
 	/**
 	 * Do the actual split.
-	 * is accessed with ?action=splittopics;sa=execute.
-	 * uses the main SplitTopics template.
-	 * supports three ways of splitting:
-	 * (1) only one message is split off.
-	 * (2) all messages after and including a given message are split off.
-	 * (3) select topics to split (redirects to action_splitSelectTopics()).
-	 * uses splitTopic function to do the actual splitting.
+	 *
+	 * What it does:
+	 * - Is accessed with ?action=splittopics;sa=execute.
+	 * - Supports three ways of splitting:
+	 *   (1) only one message is split off.
+	 *   (2) all messages after and including a given message are split off.
+	 *   (3) select topics to split (redirects to action_splitSelectTopics()).
+	 * - Uses splitTopic function to do the actual splitting.
+	 *
+	 * @uses template_split_successful() in SplitTopics.template
 	 */
 	public function action_splitExecute()
 	{
@@ -171,11 +199,13 @@ class SplitTopics_Controller extends Action_Controller
 		}
 
 		// Redirect to the selector if they chose selective.
-		if ($_POST['step2'] == 'selective')
+		if ($this->_req->post->step2 === 'selective')
 		{
-			if (!empty($_POST['at']))
-				$_SESSION['split_selection'][$topic][] = (int) $_POST['at'];
-			return $this->action_splitSelectTopics();
+			if (!empty($this->_req->post->at))
+				$_SESSION['split_selection'][$topic][] = (int) $this->_req->post->at;
+
+			$this->action_splitSelectTopics();
+			return true;
 		}
 
 		// We work with them topics.
@@ -187,14 +217,14 @@ class SplitTopics_Controller extends Action_Controller
 		// Before the actual split because of the fatal_lang_errors
 		$boards = splitDestinationBoard($_SESSION['move_to_board']);
 
-		$splitAt = (int) $_POST['at'];
+		$splitAt = $this->_req->getPost('at', 'intval', 0);
 		$messagesToBeSplit = array();
 
 		// Fetch the message IDs of the topic that are at or after the message.
-		if ($_POST['step2'] == 'afterthis')
+		if ($this->_req->post->step2 === 'afterthis')
 			$messagesToBeSplit = messagesSince($topic, $splitAt, true);
 		// Only the selected message has to be split. That should be easy.
-		elseif ($_POST['step2'] == 'onlythis')
+		elseif ($this->_req->post->step2 === 'onlythis')
 			$messagesToBeSplit[] = $splitAt;
 		// There's another action?!
 		else
@@ -216,13 +246,19 @@ class SplitTopics_Controller extends Action_Controller
 			postSplitRedirect($_SESSION['reason'], $_SESSION['new_topic_subject'], $boards['destination'], $context['new_topic']);
 
 		$this->_unset_session_values();
+
+		return true;
 	}
 
 	/**
 	 * Do the actual split of a selection of topics.
-	 * is accessed with ?action=splittopics;sa=splitSelection.
-	 * uses the main SplitTopics template.
-	 * uses splitTopic function to do the actual splitting.
+	 *
+	 * What it does:
+	 * - Is accessed with ?action=splittopics;sa=splitSelection.
+	 * - Uses the main SplitTopics template.
+	 *
+	 * @uses splitTopic() function to do the actual splitting.
+	 * @uses template_split_successful() of SplitTopics.template
 	 */
 	public function action_splitSelection()
 	{
@@ -260,28 +296,33 @@ class SplitTopics_Controller extends Action_Controller
 
 	/**
 	 * Allows the user to select the messages to be split.
-	 * is accessed with ?action=splittopics;sa=selectTopics.
-	 * uses 'select' sub template of the SplitTopics template or (for
+	 *
+	 * What it does:
+	 * - Is accessed with ?action=splittopics;sa=selectTopics.
+	 * - Uses 'select' sub template of the SplitTopics template or (for
 	 * XMLhttp) the 'split' sub template of the Xml template.
-	 * supports XMLhttp for adding/removing a message to the selection.
-	 * uses a session variable to store the selected topics.
-	 * shows two independent page indexes for both the selected and
+	 * - Supports XMLhttp for adding/removing a message to the selection.
+	 * - Uses a session variable to store the selected topics.
+	 * - Shows two independent page indexes for both the selected and
 	 * not-selected messages (;topic=1.x;start2=y).
+	 *
+	 * @uses template_select() of SplitTopics.template
+	 * @uses template_split() of SplitTopics.template
 	 */
 	public function action_splitSelectTopics()
 	{
 		global $txt, $scripturl, $topic, $context, $modSettings, $options;
 
 		$context['page_title'] = $txt['split_topic'] . ' - ' . $txt['select_split_posts'];
-		$context['destination_board'] = !empty($_POST['move_to_board']) ? (int) $_POST['move_to_board'] : 0;
+		$context['destination_board'] = !empty($this->_req->post->move_to_board) ? (int) $this->_req->post->move_to_board : 0;
 
 		// Haven't selected anything have we?
 		$_SESSION['split_selection'][$topic] = empty($_SESSION['split_selection'][$topic]) ? array() : $_SESSION['split_selection'][$topic];
 
 		// This is a special case for split topics from quick-moderation checkboxes
-		if (isset($_REQUEST['subname_enc']))
+		if (isset($this->_req->query->subname_enc))
 		{
-			$this->_new_topic_subject = urldecode($_REQUEST['subname_enc']);
+			$this->_new_topic_subject = urldecode($this->_req->query->subname_enc);
 			$this->_set_session_values();
 		}
 
@@ -290,13 +331,13 @@ class SplitTopics_Controller extends Action_Controller
 
 		$context['not_selected'] = array(
 			'num_messages' => 0,
-			'start' => empty($_REQUEST['start']) ? 0 : (int) $_REQUEST['start'],
+			'start' => $this->_req->getPost('start', 'intval', 0),
 			'messages' => array(),
 		);
 
 		$context['selected'] = array(
 			'num_messages' => 0,
-			'start' => empty($_REQUEST['start2']) ? 0 : (int) $_REQUEST['start2'],
+			'start' => $this->_req->getQuery('start2', 'intval', 0),
 			'messages' => array(),
 		);
 
@@ -309,17 +350,17 @@ class SplitTopics_Controller extends Action_Controller
 		$context['new_subject'] = $_SESSION['new_topic_subject'];
 
 		// Using the "select" sub template.
-		$context['sub_template'] = isset($_REQUEST['xml']) ? 'split' : 'select';
+		$context['sub_template'] = isset($this->_req->query->xml) ? 'split' : 'select';
 
 		// All of the js for topic split selection is needed
-		if (!isset($_REQUEST['xml']))
+		if (!isset($this->_req->query->xml))
 			loadJavascriptFile('topic.js');
 
 		// Are we using a custom messages per page?
 		$context['messages_per_page'] = empty($modSettings['disableCustomPerPage']) && !empty($options['messages_per_page']) ? $options['messages_per_page'] : $modSettings['defaultMaxMessages'];
 
 		// Get the message ID's from before the move.
-		if (isset($_REQUEST['xml']))
+		if (isset($this->_req->query->xml))
 		{
 			$original_msgs = array(
 				'not_selected' => messageAt($context['not_selected']['start'], $topic, array(
@@ -331,8 +372,8 @@ class SplitTopics_Controller extends Action_Controller
 			);
 
 			// You can't split the last message off.
-			if (empty($context['not_selected']['start']) && count($original_msgs['not_selected']) <= 1 && $_REQUEST['move'] == 'down')
-				$_REQUEST['move'] = '';
+			if (empty($context['not_selected']['start']) && count($original_msgs['not_selected']) <= 1 && $this->_req->query->move === 'down')
+				$this->_req->query->move = '';
 
 			if (!empty($_SESSION['split_selection'][$topic]))
 			{
@@ -345,16 +386,16 @@ class SplitTopics_Controller extends Action_Controller
 		}
 
 		// (De)select a message..
-		if (!empty($_REQUEST['move']))
+		if (!empty($this->_req->query->move))
 		{
-			$_REQUEST['msg'] = (int) $_REQUEST['msg'];
+			$_id_msg = $this->_req->getQuery('msg', 'intval');
 
-			if ($_REQUEST['move'] == 'reset')
+			if ($this->_req->query->move === 'reset')
 				$_SESSION['split_selection'][$topic] = array();
-			elseif ($_REQUEST['move'] == 'up')
-				$_SESSION['split_selection'][$topic] = array_diff($_SESSION['split_selection'][$topic], array($_REQUEST['msg']));
+			elseif ($this->_req->query->move === 'up')
+				$_SESSION['split_selection'][$topic] = array_diff($_SESSION['split_selection'][$topic], array($_id_msg));
 			else
-				$_SESSION['split_selection'][$topic][] = $_REQUEST['msg'];
+				$_SESSION['split_selection'][$topic][] = $_id_msg;
 		}
 
 		// Make sure the selection is still accurate.
@@ -375,11 +416,12 @@ class SplitTopics_Controller extends Action_Controller
 		foreach ($split_counts as $key => $num_messages)
 			$context[$key]['num_messages'] = $num_messages;
 
-		// Fix an oversized starting page (to make sure both pageindexes are properly set).
+		// Fix an oversize starting page (to make sure both pageindexes are properly set).
 		if ($context['selected']['start'] >= $context['selected']['num_messages'])
 			$context['selected']['start'] = $context['selected']['num_messages'] <= $context['messages_per_page'] ? 0 : ($context['selected']['num_messages'] - (($context['selected']['num_messages'] % $context['messages_per_page']) == 0 ? $context['messages_per_page'] : ($context['selected']['num_messages'] % $context['messages_per_page'])));
 
 		$page_index_url = $scripturl . '?action=splittopics;sa=selectTopics;subname=' . strtr(urlencode($_SESSION['new_topic_subject']), array('%' => '%%')) . ';topic=' . $topic;
+
 		// Build a page list of the not-selected topics...
 		$context['not_selected']['page_index'] = constructPageIndex($page_index_url . '.%1$d;start2=' . $context['selected']['start'], $context['not_selected']['start'], $context['not_selected']['num_messages'], $context['messages_per_page'], true);
 
@@ -394,7 +436,7 @@ class SplitTopics_Controller extends Action_Controller
 			$context['selected']['messages'] = selectMessages($topic, $context['selected']['start'], $context['messages_per_page'], array('included' => $_SESSION['split_selection'][$topic]), $modSettings['postmod_active'] && !allowedTo('approve_posts'));
 
 		// The XMLhttp method only needs the stuff that changed, so let's compare.
-		if (isset($_REQUEST['xml']))
+		if (isset($this->_req->query->xml))
 		{
 			$changes = array(
 				'remove' => array(
@@ -422,7 +464,8 @@ class SplitTopics_Controller extends Action_Controller
 							'type' => $change_type,
 							'section' => $section,
 						);
-						if ($change_type == 'insert')
+
+						if ($change_type === 'insert')
 							$context['changes']['insert' . $id_msg]['insert_value'] = $context[$section]['messages'][$id_msg];
 					}
 				}
@@ -438,8 +481,9 @@ class SplitTopics_Controller extends Action_Controller
 		global $txt;
 
 		// Clean up the subject.
-		if (isset($_POST['subname']) && empty($this->_new_topic_subject))
-			$this->_new_topic_subject = trim(Util::htmlspecialchars($_POST['subname']));
+		$subname = $this->_req->getPost('subname', 'trim', $this->_req->getQuery('subname', 'trim', null));
+		if (isset($subname) && empty($this->_new_topic_subject))
+			$this->_new_topic_subject = Util::htmlspecialchars($subname);
 
 		if (empty($this->_new_topic_subject))
 			$this->_new_topic_subject = $txt['new_topic'];
@@ -447,9 +491,9 @@ class SplitTopics_Controller extends Action_Controller
 		// Save in session so its available across all the form pages
 		if (empty($_SESSION['move_to_board']))
 		{
-			$_SESSION['move_to_board'] = (!empty($_POST['move_new_topic']) && !empty($_POST['move_to_board'])) ? (int) $_POST['move_to_board'] : 0;
-			$_SESSION['reason'] = !empty($_POST['reason']) ? trim(Util::htmlspecialchars($_POST['reason'], ENT_QUOTES)) : '';
-			$_SESSION['messageRedirect'] = !empty($_POST['messageRedirect']);
+			$_SESSION['move_to_board'] = (!empty($this->_req->post->move_new_topic) && !empty($this->_req->post->move_to_board)) ? (int) $this->_req->post->move_to_board : 0;
+			$_SESSION['reason'] = !empty($this->_req->post->reason) ? trim(Util::htmlspecialchars($this->_req->post->reason, ENT_QUOTES)) : '';
+			$_SESSION['messageRedirect'] = !empty($this->_req->post->messageRedirect);
 			$_SESSION['new_topic_subject'] = $this->_new_topic_subject;
 		}
 	}

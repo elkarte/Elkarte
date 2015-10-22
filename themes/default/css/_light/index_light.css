@@ -1413,14 +1413,14 @@ div.bbc_footnotes .meaction {
 }
 
 /* Poster and postarea + moderation area underneath */
-.forumposts, .forumposts .approvebg {
+.forumposts {
 	border: 1px solid #DDDDDD;
 	border-bottom: 1px solid #CCCCCC;
 	background: #FEFEFE;
 }
 
 /* Colors for background of posts requiring approval */
-.forumposts .approvebg {
+.approvebg {
 	background: #FFF5CD;
 }
 
@@ -1633,7 +1633,7 @@ div.bbc_footnotes .meaction {
 	background: none repeat scroll 0 0 #FEFEFE;
 }
 
-#profile_attachments, .profile_center {
+#profile_attachments {
 	border: 1px solid #CCCCCC;
 	border-radius: 7px;
 	background: #EEEFEE;

@@ -63,9 +63,9 @@ function list_getModLogEntryCount($query_string = '', $query_params = array(), $
  * Gets the moderation log entries that match the specified parameters.
  * Callback for createList() in Modlog::action_log().
  *
- * @param int $start
- * @param int $items_per_page
- * @param string $sort
+ * @param int $start The item to start with (for pagination purposes)
+ * @param int $items_per_page  The number of items to show per page
+ * @param string $sort A string indicating how to sort the results
  * @param string|null $query_string
  * @param mixed[] $query_params
  * @param int $log_type

@@ -237,7 +237,7 @@ function logTask($id_log, $task_id, $total_time = null)
  * enabled, while the remaining are disabled
  *
  * @package ScheduledTasks
- * @param integer[] $enablers array od task IDs
+ * @param int[] $enablers array od task IDs
  */
 function updateTaskStatus($enablers)
 {
@@ -410,9 +410,9 @@ function scheduledTasks()
  * - Used by createList() callbacks.
  *
  * @package ScheduledTasks
- * @param int $start
- * @param int $items_per_page
- * @param string $sort
+ * @param int $start The item to start with (for pagination purposes)
+ * @param int $items_per_page  The number of items to show per page
+ * @param string $sort A string indicating how to sort the results
  *
  * @return array
  */

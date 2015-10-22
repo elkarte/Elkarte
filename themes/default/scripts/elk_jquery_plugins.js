@@ -8,7 +8,6 @@
  * This file contains javascript plugins for use with jquery
  */
 
-
 /*!
  * hoverIntent v1.9.0 // 2014.08.11 // jQuery v1.9.1+
  * http://cherne.net/brian/resources/jquery.hoverIntent.html
@@ -164,7 +163,7 @@
 });
 
 
-/**
+/*!
  * jQuery Superfish Menu Plugin - v1.7.5
  * Copyright (c) 2014 Joel Birch
  *
@@ -434,7 +433,7 @@
 
 })(jQuery, window);
 
-/*
+/*!
  * Superclick v1.0.0 - jQuery menu widget
  * Copyright (c) 2013 Joel Birch
  *
@@ -674,10 +673,13 @@
 })(jQuery, window);
 
 
-/*
- * ElkArte news fader
- * Copyright (c) ElkArte Forum contributors
- *
+/*!
+ * @name      ElkArte news fader
+ * @copyright ElkArte Forum contributors
+ * @license   MIT http://www.opensource.org/licenses/mit-license.php
+ */
+
+/**
  * Inspired by Paul Mason's tutorial:
  * http://paulmason.name/item/simple-jquery-carousel-slider-tutorial
  *

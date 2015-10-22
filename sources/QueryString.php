@@ -24,13 +24,13 @@ if (!defined('ELK'))
  * Clean the request variables - add html entities to GET and slashes if magic_quotes_gpc is Off.
  *
  * What it does:
- * - uses Request to determine as best it can client IPs for the current request.
- * - uses Request cleanRequest() to:
- *   - clean the request variables (ENV, GET, POST, COOKIE, SERVER)
- *   - makes sure the query string was parsed correctly.
- *   - handles the URLs passed by the queryless URLs option.
- *   - makes sure, regardless of php.ini, everything has slashes.
- * - uses Request parseRequest() to clean and set up variables like $board or $_REQUEST'start'].
+ * - Uses Request to determine as best it can client IPs for the current request.
+ * - Uses Request cleanRequest() to:
+ *   - Clean the request variables (ENV, GET, POST, COOKIE, SERVER)
+ *   - Makes sure the query string was parsed correctly.
+ *   - Handles the URLs passed by the queryless URLs option.
+ *   - Makes sure, regardless of php.ini, everything has slashes.
+ * - Uses Request parseRequest() to clean and set up variables like $board or $_REQUEST'start'].
  */
 function cleanRequest()
 {
@@ -78,7 +78,7 @@ function convertIPv6toInts($ip)
 	foreach ($expanded_ip as $int)
 		$new_ip[] = hexdec($int);
 
-	// Save this incase of repeated use.
+	// Save this in case of repeated use.
 	$expanded[$ip] = $new_ip;
 
 	return $expanded[$ip];
@@ -140,7 +140,7 @@ function expandIPv6($addr, $strict_check = true)
 	// Join segments.
 	$result = implode(':', $part);
 
-	// Save this incase of repeated use.
+	// Save this in case of repeated use.
 	$converted[$addr] = $result;
 
 	// Quick check to make sure the length is as expected.
@@ -154,13 +154,14 @@ function expandIPv6($addr, $strict_check = true)
  * Adds html entities to the array/variable.  Uses two underscores to guard against overloading.
  *
  * What it does:
- * - adds entities (&quot;, &lt;, &gt;) to the array or string var.
- * - importantly, does not effect keys, only values.
- * - calls itself recursively if necessary.
+ * - Adds entities (&quot;, &lt;, &gt;) to the array or string var.
+ * - Importantly, does not effect keys, only values.
+ * - Calls itself recursively if necessary.
+ * - Does not go deeper than 25 to prevent loop exhaustion
  *
- * @param string[]|string $var
- * @param int $level = 0
- * @return mixed[]|string
+ * @param array|string $var The string or array of strings to add entities
+ * @param int $level = 0 The current level we're at within the array (if called recursively)
+ * @return array|string The string or array of strings with entities added
  */
 function htmlspecialchars__recursive($var, $level = 0)
 {
@@ -178,13 +179,15 @@ function htmlspecialchars__recursive($var, $level = 0)
  * Trim a string including the HTML space, character 160.  Uses two underscores to guard against overloading.
  *
  * What it does:
- * - trims a string or an the var array using html characters as well.
- * - does not effect keys, only values.
- * - may call itself recursively if needed.
+ * - Trims a string or an array using html characters as well.
+ * - Remove spaces (32), tabs (9), returns (13, 10, and 11), nulls (0), and hard spaces. (160)
+ * - Does not effect keys, only values.
+ * - May call itself recursively if needed.
+ * - Does not go deeper than 25 to prevent loop exhaustion
  *
- * @param string[]|string $var
- * @param int $level = 0
- * @return mixed[]|string
+ * @param array|string $var The string or array of strings to trim
+ * @param int $level = 0 How deep we're at within the array (if called recursively)
+ * @return mixed[]|string The trimmed string or array of trimmed strings
  */
 function htmltrim__recursive($var, $level = 0)
 {
@@ -203,11 +206,11 @@ function htmltrim__recursive($var, $level = 0)
  * Clean up the XML to make sure it doesn't contain invalid characters.
  *
  * What it does:
- * - removes invalid XML characters to assure the input string being
- * - parsed properly.
+ * - Removes invalid XML characters to assure the input string being
+ * parsed properly.
  *
- * @param string $string
- * @return string
+ * @param string $string The string to clean
+ * @return string The clean string
  */
 function cleanXml($string)
 {
@@ -218,8 +221,8 @@ function cleanXml($string)
 /**
  * Escapes (replaces) characters in strings to make them safe for use in javascript
  *
- * @param string $string
- * @return string
+ * @param string $string The string to escape
+ * @return string The escaped string
  */
 function JavaScriptEscape($string)
 {
@@ -243,14 +246,14 @@ function JavaScriptEscape($string)
  * Rewrite URLs to include the session ID.
  *
  * What it does:
- * - rewrites the URLs outputted to have the session ID, if the user
+ * - Rewrites the URLs outputted to have the session ID, if the user
  *   is not accepting cookies and is using a standard web browser.
- * - handles rewriting URLs for the queryless URLs option.
- * - can be turned off entirely by setting $scripturl to an empty
- *   string, ''. (it wouldn't work well like that anyway.)
+ * - Handles rewriting URLs for the queryless URLs option.
+ * - Can be turned off entirely by setting $scripturl to an empty
+ *   string, ''. (it would not work well like that anyway.)
  *
- * @param string $buffer
- * @return string
+ * @param string $buffer The unmodified output buffer
+ * @return string The modified output buffer
  */
 function ob_sessrewrite($buffer)
 {
