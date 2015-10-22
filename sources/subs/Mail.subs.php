@@ -592,6 +592,12 @@ function smtp_mail($mail_to_array, $subject, $message, $headers, $priority, $mes
 		// EHLO could be understood to mean encrypted hello...
 		if (server_parse('EHLO ' . $modSettings['smtp_host'], $socket, null) == '250')
 		{
+			if ($modSettings['smtp_starttls']) {
+				server_parse('STARTTLS', $socket, null);
+				stream_socket_enable_crypto($socket, true, STREAM_CRYPTO_METHOD_TLS_CLIENT);
+				server_parse('EHLO ' . $modSettings['smtp_host'], $socket, null);
+			}
+
 			if (!server_parse('AUTH LOGIN', $socket, '334'))
 				return false;
 			// Send the username and password, encoded.
