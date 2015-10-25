@@ -430,6 +430,8 @@ class Attachment_Controller extends Action_Controller
 		while (ob_get_level() > 0)
 			@ob_end_clean();
 
+		$finfo = finfo_open(FILEINFO_MIME_TYPE); // return mime type ala mimetype extension
+
 		if (in_array($file_ext, array(
 			'c', 'cpp', 'css', 'csv', 'doc', 'docx', 'flv', 'html', 'htm', 'java', 'js', 'log', 'mp3',
 			'mp4', 'mgp', 'pdf', 'php', 'ppt', 'rtf', 'sql', 'tgz', 'txt', 'wav', 'xls', 'xml', 'zip'
@@ -443,6 +445,13 @@ class Attachment_Controller extends Action_Controller
 			if (!file_exists($filename))
 				$filename = $settings['theme_dir'] . '/images/mime_images/default.png';
 		}
+		elseif (substr(finfo_file($finfo, $filename), 0, 5) !== 'image')
+		{
+			$mime_type = 'image/png';
+			$resize = false;
+			$filename = $settings['theme_dir'] . '/images/mime_images/default.png';
+		}
+		finfo_close($finfo);
 
 		ob_start();
 		header('Content-Encoding: none');
