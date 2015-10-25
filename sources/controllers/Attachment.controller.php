@@ -392,7 +392,7 @@ class Attachment_Controller extends Action_Controller
 
 		try
 		{
-			if (empty($topic) || (string) (int) $this->_req->query->attach !== (string) $this->_req->query->attach)
+			if ((empty($topic) && empty($_REQUEST['id_draft'])) || (string) (int) $this->_req->query->attach !== (string) $this->_req->query->attach)
 			{
 				$attach_data = getTempAttachById($this->_req->query->attach);
 				$file_ext = pathinfo($attach_data['name'], PATHINFO_EXTENSION);
@@ -406,8 +406,8 @@ class Attachment_Controller extends Action_Controller
 				$id_attach = $this->_req->getQuery('attach', 'intval', -1);
 
 				isAllowedTo('view_attachments');
-				$attachment = getAttachmentFromTopic($id_attach, $topic);
 
+				$attachment = getAttachmentFromTopic($id_attach, $topic, (int) !empty($_REQUEST['id_draft']), $user_info['id']);
 				if (empty($attachment))
 					Errors::instance()->fatal_lang_error('no_access', false);
 

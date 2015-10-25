@@ -64,6 +64,11 @@ class Drafts_Post_Module implements ElkArte\sources\modules\Module_Interface
 
 	public function prepare_modifying(&$really_previewing)
 	{
+		global $context;
+
+		if (!empty($_REQUEST['id_draft']))
+			$context['attach_source'] = 1;
+
 		$really_previewing = $really_previewing && !isset($_REQUEST['save_draft']);
 	}
 
@@ -79,6 +84,12 @@ class Drafts_Post_Module implements ElkArte\sources\modules\Module_Interface
 		if (!empty($context['drafts_save']))
 		{
 			loadLanguage('Drafts');
+			if (!empty($_REQUEST['id_draft']))
+			{
+				$id_draft = (int) $_REQUEST['id_draft'];
+				$context['id_draft'] = $id_draft;
+			}
+
 			if (!empty($context['drafts_autosave']) && !empty($options['drafts_autosave_enabled']))
 			{
 				if (!isset($editorOptions['plugin_addons']))
@@ -209,7 +220,11 @@ class Drafts_Post_Module implements ElkArte\sources\modules\Module_Interface
 
 		// has a specific draft has been selected?  Load it up if there is not already a message already in the editor
 		if (isset($_REQUEST['id_draft']) && empty($_POST['subject']) && empty($_POST['message']) || !empty($_REQUEST['save_draft']))
-			$this->_current_draft = loadDraft((int) $_REQUEST['id_draft'], 0, true, true);
+		{
+			$id_draft = (int) $_REQUEST['id_draft'];
+			$this->_current_draft = loadDraft($id_draft, 0, true, true);
+			$context['id_draft'] = $id_draft;
+		}
 
 		// load all the drafts for this user that meet the criteria
 		$order = 'poster_time DESC';

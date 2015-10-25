@@ -124,8 +124,8 @@ class In_Line_Attachment
 		if (empty($modSettings['enableBBC']) || (isset($context['site_action']) && in_array($context['site_action'], array('boardindex', 'messageindex'))))
 			return $this->_message;
 
-		// No message id and not previewing a new message ($_REQUEST['ila'] will be set)
-		if ($this->_id_msg === -1 && !isset($_REQUEST['ila']))
+		// No message id and not previewing a new message ($this->_attach_source will be 1)
+		if ($this->_id_msg === -1 && $this->_attach_source == 0)
 		{
 			// Make sure block quotes are cleaned up, then return
 			$this->_find_nested();
@@ -560,7 +560,7 @@ class In_Line_Attachment
 				$inlinedtext = '
 					<a href="' . $this->_attachment['href'] . '">
 						<img src="' . $settings['images_url'] . '/icons/clip.png" class="icon" alt="*" />&nbsp;' . $this->_attachment['name'] . '
-					</a> (' . $this->_attachment['size'] . ($this->_attachment['is_image'] ? ', ' . $this->_attachment['real_width'] . 'x' . $this->_attachment['real_height'] . ' - ' . sprintf($txt['attach_viewed'], $this->_attachment['downloads']) : ' ' . sprintf($txt['attach_downloaded'] . $this->_attachment['downloads'])) . ')';
+					</a> (' . $this->_attachment['size'] . ($this->_attachment['is_image'] ? ', ' . $this->_attachment['real_width'] . 'x' . $this->_attachment['real_height'] . ' - ' . sprintf($txt['attach_viewed'], $this->_attachment['downloads']) : ' ' . sprintf($txt['attach_downloaded'], $this->_attachment['downloads'])) . ')';
 				break;
 			// [attachmini=xx] -- just a plain link type = mini
 			case 'mini':
@@ -691,9 +691,16 @@ class In_Line_Attachment
 		$msg_id = array($this->_id_msg);
 		$attachments = array();
 
-		// With a message id and the topic we can fetch the attachments
-		if (!empty($modSettings['attachmentEnable']) && allowedTo('view_attachments', $this->_board) && $this->_topic != -1)
+		if ($this->_attach_source == 0)
+		{
+			// With a message id and the topic we can fetch the attachments
+			if (!empty($modSettings['attachmentEnable']) && allowedTo('view_attachments', $this->_board) && $this->_topic != -1)
+				$attachments = getAttachments($msg_id, false, null, array(), $this->_attach_source);
+		}
+		else
+		{
 			$attachments = getAttachments($msg_id, false, null, array(), $this->_attach_source);
+		}
 
 		return $attachments;
 	}

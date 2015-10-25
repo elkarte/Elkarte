@@ -113,8 +113,16 @@ class Ila_Integrate
 			if (!isset($context['attach_source']))
 				$context['attach_source'] = 0;
 
-			// Previewing a modified message, check for a value in $_REQUEST['msg']
-			$msg_id = empty($cache_id) ? (isset($_REQUEST['msg']) ? (int) $_REQUEST['msg'] : -1) : $cache_id;
+			if (!empty($_REQUEST['id_draft']))
+			{
+				// Previewing a draft
+				$msg_id = empty($cache_id) ? (isset($_REQUEST['id_draft']) ? (int) $_REQUEST['id_draft'] : -1) : $cache_id;
+			}
+			else
+			{
+				// Previewing a modified message, check for a value in $_REQUEST['msg']
+				$msg_id = empty($cache_id) ? (isset($_REQUEST['msg']) ? (int) $_REQUEST['msg'] : -1) : $cache_id;
+			}
 
 			$ila_parser = new In_Line_Attachment($message, $msg_id, $context['attach_source']);
 			$message = $ila_parser->hide_bbc();
@@ -141,8 +149,16 @@ class Ila_Integrate
 			if (!isset($context['attach_source']))
 				$context['attach_source'] = 0;
 
-			// Previewing a modified message, check for a value in $_REQUEST['msg']
-			$msg_id = empty($cache_id) ? (isset($_REQUEST['msg']) ? (int) $_REQUEST['msg'] : -1) : $cache_id;
+			if (!empty($_REQUEST['id_draft']))
+			{
+				// Previewing a draft
+				$msg_id = empty($cache_id) ? (isset($_REQUEST['id_draft']) ? (int) $_REQUEST['id_draft'] : -1) : $cache_id;
+			}
+			else
+			{
+				// Previewing a modified message, check for a value in $_REQUEST['msg']
+				$msg_id = empty($cache_id) ? (isset($_REQUEST['msg']) ? (int) $_REQUEST['msg'] : -1) : $cache_id;
+			}
 
 			$ila_parser = new In_Line_Attachment($message, $msg_id, $context['attach_source']);
 			$message = $ila_parser->parse_bbc();
