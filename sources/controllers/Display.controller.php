@@ -398,35 +398,24 @@ class Display_Controller extends Action_Controller
 		// Guests can't mark topics read or for notifications, just can't sorry.
 		if (!$user_info['is_guest'] && !empty($messages))
 		{
+			$boardseen = isset($this->_req->query->boardseen);
+
 			$mark_at_msg = max($messages);
 			if ($mark_at_msg >= $topicinfo['id_last_msg'])
 				$mark_at_msg = $modSettings['maxMsgID'];
 			if ($mark_at_msg >= $topicinfo['new_from'])
+			{
 				markTopicsRead(array($user_info['id'], $topic, $mark_at_msg, $topicinfo['unwatched']), $topicinfo['new_from'] !== 0);
+				$numNewTopics = getUnreadCountSince($board, empty($_SESSION['id_msg_last_visit']) ? 0 : $_SESSION['id_msg_last_visit']);
+
+				if (empty($numNewTopics))
+					$boardseen = true;
+			}
 
 			updateReadNotificationsFor($topic, $board);
 
-			// Have we recently cached the number of new topics in this board, and it's still a lot?
-			if (isset($this->_req->query->topicseen) && isset($_SESSION['topicseen_cache'][$board]) && $_SESSION['topicseen_cache'][$board] > 5)
-				$_SESSION['topicseen_cache'][$board]--;
-			// Mark board as seen if this is the only new topic.
-			elseif (isset($this->_req->query->topicseen))
-			{
-				// Use the mark read tables... and the last visit to figure out if this should be read or not.
-				$numNewTopics = getUnreadCountSince($board, empty($_SESSION['id_msg_last_visit']) ? 0 : $_SESSION['id_msg_last_visit']);
-
-				// If there're no real new topics in this board, mark the board as seen.
-				if (empty($numNewTopics))
-					$this->_req->query->boardseen = true;
-				else
-					$_SESSION['topicseen_cache'][$board] = $numNewTopics;
-			}
-			// Probably one less topic - maybe not, but even if we decrease this too fast it will only make us look more often.
-			elseif (isset($_SESSION['topicseen_cache'][$board]))
-				$_SESSION['topicseen_cache'][$board]--;
-
 			// Mark board as seen if we came using last post link from BoardIndex. (or other places...)
-			if (isset($this->_req->query->boardseen))
+			if ($boardseen)
 			{
 				require_once(SUBSDIR . '/Boards.subs.php');
 				markBoardsRead($board, false, false);
