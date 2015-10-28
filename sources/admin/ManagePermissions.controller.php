@@ -527,6 +527,8 @@ class ManagePermissions_Controller extends Action_Controller
 			);
 			foreach ($boardList[$catid] as $boardid)
 			{
+				$boards[$boardid]['description'] = parse_bbc($boards[$boardid]['description']);
+
 				if (!isset($context['profiles'][$boards[$boardid]['profile']]))
 					$boards[$boardid]['profile'] = 1;
 
