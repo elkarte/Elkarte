@@ -30,12 +30,6 @@ if (!defined('ELK'))
 class Packages_Controller extends Action_Controller
 {
 	/**
-	 * Holds instance of HttpReq object
-	 * @var HttpReq
-	 */
-	protected $_req;
-
-	/**
 	 * listing of files in a packages
 	 * @var string[]|boolean
 	 */
@@ -84,12 +78,10 @@ class Packages_Controller extends Action_Controller
 	public $chmod_files;
 
 	/**
-	 * Pre Dispatch, called before other methods.  Loads HttpReq
+	 * Pre Dispatch, called before other methods.
 	 */
 	public function pre_dispatch()
 	{
-		$this->_req = HttpReq::instance();
-
 		// Generic subs for this controller
 		require_once(SUBSDIR . '/Package.subs.php');
 	}

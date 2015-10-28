@@ -35,20 +35,6 @@ class ManagePaid_Controller extends Action_Controller
 	protected $_paidSettings;
 
 	/**
-	 * Holds instance of HttpReq object
-	 * @var HttpReq
-	 */
-	protected $_req;
-
-	/**
-	 * Pre Dispatch, called before other methods.  Loads HttpReq
-	 */
-	public function pre_dispatch()
-	{
-		$this->_req = HttpReq::instance();
-	}
-
-	/**
 	 * The main entrance point for the 'Paid Subscription' screen,
 	 *
 	 * What it does:

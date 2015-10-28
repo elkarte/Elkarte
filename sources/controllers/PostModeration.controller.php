@@ -26,25 +26,10 @@ if (!defined('ELK'))
 class PostModeration_Controller extends Action_Controller
 {
 	/**
-	 * Holds instance of HttpReq object
-	 * @var HttpReq
-	 */
-	private $_req;
-
-	/**
 	 * Holds any passed brd values, used for filtering and the like
 	 * @var array|null
 	 */
 	private $_brd = null;
-
-	/**
-	 * Called before all other methods when coming from the dispatcher or
-	 * action class.
-	 */
-	public function pre_dispatch()
-	{
-		$this->_req = HttpReq::instance();
-	}
 
 	/**
 	 * This is the entry point for all things post moderation.

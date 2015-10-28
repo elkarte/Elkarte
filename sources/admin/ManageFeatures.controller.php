@@ -71,18 +71,10 @@ class ManageFeatures_Controller extends Action_Controller
 	protected $_PMSettings;
 
 	/**
-	 * Holds instance of HttpReq object
-	 * @var HttpReq
-	 */
-	protected $_req;
-
-	/**
-	 * Pre Dispatch, called before other methods.  Loads HttpReq
+	 * Pre Dispatch, called before other methods.
 	 */
 	public function pre_dispatch()
 	{
-		$this->_req = HttpReq::instance();
-
 		// We need this in few places so it's easier to have it loaded here
 		require_once(SUBSDIR . '/ManageFeatures.subs.php');
 	}

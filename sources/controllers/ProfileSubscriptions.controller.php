@@ -26,12 +26,6 @@ if (!defined('ELK'))
 class ProfileSubscriptions_Controller extends Action_Controller
 {
 	/**
-	 * Holds instance of HttpReq object
-	 * @var HttpReq
-	 */
-	private $_req;
-
-	/**
 	 * Holds the the details of the subscription order
 	 * @var
 	 */
@@ -48,14 +42,6 @@ class ProfileSubscriptions_Controller extends Action_Controller
 	 * @var int
 	 */
 	private $_id_sub;
-
-	/**
-	 * Pre Dispatch, called before other methods.  Loads HttpReq instance.
-	 */
-	public function pre_dispatch()
-	{
-		$this->_req = HttpReq::instance();
-	}
 
 	/**
 	 * Default action for the controller

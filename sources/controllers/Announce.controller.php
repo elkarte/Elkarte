@@ -26,12 +26,6 @@ if (!defined('ELK'))
 class Announce_Controller extends Action_Controller
 {
 	/**
-	 * Holds instance of HttpReq object
-	 * @var HttpReq
-	 */
-	private $_req;
-
-	/**
 	 * Set up the context for the announce topic function (action=announce).
 	 * This function is called before the flow is redirected to action_selectgroup() or action_send().
 	 *
@@ -57,8 +51,6 @@ class Announce_Controller extends Action_Controller
 		loadTemplate('Announce');
 
 		$context['page_title'] = $txt['announce_topic'];
-
-		$this->_req = HttpReq::instance();
 	}
 
 	/**

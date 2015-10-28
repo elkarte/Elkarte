@@ -44,12 +44,6 @@ class Register_Controller extends Action_Controller
 	private $_row;
 
 	/**
-	 * Holds instance of HttpReq object
-	 * @var HttpReq
-	 */
-	private $_req;
-
-	/**
 	 * Pre Dispatch, called before other methods.  Loads HttpReq instance.
 	 */
 	public function pre_dispatch()
@@ -59,9 +53,6 @@ class Register_Controller extends Action_Controller
 		// Check if the administrator has it disabled.
 		if (!empty($modSettings['registration_method']) && $modSettings['registration_method'] == '3')
 			Errors::instance()->fatal_lang_error('registration_disabled', false);
-
-		// Load in the form / url / etc values
-		$this->_req = HttpReq::instance();
 	}
 
 	/**

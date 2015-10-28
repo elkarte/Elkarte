@@ -90,20 +90,6 @@ class ManageThemes_Controller extends Action_Controller
 	private $images_url;
 
 	/**
-	 * Holds instance of HttpReq object
-	 * @var HttpReq
-	 */
-	protected $_req;
-
-	/**
-	 * Pre Dispatch, called before other methods.  Loads HttpReq
-	 */
-	public function pre_dispatch()
-	{
-		$this->_req = HttpReq::instance();
-	}
-
-	/**
 	 * Subaction handler - manages the action and delegates control to the proper
 	 * sub-action.
 	 *

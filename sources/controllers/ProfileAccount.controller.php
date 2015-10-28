@@ -28,12 +28,6 @@ if (!defined('ELK'))
 class ProfileAccount_Controller extends Action_Controller
 {
 	/**
-	 * Holds instance of HttpReq object
-	 * @var HttpReq
-	 */
-	private $_req;
-
-	/**
 	 * Member id for the account being worked on
 	 * @var int
 	 */
@@ -51,8 +45,6 @@ class ProfileAccount_Controller extends Action_Controller
 	 */
 	public function pre_dispatch()
 	{
-		$this->_req = HttpReq::instance();
-
 		$this->_memID = currentMemberID();
 	}
 

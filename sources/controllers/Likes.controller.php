@@ -34,12 +34,6 @@ class Likes_Controller extends Action_Controller
 	protected $_id_liked = null;
 
 	/**
-	 * Holds instance of HttpReq object
-	 * @var HttpReq
-	 */
-	private $_req;
-
-	/**
 	 * Entry point function for likes, permission checks, just makes sure its on
 	 */
 	public function pre_dispatch()
@@ -49,8 +43,6 @@ class Likes_Controller extends Action_Controller
 		// If likes are disabled, we don't go any further
 		if (empty($modSettings['likes_enabled']))
 			Errors::instance()->fatal_lang_error('feature_disabled', true);
-
-		$this->_req = HttpReq::instance();
 	}
 
 	/**

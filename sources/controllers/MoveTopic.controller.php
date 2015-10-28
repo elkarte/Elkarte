@@ -50,19 +50,11 @@ class MoveTopic_Controller extends Action_Controller
 	private $_toboard;
 
 	/**
-	 * Holds instance of HttpReq object
-	 * @var HttpReq
-	 */
-	private $_req;
-
-	/**
 	 * Pre Dispatch, called before other methods.  Loads HttpReq instance.
 	 */
 	public function pre_dispatch()
 	{
 		global $topic;
-
-		$this->_req = HttpReq::instance();
 
 		// Set the topic from the global, yes yes
 		$this->_topic = $topic;
