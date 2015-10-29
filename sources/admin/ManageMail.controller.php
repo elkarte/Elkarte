@@ -37,20 +37,6 @@ class ManageMail_Controller extends Action_Controller
 	protected $_mailSettings;
 
 	/**
-	 * Holds instance of HttpReq object
-	 * @var HttpReq
-	 */
-	protected $_req;
-
-	/**
-	 * Pre Dispatch, called before other methods.  Loads HttpReq
-	 */
-	public function pre_dispatch()
-	{
-		$this->_req = HttpReq::instance();
-	}
-
-	/**
 	 * Main dispatcher.
 	 *
 	 * - This function checks permissions and passes control through to the relevant section.
@@ -262,11 +248,14 @@ class ManageMail_Controller extends Action_Controller
 		// Saving?
 		if (isset($this->_req->query->save))
 		{
+			// TODO: $postobj is should be removed after save_db is properly refactored.
+			$postobj = null;
 			// Make the SMTP password a little harder to see in a backup etc.
 			if (!empty($this->_req->post->smtp_password[1]))
 			{
 				$this->_req->post->smtp_password[0] = base64_encode($this->_req->post->smtp_password[0]);
 				$this->_req->post->smtp_password[1] = base64_encode($this->_req->post->smtp_password[1]);
+				$postobj = array ('smtp_password' => array(0 => ($this->_req->post->smtp_password[0]), 1 => ($this->_req->post->smtp_password[1])));
 			}
 			checkSession();
 
@@ -278,7 +267,7 @@ class ManageMail_Controller extends Action_Controller
 			if (!empty($this->_req->post->mail_batch_size))
 				$this->_req->post->mail_batch_size = min((int) $this->_req->post->mail_batch_size, (int) $this->_req->post->mail_period_limit);
 
-			Settings_Form::save_db($config_vars);
+			Settings_Form::save_db($config_vars, (object) $postobj);
 			redirectexit('action=admin;area=mailqueue;sa=settings');
 		}
 
@@ -362,6 +351,7 @@ class ManageMail_Controller extends Action_Controller
 				array('select', 'mail_type', array($txt['mail_type_default'], 'SMTP')),
 				array('text', 'smtp_host'),
 				array('text', 'smtp_port'),
+				array('check', 'smtp_starttls'),
 				array('text', 'smtp_username'),
 				array('password', 'smtp_password'),
 			'',

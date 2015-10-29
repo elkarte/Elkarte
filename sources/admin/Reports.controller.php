@@ -32,20 +32,6 @@ if (!defined('ELK'))
 class Reports_Controller extends Action_Controller
 {
 	/**
-	 * Holds instance of HttpReq object
-	 * @var HttpReq
-	 */
-	protected $_req;
-
-	/**
-	 * Pre Dispatch, called before other methods.  Loads HttpReq
-	 */
-	public function pre_dispatch()
-	{
-		$this->_req = HttpReq::instance();
-	}
-
-	/**
 	 * Handling function for generating reports.
 	 *  - Requires the admin_forum permission.
 	 *  - Loads the Reports template and language files.

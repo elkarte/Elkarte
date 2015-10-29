@@ -35,17 +35,10 @@ class ManageSearch_Controller extends Action_Controller
 	protected $_searchSettings;
 
 	/**
-	 * Holds instance of HttpReq object
-	 * @var HttpReq
-	 */
-	protected $_req;
-
-	/**
-	 * Pre Dispatch, called before other methods.  Loads HttpReq
+	 * Pre Dispatch, called before other methods.
 	 */
 	public function pre_dispatch()
 	{
-		$this->_req = HttpReq::instance();
 		Elk_Autoloader::getInstance()->register(SUBSDIR . '/Search', '\\ElkArte\\Search');
 	}
 

@@ -45,20 +45,6 @@ class ManageMaillist_Controller extends Action_Controller
 	protected $_parsersSettings;
 
 	/**
-	 * Holds instance of HttpReq object
-	 * @var HttpReq
-	 */
-	protected $_req;
-
-	/**
-	 * Pre Dispatch, called before other methods.  Loads HttpReq
-	 */
-	public function pre_dispatch()
-	{
-		$this->_req = HttpReq::instance();
-	}
-
-	/**
 	 * Main dispatcher.
 	 *
 	 * This function checks permissions and passes control to the sub action.

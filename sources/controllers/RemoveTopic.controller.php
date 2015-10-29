@@ -35,18 +35,10 @@ class RemoveTopic_Controller extends Action_Controller
 	private $_topic_info;
 
 	/**
-	 * Holds instance of HttpReq object
-	 * @var HttpReq
-	 */
-	private $_req;
-
-	/**
 	 * Pre Dispatch, called before other methods.  Loads HttpReq instance.
 	 */
 	public function pre_dispatch()
 	{
-		$this->_req = HttpReq::instance();
-
 		// This has some handy functions for topics
 		require_once(SUBSDIR . '/Topic.subs.php');
 	}

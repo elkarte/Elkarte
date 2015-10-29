@@ -36,20 +36,6 @@ class AddonSettings_Controller extends Action_Controller
 	protected $_addonSettings;
 
 	/**
-	 * Holds instance of HttpReq object
-	 * @var HttpReq
-	 */
-	private $_req;
-
-	/**
-	 * Pre Dispatch, called before other methods.  Loads HttpReq
-	 */
-	public function pre_dispatch()
-	{
-		$this->_req = HttpReq::instance();
-	}
-
-	/**
 	 * This, my friend, is for all the authors of addons out there.
 	 *
 	 * @see Action_Controller::action_index()

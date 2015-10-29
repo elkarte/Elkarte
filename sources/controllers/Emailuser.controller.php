@@ -27,12 +27,6 @@ if (!defined('ELK'))
 class Emailuser_Controller extends Action_Controller
 {
 	/**
-	 * Holds instance of HttpReq object
-	 * @var HttpReq
-	 */
-	private $_req;
-
-	/**
 	 * This function initializes or sets up the necessary, for the other actions
 	 */
 	public function pre_dispatch()
@@ -44,9 +38,6 @@ class Emailuser_Controller extends Action_Controller
 
 		// Load the template.
 		loadTemplate('Emailuser');
-
-		// Interact with the sent data
-		$this->_req = HttpReq::instance();
 	}
 
 	/**

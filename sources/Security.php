@@ -839,6 +839,9 @@ function validateToken($action, $type = 'post', $reset = true, $fatal = true)
 			return '';
 	}
 
+	if (!isset($_SESSION['token'][$token_index]))
+		return false;
+
 	// This code validates a supplied token.
 	// 1. The token exists in session.
 	// 2. The {$type} variable should exist.

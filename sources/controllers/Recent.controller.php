@@ -26,12 +26,6 @@ if (!defined('ELK'))
 class Recent_Controller extends Action_Controller
 {
 	/**
-	 * Holds instance of HttpReq object
-	 * @var HttpReq
-	 */
-	private $_req;
-
-	/**
 	 * The object that will retrieve the data
 	 * @var Recent_Class
 	 */
@@ -86,9 +80,6 @@ class Recent_Controller extends Action_Controller
 
 		// Prefetching + lots of MySQL work = bad mojo.
 		stop_prefetching();
-
-		// Load in the form / url / etc values
-		$this->_req = HttpReq::instance();
 
 		// Some common method dependencies
 		require_once(SUBSDIR . '/Recent.subs.php');

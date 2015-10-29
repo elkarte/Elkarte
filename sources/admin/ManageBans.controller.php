@@ -23,20 +23,6 @@ if (!defined('ELK'))
 class ManageBans_Controller extends Action_Controller
 {
 	/**
-	 * Holds instance of HttpReq object
-	 * @var HttpReq
-	 */
-	protected $_req;
-
-	/**
-	 * Pre Dispatch, called before other methods.  Loads HttpReq
-	 */
-	public function pre_dispatch()
-	{
-		$this->_req = HttpReq::instance();
-	}
-
-	/**
 	 * Ban center. The main entrance point for all ban center functions.
 	 *
 	 * What it does:

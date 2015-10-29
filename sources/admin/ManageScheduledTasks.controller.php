@@ -29,20 +29,6 @@ if (!defined('ELK'))
 class ManageScheduledTasks_Controller extends Action_Controller
 {
 	/**
-	 * Holds instance of HttpReq object
-	 * @var HttpReq
-	 */
-	protected $_req;
-
-	/**
-	 * Pre Dispatch, called before other methods.  Loads HttpReq
-	 */
-	public function pre_dispatch()
-	{
-		$this->_req = HttpReq::instance();
-	}
-
-	/**
 	 * Scheduled tasks management dispatcher.
 	 *
 	 * - This function checks permissions and delegates to the appropriate function

@@ -35,20 +35,6 @@ class ManageCalendarModule_Controller extends Action_Controller
 	protected $_calendarSettings;
 
 	/**
-	 * Holds instance of HttpReq object
-	 * @var HttpReq
-	 */
-	protected $_req;
-
-	/**
-	 * Pre Dispatch, called before other methods.  Loads HttpReq
-	 */
-	public function pre_dispatch()
-	{
-		$this->_req = HttpReq::instance();
-	}
-
-	/**
 	 * Used to add the Calendar entry to the Core Features list.
 	 *
 	 * @param mixed[] $core_features The core features array

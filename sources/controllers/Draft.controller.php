@@ -27,12 +27,6 @@ class Draft_Controller extends Action_Controller
 	private $_memID = 0;
 
 	/**
-	 * Holds instance of HttpReq object
-	 * @var HttpReq
-	 */
-	private $_req;
-
-	/**
 	 * This method is executed before any action handler.
 	 * Loads language, common needed stuffs.
 	 */
@@ -44,7 +38,6 @@ class Draft_Controller extends Action_Controller
 		require_once(SUBSDIR . '/Profile.subs.php');
 
 		$this->_memID = currentMemberID();
-		$this->_req = HttpReq::instance();
 	}
 
 	/**

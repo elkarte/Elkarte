@@ -40,20 +40,6 @@ class ManageRegistration_Controller extends Action_Controller
 	protected $_registerSettings;
 
 	/**
-	 * Holds instance of HttpReq object
-	 * @var HttpReq
-	 */
-	protected $_req;
-
-	/**
-	 * Pre Dispatch, called before other methods.  Loads HttpReq
-	 */
-	public function pre_dispatch()
-	{
-		$this->_req = HttpReq::instance();
-	}
-
-	/**
 	 * Entrance point for the registration center, it checks permissions and forwards
 	 * to the right method based on the subaction.
 	 *

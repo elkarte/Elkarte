@@ -48,12 +48,6 @@ class PersonalMessage_Controller extends Action_Controller
 	private $_searchq_parameters = array();
 
 	/**
-	 * Holds instance of HttpReq object
-	 * @var HttpReq
-	 */
-	private $_req;
-
-	/**
 	 * This method is executed before any other in this file (when the class is
 	 * loaded by the dispatcher).
 	 *
@@ -73,9 +67,6 @@ class PersonalMessage_Controller extends Action_Controller
 
 		// This file contains the our PM functions such as mark, send, delete
 		require_once(SUBSDIR . '/PersonalMessage.subs.php');
-
-		// What data have we been passed
-		$this->_req = HttpReq::instance();
 
 		// Templates, language, javascripts
 		loadLanguage('PersonalMessage');

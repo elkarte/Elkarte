@@ -26,20 +26,6 @@ if (!defined('ELK'))
 class Members_Controller extends Action_Controller
 {
 	/**
-	 * Holds instance of HttpReq object
-	 * @var HttpReq
-	 */
-	private $_req;
-
-	/**
-	 * Class entry point function, called before all others
-	 */
-	public function pre_dispatch()
-	{
-		$this->_req = HttpReq::instance();
-	}
-
-	/**
 	 * Forwards to an action method.
 	 *
 	 * @see Action_Controller::action_index()

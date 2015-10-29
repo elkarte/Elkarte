@@ -41,20 +41,6 @@ class ManagePermissions_Controller extends Action_Controller
 	protected $_pid = null;
 
 	/**
-	 * Holds instance of HttpReq object
-	 * @var HttpReq
-	 */
-	protected $_req;
-
-	/**
-	 * Pre Dispatch, called before other methods.  Loads HttpReq
-	 */
-	public function pre_dispatch()
-	{
-		$this->_req = HttpReq::instance();
-	}
-
-	/**
 	 * Dispaches to the right function based on the given subaction.
 	 *
 	 * - Checks the permissions, based on the sub-action.
@@ -541,6 +527,8 @@ class ManagePermissions_Controller extends Action_Controller
 			);
 			foreach ($boardList[$catid] as $boardid)
 			{
+				$boards[$boardid]['description'] = parse_bbc($boards[$boardid]['description']);
+
 				if (!isset($context['profiles'][$boards[$boardid]['profile']]))
 					$boards[$boardid]['profile'] = 1;
 

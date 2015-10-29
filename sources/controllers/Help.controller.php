@@ -26,20 +26,11 @@ if (!defined('ELK'))
 class Help_Controller extends Action_Controller
 {
 	/**
-	 * Holds instance of HttpReq object
-	 * @var HttpReq
-	 */
-	private $_req;
-
-	/**
-	 * Pre Dispatch, called before other methods.  Loads integration hooks
-	 * and HttpReq instance.
+	 * Pre Dispatch, called before other methods.  Loads integration hooks.
 	 */
 	public function pre_dispatch()
 	{
 		Hooks::get()->loadIntegrationsSettings();
-
-		$this->_req = HttpReq::instance();
 	}
 
 	/**

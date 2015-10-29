@@ -29,20 +29,6 @@ class ManageBBC_Controller extends Action_Controller
 	protected $_bbcSettings;
 
 	/**
-	 * Holds instance of HttpReq object
-	 * @var HttpReq
-	 */
-	protected $_req;
-
-	/**
-	 * Pre Dispatch, called before other methods.  Loads HttpReq
-	 */
-	public function pre_dispatch()
-	{
-		$this->_req = HttpReq::instance();
-	}
-
-	/**
 	 * The BBC admin area
 	 *
 	 * What it does:

@@ -33,19 +33,11 @@ class Memberlist_Controller extends Action_Controller
 	public $_search_fields;
 
 	/**
-	 * Holds instance of HttpReq object
-	 * @var HttpReq
-	 */
-	private $_req;
-
-	/**
 	 * Entry point function, called before all others
 	 */
 	public function pre_dispatch()
 	{
 		global $context, $txt;
-
-		$this->_req = HttpReq::instance();
 
 		// These are all the possible fields.
 		$this->_search_fields = array(

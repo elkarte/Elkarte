@@ -35,6 +35,12 @@ abstract class Action_Controller
 	protected $_hook = '';
 
 	/**
+	 * Holds instance of HttpReq object
+	 * @var HttpReq
+	 */
+	protected $_req;
+
+	/**
 	 * Constructor...
 	 * Requires the name of the controller we want to instantiate, lowercase and
 	 * without the "_Controller" part.
@@ -48,6 +54,9 @@ abstract class Action_Controller
 			$eventManager = new Event_Manager();
 
 		$this->_events = $eventManager;
+
+		// Dependency injection will come later
+		$this->_req = HttpReq::instance();
 
 		$this->_initEventManager();
 	}

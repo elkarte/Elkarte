@@ -31,25 +31,11 @@ if (!defined('ELK'))
 class SplitTopics_Controller extends Action_Controller
 {
 	/**
-	 * Holds instance of HttpReq object
-	 * @var HttpReq
-	 */
-	private $_req;
-
-	/**
 	 * Holds the new subject for the split topic
 	 *
 	 * @var string
 	 */
 	private $_new_topic_subject = null;
-
-	/**
-	 * Pre Dispatch, called before other methods.  Loads HttpReq instance.
-	 */
-	public function pre_dispatch()
-	{
-		$this->_req = HttpReq::instance();
-	}
 
 	/**
 	 * Intended entry point for this class.

@@ -58,12 +58,6 @@ class Profile_Controller extends Action_Controller
 	private $_current_area;
 
 	/**
-	 * Holds instance of HttpReq object
-	 * @var HttpReq
-	 */
-	private $_req;
-
-	/**
 	 * Member id for the history being viewed
 	 * @var int
 	 */
@@ -75,8 +69,6 @@ class Profile_Controller extends Action_Controller
 	 */
 	public function pre_dispatch()
 	{
-		$this->_req = HttpReq::instance();
-
 		require_once(SUBSDIR . '/Menu.subs.php');
 		require_once(SUBSDIR . '/Profile.subs.php');
 

@@ -62,20 +62,6 @@ class ManageServer_Controller extends Action_Controller
 	protected $_balancingSettingsForm;
 
 	/**
-	 * Holds instance of HttpReq object
-	 * @var HttpReq
-	 */
-	protected $_req;
-
-	/**
-	 * Pre Dispatch, called before other methods.  Loads HttpReq
-	 */
-	public function pre_dispatch()
-	{
-		$this->_req = HttpReq::instance();
-	}
-
-	/**
 	 * This is the main dispatcher. Sets up all the available sub-actions, all the tabs and selects
 	 * the appropriate one based on the sub-action.
 	 *

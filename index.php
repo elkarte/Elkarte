@@ -30,7 +30,6 @@ const ELK = '1';
 // Shortcut for the browser cache stale
 const CACHE_STALE = '?R11';
 
-
 // Report errors but not depreciated ones
 error_reporting(E_ALL | E_STRICT & ~8192);
 
@@ -191,7 +190,7 @@ obExit(null, null, true);
  */
 function elk_main()
 {
-	global $modSettings, $user_info, $topic, $board_info, $context;
+	global $modSettings, $user_info, $topic, $board_info, $context, $maintenance;
 
 	$_req = HttpReq::instance();
 
@@ -219,7 +218,7 @@ function elk_main()
 	loadBadBehavior();
 
 	// Attachments don't require the entire theme to be loaded.
-	if ($_req->getQuery('action') === 'dlattach' && (!empty($modSettings['allow_guestAccess']) && $user_info['is_guest']))
+	if ($_req->getQuery('action') === 'dlattach' && (!empty($modSettings['allow_guestAccess']) && $user_info['is_guest']) && (empty($maintenance) || allowedTo('admin_forum')))
 		detectBrowser();
 	// Load the current theme.  (note that ?theme=1 will also work, may be used for guest theming.)
 	else

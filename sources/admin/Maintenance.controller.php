@@ -59,20 +59,6 @@ class Maintenance_Controller extends Action_Controller
 	public $step;
 
 	/**
-	 * Holds instance of HttpReq object
-	 * @var HttpReq
-	 */
-	protected $_req;
-
-	/**
-	 * Pre Dispatch, called before other methods.  Loads HttpReq
-	 */
-	public function pre_dispatch()
-	{
-		$this->_req = HttpReq::instance();
-	}
-
-	/**
 	 * Main dispatcher, the maintenance access point.
 	 *
 	 * What it does:

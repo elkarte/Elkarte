@@ -67,12 +67,6 @@ class Unread_Controller extends Action_Controller
 	private $_grabber = null;
 
 	/**
-	 * Holds instance of HttpReq object
-	 * @var HttpReq
-	 */
-	private $_req;
-
-	/**
 	 * Called before any other action method in this class.
 	 *
 	 * - Allows for initializations, such as default values or
@@ -92,9 +86,6 @@ class Unread_Controller extends Action_Controller
 
 		require_once(SUBSDIR . '/Recent.subs.php');
 		require_once(SUBSDIR . '/Boards.subs.php');
-
-		// Load in the form values
-		$this->_req = HttpReq::instance();
 
 		// Determine the action, unreadreplies or unread
 		$this->_action = $this->_req->getQuery('action') === 'unreadreplies' ? 'unreadreplies' : 'unread';
