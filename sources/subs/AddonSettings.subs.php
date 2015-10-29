@@ -83,7 +83,7 @@ function list_integration_hooks_data($start, $items_per_page, $sort)
 			if (is_file($file['dir'] . '/' . $file['name']) && substr($file['name'], -4) === '.php')
 			{
 				$fp = fopen($file['dir'] . '/' . $file['name'], 'rb');
-				$fc = strtr(fread($fp, filesize($file['dir'] . '/' . $file['name'])), array("\r" => '', "\n" => ''));
+				$fc = strtr(fread($fp, max(filesize($file['dir'] . '/' . $file['name']), 1)), array("\r" => '', "\n" => ''));
 				fclose($fp);
 
 				foreach ($temp_hooks as $hook => $functions)
