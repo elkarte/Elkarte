@@ -135,7 +135,6 @@ class Site_Dispatcher
 			'unwatchtopic' => array('Notify_Controller', 'action_unwatchtopic'),
 			'editpoll' => array('Poll_Controller', 'action_editpoll'),
 			'editpoll2' => array('Poll_Controller', 'action_editpoll2'),
-			'findmember' => array('Members_Controller', 'action_findmember'),
 			'quickhelp' => array('Help_Controller', 'action_quickhelp'),
 			'jsmodify' => array('Post_Controller', 'action_jsmodify'),
 			'jsoption' => array('ManageThemes_Controller', 'action_jsoption'),
