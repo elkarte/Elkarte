@@ -227,7 +227,7 @@ function list_integration_hooks_data($start, $items_per_page, $sort)
 					'status' => $hook_exists ? ($enabled ? 'allow' : 'moderate') : 'deny',
 					'img_text' => $txt['hooks_' . ($hook_exists ? ($enabled ? 'active' : 'disabled') : 'missing')],
 					'enabled' => $enabled,
-					'can_be_disabled' => !empty($modSettings['handlinghooks_enabled']) && !isset($hook_status[$hook][$function]['enabled']),
+					'can_be_disabled' => false,
 				);
 
 				// Build the array of sort to values
