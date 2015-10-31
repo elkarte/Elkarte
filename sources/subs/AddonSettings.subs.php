@@ -83,7 +83,7 @@ function list_integration_hooks_data($start, $items_per_page, $sort)
 			if (is_file($file['dir'] . '/' . $file['name']) && substr($file['name'], -4) === '.php')
 			{
 				$fp = fopen($file['dir'] . '/' . $file['name'], 'rb');
-				$fc = strtr(fread($fp, filesize($file['dir'] . '/' . $file['name'])), array("\r" => '', "\n" => ''));
+				$fc = strtr(fread($fp, max(filesize($file['dir'] . '/' . $file['name']), 1)), array("\r" => '', "\n" => ''));
 				fclose($fp);
 
 				foreach ($temp_hooks as $hook => $functions)
@@ -227,7 +227,7 @@ function list_integration_hooks_data($start, $items_per_page, $sort)
 					'status' => $hook_exists ? ($enabled ? 'allow' : 'moderate') : 'deny',
 					'img_text' => $txt['hooks_' . ($hook_exists ? ($enabled ? 'active' : 'disabled') : 'missing')],
 					'enabled' => $enabled,
-					'can_be_disabled' => !empty($modSettings['handlinghooks_enabled']) && !isset($hook_status[$hook][$function]['enabled']),
+					'can_be_disabled' => false,
 				);
 
 				// Build the array of sort to values

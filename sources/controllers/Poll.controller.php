@@ -292,7 +292,7 @@ class Poll_Controller extends Action_Controller
 		$groupsAllowedVote = groupsAllowedTo('poll_vote', $board);
 
 		// Want to make sure before you actually submit?  Must be a lot of options, or something.
-		if (isset($this->_req->post->preview) || $poll_errors->hasErrors())
+		if ($poll_errors->hasErrors())
 		{
 			$question = Util::htmlspecialchars($this->_req->post->question);
 
@@ -515,9 +515,6 @@ class Poll_Controller extends Action_Controller
 
 		if (checkSession('post', '', false) != '')
 			$poll_errors->addError('session_timeout');
-
-		if (isset($this->_req->post->preview))
-			$this->action_editpoll();
 
 		// HACKERS (!!) can't edit :P.
 		if (empty($topic))

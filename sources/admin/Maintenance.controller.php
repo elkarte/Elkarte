@@ -1267,42 +1267,6 @@ class Maintenance_Controller extends Action_Controller
 			$context['current_filter'] = $this->_req->query->filter;
 		}
 
-		if (!empty($modSettings['handlinghooks_enabled']))
-		{
-			if (!empty($this->_req->query->do) && isset($this->_req->query->hook) && isset($this->_req->query->function))
-			{
-				checkSession('request');
-				validateToken('admin-hook', 'request');
-
-				if ($this->_req->query->do == 'remove')
-					remove_integration_function($this->_req->query->hook, urldecode($this->_req->query->function));
-				else
-				{
-					if ($this->_req->query->do == 'disable')
-					{
-						// It's a hack I know...but I'm way too lazy!!!
-						$function_remove = $this->_req->query->function;
-						$function_add = $this->_req->query->function . ']';
-					}
-					else
-					{
-						$function_remove = $this->_req->query->function . ']';
-						$function_add = $this->_req->query->function;
-					}
-
-					$file = !empty($this->_req->query->includedfile) ? urldecode($this->_req->query->includedfile) : '';
-
-					remove_integration_function($this->_req->query->hook, $function_remove, $file);
-					add_integration_function($this->_req->query->hook, $function_add, $file);
-
-					// Clean the cache.
-					Cache::instance()->clean();
-				}
-
-				redirectexit('action=admin;area=maintain;sa=hooks' . $context['filter_url']);
-			}
-		}
-
 		$list_options = array(
 			'id' => 'list_integration_hooks',
 			'title' => $txt['maintain_sub_hooks_list'],
@@ -1369,13 +1333,7 @@ class Maintenance_Controller extends Action_Controller
 						'function' => function ($data) {
 							global $txt, $settings, $scripturl, $context;
 
-							$change_status = array('before' => '', 'after' => '');
-							if ($data['can_be_disabled'] && $data['status'] != 'deny')
-							{
-								$change_status['before'] = '<a href="' . $scripturl . '?action=admin;area=maintain;sa=hooks;do=' . ($data['enabled'] ? 'disable' : 'enable') . ';hook=' . $data['hook_name'] . ';function=' . $data['real_function'] . (!empty($data['included_file']) ? ';includedfile=' . urlencode($data['included_file']) : '') . $context['filter_url'] . ';' . $context['admin-hook_token_var'] . '=' . $context['admin-hook_token'] . ';' . $context['session_var'] . '=' . $context['session_id'] . '" onclick="return confirm(' . javaScriptEscape($txt['quickmod_confirm']) . ');">';
-								$change_status['after'] = '</a>';
-							}
-							return $change_status['before'] . '<img src="' . $settings['images_url'] . '/admin/post_moderation_' . $data['status'] . '.png" alt="' . $data['img_text'] . '" title="' . $data['img_text'] . '" />' . $change_status['after'];
+							return '<img src="' . $settings['images_url'] . '/admin/post_moderation_' . $data['status'] . '.png" alt="' . $data['img_text'] . '" title="' . $data['img_text'] . '" />';
 						},
 						'class' => 'centertext',
 					),
@@ -1388,8 +1346,7 @@ class Maintenance_Controller extends Action_Controller
 			'additional_rows' => array(
 				array(
 					'position' => 'after_title',
-					'value' => $txt['hooks_disable_instructions'] . '<br />
-						' . $txt['hooks_disable_legend'] . ':
+					'value' => $txt['hooks_disable_legend'] . ':
 					<ul>
 						<li>
 							<img src="' . $settings['images_url'] . '/admin/post_moderation_allow.png" alt="' . $txt['hooks_active'] . '" title="' . $txt['hooks_active'] . '" /> ' . $txt['hooks_disable_legend_exists'] . '
@@ -1404,35 +1361,6 @@ class Maintenance_Controller extends Action_Controller
 				),
 			),
 		);
-
-		if (!empty($modSettings['handlinghooks_enabled']))
-		{
-			createToken('admin-hook', 'request');
-
-			$list_options['columns']['remove'] = array(
-				'header' => array(
-					'value' => $txt['hooks_button_remove'],
-					'style' => 'width:3%',
-				),
-				'data' => array(
-					'function' => function ($data) {
-						global $txt, $settings, $scripturl, $context;
-
-						if (!$data['hook_exists'])
-							return '
-							<a href="' . $scripturl . '?action=admin;area=maintain;sa=hooks;do=remove;hook=' . $data['hook_name'] . ';function=' . urlencode($data['function_name']) . $context['filter_url'] . ';' . $context['admin-hook_token_var'] . '=' . $context['admin-hook_token'] . ';' . $context['session_var'] . '=' . $context['session_id'] . '" onclick="return confirm(' . javaScriptEscape($txt['quickmod_confirm']) . ');">
-								<img src="' . $settings['images_url'] . '/icons/quick_remove.png" alt="' . $txt['hooks_button_remove'] . '" title="' . $txt['hooks_button_remove'] . '" />
-							</a>';
-					},
-					'class' => 'centertext',
-				),
-			);
-
-			$list_options['form'] = array(
-				'href' => $scripturl . '?action=admin;area=maintain;sa=hooks' . $context['filter_url'] . ';' . $context['session_var'] . '=' . $context['session_id'],
-				'name' => 'list_integration_hooks',
-			);
-		}
 
 		createList($list_options);
 

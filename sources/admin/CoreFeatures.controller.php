@@ -140,13 +140,6 @@ class CoreFeatures_Controller extends Action_Controller
 						return array();
 				},
 			),
-			// ih = Integration Hooks Handling.
-			'ih' => array(
-				'url' => 'action=admin;area=maintain;sa=hooks',
-				'settings' => array(
-					'handlinghooks_enabled' => 1,
-				),
-			),
 			// k = karma.
 			'k' => array(
 				'url' => 'action=admin;area=featuresettings;sa=karma',
