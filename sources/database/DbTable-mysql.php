@@ -333,8 +333,6 @@ class DbTable_MySQL extends DbTable
 			else
 				$index_info['name'] = implode('_', $index_info['columns']);
 		}
-		else
-			$index_info['name'] = $index_info['name'];
 
 		// Log that we are going to want to remove this!
 		$this->_package_log[] = array('remove_index', $table_name, $index_info['name']);
