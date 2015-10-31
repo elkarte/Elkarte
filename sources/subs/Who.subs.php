@@ -120,7 +120,7 @@ function formatViewers($id, $type)
 /**
  * This function reads from the database the addons credits,
  * and returns them in an array for display in credits section of the site.
- * The addons copyright, license, title informations are those saved from <license>
+ * The addons copyright, license, title information are those saved from <license>
  * and <credits> tags in package.xml.
  *
  * @return array

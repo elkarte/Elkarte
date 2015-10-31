@@ -150,7 +150,7 @@ class Reminder_Controller extends Action_Controller
 			// Set up the template.
 			$context['sub_template'] = 'sent';
 
-			// Dont really.
+			// Don't really.
 			return;
 		}
 		// Otherwise are ready to answer the question?

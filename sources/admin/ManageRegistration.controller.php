@@ -135,7 +135,7 @@ class ManageRegistration_Controller extends Action_Controller
 			checkSession();
 			validateToken('admin-regc');
 
-			// @todo move this to a filter/sanitzation class
+			// @todo move this to a filter/sanitation class
 			foreach ($this->_req->post as $key => $value)
 				if (!is_array($value))
 					$this->_req->post[$key] = htmltrim__recursive(str_replace(array("\n", "\r"), '', $value));

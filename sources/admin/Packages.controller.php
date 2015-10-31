@@ -510,11 +510,11 @@ class Packages_Controller extends Action_Controller
 			deltree(BOARDDIR . '/packages/temp', false);
 			if (!mktree(BOARDDIR . '/packages/temp', 0777))
 			{
-				// That did not work either, we need additonal permissions
+				// That did not work either, we need additional permissions
 				deltree(BOARDDIR . '/packages/temp', false);
 				create_chmod_control(array(BOARDDIR . '/packages/temp/delme.tmp'), array('destination_url' => $scripturl . '?action=admin;area=packages;sa=' . $this->_req->query->sa . ';package=' . $context['filename'], 'crash_on_error' => true));
 
-				// No temp directory was able to be made, thats fatal
+				// No temp directory was able to be made, that's fatal
 				deltree(BOARDDIR . '/packages/temp', false);
 				if (!mktree(BOARDDIR . '/packages/temp', 0777))
 					Errors::instance()->fatal_lang_error('package_cant_download', false);
@@ -1702,7 +1702,7 @@ class Packages_Controller extends Action_Controller
 	}
 
 	/**
-	 * Recursive counts all the directorys under a given path
+	 * Recursive counts all the directory's under a given path
 	 *
 	 * @param string $dir
 	 */

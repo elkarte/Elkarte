@@ -1286,7 +1286,7 @@ class ManageMembers_Controller extends Action_Controller
 	}
 
 	/**
-	 * Tell some members that they require activation of thier account
+	 * Tell some members that they require activation of their account
 	 */
 	private function _requireMember()
 	{

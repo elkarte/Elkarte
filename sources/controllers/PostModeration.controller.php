@@ -173,7 +173,7 @@ class PostModeration_Controller extends Action_Controller
 					// Is it a reply to their own topic?
 					elseif ($row['id_member'] == $row['id_member_started'] && $row['id_msg'] != $row['id_first_msg'] && ($delete_own_replies == array(0) || in_array($row['id_board'], $delete_own_replies)))
 						$can_add = true;
-					// Someone elses?
+					// Someone else's?
 					elseif ($row['id_member'] != $user_info['id'] && ($delete_any_boards == array(0) || in_array($row['id_board'], $delete_any_boards)))
 						$can_add = true;
 				}

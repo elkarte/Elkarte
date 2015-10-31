@@ -233,7 +233,7 @@ class ManageSearchEngines_Controller extends Action_Controller
 			recacheSpiderNames();
 		}
 
-		// Get the last seens.
+		// Get the last seen's.
 		$context['spider_last_seen'] = spidersLastSeen();
 
 		// Token for the ride

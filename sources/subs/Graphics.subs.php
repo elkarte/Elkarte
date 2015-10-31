@@ -784,7 +784,7 @@ function showCodeImage($code)
 	$simpleFGColor = $imageType == 0 ? true : false;
 	// High much to rotate each character.
 	$rotationType = $imageType == 1 ? 'none' : ($imageType > 3 ? 'low' : 'high');
-	// Do we show some characters inversed?
+	// Do we show some characters inverse?
 	$showReverseChars = $imageType > 3 ? true : false;
 	// Special case for not showing any characters.
 	$disableChars = $imageType == 0 ? true : false;

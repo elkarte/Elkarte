@@ -105,15 +105,15 @@ class In_Line_Attachment
 	 * ila_parse_bbc()
 	 *
 	 * - Traffic cop
-	 * - Checks availablity
-	 * - Finds all [attach tags, determins msg number, inits values
+	 * - Checks availability
+	 * - Finds all [attach tags, determines msg number, inits values
 	 * - Calls needed functions to render ila tags
 	 */
 	public function ila_parse_bbc()
 	{
 		global $modSettings, $context, $txt, $attachments, $topic;
 
-		// Addon or BBC disabled, or comming in from areas we don't want to work on
+		// Addon or BBC disabled, or coming in from areas we don't want to work on
 		if (empty($modSettings['enableBBC']) || (isset($context['site_action']) && in_array($context['site_action'], array('boardindex', 'messageindex'))))
 			return $this->_message;
 
@@ -155,7 +155,7 @@ class In_Line_Attachment
 			$this->_start_num = isset($attachments[$this->_id_msg]) ? count($attachments[$this->_id_msg]) : 0;
 			$ila_temp = explode(',', $_REQUEST['ila']);
 
-			// Add thme at the end of the currently uploaded attachment count index
+			// Add them at the end of the currently uploaded attachment count index
 			foreach ($ila_temp as $new_attach)
 			{
 				$this->_start_num++;
@@ -204,7 +204,7 @@ class In_Line_Attachment
 					// - The tags in the message but there is no attachments, perhaps the attachment did not upload correctly
 					// - The user put the tag in wrong because they are rock dumb and did not read our fantastic help,
 					// just kidding, really the help is not that good.
-					// - They don't have premission to view attachments in that board or the admin has disable attacments
+					// - They don't have permission to view attachments in that board or the admin has disable attachments
 					foreach ($ila_tags[1] as $id => $ila_replace)
 						$this->_message = $this->ila_str_replace_once($ila_tags[0][$id], $txt['ila_invalid'], $this->_message);
 				}
@@ -263,11 +263,11 @@ class In_Line_Attachment
 			$this->_curr_tag['type'] = 'none';
 		}
 
-		// Lets help the kids out by fixing some common erros in usage, I mean did they read the super great help?
+		// Lets help the kids out by fixing some common errors in usage, I mean did they read the super great help?
 		// like attach=#1 -> attach=1
 		$this->_curr_tag['id'] = str_replace('#', '', $this->_curr_tag['id']);
 
-		// like [attach] -> attach=1 by assuming attachments are sequentally placed in the
+		// like [attach] -> attach=1 by assuming attachments are sequentially placed in the
 		// topic and sub in the attachment index increment
 		if (!is_numeric($this->_curr_tag['id']))
 		{
@@ -306,7 +306,7 @@ class In_Line_Attachment
 		if (empty($modSettings['enableBBC']))
 			return;
 
-		// Regexs to seach the message for quotes, nested quotes and quoted text, and tags
+		// Regexs to search the message for quotes, nested quotes and quoted text, and tags
 		$regex = array();
 		$regex['quotelinks'] = '~<div\b[^>]*class="quoteheader">(?:.*?)</div>~si';
 		$regex['ila'] = '~\[attach\s*?(.*?(?:".+?")?.*?|.*?)\][\r\n]?~i';
@@ -450,7 +450,7 @@ class In_Line_Attachment
 				{
 					// If the image is too large to show inline, make it a popup window.
 					if (((!empty($modSettings['max_image_width']) && $this->_attachment['real_width'] > $modSettings['max_image_width']) || (!empty($modSettings['max_image_height']) && $this->_attachment['real_height'] > $modSettings['max_image_height'])))
-						$this->_attachment['thumbnail']['javascript'] = $this->_attachment['thumbnail']['javascript'];
+						$this->_attachment['thumbnail']['javascript'] .= '';
 					else
 						$this->_attachment['thumbnail']['javascript'] = 'return expandThumb(\'' . $uniqueID . '\');';
 				}
@@ -477,7 +477,7 @@ class In_Line_Attachment
 			// - or they don't have permissions for attachments
 			// - or they are replying to a message and this is in a quote, code or other type of tag
 			// - or it has not been uploaded yet because they are previewing a new message,
-			// - or they are modifiying a message and added new attachments and hit preview
+			// - or they are modifying a message and added new attachments and hit preview
 			// .... simple huh?
 			if (allowedTo('view_attachments'))
 			{
@@ -604,7 +604,7 @@ class In_Line_Attachment
 		// Don't show a link if we can't resize or if we were asked not to
 		$ila_title = isset($context['subject']) ? $context['subject'] : (isset($this->_attachment['name']) ? $this->_attachment['name'] : '');
 
-		// Build the relacement string
+		// Build the replacement string
 		if ($dst_width < $src_width || $dst_height < $src_height)
 			$inlinedtext = '
 				<a href="' . $this->_attachment['href'] . ';image" id="link_' . $uniqueID . '" onclick="return expandThumb(\'' . $uniqueID . '\');">
@@ -712,7 +712,7 @@ class In_Line_Attachment
 		$topic = -1;
 		$board = null;
 
-		// No message is comlete without a topic and board, its like bread, peanut butter and jelly
+		// No message is complete without a topic and board, its like bread, peanut butter and jelly
 		if (!empty($msg_id))
 		{
 			$request = $db->query('', '
@@ -736,7 +736,7 @@ class In_Line_Attachment
 	/**
 	 * ila_str_replace_once()
 	 *
-	 * - Looks for the first occurence of $needle in $haystack and replaces it with $replace,
+	 * - Looks for the first occurrence of $needle in $haystack and replaces it with $replace,
 	 * this is a single replace
 	 *
 	 * @param string $needle

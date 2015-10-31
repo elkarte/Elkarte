@@ -46,7 +46,7 @@ class Likes_Controller extends Action_Controller
 	}
 
 	/**
-	 * Default action method, if a specific methods wasn't
+	 * Default action method, if a specific methods was not
 	 * directly called already. Simply forwards to likepost.
 	 *
 	 * @see Action_Controller::action_index()

@@ -36,7 +36,7 @@ class Karma_Controller extends Action_Controller
 	}
 
 	/**
-	 * Default entry point, in case action methods aren't directly
+	 * Default entry point, in case action methods are not directly
 	 * called. Simply forward to applaud.
 	 *
 	 * @see Action_Controller::action_index()

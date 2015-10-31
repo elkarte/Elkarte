@@ -2457,7 +2457,7 @@ function package_create_backup($id = 'backup')
 		$dirs[$row['value']] = empty($_REQUEST['use_full_paths']) ? 'themes/' . basename($row['value']) . '/' : strtr($row['value'] . '/', '\\', '/');
 	$db->free_result($request);
 
-	// While we have directorys to check
+	// While we have directory's to check
 	while (!empty($dirs))
 	{
 		list ($dir, $dest) = each($dirs);
@@ -2569,7 +2569,7 @@ function package_create_backup($id = 'backup')
 		// Write out the file header (insert the checksum we just computed)
 		$fwrite($output, substr($current, 0, 148) . pack('a8', decoct($checksum)) . substr($current, 156, 511));
 
-		// If this is a directory entry all thats needed is the header
+		// If this is a directory entry all that's needed is the header
 		if ($stat['size'] == 0)
 			continue;
 
