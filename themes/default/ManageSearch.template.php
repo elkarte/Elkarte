@@ -26,9 +26,11 @@ function template_modify_weights()
 	echo '
 	<div id="admincenter">
 		<form id="admin_form_wrapper" action="', $scripturl, '?action=admin;area=managesearch;sa=weights" method="post" accept-charset="UTF-8">
-			<h2 class="category_header">', $txt['search_weights'], '</h2>';
+			<h2 class="category_header">
+				<a class="hdicon cat_img_helptopics help" href="', $scripturl, '?action=quickhelp;help=search_weight_commonheader" onclick="return reqOverlayDiv(this.href);" title="', $txt['help'], '"></a> ', $txt['search_weights'], '
+			</h2>';
 
-	if (!empty($modSettings['search_index']) && ($modSettings['search_index'] === 'sphinx' || $modSettings['search_index'] === 'sphinxql'))
+	if (!empty($modSettings['search_index']) && (stripos($modSettings['search_index'], 'sphinx') === 0))
 		echo '
 			<div class="content">
 				<div class="infobox">',
@@ -40,52 +42,60 @@ function template_modify_weights()
 			<div class="content">
 				<dl class="settings large_caption">
 					<dt>
-						<a href="', $scripturl, '?action=quickhelp;help=search_weight_commonheader%2Bsearch_weight_frequency" onclick="return reqOverlayDiv(this.href);" class="help"><img src="', $settings['images_url'], '/helptopics.png" alt="', $txt['help'], '" /></a><label for="weight1_val">
-						', $txt['search_weight_frequency'], ':</label>
+						<a href="', $scripturl, '?action=quickhelp;help=search_weight_frequency" onclick="return reqOverlayDiv(this.href);" class="help"><img src="', $settings['images_url'], '/helptopics.png" alt="', $txt['help'], '" /></a>
+						<label for="weight1_val">', $txt['search_weight_frequency'], ':</label>
 					</dt>
 					<dd>
 						<span class="search_weight"><input type="text" name="search_weight_frequency" id="weight1_val" value="', empty($modSettings['search_weight_frequency']) ? '0' : $modSettings['search_weight_frequency'], '" onchange="calculateNewValues()" size="3" class="input_text" /></span>
 						<span id="weight1" class="search_weight">', $context['relative_weights']['search_weight_frequency'], '%</span>
 					</dd>
 					<dt>
-						<a href="', $scripturl, '?action=quickhelp;help=search_weight_commonheader%2Bsearch_weight_age" onclick="return reqOverlayDiv(this.href);" class="help"><img src="', $settings['images_url'], '/helptopics.png" alt="', $txt['help'], '" /></a><label for="weight2_val">
-						', $txt['search_weight_age'], ':</label>
+						<a href="', $scripturl, '?action=quickhelp;help=search_weight_age" onclick="return reqOverlayDiv(this.href);" class="help"><img src="', $settings['images_url'], '/helptopics.png" alt="', $txt['help'], '" /></a>
+						<label for="weight2_val">', $txt['search_weight_age'], ':</label>
 					</dt>
 					<dd>
 						<span class="search_weight"><input type="text" name="search_weight_age" id="weight2_val" value="', empty($modSettings['search_weight_age']) ? '0' : $modSettings['search_weight_age'], '" onchange="calculateNewValues()" size="3" class="input_text" /></span>
 						<span id="weight2" class="search_weight">', $context['relative_weights']['search_weight_age'], '%</span>
 					</dd>
 					<dt>
-						<a href="', $scripturl, '?action=quickhelp;help=search_weight_commonheader%2Bsearch_weight_length" onclick="return reqOverlayDiv(this.href);" class="help"><img src="', $settings['images_url'], '/helptopics.png" alt="', $txt['help'], '" /></a><label for="weight3_val">
-						', $txt['search_weight_length'], ':</label>
+						<a href="', $scripturl, '?action=quickhelp;help=search_weight_length" onclick="return reqOverlayDiv(this.href);" class="help"><img src="', $settings['images_url'], '/helptopics.png" alt="', $txt['help'], '" /></a>
+						<label for="weight3_val">', $txt['search_weight_length'], ':</label>
 					</dt>
 					<dd>
 						<span class="search_weight"><input type="text" name="search_weight_length" id="weight3_val" value="', empty($modSettings['search_weight_length']) ? '0' : $modSettings['search_weight_length'], '" onchange="calculateNewValues()" size="3" class="input_text" /></span>
 						<span id="weight3" class="search_weight">', $context['relative_weights']['search_weight_length'], '%</span>
 					</dd>
 					<dt>
-						<a href="', $scripturl, '?action=quickhelp;help=search_weight_commonheader%2Bsearch_weight_subject" onclick="return reqOverlayDiv(this.href);" class="help"><img src="', $settings['images_url'], '/helptopics.png" alt="', $txt['help'], '" /></a><label for="weight4_val">
-						', $txt['search_weight_subject'], ':</label>
+						<a href="', $scripturl, '?action=quickhelp;help=search_weight_subject" onclick="return reqOverlayDiv(this.href);" class="help"><img src="', $settings['images_url'], '/helptopics.png" alt="', $txt['help'], '" /></a>
+						<label for="weight4_val">', $txt['search_weight_subject'], ':</label>
 					</dt>
 					<dd>
 						<span class="search_weight"><input type="text" name="search_weight_subject" id="weight4_val" value="', empty($modSettings['search_weight_subject']) ? '0' : $modSettings['search_weight_subject'], '" onchange="calculateNewValues()" size="3" class="input_text" /></span>
 						<span id="weight4" class="search_weight">', $context['relative_weights']['search_weight_subject'], '%</span>
 					</dd>
 					<dt>
-						<a href="', $scripturl, '?action=quickhelp;help=search_weight_commonheader%2Bsearch_weight_first_message" onclick="return reqOverlayDiv(this.href);" class="help"><img src="', $settings['images_url'], '/helptopics.png" alt="', $txt['help'], '" /></a><label for="weight5_val">
-						', $txt['search_weight_first_message'], ':</label>
+						<a href="', $scripturl, '?action=quickhelp;help=search_weight_first_message" onclick="return reqOverlayDiv(this.href);" class="help"><img src="', $settings['images_url'], '/helptopics.png" alt="', $txt['help'], '" /></a>
+						<label for="weight5_val">', $txt['search_weight_first_message'], ':</label>
 					</dt>
 					<dd>
 						<span class="search_weight"><input type="text" name="search_weight_first_message" id="weight5_val" value="', empty($modSettings['search_weight_first_message']) ? '0' : $modSettings['search_weight_first_message'], '" onchange="calculateNewValues()" size="3" class="input_text" /></span>
 						<span id="weight5" class="search_weight">', $context['relative_weights']['search_weight_first_message'], '%</span>
 					</dd>
 					<dt>
-						<a href="', $scripturl, '?action=quickhelp;help=search_weight_commonheader%2Bsearch_weight_sticky" onclick="return reqOverlayDiv(this.href);" class="help"><img src="', $settings['images_url'], '/helptopics.png" alt="', $txt['help'], '" /></a><label for="weight6_val">
-						', $txt['search_weight_sticky'], ':</label>
+						<a href="', $scripturl, '?action=quickhelp;help=search_weight_sticky" onclick="return reqOverlayDiv(this.href);" class="help"><img src="', $settings['images_url'], '/helptopics.png" alt="', $txt['help'], '" /></a>
+						<label for="weight6_val">', $txt['search_weight_sticky'], ':</label>
 					</dt>
 					<dd>
 						<span class="search_weight"><input type="text" name="search_weight_sticky" id="weight6_val" value="', empty($modSettings['search_weight_sticky']) ? '0' : $modSettings['search_weight_sticky'], '" onchange="calculateNewValues()" size="3" class="input_text" /></span>
 						<span id="weight6" class="search_weight">', $context['relative_weights']['search_weight_sticky'], '%</span>
+					</dd>
+					<dt>
+						<a href="', $scripturl, '?action=quickhelp;help=search_weight_likes" onclick="return reqOverlayDiv(this.href);" class="help"><img src="', $settings['images_url'], '/helptopics.png" alt="', $txt['help'], '" /></a>
+						<label for="weight6_val">						', $txt['search_weight_likes'], ':</label>
+					</dt>
+					<dd>
+						<span class="search_weight"><input type="text" name="search_weight_likes" id="weight7_val" value="', empty($modSettings['search_weight_likes']) ? '0' : $modSettings['search_weight_likes'], '" onchange="calculateNewValues()" size="3" class="input_text" /></span>
+						<span id="weight7" class="search_weight">', $context['relative_weights']['search_weight_likes'], '%</span>
 					</dd>
 					<dt>
 						<strong>', $txt['search_weights_total'], '</strong>
@@ -240,7 +250,7 @@ function template_select_search_method()
 	<script><!-- // --><![CDATA[
 		showhideSearchMethod();
 
-		$("#search_index input").change(function() {
+		$("#search_index").find("input").change(function() {
 			showhideSearchMethod();
 		});
    // ]]></script>';
