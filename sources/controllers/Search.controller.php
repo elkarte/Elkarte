@@ -28,36 +28,32 @@ if (!defined('ELK'))
 class Search_Controller extends Action_Controller
 {
 	/**
-	 * Weighing factor each area, ie frequency, age, sticky, ec
+	 * Weighing factor each area, ie frequency, age, sticky, etc
 	 * @var array
 	 */
 	protected $_weight = array();
 
 	/**
 	 * Holds the total of all weight factors, should be 100
-	 *
 	 * @var int
 	 */
 	protected $_weight_total = 0;
 
 	/**
 	 * Holds array of search result relevancy weigh factors
-	 *
 	 * @var array
 	 */
 	protected $_weight_factors = array();
 
 	/**
 	 * Holds the search object
-	 *
-	 * @var object
+	 * @var Search
 	 */
 	protected $_search = null;
 
 	/**
 	 * The class that takes care of rendering the message icons (MessageTopicIcons)
-	 *
-	 * @var null|object
+	 * @var null|MessageTopicIcons
 	 */
 	protected $_icon_sources = null;
 
@@ -82,7 +78,7 @@ class Search_Controller extends Action_Controller
 			}
 		}
 
-		// if coming from the quick search box, and we want to search on members, well we need to do that ;)
+		// If coming from the quick search box, and we want to search on members, well we need to do that ;)
 		if (isset($_REQUEST['search_selection']) && $_REQUEST['search_selection'] === 'members')
 			redirectexit($scripturl . '?action=memberlist;sa=search;fields=name,email;search=' . urlencode($_REQUEST['search']));
 
@@ -109,12 +105,12 @@ class Search_Controller extends Action_Controller
 	 * Ask the user what they want to search for.
 	 *
 	 * What it does:
-	 * - shows the screen to search forum posts (action=search),
-	 * - uses the main sub template of the Search template.
-	 * - uses the Search language file.
-	 * - requires the search_posts permission.
-	 * - decodes and loads search parameters given in the URL (if any).
-	 * - the form redirects to index.php?action=search;sa=results.
+	 * - Shows the screen to search forum posts (action=search),
+	 * - Uses the main sub template of the Search template.
+	 * - Uses the Search language file.
+	 * - Requires the search_posts permission.
+	 * - Decodes and loads search parameters given in the URL (if any).
+	 * - The form redirects to index.php?action=search;sa=results.
 	 *
 	 * @uses Search language file and Errors language when needed
 	 * @uses Search template, searchform sub template
@@ -205,6 +201,7 @@ class Search_Controller extends Action_Controller
 
 		require_once(SUBSDIR . '/Boards.subs.php');
 		$context += getBoardList(array('not_redirection' => true));
+
 		$context['boards_in_category'] = array();
 		foreach ($context['categories'] as $cat => &$category)
 		{
@@ -248,12 +245,12 @@ class Search_Controller extends Action_Controller
 	 * Gather the results and show them.
 	 *
 	 * What it does:
-	 * - checks user input and searches the messages table for messages matching the query.
-	 * - requires the search_posts permission.
-	 * - uses the results sub template of the Search template.
-	 * - uses the Search language file.
-	 * - stores the results into the search cache.
-	 * - show the results of the search query.
+	 * - Checks user input and searches the messages table for messages matching the query.
+	 * - Requires the search_posts permission.
+	 * - Uses the results sub template of the Search template.
+	 * - Uses the Search language file.
+	 * - Stores the results into the search cache.
+	 * - Show the results of the search query.
 	 */
 	public function action_results()
 	{
@@ -312,12 +309,10 @@ class Search_Controller extends Action_Controller
 			$context['search_errors']['invalid_search_string'] = true;
 		// Too long?
 		elseif (Util::strlen($this->_search->param('search')) > $context['search_string_limit'])
-		{
 			$context['search_errors']['string_too_long'] = true;
-		}
 
 		// Build the search array
-		// $modSettings['search_simple_fulltext'] is an hidden setting that will
+		// $modSettings ['search_simple_fulltext'] is an hidden setting that will
 		// do fulltext searching in the most basic way.
 		$searchArray = $this->_search->searchArray(!empty($modSettings['search_simple_fulltext']));
 
@@ -393,6 +388,7 @@ class Search_Controller extends Action_Controller
 			'url' => $scripturl . '?action=search;params=' . $context['params'],
 			'name' => $txt['search']
 		);
+
 		$context['linktree'][] = array(
 			'url' => $scripturl . '?action=search;sa=results;params=' . $context['params'],
 			'name' => $txt['search_results']
@@ -407,7 +403,7 @@ class Search_Controller extends Action_Controller
 
 		// One or more search errors? Go back to the first search screen.
 		if (!empty($context['search_errors']))
-			return $this->action_search();
+			$this->action_search();
 
 		// Spam me not, Spam-a-lot?
 		if (empty($_SESSION['last_ss']) || $_SESSION['last_ss'] != $this->_search->param('search'))
@@ -445,8 +441,9 @@ class Search_Controller extends Action_Controller
 					if ($num_res === false)
 					{
 						$context['search_errors']['query_not_specific_enough'] = true;
-						return $this->action_search();
+						$this->action_search();
 					}
+
 					$_SESSION['search_cache']['num_results'] = $num_res;
 				}
 			}
@@ -495,6 +492,7 @@ class Search_Controller extends Action_Controller
 			{
 				require_once(SUBSDIR . '/MessageIndex.subs.php');
 				$topics_participated_in = topicsParticipation($user_info['id'], array_keys($participants));
+
 				foreach ($topics_participated_in as $topic)
 					$participants[$topic['id_topic']] = true;
 			}
@@ -508,7 +506,6 @@ class Search_Controller extends Action_Controller
 			cache_put_data('search_start:' . ($user_info['is_guest'] ? $user_info['ip'] : $user_info['id']), null, 90);
 
 		$context['key_words'] = &$searchArray;
-
 		$context['sub_template'] = 'results';
 		$context['page_title'] = $txt['search_results'];
 		$context['get_topics'] = array($this, 'prepareSearchContext_callback');
@@ -529,8 +526,8 @@ class Search_Controller extends Action_Controller
 	 * So all it does is to fallback and return.
 	 *
 	 * What it does:
-	 * - callback function for the results sub template.
-	 * - loads the necessary contextual data to show a search result.
+	 * - Callback function for the results sub template.
+	 * - Loads the necessary contextual data to show a search result.
 	 *
 	 * @param boolean $reset = false
 	 * @return array of messages that match the search
@@ -538,7 +535,7 @@ class Search_Controller extends Action_Controller
 	public function prepareSearchContext_callback($reset = false)
 	{
 		global $txt, $modSettings, $scripturl, $user_info;
-		global $memberContext, $context, $settings, $options, $messages_request;
+		global $memberContext, $context, $options, $messages_request;
 		global $boards_can, $participants;
 
 		// Remember which message this is.  (ie. reply #83)
@@ -618,7 +615,7 @@ class Search_Controller extends Action_Controller
 					foreach ($matches[0] as $match)
 					{
 						$match = strtr(htmlspecialchars($match, ENT_QUOTES, 'UTF-8'), array("\n" => '&nbsp;'));
-						$message['body'] .= '<strong>......</strong>&nbsp;' . $match . '&nbsp;<strong>......</strong>';
+						$message['body'] .= '<strong>&hellip;&hellip;</strong>&nbsp;' . $match . '&nbsp;<strong>&hellip;&hellip;</strong>';
 					}
 				}
 
@@ -700,6 +697,7 @@ class Search_Controller extends Action_Controller
 				'link' => '<a href="' . $scripturl . '#c' . $message['id_cat'] . '">' . $message['cat_name'] . '</a>'
 			)
 		));
+
 		determineTopicClass($output);
 
 		if ($output['posted_in'])
@@ -805,7 +803,7 @@ class Search_Controller extends Action_Controller
 	 */
 	private function _highlighted_callback($matches)
 	{
-		return isset($matches[2]) && $matches[2] == $matches[1] ? stripslashes($matches[1]) : '<strong class="highlight">' . $matches[1] . '</strong>';
+		return isset($matches[2]) && $matches[2] == $matches[1] ? stripslashes($matches[1]) : '<span class="highlight">' . $matches[1] . '</span>';
 	}
 
 	/**
@@ -838,6 +836,10 @@ class Search_Controller extends Action_Controller
 			'sticky' => array(
 				'search' => 'MAX(t.is_sticky)',
 				'results' => 't.is_sticky',
+			),
+			'likes' => array(
+				'search' => 'MAX(t.num_likes)',
+				'results' => 't.num_likes',
 			),
 		);
 
@@ -905,14 +907,17 @@ class Search_Controller extends Action_Controller
 			$array['userspec'] = '*';
 		if (empty($array['searchtype']))
 			$array['searchtype'] = 0;
+
 		if (!isset($array['show_complete']))
 			$array['show_complete'] = 0;
 		else
 			$array['show_complete'] = (int) $array['show_complete'];
+
 		if (!isset($array['subject_only']))
 			$array['subject_only'] = 0;
 		else
 			$array['subject_only'] = (int) $array['subject_only'];
+
 		if (empty($array['minage']))
 			$array['minage'] = 0;
 		if (empty($array['maxage']))
@@ -925,8 +930,8 @@ class Search_Controller extends Action_Controller
 
 	/**
 	 * Increase the search pointer by 1.
-	 * The maximum value is 255, so when it becomes bigger, the pointer is reset
-	 * to 0.
+	 *
+	 * - The maximum value is 255, so when it becomes bigger, the pointer is reset to 0.
 	 */
 	private function _increase_pointer()
 	{
@@ -934,8 +939,10 @@ class Search_Controller extends Action_Controller
 
 		// Increase the pointer...
 		$modSettings['search_pointer'] = empty($modSettings['search_pointer']) ? 0 : (int) $modSettings['search_pointer'];
+
 		// ...and store it right off.
 		updateSettings(array('search_pointer' => $modSettings['search_pointer'] >= 255 ? 0 : $modSettings['search_pointer'] + 1));
+
 		// As long as you don't change the parameters, the cache result is yours.
 		$_SESSION['search_cache'] = array(
 			'id_search' => $modSettings['search_pointer'],
