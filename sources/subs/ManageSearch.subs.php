@@ -105,6 +105,7 @@ function createSphinxConfig()
 		'length',
 		'first_message',
 		'sticky',
+		'likes',
 	);
 
 	$weight = array();
@@ -122,7 +123,8 @@ function createSphinxConfig()
 			'age' => 25,
 			'length' => 25,
 			'first_message' => 25,
-			'sticky' => 25,
+			'sticky' => 15,
+			'likes' => 10
 		);
 		$weight_total = 100;
 	}
@@ -138,7 +140,7 @@ function createSphinxConfig()
 # This is the minimum needed clean, simple, functional
 #
 # By default the location of this file would probably be:
-# /usr/local/etc/sphinx.conf
+# /usr/local/etc/sphinx.conf or /etc/sphinxsearch/sphinx.conf
 #
 
 source elkarte_source
@@ -165,9 +167,10 @@ source elkarte_source
 			m.id_msg, m.id_topic, m.id_board, IF(m.id_member = 0, 4294967295, m.id_member) AS id_member, m.poster_time, m.body, m.subject, \
 			t.num_replies + 1 AS num_replies, CEILING(1000000 * ( \
 				IF(m.id_msg < 0.7 * s.value, 0, (m.id_msg - 0.7 * s.value) / (0.3 * s.value)) * ' . $weight['age'] . ' + \
-				IF(t.num_replies < 200, t.num_replies / 200, 1) * ' . $weight['length'] . ' + \
+				IF(t.num_replies < 50, t.num_replies / 50, 1) * ' . $weight['length'] . ' + \
 				IF(m.id_msg = t.id_first_msg, 1, 0) * ' . $weight['first_message'] . ' + \
-				IF(t.is_sticky = 0, 0, 1) * ' . $weight['sticky'] . ' \
+				IF(t.num_likes < 10, t.num_likes / 10, 1) * ' . $weight['likes'] . ' + \
+				IF(t.is_sticky = 0, 0, 100) * ' . $weight['sticky'] . ' \
 			) / ' . $weight_total . ') AS relevance \
 		FROM ', $db_prefix, 'messages AS m, ', $db_prefix, 'topics AS t, ', $db_prefix, 'settings AS s \
 		WHERE t.id_topic = m.id_topic \
@@ -177,8 +180,8 @@ source elkarte_source
 	sql_attr_uint		= id_board
 	sql_attr_uint		= id_member
 	sql_attr_timestamp	= poster_time
-	sql_attr_timestamp	= relevance
-	sql_attr_timestamp	= num_replies
+	sql_attr_uint		= relevance
+	sql_attr_uint		= num_replies
 }
 
 source elkarte_delta_source : elkarte_source
