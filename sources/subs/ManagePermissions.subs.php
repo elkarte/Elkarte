@@ -568,24 +568,29 @@ function loadAllPermissions()
 
 	$context['permissions'] = array();
 	$context['hidden_permissions'] = array();
-	foreach ($permissionList as $permissionType => $permissionList)
+	foreach ($permissionList as $permissionType => $currentPermissionList)
 	{
 		$context['permissions'][$permissionType] = array(
 			'id' => $permissionType,
 			'columns' => array()
 		);
-		foreach ($permissionList as $permission => $permissionArray)
+
+		foreach ($currentPermissionList as $permission => $permissionArray)
 		{
 			// If this is a guest permission we don't do it if it's the guest group.
 			if (isset($context['group']['id']) && $context['group']['id'] == -1 && in_array($permission, $context['non_guest_permissions']))
+			{
 				continue;
+			}
 
 			// What groups will this permission be in?
 			$own_group = $permissionArray[1];
 
 			// First, Do these groups actually exist - if not add them.
 			if (!isset($permissionGroups[$permissionType][$own_group]))
+			{
 				$permissionGroups[$permissionType][$own_group] = true;
+			}
 
 			// What column should this be located into?
 			$position = !in_array($own_group, $leftPermissionGroups) ? 1 : 0;
@@ -595,12 +600,18 @@ function loadAllPermissions()
 
 			// Guests can have only any, registered users both
 			if (!isset($context['group']['id']) || !($context['group']['id'] == -1))
+			{
 				$bothGroups['own'] = $own_group;
+			}
 			else
+			{
 				$bothGroups['any'] = $own_group;
+			}
 
 			foreach ($bothGroups as $group)
+			{
 				if (!isset($context['permissions'][$permissionType]['columns'][$position][$group]['type']))
+				{
 					$context['permissions'][$permissionType]['columns'][$position][$group] = array(
 						'type' => $permissionType,
 						'id' => $group,
@@ -610,6 +621,8 @@ function loadAllPermissions()
 						'hidden' => false,
 						'permissions' => array()
 					);
+				}
+			}
 
 			// This is where we set up the permission.
 			$context['permissions'][$permissionType]['columns'][$position][$own_group]['permissions'][$permission] = array(
@@ -637,27 +650,40 @@ function loadAllPermissions()
 					$context['hidden_permissions'][] = $permission . '_any';
 				}
 				else
+				{
 					$context['hidden_permissions'][] = $permission;
+				}
 			}
 		}
 		ksort($context['permissions'][$permissionType]['columns']);
 
 		// Check we don't leave any empty groups - and mark hidden ones as such.
 		foreach ($context['permissions'][$permissionType]['columns'] as $column => $groups)
+		{
 			foreach ($groups as $id => $group)
 			{
 				if (empty($group['permissions']))
+				{
 					unset($context['permissions'][$permissionType]['columns'][$column][$id]);
+				}
 				else
 				{
 					$foundNonHidden = false;
 					foreach ($group['permissions'] as $permission)
+					{
 						if (empty($permission['hidden']))
+						{
 							$foundNonHidden = true;
+						}
+					}
+
 					if (!$foundNonHidden)
+					{
 						$context['permissions'][$permissionType]['columns'][$column][$id]['hidden'] = true;
+					}
 				}
 			}
+		}
 	}
 }
 
@@ -757,11 +783,11 @@ function assignPermissionProfileToBoard($profile, $board)
  * @package Permissions
  * @param int $copy_from
  * @param int[] $groups
- * @param string[] $illgeal_permissions
+ * @param string[] $illegal_permissions
  * @param string[] $non_guest_permissions
  * @todo another function with the same name in Membergroups.subs.php
  */
-function copyPermission($copy_from, $groups, $illgeal_permissions, $non_guest_permissions = array())
+function copyPermission($copy_from, $groups, $illegal_permissions, $non_guest_permissions = array())
 {
 	$db = database();
 
@@ -784,7 +810,7 @@ function copyPermission($copy_from, $groups, $illgeal_permissions, $non_guest_pe
 		foreach ($target_perm as $perm => $add_deny)
 		{
 			// No dodgy permissions please!
-			if (!empty($illgeal_permissions) && in_array($perm, $illgeal_permissions))
+			if (!empty($illegal_permissions) && in_array($perm, $illegal_permissions))
 				continue;
 			if ($group_id == -1 && in_array($perm, $non_guest_permissions))
 				continue;
@@ -797,10 +823,10 @@ function copyPermission($copy_from, $groups, $illgeal_permissions, $non_guest_pe
 	$db->query('', '
 		DELETE FROM {db_prefix}permissions
 		WHERE id_group IN ({array_int:group_list})
-			' . (empty($illgeal_permissions) ? '' : ' AND permission NOT IN ({array_string:illegal_permissions})'),
+			' . (empty($illegal_permissions) ? '' : ' AND permission NOT IN ({array_string:illegal_permissions})'),
 		array(
 			'group_list' => $groups,
-			'illegal_permissions' => !empty($illgeal_permissions) ? $illgeal_permissions : array(),
+			'illegal_permissions' => !empty($illegal_permissions) ? $illegal_permissions : array(),
 		)
 	);
 
