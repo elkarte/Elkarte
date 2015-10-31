@@ -47,7 +47,7 @@ class Search_Controller extends Action_Controller
 
 	/**
 	 * Holds the search object
-	 * @var Search
+	 * @var \ElkArte\Search\Search
 	 */
 	protected $_search = null;
 

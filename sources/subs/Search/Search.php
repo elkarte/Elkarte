@@ -60,8 +60,8 @@ class Search
 	private $_searchArray = array();
 
 	/**
-	 * Holds instance of the search api in use such as Standard_Search, Sphinx_Search etc
-	 * @var null|SearchAPI
+	 * Holds instance of the search api in use such as ElkArte\Search\API\Standard_Search
+	 * @var null|object
 	 */
 	private $_searchAPI = null;
 
@@ -193,12 +193,12 @@ class Search
 
 	/**
 	 * If we are creating a tmp db table
-	 * @var bool|null
+	 * @var bool
 	 */
-	private $_createTemporary = null;
+	private $_createTemporary = true;
 
 	/**
-	 * Constructor.
+	 * Constructor
 	 * Easy enough, initialize the database objects (generic db and search db)
 	 *
 	 * @package Search
@@ -402,32 +402,10 @@ class Search
 
 		// A minus sign in front of a word excludes the word.... so...
 		// .. first, we check for things like -"some words", but not "-some words".
-		foreach ($matches[1] as $index => $word)
-		{
-			if ($word === '-')
-			{
-				if (($word = trim($phraseArray[$index], '-_\' ')) !== '' && !in_array($word, $this->_blacklisted_words))
-				{
-					$this->_excludedWords[] = $word;
-				}
-
-				unset($phraseArray[$index]);
-			}
-		}
+		$phraseArray = $this->_checkExcludePhrase($matches[1], $phraseArray);
 
 		// Now we look for -test, etc.... normaller.
-		foreach ($wordArray as $index => $word)
-		{
-			if (strpos(trim($word), '-') === 0)
-			{
-				if (($word = trim($word, '-_\' ')) !== '' && !in_array($word, $this->_blacklisted_words))
-				{
-					$this->_excludedWords[] = $word;
-				}
-
-				unset($wordArray[$index]);
-			}
-		}
+		$wordArray =  $this->_checkExcludeWord($wordArray);
 
 		// The remaining words and phrases are all included.
 		$this->_searchArray = array_merge($phraseArray, $wordArray);
@@ -457,6 +435,59 @@ class Search
 		$this->_searchArray = array_slice(array_unique($this->_searchArray), 0, 10);
 
 		return $this->_searchArray;
+	}
+
+	/**
+	 * Looks for phrases that should be excluded from results
+	 *
+	 * - Check for things like -"some words", but not "-some words"
+	 * - Prevents redundancy with blacklisted words
+	 *
+	 * @param array $matches
+	 * @param string[]  $phraseArray
+	 */
+	private function _checkExcludePhrase($matches, $phraseArray)
+	{
+		foreach ($matches as $index => $word)
+		{
+			if ($word === '-')
+			{
+				if (($word = trim($phraseArray[$index], '-_\' ')) !== '' && !in_array($word, $this->_blacklisted_words))
+				{
+					$this->_excludedWords[] = $word;
+				}
+
+				unset($phraseArray[$index]);
+			}
+		}
+
+		return $phraseArray;
+	}
+
+	/**
+	 * Looks for words that should be excluded in the results (-word)
+	 *
+	 * - Look for -test, etc
+	 * - Prevents excluding blacklisted words since it is redundant
+	 *
+	 * @param string[] $wordArray
+	 */
+	private function _checkExcludeWord($wordArray)
+	{
+		foreach ($wordArray as $index => $word)
+		{
+			if (strpos(trim($word), '-') === 0)
+			{
+				if (($word = trim($word, '-_\' ')) !== '' && !in_array($word, $this->_blacklisted_words))
+				{
+					$this->_excludedWords[] = $word;
+				}
+
+				unset($wordArray[$index]);
+			}
+		}
+
+		return $wordArray;
 	}
 
 	/**
