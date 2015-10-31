@@ -265,7 +265,7 @@ class Email_Format
 			elseif (isset($this->_body_array[$i - 1]['content']) && substr(trim($this->_body_array[$i - 1]['content']), -4) == '[br]')
 			{
 				// Nothing to do then
-				 $this->_body_array[$i]['content'] .= ''
+				 $this->_body_array[$i]['content'] .= '';
 			}
 			// OK, we can't seem to think of other obvious reasons this should not be on the same line
 			// and these numbers are quite frankly subjective, but so is how we got here, final "check"
