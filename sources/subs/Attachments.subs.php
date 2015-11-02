@@ -1780,7 +1780,11 @@ function loadAttachmentContext($id_msg)
 			}
 			elseif ($attachmentData[$i]['thumbnail']['has_thumb'])
 			{
+				// Data attributes for use in expandThumb
+				$attachmentData[$i]['thumbnail']['lightbox'] = 'data-lightboxmessage="' . $id_msg . '" data-lightboximage="' .  $attachment['id_attach'] . '"';
+
 				// If the image is too large to show inline, make it a popup.
+				// @todo this needs to be removed or depreciated
 				if (((!empty($modSettings['max_image_width']) && $attachmentData[$i]['real_width'] > $modSettings['max_image_width']) || (!empty($modSettings['max_image_height']) && $attachmentData[$i]['real_height'] > $modSettings['max_image_height'])))
 					$attachmentData[$i]['thumbnail']['javascript'] = 'return reqWin(\'' . $attachmentData[$i]['href'] . ';image\', ' . ($attachment['width'] + 20) . ', ' . ($attachment['height'] + 20) . ', true);';
 				else
