@@ -29,6 +29,12 @@ $(document).ready(function() {
 		$("html,body").animate({scrollTop: 0}, 1200);
 	});
 
+	// Attachment thumbnail expand on click
+	$(document).on('click', 'a[data-lightboximage]', function() {
+		expandThumb($(this).data('lightboximage'));
+		return false;
+	});
+
 	// Smooth scroll to bottom.
 	$("a[href=#bot]").on("click", function(e) {
 		e.preventDefault();
@@ -59,6 +65,7 @@ $(document).ready(function() {
 		$(this).siblings().slideToggle("fast");
 		$(this).parent().toggleClass("collapsed");
 	});
+
 	$(document).on('ready', 'legend', function () {
 		if ($(this).data('collapsed'))
 			$(this).click();
