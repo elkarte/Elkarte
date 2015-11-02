@@ -870,40 +870,59 @@ function expandThumb(thumbID)
 	var link = document.getElementById('link_' + thumbID),
 		$elk_expand_icon = $('<span id="elk_lb_expand"></span>'),
 		$elk_lightbox = $('#elk_lightbox'),
-		$elk_lb_content = $('#elk_lb_content');
+		$elk_lb_content = $('#elk_lb_content'),
+		ajaxIndicatorOn = function() {$('<div id="lightbox-loading"><i class="fa fa-spinner fa-spin fa-4x"></i><div>').appendTo($elk_lb_content);},
+		ajaxIndicatorOff = function() {$('#lightbox-loading' ).remove();};
 
-	// Create the lightbox container (if needed)
+	// Create the lightbox container only if needed
 	if ($elk_lightbox.length <= 0) {
 		$('body').append('<div id="elk_lightbox"><div id="elk_lb_content"></div></div>');
+
+		// For easy manipulation
 		$elk_lightbox = $('#elk_lightbox');
 		$elk_lb_content = $('#elk_lb_content');
 	}
 
 	// Load and show the lightbox container div
-	$elk_lb_content.html('<div style="position:fixed;left:50%;top:50%;"><i class="fa fa-spinner fa-spin fa-4x"></i><div>');
+	ajaxIndicatorOn();
 	$elk_lightbox.fadeIn(200);
 
 	// Fetch the image, replace the spinner with it when it arrives
 	$('<img id="elk_lb_img" src="' + link.href + '">')
 		.load(function() {
-			$(this).css({'max-height': $(window).height() - 40});
+			var screenWidth = window.innerWidth * 0.9,
+				screenHeight = window.innerHeight * 0.9;
+
+			$(this).css({
+				'max-width': screenWidth + 'px',
+				'max-height': screenHeight + 'px'
+			});
+
 			$elk_lb_content.html($(this)).append($elk_expand_icon);
+
+			ajaxIndicatorOff();
 		})
 		.error(function() {
 			// Perhaps a message, but for now make it look like we tried and failed
-			setTimeout(function() { $("#elk_lightbox").hide();
-			$elk_lb_content.html(''); }, 1500);
+			setTimeout(function() {
+				ajaxIndicatorOff();
+				$("#elk_lightbox").hide();
+				$elk_lb_content.html(''); }, 1500);
+
 			$(window).off('resize.expandThumb');
 		});
 
-	// Provide an expand out on icon click
+	// Provide an expand to full image icon click
 	$elk_expand_icon.on('click', function(event) {
-		$('#elk_lb_content').css({'overflow':'auto', 'height':$(window).height(), 'padding':'0'});
-		$('#elk_lb_img').css({'width':'100%', 'max-height':'initial'});
+		$('#elk_lb_content').addClass('expand').css({
+			'height':window.innerHeight * 0.9,
+			'width':window.innerWidth * 0.9
+		});
+		$('#elk_lb_img').removeAttr('style');
 		$elk_expand_icon.hide();
 	});
 
-	// Click anywhere on the page (except the expand icon) to close the lightbox window
+	// Click anywhere on the page (except the expand icon) to close the lightbox
 	$elk_lightbox.on('click', function(event) {
 		if (event.target.id !== $elk_expand_icon.attr('id')) {
 			event.preventDefault();
@@ -925,7 +944,11 @@ function expandThumb(thumbID)
 
 	// Make the image size fluid as the browser window changes
 	$(window).on('resize.expandThumb', function() {
-		$('#elk_lb_img').css({'max-height':$(window).height() - 40, 'max-width':$(window).width() - 100});
+		// Account for either a normal or expanded view
+		if ($('#elk_lb_content').hasClass('expand'))
+			$('#elk_lb_content').css({'height':window.innerHeight * 0.85, 'width':window.innerWidth * 0.9});
+		else
+			$('#elk_lb_img').css({'max-height':window.innerHeight * 0.9, 'max-width':window.innerWidth * 0.8});
 	});
 
 	return false;

@@ -2610,6 +2610,19 @@ img.new_posts {
 	position: relative;
 }
 
+#elk_lb_content div {
+	position: fixed;
+	left: 50%;
+	top: 50%;
+}
+
+#elk_lb_content.expand {
+	overflow: auto;
+	padding: 0;
+	margin-top: 20px;
+	border: 1px solid #fff;
+}
+
 #elk_lb_expand {
 	display: inline-block;
 	width: 1.15em;
