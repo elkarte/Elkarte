@@ -29,9 +29,10 @@ $(document).ready(function() {
 		$("html,body").animate({scrollTop: 0}, 1200);
 	});
 
-	// Attachment thumbnail expand on click
-	$(document).on('click', 'a[data-lightboximage]', function() {
-		expandThumb($(this).data('lightboximage'));
+	// Attachment thumbnail expand on click, you can turn off this namespaced click
+	// event with $('[data-lightboximage]').off('click.elk_lb');
+	$('[data-lightboximage]').on('click.elk_lb', function() {
+		expandThumbLB($(this).data('lightboximage'));
 		return false;
 	});
 

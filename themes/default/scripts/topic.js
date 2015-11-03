@@ -856,23 +856,24 @@ InTopicModeration.prototype.handleSubmit = function (sSubmitType)
 	return true;
 };
 
+
 /**
  * Expands an attachment thumbnail when its clicked
  *
  * @param {string} thumbID
  */
-function expandThumb(thumbID)
-{
-	// For addon authors, set a global js elk_bypass_lb = true to turn off this function
-	if (typeof(elk_bypass_lb) !== 'undefined')
-		return;
+function expandThumbLB(thumbID) {
 
 	var link = document.getElementById('link_' + thumbID),
-		$elk_expand_icon = $('<span id="elk_lb_expand"></span>'),
-		$elk_lightbox = $('#elk_lightbox'),
-		$elk_lb_content = $('#elk_lb_content'),
-		ajaxIndicatorOn = function() {$('<div id="lightbox-loading"><i class="fa fa-spinner fa-spin fa-4x"></i><div>').appendTo($elk_lb_content);},
-		ajaxIndicatorOff = function() {$('#lightbox-loading' ).remove();};
+			$elk_expand_icon = $('<span id="elk_lb_expand"></span>'),
+			$elk_lightbox = $('#elk_lightbox'),
+			$elk_lb_content = $('#elk_lb_content'),
+			ajaxIndicatorOn = function () {
+				$('<div id="lightbox-loading"><i class="fa fa-spinner fa-spin fa-4x"></i><div>').appendTo($elk_lb_content);
+			},
+			ajaxIndicatorOff = function () {
+				$('#lightbox-loading').remove();
+			};
 
 	// Create the lightbox container only if needed
 	if ($elk_lightbox.length <= 0) {
@@ -889,7 +890,7 @@ function expandThumb(thumbID)
 
 	// Fetch the image, replace the spinner with it when it arrives
 	$('<img id="elk_lb_img" src="' + link.href + '">')
-		.load(function() {
+		.load(function () {
 			var screenWidth = window.innerWidth * 0.9,
 				screenHeight = window.innerHeight * 0.9;
 
@@ -902,28 +903,29 @@ function expandThumb(thumbID)
 
 			ajaxIndicatorOff();
 		})
-		.error(function() {
+		.error(function () {
 			// Perhaps a message, but for now make it look like we tried and failed
-			setTimeout(function() {
+			setTimeout(function () {
 				ajaxIndicatorOff();
 				$("#elk_lightbox").hide();
-				$elk_lb_content.html(''); }, 1500);
+				$elk_lb_content.html('');
+			}, 1500);
 
 			$(window).off('resize.expandThumb');
 		});
 
 	// Provide an expand to full image icon click
-	$elk_expand_icon.on('click', function(event) {
+	$elk_expand_icon.on('click', function (event) {
 		$('#elk_lb_content').addClass('expand').css({
-			'height':window.innerHeight * 0.9,
-			'width':window.innerWidth * 0.9
+			'height': window.innerHeight * 0.9,
+			'width': window.innerWidth * 0.9
 		});
 		$('#elk_lb_img').removeAttr('style');
 		$elk_expand_icon.hide();
 	});
 
 	// Click anywhere on the page (except the expand icon) to close the lightbox
-	$elk_lightbox.on('click', function(event) {
+	$elk_lightbox.on('click', function (event) {
 		if (event.target.id !== $elk_expand_icon.attr('id')) {
 			event.preventDefault();
 			$elk_lightbox.hide();
@@ -933,8 +935,8 @@ function expandThumb(thumbID)
 	});
 
 	// Hit escape to close it as well
-	$(window).on('keydown', function(event) {
-		if (event.keyCode === 27 ) {
+	$(window).on('keydown', function (event) {
+		if (event.keyCode === 27) {
 			event.preventDefault();
 			$elk_lightbox.hide();
 			$elk_lb_content.html('').removeAttr('style');
@@ -943,12 +945,12 @@ function expandThumb(thumbID)
 	});
 
 	// Make the image size fluid as the browser window changes
-	$(window).on('resize.expandThumb', function() {
+	$(window).on('resize.expandThumb', function () {
 		// Account for either a normal or expanded view
 		if ($('#elk_lb_content').hasClass('expand'))
-			$('#elk_lb_content').css({'height':window.innerHeight * 0.85, 'width':window.innerWidth * 0.9});
+			$('#elk_lb_content').css({'height': window.innerHeight * 0.85, 'width': window.innerWidth * 0.9});
 		else
-			$('#elk_lb_img').css({'max-height':window.innerHeight * 0.9, 'max-width':window.innerWidth * 0.8});
+			$('#elk_lb_img').css({'max-height': window.innerHeight * 0.9, 'max-width': window.innerWidth * 0.8});
 	});
 
 	return false;
@@ -959,7 +961,7 @@ function expandThumb(thumbID)
  *
  * @param {string} thumbID
  */
-function expandThumbLegacy(thumbID)
+function expandThumb(thumbID)
 {
 	var img = document.getElementById('thumb_' + thumbID),
 		link = document.getElementById('link_' + thumbID);
