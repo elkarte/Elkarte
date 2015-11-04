@@ -31,18 +31,7 @@ class TestFiles extends PHPUnit_Framework_TestCase
 	public function testSyntaxErrors()
 	{
 		$dirs = array(
-			'board' => BOARDDIR . '/*.php',
-			'source' => SOURCEDIR . '/*.php',
-			'controllers' => CONTROLLERDIR . '/*.php',
-			'database' => SOURCEDIR . '/database/*.php',
-			'subs' => SUBSDIR . '/*.php',
-			'cache_methods' => SUBSDIR . '/CacheMethod/*.php',
-			'mention_type' => SUBSDIR . '/MentionType/*.php',
-			'scheduled_task' => SUBSDIR . '/ScheduledTask/*.php',
-			'admin' => ADMINDIR . '/*.php',
-			'ext' => EXTDIR . '/*.php',
-			'language' => LANGUAGEDIR . '/english/*.php',
-			'defaulttheme' => BOARDDIR . '/themes/default/*.php',
+			'board' => BOARDDIR,
 		);
 
 		// Provide a way to skip eval of files where needed
@@ -50,10 +39,15 @@ class TestFiles extends PHPUnit_Framework_TestCase
 
 		foreach ($dirs as $dir)
 		{
-			$files = glob($dir);
+			$directory = new RecursiveDirectoryIterator($dir);
+			$iterator = new RecursiveIteratorIterator($directory);
+			$regex = new RegexIterator($iterator, '/^.+\.php$/i', RecursiveRegexIterator::GET_MATCH);
 
-			foreach ($files as $file)
+// 			$files = glob($dir);
+
+			foreach ($regex as $fileo)
 			{
+				$file = $fileo->getRealPath();
 				$file_content = file_get_contents($file);
 
 				// This is likely to be one of the two files emailpost.php or emailtopic.php
@@ -74,7 +68,7 @@ class TestFiles extends PHPUnit_Framework_TestCase
 				if (!empty($level))
 					$this->assertTrue($syntax_valid, empty($level));
 				// Skipping the eval of this one?
-				elseif (!in_array($file, $skip_files))
+				elseif (!in_array($file, $skip_files) && strpos($file, '/tests/') === false)
 				{
 					// Check the validity of the syntax.
 					ob_start();
