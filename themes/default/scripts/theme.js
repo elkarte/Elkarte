@@ -29,20 +29,13 @@ $(document).ready(function() {
 		$("html,body").animate({scrollTop: 0}, 1200);
 	});
 
-	// Attachment thumbnail expand on click, you can turn off this namespaced click
-	// event with $('[data-lightboximage]').off('click.elk_lb');
-	$('[data-lightboximage]').on('click.elk_lb', function() {
-		expandThumbLB($(this).data('lightboximage'));
-		return false;
-	});
-
 	// Smooth scroll to bottom.
 	$("a[href=#bot]").on("click", function(e) {
 		e.preventDefault();
 
 		// Don't scroll all the way down to the footer, just the content bottom
 		var link = $('#bot'),
-		link_y = link.height();
+			link_y = link.height();
 
 		$("html,body").animate({scrollTop:link.offset().top + link_y - $(window).height()}, 1200);
 	});
@@ -62,7 +55,7 @@ $(document).ready(function() {
 	$('.expand_pages').expand_pages();
 
 	// Collapsible fieldsets, pure candy
-	$(document).on('click', 'legend', function(){
+	$(document).on('click', 'legend', function() {
 		$(this).siblings().slideToggle("fast");
 		$(this).parent().toggleClass("collapsed");
 	});
@@ -75,6 +68,13 @@ $(document).ready(function() {
 	// Spoiler
 	$('.spoilerheader').click(function() {
 		$(this).next().children().slideToggle("fast");
+	});
+
+	// Attachment thumbnail expand on click, you can turn off this namespaced click
+	// event with $('[data-lightboximage]').off('click.elk_lb');
+	$('[data-lightboximage]').on('click.elk_lb', function(e) {
+		e.preventDefault();
+		expandThumbLB($(this).data('lightboximage'));
 	});
 
 	// BBC [img] element toggle for height and width styles of an image.
@@ -99,7 +99,7 @@ $(document).ready(function() {
 
 				// Override default css to allow the image to expand fully, add a div to expand in
 				$this.css({'max-width': 'none'});
-				$this.wrap('<div style="overflow: auto"></div>');
+				$this.wrap('<div style="overflow: auto;"></div>');
 			}
 			else
 			{
@@ -113,10 +113,10 @@ $(document).ready(function() {
 				// Remove the div we added to allow the image to overflow expand in
 				$this.unwrap();
 				$this.css({'max-width': '100%'});
-
 			}
 		});
 	});
+
 	$('.hamburger_30').click(function(e) {
 		e.preventDefault();
 		var id = $(this).data('id');

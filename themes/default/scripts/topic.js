@@ -863,17 +863,16 @@ InTopicModeration.prototype.handleSubmit = function (sSubmitType)
  * @param {string} thumbID
  */
 function expandThumbLB(thumbID) {
-
 	var link = document.getElementById('link_' + thumbID),
-			$elk_expand_icon = $('<span id="elk_lb_expand"></span>'),
-			$elk_lightbox = $('#elk_lightbox'),
-			$elk_lb_content = $('#elk_lb_content'),
-			ajaxIndicatorOn = function () {
-				$('<div id="lightbox-loading"><i class="fa fa-spinner fa-spin fa-4x"></i><div>').appendTo($elk_lb_content);
-			},
-			ajaxIndicatorOff = function () {
-				$('#lightbox-loading').remove();
-			};
+		$elk_expand_icon = $('<span id="elk_lb_expand"></span>'),
+		$elk_lightbox = $('#elk_lightbox'),
+		$elk_lb_content = $('#elk_lb_content'),
+		ajaxIndicatorOn = function () {
+			$('<div id="lightbox-loading"><i class="fa fa-spinner fa-spin fa-4x"></i><div>').appendTo($elk_lb_content);
+		},
+		ajaxIndicatorOff = function () {
+			$('#lightbox-loading').remove();
+		};
 
 	// Create the lightbox container only if needed
 	if ($elk_lightbox.length <= 0) {
@@ -929,7 +928,7 @@ function expandThumbLB(thumbID) {
 		if (event.target.id !== $elk_expand_icon.attr('id')) {
 			event.preventDefault();
 			$elk_lightbox.hide();
-			$elk_lb_content.html('').removeAttr('style');
+			$elk_lb_content.html('').removeAttr('style').removeClass('expand');
 			$(window).off('resize.expandThumb');
 		}
 	});
