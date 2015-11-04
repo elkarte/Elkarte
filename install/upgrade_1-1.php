@@ -374,13 +374,13 @@ class UpgradeInstructions_upgrade_1_1
 					{
 						// Rename some columns
 						$db_table->db_change_column('{db_prefix}postby_emails_error',
-							'data_id'
+							'data_id',
 							array(
 								'name' => 'message_key',
 							)
 						);
 						$db_table->db_change_column('{db_prefix}postby_emails_error',
-							'id_message'
+							'id_message',
 							array(
 								'name' => 'message_id',
 							)
