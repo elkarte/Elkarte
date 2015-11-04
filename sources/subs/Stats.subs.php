@@ -511,7 +511,7 @@ function topTopicStarter()
 	}
 	$db->free_result($members_result);
 
-	// Finish of with the determing the percentages
+	// Finish of with the determining the percentages
 	foreach ($top_starters as $i => $topic)
 	{
 		$top_starters[$i]['post_percent'] = round(($topic['num_topics'] * 100) / $max_num_topics);

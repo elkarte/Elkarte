@@ -1,38 +1,57 @@
 <?php
 
 /**
- * DB and general functions for working with the message index
+ * General class for setting the message icon array and returning index values
  *
  * @name      ElkArte Forum
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
- *
- * This software is a derived product, based on:
- *
- * Simple Machines Forum (SMF)
- * copyright:	2011 Simple Machines (http://www.simplemachines.org)
- * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
  * @version 1.1 dev
  *
  */
 
 if (!defined('ELK'))
+{
 	die('No access...');
+}
 
+/**
+ * Class MessageTopicIcons
+ */
 class MessageTopicIcons extends ElkArte\ValuesContainer
 {
 	const IMAGE_URL = 'images_url';
 	const DEFAULT_URL = 'default_images_url';
 
+	/**
+	 * Whether to check if the icon exists in the expected location
+	 * @var bool
+	 */
 	protected $_check = false;
+
+	/**
+	 * Theme directory path
+	 * @var string
+	 */
 	protected $_theme_dir = '';
+
+	/**
+	 * Default icon code
+	 * @var string
+	 */
 	protected $_default_icon = 'xx';
+
 	/**
 	 * This simple function returns the message topic icon array.
+	 *
+	 * @param bool|false $icon_check
+	 * @param string $theme_dir
+	 * @param string $default
 	 */
 	public function __construct($icon_check = false, $theme_dir = '', $default = 'xx')
 	{
+		// Load passed parameters to the class properties
 		$this->_check = $icon_check;
 		$this->_theme_dir = $theme_dir;
 		$this->_default_icon = $default;
@@ -40,6 +59,11 @@ class MessageTopicIcons extends ElkArte\ValuesContainer
 		$this->_loadIcons();
 	}
 
+	/**
+	 * Return the icon specified by idx, or the default icon for invalid names
+	 *
+	 * @param int|string $idx
+	 */
 	public function __get($idx)
 	{
 		if (isset($this->data[$idx]))
@@ -88,7 +112,9 @@ class MessageTopicIcons extends ElkArte\ValuesContainer
 		{
 			if ($this->_check)
 			{
-				$this->data[$icon] = $settings[file_exists($this->_theme_dir . '/images/post/' . $icon . '.png') ? MessageTopicIcons::IMAGE_URL : MessageTopicIcons::DEFAULT_URL] . '/post/' . $icon . '.png';
+				$this->data[$icon] = $settings[file_exists($this->_theme_dir . '/images/post/' . $icon . '.png')
+					? MessageTopicIcons::IMAGE_URL
+					: MessageTopicIcons::DEFAULT_URL] . '/post/' . $icon . '.png';
 			}
 			else
 			{

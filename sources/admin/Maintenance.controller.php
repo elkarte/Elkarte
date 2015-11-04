@@ -88,7 +88,6 @@ class Maintenance_Controller extends Action_Controller
 				'database' => array(),
 				'members' => array(),
 				'topics' => array(),
-				'topics' => array(),
 				'hooks' => array(),
 				'attachments' => array('label' => $txt['maintain_sub_attachments']),
 			),

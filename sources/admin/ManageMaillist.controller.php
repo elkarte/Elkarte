@@ -523,11 +523,11 @@ class ManageMaillist_Controller extends Action_Controller
 				{
 					$context['bounce_templates'][$k]['body'] = strtr($name['body'], array(
 						'{MEMBER}' => un_htmlspecialchars($temp_email[0]['name']),
-						'{SCRIPTURL}' => $scripturl, '{FORUMNAME}' => $mbname,
+						'{SCRIPTURL}' => $scripturl,
+						'{FORUMNAME}' => $mbname,
 						'{REGARDS}' => replaceBasicActionUrl($txt['regards_team']),
 						'{SUBJECT}' => $temp_email[0]['subject'],
 						'{ERROR}' => $fullerrortext,
-						'{FORUMNAME}' => $mbname,
 						'{FORUMNAMESHORT}' => (!empty($modSettings['maillist_sitename']) ? $modSettings['maillist_sitename'] : $mbname),
 						'{EMAILREGARDS}' => (!empty($modSettings['maillist_sitename_regards']) ? $modSettings['maillist_sitename_regards'] : ''),
 					));

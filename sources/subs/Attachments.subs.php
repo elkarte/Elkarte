@@ -498,7 +498,7 @@ function processAttachments($id_msg = null)
 				unlink($_FILES['attachment']['tmp_name'][$n]);
 		}
 
-		// If there were no errors to this pont, we apply some additional checks
+		// If there were no errors to this point, we apply some additional checks
 		if (empty($_SESSION['temp_attachments'][$attachID]['errors']))
 			attachmentChecks($attachID);
 

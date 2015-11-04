@@ -1600,7 +1600,7 @@ class ManageFeatures_Controller extends Action_Controller
  *
  * @todo Move to subs file
  * @todo Merge with other pause functions?
- *    pausePermsSave(), pausAttachmentMaintenance(), pauseRepairProcess()
+ *    pausePermsSave(), pauseAttachmentMaintenance(), pauseRepairProcess()
  *
  * @param int $applied_sigs
  */

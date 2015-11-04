@@ -160,7 +160,7 @@ class Sphinx_Search extends SearchAPI
 	/**
 	 * Do we have to do some work with the words we are searching for to prepare them?
 	 *
-	 * @param mixed[] $word A word to index
+	 * @param string Word(s) to index
 	 * @param mixed[] $wordsSearch The Search words
 	 * @param string[] $wordsExclude Words to exclude
 	 * @param boolean $isExcluded

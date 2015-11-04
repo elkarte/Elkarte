@@ -562,7 +562,7 @@ class PersonalMessage_Controller extends Action_Controller
 			'pmid' => isset($pmID) ? $pmID : 0,
 		), $user_info['id']);
 
-		// Make sure that we have been given a correct head pm id if we are in converstation mode
+		// Make sure that we have been given a correct head pm id if we are in conversation mode
 		if ($context['display_mode'] == 2 && !empty($pmID) && $pmID != $lastData['id'])
 		{
 			Errors::instance()->fatal_lang_error('no_access', false);
@@ -2568,7 +2568,7 @@ class PersonalMessage_Controller extends Action_Controller
 
 		if ($context['folder'] === 'inbox' && !empty($this->_search_params['advanced']) && $context['currently_using_labels'])
 		{
-			// Came here from pagination?  Put them back into $_REQUEST for sanitization.
+			// Came here from pagination?  Put them back into $_REQUEST for sanitation.
 			if (isset($this->_search_params['labels']))
 			{
 				$this->_req->post->searchlabel = explode(',', $this->_search_params['labels']);

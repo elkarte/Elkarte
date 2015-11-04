@@ -97,14 +97,14 @@ class Drafts_PersonalMessage_Module implements ElkArte\sources\modules\Module_In
 			}
 			else
 			{
-				$this->_prepareDraftsContext(user_info['id'], $pmsg);
+				$this->_prepareDraftsContext($user_info['id'], $pmsg);
 			}
 		}
 	}
 
 	public function prepare_send_context(&$editorOptions, &$recipientList)
 	{
-		global $context, $user_info, $options, $txt;
+		global $context, $options, $txt;
 
 		if (!empty($context['drafts_pm_save']) && !empty($options['drafts_autosave_enabled']))
 		{
@@ -138,6 +138,7 @@ class Drafts_PersonalMessage_Module implements ElkArte\sources\modules\Module_In
 
 			if (!isset($editorOptions['buttons']))
 				$editorOptions['buttons'] = array();
+
 			if (!isset($editorOptions['hidden_fields']))
 				$editorOptions['hidden_fields'] = array();
 
@@ -146,6 +147,7 @@ class Drafts_PersonalMessage_Module implements ElkArte\sources\modules\Module_In
 				'value' => $txt['draft_save'],
 				'options' => 'onclick="submitThisOnce(this);" accesskey="d"',
 			);
+
 			$editorOptions['hidden_fields'][] = array(
 				'name' => 'id_pm_draft',
 				'value' => empty($context['id_pm_draft']) ? 0 : $context['id_pm_draft'],

@@ -1089,7 +1089,7 @@ class ManageLanguages_Controller extends Action_Controller
 	}
 
 	/**
-	 * Load up all of the lanaguage settings
+	 * Load up all of the language settings
 	 */
 	private function _settings()
 	{

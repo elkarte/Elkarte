@@ -40,7 +40,7 @@ class Display_Controller extends Action_Controller
 
 	/**
 	 * The class that takes care of rendering the message icons (MessageTopicIcons)
-	 * @var null|object
+	 * @var null|MessageTopicIcons
 	 */
 	protected $_icon_sources = null;
 
@@ -313,7 +313,8 @@ class Display_Controller extends Action_Controller
 		$context['page_index'] = constructPageIndex($scripturl . '?topic=' . $topic . '.%1$d', $this->_start, $total_visible_posts, $context['messages_per_page'], true, array('all' => $can_show_all, 'all_selected' => isset($this->_req->query->all)));
 		$context['start'] = $this->_start;
 
-		// This is information about which page is current, and which page we're on - in case you don't like the constructed page index. (again, wireles..)
+		// This is information about which page is current, and which page we're on - in case you don't like
+		// the constructed page index. (again, wireless..)
 		$context['page_info'] = array(
 			'current_page' => $this->_start / $context['messages_per_page'] + 1,
 			'num_pages' => floor(($total_visible_posts - 1) / $context['messages_per_page']) + 1,

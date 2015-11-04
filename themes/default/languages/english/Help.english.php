@@ -667,24 +667,24 @@ $helptxt['attachmentInLine'] = '<b>Add an inline attachment</b><br />
 			<p>
 				You can choose the inline mode you want for your attachment:
 				<ul>
-					<li><u>Thumbnail [attach=x]</u> Your image will be shown as a thumbnail</li>
-					<li><u>Full-size Image [attachimg=x]</u> Your image will be shown using its full dimensions up to the viewing size allowed by the forum.  Images larger than the viewing size allowed by the forum will be displayed at the forum maximum and be click-able to full size</li>
-					<li><u>Text Link [attachurl=x]</u> Only a link is show with size and view details. By clicking on it, the image is displayed.</li>
-					<li><u>Short Text Link [attachmini=x]</u> Only a link is shown without any details. By clicking on it, the image is displayed.</li>
+					<li>Thumbnail [attach=x] : Your image will be shown as a thumbnail</li>
+					<li>Full-size Image [attachimg=x] : Your image will be shown using its full dimensions up to the viewing size allowed by the forum.  Images larger than the viewing size allowed by the forum will be displayed at the forum maximum and be click-able to full size</li>
+					<li>Text Link [attachurl=x] : Only a link is show with size and view details. By clicking on it, the image is displayed.</li>
+					<li>Short Text Link [attachmini=x] : Only a link is shown without any details. By clicking on it, the image is displayed.</li>
 				</ul>
 			</p><br />
 		<p>
 			You can choose how to align the inline image:
 			<ul>
-				<li><u>align=left</u> The image is aligned to the left and the text will flow around it</li>
-				<li><u>align=right</u> The image is aligned to the right and the text will flow around it</li>
-				<li><u>align=center</u> The image is centered and the text will be below it</li>
+				<li>align=left : The image is aligned to the left and the text will flow around it</li>
+				<li>align=right : The image is aligned to the right and the text will flow around it</li>
+				<li>align=center : The image is centered and the text will be below it</li>
 			</ul>
 		</p><br />
 		<p>
 			You can choose how wide to show the image:
 			<ul>
-				<li><u>width=123</u> The image is displayed 123pixels wide</li>
+				<li>width=123 : The image is displayed 123 pixels wide</li>
 				<li>If the width specified is larger than the image or larger than the forum allows the largest allowable width will be used</li>
 				<li>Can be used to shrink a thumbnail as well [attach=1 width=50] will display a 50px wide thumbnail
 			</ul>

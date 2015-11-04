@@ -547,7 +547,7 @@ class Auth_Controller extends Action_Controller
 		// What kind of data are we dealing with
 		$pw_strlen = strlen($user_settings['passwd']);
 
-		// Start off with none, thats safe
+		// Start off with none, that's safe
 		$other_passwords = array();
 
 		// None of the below cases will be used most of the time (because the salt is normally set.)

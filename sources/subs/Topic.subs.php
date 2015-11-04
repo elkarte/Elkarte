@@ -2541,7 +2541,6 @@ function splitTopic($split1_ID_TOPIC, $splitMessages, $new_subject)
 	require_once(SUBSDIR . '/Topic.subs.php');
 	updateSplitTopics(array(
 		'splitMessages' => $splitMessages,
-		'split2_ID_TOPIC' => $split2_ID_TOPIC,
 		'split1_replies' => $split1_replies,
 		'split1_first_msg' => $split1_first_msg,
 		'split1_last_msg' => $split1_last_msg,

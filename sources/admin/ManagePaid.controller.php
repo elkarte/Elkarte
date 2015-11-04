@@ -175,7 +175,7 @@ class ManagePaid_Controller extends Action_Controller
 					$this->_req->post->paid_email_to = $validator->validation_data('paid_email_to');
 				else
 				{
-					// Thats not an email, lets set it back in the form to be fixed and let them know its wrong
+					// That's not an email, lets set it back in the form to be fixed and let them know its wrong
 					$config_vars[1]['value'] = $this->_req->post->paid_email_to;
 					$context['error_type'] = 'minor';
 					$context['settings_message'] = array();

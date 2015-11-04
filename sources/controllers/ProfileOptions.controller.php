@@ -411,7 +411,7 @@ class ProfileOptions_Controller extends Action_Controller
 	}
 
 	/**
-	 * Allow the edit of *someone elses* personal message settings.
+	 * Allow the edit of *someone else's* personal message settings.
 	 */
 	public function action_pmprefs()
 	{

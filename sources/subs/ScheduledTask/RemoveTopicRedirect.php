@@ -39,7 +39,7 @@ class Remove_Topic_Redirect implements Scheduled_Task_Interface
 		// Init
 		$topics = array();
 
-		// We will need this for lanaguage files
+		// We will need this for language files
 		loadEssentialThemeData();
 
 		// Find all of the old MOVE topic notices that were set to expire
