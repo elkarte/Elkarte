@@ -440,7 +440,7 @@ class UpgradeInstructions_upgrade_1_1
 
 	public function fix_ipv6()
 	{
-		$columns = $this->db_list_columns('{db_prefix}log_online', true);
+		$columns = $this->table->db_list_columns('{db_prefix}log_online', true);
 
 		return array(
 			array(
