@@ -2807,9 +2807,9 @@ function template_javascript($do_defered = false)
 	// First up, load jQuery and jQuery UI
 	if (isset($modSettings['jquery_source']) && !$do_defered)
 	{
-		// Using a specified version of jquery or what was shipped 1.11.1  / 1.10.4
-		$jquery_version = (!empty($modSettings['jquery_default']) && !empty($modSettings['jquery_version'])) ? $modSettings['jquery_version'] : '1.11.1';
-		$jqueryui_version = (!empty($modSettings['jqueryui_default']) && !empty($modSettings['jqueryui_version'])) ? $modSettings['jqueryui_version'] : '1.10.4';
+		// Using a specified version of jquery or what was shipped 2.1.4  / 1.11.4
+		$jquery_version = (!empty($modSettings['jquery_default']) && !empty($modSettings['jquery_version'])) ? $modSettings['jquery_version'] : '2.1.4';
+		$jqueryui_version = (!empty($modSettings['jqueryui_default']) && !empty($modSettings['jqueryui_version'])) ? $modSettings['jqueryui_version'] : '1.11.4';
 
 		switch ($modSettings['jquery_source'])
 		{

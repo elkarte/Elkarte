@@ -13,9 +13,9 @@ function template_install_above()
 		<link rel="stylesheet" href="../themes/default/css/index.css?10RC1" />
 		<link rel="stylesheet" href="../themes/default/css/_light/index_light.css?10RC1" />
 		<link rel="stylesheet" href="../themes/default/css/install.css?10RC1" />
-		<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js" id="jquery"></script>
+		<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js" id="jquery"></script>
 		<script><!-- // --><![CDATA[
-			window.jQuery || document.write(\'<script src="../themes/default/scripts/jquery-1.11.1.min.js"><\/script>\');
+			window.jQuery || document.write(\'<script src="../themes/default/scripts/jquery-1.11.4.min.js"><\/script>\');
 			var elk_scripturl = ', JavaScriptEscape(str_replace('/install/install.php', '/index.php', $installurl)), ';
 		// ]]></script>
 		<script src="../themes/default/scripts/script.js"></script>
