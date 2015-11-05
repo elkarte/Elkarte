@@ -37,56 +37,53 @@ class TestFiles extends PHPUnit_Framework_TestCase
 		// Provide a way to skip eval of files where needed
 		$skip_files = array(BOARDDIR . '/index.php');
 
-		foreach ($dirs as $dir)
+		$directory = new RecursiveDirectoryIterator(BOARDDIR);
+		$iterator = new RecursiveIteratorIterator($directory);
+		$regex = new RegexIterator($iterator, '/^.+\.php$/i', RecursiveRegexIterator::GET_MATCH);
+
+		foreach ($regex as $fileo)
 		{
-			$directory = new RecursiveDirectoryIterator($dir);
-			$iterator = new RecursiveIteratorIterator($directory);
-			$regex = new RegexIterator($iterator, '/^.+\.php$/i', RecursiveRegexIterator::GET_MATCH);
+			$file = $fileo[0];
+			$file_content = file_get_contents($file);
 
-			foreach ($regex as $fileo)
+			// This is likely to be one of the two files emailpost.php or emailtopic.php
+			if ($file_content[0] === '#')
+				$file_content = trim(substr($file_content, strpos($file_content, "\n")));
+
+			// Check the depth.
+			$level = 0;
+			$tokens = @token_get_all($file_content);
+			foreach ($tokens as $token)
 			{
-				$file = $fileo[0];
-				$file_content = file_get_contents($file);
+				if ($token === '{')
+					$level++;
+				elseif ($token === '}')
+					$level--;
+			}
 
-				// This is likely to be one of the two files emailpost.php or emailtopic.php
-				if ($file_content[0] === '#')
-					$file_content = trim(substr($file_content, strpos($file_content, "\n")));
+			if (!empty($level))
+				$this->assertTrue($syntax_valid, empty($level));
+			// Skipping the eval of this one?
+			elseif (!in_array($file, $skip_files) && strpos($file, '/tests/') === false)
+			{
+				// Check the validity of the syntax.
+				ob_start();
+				$errorReporting = error_reporting(0);
+				$result = shell_exec(str_replace('{filename}', $file, 'php -l {filename}'));
+				error_reporting($errorReporting);
+				@ob_end_clean();
 
-				// Check the depth.
-				$level = 0;
-				$tokens = @token_get_all($file_content);
-				foreach ($tokens as $token)
+				// Did eval run without error?
+				$syntax_valid = strpos($result, 'No syntax errors') !== false;
+				if (!$syntax_valid)
 				{
-					if ($token === '{')
-						$level++;
-					elseif ($token === '}')
-						$level--;
+					$error_message = $result;
+					print_r($error_message);
 				}
+				else
+					$error_message = '';
 
-				if (!empty($level))
-					$this->assertTrue($syntax_valid, empty($level));
-				// Skipping the eval of this one?
-				elseif (!in_array($file, $skip_files) && strpos($file, '/tests/') === false)
-				{
-					// Check the validity of the syntax.
-					ob_start();
-					$errorReporting = error_reporting(0);
-					$result = shell_exec(str_replace('{filename}', $file, 'php -l {filename}'));
-					error_reporting($errorReporting);
-					@ob_end_clean();
-
-					// Did eval run without error?
-					$syntax_valid = strpos($result, 'No syntax errors') !== false;
-					if (!$syntax_valid)
-					{
-						$error_message = $result;
-						print_r($error_message);
-					}
-					else
-						$error_message = '';
-
-					$this->assertTrue($syntax_valid, $error_message);
-				}
+				$this->assertTrue($syntax_valid, $error_message);
 			}
 		}
 	}
