@@ -43,11 +43,9 @@ class TestFiles extends PHPUnit_Framework_TestCase
 			$iterator = new RecursiveIteratorIterator($directory);
 			$regex = new RegexIterator($iterator, '/^.+\.php$/i', RecursiveRegexIterator::GET_MATCH);
 
-// 			$files = glob($dir);
-
 			foreach ($regex as $fileo)
 			{
-				$file = $fileo->getRealPath();
+				$file = $fileo[0];
 				$file_content = file_get_contents($file);
 
 				// This is likely to be one of the two files emailpost.php or emailtopic.php
