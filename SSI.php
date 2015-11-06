@@ -303,7 +303,7 @@ function ssi_queryPosts($query_where = '', $query_where_params = array(), $query
 		censorText($row['subject']);
 		censorText($row['body']);
 
-		$preview = strip_tags(strtr($row['body'], array('<br />' => '&#10;')));
+		$preview = strip_tags(strtr($row['body'], array('<br>' => '&#10;')));
 
 		// Build the array.
 		$posts[] = array(
@@ -451,7 +451,7 @@ function ssi_recentTopics($num_recent = 8, $exclude_boards = null, $include_boar
 	$posts = array();
 	while ($row = $db->fetch_assoc($request))
 	{
-		$row['body'] = strip_tags(strtr(parse_bbc($row['body'], $row['smileys_enabled'], $row['id_msg']), array('<br />' => '&#10;')));
+		$row['body'] = strip_tags(strtr(parse_bbc($row['body'], $row['smileys_enabled'], $row['id_msg']), array('<br>' => '&#10;')));
 		if (Util::strlen($row['body']) > 128)
 			$row['body'] = Util::substr($row['body'], 0, 128) . '...';
 
@@ -491,7 +491,7 @@ function ssi_recentTopics($num_recent = 8, $exclude_boards = null, $include_boar
 			'new' => !empty($row['is_read']),
 			'is_new' => empty($row['is_read']),
 			'new_from' => $row['new_from'],
-			'icon' => '<img src="' . $settings[$icon_sources[$row['icon']]] . '/post/' . $row['icon'] . '.png" style="vertical-align: middle;" alt="' . $row['icon'] . '" />',
+			'icon' => '<img src="' . $settings[$icon_sources[$row['icon']]] . '/post/' . $row['icon'] . '.png" class="centericon" alt="' . $row['icon'] . '" />',
 		);
 	}
 	$db->free_result($request);
@@ -676,7 +676,7 @@ function ssi_latestMember($output_method = 'echo')
 
 	if ($output_method == 'echo')
 		echo '
-	', sprintf($txt['welcome_newest_member'], $context['common_stats']['latest_member']['link']), '<br />';
+	', sprintf($txt['welcome_newest_member'], $context['common_stats']['latest_member']['link']), '<br>';
 	else
 		return $context['common_stats']['latest_member'];
 }
@@ -808,8 +808,8 @@ function ssi_queryMembers($query_where = null, $query_where_params = array(), $q
 			<tr>
 				<td class="centertext">
 					', $query_members[$member]['link'], '
-					<br />', $query_members[$member]['blurb'], '
-					<br />', $query_members[$member]['avatar']['image'], '
+					<br>', $query_members[$member]['blurb'], '
+					<br>', $query_members[$member]['avatar']['image'], '
 				</td>
 			</tr>';
 	}
@@ -853,10 +853,10 @@ function ssi_boardStats($output_method = 'echo')
 		return $totals;
 
 	echo '
-		', $txt['total_members'], ': <a href="', $scripturl . '?action=memberlist">', comma_format($totals['members']), '</a><br />
-		', $txt['total_posts'], ': ', comma_format($totals['posts']), '<br />
-		', $txt['total_topics'], ': ', comma_format($totals['topics']), ' <br />
-		', $txt['total_cats'], ': ', comma_format($totals['categories']), '<br />
+		', $txt['total_members'], ': <a href="', $scripturl . '?action=memberlist">', comma_format($totals['members']), '</a><br>
+		', $txt['total_posts'], ': ', comma_format($totals['posts']), '<br>
+		', $txt['total_topics'], ': ', comma_format($totals['topics']), ' <br>
+		', $txt['total_cats'], ': ', comma_format($totals['categories']), '<br>
 		', $txt['total_boards'], ': ', comma_format($totals['boards']);
 }
 
@@ -903,12 +903,12 @@ function ssi_whosOnline($output_method = 'echo')
 	if (!empty($bracketList))
 		echo ' (' . implode(', ', $bracketList) . ')';
 
-	echo '<br />
+	echo '<br>
 			', implode(', ', $return['list_users_online']);
 
 	// Showing membergroups?
 	if (!empty($settings['show_group_key']) && !empty($return['membergroups']))
-		echo '<br />
+		echo '<br>
 			[' . implode(']&nbsp;&nbsp;[', $return['membergroups']) . ']';
 }
 
@@ -957,7 +957,7 @@ function ssi_login($redirect_to = '', $output_method = 'echo')
 	// Did they make a mistake last time?
 	if (!empty($context['login_errors']))
 		echo '
-			<p class="errorbox">', implode('<br />', $context['login_errors']), '</p><br />';
+			<p class="errorbox">', implode('<br>', $context['login_errors']), '</p><br>';
 
 	// Or perhaps there's some special description for this time?
 	if (isset($context['description']))
@@ -1118,8 +1118,8 @@ function ssi_recentPoll($topPollInstead = false, $output_method = 'echo')
 		$return['options'][$i] = array(
 			'id' => 'options-' . ($topPollInstead ? 'top-' : 'recent-') . $i,
 			'percent' => $bar,
-			'votes' => $option[1],
-			'bar' => '<span style="white-space: nowrap;"><img src="' . $settings['images_url'] . '/poll_' . ($context['right_to_left'] ? 'right' : 'left') . '.png" alt="" /><img src="' . $settings['images_url'] . '/poll_middle.png" style="width:' . $barWide . 'px; height:12px;" alt="-" /><img src="' . $settings['images_url'] . '/poll_' . ($context['right_to_left'] ? 'left' : 'right') . '.png" alt="" /></span>',
+			'votes' => $option[1], /* TODO: The 'bar' should really be a gradient */
+			'bar' => '<span class="nowrap"><img src="' . $settings['images_url'] . '/poll_' . ($context['right_to_left'] ? 'right' : 'left') . '.png" alt="" /><img src="' . $settings['images_url'] . '/poll_middle.png" style="width:' . $barWide . 'px; height:12px;" alt="-" /><img src="' . $settings['images_url'] . '/poll_' . ($context['right_to_left'] ? 'left' : 'right') . '.png" alt="" /></span>',
 			'option' => parse_bbc($option[0]),
 			'vote_button' => '<input type="' . ($row['max_votes'] > 1 ? 'checkbox' : 'radio') . '" name="options[]" id="options-' . ($topPollInstead ? 'top-' : 'recent-') . $i . '" value="' . $i . '" class="input_' . ($row['max_votes'] > 1 ? 'check' : 'radio') . '" />'
 		);
@@ -1134,12 +1134,12 @@ function ssi_recentPoll($topPollInstead = false, $output_method = 'echo')
 	{
 		echo '
 		<form class="ssi_poll" action="', $boardurl, '/SSI.php?ssi_function=pollVote" method="post" accept-charset="UTF-8">
-			<strong>', $return['question'], '</strong><br />
-			', !empty($return['allowed_warning']) ? $return['allowed_warning'] . '<br />' : '';
+			<strong>', $return['question'], '</strong><br>
+			', !empty($return['allowed_warning']) ? $return['allowed_warning'] . '<br>' : '';
 
 		foreach ($return['options'] as $option)
 			echo '
-			<label for="', $option['id'], '">', $option['vote_button'], ' ', $option['option'], '</label><br />';
+			<label for="', $option['id'], '">', $option['vote_button'], ' ', $option['option'], '</label><br>';
 
 		echo '
 			<input type="submit" value="', $txt['poll_vote'], '" />
@@ -1443,7 +1443,7 @@ function ssi_todaysEvents($output_method = 'echo')
 	{
 		if ($event['can_edit'])
 			echo '
-	<a href="' . $event['modify_href'] . '" style="color: #ff0000;">*</a> ';
+	<a href="' . $event['modify_href'] . '" class="moderation_link">*</a> ';
 		echo '
 	' . $event['link'] . (!$event['is_last'] ? ', ' : '');
 	}
@@ -1475,7 +1475,7 @@ function ssi_todaysCalendar($output_method = 'echo')
 
 	if (!empty($return['calendar_holidays']))
 		echo '
-			<span class="holiday">' . $txt['calendar_prompt'] . ' ' . implode(', ', $return['calendar_holidays']) . '<br /></span>';
+			<span class="holiday">' . $txt['calendar_prompt'] . ' ' . implode(', ', $return['calendar_holidays']) . '<br></span>';
 
 	if (!empty($return['calendar_birthdays']))
 	{
@@ -1485,7 +1485,7 @@ function ssi_todaysCalendar($output_method = 'echo')
 			echo '
 			<a href="', $scripturl, '?action=profile;u=', $member['id'], '">', $member['name'], isset($member['age']) ? ' (' . $member['age'] . ')' : '', '</a>', !$member['is_last'] ? ', ' : '';
 		echo '
-			<br />';
+			<br>';
 	}
 
 	if (!empty($return['calendar_events']))
@@ -1496,7 +1496,7 @@ function ssi_todaysCalendar($output_method = 'echo')
 		{
 			if ($event['can_edit'])
 				echo '
-			<a href="' . $event['modify_href'] . '" style="color: #ff0000;">*</a> ';
+			<a href="' . $event['modify_href'] . '" class="moderation_link">*</a> ';
 			echo '
 			' . $event['link'] . (!$event['is_last'] ? ', ' : '');
 		}
@@ -1649,13 +1649,13 @@ function ssi_boardNews($board = null, $limit = null, $start = null, $length = nu
 					<a href="', $news['href'], '">', $news['subject'], '</a>
 				</h3>
 				<div class="news_timestamp">', $news['time'], ' ', $txt['by'], ' ', $news['poster']['link'], '</div>
-				<div class="news_body" style="padding: 2ex 0;">', $news['body'], '</div>
+				<div class="news_body">', $news['body'], '</div>
 				', $news['link'], $news['locked'] ? '' : ' | ' . $news['comment_link'], '
 			</div>';
 
 		if (!$news['is_last'])
 			echo '
-			<hr />';
+			<hr>';
 	}
 }
 
@@ -1710,7 +1710,7 @@ function ssi_recentEvents($max_events = 7, $output_method = 'echo')
 		{
 			if ($event['can_edit'])
 				echo '
-				<a href="' . $event['modify_href'] . '" style="color: #ff0000;">*</a> ';
+				<a href="' . $event['modify_href'] . '" class="moderation_link">*</a> ';
 
 			echo '
 				' . $event['link'] . (!$event['is_last'] ? ', ' : '');

@@ -51,10 +51,10 @@ foreach (array('db_character_set', 'cachedir') as $variable)
 		unset($GLOBALS[$variable], $GLOBALS[$variable]);
 
 // Where the Settings.php file is located
-$settings_loc = __DIR__ . '/Settings.php';
+$settings_loc = 'Settings.php';
 
 // First thing: if the install dir exists, just send anybody there
-if (file_exists(__DIR__ . '/install'))
+if (file_exists('install'))
 {
 	if (file_exists($settings_loc))
 	{
@@ -75,7 +75,7 @@ else
 
 
 // Make sure the paths are correct... at least try to fix them.
-if (!file_exists($boarddir) && file_exists(__DIR__ . '/agreement.txt'))
+if (!file_exists($boarddir) && file_exists('agreement.txt'))
 	$boarddir = __DIR__;
 if (!file_exists($sourcedir . '/SiteDispatcher.class.php') && file_exists($boarddir . '/sources'))
 	$sourcedir = $boarddir . '/sources';
