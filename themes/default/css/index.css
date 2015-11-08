@@ -2579,60 +2579,60 @@ img.new_posts {
 
 /* Poor Mans lightbox support */
 #elk_lightbox {
-	background: rgba(0, 0, 0, .5);
 	position: fixed;
 	top: 0;
 	right: 0;
 	bottom: 0;
 	left: 0;
 	z-index: 100;
-	text-align: center;
 	overflow: hidden;
+	background: rgba(0, 0, 0, .5);
+	text-align: center;
 	white-space: nowrap;
 	cursor: pointer;
 }
 
 #elk_lightbox:before {
-	content: '';
 	display: inline-block;
-	height: 100%;
-	vertical-align: middle;
 	margin-right: -0.25em;
+	height: 100%;
+	content: '';
+	vertical-align: middle;
 }
 
 #elk_lb_content {
+	position: relative;
 	display: inline-block;
+	margin-right: 5%;
+	margin-left: 5%;
 	padding: 20px;
 	min-width: 30%;
-	margin-left: 5%;
-	margin-right: 5%;
 	white-space: normal;
-	position: relative;
 }
 
 #elk_lb_content div {
 	position: fixed;
-	left: 50%;
 	top: 50%;
+	left: 50%;
 }
 
 #elk_lb_content.expand {
 	overflow: auto;
-	padding: 0;
 	margin-top: 20px;
+	padding: 0;
 	border: 1px solid #fff;
 }
 
 #elk_lb_expand {
+	position: absolute;
+	top: 1%;
+	right: 1%;
 	display: inline-block;
 	width: 1.15em;
 	height: 1.15em;
 	border: 2px solid #CCCCCC;
 	border-radius: 4px;
 	line-height: 1em;
-	position: absolute;
-	top: 1%;
-	right: 1%;
 }
 
 #elk_lb_expand:before {
@@ -4594,252 +4594,57 @@ a.help .icon {
 	width: 100%;
 }
 
-.like_post_stats_menu {
-	position: relative;
-	overflow: hidden;
-	margin: 10px 0 15px;
-}
-
-.like_post_stats_data {
-	position: relative;
-	overflow: hidden;
-	width: 100%;
-}
-
 .like_post_stats_data .individual_data {
 	display: none;
 }
 
 #like_post_stats_overlay {
-	position: absolute;
+	position: fixed;
 	top: 0;
+	right: 0;
+	bottom: 0;
 	left: 0;
 	z-index: 100;
-	display: none;
-	width: 100%;
+	background: rgba(0, 0, 0, .5);
+	text-align: center;
+}
+
+#like_post_stats_overlay:before {
+	display: inline-block;
+	margin-right: -0.25em;
 	height: 100%;
-	background: rgba(255, 255, 255, 0.5);
+	content: '';
+	vertical-align: middle;
 }
 
 #lp_preloader {
-	position: absolute;
-	top: 50%;
-	left: 50%;
-	z-index: 101;
-	display: none;
-	margin-top: -50px;
-	margin-left: -50px;
-	width: 100px;
-	height: 100px;
-	background-image: url(../images/preloader.gif);
-	background-position: center center;
-	background-size: 100% auto;
-	background-repeat: no-repeat;
-}
-
-.like_post_stats_error {
 	position: relative;
-	float: left;
-	overflow: hidden;
-	padding: 10px 20px;
-	width: 94%;
-	background-color: #E7EAEF;
-	color: #000000;
-	font-size: 14px;
+	white-space: normal;
 }
 
-.like_post_message_data, .like_post_topic_data, .like_post_board_data,
-.like_post_most_liked_user_data, .like_post_most_likes_given_user_data {
-	position: relative;
-	float: left;
-	overflow: hidden;
-	padding: 10px 2%;
-	width: 94%;
-	color: #000000;
+.like_stats_avatar {
+	min-width: 6em;
 }
 
-.like_post_message_data .message_title, .like_post_topic_data .topic_title,
-.like_post_board_data .board_title {
-	position: relative;
-	float: left;
-	overflow: hidden;
-	width: 100%;
-	font-size: 15px;
-	line-height: normal;
+.like_stats_details {
+	min-width: 15em;
+	vertical-align: top;
 }
 
-/*Specific to message data tile*/
-.like_post_message_data .poster_avatar,
-.like_post_most_liked_user_data .poster_avatar,
-.like_post_most_likes_given_user_data .poster_avatar {
-	float: left;
-	margin: 20px 0;
-	width: 100px;
-	height: 100px;
-	border: 5px solid #FFFFFF;
-	border-radius: 10px;
-	box-shadow: 0 0 10px 1px #777777;
+.like_stats_subject {
+	vertical-align: top;
 }
 
-.like_post_message_data .poster_avatar .avatar,
-.like_post_most_liked_user_data .poster_avatar .avatar,
-.like_post_most_likes_given_user_data .poster_avatar .avatar {
-	width: 100px;
-	height: 100px;
+.like_stats_likers, .like_stats_subject, .like_stats_details, #lp_preloader {
+	display: inline-block;
+}
+
+.like_stats_likers img, .like_stats_small_avatar {
+	max-width: 40px;
 	border-radius: 5px;
-	background-position: center center;
-	background-size: 100% 100%;
-	background-repeat: no-repeat;
+	vertical-align: middle;
 }
 
-.like_post_message_data .poster_data,
-.like_post_most_liked_user_data .poster_data,
-.like_post_most_likes_given_user_data .poster_data {
-	position: relative;
-	float: left;
-	overflow: hidden;
-	margin: 20px 0;
-}
-
-.like_post_message_data .poster_data .poster_details,
-.like_post_most_liked_user_data .poster_data .poster_details,
-.like_post_most_likes_given_user_data .poster_data .poster_details {
-	position: relative;
-	float: left;
-	margin: 0 0 5px 20px;
-	width: 100%;
-}
-
-.like_post_message_data .poster_data a.poster_details,
-.like_post_most_liked_user_data .poster_data a.poster_details,
-.like_post_most_likes_given_user_data .poster_data a.poster_details {
-	margin: 10px 0 10px 20px;
-}
-
-.like_post_message_data .users_liked {
-	position: relative;
-	clear: both;
-	overflow: hidden;
-	width: 100%;
-}
-
-.like_post_message_data .users_liked .poster_details {
-	position: relative;
-	float: left;
-	margin: 0 10px 15px;
-	text-decoration: none;
-}
-
-.like_post_message_data .users_liked .title {
-	margin: 15px 0 15px 15px;
-	font-size: 15px;
-}
-
-.like_post_message_data .users_liked .poster_details .poster_avatar {
-	margin: 0;
-	width: 50px;
-	height: 50px;
-	border: 3px solid #FFFFFF;
-	border-radius: 5px;
-	background-position: center center;
-	background-size: 100% 100%;
-	background-repeat: no-repeat;
-}
-
-/*specific to topic data tile*/
-.like_post_topic_data .topic_info {
-	position: relative;
-	float: left;
-	overflow: hidden;
-	margin: 7px 0 15px;
-	padding: 0;
-	width: 100%;
-}
-
-.like_post_topic_data .message_body, .like_post_board_data .message_body,
-.like_post_most_liked_user_data .message_body,
-.like_post_most_likes_given_user_data .message_body {
-	position: relative;
-	float: left;
-	margin: 0 0 10px;
-	padding: 30px 10px 5px;
-	width: 99%;
-	border: 1px solid #C4C4C4;
-	background: #FFFFFF;
-}
-
-.like_post_topic_data .message_body .poster_details,
-.like_post_board_data .message_body .poster_details {
-	position: relative;
-	float: left;
-	margin: 10px 10px 10px 0;
-	border: 5px solid #FFFFFF;
-	border-radius: 5px;
-	box-shadow: 0 0 4px 2px #C4C4C4;
-	text-decoration: none;
-}
-
-.like_post_topic_data .message_body .poster_details .poster_avatar,
-.like_post_board_data .message_body .poster_details .poster_avatar {
-	margin: 0;
-	width: 50px;
-	height: 50px;
-	border-radius: 5px;
-	background-position: center center;
-	background-size: 100% 100%;
-	background-repeat: no-repeat;
-}
-
-.like_post_topic_data .message_body .posted_at,
-.like_post_board_data .message_body .posted_at,
-.like_post_most_liked_user_data .posted_at,
-.like_post_most_likes_given_user_data .posted_at {
-	position: absolute;
-	top: 0;
-	left: 0;
-	padding: 3px;
-	border: 1px solid #C4C4C4;
-	border-top: none;
-	border-left: none;
-	background: #C4C4C4;
-	box-shadow: 0 0 2px 1px #8D9EC0;
-}
-
-.content_encapsulate {
-	margin: 10px 0;
-}
-
-.like_post_topic_data .message_body .read_more,
-.like_post_board_data .message_body .read_more,
-.like_post_most_liked_user_data .read_more,
-.like_post_most_likes_given_user_data .read_more {
-	position: absolute;
-	right: 10px;
-	bottom: 10px;
-	margin: 5px 0 0 10px;
-	padding: 0 3px;
-	background: #E5E5E5;
-}
-
-/*specific to board stats tab*/
-.like_post_board_data .board_info {
-	position: relative;
-	float: left;
-	overflow: hidden;
-	margin: 15px 0 0;
-	padding: 0;
-	width: 100%;
-}
-
-.like_post_most_liked_user_data .generic_text,
-.like_post_most_likes_given_user_data .generic_text {
-	position: relative;
-	float: left;
-	margin: 20px 0 30px;
-	width: 100%;
-	font-size: 20px;
-	line-height: normal;
-}
 
 /* ------------------------------------------------------- */
 /*	$MEDIA                                                 */
