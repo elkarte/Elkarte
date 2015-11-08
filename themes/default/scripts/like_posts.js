@@ -15,10 +15,10 @@
 /**
  * Simply invoke the constructor by calling likePosts with init method
  */
-(function() {
+(function () {
 	function likePosts() {}
 
-	likePosts.prototype = function() {
+	likePosts.prototype = function () {
 		var oTxt = {},
 
 			/**
@@ -26,7 +26,7 @@
 			 * likePosts.prototype.init(params)
 			 * currently passing the text from php
 			 */
-			init = function(params) {
+			init = function (params) {
 				oTxt = params.oTxt;
 			},
 
@@ -34,7 +34,7 @@
 			 * This is bound to a click event on the page like/unlike buttons
 			 * likePosts.prototype.likeUnlikePosts(event, messageID, topidID)
 			 */
-			likeUnlikePosts = function(e, mId, tId) {
+			likeUnlikePosts = function (e, mId, tId) {
 				var messageId = parseInt(mId, 10),
 					topicId = parseInt(tId, 10),
 					subAction = '',
@@ -44,8 +44,7 @@
 					return false;
 
 				// Set the subAction to what they are doing
-				if (check.indexOf('unlike_button') >= 0)
-				{
+				if (check.indexOf('unlike_button') >= 0) {
 					if (!confirm(likemsg_are_you_sure))
 						return;
 
@@ -62,13 +61,13 @@
 
 				// Make the ajax call to the likes system
 				$.ajax({
-					url: elk_scripturl + '?action=likes;sa=' + subAction + ';xml;api=json;' + elk_session_var + '=' + elk_session_id,
-					type: 'POST',
-					dataType: 'json',
-					data: values,
-					cache: false
-				})
-					.done(function(resp) {
+						url: elk_scripturl + '?action=likes;sa=' + subAction + ';xml;api=json;' + elk_session_var + '=' + elk_session_id,
+						type: 'POST',
+						dataType: 'json',
+						data: values,
+						cache: false
+					})
+					.done(function (resp) {
 						// json response from the server says success?
 						if (resp.result === true) {
 							// Update the page with the new likes information
@@ -84,7 +83,7 @@
 						else
 							handleError(resp);
 					})
-					.fail(function(err, textStatus, errorThrown) {
+					.fail(function (err, textStatus, errorThrown) {
 						// Some failure sending the request, this generally means some html in
 						// the output from php error or access denied fatal errors etc
 						err.data = oTxt.error_occurred + ' : ' + errorThrown;
@@ -97,7 +96,7 @@
 			 *
 			 * @param {object} params object of new values from the ajax request
 			 */
-			updateUi = function(params) {
+			updateUi = function (params) {
 				var currentClass = (params.action === 'unlikepost') ? 'unlike_button' : 'like_button',
 					nextClass = (params.action === 'unlikepost') ? 'like_button' : 'unlike_button';
 
@@ -126,8 +125,9 @@
 			 *
 			 * @param {type} params
 			 */
-			handleError = function(params) {
+			handleError = function (params) {
 				var str = '<div class="floating_error"><div class="error_heading">' + oTxt.likeHeadingError + '</div><p class="error_msg">' + params.data + '</p><p class="error_btn">' + oTxt.btnText + '</p></div>';
+
 				$('body').append(str);
 
 				var screenWidth = $(window).width(),
@@ -152,7 +152,7 @@
 			 *
 			 * @param {type} e
 			 */
-			removeOverlay = function(e) {
+			removeOverlay = function (e) {
 				if (typeof(e) === 'undefined')
 					return false;
 				else if ((e.type === 'keyup' && e.keyCode === 27) || e.type === 'click') {
@@ -176,14 +176,15 @@
 	// Class for like posts stats
 	function likePostStats() {}
 
-	likePostStats.prototype = function() {
+	likePostStats.prototype = function () {
 		var currentUrlFrag = null,
 			allowedUrls = {},
 			tabsVisitedCurrentSession = {},
 			defaultHash = 'messagestats',
 			txtStrings = {},
 
-			init = function(params) {
+			// Initialize, load in text strings, etc
+			init = function (params) {
 				txtStrings = $.extend({}, params.txtStrings);
 				allowedUrls = {
 					'messagestats': {
@@ -202,207 +203,361 @@
 						'uiFunc': showMostLikesGivenUserStats
 					}
 				};
+
 				checkUrl();
 			},
 
-			showSpinnerOverlay = function() {
+			// Show the ajax spinner
+			showSpinnerOverlay = function () {
+				$('<div id="lp_preloader"><i class="fa fa-spinner fa-spin fa-4x"></i><div>').appendTo('#like_post_stats_overlay');
 				$('#like_post_stats_overlay').show();
-				$('#lp_preloader').show();
 			},
 
-			hideSpinnerOverlay = function() {
-				$('#lp_preloader').hide();
+			// Hide the ajax spinner
+			hideSpinnerOverlay = function () {
+				$('#lp_preloader').remove();
 				$('#like_post_stats_overlay').hide();
 			},
 
-			highlightActiveTab = function() {
+			// Set the active tab
+			highlightActiveTab = function () {
 				$('.like_post_stats_menu a').removeClass('active');
-				$('.like_post_stats_menu #' + currentUrlFrag).addClass('active');
+				$('#' + currentUrlFrag).addClass('active');
 			},
 
-			checkUrl = function(url) {
+			checkUrl = function (url) {
+				// Busy doing something
 				showSpinnerOverlay();
 
-				$(".message_title").off('mouseenter mousemove mouseout');
+				// Not tab sent, use the current hash
 				if (typeof(url) === 'undefined' || url === '') {
 					var currentHref = window.location.href.split('#');
+
 					currentUrlFrag = (typeof(currentHref[1]) !== 'undefined') ? currentHref[1] : defaultHash;
-				} else {
+				}
+				else {
 					currentUrlFrag = url;
 				}
 
+				// Ensure this is a valid hash value for our like tabs, otherwise set a default
 				if (allowedUrls.hasOwnProperty(currentUrlFrag) === false) {
 					currentUrlFrag = defaultHash;
 				}
 
+				// Hide whatever is there
 				$('.like_post_stats_data').children().hide();
 				highlightActiveTab();
+
+				// If we have not loaded this tabs data, then fetch it
 				if (tabsVisitedCurrentSession.hasOwnProperty(currentUrlFrag) === false) {
 					getDataFromServer({
 						'url': currentUrlFrag,
 						'uiFunc': allowedUrls[currentUrlFrag].uiFunc
 					});
-				} else {
+				}
+				else {
 					allowedUrls[currentUrlFrag].uiFunc();
 				}
 			},
 
-			getDataFromServer = function(params) {
+			// Fetch specific tab data via ajax from the server
+			getDataFromServer = function (params) {
 				$('.like_post_stats_error').hide().html('');
 
 				// Make the ajax call to the likes system
 				$.ajax({
-					url: elk_scripturl + '?action=likes;sa=likestats;area=' + params.url + ';xml;api=json;',
-					type: 'POST',
-					dataType: 'json',
-					cache: false
-				}).done(function(resp) {
-
-					if (typeof(resp.error) !== 'undefined' && resp.error !== '') {
-						genericErrorMessage({
-							errorMsg: resp.error
-						});
-					} else if (typeof(resp.data) !== 'undefined' && typeof(resp.data.noDataMessage) !== 'undefined' && resp.data.noDataMessage !== '') {
-						genericErrorMessage({
-							errorMsg: resp.data.noDataMessage
-						});
-					} else if (resp.result === true) {
-						tabsVisitedCurrentSession[currentUrlFrag] = resp.data;
-						params.uiFunc();
-					} else {
-						genericErrorMessage(resp);
-					}
-				}).fail(function(err, textStatus, errorThrown) {
-					// Some failure sending the request, this generally means some html in
-					// the output from php error or access denied fatal errors etc
-					// err.data = oTxt.error_occurred + ' : ' + errorThrown;
-					// handleError(err);
-					console.log('fail');
-					console.log(err, textStatus, errorThrown);
-				});
+						url: elk_scripturl + '?action=likes;sa=likestats;area=' + params.url + ';xml;api=json;',
+						type: 'POST',
+						dataType: 'json',
+						cache: false
+					})
+					.done(function (resp) {
+						if (typeof(resp.error) !== 'undefined' && resp.error !== '') {
+							genericErrorMessage({
+								errorMsg: resp.error
+							});
+						}
+						else if (typeof(resp.data) !== 'undefined' && typeof(resp.data.noDataMessage) !== 'undefined' && resp.data.noDataMessage !== '') {
+							genericErrorMessage({
+								errorMsg: resp.data.noDataMessage
+							});
+						}
+						else if (resp.result === true) {
+							tabsVisitedCurrentSession[currentUrlFrag] = resp.data;
+							params.uiFunc();
+						}
+						else {
+							genericErrorMessage(resp);
+						}
+					})
+					.fail(function (err, textStatus, errorThrown) {
+						// Some failure sending the request, this generally means some html in
+						// the output from php error or access denied fatal errors etc
+						// err.data = oTxt.error_occurred + ' : ' + errorThrown;
+						// handleError(err);
+						if ('console' in window) {
+							window.console.info('fail');
+							window.console.info(err, textStatus, errorThrown);
+						}
+					});
 			},
 
-			showMessageStats = function() {
+			// Show the most liked messages
+			showMessageStats = function () {
 				var data = tabsVisitedCurrentSession[currentUrlFrag],
 					htmlContent = '',
-					messageUrl = elk_scripturl + '?topic=' + data.id_topic + '.msg' + data.id_msg,
+					messageUrl = '',
 					$like_post_message_data = $('.like_post_message_data');
 
+				// Clear anything that was in place
 				$like_post_message_data.html('');
-				htmlContent += '<a class="message_title" href="' + messageUrl + '">' + txtStrings.topic + ': ' + data.subject + '</a>' + '<span class="hide">' + data.body + '</span>';
 
-				htmlContent += '<div class="poster_avatar"><div class="avatar" style="background-image: url(' + encodeURI(data.member_received.avatar) + ')"></div></div>' + '<div class="poster_data">' + '<a class="poster_details" href="' + data.member_received.href + '" style="font-size: 20px;">' + data.member_received.name + '</a>' + '<div class="poster_details">' + txtStrings.totalPosts + ': ' + data.member_received.total_posts + '</div>' + '</div>';
+				// Build the new html to add to the page
+				for (var i = 0, len = data.length; i < len; i++) {
+					messageUrl = elk_scripturl + '?topic=' + data[i].id_topic + '.msg' + data[i].id_msg;
 
-				htmlContent += '<div class="users_liked">';
-				htmlContent += '<p class="title">' + data.member_liked_data.length + ' ' + txtStrings.usersWhoLiked + '</p>';
-				for (var i = 0, len = data.member_liked_data.length; i < len; i++) {
-					htmlContent += '<a class="poster_details" href="' + data.member_liked_data[i].href + '"><div class="poster_avatar" style="background-image: url(' + encodeURI(data.member_liked_data[i].avatar) + ')" title="' + data.member_liked_data[i].real_name + '"></div></a>';
+					htmlContent += '' +
+						'<div class="content forumposts">' +
+						'   <div class="like_stats_avatar">' +
+						'       <img class="avatar avatarresize" alt="" src="' + encodeURI(data[i].member_received.avatar) + '" />' +
+						'   </div>' +
+						'   <div class="like_stats_details">' +
+						'       <a class="poster_details largetext" href="' + data[i].member_received.href + '">' + data[i].member_received.name + '</a>' +
+						'       <div class="poster_details">' + txtStrings.totalPosts + ': ' + data[i].member_received.total_posts + '</div>' +
+						'   </div>' +
+						'   <div class="like_stats_subject largetext">' +
+						'      <a class="message_title" title="' + data[i].preview + '" href="' + messageUrl + '">' + txtStrings.topic + ': ' + data[i].subject + '</a>' +
+						'   </div>' +
+						'   <div class="separator"></div>' +
+						'   <div class="well">' +
+						'       <p>' + data[i].member_liked_data.length + ' ' + txtStrings.usersWhoLiked + '</p>';
+
+					// All the members that liked this masterpiece of internet jibba jabba
+					for (var j = 0, likerslen = data[i].member_liked_data.length; j < likerslen; j++) {
+						htmlContent += '' +
+							'   <div class="like_stats_likers">' +
+							'       <a href="' + data[i].member_liked_data[j].href + '">' +
+							'           <img class="avatar" alt="" src="' + encodeURI(data[i].member_liked_data[j].avatar) + '" title="' + data[i].member_liked_data[j].real_name + '"/>' +
+							'       </a> ' +
+							'   </div>';
+
+					}
+
+					htmlContent += '' +
+						'   </div>' +
+						'</div>';
 				}
-				htmlContent += '</div>';
 
-				$('#like_post_current_tab').text(txtStrings.mostLikedMessage);
+				// Set the category header div (below the tabs) text
+				$('#like_post_current_tab_desc').text(txtStrings.mostLikedMessage);
+
+				// Show the htmlContent we built
 				$like_post_message_data.append(htmlContent).show();
-				$(".message_title").on('mouseenter', function(e) {
-					e.preventDefault();
-					var currText = $(this).next().html();
 
-					$("<div class=\'subject_details\'></div>").html(currText).appendTo("body").fadeIn("slow");
-				}).on('mouseout', function() {
-					$(".subject_details").fadeOut("slow", function() {$(this).remove();});
-				}).on('mousemove', function(e) {
-					var mousex = e.pageX + 20,
-						mousey = e.pageY + 10,
-						width = $("#wrapper").width() - mousex - 50;
+				// Hover subject link to show message body preview
+				$('.message_title').SiteTooltip({hoverIntent: {sensitivity: 10, interval: 150, timeout: 50}});
 
-					$(".subject_details").css({
-						top: mousey,
-						left: mousex,
-						width: width + "px"
-					});
-				});
+				// All done
 				hideSpinnerOverlay();
 			},
 
-			showTopicStats = function() {
+			// The most liked Topics !
+			showTopicStats = function () {
 				var data = tabsVisitedCurrentSession[currentUrlFrag],
+					topicUrl ='',
+					msgUrl = '',
 					htmlContent = '',
-					topicUrl = elk_scripturl + '?topic=' + data.id_topic,
 					$like_post_topic_data = $('.like_post_topic_data');
 
+				// Clear the area
 				$like_post_topic_data.html('');
-				htmlContent += '<a class="topic_title" href="' + topicUrl + '">' + txtStrings.mostPopularTopicHeading1 + ' ' + data.like_count + ' ' + txtStrings.genricHeading1 + '</a>';
-				htmlContent += '<p class="topic_info">' + txtStrings.mostPopularTopicSubHeading1 + ' ' + data.msg_data.length + ' ' + txtStrings.mostPopularTopicSubHeading2 + '</p>';
 
-				for (var i = 0, len = data.msg_data.length; i < len; i++) {
-					var msgUrl = topicUrl + '.msg' + data.msg_data[i].id_msg;
+				// For each of the top X topics, output the info
+				for (var i = 0, len = data.length; i < len; i++) {
+					topicUrl = elk_scripturl + '?topic=' + data[i].id_topic;
 
-					htmlContent += '<div class="message_body">' + '<div class="posted_at">' + data.msg_data[i].member.name + ' : ' + txtStrings.postedAt + ' ' + data.msg_data[i].html_time + '</div> ' + '<a class="poster_details" href="' + data.msg_data[i].member.href + '"><div class="poster_avatar" style="background-image: url(' + encodeURI(data.msg_data[i].member.avatar) + ')"></div></a><div class="content_encapsulate">' + data.msg_data[i].body + '</div><a class="read_more" href="' + msgUrl + '">' + txtStrings.readMore + '</a>' + '</div>';
+					// Start with the topic info
+					htmlContent += '' +
+						'<div class="content forumposts">' +
+						'   <a class="largetext" href="' + topicUrl + '">' + data[i].msg_data[0].subject + '</a> ' + txtStrings.mostPopularTopicHeading1 + ' ' +  data[i].like_count + ' ' + txtStrings.genricHeading1 +
+						'    <p>' + txtStrings.mostPopularTopicSubHeading1 + ' ' +  data[i].msg_data.length + ' ' + txtStrings.mostPopularTopicSubHeading2 + '</p>' +
+						'</div>';
+
+					// Posts from the topic itself
+					for (var j = 0, topiclen =  data[i].msg_data.length; j < topiclen; j++) {
+						msgUrl = topicUrl + '.msg' +  data[i].msg_data[j].id_msg;
+
+						htmlContent += '' +
+						'<div class="content forumposts">' +
+							'<div class="topic_details">' +
+							'	<img class="like_stats_small_avatar" alt="" src="' + encodeURI( data[i].msg_data[j].member.avatar) + '"/>' +
+							'   <h5 class="like_stats_likers">' +
+									data[i].msg_data[j].member.name + ' : ' + txtStrings.postedAt + ' ' +  data[i].msg_data[j].html_time +
+							'   </h5>' +
+							'</div>' +
+							'<div class="inner">' +  data[i].msg_data[j].body + '</div>' +
+							'<a class="linkbutton floatright" href="' + msgUrl + '">' + txtStrings.readMore + '</a>' +
+						'</div>';
+					}
 				}
-				$('#like_post_current_tab').text(txtStrings.mostLikedTopic);
+
+				// Load and show the content
+				$('#like_post_current_tab_desc').text(txtStrings.mostLikedTopic);
 				$like_post_topic_data.html(htmlContent).show();
+
+				// All done with this request
 				hideSpinnerOverlay();
 			},
 
-			showBoardStats = function(response) {
+			// The single most liked board, like ever
+			showBoardStats = function (response) {
 				var data = tabsVisitedCurrentSession[currentUrlFrag],
-					htmlContent = '',
 					boardUrl = elk_scripturl + '?board=' + data.id_board,
 					$like_post_board_data = $('.like_post_board_data');
 
+				// Start off clean
 				$like_post_board_data.html('');
-				htmlContent += '<a class="board_title" href="' + boardUrl + '">' + data.name + ' ' + txtStrings.mostPopularBoardHeading1 + ' ' + data.like_count + ' ' + txtStrings.genricHeading1 + '</a>';
-				htmlContent += '<p class="board_info">' + txtStrings.mostPopularBoardSubHeading1 + ' ' + data.num_topics + ' ' + txtStrings.mostPopularBoardSubHeading2 + ' ' + data.topics_liked + ' ' + txtStrings.mostPopularBoardSubHeading3 + '</p>';
-				htmlContent += '<p class="board_info" style="margin: 5px 0 20px;">' + txtStrings.mostPopularBoardSubHeading4 + ' ' + data.num_posts + ' ' + txtStrings.mostPopularBoardSubHeading5 + ' ' + data.msgs_liked + ' ' + txtStrings.mostPopularBoardSubHeading6 + '</p>';
 
+				// First a bit about the board
+				var htmlContent = '' +
+					'<div class="content forumposts">' +
+					'	<p>' +
+					'       <a class="largetext" href="' + boardUrl + '">' + data.name + '</a> ' + txtStrings.mostPopularBoardHeading1 + ' ' + data.like_count + ' ' + txtStrings.genricHeading1 +
+					'   </p>' +
+					'   <p>' +
+							txtStrings.mostPopularBoardSubHeading1 + ' ' + data.num_topics + ' ' + txtStrings.mostPopularBoardSubHeading2 + ' ' + data.topics_liked + ' ' + txtStrings.mostPopularBoardSubHeading3 +
+					'   </p>' +
+					'   <p>' +
+							txtStrings.mostPopularBoardSubHeading4 + ' ' + data.num_posts + ' ' + txtStrings.mostPopularBoardSubHeading5 + ' ' + data.msgs_liked + ' ' + txtStrings.mostPopularBoardSubHeading6 +
+					'   </p>' +
+					'</div>';
+
+				// And show some of the topics from it
 				for (var i = 0, len = data.topic_data.length; i < len; i++) {
 					var topicUrl = elk_scripturl + '?topic=' + data.topic_data[i].id_topic;
 
-					htmlContent += '<div class="message_body">' + '<div class="posted_at">' + data.topic_data[i].member.name + ' : ' + txtStrings.postedAt + ' ' + data.topic_data[i].html_time + '</div> ' + '<a class="poster_details" href="' + data.topic_data[i].member.href + '"><div class="poster_avatar" style="background-image: url(' + encodeURI(data.topic_data[i].member.avatar) + ')"></div></a><div class="content_encapsulate">' + data.topic_data[i].body + '</div><a class="read_more" href="' + topicUrl + '">' + txtStrings.readMore + '</a></div>';
+					htmlContent += '' +
+					'<div class="content forumposts">' +
+					'	<div class="topic_details">' +
+					'	    <img class="like_stats_small_avatar" alt="" src="' + encodeURI( data.topic_data[i].member.avatar) + '"/>' +
+					'       <h5 class="like_stats_likers">' +
+					'           <a href="' + data.topic_data[i].member.href + '">' +
+									data.topic_data[i].member.name +
+					'           </a> : ' + txtStrings.postedAt + ' ' + data.topic_data[i].html_time +
+					'       </h5>' +
+					'   </div>' +
+					'   <div class="inner">' + data.topic_data[i].body + '</div>' +
+					'   <a class="linkbutton floatright" href="' + topicUrl + '">' + txtStrings.readMore + '</a>' +
+					'</div>';
 				}
-				$('#like_post_current_tab').text(txtStrings.mostLikedBoard);
+
+				// Load and show
+				$('#like_post_current_tab_desc').text(txtStrings.mostLikedBoard);
 				$like_post_board_data.html(htmlContent).show();
+
+				// Done with ajax
 				hideSpinnerOverlay();
 			},
 
-			showMostLikesReceivedUserStats = function(response) {
+			// Data for all the narcissists out there !
+			showMostLikesReceivedUserStats = function (response) {
 				var data = tabsVisitedCurrentSession[currentUrlFrag],
+					msgUrl = '',
 					htmlContent = '',
 					$like_post_most_liked_user_data = $('.like_post_most_liked_user_data');
 
+				// Clean the screen
 				$like_post_most_liked_user_data.html('');
-				htmlContent += '<div class="poster_avatar"><div class="avatar" style="background-image: url(' + encodeURI(data.member_received.avatar) + ')"></div></div>' + '<div class="poster_data">' + '<a class="poster_details" href="' + data.member_received.href + '" style="font-size: 20px;">' + data.member_received.name + '</a>' + '<div class="poster_details">' + txtStrings.totalPosts + ': ' + data.member_received.total_posts + '</div>' + '<div class="poster_details">' + txtStrings.totalLikesReceived + ': ' + data.like_count + '</div>' + '</div>';
 
-				htmlContent += '<p class="generic_text">' + txtStrings.mostPopularUserHeading1 + '</p>';
-				for (var i = 0, len = data.topic_data.length; i < len; i++) {
-					var msgUrl = elk_scripturl + '?topic=' + data.topic_data[i].id_topic + '.msg' + data.topic_data[i].id_msg;
+				// For each member returned
+				for (var i = 0, len = data.length; i < len; i++) {
+					htmlContent += '' +
+						'<div class="content forumposts">' +
+						'   <div class="like_stats_avatar">' +
+						'       <img class="avatar avatarresize" alt="" src="' + encodeURI(data[i].member_received.avatar) + '" />' +
+						'   </div>' +
+						'   <div class="like_stats_details">' +
+						'       <a class="poster_details largetext" href="' + data[i].member_received.href + '">' + data[i].member_received.name + '</a>' +
+						'       <div class="poster_details">' + txtStrings.totalPosts + ': ' + data[i].member_received.total_posts + '</div>' +
+						'       <div class="poster_details">' + txtStrings.totalLikesReceived + ': ' + data[i].like_count + '</div>' +
+						'   </div>' +
+						'</div>' +
+						'<h3 class="secondary_header">' + txtStrings.mostPopularUserHeading1 + '</h3>';
 
-					htmlContent += '<div class="message_body">' + '<div class="posted_at">' + txtStrings.postedAt + ' ' + data.topic_data[i].html_time + ': ' + txtStrings.likesReceived + ' (' + data.topic_data[i].like_count + ')</div><div class="content_encapsulate">' + data.topic_data[i].body + '</div><a class="read_more" href="' + msgUrl + '">' + txtStrings.readMore + '</a></div>';
+					for (var j = 0, msglen = data[i].post_data.length; j < msglen; j++) {
+						msgUrl = elk_scripturl + '?topic=' + data[i].post_data[j].id_topic + '.msg' + data[i].post_data[j].id_msg;
+
+						htmlContent += '' +
+						'<div class="content forumposts">' +
+						'	<div class="topic_details">' +
+						'       <h5 class="like_stats_likers">' +
+									txtStrings.postedAt + ' ' + data[i].post_data[j].html_time + ': ' + txtStrings.likesReceived + ' (' + data[i].post_data[j].like_count + ')' +
+						'       </h5>' +
+						'   </div>' +
+						'   <div class="inner">' + data[i].post_data[j].body + '</div>' +
+						'   <a class="linkbutton floatright" href="' + msgUrl + '">' + txtStrings.readMore + '</a>' +
+						'</div>';
+					}
 				}
-				$('#like_post_current_tab').text(txtStrings.mostLikedMember);
+
+				// Load the template with the data
+				$('#like_post_current_tab_desc').text(txtStrings.mostLikedMember);
 				$like_post_most_liked_user_data.html(htmlContent).show();
+
+				// Show we are done
 				hideSpinnerOverlay();
 			},
 
-			showMostLikesGivenUserStats = function(response) {
+			// Data for all the +1, me too, etc users as well
+			showMostLikesGivenUserStats = function (response) {
 				var data = tabsVisitedCurrentSession[currentUrlFrag],
 					htmlContent = '',
+					msgUrl = '',
 					$like_post_most_likes_given_user_data = $('.like_post_most_likes_given_user_data');
 
+				// Clear the div of any previous content
 				$like_post_most_likes_given_user_data.html('');
-				htmlContent += '<div class="poster_avatar"><div class="avatar" style="background-image: url(' + encodeURI(data.member_given.avatar) + ')"></div></div>' + '<div class="poster_data">' + '<a class="poster_details" href="' + data.member_given.href + '" style="font-size: 20px;">' + data.member_given.name + '</a>' + '<div class="poster_details">' + txtStrings.totalPosts + ': ' + data.member_given.total_posts + '</div>' + '<div class="poster_details">' + txtStrings.totalLikesGiven + ': ' + data.like_count + '</div>' + '</div>';
 
-				htmlContent += '<p class="generic_text">' + txtStrings.mostLikeGivenUserHeading1 + '</p>';
-				for (var i = 0, len = data.topic_data.length; i < len; i++) {
-					var msgUrl = elk_scripturl + '?topic=' + data.topic_data[i].id_topic + '.msg' + data.topic_data[i].id_msg;
+				// For each member returned
+				for (var i = 0, len = data.length; i < len; i++) {
+					htmlContent += '' +
+						'<div class="content forumposts">' +
+						'   <div class="like_stats_avatar">' +
+						'       <img class="avatar avatarresize" alt="" src="' + encodeURI(data[i].member_given.avatar) + '" />' +
+						'   </div>' +
+						'   <div class="like_stats_details">' +
+						'       <a class="poster_details largetext" href="' + data[i].member_given.href + '">' + data[i].member_given.name + '</a>' +
+						'       <div class="poster_details">' + txtStrings.totalPosts + ': ' + data[i].member_given.total_posts + '</div>' +
+						'       <div class="poster_details">' + txtStrings.totalLikesGiven + ': ' + data[i].like_count + '</div>' +
+						'   </div>' +
+						'</div>' +
+						'<h3 class="secondary_header">' + txtStrings.mostLikeGivenUserHeading1 + '</h3>';
 
-					htmlContent += '<div class="message_body">' + '<div class="posted_at">' + txtStrings.postedAt + ' ' + data.topic_data[i].html_time + '</div><div class="content_encapsulate">' + data.topic_data[i].body + '</div><a class="read_more" href="' + msgUrl + '">' + txtStrings.readMore + '</a></div>';
+					for (var j = 0, postlen = data[i].post_data.length; j < postlen; j++) {
+						 msgUrl = elk_scripturl + '?topic=' + data[i].post_data[j].id_topic + '.msg' + data[i].post_data[j].id_msg;
+
+						htmlContent += '' +
+						'<div class="content forumposts">' +
+						'	<div class="topic_details">' +
+						'       <h5 class="like_stats_likers">' +
+									txtStrings.postedAt + ' ' + data[i].post_data[j].html_time  +
+						'       </h5>' +
+						'   </div>' +
+						'   <div class="inner">' + data[i].post_data[j].body + '</div>' +
+						'   <a class="linkbutton floatright" href="' + msgUrl + '">' + txtStrings.readMore + '</a>' +
+						'</div>';
+					}
 				}
-				$('#like_post_current_tab').text(txtStrings.mostLikeGivingMember);
+
+				// Load it to the page
+				$('#like_post_current_tab_desc').text(txtStrings.mostLikeGivingMember);
 				$like_post_most_likes_given_user_data.html(htmlContent).show();
+
+				// Done!
 				hideSpinnerOverlay();
 			},
 
-			genericErrorMessage = function(params) {
+			genericErrorMessage = function (params) {
 				$('.like_post_stats_error').html(params.errorMsg).show();
 				hideSpinnerOverlay();
 			};
@@ -415,7 +570,8 @@
 
 	this.likePostStats = likePostStats;
 
-	$(".like_post_stats_menu a").on("click", function(e) {
+	// Setup the menu to act as ajax tabs
+	$(".like_post_stats_menu a").on("click", function (e) {
 		if (e) {
 			e.preventDefault();
 			e.stopPropagation();
