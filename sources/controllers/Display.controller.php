@@ -470,7 +470,7 @@ class Display_Controller extends Action_Controller
 						}),
 					});
 
-					$(".like_button, .unlike_button").SiteTooltip({
+					$(".like_button, .unlike_button, .likes_button").SiteTooltip({
 						hoverIntent: {
 							sensitivity: 10,
 							interval: 150,
