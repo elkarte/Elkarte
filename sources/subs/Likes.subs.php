@@ -511,53 +511,68 @@ function messageLikeCount($message)
 }
 
 /**
- * Function to get most liked message
+ * Function to get most liked messages
  *
+ * @param int $limit the number of top liked messages to fetch
  * @package Likes
  */
-function dbMostLikedMessage()
+function dbMostLikedMessage($limit = 10)
 {
 	global $scripturl, $txt;
 
 	$db = database();
 
 	// Most liked Message
-	$mostLikedMessage = array();
-
 	$request = $db->query('', '
-		SELECT IFNULL(mem.real_name, m.poster_name) AS member_received_name, lp.id_msg,
-			m.id_topic, m.id_board, m.id_member,
-			lp.like_count AS like_count, m.subject, m.body, m.poster_time,
-			IFNULL(a.id_attach, 0) AS id_attach, a.filename, a.attachment_type, mem.avatar,
-			mem.posts, m.smileys_enabled, mem.email_address
+		SELECT
+			IFNULL(mem.real_name, m.poster_name) AS member_received_name,
+			lp.id_msg, lp.like_count AS like_count,
+			m.id_topic, m.id_board, m.id_member, m.subject, m.body, m.poster_time, m.smileys_enabled,
+			IFNULL(a.id_attach, 0) AS id_attach, a.filename, a.attachment_type,
+			mem.avatar, mem.posts, mem.email_address
 		FROM (
-			SELECT COUNT(lp.id_msg) AS like_count, lp.id_msg
-			FROM {db_prefix}message_likes AS lp
-			GROUP BY lp.id_msg
-			ORDER BY like_count DESC
-		) AS lp
+				SELECT
+					COUNT(lp.id_msg) AS like_count, lp.id_msg
+				FROM {db_prefix}message_likes AS lp
+				GROUP BY lp.id_msg
+				ORDER BY like_count DESC
+				LIMIT {int:limit}
+			) AS lp
 			INNER JOIN {db_prefix}messages AS m ON (m.id_msg = lp.id_msg)
 			INNER JOIN {db_prefix}members AS mem ON (mem.id_member = m.id_member)
 			INNER JOIN {db_prefix}boards AS b ON (b.id_board = m.id_board)
 			LEFT JOIN {db_prefix}attachments AS a ON (a.id_member = m.id_member)
 		WHERE {query_wanna_see_board}
-		LIMIT 1',
-		array()
+		LIMIT {int:limit}',
+		array(
+			'limit' => $limit,
+		)
 	);
-
+	$mostLikedMessages = array();
 	while ($row = $db->fetch_assoc($request))
 	{
+		$row['body'] = parse_bbc($row['body'], $row['smileys_enabled'], $row['id_msg']);
+
+		// Censor it!
+		censorText($row['subject']);
 		censorText($row['body']);
-		$msgString = Util::shorten_text($row['body'], 255, true);
+
+		// Something short and sweet
+		$msgString = Util::shorten_html($row['body'], 255);
+		$preview = Util::htmlspecialchars(strtr($msgString, array('<br />' => "\n", '&nbsp;' => ' ')));
+
+		// Love those avatars
 		$avatar = determineAvatar($row);
 
-		$mostLikedMessage = array(
+		// Build it out
+		$mostLikedMessages[] = array(
 			'id_msg' => $row['id_msg'],
 			'id_topic' => $row['id_topic'],
 			'id_board' => $row['id_board'],
 			'like_count' => $row['like_count'],
 			'subject' => $row['subject'],
-			'body' => parse_bbc($msgString, $row['smileys_enabled'], $row['id_msg']),
+			'preview' => $preview,
+			'body' => $msgString,
 			'time' => standardTime($row['poster_time']),
 			'html_time' => htmlTime($row['poster_time']),
 			'timestamp' => forum_time(true, $row['poster_time']),
@@ -568,47 +583,54 @@ function dbMostLikedMessage()
 				'href' => !empty($row['id_member']) ? $scripturl . '?action=profile;u=' . $row['id_member'] : '',
 				'avatar' => $avatar['href'],
 			),
+			'member_liked_data' => postLikers(0, 20, 'l.id_member DESC', $row['id_msg'], false),
 		);
-		$id_msg = $row['id_msg'];
 	}
 	$db->free_result($request);
 
-	if (empty($mostLikedMessage))
+	// No likes in the system?
+	if (empty($mostLikedMessages))
 	{
 		return array(
 			'noDataMessage' => $txt['like_post_error_no_data']
 		);
 	}
 
-	$mostLikedMessage['member_liked_data'] = postLikers(0, 20, 'l.id_member DESC', $id_msg, false);
-
-	return $mostLikedMessage;
+	return $mostLikedMessages;
 }
 
 /**
  * Function to get most liked messages in a topic
  *
+ * What it does:
+ * - For a supplied topic gets the, default 5, posts that have been liked
+ * - Returns the messages in descending order of likes
+ *
+ * @param int $topic the topic_id we are going to look for liked posts within
+ * @param int $limit the maximum number of liked posts to return
  * @package Likes
  */
-function dbMostLikedMessagesByTopic($topic)
+function dbMostLikedMessagesByTopic($topic, $limit = 5)
 {
 	global $scripturl;
 
 	$db = database();
 
-	// Most liked Message
+	// Most liked messages in a given topic
 	return $db->fetchQueryCallback('
-		SELECT IFNULL(mem.real_name, m.poster_name) AS member_received_name, lp.id_msg,
-			m.id_topic, m.id_board, m.id_member,
-			lp.like_count AS like_count, m.subject, m.body, m.poster_time,
-			IFNULL(a.id_attach, 0) AS id_attach, a.filename, a.attachment_type, mem.avatar,
-			mem.posts, m.smileys_enabled, mem.email_address
+		SELECT
+			IFNULL(mem.real_name, m.poster_name) AS member_received_name, lp.id_msg,
+			m.id_topic, m.id_board, m.id_member, m.subject, m.body, m.poster_time,
+			lp.like_count AS like_count,
+			IFNULL(a.id_attach, 0) AS id_attach, a.filename, a.attachment_type,
+			mem.posts, m.smileys_enabled, mem.email_address, mem.avatar
 		FROM (
-			SELECT COUNT(lp.id_msg) AS like_count, lp.id_msg
-			FROM {db_prefix}message_likes AS lp
-			GROUP BY lp.id_msg
-			ORDER BY like_count DESC
-		) AS lp
+				SELECT
+					COUNT(lp.id_msg) AS like_count, lp.id_msg
+				FROM {db_prefix}message_likes AS lp
+				GROUP BY lp.id_msg
+				ORDER BY like_count DESC
+			) AS lp
 			INNER JOIN {db_prefix}messages AS m ON (m.id_msg = lp.id_msg)
 			INNER JOIN {db_prefix}members AS mem ON (mem.id_member = m.id_member)
 			INNER JOIN {db_prefix}topics AS t ON (t.id_topic = m.id_topic)
@@ -618,12 +640,20 @@ function dbMostLikedMessagesByTopic($topic)
 		LIMIT {int:limit}',
 		array(
 			'id_topic' => $topic,
-			'limit' => 5,
+			'limit' => $limit,
 		),
 		function($row) use ($scripturl)
 		{
+			$row['body'] = parse_bbc($row['body'], $row['smileys_enabled'], $row['id_msg']);
+
+			// Censor those naughty words
 			censorText($row['body']);
-			$msgString = Util::shorten_text($row['body'], 255, true);
+			censorText($row['subject']);
+
+			// Something short to show is all that's needed
+			$msgString = Util::shorten_html($row['body'], 255);
+			$preview = Util::htmlspecialchars(strtr($msgString, array('<br />' => "\n", '&nbsp;' => ' ')));
+
 			$avatar = determineAvatar($row);
 
 			return array(
@@ -632,7 +662,8 @@ function dbMostLikedMessagesByTopic($topic)
 				'id_board' => $row['id_board'],
 				'like_count' => $row['like_count'],
 				'subject' => $row['subject'],
-				'body' => parse_bbc($msgString, $row['smileys_enabled'], $row['id_msg']),
+				'body' => $msgString,
+				'preview' => $preview,
 				'time' => standardTime($row['poster_time']),
 				'html_time' => htmlTime($row['poster_time']),
 				'timestamp' => forum_time(true, $row['poster_time']),
@@ -646,16 +677,15 @@ function dbMostLikedMessagesByTopic($topic)
 			);
 		}
 	);
-
-	return $mostLikedMessage;
 }
 
 /**
- * Function to get most liked topic.
+ * Function to get most liked topics.
  *
  * @package Likes
  * @param null|int $board - An optional board id to find most liked topics in.
- *                          If omitted, {query_wanna_see_board} is used.
+ *  If omitted, {query_wanna_see_board} is used to return the most liked topics in the boards
+ * they can see
  * @param int $limit - Optional, number of topics to return (default 10).
  */
 function dbMostLikedTopic($board = null, $limit = 10)
@@ -664,36 +694,68 @@ function dbMostLikedTopic($board = null, $limit = 10)
 
 	$db = database();
 
-	// fetch 10 highest like topics if seeking for board
-	// else fetch only the highest like topic
+	// The most liked topics by sum of likes and distinct likers
 	$request = $db->query('', '
-		SELECT COUNT(m.id_topic) AS like_count, m.id_topic
+		SELECT
+			t.id_topic, t.num_replies, t.id_board,
+			COUNT(lp.id_msg) AS like_count,
+			COUNT(DISTINCT lp.id_member) AS distinct_likers,
+			COUNT(DISTINCT m.id_msg) AS num_messages_liked
 		FROM {db_prefix}message_likes AS lp
-			INNER JOIN {db_prefix}messages AS m ON (m.id_msg = lp.id_msg)
-			INNER JOIN {db_prefix}boards AS b ON (m.id_board = b.id_board)
+			INNER JOIN {db_prefix}messages AS m ON (lp.id_msg = m.id_msg)
+			INNER JOIN {db_prefix}topics AS t ON (m.id_topic = t.id_topic)
+			INNER JOIN {db_prefix}boards AS b ON (t.id_board = b.id_board)
 		WHERE ' . ($board === null ? '{query_wanna_see_board}' : 'b.id_board = {int:id_board}') . '
-		GROUP BY m.id_topic
-		ORDER BY like_count DESC
+		GROUP BY t.id_topic
+		ORDER BY distinct_likers DESC
 		LIMIT {int:limit}',
 		array(
 			'id_board' => $board,
-			'limit' => $board === null ? 1 : $limit,
+			'limit' => $limit * 5,
 		)
 	);
-	$mostLikedTopic = $db->fetch_assoc($request);
-	$topics = array($mostLikedTopic['id_topic']);
-
+	$mostLikedTopics = array();
+	while ($row = $db->fetch_assoc($request))
+	{
+		$mostLikedTopics[$row['id_topic']] = $row;
+		$mostLikedTopics[$row['id_topic']]['relevance'] = $row['distinct_likers'] +
+			$row['distinct_likers'] / $row['num_messages_liked'] +
+			min($row['distinct_likers'], 1 / (log($row['like_count'] / ($row['num_replies'] + 1))));
+	}
 	$db->free_result($request);
 
-	if (empty($mostLikedTopic))
+	// Sort the results from the net we cast, then cut it down to the top X limit
+	uasort($mostLikedTopics, 'sort_by_relevance');
+	$mostLikedTopics = array_slice($mostLikedTopics, 0, $limit);
+
+	// Fetch some sample posts for each of the top X topics
+	foreach($mostLikedTopics as $key => $topic)
+	{
+		$mostLikedTopics[$key]['msg_data'] = dbMostLikedMessagesByTopic($topic['id_topic']);
+	}
+
+	// Looks like there is nothing liked
+	if (empty($mostLikedTopics))
 	{
 		return array(
 			'noDataMessage' => $txt['like_post_error_no_data']
 		);
 	}
-	$mostLikedTopic['msg_data'] = dbMostLikedMessagesByTopic($mostLikedTopic['id_topic']);
 
-	return $mostLikedTopic;
+	return $mostLikedTopics;
+}
+
+/**
+ * Helper function to sort by topic like relevance
+ *
+ * @param float $a
+ * @param float $b
+ *
+ * @return mixed
+ */
+function sort_by_relevance($a, $b)
+{
+	return $b['relevance'] - $a['relevance'];
 }
 
 /**
@@ -709,13 +771,13 @@ function dbMostLikedBoard()
 
 	// Most liked board
 	$request = $db->query('', '
-		SELECT b.id_board, b.name, b.num_topics, b.num_posts,
-			tc.topics_liked,
-			tc.msgs_liked,
-			tc.like_count
+		SELECT
+		 	b.id_board, b.name, b.num_topics, b.num_posts,
+			tc.topics_liked, tc.msgs_liked, tc.like_count
 		FROM {db_prefix}boards AS b
 			INNER JOIN (
-				SELECT m.id_board,
+				SELECT
+					m.id_board,
 					COUNT(DISTINCT(m.id_topic)) AS topics_liked,
 					COUNT(DISTINCT(lp.id_msg)) AS msgs_liked,
 					COUNT(m.id_board) AS like_count
@@ -733,7 +795,6 @@ function dbMostLikedBoard()
 		)
 	);
 	$mostLikedBoard = $db->fetch_assoc($request);
-
 	$db->free_result($request);
 
 	if (empty($mostLikedBoard['id_board']))
@@ -743,49 +804,54 @@ function dbMostLikedBoard()
 		);
 	}
 
-	$mostLikedTopic = dbMostLikedTopic($mostLikedBoard['id_board'], 10);
-	$mostLikedBoard['topic_data'] = $mostLikedTopic['msg_data'];
+	$mostLikedTopic = dbMostLikedTopic($mostLikedBoard['id_board']);
+	$mostLikedBoard['topic_data'] = $mostLikedTopic[0]['msg_data'];
 
 	return $mostLikedBoard;
 }
 
 /**
- * Function to get most liked user
+ * Function to get most liked members
  *
  * @package Likes
+ * @param int $limit the number of most liked members to return
  */
-function dbMostLikesReceivedUser()
+function dbMostLikesReceivedUser($limit = 10)
 {
 	global $scripturl, $txt;
 
 	$db = database();
 
-	$mostLikedMember = array();
-
 	$request = $db->query('', '
-		SELECT lp.id_poster, lp.like_count,
+		SELECT
+			lp.id_poster, lp.like_count,
 			IFNULL(a.id_attach, 0) AS id_attach, a.filename, a.attachment_type,
-			IFNULL(mem.real_name, m.poster_name) AS real_name, mem.avatar, mem.date_registered, mem.posts, mem.email_address
+			IFNULL(mem.real_name, m.poster_name) AS real_name,
+			mem.avatar, mem.date_registered, mem.posts, mem.email_address
 		FROM (
-			SELECT id_poster,
-			COUNT(id_msg) AS like_count,
+			SELECT
+				id_poster,
+				COUNT(id_msg) AS like_count,
 				MAX(id_msg) AS id_msg
 			FROM {db_prefix}message_likes
 			WHERE id_poster != 0
 			GROUP BY id_poster
 			ORDER BY like_count DESC
-			LIMIT 1
+			LIMIT {int:limit}
 		) AS lp
 			INNER JOIN {db_prefix}messages AS m ON (m.id_msg = lp.id_msg)
 			INNER JOIN {db_prefix}members AS mem ON (mem.id_member = m.id_member)
 			LEFT JOIN {db_prefix}attachments AS a ON (a.id_member = m.id_member)
 		LIMIT 1',
-		array()
+		array(
+			'limit' => $limit
+		)
 	);
+	$mostLikedMembers = array();
 	while ($row = $db->fetch_assoc($request))
 	{
 		$avatar = determineAvatar($row);
-		$mostLikedMember = array(
+		$mostLikedMembers[] = array(
 			'member_received' => array(
 				'id_member' => $row['id_poster'],
 				'name' => $row['real_name'],
@@ -795,22 +861,38 @@ function dbMostLikesReceivedUser()
 				'avatar' => $avatar['href'],
 			),
 			'like_count' => $row['like_count'],
+			'post_data' => dbMostLikedPostsByUser($row['id_poster']),
 		);
-		$id_member = $row['id_poster'];
 	}
 	$db->free_result($request);
 
-	if (empty($id_member))
+	if (empty($mostLikedMembers))
 	{
 		return array(
 			'noDataMessage' => $txt['like_post_error_no_data']
 		);
 	}
 
+	return $mostLikedMembers;
+}
+
+/**
+ * Returns the most liked posts of a given user
+ *
+ * @param int $id_member find top posts for this member id
+ * @param int $limit then number of top posts to return
+ *
+ * @return array
+ */
+function dbMostLikedPostsByUser($id_member, $limit = 10)
+{
+	$db = database();
+
 	// Lets fetch highest liked posts by this user
-	$mostLikedMember['topic_data'] = $db->fetchQueryCallback('
-		SELECT lp.id_msg, m.id_topic, COUNT(lp.id_msg) AS like_count, m.subject,
-			m.body, m.poster_time, m.smileys_enabled
+	return $db->fetchQueryCallback('
+		SELECT
+			lp.id_msg, COUNT(lp.id_msg) AS like_count,
+			m.body, m.poster_time, m.smileys_enabled, m.id_topic, m.subject
 		FROM {db_prefix}message_likes AS lp
 			INNER JOIN {db_prefix}messages AS m ON (m.id_msg = lp.id_msg)
 			INNER JOIN {db_prefix}boards AS b ON (b.id_board = m.id_board)
@@ -818,64 +900,77 @@ function dbMostLikesReceivedUser()
 			AND lp.id_poster = {int:id_member}
 		GROUP BY lp.id_msg, m.id_topic, m.subject, m.body, m.poster_time, m.smileys_enabled
 		ORDER BY like_count DESC
-		LIMIT 10',
+		LIMIT {int:limit}',
 		array(
-			'id_member' => $id_member
+			'id_member' => $id_member,
+			'limit' => $limit
 		),
-		function($row)
+		function ($row)
 		{
+			$row['body'] = parse_bbc($row['body'], $row['smileys_enabled'], $row['id_msg']);
+
+			// Censor those naughty words
 			censorText($row['body']);
-			$msgString = Util::shorten_text($row['body'], 255, true);
+			censorText($row['subject']);
+
+			// Something short to show is all that's needed
+			$msgString = Util::shorten_html($row['body'], 255);
+			$preview = Util::htmlspecialchars(strtr($msgString, array('<br />' => "\n", '&nbsp;' => ' ')));
 
 			return array(
-				'id_topic' => $row['id_topic'],
-				'id_msg' => $row['id_msg'],
-				'like_count' => $row['like_count'],
-				'subject' => $row['subject'],
-				'body' => parse_bbc($msgString, $row['smileys_enabled'], $row['id_msg']),
-				'time' => standardTime($row['poster_time']),
-				'html_time' => htmlTime($row['poster_time']),
-				'timestamp' => forum_time(true, $row['poster_time']),
+					'id_topic' => $row['id_topic'],
+					'id_msg' => $row['id_msg'],
+					'like_count' => $row['like_count'],
+					'subject' => $row['subject'],
+					'body' => $msgString,
+					'preview' => $preview,
+					'time' => standardTime($row['poster_time']),
+					'html_time' => htmlTime($row['poster_time']),
+					'timestamp' => forum_time(true, $row['poster_time']),
 			);
 		}
 	);
-
-	return $mostLikedMember;
 }
 
 /**
  * Function to get most likes giving user
  *
  * @package Likes
+ * @param int $limit the number of members to return
  */
-function dbMostLikesGivenUser()
+function dbMostLikesGivenUser($limit = 10)
 {
 	global $scripturl, $txt;
 
 	$db = database();
 
-	$mostLikeGivingMember = array();
 	$request = $db->query('', '
-		SELECT lp.id_member, lp.like_count,
+		SELECT
+			lp.id_member, lp.like_count,
 			IFNULL(a.id_attach, 0) AS id_attach, a.filename, a.attachment_type,
-			IFNULL(mem.real_name, m.poster_name) AS real_name, mem.avatar, mem.date_registered, mem.posts, mem.email_address
+			IFNULL(mem.real_name, m.poster_name) AS real_name,
+			mem.avatar, mem.date_registered, mem.posts, mem.email_address
 		FROM (
-			SELECT COUNT(id_msg) AS like_count, id_member, MAX(id_msg) AS id_msg
+			SELECT
+				COUNT(id_msg) AS like_count, id_member, MAX(id_msg) AS id_msg
 			FROM {db_prefix}message_likes
 			GROUP BY id_member
 			ORDER BY like_count DESC
-			LIMIT 1
+			LIMIT {int:limit}
 		) AS lp
 			INNER JOIN {db_prefix}messages AS m ON (m.id_msg = lp.id_msg)
 			INNER JOIN {db_prefix}members AS mem ON (mem.id_member = lp.id_member)
 			LEFT JOIN {db_prefix}attachments AS a ON (a.id_member = lp.id_member)',
-		array()
+		array(
+			'limit' => $limit
+		)
 	);
-
+	$mostLikeGivingMembers = array();
 	while ($row = $db->fetch_assoc($request))
 	{
 		$avatar = determineAvatar($row);
-		$mostLikeGivingMember = array(
+
+		$mostLikeGivingMembers[] = array(
 			'member_given' => array(
 				'id_member' => $row['id_member'],
 				'name' => $row['real_name'],
@@ -885,48 +980,69 @@ function dbMostLikesGivenUser()
 				'avatar' => $avatar['href'],
 			),
 			'like_count' => $row['like_count'],
+			'post_data' => dbRecentlyLikedPostsGivenUser($row['id_member'])
 		);
-		$id_liker = $row['id_member'];
 	}
 	$db->free_result($request);
 
-	if (empty($mostLikeGivingMember))
+	if (empty($mostLikeGivingMembers))
 	{
 		return array(
 			'noDataMessage' => $txt['like_post_error_no_data']
 		);
 	}
 
-	// Lets fetch the latest posts by this user
-	$mostLikeGivingMember['topic_data'] = $db->fetchQueryCallback('
-		SELECT m.id_msg, m.id_topic, m.subject, m.body, m.poster_time, m.smileys_enabled
+	return $mostLikeGivingMembers;
+}
+
+/**
+ * Returns posts that were recently liked by a given user
+ *
+ * @param int $id_liker the userid to find recently liked posts
+ * @param int $limit number of recently liked posts to fetch
+ */
+function dbRecentlyLikedPostsGivenUser($id_liker, $limit = 5)
+{
+	$db = database();
+
+	// Lets fetch the latest liked posts by this user
+	return $db->fetchQueryCallback('
+		SELECT
+			m.id_msg, m.id_topic, m.subject, m.body, m.poster_time, m.smileys_enabled
 		FROM {db_prefix}messages AS m
 			INNER JOIN {db_prefix}boards AS b ON (b.id_board = m.id_board)
 		WHERE {query_wanna_see_board}
 			AND m.id_member = {int:id_member}
 		ORDER BY m.id_msg DESC
-		LIMIT 10',
+		LIMIT {int:limit}',
 		array(
-			'id_member' => $id_liker
+			'id_member' => $id_liker,
+			'limit' => $limit
 		),
 		function($row)
 		{
+			$row['body'] = parse_bbc($row['body'], $row['smileys_enabled'], $row['id_msg']);
+
+			// Censor those $%#^&% words
 			censorText($row['body']);
-			$msgString = Util::shorten_text($row['body'], 255, true);
+			censorText($row['subject']);
+
+			// Something short to show is all that's required
+			$msgString = Util::shorten_html($row['body'], 255);
+			$preview = Util::htmlspecialchars(strtr($msgString, array('<br />' => "\n", '&nbsp;' => ' ')));
 
 			return array(
 				'id_msg' => $row['id_msg'],
 				'id_topic' => $row['id_topic'],
 				'subject' => $row['subject'],
-				'body' => parse_bbc($msgString, $row['smileys_enabled'], $row['id_msg']),
+				'body' => $msgString,
+				'preview' => $preview,
 				'time' => standardTime($row['poster_time']),
 				'html_time' => htmlTime($row['poster_time']),
 				'timestamp' => forum_time(true, $row['poster_time']),
 			);
 		}
 	);
-
-	return $mostLikeGivingMember;
 }
 
 /**
