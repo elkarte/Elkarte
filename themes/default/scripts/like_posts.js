@@ -173,7 +173,11 @@
 	// instead of this, we can use namespace too
 	this.likePosts = likePosts;
 
-	// Class for like posts stats
+	/**
+	 * Class for like posts stats
+	 *
+	 * Simply invoke the constructor by calling likePostStats with init method
+	 */
 	function likePostStats() {}
 
 	likePostStats.prototype = function () {
@@ -219,17 +223,18 @@
 				$('#like_post_stats_overlay').hide();
 			},
 
-			// Set the active tab
+			// Set the active stats tab
 			highlightActiveTab = function () {
 				$('.like_post_stats_menu a').removeClass('active');
 				$('#' + currentUrlFrag).addClass('active');
 			},
 
+			// Check the url for a valid like stat tab, load data if its not been done yet
 			checkUrl = function (url) {
 				// Busy doing something
 				showSpinnerOverlay();
 
-				// Not tab sent, use the current hash
+				// No tab sent, use the current hash
 				if (typeof(url) === 'undefined' || url === '') {
 					var currentHref = window.location.href.split('#');
 
@@ -260,7 +265,7 @@
 				}
 			},
 
-			// Fetch specific tab data via ajax from the server
+			// Fetch the specific tab data via ajax from the server
 			getDataFromServer = function (params) {
 				$('.like_post_stats_error').hide().html('');
 
@@ -367,6 +372,8 @@
 					topicUrl ='',
 					msgUrl = '',
 					htmlContent = '',
+					expand_txt = [],
+					collapse_txt = [],
 					$like_post_topic_data = $('.like_post_topic_data');
 
 				// Clear the area
@@ -379,31 +386,54 @@
 					// Start with the topic info
 					htmlContent += '' +
 						'<div class="content forumposts">' +
-						'   <a class="largetext" href="' + topicUrl + '">' + data[i].msg_data[0].subject + '</a> ' + txtStrings.mostPopularTopicHeading1 + ' ' +  data[i].like_count + ' ' + txtStrings.genricHeading1 +
-						'    <p>' + txtStrings.mostPopularTopicSubHeading1 + ' ' +  data[i].msg_data.length + ' ' + txtStrings.mostPopularTopicSubHeading2 + '</p>' +
-						'</div>';
+						'   <a class="largetext" href="' + topicUrl + '">' + data[i].msg_data[0].subject + '</a> ' + txtStrings.mostPopularTopicHeading1.easyReplace({1 : data[i].like_count}) +
+						'   <p class="panel_toggle secondary_header">'	+
+						'       <span class="topic_toggle">&nbsp' +
+						'           <span id="topic_toggle_img_' + i + '" class="collapse" title=""></span>' +
+						'       </span>' +
+						'       <a href="#" id="topic_toggle_link_' + i + '">' + txtStrings.mostPopularTopicSubHeading1.easyReplace({1 : data[i].msg_data.length, 2 : txtStrings.showPosts}) + '</a>' +
+						'   </p>' +
+						'   <div id="topic_container_' + i + '" class="hide">';
+
+					// Expand / collapse text strings for this area
+					collapse_txt[i] = txtStrings.mostPopularTopicSubHeading1.easyReplace({
+						1 : data[i].msg_data.length,
+						2 : txtStrings.showPosts
+					});
+					expand_txt[i] = txtStrings.mostPopularTopicSubHeading1.easyReplace({
+						1 : data[i].msg_data.length,
+						2 : txtStrings.hidePosts
+					});
 
 					// Posts from the topic itself
 					for (var j = 0, topiclen =  data[i].msg_data.length; j < topiclen; j++) {
 						msgUrl = topicUrl + '.msg' +  data[i].msg_data[j].id_msg;
 
 						htmlContent += '' +
-						'<div class="content forumposts">' +
-							'<div class="topic_details">' +
-							'	<img class="like_stats_small_avatar" alt="" src="' + encodeURI( data[i].msg_data[j].member.avatar) + '"/>' +
-							'   <h5 class="like_stats_likers">' +
-									data[i].msg_data[j].member.name + ' : ' + txtStrings.postedAt + ' ' +  data[i].msg_data[j].html_time +
-							'   </h5>' +
-							'</div>' +
-							'<div class="inner">' +  data[i].msg_data[j].body + '</div>' +
-							'<a class="linkbutton floatright" href="' + msgUrl + '">' + txtStrings.readMore + '</a>' +
-						'</div>';
+							'   <div class="content forumposts">' +
+							'       <div class="topic_details">' +
+							'   	    <img class="like_stats_small_avatar" alt="" src="' + encodeURI( data[i].msg_data[j].member.avatar) + '"/>' +
+							'           <h5 class="like_stats_likers">' +
+							data[i].msg_data[j].member.name + ' : ' + txtStrings.postedAt + ' ' +  data[i].msg_data[j].html_time +
+							'           </h5>' +
+							'       </div>' +
+							'       <div class="inner">' +  data[i].msg_data[j].body + '</div>' +
+							'       <a class="linkbutton_right" href="' + msgUrl + '">' + txtStrings.readMore + '</a>' +
+							'       <div class="separator"></div>' +
+							'   </div>';
 					}
+
+					htmlContent += '' +
+						'   </div>' +
+						'</div>';
 				}
 
 				// Load and show the content
 				$('#like_post_current_tab_desc').text(txtStrings.mostLikedTopic);
 				$like_post_topic_data.html(htmlContent).show();
+
+				// Add in the toggle functions
+				createCollapsibleContent(data.length, expand_txt, collapse_txt, 'topic');
 
 				// All done with this request
 				hideSpinnerOverlay();
@@ -464,13 +494,16 @@
 				var data = tabsVisitedCurrentSession[currentUrlFrag],
 					msgUrl = '',
 					htmlContent = '',
+					expand_txt = [],
+					collapse_txt = [],
 					$like_post_most_liked_user_data = $('.like_post_most_liked_user_data');
 
 				// Clean the screen
-				$like_post_most_liked_user_data.html('');
+				$like_post_most_liked_user_data.html('').off();
 
 				// For each member returned
 				for (var i = 0, len = data.length; i < len; i++) {
+					// Start off with a bit about them and why they are great
 					htmlContent += '' +
 						'<div class="content forumposts">' +
 						'   <div class="like_stats_avatar">' +
@@ -481,28 +514,49 @@
 						'       <div class="poster_details">' + txtStrings.totalPosts + ': ' + data[i].member_received.total_posts + '</div>' +
 						'       <div class="poster_details">' + txtStrings.totalLikesReceived + ': ' + data[i].like_count + '</div>' +
 						'   </div>' +
-						'</div>' +
-						'<h3 class="secondary_header">' + txtStrings.mostPopularUserHeading1 + '</h3>';
+						'   <p class="panel_toggle secondary_header">' +
+						'       <span class="liked_toggle">&nbsp' +
+						'           <span id="liked_toggle_img_' + i + '" class="collapse" title=""></span>' +
+						'       </span>' +
+						'       <a href="#" id="liked_toggle_link_' + i + '">' + txtStrings.mostPopularUserHeading1.easyReplace({1: txtStrings.showPosts}) + '</a>' +
+						'   </p>' +
+						'   <div id="liked_container_' + i + '" class="hide">';
+
+					// Expand / collapse text strings for this area
+					collapse_txt[i] = txtStrings.mostPopularUserHeading1.easyReplace({
+						1 : txtStrings.showPosts
+					});
+					expand_txt[i] = txtStrings.mostPopularUserHeading1.easyReplace({
+						1 : txtStrings.hidePosts
+					});
 
 					for (var j = 0, msglen = data[i].post_data.length; j < msglen; j++) {
 						msgUrl = elk_scripturl + '?topic=' + data[i].post_data[j].id_topic + '.msg' + data[i].post_data[j].id_msg;
 
 						htmlContent += '' +
-						'<div class="content forumposts">' +
-						'	<div class="topic_details">' +
-						'       <h5 class="like_stats_likers">' +
-									txtStrings.postedAt + ' ' + data[i].post_data[j].html_time + ': ' + txtStrings.likesReceived + ' (' + data[i].post_data[j].like_count + ')' +
-						'       </h5>' +
-						'   </div>' +
-						'   <div class="inner">' + data[i].post_data[j].body + '</div>' +
-						'   <a class="linkbutton floatright" href="' + msgUrl + '">' + txtStrings.readMore + '</a>' +
-						'</div>';
+						'       <div class="content forumposts">' +
+						'	        <div class="topic_details">' +
+						'                <h5 class="like_stats_likers">' +
+						txtStrings.postedAt + ' ' + data[i].post_data[j].html_time + ': ' + txtStrings.likesReceived + ' (' + data[i].post_data[j].like_count + ')' +
+						'               </h5>' +
+						'           </div>' +
+						'          <div class="inner">' + data[i].post_data[j].body + '</div>' +
+						'          <a class="linkbutton_right" href="' + msgUrl + '">' + txtStrings.readMore + '</a>' +
+						'          <div class="separator"></div>' +
+						'       </div>';
 					}
+
+					htmlContent += '' +
+						'   </div>' +
+						'</div>';
 				}
 
 				// Load the template with the data
 				$('#like_post_current_tab_desc').text(txtStrings.mostLikedMember);
 				$like_post_most_liked_user_data.html(htmlContent).show();
+
+				// Add in the toggle functions
+				createCollapsibleContent(data.length, expand_txt, collapse_txt, 'liked');
 
 				// Show we are done
 				hideSpinnerOverlay();
@@ -513,6 +567,8 @@
 				var data = tabsVisitedCurrentSession[currentUrlFrag],
 					htmlContent = '',
 					msgUrl = '',
+					expand_txt = [],
+					collapse_txt = [],
 					$like_post_most_likes_given_user_data = $('.like_post_most_likes_given_user_data');
 
 				// Clear the div of any previous content
@@ -530,31 +586,81 @@
 						'       <div class="poster_details">' + txtStrings.totalPosts + ': ' + data[i].member_given.total_posts + '</div>' +
 						'       <div class="poster_details">' + txtStrings.totalLikesGiven + ': ' + data[i].like_count + '</div>' +
 						'   </div>' +
-						'</div>' +
-						'<h3 class="secondary_header">' + txtStrings.mostLikeGivenUserHeading1 + '</h3>';
+						'   <p class="panel_toggle secondary_header">' +
+						'       <span class="liker_toggle">&nbsp' +
+						'           <span id="liker_toggle_img_' + i + '" class="collapse" title=""></span>' +
+						'       </span>' +
+						'       <a href="#" id="liker_toggle_link_' + i + '">' + txtStrings.mostLikeGivenUserHeading1.easyReplace({1: txtStrings.showPosts}) + '</a>' +
+						'   </p>' +
+						'   <div id="liker_container_' + i + '" class="hide">';
+
+					// Expand / collapse text strings for this area
+					collapse_txt[i] = txtStrings.mostLikeGivenUserHeading1.easyReplace({
+						1 : txtStrings.showPosts
+					});
+					expand_txt[i] = txtStrings.mostLikeGivenUserHeading1.easyReplace({
+						1 : txtStrings.hidePosts
+					});
 
 					for (var j = 0, postlen = data[i].post_data.length; j < postlen; j++) {
 						 msgUrl = elk_scripturl + '?topic=' + data[i].post_data[j].id_topic + '.msg' + data[i].post_data[j].id_msg;
 
 						htmlContent += '' +
-						'<div class="content forumposts">' +
-						'	<div class="topic_details">' +
-						'       <h5 class="like_stats_likers">' +
-									txtStrings.postedAt + ' ' + data[i].post_data[j].html_time  +
-						'       </h5>' +
-						'   </div>' +
-						'   <div class="inner">' + data[i].post_data[j].body + '</div>' +
-						'   <a class="linkbutton floatright" href="' + msgUrl + '">' + txtStrings.readMore + '</a>' +
-						'</div>';
+							'   <div class="content forumposts">' +
+							'	    <div class="topic_details">' +
+							'           <h5 class="like_stats_likers">' +
+							txtStrings.postedAt + ' ' + data[i].post_data[j].html_time +
+							'           </h5>' +
+							'       </div>' +
+							'       <div class="inner">' + data[i].post_data[j].body + '</div>' +
+							'       <a class="linkbutton_right" href="' + msgUrl + '">' + txtStrings.readMore + '</a>' +
+							'   	<div class="separator"></div>' +
+							'   </div>';
 					}
+
+					htmlContent += '' +
+						'   </div>' +
+						'</div>';
 				}
 
 				// Load it to the page
 				$('#like_post_current_tab_desc').text(txtStrings.mostLikeGivingMember);
 				$like_post_most_likes_given_user_data.html(htmlContent).show();
 
+				// Add in the toggle functions
+				createCollapsibleContent(data.length, expand_txt, collapse_txt, 'liker');
+
 				// Done!
 				hideSpinnerOverlay();
+			},
+
+			// Attach the toggle class to each hidden div
+			createCollapsibleContent = function(count, expand_txt, collapse_txt, prefix) {
+				for (var section = 0; section < count; section++) {
+					new elk_Toggle({
+						bToggleEnabled: true,
+						bCurrentlyCollapsed: true,
+						aSwappableContainers: [
+							prefix + '_container_' + section
+						],
+						aSwapClasses: [
+							{
+								sId: prefix + '_toggle_img_' + section,
+								classExpanded: 'collapse',
+								titleExpanded: 'Hide',
+								classCollapsed: 'expand',
+								titleCollapsed: 'Show'
+							}
+						],
+						aSwapLinks: [
+							{
+								sId: prefix + '_toggle_link_' + section,
+								msgExpanded: expand_txt[section],
+								msgCollapsed: collapse_txt[section]
+							}
+						]
+					});
+				}
 			},
 
 			genericErrorMessage = function (params) {
