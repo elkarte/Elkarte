@@ -4628,19 +4628,19 @@ a.help .icon {
 
 .like_stats_details {
 	min-width: 15em;
-	vertical-align: top;
 }
 
-.like_stats_subject {
+.like_stats_details, .like_stats_subject{
 	vertical-align: top;
+	margin-top: .1em;
 }
 
-.like_stats_likers, .like_stats_subject, .like_stats_details, #lp_preloader {
+.like_stats_likers, .like_stats_subject, .like_stats_details, #lp_preloader, .like_stats_avatar {
 	display: inline-block;
 }
 
 .like_stats_likers img, .like_stats_small_avatar {
-	max-width: 40px;
+	max-width: 35px;
 	border-radius: 5px;
 	vertical-align: middle;
 }
