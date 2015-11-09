@@ -81,7 +81,6 @@ function template_lp_stats()
 					usersWhoLiked: ' . JavaScriptEscape($txt['like_post_users_who_liked']) . ',
 					mostPopularTopicHeading1: ' . JavaScriptEscape($txt['like_post_most_popular_topic_heading1']) . ',
 					mostPopularTopicSubHeading1: ' . JavaScriptEscape($txt['like_post_most_popular_topic_sub_heading1']) . ',
-					mostPopularTopicSubHeading2: ' . JavaScriptEscape($txt['like_post_most_popular_topic_sub_heading2']) . ',
 					mostPopularBoardHeading1: ' . JavaScriptEscape($txt['like_post_most_popular_board_heading1']) . ',
 					mostPopularBoardSubHeading1: ' . JavaScriptEscape($txt['like_post_most_popular_board_sub_heading1']) . ',
 					mostPopularBoardSubHeading2: ' . JavaScriptEscape($txt['like_post_most_popular_board_sub_heading2']) . ',
@@ -92,6 +91,8 @@ function template_lp_stats()
 					mostPopularUserHeading1: ' . JavaScriptEscape($txt['like_post_most_popular_user_heading1']) . ',
 					likesReceived: ' . JavaScriptEscape($txt['like_post_liked_by_others']) . ',
 					totalLikesGiven: ' . JavaScriptEscape($txt['like_post_total_likes_given']) . ',
+					showPosts: ' . JavaScriptEscape($txt['like_post_show']) . ',
+					hidePosts: ' . JavaScriptEscape($txt['like_post_hide']) . ',
 					mostLikeGivenUserHeading1: ' . JavaScriptEscape($txt['like_post_most_like_given_user_heading1']) . ',
 				}
 			});
