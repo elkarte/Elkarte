@@ -720,7 +720,7 @@ function dbMostLikedTopic($board = null, $limit = 10)
 		$mostLikedTopics[$row['id_topic']] = $row;
 		$mostLikedTopics[$row['id_topic']]['relevance'] = $row['distinct_likers'] +
 			$row['distinct_likers'] / $row['num_messages_liked'] +
-			min($row['distinct_likers'], 1 / (log($row['like_count'] / ($row['num_replies'] + 1))));
+			min($row['distinct_likers'], 1 / (log($row['like_count'] / ($row['num_replies'] + ($row['like_count'] == $row['num_replies'] ? 1 : 0)))));
 	}
 	$db->free_result($request);
 
@@ -842,7 +842,7 @@ function dbMostLikesReceivedUser($limit = 10)
 			INNER JOIN {db_prefix}messages AS m ON (m.id_msg = lp.id_msg)
 			INNER JOIN {db_prefix}members AS mem ON (mem.id_member = m.id_member)
 			LEFT JOIN {db_prefix}attachments AS a ON (a.id_member = m.id_member)
-		LIMIT 1',
+		LIMIT {int:limit}',
 		array(
 			'limit' => $limit
 		)
@@ -1009,10 +1009,11 @@ function dbRecentlyLikedPostsGivenUser($id_liker, $limit = 5)
 	return $db->fetchQueryCallback('
 		SELECT
 			m.id_msg, m.id_topic, m.subject, m.body, m.poster_time, m.smileys_enabled
-		FROM {db_prefix}messages AS m
+		FROM {db_prefix}message_likes AS ml
+			INNER JOIN {db_prefix}messages AS m ON (ml.id_msg = m.id_msg)
 			INNER JOIN {db_prefix}boards AS b ON (b.id_board = m.id_board)
 		WHERE {query_wanna_see_board}
-			AND m.id_member = {int:id_member}
+			AND ml.id_member = {int:id_member}
 		ORDER BY m.id_msg DESC
 		LIMIT {int:limit}',
 		array(
