@@ -77,14 +77,6 @@
 	font-size: 0.786em;
 }
 
-#quick_search .input_text, #quick_search select, #quick_search .button_submit {
-	margin: 5px 0 0 4px;
-}
-
-#quick_search .icon {
-	margin: 12px 0 0 4px;
-}
-
 /* alternate row colors on Modify Themes,Copy a template */
 .theme_options .content {
 	background: #FCFCFC;
