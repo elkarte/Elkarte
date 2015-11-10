@@ -49,7 +49,7 @@
 /* ------------------------------------------------------- */
 /* Normal, standard links. */
 a, a:link, a:visited,
-	/* Links that open in a new window. */
+/* Links that open in a new window. */
 a.new_win:link, a.new_win:visited {
 	color: #008299;
 	text-decoration: none;
@@ -67,26 +67,26 @@ html {
 }
 
 body {
+	padding-top: 35px;
 	background: #EEEEEE;
 	color: #4D4F53;
-	padding-top: 35px;
 	font: 90%/130% Helvetica, Arial, "Nimbus Sans L", sans-serif;
 }
 
 fieldset {
-	background: transparent;
 	border: 1px solid #CCCCCC;
-	box-shadow: none;
 	border-radius: 5px;
+	background: transparent;
+	box-shadow: none;
 }
 
 legend {
-	background: url(../../images/selected_open.png) 0 50% no-repeat;
-	cursor: pointer;
+	margin-left: 15px;
 	padding: 0 0 2px 20px;
+	background: url(../../images/selected_open.png) 0 50% no-repeat;
 	color: #333333;
 	font-size: 1.071em;
-	margin-left: 15px;
+	cursor: pointer;
 }
 
 .collapsed legend {
@@ -113,11 +113,6 @@ input:hover, textarea:hover, button:hover, select:hover {
 	border: 1px solid #999999;
 }
 
-textarea:hover, .editor:hover {
-	background: #FBFBFB;
-	color: #444444;
-}
-
 input:focus, textarea:focus, button:focus, select:focus, .editor:focus {
 	border: 1px solid #999999;
 }
@@ -130,36 +125,37 @@ input[disabled].input_text {
 /* The OpenID login form */
 .openid_login {
 	padding-left: 20px;
-	background: white url(../../images/openid.png) no-repeat;
-	background-position: 2% 50%;
+	background: white url(../../images/openid.png) no-repeat 2% 50%;
 }
 
 /* Common button styling. */
-/* It is being replaced with three classes: */
-/*    .button_submit is not floated */
-/*    .right_submit is right floated */
-/*    .left_submit is left floated */
-/* The button_reset class may need attention too. */
-.button_submit, .right_submit, .left_submit, .button_reset, .drop_area_fileselect_text,
-	/* Anchors styled to look like buttons. */
-	/* These have standard body text size. Can be chained with smalltext class. */
+input[type="submit"], .drop_area_fileselect_text, button[type="submit"], input[type="button"],
+/* Anchors styled to look like buttons. */
+/* These have standard body text size. Can be chained with smalltext class. */
 .linkbutton:link, .linkbutton_right:link, .linkbutton_left:link,
 .linkbutton:visited, .linkbutton_right:visited, .linkbutton_left:visited {
 	border: 1px solid #AFAFAF;
+	border-top: 1px solid #CFCFCF;
+	border-left: 1px solid #BFBFBF;
+	border-radius: 2px;
 	background: #F4F4F4;
+	background-image: linear-gradient(to bottom, #FFFFFF, #E4E4E4);
+	box-shadow: 1px 1px 2px #E5E5E5;
 	color: #555555;
 }
 
-.button_submit, .right_submit, .left_submit, .button_reset {
+input[type="submit"] {
 	font-size: 0.857em;
 }
 
 /* Hover effects. */
-.button_submit:hover, .right_submit:hover, .left_submit:hover,
-.button_reset:hover,
+input[type="submit"]:hover, button[type="submit"]:hover, input[type="button"]:hover,
 .linkbutton:hover, .linkbutton_right:hover, .linkbutton_left:hover {
 	border: 1px solid #CCCCCC;
+	border-top: 1px solid #AFAFAF;
+	border-left: 1px solid #AFAFAF;
 	background: #F0F0F0;
+	box-shadow: 2px 1px 1px rgba(0, 0, 0, 0.07) inset;
 	color: #555555;
 	text-decoration: none;
 }
@@ -191,23 +187,22 @@ strong {
 
 /* @todo - Test this everywhere. */
 .content {
-	border: 1px solid #DDDDDD;
-	background: #FFFFFF;
+	background: #FCFCFC;
 }
 
 /* Styles for main headers. */
 .category_header, .forum_category .category_header {
+	margin-bottom: 5px;
 	border-radius: 5px;
 	background: #EEEEEE;
 	color: #666666;
-	font-size: 1.5em;
-	font-weight: bolder;
 	text-shadow: 1px 1px 0 #EBEBEB;
-	margin-bottom: 5px;
+	font-weight: bolder;
+	font-size: 1.5em;
 }
 
 /* Single ones a bit darker than board index ones. */
-.forumposts .category_header, .content_category .category_header {
+#forumposts .category_header, .content_category .category_header {
 	border: 1px solid #CCCCCC;
 	border-top: 1px solid #CFCFCF;
 	border-bottom: 1px solid #B7B7B7;
@@ -222,7 +217,7 @@ strong {
 	text-shadow: 1px 1px 0 #FFFFFF;
 }
 
-.category_header a:link {
+.category_header a:link, .category_header a:visited {
 	color: #777777;
 }
 
@@ -245,7 +240,7 @@ strong {
 
 ::selection {
 	background: #7BB128;
-	color: white
+	color: white;
 }
 
 /* Other highlighted text, such as search results. */
@@ -297,8 +292,7 @@ strong {
 }
 
 /* Used for sections that need somewhat larger corners */
-/* @todo - Daft name. Other stuffz. :P */
-.roundframe {
+.roundframe, .well {
 	border: 1px solid #C5C5C5;
 	border-radius: 7px;
 	background: #F5F5F5;
@@ -306,6 +300,7 @@ strong {
 
 /* The generic wrapper thingy. */
 .generic_list_wrapper {
+	margin-top: 4px;
 	border: 1px solid #CCCCCC;
 	border-radius: 7px;
 }
@@ -386,13 +381,13 @@ strong {
 
 /* Styling for BBC tags */
 .bbc_link:link, .bbc_link:visited {
-	color: #377828;
 	box-shadow: 0 -1px 0 #CEDCCB inset;
+	color: #377828;
 }
 
 .bbc_link:hover {
-	color: #377828;
 	box-shadow: 0 -1px 0 #66AA55 inset;
+	color: #377828;
 	text-decoration: none;
 }
 
@@ -409,13 +404,13 @@ strong {
 
 .spoilerheader {
 	font-weight: bold;
-	cursor: pointer;
 	font-size: 0.857em;
+	cursor: pointer;
 }
 
 .spoiler {
-	border: 1px solid #CCCCCC;
 	padding: 0.3em;
+	border: 1px solid #CCCCCC;
 	background-color: #EEEEEE;
 }
 
@@ -439,10 +434,10 @@ div.bbc_footnotes .meaction {
 /* Prevent the footnote named anchor from hiding under the menu */
 .bbc_footnotes div:before {
 	display: block;
-	content: " ";
+	visibility: hidden;
 	margin-top: -75px;
 	height: 75px;
-	visibility: hidden;
+	content: " ";
 }
 
 /*	$AJAX		*/
@@ -464,21 +459,16 @@ div.bbc_footnotes .meaction {
 /* The top bar. */
 
 #top_section .wrapper {
-	background-color: white;
 	padding: 0 15px;
-	border-left: 1px solid #CCCCCC;
 	border-right: 1px solid #CCCCCC;
+	border-left: 1px solid #CCCCCC;
+	background-color: white;
 }
 
 /* Maintenance mode warning. */
 .notice {
-	font-weight: bold;
 	color: #A80000;
-}
-
-#search_form .button_submit {
-	font-variant: small-caps;
-	color: #333333;
+	font-weight: bold;
 }
 
 #search_form select {
@@ -495,24 +485,19 @@ div.bbc_footnotes .meaction {
 	background-color: white;
 }
 
-/* Main forum area. */
-/* Box-shadow only on this one. */
-#wrapper {
-	background: white;
-	border: 1px solid #CCCCCC;
-	border-top: none;
-}
+/* debug forum area. */
+
 
 #debug_logging a, #debug_logging strong {
 	color: yellow;
 }
 
 #debug_logging {
-	color: #BBBBBB;
-	background: #222222;
 	margin: 0 auto;
 	max-width: 90em;
 	width: 90%;
+	background: #222222;
+	color: #BBBBBB;
 }
 
 #debug_logging_wrapper {
@@ -520,10 +505,10 @@ div.bbc_footnotes .meaction {
 }
 
 #footer_section {
-	background-color: #4D4F54;
 	border-top: 2px solid #444444;
-	text-align: center;
+	background-color: #4D4F54;
 	color: #CCCCCC;
+	text-align: center;
 }
 
 #footer_section a {
@@ -531,9 +516,9 @@ div.bbc_footnotes .meaction {
 }
 
 #footer_section .rssfeeds {
-	color: orange;
-	background-color: white;
 	border-radius: 0.3em;
+	background-color: white;
+	color: orange;
 	text-shadow: 1px 1px 0 #000000;
 }
 
@@ -541,10 +526,10 @@ div.bbc_footnotes .meaction {
 /* ------------------------------------------------------- */
 /* Level 1 Menu bar: link or button. General styling. */
 .linklevel1, .linklevel1:link, .linklevel1:visited {
-	border-radius: 2px;
 	border: 1px solid #AFAFAF;
 	border-top: 1px solid #CFCFCF;
 	border-left: 1px solid #BFBFBF;
+	border-radius: 2px;
 	background: #F4F4F4;
 	background-image: linear-gradient(to bottom, #EFEFEF, #E4E4E4);
 	box-shadow: 1px 1px 2px #E5E5E5;
@@ -554,6 +539,10 @@ div.bbc_footnotes .meaction {
 
 .quickbuttons .listlevel1 {
 	font-size: 0.929em;
+}
+
+.quickbuttons .inline_mod_check {
+	margin-left: 0;
 }
 
 /* Level 1 button hover and focus effects. */
@@ -589,6 +578,9 @@ div.bbc_footnotes .meaction {
 }
 
 .poster li.poster_online .nolink {
+	position: relative;
+	display: block;
+	margin: 3px 1.5em;
 	border: 1px solid #AFAFAF;
 	border-top: 1px solid #CFCFCF;
 	border-left: 1px solid #BFBFBF;
@@ -596,10 +588,7 @@ div.bbc_footnotes .meaction {
 	background-image: linear-gradient(to bottom, #FFFFFF, #E4E4E4);
 	box-shadow: 1px 1px 2px #E5E5E5;
 	color: #7BB128;
-	display: block;
 	line-height: 2em;
-	margin: 3px 1.5em;
-	position: relative;
 }
 
 .poster li.poster_online .nolink img {
@@ -607,8 +596,8 @@ div.bbc_footnotes .meaction {
 }
 
 .poster li.subsections.listlevel1:hover .linklevel1 {
-	background: transparent;
 	border: 1px solid transparent;
+	background: transparent;
 	box-shadow: none;
 }
 
@@ -623,9 +612,9 @@ div.bbc_footnotes .meaction {
 }
 
 .poster .listlevel2:hover .linklevel2 {
-	color: #008299;
 	border: none;
 	box-shadow: none;
+	color: #008299;
 }
 
 .poster .listlevel1.subsections:hover:after {
@@ -633,11 +622,11 @@ div.bbc_footnotes .meaction {
 }
 
 .poster .subsections > a:after {
-	font-family: "FontAwesome";
-	font-size: 1.4em;
-	content: "\f0d7";
 	margin: 0 0 0 10px;
 	color: #CCCCCC;
+	content: "\f0d7";
+	font-size: 1.4em;
+	font-family: "FontAwesome";
 }
 
 .poster .linklevel2, .poster .linklevel2:hover {
@@ -646,45 +635,11 @@ div.bbc_footnotes .meaction {
 
 #main_menu .linklevel1, #main_menu .linklevel1:link, #main_menu .linklevel1:visited,
 .poster li.listlevel1, .poster li.listlevel1 a, .poster li.listlevel1 a:hover {
-	border-radius: 0;
 	border: 1px solid transparent;
+	border-radius: 0;
 	background-color: transparent;
 	background-image: none;
 	box-shadow: none;
-}
-
-/* Common button styling. */
-/* It is being replaced with three classes: */
-/*    .button_submit is not floated */
-/*    .right_submit is right floated */
-/*    .left_submit is left floated */
-/* The button_reset class may need attention too. */
-.button_submit, .right_submit, .left_submit, .button_reset,
-	/* Anchors styled to look like buttons. */
-	/* These have standard body text size. Can be chained with smalltext class. */
-.linkbutton:link, .linkbutton_right:link, .linkbutton_left:link,
-.linkbutton:visited, .linkbutton_right:visited, .linkbutton_left:visited {
-	border-radius: 2px;
-	border: 1px solid #AFAFAF;
-	border-top: 1px solid #CFCFCF;
-	border-left: 1px solid #BFBFBF;
-	background: #F4F4F4;
-	background-image: linear-gradient(to bottom, #FFFFFF, #E4E4E4);
-	color: #555555;
-	box-shadow: 1px 1px 2px #E5E5E5;
-}
-
-/* Hover effects. */
-.button_submit:hover, .right_submit:hover, .left_submit:hover,
-.button_reset:hover,
-.linkbutton:hover, .linkbutton_right:hover, .linkbutton_left:hover {
-	border: 1px solid #CCCCCC;
-	border-top: 1px solid #AFAFAF;
-	border-left: 1px solid #AFAFAF;
-	background: #F0F0F0;
-	box-shadow: 2px 1px 1px rgba(0, 0, 0, 0.07) inset;
-	color: #555555;
-	text-decoration: none;
 }
 
 /* Level 1 Menu bar: link or button. */
@@ -696,27 +651,26 @@ div.bbc_footnotes .meaction {
 }
 
 #menu_nav {
-	background: #333333;
-	background-image: linear-gradient(to bottom, #4D4F53 0%, #333333 49%, #333333 51%, #4D4F53 100%);
 	position: fixed;
 	top: 0;
 	z-index: 99;
+	padding: 0;
+	min-height: 35px;
 	width: 100%;
+	background: #333333;
+	background-image: linear-gradient(to bottom, #4D4F53 0%, #333333 49%, #333333 51%, #4D4F53 100%);
 	color: #EEEEEE;
 	line-height: 30px;
-	min-height: 35px;
-	padding: 0;
-	-webkit-backface-visibility: hidden;
 	-webkit-transform: translateZ(0);
-	-moz-transform: translateZ(0);
 	-ms-transform: translateZ(0);
+	-webkit-backface-visibility: hidden;
 }
 
 #main_menu {
-	background: transparent !important;
-	border: none !important;
-	padding: 0 !important;
 	margin: 0 auto;
+	padding: 0 !important;
+	border: none !important;
+	background: transparent !important;
 }
 
 /* Override link colour for admin/profile/etc menus. */
@@ -726,7 +680,7 @@ div.bbc_footnotes .meaction {
 
 /* For primary admin/profile/etc drop menus. */
 .admin_menu .linklevel1:hover, .admin_menu .linklevel1:focus,
-	/* For secondary admin/profile/etc menus. */
+/* For secondary admin/profile/etc menus. */
 #adm_submenus .linklevel1:hover, #adm_submenus .linklevel1:focus {
 	color: #333333;
 	text-decoration: none;
@@ -739,7 +693,7 @@ div.bbc_footnotes .meaction {
 
 /* Level 1 active buttons for primary admin/profile/etc drop menus... */
 .admin_menu .active,
-	/* ......and for secondary admin/profile/etc menu strip. */
+/* ......and for secondary admin/profile/etc menu strip. */
 #adm_submenus .active {
 	border: 1px solid #AAAAAA;
 	background: #7BB128;
@@ -763,26 +717,26 @@ a.active {
 /* Top level subsection indicators. */
 /* Level 1 active buttons. */
 .pm_indicator {
-	background: #F3B200;
-	color: #FFFFFF;
-	font-weight: bold;
-	box-shadow: 1px 1px 2px #444444;
-	border-radius: 4px;
-	padding: 0 5px;
 	position: relative;
 	top: -5px;
 	left: -1px;
+	padding: 0 5px;
+	border-radius: 4px;
+	background: #F3B200;
+	box-shadow: 1px 1px 2px #444444;
+	color: #FFFFFF;
+	font-weight: bold;
 }
 
 .likes_indicator {
 	position: absolute;
 	top: -1em;
 	right: -0.5em;
-	background: #F3B200;
-	color: #FFFFFF;
 	padding: 0 0.6em;
 	border-radius: 4px;
+	background: #F3B200;
 	box-shadow: 1px 1px 1px #444444;
+	color: #FFFFFF;
 	font-weight: bold;
 	font-size: 0.786em;
 	line-height: 1.4em;
@@ -791,9 +745,9 @@ a.active {
 /* Levels 2 and 3: drop menu wrapper. */
 .menulevel2, .menulevel3 {
 	border: 1px solid grey;
+	border-radius: 5px;
 	background: white;
 	box-shadow: 1px 2px 4px #CCCCCC;
-	border-radius: 5px;
 }
 
 /* Levels 2 and 3 drop menus: link or button. */
@@ -821,11 +775,11 @@ a.active {
 /* Level 2: subsection indicators. */
 .listlevel2.subsections .linklevel2:after {
 	position: absolute;
-	font-family: "FontAwesome";
 	right: 6px;
 	color: #CCCCCC;
 	content: "\f0da";
 	font-size: 1.286em;
+	font-family: "FontAwesome";
 }
 
 /* Levels 2 and 3: highlighting of current section */
@@ -856,8 +810,8 @@ a.active {
 #menu_sidebar .listlevel1.subsections .linklevel1:after {
 	position: absolute;
 	right: 6px;
-	font-family: "FontAwesome";
 	content: "\f0da";
+	font-family: "FontAwesome";
 }
 
 /*	$PAGELINKS	*/
@@ -867,8 +821,8 @@ a.active {
 }
 
 .pagelinks .navPages {
-	color: #555555;
 	margin: 0 2px;
+	color: #555555;
 }
 
 .pagelinks .navPages:hover, .pagelinks .current_page {
@@ -883,19 +837,19 @@ a.active {
 
 /* our buddies &laquo; &raquo; */
 .small_pagelinks:before {
-	content: '\00AB';
 	float: left;
+	color: #999999;
+	content: '\00AB';
 	font-size: 1.286em;
 	line-height: 1.3em;
-	color: #999999;
 }
 
 .small_pagelinks:after {
-	content: '\00BB';
 	float: left;
+	color: #999999;
+	content: '\00BB';
 	font-size: 1.286em;
 	line-height: 1.3em;
-	color: #999999;
 }
 
 /* Globally accessible top/bottom links. */
@@ -924,15 +878,18 @@ a.active {
 /*	$MAIN.		*/
 /* ------------------------------------------------------- */
 #wrapper {
+	border: 1px solid #CCCCCC;
+	border-top: none;
+	background: white;
 	margin-top: 0;
 }
 
 #forumtitle {
+	margin: 0;
+	padding: 0;
+	text-shadow: 1px 1px 2px #FFFFFF;
 	font-weight: bolder;
 	font-size: 2.5em;
-	padding: 0;
-	margin: 0;
-	text-shadow: 1px 1px 2px #FFFFFF;
 }
 
 #forumtitle > a {
@@ -941,24 +898,24 @@ a.active {
 
 /* News section. */
 #news {
-	font-size: 0.929em;
-	background-color: #F9F9F9;
 	padding: 8px;
+	background-color: #F9F9F9;
+	font-size: 0.929em;
 }
 
 #news > h2 {
 	color: #7BB128;
+	font-weight: bold;
 	font-size: 1.5em;
 	line-height: 1.2em;
-	font-weight: bold;
 }
 
 #news_line, #elkFadeScroller {
-	color: #666666;
+	overflow: auto;
+	padding: 3px;
 	min-height: 60px;
 	height: 60px;
-	padding: 3px;
-	overflow: auto;
+	color: #666666;
 	resize: vertical;
 }
 
@@ -970,8 +927,8 @@ a.active {
 /* ------------------------------------------------------- */
 /* The navigation list (i.e. linktree) */
 .navigate_section {
-	border: 1px solid #EEEEEE;
 	margin: 4px 0 0 0;
+	border: 1px solid #EEEEEE;
 }
 
 .linktree {
@@ -979,13 +936,13 @@ a.active {
 }
 
 .linktree:not(:last-child):after {
+	top: 0.25em;
+	width: 1.5em;
+	height: 1.5em;
 	background-image: linear-gradient(45deg, #FFFFFF 0%, #FFFFFF 50%, #EEEEEE 50%, #EEEEEE 100%);
 	-webkit-transform: rotate(45deg);
 	-ms-transform: rotate(45deg);
 	transform: rotate(45deg);
-	width: 1.5em;
-	height: 1.5em;
-	top: 0.25em;
 }
 
 .board_name > a {
@@ -1048,14 +1005,14 @@ a.active {
 .board_key:before {
 	display: block;
 	float: left;
-	height: 24px;
 	width: 26px;
+	height: 24px;
 	content: "";
 }
 
 .category_boards .board_icon, .board_key:before {
-	background-repeat: no-repeat;
 	background-image: url(../../images/_besocial/board_icons.png);
+	background-repeat: no-repeat;
 }
 
 .on_board {
@@ -1087,8 +1044,8 @@ a.active {
 }
 
 .topic_listing li {
-	border-bottom: 1px solid #EEEEEE;
 	border-top: 1px solid #EEEEEE;
+	border-bottom: 1px solid #EEEEEE;
 }
 
 .topic_listing li.sticky_row {
@@ -1103,17 +1060,33 @@ a.active {
 /* We need an offset for some of our anchors due to the fixed top navigation */
 .post_anchor, .pm_anchor, #new {
 	display: block;
+	visibility: hidden;
 	margin-top: -45px;
 	padding-top: 45px;
-	visibility: hidden;
 }
 
-.windowbg {
-	background-color: #F6F6F6;
+
+/* On to the posts */
+#quickreplybox, #forumposts, #searchform, #recentposts, #pmFolder, #topic_summary, #preview_section {
 }
 
-.windowbg2 {
-	background-color: #FCFCFC;
+.forumposts, .profile_content {
+	background: #F6F6F6;
+}
+
+.forumposts:nth-of-type(even) {
+	margin-top: 2px;
+	background: #FCFCFC;
+}
+
+.forumposts:nth-of-type(odd) {
+	margin-top: 2px;
+	background: #F6F6F6;
+}
+
+.content_noframe {
+	border: none;
+	box-shadow: none;
 }
 
 .approvebg {
@@ -1121,9 +1094,9 @@ a.active {
 }
 
 .board_stats {
-	text-align: left;
-	padding: 1px 6px 1px 0;
 	float: left;
+	padding: 1px 6px 1px 0;
+	text-align: left;
 }
 
 .small_pagelinks li {
@@ -1131,9 +1104,9 @@ a.active {
 }
 
 #expanded_pages_container {
-	background: #FFFFFF;
-	border-radius: 2px;
 	border: 1px solid #EEEEEE;
+	border-radius: 2px;
+	background: #FFFFFF;
 }
 
 #pages_scroll_left, #pages_scroll_right {
@@ -1161,19 +1134,19 @@ a.active {
 }
 
 #poll_options .options .percentage {
-	background: #FFFFFF;
 	border-radius: 4px;
+	background: #FFFFFF;
 }
 
 /*	$EDITOR		*/
 /* ------------------------------------------------------- */
 
 .drop_area {
-	-webkit-font-smoothing: antialiased;
-	color: #43A8DA;
-	background-color: #EEEEEE;
 	border: 1px dashed #CCCCCC;
 	border-radius: 5px;
+	background-color: #EEEEEE;
+	color: #43A8DA;
+	-webkit-font-smoothing: antialiased;
 }
 
 .statusbar {
@@ -1187,13 +1160,13 @@ a.active {
 }
 
 .progressBar div {
-	color: #FFFFFF;
 	background-color: #43A8DA;
+	color: #FFFFFF;
 }
 
 .abort, .remove .share {
-	background-color: #A8352F;
 	border-radius: 5px;
+	background-color: #A8352F;
 	color: #FFFFFF;
 	cursor: pointer;
 }
@@ -1206,8 +1179,8 @@ a.active {
 
 /* Lotsa boxes. */
 .description, .information, .warningbox, .successbox, .infobox, .errorbox {
-	background: #FFFFFF;
 	border: 1px solid #CCCCCC;
+	background: #FFFFFF;
 }
 
 /* Information boxes. */
@@ -1369,9 +1342,9 @@ a.help .icon {
 /* $STATISTICS	*/
 /* ------------------------------------------------------- */
 .statistics .category_header {
-	background: none;
 	border: none;
 	border-bottom: 2px solid #CCCCCC;
+	background: none;
 	text-shadow: none;
 }
 
@@ -1400,8 +1373,8 @@ a.help .icon {
 }
 
 .statsbar .bar {
-	background: #43A8DA;
 	border-radius: 4px 0 0 4px;
+	background: #43A8DA;
 }
 
 /* Absolute positioning stops these breaking the bars on narrow screens. */
@@ -1422,12 +1395,12 @@ a.help .icon {
 }
 
 .ui-tabs .ui-tabs-nav li {
-	border-radius: 5px 5px 0 0;
+	margin-left: 2px;
 	border: 2px solid #F0F0F0;
 	border-bottom: none;
-	color: #FFFFFF;
+	border-radius: 5px 5px 0 0;
 	box-shadow: 2px 0 0 rgba(0, 0, 0, 0.3);
-	margin-left: 2px;
+	color: #FFFFFF;
 }
 
 .ui-tabs .ui-tabs-nav .ui-state-active a, .ui-tabs .ui-tabs-nav .ui-state-active {
@@ -1435,10 +1408,10 @@ a.help .icon {
 }
 
 .ui-tabs .ui-tabs-nav li a {
-	background: #F0F0F0;
-	border-bottom-color: #CCCCCC;
 	outline: none;
+	border-bottom-color: #CCCCCC;
 	border-radius: 5px 5px 0 0;
+	background: #F0F0F0;
 }
 
 .ui-tabs .ui-tabs-nav .ui-state-default a {
@@ -1447,9 +1420,9 @@ a.help .icon {
 }
 
 .ui-tabs .ui-tabs-nav .ui-state-active a, .ui-tabs .ui-tabs-nav .ui-state-active {
+	border-radius: 5px 5px 0 0;
 	background: #F6F6F6;
 	color: #333333;
-	border-radius: 5px 5px 0 0;
 }
 
 .ui-tabs .ui-state-hover {
@@ -1459,14 +1432,14 @@ a.help .icon {
 }
 
 /*floating error box*/
-/* currently used by like funcationality*/
+/* currently used by like functionality*/
 .floating_error {
+	border: solid 1px #E4E4E4;
+	border-radius: 10px;
 	background: #FFFFFF;
 	background: rgba(255, 255, 255, 1);
-	font-size: 15px;
 	color: #404040;
-	border-radius: 10px;
-	border: solid 1px #E4E4E4;
+	font-size: 15px;
 }
 
 .floating_error .error_heading {
@@ -1480,8 +1453,8 @@ a.help .icon {
 .floating_error .error_btn {
 	border-top: solid 1px #D6D6D6;
 	color: #157DFB;
-	font-size: 16px;
 	font-weight: bold;
+	font-size: 16px;
 }
 
 .floating_error .error_btn:hover {
@@ -1496,15 +1469,15 @@ a.help .icon {
 }
 
 .mlist li div, .whos_online dd:nth-child(odd) div {
-	background-color: #FFFFFF;
-	border-bottom: 1px solid #CCCCCC;
 	border-top: 1px solid #CCCCCC;
+	border-bottom: 1px solid #CCCCCC;
+	background-color: #FFFFFF;
 }
 
 .mlist li.alternate_row div, .whos_online dd:nth-child(even) div {
-	background-color: #FAFAFA;
-	border-bottom: 1px solid #CCCCCC;
 	border-top: 1px solid #CCCCCC;
+	border-bottom: 1px solid #CCCCCC;
+	background-color: #FAFAFA;
 }
 
 .mlist li div:first-child {
@@ -1517,8 +1490,8 @@ a.help .icon {
 
 .letter_row h3 {
 	border: 1px solid #CCCCCC;
-	border-radius: 6px 6px 0 0;
 	border-bottom: none;
+	border-radius: 6px 6px 0 0;
 }
 
 /*	$MEDIA		*/
@@ -1554,12 +1527,12 @@ a.help .icon {
 /* This one does 800 screens at default font size. */
 @media screen and (min-width: 50em) {
 	#menu_nav .listlevel1.subsections > a:before {
-		font-family: "FontAwesome";
-		margin: -1px 5px 0 0;
 		float: left;
-		font-size: 1.2em;
-		content: "\f0d7";
+		margin: -1px 5px 0 0;
 		color: #43A8DA;
+		content: "\f0d7";
+		font-size: 1.2em;
+		font-family: "FontAwesome";
 	}
 
 	#menu_nav .listlevel1 {
@@ -1580,20 +1553,20 @@ a.help .icon {
 	}
 
 	[data-icon]:before {
-		font-family: 'FontAwesome';
-		border: 3px solid white;
+		display: inline-block;
+		margin: 2px;
 		padding: 3px;
 		padding-bottom: 0;
-		margin: 2px;
-		height: 1.1em;
-		line-height: 1.1em;
 		width: 1.1em;
-		text-align: center;
-		display: inline-block;
+		height: 1.1em;
+		border: 3px solid white;
 		border-radius: 4px;
-		font-size: 2.071em;
 		color: #43A8DA;
 		content: attr(data-icon);
+		text-align: center;
+		font-size: 2.071em;
+		font-family: 'FontAwesome';
+		line-height: 1.1em;
 	}
 
 	.indicator[data-icon]:before {
@@ -1605,11 +1578,11 @@ a.help .icon {
 	}
 
 	.statistics .category_header {
+		margin-bottom: 5px !important;
 		border: none;
 		border-bottom: 1px solid #CCCCCC;
 		border-radius: 0;
 		background-color: #F6F6F6;
-		margin-bottom: 5px !important;
 	}
 
 	.mlist li div.posts {
@@ -1620,8 +1593,8 @@ a.help .icon {
 /* This one does up to 540 screens. */
 @media screen and (max-width: 33.750em) {
 	#gotop, #gobottom {
-		border-radius: 0 0 0;
 		border-top: 0;
+		border-radius: 0 0 0;
 	}
 
 	#gotop {
@@ -1634,8 +1607,8 @@ a.help .icon {
 
 	.board_row, .childboard_row {
 		border: 1px solid #CCCCCC;
-		box-shadow: 1px 1px 3px #CCCCCC;
 		background-color: #F9F9F9;
+		box-shadow: 1px 1px 3px #CCCCCC;
 	}
 
 	.board_row {
@@ -1672,16 +1645,16 @@ a.help .icon {
 	}
 
 	.topic_listing > li {
-		border: 1px solid #BFBFBF;
-		box-shadow: 3px 3px 6px #E5E5E5;
-		border-radius: 3px;
 		margin-bottom: 8px;
+		border: 1px solid #BFBFBF;
+		border-radius: 3px;
+		box-shadow: 3px 3px 6px #E5E5E5;
 	}
 
 	.new_posts {
-		font-size: 0.714em;
 		position: relative;
 		top: -3px;
+		font-size: 0.714em;
 	}
 
 	.topic_name {
@@ -1689,11 +1662,11 @@ a.help .icon {
 	}
 
 	.topic_listing h4 {
+		overflow: hidden;
 		margin-bottom: 3px;
 		max-width: 20em;
 		text-overflow: ellipsis;
 		white-space: nowrap;
-		overflow: hidden;
 	}
 
 	.topic_listing li.sticky_row {
@@ -1713,8 +1686,8 @@ a.help .icon {
 	}
 
 	.topic_name h4 {
-		font-size: 1.429em;
 		padding-bottom: 2px;
+		font-size: 1.429em;
 	}
 
 	.topic_latest:after {
@@ -1756,15 +1729,15 @@ a.help .icon {
 	}
 
 	.forumposts .windowbg, .forumposts .windowbg2 {
-		border: 1px solid #BFBFBF;
-		box-shadow: 3px 3px 6px #E5E5E5;
-		border-radius: 3px;
 		margin-top: 8px;
+		border: 1px solid #BFBFBF;
+		border-radius: 3px;
+		box-shadow: 3px 3px 6px #E5E5E5;
 	}
 
 	.forum_category, .forumposts, .content_category {
-		background: #FFFFFF;
 		border: none;
+		background: #FFFFFF;
 	}
 
 	.listlevel2.subsections .linklevel2::after {
@@ -1793,10 +1766,10 @@ a.help .icon {
 	}
 
 	.admin_menu li {
-		float: left;
 		display: block;
-		width: 48%;
+		float: left;
 		box-sizing: border-box;
+		width: 48%;
 	}
 
 	.listlevel1#button_profile .linklevel1 {
@@ -1804,10 +1777,10 @@ a.help .icon {
 	}
 
 	#search_form {
+		float: none;
 		padding: 4px 0;
 		width: 100%;
 		border-bottom: 1px solid #CCCCCC;
-		float: none;
 	}
 
 	#search_form .input_text {
@@ -1819,8 +1792,8 @@ a.help .icon {
 	}
 
 	.whos_online dd div {
-		border-bottom: none !important;
 		border-top: none !important;
+		border-bottom: none !important;
 	}
 
 	.whos_online dd:nth-child(even), .whos_online dd:nth-child(odd) {
