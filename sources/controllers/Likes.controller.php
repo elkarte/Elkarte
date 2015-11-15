@@ -618,8 +618,9 @@ class Likes_Controller extends Action_Controller
 	/**
 	 * Like stats controller function, used by API calls.
 	 *
-	 * Validates whether user is allowed to see stats or not.
-	 * Decides which tab data to fetch and shown to user.
+	 * What it does:
+	 * - Validates whether user is allowed to see stats or not.
+	 * - Decides which tab data to fetch and show to user.
 	 */
 	public function action_index_api()
 	{
@@ -627,9 +628,11 @@ class Likes_Controller extends Action_Controller
 
 		require_once(SUBSDIR . '/Likes.subs.php');
 
+		// Likes are not on, your quest for statistics ends here
 		if (empty($modSettings['likes_enabled']))
 			Errors::instance()->fatal_lang_error('feature_disabled', true);
 
+		// And you can see the stats
 		isAllowedTo('like_posts_stats');
 
 		loadLanguage('LikePosts');
@@ -656,9 +659,10 @@ class Likes_Controller extends Action_Controller
 	/**
 	 * Like stats controller function.
 	 *
-	 * Validates whether user is allowed to see stats or not.
-	 * Presents a general page without data that will be fully loaded
-	 * by API calls.
+	 * What it does:
+	 * - Validates whether user is allowed to see stats or not.
+	 * - Presents a general page without data that will be fully loaded by API calls.
+	 * - Used when JS is not enabled and data is fulled by page request
 	 */
 	public function action_likestats()
 	{
@@ -666,9 +670,11 @@ class Likes_Controller extends Action_Controller
 
 		require_once(SUBSDIR . '/Likes.subs.php');
 
+		// Likes are not on, your quest for statistics ends here
 		if (empty($modSettings['likes_enabled']))
 			Errors::instance()->fatal_lang_error('feature_disabled', true);
 
+		// Worthy to view like statistics?
 		isAllowedTo('like_posts_stats');
 
 		// Load the required files
@@ -676,9 +682,9 @@ class Likes_Controller extends Action_Controller
 		loadJavascriptFile('like_posts.js', array('defer' => true));
 		loadtemplate('LikePostsStats');
 
+		// Template and tab data
 		$context['page_title'] = $txt['like_post_stats'];
 		$context['like_posts']['tab_desc'] = $txt['like_posts_stats_desc'];
-
 		$context['lp_stats_tabs'] = array(
 			'messagestats' => array(
 				'label' => $txt['like_post_message'],
@@ -705,26 +711,35 @@ class Likes_Controller extends Action_Controller
 	}
 
 	/**
-	 * Fetches the most liked message data
-	 * Returns the data via ajax
+	 * Determines the most liked message in the system
+	 *
+	 * What it does:
+	 * - Fetches the most liked message data
+	 * - Returns the data via ajax
 	 */
 	public function action_messageStats()
 	{
 		global $txt;
 
+		// Lets get the statistics!
 		$data = dbMostLikedMessage();
 
+		// Set the response
 		if (!empty($data))
 			$this->_likes_response = array('result' => true, 'data' => $data);
 		else
 			$this->_likes_response = array('result' => false, 'error' => $txt['like_post_error_something_wrong']);
 
+		// Off we go
 		$this->likeResponse();
 	}
 
 	/**
-	 * Fetches the most liked topic data
-	 * Returns the data via ajax
+	 * Determine the most liked topics in the system
+	 *
+	 * What it does:
+	 * - Gets the most liked topics in the system
+	 * - Returns the data via ajax
 	 */
 	public function action_topicStats()
 	{

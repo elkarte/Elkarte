@@ -819,12 +819,6 @@ function template_pages_and_buttons_below()
 					sGoButtonLabel: "', $txt['go'], '"
 				});
 			// ]]></script>';
-
-	// Tooltips for likes
-	echo '
-			<script><!-- // --><![CDATA[
-				$(".like_button, .unlike_button, .likes_button").SiteTooltip({hoverIntent: {sensitivity: 10, interval: 150, timeout: 50}});
-			// ]]></script>';
 }
 
 /**

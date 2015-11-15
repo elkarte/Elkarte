@@ -252,8 +252,10 @@ String.prototype.easyReplace = function (oReplacements)
 {
 	var sResult = this;
 
-	for (var sSearch in oReplacements)
+	for (var sSearch in oReplacements) {
+		sSearch = sSearch.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&');
 		sResult = sResult.replace(new RegExp('%' + sSearch + '%', 'g'), oReplacements[sSearch]);
+	}
 
 	return sResult;
 };
@@ -856,6 +858,7 @@ elk_Toggle.prototype.init = function()
 					oContainer.style.display = 'block';
 
 				oContainer.instanceRef = this;
+
 				oContainer.onclick = function () {
 					this.instanceRef.toggle();
 					this.blur();
