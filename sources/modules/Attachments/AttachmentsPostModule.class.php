@@ -355,7 +355,7 @@ class Attachments_Post_Module implements ElkArte\sources\modules\Module_Interfac
 		}
 		else
 		{
-			$this->createAttachment($msg);
+			$this->createAttachment($msg, 0);
 		}
 	}
 
@@ -422,7 +422,7 @@ class Attachments_Post_Module implements ElkArte\sources\modules\Module_Interfac
 
 		$this->_is_new_message = empty($msgOptions['id']);
 
-		$this->createAttachment($msg);
+		$this->createAttachment($msg, 0);
 
 		if (!empty($this->_saved_attach_id) && $msgOptions['icon'] === 'xx')
 			$msgOptions['icon'] = 'clip';
@@ -484,18 +484,41 @@ class Attachments_Post_Module implements ElkArte\sources\modules\Module_Interfac
 	public function after_save_post($msgOptions)
 	{
 		if ($this->_is_new_message && !empty($this->_saved_attach_id))
+		{
 			bindMessageAttachments($msgOptions['id'], array_values($this->_saved_attach_id));
+		}
 	}
 
 	public function before_delete_draft($id_draft, $msgOptions)
 	{
 		if (!empty($id_draft))
-			bindDraftAttachmentsToMessage($msgOptions['id'], array_values($id_draft));
+		{
+			$attach_ids = getAttachmentsFromMsg($id_draft, 1);
+			$attach_to_keep = array_map('intval', $_POST['attach_del']);
+			if (!empty($this->_saved_attach_id))
+				$attach_to_keep = array_merge($attach_to_keep, array_values($this->_saved_attach_id));
+			$attach_to_bind = array();
+
+			foreach ($attach_ids as $attach_id)
+			{
+				if (in_array($attach_id, $attach_to_keep))
+				{
+					$attach_to_bind[] = $attach_id;
+				}
+			}
+
+			if (!empty($attach_to_bind))
+			{
+				bindAttachmentsTo($msgOptions['id'], $attach_to_bind, 1, 0);
+			}
+		}
 	}
 
 	public function after_save_draft($id_draft)
 	{
 		if (!empty($id_draft) && !empty($this->_saved_attach_id))
+		{
 			bindMessageAttachments($id_draft, array_values($this->_saved_attach_id), 1);
+		}
 	}
 }

@@ -479,16 +479,6 @@ function saveDraft($draft, $check_last_save = false, $id_topic = 0)
 			$post_errors->addError('draft_not_saved');
 	}
 
-	// If we were called from the autosave function, send something back
-	if (!empty($id_draft) && $check_last_save && !$post_errors->hasError('session_timeout'))
-	{
-		loadTemplate('Xml');
-		$context['sub_template'] = 'xml_draft';
-		$context['id_draft'] = $id_draft;
-		$context['draft_saved_on'] = time();
-		obExit();
-	}
-
 	return;
 }
 

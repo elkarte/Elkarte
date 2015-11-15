@@ -186,6 +186,18 @@ class Drafts_Post_Module implements ElkArte\sources\modules\Module_Interface
 				// Cleanup
 				unset($_POST['save_draft']);
 
+				// Be ready for surprises
+				$post_errors = Error_Context::context('post', 1);
+
+				// If we were called from the autosave function, send something back
+				if (!empty($context['id_draft']) && isset($_REQUEST['xml']) && !$post_errors->hasError('session_timeout'))
+				{
+					loadTemplate('Xml');
+					$context['sub_template'] = 'xml_draft';
+					$context['draft_saved_on'] = time();
+					obExit();
+				}
+
 				throw new Controller_Redirect_Exception('Post_Controller', 'action_post');
 			}
 		}
