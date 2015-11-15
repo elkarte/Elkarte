@@ -225,6 +225,13 @@ strong, .bbc_strong {
 	border-radius: 2px;
 }
 
+/* Custom highlighted text style for modern browsers. */
+/* Nicer than default. Needs two separate rules. */
+::-moz-selection {
+	background: #D8FFDF;
+	color: #444444;
+}
+
 ::selection {
 	background: #D8FFDF;
 	color: #444444;
@@ -453,7 +460,6 @@ div.bbc_footnotes .meaction {
 #search_form input[type="submit"] {
 	border-radius: 0 2px 2px 0;
 	color: #333333;
-	font-variant: small-caps;
 }
 
 #search_form select {
@@ -1396,12 +1402,9 @@ div.bbc_footnotes .meaction {
 	border-radius: 4px 4px 0 0;
 }
 
-.forumposts {
-	margin-top: 2px;
-}
-
 /* Poster and postarea + moderation area underneath */
 .forumposts {
+	margin-top: 2px;
 	border: 1px solid #DDDDDD;
 	border-bottom: 1px solid #CCCCCC;
 	background: #FEFEFE;
