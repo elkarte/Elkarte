@@ -48,12 +48,11 @@ a, a:link, a:visited,
 /* Links that open in a new window. */
 a.new_win:link, a.new_win:visited {
 	color: #49643D;
-	text-decoration: none;
 }
 
 /* Cursor declared here.Should not be required anywhere else. */
 a:hover, a.new_win:hover {
-	text-decoration: underline;
+
 }
 
 /* Stop white band under footer on short pages. */
@@ -63,27 +62,19 @@ html {
 }
 
 body {
-	background: #585858;
-	background-image: linear-gradient(to right, #333333 0%, #888888 50%, #333333 100%);
+	background: #585858 linear-gradient(to right, #333333 0%, #888888 50%, #333333 100%);
 	color: #585858;
 }
 
 fieldset {
-	margin: 5px 0;
-	padding: 6px;
-	border: 1px solid #CCCCCC;
-	border-radius: 5px;
+	border-color: #CCCCCC;
 	background: transparent;
 	box-shadow: inset -1px -1px 3px #FEFEFE;
 }
 
 legend {
-	margin-left: 15px;
 	background: url(../../images/selected_open.png) 0 50% no-repeat;
-	padding: 0 0 2px 20px;
 	color: #333333;
-	font-size: 1.071em;
-	cursor: pointer;
 }
 
 .collapsed legend {
@@ -91,14 +82,13 @@ legend {
 }
 
 input, button, select, textarea, .editor {
-	border: 1px solid #CCCCCC;
-	border-radius: 2px;
+	border-color: #CCCCCC;
 	background: #FAFAFA;
 	color: #585858;
 }
 
 input:hover, textarea:hover, button:hover, select:hover {
-	border: 1px solid #999999;
+	border-color: #999999;
 	background: #FEFEFE;
 }
 
@@ -108,7 +98,7 @@ textarea:hover, .editor:hover {
 }
 
 input:focus, textarea:focus, button:focus, select:focus, .editor:focus {
-	border: 1px solid #999999;
+	border-color: #999999;
 }
 
 /* Give disabled text input elements a different background color. */
@@ -118,7 +108,6 @@ input[disabled].input_text, input[disabled].input_password {
 
 /* The OpenID login form */
 .openid_login {
-	padding-left: 20px;
 	background: white url(../../images/openid.png) no-repeat 2% 50%;
 }
 
@@ -132,8 +121,7 @@ input[type="submit"], .drop_area_fileselect_text, button[type="submit"], input[t
 	border-top: 1px solid #CFCFCF;
 	border-left: 1px solid #BFBFBF;
 	border-radius: 2px;
-	background: #F4F4F4;
-	background-image: linear-gradient(to bottom, #FEFEFE, #E4E4E4);
+	background: #F4F4F4 linear-gradient(to bottom, #FEFEFE, #E4E4E4);
 	box-shadow: 1px 1px 2px #E4E4E4, 0 -1px 0 #E4E4E4 inset;
 	color: #585858;
 }

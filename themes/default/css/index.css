@@ -60,14 +60,28 @@
 	max-width: 90em;
 }
 
+/* ------------------------------------------------------- */
+/*	$GENERAL	                                           */
+/* ------------------------------------------------------- */
+/* Normal, standard links. */
+a, a:link, a:visited,
+	/* Links that open in a new window. */
+a.new_win:link, a.new_win:visited {
+	text-decoration: none;
+}
+
 /* Cursor declared here.Should not be required anywhere else. */
 a:hover, a.new_win:hover {
 	cursor: pointer;
+	text-decoration: underline;
 }
 
-body {
+html, body {
 	margin: 0;
-	padding: 0 0 0 0;
+	padding: 0;
+}
+
+body, input, button, select, textarea, .editor {
 	/* Set a font-size that will look the same in all browsers. */
 	/* Start with the best Vista/W7 font, then Mac, Linux, then old fallbacks. */
 	/* this results in a base 14pt and pt to em translation approx as so
@@ -75,6 +89,13 @@ body {
 	/* 17 - 1.214, 18 - 1.286, 19 - 1.357, 20 - 1.429, 21 - 1.5, 22 - 1.571, 23 - 1.643
 	/* 24 - 1.714, 25 - 1.786, 26 - 1.857, 27 - 1.929, 28 - 2, 29 - 2.071 */
 	font: 87.5%/150% "Segoe UI", "Helvetica Neue", "Liberation Sans", "Nimbus Sans L", "Trebuchet MS", Arial, sans-serif;
+}
+
+legend {
+	margin-left: 15px;
+	padding: 0 0 2px 20px;
+	font-size: 1.071em;
+	cursor: pointer;
 }
 
 /* Tables should show empty cells. */
@@ -90,13 +111,20 @@ h1, h2, h3, h4, h5, h6,
 ul, ol, li,
 dl, dd, dt,
 p, fieldset,
-form, input, button, select, .input_text, textarea,
-.editor {
+form, input, button, select, textarea,
+.input_text, .editor {
 	box-sizing: border-box;
 	margin: 0;
 	padding: 0;
 	font-weight: normal;
 	font-size: 1em;
+}
+
+fieldset {
+	margin: 5px 0;
+	padding: 6px;
+	border-radius: 5px;
+	border: 1px solid #CCCCCC;
 }
 
 /* Specific box-sizing declarations */
@@ -167,14 +195,10 @@ input::-moz-focus-inner {
 	padding: 0;
 	border: 0;
 }
-input, button, select, textarea, .editor {
-	font: 87.5%/150% "Segoe UI", "Helvetica Neue", "Liberation Sans", "Nimbus Sans L", "Trebuchet MS", Arial, sans-serif;
-}
 
 /* The following is necessary. */
 textarea, .editor {
 	border-radius: 4px;
-	font-size: 1em;
 }
 
 .sceditor-container {
@@ -191,6 +215,11 @@ select {
 	max-height: 2em;
 	height: 2em;
 	vertical-align: middle;
+}
+
+input, button, select, textarea, .editor {
+	border: 1px solid #CCCCCC;
+	border-radius: 2px;
 }
 
 .input_text {
@@ -211,6 +240,11 @@ input[type="file"] {
 .select_multiple {
 	min-height: 10em;
 	height: auto;
+}
+
+/* The OpenID login form */
+.openid_login {
+	padding-left: 20px;
 }
 
 input[type="number"] {
