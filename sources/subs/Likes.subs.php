@@ -550,15 +550,15 @@ function dbMostLikedMessage($limit = 10)
 	);
 
 	$mostLikedMessages = array();
-	$bbc_wrapper = \BBC\ParserWrapper::getInstance();
+	$bbc_parser = \BBC\ParserWrapper::getInstance();
 
 	while ($row = $db->fetch_assoc($request))
 	{
-		$row['body'] = parse_bbc($row['body'], $row['smileys_enabled'], $row['id_msg']);
-
 		// Censor it!
 		censorText($row['subject']);
 		censorText($row['body']);
+
+		$row['body'] = $bbc_wrapper->parseMessage($row['body'], $row['smileys_enabled'], $row['id_msg']);
 
 		// Something short and sweet
 		$msgString = Util::shorten_html($row['body'], 255);
@@ -575,7 +575,7 @@ function dbMostLikedMessage($limit = 10)
 			'like_count' => $row['like_count'],
 			'subject' => $row['subject'],
 			'preview' => $preview,
-			'body' => $bbc_wrapper->parseMessage($msgString, $row['smileys_enabled'], $row['id_msg']),
+			'body' => $msgString,
 			'time' => standardTime($row['poster_time']),
 			'html_time' => htmlTime($row['poster_time']),
 			'timestamp' => forum_time(true, $row['poster_time']),
@@ -648,11 +648,11 @@ function dbMostLikedMessagesByTopic($topic, $limit = 5)
 		),
 		function($row) use ($scripturl, $bbc_wrapper)
 		{
-			$row['body'] = parse_bbc($row['body'], $row['smileys_enabled'], $row['id_msg']);
-
 			// Censor those naughty words
 			censorText($row['body']);
 			censorText($row['subject']);
+
+			$row['body'] = $bbc_wrapper->parseMessage($row['body'], $row['smileys_enabled']);
 
 			// Something short to show is all that's needed
 			$msgString = Util::shorten_html($row['body'], 255);
@@ -666,7 +666,7 @@ function dbMostLikedMessagesByTopic($topic, $limit = 5)
 				'id_board' => $row['id_board'],
 				'like_count' => $row['like_count'],
 				'subject' => $row['subject'],
-				'body' => $bbc_wrapper->parseMessage($msgString, $row['smileys_enabled']),
+				'body' => $msgString,
 				'preview' => $preview,
 				'time' => standardTime($row['poster_time']),
 				'html_time' => htmlTime($row['poster_time']),
@@ -910,13 +910,13 @@ function dbMostLikedPostsByUser($id_member, $limit = 10)
 			'id_member' => $id_member,
 			'limit' => $limit
 		),
-		function($row) use($bbc_wrapper)
+		function ($row) use ($bbc_wrapper)
 		{
-			$row['body'] = parse_bbc($row['body'], $row['smileys_enabled'], $row['id_msg']);
-
 			// Censor those naughty words
 			censorText($row['body']);
 			censorText($row['subject']);
+
+			$row['body'] = $bbc_wrapper->parseMessage($row['body'], $row['smileys_enabled']);
 
 			// Something short to show is all that's needed
 			$msgString = Util::shorten_html($row['body'], 255);
@@ -927,7 +927,7 @@ function dbMostLikedPostsByUser($id_member, $limit = 10)
 				'id_msg' => $row['id_msg'],
 				'like_count' => $row['like_count'],
 				'subject' => $row['subject'],
-				'body' => $bbc_wrapper->parseMessage($msgString, $row['smileys_enabled']),
+				'body' => $msgString,
 				'preview' => $preview,
 				'time' => standardTime($row['poster_time']),
 				'html_time' => htmlTime($row['poster_time']),
@@ -1025,13 +1025,13 @@ function dbRecentlyLikedPostsGivenUser($id_liker, $limit = 5)
 			'id_member' => $id_liker,
 			'limit' => $limit
 		),
-		function($row) use($bbc_wrapper)
+		function($row) use ($bbc_wrapper)
 		{
-			$row['body'] = parse_bbc($row['body'], $row['smileys_enabled'], $row['id_msg']);
-
 			// Censor those $%#^&% words
 			censorText($row['body']);
 			censorText($row['subject']);
+
+			$row['body'] = $bbc_wrapper->parseMessage($row['body'], $row['smileys_enabled']);
 
 			// Something short to show is all that's required
 			$msgString = Util::shorten_html($row['body'], 255);
@@ -1041,7 +1041,7 @@ function dbRecentlyLikedPostsGivenUser($id_liker, $limit = 5)
 				'id_msg' => $row['id_msg'],
 				'id_topic' => $row['id_topic'],
 				'subject' => $row['subject'],
-				'body' => $bbc_wrapper->parseMessage($msgString, $row['smileys_enabled']),
+				'body' => $msgString,
 				'preview' => $preview,
 				'time' => standardTime($row['poster_time']),
 				'html_time' => htmlTime($row['poster_time']),

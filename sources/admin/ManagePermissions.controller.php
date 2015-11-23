@@ -522,6 +522,7 @@ class ManagePermissions_Controller extends Action_Controller
 
 		// Build the list of the boards.
 		$context['categories'] = array();
+		$bbc_parser = \BBC\ParserWrapper::getInstance();
 		foreach ($cat_tree as $catid => $tree)
 		{
 			$context['categories'][$catid] = array(
@@ -531,7 +532,7 @@ class ManagePermissions_Controller extends Action_Controller
 			);
 			foreach ($boardList[$catid] as $boardid)
 			{
-				$boards[$boardid]['description'] = parse_bbc($boards[$boardid]['description']);
+				$boards[$boardid]['description'] = $bbc_parser->parseBoard($boards[$boardid]['description']);
 
 				if (!isset($context['profiles'][$boards[$boardid]['profile']]))
 					$boards[$boardid]['profile'] = 1;

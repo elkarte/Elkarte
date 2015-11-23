@@ -177,6 +177,8 @@ class ManageBoards_Controller extends Action_Controller
 		createToken('admin-sort');
 		$context['move_board'] = !empty($this->_req->query->move) && isset($boards[(int) $this->_req->query->move]) ? (int) $this->_req->query->move : 0;
 
+		$bbc_parser = \BBC\ParserWrapper::getInstance();
+
 		$context['categories'] = array();
 		foreach ($cat_tree as $catid => $tree)
 		{
@@ -188,7 +190,7 @@ class ManageBoards_Controller extends Action_Controller
 			$move_cat = !empty($context['move_board']) && $boards[$context['move_board']]['category'] == $catid;
 			foreach ($boardList[$catid] as $boardid)
 			{
-				$boards[$boardid]['description'] = parse_bbc($boards[$boardid]['description']);
+				$boards[$boardid]['description'] = $bbc_parser->parseBoard($boards[$boardid]['description']);
 				$context['categories'][$catid]['boards'][$boardid] = array(
 					'id' => &$boards[$boardid]['id'],
 					'name' => &$boards[$boardid]['name'],

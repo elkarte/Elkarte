@@ -344,6 +344,7 @@ class ProfileInfo_Controller extends Action_Controller
 
 				// Find this user's most recent posts
 				$rows = load_user_posts($this->_memID, 0, $maxIndex, $range_limit);
+				$bbc_parser = \BBC\ParserWrapper::getInstance();
 				$context['posts'] = array();
 				foreach ($rows as $row)
 				{
@@ -352,7 +353,7 @@ class ProfileInfo_Controller extends Action_Controller
 					censorText($row['subject']);
 
 					// Do the code.
-					$row['body'] = parse_bbc($row['body'], $row['smileys_enabled'], $row['id_msg']);
+					$row['body'] = $bbc_parser->parseMessage($row['body'], $row['smileys_enabled']);
 					$preview = strip_tags(strtr($row['body'], array('<br />' => '&#10;')));
 					$preview = Util::shorten_text($preview, !empty($modSettings['ssi_preview_length']) ? $modSettings['ssi_preview_length'] : 128);
 					$short_subject = Util::shorten_text($row['subject'], !empty($modSettings['ssi_subject_length']) ? $modSettings['ssi_subject_length'] : 24);
