@@ -382,7 +382,9 @@ class ModerationCenter_Controller extends Action_Controller
 
 		list ($context['notice_body'], $context['notice_subject']) = $notice;
 
-		$context['notice_body'] = parse_bbc($context['notice_body'], false);
+		$parser = \BBC\ParserWrapper::getInstance();
+
+		$context['notice_body'] = $parser->parseNotice($context['notice_body']);
 		$context['page_title'] = $txt['show_notice'];
 		$context['sub_template'] = 'show_notice';
 		Template_Layers::getInstance()->removeAll();
@@ -483,6 +485,7 @@ class ModerationCenter_Controller extends Action_Controller
 		$context['reports'] = getModReports($context['view_closed'], $context['start'], 10, $show_pms);
 		$report_ids = array_keys($context['reports']);
 		$report_boards_ids = array();
+		$bbc_parser = \BBC\ParserWrapper::getInstance();
 		foreach ($context['reports'] as $row)
 		{
 			$context['reports'][$row['id_report']] = array(
@@ -500,7 +503,7 @@ class ModerationCenter_Controller extends Action_Controller
 				'time_started' => standardTime($row['time_started']),
 				'last_updated' => standardTime($row['time_updated']),
 				'subject' => $row['subject'],
-				'body' => parse_bbc($row['body']),
+				'body' => $bbc_parser->parseReport($row['body']),
 				'num_reports' => $row['num_reports'],
 				'closed' => $row['closed'],
 				'ignore' => $row['ignore_all'],
@@ -817,6 +820,8 @@ class ModerationCenter_Controller extends Action_Controller
 			}
 		}
 
+		$bbc_parser = \BBC\ParserWrapper::getInstance();
+
 		$context['report'] = array(
 			'id' => $row['id_report'],
 			'topic_id' => $row['id_topic'],
@@ -836,7 +841,7 @@ class ModerationCenter_Controller extends Action_Controller
 			'time_started' => standardTime($row['time_started']),
 			'last_updated' => standardTime($row['time_updated']),
 			'subject' => $row['subject'],
-			'body' => parse_bbc($row['body']),
+			'body' => $bbc_parser->parseReport($row['body']),
 			'num_reports' => $row['num_reports'],
 			'closed' => $row['closed'],
 			'ignore' => $row['ignore_all']
@@ -868,7 +873,7 @@ class ModerationCenter_Controller extends Action_Controller
 		{
 			$context['report']['mod_comments'][] = array(
 				'id' => $row['id_comment'],
-				'message' => parse_bbc($row['body']),
+				'message' => $bbc_parser->parseReport($row['body']),
 				'time' => standardTime($row['log_time']),
 				'html_time' => htmlTime($row['log_time']),
 				'timestamp' => forum_time(true, $row['log_time']),
@@ -1797,6 +1802,8 @@ class ModerationCenter_Controller extends Action_Controller
 		$context['page_index'] = constructPageIndex($scripturl . '?action=moderate;area=index;notes', $this->_req->query->start, $moderator_notes_total, 10);
 		$context['start'] = $this->_req->query->start;
 
+		$bbc_parser = \BBC\ParserWrapper::getInstance();
+
 		$context['notes'] = array();
 		foreach ($moderator_notes as $note)
 		{
@@ -1808,7 +1815,7 @@ class ModerationCenter_Controller extends Action_Controller
 				'time' => standardTime($note['log_time']),
 				'html_time' => htmlTime($note['log_time']),
 				'timestamp' => forum_time(true, $note['log_time']),
-				'text' => parse_bbc($note['body']),
+				'text' => $bbc_parser->parseReport($note['body']),
 				'delete_href' => $scripturl . '?action=moderate;area=index;notes;delete=' . $note['id_note'] . ';' . $context['session_var'] . '=' . $context['session_id'],
 			);
 		}

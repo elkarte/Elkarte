@@ -335,6 +335,8 @@ function printMemberListRows($request)
 	// Load all the members for display.
 	loadMemberData($members);
 
+	$bbc_parser = \BBC\ParserWrapper::getInstance();
+
 	$context['members'] = array();
 	foreach ($members as $member)
 	{
@@ -376,7 +378,7 @@ function printMemberListRows($request)
 
 				// Anything else to make it look "nice"
 				if ($column['bbc'])
-					$context['members'][$member]['options'][$curField] = strip_tags(parse_bbc($context['members'][$member]['options'][$curField]));
+					$context['members'][$member]['options'][$curField] = strip_tags($bbc_parser->parseCustomFields($context['members'][$member]['options'][$curField]));
 				elseif ($column['type'] === 'check')
 					$context['members'][$member]['options'][$curField] = $context['members'][$member]['options'][$curField] == 0 ? $txt['no'] : $txt['yes'];
 			}

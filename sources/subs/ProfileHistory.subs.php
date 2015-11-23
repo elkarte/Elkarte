@@ -291,6 +291,7 @@ function getProfileEdits($start, $items_per_page, $sort, $memID)
 	);
 	$edits = array();
 	$members = array();
+	$bbc_parser = \BBC\ParserWrapper::getInstance();
 	while ($row = $db->fetch_assoc($request))
 	{
 		$extra = @unserialize($row['extra']);
@@ -318,8 +319,8 @@ function getProfileEdits($start, $items_per_page, $sort, $memID)
 			'member_link' => $txt['trackEdit_deleted_member'],
 			'action' => $row['action'],
 			'action_text' => $action_text,
-			'before' => !empty($extra['previous']) ? ($parse_bbc ? parse_bbc($extra['previous']) : $extra['previous']) : '',
-			'after' => !empty($extra['new']) ? ($parse_bbc ? parse_bbc($extra['new']) : $extra['new']) : '',
+			'before' => !empty($extra['previous']) ? ($parse_bbc ? $bbc_parser->parseCustomFields($extra['previous']) : $extra['previous']) : '',
+			'after' => !empty($extra['new']) ? ($parse_bbc ? $bbc_parser->parseCustomFields($extra['new']) : $extra['new']) : '',
 			'time' => standardTime($row['log_time']),
 			'html_time' => htmlTime($row['log_time']),
 			'timestamp' => forum_time(true, $row['log_time']),

@@ -343,10 +343,8 @@ class Settings_Form
 		if (!empty($bbcChoice))
 		{
 			// What are the options, eh?
-			$temp = parse_bbc(false);
-			$bbcTags = array();
-			foreach ($temp as $tag)
-				$bbcTags[] = $tag['tag'];
+			$codes = \BBC\ParserWrapper::getInstance()->getCodes();
+			$bbcTags = $codes->getTags();
 
 			$bbcTags = array_unique($bbcTags);
 			$totalTags = count($bbcTags);
@@ -599,10 +597,8 @@ class Settings_Form
 			// BBC.
 			elseif ($var[0] == 'bbc')
 			{
-
-				$bbcTags = array();
-				foreach (parse_bbc(false) as $tag)
-					$bbcTags[] = $tag['tag'];
+				$codes = \BBC\ParserWrapper::getInstance()->getCodes();
+				$bbcTags = $codes->getTags();
 
 				if (!isset($_POST[$var[1] . '_enabledTags']))
 					$_POST[$var[1] . '_enabledTags'] = array();

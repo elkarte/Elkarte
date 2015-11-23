@@ -264,10 +264,12 @@ class Package_Actions extends Action_Controller
 		// Fancy or plain
 		if (!empty($this->_action['parse_bbc']))
 		{
+			$bbc_parser = \BBC\ParserWrapper::getInstance();
+
 			require_once(SUBSDIR . '/Post.subs.php');
 			preparsecode($context[$type]);
 
-			$context[$type] = parse_bbc($context[$type]);
+			$context[$type] = $bbc_parser->parsePackage($context[$type]);
 		}
 		else
 			$context[$type] = nl2br($context[$type]);

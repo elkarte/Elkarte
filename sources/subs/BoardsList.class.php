@@ -200,6 +200,8 @@ class Boards_List
 			)
 		);
 
+		$bbc_parser = \BBC\ParserWrapper::getInstance();
+
 		// Run through the categories and boards (or only boards)....
 		while ($row_board = $this->_db->fetch_assoc($result_boards))
 		{
@@ -253,7 +255,7 @@ class Boards_List
 						'new' => empty($row_board['is_read']),
 						'id' => $row_board['id_board'],
 						'name' => $row_board['board_name'],
-						'description' => parse_bbc($row_board['description']),
+						'description' => $bbc_parser->parseBoard($row_board['description']),
 						'raw_description' => $row_board['description'],
 						'moderators' => array(),
 						'link_moderators' => array(),
@@ -281,7 +283,7 @@ class Boards_List
 				$this->_current_boards[$row_board['id_parent']]['children'][$row_board['id_board']] = array(
 					'id' => $row_board['id_board'],
 					'name' => $row_board['board_name'],
-					'description' => parse_bbc($row_board['description']),
+					'description' => $bbc_parser->parseBoard($row_board['description']),
 					'raw_description' => $row_board['description'],
 					'new' => empty($row_board['is_read']) && $row_board['poster_name'] != '',
 					'topics' => $row_board['num_topics'],

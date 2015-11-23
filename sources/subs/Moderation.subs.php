@@ -1081,7 +1081,10 @@ function watchedUserPosts($start, $items_per_page, $sort, $approve_query, $delet
 			'recycle' => $modSettings['recycle_board'],
 		)
 	);
+
 	$member_posts = array();
+	$bbc_parser = \BBC\ParserWrapper::getInstance();
+
 	while ($row = $db->fetch_assoc($request))
 	{
 		$row['subject'] = censorText($row['subject']);
@@ -1092,7 +1095,7 @@ function watchedUserPosts($start, $items_per_page, $sort, $approve_query, $delet
 			'id_topic' => $row['id_topic'],
 			'author_link' => '<a href="' . $scripturl . '?action=profile;u=' . $row['id_member'] . '">' . $row['real_name'] . '</a>',
 			'subject' => $row['subject'],
-			'body' => parse_bbc($row['body'], $row['smileys_enabled'], $row['id_msg']),
+			'body' => $bbc_parser->parseMessage($row['body'], $row['smileys_enabled']),
 			'poster_time' => standardTime($row['poster_time']),
 			'approved' => $row['approved'],
 			'can_delete' => $delete_boards == array(0) || in_array($row['id_board'], $delete_boards),
@@ -1401,7 +1404,8 @@ function moderatorNotice($id_notice)
 	$db->free_result($request);
 
 	// Make it look nice
-	$notice_body = parse_bbc($notice_body, false);
+	$bbc_parser = \BBC\ParserWrapper::getInstance();
+	$notice_body = $bbc_parser->parseNotice($notice_body);
 
 	return array($notice_body, $notice_subject);
 }
@@ -1480,7 +1484,10 @@ function getUnapprovedPosts($approve_query, $current_view, $boards_allowed, $sta
 			'not_approved' => 0,
 		)
 	);
+
 	$unapproved_items = array();
+	$bbc_parser = \BBC\ParserWrapper::getInstance();
+
 	for ($i = 1; $row = $db->fetch_assoc($request); $i++)
 	{
 		// Can delete is complicated, let's solve it first... is it their own post?
@@ -1502,7 +1509,7 @@ function getUnapprovedPosts($approve_query, $current_view, $boards_allowed, $sta
 			'href' => $scripturl . '?topic=' . $row['id_topic'] . '.msg' . $row['id_msg'] . '#msg' . $row['id_msg'],
 			'link' => '<a href="' . $scripturl . '?topic=' . $row['id_topic'] . '.msg' . $row['id_msg'] . '#msg' . $row['id_msg'] . '">' . $row['subject'] . '</a>',
 			'subject' => $row['subject'],
-			'body' => parse_bbc($row['body'], $row['smileys_enabled'], $row['id_msg']),
+			'body' => $bbc_parser->parseMessage($row['body'], $row['smileys_enabled']),
 			'time' => standardTime($row['poster_time']),
 			'html_time' => htmlTime($row['poster_time']),
 			'timestamp' => forum_time(true, $row['poster_time']),

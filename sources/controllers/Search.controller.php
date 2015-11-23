@@ -583,7 +583,8 @@ class Search_Controller extends Action_Controller
 			$charLimit = 50;
 
 			$message['body'] = strtr($message['body'], array("\n" => ' ', '<br />' => "\n"));
-			$message['body'] = parse_bbc($message['body'], $message['smileys_enabled'], $message['id_msg']);
+			$bbc_parser = \BBC\ParserWrapper::getInstance();
+			$message['body'] = $bbc_parser->parseMessage($message['body'], $message['smileys_enabled']);
 			$message['body'] = strip_tags(strtr($message['body'], array('</div>' => '<br />', '</li>' => '<br />')), '<br>');
 
 			if (Util::strlen($message['body']) > $charLimit)
@@ -626,7 +627,8 @@ class Search_Controller extends Action_Controller
 		else
 		{
 			// Run BBC interpreter on the message.
-			$message['body'] = parse_bbc($message['body'], $message['smileys_enabled'], $message['id_msg']);
+			$bbc_parser = \BBC\ParserWrapper::getInstance();
+			$message['body'] = $bbc_parser->parseMessage($message['body'], $message['smileys_enabled'], $message['id_msg']);
 		}
 
 		// Make sure we don't end up with a practically empty message body.

@@ -324,6 +324,7 @@ class Draft_Controller extends Action_Controller
 		censorText($subject);
 
 		// BBC-ilize the message.
-		$body = parse_bbc($body, $smiley_enabled, 'draft' . $id_draft);
+		$parser = \BBC\ParserWrapper::getInstance();
+		$body = $parser->parseMessage($body, $smiley_enabled);
 	}
 }

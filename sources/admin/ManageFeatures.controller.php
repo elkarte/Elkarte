@@ -578,9 +578,8 @@ class ManageFeatures_Controller extends Action_Controller
 			checkSession();
 
 			// Clean up the tag stuff!
-			$bbcTags = array();
-			foreach (parse_bbc(false) as $tag)
-				$bbcTags[] = $tag['tag'];
+			$codes = \BBC\ParserWrapper::getInstance()->getCodes();
+			$bbcTags = $codes->getTags();
 
 			if (!isset($this->_req->post->signature_bbc_enabledTags))
 				$this->_req->post->signature_bbc_enabledTags = array();
