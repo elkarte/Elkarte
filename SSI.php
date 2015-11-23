@@ -294,10 +294,13 @@ function ssi_queryPosts($query_where = '', $query_where_params = array(), $query
 			'is_approved' => 1,
 		))
 	);
+
+	$bbc_parser = \BBC\ParserWrapper::getInstance();
+
 	$posts = array();
 	while ($row = $db->fetch_assoc($request))
 	{
-		$row['body'] = parse_bbc($row['body'], $row['smileys_enabled'], $row['id_msg']);
+		$row['body'] = $bbc_parser->parseMessage($row['body'], $row['smileys_enabled']);
 
 		// Censor it!
 		censorText($row['subject']);
@@ -448,10 +451,12 @@ function ssi_recentTopics($num_recent = 8, $exclude_boards = null, $include_boar
 			'topic_list' => array_keys($topics),
 		)
 	);
+
+	$bbc_parser = \BBC\ParserWrapper::getInstance();
 	$posts = array();
 	while ($row = $db->fetch_assoc($request))
 	{
-		$row['body'] = strip_tags(strtr(parse_bbc($row['body'], $row['smileys_enabled'], $row['id_msg']), array('<br>' => '&#10;')));
+		$row['body'] = strip_tags(strtr($bbc_parser->parseMessage($row['body'], $row['smileys_enabled']), array('<br>' => '&#10;')));
 		if (Util::strlen($row['body']) > 128)
 			$row['body'] = Util::substr($row['body'], 0, 128) . '...';
 
@@ -1109,6 +1114,8 @@ function ssi_recentPoll($topPollInstead = false, $output_method = 'echo')
 		'options' => array()
 	);
 
+	$bbc_parser = \BBC\ParserWrapper::getInstance();
+
 	// Calculate the percentages and bar lengths...
 	$divisor = $return['total_votes'] == 0 ? 1 : $return['total_votes'];
 	foreach ($options as $i => $option)
@@ -1120,7 +1127,7 @@ function ssi_recentPoll($topPollInstead = false, $output_method = 'echo')
 			'percent' => $bar,
 			'votes' => $option[1], /* TODO: The 'bar' should really be a gradient */
 			'bar' => '<span class="nowrap"><img src="' . $settings['images_url'] . '/poll_' . ($context['right_to_left'] ? 'right' : 'left') . '.png" alt="" /><img src="' . $settings['images_url'] . '/poll_middle.png" style="width:' . $barWide . 'px; height:12px;" alt="-" /><img src="' . $settings['images_url'] . '/poll_' . ($context['right_to_left'] ? 'left' : 'right') . '.png" alt="" /></span>',
-			'option' => parse_bbc($option[0]),
+			'option' => $bbc_parser->parsePoll($option[0]),
 			'vote_button' => '<input type="' . ($row['max_votes'] > 1 ? 'checkbox' : 'radio') . '" name="options[]" id="options-' . ($topPollInstead ? 'top-' : 'recent-') . $i . '" value="' . $i . '" class="input_' . ($row['max_votes'] > 1 ? 'check' : 'radio') . '" />'
 		);
 	}
@@ -1586,6 +1593,8 @@ function ssi_boardNews($board = null, $limit = null, $start = null, $length = nu
 	if (empty($request))
 		return false;
 
+	$bbc_parser = \BBC\ParserWrapper::getInstance();
+
 	$return = array();
 	foreach ($request as $row)
 	{
@@ -1600,7 +1609,7 @@ function ssi_boardNews($board = null, $limit = null, $start = null, $length = nu
 		$row['smileys_enabled'] = $row[$preview . '_smileys'];
 		$row['poster_time'] = $row[$preview . '_poster_time'];
 		$row['poster_name'] = $row[$preview . '_display_name'];
-		$row['body'] = parse_bbc($row['body'], $row['smileys_enabled'], $row['id_msg']);
+		$row['body'] = $bbc_parser->parseMessage($row['body'], $row['smileys_enabled']);
 
 		// Check that this message icon is there...
 		if (!empty($modSettings['messageIconChecks_enable']) && !isset($icon_sources[$row['icon']]))

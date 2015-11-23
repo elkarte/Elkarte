@@ -308,6 +308,17 @@ class ParserWrapper
     }
 
     /**
+     * Parse the BBC and smileys in board descriptions
+     *
+     * @param string $board
+     * @return string
+     */
+    public function parseBoard($board)
+    {
+        return $this->enableSmileys(true)->parse('board', $board);
+    }
+
+    /**
      * Set the disabled tags
      * (usually from $modSettings['disabledBBC'])
      * @param array $disabled
