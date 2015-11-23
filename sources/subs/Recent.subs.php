@@ -57,14 +57,17 @@ function getLastPosts($latestPostOptions)
 			'is_approved' => 1,
 		)
 	);
+
 	$posts = array();
+	$bbc_parser = \BBC\ParserWrapper::getInstance();
+
 	while ($row = $db->fetch_assoc($request))
 	{
 		// Censor the subject and post for the preview ;).
 		censorText($row['subject']);
 		censorText($row['body']);
 
-		$row['body'] = strip_tags(strtr(parse_bbc($row['body'], $row['smileys_enabled'], $row['id_msg']), array('<br />' => '&#10;')));
+		$row['body'] = strip_tags(strtr($bbc_parser->parseMessage($row['body'], $row['smileys_enabled']), array('<br />' => '&#10;')));
 		$row['body'] = Util::shorten_text($row['body'], !empty($modSettings['lastpost_preview_characters']) ? $modSettings['lastpost_preview_characters'] : 128, true);
 
 		// Build the array.
@@ -133,6 +136,7 @@ function prepareRecentPosts($messages, $start)
 	$counter = $start + 1;
 	$posts = array();
 	$board_ids = array('own' => array(), 'any' => array());
+	$bbc_parser = \BBC\ParserWrapper::getInstance();
 	foreach ($messages as $row)
 	{
 		// Censor everything.
@@ -140,7 +144,7 @@ function prepareRecentPosts($messages, $start)
 		censorText($row['subject']);
 
 		// BBC-atize the message.
-		$row['body'] = parse_bbc($row['body'], $row['smileys_enabled'], $row['id_msg']);
+		$row['body'] = $bbc_parser->parseMessage($row['body'], $row['smileys_enabled']);
 
 		// And build the array.
 		$posts[$row['id_msg']] = array(

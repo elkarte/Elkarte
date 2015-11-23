@@ -882,11 +882,13 @@ function loadPollContext($poll_id)
 		}
 	}
 
+	$bbc_parser = \BBC\ParserWrapper::getInstance();
+
 	// Set up the basic poll information.
 	$context['poll'] = array(
 		'id' => $poll_id,
 		'image' => 'normal_' . (empty($pollinfo['voting_locked']) ? 'poll' : 'locked_poll'),
-		'question' => parse_bbc($pollinfo['question']),
+		'question' => $bbc_parser->parsePoll($pollinfo['question']),
 		'total_votes' => $pollinfo['total'],
 		'change_vote' => !empty($pollinfo['change_vote']),
 		'is_locked' => !empty($pollinfo['voting_locked']),
@@ -963,7 +965,7 @@ function loadPollContext($poll_id)
 			// Note: IE < 8 requires us to set a width on the container, too.
 			'bar_ndt' => $bar > 0 ? '<div class="bar" style="width: ' . $bar . '%;"><div style="width: ' . $bar . '%;"></div></div>' : '<div class="bar"></div>',
 			'bar_width' => $barWide,
-			'option' => parse_bbc($option['label']),
+			'option' => $bbc_parser->parsePoll($option['label']),
 			'vote_button' => '<input type="' . ($pollinfo['max_votes'] > 1 ? 'checkbox' : 'radio') . '" name="options[]" id="options-' . $i . '" value="' . $i . '" class="input_' . ($pollinfo['max_votes'] > 1 ? 'check' : 'radio') . '" />'
 		);
 	}

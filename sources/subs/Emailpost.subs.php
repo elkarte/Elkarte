@@ -937,7 +937,8 @@ function pbe_prepare_text(&$message, &$subject = '', &$signature = '')
 	call_integration_hook('integrate_mailist_pre_parsebbc', array(&$message));
 
 	// Convert the remaining bbc to html
-	$message = parse_bbc($message, false);
+	$bbc_wrapper = \BBC\ParserWrapper::getInstance();
+	$message = $bbc_wrapper->parseMessage($message, false);
 
 	// Change list style to something standard to make text conversion easier
 	$message = preg_replace('~<ul class=\"bbc_list\" style=\"list-style-type: decimal;\">(.*?)</ul>~si', '<ol>\\1</ol>', $message);
@@ -985,7 +986,7 @@ function pbe_prepare_text(&$message, &$subject = '', &$signature = '')
 	{
 		call_integration_hook('integrate_mailist_pre_sig_parsebbc', array(&$signature));
 
-		$signature = parse_bbc($signature, false);
+		$signature = $bbc_wrapper->parseSignature($signature, false);
 		$signature = trim(un_htmlspecialchars(strip_tags(strtr($signature, array('</tr>' => "   \n", '<br />' => "   \n", '</div>' => "\n", '</li>' => "   \n", '&#91;' => '[', '&#93;' => ']')))));
 	}
 
@@ -1236,7 +1237,10 @@ function query_sender_wrapper($from)
 
 	// Clean up the signature line
 	if (!empty($result['signature']))
-		$result['signature'] = trim(un_htmlspecialchars(strip_tags(strtr(parse_bbc($result['signature'], false), array('</tr>' => "   \n", '<br />' => "   \n", '</div>' => "\n", '</li>' => "   \n", '&#91;' => '[', '&#93;' => ']')))));
+	{
+		$bbc_wrapper = \BBC\ParserWrapper::getInstance();
+		$result['signature'] = trim(un_htmlspecialchars(strip_tags(strtr($bbc_wrapper->parseSignature($result['signature'], false), array('</tr>' => "   \n", '<br />' => "   \n", '</div>' => "\n", '</li>' => "   \n", '&#91;' => '[', '&#93;' => ']')))));
+	}
 
 	$db->free_result($request);
 

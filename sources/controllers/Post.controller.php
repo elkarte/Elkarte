@@ -301,8 +301,9 @@ class Post_Controller extends Action_Controller
 				preparsecode($form_message, true);
 
 				// Do all bulletin board code thing on the message
+				$bbc_parser = \BBC\ParserWrapper::getInstance();
 				preparsecode($context['preview_message']);
-				$context['preview_message'] = parse_bbc($context['preview_message'], isset($_REQUEST['ns']) ? 0 : 1);
+				$context['preview_message'] = $bbc_parser->parseMessage($context['preview_message'], isset($_REQUEST['ns']) ? 0 : 1);
 				censorText($context['preview_message']);
 
 				// Don't forget the subject
@@ -859,8 +860,10 @@ class Post_Controller extends Action_Controller
 				$user_info['name'] = $_POST['guestname'];
 			preparsecode($_POST['message']);
 
+			$bbc_parser = \BBC\ParserWrapper::getInstance();
+
 			// Let's see if there's still some content left without the tags.
-			if (Util::htmltrim(strip_tags(parse_bbc($_POST['message'], false), '<img>')) === '' && (!allowedTo('admin_forum') || strpos($_POST['message'], '[html]') === false))
+			if (Util::htmltrim(strip_tags($bbc_parser->parseMessage($_POST['message'], false), '<img>')) === '' && (!allowedTo('admin_forum') || strpos($_POST['message'], '[html]') === false))
 				$this->_post_errors->addError('no_message');
 		}
 
@@ -1224,8 +1227,9 @@ class Post_Controller extends Action_Controller
 				$_POST['message'] = Util::htmlspecialchars($_POST['message'], ENT_QUOTES, 'UTF-8', true);
 
 				preparsecode($_POST['message']);
+				$bbc_parser = \BBC\ParserWrapper::getInstance();
 
-				if (Util::htmltrim(strip_tags(parse_bbc($_POST['message'], false), '<img>')) === '')
+				if (Util::htmltrim(strip_tags($bbc_parser->parseMessage($_POST['message'], false), '<img>')) === '')
 				{
 					$this->_post_errors->addError('no_message');
 					unset($_POST['message']);
@@ -1349,7 +1353,7 @@ class Post_Controller extends Action_Controller
 				censorText($context['message']['subject']);
 				censorText($context['message']['body']);
 
-				$context['message']['body'] = parse_bbc($context['message']['body'], $row['smileys_enabled'], $row['id_msg']);
+				$context['message']['body'] = $bbc_parser->parseMessage($context['message']['body'], $row['smileys_enabled'], $row['id_msg']);
 			}
 			// Topic?
 			elseif (!$this->_post_errors->hasErrors())

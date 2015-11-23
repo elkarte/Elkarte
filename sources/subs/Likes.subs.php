@@ -548,7 +548,10 @@ function dbMostLikedMessage($limit = 10)
 			'limit' => $limit,
 		)
 	);
+
 	$mostLikedMessages = array();
+	$bbc_wrapper = \BBC\ParserWrapper::getInstance();
+
 	while ($row = $db->fetch_assoc($request))
 	{
 		$row['body'] = parse_bbc($row['body'], $row['smileys_enabled'], $row['id_msg']);
@@ -572,7 +575,7 @@ function dbMostLikedMessage($limit = 10)
 			'like_count' => $row['like_count'],
 			'subject' => $row['subject'],
 			'preview' => $preview,
-			'body' => $msgString,
+			'body' => $bbc_wrapper->parseMessage($msgString, $row['smileys_enabled'], $row['id_msg']),
 			'time' => standardTime($row['poster_time']),
 			'html_time' => htmlTime($row['poster_time']),
 			'timestamp' => forum_time(true, $row['poster_time']),
@@ -615,6 +618,7 @@ function dbMostLikedMessagesByTopic($topic, $limit = 5)
 	global $scripturl;
 
 	$db = database();
+	$bbc_wrapper = \BBC\ParserWrapper::getInstance();
 
 	// Most liked messages in a given topic
 	return $db->fetchQueryCallback('
@@ -642,7 +646,7 @@ function dbMostLikedMessagesByTopic($topic, $limit = 5)
 			'id_topic' => $topic,
 			'limit' => $limit,
 		),
-		function($row) use ($scripturl)
+		function($row) use ($scripturl, $bbc_wrapper)
 		{
 			$row['body'] = parse_bbc($row['body'], $row['smileys_enabled'], $row['id_msg']);
 
@@ -662,7 +666,7 @@ function dbMostLikedMessagesByTopic($topic, $limit = 5)
 				'id_board' => $row['id_board'],
 				'like_count' => $row['like_count'],
 				'subject' => $row['subject'],
-				'body' => $msgString,
+				'body' => $bbc_wrapper->parseMessage($msgString, $row['smileys_enabled']),
 				'preview' => $preview,
 				'time' => standardTime($row['poster_time']),
 				'html_time' => htmlTime($row['poster_time']),
@@ -887,6 +891,7 @@ function dbMostLikesReceivedUser($limit = 10)
 function dbMostLikedPostsByUser($id_member, $limit = 10)
 {
 	$db = database();
+	$bbc_wrapper = \BBC\ParserWrapper::getInstance();
 
 	// Lets fetch highest liked posts by this user
 	return $db->fetchQueryCallback('
@@ -905,7 +910,7 @@ function dbMostLikedPostsByUser($id_member, $limit = 10)
 			'id_member' => $id_member,
 			'limit' => $limit
 		),
-		function ($row)
+		function($row) use($bbc_wrapper)
 		{
 			$row['body'] = parse_bbc($row['body'], $row['smileys_enabled'], $row['id_msg']);
 
@@ -918,15 +923,15 @@ function dbMostLikedPostsByUser($id_member, $limit = 10)
 			$preview = Util::htmlspecialchars(strtr($msgString, array('<br />' => "\n", '&nbsp;' => ' ')));
 
 			return array(
-					'id_topic' => $row['id_topic'],
-					'id_msg' => $row['id_msg'],
-					'like_count' => $row['like_count'],
-					'subject' => $row['subject'],
-					'body' => $msgString,
-					'preview' => $preview,
-					'time' => standardTime($row['poster_time']),
-					'html_time' => htmlTime($row['poster_time']),
-					'timestamp' => forum_time(true, $row['poster_time']),
+				'id_topic' => $row['id_topic'],
+				'id_msg' => $row['id_msg'],
+				'like_count' => $row['like_count'],
+				'subject' => $row['subject'],
+				'body' => $bbc_wrapper->parseMessage($msgString, $row['smileys_enabled']),
+				'preview' => $preview,
+				'time' => standardTime($row['poster_time']),
+				'html_time' => htmlTime($row['poster_time']),
+				'timestamp' => forum_time(true, $row['poster_time']),
 			);
 		}
 	);
@@ -1004,12 +1009,12 @@ function dbMostLikesGivenUser($limit = 10)
 function dbRecentlyLikedPostsGivenUser($id_liker, $limit = 5)
 {
 	$db = database();
+	$bbc_wrapper = \BBC\ParserWrapper::getInstance();
 
 	// Lets fetch the latest liked posts by this user
-	return $db->fetchQueryCallback('
-		SELECT
-			m.id_msg, m.id_topic, m.subject, m.body, m.poster_time, m.smileys_enabled
-		FROM {db_prefix}message_likes AS ml
+	$mostLikeGivingMember['topic_data'] = $db->fetchQueryCallback('
+		SELECT m.id_msg, m.id_topic, m.subject, m.body, m.poster_time, m.smileys_enabled
+		FROM {db_prefix}messages AS m
 			INNER JOIN {db_prefix}messages AS m ON (ml.id_msg = m.id_msg)
 			INNER JOIN {db_prefix}boards AS b ON (b.id_board = m.id_board)
 		WHERE {query_wanna_see_board}
@@ -1020,7 +1025,7 @@ function dbRecentlyLikedPostsGivenUser($id_liker, $limit = 5)
 			'id_member' => $id_liker,
 			'limit' => $limit
 		),
-		function($row)
+		function($row) use($bbc_wrapper)
 		{
 			$row['body'] = parse_bbc($row['body'], $row['smileys_enabled'], $row['id_msg']);
 
@@ -1036,7 +1041,7 @@ function dbRecentlyLikedPostsGivenUser($id_liker, $limit = 5)
 				'id_msg' => $row['id_msg'],
 				'id_topic' => $row['id_topic'],
 				'subject' => $row['subject'],
-				'body' => $msgString,
+				'body' => $bbc_wrapper->parseMessage($msgString, $row['smileys_enabled']),
 				'preview' => $preview,
 				'time' => standardTime($row['poster_time']),
 				'html_time' => htmlTime($row['poster_time']),

@@ -818,7 +818,8 @@ class Display_Controller extends Action_Controller
 		censorText($message['subject']);
 
 		// Run BBC interpreter on the message.
-		$message['body'] = parse_bbc($message['body'], $message['smileys_enabled'], $message['id_msg']);
+		$bbc_wrapper = \BBC\ParserWrapper::getInstance();
+		$message['body'] = $bbc_wrapper->parseMessage($message['body'], $message['smileys_enabled']);
 
 		// Compose the memory eat- I mean message array.
 		require_once(SUBSDIR . '/Attachments.subs.php');

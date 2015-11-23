@@ -892,6 +892,8 @@ function prepareMailingForPreview()
 	// We might need this in a bit
 	$cleanLatestMember = empty($context['send_html']) || $context['send_pm'] ? un_htmlspecialchars($modSettings['latestRealName']) : $modSettings['latestRealName'];
 
+	$bbc_parser = \BBC\ParserWrapper::getInstance();
+
 	foreach ($processing as $key => $post)
 	{
 		$context[$key] = !empty($_REQUEST[$post]) ? $_REQUEST[$post] : '';
@@ -908,7 +910,7 @@ function prepareMailingForPreview()
 		{
 			$enablePostHTML = $modSettings['enablePostHTML'];
 			$modSettings['enablePostHTML'] = $context['send_html'];
-			$context[$key] = parse_bbc($context[$key]);
+			$context[$key] = $bbc_parser->parseEmail($context[$key]);
 			$modSettings['enablePostHTML'] = $enablePostHTML;
 		}
 

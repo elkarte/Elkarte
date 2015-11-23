@@ -70,13 +70,15 @@ class XmlPreview_Controller extends Action_Controller
 		else
 			preparsecode($news);
 
+		$bbc_parser = \BBC\ParserWrapper::getInstance();
+
 		// Return the xml response to the template
 		$context['xml_data'] = array(
 			'news' => array(
 				'identifier' => 'parsedNews',
 				'children' => array(
 					array(
-						'value' => parse_bbc($news),
+						'value' => $bbc_parser->parseNews($news),
 					),
 				),
 			),
@@ -142,7 +144,8 @@ class XmlPreview_Controller extends Action_Controller
 			$member = getBasicMemberData($user, array('preferences' => true));
 
 			censorText($member['signature']);
-			$member['signature'] = parse_bbc($member['signature'], true, 'sig' . $user);
+			$bbc_parser = \BBC\ParserWrapper::getInstance();
+			$member['signature'] = $bbc_parser->parseSignature($member['signature'], true);
 
 			// And now what they want it to be
 			$preview_signature = !empty($this->_req->post->signature) ? Util::htmlspecialchars($this->_req->post->signature) : '';
@@ -154,7 +157,7 @@ class XmlPreview_Controller extends Action_Controller
 
 			preparsecode($preview_signature);
 			censorText($preview_signature);
-			$preview_signature = parse_bbc($preview_signature, true, 'sig' . $user);
+			$preview_signature = $bbc_parser->parseSignature($preview_signature, true);
 		}
 		// Sorry but you can't change the signature
 		elseif (!$can_change)
@@ -257,7 +260,8 @@ class XmlPreview_Controller extends Action_Controller
 			if (!empty($this->_req->post->body))
 			{
 				preparsecode($warning_body);
-				$warning_body = parse_bbc($warning_body, true);
+				$bbc_parser = \BBC\ParserWrapper::getInstance();
+				$warning_body = $bbc_parser->parseNotice($warning_body);
 			}
 			$context['preview_message'] = $warning_body;
 		}
@@ -331,7 +335,8 @@ class XmlPreview_Controller extends Action_Controller
 			if (!empty($this->_req->post->body))
 			{
 				preparsecode($body);
-				$body = parse_bbc($body, true);
+				$bbc_parser = \BBC\ParserWrapper::getInstance();
+				$body = $bbc_parser->parseEmail($body);
 			}
 
 			$context['preview_message'] = $body;
