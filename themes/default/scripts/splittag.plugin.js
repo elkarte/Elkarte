@@ -1,4 +1,4 @@
-/**
+/*!
  * This file contains javascript associated with the splittag function as it
  * relates to an sceditor sourcemode instance
  *

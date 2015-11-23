@@ -27,12 +27,6 @@ if (!defined('ELK'))
 class Groups_Controller extends Action_Controller
 {
 	/**
-	 * Holds instance of HttpReq object
-	 * @var HttpReq
-	 */
-	private $_req;
-
-	/**
 	 * Set up templates and pre-requisites for any request processed by this class.
 	 *
 	 * - Called automagically before any action_() call.
@@ -41,8 +35,6 @@ class Groups_Controller extends Action_Controller
 	public function pre_dispatch()
 	{
 		global $context, $txt, $scripturl, $user_info;
-
-		$this->_req = HttpReq::instance();
 
 		// Get the template stuff up and running.
 		loadLanguage('ManageMembers');

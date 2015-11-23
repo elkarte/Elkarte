@@ -1,10 +1,12 @@
-/**
+/*!
  * @name      ElkArte Forum
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
  * @version 1.1 dev
- *
+ */
+
+/**
  * This file contains javascript utility functions specific to ElkArte
  */
 

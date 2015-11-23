@@ -40,7 +40,7 @@ class Display_Controller extends Action_Controller
 
 	/**
 	 * The class that takes care of rendering the message icons (MessageTopicIcons)
-	 * @var null|object
+	 * @var null|MessageTopicIcons
 	 */
 	protected $_icon_sources = null;
 
@@ -56,20 +56,6 @@ class Display_Controller extends Action_Controller
 	 * @var int|string
 	 */
 	private $_start;
-
-	/**
-	 * Holds instance of HttpReq object
-	 * @var HttpReq
-	 */
-	private $_req;
-
-	/**
-	 * Pre Dispatch, called before other methods.  Loads HttpReq instance.
-	 */
-	public function pre_dispatch()
-	{
-		$this->_req = HttpReq::instance();
-	}
 
 	/**
 	 * Default action handler for this controller
@@ -121,7 +107,7 @@ class Display_Controller extends Action_Controller
 		$includeUnapproved = !$modSettings['postmod_active'] || allowedTo('approve_posts');
 
 		// Let's do some work on what to search index.
-		if (count($this->_req->query) > 2)
+		if (count((array) $this->_req->query) > 2)
 		{
 			foreach ($this->_req->query as $k => $v)
 			{
@@ -327,7 +313,8 @@ class Display_Controller extends Action_Controller
 		$context['page_index'] = constructPageIndex($scripturl . '?topic=' . $topic . '.%1$d', $this->_start, $total_visible_posts, $context['messages_per_page'], true, array('all' => $can_show_all, 'all_selected' => isset($this->_req->query->all)));
 		$context['start'] = $this->_start;
 
-		// This is information about which page is current, and which page we're on - in case you don't like the constructed page index. (again, wireles..)
+		// This is information about which page is current, and which page we're on - in case you don't like
+		// the constructed page index. (again, wireless..)
 		$context['page_info'] = array(
 			'current_page' => $this->_start / $context['messages_per_page'] + 1,
 			'num_pages' => floor(($total_visible_posts - 1) / $context['messages_per_page']) + 1,
@@ -412,35 +399,24 @@ class Display_Controller extends Action_Controller
 		// Guests can't mark topics read or for notifications, just can't sorry.
 		if (!$user_info['is_guest'] && !empty($messages))
 		{
+			$boardseen = isset($this->_req->query->boardseen);
+
 			$mark_at_msg = max($messages);
 			if ($mark_at_msg >= $topicinfo['id_last_msg'])
 				$mark_at_msg = $modSettings['maxMsgID'];
 			if ($mark_at_msg >= $topicinfo['new_from'])
+			{
 				markTopicsRead(array($user_info['id'], $topic, $mark_at_msg, $topicinfo['unwatched']), $topicinfo['new_from'] !== 0);
+				$numNewTopics = getUnreadCountSince($board, empty($_SESSION['id_msg_last_visit']) ? 0 : $_SESSION['id_msg_last_visit']);
+
+				if (empty($numNewTopics))
+					$boardseen = true;
+			}
 
 			updateReadNotificationsFor($topic, $board);
 
-			// Have we recently cached the number of new topics in this board, and it's still a lot?
-			if (isset($this->_req->query->topicseen) && isset($_SESSION['topicseen_cache'][$board]) && $_SESSION['topicseen_cache'][$board] > 5)
-				$_SESSION['topicseen_cache'][$board]--;
-			// Mark board as seen if this is the only new topic.
-			elseif (isset($this->_req->query->topicseen))
-			{
-				// Use the mark read tables... and the last visit to figure out if this should be read or not.
-				$numNewTopics = getUnreadCountSince($board, empty($_SESSION['id_msg_last_visit']) ? 0 : $_SESSION['id_msg_last_visit']);
-
-				// If there're no real new topics in this board, mark the board as seen.
-				if (empty($numNewTopics))
-					$this->_req->query->boardseen = true;
-				else
-					$_SESSION['topicseen_cache'][$board] = $numNewTopics;
-			}
-			// Probably one less topic - maybe not, but even if we decrease this too fast it will only make us look more often.
-			elseif (isset($_SESSION['topicseen_cache'][$board]))
-				$_SESSION['topicseen_cache'][$board]--;
-
 			// Mark board as seen if we came using last post link from BoardIndex. (or other places...)
-			if (isset($this->_req->query->boardseen))
+			if ($boardseen)
 			{
 				require_once(SUBSDIR . '/Boards.subs.php');
 				markBoardsRead($board, false, false);
@@ -494,7 +470,7 @@ class Display_Controller extends Action_Controller
 						}),
 					});
 
-					$(".like_button, .unlike_button").SiteTooltip({
+					$(".like_button, .unlike_button, .likes_button").SiteTooltip({
 						hoverIntent: {
 							sensitivity: 10,
 							interval: 150,

@@ -101,13 +101,13 @@ class Email_Format
 
 	/**
 	 * Extra items to removed, defined in the acp
-	 * @var string[]
+	 * @var string
 	 */
 	private $_maillist_leftover_remove = null;
 
 	/**
 	 * Items that may indicate the start of a signature line, defined in the acp
-	 * @var string[]
+	 * @var string
 	 */
 	private $_maillist_sig_keys = null;
 
@@ -264,7 +264,8 @@ class Email_Format
 			// Previous line ended in a break already
 			elseif (isset($this->_body_array[$i - 1]['content']) && substr(trim($this->_body_array[$i - 1]['content']), -4) == '[br]')
 			{
-				$this->_body_array[$i]['content'] = $this->_body_array[$i]['content'];
+				// Nothing to do then
+				 $this->_body_array[$i]['content'] .= '';
 			}
 			// OK, we can't seem to think of other obvious reasons this should not be on the same line
 			// and these numbers are quite frankly subjective, but so is how we got here, final "check"
@@ -282,7 +283,7 @@ class Email_Format
 					// If the previous short line did not end in a period or it did and the next line does not start
 					// with a capital and passes para check then it wraps
 					if ((substr($this->_body_array[$i - 1]['content'], -1) !== '.') || (substr($this->_body_array[$i - 1]['content'], -1) === '.' && $para_check < $this->_para_check && ($this->_body_array[$i]['content'][0] !== strtoupper($this->_body_array[$i]['content'][0]))))
-						$this->_body_array[$i]['content'] = $this->_body_array[$i]['content'];
+						$this->_body_array[$i]['content'] .= '';
 					else
 						$this->_body_array[$i]['content'] = "\n" . $this->_body_array[$i]['content'];
 				}
@@ -290,7 +291,7 @@ class Email_Format
 					$this->_body_array[$i]['content'] = "\n" . $this->_body_array[$i]['content'];
 				// A very short line (but not a empty one) followed by a very long line
 				elseif (isset($this->_body_array[$i - 1]) && !empty($this->_body_array[$i - 1]['content']) && $para_check > $this->_sig_longline && $this->_body_array[$i - 1]['length'] < 3)
-					$this->_body_array[$i]['content'] = $this->_body_array[$i]['content'];
+					$this->_body_array[$i]['content'] .= '';
 				else
 					$this->_body_array[$i]['content'] = "\n\n" . $this->_body_array[$i]['content'];
 			}

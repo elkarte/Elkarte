@@ -8,6 +8,7 @@ $txt['mail_type'] = 'Mail type';
 $txt['mail_type_default'] = '(PHP default)';
 $txt['smtp_host'] = 'SMTP server';
 $txt['smtp_port'] = 'SMTP port';
+$txt['smtp_starttls'] = 'STARTTLS';
 $txt['smtp_username'] = 'SMTP username';
 $txt['smtp_password'] = 'SMTP password';
 

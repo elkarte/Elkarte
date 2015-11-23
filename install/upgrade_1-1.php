@@ -374,13 +374,13 @@ class UpgradeInstructions_upgrade_1_1
 					{
 						// Rename some columns
 						$db_table->db_change_column('{db_prefix}postby_emails_error',
-							'data_id'
+							'data_id',
 							array(
 								'name' => 'message_key',
 							)
 						);
 						$db_table->db_change_column('{db_prefix}postby_emails_error',
-							'id_message'
+							'id_message',
 							array(
 								'name' => 'message_id',
 							)
@@ -440,12 +440,13 @@ class UpgradeInstructions_upgrade_1_1
 
 	public function fix_ipv6()
 	{
+		$columns = $this->table->db_list_columns('{db_prefix}log_online', true);
+
 		return array(
 			array(
 				'debug_title' => 'Converting IP columns to varchar instead of int...',
-				'function' => function($db, $db_table)
+				'function' => function($db, $db_table) use ($columns)
 				{
-					$columns = $this->db_list_columns('{db_prefix}log_online', true);
 					$column_name = 'ip';
 
 					foreach ($columns as $column)

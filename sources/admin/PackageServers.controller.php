@@ -30,13 +30,6 @@ if (!defined('ELK'))
 class PackageServers_Controller extends Action_Controller
 {
 	/**
-	 * Holds instance of HttpReq object
-	 * @var HttpReq
-	 */
-	protected $_req;
-
-	/**
-
 	 * Called before all other methods when coming from the dispatcher or
 	 * action class.  Loads language and templates files so they are available
 	 * to the other methods.
@@ -49,9 +42,6 @@ class PackageServers_Controller extends Action_Controller
 		// Use the PackageServers template.
 		loadTemplate('PackageServers');
 		loadCSSFile('admin.css');
-
-		// Load request interface
-		$this->_req = HttpReq::instance();
 	}
 
 	/**

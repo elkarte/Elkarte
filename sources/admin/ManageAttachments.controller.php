@@ -83,20 +83,6 @@ class ManageAttachments_Controller extends Action_Controller
 	protected $_attachSettingsForm;
 
 	/**
-	 * Holds instance of HttpReq object
-	 * @var HttpReq
-	 */
-	protected $_req;
-
-	/**
-	 * Pre Dispatch, called before other methods.  Loads HttpReq
-	 */
-	public function pre_dispatch()
-	{
-		$this->_req = HttpReq::instance();
-	}
-
-	/**
 	 * The main 'Attachments and Avatars' admin.
 	 *
 	 * What it does:
@@ -314,7 +300,7 @@ class ManageAttachments_Controller extends Action_Controller
 		// Perform a test to see if the GD module or ImageMagick are installed.
 		$testImg = get_extension_funcs('gd') || class_exists('Imagick');
 
-		// See if we can find if the server is set up to support the attacment limits
+		// See if we can find if the server is set up to support the attachment limits
 		$post_max_size = ini_get('post_max_size');
 		$upload_max_filesize = ini_get('upload_max_filesize');
 		$testPM = !empty($post_max_size) ? (memoryReturnBytes($post_max_size) >= (isset($modSettings['attachmentPostLimit']) ? $modSettings['attachmentPostLimit'] * 1024 : 0)) : true;
@@ -1655,7 +1641,7 @@ class ManageAttachments_Controller extends Action_Controller
 			{
 				$modSettings['automanage_attachments'] = 1;
 
-				// Create sub directroys off the root or from an attachment directory?
+				// Create sub directory's off the root or from an attachment directory?
 				$modSettings['use_subdirectories_for_attachments'] = $this->auto == -1 ? 0 : 1;
 				$modSettings['basedirectory_for_attachments'] = $this->auto > 0 ? $modSettings['attachmentUploadDir'][$this->auto] : $modSettings['basedirectory_for_attachments'];
 

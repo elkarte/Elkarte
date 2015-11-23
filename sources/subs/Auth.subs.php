@@ -418,10 +418,13 @@ function resetPassword($memID, $username = null)
 		$user = trim($username);
 	}
 
-	// Generate a random password.
+	// Generate a 10 digit random password.
+	$tokenizer = new Token_Hash();
+	$newPassword = $tokenizer->generate_hash();
+
+	// Create a db hash for the generated password
 	require_once(EXTDIR . '/PasswordHash.php');
 	$t_hasher = new PasswordHash(8, false);
-	$newPassword = substr(preg_replace('/\W/', '', md5(mt_rand())), 0, 10);
 	$newPassword_sha256 = hash('sha256', strtolower($user) . $newPassword);
 	$db_hash = $t_hasher->HashPassword($newPassword_sha256);
 
@@ -588,7 +591,7 @@ function validateLoginPassword(&$password, $hash, $user = '', $returnhash = fals
 	{
 		$passhash = $hasher->HashPassword($password);
 
-		// Something is not right, we can not generate a valid hash thats <20 characters
+		// Something is not right, we can not generate a valid hash that's <20 characters
 		if (strlen($passhash) < 20)
 			$passhash = false;
 	}
@@ -814,20 +817,9 @@ function userByEmail($email, $username = null)
  */
 function generateValidationCode()
 {
-	global $modSettings;
+	$tokenizer = new Token_Hash();
 
-	$db = database();
-
-	$request = $db->query('get_random_number', '
-		SELECT RAND()',
-		array(
-		)
-	);
-
-	list ($dbRand) = $db->fetch_row($request);
-	$db->free_result($request);
-
-	return substr(preg_replace('/\W/', '', sha1(microtime() . mt_rand() . $dbRand . $modSettings['rand_seed'])), 0, 10);
+	return $tokenizer->generate_hash();
 }
 
 /**

@@ -48,12 +48,6 @@ class PersonalMessage_Controller extends Action_Controller
 	private $_searchq_parameters = array();
 
 	/**
-	 * Holds instance of HttpReq object
-	 * @var HttpReq
-	 */
-	private $_req;
-
-	/**
 	 * This method is executed before any other in this file (when the class is
 	 * loaded by the dispatcher).
 	 *
@@ -73,9 +67,6 @@ class PersonalMessage_Controller extends Action_Controller
 
 		// This file contains the our PM functions such as mark, send, delete
 		require_once(SUBSDIR . '/PersonalMessage.subs.php');
-
-		// What data have we been passed
-		$this->_req = HttpReq::instance();
 
 		// Templates, language, javascripts
 		loadLanguage('PersonalMessage');
@@ -571,7 +562,7 @@ class PersonalMessage_Controller extends Action_Controller
 			'pmid' => isset($pmID) ? $pmID : 0,
 		), $user_info['id']);
 
-		// Make sure that we have been given a correct head pm id if we are in converstation mode
+		// Make sure that we have been given a correct head pm id if we are in conversation mode
 		if ($context['display_mode'] == 2 && !empty($pmID) && $pmID != $lastData['id'])
 		{
 			Errors::instance()->fatal_lang_error('no_access', false);
@@ -760,6 +751,15 @@ class PersonalMessage_Controller extends Action_Controller
 			}
 		}
 
+		try
+		{
+			$this->_events->trigger('before_set_context', array('pmsg' => isset($this->_req->query->pmsg) ? $this->_req->query->pmsg : (isset($this->_req->query->quote) ? $this->_req->query->quote : 0)));
+		}
+		catch (Pm_Error_Exception $e)
+		{
+			return $this->messagePostError($e->namedRecipientList, $e->recipientList, $e->msgOptions);
+		}
+
 		// Quoting / Replying to a message?
 		if (!empty($this->_req->query->pmsg))
 		{
@@ -928,7 +928,7 @@ class PersonalMessage_Controller extends Action_Controller
 			'preview_type' => 2,
 		);
 
-		$this->_events->trigger('prepare_send_context', array('pmsg' => isset($this->_req->query->pmsg) ? $this->_req->query->pmsg : (isset($this->_req->query->quote) ? $this->_req->query->quote : 0), 'editorOptions' => &$editorOptions));
+		$this->_events->trigger('prepare_send_context', array('pmsg' => isset($this->_req->query->pmsg) ? $this->_req->query->pmsg : (isset($this->_req->query->quote) ? $this->_req->query->quote : 0), 'editorOptions' => &$editorOptions, 'recipientList' => &$recipientList));
 
 		create_control_richedit($editorOptions);
 
@@ -1258,8 +1258,9 @@ class PersonalMessage_Controller extends Action_Controller
 	 *
 	 * @param mixed[] $named_recipients
 	 * @param mixed[] $recipient_ids array keys of [bbc] => int[] and [to] => int[]
+	 * @param mixed[] $msg_options body, subject and reply values
 	 */
-	public function messagePostError($named_recipients, $recipient_ids = array())
+	public function messagePostError($named_recipients, $recipient_ids = array(), $msg_options = null)
 	{
 		global $txt, $context, $scripturl, $modSettings, $user_info;
 
@@ -1301,9 +1302,18 @@ class PersonalMessage_Controller extends Action_Controller
 		}
 
 		// Set everything up like before....
-		$context['subject'] = isset($this->_req->post->subject) ? Util::htmlspecialchars($this->_req->post->subject) : '';
-		$context['message'] = isset($this->_req->post->message) ? str_replace(array('  '), array('&nbsp; '), Util::htmlspecialchars($this->_req->post->message, ENT_QUOTES, 'UTF-8', true)) : '';
-		$context['reply'] = !empty($this->_req->post->replied_to);
+		if (!empty($msg_options))
+		{
+			$context['subject'] = $msg_options->subject;
+			$context['message'] = $msg_options->body;
+			$context['reply'] = $msg_options->reply_to;
+		}
+		else
+		{
+			$context['subject'] = isset($this->_req->post->subject) ? Util::htmlspecialchars($this->_req->post->subject) : '';
+			$context['message'] = isset($this->_req->post->message) ? str_replace(array('  '), array('&nbsp; '), Util::htmlspecialchars($this->_req->post->message, ENT_QUOTES, 'UTF-8', true)) : '';
+			$context['reply'] = !empty($this->_req->post->replied_to);
+		}
 
 		// If this is a reply to message, we need to reload the quote
 		if ($context['reply'])
@@ -1375,7 +1385,7 @@ class PersonalMessage_Controller extends Action_Controller
 			'preview_type' => 2,
 		);
 
-		$this->_events->trigger('prepare_send_context', array('pmsg' => isset($this->_req->query->pmsg) ? $this->_req->query->pmsg : (isset($this->_req->query->quote) ? $this->_req->query->quote : 0), 'editorOptions' => &$editorOptions));
+		$this->_events->trigger('prepare_send_context', array('pmsg' => isset($this->_req->query->pmsg) ? $this->_req->query->pmsg : (isset($this->_req->query->quote) ? $this->_req->query->quote : 0), 'editorOptions' => &$editorOptions, 'recipientList' => &$recipientList));
 
 		create_control_richedit($editorOptions);
 
@@ -2563,7 +2573,7 @@ class PersonalMessage_Controller extends Action_Controller
 
 		if ($context['folder'] === 'inbox' && !empty($this->_search_params['advanced']) && $context['currently_using_labels'])
 		{
-			// Came here from pagination?  Put them back into $_REQUEST for sanitization.
+			// Came here from pagination?  Put them back into $_REQUEST for sanitation.
 			if (isset($this->_search_params['labels']))
 			{
 				$this->_req->post->searchlabel = explode(',', $this->_search_params['labels']);

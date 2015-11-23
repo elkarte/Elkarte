@@ -133,7 +133,7 @@ class AdminSettings_Search
 	 *                        standalone strings, index for $txt, partial index
 	 *                        for $txt['setting_' . $item]
 	 * @return string[] - An empty array if $search_term is not found, otherwise
-	 *                    part of the serch_result array (consisting of 'name'
+	 *                    part of the search_result array (consisting of 'name'
 	 *                    and 'help') of the term the result was found
 	 */
 	protected function _find_term($search_term, $item)

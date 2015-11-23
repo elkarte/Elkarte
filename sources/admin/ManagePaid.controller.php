@@ -35,20 +35,6 @@ class ManagePaid_Controller extends Action_Controller
 	protected $_paidSettings;
 
 	/**
-	 * Holds instance of HttpReq object
-	 * @var HttpReq
-	 */
-	protected $_req;
-
-	/**
-	 * Pre Dispatch, called before other methods.  Loads HttpReq
-	 */
-	public function pre_dispatch()
-	{
-		$this->_req = HttpReq::instance();
-	}
-
-	/**
 	 * The main entrance point for the 'Paid Subscription' screen,
 	 *
 	 * What it does:
@@ -189,7 +175,7 @@ class ManagePaid_Controller extends Action_Controller
 					$this->_req->post->paid_email_to = $validator->validation_data('paid_email_to');
 				else
 				{
-					// Thats not an email, lets set it back in the form to be fixed and let them know its wrong
+					// That's not an email, lets set it back in the form to be fixed and let them know its wrong
 					$config_vars[1]['value'] = $this->_req->post->paid_email_to;
 					$context['error_type'] = 'minor';
 					$context['settings_message'] = array();

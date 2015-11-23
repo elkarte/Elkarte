@@ -202,8 +202,7 @@ class ProfileAccount_Controller extends Action_Controller
 				require_once(SUBSDIR . '/Post.subs.php');
 
 				preparsecode($warning_body);
-				$bbc_parser = \BBC\ParserWrapper::getInstance();
-				$warning_body = $bbc_parser->parseNotice($warning_body);
+				$warning_body = parse_bbc($warning_body, true);
 			}
 
 			// Try to remember some bits.

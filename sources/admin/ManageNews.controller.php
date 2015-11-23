@@ -46,20 +46,6 @@ class ManageNews_Controller extends Action_Controller
 	protected $_exclude_members = array();
 
 	/**
-	 * Holds instance of HttpReq object
-	 * @var HttpReq
-	 */
-	protected $_req;
-
-	/**
-	 * Pre Dispatch, called before other methods.  Loads HttpReq
-	 */
-	public function pre_dispatch()
-	{
-		$this->_req = HttpReq::instance();
-	}
-
-	/**
 	 * The news dispatcher / delegator
 	 *
 	 * What it does:
@@ -123,7 +109,7 @@ class ManageNews_Controller extends Action_Controller
 		// Give integration its shot via integrate_sa_manage_news
 		$subAction = $action->initialize($subActions, (allowedTo('edit_news') ? 'editnews' : (allowedTo('send_mail') ? 'mailingmembers' : 'settings')));
 
-		// Some bits for the tempalte
+		// Some bits for the template
 		$context['page_title'] = $txt['news_title'];
 		$context['sub_action'] = $subAction;
 
@@ -255,8 +241,8 @@ class ManageNews_Controller extends Action_Controller
 					'position' => 'bottom_of_list',
 					'class' => 'submitbutton',
 					'value' => '
-					<input type="submit" name="save_items" value="' . $txt['save'] . '" class="right_submit" />
-					<input type="submit" name="delete_selection" value="' . $txt['editnews_remove_selected'] . '" onclick="return confirm(\'' . $txt['editnews_remove_confirm'] . '\');" class="right_submit" />
+					<input type="submit" name="save_items" value="' . $txt['save'] . '" />
+					<input type="submit" name="delete_selection" value="' . $txt['editnews_remove_selected'] . '" onclick="return confirm(\'' . $txt['editnews_remove_confirm'] . '\');" />
 					<span id="moreNewsItems_link" class="hide">
 						<a class="linkbutton" href="javascript:void(0);" onclick="addAnotherNews(); return false;">' . $txt['editnews_clickadd'] . '</a>
 					</span>',
@@ -412,7 +398,7 @@ class ManageNews_Controller extends Action_Controller
 		// Start by finding any manually entered members!
 		$this->_toClean();
 
-		// Add in any members chosen from the autoselct dropdown.
+		// Add in any members chosen from the auto select dropdown.
 		$this->_toAddOrExclude();
 
 		// Clean the other vars.
@@ -461,7 +447,7 @@ class ManageNews_Controller extends Action_Controller
 	 */
 	private function _toAddOrExclude()
 	{
-		// Members selected (via autoselect) to specifically get the newsletter
+		// Members selected (via auto select) to specifically get the newsletter
 		if (isset($this->_req->post->member_list) && is_array($this->_req->post->member_list))
 		{
 			$members = array();
@@ -471,7 +457,7 @@ class ManageNews_Controller extends Action_Controller
 			$this->_members = array_unique(array_merge($this->_members, $members));
 		}
 
-		// Members selected (via autoselect) to specifically not get the newsletter
+		// Members selected (via auto select) to specifically not get the newsletter
 		if (isset($this->_req->post->exclude_member_list) && is_array($this->_req->post->exclude_member_list))
 		{
 			$members = array();
@@ -483,7 +469,7 @@ class ManageNews_Controller extends Action_Controller
 	}
 
 	/**
-	 * If they did not use autoselect function on the include/exclude members then
+	 * If they did not use auto select function on the include/exclude members then
 	 * we need to look them up from the supplied "one","two" string
 	 */
 	private function _toClean()

@@ -99,20 +99,6 @@ class MessageIndex_Controller extends Action_Controller implements Frontpage_Int
 	}
 
 	/**
-	 * Holds instance of HttpReq object
-	 * @var HttpReq
-	 */
-	private $_req;
-
-	/**
-	 * Pre Dispatch, called before other methods.  Loads HttpReq instance.
-	 */
-	public function pre_dispatch()
-	{
-		$this->_req = HttpReq::instance();
-	}
-
-	/**
 	 * Dispatches forward to message index handler.
 	 *
 	 * @see Action_Controller::action_index()

@@ -39,20 +39,6 @@ class ManageSmileys_Controller extends Action_Controller
 	private $_smiley_context = array();
 
 	/**
-	 * Holds instance of HttpReq object
-	 * @var HttpReq
-	 */
-	protected $_req;
-
-	/**
-	 * Pre Dispatch, called before other methods.  Loads HttpReq
-	 */
-	public function pre_dispatch()
-	{
-		$this->_req = HttpReq::instance();
-	}
-
-	/**
 	 * This is the dispatcher of smileys administration.
 	 *
 	 * @uses ManageSmileys language

@@ -41,20 +41,6 @@ class ManagePermissions_Controller extends Action_Controller
 	protected $_pid = null;
 
 	/**
-	 * Holds instance of HttpReq object
-	 * @var HttpReq
-	 */
-	protected $_req;
-
-	/**
-	 * Pre Dispatch, called before other methods.  Loads HttpReq
-	 */
-	public function pre_dispatch()
-	{
-		$this->_req = HttpReq::instance();
-	}
-
-	/**
 	 * Dispaches to the right function based on the given subaction.
 	 *
 	 * - Checks the permissions, based on the sub-action.
@@ -176,6 +162,9 @@ class ManagePermissions_Controller extends Action_Controller
 		if (!empty($this->_req->query->pid))
 			$this->_pid = (int) $this->_req->query->pid;
 
+		// Needed for <5.4 due to lack of $this support in closures
+		$_pid = isset($this->_pid) ? $this->_pid : null;
+
 		// We can modify any permission set apart from the read only, reply only and no polls ones as they are redefined.
 		$context['can_modify'] = empty($this->_pid) || $this->_pid == 1 || $this->_pid > 4;
 
@@ -291,11 +280,13 @@ class ManagePermissions_Controller extends Action_Controller
 						'class' => 'grid17',
 					),
 					'data' => array(
-						'function' => function ($rowData) {
+						'function' => function ($rowData) use ($_pid) {
 							global $scripturl, $txt;
 
 							if ($rowData['id_group'] != 1)
-								return '<a href="' . $scripturl . '?action=admin;area=permissions;sa=modify;group=' . $rowData['id_group'] . '' . (isset($this->_pid) ? ';pid=' . $this->_pid : '') . '">' . $txt['membergroups_modify'] . '</a>';
+								return '<a href="' . $scripturl . '?action=admin;area=permissions;sa=modify;group=' . $rowData['id_group'] . '' . (isset($_pid) ? ';pid=' . $_pid : '') . '">' . $txt['membergroups_modify'] . '</a>';
+
+							return null;
 						},
 					),
 				),
@@ -321,7 +312,6 @@ class ManagePermissions_Controller extends Action_Controller
 		// The second list shows the post count based groups...if enabled
 		if (!empty($modSettings['permission_enable_postgroups']))
 		{
-			$_pid = isset($this->_pid) ? $this->_pid : null;
 			$listOptions = array(
 				'id' => 'post_count_membergroups_list',
 				'title' => $txt['membergroups_post'],
@@ -519,6 +509,7 @@ class ManagePermissions_Controller extends Action_Controller
 			$js = 'new Array(';
 			foreach ($context['profiles'] as $id => $profile)
 				$js .= '{name: ' . JavaScriptEscape($profile['name']) . ', id: ' . $id . '},';
+
 			addJavascriptVar(array(
 				'permission_profiles' => substr($js, 0, -1) . ')',
 				'txt_save' => JavaScriptEscape($txt['save']),
@@ -527,7 +518,6 @@ class ManagePermissions_Controller extends Action_Controller
 
 		// Get the board tree.
 		require_once(SUBSDIR . '/Boards.subs.php');
-
 		getBoardTree();
 
 		// Build the list of the boards.
@@ -541,6 +531,8 @@ class ManagePermissions_Controller extends Action_Controller
 			);
 			foreach ($boardList[$catid] as $boardid)
 			{
+				$boards[$boardid]['description'] = parse_bbc($boards[$boardid]['description']);
+
 				if (!isset($context['profiles'][$boards[$boardid]['profile']]))
 					$boards[$boardid]['profile'] = 1;
 

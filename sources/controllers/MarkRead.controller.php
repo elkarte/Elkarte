@@ -34,20 +34,6 @@ class MarkRead_Controller extends Action_Controller
 	private $_querystring_sort_limits = '';
 
 	/**
-	 * Holds instance of HttpReq object
-	 * @var HttpReq
-	 */
-	private $_req;
-
-	/**
-	 * Entry point function
-	 */
-	public function pre_dispatch()
-	{
-		$this->_req = HttpReq::instance();
-	}
-
-	/**
 	 * This is the main function for markasread file if not using API
 	 *
 	 * @see Action_Controller::action_index()

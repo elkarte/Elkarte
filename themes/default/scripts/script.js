@@ -1,4 +1,4 @@
-/**
+/*!
  * @name      ElkArte Forum
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
@@ -10,7 +10,9 @@
  * license:		BSD, See included LICENSE.TXT for terms and conditions.
  *
  * @version 1.1 dev
- *
+ */
+
+/**
  * This file contains javascript utility functions
  */
 
@@ -250,8 +252,10 @@ String.prototype.easyReplace = function (oReplacements)
 {
 	var sResult = this;
 
-	for (var sSearch in oReplacements)
+	for (var sSearch in oReplacements) {
+		sSearch = sSearch.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&');
 		sResult = sResult.replace(new RegExp('%' + sSearch + '%', 'g'), oReplacements[sSearch]);
+	}
 
 	return sResult;
 };
@@ -854,6 +858,7 @@ elk_Toggle.prototype.init = function()
 					oContainer.style.display = 'block';
 
 				oContainer.instanceRef = this;
+
 				oContainer.onclick = function () {
 					this.instanceRef.toggle();
 					this.blur();

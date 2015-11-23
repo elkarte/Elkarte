@@ -30,20 +30,6 @@ class OpenID_Controller extends Action_Controller
 	private $_secret = '';
 
 	/**
-	 * Holds instance of HttpReq object
-	 * @var HttpReq
-	 */
-	private $_req;
-
-	/**
-	 * Pre Dispatch, called before other methods.  Loads HttpReq instance.
-	 */
-	public function pre_dispatch()
-	{
-		$this->_req = HttpReq::instance();
-	}
-
-	/**
 	 * Forward to the right action.
 	 *
 	 * @see Action_Controller::action_index()
@@ -185,7 +171,9 @@ class OpenID_Controller extends Action_Controller
 
 			// Generate an ElkArte hash for the db to protect this account
 			$user_settings['passwd'] = validateLoginPassword($this->_secret, '', $user_settings['member_name'], true);
-			$user_settings['password_salt'] = substr(md5(mt_rand()), 0, 4);
+
+			$tokenizer = new Token_Hash();
+			$user_settings['password_salt'] = $tokenizer->generate_hash(4);
 
 			require_once(SUBSDIR . '/Members.subs.php');
 			updateMemberData($user_settings['id_member'], array('passwd' => $user_settings['passwd'], 'password_salt' => $user_settings['password_salt']));

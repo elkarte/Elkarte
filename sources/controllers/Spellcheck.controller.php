@@ -53,20 +53,6 @@ class Spellcheck_Controller extends Action_Controller
 	protected $_template_layers = null;
 
 	/**
-	 * Holds instance of HttpReq object
-	 * @var HttpReq
-	 */
-	private $_req;
-
-	/**
-	 * Pre Dispatch, called before other methods.  Loads HttpReq instance.
-	 */
-	public function pre_dispatch()
-	{
-		$this->_req = HttpReq::instance();
-	}
-
-	/**
 	 * Spell checks the post for typos ;).
 	 *
 	 * What it does:

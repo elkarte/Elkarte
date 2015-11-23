@@ -28,24 +28,15 @@ if (!defined('ELK'))
 class Karma_Controller extends Action_Controller
 {
 	/**
-	 * Holds instance of HttpReq object
-	 * @var HttpReq
-	 */
-	private $_req;
-
-	/**
-	 * Pre Dispatch, called before other methods.  Loads integration hooks
-	 * and HttpReq instance.
+	 * Pre Dispatch, called before other methods.  Loads integration hooks.
 	 */
 	public function pre_dispatch()
 	{
 		Hooks::get()->loadIntegrationsSettings();
-
-		$this->_req = HttpReq::instance();
 	}
 
 	/**
-	 * Default entry point, in case action methods aren't directly
+	 * Default entry point, in case action methods are not directly
 	 * called. Simply forward to applaud.
 	 *
 	 * @see Action_Controller::action_index()

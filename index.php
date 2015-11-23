@@ -30,7 +30,6 @@ const ELK = '1';
 // Shortcut for the browser cache stale
 const CACHE_STALE = '?R11';
 
-
 // Report errors but not depreciated ones
 error_reporting(E_ALL | E_STRICT & ~8192);
 
@@ -52,10 +51,10 @@ foreach (array('db_character_set', 'cachedir') as $variable)
 		unset($GLOBALS[$variable], $GLOBALS[$variable]);
 
 // Where the Settings.php file is located
-$settings_loc = __DIR__ . '/Settings.php';
+$settings_loc = 'Settings.php';
 
 // First thing: if the install dir exists, just send anybody there
-if (file_exists(__DIR__ . '/install'))
+if (file_exists('install'))
 {
 	if (file_exists($settings_loc))
 	{
@@ -76,7 +75,7 @@ else
 
 
 // Make sure the paths are correct... at least try to fix them.
-if (!file_exists($boarddir) && file_exists(__DIR__ . '/agreement.txt'))
+if (!file_exists($boarddir) && file_exists('agreement.txt'))
 	$boarddir = __DIR__;
 if (!file_exists($sourcedir . '/SiteDispatcher.class.php') && file_exists($boarddir . '/sources'))
 	$sourcedir = $boarddir . '/sources';
@@ -191,7 +190,7 @@ obExit(null, null, true);
  */
 function elk_main()
 {
-	global $modSettings, $user_info, $topic, $board_info, $context;
+	global $modSettings, $user_info, $topic, $board_info, $context, $maintenance;
 
 	$_req = HttpReq::instance();
 
@@ -219,7 +218,7 @@ function elk_main()
 	loadBadBehavior();
 
 	// Attachments don't require the entire theme to be loaded.
-	if ($_req->getQuery('action') === 'dlattach' && (!empty($modSettings['allow_guestAccess']) && $user_info['is_guest']))
+	if ($_req->getQuery('action') === 'dlattach' && (!empty($modSettings['allow_guestAccess']) && $user_info['is_guest']) && (empty($maintenance) || allowedTo('admin_forum')))
 		detectBrowser();
 	// Load the current theme.  (note that ?theme=1 will also work, may be used for guest theming.)
 	else
@@ -234,7 +233,7 @@ function elk_main()
 	if (!empty($topic) && empty($board_info['cur_topic_approved']) && !allowedTo('approve_posts') && ($user_info['id'] != $board_info['cur_topic_starter'] || $user_info['is_guest']))
 		Errors::instance()->fatal_lang_error('not_a_topic', false);
 
-	$no_stat_actions = array('dlattach', 'findmember', 'jsoption', 'requestmembers', 'jslocale', 'xmlpreview', 'suggest', '.xml', 'xmlhttp', 'verificationcode', 'viewquery', 'viewadminfile');
+	$no_stat_actions = array('dlattach', 'jsoption', 'requestmembers', 'jslocale', 'xmlpreview', 'suggest', '.xml', 'xmlhttp', 'verificationcode', 'viewquery', 'viewadminfile');
 	call_integration_hook('integrate_pre_log_stats', array(&$no_stat_actions));
 
 	// Do some logging, unless this is an attachment, avatar, toggle of editor buttons, theme option, XML feed etc.

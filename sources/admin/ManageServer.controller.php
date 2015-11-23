@@ -62,20 +62,6 @@ class ManageServer_Controller extends Action_Controller
 	protected $_balancingSettingsForm;
 
 	/**
-	 * Holds instance of HttpReq object
-	 * @var HttpReq
-	 */
-	protected $_req;
-
-	/**
-	 * Pre Dispatch, called before other methods.  Loads HttpReq
-	 */
-	public function pre_dispatch()
-	{
-		$this->_req = HttpReq::instance();
-	}
-
-	/**
 	 * This is the main dispatcher. Sets up all the available sub-actions, all the tabs and selects
 	 * the appropriate one based on the sub-action.
 	 *
@@ -666,6 +652,15 @@ class ManageServer_Controller extends Action_Controller
 			array('cache_enable', $txt['cache_enable'], 'file', 'select', $cache_level, 'cache_enable'),
 			array('cache_accelerator', $txt['cache_accelerator'], 'file', 'select', $detected_supported),
 		);
+
+		foreach ($detected as $key => $value)
+		{
+			$cache_class = '\\ElkArte\\sources\\subs\\CacheMethod\\' . ucfirst($key);
+			if ($cache_class::available())
+			{
+				$cache_class::settings($config_vars);
+			}
+		}
 
 		// Notify the integration that we're preparing to mess up with cache settings...
 		call_integration_hook('integrate_modify_cache_settings', array(&$config_vars));

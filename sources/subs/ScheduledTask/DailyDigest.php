@@ -307,7 +307,7 @@ class Daily_Digest implements Scheduled_Task_Interface
 				{
 					foreach ($board['lines'] as $topic)
 					{
-						// This member wants notices on replys to this topic
+						// This member wants notices on reply's to this topic
 						if (in_array($mid, $topic['members']))
 						{
 							// First one in the section gets a nice heading
@@ -363,7 +363,7 @@ class Daily_Digest implements Scheduled_Task_Interface
 			sendmail($email['email'], $email['subject'], $email['body'], null, null, false, 4);
 		}
 
-		// Using the queue, do a final flush before we say thats all folks
+		// Using the queue, do a final flush before we say that's all folks
 		if (!empty($modSettings['mail_queue']))
 			AddMailQueue(true);
 

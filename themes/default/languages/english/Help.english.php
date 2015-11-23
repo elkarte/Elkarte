@@ -522,13 +522,14 @@ $helptxt['gravatar_rating'] = 'Gravatar allows users to self-rate their images s
 $helptxt['custom_avatar_enabled'] = 'It is recommended that you enable this for best performance as it will reduce both the processor load, and database load when viewing pages with avatars.<br />You must enter both a publicly accessible directory to save avatars in and the publicly accessible URL for that directory.  For example a directory of /home/yourforumname/public_html/NewAvatarDirectory and an URL of http://www.yourforumname.com/NewAvatarDirectory';
 $helptxt['disableHostnameLookup'] = 'This disables host name lookups, which on some servers are very slow.  Note that this will make banning less effective.';
 
-$helptxt['search_weight_commonheader'] = 'Weight factors are used to determine the relevancy of a search result. Change these weight factors to match the things that are specifically important for your forum. For instance, a forum of a news site might want a relatively high value for \'age of last matching message\'. All values are relative in relation to each other and should be positive integers.<br /><br />';
+$helptxt['search_weight_commonheader'] = 'Weight factors are used to determine the relevancy of a search result. Change these weight factors to match the things that are specifically important for your forum. For instance, a forum of a news site might want a relatively high value for \'age of last matching message\'. All values are relative in relation to each other and should be positive integers.';
 $helptxt['search_weight_frequency'] = 'This factor counts the amount of matching messages and divides them by the total number of messages within a topic.';
 $helptxt['search_weight_age'] = 'This factor rates the age of the last matching message within a topic. The more recent this message is, the higher the score.';
 $helptxt['search_weight_length'] = 'This factor is based on the topic size. The more messages are within the topic, the higher the score.';
 $helptxt['search_weight_subject'] = 'This factor looks whether a search term can be found within the subject of a topic.';
 $helptxt['search_weight_first_message'] = 'This factor looks whether a match can be found in the first message of a topic.';
 $helptxt['search_weight_sticky'] = 'This factor looks whether a topic is pinned and increases the relevancy score if it is.';
+$helptxt['search_weight_likes'] = 'This factor looks whether a topic has likes and increases the relevancy score based on the number.';
 $helptxt['search'] = 'Adjust all settings for the search function here.';
 $helptxt['search_why_use_index'] = 'A search index can greatly improve the performance of searches on your forum. Especially when the number of messages on a forum grows bigger, searching without an index can take a long time and increase the pressure on your database. If your forum is bigger than 50,000 messages, you should consider creating a search index to assure peak performance of your forum.<br /><br />Note that a search index can take up quite some space. A fulltext index is a built-in index of the database. It\'s relatively compact (approximately the same size as the message table), but a lot of common words aren\'t indexed and it can, in some wildcard queries, turn out to be slow. The custom index is bigger (depending on your configuration it can be up to 3 times the size of the messages table) but its performance is often better than fulltext and indexes most words.';
 
@@ -666,24 +667,24 @@ $helptxt['attachmentInLine'] = '<b>Add an inline attachment</b><br />
 			<p>
 				You can choose the inline mode you want for your attachment:
 				<ul>
-					<li><u>Thumbnail [attach=x]</u> Your image will be shown as a thumbnail</li>
-					<li><u>Full-size Image [attachimg=x]</u> Your image will be shown using its full dimensions up to the viewing size allowed by the forum.  Images larger than the viewing size allowed by the forum will be displayed at the forum maximum and be click-able to full size</li>
-					<li><u>Text Link [attachurl=x]</u> Only a link is show with size and view details. By clicking on it, the image is displayed.</li>
-					<li><u>Short Text Link [attachmini=x]</u> Only a link is shown without any details. By clicking on it, the image is displayed.</li>
+					<li>Thumbnail [attach=x] : Your image will be shown as a thumbnail</li>
+					<li>Full-size Image [attachimg=x] : Your image will be shown using its full dimensions up to the viewing size allowed by the forum.  Images larger than the viewing size allowed by the forum will be displayed at the forum maximum and be click-able to full size</li>
+					<li>Text Link [attachurl=x] : Only a link is show with size and view details. By clicking on it, the image is displayed.</li>
+					<li>Short Text Link [attachmini=x] : Only a link is shown without any details. By clicking on it, the image is displayed.</li>
 				</ul>
 			</p><br />
 		<p>
 			You can choose how to align the inline image:
 			<ul>
-				<li><u>align=left</u> The image is aligned to the left and the text will flow around it</li>
-				<li><u>align=right</u> The image is aligned to the right and the text will flow around it</li>
-				<li><u>align=center</u> The image is centered and the text will be below it</li>
+				<li>align=left : The image is aligned to the left and the text will flow around it</li>
+				<li>align=right : The image is aligned to the right and the text will flow around it</li>
+				<li>align=center : The image is centered and the text will be below it</li>
 			</ul>
 		</p><br />
 		<p>
 			You can choose how wide to show the image:
 			<ul>
-				<li><u>width=123</u> The image is displayed 123pixels wide</li>
+				<li>width=123 : The image is displayed 123 pixels wide</li>
 				<li>If the width specified is larger than the image or larger than the forum allows the largest allowable width will be used</li>
 				<li>Can be used to shrink a thumbnail as well [attach=1 width=50] will display a 50px wide thumbnail
 			</ul>

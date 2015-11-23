@@ -35,20 +35,6 @@ class ManageSearchEngines_Controller extends Action_Controller
 	protected $_engineSettings;
 
 	/**
-	 * Holds instance of HttpReq object
-	 * @var HttpReq
-	 */
-	protected $_req;
-
-	/**
-	 * Pre Dispatch, called before other methods.  Loads HttpReq
-	 */
-	public function pre_dispatch()
-	{
-		$this->_req = HttpReq::instance();
-	}
-
-	/**
 	* Entry point for this section.
 	*
 	* @see Action_Controller::action_index()
@@ -247,7 +233,7 @@ class ManageSearchEngines_Controller extends Action_Controller
 			recacheSpiderNames();
 		}
 
-		// Get the last seens.
+		// Get the last seen's.
 		$context['spider_last_seen'] = spidersLastSeen();
 
 		// Token for the ride
@@ -347,7 +333,7 @@ class ManageSearchEngines_Controller extends Action_Controller
 					'class' => 'submitbutton',
 					'position' => 'bottom_of_list',
 					'value' => '
-						<input type="submit" name="removeSpiders" value="' . $txt['spiders_remove_selected'] . '" onclick="return confirm(\'' . $txt['spider_remove_selected_confirm'] . '\');" class="right_submit" />
+						<input type="submit" name="removeSpiders" value="' . $txt['spiders_remove_selected'] . '" onclick="return confirm(\'' . $txt['spider_remove_selected_confirm'] . '\');" />
 						<input type="submit" name="addSpider" value="' . $txt['spiders_add'] . '" class="right_submit" />
 					',
 				),

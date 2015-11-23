@@ -26,20 +26,6 @@ class ManageTopics_Controller extends Action_Controller
 	protected $_topicSettings;
 
 	/**
-	 * Holds instance of HttpReq object
-	 * @var HttpReq
-	 */
-	protected $_req;
-
-	/**
-	 * Pre Dispatch, called before other methods.  Loads HttpReq
-	 */
-	public function pre_dispatch()
-	{
-		$this->_req = HttpReq::instance();
-	}
-
-	/**
 	 * Check permissions and forward to the right method.
 	 *
 	 * @see Action_Controller::action_index()

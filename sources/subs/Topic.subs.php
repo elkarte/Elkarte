@@ -2274,8 +2274,8 @@ function approveTopics($topics, $approve = true, $log = false)
 			SELECT t.id_topic, t.id_member_started, m.subject
 			FROM {db_prefix}topics as t
 				LEFT JOIN {db_prefix}messages AS m ON (t.id_first_msg = m.id_msg)
-			WHERE id_topic IN ({array_int:approve_topic_ids})
-				AND approved = {int:approve_type}
+			WHERE t.id_topic IN ({array_int:approve_topic_ids})
+				AND t.approved = {int:approve_type}
 			LIMIT ' . count($topics),
 			array(
 				'approve_topic_ids' => $topics,
@@ -2552,7 +2552,6 @@ function splitTopic($split1_ID_TOPIC, $splitMessages, $new_subject)
 	require_once(SUBSDIR . '/Topic.subs.php');
 	updateSplitTopics(array(
 		'splitMessages' => $splitMessages,
-		'split2_ID_TOPIC' => $split2_ID_TOPIC,
 		'split1_replies' => $split1_replies,
 		'split1_first_msg' => $split1_first_msg,
 		'split1_last_msg' => $split1_last_msg,

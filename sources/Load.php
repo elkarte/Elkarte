@@ -526,7 +526,8 @@ function loadBoard()
 					'name' => $row['cname']
 				),
 				'name' => $row['bname'],
-				'description' => $row['description'],
+				'raw_description' => $row['description'],
+				'description' => parse_bbc($row['description']),
 				'num_topics' => $row['num_topics'],
 				'unapproved_topics' => $row['unapproved_topics'],
 				'unapproved_posts' => $row['unapproved_posts'],
@@ -660,9 +661,16 @@ function loadBoard()
 			)
 		);
 
-		// If it's a prefetching agent or we're requesting an attachment.
-		if ((isset($_SERVER['HTTP_X_MOZ']) && $_SERVER['HTTP_X_MOZ'] === 'prefetch') || (!empty($_REQUEST['action']) && $_REQUEST['action'] === 'dlattach'))
-			stop_prefetching();
+		// If it's a prefetching agent, stop it
+		stop_prefetching();
+
+		// If we're requesting an attachment.
+		if (!empty($_REQUEST['action']) && $_REQUEST['action'] === 'dlattach')
+		{
+			ob_end_clean();
+			header('HTTP/1.1 403 Forbidden');
+			exit;
+		}
 		elseif ($user_info['is_guest'])
 		{
 			loadLanguage('Errors');
@@ -1504,7 +1512,6 @@ function loadTheme($id_theme = 0, $initialize = true)
 		$txt = array();
 
 	$simpleActions = array(
-		'findmember',
 		'quickhelp',
 		'printpage',
 		'quotefast',
@@ -2114,7 +2121,7 @@ function loadAssetFile($filenames, $params = array(), $id = '')
 	$dir = '/' . $params['subdir'] . '/';
 
 	// Whoa ... we've done this before yes?
-	$cache_name = 'load_' . $params['extension'] . '_' . md5($settings['theme_dir'] . implode('_', $filenames));
+	$cache_name = 'load_' . $params['extension'] . '_' . hash('md5', $settings['theme_dir'] . implode('_', $filenames));
 	if (($temp = cache_get_data($cache_name, 600)) !== null)
 	{
 		if (empty($context[$params['index_name']]))
@@ -2900,7 +2907,7 @@ function determineAvatar($profile)
 	elseif (!empty($profile['avatar']) && $profile['avatar'] === 'gravatar')
 	{
 		// Gravatars URL.
-		$gravatar_url = '//www.gravatar.com/avatar/' . md5(strtolower($profile['email_address'])) . ';s=' . $modSettings['avatar_max_height'] . (!empty($modSettings['gravatar_rating']) ? ('&amp;r=' . $modSettings['gravatar_rating']) : '');
+		$gravatar_url = '//www.gravatar.com/avatar/' . hash('md5', strtolower($profile['email_address'])) . ';s=' . $modSettings['avatar_max_height'] . (!empty($modSettings['gravatar_rating']) ? ('&amp;r=' . $modSettings['gravatar_rating']) : '');
 
 		$avatar = array(
 			'name' => $profile['avatar'],
@@ -2944,7 +2951,7 @@ function determineAvatar($profile)
 		);
 
 	// Make sure there's a preview for gravatars available.
-	$avatar['gravatar_preview'] = '//www.gravatar.com/avatar/' . md5(strtolower($profile['email_address'])) . ';s=' . $modSettings['avatar_max_height'] . (!empty($modSettings['gravatar_rating']) ? ('&amp;r=' . $modSettings['gravatar_rating']) : '');
+	$avatar['gravatar_preview'] = '//www.gravatar.com/avatar/' . hash('md5', strtolower($profile['email_address'])) . ';s=' . $modSettings['avatar_max_height'] . (!empty($modSettings['gravatar_rating']) ? ('&amp;r=' . $modSettings['gravatar_rating']) : '');
 
 	call_integration_hook('integrate_avatar', array(&$avatar));
 

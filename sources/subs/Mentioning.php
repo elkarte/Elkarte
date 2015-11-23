@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Handles all the mentions actions so members are notified of mentionalbe actions
+ * Handles all the mentions actions so members are notified of mentionable actions
  *
  * @name      ElkArte Forum
  * @copyright ElkArte Forum contributors

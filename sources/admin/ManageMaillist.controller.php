@@ -45,20 +45,6 @@ class ManageMaillist_Controller extends Action_Controller
 	protected $_parsersSettings;
 
 	/**
-	 * Holds instance of HttpReq object
-	 * @var HttpReq
-	 */
-	protected $_req;
-
-	/**
-	 * Pre Dispatch, called before other methods.  Loads HttpReq
-	 */
-	public function pre_dispatch()
-	{
-		$this->_req = HttpReq::instance();
-	}
-
-	/**
 	 * Main dispatcher.
 	 *
 	 * This function checks permissions and passes control to the sub action.
@@ -538,11 +524,11 @@ class ManageMaillist_Controller extends Action_Controller
 				{
 					$context['bounce_templates'][$k]['body'] = strtr($name['body'], array(
 						'{MEMBER}' => un_htmlspecialchars($temp_email[0]['name']),
-						'{SCRIPTURL}' => $scripturl, '{FORUMNAME}' => $mbname,
+						'{SCRIPTURL}' => $scripturl,
+						'{FORUMNAME}' => $mbname,
 						'{REGARDS}' => replaceBasicActionUrl($txt['regards_team']),
 						'{SUBJECT}' => $temp_email[0]['subject'],
 						'{ERROR}' => $fullerrortext,
-						'{FORUMNAME}' => $mbname,
 						'{FORUMNAMESHORT}' => (!empty($modSettings['maillist_sitename']) ? $modSettings['maillist_sitename'] : $mbname),
 						'{EMAILREGARDS}' => (!empty($modSettings['maillist_sitename_regards']) ? $modSettings['maillist_sitename_regards'] : ''),
 					));

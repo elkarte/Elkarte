@@ -609,7 +609,7 @@ function findOrphanThumbnails($start, $fix_errors, $to_fix)
 }
 
 /**
- * Finds parents who thing they do have thumbnails, but dont
+ * Finds parents who thing they do have thumbnails, but don't
  *
  * - Checks in groups of 500
  * - Called by attachment maintenance

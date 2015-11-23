@@ -29,7 +29,7 @@ if (!defined('ELK'))
  * What it does:
  * - Used when an Sphinx search daemon is running
  * - Access is via Sphinx's own implementation of MySQL network protocol (SphinxQL)
- * - requires Sphinx 2 or higher
+ * - Requires Sphinx 2 or higher
  *
  * @package Search
  */
@@ -130,8 +130,9 @@ class Sphinxql_Search extends SearchAPI
 	}
 
 	/**
-	 * callback function for usort used to sort the results.
-	 * the order of sorting is: large words, small words, large words that
+	 * Callback function for usort used to sort the results.
+	 *
+	 * - The order of sorting is: large words, small words, large words that
 	 * are excluded from the search, small words that are excluded.
 	 *
 	 * @param string $a Word A
@@ -159,7 +160,7 @@ class Sphinxql_Search extends SearchAPI
 	/**
 	 * Do we have to do some work with the words we are searching for to prepare them?
 	 *
-	 * @param string[] $word A word to index
+	 * @param string $word word(s) to index
 	 * @param mixed[] $wordsSearch The Search words
 	 * @param string[] $wordsExclude Words to exclude
 	 * @param boolean $isExcluded
@@ -188,14 +189,14 @@ class Sphinxql_Search extends SearchAPI
 		global $user_info, $context, $modSettings;
 
 		// Only request the results if they haven't been cached yet.
-		if (($cached_results = cache_get_data('searchql_results_' . md5($user_info['query_see_board'] . '_' . $context['params']))) === null)
+		if (($cached_results = cache_get_data('ssearchql_results_' . md5($user_info['query_see_board'] . '_' . $context['params']))) === null)
 		{
 			// Create an instance of the sphinx client and set a few options.
 			$mySphinx = @mysqli_connect(($modSettings['sphinx_searchd_server'] === 'localhost' ? '127.0.0.1' : $modSettings['sphinx_searchd_server']), '', '', '', (int) $modSettings['sphinxql_searchd_port']);
 
 			// No connection, daemon not running?  log the error
 			if ($mySphinx === false)
-				Errors::instance()->fatal_lang_error('error_no_search_daemon');
+				\Errors::instance()->fatal_lang_error('error_no_search_daemon');
 
 			// Compile different options for our query
 			$query = 'SELECT *' . (empty($search_params['topic']) ? ', COUNT(*) num' : '') . ', WEIGHT() weights, (weights + (relevance/1000)) rank FROM elkarte_index';
@@ -243,7 +244,9 @@ class Sphinxql_Search extends SearchAPI
 			$query .= ' LIMIT 0,' . (int) $modSettings['sphinx_max_results'];
 
 			// Set any options needed, like field weights
-			$query .= ' OPTION field_weights=(subject=' . (!empty($modSettings['search_weight_subject']) ? $modSettings['search_weight_subject'] * 200 : 1000) . ',body=1000)';
+			$query .= ' OPTION field_weights=(subject=' . (!empty($modSettings['search_weight_subject']) ? $modSettings['search_weight_subject'] * 200 : 1000) . ',body=1000),
+			ranker=proximity_bm25,
+			max_matches=' . (int) $modSettings['sphinx_max_results'];
 
 			// Execute the search query.
 			$request = mysqli_query($mySphinx, $query);
@@ -253,9 +256,9 @@ class Sphinxql_Search extends SearchAPI
 			{
 				// Just log the error.
 				if (mysqli_error($mySphinx))
-					Errors::instance()->log_error(mysqli_error($mySphinx));
+					\Errors::instance()->log_error(mysqli_error($mySphinx));
 
-				Errors::instance()->fatal_lang_error('error_no_search_daemon');
+				\Errors::instance()->fatal_lang_error('error_no_search_daemon');
 			}
 
 			// Get the relevant information from the search results.
@@ -335,7 +338,7 @@ class Sphinxql_Search extends SearchAPI
 			// Prepare this token
 			$cleanWords = $this->_cleanString($token[2]);
 
-			// Explode the cleanWords again incase the cleaning puts more spaces into it
+			// Explode the cleanWords again in case the cleaning puts more spaces into it
 			$addWords = $phrase ? array('"' . $cleanWords . '"') : preg_split('~ ~u', $cleanWords, null, PREG_SPLIT_NO_EMPTY);
 
 			// Excluding this word?
@@ -398,7 +401,7 @@ class Sphinxql_Search extends SearchAPI
 		$string = html_entity_decode($string, ENT_QUOTES, 'UTF-8');
 
 		// Lowercase string
-		$string = Util::strtolower($string);
+		$string = \Util::strtolower($string);
 
 		// Fix numbers so they search easier (phone numbers, SSN, dates, etc)
 		$string = preg_replace('~([[:digit:]]+)\pP+(?=[[:digit:]])~u', '', $string);

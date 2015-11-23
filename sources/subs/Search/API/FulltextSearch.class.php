@@ -20,7 +20,9 @@
 namespace ElkArte\Search\API;
 
 if (!defined('ELK'))
+{
 	die('No access...');
+}
 
 /**
  * SearchAPI-Fulltext.class.php, Fulltext API, used when an SQL fulltext index is used
@@ -39,7 +41,7 @@ class Fulltext_Search extends SearchAPI
 	 * This won't work with versions of ElkArte less than this.
 	 * @var string
 	 */
-	public $min_elk_version = 'ElkArte 1.0 Beta';
+	public $min_elk_version = 'ElkArte 1.0';
 
 	/**
 	 * Is it supported?
@@ -82,6 +84,7 @@ class Fulltext_Search extends SearchAPI
 		if (!in_array(DB_TYPE, $this->supported_databases))
 		{
 			$this->is_supported = false;
+
 			return;
 		}
 
@@ -106,12 +109,9 @@ class Fulltext_Search extends SearchAPI
 			case 'prepareIndexes':
 			case 'indexedWordQuery':
 				return true;
-			break;
-
 			// All other methods, too bad dunno you.
 			default:
 				return false;
-			break;
 		}
 	}
 
@@ -142,7 +142,9 @@ class Fulltext_Search extends SearchAPI
 		}
 		// 4 is the MySQL default...
 		else
+		{
 			$min_word_length = 4;
+		}
 
 		return $min_word_length;
 	}
@@ -155,12 +157,13 @@ class Fulltext_Search extends SearchAPI
 	 *
 	 * @param string $a Word A
 	 * @param string $b Word B
+	 *
 	 * @return int An integer indicating how the words should be sorted (-1, 0 1)
 	 */
 	public function searchSort($a, $b)
 	{
-		$x = Util::strlen($a) - (in_array($a, $this->_excludedWords) ? 1000 : 0);
-		$y = Util::strlen($b) - (in_array($b, $this->_excludedWords) ? 1000 : 0);
+		$x = \Util::strlen($a) - (in_array($a, $this->_excludedWords) ? 1000 : 0);
+		$y = \Util::strlen($b) - (in_array($b, $this->_excludedWords) ? 1000 : 0);
 
 		return $x < $y ? 1 : ($x > $y ? -1 : 0);
 	}
@@ -199,13 +202,13 @@ class Fulltext_Search extends SearchAPI
 			{
 				// Using special characters that a full index would ignore and the remaining words are
 				// short which would also be ignored
-				if ((Util::strlen(current($subwords)) < $this->min_word_length) && (Util::strlen(next($subwords)) < $this->min_word_length))
+				if ((\Util::strlen(current($subwords)) < $this->min_word_length) && (\Util::strlen(next($subwords)) < $this->min_word_length))
 				{
 					$wordsSearch['words'][] = trim($word, '/*- ');
 					$wordsSearch['complex_words'][] = count($subwords) === 1 ? $word : '"' . $word . '"';
 				}
 			}
-			elseif (Util::strlen(trim($word, '/*- ')) < $this->min_word_length)
+			elseif (\Util::strlen(trim($word, '/*- ')) < $this->min_word_length)
 			{
 				// Short words have feelings too
 				$wordsSearch['words'][] = trim($word, '/*- ');
@@ -216,7 +219,9 @@ class Fulltext_Search extends SearchAPI
 		$fulltextWord = count($subwords) === 1 ? $word : '"' . $word . '"';
 		$wordsSearch['indexed_words'][] = $fulltextWord;
 		if ($isExcluded)
+		{
 			$wordsExclude[] = $fulltextWord;
+		}
 	}
 
 	/**
@@ -238,45 +243,73 @@ class Fulltext_Search extends SearchAPI
 		$query_select = array(
 			'id_msg' => 'm.id_msg',
 		);
+
 		$query_where = array();
 		$query_params = $search_data['params'];
 
 		if ($query_params['id_search'])
+		{
 			$query_select['id_search'] = '{int:id_search}';
+		}
 
 		$count = 0;
 		if (empty($modSettings['search_simple_fulltext']))
+		{
 			foreach ($words['words'] as $regularWord)
 			{
-				$query_where[] = 'm.body' . (in_array($regularWord, $query_params['excluded_words']) ? ' NOT' : '') . (empty($modSettings['search_match_words']) || $search_data['no_regexp'] ? ' LIKE ' : 'RLIKE') . '{string:complex_body_' . $count . '}';
+				$query_where[] = 'm.body' . (in_array($regularWord, $query_params['excluded_words']) ? ' NOT' : '') . (empty($modSettings['search_match_words']) || $search_data['no_regexp'] ? ' LIKE ' : ' RLIKE ') . '{string:complex_body_' . $count . '}';
 				$query_params['complex_body_' . $count++] = $this->prepareWord($regularWord, $search_data['no_regexp']);
 			}
+		}
 
+		// Just by a specific user
 		if ($query_params['user_query'])
+		{
 			$query_where[] = '{raw:user_query}';
+		}
+
+		// Just in specific boards
 		if ($query_params['board_query'])
+		{
 			$query_where[] = 'm.id_board {raw:board_query}';
+		}
+
+		// Just search in a specific topic
 		if ($query_params['topic'])
+		{
 			$query_where[] = 'm.id_topic = {int:topic}';
+		}
+
+		// Just in a range of messages (age)
 		if ($query_params['min_msg_id'])
+		{
 			$query_where[] = 'm.id_msg >= {int:min_msg_id}';
+		}
+
 		if ($query_params['max_msg_id'])
+		{
 			$query_where[] = 'm.id_msg <= {int:max_msg_id}';
+		}
 
 		$count = 0;
 		if (!empty($query_params['excluded_phrases']) && empty($modSettings['search_force_index']))
+		{
 			foreach ($query_params['excluded_phrases'] as $phrase)
 			{
 				$query_where[] = 'subject NOT ' . (empty($modSettings['search_match_words']) || $search_data['no_regexp'] ? ' LIKE ' : 'RLIKE') . '{string:exclude_subject_phrase_' . $count . '}';
 				$query_params['exclude_subject_phrase_' . $count++] = $this->prepareWord($phrase, $search_data['no_regexp']);
 			}
+		}
+
 		$count = 0;
 		if (!empty($query_params['excluded_subject_words']) && empty($modSettings['search_force_index']))
+		{
 			foreach ($query_params['excluded_subject_words'] as $excludedWord)
 			{
 				$query_where[] = 'subject NOT ' . (empty($modSettings['search_match_words']) || $search_data['no_regexp'] ? ' LIKE ' : 'RLIKE') . '{string:exclude_subject_words_' . $count . '}';
 				$query_params['exclude_subject_words_' . $count++] = $this->prepareWord($excludedWord, $search_data['no_regexp']);
 			}
+		}
 
 		if (!empty($modSettings['search_simple_fulltext']))
 		{
@@ -296,10 +329,12 @@ class Fulltext_Search extends SearchAPI
 
 			// If we have bool terms to search, add them in
 			if ($query_params['boolean_match'])
+			{
 				$query_where[] = 'MATCH (body) AGAINST ({string:boolean_match} IN BOOLEAN MODE)';
+			}
 		}
 
-		$ignoreRequest = $db_search->search_query('insert_into_log_messages_fulltext', ($db->support_ignore() ? ( '
+		$ignoreRequest = $db_search->search_query('insert_into_log_messages_fulltext', ($db->support_ignore() ? ('
 			INSERT IGNORE INTO {db_prefix}' . $search_data['insert_into'] . '
 				(' . implode(', ', array_keys($query_select)) . ')') : '') . '
 			SELECT ' . implode(', ', $query_select) . '

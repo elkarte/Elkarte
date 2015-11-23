@@ -334,6 +334,7 @@ function loadModeratorMenuCounts($brd = null)
  *
  * @param string $subject
  * @param string $body
+ * @return int
  */
 function logWarningNotice($subject, $body)
 {
@@ -350,7 +351,7 @@ function logWarningNotice($subject, $body)
 		),
 		array('id_notice')
 	);
-	$id_notice = $db->insert_id('{db_prefix}log_member_notices', 'id_notice');
+	$id_notice = (int) $db->insert_id('{db_prefix}log_member_notices', 'id_notice');
 
 	return $id_notice;
 }

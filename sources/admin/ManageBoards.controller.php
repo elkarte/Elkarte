@@ -47,20 +47,6 @@ class ManageBoards_Controller extends Action_Controller
 	protected $_boardSettings;
 
 	/**
-	 * Holds instance of HttpReq object
-	 * @var HttpReq
-	 */
-	protected $_req;
-
-	/**
-	 * Pre Dispatch, called before other methods.  Loads HttpReq
-	 */
-	public function pre_dispatch()
-	{
-		$this->_req = HttpReq::instance();
-	}
-
-	/**
 	 * The main dispatcher; delegates.
 	 *
 	 * What it does:
@@ -202,6 +188,7 @@ class ManageBoards_Controller extends Action_Controller
 			$move_cat = !empty($context['move_board']) && $boards[$context['move_board']]['category'] == $catid;
 			foreach ($boardList[$catid] as $boardid)
 			{
+				$boards[$boardid]['description'] = parse_bbc($boards[$boardid]['description']);
 				$context['categories'][$catid]['boards'][$boardid] = array(
 					'id' => &$boards[$boardid]['id'],
 					'name' => &$boards[$boardid]['name'],
@@ -463,6 +450,7 @@ class ManageBoards_Controller extends Action_Controller
 
 		loadTemplate('ManageBoards');
 		require_once(SUBSDIR . '/Boards.subs.php');
+		require_once(SUBSDIR . '/Post.subs.php');
 		getBoardTree();
 
 		// For editing the profile we'll need this.
@@ -515,7 +503,7 @@ class ManageBoards_Controller extends Action_Controller
 			$curBoard = &$boards[$this->boardid];
 			$context['board'] = $boards[$this->boardid];
 			$context['board']['name'] = htmlspecialchars(strtr($context['board']['name'], array('&amp;' => '&')), ENT_COMPAT, 'UTF-8');
-			$context['board']['description'] = htmlspecialchars($context['board']['description'], ENT_COMPAT, 'UTF-8');
+			$context['board']['description'] = un_preparsecode($context['board']['description']);
 			$context['board']['no_children'] = empty($boards[$this->boardid]['tree']['children']);
 			$context['board']['is_recycle'] = !empty($modSettings['recycle_enable']) && !empty($modSettings['recycle_board']) && $modSettings['recycle_board'] == $context['board']['id'];
 		}
@@ -638,6 +626,7 @@ class ManageBoards_Controller extends Action_Controller
 		validateToken('admin-be-' . $this->_req->post->boardid);
 
 		require_once(SUBSDIR . '/Boards.subs.php');
+		require_once(SUBSDIR . '/Post.subs.php');
 
 		// Mode: modify aka. don't delete.
 		if (isset($this->_req->post->edit) || isset($this->_req->post->add))
@@ -683,7 +672,10 @@ class ManageBoards_Controller extends Action_Controller
 
 			// Change '1 & 2' to '1 &amp; 2', but not '&amp;' to '&amp;amp;'...
 			$boardOptions['board_name'] = preg_replace('~[&]([^;]{8}|[^;]{0,8}$)~', '&amp;$1', $this->_req->post->board_name);
-			$boardOptions['board_description'] = preg_replace('~[&]([^;]{8}|[^;]{0,8}$)~', '&amp;$1', $this->_req->post->desc);
+
+			$boardOptions['board_description'] = Util::htmlspecialchars($this->_req->post->desc);
+			preparsecode($boardOptions['board_description']);
+
 			$boardOptions['moderator_string'] = $this->_req->post->moderators;
 
 			if (isset($this->_req->post->moderator_list) && is_array($this->_req->post->moderator_list))

@@ -348,9 +348,9 @@ function list_getModLogEntries($start, $items_per_page, $sort, $query_string = '
 }
 
 /**
- * Mod Log Replacment Callback.
+ * Mod Log Replacement Callback.
  *
- * Our callback that does the actual replacment.
+ * Our callback that does the actual replacement.
  *
  */
 class ModLogEntriesReplacement

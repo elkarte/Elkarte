@@ -592,6 +592,12 @@ function smtp_mail($mail_to_array, $subject, $message, $headers, $priority, $mes
 		// EHLO could be understood to mean encrypted hello...
 		if (server_parse('EHLO ' . $modSettings['smtp_host'], $socket, null) == '250')
 		{
+			if ($modSettings['smtp_starttls']) {
+				server_parse('STARTTLS', $socket, null);
+				stream_socket_enable_crypto($socket, true, STREAM_CRYPTO_METHOD_TLS_CLIENT);
+				server_parse('EHLO ' . $modSettings['smtp_host'], $socket, null);
+			}
+
 			if (!server_parse('AUTH LOGIN', $socket, '334'))
 				return false;
 			// Send the username and password, encoded.
@@ -1338,6 +1344,9 @@ function reduceMailQueue($batch_size = false, $override_limit = false, $force_se
 
 	foreach ($emails as $key => $email)
 	{
+		// So that we have it, just in case it's really needed - see #2245
+		$email['body_fail'] = $email['body'];
+
 		// Use the right mail resource
 		if ($use_sendmail)
 		{
@@ -1349,6 +1358,8 @@ function reduceMailQueue($batch_size = false, $override_limit = false, $force_se
 				$email['headers'] = strtr($email['headers'], array("\r" => ''));
 			}
 
+			// See the assignment 10 lines before this and #2245 - repeated here for the strtr
+			$email['body_fail'] = $email['body'];
 			$need_break = substr($email['headers'], -1) === "\n" || substr($email['headers'], -1) === "\r" ? false : true;
 
 			// Create our unique reply to email header if this message needs one
@@ -1363,7 +1374,6 @@ function reduceMailQueue($batch_size = false, $override_limit = false, $force_se
 				$unq_head = $unq_head_array[0] . '-' . $unq_head_array[2];
 				$encoded_unq_head = base64_encode($line_break . $line_break . '[' . $unq_head . ']' . $line_break);
 				$unq_id = ($need_break ? $line_break : '') . 'Message-ID: <' . $unq_head . strstr(empty($modSettings['maillist_mail_from']) ? $webmaster_email : $modSettings['maillist_mail_from'], '@') . '>';
-				$email['body_fail'] = $email['body'];
 				$email['body'] = mail_insert_key($email['body'], $unq_head, $encoded_unq_head, $line_break);
 			}
 			elseif ($email['message_id'] !== null && empty($modSettings['mail_no_message_id']))

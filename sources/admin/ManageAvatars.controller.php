@@ -31,20 +31,6 @@ class ManageAvatars_Controller extends Action_Controller
 	protected $_avatarSettings;
 
 	/**
-	 * Holds instance of HttpReq object
-	 * @var HttpReq
-	 */
-	protected $_req;
-
-	/**
-	 * Pre Dispatch, called before other methods.  Loads HttpReq
-	 */
-	public function pre_dispatch()
-	{
-		$this->_req = HttpReq::instance();
-	}
-
-	/**
 	 * The Avatars admin area
 	 *
 	 * What it does:

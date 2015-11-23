@@ -26,12 +26,6 @@ if (!defined('ELK'))
 class Reminder_Controller extends Action_Controller
 {
 	/**
-	 * Holds instance of HttpReq object
-	 * @var HttpReq
-	 */
-	private $_req;
-
-	/**
 	 * This is the pre-dispatch function
 	 *
 	 * @uses Profile language files and Reminder template
@@ -45,9 +39,6 @@ class Reminder_Controller extends Action_Controller
 
 		$context['page_title'] = $txt['authentication_reminder'];
 		$context['robot_no_index'] = true;
-
-		// Load in the form values
-		$this->_req = HttpReq::instance();
 	}
 
 	/**
@@ -159,7 +150,7 @@ class Reminder_Controller extends Action_Controller
 			// Set up the template.
 			$context['sub_template'] = 'sent';
 
-			// Dont really.
+			// Don't really.
 			return;
 		}
 		// Otherwise are ready to answer the question?

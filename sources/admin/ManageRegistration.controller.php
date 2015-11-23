@@ -40,20 +40,6 @@ class ManageRegistration_Controller extends Action_Controller
 	protected $_registerSettings;
 
 	/**
-	 * Holds instance of HttpReq object
-	 * @var HttpReq
-	 */
-	protected $_req;
-
-	/**
-	 * Pre Dispatch, called before other methods.  Loads HttpReq
-	 */
-	public function pre_dispatch()
-	{
-		$this->_req = HttpReq::instance();
-	}
-
-	/**
 	 * Entrance point for the registration center, it checks permissions and forwards
 	 * to the right method based on the subaction.
 	 *
@@ -149,7 +135,7 @@ class ManageRegistration_Controller extends Action_Controller
 			checkSession();
 			validateToken('admin-regc');
 
-			// @todo move this to a filter/sanitzation class
+			// @todo move this to a filter/sanitation class
 			foreach ($this->_req->post as $key => $value)
 				if (!is_array($value))
 					$this->_req->post[$key] = htmltrim__recursive(str_replace(array("\n", "\r"), '', $value));

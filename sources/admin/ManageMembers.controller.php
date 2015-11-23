@@ -41,20 +41,6 @@ class ManageMembers_Controller extends Action_Controller
 	protected $member_info;
 
 	/**
-	 * Holds instance of HttpReq object
-	 * @var HttpReq
-	 */
-	protected $_req;
-
-	/**
-	 * Pre Dispatch, called before other methods.  Loads HttpReq
-	 */
-	public function pre_dispatch()
-	{
-		$this->_req = HttpReq::instance();
-	}
-
-	/**
 	 * The main entrance point for the Manage Members screen.
 	 *
 	 * What it does:
@@ -1300,7 +1286,7 @@ class ManageMembers_Controller extends Action_Controller
 	}
 
 	/**
-	 * Tell some members that they require activation of thier account
+	 * Tell some members that they require activation of their account
 	 */
 	private function _requireMember()
 	{

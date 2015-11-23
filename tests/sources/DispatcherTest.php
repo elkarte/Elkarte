@@ -56,7 +56,6 @@ class DispatcherTest extends PHPUnit_Framework_TestCase
 			'coppa' => 'Register',
 			'deletemsg' => 'RemoveTopic',
 			'dlattach' => 'Attachment',
-			'findmember' => 'Members',
 			'unwatchtopic' => 'Notify',
 			'quickhelp' => 'Help',
 			'login' => 'Auth',

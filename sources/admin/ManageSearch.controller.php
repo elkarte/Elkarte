@@ -35,17 +35,11 @@ class ManageSearch_Controller extends Action_Controller
 	protected $_searchSettings;
 
 	/**
-	 * Holds instance of HttpReq object
-	 * @var HttpReq
-	 */
-	protected $_req;
-
-	/**
-	 * Pre Dispatch, called before other methods.  Loads HttpReq
+	 * Pre Dispatch, called before other methods.
 	 */
 	public function pre_dispatch()
 	{
-		$this->_req = HttpReq::instance();
+		Elk_Autoloader::getInstance()->register(SUBSDIR . '/Search', '\\ElkArte\\Search');
 	}
 
 	/**
@@ -131,7 +125,7 @@ class ManageSearch_Controller extends Action_Controller
 		$config_vars = $this->_searchSettings->settings();
 
 		// Perhaps the search method wants to add some settings?
-		$search = new Search();
+		$search = new \ElkArte\Search\Search();
 		$searchAPI = $search->findSearchAPI();
 
 		if (is_callable(array($searchAPI, 'searchSettings')))
@@ -265,6 +259,7 @@ class ManageSearch_Controller extends Action_Controller
 			'search_weight_subject',
 			'search_weight_first_message',
 			'search_weight_sticky',
+			'search_weight_likes',
 		);
 
 		call_integration_hook('integrate_modify_search_weights', array(&$factors));
@@ -326,7 +321,8 @@ class ManageSearch_Controller extends Action_Controller
 		if ($context['supports_fulltext'])
 			detectFulltextIndex();
 
-		if (!empty($this->_req->query->sa) && $this->_req->query->sa == 'createfulltext')
+		// Creating index, removing or simply changing the one in use?
+		if ($this->_req->getQuery('sa', 'trim', '') === 'createfulltext')
 		{
 			checkSession('get');
 			validateToken('admin-msm', 'get');
@@ -334,7 +330,7 @@ class ManageSearch_Controller extends Action_Controller
 			$context['fulltext_index'] = 'body';
 			alterFullTextIndex('{db_prefix}messages', $context['fulltext_index'], true);
 		}
-		elseif (!empty($this->_req->query->sa) && $this->_req->query->sa == 'removefulltext' && !empty($context['fulltext_index']))
+		elseif ($this->_req->getQuery('sa', 'trim', '') === 'removefulltext' && !empty($context['fulltext_index']))
 		{
 			checkSession('get');
 			validateToken('admin-msm', 'get');
@@ -349,7 +345,7 @@ class ManageSearch_Controller extends Action_Controller
 					'search_index' => '',
 				));
 		}
-		elseif (!empty($this->_req->query->sa) && $this->_req->query->sa == 'removecustom')
+		elseif ($this->_req->getQuery('sa', 'trim', '') === 'removecustom')
 		{
 			checkSession('get');
 			validateToken('admin-msm', 'get');
@@ -362,7 +358,7 @@ class ManageSearch_Controller extends Action_Controller
 			));
 
 			// Go back to the default search method.
-			if (!empty($modSettings['search_index']) && $modSettings['search_index'] == 'custom')
+			if (!empty($modSettings['search_index']) && $modSettings['search_index'] === 'custom')
 				updateSettings(array(
 					'search_index' => '',
 				));
@@ -563,14 +559,14 @@ class ManageSearch_Controller extends Action_Controller
 			validateToken('admin-mssphinx');
 
 			// If they have not picked sphinx yet, let them know, but we can still check connections
-			if (empty($modSettings['search_index']) || ($modSettings['search_index'] !== 'sphinx' && $modSettings['search_index'] !== 'sphinxql'))
+			if (empty($modSettings['search_index']) || stripos($modSettings['search_index'], 'sphinx') === false)
 			{
 				$context['settings_message'][] = $txt['sphinx_test_not_selected'];
 				$context['error_type'] = 'notice';
 			}
 
 			// Try to connect via Sphinx API?
-			if (!empty($modSettings['search_index']) && ($modSettings['search_index'] === 'sphinx' || empty($modSettings['search_index'])))
+			if (!empty($modSettings['search_index']) && (stripos($modSettings['search_index'], 'sphinx_') === 0 || empty($modSettings['search_index'])))
 			{
 				if (@file_exists(SOURCEDIR . '/sphinxapi.php'))
 				{
@@ -598,7 +594,7 @@ class ManageSearch_Controller extends Action_Controller
 			}
 
 			// Try to connect via SphinxQL
-			if (!empty($modSettings['search_index']) && ($modSettings['search_index'] === 'sphinxql' || empty($modSettings['search_index'])))
+			if (!empty($modSettings['search_index']) && (stripos($modSettings['search_index'], 'sphinxql_') === 0 || empty($modSettings['search_index'])))
 			{
 				if (!empty($modSettings['sphinx_searchd_server']) && !empty($modSettings['sphinxql_searchd_port']))
 				{
@@ -628,6 +624,7 @@ class ManageSearch_Controller extends Action_Controller
 		}
 
 		// Setup for the template
+		$context[$context['admin_menu_name']]['current_subsection'] = 'managesphinx';
 		$context['page_title'] = $txt['search_sphinx'];
 		$context['page_description'] = $txt['sphinx_description'];
 		$context['sub_template'] = 'manage_sphinx';
@@ -638,7 +635,6 @@ class ManageSearch_Controller extends Action_Controller
 	 * Get the installed Search API implementations.
 	 *
 	 * - This function checks for patterns in comments on top of the Search-API files!
-	 * - In addition to filenames pattern.
 	 * - It loads the search API classes if identified.
 	 * - This function is used by action_edit to list all installed API implementations.
 	 */
@@ -647,7 +643,6 @@ class ManageSearch_Controller extends Action_Controller
 		global $txt, $scripturl;
 
 		$apis = array();
-		Elk_Autoloader::getInstance()->register(SUBSDIR . '/Search', '\\ElkArte\\Search');
 
 		try
 		{
@@ -657,21 +652,23 @@ class ManageSearch_Controller extends Action_Controller
 				if ($file->isFile())
 				{
 					$index_name = str_replace('Search', '_Search', $file->getBasename('.class.php'));
+					$common_name = strtolower(str_replace('Search', '', $file->getBasename('.class.php')));
 					$search_class_name = '\\ElkArte\\Search\\API\\' . $index_name;
+
 					if (class_implements($search_class_name, 'Search_Interface'))
 					{
 						$searchAPI = new $search_class_name();
 
-						// No Support?  NEXT!
+						// No Support? NEXT!
 						if (!$searchAPI->is_supported)
 							continue;
 
 						$apis[$index_name] = array(
 							'filename' => $file->getFilename(),
 							'setting_index' => $index_name,
-							'has_template' => in_array($index_name, array('custom', 'fulltext', 'standard')),
-							'label' => $index_name && isset($txt['search_index_' . $index_name]) ? str_replace('{managesearch_url}', $scripturl . '?action=admin;area=managesearch;sa=manage' . $index_name, $txt['search_index_' . $index_name]) : '',
-							'desc' => $index_name && isset($txt['search_index_' . $index_name . '_desc']) ? str_replace('{managesearch_url}', $scripturl . '?action=admin;area=managesearch;sa=manage' . $index_name, $txt['search_index_' . $index_name . '_desc']) : '',
+							'has_template' => in_array($common_name, array('custom', 'fulltext', 'standard')),
+							'label' => $index_name && isset($txt['search_index_' . $common_name]) ? str_replace('{managesearch_url}', $scripturl . '?action=admin;area=managesearch;sa=manage' . $common_name, $txt['search_index_' . $common_name]) : '',
+							'desc' => $index_name && isset($txt['search_index_' . $common_name . '_desc']) ? str_replace('{managesearch_url}', $scripturl . '?action=admin;area=managesearch;sa=manage' . $common_name, $txt['search_index_' . $common_name . '_desc']) : '',
 						);
 					}
 				}

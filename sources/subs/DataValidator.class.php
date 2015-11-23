@@ -354,7 +354,7 @@ class Data_Validator
 		if (!isset($input[$field]))
 			return;
 
-		// Start a new instance of the validtor to work on this sub data (csv/array)
+		// Start a new instance of the validator to work on this sub data (csv/array)
 		$sub_validator = new Data_Validator();
 
 		$fields = array();
@@ -474,7 +474,7 @@ class Data_Validator
 					else
 					{
 						// @todo fatal_error or other ? being asked to do something we don't know?
-						$input[$field] = $input[$field];
+						// results in returning $input[$field] = $input[$field];
 					}
 				}
 			}
