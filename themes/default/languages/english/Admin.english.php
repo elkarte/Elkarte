@@ -137,6 +137,10 @@ $txt['viewmembers_online'] = 'Last Online';
 
 $txt['smileys_manage'] = 'Smileys and Message Icons';
 $txt['smileys_manage_info'] = 'Install new smiley sets, add smileys to existing sets or manage your message icons.';
+
+$txt['bbc_manage'] = 'Bulletin Board Codes (BBC)';
+$txt['bbc_manage_info'] = 'Add, remove, and edit bulletin board codes.';
+
 $txt['package_info'] = 'Install, download and upload Modification packages; check File Permissions and FTP settings.';
 $txt['theme_admin'] = 'Theme Management';
 $txt['theme_admin_info'] = 'Install new themes, select themes that are available for your users and set or reset theme options.';

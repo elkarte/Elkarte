@@ -545,6 +545,8 @@ function dbMostLikedMessage()
 		array()
 	);
 
+	$bbc_wrapper = \BBC\ParserWrapper::getInstance();
+
 	while ($row = $db->fetch_assoc($request))
 	{
 		censorText($row['body']);
@@ -557,7 +559,7 @@ function dbMostLikedMessage()
 			'id_board' => $row['id_board'],
 			'like_count' => $row['like_count'],
 			'subject' => $row['subject'],
-			'body' => parse_bbc($msgString, $row['smileys_enabled'], $row['id_msg']),
+			'body' => $bbc_wrapper->parseMessage($msgString, $row['smileys_enabled'], $row['id_msg']),
 			'time' => standardTime($row['poster_time']),
 			'html_time' => htmlTime($row['poster_time']),
 			'timestamp' => forum_time(true, $row['poster_time']),
@@ -596,6 +598,8 @@ function dbMostLikedMessagesByTopic($topic)
 
 	$db = database();
 
+	$bbc_wrapper = \BBC\ParserWrapper::getInstance();
+
 	// Most liked Message
 	return $db->fetchQueryCallback('
 		SELECT IFNULL(mem.real_name, m.poster_name) AS member_received_name, lp.id_msg,
@@ -620,7 +624,7 @@ function dbMostLikedMessagesByTopic($topic)
 			'id_topic' => $topic,
 			'limit' => 5,
 		),
-		function($row) use ($scripturl)
+		function($row) use ($scripturl, $bbc_wrapper)
 		{
 			censorText($row['body']);
 			$msgString = Util::shorten_text($row['body'], 255, true);
@@ -632,7 +636,7 @@ function dbMostLikedMessagesByTopic($topic)
 				'id_board' => $row['id_board'],
 				'like_count' => $row['like_count'],
 				'subject' => $row['subject'],
-				'body' => parse_bbc($msgString, $row['smileys_enabled'], $row['id_msg']),
+				'body' => $bbc_wrapper->parseMessage($msgString, $row['smileys_enabled']),
 				'time' => standardTime($row['poster_time']),
 				'html_time' => htmlTime($row['poster_time']),
 				'timestamp' => forum_time(true, $row['poster_time']),
@@ -807,6 +811,8 @@ function dbMostLikesReceivedUser()
 		);
 	}
 
+	$bbc_wrapper = \BBC\ParserWrapper::getInstance();
+
 	// Lets fetch highest liked posts by this user
 	$mostLikedMember['topic_data'] = $db->fetchQueryCallback('
 		SELECT lp.id_msg, m.id_topic, COUNT(lp.id_msg) AS like_count, m.subject,
@@ -822,7 +828,7 @@ function dbMostLikesReceivedUser()
 		array(
 			'id_member' => $id_member
 		),
-		function($row)
+		function($row) use($bbc_wrapper)
 		{
 			censorText($row['body']);
 			$msgString = Util::shorten_text($row['body'], 255, true);
@@ -832,7 +838,7 @@ function dbMostLikesReceivedUser()
 				'id_msg' => $row['id_msg'],
 				'like_count' => $row['like_count'],
 				'subject' => $row['subject'],
-				'body' => parse_bbc($msgString, $row['smileys_enabled'], $row['id_msg']),
+				'body' => $bbc_wrapper->parseMessage($msgString, $row['smileys_enabled']),
 				'time' => standardTime($row['poster_time']),
 				'html_time' => htmlTime($row['poster_time']),
 				'timestamp' => forum_time(true, $row['poster_time']),
@@ -897,6 +903,8 @@ function dbMostLikesGivenUser()
 		);
 	}
 
+	$bbc_wrapper = \BBC\ParserWrapper::getInstance();
+
 	// Lets fetch the latest posts by this user
 	$mostLikeGivingMember['topic_data'] = $db->fetchQueryCallback('
 		SELECT m.id_msg, m.id_topic, m.subject, m.body, m.poster_time, m.smileys_enabled
@@ -909,7 +917,7 @@ function dbMostLikesGivenUser()
 		array(
 			'id_member' => $id_liker
 		),
-		function($row)
+		function($row) use($bbc_wrapper)
 		{
 			censorText($row['body']);
 			$msgString = Util::shorten_text($row['body'], 255, true);
@@ -918,7 +926,7 @@ function dbMostLikesGivenUser()
 				'id_msg' => $row['id_msg'],
 				'id_topic' => $row['id_topic'],
 				'subject' => $row['subject'],
-				'body' => parse_bbc($msgString, $row['smileys_enabled'], $row['id_msg']),
+				'body' => $bbc_wrapper->parseMessage($msgString, $row['smileys_enabled']),
 				'time' => standardTime($row['poster_time']),
 				'html_time' => htmlTime($row['poster_time']),
 				'timestamp' => forum_time(true, $row['poster_time']),

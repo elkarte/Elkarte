@@ -198,6 +198,7 @@ function loadCustomFields($memID, $area = 'summary', array $custom_fields = arra
 	);
 	$context['custom_fields'] = array();
 	$context['custom_fields_required'] = false;
+	$bbc_parser = \BBC\ParserWrapper::getInstance();
 	while ($row = $db->fetch_assoc($request))
 	{
 		// Shortcut.
@@ -265,7 +266,7 @@ function loadCustomFields($memID, $area = 'summary', array $custom_fields = arra
 
 		// Parse BBCode
 		if ($row['bbc'])
-			$output_html = parse_bbc($output_html);
+			$output_html = $bbc_parser->parseCustomFields($output_html);
 		// Allow for newlines at least
 		elseif ($row['field_type'] == 'textarea')
 			$output_html = strtr($output_html, array("\n" => '<br />'));
@@ -1740,7 +1741,8 @@ function profileLoadSignatureData()
 		censorText($context['member']['signature']);
 		$context['member']['current_signature'] = $context['member']['signature'];
 		censorText($signature);
-		$context['member']['signature_preview'] = parse_bbc($signature, true, 'sig' . $memberContext[$context['id_member']]);
+		$bbc_parser = \BBC\ParserWrapper::getInstance();
+		$context['member']['signature_preview'] = $bbc_parser->parseSignature($signature, true);
 		$context['member']['signature'] = $_POST['signature'];
 	}
 

@@ -294,6 +294,7 @@ class ProfileInfo_Controller extends Action_Controller
 				// Find this user's most recent posts
 				$rows = load_user_posts($memID, 0, $maxIndex, $range_limit);
 				$context['posts'] = array();
+				$bbc_parser = \BBC\ParserWrapper::getInstance();
 				foreach ($rows as $row)
 				{
 					// Censor....
@@ -301,7 +302,7 @@ class ProfileInfo_Controller extends Action_Controller
 					censorText($row['subject']);
 
 					// Do the code.
-					$row['body'] = parse_bbc($row['body'], $row['smileys_enabled'], $row['id_msg']);
+					$row['body'] = $bbc_parser->parseMessage($row['body'], $row['smileys_enabled']);
 					$preview = strip_tags(strtr($row['body'], array('<br />' => '&#10;')));
 					$preview = Util::shorten_text($preview, !empty($modSettings['ssi_preview_length']) ? $modSettings['ssi_preview_length'] : 128);
 					$short_subject = Util::shorten_text($row['subject'], !empty($modSettings['ssi_subject_length']) ? $modSettings['ssi_subject_length'] : 24);
@@ -496,6 +497,7 @@ class ProfileInfo_Controller extends Action_Controller
 		$counter = $reverse ? $context['start'] + $maxIndex + 1 : $context['start'];
 		$context['posts'] = array();
 		$board_ids = array('own' => array(), 'any' => array());
+		$bbc_parser = \BBC\ParserWrapper::getInstance();
 		foreach ($rows as $row)
 		{
 			// Censor....
@@ -503,7 +505,7 @@ class ProfileInfo_Controller extends Action_Controller
 			censorText($row['subject']);
 
 			// Do the code.
-			$row['body'] = parse_bbc($row['body'], $row['smileys_enabled'], $row['id_msg']);
+			$row['body'] = $bbc_parser->parseMessage($row['body'], $row['smileys_enabled']);
 
 			// And the array...
 			$context['posts'][$counter += $reverse ? -1 : 1] = array(

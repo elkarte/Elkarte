@@ -1610,13 +1610,16 @@ function selectMessages($topic, $start, $items_per_page, $messages = array(), $o
 			'msg_after' => !empty($messages['after']) ? (int) $messages['after'] : 0,
 		)
 	);
+
 	$messages = array();
+	$parser = \BBC\ParserWrapper::getInstance();
+
 	for ($counter = 0; $row = $db->fetch_assoc($request); $counter ++)
 	{
 		censorText($row['subject']);
 		censorText($row['body']);
 
-		$row['body'] = parse_bbc($row['body'], $row['smileys_enabled'], $row['id_msg']);
+		$row['body'] = $parser->parseMessage($row['body'], (bool) $row['smileys_enabled']);
 
 		$messages[$row['id_msg']] = array(
 			'id' => $row['id_msg'],
@@ -1661,7 +1664,15 @@ function topicMessages($topic, $render = 'print')
 			'current_member' => $user_info['id'],
 		)
 	);
+
 	$posts = array();
+	$parser = \BBC\ParserWrapper::getInstance();
+
+	if ($render === 'print')
+	{
+		$parser->getCodes()->setForPrinting();
+	}
+
 	while ($row = $db->fetch_assoc($request))
 	{
 		// Censor the subject and message.
@@ -1674,7 +1685,7 @@ function topicMessages($topic, $render = 'print')
 			'time' => standardTime($row['poster_time'], false),
 			'html_time' => htmlTime($row['poster_time']),
 			'timestamp' => forum_time(true, $row['poster_time']),
-			'body' => parse_bbc($row['body'], $render),
+			'body' => $parser->parseMessage($row['body'], $render !== 'print'),
 			'id_msg' => $row['id_msg'],
 		);
 	}

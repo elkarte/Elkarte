@@ -32,12 +32,14 @@ function getNews()
 
 	$admin_current_news = array();
 
+	$bbc_parser = \BBC\ParserWrapper::getInstance();
+
 	// Ready the current news.
 	foreach (explode("\n", $modSettings['news']) as $id => $line)
 		$admin_current_news[$id] = array(
 			'id' => $id,
 			'unparsed' => un_preparsecode($line),
-			'parsed' => preg_replace('~<([/]?)form[^>]*?[>]*>~i', '<em class="smalltext">&lt;$1form&gt;</em>', parse_bbc($line)),
+			'parsed' => preg_replace('~<([/]?)form[^>]*?[>]*>~i', '<em class="smalltext">&lt;$1form&gt;</em>', $bbc_parser->parseNews($line)),
 		);
 
 	$admin_current_news['last'] = array(

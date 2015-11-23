@@ -1590,6 +1590,8 @@ class ManageSmileys_Controller extends Action_Controller
 		$context['actions'] = array();
 		$context['ftp_needed'] = false;
 
+		$bbc_parser = \BBC\ParserWrapper::getInstance();
+
 		foreach ($actions as $action)
 		{
 			if ($action['type'] == 'readme' || $action['type'] == 'license')
@@ -1604,7 +1606,7 @@ class ManageSmileys_Controller extends Action_Controller
 				{
 					require_once(SUBSDIR . '/Post.subs.php');
 					preparsecode($context[$type]);
-					$context[$type] = parse_bbc($context[$type]);
+					$context[$type] = $bbc_parser->parsePackage($context[$type]);
 				}
 				else
 					$context[$type] = nl2br($context[$type]);

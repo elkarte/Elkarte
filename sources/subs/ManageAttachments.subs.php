@@ -1066,6 +1066,8 @@ function list_getUnapprovedAttachments($start, $items_per_page, $sort, $approve_
 
 	$db = database();
 
+	$bbc_parser = \BBC\ParserWrapper::getInstance();
+
 	// Get all unapproved attachments.
 	return $db->fetchQueryCallback('
 		SELECT a.id_attach, a.filename, a.size, m.id_msg, m.id_topic, m.id_board, m.subject, m.body, m.id_member,
@@ -1091,7 +1093,7 @@ function list_getUnapprovedAttachments($start, $items_per_page, $sort, $approve_
 			'items_per_page' => $items_per_page,
 			'approve_query' => $approve_query,
 		),
-		function($row) use ($scripturl)
+		function($row) use ($scripturl, $bbc_parser)
 		{
 			return array(
 				'id' => $row['id_attach'],
@@ -1109,7 +1111,7 @@ function list_getUnapprovedAttachments($start, $items_per_page, $sort, $approve_
 				'message' => array(
 					'id' => $row['id_msg'],
 					'subject' => $row['subject'],
-					'body' => parse_bbc($row['body']),
+					'body' => $bbc_parser->parseMessage($row['body']),
 					'time' => standardTime($row['poster_time']),
 					'html_time' => htmlTime($row['poster_time']),
 					'timestamp' => forum_time(true, $row['poster_time']),

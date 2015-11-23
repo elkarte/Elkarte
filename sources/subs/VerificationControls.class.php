@@ -622,11 +622,13 @@ class Verification_Controls_Questions implements Verification_Controls
 		$questions = $this->_loadAntispamQuestions(array('type' => 'id_question', 'value' => $this->_questionIDs));
 		$asked_questions = array();
 
+		$parser = \BBC\ParserWrapper::getInstance();
+
 		foreach ($questions as $row)
 		{
 			$asked_questions[] = array(
 				'id' => $row['id_question'],
-				'q' => parse_bbc($row['question']),
+				'q' => $parser->parseVerificationControls($row['question']),
 				'is_error' => !empty($this->_incorrectQuestions) && in_array($row['id_question'], $this->_incorrectQuestions),
 				// Remember a previous submission?
 				'a' => isset($_REQUEST[$this->_options['id'] . '_vv'], $_REQUEST[$this->_options['id'] . '_vv']['q'], $_REQUEST[$this->_options['id'] . '_vv']['q'][$row['id_question']]) ? Util::htmlspecialchars($_REQUEST[$this->_options['id'] . '_vv']['q'][$row['id_question']]) : '',

@@ -47,13 +47,15 @@ class Topic_Util
 
 		$icon_sources = new MessageTopicIcons();
 
+		$parser = \BBC\ParserWrapper::getInstance();
+
 		foreach ($topics_info as $row)
 		{
 			// Is there a body to preview? (If not the preview is disabled.)
 			if (isset($row['first_body']))
 			{
 				// Limit them to $preview_length characters - do this FIRST because it's a lot of wasted censoring otherwise.
-				$row['first_body'] = strtr(parse_bbc($row['first_body'], $row['first_smileys'], $row['id_first_msg']), array('<br />' => "\n", '&nbsp;' => ' '));
+				$row['first_body'] = strtr($parser->parseMessage($row['first_body'], $row['first_smileys']), array('<br />' => "\n", '&nbsp;' => ' '));
 				$row['first_body'] = Util::htmlspecialchars(Util::shorten_html($row['first_body'], $preview_length));
 
 				// No reply then they are the same, no need to process it again
@@ -61,7 +63,7 @@ class Topic_Util
 					$row['last_body'] = $row['first_body'];
 				else
 				{
-					$row['last_body'] = strtr(parse_bbc($row['last_body'], $row['last_smileys'], $row['id_last_msg']), array('<br />' => "\n", '&nbsp;' => ' '));
+					$row['last_body'] = strtr($parser->parseMessage($row['last_body'], $row['last_smileys']), array('<br />' => "\n", '&nbsp;' => ' '));
 					$row['last_body'] = Util::htmlspecialchars(Util::shorten_html($row['last_body'], $preview_length));
 				}
 
