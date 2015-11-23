@@ -34,12 +34,6 @@ abstract class Action_Controller
 	 */
 	protected $_hook = '';
 
-	protected $_bbc_codes;
-	protected $_bbc_parser;
-	protected $_smiley_parser;
-	protected $_html_parser;
-	protected $_autolink_parser;
-
 	/**
 	 * Holds instance of HttpReq object
 	 * @var HttpReq
@@ -208,72 +202,5 @@ abstract class Action_Controller
 		{
 			$this->_events->register($name, array($name, array($class, $method, 0)));
 		}
-	}
-
-	public function getBBCCodes()
-	{
-		global $modSettings;
-
-		if ($this->_bbc_codes === null)
-		{
-			$disabled = array();
-
-			if (!empty($modSettings['disabledBBC']))
-			{
-				$temp = explode(',', strtolower($modSettings['disabledBBC']));
-
-				foreach ($temp as $tag)
-					$disabled[trim($tag)] = true;
-			}
-
-			require_once(SUBSDIR . '/BBC/Codes.class.php');
-			$this->_bbc_codes = new \BBC\Codes(array(), $disabled);
-		}
-
-		return $this->_bbc_codes;
-	}
-
-	public function getBBCParser()
-	{
-		if ($this->_bbc_parser === null)
-		{
-			require_once(SUBSDIR . '/BBC/BBCParser.class.php');
-			$this->_bbc_parser = new \BBC\BBCParser($this->getBBCCodes(), $this->getAutolinkParser());
-		}
-
-		return $this->_bbc_parser;
-	}
-
-	public function getAutolinkParser()
-	{
-		if ($this->_autolink_parser === null)
-		{
-			require_once(SUBSDIR . '/BBC/Autolink.class.php');
-			$this->_autolink_parser = new \BBC\Autolink($this->getBBCCodes());
-		}
-
-		return $this->_autolink_parser;
-	}
-
-	public function getSmileyParser()
-	{
-		if ($this->_smiley_parser === null)
-		{
-			require_once(SUBSDIR . '/BBC/SmileyParser.class.php');
-			$this->_smiley_parser = new \BBC\SmileyParser;
-		}
-
-		return $this->_smiley_parser;
-	}
-
-	public function getHtmlParser()
-	{
-		if ($this->_html_parser === null)
-		{
-			require_once(SUBSDIR . '/BBC/HtmlParser.class.php');
-			$this->_html_parser = new \BBC\HtmlParser;
-		}
-
-		return $this->_html_parser;
 	}
 }
