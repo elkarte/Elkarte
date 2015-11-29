@@ -47,6 +47,18 @@ class Post_Controller extends Action_Controller
 	protected $_topic_attributes = array();
 
 	/**
+	 * The message subject
+	 * @var string
+	 */
+	protected $_form_subject = '';
+
+	/**
+	 * The message
+	 * @var string
+	 */
+	protected $_form_message = '';
+
+	/**
 	 * Sets up common stuff for all or most of the actions.
 	 */
 	public function pre_dispatch()
@@ -92,7 +104,61 @@ class Post_Controller extends Action_Controller
 	 */
 	public function action_post()
 	{
-		global $txt, $scripturl, $topic, $modSettings, $board, $user_info, $context, $options;
+		global $context;
+
+		$this->_before_prepare_post();
+
+		// Trigger the prepare_post event
+		$this->_events->trigger('prepare_post', array('topic_attributes' => &$this->_topic_attributes));
+
+		$this->_before_prepare_context();
+
+		// Trigger the prepare_context event
+		try
+		{
+			$this->_events->trigger('prepare_context', array('id_member_poster' => $this->_topic_attributes['id_member']));
+		}
+		catch (Controller_Redirect_Exception $e)
+		{
+			return $e->doRedirect($this);
+		}
+
+		$this->_generating_message();
+
+		// Trigger post_errors event
+		$this->_events->trigger('post_errors');
+
+		$this->_preparing_page();
+
+		// Needed for the editor and message icons.
+		require_once(SUBSDIR . '/Editor.subs.php');
+
+		// Now create the editor.
+		$editorOptions = array(
+			'id' => 'message',
+			'value' => $context['message'],
+			'labels' => array(
+				'post_button' => $context['submit_label'],
+			),
+			// add height and width for the editor
+			'height' => '275px',
+			'width' => '100%',
+			// We do XML preview here.
+			'preview_type' => 2
+		);
+
+		// Trigger the finalize_post_form event
+		$this->_events->trigger('finalize_post_form', array('destination' => &$context['destination'], 'page_title' => &$context['page_title'], 'show_additional_options' => &$context['show_additional_options'], 'editorOptions' => &$editorOptions));
+
+		// Initialize the editor
+		create_control_richedit($editorOptions);
+
+		$this->_finalize_page();
+	}
+
+	protected function _before_prepare_post()
+	{
+		global $context;
 
 		loadLanguage('Post');
 		loadLanguage('Errors');
@@ -109,9 +175,11 @@ class Post_Controller extends Action_Controller
 			'subject' => '',
 			'last_post_time' => 0
 		);
+	}
 
-		// Trigger the prepare_post event
-		$this->_events->trigger('prepare_post', array('topic_attributes' => &$this->_topic_attributes));
+	protected function _before_prepare_context()
+	{
+		global $topic, $modSettings, $board, $user_info, $context;
 
 		// You must be posting to *some* board.
 		if (empty($board) && !$context['make_event'])
@@ -221,16 +289,11 @@ class Post_Controller extends Action_Controller
 		// Don't allow a post if it's locked and you aren't all powerful.
 		if ($this->_topic_attributes['locked'] && !allowedTo('moderate_board'))
 			Errors::instance()->fatal_lang_error('topic_locked', false);
+	}
 
-		// Trigger the prepare_context event
-		try
-		{
-			$this->_events->trigger('prepare_context', array('id_member_poster' => $this->_topic_attributes['id_member']));
-		}
-		catch (Controller_Redirect_Exception $e)
-		{
-			return $e->doRedirect($this);
-		}
+	protected function _generating_message()
+	{
+		global $txt, $topic, $modSettings, $user_info, $context, $options;
 
 		// See if any new replies have come along.
 		if (empty($_REQUEST['msg']) && !empty($topic))
@@ -291,12 +354,12 @@ class Post_Controller extends Action_Controller
 			$context['can_announce'] &= $context['becomes_approved'];
 
 			// Set up the inputs for the form.
-			$form_subject = strtr(Util::htmlspecialchars($_REQUEST['subject']), array("\r" => '', "\n" => '', "\t" => ''));
-			$form_message = Util::htmlspecialchars($_REQUEST['message'], ENT_QUOTES, 'UTF-8', true);
+			$this->_form_subject = strtr(Util::htmlspecialchars($_REQUEST['subject']), array("\r" => '', "\n" => '', "\t" => ''));
+			$this->_form_message = Util::htmlspecialchars($_REQUEST['message'], ENT_QUOTES, 'UTF-8', true);
 
 			// Make sure the subject isn't too long - taking into account special characters.
-			if (Util::strlen($form_subject) > 100)
-				$form_subject = Util::substr($form_subject, 0, 100);
+			if (Util::strlen($this->_form_subject) > 100)
+				$this->_form_subject = Util::substr($this->_form_subject, 0, 100);
 
 			// Are you... a guest?
 			if ($user_info['is_guest'])
@@ -310,8 +373,8 @@ class Post_Controller extends Action_Controller
 			if ($really_previewing === true)
 			{
 				// Set up the preview message and subject
-				$context['preview_message'] = $form_message;
-				preparsecode($form_message, true);
+				$context['preview_message'] = $this->_form_message;
+				preparsecode($this->_form_message, true);
 
 				// Do all bulletin board code thing on the message
 				$bbc_parser = \BBC\ParserWrapper::getInstance();
@@ -320,10 +383,10 @@ class Post_Controller extends Action_Controller
 				$context['preview_message'] = censor($context['preview_message']);
 
 				// Don't forget the subject
-				$context['preview_subject'] = censor($form_subject);
+				$context['preview_subject'] = censor($this->_form_subject);
 
 				// Any errors we should tell them about?
-				if ($form_subject === '')
+				if ($this->_form_subject === '')
 				{
 					$this->_post_errors->addError('no_subject');
 					$context['preview_subject'] = '<em>' . $txt['no_subject'] . '</em>';
@@ -331,7 +394,7 @@ class Post_Controller extends Action_Controller
 
 				if ($context['preview_message'] === '')
 					$this->_post_errors->addError('no_message');
-				elseif (!empty($modSettings['max_messageLength']) && Util::strlen($form_message) > $modSettings['max_messageLength'])
+				elseif (!empty($modSettings['max_messageLength']) && Util::strlen($this->_form_message) > $modSettings['max_messageLength'])
 					$this->_post_errors->addError(array('long_message', array($modSettings['max_messageLength'])));
 
 				// Protect any CDATA blocks.
@@ -380,7 +443,7 @@ class Post_Controller extends Action_Controller
 				else
 					$case = 4;
 
-				list ($form_subject,) = getFormMsgSubject($case, $topic, $this->_topic_attributes['subject']);
+				list ($this->_form_subject,) = getFormMsgSubject($case, $topic, $this->_topic_attributes['subject']);
 			}
 
 			// No check is needed, since nothing is really posted.
@@ -405,11 +468,11 @@ class Post_Controller extends Action_Controller
 					$this->_post_errors->addError($error);
 
 			// Get the stuff ready for the form.
-			$form_subject = $message['message']['subject'];
-			$form_message = un_preparsecode($message['message']['body']);
+			$this->_form_subject = $message['message']['subject'];
+			$this->_form_message = un_preparsecode($message['message']['body']);
 
-			$form_message = censor($form_message);
-			$form_subject = censor($form_subject);
+			$this->_form_message = censorText($this->_form_message);
+			$this->_form_subject = censorText($this->_form_subject);
 
 			// Check the boxes that should be checked.
 			$context['use_smileys'] = !empty($message['message']['smileys_enabled']);
@@ -447,15 +510,17 @@ class Post_Controller extends Action_Controller
 			else
 				$case = 4;
 
-			list ($form_subject, $form_message) = getFormMsgSubject($case, $topic, $this->_topic_attributes['subject']);
+			list ($this->_form_subject, $this->_form_message) = getFormMsgSubject($case, $topic, $this->_topic_attributes['subject']);
 		}
 
 		// Check whether this is a really old post being bumped...
 		if (!empty($topic) && !empty($modSettings['oldTopicDays']) && $this->_topic_attributes['last_post_time'] + $modSettings['oldTopicDays'] * 86400 < time() && empty($this->_topic_attributes['is_sticky']) && !isset($_REQUEST['subject']))
 			$this->_post_errors->addError(array('old_topic', array($modSettings['oldTopicDays'])), 0);
+	}
 
-		// Trigger post_errors event
-		$this->_events->trigger('post_errors');
+	protected function _preparing_page()
+	{
+		global $txt, $topic, $modSettings, $board, $user_info, $context;
 
 		// Any errors occurred?
 		$context['post_error'] = array(
@@ -506,25 +571,8 @@ class Post_Controller extends Action_Controller
 		if (isset($_REQUEST['xml']))
 			obExit();
 
-		$context['subject'] = addcslashes($form_subject, '"');
-		$context['message'] = str_replace(array('"', '<', '>', '&nbsp;'), array('&quot;', '&lt;', '&gt;', ' '), $form_message);
-
-		// Needed for the editor and message icons.
-		require_once(SUBSDIR . '/Editor.subs.php');
-
-		// Now create the editor.
-		$editorOptions = array(
-			'id' => 'message',
-			'value' => $context['message'],
-			'labels' => array(
-				'post_button' => $context['submit_label'],
-			),
-			// add height and width for the editor
-			'height' => '275px',
-			'width' => '100%',
-			// We do XML preview here.
-			'preview_type' => 2
-		);
+		$context['subject'] = addcslashes($this->_form_subject, '"');
+		$context['message'] = str_replace(array('"', '<', '>', '&nbsp;'), array('&quot;', '&lt;', '&gt;', ' '), $this->_form_message);
 
 		// Message icons - customized or not, retrieve them...
 		$context['icons'] = getMessageIcons($board);
@@ -558,12 +606,11 @@ class Post_Controller extends Action_Controller
 		}
 
 		$context['show_additional_options'] = !empty($_POST['additional_options']) || isset($_GET['additionalOptions']);
+	}
 
-		// Trigger the finalize_post_form event
-		$this->_events->trigger('finalize_post_form', array('destination' => &$context['destination'], 'page_title' => &$context['page_title'], 'show_additional_options' => &$context['show_additional_options'], 'editorOptions' => &$editorOptions));
-
-		// Initialize the editor
-		create_control_richedit($editorOptions);
+	protected function _finalize_page()
+	{
+		global $txt, $scripturl, $topic, $context;
 
 		// Build the link tree.
 		if (empty($topic))
@@ -576,7 +623,7 @@ class Post_Controller extends Action_Controller
 		{
 			$context['linktree'][] = array(
 				'url' => $scripturl . '?topic=' . $topic . '.' . $_REQUEST['start'],
-				'name' => $form_subject,
+				'name' => $this->_form_subject,
 				'extra_before' => '<span><strong class="nav">' . $context['page_title'] . ' ( </strong></span>',
 				'extra_after' => '<span><strong class="nav"> )</strong></span>'
 			);

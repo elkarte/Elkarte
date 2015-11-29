@@ -19,7 +19,7 @@ if (!defined('ELK'))
  * This class handles requests that allow for the saving,
  * retrieving, deleting and settings for the drafts functionality.
  */
-class Draft_Controller extends Action_Controller
+class Draft_Controller extends Post_Controller
 {
 	/**
 	 * The id of the member
@@ -49,6 +49,22 @@ class Draft_Controller extends Action_Controller
 	{
 		// Where do you want to go today? :P
 		$this->action_showProfileDrafts();
+	}
+
+	/**
+	 * @override
+	 */
+	public function action_post()
+	{
+		$this->action_index();
+	}
+
+	/**
+	 * @override
+	 */
+	public function action_post2()
+	{
+		$this->action_index();
 	}
 
 	/**
