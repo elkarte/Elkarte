@@ -418,6 +418,9 @@ function loadBoard()
 	$db = database();
 	$cache = Cache::instance();
 
+	require_once(SUBSDIR . '/BBC/ParserWrapper.php');
+	$parser = \BBC\ParserWrapper::getInstance();
+
 	// Assume they are not a moderator.
 	$user_info['is_mod'] = false;
 	$context['user']['is_mod'] = &$user_info['is_mod'];
@@ -527,7 +530,7 @@ function loadBoard()
 				),
 				'name' => $row['bname'],
 				'raw_description' => $row['description'],
-				'description' => parse_bbc($row['description']),
+				'description' => $parser->parseMessage($row['description'], true),
 				'num_topics' => $row['num_topics'],
 				'unapproved_topics' => $row['unapproved_topics'],
 				'unapproved_posts' => $row['unapproved_posts'],
