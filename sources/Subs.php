@@ -644,7 +644,6 @@ function parse_bbc($message, $smileys = true, $cache_id = '', $parse_tags = arra
 	// Clean up any cut/paste issues we may have
 	$message = sanitizeMSCutPaste($message);
 
-	require_once(SUBSDIR . '/BBC/ParserWrapper.php');
 	$parser = \BBC\ParserWrapper::getInstance();
 
 	// This is a deprecated way of getting codes

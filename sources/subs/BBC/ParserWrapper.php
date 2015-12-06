@@ -349,7 +349,6 @@ class ParserWrapper
 	{
 		if ($this->codes === null)
 		{
-			require_once(SUBSDIR . '/BBC/Codes.class.php');
 			$this->codes = new \BBC\Codes(array(), $this->disabled);
 		}
 
@@ -363,7 +362,6 @@ class ParserWrapper
 	{
 		if ($this->bbc_parser === null)
 		{
-			require_once(SUBSDIR . '/BBC/BBCParser.class.php');
 			$this->bbc_parser = new \BBC\BBCParser($this->getCodes(), $this->getAutolinkParser());
 		}
 
@@ -377,7 +375,6 @@ class ParserWrapper
 	{
 		if ($this->autolink_parser === null)
 		{
-			require_once(SUBSDIR . '/BBC/Autolink.class.php');
 			$this->autolink_parser = new \BBC\Autolink($this->getCodes());
 		}
 
@@ -391,7 +388,6 @@ class ParserWrapper
 	{
 		if ($this->smiley_parser === null)
 		{
-			require_once(SUBSDIR . '/BBC/SmileyParser.class.php');
 			$this->smiley_parser = new \BBC\SmileyParser;
 		}
 
@@ -405,7 +401,6 @@ class ParserWrapper
 	{
 		if ($this->html_parser === null)
 		{
-			require_once(SUBSDIR . '/BBC/HtmlParser.class.php');
 			$this->html_parser = new \BBC\HtmlParser;
 		}
 

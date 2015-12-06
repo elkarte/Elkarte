@@ -418,7 +418,6 @@ function loadBoard()
 	$db = database();
 	$cache = Cache::instance();
 
-	require_once(SUBSDIR . '/BBC/ParserWrapper.php');
 	$parser = \BBC\ParserWrapper::getInstance();
 
 	// Assume they are not a moderator.
@@ -3169,9 +3168,6 @@ function detectServerCores()
 function loadBBCParsers()
 {
 	global $modSettings;
-
-	// Load the BBC parsers as late as possible while still making it catch everything
-	require_once(SUBSDIR . '/BBC/ParserWrapper.php');
 
 	// Set the default disabled BBC
 	if (!empty($modSettings['disabledBBC']))
