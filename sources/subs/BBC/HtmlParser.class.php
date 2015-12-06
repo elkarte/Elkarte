@@ -92,6 +92,7 @@ class HtmlParser
 		if (!empty($matches[0]))
 		{
 			$replaces = array();
+			require_once(SUBSDIR . '/Attachments.subs.php');
 			foreach ($matches[2] as $match => $imgtag)
 			{
 				$alt = empty($matches[3][$match]) ? '' : ' alt=' . preg_replace('~^&quot;|&quot;$~', '', $matches[3][$match]);
