@@ -262,7 +262,7 @@ class Codes
 			array(
 				self::ATTR_TAG => 'anchor',
 				self::ATTR_TYPE => self::TYPE_UNPARSED_EQUALS,
-				self::ATTR_TEST => '[#]?([A-Za-z][A-Za-z0-9_\-]*)',
+				self::ATTR_TEST => '[#]?([A-Za-z][A-Za-z0-9_\-]*)$',
 				self::ATTR_BEFORE => '<span id="post_$1">',
 				self::ATTR_AFTER => '</span>',
 				self::ATTR_BLOCK_LEVEL => false,
