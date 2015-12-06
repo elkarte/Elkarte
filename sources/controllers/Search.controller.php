@@ -628,7 +628,7 @@ class Search_Controller extends Action_Controller
 		{
 			// Run BBC interpreter on the message.
 			$bbc_parser = \BBC\ParserWrapper::getInstance();
-			$message['body'] = $bbc_parser->parseMessage($message['body'], $message['smileys_enabled'], $message['id_msg']);
+			$message['body'] = $bbc_parser->parseMessage($message['body'], $message['smileys_enabled']);
 		}
 
 		// Make sure we don't end up with a practically empty message body.

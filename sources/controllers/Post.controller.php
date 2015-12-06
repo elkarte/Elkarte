@@ -1353,7 +1353,7 @@ class Post_Controller extends Action_Controller
 				censorText($context['message']['subject']);
 				censorText($context['message']['body']);
 
-				$context['message']['body'] = $bbc_parser->parseMessage($context['message']['body'], $row['smileys_enabled'], $row['id_msg']);
+				$context['message']['body'] = $bbc_parser->parseMessage($context['message']['body'], $row['smileys_enabled']);
 			}
 			// Topic?
 			elseif (!$this->_post_errors->hasErrors())
