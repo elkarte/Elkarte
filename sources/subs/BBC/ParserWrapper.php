@@ -76,7 +76,9 @@ class ParserWrapper
 	 */
 	protected function isEnabled()
 	{
-		return empty($modSettings['enableBBC']);
+		global $modSettings;
+
+		return !empty($modSettings['enableBBC']);
 	}
 
 	/**
