@@ -1214,6 +1214,9 @@ class ManageFeatures_Controller extends Action_Controller
 						$default = $v;
 				}
 
+				if (isset($_POST['default_select']) && $_POST['default_select'] == 'no_default')
+					$default = 'no_default';
+
 				$field_options = substr($field_options, 0, -1);
 			}
 
