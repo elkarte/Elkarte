@@ -821,7 +821,8 @@ class PersonalMessage_Controller extends Action_Controller
 			}
 
 			// Do the BBC thang on the message.
-			$row_quoted['body'] = parse_bbc($row_quoted['body'], true, 'pm' . $row_quoted['id_pm']);
+			$bbc_parser = \BBC\ParserWrapper::getInstance();
+			$row_quoted['body'] = $bbc_parser->parsePM($row_quoted['body']);
 
 			// Set up the quoted message array.
 			$context['quoted_message'] = array(
@@ -996,6 +997,8 @@ class PersonalMessage_Controller extends Action_Controller
 			$this->_req->post->recipient_to = explode(',', $this->_req->post->u);
 		}
 
+		$bbc_parser = \BBC\ParserWrapper::getInstance();
+
 		// Construct the list of recipients.
 		$recipientList = array();
 		$namedRecipientList = array();
@@ -1118,7 +1121,7 @@ class PersonalMessage_Controller extends Action_Controller
 			preparsecode($message);
 
 			// Make sure there's still some content left without the tags.
-			if (Util::htmltrim(strip_tags(parse_bbc(Util::htmlspecialchars($message, ENT_QUOTES), false), '<img>')) === '' && (!allowedTo('admin_forum') || strpos($message, '[html]') === false))
+			if (Util::htmltrim(strip_tags($bbc_parser->parsePM(Util::htmlspecialchars($message, ENT_QUOTES)), '<img>')) === '' && (!allowedTo('admin_forum') || strpos($message, '[html]') === false))
 			{
 				$post_errors->addError('no_message');
 			}
@@ -1141,7 +1144,7 @@ class PersonalMessage_Controller extends Action_Controller
 			preparsecode($context['preview_message'], true);
 
 			// Parse out the BBC if it is enabled.
-			$context['preview_message'] = parse_bbc($context['preview_message']);
+			$context['preview_message'] = $bbc_parser->parsePM($context['preview_message']);
 
 			// Censor, as always.
 			censorText($context['preview_subject']);
@@ -1333,6 +1336,7 @@ class PersonalMessage_Controller extends Action_Controller
 			{
 				censorText($row_quoted['subject']);
 				censorText($row_quoted['body']);
+				$bbc_parser = \BBC\ParserWrapper::getInstance();
 
 				$context['quoted_message'] = array(
 					'id' => $row_quoted['id_pm'],
@@ -1348,7 +1352,7 @@ class PersonalMessage_Controller extends Action_Controller
 					'time' => standardTime($row_quoted['msgtime']),
 					'html_time' => htmlTime($row_quoted['msgtime']),
 					'timestamp' => forum_time(true, $row_quoted['msgtime']),
-					'body' => parse_bbc($row_quoted['body'], true, 'pm' . $row_quoted['id_pm']),
+					'body' => $bbc_parser->parsePM($row_quoted['body']),
 				);
 			}
 		}
@@ -2461,6 +2465,7 @@ class PersonalMessage_Controller extends Action_Controller
 			// Prepare for the callback!
 			$search_results = loadPMSearchResults($foundMessages, $this->_search_params);
 			$counter = 0;
+			$bbc_parser = \BBC\ParserWrapper::getInstance();
 			foreach ($search_results as $row)
 			{
 				// If there's no subject, use the default.
@@ -2483,7 +2488,7 @@ class PersonalMessage_Controller extends Action_Controller
 				censorText($row['subject']);
 
 				// Parse out any BBC...
-				$row['body'] = parse_bbc($row['body'], true, 'pm' . $row['id_pm']);
+				$row['body'] = $bbc_parser->parsePM($row['body']);
 
 				// Highlight the hits
 				$body_highlighted = '';
@@ -3052,7 +3057,8 @@ function preparePMContext_callback($type = 'subject', $reset = false)
 	censorText($message['subject']);
 
 	// Run BBC interpreter on the message.
-	$message['body'] = parse_bbc($message['body'], true, 'pm' . $message['id_pm']);
+	$bbc_parser = \BBC\ParserWrapper::getInstance();
+	$message['body'] = $bbc_parser->parsePM($message['body']);
 
 	// Return the array.
 	$output = array(

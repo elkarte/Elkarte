@@ -224,6 +224,8 @@ function elk_main()
 	else
 		loadTheme();
 
+	loadBBCParsers();
+
 	// Check if the user should be disallowed access.
 	is_not_banned();
 

@@ -615,11 +615,13 @@ class Register_Controller extends Action_Controller
 
 		if ($context['require_agreement'])
 		{
+			$bbc_parser = \BBC\ParserWrapper::getInstance();
+
 			// Have we got a localized one?
 			if (file_exists(BOARDDIR . '/agreement.' . $user_info['language'] . '.txt'))
-				$context['agreement'] = parse_bbc(file_get_contents(BOARDDIR . '/agreement.' . $user_info['language'] . '.txt'), true, 'agreement_' . $user_info['language']);
+				$context['agreement'] = $bbc_parser->parseAgreement(file_get_contents(BOARDDIR . '/agreement.' . $user_info['language'] . '.txt'));
 			elseif (file_exists(BOARDDIR . '/agreement.txt'))
-				$context['agreement'] = parse_bbc(file_get_contents(BOARDDIR . '/agreement.txt'), true, 'agreement');
+				$context['agreement'] = $bbc_parser->parseAgreement(file_get_contents(BOARDDIR . '/agreement.txt'));
 			else
 				$context['agreement'] = '';
 

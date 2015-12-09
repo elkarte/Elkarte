@@ -335,13 +335,16 @@ class News_Controller extends Action_Controller
 
 		// Prepare it for the feed in the format chosen (rss, atom, etc)
 		$data = array();
+
+		$bbc_parser = \BBC\ParserWrapper::getInstance();
+
 		foreach ($results as $row)
 		{
 			// Limit the length of the message, if the option is set.
 			if (!empty($modSettings['xmlnews_maxlen']) && Util::strlen(str_replace('<br />', "\n", $row['body'])) > $modSettings['xmlnews_maxlen'])
 				$row['body'] = strtr(Util::shorten_text(str_replace('<br />', "\n", $row['body']), $modSettings['xmlnews_maxlen'], true), array("\n" => '<br />'));
 
-			$row['body'] = parse_bbc($row['body'], $row['smileys_enabled'], $row['id_msg']);
+			$row['body'] = $bbc_parser->parseMessage($row['body'], $row['smileys_enabled']);
 
 			// Dirty mouth?
 			censorText($row['body']);
@@ -439,13 +442,15 @@ class News_Controller extends Action_Controller
 
 		// Loop on the results and prepare them in the format requested
 		$data = array();
+		$bbc_parser = \BBC\ParserWrapper::getInstance();
+
 		foreach ($results as $row)
 		{
 			// Limit the length of the message, if the option is set.
 			if (!empty($modSettings['xmlnews_maxlen']) && Util::strlen(str_replace('<br />', "\n", $row['body'])) > $modSettings['xmlnews_maxlen'])
 				$row['body'] = strtr(Util::shorten_text(str_replace('<br />', "\n", $row['body']), $modSettings['xmlnews_maxlen'], true), array("\n" => '<br />'));
 
-			$row['body'] = parse_bbc($row['body'], $row['smileys_enabled'], $row['id_msg']);
+			$row['body'] = $bbc_parser->parseMessage($row['body'], $row['smileys_enabled']);
 
 			// You can't say that
 			censorText($row['body']);

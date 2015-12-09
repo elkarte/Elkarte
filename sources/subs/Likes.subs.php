@@ -548,14 +548,17 @@ function dbMostLikedMessage($limit = 10)
 			'limit' => $limit,
 		)
 	);
+
 	$mostLikedMessages = array();
+	$bbc_parser = \BBC\ParserWrapper::getInstance();
+
 	while ($row = $db->fetch_assoc($request))
 	{
-		$row['body'] = parse_bbc($row['body'], $row['smileys_enabled'], $row['id_msg']);
-
 		// Censor it!
 		censorText($row['subject']);
 		censorText($row['body']);
+
+		$row['body'] = $bbc_wrapper->parseMessage($row['body'], $row['smileys_enabled']);
 
 		// Something short and sweet
 		$msgString = Util::shorten_html($row['body'], 255);
@@ -615,6 +618,7 @@ function dbMostLikedMessagesByTopic($topic, $limit = 5)
 	global $scripturl;
 
 	$db = database();
+	$bbc_parser = \BBC\ParserWrapper::getInstance();
 
 	// Most liked messages in a given topic
 	return $db->fetchQueryCallback('
@@ -642,13 +646,13 @@ function dbMostLikedMessagesByTopic($topic, $limit = 5)
 			'id_topic' => $topic,
 			'limit' => $limit,
 		),
-		function($row) use ($scripturl)
+		function($row) use ($scripturl, $bbc_parser)
 		{
-			$row['body'] = parse_bbc($row['body'], $row['smileys_enabled'], $row['id_msg']);
-
 			// Censor those naughty words
 			censorText($row['body']);
 			censorText($row['subject']);
+
+			$row['body'] = $bbc_wrapper->parseMessage($row['body'], $row['smileys_enabled']);
 
 			// Something short to show is all that's needed
 			$msgString = Util::shorten_html($row['body'], 255);
@@ -887,6 +891,7 @@ function dbMostLikesReceivedUser($limit = 10)
 function dbMostLikedPostsByUser($id_member, $limit = 10)
 {
 	$db = database();
+	$bbc_parser = \BBC\ParserWrapper::getInstance();
 
 	// Lets fetch highest liked posts by this user
 	return $db->fetchQueryCallback('
@@ -905,28 +910,28 @@ function dbMostLikedPostsByUser($id_member, $limit = 10)
 			'id_member' => $id_member,
 			'limit' => $limit
 		),
-		function ($row)
+		function ($row) use ($bbc_parser)
 		{
-			$row['body'] = parse_bbc($row['body'], $row['smileys_enabled'], $row['id_msg']);
-
 			// Censor those naughty words
 			censorText($row['body']);
 			censorText($row['subject']);
+
+			$row['body'] = $bbc_wrapper->parseMessage($row['body'], $row['smileys_enabled']);
 
 			// Something short to show is all that's needed
 			$msgString = Util::shorten_html($row['body'], 255);
 			$preview = Util::htmlspecialchars(strtr($msgString, array('<br />' => "\n", '&nbsp;' => ' ')));
 
 			return array(
-					'id_topic' => $row['id_topic'],
-					'id_msg' => $row['id_msg'],
-					'like_count' => $row['like_count'],
-					'subject' => $row['subject'],
-					'body' => $msgString,
-					'preview' => $preview,
-					'time' => standardTime($row['poster_time']),
-					'html_time' => htmlTime($row['poster_time']),
-					'timestamp' => forum_time(true, $row['poster_time']),
+				'id_topic' => $row['id_topic'],
+				'id_msg' => $row['id_msg'],
+				'like_count' => $row['like_count'],
+				'subject' => $row['subject'],
+				'body' => $msgString,
+				'preview' => $preview,
+				'time' => standardTime($row['poster_time']),
+				'html_time' => htmlTime($row['poster_time']),
+				'timestamp' => forum_time(true, $row['poster_time']),
 			);
 		}
 	);
@@ -1004,12 +1009,12 @@ function dbMostLikesGivenUser($limit = 10)
 function dbRecentlyLikedPostsGivenUser($id_liker, $limit = 5)
 {
 	$db = database();
+	$bbc_parser = \BBC\ParserWrapper::getInstance();
 
 	// Lets fetch the latest liked posts by this user
-	return $db->fetchQueryCallback('
-		SELECT
-			m.id_msg, m.id_topic, m.subject, m.body, m.poster_time, m.smileys_enabled
-		FROM {db_prefix}message_likes AS ml
+	$mostLikeGivingMember['topic_data'] = $db->fetchQueryCallback('
+		SELECT m.id_msg, m.id_topic, m.subject, m.body, m.poster_time, m.smileys_enabled
+		FROM {db_prefix}messages AS m
 			INNER JOIN {db_prefix}messages AS m ON (ml.id_msg = m.id_msg)
 			INNER JOIN {db_prefix}boards AS b ON (b.id_board = m.id_board)
 		WHERE {query_wanna_see_board}
@@ -1020,13 +1025,13 @@ function dbRecentlyLikedPostsGivenUser($id_liker, $limit = 5)
 			'id_member' => $id_liker,
 			'limit' => $limit
 		),
-		function($row)
+		function($row) use ($bbc_parser)
 		{
-			$row['body'] = parse_bbc($row['body'], $row['smileys_enabled'], $row['id_msg']);
-
 			// Censor those $%#^&% words
 			censorText($row['body']);
 			censorText($row['subject']);
+
+			$row['body'] = $bbc_wrapper->parseMessage($row['body'], $row['smileys_enabled']);
 
 			// Something short to show is all that's required
 			$msgString = Util::shorten_html($row['body'], 255);

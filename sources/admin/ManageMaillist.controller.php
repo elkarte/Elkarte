@@ -357,8 +357,9 @@ class ManageMaillist_Controller extends Action_Controller
 		else
 			$text = $txt['badid'];
 
+		$parser = \BBC\ParserWrapper::getInstance();
 		// Prep and show the template with what we found
-		$context['body'] = parse_bbc($text);
+		$context['body'] = $parser->parseEmail($text);
 		$context['to'] = $txt['to'] . ' ' . (isset($email_to) ? $email_to : '');
 		$context['notice_subject'] = isset($temp_email[0]['subject']) ? $txt['subject'] . ': ' . $temp_email[0]['subject'] : '';
 		$context['notice_from'] = isset($temp_email[0]['from']) ? $txt['from'] . ': ' . $temp_email[0]['from'] : '';
@@ -568,7 +569,7 @@ class ManageMaillist_Controller extends Action_Controller
 		// Prepare and show the template
 		createToken('admin-ml');
 		$context['warning_data'] = array('notify' => '', 'notify_subject' => '', 'notify_body' => '');
-		$context['body'] = isset($fullerrortext) ? parse_bbc($fullerrortext) : '';
+		$context['body'] = isset($fullerrortext) ? \BBC\ParserWrapper::getInstance()->parseEmail($fullerrortext) : '';
 		$context['item'] = isset($this->_req->post->item) ? $this->_req->post->item : '';
 		$context['notice_to'] = $txt['to'] . ' ' . isset($temp_email[0]['from']) ? $temp_email[0]['from'] : '';
 		$context['page_title'] = $txt['bounce_title'];

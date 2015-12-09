@@ -418,6 +418,8 @@ function loadBoard()
 	$db = database();
 	$cache = Cache::instance();
 
+	$parser = \BBC\ParserWrapper::getInstance();
+
 	// Assume they are not a moderator.
 	$user_info['is_mod'] = false;
 	$context['user']['is_mod'] = &$user_info['is_mod'];
@@ -527,7 +529,7 @@ function loadBoard()
 				),
 				'name' => $row['bname'],
 				'raw_description' => $row['description'],
-				'description' => parse_bbc($row['description']),
+				'description' => $parser->parseMessage($row['description'], true),
 				'num_topics' => $row['num_topics'],
 				'unapproved_topics' => $row['unapproved_topics'],
 				'unapproved_posts' => $row['unapproved_posts'],
@@ -1003,6 +1005,8 @@ function loadMemberContext($user, $display_custom_fields = false)
 		return false;
 	}
 
+	$parsers = \BBC\ParserWrapper::getInstance();
+
 	// Well, it's loaded now anyhow.
 	$dataLoaded[$user] = true;
 	$profile = $user_profile[$user];
@@ -1015,7 +1019,7 @@ function loadMemberContext($user, $display_custom_fields = false)
 	// Set things up to be used before hand.
 	$gendertxt = $profile['gender'] == 2 ? $txt['female'] : ($profile['gender'] == 1 ? $txt['male'] : '');
 	$profile['signature'] = str_replace(array("\n", "\r"), array('<br />', ''), $profile['signature']);
-	$profile['signature'] = parse_bbc($profile['signature'], true, 'sig' . $profile['id_member']);
+	$profile['signature'] = $parsers->parseSignature($profile['signature'], true);
 	$profile['is_online'] = (!empty($profile['show_online']) || allowedTo('moderate_forum')) && $profile['is_online'] > 0;
 	$profile['icons'] = empty($profile['icons']) ? array('', '') : explode('#', $profile['icons']);
 
@@ -1118,7 +1122,7 @@ function loadMemberContext($user, $display_custom_fields = false)
 
 			// BBC?
 			if ($custom['bbc'])
-				$value = parse_bbc($value);
+				$value = $parsers->parseCustomFields($value);
 			// ... or checkbox?
 			elseif (isset($custom['type']) && $custom['type'] == 'check')
 				$value = $value ? $txt['yes'] : $txt['no'];
@@ -3156,4 +3160,18 @@ function detectServerCores()
 	}
 
 	return 1;
+}
+
+/**
+ * Load everything necessary for the BBC parsers
+ */
+function loadBBCParsers()
+{
+	global $modSettings;
+
+	// Set the default disabled BBC
+	if (!empty($modSettings['disabledBBC']))
+	{
+		\BBC\ParserWrapper::getInstance()->setDisabled($modSettings['disabledBBC']);
+	}
 }

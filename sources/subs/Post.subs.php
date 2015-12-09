@@ -1502,7 +1502,9 @@ function lastPost()
 	censorText($row['subject']);
 	censorText($row['body']);
 
-	$row['body'] = strip_tags(strtr(parse_bbc($row['body'], $row['smileys_enabled']), array('<br />' => '&#10;')));
+	$bbc_parser = \BBC\ParserWrapper::getInstance();
+
+	$row['body'] = strip_tags(strtr($bbc_parser->parseMessage($row['body'], $row['smileys_enabled']), array('<br />' => '&#10;')));
 	$row['body'] = Util::shorten_text($row['body'], !empty($modSettings['lastpost_preview_characters']) ? $modSettings['lastpost_preview_characters'] : 128, true);
 
 	// Send the data.

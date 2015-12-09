@@ -24,7 +24,7 @@ if (!defined('ELK'))
  * This class is in charge with administration of smileys and message icons.
  * It handles actions from the Smileys pages in admin panel.
  */
-class ManageSmileys_Controller extends Action_Controller
+class ManageBBC_Controller extends Action_Controller
 {
 	/**
 	 * Smileys configuration settings form
@@ -37,6 +37,20 @@ class ManageSmileys_Controller extends Action_Controller
 	 * @var mixed[]
 	 */
 	private $_smiley_context = array();
+
+	/**
+	 * Holds instance of HttpReq object
+	 * @var HttpReq
+	 */
+	protected $_req;
+
+	/**
+	 * Pre Dispatch, called before other methods.  Loads HttpReq
+	 */
+	public function pre_dispatch()
+	{
+		$this->_req = HttpReq::instance();
+	}
 
 	/**
 	 * This is the dispatcher of smileys administration.
@@ -199,17 +213,17 @@ class ManageSmileys_Controller extends Action_Controller
 		// All the settings for the page...
 		$config_vars = array(
 			array('title', 'settings'),
-				// Inline permissions.
-				array('permissions', 'manage_smileys'),
+			// Inline permissions.
+			array('permissions', 'manage_smileys'),
 			'',
-				array('select', 'smiley_sets_default', $this->_smiley_context),
-				array('check', 'smiley_sets_enable'),
-				array('check', 'smiley_enable', 'subtext' => $txt['smileys_enable_note']),
-				array('text', 'smileys_url', 40),
-				array('text', 'smileys_dir', 'invalid' => !$context['smileys_dir_found'], 40),
+			array('select', 'smiley_sets_default', $this->_smiley_context),
+			array('check', 'smiley_sets_enable'),
+			array('check', 'smiley_enable', 'subtext' => $txt['smileys_enable_note']),
+			array('text', 'smileys_url', 40),
+			array('text', 'smileys_dir', 'invalid' => !$context['smileys_dir_found'], 40),
 			'',
-				// Message icons.
-				array('check', 'messageIcons_enable', 'subtext' => $txt['setting_messageIcons_enable_note']),
+			// Message icons.
+			array('check', 'messageIcons_enable', 'subtext' => $txt['setting_messageIcons_enable_note']),
 		);
 
 		call_integration_hook('integrate_modify_smiley_settings', array(&$config_vars));
@@ -1576,8 +1590,6 @@ class ManageSmileys_Controller extends Action_Controller
 		$context['actions'] = array();
 		$context['ftp_needed'] = false;
 
-		$bbc_parser = \BBC\ParserWrapper::getInstance();
-
 		foreach ($actions as $action)
 		{
 			if ($action['type'] == 'readme' || $action['type'] == 'license')
@@ -1592,7 +1604,7 @@ class ManageSmileys_Controller extends Action_Controller
 				{
 					require_once(SUBSDIR . '/Post.subs.php');
 					preparsecode($context[$type]);
-					$context[$type] = $bbc_parser->parsePackage($context[$type]);
+					$context[$type] = parse_bbc($context[$type]);
 				}
 				else
 					$context[$type] = nl2br($context[$type]);

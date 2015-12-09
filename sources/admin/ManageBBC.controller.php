@@ -89,10 +89,10 @@ class ManageBBC_Controller extends Action_Controller
 		{
 			checkSession();
 
+
 			// Security: make a pass through all tags and fix them as necessary
-			$bbcTags = array();
-			foreach (parse_bbc(false) as $tag)
-				$bbcTags[] = $tag['tag'];
+			$codes = \BBC\ParserWrapper::getInstance()->getCodes();
+			$bbcTags = $codes->getTags();
 
 			if (!isset($this->_req->post->disabledBBC_enabledTags))
 				$this->_req->post->disabledBBC_enabledTags = array();
