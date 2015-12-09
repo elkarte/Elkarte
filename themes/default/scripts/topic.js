@@ -543,6 +543,8 @@ QuickModify.prototype.modifySave = function (sSessionId, sSessionVar)
 	if (!this.bInEditMode)
 		return true;
 
+	this.bInEditMode = false
+
 	// Let's put back the accesskeys to their original place
 	if (typeof(this.opt.sFormRemoveAccessKeys) !== 'undefined')
 	{
