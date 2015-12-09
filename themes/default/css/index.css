@@ -844,6 +844,7 @@ a.bbc_link {
 }
 #siteslogan {
 	clear: both;
+	font-size: 0.65em;
 }
 /* Tweak the logo */
 #logo {
