@@ -224,7 +224,7 @@ function loadCustomFields($memID, $area = 'summary')
 		// A select list
 		elseif ($row['field_type'] == 'select')
 		{
-			$input_html = '<select id="' . $row['col_name'] . '" name="customfield[' . $row['col_name'] . ']"><option value="-1"></option>';
+			$input_html = '<select id="' . $row['col_name'] . '" name="customfield[' . $row['col_name'] . ']"><option value=""' . ($row['default_value'] == 'no_default' ? ' selected="selected"' : '') . '></option>';
 			$options = explode(',', $row['field_options']);
 			foreach ($options as $k => $v)
 			{

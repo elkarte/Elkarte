@@ -231,10 +231,15 @@ class ProfileAccount_Controller extends Action_Controller
 		// Work our the various levels.
 		$context['level_effects'] = array(
 			0 => $txt['profile_warning_effect_none'],
-			$modSettings['warning_watch'] => $txt['profile_warning_effect_watch'],
-			$modSettings['warning_moderate'] => $txt['profile_warning_effect_moderation'],
-			$modSettings['warning_mute'] => $txt['profile_warning_effect_mute'],
 		);
+
+		foreach (array('watch', 'moderate', 'mute') as $status)
+		{
+			if ($modSettings['warning_' . $status] != 110)
+			{
+				$context['level_effects'][$modSettings['warning_' . $status]] = $txt['profile_warning_effect_' . $status];
+			}
+		}
 		$context['current_level'] = 0;
 
 		foreach ($context['level_effects'] as $limit => $dummy)

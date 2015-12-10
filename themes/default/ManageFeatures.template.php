@@ -181,6 +181,12 @@ function template_edit_profile_field()
 							<dd id="options_dd">
 								<div>';
 
+	if (!empty($context['field']['show_nodefault']))
+	{
+		echo '
+								<input type="radio" name="default_select" value="no_default"', $context['field']['default_select'] == 'no_default' ? ' checked="checked"' : '', ' class="input_radio" /><label>' . $txt['custom_edit_options_no_default'] . '</label><br />';
+	}
+
 	foreach ($context['field']['options'] as $k => $option)
 		echo '
 								', $k == 0 ? '' : '<br />', '<input type="radio" name="default_select" value="', $k, '"', $context['field']['default_select'] == $option ? ' checked="checked"' : '', ' class="input_radio" /><input type="text" name="select_option[', $k, ']" value="', $option, '" class="input_text" />';

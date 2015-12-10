@@ -4455,3 +4455,23 @@ function isValidEmail($value)
 	else
 		return false;
 }
+
+/**
+ * Helper function able to determine if the current member can see at least
+ * one button of a button strip.
+ *
+ * @param mixed[] $button_strip
+ * @return bool
+ */
+function can_see_button_strip($button_strip)
+{
+	global $context;
+
+	foreach ($button_strip as $key => $value)
+	{
+		if (!isset($value['test']) || !empty($context[$value['test']]))
+			return true;
+	}
+
+	return false;
+}

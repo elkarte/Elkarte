@@ -187,6 +187,7 @@ function getProfileField($id_field)
 			'bbc' => $row['bbc'] ? true : false,
 			'default_check' => $row['field_type'] == 'check' && $row['default_value'] ? true : false,
 			'default_select' => $row['field_type'] == 'select' || $row['field_type'] == 'radio' ? $row['default_value'] : '',
+			'show_nodefault' => $row['field_type'] == 'select' || $row['field_type'] == 'radio',
 			'options' => strlen($row['field_options']) > 1 ? explode(',', $row['field_options']) : array('', '', ''),
 			'active' => $row['active'],
 			'private' => $row['private'],
