@@ -1906,19 +1906,29 @@ function profileValidateSignature(&$value)
 		}
 
 		// Maybe we are abusing font sizes?
-		if (!empty($sig_limits[7]) && preg_match_all('~\[size=([\d\.]+)?(px|pt|em|x-large|larger)~i', $unparsed_signature, $matches) !== false && isset($matches[2]))
+		if (!empty($sig_limits[7]) && preg_match_all('~\[size=([\d\.]+)+(px|pt|em|x-large|larger)?~i', $unparsed_signature, $matches) !== false)
 		{
+			// Same as parse_bbc
+			$sizes = array(1 => 0.7, 2 => 1.0, 3 => 1.35, 4 => 1.45, 5 => 2.0, 6 => 2.65, 7 => 3.95);
+
 			foreach ($matches[1] as $ind => $size)
 			{
 				$limit_broke = 0;
+
+				// Just specifying as [size=x]?
+				if (empty($matches[2][$ind]))
+				{
+					$matches[2][$ind] = 'em';
+					$size = isset($sizes[$size]) ? $sizes[$size] : 0;
+				}
 
 				// Attempt to allow all sizes of abuse, so to speak.
 				if ($matches[2][$ind] == 'px' && $size > $sig_limits[7])
 					$limit_broke = $sig_limits[7] . 'px';
 				elseif ($matches[2][$ind] == 'pt' && $size > ($sig_limits[7] * 0.75))
 					$limit_broke = ((int) $sig_limits[7] * 0.75) . 'pt';
-				elseif ($matches[2][$ind] == 'em' && $size > ((float) $sig_limits[7] / 16))
-					$limit_broke = ((float) $sig_limits[7] / 16) . 'em';
+				elseif ($matches[2][$ind] == 'em' && $size > ((float) $sig_limits[7] / 14))
+					$limit_broke = ((float) $sig_limits[7] / 14) . 'em';
 				elseif ($matches[2][$ind] != 'px' && $matches[2][$ind] != 'pt' && $matches[2][$ind] != 'em' && $sig_limits[7] < 18)
 					$limit_broke = 'large';
 
@@ -2024,8 +2034,12 @@ function profileValidateSignature(&$value)
 			}
 		}
 
+		// @todo temporary, footnotes in signatures is not available at this time
+		$disabledTags[] = 'footnote';
+
 		// Any disabled BBC?
 		$disabledSigBBC = implode('|', $disabledTags);
+
 		if (!empty($disabledSigBBC))
 		{
 			if (preg_match('~\[(' . $disabledSigBBC . '[ =\]/])~i', $unparsed_signature, $matches) !== false && isset($matches[1]))
