@@ -13,7 +13,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0.5
+ * @version 1.0.6
  *
  */
 
@@ -1906,7 +1906,7 @@ function profileValidateSignature(&$value)
 		}
 
 		// Maybe we are abusing font sizes?
-		if (!empty($sig_limits[7]) && preg_match_all('~\[size=([\d\.]+)+(px|pt|em|x-large|larger)?~i', $unparsed_signature, $matches) !== false)
+		if (!empty($sig_limits[7]) && preg_match_all('~\[size=([\d\.]+)(\]|px|pt|em|x-large|larger)~i', $unparsed_signature, $matches) !== false)
 		{
 			// Same as parse_bbc
 			$sizes = array(1 => 0.7, 2 => 1.0, 3 => 1.35, 4 => 1.45, 5 => 2.0, 6 => 2.65, 7 => 3.95);
@@ -1919,7 +1919,7 @@ function profileValidateSignature(&$value)
 				if (empty($matches[2][$ind]))
 				{
 					$matches[2][$ind] = 'em';
-					$size = isset($sizes[$size]) ? $sizes[$size] : 0;
+					$size = isset($sizes[(int) $size]) ? $sizes[(int) $size] : 0;
 				}
 
 				// Attempt to allow all sizes of abuse, so to speak.

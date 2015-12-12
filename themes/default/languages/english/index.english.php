@@ -1,5 +1,5 @@
 <?php
-// Version: 1.0; index
+// Version: 1.0.6; index
 
 global $forum_copyright;
 
