@@ -13,7 +13,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:		BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0
+ * @version 1.0.6
  *
  */
 
@@ -307,7 +307,7 @@ class Search_Controller extends Action_Controller
 		// $search_params will carry all settings that differ from the default search parameters.
 		// That way, the URLs involved in a search page will be kept as short as possible.
 		$search_params = array();
-
+// _debug($_REQUEST,0,0,1);
 		if (isset($_REQUEST['params']))
 		{
 			// Due to IE's 2083 character limit, we have to compress long search strings
@@ -453,9 +453,9 @@ class Search_Controller extends Action_Controller
 			$query_boards = array_map('intval', $_REQUEST['brd']);
 		elseif (!empty($_REQUEST['brd']))
 			$query_boards = array_map('intval', explode(',', $_REQUEST['brd']));
-		elseif (!empty($_REQUEST['sd_brd']) && is_array($_REQUEST['sd_brd']))
+		elseif (!empty($_REQUEST['search_selection']) && $_REQUEST['search_selection'] === 'board' && !empty($_REQUEST['sd_brd']) && is_array($_REQUEST['sd_brd']))
 			$query_boards = array_map('intval', $_REQUEST['sd_brd']);
-		elseif (isset($_REQUEST['sd_brd']) && (int) $_REQUEST['sd_brd'] !== 0)
+		elseif (!empty($_REQUEST['search_selection']) && $_REQUEST['search_selection'] === 'board' && isset($_REQUEST['sd_brd']) && (int) $_REQUEST['sd_brd'] !== 0)
 			$query_boards = array((int) $_REQUEST['sd_brd']);
 		else
 			$query_boards = array();
