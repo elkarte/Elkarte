@@ -335,6 +335,9 @@ class Elk_Autoloader
 			case '':
 				$this->_file_name = $this->_surname;
 
+				if (!empty($this->_current_namespace))
+						$this->_file_name = $this->_current_namespace . '/' . $this->_file_name;
+
 				// validate the file since it can vary
 				if (stream_resolve_include_path($this->_file_name . '.class.php'))
 				{
