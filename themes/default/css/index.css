@@ -3062,6 +3062,7 @@ ul.post_options li {
 	overflow: hidden;
 	padding: 4px 6px;
 	font-size: 1em;
+	cursor: pointer;
 }
 
 .share {
