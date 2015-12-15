@@ -222,8 +222,8 @@ input, button, select, textarea, .editor {
 	border-radius: 2px;
 }
 
-.input_text {
-	font-size: .876em;
+input, .input_text, select, button {
+	font-size: .857em;
 }
 
 select option {
@@ -298,9 +298,8 @@ input[type=submit][disabled]:hover, button[disabled], button[disabled]:hover {
 .linkbutton:link, .linkbutton_right:link, .linkbutton_left:link,
 .linkbutton:visited, .linkbutton_right:visited, .linkbutton_left:visited {
 	font-size: 0.857em;
-	line-height: 1.929em;
+	line-height: 1.8em;
 	/*padding: 0.4em 0.5em 0.5em 0.5em;*/
-
 }
 
 /* Use new class that is defined to suit, and with a sensible name. */
