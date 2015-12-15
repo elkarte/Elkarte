@@ -148,7 +148,7 @@ input[type="submit"], .drop_area_fileselect_text, button[type="submit"], input[t
 	color: #555555;
 }
 
-input[type="submit"] {
+input, button, select {
 	font-size: 0.857em;
 }
 
