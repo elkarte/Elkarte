@@ -31,6 +31,8 @@ class ParserWrapper
 	/** @var  \BBC\Autolink */
 	protected $autolink_parser;
 
+	protected $smileys_enabled = true;
+
 	public static $instance;
 
 	/**
@@ -164,20 +166,19 @@ class ParserWrapper
 
 		if (!$this->isEnabled())
 		{
-			if ($this->smileys_enabled)
-			{
-				$parsers['smiley']->parse($message);
-			}
+			// You need to run the smiley parser to get rid of the markers
+			$parsers['smiley']
+				->setEnabled($this->smileys_enabled && $GLOBALS['user_info']['smiley_set'] !== 'none')
+				->parse($message);
 
 			return $message;
 		}
 
 		$message = $parsers['bbc']->parse($message);
 
-		if ($this->smileys_enabled)
-		{
-			$parsers['smiley']->parse($message);
-		}
+		$parsers['smiley']
+			->setEnabled($this->smileys_enabled && $GLOBALS['user_info']['smiley_set'] !== 'none')
+			->parse($message);
 
 		return $message;
 	}
@@ -351,7 +352,9 @@ class ParserWrapper
 	{
 		if ($this->codes === null)
 		{
-			$this->codes = new \BBC\Codes(array(), $this->disabled);
+			$additional_bbc = array();
+			call_integration_hook('integrate_additional_bbc', array(&$additional_bbc));
+			$this->codes = new \BBC\Codes($additional_bbc, $this->disabled);
 		}
 
 		return $this->codes;
@@ -388,9 +391,13 @@ class ParserWrapper
 	 */
 	public function getSmileyParser()
 	{
+		global $modSettings, $user_info;
+
 		if ($this->smiley_parser === null)
 		{
-			$this->smiley_parser = new \BBC\SmileyParser;
+			$path = $modSettings['smileys_url'] . '/' . $user_info['smiley_set'] . '/';
+			$this->smiley_parser = new \BBC\SmileyParser($path);
+			$this->smiley_parser->setEnabled($GLOBALS['user_info']['smiley_set'] !== 'none');
 		}
 
 		return $this->smiley_parser;

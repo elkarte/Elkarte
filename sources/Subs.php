@@ -706,23 +706,6 @@ function footnote_callback($matches)
 }
 
 /**
- * Callback function for autolinking.
- *
- * - If the look behind contains ( then it will trim any trailing ) from the link
- * this to allow (link/path) where the path contains ) characters as allowed by RFC
- *
- * @param mixed[] $matches
- * @return string
- */
-function parse_autolink($matches)
-{
- 	if ($matches[1] === '(' && substr($matches[2], -1) === ')')
-		return '[url]' . rtrim($matches[2], ')') . '[/url])';
-	else
-		return '[url]' . $matches[2] . '[/url]';
-}
-
-/**
  * Parse smileys in the passed message.
  *
  * What it does:

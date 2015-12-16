@@ -1442,7 +1442,7 @@ function loadTheme($id_theme = 0, $initialize = true)
 		$context['minmax_preferences'] = array('upshrink' => $_COOKIE['upshrink']);
 
 	// Determine the current smiley set.
-	$user_info['smiley_set'] = (!in_array($user_info['smiley_set'], explode(',', $modSettings['smiley_sets_known'])) && $user_info['smiley_set'] != 'none') || empty($modSettings['smiley_sets_enable']) ? (!empty($settings['smiley_sets_default']) ? $settings['smiley_sets_default'] : $modSettings['smiley_sets_default']) : $user_info['smiley_set'];
+	$user_info['smiley_set'] = determineSmileySet();
 	$context['user']['smiley_set'] = $user_info['smiley_set'];
 
 	// Some basic information...
@@ -1766,6 +1766,27 @@ function loadTheme($id_theme = 0, $initialize = true)
 
 	// We are ready to go.
 	$context['theme_loaded'] = true;
+}
+
+/**
+ * Determine the current user's smiley set
+ *
+ * @return string
+ */
+function determineSmileySet()
+{
+	global $user_info, $modSettings, $settings;
+
+	if ((!in_array($user_info['smiley_set'], explode(',', $modSettings['smiley_sets_known'])) && $user_info['smiley_set'] != 'none') || empty($modSettings['smiley_sets_enable']))
+	{
+		$set = !empty($settings['smiley_sets_default']) ? $settings['smiley_sets_default'] : $modSettings['smiley_sets_default'];
+	}
+	else
+	{
+		$set = $user_info['smiley_set'];
+	}
+
+	return $set;
 }
 
 /**
