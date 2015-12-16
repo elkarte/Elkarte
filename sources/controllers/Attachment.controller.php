@@ -156,11 +156,11 @@ class Attachment_Controller extends Action_Controller
 		}
 
 		// We need a filename and path or we are not going any further
-		if (isset($this->_req->query->attachid))
+		if (isset($this->_req->post->attachid) && !empty($_SESSION['temp_attachments']))
 		{
 			require_once(SUBSDIR . '/Attachments.subs.php');
 
-			$result = removeTempAttachById($this->_req->query->attachid);
+			$result = removeTempAttachById($this->_req->post->attachid);
 			if ($result === true)
 				$context['json_data'] = array('result' => true);
 			else

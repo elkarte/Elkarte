@@ -148,10 +148,6 @@ input[type="submit"], .drop_area_fileselect_text, button[type="submit"], input[t
 	color: #555555;
 }
 
-input[type="submit"] {
-	font-size: 0.857em;
-}
-
 /* Hover effects. */
 input[type="submit"]:hover, button[type="submit"]:hover, input[type="button"]:hover,
 .linkbutton:hover, .linkbutton_right:hover, .linkbutton_left:hover {
@@ -1172,7 +1168,6 @@ a.active {
 	border-radius: 5px;
 	background-color: #A8352F;
 	color: #FFFFFF;
-	cursor: pointer;
 }
 
 .drop_attachments_error {

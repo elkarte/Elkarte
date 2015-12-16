@@ -233,12 +233,14 @@
 
 					// Done with this one, so remove it from existence
 					$('#' + dataToSend.attachid).unbind().remove();
-				} else
-					console.log('error success');
+				} else if (typeof window.console !== 'undefined' && typeof window.console.log !== 'undefined')
+					console.log(resp.data);
 			}).fail(function(jqXHR, textStatus, errorThrown) {
-				console.log(jqXHR);
-				console.log(textStatus);
-				console.log(errorThrown);
+				if (typeof window.console !== 'undefined' && typeof window.console.log !== 'undefined') {
+					console.log(jqXHR);
+					console.log(textStatus);
+					console.log(errorThrown);
+				}
 			});
 		},
 
