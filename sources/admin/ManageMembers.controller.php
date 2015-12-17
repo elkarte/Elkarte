@@ -1106,7 +1106,7 @@ class ManageMembers_Controller extends Action_Controller
 		$this->conditions = array();
 
 		// Sort out where we are going...
-		$current_filter = $$this->conditions['activated_status'] = (int) $this->_req->query->orig_filter;
+		$current_filter = $this->conditions['activated_status'] = (int) $this->_req->query->orig_filter;
 
 		// If we are applying a filter do just that - then redirect.
 		if (isset($this->_req->query->filter) && $this->_req->query->filter != $this->_req->query->orig_filter)
@@ -1259,7 +1259,7 @@ class ManageMembers_Controller extends Action_Controller
 	 */
 	private function _okMember()
 	{
-		global $modSettings, $scripturl;
+		global $scripturl;
 
 		// Approve / activate this member.
 		approveMembers($this->conditions);
