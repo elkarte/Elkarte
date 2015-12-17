@@ -24,7 +24,7 @@
  */
 function template_control_richedit($editor_id, $smileyContainer = null, $bbcContainer = null)
 {
-	global $context, $settings, $options;
+	global $context, $settings;
 
 	$editor_context = &$context['controls']['richedit'][$editor_id];
 

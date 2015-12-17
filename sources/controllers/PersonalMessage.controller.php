@@ -245,7 +245,7 @@ class PersonalMessage_Controller extends Action_Controller
 	 */
 	private function _messageIndexBar($area)
 	{
-		global $txt, $context, $scripturl, $modSettings, $user_info;
+		global $txt, $context, $scripturl, $user_info;
 
 		require_once(SUBSDIR . '/Menu.subs.php');
 
@@ -1890,7 +1890,7 @@ class PersonalMessage_Controller extends Action_Controller
 
 			require_once(SUBSDIR . '/Messages.subs.php');
 
-			$id_report = recordReport(array(
+			recordReport(array(
 				'id_msg' => $pmsg,
 				'id_topic' => 0,
 				'id_board' => 0,

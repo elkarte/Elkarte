@@ -17,9 +17,6 @@
 
 namespace BBC;
 
-use \BBC\Codes;
-use \BBC\Autolink;
-
 class BBCParser
 {
 	const MAX_PERMUTE_ITERATIONS = 5040;

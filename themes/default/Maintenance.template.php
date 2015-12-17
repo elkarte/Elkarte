@@ -318,7 +318,7 @@ function template_maintain_topics()
 
 function template_maintain_topics_pruneold()
 {
-	global $context, $txt, $modSettings;
+	global $txt;
 
 	// The otherwise hidden "choose which boards to prune".
 	echo '
@@ -343,7 +343,7 @@ function template_maintain_topics_pruneold()
 
 function template_maintain_topics_olddrafts()
 {
-	global $context, $txt, $modSettings;
+	global $txt, $modSettings;
 
 	echo '
 					<p>
@@ -353,7 +353,7 @@ function template_maintain_topics_olddrafts()
 
 function template_maintain_topics_massmove()
 {
-	global $context, $txt;
+	global $txt;
 
 	echo '
 					<p>';

@@ -175,8 +175,6 @@ function template_memberlist()
  */
 function template_mlsearch_below()
 {
-	global $context, $scripturl, $txt;
-
 	// Show the page numbers again. (makes 'em easier to find!)
 	template_pagesection(false, false);
 

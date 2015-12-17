@@ -921,7 +921,7 @@ class Maintenance_Controller extends Action_Controller
 	 */
 	public function action_version_display()
 	{
-		global $txt, $context, $modSettings;
+		global $txt, $context;
 
 		isAllowedTo('admin_forum');
 
@@ -1251,7 +1251,7 @@ class Maintenance_Controller extends Action_Controller
 	 */
 	public function action_hooks()
 	{
-		global $scripturl, $context, $txt, $modSettings, $settings;
+		global $scripturl, $context, $txt, $settings;
 
 		require_once(SUBSDIR . '/AddonSettings.subs.php');
 
@@ -1330,7 +1330,7 @@ class Maintenance_Controller extends Action_Controller
 					),
 					'data' => array(
 						'function' => function ($data) {
-							global $txt, $settings, $scripturl, $context;
+							global $settings;
 
 							return '<img src="' . $settings['images_url'] . '/admin/post_moderation_' . $data['status'] . '.png" alt="' . $data['img_text'] . '" title="' . $data['img_text'] . '" />';
 						},

@@ -1692,7 +1692,7 @@ function profileSendActivation()
  */
 function profileLoadSignatureData()
 {
-	global $modSettings, $context, $txt, $cur_profile, $memberContext;
+	global $modSettings, $context, $txt, $cur_profile;
 
 	// Signature limits.
 	list ($sig_limits, $sig_bbc) = explode(':', $modSettings['signature_settings']);

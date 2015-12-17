@@ -1084,7 +1084,7 @@ class Post_Controller extends Action_Controller
 	 */
 	public function action_quotefast()
 	{
-		global $modSettings, $user_info, $context;
+		global $user_info, $context;
 
 		loadLanguage('Post');
 

@@ -90,7 +90,7 @@ class Ila_Integrate
 	 */
 	public static function integrate_pre_parsebbc(&$message, &$smileys, &$cache_id, &$parse_tags)
 	{
-		global $context, $modSettings;
+		global $context;
 
 		// Enabled and we have ila tags, then hide them from parsebbc where approriate
 		if (empty($parse_tags) && empty($context['uninstalling']) && stripos($message, '[attach') !== false)
@@ -112,7 +112,7 @@ class Ila_Integrate
 	 */
 	public static function integrate_post_parsebbc(&$message, &$smileys, &$cache_id, &$parse_tags)
 	{
-		global $context, $modSettings;
+		global $context;
 
 		// Enabled and we have tags, time to render them
 		if (empty($parse_tags) && empty($context['uninstalling']) && stripos($message, '[attach') !== false)
@@ -149,8 +149,6 @@ class Ila_Integrate
 	 */
 	public static function integrate_modify_attachment_settings(&$config_vars)
 	{
-		global $txt, $scripturl, $context;
-
 		$config_vars[] = array('title', 'attachment_inline_title');
 		$config_vars[] = array('check', 'attachment_inline_enabled');
 		$config_vars[] = array('check', 'attachment_inline_basicmenu');
