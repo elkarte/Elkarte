@@ -141,7 +141,6 @@ class AdminSettings_Search
 		global $txt, $helptxt;
 
 		$found = false;
-		$name = false;
 		$return = array();
 
 		if (!is_array($item[0]))

@@ -482,8 +482,6 @@ function moveTopicsPermissions($moveCache)
 	}
 	$db->free_result($request);
 
-	$moveCache = $moveCache2;
-
 	// Do the actual moves...
 	foreach ($moveTos as $to => $topics)
 		moveTopics($topics, $to, true);
@@ -3222,7 +3220,6 @@ function toggleTopicsLock($topics, $log = false)
 
 	$db = database();
 
-	$lockStatus = array();
 	$needs_check = !empty($board) && !allowedTo('lock_any');
 	$lockCache = array();
 

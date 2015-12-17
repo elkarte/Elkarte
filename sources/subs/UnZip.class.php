@@ -275,7 +275,6 @@ class UnZip
 		// Each header will be proceeded by the central directory file header signature which is always \x50\x4b\x01\x02
 		while (substr($this->_data_cdr, $pointer, 4) === "\x50\x4b\x01\x02")
 		{
-			$temp = array();
 			$i++;
 
 			// Extract all file standard length information for this record, its the 42 bytes following the signature

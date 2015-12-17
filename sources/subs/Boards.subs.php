@@ -1614,8 +1614,6 @@ function boardsModerated($id_member)
 {
 	$db = database();
 
-	$boards = array();
-
 	return $db->fetchQueryCallback('
 		SELECT id_board
 		FROM {db_prefix}moderators

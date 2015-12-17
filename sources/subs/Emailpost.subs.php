@@ -1283,8 +1283,6 @@ function query_key_owner($email_message)
 {
 	$db = database();
 
-	$email_to = false;
-
 	if (empty($key))
 		return false;
 

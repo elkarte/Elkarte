@@ -661,8 +661,6 @@ function getTopicsToMove($id_board)
 {
 	$db = database();
 
-	$topics = array();
-
 	// Lets get the topics.
 	$db->fetchQueryCallback('
 		SELECT id_topic

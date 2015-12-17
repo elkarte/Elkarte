@@ -355,7 +355,6 @@ class In_Line_Attachment
 				for ($i = $start; $i <= $end; $i++)
 				{
 					// Search the link to get the msg_id
-					$quoted_msg_id = '';
 					$href_temp = array();
 					if (preg_match('~<a href="(?:.*)#(.*?)">~i', $links[$which_link][0], $href_temp) == 1)
 						$quoted_msg_id = $href_temp[1];
