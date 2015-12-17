@@ -558,7 +558,7 @@ function dbMostLikedMessage($limit = 10)
 		censorText($row['subject']);
 		censorText($row['body']);
 
-		$row['body'] = $bbc_wrapper->parseMessage($row['body'], $row['smileys_enabled']);
+		$row['body'] = $bbc_parser->parseMessage($row['body'], $row['smileys_enabled']);
 
 		// Something short and sweet
 		$msgString = Util::shorten_html($row['body'], 255);
