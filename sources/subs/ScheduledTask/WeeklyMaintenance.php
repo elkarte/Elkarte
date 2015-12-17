@@ -23,7 +23,7 @@ if (!defined('ELK'))
 	die('No access...');
 
 /**
- * Weekly maintenance tasks
+ * Class Weekly_Maintenance - Weekly maintenance tasks
  *
  * What it does:
  * - remove empty or temporary settings

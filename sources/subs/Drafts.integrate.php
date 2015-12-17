@@ -19,6 +19,10 @@ if (!defined('ELK'))
  */
 class Drafts_Integrate
 {
+	/**
+	 * Registers hooks as needed for the drafts function to work
+	 * @return array
+	 */
 	public static function register()
 	{
 		// $hook, $function, $file
@@ -26,6 +30,11 @@ class Drafts_Integrate
 		);
 	}
 
+	/**
+	 * Returns the config settings form the drafts module
+	 *
+	 * @return array
+	 */
 	public static function settingsRegister()
 	{
 		// $hook, $function, $file

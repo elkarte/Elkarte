@@ -17,7 +17,7 @@ if (!defined('ELK'))
 	die('No access...');
 
 /**
- * Fetch emails from an imap box and process them
+ * Class Maillist_Fetch_IMAP - Fetch emails from an imap box and process them
  *
  * - If we can't run this via cron, run it as a task instead
  *

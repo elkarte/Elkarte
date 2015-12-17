@@ -20,6 +20,9 @@
 if (!defined('ELK'))
 	die('No access...');
 
+/**
+ * Class Cache - Methods that deal with getting and setting cache values.
+ */
 class Cache
 {
 	/**
@@ -129,13 +132,13 @@ class Cache
 	 * - It may "miss" so shouldn't be depended on
 	 * - Uses the cache engine chosen in the ACP and saved in settings.php
 	 * - It supports:
-	 *     Turck MMCache: http://turck-mmcache.sourceforge.net/index_old.html#api
-	 *     Xcache: http://xcache.lighttpd.net/wiki/XcacheApi
-	 *     memcache: http://www.php.net/memcache
-	 *     APC: http://www.php.net/apc
-	 *     eAccelerator: http://bart.eaccelerator.net/doc/phpdoc/
-	 *     Zend: http://files.zend.com/help/Zend-Platform/output_cache_functions.htm
-	 *     Zend: http://files.zend.com/help/Zend-Platform/zend_cache_functions.htm
+	 *   - Turck MMCache: http://turck-mmcache.sourceforge.net/index_old.html#api
+	 *   - Xcache: http://xcache.lighttpd.net/wiki/XcacheApi
+	 *   - memcache: http://www.php.net/memcache
+	 *   - APC: http://www.php.net/apc
+	 *   - eAccelerator: http://bart.eaccelerator.net/doc/phpdoc/
+	 *   - Zend: http://files.zend.com/help/Zend-Platform/output_cache_functions.htm
+	 *   - Zend: http://files.zend.com/help/Zend-Platform/zend_cache_functions.htm
 	 *
 	 * @param string $key
 	 * @param string|int|mixed[]|null $value
@@ -174,6 +177,7 @@ class Cache
 
 	/**
 	 * Gets the value from the cache specified by key, so long as it is not older than ttl seconds.
+	 *
 	 * - It may often "miss", so shouldn't be depended on.
 	 * - It supports the same as cache::put().
 	 *

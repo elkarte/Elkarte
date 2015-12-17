@@ -23,7 +23,7 @@ if (!defined('ELK'))
 	die('No access...');
 
 /**
- * This class handles known scheduled tasks.
+ * Class Remove_Topic_Redirect - This class handles known scheduled tasks.
  *
  * - Each method implements a task, and
  * - it's called automatically for the task to run.

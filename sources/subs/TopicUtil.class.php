@@ -22,6 +22,12 @@
 if (!defined('ELK'))
 	die('No access...');
 
+/**
+ * Class Topic_Util
+ *
+ * Methods for dealing with topics presentation.
+ * Converts queries results into data usable in the templates.
+ */
 class Topic_Util
 {
 	/**

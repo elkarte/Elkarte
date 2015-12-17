@@ -21,6 +21,11 @@
 if (!defined('ELK'))
 	die('No access...');
 
+/**
+ * Class MessagesDelete
+ *
+ * Methods for deleting and restoring messages in boards
+ */
 class MessagesDelete
 {
 	/**

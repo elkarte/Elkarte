@@ -18,6 +18,10 @@ if (!defined('ELK'))
 
 class Ila_Integrate
 {
+	/**
+	 * Register ILA hooks to the system
+	 * @return array
+	 */
 	public static function register()
 	{
 		global $modSettings;
@@ -34,6 +38,10 @@ class Ila_Integrate
 		);
 	}
 
+	/**
+	 * Register ACP config hooks for setting values
+	 * @return array
+	 */
 	public static function settingsRegister()
 	{
 		// $hook, $function, $file
