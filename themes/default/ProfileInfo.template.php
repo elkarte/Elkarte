@@ -379,7 +379,7 @@ function template_action_statPanel()
 	}
 
 	echo '
-				<span class="clear" />
+				<span class="clear"></span>
 			</div>
 		</div>';
 
