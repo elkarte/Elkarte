@@ -192,6 +192,7 @@ function elk_main()
 {
 	global $modSettings, $user_info, $topic, $board_info, $context, $maintenance;
 
+	// A safer way to work with our form globals
 	$_req = HttpReq::instance();
 
 	// Special case: session keep-alive, output a transparent pixel.
@@ -224,6 +225,7 @@ function elk_main()
 	else
 		loadTheme();
 
+	// The parser is not a DIC just yet
 	loadBBCParsers();
 
 	// Check if the user should be disallowed access.

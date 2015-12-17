@@ -48,9 +48,11 @@ class BBCParser
 	protected $smiley_marker = "\r";
 
 	/**
+	 * BBCParser constructor.
+	 *
 	 * @param \BBC\Codes $bbc
-	 * @param \BBC\Autolink $autolinker = null
-	 * @param \BBC\HtmlParser $html_parser = null
+	 * @param \BBC\Autolink|null $autolinker
+	 * @param \BBC\HtmlParser|null $html_parser
 	 */
 	public function __construct(Codes $bbc, Autolink $autolinker = null, HtmlParser $html_parser = null)
 	{
