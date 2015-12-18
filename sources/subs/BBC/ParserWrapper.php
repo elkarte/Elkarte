@@ -31,10 +31,8 @@ class ParserWrapper
 	/** @var  \BBC\Autolink */
 	protected $autolink_parser;
 	/** @var bool If smileys are enabled */
-	public $smileys_enabled;
-	/** @var ParserWrapper */
 	protected $smileys_enabled = true;
-
+	/** @var ParserWrapper */
 	public static $instance;
 
 	/**
@@ -373,8 +371,7 @@ class ParserWrapper
 		{
 			$additional_bbc = array();
 			call_integration_hook('integrate_additional_bbc', array(&$additional_bbc));
-			$this->codes = new \BBC\Codes($additional_bbc, $this->disabled);
-			$this->codes = new Codes(array(), $this->disabled);
+			$this->codes = new Codes($additional_bbc, $this->disabled);
 		}
 
 		return $this->codes;
@@ -396,7 +393,7 @@ class ParserWrapper
 	}
 
 	/**
-	 * Return an, thats right not and, just an, like a single instance of the autolink parser
+	 * Return an, that's right not and, just an, like a single instance of the autolink parser
 	 *
 	 * @return Autolink
 	 */
@@ -411,7 +408,7 @@ class ParserWrapper
 	}
 
 	/**
-	 * Return an, thats right not and, just an, like a single instance of the Smiley parser
+	 * Return an, that's right not and, just an, like a single instance of the Smiley parser
 	 *
 	 * @return SmileyParser
 	 */
@@ -422,16 +419,15 @@ class ParserWrapper
 		if ($this->smiley_parser === null)
 		{
 			$path = $modSettings['smileys_url'] . '/' . $user_info['smiley_set'] . '/';
-			$this->smiley_parser = new \BBC\SmileyParser($path);
+			$this->smiley_parser = new SmileyParser($path);
 			$this->smiley_parser->setEnabled($GLOBALS['user_info']['smiley_set'] !== 'none');
-			$this->smiley_parser = new SmileyParser;
 		}
 
 		return $this->smiley_parser;
 	}
 
 	/**
-	 * Return an, thats right not and, just an, like a single instance of the HTML parser
+	 * Return an, that's right not and, just an, like a single instance of the HTML parser
 	 *
 	 * @return HtmlParser
 	 */
