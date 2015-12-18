@@ -641,9 +641,6 @@ function parse_bbc($message, $smileys = true, $cache_id = '', $parse_tags = arra
 	if ($message === '')
 		return '';
 
-	// Clean up any cut/paste issues we may have
-	$message = sanitizeMSCutPaste($message);
-
 	$parser = \BBC\ParserWrapper::getInstance();
 
 	// This is a deprecated way of getting codes
@@ -653,56 +650,6 @@ function parse_bbc($message, $smileys = true, $cache_id = '', $parse_tags = arra
 	}
 
 	return $parser->parseMessage($message, $smileys);
-
-	if ($smileys !== null && ($smileys == '1' || $smileys == '0'))
-		$smileys = (bool) $smileys;
-
-	if (empty($modSettings['enableBBC']) && $message !== false)
-	{
-		if ($smileys === true)
-			parsesmileys($message);
-
-		return $message;
-	}
-
-	// Allow addons access before entering the main parse_bbc loop
-	call_integration_hook('integrate_pre_parsebbc', array(&$message, &$smileys, &$cache_id, &$parse_tags));
-
-	if ($smileys === 'print')
-	{
-		// Colors can't well be displayed... supposed to be black and white.
-		$disabled['color'] = true;
-		$disabled['me'] = true;
-
-		// Links are useless on paper... just show the link.
-		$disabled['url'] = true;
-		$disabled['iurl'] = true;
-		$disabled['email'] = true;
-
-		// @todo Change maybe?
-		if (!isset($_GET['images']))
-			$disabled['img'] = true;
-
-		// @todo Interface/setting to add more?
-	}
-}
-
-/**
- * Call back function for footnotes
- *
- * - Builds the unique id and to/for link for each footnote in a message and page
- *
- * @param mixed[] $matches
- * @return string
- */
-function footnote_callback($matches)
-{
-	global $fn_num, $fn_content, $fn_count;
-
-	$fn_num++;
-	$fn_content[] = '<div class="target" id="fn' . $fn_num . '_' . $fn_count . '"><sup>' . $fn_num . '&nbsp;</sup>' . $matches[2] . '<a class="footnote_return" href="#ref' . $fn_num . '_' . $fn_count . '">&crarr;</a></div>';
-
-	return '<a class="target" href="#fn' . $fn_num . '_' . $fn_count . '" id="ref' . $fn_num . '_' . $fn_count . '">[' . $fn_num . ']</a>';
 }
 
 /**
@@ -716,88 +663,19 @@ function footnote_callback($matches)
  * - Doesn't return anything, but rather modifies message directly.
  *
  * @param string $message The string containing smileys to parse
+ * @deprecated since 1.1b1
  */
 function parsesmileys(&$message)
 {
-	global $modSettings, $txt, $user_info;
-	static $smileyPregSearch = null, $smileyPregReplacements = array();
-
-	$db = database();
-
 	// No smiley set at all?!
-	if ($user_info['smiley_set'] == 'none' || trim($message) == '')
-		return;
-
-	// If smileyPregSearch hasn't been set, do it now.
-	if (empty($smileyPregSearch))
+	if ($GLOBALS['user_info']['smiley_set'] == 'none' || trim($message) == '')
 	{
-		// Use the default smileys if it is disabled. (better for "portability" of smileys.)
-		if (empty($modSettings['smiley_enable']))
-		{
-			$smileysfrom = array('>:D', ':D', '::)', '>:(', ':))', ':)', ';)', ';D', ':(', ':o', '8)', ':P', '???', ':-[', ':-X', ':-*', ':\'(', ':-\\', '^-^', 'O0', 'C:-)', 'O:)');
-			$smileysto = array('evil.gif', 'cheesy.gif', 'rolleyes.gif', 'angry.gif', 'laugh.gif', 'smiley.gif', 'wink.gif', 'grin.gif', 'sad.gif', 'shocked.gif', 'cool.gif', 'tongue.gif', 'huh.gif', 'embarrassed.gif', 'lipsrsealed.gif', 'kiss.gif', 'cry.gif', 'undecided.gif', 'azn.gif', 'afro.gif', 'police.gif', 'angel.gif');
-			$smileysdescs = array('', $txt['icon_cheesy'], $txt['icon_rolleyes'], $txt['icon_angry'], $txt['icon_laugh'], $txt['icon_smiley'], $txt['icon_wink'], $txt['icon_grin'], $txt['icon_sad'], $txt['icon_shocked'], $txt['icon_cool'], $txt['icon_tongue'], $txt['icon_huh'], $txt['icon_embarrassed'], $txt['icon_lips'], $txt['icon_kiss'], $txt['icon_cry'], $txt['icon_undecided'], '', '', '', $txt['icon_angel']);
-		}
-		else
-		{
-			// Load the smileys in reverse order by length so they don't get parsed wrong.
-			if (($temp = cache_get_data('parsing_smileys', 480)) == null)
-			{
-				$smileysfrom = array();
-				$smileysto = array();
-				$smileysdescs = array();
-
-				$db->fetchQueryCallback('
-					SELECT code, filename, description
-					FROM {db_prefix}smileys
-					ORDER BY LENGTH(code) DESC',
-					array(
-					),
-					function($row) use (&$smileysfrom, &$smileysto, &$smileysdescs)
-					{
-						$smileysfrom[] = $row['code'];
-						$smileysto[] = htmlspecialchars($row['filename']);
-						$smileysdescs[] = $row['description'];
-					}
-				);
-
-				cache_put_data('parsing_smileys', array($smileysfrom, $smileysto, $smileysdescs), 480);
-			}
-			else
-				list ($smileysfrom, $smileysto, $smileysdescs) = $temp;
-		}
-
-		// The non-breaking-space is a complex thing...
-		$non_breaking_space = '\x{A0}';
-
-		// This smiley regex makes sure it doesn't parse smileys within code tags (so [url=mailto:David@bla.com] doesn't parse the :D smiley)
-		$smileyPregReplacements = array();
-		$searchParts = array();
-		$smileys_path = htmlspecialchars($modSettings['smileys_url'] . '/' . $user_info['smiley_set'] . '/');
-
-		for ($i = 0, $n = count($smileysfrom); $i < $n; $i++)
-		{
-			$specialChars = htmlspecialchars($smileysfrom[$i], ENT_QUOTES);
-			$smileyCode = '<img src="' . $smileys_path . $smileysto[$i] . '" alt="' . strtr($specialChars, array(':' => '&#58;', '(' => '&#40;', ')' => '&#41;', '$' => '&#36;', '[' => '&#091;')). '" title="' . strtr(htmlspecialchars($smileysdescs[$i]), array(':' => '&#58;', '(' => '&#40;', ')' => '&#41;', '$' => '&#36;', '[' => '&#091;')) . '" class="smiley" />';
-
-			$smileyPregReplacements[$smileysfrom[$i]] = $smileyCode;
-
-			$searchParts[] = preg_quote($smileysfrom[$i], '~');
-			if ($smileysfrom[$i] != $specialChars)
-			{
-				$smileyPregReplacements[$specialChars] = $smileyCode;
-				$searchParts[] = preg_quote($specialChars, '~');
-			}
-		}
-
-		$smileyPregSearch = '~(?<=[>:\?\.\s' . $non_breaking_space . '[\]()*\\\;]|^)(' . implode('|', $searchParts) . ')(?=[^[:alpha:]0-9]|$)~';
+		return;
 	}
 
-	// Replace away!
-	$message = preg_replace_callback($smileyPregSearch, function ($matches) use ($smileyPregReplacements)
-	{
-		return $smileyPregReplacements[$matches[0]];
-	}, $message);
+	$wrapper = \BBC\ParserWrapper::getInstance();
+	$parser = $wrapper->getSmileyParser();
+	$parser->parseBlock($message);
 }
 
 /**

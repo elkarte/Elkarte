@@ -529,7 +529,7 @@ function loadBoard()
 				),
 				'name' => $row['bname'],
 				'raw_description' => $row['description'],
-				'description' => $parser->parseMessage($row['description'], true),
+				'description' => $row['description'],
 				'num_topics' => $row['num_topics'],
 				'unapproved_topics' => $row['unapproved_topics'],
 				'unapproved_posts' => $row['unapproved_posts'],
@@ -1443,6 +1443,7 @@ function loadTheme($id_theme = 0, $initialize = true)
 
 	// Determine the current smiley set.
 	$user_info['smiley_set'] = determineSmileySet();
+
 	$context['user']['smiley_set'] = $user_info['smiley_set'];
 
 	// Some basic information...

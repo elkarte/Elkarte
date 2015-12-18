@@ -147,9 +147,11 @@ class MessageIndex_Controller extends Action_Controller implements Frontpage_Int
 		loadTemplate('MessageIndex');
 		loadJavascriptFile('topic.js');
 
+		$bbc = \BBC\ParserWrapper::getInstance();
+
 		$context['name'] = $board_info['name'];
 		$context['sub_template'] = 'topic_listing';
-		$context['description'] = $board_info['description'];
+		$context['description'] = $bbc->parseBoard($board_info['description']);
 		$template_layers = Template_Layers::getInstance();
 
 		// How many topics do we have in total?
