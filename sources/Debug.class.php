@@ -293,8 +293,10 @@ class Debug
 
 		foreach ($this->_debugs as $key => $value)
 		{
+			$value = array_map('htmlentities', $value);
 			if (in_array($key, $expandable))
 			{
+				$key = htmlentities($key, ENT_QUOTES);
 				$expand_id[] = 'debug_' . $key;
 				$pre = ' (<a id="debug_' . $key . '" href="#">' . $txt['debug_show'] . '</a><span class="hide">';
 				$post = '</span>)';
@@ -304,6 +306,7 @@ class Debug
 				$pre = '';
 				$post = '';
 			}
+
 			echo '
 				', $txt['debug_' . $key], count($value), ' - ' . $pre . '<em>', implode('</em>, <em>', $value), '</em>.' . $post . '<br />';
 		}

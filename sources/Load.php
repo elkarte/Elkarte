@@ -2019,7 +2019,7 @@ function loadSubTemplate($sub_template_name, $fatal = false)
 	if (allowedTo('admin_forum') && isset($_req->query->debug) && !in_array($sub_template_name, array('init')) && ob_get_length() > 0 && !isset($_req->query->xml))
 	{
 		echo '
-<div class="infobox">---- ', $sub_template_name, ' ends ----</div>';
+<div class="infobox">---- ', htmlentities($sub_template_name), ' ends ----</div>';
 	}
 }
 
