@@ -49,8 +49,9 @@ function template_manage_boards()
 		// Link to modify the category.
 		echo '
 			<h2 class="category_header">
+			<i class="fa fa-pencil-square-o"></i>
 				<a href="' . $scripturl . '?action=admin;area=manageboards;sa=cat;cat=' . $category['id'] . '">', $category['name'], '</a>
-				<a href="' . $scripturl . '?action=admin;area=manageboards;sa=cat;cat=' . $category['id'] . '">', $txt['catModify'], '</a>
+				<a href="' . $scripturl . '?action=admin;area=manageboards;sa=cat;cat=' . $category['id'] . '">&nbsp;', $txt['catModify'], '</a>
 			</h2>';
 
 		// Boards table header.
