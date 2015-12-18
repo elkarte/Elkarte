@@ -216,6 +216,7 @@ class Boards_List
 				// Haven't set this category yet.
 				if (empty($this->_categories[$row_board['id_cat']]))
 				{
+					$cat_name = $row_board['cat_name'];
 					$this->_categories[$row_board['id_cat']] = array(
 						'id' => $row_board['id_cat'],
 						'name' => $row_board['cat_name'],
@@ -227,7 +228,9 @@ class Boards_List
 						'boards' => array(),
 						'new' => false
 					);
-					$this->_categories[$row_board['id_cat']]['link'] = '<a id="c' . $row_board['id_cat'] . '"></a>' . (!$this->_user['is_guest'] ? '<a href="' . $this->_scripturl . '?action=unread;c='. $row_board['id_cat'] . '" title="' . sprintf($txt['new_posts_in_category'], strip_tags($row_board['cat_name'])) . '">' . $row_board['cat_name'] . '</a>' : $row_board['cat_name']);
+					$this->_categories[$row_board['id_cat']]['link'] = '<a id="c' . $row_board['id_cat'] . '"></a>' . (!$this->_user['is_guest']
+							? '<a href="' . $this->_scripturl . '?action=unread;c='. $row_board['id_cat'] . '" title="' . sprintf($txt['new_posts_in_category'], strip_tags($row_board['cat_name'])) . '">' . $cat_name . '</a>'
+							: $cat_name);
 				}
 
 				// If this board has new posts in it (and isn't the recycle bin!) then the category is new.
