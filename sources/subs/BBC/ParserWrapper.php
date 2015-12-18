@@ -396,7 +396,7 @@ class ParserWrapper
 	}
 
 	/**
-	 * Return and instance of the autolink parser
+	 * Return an, thats right not and, just an, like a single instance of the autolink parser
 	 *
 	 * @return Autolink
 	 */
@@ -411,7 +411,7 @@ class ParserWrapper
 	}
 
 	/**
-	 * Return and instance of the smiley parser
+	 * Return an, thats right not and, just an, like a single instance of the Smiley parser
 	 *
 	 * @return SmileyParser
 	 */
@@ -431,7 +431,7 @@ class ParserWrapper
 	}
 
 	/**
-	 * Return and instance of the html parser
+	 * Return an, thats right not and, just an, like a single instance of the HTML parser
 	 *
 	 * @return HtmlParser
 	 */
