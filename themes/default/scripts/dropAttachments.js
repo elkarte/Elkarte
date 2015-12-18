@@ -233,13 +233,12 @@
 
 					// Done with this one, so remove it from existence
 					$('#' + dataToSend.attachid).unbind().remove();
-				} else if (typeof window.console !== 'undefined' && typeof window.console.log !== 'undefined')
-					console.log(resp.data);
+				} else if ('console' in window)
+					window.console.info(resp.data);
 			}).fail(function(jqXHR, textStatus, errorThrown) {
-				if (typeof window.console !== 'undefined' && typeof window.console.log !== 'undefined') {
-					console.log(jqXHR);
-					console.log(textStatus);
-					console.log(errorThrown);
+				if ('console' in window) {
+					window.console.info('Error:', textStatus, errorThrown.name);
+					window.console.info(jqXHR.responseText);
 				}
 			});
 		},
