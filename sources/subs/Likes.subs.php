@@ -733,7 +733,7 @@ function dbMostLikedTopic($board = null, $limit = 10)
 	$mostLikedTopics = array_slice($mostLikedTopics, 0, $limit);
 
 	// Fetch some sample posts for each of the top X topics
-	foreach($mostLikedTopics as $key => $topic)
+	foreach ($mostLikedTopics as $key => $topic)
 	{
 		$mostLikedTopics[$key]['msg_data'] = dbMostLikedMessagesByTopic($topic['id_topic']);
 	}

@@ -494,7 +494,7 @@ class Site_Combiner
 			$post_data_raw = '';
 
 			// Combine data in to chunks of < 200k to minimize http posts
-			while($i < $filecount)
+			while ($i < $filecount)
 			{
 				// Get the details for this file
 				$file = $combine_files[$i];

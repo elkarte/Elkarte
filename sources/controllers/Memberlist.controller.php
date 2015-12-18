@@ -321,7 +321,7 @@ class Memberlist_Controller extends Action_Controller
 		$context['can_moderate_forum'] = allowedTo('moderate_forum');
 		$context['page_title'] = sprintf($txt['viewing_members'], $context['start'], $context['end']);
 		$context['linktree'][] = array(
-			'url' => $scripturl . '?action=memberlist;sort=' .$sort . ';start=' . $start,
+			'url' => $scripturl . '?action=memberlist;sort=' . $sort . ';start=' . $start,
 			'name' => &$context['page_title'],
 			'extra_after' => ' (' . sprintf($txt['of_total_members'], $context['num_members']) . ')'
 		);
@@ -335,7 +335,7 @@ class Memberlist_Controller extends Action_Controller
 		);
 
 		// Using cache allows to narrow down the list to be retrieved.
-		if ($use_cache &&$sort === 'real_name' && !isset($desc))
+		if ($use_cache && $sort === 'real_name' && !isset($desc))
 		{
 			$first_offset = $start - ($start % $cache_step_size);
 			$second_offset = ceil(($start + $modSettings['defaultMaxMembers']) / $cache_step_size) * $cache_step_size;

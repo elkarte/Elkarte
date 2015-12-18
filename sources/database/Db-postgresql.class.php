@@ -498,7 +498,7 @@ class Database_PostgreSQL extends Database_Abstract
 
 		// Log the error.
 		if (function_exists('log_error'))
-			Errors::instance()->log_error($txt['database_error'] . ': ' . $query_error . (!empty($modSettings['enableErrorQueryLogging']) ? "\n\n" .$db_string : ''), 'database', $file, $line);
+			Errors::instance()->log_error($txt['database_error'] . ': ' . $query_error . (!empty($modSettings['enableErrorQueryLogging']) ? "\n\n" . $db_string : ''), 'database', $file, $line);
 
 		// Nothing's defined yet... just die with it.
 		if (empty($context) || empty($txt))

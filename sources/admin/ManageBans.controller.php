@@ -776,8 +776,8 @@ class ManageBans_Controller extends Action_Controller
 
 		require_once(SUBSDIR . '/Bans.subs.php');
 
-		$ban_group = $this->_req->getQuery('bg'. 'intval', 0);
-		$ban_id = $this->_req->getQuery('bi'. 'intval', 0);
+		$ban_group = $this->_req->getQuery('bg', 'intval', 0);
+		$ban_id = $this->_req->getQuery('bi', 'intval', 0);
 
 		if (empty($ban_group))
 			Errors::instance()->fatal_lang_error('ban_not_found', false);

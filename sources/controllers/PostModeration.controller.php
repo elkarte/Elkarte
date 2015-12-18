@@ -222,7 +222,7 @@ class PostModeration_Controller extends Action_Controller
 
 		// Update the tabs with the correct number of actions to account for brd filtering
 		$context['menu_data_' . $context['moderation_menu_id']]['sections']['posts']['areas']['postmod']['subsections']['posts']['label'] = $context['menu_data_' . $context['moderation_menu_id']]['sections']['posts']['areas']['postmod']['subsections']['posts']['label'] . ' [' . $context['total_unapproved_posts'] . ']';
-		$context['menu_data_' . $context['moderation_menu_id']]['sections']['posts']['areas']['postmod']['subsections']['topics']['label'] = $context['menu_data_' . $context['moderation_menu_id']]['sections']['posts']['areas']['postmod']['subsections']['topics']['label']. ' [' . $context['total_unapproved_topics'] . ']';
+		$context['menu_data_' . $context['moderation_menu_id']]['sections']['posts']['areas']['postmod']['subsections']['topics']['label'] = $context['menu_data_' . $context['moderation_menu_id']]['sections']['posts']['areas']['postmod']['subsections']['topics']['label'] . ' [' . $context['total_unapproved_topics'] . ']';
 
 		// If we are filtering some boards out then make sure to send that along with the links.
 		if (isset($this->_brd))
@@ -502,6 +502,6 @@ class PostModeration_Controller extends Action_Controller
 
 		cache_put_data('num_menu_errors', null, 900);
 
-		redirectexit('topic=' . $topic . '.msg' . $current_msg. '#msg' . $current_msg);
+		redirectexit('topic=' . $topic . '.msg' . $current_msg . '#msg' . $current_msg);
 	}
 }

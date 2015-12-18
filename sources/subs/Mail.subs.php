@@ -157,7 +157,7 @@ function sendmail($to, $subject, $message, $from = null, $message_id = null, $se
 
 		// Indicate its a list server to avoid spam tagging and to help client filters
 		// http://www.ietf.org/rfc/rfc2369.txt
-		$headers .= 'List-Id: <' . (!empty($modSettings['maillist_sitename_address']) ? $modSettings['maillist_sitename_address'] : (empty($modSettings['maillist_mail_from']) ? $webmaster_email : $modSettings['maillist_mail_from'])). '>' . $line_break;
+		$headers .= 'List-Id: <' . (!empty($modSettings['maillist_sitename_address']) ? $modSettings['maillist_sitename_address'] : (empty($modSettings['maillist_mail_from']) ? $webmaster_email : $modSettings['maillist_mail_from'])) . '>' . $line_break;
 		$headers .= 'List-Unsubscribe: <' . $boardurl . '/index.php?action=profile;area=notification>' . $line_break;
 		$headers .= 'List-Owner: <mailto:' . (!empty($modSettings['maillist_sitename_help']) ? $modSettings['maillist_sitename_help'] : (empty($modSettings['maillist_mail_from']) ? $webmaster_email : $modSettings['maillist_mail_from'])) . '> (' . (!empty($modSettings['maillist_sitename']) ? $modSettings['maillist_sitename'] : $context['forum_name']) . ')' . $line_break;
 	}
@@ -592,7 +592,8 @@ function smtp_mail($mail_to_array, $subject, $message, $headers, $priority, $mes
 		// EHLO could be understood to mean encrypted hello...
 		if (server_parse('EHLO ' . $modSettings['smtp_host'], $socket, null) == '250')
 		{
-			if ($modSettings['smtp_starttls']) {
+			if ($modSettings['smtp_starttls'])
+			{
 				server_parse('STARTTLS', $socket, null);
 				stream_socket_enable_crypto($socket, true, STREAM_CRYPTO_METHOD_TLS_CLIENT);
 				server_parse('EHLO ' . $modSettings['smtp_host'], $socket, null);

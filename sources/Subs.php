@@ -1440,13 +1440,13 @@ function template_css()
 
 			foreach ($combiner->getSpares() as $id => $file)
 				echo '
-	<link rel="stylesheet" href="', $file['filename'], '" id="', $id,'" />';
+	<link rel="stylesheet" href="', $file['filename'], '" id="', $id, '" />';
 		}
 		else
 		{
 			foreach ($context['css_files'] as $id => $file)
 				echo '
-	<link rel="stylesheet" href="', $file['filename'], '" id="', $id,'" />';
+	<link rel="stylesheet" href="', $file['filename'], '" id="', $id, '" />';
 		}
 	}
 }

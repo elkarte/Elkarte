@@ -1045,9 +1045,9 @@ function loadMemberContext($user, $display_custom_fields = false)
 	if ($context['loadMemberContext_set'] !== 'minimal')
 	{
 		$memberContext[$user] += array(
-			'username_color' => '<span '. (!empty($profile['member_group_color']) ? 'style="color:'. $profile['member_group_color'] .';"' : '') .'>'. $profile['member_name'] .'</span>',
-			'name_color' => '<span '. (!empty($profile['member_group_color']) ? 'style="color:'. $profile['member_group_color'] .';"' : '') .'>'. $profile['real_name'] .'</span>',
-			'link_color' => '<a href="' . $scripturl . '?action=profile;u=' . $profile['id_member'] . '" title="' . $txt['profile_of'] . ' ' . $profile['real_name'] . '" '. (!empty($profile['member_group_color']) ? 'style="color:'. $profile['member_group_color'] .';"' : '') .'>' . $profile['real_name'] . '</a>',
+			'username_color' => '<span '. (!empty($profile['member_group_color']) ? 'style="color:' . $profile['member_group_color'] .';"' : '') .'>'. $profile['member_name'] .'</span>',
+			'name_color' => '<span '. (!empty($profile['member_group_color']) ? 'style="color:' . $profile['member_group_color'] .';"' : '') .'>'. $profile['real_name'] .'</span>',
+			'link_color' => '<a href="' . $scripturl . '?action=profile;u=' . $profile['id_member'] . '" title="' . $txt['profile_of'] . ' ' . $profile['real_name'] . '" ' . (!empty($profile['member_group_color']) ? 'style="color:' . $profile['member_group_color'] . ';"' : '') .'>' . $profile['real_name'] . '</a>',
 			'is_buddy' => $profile['buddy'],
 			'is_reverse_buddy' => in_array($user_info['id'], $buddy_list),
 			'buddies' => $buddy_list,
@@ -1615,7 +1615,7 @@ function loadTheme($id_theme = 0, $initialize = true)
 	}
 
 	// A bit lonely maybe, though I think it should be set up *after* the theme variants detection
-	$context['header_logo_url_html_safe'] = empty($settings['header_logo_url']) ? $settings['images_url'] . '/' . $context['theme_variant_url'] .  'logo_elk.png' : Util::htmlspecialchars($settings['header_logo_url']);
+	$context['header_logo_url_html_safe'] = empty($settings['header_logo_url']) ? $settings['images_url'] . '/' . $context['theme_variant_url'] . 'logo_elk.png' : Util::htmlspecialchars($settings['header_logo_url']);
 
 	// Allow overriding the board wide time/number formats.
 	if (empty($user_settings['time_format']) && !empty($txt['time_format']))
@@ -3158,7 +3158,7 @@ function detectServerLoad()
 	if (function_exists('sys_getloadavg'))
 	{
 		$sys_load = sys_getloadavg();
-        return $sys_load[0] / $cores;
+		return $sys_load[0] / $cores;
 	}
 	// Maybe someone has a custom compile
 	else

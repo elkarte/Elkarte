@@ -665,7 +665,7 @@ class ManageMembers_Controller extends Action_Controller
 		}
 
 		// Are we banning?
-		if(in_array($this->_req->post->maction, array('ban_names', 'ban_mails', 'ban_ips', 'ban_names_mails')) && allowedTo('manage_bans'))
+		if (in_array($this->_req->post->maction, array('ban_names', 'ban_mails', 'ban_ips', 'ban_names_mails')) && allowedTo('manage_bans'))
 		{
 			require_once(SUBSDIR . '/Bans.subs.php');
 			require_once(SUBSDIR . '/Members.subs.php');

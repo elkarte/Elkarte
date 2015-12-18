@@ -212,7 +212,7 @@ function getLogins($start, $items_per_page, $sort, $where, $where_vars = array()
 	$request = $db->query('', '
 		SELECT time, ip, ip2
 		FROM {db_prefix}member_logins
-		WHERE ' . $where .'
+		WHERE ' . $where . '
 		ORDER BY time DESC',
 		array(
 			'current_member' => $where_vars['current_member'],

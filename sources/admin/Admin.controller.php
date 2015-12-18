@@ -602,7 +602,7 @@ class Admin_Controller extends Action_Controller
 			$class = $name . '_Controller';
 			$module = strtolower(substr($name, 6, -6));
 
-			if (isModuleEnabled($module) && method_exists($class, 'addAdminMenu') )
+			if (isModuleEnabled($module) && method_exists($class, 'addAdminMenu'))
 				$class::addAdminMenu($admin_areas);
 		}
 	}

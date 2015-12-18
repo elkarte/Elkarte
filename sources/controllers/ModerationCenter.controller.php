@@ -1019,7 +1019,7 @@ class ModerationCenter_Controller extends Action_Controller
 		// Some important context!
 		$context['page_title'] = $txt['mc_watched_users_title'];
 		$context['view_posts'] = isset($this->_req->query->sa) && $this->_req->query->sa === 'post';
-		$context['start'] =  $this->_req->getQuery('start', 'intval', 0);
+		$context['start'] = $this->_req->getQuery('start', 'intval', 0);
 
 		loadTemplate('ModerationCenter');
 
@@ -1247,7 +1247,7 @@ class ModerationCenter_Controller extends Action_Controller
 
 		// Setup the allowed quick search type
 		$context['order'] = isset($this->_req->query->sort) && isset($searchTypes[$this->_req->query->sort]) ? $this->_req->query->sort : 'member';
-		$context['url_start'] = '?action=moderate;area=warnings;sa=log;sort='.  $context['order'];
+		$context['url_start'] = '?action=moderate;area=warnings;sa=log;sort=' . $context['order'];
 
 		if (!isset($search_params['string']) || (!empty($this->_req->post->search) && $search_params['string'] != $this->_req->post->search))
 			$search_params_string = empty($this->_req->post->search) ? '' : $this->_req->post->search;

@@ -367,7 +367,7 @@ class In_Line_Attachment
 					if (!empty($quoted_msg_id))
 					{
 						if (!isset($context['current_topic']))
-							list($quote_topic, ) = $this->_ila_get_topic(str_replace('msg', '', $quoted_msg_id));
+							list($quote_topic,) = $this->_ila_get_topic(str_replace('msg', '', $quoted_msg_id));
 						else
 							$quote_topic = $context['current_topic'];
 
@@ -678,8 +678,6 @@ class In_Line_Attachment
 	 *
 	 * - Loads attachments for a given msg if they have not yet been loaded
 	 * - Attachments must be enabled and user allowed to see attachments
-	 *
-	 * @param int $msg_id
 	 */
 	private function ila_load_attachments()
 	{

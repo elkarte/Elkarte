@@ -296,7 +296,7 @@ class PackageServers_Controller extends Action_Controller
 		$under = str_replace(' ', '_', $thisPackage->title);
 		$none = str_replace(' ', '', $thisPackage->title);
 
-		return array (
+		return array(
 			$thisPackage->author . ':' . $under,
 			$thisPackage->author . ':' . $none,
 			strtolower($thisPackage->author) . ':' . $under,

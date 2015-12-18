@@ -1781,7 +1781,7 @@ function loadAttachmentContext($id_msg)
 			elseif ($attachmentData[$i]['thumbnail']['has_thumb'])
 			{
 				// Data attributes for use in expandThumb
-				$attachmentData[$i]['thumbnail']['lightbox'] = 'data-lightboxmessage="' . $id_msg . '" data-lightboximage="' .  $attachment['id_attach'] . '"';
+				$attachmentData[$i]['thumbnail']['lightbox'] = 'data-lightboxmessage="' . $id_msg . '" data-lightboximage="' . $attachment['id_attach'] . '"';
 
 				// If the image is too large to show inline, make it a popup.
 				// @todo this needs to be removed or depreciated

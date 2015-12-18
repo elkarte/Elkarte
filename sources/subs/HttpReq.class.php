@@ -169,7 +169,8 @@ class HttpReq
 	 */
 	public function __get($key)
 	{
-		switch (true) {
+		switch (true)
+		{
 			case isset($this->_param[$key]):
 				return $this->_param[$key];
 			case isset($this->query->$key):
@@ -215,7 +216,8 @@ class HttpReq
 	 */
 	public function __isset($key)
 	{
-		switch (true) {
+		switch (true)
+		{
 			case isset($this->_param[$key]):
 				return true;
 			case isset($this->query->$key):

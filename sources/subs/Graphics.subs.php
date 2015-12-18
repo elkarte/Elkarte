@@ -351,7 +351,7 @@ function resizeImage($src_img, $destName, $src_width, $src_height, $max_width, $
 			// Free resources associated with the Imagick object
 			$imagick->destroy();
 		}
-		catch(Exception $e)
+		catch (Exception $e)
 		{
 			// Not currently used, but here is the error
 			$success = $e->getMessage();
@@ -436,13 +436,13 @@ function resizeImage($src_img, $destName, $src_width, $src_height, $max_width, $
  * - Checks exif data for orientation flag and rotates image so its proper
  * - Updates orientation flag if rotation was required
  *
- * @param object $image
+ * @param Imagick $image
  */
 function autoRotateImage($image)
 {
 	// This method should exist if Imagick has been compiled against ImageMagick version
 	// 6.3.0 or higher which is forever ago, but we check anyway ;)
-	if (!method_exists($image , 'getImageOrientation'))
+	if (!method_exists($image, 'getImageOrientation'))
 		return;
 
 	$orientation = $image->getImageOrientation();

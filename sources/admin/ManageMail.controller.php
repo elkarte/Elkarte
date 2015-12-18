@@ -255,7 +255,7 @@ class ManageMail_Controller extends Action_Controller
 			{
 				$this->_req->post->smtp_password[0] = base64_encode($this->_req->post->smtp_password[0]);
 				$this->_req->post->smtp_password[1] = base64_encode($this->_req->post->smtp_password[1]);
-				$postobj = array ('smtp_password' => array(0 => ($this->_req->post->smtp_password[0]), 1 => ($this->_req->post->smtp_password[1])));
+				$postobj = array('smtp_password' => array(0 => ($this->_req->post->smtp_password[0]), 1 => ($this->_req->post->smtp_password[1])));
 			}
 			checkSession();
 

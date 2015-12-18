@@ -50,7 +50,7 @@ class Daily_Maintenance implements Scheduled_Task_Interface
 		clean_cache('data');
 
 		// If warning decrement is enabled and we have people who have not had a new warning in 24 hours, lower their warning level.
-		list (, , $modSettings['warning_decrement']) = explode(',', $modSettings['warning_settings']);
+		list (,, $modSettings['warning_decrement']) = explode(',', $modSettings['warning_settings']);
 		if ($modSettings['warning_decrement'])
 		{
 			// Find every member who has a warning level...

@@ -522,7 +522,7 @@ function createBoard($boardOptions)
 		'member_groups' => 'string', 'redirect' => 'string',
 	);
 	$board_parameters = array(
-		$boardOptions['target_category'], $boardOptions['board_name'] , '', 0,
+		$boardOptions['target_category'], $boardOptions['board_name'], '', 0,
 		'-1,0', '',
 	);
 

@@ -229,7 +229,7 @@ class Boards_List
 						'new' => false
 					);
 					$this->_categories[$row_board['id_cat']]['link'] = '<a id="c' . $row_board['id_cat'] . '"></a>' . (!$this->_user['is_guest']
-							? '<a href="' . $this->_scripturl . '?action=unread;c='. $row_board['id_cat'] . '" title="' . sprintf($txt['new_posts_in_category'], strip_tags($row_board['cat_name'])) . '">' . $cat_name . '</a>'
+							? '<a href="' . $this->_scripturl . '?action=unread;c=' . $row_board['id_cat'] . '" title="' . sprintf($txt['new_posts_in_category'], strip_tags($row_board['cat_name'])) . '">' . $cat_name . '</a>'
 							: $cat_name);
 				}
 

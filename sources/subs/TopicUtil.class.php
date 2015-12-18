@@ -31,7 +31,7 @@ if (!defined('ELK'))
 class Topic_Util
 {
 	/**
- 	 * This function takes an array of data coming from the database and related
+	 * This function takes an array of data coming from the database and related
 	 * to a list of topics and returns data useful in the template.
 	 *
 	 * @param mixed[] $topics_info - data coming from a query, for example
@@ -39,7 +39,7 @@ class Topic_Util
 	 * @param bool $topicseen - if use the temp table or not
 	 * @param int|null $preview_length - length of the preview
 	 * @return mixed[] - array of data related to topics
-	*/
+	 */
 	public static function prepareContext($topics_info, $topicseen = false, $preview_length = null)
 	{
 		global $modSettings, $options, $scripturl, $txt, $user_info;

@@ -2430,10 +2430,10 @@ class PersonalMessage_Controller extends Action_Controller
 		}
 
 		// Get the number of results.
-		$numResults = numPMSeachResults($userQuery, $labelQuery, $timeQuery, $searchQuery, $this->_searchq_parameters );
+		$numResults = numPMSeachResults($userQuery, $labelQuery, $timeQuery, $searchQuery, $this->_searchq_parameters);
 
 		// Get all the matching message ids, senders and head pm nodes
-		list($foundMessages, $posters, $head_pms) = loadPMSearchMessages($userQuery, $labelQuery, $timeQuery, $searchQuery, $this->_searchq_parameters , $this->_search_params);
+		list($foundMessages, $posters, $head_pms) = loadPMSearchMessages($userQuery, $labelQuery, $timeQuery, $searchQuery, $this->_searchq_parameters, $this->_search_params);
 
 		// Find the real head pm when in conversation view
 		if ($context['display_mode'] == 2 && !empty($head_pms))

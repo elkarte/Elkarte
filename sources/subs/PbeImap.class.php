@@ -153,7 +153,7 @@ class Pbe_Imap
 		$connection = $this->_port_type();
 		$this->_hostname .= (strpos($this->_hostname, ':') === false) ? ':' . $connection['port'] : '';
 		$this->_imap_server = '{' . $this->_hostname . '/' . $connection['protocol'] . $connection['flags'] . '}';
-		$this->_mailbox = $this->_imap_server .  imap_utf7_encode($this->_mailbox);
+		$this->_mailbox = $this->_imap_server . imap_utf7_encode($this->_mailbox);
 
 		// Connect to the mailbox using the supplied credentials and protocol
 		$this->_inbox = @imap_open($this->_mailbox, $this->_username, $this->_password);
@@ -167,7 +167,7 @@ class Pbe_Imap
 	protected function _fetch_email($email_uid)
 	{
 		// Get the headers and prefetch the body as well to avoid a second request
-		$headers = imap_fetchheader($this->_inbox, $email_uid, FT_PREFETCHTEXT|FT_UID);
+		$headers = imap_fetchheader($this->_inbox, $email_uid, FT_PREFETCHTEXT | FT_UID);
 		$message = imap_body($this->_inbox, $email_uid, FT_UID);
 
 		// Create the save-as email
@@ -268,7 +268,7 @@ class Pbe_Imap
 		$mailboxes = imap_list($this->_inbox, $this->_imap_server, '*');
 
 		// Check the names to see if one is known as a trashbin
-		foreach($mailboxes as $mailbox)
+		foreach ($mailboxes as $mailbox)
 		{
 			$name = str_replace($this->_imap_server, '', $mailbox);
 			if (in_array($name, $trashbox))

@@ -118,7 +118,7 @@ class SmileyParser
 		for ($i = 0, $n = count($smileysfrom); $i < $n; $i++)
 		{
 			$specialChars = htmlspecialchars($smileysfrom[$i], ENT_QUOTES);
-			$smileyCode = '<img src="' . $this->path . $smileysto[$i] . '" alt="' . strtr($specialChars, array(':' => '&#58;', '(' => '&#40;', ')' => '&#41;', '$' => '&#36;', '[' => '&#091;')). '" title="' . strtr(htmlspecialchars($smileysdescs[$i]), array(':' => '&#58;', '(' => '&#40;', ')' => '&#41;', '$' => '&#36;', '[' => '&#091;')) . '" class="smiley" />';
+			$smileyCode = '<img src="' . $this->path . $smileysto[$i] . '" alt="' . strtr($specialChars, array(':' => '&#58;', '(' => '&#40;', ')' => '&#41;', '$' => '&#36;', '[' => '&#091;')) . '" title="' . strtr(htmlspecialchars($smileysdescs[$i]), array(':' => '&#58;', '(' => '&#40;', ')' => '&#41;', '$' => '&#36;', '[' => '&#091;')) . '" class="smiley" />';
 
 			$this->replace[$smileysfrom[$i]] = $smileyCode;
 

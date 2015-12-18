@@ -186,7 +186,7 @@ class BBCParser
 			// Possibly a closer?
 			if ($next_char === '/')
 			{
-				if($this->hasOpenTags())
+				if ($this->hasOpenTags())
 				{
 					$this->handleOpenTags();
 				}
@@ -254,7 +254,7 @@ class BBCParser
 			}
 
 			// This is the part where we actually handle the tags. I know, crazy how long it took.
-			if($this->handleTag($tag))
+			if ($this->handleTag($tag))
 			{
 				continue;
 			}
@@ -436,7 +436,7 @@ class BBCParser
 	 */
 	protected function autoLink(&$data)
 	{
-		if ($data === '' || $data === $this->smiley_marker  || !$this->autolinker->hasPossible())
+		if ($data === '' || $data === $this->smiley_marker || !$this->autolinker->hasPossible())
 		{
 			return;
 		}
@@ -511,7 +511,7 @@ class BBCParser
 			}
 
 			$tag = $this->checkCodeAttributes($next_c, $possible, $tag);
-			if($tag === null)
+			if ($tag === null)
 			{
 				continue;
 			}
@@ -1189,10 +1189,11 @@ class BBCParser
 		if (!isset($possible['regex_cache']))
 		{
 			$possible['regex_cache'] = array();
-			foreach ($possible[Codes::ATTR_PARAM] as $p => $info) {
+			foreach ($possible[Codes::ATTR_PARAM] as $p => $info)
+			{
 				$quote = empty($info[Codes::PARAM_ATTR_QUOTED]) ? '' : '&quot;';
 
-				$possible['regex_cache'][] = '(\s+' . $p . '=' . $quote . (isset($info[Codes::PARAM_ATTR_MATCH]) ? $info[Codes::PARAM_ATTR_MATCH] : '(.+?)') . $quote. ')' . (empty($info[Codes::PARAM_ATTR_OPTIONAL]) ? '' : '?');
+				$possible['regex_cache'][] = '(\s+' . $p . '=' . $quote . (isset($info[Codes::PARAM_ATTR_MATCH]) ? $info[Codes::PARAM_ATTR_MATCH] : '(.+?)') . $quote . ')' . (empty($info[Codes::PARAM_ATTR_OPTIONAL]) ? '' : '?');
 			}
 			$possible['regex_size'] = count($possible['regex_cache']) - 1;
 			$possible['regex_keys'] = range(0, $possible['regex_size']);
@@ -1210,7 +1211,8 @@ class BBCParser
 		$keys = $possible['regex_keys'];
 
 		// Step, one by one, through all possible permutations of the parameters until we have a match
-		do {
+		do
+		{
 			$match_preg = '~^';
 			foreach ($keys as $key)
 			{

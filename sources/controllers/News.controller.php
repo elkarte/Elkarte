@@ -244,9 +244,9 @@ class News_Controller extends Action_Controller
 			$url_parts = array();
 			foreach (array('board', 'boards', 'c') as $var)
 			{
-				if (isset( $this->_req->query->$var))
+				if (isset($this->_req->query->$var))
 				{
-					$url_parts[] = $var . '=' . (is_array( $this->_req->query->$var) ? implode(',',  $this->_req->query->$var) :  $this->_req->query->$var);
+					$url_parts[] = $var . '=' . (is_array( $this->_req->query->$var) ? implode(',',  $this->_req->query->$var) : $this->_req->query->$var);
 				}
 			}
 

@@ -1143,7 +1143,7 @@ class Maintenance_Controller extends Action_Controller
 		$exclude_stickies = isset($this->_req->post->delete_old_not_sticky);
 
 		// @todo what is the minimum for maxdays? Maybe throw an error?
-		$older_than = time() - 3600 * 24 *  max($this->_req->getPost('maxdays', 'intval', 0), 1);
+		$older_than = time() - 3600 * 24 * max($this->_req->getPost('maxdays', 'intval', 0), 1);
 
 		require_once(SUBSDIR . '/Topic.subs.php');
 		removeOldTopics($boards, $delete_type, $exclude_stickies, $older_than);

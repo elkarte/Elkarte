@@ -134,7 +134,7 @@ class ProfileHistory_Controller extends Action_Controller
 					),
 					'data' => array(
 						'sprintf' => array(
-							'format' => '<a href="' . $scripturl . '?action=profile;area=history;sa=ip;searchip=%1$s;u=' . $this->_memID. '">%1$s</a>',
+							'format' => '<a href="' . $scripturl . '?action=profile;area=history;sa=ip;searchip=%1$s;u=' . $this->_memID . '">%1$s</a>',
 							'params' => array(
 								'ip' => false,
 							),

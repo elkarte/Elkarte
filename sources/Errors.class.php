@@ -25,7 +25,8 @@ if (!defined('ELK'))
 /**
  * Class to handle all forum errors and exceptions
  */
-class Errors {
+class Errors
+{
 	/**
 	 * The prepared error string from getTrace to display when debug is enabled
 	 * @var string
@@ -332,7 +333,7 @@ class Errors {
 		$exception = !isset($err_file, $err_line);
 		$this->error_string = $e->getMessage();
 		$this->error_level = $e->getCode();
-		$this->error_name =  $this->error_level % 255 === E_ERROR ? 'Error' : ($this->error_level % 255 === E_WARNING ? 'Warning' : 'Notice');
+		$this->error_name = $this->error_level % 255 === E_ERROR ? 'Error' : ($this->error_level % 255 === E_WARNING ? 'Warning' : 'Notice');
 		$error_type = stripos($this->error_string, 'undefined') !== false ? 'undefined_vars' : 'general';
 		$err_file = htmlspecialchars(isset($err_file) ? $err_file : $e->getFile());
 		$err_line = isset($err_line) ? $err_line : $e->getLine();

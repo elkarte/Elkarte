@@ -509,7 +509,7 @@ class Hooks
 		if ($debug === null)
 			$debug = Debug::get();
 
-		self::$_instance = New Hooks($db, $debug, $paths);
+		self::$_instance = new Hooks($db, $debug, $paths);
 	}
 
 	/**

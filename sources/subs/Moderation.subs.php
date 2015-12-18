@@ -1135,7 +1135,7 @@ function groupRequests()
 		array(
 		)
 	);
-	for ($i = 0; $row = $db->fetch_assoc($request); $i ++)
+	for ($i = 0; $row = $db->fetch_assoc($request); $i++)
 	{
 		$group_requests[] = array(
 			'id' => $row['id_request'],

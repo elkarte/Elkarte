@@ -210,7 +210,7 @@ class Sphinx_Search extends SearchAPI
 			$sphinx_sort = str_replace('relevance ', '@weight ' . $search_params['sort_dir'] . ', relevance ', $sphinx_sort);
 
 			// Grouping by topic id makes it return only one result per topic, so don't set that for in-topic searches
-			if (empty($search_params['topic']) )
+			if (empty($search_params['topic']))
 				$mySphinx->SetGroupBy('id_topic', SPH_GROUPBY_ATTR, $sphinx_sort);
 
 			// Set up the sort expression

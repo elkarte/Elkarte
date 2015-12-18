@@ -405,7 +405,7 @@ class Search
 		$phraseArray = $this->_checkExcludePhrase($matches[1], $phraseArray);
 
 		// Now we look for -test, etc.... normaller.
-		$wordArray =  $this->_checkExcludeWord($wordArray);
+		$wordArray = $this->_checkExcludeWord($wordArray);
 
 		// The remaining words and phrases are all included.
 		$this->_searchArray = array_merge($phraseArray, $wordArray);
@@ -443,7 +443,7 @@ class Search
 	 * - Check for things like -"some words", but not "-some words"
 	 * - Prevents redundancy with blacklisted words
 	 *
-	 * @param array $matches
+	 * @param string[] $matches
 	 * @param string[]  $phraseArray
 	 */
 	private function _checkExcludePhrase($matches, $phraseArray)

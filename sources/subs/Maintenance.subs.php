@@ -351,124 +351,124 @@ function updateBoardsCounter($type, $start, $increment)
 
 	switch ($type)
 	{
-	case 'posts':
-		$request = $db->query('', '
-			SELECT /*!40001 SQL_NO_CACHE */ m.id_board, COUNT(*) AS real_num_posts
-			FROM {db_prefix}messages AS m
-			WHERE m.id_topic > {int:id_topic_min}
-				AND m.id_topic <= {int:id_topic_max}
-				AND m.approved = {int:is_approved}
-			GROUP BY m.id_board',
-			array(
-				'id_topic_min' => $start,
-				'id_topic_max' => $start + $increment,
-				'is_approved' => 1,
-			)
-		);
-		while ($row = $db->fetch_assoc($request))
-		{
-			$db->query('', '
-				UPDATE {db_prefix}boards
-				SET num_posts = num_posts + {int:real_num_posts}
-				WHERE id_board = {int:id_board}',
+		case 'posts':
+			$request = $db->query('', '
+				SELECT /*!40001 SQL_NO_CACHE */ m.id_board, COUNT(*) AS real_num_posts
+				FROM {db_prefix}messages AS m
+				WHERE m.id_topic > {int:id_topic_min}
+					AND m.id_topic <= {int:id_topic_max}
+					AND m.approved = {int:is_approved}
+				GROUP BY m.id_board',
 				array(
-					'id_board' => $row['id_board'],
-					'real_num_posts' => $row['real_num_posts'],
+					'id_topic_min' => $start,
+					'id_topic_max' => $start + $increment,
+					'is_approved' => 1,
 				)
 			);
-		}
-		$db->free_result($request);
-		break;
+			while ($row = $db->fetch_assoc($request))
+			{
+				$db->query('', '
+					UPDATE {db_prefix}boards
+					SET num_posts = num_posts + {int:real_num_posts}
+					WHERE id_board = {int:id_board}',
+					array(
+						'id_board' => $row['id_board'],
+						'real_num_posts' => $row['real_num_posts'],
+					)
+				);
+			}
+			$db->free_result($request);
+			break;
 
-	case 'topics':
-		$request = $db->query('', '
-			SELECT /*!40001 SQL_NO_CACHE */ t.id_board, COUNT(*) AS real_num_topics
-			FROM {db_prefix}topics AS t
-			WHERE t.approved = {int:is_approved}
-				AND t.id_topic > {int:id_topic_min}
-				AND t.id_topic <= {int:id_topic_max}
-			GROUP BY t.id_board',
-			array(
-				'is_approved' => 1,
-				'id_topic_min' => $start,
-				'id_topic_max' => $start + $increment,
-			)
-		);
-		while ($row = $db->fetch_assoc($request))
-		{
-			$db->query('', '
-				UPDATE {db_prefix}boards
-				SET num_topics = num_topics + {int:real_num_topics}
-				WHERE id_board = {int:id_board}',
+		case 'topics':
+			$request = $db->query('', '
+				SELECT /*!40001 SQL_NO_CACHE */ t.id_board, COUNT(*) AS real_num_topics
+				FROM {db_prefix}topics AS t
+				WHERE t.approved = {int:is_approved}
+					AND t.id_topic > {int:id_topic_min}
+					AND t.id_topic <= {int:id_topic_max}
+				GROUP BY t.id_board',
 				array(
-					'id_board' => $row['id_board'],
-					'real_num_topics' => $row['real_num_topics'],
+					'is_approved' => 1,
+					'id_topic_min' => $start,
+					'id_topic_max' => $start + $increment,
 				)
 			);
-		}
-		$db->free_result($request);
-		break;
+			while ($row = $db->fetch_assoc($request))
+			{
+				$db->query('', '
+					UPDATE {db_prefix}boards
+					SET num_topics = num_topics + {int:real_num_topics}
+					WHERE id_board = {int:id_board}',
+					array(
+						'id_board' => $row['id_board'],
+						'real_num_topics' => $row['real_num_topics'],
+					)
+				);
+			}
+			$db->free_result($request);
+			break;
 
-	case 'unapproved_posts':
-		$request = $db->query('', '
-			SELECT /*!40001 SQL_NO_CACHE */ m.id_board, COUNT(*) AS real_unapproved_posts
-			FROM {db_prefix}messages AS m
-			WHERE m.id_topic > {int:id_topic_min}
-				AND m.id_topic <= {int:id_topic_max}
-				AND m.approved = {int:is_approved}
-			GROUP BY m.id_board',
-			array(
-				'id_topic_min' => $start,
-				'id_topic_max' => $start + $increment,
-				'is_approved' => 0,
-			)
-		);
-		while ($row = $db->fetch_assoc($request))
-		{
-			$db->query('', '
-				UPDATE {db_prefix}boards
-				SET unapproved_posts = unapproved_posts + {int:unapproved_posts}
-				WHERE id_board = {int:id_board}',
+		case 'unapproved_posts':
+			$request = $db->query('', '
+				SELECT /*!40001 SQL_NO_CACHE */ m.id_board, COUNT(*) AS real_unapproved_posts
+				FROM {db_prefix}messages AS m
+				WHERE m.id_topic > {int:id_topic_min}
+					AND m.id_topic <= {int:id_topic_max}
+					AND m.approved = {int:is_approved}
+				GROUP BY m.id_board',
 				array(
-					'id_board' => $row['id_board'],
-					'unapproved_posts' => $row['real_unapproved_posts'],
+					'id_topic_min' => $start,
+					'id_topic_max' => $start + $increment,
+					'is_approved' => 0,
 				)
 			);
-		}
-		$db->free_result($request);
-		break;
+			while ($row = $db->fetch_assoc($request))
+			{
+				$db->query('', '
+					UPDATE {db_prefix}boards
+					SET unapproved_posts = unapproved_posts + {int:unapproved_posts}
+					WHERE id_board = {int:id_board}',
+					array(
+						'id_board' => $row['id_board'],
+						'unapproved_posts' => $row['real_unapproved_posts'],
+					)
+				);
+			}
+			$db->free_result($request);
+			break;
 
-	case 'unapproved_topics':
-		$request = $db->query('', '
-			SELECT /*!40001 SQL_NO_CACHE */ t.id_board, COUNT(*) AS real_unapproved_topics
-			FROM {db_prefix}topics AS t
-			WHERE t.approved = {int:is_approved}
-				AND t.id_topic > {int:id_topic_min}
-				AND t.id_topic <= {int:id_topic_max}
-			GROUP BY t.id_board',
-			array(
-				'is_approved' => 0,
-				'id_topic_min' => $start,
-				'id_topic_max' => $start + $increment,
-			)
-		);
-		while ($row = $db->fetch_assoc($request))
-		{
-			$db->query('', '
-				UPDATE {db_prefix}boards
-				SET unapproved_topics = unapproved_topics + {int:real_unapproved_topics}
-				WHERE id_board = {int:id_board}',
+		case 'unapproved_topics':
+			$request = $db->query('', '
+				SELECT /*!40001 SQL_NO_CACHE */ t.id_board, COUNT(*) AS real_unapproved_topics
+				FROM {db_prefix}topics AS t
+				WHERE t.approved = {int:is_approved}
+					AND t.id_topic > {int:id_topic_min}
+					AND t.id_topic <= {int:id_topic_max}
+				GROUP BY t.id_board',
 				array(
-					'id_board' => $row['id_board'],
-					'real_unapproved_topics' => $row['real_unapproved_topics'],
+					'is_approved' => 0,
+					'id_topic_min' => $start,
+					'id_topic_max' => $start + $increment,
 				)
 			);
-		}
-		$db->free_result($request);
-		break;
+			while ($row = $db->fetch_assoc($request))
+			{
+				$db->query('', '
+					UPDATE {db_prefix}boards
+					SET unapproved_topics = unapproved_topics + {int:real_unapproved_topics}
+					WHERE id_board = {int:id_board}',
+					array(
+						'id_board' => $row['id_board'],
+						'real_unapproved_topics' => $row['real_unapproved_topics'],
+					)
+				);
+			}
+			$db->free_result($request);
+			break;
 
-	default:
-		trigger_error('updateBoardsCounter(): Invalid counter type \'' . $type . '\'', E_USER_NOTICE);
+		default:
+			trigger_error('updateBoardsCounter(): Invalid counter type \'' . $type . '\'', E_USER_NOTICE);
 	}
 }
 

@@ -260,11 +260,11 @@ class Packages_Controller extends Action_Controller
 		// Change our last link tree item for more information on this Packages area.
 		$context['linktree'][count($context['linktree']) - 1] = array(
 			'url' => $scripturl . '?action=admin;area=packages;sa=browse',
-			'name' => $this->_uninstalling  ? $txt['package_uninstall_actions'] : $txt['install_actions']
+			'name' => $this->_uninstalling ? $txt['package_uninstall_actions'] : $txt['install_actions']
 		);
 
 		// All things to make the template go round
-		$context['page_title'] .= ' - ' . ($this->_uninstalling  ? $txt['package_uninstall_actions'] : $txt['install_actions']);
+		$context['page_title'] .= ' - ' . ($this->_uninstalling ? $txt['package_uninstall_actions'] : $txt['install_actions']);
 		$context['sub_template'] = 'view_package';
 		$context['filename'] = $this->_filename;
 		$context['package_name'] = isset($packageInfo['name']) ? $packageInfo['name'] : $this->_filename;
@@ -290,7 +290,7 @@ class Packages_Controller extends Action_Controller
 			$context['ftp_needed'] = !empty($ftp_status['files']['notwritable']) && !empty($context['package_ftp']);
 		}
 
-		$context['post_url'] = $scripturl . '?action=admin;area=packages;sa=' . ($this->_uninstalling  ? 'uninstall' : 'install') . ($context['ftp_needed'] ? '' : '2') . ';package=' . $this->_filename. ';pid=' . $this->install_id;
+		$context['post_url'] = $scripturl . '?action=admin;area=packages;sa=' . ($this->_uninstalling  ? 'uninstall' : 'install') . ($context['ftp_needed'] ? '' : '2') . ';package=' . $this->_filename . ';pid=' . $this->install_id;
 		checkSubmitOnce('register');
 	}
 
@@ -319,7 +319,7 @@ class Packages_Controller extends Action_Controller
 				if (!empty($matches[3]))
 					$path .= $matches[3];
 
-				if (!$this->_uninstalling )
+				if (!$this->_uninstalling)
 					$path .= '/' . basename($action_data['filename']);
 
 				// Loop through each custom theme to note it's candidacy!
@@ -351,7 +351,7 @@ class Packages_Controller extends Action_Controller
 									'actions' => array(),
 								);
 
-							if ($this->_uninstalling )
+							if ($this->_uninstalling)
 								$context['theme_actions'][$id]['actions'][] = array(
 									'type' => $txt['package_delete'] . ' ' . ($action_data['type'] === 'require-dir' ? $txt['package_tree'] : $txt['package_file']),
 									'action' => strtr($real_path, array('\\' => '/', BOARDDIR => '.')),

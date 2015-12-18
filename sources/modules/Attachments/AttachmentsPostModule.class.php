@@ -151,7 +151,7 @@ class Attachments_Post_Module implements ElkArte\sources\modules\Module_Interfac
 					{
 						// Since, they don't belong here. Let's inform the user that they exist..
 						if (!empty($topic))
-							$delete_url = $scripturl . '?action=post' .(!empty($_REQUEST['msg']) ? (';msg=' . $_REQUEST['msg']) : '') . (!empty($_REQUEST['last_msg']) ? (';last_msg=' . $_REQUEST['last_msg']) : '') . ';topic=' . $topic . ';delete_temp';
+							$delete_url = $scripturl . '?action=post' . (!empty($_REQUEST['msg']) ? (';msg=' . $_REQUEST['msg']) : '') . (!empty($_REQUEST['last_msg']) ? (';last_msg=' . $_REQUEST['last_msg']) : '') . ';topic=' . $topic . ';delete_temp';
 						else
 							$delete_url = $scripturl . '?action=post;board=' . $board . ';delete_temp';
 
@@ -167,7 +167,7 @@ class Attachments_Post_Module implements ElkArte\sources\modules\Module_Interfac
 						if (!empty($_SESSION['temp_attachments']['post']['msg']))
 						{
 							// We have a message id, so we can link back to the old topic they were trying to edit..
-							$goback_link = '<a href="' . $scripturl . '?action=post' .(!empty($_SESSION['temp_attachments']['post']['msg']) ? (';msg=' . $_SESSION['temp_attachments']['post']['msg']) : '') . (!empty($_SESSION['temp_attachments']['post']['last_msg']) ? (';last_msg=' . $_SESSION['temp_attachments']['post']['last_msg']) : '') . ';topic=' . $_SESSION['temp_attachments']['post']['topic'] . ';additionalOptions">' . $txt['here'] . '</a>';
+							$goback_link = '<a href="' . $scripturl . '?action=post' . (!empty($_SESSION['temp_attachments']['post']['msg']) ? (';msg=' . $_SESSION['temp_attachments']['post']['msg']) : '') . (!empty($_SESSION['temp_attachments']['post']['last_msg']) ? (';last_msg=' . $_SESSION['temp_attachments']['post']['last_msg']) : '') . ';topic=' . $_SESSION['temp_attachments']['post']['topic'] . ';additionalOptions">' . $txt['here'] . '</a>';
 
 							$this->_attach_errors->addError(array('temp_attachments_found', array($delete_url, $goback_link, $file_list)));
 							$context['ignore_temp_attachments'] = true;

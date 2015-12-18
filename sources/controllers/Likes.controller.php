@@ -180,7 +180,7 @@ class Likes_Controller extends Action_Controller
 		if (!isset($this->_req->query->profile))
 			redirectexit('topic=' . $topic . '.msg' . $this->_id_liked . '#msg' . $this->_id_liked);
 		else
-			redirectexit('action=profile;area=showlikes;sa=given;u=' .$user_info['id']);
+			redirectexit('action=profile;area=showlikes;sa=given;u=' . $user_info['id']);
 	}
 
 	/**

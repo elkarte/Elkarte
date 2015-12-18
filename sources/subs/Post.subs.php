@@ -110,7 +110,7 @@ function preparsecode(&$message, $previewing = false)
 			}
 			else
 			{
-				$parts[$i] = preg_replace('~(\A|\n)/me(?: |&nbsp;)([^\n]*)(?:\z)?~i', '$1[me=' . $user_info['name'] .  ']$2[/me]', $parts[$i]);
+				$parts[$i] = preg_replace('~(\A|\n)/me(?: |&nbsp;)([^\n]*)(?:\z)?~i', '$1[me=' . $user_info['name'] . ']$2[/me]', $parts[$i]);
 				$parts[$i] = preg_replace('~(\[footnote\])/me(?: |&nbsp;)([^\n]*?)(\[\/footnote\])~i', '$1[me=' . $user_info['name'] . ']$2[/me]$3', $parts[$i]);
 			}
 
@@ -1567,7 +1567,7 @@ function getFormMsgSubject($editing, $topic, $first_subject = '', $msg_id = 0)
 		// Posting a quoted reply?
 		case 2:
 		{
-			$msg_id =  !empty($_REQUEST['quote']) ? (int) $_REQUEST['quote'] : (int) $_REQUEST['followup'];
+			$msg_id = !empty($_REQUEST['quote']) ? (int) $_REQUEST['quote'] : (int) $_REQUEST['followup'];
 
 			// Make sure they _can_ quote this post, and if so get it.
 			$request = $db->query('', '

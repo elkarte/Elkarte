@@ -731,7 +731,7 @@ function countPermissions($groups, $hidden_permissions = null)
  *
  * @return int[]
  */
-function countBoardPermissions($groups, $hidden_permissions = null , $profile_id = null)
+function countBoardPermissions($groups, $hidden_permissions = null, $profile_id = null)
 {
 	$db = database();
 
@@ -739,7 +739,7 @@ function countBoardPermissions($groups, $hidden_permissions = null , $profile_id
 		SELECT id_profile, id_group, COUNT(*) AS num_permissions, add_deny
 		FROM {db_prefix}board_permissions
 		WHERE 1 = 1'
-			. (isset($profile_id) ? ' AND id_profile = {int:current_profile}' : '' )
+			. (isset($profile_id) ? ' AND id_profile = {int:current_profile}' : '')
 			. (empty($hidden_permissions) ? '' : ' AND permission NOT IN ({array_string:hidden_permissions})') . '
 		GROUP BY ' . (isset($profile_id) ? 'id_profile, ' : '') . 'id_group, add_deny',
 		array(

@@ -448,7 +448,7 @@ function ensureUniqueProfileField($colname, $initial_colname, $unique = false)
 	$db = database();
 	// Make sure this is unique.
 	// @todo This may not be the most efficient way to do this.
-	for ($i = 0; !$unique && $i < 9; $i ++)
+	for ($i = 0; !$unique && $i < 9; $i++)
 	{
 		$request = $db->query('', '
 			SELECT id_field
@@ -784,6 +784,12 @@ function getFrontPageControllers()
 	return $config_vars;
 }
 
+/**
+ * @param GlobIterator $iterator
+ * @param string $namespace
+ *
+ * @return array
+ */
 function scanFileSystemForControllers($iterator, $namespace = '')
 {
 	global $txt;

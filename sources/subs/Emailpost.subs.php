@@ -66,7 +66,7 @@ function pbe_email_to_bbc($text, $html)
 
 		// Attempt to fix textual ('>') quotes so we also fix wrapping issues first!
 		$text = pbe_fix_email_quotes($text, ($html && !$gmail));
-		$text = str_replace(array('[quote]','[/quote]'), array('&gt;blockquote>', '&gt;/blockquote>'), $text);
+		$text = str_replace(array('[quote]', '[/quote]'), array('&gt;blockquote>', '&gt;/blockquote>'), $text);
 
 		// Convert this (markup) text to html
 		$text = preg_replace(array_keys($tags), array_values($tags), $text);
@@ -501,9 +501,9 @@ function pbe_fix_client_quotes($body)
 	// [quote] on: mon jan 12, 2004 John Smith wrote:
 	$regex[] = '~\[quote\]\s?' . $txt['email_on'] . ': \w{3} \w{3} \d{1,2}, \d{4} (.*)?' . $txt['email_wrote'] . ':\s~i';
 	// on jan 12, 2004 at 10:10 PM, John Smith wrote:   [quote]
-	$regex[] = '~' .  $txt['email_on'] . ' \w{3} \d{1,2}, \d{4}, ' . $txt['email_at'] . ' \d{1,2}:\d{1,2} [AP]M,(.*)?' . $txt['email_wrote'] . ':\s{1,4}\[quote\]~i';
+	$regex[] = '~' . $txt['email_on'] . ' \w{3} \d{1,2}, \d{4}, ' . $txt['email_at'] . ' \d{1,2}:\d{1,2} [AP]M,(.*)?' . $txt['email_wrote'] . ':\s{1,4}\[quote\]~i';
 	// on jan 12, 2004 at 10:10, John Smith wrote   [quote]
-	$regex[] = '~' .  $txt['email_on'] . ' \w{3} \d{1,2}, \d{4}, ' . $txt['email_at'] . ' \d{1,2}:\d{1,2}, (.*)?' . $txt['email_wrote'] . ':\s{1,4}\[quote\]~i';
+	$regex[] = '~' . $txt['email_on'] . ' \w{3} \d{1,2}, \d{4}, ' . $txt['email_at'] . ' \d{1,2}:\d{1,2}, (.*)?' . $txt['email_wrote'] . ':\s{1,4}\[quote\]~i';
 	// quoting: John Smith on stuffz at 10:10:23 AM
 	$regex[] = '~' . $txt['email_quotefrom'] . ': (.*) ' . $txt['email_on'] . ' .* ' . $txt['email_at'] . ' \d{1,2}:\d{1,2}:\d{1,2} [AP]M~';
 	// quoting John Smith <johnsmith@tardis.com>
@@ -859,7 +859,7 @@ function pbe_email_attachments($pbe, $email_message)
  * - Returns the board number in which the new topic must go
  *
  * @package Maillist
- * @param object $email_address
+ * @param Email_Parse $email_address
  */
 function pbe_find_board_number($email_address)
 {
