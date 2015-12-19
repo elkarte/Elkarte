@@ -28,7 +28,7 @@ function template_control_richedit($editor_id, $smileyContainer = null, $bbcCont
 
 	$editor_context = &$context['controls']['richedit'][$editor_id];
 
-	$plugins = array_filter(array('bbcode', 'splittag', (!empty($context['mentions_enabled']) ? 'mention' : '')));
+	$plugins = array_filter(array('bbcode', 'splittag', 'undo', (!empty($context['mentions_enabled']) ? 'mention' : '')));
 
 	// Allow addons to insert additional editor plugin scripts
 	if (!empty($editor_context['plugin_addons']) && is_array($editor_context['plugin_addons']))
@@ -138,7 +138,7 @@ function template_control_richedit($editor_id, $smileyContainer = null, $bbcCont
 
 		// Create the tooltag rows to display the buttons in the editor
 		foreach ($context['bbc_toolbar'] as $i => $buttonRow)
-			echo implode('', $buttonRow), '||';
+			echo $buttonRow[0], '||';
 
 		echo ',emoticon",';
 	}
