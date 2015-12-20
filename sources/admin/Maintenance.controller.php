@@ -169,8 +169,15 @@ class Maintenance_Controller extends Action_Controller
 				$subActions[$subAction]['activities'][$activity]();
 			else
 			{
-				$activity_obj = new $subActions[$subAction]['activities'][$activity]['class']();
-				$activity_obj->{$subActions[$subAction]['activities'][$activity]['method']}();
+				if (is_array($subActions[$subAction]['activities'][$activity]))
+				{
+					$activity_obj = new $subActions[$subAction]['activities'][$activity]['class']();
+					$activity_obj->{$subActions[$subAction]['activities'][$activity]['method']}();
+				}
+				else
+				{
+					$subActions[$subAction]['activities'][$activity]();
+				}
 			}
 		}
 
