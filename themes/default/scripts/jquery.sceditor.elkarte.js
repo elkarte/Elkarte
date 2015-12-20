@@ -15,7 +15,6 @@
 /**
  * Extension functions to provide ElkArte compatibility with sceditor
  */
-
 (function($) {
 	var extensionMethods = {
 		addEvent: function(id, event, func) {
@@ -185,7 +184,7 @@
  * ElkArte unique commands to add to the toolbar, when a button
  * with the same name is selected, it will trigger these definitions
  *
- * tooltip - the hover text, this is the name in the editors.xxxx.php file
+ * tooltip - the hover text, this is the name in the editors.(language).php file
  * txtExec - this is the text to insert before and after the cursor or selected text
  *           when in the plain text part of the editor
  * exec - this is called when in the wizzy part of the editor to insert text or html tags
@@ -195,11 +194,6 @@
  */
 $.sceditor.command
 	.set('space', {
-	})
-	.set('source', {
-		state: function() {
-			return true;
-		}
 	})
 	.set('spoiler', {
 		state: function() {

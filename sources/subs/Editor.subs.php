@@ -104,7 +104,7 @@ function getMessageIcons($board_id)
  *  must contain:
  *   - id => unique id for the css
  *   - value => text for the editor or blank
- *  Optionally
+ * Optionally
  *   - height => height of the initial box
  *   - width => width of the box (100%)
  *   - force_rich => force wysiwyg to be enabled
@@ -137,10 +137,6 @@ function create_control_richedit($editorOptions)
 		// Some general stuff.
 		$settings['smileys_url'] = $modSettings['smileys_url'] . '/' . $user_info['smiley_set'];
 
-		// @deprecated since 1.1
-		if (!isset($context['drafts_autosave_frequency']) && !empty($context['drafts_autosave']) && !empty($options['drafts_autosave_enabled']))
-			$context['drafts_autosave_frequency'] = empty($modSettings['drafts_autosave_frequency']) ? 30000 : $modSettings['drafts_autosave_frequency'] * 1000;
-
 		// This really has some WYSIWYG stuff.
 		loadTemplate('GenericControls');
 		loadCSSFile('jquery.sceditor.css');
@@ -148,7 +144,7 @@ function create_control_richedit($editorOptions)
 			loadCSSFile($context['theme_variant'] . '/jquery.sceditor.elk' . $context['theme_variant'] . '.css');
 
 		// JS makes the editor go round
-		loadJavascriptFile(array('jquery.sceditor.min.js', 'jquery.sceditor.bbcode.min.js', 'jquery.sceditor.elkarte.js', 'post.js', 'splittag.plugin.js', 'dropAttachments.js'));
+		loadJavascriptFile(array('jquery.sceditor.bbcode.min.js', 'jquery.sceditor.elkarte.js', 'post.js', 'splittag.plugin.js', 'undo.plugin.min.js', 'dropAttachments.js'));
 		addJavascriptVar(array(
 			'post_box_name' => $editorOptions['id'],
 			'elk_smileys_url' => $settings['smileys_url'],
@@ -225,7 +221,7 @@ function create_control_richedit($editorOptions)
 	{
 		// The below array is used to show a command button in the editor, the execution
 		// and display details of any added buttons must be defined in the javascript files
-		// see  jquery.sceditor.elkarte.js under the $.sceditor.plugins.bbcode.bbcode area
+		// see jquery.sceditor.elkarte.js under the $.sceditor.plugins.bbcode.bbcode area
 		// for examples of how to use the .set command to add codes.  Include your new
 		// JS with addInlineJavascript() or loadJavascriptFile()
 		$bbc_tags['row1'] = array(
@@ -238,6 +234,7 @@ function create_control_richedit($editorOptions)
 			array('bulletlist', 'orderedlist', 'horizontalrule'),
 			array('spoiler', 'footnote', 'splittag'),
 			array('image', 'link', 'email'),
+			array('undo', 'redo'),
 		);
 
 		// Allow mods to add BBC buttons to the toolbar, actions are defined in the JS
@@ -290,7 +287,7 @@ function create_control_richedit($editorOptions)
 				}
 
 				// If the row is not empty, and the last added tag is not a space, add a space.
-				if (!empty($tagsRow) && $tagsRow[count($tagsRow) - 1] != 'space')
+				if (!empty($tagsRow) && $tagsRow[count($tagsRow) - 1] !== 'space')
 					$tagsRow[] = 'space';
 			}
 
@@ -408,7 +405,7 @@ function create_control_richedit($editorOptions)
 				'isLast' => true,
 			);
 		}
-		elseif ($user_info['smiley_set'] != 'none')
+		elseif ($user_info['smiley_set'] !== 'none')
 		{
 			if (($temp = cache_get_data('posting_smileys', 480)) == null)
 			{
@@ -443,7 +440,6 @@ function create_control_richedit($editorOptions)
 						$context['smileys'][$section][$last_row]['isLast'] = true;
 				}
 
-
 				cache_put_data('posting_smileys', $context['smileys'], 480);
 			}
 			else
@@ -452,7 +448,6 @@ function create_control_richedit($editorOptions)
 			// The smiley popup may take advantage of Jquery UI ....
 			if (!empty($context['smileys']['popup']))
 				$modSettings['jquery_include_ui'] = true;
-
 		}
 	}
 

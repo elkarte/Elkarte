@@ -361,10 +361,11 @@
 
 		/**
 		 * Informs the autosave function that some activity has occurred in the
-		 * editor window since the last save ... activity being any keypress
-		 * in the editor which we assume means they changed it
+		 * editor window since the last save ... activity being triggered whenever
+		 * the editor loses focus, something is pasted/inserted and when the user
+		 * stops typing for 1.5s or the press space/return
 		 */
-		base.signalKeydownEvent = function(oEvent) {
+		base.signalValuechangedEvent = function(oEvent) {
 			// Prevent autosave when using the tab key to navigate to the submit buttons
 			if (oEvent.keyCode === 9)
 				oDrafts.opts._bInDraftMode = true;
