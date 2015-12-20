@@ -233,8 +233,6 @@ function list_count_filter_parser($id, $style)
 {
 	$db = database();
 
-	$total = 0;
-
 	// Get the total filter count, needed for pages
 	$request = $db->query('', '
 		SELECT

@@ -216,7 +216,7 @@ function template_html_above()
  */
 function template_body_above()
 {
-	global $context, $settings, $scripturl, $txt, $modSettings;
+	global $context, $settings, $scripturl, $txt;
 
 	// Go to top/bottom of page links and skipnav link for a11y.
 	echo '

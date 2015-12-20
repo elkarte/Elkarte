@@ -188,7 +188,7 @@ class Register_Controller extends Action_Controller
 		if (!empty($_SESSION['openid']['verified']) && !empty($_SESSION['openid']['openid_uri']) && !empty($_SESSION['openid']['nickname']))
 		{
 			$context['openid'] = $_SESSION['openid']['openid_uri'];
-			$context['username'] =  $this->_req->getPost('user', 'Util::htmlspecialchars', $_SESSION['openid']['nickname']);
+			$context['username'] = $this->_req->getPost('user', 'Util::htmlspecialchars', $_SESSION['openid']['nickname']);
 			$context['email'] = $this->_req->getPost('email', 'Util::htmlspecialchars', $_SESSION['openid']['email']);
 		}
 		// See whether we have some pre filled values.

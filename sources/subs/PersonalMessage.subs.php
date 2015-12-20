@@ -955,7 +955,7 @@ function loadPMs($pm_options, $id_member)
 					INNER JOIN {db_prefix}pm_recipients AS pmr ON (pmr.id_pm = pm.id_pm
 						AND pmr.id_member = {int:current_member}
 						AND pmr.deleted = {int:not_deleted}
-						' . $pm_options['label_query'] . ')') . ($pm_options['sort_by'] == 'name' ? ( '
+						' . $pm_options['label_query'] . ')') . ($pm_options['sort_by'] == 'name' ? ('
 					LEFT JOIN {db_prefix}members AS mem ON (mem.id_member = {raw:id_member})') : '') . '
 				WHERE ' . ($pm_options['folder'] == 'sent' ? 'pm.id_member_from = {int:current_member}
 					AND pm.deleted_by_sender = {int:not_deleted}' : '1=1') . (empty($pm_options['pmsg']) ? '' : '
@@ -985,7 +985,7 @@ function loadPMs($pm_options, $id_member)
 					INNER JOIN {db_prefix}pm_recipients AS pmr ON (pmr.id_pm = pm.id_pm
 						AND pmr.id_member = {int:current_member}
 						AND pmr.deleted = {int:not_deleted}
-						' . $pm_options['label_query'] . ')') . ($pm_options['sort_by'] == 'name' ? ( '
+						' . $pm_options['label_query'] . ')') . ($pm_options['sort_by'] == 'name' ? ('
 					LEFT JOIN {db_prefix}members AS mem ON (mem.id_member = {raw:id_member})') : '') . '
 				WHERE ' . (empty($sub_pms) ? '0=1' : 'pm.id_pm IN ({array_int:pm_list})') . '
 				ORDER BY ' . ($pm_options['sort_by_query'] == 'pm.id_pm' && $pm_options['folder'] != 'sent' ? 'id_pm' : '{raw:sort}') . ($pm_options['descending'] ? ' DESC' : ' ASC') . (empty($pm_options['pmsg']) ? '
@@ -1010,7 +1010,7 @@ function loadPMs($pm_options, $id_member)
 					INNER JOIN {db_prefix}pm_recipients AS pmr ON (pmr.id_pm = pm.id_pm
 						AND pmr.id_member = {int:current_member}
 						AND pmr.deleted = {int:deleted_by}
-						' . $pm_options['label_query'] . ')') . ($pm_options['sort_by'] == 'name' ? ( '
+						' . $pm_options['label_query'] . ')') . ($pm_options['sort_by'] == 'name' ? ('
 					LEFT JOIN {db_prefix}members AS mem ON (mem.id_member = {raw:pm_member})') : '') . '
 				WHERE ' . ($pm_options['folder'] == 'sent' ? 'pm.id_member_from = {int:current_member}
 					AND pm.deleted_by_sender = {int:deleted_by}' : '1=1') . (empty($pm_options['pmsg']) ? '' : '
@@ -1040,7 +1040,7 @@ function loadPMs($pm_options, $id_member)
 				INNER JOIN {db_prefix}pm_recipients AS pmr ON (pmr.id_pm = pm.id_pm
 					AND pmr.id_member = {int:current_member}
 					AND pmr.deleted = {int:is_deleted}
-					' . $pm_options['label_query'] . ')') . ($pm_options['sort_by'] == 'name' ? ( '
+					' . $pm_options['label_query'] . ')') . ($pm_options['sort_by'] == 'name' ? ('
 				LEFT JOIN {db_prefix}members AS mem ON (mem.id_member = {raw:pm_member})') : '') . '
 			WHERE ' . ($pm_options['folder'] == 'sent' ? 'pm.id_member_from = {raw:current_member}
 				AND pm.deleted_by_sender = {int:is_deleted}' : '1=1') . (empty($pm_options['pmsg']) ? '' : '

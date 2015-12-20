@@ -813,7 +813,7 @@ function validateNotificationAccess($row, $maillist, &$email_perm = true)
 	static $board_profile = array();
 
 	$allowed = explode(',', $row['member_groups']);
-	$row['additional_groups'] = !empty( $row['additional_groups']) ? explode(',', $row['additional_groups']) : array();
+	$row['additional_groups'] = !empty($row['additional_groups']) ? explode(',', $row['additional_groups']) : array();
 	$row['additional_groups'][] = $row['id_group'];
 	$row['additional_groups'][] = $row['id_post_group'];
 

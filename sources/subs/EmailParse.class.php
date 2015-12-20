@@ -533,7 +533,7 @@ class Email_Parse
 							$dsn_body = array();
 							foreach (explode("\n", str_replace("\r\n", "\n", $this->_boundary_section[$i]->body)) as $l)
 							{
-								$field = $type = $val = "";
+								$type = $val = "";
 								list($field, $rest) = explode(':', $l);
 
 								if (strpos($l, ';'))
@@ -792,13 +792,13 @@ class Email_Parse
 	 * Checks the message components to determine if the message is a DSN
 	 *
 	 * What it does:
-	 * 	Checks the content of the message, looking for headers and values that
-	 * 	correlate with the message being a DSN. _parse_body checks for the existence
-	 * 	of a "message/delivery-status" header
-	 * 	As many, many daemons and providers do not adhere to the RFC 3464
-	 *	standard, this function will hold the "special cases"
+	 * - Checks the content of the message, looking for headers and values that
+	 * correlate with the message being a DSN. _parse_body checks for the existence
+	 * of a "message/delivery-status" header
+	 * - As many, many daemons and providers do not adhere to the RFC 3464
+	 * standard, this function will hold the "special cases"
 	 *
-	 * @return boolean
+	 * @return boolean|null
 	 */
 	private function _check_dsn()
 	{
@@ -1028,7 +1028,7 @@ class Email_Parse
 	/**
 	 * Validates that the ip is a valid ip4 address
 	 *
-	 * @param string $string
+	 * @param string|null $string
 	 * @return array
 	 */
 	private function _parse_ip($string)

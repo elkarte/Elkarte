@@ -103,7 +103,7 @@ function validateSession($type = 'admin')
 		}
 
 		// Posting the password... check it.
-		if (isset($_POST[$type. '_pass']) && str_replace('*', '', $_POST[$type. '_pass']) !== '')
+		if (isset($_POST[$type . '_pass']) && str_replace('*', '', $_POST[$type. '_pass']) !== '')
 		{
 			// Give integrated systems a chance to verify this password
 			$good_password = in_array(true, call_integration_hook('integrate_verify_password', array($user_info['username'], $_POST[$type . '_pass'], false)), true);
@@ -1592,7 +1592,7 @@ function securityOptionsHeader($override = null)
  */
 function stop_prefetching()
 {
-	if  (isset($_SERVER["HTTP_X_PURPOSE"]) && in_array($_SERVER["HTTP_X_PURPOSE"], array("preview", "instant"))
+	if (isset($_SERVER["HTTP_X_PURPOSE"]) && in_array($_SERVER["HTTP_X_PURPOSE"], array("preview", "instant"))
 		|| (isset($_SERVER['HTTP_X_MOZ']) && $_SERVER['HTTP_X_MOZ'] === "prefetch"))
 	{
 		@ob_end_clean();

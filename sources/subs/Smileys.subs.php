@@ -405,7 +405,7 @@ function logPackageInstall($param)
 		'{db_prefix}log_packages',
 		array(
 			'filename' => 'string', 'name' => 'string', 'package_id' => 'string', 'version' => 'string',
-			'id_member_installed' => 'int', 'member_installed' => 'string','time_installed' => 'int',
+			'id_member_installed' => 'int', 'member_installed' => 'string', 'time_installed' => 'int',
 			'install_state' => 'int', 'failed_steps' => 'string', 'themes_installed' => 'string',
 			'member_removed' => 'int', 'db_changes' => 'string', 'credits' => 'string',
 		),

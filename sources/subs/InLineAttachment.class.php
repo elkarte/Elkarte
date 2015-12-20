@@ -355,7 +355,6 @@ class In_Line_Attachment
 				for ($i = $start; $i <= $end; $i++)
 				{
 					// Search the link to get the msg_id
-					$quoted_msg_id = '';
 					$href_temp = array();
 					if (preg_match('~<a href="(?:.*)#(.*?)">~i', $links[$which_link][0], $href_temp) == 1)
 						$quoted_msg_id = $href_temp[1];
@@ -368,7 +367,7 @@ class In_Line_Attachment
 					if (!empty($quoted_msg_id))
 					{
 						if (!isset($context['current_topic']))
-							list($quote_topic, ) = $this->_ila_get_topic(str_replace('msg', '', $quoted_msg_id));
+							list($quote_topic,) = $this->_ila_get_topic(str_replace('msg', '', $quoted_msg_id));
 						else
 							$quote_topic = $context['current_topic'];
 
@@ -679,8 +678,6 @@ class In_Line_Attachment
 	 *
 	 * - Loads attachments for a given msg if they have not yet been loaded
 	 * - Attachments must be enabled and user allowed to see attachments
-	 *
-	 * @param int $msg_id
 	 */
 	private function ila_load_attachments()
 	{

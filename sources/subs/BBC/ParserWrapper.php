@@ -30,12 +30,15 @@ class ParserWrapper
 	protected $html_parser;
 	/** @var  \BBC\Autolink */
 	protected $autolink_parser;
-
+	/** @var bool If smileys are enabled */
 	protected $smileys_enabled = true;
-
+	/** @var ParserWrapper */
 	public static $instance;
 
 	/**
+	 * Find and return ParserWrapper instance if it exists,
+	 * or create a new instance
+	 *
 	 * @return ParserWrapper
 	 */
 	public static function getInstance()
@@ -48,6 +51,9 @@ class ParserWrapper
 		return self::$instance;
 	}
 
+	/**
+	 * ParserWrapper constructor.
+	 */
 	private function __construct()
 	{
 
@@ -84,6 +90,8 @@ class ParserWrapper
 	}
 
 	/**
+	 * Enable or disable smileys
+	 *
 	 * @param bool $toggle
 	 * @return $this
 	 */
@@ -124,14 +132,18 @@ class ParserWrapper
 	}
 
 	/**
+	 * Return the current message parsers
+	 *
 	 * @return array
 	 */
-	public function getMessageParsers()
+	public function getMessageParser()
 	{
 		return $this->getParsersByArea('message');
 	}
 
 	/**
+	 * Return the current signature parsers
+	 *
 	 * @return array
 	 */
 	public function getSignatureParser()
@@ -140,6 +152,8 @@ class ParserWrapper
 	}
 
 	/**
+	 * Return the news parsers
+	 *
 	 * @return array
 	 */
 	public function getNewsParser()
@@ -221,16 +235,17 @@ class ParserWrapper
 	/**
 	 * Parse the BBC and smileys in emails
 	 *
-	 * @param string $message
+	 * @param string $email
 	 * @return string
 	 */
-	public function parseEmail($message)
+	public function parseEmail($email)
 	{
-		return $this->enableSmileys(false)->parse('email', $message);
+		return $this->enableSmileys(false)->parse('email', $email);
 	}
 
 	/**
 	 * Parse the BBC and smileys in custom profile fields
+	 *
 	 * @param string $field
 	 * @return string
 	 */
@@ -244,12 +259,12 @@ class ParserWrapper
 	/**
 	 * Parse the BBC and smileys in poll questions/answers
 	 *
-	 * @param string $field
+	 * @param string $poll
 	 * @return string
 	 */
-	public function parsePoll($field)
+	public function parsePoll($poll)
 	{
-		return $this->enableSmileys(true)->parse('poll', $field);
+		return $this->enableSmileys(true)->parse('poll', $poll);
 	}
 
 	/**
@@ -266,12 +281,12 @@ class ParserWrapper
 	/**
 	 * Parse the BBC and smileys in personal messages
 	 *
-	 * @param string $message
+	 * @param string $pm
 	 * @return string
 	 */
-	public function parsePM($message)
+	public function parsePM($pm)
 	{
-		return $this->enableSmileys(true)->parse('pm', $message);
+		return $this->enableSmileys(true)->parse('pm', $pm);
 	}
 
 	/**
@@ -288,12 +303,12 @@ class ParserWrapper
 	/**
 	 * Parse the BBC and smileys in package descriptions
 	 *
-	 * @param string $report
+	 * @param string $package
 	 * @return string
 	 */
-	public function parsePackage($string)
+	public function parsePackage($package)
 	{
-		return $this->enableSmileys(true)->parse('package', $string);
+		return $this->enableSmileys(true)->parse('package', $package);
 	}
 
 	/**
@@ -331,8 +346,8 @@ class ParserWrapper
 
 	/**
 	 * Set the disabled tags
-	 * (usually from $modSettings['disabledBBC'])
-	 * @param array $disabled
+	 *
+	 * @param string[] $disabled (usually from $modSettings['disabledBBC'])
 	 * @return $this
 	 */
 	public function setDisabled(array $disabled)
@@ -346,6 +361,8 @@ class ParserWrapper
 	}
 
 	/**
+	 * Return the bbc code definitions for the parser
+	 *
 	 * @return Codes
 	 */
 	public function getCodes()
@@ -354,39 +371,45 @@ class ParserWrapper
 		{
 			$additional_bbc = array();
 			call_integration_hook('integrate_additional_bbc', array(&$additional_bbc));
-			$this->codes = new \BBC\Codes($additional_bbc, $this->disabled);
+			$this->codes = new Codes($additional_bbc, $this->disabled);
 		}
 
 		return $this->codes;
 	}
 
 	/**
+	 * Return an instance of the bbc parser
+	 *
 	 * @return BBCParser
 	 */
 	public function getBBCParser()
 	{
 		if ($this->bbc_parser === null)
 		{
-			$this->bbc_parser = new \BBC\BBCParser($this->getCodes(), $this->getAutolinkParser());
+			$this->bbc_parser = new BBCParser($this->getCodes(), $this->getAutolinkParser());
 		}
 
 		return $this->bbc_parser;
 	}
 
 	/**
+	 * Return an, that's right not and, just an, like a single instance of the autolink parser
+	 *
 	 * @return Autolink
 	 */
 	public function getAutolinkParser()
 	{
 		if ($this->autolink_parser === null)
 		{
-			$this->autolink_parser = new \BBC\Autolink($this->getCodes());
+			$this->autolink_parser = new Autolink($this->getCodes());
 		}
 
 		return $this->autolink_parser;
 	}
 
 	/**
+	 * Return an, that's right not and, just an, like a single instance of the Smiley parser
+	 *
 	 * @return SmileyParser
 	 */
 	public function getSmileyParser()
@@ -396,7 +419,7 @@ class ParserWrapper
 		if ($this->smiley_parser === null)
 		{
 			$path = $modSettings['smileys_url'] . '/' . $user_info['smiley_set'] . '/';
-			$this->smiley_parser = new \BBC\SmileyParser($path);
+			$this->smiley_parser = new SmileyParser($path);
 			$this->smiley_parser->setEnabled($GLOBALS['user_info']['smiley_set'] !== 'none');
 		}
 
@@ -404,13 +427,15 @@ class ParserWrapper
 	}
 
 	/**
+	 * Return an, that's right not and, just an, like a single instance of the HTML parser
+	 *
 	 * @return HtmlParser
 	 */
 	public function getHtmlParser()
 	{
 		if ($this->html_parser === null)
 		{
-			$this->html_parser = new \BBC\HtmlParser;
+			$this->html_parser = new HtmlParser;
 		}
 
 		return $this->html_parser;

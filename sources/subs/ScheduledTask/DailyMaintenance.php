@@ -23,8 +23,9 @@ if (!defined('ELK'))
 	die('No access...');
 
 /**
- * This function does daily cleaning up:
+ * Class Daily_Maintenance - This function does daily cleaning up:
  *
+ * What it does:
  * - decrements warning levels if it's enabled
  * - consolidate spider statistics
  * - fix MySQL version
@@ -35,6 +36,10 @@ if (!defined('ELK'))
  */
 class Daily_Maintenance implements Scheduled_Task_Interface
 {
+	/**
+	 * Our only method, runs the show
+	 * @return bool
+	 */
 	public function run()
 	{
 		global $modSettings;
@@ -45,7 +50,7 @@ class Daily_Maintenance implements Scheduled_Task_Interface
 		clean_cache('data');
 
 		// If warning decrement is enabled and we have people who have not had a new warning in 24 hours, lower their warning level.
-		list (, , $modSettings['warning_decrement']) = explode(',', $modSettings['warning_settings']);
+		list (,, $modSettings['warning_decrement']) = explode(',', $modSettings['warning_settings']);
 		if ($modSettings['warning_decrement'])
 		{
 			// Find every member who has a warning level...

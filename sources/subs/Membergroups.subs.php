@@ -2083,7 +2083,7 @@ function getUnassignableGroups($ignore_protected)
 
 function getGroupsList()
 {
-	global $context, $txt;
+	global $txt;
 
 	loadLanguage('Profile');
 

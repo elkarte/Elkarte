@@ -72,7 +72,7 @@ class Html_2_Md
 		$html = preg_replace('/(?:(?<=\>)|(?<=\/\>))(\s+)(?=\<\/?)/', '', $html);
 
 		// The XML parser will not fix these for us
-		$html = strtr($html, array('?<' => '?&LT;', '?>' => '?&GT;') );
+		$html = strtr($html, array('?<' => '?&LT;', '?>' => '?&GT;'));
 
 		// Using PHP built in functions ...
 		if (class_exists('DOMDocument'))

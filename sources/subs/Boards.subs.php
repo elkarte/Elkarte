@@ -522,7 +522,7 @@ function createBoard($boardOptions)
 		'member_groups' => 'string', 'redirect' => 'string',
 	);
 	$board_parameters = array(
-		$boardOptions['target_category'], $boardOptions['board_name'] , '', 0,
+		$boardOptions['target_category'], $boardOptions['board_name'], '', 0,
 		'-1,0', '',
 	);
 
@@ -1613,8 +1613,6 @@ function allBoardModerators($only_id = false)
 function boardsModerated($id_member)
 {
 	$db = database();
-
-	$boards = array();
 
 	return $db->fetchQueryCallback('
 		SELECT id_board

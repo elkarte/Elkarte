@@ -558,7 +558,7 @@ function dbMostLikedMessage($limit = 10)
 		censorText($row['subject']);
 		censorText($row['body']);
 
-		$row['body'] = $bbc_wrapper->parseMessage($row['body'], $row['smileys_enabled']);
+		$row['body'] = $bbc_parser->parseMessage($row['body'], $row['smileys_enabled']);
 
 		// Something short and sweet
 		$msgString = Util::shorten_html($row['body'], 255);
@@ -652,7 +652,7 @@ function dbMostLikedMessagesByTopic($topic, $limit = 5)
 			censorText($row['body']);
 			censorText($row['subject']);
 
-			$row['body'] = $bbc_wrapper->parseMessage($row['body'], $row['smileys_enabled']);
+			$row['body'] = $bbc_parser->parseMessage($row['body'], $row['smileys_enabled']);
 
 			// Something short to show is all that's needed
 			$msgString = Util::shorten_html($row['body'], 255);
@@ -733,7 +733,7 @@ function dbMostLikedTopic($board = null, $limit = 10)
 	$mostLikedTopics = array_slice($mostLikedTopics, 0, $limit);
 
 	// Fetch some sample posts for each of the top X topics
-	foreach($mostLikedTopics as $key => $topic)
+	foreach ($mostLikedTopics as $key => $topic)
 	{
 		$mostLikedTopics[$key]['msg_data'] = dbMostLikedMessagesByTopic($topic['id_topic']);
 	}
@@ -916,7 +916,7 @@ function dbMostLikedPostsByUser($id_member, $limit = 10)
 			censorText($row['body']);
 			censorText($row['subject']);
 
-			$row['body'] = $bbc_wrapper->parseMessage($row['body'], $row['smileys_enabled']);
+			$row['body'] = $bbc_parser->parseMessage($row['body'], $row['smileys_enabled']);
 
 			// Something short to show is all that's needed
 			$msgString = Util::shorten_html($row['body'], 255);
@@ -1005,6 +1005,7 @@ function dbMostLikesGivenUser($limit = 10)
  *
  * @param int $id_liker the userid to find recently liked posts
  * @param int $limit number of recently liked posts to fetch
+ * @return array
  */
 function dbRecentlyLikedPostsGivenUser($id_liker, $limit = 5)
 {
@@ -1012,9 +1013,10 @@ function dbRecentlyLikedPostsGivenUser($id_liker, $limit = 5)
 	$bbc_parser = \BBC\ParserWrapper::getInstance();
 
 	// Lets fetch the latest liked posts by this user
-	$mostLikeGivingMember['topic_data'] = $db->fetchQueryCallback('
-		SELECT m.id_msg, m.id_topic, m.subject, m.body, m.poster_time, m.smileys_enabled
-		FROM {db_prefix}messages AS m
+	return $db->fetchQueryCallback('
+		SELECT
+			m.id_msg, m.id_topic, m.subject, m.body, m.poster_time, m.smileys_enabled
+		FROM {db_prefix}message_likes AS ml
 			INNER JOIN {db_prefix}messages AS m ON (ml.id_msg = m.id_msg)
 			INNER JOIN {db_prefix}boards AS b ON (b.id_board = m.id_board)
 		WHERE {query_wanna_see_board}
@@ -1031,7 +1033,7 @@ function dbRecentlyLikedPostsGivenUser($id_liker, $limit = 5)
 			censorText($row['body']);
 			censorText($row['subject']);
 
-			$row['body'] = $bbc_wrapper->parseMessage($row['body'], $row['smileys_enabled']);
+			$row['body'] = $bbc_parser->parseMessage($row['body'], $row['smileys_enabled']);
 
 			// Something short to show is all that's required
 			$msgString = Util::shorten_html($row['body'], 255);

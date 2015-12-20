@@ -405,7 +405,7 @@ class ManageAttachments_Controller extends Action_Controller
 			'items_per_page' => $modSettings['defaultMaxMessages'],
 			'base_href' => $scripturl . '?action=admin;area=manageattachments;sa=browse' . ($context['browse_type'] === 'avatars' ? ';avatars' : ($context['browse_type'] === 'thumbs' ? ';thumbs' : '')),
 			'default_sort_col' => 'name',
-			'no_items_label' => $txt['attachment_manager_' . ($context['browse_type'] === 'avatars' ? 'avatars' : ( $context['browse_type'] === 'thumbs' ? 'thumbs' : 'attachments')) . '_no_entries'],
+			'no_items_label' => $txt['attachment_manager_' . ($context['browse_type'] === 'avatars' ? 'avatars' : ($context['browse_type'] === 'thumbs' ? 'thumbs' : 'attachments')) . '_no_entries'],
 			'get_items' => array(
 				'function' => 'list_getFiles',
 				'params' => array(
@@ -847,7 +847,7 @@ class ManageAttachments_Controller extends Action_Controller
 				if (empty($this->_req->post->to_fix))
 					redirectexit('action=admin;area=manageattachments;sa=maintenance');
 
-				foreach($this->_req->post->to_fix as $key => $value)
+				foreach ($this->_req->post->to_fix as $key => $value)
 					$_SESSION['attachments_to_fix'][] = $value;
 			}
 		}
@@ -920,7 +920,7 @@ class ManageAttachments_Controller extends Action_Controller
 			{
 				$repair_errors = repairAttachmentData($this->substep, $fix_errors, $to_fix);
 
-				foreach($repair_errors as $key => $value)
+				foreach ($repair_errors as $key => $value)
 					$context['repair_errors'][$key] += $value;
 
 				$this->_pauseAttachmentMaintenance($to_fix, $thumbnails);

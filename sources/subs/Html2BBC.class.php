@@ -598,7 +598,7 @@ class Html_2_BBC
 			$blocks[0] = '[size=' . $size . ']' . $blocks[0] . '[/size]';
 		}
 		if (!empty($face))
-			$blocks[0]  = '[font=' . strtolower($face). ']' . $blocks[0] . '[/font]';
+			$blocks[0]  = '[font=' . strtolower($face) . ']' . $blocks[0] . '[/font]';
 		if (!empty($color))
 			$blocks[0]  = '[color=' . strtolower($color) . ']' . $blocks[0] . '[/color]';
 

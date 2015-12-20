@@ -451,7 +451,7 @@ class Xml_Array
 			if ((!isset($match[3]) || trim($match[3]) != '/') && (!isset($match[2]) || trim($match[2]) != '/'))
 			{
 				// Because PHP 5.2.0+ seems to croak using regex, we'll have to do this the less fun way.
-				$last_tag_end = strpos($data, '</' . $match[1]. '>');
+				$last_tag_end = strpos($data, '</' . $match[1] . '>');
 				if ($last_tag_end === false)
 					continue;
 
@@ -466,7 +466,7 @@ class Xml_Array
 						break;
 
 					// If not then find the next ending tag.
-					$next_tag_end = strpos($data, '</' . $match[1]. '>', $offset);
+					$next_tag_end = strpos($data, '</' . $match[1] . '>', $offset);
 
 					// Didn't find one? Then just use the last and sod it.
 					if ($next_tag_end === false)
@@ -482,7 +482,7 @@ class Xml_Array
 				$inner_match = substr($data, 0, $last_tag_end);
 
 				// Data now starts from where this section ends.
-				$data = substr($data, $last_tag_end + strlen('</' . $match[1]. '>'));
+				$data = substr($data, $last_tag_end + strlen('</' . $match[1] . '>'));
 
 				if (!empty($inner_match))
 				{

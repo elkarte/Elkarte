@@ -79,6 +79,7 @@ class Quotedmem_Mention extends Mention_BoardAccess_Abstract
 	 *
 	 * @param string $text The message body
 	 * @param int $msg_id The message id of the post containing the quote
+	 * @param string $status
 	 * @param mixed[] $posterOptions
 	 */
 	protected function _sendNotification($text, $msg_id, $status, $posterOptions)

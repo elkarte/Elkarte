@@ -1468,7 +1468,6 @@ function findForumErrors($do_fix = false)
 				array(
 				)
 			);
-			$needs_fix = false;
 
 			// Does it need a fix?
 			if (!empty($test['check_type']) && $test['check_type'] == 'count')

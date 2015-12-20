@@ -301,8 +301,8 @@
 						// err.data = oTxt.error_occurred + ' : ' + errorThrown;
 						// handleError(err);
 						if ('console' in window) {
-							window.console.info('fail');
-							window.console.info(err, textStatus, errorThrown);
+							window.console.info('fail:', textStatus, errorThrown.name);
+							window.console.info(err.responseText);
 						}
 					});
 			},

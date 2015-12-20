@@ -112,7 +112,7 @@ function excludeBannedMembers()
 		$request = $db->query('', '
 			SELECT id_member
 			FROM {db_prefix}members
-			WHERE email_address IN(' . implode(', ', $condition_array) .')',
+			WHERE email_address IN(' . implode(', ', $condition_array) . ')',
 			$condition_array_params
 		);
 		while ($row = $db->fetch_assoc($request))

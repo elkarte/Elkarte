@@ -116,7 +116,7 @@ class Xml_Controller extends Action_Controller
 				$icons[] = array(
 					'value' => $file->getFilename(),
 					'name' => '',
-					'url' => $settings['images_url'] . '/group_icons/' .  $file->getFilename(),
+					'url' => $settings['images_url'] . '/group_icons/' . $file->getFilename(),
 					'is_last' => false,
 				);
 			}

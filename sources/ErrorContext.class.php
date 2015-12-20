@@ -71,7 +71,7 @@ class Error_Context
 	 * @param string $id the error identifier
 	 * @param int|null $default_severity the default error severity level
 	 */
-	private function __construct ($id = 'default', $default_severity = null)
+	private function __construct($id = 'default', $default_severity = null)
 	{
 		if (!empty($id))
 			$this->_name = $id;

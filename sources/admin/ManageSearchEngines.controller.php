@@ -35,10 +35,10 @@ class ManageSearchEngines_Controller extends Action_Controller
 	protected $_engineSettings;
 
 	/**
-	* Entry point for this section.
-	*
-	* @see Action_Controller::action_index()
-	*/
+	 * Entry point for this section.
+	 *
+	 * @see Action_Controller::action_index()
+	 */
 	public function action_index()
 	{
 		global $context, $txt;

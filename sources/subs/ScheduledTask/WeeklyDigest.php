@@ -17,6 +17,7 @@ if (!defined('ELK'))
 	die('No access...');
 
 /**
+ * Class Weekly_Digest
  * Sends out email notifications for new/updated topics.
  *
  * - Like the daily stuff - just seven times less regular ;)

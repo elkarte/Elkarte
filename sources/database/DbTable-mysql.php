@@ -660,7 +660,7 @@ class DbTable_MySQL extends DbTable
 	 * Static method that allows to retrieve or create an instance of this class.
 	 *
 	 * @param object $db - A Database_MySQL object
-	 * @return object - A DbTable_MySQL object
+	 * @return DbTable_MySQL - A DbTable_MySQL object
 	 */
 	public static function db_table($db)
 	{

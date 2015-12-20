@@ -137,7 +137,7 @@ class Sphinxql_Search extends SearchAPI
 	 *
 	 * @param string $a Word A
 	 * @param string $b Word B
-	 * @return An integer indicating how the words should be sorted (-1, 0 1)
+	 * @return integer indicating how the words should be sorted (-1, 0 1)
 	 */
 	public function searchSort($a, $b)
 	{

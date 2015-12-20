@@ -129,7 +129,7 @@ class RemoveTopic_Controller extends Action_Controller
 	 */
 	public function action_deletemsg()
 	{
-		global $user_info, $topic, $modSettings;
+		global $topic, $modSettings;
 
 		checkSession('get');
 

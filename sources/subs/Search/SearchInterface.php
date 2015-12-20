@@ -13,6 +13,11 @@
 
 namespace ElkArte\Search;
 
+/**
+ * Interface Search_Interface
+ *
+ * @package Search
+ */
 interface Search_Interface
 {
 

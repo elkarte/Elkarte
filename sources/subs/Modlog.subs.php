@@ -403,7 +403,7 @@ function recentlyLogged($action, $time = 60)
 {
 	$db = database();
 
-	$request = $db->query('','
+	$request = $db->query('', '
 		SELECT COUNT(*)
 		FROM {db_prefix}log_actions
 		WHERE action = {string:action}

@@ -836,5 +836,5 @@ class Settings_Form
 		}
 
 		return false;
-    }
+	}
 }

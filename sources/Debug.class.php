@@ -255,7 +255,7 @@ class Debug
 
 		if (!empty($this->_rusage))
 		{
-			$this->_system['script_cpu_load'] = ($this->_rusage['end']['ru_utime.tv_sec'] - $this->_rusage['start']['ru_utime.tv_sec'] + ($this->_rusage['end']['ru_utime.tv_usec'] / 1000000))  . ' / ' . ($this->_rusage['end']['ru_stime.tv_sec'] - $this->_rusage['start']['ru_stime.tv_sec'] + ($this->_rusage['end']['ru_stime.tv_usec'] / 1000000));
+			$this->_system['script_cpu_load'] = ($this->_rusage['end']['ru_utime.tv_sec'] - $this->_rusage['start']['ru_utime.tv_sec'] + ($this->_rusage['end']['ru_utime.tv_usec'] / 1000000)) . ' / ' . ($this->_rusage['end']['ru_stime.tv_sec'] - $this->_rusage['start']['ru_stime.tv_sec'] + ($this->_rusage['end']['ru_stime.tv_usec'] / 1000000));
 		}
 
 		$this->_system['browser'] = $context['browser_body_id'] . ' <em>(' . implode('</em>, <em>', array_reverse(array_keys($context['browser'], true))) . ')</em>';
@@ -293,8 +293,10 @@ class Debug
 
 		foreach ($this->_debugs as $key => $value)
 		{
+			$value = array_map('htmlentities', $value);
 			if (in_array($key, $expandable))
 			{
+				$key = htmlentities($key, ENT_QUOTES);
 				$expand_id[] = 'debug_' . $key;
 				$pre = ' (<a id="debug_' . $key . '" href="#">' . $txt['debug_show'] . '</a><span class="hide">';
 				$post = '</span>)';
@@ -304,6 +306,7 @@ class Debug
 				$pre = '';
 				$post = '';
 			}
+
 			echo '
 				', $txt['debug_' . $key], count($value), ' - ' . $pre . '<em>', implode('</em>, <em>', $value), '</em>.' . $post . '<br />';
 		}
@@ -435,7 +438,7 @@ class Debug
 	public static function get()
 	{
 		if (self::$_instance === null)
-			self::$_instance = New Debug();
+			self::$_instance = new Debug();
 
 		return self::$_instance;
 	}

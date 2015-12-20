@@ -23,7 +23,7 @@ if (!defined('ELK'))
 	die('No access...');
 
 /**
- * Perform the standard checks on expiring/near expiring subscriptions:
+ * Class Paid_Subscriptions - Perform the standard checks on expiring/near expiring subscriptions:
  *
  * - remove expired subscriptions
  * - notify of subscriptions about to expire

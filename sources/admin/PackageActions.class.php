@@ -784,7 +784,7 @@ class Package_Actions extends Action_Controller
 		if ($this->_action['type'] == 'code' && !empty($this->_action['filename']))
 		{
 			// This is just here as reference for what is available.
-			global $txt, $modSettings, $context;
+			global $context;
 
 			// Now include the file and be done with it ;).
 			if (file_exists(BOARDDIR . '/packages/temp/' . $context['base_path'] . $this->_action['filename']))
@@ -832,7 +832,7 @@ class Package_Actions extends Action_Controller
 		if (!empty($this->_action['filename']) && (!$this->_uninstalling || !empty(HttpReq::instance()->post->do_db_changes)))
 		{
 			// These can also be there for database changes.
-			global $txt, $modSettings, $context;
+			global $context;
 
 			// Let the file work its magic ;)
 			if (file_exists(BOARDDIR . '/packages/temp/' . $context['base_path'] . $this->_action['filename']))

@@ -562,7 +562,7 @@ function loadBoard()
 			}
 			while ($row = $db->fetch_assoc($request));
 
-			// If the board only contains unapproved posts and the user isn't an approver then they can't see any topics.
+			// If the board only contains unapproved posts and the user can't approve then they can't see any topics.
 			// If that is the case do an additional check to see if they have any topics waiting to be approved.
 			if ($board_info['num_topics'] == 0 && $modSettings['postmod_active'] && !allowedTo('approve_posts'))
 			{
@@ -709,6 +709,8 @@ function loadPermissions()
 		return;
 	}
 
+	$removals = array();
+
 	if (!empty($modSettings['cache_enable']))
 	{
 		$cache_groups = $user_info['groups'];
@@ -746,7 +748,6 @@ function loadPermissions()
 				'spider_group' => !empty($modSettings['spider_group']) && $modSettings['spider_group'] != 1 ? $modSettings['spider_group'] : 0,
 			)
 		);
-		$removals = array();
 		while ($row = $db->fetch_assoc($request))
 		{
 			if (empty($row['add_deny']))
@@ -933,7 +934,7 @@ function loadMemberData($users, $is_name = false, $set = 'normal')
 		$db->free_result($request);
 	}
 
-	// Anthing else integration may want to add to the user_profile array
+	// Anything else integration may want to add to the user_profile array
 	if (!empty($new_loaded_ids))
 		call_integration_hook('integrate_add_member_data', array($new_loaded_ids, $set));
 
@@ -1044,9 +1045,9 @@ function loadMemberContext($user, $display_custom_fields = false)
 	if ($context['loadMemberContext_set'] !== 'minimal')
 	{
 		$memberContext[$user] += array(
-			'username_color' => '<span '. (!empty($profile['member_group_color']) ? 'style="color:'. $profile['member_group_color'] .';"' : '') .'>'. $profile['member_name'] .'</span>',
-			'name_color' => '<span '. (!empty($profile['member_group_color']) ? 'style="color:'. $profile['member_group_color'] .';"' : '') .'>'. $profile['real_name'] .'</span>',
-			'link_color' => '<a href="' . $scripturl . '?action=profile;u=' . $profile['id_member'] . '" title="' . $txt['profile_of'] . ' ' . $profile['real_name'] . '" '. (!empty($profile['member_group_color']) ? 'style="color:'. $profile['member_group_color'] .';"' : '') .'>' . $profile['real_name'] . '</a>',
+			'username_color' => '<span '. (!empty($profile['member_group_color']) ? 'style="color:' . $profile['member_group_color'] .';"' : '') .'>'. $profile['member_name'] .'</span>',
+			'name_color' => '<span '. (!empty($profile['member_group_color']) ? 'style="color:' . $profile['member_group_color'] .';"' : '') .'>'. $profile['real_name'] .'</span>',
+			'link_color' => '<a href="' . $scripturl . '?action=profile;u=' . $profile['id_member'] . '" title="' . $txt['profile_of'] . ' ' . $profile['real_name'] . '" ' . (!empty($profile['member_group_color']) ? 'style="color:' . $profile['member_group_color'] . ';"' : '') .'>' . $profile['real_name'] . '</a>',
 			'is_buddy' => $profile['buddy'],
 			'is_reverse_buddy' => in_array($user_info['id'], $buddy_list),
 			'buddies' => $buddy_list,
@@ -1614,7 +1615,7 @@ function loadTheme($id_theme = 0, $initialize = true)
 	}
 
 	// A bit lonely maybe, though I think it should be set up *after* the theme variants detection
-	$context['header_logo_url_html_safe'] = empty($settings['header_logo_url']) ? $settings['images_url'] . '/' . $context['theme_variant_url'] .  'logo_elk.png' : Util::htmlspecialchars($settings['header_logo_url']);
+	$context['header_logo_url_html_safe'] = empty($settings['header_logo_url']) ? $settings['images_url'] . '/' . $context['theme_variant_url'] . 'logo_elk.png' : Util::htmlspecialchars($settings['header_logo_url']);
 
 	// Allow overriding the board wide time/number formats.
 	if (empty($user_settings['time_format']) && !empty($txt['time_format']))
@@ -1991,10 +1992,10 @@ function requireTemplate($template_name, $style_sheets, $fatal)
  * - if ?debug is in the query string, shows administrators a marker after every sub template
  * for debugging purposes.
  *
- * @todo get rid of reading $_REQUEST directly
  * @param string $sub_template_name
- * @param bool|string $fatal = false, $fatal = true is for templates that
- *                 shouldn't get a 'pretty' error screen 'ignore' to skip
+ * @param bool|string $fatal = false
+ * - $fatal = true is for templates that shouldn't get a 'pretty' error screen
+ * - $fatal = 'ignore' to skip
  */
 function loadSubTemplate($sub_template_name, $fatal = false)
 {
@@ -2014,10 +2015,11 @@ function loadSubTemplate($sub_template_name, $fatal = false)
 		die(Errors::instance()->log_error(sprintf(isset($txt['theme_template_error']) ? $txt['theme_template_error'] : 'Unable to load the %s sub template!', (string) $sub_template_name), 'template'));
 
 	// Are we showing debugging for templates?  Just make sure not to do it before the doctype...
-	if (allowedTo('admin_forum') && isset($_REQUEST['debug']) && !in_array($sub_template_name, array('init')) && ob_get_length() > 0 && !isset($_REQUEST['xml']))
+	$_req = HttpReq::instance();
+	if (allowedTo('admin_forum') && isset($_req->query->debug) && !in_array($sub_template_name, array('init')) && ob_get_length() > 0 && !isset($_req->query->xml))
 	{
 		echo '
-<div class="warningbox">---- ', $sub_template_name, ' ends ----</div>';
+<div class="infobox">---- ', htmlentities($sub_template_name), ' ends ----</div>';
 	}
 }
 
@@ -2097,7 +2099,7 @@ function loadJavascriptFile($filenames, $params = array(), $id = '')
  * What it does:
  * - Can be passed an array of filenames, all which will have the same
  *   parameters applied,
- * - if you need specific parameters on a per file basis, call it multiple times
+ * - If you need specific parameters on a per file basis, call it multiple times
  *
  * @param string[]|string $filenames string or array of filenames to work on
  * @param mixed[] $params = array()
@@ -2360,68 +2362,7 @@ function loadLanguage($template_name, $lang = '', $fatal = true, $force_reload =
 	}
 
 	if ($fix_arrays)
-	{
-		$txt['days'] = array(
-			$txt['sunday'],
-			$txt['monday'],
-			$txt['tuesday'],
-			$txt['wednesday'],
-			$txt['thursday'],
-			$txt['friday'],
-			$txt['saturday'],
-		);
-		$txt['days_short'] = array(
-			$txt['sunday_short'],
-			$txt['monday_short'],
-			$txt['tuesday_short'],
-			$txt['wednesday_short'],
-			$txt['thursday_short'],
-			$txt['friday_short'],
-			$txt['saturday_short'],
-		);
-		$txt['months'] = array(
-			1 => $txt['january'],
-			$txt['february'],
-			$txt['march'],
-			$txt['april'],
-			$txt['may'],
-			$txt['june'],
-			$txt['july'],
-			$txt['august'],
-			$txt['september'],
-			$txt['october'],
-			$txt['november'],
-			$txt['december'],
-		);
-		$txt['months_titles'] = array(
-			1 => $txt['january_titles'],
-			$txt['february_titles'],
-			$txt['march_titles'],
-			$txt['april_titles'],
-			$txt['may_titles'],
-			$txt['june_titles'],
-			$txt['july_titles'],
-			$txt['august_titles'],
-			$txt['september_titles'],
-			$txt['october_titles'],
-			$txt['november_titles'],
-			$txt['december_titles'],
-		);
-		$txt['months_short'] = array(
-			1 => $txt['january_short'],
-			$txt['february_short'],
-			$txt['march_short'],
-			$txt['april_short'],
-			$txt['may_short'],
-			$txt['june_short'],
-			$txt['july_short'],
-			$txt['august_short'],
-			$txt['september_short'],
-			$txt['october_short'],
-			$txt['november_short'],
-			$txt['december_short'],
-		);
-	}
+		fix_calendar_text();
 
 	// Keep track of what we're up to soldier.
 	if ($db_show_debug === true)
@@ -2432,6 +2373,75 @@ function loadLanguage($template_name, $lang = '', $fatal = true, $force_reload =
 
 	// Return the language actually loaded.
 	return $lang;
+}
+
+/**
+ * Loads / Sets arrays for use in date display
+ */
+function fix_calendar_text()
+{
+	global $txt;
+
+	$txt['days'] = array(
+		$txt['sunday'],
+		$txt['monday'],
+		$txt['tuesday'],
+		$txt['wednesday'],
+		$txt['thursday'],
+		$txt['friday'],
+		$txt['saturday'],
+	);
+	$txt['days_short'] = array(
+		$txt['sunday_short'],
+		$txt['monday_short'],
+		$txt['tuesday_short'],
+		$txt['wednesday_short'],
+		$txt['thursday_short'],
+		$txt['friday_short'],
+		$txt['saturday_short'],
+	);
+	$txt['months'] = array(
+		1 => $txt['january'],
+		$txt['february'],
+		$txt['march'],
+		$txt['april'],
+		$txt['may'],
+		$txt['june'],
+		$txt['july'],
+		$txt['august'],
+		$txt['september'],
+		$txt['october'],
+		$txt['november'],
+		$txt['december'],
+	);
+	$txt['months_titles'] = array(
+		1 => $txt['january_titles'],
+		$txt['february_titles'],
+		$txt['march_titles'],
+		$txt['april_titles'],
+		$txt['may_titles'],
+		$txt['june_titles'],
+		$txt['july_titles'],
+		$txt['august_titles'],
+		$txt['september_titles'],
+		$txt['october_titles'],
+		$txt['november_titles'],
+		$txt['december_titles'],
+	);
+	$txt['months_short'] = array(
+		1 => $txt['january_short'],
+		$txt['february_short'],
+		$txt['march_short'],
+		$txt['april_short'],
+		$txt['may_short'],
+		$txt['june_short'],
+		$txt['july_short'],
+		$txt['august_short'],
+		$txt['september_short'],
+		$txt['october_short'],
+		$txt['november_short'],
+		$txt['december_short'],
+	);
 }
 
 /**
@@ -2517,6 +2527,7 @@ function getLanguages($use_cache = true)
 	global $settings, $modSettings;
 
 	// Either we don't use the cache, or its expired.
+	$languages = '';
 	if (!$use_cache || ($languages = cache_get_data('known_languages', !empty($modSettings['cache_enable']) && $modSettings['cache_enable'] < 1 ? 86400 : 3600)) == null)
 	{
 		// If we don't have our theme information yet, lets get it.
@@ -2644,7 +2655,7 @@ function censorText(&$text, $force = false)
  */
 function template_include($filename, $once = false)
 {
-	global $context, $settings, $txt, $scripturl, $modSettings, $boardurl;
+	global $context, $txt, $scripturl, $modSettings, $boardurl;
 	global $maintenance, $mtitle, $mmessage;
 	static $templates = array();
 
@@ -3147,7 +3158,7 @@ function detectServerLoad()
 	if (function_exists('sys_getloadavg'))
 	{
 		$sys_load = sys_getloadavg();
-        return $sys_load[0] / $cores;
+		return $sys_load[0] / $cores;
 	}
 	// Maybe someone has a custom compile
 	else

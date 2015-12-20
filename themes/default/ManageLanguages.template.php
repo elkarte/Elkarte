@@ -20,7 +20,7 @@
  */
 function template_download_language()
 {
-	global $context, $settings, $txt, $scripturl, $modSettings;
+	global $context, $settings, $txt, $scripturl;
 
 	// Actually finished?
 	if (!empty($context['install_complete']))

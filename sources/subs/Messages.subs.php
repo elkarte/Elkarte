@@ -240,7 +240,7 @@ function prepareMessageContext($message)
 	}
 
 	// Show an "approve" box if the user can approve it, and the message isn't approved.
-	if (! $message['message']['approved'] && !$context['show_approval'])
+	if (!$message['message']['approved'] && !$context['show_approval'])
 		$context['show_approval'] = allowedTo('approve_posts');
 }
 

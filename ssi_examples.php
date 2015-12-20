@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @name      ElkArte Forum
  * @copyright ElkArte Forum contributors

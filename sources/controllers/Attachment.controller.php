@@ -371,7 +371,7 @@ class Attachment_Controller extends Action_Controller
 	 */
 	public function action_tmpattach()
 	{
-		global $txt, $modSettings, $user_info, $context, $topic, $settings;
+		global $txt, $modSettings, $user_info, $topic, $settings;
 
 		// Make sure some attachment was requested!
 		if (!isset($this->_req->query->attach))
@@ -442,7 +442,7 @@ class Attachment_Controller extends Action_Controller
 		{
 			loadLanguage('Errors');
 
-			header((preg_match('~HTTP/1\.[01]~i',$this->_req->server->SERVER_PROTOCOL) ? $this->_req->server->SERVER_PROTOCOL : 'HTTP/1.0') . ' 404 Not Found');
+			header((preg_match('~HTTP/1\.[01]~i', $this->_req->server->SERVER_PROTOCOL) ? $this->_req->server->SERVER_PROTOCOL : 'HTTP/1.0') . ' 404 Not Found');
 			header('Content-Type: text/plain; charset=UTF-8');
 
 			// We need to die like this *before* we send any anti-caching headers as below.

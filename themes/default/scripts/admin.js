@@ -53,7 +53,6 @@ elk_AdminIndex.prototype.init = function ()
 elk_AdminIndex.prototype.loadAdminIndex = function ()
 {
 	// Load the current master and your version numbers.
-	console.log(this.opt.bLoadVersions);
 	if (this.opt.bLoadVersions)
 		this.showCurrentVersion();
 

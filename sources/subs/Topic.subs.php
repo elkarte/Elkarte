@@ -482,8 +482,6 @@ function moveTopicsPermissions($moveCache)
 	}
 	$db->free_result($request);
 
-	$moveCache = $moveCache2;
-
 	// Do the actual moves...
 	foreach ($moveTos as $to => $topics)
 		moveTopics($topics, $to, true);
@@ -902,7 +900,7 @@ function moveTopicConcurrence($move_from = null, $id_board = null, $id_topic = n
  * What it does:
  *  - If the topic has been removed and resides in the recycle bin, present confirm dialog
  *  - If recycling is not enabled, or user confirms or topic is not in recycle simply returns
-  */
+ */
 function removeDeleteConcurrence()
 {
 	global $modSettings, $board, $scripturl, $context;
@@ -1214,8 +1212,7 @@ function topicPointer($id_topic, $id_board, $next = true, $id_member = 0, $inclu
 			($includeUnapproved ? '' : '
 				AND (approved = {int:is_approved} OR (id_member_started != {int:id_member_started} AND id_member_started = {int:current_member}))') . '
 			ORDER BY' . (
-				$includeStickies ? ' is_sticky {raw:sorting},' :
-				'').
+				$includeStickies ? ' is_sticky {raw:sorting},' : '') .
 				' id_last_msg {raw:sorting}
 			LIMIT 1',
 			array(
@@ -1614,7 +1611,7 @@ function selectMessages($topic, $start, $items_per_page, $messages = array(), $o
 	$messages = array();
 	$parser = \BBC\ParserWrapper::getInstance();
 
-	for ($counter = 0; $row = $db->fetch_assoc($request); $counter ++)
+	for ($counter = 0; $row = $db->fetch_assoc($request); $counter++)
 	{
 		censorText($row['subject']);
 		censorText($row['body']);
@@ -3222,7 +3219,6 @@ function toggleTopicsLock($topics, $log = false)
 
 	$db = database();
 
-	$lockStatus = array();
 	$needs_check = !empty($board) && !allowedTo('lock_any');
 	$lockCache = array();
 

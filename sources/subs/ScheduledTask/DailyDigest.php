@@ -23,10 +23,9 @@ if (!defined('ELK'))
 	die('No access...');
 
 /**
- * Send out a daily email of all subscribed topics, to members.
+ * Class Daily_Digest - Send out a daily email of all subscribed topics, to members.
  *
- * - It sends notifications about replies or new topics,
- * and moderation actions.
+ * - It sends notifications about replies or new topics, and moderation actions.
  *
  * @package ScheduledTasks
  */
@@ -37,6 +36,17 @@ class Daily_Digest implements Scheduled_Task_Interface
 		return $this->runDigest();
 	}
 
+	/**
+	 * Send out a email of all subscribed topics, to members.
+	 *
+	 * - Builds email bodys of topics and messages per user as defined by their
+	 * notification settings
+	 * - If weekly builds the weekly abridged digest
+	 *
+	 * @param bool $is_weekly
+	 *
+	 * @return bool
+	 */
 	public function runDigest($is_weekly = false)
 	{
 		global $txt, $mbname, $scripturl, $modSettings, $boardurl;

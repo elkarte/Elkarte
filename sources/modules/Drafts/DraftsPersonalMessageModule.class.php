@@ -84,7 +84,7 @@ class Drafts_PersonalMessage_Module implements ElkArte\sources\modules\Module_In
 
 	public function before_set_context($pmsg)
 	{
-		global $context, $user_info, $options, $txt;
+		global $context, $user_info;
 
 		// If drafts are enabled, lets generate a list of drafts that they can load in to the editor
 		if (!empty($context['drafts_pm_save']))
@@ -214,8 +214,6 @@ class Drafts_PersonalMessage_Module implements ElkArte\sources\modules\Module_In
 	 */
 	protected function _loadDraft($member_id, $id_draft)
 	{
-		global $scripturl, $context, $txt;
-
 		// Need a member
 		if (empty($member_id) || empty($id_draft))
 			return false;

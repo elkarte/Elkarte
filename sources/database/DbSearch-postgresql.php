@@ -121,8 +121,8 @@ class DbSearch_PostgreSQL implements DbSearch
 			WHERE relname = {string:messages} OR relname = {string:log_search_words}
 			ORDER BY relpages DESC',
 			array(
-				'messages' => $db_prefix. 'messages',
-				'log_search_words' => $db_prefix. 'log_search_words',
+				'messages' => $db_prefix . 'messages',
+				'log_search_words' => $db_prefix . 'log_search_words',
 			)
 		);
 

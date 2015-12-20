@@ -192,7 +192,7 @@ class Browser_Detector
 	}
 
 	/**
-     * Determine if the browser is konqueror or not
+	 * Determine if the browser is konqueror or not
 	 *
 	 * @return boolean true if the browser is konqueror otherwise false
 	 */

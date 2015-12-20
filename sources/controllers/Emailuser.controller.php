@@ -506,7 +506,7 @@ class Emailuser_Controller extends Action_Controller
 		});', true);
 
 		$context['comment_body'] = $this->_req->getPost('comment', 'trim', '');
-		$context['email_address'] =  $this->_req->getPost('email', 'trim', '');
+		$context['email_address'] = $this->_req->getPost('email', 'trim', '');
 
 		// This is here so that the user could, in theory, be redirected back to the topic.
 		$context['start'] = $this->_req->query->start;

@@ -2015,9 +2015,9 @@ class ManageThemes_Controller extends Action_Controller
 	}
 
 	/**
-	* This function makes necessary pre-checks and fills
-	* the contextual data as needed by theme editing functions.
-	*/
+	 * This function makes necessary pre-checks and fills
+	 * the contextual data as needed by theme editing functions.
+	 */
 	private function prepareThemeEditContext()
 	{
 		global $context;

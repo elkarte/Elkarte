@@ -1,4 +1,5 @@
 <?php
+
 /**
  * This file contains functions that deal with getting and setting cache values.
  *

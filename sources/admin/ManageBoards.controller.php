@@ -437,7 +437,7 @@ class ManageBoards_Controller extends Action_Controller
 	/**
 	 * Modify a specific board...
 	 *
-	 * What it doews
+	 * What it does
 	 * - screen for editing and repositioning a board.
 	 * - called by ?action=admin;area=manageboards;sa=board
 	 * - also used to show the confirm deletion of category screen (sub-template confirm_board_delete).

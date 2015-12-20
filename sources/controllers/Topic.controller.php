@@ -61,7 +61,7 @@ class Topic_Controller extends Action_Controller
 	 *  - Logs the action to the moderator log.
 	 *  - Returns to the topic after it is done.
 	 *  - It is accessed via ?action=topic;sa=lock.
-	*/
+	 */
 	public function action_lock()
 	{
 		global $topic, $user_info, $board;

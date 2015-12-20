@@ -939,7 +939,7 @@ function updateBanMembers()
 		$db->fetchQueryCallback('
 			SELECT mem.id_member, mem.is_activated
 			FROM {db_prefix}members AS mem
-			WHERE ' . implode( ' OR ', $queryPart),
+			WHERE ' . implode(' OR ', $queryPart),
 			$queryValues,
 			function($row) use (&$allMembers, &$updates, &$newMembers)
 			{

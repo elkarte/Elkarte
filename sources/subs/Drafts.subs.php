@@ -416,7 +416,7 @@ function getOldDrafts($days)
  */
 function saveDraft($draft, $check_last_save = false, $id_topic = 0)
 {
-	global $context, $user_info, $modSettings, $board;
+	global $context;
 
 	$id_draft = $draft['id_draft'];
 
@@ -501,7 +501,7 @@ function saveDraft($draft, $check_last_save = false, $id_topic = 0)
  */
 function savePMDraft($recipientList, $draft, $check_last_save = false)
 {
-	global $context, $user_info, $modSettings;
+	global $context;
 
 	// Read in what was sent
 	$id_pm_draft = $draft['id_pm_draft'];

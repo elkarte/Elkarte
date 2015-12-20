@@ -26,7 +26,7 @@ if (!defined('ELK'))
 	die('No access...');
 
 /**
- * Check for un-posted attachments is something we can do once in a while :P
+ * Class Remove_Temp_Attachments - Check for un-posted attachments is something we can do once in a while :P
  *
  * - This function uses FilesystemIterator cycling through all the attachments
  *

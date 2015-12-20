@@ -23,7 +23,7 @@ if (!defined('ELK'))
 	die('No access...');
 
 /**
- * Check for old drafts and remove them
+ * Class Remove_Old_Drafts - Check for old drafts and remove them
  *
  * @package ScheduledTasks
  */

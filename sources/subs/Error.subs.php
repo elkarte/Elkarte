@@ -108,7 +108,7 @@ function getErrorLogData($start, $sort_direction = 'DESC', $filter = null)
 
 	$log = array();
 
-	for ($i = 0; $row = $db->fetch_assoc($request); $i ++)
+	for ($i = 0; $row = $db->fetch_assoc($request); $i++)
 	{
 		$search_message = preg_replace('~&lt;span class=&quot;remove&quot;&gt;(.+?)&lt;/span&gt;~', '%', $db->escape_wildcard_string($row['message']));
 		if (!empty($filter) && $search_message == $filter['value']['sql'])
