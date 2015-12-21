@@ -390,7 +390,8 @@ function getOldDrafts($days)
 
 	// Find all of the old drafts
 	return $db->fetchQueryCallback('
-		SELECT id_draft
+		SELECT
+			id_draft
 		FROM {db_prefix}user_drafts
 		WHERE poster_time <= {int:poster_time_old}',
 		array(
@@ -398,7 +399,7 @@ function getOldDrafts($days)
 		),
 		function($row)
 		{
-			$drafts[] = (int) $row['id_draft'];
+			return (int) $row['id_draft'];
 		}
 	);
 }

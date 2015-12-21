@@ -776,11 +776,11 @@ function setBoardIds() {
 				$(uls).append('<li id="cbp_' + cat + ',-1,-1"></li>');
 			// Otherwise the li's need a child ul so we have a "child-of" drop zone
 			else
-				$(uls).find("li:not(:has(ul))").append('<ul class="nolist"></ul>');
+				$(uls).find("li:not(:has(ul))").append('<ul class="nolist elk_droppings"></ul>');
 		}
 		// All others normally
 		else
-			$(uls).find("li:not(:has(ul))").append('<ul class="nolist"></ul>');
+			$(uls).find("li:not(:has(ul))").append('<ul class="nolist elk_droppings"></ul>');
 
 		// Next make find all the ul's in this category that have children, update the
 		// id's with information that indicates the 1-n and parent/child info

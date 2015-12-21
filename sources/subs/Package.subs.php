@@ -566,7 +566,7 @@ function list_restoreFiles($dummy1, $dummy2, $dummy3, $do_change)
 				$package_ftp->chmod($ftp_file, $perms);
 			}
 			else
-				@chmod($file, $perms);
+				elk_chmod($file, $perms);
 
 			$new_permissions = @fileperms($file);
 			$result = $new_permissions == $perms ? 'success' : 'failure';
@@ -617,13 +617,13 @@ function packageRequireFTP($destination_url, $files = null, $return = false)
 
 			// This looks odd, but it's an attempt to work around PHP suExec.
 			if (!@is_writable($file))
-				@chmod($file, 0755);
+				elk_chmod($file, 0755);
 			if (!@is_writable($file))
-				@chmod($file, 0777);
+				elk_chmod($file, 0777);
 			if (!@is_writable(dirname($file)))
-				@chmod($file, 0755);
+				elk_chmod($file, 0755);
 			if (!@is_writable(dirname($file)))
-				@chmod($file, 0777);
+				elk_chmod($file, 0777);
 
 			$fp = is_dir($file) ? @opendir($file) : @fopen($file, 'rb');
 			if (@is_writable($file) && $fp)
@@ -654,13 +654,12 @@ function packageRequireFTP($destination_url, $files = null, $return = false)
 			{
 				mktree(dirname($file), 0755);
 				@touch($file);
-				@chmod($file, 0755);
+				elk_chmod($file, 0755);
 			}
-
 			if (!@is_writable($file))
-				@chmod($file, 0777);
+				elk_chmod($file, 0777);
 			if (!@is_writable(dirname($file)))
-				@chmod(dirname($file), 0777);
+				elk_chmod(dirname($file), 0777);
 
 			if (@is_writable($file))
 				unset($files[$k]);
@@ -1508,7 +1507,7 @@ function deltree($dir, $delete_dir = true)
 				else
 				{
 					if (!$entryname->isWritable())
-						@chmod($entryname->getPathname(), 0777);
+						elk_chmod($entryname->getPathname(), 0777);
 
 					@unlink($entryname->getPathname());
 				}
@@ -1544,7 +1543,7 @@ function deltree($dir, $delete_dir = true)
 		else
 		{
 			if (!is_writable($dir))
-				@chmod($dir, 0777);
+				elk_chmod($dir, 0777);
 
 			@rmdir($dir);
 		}
@@ -1574,7 +1573,7 @@ function mktree($strPath, $mode)
 			if (isset($package_ftp))
 				$package_ftp->chmod(strtr($strPath, array($_SESSION['pack_ftp']['root'] => '')), $mode);
 			else
-				@chmod($strPath, $mode);
+				elk_chmod($strPath, $mode);
 		}
 
 		// See if we can open it for access, return the result
@@ -1598,7 +1597,7 @@ function mktree($strPath, $mode)
 		if (isset($package_ftp))
 			$package_ftp->chmod(dirname(strtr($strPath, array($_SESSION['pack_ftp']['root'] => ''))), $mode);
 		else
-			@chmod(dirname($strPath), $mode);
+			elk_chmod(dirname($strPath), $mode);
 	}
 
 	// Return an ftp control if using FTP
@@ -2302,7 +2301,7 @@ function package_chmod($filename, $perm_state = 'writable', $track_change = fals
 
 					mktree(dirname($chmod_file), 0755);
 					@touch($chmod_file);
-					@chmod($chmod_file, 0755);
+					elk_chmod($chmod_file, 0755);
 				}
 				else
 					$file_permissions = @fileperms($chmod_file);
@@ -2310,17 +2309,17 @@ function package_chmod($filename, $perm_state = 'writable', $track_change = fals
 
 			// This looks odd, but it's another attempt to work around PHP suExec.
 			if ($perm_state != 'writable')
-				@chmod($chmod_file, $perm_state == 'execute' ? 0755 : 0644);
+				elk_chmod($chmod_file, $perm_state == 'execute' ? 0755 : 0644);
 			else
 			{
 				if (!@is_writable($chmod_file))
-					@chmod($chmod_file, 0755);
+					elk_chmod($chmod_file, 0755);
 				if (!@is_writable($chmod_file))
-					@chmod($chmod_file, 0777);
+					elk_chmod($chmod_file, 0777);
 				if (!@is_writable(dirname($chmod_file)))
-					@chmod($chmod_file, 0755);
+					elk_chmod($chmod_file, 0755);
 				if (!@is_writable(dirname($chmod_file)))
-					@chmod($chmod_file, 0777);
+					elk_chmod($chmod_file, 0777);
 			}
 
 			// The ultimate writable test.
@@ -2952,4 +2951,38 @@ function isAuthorizedServer($remote_url)
 			return true;
 
 	return false;
+}
+
+/**
+ * Simple wrapper around chmod
+ *
+ * - Checks proper value for mode is supplied
+ * - Consolidates chmod error suppression to single function
+ *
+ * @param string $file
+ * @param string|int|null $mode
+ *
+ * @return bool
+ */
+function elk_chmod($file, $mode = null)
+{
+	$result = false;
+
+	if (!isset($mode))
+	{
+		if (is_dir($file))
+		{
+			$mode = 0755;
+		}
+		else
+		{
+			$mode = 0664;
+		}
+	}
+
+	// Make sure we have a form of 0777 or '777' or '0777' so its safe for intval '8'
+	if ($mode == decoct(octdec("$mode")))
+		$result = @chmod($file, intval($mode, 8));
+
+	return $result;
 }

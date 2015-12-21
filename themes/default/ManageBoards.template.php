@@ -136,6 +136,7 @@ function template_manage_boards()
 		// Button to add a new board.
 		echo '
 				</ul>
+				<br class="clear" />
 				<div class="submitbutton">
 					<input type="submit" value="', $txt['mboards_new_board'], '" />
 					<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />

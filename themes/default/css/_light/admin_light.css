@@ -9,7 +9,7 @@
 
 #admin_main_section, .quick_tasks, #mod_main_section,
 #support_credits, #admin_newsletters,
-#core_features,
+#core_features, #entry_form,
 #groupForm, #mailqueue_stats, #manage_maintenance,
 #new_group, #view_group, #admin_form_wrapper, .action_admin .generic_list_wrapper {
 	background: #EEEEEE;
@@ -115,23 +115,21 @@
 	border-bottom: 2px solid #999999;
 }
 
+/* Styles for the D&D indicators
+------------------------------------------------- */
+#sort_email_fp td:nth-child(2):before,
+#custom_profile_fields td:nth-child(2):before,
+#message_icon_list td:nth-child(1):before,
+#manage_boards li .floatleft:before {
+	color: #AAAAAA;
+}
+
 /* Styles for the manage boards section.
 ------------------------------------------------- */
-
-#manage_boards .category_header {
-	border-bottom: 1px solid #BBBBBB;
-}
-
-#manage_boards .content, #manage_attachments .content {
-	background: #EEEEEE;
-	border: 1px solid #CCCCCC;
-	border-top: 0 solid;
-	border-radius: 0 0 4px 4px;
-}
-
+/* This is the drag/drop placeholder, normally not visible */
 .ui-state-highlight {
-	background-color: #EEFFEE;
-	border: 1px dashed green;
+	background-color: #EEEEEE !important;
+	border: 1px dashed green !important;
 }
 
 #manage_boards .recycle_board {
@@ -154,6 +152,21 @@
 
 #manage_boards .post_group, #manage_boards .regular_members {
 	border-bottom: 1px dotted #000000;
+}
+
+/* Indeed ugly, but will allow 4 level deep board nesting stripping to work */
+#manage_boards li:nth-child(even),
+#manage_boards li:nth-child(even) > li:nth-child(odd),
+#manage_boards li:nth-child(even) > li:nth-child(odd) > li:nth-child(even),
+#manage_boards li:nth-child(even) > li:nth-child(odd) > li:nth-child(even) > li:nth-child(odd) {
+	background: #FAFAFA;
+}
+
+#manage_boards li:nth-child(odd),
+#manage_boards li:nth-child(odd) > li:nth-child(even),
+#manage_boards li:nth-child(odd) > li:nth-child(even) > li:nth-child(odd),
+#manage_boards li:nth-child(odd) > li:nth-child(even) > li:nth-child(odd) > li:nth-child(even) {
+	background: #FFFFFF;
 }
 
 /* Styles for the manage maintenance section.

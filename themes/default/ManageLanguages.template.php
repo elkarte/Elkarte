@@ -246,8 +246,8 @@ function template_modify_language_entries()
 			</div>
 		</form>
 
-		<form action="', $scripturl, '?action=admin;area=languages;sa=editlang;lid=', $context['lang_id'], ';entries" id="entry_form" method="post" accept-charset="UTF-8">
-			<div class="category_header">
+		<form id="entry_form" action="', $scripturl, '?action=admin;area=languages;sa=editlang;lid=', $context['lang_id'], ';entries#entry_form" method="post" accept-charset="UTF-8">
+			<div class="category_header well">
 				<h3 class="floatleft">
 					', $txt['edit_language_entries'], '
 				</h3>
