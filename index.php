@@ -256,6 +256,6 @@ function elk_main()
 
 	// Show where we came from, and go
 	$context['site_action'] = $dispatcher->site_action();
-	$context['site_action'] = !empty($context['site_action']) ? $context['site_action'] : (isset($_REQUEST['action']) ? $_REQUEST['action'] : '');
+	$context['site_action'] = !empty($context['site_action']) ? $context['site_action'] : $_req->getQuery('action', 'trim|strval', '');
 	$dispatcher->dispatch();
 }
