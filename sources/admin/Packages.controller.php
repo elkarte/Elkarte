@@ -146,9 +146,6 @@ class Packages_Controller extends Action_Controller
 				'perms' => array(
 					'description' => $txt['package_file_perms_desc'],
 				),
-				'options' => array(
-					'description' => $txt['package_install_options_desc'],
-				),
 				// The following two belong to PackageServers,
 				// for UI's sake moved here at least temporarily
 				'servers' => array(
@@ -156,6 +153,9 @@ class Packages_Controller extends Action_Controller
 				),
 				'upload' => array(
 					'description' => $txt['upload_packages_desc'],
+				),
+				'options' => array(
+					'description' => $txt['package_install_options_desc'],
 				),
 			),
 		);
