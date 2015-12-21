@@ -307,7 +307,7 @@ class Search_Controller extends Action_Controller
 		// $search_params will carry all settings that differ from the default search parameters.
 		// That way, the URLs involved in a search page will be kept as short as possible.
 		$search_params = array();
-// _debug($_REQUEST,0,0,1);
+
 		if (isset($_REQUEST['params']))
 		{
 			// Due to IE's 2083 character limit, we have to compress long search strings
