@@ -305,13 +305,6 @@ class Admin_Controller extends Action_Controller
 						'icon' => 'transparent.png',
 						'class' => 'admin_img_smiley',
 						'permission' => array('manage_bbc'),
-						'subsections' => array(
-							'addcode' => array($txt['smileys_add']),
-							'editcodes' => array($txt['smileys_edit']),
-							'setorder' => array($txt['smileys_set_order']),
-							'editicons' => array($txt['icons_edit_message_icons']),
-							'settings' => array($txt['settings']),
-						),
 					),
 					'smileys' => array(
 						'label' => $txt['smileys_manage'],
