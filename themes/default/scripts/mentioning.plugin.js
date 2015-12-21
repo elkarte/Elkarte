@@ -52,9 +52,20 @@ var disableDrafts = false;
 
 					// Well then lets make a find member suggest call
 					oMentions.opts._names = [];
+
+					// What we want
+					var obj = {
+						"suggest_type": "member",
+						"search": query.php_to8bit().php_urlencode(),
+						"time": current_call
+					};
+					obj[elk_session_var] = elk_session_id;
+
+					// Make the request
 					$.ajax({
-						url: elk_scripturl + "?action=suggest;suggest_type=member;search=" + query.php_to8bit().php_urlencode() + ";" + elk_session_var + "=" + elk_session_id + ";xml;time=" + current_call,
-						type: "get",
+						url: elk_scripturl + "?action=suggest;xml",
+						type: "post",
+						data: obj,
 						async: false
 					})
 					.done(function(request) {
@@ -65,6 +76,12 @@ var disableDrafts = false;
 							oMentions.opts._names[oMentions.opts._names.length - 1].id = $(item).attr('id');
 							oMentions.opts._names[oMentions.opts._names.length - 1].name = $(item).text();
 						});
+					})
+					.fail(function(jqXHR, textStatus, errorThrown) {
+						if ('console' in window) {
+							window.console.info('Error:', textStatus, errorThrown.name);
+							window.console.info(jqXHR.responseText);
+						}
 					});
 
 					// Save this information so we can reuse it
