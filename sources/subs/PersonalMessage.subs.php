@@ -17,7 +17,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0.5
+ * @version 1.0.6
  *
  */
 
@@ -1879,7 +1879,7 @@ function loadConversationUnreadStatus($pms)
  */
 function loadPMRecipientInfo($all_pms, &$recipients, $folder = '', $search = false)
 {
-	global $txt, $user_info, $scripturl;
+	global $txt, $user_info, $scripturl, $context;
 
 	$db = database();
 
@@ -1915,8 +1915,8 @@ function loadPMRecipientInfo($all_pms, &$recipients, $folder = '', $search = fal
 			$row['labels'] = $row['labels'] == '' ? array() : explode(',', $row['labels']);
 			foreach ($row['labels'] as $v)
 			{
-				if (isset($message_labels[(int) $v]))
-					$message_labels[$row['id_pm']][(int) $v] = array('id' => $v, 'name' => $message_labels[(int) $v]['name']);
+				if (isset($context['labels'][(int) $v]))
+					$message_labels[$row['id_pm']][(int) $v] = array('id' => $v, 'name' => $context['labels'][(int) $v]['name']);
 
 				// Here we find the first label on a message - used for linking to posts
 				if ($search && (!isset($message_first_label[$row['id_pm']]) && !in_array('-1', $row['labels'])))

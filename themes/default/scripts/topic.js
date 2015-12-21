@@ -9,7 +9,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:		BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0.5
+ * @version 1.0.6
  *
  * This file contains javascript associated with the topic viewing including
  * Quick Modify, Quick Reply, In Topic Moderation, thumbnail expansion etc
@@ -542,6 +542,8 @@ QuickModify.prototype.modifySave = function (sSessionId, sSessionVar)
 	// We cannot save if we weren't in edit mode.
 	if (!this.bInEditMode)
 		return true;
+
+	this.bInEditMode = false
 
 	// Let's put back the accesskeys to their original place
 	if (typeof(this.opt.sFormRemoveAccessKeys) !== 'undefined')

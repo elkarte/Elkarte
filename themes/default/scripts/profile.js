@@ -9,7 +9,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:		BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0
+ * @version 1.0.6
  *
  * This file contains javascript associated with the user profile
  */
@@ -114,6 +114,10 @@ function ajax_getSignaturePreview(showPreview)
 				$("#" + signatures[i] + "_signature").css({display:""});
 				$("#" + signatures[i] + "_signature_display").css({display:""}).html($(request).find('[type="' + signatures[i] + '"]').text() + '<hr />');
 			}
+
+			$('.spoilerheader').click(function(){
+				$(this).next().children().slideToggle("fast");
+			});
 		}
 
 		if ($(request).find("error").text() !== '')

@@ -7,7 +7,7 @@
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
- * @version 1.0
+ * @version 1.0.6
  *
  */
 
@@ -104,7 +104,7 @@ class Likes_Controller extends Action_Controller
 		if ($this->prepare_like() && canAccessMessage($this->_id_liked))
 		{
 			$liked_message = basicMessageInfo($this->_id_liked, true, true);
-			if ($liked_message)
+			if ($liked_message && empty($liked_message['locked']))
 			{
 				// Like it
 				$likeResult = likePost($user_info['id'], $liked_message, '+');

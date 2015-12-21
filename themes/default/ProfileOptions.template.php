@@ -11,7 +11,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0.3
+ * @version 1.0.6
  *
  */
 
@@ -1113,6 +1113,7 @@ function template_profile_signature_modify()
 									var maxLength = ', $context['signature_limits']['max_length'], ';
 
 									$(document).ready(function() {
+										calcCharLeft();
 										$("#preview_button").click(function() {
 											return ajax_getSignaturePreview(true);
 										});

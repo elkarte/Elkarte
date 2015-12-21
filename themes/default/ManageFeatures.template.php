@@ -11,7 +11,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0
+ * @version 1.0.6
  *
  */
 
@@ -180,6 +180,12 @@ function template_edit_profile_field()
 							</dt>
 							<dd id="options_dd">
 								<div>';
+
+	if (!empty($context['field']['show_nodefault']))
+	{
+		echo '
+								<input type="radio" name="default_select" value="no_default"', $context['field']['default_select'] == 'no_default' ? ' checked="checked"' : '', ' class="input_radio" /><label>' . $txt['custom_edit_options_no_default'] . '</label><br />';
+	}
 
 	foreach ($context['field']['options'] as $k => $option)
 		echo '

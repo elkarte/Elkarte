@@ -11,7 +11,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0
+ * @version 1.0.6
  *
  */
 
@@ -30,7 +30,7 @@ function template_build_poster_div($message, $ignoring = false)
 
 	// Show information about the poster of this message.
 	$poster_div .= '
-							<li class="listlevel1 subsections" aria-haspopup="true">';
+							<li class="' . ($ignoring ? 'subsections"' : 'listlevel1 subsections"') . ' aria-haspopup="true">';
 
 	// Show a link to the member's profile.
 	if (!empty($message['member']['id']))
@@ -202,7 +202,7 @@ function template_build_poster_div($message, $ignoring = false)
 							</li>';
 
 	// Show avatars, images, etc.?
-	if (empty($options['hide_poster_area']))
+	if (empty($options['hide_poster_area']) && !$ignoring)
 	{
 		if (!empty($settings['show_user_images']) && empty($options['show_no_avatars']) && !empty($message['member']['avatar']['image']))
 			$poster_div .= '
