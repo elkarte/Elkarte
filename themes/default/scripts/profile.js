@@ -124,6 +124,10 @@ function ajax_getSignaturePreview(showPreview)
 				$("#" + signatures[i] + "_signature").css({display:"block"});
 				$("#" + signatures[i] + "_signature_display").css({display:"block"}).html($(request).find('[type="' + signatures[i] + '"]').text() + '<hr />');
 			}
+
+			$('.spoilerheader').click(function(){
+				$(this).next().children().slideToggle("fast");
+			});
 		}
 
 		var $_profile_error = $("#profile_error");

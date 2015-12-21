@@ -84,6 +84,9 @@ function updateAllSignatures($applied_sigs)
 	$sig_limits = explode(',', $sig_limits);
 	$disabledTags = !empty($sig_bbc) ? explode(',', $sig_bbc) : array();
 
+	// @todo temporary since it does not work, and seriously why would you do this?
+	$disabledTags[] = 'footnote';
+
 	while (!$done)
 	{
 		// No changed signatures yet
@@ -123,9 +126,19 @@ function updateAllSignatures($applied_sigs)
 			// Max text size
 			if (!empty($sig_limits[7]) && preg_match_all('~\[size=([\d\.]+)?(px|pt|em|x-large|larger)?~i', $sig, $matches) !== false && isset($matches[2]))
 			{
+				// Same as parse_bbc
+				$sizes = array(1 => 0.7, 2 => 1.0, 3 => 1.35, 4 => 1.45, 5 => 2.0, 6 => 2.65, 7 => 3.95);
+
 				foreach ($matches[1] as $ind => $size)
 				{
 					$limit_broke = 0;
+
+					// Just specifying as [size=x]?
+					if (empty($matches[2][$ind]))
+					{
+						$matches[2][$ind] = 'em';
+						$size = isset($sizes[(int) $size]) ? $sizes[(int) $size] : 0;
+					}
 
 					// Attempt to allow all sizes of abuse, so to speak.
 					if ($matches[2][$ind] == 'px' && $size > $sig_limits[7])
@@ -420,6 +433,7 @@ function getProfileField($id_field)
 			'bbc' => $row['bbc'] ? true : false,
 			'default_check' => $row['field_type'] == 'check' && $row['default_value'] ? true : false,
 			'default_select' => $row['field_type'] == 'select' || $row['field_type'] == 'radio' ? $row['default_value'] : '',
+			'show_nodefault' => $row['field_type'] == 'select' || $row['field_type'] == 'radio',
 			'options' => strlen($row['field_options']) > 1 ? explode(',', $row['field_options']) : array('', '', ''),
 			'active' => $row['active'],
 			'private' => $row['private'],

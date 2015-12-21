@@ -770,7 +770,7 @@ class Display_Controller extends Action_Controller
 		// Have you liked this post, can you?
 		$message['you_liked'] = !empty($context['likes'][$message['id_msg']]['member'])
 			&& isset($context['likes'][$message['id_msg']]['member'][$user_info['id']]);
-		$message['use_likes'] = allowedTo('like_posts')
+		$message['use_likes'] = allowedTo('like_posts') && empty($context['is_locked'])
 			&& ($message['id_member'] != $user_info['id'] || !empty($modSettings['likeAllowSelf']))
 			&& (empty($modSettings['likeMinPosts']) ? true : $modSettings['likeMinPosts'] <= $user_info['posts']);
 		$message['like_count'] = !empty($context['likes'][$message['id_msg']]['count']) ? $context['likes'][$message['id_msg']]['count'] : 0;

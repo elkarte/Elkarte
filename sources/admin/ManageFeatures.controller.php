@@ -536,6 +536,9 @@ class ManageFeatures_Controller extends Action_Controller
 		$sig_limits = explode(',', $sig_limits);
 		$disabledTags = !empty($sig_bbc) ? explode(',', $sig_bbc) : array();
 
+		// @todo temporary since it does not work, and seriously why would you do this?
+		$disabledTags[] = 'footnote';
+
 		// Applying to ALL signatures?!!
 		if (isset($this->_req->query->apply))
 		{
@@ -1051,6 +1054,9 @@ class ManageFeatures_Controller extends Action_Controller
 					if (isset($this->_req->post->default_select) && $this->_req->post->default_select == $k)
 						$default = $v;
 				}
+
+				if (isset($_POST['default_select']) && $_POST['default_select'] == 'no_default')
+					$default = 'no_default';
 
 				$field_options = substr($field_options, 0, -1);
 			}
