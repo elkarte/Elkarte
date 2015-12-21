@@ -70,9 +70,20 @@ elk_mentions.prototype.attachAtWho = function ()
 
 				// Well then lets make a find member suggest call
 				_self.names = [];
+
+				// What we want
+				var obj = {
+						"suggest_type": "member",
+						"search": query.php_to8bit().php_urlencode(),
+						"time": current_call
+					};
+				obj[elk_session_var] = elk_session_id;
+
+				// And how to ask for it
 				$.ajax({
-					url: elk_scripturl + "?action=suggest;suggest_type=member;search=" + query.php_to8bit().php_urlencode() + ";" + elk_session_var + "=" + elk_session_id + ";xml;time=" + this.current_call,
-					type: "get",
+					url: elk_scripturl + "?action=suggest;xml",
+					data: obj,
+					type: "post",
 					async: false
 				})
 				.done(function(request) {
@@ -85,6 +96,12 @@ elk_mentions.prototype.attachAtWho = function ()
 						_self.names[_self.names.length - 1].id = $(item).attr('id');
 						_self.names[_self.names.length - 1].name = $(item).text();
 					});
+				})
+				.fail(function(jqXHR, textStatus, errorThrown) {
+					if ('console' in window) {
+						window.console.info('Error:', textStatus, errorThrown.name);
+						window.console.info(jqXHR.responseText);
+					}
 				});
 
 				// Save this information so we can reuse it
@@ -102,9 +119,10 @@ elk_mentions.prototype.attachAtWho = function ()
 				return value;
 			},
 			matcher: function(flag, subtext, should_start_with_space) {
-				var match, regexp;
+				var match,
+					regexp;
 
-				flag = flag.replace(/[\-\[\]\/\{\}\(\)\*\+\?\.\\\^\$\|]/g, "\\$&");
+				flag = flag.replace(/[\-\[\]\/\{}\(\)\*\+\?\.\\\^\$\|]/g, "\\$&");
 
 				if (should_start_with_space)
 					flag = '(?:^|\\s)' + flag;
@@ -118,6 +136,7 @@ elk_mentions.prototype.attachAtWho = function ()
 			},
 			highlighter: function(li, query) {
 				var regexp;
+
 				if (!query)
 					return li;
 
