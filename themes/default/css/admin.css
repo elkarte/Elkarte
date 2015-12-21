@@ -624,13 +624,6 @@ ul.package_servers li {
 	width: 60%;
 }
 
-#manage_boards li .floatleft:before {
-	content: "\f07d";
-	font-family: 'FontAwesome';
-	padding-right: 5px;
-	margin-top: 1px;
-}
-
 .ui-state-highlight {
 	height: 2em;
 	cursor: move;
@@ -1281,12 +1274,22 @@ ul.moderation_notes li {
 #sort_email_fp td, #custom_profile_fields td:nth-child(2), #message_icon_list td:nth-child(-n+3) {
 	cursor: move;
 }
+#message_icon_list img {
+	vertical-align: middle;
+}
 
-#sort_email_fp td:nth-child(2):before, #custom_profile_fields td:nth-child(2):before, #message_icon_list td:nth-child(1):before {
-	font-family: "Segoe UI Symbol", "DejaVu Sans", "GNU Unifont";
-	content: "\21f3";
+/* Styles for the D&D indicators
+------------------------------------------------- */
+#sort_email_fp td:nth-child(2):before,
+#custom_profile_fields td:nth-child(2):before,
+#message_icon_list td:nth-child(1):before,
+#manage_boards li .floatleft:before {
+	margin-top: 1px;
 	padding-right: 5px;
-	font-size: 1.786em;
+	content: "\f07d";
+	vertical-align: middle;
+	font-size: 1.071em;
+	font-family: 'FontAwesome';
 }
 
 #custom_profile_fields td:nth-child(2):before {

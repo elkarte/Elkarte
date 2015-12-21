@@ -115,16 +115,21 @@
 	border-bottom: 2px solid #999999;
 }
 
+/* Styles for the D&D indicators
+------------------------------------------------- */
+#sort_email_fp td:nth-child(2):before,
+#custom_profile_fields td:nth-child(2):before,
+#message_icon_list td:nth-child(1):before,
+#manage_boards li .floatleft:before {
+	color: #AAAAAA;
+}
+
 /* Styles for the manage boards section.
 ------------------------------------------------- */
 /* This is the drag/drop placeholder, normally not visible */
 .ui-state-highlight {
 	background-color: #EEEEEE !important;
 	border: 1px dashed green !important;
-}
-
-#manage_boards li .floatleft:before {
-	color: #AAAAAA;
 }
 
 #manage_boards .recycle_board {
