@@ -586,45 +586,29 @@ ul.package_servers li {
 
 /* Styles for the manage boards section.
 ------------------------------------------------- */
-#manage_boards .content {
-	margin: 0;
-	padding: 0;
-}
-
-#manage_boards .content, #manage_attachments .content {
-	margin: -6px 0 12px 0;
-	padding: 6px 8px 16px 8px;
-	overflow: auto;
-}
-
-#manage_attachments .content {
-	margin: 0;
-	padding: 6px 8px;
-}
-
 #attach_paths .input_text {
 	width: 100%;
 }
 
-#manage_boards ul {
-	margin: 0 0 12px;
+#manage_boards ul li {
+	border-top: 1px solid #cccccc;
 }
 
-#manage_boards ul:nth-child(n+2) {
-	min-height: 12px;
+#manage_boards ul:nth-child(n+2) li {
 	padding-left: 30px;
-	margin: 0 0 -12px;
+	border: none;
 }
 
-.ui-state-highlight {
-	height: 25px;
-	cursor: move;
+/* This is the UL drop zone , normally not visible */
+#manage_boards ul.elk_droppings:nth-child(n+2) {
+	min-height: 1em;
+	margin: 0 0 -1em;
+	padding-left: 30px !important;
 }
 
 #manage_boards li, #manage_boards li.content {
 	list-style: none;
-	margin: 0;
-	padding-top: 12px;
+	line-height: 3em;
 }
 
 #manage_boards li img {
@@ -641,12 +625,15 @@ ul.package_servers li {
 }
 
 #manage_boards li .floatleft:before {
-	font-family: "Segoe UI Symbol", "DejaVu Sans", "GNU Unifont", serif;
-	content: "\21f3";
+	content: "\f07d";
+	font-family: 'FontAwesome';
 	padding-right: 5px;
-	font-size: 1.286em;
-	float: left;
-	margin-top: -1px;
+	margin-top: 1px;
+}
+
+.ui-state-highlight {
+	height: 2em;
+	cursor: move;
 }
 
 .move_links {
@@ -746,7 +733,6 @@ ul.package_servers li {
 
 /* Stop the submit buttons running away on wide screens.*/
 #manage_maintenance form {
-	max-width: 75em;
 	margin: 0 12px;
 }
 
@@ -1187,14 +1173,6 @@ ul.moderation_notes li {
 .pagelink, .current_page, .expand_pages {
 	border: 0;
 	background-color: transparent;
-}
-
-#taskpad select {
-	margin-top: 3px;
-}
-
-#taskpad {
-	margin: 2px 8px 2px 0;
 }
 
 @media screen and (max-width: 33.750em) {
