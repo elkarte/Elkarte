@@ -404,7 +404,7 @@ class ManageFeatures_Controller extends Action_Controller
 	/**
 	 * Initializes the mentions settings admin page.
 	 *
-	 * - Accessed from ?action=admin;area=featuresettings;sa=mentions;
+	 * - Accessed from ?action=admin;area=featuresettings;sa=mention;
 	 */
 	public function action_notificationsSettings_display()
 	{
@@ -424,7 +424,9 @@ class ManageFeatures_Controller extends Action_Controller
 			call_integration_hook('integrate_save_modify_mention_settings', array(&$config_vars));
 
 			if (empty($this->_req->post->notifications))
+			{
 				$notification_methods = serialize(array());
+			}
 			else
 			{
 				$notification_methods = serialize($this->_req->post->notifications);
@@ -450,6 +452,7 @@ class ManageFeatures_Controller extends Action_Controller
 			{
 				foreach ($this->_req->post->notifications as $type => $val)
 				{
+
 					if (!isset($current_settings[$type]))
 					{
 						toggleMentionsVisibility($type, true);
@@ -464,13 +467,18 @@ class ManageFeatures_Controller extends Action_Controller
 			require_once(SUBSDIR . '/ScheduledTasks.subs.php');
 			toggleTaskStatusByName('user_access_mentions', true);
 
+			// Disable or enable modules as needed
 			foreach ($modules_toggle as $action => $toggles)
 			{
 				if (!empty($toggles))
 				{
+					// The modules associated with the notification (mentionmem, likes, etc) area
 					$modules = getMentionsModules($toggles);
+
+					// The action will either be enable to disable
 					$function = $action . 'Modules';
 
+					// Something like enableModule('mentions', array('post', 'display');
 					foreach ($modules as $key => $val)
 						$function($key, $val);
 				}

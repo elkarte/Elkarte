@@ -52,7 +52,8 @@ class Event_Manager
 
 	/**
 	 * Allows to set the object that instantiated the Event_Manager.
-	 * Necessary in order to be able to provide the dependencies later on
+	 *
+	 * - Necessary in order to be able to provide the dependencies later on
 	 *
 	 * @param object $source The controller that instantiated the Event_Manager
 	 */
@@ -64,7 +65,7 @@ class Event_Manager
 	/**
 	 * This is the function use to... trigger an event.
 	 *
-	 * Called from many areas in the code where events can be raised
+	 * - Called from many areas in the code where events can be raised
 	 * $this->_events->trigger('area', args)
 	 *
 	 * @param string $position The "identifier" of the event, such as prepare_post
@@ -72,11 +73,11 @@ class Event_Manager
 	 */
 	public function trigger($position, $args = array())
 	{
-		// No registered events for this area, just return
+		// Nothing registered against this event, just return
 		if (!isset($this->_registered_events[$position]) || !$this->_registered_events[$position]->hasEvents())
 			return false;
 
-		// For all events that registered here, lets trigger an event
+		// For all areas that that registered against this event, let them know its been triggered
 		foreach ($this->_registered_events[$position]->getEvents() as $event)
 		{
 			$class = $event[1];
@@ -120,9 +121,11 @@ class Event_Manager
 
 	/**
 	 * Retrieves or creates the instance of an object.
-	 * Objects are stored in order to be shared between different triggers
+	 *
+	 * What it does:
+	 * - Objects are stored in order to be shared between different triggers
 	 * in the same Event_Manager.
-	 * If the object doesn't exist yet, it is created
+	 * - If the object doesn't exist yet, it is created
 	 *
 	 * @param string $class_name The name of the class.
 	 * @return An instance of the class requested.
@@ -182,7 +185,8 @@ class Event_Manager
 
 	/**
 	 * Loads addons and modules based on a pattern.
-	 * The pattern defines the names of the classes that will be registered
+	 *
+	 * - The pattern defines the names of the classes that will be registered
 	 * to this Event_Manager.
 	 *
 	 * @param string[] $classes A set of class names that should be attached
@@ -209,9 +213,10 @@ class Event_Manager
 	 * Takes care of registering the classes/methods to the different positions
 	 * of the Event_Manager.
 	 *
-	 * Each class must have a static method::hooks that will return an array
-	 * defining where and how the class will interact with the object that
-	 * started the Event_Manager.
+	 * What it does:
+	 * - Each class must have a static Method ::hooks
+	 * - Method ::hooks must return an array defining where and how the class
+	 * will interact with the object that started the Event_Manager.
 	 *
 	 * @param string[] $classes A list of class names.
 	 */
@@ -224,9 +229,11 @@ class Event_Manager
 
 			foreach ($events as $event)
 			{
+				// Check if a priority (ordering) was specified
 				$priority = isset($event[1][2]) ? $event[1][2] : 0;
 				$position = $event[0];
 
+				// Register the "action" to take when the event is triggered
 				$this->register($position, $event, $priority);
 			}
 		}

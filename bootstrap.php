@@ -88,6 +88,7 @@ require_once(SOURCEDIR . '/Load.php');
 require_once(SOURCEDIR . '/Security.php');
 require_once(SUBSDIR . '/Cache.subs.php');
 
+// Initialize the class Autoloader
 require(SOURCEDIR . '/Autoloader.class.php');
 $autoloder = Elk_Autoloader::getInstance();
 $autoloder->setupAutoloader(array(SOURCEDIR, SUBSDIR, CONTROLLERDIR, ADMINDIR, ADDONSDIR));

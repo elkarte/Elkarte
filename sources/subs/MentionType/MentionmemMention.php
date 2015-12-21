@@ -163,6 +163,7 @@ class Mentionmem_Mention extends Mention_BoardAccess_Abstract
 	public static function getModules($modules)
 	{
 		$modules['mentions'] = array('post', 'display');
+
 		return $modules;
 	}
 
