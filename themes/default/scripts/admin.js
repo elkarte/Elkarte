@@ -885,7 +885,7 @@ function generateFTPTest()
 	// create our test button to call testFTP on click
 	var ftpTest = document.createElement("input");
 	ftpTest.type = "button";
-	ftpTest.className = "right_submit";
+	ftpTest.className = "submit";
 	ftpTest.onclick = testFTP;
 
 	// Set the button value based on which form we are on
