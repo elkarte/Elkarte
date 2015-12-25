@@ -1527,7 +1527,6 @@ var ElkNotifier = new ElkNotifications();
  * Initialize the inline attachments posting interface
  */
 (function() {
-	var attid = 1;
 	var ElkInlineAttachments = (function(selector, editor, opt) {
 		'use strict';
 		$.extend(opt, {inlineSelector: '.inline_insert', data: 'attachid', addAfter: 'label'});
@@ -1551,10 +1550,9 @@ var ElkNotifier = new ElkNotifications();
 			$trigger.click(function(e) {
 				e.preventDefault;
 
-				var ila_text = '[attach=' + $(this).data('attid') + ']';
+				var ila_text = '[ila=' + attachId + ']';
 				$editor_data[editor].insertText(ila_text, false, true);
 			}).attr('id', 'inline_attach_' + attachId)
-			.data('attid', attid++)
 			.data('attachid', attachId);
 
 			$before.after($trigger);
@@ -1574,12 +1572,10 @@ var ElkNotifier = new ElkNotifications();
 			i++;
 			for (; i < listAttachs.length; i++)
 			{
-				listAttachs[i].data('attid', listAttachs[i].data('attid') - 1);
 				tmpList.push(listAttachs[i]);
 			}
 
 			listAttachs = tmpList;
-			attid--;
 			$('#inline_attach_' + attachId).remove();
 		};
 
