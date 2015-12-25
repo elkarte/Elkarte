@@ -1119,6 +1119,51 @@ function getAttachmentFromTopic($id_attach, $id_topic, $attach_source = 0, $owne
 }
 
 /**
+ * Get the thumbnail of specified attachment.
+ *
+ * What it does:
+ * - This includes a check of the topic
+ * - it only returns the attachment if it's indeed attached to a message in the topic given as parameter, and query_see_board...
+ * - Must return the same values and in the same order as getAvatar()
+ *
+ * @package Attachments
+ * @param int $id_attach
+ * @param int $id_topic
+ * @param int $attach_source
+ * @param int $owner
+ */
+function getAttachmentThumbFromTopic($id_attach, $id_topic, $attach_source = 0, $owner = 0)
+{
+	$db = database();
+
+	// Make sure this attachment is on this board.
+	$request = $db->query('', '
+		SELECT th.id_folder, th.filename, th.file_hash, th.fileext, th.id_attach,
+			th.attachment_type, th.mime_type, a.approved, m.id_member
+		FROM {db_prefix}attachments AS a' . ($attach_source === 0 ? '
+			INNER JOIN {db_prefix}messages AS m ON (m.id_msg = a.id_msg AND m.id_topic = {int:current_topic})
+			INNER JOIN {db_prefix}boards AS b ON (b.id_board = m.id_board AND {query_see_board})' : '
+			INNER JOIN {db_prefix}user_drafts AS m ON (m.id_draft = a.id_msg AND m.id_member = {int:owner})') . '
+			LEFT JOIN {db_prefix}attachments AS th ON (th.id_attach = a.id_thumb)
+		WHERE a.id_attach = {int:attach}
+			AND a.attach_source = {int:attach_source}',
+		array(
+			'attach' => $id_attach,
+			'attach_source' => (int) $attach_source,
+			'current_topic' => $id_topic,
+			'owner' => $owner,
+		)
+	);
+
+	$attachmentData = array();
+	if ($db->num_rows($request) != 0)
+		$attachmentData = $db->fetch_row($request);
+	$db->free_result($request);
+
+	return $attachmentData;
+}
+
+/**
  * Fetches information on the message (id, topic id, board id) based on the
  * attachment id passed.
  * Uses {query_see_board} to determine if the user can actually see the
