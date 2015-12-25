@@ -397,6 +397,16 @@ class Codes
 				self::ATTR_LENGTH => 1,
 			),
 			array(
+				self::ATTR_TAG => 'ila',
+				self::ATTR_TYPE => self::TYPE_CLOSED,
+				self::ATTR_CONTENT => '<a href="' . $scripturl . '?action=dlattach;attach=$1;image"><img src="' . $scripturl . '?action=dlattach;attach=$1;thumb" alt="" class="bbc_img" /></a>',
+				self::ATTR_TEST => '(^\d+$)',
+				self::ATTR_DISABLED_CONTENT => '<a href="' . $scripturl . '?action=dlattach;attach=$1;image">(' . $scripturl . '?action=dlattach;attach=$1;image)</a>',
+				self::ATTR_BLOCK_LEVEL => false,
+				self::ATTR_AUTOLINK => false,
+				self::ATTR_LENGTH => 3,
+			),
+			array(
 				self::ATTR_TAG => 'img',
 				self::ATTR_TYPE => self::TYPE_UNPARSED_CONTENT,
 				self::ATTR_PARAM => array(
