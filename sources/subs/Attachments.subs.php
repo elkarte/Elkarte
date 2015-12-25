@@ -1119,6 +1119,43 @@ function getAttachmentFromTopic($id_attach, $id_topic, $attach_source = 0, $owne
 }
 
 /**
+ * Fetches information on the message (id, topic id, board id) based on the
+ * attachment id passed.
+ * Uses {query_see_board} to determine if the user can actually see the
+ * attachment.
+ *
+ * @package Attachments
+ * @param int $id_attach
+ * @param int $attach_source
+ */
+function getMessageDataFromAttachment($id_attach, $attach_source)
+{
+	$db = database();
+
+	// Make sure this attachment is on this board.
+	$request = $db->query('', '
+		SELECT a.id_msg, b.id_board, t.id_topic
+		FROM {db_prefix}attachments AS a
+			LEFT JOIN {db_prefix}messages AS m ON (m.id_msg = a.id_msg)
+			LEFT JOIN {db_prefix}topics AS t ON (t.id_topic = m.id_topic)
+			LEFT JOIN {db_prefix}boards AS b ON (b.id_board = m.id_board AND {query_see_board})
+		WHERE a.id_attach = {int:attach}
+			AND a.attach_source = {int:attach_source}',
+		array(
+			'attach' => $id_attach,
+			'attach_source' => $attach_source,
+		)
+	);
+
+	$msgData = array();
+	if ($db->num_rows($request) != 0)
+		$msgData = $db->fetch_assoc($request);
+	$db->free_result($request);
+
+	return new ValuesContainer($msgData);
+}
+
+/**
  * Increase download counter for id_attach.
  *
  * What it does:

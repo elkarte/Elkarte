@@ -214,8 +214,17 @@ class Attachment_Controller extends Action_Controller
 		// This is just a regular attachment...
 		else
 		{
-			isAllowedTo('view_attachments');
-			$attach_source = 0;
+			$attach_source = $this->_req->getQuery('status', 'intval', 0);
+			$id_board = null;
+
+			if (empty($topic))
+			{
+				$msgData = getMessageDataFromAttachment($id_attach, $attach_source);
+				$id_board = (int) $msgData['id_board']
+			}
+
+			isAllowedTo('view_attachments', $id_board);
+
 			$this->_events->trigger('get_attachment_data', array('attach_source' => &$attach_source));
 			$attachment = getAttachmentFromTopic($id_attach, $topic, $attach_source);
 		}
