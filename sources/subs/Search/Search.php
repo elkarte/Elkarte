@@ -830,11 +830,11 @@ class Search
 		{
 			$query_boards = array_map('intval', explode(',', $params['brd']));
 		}
-		elseif (!empty($params['sd_brd']) && is_array($params['sd_brd']))
+		elseif (!empty($params['search_selection']) && $params['search_selection'] === 'board' && !empty($params['sd_brd']) && is_array($params['sd_brd']))
 		{
 			$query_boards = array_map('intval', $params['sd_brd']);
 		}
-		elseif (isset($params['sd_brd']) && (int) $params['sd_brd'] !== 0)
+		elseif (!empty($params['search_selection']) && $params['search_selection'] === 'board' && isset($params['sd_brd']) && (int) $params['sd_brd'] !== 0)
 		{
 			$query_boards = array((int) $params['sd_brd']);
 		}

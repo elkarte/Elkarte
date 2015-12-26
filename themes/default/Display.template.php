@@ -798,8 +798,13 @@ function template_pages_and_buttons_below()
 	// Show the lower breadcrumbs.
 	theme_linktree();
 
+	if (can_see_button_strip($context['mod_buttons']))
+	{
+		echo '
+			<i class="fa fa-2x fa-bars hamburger_30" data-id="moderationbuttons"></i>';
+	}
+
 	echo '
-			<i class="fa fa-2x fa-bars hamburger_30" data-id="moderationbuttons"></i>
 			<div id="moderationbuttons" class="hide_30 hamburger_30_target">', template_button_strip($context['mod_buttons'], 'bottom', array('id' => 'moderationbuttons_strip')), '</div>';
 
 	// Show the jump-to box, or actually...let Javascript do it.
