@@ -3099,8 +3099,9 @@ function doSecurityChecks()
 			$show_warnings = true;
 		}
 
-		// @todo add a hook here
 		$securityFiles = array('install.php', 'upgrade.php', 'convert.php', 'repair_paths.php', 'repair_settings.php', 'Settings.php~', 'Settings_bak.php~');
+		call_integration_hook('integrate_security_files', array(&$securityFiles));
+
 		foreach ($securityFiles as $securityFile)
 		{
 			if (file_exists(BOARDDIR . '/' . $securityFile))
