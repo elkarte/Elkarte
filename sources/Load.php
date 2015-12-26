@@ -1339,9 +1339,6 @@ function loadTheme($id_theme = 0, $initialize = true)
 
 	loadThemeUrls();
 
-	// Determine the current smiley set.
-	$user_info['smiley_set'] = determineSmileySet($user_info['smiley_set'], $modSettings['smiley_sets_known']);
-
 	loadUserContext();
 
 	// Set up some additional interface preference context
@@ -1753,7 +1750,9 @@ function loadUserContext()
 	elseif ($context['user']['is_guest'] && !empty($txt['guest_title']))
 		$context['user']['name'] = $txt['guest_title'];
 
-	$context['user']['smiley_set'] = $user_info['smiley_set'];
+	$context['user']['smiley_set'] = determineSmileySet($user_info['smiley_set'], $modSettings['smiley_sets_known']);
+	$context['smiley_enabled'] = $context['user']['smiley_set'] !== 'none';
+	$context['user']['smiley_path'] = $modSettings['smileys_url'] . '/' . $context['user']['smiley_set'] . '/';
 }
 
 function doScheduledSendMail()

@@ -135,7 +135,7 @@ function create_control_richedit($editorOptions)
 		$context['post_box_name'] = $editorOptions['id'];
 
 		// Some general stuff.
-		$settings['smileys_url'] = $modSettings['smileys_url'] . '/' . $user_info['smiley_set'];
+		$settings['smileys_url'] = $context['user']['smiley_path'];
 
 		// This really has some WYSIWYG stuff.
 		loadTemplate('GenericControls');
@@ -306,7 +306,7 @@ function create_control_richedit($editorOptions)
 		);
 
 		// Load smileys - don't bother to run a query if we're not using the database's ones anyhow.
-		if (empty($modSettings['smiley_enable']) && $user_info['smiley_set'] != 'none')
+		if (empty($modSettings['smiley_enable']) && $context['smiley_enabled'])
 		{
 			$context['smileys']['postform'][] = array(
 				'smileys' => array(
@@ -405,7 +405,7 @@ function create_control_richedit($editorOptions)
 				'isLast' => true,
 			);
 		}
-		elseif ($user_info['smiley_set'] !== 'none')
+		elseif ($context['smiley_enabled'])
 		{
 			if (($temp = cache_get_data('posting_smileys', 480)) == null)
 			{

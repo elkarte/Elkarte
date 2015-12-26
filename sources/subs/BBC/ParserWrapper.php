@@ -414,13 +414,12 @@ class ParserWrapper
 	 */
 	public function getSmileyParser()
 	{
-		global $modSettings, $user_info;
+		global $context;
 
 		if ($this->smiley_parser === null)
 		{
-			$path = $modSettings['smileys_url'] . '/' . $user_info['smiley_set'] . '/';
-			$this->smiley_parser = new SmileyParser($path);
-			$this->smiley_parser->setEnabled($GLOBALS['user_info']['smiley_set'] !== 'none');
+			$this->smiley_parser = new \BBC\SmileyParser($context['user']['smiley_path']);
+			$this->smiley_parser->setEnabled($context['smiley_enabled']);
 		}
 
 		return $this->smiley_parser;
