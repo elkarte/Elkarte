@@ -175,13 +175,15 @@ class Mentions_Controller extends Action_Controller
 	public function action_index()
 	{
 		$req = HttpReq::instance();
-		if (isset($req->query->sa) && $req->query->sa == 'fetch')
+		if ($req->getQuery('sa') === 'fetch')
 		{
-			return $this->action_fetch();
+			$this->action_fetch();
 		}
-
-		// default action to execute
-		$this->action_list();
+		else
+		{
+			// default action to execute
+			$this->action_list();
+		}
 	}
 
 	/**
