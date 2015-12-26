@@ -15,6 +15,9 @@
 (function($, window, document) {
 	'use strict';
 
+	// Editor instance
+	var editor;
+
 	function elk_Drafts(options) {
 		// All the passed options and defaults are loaded to the opts object
 		this.opts = $.extend({}, this.defaults, options);
@@ -25,6 +28,7 @@
 
 	/**
 	 * Make the call to save this draft in the background
+	 *
 	 * - returns if nothing has changed since the last save or there is nothing to save
 	 * - updates the display to show we are saving
 	 * - loads the form data and makes the ajax request
@@ -39,7 +43,7 @@
 			this.draftCancel();
 
 		// Get the editor text, either from sceditor or from the quicktext textarea
-		var sPostdata = base.val();
+		var sPostdata = editor.val();
 
 		// Nothing to save?
 		if (isEmptyText(sPostdata))
@@ -78,7 +82,7 @@
 		}
 
 		// Keep track of source or wysiwyg when using the full editor
-		aSections[aSections.length] = 'message_mode=' + (base.inSourceMode() ? '1' : '0');
+		aSections[aSections.length] = 'message_mode=' + (editor.inSourceMode() ? '1' : '0');
 
 		// Send in the request to save the data
 		this.draftAjax(aSections, "?action=post2;board=" + this.opts.iBoard + ";xml");
@@ -86,6 +90,7 @@
 
 	/**
 	 * Make the call to save this PM draft in the background
+	 *
 	 * - returns if nothing has changed since the last save or there is nothing to save
 	 * - updates the display to show we are saving
 	 * - loads the form data and makes the ajax request
@@ -101,7 +106,7 @@
 			this.draftCancel();
 
 		// Nothing to save
-		var sPostdata = base.val();
+		var sPostdata = editor.val();
 		if (isEmptyText(sPostdata))
 			return false;
 
@@ -127,7 +132,7 @@
 
 		// Account for wysiwyg
 		if (this.opts.sType && this.opts.sType === 'post')
-			aSections[aSections.length] = 'message_mode=' + (base.inSourceMode() ? '1' : '0');
+			aSections[aSections.length] = 'message_mode=' + (editor.inSourceMode() ? '1' : '0');
 
 		// Send in (post) the document for saving
 		this.draftAjax(aSections, "?action=pm;sa=send2;xml");
@@ -185,6 +190,7 @@
 
 	/**
 	 * Function to retrieve the to and bcc values from the pseudo arrays
+	 *
 	 *  - Accounts for either a single or multiple to/bcc recipients
 	 *
 	 * @param {string} sField name of the form elements we are getting
@@ -235,7 +241,8 @@
 
 	/**
 	 * Signals that one of the post/pm/qr form buttons was pressed
-	 * Used to prevent saving an auto draft on input button (post, save, etc)
+	 *
+	 * - Used to prevent saving an auto draft on input button (post, save, etc)
 	 */
 	elk_Drafts.prototype.formCheck = function() {
 		var oInstance = this,
@@ -259,6 +266,7 @@
 		$_form_submitt.on('mousedown', oInstance, function() {
 			oInstance.opts._bInDraftMode = true;
 		});
+
 		$_form_submitt.on('keydown', oInstance, function() {
 			oInstance.opts._bInDraftMode = true;
 		});
@@ -306,6 +314,7 @@
 
 	/**
 	 * Draft plugin interface to SCEditor
+	 *
 	 *  - Called from the editor as a plugin
 	 *  - Monitors events so we control the elk_draft autosaver (on/off/change)
 	 */
@@ -317,9 +326,13 @@
 		 * Initialize, called when sceditor starts and initializes plugins
 		 */
 		base.init = function() {
+			// Grab this instance for use use in oDrafts
+			editor = this;
+
 			// Init the draft instance, load in the options
 			oDrafts = new elk_Drafts(this.opts.draftOptions);
 			oDrafts.opts.bPM = oDrafts.opts.bPM ? true : false;
+			oDrafts.base = base;
 
 			// Start the autosave timer
 			if (oDrafts.opts.iFreq > 0)
@@ -363,7 +376,7 @@
 		 * Informs the autosave function that some activity has occurred in the
 		 * editor window since the last save ... activity being triggered whenever
 		 * the editor loses focus, something is pasted/inserted and when the user
-		 * stops typing for 1.5s or the press space/return
+		 * stops typing for 1.5s or press space/return
 		 */
 		base.signalValuechangedEvent = function(oEvent) {
 			// Prevent autosave when using the tab key to navigate to the submit buttons
@@ -373,5 +386,4 @@
 			oDrafts.opts._bCheckDraft = true;
 		};
 	};
-
 })(jQuery, window, document);
