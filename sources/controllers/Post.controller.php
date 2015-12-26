@@ -71,14 +71,21 @@ class Post_Controller extends Action_Controller
 	}
 
 	/**
-	 * Handles showing the post screen, loading the post to be modified, and loading any post quoted.
+	 * Handles showing the post screen, loading the post to be modified, loading any post quoted, previews,
+	 * display of errors and polls.
 	 *
-	 * - additionally handles previews of posts.
-	 * - requires different permissions depending on the actions, but most notably post_new, post_reply_own, and post_reply_any.
-	 * - shows options for the editing and posting of calendar events and attachments, as well as the posting of polls (using modules).
-	 * - accessed from ?action=post.
+	 * What it does:
+	 * - Validates that we're posting in a board.
+	 * - Find the topic id if a message id is passed, else assume it's a new message
+	 * - Get the response prefix in the default forum language.
+	 * - Triggers events associated with posting.
+	 * - Additionally handles previews of posts.
+	 * - Requires different permissions depending on the actions, but most notably post_new, post_reply_own, and post_reply_any.
+	 * - Shows options for the editing and posting of calendar events and attachments, and as the posting of polls (using modules).
+	 * - Accessed from ?action=post or called from action_post2 in the event of errors or preview from quick reply.
 	 *
 	 * @uses the Post template and language file, main sub template.
+	 * @uses Errors language
 	 */
 	public function action_post()
 	{
@@ -100,6 +107,7 @@ class Post_Controller extends Action_Controller
 			'last_post_time' => 0
 		);
 
+		// Trigger the prepare_post event
 		$this->_events->trigger('prepare_post', array('topic_attributes' => &$this->_topic_attributes));
 
 		// You must be posting to *some* board.
@@ -270,6 +278,7 @@ class Post_Controller extends Action_Controller
 				$really_previewing = !empty($_REQUEST['preview']) || isset($_REQUEST['xml']);
 			}
 
+			// Trigger the prepare_modifying event
 			$this->_events->trigger('prepare_modifying', array('post_errors' => $this->_post_errors, 'really_previewing' => &$really_previewing));
 
 			// In order to keep the approval status flowing through, we have to pass it through the form...
@@ -520,6 +529,7 @@ class Post_Controller extends Action_Controller
 		{
 			$context['icons'][count($context['icons']) - 1]['is_last'] = true;
 			$context['icons'][0]['selected'] = true;
+
 			// $context['icon'] is set when editing a message
 			if (!isset($context['icon']))
 				$context['icon'] = $context['icons'][0]['value'];
@@ -533,7 +543,7 @@ class Post_Controller extends Action_Controller
 					break;
 				}
 			}
-			// Failsafe
+			// Fail safe
 			if (!$found)
 			{
 				$context['icon'] = $context['icons'][0]['value'];
@@ -543,8 +553,10 @@ class Post_Controller extends Action_Controller
 
 		$context['show_additional_options'] = !empty($_POST['additional_options']) || isset($_GET['additionalOptions']);
 
+		// Trigger the finalize_post_form event
 		$this->_events->trigger('finalize_post_form', array('destination' => &$context['destination'], 'page_title' => &$context['page_title'], 'show_additional_options' => &$context['show_additional_options'], 'editorOptions' => &$editorOptions));
 
+		// Initialize the editor
 		create_control_richedit($editorOptions);
 
 		// Build the link tree.

@@ -74,7 +74,7 @@ class Likes_Controller extends Action_Controller
 				loadLanguage('Errors');
 				$this->_likes_response = array('result' => false, 'data' => $txt['like_unlike_error']);
 			}
-	}
+		}
 
 		$this->likeResponse();
 	}
