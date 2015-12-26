@@ -1454,16 +1454,17 @@ function disableAutoComplete()
 (function() {
 	var ElkNotifications = (function(opt) {
 		'use strict';
+
 		opt = (opt) ? opt : {};
 		var _notifiers = [],
 			start = true,
 			lastTime = 0;
 
 		var init = function(opt) {
-			if (typeof opt.delay == 'undefined')
+			if (typeof opt.delay === 'undefined')
 			{
 				start = false;
-				opt.delay = 10000;
+				opt.delay = 15000;
 			}
 
 			setTimeout(function() {
@@ -1483,11 +1484,13 @@ function disableAutoComplete()
 
 		var fetch = function() {
 			$.ajax({
-				url: elk_scripturl + "?action=mentions;sa=fetch;api=json;lastsent=" + lastTime,
+				url: elk_scripturl + "?action=mentions;sa=fetch;api=json;lastsent=" + lastTime
 			})
 			.done(function(request) {
-				send(request);
-				lastTime = request.timelast;
+				if (request !== "") {
+					send(request);
+					lastTime = request.timelast;
+				}
 
 				setTimeout(function() {
 					fetch();
@@ -1498,7 +1501,7 @@ function disableAutoComplete()
 		init(opt);
 		return {
 			add: add
-		}
+		};
 	});
 
 	// AMD / RequireJS
