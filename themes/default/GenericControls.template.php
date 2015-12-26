@@ -148,15 +148,15 @@ function template_control_richedit($editor_id, $smileyContainer = null, $bbcCont
 
 	echo '
 				});
-				$editor_data[\'', $editor_id, '\'] = $("#', $editor_id, '").data("sceditor");
-				$editor_container[\'', $editor_id, '\'] = $(".sceditor-container");
-				$editor_data[\'', $editor_id, '\'].css(\'code {white-space: pre;}\').createPermanentDropDown();
-				$editor_container[\'', $editor_id, '\'].width("100%").height("100%");', $editor_context['rich_active'] ? '' : '
-				$editor_data[\'' . $editor_id . '\'].setTextMode();', '
+				$editor_data["', $editor_id, '"] = $("#', $editor_id, '").data("sceditor");
+				$editor_container["', $editor_id, '"] = $(".sceditor-container");
+				$editor_data["', $editor_id, '"].css("code {white-space: pre;}").createPermanentDropDown();
+				$editor_container["', $editor_id, '"].css({width: "100%", height: "100%"})', $editor_context['rich_active'] ? '' : '
+				$editor_data["' . $editor_id . '"].sourceMode(true);', '
 				if (!(is_ie || is_ff || is_opera || is_safari || is_chrome))
 					$(".sceditor-button-source").hide();
 				', isset($context['post_error']['errors']['no_message']) || isset($context['post_error']['errors']['long_message']) ? '
-				$editor_container[\'' . $editor_id . '\'].find("textarea, iframe").addClass("border_error");' : '', '
+				$editor_container["' . $editor_id . '"].find("textarea, iframe").addClass("border_error");' : '', '
 		}
 
 		$(document).ready(function(){
