@@ -84,6 +84,7 @@ function reloadSettings()
 	{
 		if (($modSettings['load_average'] = $cache->get('loadavg', 90)) == null)
 		{
+			require_once(SUBSDIR . '/Server.subs.php');
 			$modSettings['load_average'] = detectServerLoad();
 
 			$cache->put('loadavg', $modSettings['load_average'], 90);
@@ -3026,18 +3027,42 @@ function detectServer()
 	global $context;
 
 	$context['server'] = array(
-		'is_iis' => isset($_SERVER['SERVER_SOFTWARE']) && strpos($_SERVER['SERVER_SOFTWARE'], 'Microsoft-IIS') !== false,
-		'is_apache' => isset($_SERVER['SERVER_SOFTWARE']) && strpos($_SERVER['SERVER_SOFTWARE'], 'Apache') !== false,
-		'is_litespeed' => isset($_SERVER['SERVER_SOFTWARE']) && strpos($_SERVER['SERVER_SOFTWARE'], 'LiteSpeed') !== false,
-		'is_lighttpd' => isset($_SERVER['SERVER_SOFTWARE']) && strpos($_SERVER['SERVER_SOFTWARE'], 'lighttpd') !== false,
-		'is_nginx' => isset($_SERVER['SERVER_SOFTWARE']) && strpos($_SERVER['SERVER_SOFTWARE'], 'nginx') !== false,
-		'is_cgi' => isset($_SERVER['SERVER_SOFTWARE']) && strpos(php_sapi_name(), 'cgi') !== false,
-		'is_windows' => strpos(PHP_OS, 'WIN') === 0,
-		'iso_case_folding' => ord(strtolower(chr(138))) === 154,
+		'is_iis'			=> serverIs('iis'),
+		'is_apache'			=> serverIs('apache'),
+		'is_litespeed' 		=> serverIs('litespeed'),
+		'is_lighttpd' 		=> serverIs('lighttpd'),
+		'is_nginx' 			=> serverIs('nginx'),
+		'is_cgi' 			=> serverIs('cgi'),
+		'is_windows' 		=> serverIs('windows'),
+		'iso_case_folding' 	=> serverIs('iso_case_folding'),
+		// A bug in some versions of IIS under CGI (older ones) makes cookie setting not work with Location: headers.
+		'needs_login_fix'	=> serverIs('needs_login_fix'),
 	);
+}
 
-	// A bug in some versions of IIS under CGI (older ones) makes cookie setting not work with Location: headers.
-	$context['server']['needs_login_fix'] = $context['server']['is_cgi'] && $context['server']['is_iis'];
+function serverIs($server)
+{
+	switch ($server)
+	{
+		case 'apache':
+			return isset($_SERVER['SERVER_SOFTWARE']) && strpos($_SERVER['SERVER_SOFTWARE'], 'Apache') !== false;
+		case 'cgi':
+			return isset($_SERVER['SERVER_SOFTWARE']) && strpos(php_sapi_name(), 'cgi') !== false;
+		case 'iis':
+			return isset($_SERVER['SERVER_SOFTWARE']) && strpos($_SERVER['SERVER_SOFTWARE'], 'Microsoft-IIS') !== false;
+		case 'iso_case_folding':
+			return ord(strtolower(chr(138))) === 154;
+		case 'lighttpd':
+			return isset($_SERVER['SERVER_SOFTWARE']) && strpos($_SERVER['SERVER_SOFTWARE'], 'lighttpd') !== false;
+		case 'litespeed':
+			return isset($_SERVER['SERVER_SOFTWARE']) && strpos($_SERVER['SERVER_SOFTWARE'], 'LiteSpeed') !== false;
+		case 'needs_login_fix':
+			return serverIs('cgi') && serverIs('iis');
+		case 'nginx':
+			return isset($_SERVER['SERVER_SOFTWARE']) && strpos($_SERVER['SERVER_SOFTWARE'], 'nginx') !== false;
+		case 'windows':
+			return strpos(PHP_OS, 'WIN') === 0;
+	}
 }
 
 /**
@@ -3165,59 +3190,6 @@ function doSecurityChecks()
 	// Finally, let's show the layer.
 	if ($show_warnings || !empty($context['warning_controls']))
 		Template_Layers::getInstance()->addAfter('admin_warning', 'body');
-}
-
-/**
- * Returns the current server load for nix systems
- *
- * - Used to enable / disable features based on current system overhead
- */
-function detectServerLoad()
-{
-	if (stristr(PHP_OS, 'win'))
-		return false;
-
-	$cores = detectServerCores();
-
-	// The internal function should always be available
-	if (function_exists('sys_getloadavg'))
-	{
-		$sys_load = sys_getloadavg();
-        return $sys_load[0] / $cores;
-	}
-	// Maybe someone has a custom compile
-	else
-	{
-		$load_average = @file_get_contents('/proc/loadavg');
-
-		if (!empty($load_average) && preg_match('~^([^ ]+?) ([^ ]+?) ([^ ]+)~', $load_average, $matches) != 0)
-			return (float) $matches[1] / $cores;
-		elseif (($load_average = @`uptime`) != null && preg_match('~load average[s]?: (\d+\.\d+), (\d+\.\d+), (\d+\.\d+)~i', $load_average, $matches) != 0)
-			return (float) $matches[1] / $cores;
-
-		return false;
-	}
-}
-
-/**
- * Determines the number of cpu cores available
- *
- * - Used to normalize server load based on cores
- *
- * @return int
- */
-function detectServerCores()
-{
-	$cores = @file_get_contents('/proc/cpuinfo');
-
-	if (!empty($cores))
-	{
-		$cores = preg_match_all('~^physical id~m', $cores, $matches);
-		if (!empty($cores))
-			return (int) $cores;
-	}
-
-	return 1;
 }
 
 /**

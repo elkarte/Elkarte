@@ -692,6 +692,7 @@ class ManageServer_Controller extends Action_Controller
 			$context['settings_message'] = $txt['loadavg_disabled_windows'];
 		else
 		{
+			require_once(SUBSDIR . '/Server.subs.php');
 			$modSettings['load_average'] = detectServerLoad();
 
 			if ($modSettings['load_average'] !== false)
