@@ -574,6 +574,7 @@ class Post_Controller extends Action_Controller
 		$context['subject'] = addcslashes($this->_form_subject, '"');
 		$context['message'] = str_replace(array('"', '<', '>', '&nbsp;'), array('&quot;', '&lt;', '&gt;', ' '), $this->_form_message);
 
+		require_once(SUBSDIR . '/Editor.subs.php');
 		// Message icons - customized or not, retrieve them...
 		$context['icons'] = getMessageIcons($board);
 

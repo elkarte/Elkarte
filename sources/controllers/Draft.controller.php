@@ -68,6 +68,14 @@ class Draft_Controller extends Post_Controller
 	}
 
 	/**
+	 * @override
+	 */
+	public function action_save()
+	{
+		$this->action_index();
+	}
+
+	/**
 	 * Show all drafts of a given type by the current user
 	 *
 	 * What it does:

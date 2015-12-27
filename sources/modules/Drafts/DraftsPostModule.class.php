@@ -37,6 +37,7 @@ class Drafts_Post_Module implements ElkArte\sources\modules\Module_Interface
 	{
 		global $modSettings;
 
+		$return = array();
 		if (!empty($modSettings['drafts_enabled']) && !empty($modSettings['drafts_post_enabled']))
 		{
 			self::$_eventsManager = $eventsManager;
@@ -49,17 +50,21 @@ class Drafts_Post_Module implements ElkArte\sources\modules\Module_Interface
 			if (!empty($modSettings['draft_subject_length']))
 				self::$_subject_length = (int) $modSettings['draft_subject_length'];
 
-			return array(
+			$return = array(
 				array('prepare_modifying', array('Drafts_Post_Module', 'prepare_modifying'), array('really_previewing')),
 				array('finalize_post_form', array('Drafts_Post_Module', 'finalize_post_form'), array('editorOptions', 'board', 'topic', 'template_layers')),
-
-				array('prepare_save_post', array('Drafts_Post_Module', 'prepare_save_post'), array()),
-				array('before_save_post', array('Drafts_Post_Module', 'before_save_post'), array()),
-				array('after_save_post', array('Drafts_Post_Module', 'after_save_post'), array('msgOptions')),
 			);
+			if (isset($_REQUEST['save_draft']))
+			{
+				$return += array(
+					array('prepare_save_post', array('Drafts_Post_Module', 'prepare_save_post'), array()),
+					array('before_save_post', array('Drafts_Post_Module', 'before_save_post'), array()),
+					array('after_save_post', array('Drafts_Post_Module', 'after_save_post'), array('msgOptions')),
+				);
+			}
 		}
-		else
-			return array();
+
+		return $return;
 	}
 
 	public function prepare_modifying(&$really_previewing)
