@@ -1289,7 +1289,7 @@ function getThemeData($id_theme, $member)
 
 function initTheme($id_theme = 0)
 {
-	global $user_info, $settings, $options;
+	global $user_info, $settings, $options, $context;
 
 	$id_theme = getThemeId($id_theme);
 
@@ -1307,6 +1307,26 @@ function initTheme($id_theme = 0)
 
 	// Reload the templates
 	Templates::getInstance()->reloadDirectories($settings);
+
+	// Setup the default theme file. In the future, this won't exist and themes will just have to extend it if they want
+	require_once($settings['default_theme_dir'] . '/Theme.php');
+	$context['default_theme_instance'] = new \Themes\DefaultTheme\Theme(1);
+
+	// Check if there is a Theme file
+	if ($id_theme != 1 && !empty($settings['theme_dir']) && file_exists($settings['theme_dir'] . '/Theme.php'))
+	{
+		require_once($settings['theme_dir'] . '/Theme.php');
+
+		$class = '\\Themes\\' . basename($settings['theme_dir']) . '\\Theme';
+
+		$theme = new $class($id_theme);
+
+		$context['theme_instance'] = $theme;
+	}
+	else
+	{
+		$context['theme_instance'] = $context['default_theme_instance'];
+	}
 }
 
 /**
@@ -1397,7 +1417,7 @@ function loadTheme($id_theme = 0, $initialize = true)
 	if (!isset($txt))
 		$txt = array();
 
-	loadDefaultLayers();
+	theme()->loadDefaultLayers();
 
 	// Defaults in case of odd things
 	$settings['avatars_on_indexes'] = 0;
@@ -1423,7 +1443,7 @@ function loadTheme($id_theme = 0, $initialize = true)
 	// We allow theme variants, because we're cool.
 	if (!empty($settings['theme_variants']))
 	{
-		loadThemeVariant();
+		theme()->loadThemeVariant();
 	}
 
 	// A bit lonely maybe, though I think it should be set up *after* the theme variants detection
@@ -1459,7 +1479,7 @@ function loadTheme($id_theme = 0, $initialize = true)
 			'atom' => $scripturl . '?action=.xml;type=atom;limit=' . (!empty($modSettings['xmlnews_limit']) ? $modSettings['xmlnews_limit'] : 5)
 		);
 
-	loadThemeJavascript();
+	theme()->loadThemeJavascript();
 
 	Hooks::get()->newPath(array('$themedir' => $settings['theme_dir']));
 
@@ -1565,165 +1585,6 @@ function loadThemeContext()
 	$context['insert_after_template'] = '';
 }
 
-function loadDefaultLayers()
-{
-	global $settings;
-
-	$simpleActions = array(
-		'quickhelp',
-		'printpage',
-		'quotefast',
-		'spellcheck',
-	);
-
-	call_integration_hook('integrate_simple_actions', array(&$simpleActions));
-
-	// Output is fully XML, so no need for the index template.
-	if (isset($_REQUEST['xml']))
-	{
-		loadLanguage('index+Addons');
-
-		// @todo added because some $settings in template_init are necessary even in xml mode. Maybe move template_init to a settings file?
-		loadTemplate('index');
-		loadTemplate('Xml');
-		Template_Layers::getInstance()->removeAll();
-	}
-	// These actions don't require the index template at all.
-	elseif (!empty($_REQUEST['action']) && in_array($_REQUEST['action'], $simpleActions))
-	{
-		loadLanguage('index+Addons');
-		Template_Layers::getInstance()->removeAll();
-	}
-	else
-	{
-		// Custom templates to load, or just default?
-		if (isset($settings['theme_templates']))
-			$templates = explode(',', $settings['theme_templates']);
-		else
-			$templates = array('index');
-
-		// Load each template...
-		foreach ($templates as $template)
-			loadTemplate($template);
-
-		// ...and attempt to load their associated language files.
-		$required_files = implode('+', array_merge($templates, array('Addons')));
-		loadLanguage($required_files, '', false);
-
-		// Custom template layers?
-		if (isset($settings['theme_layers']))
-			$layers = explode(',', $settings['theme_layers']);
-		else
-			$layers = array('html', 'body');
-
-		$template_layers = Template_Layers::getInstance(true);
-		foreach ($layers as $layer)
-			$template_layers->addBegin($layer);
-	}
-}
-
-function loadThemeVariant()
-{
-	global $context, $settings, $options;
-
-	// Overriding - for previews and that ilk.
-	if (!empty($_REQUEST['variant']))
-		$_SESSION['id_variant'] = $_REQUEST['variant'];
-
-	// User selection?
-	if (empty($settings['disable_user_variant']) || allowedTo('admin_forum'))
-		$context['theme_variant'] = !empty($_SESSION['id_variant']) ? $_SESSION['id_variant'] : (!empty($options['theme_variant']) ? $options['theme_variant'] : '');
-
-	// If not a user variant, select the default.
-	if ($context['theme_variant'] == '' || !in_array($context['theme_variant'], $settings['theme_variants']))
-		$context['theme_variant'] = !empty($settings['default_variant']) && in_array($settings['default_variant'], $settings['theme_variants']) ? $settings['default_variant'] : $settings['theme_variants'][0];
-
-	// Do this to keep things easier in the templates.
-	$context['theme_variant'] = '_' . $context['theme_variant'];
-	$context['theme_variant_url'] = $context['theme_variant'] . '/';
-
-	// The most efficient way of writing multi themes is to use a master index.css plus variant.css files.
-	if (!empty($context['theme_variant']))
-		loadCSSFile($context['theme_variant'] . '/index' . $context['theme_variant'] . '.css');
-}
-
-function loadThemeJavascript()
-{
-	global $settings, $context, $modSettings, $scripturl, $txt, $options;
-	// A bit lonely maybe, though I think it should be set up *after* the theme variants detection
-	$context['header_logo_url_html_safe'] = empty($settings['header_logo_url']) ? $settings['images_url'] . '/' . $context['theme_variant_url'] . 'logo_elk.png' : Util::htmlspecialchars($settings['header_logo_url']);
-
-	// Allow overriding the board wide time/number formats.
-	if (empty($user_settings['time_format']) && !empty($txt['time_format']))
-		$user_info['time_format'] = $txt['time_format'];
-
-	if (isset($settings['use_default_images']) && $settings['use_default_images'] == 'always')
-	{
-		$settings['theme_url'] = $settings['default_theme_url'];
-		$settings['images_url'] = $settings['default_images_url'];
-		$settings['theme_dir'] = $settings['default_theme_dir'];
-	}
-
-	// Queue our Javascript
-	loadJavascriptFile(array('elk_jquery_plugins.js', 'script.js', 'script_elk.js', 'theme.js'));
-
-	// Default JS variables for use in every theme
-	addJavascriptVar(array(
-		'elk_theme_url' => JavaScriptEscape($settings['theme_url']),
-		'elk_default_theme_url' => JavaScriptEscape($settings['default_theme_url']),
-		'elk_images_url' => JavaScriptEscape($settings['images_url']),
-		'elk_smiley_url' => JavaScriptEscape($modSettings['smileys_url']),
-		'elk_scripturl' => '\'' . $scripturl . '\'',
-		'elk_iso_case_folding' => $context['server']['iso_case_folding'] ? 'true' : 'false',
-		'elk_charset' => '"UTF-8"',
-		'elk_session_id' => JavaScriptEscape($context['session_id']),
-		'elk_session_var' => JavaScriptEscape($context['session_var']),
-		'elk_member_id' => $context['user']['id'],
-		'ajax_notification_text' => JavaScriptEscape($txt['ajax_in_progress']),
-		'ajax_notification_cancel_text' => JavaScriptEscape($txt['modify_cancel']),
-		'help_popup_heading_text' => JavaScriptEscape($txt['help_popup']),
-		'use_click_menu' => !empty($options['use_click_menu']) ? 'true' : 'false',
-		'todayMod' => !empty($modSettings['todayMod']) ? (int) $modSettings['todayMod'] : 0)
-	);
-
-	// Auto video embedding enabled, then load the needed JS
-	if (!empty($modSettings['enableVideoEmbeding']))
-	{
-		autoEmbedVideo();
-	}
-
-	// Prettify code tags? Load the needed JS and CSS.
-	if (!empty($modSettings['enableCodePrettify']))
-	{
-		addCodePrettify();
-	}
-
-	relativeTimes();
-
-	// If we think we have mail to send, let's offer up some possibilities... robots get pain (Now with scheduled task support!)
-	if ((!empty($modSettings['mail_next_send']) && $modSettings['mail_next_send'] < time() && empty($modSettings['mail_queue_use_cron'])) || empty($modSettings['next_task_time']) || $modSettings['next_task_time'] < time())
-	{
-		doScheduledSendMail();
-	}
-}
-
-function autoEmbedVideo()
-{
-	global $txt;
-
-	addInlineJavascript('
-		var oEmbedtext = ({
-			preview_image : ' . JavaScriptEscape($txt['preview_image']) . ',
-			ctp_video : ' . JavaScriptEscape($txt['ctp_video']) . ',
-			hide_video : ' . JavaScriptEscape($txt['hide_video']) . ',
-			youtube : ' . JavaScriptEscape($txt['youtube']) . ',
-			vimeo : ' . JavaScriptEscape($txt['vimeo']) . ',
-			dailymotion : ' . JavaScriptEscape($txt['dailymotion']) . '
-		});', true);
-
-	loadJavascriptFile('elk_jquery_embed.js', array('defer' => true));
-}
-
 function loadUserContext()
 {
 	global $context, $user_info, $txt, $modSettings;
@@ -1753,36 +1614,6 @@ function loadUserContext()
 	$context['user']['smiley_set'] = determineSmileySet($user_info['smiley_set'], $modSettings['smiley_sets_known']);
 	$context['smiley_enabled'] = $context['user']['smiley_set'] !== 'none';
 	$context['user']['smiley_path'] = $modSettings['smileys_url'] . '/' . $context['user']['smiley_set'] . '/';
-}
-
-function doScheduledSendMail()
-{
-	global $modSettings;
-
-	if (isBrowser('possibly_robot'))
-	{
-		// @todo Maybe move this somewhere better?!
-		$controller = new ScheduledTasks_Controller();
-
-		// What to do, what to do?!
-		if (empty($modSettings['next_task_time']) || $modSettings['next_task_time'] < time())
-			$controller->action_autotask();
-		else
-			$controller->action_reducemailqueue();
-	}
-	else
-	{
-		$type = empty($modSettings['next_task_time']) || $modSettings['next_task_time'] < time() ? 'task' : 'mailq';
-		$ts = $type == 'mailq' ? $modSettings['mail_next_send'] : $modSettings['next_task_time'];
-
-		addInlineJavascript('
-		function elkAutoTask()
-		{
-			var tempImage = new Image();
-			tempImage.src = elk_scripturl + "?scheduled=' . $type . ';ts=' . $ts . '";
-		}
-		window.setTimeout("elkAutoTask();", 1);', true);
-	}
 }
 
 function fixThemeUrls($detected_url)
@@ -1821,46 +1652,6 @@ function fixThemeUrls($detected_url)
 
 	foreach ($context['linktree'] as $k => $dummy)
 		$context['linktree'][$k]['url'] = strtr($dummy['url'], array($oldurl => $boardurl));
-}
-
-function relativeTimes()
-{
-	global $modSettings, $context, $txt;
-
-	// Relative times?
-	if (!empty($modSettings['todayMod']) && $modSettings['todayMod'] > 2)
-	{
-		addInlineJavascript('
-		var oRttime = ({
-			referenceTime : ' . forum_time() * 1000 . ',
-			now : ' . JavaScriptEscape($txt['rt_now']) . ',
-			minute : ' . JavaScriptEscape($txt['rt_minute']) . ',
-			minutes : ' . JavaScriptEscape($txt['rt_minutes']) . ',
-			hour : ' . JavaScriptEscape($txt['rt_hour']) . ',
-			hours : ' . JavaScriptEscape($txt['rt_hours']) . ',
-			day : ' . JavaScriptEscape($txt['rt_day']) . ',
-			days : ' . JavaScriptEscape($txt['rt_days']) . ',
-			week : ' . JavaScriptEscape($txt['rt_week']) . ',
-			weeks : ' . JavaScriptEscape($txt['rt_weeks']) . ',
-			month : ' . JavaScriptEscape($txt['rt_month']) . ',
-			months : ' . JavaScriptEscape($txt['rt_months']) . ',
-			year : ' . JavaScriptEscape($txt['rt_year']) . ',
-			years : ' . JavaScriptEscape($txt['rt_years']) . ',
-		});
-		updateRelativeTime();', true);
-		$context['using_relative_time'] = true;
-	}
-}
-
-function addCodePrettify()
-{
-	loadCSSFile('prettify.css');
-	loadJavascriptFile('prettify.min.js', array('defer' => true));
-
-	addInlineJavascript('
-		$(document).ready(function(){
-			prettyPrint();
-		});', true);
 }
 
 /**
@@ -2178,13 +1969,7 @@ function loadAssetFile($filenames, $params = array(), $id = '')
  */
 function addJavascriptVar($vars, $escape = false)
 {
-	global $context;
-
-	if (empty($vars) || !is_array($vars))
-		return;
-
-	foreach ($vars as $key => $value)
-		$context['javascript_vars'][$key] = !empty($escape) ? JavaScriptEscape($value) : $value;
+	theme()->addJavascriptVar($vars, $escape);
 }
 
 /**
@@ -2200,10 +1985,7 @@ function addJavascriptVar($vars, $escape = false)
  */
 function addInlineJavascript($javascript, $defer = false)
 {
-	global $context;
-
-	if (!empty($javascript))
-		$context['javascript_inline'][(!empty($defer) ? 'defer' : 'standard')][] = $javascript;
+	theme()->addInlineJavascript($javascript, $defer);
 }
 
 /**
@@ -2853,7 +2635,7 @@ function doSecurityChecks()
 
 	// Finally, let's show the layer.
 	if ($show_warnings || !empty($context['warning_controls']))
-		Template_Layers::getInstance()->addAfter('admin_warning', 'body');
+		\Template_Layers::getInstance()->addAfter('admin_warning', 'body');
 }
 
 /**
