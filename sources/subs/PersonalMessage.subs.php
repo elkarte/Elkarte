@@ -37,7 +37,7 @@ function loadMessageLimit()
 
 	if ($user_info['is_admin'])
 		$message_limit = 0;
-	elseif (($message_limit = cache_get_data('msgLimit:' . $user_info['id'], 360)) === null)
+	elseif (!Cache::instance()->getVar($message_limit, 'msgLimit:' . $user_info['id'], 360))
 	{
 		$request = $db->query('', '
 			SELECT
@@ -54,7 +54,7 @@ function loadMessageLimit()
 		$message_limit = $minMessage == 0 ? 0 : $maxMessage;
 
 		// Save us doing it again!
-		cache_put_data('msgLimit:' . $user_info['id'], $message_limit, 360);
+		Cache::instance()->put('msgLimit:' . $user_info['id'], $message_limit, 360);
 	}
 
 	return $message_limit;
@@ -101,7 +101,7 @@ function loadPMLabels($labels)
 	$db->free_result($result);
 
 	// Store it please!
-	cache_put_data('labelCounts:' . $user_info['id'], $labels, 720);
+	Cache::instance()->put('labelCounts:' . $user_info['id'], $labels, 720);
 
 	return $labels;
 }
@@ -303,7 +303,7 @@ function deleteMessages($personal_messages, $folder = null, $owner = null)
 	}
 
 	// Any cached numbers may be wrong now.
-	cache_put_data('labelCounts:' . $user_info['id'], null, 720);
+	Cache::instance()->put('labelCounts:' . $user_info['id'], null, 720);
 }
 
 /**
@@ -431,7 +431,7 @@ function updatePMMenuCounts($owner)
 	$db->free_result($result);
 
 	// Need to store all this.
-	cache_put_data('labelCounts:' . $owner, $context['labels'], 720);
+	Cache::instance()->put('labelCounts:' . $owner, $context['labels'], 720);
 	require_once(SUBSDIR . '/Members.subs.php');
 	updateMemberData($owner, array('unread_messages' => $total_unread));
 

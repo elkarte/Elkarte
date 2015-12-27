@@ -58,7 +58,7 @@ function recountOpenReports($flush = true, $count_pms = false)
 
 	$context['open_mod_reports'] = $open_reports;
 	if ($flush)
-		cache_put_data('num_menu_errors', null, 900);
+		Cache::instance()->remove('num_menu_errors');
 	return $open_reports;
 }
 
@@ -251,7 +251,7 @@ function loadModeratorMenuCounts($brd = null)
 		return $menu_errors[$cache_key];
 
 	// If its been cached, guess what, thats right use it!
-	$temp = cache_get_data('num_menu_errors', 900);
+	$temp = Cache::instance()->get('num_menu_errors', 900);
 	if ($temp === null || !isset($temp[$cache_key]))
 	{
 		// Starting out with nothing is a good start
@@ -321,7 +321,7 @@ function loadModeratorMenuCounts($brd = null)
 		$menu_errors = is_array($temp) ? array_merge($temp, $menu_errors) : $menu_errors;
 
 		// Store it away for a while, not like this should change that often
-		cache_put_data('num_menu_errors', $menu_errors, 900);
+		Cache::instance()->put('num_menu_errors', $menu_errors, 900);
 	}
 	else
 		$menu_errors = $temp === null ? array() : $temp;
@@ -855,7 +855,7 @@ function approveAllUnapproved()
 	{
 		require_once(SUBSDIR . '/Post.subs.php');
 		approvePosts($msgs);
-		cache_put_data('num_menu_errors', null, 900);
+		Cache::instance()->remove('num_menu_errors');
 	}
 
 	// Now do attachments
@@ -876,7 +876,7 @@ function approveAllUnapproved()
 	{
 		require_once(SUBSDIR . '/ManageAttachments.subs.php');
 		approveAttachments($attaches);
-		cache_put_data('num_menu_errors', null, 900);
+		Cache::instance()->remove('num_menu_errors');
 	}
 }
 
@@ -1168,7 +1168,7 @@ function basicWatchedUsers()
 
 	$db = database();
 
-	if (($watched_users = cache_get_data('recent_user_watches', 240)) === null)
+	if (!Cache::instance()->getVar($watched_users, 'recent_user_watches', 240))
 	{
 		$modSettings['warning_watch'] = empty($modSettings['warning_watch']) ? 1 : $modSettings['warning_watch'];
 		$request = $db->query('', '
@@ -1186,7 +1186,7 @@ function basicWatchedUsers()
 			$watched_users[] = $row;
 		$db->free_result($request);
 
-		cache_put_data('recent_user_watches', $watched_users, 240);
+		Cache::instance()->put('recent_user_watches', $watched_users, 240);
 	}
 
 	return $watched_users;
@@ -1206,7 +1206,7 @@ function reportedPosts($show_pms = false)
 	// Got the info already?
 	$cachekey = md5(serialize($user_info['mod_cache']['bq']));
 
-	if (($reported_posts = cache_get_data('reported_posts_' . $cachekey, 90)) === null)
+	if (!Cache::instance()->getVar($reported_posts, 'reported_posts_' . $cachekey, 90))
 	{
 		// By George, that means we in a position to get the reports, jolly good.
 		$request = $db->query('', '
@@ -1233,7 +1233,7 @@ function reportedPosts($show_pms = false)
 		$db->free_result($request);
 
 		// Cache it.
-		cache_put_data('reported_posts_' . $cachekey, $reported_posts, 90);
+		Cache::instance()->put('reported_posts_' . $cachekey, $reported_posts, 90);
 	}
 
 	return $reported_posts;
@@ -1269,7 +1269,7 @@ function countModeratorNotes()
 {
 	$db = database();
 
-	if (($moderator_notes_total = cache_get_data('moderator_notes_total', 240)) === null)
+	if (!Cache::instance()->getVar($moderator_notes_total, 'moderator_notes_total', 240))
 	{
 		$request = $db->query('', '
 			SELECT COUNT(*)
@@ -1283,7 +1283,7 @@ function countModeratorNotes()
 		list ($moderator_notes_total) = $db->fetch_row($request);
 		$db->free_result($request);
 
-		cache_put_data('moderator_notes_total', $moderator_notes_total, 240);
+		Cache::instance()->put('moderator_notes_total', $moderator_notes_total, 240);
 	}
 
 	return $moderator_notes_total;
@@ -1353,7 +1353,7 @@ function moderatorNotes($offset)
 
 	// Grab the current notes.
 	// We can only use the cache for the first page of notes.
-	if ($offset != 0 || ($moderator_notes = cache_get_data('moderator_notes', 240)) === null)
+	if ($offset != 0 || !Cache::instance()->getVar($moderator_notes, 'moderator_notes', 240))
 	{
 		$request = $db->query('', '
 			SELECT IFNULL(mem.id_member, 0) AS id_member, IFNULL(mem.real_name, lc.member_name) AS member_name,
@@ -1374,7 +1374,7 @@ function moderatorNotes($offset)
 		$db->free_result($request);
 
 		if ($offset == 0)
-			cache_put_data('moderator_notes', $moderator_notes, 240);
+			Cache::instance()->put('moderator_notes', $moderator_notes, 240);
 	}
 
 	return $moderator_notes;

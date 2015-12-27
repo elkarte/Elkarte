@@ -58,7 +58,9 @@ class Xcache extends Cache_Method_Abstract
 	 */
 	public function get($key, $ttl = 120)
 	{
-		return xcache_get($key);
+		$result = xcache_get($key);
+		$this->is_miss = $result === null;
+		return $result;
 	}
 
 	/**

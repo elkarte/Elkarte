@@ -51,11 +51,16 @@ class Zend extends Cache_Method_Abstract
 	 */
 	public function get($key, $ttl = 120)
 	{
+
 		// Zend's pricey stuff.
 		if ($this->_shm)
-			return zend_shm_cache_fetch('ELK::' . $key);
+			$result = zend_shm_cache_fetch('ELK::' . $key);
 		else
-			return output_cache_get($key, $ttl);
+			$result = output_cache_get($key, $ttl);
+
+		$this->is_miss = $result === null;
+
+		return $result;
 	}
 
 	/**

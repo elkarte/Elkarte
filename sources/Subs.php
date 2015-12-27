@@ -98,6 +98,7 @@ function updateSettings($changeArray, $update = false, $debug = false)
 	global $modSettings;
 
 	$db = database();
+	$cache = Cache::instance();
 
 	if (empty($changeArray) || !is_array($changeArray))
 		return;
@@ -121,7 +122,7 @@ function updateSettings($changeArray, $update = false, $debug = false)
 		}
 
 		// Clean out the cache and make sure the cobwebs are gone too.
-		cache_put_data('modSettings', null, 90);
+		$cache->remove('modSettings');
 
 		return;
 	}
@@ -152,7 +153,7 @@ function updateSettings($changeArray, $update = false, $debug = false)
 	);
 
 	// Kill the cache - it needs redoing now, but we won't bother ourselves with that here.
-	cache_put_data('modSettings', null, 90);
+	$cache->remove('modSettings');
 }
 
 /**
@@ -187,7 +188,7 @@ function removeSettings($toRemove)
 			unset($modSettings[$setting]);
 
 	// Kill the cache - it needs redoing now, but we won't bother ourselves with that here.
-	cache_put_data('modSettings', null, 90);
+	Cache::instance()->remove('modSettings');
 }
 
 /**
@@ -1183,8 +1184,11 @@ function host_from_ip($ip)
 {
 	global $modSettings;
 
-	if (($host = cache_get_data('hostlookup-' . $ip, 600)) !== null || empty($ip))
+	$cache = Cache::instance();
+
+	if ($cache->getVar($host, 'hostlookup-' . $ip, 600) || empty($ip))
 		return $host;
+
 	$t = microtime(true);
 
 	// Try the Linux host command, perhaps?
@@ -1223,7 +1227,7 @@ function host_from_ip($ip)
 
 	// It took a long time, so let's cache it!
 	if (microtime(true) - $t > 0.5)
-		cache_put_data('hostlookup-' . $ip, $host, 600);
+		$cache->put('hostlookup-' . $ip, $host, 600);
 
 	return $host;
 }
@@ -1827,8 +1831,10 @@ function response_prefix()
 	global $language, $user_info, $txt;
 	static $response_prefix = null;
 
+	$cache = Cache::instance();
+
 	// Get a response prefix, but in the forum's default language.
-	if ($response_prefix === null && !($response_prefix = cache_get_data('response_prefix')))
+	if ($response_prefix === null && (!$cache->getVar($response_prefix, 'response_prefix') || !$response_prefix))
 	{
 		if ($language === $user_info['language'])
 			$response_prefix = $txt['response_prefix'];
@@ -1838,7 +1844,8 @@ function response_prefix()
 			$response_prefix = $txt['response_prefix'];
 			loadLanguage('index');
 		}
-		cache_put_data('response_prefix', $response_prefix, 600);
+
+		$cache->put('response_prefix', $response_prefix, 600);
 	}
 
 	return $response_prefix;

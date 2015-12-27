@@ -199,16 +199,16 @@ class News_Controller extends Action_Controller
 		$cache_t = microtime(true);
 
 		// Get the associative array representing the xml.
-		if (!empty($modSettings['cache_enable']) && (!$user_info['is_guest'] || $modSettings['cache_enable'] >= 3))
-			$xml = cache_get_data('xmlfeed-' . $xml_format . ':' . ($user_info['is_guest'] ? '' : $user_info['id'] . '-') . $cachekey, 240);
+		if (Cache::instance()->isEnabled() && (!$user_info['is_guest'] || Cache::instance()->checkLevel(3)))
+			$xml = Cache::instance()->get('xmlfeed-' . $xml_format . ':' . ($user_info['is_guest'] ? '' : $user_info['id'] . '-') . $cachekey, 240);
 
 		if (empty($xml))
 		{
 			$xml = $this->{$subActions[$subAction][0]}($xml_format);
 
-			if (!empty($modSettings['cache_enable']) && (($user_info['is_guest'] && $modSettings['cache_enable'] >= 3)
+			if (Cache::instance()->isEnabled() && (($user_info['is_guest'] && Cache::instance()->checkLevel(3))
 			|| (!$user_info['is_guest'] && (microtime(true) - $cache_t > 0.2))))
-				cache_put_data('xmlfeed-' . $xml_format . ':' . ($user_info['is_guest'] ? '' : $user_info['id'] . '-') . $cachekey, $xml, 240);
+				Cache::instance()->put('xmlfeed-' . $xml_format . ':' . ($user_info['is_guest'] ? '' : $user_info['id'] . '-') . $cachekey, $xml, 240);
 		}
 
 		$feed_title = encode_special(strip_tags(un_htmlspecialchars($context['forum_name']) . (isset($feed_title) ? $feed_title : '')));

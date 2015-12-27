@@ -1382,7 +1382,7 @@ function makeThemeChanges($memID, $id_theme)
 
 		$themes = explode(',', $modSettings['knownThemes']);
 		foreach ($themes as $t)
-			cache_put_data('theme_settings-' . $t . ':' . $memID, null, 60);
+			Cache::instance()->remove('theme_settings-' . $t . ':' . $memID);
 	}
 }
 

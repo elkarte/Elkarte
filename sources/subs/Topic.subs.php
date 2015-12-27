@@ -72,6 +72,7 @@ function removeTopics($topics, $decreasePostCount = true, $ignoreRecycling = fal
 		return;
 
 	$db = database();
+	$cache = Cache::instance();
 
 	// Only a single topic.
 	if (!is_array($topics))
@@ -202,7 +203,7 @@ function removeTopics($topics, $decreasePostCount = true, $ignoreRecycling = fal
 	{
 		if (!isset($adjustBoards[$row['id_board']]['num_posts']))
 		{
-			cache_put_data('board-' . $row['id_board'], null, 120);
+			$cache->remove('board-' . $row['id_board']);
 
 			$adjustBoards[$row['id_board']] = array(
 				'num_posts' => 0,
@@ -415,7 +416,7 @@ function removeTopics($topics, $decreasePostCount = true, $ignoreRecycling = fal
 	removeFollowUpsByTopic($topics);
 
 	foreach ($topics as $topic_id)
-		cache_put_data('topic_board-' . $topic_id, null, 120);
+		$cache->remove('topic_board-' . $topic_id);
 
 	// Maybe there's an addon that wants to delete topic related data of its own
 	call_integration_hook('integrate_remove_topics', array($topics));
@@ -813,10 +814,10 @@ function moveTopics($topics, $toBoard, $log = false)
 		markBoardsRead($toBoard);
 	}
 
+	$cache = Cache::instance();
 	// Update the cache?
-	if (!empty($modSettings['cache_enable']) && $modSettings['cache_enable'] >= 3)
-		foreach ($topics as $topic_id)
-			cache_put_data('topic_board-' . $topic_id, null, 120);
+	foreach ($topics as $topic_id)
+		$cache->remove('topic_board-' . $topic_id);
 
 	require_once(SUBSDIR . '/Post.subs.php');
 

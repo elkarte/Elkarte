@@ -66,7 +66,7 @@ function getMessageIcons($board_id)
 	// Otherwise load the icons, and check we give the right image too...
 	else
 	{
-		if (($temp = cache_get_data('posting_icons-' . $board_id, 480)) == null)
+		if (!Cache::instance()->getVar($temp, 'posting_icons-' . $board_id, 480))
 		{
 			$icon_data = $db->fetchQuery('
 				SELECT title, filename
@@ -89,7 +89,7 @@ function getMessageIcons($board_id)
 				);
 			}
 
-			cache_put_data('posting_icons-' . $board_id, $icons, 480);
+			Cache::instance()->put('posting_icons-' . $board_id, $icons, 480);
 		}
 		else
 			$icons = $temp;
@@ -415,7 +415,7 @@ function create_control_richedit($editorOptions)
 		}
 		elseif ($context['smiley_enabled'])
 		{
-			if (($temp = cache_get_data('posting_smileys', 480)) == null)
+			if (!Cache::instance()->getVar($temp, 'posting_smileys', 480))
 			{
 				$db->fetchQueryCallback('
 					SELECT code, filename, description, smiley_row, hidden
@@ -448,7 +448,7 @@ function create_control_richedit($editorOptions)
 						$context['smileys'][$section][$last_row]['isLast'] = true;
 				}
 
-				cache_put_data('posting_smileys', $context['smileys'], 480);
+				Cache::instance()->put('posting_smileys', $context['smileys'], 480);
 			}
 			else
 				$context['smileys'] = $temp;

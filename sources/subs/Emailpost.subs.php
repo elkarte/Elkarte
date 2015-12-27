@@ -733,7 +733,7 @@ function pbe_emailError($error, $email_message)
 	);
 
 	// Flush the moderator error number cache, if we are here it likely just changed.
-	cache_put_data('num_menu_errors', null, 900);
+	Cache::instance()->remove('num_menu_errors');
 
 	// If not running from the cli, then go back to the form
 	if (isset($_POST['item']))

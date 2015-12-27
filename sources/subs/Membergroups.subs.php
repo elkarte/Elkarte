@@ -2004,7 +2004,7 @@ function updatePostGroupStats($members = null, $parameter2 = null)
 	if ($parameter2 !== null && !in_array('posts', $parameter2))
 		return;
 
-	$postgroups = cache_get_data('updatePostGroupStats', 360);
+	$postgroups = Cache::instance()->get('updatePostGroupStats', 360);
 	if ($postgroups === null || $members === null)
 	{
 		// Fetch the postgroups!
@@ -2024,7 +2024,7 @@ function updatePostGroupStats($members = null, $parameter2 = null)
 		// Sort them this way because if it's done with MySQL it causes a filesort :(.
 		arsort($postgroups);
 
-		cache_put_data('updatePostGroupStats', $postgroups, 360);
+		Cache::instance()->put('updatePostGroupStats', $postgroups, 360);
 	}
 
 	// Oh great, they've screwed their post groups.
