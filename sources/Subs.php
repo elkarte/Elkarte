@@ -1834,7 +1834,7 @@ function response_prefix()
 	$cache = Cache::instance();
 
 	// Get a response prefix, but in the forum's default language.
-	if ($response_prefix === null && (!$cache->get($response_prefix, 'response_prefix') || !$response_prefix))
+	if ($response_prefix === null && (!$cache->getVar($response_prefix, 'response_prefix') || !$response_prefix))
 	{
 		if ($language === $user_info['language'])
 			$response_prefix = $txt['response_prefix'];

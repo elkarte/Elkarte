@@ -1472,8 +1472,8 @@ class ManageBBC_Controller extends Action_Controller
 			}
 		}
 
-		Cache::instance()->put('parsing_smileys', null, 480);
-		Cache::instance()->put('posting_smileys', null, 480);
+		Cache::instance()->remove('parsing_smileys');
+		Cache::instance()->remove('posting_smileys');
 
 		createToken('admin-sort');
 	}
@@ -1688,8 +1688,8 @@ class ManageBBC_Controller extends Action_Controller
 
 			logAction('install_package', array('package' => Util::htmlspecialchars($smileyInfo['name']), 'version' => Util::htmlspecialchars($smileyInfo['version'])), 'admin');
 
-			Cache::instance()->put('parsing_smileys', null, 480);
-			Cache::instance()->put('posting_smileys', null, 480);
+			Cache::instance()->remove('parsing_smileys');
+			Cache::instance()->remove('posting_smileys');
 		}
 
 		if (file_exists(BOARDDIR . '/packages/temp'))
@@ -1763,8 +1763,8 @@ class ManageBBC_Controller extends Action_Controller
 			// Make sure the smiley codes are still in the right order.
 			sortSmileyTable();
 
-			Cache::instance()->put('parsing_smileys', null, 480);
-			Cache::instance()->put('posting_smileys', null, 480);
+			Cache::instance()->remove('parsing_smileys');
+			Cache::instance()->remove('posting_smileys');
 		}
 	}
 
