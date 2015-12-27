@@ -98,6 +98,7 @@ function updateSettings($changeArray, $update = false, $debug = false)
 	global $modSettings;
 
 	$db = database();
+	$cache = Cache::instance();
 
 	if (empty($changeArray) || !is_array($changeArray))
 		return;
@@ -121,7 +122,7 @@ function updateSettings($changeArray, $update = false, $debug = false)
 		}
 
 		// Clean out the cache and make sure the cobwebs are gone too.
-		Cache::instance()->put('modSettings', null, 90);
+		$cache->put('modSettings', null, 90);
 
 		return;
 	}
@@ -152,7 +153,7 @@ function updateSettings($changeArray, $update = false, $debug = false)
 	);
 
 	// Kill the cache - it needs redoing now, but we won't bother ourselves with that here.
-	Cache::instance()->put('modSettings', null, 90);
+	$cache->put('modSettings', null, 90);
 }
 
 /**
@@ -187,7 +188,7 @@ function removeSettings($toRemove)
 			unset($modSettings[$setting]);
 
 	// Kill the cache - it needs redoing now, but we won't bother ourselves with that here.
-	Cache::instance()->put('modSettings', null, 90);
+	Cache::instance()->remove('modSettings');
 }
 
 /**

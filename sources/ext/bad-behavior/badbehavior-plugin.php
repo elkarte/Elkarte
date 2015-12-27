@@ -344,7 +344,7 @@ function bb2_insert_stats($force = false)
 	if ($force || $settings['display_stats'])
 	{
 		// Get the blocked count for the last 7 days ... cache this as well
-		if (($bb2_blocked = Cache::instance()->get('bb2_blocked', 900)) === null)
+		if (!Cache::instance()->getVar($bb2_blocked, 'bb2_blocked', 900))
 		{
 			$bb2_blocked = bb2_db_query('SELECT COUNT(*) FROM {db_prefix}log_badbehavior WHERE `valid` NOT LIKE \'00000000\'');
 			Cache::instance()->put('bb2_blocked', $bb2_blocked, 900);

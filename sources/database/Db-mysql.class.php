@@ -531,7 +531,7 @@ class Database_MySQL extends Database_Abstract
 			$old_cache = isset($modSettings['cache_enable']) ? $modSettings['cache_enable'] : null;
 			$modSettings['cache_enable'] = '1';
 
-			if (($temp = Cache::instance()->get('db_last_error', 600)) !== null)
+			if (Cache::instance()->getVar($temp, 'db_last_error', 600))
 				$db_last_error = max($db_last_error, $temp);
 
 			if ($db_last_error < time() - 3600 * 24 * 3)
@@ -579,7 +579,7 @@ class Database_MySQL extends Database_Abstract
 
 				// Make a note of the REPAIR...
 				Cache::instance()->put('db_last_error', time(), 600);
-				if (($temp = Cache::instance()->get('db_last_error', 600)) === null)
+				if (!Cache::instance()->getVar($temp, 'db_last_error', 600))
 					updateDbLastError(time());
 
 				// Attempt to find and repair the broken table.

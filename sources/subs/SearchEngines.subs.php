@@ -38,7 +38,7 @@ function spiderCheck()
 	$_SESSION['robot_check'] = time();
 
 	// We cache the spider data for five minutes if we can.
-	if (($spider_data = Cache::instance()->get('spider_search', 300)) === null)
+	if (!Cache::instance()->getVar($spider_data, 'spider_search', 300))
 	{
 		$request = $db->query('', '
 			SELECT id_spider, user_agent, ip_info

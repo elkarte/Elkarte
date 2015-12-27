@@ -1037,7 +1037,7 @@ function getAvatar($id_attach)
 	$db = database();
 
 	// Use our cache when possible
-	if (($cache = Cache::instance()->get('getAvatar_id-' . $id_attach)) !== null)
+	if (Cache::instance()->getVar($cache, 'getAvatar_id-' . $id_attach))
 		$avatarData = $cache;
 	else
 	{
@@ -1258,7 +1258,7 @@ function url_image_size($url)
 	$url = str_replace(' ', '%20', $url);
 
 	// Can we pull this from the cache... please please?
-	if (($temp = Cache::instance()->get('url_image_size-' . md5($url), 240)) !== null)
+	if (Cache::instance()->getVar($temp, 'url_image_size-' . md5($url), 240))
 		return $temp;
 
 	$t = microtime(true);

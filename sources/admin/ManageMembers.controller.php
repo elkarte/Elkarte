@@ -1282,7 +1282,7 @@ class ManageMembers_Controller extends Action_Controller
 		}
 
 		// Update the menu action cache so its forced to refresh
-		Cache::instance()->put('num_menu_errors', null, 900);
+		Cache::instance()->remove('num_menu_errors');
 	}
 
 	/**

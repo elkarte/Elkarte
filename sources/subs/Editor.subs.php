@@ -66,7 +66,7 @@ function getMessageIcons($board_id)
 	// Otherwise load the icons, and check we give the right image too...
 	else
 	{
-		if (($temp = Cache::instance()->get('posting_icons-' . $board_id, 480)) == null)
+		if (!Cache::instance()->getVar($temp, 'posting_icons-' . $board_id, 480))
 		{
 			$icon_data = $db->fetchQuery('
 				SELECT title, filename
@@ -415,7 +415,7 @@ function create_control_richedit($editorOptions)
 		}
 		elseif ($context['smiley_enabled'])
 		{
-			if (($temp = Cache::instance()->get('posting_smileys', 480)) == null)
+			if (!Cache::instance()->getVar($temp, 'posting_smileys', 480))
 			{
 				$db->fetchQueryCallback('
 					SELECT code, filename, description, smiley_row, hidden

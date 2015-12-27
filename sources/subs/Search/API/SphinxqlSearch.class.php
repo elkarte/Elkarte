@@ -189,7 +189,8 @@ class Sphinxql_Search extends SearchAPI
 		global $user_info, $context, $modSettings;
 
 		// Only request the results if they haven't been cached yet.
-		if (($cached_results = Cache::instance()->get('ssearchql_results_' . md5($user_info['query_see_board'] . '_' . $context['params']))) === null)
+		$cached_results = null;
+		if (!\Cache::instance()->getVar($cached_results, 'ssearchql_results_' . md5($user_info['query_see_board'] . '_' . $context['params'])))
 		{
 			// Create an instance of the sphinx client and set a few options.
 			$mySphinx = @mysqli_connect(($modSettings['sphinx_searchd_server'] === 'localhost' ? '127.0.0.1' : $modSettings['sphinx_searchd_server']), '', '', '', (int) $modSettings['sphinxql_searchd_port']);
@@ -290,7 +291,7 @@ class Sphinxql_Search extends SearchAPI
 			$cached_results['num_results'] = count($cached_results['matches']);
 
 			// Store the search results in the cache.
-			Cache::instance()->put('searchql_results_' . md5($user_info['query_see_board'] . '_' . $context['params']), $cached_results, 600);
+			\Cache::instance()->put('searchql_results_' . md5($user_info['query_see_board'] . '_' . $context['params']), $cached_results, 600);
 		}
 
 		$participants = array();

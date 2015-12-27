@@ -104,7 +104,7 @@ class PersonalMessage_Controller extends Action_Controller
 		}
 
 		// Load the label counts data.
-		if ($user_settings['new_pm'] || ($context['labels'] = Cache::instance()->get('labelCounts:' . $user_info['id'], 720)) === null)
+		if ($user_settings['new_pm'] || !Cache::instance()->getVar($context['labels'], 'labelCounts:' . $user_info['id'], 720))
 		{
 			$this->_loadLabels();
 
@@ -1763,7 +1763,7 @@ class PersonalMessage_Controller extends Action_Controller
 			}
 
 			// Make sure we're not caching this!
-			Cache::instance()->put('labelCounts:' . $user_info['id'], null, 720);
+			Cache::instance()->remove('labelCounts:' . $user_info['id']);
 
 			// To make the changes appear right away, redirect.
 			redirectexit('action=pm;sa=manlabels');
@@ -1827,7 +1827,7 @@ class PersonalMessage_Controller extends Action_Controller
 			}
 
 			// Invalidate any cached data and reload so we show the saved values
-			Cache::instance()->put('member_data-profile-' . $user_info['id'], null, 0);
+			Cache::instance()->remove('member_data-profile-' . $user_info['id']);
 			loadMemberData($user_info['id'], false, 'profile');
 			$cur_profile = $user_profile[$user_info['id']];
 		}

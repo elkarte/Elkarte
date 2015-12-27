@@ -406,6 +406,7 @@ function display_db_error()
 	global $webmaster_email, $db_last_error, $db_error_send;
 
 	$db = database();
+	$cache = Cache::instance();
 
 	// Just check we're not in any buffers, just in case.
 	while (@ob_get_level() > 0)
@@ -415,14 +416,15 @@ function display_db_error()
 
 	// For our purposes, we're gonna want this on if at all possible.
 	$modSettings['cache_enable'] = 1;
+	$cache->enable(true)->setLevel(1);
 
-	if (($temp = Cache::instance()->get('db_last_error', 600)) !== null)
+	if ($cache->getVar($temp, 'db_last_error', 600))
 		$db_last_error = max($db_last_error, $temp);
 
 	if ($db_last_error < time() - 3600 * 24 * 3 && empty($maintenance) && !empty($db_error_send))
 	{
-		Cache::instance()->put('db_last_error', time(), 600);
-		if (($temp = Cache::instance()->get('db_last_error', 600)) === null)
+		$cache->put('db_last_error', time(), 600);
+		if (!$cache->getVar($temp, 'db_last_error', 600))
 			logLastDatabaseError();
 
 		// Language files aren't loaded yet :(.

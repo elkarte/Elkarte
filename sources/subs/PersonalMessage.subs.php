@@ -37,7 +37,7 @@ function loadMessageLimit()
 
 	if ($user_info['is_admin'])
 		$message_limit = 0;
-	elseif (($message_limit = Cache::instance()->get('msgLimit:' . $user_info['id'], 360)) === null)
+	elseif (!Cache::instance()->getVar($message_limit, 'msgLimit:' . $user_info['id'], 360))
 	{
 		$request = $db->query('', '
 			SELECT

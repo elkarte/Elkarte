@@ -229,7 +229,7 @@ class ManageSearchEngines_Controller extends Action_Controller
 			// Delete them all!
 			removeSpiders($toRemove);
 
-			Cache::instance()->put('spider_search', null, 300);
+			Cache::instance()->remove('spider_search');
 			recacheSpiderNames();
 		}
 
@@ -382,7 +382,7 @@ class ManageSearchEngines_Controller extends Action_Controller
 			// Order by user agent length.
 			sortSpiderTable();
 
-			Cache::instance()->put('spider_search', null, 300);
+			Cache::instance()->remove('spider_search');
 			recacheSpiderNames();
 
 			redirectexit('action=admin;area=sengines;sa=spiders');

@@ -173,8 +173,8 @@ class ManageBBC_Controller extends Action_Controller
 			Settings_Form::save_db($config_vars, $this->_req->post);
 
 			// Flush the cache so the new settings take effect
-			Cache::instance()->put('parsing_smileys', null, 480);
-			Cache::instance()->put('posting_smileys', null, 480);
+			Cache::instance()->remove('parsing_smileys');
+			Cache::instance()->remove('posting_smileys');
 
 			redirectexit('action=admin;area=smileys;sa=settings');
 		}
@@ -462,8 +462,8 @@ class ManageBBC_Controller extends Action_Controller
 			}
 
 			// No matter what, reset the cache
-			Cache::instance()->put('parsing_smileys', null, 480);
-			Cache::instance()->put('posting_smileys', null, 480);
+			Cache::instance()->remove('parsing_smileys');
+			Cache::instance()->remove('posting_smileys');
 		}
 	}
 
@@ -755,8 +755,8 @@ class ManageBBC_Controller extends Action_Controller
 			);
 			addSmiley($param);
 
-			Cache::instance()->put('parsing_smileys', null, 480);
-			Cache::instance()->put('posting_smileys', null, 480);
+			Cache::instance()->remove('parsing_smileys');
+			Cache::instance()->remove('posting_smileys');
 
 			// No errors? Out of here!
 			redirectexit('action=admin;area=smileys;sa=editsmileys');
@@ -879,8 +879,8 @@ class ManageBBC_Controller extends Action_Controller
 				sortSmileyTable();
 			}
 
-			Cache::instance()->put('parsing_smileys', null, 480);
-			Cache::instance()->put('posting_smileys', null, 480);
+			Cache::instance()->remove('parsing_smileys');
+			Cache::instance()->remove('posting_smileys');
 		}
 
 		// Load all known smiley sets.

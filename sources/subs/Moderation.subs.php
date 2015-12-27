@@ -58,7 +58,7 @@ function recountOpenReports($flush = true, $count_pms = false)
 
 	$context['open_mod_reports'] = $open_reports;
 	if ($flush)
-		Cache::instance()->put('num_menu_errors', null, 900);
+		Cache::instance()->remove('num_menu_errors');
 	return $open_reports;
 }
 
@@ -855,7 +855,7 @@ function approveAllUnapproved()
 	{
 		require_once(SUBSDIR . '/Post.subs.php');
 		approvePosts($msgs);
-		Cache::instance()->put('num_menu_errors', null, 900);
+		Cache::instance()->remove('num_menu_errors');
 	}
 
 	// Now do attachments
@@ -876,7 +876,7 @@ function approveAllUnapproved()
 	{
 		require_once(SUBSDIR . '/ManageAttachments.subs.php');
 		approveAttachments($attaches);
-		Cache::instance()->put('num_menu_errors', null, 900);
+		Cache::instance()->remove('num_menu_errors');
 	}
 }
 
@@ -1168,7 +1168,7 @@ function basicWatchedUsers()
 
 	$db = database();
 
-	if (($watched_users = Cache::instance()->get('recent_user_watches', 240)) === null)
+	if (!Cache::instance()->getVar($watched_users, 'recent_user_watches', 240))
 	{
 		$modSettings['warning_watch'] = empty($modSettings['warning_watch']) ? 1 : $modSettings['warning_watch'];
 		$request = $db->query('', '
@@ -1206,7 +1206,7 @@ function reportedPosts($show_pms = false)
 	// Got the info already?
 	$cachekey = md5(serialize($user_info['mod_cache']['bq']));
 
-	if (($reported_posts = Cache::instance()->get('reported_posts_' . $cachekey, 90)) === null)
+	if (!Cache::instance()->getVar($reported_posts, 'reported_posts_' . $cachekey, 90))
 	{
 		// By George, that means we in a position to get the reports, jolly good.
 		$request = $db->query('', '
@@ -1269,7 +1269,7 @@ function countModeratorNotes()
 {
 	$db = database();
 
-	if (($moderator_notes_total = Cache::instance()->get('moderator_notes_total', 240)) === null)
+	if (!Cache::instance()->getVar($moderator_notes_total, 'moderator_notes_total', 240))
 	{
 		$request = $db->query('', '
 			SELECT COUNT(*)
@@ -1353,7 +1353,7 @@ function moderatorNotes($offset)
 
 	// Grab the current notes.
 	// We can only use the cache for the first page of notes.
-	if ($offset != 0 || ($moderator_notes = Cache::instance()->get('moderator_notes', 240)) === null)
+	if ($offset != 0 || !Cache::instance()->getVar($moderator_notes, 'moderator_notes', 240))
 	{
 		$request = $db->query('', '
 			SELECT IFNULL(mem.id_member, 0) AS id_member, IFNULL(mem.real_name, lc.member_name) AS member_name,

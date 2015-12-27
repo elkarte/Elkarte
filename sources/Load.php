@@ -265,8 +265,7 @@ function loadUserSettings()
 				if ($cache->checkLevel(2))
 					$cache->put('user_settings-' . $id_member, $user_settings, 60);
 
-				if ($cache->isEnabled())
-					$cache->put('user_last_visit-' . $id_member, $_SESSION['id_msg_last_visit'], 5 * 3600);
+				$cache->put('user_last_visit-' . $id_member, $_SESSION['id_msg_last_visit'], 5 * 3600);
 			}
 		}
 		elseif (empty($_SESSION['id_msg_last_visit']))
@@ -941,7 +940,7 @@ function loadMemberData($users, $is_name = false, $set = 'normal')
 	if (!empty($new_loaded_ids))
 		call_integration_hook('integrate_add_member_data', array($new_loaded_ids, $set));
 
-	if (!empty($new_loaded_ids) && $cache->isEnabled() && $cache->checkLevel(3))
+	if (!empty($new_loaded_ids) && $cache->checkLevel(3))
 	{
 		for ($i = 0, $n = count($new_loaded_ids); $i < $n; $i++)
 			$cache->put('member_data-' . $set . '-' . $new_loaded_ids[$i], $user_profile[$new_loaded_ids[$i]], 240);
@@ -1279,7 +1278,7 @@ function getThemeData($id_theme, $member)
 		}
 
 		// If being aggressive we save the site wide and member theme settings
-		if ($cache->isEnabled() && $cache->checkLevel(2))
+		if ($cache->checkLevel(2))
 			$cache->put('theme_settings-' . $id_theme . ':' . $member, $themeData, 60);
 		// Only if we didn't already load that part of the cache...
 		elseif (!isset($temp))
@@ -2269,7 +2268,7 @@ function getLanguages($use_cache = true)
 	// Either we don't use the cache, or its expired.
 	$languages = '';
 
-	if (!$use_cache || !$cache->getVar($languages, 'known_languages', $cache->isEnabled() && $modSettings['cache_enable'] < 1 ? 86400 : 3600))
+	if (!$use_cache || !$cache->getVar($languages, 'known_languages', !$cache->checkLevel(1) ? 86400 : 3600))
 	{
 		// If we don't have our theme information yet, lets get it.
 		if (empty($settings['default_theme_dir']))
@@ -2322,8 +2321,7 @@ function getLanguages($use_cache = true)
 		}
 
 		// Lets cash in on this deal.
-		if ($cache->isEnabled())
-			$cache->put('known_languages', $languages, $cache->isEnabled() && $modSettings['cache_enable'] < 1 ? 86400 : 3600);
+		$cache->put('known_languages', $languages, $cache->isEnabled() && !Cache::instance()->checkLevel(1) ? 86400 : 3600);
 	}
 
 	return $languages;
@@ -2549,6 +2547,8 @@ function doSecurityChecks()
 	global $modSettings, $context, $maintenance, $user_info, $txt, $scripturl, $user_settings, $options;
 
 	$show_warnings = false;
+
+	$cache = Cache::instance();
 
 	if (allowedTo('admin_forum') && !$user_info['is_guest'])
 	{
