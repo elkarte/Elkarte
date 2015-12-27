@@ -48,10 +48,15 @@ class Eaccelerator extends Cache_Method_Abstract
 	 */
 	public function get($key, $ttl = 120)
 	{
+		$result = null;
 		if (function_exists('eaccelerator_get'))
-			return eaccelerator_get($key);
+		{
+			$result = eaccelerator_get($key);
+		}
 
-		return false;
+		$this->is_miss = $result === null;
+
+		return $result;
 	}
 
 	/**

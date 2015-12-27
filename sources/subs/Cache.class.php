@@ -39,10 +39,15 @@ class Cache
 
 	/**
 	 * If the cache is enabled or not.
-	 * Set in __construct based on the global $cache_enable
+	 * @var bool
+	 */
+	protected $enabled = false;
+
+	/**
+	 * The caching level
 	 * @var int
 	 */
-	protected $_cache_enable = false;
+	protected $level = 0;
 
 	/**
 	 * The prefix to append to the cache key
@@ -59,16 +64,21 @@ class Cache
 	/**
 	 * Initialize the class, defines the options and the caching method to use
 	 *
-	 * @param int $enabled The level of caching
+	 * @param int $level The level of caching
 	 * @param string $accelerator The accelerator used
 	 * @param mixed[] $options Any setting necessary to the caching engine
 	 */
-	public function __construct($enabled, $accelerator, $options)
+	public function __construct($level, $accelerator, $options)
 	{
-		$this->_cache_enable = (int) $enabled;
+		$this->setLevel($level);
+
+		if ($level > 0)
+		{
+			$this->enable(true);
+		}
 
 		// If the cache is disabled just go out
-		if (!$this->_cache_enable)
+		if (!$this->isEnabled())
 			return;
 
 		$this->_options = $options;
@@ -99,6 +109,9 @@ class Cache
 	 */
 	public function quick_get($key, $file, $function, $params, $level = 1)
 	{
+		if (!$this->isEnabled())
+			return;
+
 		call_integration_hook('pre_cache_quick_get', array(&$key, &$file, &$function, &$params, &$level));
 
 		/* Refresh the cache if either:
@@ -108,7 +121,7 @@ class Cache
 			4. The cached item has a custom expiration condition evaluating to true.
 			5. The expire time set in the cache item has passed (needed for Zend).
 		*/
-		if ($this->_cache_enable < $level || !is_array($cache_block = $this->get($key, 3600)) || (!empty($cache_block['refresh_eval']) && eval($cache_block['refresh_eval'])) || (!empty($cache_block['expires']) && $cache_block['expires'] < time()))
+		if ($this->level < $level || !is_array($cache_block = $this->get($key, 3600)) || (!empty($cache_block['refresh_eval']) && eval($cache_block['refresh_eval'])) || (!empty($cache_block['expires']) && $cache_block['expires'] < time()))
 		{
 			require_once(SOURCEDIR . '/' . $file);
 			$cache_block = call_user_func_array($function, $params);
@@ -148,7 +161,7 @@ class Cache
 	{
 		global $db_show_debug;
 
-		if (!$this->_cache_enable)
+		if (!$this->isEnabled())
 			return;
 
 		if ($db_show_debug === true)
@@ -188,7 +201,7 @@ class Cache
 	{
 		global $db_show_debug;
 
-		if (!$this->_cache_enable)
+		if (!$this->isEnabled())
 			return;
 
 		if ($db_show_debug === true)
@@ -229,7 +242,7 @@ class Cache
 	 */
 	public function clean($type = '')
 	{
-		if (!$this->_cache_enable)
+		if (!$this->isEnabled())
 			return;
 
 		$this->_cache_obj->clean($type);
@@ -242,6 +255,54 @@ class Cache
 		call_integration_hook('integrate_clean_cache');
 
 		clearstatcache();
+	}
+
+	/**
+	 * Enable or disable caching
+	 *
+	 * @param bool $enable
+	 * @return $this
+	 */
+	public function enable($enable)
+	{
+		$this->enabled = (bool) $enable;
+
+		return $this;
+	}
+
+	/**
+	 * Check if caching is enabled
+	 * @return bool
+	 */
+	public function isEnabled()
+	{
+		return $this->enabled;
+	}
+
+	/**
+	 * Set the caching level. Setting it to <= 0 disables caching
+	 *
+	 * @param int $level
+	 * @return $this
+	 */
+	public function setLevel($level)
+	{
+		$this->level = (int) $level;
+
+		if ($this->level <= 0)
+		{
+			$this->enable(false);
+		}
+
+		return $this;
+	}
+
+	/**
+	 * @var bool If the result of the last get was a miss
+	 */
+	public function isMiss()
+	{
+		return $this->_cache_obj->isMiss();
 	}
 
 	/**

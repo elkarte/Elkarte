@@ -52,7 +52,9 @@ class Mmcache extends Cache_Method_Abstract
 	 */
 	public function get($key, $ttl = 120)
 	{
-		return mmcache_get($key);
+		$result = mmcache_get($key);
+		$this->is_miss = $result === null;
+		return $result;
 	}
 
 	/**

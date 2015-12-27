@@ -103,4 +103,10 @@ interface Cache_Method_Interface
 	 * @return string
 	 */
 	public static function title();
+
+	/**
+	 * Check if the last result was a miss
+	 * @return bool
+	 */
+	public function isMiss();
 }

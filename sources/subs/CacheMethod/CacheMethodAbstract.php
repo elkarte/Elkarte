@@ -28,6 +28,8 @@ abstract class Cache_Method_Abstract implements Cache_Method_Interface
 	 */
 	public $_options = null;
 
+	protected $is_miss = true;
+
 	/**
 	 * {@inheritdoc }
 	 */
@@ -42,6 +44,11 @@ abstract class Cache_Method_Abstract implements Cache_Method_Interface
 	public function fixkey($key)
 	{
 		return $key;
+	}
+
+	public function isMiss()
+	{
+		return $this->is_miss;
 	}
 
 	/**

@@ -79,10 +79,14 @@ class Filebased extends Cache_Method_Abstract
 
 			unset($value);
 
+			$this->is_miss = $return === null;
+
 			return $return;
 		}
 
-		return null;
+		$this->is_miss = true;
+
+		return;
 	}
 
 	/**

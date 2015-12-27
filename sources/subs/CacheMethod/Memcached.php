@@ -57,9 +57,17 @@ class Memcached extends Cache_Method_Abstract
 	public function get($key, $ttl = 120)
 	{
 		if ($this->_memcache)
-			return memcache_get($this->_options['memcached'], $key);
+		{
+			$result = memcache_get($this->_options['memcached'], $key);
+		}
 		else
-			return memcached_get($this->_options['memcached'], $key);
+		{
+			$result = memcached_get($this->_options['memcached'], $key);
+		}
+
+		$this->is_miss = $result === null;
+
+		return $result;
 	}
 
 	/**
