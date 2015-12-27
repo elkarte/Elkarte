@@ -42,7 +42,7 @@ function reloadSettings()
 	$hooks = Hooks::get();
 
 	// Try to load it from the cache first; it'll never get cached if the setting is off.
-	if (($modSettings = $cache->get('modSettings', 90)) == null)
+	if (!$cache->getVar($modSettings, 'modSettings', 90))
 	{
 		$request = $db->query('', '
 			SELECT variable, value
@@ -69,8 +69,7 @@ function reloadSettings()
 
 		$modSettings['warning_enable'] = $modSettings['warning_settings'][0];
 
-		if (!empty($modSettings['cache_enable']))
-			$cache->put('modSettings', $modSettings, 90);
+		$cache->put('modSettings', $modSettings, 90);
 	}
 
 	$hooks->loadIntegrations();
@@ -82,7 +81,7 @@ function reloadSettings()
 	// Check the load averages?
 	if (!empty($modSettings['loadavg_enable']))
 	{
-		if (($modSettings['load_average'] = $cache->get('loadavg', 90)) == null)
+		if (!$cache->getVar($modSettings['load_average'], 'loadavg', 90))
 		{
 			require_once(SUBSDIR . '/Server.subs.php');
 			$modSettings['load_average'] = detectServerLoad();
@@ -196,7 +195,7 @@ function loadUserSettings()
 	if ($id_member != 0)
 	{
 		// Is the member data cached?
-		if (empty($modSettings['cache_enable']) || $modSettings['cache_enable'] < 2 || ($user_settings = $cache->get('user_settings-' . $id_member, 60)) == null)
+		if (!$cache->checkLevel(2) || !$cache->getVar($user_settings, 'user_settings-' . $id_member, 60))
 		{
 			list ($user_settings) = $db->fetchQuery('
 				SELECT mem.*, IFNULL(a.id_attach, 0) AS id_attach, a.filename, a.attachment_type
@@ -212,7 +211,7 @@ function loadUserSettings()
 			// Make the ID specifically an integer
 			$user_settings['id_member'] = (int) $user_settings['id_member'];
 
-			if (!empty($modSettings['cache_enable']) && $modSettings['cache_enable'] >= 2)
+			if ($cache->checkLevel(2))
 				$cache->put('user_settings-' . $id_member, $user_settings, 60);
 		}
 
@@ -247,7 +246,7 @@ function loadUserSettings()
 		// 2. RSS feeds and XMLHTTP requests don't count either.
 		// 3. If it was set within this session, no need to set it again.
 		// 4. New session, yet updated < five hours ago? Maybe cache can help.
-		if (ELK != 'SSI' && !isset($_REQUEST['xml']) && (!isset($_REQUEST['action']) || $_REQUEST['action'] != '.xml') && empty($_SESSION['id_msg_last_visit']) && (empty($modSettings['cache_enable']) || ($_SESSION['id_msg_last_visit'] = $cache->get('user_last_visit-' . $id_member, 5 * 3600)) === null))
+		if (ELK != 'SSI' && !isset($_REQUEST['xml']) && (!isset($_REQUEST['action']) || $_REQUEST['action'] != '.xml') && empty($_SESSION['id_msg_last_visit']) && (!$cache->isEnabled() || !$cache->getVar($_SESSION['id_msg_last_visit'], 'user_last_visit-' . $id_member, 5 * 3600)))
 		{
 			// @todo can this be cached?
 			// Do a quick query to make sure this isn't a mistake.
@@ -263,10 +262,10 @@ function loadUserSettings()
 				updateMemberData($id_member, array('id_msg_last_visit' => (int) $modSettings['maxMsgID'], 'last_login' => time(), 'member_ip' => $req->client_ip(), 'member_ip2' => $req->ban_ip()));
 				$user_settings['last_login'] = time();
 
-				if (!empty($modSettings['cache_enable']) && $modSettings['cache_enable'] >= 2)
+				if ($cache->checkLevel(2))
 					$cache->put('user_settings-' . $id_member, $user_settings, 60);
 
-				if (!empty($modSettings['cache_enable']))
+				if ($cache->isEnabled())
 					$cache->put('user_last_visit-' . $id_member, $_SESSION['id_msg_last_visit'], 5 * 3600);
 			}
 		}
@@ -439,7 +438,7 @@ function loadBoard()
 		$_REQUEST['msg'] = (int) $_REQUEST['msg'];
 
 		// Looking through the message table can be slow, so try using the cache first.
-		if (($topic = $cache->get('msg_topic-' . $_REQUEST['msg'], 120)) === null)
+		if (!$cache->getVar($topic, 'msg_topic-' . $_REQUEST['msg'], 120))
 		{
 			require_once(SUBSDIR . '/Messages.subs.php');
 			$topic = associatedTopic($_REQUEST['msg']);
@@ -470,7 +469,7 @@ function loadBoard()
 		return;
 	}
 
-	if (!empty($modSettings['cache_enable']) && (empty($topic) || $modSettings['cache_enable'] >= 3))
+	if ($cache->isEnabled() && (empty($topic) || $cache->checkLevel(3)))
 	{
 		// @todo SLOW?
 		if (!empty($topic))
@@ -590,7 +589,7 @@ function loadBoard()
 
 			call_integration_hook('integrate_loaded_board', array(&$board_info, &$row));
 
-			if (!empty($modSettings['cache_enable']) && (empty($topic) || $modSettings['cache_enable'] >= 3))
+			if ($cache->isEnabled() && (empty($topic) || $cache->checkLevel(3)))
 			{
 				// @todo SLOW?
 				if (!empty($topic))
@@ -712,7 +711,9 @@ function loadPermissions()
 
 	$removals = array();
 
-	if (!empty($modSettings['cache_enable']))
+	$cache = Cache::instance();
+
+	if ($cache->isEnabled())
 	{
 		$cache_groups = $user_info['groups'];
 		asort($cache_groups);
@@ -722,14 +723,14 @@ function loadPermissions()
 		if ($user_info['possibly_robot'])
 			$cache_groups .= '-spider';
 
-		if ($modSettings['cache_enable'] >= 2 && !empty($board) && ($temp = cache_get_data('permissions:' . $cache_groups . ':' . $board, 240)) != null && time() - 240 > $modSettings['settings_updated'])
+		if ($cache->checkLevel(2) && !empty($board) && $cache->getVar($temp, 'permissions:' . $cache_groups . ':' . $board, 240) && time() - 240 > $modSettings['settings_updated'])
 		{
 			list ($user_info['permissions']) = $temp;
 			banPermissions();
 
 			return;
 		}
-		elseif (($temp = cache_get_data('permissions:' . $cache_groups, 240)) != null && time() - 240 > $modSettings['settings_updated'])
+		elseif ($cache->getVar($temp, 'permissions:' . $cache_groups, 240) && time() - 240 > $modSettings['settings_updated'])
 			list ($user_info['permissions'], $removals) = $temp;
 	}
 
@@ -759,7 +760,7 @@ function loadPermissions()
 		$db->free_result($request);
 
 		if (isset($cache_groups))
-			cache_put_data('permissions:' . $cache_groups, array($user_info['permissions'], $removals), 240);
+			$cache->put('permissions:' . $cache_groups, array($user_info['permissions'], $removals), 240);
 	}
 
 	// Get the board permissions.
@@ -795,8 +796,8 @@ function loadPermissions()
 	if (!empty($modSettings['permission_enable_deny']))
 		$user_info['permissions'] = array_diff($user_info['permissions'], $removals);
 
-	if (isset($cache_groups) && !empty($board) && $modSettings['cache_enable'] >= 2)
-		cache_put_data('permissions:' . $cache_groups . ':' . $board, array($user_info['permissions'], null), 240);
+	if (isset($cache_groups) && !empty($board) && $cache->checkLevel(2))
+		$cache->put('permissions:' . $cache_groups . ':' . $board, array($user_info['permissions'], null), 240);
 
 	// Banned?  Watch, don't touch..
 	banPermissions();
@@ -827,6 +828,7 @@ function loadMemberData($users, $is_name = false, $set = 'normal')
 	global $user_profile, $modSettings, $board_info, $context;
 
 	$db = database();
+	$cache = Cache::instance();
 
 	// Can't just look for no users :P.
 	if (empty($users))
@@ -839,13 +841,13 @@ function loadMemberData($users, $is_name = false, $set = 'normal')
 	$users = !is_array($users) ? array($users) : array_unique($users);
 	$loaded_ids = array();
 
-	if (!$is_name && !empty($modSettings['cache_enable']) && $modSettings['cache_enable'] >= 3)
+	if (!$is_name && $cache->isEnabled() && $cache->checkLevel(3))
 	{
 		$users = array_values($users);
 		for ($i = 0, $n = count($users); $i < $n; $i++)
 		{
-			$data = cache_get_data('member_data-' . $set . '-' . $users[$i], 240);
-			if ($data == null)
+			$data = $cache->get('member_data-' . $set . '-' . $users[$i], 240);
+			if ($cache->isMiss())
 				continue;
 
 			$loaded_ids[] = $data['id_member'];
@@ -939,21 +941,21 @@ function loadMemberData($users, $is_name = false, $set = 'normal')
 	if (!empty($new_loaded_ids))
 		call_integration_hook('integrate_add_member_data', array($new_loaded_ids, $set));
 
-	if (!empty($new_loaded_ids) && !empty($modSettings['cache_enable']) && $modSettings['cache_enable'] >= 3)
+	if (!empty($new_loaded_ids) && $cache->isEnabled() && $cache->checkLevel(3))
 	{
 		for ($i = 0, $n = count($new_loaded_ids); $i < $n; $i++)
-			cache_put_data('member_data-' . $set . '-' . $new_loaded_ids[$i], $user_profile[$new_loaded_ids[$i]], 240);
+			$cache->put('member_data-' . $set . '-' . $new_loaded_ids[$i], $user_profile[$new_loaded_ids[$i]], 240);
 	}
 
 	// Are we loading any moderators?  If so, fix their group data...
 	if (!empty($loaded_ids) && !empty($board_info['moderators']) && $set === 'normal' && count($temp_mods = array_intersect($loaded_ids, array_keys($board_info['moderators']))) !== 0)
 	{
-		if (($group_info = cache_get_data('moderator_group_info', 480)) == null)
+		if (!$cache->getVar($group_info, 'moderator_group_info', 480))
 		{
 			require_once(SUBSDIR . '/Membergroups.subs.php');
 			$group_info = membergroupById(3, true);
 
-			cache_put_data('moderator_group_info', $group_info, 480);
+			$cache->put('moderator_group_info', $group_info, 480);
 		}
 
 		foreach ($temp_mods as $id)
@@ -1219,13 +1221,13 @@ function getThemeData($id_theme, $member)
 	global $modSettings;
 
 	// Do we already have this members theme data and specific options loaded (for aggressive cache settings)
-	if (!empty($modSettings['cache_enable']) && $modSettings['cache_enable'] >= 2 && ($temp = cache_get_data('theme_settings-' . $id_theme . ':' . $member, 60)) != null && time() - 60 > $modSettings['settings_updated'])
+	if ($cache->checkLevel(2) && $cache->getVar($temp, 'theme_settings-' . $id_theme . ':' . $member, 60) && time() - 60 > $modSettings['settings_updated'])
 	{
 		$themeData = $temp;
 		$flag = true;
 	}
 	// Or do we just have the system wide theme settings cached
-	elseif (($temp = cache_get_data('theme_settings-' . $id_theme, 90)) != null && time() - 60 > $modSettings['settings_updated'])
+	elseif ($cache->getVar($temp, 'theme_settings-' . $id_theme, 90) && time() - 60 > $modSettings['settings_updated'])
 		$themeData = $temp + array($member => array());
 	// Nothing at all then
 	else
@@ -1277,11 +1279,11 @@ function getThemeData($id_theme, $member)
 		}
 
 		// If being aggressive we save the site wide and member theme settings
-		if (!empty($modSettings['cache_enable']) && $modSettings['cache_enable'] >= 2)
-			cache_put_data('theme_settings-' . $id_theme . ':' . $member, $themeData, 60);
+		if ($cache->isEnabled() && $cache->checkLevel(2))
+			$cache->put('theme_settings-' . $id_theme . ':' . $member, $themeData, 60);
 		// Only if we didn't already load that part of the cache...
 		elseif (!isset($temp))
-			cache_put_data('theme_settings-' . $id_theme, array(-1 => $themeData[-1], 0 => $themeData[0]), 90);
+			$cache->put('theme_settings-' . $id_theme, array(-1 => $themeData[-1], 0 => $themeData[0]), 90);
 	}
 
 	return $themeData;
@@ -1871,6 +1873,8 @@ function loadAssetFile($filenames, $params = array(), $id = '')
 	if (empty($filenames))
 		return;
 
+	$cache = Cache::instance();
+
 	if (!is_array($filenames))
 		$filenames = array($filenames);
 
@@ -1887,7 +1891,7 @@ function loadAssetFile($filenames, $params = array(), $id = '')
 
 	// Whoa ... we've done this before yes?
 	$cache_name = 'load_' . $params['extension'] . '_' . hash('md5', $settings['theme_dir'] . implode('_', $filenames));
-	if (($temp = cache_get_data($cache_name, 600)) !== null)
+	if ($cache->getVar($temp, $cache_name, 600))
 	{
 		if (empty($context[$params['index_name']]))
 			$context[$params['index_name']] = array();
@@ -1957,7 +1961,7 @@ function loadAssetFile($filenames, $params = array(), $id = '')
 			}
 
 			// Save it so we don't have to build this so often
-			cache_put_data($cache_name, $this_build, 600);
+			$cache->put($cache_name, $this_build, 600);
 		}
 	}
 }
@@ -2192,9 +2196,10 @@ function getBoardParents($id_parent)
 	global $scripturl;
 
 	$db = database();
+	$cache = Cache::instance();
 
 	// First check if we have this cached already.
-	if (($boards = cache_get_data('board_parents-' . $id_parent, 480)) === null)
+	if ($cache->getVar($boards, 'board_parents-' . $id_parent, 480))
 	{
 		$boards = array();
 		$original_parent = $id_parent;
@@ -2244,7 +2249,7 @@ function getBoardParents($id_parent)
 			$db->free_result($result);
 		}
 
-		cache_put_data('board_parents-' . $original_parent, $boards, 480);
+		$cache->put('board_parents-' . $original_parent, $boards, 480);
 	}
 
 	return $boards;
@@ -2259,9 +2264,12 @@ function getLanguages($use_cache = true)
 {
 	global $settings, $modSettings;
 
+	$cache = Cache::instance();
+
 	// Either we don't use the cache, or its expired.
 	$languages = '';
-	if (!$use_cache || ($languages = cache_get_data('known_languages', !empty($modSettings['cache_enable']) && $modSettings['cache_enable'] < 1 ? 86400 : 3600)) == null)
+
+	if (!$use_cache || !$cache->getVar($languages, 'known_languages', $cache->isEnabled() && $modSettings['cache_enable'] < 1 ? 86400 : 3600))
 	{
 		// If we don't have our theme information yet, lets get it.
 		if (empty($settings['default_theme_dir']))
@@ -2314,8 +2322,8 @@ function getLanguages($use_cache = true)
 		}
 
 		// Lets cash in on this deal.
-		if (!empty($modSettings['cache_enable']))
-			cache_put_data('known_languages', $languages, !empty($modSettings['cache_enable']) && $modSettings['cache_enable'] < 1 ? 86400 : 3600);
+		if ($cache->isEnabled())
+			$cache->put('known_languages', $languages, $cache->isEnabled() && $modSettings['cache_enable'] < 1 ? 86400 : 3600);
 	}
 
 	return $languages;
@@ -2553,7 +2561,7 @@ function doSecurityChecks()
 		}
 
 		// Cache directory writable?
-		if (!empty($modSettings['cache_enable']) && !is_writable(CACHEDIR))
+		if ($cache->isEnabled() && !is_writable(CACHEDIR))
 		{
 			$context['security_controls_files']['title'] = $txt['generic_warning'];
 			$context['security_controls_files']['errors']['cache'] = $txt['cache_writable'];

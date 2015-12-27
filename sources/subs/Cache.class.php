@@ -229,6 +229,20 @@ class Cache
 	}
 
 	/**
+	 * Same as $this->get but sets $var to the result and return if it was a hit
+	 *
+	 * @param mixed $var The variable to be assigned the result
+	 * @param string $key
+	 * @param int $ttl
+	 * @return bool if it was a hit
+	 */
+	public function getVar(&$var, $key, $ttl = 120)
+	{
+		$var = $this->get($key, $ttl);
+		return !$this->isMiss();
+	}
+
+	/**
 	 * Empty out the cache in use as best it can
 	 *
 	 * It may only remove the files of a certain type (if the $type parameter is given)
@@ -298,11 +312,24 @@ class Cache
 	}
 
 	/**
+	 * @return int
+	 */
+	public function getLevel()
+	{
+		return $this->level;
+	}
+
+	public function checkLevel($level)
+	{
+		return $this->isEnabled() && $this->level >= $level;
+	}
+
+	/**
 	 * @var bool If the result of the last get was a miss
 	 */
 	public function isMiss()
 	{
-		return $this->_cache_obj->isMiss();
+		return $this->isEnabled() ? $this->_cache_obj->isMiss() : true;
 	}
 
 	/**
