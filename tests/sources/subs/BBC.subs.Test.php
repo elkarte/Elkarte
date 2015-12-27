@@ -9,6 +9,8 @@ class TestBBC extends PHPUnit_Framework_TestCase
 	 */
 	public function setUp()
 	{
+		loadTheme();
+
 		$this->bbcTestCases = array(
 			array(
 				'Test abbreviation',
