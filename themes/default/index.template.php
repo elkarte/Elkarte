@@ -199,7 +199,7 @@ function template_html_above()
 	<link rel="index" href="', $scripturl, '?board=', $context['current_board'], '.0" />';
 
 	// load in any javascript files from addons and themes
-	template_javascript();
+	theme()->template_javascript();
 
 	// Output any remaining HTML headers. (from addons, maybe?)
 	echo $context['html_headers'];
@@ -432,7 +432,7 @@ function template_html_below()
 	</div>';
 
 	// load in any javascript that could be deferred to the end of the page
-	template_javascript(true);
+	theme()->template_javascript(true);
 
 	// Anything special to put out?
 	if (!empty($context['insert_after_template']))

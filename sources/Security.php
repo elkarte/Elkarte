@@ -1600,3 +1600,51 @@ function stop_prefetching()
 		die;
 	}
 }
+
+/**
+ * Check if the admin's session is active
+ *
+ * @return bool
+ */
+function isAdminSessionActive()
+{
+	global $modSettings;
+
+	return empty($modSettings['securityDisable']) && (isset($_SESSION['admin_time']) && $_SESSION['admin_time'] + ($modSettings['admin_session_lifetime'] * 60) > time());
+}
+
+/**
+ * Check if security files exist
+ * If files are found, populate $context['security_controls_files']:
+ * * 'title'	- $txt['security_risk']
+ * * 'errors'	- An array of strings with the key being the filename and the value an error with the filename in it
+ *
+ * @return bool
+ */
+function checkSecurityFiles()
+{
+	global $txt;
+
+	$has_files = false;
+
+	$securityFiles = array('install.php', 'upgrade.php', 'convert.php', 'repair_paths.php', 'repair_settings.php', 'Settings.php~', 'Settings_bak.php~');
+	call_integration_hook('integrate_security_files', array(&$securityFiles));
+
+	foreach ($securityFiles as $securityFile)
+	{
+		if (file_exists(BOARDDIR . '/' . $securityFile))
+		{
+			$has_files = true;
+
+			$context['security_controls_files']['title'] = $txt['security_risk'];
+			$context['security_controls_files']['errors'][$securityFile] = sprintf($txt['not_removed'], $securityFile);
+
+			if ($securityFile == 'Settings.php~' || $securityFile == 'Settings_bak.php~')
+			{
+				$context['security_controls_files']['errors'][$securityFile] .= '<span class="smalltext">' . sprintf($txt['not_removed_extra'], $securityFile, substr($securityFile, 0, -1)) . '</span>';
+			}
+		}
+	}
+
+	return $has_files;
+}

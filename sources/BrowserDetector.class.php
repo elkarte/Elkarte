@@ -105,18 +105,7 @@ class Browser_Detector
 		$this->isOperaMini();
 		$this->isOperaMobi();
 
-		// Be you robot or human?
-		if ($user_info['possibly_robot'])
-		{
-			// This isn't meant to be reliable, it's just meant to catch most bots to prevent PHPSESSID from showing up.
-			$this->_browsers['possibly_robot'] = !empty($user_info['possibly_robot']);
-
-			// Robots shouldn't be logging in or registering.  So, they aren't a bot.  Better to be wrong than sorry (or people won't be able to log in!), anyway.
-			if ((isset($_REQUEST['action']) && in_array($_REQUEST['action'], array('login', 'login2', 'register'))) || !$user_info['is_guest'])
-				$this->_browsers['possibly_robot'] = false;
-		}
-		else
-			$this->_browsers['possibly_robot'] = false;
+		$this->isPossibleRobot();
 
 		// Last step ...
 		$this->_setupBrowserPriority();
@@ -245,6 +234,32 @@ class Browser_Detector
 			$this->_is_mobile = true;
 
 		return $this->_browsers['is_opera_mini'];
+	}
+
+	/**
+	 * Determine if the browser is possibly a robot or not
+	 *
+	 * @return boolean true if the browser is possibly a robot otherwise false
+	 */
+	public function isPossibleRobot()
+	{
+		global $user_info;
+
+		// Be you robot or human?
+		if (!isset($this->_browsers['possibly_robot']))
+		{
+			if ($user_info['possibly_robot']) {
+				// This isn't meant to be reliable, it's just meant to catch most bots to prevent PHPSESSID from showing up.
+				$this->_browsers['possibly_robot'] = !empty($user_info['possibly_robot']);
+
+				// Robots shouldn't be logging in or registering.  So, they aren't a bot.  Better to be wrong than sorry (or people won't be able to log in!), anyway.
+				if ((isset($_REQUEST['action']) && in_array($_REQUEST['action'], array('login', 'login2', 'register'))) || !$user_info['is_guest'])
+					$this->_browsers['possibly_robot'] = false;
+			} else
+				$this->_browsers['possibly_robot'] = false;
+		}
+
+		return $this->_browsers['possibly_robot'];
 	}
 
 	/**

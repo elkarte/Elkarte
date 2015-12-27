@@ -139,7 +139,11 @@ function create_control_richedit($editorOptions)
 		$context['post_box_name'] = $editorOptions['id'];
 
 		// Some general stuff.
-		$settings['smileys_url'] = $modSettings['smileys_url'] . '/' . $user_info['smiley_set'];
+		$settings['smileys_url'] = $context['user']['smiley_path'];
+
+		// @deprecated since 1.1
+		if (!isset($context['drafts_autosave_frequency']) && !empty($context['drafts_autosave']) && !empty($options['drafts_autosave_enabled']))
+			$context['drafts_autosave_frequency'] = empty($modSettings['drafts_autosave_frequency']) ? 30000 : $modSettings['drafts_autosave_frequency'] * 1000;
 
 		// This really has some WYSIWYG stuff.
 		loadTemplate('GenericControls');
@@ -310,7 +314,7 @@ function create_control_richedit($editorOptions)
 		);
 
 		// Load smileys - don't bother to run a query if we're not using the database's ones anyhow.
-		if (empty($modSettings['smiley_enable']) && $user_info['smiley_set'] != 'none')
+		if (empty($modSettings['smiley_enable']) && $context['smiley_enabled'])
 		{
 			$context['smileys']['postform'][] = array(
 				'smileys' => array(
@@ -409,7 +413,7 @@ function create_control_richedit($editorOptions)
 				'isLast' => true,
 			);
 		}
-		elseif ($user_info['smiley_set'] !== 'none')
+		elseif ($context['smiley_enabled'])
 		{
 			if (($temp = cache_get_data('posting_smileys', 480)) == null)
 			{
