@@ -240,7 +240,7 @@ class UpgradeInstructions_upgrade_1_1
 					}
 					if (!empty($modSettings['enabled_mentions']))
 					{
-						enableModules('mentions', 'post', 'display');
+						enableModules('mentions', array('post', 'display'));
 					}
 					enableModules('poll', array('display', 'post'));
 					enableModules('verification', array('post', 'personalmessage', 'register'));

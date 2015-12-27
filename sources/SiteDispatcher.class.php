@@ -243,7 +243,7 @@ class Site_Dispatcher
 				return $this->dispatch();
 			}
 
-			// Initialize this controller with its own event manager
+			// Initialize this controller with its event manager
 			$controller = new $this->_controller_name(new Event_Manager());
 
 			// Fetch controllers generic hook name from the action controller

@@ -49,15 +49,18 @@ abstract class Action_Controller
 	 */
 	public function __construct($eventManager = null)
 	{
-		// A safety-net to remain backward compatibility
-		if ($eventManager === null)
-			$eventManager = new Event_Manager();
-
-		$this->_events = $eventManager;
-
 		// Dependency injection will come later
 		$this->_req = HttpReq::instance();
 
+		// A safety-net to remain backward compatibility
+		if ($eventManager === null)
+		{
+			$eventManager = new Event_Manager();
+		}
+
+		$this->_events = $eventManager;
+
+		// Initialize the events associated with this controller
 		$this->_initEventManager();
 	}
 
@@ -97,8 +100,10 @@ abstract class Action_Controller
 		// Use the base controller name for the hook, ie post
 		$this->_hook = str_replace('_Controller', '', get_class($this));
 
+		// Find any module classes associated with this controller
 		$classes = $this->_loadModules();
 
+		// Register any module classes => events we found
 		$this->_events->registerClasses($classes);
 
 		$this->_events->setSource($this);
@@ -113,9 +118,17 @@ abstract class Action_Controller
 	}
 
 	/**
-	 * Finds the modules for a certain controller.
+	 * Finds modules registered to a certain controller
 	 *
-	 * @return string[] Class names to look for
+	 * What it does:
+	 * - Uses the controllers generic hook name to find modules
+	 * - Searches for modules registered against the module name
+	 * - Example
+	 *   - Display_Controller results in searching for modules registered against modules_display
+	 *   - $modSettings['modules_display'] returns drafts,calendar,.....
+	 *   - Verifies classes Drafts_Display_Module, Calendar_Display_Module, ... exist
+	 *
+	 * @return string[] Valid Module Classes for this Controller
 	 */
 	protected function _loadModules()
 	{
@@ -145,6 +158,7 @@ abstract class Action_Controller
 	/**
 	 * Default action handler.
 	 *
+	 * What it does:
 	 * - This will be called by the dispatcher in many cases.
 	 * - It may set up a menu, sub-dispatch at its turn to the method matching ?sa= parameter
 	 * or simply forward the request to a known default method.

@@ -81,7 +81,7 @@ class Mentionmem_Mention extends Mention_BoardAccess_Abstract
 	{
 		// Just using the plain text quick reply and not the editor
 		if ($simple)
-			loadJavascriptFile(array('jquery.atwho.js', 'jquery.caret.min.js', 'mentioning.js'));
+			loadJavascriptFile(array('jquery.atwho.min.js', 'jquery.caret.min.js', 'mentioning.js'));
 
 		loadCSSFile('jquery.atwho.css');
 
@@ -163,6 +163,7 @@ class Mentionmem_Mention extends Mention_BoardAccess_Abstract
 	public static function getModules($modules)
 	{
 		$modules['mentions'] = array('post', 'display');
+
 		return $modules;
 	}
 

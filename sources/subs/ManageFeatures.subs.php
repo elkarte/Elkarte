@@ -760,6 +760,17 @@ function getNotificationTypes()
 	return $types;
 }
 
+/**
+ * Returns the modules for the given mentions
+ *
+ * What it does:
+ * - Calls each modules static function ::getModules
+ * - Called from ManageFeatures.controller as part of notification settings
+ *
+ * @param string[] $enabled_mentions
+ *
+ * @return array
+ */
 function getMentionsModules($enabled_mentions)
 {
 	$modules = array();

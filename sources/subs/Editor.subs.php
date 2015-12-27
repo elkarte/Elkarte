@@ -100,11 +100,12 @@ function getMessageIcons($board_id)
 
 /**
  * Creates a box that can be used for richedit stuff like BBC, Smileys etc.
+ *
  * @param mixed[] $editorOptions associative array of options => value
- *  must contain:
+ *  Must contain:
  *   - id => unique id for the css
  *   - value => text for the editor or blank
- * Optionally
+ * Optionally:
  *   - height => height of the initial box
  *   - width => width of the box (100%)
  *   - force_rich => force wysiwyg to be enabled
@@ -113,6 +114,9 @@ function getMessageIcons($board_id)
  *       - 'post_button' => $txt['for post button'],
  *     ),
  *   - preview_type => 2 how to act on preview click, see template_control_richedit_buttons
+ *
+ * @uses Post language
+ * @uses GenericControls template
  */
 function create_control_richedit($editorOptions)
 {
@@ -159,7 +163,7 @@ function create_control_richedit($editorOptions)
 
 		// Mentions?
 		if (!empty($context['mentions_enabled']))
-			loadJavascriptFile(array('jquery.atwho.js', 'jquery.caret.min.js', 'mentioning.plugin.js'));
+			loadJavascriptFile(array('jquery.atwho.min.js', 'jquery.caret.min.js', 'mentioning.plugin.js'));
 
 		// Our not so concise shortcut line
 		if (!isset($context['shortcuts_text']))

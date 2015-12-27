@@ -496,7 +496,7 @@ function template_quickreply_below()
 				</div>
 			</div>';
 
-		// Using the plain text box we need to load in some additonal javascript
+		// Using the plain text box we need to load in some additional javascript
 		if (empty($options['use_editor_quick_reply']))
 		{
 			echo '
