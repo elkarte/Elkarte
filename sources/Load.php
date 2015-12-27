@@ -1219,6 +1219,8 @@ function getThemeData($id_theme, $member)
 {
 	global $modSettings;
 
+	$cache = Cache::instance();
+
 	// Do we already have this members theme data and specific options loaded (for aggressive cache settings)
 	if ($cache->checkLevel(2) && $cache->getVar($temp, 'theme_settings-' . $id_theme . ':' . $member, 60) && time() - 60 > $modSettings['settings_updated'])
 	{
