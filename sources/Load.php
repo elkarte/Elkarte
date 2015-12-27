@@ -1612,7 +1612,7 @@ function loadUserContext()
 		$context['user']['name'] = $txt['guest_title'];
 
 	$context['user']['smiley_set'] = determineSmileySet($user_info['smiley_set'], $modSettings['smiley_sets_known']);
-	$context['smiley_enabled'] = $context['user']['smiley_set'] !== 'none';
+	$context['smiley_enabled'] = $user_info['smiley_set'] !== 'none';
 	$context['user']['smiley_path'] = $modSettings['smileys_url'] . '/' . $context['user']['smiley_set'] . '/';
 }
 
