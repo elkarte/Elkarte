@@ -1826,7 +1826,7 @@ function loadJavascriptFile($filenames, $params = array(), $id = '')
 
 	$params['subdir'] = 'scripts';
 	$params['extension'] = 'js';
-	$params['index_name'] = 'javascript_files';
+	$params['index_name'] = 'js_files';
 	$params['debug_index'] = 'javascript';
 
 	loadAssetFile($filenames, $params, $id);
@@ -1891,6 +1891,7 @@ function loadAssetFile($filenames, $params = array(), $id = '')
 	{
 		if (empty($context[$params['index_name']]))
 			$context[$params['index_name']] = array();
+
 		$context[$params['index_name']] += $temp;
 
 		if ($db_show_debug === true)

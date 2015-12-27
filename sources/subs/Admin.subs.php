@@ -93,6 +93,7 @@ function getServerVersions($checkFor)
 
 		// Compute some system info, if we can
 		$versions['server_name'] = array('title' => $txt['support_versions'], 'version' => php_uname());
+		require_once(SUBSDIR . '/Server.subs.php');
 		$loading = detectServerLoad();
 		if ($loading !== false)
 			$versions['server_load'] = array('title' => $txt['load_balancing_settings'], 'version' => $loading);
