@@ -502,8 +502,8 @@ class Search_Controller extends Action_Controller
 		$context['page_index'] = constructPageIndex($scripturl . '?action=search;sa=results;params=' . $context['params'], $_REQUEST['start'], $num_results, $modSettings['search_results_per_page'], false);
 
 		// Consider the search complete!
-		if (!empty($modSettings['cache_enable']) && $modSettings['cache_enable'] >= 2)
-			cache_put_data('search_start:' . ($user_info['is_guest'] ? $user_info['ip'] : $user_info['id']), null, 90);
+		if (Cache::instance()->isEnabled() && Cache::instance()->checkLevel(2))
+			Cache::instance()->put('search_start:' . ($user_info['is_guest'] ? $user_info['ip'] : $user_info['id']), null, 90);
 
 		$context['key_words'] = &$searchArray;
 		$context['sub_template'] = 'results';

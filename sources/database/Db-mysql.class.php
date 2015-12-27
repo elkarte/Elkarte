@@ -524,14 +524,14 @@ class Database_MySQL extends Database_Abstract
 			Errors::instance()->log_error($txt['database_error'] . ': ' . $query_error . (!empty($modSettings['enableErrorQueryLogging']) ? "\n\n$db_string" : ''), 'database', $file, $line);
 
 		// Database error auto fixing ;).
-		if (function_exists('cache_get_data') && (!isset($modSettings['autoFixDatabase']) || $modSettings['autoFixDatabase'] == '1'))
+		if (function_exists('Cache::instance()->get') && (!isset($modSettings['autoFixDatabase']) || $modSettings['autoFixDatabase'] == '1'))
 		{
 			$db_last_error = db_last_error();
 			// Force caching on, just for the error checking.
 			$old_cache = isset($modSettings['cache_enable']) ? $modSettings['cache_enable'] : null;
 			$modSettings['cache_enable'] = '1';
 
-			if (($temp = cache_get_data('db_last_error', 600)) !== null)
+			if (($temp = Cache::instance()->get('db_last_error', 600)) !== null)
 				$db_last_error = max($db_last_error, $temp);
 
 			if ($db_last_error < time() - 3600 * 24 * 3)
@@ -578,8 +578,8 @@ class Database_MySQL extends Database_Abstract
 				require_once(SUBSDIR . '/Mail.subs.php');
 
 				// Make a note of the REPAIR...
-				cache_put_data('db_last_error', time(), 600);
-				if (($temp = cache_get_data('db_last_error', 600)) === null)
+				Cache::instance()->put('db_last_error', time(), 600);
+				if (($temp = Cache::instance()->get('db_last_error', 600)) === null)
 					updateDbLastError(time());
 
 				// Attempt to find and repair the broken table.

@@ -1037,7 +1037,7 @@ function getAvatar($id_attach)
 	$db = database();
 
 	// Use our cache when possible
-	if (($cache = cache_get_data('getAvatar_id-' . $id_attach)) !== null)
+	if (($cache = Cache::instance()->get('getAvatar_id-' . $id_attach)) !== null)
 		$avatarData = $cache;
 	else
 	{
@@ -1057,7 +1057,7 @@ function getAvatar($id_attach)
 			$avatarData = $db->fetch_row($request);
 		$db->free_result($request);
 
-		cache_put_data('getAvatar_id-' . $id_attach, $avatarData, 900);
+		Cache::instance()->put('getAvatar_id-' . $id_attach, $avatarData, 900);
 	}
 
 	return $avatarData;
@@ -1258,7 +1258,7 @@ function url_image_size($url)
 	$url = str_replace(' ', '%20', $url);
 
 	// Can we pull this from the cache... please please?
-	if (($temp = cache_get_data('url_image_size-' . md5($url), 240)) !== null)
+	if (($temp = Cache::instance()->get('url_image_size-' . md5($url), 240)) !== null)
 		return $temp;
 
 	$t = microtime(true);
@@ -1315,7 +1315,7 @@ function url_image_size($url)
 
 	// If this took a long time, we may never have to do it again, but then again we might...
 	if (microtime(true) - $t > 0.8)
-		cache_put_data('url_image_size-' . md5($url), $size, 240);
+		Cache::instance()->put('url_image_size-' . md5($url), $size, 240);
 
 	// Didn't work.
 	return $size;

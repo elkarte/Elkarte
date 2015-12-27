@@ -732,7 +732,7 @@ class Profile_Controller extends Action_Controller
 				$context['profile_updated'] = $context['user']['is_owner'] ? $txt['profile_updated_own'] : sprintf($txt['profile_updated_else'], $cur_profile['member_name']);
 
 				// Invalidate any cached data.
-				cache_put_data('member_data-profile-' . $this->_memID, null, 0);
+				Cache::instance()->put('member_data-profile-' . $this->_memID, null, 0);
 			}
 		}
 	}

@@ -189,7 +189,7 @@ class Sphinx_Search extends SearchAPI
 		global $user_info, $context, $modSettings;
 
 		// Only request the results if they haven't been cached yet.
-		if (($cached_results = cache_get_data('search_results_' . md5($user_info['query_see_board'] . '_' . $context['params']))) === null)
+		if (($cached_results = Cache::instance()->get('search_results_' . md5($user_info['query_see_board'] . '_' . $context['params']))) === null)
 		{
 			// The API communicating with the search daemon.
 			require_once(SOURCEDIR . '/sphinxapi.php');
@@ -300,7 +300,7 @@ class Sphinx_Search extends SearchAPI
 			}
 
 			// Store the search results in the cache.
-			cache_put_data('search_results_' . md5($user_info['query_see_board'] . '_' . $context['params']), $cached_results, 600);
+			Cache::instance()->put('search_results_' . md5($user_info['query_see_board'] . '_' . $context['params']), $cached_results, 600);
 		}
 
 		$participants = array();

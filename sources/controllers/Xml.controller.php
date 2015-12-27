@@ -568,8 +568,8 @@ class Xml_Controller extends Action_Controller
 						}
 
 						// Clear the cache, its stale now
-						cache_put_data('parsing_smileys', null, 480);
-						cache_put_data('posting_smileys', null, 480);
+						Cache::instance()->put('parsing_smileys', null, 480);
+						Cache::instance()->put('posting_smileys', null, 480);
 						$order[] = array('value' => $txt['smileys_moved_done']);
 					}
 				}

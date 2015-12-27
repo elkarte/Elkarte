@@ -1244,8 +1244,8 @@ class Maintenance_Controller extends Action_Controller
 		}
 
 		// Don't confuse admins by having an out of date cache.
-		cache_put_data('board-' . $id_board_from, null, 120);
-		cache_put_data('board-' . $id_board_to, null, 120);
+		Cache::instance()->put('board-' . $id_board_from, null, 120);
+		Cache::instance()->put('board-' . $id_board_to, null, 120);
 
 		redirectexit('action=admin;area=maintain;sa=topics;done=massmove');
 	}

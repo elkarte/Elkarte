@@ -796,7 +796,7 @@ class Verification_Controls_Questions implements Verification_Controls
 
 		$db = database();
 
-		if (($modSettings['question_id_cache'] = cache_get_data('verificationQuestionIds', 300)) == null)
+		if (($modSettings['question_id_cache'] = Cache::instance()->get('verificationQuestionIds', 300)) == null)
 		{
 			$request = $db->query('', '
 				SELECT id_question, language
@@ -808,8 +808,8 @@ class Verification_Controls_Questions implements Verification_Controls
 				$modSettings['question_id_cache'][$row['language']][] = $row['id_question'];
 			$db->free_result($request);
 
-			if (!empty($modSettings['cache_enable']))
-				cache_put_data('verificationQuestionIds', $modSettings['question_id_cache'], 300);
+			if (Cache::instance()->isEnabled())
+				Cache::instance()->put('verificationQuestionIds', $modSettings['question_id_cache'], 300);
 		}
 	}
 

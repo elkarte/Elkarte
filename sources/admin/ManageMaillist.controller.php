@@ -388,7 +388,7 @@ class ManageMaillist_Controller extends Action_Controller
 			maillist_delete_error_entry($id);
 
 		// Flush the cache
-		cache_put_data('num_menu_errors', null, 900);
+		Cache::instance()->put('num_menu_errors', null, 900);
 
 		// Back to the failed list we go
 		redirectexit('action=admin;area=maillist;sa=emaillist');
@@ -449,7 +449,7 @@ class ManageMaillist_Controller extends Action_Controller
 						maillist_delete_error_entry($id);
 
 						// Flush the menu count cache
-						cache_put_data('num_menu_errors', null, 900);
+						Cache::instance()->put('num_menu_errors', null, 900);
 
 						$_SESSION['email_error'] = $txt['approved'];
 						$_SESSION['email_error_type'] = 1;
@@ -1506,7 +1506,7 @@ class ManageMaillist_Controller extends Action_Controller
 			else
 			{
 				// Clear the moderation count cache
-				cache_put_data('num_menu_errors', null, 900);
+				Cache::instance()->put('num_menu_errors', null, 900);
 
 				// Should be off if mail posting is on, we ignore it anyway but this at least updates the ACP
 				if (!empty($this->_req->post->maillist_enabled))

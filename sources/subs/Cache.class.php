@@ -179,7 +179,7 @@ class Cache
 
 		$this->_cache_obj->put($key, $value, $ttl);
 
-		call_integration_hook('cache_put_data', array($key, $value, $ttl));
+		call_integration_hook('Cache::instance()->put', array($key, $value, $ttl));
 
 		if ($db_show_debug === true)
 		{
@@ -223,7 +223,7 @@ class Cache
 			Debug::get()->cache($cache_hit);
 		}
 
-		call_integration_hook('cache_get_data', array($key, $ttl, $value));
+		call_integration_hook('Cache::instance()->get', array($key, $ttl, $value));
 
 		return empty($value) ? null : @unserialize($value);
 	}

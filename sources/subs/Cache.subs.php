@@ -63,7 +63,7 @@ function cache_put_data($key, $value, $ttl = 120)
 /**
  * Gets the value from the cache specified by key, so long as it is not older than ttl seconds.
  * - It may often "miss", so shouldn't be depended on.
- * - It supports the same as cache_put_data().
+ * - It supports the same as Cache::instance()->put().
  *
  * @param string $key
  * @param int $ttl = 120

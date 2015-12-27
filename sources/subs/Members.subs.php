@@ -137,8 +137,8 @@ function deleteMembers($users, $check_not_admin = false)
 		);
 
 		// Remove any cached data if enabled.
-		if (!empty($modSettings['cache_enable']) && $modSettings['cache_enable'] >= 2)
-			cache_put_data('user_settings-' . $user[0], null, 60);
+		if (Cache::instance()->isEnabled() && Cache::instance()->checkLevel(2))
+			Cache::instance()->put('user_settings-' . $user[0], null, 60);
 	}
 
 	// Make these peoples' posts guest posts.
@@ -2509,21 +2509,21 @@ function updateMemberData($members, $data)
 	updatePostGroupStats($members, array_keys($data));
 
 	// Clear any caching?
-	if (!empty($modSettings['cache_enable']) && $modSettings['cache_enable'] >= 2 && !empty($members))
+	if (Cache::instance()->isEnabled() && Cache::instance()->checkLevel(2) && !empty($members))
 	{
 		if (!is_array($members))
 			$members = array($members);
 
 		foreach ($members as $member)
 		{
-			if ($modSettings['cache_enable'] >= 3)
+			if (Cache::instance()->checkLevel(3))
 			{
-				cache_put_data('member_data-profile-' . $member, null, 120);
-				cache_put_data('member_data-normal-' . $member, null, 120);
-				cache_put_data('member_data-minimal-' . $member, null, 120);
+				Cache::instance()->put('member_data-profile-' . $member, null, 120);
+				Cache::instance()->put('member_data-normal-' . $member, null, 120);
+				Cache::instance()->put('member_data-minimal-' . $member, null, 120);
 			}
 
-			cache_put_data('user_settings-' . $member, null, 60);
+			Cache::instance()->put('user_settings-' . $member, null, 60);
 		}
 	}
 }

@@ -114,12 +114,12 @@ class Recent_Class
 	public function findRecentMessages($start, $limit = 10)
 	{
 		$key = 'recent-' . $this->_user_id . '-' . md5(serialize(array_diff_key($this->_query_parameters, array('max_id_msg' => 0)))) . '-' . $start . '-' . $limit;
-		if (($this->_messages = cache_get_data($key, 120)) === null)
+		if (($this->_messages = Cache::instance()->get($key, 120)) === null)
 		{
 			$this->_findRecentMessages($start, $limit);
 
 			if (!empty($this->_cache_results))
-					cache_put_data($key, $this->_messages, 120);
+					Cache::instance()->put($key, $this->_messages, 120);
 		}
 
 		return !empty($this->_messages);

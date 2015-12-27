@@ -74,7 +74,7 @@ function writeLog($force = false)
 	$session_id = $user_info['is_guest'] ? 'ip' . $user_info['ip'] : session_id();
 
 	// Grab the last all-of-Elk-specific log_online deletion time.
-	$do_delete = cache_get_data('log_online-update', 30) < time() - 30;
+	$do_delete = Cache::instance()->get('log_online-update', 30) < time() - 30;
 
 	require_once(SUBSDIR . '/Logging.subs.php');
 
@@ -86,7 +86,7 @@ function writeLog($force = false)
 			deleteLogOnlineInterval($session_id);
 
 			// Cache when we did it last.
-			cache_put_data('log_online-update', time(), 30);
+			Cache::instance()->put('log_online-update', time(), 30);
 		}
 
 		updateLogOnline($session_id, $serialized);
@@ -119,8 +119,8 @@ function writeLog($force = false)
 		require_once(SUBSDIR . '/Members.subs.php');
 		updateMemberData($user_info['id'], array('last_login' => time(), 'member_ip' => $user_info['ip'], 'member_ip2' => $req->ban_ip(), 'total_time_logged_in' => $user_settings['total_time_logged_in']));
 
-		if (!empty($modSettings['cache_enable']) && $modSettings['cache_enable'] >= 2)
-			cache_put_data('user_settings-' . $user_info['id'], $user_settings, 60);
+		if (Cache::instance()->checkLevel(2))
+			Cache::instance()->put('user_settings-' . $user_info['id'], $user_settings, 60);
 
 		$user_info['total_time_logged_in'] += time() - $_SESSION['timeOnlineUpdated'];
 		$_SESSION['timeOnlineUpdated'] = time();

@@ -100,7 +100,7 @@ class ModerateAttachments_Controller extends Action_Controller
 			removeAttachments(array('id_attach' => $attachments, 'do_logging' => true));
 
 		// We approved or removed, either way we reset those numbers
-		cache_put_data('num_menu_errors', null, 900);
+		Cache::instance()->put('num_menu_errors', null, 900);
 
 		// Return to the topic....
 		redirectexit($redirect);

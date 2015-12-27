@@ -159,8 +159,8 @@ class ManageSmileys_Controller extends Action_Controller
 			Settings_Form::save_db($config_vars, $this->_req->post);
 
 			// Flush the cache so the new settings take effect
-			cache_put_data('parsing_smileys', null, 480);
-			cache_put_data('posting_smileys', null, 480);
+			Cache::instance()->put('parsing_smileys', null, 480);
+			Cache::instance()->put('posting_smileys', null, 480);
 
 			redirectexit('action=admin;area=smileys;sa=settings');
 		}
@@ -448,8 +448,8 @@ class ManageSmileys_Controller extends Action_Controller
 			}
 
 			// No matter what, reset the cache
-			cache_put_data('parsing_smileys', null, 480);
-			cache_put_data('posting_smileys', null, 480);
+			Cache::instance()->put('parsing_smileys', null, 480);
+			Cache::instance()->put('posting_smileys', null, 480);
 		}
 	}
 
@@ -741,8 +741,8 @@ class ManageSmileys_Controller extends Action_Controller
 			);
 			addSmiley($param);
 
-			cache_put_data('parsing_smileys', null, 480);
-			cache_put_data('posting_smileys', null, 480);
+			Cache::instance()->put('parsing_smileys', null, 480);
+			Cache::instance()->put('posting_smileys', null, 480);
 
 			// No errors? Out of here!
 			redirectexit('action=admin;area=smileys;sa=editsmileys');
@@ -865,8 +865,8 @@ class ManageSmileys_Controller extends Action_Controller
 				sortSmileyTable();
 			}
 
-			cache_put_data('parsing_smileys', null, 480);
-			cache_put_data('posting_smileys', null, 480);
+			Cache::instance()->put('parsing_smileys', null, 480);
+			Cache::instance()->put('posting_smileys', null, 480);
 		}
 
 		// Load all known smiley sets.
@@ -1458,8 +1458,8 @@ class ManageSmileys_Controller extends Action_Controller
 			}
 		}
 
-		cache_put_data('parsing_smileys', null, 480);
-		cache_put_data('posting_smileys', null, 480);
+		Cache::instance()->put('parsing_smileys', null, 480);
+		Cache::instance()->put('posting_smileys', null, 480);
 
 		createToken('admin-sort');
 	}
@@ -1676,8 +1676,8 @@ class ManageSmileys_Controller extends Action_Controller
 
 			logAction('install_package', array('package' => Util::htmlspecialchars($smileyInfo['name']), 'version' => Util::htmlspecialchars($smileyInfo['version'])), 'admin');
 
-			cache_put_data('parsing_smileys', null, 480);
-			cache_put_data('posting_smileys', null, 480);
+			Cache::instance()->put('parsing_smileys', null, 480);
+			Cache::instance()->put('posting_smileys', null, 480);
 		}
 
 		if (file_exists(BOARDDIR . '/packages/temp'))
@@ -1751,8 +1751,8 @@ class ManageSmileys_Controller extends Action_Controller
 			// Make sure the smiley codes are still in the right order.
 			sortSmileyTable();
 
-			cache_put_data('parsing_smileys', null, 480);
-			cache_put_data('posting_smileys', null, 480);
+			Cache::instance()->put('parsing_smileys', null, 480);
+			Cache::instance()->put('posting_smileys', null, 480);
 		}
 	}
 

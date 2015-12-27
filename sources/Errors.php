@@ -416,13 +416,13 @@ function display_db_error()
 	// For our purposes, we're gonna want this on if at all possible.
 	$modSettings['cache_enable'] = 1;
 
-	if (($temp = cache_get_data('db_last_error', 600)) !== null)
+	if (($temp = Cache::instance()->get('db_last_error', 600)) !== null)
 		$db_last_error = max($db_last_error, $temp);
 
 	if ($db_last_error < time() - 3600 * 24 * 3 && empty($maintenance) && !empty($db_error_send))
 	{
-		cache_put_data('db_last_error', time(), 600);
-		if (($temp = cache_get_data('db_last_error', 600)) === null)
+		Cache::instance()->put('db_last_error', time(), 600);
+		if (($temp = Cache::instance()->get('db_last_error', 600)) === null)
 			logLastDatabaseError();
 
 		// Language files aren't loaded yet :(.

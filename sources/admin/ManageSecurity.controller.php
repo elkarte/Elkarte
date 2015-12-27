@@ -264,7 +264,7 @@ class ManageSecurity_Controller extends Action_Controller
 
 			// Now save.
 			Settings_Form::save_db($config_vars, $this->_req->post);
-			cache_put_data('verificationQuestionIds', null, 300);
+			Cache::instance()->put('verificationQuestionIds', null, 300);
 			redirectexit('action=admin;area=securitysettings;sa=spam');
 		}
 
