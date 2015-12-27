@@ -2198,7 +2198,7 @@ function getBoardParents($id_parent)
 	$cache = Cache::instance();
 
 	// First check if we have this cached already.
-	if ($cache->getVar($boards, 'board_parents-' . $id_parent, 480))
+	if (!$cache->getVar($boards, 'board_parents-' . $id_parent, 480))
 	{
 		$boards = array();
 		$original_parent = $id_parent;
