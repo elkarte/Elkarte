@@ -816,9 +816,8 @@ function moveTopics($topics, $toBoard, $log = false)
 
 	$cache = Cache::instance();
 	// Update the cache?
-	if ($cache->checkLevel(3))
-		foreach ($topics as $topic_id)
-			$cache->put('topic_board-' . $topic_id, null, 120);
+	foreach ($topics as $topic_id)
+		$cache->remove('topic_board-' . $topic_id);
 
 	require_once(SUBSDIR . '/Post.subs.php');
 

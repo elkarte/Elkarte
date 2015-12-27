@@ -122,7 +122,7 @@ function updateSettings($changeArray, $update = false, $debug = false)
 		}
 
 		// Clean out the cache and make sure the cobwebs are gone too.
-		$cache->put('modSettings', null, 90);
+		$cache->remove('modSettings');
 
 		return;
 	}
@@ -153,7 +153,7 @@ function updateSettings($changeArray, $update = false, $debug = false)
 	);
 
 	// Kill the cache - it needs redoing now, but we won't bother ourselves with that here.
-	$cache->put('modSettings', null, 90);
+	$cache->remove('modSettings');
 }
 
 /**
