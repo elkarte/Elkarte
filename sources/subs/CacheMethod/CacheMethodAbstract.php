@@ -46,9 +46,20 @@ abstract class Cache_Method_Abstract implements Cache_Method_Interface
 		return $key;
 	}
 
+	/**
+	 * {@inheritdoc }
+	 */
 	public function isMiss()
 	{
 		return $this->is_miss;
+	}
+
+	/**
+	 * {@inheritdoc }
+	 */
+	public function remove($key)
+	{
+		$this->put($key, null, 0);
 	}
 
 	/**

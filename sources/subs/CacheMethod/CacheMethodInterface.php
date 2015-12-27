@@ -109,4 +109,11 @@ interface Cache_Method_Interface
 	 * @return bool
 	 */
 	public function isMiss();
+
+	/**
+	 * Remove a item from the cache
+	 * @param string $key
+	 * @return void
+	 */
+	public function remove($key);
 }

@@ -333,6 +333,19 @@ class Cache
 	}
 
 	/**
+	 * @param $key
+	 */
+	public function remove($key)
+	{
+		if (!$this->isEnabled())
+		{
+			return;
+		}
+
+		$this->_cache_obj->remove($key);
+	}
+
+	/**
 	 * Get the key for the cache.
 	 *
 	 * @param string $key
