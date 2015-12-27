@@ -82,6 +82,13 @@ class ManageAttachments_Controller extends Action_Controller
 	 */
 	protected $_attachSettingsForm;
 
+	public function pre_dispatch()
+	{
+		// These get used often enough that it makes sense to include them for every action
+		require_once(SUBSDIR . '/Attachments.subs.php');
+		require_once(SUBSDIR . '/ManageAttachments.subs.php');
+	}
+
 	/**
 	 * The main 'Attachments and Avatars' admin.
 	 *
@@ -172,9 +179,6 @@ class ManageAttachments_Controller extends Action_Controller
 	base_dir.addEventListener("change", toggleSubDir, false);
 	toggleSubDir();', true);
 
-		// These are very likely to come in handy! (i.e. without them we're doomed!)
-		require_once(SUBSDIR . '/Attachments.subs.php');
-
 		// Saving settings?
 		if (isset($this->_req->query->save))
 		{
@@ -263,8 +267,6 @@ class ManageAttachments_Controller extends Action_Controller
 	private function _settings()
 	{
 		global $modSettings, $txt, $scripturl, $context;
-
-		require_once(SUBSDIR . '/Attachments.subs.php');
 
 		// Get the current attachment directory.
 		$modSettings['attachmentUploadDir'] = unserialize($modSettings['attachmentUploadDir']);
@@ -391,9 +393,6 @@ class ManageAttachments_Controller extends Action_Controller
 	public function action_browse()
 	{
 		global $context, $txt, $scripturl, $modSettings;
-
-		// We're working with them attachments here!
-		require_once(SUBSDIR . '/ManageAttachments.subs.php');
 
 		// Attachments or avatars?
 		$context['browse_type'] = isset($this->_req->query->avatars) ? 'avatars' : (isset($this->_req->query->thumbs) ? 'thumbs' : 'attachments');
@@ -613,9 +612,6 @@ class ManageAttachments_Controller extends Action_Controller
 		loadTemplate('ManageAttachments');
 		$context['sub_template'] = 'maintenance';
 
-		// We're working with them attachments here!
-		require_once(SUBSDIR . '/ManageAttachments.subs.php');
-
 		// We need our attachments directories...
 		$attach_dirs = getAttachmentDirs();
 
@@ -672,7 +668,6 @@ class ManageAttachments_Controller extends Action_Controller
 		}
 
 		// Finally move the attachments..
-		require_once(SUBSDIR . '/ManageAttachments.subs.php');
 		moveAvatars();
 
 		redirectexit('action=admin;area=manageattachments;sa=maintenance');
@@ -690,9 +685,6 @@ class ManageAttachments_Controller extends Action_Controller
 		checkSession('post', 'admin');
 
 		// @todo Ignore messages in topics that are stickied?
-
-		// someone has to do the dirty work
-		require_once(SUBSDIR . '/ManageAttachments.subs.php');
 
 		// Deleting an attachment?
 		if ($this->_req->getQuery('type', 'strval') !== 'avatars')
@@ -723,9 +715,6 @@ class ManageAttachments_Controller extends Action_Controller
 	{
 		checkSession('post', 'admin');
 
-		// we'll need this
-		require_once(SUBSDIR . '/ManageAttachments.subs.php');
-
 		// Find humungous attachments.
 		$messages = removeAttachments(array('attachment_type' => 0, 'size' => 1024 * $this->_req->post->size), 'messages', true);
 
@@ -749,9 +738,6 @@ class ManageAttachments_Controller extends Action_Controller
 
 		if (!empty($this->_req->post->remove))
 		{
-			// we'll need this
-			require_once(SUBSDIR . '/ManageAttachments.subs.php');
-
 			// There must be a quicker way to pass this safety test??
 			$attachments = array();
 			foreach ($this->_req->post->remove as $removeID => $dummy)
@@ -787,9 +773,6 @@ class ManageAttachments_Controller extends Action_Controller
 		global $txt;
 
 		checkSession('get', 'admin');
-
-		// lots of work to do
-		require_once(SUBSDIR . '/ManageAttachments.subs.php');
 
 		$messages = removeAttachments(array('attachment_type' => 0), '', true);
 
@@ -851,9 +834,6 @@ class ManageAttachments_Controller extends Action_Controller
 					$_SESSION['attachments_to_fix'][] = $value;
 			}
 		}
-
-		// We will work hard with attachments.
-		require_once(SUBSDIR . '/ManageAttachments.subs.php');
 
 		// All the valid problems are here:
 		$context['repair_errors'] = array(
@@ -1064,9 +1044,6 @@ class ManageAttachments_Controller extends Action_Controller
 	public function action_attachpaths()
 	{
 		global $modSettings, $scripturl, $context, $txt;
-
-		require_once(SUBSDIR . '/Attachments.subs.php');
-		require_once(SUBSDIR . '/ManageAttachments.subs.php');
 
 		// Since this needs to be done eventually.
 		if (!is_array($modSettings['attachmentUploadDir']))
@@ -1360,7 +1337,6 @@ class ManageAttachments_Controller extends Action_Controller
 			// Or adding a new one?
 			if (!empty($this->_req->post->new_base_dir))
 			{
-				require_once(SUBSDIR . '/Attachments.subs.php');
 				$this->_req->post->new_base_dir = htmlspecialchars($this->_req->post->new_base_dir, ENT_QUOTES, 'UTF-8');
 
 				$current_dir = $modSettings['currentAttachmentUploadDir'];
@@ -1586,10 +1562,6 @@ class ManageAttachments_Controller extends Action_Controller
 		global $modSettings, $txt;
 
 		checkSession();
-
-		// We will need the functions from here
-		require_once(SUBSDIR . '/Attachments.subs.php');
-		require_once(SUBSDIR . '/ManageAttachments.subs.php');
 
 		// The list(s) of directory's that are available.
 		$modSettings['attachmentUploadDir'] = unserialize($modSettings['attachmentUploadDir']);

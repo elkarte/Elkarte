@@ -1113,52 +1113,6 @@ function template_admin_warning_above()
 }
 
 /**
- * Get an attachment's encrypted filename. If $new is true, won't check for file existence.
- *
- * - If new is set returns a hash for the db
- * - If no file hash is supplied, determines one and returns it
- * - Returns the path to the file
- *
- * @todo this currently returns the hash if new, and the full filename otherwise.
- * Something messy like that.
- * @todo and of course everything relies on this behavior and work around it. :P.
- * Converters included.
- *
- * @param string $filename The name of the file
- * @param int $attachment_id The ID of the attachment
- * @param string|null $dir Which directory it should be in (null to use current)
- * @param bool $new If this is a new attachment, if so just returns a hash
- * @param string $file_hash The file hash
- */
-function getAttachmentFilename($filename, $attachment_id, $dir = null, $new = false, $file_hash = '')
-{
-	global $modSettings;
-
-	// Just make up a nice hash...
-	if ($new)
-		return hash('sha1', hash('md5', $filename . time()) . mt_rand());
-
-	// In case of files from the old system, do a legacy call.
-	if (empty($file_hash))
-	{
-		require_once(SUBSDIR . '/Attachments.subs.php');
-		return getLegacyAttachmentFilename($filename, $attachment_id, $dir, $new);
-	}
-
-	// Are we using multiple directories?
-	if (!empty($modSettings['currentAttachmentUploadDir']))
-	{
-		if (!is_array($modSettings['attachmentUploadDir']))
-			$modSettings['attachmentUploadDir'] = unserialize($modSettings['attachmentUploadDir']);
-		$path = isset($modSettings['attachmentUploadDir'][$dir]) ? $modSettings['attachmentUploadDir'][$dir] : $modSettings['basedirectory_for_attachments'];
-	}
-	else
-		$path = $modSettings['attachmentUploadDir'];
-
-	return $path . '/' . $attachment_id . '_' . $file_hash . '.elk';
-}
-
-/**
  * Convert a single IP to a ranged IP.
  *
  * - Internal function used to convert a user-readable format to a format suitable for the database.
