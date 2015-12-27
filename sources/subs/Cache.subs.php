@@ -91,24 +91,6 @@ function clean_cache($type = '')
 }
 
 /**
- * Get the key for the cache.
- *
- * @param string $key
- * @return string
- */
-function cache_get_key($key)
-{
-	global $boardurl, $cache_accelerator;
-	static $key_prefix = null;
-
-	// no need to do this every time, slows us down :P
-	if (empty($key_prefix))
-		$key_prefix = md5($boardurl . filemtime(SOURCEDIR . '/Load.php')) . '-ELK-';
-
-	return $key_prefix . ((empty($cache_accelerator) || $cache_accelerator === 'filebased') ? strtr($key, ':/', '-_') : $key);
-}
-
-/**
  * Finds all the caching engines available and loads some details depending on
  * parameters.
  *
