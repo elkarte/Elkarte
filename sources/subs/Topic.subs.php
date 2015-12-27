@@ -1702,6 +1702,8 @@ function messagesAttachments($id_messages)
 {
 	global $modSettings;
 
+	require_once(SUBSDIR . '/Attachments.subs.php');
+
 	$db = database();
 
 	$request = $db->query('', '
