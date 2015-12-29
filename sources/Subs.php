@@ -1957,39 +1957,15 @@ function isBrowser($browser)
  */
 function censorText(&$text, $force = false)
 {
-	global $modSettings, $options;
-	static $censor_vulgar = null, $censor_proper = null;
+	global $modSettings;
+	static $censor = null;
 
-	// Are we going to censor this string
-	if ((!empty($options['show_no_censored']) && !empty($modSettings['allow_no_censored']) && !$force) || empty($modSettings['censor_vulgar']) || trim($text) === '')
-		return $text;
-
-	// If they haven't yet been loaded, load them.
-	if ($censor_vulgar == null)
+	if ($censor === null)
 	{
-		$censor_vulgar = explode("\n", $modSettings['censor_vulgar']);
-		$censor_proper = explode("\n", $modSettings['censor_proper']);
-
-		// Quote them for use in regular expressions.
-		if (!empty($modSettings['censorWholeWord']))
-		{
-			for ($i = 0, $n = count($censor_vulgar); $i < $n; $i++)
-			{
-				$censor_vulgar[$i] = str_replace(array('\\\\\\*', '\\*', '&', '\''), array('[*]', '[^\s]*?', '&amp;', '&#039;'), preg_quote($censor_vulgar[$i], '/'));
-				$censor_vulgar[$i] = '/(?<=^|\W)' . $censor_vulgar[$i] . '(?=$|\W)/u' . (empty($modSettings['censorIgnoreCase']) ? '' : 'i');
-
-				// @todo I'm thinking the old way is some kind of bug and this is actually fixing it.
-				//if (strpos($censor_vulgar[$i], '\'') !== false)
-				//$censor_vulgar[$i] = str_replace('\'', '&#039;', $censor_vulgar[$i]);
-			}
-		}
+		$censor = new Censor(explode("\n", $modSettings['censor_vulgar']), explode("\n", $modSettings['censor_proper']), $modSettings);
 	}
 
-	// Censoring isn't so very complicated :P.
-	if (empty($modSettings['censorWholeWord']))
-		$text = empty($modSettings['censorIgnoreCase']) ? str_replace($censor_vulgar, $censor_proper, $text) : str_ireplace($censor_vulgar, $censor_proper, $text);
-	else
-		$text = preg_replace($censor_vulgar, $censor_proper, $text);
+	$text = $censor->censor($text, $force);
 
 	return $text;
 }
