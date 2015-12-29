@@ -143,7 +143,6 @@ class ManageTopics_Controller extends Action_Controller
 				// All, next/prev...
 				array('int', 'enableAllMessages', 'postinput' => $txt['manageposts_posts'], 'subtext' => $txt['enableAllMessages_zero']),
 				array('check', 'disableCustomPerPage'),
-				array('check', 'enablePreviousNext'),
 		);
 
 		call_integration_hook('integrate_modify_topic_settings', array(&$config_vars));
