@@ -81,7 +81,7 @@ class Emailuser_Controller extends Action_Controller
 			Errors::instance()->fatal_lang_error('not_approved_topic', false);
 
 		// Censor the subject....
-		censorText($row['subject']);
+		$row['subject'] = censor($row['subject']);
 
 		// Sending yet, or just getting prepped?
 		if (empty($this->_req->post->send))
@@ -180,7 +180,7 @@ class Emailuser_Controller extends Action_Controller
 		}
 
 		// Censor the subject....
-		censorText($row['subject']);
+		$row['subject'] = censor($row['subject']);
 
 		// Actually send it off
 		$result = $this->_sendTopic($row);

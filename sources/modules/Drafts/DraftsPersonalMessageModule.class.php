@@ -260,7 +260,7 @@ class Drafts_PersonalMessage_Module implements ElkArte\sources\modules\Module_In
 		{
 			$short_subject = empty($draft['subject']) ? $txt['drafts_none'] : Util::shorten_text(stripslashes($draft['subject']), self::$_subject_length);
 			$context['drafts'][] = array(
-				'subject' => censorText($short_subject),
+				'subject' => censor($short_subject),
 				'poster_time' => standardTime($draft['poster_time']),
 					'link' => '<a href="' . $scripturl . '?action=pm;sa=send;id_draft=' . $draft['id_draft'] . '">' . (!empty($draft['subject']) ? $draft['subject'] : $txt['drafts_none']) . '</a>',
 				);

@@ -571,10 +571,10 @@ class Search_Controller extends Action_Controller
 		$memberContext[$message['id_member']]['ip'] = $message['poster_ip'];
 
 		// Do the censor thang...
-		censorText($message['body']);
-		censorText($message['subject']);
-		censorText($message['first_subject']);
-		censorText($message['last_subject']);
+		$message['body'] = censor($message['body']);
+		$message['subject'] = censor($message['subject']);
+		$message['first_subject'] = censor($message['first_subject']);
+		$message['last_subject'] = censor($message['last_subject']);
 
 		// Shorten this message if necessary.
 		if ($context['compact'])

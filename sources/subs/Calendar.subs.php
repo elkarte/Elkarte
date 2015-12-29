@@ -143,7 +143,7 @@ function getEventRange($low_date, $high_date, $use_permissions = true, $limit = 
 			continue;
 
 		// Force a censor of the title - as often these are used by others.
-		censorText($row['title'], $use_permissions ? false : true);
+		$row['title'] = censor($row['title'], $use_permissions ? false : true);
 
 		$start_date = sscanf($row['start_date'], '%04d-%02d-%02d');
 		$start_date = max(mktime(0, 0, 0, $start_date[1], $start_date[2], $start_date[0]), $low_date_time);

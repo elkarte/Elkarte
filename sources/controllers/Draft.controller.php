@@ -320,8 +320,8 @@ class Draft_Controller extends Action_Controller
 			$subject = $default_subject;
 
 		// Censor...
-		censorText($body);
-		censorText($subject);
+		$body = censor($body);
+		$subject = censor($subject);
 
 		// BBC-ilize the message.
 		$parser = \BBC\ParserWrapper::getInstance();

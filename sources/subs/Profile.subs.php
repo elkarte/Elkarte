@@ -1687,7 +1687,7 @@ function profileSendActivation()
 
 /**
  * Load key signature context data.
- *
+ * @todo where does this get used at?
  * @return boolean
  */
 function profileLoadSignatureData()
@@ -1739,9 +1739,9 @@ function profileLoadSignatureData()
 		if ($validation !== true && $validation !== false)
 			$context['post_errors'][] = $validation;
 
-		censorText($context['member']['signature']);
+		$context['member']['signature'] = censor($context['member']['signature']);
 		$context['member']['current_signature'] = $context['member']['signature'];
-		censorText($signature);
+		$signature = censor($signature);
 		$bbc_parser = \BBC\ParserWrapper::getInstance();
 		$context['member']['signature_preview'] = $bbc_parser->parseSignature($signature, true);
 		$context['member']['signature'] = $_POST['signature'];
@@ -2658,7 +2658,7 @@ function profileLoadAttachments($start, $items_per_page, $sort, $boardsAllowed, 
 			'downloads' => $row['downloads'],
 			'is_image' => !empty($row['width']) && !empty($row['height']) && !empty($modSettings['attachmentShowImages']),
 			'id_thumb' => !empty($row['id_thumb']) ? $row['id_thumb'] : '',
-			'subject' => '<a href="' . $scripturl . '?topic=' . $row['id_topic'] . '.msg' . $row['id_msg'] . '#msg' . $row['id_msg'] . '" rel="nofollow">' . censorText($row['subject']) . '</a>',
+			'subject' => '<a href="' . $scripturl . '?topic=' . $row['id_topic'] . '.msg' . $row['id_msg'] . '#msg' . $row['id_msg'] . '" rel="nofollow">' . censor($row['subject']) . '</a>',
 			'posted' => $row['poster_time'],
 			'msg' => $row['id_msg'],
 			'topic' => $row['id_topic'],

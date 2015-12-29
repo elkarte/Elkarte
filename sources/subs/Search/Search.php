@@ -1046,7 +1046,7 @@ class Search
 					unset($suggestions[$i]);
 				}
 				// Plus, don't suggest something the user thinks is rude!
-				elseif ($suggestions[$i] != censorText($s))
+				elseif ($suggestions[$i] != censor($s))
 				{
 					unset($suggestions[$i]);
 				}

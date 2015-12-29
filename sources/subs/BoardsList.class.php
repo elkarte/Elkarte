@@ -348,7 +348,7 @@ class Boards_List
 				continue;
 
 			// Prepare the subject, and make sure it's not too long.
-			censorText($row_board['subject']);
+			$row_board['subject'] = censor($row_board['subject']);
 			$row_board['short_subject'] = Util::shorten_text($row_board['subject'], $this->_subject_length);
 			$this_last_post = array(
 				'id' => $row_board['id_msg'],

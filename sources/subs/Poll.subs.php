@@ -295,7 +295,7 @@ function pollOptionsForMember($id_poll, $id_member)
 	$pollOptions = array();
 	while ($row = $db->fetch_assoc($request))
 	{
-		censorText($row['label']);
+		$row['label'] = censor($row['label']);
 		$pollOptions[$row['id_choice']] = $row;
 	}
 	$db->free_result($request);
@@ -324,7 +324,7 @@ function pollOptions($id_poll)
 	$pollOptions = array();
 	while ($row = $db->fetch_assoc($request))
 	{
-		censorText($row['label']);
+		$row['label'] = censor($row['label']);
 		$pollOptions[$row['id_choice']] = $row;
 	}
 	$db->free_result($request);
@@ -775,7 +775,7 @@ function getPollChoices($id_poll)
 	$number = 1;
 	while ($row = $db->fetch_assoc($request))
 	{
-		censorText($row['label']);
+		$row['label'] = censor($row['label']);
 		$choices[$row['id_choice']] = array(
 			'id' => $row['id_choice'],
 			'number' => $number++,

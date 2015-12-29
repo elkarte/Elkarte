@@ -352,8 +352,7 @@ class Poll_Controller extends Action_Controller
 			// If an option exists, update it.  If it is new, add it - but don't reuse ids!
 			foreach ($this->_req->post->options as $id => $label)
 			{
-				$label = Util::htmlspecialchars($label);
-				censorText($label);
+				$label = censor(Util::htmlspecialchars($label));
 
 				if (isset($context['poll']['choices'][$id]))
 					$context['poll']['choices'][$id]['label'] = $label;
@@ -477,7 +476,7 @@ class Poll_Controller extends Action_Controller
 		$context['form_url'] = $scripturl . '?action=editpoll2' . ($context['is_edit'] ? '' : ';add') . ';topic=' . $context['current_topic'] . '.' . $context['start'];
 
 		// Build the link tree.
-		censorText($pollinfo['subject']);
+		$pollinfo['subject'] = censor($pollinfo['subject']);
 		$context['linktree'][] = array(
 			'url' => $scripturl . '?topic=' . $topic . '.0',
 			'name' => $pollinfo['subject'],

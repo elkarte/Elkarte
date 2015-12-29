@@ -143,7 +143,7 @@ class XmlPreview_Controller extends Action_Controller
 			// Get the current signature
 			$member = getBasicMemberData($user, array('preferences' => true));
 
-			censorText($member['signature']);
+			$member['signature'] = censor($member['signature']);
 			$bbc_parser = \BBC\ParserWrapper::getInstance();
 			$member['signature'] = $bbc_parser->parseSignature($member['signature'], true);
 
@@ -156,7 +156,7 @@ class XmlPreview_Controller extends Action_Controller
 				$errors[] = array('value' => $txt['profile_error_' . $validation], 'attributes' => array('type' => 'error'));
 
 			preparsecode($preview_signature);
-			censorText($preview_signature);
+			$preview_signature = censor($preview_signature);
 			$preview_signature = $bbc_parser->parseSignature($preview_signature, true);
 		}
 		// Sorry but you can't change the signature
@@ -218,7 +218,7 @@ class XmlPreview_Controller extends Action_Controller
 		// If you can't issue the warning, what are you doing here?
 		if (allowedTo('issue_warning'))
 		{
-			$warning_body = !empty($this->_req->post->body) ? trim(censorText($this->_req->post->body)) : '';
+			$warning_body = !empty($this->_req->post->body) ? trim(censor($this->_req->post->body)) : '';
 			$context['preview_subject'] = !empty($this->_req->post->title) ? trim(Util::htmlspecialchars($this->_req->post->title)) : '';
 			if (isset($this->_req->post->issuing))
 			{
@@ -287,7 +287,7 @@ class XmlPreview_Controller extends Action_Controller
 		// If you can't approve emails, what are you doing here?
 		if (allowedTo('approve_emails'))
 		{
-			$body = !empty($this->_req->post->body) ? trim(censorText($this->_req->post->body)) : '';
+			$body = !empty($this->_req->post->body) ? trim(censor($this->_req->post->body)) : '';
 			$context['preview_subject'] = !empty($this->_req->post->title) ? trim(Util::htmlspecialchars($this->_req->post->title)) : '';
 
 			if (isset($this->_req->post->issuing))

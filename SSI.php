@@ -303,8 +303,8 @@ function ssi_queryPosts($query_where = '', $query_where_params = array(), $query
 		$row['body'] = $bbc_parser->parseMessage($row['body'], $row['smileys_enabled']);
 
 		// Censor it!
-		censorText($row['subject']);
-		censorText($row['body']);
+		$row['subject'] = censor($row['subject']);
+		$row['body'] = censor($row['body']);
 
 		$preview = strip_tags(strtr($row['body'], array('<br>' => '&#10;')));
 
@@ -461,8 +461,8 @@ function ssi_recentTopics($num_recent = 8, $exclude_boards = null, $include_boar
 			$row['body'] = Util::substr($row['body'], 0, 128) . '...';
 
 		// Censor the subject.
-		censorText($row['subject']);
-		censorText($row['body']);
+		$row['subject'] = censor($row['subject']);
+		$row['body'] = censor($row['body']);
 
 		if (!empty($modSettings['messageIconChecks_enable']) && !isset($icon_sources[$row['icon']]))
 			$icon_sources[$row['icon']] = file_exists($settings['theme_dir'] . '/images/post/' . $row['icon'] . '.png') ? 'images_url' : 'default_images_url';
@@ -614,7 +614,7 @@ function ssi_topTopics($type = 'replies', $num_topics = 10, $output_method = 'ec
 
 	foreach ($topics as $topic_id => $row)
 	{
-		censorText($row['subject']);
+		$row['subject'] = censor($row['subject']);
 
 		$topics[$topic_id]['href'] = $scripturl . '?topic=' . $row['id'] . '.0';
 		$topics[$topic_id]['link'] = '<a href="' . $scripturl . '?topic=' . $row['id'] . '.0">' . $row['subject'] . '</a>';
@@ -1093,7 +1093,7 @@ function ssi_recentPoll($topPollInstead = false, $output_method = 'echo')
 	$options = array();
 	while ($rowChoice = $db->fetch_assoc($request))
 	{
-		censorText($rowChoice['label']);
+		$rowChoice['label'] = censor($rowChoice['label']);
 
 		$options[$rowChoice['id_choice']] = array($rowChoice['label'], $rowChoice['votes']);
 	}
@@ -1615,8 +1615,8 @@ function ssi_boardNews($board = null, $limit = null, $start = null, $length = nu
 		if (!empty($modSettings['messageIconChecks_enable']) && !isset($icon_sources[$row['icon']]))
 			$icon_sources[$row['icon']] = file_exists($settings['theme_dir'] . '/images/post/' . $row['icon'] . '.png') ? 'images_url' : 'default_images_url';
 
-		censorText($row['subject']);
-		censorText($row['body']);
+		$row['subject'] = censor($row['subject']);
+		$row['body'] = censor($row['body']);
 
 		$return[] = array(
 			'id' => $row['id_topic'],

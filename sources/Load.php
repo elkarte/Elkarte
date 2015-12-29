@@ -1014,9 +1014,9 @@ function loadMemberContext($user, $display_custom_fields = false)
 	$profile = $user_profile[$user];
 
 	// Censor everything.
-	censorText($profile['signature']);
-	censorText($profile['personal_text']);
-	censorText($profile['location']);
+	$profile['signature'] = censor($profile['signature']);
+	$profile['personal_text'] = censor($profile['personal_text']);
+	$profile['location'] = censor($profile['location']);
 
 	// Set things up to be used before hand.
 	$gendertxt = $profile['gender'] == 2 ? $txt['female'] : ($profile['gender'] == 1 ? $txt['male'] : '');

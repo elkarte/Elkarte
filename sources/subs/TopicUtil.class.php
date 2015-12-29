@@ -75,8 +75,8 @@ class Topic_Util
 				}
 
 				// Censor the subject and message preview.
-				censorText($row['first_subject']);
-				censorText($row['first_body']);
+				$row['first_subject'] = censor($row['first_subject']);
+				$row['first_body'] = censor($row['first_body']);
 
 				// Don't censor them twice!
 				if ($row['id_first_msg'] == $row['id_last_msg'])
@@ -86,20 +86,20 @@ class Topic_Util
 				}
 				else
 				{
-					censorText($row['last_subject']);
-					censorText($row['last_body']);
+					$row['last_subject'] = censor($row['last_subject']);
+					$row['last_body'] = censor($row['last_body']);
 				}
 			}
 			else
 			{
 				$row['first_body'] = '';
 				$row['last_body'] = '';
-				censorText($row['first_subject']);
+				$row['first_subject']= censor($row['first_subject']);
 
 				if ($row['id_first_msg'] == $row['id_last_msg'])
 					$row['last_subject'] = $row['first_subject'];
 				else
-					censorText($row['last_subject']);
+					$row['last_subject'] = censor($row['last_subject']);
 			}
 
 			// Decide how many pages the topic should have.

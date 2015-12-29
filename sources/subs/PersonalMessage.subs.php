@@ -842,7 +842,7 @@ function sendpm($recipients, $subject, $message, $store_outbox = true, $from = n
 	if (!$maillist && !empty($modSettings['disallow_sendBody']))
 	{
 		$message = '';
-		censorText($subject);
+		$subject = censor($subject);
 	}
 	else
 	{

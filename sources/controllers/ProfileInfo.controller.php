@@ -283,8 +283,8 @@ class ProfileInfo_Controller extends Action_Controller
 				foreach ($rows as $row)
 				{
 					// Censor....
-					censorText($row['body']);
-					censorText($row['subject']);
+					$row['body'] = censor($row['body']);
+					$row['body'] = censor($row['subject']);
 
 					// Do the code.
 					$row['body'] = $bbc_parser->parseMessage($row['body'], $row['smileys_enabled']);
@@ -349,8 +349,8 @@ class ProfileInfo_Controller extends Action_Controller
 				foreach ($rows as $row)
 				{
 					// Censor....
-					censorText($row['body']);
-					censorText($row['subject']);
+					$row['body'] = censor($row['body']);
+					$row['body'] = censor($row['subject']);
 
 					// Do the code.
 					$row['body'] = $bbc_parser->parseMessage($row['body'], $row['smileys_enabled']);
@@ -593,8 +593,8 @@ class ProfileInfo_Controller extends Action_Controller
 		foreach ($rows as $row)
 		{
 			// Censor....
-			censorText($row['body']);
-			censorText($row['subject']);
+			$row['body'] = censor($row['body']);
+			$row['body'] = censor($row['subject']);
 
 			// Do the code.
 			$row['body'] = $bbc_parser->parseMessage($row['body'], $row['smileys_enabled']);

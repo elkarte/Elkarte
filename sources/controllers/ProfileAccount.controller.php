@@ -352,7 +352,7 @@ class ProfileAccount_Controller extends Action_Controller
 
 		if (isset($this->_req->post->preview))
 		{
-			$warning_body = !empty($this->_req->post->warn_body) ? trim(censorText($this->_req->post->warn_body)) : '';
+			$warning_body = !empty($this->_req->post->warn_body) ? trim(censor($this->_req->post->warn_body)) : '';
 
 			if (empty($this->_req->post->warn_sub) || empty($this->_req->post->warn_body))
 			{
