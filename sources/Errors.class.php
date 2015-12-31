@@ -563,8 +563,9 @@ class Errors
 
 		// For our purposes, we're gonna want this on if at all possible.
 		$modSettings['cache_enable'] = 1;
+		$cache->enable(true)->setLevel(1);
 
-		if (($temp = $cache->get('db_last_error', 600)) !== null)
+		if ($cache->getVar($temp, 'db_last_error', 600))
 			$db_last_error = max($db_last_error, $temp);
 
 		// Perhaps we want to notify by mail that there was a db error
@@ -572,7 +573,7 @@ class Errors
 		{
 			// Avoid writing to the Settings.php file if at all possible; use shared memory instead.
 			$cache->put('db_last_error', time(), 600);
-			if (($temp = $cache->get('db_last_error', 600)) === null)
+			if (!$cache->getVar($temp, 'db_last_error', 600))
 				logLastDatabaseError();
 
 			// Language files aren't loaded yet :'(

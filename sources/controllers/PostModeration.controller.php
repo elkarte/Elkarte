@@ -200,7 +200,7 @@ class PostModeration_Controller extends Action_Controller
 				else
 					removeMessages($toAction, $details, $context['current_view']);
 
-				cache_put_data('num_menu_errors', null, 900);
+				Cache::instance()->remove('num_menu_errors');
 			}
 		}
 
@@ -320,7 +320,7 @@ class PostModeration_Controller extends Action_Controller
 				else
 					removeAttachments(array('id_attach' => $attachments, 'do_logging' => true));
 
-				cache_put_data('num_menu_errors', null, 900);
+				Cache::instance()->remove('num_menu_errors');
 			}
 		}
 
@@ -500,7 +500,7 @@ class PostModeration_Controller extends Action_Controller
 				logAction(($message_info['approved'] ? 'un' : '') . 'approve', array('topic' => $topic, 'subject' => $message_info['subject'], 'member' => $message_info['id_member'], 'board' => $board));
 		}
 
-		cache_put_data('num_menu_errors', null, 900);
+		Cache::instance()->remove('num_menu_errors');
 
 		redirectexit('topic=' . $topic . '.msg' . $current_msg . '#msg' . $current_msg);
 	}

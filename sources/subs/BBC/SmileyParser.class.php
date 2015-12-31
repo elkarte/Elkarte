@@ -164,7 +164,7 @@ class SmileyParser
 	protected function getFromDB()
 	{
 		// Load the smileys in reverse order by length so they don't get parsed wrong.
-		if (($temp = cache_get_data('parsing_smileys', 480)) == null)
+		if (!\Cache::instance()->getVar($temp, 'parsing_smileys', 480))
 		{
 			$smileysfrom = array();
 			$smileysto = array();
@@ -188,7 +188,7 @@ class SmileyParser
 
 			$temp = array($smileysfrom, $smileysto, $smileysdescs);
 
-			cache_put_data('parsing_smileys', $temp, 480);
+			!\Cache::instance()->put('parsing_smileys', $temp, 480);
 		}
 
 		return $temp;

@@ -63,7 +63,7 @@ function cache_put_data($key, $value, $ttl = 120)
 /**
  * Gets the value from the cache specified by key, so long as it is not older than ttl seconds.
  * - It may often "miss", so shouldn't be depended on.
- * - It supports the same as cache_put_data().
+ * - It supports the same as Cache::instance()->put().
  *
  * @param string $key
  * @param int $ttl = 120
@@ -88,24 +88,6 @@ function cache_get_data($key, $ttl = 120)
 function clean_cache($type = '')
 {
 	Cache::instance()->clean($type);
-}
-
-/**
- * Get the key for the cache.
- *
- * @param string $key
- * @return string
- */
-function cache_get_key($key)
-{
-	global $boardurl, $cache_accelerator;
-	static $key_prefix = null;
-
-	// no need to do this every time, slows us down :P
-	if (empty($key_prefix))
-		$key_prefix = md5($boardurl . filemtime(SOURCEDIR . '/Load.php')) . '-ELK-';
-
-	return $key_prefix . ((empty($cache_accelerator) || $cache_accelerator === 'filebased') ? strtr($key, ':/', '-_') : $key);
 }
 
 /**

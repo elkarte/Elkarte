@@ -75,7 +75,7 @@ function loadSession()
 			@ini_set('session.gc_maxlifetime', max($modSettings['databaseSession_lifetime'], 60));
 
 		// Use cache setting sessions?
-		if (empty($modSettings['databaseSession_enable']) && !empty($modSettings['cache_enable']) && php_sapi_name() != 'cli')
+		if (empty($modSettings['databaseSession_enable']) && Cache::instance()->isEnabled() && php_sapi_name() != 'cli')
 		{
 			call_integration_hook('integrate_session_handlers');
 

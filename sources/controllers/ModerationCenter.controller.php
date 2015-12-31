@@ -1765,8 +1765,8 @@ class ModerationCenter_Controller extends Action_Controller
 				addModeratorNote($user_info['id'], $user_info['name'], $new_note);
 
 				// Clear the cache.
-				cache_put_data('moderator_notes', null, 240);
-				cache_put_data('moderator_notes_total', null, 240);
+				Cache::instance()->remove('moderator_notes');
+				Cache::instance()->remove('moderator_notes_total');
 			}
 
 			// Redirect otherwise people can resubmit.
@@ -1785,8 +1785,8 @@ class ModerationCenter_Controller extends Action_Controller
 			removeModeratorNote($id_delete);
 
 			// Clear the cache.
-			cache_put_data('moderator_notes', null, 240);
-			cache_put_data('moderator_notes_total', null, 240);
+			Cache::instance()->remove('moderator_notes');
+			Cache::instance()->remove('moderator_notes_total');
 
 			redirectexit('action=moderate');
 		}
