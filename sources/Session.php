@@ -169,6 +169,11 @@ function sessionRead($session_id)
 	list ($sess_data) = $db->fetch_row($result);
 	$db->free_result($result);
 
+	if (empty($sess_data))
+	{
+		return '';
+	}
+
 	return $sess_data;
 }
 
@@ -243,7 +248,7 @@ function sessionDestroy($session_id)
 		)
 	);
 
-	return $db->affected_rows() != 0;
+	return true;
 }
 
 /**
