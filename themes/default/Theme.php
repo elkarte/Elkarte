@@ -1,7 +1,5 @@
 <?php
 
-namespace Themes\DefaultTheme;
-
 /**
  * The default theme
  *
@@ -18,6 +16,8 @@ namespace Themes\DefaultTheme;
  * @version 1.1 dev
  *
  */
+
+namespace Themes\DefaultTheme;
 
 if (!defined('ELK'))
 	die('No access...');

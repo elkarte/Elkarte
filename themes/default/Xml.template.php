@@ -7,7 +7,7 @@
  *
  * This software is a derived product, based on:
  *
- * Simple Machines Forum (elk)
+ * Simple Machines Forum (SMF)
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *

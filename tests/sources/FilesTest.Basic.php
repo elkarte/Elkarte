@@ -106,7 +106,7 @@ class TestFiles extends PHPUnit_Framework_TestCase
 			'^<\?php
 
 \/\*\*
-( \*(\s.{0,200})?\n)+ \* @name      ElkArte Forum
+( \*(\s.{0,200})?\n)* \* @name      ElkArte Forum
  \* @copyright ElkArte Forum contributors
  \* @license   BSD http:\/\/opensource\.org\/licenses\/BSD-3-Clause
  \*
@@ -116,7 +116,7 @@ class TestFiles extends PHPUnit_Framework_TestCase
 			'^<\?php
 
 \/\*\*
-( \*(\s.{0,200})?\n)+ \* @name      ElkArte Forum
+( \*(\s.{0,200})?\n)* \* @name      ElkArte Forum
  \* @copyright ElkArte Forum contributors
  \* @license   BSD http:\/\/opensource\.org\/licenses\/BSD-3-Clause
  \*
@@ -182,6 +182,8 @@ class TestFiles extends PHPUnit_Framework_TestCase
 			if (strpos($file, BOARDDIR . '/tests/') !== false)
 				continue;
 			if (strpos($file, BOARDDIR . '/wiki/') !== false)
+				continue;
+			if (strpos($file, BOARDDIR . '/install/patch') !== false)
 				continue;
 			if (strpos($file, '/vendor/') !== false)
 				continue;

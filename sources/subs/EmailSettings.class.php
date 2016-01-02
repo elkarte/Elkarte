@@ -3,6 +3,7 @@
 /**
  * Specialized version of saveDBSettings to save config_vars in a table and not
  * an external file.
+ * Handles saving of config vars in another table than settings.
  *
  * @name      ElkArte Forum
  * @copyright ElkArte Forum contributors
@@ -10,7 +11,6 @@
  *
  * @version 1.1 dev
  *
- * Handles saving of config vars in another table than settings
  */
 
 if (!defined('ELK'))

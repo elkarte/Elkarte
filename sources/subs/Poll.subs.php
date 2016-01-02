@@ -10,8 +10,6 @@
  *
  * @version 1.1 dev
  *
- * This file contains functions for dealing with polls.
- *
  */
 
 /**
