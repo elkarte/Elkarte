@@ -112,6 +112,17 @@ class TestFiles extends PHPUnit_Framework_TestCase
  \*
  \* @version \d+\.\d+(\.\d+|\sdev|\s(beta|RC|Release Candidate)\s\d+)
 ( \*\n)? \*\/',
+			// Pure ElkArte with php path
+			'^#!\/usr\/local\/bin\/php -q
+<\?php
+
+\/\*\*
+( \*(\s.{0,200})?\n)+ \* @name      ElkArte Forum
+ \* @copyright ElkArte Forum contributors
+ \* @license   BSD http:\/\/opensource\.org\/licenses\/BSD-3-Clause
+ \*
+ \* @version \d+\.\d+(\.\d+|\sdev|\s(beta|RC|Release Candidate)\s\d+)
+( \*\n)? \*\/',
 			// SMF-derived
 			'^<\?php
 
@@ -201,6 +212,11 @@ class TestFiles extends PHPUnit_Framework_TestCase
 			if (strpos($file, BOARDDIR . '/themes/default/languages/') !== false)
 				continue;
 			if (basename($file) == 'index.php' && $file != BOARDDIR . '/index.php')
+				continue;
+			if ($file == BOARDDIR . '/Settings.php'
+				|| $file == BOARDDIR . '/Settings_bak.php'
+				|| $file == BOARDDIR . '/Settings.sample.php'
+				|| $file == BOARDDIR . '/Settings_bak.sample.php')
 				continue;
 			if (is_link($file))
 				continue;
