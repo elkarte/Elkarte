@@ -110,7 +110,7 @@ class Cache
 	public function quick_get($key, $file, $function, $params, $level = 1)
 	{
 		if (!$this->isEnabled())
-			return;
+			return array();
 
 		call_integration_hook('pre_cache_quick_get', array(&$key, &$file, &$function, &$params, &$level));
 
