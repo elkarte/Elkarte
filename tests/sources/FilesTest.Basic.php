@@ -123,16 +123,32 @@ class TestFiles extends PHPUnit_Framework_TestCase
  \* This software is a derived product, based on:
  \*
  \* Simple Machines Forum \(SMF\)
- \* copyright:	2011 Simple Machines \(http:\/\/www\.simplemachines\.org\)
+ \* copyright:	20\d\d Simple Machines (Forum )?\(http:\/\/www\.simplemachines\.org\)
  \* license:		BSD, See included LICENSE\.TXT for terms and conditions\.
  \*
  \* @version \d+\.\d+(\.\d+|\sdev|\sbeta\s\d+)
-( \*\n)? \*\/',
+(( \*\n)?|( \*(\s.{0,200})?\n))+ \*\/',
+			// SMF-derived v2
+			'^<\?php
+
+\/\*\*
+( \*\n)?( \*(\s.{0,200})?\n)+ \* @name      ElkArte Forum
+ \* @copyright ElkArte Forum contributors
+ \* @license   BSD http:\/\/opensource\.org\/licenses\/BSD-3-Clause
+ \*
+ \* This file contains code covered by:
+ \* copyright:	20\d\d Simple Machines (Forum )?\(http:\/\/www\.simplemachines\.org\)
+ \* license:		BSD, See included LICENSE\.TXT for terms and conditions\.
+ \*
+ \* @version \d+\.\d+(\.\d+|\sdev|\sbeta\s\d+)
+(( \*\n)?|( \*(\s.{0,200})?\n))+ \*\/',
 		);
 		foreach ($this->_ourFiles as $file)
 		{
 			// We do not care about some project files
 			if (strpos($file, BOARDDIR . '/cache/') !== false)
+				continue;
+			if (strpos($file, BOARDDIR . '/addons/') !== false)
 				continue;
 			if (strpos($file, BOARDDIR . '/attachments/') !== false)
 				continue;
@@ -155,6 +171,8 @@ class TestFiles extends PHPUnit_Framework_TestCase
 			if (strpos($file, BOARDDIR . '/themes/default/languages/') !== false)
 				continue;
 			if (basename($file) == 'index.php' && $file != BOARDDIR . '/index.php')
+				continue;
+			if (is_link($file))
 				continue;
 
 			$file_content = @file_get_contents($file);
