@@ -5,6 +5,8 @@
  */
 class TestFiles extends PHPUnit_Framework_TestCase
 {
+	protected $_ourFiles = array();
+
 	/**
 	 * Prepare what is necessary to use in these tests.
 	 *
@@ -12,6 +14,22 @@ class TestFiles extends PHPUnit_Framework_TestCase
 	 */
 	public function setUp()
 	{
+		$this->_ourFiles = array();
+
+		$directory = new RecursiveDirectoryIterator(BOARDDIR);
+		$iterator = new RecursiveIteratorIterator($directory);
+		$regex = new RegexIterator($iterator, '/^.+\.php$/i', RecursiveRegexIterator::GET_MATCH);
+
+		foreach ($regex as $fileo)
+		{
+			$file = $fileo[0];
+
+			// We do not care about non-project files
+			if (strpos($file, '/sources/ext/') !== false)
+				continue;
+
+			$this->_ourFiles[] = $file;
+		}
 	}
 
 	/**
@@ -25,25 +43,14 @@ class TestFiles extends PHPUnit_Framework_TestCase
 
 	/**
 	 * Test that there are no syntax errors.
-	 *
-	 * @todo use recursive fetching of files
 	 */
 	public function testSyntaxErrors()
 	{
-		$dirs = array(
-			'board' => BOARDDIR,
-		);
-
 		// Provide a way to skip eval of files where needed
 		$skip_files = array(BOARDDIR . '/index.php');
 
-		$directory = new RecursiveDirectoryIterator(BOARDDIR);
-		$iterator = new RecursiveIteratorIterator($directory);
-		$regex = new RegexIterator($iterator, '/^.+\.php$/i', RecursiveRegexIterator::GET_MATCH);
-
-		foreach ($regex as $fileo)
+		foreach ($this->_ourFiles as $file)
 		{
-			$file = $fileo[0];
 			$file_content = file_get_contents($file);
 
 			// This is likely to be one of the two files emailpost.php or emailtopic.php
@@ -85,6 +92,86 @@ class TestFiles extends PHPUnit_Framework_TestCase
 
 				$this->assertTrue($syntax_valid, $error_message);
 			}
+		}
+	}
+
+	/**
+	 * Test that the headers are in place
+	 * @todo distinguish between SMF-derived and non-SMF-derived
+	 */
+	public function testHeaders()
+	{
+		$header_styles = array(
+			// Pure ElkArte
+			'^<\?php
+
+\/\*\*
+( \*(\s.{0,200})?\n)+ \* @name      ElkArte Forum
+ \* @copyright ElkArte Forum contributors
+ \* @license   BSD http:\/\/opensource\.org\/licenses\/BSD-3-Clause
+ \*
+ \* @version \d+\.\d+(\.\d+|\sdev|\sbeta\s\d+)
+( \*\n)? \*\/',
+			// SMF-derived
+			'^<\?php
+
+\/\*\*
+( \*(\s.{0,200})?\n)+ \* @name      ElkArte Forum
+ \* @copyright ElkArte Forum contributors
+ \* @license   BSD http:\/\/opensource\.org\/licenses\/BSD-3-Clause
+ \*
+ \* This software is a derived product, based on:
+ \*
+ \* Simple Machines Forum \(SMF\)
+ \* copyright:	2011 Simple Machines \(http:\/\/www\.simplemachines\.org\)
+ \* license:		BSD, See included LICENSE\.TXT for terms and conditions\.
+ \*
+ \* @version \d+\.\d+(\.\d+|\sdev|\sbeta\s\d+)
+( \*\n)? \*\/',
+		);
+		foreach ($this->_ourFiles as $file)
+		{
+			// We do not care about some project files
+			if (strpos($file, BOARDDIR . '/cache/') !== false)
+				continue;
+			if (strpos($file, BOARDDIR . '/attachments/') !== false)
+				continue;
+			if (strpos($file, BOARDDIR . '/avatars/') !== false)
+				continue;
+			if (strpos($file, BOARDDIR . '/docs/') !== false)
+				continue;
+			if (strpos($file, BOARDDIR . '/packages/') !== false)
+				continue;
+			if (strpos($file, BOARDDIR . '/release_tools/') !== false)
+				continue;
+			if (strpos($file, BOARDDIR . '/smileys/') !== false)
+				continue;
+			if (strpos($file, BOARDDIR . '/tests/') !== false)
+				continue;
+			if (strpos($file, BOARDDIR . '/wiki/') !== false)
+				continue;
+			if (strpos($file, '/vendor/') !== false)
+				continue;
+			if (strpos($file, BOARDDIR . '/themes/default/languages/') !== false)
+				continue;
+			if (basename($file) == 'index.php' && $file != BOARDDIR . '/index.php')
+				continue;
+
+			$file_content = @file_get_contents($file);
+			if (empty($file_content))
+				continue;
+
+			$found = false;
+
+			foreach ($header_styles as $style)
+			{
+				if (preg_match('/' . strtr($style, array("\n" => '\n')) . '/', $file_content) == 1)
+				{
+					$found = true;
+					continue;
+				}
+			}
+			$this->assertTrue($found, $file);
 		}
 	}
 }
