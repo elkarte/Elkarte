@@ -1951,6 +1951,29 @@ function isBrowser($browser)
 /**
  * Replace all vulgar words with respective proper words. (substring or whole words..)
  *
+ * @deprecated use censor() or Censor class
+ *
+ * What it does:
+ * - it censors the passed string.
+ * - if the admin setting allow_no_censored is on it does not censor unless force is also set.
+ * - if the admin setting allow_no_censored is off will censor words unless the user has set
+ * it to not censor in their profile and force is off
+ * - it caches the list of censored words to reduce parsing.
+ * - Returns the censored text
+ *
+ * @param string &$text
+ * @param bool $force = false
+ */
+function censorText(&$text, $force = false)
+{
+	$text = censor($text, $force);
+
+	return $text;
+}
+
+/**
+ * Replace all vulgar words with respective proper words. (substring or whole words..)
+ *
  * What it does:
  * - it censors the passed string.
  * - if the admin setting allow_no_censored is on it does not censor unless force is also set.
@@ -1962,45 +1985,18 @@ function isBrowser($browser)
  * @param string $text
  * @param bool $force = false
  */
-function censorText(&$text, $force = false)
+function censor($text, $force = false)
 {
-	global $modSettings, $options;
-	static $censor_vulgar = null, $censor_proper = null;
+	global $modSettings;
+	static $censor = null;
 
-	// Are we going to censor this string
-	if ((!empty($options['show_no_censored']) && !empty($modSettings['allow_no_censored']) && !$force) || empty($modSettings['censor_vulgar']) || trim($text) === '')
-		return $text;
-
-	// If they haven't yet been loaded, load them.
-	if ($censor_vulgar == null)
+	if ($censor === null)
 	{
-		$censor_vulgar = explode("\n", $modSettings['censor_vulgar']);
-		$censor_proper = explode("\n", $modSettings['censor_proper']);
-
-		// Quote them for use in regular expressions.
-		if (!empty($modSettings['censorWholeWord']))
-		{
-			for ($i = 0, $n = count($censor_vulgar); $i < $n; $i++)
-			{
-				$censor_vulgar[$i] = str_replace(array('\\\\\\*', '\\*', '&', '\''), array('[*]', '[^\s]*?', '&amp;', '&#039;'), preg_quote($censor_vulgar[$i], '/'));
-				$censor_vulgar[$i] = '/(?<=^|\W)' . $censor_vulgar[$i] . '(?=$|\W)/u' . (empty($modSettings['censorIgnoreCase']) ? '' : 'i');
-
-				// @todo I'm thinking the old way is some kind of bug and this is actually fixing it.
-				//if (strpos($censor_vulgar[$i], '\'') !== false)
-				//$censor_vulgar[$i] = str_replace('\'', '&#039;', $censor_vulgar[$i]);
-			}
-		}
+		$censor = new Censor(explode("\n", $modSettings['censor_vulgar']), explode("\n", $modSettings['censor_proper']), $modSettings);
 	}
 
-	// Censoring isn't so very complicated :P.
-	if (empty($modSettings['censorWholeWord']))
-		$text = empty($modSettings['censorIgnoreCase']) ? str_replace($censor_vulgar, $censor_proper, $text) : str_ireplace($censor_vulgar, $censor_proper, $text);
-	else
-		$text = preg_replace($censor_vulgar, $censor_proper, $text);
-
-	return $text;
+	return $censor->censor($text, $force);
 }
-
 
 /**
  * Helper function able to determine if the current member can see at least

@@ -348,8 +348,8 @@ class News_Controller extends Action_Controller
 			$row['body'] = $bbc_parser->parseMessage($row['body'], $row['smileys_enabled']);
 
 			// Dirty mouth?
-			censorText($row['body']);
-			censorText($row['subject']);
+			$row['body'] = censor($row['body']);
+			$row['body'] = censor($row['subject']);
 
 			// Being news, this actually makes sense in rss format.
 			if ($xml_format === 'rss' || $xml_format === 'rss2')
@@ -454,8 +454,8 @@ class News_Controller extends Action_Controller
 			$row['body'] = $bbc_parser->parseMessage($row['body'], $row['smileys_enabled']);
 
 			// You can't say that
-			censorText($row['body']);
-			censorText($row['subject']);
+			$row['body'] = censor($row['body']);
+			$row['body'] = censor($row['subject']);
 
 			// Doesn't work as well as news, but it kinda does..
 			if ($xml_format === 'rss' || $xml_format === 'rss2')

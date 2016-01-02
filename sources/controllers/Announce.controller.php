@@ -88,7 +88,7 @@ class Announce_Controller extends Action_Controller
 		// Get the subject of the topic we're about to announce.
 		$topic_info = getTopicInfo($topic, 'message');
 		$context['topic_subject'] = $topic_info['subject'];
-		censorText($context['announce_topic']['subject']);
+		$context['announce_topic']['subject'] = censor($context['announce_topic']['subject']);
 
 		// Prepare for the template
 		$context['move'] = isset($this->_req->query->move) ? 1 : 0;

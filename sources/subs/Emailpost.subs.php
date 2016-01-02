@@ -916,10 +916,9 @@ function pbe_prepare_text(&$message, &$subject = '', &$signature = '')
 		detectServer();
 
 	// Clean it up.
-	censorText($message);
-	censorText($signature);
-	$subject = un_htmlspecialchars($subject);
-	censorText($subject);
+	$message = censor($message);
+	$signature = censor($signature);
+	$subject = censor(un_htmlspecialchars($subject));
 
 	// Convert bbc [quotes] before we go to parsebbc so they are easier to plain-textify later
 	$message = preg_replace_callback('~(\[quote)\s?author=(.*)\s?link=(.*)\s?date=([0-9]{10})(\])~sU', 'quote_callback', $message);

@@ -315,7 +315,7 @@ function topTopicReplies($limit = null)
 	while ($row_topic_reply = $db->fetch_assoc($topic_reply_result))
 	{
 		// Build out this topics details for controller use
-		censorText($row_topic_reply['subject']);
+		$row_topic_reply['subject'] = censor($row_topic_reply['subject']);
 		$top_topics_replies[$row_topic_reply['id_topic']] = array(
 			'id' => $row_topic_reply['id_topic'],
 			'board' => array(
@@ -411,7 +411,7 @@ function topTopicViews($limit = null)
 	while ($row_topic_views = $db->fetch_assoc($topic_view_result))
 	{
 		// Build the topic result array
-		censorText($row_topic_views['subject']);
+		$row_topic_views['subject'] = censor($row_topic_views['subject']);
 		$top_topics_views[$row_topic_views['id_topic']] = array(
 			'id' => $row_topic_views['id_topic'],
 			'board' => array(

@@ -145,7 +145,7 @@ class Spellcheck_Controller extends Action_Controller
 				// But first check they aren't going to be censored - no naughty words!
 				foreach ($suggestions as $k => $word)
 				{
-					if ($suggestions[$k] != censorText($word))
+					if ($suggestions[$k] != censor($word))
 					{
 						unset($suggestions[$k]);
 					}

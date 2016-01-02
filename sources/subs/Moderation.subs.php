@@ -1087,8 +1087,8 @@ function watchedUserPosts($start, $items_per_page, $sort, $approve_query, $delet
 
 	while ($row = $db->fetch_assoc($request))
 	{
-		$row['subject'] = censorText($row['subject']);
-		$row['body'] = censorText($row['body']);
+		$row['subject'] = censor($row['subject']);
+		$row['body'] = censor($row['body']);
 
 		$member_posts[$row['id_msg']] = array(
 			'id' => $row['id_msg'],

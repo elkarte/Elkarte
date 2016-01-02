@@ -846,7 +846,7 @@ function isReservedName($name, $current_ID_MEMBER = 0, $is_name = true, $fatal =
 		}
 
 		$censor_name = $name;
-		if (censorText($censor_name) != $name)
+		if (censor($censor_name) != $name)
 			if ($fatal)
 				Errors::instance()->fatal_lang_error('name_censored', 'password', array($name));
 			else

@@ -782,8 +782,8 @@ class PersonalMessage_Controller extends Action_Controller
 			}
 
 			// Censor the message.
-			censorText($row_quoted['subject']);
-			censorText($row_quoted['body']);
+			$row_quoted['subject'] = censor($row_quoted['subject']);
+			$row_quoted['body'] = censor($row_quoted['body']);
 
 			// Lets make sure we mark this one as read
 			markMessages($pmsg);
@@ -1147,8 +1147,8 @@ class PersonalMessage_Controller extends Action_Controller
 			$context['preview_message'] = $bbc_parser->parsePM($context['preview_message']);
 
 			// Censor, as always.
-			censorText($context['preview_subject']);
-			censorText($context['preview_message']);
+			$context['preview_subject'] = censor($context['preview_subject']);
+			$context['preview_message'] = censor($context['preview_message']);
 
 			// Set a descriptive title.
 			$context['page_title'] = $txt['preview'] . ' - ' . $context['preview_subject'];
@@ -1334,8 +1334,8 @@ class PersonalMessage_Controller extends Action_Controller
 			}
 			else
 			{
-				censorText($row_quoted['subject']);
-				censorText($row_quoted['body']);
+				$row_quoted['subject'] = censor($row_quoted['subject']);
+				$row_quoted['body'] = censor($row_quoted['body']);
 				$bbc_parser = \BBC\ParserWrapper::getInstance();
 
 				$context['quoted_message'] = array(
@@ -2484,8 +2484,8 @@ class PersonalMessage_Controller extends Action_Controller
 				}
 
 				// Censor anything we don't want to see...
-				censorText($row['body']);
-				censorText($row['subject']);
+				$row['body'] = censor($row['body']);
+				$row['body'] = censor($row['subject']);
 
 				// Parse out any BBC...
 				$row['body'] = $bbc_parser->parsePM($row['body']);
@@ -2972,7 +2972,7 @@ function preparePMContext_callback($type = 'subject', $reset = false)
 
 		// Make sure we have a subject
 		$subject['subject'] = $subject['subject'] === '' ? $txt['no_subject'] : $subject['subject'];
-		censorText($subject['subject']);
+		$subject['subject'] = censor($subject['subject']);
 
 		$output = array(
 			'id' => $subject['id_pm'],
@@ -3053,8 +3053,8 @@ function preparePMContext_callback($type = 'subject', $reset = false)
 	$memberContext[$message['id_member_from']]['show_profile_buttons'] = $settings['show_profile_buttons'] && (!empty($memberContext[$message['id_member_from']]['can_view_profile']) || (!empty($memberContext[$message['id_member_from']]['website']['url']) && !isset($context['disabled_fields']['website'])) || (in_array($memberContext[$message['id_member_from']]['show_email'], array('yes', 'yes_permission_override', 'no_through_forum'))) || $context['can_send_pm']);
 
 	// Censor all the important text...
-	censorText($message['body']);
-	censorText($message['subject']);
+	$message['body'] = censor($message['body']);
+	$message['subject'] = censor($message['subject']);
 
 	// Run BBC interpreter on the message.
 	$bbc_parser = \BBC\ParserWrapper::getInstance();

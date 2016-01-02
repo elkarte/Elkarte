@@ -1499,8 +1499,8 @@ function lastPost()
 	$db->free_result($request);
 
 	// Censor the subject and post...
-	censorText($row['subject']);
-	censorText($row['body']);
+	$row['body'] = censor($row['subject']);
+	$row['body'] = censor($row['body']);
 
 	$bbc_parser = \BBC\ParserWrapper::getInstance();
 
@@ -1594,8 +1594,8 @@ function getFormMsgSubject($editing, $topic, $first_subject = '', $msg_id = 0)
 				$form_subject = $response_prefix . $form_subject;
 
 			// Censor the message and subject.
-			censorText($form_message);
-			censorText($form_subject);
+			$form_message = censor($form_message);
+			$form_subject = censor($form_subject);
 
 			$form_message = un_preparsecode($form_message);
 
@@ -1618,7 +1618,7 @@ function getFormMsgSubject($editing, $topic, $first_subject = '', $msg_id = 0)
 				$form_subject = $response_prefix . $form_subject;
 
 			// Censor the subject.
-			censorText($form_subject);
+			$form_subject = censor($form_subject);
 
 			$form_message = '';
 

@@ -171,7 +171,7 @@ class ManagePosts_Controller extends Action_Controller
 			$censorText = htmlspecialchars($this->_req->post->censortest, ENT_QUOTES, 'UTF-8');
 			preparsecode($censorText);
 			$pre_censor = $censorText;
-			$context['censor_test'] = strtr(censorText($censorText), array('"' => '&quot;'));
+			$context['censor_test'] = strtr(censor($censorText), array('"' => '&quot;'));
 		}
 
 		// Set everything up for the template to do its thang.

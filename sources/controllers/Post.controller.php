@@ -313,11 +313,10 @@ class Post_Controller extends Action_Controller
 				$bbc_parser = \BBC\ParserWrapper::getInstance();
 				preparsecode($context['preview_message']);
 				$context['preview_message'] = $bbc_parser->parseMessage($context['preview_message'], isset($_REQUEST['ns']) ? 0 : 1);
-				censorText($context['preview_message']);
+				$context['preview_message'] = censor($context['preview_message']);
 
 				// Don't forget the subject
-				$context['preview_subject'] = $form_subject;
-				censorText($context['preview_subject']);
+				$context['preview_subject'] = censor($form_subject);
 
 				// Any errors we should tell them about?
 				if ($form_subject === '')
@@ -404,8 +403,8 @@ class Post_Controller extends Action_Controller
 			$form_subject = $message['message']['subject'];
 			$form_message = un_preparsecode($message['message']['body']);
 
-			censorText($form_message);
-			censorText($form_subject);
+			$form_message = censor($form_message);
+			$form_subject = censor($form_subject);
 
 			// Check the boxes that should be checked.
 			$context['use_smileys'] = !empty($message['message']['smileys_enabled']);
@@ -1115,14 +1114,14 @@ class Post_Controller extends Action_Controller
 			$row['body'] = un_preparsecode($row['body']);
 
 			// Censor the message!
-			censorText($row['body']);
+			$row['body'] = censor($row['body']);
 
 			$row['body'] = preg_replace('~<br ?/?' . '>~i', "\n", $row['body']);
 
 			// Want to modify a single message by double clicking it?
 			if (isset($_REQUEST['modify']))
 			{
-				censorText($row['subject']);
+				$row['body'] = censor($row['subject']);
 
 				$context['sub_template'] = 'modifyfast';
 				$context['message'] = array(
@@ -1362,8 +1361,8 @@ class Post_Controller extends Action_Controller
 					'body' => strtr($msgOptions['body'], array(']]>' => ']]]]><![CDATA[>')),
 				);
 
-				censorText($context['message']['subject']);
-				censorText($context['message']['body']);
+				$context['message']['subject'] = censor($context['message']['subject']);
+				$context['message']['body'] = censor($context['message']['body']);
 
 				$context['message']['body'] = $bbc_parser->parseMessage($context['message']['body'], $row['smileys_enabled']);
 			}
@@ -1382,7 +1381,7 @@ class Post_Controller extends Action_Controller
 					'subject' => isset($msgOptions['subject']) ? $msgOptions['subject'] : '',
 				);
 
-				censorText($context['message']['subject']);
+				$context['message']['subject'] = censor($context['message']['subject']);
 			}
 			else
 			{

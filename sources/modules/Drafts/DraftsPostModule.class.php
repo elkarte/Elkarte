@@ -208,7 +208,7 @@ class Drafts_Post_Module implements ElkArte\sources\modules\Module_Interface
 		{
 			$short_subject = empty($draft['subject']) ? $txt['drafts_none'] : Util::shorten_text(stripslashes($draft['subject']), self::$_subject_length);
 			$context['drafts'][] = array(
-				'subject' => censorText($short_subject),
+				'subject' => censor($short_subject),
 				'poster_time' => standardTime($draft['poster_time']),
 				'link' => '<a href="' . $scripturl . '?action=post;board=' . $draft['id_board'] . ';' . (!empty($draft['id_topic']) ? 'topic=' . $draft['id_topic'] . '.0;' : '') . 'id_draft=' . $draft['id_draft'] . '">' . (!empty($draft['subject']) ? $draft['subject'] : $txt['drafts_none']) . '</a>',
 			);

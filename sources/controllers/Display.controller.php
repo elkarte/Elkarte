@@ -280,7 +280,7 @@ class Display_Controller extends Action_Controller
 		$context['disabled_fields'] = isset($modSettings['disabled_profile_fields']) ? array_flip(explode(',', $modSettings['disabled_profile_fields'])) : array();
 
 		// Censor the title...
-		censorText($topicinfo['subject']);
+		$topicinfo['subject'] = censor($topicinfo['subject']);
 		$context['page_title'] = $topicinfo['subject'];
 
 		// Allow addons access to the topicinfo array
@@ -814,8 +814,8 @@ class Display_Controller extends Action_Controller
 		$memberContext[$message['id_member']]['show_profile_buttons'] = $settings['show_profile_buttons'] && (!empty($memberContext[$message['id_member']]['can_view_profile']) || (!empty($memberContext[$message['id_member']]['website']['url']) && !isset($context['disabled_fields']['website'])) || (in_array($memberContext[$message['id_member']]['show_email'], array('yes', 'yes_permission_override', 'no_through_forum'))) || $context['can_send_pm']);
 
 		// Do the censor thang.
-		censorText($message['body']);
-		censorText($message['subject']);
+		$message['body'] = censor($message['body']);
+		$message['subject'] = censor($message['subject']);
 
 		// Run BBC interpreter on the message.
 		$bbc_wrapper = \BBC\ParserWrapper::getInstance();
