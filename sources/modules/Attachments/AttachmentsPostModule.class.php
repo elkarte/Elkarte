@@ -488,7 +488,9 @@ class Attachments_Post_Module implements ElkArte\sources\modules\Module_Interfac
 	{
 		if ($this->_is_new_message && !empty($this->_saved_attach_id) && !empty($msgOptions['id']))
 		{
-			bindMessageAttachments($msgOptions['id'], $this->_savedAttachments($msgOptions['id']));
+			$ids = $this->_savedAttachments($msgOptions['id']);
+
+			bindMessageAttachments($msgOptions['id'], $ids);
 		}
 	}
 
@@ -498,7 +500,7 @@ class Attachments_Post_Module implements ElkArte\sources\modules\Module_Interfac
 
 		foreach ($this->_saved_attach_id as $attach)
 		{
-			if ($msg === $attach['id_msg'])
+			if ($msg === $attach['id_msg'] || empty($attach['id_msg']))
 			{
 				$ids[] = $attach['id'];
 				if (!empty($attach['thumb']))

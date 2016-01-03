@@ -1483,6 +1483,9 @@ function disableAutoComplete()
 		};
 
 		var fetch = function() {
+			if (_notifiers.length == 0)
+				return;
+
 			$.ajax({
 				url: elk_scripturl + "?action=mentions;sa=fetch;api=json;lastsent=" + lastTime
 			})
