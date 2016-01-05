@@ -13,7 +13,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.1 dev Release Candidate 1
+ * @version 1.1 dev
  *
  */
 
@@ -110,7 +110,7 @@ class Cache
 	public function quick_get($key, $file, $function, $params, $level = 1)
 	{
 		if (!$this->isEnabled())
-			return;
+			return array();
 
 		call_integration_hook('pre_cache_quick_get', array(&$key, &$file, &$function, &$params, &$level));
 

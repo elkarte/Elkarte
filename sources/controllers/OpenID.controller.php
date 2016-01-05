@@ -7,8 +7,8 @@
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
- * This file contains code by:
- * copyright:	2012 Simple Machines Forum contributors (http://www.simplemachines.org)
+ * This file contains code covered by:
+ * copyright:	2012 Simple Machines Forum (http://www.simplemachines.org)
  * license:		BSD, See included LICENSE.TXT for terms and conditions.
  *
  * @version 1.1 dev

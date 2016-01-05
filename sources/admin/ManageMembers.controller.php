@@ -2,7 +2,7 @@
 
 /**
  * Show a list of members or a selection of members.
-
+ *
  * @name      ElkArte Forum
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause

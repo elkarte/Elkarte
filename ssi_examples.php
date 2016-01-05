@@ -9,7 +9,7 @@
  *
  * Simple Machines Forum (SMF)
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
- * license:	BSD, See included LICENSE.TXT for terms and conditions.
+ * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
  * @version 1.1 dev
  */

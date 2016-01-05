@@ -25,7 +25,7 @@ class User_Notification_Integrate
 
 		// $hook, $function, $file
 		return array(
-			array('integrate_user_info', 'User_Notification_Integrate::integrate_user_info'),
+			array('integrate_load_theme', 'User_Notification_Integrate::integrate_load_theme'),
 		);
 	}
 
@@ -44,7 +44,7 @@ class User_Notification_Integrate
 	/**
 	 * Adds the relevant javascript code when loading the page.
 	 */
-	public static function integrate_user_info()
+	public static function integrate_load_theme()
 	{
 		global $modSettings;
 

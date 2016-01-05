@@ -12,19 +12,19 @@ class TestAuth_Controller extends ElkArteWebTest
 	public function testAlive()
 	{
 		$this->url('index.php');
-        $this->assertEquals('My Community - Index', $this->title());
+		$this->assertEquals('My Community - Index', $this->title());
 	}
 
 	/**
 	 * Click on login button and try to login.
-     *
+	 *
 	 * It should fail with an error message.
 	 * You can echo a page result with $source = $this->source(); to help debug
 	 */
 	public function testLogin()
 	{
-        $username = 'test';
-        $password = 'ainttellin';
+		$username = 'test';
+		$password = 'ainttellin';
 
 		// Select login from the main page
 		$this->url('index.php');
@@ -43,7 +43,7 @@ class TestAuth_Controller extends ElkArteWebTest
 		$this->assertEquals($password, $passwordInput->value());
 
 		// Submit it
-        $this->byCssSelector('.login > div > input[type="submit"]')->click();
+		$this->byCssSelector('.login > div > input[type="submit"]')->click();
 
 		// Nope, huh? I hope :P
 		$this->assertEquals('That username does not exist.', $this->byClassName('errorbox')->text());
