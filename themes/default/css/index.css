@@ -120,11 +120,16 @@ form, input, button, select, textarea,
 	font-size: 1em;
 }
 
+/* Fieldsets are used to group elements. */
+/* @todo - Can we do this by class? What about default styling? Needed? */
+/* Declaring as overflow: auto; is probably a good idea. */
+
 fieldset {
 	margin: 5px 0;
 	padding: 6px;
 	border-radius: 5px;
-	border: 1px solid #CCCCCC;
+	overflow: auto;
+	border: none;
 }
 
 /* Specific box-sizing declarations */
@@ -273,6 +278,17 @@ input[type="submit"], button[type="submit"], input[type="button"],
 	padding: 0 6px;
 }
 
+input[type="submit"], .drop_area_fileselect_text, button[type="submit"], input[type="button"],
+	/* Anchors styled to look like buttons. */
+	/* These have standard body text size. Can be chained with smalltext class. */
+.linkbutton:link, .linkbutton_right:link, .linkbutton_left:link,
+.linkbutton:visited, .linkbutton_right:visited, .linkbutton_left:visited {
+	border: 1px solid #AFAFAF;
+	border-top: 1px solid #CFCFCF;
+	border-left: 1px solid #BFBFBF;
+	border-radius: 2px;
+}
+
 .left_submit, .linkbutton_left {
 	float: left;
 }
@@ -285,6 +301,7 @@ input[type="submit"], button[type="submit"], input[type="button"],
 input[type="submit"]:hover, button[type="submit"]:hover, input[type="button"]:hover,
 .linkbutton:hover, .linkbutton_right:hover, .linkbutton_left:hover {
 	cursor: pointer;
+	text-decoration: none;
 }
 
 /* Don't show disabled buttons as active on hover */
@@ -326,6 +343,7 @@ input[type=submit][disabled]:hover, button[disabled], button[disabled]:hover {
 /* @todo - Might add extra fallbacks. Possibly monospace. */
 /* @todo - Also, look at deprecating spans here. */
 .new_posts, .require_approval {
+	border-radius: 2px;
 	padding: 1px 4px 2px 4px;
 	font-weight: bold;
 	font-size: .643em;
@@ -350,14 +368,8 @@ del .bbc_link:link, del .bbc_link:visited {
 hr {
 	margin: 12px 0;
 	height: 1px;
-}
-
-/* Fieldsets are used to group elements. */
-/* @todo - Can we do this by class? What about default styling? Needed? */
-/* Declaring as overflow: auto; is probably a good idea. */
-fieldset {
-	overflow: auto;
-	border: none;
+	border-top: 1px solid #BBBBBB;
+	border-left: 0;
 }
 
 /*...and em as italics */
@@ -486,6 +498,10 @@ em, .em {
 	padding: 4px 10px 2px 10px;
 	font-size: 1.214em;
 	line-height: 1.8em;
+	border: 1px solid #CCCCCC;
+	border-top: 1px solid #DDDDDD;
+	border-bottom: 1px solid #BBBBBB;
+	border-radius: 4px 4px 0 0;
 }
 
 /* Styles for subsection headers. @todo */
@@ -494,6 +510,8 @@ em, .em {
 	padding: 1px 10px 1px;
 	font-size: 1.143em;
 	line-height: 1.8em;
+	border: 1px solid #CCCCCC;
+	border-top: 1px solid #DDDDDD;
 }
 
 .category_header .icon {
@@ -583,6 +601,7 @@ em, .em {
 .content {
 	overflow: auto;
 	padding: 0.5em 1em;
+	border: 1px solid #CCCCCC;
 }
 
 .content p {
@@ -671,6 +690,22 @@ em, .em {
 	font-size: 0.857em;
 }
 
+/* Use demi bold font weight for some key areas */
+.codeheader, .quoteheader,
+.expand_pages,
+.table_head > th,
+.topic_sorting_row > h3, .topic_name h4 a,
+.poster .name,
+.keyinfo h5 a, .keyinfo h5 a strong,
+.ui-tabs .ui-tabs-nav .ui-state-active a, .ui-tabs .ui-tabs-nav .ui-state-active,
+.ui-dialog .ui-dialog-titlebar,
+#creator dt strong, .settings label,
+.popup_heading {
+	font-weight: 600;
+	font-family: "Segoe UI Semibold", "Segoe UI", "Helvetica Neue Medium", "Helvetica Neue", serif;
+	-webkit-font-smoothing: antialiased;
+}
+
 /* [Select] link to copy code. */
 .codeoperation {
 	font-weight: normal;
@@ -722,8 +757,9 @@ em, .em {
 	color: inherit;
 }
 
-.bbc_strong {
+strong, .bbc_strong {
 	color: inherit;
+	font-weight: bold;
 }
 
 .bbc_img {
@@ -1845,6 +1881,11 @@ a.bbc_link {
 /* Styles for the info center on the board index. */
 #upshrinkHeaderIC .board_row {
 	padding: 8px 12px;
+}
+
+/* Upshrink image in the general category headers */
+#category_toggle, #category_toggle_more, #upshrink_header {
+	border-radius: 2px;
 }
 
 .ic_section_header {
@@ -4505,6 +4546,14 @@ a.help .icon {
 .errorbox {
 	margin-bottom: 1em;
 	text-align: left;
+}
+
+.border_error {
+	border: 1px solid #FF0000 !important;
+}
+
+.selected {
+	font-weight: bold;
 }
 
 /* Styles for (fatal) errors. */
