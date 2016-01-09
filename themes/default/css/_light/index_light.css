@@ -68,7 +68,7 @@ body {
 
 fieldset {
 	background: transparent;
-	border: 1px solid #CCCCCC;
+	border-color: #CCCCCC;
 	box-shadow: inset -1px -1px 3px #FEFEFE;
 }
 
@@ -117,10 +117,9 @@ input[type="submit"], .drop_area_fileselect_text, button[type="submit"], input[t
 /* These have standard body text size. Can be chained with smalltext class. */
 .linkbutton:link, .linkbutton_right:link, .linkbutton_left:link,
 .linkbutton:visited, .linkbutton_right:visited, .linkbutton_left:visited {
-	border: 1px solid #AFAFAF;
-	border-top: 1px solid #CFCFCF;
-	border-left: 1px solid #BFBFBF;
-	border-radius: 2px;
+	border-color: #AFAFAF;
+	border-top-color: #CFCFCF;
+	border-left-color: #BFBFBF;
 	background: #F4F4F4 linear-gradient(to bottom, #FEFEFE, #E4E4E4);
 	box-shadow: 1px 1px 2px #E4E4E4, 0 -1px 0 #E4E4E4 inset;
 	color: #585858;
@@ -129,70 +128,48 @@ input[type="submit"], .drop_area_fileselect_text, button[type="submit"], input[t
 /* Hover effects. */
 input[type="submit"]:hover, button[type="submit"]:hover, input[type="button"]:hover,
 .linkbutton:hover, .linkbutton_right:hover, .linkbutton_left:hover {
-	border: 1px solid #CCCCCC;
-	border-top: 1px solid #AFAFAF;
-	border-left: 1px solid #AFAFAF;
+	border-color: #CCCCCC;
+	border-top-color: #AFAFAF;
+	border-left-color: #AFAFAF;
 	background: #F0F0F0;
 	box-shadow: 2px 1px 1px rgba(0, 0, 0, 0.07) inset;
 	color: #585858;
-	text-decoration: none;
 }
 
 /* the new "button" */
 .new_posts, .new_posts:visited, .new_posts:link {
-	border-radius: 2px;
 	background: #27A348;
 	color: #FEFEFE;
 }
 
 /* approval indicator */
 .require_approval {
-	border-radius: 4px;
 	background: #27A348;
 	color: #FEFEFE;
 }
 
 /* Standard horizontal rule.. ([hr], etc.) */
 hr {
-	border-top: 1px solid #BBBBBB;
-	border-left: 0;
+	border-top-color: #BBBBBB;
 	background: #EEEEEE;
 }
 
 strong, .bbc_strong {
 	color: #686868;
-	font-weight: bold;
-}
-
-/* Use demi bold font weight for some key areas */
-.codeheader, .quoteheader,
-.expand_pages,
-.table_head > th,
-.topic_sorting_row > h3, .topic_name h4 a,
-.poster .name,
-.keyinfo h5 a, .keyinfo h5 a strong,
-.ui-tabs .ui-tabs-nav .ui-state-active a, .ui-tabs .ui-tabs-nav .ui-state-active,
-.ui-dialog .ui-dialog-titlebar,
-#creator dt strong, .settings label,
-.popup_heading {
-	font-weight: 600;
-	font-family: "Segoe UI Semibold", "Segoe UI", "Helvetica Neue Medium", "Helvetica Neue", serif;
-	-webkit-font-smoothing: antialiased;
 }
 
 /* @todo - Test this everywhere. */
 .content {
 	background: #FEFEFE;
 	box-shadow: 1px 2px 4px #EBEBEB;
-	border: 1px solid #CCCCCC;
+	border-color: #CCCCCC;
 }
 
 /* Styles for main headers. */
 .category_header, .forum_category .category_header {
-	border: 1px solid #CCCCCC;
-	border-top: 1px solid #DDDDDD;
-	border-bottom: 1px solid #BBBBBB;
-	border-radius: 4px 4px 0 0;
+	border-color: #CCCCCC;
+	border-top-color: #DDDDDD;
+	border-bottom-color: #BBBBBB;
 	background: #EBEBEB;
 	background-image: linear-gradient(to bottom, #FAFAFA, #EAEAEA);
 	color: #566450;
@@ -201,16 +178,16 @@ strong, .bbc_strong {
 
 /* Single ones a bit darker than board index ones. */
 .category_header, .content_category .category_header {
-	border-top: 1px solid #CFCFCF;
-	border-bottom: 1px solid #BBBBBB;
+	border-top-color: #CFCFCF;
+	border-bottom-color: #BBBBBB;
 	background: #E9E9E9;
 	background-image: linear-gradient(to bottom, #FAFAFA, #E4E4E4);
 }
 
 /* Styles for subsection headers. @todo */
 .secondary_header {
-	border: 1px solid #CCCCCC;
-	border-top: 1px solid #DDDDDD;
+	border-color: #CCCCCC;
+	border-top-color: #DDDDDD;
 	background: #FAFAFA;
 	background-image: linear-gradient(to bottom, #FAFAFA, #EBEBEB);
 	text-shadow: 1px 1px 0 #FEFEFE;
@@ -218,11 +195,6 @@ strong, .bbc_strong {
 
 .category_header a:link {
 	color: #566450;
-}
-
-/* Upshrink image in the general category headers */
-#category_toggle, #category_toggle_more, #upshrink_header {
-	border-radius: 2px;
 }
 
 /* Custom highlighted text style for modern browsers. */
@@ -248,15 +220,12 @@ strong, .bbc_strong {
 }
 
 .border_error {
-	border: 1px solid #FF0000 !important;
+	border-color: #FF0000 !important;
 }
 
 /* Messages that somehow need to attract the attention. */
 .alert {
 	color: #FF0000;
-}
-.selected {
-	font-weight: bold;
 }
 
 /* Colors for warnings. */
