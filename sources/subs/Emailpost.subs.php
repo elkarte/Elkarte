@@ -1033,15 +1033,8 @@ function pbe_disable_user_notify($email_message)
 			WHERE id_member = {int:id_member}',
 			array(
 				'id_member' => $id_member
-			)
-		);
-		/*$n = Notifications($db); //Grab a reference to the singleton
-		$n->add(new Notifications_Task("nomail",
-			$id_member, //The member to notify
-			0,  //Not sure what to use for system-triggered messages
-			array('id_members'=>array($id_member)) //Haven't the foggiest what all goes in here yet
-			));
-		*/
+			)		
+		);		
 	}	
 }
 
