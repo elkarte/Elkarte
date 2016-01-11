@@ -1007,7 +1007,7 @@ function pbe_disable_user_notify($email_message)
 	$db = database();
 
 	$email = $email_message->get_failed_dest();
-	
+
 	$request = $db->query('', '
 		SELECT
 			id_member
@@ -1033,9 +1033,9 @@ function pbe_disable_user_notify($email_message)
 			WHERE id_member = {int:id_member}',
 			array(
 				'id_member' => $id_member
-			)		
-		);		
-	}	
+			)
+		);
+	}
 }
 
 /**
