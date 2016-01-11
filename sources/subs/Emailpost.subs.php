@@ -997,6 +997,8 @@ function pbe_prepare_text(&$message, &$subject = '', &$signature = '')
  * For the user in question to disable Board and Post notifications. Do not clear
  * Notification subscriptions.
  *
+ * When finished, fire off a site notification informing the user of the action and reason
+ *
  * @package Maillist
  * @param Email_Parse $email_message
  */
@@ -1004,8 +1006,8 @@ function pbe_disable_user_notify($email_message)
 {
 	$db = database();
 
-	$email = $email_message->_dsn['body']['original-recipient']['value'];
-
+	$email = $email_message->get_failed_dest();
+	
 	$request = $db->query('', '
 		SELECT
 			id_member
@@ -1033,7 +1035,14 @@ function pbe_disable_user_notify($email_message)
 				'id_member' => $id_member
 			)
 		);
-	}
+		/*$n = Notifications($db); //Grab a reference to the singleton
+		$n->add(new Notifications_Task("nomail",
+			$id_member, //The member to notify
+			0,  //Not sure what to use for system-triggered messages
+			array('id_members'=>array($id_member)) //Haven't the foggiest what all goes in here yet
+			));
+		*/
+	}	
 }
 
 /**

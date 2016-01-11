@@ -808,6 +808,28 @@ class Email_Parse
 
 		/** Add non-header-based detection **/
 	}
+	
+	/**
+	 * Tries to find the original intended recipient that failed to deliver
+	 *
+	 * What it does:
+	 * - Checks the headers of a DSN for the various ways that the intended recipient
+	 *   Might have been included in the DSN headers
+	 *
+	 * @return string or null
+	 */
+	public function get_failed_dest()
+	{
+		/** Body->Original-Recipient Header **/
+		if (isset($this->_dsn['body']['original-recipient']['value']))
+			return $this->_dsn['body']['original-recipient']['value'];
+		
+		/** Body->Final-recipient Header **/
+		if (isset($this->_dsn['body']['final-recipient']['value']))
+			return $this->_dsn['body']['final-recipient']['value'];
+		
+		return null;
+	}
 
 	/**
 	 * Find the message return_path and well return it
