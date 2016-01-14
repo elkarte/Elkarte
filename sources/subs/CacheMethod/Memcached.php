@@ -24,19 +24,21 @@ if (!defined('ELK'))
 class Memcached extends Cache_Method_Abstract
 {
 	private $_memcache = null;
+	private $_memcachec = null;
 
 	/**
 	 * {@inheritdoc }
 	 */
 	public function init()
 	{
-		if (!function_exists('memcache_get') && !function_exists('memcached_get'))
+		if (!class_exists('Memcached') && !function_exists('memcache_get') && !function_exists('memcached_get'))
 			return false;
 
 		$memcached = self::get_memcached_server();
 		if (!$memcached)
 			return false;
 
+		$this->_memcachec = class_exists('Memcached');
 		$this->_memcache = function_exists('memcache_get');
 		$this->_options['memcached'] = $memcached;
 
@@ -48,7 +50,10 @@ class Memcached extends Cache_Method_Abstract
 	 */
 	public function put($key, $value, $ttl = 120)
 	{
-		memcache_set($this->_options['memcached'], $key, $value, 0, $ttl);
+		if ($this->_memcachec)
+			$this->_options['memcached']->set($key, $value, $ttl);
+		else
+			memcache_set($this->_options['memcached'], $key, $value, 0, $ttl);
 	}
 
 	/**
@@ -56,7 +61,11 @@ class Memcached extends Cache_Method_Abstract
 	 */
 	public function get($key, $ttl = 120)
 	{
-		if ($this->_memcache)
+		if ($this->_memcachec)
+		{
+			$result = $this->_options['memcached']->get($key);
+		}
+		elseif ($this->_memcache)
 		{
 			$result = memcache_get($this->_options['memcached'], $key);
 		}
@@ -76,7 +85,9 @@ class Memcached extends Cache_Method_Abstract
 	public function clean($type = '')
 	{
 		// Clear it out, really invalidate whats there
-		if ($this->_memcache)
+		if ($this->_memcachec)
+			$this->_options['memcached']->flush();
+		elseif ($this->_memcache)
 			memcache_flush($this->_options['memcached']);
 		else
 			memcached_flush($this->_options['memcached']);
@@ -105,14 +116,24 @@ class Memcached extends Cache_Method_Abstract
 		// Don't wait too long: yes, we want the server, but we might be able to run the query faster!
 		if (empty($db_persist))
 		{
-			if (function_exists('memcache_get'))
+			if (class_exists('Memcached'))
+			{
+				$memcached = new Memcached;
+				$memcached->addServers($servers);
+			}
+			elseif (function_exists('memcache_get'))
 				$memcached = memcache_connect($server[0], $port);
 			else
 				$memcached = memcached_connect($server[0], $port);
 		}
 		else
 		{
-			if (function_exists('memcache_get'))
+			if (class_exists('Memcached'))
+			{
+				$memcached = new Memcached;
+				$memcached->addServers($servers);
+			}
+			elseif (function_exists('memcache_get'))
 				$memcached = memcache_pconnect($server[0], $port);
 			else
 				$memcached = memcached_pconnect($server[0], $port);
@@ -131,7 +152,7 @@ class Memcached extends Cache_Method_Abstract
 	{
 		global $modSettings;
 
-		return function_exists('memcache_get') && isset($modSettings['cache_memcached']) && trim($modSettings['cache_memcached']) != '';
+		return (class_exists('Memcached') || function_exists('memcache_get')) && isset($modSettings['cache_memcached']) && trim($modSettings['cache_memcached']) != '';
 	}
 
 	/**
@@ -141,7 +162,7 @@ class Memcached extends Cache_Method_Abstract
 	{
 		$memcached = self::get_memcached_server();
 
-		return array('title' => self::title(), 'version' => empty($memcached) ? '???' : memcache_get_version($memcached));
+		return array('title' => self::title(), 'version' => empty($memcached) ? '???' : (class_exists('Memcached') ? $memcached->getVersion() : memcache_get_version($memcached)));
 	}
 
 	/**
