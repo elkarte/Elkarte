@@ -113,27 +113,28 @@ class Memcached extends Cache_Method_Abstract
 		// Don't try more times than we have servers!
 		$level = min(count($servers), $level);
 
-		// Don't wait too long: yes, we want the server, but we might be able to run the query faster!
-		if (empty($db_persist))
+		if (class_exists('Memcached'))
 		{
-			if (class_exists('Memcached'))
+			$serversm = array();
+			foreach ($servers as $server)
 			{
-				$memcached = new Memcached;
-				$memcached->addServers($servers);
+				$server = explode(':', trim($server));
+				$serversm[] = $server;
 			}
-			elseif (function_exists('memcache_get'))
+			$memcached = new Memcached;
+			$memcached->addServers($serversm);
+		}
+		// Don't wait too long: yes, we want the server, but we might be able to run the query faster!
+		elseif (empty($db_persist))
+		{
+			if (function_exists('memcache_get'))
 				$memcached = memcache_connect($server[0], $port);
 			else
 				$memcached = memcached_connect($server[0], $port);
 		}
 		else
 		{
-			if (class_exists('Memcached'))
-			{
-				$memcached = new Memcached;
-				$memcached->addServers($servers);
-			}
-			elseif (function_exists('memcache_get'))
+			if (function_exists('memcache_get'))
 				$memcached = memcache_pconnect($server[0], $port);
 			else
 				$memcached = memcached_pconnect($server[0], $port);
