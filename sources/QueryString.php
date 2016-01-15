@@ -289,11 +289,10 @@ function ob_sessrewrite($buffer)
 function buffer_callback($matches)
 {
 	global $scripturl;
-	static $robotset = false;
-	static $isarobot;
-	if (!$robotset)
+	static $isarobot = null;
+
+	if ($isarobot === null)
 	{
-		$robotset = true;
 		$isarobot = isBrowser('possibly_robot');
 	}
 
