@@ -289,8 +289,9 @@ function ob_sessrewrite($buffer)
 function buffer_callback($matches)
 {
 	global $scripturl;
+	static $isarobot = isBrowser('possibly_robot');
 
-	if (empty($_COOKIE) && defined('SID') && SID != '')
+	if (!$isarobot && empty($_COOKIE) && defined('SID') && SID != '')
 		return '"' . $scripturl . '/' . strtr($matches[1], '&;=', '//,') . '.html?' . SID . (isset($matches[2]) ? $matches[2] : '') . '"';
 	else
 		return '"' . $scripturl . '/' . strtr($matches[1], '&;=', '//,') . '.html' . (isset($matches[2]) ? $matches[2] : '') . '"';
