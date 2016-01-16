@@ -86,7 +86,7 @@ class Suggest_Controller extends Action_Controller
 				$suggest = new $currentSearch['class']($this->_req->post->search, $context['search_param']);
 
 				// Okay, let's at least assume the method exists... *rolleyes*
-				$context['xml_data'] = $suggest->$currentSearch['function']();
+				$context['xml_data'] = $suggest->{$currentSearch['function']}();
 			}
 			// Let's maintain the "namespace" action_suggest_
 			elseif (function_exists('action_suggest_' . $currentSearch['function']))

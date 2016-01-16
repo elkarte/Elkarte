@@ -178,7 +178,7 @@ class AdminLog_Controller extends Action_Controller
 					if (!is_array($dummy) || $index == 'pruningOptions')
 						continue;
 
-					$vals[] = empty($this->_req->post->$dummy[1]) || $this->_req->post->$dummy[1] < 0 ? 0 : $this->_req->getPost($dummy[1], 'intval');
+					$vals[] = empty($this->_req->post->{$dummy[1]}) || $this->_req->post->{$dummy[1]} < 0 ? 0 : $this->_req->getPost($dummy[1], 'intval');
 				}
 				$_POST['pruningOptions'] = implode(',', $vals);
 			}

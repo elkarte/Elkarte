@@ -575,7 +575,7 @@ class ManageSmileys_Controller extends Action_Controller
 			);
 
 		// Submitting a form?
-		if (isset($this->_req->post->$context['session_var'], $this->_req->post->smiley_code))
+		if (isset($this->_req->post->{$context['session_var']}, $this->_req->post->smiley_code))
 		{
 			checkSession();
 

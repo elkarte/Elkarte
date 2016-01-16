@@ -442,7 +442,7 @@ class Groups_Controller extends Action_Controller
 		$where_parameters = array();
 
 		// We've submitted?
-		if (isset($this->_req->post->$context['session_var'])
+		if (isset($this->_req->post->{$context['session_var']})
 			&& !empty($this->_req->post->groupr)
 			&& !empty($this->_req->post->req_action))
 		{

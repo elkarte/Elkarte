@@ -340,7 +340,7 @@ class Markdown_Parser {
 
 		# Run document gamut methods.
 		foreach ($this->document_gamut as $method => $priority) {
-			$text = $this->$method($text);
+			$text = $this->{$method}($text);
 		}
 
 		$this->teardown();
@@ -610,7 +610,7 @@ class Markdown_Parser {
 	# whole-document pass.
 	#
 		foreach ($this->block_gamut as $method => $priority) {
-			$text = $this->$method($text);
+			$text = $this->{$method}($text);
 		}
 
 		# Finally form paragraph and restore hashed blocks.
@@ -667,7 +667,7 @@ class Markdown_Parser {
 	# Run span gamut tranformations.
 	#
 		foreach ($this->span_gamut as $method => $priority) {
-			$text = $this->$method($text);
+			$text = $this->{$method}($text);
 		}
 
 		return $text;
@@ -1407,7 +1407,7 @@ class Markdown_Parser {
 //
 //					# Run document gamut methods on the content.
 //					foreach ($this->document_gamut as $method => $priority) {
-//						$div_content = $this->$method($div_content);
+//						$div_content = $this->{$method}($div_content);
 //					}
 //
 //					$div_open = preg_replace(
@@ -2328,7 +2328,7 @@ class MarkdownExtra_Parser extends Markdown_Parser {
 
 					# End preceding block with this tag.
 					$block_text .= $tag;
-					$parsed .= $this->$hash_method($block_text);
+					$parsed .= $this->{$hash_method}($block_text);
 
 					# Get enclosing tag name for the ParseMarkdown function.
 					# (This pattern makes $tag_name_re safe without quoting.)
@@ -2361,7 +2361,7 @@ class MarkdownExtra_Parser extends Markdown_Parser {
 		#
 		# Hash last block text that wasn't processed inside the loop.
 		#
-		$parsed .= $this->$hash_method($block_text);
+		$parsed .= $this->{$hash_method}($block_text);
 
 		return array($parsed, $text);
 	}

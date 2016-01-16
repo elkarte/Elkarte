@@ -1008,16 +1008,16 @@ class PersonalMessage_Controller extends Action_Controller
 			// First, let's see if there's user ID's given.
 			$recipientList[$recipientType] = array();
 			$type = 'recipient_' . $recipientType;
-			if (!empty($this->_req->post->$type) && is_array($this->_req->post->$type))
+			if (!empty($this->_req->post->{$type}) && is_array($this->_req->post->{$type}))
 			{
-				$recipientList[$recipientType] = array_map('intval', $this->_req->post->$type);
+				$recipientList[$recipientType] = array_map('intval', $this->_req->post->{$type});
 			}
 
 			// Are there also literal names set?
-			if (!empty($this->_req->post->$recipientType))
+			if (!empty($this->_req->post->{$recipientType}))
 			{
 				// We're going to take out the "s anyway ;).
-				$recipientString = strtr($this->_req->post->$recipientType, array('\\"' => '"'));
+				$recipientString = strtr($this->_req->post->{$recipientType}, array('\\"' => '"'));
 
 				preg_match_all('~"([^"]+)"~', $recipientString, $matches);
 				$namedRecipientList[$recipientType] = array_unique(array_merge($matches[1], explode(',', preg_replace('~"[^"]+"~', '', $recipientString))));

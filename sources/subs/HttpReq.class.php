@@ -173,10 +173,10 @@ class HttpReq
 		{
 			case isset($this->_param[$key]):
 				return $this->_param[$key];
-			case isset($this->query->$key):
-				return $this->query->$key;
-			case isset($this->post->$key):
-				return $this->post->$key;
+			case isset($this->query->{$key}):
+				return $this->query->{$key};
+			case isset($this->post->{$key}):
+				return $this->post->{$key};
 			default:
 				return null;
 		}
@@ -220,9 +220,9 @@ class HttpReq
 		{
 			case isset($this->_param[$key]):
 				return true;
-			case isset($this->query->$key):
+			case isset($this->query->{$key}):
 				return true;
-			case isset($this->post->$key):
+			case isset($this->post->{$key}):
 				return true;
 			default:
 				return false;
@@ -244,7 +244,7 @@ class HttpReq
 	 *
 	 * - Uses any sanitize rule(s) that can be passed to the Data_Validator class
 	 * - Returned value will be the sanitized value or null of the key is not in $_GET
-	 * - If you just want a value back access it directly as $req->query->$name
+	 * - If you just want a value back access it directly as $req->query->{$name}
 	 *
 	 * @param string $name The key name of the value to return
 	 * @param string|null $sanitize a comma separated list of sanitation rules to apply
@@ -254,9 +254,9 @@ class HttpReq
 	{
 		$this->_param[$name] = $default;
 
-		if (isset($this->query->$name))
+		if (isset($this->query->{$name}))
 		{
-			$this->_param[$name] = $this->query->$name;
+			$this->_param[$name] = $this->query->{$name};
 			$this->_param[$name] = $this->cleanValue($name, $sanitize);
 		}
 
@@ -268,7 +268,7 @@ class HttpReq
 	 *
 	 * - Uses any sanitize rule(s) that can be passed to the Data_Validator class
 	 * - Returned value will be the sanitized value or null of the key is not in $_POST
-	 * - If you just want a value back access it directly as $req->post->$name
+	 * - If you just want a value back access it directly as $req->post->{$name}
 	 *
 	 * @param string $name The key name of the value to return
 	 * @param string|null $sanitize a comma separated list of sanitation rules to apply
@@ -278,9 +278,9 @@ class HttpReq
 	{
 		$this->_param[$name] = $default;
 
-		if (isset($this->post->$name))
+		if (isset($this->post->{$name}))
 		{
-			$this->_param[$name] = $this->post->$name;
+			$this->_param[$name] = $this->post->{$name};
 			$this->_param[$name] = $this->cleanValue($name, $sanitize);
 		}
 
@@ -297,8 +297,8 @@ class HttpReq
 	 */
 	public function getCookie($name = '', $default = null)
 	{
-		if (isset($this->cookie->$name))
-			return $this->cookie->$name;
+		if (isset($this->cookie->{$name}))
+			return $this->cookie->{$name};
 		elseif ($default !== null)
 			return $default;
 		else
@@ -315,8 +315,8 @@ class HttpReq
 	 */
 	public function getSession($name = '', $default = null)
 	{
-		if (isset($this->session->$name))
-			return $this->session->$name;
+		if (isset($this->session->{$name}))
+			return $this->session->{$name};
 		elseif ($default !== null)
 			return $default;
 		else

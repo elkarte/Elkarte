@@ -318,7 +318,7 @@ class Data_Validator
 
 					// Defined method to use?
 					if (is_callable(array($this, $validation_method)))
-						$result = $this->$validation_method($field, $input, $validation_parameters);
+						$result = $this->{$validation_method}($field, $input, $validation_parameters);
 					// Maybe even a custom function set up like a defined one, addons can do this.
 					elseif (is_callable($validation_function) && strpos($validation_function, 'validate_') === 0 && isset($input[$field]))
 						$result = call_user_func_array($validation_function, array_merge((array) $field, (array) $input[$field], $validation_parameters_function));
@@ -450,7 +450,7 @@ class Data_Validator
 
 					// Defined method to use?
 					if (is_callable(array($this, $sanitation_method)))
-						$input[$field] = $this->$sanitation_method($input[$field], $sanitation_parameters);
+						$input[$field] = $this->{$sanitation_method}($input[$field], $sanitation_parameters);
 					// One of our static methods or even a built in php function like strtoupper, intval, etc?
 					elseif (is_callable($sanitation_function))
 						$input[$field] = call_user_func_array($sanitation_function, array_merge((array) $input[$field], $sanitation_parameters_function));

@@ -296,7 +296,7 @@ class Register_Controller extends Action_Controller
 		{
 			if (!is_array($value))
 			{
-				$this->_req->post->$key = htmltrim__recursive(str_replace(array("\n", "\r"), '', $value));
+				$this->_req->post->{$key} = htmltrim__recursive(str_replace(array("\n", "\r"), '', $value));
 			}
 		}
 
@@ -582,20 +582,20 @@ class Register_Controller extends Action_Controller
 
 		// Include the additional options that might have been filled in.
 		foreach ($possible_strings as $var)
-			if (isset($this->_req->post->$var))
-				$extra_register_vars[$var] = Util::htmlspecialchars($this->_req->post->$var, ENT_QUOTES);
+			if (isset($this->_req->post->{$var}))
+				$extra_register_vars[$var] = Util::htmlspecialchars($this->_req->post->{$var}, ENT_QUOTES);
 
 		foreach ($possible_ints as $var)
-			if (isset($this->_req->post->$var))
-				$extra_register_vars[$var] = (int) $this->_req->post->$var;
+			if (isset($this->_req->post->{$var}))
+				$extra_register_vars[$var] = (int) $this->_req->post->{$var};
 
 		foreach ($possible_floats as $var)
-			if (isset($this->_req->post->$var))
-				$extra_register_vars[$var] = (float) $this->_req->post->$var;
+			if (isset($this->_req->post->{$var}))
+				$extra_register_vars[$var] = (float) $this->_req->post->{$var};
 
 		foreach ($possible_bools as $var)
-			if (isset($this->_req->post->$var))
-				$extra_register_vars[$var] = empty($this->_req->post->$var) ? 0 : 1;
+			if (isset($this->_req->post->{$var}))
+				$extra_register_vars[$var] = empty($this->_req->post->{$var}) ? 0 : 1;
 
 		return $extra_register_vars;
 	}
@@ -705,9 +705,9 @@ class Register_Controller extends Action_Controller
 			// We might have had some submissions on this front - go check.
 			foreach ($reg_fields as $field)
 			{
-				if (isset($this->_req->post->$field))
+				if (isset($this->_req->post->{$field}))
 				{
-					$cur_profile[$field] = Util::htmlspecialchars($this->_req->post->$field);
+					$cur_profile[$field] = Util::htmlspecialchars($this->_req->post->{$field});
 				}
 			}
 

@@ -354,10 +354,10 @@ class ManageSecurity_Controller extends Action_Controller
 				$this_list = array();
 				$this_desc = array();
 
-				if (isset($this->_req->post->$list))
+				if (isset($this->_req->post->{$list}))
 				{
 					// Clear blanks from the data field, only grab the comments that don't have blank data value
-					$this_list = array_map('trim', array_filter($this->_req->post->$list));
+					$this_list = array_map('trim', array_filter($this->_req->post->{$list}));
 					$this_desc = array_intersect_key($this->_req->post->{$list . '_desc'}, $this_list);
 				}
 

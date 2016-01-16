@@ -65,9 +65,9 @@ class OpenID_Controller extends Action_Controller
 		// This has annoying habit of removing the + from the base64 encoding.  So lets put them back.
 		foreach (array('openid_assoc_handle', 'openid_invalidate_handle', 'openid_sig', 'sf') as $key)
 		{
-			if (isset($this->_req->query->$key))
+			if (isset($this->_req->query->{$key}))
 			{
-				$this->_req->query->$key = str_replace(' ', '+', $this->_req->query->$key);
+				$this->_req->query->{$key} = str_replace(' ', '+', $this->_req->query->{$key});
 			}
 		}
 
@@ -144,7 +144,7 @@ class OpenID_Controller extends Action_Controller
 				if (!empty($openid_save_fields))
 				{
 					foreach ($openid_save_fields as $id => $value)
-						$this->_req->post->$id = $value;
+						$this->_req->post->{$id} = $value;
 				}
 
 				$controller = new Register_Controller(new Event_Manager());
@@ -207,7 +207,7 @@ class OpenID_Controller extends Action_Controller
 		foreach ($signed as $sign)
 		{
 			$sign_key = 'openid_' . str_replace('.', '_', $sign);
-			$verify_str .= $sign . ':' . strtr($this->_req->query->$sign_key, array('&amp;' => '&')) . "\n";
+			$verify_str .= $sign . ':' . strtr($this->_req->query->{$sign_key}, array('&amp;' => '&')) . "\n";
 		}
 
 		$verify_str = base64_encode(hash_hmac('sha1', $verify_str, $this->_secret, true));

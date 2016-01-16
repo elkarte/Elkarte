@@ -488,10 +488,10 @@ class ManageNews_Controller extends Action_Controller
 			foreach ($toClean as $key => $type)
 			{
 				// Remove the quotes.
-				$temp = strtr((string) $this->_req->post->$type, array('\\"' => '"'));
+				$temp = strtr((string) $this->_req->post->{$type}, array('\\"' => '"'));
 
 				// Break it up in to an array for processing
-				preg_match_all('~"([^"]+)"~', $this->_req->post->$type, $matches);
+				preg_match_all('~"([^"]+)"~', $this->_req->post->{$type}, $matches);
 				$temp = array_unique(array_merge($matches[1], explode(',', preg_replace('~"[^"]+"~', '', $temp))));
 
 				// Clean the valid ones, drop the mangled ones
@@ -504,7 +504,7 @@ class ManageNews_Controller extends Action_Controller
 				}
 
 				// Find the members
-				$this->$key = array_keys(findMembers($temp));
+				$this->{$key} = array_keys(findMembers($temp));
 			}
 		}
 	}
