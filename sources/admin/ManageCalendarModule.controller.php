@@ -278,7 +278,7 @@ class ManageCalendarModule_Controller extends Action_Controller
 
 		// Submitting?
 
-		if (isset($this->_req->post->$context['session_var']) && (isset($this->_req->post->delete) || $this->_req->post->title != ''))
+		if (isset($this->_req->post->{$context['session_var']}) && (isset($this->_req->post->delete) || $this->_req->post->title != ''))
 		{
 			checkSession();
 

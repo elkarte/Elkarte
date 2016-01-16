@@ -457,7 +457,7 @@ class Emailuser_Controller extends Action_Controller
 		);
 
 		// If they're posting, it should be processed by action_reporttm2.
-		if ((isset($this->_req->post->$context['session_var']) || isset($this->_req->post->save)) && !$report_errors->hasErrors())
+		if ((isset($this->_req->post->{$context['session_var']}) || isset($this->_req->post->save)) && !$report_errors->hasErrors())
 			$this->action_reporttm2();
 
 		// We need a message ID to check!

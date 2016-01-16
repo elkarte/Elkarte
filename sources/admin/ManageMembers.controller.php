@@ -283,8 +283,8 @@ class ManageMembers_Controller extends Action_Controller
 				$search_params['types'] = $this->_req->post->types;
 				foreach ($params as $param_name => $param_info)
 				{
-					if (isset($this->_req->post->$param_name))
-						$search_params[$param_name] = $this->_req->post->$param_name;
+					if (isset($this->_req->post->{$param_name}))
+						$search_params[$param_name] = $this->_req->post->{$param_name};
 				}
 			}
 

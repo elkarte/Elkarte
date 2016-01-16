@@ -160,7 +160,7 @@ class simple_html_dom_node
 		{
 			echo '(';
 			foreach ($this->attr as $k=>$v)
-				echo "[$k]=>\"".$this->$k.'", ';
+				echo "[$k]=>\"".$this->{$k}.'", ';
 			echo ')';
 		}
 		echo "\n";
@@ -185,7 +185,7 @@ class simple_html_dom_node
 			$string .= '(';
 			foreach ($this->attr as $k=>$v)
 			{
-				$string .= "[$k]=>\"".$this->$k.'", ';
+				$string .= "[$k]=>\"".$this->{$k}.'", ';
 			}
 			$string .= ')';
 		}

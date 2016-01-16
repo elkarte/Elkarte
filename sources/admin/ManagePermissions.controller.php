@@ -1099,7 +1099,7 @@ class ManagePermissions_Controller extends Action_Controller
 			{
 				foreach ($mappings as $index => $data)
 				{
-					$temp = $this->_req->post->$index;
+					$temp = $this->_req->post->{$index};
 					if (isset($temp[$group['id']]))
 					{
 						if ($temp[$group['id']] == 'allow')

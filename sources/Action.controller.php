@@ -190,7 +190,7 @@ abstract class Action_Controller
 	{
 		if (property_exists($this, $dep))
 		{
-			$dependencies[$dep] = &$this->$dep;
+			$dependencies[$dep] = &$this->{$dep};
 		}
 		elseif (property_exists($this, '_' . $dep))
 		{

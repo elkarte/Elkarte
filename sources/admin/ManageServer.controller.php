@@ -421,7 +421,7 @@ class ManageServer_Controller extends Action_Controller
 				elseif ($key == 'loadavg_forum' && $value < 10)
 					$this->_req->post->loadavg_forum = '10.0';
 				elseif ($value < 2)
-					$this->_req->$key = '2.0';
+					$this->_req->{$key} = '2.0';
 			}
 
 			call_integration_hook('integrate_save_loadavg_settings');

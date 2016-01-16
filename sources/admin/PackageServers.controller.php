@@ -387,7 +387,7 @@ class PackageServers_Controller extends Action_Controller
 
 			// Find the requested package by section and number, make sure it matches
 			$section = $this->_req->query->section;
-			$section = $listing->$section;
+			$section = $listing->{$section};
 
 			// This is what they requested, yes?
 			if (basename($section[$this->_req->query->num]->server[0]->download) === $this->_req->query->package)

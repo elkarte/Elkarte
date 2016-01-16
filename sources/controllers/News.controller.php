@@ -190,8 +190,8 @@ class News_Controller extends Action_Controller
 		$cachekey = array($xml_format, $this->_req->query->action, $this->_limit, $subAction);
 		foreach (array('board', 'boards', 'c') as $var)
 		{
-			if (isset($this->_req->query->$var))
-				$cachekey[] = $this->_req->query->$var;
+			if (isset($this->_req->query->{$var}))
+				$cachekey[] = $this->_req->query->{$var};
 		}
 
 		$cachekey = md5(serialize($cachekey) . (!empty($this->_query_this_board) ? $this->_query_this_board : ''));
@@ -245,9 +245,9 @@ class News_Controller extends Action_Controller
 			$url_parts = array();
 			foreach (array('board', 'boards', 'c') as $var)
 			{
-				if (isset($this->_req->query->$var))
+				if (isset($this->_req->query->{$var}))
 				{
-					$url_parts[] = $var . '=' . (is_array( $this->_req->query->$var) ? implode(',',  $this->_req->query->$var) : $this->_req->query->$var);
+					$url_parts[] = $var . '=' . (is_array( $this->_req->query->{$var}) ? implode(',',  $this->_req->query->{$var}) : $this->_req->query->{$var});
 				}
 			}
 

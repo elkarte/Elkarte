@@ -164,7 +164,7 @@ class Xml_Controller extends Action_Controller
 					$feature = $context['features'][$id];
 					$feature_id = 'feature_' . $id;
 					$returns[] = array(
-						'value' => (!empty($this->_req->post->$feature_id) && $feature['url'] ? '<a href="' . $feature['url'] . '">' . $feature['title'] . '</a>' : $feature['title']),
+						'value' => (!empty($this->_req->post->{$feature_id}) && $feature['url'] ? '<a href="' . $feature['url'] . '">' . $feature['title'] . '</a>' : $feature['title']),
 					);
 
 					createToken('admin-core', 'post');

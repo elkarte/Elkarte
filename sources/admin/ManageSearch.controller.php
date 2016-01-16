@@ -274,7 +274,7 @@ class ManageSearch_Controller extends Action_Controller
 
 			$changes = array();
 			foreach ($factors as $factor)
-				$changes[$factor] = (int) $this->_req->post->$factor;
+				$changes[$factor] = (int) $this->_req->post->{$factor};
 
 			updateSettings($changes);
 		}
