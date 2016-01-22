@@ -16,7 +16,7 @@ if (!defined('ELK'))
 	die('No access...');
 
 /**
- * Class Random_Hash
+ * Class Token_Hash
  *
  * Used to generate a high entropy random hash for use in one time use forms
  *
