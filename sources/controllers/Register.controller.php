@@ -44,7 +44,7 @@ class Register_Controller extends Action_Controller
 	private $_row;
 
 	/**
-	 * Pre Dispatch, called before other methods.  Loads HttpReq instance.
+	 * Pre Dispatch, called before other methods.
 	 */
 	public function pre_dispatch()
 	{

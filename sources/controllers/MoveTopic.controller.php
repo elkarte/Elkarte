@@ -50,7 +50,7 @@ class MoveTopic_Controller extends Action_Controller
 	private $_toboard;
 
 	/**
-	 * Pre Dispatch, called before other methods.  Loads HttpReq instance.
+	 * Pre Dispatch, called before other methods.
 	 */
 	public function pre_dispatch()
 	{

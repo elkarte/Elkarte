@@ -35,7 +35,7 @@ class RemoveTopic_Controller extends Action_Controller
 	private $_topic_info;
 
 	/**
-	 * Pre Dispatch, called before other methods.  Loads HttpReq instance.
+	 * Pre Dispatch, called before other methods.
 	 */
 	public function pre_dispatch()
 	{

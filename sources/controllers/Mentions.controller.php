@@ -174,7 +174,6 @@ class Mentions_Controller extends Action_Controller
 	 */
 	public function action_index()
 	{
-		$req = HttpReq::instance();
 		if ($req->getQuery('sa') === 'fetch')
 		{
 			$this->action_fetch();

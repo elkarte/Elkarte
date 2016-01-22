@@ -32,7 +32,6 @@ class Announce_Controller extends Action_Controller
 	 * checks the topic announcement permissions and loads the announcement template.
 	 * requires the announce_topic permission.
 	 * uses the Announce template and Post language file.
-	 * Loads HttpReq instance
 	 */
 	public function pre_dispatch()
 	{
