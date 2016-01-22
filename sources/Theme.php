@@ -10,15 +10,17 @@
  * This software is a derived product, based on:
  *
  * Simple Machines Forum (SMF)
- * copyright:	2011 Simple Machines (http://www.simplemachines.org)
- * license:		BSD, See included LICENSE.TXT for terms and conditions.
+ * copyright:    2011 Simple Machines (http://www.simplemachines.org)
+ * license:        BSD, See included LICENSE.TXT for terms and conditions.
  *
  * @version 1.1 dev
  *
  */
 
 if (!defined('ELK'))
+{
 	die('No access...');
+}
 
 abstract class Theme
 {
@@ -35,8 +37,8 @@ abstract class Theme
 	protected $links = array();
 	protected $js_files = array();
 	protected $js_inline = array(
-		'standard'  => array(),
-		'defer'	 => array()
+		'standard' => array(),
+		'defer' => array()
 	);
 	protected $js_vars = array();
 	protected $css_files = array();
@@ -64,7 +66,9 @@ abstract class Theme
 	public function addJavascriptVar($vars, $escape = false)
 	{
 		if (empty($vars) || !is_array($vars))
+		{
 			return;
+		}
 
 		foreach ($vars as $key => $value)
 			$this->js_vars[$key] = !empty($escape) ? JavaScriptEscape($value) : $value;
@@ -77,6 +81,7 @@ abstract class Theme
 
 	/**
 	 * @param int|self::ALL $type One of ALL, SELF, DEFERRED class constants
+	 *
 	 * @return array
 	 * @throws Exception if the type is not known
 	 */
@@ -109,12 +114,15 @@ abstract class Theme
 	function addInlineJavascript($javascript, $defer = false)
 	{
 		if (!empty($javascript))
+		{
 			$this->js_inline[(!empty($defer) ? self::DEFERRED : self::STANDARD)][] = $javascript;
+		}
 	}
 
 	public function setRTL($toggle)
 	{
 		$this->rtl = (bool) $toggle;
+
 		return $this;
 	}
 }
