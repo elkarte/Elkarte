@@ -23,7 +23,8 @@ if (!defined('ELK'))
 	die('No access...');
 
 /**
- * MergeTopics_Controller class.  Merges two or more topics into a single topic.
+ * MergeTopics_Controller class.
+ * Merges two or more topics into a single topic.
  */
 class MergeTopics_Controller extends Action_Controller
 {

@@ -22,8 +22,8 @@ if (!defined('ELK'))
 	die('No access...');
 
 /**
- * Auth_Controller class, deals with logging in and out members,
- * and the validation of them
+ * Auth_Controller class.
+ * Deals with logging in and out members, and the validation of them
  *
  * @package Authorization
  */
@@ -49,6 +49,7 @@ class Auth_Controller extends Action_Controller
 	 *  - Shows a page for the user to type in their username and password.
 	 *  - It caches the referring URL in $_SESSION['login_url'].
 	 *  - It is accessed from ?action=login.
+	 *
 	 *  @uses Login template and language file with the login sub-template.
 	 */
 	public function action_login()
@@ -98,7 +99,8 @@ class Auth_Controller extends Action_Controller
 	 * - Upgrades password encryption on login, if necessary.
 	 * - After successful login, redirects you to $_SESSION['login_url'].
 	 * - Accessed from ?action=login2, by forms.
-	 * - On error, uses the same templates action_login() uses.
+	 *
+	 * @uses the same templates action_login()
 	 */
 	public function action_login2()
 	{
@@ -166,7 +168,7 @@ class Auth_Controller extends Action_Controller
 		}
 
 		// You forgot to type your username, dummy!
-		if (!isset($_POST['user']) || $_POST['user'] == '')
+		if (!isset($_POST['user']) || $_POST['user'] === '')
 		{
 			$context['login_errors'] = array($txt['need_username']);
 			return false;
@@ -185,7 +187,7 @@ class Auth_Controller extends Action_Controller
 		}
 
 		// Hmm... maybe 'admin' will login with no password. Uhh... NO!
-		if ((!isset($_POST['passwrd']) || $_POST['passwrd'] == '') && (!isset($_POST['hash_passwrd']) || strlen($_POST['hash_passwrd']) != 64))
+		if ((!isset($_POST['passwrd']) || $_POST['passwrd'] === '') && (!isset($_POST['hash_passwrd']) || strlen($_POST['hash_passwrd']) != 64))
 		{
 			$context['login_errors'] = array($txt['no_password']);
 			return false;
@@ -342,7 +344,7 @@ class Auth_Controller extends Action_Controller
 		}
 
 		// Correct password, but they've got no salt; fix it!
-		if ($user_settings['password_salt'] == '')
+		if ($user_settings['password_salt'] === '')
 		{
 			$tokenizer = new Token_Hash();
 			$user_settings['password_salt'] = $tokenizer->generate_hash(4);
@@ -443,7 +445,8 @@ class Auth_Controller extends Action_Controller
 	 *
 	 * What it does:
 	 * - It sets $_SESSION['login_url'] to $_SERVER['REQUEST_URL'].
-	 * - It uses the 'kick_guest' sub template found in Login.template.php.
+	 *
+	 * @uses 'kick_guest' sub template found in Login.template.php.
 	 */
 	public function action_kickguest()
 	{
@@ -551,7 +554,7 @@ class Auth_Controller extends Action_Controller
 		$other_passwords = array();
 
 		// None of the below cases will be used most of the time (because the salt is normally set.)
-		if (!empty($modSettings['enable_password_conversion']) && $user_settings['password_salt'] == '')
+		if (!empty($modSettings['enable_password_conversion']) && $user_settings['password_salt'] === '')
 		{
 			// YaBB SE, Discus, MD5 (used a lot), SHA-1 (used some), SMF 1.0.x, IkonBoard, and none at all.
 			$other_passwords[] = crypt($_POST['passwrd'], substr($_POST['passwrd'], 0, 2));

@@ -21,7 +21,8 @@ if (!defined('ELK'))
 	die('No access...');
 
 /**
- * Class to handle the help page and boxes
+ * Help_Controller Class
+ * Handles the help page and boxes
  */
 class Help_Controller extends Action_Controller
 {
@@ -46,8 +47,11 @@ class Help_Controller extends Action_Controller
 
 	/**
 	 * Prepares the help page.
-	 * Uses Help template and Manual language file.
-	 * It is accessed by ?action=help.
+	 *
+	 * What it does:
+	 * - It is accessed by ?action=help.
+	 *
+	 * @uses Help template and Manual language file.
 	 */
 	public function action_help()
 	{
@@ -86,10 +90,12 @@ class Help_Controller extends Action_Controller
 
 	/**
 	 * Show boxes with more detailed help on items, when the user clicks on their help icon.
-	 * It handles both administrative or user help.
-	 * Data: $_GET['help'] parameter, it holds what string to display
+	 *
+	 * What it does
+	 * - It handles both administrative or user help.
+	 * - Data: $_GET['help'] parameter, it holds what string to display
 	 * and where to get the string from. ($helptxt or $txt)
-	 * It is accessed via ?action=quickhelp;help=?.
+	 * - It is accessed via ?action=quickhelp;help=?.
 	 *
 	 * @uses ManagePermissions language file, if the help starts with permissionhelp.
 	 * @uses Help template, 'popup' sub-template.

@@ -22,7 +22,8 @@ if (!defined('ELK'))
 	die('No access...');
 
 /**
- * Emailuser_Controller class, allows for sending topics via email
+ * Emailuser_Controller class.
+ * Allows for sending topics via email
  */
 class Emailuser_Controller extends Action_Controller
 {
@@ -55,10 +56,11 @@ class Emailuser_Controller extends Action_Controller
 	 * Send a topic to a friend.
 	 *
 	 * What it does:
-	 * - Uses the Emailuser template, with the main sub template.
 	 * - Requires the send_topic permission.
 	 * - Redirects back to the first page of the topic when done.
 	 * - Is accessed via ?action=emailuser;sa=sendtopic.
+	 *
+	 * @uses the Emailuser template, with the main sub template.
 	 */
 	public function action_sendtopic()
 	{

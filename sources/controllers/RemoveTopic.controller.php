@@ -24,7 +24,8 @@ if (!defined('ELK'))
 }
 
 /**
- * Remove Topic Controller
+ * RemoveTopic_Controller Class
+ * Handles the deletion of topics, posts
  */
 class RemoveTopic_Controller extends Action_Controller
 {

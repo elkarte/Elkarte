@@ -24,7 +24,7 @@ if (!defined('ELK'))
 	die('No access...');
 
 /**
- * Message Index Controller
+ * MessageIndex_Controller class
  */
 class MessageIndex_Controller extends Action_Controller implements Frontpage_Interface
 {
@@ -93,7 +93,9 @@ class MessageIndex_Controller extends Action_Controller implements Frontpage_Int
 
 		$boards = array();
 		foreach ($boards_list as $board)
+		{
 			$boards[$board['id_board']] = $board['cat_name'] . ' - ' . $board['board_name'];
+		}
 
 		return $boards;
 	}
@@ -193,8 +195,8 @@ class MessageIndex_Controller extends Action_Controller implements Frontpage_Int
 			$sort_string = ';sort=' . $this->_req->query->sort . (isset($this->_req->query->desc) ? ';desc' : '');
 		else
 			$sort_string = '';
-		$context['page_index'] = constructPageIndex($scripturl . '?board=' . $board . '.%1$d' . $sort_string, $this->_req->query->start, $board_info['total_topics'], $maxindex, true);
 
+		$context['page_index'] = constructPageIndex($scripturl . '?board=' . $board . '.%1$d' . $sort_string, $this->_req->query->start, $board_info['total_topics'], $maxindex, true);
 		$context['start'] = &$this->_req->query->start;
 
 		// Set a canonical URL for this page.
@@ -248,12 +250,18 @@ class MessageIndex_Controller extends Action_Controller implements Frontpage_Int
 			{
 				// We've seen all these boards now!
 				foreach ($board_info['parent_boards'] as $k => $dummy)
+				{
 					if (isset($_SESSION['topicseen_cache'][$k]))
+					{
 						unset($_SESSION['topicseen_cache'][$k]);
+					}
+				}
 			}
 
 			if (isset($_SESSION['topicseen_cache'][$board]))
+			{
 				unset($_SESSION['topicseen_cache'][$board]);
+			}
 
 			// From now on, they've seen it. So we reset notifications.
 			$context['is_marked_notify'] = resetSentBoardNotification($user_info['id'], $board);
@@ -317,10 +325,12 @@ class MessageIndex_Controller extends Action_Controller implements Frontpage_Int
 		$txt['starter'] = $txt['started_by'];
 
 		foreach ($sort_methods as $key => $val)
+		{
 			$context['topics_headers'][$key] = array(
 				'url' => $scripturl . '?board=' . $context['current_board'] . '.' . $context['start'] . ';sort=' . $key . ($context['sort_by'] == $key && $context['sort_direction'] === 'up' ? ';desc' : ''),
 				'sort_dir_img' => $context['sort_by'] == $key ? '<img class="sort" src="' . $settings['images_url'] . '/sort_' . $context['sort_direction'] . '.png" alt="" title="' . $context['sort_title'] . '" />' : '',
 			);
+		}
 
 		// Calculate the fastest way to get the topics.
 		$start = (int) $this->_req->query->start;

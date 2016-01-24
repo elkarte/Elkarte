@@ -20,6 +20,7 @@
 /**
  * Attachment_Controller class.
  *
+ * What it does:
  * - Handles the downloading of an attachment or avatar
  * - Handles the uploading of attachments via Ajax
  * - increments the download count where applicable
@@ -332,11 +333,17 @@ class Attachment_Controller extends Action_Controller
 		{
 			$req = request();
 			if (strpos($req->user_agent(), 'Windows') !== false)
-				$callback = function ($buffer) {return preg_replace('~[\r]?\n~', "\r\n", $buffer);};
+				$callback = function ($buffer) {
+					return preg_replace('~[\r]?\n~', "\r\n", $buffer);
+				};
 			elseif (strpos($req->user_agent(), 'Mac') !== false)
-				$callback = function ($buffer) {return preg_replace('~[\r]?\n~', "\r", $buffer);};
+				$callback = function ($buffer) {
+					return preg_replace('~[\r]?\n~', "\r", $buffer);
+				};
 			else
-				$callback = function ($buffer) {return preg_replace('~[\r]?\n~', "\n", $buffer);};
+				$callback = function ($buffer) {
+					return preg_replace('~[\r]?\n~', "\n", $buffer);
+				};
 		}
 
 		// Since we don't do output compression for files this large...
@@ -401,6 +408,7 @@ class Attachment_Controller extends Action_Controller
 
 				if (empty($attachment))
 					Errors::instance()->fatal_lang_error('no_access', false);
+
 				list ($id_folder, $real_filename, $file_hash, $file_ext, $id_attach, $attachment_type, $mime_type, $is_approved, $id_member) = $attachment;
 
 				// If it isn't yet approved, do they have permission to view it?
@@ -482,7 +490,6 @@ class Attachment_Controller extends Action_Controller
 		header('Accept-Ranges: bytes');
 		header('Connection: close');
 		header('ETag: ' . $eTag);
-
 		header('Content-Type: ' . strtr($mime_type, array('image/bmp' => 'image/x-ms-bmp')));
 
 		// Different browsers like different standards...

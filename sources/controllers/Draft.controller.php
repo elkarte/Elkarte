@@ -53,8 +53,12 @@ class Draft_Controller extends Action_Controller
 
 	/**
 	 * Show all drafts of a given type by the current user
-	 * Uses the showdrafts template
-	 * Allows for the deleting and loading/editing of drafts
+	 *
+	 * What it does:
+	 * - Allows for the deleting and loading/editing of drafts
+	 *
+	 * @uses the showdrafts template
+	 *
 	 */
 	public function action_showProfileDrafts()
 	{
@@ -151,8 +155,11 @@ class Draft_Controller extends Action_Controller
 
 	/**
 	 * Show all PM drafts of the current user
-	 * Uses the showPMDrafts template
-	 * Allows for the deleting and loading/editing of PM drafts
+	 *
+	 * What it does:
+	 * - Allows for the deleting and loading/editing of PM drafts
+	 *
+	 * @uses the showPMDrafts template
 	 */
 	public function action_showPMDrafts()
 	{
@@ -247,7 +254,7 @@ class Draft_Controller extends Action_Controller
 	 * The function redirects to a selected location.
 	 *
 	 * @param string $redirect - The url to redirect to after the drafts have
-	 *               been deleted
+	 * been deleted
 	 */
 	private function _action_delete($redirect = '')
 	{

@@ -21,7 +21,8 @@ if (!defined('ELK'))
 	die('No access...');
 
 /**
- * Reminder Controller handles sending out reminders, and checking the secret answer and question.
+ * Reminder_Controller Class
+ * Handles sending out reminders, and checking the secret answer and question.
  */
 class Reminder_Controller extends Action_Controller
 {

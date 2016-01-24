@@ -21,8 +21,7 @@ if (!defined('ELK'))
 	die('No access...');
 
 /**
- * ProfileAccount controller handles actions made on a user's profile.
- *
+ * ProfileAccount_Controller Class
  * Processes user warnings, account activation and account deletion
  */
 class ProfileAccount_Controller extends Action_Controller
@@ -400,7 +399,7 @@ class ProfileAccount_Controller extends Action_Controller
 
 			// There must be a reason, and use of flowery words is allowed.
 			$warn_reason = $this->_req->getPost('warn_reason', 'trim|Util::htmlspecialchars', '');
-			if ($warn_reason == '' && !$context['user']['is_owner'])
+			if ($warn_reason === '' && !$context['user']['is_owner'])
 			{
 				$this->_issueErrors[] = 'warning_no_reason';
 			}
@@ -580,7 +579,7 @@ class ProfileAccount_Controller extends Action_Controller
 				require_once(SUBSDIR . '/Messages.subs.php');
 
 				// First off we delete any topics the member has started - if they wanted topics being done.
-				if ($this->_req->post->remove_type == 'topics')
+				if ($this->_req->post->remove_type === 'topics')
 				{
 					// Fetch all topics started by this user.
 					$topicIDs = topicsStartedBy($this->_memID);

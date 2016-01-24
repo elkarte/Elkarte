@@ -21,7 +21,8 @@ if (!defined('ELK'))
 	die('No access...');
 
 /**
- * Spell check Controller
+ * Spellcheck_Controller Class
+ * Handles the initialization pspell and spellchecker processing
  */
 class Spellcheck_Controller extends Action_Controller
 {
@@ -59,6 +60,7 @@ class Spellcheck_Controller extends Action_Controller
 	 * - It uses the pspell library, which MUST be installed.
 	 * - It has problems with internationalization.
 	 * - It is accessed via ?action=spellcheck.
+	 * - Triggers the prepare_spellcheck event
 	 */
 	public function action_index()
 	{

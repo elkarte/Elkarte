@@ -21,7 +21,8 @@ if (!defined('ELK'))
 	die('No access...');
 
 /**
- * Recent Post Controller, retrieve information about recent posts
+ * Recent_Controller Class
+ * Retrieve information about recent posts
  */
 class Recent_Controller extends Action_Controller
 {

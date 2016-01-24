@@ -21,7 +21,8 @@ if (!defined('ELK'))
 	die('No access...');
 
 /**
- * Moderation Center Controller
+ * ModerationCenter_Controller Class
+ * Provides overview of moderation items to the team
  */
 class ModerationCenter_Controller extends Action_Controller
 {
@@ -387,8 +388,8 @@ class ModerationCenter_Controller extends Action_Controller
 		$context['notice_body'] = $parser->parseNotice($context['notice_body']);
 		$context['page_title'] = $txt['show_notice'];
 		$context['sub_template'] = 'show_notice';
-		Template_Layers::getInstance()->removeAll();
 
+		Template_Layers::getInstance()->removeAll();
 		loadTemplate('ModerationCenter');
 	}
 
@@ -425,7 +426,7 @@ class ModerationCenter_Controller extends Action_Controller
 
 		// This should not be needed...
 		$show_pms = false;
-		if ($context['admin_area'] == 'pm_reports')
+		if ($context['admin_area'] === 'pm_reports')
 		{
 			$show_pms = true;
 			isAllowedTo('admin_forum');
@@ -789,7 +790,7 @@ class ModerationCenter_Controller extends Action_Controller
 
 		// This should not be needed...
 		$show_pms = false;
-		if ($context['admin_area'] == 'pm_reports')
+		if ($context['admin_area'] === 'pm_reports')
 		{
 			$show_pms = true;
 			isAllowedTo('admin_forum');
@@ -993,7 +994,7 @@ class ModerationCenter_Controller extends Action_Controller
 
 		// Finally we are done :P
 		loadTemplate('ModerationCenter');
-		if ($context['admin_area'] == 'pm_reports')
+		if ($context['admin_area'] === 'pm_reports')
 		{
 			$context['page_title'] = sprintf($txt['mc_view_pmreport'], $context['report']['author']['name']);
 			$context['section_title'] = sprintf($txt['mc_view_pmreport'], $context['report']['author']['link']);
@@ -1669,7 +1670,7 @@ class ModerationCenter_Controller extends Action_Controller
 		global $context, $user_info;
 
 		// Make sure they can even moderate someone!
-		if ($user_info['mod_cache']['gq'] == '0=1')
+		if ($user_info['mod_cache']['gq'] === '0=1')
 			return 'group_requests_block';
 
 		$context['group_requests'] = groupRequests();
@@ -1830,7 +1831,7 @@ class ModerationCenter_Controller extends Action_Controller
 	{
 		global $context, $user_info, $scripturl;
 
-		if ($user_info['mod_cache']['bq'] == '0=1')
+		if ($user_info['mod_cache']['bq'] === '0=1')
 			return 'reported_posts_block';
 
 		$context['reported_posts'] = array();

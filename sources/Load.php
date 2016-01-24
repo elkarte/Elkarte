@@ -1420,6 +1420,7 @@ function loadTheme($id_theme = 0, $initialize = true)
 	if (!isset($txt))
 		$txt = array();
 
+	// Load the basic layers
 	theme()->loadDefaultLayers();
 
 	// Defaults in case of odd things

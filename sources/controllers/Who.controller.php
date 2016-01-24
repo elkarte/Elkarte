@@ -22,12 +22,15 @@ if (!defined('ELK'))
 	die('No access...');
 
 /**
- * Who Controller
+ * Who_Controller Class
+ * I woke up in a Soho doorway A policeman knew my name He said "You can go sleep at home
+ * tonight If you can get up and walk away"
  */
 class Who_Controller extends Action_Controller
 {
 	/**
-	 * Default action of this class.
+	 * Default action of this class
+	 *
 	 * Accessed with ?action=who
 	 */
 	public function action_index()
@@ -200,6 +203,7 @@ class Who_Controller extends Action_Controller
 		if (!empty($modSettings['show_spider_online']) && ($modSettings['show_spider_online'] == 2 || allowedTo('admin_forum')) && !empty($modSettings['spider_name_cache']))
 		{
 			foreach (unserialize($modSettings['spider_name_cache']) as $id => $name)
+			{
 				$spiderContext[$id] = array(
 					'id' => 0,
 					'name' => $name,
@@ -209,6 +213,7 @@ class Who_Controller extends Action_Controller
 					'email' => $name,
 					'is_guest' => true
 				);
+			}
 		}
 
 		require_once(SUBSDIR . '/Who.subs.php');

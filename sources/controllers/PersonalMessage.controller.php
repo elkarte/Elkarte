@@ -25,8 +25,8 @@ if (!defined('ELK'))
 }
 
 /**
- * Personal Message Controller, It allows viewing, sending, deleting, and
- * marking personal messages
+ * PersonalMessage_Controller class
+ * It allows viewing, sending, deleting, and marking personal messages
  *
  * @package PersonalMessage
  */
@@ -34,9 +34,8 @@ class PersonalMessage_Controller extends Action_Controller
 {
 	/**
 	 * $_search_params will carry all settings that differ from the default
-	 * search parameters.
-	 * That way, the URLs involved in a search page will be kept as short
-	 * as possible.
+	 * search parameters. That way, the URLs involved in a search page will
+	 * be kept as short as possible.
 	 * @var array
 	 */
 	private $_search_params = array();

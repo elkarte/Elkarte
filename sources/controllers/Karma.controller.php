@@ -21,7 +21,8 @@ if (!defined('ELK'))
 	die('No access...');
 
 /**
- * Karma_Controller class, can give good or bad karma so watch out!
+ * Karma_Controller class,
+ * Can give good or bad karma so watch out!
  *
  * @package Karma
  */
@@ -49,10 +50,12 @@ class Karma_Controller extends Action_Controller
 
 	/**
 	 * Modify a user's karma.
-	 * It redirects back to the referrer afterward, whether by javascript or the passed parameters.
-	 * Requires the karma_edit permission, and that the user isn't a guest.
-	 * It depends on the karmaMode, karmaWaitTime, and karmaTimeRestrictAdmins settings.
-	 * It is accessed via ?action=karma, sa=smite or sa=applaud.
+	 *
+	 * What it does:
+	 * - It redirects back to the referrer afterward, whether by javascript or the passed parameters.
+	 * - Requires the karma_edit permission, and that the user isn't a guest.
+	 * - It depends on the karmaMode, karmaWaitTime, and karmaTimeRestrictAdmins settings.
+	 * - It is accessed via ?action=karma, sa=smite or sa=applaud.
 	 */
 	public function action_applaud()
 	{

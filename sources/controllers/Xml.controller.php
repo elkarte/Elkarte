@@ -15,8 +15,9 @@ if (!defined('ELK'))
 	die('No access...');
 
 /**
- * Xml controller receives XMLhttp requests of various types.
- * (jump to, message and group icons, core features)
+ * Xml_Controller Class
+ * Receives XMLhttp requests of various types such as
+ * jump to, message and group icons, core features, drag and drop ordering
  */
 class Xml_Controller extends Action_Controller
 {
@@ -72,7 +73,9 @@ class Xml_Controller extends Action_Controller
 		{
 			$context['categories'][$id_cat]['name'] = un_htmlspecialchars(strip_tags($cat['name']));
 			foreach ($cat['boards'] as $id_board => $board)
+			{
 				$context['categories'][$id_cat]['boards'][$id_board]['name'] = un_htmlspecialchars(strip_tags($board['name']));
+			}
 		}
 
 		$context['sub_template'] = 'jump_to';
@@ -86,8 +89,8 @@ class Xml_Controller extends Action_Controller
 		global $context, $board;
 
 		require_once(SUBSDIR . '/Editor.subs.php');
-		$context['icons'] = getMessageIcons($board);
 
+		$context['icons'] = getMessageIcons($board);
 		$context['sub_template'] = 'message_icons';
 	}
 
@@ -463,8 +466,10 @@ class Xml_Controller extends Action_Controller
 
 	/**
 	 * Reorders the smileys from a drag/drop event
-	 * Will move them from post to popup location and visa-versa
-	 * Will move them to new rows
+	 *
+	 * What it does:
+	 * - Will move them from post to popup location and visa-versa
+	 * - Will move them to new rows
 	 */
 	public function action_smileyorder()
 	{

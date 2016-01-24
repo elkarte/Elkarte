@@ -23,7 +23,8 @@ if (!defined('ELK'))
 	die('No access...');
 
 /**
- * Profile_Controller class has the job of showing and editing people's profiles.
+ * Profile_Controller class
+ * Has the job of showing and editing people's profiles.
  */
 class Profile_Controller extends Action_Controller
 {
@@ -77,6 +78,8 @@ class Profile_Controller extends Action_Controller
 
 	/**
 	 * Allow the change or view of profiles.
+	 *
+	 * - Fires the pre_load event
 	 *
 	 * @see Action_Controller::action_index()
 	 */

@@ -23,7 +23,8 @@ if (!defined('ELK'))
 }
 
 /**
- * Unread posts and replies Controller
+ * Unread_Controller Class
+ * Handles the finding of Unread posts and replies
  */
 class Unread_Controller extends Action_Controller
 {
@@ -166,12 +167,13 @@ class Unread_Controller extends Action_Controller
 	 */
 	public function action_index()
 	{
-		// Figure out what action to do
+		// Figure out what action to do .. Thinking, Thinking, OK unread
 		$this->action_unread();
 	}
 
 	/**
 	 * Find unread topics.
+	 *
 	 * Accessed by action=unread
 	 */
 	public function action_unread()

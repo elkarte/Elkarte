@@ -21,7 +21,8 @@ if (!defined('ELK'))
 	die('No access...');
 
 /**
- * ProfileHistory Controller, show a users login, profile edits, IP history
+ * ProfileHistory_Controller
+ * Show a users login, profile edits, IP history
  */
 class ProfileHistory_Controller extends Action_Controller
 {

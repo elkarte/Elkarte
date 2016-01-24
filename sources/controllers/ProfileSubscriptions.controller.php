@@ -21,6 +21,7 @@ if (!defined('ELK'))
 	die('No access...');
 
 /**
+ * ProfileSubscriptions_Controller Class
  * This class handles the paid subscriptions on a user's profile.
  */
 class ProfileSubscriptions_Controller extends Action_Controller

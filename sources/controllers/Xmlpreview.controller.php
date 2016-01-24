@@ -14,7 +14,8 @@ if (!defined('ELK'))
 	die('No access...');
 
 /**
- * This class handles requests for previews of an item, in an ajax enabled template.
+ * XmlPreview_Controller Class.
+ * Handles requests for previews of an item, in an ajax enabled template.
  */
 class XmlPreview_Controller extends Action_Controller
 {

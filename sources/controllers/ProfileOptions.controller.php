@@ -23,7 +23,8 @@ if (!defined('ELK'))
 	die('No access...');
 
 /**
- * ProfileOptions_Controller class. Does the job of showing and editing people's profiles.
+ * ProfileOptions_Controller Class.
+ * Does the job of showing and editing people's profiles.
  * Interface to buddy list, ignore list, notifications, authentication options, forum profile
  * account settings, etc
  */

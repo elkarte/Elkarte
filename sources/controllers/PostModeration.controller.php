@@ -21,7 +21,8 @@ if (!defined('ELK'))
 	die('No access...');
 
 /**
- * PostModeration Controller handles post moderation actions. (approvals, unapproved)
+ * PostModeration_Controller Class
+ * Handles post moderation actions. (approvals, unapproved)
  */
 class PostModeration_Controller extends Action_Controller
 {
@@ -256,6 +257,7 @@ class PostModeration_Controller extends Action_Controller
 						'test' => 'can_delete',
 					),
 			);
+
 			$context['unapproved_items'][$key]['tests'] = array(
 				'can_delete' => $item['can_delete']
 			);
@@ -481,6 +483,7 @@ class PostModeration_Controller extends Action_Controller
 
 		$current_msg = $this->_req->getQuery('msg', 'intval', 0);
 
+		// Needy baby, Greedy baby
 		require_once(SUBSDIR . '/Topic.subs.php');
 		require_once(SUBSDIR . '/Post.subs.php');
 		require_once(SUBSDIR . '/Messages.subs.php');

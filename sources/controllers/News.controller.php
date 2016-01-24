@@ -22,7 +22,7 @@ if (!defined('ELK'))
 	die('No access...');
 
 /**
- * News Controller
+ * News Controller class
  */
 class News_Controller extends Action_Controller
 {
@@ -196,7 +196,6 @@ class News_Controller extends Action_Controller
 
 		$cachekey = md5(serialize($cachekey) . (!empty($this->_query_this_board) ? $this->_query_this_board : ''));
 		$cache_t = microtime(true);
-
 		$cache = Cache::instance;
 
 		// Get the associative array representing the xml.
@@ -212,6 +211,7 @@ class News_Controller extends Action_Controller
 		}
 
 		$context['feed_title'] = encode_special(strip_tags(un_htmlspecialchars($context['forum_name']) . (isset($feed_title) ? $feed_title : '')));
+
 		// We send a feed with recent posts, and alerts for PMs for logged in users
 		$context['recent_posts_data'] = $xml;
 		$context['xml_format'] = $xml_format;
@@ -272,6 +272,7 @@ class News_Controller extends Action_Controller
 	{
 		global $scripturl;
 
+		// Not allowed, then you get nothing
 		if (!allowedTo('view_mlist'))
 			return array();
 
@@ -336,7 +337,6 @@ class News_Controller extends Action_Controller
 
 		// Prepare it for the feed in the format chosen (rss, atom, etc)
 		$data = array();
-
 		$bbc_parser = \BBC\ParserWrapper::getInstance();
 
 		foreach ($results as $row)
@@ -567,6 +567,7 @@ class News_Controller extends Action_Controller
 		$data = array();
 
 		if ($xml_format === 'rss' || $xml_format === 'rss2')
+		{
 			$data = array(array(
 				'title' => cdata_parse($profile['name']),
 				'link' => $scripturl . '?action=profile;u=' . $profile['id'],
@@ -575,13 +576,17 @@ class News_Controller extends Action_Controller
 				'pubDate' => gmdate('D, d M Y H:i:s \G\M\T', $user_profile[$profile['id']]['date_registered']),
 				'guid' => $scripturl . '?action=profile;u=' . $profile['id'],
 			));
+		}
 		elseif ($xml_format === 'rdf')
+		{
 			$data = array(array(
 				'title' => cdata_parse($profile['name']),
 				'link' => $scripturl . '?action=profile;u=' . $profile['id'],
 				'description' => cdata_parse(isset($profile['group']) ? $profile['group'] : $profile['post_group']),
 			));
+		}
 		elseif ($xml_format === 'atom')
+		{
 			$data[] = array(
 				'title' => cdata_parse($profile['name']),
 				'link' => $scripturl . '?action=profile;u=' . $profile['id'],
@@ -596,6 +601,7 @@ class News_Controller extends Action_Controller
 				'id' => $scripturl . '?action=profile;u=' . $profile['id'],
 				'logo' => !empty($profile['avatar']) ? $profile['avatar']['url'] : '',
 			);
+		}
 		else
 		{
 			$data = array(
@@ -684,13 +690,15 @@ function fix_possible_url($val)
 		return $val;
 
 	$val = preg_replace_callback('~^' . preg_quote($scripturl, '~') . '\?((?:board|topic)=[^#"]+)(#[^"]*)?$~', 'fix_possible_url_callback', $val);
+
 	return $val;
 }
 
 /**
  * Callback function for the preg_replace_callback in fix_possible_url
- * Invoked when queryless_urls are enabled and the system supports them
- * Updated URLs to be of "queryless" style
+ *
+ * - Invoked when queryless_urls are enabled and the system supports them
+ * - Updated URLs to be of "queryless" style
  *
  * @param mixed[] $matches
  */
@@ -797,8 +805,9 @@ function cdata_parse($data, $ns = '')
 
 /**
  * Formats data retrieved in other functions into xml format.
- * Additionally formats data based on the specific format passed.
- * This function is recursively called to handle sub arrays of data.
+ *
+ * - Additionally formats data based on the specific format passed.
+ * - This function is recursively called to handle sub arrays of data.
  *
  * @deprecated since 1.1 - use template_xml_news instead
  *

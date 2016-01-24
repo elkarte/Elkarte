@@ -22,7 +22,7 @@ if (!defined('ELK'))
 	die('No access...');
 
 /**
- * Memberlist Controller
+ * Memberlist Controller class
  */
 class Memberlist_Controller extends Action_Controller
 {
@@ -62,7 +62,9 @@ class Memberlist_Controller extends Action_Controller
 	/**
 	 * Sets up the context for showing a listing of registered members.
 	 * For the handlers in this file, it requires the view_mlist permission.
-	 * Accessed by ?action_memberlist.
+	 *
+	 * - Accessed by ?action_memberlist.
+	 *
 	 * @uses Memberlist template, main sub-template.
 	 *
 	 * @see Action_Controller::action_index()
@@ -226,9 +228,10 @@ class Memberlist_Controller extends Action_Controller
 
 	/**
 	 * List all members, page by page, with sorting.
-	 * Called from MemberList().
-	 * Can be passed a sort parameter, to order the display of members.
-	 * Calls printMemberListRows to retrieve the results of the query.
+	 *
+	 * - Called from MemberList().
+	 * - Can be passed a sort parameter, to order the display of members.
+	 * - Calls printMemberListRows to retrieve the results of the query.
 	 */
 	public function action_mlall()
 	{
@@ -386,8 +389,10 @@ class Memberlist_Controller extends Action_Controller
 
 	/**
 	 * Search for members, or display search results.
-	 * If variable $_REQUEST['search'] is empty displays search dialog box, using the search sub-template.
-	 * Calls printMemberListRows to retrieve the results of the query.
+	 *
+	 * - If variable $_REQUEST['search'] is empty displays search dialog box,
+	 * using the search sub-template.
+	 * - Calls printMemberListRows to retrieve the results of the query.
 	 */
 	public function action_mlsearch()
 	{
