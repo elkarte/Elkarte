@@ -152,7 +152,7 @@ function DumpDatabase2()
 			// Time is what we need here!
 			if (function_exists('apache_reset_timeout'))
 				@apache_reset_timeout();
-			elseif (!empty($time_limit) && ($start_time + $time_limit - 20 > time()))
+			elseif (!empty($time_limit) && (((int) $start_time + (int) $time_limit - 20) > time()))
 			{
 				$start_time = time();
 				@set_time_limit(150);

@@ -479,7 +479,7 @@ function loadBoard()
 		if (!empty($temp))
 		{
 			$board_info = $temp;
-			$board = $board_info['id'];
+			$board = (int) $board_info['id'];
 		}
 	}
 
@@ -516,7 +516,7 @@ function loadBoard()
 
 			// Set the current board.
 			if (!empty($row['id_board']))
-				$board = $row['id_board'];
+				$board = (int) $row['id_board'];
 
 			// Basic operating information. (globals... :/)
 			$board_info = array(
@@ -2269,12 +2269,12 @@ function getBoardParents($id_parent)
  */
 function getLanguages($use_cache = true)
 {
-	global $settings, $modSettings;
+	global $settings;
 
 	$cache = Cache::instance();
 
 	// Either we don't use the cache, or its expired.
-	$languages = '';
+	$languages = array();
 
 	if (!$use_cache || !$cache->getVar($languages, 'known_languages', !$cache->checkLevel(1) ? 86400 : 3600))
 	{
