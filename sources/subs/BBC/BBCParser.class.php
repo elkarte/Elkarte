@@ -511,7 +511,7 @@ class BBCParser
 				continue;
 			}
 
-			$tag = $this->checkCodeAttributes($next_c, $possible, $tag);
+			$tag = $this->checkCodeAttributes($next_c, $possible);
 			if ($tag === null)
 			{
 				continue;
