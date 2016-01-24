@@ -927,7 +927,8 @@ class PersonalMessage_Controller extends Action_Controller
 			'preview_type' => 2,
 		);
 
-		$this->_events->trigger('prepare_send_context', array('pmsg' => isset($this->_req->query->pmsg) ? $this->_req->query->pmsg : (isset($this->_req->query->quote) ? $this->_req->query->quote : 0), 'editorOptions' => &$editorOptions, 'recipientList' => &$recipientList));
+		// Trigger the prepare_send_context PM event
+		$this->_events->trigger('prepare_send_context', array('pmsg' => isset($this->_req->query->pmsg) ? $this->_req->query->pmsg : (isset($this->_req->query->quote) ? $this->_req->query->quote : 0), 'editorOptions' => &$editorOptions, 'recipientList' => &$context['recipients']));
 
 		create_control_richedit($editorOptions);
 
@@ -1384,7 +1385,8 @@ class PersonalMessage_Controller extends Action_Controller
 			'preview_type' => 2,
 		);
 
-		$this->_events->trigger('prepare_send_context', array('pmsg' => isset($this->_req->query->pmsg) ? $this->_req->query->pmsg : (isset($this->_req->query->quote) ? $this->_req->query->quote : 0), 'editorOptions' => &$editorOptions, 'recipientList' => &$recipientList));
+		// Trigger the prepare_send_context PM event
+		$this->_events->trigger('prepare_send_context', array('pmsg' => isset($this->_req->query->pmsg) ? $this->_req->query->pmsg : (isset($this->_req->query->quote) ? $this->_req->query->quote : 0), 'editorOptions' => &$editorOptions, 'recipientList' => &$recipient_ids));
 
 		create_control_richedit($editorOptions);
 
