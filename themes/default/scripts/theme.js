@@ -97,14 +97,14 @@ $(document).ready(function() {
 						width: $this.css('width'),
 						height: $this.css('height'),
 						'max-width': $this.css('max-width'),
-						'max-height': $this.css('max-height'),
+						'max-height': $this.css('max-height')
 				});
 				$this.css({'width': $this.css('width') === 'auto' ? null : 'auto'});
 				$this.css({'height': $this.css('height') === 'auto' ? null : 'auto'});
 
 				// Override default css to allow the image to expand fully, add a div to expand in
 				$this.css({'max-height': 'none'});
-				$this.wrap('<div style="overflow: auto"></div>');
+				$this.wrap('<div style="overflow: auto;"></div>');
 			}
 			else
 			{

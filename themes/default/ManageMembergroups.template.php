@@ -137,7 +137,7 @@ function template_new_group()
 	echo '
 					<dt>
 						<label>', $txt['membergroups_new_board'], ':</label>', $context['post_group'] ? '<br />
-						<span class="smalltext" style="font-weight: normal">' . $txt['membergroups_new_board_post_groups'] . '</span>' : '', '
+						<span class="smalltext" style="font-weight: normal;">' . $txt['membergroups_new_board_post_groups'] . '</span>' : '', '
 					</dt>
 					<dd>';
 

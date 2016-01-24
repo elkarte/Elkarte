@@ -1271,10 +1271,9 @@ a.active {
 
 /* Profile colors */
 .activity_stats li span {
-	border: solid #555555;
-	border-width: 1px 1px 1px 1px;
-	border-right: none;
-	border-left: none;
+	border: 1px solid #555555;
+	border-right-style: none;
+	border-left-style: none;
 	background: #EEEEEE;
 }
 
@@ -1554,8 +1553,7 @@ a.help .icon {
 	[data-icon]:before {
 		display: inline-block;
 		margin: 2px;
-		padding: 3px;
-		padding-bottom: 0;
+		padding: 3px 3px 0;
 		width: 1.1em;
 		height: 1.1em;
 		border: 3px solid white;

@@ -374,7 +374,7 @@ function template_topic_listing_below()
 	<script><!-- // --><![CDATA[
 		var oQuickModifyTopic = new QuickModifyTopic({
 			aHidePrefixes: Array("lockicon", "stickyicon", "pages", "newicon"),
-			bMouseOnDiv: false,
+			bMouseOnDiv: false
 		});
 	// ]]></script>';
 }
