@@ -300,7 +300,7 @@ function preparsecode_nobbc_callback($matches)
 }
 
 /**
- * Takes a tag and lowercases it
+ * Takes a tag and changes it to lowercase
  *
  * @package Posts
  * @param string[] $matches
@@ -399,7 +399,7 @@ function fixTags(&$message)
 }
 
 /**
- * Ensure image tags do not load anything by themselfs (security)
+ * Ensure image tags do not load anything by themselves (security)
  *
  * @package Posts
  * @param string[] $matches

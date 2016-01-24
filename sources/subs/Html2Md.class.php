@@ -472,7 +472,7 @@ class Html_2_Md
 	{
 		$value = $this->_get_innerHTML($node);
 
-		// If we have a multi line code block, we are working outside to in, and need to convert the br's ourselfs
+		// If we have a multi line code block, we are working outside to in, and need to convert the br's ourselves
 		$value = preg_replace('~<br( /)?' . '>~', "\n", str_replace('&nbsp;', ' ', $value));
 
 		// If there are html tags in this code block, we need to disable strip tags

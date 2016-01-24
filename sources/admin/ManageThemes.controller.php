@@ -1459,7 +1459,7 @@ class ManageThemes_Controller extends Action_Controller
 
 		$selectedTheme = $this->_req->getQuery('th', 'intval', $this->_req->getQuery('id', 'intval', 0));
 
-		// Unfortunately we cannot edit an unkwown theme.. redirect.
+		// Unfortunately we cannot edit an unknown theme.. redirect.
 		if (empty($selectedTheme))
 			redirectexit('action=admin;area=theme;sa=themelist');
 		// You're browsing around, aren't you

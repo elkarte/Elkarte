@@ -346,7 +346,7 @@ function toggleMentionsApproval($msgs, $approved)
  * Toggles a mention visibility on/off
  *
  * - if off is restored to visible,
- * - if on is switched to unvisible for all the users
+ * - if on is switched to invisible for all the users
  *
  * @package Mentions
  * @param string $type type of the mention that you want to toggle
@@ -480,7 +480,7 @@ function updateMentionMenuCount($status, $member_id)
 	// Mark as read we decrease the count
 	elseif ($status === 1)
 		updateMemberdata($member_id, array('mentions' => '-'));
-	// Deleting or unapproving may have been read or not, so a count is required
+	// Deleting or un-approving may have been read or not, so a count is required
 	else
 		countUserMentions(false, '', $member_id);
 }

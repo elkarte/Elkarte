@@ -453,7 +453,7 @@ class Packages_Controller extends Action_Controller
 				Errors::instance()->fatal_lang_error('package_uninstall_cannot', false);
 			}
 
-			// Can't edit the custom themes it's edited if you're unisntalling, they must be removed.
+			// Can't edit the custom themes it's edited if you're uninstalling, they must be removed.
 			$context['themes_locked'] = true;
 
 			// Only let them uninstall themes it was installed into.

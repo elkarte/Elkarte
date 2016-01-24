@@ -267,7 +267,7 @@ function recacheSpiderNames()
 }
 
 /**
- * Sort the search engine table by user agent name to avoid misidentification of engine.
+ * Sort the search engine table by user agent name to avoid misidentifying of engine.
  *
  * @package SearchEngines
  * @deprecated since 1.0 - the ordering is done in the query, probably not needed

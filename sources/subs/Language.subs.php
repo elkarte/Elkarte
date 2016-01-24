@@ -209,7 +209,7 @@ function cleanLangString($string, $to_display = true)
 					// @todo Do better than this, please!
 					$new_string .= '{%' . $matches[1] . '%}';
 
-					// We're not going to reparse this.
+					// We're not going to re-parse this.
 					$i += strlen($matches[1]) - 1;
 				}
 
