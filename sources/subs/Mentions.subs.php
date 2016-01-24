@@ -298,7 +298,7 @@ function removeMentions($id_mentions)
 
 	// Update the top level mentions count
 	if ($success)
-		updateMentionMenuCount($status, $user_info['id']);
+		updateMentionMenuCount(null, $user_info['id']);
 
 	return $success;
 }
@@ -467,7 +467,7 @@ function findMemberMention($id_mention, $id_member)
  * Updates the mention count as a result of an action, read, new, delete, etc
  *
  * @package Mentions
- * @param int $status
+ * @param int|null $status
  * @param int $member_id
  */
 function updateMentionMenuCount($status, $member_id)
