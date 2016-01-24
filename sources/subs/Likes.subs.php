@@ -420,8 +420,6 @@ function likesPostsReceived($start, $items_per_page, $sort, $memberID)
 			);
 		}
 	);
-
-	return $likes;
 }
 
 /**
