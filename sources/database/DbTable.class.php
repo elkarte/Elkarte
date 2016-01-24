@@ -208,7 +208,7 @@ abstract class DbTable
 		{
 			if ($column_name == $column['name'])
 			{
-				return $column_info;
+				return $column;
 			}
 		}
 
