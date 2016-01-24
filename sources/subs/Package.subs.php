@@ -960,7 +960,7 @@ function parsePackageInfo(&$packageXML, $testing_only = true, $method = 'install
 			$url = $action->exists('@url') ? $action->fetch('@url') : '';
 			if (strlen(trim($url)) > 0)
 			{
-				$url = addProtocol($data, array('http://', 'https://'));
+				$url = addProtocol($url, array('http://', 'https://'));
 
 				if (strlen($url) < 8)
 					$url = '';
@@ -2781,7 +2781,7 @@ function isPackageInstalled($id, $install_id = null)
 		'install_state' => null,
 		'old_themes' => null,
 		'old_version' => null,
-		'db_changes' => null
+		'db_changes' => array()
 	);
 
 	if (empty($id))
