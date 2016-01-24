@@ -134,8 +134,8 @@ class TestFiles extends PHPUnit_Framework_TestCase
  \* This software is a derived product, based on:
  \*
  \* Simple Machines Forum \(SMF\)
- \* copyright:	20\d\d Simple Machines (Forum )?\(http:\/\/www\.simplemachines\.org\)
- \* license:(  	|		)BSD, See included LICENSE\.TXT for terms and conditions\.
+ \* copyright:\s+?20\d\d Simple Machines (Forum )?\(http:\/\/www\.simplemachines\.org\)
+ \* license:(\s+?)BSD, See included LICENSE\.TXT for terms and conditions\.
  \*
  \* @version \d+\.\d+(\.\d+|\sdev|\s(beta|RC|Release Candidate)\s\d+)
 (( \*\n)?|( \*(\s.{0,200})?\n))+ \*\/',
@@ -148,8 +148,8 @@ class TestFiles extends PHPUnit_Framework_TestCase
  \* @license   BSD http:\/\/opensource\.org\/licenses\/BSD-3-Clause
  \*
  \* This file contains code covered by:
- \* copyright:	20\d\d Simple Machines (Forum )?\(http:\/\/www\.simplemachines\.org\)
- \* license:(  	|		)BSD, See included LICENSE\.TXT for terms and conditions\.
+ \* copyright:\s+?20\d\d Simple Machines (Forum )?\(http:\/\/www\.simplemachines\.org\)
+ \* license:\s+?BSD, See included LICENSE\.TXT for terms and conditions\.
  \*
  \* @version \d+\.\d+(\.\d+|\sdev|\s(beta|RC|Release Candidate)\s\d+)
 (( \*\n)?|( \*(\s.{0,200})?\n))+ \*\/',
@@ -163,10 +163,10 @@ class TestFiles extends PHPUnit_Framework_TestCase
  \*
  \* This file contains code covered by:
  \* copyright:	20\d\d Simple Machines (Forum )?\(http:\/\/www\.simplemachines\.org\)
- \* license:(  	|		)BSD, See included LICENSE\.TXT for terms and conditions\.
+ \* license:(\s+?)BSD, See included LICENSE\.TXT for terms and conditions\.
  \*
  \* copyright:	2004-2011, GreyWyvern - All rights reserved\.
- \* license:(  	|		)BSD, See included LICENSE\.TXT for terms and conditions\.
+ \* license:(\s+?)BSD, See included LICENSE\.TXT for terms and conditions\.
  \*
  \* @version \d+\.\d+(\.\d+|\sdev|\s(beta|RC|Release Candidate)\s\d+)
 (( \*\n)?|( \*(\s.{0,200})?\n))+ \*\/',
