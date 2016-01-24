@@ -951,8 +951,8 @@ class Database_MySQL extends Database_Abstract
 	 * This function lists all tables in the database.
 	 * The listing could be filtered according to $filter.
 	 *
-	 * @param string|false $db_name_str string holding the database name, or false, default false
-	 * @param string|false $filter string to filter by, or false, default false
+	 * @param string|bool $db_name_str string holding the database name, or false, default false
+	 * @param string|bool $filter string to filter by, or false, default false
 	 *
 	 * @return string[] an array of table names. (strings)
 	 */
@@ -1169,7 +1169,7 @@ class Database_MySQL extends Database_Abstract
 	 * It ignores $counter parameter.
 	 *
 	 * @param resource $request
-	 * @param int|false $counter = false
+	 * @param int|bool $counter = false
 	 */
 	public function fetch_assoc($request, $counter = false)
 	{

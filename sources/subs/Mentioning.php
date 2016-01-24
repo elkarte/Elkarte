@@ -79,7 +79,11 @@ class Mentioning extends AbstractModel
 	protected $_data = null;
 
 	/**
-	 * Start things up, what else does a constructor do
+	 * Mentioning constructor.
+	 *
+	 * @param Database $db
+	 * @param Data_Validator $validator
+	 * @param string $enabled_mentions
 	 */
 	public function __construct($db, $validator, $enabled_mentions = '')
 	{
@@ -163,6 +167,8 @@ class Mentioning extends AbstractModel
 	 * Did you read the mention? Then let's move it to the graveyard.
 	 * Used in Display.controller.php, it may be merged to action_updatestatus
 	 * though that would require to add an optional parameter to avoid the redirect
+	 *
+	 * @param int $mention_id
 	 */
 	public function markread($mention_id)
 	{
@@ -171,6 +177,9 @@ class Mentioning extends AbstractModel
 
 	/**
 	 * Updating the status from the listing?
+	 *
+	 * @param int[] $items
+	 * @param string $mark
 	 */
 	public function updateStatus($items, $mark)
 	{
@@ -315,7 +324,7 @@ class Mentioning extends AbstractModel
 		// Mark as read we decrease the count
 		elseif ($status === 1)
 			updateMemberdata($member_id, array('mentions' => '-'));
-		// Deleting or unapproving may have been read or not, so a count is required
+		// Deleting or un-approving may have been read or not, so a count is required
 		else
 			countUserMentions(false, '', $member_id);
 	}

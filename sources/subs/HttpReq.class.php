@@ -332,7 +332,7 @@ class HttpReq
 	 * Runs sanitation rules against a single value
 	 *
 	 * @param string $name the key name in the _param array
-	 * @param string|null $sanitize comma seperated list of rules
+	 * @param string|null $sanitize comma separated list of rules
 	 */
 	public function cleanValue($name, $sanitize = null)
 	{

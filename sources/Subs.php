@@ -344,7 +344,7 @@ function constructPageIndex($base_url, &$start, $max_value, $num_per_page, $flex
  * - Caches the formatting data from the setting for optimization.
  *
  * @param float $number The float value to apply comma formatting
- * @param integer|false $override_decimal_count = false or number of decimals
+ * @param integer|bool $override_decimal_count = false or number of decimals
  */
 function comma_format($number, $override_decimal_count = false)
 {
@@ -1083,14 +1083,15 @@ function template_footer()
  * What it does:
  * - tabbing in this function is to make the HTML source look proper
  * - outputs jQuery/jQueryUI from the proper source (local/CDN)
- * - if defered is set function will output all JS (source & inline) set to load at page end
+ * - if deferred is set function will output all JS (source & inline) set to load at page end
  * - if the admin option to combine files is set, will use Combiner.class
  *
- * @param bool $do_defered = false
+ * @param bool $do_deferred = false
  */
-function template_javascript($do_defered = false)
+function template_javascript($do_deferred = false)
 {
-	return theme()->template_javascript($do_defered);
+	theme()->template_javascript($do_deferred);
+	return;
 }
 
 /**
@@ -1101,7 +1102,8 @@ function template_javascript($do_defered = false)
  */
 function template_css()
 {
-	return theme()->template_css();
+	theme()->template_css();
+	return;
 }
 
 /**
@@ -1110,7 +1112,8 @@ function template_css()
  */
 function template_admin_warning_above()
 {
-	return theme()->template_admin_warning_above();
+	theme()->template_admin_warning_above();
+	return;
 }
 
 /**

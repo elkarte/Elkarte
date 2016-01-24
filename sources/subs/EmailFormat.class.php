@@ -128,12 +128,13 @@ class Email_Format
 	/**
 	 * Main routine, calls the need functions in the order needed
 	 *
-	 * - Returns a formated string
+	 * - Returns a formatted string
 	 *
 	 * @param string $data
-	 * @param boolean $html
+	 * @param bool $html
 	 * @param string $real_name
 	 * @param string $charset
+	 * @param bool $bbc_br
 	 */
 	public function reflow($data, $html = false, $real_name = '', $charset = 'UTF-8', $bbc_br = true)
 	{

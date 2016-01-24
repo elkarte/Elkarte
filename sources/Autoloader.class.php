@@ -100,6 +100,8 @@ class Elk_Autoloader
 
 	/**
 	 * Setup the autoloader environment
+	 *
+	 * @param string|string[] $dir
 	 */
 	public function setupAutoloader($dir)
 	{
@@ -469,6 +471,8 @@ class Elk_Autoloader
 	 * Manually sets the autoloader instance.
 	 *
 	 * - Use this to inject a modified version.
+	 *
+	 * @param Elk_Autoloader|null $loader
 	 */
 	public static function setInstance(Elk_Autoloader $loader = null)
 	{

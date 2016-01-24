@@ -76,6 +76,7 @@ class ValuesContainer implements \ArrayAccess
 	 * Assigns a value to a certain offset.
 	 *
 	 * @param mixed|mixed[] $offset
+	 * @param string $value
 	 */
 	public function offsetSet($offset, $value)
 	{

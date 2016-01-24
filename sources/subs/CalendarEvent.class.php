@@ -248,6 +248,8 @@ class Calendar_Event
 
 	/**
 	 * Determines if the passed member is the one that originally posted the event.
+	 *
+	 * @param int $member_id
 	 * @return bool
 	 */
 	public function isStarter($member_id)

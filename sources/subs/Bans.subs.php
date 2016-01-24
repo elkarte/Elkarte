@@ -1504,7 +1504,7 @@ function banLoadAdditionalIPs($member_id)
  *
  * @package Bans
  * @param int[]|int $ban_ids
- * @param int|false $ban_group
+ * @param int|bool $ban_group
  */
 function banDetails($ban_ids, $ban_group = false)
 {

@@ -242,6 +242,7 @@ abstract class DbTable
 	 * Checks if a column exists in a table
 	 *
 	 * @param string $table_name
+	 * @param string $column_name
 	 * @return bool
 	 */
 	public function column_exists($table_name, $column_name)

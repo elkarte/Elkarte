@@ -1489,7 +1489,7 @@ function loadBadBehavior()
  * - Importantly, even if the password was right we DON'T TELL THEM!
  *
  * @param int $id_member
- * @param string|false $password_flood_value = false or string joined on |'s
+ * @param string|bool $password_flood_value = false or string joined on |'s
  * @param boolean $was_correct = false
  */
 function validatePasswordFlood($id_member, $password_flood_value = false, $was_correct = false)

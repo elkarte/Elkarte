@@ -110,7 +110,9 @@ class Mentions_Controller extends Action_Controller
 	protected $_all = false;
 
 	/**
-	 * Start things up, what else does a constructor do
+	 * Mentions_Controller constructor.
+	 *
+	 * @param Event_Manager|null $eventManager
 	 */
 	public function __construct($eventManager)
 	{

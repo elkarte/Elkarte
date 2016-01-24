@@ -67,6 +67,8 @@ function updateSignature($id_member, $signature)
 
 /**
  * Update all signatures given a new set of constraints
+ *
+ * @param array $applied_sigs
  */
 function updateAllSignatures($applied_sigs)
 {

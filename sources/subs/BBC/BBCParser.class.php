@@ -511,7 +511,7 @@ class BBCParser
 				continue;
 			}
 
-			$tag = $this->checkCodeAttributes($next_c, $possible);
+			$tag = $this->checkCodeAttributes($next_c, $possible, $tag);
 			if ($tag === null)
 			{
 				continue;
@@ -1284,7 +1284,7 @@ class BBCParser
 	}
 
 	/**
-	 * @param string|false $tag = false False closes the last open tag. Anything else finds that tag LIFO
+	 * @param string|bool $tag = false False closes the last open tag. Anything else finds that tag LIFO
 	 *
 	 * @return mixed
 	 */

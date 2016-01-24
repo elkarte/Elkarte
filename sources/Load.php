@@ -1165,7 +1165,9 @@ function detectBrowser()
 }
 
 /**
- * @param int|0 $id_theme
+ * Get the id of a theme
+ *
+ * @param int $id_theme
  * @return int
  */
 function getThemeId($id_theme = 0)
@@ -1661,7 +1663,10 @@ function fixThemeUrls($detected_url)
 /**
  * Determine the current user's smiley set
  *
- * @return string
+ * @param mixed[] $user_smiley_set
+ * @param mixed[] $known_smiley_sets
+ *
+ * @return mixed
  */
 function determineSmileySet($user_smiley_set, $known_smiley_sets)
 {
