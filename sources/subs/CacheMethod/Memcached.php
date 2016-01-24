@@ -163,7 +163,7 @@ class Memcached extends Cache_Method_Abstract
 	{
 		$memcached = self::get_memcached_server();
 
-		return array('title' => self::title(), 'version' => empty($memcached) ? '???' : (class_exists('Memcached') ? $memcached->getVersion() : memcache_get_version($memcached)));
+		return array('title' => self::title(), 'version' => empty($memcached) ? '???' : (class_exists('Memcached') ? $memcached->getVersion() : memcache_get_version()));
 	}
 
 	/**
