@@ -46,6 +46,8 @@ class Notifications_Task extends \ElkArte\ValuesContainer
 	 */
 	public function __construct($type, $id, $id_member, $data, $namespace = '')
 	{
+		parent::__construct();
+
 		$this->data = array(
 			'notification_type' => $type,
 			'namespace' => empty($namespace) ? '\\ElkArte\\sources\\subs\\MentionType\\' : rtrim($namespace, '\\') . '\\',
