@@ -196,7 +196,7 @@ class News_Controller extends Action_Controller
 
 		$cachekey = md5(serialize($cachekey) . (!empty($this->_query_this_board) ? $this->_query_this_board : ''));
 		$cache_t = microtime(true);
-		$cache = Cache::instance;
+		$cache = Cache::instance();
 
 		// Get the associative array representing the xml.
 		if ($cache->isEnabled() && (!$user_info['is_guest'] || $cache->checkLevel(3)))
