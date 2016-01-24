@@ -686,7 +686,7 @@ class Likes_Controller extends Action_Controller
 
 		// Load the required files
 		loadLanguage('LikePosts');
-		loadJavascriptFile('like_posts.js', array('defer' => true));
+		loadJavascriptFile('like_posts.js');
 		loadtemplate('LikePostsStats');
 
 		// Template and tab data
