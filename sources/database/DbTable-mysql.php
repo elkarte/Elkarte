@@ -125,7 +125,7 @@ class DbTable_MySQL extends DbTable
 		// Righty - let's do the damn thing!
 		$table_query = 'CREATE TABLE ' . $table_name . "\n" . '(';
 		foreach ($columns as $column)
-			$table_query .= "\n\t" . $this->_db_create_query_column($column)  . ',';
+			$table_query .= "\n\t" . $this->_db_create_query_column($column) . ',';
 
 		// Loop through the indexes next...
 		foreach ($indexes as $index)
@@ -597,7 +597,7 @@ class DbTable_MySQL extends DbTable
 			$type = $type . '(' . $size . ')';
 
 		// Now just put it together!
-		return '`' .$column['name'] . '` ' . $type . ' ' . (!empty($unsigned) ? $unsigned : '') . (!empty($column['null']) ? '' : 'NOT NULL') . ' ' . $default;
+		return '`' . $column['name'] . '` ' . $type . ' ' . (!empty($unsigned) ? $unsigned : '') . (!empty($column['null']) ? '' : 'NOT NULL') . ' ' . $default;
 	}
 
 	/**

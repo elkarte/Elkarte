@@ -103,7 +103,7 @@ function validateSession($type = 'admin')
 		}
 
 		// Posting the password... check it.
-		if (isset($_POST[$type . '_pass']) && str_replace('*', '', $_POST[$type. '_pass']) !== '')
+		if (isset($_POST[$type . '_pass']) && str_replace('*', '', $_POST[$type . '_pass']) !== '')
 		{
 			// Give integrated systems a chance to verify this password
 			$good_password = in_array(true, call_integration_hook('integrate_verify_password', array($user_info['username'], $_POST[$type . '_pass'], false)), true);

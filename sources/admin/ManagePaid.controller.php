@@ -280,13 +280,13 @@ class ManagePaid_Controller extends Action_Controller
 			'items_per_page' => 20,
 			'base_href' => $scripturl . '?action=admin;area=paidsubscribe;sa=view',
 			'get_items' => array(
-				'function' => function () {
+				'function' => function() {
 					global $context;
 					return $context['subscriptions'];
 				},
 			),
 			'get_count' => array(
-				'function' => function () {
+				'function' => function() {
 					global $context;
 					return count($context['subscriptions']);
 				},
@@ -299,7 +299,7 @@ class ManagePaid_Controller extends Action_Controller
 						'style' => 'width: 30%;',
 					),
 					'data' => array(
-						'function' => function ($rowData) {
+						'function' => function($rowData) {
 							global $scripturl;
 
 							return sprintf('<a href="%1$s?action=admin;area=paidsubscribe;sa=viewsub;sid=%2$s">%3$s</a>', $scripturl, $rowData['id'], $rowData['name']);
@@ -311,7 +311,7 @@ class ManagePaid_Controller extends Action_Controller
 						'value' => $txt['paid_cost'],
 					),
 					'data' => array(
-						'function' => function ($rowData) {
+						'function' => function($rowData) {
 							global $txt;
 
 							return $rowData['flexible'] ? '<em>' . $txt['flexible'] . '</em>' : $rowData['cost'] . ' / ' . $rowData['length'];
@@ -348,7 +348,7 @@ class ManagePaid_Controller extends Action_Controller
 						'value' => $txt['paid_is_active'],
 					),
 					'data' => array(
-						'function' => function ($rowData) {
+						'function' => function($rowData) {
 							global $txt;
 
 							return '<span class="' . ($rowData['active'] ? 'success' : 'alert') . '">' . ($rowData['active'] ? $txt['yes'] : $txt['no']) . '</span>';
@@ -360,7 +360,7 @@ class ManagePaid_Controller extends Action_Controller
 						'value' => $txt['subscribers'],
 					),
 					'data' => array(
-						'function' => function ($rowData) {
+						'function' => function($rowData) {
 							global $scripturl, $txt, $settings;
 
 							return '<a href="' . $scripturl . '?action=admin;area=paidsubscribe;sa=viewsub;sid=' . $rowData['id'] . '"><img title="' . $txt['view'] . '" src="' . $settings['images_url'] . '/icons/members.png" alt="*" /></a>';
@@ -373,7 +373,7 @@ class ManagePaid_Controller extends Action_Controller
 						'value' => $txt['modify'],
 					),
 					'data' => array(
-						'function' => function ($rowData) {
+						'function' => function($rowData) {
 							global $txt, $scripturl, $settings;
 
 							return '<a href="' . $scripturl . '?action=admin;area=paidsubscribe;sa=modify;sid=' . $rowData['id'] . '"><img title="' . $txt['modify'] . '" src="' . $settings['images_url'] . '/icons/modify_inline.png" alt="*" /></a>';
@@ -386,7 +386,7 @@ class ManagePaid_Controller extends Action_Controller
 						'value' => $txt['remove']
 					),
 					'data' => array(
-						'function' => function ($rowData) {
+						'function' => function($rowData) {
 							global $txt, $scripturl, $settings;
 
 							return '<a href="' . $scripturl . '?action=admin;area=paidsubscribe;sa=modify;delete;sid=' . $rowData['id'] . '"><img title="' . $txt['delete'] . '" src="' . $settings['images_url'] . '/icons/delete.png" alt="*" /></a>';
@@ -639,7 +639,7 @@ class ManagePaid_Controller extends Action_Controller
 						'style' => 'width: 20%;',
 					),
 					'data' => array(
-						'function' => function ($rowData) {
+						'function' => function($rowData) {
 							global $txt, $scripturl;
 
 							return $rowData['id_member'] == 0 ? $txt['guest'] : '<a href="' . $scripturl . '?action=profile;u=' . $rowData['id_member'] . '">' . $rowData['name'] . '</a>';
@@ -711,7 +711,7 @@ class ManagePaid_Controller extends Action_Controller
 						'value' => $txt['edit_subscriber'],
 					),
 					'data' => array(
-						'function' => function ($rowData) {
+						'function' => function($rowData) {
 							global $txt, $scripturl;
 
 							return '<a href="' . $scripturl . '?action=admin;area=paidsubscribe;sa=modifyuser;lid=' . $rowData['id'] . '">' . $txt['modify'] . '</a>';
@@ -725,7 +725,7 @@ class ManagePaid_Controller extends Action_Controller
 						'class' => 'centertext',
 					),
 					'data' => array(
-						'function' => function ($rowData) {
+						'function' => function($rowData) {
 							return '<input type="checkbox" name="delsub[' . $rowData['id'] . ']" class="input_check" />';
 						},
 						'class' => 'centertext',

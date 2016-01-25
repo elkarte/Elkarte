@@ -117,7 +117,7 @@ class Spellcheck_Controller extends Action_Controller
 	 * - Examines all words passed to it, checking spelling of each
 	 * - Incorrect ones are supplied an array of possible substitutions
 	 *
-	 * @return array
+	 * @return string
 	 */
 	protected function _build_misps_array()
 	{

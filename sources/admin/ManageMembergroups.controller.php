@@ -143,7 +143,7 @@ class ManageMembergroups_Controller extends Action_Controller
 						'value' => $txt['membergroups_name'],
 					),
 					'data' => array(
-						'function' => function ($rowData) {
+						'function' => function($rowData) {
 							global $scripturl;
 
 							// Since the moderator group has no explicit members, no link is needed.
@@ -173,7 +173,7 @@ class ManageMembergroups_Controller extends Action_Controller
 						'value' => $txt['membergroups_icons'],
 					),
 					'data' => array(
-						'function' => function ($rowData) {
+						'function' => function($rowData) {
 							global $settings;
 
 							if (!empty($rowData['icons'][0]) && !empty($rowData['icons'][1]))
@@ -192,7 +192,7 @@ class ManageMembergroups_Controller extends Action_Controller
 						'value' => $txt['membergroups_members_top'],
 					),
 					'data' => array(
-						'function' => function ($rowData) {
+						'function' => function($rowData) {
 							global $txt;
 
 							// No explicit members for the moderator group.
@@ -255,7 +255,7 @@ class ManageMembergroups_Controller extends Action_Controller
 						'value' => $txt['membergroups_name'],
 					),
 					'data' => array(
-						'function' => function ($rowData) {
+						'function' => function($rowData) {
 							global $scripturl;
 
 							return sprintf('<a href="%1$s?action=admin;area=membergroups;sa=members;group=%2$d">%3$s</a>', $scripturl, $rowData['id_group'], $rowData['group_name_color']);
@@ -271,7 +271,7 @@ class ManageMembergroups_Controller extends Action_Controller
 						'value' => $txt['membergroups_icons'],
 					),
 					'data' => array(
-						'function' => function ($rowData) {
+						'function' => function($rowData) {
 							global $settings;
 
 							if (!empty($rowData['icons'][0]) && !empty($rowData['icons'][1]))

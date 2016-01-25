@@ -303,7 +303,7 @@ function deleteDrafts($id_draft, $member_id = -1, $check = true)
 			AND  id_member = {int:id_member}' : ''),
 		array(
 			'id_draft' => $id_draft,
-			'id_member' => $member_id ,
+			'id_member' => $member_id,
 		)
 	);
 }

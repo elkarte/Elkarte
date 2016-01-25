@@ -1485,7 +1485,7 @@ class ModerationCenter_Controller extends Action_Controller
 						'style' => 'width: 4%;text-align: center;',
 					),
 					'data' => array(
-						'function' => function ($rowData) {
+						'function' => function($rowData) {
 							return '<input type="checkbox" name="deltpl[]" value="' . $rowData['id_comment'] . '" class="input_check" />';
 						},
 						'class' => 'centertext',

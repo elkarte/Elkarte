@@ -1047,9 +1047,9 @@ function loadMemberContext($user, $display_custom_fields = false)
 	if ($context['loadMemberContext_set'] !== 'minimal')
 	{
 		$memberContext[$user] += array(
-			'username_color' => '<span '. (!empty($profile['member_group_color']) ? 'style="color:' . $profile['member_group_color'] .';"' : '') .'>'. $profile['member_name'] .'</span>',
-			'name_color' => '<span '. (!empty($profile['member_group_color']) ? 'style="color:' . $profile['member_group_color'] .';"' : '') .'>'. $profile['real_name'] .'</span>',
-			'link_color' => '<a href="' . $scripturl . '?action=profile;u=' . $profile['id_member'] . '" title="' . $txt['profile_of'] . ' ' . $profile['real_name'] . '" ' . (!empty($profile['member_group_color']) ? 'style="color:' . $profile['member_group_color'] . ';"' : '') .'>' . $profile['real_name'] . '</a>',
+			'username_color' => '<span '. (!empty($profile['member_group_color']) ? 'style="color:' . $profile['member_group_color'] .';"' : '') . '>' . $profile['member_name'] .'</span>',
+			'name_color' => '<span '. (!empty($profile['member_group_color']) ? 'style="color:' . $profile['member_group_color'] .';"' : '') . '>' . $profile['real_name'] .'</span>',
+			'link_color' => '<a href="' . $scripturl . '?action=profile;u=' . $profile['id_member'] . '" title="' . $txt['profile_of'] . ' ' . $profile['real_name'] . '" ' . (!empty($profile['member_group_color']) ? 'style="color:' . $profile['member_group_color'] . ';"' : '') . '>' . $profile['real_name'] . '</a>',
 			'is_buddy' => $profile['buddy'],
 			'is_reverse_buddy' => in_array($user_info['id'], $buddy_list),
 			'buddies' => $buddy_list,
@@ -1217,6 +1217,14 @@ function getThemeId($id_theme = 0)
 	return $id_theme;
 }
 
+/**
+ * Load in the theme variables for a given theme / member combination
+ *
+ * @param int $id_theme
+ * @param int $member
+ *
+ * @return array
+ */
 function getThemeData($id_theme, $member)
 {
 	global $modSettings;
@@ -1292,14 +1300,22 @@ function getThemeData($id_theme, $member)
 	return $themeData;
 }
 
+/**
+ * Initialize a theme for use
+ *
+ * @param int $id_theme
+ */
 function initTheme($id_theme = 0)
 {
 	global $user_info, $settings, $options, $context;
 
+	// Validate / fetch the themes id
 	$id_theme = getThemeId($id_theme);
 
+	// Need to know who we are loading the theme for
 	$member = empty($user_info['id']) ? -1 : $user_info['id'];
 
+	// Load in the theme variables for them
 	$themeData = getThemeData($id_theme, $member);
 
 	$settings = $themeData[0];
@@ -1453,7 +1469,7 @@ function loadTheme($id_theme = 0, $initialize = true)
 	}
 
 	// A bit lonely maybe, though I think it should be set up *after* the theme variants detection
-	$context['header_logo_url_html_safe'] = empty($settings['header_logo_url']) ? $settings['images_url'] . '/' . $context['theme_variant_url'] .  'logo_elk.png' : Util::htmlspecialchars($settings['header_logo_url']);
+	$context['header_logo_url_html_safe'] = empty($settings['header_logo_url']) ? $settings['images_url'] . '/' . $context['theme_variant_url'] . 'logo_elk.png' : Util::htmlspecialchars($settings['header_logo_url']);
 
 	// Allow overriding the board wide time/number formats.
 	if (empty($user_settings['time_format']) && !empty($txt['time_format']))

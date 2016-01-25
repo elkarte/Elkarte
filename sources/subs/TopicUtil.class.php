@@ -94,7 +94,7 @@ class Topic_Util
 			{
 				$row['first_body'] = '';
 				$row['last_body'] = '';
-				$row['first_subject']= censor($row['first_subject']);
+				$row['first_subject'] = censor($row['first_subject']);
 
 				if ($row['id_first_msg'] == $row['id_last_msg'])
 					$row['last_subject'] = $row['first_subject'];

@@ -919,6 +919,7 @@ function determineTopicClass(&$topic_context)
 	// @deprecated since 1.0 do not rely on it
 	$topic_context['extended_class'] = &$topic_context['class'];
 }
+
 /**
  * Sets up the basic theme context stuff.
  *
@@ -928,7 +929,6 @@ function setupThemeContext($forceload = false)
 {
 	return theme()->setupThemeContext($forceload);
 }
-
 
 /**
  * Helper function to set the system memory to a needed value
@@ -2020,6 +2020,7 @@ function can_see_button_strip($button_strip)
 
 	return false;
 }
+
 /**
  * @return Themes\DefaultTheme\Theme
  */

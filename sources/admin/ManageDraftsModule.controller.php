@@ -43,7 +43,7 @@ class ManageDraftsModule_Controller extends Action_Controller
 				'drafts_autosave_enabled' => 2,
 				'drafts_show_saved_enabled' => 2,
 			),
-			'setting_callback' => function ($value) {
+			'setting_callback' => function($value) {
 				require_once(SUBSDIR . '/ScheduledTasks.subs.php');
 				toggleTaskStatusByName('remove_old_drafts', $value);
 

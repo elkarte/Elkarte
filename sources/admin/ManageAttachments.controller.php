@@ -424,7 +424,7 @@ class ManageAttachments_Controller extends Action_Controller
 						'class' => 'grid50',
 					),
 					'data' => array(
-						'function' => function ($rowData) {
+						'function' => function($rowData) {
 							global $modSettings, $context, $scripturl;
 
 							$link = '<a href="';
@@ -467,7 +467,7 @@ class ManageAttachments_Controller extends Action_Controller
 						'class' => 'nowrap',
 					),
 					'data' => array(
-						'function' => function ($rowData) {
+						'function' => function($rowData) {
 							global $txt;
 
 							return sprintf('%1$s%2$s', round($rowData['size'] / 1024, 2), $txt['kilobyte']);
@@ -484,7 +484,7 @@ class ManageAttachments_Controller extends Action_Controller
 						'class' => 'nowrap',
 					),
 					'data' => array(
-						'function' => function ($rowData) {
+						'function' => function($rowData) {
 							global $scripturl;
 
 							// In case of an attachment, return the poster of the attachment.
@@ -507,7 +507,7 @@ class ManageAttachments_Controller extends Action_Controller
 						'class' => 'nowrap',
 					),
 					'data' => array(
-						'function' => function ($rowData) {
+						'function' => function($rowData) {
 							global $txt, $context, $scripturl;
 
 							// The date the message containing the attachment was posted or the owner of the avatar was active.
@@ -1398,7 +1398,7 @@ class ManageAttachments_Controller extends Action_Controller
 						'class' => 'centertext',
 					),
 					'data' => array(
-						'function' => function ($rowData) {
+						'function' => function($rowData) {
 							return '<input type="radio" name="current_dir" value="' . $rowData['id'] . '" ' . ($rowData['current'] ? ' checked="checked"' : '') . (!empty($rowData['disable_current']) ? ' disabled="disabled"' : '') . ' class="input_radio" />';
 						},
 						'style' => 'width: 10%;',
@@ -1410,7 +1410,7 @@ class ManageAttachments_Controller extends Action_Controller
 						'value' => $txt['attach_path'],
 					),
 					'data' => array(
-						'function' => function ($rowData) {
+						'function' => function($rowData) {
 							return '<input type="hidden" name="dirs[' . $rowData['id'] . ']" value="' . $rowData['path'] . '" /><input type="text" size="40" name="dirs[' . $rowData['id'] . ']" value="' . $rowData['path'] . '"' . (!empty($rowData['disable_base_dir']) ? ' disabled="disabled"' : '') . ' class="input_text"/>';
 						},
 						'style' => 'width: 40%;',
@@ -1487,7 +1487,7 @@ class ManageAttachments_Controller extends Action_Controller
 							'class' => 'centertext',
 						),
 						'data' => array(
-							'function' => function ($rowData) {
+							'function' => function($rowData) {
 								return '<input type="radio" name="current_base_dir" value="' . $rowData['id'] . '" ' . ($rowData['current'] ? ' checked="checked"' : '') . ' class="input_radio" />';
 							},
 							'style' => 'width: 10%;',

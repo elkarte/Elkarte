@@ -199,7 +199,7 @@ class ManagePermissions_Controller extends Action_Controller
 						'class' => 'grid50',
 					),
 					'data' => array(
-						'function' => function ($rowData) {
+						'function' => function($rowData) {
 							global $scripturl, $txt;
 
 							// Since the moderator group has no explicit members, no link is needed.
@@ -234,7 +234,7 @@ class ManagePermissions_Controller extends Action_Controller
 						'class' => 'grid10',
 					),
 					'data' => array(
-						'function' => function ($rowData) {
+						'function' => function($rowData) {
 							global $txt, $scripturl;
 
 							// No explicit members for guests and the moderator group.
@@ -257,7 +257,7 @@ class ManagePermissions_Controller extends Action_Controller
 						'class' => 'grid8',
 					),
 					'data' => array(
-						'function' => function ($rowData) {
+						'function' => function($rowData) {
 							return $rowData['num_permissions']['allowed'];
 						},
 					),
@@ -269,7 +269,7 @@ class ManagePermissions_Controller extends Action_Controller
 						'class' => 'grid8',
 					),
 					'data' => array(
-						'function' => function ($rowData) {
+						'function' => function($rowData) {
 							return $rowData['num_permissions']['denied'];
 						},
 					),
@@ -297,7 +297,7 @@ class ManagePermissions_Controller extends Action_Controller
 						'style' => 'width:4%;',
 					),
 					'data' => array(
-						'function' => function ($rowData) {
+						'function' => function($rowData) {
 							if ($rowData['id_group'] != 1)
 								return '<input type="checkbox" name="group[]" value="' . $rowData['id_group'] . '" class="input_check" />';
 						},
@@ -341,7 +341,7 @@ class ManagePermissions_Controller extends Action_Controller
 							'class' => 'grid25',
 						),
 						'data' => array(
-							'function' => function ($rowData) {
+							'function' => function($rowData) {
 								global $scripturl;
 
 								return sprintf('<a href="%1$s?action=admin;area=permissions;sa=members;group=%2$d">%3$s</a>', $scripturl, $rowData['id_group'], $rowData['group_name_color']);
@@ -371,7 +371,7 @@ class ManagePermissions_Controller extends Action_Controller
 							'class' => 'grid10',
 						),
 						'data' => array(
-							'function' => function ($rowData) {
+							'function' => function($rowData) {
 								global $scripturl;
 
 								if ($rowData['can_search'])
@@ -391,7 +391,7 @@ class ManagePermissions_Controller extends Action_Controller
 							'class' => 'grid8',
 						),
 						'data' => array(
-							'function' => function ($rowData) {
+							'function' => function($rowData) {
 								return $rowData['num_permissions']['allowed'];
 							},
 						),
@@ -403,7 +403,7 @@ class ManagePermissions_Controller extends Action_Controller
 							'class' => 'grid8',
 						),
 						'data' => array(
-							'function' => function ($rowData) {
+							'function' => function($rowData) {
 								return $rowData['num_permissions']['denied'];
 							},
 						),

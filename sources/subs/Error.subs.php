@@ -136,7 +136,7 @@ function getErrorLogData($start, $sort_direction = 'DESC', $filter = null)
 			'id' => $row['id_error'],
 			'error_type' => array(
 				'type' => $row['error_type'],
-				'name' => isset($txt['errortype_'.$row['error_type']]) ? $txt['errortype_'.$row['error_type']] : $row['error_type'],
+				'name' => isset($txt['errortype_' . $row['error_type']]) ? $txt['errortype_' . $row['error_type']] : $row['error_type'],
 			),
 			'file' => array(),
 		);

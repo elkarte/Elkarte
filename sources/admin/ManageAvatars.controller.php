@@ -164,7 +164,7 @@ class ManageAvatars_Controller extends Action_Controller
 			array('title', 'avatar_external'),
 				array('check', 'avatar_external_enabled'),
 				array('check', 'avatar_download_external', 0, 'onchange' => 'fUpdateStatus();'),
-			array('title','gravatar'),
+			array('title', 'gravatar'),
 				array('check', 'avatar_gravatar_enabled'),
 				array('select', 'gravatar_rating',
 					array(

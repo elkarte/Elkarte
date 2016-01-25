@@ -584,8 +584,10 @@ class Database_MySQL extends Database_Abstract
 
 				// Attempt to find and repair the broken table.
 				foreach ($fix_tables as $table)
+				{
 					$this->query('', "
 						REPAIR TABLE $table", false, false);
+				}
 
 				// And send off an email!
 				sendmail($webmaster_email, $txt['database_error'], $txt['tried_to_repair']);
@@ -717,7 +719,9 @@ class Database_MySQL extends Database_Abstract
 		// Here's where the variables are injected to the query.
 		$insertRows = array();
 		foreach ($data as $dataRow)
+		{
 			$insertRows[] = $this->quote($insertData, $this->_array_combine($indexed_columns, $dataRow), $connection);
+		}
 
 		// Determine the method of insertion.
 		$queryTitle = $method == 'replace' ? 'REPLACE' : ($method == 'ignore' ? 'INSERT IGNORE' : 'INSERT');
@@ -975,7 +979,9 @@ class Database_MySQL extends Database_Abstract
 		);
 		$tables = array();
 		while ($row = $this->fetch_row($request))
+		{
 			$tables[] = $row[0];
+		}
 		$this->free_result($request);
 
 		return $tables;

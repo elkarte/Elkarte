@@ -1,7 +1,7 @@
 <?php
 
 /**
- * This file has functions dealing with loading and prcessing template files.
+ * This file has functions dealing with loading and precessing template files.
  *
  * @name      ElkArte Forum
  * @copyright ElkArte Forum contributors
@@ -10,19 +10,22 @@
  * This software is a derived product, based on:
  *
  * Simple Machines Forum (SMF)
- * copyright:	2011 Simple Machines (http://www.simplemachines.org)
- * license:		BSD, See included LICENSE.TXT for terms and conditions.
+ * copyright:    2011 Simple Machines (http://www.simplemachines.org)
+ * license:        BSD, See included LICENSE.TXT for terms and conditions.
  *
  * @version 1.1 dev
  *
  */
 
+/**
+ * Class Templates
+ */
 class Templates
 {
 	protected static $instance = null;
 
 	public $dirs = array();
-	protected $delayed  = array();
+	protected $delayed = array();
 	protected $templates = array();
 	protected $default_loaded = false;
 
@@ -58,6 +61,7 @@ class Templates
 	 * - if $this->dirs is empty, it delays the loading of the template
 	 *
 	 * @uses $this->requireTemplate() to actually load the file.
+	 *
 	 * @param string|false $template_name
 	 * @param string[]|string $style_sheets any style sheets to load with the template
 	 * @param bool $fatal = true if fatal is true, dies with an error message if the template cannot be found
@@ -102,6 +106,7 @@ class Templates
 	 *   loading of style sheets with this function is deprecated, use loadCSSFile instead
 	 *
 	 * @uses $this->templateInclude() to include the file.
+	 *
 	 * @param string|false $template_name
 	 * @param string[]|string $style_sheets any style sheets to load with the template
 	 * @param bool $fatal = true if fatal is true, dies with an error message if the template cannot be found
@@ -113,7 +118,9 @@ class Templates
 		global $context, $settings, $txt, $scripturl, $db_show_debug;
 
 		if (!is_array($style_sheets))
+		{
 			$style_sheets = array($style_sheets);
+		}
 
 		if ($this->default_loaded === false)
 		{
@@ -130,14 +137,18 @@ class Templates
 			{
 				$sheets[] = stripos('.css', $sheet) !== false ? $sheet : $sheet . '.css';
 				if ($sheet == 'admin' && !empty($context['theme_variant']))
+				{
 					$sheets[] = $context['theme_variant'] . '/admin' . $context['theme_variant'] . '.css';
+				}
 			}
 			loadCSSFile($sheets);
 		}
 
 		// No template to load?
 		if ($template_name === false)
+		{
 			return true;
+		}
 
 		$loaded = false;
 		foreach ($this->dirs as $template_dir)
@@ -153,11 +164,15 @@ class Templates
 		if ($loaded)
 		{
 			if ($db_show_debug === true)
+			{
 				Debug::get()->add('templates', $template_name . ' (' . basename($template_dir) . ')');
+			}
 
 			// If they have specified an initialization function for this template, go ahead and call it now.
 			if (function_exists('template_' . $template_name . '_init'))
+			{
 				call_user_func('template_' . $template_name . '_init');
+			}
 		}
 		// Hmmm... doesn't exist?!  I don't suppose the directory is wrong, is it?
 		elseif (!file_exists($settings['default_theme_dir']) && file_exists(BOARDDIR . '/themes/default'))
@@ -170,7 +185,9 @@ class Templates
 				loadLanguage('Errors');
 
 				if (!isset($context['security_controls_files']['title']))
+				{
 					$context['security_controls_files']['title'] = $txt['generic_warning'];
+				}
 
 				$context['security_controls_files']['errors']['theme_dir'] = '<a href="' . $scripturl . '?action=admin;area=theme;sa=list;th=1;' . $context['session_var'] . '=' . $context['session_id'] . '">' . $txt['theme_dir_wrong'] . '</a>';
 			}
@@ -179,11 +196,17 @@ class Templates
 		}
 		// Cause an error otherwise.
 		elseif ($template_name != 'Errors' && $template_name != 'index' && $fatal)
+		{
 			Errors::instance()->fatal_lang_error('theme_template_error', 'template', array((string) $template_name));
+		}
 		elseif ($fatal)
+		{
 			die(Errors::instance()->log_error(sprintf(isset($txt['theme_template_error']) ? $txt['theme_template_error'] : 'Unable to load themes/default/%s.template.php!', (string) $template_name), 'template'));
+		}
 		else
+		{
 			return false;
+		}
 	}
 
 	/**
@@ -195,26 +218,35 @@ class Templates
 	 * for debugging purposes.
 	 *
 	 * @todo get rid of reading $_REQUEST directly
+	 *
 	 * @param string $sub_template_name
 	 * @param bool|string $fatal = false, $fatal = true is for templates that
-	 *				 shouldn't get a 'pretty' error screen 'ignore' to skip
+	 *                 shouldn't get a 'pretty' error screen 'ignore' to skip
 	 */
 	public function loadSubTemplate($sub_template_name, $fatal = false)
 	{
 		global $txt, $db_show_debug;
 
 		if ($db_show_debug === true)
+		{
 			Debug::get()->add('sub_templates', $sub_template_name);
+		}
 
 		// Figure out what the template function is named.
 		$theme_function = 'template_' . $sub_template_name;
 
 		if (function_exists($theme_function))
+		{
 			$theme_function();
+		}
 		elseif ($fatal === false)
+		{
 			Errors::instance()->fatal_lang_error('theme_template_error', 'template', array((string) $sub_template_name));
+		}
 		elseif ($fatal !== 'ignore')
+		{
 			die(Errors::instance()->log_error(sprintf(isset($txt['theme_template_error']) ? $txt['theme_template_error'] : 'Unable to load the %s sub template!', (string) $sub_template_name), 'template'));
+		}
 	}
 
 	/**
@@ -250,12 +282,18 @@ class Templates
 		$file_found = file_exists($filename);
 
 		if ($once && $file_found)
+		{
 			require_once($filename);
+		}
 		elseif ($file_found)
+		{
 			require($filename);
+		}
 
 		if ($file_found !== true)
+		{
 			$this->templateNotFound($filename);
+		}
 	}
 
 	protected function templateNotFound($filename)
@@ -265,12 +303,18 @@ class Templates
 
 		@ob_end_clean();
 		if (!empty($modSettings['enableCompressedOutput']))
+		{
 			ob_start('ob_gzhandler');
+		}
 		else
+		{
 			ob_start();
+		}
 
 		if (isset($_GET['debug']))
+		{
 			header('Content-Type: application/xhtml+xml; charset=UTF-8');
+		}
 
 		// Don't cache error pages!!
 		header('Expires: Mon, 26 Jul 1997 05:00:00 GMT');
@@ -291,7 +335,8 @@ class Templates
 	<head>
 		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />';
 
-		if (!empty($maintenance) && !allowedTo('admin_forum')) {
+		if (!empty($maintenance) && !allowedTo('admin_forum'))
+		{
 			echo '
 		<title>', $mtitle, '</title>
 	</head>
@@ -318,9 +363,13 @@ class Templates
 
 			$error = fetch_web_data($boardurl . strtr($filename, array(BOARDDIR => '', strtr(BOARDDIR, '\\', '/') => '')));
 			if (empty($error) && ini_get('track_errors') && !empty($php_errormsg))
+			{
 				$error = $php_errormsg;
+			}
 			elseif (empty($error))
+			{
 				$error = $txt['template_parse_undefined'];
+			}
 
 			$error = strtr($error, array('<b>' => '<strong>', '</b>' => '</strong>'));
 
@@ -332,10 +381,12 @@ class Templates
 		', sprintf($txt['template_parse_error_details'], strtr($filename, array(BOARDDIR => '', strtr(BOARDDIR, '\\', '/') => '')), $boardurl, $scripturl . '?theme=1');
 
 			if (!empty($error))
+			{
 				echo '
 		<hr />
 
 		<div style="margin: 0 20px;"><span style="font-family: monospace;">', strtr(strtr($error, array('<strong>' . BOARDDIR => '<strong>...', '<strong>' . strtr(BOARDDIR, '\\', '/') => '<strong>...')), '\\', '/'), '</span></div>';
+			}
 
 			// I know, I know... this is VERY COMPLICATED.  Still, it's good.
 			if (preg_match('~ <strong>(\d+)</strong><br( /)?' . '>$~i', $error, $match) != 0)
@@ -346,9 +397,13 @@ class Templates
 
 				// Fix the PHP code stuff...
 				if (!isBrowser('gecko'))
+				{
 					$data2 = str_replace("\t", '<span style="white-space: pre;">' . "\t" . '</span>', $data2);
+				}
 				else
+				{
 					$data2 = str_replace('<pre style="display: inline;">' . "\t" . '</pre>', "\t", $data2);
+				}
 
 				// Now we get to work around a bug in PHP where it doesn't escape <br />s!
 				$j = -1;
@@ -357,7 +412,9 @@ class Templates
 					$j++;
 
 					if (substr_count($line, '<br />') == 0)
+					{
 						continue;
+					}
 
 					$n = substr_count($line, '<br />');
 					for ($i = 0; $i < $n; $i++)
@@ -377,22 +434,30 @@ class Templates
 				$line = max($match[1] - 9, 1);
 				$last_line = '';
 				for ($line2 = $line - 1; $line2 > 1; $line2--)
+				{
 					if (strpos($data2[$line2], '<') !== false)
 					{
 						if (preg_match('~(<[^/>]+>)[^<]*$~', $data2[$line2], $color_match) != 0)
+						{
 							$last_line = $color_match[1];
+						}
 						break;
 					}
+				}
 
 				// Show the relevant lines...
 				for ($n = min($match[1] + 4, count($data2) + 1); $line <= $n; $line++)
 				{
 					if ($line == $match[1])
+					{
 						echo '</pre><div style="background: #ffb0b5;"><pre style="margin: 0;">';
+					}
 
 					echo '<span style="color: black;">', sprintf('%' . strlen($n) . 's', $line), ':</span> ';
 					if (isset($data2[$line]) && $data2[$line] != '')
+					{
 						echo substr($data2[$line], 0, 2) == '</' ? preg_replace('~^</[^>]+>~', '', $data2[$line]) : $last_line . $data2[$line];
+					}
 
 					if (isset($data2[$line]) && preg_match('~(<[^/>]+>)[^<]*$~', $data2[$line], $color_match) != 0)
 					{
@@ -400,14 +465,22 @@ class Templates
 						echo '</', substr($last_line, 1, 4), '>';
 					}
 					elseif ($last_line != '' && strpos($data2[$line], '<') !== false)
+					{
 						$last_line = '';
+					}
 					elseif ($last_line != '' && $data2[$line] != '')
+					{
 						echo '</', substr($last_line, 1, 4), '>';
+					}
 
 					if ($line == $match[1])
+					{
 						echo '</pre></div><pre style="margin: 0;">';
+					}
 					else
+					{
 						echo "\n";
+					}
 				}
 
 				echo '</pre></div>';
@@ -424,6 +497,7 @@ class Templates
 	public function addDirectory($dir)
 	{
 		$this->dirs[] = (string) $dir;
+
 		return $this;
 	}
 

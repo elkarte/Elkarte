@@ -46,7 +46,7 @@ class ManageCalendarModule_Controller extends Action_Controller
 			'settings' => array(
 				'cal_enabled' => 1,
 			),
-			'setting_callback' => function ($value) {
+			'setting_callback' => function($value) {
 				if ($value)
 				{
 					enableModules('calendar', array('post', 'boardindex', 'display'));
@@ -204,7 +204,7 @@ class ManageCalendarModule_Controller extends Action_Controller
 						'value' => $txt['date'],
 					),
 					'data' => array(
-						'function' => function ($rowData) {
+						'function' => function($rowData) {
 							global $txt;
 
 							// Recurring every year or just a single year?

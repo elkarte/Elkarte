@@ -645,7 +645,7 @@ function removeThemeOptions($theme, $membergroups, $old_settings = '')
 		$query_param = array('theme_operator' => '=', 'theme' => (int) $theme);
 
 	// Guests means id_member = -1
-	if ($membergroups === 'guests' )
+	if ($membergroups === 'guests')
 		$query_param += array('member_operator' => '=', 'member' => -1);
 	// Members means id_member > 0
 	elseif ($membergroups === 'members')

@@ -37,8 +37,8 @@ class Jslocale_Controller extends Action_Controller
 	}
 
 	/**
-	* Creates the javascript code for localization of the editor (SCEditor)
-	*/
+	 * Creates the javascript code for localization of the editor (SCEditor)
+	 */
 	public function action_sceditor()
 	{
 		global $txt, $editortxt;

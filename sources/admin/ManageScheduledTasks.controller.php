@@ -376,7 +376,7 @@ class ManageScheduledTasks_Controller extends Action_Controller
 						'value' => $txt['scheduled_log_time_run'],
 					),
 					'data' => array(
-						'function' => function ($rowData) {
+						'function' => function($rowData) {
 							return standardTime($rowData['time_run'], true);
 						},
 					),
@@ -407,7 +407,7 @@ class ManageScheduledTasks_Controller extends Action_Controller
 						'value' => $txt['scheduled_log_completed'],
 					),
 					'data' => array(
-						'function' => function ($rowData) {
+						'function' => function($rowData) {
 							global $settings, $txt;
 
 							return '<img src="' . $settings['images_url'] . '/admin/complete_' . ($rowData['task_completed'] ? 'success' : 'fail') . '.png" alt="' . sprintf($txt[$rowData['task_completed'] ? 'maintain_done' : 'maintain_fail'], $rowData['name']) . '" />';

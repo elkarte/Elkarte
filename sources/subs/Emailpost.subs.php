@@ -72,7 +72,7 @@ function pbe_email_to_bbc($text, $html)
 		$text = preg_replace(array_keys($tags), array_values($tags), $text);
 		require_once(EXTDIR . '/markdown/markdown.php');
 		$text = Markdown($text);
-		$text = str_replace(array('&gt;blockquote>','&gt;/blockquote>'), array('<blockquote>', '</blockquote>'), $text);
+		$text = str_replace(array('&gt;blockquote>', '&gt;/blockquote>'), array('<blockquote>', '</blockquote>'), $text);
 
 		// Convert any resulting HTML created by markup style text in the email to BBC
 		$bbc_converter = new Html_2_BBC($text, false);
