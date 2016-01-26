@@ -1695,7 +1695,7 @@ function getGroupModerators($id_group)
  * - If no group is specified it will list any group that can be used
  *
  * @package Membergroups
- * @param int|false $id_group
+ * @param int|bool $id_group
  * @return array
  */
 function getInheritableGroups($id_group = false)

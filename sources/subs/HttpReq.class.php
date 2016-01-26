@@ -19,8 +19,10 @@
  * - Can be passed DataValidation sanitation values to return sanitized values
  * - Fetch raw values as $instance->post->keyname
  *     - $this->-req->post->filename
+ *     - $this->_req->query->sa
  * - Fetch cleaned values with $instance->getPost('keyname', 'sanitation needs', 'default value')
  *     - $this->-req->getPost('filename', 'trim|strval', '');
+ *     - $this->-req->getQuery('filename', 'intval', 0);
  */
 class HttpReq
 {
@@ -93,20 +95,23 @@ class HttpReq
 		$this->session = new ArrayObject($_SESSION, ArrayObject::ARRAY_AS_PROPS);
 		$this->server = new ArrayObject($_SERVER, ArrayObject::ARRAY_AS_PROPS);
 
+		// Get will be in ->query, Post in ->post
 		$this->_loadParsed();
 	}
 
 	/**
 	 * Certain variables are born in Request, others are sanitized, and stored in
 	 * $_REQUEST, its a awful mess really.
+	 *
 	 * Once that mess is cleaned up this should not be needed.  But the basis is due to
 	 * what function cleanRequest() does.
 	 *
 	 * What it does:
-	 * - finds items added by cleanRequest to $_REQUEST
-	 * - adds the above to both $_POST and $_GET
-	 * - looks for duplicate items in $_REQUEST and $_POST and used the $_REQUEST
-	 *   values, being they are "sanitized"  $_GET ones are re-stuffed by cleanRequest
+	 * - Finds items added by cleanRequest to $_REQUEST
+	 * - Adds the above to both $_POST and $_GET
+	 * - Looks for duplicate items in $_REQUEST and $_POST and uses the $_REQUEST
+	 *   values, being they are "sanitized"
+	 * - $_GET ones are already re-stuffed by cleanRequest
 	 */
 	private function _loadParsed()
 	{
@@ -130,12 +135,12 @@ class HttpReq
 	}
 
 	/**
-	 * Looks for the post value jsonString and expands it to POST
+	 * Looks for the post value "jsonString" and expands values to POST
 	 *
 	 * What it does:
 	 * - Looks for jsonString passed in post
 	 * - json decodes the string and loads its values in to POST
-	 * - Does not overwrite any existing keys
+	 * - Does *not* overwrite any existing keys
 	 */
 	private function _loadJson()
 	{
@@ -158,8 +163,8 @@ class HttpReq
 
 	/**
 	 * Generic fetch access for values contained in the super globals
-	 * - gets in order of param, get and post
 	 *
+	 * - gets in order of param, get and post
 	 * - $instance->keyanme will check cleaned params, get then post for values
 	 *     - $_POST['foo'] = 'bar', $_GET['bar'] = 'foo'
 	 *     - $this->req->post->foo is explicit and returns bar
@@ -327,7 +332,7 @@ class HttpReq
 	 * Runs sanitation rules against a single value
 	 *
 	 * @param string $name the key name in the _param array
-	 * @param string|null $sanitize comma seperated list of rules
+	 * @param string|null $sanitize comma separated list of rules
 	 */
 	public function cleanValue($name, $sanitize = null)
 	{

@@ -15,8 +15,8 @@ if (!defined('ELK'))
 	die('No access...');
 
 /**
- * Post-by-email controller.  Handles items pertaining to posting or PM an
- * item that was received by email
+ * Emailpost_Controller class.
+ * Handles items pertaining to posting or PM an item that was received by email
  *
  * @package Maillist
  */
@@ -270,7 +270,6 @@ class Emailpost_Controller extends Action_Controller
 				}
 
 				// If they don't wish, then return false like recording the failure
-				// would do
 				return false;
 			}
 			else
@@ -485,9 +484,9 @@ function pbe_create_post($pbe, $email_message, $topic_info)
  * - Checks if the user has permissions
  * - Calls pbe_load_text to prepare text for the pm
  * - Calls query_mark_pms to mark things as read
- * - Uses sendpm to do the actual "sending"
  * - Returns true if successful or false for any number of failures
  *
+ * @uses sendpm to do the actual "sending"
  * @package Maillist
  * @param mixed[] $pbe array of pbe 'user_info' values
  * @param Email_Parse $email_message
@@ -538,11 +537,11 @@ function pbe_create_pm($pbe, $email_message, $pm_info)
  * - Called by pbe_topic to create a new topic or by pbe_main to create a new topic via a subject change
  * - checks posting permissions, but requires all email validation checks are complete
  * - Calls pbe_load_text to prepare text for the post
- * - Uses createPost to do the actual "posting"
  * - Calls sendNotifications to announce the new post
  * - Calls query_update_member_stats to show they did something
  * - Requires the pbe, email_message and board_info arrays to be populated.
  *
+ * @uses createPost to do the actual "posting"
  * @package Maillist
  * @param mixed[] $pbe array of pbe 'user_info' values
  * @param Email_Parse $email_message

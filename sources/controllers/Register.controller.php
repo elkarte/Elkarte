@@ -23,8 +23,8 @@ if (!defined('ELK'))
 	die('No access...');
 
 /**
- * Register Controller Class, It registers new members, and it allows
- * the administrator moderate member registration
+ * Register_Controller Class
+ * It registers new members, and it allows the administrator moderate member registration
  *
  * is_activated value key is as follows, for reference again:
  * - > 10 Banned with activation status as value - 10
@@ -44,7 +44,7 @@ class Register_Controller extends Action_Controller
 	private $_row;
 
 	/**
-	 * Pre Dispatch, called before other methods.  Loads HttpReq instance.
+	 * Pre Dispatch, called before other methods.
 	 */
 	public function pre_dispatch()
 	{
@@ -85,6 +85,8 @@ class Register_Controller extends Action_Controller
 
 	/**
 	 * Begin the registration process.
+	 *
+	 * - Triggers the prepare_context event
 	 *
 	 * Accessed by ?action=register
 	 *
@@ -216,6 +218,7 @@ class Register_Controller extends Action_Controller
 	 * - Validates all requirements have been filled in properly
 	 * - Passes final processing to do_register
 	 * - Directs back to register on errors
+	 * - Triggers the before_complete_register event
 	 *
 	 * Accessed by ?action=register;sa=register2
 	 */
@@ -1072,6 +1075,7 @@ class Register_Controller extends Action_Controller
 	 * Shows the contact form for the user to fill out
 	 *
 	 * - Functionality needs to be enabled in the ACP for this to be used
+	 * - Triggers the verify_contact event
 	 */
 	public function action_contact()
 	{

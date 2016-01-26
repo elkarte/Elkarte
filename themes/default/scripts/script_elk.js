@@ -1189,7 +1189,7 @@ errorbox_handler.prototype.addError = function(error_elem, error_code)
 			this.oError_box.append("<ul id='" + this.opt.error_box_id + "_list'></ul>");
 
 		// Add the error it and show it
-		$(document.getElementById(this.opt.error_box_id + "_list")).append("<li style=\"display:none\" id='" + this.opt.error_box_id + "_" + error_code + "' class='error'>" + error_txts[error_code] + "</li>");
+		$(document.getElementById(this.opt.error_box_id + "_list")).append("<li style=\"display:none;\" id='" + this.opt.error_box_id + "_" + error_code + "' class='error'>" + error_txts[error_code] + "</li>");
 		$(document.getElementById(this.opt.error_box_id + "_" + error_code)).slideDown();
 	}
 };

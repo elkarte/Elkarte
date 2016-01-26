@@ -374,7 +374,7 @@ function loadProfileFields($force_reload = false)
 			'type' => 'callback',
 			'callback_func' => 'birthdate',
 			'permission' => 'profile_extra',
-			'preload' => function () {
+			'preload' => function() {
 				global $cur_profile, $context;
 
 				// Split up the birth date....
@@ -509,7 +509,7 @@ function loadProfileFields($force_reload = false)
 			'callback_func' => 'theme_pick',
 			'permission' => 'profile_extra',
 			'enabled' => empty($settings['disable_user_variant']) || !empty($modSettings['theme_allow']) || allowedTo('admin_forum'),
-			'preload' => function () {
+			'preload' => function() {
 				global $context, $cur_profile, $txt;
 
 				$db = database();
@@ -554,7 +554,7 @@ function loadProfileFields($force_reload = false)
 				}
 				return true;
 			},
-			'preload' => function () {
+			'preload' => function() {
 				global $context, $cur_profile;
 
 				$context['member']['karma']['good'] = $cur_profile['karma_good'];
@@ -747,7 +747,7 @@ function loadProfileFields($force_reload = false)
 			'callback_func' => 'pm_settings',
 			'permission' => 'pm_read',
 			'save_key' => 'pm_prefs',
-			'preload' => function () {
+			'preload' => function() {
 				global $context, $cur_profile;
 
 				$context['display_mode'] = $cur_profile['pm_prefs'] & 3;
@@ -865,7 +865,7 @@ function loadProfileFields($force_reload = false)
 			'callback_func' => 'smiley_pick',
 			'enabled' => !empty($modSettings['smiley_sets_enable']),
 			'permission' => 'profile_extra',
-			'preload' => function () {
+			'preload' => function() {
 				global $modSettings, $context, $txt, $cur_profile;
 
 				$context['member']['smiley_set']['id'] = empty($cur_profile['smiley_set']) ? '' : $cur_profile['smiley_set'];
@@ -899,7 +899,7 @@ function loadProfileFields($force_reload = false)
 			'callback_func' => 'theme_settings',
 			'permission' => 'profile_extra',
 			'is_dummy' => true,
-			'preload' => function () {
+			'preload' => function() {
 				global $context, $user_info;
 
 				loadLanguage('Settings');
@@ -916,7 +916,7 @@ function loadProfileFields($force_reload = false)
 			'type' => 'callback',
 			'callback_func' => 'timeformat_modify',
 			'permission' => 'profile_extra',
-			'preload' => function () {
+			'preload' => function() {
 				global $context, $user_info, $txt, $cur_profile, $modSettings;
 
 				$context['easy_timeformats'] = array(
@@ -939,7 +939,7 @@ function loadProfileFields($force_reload = false)
 			'type' => 'callback',
 			'callback_func' => 'timeoffset_modify',
 			'permission' => 'profile_extra',
-			'preload' => function () {
+			'preload' => function() {
 				global $context, $cur_profile;
 
 				$context['member']['time_offset'] = $cur_profile['time_offset'];

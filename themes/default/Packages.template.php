@@ -276,7 +276,7 @@ function template_view_package()
 
 							echo '
 								<tr>
-									<td style="width:0"></td>
+									<td style="width:0;"></td>
 									<td style="width: 30px;" class="smalltext">
 										<a href="' . $scripturl . '?action=admin;area=packages;sa=showoperations;operation_key=', $operation['operation_key'], ';package=', $context['filename'], ';filename=', $operation['filename'], (!empty($context['uninstalling']) ? ';reverse' : ''), '" onclick="return reqWin(this.href, 600, 400, false);">
 											<img src="', $settings['default_images_url'], '/admin/package_ops.png" alt="" />

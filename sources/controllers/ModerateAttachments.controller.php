@@ -21,12 +21,12 @@ if (!defined('ELK'))
 	die('No access...');
 
 /**
- * Moderate Attachments Controller
+ * ModerateAttachments_Controller class
  */
 class ModerateAttachments_Controller extends Action_Controller
 {
 	/**
-	 * Forward to attachments approval method, the only responsibility
+	 * Forward to attachments approval method is the only responsibility
 	 * of this controller.
 	 *
 	 * @see Action_Controller::action_index()
@@ -74,11 +74,17 @@ class ModerateAttachments_Controller extends Action_Controller
 		$allowed_boards = !empty($user_info['mod_cache']['ap']) ? $user_info['mod_cache']['ap'] : boardsAllowedTo('approve_posts');
 
 		if ($allowed_boards == array(0))
+		{
 			$approve_query = '';
+		}
 		elseif (!empty($allowed_boards))
+		{
 			$approve_query = ' AND m.id_board IN (' . implode(',', $allowed_boards) . ')';
+		}
 		else
+		{
 			$approve_query = ' AND 0';
+		}
 
 		// Validate the attachments exist and have the right approval state.
 		$attachments = validateAttachments($attachments, $approve_query);

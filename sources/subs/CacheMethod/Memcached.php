@@ -163,7 +163,7 @@ class Memcached extends Cache_Method_Abstract
 	{
 		$memcached = self::get_memcached_server();
 
-		return array('title' => self::title(), 'version' => empty($memcached) ? '???' : (class_exists('Memcached') ? $memcached->getVersion() : memcache_get_version($memcached)));
+		return array('title' => self::title(), 'version' => empty($memcached) ? '???' : (class_exists('Memcached') ? $memcached->getVersion() : memcache_get_version()));
 	}
 
 	/**
@@ -181,6 +181,8 @@ class Memcached extends Cache_Method_Abstract
 	 * Adds the settings to the settings page.
 	 *
 	 * Used by integrate_modify_cache_settings added in the title method
+	 *
+	 * @param array() $config_vars
 	 */
 	public static function settings(&$config_vars)
 	{

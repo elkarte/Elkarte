@@ -23,7 +23,8 @@ if (!defined('ELK'))
 	die('No access...');
 
 /**
- * BoardIndex_Controller class, displays the main board index
+ * BoardIndex_Controller class
+ * Displays the main board index
  */
 class BoardIndex_Controller extends Action_Controller implements Frontpage_Interface
 {
@@ -53,9 +54,10 @@ class BoardIndex_Controller extends Action_Controller implements Frontpage_Inter
 	 * This function shows the board index.
 	 *
 	 * What it does:
-	 * - It uses the BoardIndex template, and main sub template.
 	 * - It updates the most online statistics.
 	 * - It is accessed by ?action=boardindex.
+	 *
+	 * @uses the BoardIndex template, and main sub template
 	 */
 	public function action_boardindex()
 	{

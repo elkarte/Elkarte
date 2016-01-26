@@ -61,8 +61,8 @@ function template_lp_stats()
 	echo '
 		</div>';
 
-	echo '<script><!-- // --><![CDATA[
-		window.onload = function() {
+	echo '<script defer="defer"><!-- // --><![CDATA[
+		$(document).ready(function() {
 			likePostStats.prototype.init({
 				txtStrings: {
 					topic: ' . JavaScriptEscape($txt['like_post_topic']) . ',
@@ -93,9 +93,9 @@ function template_lp_stats()
 					totalLikesGiven: ' . JavaScriptEscape($txt['like_post_total_likes_given']) . ',
 					showPosts: ' . JavaScriptEscape($txt['like_post_show']) . ',
 					hidePosts: ' . JavaScriptEscape($txt['like_post_hide']) . ',
-					mostLikeGivenUserHeading1: ' . JavaScriptEscape($txt['like_post_most_like_given_user_heading1']) . ',
+					mostLikeGivenUserHeading1: ' . JavaScriptEscape($txt['like_post_most_like_given_user_heading1']) . '
 				}
 			});
-		}
+		})
 	// ]]></script>';
 }

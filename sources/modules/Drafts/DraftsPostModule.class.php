@@ -178,7 +178,7 @@ class Drafts_Post_Module implements ElkArte\sources\modules\Module_Interface
 	 * Will load a draft if selected is supplied via post
 	 *
 	 * @param int $member_id
-	 * @param int|false $id_topic if set, load drafts for the specified topic
+	 * @param int|bool $id_topic if set, load drafts for the specified topic
 	 * @return false|null
 	 */
 	protected function _prepareDraftsContext($member_id, $id_topic = false)

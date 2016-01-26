@@ -100,7 +100,7 @@ class Ila_Integrate
 	{
 		global $context;
 
-		// Enabled and we have ila tags, then hide them from parsebbc where approriate
+		// Enabled and we have ila tags, then hide them from parsebbc where appropriate
 		if (empty($parse_tags) && empty($context['uninstalling']) && stripos($message, '[attach') !== false)
 		{
 			require_once(SUBSDIR . '/InLineAttachment.class.php');
@@ -114,7 +114,7 @@ class Ila_Integrate
 	 * - Allow addons access to what parse_bbc created, here we call ILA to render its tags
 	 *
 	 * @param string $message
-	 * @param smixed[] $smileys
+	 * @param mixed[] $smileys
 	 * @param string $cache_id
 	 * @param string[]|null $parse_tags
 	 */
@@ -154,6 +154,8 @@ class Ila_Integrate
 
 	/**
 	 * - Defines our settings array and uses our settings class to manage the data
+	 *
+	 * @param array $config_vars
 	 */
 	public static function integrate_modify_attachment_settings(&$config_vars)
 	{

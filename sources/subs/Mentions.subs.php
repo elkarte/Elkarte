@@ -298,7 +298,7 @@ function removeMentions($id_mentions)
 
 	// Update the top level mentions count
 	if ($success)
-		updateMentionMenuCount($status, $user_info['id']);
+		updateMentionMenuCount(null, $user_info['id']);
 
 	return $success;
 }
@@ -346,7 +346,7 @@ function toggleMentionsApproval($msgs, $approved)
  * Toggles a mention visibility on/off
  *
  * - if off is restored to visible,
- * - if on is switched to unvisible for all the users
+ * - if on is switched to invisible for all the users
  *
  * @package Mentions
  * @param string $type type of the mention that you want to toggle
@@ -467,7 +467,7 @@ function findMemberMention($id_mention, $id_member)
  * Updates the mention count as a result of an action, read, new, delete, etc
  *
  * @package Mentions
- * @param int $status
+ * @param int|null $status
  * @param int $member_id
  */
 function updateMentionMenuCount($status, $member_id)
@@ -480,7 +480,7 @@ function updateMentionMenuCount($status, $member_id)
 	// Mark as read we decrease the count
 	elseif ($status === 1)
 		updateMemberdata($member_id, array('mentions' => '-'));
-	// Deleting or unapproving may have been read or not, so a count is required
+	// Deleting or un-approving may have been read or not, so a count is required
 	else
 		countUserMentions(false, '', $member_id);
 }

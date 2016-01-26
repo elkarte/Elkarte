@@ -397,7 +397,8 @@ class Verification_Controls_Captcha implements Verification_Controls
 
 	/**
 	 * Required by the interface, returns true for Captcha display
-	 * @return true
+	 *
+	 * @return bool
 	 */
 	public function hasVisibleTemplate()
 	{
@@ -661,7 +662,7 @@ class Verification_Controls_Questions implements Verification_Controls
 	/**
 	 * Required by the interface, returns true for question challenges
 	 *
-	 * @return true
+	 * @return boo
 	 */
 	public function hasVisibleTemplate()
 	{

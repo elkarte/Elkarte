@@ -90,7 +90,7 @@ class In_Line_Attachment
 	protected $_curr_tag = array();
 
 	/**
-	 * Contstuctor, loads the message an id in to the class
+	 * Constructor, loads the message an id in to the class
 	 *
 	 * @param string $message
 	 * @param int|null $id_msg

@@ -19,7 +19,8 @@ if (!defined('ELK'))
 	die('No access...');
 
 /**
- * OpenID controller.
+ * OpenID_Controller Class.
+ * Controls openID verification process
  */
 class OpenID_Controller extends Action_Controller
 {
@@ -149,6 +150,7 @@ class OpenID_Controller extends Action_Controller
 
 				$controller = new Register_Controller(new Event_Manager());
 				$controller->pre_dispatch();
+
 				return $controller->do_register(true);
 			}
 			else

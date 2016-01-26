@@ -60,7 +60,7 @@ class ManageTopics_Controller extends Action_Controller
 	 *
 	 * Requires the admin_forum permission.
 	 * Accessed from ?action=admin;area=postsettings;sa=topics.
-
+	 *
 	 * @uses Admin template, edit_topic_settings sub-template.
 	 */
 	public function action_topicSettings_display()

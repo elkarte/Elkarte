@@ -849,7 +849,7 @@ a.bbc_link {
 }
 #quick_edit_body_container .editor {
 	width: 100%;
-	margin-bottom: 10px
+	margin-bottom: 10px;
 }
 #quick_edit_body_container .input_text {
 	width: 85%;
@@ -2106,10 +2106,6 @@ img.new_posts {
 	word-wrap: break-word;
 	word-break: break-all;
 	line-height: 1.429em;
-}
-
-.topic_name h4 a {
-	font-weight: bold;
 }
 
 .topic_starter {
@@ -5571,7 +5567,7 @@ a.help .icon {
 
 	dt, dd, dd label, .login dt, #advanced_search dt {
 		width: 100% !important;
-		margin: 0 !important
+		margin: 0 !important;
 	}
 
 	dd {

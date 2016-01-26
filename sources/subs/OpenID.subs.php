@@ -328,7 +328,7 @@ class OpenID
 	/**
 	 * Retrieve DH keys from the store.
 	 *
-	 * - It generates them if they're not stored or $regerate parameter is true.
+	 * - It generates them if they're not stored or $regenerate parameter is true.
 	 *
 	 * @param bool $regenerate
 	 */
@@ -347,7 +347,8 @@ class OpenID
 			);
 		}
 
-		// Dang it, now I have to do math.  And it's not just ordinary math, its the evil big interger math.  This will take a few seconds.
+		// Dang it, now I have to do math.  And it's not just ordinary math, its the evil big integer math.
+		// This will take a few seconds.
 		$private = $this->generate_private_key();
 		$public = bcpowmod($g, $private, $p);
 

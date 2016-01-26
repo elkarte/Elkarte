@@ -21,6 +21,7 @@ if (!defined('ELK'))
 	die('No access...');
 
 /**
+ * Display_Controller class.
  * This controller is the most important and probably most accessed of all.
  * It controls topic display, with all related.
  */
@@ -71,11 +72,12 @@ class Display_Controller extends Action_Controller
 	 *
 	 * What it does:
 	 * - This function loads the posts in a topic up so they can be displayed.
-	 * - It uses the main sub template of the Display template.
 	 * - It requires a topic, and can go to the previous or next topic from it.
 	 * - It jumps to the correct post depending on a number/time/IS_MSG passed.
 	 * - It depends on the messages_per_page, defaultMaxMessages and enableAllMessages settings.
 	 * - It is accessed by ?topic=id_topic.START.
+	 *
+	 * @uses the main sub template of the Display template.
 	 */
 	public function action_display()
 	{

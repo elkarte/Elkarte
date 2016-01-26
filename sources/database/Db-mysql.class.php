@@ -584,8 +584,10 @@ class Database_MySQL extends Database_Abstract
 
 				// Attempt to find and repair the broken table.
 				foreach ($fix_tables as $table)
+				{
 					$this->query('', "
 						REPAIR TABLE $table", false, false);
+				}
 
 				// And send off an email!
 				sendmail($webmaster_email, $txt['database_error'], $txt['tried_to_repair']);
@@ -717,7 +719,9 @@ class Database_MySQL extends Database_Abstract
 		// Here's where the variables are injected to the query.
 		$insertRows = array();
 		foreach ($data as $dataRow)
+		{
 			$insertRows[] = $this->quote($insertData, $this->_array_combine($indexed_columns, $dataRow), $connection);
+		}
 
 		// Determine the method of insertion.
 		$queryTitle = $method == 'replace' ? 'REPLACE' : ($method == 'ignore' ? 'INSERT IGNORE' : 'INSERT');
@@ -951,8 +955,8 @@ class Database_MySQL extends Database_Abstract
 	 * This function lists all tables in the database.
 	 * The listing could be filtered according to $filter.
 	 *
-	 * @param string|false $db_name_str string holding the database name, or false, default false
-	 * @param string|false $filter string to filter by, or false, default false
+	 * @param string|bool $db_name_str string holding the database name, or false, default false
+	 * @param string|bool $filter string to filter by, or false, default false
 	 *
 	 * @return string[] an array of table names. (strings)
 	 */
@@ -975,7 +979,9 @@ class Database_MySQL extends Database_Abstract
 		);
 		$tables = array();
 		while ($row = $this->fetch_row($request))
+		{
 			$tables[] = $row[0];
+		}
 		$this->free_result($request);
 
 		return $tables;
@@ -1169,7 +1175,7 @@ class Database_MySQL extends Database_Abstract
 	 * It ignores $counter parameter.
 	 *
 	 * @param resource $request
-	 * @param int|false $counter = false
+	 * @param int|bool $counter = false
 	 */
 	public function fetch_assoc($request, $counter = false)
 	{

@@ -103,7 +103,7 @@ function validateSession($type = 'admin')
 		}
 
 		// Posting the password... check it.
-		if (isset($_POST[$type . '_pass']) && str_replace('*', '', $_POST[$type. '_pass']) !== '')
+		if (isset($_POST[$type . '_pass']) && str_replace('*', '', $_POST[$type . '_pass']) !== '')
 		{
 			// Give integrated systems a chance to verify this password
 			$good_password = in_array(true, call_integration_hook('integrate_verify_password', array($user_info['username'], $_POST[$type . '_pass'], false)), true);
@@ -1489,7 +1489,7 @@ function loadBadBehavior()
  * - Importantly, even if the password was right we DON'T TELL THEM!
  *
  * @param int $id_member
- * @param string|false $password_flood_value = false or string joined on |'s
+ * @param string|bool $password_flood_value = false or string joined on |'s
  * @param boolean $was_correct = false
  */
 function validatePasswordFlood($id_member, $password_flood_value = false, $was_correct = false)

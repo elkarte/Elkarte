@@ -25,8 +25,8 @@ if (!defined('ELK'))
 }
 
 /**
- * Personal Message Controller, It allows viewing, sending, deleting, and
- * marking personal messages
+ * PersonalMessage_Controller class
+ * It allows viewing, sending, deleting, and marking personal messages
  *
  * @package PersonalMessage
  */
@@ -34,9 +34,8 @@ class PersonalMessage_Controller extends Action_Controller
 {
 	/**
 	 * $_search_params will carry all settings that differ from the default
-	 * search parameters.
-	 * That way, the URLs involved in a search page will be kept as short
-	 * as possible.
+	 * search parameters. That way, the URLs involved in a search page will
+	 * be kept as short as possible.
 	 * @var array
 	 */
 	private $_search_params = array();
@@ -928,7 +927,8 @@ class PersonalMessage_Controller extends Action_Controller
 			'preview_type' => 2,
 		);
 
-		$this->_events->trigger('prepare_send_context', array('pmsg' => isset($this->_req->query->pmsg) ? $this->_req->query->pmsg : (isset($this->_req->query->quote) ? $this->_req->query->quote : 0), 'editorOptions' => &$editorOptions, 'recipientList' => &$recipientList));
+		// Trigger the prepare_send_context PM event
+		$this->_events->trigger('prepare_send_context', array('pmsg' => isset($this->_req->query->pmsg) ? $this->_req->query->pmsg : (isset($this->_req->query->quote) ? $this->_req->query->quote : 0), 'editorOptions' => &$editorOptions, 'recipientList' => &$context['recipients']));
 
 		create_control_richedit($editorOptions);
 
@@ -1385,7 +1385,8 @@ class PersonalMessage_Controller extends Action_Controller
 			'preview_type' => 2,
 		);
 
-		$this->_events->trigger('prepare_send_context', array('pmsg' => isset($this->_req->query->pmsg) ? $this->_req->query->pmsg : (isset($this->_req->query->quote) ? $this->_req->query->quote : 0), 'editorOptions' => &$editorOptions, 'recipientList' => &$recipientList));
+		// Trigger the prepare_send_context PM event
+		$this->_events->trigger('prepare_send_context', array('pmsg' => isset($this->_req->query->pmsg) ? $this->_req->query->pmsg : (isset($this->_req->query->quote) ? $this->_req->query->quote : 0), 'editorOptions' => &$editorOptions, 'recipientList' => &$recipient_ids));
 
 		create_control_richedit($editorOptions);
 

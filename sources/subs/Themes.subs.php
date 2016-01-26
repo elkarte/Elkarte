@@ -637,7 +637,7 @@ function removeThemeOptions($theme, $membergroups, $old_settings = '')
 	if ($theme === 'default')
 		$query_param = array('theme_operator' => '=', 'theme' => 1);
 	// All the themes that are not the default one (id_theme != 1)
-	// @todo 'non_default' would be more esplicative, though it could be confused with the one in $membergroups
+	// @todo 'non_default' would be more explicative, though it could be confused with the one in $membergroups
 	elseif ($theme === 'custom')
 		$query_param = array('theme_operator' => '!=', 'theme' => 1);
 	// If numeric means a specific theme
@@ -645,7 +645,7 @@ function removeThemeOptions($theme, $membergroups, $old_settings = '')
 		$query_param = array('theme_operator' => '=', 'theme' => (int) $theme);
 
 	// Guests means id_member = -1
-	if ($membergroups === 'guests' )
+	if ($membergroups === 'guests')
 		$query_param += array('member_operator' => '=', 'member' => -1);
 	// Members means id_member > 0
 	elseif ($membergroups === 'members')

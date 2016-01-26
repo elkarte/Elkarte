@@ -235,7 +235,7 @@ class ManageMaillist_Controller extends Action_Controller
 						'value' => $txt['message_type'],
 					),
 					'data' => array(
-						'function' => function ($rowData) {
+						'function' => function($rowData) {
 							global $txt;
 
 							// Do we have a type?
@@ -1733,7 +1733,7 @@ class ManageMaillist_Controller extends Action_Controller
 						'class' => 'centertext',
 					),
 					'data' => array(
-						'function' => function ($rowData) {
+						'function' => function($rowData) {
 							return '<input type="checkbox" name="deltpl[]" value="' . $rowData['id_comment'] . '" class="input_check" />';
 						},
 						'class' => 'centertext',

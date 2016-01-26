@@ -21,7 +21,8 @@ if (!defined('ELK'))
 	die('No access...');
 
 /**
- * Search_Controller class, it handle all of the searching
+ * Search_Controller class
+ * Handle all of the searching for the site
  *
  * @package Search
  */
@@ -148,10 +149,12 @@ class Search_Controller extends Action_Controller
 		$context['require_verification'] = $user_info['is_guest'] && !empty($modSettings['search_enable_captcha']) && empty($_SESSION['ss_vv_passed']);
 		if ($context['require_verification'])
 		{
+			// Build a verification control for the form
 			require_once(SUBSDIR . '/VerificationControls.class.php');
 			$verificationOptions = array(
 				'id' => 'search',
 			);
+
 			$context['require_verification'] = create_control_verification($verificationOptions);
 			$context['visual_verification_id'] = $verificationOptions['id'];
 		}
@@ -192,7 +195,7 @@ class Search_Controller extends Action_Controller
 				if ($search_error === 'messages')
 					continue;
 
-				if ($search_error == 'string_too_long')
+				if ($search_error === 'string_too_long')
 					$txt['error_string_too_long'] = sprintf($txt['error_string_too_long'], $context['search_string_limit']);
 
 				$context['search_errors']['messages'][] = $txt['error_' . $search_error];
@@ -261,6 +264,7 @@ class Search_Controller extends Action_Controller
 		// No, no, no... this is a bit hard on the server, so don't you go prefetching it!
 		stop_prefetching();
 
+		// Set up the weights to help tune result relevancy
 		$this->_setup_weight_factors();
 
 		// These vars don't require an interface, they're just here for tweaking.
@@ -288,11 +292,8 @@ class Search_Controller extends Action_Controller
 		// Are you allowed?
 		isAllowedTo('search_posts');
 
-		require_once(SUBSDIR . '/Package.subs.php');
-
 		Elk_Autoloader::getInstance()->register(SUBSDIR . '/Search', '\\ElkArte\\Search');
 		$this->_search = new \ElkArte\Search\Search();
-
 		$this->_search->setWeights($this->_weight_factors, $this->_weight, $this->_weight_total);
 
 		// Load up the search API we are going to use.
@@ -305,7 +306,7 @@ class Search_Controller extends Action_Controller
 		$context['compact'] = $this->_search->isCompact();
 
 		// Nothing??
-		if ($this->_search->param('search') === false || $this->_search->param('search') == '')
+		if ($this->_search->param('search') === false || $this->_search->param('search') === '')
 			$context['search_errors']['invalid_search_string'] = true;
 		// Too long?
 		elseif (Util::strlen($this->_search->param('search')) > $context['search_string_limit'])

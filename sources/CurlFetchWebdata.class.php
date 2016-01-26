@@ -273,7 +273,7 @@ class Curl_Fetch_Webdata
 	 * - Drops vars with @ since we don't support sending files (uploading)
 	 *
 	 * @param mixed[] $post_data
-	*/
+	 */
 	private function _buildPostData($post_data)
 	{
 		if (is_array($post_data))
@@ -282,7 +282,9 @@ class Curl_Fetch_Webdata
 
 			// Build the post data, drop ones with leading @'s since those can be used to send files, we don't support that.
 			foreach ($post_data as $name => $value)
+			{
 				$postvars[] = $name . '=' . urlencode($value[0] == '@' ? '' : $value);
+			}
 
 			return implode('&', $postvars);
 		}

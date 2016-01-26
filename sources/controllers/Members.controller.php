@@ -21,7 +21,8 @@ if (!defined('ELK'))
 	die('No access...');
 
 /**
- * Members Controller, allows for the adding or removing of buddies
+ * Members Controller class.
+ * Allows for the adding or removing of buddies
  */
 class Members_Controller extends Action_Controller
 {
@@ -50,8 +51,8 @@ class Members_Controller extends Action_Controller
 	/**
 	 * This simple function adds the passed user from the current users buddy list.
 	 *
-	 * Called by ?action=buddy;u=x;session_id=y.
-	 * Redirects to ?action=profile;u=x.
+	 * - Called by ?action=buddy;u=x;session_id=y.
+	 * - Redirects to ?action=profile;u=x.
 	 */
 	public function action_addbuddy()
 	{
@@ -98,8 +99,8 @@ class Members_Controller extends Action_Controller
 	/**
 	 * This function removes the passed user from the current users buddy list.
 	 *
-	 * Called by ?action=buddy;u=x;session_id=y.
-	 * Redirects to ?action=profile;u=x.
+	 * - Called by ?action=buddy;u=x;session_id=y.
+	 * - Redirects to ?action=profile;u=x.
 	 */
 	public function action_removebuddy()
 	{

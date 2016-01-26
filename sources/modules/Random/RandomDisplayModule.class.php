@@ -1,7 +1,7 @@
 <?php
 
 /**
- * 
+ *
  *
  * @name      ElkArte Forum
  * @copyright ElkArte Forum contributors
@@ -40,6 +40,10 @@ class Random_Display_Module implements ElkArte\sources\modules\Module_Interface
 
 	/**
 	 * Adds to the display query to fetch the id of the original topic.
+	 *
+	 * @param string[] $topic_selects
+	 * @param string[] $topic_tables
+	 * @param string[] $topic_parameters
 	 */
 	public static function followup_topic_query(&$topic_selects, &$topic_tables, &$topic_parameters)
 	{
@@ -49,6 +53,8 @@ class Random_Display_Module implements ElkArte\sources\modules\Module_Interface
 
 	/**
 	 * Show topics originated from the messages.
+	 *
+	 * @param int[] $messages
 	 */
 	public static function followup_message_list($messages)
 	{
@@ -60,6 +66,10 @@ class Random_Display_Module implements ElkArte\sources\modules\Module_Interface
 
 	/**
 	 * Prepares the data for the droppy with "child topics".
+	 *
+	 * @param mixed[] $topicinfo
+	 * @param int $topic
+	 * @param bool $includeUnapproved
 	 */
 	public function topicinfo($topicinfo, $topic, $includeUnapproved)
 	{

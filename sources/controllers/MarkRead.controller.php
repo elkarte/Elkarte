@@ -15,7 +15,9 @@ if (!defined('ELK'))
 	die('No access...');
 
 /**
- * This class handles a part of the actions to mark boards, topics, or replies, as read/unread.
+ * MarkRead_Controller class
+ * This class handles a part of the actions to mark boards, topics, or replies,
+ * as read/unread.
  */
 class MarkRead_Controller extends Action_Controller
 {
@@ -173,7 +175,8 @@ class MarkRead_Controller extends Action_Controller
 
 	/**
 	 * Marks the selected topics as read.
-	 * Accessed by action=markasread;sa=unreadreplies
+	 *
+	 * - Accessed by action=markasread;sa=unreadreplies
 	 */
 	public function action_markreplies()
 	{
@@ -199,7 +202,8 @@ class MarkRead_Controller extends Action_Controller
 
 	/**
 	 * Mark a single topic as unread.
-	 * Accessed by action=markasread;sa=topic
+	 *
+	 * - Accessed by action=markasread;sa=topic
 	 */
 	public function action_marktopic()
 	{
@@ -242,13 +246,15 @@ class MarkRead_Controller extends Action_Controller
 
 	/**
 	 * Mark as read: boards, topics, unread replies.
-	 * Accessed by action=markasread
-	 * Subactions: sa=topic, sa=all, sa=unreadreplies
+	 *
+	 * - Accessed by action=markasread
+	 * - Subactions: sa=topic, sa=all, sa=unreadreplies
 	 */
 	public function action_markasread()
 	{
 		global $board, $board_info;
 
+		// @todo check on why this is commented out
 		//checkSession('get');
 
 		require_once(SUBSDIR . '/Boards.subs.php');

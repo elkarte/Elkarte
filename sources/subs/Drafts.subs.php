@@ -238,7 +238,7 @@ function load_draft($id_draft, $uid, $type = 0, $drafts_keep_days = 0, $check = 
  * @package Drafts
  * @param int $member_id - user id to get drafts for
  * @param int $draft_type - 0 for post, 1 for pm
- * @param int|false $topic - if set, load drafts for that specific topic / pm
+ * @param int|bool $topic - if set, load drafts for that specific topic / pm
  * @param string $order - optional parameter to order the results
  * @param string $limit - optional parameter to limit the number returned 0,15
  */
@@ -303,7 +303,7 @@ function deleteDrafts($id_draft, $member_id = -1, $check = true)
 			AND  id_member = {int:id_member}' : ''),
 		array(
 			'id_draft' => $id_draft,
-			'id_member' => $member_id ,
+			'id_member' => $member_id,
 		)
 	);
 }

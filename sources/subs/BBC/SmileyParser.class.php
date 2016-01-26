@@ -189,7 +189,7 @@ class SmileyParser
 
 			$temp = array($smileysfrom, $smileysto, $smileysdescs);
 
-			!\Cache::instance()->put('parsing_smileys', $temp, 480);
+			\Cache::instance()->put('parsing_smileys', $temp, 480);
 		}
 
 		return $temp;

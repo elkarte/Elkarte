@@ -1476,7 +1476,7 @@ function prepareMembersByQuery($query, &$query_params, $only_active = true)
 {
 	$allowed_conditions = array(
 		'member_ids'   => 'id_member IN ({array_int:member_ids})',
-		'member_names' => function (&$members)
+		'member_names' => function(&$members)
 		{
 			$mem_query = array();
 

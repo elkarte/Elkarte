@@ -138,7 +138,7 @@ class DbSearch_PostgreSQL implements DbSearch
 					// Doesn't support fulltext
 					$table_info['fulltext_length'] = $txt['not_applicable'];
 				}
-				elseif ($row['relname'] == $db_prefix. 'log_search_words')
+				elseif ($row['relname'] == $db_prefix . 'log_search_words')
 				{
 					$table_info['index_length'] = (int) $row['KB'];
 					$table_info['custom_index_length'] = (int) $row['KB'];

@@ -281,7 +281,7 @@ class Site_Dispatcher
 	{
 		if (!empty($this->_controller_name))
 		{
-			$action  = strtolower(str_replace('_Controller', '', $this->_controller_name));
+			$action = strtolower(str_replace('_Controller', '', $this->_controller_name));
 			$action = substr($action, -1) == 2 ? substr($action, 0, -1) : $action;
 		}
 

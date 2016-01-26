@@ -21,7 +21,8 @@ if (!defined('ELK'))
 	die('No access...');
 
 /**
- * Statistics Controller
+ * Stats_Controller Class
+ * Handles the calculation of forum statistics
  */
 class Stats_Controller extends Action_Controller
 {

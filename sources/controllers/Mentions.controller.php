@@ -110,7 +110,9 @@ class Mentions_Controller extends Action_Controller
 	protected $_all = false;
 
 	/**
-	 * Start things up, what else does a constructor do
+	 * Mentions_Controller constructor.
+	 *
+	 * @param Event_Manager|null $eventManager
 	 */
 	public function __construct($eventManager)
 	{
@@ -129,7 +131,6 @@ class Mentions_Controller extends Action_Controller
 	/**
 	 * Determines the enabled mention types.
 	 *
-	 * @global $modSettings
 	 * @return string[]
 	 */
 	protected function _findMentionTypes()
@@ -174,8 +175,7 @@ class Mentions_Controller extends Action_Controller
 	 */
 	public function action_index()
 	{
-		$req = HttpReq::instance();
-		if ($req->getQuery('sa') === 'fetch')
+		if ($this->_req->getQuery('sa') === 'fetch')
 		{
 			$this->action_fetch();
 		}
@@ -349,6 +349,7 @@ class Mentions_Controller extends Action_Controller
 	/**
 	 * Fetches number of notifications and number of recently added ones for use
 	 * in favicon and desktop notifications.
+	 *
 	 * @todo probably should be placed somewhere else.
 	 */
 	public function action_fetch()
@@ -364,9 +365,11 @@ class Mentions_Controller extends Action_Controller
 		$template_layers->removeAll();
 		require_once(SUBSDIR . '/Mentions.subs.php');
 
-		$lastsent = isset($_GET['lastsent']) ? (int) $_GET['lastsent'] : 0;
-		if (empty($lastsent) && !empty($_SESSION['notifications_lastseen']))
-			$lastsent = (int) $_SESSION['notifications_lastseen'];
+		$lastsent = $this->_req->getQuery('lastsent', 'intval', 0);
+		if (empty($lastsent) && !empty($this->_req->session->notifications_lastseen))
+		{
+			$lastsent = (int) $this->_req->session->notifications_lastseen;
+		}
 
 		// We only know AJAX for this particular action
 		$context['json_data'] = array(

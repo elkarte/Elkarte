@@ -84,10 +84,10 @@ class ManageSecurity_Controller extends Action_Controller
 				'general' => array(
 				),
 				'spam' => array(
-					'description' => $txt['antispam_Settings_desc'] ,
+					'description' => $txt['antispam_Settings_desc'],
 				),
 				'badbehavior' => array(
-					'description' => $txt['badbehavior_desc'] ,
+					'description' => $txt['badbehavior_desc'],
 				),
 				'moderation' => array(
 				),

@@ -22,8 +22,8 @@ if (!defined('ELK'))
 	die('No access...');
 
 /**
- * Calendar_Controller class, displays the calendar for the site and
- * provides for its navigation
+ * Calendar_Controller class
+ * Displays the calendar for the site and provides for its navigation
  */
 class Calendar_Controller extends Action_Controller
 {
@@ -40,13 +40,15 @@ class Calendar_Controller extends Action_Controller
 
 	/**
 	 * Show the calendar.
-	 * It loads the specified month's events, holidays, and birthdays.
-	 * It requires the calendar_view permission.
-	 * It depends on the cal_enabled setting, and many of the other cal_ settings.
-	 * It uses the calendar_start_day theme option. (Monday/Sunday)
-	 * It uses the main sub template in the Calendar template.
-	 * It goes to the month and year passed in 'month' and 'year' by get or post.
-	 * It is accessed through ?action=calendar.
+	 *
+	 * - It loads the specified month's events, holidays, and birthdays.
+	 * - It requires the calendar_view permission.
+	 * - It depends on the cal_enabled setting, and many of the other cal_ settings.
+	 * - It uses the calendar_start_day theme option. (Monday/Sunday)
+	 * - It goes to the month and year passed in 'month' and 'year' by get or post.
+	 * - It is accessed through ?action=calendar.
+	 *
+	 * @uses the main sub template in the Calendar template.
 	 */
 	public function action_calendar()
 	{
@@ -174,12 +176,12 @@ class Calendar_Controller extends Action_Controller
 	/**
 	 * This function processes posting/editing/deleting a calendar event.
 	 *
-	 *  - calls action_post() function if event is linked to a post.
-	 *  - calls insertEvent() to insert the event if not linked to post.
+	 *  - Calls action_post() function if event is linked to a post.
+	 *  - Calls insertEvent() to insert the event if not linked to post.
+	 *  - It requires the calendar_post permission to use.
+	 *  - It is accessed with ?action=calendar;sa=post.
 	 *
-	 * It requires the calendar_post permission to use.
-	 * It uses the event_post sub template in the Calendar template.
-	 * It is accessed with ?action=calendar;sa=post.
+	 * @uses the event_post sub template in the Calendar template.
 	 */
 	public function action_post()
 	{
@@ -296,12 +298,14 @@ class Calendar_Controller extends Action_Controller
 	}
 
 	/**
-	 * Shortcut to instantiate the Post_Controller:
+	 * Shortcut to instantiate the Post_Controller
+	 *
+	 * What it does:
 	 *  - require_once modules of the controller (not addons because these are
 	 *    always all require'd by the dispatcher),
-	 *  - creates the event manager and registers addons and modules,
-	 *  - instantiate the controller
-	 *  - runs pre_dispatch
+	 *  - Creates the event manager and registers addons and modules,
+	 *  - Instantiate the controller
+	 *  - Runs pre_dispatch
 	 * @return The return of the action_post.
 	 */
 	protected function _returnToPost()
@@ -315,11 +319,12 @@ class Calendar_Controller extends Action_Controller
 	/**
 	 * This function offers up a download of an event in iCal 2.0 format.
 	 *
-	 * follows the conventions in RFC5546 http://tools.ietf.org/html/rfc5546
-	 * sets events as all day events since we don't have hourly events
-	 * will honor and set multi day events
-	 * sets a sequence number if the event has been modified.
-	 * Accessed by action=calendar;sa=ical
+	 * What it does:
+	 * - Follows the conventions in RFC5546 http://tools.ietf.org/html/rfc5546
+	 * - Sets events as all day events since we don't have hourly events
+	 * - Will honor and set multi day events
+	 * - Sets a sequence number if the event has been modified.
+	 * - Accessed by action=calendar;sa=ical
 	 *
 	 * @todo .... allow for week or month export files as well?
 	 */

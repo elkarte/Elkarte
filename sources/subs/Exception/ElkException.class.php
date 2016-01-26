@@ -33,6 +33,7 @@ class Elk_Exception extends Exception
 	protected $sprintf = array();
 
 	/**
+	 * Elk_Exception constructor.
 	 * Extended exception rules because we need more stuff
 	 *
 	 * @param string|string[] $message index of $txt or message
@@ -40,6 +41,8 @@ class Elk_Exception extends Exception
 	 * @param bool|string $log type of error, defines under which "log" is it shown.
 	 *  - If false is used, the error is not logged.
 	 * @param string[] $sprintf optional array of values to use in vsprintf with the $txt
+	 * @param int $code
+	 * @param Exception|null $previous
 	 */
 	public function __construct($message, $log = 'general', $sprintf = array(), $code = 0, Exception $previous = null)
 	{

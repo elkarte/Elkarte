@@ -22,10 +22,10 @@ if (!defined('ELK'))
 	die('No access...');
 
 /**
- * SplitTopics Controller.
+ * SplitTopics_Controller Class
+ * Allows to take a topic and split at a point or select individual messages to
+ * split to a new topic.
  *
- * - Allows to take a topic and split at a point or select
- * individual messages to split to a new topic.
  * - Requires the split_any permission
  */
 class SplitTopics_Controller extends Action_Controller
@@ -68,6 +68,7 @@ class SplitTopics_Controller extends Action_Controller
 		if (!isset($this->_req->query->xml))
 			loadTemplate('SplitTopics');
 
+		// Need some utilities to deal with topics
 		require_once(SUBSDIR . '/Boards.subs.php');
 		require_once(SUBSDIR . '/Post.subs.php');
 

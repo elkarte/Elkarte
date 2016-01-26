@@ -36,6 +36,10 @@ class Random_Post_Module implements ElkArte\sources\modules\Module_Interface
 
 	/**
 	 * Create a followup.
+	 *
+	 * @param mixed[] $msgOptions
+	 * @param mixed[] $topicOptions
+	 * @param mixed[] $posterOptions
 	 */
 	public static function followup_create_topic($msgOptions, $topicOptions, $posterOptions)
 	{

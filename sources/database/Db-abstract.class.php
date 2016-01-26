@@ -61,7 +61,7 @@ abstract class Database_Abstract implements Database
 	 * It allows to replace on the fly a few pre-defined strings, for
 	 * convenience ('query_see_board', 'query_wanna_see_board'), with
 	 * their current values from $user_info.
-	 * In addition, it performs checks and sanitization on the values
+	 * In addition, it performs checks and sanitation on the values
 	 * sent to the database.
 	 *
 	 * @param mixed[] $matches

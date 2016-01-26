@@ -24,7 +24,8 @@ if (!defined('ELK'))
 	die('No access...');
 
 /**
- * Topics Controller
+ * Topic_Controller Class
+ * Handles various topic actions, lock/unlock, sticky (pin) /unsticky (unpin), printing
  */
 class Topic_Controller extends Action_Controller
 {
@@ -228,7 +229,9 @@ class Topic_Controller extends Action_Controller
 		$context['parent_boards'] = array();
 
 		foreach ($board_info['parent_boards'] as $parent)
+		{
 			$context['parent_boards'][] = $parent['name'];
+		}
 
 		// Split the topics up so we can print them.
 		$context['posts'] = topicMessages($topic);

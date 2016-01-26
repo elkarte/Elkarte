@@ -1315,7 +1315,7 @@ function toggleNewPM($id_member, $new = false)
  * Load the PM limits for each group or for a specified group
  *
  * @package PersonalMessage
- * @param int|false $id_group (optional) the id of a membergroup
+ * @param int|bool $id_group (optional) the id of a membergroup
  */
 function loadPMLimits($id_group = false)
 {

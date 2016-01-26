@@ -176,6 +176,7 @@ function logLoginHistory($id_member, $ip, $ip2)
  *
  * @param string $msg_id
  * @param string $topic_id
+ * @param string $type
  */
 function loadLogReported($msg_id, $topic_id, $type = 'msg')
 {

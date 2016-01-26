@@ -638,6 +638,9 @@ class Package_Actions extends Action_Controller
 
 	/**
 	 * Helper function for action_remove_dir_file and action_require_dir_file
+	 *
+	 * @param string $destination
+	 * @param bool $set_destination
 	 */
 	private function _check_theme_actions($destination, $set_destination = false)
 	{

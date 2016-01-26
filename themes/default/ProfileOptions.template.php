@@ -1301,7 +1301,7 @@ function template_profile_timeoffset_modify()
 
 	echo '
 							<dt>
-								<label', (isset($context['modify_error']['bad_offset']) ? ' class="error"' : ''),' for="time_offset">', $txt['time_offset'], '</label>
+								<label', (isset($context['modify_error']['bad_offset']) ? ' class="error"' : ''), ' for="time_offset">', $txt['time_offset'], '</label>
 								<p>', $txt['personal_time_offset'], '</p>
 							</dt>
 							<dd>

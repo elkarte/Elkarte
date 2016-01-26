@@ -328,7 +328,7 @@ class Browser_Detector
 	 * What it does:
 	 * - determines the version of the IE browser in use
 	 * - detects ie4 onward
-	 * - attempts to distinguish between IE and IE in compatabilty view
+	 * - attempts to distinguish between IE and IE in compatibility view
 	 */
 	private function _setupIe()
 	{
@@ -342,12 +342,12 @@ class Browser_Detector
 			$this->_browsers['is_ie' . $msie_match[1]] = true;
 		}
 
-		// "modern" ie uses trident 4=ie8, 5=ie9, 6=ie10, even in compatability view
+		// "modern" ie uses trident 4=ie8, 5=ie9, 6=ie10, even in compatibility view
 		if (preg_match('~Trident/([0-9.])~i', $this->_ua, $trident_match) === 1)
 		{
 			$this->_browsers['is_ie' . ((int) $trident_match[1] + 4)] = true;
 
-			// If trident is set, see the (if any) msie tag in the user agent matches ... if not its in some compatablity view
+			// If trident is set, see the (if any) msie tag in the user agent matches ... if not its in some compatibility view
 			if (isset($msie_match[1]) && ($msie_match[1] < $trident_match[1] + 4))
 				$this->_browsers['is_ie_compat_view'] = true;
 		}
@@ -417,7 +417,7 @@ class Browser_Detector
 	 * What it does:
 	 * - The order of each browser in $browser_priority is important
 	 * - if you want to have id='ie6' and not id='ie' then it must appear first in the list of ie browsers
-	 * - only sets browsers that may need some help via css for compatablity
+	 * - only sets browsers that may need some help via css for compatibility
 	 */
 	private function _setupBrowserPriority()
 	{

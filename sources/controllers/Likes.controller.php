@@ -60,6 +60,7 @@ class Likes_Controller extends Action_Controller
 	/**
 	 * Liking a post via ajax, then _api will be added to the sa=
 	 * and this method will be called
+	 *
 	 * Calls the standard like method and then the api return method
 	 */
 	public function action_likepost_api()
@@ -81,6 +82,7 @@ class Likes_Controller extends Action_Controller
 
 	/**
 	 * Un liking a post via ajax
+	 *
 	 * Calls the standard unlike method and then the api return method
 	 */
 	public function action_unlikepost_api()
@@ -102,9 +104,11 @@ class Likes_Controller extends Action_Controller
 
 	/**
 	 * Likes a post due to its awesomeness
-	 * Permission checks are done in prepare_likes
-	 * It redirects back to the referrer afterward.
-	 * It is accessed via ?action=like,sa=likepost
+	 *
+	 * What it does:
+	 * - Permission checks are done in prepare_likes
+	 * - It redirects back to the referrer afterward.
+	 * - It is accessed via ?action=like,sa=likepost
 	 */
 	public function action_likepost()
 	{
@@ -120,6 +124,7 @@ class Likes_Controller extends Action_Controller
 	 *
 	 * Fills $_likes_response that can be used by likeResponse() in order to
 	 * return a JSON response
+	 *
 	 * @param string $sign '+' or '-'
 	 * @param string $type the type of like 'likemsg' or 'rlikemsg'
 	 *
@@ -167,8 +172,9 @@ class Likes_Controller extends Action_Controller
 
 	/**
 	 * Unlikes a post that you previously liked ... no negatives though, hurts feelings :'(
-	 * It redirects back to the referrer afterward.
-	 * It is accessed via ?action=like,sa=unlikepost.
+	 *
+	 * - It redirects back to the referrer afterward.
+	 * - It is accessed via ?action=like,sa=unlikepost.
 	 */
 	public function action_unlikepost()
 	{
@@ -478,10 +484,11 @@ class Likes_Controller extends Action_Controller
 	}
 
 	/**
-	 * Function to return an array of users that liked a particular
-	 * message.  Used in profile so a user can see the full
-	 * list of members, vs the truncated (optional) one shown in message display
-	 * accessed by ?action=likes;sa=showWhoLiked;msg=x
+	 * Function to return an array of users that liked a particular message.
+	 *
+	 * - Used in profile so a user can see the full list of members, vs the
+	 * truncated (optional) one shown in message display
+	 * - Accessed by ?action=likes;sa=showWhoLiked;msg=x
 	 */
 	public function action_showWhoLiked()
 	{
@@ -679,7 +686,7 @@ class Likes_Controller extends Action_Controller
 
 		// Load the required files
 		loadLanguage('LikePosts');
-		loadJavascriptFile('like_posts.js', array('defer' => true));
+		loadJavascriptFile('like_posts.js');
 		loadtemplate('LikePostsStats');
 
 		// Template and tab data
@@ -793,6 +800,7 @@ class Likes_Controller extends Action_Controller
 
 	/**
 	 * Retrieves the most like giving user
+	 *
 	 * Returns the data via ajax
 	 */
 	public function action_mostLikesGivenUserStats()

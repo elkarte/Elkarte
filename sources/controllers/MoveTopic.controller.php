@@ -50,7 +50,7 @@ class MoveTopic_Controller extends Action_Controller
 	private $_toboard;
 
 	/**
-	 * Pre Dispatch, called before other methods.  Loads HttpReq instance.
+	 * Pre Dispatch, called before other methods.
 	 */
 	public function pre_dispatch()
 	{
@@ -74,6 +74,7 @@ class MoveTopic_Controller extends Action_Controller
 	/**
 	 * This function allows to move a topic
 	 *
+	 * What it does:
 	 * - It must be called with a topic specified. (that is, global $topic must
 	 * be set... @todo fix this thing.)
 	 * - Validates access

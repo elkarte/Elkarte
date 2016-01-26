@@ -677,7 +677,7 @@ function template_modify_board()
 		{
 			var redirect = document.getElementById("redirect_enable"),
 				redirectEnabled = redirect ? redirect.checked : false,
-				nonDefaultTheme = document.getElementById("boardtheme").value == 0 ? false : true;
+				nonDefaultTheme = document.getElementById("boardtheme").value!=0;
 
 			// What to show?
 			document.getElementById("override_theme_div").style.display = redirectEnabled || !nonDefaultTheme ? "none" : "";

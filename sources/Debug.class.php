@@ -1,7 +1,7 @@
 <?php
 
 /**
- * This file contains a (static) class that will track some debug informations
+ * This file contains a (static) class that will track some debug information
  * if debug is on.
  *
  * @name      ElkArte Forum
@@ -20,7 +20,7 @@ if (!defined('ELK'))
 	die('No access...');
 
 /**
- * Stored debugging informations.
+ * Stored debugging information.
  */
 class Debug
 {
@@ -223,7 +223,7 @@ class Debug
 	}
 
 	/**
-	 * Collects some other generic system informations necessary for the
+	 * Collects some other generic system information necessary for the
 	 * debug screen
 	 */
 	private function _prepare_last_bits()

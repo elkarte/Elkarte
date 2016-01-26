@@ -21,7 +21,8 @@ if (!defined('ELK'))
 	die('No access...');
 
 /**
- * Class to handle announce topic functionality.
+ * Announce_Controller class.
+ * Used to handle announce topic functionality.
  */
 class Announce_Controller extends Action_Controller
 {
@@ -29,10 +30,11 @@ class Announce_Controller extends Action_Controller
 	 * Set up the context for the announce topic function (action=announce).
 	 * This function is called before the flow is redirected to action_selectgroup() or action_send().
 	 *
-	 * checks the topic announcement permissions and loads the announcement template.
-	 * requires the announce_topic permission.
-	 * uses the Announce template and Post language file.
-	 * Loads HttpReq instance
+	 * What it does:
+	 * - Checks the topic announcement permissions and loads the announcement template.
+	 * - Requires the announce_topic permission.
+	 *
+	 * @uses the Announce template and Post language file.
 	 */
 	public function pre_dispatch()
 	{
@@ -66,8 +68,11 @@ class Announce_Controller extends Action_Controller
 
 	/**
 	 * Allow a user to chose the membergroups to send the announcement to.
-	 * Lets the user select the membergroups that will receive the topic announcement.
-	 * Accessed by action=announce;sa=selectgroup
+	 *
+	 * What it does:
+	 * - Lets the user select the membergroups that will receive the topic announcement.
+	 * - Accessed by action=announce;sa=selectgroup
+	 *
 	 * @uses Announce template announce sub template
 	 */
 	public function action_selectgroup()
@@ -105,6 +110,7 @@ class Announce_Controller extends Action_Controller
 	 * - Does the actual sending of the topic announcements in chunks.
 	 * - Calculates a rough estimate of the percentage items sent.
 	 * - Accessed by action=announce;sa=send
+	 *
 	 * @uses announcement template announcement_send sub template
 	 */
 	public function action_send()

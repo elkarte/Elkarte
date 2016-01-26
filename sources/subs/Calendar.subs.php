@@ -794,6 +794,7 @@ function getEventPoster($event_id)
 /**
  * Inserts events in to the calendar
  *
+ * What it does:
  * - Consolidating the various INSERT statements into this function.
  * - inserts the passed event information into the calendar table.
  * - allows to either set a time span (in days) or an end_date.

@@ -325,7 +325,7 @@ function create_chmod_control($chmodFiles = array(), $chmodOptions = array(), $r
 						'value' => $txt['package_restore_permissions_cur_status'],
 					),
 					'data' => array(
-						'function' => function ($rowData) {
+						'function' => function($rowData) {
 							global $txt;
 
 							$formatTxt = $rowData['result'] == '' || $rowData['result'] == 'skipped' ? $txt['package_restore_permissions_pre_change'] : $txt['package_restore_permissions_post_change'];
@@ -354,7 +354,7 @@ function create_chmod_control($chmodFiles = array(), $chmodOptions = array(), $r
 						'value' => $txt['package_restore_permissions_result'],
 					),
 					'data' => array(
-						'function' => function ($rowData) {
+						'function' => function($rowData) {
 							global $txt;
 
 							return $txt['package_restore_permissions_action_' . $rowData['result']];
@@ -960,7 +960,7 @@ function parsePackageInfo(&$packageXML, $testing_only = true, $method = 'install
 			$url = $action->exists('@url') ? $action->fetch('@url') : '';
 			if (strlen(trim($url)) > 0)
 			{
-				$url = addProtocol($data, array('http://', 'https://'));
+				$url = addProtocol($url, array('http://', 'https://'));
 
 				if (strlen($url) < 8)
 					$url = '';
@@ -2781,7 +2781,7 @@ function isPackageInstalled($id, $install_id = null)
 		'install_state' => null,
 		'old_themes' => null,
 		'old_version' => null,
-		'db_changes' => null
+		'db_changes' => array()
 	);
 
 	if (empty($id))

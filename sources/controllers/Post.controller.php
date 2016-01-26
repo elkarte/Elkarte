@@ -23,7 +23,8 @@ if (!defined('ELK'))
 	die('No access...');
 
 /**
- * Post Controller
+ * Post_Controller Class
+ * Everything related to posting new replies and topics and modifications of them
  */
 class Post_Controller extends Action_Controller
 {
@@ -79,6 +80,8 @@ class Post_Controller extends Action_Controller
 	 * - Find the topic id if a message id is passed, else assume it's a new message
 	 * - Get the response prefix in the default forum language.
 	 * - Triggers events associated with posting.
+	 *    - prepare_post, prepare_context, prepare_modifying, prepare_editing,
+	 *    - prepare_posting, post_errors, finalize_post_form
 	 * - Additionally handles previews of posts.
 	 * - Requires different permissions depending on the actions, but most notably post_new, post_reply_own, and post_reply_any.
 	 * - Shows options for the editing and posting of calendar events and attachments, and as the posting of polls (using modules).
@@ -117,7 +120,7 @@ class Post_Controller extends Action_Controller
 		// All those wonderful modifiers and attachments
 		$this->_template_layers->add('additional_options', 200);
 
-		if (isset($_REQUEST['xml']))
+		if (isset($this->_req->query->xml))
 		{
 			$context['sub_template'] = 'post';
 
@@ -219,6 +222,7 @@ class Post_Controller extends Action_Controller
 		if ($this->_topic_attributes['locked'] && !allowedTo('moderate_board'))
 			Errors::instance()->fatal_lang_error('topic_locked', false);
 
+		// Trigger the prepare_context event
 		try
 		{
 			$this->_events->trigger('prepare_context', array('id_member_poster' => $this->_topic_attributes['id_member']));
@@ -393,6 +397,7 @@ class Post_Controller extends Action_Controller
 			if ($message === false)
 				Errors::instance()->fatal_lang_error('no_message', false);
 
+			// Trigger the prepare_editing event
 			$this->_events->trigger('prepare_editing', array('topic' => $topic, 'message' => &$message));
 
 			if (!empty($message['errors']))
@@ -427,6 +432,7 @@ class Post_Controller extends Action_Controller
 				$context['email'] = isset($_SESSION['guest_email']) ? $_SESSION['guest_email'] : '';
 			}
 
+			// Trigger the prepare_posting event
 			$this->_events->trigger('prepare_posting');
 
 			$context['submit_label'] = $txt['post'];
@@ -448,6 +454,7 @@ class Post_Controller extends Action_Controller
 		if (!empty($topic) && !empty($modSettings['oldTopicDays']) && $this->_topic_attributes['last_post_time'] + $modSettings['oldTopicDays'] * 86400 < time() && empty($this->_topic_attributes['is_sticky']) && !isset($_REQUEST['subject']))
 			$this->_post_errors->addError(array('old_topic', array($modSettings['oldTopicDays'])), 0);
 
+		// Trigger post_errors event
 		$this->_events->trigger('post_errors');
 
 		// Any errors occurred?
@@ -595,10 +602,14 @@ class Post_Controller extends Action_Controller
 	/**
 	 * Posts or saves the message composed with Post().
 	 *
-	 * requires various permissions depending on the action.
-	 * handles attachment, post, and calendar saving.
-	 * sends off notifications, and allows for announcements and moderation.
+	 * What it does:
+	 * - Requires various permissions depending on the action.
+	 * - Handles attachment, post, and calendar saving.
+	 * - Sends off notifications, and allows for announcements and moderation.
 	 * accessed from ?action=post2.
+	 * - Triggers events associated with the actual posting
+	 *   - prepare_save_post, save_replying, save_new_topic, save_modify
+	 *   - before_save_post, pre_save_post, after_save_post
 	 */
 	public function action_post2()
 	{
@@ -642,6 +653,7 @@ class Post_Controller extends Action_Controller
 		require_once(SUBSDIR . '/Boards.subs.php');
 		loadLanguage('Post');
 
+		// Trigger the prepare_save_post event
 		$this->_events->trigger('prepare_save_post', array('topic_info' => &$topic_info));
 
 		// Prevent double submission of this form.
@@ -700,6 +712,7 @@ class Post_Controller extends Action_Controller
 			if (isset($_POST['sticky']) && ($_POST['sticky'] == $topic_info['is_sticky'] || !allowedTo('make_sticky')))
 				unset($_POST['sticky']);
 
+			// Trigger the save_replying event
 			$this->_events->trigger('save_replying', array('topic_info' => &$topic_info));
 
 			// If the number of replies has changed, if the setting is enabled, go back to action_post() - which handles the error.
@@ -729,6 +742,7 @@ class Post_Controller extends Action_Controller
 			else
 				isAllowedTo('post_new');
 
+			// Trigger teh save new topic event
 			$this->_events->trigger('save_new_topic', array('becomesApproved' => &$becomesApproved));
 
 			if (isset($_POST['lock']))
@@ -751,6 +765,7 @@ class Post_Controller extends Action_Controller
 			if (empty($msgInfo))
 				Errors::instance()->fatal_lang_error('cant_find_messages', false);
 
+			// Trigger teh save_modify event
 			$this->_events->trigger('save_modify', array('msgInfo' => &$msgInfo));
 
 			if (!empty($topic_info['locked']) && !allowedTo('moderate_board'))
@@ -844,6 +859,7 @@ class Post_Controller extends Action_Controller
 			}
 		}
 
+		// Trigger before_save_post event
 		try
 		{
 			$this->_events->trigger('before_save_post', array('post_errors' => $this->_post_errors, 'topic_info' => $topic_info));
@@ -965,6 +981,7 @@ class Post_Controller extends Action_Controller
 			'update_post_count' => !$user_info['is_guest'] && !isset($_REQUEST['msg']) && $board_info['posts_count'],
 		);
 
+		// Trigger the pre_save_post event
 		$this->_events->trigger('pre_save_post', array('msgOptions' => &$msgOptions, 'topicOptions' => &$topicOptions, 'posterOptions' => &$posterOptions));
 
 		// This is an already existing message. Edit it.
@@ -1005,6 +1022,7 @@ class Post_Controller extends Action_Controller
 				$topic = $topicOptions['id'];
 		}
 
+		// Trigger the after_save_post event
 		$this->_events->trigger('after_save_post', array('board' => $board, 'topic' => $topic, 'msgOptions' => $msgOptions, 'topicOptions' => $topicOptions, 'becomesApproved' => $becomesApproved, 'posterOptions' => $posterOptions));
 
 		// Marking boards as read.

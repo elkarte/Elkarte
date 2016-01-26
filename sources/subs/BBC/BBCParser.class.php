@@ -423,7 +423,7 @@ class BBCParser
 	/**
 	 * Parse the HTML in a string
 	 *
-	 * @param string &$data
+	 * @param string $data
 	 */
 	protected function parseHTML(&$data)
 	{
@@ -433,7 +433,7 @@ class BBCParser
 	/**
 	 * Parse URIs and email addresses in a string to url and email BBC tags to be parsed by the BBC parser
 	 *
-	 * @param string &$data
+	 * @param string $data
 	 */
 	protected function autoLink(&$data)
 	{
@@ -511,7 +511,7 @@ class BBCParser
 				continue;
 			}
 
-			$tag = $this->checkCodeAttributes($next_c, $possible, $tag);
+			$tag = $this->checkCodeAttributes($next_c, $possible);
 			if ($tag === null)
 			{
 				continue;
@@ -1232,7 +1232,7 @@ class BBCParser
 	 * Recursively call the parser with a new Codes object
 	 * This allows to parse BBC in parameters like [quote author="[url]www.quotes.com[/url]"]Something famous.[/quote]
 	 *
-	 * @param string &$data
+	 * @param string $data
 	 * @param array $tag
 	 */
 	protected function recursiveParser(&$data, array $tag)
@@ -1284,7 +1284,7 @@ class BBCParser
 	}
 
 	/**
-	 * @param string|false $tag = false False closes the last open tag. Anything else finds that tag LIFO
+	 * @param string|bool $tag = false False closes the last open tag. Anything else finds that tag LIFO
 	 *
 	 * @return mixed
 	 */

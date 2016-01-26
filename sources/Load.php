@@ -479,7 +479,7 @@ function loadBoard()
 		if (!empty($temp))
 		{
 			$board_info = $temp;
-			$board = $board_info['id'];
+			$board = (int) $board_info['id'];
 		}
 	}
 
@@ -516,7 +516,7 @@ function loadBoard()
 
 			// Set the current board.
 			if (!empty($row['id_board']))
-				$board = $row['id_board'];
+				$board = (int) $row['id_board'];
 
 			// Basic operating information. (globals... :/)
 			$board_info = array(
@@ -1047,9 +1047,9 @@ function loadMemberContext($user, $display_custom_fields = false)
 	if ($context['loadMemberContext_set'] !== 'minimal')
 	{
 		$memberContext[$user] += array(
-			'username_color' => '<span '. (!empty($profile['member_group_color']) ? 'style="color:' . $profile['member_group_color'] .';"' : '') .'>'. $profile['member_name'] .'</span>',
-			'name_color' => '<span '. (!empty($profile['member_group_color']) ? 'style="color:' . $profile['member_group_color'] .';"' : '') .'>'. $profile['real_name'] .'</span>',
-			'link_color' => '<a href="' . $scripturl . '?action=profile;u=' . $profile['id_member'] . '" title="' . $txt['profile_of'] . ' ' . $profile['real_name'] . '" ' . (!empty($profile['member_group_color']) ? 'style="color:' . $profile['member_group_color'] . ';"' : '') .'>' . $profile['real_name'] . '</a>',
+			'username_color' => '<span '. (!empty($profile['member_group_color']) ? 'style="color:' . $profile['member_group_color'] .';"' : '') . '>' . $profile['member_name'] .'</span>',
+			'name_color' => '<span '. (!empty($profile['member_group_color']) ? 'style="color:' . $profile['member_group_color'] .';"' : '') . '>' . $profile['real_name'] .'</span>',
+			'link_color' => '<a href="' . $scripturl . '?action=profile;u=' . $profile['id_member'] . '" title="' . $txt['profile_of'] . ' ' . $profile['real_name'] . '" ' . (!empty($profile['member_group_color']) ? 'style="color:' . $profile['member_group_color'] . ';"' : '') . '>' . $profile['real_name'] . '</a>',
 			'is_buddy' => $profile['buddy'],
 			'is_reverse_buddy' => in_array($user_info['id'], $buddy_list),
 			'buddies' => $buddy_list,
@@ -1165,7 +1165,9 @@ function detectBrowser()
 }
 
 /**
- * @param int|0 $id_theme
+ * Get the id of a theme
+ *
+ * @param int $id_theme
  * @return int
  */
 function getThemeId($id_theme = 0)
@@ -1215,6 +1217,14 @@ function getThemeId($id_theme = 0)
 	return $id_theme;
 }
 
+/**
+ * Load in the theme variables for a given theme / member combination
+ *
+ * @param int $id_theme
+ * @param int $member
+ *
+ * @return array
+ */
 function getThemeData($id_theme, $member)
 {
 	global $modSettings;
@@ -1290,14 +1300,22 @@ function getThemeData($id_theme, $member)
 	return $themeData;
 }
 
+/**
+ * Initialize a theme for use
+ *
+ * @param int $id_theme
+ */
 function initTheme($id_theme = 0)
 {
 	global $user_info, $settings, $options, $context;
 
+	// Validate / fetch the themes id
 	$id_theme = getThemeId($id_theme);
 
+	// Need to know who we are loading the theme for
 	$member = empty($user_info['id']) ? -1 : $user_info['id'];
 
+	// Load in the theme variables for them
 	$themeData = getThemeData($id_theme, $member);
 
 	$settings = $themeData[0];
@@ -1420,6 +1438,7 @@ function loadTheme($id_theme = 0, $initialize = true)
 	if (!isset($txt))
 		$txt = array();
 
+	// Load the basic layers
 	theme()->loadDefaultLayers();
 
 	// Defaults in case of odd things
@@ -1450,7 +1469,7 @@ function loadTheme($id_theme = 0, $initialize = true)
 	}
 
 	// A bit lonely maybe, though I think it should be set up *after* the theme variants detection
-	$context['header_logo_url_html_safe'] = empty($settings['header_logo_url']) ? $settings['images_url'] . '/' . $context['theme_variant_url'] .  'logo_elk.png' : Util::htmlspecialchars($settings['header_logo_url']);
+	$context['header_logo_url_html_safe'] = empty($settings['header_logo_url']) ? $settings['images_url'] . '/' . $context['theme_variant_url'] . 'logo_elk.png' : Util::htmlspecialchars($settings['header_logo_url']);
 
 	// Allow overriding the board wide time/number formats.
 	if (empty($user_settings['time_format']) && !empty($txt['time_format']))
@@ -1660,7 +1679,10 @@ function fixThemeUrls($detected_url)
 /**
  * Determine the current user's smiley set
  *
- * @return string
+ * @param mixed[] $user_smiley_set
+ * @param mixed[] $known_smiley_sets
+ *
+ * @return mixed
  */
 function determineSmileySet($user_smiley_set, $known_smiley_sets)
 {
@@ -2263,12 +2285,12 @@ function getBoardParents($id_parent)
  */
 function getLanguages($use_cache = true)
 {
-	global $settings, $modSettings;
+	global $settings;
 
 	$cache = Cache::instance();
 
 	// Either we don't use the cache, or its expired.
-	$languages = '';
+	$languages = array();
 
 	if (!$use_cache || !$cache->getVar($languages, 'known_languages', !$cache->checkLevel(1) ? 86400 : 3600))
 	{

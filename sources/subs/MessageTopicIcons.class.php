@@ -51,6 +51,8 @@ class MessageTopicIcons extends ElkArte\ValuesContainer
 	 */
 	public function __construct($icon_check = false, $theme_dir = '', $default = 'xx')
 	{
+		parent::__construct();
+
 		// Load passed parameters to the class properties
 		$this->_check = $icon_check;
 		$this->_theme_dir = $theme_dir;

@@ -286,7 +286,7 @@ function resizeImageFile($source, $destination, $max_width, $max_height, $prefer
 }
 
 /**
- * Resizes an image proportionally to fit within the defined max_width and max_height limits
+ * Resize an image proportionally to fit within the defined max_width and max_height limits
  *
  * - Will do nothing to the image if the file fits within the size limits
  * - If Image Magick is present it will use those function over any GD solutions

@@ -22,7 +22,8 @@ if (!defined('ELK'))
 	die('No access...');
 
 /**
- * Groups_Controller class, shows group access and allows for add/remove group members
+ * Groups_Controller class
+ * Shows group access and allows for add/remove group members
  */
 class Groups_Controller extends Action_Controller
 {
@@ -152,7 +153,7 @@ class Groups_Controller extends Action_Controller
 						'value' => $txt['membergroups_icons'],
 					),
 					'data' => array(
-						'function' => function ($rowData) {
+						'function' => function($rowData) {
 							global $settings;
 
 							if (!empty($rowData['icons'][0]) && !empty($rowData['icons'][1]))
@@ -183,7 +184,7 @@ class Groups_Controller extends Action_Controller
 						'value' => $txt['membergroups_members_top'],
 					),
 					'data' => array(
-						'function' => function ($rowData) {
+						'function' => function($rowData) {
 							global $txt;
 
 							// No explicit members for the moderator group.
@@ -217,6 +218,7 @@ class Groups_Controller extends Action_Controller
 	 * - It allows to add and remove members from the selected membergroup.
 	 * - It allows sorting on several columns.
 	 * - It redirects to itself.
+	 *
 	 * @uses ManageMembergroups template, group_members sub template.
 	 */
 	public function action_members()

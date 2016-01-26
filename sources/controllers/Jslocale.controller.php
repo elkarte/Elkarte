@@ -15,6 +15,7 @@ if (!defined('ELK'))
 	die('No access...');
 
 /**
+ * Jslocale_Controller class.
  * This file is called via ?action=jslocale;sa=sceditor to load in a list of
  * language strings for the editor
  */
@@ -36,8 +37,8 @@ class Jslocale_Controller extends Action_Controller
 	}
 
 	/**
-	* Creates the javascript code for localization of the editor (SCEditor)
-	*/
+	 * Creates the javascript code for localization of the editor (SCEditor)
+	 */
 	public function action_sceditor()
 	{
 		global $txt, $editortxt;
@@ -67,6 +68,7 @@ class Jslocale_Controller extends Action_Controller
 
 	/**
 	 * Handy shortcut to prepare the "system"
+	 *
 	 * @param string $language_file
 	 */
 	private function _prepareLocale($language_file)

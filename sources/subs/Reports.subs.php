@@ -177,7 +177,7 @@ function allMembergroupsBoardAccess()
 /**
  * Boards profiles and related permissions based on groups
  *
- * @param string $group_clause a string used as WHERE cluase in the query
+ * @param string $group_clause a string used as WHERE clause in the query
  * @param int[] $query_groups an array of group ids
  */
 function boardPermissionsByGroup($group_clause, $query_groups)

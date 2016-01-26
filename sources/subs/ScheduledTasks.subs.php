@@ -57,7 +57,7 @@ function calculateNextTrigger($tasks = array(), $forceUpdate = false)
 	$tasks = array();
 	while ($row = $db->fetch_assoc($request))
 	{
-		// scheduleTaskImmediate is a way to speed up scheduled tasts and fire them as fast as possible
+		// scheduleTaskImmediate is a way to speed up scheduled tasks and fire them as fast as possible
 		$scheduleTaskImmediate = @unserialize($modSettings['scheduleTaskImmediate']);
 		if (!empty($scheduleTaskImmediate) && isset($scheduleTaskImmediate[$row['task']]))
 			$next_time = next_time(1, '', rand(0, 60), true);

@@ -1144,7 +1144,7 @@ function checkAttributeValidity()
 		warningMessage = warningMessage.replace(/%type%/, '', reattribute_confirm_username).replace(/%find%/, document.getElementById('from_name').value);
 	}
 
-	document.getElementById('do_attribute').disabled = valid ? false : true;
+	document.getElementById('do_attribute').disabled = !valid;
 
 	// Keep checking for a valid form so we can activate the submit button
 	setTimeout(function() {checkAttributeValidity();}, 500);

@@ -22,7 +22,8 @@ if (!defined('ELK'))
 	die('No access...');
 
 /**
- * Notify Controller
+ * Notify_Controller Class
+ * Functions that turn on and off various member notifications
  */
 class Notify_Controller extends Action_Controller
 {
@@ -113,6 +114,7 @@ class Notify_Controller extends Action_Controller
 				'error' => 1,
 				'text' => $txt['not_guests']
 			);
+
 			return;
 		}
 
@@ -124,6 +126,7 @@ class Notify_Controller extends Action_Controller
 				'error' => 1,
 				'text' => $txt['cannot_mark_any_notify']
 			);
+
 			return;
 		}
 
@@ -239,6 +242,7 @@ class Notify_Controller extends Action_Controller
 				'error' => 1,
 				'text' => $txt['not_guests']
 			);
+
 			return;
 		}
 
@@ -339,6 +343,7 @@ class Notify_Controller extends Action_Controller
 				'error' => 1,
 				'text' => $txt['not_guests']
 			);
+
 			return;
 		}
 
@@ -350,6 +355,7 @@ class Notify_Controller extends Action_Controller
 				'error' => 1,
 				'text' => $txt['feature_disabled'],
 			);
+
 			return;
 		}
 
@@ -361,6 +367,7 @@ class Notify_Controller extends Action_Controller
 				'error' => 1,
 				'url' => $scripturl . '?action=unwatchtopic;sa=' . ($this->_req->query->sa === 'on' ? 'on' : 'off') . ';topic=' . $topic . '.' . $this->_req->query->start . ';' . $context['session_var'] . '=' . $context['session_id'],
 			);
+
 			return;
 		}
 

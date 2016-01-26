@@ -27,6 +27,7 @@ if (!defined('ELK'))
  *  - sets $context['open_mod_reports'] for template use
  *
  * @param boolean $flush = true if moderator menu count will be cleared
+ * @param boolean $count_pms
  */
 function recountOpenReports($flush = true, $count_pms = false)
 {
@@ -151,6 +152,7 @@ function recountFailedEmails($approve_query = null)
  * How many entries are we viewing?
  *
  * @param int $status
+ * @param bool $show_pms
  */
 function totalReports($status = 0, $show_pms = false)
 {
@@ -250,7 +252,7 @@ function loadModeratorMenuCounts($brd = null)
 	if (isset($menu_errors[$cache_key]))
 		return $menu_errors[$cache_key];
 
-	// If its been cached, guess what, thats right use it!
+	// If its been cached, guess what, that's right use it!
 	$temp = Cache::instance()->get('num_menu_errors', 900);
 	if ($temp === null || !isset($temp[$cache_key]))
 	{
@@ -691,6 +693,7 @@ function modAddUpdateTemplate($recipient_id, $template_title, $template_body, $i
  *  - returns false if they are requesting a report they can not see or does not exist
  *
  * @param int $id_report
+ * @param bool $show_pms
  */
 function modReportDetails($id_report, $show_pms = false)
 {
@@ -731,6 +734,7 @@ function modReportDetails($id_report, $show_pms = false)
  * @param int $status 0 => show open reports, 1 => closed reports
  * @param int $start starting point
  * @param int $limit the number of reports
+ * @param bool $show_pms
  *
  * @todo move to createList?
  */
@@ -1195,6 +1199,8 @@ function basicWatchedUsers()
 /**
  * Returns the most recent reported posts as array
  *
+ * @param bool $show_pms
+ *
  * @return array
  */
 function reportedPosts($show_pms = false)
@@ -1496,7 +1502,7 @@ function getUnapprovedPosts($approve_query, $current_view, $boards_allowed, $sta
 		// Is it a reply to their own topic?
 		elseif ($row['id_member'] == $row['id_member_started'] && $row['id_msg'] != $row['id_first_msg'] && ($boards_allowed['delete_own_replies'] == array(0) || in_array($row['id_board'], $boards_allowed['delete_own_replies'])))
 			$can_delete = true;
-		// Someone elses?
+		// Someone else's?
 		elseif ($row['id_member'] != $user_info['id'] && ($boards_allowed['delete_any_boards'] == array(0) || in_array($row['id_board'], $boards_allowed['delete_any_boards'])))
 			$can_delete = true;
 		else

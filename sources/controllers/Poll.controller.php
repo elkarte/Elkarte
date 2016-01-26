@@ -21,10 +21,9 @@ if (!defined('ELK'))
 	die('No access...');
 
 /**
- * Poll Controller.
- * This receives requests for voting, locking, removing and
- * editing polls. Note that that posting polls is done in
- * Post.controller.php.
+ * Poll_Controller Class
+ * This receives requests for voting, locking, removing and editing polls.
+ * Note that that posting polls is done in Post.controller.php.
  */
 class Poll_Controller extends Action_Controller
 {
@@ -316,6 +315,7 @@ class Poll_Controller extends Action_Controller
 			{
 				$pollOptions = pollOptions($pollinfo['id_poll']);
 				$context['poll']['choices'] = array();
+
 				// @deprecated since 1.1 - backward compatibility with 1.0
 				$context['choices'] &= $context['poll']['choices'];
 				foreach ($pollOptions as $option)
@@ -355,8 +355,11 @@ class Poll_Controller extends Action_Controller
 				$label = censor(Util::htmlspecialchars($label));
 
 				if (isset($context['poll']['choices'][$id]))
+				{
 					$context['poll']['choices'][$id]['label'] = $label;
+				}
 				elseif ($label != '')
+				{
 					$context['poll']['choices'][] = array(
 						'id' => $last_id++,
 						'number' => $number++,
@@ -364,6 +367,7 @@ class Poll_Controller extends Action_Controller
 						'votes' => -1,
 						'is_last' => $count++ == $totalPostOptions && $totalPostOptions > 1 ? true : false,
 					);
+				}
 			}
 
 			// Make sure we have two choices for sure!
@@ -380,6 +384,7 @@ class Poll_Controller extends Action_Controller
 						'is_last' => false
 					);
 				}
+
 				$poll_errors->addError('poll_few');
 			}
 
@@ -399,7 +404,7 @@ class Poll_Controller extends Action_Controller
 
 			// Check the question/option count for errors.
 			// @todo: why !$poll_errors->hasErrors()?
-			if (trim($this->_req->post->question) == '' && !$poll_errors->hasErrors())
+			if (trim($this->_req->post->question) === '' && !$poll_errors->hasErrors())
 				$poll_errors->addError('no_question');
 
 			// No check is needed, since nothing is really posted.
@@ -641,7 +646,7 @@ class Poll_Controller extends Action_Controller
 			$k = (int) $k;
 
 			// They've cleared the box.  Either they want it deleted, or it never existed.
-			if (trim($option) == '')
+			if (trim($option) === '')
 			{
 				// They want it deleted.  Bye.
 				if (in_array($k, $choices))
@@ -660,6 +665,7 @@ class Poll_Controller extends Action_Controller
 			else
 				$add_options[] = array($bcinfo['id_poll'], $k, $option, 0);
 		}
+
 		if (!empty($update_options))
 			modifyPollOption($update_options);
 

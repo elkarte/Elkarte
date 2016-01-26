@@ -286,7 +286,7 @@ function sendNotifications($topics, $type, $exclude = array(), $members_only = a
 			continue;
 
 		// Easier to check this here... if they aren't the topic poster do they really want to know?
-		// @todo prehaps just if they posted by email?
+		// @todo perhaps just if they posted by email?
 		if ($type != 'reply' && $row['notify_types'] == 2 && $row['id_member'] != $row['id_member_started'])
 			continue;
 
@@ -914,7 +914,7 @@ function getUsersNotificationsPreferences($notification_types, $members)
  * Saves into the database the notification preferences of a certain member.
  *
  * @param int $member The member id
- * @param int[] $notification_types The array of notifications ('type' => 'level')
+ * @param int[] $notification_data The array of notifications ('type' => 'level')
  */
 function saveUserNotificationsPreferences($member, $notification_data)
 {

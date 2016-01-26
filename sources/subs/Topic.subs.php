@@ -2688,6 +2688,7 @@ function splitAttemptMove($boards, $totopic)
 /**
  * Retrieves information of the current and destination board of a split topic
  *
+ * @param int $toboard
  * @return array
  */
 function splitDestinationBoard($toboard = 0)

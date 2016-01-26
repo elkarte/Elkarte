@@ -10,8 +10,8 @@
  * This software is a derived product, based on:
  *
  * Simple Machines Forum (SMF)
- * copyright:	2011 Simple Machines (http://www.simplemachines.org)
- * license:		BSD, See included LICENSE.TXT for terms and conditions.
+ * copyright:    2011 Simple Machines (http://www.simplemachines.org)
+ * license:      BSD, See included LICENSE.TXT for terms and conditions.
  *
  * @version 1.1 dev
  *
@@ -20,17 +20,28 @@
 namespace Themes\DefaultTheme;
 
 if (!defined('ELK'))
+{
 	die('No access...');
+}
 
+/**
+ * Class Theme
+ *
+ * - Extends the abstract theme class
+ *
+ * @package Themes\DefaultTheme
+ */
 class Theme extends \Theme
 {
+	/**
+	 * @var int
+	 */
 	protected $id = 0;
-
 
 	/**
 	 * This is the only template included in the sources.
 	 */
-	function template_rawdata()
+	public function template_rawdata()
 	{
 		global $context;
 
@@ -40,7 +51,7 @@ class Theme extends \Theme
 	/**
 	 * The header template
 	 */
-	function template_header()
+	public function template_header()
 	{
 		global $context, $settings;
 
@@ -56,18 +67,28 @@ class Theme extends \Theme
 
 			// Are we debugging the template/html content?
 			if ((!isset($_REQUEST['xml']) || !isset($_REQUEST['api'])) && isset($_GET['debug']) && !isBrowser('ie'))
+			{
 				header('Content-Type: application/xhtml+xml');
+			}
 			elseif (!isset($_REQUEST['xml']) || !isset($_REQUEST['api']))
+			{
 				header('Content-Type: text/html; charset=UTF-8');
+			}
 		}
 
 		// Probably temporary ($_REQUEST['xml'] should be replaced by $_REQUEST['api'])
 		if (isset($_REQUEST['api']) && $_REQUEST['api'] == 'json')
+		{
 			header('Content-Type: application/json; charset=UTF-8');
+		}
 		elseif (isset($_REQUEST['xml']) || isset($_REQUEST['api']))
+		{
 			header('Content-Type: text/xml; charset=UTF-8');
+		}
 		else
+		{
 			header('Content-Type: text/html; charset=UTF-8');
+		}
 
 		foreach (\Template_Layers::getInstance()->prepareContext() as $layer)
 			loadSubTemplate($layer . '_above', 'ignore');
@@ -83,13 +104,15 @@ class Theme extends \Theme
 	/**
 	 * Show the copyright.
 	 */
-	function theme_copyright()
+	public function theme_copyright()
 	{
 		global $forum_copyright;
 
 		// Don't display copyright for things like SSI.
 		if (!defined('FORUM_VERSION'))
+		{
 			return;
+		}
 
 		// Put in the version...
 		$forum_copyright = replaceBasicActionUrl(sprintf($forum_copyright, FORUM_VERSION));
@@ -101,7 +124,7 @@ class Theme extends \Theme
 	/**
 	 * The template footer
 	 */
-	function template_footer()
+	public function template_footer()
 	{
 		global $context, $settings, $modSettings, $time_start;
 
@@ -120,11 +143,17 @@ class Theme extends \Theme
 		}
 
 		foreach (\Template_Layers::getInstance()->reverseLayers() as $layer)
+		{
 			loadSubTemplate($layer . '_below', 'ignore');
-
+		}
 	}
 
-	public function templateJquery()
+	/**
+	 * Loads the required jQuery files for the system
+	 *
+	 * - Determines the correct script tags to add based on CDN/Local/Auto
+	 */
+	protected function templateJquery()
 	{
 		global $modSettings, $settings;
 
@@ -164,55 +193,73 @@ class Theme extends \Theme
 		}
 	}
 
-	protected function templateJavascriptFiles($do_defered)
+	/**
+	 * Loads the JS files that have been requested
+	 *
+	 * - Will combine / minify the files it the option is set.
+	 * - Handles both above and below (deferred) files
+	 *
+	 * @param bool $do_deferred
+	 */
+	protected function templateJavascriptFiles($do_deferred)
 	{
 		global $boardurl, $modSettings;
+
+		// Combine and minify javascript source files to save bandwidth and requests
 		if (!empty($modSettings['minify_css_js']))
 		{
 			$combiner = new \Site_Combiner(CACHEDIR, $boardurl . '/cache');
-			$combine_name = $combiner->site_js_combine($this->js_files, $do_defered);
+			$combine_name = $combiner->site_js_combine($this->js_files, $do_deferred);
 
 			call_integration_hook('post_javascript_combine', array(&$combine_name, $combiner));
 
 			if (!empty($combine_name))
+			{
 				echo '
-	<script src="', $combine_name, '" id="jscombined', $do_defered ? 'bottom' : 'top', '"></script>';
+	<script src="', $combine_name, '" id="jscombined', $do_deferred ? 'bottom' : 'top', '"></script>';
+			}
 			// While we have Javascript files to place in the template
 			foreach ($combiner->getSpares() as $id => $js_file)
 			{
-				if ((!$do_defered && empty($js_file['options']['defer'])) || ($do_defered && !empty($js_file['options']['defer'])))
+				if ((!$do_deferred && empty($js_file['options']['defer'])) || ($do_deferred && !empty($js_file['options']['defer'])))
+				{
 					echo '
 	<script src="', $js_file['filename'], '" id="', $id, '"', !empty($js_file['options']['async']) ? ' async="async"' : '', '></script>';
+				}
 			}
 		}
+		// Just give them the full load then
 		else
 		{
 			// While we have Javascript files to place in the template
 			foreach ($this->js_files as $id => $js_file)
 			{
-				if ((!$do_defered && empty($js_file['options']['defer'])) || ($do_defered && !empty($js_file['options']['defer'])))
+				if ((!$do_deferred && empty($js_file['options']['defer'])) || ($do_deferred && !empty($js_file['options']['defer'])))
+				{
 					echo '
 	<script src="', $js_file['filename'], '" id="', $id, '"', !empty($js_file['options']['async']) ? ' async="async"' : '', '></script>';
+				}
 			}
 		}
 	}
+
 	/**
 	 * Output the Javascript files
 	 *
 	 * What it does:
-	 * - tabbing in this function is to make the HTML source look proper
-	 * - outputs jQuery/jQueryUI from the proper source (local/CDN)
-	 * - if defered is set function will output all JS (source & inline) set to load at page end
-	 * - if the admin option to combine files is set, will use Combiner.class
+	 * - Tabbing in this function is to make the HTML source look proper
+	 * - Outputs jQuery/jQueryUI from the proper source (local/CDN)
+	 * - If deferred is set function will output all JS (source & inline) set to load at page end
+	 * - If the admin option to combine files is set, will use Combiner.class
 	 *
-	 * @param bool $do_defered = false
+	 * @param bool $do_deferred = false
 	 */
-	function template_javascript($do_defered = false)
+	function template_javascript($do_deferred = false)
 	{
 		global $modSettings;
 
 		// First up, load jQuery and jQuery UI
-		if (isset($modSettings['jquery_source']) && !$do_defered)
+		if (isset($modSettings['jquery_source']) && !$do_deferred)
 		{
 			$this->templateJquery();
 		}
@@ -220,15 +267,15 @@ class Theme extends \Theme
 		// Use this hook to work with Javascript files and vars pre output
 		call_integration_hook('pre_javascript_output');
 
-		// Combine and minify javascript source files to save bandwidth and requests
+		// Load in the JS files
 		if (!empty($this->js_files))
 		{
-			$this->templateJavascriptFiles($do_defered);
+			$this->templateJavascriptFiles($do_deferred);
 		}
 
 		// Build the declared Javascript variables script
 		$js_vars = array();
-		if (!empty($this->js_vars) && !$do_defered)
+		if (!empty($this->js_vars) && !$do_deferred)
 		{
 			foreach ($this->js_vars as $var => $value)
 				$js_vars[] = $var . ' = ' . $value;
@@ -240,14 +287,14 @@ class Theme extends \Theme
 		// Inline JavaScript - Actually useful some times!
 		if (!empty($this->js_inline))
 		{
-			// Defered output waits until we are defering !
-			if (!empty($this->js_inline['defer']) && $do_defered)
+			// Deferred output waits until we are deferring !
+			if (!empty($this->js_inline['defer']) && $do_deferred)
 			{
 				// Combine them all in to one output
 				$this->js_inline['defer'] = array_map('trim', $this->js_inline['defer']);
 				$inline_defered_code = implode("\n\t\t", $this->js_inline['defer']);
 
-				// Output the defered script
+				// Output the deferred script
 				echo '
 	<script><!-- // --><![CDATA[
 		', $inline_defered_code, '
@@ -255,7 +302,7 @@ class Theme extends \Theme
 			}
 
 			// Standard output, and our javascript vars, get output when we are not on a defered call
-			if (!empty($this->js_inline['standard']) && !$do_defered)
+			if (!empty($this->js_inline['standard']) && !$do_deferred)
 			{
 				$this->js_inline['standard'] = array_map('trim', $this->js_inline['standard']);
 
@@ -292,18 +339,20 @@ class Theme extends \Theme
 				call_integration_hook('post_css_combine', array(&$combine_name, $combiner));
 
 				if (!empty($combine_name))
+				{
 					echo '
 	<link rel="stylesheet" href="', $combine_name, '" id="csscombined" />';
+				}
 
 				foreach ($combiner->getSpares() as $id => $file)
 					echo '
-	<link rel="stylesheet" href="', $file['filename'], '" id="', $id,'" />';
+	<link rel="stylesheet" href="', $file['filename'], '" id="', $id, '" />';
 			}
 			else
 			{
 				foreach ($this->css_files as $id => $file)
 					echo '
-	<link rel="stylesheet" href="', $file['filename'], '" id="', $id,'" />';
+	<link rel="stylesheet" href="', $file['filename'], '" id="', $id, '" />';
 			}
 		}
 	}
@@ -349,35 +398,53 @@ class Theme extends \Theme
 		}
 	}
 
-	function addCodePrettify()
+	/**
+	 * If the option to pretty output code is on, this loads the JS and CSS
+	 */
+	public function addCodePrettify()
 	{
-		loadCSSFile('prettify.css');
-		loadJavascriptFile('prettify.min.js', array('defer' => true));
+		global $modSettings;
 
-		addInlineJavascript('
-		$(document).ready(function(){
-			prettyPrint();
-		});', true);
+		if (!empty($modSettings['enableCodePrettify']))
+		{
+			loadCSSFile('prettify.css');
+			loadJavascriptFile('prettify.min.js', array('defer' => true));
+
+			addInlineJavascript('
+			$(document).ready(function(){
+				prettyPrint();
+			});', true);
+		}
 	}
 
-	function autoEmbedVideo()
+	/**
+	 * If video embedding is enabled, this loads the needed JS and vars
+	 */
+	public function autoEmbedVideo()
 	{
-		global $txt;
+		global $txt, $modSettings;
 
-		addInlineJavascript('
-		var oEmbedtext = ({
-			preview_image : ' . JavaScriptEscape($txt['preview_image']) . ',
-			ctp_video : ' . JavaScriptEscape($txt['ctp_video']) . ',
-			hide_video : ' . JavaScriptEscape($txt['hide_video']) . ',
-			youtube : ' . JavaScriptEscape($txt['youtube']) . ',
-			vimeo : ' . JavaScriptEscape($txt['vimeo']) . ',
-			dailymotion : ' . JavaScriptEscape($txt['dailymotion']) . '
-		});', true);
+		if (!empty($modSettings['enableVideoEmbeding']))
+		{
+			addInlineJavascript('
+			var oEmbedtext = ({
+				preview_image : ' . JavaScriptEscape($txt['preview_image']) . ',
+				ctp_video : ' . JavaScriptEscape($txt['ctp_video']) . ',
+				hide_video : ' . JavaScriptEscape($txt['hide_video']) . ',
+				youtube : ' . JavaScriptEscape($txt['youtube']) . ',
+				vimeo : ' . JavaScriptEscape($txt['vimeo']) . ',
+				dailymotion : ' . JavaScriptEscape($txt['dailymotion']) . '
+			});', true);
 
-		loadJavascriptFile('elk_jquery_embed.js', array('defer' => true));
+			loadJavascriptFile('elk_jquery_embed.js', array('defer' => true));
+		}
 	}
 
-	function doScheduledSendMail()
+	/**
+	 * Ensures we kick the mail queue from time to time so that it gets
+	 * checked as often as possible.
+	 */
+	public function doScheduledSendMail()
 	{
 		global $modSettings;
 
@@ -388,9 +455,13 @@ class Theme extends \Theme
 
 			// What to do, what to do?!
 			if (empty($modSettings['next_task_time']) || $modSettings['next_task_time'] < time())
+			{
 				$controller->action_autotask();
+			}
 			else
+			{
 				$controller->action_reducemailqueue();
+			}
 		}
 		else
 		{
@@ -407,7 +478,10 @@ class Theme extends \Theme
 		}
 	}
 
-	function relativeTimes()
+	/**
+	 * Relative times require a few variables be set in the JS
+	 */
+	public function relativeTimes()
 	{
 		global $modSettings, $context, $txt;
 
@@ -415,23 +489,24 @@ class Theme extends \Theme
 		if (!empty($modSettings['todayMod']) && $modSettings['todayMod'] > 2)
 		{
 			addInlineJavascript('
-		var oRttime = ({
-			referenceTime : ' . forum_time() * 1000 . ',
-			now : ' . JavaScriptEscape($txt['rt_now']) . ',
-			minute : ' . JavaScriptEscape($txt['rt_minute']) . ',
-			minutes : ' . JavaScriptEscape($txt['rt_minutes']) . ',
-			hour : ' . JavaScriptEscape($txt['rt_hour']) . ',
-			hours : ' . JavaScriptEscape($txt['rt_hours']) . ',
-			day : ' . JavaScriptEscape($txt['rt_day']) . ',
-			days : ' . JavaScriptEscape($txt['rt_days']) . ',
-			week : ' . JavaScriptEscape($txt['rt_week']) . ',
-			weeks : ' . JavaScriptEscape($txt['rt_weeks']) . ',
-			month : ' . JavaScriptEscape($txt['rt_month']) . ',
-			months : ' . JavaScriptEscape($txt['rt_months']) . ',
-			year : ' . JavaScriptEscape($txt['rt_year']) . ',
-			years : ' . JavaScriptEscape($txt['rt_years']) . ',
-		});
-		updateRelativeTime();', true);
+			var oRttime = ({
+				referenceTime : ' . forum_time() * 1000 . ',
+				now : ' . JavaScriptEscape($txt['rt_now']) . ',
+				minute : ' . JavaScriptEscape($txt['rt_minute']) . ',
+				minutes : ' . JavaScriptEscape($txt['rt_minutes']) . ',
+				hour : ' . JavaScriptEscape($txt['rt_hour']) . ',
+				hours : ' . JavaScriptEscape($txt['rt_hours']) . ',
+				day : ' . JavaScriptEscape($txt['rt_day']) . ',
+				days : ' . JavaScriptEscape($txt['rt_days']) . ',
+				week : ' . JavaScriptEscape($txt['rt_week']) . ',
+				weeks : ' . JavaScriptEscape($txt['rt_weeks']) . ',
+				month : ' . JavaScriptEscape($txt['rt_month']) . ',
+				months : ' . JavaScriptEscape($txt['rt_months']) . ',
+				year : ' . JavaScriptEscape($txt['rt_year']) . ',
+				years : ' . JavaScriptEscape($txt['rt_years']) . ',
+			});
+			updateRelativeTime();', true);
+
 			$context['using_relative_time'] = true;
 		}
 	}
@@ -450,7 +525,9 @@ class Theme extends \Theme
 		// Under SSI this function can be called more then once.  That can cause some problems.
 		// So only run the function once unless we are forced to run it again.
 		if ($loaded && !$forceload)
+		{
 			return;
+		}
 
 		$loaded = true;
 
@@ -465,12 +542,15 @@ class Theme extends \Theme
 		for ($i = 0, $n = count($context['news_lines']); $i < $n; $i++)
 		{
 			if (trim($context['news_lines'][$i]) == '')
+			{
 				continue;
+			}
 
 			// Clean it up for presentation ;).
 			$context['news_lines'][$i] = $bbc_parser->parseNews(stripslashes(trim($context['news_lines'][$i])));
 		}
 
+		// If we have some, setup for display
 		if (!empty($context['news_lines']))
 		{
 			$context['random_news_line'] = $context['news_lines'][mt_rand(0, count($context['news_lines']) - 1)];
@@ -485,23 +565,20 @@ class Theme extends \Theme
 
 			// Personal message popup...
 			if ($user_info['unread_messages'] > (isset($_SESSION['unread_messages']) ? $_SESSION['unread_messages'] : 0))
+			{
 				$context['user']['popup_messages'] = true;
+			}
 			else
+			{
 				$context['user']['popup_messages'] = false;
+			}
+
 			$_SESSION['unread_messages'] = $user_info['unread_messages'];
 
 			$context['user']['avatar'] = array(
 				'href' => !empty($user_info['avatar']['href']) ? $user_info['avatar']['href'] : '',
 				'image' => !empty($user_info['avatar']['image']) ? $user_info['avatar']['image'] : '',
 			);
-
-			// @deprecated since 1.0.2
-			if (!empty($modSettings['avatar_max_width']))
-				$context['user']['avatar']['width'] = $modSettings['avatar_max_width'];
-
-			// @deprecated since 1.0.2
-			if (!empty($modSettings['avatar_max_height']))
-				$context['user']['avatar']['height'] = $modSettings['avatar_max_height'];
 
 			// Figure out how long they've been logged in.
 			$context['user']['total_time_logged_in'] = array(
@@ -520,19 +597,26 @@ class Theme extends \Theme
 			$context['user']['popup_messages'] = false;
 
 			if (!empty($modSettings['registration_method']) && $modSettings['registration_method'] == 1)
+			{
 				$txt['welcome_guest'] .= $txt['welcome_guest_activate'];
+			}
+
 			$txt['welcome_guest'] = replaceBasicActionUrl($txt['welcome_guest']);
 
 			// If we've upgraded recently, go easy on the passwords.
 			if (!empty($modSettings['enable_password_conversion']))
+			{
 				$context['disable_login_hashing'] = true;
+			}
 		}
 
 		// Setup the main menu items.
 		$this->setupMenuContext();
 
 		if (empty($settings['theme_version']))
+		{
 			$context['show_vBlogin'] = $context['show_quick_login'];
+		}
 
 		// This is here because old index templates might still use it.
 		$context['show_news'] = !empty($settings['enable_news']);
@@ -544,14 +628,16 @@ class Theme extends \Theme
 
 		// Add the PM popup here instead. Theme authors can still override it simply by editing/removing the 'fPmPopup' in the array.
 		if ($context['show_pm_popup'])
+		{
 			addInlineJavascript('
-		$(document).ready(function(){
-			new smc_Popup({
-				heading: ' . JavaScriptEscape($txt['show_personal_messages_heading']) . ',
-				content: ' . JavaScriptEscape(sprintf($txt['show_personal_messages'], $context['user']['unread_messages'], $scripturl . '?action=pm')) . ',
-				icon: elk_images_url + \'/im_sm_newmsg.png\'
-			});
-		});', true);
+			$(document).ready(function(){
+				new smc_Popup({
+					heading: ' . JavaScriptEscape($txt['show_personal_messages_heading']) . ',
+					content: ' . JavaScriptEscape(sprintf($txt['show_personal_messages'], $context['user']['unread_messages'], $scripturl . '?action=pm')) . ',
+					icon: elk_images_url + \'/im_sm_newmsg.png\'
+				});
+			});', true);
+		}
 
 		// This looks weird, but it's because BoardIndex.controller.php references the variable.
 		$context['common_stats']['latest_member'] = array(
@@ -560,28 +646,39 @@ class Theme extends \Theme
 			'href' => $scripturl . '?action=profile;u=' . $modSettings['latestMember'],
 			'link' => '<a href="' . $scripturl . '?action=profile;u=' . $modSettings['latestMember'] . '">' . $modSettings['latestRealName'] . '</a>',
 		);
+
 		$context['common_stats'] = array(
 			'total_posts' => comma_format($modSettings['totalMessages']),
 			'total_topics' => comma_format($modSettings['totalTopics']),
 			'total_members' => comma_format($modSettings['totalMembers']),
 			'latest_member' => $context['common_stats']['latest_member'],
 		);
+
 		$context['common_stats']['boardindex_total_posts'] = sprintf($txt['boardindex_total_posts'], $context['common_stats']['total_posts'], $context['common_stats']['total_topics'], $context['common_stats']['total_members']);
 
 		if (empty($settings['theme_version']))
+		{
 			addJavascriptVar(array('elk_scripturl' => '\'' . $scripturl . '\''));
+		}
 
 		if (!isset($context['page_title']))
+		{
 			$context['page_title'] = '';
+		}
 
 		// Set some specific vars.
 		$context['page_title_html_safe'] = \Util::htmlspecialchars(un_htmlspecialchars($context['page_title'])) . (!empty($context['current_page']) ? ' - ' . $txt['page'] . ' ' . ($context['current_page'] + 1) : '');
 
 		// Load a custom CSS file?
 		if (file_exists($settings['theme_dir'] . '/css/custom.css'))
+		{
 			loadCSSFile('custom.css');
+		}
+
 		if (!empty($context['theme_variant']) && file_exists($settings['theme_dir'] . '/css/' . $context['theme_variant'] . '/custom' . $context['theme_variant'] . '.css'))
+		{
 			loadCSSFile($context['theme_variant'] . '/custom' . $context['theme_variant'] . '.css');
+		}
 	}
 
 	/**
@@ -593,7 +690,7 @@ class Theme extends \Theme
 	 * - Saves them in the cache if it is available and on
 	 * - Places the results in $context
 	 */
-	function setupMenuContext()
+	public function setupMenuContext()
 	{
 		global $context, $modSettings, $user_info, $txt, $scripturl, $settings;
 
@@ -607,7 +704,9 @@ class Theme extends \Theme
 		$context['allow_pm'] = allowedTo('pm_read');
 
 		if ($context['allow_search'])
+		{
 			$context['theme_header_callbacks'] = elk_array_insert($context['theme_header_callbacks'], 'login_bar', array('search_bar'), 'after');
+		}
 
 		$cacheTime = $modSettings['lastActive'] * 60;
 
@@ -896,7 +995,9 @@ class Theme extends \Theme
 
 					// This button needs some action.
 					if (isset($button['action_hook']))
+					{
 						$needs_action_hook = true;
+					}
 
 					if (isset($button['counter']) && !empty($menu_count[$button['counter']]))
 					{
@@ -914,12 +1015,16 @@ class Theme extends \Theme
 						foreach ($button['sub_buttons'] as $key => $subbutton)
 						{
 							if (empty($subbutton['show']))
+							{
 								unset($button['sub_buttons'][$key]);
+							}
 							elseif (isset($subbutton['counter']) && !empty($menu_count[$subbutton['counter']]))
 							{
 								$button['sub_buttons'][$key]['alttitle'] = $subbutton['title'] . ' [' . $menu_count[$subbutton['counter']] . ']';
 								if (!empty($settings['menu_numeric_notice'][1]))
+								{
 									$button['sub_buttons'][$key]['title'] .= sprintf($settings['menu_numeric_notice'][1], $menu_count[$subbutton['counter']]);
+								}
 
 								// 2nd level sub buttons next...
 								if (isset($subbutton['sub_buttons']))
@@ -928,12 +1033,16 @@ class Theme extends \Theme
 									{
 										$button['sub_buttons'][$key]['sub_buttons'][$key2] = $subbutton2;
 										if (empty($subbutton2['show']))
+										{
 											unset($button['sub_buttons'][$key]['sub_buttons'][$key2]);
+										}
 										elseif (isset($subbutton2['counter']) && !empty($menu_count[$subbutton2['counter']]))
 										{
 											$button['sub_buttons'][$key]['sub_buttons'][$key2]['alttitle'] = $subbutton2['title'] . ' [' . $menu_count[$subbutton2['counter']] . ']';
 											if (!empty($settings['menu_numeric_notice'][2]))
+											{
 												$button['sub_buttons'][$key]['sub_buttons'][$key2]['title'] .= sprintf($settings['menu_numeric_notice'][2], $menu_count[$subbutton2['counter']]);
+											}
 											unset($menu_count[$subbutton2['counter']]);
 										}
 									}
@@ -947,11 +1056,15 @@ class Theme extends \Theme
 			}
 
 			if (!empty($modSettings['cache_enable']) && $modSettings['cache_enable'] >= 2)
+			{
 				cache_put_data('menu_buttons-' . implode('_', $user_info['groups']) . '-' . $user_info['language'], $menu_buttons, $cacheTime);
+			}
 		}
 
 		if (!empty($menu_buttons['profile']['sub_buttons']['logout']))
+		{
 			$menu_buttons['profile']['sub_buttons']['logout']['href'] .= ';' . $context['session_var'] . '=' . $context['session_id'];
+		}
 
 		$context['menu_buttons'] = $menu_buttons;
 
@@ -960,26 +1073,45 @@ class Theme extends \Theme
 		$current_action = 'home';
 
 		if (isset($context['menu_buttons'][$context['current_action']]))
+		{
 			$current_action = $context['current_action'];
+		}
 		elseif ($context['current_action'] == 'profile')
+		{
 			$current_action = 'pm';
+		}
 		elseif ($context['current_action'] == 'theme')
+		{
 			$current_action = isset($_REQUEST['sa']) && $_REQUEST['sa'] == 'pick' ? 'profile' : 'admin';
+		}
 		elseif ($context['current_action'] == 'login2' || ($user_info['is_guest'] && $context['current_action'] == 'reminder'))
+		{
 			$current_action = 'login';
+		}
 		elseif ($context['current_action'] == 'groups' && $context['allow_moderation_center'])
+		{
 			$current_action = 'moderate';
+		}
 		elseif ($context['current_action'] == 'moderate' && $context['allow_admin'])
+		{
 			$current_action = 'admin';
+		}
 
 		// Not all actions are simple.
 		if (!empty($needs_action_hook))
+		{
 			call_integration_hook('integrate_current_action', array(&$current_action));
+		}
 
 		if (isset($context['menu_buttons'][$current_action]))
+		{
 			$context['menu_buttons'][$current_action]['active_button'] = true;
+		}
 	}
 
+	/**
+	 * Load the base JS that gives Elkarte a nice rack
+	 */
 	public function loadThemeJavascript()
 	{
 		global $settings, $context, $modSettings, $scripturl, $txt, $options;
@@ -989,35 +1121,30 @@ class Theme extends \Theme
 
 		// Default JS variables for use in every theme
 		$this->addJavascriptVar(array(
-			'elk_theme_url' => JavaScriptEscape($settings['theme_url']),
-			'elk_default_theme_url' => JavaScriptEscape($settings['default_theme_url']),
-			'elk_images_url' => JavaScriptEscape($settings['images_url']),
-			'elk_smiley_url' => JavaScriptEscape($modSettings['smileys_url']),
-			'elk_scripturl' => '\'' . $scripturl . '\'',
-			'elk_iso_case_folding' => $context['server']['iso_case_folding'] ? 'true' : 'false',
-			'elk_charset' => '"UTF-8"',
-			'elk_session_id' => JavaScriptEscape($context['session_id']),
-			'elk_session_var' => JavaScriptEscape($context['session_var']),
-			'elk_member_id' => $context['user']['id'],
-			'ajax_notification_text' => JavaScriptEscape($txt['ajax_in_progress']),
-			'ajax_notification_cancel_text' => JavaScriptEscape($txt['modify_cancel']),
-			'help_popup_heading_text' => JavaScriptEscape($txt['help_popup']),
-			'use_click_menu' => !empty($options['use_click_menu']) ? 'true' : 'false',
-			'todayMod' => !empty($modSettings['todayMod']) ? (int) $modSettings['todayMod'] : 0)
+				'elk_theme_url' => JavaScriptEscape($settings['theme_url']),
+				'elk_default_theme_url' => JavaScriptEscape($settings['default_theme_url']),
+				'elk_images_url' => JavaScriptEscape($settings['images_url']),
+				'elk_smiley_url' => JavaScriptEscape($modSettings['smileys_url']),
+				'elk_scripturl' => '\'' . $scripturl . '\'',
+				'elk_iso_case_folding' => $context['server']['iso_case_folding'] ? 'true' : 'false',
+				'elk_charset' => '"UTF-8"',
+				'elk_session_id' => JavaScriptEscape($context['session_id']),
+				'elk_session_var' => JavaScriptEscape($context['session_var']),
+				'elk_member_id' => $context['user']['id'],
+				'ajax_notification_text' => JavaScriptEscape($txt['ajax_in_progress']),
+				'ajax_notification_cancel_text' => JavaScriptEscape($txt['modify_cancel']),
+				'help_popup_heading_text' => JavaScriptEscape($txt['help_popup']),
+				'use_click_menu' => !empty($options['use_click_menu']) ? 'true' : 'false',
+				'todayMod' => !empty($modSettings['todayMod']) ? (int) $modSettings['todayMod'] : 0)
 		);
 
 		// Auto video embedding enabled, then load the needed JS
-		if (!empty($modSettings['enableVideoEmbeding']))
-		{
-			theme()->autoEmbedVideo();
-		}
+		theme()->autoEmbedVideo();
 
 		// Prettify code tags? Load the needed JS and CSS.
-		if (!empty($modSettings['enableCodePrettify']))
-		{
-			theme()->addCodePrettify();
-		}
+		theme()->addCodePrettify();
 
+		// Relative times for posts?
 		theme()->relativeTimes();
 
 		// If we think we have mail to send, let's offer up some possibilities... robots get pain (Now with scheduled task support!)
@@ -1027,6 +1154,13 @@ class Theme extends \Theme
 		}
 	}
 
+	/**
+	 * Makes the default layers and languages available
+	 *
+	 * - Loads index and addon language files as needed
+	 * - Loads xml, index or no templates as needed
+	 * - Loads templates as defined by $settings['theme_templates']
+	 */
 	public function loadDefaultLayers()
 	{
 		global $settings;
@@ -1040,12 +1174,13 @@ class Theme extends \Theme
 
 		call_integration_hook('integrate_simple_actions', array(&$simpleActions));
 
-		// Output is fully XML, so no need for the index template.
+		// Output is fully XML
 		if (isset($_REQUEST['xml']))
 		{
 			loadLanguage('index+Addons');
 
-			// @todo added because some $settings in template_init are necessary even in xml mode. Maybe move template_init to a settings file?
+			// @todo added because some $settings in template_init are necessary even in
+			// xml mode. Maybe move template_init to a settings file?
 			loadTemplate('index');
 			loadTemplate('Xml');
 			\Template_Layers::getInstance()->removeAll();
@@ -1060,9 +1195,13 @@ class Theme extends \Theme
 		{
 			// Custom templates to load, or just default?
 			if (isset($settings['theme_templates']))
+			{
 				$templates = explode(',', $settings['theme_templates']);
+			}
 			else
+			{
 				$templates = array('index');
+			}
 
 			// Load each template...
 			foreach ($templates as $template)
@@ -1074,31 +1213,46 @@ class Theme extends \Theme
 
 			// Custom template layers?
 			if (isset($settings['theme_layers']))
+			{
 				$layers = explode(',', $settings['theme_layers']);
+			}
 			else
+			{
 				$layers = array('html', 'body');
+			}
 
 			$template_layers = \Template_Layers::getInstance(true);
 			foreach ($layers as $layer)
+			{
 				$template_layers->addBegin($layer);
+			}
 		}
 	}
 
+	/**
+	 * If a variant CSS is needed, this loads it
+	 */
 	public function loadThemeVariant()
 	{
 		global $context, $settings, $options;
 
 		// Overriding - for previews and that ilk.
 		if (!empty($_REQUEST['variant']))
+		{
 			$_SESSION['id_variant'] = $_REQUEST['variant'];
+		}
 
 		// User selection?
 		if (empty($settings['disable_user_variant']) || allowedTo('admin_forum'))
+		{
 			$context['theme_variant'] = !empty($_SESSION['id_variant']) ? $_SESSION['id_variant'] : (!empty($options['theme_variant']) ? $options['theme_variant'] : '');
+		}
 
 		// If not a user variant, select the default.
 		if ($context['theme_variant'] == '' || !in_array($context['theme_variant'], $settings['theme_variants']))
+		{
 			$context['theme_variant'] = !empty($settings['default_variant']) && in_array($settings['default_variant'], $settings['theme_variants']) ? $settings['default_variant'] : $settings['theme_variants'][0];
+		}
 
 		// Do this to keep things easier in the templates.
 		$context['theme_variant'] = '_' . $context['theme_variant'];
@@ -1106,6 +1260,8 @@ class Theme extends \Theme
 
 		// The most efficient way of writing multi themes is to use a master index.css plus variant.css files.
 		if (!empty($context['theme_variant']))
+		{
 			loadCSSFile($context['theme_variant'] . '/index' . $context['theme_variant'] . '.css');
+		}
 	}
 }

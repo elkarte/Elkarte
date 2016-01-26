@@ -497,7 +497,7 @@ function template_ssi_above()
 	<head>
 		<title>SSI.php Examples</title>
 		<link rel="stylesheet" href="', $settings['default_theme_url'], '/css/index.css', CACHE_STALE, '" />
-		<link rel="stylesheet" href="', $settings['default_theme_url'], '/css/_light/index_light.css' , CACHE_STALE, '" />
+		<link rel="stylesheet" href="', $settings['default_theme_url'], '/css/_light/index_light.css', CACHE_STALE, '" />
 		<script src="', $settings['default_theme_url'], '/scripts/script.js"></script>
 		<style>
 			#wrapper {
@@ -671,7 +671,7 @@ function template_homepage_sample1($method = 'source')
 			font-family: Arial, Tahoma, sans-serif; font-size: 80%;
 			background: #DFDFDF;
 			color: #FFFFFF;
-			margin: 0
+			margin: 0;
 		}
 		ul,ol {
 			padding-left: 19px;
@@ -745,7 +745,7 @@ function template_homepage_sample1($method = 'source')
 
 	$footer = '
 	<div id="footer">
-		<a target="_blank" rel="license" href="http://creativecommons.org/licenses/publicdomain/"><img alt="Creative Commons License" style="border:0" src="http://i.creativecommons.org/l/publicdomain/88x31.png" /></a>
+		<a target="_blank" rel="license" href="http://creativecommons.org/licenses/publicdomain/"><img alt="Creative Commons License" style="border:0;" src="http://i.creativecommons.org/l/publicdomain/88x31.png" /></a>
 		This sample website layout is dedicated to the <a target="_blank" rel="license" href="http://creativecommons.org/licenses/publicdomain/">Public Domain</a>.
 	</div>
 </div>

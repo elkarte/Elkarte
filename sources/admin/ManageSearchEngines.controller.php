@@ -260,7 +260,7 @@ class ManageSearchEngines_Controller extends Action_Controller
 						'value' => $txt['spider_name'],
 					),
 					'data' => array(
-						'function' => function ($rowData) {
+						'function' => function($rowData) {
 							global $scripturl;
 
 							return sprintf('<a href="%1$s?action=admin;area=sengines;sa=editspiders;sid=%2$d">%3$s</a>', $scripturl, $rowData['id_spider'], htmlspecialchars($rowData['spider_name'], ENT_COMPAT, 'UTF-8'));
@@ -276,7 +276,7 @@ class ManageSearchEngines_Controller extends Action_Controller
 						'value' => $txt['spider_last_seen'],
 					),
 					'data' => array(
-						'function' => function ($rowData) {
+						'function' => function($rowData) {
 							global $context, $txt;
 
 							return isset($context['spider_last_seen'][$rowData['id_spider']]) ? standardTime($context['spider_last_seen'][$rowData['id_spider']]) : $txt['spider_last_never'];
@@ -461,7 +461,7 @@ class ManageSearchEngines_Controller extends Action_Controller
 						'value' => $txt['spider_time'],
 					),
 					'data' => array(
-						'function' => function ($rowData) {
+						'function' => function($rowData) {
 							return standardTime($rowData['log_time']);
 						},
 					),

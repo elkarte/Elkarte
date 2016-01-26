@@ -22,9 +22,9 @@ if (!defined('ELK'))
 	die('No access...');
 
 /**
- * ProfileInfo_Controller class, access all profile summary areas for a user
- * including overall summary, post listing, attachment listing, user statistics
- * user permissions, user warnings
+ * ProfileInfo_Controller Class
+ * Access all profile summary areas for a user including overall summary,
+ * post listing, attachment listing, user statistics user permissions, user warnings
  */
 class ProfileInfo_Controller extends Action_Controller
 {

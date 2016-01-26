@@ -54,6 +54,8 @@ class User_Notification_Integrate
 
 	/**
 	 * Adds the settings to the admin page.
+	 *
+	 * @param mixed[] $config_vars
 	 */
 	public static function integrate_modify_mention_settings(&$config_vars)
 	{

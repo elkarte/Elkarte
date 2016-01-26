@@ -367,7 +367,7 @@ class Daily_Digest implements Scheduled_Task_Interface
 				$email['body'] .= "\n";
 
 			// Then just say our goodbyes!
-			$email['body'] .= "\n\n" .$langtxt[$lang]['bye'];
+			$email['body'] .= "\n\n" . $langtxt[$lang]['bye'];
 
 			// Send it - low priority!
 			sendmail($email['email'], $email['subject'], $email['body'], null, null, false, 4);

@@ -421,7 +421,7 @@ class Errors
 				$entry['file'] = isset($entry['file']) ? str_replace($current_directory, '', str_replace('\\', '/', $entry['file'])) : '';
 
 				$this->error_text .= '<li><strong>' . htmlspecialchars($function) . '()</strong>' . (isset($entry['file'], $entry['line'])
-						? ' in <strong>' . $entry['file'] . '</strong> at line <strong>' .  $entry['line'] . '</strong>'
+						? ' in <strong>' . $entry['file'] . '</strong> at line <strong>' . $entry['line'] . '</strong>'
 						: '') . "</li>\n";
 			}
 		}
@@ -554,7 +554,9 @@ class Errors
 
 		// Just check we're not in any buffers, just in case.
 		while (ob_get_level() > 0)
+		{
 			@ob_end_clean();
+		}
 
 		// Set the output headers
 		$this->_set_fatal_error_headers();
