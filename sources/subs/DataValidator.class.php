@@ -1145,12 +1145,19 @@ class Data_Validator
 			// Check the validity of the syntax.
 			ob_start();
 			$errorReporting = error_reporting(0);
-			$result = @eval('
-				if (false)
-				{
-					' . preg_replace('~^(?:\s*<\\?(?:php)?|\\?>\s*$)~u', '', $input[$field]) . '
-				}
-			');
+			try
+			{
+				$result = @eval('
+					if (false)
+					{
+						' . preg_replace('~^(?:\s*<\\?(?:php)?|\\?>\s*$)~u', '', $input[$field]) . '
+					}
+				');
+			}
+			catch (ParseError $e)
+			{
+				$result = false;
+			}
 			error_reporting($errorReporting);
 			@ob_end_clean();
 		}

@@ -169,6 +169,11 @@ function sessionRead($session_id)
 	list ($sess_data) = $db->fetch_row($result);
 	$db->free_result($result);
 
+	if (empty($sess_data))
+	{
+		return '';
+	}
+
 	return $sess_data;
 }
 
@@ -235,13 +240,15 @@ function sessionDestroy($session_id)
 	$db = database();
 
 	// Just delete the row...
-	return $db->query('', '
+	$db->query('', '
 		DELETE FROM {db_prefix}sessions
 		WHERE session_id = {string:session_id}',
 		array(
 			'session_id' => $session_id,
 		)
 	);
+
+	return true;
 }
 
 /**
@@ -265,11 +272,13 @@ function sessionGC($max_lifetime)
 	$db = database();
 
 	// Clean up after yerself ;).
-	return $db->query('', '
+	$db->query('', '
 		DELETE FROM {db_prefix}sessions
 		WHERE last_update < {int:last_update}',
 		array(
 			'last_update' => time() - $max_lifetime,
 		)
 	);
+
+	return $db->affected_rows() != 0;
 }
