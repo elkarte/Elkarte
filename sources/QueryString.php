@@ -290,7 +290,7 @@ function buffer_callback($matches)
 {
 	global $scripturl;
 
-	if (defined('SID') && SID != '')
+	if (!isBrowser('possibly_robot') && empty($_COOKIE) && defined('SID') && SID != '')
 		return '"' . $scripturl . '/' . strtr($matches[1], '&;=', '//,') . '.html?' . SID . (isset($matches[2]) ? $matches[2] : '') . '"';
 	else
 		return '"' . $scripturl . '/' . strtr($matches[1], '&;=', '//,') . '.html' . (isset($matches[2]) ? $matches[2] : '') . '"';
