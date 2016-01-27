@@ -2421,7 +2421,7 @@ function redirectexit($setLocation = '', $refresh = false)
 		$setLocation = $scripturl . ($setLocation != '' ? '?' . $setLocation : '');
 
 	// Put the session ID in.
-	if (defined('SID') && SID != '')
+	if (empty($_COOKIE) && defined('SID') && SID != '')
 		$setLocation = preg_replace('/^' . preg_quote($scripturl, '/') . '(?!\?' . preg_quote(SID, '/') . ')\\??/', $scripturl . '?' . SID . ';', $setLocation);
 	// Keep that debug in their for template debugging!
 	elseif (isset($_GET['debug']))
