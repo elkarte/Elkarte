@@ -619,6 +619,8 @@ em, .em {
 	overflow: hidden;
 	margin: 2px 0 0 0;
 	padding: 9px;
+	border: 1px solid #CCCCCC;
+	border-radius: 7px;
 }
 
 .well p, .roundframe p {
@@ -632,13 +634,21 @@ em, .em {
 /* The generic wrapper thingy. Used by generic list template */
 .generic_list_wrapper {
 	overflow: auto;
-	margin: 0;
+	margin: 4px 0 0 0;
 	padding: 8px 8px 16px 8px;
+	border: 1px solid #CCCCCC;
+	border-radius: 7px;
 }
 
 .generic_list_wrapper .additional_row {
 	margin: 0;
 	padding: 10px 0 0;
+	border-radius: 0;
+}
+
+.generic_list_wrapper .title_bar {
+	border-bottom: 1px solid #FEFEFE;
+	border-radius: 0;
 }
 
 /* The .information box is used by the after_title additional row */
@@ -651,6 +661,7 @@ em, .em {
 	margin: 0;
 	padding: 0;
 	border: none;
+	border-bottom: 1px solid #FEFEFE;
 }
 
 /* Styles used by the auto suggest control. */
@@ -658,6 +669,8 @@ em, .em {
 	position: absolute;
 	z-index: 100;
 	visibility: hidden;
+	border: 1px solid #BBBBBB;
+	border-radius: 3px;
 }
 
 .auto_suggest_div:focus {
@@ -688,6 +701,12 @@ em, .em {
 	padding: 4px 6px 2px 6px;
 	font-weight: bold;
 	font-size: 0.857em;
+	border: 1px solid #CCCCCC;
+	border-bottom: none;
+}
+
+.codeheader {
+	border-top: 3px solid #AFAFAF;
 }
 
 /* Use demi bold font weight for some key areas */
@@ -719,6 +738,8 @@ em, .em {
 	margin: 0 0 1em 0;
 	padding: 6px 10px;
 	font-size: 0.857em;
+	border: 1px solid #CCCCCC;
+	border-top: none;
 }
 
 /* Extra code block styling. */
@@ -728,6 +749,8 @@ em, .em {
 	white-space: nowrap;
 	font-family: "DejaVu Sans Mono", Monaco, Consolas, monospace;
 	resize: vertical;
+	border-top: 3px solid #AFAFAF;
+	border-bottom: 3px solid #AFAFAF;
 }
 
 .bbc_code .tab {
@@ -813,6 +836,18 @@ strong, .bbc_strong {
 	font-size: small;
 }
 
+div.bbc_footnotes {
+	border-top: 1px solid #BFBFBF;
+}
+
+sup.bbc_footnotes, sup.bbc_footnotes a {
+	font-weight: 700;
+}
+
+div.bbc_footnotes .meaction {
+	display: inline-block;
+}
+
 .footnote_return {
 	font-size: 1.357em;
 }
@@ -826,6 +861,27 @@ a.bbc_link {
 	text-overflow: ellipsis;
 	white-space: nowrap;
 	word-wrap: normal;
+}
+
+.bbc_link:hover {
+	text-decoration: none;
+}
+
+.meaction:before {
+	content: "\270c";
+	font-size: 1.714em;
+	line-height: 1em;
+}
+
+.spoiler {
+	padding: 0.3em;
+	border: 1px solid #CCCCCC;
+}
+
+.spoilerheader {
+	font-weight: bold;
+	font-size: 0.857em;
+	cursor: pointer;
 }
 
 /* ------------------------------------------------------- */
@@ -842,6 +898,11 @@ a.bbc_link {
 	width: 100%;
 	text-align: center;
 	font-size: 1.571em;
+	border-bottom: 4px solid #3D6E32;
+}
+
+#ajax_in_progress a {
+	text-decoration: underline;
 }
 
 #quick_edit_body_container {
@@ -862,6 +923,8 @@ a.bbc_link {
 #top_section {
 	margin: 0;
 	padding: 0;
+	border-top: 4px solid #5BA048;
+	border-bottom: 4px solid #3D6E32;
 }
 
 #top_section_notice {
@@ -870,6 +933,7 @@ a.bbc_link {
 	padding: 12px 8px 0 8px;
 	min-width: 38%;
 	line-height: 1.286em;
+	font-weight: 700;
 }
 
 #top_section_notice .toggle_login {
@@ -896,6 +960,8 @@ a.bbc_link {
 	padding: 12px 3px 4px 8px;
 }
 
+/* TODO: This is really bad. Parameters are evaluated from right to left when evaluating css, which means
+         this is checked against every element on the page. */
 #search_form * {
 	float: left;
 	margin: 0;
@@ -903,8 +969,26 @@ a.bbc_link {
 }
 
 #search_form button {
-	box-shadow: inset 0 0 0 1px #CCCCCC;
 	border: 0;
+}
+
+#search_form .input_text {
+	border-right: none;
+	border-radius: 2px 0 0 2px;
+}
+
+#search_form input[type="submit"] {
+	border-radius: 0 2px 2px 0;
+}
+
+#search_form select {
+	border: 1px solid #AFAFAF;
+	border-right: none;
+}
+
+#search_form select:focus {
+	border: 1px solid #999999;
+	border-right: none;
 }
 
 /* The logo and slogan. */
@@ -967,8 +1051,10 @@ a.bbc_link {
 
 /* Main forum area. */
 #wrapper {
-	margin-top: 20px;
 	padding: 1.2em 1em;
+	margin-top: 1em;
+	border: 3px solid;
+	border-radius: 5px;
 }
 
 /* The user info, news, etc.*/
@@ -976,10 +1062,35 @@ a.bbc_link {
 	margin-left: -1px;
 	padding: 0 0 1em 0;
 	vertical-align: top;
+	font-size: 0.929em;
 }
 
 #news .bbc_link {
 	display: inline;
+}
+
+#news > h2 {
+	float: left;
+	margin: -2px 1em 0 0;
+	height: 1em;
+	font-weight: 700;
+	font-variant: small-caps;
+	font-size: 1.286em;
+	line-height: 1.286em;
+}
+
+#news > h2:after {
+	content: "\2026";
+}
+
+#news_line, #news {
+	overflow: auto;
+	padding: 6px 12px;
+	min-height: 60px;
+	height: 60px;
+	/* Longhand style due to JS bug in IE! */
+	border: 1px solid;
+	resize: vertical;
 }
 
 /* The content section */
@@ -991,6 +1102,7 @@ a.bbc_link {
 /* The footer with copyright links etc. */
 #footer_section {
 	margin: 35px 0 0 0;
+	border-top: 6px solid;
 }
 
 #footer_section .wrapper {
@@ -1019,6 +1131,13 @@ a.bbc_link {
 	padding-top: 2px;
 	width: 21px;
 	text-align: center;
+	border-radius: 0.3em;
+}
+
+#debug_logging {
+	margin: 0 auto;
+	max-width: 90em;
+	width: 90%;
 }
 
 /* ------------------------------------------------------- */
@@ -1355,6 +1474,11 @@ a.bbc_link {
 }
 
 /* Odd cases. */
+
+.moderation_link, .moderation_link:visited {
+	font-weight: bold;
+}
+
 .follow_ups .listlevel1, #topic_summary .quickbuttons .listlevel1 {
 	font-size: 1em;
 }
@@ -2007,6 +2131,33 @@ img.new_posts {
 .action_unread .topic_sorting #sortby, .action_unread #sortby,
 .action_unreadreplies .topic_sorting #sortby, .action_unreadreplies #sortby {
 	width: 9em;
+}
+
+.action_viewquery {
+
+}
+
+.action_viewquery a {
+	text-decoration: none;
+	font-weight: bold;
+}
+
+.action_viewquery .explain {
+	/*border="1" cellpadding="4" cellspacing="0"*/
+	margin-bottom: 1em;
+	border-collapse: collapse;
+	empty-cells: show;
+	font-family: serif;
+}
+
+.action_viewquery .explain th,
+.action_viewquery .explain td {
+	padding: 2px;
+	border: 1px solid;
+}
+
+.action_viewquery .query {
+	margin: 1em;
 }
 
 #unread_header {

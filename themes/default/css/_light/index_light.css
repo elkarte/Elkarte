@@ -243,47 +243,41 @@ strong, .bbc_strong {
 
 .moderation_link, .moderation_link:visited {
 	color: #FF0000;
-	font-weight: bold;
 }
 
 /* Used for sections that need somewhat larger corners */
 .roundframe, .well {
-	border: 1px solid #CCCCCC;
-	border-radius: 7px;
+	border-color: #CCCCCC;
 	background: #FAFAFA;
 }
 
 /* The generic wrapper thingy. */
 .generic_list_wrapper {
-	margin-top: 4px;
-	border: 1px solid #CCCCCC;
-	border-radius: 7px;
+	border-color: #CCCCCC;
 	box-shadow: 0 -2px 2px rgba(0, 0, 0, 0.1);
 }
 
 .generic_list_wrapper .additional_row {
-	border-radius: 0;
+
 }
 
 .generic_list_wrapper .title_bar {
-	border-bottom: 1px solid #FEFEFE;
-	border-radius: 0;
+	border-bottom-color: #FEFEFE;
 	background: none;
 }
 
 .generic_list_wrapper .information {
-	border-bottom: 1px solid #FEFEFE;
+	border-bottom-color: #FEFEFE;
 	background: none;
 }
 
 /* Styles used by the auto suggest control. */
 .auto_suggest_div {
-	border: 1px solid #BBBBBB;
-	border-radius: 3px;
+	border-color: #BBBBBB;
 }
 
 .auto_suggest_div:focus {
-	border: 1px solid #BBBBBB;
+	border-color: #BBBBBB;
 }
 
 .auto_suggest_item {
@@ -300,27 +294,25 @@ strong, .bbc_strong {
 /* ------------------------------------------------------- */
 /* The "Quote:" and "Code:" header parts... */
 .codeheader, .quoteheader {
-	border: 1px solid #CCCCCC;
-	border-bottom: none;
+	border-color: #CCCCCC;
 	background: #FEFEFE;
 	color: #585858;
 }
 
 .codeheader {
-	border-top: 3px solid #AFAFAF;
+	border-top-color: #AFAFAF;
 }
 
 /* [Select] link to copy code. */
 .codeoperation {
-	font-weight: normal;
+
 }
 
 /* A quote, perhaps from another post. */
 .bbc_standard_quote, .bbc_alternate_quote,
 	/* A code block - maybe PHP ;) - shared styles. */
 .bbc_code {
-	border: 1px solid #CCCCCC;
-	border-top: none;
+	border-color: #CCCCCC;
 	background: #FEFEFE;
 }
 
@@ -331,8 +323,8 @@ strong, .bbc_strong {
 
 /* Extra code block styling. */
 .bbc_code {
-	border-top: 3px solid #AFAFAF;
-	border-bottom: 3px solid #AFAFAF;
+	border-top-color: #AFAFAF;
+	border-bottom-color: #AFAFAF;
 	background: #FAFAFA;
 }
 
@@ -345,7 +337,6 @@ strong, .bbc_strong {
 .bbc_link:hover {
 	box-shadow: 0 -1px 0 #5BA048 inset;
 	color: #377828;
-	text-decoration: none;
 }
 
 /* /me uses this a lot. (emote, try typing /me in a post.) */
@@ -354,25 +345,20 @@ strong, .bbc_strong {
 }
 
 .meaction:before {
-	content: "\270c";
-	font-size: 1.714em;
-	line-height: 1em;
+
 }
 
 .spoilerheader {
-	font-weight: bold;
-	font-size: 0.857em;
-	cursor: pointer;
+
 }
 
 .spoiler {
-	padding: 0.3em;
-	border: 1px solid #CCCCCC;
+	border-color: #CCCCCC;
 	background-color: #EEEEEE;
 }
 
 div.bbc_footnotes {
-	border-top: 1px solid #BFBFBF;
+	border-top-color: #BFBFBF;
 }
 
 .bbc_footnotes .target:target {
@@ -381,11 +367,10 @@ div.bbc_footnotes {
 
 sup.bbc_footnotes, sup.bbc_footnotes a {
 	color: #50AA3A;
-	font-weight: 700;
 }
 
 div.bbc_footnotes .meaction {
-	display: inline-block;
+
 }
 
 /* ------------------------------------------------------- */
@@ -393,14 +378,13 @@ div.bbc_footnotes .meaction {
 /* ------------------------------------------------------- */
 /* The "Loading" bar for quick edit, etc. */
 #ajax_in_progress {
-	border-bottom: 4px solid #3D6E32;
+	border-bottom-color: #3D6E32;
 	background: #FEFEFE;
 	color: #3D6E32;
 }
 
 #ajax_in_progress a {
 	color: #FFA500;
-	text-decoration: underline;
 }
 
 /* ------------------------------------------------------- */
@@ -408,38 +392,33 @@ div.bbc_footnotes .meaction {
 /* ------------------------------------------------------- */
 /* The top bar. */
 #top_section {
-	border-top: 4px solid #5BA048;
-	border-bottom: 4px solid #3D6E32;
+	border-top-color: #5BA048;
+	border-bottom-color: #3D6E32;
 	background: #F4F4F4;
 	background-image: linear-gradient(to bottom, #FEFEFE, #EEEEEE);
 	box-shadow: 0 1px 4px rgba(0, 0, 0, 0.3), 0 1px 0 #38642D inset;
 }
 
 /* Maintenance mode warning. */
-.notice {
+#top_section_notice {
 	color: #A80000;
-	font-weight: 700;
 }
 
 #search_form .input_text {
-	border-right: none;
-	border-radius: 2px 0 0 2px;
+
 }
 
 #search_form input[type="submit"] {
-	border-radius: 0 2px 2px 0;
 	color: #333333;
 }
 
 #search_form select {
-	border: 1px solid #AFAFAF;
-	border-right: none;
+	border-color: #AFAFAF;
 	opacity: 0.8;
 }
 
 #search_form select:focus {
-	border: 1px solid #999999;
-	border-right: none;
+	border-color: #999999;
 	opacity: 1;
 }
 
@@ -450,53 +429,37 @@ div.bbc_footnotes .meaction {
 
 /* News section. */
 #news {
-	font-size: 0.929em;
+
 }
 
 #news > h2 {
-	float: left;
-	margin: -2px 1em 0 0;
-	height: 1em;
 	color: #4B863C;
-	font-weight: 700;
-	font-variant: small-caps;
-	font-size: 1.286em;
-	line-height: 1.286em;
 }
 
 #news > h2:after {
-	content: "\2026";
+
 }
 
 #news_line, #news {
-	overflow: auto;
-	padding: 6px 12px;
-	min-height: 60px;
-	height: 60px;
-	/* Longhand style due to JS bug in IE! */
-	border: 1px solid #CCCCCC;
+	border-color: #CCCCCC;
 	background: #FEFEFE;
 	box-shadow: 1px 2px 3px #EEEEEE;
 	color: #585858;
-	resize: vertical;
 }
 
 /* Main forum area. */
 /* Box-shadow only on this one. */
 #wrapper {
-	margin-top: 16px;
-	padding-top: 12px;
-	border: 3px solid #4B863C;
-	border-top: 3px solid #5BA048;
-	border-bottom: 3px solid #3D6E32;
-	border-radius: 5px;
+	border-color: #4B863C;
+	border-top-color: #5BA048;
+	border-bottom-color: #3D6E32;
 	background: #FAFAFA;
 	box-shadow: 0 2px 4px #111111;
 }
 
 /* The footer with copyright links etc. */
 #footer_section {
-	border-top: 6px solid #3D6E32;
+	border-top-color: #3D6E32;
 	background: #222222;
 	box-shadow: 0 -1px 0 #686868, 0 1px 0 #0E0E0E inset;
 	color: #BBBBBB;
@@ -507,7 +470,6 @@ div.bbc_footnotes .meaction {
 }
 
 #footer_section .rssfeeds {
-	border-radius: 0.3em;
 	background-color: white;
 	color: #FFA500;
 	text-shadow: 1px 1px 0 #000000;
@@ -519,9 +481,6 @@ div.bbc_footnotes .meaction {
 }
 
 #debug_logging {
-	margin: 0 auto;
-	max-width: 90em;
-	width: 90%;
 	background: #222222;
 	color: #BBBBBB;
 }
@@ -536,26 +495,20 @@ div.bbc_footnotes .meaction {
 }
 
 .action_viewquery a {
-	text-decoration: none;
-	font-weight: bold;
+	
 }
 
 .action_viewquery .explain {
-	/*border="1" cellpadding="4" cellspacing="0"*/
-	margin-bottom: 1em;
-	border-collapse: collapse;
-	empty-cells: show;
-	font-family: serif;
+
 }
 
 .action_viewquery .explain th,
 .action_viewquery .explain td {
-	padding: 2px;
-	border: 1px solid gray;
+	border-color: gray;
 }
 
 .action_viewquery .query {
-	margin: 1em;
+
 }
 
 /* ------------------------------------------------------- */
