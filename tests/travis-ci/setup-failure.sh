@@ -7,7 +7,7 @@ set -e
 set -x
 
 DB=$1
-SHORT_DB=${DB%-*}
+SHORT_DB=${DB%%-*}
 
 TRAVIS_PHP_VERSION=$2
 SHORT_PHP=${TRAVIS_PHP_VERSION:0:3}

@@ -9,7 +9,7 @@ set -e
 set -x
 
 DB=$1
-SHORT_DB=${DB%-*}
+SHORT_DB=${DB%%-*}
 
 TRAVIS_PHP_VERSION=$2
 SHORT_PHP=${TRAVIS_PHP_VERSION:0:3}
@@ -18,7 +18,7 @@ SHORT_PHP=${TRAVIS_PHP_VERSION:0:3}
 sudo apt-get update -qq
 
 # Specific version of MySQL ?
-if [ "$DB" == "mysql-5.6" -o "$DB" == "mysql-5.7" ]
+if [ "$DB" == "mysql-5.6" -o "$DB" == "mysql-5.7-dmr" ]
 then
    # Travis is MySQL 5.5 on ubuntu 12.04 ATM
    sudo service mysql stop
