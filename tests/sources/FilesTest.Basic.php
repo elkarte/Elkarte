@@ -106,70 +106,70 @@ class TestFiles extends PHPUnit_Framework_TestCase
 			'^<\?php
 
 \/\*\*
-( \*(\s.{0,200})?\n)* \* @name      ElkArte Forum
+(?: \*.{0,200}\n)* \* @name\s{1,10}ElkArte Forum
  \* @copyright ElkArte Forum contributors
- \* @license   BSD http:\/\/opensource\.org\/licenses\/BSD-3-Clause
+ \* @license\s+?BSD http:\/\/opensource\.org\/licenses\/BSD-3-Clause
  \*
- \* @version \d+\.\d+(\.\d+|\sdev|\s(beta|RC|Release Candidate)\s\d+)
-( \*\n)? \*\/',
+ \* @version \d+\.\d+(?:\.\d+|\sdev|\s(beta|RC|Release Candidate)\s\d+)
+(?:(?: \*\n)?|(?: \*(?:\s.{0,200})?\n))+ \*\/',
 			// Pure ElkArte with php path
 			'^#!\/usr\/local\/bin\/php -q
 <\?php
 
 \/\*\*
-( \*(\s.{0,200})?\n)+ \* @name      ElkArte Forum
+(?: \*.{0,200}\n)* \* @name\s{1,10}ElkArte Forum
  \* @copyright ElkArte Forum contributors
- \* @license   BSD http:\/\/opensource\.org\/licenses\/BSD-3-Clause
+ \* @license\s+?BSD http:\/\/opensource\.org\/licenses\/BSD-3-Clause
  \*
- \* @version \d+\.\d+(\.\d+|\sdev|\s(beta|RC|Release Candidate)\s\d+)
-( \*\n)? \*\/',
+ \* @version \d+\.\d+(?:\.\d+|\sdev|\s(beta|RC|Release Candidate)\s\d+)
+(?:(?: \*\n)?|(?: \*(?:\s.{0,200})?\n))+ \*\/',
 			// SMF-derived
 			'^<\?php
 
 \/\*\*
-( \*(\s.{0,200})?\n)* \* @name      ElkArte Forum
+(?: \*.{0,200}\n)* \* @name\s{1,10}ElkArte Forum
  \* @copyright ElkArte Forum contributors
- \* @license   BSD http:\/\/opensource\.org\/licenses\/BSD-3-Clause
+ \* @license\s+?BSD http:\/\/opensource\.org\/licenses\/BSD-3-Clause
  \*
  \* This software is a derived product, based on:
  \*
  \* Simple Machines Forum \(SMF\)
- \* copyright:\s+?20\d\d Simple Machines (Forum )?\(http:\/\/www\.simplemachines\.org\)
- \* license:(\s+?)BSD, See included LICENSE\.TXT for terms and conditions\.
+ \* copyright:\s+?20\d\d Simple Machines (?:Forum )?\(http:\/\/www\.simplemachines\.org\)
+ \* license:\s+?BSD, See included LICENSE\.TXT for terms and conditions\.
  \*
- \* @version \d+\.\d+(\.\d+|\sdev|\s(beta|RC|Release Candidate)\s\d+)
-(( \*\n)?|( \*(\s.{0,200})?\n))+ \*\/',
+ \* @version \d+\.\d+(?:\.\d+|\sdev|\s(beta|RC|Release Candidate)\s\d+)
+(?:(?: \*\n)?|(?: \*(?:\s.{0,200})?\n))+ \*\/',
 			// SMF-derived v2
 			'^<\?php
 
 \/\*\*
-( \*\n)?( \*(\s.{0,200})?\n)+ \* @name      ElkArte Forum
+(?: \*.{0,200}\n)* \* @name\s{1,10}ElkArte Forum
  \* @copyright ElkArte Forum contributors
- \* @license   BSD http:\/\/opensource\.org\/licenses\/BSD-3-Clause
+ \* @license\s+?BSD http:\/\/opensource\.org\/licenses\/BSD-3-Clause
  \*
  \* This file contains code covered by:
- \* copyright:\s+?20\d\d Simple Machines (Forum )?\(http:\/\/www\.simplemachines\.org\)
+ \* copyright:\s+?20\d\d Simple Machines (?:Forum )?\(http:\/\/www\.simplemachines\.org\)
  \* license:\s+?BSD, See included LICENSE\.TXT for terms and conditions\.
  \*
- \* @version \d+\.\d+(\.\d+|\sdev|\s(beta|RC|Release Candidate)\s\d+)
-(( \*\n)?|( \*(\s.{0,200})?\n))+ \*\/',
+ \* @version \d+\.\d+(?:\.\d+|\sdev|\s(beta|RC|Release Candidate)\s\d+)
+(?:(?: \*\n)?|(?: \*(?:\s.{0,200})?\n))+ \*\/',
 			// Special case, explicitly added on purpose.
 			'^<\?php
 
 \/\*\*
-( \*\n)?( \*(\s.{0,200})?\n)+ \* @name      ElkArte Forum
+(?: \*.{0,200}\n)* \* @name\s{1,10}ElkArte Forum
  \* @copyright ElkArte Forum contributors
  \* @license   BSD http:\/\/opensource\.org\/licenses\/BSD-3-Clause
  \*
  \* This file contains code covered by:
- \* copyright:	20\d\d Simple Machines (Forum )?\(http:\/\/www\.simplemachines\.org\)
+ \* copyright:	20\d\d Simple Machines (?:Forum )?\(http:\/\/www\.simplemachines\.org\)
  \* license:(\s+?)BSD, See included LICENSE\.TXT for terms and conditions\.
  \*
  \* copyright:	2004-2011, GreyWyvern - All rights reserved\.
  \* license:(\s+?)BSD, See included LICENSE\.TXT for terms and conditions\.
  \*
- \* @version \d+\.\d+(\.\d+|\sdev|\s(beta|RC|Release Candidate)\s\d+)
-(( \*\n)?|( \*(\s.{0,200})?\n))+ \*\/',
+ \* @version \d+\.\d+(?:\.\d+|\sdev|\s(beta|RC|Release Candidate)\s\d+)
+(?:(?: \*\n)?|(?: \*(?:\s.{0,200})?\n))+ \*\/',
 			// ILA-specific
 			'^<\?php
 
@@ -229,7 +229,7 @@ class TestFiles extends PHPUnit_Framework_TestCase
 
 			foreach ($header_styles as $style)
 			{
-				if (preg_match('/' . strtr($style, array("\n" => '\n')) . '/', $file_content) == 1)
+				if (preg_match('%' . strtr($style, array("\n" => '\n')) . '%', $file_content) == 1)
 				{
 					$found = true;
 					continue;
