@@ -9,11 +9,13 @@ matrix:
     - php: 7.0
       env: DB=mysqli-5.7
     - php: 5.3
-      env: DB=postgres
+      env: DB=postgres-9.3
     - php: 5.6
-      env: DB=postgres
+      env: DB=postgres-9.3
     - php: 7.0
-      env: DB=postgres
+      env: DB=postgres-9.4
+      addons:
+        postgresql: "9.4"
   fast_finish: true
 
 install:
