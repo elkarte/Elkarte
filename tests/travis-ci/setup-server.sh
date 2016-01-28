@@ -22,12 +22,12 @@ if [ "$DB" == "mysqli-5.6" -o "$DB" == "mysqli-5.7" ]
 then
    # Travis is MySQL 5.5 on ubuntu 12.04 ATM
    sudo service mysql stop
-   sudo apt-get install python-software-properties
+   sudo apt-get -qq install python-software-properties > /dev/null
    echo mysql-apt-config mysql-apt-config/enable-repo select "$DB" | sudo debconf-set-selections
-   wget http://dev.mysql.com/get/mysql-apt-config_0.2.1-1ubuntu12.04_all.deb
+   wget http://dev.mysql.com/get/mysql-apt-config_0.2.1-1ubuntu12.04_all.deb > /dev/null
    sudo dpkg --install mysql-apt-config_0.2.1-1ubuntu12.04_all.deb
-   sudo apt-get update -q
-   sudo apt-get install -q -y -o Dpkg::Options::=--force-confnew mysql-server
+   sudo apt-get update -qq
+   sudo apt-get install -qq -y -o Dpkg::Options::=--force-confnew mysql-server
 fi
 
 # Install Apache, PHP w/DB support if any
