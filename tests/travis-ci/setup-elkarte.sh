@@ -1,7 +1,7 @@
 #!/bin/bash
 #
 # Install elkarte to /var/www and setup the database
-# If this is a defined coverage run (php5.4+mysql) also
+# If this is a defined coverage run (php5.6+mysql) also
 #    - calls the selenium install script
 #    - updates php.ini so selenium coverage results are also noted
 
@@ -27,7 +27,7 @@ cd /var/www
 sudo chmod -R 777 /var/www
 
 # Install the right database for this run
-if [ "$SHORT_DB" == "mysqli" ]; then sudo php ./tests/travis-ci/setup_mysql.php; fi
+if [ "$SHORT_DB" == "mysql" ]; then sudo php ./tests/travis-ci/setup_mysql.php; fi
 if [ "$SHORT_DB" == "postgres" ]; then sudo php ./tests/travis-ci/setup_pgsql.php; fi
 
 # Remove the install dir
@@ -46,7 +46,7 @@ then
     phpenv config-add /var/www//tests/travis-ci/travis_php.ini
 
     # If this is a code coverage run, we need to enable selenium and capture its coverage results
-    if [ "$SHORT_PHP" == "5.4" -a "$SHORT_DB" == "mysqli" ]
+    if [ "$SHORT_PHP" == "5.6" -a "$SHORT_DB" == "mysql" ]
     then
 	    phpenv config-add /var/www//tests/travis-ci/travis_webtest_php.ini
 	    sudo ./tests/travis-ci/setup-selenium.sh

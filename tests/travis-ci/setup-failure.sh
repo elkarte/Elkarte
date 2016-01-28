@@ -19,7 +19,7 @@ then
 fi
 
 # Upload any selenium selfies
-if [ "$SHORT_PHP" == "5.4" -a "$SHORT_DB" == "mysqli" ]
+if [ "$SHORT_PHP" == "5.6" -a "$SHORT_DB" == "mysql" ]
 then
 	screenshots_dir="/var/www/screenshots"
 	screenshots=$(find $screenshots_dir -name "*.png" -type f)

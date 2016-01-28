@@ -18,7 +18,7 @@ SHORT_PHP=${TRAVIS_PHP_VERSION:0:3}
 sudo apt-get update -qq
 
 # Specific version of MySQL ?
-if [ "$DB" == "mysqli-5.6" -o "$DB" == "mysqli-5.7" ]
+if [ "$DB" == "mysql-5.6" -o "$DB" == "mysql-5.7" ]
 then
    # Travis is MySQL 5.5 on ubuntu 12.04 ATM
    sudo service mysql stop
@@ -34,7 +34,7 @@ fi
 if [ "$SHORT_DB" == "postgres" ]
 then
     sudo apt-get -qq -y --force-yes install apache2 libapache2-mod-php5 php5-pgsql php5-curl > /dev/null
-elif [ "$SHORT_DB" == "mysqli" ]
+elif [ "$SHORT_DB" == "mysql" ]
 then
     sudo apt-get -qq -y --force-yes install apache2 libapache2-mod-php5 php5-mysql php5-curl > /dev/null
 else
@@ -58,7 +58,7 @@ if [ "$SHORT_DB" == "postgres" ]
 then
     psql -c "DROP DATABASE IF EXISTS elkarte_test;" -U postgres
     psql -c "create database elkarte_test;" -U postgres
-elif [ "$SHORT_DB" == "mysqli" ]
+elif [ "$SHORT_DB" == "mysql" ]
 then
     mysql -e "DROP DATABASE IF EXISTS elkarte_test;" -uroot
     mysql -e "create database IF NOT EXISTS elkarte_test;" -uroot
