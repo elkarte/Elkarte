@@ -127,25 +127,25 @@ class TestFiles extends PHPUnit_Framework_TestCase
 			'^<\?php
 
 \/\*\*
-( \*(\s.{0,200})?\n)* \* @name      ElkArte Forum
+( \*\s.*?\n)* \* @name\s+?ElkArte Forum
  \* @copyright ElkArte Forum contributors
- \* @license   BSD http:\/\/opensource\.org\/licenses\/BSD-3-Clause
+ \* @license\s+?BSD http:\/\/opensource\.org\/licenses\/BSD-3-Clause
  \*
  \* This software is a derived product, based on:
  \*
  \* Simple Machines Forum \(SMF\)
- \* copyright:\s+?20\d\d Simple Machines (Forum )?\(http:\/\/www\.simplemachines\.org\)
- \* license:(\s+?)BSD, See included LICENSE\.TXT for terms and conditions\.
+ \* copyright:\s+?20\d\d Simple Machines (?:Forum )?\(http:\/\/www\.simplemachines\.org\)
+ \* license:\s+?BSD, See included LICENSE\.TXT for terms and conditions\.
  \*
  \* @version \d+\.\d+(\.\d+|\sdev|\s(beta|RC|Release Candidate)\s\d+)
-(( \*\n)?|( \*(\s.{0,200})?\n))+ \*\/',
+(?:( \*\n)?|( \*(\s.{0,200})?\n))+ \*\/',
 			// SMF-derived v2
 			'^<\?php
 
 \/\*\*
-( \*\n)?( \*(\s.{0,200})?\n)+ \* @name      ElkArte Forum
+( \*\n)?( \*\s.*?\n)+ \* @name\s+?ElkArte Forum
  \* @copyright ElkArte Forum contributors
- \* @license   BSD http:\/\/opensource\.org\/licenses\/BSD-3-Clause
+ \* @license\s+?BSD http:\/\/opensource\.org\/licenses\/BSD-3-Clause
  \*
  \* This file contains code covered by:
  \* copyright:\s+?20\d\d Simple Machines (Forum )?\(http:\/\/www\.simplemachines\.org\)
@@ -163,10 +163,10 @@ class TestFiles extends PHPUnit_Framework_TestCase
  \*
  \* This file contains code covered by:
  \* copyright:	20\d\d Simple Machines (Forum )?\(http:\/\/www\.simplemachines\.org\)
- \* license:(\s+?)BSD, See included LICENSE\.TXT for terms and conditions\.
+ \* license:\s+?BSD, See included LICENSE\.TXT for terms and conditions\.
  \*
  \* copyright:	2004-2011, GreyWyvern - All rights reserved\.
- \* license:(\s+?)BSD, See included LICENSE\.TXT for terms and conditions\.
+ \* license:\s+?BSD, See included LICENSE\.TXT for terms and conditions\.
  \*
  \* @version \d+\.\d+(\.\d+|\sdev|\s(beta|RC|Release Candidate)\s\d+)
 (( \*\n)?|( \*(\s.{0,200})?\n))+ \*\/',
@@ -174,9 +174,9 @@ class TestFiles extends PHPUnit_Framework_TestCase
 			'^<\?php
 
 \/\*\*
- \* @name      Inline Attachments \(ILA\)
- \* @license   Mozilla Public License version 1\.1 http:\/\/www\.mozilla\.org\/MPL\/1\.1\/\.
- \* @author    Spuds
+ \* @name\s+?Inline Attachments \(ILA\)
+ \* @license\s+?Mozilla Public License version 1\.1 http:\/\/www\.mozilla\.org\/MPL\/1\.1\/\.
+ \* @author\s+?Spuds
  \* @copyright \(c\) 2014 Spuds
  \*
  \* @version   1\.0
@@ -229,7 +229,7 @@ class TestFiles extends PHPUnit_Framework_TestCase
 
 			foreach ($header_styles as $style)
 			{
-				if (preg_match('/' . strtr($style, array("\n" => '\n')) . '/', $file_content) == 1)
+				if (preg_match('~' . strtr($style, array("\n" => '\n')) . '~', $file_content) == 1)
 				{
 					$found = true;
 					continue;
