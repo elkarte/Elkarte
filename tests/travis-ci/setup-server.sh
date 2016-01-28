@@ -12,11 +12,25 @@ DB=$1
 SHORT_DB=${DB%-*}
 
 TRAVIS_PHP_VERSION=$2
+SHORT_PHP=${TRAVIS_PHP_VERSION:0:3}
 
 # Packages update
 sudo apt-get update -qq
 
-# Install Apache, PHP and DB support if any
+# Specific version of MySQL ?
+if [ "$DB" == "mysqli-5.6" -o "$DB" == "mysqli-5.7" ]
+then
+   # Travis is MySQL 5.5 on ubuntu 12.04 ATM
+   sudo service mysql stop
+   sudo apt-get install python-software-properties
+   echo mysql-apt-config mysql-apt-config/enable-repo select "$DB" | sudo debconf-set-selections
+   wget http://dev.mysql.com/get/mysql-apt-config_0.2.1-1ubuntu12.04_all.deb
+   sudo dpkg --install mysql-apt-config_0.2.1-1ubuntu12.04_all.deb
+   sudo apt-get update -q
+   sudo apt-get install -q -y -o Dpkg::Options::=--force-confnew mysql-server
+fi
+
+# Install Apache, PHP w/DB support if any
 if [ "$SHORT_DB" == "postgres" ]
 then
     sudo apt-get -qq -y --force-yes install apache2 libapache2-mod-php5 php5-pgsql php5-curl > /dev/null
