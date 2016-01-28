@@ -9,16 +9,18 @@ set -e
 set -x
 
 DB=$1
+SHORT_DB=${DB%-*}
+
 TRAVIS_PHP_VERSION=$2
 
 # Packages update
 sudo apt-get update -qq
 
 # Install Apache, PHP and DB support if any
-if [ "$DB" == "postgres" ]
+if [ "$SHORT_DB" == "postgres" ]
 then
     sudo apt-get -qq -y --force-yes install apache2 libapache2-mod-php5 php5-pgsql php5-curl > /dev/null
-elif [ "$DB" == "mysqli" ]
+elif [ "$SHORT_DB" == "mysqli" ]
 then
     sudo apt-get -qq -y --force-yes install apache2 libapache2-mod-php5 php5-mysql php5-curl > /dev/null
 else
@@ -38,18 +40,18 @@ sudo a2enmod headers > /dev/null
 sudo /etc/init.d/apache2 restart
 
 # Setup a database if we are installing
-if [ "$DB" == "postgres" ]
+if [ "$SHORT_DB" == "postgres" ]
 then
     psql -c "DROP DATABASE IF EXISTS elkarte_test;" -U postgres
     psql -c "create database elkarte_test;" -U postgres
-elif [ "$DB" == "mysqli" ]
+elif [ "$SHORT_DB" == "mysqli" ]
 then
     mysql -e "DROP DATABASE IF EXISTS elkarte_test;" -uroot
     mysql -e "create database IF NOT EXISTS elkarte_test;" -uroot
 fi
 
 # Install or Update Composer
-if [ "$DB" != "none" ]
+if [ "$SHORT_DB" != "none" ]
 then
     composer -v > /dev/null 2>&1
     COMPOSER_IS_INSTALLED=$?
