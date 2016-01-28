@@ -1,5 +1,5 @@
 <?php if (!defined('BB2_CWD')) die("I said no cheating!");
-define('BB2_VERSION', "2.2.16");
+define('BB2_VERSION', "2.2.18");
 
 // Bad Behavior entry point is bb2_start()
 // If you're reading this, you are probably lost.
@@ -68,6 +68,19 @@ function bb2_reverse_proxy($settings, $headers_mixed)
 	return false;
 }
 
+# FIXME: Bug #12. But this code doesn't currently work.
+function bb2_unpack_php_post_array($key, $value)
+{
+	$unpacked = array();
+	foreach ($value as $k => $v) {
+		$i = $key. '[' . $k . ']';
+		if (is_array($v))
+			$v = bb2_unpack_php_post_array($i, $v);
+		$unpacked[$i] = $v;
+	}
+	return $unpacked;
+}
+
 // Let God sort 'em out!
 function bb2_start($settings)
 {
@@ -87,6 +100,10 @@ function bb2_start($settings)
 	$request_entity = array();
 	if (!strcasecmp($_SERVER['REQUEST_METHOD'], "POST") || !strcasecmp($_SERVER['REQUEST_METHOD'], "PUT")) {
 		foreach ($_POST as $h => $v) {
+			if (is_array($v)) {
+				# Workaround, see Bug #12
+				$v = "Array";
+			}
 			$request_entity[$h] = $v;
 		}
 	}

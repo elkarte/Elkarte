@@ -58,6 +58,8 @@ function bb2_post($settings, $package)
 		$url = parse_url($package['headers_mixed']['Referer']);
 		$url['host'] = preg_replace('|^www\.|', '', $url['host']);
 		$host = preg_replace('|^www\.|', '', $package['headers_mixed']['Host']);
+		# Strip port
+		$host = preg_replace('|:\d+$|', '', $host);
 		if (strcasecmp($host, $url['host'])) {
 			return "cd361abb";
 		}
