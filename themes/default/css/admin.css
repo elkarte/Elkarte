@@ -9,6 +9,8 @@
 .action_admin .generic_list_wrapper .information {
 	margin: 8px 0;
 	padding: 4px 12px 2px 12px;
+	border: 1px solid;
+	border-radius: 2px;
 }
 
 .action_admin .generic_list_wrapper .information div {
@@ -25,6 +27,7 @@
 
 #admin_content .content {
 	margin-bottom: 5px;
+	border: none;
 }
 
 .admincenter {
@@ -52,6 +55,15 @@
 	margin: 12px 0 0 0;
 	padding: 8px;
 	overflow: auto;
+}
+
+#admin_main_section, .quick_tasks, #mod_main_section,
+#support_credits, #admin_newsletters,
+#core_features, #entry_form,
+#groupForm, #mailqueue_stats, #manage_maintenance,
+#new_group, #view_group, #admin_form_wrapper, .action_admin .generic_list_wrapper {
+	border: 1px solid;
+	border-radius: 7px;
 }
 
 #new_group div.content,
@@ -96,10 +108,14 @@
 #admin_newsletters .information {
 	margin: 8px 0;
 	padding: 8px 12px 6px 12px;
+	border: 1px solid;
+	border-radius: 2px;
 }
 
 #advanced_panel_header {
 	margin-bottom: 8px;
+	border: 1px solid;
+	border-radius: 2px;
 }
 
 #news_lists .newsarea {
@@ -206,6 +222,9 @@ fieldset dl {
 #welcome {
 	font-size: 0.929em;
 	padding: 12px 9px 8px 9px;
+	border: 1px solid;
+	border-top: none;
+	border-radius: 0 0 7px 7px;
 }
 
 #welcome a {
@@ -225,6 +244,7 @@ fieldset dl {
 	padding: 5px 0;
 	overflow: auto;
 	line-height: 1.7em;
+	border-bottom: double;
 }
 
 .search_results li p {
@@ -275,6 +295,8 @@ fieldset dl {
 	padding: 6px 0;
 	height: 12em;
 	overflow: auto;
+	border: 1px solid;
+	border-radius: 0;
 }
 
 #admin_search_box {
@@ -296,6 +318,7 @@ fieldset dl {
 
 #ourAnnouncements dt {
 	padding: 4px 6px 2px 6px;
+	border-top: 1px solid;
 }
 
 #ourAnnouncements dt a {
@@ -306,6 +329,7 @@ fieldset dl {
 #ourAnnouncements dd {
 	margin: 0;
 	padding: 6px 12px;
+	border-top: double;
 }
 
 /* The update warning. */
@@ -321,6 +345,13 @@ fieldset dl {
 /* and the advantage is that a clean layout is always maintained.
 /* The <li>'s could be set to auto overflow instead, but that just clutters things up with scrollbars.
 /* Scrollbars here look worse, take up space, and don't really add anything useful in this context. */
+
+.quick_tasks {
+	margin: -8px 0 0 0;
+	border-radius: 7px;
+	padding: 0 0 16px 0;
+}
+
 #quick_tasks li {
 	list-style: none;
 	padding: 10px 6px 10px 6px;
@@ -328,6 +359,8 @@ fieldset dl {
 	width: 50%;
 	height: 8em;
 	overflow: auto;
+	border-top: 1px solid;
+	border-bottom: 1px solid;
 }
 
 #quick_tasks li a {
@@ -342,6 +375,14 @@ fieldset dl {
 #quick_tasks li span {
 	display: block;
 	margin: 0 0 0 70px;
+}
+
+#quick_tasks li:first-child, #quick_tasks li:nth-child(2) {
+	border-top: none;
+}
+
+#quick_tasks li:last-child, #quick_tasks li:nth-child(7) {
+	border-bottom: none;
 }
 
 /* Styles for the support and credits page.
@@ -466,6 +507,7 @@ fieldset dl {
 	padding: 0.2em;
 	margin: 1px;
 	font-weight: 600;
+	border: 1px solid;
 }
 
 .description, .information {
@@ -486,6 +528,8 @@ fieldset dl {
 	/* This is much better than the old max-height css. */
 	height: 10em;
 	resize: vertical;
+	border-top: 2px solid;
+	border-bottom: 2px solid;
 }
 
 .package_image {
@@ -540,23 +584,23 @@ ul.package_servers li {
 }
 
 .perm_read {
-	background-color: #D1F7BF;
+
 }
 
 .perm_write {
-	background-color: #FFBBBB;
+
 }
 
 .perm_execute {
-	background-color: #FDD7AF;
+
 }
 
 .perm_custom {
-	background-color: #C2C6C0;
+
 }
 
 .perm_nochange {
-	background-color: #EEEEEE;
+
 }
 
 /* Styles for anti-spam questions.
@@ -591,7 +635,7 @@ ul.package_servers li {
 }
 
 #manage_boards ul li {
-	border-top: 1px solid #cccccc;
+	border-top: 1px solid;
 }
 
 #manage_boards ul:nth-child(n+2) li {
@@ -624,11 +668,6 @@ ul.package_servers li {
 	width: 60%;
 }
 
-.ui-state-highlight {
-	height: 2em;
-	cursor: move;
-}
-
 .move_links {
 	padding: 0 13px 0 0;
 }
@@ -642,6 +681,7 @@ ul.package_servers li {
 	padding: 3px 6px;
 	font-size: 1em;
 	text-transform: capitalize;
+	border: 1px solid;
 }
 
 #manage_boards span.modify_boards a:hover {
@@ -658,6 +698,7 @@ ul.package_servers li {
 
 #manage_boards .post_group, #manage_boards .regular_members {
 	cursor: help;
+	border-bottom: 1px dotted;
 }
 
 .select_all_box {
@@ -670,6 +711,12 @@ ul.package_servers li {
 .select_category label {
 	width: 32%;
 	display: inline-block;
+}
+
+.select_category, .select_all_box {
+	font-style: italic;
+	border-top: 1px dashed;
+	border-bottom: 1px dashed;
 }
 
 .visible_boards .select_all_box .floatright,
@@ -735,6 +782,10 @@ ul.package_servers li {
 
 #manage_maintenance h3 a.help .icon {
 	padding: 4px 0 0;
+}
+
+#manage_maintenance div.content {
+	border-bottom: 1px solid;
 }
 
 /* Styles for the manage calendar section.
@@ -856,6 +907,7 @@ dl.admin_permissions dd {
 .perm_boards li {
 	padding: 0.3em 0.5em;
 	margin: 1px;
+	border: 1px solid;
 }
 
 .perm_classic {
@@ -885,8 +937,7 @@ dl.admin_permissions dd {
 
 .edit_board {
 	padding: 0 8px 8px;
-	background-image: url(../images/icons/modify_small.png);
-	background-repeat: no-repeat;
+	background: url(../images/icons/modify_small.png) no-repeat;
 	margin-left: 3px;
 }
 
@@ -949,6 +1000,12 @@ dl.themes_list dd {
 	width: 40%;
 }
 
+/* alternate row colors on Modify Themes,Copy a template */
+.theme_options .content:nth-child(even), .theme_options li:nth-child(even) {
+	border-top: 1px solid;
+	border-bottom: 1px solid;
+}
+
 .theme_settings .input_text {
 	max-width: 100%;
 	width: 30em;
@@ -959,7 +1016,7 @@ dl.themes_list dd {
 	margin-bottom: 2ex;
 	width: 99%;
 	height: 300px;
-	border: 1px solid black;
+	border: 1px solid;
 }
 
 /* Styles for the registration center.
@@ -978,11 +1035,13 @@ dl.themes_list dd {
 #modcenter {
 	display: block;
 	width: 100%;
+	border-radius: 5px 5px 0 0;
 }
 
 #modcenter .content, #modcenter .generic_list_wrapper {
 	overflow: visible;
 	margin: 2px 0 0 0;
+	border: 1px solid;
 }
 
 #modcenter .content {
@@ -993,6 +1052,8 @@ dl.themes_list dd {
 	padding: 6px;
 	height: 14em;
 	overflow: auto;
+	border: 1px solid;
+	border-radius: 0;
 }
 
 .modblock_left {
@@ -1021,7 +1082,7 @@ dl.themes_list dd {
 }
 
 /* Moderation Notes */
-ul.moderation_notes {
+.moderation_notes {
 	margin: 0;
 	padding: 0;
 	list-style: none;
@@ -1029,9 +1090,9 @@ ul.moderation_notes {
 	height: auto;
 }
 
-ul.moderation_notes li {
+.moderation_notes li {
 	padding: 0.2em;
-	border-bottom: 1px solid #CCCCCC;
+	border-bottom: 1px solid;
 }
 
 .notes {
@@ -1051,6 +1112,7 @@ ul.moderation_notes li {
 
 #error_log {
 	width: 100%;
+	border-top: 1px solid;
 }
 
 #error_log tr.content td {
@@ -1077,6 +1139,7 @@ ul.moderation_notes li {
 #error_log .error_where {
 	width: 100%;
 	padding-top: 4px;
+	border-top: 1px solid;
 }
 
 #error_log .error_who li>a, #error_log .error_type li>a, #error_log .error_where li>a,
@@ -1102,8 +1165,8 @@ ul.moderation_notes li {
 	white-space: nowrap;
 }
 #errorfile_table .current .linetext {
-	border: 1px solid black;
-	border-width: 1px 1px 1px 0;
+	border: 1px solid;
+	border-left-width: 0;
 }
 
 /* Styles for the Report generation
@@ -1111,6 +1174,11 @@ ul.moderation_notes li {
 #report_buttons {
 	min-height: 2.4em;
 	padding: 3px 0;
+}
+
+.report_results th {
+	border-left: 1px solid;
+	border-right: 1px solid;
 }
 
 /* Admin menu icons as sprites
@@ -1157,10 +1225,6 @@ ul.moderation_notes li {
 .sortable_smiley li {
 	display: inline;
 	padding: 0 6px;
-}
-
-.ui-sortable li > a {
-	cursor: move;
 }
 
 .pagelink, .current_page, .expand_pages {
@@ -1314,10 +1378,22 @@ ul.moderation_notes li {
 	display: table;
 }
 
+.ui-sortable li > a {
+	cursor: move;
+}
+
+.ui-state-highlight {
+	height: 2em;
+	cursor: move;
+	border: 1px dashed;
+}
+
 /* jQuery Dialog */
 .ui-dialog {
 	padding: 0;
 	z-index: 100;
+	border: 1px solid;
+	border-radius: 4px 4px 0 0;
 }
 
 .ui-dialog .ui-dialog-title {
@@ -1333,6 +1409,7 @@ ul.moderation_notes li {
 	padding: 0 1em;
 	font-weight: bold;
 	font-size: 1.071em;
+	border-radius: 4px 4px 0 0;
 }
 
 .ui-dialog .ui-dialog-content {
