@@ -468,9 +468,12 @@ class Attachments_Post_Module implements ElkArte\sources\modules\Module_Interfac
 
 					if (createAttachment($attachmentOptions))
 					{
-						$this->_saved_attach_id[$attachID] = $attachmentOptions['id'];
-						if (!empty($attachmentOptions['thumb']))
-							$this->_saved_attach_id[$attachID] = $attachmentOptions['thumb'];
+						$this->_saved_attach_id[$attachID] = array(
+							'id' => $attachmentOptions['id'],
+							'thumb' => !empty($attachmentOptions['thumb']) ? $attachmentOptions['thumb'] : 0,
+							'id_msg' => $msg,
+							'attach_source' => $attach_source,
+						);
 					}
 				}
 				// We have errors on this file, build out the issues for display to the user
@@ -483,10 +486,29 @@ class Attachments_Post_Module implements ElkArte\sources\modules\Module_Interfac
 
 	public function after_save_post($msgOptions)
 	{
-		if ($this->_is_new_message && !empty($this->_saved_attach_id))
+		if ($this->_is_new_message && !empty($this->_saved_attach_id) && !empty($msgOptions['id']))
 		{
-			bindMessageAttachments($msgOptions['id'], array_values($this->_saved_attach_id));
+			bindMessageAttachments($msgOptions['id'], $this->_savedAttachments($msgOptions['id']));
 		}
+	}
+
+	protected function _savedAttachments($msg)
+	{
+		$ids = array();
+
+		foreach ($this->_saved_attach_id as $attach)
+		{
+			if ($msg === $attach['id_msg'])
+			{
+				$ids[] = $attach['id'];
+				if (!empty($attach['thumb']))
+				{
+					$ids[] = $attach['thumb'];
+				}
+			}
+		}
+
+		return $ids;
 	}
 
 	public function before_delete_draft($id_draft, $msgOptions)
@@ -518,7 +540,7 @@ class Attachments_Post_Module implements ElkArte\sources\modules\Module_Interfac
 	{
 		if (!empty($id_draft) && !empty($this->_saved_attach_id))
 		{
-			bindMessageAttachments($id_draft, array_values($this->_saved_attach_id), 1);
+			bindMessageAttachments($id_draft, array_values($this->_saved_attach_id));
 		}
 	}
 }
