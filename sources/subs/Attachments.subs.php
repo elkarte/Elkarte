@@ -1927,6 +1927,29 @@ function bindMessageAttachments($id_msg, $attachment_ids, $attach_source = 0)
 }
 
 /**
+ * Re-binds a set of attachments belonging to a draft to a message instead.
+ *
+ * @package Attachments
+ * @param int $id_msg
+ * @param int[] $attachment_ids
+ */
+function bindDraftAttachmentsToMessage($id_msg, $attachment_ids, $attach_source = 0)
+{
+	$db = database();
+
+	$db->query('', '
+		UPDATE {db_prefix}attachments
+		SET id_msg = {int:id_msg}
+		WHERE id_attach IN ({array_int:attachment_list})
+			AND attach_source = {int:attach_source}',
+		array(
+			'attachment_list' => $attachment_ids,
+			'id_msg' => $id_msg,
+			'attach_source' => $attach_source
+		)
+	);
+}
+/**
  * Get an attachment's encrypted filename. If $new is true, won't check for file existence.
  *
  * - If new is set returns a hash for the db

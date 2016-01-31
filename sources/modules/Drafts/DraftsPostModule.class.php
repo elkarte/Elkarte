@@ -55,7 +55,7 @@ class Drafts_Post_Module implements ElkArte\sources\modules\Module_Interface
 
 				array('prepare_save_post', array('Drafts_Post_Module', 'prepare_save_post'), array()),
 				array('before_save_post', array('Drafts_Post_Module', 'before_save_post'), array()),
-				array('after_save_post', array('Drafts_Post_Module', 'after_save_post'), array()),
+				array('after_save_post', array('Drafts_Post_Module', 'after_save_post'), array('msgOptions')),
 			);
 		}
 		else
@@ -126,8 +126,14 @@ class Drafts_Post_Module implements ElkArte\sources\modules\Module_Interface
 				'options' => 'onclick="return confirm(' . JavaScriptEscape($txt['draft_save_note']) . ') && submitThisOnce(this);" accesskey="d"',
 			);
 
-			$this->_prepareDraftsContext($user_info['id'], $topic);
-			self::$_eventsManager->trigger('after_loading_drafts', array('loaded_drafts' => &$this->_loaded_drafts, 'current_draft' => &$this->_current_draft));
+			if (!empty($id_draft))
+			{
+				$this->_prepareDraftsContext($user_info['id'], $topic);
+				self::$_eventsManager->trigger('after_loading_drafts', array('loaded_drafts' => &$this->_loaded_drafts, 'current_draft' => &$this->_current_draft));
+
+				$context['message'] = $editorOptions['value'] = $this->_current_draft['body'];
+				$context['subject'] = addcslashes($this->_current_draft['subject'], '"');
+			}
 
 			if (!empty($context['drafts']))
 				$template_layers->add('load_drafts', 100);
@@ -185,13 +191,19 @@ class Drafts_Post_Module implements ElkArte\sources\modules\Module_Interface
 		}
 	}
 
-	public function after_save_post()
+	public function after_save_post($msgOptions)
 	{
 		global $user_info;
 
 		// If we had a draft for this, its time to remove it since it was just posted
 		if (!empty($_POST['id_draft']))
-			deleteDrafts($_POST['id_draft'], $user_info['id']);
+		{
+			$id_draft = (int) $_POST['id_draft'];
+
+			self::$_eventsManager->trigger('before_delete_draft', array('id_draft' => $id_draft, 'msgOptions' => $msgOptions));
+
+			deleteDrafts($id_draft, $user_info['id']);
+		}
 	}
 
 	/**

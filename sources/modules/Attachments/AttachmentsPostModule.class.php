@@ -69,6 +69,7 @@ class Attachments_Post_Module implements ElkArte\sources\modules\Module_Interfac
 				array('after_loading_drafts', array('Attachments_Post_Module', 'after_loading_drafts'), array('current_draft')),
 				array('before_save_draft', array('Attachments_Post_Module', 'before_save_draft'), array()),
 				array('after_save_draft', array('Attachments_Post_Module', 'after_save_draft'), array()),
+				array('before_delete_draft', array('Attachments_Post_Module', 'before_delete_draft'), array()),
 			);
 		}
 		else
@@ -484,6 +485,12 @@ class Attachments_Post_Module implements ElkArte\sources\modules\Module_Interfac
 	{
 		if ($this->_is_new_message && !empty($this->_saved_attach_id))
 			bindMessageAttachments($msgOptions['id'], array_values($this->_saved_attach_id));
+	}
+
+	public function before_delete_draft($id_draft, $msgOptions)
+	{
+		if (!empty($id_draft))
+			bindDraftAttachmentsToMessage($msgOptions['id'], array_values($id_draft));
 	}
 
 	public function after_save_draft($id_draft)
