@@ -92,6 +92,7 @@ class Attachment_Controller extends Action_Controller
 				require_once(SUBSDIR . '/Attachments.subs.php');
 
 				$process = $this->_req->getPost('msg', 'intval', '');
+
 				processAttachments($process);
 			}
 
@@ -116,7 +117,8 @@ class Attachment_Controller extends Action_Controller
 					{
 						$resp_data = array(
 							'name' => $val['name'],
-							'attachid' => $attachID,
+							'temp_attachid' => $attachID,
+							'attachid' => empty($val['id']) ? $attachID : $val['id'],
 							'size' => $val['size']
 						);
 					}
@@ -430,7 +432,7 @@ class Attachment_Controller extends Action_Controller
 
 				isAllowedTo('view_attachments');
 
-				$attachment = getAttachmentFromTopic($id_attach, $topic, (int) !empty($_REQUEST['id_draft']), $user_info['id']);
+				$attachment = getAttachmentFromTopic($id_attach, $topic, 1, $user_info['id']);
 				if (empty($attachment))
 					Errors::instance()->fatal_lang_error('no_access', false);
 

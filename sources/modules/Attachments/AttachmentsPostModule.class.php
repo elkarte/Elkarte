@@ -51,29 +51,46 @@ class Attachments_Post_Module implements ElkArte\sources\modules\Module_Interfac
 	 */
 	public static function hooks(\Event_Manager $eventsManager)
 	{
-		global $modSettings;
+		global $modSettings, $context;
 
-		if (!empty($modSettings['attachmentEnable']))
+		$return = array();
+
+		self::$_attach_level = $modSettings['attachmentEnable'];
+
+		$context['attachments'] = array(
+			'can' => array(
+				'post' => self::$_attach_level == 1 && (allowedTo('post_attachment') || ($modSettings['postmod_active'] && allowedTo('post_unapproved_attachments')))
+			)
+		);
+
+		if (!empty(self::$_attach_level))
 		{
-			self::$_attach_level = $modSettings['attachmentEnable'];
-
-			return array(
+			$return = array(
 				array('prepare_post', array('Attachments_Post_Module', 'prepare_post'), array()),
 				array('prepare_context', array('Attachments_Post_Module', 'prepare_context'), array('post_errors')),
 				array('finalize_post_form', array('Attachments_Post_Module', 'finalize_post_form'), array('show_additional_options', 'board', 'topic')),
-
-				array('prepare_save_post', array('Attachments_Post_Module', 'prepare_save_post'), array('post_errors')),
-				array('pre_save_post', array('Attachments_Post_Module', 'pre_save_post'), array('msgOptions')),
-				array('after_save_post', array('Attachments_Post_Module', 'after_save_post'), array('msgOptions')),
-
-				array('after_loading_drafts', array('Attachments_Post_Module', 'after_loading_drafts'), array('current_draft')),
-				array('before_save_draft', array('Attachments_Post_Module', 'before_save_draft'), array()),
-				array('after_save_draft', array('Attachments_Post_Module', 'after_save_draft'), array()),
-				array('before_delete_draft', array('Attachments_Post_Module', 'before_delete_draft'), array()),
 			);
+
+			if (isset($_POST['save_draft']))
+			{
+				$return = array_merge($return, array(
+					array('after_loading_drafts', array('Attachments_Post_Module', 'after_loading_drafts'), array('current_draft')),
+					array('before_save_draft', array('Attachments_Post_Module', 'before_save_draft'), array()),
+					array('after_save_draft', array('Attachments_Post_Module', 'after_save_draft'), array()),
+					array('before_delete_draft', array('Attachments_Post_Module', 'before_delete_draft'), array()),
+				));
+			}
+			else
+			{
+				$return = array_merge($return, array(
+					array('prepare_save_post', array('Attachments_Post_Module', 'prepare_save_post'), array('post_errors')),
+					array('pre_save_post', array('Attachments_Post_Module', 'pre_save_post'), array('msgOptions')),
+					array('after_save_post', array('Attachments_Post_Module', 'after_save_post'), array('msgOptions')),
+				));
+			}
 		}
-		else
-			return array();
+
+		return $return;
 	}
 
 	public function after_loading_drafts($current_draft)
@@ -112,7 +129,7 @@ class Attachments_Post_Module implements ElkArte\sources\modules\Module_Interfac
 
 	public function before_save_draft($draft, $is_usersaved, $error_context)
 	{
-		$this->saveAttachments(isset($_REQUEST['id_draft']) ? (int) $_REQUEST['id_draft'] : 0);
+		$this->saveAttachments($draft['id_draft']);
 
 		if ($this->_attach_errors->hasErrors())
 		{
@@ -121,6 +138,7 @@ class Attachments_Post_Module implements ElkArte\sources\modules\Module_Interfac
 		else
 		{
 			$this->createAttachment($draft['id_draft'], 1);
+			$this->loadAttachments($draft['id_draft'], 1);
 		}
 	}
 
@@ -146,7 +164,6 @@ class Attachments_Post_Module implements ElkArte\sources\modules\Module_Interfac
 	{
 		global $txt, $context, $modSettings, $user_info, $scripturl;
 
-		$context['attachments']['can']['post'] = self::$_attach_level == 1 && (allowedTo('post_attachment') || ($modSettings['postmod_active'] && allowedTo('post_unapproved_attachments')));
 		if ($context['attachments']['can']['post'])
 		{
 			// If there are attachments, calculate the total size and how many.
@@ -359,7 +376,7 @@ class Attachments_Post_Module implements ElkArte\sources\modules\Module_Interfac
 		}
 	}
 
-	protected function saveAttachments($msg)
+	protected function saveAttachments($msg = 0)
 	{
 		global $user_info, $context, $modSettings;
 
@@ -382,6 +399,7 @@ class Attachments_Post_Module implements ElkArte\sources\modules\Module_Interfac
 
 			if (isset($_SESSION['temp_attachments']))
 			{
+				// Find temp attachments to be removed and remove them
 				foreach ($_SESSION['temp_attachments'] as $attachID => $attachment)
 				{
 					if ((isset($_SESSION['temp_attachments']['post']['files'], $attachment['name']) && in_array($attachment['name'], $_SESSION['temp_attachments']['post']['files'])) || in_array($attachID, $keep_temp) || strpos($attachID, 'post_tmp_' . $user_info['id']) === false)
@@ -405,27 +423,48 @@ class Attachments_Post_Module implements ElkArte\sources\modules\Module_Interfac
 		}
 
 		// Then try to upload any attachments.
-		$context['attachments']['can']['post'] = self::$_attach_level == 1 && (allowedTo('post_attachment') || ($modSettings['postmod_active'] && allowedTo('post_unapproved_attachments')));
 		if ($context['attachments']['can']['post'] && empty($_POST['from_qr']))
 		{
 			require_once(SUBSDIR . '/Attachments.subs.php');
-			if (!empty($msg))
-				processAttachments((int) $msg);
-			else
-				processAttachments();
+
+			processAttachments((int) $msg);
 		}
 	}
 
 	public function pre_save_post(&$msgOptions)
 	{
 		$msg = isset($_REQUEST['msg']) ? $_REQUEST['msg'] : 0;
+		$id_draft = isset($_REQUEST['id_draft']) ? $_REQUEST['id_draft'] : 0;
 
 		$this->_is_new_message = empty($msgOptions['id']);
 
 		$this->createAttachment($msg, 0);
+		$this->loadAttachments($msg, 0);
+		if (!empty($id_draft))
+			$this->loadAttachments($id_draft, 1);
 
 		if (!empty($this->_saved_attach_id) && $msgOptions['icon'] === 'xx')
 			$msgOptions['icon'] = 'clip';
+	}
+
+	protected function loadAttachments($msg, $attach_source = 1)
+	{
+		if (!empty($msg))
+		{
+			$attachs = getAttachmentsFromMsg($msg, $attach_source, true);
+
+			// @todo we have to delete unwanted attachments
+
+			foreach ($attachs as $attach)
+			{
+				$this->_saved_attach_id[$attach['id_attach']] = array(
+					'id' => $attach['id_attach'],
+					'thumb' => !empty($attach['id_thumb']) ? $attach['id_thumb'] : 0,
+					'id_msg' => $msg,
+					'attach_source' => $attach_source,
+				);
+			}
+		}
 	}
 
 	protected function createAttachment($msg, $attach_source = 1)
@@ -439,6 +478,7 @@ class Attachments_Post_Module implements ElkArte\sources\modules\Module_Interfac
 			{
 				if ($attachID != 'initial_error' && strpos($attachID, 'post_tmp_' . $user_info['id']) === false)
 					continue;
+
 				if (isset($this->_saved_attach_id[$attachID]))
 					continue;
 
@@ -468,7 +508,7 @@ class Attachments_Post_Module implements ElkArte\sources\modules\Module_Interfac
 
 					if (createAttachment($attachmentOptions))
 					{
-						$this->_saved_attach_id[$attachID] = array(
+						$this->_saved_attach_id[$attachmentOptions['id']] = array(
 							'id' => $attachmentOptions['id'],
 							'thumb' => !empty($attachmentOptions['thumb']) ? $attachmentOptions['thumb'] : 0,
 							'id_msg' => $msg,
@@ -478,7 +518,9 @@ class Attachments_Post_Module implements ElkArte\sources\modules\Module_Interfac
 				}
 				// We have errors on this file, build out the issues for display to the user
 				else
+				{
 					@unlink($attachment['tmp_name']);
+				}
 			}
 			unset($_SESSION['temp_attachments']);
 		}
@@ -486,26 +528,40 @@ class Attachments_Post_Module implements ElkArte\sources\modules\Module_Interfac
 
 	public function after_save_post($msgOptions)
 	{
+		$id_draft = isset($_REQUEST['id_draft']) ? $_REQUEST['id_draft'] : 0;
 		if ($this->_is_new_message && !empty($this->_saved_attach_id) && !empty($msgOptions['id']))
 		{
-			$ids = $this->_savedAttachments($msgOptions['id']);
+			$ids = $this->_savedAttachments(array($msgOptions['id'], $id_draft));
 
-			bindMessageAttachments($msgOptions['id'], $ids);
+			foreach ($ids as $attach_source => $attaches)
+			{
+				if ($attach_source === 0)
+				{
+					bindMessageAttachments($msgOptions['id'], $attaches);
+				}
+				else
+				{
+					bindAttachmentsTo($msgOptions['id'], $attaches, $attach_source, 0);
+				}
+			}
 		}
 	}
 
-	protected function _savedAttachments($msg)
+	protected function _savedAttachments($msgs)
 	{
 		$ids = array();
+		$msgs = (array) $msgs;
+		$msgs[] = 0;
 
 		foreach ($this->_saved_attach_id as $attach)
 		{
-			if ($msg === $attach['id_msg'] || empty($attach['id_msg']))
+			if (in_array($attach['id_msg'], $msgs))
 			{
-				$ids[] = $attach['id'];
+				$ids[$attach['attach_source']][] = $attach['id'];
+
 				if (!empty($attach['thumb']))
 				{
-					$ids[] = $attach['thumb'];
+					$ids[$attach['attach_source']][] = $attach['thumb'];
 				}
 			}
 		}
@@ -520,7 +576,12 @@ class Attachments_Post_Module implements ElkArte\sources\modules\Module_Interfac
 			$attach_ids = getAttachmentsFromMsg($id_draft, 1);
 			$attach_to_keep = array_map('intval', $_POST['attach_del']);
 			if (!empty($this->_saved_attach_id))
-				$attach_to_keep = array_merge($attach_to_keep, array_values($this->_saved_attach_id));
+			{
+				foreach ($this->_saved_attach_id as $attach)
+					$attach_to_keep[] = $attach['id'];
+				$attach_to_keep = array_unique($attach_to_keep);
+			}
+
 			$attach_to_bind = array();
 
 			foreach ($attach_ids as $attach_id)
@@ -542,7 +603,10 @@ class Attachments_Post_Module implements ElkArte\sources\modules\Module_Interfac
 	{
 		if (!empty($id_draft) && !empty($this->_saved_attach_id))
 		{
-			bindMessageAttachments($id_draft, array_values($this->_saved_attach_id));
+			$id_attachs = array();
+			foreach ($this->_saved_attach_id as $attach)
+				$id_attachs[] = $attach['id'];
+			bindMessageAttachments($id_draft, $id_attachs);
 		}
 	}
 }

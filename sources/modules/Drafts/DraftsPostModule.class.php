@@ -56,11 +56,11 @@ class Drafts_Post_Module implements ElkArte\sources\modules\Module_Interface
 			);
 			if (isset($_REQUEST['save_draft']))
 			{
-				$return += array(
+				$return = array_merge($return, array(
 					array('prepare_save_post', array('Drafts_Post_Module', 'prepare_save_post'), array()),
 					array('before_save_post', array('Drafts_Post_Module', 'before_save_post'), array()),
 					array('after_save_post', array('Drafts_Post_Module', 'after_save_post'), array('msgOptions')),
-				);
+				));
 			}
 		}
 
@@ -184,7 +184,7 @@ class Drafts_Post_Module implements ElkArte\sources\modules\Module_Interface
 
 				self::$_eventsManager->trigger('before_save_draft', array('draft' => &$draft, 'is_usersaved' => empty($_REQUEST['autosave']), 'error_context' => $error));
 
-				saveDraft($draft, isset($_REQUEST['xml']));
+				$context['id_draft'] = saveDraft($draft, isset($_REQUEST['xml']));
 
 				self::$_eventsManager->trigger('after_save_draft', array('id_draft' => $context['id_draft']));
 

@@ -422,12 +422,14 @@ function processAttachments($id_msg = null)
 
 	// Remember where we are at. If it's anywhere at all.
 	if (!$ignore_temp)
+	{
 		$_SESSION['temp_attachments']['post'] = array(
 			'msg' => !empty($id_msg) ? $id_msg : 0,
 			'last_msg' => !empty($_REQUEST['last_msg']) ? $_REQUEST['last_msg'] : 0,
 			'topic' => !empty($topic) ? $topic : 0,
 			'board' => !empty($board) ? $board : 0,
 		);
+	}
 
 	// If we have an initial error, lets just display it.
 	if (!empty($initial_error))
@@ -1197,7 +1199,7 @@ function getMessageDataFromAttachment($id_attach, $attach_source)
 		$msgData = $db->fetch_assoc($request);
 	$db->free_result($request);
 
-	return new ValuesContainer($msgData);
+	return new ElkArte\ValuesContainer($msgData);
 }
 
 /**
@@ -2032,12 +2034,12 @@ function bindAttachmentsTo($id_msg, $attachment_ids, $attach_source_from, $attac
 	);
 }
 
-function getAttachmentsFromMsg($id_draft, $attach_source = 0)
+function getAttachmentsFromMsg($id_draft, $attach_source = 0, $details = false)
 {
 	$db = database();
 
 	return $db->fetchQuery('
-		SELECT id_attach
+		SELECT id_attach' . ($details === true ? ', id_thumb' : '') . '
 		FROM {db_prefix}attachments
 		WHERE id_msg = {int:id_draft}
 			AND attach_source = {int:attach_source}',
