@@ -28,6 +28,12 @@ $disable_security = false;
 // How long, in seconds, must admin be inactive to allow someone else to run?
 $upcontext['inactive_timeout'] = 10;
 
+// This bunch of indexes necessary in the template and are set a bit too late
+$upcontext['current_item_num'] = 0;
+$upcontext['current_item_name'] = '';
+$upcontext['current_debug_item_num'] = 0;
+$upcontext['current_debug_item_name'] = '';
+
 // All the steps in detail.
 // Number,Name,Function,Progress Weight.
 $upcontext['steps'] = array(
