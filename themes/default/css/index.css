@@ -1210,14 +1210,117 @@ a.bbc_link {
 	display: block;
 	padding: 0 0.6em;
 	white-space: nowrap;
+	border: 1px solid;
+	border-radius: 2px;
+}
+
+/* Level 1 button hover and focus effects. */
+.linklevel1:hover, .listlevel1:hover .linklevel1,
+.linklevel2:hover, .listlevel2:hover .linklevel2,
+.linklevel3:hover, .listlevel3:hover .linklevel3,
+#menu_sidebar .linklevel1:hover, #menu_sidebar .listlevel1:hover .linklevel1,
+#menu_current_area > strong > .linklevel1 {
+	border: 1px solid;
+	text-decoration: none;
+}
+
+.poster li.listlevel1:hover {
+	border: none;
+}
+
+.poster li.poster_online:hover .linklevel1 {
+	border: 1px solid;
+}
+
+.poster li.poster_online .nolink {
+	position: relative;
+	display: block;
+	margin: 3px 1.5em;
+	border: 1px solid;
+	line-height: 2em;
+}
+
+.poster li.poster_online .nolink img {
+	vertical-align: middle;
+}
+
+.poster li.subsections.listlevel1:hover .linklevel1 {
+	border: none;
 }
 
 .listlevel1#button_profile .linklevel1 {
 	min-width: 5em;
 }
 
+/* Level 1 active buttons. */
+.linklevel1.active, .listlevel1:hover .active,
+#collapse_button .linklevel1, .pm_indicator, .likes_indicator {
+	border: 1px solid;
+	font-weight: bold;
+}
+
+/* Hover effects for those buttons. */
+.linklevel1.active:hover, .listlevel1:hover .linklevel1.active,
+#collapse_button .linklevel1:hover, .linklevel1:hover .pm_indicator {
+	border: 1px solid;
+}
+
+.linklevel1:hover .pm_indicator {
+
+}
+
+.linklevel1.active:hover .pm_indicator {
+	border-bottom: 1px solid;
+}
+
+/* Top level subsection indicators. */
+/* Comment these out if you don't want them. */
+.subsections:hover .linklevel1:after {
+	position: absolute;
+	right: 0.4em;
+	content: " \25bc";
+}
+
+#main_menu .subsections:hover .linklevel1:after {
+	top: 88%;
+	font-size: 1.429em;
+}
+
+.admin_menu .subsections:hover .linklevel1:after {
+	top: 72%;
+	font-size: 1.214em;
+}
+
+/* Corrections for other menus. */
+.quickbuttons .subsections:hover .linklevel1:after {
+	top: 1.9em;
+	font-size: 1em;
+}
+
+.subsections:hover .name.linklevel1:after {
+	top: 1.6em;
+	font-size: 1em;
+}
+
+.poster2 .subsections:hover .name.linklevel1:after {
+	top: 1em;
+}
+
+/* Do one override here for .poster. Still saves code all round. */
+.poster_avatar .linklevel1, .poster_avatar:hover .linklevel1,
+.poster_avatar .linklevel1:focus,
+.name.linklevel1, .name.linklevel1:hover, .name.linklevel1:focus {
+	border: none;
+}
+
+.name.linklevel1:hover {
+	text-decoration: underline;
+}
+
 /* Levels 2 and 3: drop menu wrapper. */
 .menulevel2, .menulevel3 {
+	border: 1px solid;
+	border-radius: 2px;
 	position: absolute;
 	top: 100%;
 	left: -9999px;
@@ -1266,6 +1369,79 @@ a.bbc_link {
 	position: relative;
 	display: block;
 	padding: 1px 7px;
+}
+
+.linklevel2:link, .linklevel2:visited, .linklevel3:link, .linklevel3:visited {
+	border: 1px solid;
+}
+
+/* Admin menu icons. */
+.linklevel2 > img {
+	margin: 0 0 0 -4px;
+	vertical-align: middle;
+}
+
+/* Level 2: subsection indicators. */
+.listlevel2.subsections .linklevel2:after,
+#menu_sidebar .subsections .linklevel1:after,
+#menu_sidebar .subsections:hover .linklevel1:after {
+	position: absolute;
+	top: 0;
+	right: 6px;
+	content: "\2192";
+	font-size: 1.286em;
+}
+
+/* Level 2: dividers between admin/moderation, and pm/profile links. */
+#button_admin .listlevel2.subsections, #button_pm .listlevel2.subsections {
+	margin-top: 7px;
+	padding-top: 4px;
+	border-top: 1px solid;
+	box-shadow: 0 -1px 0 #BBBBBB;
+}
+
+/* Levels 2 and 3: highlighting of current section */
+/* @todo - Should probably be applied to main menu as well, for consistency. */
+.linklevel2.chosen, .linklevel3.chosen,
+#menu_current_area .linklevel1 {
+	font-weight: 700;
+}
+
+/* Styles for sidebar menus.
+/* Cancel default backgrounds for sidebar. */
+#menu_sidebar .linklevel1 {
+	border: 1px solid;
+}
+
+/* Tricky PM indicator. Define it carefully,
+/* just in case someone tries to use this class elsewhere. */
+.pm_indicator, .likes_indicator {
+	position: absolute;
+	top: -1.45em;
+	right: -0.4em;
+	z-index: 2;
+	float: left;
+	padding: 0 0.7em;
+	border-radius: 8px 8px 8px 0;
+	font-weight: 700;
+	font-size: 0.929em;
+	line-height: 1.7em;
+}
+
+.poster .pm_indicator {
+	font-size: 1em;
+}
+
+#dropdown_menu_1 .pm_indicator {
+	margin-top: 5px;
+	margin-right: 2px;
+}
+
+.likes_indicator {
+	top: -1.2em;
+	border-radius: 6px 6px 6px 0;
+	font-size: .857em;
+	line-height: 1.5em;
 }
 
 /* @todo - Note: The next declarations are for keyboard access with js disabled. */
@@ -1341,6 +1517,59 @@ a.bbc_link {
 */
 
 /* ------------------------------------------------------- */
+/*	$BOARDICONS	                                           */
+/* ------------------------------------------------------- */
+
+/* @todo: This is a job for font awesome. */
+
+.board_icon {
+	display: block;
+	float: left;
+	width: 48px;
+	height: 48px;
+}
+
+.board_key:before {
+	display: block;
+	float: left;
+	width: 26px;
+	height: 24px;
+	content: "";
+}
+
+.category_boards .board_icon, .board_key:before {
+
+}
+
+.on_board {
+	background-position: 0 0;
+}
+
+.on2_board {
+	background-position: -72px 0;
+}
+
+.off_board {
+	background-position: -144px 0;
+}
+
+.redirect_board {
+	background-position: -216px 0;
+}
+
+.new_some_board:before {
+	background-position: -300px -14px;
+}
+
+.new_none_board:before {
+	background-position: -372px -14px;
+}
+
+.new_redirect_board:before {
+	background-position: -444px -14px;
+}
+
+/* ------------------------------------------------------- */
 /*	$LINKTREE                                              */
 /* ------------------------------------------------------- */
 /* The navigation list (i.e. linktree, breadcrumbs) */
@@ -1348,6 +1577,8 @@ a.bbc_link {
 	overflow: hidden;
 	margin: 3px 0 0 0;
 	padding-right: 1em;
+	border: 1px solid;
+	border-radius: 2px;
 }
 
 #main_content_section .navigate_section {
@@ -1363,6 +1594,7 @@ a.bbc_link {
 	white-space: nowrap;
 	font-size: 0.929em;
 	line-height: 2em;
+	border-bottom: 1px solid;
 }
 .linktree:first-child a {
 	height: 2em;
@@ -1389,10 +1621,10 @@ a.bbc_link {
 	text-overflow: ellipsis;
 }
 
-.linktree a {
-	display: block;
-	overflow: hidden;
-	text-overflow: ellipsis;
+.linktree:hover a, .linktree > a:hover,
+.linktree:last-child, .linktree:last-child > span > a,
+.linktree:last-child > span > a:hover, .linktree:last-child strong {
+	text-decoration: none;
 }
 
 /* Nifty indicators. */
@@ -1443,6 +1675,10 @@ a.bbc_link {
 	line-height: 2em;
 }
 
+.buttonlist li a.linklevel1 {
+	text-transform: uppercase;
+}
+
 .fa.hamburger_30 {
 	display: none;
 }
@@ -1489,7 +1725,7 @@ a.bbc_link {
 }
 
 .quickbuttons .inline_mod_check {
-	margin: 4px;
+	margin: 4px 4px 4px 0;
 	padding: 0 4px;
 }
 
@@ -1499,6 +1735,7 @@ a.bbc_link {
 	padding: 1px 6px 0 22px;
 	line-height: 2em;
 	cursor: pointer;
+	border-radius: 0;
 }
 
 /* @todo - Check with js disabled after sorting most of the other crud. */
@@ -1527,7 +1764,8 @@ a.bbc_link {
 	left: 3px;
 }
 
-/* The rest of them. */
+/* The rest of them.
+ @todo: font awesome yadda yadda */
 .quickbuttons .linklevel1:before, .quickbuttons .linklevel2:before {
 	background-image: url(../images/theme/quickbuttons.png);
 	/* A rare example of where longhand background declarations work well. */
@@ -1557,6 +1795,21 @@ a.bbc_link {
 .star_button:before       {background-position: 0 -432px;}
 .quick_edit:before        {background-position: 0 -456px;}
 .likes_button:before      {background-position: 0 -480px;}
+
+/* Radius left end of the first (Quote) button. */
+.linklevel1.quote_button {
+	border-radius: 2px 0 0 2px;
+}
+
+/* Radius right end of the last button. */
+.linklevel1.post_options, .linklevel1.remove_button {
+	border-radius: 0 2px 2px 0;
+}
+
+/* Single buttons get all corners rounded. */
+.follow_ups .linklevel1, #topic_summary .linklevel1 {
+	border-radius: 2px;
+}
 
 /* No icon here. */
 .linklevel1.post_options:before,
@@ -1657,6 +1910,21 @@ a.bbc_link {
 
 .pagelinks .navPages {
 	padding: 1px 6px;
+	border: 1px solid;
+}
+
+.pagelinks .navPages:hover, .pagelinks .current_page {
+	border: 1px solid;
+	/* @todo - Simplify. */
+	text-decoration: none;
+}
+
+.pagelinks :first-child {
+	border-radius: 2px 0 0 2px;
+}
+
+.pagelinks :last-child {
+	border-radius: 0 2px 2px 0;
 }
 
 .pagelinks .current_page {
@@ -1681,6 +1949,19 @@ a.bbc_link {
 .small_pagelinks {
 	float: right;
 	margin-top: -2px;
+}
+
+/* our buddies &laquo; &raquo; */
+.small_pagelinks:before {
+	float: left;
+	content: '\00AB';
+	font-size: 1.286em;
+}
+
+.small_pagelinks:after {
+	float: left;
+	content: '\00BB';
+	font-size: 1.286em;
 }
 
 .small_pagelinks li {
@@ -1731,11 +2012,16 @@ a.bbc_link {
 	font-size: 2em;
 	-webkit-transform: translateZ(0);
 	-webkit-backface-visibility: hidden;
+	border: 1px solid;
+	border-bottom: none;
+	border-radius: 0 20px 0 0;
 }
 
 #gobottom {
 	top: 50%;
 	padding: 0.8em 0.1em 0.5em 0.1em;
+	border-top: none;
+	border-radius: 0 0 20px 0;
 }
 
 #gotop:hover, #gobottom:hover {
@@ -1751,6 +2037,8 @@ a.bbc_link {
 	background: none repeat scroll 0 0 rgba(0, 0, 0, 0);
 	font-weight: bold;
 	transition: top .5s ease-out 0s, background 1s linear 0s;
+	border: 4px solid;
+	border-radius: 0 0 6px 6px;
 }
 
 #top:focus {
@@ -1767,6 +2055,7 @@ a.bbc_link {
 	width: 100%;
 	border-spacing: 0;
 	border-collapse: collapse;
+	border: 1px solid;
 	border-top: none;
 }
 
@@ -1775,6 +2064,8 @@ a.bbc_link {
 	text-align: left;
 	font-weight: bold;
 	font-size: 1em;
+	border-top: 2px solid;
+	border-bottom: 2px solid;
 }
 
 .table_head > th.centertext, .table_head > td.centertext {
@@ -1784,7 +2075,7 @@ a.bbc_link {
 /* Basic cells. */
 .table_grid td, .letterspacing {
 	padding: 5px 8px;
-	border-bottom: 1px solid #CCCCCC;
+	border-bottom: 1px solid;
 }
 
 .table_grid textarea {
@@ -1803,6 +2094,7 @@ a.bbc_link {
 /* ------------------------------------------------------- */
 #errorfile_table .current {
 	font-weight: bold;
+	border: 1px solid;
 }
 
 /* ------------------------------------------------------- */
@@ -1868,9 +2160,14 @@ a.bbc_link {
 /*	$BOARDS		                                           */
 /* ------------------------------------------------------- */
 /* The small stats, under upper linktree.                  */
+
 #index_common_stats {
 	margin: 0 8px 6px 8px;
 	font-size: 0.857em;
+}
+
+.forum_category, .content_category {
+	border-radius: 4px 4px 0 0;
 }
 
 /* The board categories and newsfader - some shared styling. */
@@ -1883,12 +2180,25 @@ a.bbc_link {
 	margin: 1px 0 0 0;
 }
 
+.board_row,
+.childboard_row,
+.forumposts > li,
+.content_category > div,
+.content_category > li {
+	border: 1px solid;
+}
+
+.board_row .parent_board {
+	border-bottom: none;
+}
+
 .board_row {
 	padding: 14px 0 11px 0;
 }
 
 .childboard_row {
 	margin: 0;
+	border-top: none;
 }
 
 .childboards li:nth-child(n+3):before {
@@ -1907,6 +2217,7 @@ a.bbc_link {
 	padding: 0 14px;
 	min-width: 36em;
 	width: 40%;
+	border-left: 1px solid;
 }
 
 .icon_anchor {
@@ -1975,11 +2286,16 @@ a.bbc_link {
 
 .childboards {
 	margin: 0 14px 0 64px;
+	border-top: 1px solid;
 }
 
 .childboards > li {
 	display: inline-block;
 	padding: 6px 0.3em 4px 0;
+}
+
+.childboard_row h4, .board_new_posts {
+	font-weight: 700;
 }
 
 /* The posting icons and mark read button. */
@@ -2016,6 +2332,7 @@ a.bbc_link {
 	margin: 0 0 8px 0;
 	padding: 0 0 4px 0;
 	font-size: 1.071em;
+	border-bottom: 1px solid;
 }
 
 /* Icons for info centre title bars. */
@@ -2043,6 +2360,10 @@ a.bbc_link {
 	vertical-align: top;
 	text-align: left;
 	text-overflow: ellipsis;
+}
+
+#ic_recentposts td, #ps_recentposts td, #ps_recenttopics td {
+	border-top: 1px solid;
 }
 
 .recentpost {
@@ -2074,6 +2395,9 @@ a.bbc_link {
 #sort_by {
 	margin-bottom: -6px;
 	min-height: 2.2em;
+	border: 2px solid;
+	border-bottom: none;
+	border-radius: 5px 5px 0 0;
 }
 
 #sort_by input[type="checkbox"] {
@@ -2087,6 +2411,8 @@ a.bbc_link {
 
 #sort_by.topic_sorting_recent {
 	margin: 4px 6px -1px 0;
+	border: 1px solid;
+	border-bottom: none;
 }
 
 .topic_sorting_recent:hover #sortby, .topic_sorting_recent #sortby {
@@ -2173,11 +2499,13 @@ img.new_posts {
 /* The board description and who-is-viewing stuff. */
 #description_board {
 	margin: 10px 0 0 0;
+	border-radius: 4px 4px 0 0;
 }
 
 #description_board .generalinfo, #forumposts .generalinfo {
 	margin-top: 2px;
 	padding: 4px 4px 4px 12px;
+	border: 1px solid;
 }
 
 #description_board .generalinfo .listlevel2 {
@@ -2199,6 +2527,7 @@ img.new_posts {
 .topic_listing > li {
 	display: table-row;
 	margin: 1px 0 0 0;
+	border: 1px solid;
 }
 
 .topic_sorting > .topic_sorting_row,
@@ -2225,6 +2554,8 @@ img.new_posts {
 	float: right;
 	vertical-align: top;
 	font-size: 0.857em;
+	border: 1px solid;
+	border-radius: 2px;
 }
 
 .topic_info {
@@ -2416,6 +2747,8 @@ img.new_posts {
 	margin-top: 10px;
 	padding: 8px 12px;
 	width: 100%;
+	border: 1px solid;
+	border-radius: 3px;
 }
 
 #topic_icons p {

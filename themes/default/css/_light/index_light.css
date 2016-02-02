@@ -170,8 +170,7 @@ strong, .bbc_strong {
 	border-color: #CCCCCC;
 	border-top-color: #DDDDDD;
 	border-bottom-color: #BBBBBB;
-	background: #EBEBEB;
-	background-image: linear-gradient(to bottom, #FAFAFA, #EAEAEA);
+	background: #EBEBEB linear-gradient(to bottom, #FAFAFA, #EAEAEA);
 	color: #566450;
 	text-shadow: 1px 1px 0 #EBEBEB;
 }
@@ -180,16 +179,14 @@ strong, .bbc_strong {
 .category_header, .content_category .category_header {
 	border-top-color: #CFCFCF;
 	border-bottom-color: #BBBBBB;
-	background: #E9E9E9;
-	background-image: linear-gradient(to bottom, #FAFAFA, #E4E4E4);
+	background: #E9E9E9 linear-gradient(to bottom, #FAFAFA, #E4E4E4);
 }
 
 /* Styles for subsection headers. @todo */
 .secondary_header {
 	border-color: #CCCCCC;
 	border-top-color: #DDDDDD;
-	background: #FAFAFA;
-	background-image: linear-gradient(to bottom, #FAFAFA, #EBEBEB);
+	background: #FAFAFA linear-gradient(to bottom, #FAFAFA, #EBEBEB);
 	text-shadow: 1px 1px 0 #FEFEFE;
 }
 
@@ -394,8 +391,7 @@ div.bbc_footnotes .meaction {
 #top_section {
 	border-top-color: #5BA048;
 	border-bottom-color: #3D6E32;
-	background: #F4F4F4;
-	background-image: linear-gradient(to bottom, #FEFEFE, #EEEEEE);
+	background: #F4F4F4 linear-gradient(to bottom, #FEFEFE, #EEEEEE);
 	box-shadow: 0 1px 4px rgba(0, 0, 0, 0.3), 0 1px 0 #38642D inset;
 }
 
@@ -516,12 +512,10 @@ div.bbc_footnotes .meaction {
 /* ------------------------------------------------------- */
 /* Level 1 Menu bar: link or button. General styling. */
 .linklevel1, .linklevel1:link, .linklevel1:visited {
-	border: 1px solid #AFAFAF;
-	border-top: 1px solid #CFCFCF;
-	border-left: 1px solid #BFBFBF;
-	border-radius: 2px;
-	background: #F4F4F4;
-	background-image: linear-gradient(to bottom, #FEFEFE, #E4E4E4);
+	border-color: #AFAFAF;
+	border-top-color: #CFCFCF;
+	border-left-color: #BFBFBF;
+	background: #F4F4F4 linear-gradient(to bottom, #FEFEFE, #E4E4E4);
 	box-shadow: 1px 1px 2px #E4E4E4;
 	color: #566E4B;
 }
@@ -532,50 +526,42 @@ div.bbc_footnotes .meaction {
 .linklevel3:hover, .listlevel3:hover .linklevel3,
 #menu_sidebar .linklevel1:hover, #menu_sidebar .listlevel1:hover .linklevel1,
 #menu_current_area > strong > .linklevel1 {
-	border: 1px solid #CCCCCC;
-	border-top: 1px solid #AFAFAF;
-	border-left: 1px solid #AFAFAF;
+	border-color: #CCCCCC;
+	border-top-color: #AFAFAF;
+	border-left-color: #AFAFAF;
 	background: #F0F0F0;
 	box-shadow: 2px 1px 1px rgba(0, 0, 0, 0.07) inset;
 	color: #686868;
-	text-decoration: none;
 }
 
 .poster li.listlevel1:hover {
-	border: none;
 	background: transparent;
 	box-shadow: none;
 }
 
 .poster li.poster_online:hover .linklevel1 {
-	border: 1px solid #CCCCCC;
-	border-top: 1px solid #AFAFAF;
-	border-left: 1px solid #AFAFAF;
+	border-color: #CCCCCC;
+	border-top-color: #AFAFAF;
+	border-left-color: #AFAFAF;
 	background: #F0F0F0;
 	box-shadow: 2px 1px 1px rgba(0, 0, 0, 0.07) inset;
 	color: #585858;
 }
 
 .poster li.poster_online .nolink {
-	position: relative;
-	display: block;
-	margin: 3px 1.5em;
-	border: 1px solid #AFAFAF;
-	border-top: 1px solid #CFCFCF;
-	border-left: 1px solid #BFBFBF;
-	background: #F4F4F4;
-	background-image: linear-gradient(to bottom, #FEFEFE, #E4E4E4);
+	border-color: #AFAFAF;
+	border-top-color: #CFCFCF;
+	border-left-color: #BFBFBF;
+	background: #F4F4F4 linear-gradient(to bottom, #FEFEFE, #E4E4E4);
 	box-shadow: 1px 1px 2px #E4E4E4;
 	color: #566E4B;
-	line-height: 2em;
 }
 
 .poster li.poster_online .nolink img {
-	vertical-align: middle;
+
 }
 
 .poster li.subsections.listlevel1:hover .linklevel1 {
-	border: none;
 	background: transparent;
 	box-shadow: none;
 }
@@ -583,22 +569,20 @@ div.bbc_footnotes .meaction {
 /* Level 1 active buttons. */
 .linklevel1.active, .listlevel1:hover .active,
 #collapse_button .linklevel1, .pm_indicator, .likes_indicator {
-	border: 1px solid #3D6E32;
-	border-top: 1px solid #4B863C;
-	border-left: 1px solid #38642D;
-	background: #4B863C;
-	background-image: linear-gradient(to bottom, #5BA048, #3D6E32);
+	border-color: #3D6E32;
+	border-top-color: #4B863C;
+	border-left-color: #38642D;
+	background: #4B863C linear-gradient(to bottom, #5BA048, #3D6E32);
 	box-shadow: 1px 1px 2px #BBBBBB;
 	color: #FEFEFE;
-	font-weight: bold;
 }
 
 /* Hover effects for those buttons. */
 .linklevel1.active:hover, .listlevel1:hover .linklevel1.active,
 #collapse_button .linklevel1:hover, .linklevel1:hover .pm_indicator {
-	border: 1px solid #5BA048;
-	border-top: 1px solid #2D5024;
-	border-left: 1px solid #2D5024;
+	border-color: #5BA048;
+	border-top-color: #2D5024;
+	border-left-color: #2D5024;
 	background: #3D6E32;
 	box-shadow: 1px 1px 1px rgba(0, 0, 0, 0.3) inset;
 }
@@ -608,66 +592,54 @@ div.bbc_footnotes .meaction {
 }
 
 .linklevel1.active:hover .pm_indicator {
-	border-bottom: 1px solid #2D5024;
+	border-bottom-color: #2D5024;
 }
 
 /* Top level subsection indicators. */
 /* Comment these out if you don't want them. */
 .subsections:hover .linklevel1:after {
-	position: absolute;
-	right: 0.4em;
-	content: " \25bc";
+
 }
 
 #main_menu .subsections:hover .linklevel1:after {
-	top: 88%;
 	color: #EEEEEE;
 	text-shadow: 0 4px 0 #3D6E32;
-	font-size: 1.429em;
 }
 
 .admin_menu .subsections:hover .linklevel1:after {
-	top: 72%;
 	color: #3D6E32;
-	font-size: 1.214em;
 }
 
 /* Corrections for other menus. */
 .quickbuttons .subsections:hover .linklevel1:after {
-	top: 1.9em;
-	font-size: 1em;
+
 }
 
 .subsections:hover .name.linklevel1:after {
-	top: 1.6em;
 	color: #5BA048;
-	font-size: 1em;
 }
 
 .poster2 .subsections:hover .name.linklevel1:after {
-	top: 1em;
 }
 
 /* Do one override here for .poster. Still saves code all round. */
 .poster_avatar .linklevel1, .poster_avatar:hover .linklevel1,
 .poster_avatar .linklevel1:focus,
 .name.linklevel1, .name.linklevel1:hover, .name.linklevel1:focus {
-	border: none;
 	background: none;
 	box-shadow: none;
 	color: #4B863C;
 }
 
 .name.linklevel1:hover {
-	text-decoration: underline;
+
 }
 
 /* Levels 2 and 3: drop menu wrapper. */
 .menulevel2, .menulevel3 {
-	border: 1px solid #AFAFAF;
-	border-top: 1px solid #CFCFCF;
-	border-left: 1px solid #BFBFBF;
-	border-radius: 2px;
+	border-color: #AFAFAF;
+	border-top-color: #CFCFCF;
+	border-left-color: #BFBFBF;
 	background: #FEFEFE;
 	box-shadow: 3px 3px 3px rgba(0, 0, 0, 0.2);
 }
@@ -675,65 +647,42 @@ div.bbc_footnotes .meaction {
 /* Tricky PM indicator. Define it carefully,
 /* just in case someone tries to use this class elsewhere. */
 .pm_indicator, .likes_indicator {
-	position: absolute;
-	top: -1.45em;
-	right: -0.4em;
-	z-index: 2;
-	float: left;
-	padding: 0 0.7em;
-	border-radius: 8px 8px 8px 0;
 	box-shadow: 2px 2px 3px rgba(0, 0, 0, 0.25), 0 -1px 0 #3D6E32 inset;
-	font-weight: 700;
-	font-size: 0.929em;
-	line-height: 1.7em;
 }
 
 .poster .pm_indicator {
-	font-size: 1em;
+
 }
 
 #dropdown_menu_1 .pm_indicator {
-	margin-top: 5px;
-	margin-right: 2px;
+
 }
 
 .likes_indicator {
-	top: -1.2em;
-	border-radius: 6px 6px 6px 0;
 	box-shadow: 2px 2px 2px rgba(0, 0, 0, 0.25);
-	font-size: .857em;
-	line-height: 1.5em;
 }
 
 /* Levels 2 and 3 drop menus: link or button. */
 .linklevel2:link, .linklevel2:visited, .linklevel3:link, .linklevel3:visited {
-	border: 1px solid transparent;
+	border-color: transparent;
 	color: #585858;
 }
 
 /* Admin menu icons. */
 .linklevel2 > img {
-	margin: 0 0 0 -4px;
-	vertical-align: middle;
+
 }
 
 /* Level 2: subsection indicators. */
 .listlevel2.subsections .linklevel2:after,
 #menu_sidebar .subsections .linklevel1:after,
 #menu_sidebar .subsections:hover .linklevel1:after {
-	position: absolute;
-	top: 0;
-	right: 6px;
 	color: #686868;
-	content: "\2192";
-	font-size: 1.286em;
 }
 
 /* Level 2: dividers between admin/moderation, and pm/profile links. */
 #button_admin .listlevel2.subsections, #button_pm .listlevel2.subsections {
-	margin-top: 7px;
-	padding-top: 4px;
-	border-top: 1px solid #DDDDDD;
+	border-top-color: #DDDDDD;
 	box-shadow: 0 -1px 0 #BBBBBB;
 }
 
@@ -741,13 +690,13 @@ div.bbc_footnotes .meaction {
 /* @todo - Should probably be applied to main menu as well, for consistency. */
 .linklevel2.chosen, .linklevel3.chosen,
 #menu_current_area .linklevel1 {
-	font-weight: 700;
+
 }
 
 /* Styles for sidebar menus.
 /* Cancel default backgrounds for sidebar. */
 #menu_sidebar .linklevel1 {
-	border: 1px solid transparent;
+	border-color: transparent;
 	background: none;
 	box-shadow: none;
 	color: #585858;
@@ -759,18 +708,11 @@ div.bbc_footnotes .meaction {
 /*	$BOARDICONS	                                           */
 /* ------------------------------------------------------- */
 .board_icon {
-	display: block;
-	float: left;
-	width: 48px;
-	height: 48px;
+
 }
 
 .board_key:before {
-	display: block;
-	float: left;
-	width: 26px;
-	height: 24px;
-	content: "";
+
 }
 
 .category_boards .board_icon, .board_key:before {
@@ -779,31 +721,31 @@ div.bbc_footnotes .meaction {
 }
 
 .on_board {
-	background-position: 0 0;
+
 }
 
 .on2_board {
-	background-position: -72px 0;
+
 }
 
 .off_board {
-	background-position: -144px 0;
+
 }
 
 .redirect_board {
-	background-position: -216px 0;
+
 }
 
 .new_some_board:before {
-	background-position: -300px -14px;
+
 }
 
 .new_none_board:before {
-	background-position: -372px -14px;
+
 }
 
 .new_redirect_board:before {
-	background-position: -444px -14px;
+
 }
 
 /* ------------------------------------------------------- */
@@ -812,8 +754,7 @@ div.bbc_footnotes .meaction {
 /* The navigation list (i.e. linktree) */
 /* Wrapper/background. */
 .navigate_section {
-	border: 1px solid #CCCCCC;
-	border-radius: 2px;
+	border-color: #CCCCCC;
 	background: #FEFEFE;
 	box-shadow: 1px 2px 3px #EEEEEE;
 }
@@ -824,7 +765,7 @@ div.bbc_footnotes .meaction {
 }
 
 .linktree {
-	border-bottom: 1px solid #CCCCCC;
+	border-bottom-color: #CCCCCC;
 	box-shadow: 0 -2px 0 -1px #CCCCCC, 3px -2px 0 -1px #CCCCCC, 3px 1px 0 -1px #CCCCCC;
 }
 
@@ -832,7 +773,6 @@ div.bbc_footnotes .meaction {
 .linktree:last-child, .linktree:last-child > span > a,
 .linktree:last-child > span > a:hover, .linktree:last-child strong {
 	color: #FEFEFE;
-	text-decoration: none;
 }
 
 .linktree:after {
@@ -841,13 +781,11 @@ div.bbc_footnotes .meaction {
 }
 
 .linktree:hover, .linktree:last-child {
-	background: #5BA048;
-	background-image: linear-gradient(0deg, #4B863C, #5BA048);
+	background: #5BA048 linear-gradient(0deg, #4B863C, #5BA048);
 }
 
 .linktree:hover:after, .linktree:last-child:after {
-	background: #5BA048;
-	background-image: linear-gradient(315deg, #4B863C, #5BA048);
+	background: #5BA048 linear-gradient(315deg, #4B863C, #5BA048);
 }
 
 .linktree:last-child:hover, .linktree:last-child:hover:after {
@@ -866,7 +804,6 @@ div.bbc_footnotes .meaction {
 /* @todo - Save code by amalgamating common button background declarations. */
 .buttonlist li a.linklevel1 {
 	box-shadow: 1px 1px 2px #E4E4E4, 0 -1px 0 #E4E4E4 inset;
-	text-transform: uppercase;
 }
 
 /* The active one */
@@ -882,27 +819,25 @@ div.bbc_footnotes .meaction {
 
 /* Cancel generic border-radius. */
 .quickbuttons .linklevel1 {
-	border-radius: 0;
 	color: #585858;
 }
 
 .quickbuttons .inline_mod_check {
-	margin-left: 0;
 }
 
 /* Radius left end of the first (Quote) button. */
 .linklevel1.quote_button {
-	border-radius: 2px 0 0 2px;
+
 }
 
 /* Radius right end of the last button. */
 .linklevel1.post_options, .linklevel1.remove_button {
-	border-radius: 0 2px 2px 0;
+
 }
 
 /* Single buttons get all corners rounded. */
 .follow_ups .linklevel1, #topic_summary .linklevel1 {
-	border-radius: 2px;
+
 }
 
 /* ------------------------------------------------------- */
@@ -913,69 +848,59 @@ div.bbc_footnotes .meaction {
 }
 
 .pagelinks .navPages {
-	border: 1px solid #AFAFAF;
-	border-top: 1px solid #BBBBBB;
+	border-color: #AFAFAF;
+	border-top-color: #BBBBBB;
 	background-image: linear-gradient(to bottom, #FEFEFE 0%, #E4E4E4 100%);
 	color: #585858;
 }
 
 .pagelinks .navPages:hover, .pagelinks .current_page {
-	border: 1px solid #CCCCCC;
-	border-top: 1px solid #AFAFAF;
-	border-left: 1px solid #AFAFAF;
+	border-color: #CCCCCC;
+	border-top-color: #AFAFAF;
+	border-left-color: #AFAFAF;
 	background: #F0F0F0;
 	box-shadow: 2px 1px 1px rgba(0, 0, 0, 0.07) inset;
 	/* @todo - Simplify. */
 	color: #585858;
-	text-decoration: none;
 }
 
 .pagelinks :first-child {
-	border-radius: 2px 0 0 2px;
+
 }
 
 .pagelinks :last-child {
-	border-radius: 0 2px 2px 0;
+
 }
 
 /* our buddies &laquo; &raquo; */
 .small_pagelinks:before {
-	float: left;
-	content: '\00AB';
-	font-size: 1.286em;
+
 }
 
 .small_pagelinks:after {
-	float: left;
-	content: '\00BB';
-	font-size: 1.286em;
+
 }
 
 /* Globally accessible top/bottom links. */
 #gotop, #gobottom {
-	border: 1px solid #222222;
-	border-bottom: none;
-	border-radius: 0 20px 0 0;
+	border-color: #222222;
 	background: #EEEEEE;
 	color: #EEEEEE;
 	opacity: 0.2;
 }
 
 #gobottom {
-	border-top: none;
-	border-radius: 0 0 20px 0;
+
 }
 
 #gotop:hover, #gobottom:hover {
 	color: #444444;
-	text-decoration: none;
 	opacity: 1;
 }
 
 /* Skip navigation link. */
 #top {
-	border: 4px solid #5BA048;
-	border-radius: 0 0 6px 6px;
+	border-color: #5BA048;
 	background: #FEFEFE;
 }
 
@@ -986,20 +911,19 @@ div.bbc_footnotes .meaction {
 /* @todo */
 /* A general table class. */
 .table_grid {
-	border: 1px solid #DDDDDD;
-	border-top: none;
+	border-color: #DDDDDD;
 }
 
 .table_head > th {
-	border-top: 2px solid #DDDDDD;
-	border-bottom: 2px solid #DDDDDD;
+	border-top-color: #DDDDDD;
+	border-bottom-color: #DDDDDD;
 	background: #FEFEFE;
 	color: #686868;
 }
 
 /* Basic cells. */
-.table_grid td {
-	border-bottom: 1px solid #CCCCCC;
+.table_grid td, .letterspacing {
+	border-bottom-color: #CCCCCC;
 }
 
 /* Subtle zebra striping for rows. */
@@ -1020,7 +944,7 @@ div.bbc_footnotes .meaction {
 
 /* For Errors.template.php. */
 #errorfile_table .current {
-	border: 1px solid #444444;
+	border-color: #444444;
 	background: #FFF5CD;
 }
 
@@ -1043,7 +967,6 @@ div.bbc_footnotes .meaction {
 
 /* The board categories and newsfader - some shared styling. */
 .forum_category, .content_category {
-	border-radius: 4px 4px 0 0;
 	background: #DEEDDA;
 	box-shadow: 1px 2px 3px #EEEEEE;
 }
@@ -1053,20 +976,20 @@ div.bbc_footnotes .meaction {
 .forumposts > li,
 .content_category > div,
 .content_category > li {
-	border: 1px solid #CFCFCF;
+	border-color: #CFCFCF;
 	background: #FEFEFE;
 }
 
-.board_row.parent_board {
-	border-bottom: none;
+.board_row .parent_board {
+
 }
 
 .childboard_row {
-	border-top: none;
+
 }
 
 .board_latest {
-	border-left: 1px solid #CCCCCC;
+	border-left-color: #CCCCCC;
 }
 
 .board_name > a {
@@ -1086,17 +1009,16 @@ div.bbc_footnotes .meaction {
 }
 
 .childboards {
-	border-top: 1px solid #CCCCCC;
+	border-top-color: #CCCCCC;
 }
 
 .childboard_row h4, .board_new_posts {
 	color: #686868;
-	font-weight: 700;
 }
 
 /* Styles for the info center on the board index. */
 .ic_section_header {
-	border-bottom: 1px solid #DDDDDD;
+	border-bottom-color: #DDDDDD;
 }
 
 .ic_section_header > a {
@@ -1104,7 +1026,7 @@ div.bbc_footnotes .meaction {
 }
 
 #ic_recentposts td, #ps_recentposts td, #ps_recenttopics td {
-	border-top: 1px solid #DDDDDD;
+	border-top-color: #DDDDDD;
 }
 
 .recentpost > strong > a, .inline > strong > a {
@@ -1117,14 +1039,13 @@ div.bbc_footnotes .meaction {
 
 /* The board description and who-is-viewing stuff. */
 #description_board {
-	border-radius: 4px 4px 0 0;
 	background: #E4E4E4;
 	box-shadow: 1px 2px 4px #EEEEEE;
 }
 
 #description_board .generalinfo, #forumposts .generalinfo {
-	border: 1px solid #DDDDDD;
-	border-bottom: 1px solid #CCCCCC;
+	border-color: #DDDDDD;
+	border-bottom-color: #CCCCCC;
 	background: #FEFEFE;
 }
 
@@ -1134,8 +1055,8 @@ div.bbc_footnotes .meaction {
 }
 
 .topic_listing > li {
-	border: 1px solid #DDDDDD;
-	border-bottom: 1px solid #CCCCCC;
+	border-color: #DDDDDD;
+	border-bottom-color: #CCCCCC;
 }
 
 .basic_row {
@@ -1147,19 +1068,15 @@ div.bbc_footnotes .meaction {
 }
 
 #sort_by {
-	border: 2px solid #D1D1D1;
-	border-bottom: none;
-	border-radius: 5px 5px 0 0;
+	border-color: #D1D1D1;
 }
 
 #sort_by.topic_sorting_recent {
-	border: 1px solid #D1D1D1;
-	border-bottom: none;
+	border-color: #D1D1D1;
 }
 
 .sort_by_container {
-	border: 1px solid #CCCCCC;
-	border-radius: 2px;
+	border-color: #CCCCCC;
 }
 
 .topic_name h4 a {
@@ -1199,13 +1116,11 @@ div.bbc_footnotes .meaction {
 }
 
 #topic_icons {
-	border: 1px solid #DDDDDD;
-	border-radius: 3px;
+	border-color: #DDDDDD;
 }
 
 .jump_to_header {
-	background: #EBEBEB;
-	background-image: linear-gradient(to bottom, #FAFAFA, #EAEAEA);
+	background: #EBEBEB linear-gradient(to bottom, #FAFAFA, #EAEAEA);
 	box-shadow: 2px 1px rgba(1, 1, 1, 0.07) inset;
 	color: #566450;
 }
@@ -1588,8 +1503,7 @@ div.bbc_footnotes .meaction {
 }
 
 .activity_stats li .bar div {
-	background: #60BC78;
-	background-image: linear-gradient(to bottom, #60BC78 0%, #27A348 100%);
+	background: #60BC78 linear-gradient(to bottom, #60BC78 0%, #27A348 100%);
 }
 
 .profile_pie {
