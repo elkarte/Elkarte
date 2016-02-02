@@ -11,7 +11,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:		BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.1 dev
+ * @version 1.1 beta 1
  *
  * Original module by Mach8 - We'll never forget you.
  */

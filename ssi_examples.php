@@ -9,7 +9,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.1 dev
+ * @version 1.1 beta 1
  */
 // Special thanks to Spaceman-Spiff for his contributions to this page.
 
