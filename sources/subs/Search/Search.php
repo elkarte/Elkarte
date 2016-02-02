@@ -29,7 +29,7 @@ $GLOBALS['search_versions'] = array(
 
 	// This is the minimum version of ElkArte that an API could have been written for to work.
 	// (strtr to stop accidentally updating version on release)
-	'search_version' => strtr('ElkArte 1+0', array('+' => '.', '=' => ' ')),
+	'search_version' => strtr('ElkArte 1+1', array('+' => '.', '=' => ' ')),
 );
 
 /**
@@ -203,7 +203,7 @@ class Search
 	 */
 	public function __construct()
 	{
-		$this->_search_version = strtr('ElkArte 1+0', array('+' => '.', '=' => ' '));
+		$this->_search_version = strtr('ElkArte 1+1', array('+' => '.', '=' => ' '));
 		$this->_db = database();
 		$this->_db_search = db_search();
 
