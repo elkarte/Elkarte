@@ -25,6 +25,8 @@ class Drafts_PersonalMessage_Module implements ElkArte\sources\modules\Module_In
 	protected static $_autosave_enabled = false;
 	protected static $_autosave_frequency = 30000;
 	protected static $_subject_length = 24;
+	protected static $_eventsManager = null;
+
 	protected $_loaded_draft = null;
 
 	/**
@@ -176,7 +178,7 @@ class Drafts_PersonalMessage_Module implements ElkArte\sources\modules\Module_In
 					'body' => Util::htmlspecialchars($_POST['message'], ENT_QUOTES, 'UTF-8', true),
 					'subject' => strtr(Util::htmlspecialchars($_POST['subject']), array("\r" => '', "\n" => '', "\t" => '')),
 					'id_member' => $user_info['id'],
-					'is_usersaved' => 1,
+					'is_usersaved' => (int) empty($_REQUEST['autosave']),
 				);
 
 				if (isset($_REQUEST['xml']))
@@ -184,6 +186,8 @@ class Drafts_PersonalMessage_Module implements ElkArte\sources\modules\Module_In
 					$recipientList['to'] = isset($_POST['recipient_to']) ? explode(',', $_POST['recipient_to']) : array();
 					$recipientList['bcc'] = isset($_POST['recipient_bcc']) ? explode(',', $_POST['recipient_bcc']) : array();
 				}
+
+				self::$_eventsManager->trigger('before_savepm_draft', array('draft' => &$draft, 'recipientList' => &$recipientList));
 
 				savePMDraft($recipientList, $draft, isset($_REQUEST['xml']));
 				throw new Controller_Redirect_Exception('', '');

@@ -54,38 +54,17 @@
 		this.opts._bInDraftMode = true;
 
 		// Get all the form elements that we want to save
-		var aSections = [
-			'topic=' + parseInt(document.forms.postmodify.elements['topic'].value),
-			'id_draft=' + (('id_draft' in document.forms.postmodify.elements) ? parseInt(document.forms.postmodify.elements['id_draft'].value) : 0),
-			'subject=' + document.forms.postmodify['subject'].value.replace(/&#/g, "&#38;#").php_urlencode(),
-			'message=' + sPostdata.replace(/&#/g, "&#38;#").php_urlencode(),
-			'icon=' + document.forms.postmodify['icon'].value.replace(/&#/g, "&#38;#").php_urlencode(),
-			'save_draft=true',
-			elk_session_var + '=' + elk_session_id
-		];
+		var $aForm = $('#postmodify').clone();
 
-		// Get the locked an/or sticky values if they have been selected or set that is
-		if (this.opts.sType && this.opts.sType === 'post')
-		{
-			var oLock = document.getElementById('check_lock'),
-				oSticky = document.getElementById('check_sticky'),
-				oSmile = document.getElementById('check_smileys');
-
-			if (oLock && oLock.checked)
-				aSections[aSections.length] = 'lock=1';
-
-			if (oSticky && oSticky.checked)
-				aSections[aSections.length] = 'sticky=1';
-
-			if (oSmile && oSmile.checked)
-				aSections[aSections.length] = 'ns=1';
-		}
+		$aForm.find("input[name='message']").val(sPostdata.replace(/&#/g, "&#38;#").php_urlencode());
+		$aForm.append($('<input />').attr('name', 'save_draft').val(true));
+		$aForm.append($('<input />').attr('name', 'autosave').val(true));
 
 		// Keep track of source or wysiwyg when using the full editor
-		aSections[aSections.length] = 'message_mode=' + (editor.inSourceMode() ? '1' : '0');
+		$aForm.append($('<input />').attr('name', 'message_mode').val(editor.inSourceMode() ? '1' : '0'));
 
 		// Send in the request to save the data
-		this.draftAjax(aSections, "?action=post2;board=" + this.opts.iBoard + ";xml");
+		this.draftAjax($aForm.serialize(), "?action=post2;board=" + this.opts.iBoard + ";xml");
 	};
 
 	/**
@@ -127,6 +106,7 @@
 			'recipient_to=' + aTo,
 			'recipient_bcc=' + aBcc,
 			'save_draft=true',
+			'autosave=true',
 			elk_session_var + '=' + elk_session_id
 		];
 
@@ -135,7 +115,7 @@
 			aSections[aSections.length] = 'message_mode=' + (editor.inSourceMode() ? '1' : '0');
 
 		// Send in (post) the document for saving
-		this.draftAjax(aSections, "?action=pm;sa=send2;xml");
+		this.draftAjax($(document.forms.pmFolder).serialize(), "?action=pm;sa=send2;xml");
 	};
 
 	/**
@@ -157,7 +137,7 @@
 			type: "POST",
 			dataType: 'xml',
 			url: elk_scripturl + action,
-			data: post.join("&"),
+			data: post,
 			context: this
 		})
 		.done(function(data, textStatus, jqXHR) {

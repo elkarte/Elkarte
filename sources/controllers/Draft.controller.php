@@ -19,7 +19,7 @@ if (!defined('ELK'))
  * This class handles requests that allow for the saving,
  * retrieving, deleting and settings for the drafts functionality.
  */
-class Draft_Controller extends Action_Controller
+class Draft_Controller extends Post_Controller
 {
 	/**
 	 * The id of the member
@@ -52,6 +52,30 @@ class Draft_Controller extends Action_Controller
 	}
 
 	/**
+	 * @override
+	 */
+	public function action_post()
+	{
+		$this->action_index();
+	}
+
+	/**
+	 * @override
+	 */
+	public function action_post2()
+	{
+		$this->action_index();
+	}
+
+	/**
+	 * @override
+	 */
+	public function action_save()
+	{
+		$this->action_index();
+	}
+
+	/**
 	 * Show all drafts of a given type by the current user
 	 *
 	 * What it does:
@@ -73,6 +97,7 @@ class Draft_Controller extends Action_Controller
 		// Some initial context.
 		$context['start'] = $this->_req->getQuery('start', 'intval', 0);
 		$context['current_member'] = $this->_memID;
+		$context['attach_source'] = 1;
 
 		// If just deleting a draft, do it and then redirect back.
 		if (!empty($this->_req->query->delete) || !empty($this->_req->post->delete))

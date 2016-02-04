@@ -92,6 +92,7 @@ class Attachment_Controller extends Action_Controller
 				require_once(SUBSDIR . '/Attachments.subs.php');
 
 				$process = $this->_req->getPost('msg', 'intval', '');
+
 				processAttachments($process);
 			}
 
@@ -116,7 +117,8 @@ class Attachment_Controller extends Action_Controller
 					{
 						$resp_data = array(
 							'name' => $val['name'],
-							'attachid' => $attachID,
+							'temp_attachid' => $attachID,
+							'attachid' => empty($val['id']) ? $attachID : $val['id'],
 							'size' => $val['size']
 						);
 					}
@@ -214,8 +216,33 @@ class Attachment_Controller extends Action_Controller
 		// This is just a regular attachment...
 		else
 		{
-			isAllowedTo('view_attachments');
-			$attachment = getAttachmentFromTopic($id_attach, $topic);
+			$attach_source = $this->_req->getQuery('status', 'intval', 0);
+			$id_board = null;
+
+			if (empty($topic))
+			{
+				$msgData = getMessageDataFromAttachment($id_attach, $attach_source);
+				$id_board = (int) $msgData['id_board'];
+				$id_topic = (int) $msgData['id_topic'];
+			}
+			else
+			{
+				$id_topic = $topic;
+			}
+
+			isAllowedTo('view_attachments', $id_board);
+
+			$this->_events->trigger('get_attachment_data', array('attach_source' => &$attach_source));
+
+			if ($this->_req->getQuery('thumb') === null)
+			{
+				$attachment = getAttachmentFromTopic($id_attach, $id_topic, $attach_source);
+			}
+			else
+			{
+				$attachment = getAttachmentThumbFromTopic($id_attach, $id_topic, $attach_source);
+				// @todo: if it is not an image, get a default icon based on extension
+			}
 		}
 
 		if (empty($attachment))
@@ -390,7 +417,7 @@ class Attachment_Controller extends Action_Controller
 
 		try
 		{
-			if (empty($topic) || (string) (int) $this->_req->query->attach !== (string) $this->_req->query->attach)
+			if ((empty($topic) && empty($_REQUEST['id_draft'])) || (string) (int) $this->_req->query->attach !== (string) $this->_req->query->attach)
 			{
 				$attach_data = getTempAttachById($this->_req->query->attach);
 				$file_ext = pathinfo($attach_data['name'], PATHINFO_EXTENSION);
@@ -404,8 +431,8 @@ class Attachment_Controller extends Action_Controller
 				$id_attach = $this->_req->getQuery('attach', 'intval', -1);
 
 				isAllowedTo('view_attachments');
-				$attachment = getAttachmentFromTopic($id_attach, $topic);
 
+				$attachment = getAttachmentFromTopic($id_attach, $topic, 1, $user_info['id']);
 				if (empty($attachment))
 					Errors::instance()->fatal_lang_error('no_access', false);
 
@@ -428,6 +455,8 @@ class Attachment_Controller extends Action_Controller
 		while (ob_get_level() > 0)
 			@ob_end_clean();
 
+		$finfo = finfo_open(FILEINFO_MIME_TYPE); // return mime type ala mimetype extension
+
 		if (in_array($file_ext, array(
 			'c', 'cpp', 'css', 'csv', 'doc', 'docx', 'flv', 'html', 'htm', 'java', 'js', 'log', 'mp3',
 			'mp4', 'mgp', 'pdf', 'php', 'ppt', 'rtf', 'sql', 'tgz', 'txt', 'wav', 'xls', 'xml', 'zip'
@@ -441,6 +470,13 @@ class Attachment_Controller extends Action_Controller
 			if (!file_exists($filename))
 				$filename = $settings['theme_dir'] . '/images/mime_images/default.png';
 		}
+		elseif (substr(finfo_file($finfo, $filename), 0, 5) !== 'image')
+		{
+			$mime_type = 'image/png';
+			$resize = false;
+			$filename = $settings['theme_dir'] . '/images/mime_images/default.png';
+		}
+		finfo_close($finfo);
 
 		ob_start();
 		header('Content-Encoding: none');
