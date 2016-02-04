@@ -5,13 +5,11 @@
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
- * This software is a derived product, based on:
- *
- * Simple Machines Forum (SMF)
+ * This file contains code covered by:
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.1 dev
+ * @version 1.1 beta 1
  *
  */
 
@@ -27,6 +25,12 @@ $disable_security = false;
 
 // How long, in seconds, must admin be inactive to allow someone else to run?
 $upcontext['inactive_timeout'] = 10;
+
+// This bunch of indexes necessary in the template and are set a bit too late
+$upcontext['current_item_num'] = 0;
+$upcontext['current_item_name'] = '';
+$upcontext['current_debug_item_num'] = 0;
+$upcontext['current_debug_item_name'] = '';
 
 // All the steps in detail.
 // Number,Name,Function,Progress Weight.

@@ -5,13 +5,11 @@
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
- * This software is a derived product, based on:
- *
- * Simple Machines Forum (SMF)
+ * This file contains code covered by:
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.1 dev
+ * @version 1.1 beta 1
  *
  */
 
@@ -219,6 +217,15 @@ function template_settings()
 			'type' => 'number',
 		),
 		'',
+		array(
+			'id' => 'recent_post_topics',
+			'label' => $txt['recent_post_topics'],
+			'options' => array(
+				0 => $txt['show_recent_posts'],
+				1 => $txt['show_recent_topics'],
+			),
+			'type' => 'number',
+		),
 		array(
 			'id' => 'number_recent_posts',
 			'label' => $txt['number_recent_posts'],

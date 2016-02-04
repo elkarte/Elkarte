@@ -80,6 +80,7 @@ $txt['enable_news_random_name'] = 'Random:';
 $txt['enable_news_random_desc'] = 'One news shown chosen at random.';
 $txt['enable_news_fader_name'] = 'Fader:';
 $txt['enable_news_fader_desc'] = 'All the news are displayed sequentially.';
+
 $txt['show_group_key'] = 'Show group key on board index.';
 $txt['additional_options_collapsible'] = 'Enable collapsible additional post options.';
 $txt['who_display_viewing'] = 'Show who is viewing the board index and posts:';
@@ -98,8 +99,12 @@ $txt['show_view_profile_button'] = 'Show view profile button under post.';
 $txt['enable_mark_as_read'] = 'Enable and show \'Mark as Read\' buttons.';
 $txt['header_logo_url'] = 'Logo image URL:';
 $txt['header_logo_url_desc'] = '(Leave blank to show forum name or default logo.)';
-$txt['number_recent_posts'] = 'Number of recent posts to display on board index:';
-$txt['number_recent_posts_desc'] = '(To disable the recent posts bar set this value to zero.)';
+
+$txt['recent_post_topics'] = 'Show recent posts or recent topics on board index.';
+$txt['show_recent_topics'] = 'Show recent topics';
+$txt['show_recent_posts'] = 'Show recent posts';
+$txt['number_recent_posts'] = 'Number of recent posts or topics to display on board index:';
+$txt['number_recent_posts_desc'] = '(To disable the recent posts/topics bar set this value to zero.)';
 $txt['hide_post_group'] = 'Hide post group titles for grouped members.';
 $txt['hide_post_group_desc'] = '(Enabling this will not display a member\'s post group title on the message view if they are assigned to a non-post based group.)';
 

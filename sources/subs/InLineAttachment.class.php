@@ -6,7 +6,7 @@
  * @author    Spuds
  * @copyright (c) 2014 Spuds
  *
- * @version   1.0
+ * @version 1.1 beta 1
  *
  * Based on original code by mouser http://www.donationcoder.com
  * Updated/Modified/etc with permission

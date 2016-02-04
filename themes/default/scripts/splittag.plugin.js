@@ -11,7 +11,7 @@
  * Original code author: Aziz
  * License: http://opensource.org/licenses/Zlib
  *
- * @version 1.1 dev
+ * @version 1.1 beta 1
  *
  */
 

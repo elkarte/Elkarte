@@ -131,42 +131,12 @@ class TestFiles extends PHPUnit_Framework_TestCase
  \* @copyright ElkArte Forum contributors
  \* @license\s+?BSD http:\/\/opensource\.org\/licenses\/BSD-3-Clause
  \*
- \* This software is a derived product, based on:
- \*
- \* Simple Machines Forum \(SMF\)
- \* copyright:\s+?20\d\d Simple Machines (?:Forum )?\(http:\/\/www\.simplemachines\.org\)
- \* license:\s+?BSD, See included LICENSE\.TXT for terms and conditions\.
- \*
- \* @version \d+\.\d+(?:\.\d+|\sdev|\s(beta|RC|Release Candidate)\s\d+)
-(?:(?: \*\n)?|(?: \*(?:\s.{0,200})?\n))+ \*\/',
-			// SMF-derived v2
-			'^<\?php
-
-\/\*\*
-(?: \*.{0,200}\n)* \* @name\s{1,10}ElkArte Forum
- \* @copyright ElkArte Forum contributors
- \* @license\s+?BSD http:\/\/opensource\.org\/licenses\/BSD-3-Clause
- \*
  \* This file contains code covered by:
  \* copyright:\s+?20\d\d Simple Machines (?:Forum )?\(http:\/\/www\.simplemachines\.org\)
- \* license:\s+?BSD, See included LICENSE\.TXT for terms and conditions\.
+ \* license:\s+?BSD, See included LICENSE\.TXT for terms and conditions\.(
  \*
- \* @version \d+\.\d+(?:\.\d+|\sdev|\s(beta|RC|Release Candidate)\s\d+)
-(?:(?: \*\n)?|(?: \*(?:\s.{0,200})?\n))+ \*\/',
-			// Special case, explicitly added on purpose.
-			'^<\?php
-
-\/\*\*
-(?: \*.{0,200}\n)* \* @name\s{1,10}ElkArte Forum
- \* @copyright ElkArte Forum contributors
- \* @license   BSD http:\/\/opensource\.org\/licenses\/BSD-3-Clause
- \*
- \* This file contains code covered by:
- \* copyright:	20\d\d Simple Machines (?:Forum )?\(http:\/\/www\.simplemachines\.org\)
- \* license:(\s+?)BSD, See included LICENSE\.TXT for terms and conditions\.
- \*
- \* copyright:	2004-2011, GreyWyvern - All rights reserved\.
- \* license:(\s+?)BSD, See included LICENSE\.TXT for terms and conditions\.
+ \* copyright:\s+?2004-2011, GreyWyvern - All rights reserved\.
+ \* license:\s+?BSD, See included LICENSE.TXT for terms and conditions.)?
  \*
  \* @version \d+\.\d+(?:\.\d+|\sdev|\s(beta|RC|Release Candidate)\s\d+)
 (?:(?: \*\n)?|(?: \*(?:\s.{0,200})?\n))+ \*\/',
@@ -179,7 +149,7 @@ class TestFiles extends PHPUnit_Framework_TestCase
  \* @author    Spuds
  \* @copyright \(c\) 2014 Spuds
  \*
- \* @version   1\.0
+ \* @version \d+\.\d+(?:\.\d+|\sdev|\s(beta|RC|Release Candidate)\s\d+)
 (( \*\n)?|( \*(\s.{0,200})?\n))+ \*\/',
 		);
 		foreach ($this->_ourFiles as $file)

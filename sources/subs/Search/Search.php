@@ -7,13 +7,11 @@
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
- * This software is a derived product, based on:
- *
- * Simple Machines Forum (SMF)
+ * This file contains code covered by:
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.1 dev
+ * @version 1.1 beta 1
  *
  */
 
@@ -31,7 +29,7 @@ $GLOBALS['search_versions'] = array(
 
 	// This is the minimum version of ElkArte that an API could have been written for to work.
 	// (strtr to stop accidentally updating version on release)
-	'search_version' => strtr('ElkArte 1+0', array('+' => '.', '=' => ' ')),
+	'search_version' => strtr('ElkArte 1+1', array('+' => '.', '=' => ' ')),
 );
 
 /**
@@ -205,7 +203,7 @@ class Search
 	 */
 	public function __construct()
 	{
-		$this->_search_version = strtr('ElkArte 1+0', array('+' => '.', '=' => ' '));
+		$this->_search_version = strtr('ElkArte 1+1', array('+' => '.', '=' => ' '));
 		$this->_db = database();
 		$this->_db_search = db_search();
 
