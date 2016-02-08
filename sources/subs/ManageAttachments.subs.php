@@ -172,6 +172,8 @@ function removeAttachments($condition, $query_type = '', $return_affected_messag
 	$attach = array();
 	$parents = array();
 
+	require_once(SUBSDIR . '/Attachments.subs.php');
+
 	// Get all the attachment names and id_msg's.
 	$request = $db->query('', '
 		SELECT
@@ -555,6 +557,8 @@ function findOrphanThumbnails($start, $fix_errors, $to_fix)
 {
 	$db = database();
 
+	require_once(SUBSDIR . '/Attachments.subs.php');
+
 	$result = $db->query('', '
 		SELECT thumb.id_attach, thumb.id_folder, thumb.filename, thumb.file_hash
 		FROM {db_prefix}attachments AS thumb
@@ -673,6 +677,8 @@ function repairAttachmentData($start, $fix_errors, $to_fix)
 	global $modSettings;
 
 	$db = database();
+
+	require_once(SUBSDIR . '/Attachments.subs.php');
 
 	$repair_errors = array(
 		'wrong_folder' => 0,
@@ -807,6 +813,8 @@ function findOrphanAvatars($start, $fix_errors, $to_fix)
 
 	$db = database();
 
+	require_once(SUBSDIR . '/Attachments.subs.php');
+
 	$to_remove = $db->fetchQueryCallback('
 		SELECT a.id_attach, a.id_folder, a.filename, a.file_hash, a.attachment_type
 		FROM {db_prefix}attachments AS a
@@ -866,6 +874,8 @@ function findOrphanAvatars($start, $fix_errors, $to_fix)
 function findOrphanAttachments($start, $fix_errors, $to_fix)
 {
 	$db = database();
+
+	require_once(SUBSDIR . '/Attachments.subs.php');
 
 	$to_remove = $db->fetchQueryCallback('
 		SELECT a.id_attach, a.id_folder, a.filename, a.file_hash
@@ -1520,6 +1530,8 @@ function moveAvatars()
 	global $modSettings;
 
 	$db = database();
+
+	require_once(SUBSDIR . '/Attachments.subs.php');
 
 	$request = $db->query('', '
 		SELECT id_attach, id_folder, id_member, filename, file_hash
