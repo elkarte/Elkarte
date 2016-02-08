@@ -53,6 +53,7 @@ class Draft_Controller extends Post_Controller
 
 	/**
 	 * @override
+	 * @todo implement the saving of drafts bypassing the Post_Controller
 	 */
 	public function action_post()
 	{
@@ -61,6 +62,7 @@ class Draft_Controller extends Post_Controller
 
 	/**
 	 * @override
+	 * @todo implement the saving of drafts bypassing the Post_Controller
 	 */
 	public function action_post2()
 	{
@@ -69,6 +71,7 @@ class Draft_Controller extends Post_Controller
 
 	/**
 	 * @override
+	 * @todo implement the saving of drafts bypassing the Post_Controller
 	 */
 	public function action_save()
 	{
