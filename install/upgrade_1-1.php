@@ -453,13 +453,13 @@ class UpgradeInstructions_upgrade_1_1
 
 	public function fix_ipv6()
 	{
-		$columns = $this->table->db_remove_index('{db_prefix}log_online', true);
-
 		return array(
 			array(
 				'debug_title' => 'Converting IP columns to varchar instead of int...',
-				'function' => function($db, $db_table) use ($columns)
+				'function' => function($db, $db_table)
 				{
+					$columns = $db_table->db_remove_index('{db_prefix}log_online', true);
+
 					$column_name = 'ip';
 
 					foreach ($columns as $column)
