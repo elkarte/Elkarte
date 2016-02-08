@@ -657,8 +657,17 @@ function template_postarea_below()
 
 	// Assuming this isn't a new topic pass across the last message id.
 	if (isset($context['topic_last_message']))
+	{
 		echo '
 			<input type="hidden" name="last_msg" value="', $context['topic_last_message'], '" />';
+	}
+
+	// Better remember the draft id when passing from a page to another.
+	if (isset($context['id_draft']))
+	{
+		echo '
+			<input type="hidden" name="id_draft" value="', $context['id_draft'], '" />';
+	}
 
 	// If we are starting a new topic starting from another one, here is the place to remember some details
 	if (!empty($context['original_post']))
