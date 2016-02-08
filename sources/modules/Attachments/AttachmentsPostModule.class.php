@@ -72,7 +72,6 @@ class Attachments_Post_Module implements ElkArte\sources\modules\Module_Interfac
 			if (isset($_POST['save_draft']))
 			{
 				$return = array_merge($return, array(
-					array('after_loading_drafts', array('Attachments_Post_Module', 'after_loading_drafts'), array('current_draft')),
 					array('before_save_draft', array('Attachments_Post_Module', 'before_save_draft'), array()),
 					array('after_save_draft', array('Attachments_Post_Module', 'after_save_draft'), array()),
 					array('before_delete_draft', array('Attachments_Post_Module', 'before_delete_draft'), array()),
@@ -81,6 +80,7 @@ class Attachments_Post_Module implements ElkArte\sources\modules\Module_Interfac
 			else
 			{
 				$return = array_merge($return, array(
+					array('after_loading_drafts', array('Attachments_Post_Module', 'after_loading_drafts'), array('current_draft')),
 					array('prepare_save_post', array('Attachments_Post_Module', 'prepare_save_post'), array('post_errors')),
 					array('pre_save_post', array('Attachments_Post_Module', 'pre_save_post'), array('msgOptions')),
 					array('after_save_post', array('Attachments_Post_Module', 'after_save_post'), array('msgOptions')),
