@@ -52,7 +52,8 @@ foreach (array('db_character_set', 'cachedir') as $variable)
 $settings_loc = 'Settings.php';
 
 // First thing: if the install dir exists, just send anybody there
-if (file_exists('install'))
+// The ignore_install_dir var is for developers only. Do not add it on production sites
+if (file_exists('install') && empty($ignore_install_dir))
 {
 	if (file_exists($settings_loc))
 	{
@@ -68,12 +69,8 @@ if (file_exists('install'))
 		$redirec_file = 'install.php';
 	}
 
-	// The ignore_install_dir var is for developers only. Do not add it on production sites
-	if (empty($ignore_install_dir))
-	{
-		header('Location: http' . (!empty($_SERVER['HTTPS']) && strtolower($_SERVER['HTTPS']) == 'on' ? 's' : '') . '://' . (empty($_SERVER['HTTP_HOST']) ? $_SERVER['SERVER_NAME'] . (empty($_SERVER['SERVER_PORT']) || $_SERVER['SERVER_PORT'] == '80' ? '' : ':' . $_SERVER['SERVER_PORT']) : $_SERVER['HTTP_HOST']) . (strtr(dirname($_SERVER['PHP_SELF']), '\\', '/') == '/' ? '' : strtr(dirname($_SERVER['PHP_SELF']), '\\', '/')) . '/install/' . $redirec_file);
-		die;
-	}
+	header('Location: http' . (!empty($_SERVER['HTTPS']) && strtolower($_SERVER['HTTPS']) == 'on' ? 's' : '') . '://' . (empty($_SERVER['HTTP_HOST']) ? $_SERVER['SERVER_NAME'] . (empty($_SERVER['SERVER_PORT']) || $_SERVER['SERVER_PORT'] == '80' ? '' : ':' . $_SERVER['SERVER_PORT']) : $_SERVER['HTTP_HOST']) . (strtr(dirname($_SERVER['PHP_SELF']), '\\', '/') == '/' ? '' : strtr(dirname($_SERVER['PHP_SELF']), '\\', '/')) . '/install/' . $redirec_file);
+	die;
 }
 else
 {
