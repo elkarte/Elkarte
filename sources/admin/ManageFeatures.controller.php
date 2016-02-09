@@ -1307,7 +1307,7 @@ class ManageFeatures_Controller extends Action_Controller
 				array('check', 'minify_css_js'),
 			'',
 				// SEO stuff
-				array('check', 'queryless_urls', 'subtext' => '<strong>' . $txt['queryless_urls_note'] . '</strong><br />' . ($context['server']['is_apache'] || $context['server']['is_lighttpd'] ? $txt['queryless_urls_work'] : '<span class="error">' . $txt['queryless_urls_notwork'] . '</span>')),
+				array('check', 'queryless_urls', 'subtext' => '<strong>' . $txt['queryless_urls_note'] . '</strong><br />' . ($context['server']['is_apache'] || $context['server']['is_nginx'] || $context['server']['is_lighttpd'] ? $txt['queryless_urls_work'] : '<span class="error">' . $txt['queryless_urls_notwork'] . '</span>')),
 			'',
 				// Number formatting, timezones.
 				array('text', 'time_format'),
