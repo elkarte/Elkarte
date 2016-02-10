@@ -80,7 +80,6 @@ class InstallInstructions_install_1_1
 			array(
 				array('name' => 'id_attach',       'columns' => array('id_attach'), 'type' => 'primary'),
 				array('name' => 'id_member',       'columns' => array('id_member', 'id_attach'), 'type' => 'unique'),
-				array('name' => 'id_msg',          'columns' => array('id_msg'), 'type' => 'key'),
 				array('name' => 'attachment_type', 'columns' => array('attachment_type'), 'type' => 'key'),
 				array('name' => 'id_thumb',        'columns' => array('id_thumb'), 'type' => 'key'),
 				array('name' => 'attach_source',   'columns' => array('id_msg', 'attach_source'), 'type' => 'key'),

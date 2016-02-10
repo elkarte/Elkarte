@@ -1185,7 +1185,7 @@ class Post_Controller extends Action_Controller
 			// Want to modify a single message by double clicking it?
 			if (isset($_REQUEST['modify']))
 			{
-				$row['body'] = censor($row['subject']);
+				$row['subject'] = censor($row['subject']);
 
 				$context['sub_template'] = 'modifyfast';
 				$context['message'] = array(

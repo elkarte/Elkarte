@@ -134,8 +134,11 @@ class Drafts_Post_Module implements ElkArte\sources\modules\Module_Interface
 				$this->_prepareDraftsContext($user_info['id'], $topic);
 				self::$_eventsManager->trigger('after_loading_drafts', array('loaded_drafts' => &$this->_loaded_drafts, 'current_draft' => &$this->_current_draft));
 
-				$context['message'] = $editorOptions['value'] = $this->_current_draft['body'];
-				$context['subject'] = addcslashes($this->_current_draft['subject'], '"');
+				if (!empty($this->_current_draft))
+				{
+					$context['message'] = $editorOptions['value'] = $this->_current_draft['body'];
+					$context['subject'] = addcslashes($this->_current_draft['subject'], '"');
+				}
 			}
 
 			if (!empty($context['drafts']))
@@ -162,7 +165,7 @@ class Drafts_Post_Module implements ElkArte\sources\modules\Module_Interface
 				$context['drafts_save'] = !empty($modSettings['drafts_enabled']) && !empty($modSettings['drafts_post_enabled']) && allowedTo('post_draft');
 
 			// Can you be, should you be ... here?
-			if (!empty($context['drafts_save']) && isset($_POST['id_draft']))
+			if (!empty($context['drafts_save']))
 			{
 				// Prepare and clean the data, load the draft array
 				$draft = array(
