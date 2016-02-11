@@ -624,7 +624,7 @@ function registerMember(&$regOptions, $error_context = 'register')
 		'member_ip' => $regOptions['interface'] == 'admin' ? '127.0.0.1' : $regOptions['ip'],
 		'member_ip2' => $regOptions['interface'] == 'admin' ? '127.0.0.1' : $regOptions['ip2'],
 		'validation_code' => $validation_code,
-		'real_name' => $regOptions['username'],
+		'real_name' => !empty($regOptions['real_name']) ? $regOptions['real_name'] : $regOptions['username'],
 		'personal_text' => $modSettings['default_personal_text'],
 		'pm_email_notify' => 1,
 		'id_theme' => 0,
