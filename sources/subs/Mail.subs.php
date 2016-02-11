@@ -1311,6 +1311,7 @@ function reduceMailQueue($batch_size = false, $override_limit = false, $force_se
 		if ($use_sendmail)
 		{
 			$email['subject'] = strtr($email['subject'], array("\r" => '', "\n" => ''));
+			$email['body_fail'] = $email['body'];
 
 			if (!empty($modSettings['mail_strip_carriage']))
 			{
@@ -1328,7 +1329,6 @@ function reduceMailQueue($batch_size = false, $override_limit = false, $force_se
 				$unq_head = md5($scripturl . microtime() . rand()) . '-' . $email['message_id'];
 				$encoded_unq_head = base64_encode($line_break . $line_break . '[' . $unq_head . ']' . $line_break);
 				$unq_id = ($need_break ? $line_break : '') . 'Message-ID: <' . $unq_head . strstr(empty($modSettings['maillist_mail_from']) ? $webmaster_email : $modSettings['maillist_mail_from'], '@') . '>';
-				$email['body_fail'] = $email['body'];
 				$email['body'] = mail_insert_key($email['body'], $unq_head, $encoded_unq_head, $line_break);
 			}
 			elseif ($email['message_id'] !== null && empty($modSettings['mail_no_message_id']))

@@ -318,6 +318,7 @@ class Html_2_BBC
 				break;
 			case 'div':
 				$bbc = $this->strip_newlines ? str_replace("\n", ' ', $this->_convert_styles($node)) : $this->_convert_styles($node);
+				$bbc = preg_replace('~ {2,}~', '&nbsp; ', $bbc);
 				break;
 			case 'em':
 			case 'i':
