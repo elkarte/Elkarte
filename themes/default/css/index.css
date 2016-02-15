@@ -223,7 +223,7 @@ select {
 }
 
 input, button, select, textarea, .editor {
-	border: 1px solid #CCCCCC;
+	border: 1px solid;
 	border-radius: 2px;
 }
 
@@ -283,9 +283,7 @@ input[type="submit"], .drop_area_fileselect_text, button[type="submit"], input[t
 	/* These have standard body text size. Can be chained with smalltext class. */
 .linkbutton:link, .linkbutton_right:link, .linkbutton_left:link,
 .linkbutton:visited, .linkbutton_right:visited, .linkbutton_left:visited {
-	border: 1px solid #AFAFAF;
-	border-top: 1px solid #CFCFCF;
-	border-left: 1px solid #BFBFBF;
+	border: 1px solid;
 	border-radius: 2px;
 }
 
@@ -306,10 +304,7 @@ input[type="submit"]:hover, button[type="submit"]:hover, input[type="button"]:ho
 
 /* Don't show disabled buttons as active on hover */
 input[type=submit][disabled]:hover, button[disabled], button[disabled]:hover {
-	border: 1px solid #AFAFAF;
-	border-top: 1px solid #CFCFCF;
-	border-left: 1px solid #BFBFBF;
-	box-shadow: 1px 1px 2px #E5E5E5;
+	border: 1px solid;
 }
 
 .linkbutton:link, .linkbutton_right:link, .linkbutton_left:link,
@@ -368,7 +363,7 @@ del .bbc_link:link, del .bbc_link:visited {
 hr {
 	margin: 12px 0;
 	height: 1px;
-	border-top: 1px solid #BBBBBB;
+	border-top: 1px solid;
 	border-left: 0;
 }
 
@@ -498,9 +493,7 @@ em, .em {
 	padding: 4px 10px 2px 10px;
 	font-size: 1.214em;
 	line-height: 1.8em;
-	border: 1px solid #CCCCCC;
-	border-top: 1px solid #DDDDDD;
-	border-bottom: 1px solid #BBBBBB;
+	border: 1px solid;
 	border-radius: 4px 4px 0 0;
 }
 
@@ -510,8 +503,7 @@ em, .em {
 	padding: 1px 10px 1px;
 	font-size: 1.143em;
 	line-height: 1.8em;
-	border: 1px solid #CCCCCC;
-	border-top: 1px solid #DDDDDD;
+	border: 1px solid;
 }
 
 .category_header .icon {
@@ -601,7 +593,7 @@ em, .em {
 .content {
 	overflow: auto;
 	padding: 0.5em 1em;
-	border: 1px solid #CCCCCC;
+	border: 1px solid;
 }
 
 .content p {
@@ -619,7 +611,7 @@ em, .em {
 	overflow: hidden;
 	margin: 2px 0 0 0;
 	padding: 9px;
-	border: 1px solid #CCCCCC;
+	border: 1px solid;
 	border-radius: 7px;
 }
 
@@ -636,7 +628,7 @@ em, .em {
 	overflow: auto;
 	margin: 4px 0 0 0;
 	padding: 8px 8px 16px 8px;
-	border: 1px solid #CCCCCC;
+	border: 1px solid;
 	border-radius: 7px;
 }
 
@@ -647,7 +639,7 @@ em, .em {
 }
 
 .generic_list_wrapper .title_bar {
-	border-bottom: 1px solid #FEFEFE;
+	border-bottom: 1px solid;
 	border-radius: 0;
 }
 
@@ -661,7 +653,7 @@ em, .em {
 	margin: 0;
 	padding: 0;
 	border: none;
-	border-bottom: 1px solid #FEFEFE;
+	border-bottom: 1px solid;
 }
 
 /* Styles used by the auto suggest control. */
@@ -669,7 +661,7 @@ em, .em {
 	position: absolute;
 	z-index: 100;
 	visibility: hidden;
-	border: 1px solid #BBBBBB;
+	border: 1px solid;
 	border-radius: 3px;
 }
 
@@ -701,12 +693,12 @@ em, .em {
 	padding: 4px 6px 2px 6px;
 	font-weight: bold;
 	font-size: 0.857em;
-	border: 1px solid #CCCCCC;
+	border: 1px solid;
 	border-bottom: none;
 }
 
 .codeheader {
-	border-top: 3px solid #AFAFAF;
+	border-top: 3px solid;
 }
 
 /* Use demi bold font weight for some key areas */
@@ -738,7 +730,7 @@ em, .em {
 	margin: 0 0 1em 0;
 	padding: 6px 10px;
 	font-size: 0.857em;
-	border: 1px solid #CCCCCC;
+	border: 1px solid;
 	border-top: none;
 }
 
@@ -749,8 +741,8 @@ em, .em {
 	white-space: nowrap;
 	font-family: "DejaVu Sans Mono", Monaco, Consolas, monospace;
 	resize: vertical;
-	border-top: 3px solid #AFAFAF;
-	border-bottom: 3px solid #AFAFAF;
+	border-top: 3px solid;
+	border-bottom: 3px solid;
 }
 
 .bbc_code .tab {
@@ -837,7 +829,7 @@ strong, .bbc_strong {
 }
 
 div.bbc_footnotes {
-	border-top: 1px solid #BFBFBF;
+	border-top: 1px solid;
 }
 
 sup.bbc_footnotes, sup.bbc_footnotes a {
@@ -875,7 +867,7 @@ a.bbc_link {
 
 .spoiler {
 	padding: 0.3em;
-	border: 1px solid #CCCCCC;
+	border: 1px solid;
 }
 
 .spoilerheader {
@@ -898,7 +890,7 @@ a.bbc_link {
 	width: 100%;
 	text-align: center;
 	font-size: 1.571em;
-	border-bottom: 4px solid #3D6E32;
+	border-bottom: 4px solid;
 }
 
 #ajax_in_progress a {
@@ -923,8 +915,8 @@ a.bbc_link {
 #top_section {
 	margin: 0;
 	padding: 0;
-	border-top: 4px solid #5BA048;
-	border-bottom: 4px solid #3D6E32;
+	border-top: 4px solid;
+	border-bottom: 4px solid;
 }
 
 #top_section_notice {
@@ -982,12 +974,12 @@ a.bbc_link {
 }
 
 #search_form select {
-	border: 1px solid #AFAFAF;
+	border: 1px solid;
 	border-right: none;
 }
 
 #search_form select:focus {
-	border: 1px solid #999999;
+	border: 1px solid;
 	border-right: none;
 }
 
@@ -1397,7 +1389,6 @@ a.bbc_link {
 	margin-top: 7px;
 	padding-top: 4px;
 	border-top: 1px solid;
-	box-shadow: 0 -1px 0 #BBBBBB;
 }
 
 /* Levels 2 and 3: highlighting of current section */
@@ -2816,6 +2807,7 @@ img.new_posts {
 	overflow: auto;
 	margin: 0 0 2em;
 	padding: 12px 30px 0 25px;
+	border-top: 1px solid;
 }
 
 #poll_options .options li:after {
@@ -2853,6 +2845,11 @@ img.new_posts {
 }
 
 /* On to the posts */
+#quickreplybox, #forumposts, #searchform, #recentposts, #pmFolder, #topic_summary, #preview_section {
+	border-radius: 4px 4px 0 0;
+}
+
+/* On to the posts */
 #forumposts {
 	clear: both;
 	margin: 6px 0 0 0;
@@ -2879,6 +2876,11 @@ img.new_posts {
 
 #redirectfrom {
 	display: inline-block;
+}
+
+.forumposts {
+	margin-top: 2px;
+	border: 1px solid;
 }
 
 /* Poster and postarea + moderation area underneath */
@@ -2979,6 +2981,8 @@ img.new_posts {
 .report_seperator {
 	margin: 6px 0 0 0;
 	height: 1px;
+	max-width: 14em;
+	border-bottom: 1px solid;
 }
 
 /* Icon tweaks for several areas. */
@@ -3012,6 +3016,12 @@ img.new_posts {
 	display: block;
 	margin: 3px 1.5em;
 	line-height: 2em;
+	border: 1px solid;
+	border-radius: 2px;
+}
+
+.poster_online .linklevel1:hover {
+	text-decoration: none;
 }
 
 /* End nifty new flyout. */
@@ -3104,6 +3114,7 @@ img.new_posts {
 	-webkit-hyphens: auto;
 	-moz-hyphens: auto;
 	-ms-hyphens: auto;
+	border-top: 1px solid;
 }
 
 #topic_summary .inner {
@@ -3119,6 +3130,7 @@ img.new_posts {
 	overflow: auto;
 	padding: 8px 0;
 	font-size: 0.857em;
+	border-top: 1px solid;
 }
 
 .attachments {
@@ -3142,7 +3154,6 @@ img.new_posts {
 	left: 0;
 	z-index: 100;
 	overflow: hidden;
-	background: rgba(0, 0, 0, .5);
 	text-align: center;
 	white-space: nowrap;
 	cursor: pointer;
@@ -3176,7 +3187,7 @@ img.new_posts {
 	overflow: auto;
 	margin-top: 20px;
 	padding: 0;
-	border: 1px solid #fff;
+	border: 1px solid;
 }
 
 #elk_lb_expand {
@@ -3186,7 +3197,7 @@ img.new_posts {
 	display: inline-block;
 	width: 1.15em;
 	height: 1.15em;
-	border: 2px solid #CCCCCC;
+	border: 2px solid;
 	border-radius: 4px;
 	line-height: 1em;
 }
@@ -3221,6 +3232,8 @@ img.new_posts {
 	max-height: 480px;
 	width: 640px;
 	height: auto;
+	border: 1px solid;
+	border-top: 0;
 }
 
 .elk_video a img, .elk_video embed {
@@ -3232,6 +3245,7 @@ img.new_posts {
 	padding: 0 4px 0 6px;
 	max-width: 98%;
 	width: 630px;
+	border: 1px solid;
 }
 
 .elk_previewvideo {
@@ -3311,6 +3325,8 @@ dl.send_mail dd {
 	left: 5%;
 	width: 0;
 	height: 0;
+	border: 10px solid transparent;
+	content: ' ';
 }
 
 .requiredfield {
@@ -3320,6 +3336,7 @@ dl.send_mail dd {
 	display: none;
 	font-size: 90%;
 	line-height: 1.1em;
+	border: 1px solid;
 }
 
 .popup_content .r_name,
@@ -3343,6 +3360,7 @@ dl.send_mail dd {
 	overflow: auto;
 	margin: 2px 0 0;
 	padding: 0.5em 1em;
+	border: 1px solid;
 }
 
 #postmodify #message {
@@ -3396,11 +3414,16 @@ ul.post_options li {
 #postAdditionalOptions, #postDraftOptions {
 	overflow: auto;
 	margin: 0 0 1em 0;
+	border: 1px solid;
+	border-top: none;
+	border-radius: 0 0 4px 4px
 }
 
 #postAdditionalOptionsNC {
 	overflow: auto;
 	margin: 0 0 1em 0;
+	border: 1px solid;
+	border-radius: 4px;
 }
 
 .shortcuts {
@@ -3429,6 +3452,7 @@ ul.post_options li {
 	padding: 5px 10px;
 	width: 60%;
 	font-size: 0.857em;
+	border-top: 1px solid;
 }
 
 #postDraftOptions .settings dd {
@@ -3519,6 +3543,8 @@ ul.post_options li {
 	font-weight: normal;
 	font-size: 1.643em;
 	opacity: 0.6;
+	border: dashed 1px;
+	-webkit-font-smoothing: antialiased;
 }
 
 .drop_area_fileselect {
@@ -3548,6 +3574,8 @@ ul.post_options li {
 .statusbar {
 	overflow: hidden;
 	padding: 5px;
+	border-top: 1px solid;
+	border-bottom: 1px solid;
 }
 
 .info {
@@ -3565,6 +3593,7 @@ ul.post_options li {
 	border-radius: 5px;
 	vertical-align: middle;
 	text-align: center;
+	border: 1px solid;
 }
 
 .postattach_thumb img {
@@ -3585,6 +3614,7 @@ ul.post_options li {
 	padding: 4px 6px;
 	font-size: 1em;
 	cursor: pointer;
+	border-radius: 5px;
 }
 
 .share {
@@ -3598,6 +3628,10 @@ ul.post_options li {
 	overflow: hidden;
 	padding: 10px 0;
 	width: 97%;
+}
+
+#postMoreOptions {
+	border-top: 1px solid;
 }
 
 #postMoreOptions, #postAttachment2 {
@@ -3679,6 +3713,7 @@ ul.post_options li {
 
 .split_messages .post {
 	padding: 12px 0 0 0;
+	border-top: 1px solid;
 }
 
 /* The merge topic section. */
@@ -3741,6 +3776,12 @@ dl.merge_topic dd {
 
 .ui-tabs .ui-tabs-nav .ui-state-active a, .ui-tabs .ui-tabs-nav .ui-state-active {
 	font-weight: bold;
+	border-radius: 2px 2px 0 0;
+}
+
+.ui-tabs .ui-state-hover {
+	border: 1px solid;
+	text-decoration: none;
 }
 
 /* ------------------------------------------------------- */
@@ -3749,17 +3790,25 @@ dl.merge_topic dd {
 .ui-tabs .ui-tabs-panel {
 	clear: both;
 	padding-top: 8px;
+	border: 1px solid;
 }
 
 #profile_attachments {
 	overflow: auto;
 	margin: 12px 0 0 0;
 	padding: 8px 8px 16px 8px;
+	border: 1px solid;
+	border-radius: 7px;
 }
 
 #profile_attachments .content {
 	overflow: visible;
 	padding: 0.2em 1em;
+	border: none;
+}
+
+.content_noframe {
+	border: none;
 }
 
 .profileblock {
@@ -3811,19 +3860,29 @@ dl.merge_topic dd {
 	margin-right: 5px;
 }
 
+.profileblock ul li:not(:first-child):before {
+	content: "\20\7C\20";
+}
+
+.generic_border {
+	border: 1px solid;
+	border-radius: 6px;
+}
+
 .generic_border .avatar {
 	max-width: 40px;
 	max-height: 40px;
 	padding-top: 4px;
 }
 
-.attach_title {
+.attachment_title {
 	display: block;
 	overflow: hidden;
 	margin-bottom: 4px;
 	max-width: 100%;
 	text-overflow: ellipsis;
 	white-space: pre;
+	border-bottom: 1px solid;
 }
 
 /* The basic user info on the left */
@@ -3988,6 +4047,9 @@ dl.merge_topic dd {
 	padding-right: 0.5em;
 	text-align: center;
 	font-size: 0.786em;
+	border: 1px solid;
+	border-right-style: none;
+	border-left-style: none;
 }
 
 .activity_stats .last span {
@@ -3998,6 +4060,8 @@ dl.merge_topic dd {
 	margin: 0 auto;
 	max-width: 15px;
 	width: 50%;
+	border: 1px solid;
+	border-bottom: none;
 }
 
 .activity_stats li .bar span {
@@ -4066,6 +4130,7 @@ dl.merge_topic dd {
 
 .topic_details {
 	padding: 0 4px 4px 4px;
+	border-bottom: 1px solid;
 }
 
 .topic h4 {
@@ -4126,6 +4191,11 @@ dl.merge_topic dd {
 .ignoreboards a {
 	padding: 1px 0;
 	font-weight: bold;
+	border-bottom: 1px solid;
+}
+
+.ignoreboards a:hover {
+	text-decoration: none;
 }
 
 .ignoreboards ul {
@@ -4221,11 +4291,13 @@ dl.merge_topic dd {
 	margin: 6px 0 0 12px;
 	width: 10em;
 	height: 12px;
+	border: 1px solid;
 }
 
 #personal_messages .capacity_bar span {
 	display: block;
 	height: 12px;
+	border-right: 1px solid;
 }
 
 #personal_messages .reportlinks {
@@ -4306,6 +4378,11 @@ div.labels {
 	overflow: auto;
 }
 
+/* Used to indicate the current day. */
+#main_grid .calendar_today, #month_grid .calendar_today {
+	border: 1px solid;
+}
+
 #month_grid .category_header {
 	font-size: 1em;
 }
@@ -4329,6 +4406,7 @@ div.labels {
 	width: 100%;
 	border-spacing: 1px;
 	font-size: 0.857em;
+	border-top: 1px solid;
 }
 
 .calendar_table th, .calendar_table td {
@@ -4355,8 +4433,8 @@ div.labels {
 }
 
 #main_grid .weeks {
-	font-weight: bold;
-	font-size: 1.786em;
+	font-weight: normal;
+	font-size: 1em;
 }
 
 #main_grid .weeks a:hover {
@@ -4371,6 +4449,7 @@ div.labels {
 .weeklist > li {
 	overflow: hidden;
 	margin: 2px 0;
+	border: 1px solid;
 }
 
 .weeklist h4 {
@@ -4380,14 +4459,24 @@ div.labels {
 	font-size: 1.143em;
 }
 
+.weeklist h4 a:hover {
+	text-decoration: none;
+}
+
 /* Use the old one true layout trick here. */
 .weeklist .content, .weeklist .calendar_today {
 	margin: 0 0 -95px 11.5em;
 	padding: 8px 8px 100px 8px;
 }
 
+.hidelink {
+	font-style: italic;
+}
+
 #calendar_navigation {
 	padding: 12px 0;
+	border: 1px solid;
+	border-top: none;
 }
 
 /* Cheat and match this to the submit button. */
@@ -4448,6 +4537,8 @@ div.labels {
 	padding-top: 1px;
 	width: 49%;
 	font-size: 1.214em;
+	border: none;
+	border-bottom: 2px solid;
 }
 
 #top_row .category_header {
@@ -4461,6 +4552,7 @@ div.labels {
 
 .statistics .flow_hidden, #forum_history .flow_hidden {
 	margin: 2px 0 0 0;
+	border: 1px solid;
 }
 
 .stats {
@@ -4473,6 +4565,7 @@ div.labels {
 .stats.floatleft {
 	clear: left;
 	margin: 12px 0;
+	border-right: 1px solid;
 }
 
 .stats dt {
@@ -4492,6 +4585,7 @@ div.labels {
 	padding: 0 4px 0 0;
 	min-height: 1.5em;
 	width: 50%;
+	border: 1px solid;
 }
 
 .statsbar .bar {
@@ -4513,8 +4607,16 @@ div.labels {
 	line-height: 1.75em;
 }
 
+/* Test code - an attempt to make recent posts less overwhelming. */
+#recentposts .inner {
+	position: relative;
+	overflow: auto;
+	max-height: 20em;
+}
+
 #stats {
 	margin: 6px 0 16px 0;
+	border: none;
 }
 
 #stats th, #stats td {
@@ -4554,6 +4656,8 @@ div.labels {
 	overflow: auto;
 	margin: 12px 0 0 0;
 	padding: 8px 20px 12px 20px;
+	border: 1px solid;
+	border-radius: 7px;
 }
 
 #helpmain p {
@@ -4608,6 +4712,8 @@ a.help .icon {
 	padding: 6px 9px;
 	max-width: 350px;
 	word-wrap: break-word;
+	border: 1px solid;
+	border-radius: 4px;
 }
 
 /* The help pop-ups. */
@@ -4619,6 +4725,14 @@ a.help .icon {
 	display: none;
 	width: 100%;
 	height: 100%;
+}
+
+/* The actual pop-up wrapper. */
+.popup_window {
+	margin: 0 auto;
+	width: 600px;
+	border: 1px solid;
+	border-radius: 5px;
 }
 
 /* The actual pop-up wrapper. */
@@ -4644,11 +4758,18 @@ a.help .icon {
 	background: url(../images/buttons/delete.png) 0 50% no-repeat;
 }
 
+.popup_window.in.content {
+	transition-duration: .5s;
+	transform: translate(0, 30px);
+}
+
 /* The text content, hopefully helpful. */
 .popup_content {
 	overflow: auto;
 	padding: 10px;
 	max-height: 22em;
+	border: 1px solid;
+	border-radius: 5px;
 }
 
 /* Some styles used in help entries (language strings) */
@@ -4747,6 +4868,7 @@ a.help .icon {
 	padding-top: 12px;
 	padding-bottom: 12px;
 	width: 99%;
+	border-top: 1px solid;
 }
 
 .search_results_posts .quick_mod {
@@ -4762,6 +4884,10 @@ a.help .icon {
 .search_results_posts .topic_details,
 .search_results_posts .topic_body {
 	padding: 10px 0 10px 10px;
+}
+
+.search_results_posts > li:not(:last-child) {
+	border-bottom: 4px solid;
 }
 
 .compact_view .content {
@@ -4797,6 +4923,28 @@ a.help .icon {
 	padding: 5px 8px;
 }
 
+.mlist .mlist_header div {
+	border-top: none;
+}
+
+.mlist li div, .whos_online dt div, .whos_online dd:nth-child(odd) div {
+	border-top: 1px solid;
+	border-bottom: 1px solid;
+}
+
+.mlist li.alternate_row div, .whos_online dd:nth-child(even) div {
+	border-top: 1px solid;
+	border-bottom: 1px solid;
+}
+
+.mlist li div:first-child {
+	border-left: 1px solid;
+}
+
+.mlist li div:last-child {
+	border-right: 1px solid;
+}
+
 .letter_row {
 	height: 3em;
 	vertical-align: bottom;
@@ -4811,6 +4959,8 @@ a.help .icon {
 	font-weight: bold;
 	line-height: 2em;
 	min-width: 4em;
+	border: 1px solid;
+	border-radius: 6px 6px 0 0;
 }
 
 .mlist_header {
@@ -4897,6 +5047,8 @@ a.help .icon {
 	position: absolute;
 	display: none;
 	padding: 0.5em;
+	border: 1px solid;
+	border-radius: 5px;
 }
 
 #mlsearch_options.nojs {
@@ -4971,6 +5123,7 @@ a.help .icon {
 	margin-left: 5ex;
 	padding: 4px;
 	width: 32ex;
+	border: 1px solid;
 }
 
 #agreement_box {
@@ -5012,6 +5165,7 @@ a.help .icon {
 	margin: 0 0 16px 0;
 	padding: 4px 12px;
 	font-size: 0.929em;
+	border: 1px solid;
 }
 
 .information p {
@@ -5029,7 +5183,7 @@ a.help .icon {
 }
 
 .border_error {
-	border: 1px solid #FF0000 !important;
+	border: 1px solid !important;
 }
 
 .selected {
@@ -5086,6 +5240,8 @@ a.help .icon {
 	padding: 3px;
 	width: 80%;
 	height: 2em;
+	border: 1px solid;
+	border-radius: 5px;
 }
 
 .full_bar {
@@ -5096,6 +5252,7 @@ a.help .icon {
 	text-align: center;
 	font-weight: bold;
 	height: 2em;
+	border-radius: 3px;
 }
 
 .green_percent, .blue_percent {
@@ -5130,11 +5287,15 @@ a.help .icon {
 	padding: 10px 0 0;
 	width: 50%;
 	text-align: center;
+	border: solid 1px;
+	border-radius: 10px;
+	font-size: 15px;
 }
 
 .floating_error .error_heading {
 	margin: 0;
 	padding: 5px 10px 0;
+	font-weight: bold;
 }
 
 .floating_error .error_msg {
@@ -5147,6 +5308,13 @@ a.help .icon {
 	margin: 0;
 	padding: 10px;
 	text-align: center;
+	border-top: solid 1px;
+	font-weight: bold;
+	font-size: 16px;
+}
+
+.floating_error .error_btn:hover {
+	cursor: pointer;
 }
 
 /* ------------------------------------------------------- */
@@ -5170,7 +5338,6 @@ a.help .icon {
 	bottom: 0;
 	left: 0;
 	z-index: 100;
-	background: rgba(0, 0, 0, .5);
 	text-align: center;
 }
 
@@ -5308,7 +5475,7 @@ a.help .icon {
 	}
 
 	#main_menu .linklevel1 {
-		margin-right: 5px;
+		margin-right: 2px;
 		border: 1px solid transparent;
 		box-shadow: none;
 	}
@@ -5320,6 +5487,10 @@ a.help .icon {
 
 	#main_menu .linklevel1 > .pm_indicator {
 		display: none;
+	}
+
+	#main_menu .linklevel1.active, #main_menu .linklevel1.active:hover {
+		border: 1px solid;
 	}
 
 	.button_title, .topic_moderation_alt {
@@ -5392,6 +5563,8 @@ a.help .icon {
 		z-index: 90;
 		min-height: 500px;
 		width: 6px;
+		border: 1px solid;
+		border-radius: 4px;
 	}
 
 	#menu_sidebar ul, #menu_sidebar .category_header {
@@ -5501,6 +5674,7 @@ a.help .icon {
 
 	.mlist li div.posts {
 		display: table-cell;
+		border-right: 1px solid;
 	}
 
 	.sticky_row .topic_info:before, .locked_row .topic_info:before, .locked_row.sticky_row .topic_info:before {
@@ -5521,6 +5695,10 @@ a.help .icon {
 
 	.popup_container .popup_window {
 		width: 95%;
+	}
+
+	.listlevel1#button_profile .linklevel1 {
+		min-width: 0.5em;
 	}
 }
 
@@ -5576,6 +5754,7 @@ a.help .icon {
 
 	.frame {
 		min-width: 100%;
+		border-radius: 0;
 	}
 
 	.topic_info {
@@ -5657,6 +5836,19 @@ a.help .icon {
 	#gobottom, #gotop {
 		display: none;
 		padding-right: 0.25em;
+		border: 1px solid;
+	}
+
+	#gobottom {
+		border-radius: 0;
+	}
+
+	#gotop {
+		border-radius: 0 0.5em 0 0;
+	}
+
+	#gotop:hover, #gobottom:hover {
+		text-decoration: none;
 	}
 
 	#message_index_jump_to {
@@ -5739,6 +5931,7 @@ a.help .icon {
 		min-width: 90%;
 		max-width: 90%;
 		width: 90%;
+		border-left: 0;
 	}
 
 	.board_lastpost, .topic_lastpost {
@@ -5748,6 +5941,7 @@ a.help .icon {
 	.board_lastpost {
 		margin: 3px;
 		padding-top: 6px;
+		border-top: 1px solid;
 	}
 
 	.board_info h3 a {
@@ -5767,6 +5961,7 @@ a.help .icon {
 
 	.topic_listing > li {
 		margin-bottom: 5px;
+		border: 1px solid;
 	}
 
 	.icon_anchor {
@@ -6017,6 +6212,55 @@ a.help .icon {
 	.whos_online dd, .whos_online dd div {
 		display: block;
 	}
+
+	.online_member {
+		font-size: 1.6em;
+	}
+
+	.track_ip {
+		float: right;
+		font-size: 0.7em;
+	}
+
+	.track_ip:before {
+		content: "";
+	}
+
+	.track_ip:after {
+		content: "";
+	}
+
+	.forumposts {
+		margin-top: 8px;
+		border: 1px solid;
+		border-radius: 3px;
+	}
+
+	.forum_category, .forumposts, .content_category {
+		border: none;
+	}
+
+	.listlevel2.subsections .linklevel2::after {
+		content: '';
+	}
+
+	.stats.floatleft {
+		border: none;
+	}
+
+	.subsections:hover .linklevel1:after {
+		content: "";
+	}
+
+	.whos_online dd div {
+		border-top: none !important;
+		border-bottom: none !important;
+	}
+
+	.whos_online dd:nth-child(even), .whos_online dd:nth-child(odd) {
+		margin-top: 1px;
+		border-top: 1px solid;
+	}
 }
 
 /* This one does 480px screens at default font size. */
@@ -6039,6 +6283,10 @@ a.help .icon {
 
 	.quickbuttons .modified {
 		display: none;
+	}
+
+	.mlist li .group {
+		border-right: 1px solid;
 	}
 
 	.mlist li div.posts {
