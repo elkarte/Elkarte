@@ -2116,6 +2116,32 @@ a.bbc_link {
 	width: 55%;
 }
 
+/* Theme Management,Member Options,Change Current Options  */
+/* to adjust display of wording and selections to one line */
+#admin_form_wrapper .theme_options dd {
+    float: right;
+    overflow: auto;
+    margin: 0 0 3px 0;
+    padding: 0;
+    width: 45%;
+    min-height: 2em;
+}
+
+#admin_form_wrapper .input_check, .input_radio {
+    border: none;
+    background: none;
+    vertical-align: top;
+    margin: 0 2px 4px 4px;
+}
+
+#admin_form_wrapper .theme_options dt {
+    float: left;
+    clear: both;
+    margin: 0 0 10px 0;
+    padding: 0;
+    width: 55%;
+}
+
 /* I'm a tad leary of these setting new margins, but this line is here to compress     */
 /* listings in fieldset, like a permissions radio listing, from taking up excess space */
 .settings dd > fieldset dd, .settings dd > fieldset dt {
