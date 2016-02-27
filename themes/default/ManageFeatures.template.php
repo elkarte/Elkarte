@@ -115,6 +115,7 @@ function template_edit_profile_field()
 								<option value="0"', $context['field']['placement'] == '0' ? ' selected="selected"' : '', '>', $txt['custom_edit_placement_standard'], '</option>
 								<option value="1"', $context['field']['placement'] == '1' ? ' selected="selected"' : '', '>', $txt['custom_edit_placement_withicons'], '</option>
 								<option value="2"', $context['field']['placement'] == '2' ? ' selected="selected"' : '', '>', $txt['custom_edit_placement_abovesignature'], '</option>
+								<option value="3"', $context['field']['placement'] == '3' ? ' selected="selected"' : '', '>', $txt['custom_edit_placement_aboveicons'], '</option>
 							</select>
 						</dd>
 						<dt>

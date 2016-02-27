@@ -575,7 +575,6 @@ function registerMember(&$regOptions, $error_context = 'register')
 		'member_ip2' => $regOptions['interface'] == 'admin' ? '127.0.0.1' : $regOptions['ip2'],
 		'validation_code' => $validation_code,
 		'real_name' => $regOptions['username'],
-		'personal_text' => $modSettings['default_personal_text'],
 		'pm_email_notify' => 1,
 		'id_theme' => 0,
 		'id_post_group' => 4,
@@ -585,7 +584,6 @@ function registerMember(&$regOptions, $error_context = 'register')
 		'message_labels' => '',
 		'website_title' => '',
 		'website_url' => '',
-		'location' => '',
 		'time_format' => '',
 		'signature' => '',
 		'avatar' => '',
@@ -643,7 +641,7 @@ function registerMember(&$regOptions, $error_context = 'register')
 	// Right, now let's prepare for insertion.
 	$knownInts = array(
 		'date_registered', 'posts', 'id_group', 'last_login', 'personal_messages', 'unread_messages', 'notifications',
-		'new_pm', 'pm_prefs', 'gender', 'hide_email', 'show_online', 'pm_email_notify', 'karma_good', 'karma_bad',
+		'new_pm', 'pm_prefs', 'hide_email', 'show_online', 'pm_email_notify', 'karma_good', 'karma_bad',
 		'notify_announcements', 'notify_send_body', 'notify_regularity', 'notify_types',
 		'id_theme', 'is_activated', 'id_msg_last_visit', 'id_post_group', 'total_time_logged_in', 'warning',
 	);
@@ -2406,7 +2404,7 @@ function updateMemberData($members, $data)
 	// Everything is assumed to be a string unless it's in the below.
 	$knownInts = array(
 		'date_registered', 'posts', 'id_group', 'last_login', 'personal_messages', 'unread_messages', 'mentions',
-		'new_pm', 'pm_prefs', 'gender', 'hide_email', 'show_online', 'pm_email_notify', 'receive_from', 'karma_good', 'karma_bad',
+		'new_pm', 'pm_prefs', 'hide_email', 'show_online', 'pm_email_notify', 'receive_from', 'karma_good', 'karma_bad',
 		'notify_announcements', 'notify_send_body', 'notify_regularity', 'notify_types',
 		'id_theme', 'is_activated', 'id_msg_last_visit', 'id_post_group', 'total_time_logged_in', 'warning', 'likes_given', 'likes_received', 'enable_otp'
 	);
@@ -2422,11 +2420,9 @@ function updateMemberData($members, $data)
 			'real_name',
 			'email_address',
 			'id_group',
-			'gender',
 			'birthdate',
 			'website_title',
 			'website_url',
-			'location',
 			'hide_email',
 			'time_format',
 			'time_offset',

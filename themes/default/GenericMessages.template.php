@@ -76,19 +76,20 @@ function template_build_poster_div($message, $ignoring = false)
 										(empty($modSettings['karmaDisableSmite']) ? '<a class="linklevel2" href="' . $message['member']['karma']['smite_url'] . '">' . $modSettings['karmaSmiteLabel'] . '</a>' : '') . '
 									</li>';
 
-		// Show the member's gender icon?
-		if (!empty($settings['show_gender']) && $message['member']['gender']['image'] != '' && !isset($context['disabled_fields']['gender']))
-			$poster_div .= '
-									<li class="listlevel2 gender">' . $txt['gender'] . ': ' . $message['member']['gender']['image'] . '</li>';
-
-		// Show their personal text?
-		if (!empty($settings['show_blurb']) && $message['member']['blurb'] != '')
-			$poster_div .= '
-									<li class="listlevel2 blurb">' . $message['member']['blurb'] . '</li>';
-
-		// Any custom fields to show as icons?
+		// Any custom fields to show as or above icons?
 		if (!empty($message['member']['custom_fields']))
 		{
+			// Show above-icon placement (replacing personal text and gender)
+			foreach ($message['member']['custom_fields'] as $custom)
+			{
+				if ($custom['placement'] == 3 && !empty($custom['value']))
+				{
+					$poster_div .= '
+									<li class="listlevel2 cf_aboveicons">' . $custom['value'] . '</li>';
+				}
+			}
+
+			// Icon placement.
 			$shown = false;
 			foreach ($message['member']['custom_fields'] as $custom)
 			{

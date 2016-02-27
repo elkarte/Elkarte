@@ -856,7 +856,7 @@ function loadMemberData($users, $is_name = false, $set = 'normal')
 	// Used by default
 	$select_columns = '
 			IFNULL(lo.log_time, 0) AS is_online, IFNULL(a.id_attach, 0) AS id_attach, a.filename, a.attachment_type,
-			mem.signature, mem.personal_text, mem.location, mem.gender, mem.avatar, mem.id_member, mem.member_name,
+			mem.signature, mem.avatar, mem.id_member, mem.member_name,
 			mem.real_name, mem.email_address, mem.hide_email, mem.date_registered, mem.website_title, mem.website_url,
 			mem.birthdate, mem.member_ip, mem.member_ip2, mem.posts, mem.last_login, mem.likes_given, mem.likes_received,
 			mem.karma_good, mem.id_post_group, mem.karma_bad, mem.lngfile, mem.id_group, mem.time_offset, mem.show_online,
@@ -978,7 +978,7 @@ function loadMemberData($users, $is_name = false, $set = 'normal')
  * What it does:
  * - Always loads the minimal values of username, name, id, href, link, email, show_email, registered, registered_timestamp
  * - if $context['loadMemberContext_set'] is not minimal it will load in full a full set of user information
- * - prepares signature, personal_text, location fields for display (censoring if enabled)
+ * - prepares signature for display (censoring if enabled)
  * - loads in the members custom fields if any
  * - prepares the users buddy list, including reverse buddy flags
  *
@@ -1014,11 +1014,10 @@ function loadMemberContext($user, $display_custom_fields = false)
 
 	// Censor everything.
 	$profile['signature'] = censor($profile['signature']);
-	$profile['personal_text'] = censor($profile['personal_text']);
-	$profile['location'] = censor($profile['location']);
+
+	// TODO: We should look into a censoring toggle for custom fields
 
 	// Set things up to be used before hand.
-	$gendertxt = $profile['gender'] == 2 ? $txt['female'] : ($profile['gender'] == 1 ? $txt['male'] : '');
 	$profile['signature'] = str_replace(array("\n", "\r"), array('<br />', ''), $profile['signature']);
 	$profile['signature'] = $parsers->parseSignature($profile['signature'], true);
 	$profile['is_online'] = (!empty($profile['show_online']) || allowedTo('moderate_forum')) && $profile['is_online'] > 0;
@@ -1052,18 +1051,12 @@ function loadMemberContext($user, $display_custom_fields = false)
 			'is_reverse_buddy' => in_array($user_info['id'], $buddy_list),
 			'buddies' => $buddy_list,
 			'title' => !empty($modSettings['titlesEnable']) ? $profile['usertitle'] : '',
-			'blurb' => $profile['personal_text'],
-			'gender' => array(
-				'name' => $gendertxt,
-				'image' => !empty($profile['gender']) ? '<img class="gender" src="' . $settings['images_url'] . '/profile/' . ($profile['gender'] == 1 ? 'Male' : 'Female') . '.png" alt="' . $gendertxt . '" />' : ''
-			),
 			'website' => array(
 				'title' => $profile['website_title'],
 				'url' => $profile['website_url'],
 			),
 			'birth_date' => empty($profile['birthdate']) || $profile['birthdate'] === '0001-01-01' ? '0000-00-00' : (substr($profile['birthdate'], 0, 4) === '0004' ? '0000' . substr($profile['birthdate'], 4) : $profile['birthdate']),
 			'signature' => $profile['signature'],
-			'location' => $profile['location'],
 			'real_posts' => $profile['posts'],
 			'posts' => comma_format($profile['posts']),
 			'avatar' => determineAvatar($profile),

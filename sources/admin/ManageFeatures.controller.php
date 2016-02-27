@@ -659,7 +659,8 @@ class ManageFeatures_Controller extends Action_Controller
 		$context['sub_template'] = 'show_custom_profile';
 
 		// What about standard fields they can tweak?
-		$standard_fields = array('location', 'gender', 'website', 'personal_text', 'posts', 'warning_status');
+		// TODO: Join date is a moderately popular mod that would be good here.
+		$standard_fields = array('website', 'posts', 'warning_status');
 
 		// What fields can't you put on the registration page?
 		$context['fields_no_registration'] = array('posts', 'warning_status');
@@ -865,8 +866,21 @@ class ManageFeatures_Controller extends Action_Controller
 					'data' => array(
 						'function' => function($rowData) {
 							global $txt;
+							$placement = 'custom_profile_placement_';
 
-							return $txt['custom_profile_placement_' . (empty($rowData['placement']) ? 'standard' : ($rowData['placement'] == 1 ? 'withicons' : 'abovesignature'))];
+							switch ((int) $rowData['placement'])
+							{
+								case 0: $placement .= 'standard';
+							    		break;
+								case 1: $placement .= 'withicons';
+									break;
+								case 2: $placement .= 'abovesignature';
+									break;
+								case 3: $placement .= 'aboveicons';
+									break;
+							}
+
+							return $txt[$placement];
 						},
 						'style' => 'width: 5%;',
 					),
@@ -1283,12 +1297,6 @@ class ManageFeatures_Controller extends Action_Controller
 	{
 		global $txt, $modSettings, $context;
 
-		// We need to know if personal text is enabled, and if it's in the registration fields option.
-		// If admins have set it up as an on-registration thing, they can't set a default value (because it'll never be used)
-		$disabled_fields = isset($modSettings['disabled_profile_fields']) ? explode(',', $modSettings['disabled_profile_fields']) : array();
-		$reg_fields = isset($modSettings['registration_fields']) ? explode(',', $modSettings['registration_fields']) : array();
-		$can_personal_text = !in_array('personal_text', $disabled_fields) && !in_array('personal_text', $reg_fields);
-
 		$config_vars = array(
 				// Basic stuff, titles, permissions...
 				array('check', 'allow_guestAccess'),
@@ -1296,7 +1304,6 @@ class ManageFeatures_Controller extends Action_Controller
 				array('check', 'allow_editDisplayName'),
 				array('check', 'allow_hideOnline'),
 				array('check', 'titlesEnable'),
-				array('text', 'default_personal_text', 'subtext' => $txt['default_personal_text_note'], 'disabled' => !$can_personal_text),
 			'',
 				// Javascript and CSS options
 				array('select', 'jquery_source', array('auto' => $txt['jquery_auto'], 'local' => $txt['jquery_local'], 'cdn' => $txt['jquery_cdn'])),

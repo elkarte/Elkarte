@@ -614,9 +614,6 @@ class News_Controller extends Action_Controller
 			);
 
 			// Everything below here might not be set, and thus maybe shouldn't be displayed.
-			if ($profile['gender']['name'] != '')
-				$data['gender'] = cdata_parse($profile['gender']['name']);
-
 			if ($profile['avatar']['name'] != '')
 				$data['avatar'] = $profile['avatar']['url'];
 
@@ -626,12 +623,6 @@ class News_Controller extends Action_Controller
 
 			if ($profile['signature'] != '')
 				$data['signature'] = cdata_parse($profile['signature']);
-
-			if ($profile['blurb'] != '')
-				$data['blurb'] = cdata_parse($profile['blurb']);
-
-			if ($profile['location'] != '')
-				$data['location'] = cdata_parse($profile['location']);
 
 			if ($profile['title'] != '')
 				$data['title'] = cdata_parse($profile['title']);

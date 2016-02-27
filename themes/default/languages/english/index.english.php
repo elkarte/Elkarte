@@ -289,9 +289,6 @@ $txt['query_command_denied_guests_msg'] = 'the command %1$s is denied on the dat
 $txt['last_edit_by'] = '<span class="lastedit">Last Edit</span>: %1$s by %2$s';
 $txt['notify_deactivate'] = 'Would you like to deactivate notification on this topic?';
 
-$txt['location'] = 'Location';
-$txt['gender'] = 'Gender';
-$txt['personal_text'] = 'Personal Text';
 $txt['date_registered'] = 'Date Registered';
 
 $txt['recent_view'] = 'View all recent posts.';
