@@ -244,9 +244,9 @@ Class Elk_Testing_Setup
 			array(
 				'test_admin', 'test_admin', $passwd, 'email@testadmin.tld',
 				1, 0, time(), 0,
-				substr(md5(mt_rand()), 0, 4), '', '', '',
+				substr(md5(mt_rand()), 0, 4), '', '',
 				'123.123.123.123', '123.123.123.123', '', '',
-				'', '', '', '',
+				'', '', '',
 				'', '', '',
 				'', '', '',
 			),
