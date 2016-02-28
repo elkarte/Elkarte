@@ -1047,9 +1047,9 @@ class Install_Controller
 					array(
 						stripslashes($_POST['username']), stripslashes($_POST['username']), $incontext['passwd'], stripslashes($_POST['email']),
 						1, 0, time(), 0,
-						$incontext['member_salt'], '', '', '',
+						$incontext['member_salt'], '', '',
 						$ip, $ip, '', '',
-						'', '', '', '',
+						'', '', '',
 						'', '', '',
 						'', '', '',
 					),
