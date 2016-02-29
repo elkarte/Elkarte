@@ -1609,7 +1609,7 @@ class ManageMaillist_Controller extends Action_Controller
 			$config_vars = array_merge($config_vars,
 				array(
 					array('title', 'maillist_imap'),
-					array('title', 'maillist_imap_reason'),
+					array('desc', 'maillist_imap_reason'),
 						array('text', 'maillist_imap_host', 45, 'subtext' => $txt['maillist_imap_host_desc'], 'disabled' => !function_exists('imap_open')),
 						array('text', 'maillist_imap_mailbox', 20, 'postinput' => $txt['maillist_imap_mailbox_desc'], 'disabled' => !function_exists('imap_open')),
 						array('text', 'maillist_imap_uid', 20, 'postinput' => $txt['maillist_imap_uid_desc'], 'disabled' => !function_exists('imap_open')),
