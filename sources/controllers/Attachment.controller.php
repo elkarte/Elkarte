@@ -431,8 +431,17 @@ class Attachment_Controller extends Action_Controller
 				isAllowedTo('view_attachments');
 
 				$attachment = getAttachmentFromTopic($id_attach, $topic, 1, $user_info['id']);
+
 				if (empty($attachment))
-					Errors::instance()->fatal_lang_error('no_access', false);
+				{
+					// Give it another try with posted attachments (he may be editing a message)
+					$attachment = getAttachmentFromTopic($id_attach, $topic, 0, $user_info['id']);
+
+					if (empty($attachment))
+					{
+						Errors::instance()->fatal_lang_error('no_access', false);
+					}
+				}
 
 				list ($id_folder, $real_filename, $file_hash, $file_ext, $id_attach, $attachment_type, $mime_type, $is_approved, $id_member) = $attachment;
 
