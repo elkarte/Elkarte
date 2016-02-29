@@ -182,7 +182,7 @@ function template_messages()
 
 		// Show the post itself, finally!
 		echo '
-						<div id="msg_', $message['id'], '" class="inner', $ignoring ? ' hide"' : '""', '>', $message['body'], '</div>';
+						<div id="msg_', $message['id'], '" class="inner', $ignoring ? ' hide"' : '"', '>', $message['body'], '</div>';
 
 		// Assuming there are attachments...
 		if (!empty($message['attachment']))
@@ -835,7 +835,7 @@ function template_display_attachments($message, $ignoring)
 	global $context, $txt, $scripturl, $settings;
 
 	echo '
-							<div id="msg_', $message['id'], '_footer" class="attachments', $ignoring ? ' hide"' : '""', '>';
+							<div id="msg_', $message['id'], '_footer" class="attachments', $ignoring ? ' hide"' : '"', '>';
 
 	$last_approved_state = 1;
 
