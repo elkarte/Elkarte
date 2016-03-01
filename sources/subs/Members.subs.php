@@ -1994,7 +1994,9 @@ function approveMembers($conditions)
 	if ($query)
 	{
 		$data = retrieveMemberData($conditions);
-		$members_id = $data['members'];
+		$members_id = array();
+		foreach ($data['member_info'] as $member)
+			$members_id[] = $member['username'];
 	}
 	else
 	{
