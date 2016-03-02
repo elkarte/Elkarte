@@ -197,8 +197,8 @@ class PackageServers_Controller extends Action_Controller
 					$package['id'] = $package['is_installed'] ? array_shift($is_installed) : $package['id'][0];
 
 					// Version installed vs version available
-					$package['is_current'] = !empty($package['is_installed']) && ($installed_adds[$package['id']] == $package['version']);
-					$package['is_newer'] = !empty($package['is_installed']) && ($installed_adds[$package['id']] > $package['version']);
+					$package['is_current'] = !empty($package['is_installed']) && compareVersions($installed_adds[$package['id']], $package['version']) == 0;
+					$package['is_newer'] = !empty($package['is_installed']) && compareVersions($installed_adds[$package['id']], $package['version']) > 0;
 
 					// Set the package filename for downloading and pre-existence checking
 					$base_name = $this->_rename_master($package['server']['download']);
@@ -219,7 +219,7 @@ class PackageServers_Controller extends Action_Controller
 
 					// See if this filename already exists on the server
 					$already_exists = getPackageInfo($base_name);
-					$package['download_conflict'] = is_array($already_exists) && $already_exists['id'] == $package['id'] && $already_exists['version'] != $package['version'];
+					$package['download_conflict'] = is_array($already_exists) && $already_exists['id'] == $package['id'] && compareVersions($already_exists['version'], $package['version']) != 0;
 					$package['count'] = ++$packageNum;
 
 					// Build the download to server link
@@ -425,7 +425,6 @@ class PackageServers_Controller extends Action_Controller
 		}
 
 		// First make sure it's a package.
-
 		$packageInfo = getPackageInfo($url . $_REQUEST['package']);
 		if (!is_array($packageInfo))
 			fatal_lang_error($packageInfo);
@@ -564,7 +563,7 @@ class PackageServers_Controller extends Action_Controller
 					continue;
 
 				// If it was already uploaded under another name don't upload it again.
-				if ($packageInfo['id'] == $context['package']['id'] && $packageInfo['version'] == $context['package']['version'])
+				if ($packageInfo['id'] == $context['package']['id'] && compareVersions($packageInfo['version'], $context['package']['version']) == 0)
 				{
 					@unlink($destination);
 					loadLanguage('Errors');
