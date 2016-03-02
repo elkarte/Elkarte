@@ -233,12 +233,31 @@ class PackageServers_Controller extends Action_Controller
 					$section_count++;
 				}
 
+				// Sort them naturally
+				usort($context['package_list'][$packageSection]['items'], array($this, 'package_sort'));
+
 				$context['package_list'][$packageSection]['text'] = sprintf($txt['mod_section_count'], $section_count);
 			}
 		}
 
 		// Good time to sort the categories, the packages inside each category will be by last modification date.
 		asort($context['package_list']);
+
+	}
+
+	/**
+	 * Case insensitive natural sort for packages
+	 *
+	 * - Callback for usort, can be anonymous function in 1.1
+	 *
+	 * @param array $a
+	 * @param array $b
+	 *
+	 * @return int
+	 */
+	public function package_sort($a, $b)
+	{
+		return strcasecmp($a['name'], $b['name']);
 	}
 
 	/**
