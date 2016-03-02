@@ -99,7 +99,7 @@ class OpenID
 
 		// If they are logging in but don't yet have an account or they are registering, let's request some additional information
 		if (($_REQUEST['action'] == 'login2' && !memberExists($openid_url)) || $_REQUEST['action'] == 'register')
-			$parameters[] = 'openid.sreg.optional=nickname,dob,gender';
+			$parameters[] = 'openid.sreg.optional=nickname,dob';
 
 		$redir_url = $response_data['server'] . '?' . implode('&', $parameters);
 

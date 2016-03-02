@@ -399,9 +399,9 @@ class ProfileOptions_Controller extends Action_Controller
 
 		setupProfileContext(
 			array(
-				'avatar_choice', 'hr', 'personal_text', 'hr',
-				'bday1', 'location', 'gender', 'hr',
-				'usertitle', 'signature', 'hr',
+				'avatar_choice', 'hr',
+				'bday1', 'usertitle', 'hr',
+				'signature', 'hr',
 				'karma_good', 'hr',
 				'website_title', 'website_url',
 			),

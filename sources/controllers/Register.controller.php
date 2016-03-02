@@ -530,8 +530,8 @@ class Register_Controller extends Action_Controller
 			'buddy_list',
 			'pm_ignore_list',
 			'smiley_set',
-			'personal_text', 'avatar',
-			'lngfile', 'location',
+			'avatar',
+			'lngfile',
 			'secret_question', 'secret_answer',
 			'website_url', 'website_title',
 		);
@@ -540,7 +540,6 @@ class Register_Controller extends Action_Controller
 			'pm_email_notify',
 			'notify_types',
 			'id_theme',
-			'gender',
 		);
 
 		$possible_floats = array(
@@ -559,10 +558,9 @@ class Register_Controller extends Action_Controller
 		if (!empty($modSettings['registration_fields']))
 		{
 			// But we might want some of them if the admin asks for them.
-			$standard_fields = array('location', 'gender');
 			$reg_fields = explode(',', $modSettings['registration_fields']);
 
-			$exclude_fields = array_diff($standard_fields, $reg_fields);
+			$exclude_fields = array();
 
 			// Website is a little different
 			if (!in_array('website', $reg_fields))
@@ -572,7 +570,7 @@ class Register_Controller extends Action_Controller
 			$exclude_fields[] = 'signature';
 		}
 		else
-			$exclude_fields = array('signature', 'location', 'gender', 'website_url', 'website_title');
+			$exclude_fields = array('signature', 'website_url', 'website_title');
 
 		$possible_strings = array_diff($possible_strings, $exclude_fields);
 		$possible_ints = array_diff($possible_ints, $exclude_fields);

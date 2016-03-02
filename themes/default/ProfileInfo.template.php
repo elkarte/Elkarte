@@ -509,7 +509,7 @@ function template_viewWarning()
 /**
  * Profile Summary Block
  *
- * Show avatar, title, blurb, group info, number of posts, karma, likes
+ * Show avatar, title, group info, number of posts, karma, likes
  * Has links to show posts, drafts and attachments
  */
 function template_profile_block_summary()
@@ -554,12 +554,6 @@ function template_profile_block_summary()
 						<dt>', $txt['custom_title'], ':</dt>
 						<dd>', $context['member']['title'], '</dd>';
 
-	// A little something about them?
-	if (!empty($context['member']['blurb']))
-		echo '
-						<dt>', $txt['personal_text'], ':</dt>
-						<dd>', $context['member']['blurb'], '</dd>';
-
 	// If karma is enabled show the members karma.
 	if ($modSettings['karmaMode'] == '1')
 		echo '
@@ -601,7 +595,7 @@ function template_profile_block_summary()
 /**
  * Profile Info Block
  *
- * Show additional user details including: age, gender, location, join date,
+ * Show additional user details including: age, join date,
  * localization details (language and time)
  * If user has permissions can see IP address
  */
@@ -617,22 +611,10 @@ function template_profile_block_user_info()
 			<div class="profileblock">
 					<dl>';
 
-	// Show the gender
-	if (!isset($context['disabled_fields']['gender']) && !empty($context['member']['gender']['name']))
-		echo '
-					<dt>', $txt['gender'], ':</dt>
-					<dd>', $context['member']['gender']['image'], ' ', $context['member']['gender']['name'], '</dd>';
-
 	// And how old are we, oh my!
 	echo '
 					<dt>', $txt['age'], ':</dt>
 					<dd>', $context['member']['age'] . ($context['member']['today_is_birthday'] ? ' &nbsp; <img src="' . $settings['images_url'] . '/cake.png" alt="" />' : ''), '</dd>';
-
-	// I know where you are, you're at ....
-	if (!isset($context['disabled_fields']['location']) && !empty($context['member']['location']))
-		echo '
-					<dt>', $txt['location'], ':</dt>
-					<dd>', $context['member']['location'], '</dd>';
 
 	// How long have they been a member, and when were they last on line?
 	echo '
@@ -891,25 +873,25 @@ function template_profile_block_user_customprofileinfo()
 			</h2>
 			<div class="profileblock">';
 
-	// Any custom fields for standard placement?
+	// Any custom fields for standard (non-icon, non-sig) placement?
 	if (!empty($context['custom_fields']))
 	{
 		$shown = false;
 		foreach ($context['custom_fields'] as $field)
 		{
-			if ($field['placement'] != 0 || empty($field['output_html']))
-				continue;
-
-			if (empty($shown))
+			if (($field['placement'] == 0 || $field['placement'] == 3) && !empty($field['output_html']))
 			{
-				echo '
-				<dl>';
-				$shown = true;
-			}
+				if (empty($shown))
+				{
+					echo '
+					<dl>';
+					$shown = true;
+				}
 
-			echo '
-					<dt>', $field['name'], ':</dt>
-					<dd>', $field['output_html'], '</dd>';
+				echo '
+						<dt>', $field['name'], ':</dt>
+						<dd>', $field['output_html'], '</dd>';
+			}
 		}
 
 		if (!empty($shown))

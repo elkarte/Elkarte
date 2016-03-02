@@ -819,7 +819,6 @@ function ssi_queryMembers($query_where = null, $query_where_params = array(), $q
 			<tr>
 				<td class="centertext">
 					', $query_members[$member]['link'], '
-					<br>', $query_members[$member]['blurb'], '
 					<br>', $query_members[$member]['avatar']['image'], '
 				</td>
 			</tr>';

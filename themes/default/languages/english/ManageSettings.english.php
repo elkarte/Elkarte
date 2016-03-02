@@ -354,10 +354,12 @@ $txt['custom_edit_placement'] = 'Choose Placement';
 $txt['custom_edit_placement_standard'] = 'Standard (with title)';
 $txt['custom_edit_placement_withicons'] = 'With Icons';
 $txt['custom_edit_placement_abovesignature'] = 'Above Signature';
+$txt['custom_edit_placement_aboveicons'] = 'Above Icons (no title)';
 $txt['custom_profile_placement'] = 'Placement';
 $txt['custom_profile_placement_standard'] = 'Standard';
 $txt['custom_profile_placement_withicons'] = 'With Icons';
 $txt['custom_profile_placement_abovesignature'] = 'Above Signature';
+$txt['custom_profile_placement_aboveicons'] = 'Above Icons';
 
 // Use numeric entities in the string below!
 $txt['custom_edit_delete_sure'] = 'Are you sure you wish to delete this field? All related user data will be lost!';

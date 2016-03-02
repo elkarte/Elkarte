@@ -778,8 +778,8 @@ function fix_possible_url_callback($matches)
 }
 
 /**
- * For highest feed compatibility, some special characters should be provided 
- * as character entities and not html entities 
+ * For highest feed compatibility, some special characters should be provided
+ * as character entities and not html entities
  *
  * @param string $data
  */

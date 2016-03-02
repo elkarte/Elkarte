@@ -232,11 +232,6 @@ class ManageMembers_Controller extends Action_Controller
 					'type' => 'date',
 					'range' => true
 				),
-				'gender' => array(
-					'db_fields' => array('gender'),
-					'type' => 'checkbox',
-					'values' => array('0', '1', '2'),
-				),
 				'activated' => array(
 					'db_fields' => array('is_activated'),
 					'type' => 'checkbox',
@@ -252,10 +247,6 @@ class ManageMembers_Controller extends Action_Controller
 				),
 				'website' => array(
 					'db_fields' => array('website_title', 'website_url'),
-					'type' => 'string'
-				),
-				'location' => array(
-					'db_fields' => array('location'),
 					'type' => 'string'
 				),
 				'ip' => array(

@@ -120,12 +120,6 @@ function template_search_members()
 								<input type="text" name="website" id="website" value="" class="input_text" />
 							</dd>
 							<dt class="righttext">
-								<label for="location">', $txt['location'], ':</label>
-							</dt>
-							<dd>
-								<input type="text" name="location" id="location" value="" class="input_text" />
-							</dd>
-							<dt class="righttext">
 								<label for="ip">', $txt['ip_address'], ':</label>
 							</dt>
 							<dd>
@@ -135,14 +129,6 @@ function template_search_members()
 					</div>
 				</div>
 				<div class="flow_hidden">
-					<div class="msearch_details floatleft">
-						<fieldset>
-							<legend>', $txt['gender'], '</legend>
-							<label for="gender-0"><input type="checkbox" name="gender[]" value="0" id="gender-0" checked="checked" /> ', $txt['undefined_gender'], '</label>&nbsp;&nbsp;
-							<label for="gender-1"><input type="checkbox" name="gender[]" value="1" id="gender-1" checked="checked" /> ', $txt['male'], '</label>&nbsp;&nbsp;
-							<label for="gender-2"><input type="checkbox" name="gender[]" value="2" id="gender-2" checked="checked" /> ', $txt['female'], '</label>
-						</fieldset>
-					</div>
 					<div class="msearch_details floatright">
 						<fieldset>
 							<legend>', $txt['activation_status'], '</legend>

@@ -135,8 +135,6 @@ class OpenID_Controller extends Action_Controller
 				$_SESSION['openid']['email'] = $this->_req->query->openid_sreg_email;
 			if (isset($this->_req->query->openid_sreg_dob))
 				$_SESSION['openid']['dob'] = $this->_req->query->openid_sreg_dob;
-			if (isset($this->_req->query->openid_sreg_gender))
-				$_SESSION['openid']['gender'] = $this->_req->query->openid_sreg_gender;
 
 			// Were we just verifying the registration state?
 			if (isset($this->_req->query->sa) && $this->_req->query->sa === 'register2')

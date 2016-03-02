@@ -475,13 +475,6 @@ function loadProfileFields($force_reload = false)
 				return $isValid;
 			},
 		),
-		'gender' => array(
-			'type' => 'select',
-			'cast_type' => 'int',
-			'options' => 'return array(0 => \' \', 1 => $txt[\'male\'], 2 => $txt[\'female\']);',
-			'label' => $txt['gender'],
-			'permission' => 'profile_extra',
-		),
 		'hide_email' => array(
 			'type' => 'check',
 			'value' => empty($cur_profile['hide_email']) ? true : false,
@@ -589,13 +582,6 @@ function loadProfileFields($force_reload = false)
 				}
 			},
 		),
-		'location' => array(
-			'type' => 'text',
-			'label' => $txt['location'],
-			'log_change' => true,
-			'size' => 50,
-			'permission' => 'profile_extra',
-		),
 		// The username is not always editable - so adjust it as such.
 		'member_name' => array(
 			'type' => allowedTo('admin_forum') && isset($_GET['changeusername']) ? 'text' : 'label',
@@ -702,20 +688,6 @@ function loadProfileFields($force_reload = false)
 			'value' => empty($cur_profile['otp_secret']) ? '' : $cur_profile['otp_secret'],
 			'postinput' => '<div style="display: inline-block;"><input type="button" value="' . $txt['otp_generate'] . '" onclick="generateSecret();"></div><div id="qrcode"></div>',
 			'permission' => 'profile_identity',
-		),
-		'personal_text' => array(
-			'type' => 'text',
-			'label' => $txt['personal_text'],
-			'log_change' => true,
-			'input_attr' => array('maxlength="50"'),
-			'size' => 50,
-			'permission' => 'profile_extra',
-			'input_validate' => function (&$value) {
-				if (Util::strlen($value) > 50)
-					return 'personal_text_too_long';
-
-				return true;
-			},
 		),
 		// This does contact-related settings
 		'receive_from' => array(
