@@ -14,7 +14,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:		BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0.4
+ * @version 1.0.7
  *
  */
 
@@ -187,10 +187,11 @@ class PackageServers_Controller extends Action_Controller
 				{
 					// Read in the package info from the fetched data
 					$package = $this->_load_package_json($thisPackage, $packageSection);
+					$package['possible_ids'] = $package['id'];
 
 					// Check the install status
 					$package['can_install'] = false;
-					$is_installed = array_intersect(array_keys($installed_adds), $package['id']);
+					$is_installed = array_intersect(array_keys($installed_adds), $package['possible_ids']);
 					$package['is_installed'] = !empty($is_installed);
 
 					// Set the ID from our potential list should the ID not be provided in the package .yaml
@@ -198,7 +199,7 @@ class PackageServers_Controller extends Action_Controller
 
 					// Version installed vs version available
 					$package['is_current'] = !empty($package['is_installed']) && compareVersions($installed_adds[$package['id']], $package['version']) == 0;
-					$package['is_newer'] = !empty($package['is_installed']) && compareVersions($installed_adds[$package['id']], $package['version']) > 0;
+					$package['is_newer'] = !empty($package['is_installed']) && compareVersions($package['version'], $installed_adds[$package['id']]) > 0;
 
 					// Set the package filename for downloading and pre-existence checking
 					$base_name = $this->_rename_master($package['server']['download']);
@@ -219,8 +220,16 @@ class PackageServers_Controller extends Action_Controller
 
 					// See if this filename already exists on the server
 					$already_exists = getPackageInfo($base_name);
-					$package['download_conflict'] = is_array($already_exists) && $already_exists['id'] == $package['id'] && compareVersions($already_exists['version'], $package['version']) != 0;
+					$package['download_conflict'] = is_array($already_exists) && in_array($already_exists['id'], $package['possible_ids']) && compareVersions($already_exists['version'], $package['version']) != 0;
 					$package['count'] = ++$packageNum;
+
+					// Maybe they have downloaded it but not installed it
+					$package['is_downloaded'] = !$package['is_installed'] && (is_array($already_exists) && in_array($already_exists['id'], $package['possible_ids']));
+					if ($package['is_downloaded'])
+					{
+						// Is the available package newer than whats been downloaded?
+						$package['is_newer'] = compareVersions($package['version'], $already_exists['version']) > 0;
+					}
 
 					// Build the download to server link
 					$server_att = $server != '' ? ';server=' . $server : '';
@@ -242,13 +251,10 @@ class PackageServers_Controller extends Action_Controller
 
 		// Good time to sort the categories, the packages inside each category will be by last modification date.
 		asort($context['package_list']);
-
 	}
 
 	/**
 	 * Case insensitive natural sort for packages
-	 *
-	 * - Callback for usort, can be anonymous function in 1.1
 	 *
 	 * @param array $a
 	 * @param array $b
@@ -319,6 +325,8 @@ class PackageServers_Controller extends Action_Controller
 			strtolower($thisPackage->author) . ':' . $none,
 			ucfirst($thisPackage->author) . ':' . $under,
 			ucfirst($thisPackage->author) . ':' . $none,
+			strtolower($thisPackage->author . ':' . $under),
+			strtolower($thisPackage->author . ':' . $none),
 		);
 	}
 
