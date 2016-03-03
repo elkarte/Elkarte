@@ -549,31 +549,9 @@ em, .em {
 .cat_img_talk:before        {background-position: 0 -576px;}
 
 /* Expand/Collapse image in the various headers */
-.panel_toggle span {
-	position: relative;
+
+.collapse, .expand {
 	float: right;
-	overflow: hidden;
-	padding: 0 16px;
-}
-
-.panel_toggle :after {
-	content: "\00a0";
-}
-
-.panel_toggle span span {
-	position: absolute;
-	top: 50%;
-	left: 50%;
-	margin-top: -30px;
-	margin-left: -58px;
-	padding: 47px 50px;
-	background-image: url(../images/_light/expcol.png);
-	background-repeat: no-repeat;
-}
-
-.collapse {
-	float: right;
-	margin: 2px 4px -2px 0;
 }
 
 /* The expand / collapse icon in the sprite */
@@ -949,12 +927,12 @@ a.bbc_link {
 
 #search_form {
 	float: right;
-	padding: 12px 3px 4px 8px;
+	padding: .75em .25em .25em .5em;
 }
 
 /* TODO: This is really bad. Parameters are evaluated from right to left when evaluating css, which means
          this is checked against every element on the page. */
-#search_form * {
+#search_form button, #search_form input, #search_form label {
 	float: left;
 	margin: 0;
 	border-radius: 0;
@@ -1120,8 +1098,6 @@ a.bbc_link {
 #footer_section .rssfeeds {
 	float: right;
 	margin: auto;
-	padding-top: 2px;
-	width: 21px;
 	text-align: center;
 	border-radius: 0.3em;
 }
@@ -1516,7 +1492,7 @@ a.bbc_link {
 	margin: 3px 0 0 0;
 	padding-right: 1em;
 	border: 1px solid;
-	border-radius: 2px;
+	border-radius: .125em;
 }
 
 #main_content_section .navigate_section {
@@ -1527,7 +1503,7 @@ a.bbc_link {
 	position: relative;
 	display: inline-block;
 	float: left;
-	padding: 0 1.1em 0 2em;
+	padding: 0 1em 0 2em;
 	border: none;
 	white-space: nowrap;
 	font-size: 0.929em;
@@ -1536,7 +1512,7 @@ a.bbc_link {
 }
 .linktree:first-child a {
 	height: 2em;
-	padding: 0 6px;
+	padding: 0 .25em;
 }
 .linktree:last-child {
 	max-width: 25em;
@@ -2238,22 +2214,22 @@ a.bbc_link {
 
 /* The posting icons and mark read button. */
 #posting_icons {
-	margin: 0 0 20px 4px;
+	margin: 0 0 1em .25em;
 }
 
 #posting_icons p {
 	display: table-cell;
-	padding: 0 6px;
+	padding: 0 .25em;
 	font-size: 0.857em;
+	line-height: 1.25em;
+}
+
+#posting_icons .icon {
+	vertical-align: text-top;
 }
 
 #posting_icons .buttonlist {
 	padding: 0;
-}
-
-#posting_icons img {
-	margin: 0 2px;
-	vertical-align: middle;
 }
 
 /* Styles for the info center on the board index. */
@@ -5337,8 +5313,18 @@ a.help .icon {
 
 .icon {
 	display: inline-block;
-	height: 1em;
-	width: 1em;
+	height: 1.25em;
+	width: 1.25em;
+	vertical-align: middle;
+}
+
+.icon-lg {
+	height: 2em;
+	width: 2em;
+}
+
+.icon-top {
+	vertical-align: top;
 }
 
 .board_icon {
@@ -5349,7 +5335,7 @@ a.help .icon {
 }
 
 .board_key {
-	padding: 0.25em;
+	padding: 0 0.25em;
 }
 
 /* ------------------------------------------------------- */
@@ -5479,6 +5465,11 @@ a.help .icon {
 
 	#collapse_button {
 		display: none;
+	}
+
+	.board_icon {
+		height: 2em;
+		width: 2em;
 	}
 
 	.wrapper {

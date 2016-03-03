@@ -46,7 +46,7 @@ function template_boards_list()
 		// If this category even can collapse, show a link to collapse it.
 		if ($category['can_collapse'])
 			echo '
-				<a class="collapse" href="', $category['collapse_href'], '" title="', $category['is_collapsed'] ? $txt['show'] : $txt['hide'], '">', $category['collapse_image'], '</a>';
+				<a class="collapse icon icon-top i-chevron-', $category['is_collapsed'] ? 'down' : 'up', '" href="', $category['collapse_href'], '" title="', $category['is_collapsed'] ? $txt['show'] : $txt['hide'], '"></a>';
 
 		// The "category link" is only a link for logged in members. Guests just get the name.
 		echo '
@@ -119,9 +119,7 @@ function template_info_center()
 	echo '
 	<div id="info_center" class="forum_category">
 		<h2 class="category_header panel_toggle">
-			<span>
-				<span id="upshrink_ic" class="', empty($context['minmax_preferences']['info']) ? 'collapse' : 'expand', ' hide" title="', $txt['hide'], '"></span>
-			</span>
+				<i id="upshrink_ic" class="', empty($context['minmax_preferences']['info']) ? 'collapse' : 'expand', ' hide icon i-chevron-', empty($context['minmax_preferences']['info']) ? 'up' : 'down', '" title="', $txt['hide'], '"></i>
 			<a href="#" id="upshrink_link">', sprintf($txt['info_center_title'], $context['forum_name_html_safe']), '</a>
 		</h2>
 		<ul id="upshrinkHeaderIC" class="category_boards', empty($context['minmax_preferences']['info']) ? '' : ' hide', '">';
@@ -144,9 +142,9 @@ function template_info_center()
 			aSwapClasses: [
 				{
 					sId: \'upshrink_ic\',
-					classExpanded: \'collapse\',
+					classExpanded: \'collapse icon i-chevron-up\',
 					titleExpanded: ', JavaScriptEscape($txt['hide']), ',
-					classCollapsed: \'expand\',
+					classCollapsed: \'expand icon i-chevron-down\',
 					titleCollapsed: ', JavaScriptEscape($txt['show']), '
 				}
 			],
@@ -296,7 +294,7 @@ function template_ic_show_stats()
 	echo '
 			<li class="board_row">
 				<h3 class="ic_section_header">
-					<img class="icon" src="', $settings['images_url'], '/icons/info.png" alt="" />
+					<i class="icon i-pie-chart"></i>
 					', $context['show_stats'] ? '<a href="' . $scripturl . '?action=stats" title="' . $txt['more_stats'] . '">' . $txt['forum_stats'] . '</a>' : $txt['forum_stats'], '
 				</h3>
 				<p class="inline">
@@ -317,7 +315,7 @@ function template_ic_show_users()
 	echo '
 			<li class="board_row">
 				<h3 class="ic_section_header">
-					', $context['show_who'] ? '<a href="' . $scripturl . '?action=who">' : '', '<img class="icon" src="', $settings['images_url'], '/icons/online.png', '" alt="" /> ', $txt['online_now'], ':
+					', $context['show_who'] ? '<a href="' . $scripturl . '?action=who">' : '', '<i class="icon i-users"></i> ', $txt['online_now'], ':
 					', comma_format($context['num_guests']), ' ', $context['num_guests'] == 1 ? $txt['guest'] : $txt['guests'], ', ', comma_format($context['num_users_online']), ' ', $context['num_users_online'] == 1 ? $txt['user'] : $txt['users'];
 
 	// Handle hidden users and buddies.
