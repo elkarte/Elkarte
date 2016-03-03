@@ -132,7 +132,7 @@ h3 a.help .icon {
 }
 .settings .help .icon {
 	margin: 0 0 0 -20px;
-    position: absolute;
+	position: absolute;
 }
 .table_caption, tr.table_caption td {
 	font-weight: bold;
@@ -402,6 +402,12 @@ div.quick_tasks {
 #package_list li {
 	padding: 0.2em;
 	margin: 1px;
+}
+.package_id {
+	width: 35%;
+	min-width: 20em;
+	display: inline-block;
+	font-weight: bold;
 }
 .description, .information {
 	max-height: 16em;
