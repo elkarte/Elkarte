@@ -1508,59 +1508,6 @@ a.bbc_link {
 */
 
 /* ------------------------------------------------------- */
-/*	$BOARDICONS	                                           */
-/* ------------------------------------------------------- */
-
-/* @todo: This is a job for font awesome. */
-
-.board_icon {
-	display: block;
-	float: left;
-	width: 48px;
-	height: 48px;
-}
-
-.board_key:before {
-	display: block;
-	float: left;
-	width: 26px;
-	height: 24px;
-	content: "";
-}
-
-.category_boards .board_icon, .board_key:before {
-
-}
-
-.on_board {
-	background-position: 0 0;
-}
-
-.on2_board {
-	background-position: -72px 0;
-}
-
-.off_board {
-	background-position: -144px 0;
-}
-
-.redirect_board {
-	background-position: -216px 0;
-}
-
-.new_some_board:before {
-	background-position: -300px -14px;
-}
-
-.new_none_board:before {
-	background-position: -372px -14px;
-}
-
-.new_redirect_board:before {
-	background-position: -444px -14px;
-}
-
-/* ------------------------------------------------------- */
 /*	$LINKTREE                                              */
 /* ------------------------------------------------------- */
 /* The navigation list (i.e. linktree, breadcrumbs) */
@@ -5379,6 +5326,33 @@ a.help .icon {
 
 
 /* ------------------------------------------------------- */
+/*	$ICONS                                     */
+/* ------------------------------------------------------- */
+/*
+/* Icons. Since embedded icons need to have color data
+/* included, the icons themselves go into the color files.
+/* This just holds sizing code.
+/*
+/* ------------------------------------------------------- */
+
+.icon {
+	display: inline-block;
+	height: 1em;
+	width: 1em;
+}
+
+.board_icon {
+	display: block;
+	float: left;
+	width: 3em;
+	height: 3em;
+}
+
+.board_key {
+	padding: 0.25em;
+}
+
+/* ------------------------------------------------------- */
 /*	$MEDIA                                                 */
 /* ------------------------------------------------------- */
 /* Experimental media queries.
@@ -5746,6 +5720,11 @@ a.help .icon {
 
 	#search_form .input_text {
 		width: 7em;
+	}
+
+	.board_icon {
+		height: 1.25em;
+		width: 1.25em;
 	}
 
 	.post {
@@ -6232,7 +6211,6 @@ a.help .icon {
 
 	.forumposts {
 		margin-top: 8px;
-		border: 1px solid;
 		border-radius: 3px;
 	}
 

@@ -226,11 +226,8 @@ legend {
 .board_icon {
 	float: right;
 }
-.board_key:before {
+.board_key {
 	float: right;
-}
-.category_boards .board_icon, .board_key:before {
-	background-image: url(../../images/_light/board_icons_rtl.png);
 }
 
 /*	$LINKTREE	*/
