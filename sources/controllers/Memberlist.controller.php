@@ -458,14 +458,14 @@ class Memberlist_Controller extends Action_Controller
 			$validFields = isset($input_fields) ? $input_fields : array();
 
 			// Any custom fields to search for - these being tricky?
-			foreach ($input_fields as $field)
+			foreach (array_keys($this->_search_fields) as $field)
 			{
 				$curField = substr($field, 5);
 				if (substr($field, 0, 5) === 'cust_' && isset($context['custom_search_fields'][$curField]))
 				{
-					$customJoin[] = 'LEFT JOIN {db_prefix}custom_fields_data AS cfd' . $curField . ' ON (cfd' . $curField . '.variable = {string:cfd' . $curField . '} AND cfd' . $curField . '.id_member = mem.id_member)';
-					$query_parameters['cfd' . $curField] = $curField;
-					$fields += array($customCount++ => 'IFNULL(cfd' . $curField . '.value, {string:blank_string})');
+					$customJoin[] = 'LEFT JOIN {db_prefix}custom_fields_data AS cfd' . $field . ' ON (cfd' . $field . '.variable = {string:cfd' . $field . '} AND cfd' . $field . '.id_member = mem.id_member)';
+					$query_parameters['cfd' . $field] = $curField;
+					$fields += array($customCount++ => 'IFNULL(cfd' . $field . '.value, {string:blank_string})');
 					$validFields[] = $field;
 				}
 			}
