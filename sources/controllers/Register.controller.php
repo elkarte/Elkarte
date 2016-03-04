@@ -150,6 +150,7 @@ class Register_Controller extends Action_Controller
 			if (empty($context['agreement']))
 			{
 				// No file found or a blank file, log the error so the admin knows there is a problem!
+				loadLanguage('Errors');
 				log_error($txt['registration_agreement_missing'], 'critical');
 				fatal_lang_error('registration_disabled', false);
 			}
