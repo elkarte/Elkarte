@@ -415,11 +415,9 @@ function loadBoard()
 
 	// Assume they are not a moderator.
 	$user_info['is_mod'] = false;
-	$context['user']['is_mod'] = &$user_info['is_mod'];
 	// @since 1.0.5 - is_mod takes into account only local (board) moderators,
 	// and not global moderators, is_moderator is meant to take into account both.
 	$user_info['is_moderator'] = false;
-	$context['user']['is_moderator'] = &$user_info['is_moderator'];
 
 	// Start the linktree off empty..
 	$context['linktree'] = array();
@@ -609,7 +607,6 @@ function loadBoard()
 	{
 		// Now check if the user is a moderator.
 		$user_info['is_mod'] = isset($board_info['moderators'][$user_info['id']]);
-		$user_info['is_moderator'] = $user_info['is_mod'] || allowedTo('moderate_board');
 
 		if (count(array_intersect($user_info['groups'], $board_info['groups'])) == 0 && !$user_info['is_admin'])
 			$board_info['error'] = 'access';
@@ -791,6 +788,7 @@ function loadPermissions()
 	// Load the mod cache so we can know what additional boards they should see, but no sense in doing it for guests
 	if (!$user_info['is_guest'])
 	{
+		$user_info['is_moderator'] = $user_info['is_mod'] || allowedTo('moderate_board');
 		if (!isset($_SESSION['mc']) || $_SESSION['mc']['time'] <= $modSettings['settings_updated'])
 		{
 			require_once(SUBSDIR . '/Auth.subs.php');
