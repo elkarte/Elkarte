@@ -364,7 +364,7 @@ function template_th_search_bar()
 				<input type="hidden" name="', (!empty($modSettings['search_dropdown']) ? 'sd_brd[' : 'brd['), $context['current_board'], ']"', ' value="', $context['current_board'], '" />';
 
 	echo '
-				<button type="submit" name="search;sa=results" class="', (!empty($modSettings['search_dropdown'])) ? 'with_select' : '', '"><i class="fa fa-lg fa-search"></i></button>
+				<button type="submit" name="search;sa=results" class="', (!empty($modSettings['search_dropdown'])) ? 'with_select' : '', '"><i class="icon icon-lg i-search icon-top"></i></button>
 				<input type="hidden" name="advanced" value="0" />
 			</form>';
 }
@@ -408,7 +408,7 @@ function template_body_below()
 					theme_copyright(), '
 				</li>',
 				!empty($context['newsfeed_urls']['rss']) ? '<li>
-					<a id="button_rss" href="' . $context['newsfeed_urls']['rss'] . '" class="rssfeeds new_win"><i class="largetext fa fa-rss"></i></a>
+					<a id="button_rss" href="' . $context['newsfeed_urls']['rss'] . '" class="rssfeeds new_win"><i class="icon i-rss icon-lg icon-shadow"><s>' . $txt['rss'] . '</s></i></a>
 				</li>' : '',
 			'</ul>';
 
@@ -450,7 +450,7 @@ function template_html_below()
  */
 function theme_linktree($default = 'linktree')
 {
-	global $context, $settings;
+	global $context, $settings, $txt;
 
 	// If linktree is empty, just return - also allow an override.
 	if (empty($context[$default]))
@@ -474,7 +474,7 @@ function theme_linktree($default = 'linktree')
 			echo $tree['extra_before'];
 
 		// Show the link, including a URL if it should have one.
-		echo $settings['linktree_link'] && isset($tree['url']) ? '<a href="' . $tree['url'] . '">' . ($pos == 0 ? '<i class="fa fa-home fa-lg"></i>' : $tree['name']) . '</a>' : $tree['name'];
+		echo $settings['linktree_link'] && isset($tree['url']) ? '<a href="' . $tree['url'] . '">' . ($pos == 0 ? '<i class="icon i-home icon-lg icon-top"><s>' . $txt['home'] . '</s></i>' : $tree['name']) . '</a>' : $tree['name'];
 
 		// Show something after the link...?
 		if (isset($tree['extra_after']))
@@ -504,9 +504,7 @@ function template_menu()
 	echo '
 						<li id="collapse_button" class="listlevel1">
 							<a class="linklevel1 panel_toggle">
-								<span>
-									<span id="upshrink" class="collapse hide" title="', $txt['upshrink_description'], '"></span>
-								</span>
+								<i id="upshrink" class="hide chevricon i-chevron-up icon-lg" title="', $txt['upshrink_description'], '"></i>
 							</a>
 						</li>';
 
@@ -571,9 +569,9 @@ function template_menu()
 						aSwapClasses: [
 							{
 								sId: \'upshrink\',
-								classExpanded: \'collapse\',
+								classExpanded: \'chevricon i-chevron-up icon-lg\',
 								titleExpanded: ', JavaScriptEscape($txt['upshrink_description']), ',
-								classCollapsed: \'expand\',
+								classCollapsed: \'chevricon i-chevron-down icon-lg\',
 								titleCollapsed: ', JavaScriptEscape($txt['upshrink_description']), '
 							}
 						],
@@ -649,7 +647,7 @@ function template_button_strip($button_strip, $direction = '', $strip_options = 
  *        - name => name of the checkbox array, like delete, will have [] added for the form
  *        - value => value for the checkbox to return in the post
  *
- * @param string $strip - the $context index where the strip is stored
+ * @param array $strip - the $context index where the strip is stored
  * @param bool[] $tests - an array of tests to determine if the button should
  * be displayed or not
  */

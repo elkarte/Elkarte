@@ -559,14 +559,14 @@ class In_Line_Attachment
 			case 'url':
 				$inlinedtext = '
 					<a href="' . $this->_attachment['href'] . '">
-						<img src="' . $settings['images_url'] . '/icons/clip.png" class="icon" alt="*" />&nbsp;' . $this->_attachment['name'] . '
+						<i class="icon i-paperclip"></i>' . $this->_attachment['name'] . '
 					</a> (' . $this->_attachment['size'] . ($this->_attachment['is_image'] ? ', ' . $this->_attachment['real_width'] . 'x' . $this->_attachment['real_height'] . ' - ' . sprintf($txt['attach_viewed'], $this->_attachment['downloads']) : ' ' . sprintf($txt['attach_downloaded'], $this->_attachment['downloads'])) . ')';
 				break;
 			// [attachmini=xx] -- just a plain link type = mini
 			case 'mini':
 				$inlinedtext = '
 					<a href="' . $this->_attachment['href'] . '">
-						<img src="' . $settings['images_url'] . '/icons/clip.png" class="icon" alt="*" />&nbsp;' . $this->_attachment['name'] . '
+						<i class="icon i-paperclip"></i>' . $this->_attachment['name'] . '
 					</a>';
 				break;
 		}

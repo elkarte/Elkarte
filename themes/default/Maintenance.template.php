@@ -48,9 +48,7 @@ function template_maintain_database()
 			</form>
 		</div>
 		<h2 class="category_header">
-			<a href="', $scripturl, '?action=quickhelp;help=maintenance_backup" onclick="return reqOverlayDiv(this.href);" class="help">
-				<img src="', $settings['images_url'], '/helptopics.png" class="icon" alt="', $txt['help'], '" />
-			</a> ', $txt['maintain_backup'], '
+			<a href="', $scripturl, '?action=quickhelp;help=maintenance_backup" onclick="return reqOverlayDiv(this.href);" class="helpicon i-help"><s>', $txt['help'], '</s></a> ', $txt['maintain_backup'], '
 		</h2>
 		<div class="content">
 			<form action="', $scripturl, '?action=admin;area=maintain;sa=database;activity=backup" method="post" accept-charset="UTF-8">

@@ -604,9 +604,7 @@ function template_search()
 		echo '
 		<fieldset class="content">
 			<h3 class="secondary_header panel_toggle">
-				<span>
-					<span id="advanced_panel_toggle" class="', empty($context['minmax_preferences']['pm']) ? 'collapse' : 'expand', ' hide" title="', $txt['hide'], '"></span>
-				</span>
+					<i id="advanced_panel_toggle" class="chevricon i-chevron-', empty($context['minmax_preferences']['pm']) ? 'up' : 'down', ' hide" title="', $txt['hide'], '"></i>
 				<a href="#" id="advanced_panel_link">', $txt['pm_search_choose_label'], '</a>
 			</h3>
 			<div id="advanced_panel_div" class="well', empty($context['minmax_preferences']['pm']) ? '"' : ' hide"', '>
@@ -641,9 +639,9 @@ function template_search()
 				aSwapClasses: [
 					{
 						sId: \'advanced_panel_toggle\',
-						classExpanded: \'collapse\',
+						classExpanded: \'chevricon i-chevron-up\',
 						titleExpanded: ' . JavaScriptEscape($txt['hide']) . ',
-						classCollapsed: \'expand\',
+						classCollapsed: \'chevricon i-chevron-down\',
 						titleCollapsed: ' . JavaScriptEscape($txt['show']) . '
 					}
 				],
@@ -951,9 +949,7 @@ function template_send()
 	{
 		echo '
 				<h3 id="postDraftOptionsHeader" class="category_header panel_toggle">
-					<span>
-						<span id="postDraftExpand" class="', empty($context['minmax_preferences']['pmdraft']) ? 'collapse' : 'expand', ' hide" title="', $txt['hide'], '"></span>
-					</span>
+						<i id="postDraftExpand" class="chevricon i-chevron-', empty($context['minmax_preferences']['pmdraft']) ? 'up' : 'down', ' hide" title="', $txt['hide'], '"></i>
 					<a href="#" id="postDraftExpandLink">', $txt['draft_load'], '</a>
 				</h3>
 				<div id="postDraftOptions" class="load_drafts padding', empty($context['minmax_preferences']['pmdraft']) ? '"' : ' hide"', '>
@@ -996,9 +992,9 @@ function template_send()
 			aSwapClasses: [
 				{
 					sId: \'postDraftExpand\',
-					classExpanded: \'collapse\',
+					classExpanded: \'chevricon i-chevron-up\',
 					titleExpanded: ', JavaScriptEscape($txt['hide']), ',
-					classCollapsed: \'expand\',
+					classCollapsed: \'chevricon i-chevron-down\',
 					titleCollapsed: ', JavaScriptEscape($txt['show']), '
 				}
 			],
@@ -1074,7 +1070,7 @@ function template_send()
 				sBccLinkContainerId: \'bcc_link_container\',
 				bBccShowByDefault: ', empty($context['recipients']['bcc']) && empty($context['bcc_value']) ? 'false' : 'true', ',
 				sShowBccLinkTemplate: ', JavaScriptEscape('
-					<a href="#" id="bcc_link">' . $txt['make_bcc'] . '</a> <a href="' . $scripturl . '?action=quickhelp;help=pm_bcc" onclick="return reqOverlayDiv(this.href);"><img class="icon" src="' . $settings['images_url'] . '/helptopics.png" alt="(?)" /></a>'
+					<a href="#" id="bcc_link">' . $txt['make_bcc'] . '</a> <a href="' . $scripturl . '?action=quickhelp;help=pm_bcc" onclick="return reqOverlayDiv(this.href);" class="helpicon i-help"><s>', $txt['help'], '</s></a>'
 				), '
 			});
 		// ]]></script>';

@@ -151,7 +151,7 @@ function template_registration_form()
 		echo '
 					<dl class="settings" id="authentication_group">
 						<dt>
-							<a href="', $scripturl, '?action=quickhelp;help=register_openid" onclick="return reqOverlayDiv(this.href);" class="help"><img class="icon" src="' . $settings['images_url'] . '/helptopics.png" alt="(?)" /></a>
+							<a href="', $scripturl, '?action=quickhelp;help=register_openid" onclick="return reqOverlayDiv(this.href);" class="helpicon i-help"><s>', $txt['help'], '</s></a>
 							<strong>', $txt['authenticate_label'], ':</strong>
 						</dt>
 						<dd>

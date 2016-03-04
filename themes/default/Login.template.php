@@ -71,7 +71,7 @@ function template_login()
 							<label for="openid_identifier">', $txt['openid'], ':</label>
 						</dt>
 						<dd>
-							<input type="text" id="openid_identifier" name="openid_identifier" class="input_text openid_login" size="17"', !empty($context['using_openid']) ? ' autofocus="autofocus" ' : '', ' />&nbsp;<a href="', $scripturl, '?action=quickhelp;help=register_openid" onclick="return reqOverlayDiv(this.href);" class="help"><img src="', $settings['images_url'], '/helptopics.png" alt="', $txt['help'], '" class="icon" /></a>
+							<input type="text" id="openid_identifier" name="openid_identifier" class="input_text openid_login" size="17"', !empty($context['using_openid']) ? ' autofocus="autofocus" ' : '', ' />&nbsp;<a href="', $scripturl, '?action=quickhelp;help=register_openid" onclick="return reqOverlayDiv(this.href);" class="helpicon i-help"><s>', $txt['help'], '</s></a>
 						</dd>
 					</dl>
 					<hr />';
@@ -289,9 +289,7 @@ function template_admin_login()
 	echo '
 			<label for="', $context['sessionCheckType'], '_pass">', $txt['password'], ':</label>
 			<input type="password" name="', $context['sessionCheckType'], '_pass" id="', $context['sessionCheckType'], '_pass" size="24" class="input_password" autofocus="autofocus" placeholder="', $txt['password'], '"/>
-			<a href="', $scripturl, '?action=quickhelp;help=securityDisable_why" onclick="return reqOverlayDiv(this.href);" class="help">
-				<img class="icon" src="', $settings['images_url'], '/helptopics.png" alt="', $txt['help'], '" />
-			</a>
+			<a href="', $scripturl, '?action=quickhelp;help=securityDisable_why" onclick="return reqOverlayDiv(this.href);" class="helpicon i-help"><s>', $txt['help'], '</s></a>
 			<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />
 			<input type="hidden" name="', $context['admin-login_token_var'], '" value="', $context['admin-login_token'], '" />
 			<p>

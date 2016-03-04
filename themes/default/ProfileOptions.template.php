@@ -1271,7 +1271,7 @@ function template_profile_timeformat_modify()
 							<dt>
 								<label for="easyformat">', $txt['time_format'], '</label>
 								<p>
-									<a href="', $scripturl, '?action=quickhelp;help=time_format" onclick="return reqOverlayDiv(this.href);" class="help"><img src="', $settings['images_url'], '/helptopics.png" alt="', $txt['help'], '" class="icon" /></a>
+									<a href="', $scripturl, '?action=quickhelp;help=time_format" onclick="return reqOverlayDiv(this.href);" class="helpicon i-help"><s>', $txt['help'], '</s></a>
 									&nbsp;', $txt['date_format'], '
 								</p>
 							</dt>
@@ -1366,10 +1366,8 @@ function template_authentication_method()
 					<dt>
 						<input type="radio" onclick="updateAuthMethod();" name="authenticate" value="openid" id="auth_openid"', $context['auth_method'] == 'openid' ? ' checked="checked"' : '', ' />
 						<label for="auth_openid">', $txt['authenticate_openid'], '</label>
-						<a href="', $scripturl, '?action=quickhelp;help=register_openid" onclick="return reqOverlayDiv(this.href);" class="help">
-							<img class="icon" src="', $settings['images_url'], '/helptopics.png" alt="(?)" />
-						</a>
-						<br />
+						<a href="', $scripturl, '?action=quickhelp;help=register_openid" onclick="return reqOverlayDiv(this.href);" class="helpicon i-help"><s>', $txt['help'], '</s></a>
+						<br>
 						<input type="radio" onclick="updateAuthMethod();" name="authenticate" value="passwd" id="auth_pass"', $context['auth_method'] == 'password' ? ' checked="checked"' : '', ' />
 						<label for="auth_pass">', $txt['authenticate_password'], '</label>
 					</dt>

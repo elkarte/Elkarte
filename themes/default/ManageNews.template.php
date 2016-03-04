@@ -83,7 +83,7 @@ function template_email_members()
 			<div id="exclude_panel_header">
 				<h2 class="category_header panel_toggle">
 					<span>
-						<span id="upshrink_ic" class="', empty($context['admin_preferences']['apn']) ? 'collapse' : 'expand', ' hide" title="', $txt['hide'], '"></span>
+						<span id="upshrink_ic" class="chevricon i-chevron-', empty($context['admin_preferences']['apn']) ? 'up' : 'down', ' hide" title="', $txt['hide'], '"></span>
 					</span>
 					<a href="#" id="exclude_panel_link" >', $txt['exclude_these'], '</a>
 				</h2>
@@ -129,9 +129,9 @@ function template_email_members()
 			aSwapClasses: [
 				{
 					sId: \'upshrink_ic\',
-					classExpanded: \'collapse\',
+					classExpanded: \'chevricon i-chevron-up\',
 					titleExpanded: ' . JavaScriptEscape($txt['hide']) . ',
-					classCollapsed: \'expand\',
+					classCollapsed: \'chevricon i-chevron-down\',
 					titleCollapsed: ' . JavaScriptEscape($txt['show']) . '
 				}
 			],

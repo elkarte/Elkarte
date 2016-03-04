@@ -225,7 +225,7 @@ function markallreadButton(btn)
 
 	// Turn the board icon class to off
 	$('.board_icon').each(function() {
-		$(this).removeClass('on_board on2_board').addClass('off_board');
+		$(this).removeClass('i-board-new i-board-sub').addClass('i-board-off');
 	});
 
 	$('.board_new_posts').removeClass('board_new_posts');

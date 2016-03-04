@@ -83,10 +83,10 @@ function optimizeBoardsSubdivision($categories, $total_boards)
 /**
  * Main template for displaying the list of boards
  *
- * @param int $boards
+ * @param array $boards
  * @param string $id
  */
-function template_list_boards($boards, $id)
+function template_list_boards(array $boards, $id)
 {
 	global $context, $settings, $txt, $scripturl;
 
@@ -107,17 +107,17 @@ function template_list_boards($boards, $id)
 		// If the board or children is new, show an indicator.
 		if ($board['new'] || $board['children_new'])
 			echo '
-							<span class="board_icon ', $board['new'] ? 'on_board' : 'on2_board', '" title="', $txt['new_posts'], '"></span>';
+							<span class="board_icon ', $board['new'] ? 'i-board-new' : 'i-board-sub', '" title="', $txt['new_posts'], '"></span>';
 
 		// Is it a redirection board?
 		elseif ($board['is_redirect'])
 			echo '
-							<span class="board_icon redirect_board" title="', sprintf($txt['redirect_board_to'], Util::htmlspecialchars($board['name'])), '"></span>';
+							<span class="board_icon i-board-redirect" title="', sprintf($txt['redirect_board_to'], Util::htmlspecialchars($board['name'])), '"></span>';
 
 		// No new posts at all! The agony!!
 		else
 			echo '
-							<span class="board_icon off_board" title="', $txt['old_posts'], '"></span>';
+							<span class="board_icon i-board-off" title="', $txt['old_posts'], '"></span>';
 
 		echo '
 						</a>
@@ -226,7 +226,7 @@ function template_pick_boards($form_name, $input_names = 'brd', $select_all = tr
 		echo '
 						<h3 class="secondary_header panel_toggle">
 							<span>
-								<span id="advanced_panel_toggle" class="', $context['boards_check_all'] ? 'expand' : 'collapse', ' hide" title="', $txt['hide'], '"></span>
+								<span id="advanced_panel_toggle" class="chevricon i-chevron-', $context['boards_check_all'] ? 'down' : 'up', ' hide" title="', $txt['hide'], '"></span>
 							</span>
 							<a href="#" id="advanced_panel_link">', $txt['choose_board'], '</a>
 						</h3>
@@ -291,9 +291,9 @@ function template_pick_boards($form_name, $input_names = 'brd', $select_all = tr
 			aSwapClasses: [
 				{
 					sId: \'advanced_panel_toggle\',
-					classExpanded: \'collapse\',
+					classExpanded: \'chevricon i-chevron-up\',
 					titleExpanded: ' . JavaScriptEscape($txt['hide']) . ',
-					classCollapsed: \'expand\',
+					classCollapsed: \'chevricon i-chevron-down\',
 					titleCollapsed: ' . JavaScriptEscape($txt['show']) . '
 				}
 			],
