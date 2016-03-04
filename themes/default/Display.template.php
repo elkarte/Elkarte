@@ -407,7 +407,7 @@ function template_quickreply_below()
 				<h2 class="category_header category_toggle">
 					<span>
 						<a href="javascript:oQuickReply.swap();">
-							<span id="quickReplyExpand" class="', empty($context['minmax_preferences']['qreply']) ? 'collapse' : 'expand', '" title="', $txt['hide'], '"></span>
+							<i id="quickReplyExpand" class="chevricon i-chevron-', empty($context['minmax_preferences']['qreply']) ? 'up' : 'down', '" title="', $txt['hide'], '"></i>
 						</a>
 					</span>
 					<a href="javascript:oQuickReply.swap();">', $txt['quick_reply'], '</a>
@@ -521,9 +521,9 @@ function template_quickreply_below()
 				sImagesUrl: elk_images_url,
 				sContainerId: "quickReplyOptions",
 				sClassId: "quickReplyExpand",
-				sClassCollapsed: "collapse",
+				sClassCollapsed: "chevricon i-chevron-up",
 				sTitleCollapsed: ', JavaScriptEscape($txt['show']), ',
-				sClassExpanded: "expand",
+				sClassExpanded: "chevricon i-chevron-down",
 				sTitleExpanded: ', JavaScriptEscape($txt['hide']), ',
 				sJumpAnchor: "quickreply",
 				bIsFull: ', !empty($options['use_editor_quick_reply']) ? 'true,

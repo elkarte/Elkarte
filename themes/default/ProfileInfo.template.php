@@ -526,7 +526,9 @@ function template_profile_block_summary()
 						<h4><span class="position">', (!empty($context['member']['group']) ? $context['member']['group'] : $context['member']['post_group']), '</span></h4>
 					</div>
 					', $context['member']['avatar']['image'], '
-					<span id="userstatus">', $context['can_send_pm'] ? '<a href="' . $context['member']['online']['href'] . '" title="' . $context['member']['online']['text'] . '" rel="nofollow">' : '', $settings['use_image_buttons'] ? '<img src="' . $context['member']['online']['image_href'] . '" alt="' . $context['member']['online']['text'] . '" class="centericon" />' : $context['member']['online']['label'], $context['can_send_pm'] ? '</a>' : '', $settings['use_image_buttons'] ? '<span class="smalltext"> ' . $context['member']['online']['label'] . '</span>' : '', '</span>
+					<span id="userstatus">', $context['can_send_pm'] ? '<a href="' . $context['member']['online']['href'] . '" title="' . $context['member']['online']['text'] . '" rel="nofollow">' : '',
+					'<i class="', $context['member']['online']['is_online'] ? 'iconline' : 'icoffline', '" title="' . $context['member']['online']['text'] . '"></i>',
+					$context['can_send_pm'] ? '</a>' : '', '<span class="smalltext"> ' . $context['member']['online']['label'] . '</span>', '</span>
 				</div>
 				<div id="detailedinfo">
 					<dl>';
@@ -691,7 +693,7 @@ function template_profile_block_contact()
 		$ci_empty = false;
 		echo '
 					<dt>
-						<img src="', $settings['images_url'], '/icons/online.png" alt="" class="icon" />
+						<i class="icon i-user', $context['member']['is_buddy'] ? '-plus' : '', '"></i>
 					</dt>
 					<dd>
 						<a class="linkbutton" href="', $scripturl, '?action=buddy;u=', $context['id_member'], ';', $context['session_var'], '=', $context['session_id'], ';sa=', ($context['member']['is_buddy'] ? 'remove' : 'add'), '">', $txt['buddy_' . ($context['member']['is_buddy'] ? 'remove' : 'add')], '</a>
@@ -704,7 +706,7 @@ function template_profile_block_contact()
 		$ci_empty = false;
 		echo '
 					<dt>
-						<img src="', $settings['images_url'], '/profile/im_', $context['member']['online']['is_online'] ? 'on.png' : 'off.png', '" alt="" class="icon" />
+						<i class="icon i-comment', $context['member']['online']['is_online'] ? '' : '-blank', '"></i>
 					</dt>
 					<dd>
 						<a class="linkbutton" href="', $scripturl, '?action=pm;sa=send;u=', $context['member']['id'], '">', $txt['send_member_pm'], '</a>
@@ -717,7 +719,7 @@ function template_profile_block_contact()
 		$ci_empty = false;
 		echo '
 					<dt>
-						<img src="', $settings['images_url'], '/profile/email_sm.png" alt="', $txt['email'], '" />
+						<i class="icon i-envelope', $context['member']['online']['is_online'] ? '' : '-blank', '"><s>', $txt['email'], '</s></i>
 					</dt>
 					<dd>';
 

@@ -46,7 +46,7 @@ function template_boards_list()
 		// If this category even can collapse, show a link to collapse it.
 		if ($category['can_collapse'])
 			echo '
-				<a class="collapse icon icon-top i-chevron-', $category['is_collapsed'] ? 'down' : 'up', '" href="', $category['collapse_href'], '" title="', $category['is_collapsed'] ? $txt['show'] : $txt['hide'], '"></a>';
+				<a class="chevricon icon-top i-chevron-', $category['is_collapsed'] ? 'down' : 'up', '" href="', $category['collapse_href'], '" title="', $category['is_collapsed'] ? $txt['show'] : $txt['hide'], '"></a>';
 
 		// The "category link" is only a link for logged in members. Guests just get the name.
 		echo '
@@ -119,7 +119,7 @@ function template_info_center()
 	echo '
 	<div id="info_center" class="forum_category">
 		<h2 class="category_header panel_toggle">
-				<i id="upshrink_ic" class="', empty($context['minmax_preferences']['info']) ? 'collapse' : 'expand', ' hide icon i-chevron-', empty($context['minmax_preferences']['info']) ? 'up' : 'down', '" title="', $txt['hide'], '"></i>
+				<i id="upshrink_ic" class="hide chevricon i-chevron-', empty($context['minmax_preferences']['info']) ? 'up' : 'down', '" title="', $txt['hide'], '"></i>
 			<a href="#" id="upshrink_link">', sprintf($txt['info_center_title'], $context['forum_name_html_safe']), '</a>
 		</h2>
 		<ul id="upshrinkHeaderIC" class="category_boards', empty($context['minmax_preferences']['info']) ? '' : ' hide', '">';
@@ -142,9 +142,9 @@ function template_info_center()
 			aSwapClasses: [
 				{
 					sId: \'upshrink_ic\',
-					classExpanded: \'collapse icon i-chevron-up\',
+					classExpanded: \'chevricon i-chevron-up\',
 					titleExpanded: ', JavaScriptEscape($txt['hide']), ',
-					classCollapsed: \'expand icon i-chevron-down\',
+					classCollapsed: \'chevricon i-chevron-down\',
 					titleCollapsed: ', JavaScriptEscape($txt['show']), '
 				}
 			],

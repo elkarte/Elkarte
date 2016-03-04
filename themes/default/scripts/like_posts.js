@@ -389,7 +389,7 @@
 						'   <a class="largetext" href="' + topicUrl + '">' + data[i].msg_data[0].subject + '</a> ' + txtStrings.mostPopularTopicHeading1.easyReplace({1 : data[i].like_count}) +
 						'   <p class="panel_toggle secondary_header">'	+
 						'       <span class="topic_toggle">&nbsp' +
-						'           <span id="topic_toggle_img_' + i + '" class="collapse" title=""></span>' +
+						'           <span id="topic_toggle_img_' + i + '" class="chevricon i-chevron-up" title=""></span>' +
 						'       </span>' +
 						'       <a href="#" id="topic_toggle_link_' + i + '">' + txtStrings.mostPopularTopicSubHeading1.easyReplace({1 : data[i].msg_data.length, 2 : txtStrings.showPosts}) + '</a>' +
 						'   </p>' +
@@ -516,7 +516,7 @@
 						'   </div>' +
 						'   <p class="panel_toggle secondary_header">' +
 						'       <span class="liked_toggle">&nbsp' +
-						'           <span id="liked_toggle_img_' + i + '" class="collapse" title=""></span>' +
+						'           <span id="liked_toggle_img_' + i + '" class="chevricon i-chevron-up" title=""></span>' +
 						'       </span>' +
 						'       <a href="#" id="liked_toggle_link_' + i + '">' + txtStrings.mostPopularUserHeading1.easyReplace({1: txtStrings.showPosts}) + '</a>' +
 						'   </p>' +
@@ -588,7 +588,7 @@
 						'   </div>' +
 						'   <p class="panel_toggle secondary_header">' +
 						'       <span class="liker_toggle">&nbsp' +
-						'           <span id="liker_toggle_img_' + i + '" class="collapse" title=""></span>' +
+						'           <span id="liker_toggle_img_' + i + '" class="chevricon i-chevron-up" title=""></span>' +
 						'       </span>' +
 						'       <a href="#" id="liker_toggle_link_' + i + '">' + txtStrings.mostLikeGivenUserHeading1.easyReplace({1: txtStrings.showPosts}) + '</a>' +
 						'   </p>' +
@@ -646,9 +646,9 @@
 						aSwapClasses: [
 							{
 								sId: prefix + '_toggle_img_' + section,
-								classExpanded: 'collapse',
+								classExpanded: 'chevricon i-chevron-up',
 								titleExpanded: 'Hide',
-								classCollapsed: 'expand',
+								classCollapsed: 'chevricon i-chevron-down',
 								titleCollapsed: 'Show'
 							}
 						],

@@ -143,7 +143,7 @@ function template_callback_badbehavior_add_ip()
 	echo '
 		</dl>
 		<h3 class="secondary_header">
-			<a class="help" href="' . $scripturl . '?action=quickhelp;help=badbehavior_ip_wl" onclick="return reqOverlayDiv(this.href);" class="help"><img src="' . $settings['images_url'] . '/helptopics.png" class="icon" alt="' . $txt['help'] . '" /></a>', $txt['badbehavior_ip_wl'], '
+			<a href="' . $scripturl . '?action=quickhelp;help=badbehavior_ip_wl" onclick="return reqOverlayDiv(this.href);" class="helpicon i-help"><s>"' . $txt['help'] . '</s></a>', $txt['badbehavior_ip_wl'], '
 		</h3>
 		<dl class="settings">
 			<dt>',
@@ -199,7 +199,7 @@ function template_callback_badbehavior_add_url()
 	echo '
 		</dl>
 		<h3 class="secondary_header">
-			<a class="help" href="' . $scripturl . '?action=quickhelp;help=badbehavior_url_wl" onclick="return reqOverlayDiv(this.href);" class="help"><img src="' . $settings['images_url'] . '/helptopics.png" class="icon" alt="' . $txt['help'] . '" /></a>', $txt['badbehavior_url_wl'], '
+			<a href="' . $scripturl . '?action=quickhelp;help=badbehavior_url_wl" onclick="return reqOverlayDiv(this.href);" class="helpicon i-help"><s>"' . $txt['help'] . '</s></a>', $txt['badbehavior_url_wl'], '
 		</h3>
 			<dl class="settings">
 			<dt>',
@@ -256,7 +256,7 @@ function template_callback_badbehavior_add_useragent()
 	echo '
 		</dl>
 		<h3 class="secondary_header">
-			<a class="help" href="' . $scripturl . '?action=quickhelp;help=badbehavior_useragent_wl" onclick="return reqOverlayDiv(this.href);" class="help"><img src="' . $settings['images_url'] . '/helptopics.png" class="icon" alt="' . $txt['help'] . '" /></a>', $txt['badbehavior_useragent_wl'], '
+			<a href="' . $scripturl . '?action=quickhelp;help=badbehavior_useragent_wl" onclick="return reqOverlayDiv(this.href);" class="helpicon i-help"><s>' . $txt['help'] . '</s></a>', $txt['badbehavior_useragent_wl'], '
 		</h3>
 			<dl class="settings">
 			<dt>',

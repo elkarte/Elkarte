@@ -40,7 +40,7 @@ function template_modify_weights()
 			<div class="content">
 				<dl class="settings large_caption">
 					<dt>
-						<a href="', $scripturl, '?action=quickhelp;help=search_weight_frequency" onclick="return reqOverlayDiv(this.href);" class="help"><img src="', $settings['images_url'], '/helptopics.png" alt="', $txt['help'], '" /></a>
+						<a href="', $scripturl, '?action=quickhelp;help=search_weight_frequency" onclick="return reqOverlayDiv(this.href);" class="helpicon i-help"><s>', $txt['help'], '</s></a>
 						<label for="weight1_val">', $txt['search_weight_frequency'], ':</label>
 					</dt>
 					<dd>
@@ -48,7 +48,7 @@ function template_modify_weights()
 						<span id="weight1" class="search_weight">', $context['relative_weights']['search_weight_frequency'], '%</span>
 					</dd>
 					<dt>
-						<a href="', $scripturl, '?action=quickhelp;help=search_weight_age" onclick="return reqOverlayDiv(this.href);" class="help"><img src="', $settings['images_url'], '/helptopics.png" alt="', $txt['help'], '" /></a>
+						<a href="', $scripturl, '?action=quickhelp;help=search_weight_age" onclick="return reqOverlayDiv(this.href);" class="helpicon i-help"><s>', $txt['help'], '</s></a>
 						<label for="weight2_val">', $txt['search_weight_age'], ':</label>
 					</dt>
 					<dd>
@@ -56,7 +56,7 @@ function template_modify_weights()
 						<span id="weight2" class="search_weight">', $context['relative_weights']['search_weight_age'], '%</span>
 					</dd>
 					<dt>
-						<a href="', $scripturl, '?action=quickhelp;help=search_weight_length" onclick="return reqOverlayDiv(this.href);" class="help"><img src="', $settings['images_url'], '/helptopics.png" alt="', $txt['help'], '" /></a>
+						<a href="', $scripturl, '?action=quickhelp;help=search_weight_length" onclick="return reqOverlayDiv(this.href);" class="helpicon i-help"><s>', $txt['help'], '</s></a>
 						<label for="weight3_val">', $txt['search_weight_length'], ':</label>
 					</dt>
 					<dd>
@@ -64,7 +64,7 @@ function template_modify_weights()
 						<span id="weight3" class="search_weight">', $context['relative_weights']['search_weight_length'], '%</span>
 					</dd>
 					<dt>
-						<a href="', $scripturl, '?action=quickhelp;help=search_weight_subject" onclick="return reqOverlayDiv(this.href);" class="help"><img src="', $settings['images_url'], '/helptopics.png" alt="', $txt['help'], '" /></a>
+						<a href="', $scripturl, '?action=quickhelp;help=search_weight_subject" onclick="return reqOverlayDiv(this.href);" class="helpicon i-help"><s>', $txt['help'], '</s></a>
 						<label for="weight4_val">', $txt['search_weight_subject'], ':</label>
 					</dt>
 					<dd>
@@ -72,7 +72,7 @@ function template_modify_weights()
 						<span id="weight4" class="search_weight">', $context['relative_weights']['search_weight_subject'], '%</span>
 					</dd>
 					<dt>
-						<a href="', $scripturl, '?action=quickhelp;help=search_weight_first_message" onclick="return reqOverlayDiv(this.href);" class="help"><img src="', $settings['images_url'], '/helptopics.png" alt="', $txt['help'], '" /></a>
+						<a href="', $scripturl, '?action=quickhelp;help=search_weight_first_message" onclick="return reqOverlayDiv(this.href);" class="helpicon i-help"><s>', $txt['help'], '</s></a>
 						<label for="weight5_val">', $txt['search_weight_first_message'], ':</label>
 					</dt>
 					<dd>
@@ -80,7 +80,7 @@ function template_modify_weights()
 						<span id="weight5" class="search_weight">', $context['relative_weights']['search_weight_first_message'], '%</span>
 					</dd>
 					<dt>
-						<a href="', $scripturl, '?action=quickhelp;help=search_weight_sticky" onclick="return reqOverlayDiv(this.href);" class="help"><img src="', $settings['images_url'], '/helptopics.png" alt="', $txt['help'], '" /></a>
+						<a href="', $scripturl, '?action=quickhelp;help=search_weight_sticky" onclick="return reqOverlayDiv(this.href);" class="helpicon i-help"><s>', $txt['help'], '</s></a>
 						<label for="weight6_val">', $txt['search_weight_sticky'], ':</label>
 					</dt>
 					<dd>
@@ -88,7 +88,7 @@ function template_modify_weights()
 						<span id="weight6" class="search_weight">', $context['relative_weights']['search_weight_sticky'], '%</span>
 					</dd>
 					<dt>
-						<a href="', $scripturl, '?action=quickhelp;help=search_weight_likes" onclick="return reqOverlayDiv(this.href);" class="help"><img src="', $settings['images_url'], '/helptopics.png" alt="', $txt['help'], '" /></a>
+						<a href="', $scripturl, '?action=quickhelp;help=search_weight_likes" onclick="return reqOverlayDiv(this.href);" class="helpicon i-help"><s>', $txt['help'], '</s></a>
 						<label for="weight6_val">						', $txt['search_weight_likes'], ':</label>
 					</dt>
 					<dd>

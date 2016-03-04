@@ -260,7 +260,7 @@ function template_deleteAccount()
 		if ($context['can_delete_posts'])
 			echo '
 					<dt>
-						<a href="', $scripturl, '?action=quickhelp;help=deleteAccount_posts" onclick="return reqOverlayDiv(this.href);" class="help"><img src="', $settings['images_url'], '/helptopics.png" alt="', $txt['help'], '" class="icon" /></a>
+						<a href="', $scripturl, '?action=quickhelp;help=deleteAccount_posts" onclick="return reqOverlayDiv(this.href);" class="helpicon i-help"><s>', $txt['help'], '</s></a>
 						<label for="remove_type">', $txt['deleteAccount_posts'], '</label>:
 					</dt>
 					<dd>

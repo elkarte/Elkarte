@@ -408,7 +408,7 @@ function template_body_below()
 					theme_copyright(), '
 				</li>',
 				!empty($context['newsfeed_urls']['rss']) ? '<li>
-					<a id="button_rss" href="' . $context['newsfeed_urls']['rss'] . '" class="rssfeeds new_win"><i class="icon i-rss icon-lg"></i></a>
+					<a id="button_rss" href="' . $context['newsfeed_urls']['rss'] . '" class="rssfeeds new_win"><i class="icon i-rss icon-lg icon-shadow"><s>' . $txt['rss'] . '</s></i></a>
 				</li>' : '',
 			'</ul>';
 
@@ -450,7 +450,7 @@ function template_html_below()
  */
 function theme_linktree($default = 'linktree')
 {
-	global $context, $settings;
+	global $context, $settings, $txt;
 
 	// If linktree is empty, just return - also allow an override.
 	if (empty($context[$default]))
@@ -474,7 +474,7 @@ function theme_linktree($default = 'linktree')
 			echo $tree['extra_before'];
 
 		// Show the link, including a URL if it should have one.
-		echo $settings['linktree_link'] && isset($tree['url']) ? '<a href="' . $tree['url'] . '">' . ($pos == 0 ? '<i class="icon i-home icon-lg icon-top"></i>' : $tree['name']) . '</a>' : $tree['name'];
+		echo $settings['linktree_link'] && isset($tree['url']) ? '<a href="' . $tree['url'] . '">' . ($pos == 0 ? '<i class="icon i-home icon-lg icon-top"><s>' . $txt['home'] . '</s></i>' : $tree['name']) . '</a>' : $tree['name'];
 
 		// Show something after the link...?
 		if (isset($tree['extra_after']))
@@ -504,7 +504,7 @@ function template_menu()
 	echo '
 						<li id="collapse_button" class="listlevel1">
 							<a class="linklevel1 panel_toggle">
-								<i id="upshrink" class="collapse hide icon i-chevron-up icon-lg" title="', $txt['upshrink_description'], '"></i>
+								<i id="upshrink" class="hide chevricon i-chevron-up icon-lg" title="', $txt['upshrink_description'], '"></i>
 							</a>
 						</li>';
 
@@ -569,9 +569,9 @@ function template_menu()
 						aSwapClasses: [
 							{
 								sId: \'upshrink\',
-								classExpanded: \'collapse icon i-chevron-up icon-lg\',
+								classExpanded: \'chevricon i-chevron-up icon-lg\',
 								titleExpanded: ', JavaScriptEscape($txt['upshrink_description']), ',
-								classCollapsed: \'expand icon i-chevron-down icon-lg\',
+								classCollapsed: \'chevricon i-chevron-down icon-lg\',
 								titleCollapsed: ', JavaScriptEscape($txt['upshrink_description']), '
 							}
 						],

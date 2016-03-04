@@ -226,7 +226,7 @@ function template_pick_boards($form_name, $input_names = 'brd', $select_all = tr
 		echo '
 						<h3 class="secondary_header panel_toggle">
 							<span>
-								<span id="advanced_panel_toggle" class="', $context['boards_check_all'] ? 'expand' : 'collapse', ' hide" title="', $txt['hide'], '"></span>
+								<span id="advanced_panel_toggle" class="chevricon i-chevron-', $context['boards_check_all'] ? 'down' : 'up', ' hide" title="', $txt['hide'], '"></span>
 							</span>
 							<a href="#" id="advanced_panel_link">', $txt['choose_board'], '</a>
 						</h3>
@@ -291,9 +291,9 @@ function template_pick_boards($form_name, $input_names = 'brd', $select_all = tr
 			aSwapClasses: [
 				{
 					sId: \'advanced_panel_toggle\',
-					classExpanded: \'collapse\',
+					classExpanded: \'chevricon i-chevron-up\',
 					titleExpanded: ' . JavaScriptEscape($txt['hide']) . ',
-					classCollapsed: \'expand\',
+					classCollapsed: \'chevricon i-chevron-down\',
 					titleCollapsed: ' . JavaScriptEscape($txt['show']) . '
 				}
 			],

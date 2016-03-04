@@ -1031,6 +1031,7 @@ function sendtopicOverlayDiv(desktopURL, sHeader, sIcon)
 	var sAjax_indicator = '<div class="centertext"><i class="fa fa-spinner fa-spin"></i></div>',
 		oPopup_body;
 
+	// TODO: Even if we weren't purging icons, this is still not the right icon for this.
 	sIcon = elk_images_url + '/' + (typeof(sIcon) === 'string' ? sIcon : 'helptopics.png');
 	sHeader = typeof(sHeader) === 'string' ? sHeader : help_popup_heading_text;
 

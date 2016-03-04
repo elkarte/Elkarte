@@ -5311,11 +5311,53 @@ a.help .icon {
 /*
 /* ------------------------------------------------------- */
 
+.iconline, .icoffline {
+	border: 1px solid;
+	border-radius: .75em;
+	height: .75em;
+	width: .75em;
+	display: inline-block;
+}
+
 .icon {
 	display: inline-block;
 	height: 1.25em;
 	width: 1.25em;
 	vertical-align: middle;
+}
+
+.helpicon {
+	display: inline-block;
+	height: 1.25em;
+	width: 1.25em;
+	border-radius: 1.25em;
+	border: none;
+	vertical-align: text-top;
+}
+
+.board_icon {
+	display: block;
+	float: left;
+	width: 3em;
+	height: 3em;
+}
+
+.chevricon {
+	display: inline-block;
+	height: 1.25em;
+	width: 1.25em;
+	vertical-align: middle;
+	float: right;
+}
+
+/* Screenreader-only shortcut.
+   This is the most foolproof way to ensure a screen reader reads something. */
+.icon > s, .board_icon > s, .chevricon > s, .helpicon > s {
+	position: absolute;
+	overflow: hidden;
+	clip: rect(0 0 0 0);
+	height: 1px; width: 1px;
+	margin: -1px; padding: 0; border: 0;
 }
 
 .icon-lg {
@@ -5325,13 +5367,6 @@ a.help .icon {
 
 .icon-top {
 	vertical-align: top;
-}
-
-.board_icon {
-	display: block;
-	float: left;
-	width: 3em;
-	height: 3em;
 }
 
 .board_key {

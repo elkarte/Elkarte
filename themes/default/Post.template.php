@@ -325,9 +325,7 @@ function template_additional_options_below()
 	if (!empty($settings['additional_options_collapsible']))
 		echo '
 					<h3 id="postAdditionalOptionsHeader" class="category_header panel_toggle">
-						<span>
-							<span id="postMoreExpand" class="', empty($context['minmax_preferences']['post']) ? 'collapse' : 'expand', ' hide" title="', $txt['hide'], '"></span>
-						</span>
+							<i id="postMoreExpand" class="chevricon i-chevron-', empty($context['minmax_preferences']['post']) ? 'up' : 'down', ' hide" title="', $txt['hide'], '"></i>
 						<a href="#" id="postMoreExpandLink">', $context['attachments']['can']['post'] ? $txt['post_additionalopt_attach'] : $txt['post_additionalopt'], '</a>
 					</h3>';
 
@@ -488,9 +486,7 @@ function template_load_drafts_below()
 	// Show a draft selection box
 	echo '
 					<h3 id="postDraftOptionsHeader" class="category_header panel_toggle">
-						<span>
-							<span id="postDraftExpand" class="', empty($context['minmax_preferences']['draft']) ? 'collapse' : 'expand', ' hide" title="', $txt['hide'], '"></span>
-						</span>
+							<i id="postDraftExpand" class="chevricon i-chevron-', empty($context['minmax_preferences']['draft']) ? 'up' : 'down', ' hide" title="', $txt['hide'], '"></i>
 						<a href="#" id="postDraftExpandLink">', $txt['draft_load'], '</a>
 					</h3>
 					<div id="postDraftOptions"', empty($context['minmax_preferences']['draft']) ? '' : ' class="hide"', '>
@@ -523,9 +519,9 @@ function template_load_drafts_below()
 				aSwapClasses: [
 					{
 						sId: \'postDraftExpand\',
-						classExpanded: \'collapse\',
+						classExpanded: \'chevricon i-chevron-up\',
 						titleExpanded: ', JavaScriptEscape($txt['hide']), ',
-						classCollapsed: \'expand\',
+						classCollapsed: \'chevricon i-chevron-down\',
 						titleCollapsed: ', JavaScriptEscape($txt['show']), '
 					}
 				],
@@ -717,9 +713,9 @@ function template_postarea_below()
 				aSwapClasses: [
 					{
 						sId: \'postMoreExpand\',
-						classExpanded: \'collapse\',
+						classExpanded: \'chevricon i-chevron-up\',
 						titleExpanded: ', JavaScriptEscape($txt['hide']), ',
-						classCollapsed: \'expand\',
+						classCollapsed: \'chevricon i-chevron-down\',
 						titleCollapsed: ', JavaScriptEscape($txt['show']), '
 					}
 				],

@@ -151,9 +151,7 @@ function template_package_list()
 			echo '
 					<li>
 						<p class="panel_toggle secondary_header">
-							<span>
-								<span id="ps_img_', $i, '" class="collapse hide" title="', $txt['hide'], '"></span>
-							</span>
+								<i id="ps_img_', $i, '" class="chevricon i-chevron-up hide" title="', $txt['hide'], '"></i>
 							<a href="#" id="upshrink_link_', $i, '" class="highlight">', $packageSection['title'], '</a>
 						</p>';
 
@@ -270,9 +268,9 @@ function template_package_list()
 					aSwapClasses: [
 						{
 							sId: \'ps_img_', $section, '\',
-							classExpanded: \'collapse\',
+							classExpanded: \'chevricon i-chevron-up\',
 							titleExpanded: ', JavaScriptEscape($txt['hide']), ',
-							classCollapsed: \'expand\',
+							classCollapsed: \'chevricon i-chevron-down\',
 							titleCollapsed: ', JavaScriptEscape($txt['show']), '
 						}
 					],
