@@ -13,7 +13,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0.5
+ * @version 1.0.7
  *
  */
 
@@ -613,11 +613,17 @@ function registerMember(&$regOptions, $error_context = 'register')
 	// New password hash
 	require_once(SUBSDIR . '/Auth.subs.php');
 
+	// @since 1.0.7 - This is necessary because validateLoginPassword
+	// uses a pass-by-ref and would convert to hash $regOptions['password']
+	// making it impossible to send the reminder email and even integrate
+	// the registration
+	$password = $regOptions['password'];
+
 	// Some of these might be overwritten. (the lower ones that are in the arrays below.)
 	$regOptions['register_vars'] = array(
 		'member_name' => $regOptions['username'],
 		'email_address' => $regOptions['email'],
-		'passwd' => validateLoginPassword($regOptions['password'], '', $regOptions['username'], true),
+		'passwd' => validateLoginPassword($password, '', $regOptions['username'], true),
 		'password_salt' => substr(md5(mt_rand()), 0, 4) ,
 		'posts' => 0,
 		'date_registered' => !empty($regOptions['time']) ? $regOptions['time'] : time(),
@@ -1994,7 +2000,9 @@ function approveMembers($conditions)
 	if ($query)
 	{
 		$data = retrieveMemberData($conditions);
-		$members_id = $data['members'];
+		$members_id = array();
+		foreach ($data['member_info'] as $member)
+			$members_id[] = $member['username'];
 	}
 	else
 	{

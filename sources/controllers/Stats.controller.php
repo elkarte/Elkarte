@@ -13,7 +13,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:		BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0
+ * @version 1.0.7
  *
  */
 
@@ -85,6 +85,11 @@ class Stats_Controller extends Action_Controller
 		// Handle the XMLHttpRequest.
 		if (isset($_REQUEST['xml']))
 		{
+			if (empty($year) || empty($month))
+			{
+				redirectexit('action=stats');
+			}
+
 			// Collapsing stats only needs adjustments of the session variables.
 			if (!empty($_REQUEST['collapse']))
 				obExit(false);
