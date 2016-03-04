@@ -1333,7 +1333,7 @@ a.bbc_link {
 .like_button:before, .likes_button:before, .unlike_button:before {
 	background-position: 0 -480px;
 }
-.unlike_button:hover:before {
+.unlike_button:before {
 	background-position: 0 -408px;
 }
 .like_button:hover:before {
