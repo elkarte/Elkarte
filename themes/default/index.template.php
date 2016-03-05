@@ -364,7 +364,7 @@ function template_th_search_bar()
 				<input type="hidden" name="', (!empty($modSettings['search_dropdown']) ? 'sd_brd[' : 'brd['), $context['current_board'], ']"', ' value="', $context['current_board'], '" />';
 
 	echo '
-				<button type="submit" name="search;sa=results" class="', (!empty($modSettings['search_dropdown'])) ? 'with_select' : '', '"><i class="icon icon-lg i-search icon-top"></i></button>
+				<button type="submit" name="search;sa=results" class="', (!empty($modSettings['search_dropdown'])) ? 'with_select' : '', '"><i class="icon i-search icon-shade"></i></button>
 				<input type="hidden" name="advanced" value="0" />
 			</form>';
 }
@@ -474,7 +474,7 @@ function theme_linktree($default = 'linktree')
 			echo $tree['extra_before'];
 
 		// Show the link, including a URL if it should have one.
-		echo $settings['linktree_link'] && isset($tree['url']) ? '<a href="' . $tree['url'] . '">' . ($pos == 0 ? '<i class="icon i-home icon-lg icon-top"><s>' . $txt['home'] . '</s></i>' : $tree['name']) . '</a>' : $tree['name'];
+		echo $settings['linktree_link'] && isset($tree['url']) ? '<a href="' . $tree['url'] . '">' . ($pos == 0 ? '<i class="icon i-home icon-lg icon-top icon-shade"><s>' . $txt['home'] . '</s></i>' : $tree['name']) . '</a>' : $tree['name'];
 
 		// Show something after the link...?
 		if (isset($tree['extra_after']))

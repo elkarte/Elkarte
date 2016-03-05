@@ -63,14 +63,12 @@ function template_editBuddies()
 			<tr>
 				<td>', $buddy['link'], '</td>
 				<td>
-					<a href="', $buddy['online']['href'], '">
-						<img src="', $buddy['online']['image_href'], '" alt="', $buddy['online']['text'], '" title="', $buddy['online']['text'], '" />
-					</a>
+					<a href="', $buddy['online']['href'], '" class="icon i-user', $buddy['online']['is_online'] ? '-plus' : '', '" title="', $buddy['online']['text'], '"><s>', $buddy['online']['text'], '</s></a>
 				</td>';
 
-		if ($context['can_send_email'])
+		if ($context['can_send_email'] && $buddy['show_email'] != 'no')
 			echo '
-				<td>', ($buddy['show_email'] == 'no' ? '' : '<a href="' . $scripturl . '?action=emailuser;sa=email;uid=' . $buddy['id'] . '" rel="nofollow"><img src="' . $settings['images_url'] . '/profile/email_sm.png" alt="' . $txt['email'] . '" title="' . $txt['email'] . ' ' . $buddy['name'] . '" /></a>'), '</td>';
+				<td><a href="' . $scripturl . '?action=emailuser;sa=email;uid=' . $buddy['id'] . '" class="icon i-envelope', $buddy['online']['is_online'] ? '' : '-blank', '" title="' . $txt['email'] . ' ' . $buddy['name'] . '"></a></td>';
 
 		//  Any custom profile (with icon) fields to show
 		$im = array();
@@ -177,14 +175,12 @@ function template_editIgnoreList()
 			<tr>
 				<td>', $member['link'], '</td>
 				<td>
-					<a href="', $member['online']['href'], '">
-						<img src="', $member['online']['image_href'], '" alt="', $member['online']['text'], '" title="', $member['online']['text'], '" />
-					</a>
+					<a href="', $member['online']['href'], '" class="icon i-user', $member['online']['is_online'] ? '-plus' : '', '" title="', $member['online']['text'], '"></a>
 				</td>';
 
-		if ($context['can_send_email'])
+		if ($context['can_send_email'] && $member['show_email'] != 'no')
 			echo '
-				<td>', ($member['show_email'] == 'no' ? '' : '<a href="' . $scripturl . '?action=emailuser;sa=email;uid=' . $member['id'] . '" rel="nofollow"><img src="' . $settings['images_url'] . '/profile/email_sm.png" alt="' . $txt['email'] . '" title="' . $txt['email'] . ' ' . $member['name'] . '" /></a>'), '</td>';
+				<td><a href="' . $scripturl . '?action=emailuser;sa=email;uid=' . $member['id'] . '" class="icon i-envelope', $member['online']['is_online'] ? '' : '-blank', '" title="' . $txt['email'] . ' ' . $member['name'] . '"></a></td>';
 
 		echo '
 				<td class="righttext">

@@ -1032,7 +1032,7 @@ function sendtopicOverlayDiv(desktopURL, sHeader, sIcon)
 		oPopup_body;
 
 	// TODO: Even if we weren't purging icons, this is still not the right icon for this.
-	sIcon = elk_images_url + '/' + (typeof(sIcon) === 'string' ? sIcon : 'helptopics.png');
+	sIcon = typeof(sIcon) === 'string' ? sIcon : 'envelope';
 	sHeader = typeof(sHeader) === 'string' ? sHeader : help_popup_heading_text;
 
 	// Load the send topic overlay div

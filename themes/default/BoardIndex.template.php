@@ -182,7 +182,7 @@ function template_ic_recent_posts()
 	echo '
 			<li class="board_row hslice" id="recent_posts_content">
 				<h3 class="ic_section_header">
-					<a href="', $scripturl, '?action=recent"><img class="icon" src="', $settings['images_url'], '/post/xx.png" alt="" />', $txt['recent_posts'], '</a>
+					<a href="', $scripturl, '?action=recent"><i class="icon i-post-text"></i>', $txt['recent_posts'], '</a>
 				</h3>';
 
 	// Only show one post.
@@ -238,7 +238,7 @@ function template_ic_show_events()
 			<li class="board_row">
 				<h3 class="ic_section_header">
 					<a href="', $scripturl, '?action=calendar">
-						<img class="icon" src="', $settings['images_url'], '/icons/calendar.png', '" alt="" /> ', $context['calendar_only_today'] ? $txt['calendar_today'] : $txt['calendar_upcoming'], '
+						<i class="icon i-calendar"></i> ', $context['calendar_only_today'] ? $txt['calendar_today'] : $txt['calendar_upcoming'], '
 					</a>
 				</h3>';
 
@@ -294,8 +294,7 @@ function template_ic_show_stats()
 	echo '
 			<li class="board_row">
 				<h3 class="ic_section_header">
-					<i class="icon i-pie-chart"></i>
-					', $context['show_stats'] ? '<a href="' . $scripturl . '?action=stats" title="' . $txt['more_stats'] . '">' . $txt['forum_stats'] . '</a>' : $txt['forum_stats'], '
+					', $context['show_stats'] ? '<a href="' . $scripturl . '?action=stats" title="' . $txt['more_stats'] . '"><i class="icon i-pie-chart"></i>' . $txt['forum_stats'] . '</a>' : $txt['forum_stats'], '
 				</h3>
 				<p class="inline">
 					', $context['common_stats']['boardindex_total_posts'], '', !empty($settings['show_latest_member']) ? ' - ' . $txt['latest_member'] . ': <strong> ' . $context['common_stats']['latest_member']['link'] . '</strong>' : '', ' - ', $txt['most_online_today'], ': ', comma_format($modSettings['mostOnlineToday']), '<br />

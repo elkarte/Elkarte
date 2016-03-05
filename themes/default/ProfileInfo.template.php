@@ -1023,20 +1023,20 @@ function template_profile_block_buddies()
 				echo '
 				<div class="attachment">
 					<div class="generic_border centertext">
-						', $data['avatar']['image'], '<br />
-						<a href="', $scripturl, '?action=profile;u=', $data['id'], '">', $data['name'], '</a><br />
-						<em>', $settings['use_image_buttons'] ? '<img src="' . $settings['images_url'] . '/profile/buddy_' . ($data['online']['is_online'] ? 'useron' : 'useroff') . '.png" alt="' . $txt[$data['online']['is_online'] ? 'online' : 'offline'] . '" class="icon"/>' : $txt[$data['online']['is_online'] ? 'online' : 'offline'], $settings['use_image_buttons'] ? '<span class="smalltext"> ' . $txt[$data['online']['is_online'] ? 'online' : 'offline'] . '</span>' : '', '</em>';
+						', $data['avatar']['image'], '<br>
+						<a href="', $scripturl, '?action=profile;u=', $data['id'], '">', $data['name'], '</a><br>
+						<em><i class="icon i-user', $data['online']['is_online'] ? '-plus' : '', '"></i>', '<span class="smalltext"> ' . $txt[$data['online']['is_online'] ? 'online' : 'offline'] . '</span></em>';
 
 				// Only show the email address fully if it's not hidden - and we reveal the email.
 				if ($context['can_send_email'] && ($data['show_email'] == 'yes' || $data['show_email'] == 'yes_permission_override'))
 					echo '
-						<br />
-						<a href="', $scripturl, '?action=emailuser;sa=email;uid=', $data['id'], '"><img src="' . $settings['images_url'] . '/profile/email_sm.png" alt="' . $txt['email'] . '" title="' . $txt['email'] . ' ' . $data['name'] . '" class="icon"/></a>';
+						<br>
+						<a href="', $scripturl, '?action=emailuser;sa=email;uid=', $data['id'], '" class="icon i-envelope', $data['online']['is_online'] ? '' : '-blank', '" title="' . $txt['email'] . ' ' . $data['name'] . '"><s>' . $txt['email'] . ' ' . $data['name'] . '</s></a>';
 
 				// Can they send the buddy a PM?
 				if ($context['can_send_pm'])
 					echo '
-						&nbsp;<a href="', $scripturl, '?action=pm;sa=send;u=', $data['id'], '"><img src="', $settings['images_url'], '/profile/', ($data['online']['is_online']) ? 'im_on.png' : 'im_off.png', '" alt="', $txt['profile_sendpm_short'], '" title="', $txt['profile_sendpm_short'], ' to ', $data['name'], '" class="icon"/></a>';
+						&nbsp;<a href="', $scripturl, '?action=pm;sa=send;u=', $data['id'], '" class="icon i-comment', $data['online']['is_online'] ? '' : '-blank', '" title="', $txt['profile_sendpm_short'], ' to ', $data['name'], '"><s>', $txt['profile_sendpm_short'], ' to ', $data['name'], '</s></a>';
 
 				// Other contact info from custom profile fields?
 				if (isset($data['custom_fields']))

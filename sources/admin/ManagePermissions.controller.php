@@ -211,11 +211,11 @@ class ManagePermissions_Controller extends Action_Controller
 
 							// Add a help option for guests, regular members, moderator and administrator.
 							if (!empty($rowData['help']))
-								$group_name .= sprintf(' (<a href="%1$s?action=quickhelp;help=' . $rowData['help'] . '" onclick="return reqOverlayDiv(this.href);">?</a>)', $scripturl);
+								$group_name .= sprintf(' (<a href="%1$s?action=quickhelp;help=' . $rowData['help'] . '" onclick="return reqOverlayDiv(this.href);" class="helpicon i-help"></a>)', $scripturl);
 
 							if (!empty($rowData['children']))
 								$group_name .= '
-									<br />
+									<br>
 									<span class="smalltext">' . $txt['permissions_includes_inherited'] . ': &quot;' . implode('&quot;, &quot;', $rowData['children']) . '&quot;</span>';
 
 							return $group_name;
