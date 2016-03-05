@@ -696,13 +696,20 @@ div.windowbg, div.windowbg2 {
 	color: inherit;
 	font: inherit;
 	vertical-align: top;
-	padding: 0 1em 0 0;
+	padding: 0 0.5em;
 }
 .bbc_table th {
 	color: inherit;
 	font: inherit;
 	font-weight: bold;
-	padding: 0 1em 0 0;
+	padding: 0 0.5em;
+}
+/* Styling for bbc tables inside posts */
+.inner > .bbc_table_container > .bbc_table {
+	border-collapse: collapse;
+}
+.inner > .bbc_table_container > .bbc_table th {
+	text-align: center;
 }
 .bbc_u {
 	text-decoration: underline;
@@ -1326,7 +1333,7 @@ a.bbc_link {
 .like_button:before, .likes_button:before, .unlike_button:before {
 	background-position: 0 -480px;
 }
-.unlike_button:hover:before {
+.unlike_button:before {
 	background-position: 0 -408px;
 }
 .like_button:hover:before {

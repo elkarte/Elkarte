@@ -2282,6 +2282,10 @@ function splitTopic($split1_ID_TOPIC, $splitMessages, $new_subject)
 	if ($split1_first_msg > $split2_first_msg)
 		fatal_lang_error('split_first_post', false);
 
+	// The message that is starting the new topic may have likes, these become topic likes
+	require_once(SUBSDIR . '/Likes.subs.php');
+	$split2_first_msg_likes = messageLikeCount($split2_first_msg);
+
 	// We're off to insert the new topic!  Use 0 for now to avoid UNIQUE errors.
 	$db->insert('',
 		'{db_prefix}topics',
@@ -2295,10 +2299,11 @@ function splitTopic($split1_ID_TOPIC, $splitMessages, $new_subject)
 			'unapproved_posts' => 'int',
 			'approved' => 'int',
 			'is_sticky' => 'int',
+			'num_likes' => 'int',
 		),
 		array(
 			(int) $id_board, $split2_firstMem, $split2_lastMem, 0,
-			0, $split2_replies, $split2_unapprovedposts, (int) $split2_approved, 0,
+			0, $split2_replies, $split2_unapprovedposts, (int) $split2_approved, 0, $split2_first_msg_likes,
 		),
 		array('id_topic')
 	);
