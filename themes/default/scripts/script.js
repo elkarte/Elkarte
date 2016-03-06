@@ -309,7 +309,7 @@ function reqOverlayDiv(desktopURL, sHeader, sIcon)
 	// Set up our div details
 	var sAjax_indicator = '<div class="centertext"><i class="fa fa-spinner fa-spin fa-2x"></i></div>';
 
-	//sIcon = elk_images_url + '/' + (typeof(sIcon) === 'string' ? sIcon : 'helptopics.png');
+	sIcon = typeof(sIcon) === 'string' ? sIcon : 'help';
 	sHeader = typeof(sHeader) === 'string' ? sHeader : help_popup_heading_text;
 
 	// Create the div that we are going to load
@@ -350,7 +350,7 @@ function smc_Popup(oOptions)
 smc_Popup.prototype.show = function ()
 {
 	var popup_class = 'popup_window ' + (this.opt.custom_class ? this.opt.custom_class : 'content'),
-		icon = this.opt.icon ? '<img src="' + this.opt.icon + '" class="icon" alt="" /> ' : '';
+		icon = this.opt.icon ? '<i class="icon i-' + this.opt.icon + ' icon-text-top"></i> ' : '';
 
 	// Todo: opt.icon should be a string referencing the desired icon. Will require changing all callers.
 

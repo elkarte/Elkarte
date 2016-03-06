@@ -248,7 +248,7 @@ function template_action_required()
 	{
 		echo '
 								<li>
-									<img class="icon" src="', $settings['images_url'], ($total == 0 ? '/icons/field_valid.png"' : '/icons/field_invalid.png"'), 'alt="" />
+									<i class="icon i-', ($total == 0) ? 'check' : 'warning', '"></i>
 									<a href="', $scripturl, $context['links'][$area], '"><span class="smalltext">', $txt['mc_' . $area], ' : ', $total, '</span></a>
 								</li>';
 	}

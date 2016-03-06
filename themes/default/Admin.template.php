@@ -876,7 +876,7 @@ function template_show_settings()
 						<a href="' . $scripturl . '?action=quickhelp;help=' . $config_var['help'] . '" onclick="return reqOverlayDiv(this.href);" class="hdicon cat_img_helptopics help" alt="' . $txt['help'] . '"></a>';
 					else
 						echo '
-						<a href="' . $scripturl . '?action=quickhelp;help=' . $config_var['help'] . '" onclick="return reqOverlayDiv(this.href);" class="' . $config_var['class'] . ' help"><img src="' . $settings['images_url'] . '/icons/helptopics_hd.png" class="icon" alt="' . $txt['help'] . '" /></a>';
+						<a href="' . $scripturl . '?action=quickhelp;help=' . $config_var['help'] . '" onclick="return reqOverlayDiv(this.href);" class="' . $config_var['class'] . ' help"><i class="helpicon i-help icon-lg"><s>', $txt['help'], '</s></i></a>';
 				}
 				elseif ($config_var['icon'])
 					echo
@@ -999,7 +999,7 @@ function template_show_settings()
 						foreach ($bbcColumn as $bbcTag)
 							echo '
 								<li class="list_bbc floatleft">
-									<input type="checkbox" name="', $config_var['name'], '_enabledTags[]" id="tag_', $config_var['name'], '_', $bbcTag['tag'], '" value="', $bbcTag['tag'], '"', !in_array($bbcTag['tag'], $context['bbc_sections'][$config_var['name']]['disabled']) ? ' checked="checked"' : '', ' /> <label for="tag_', $config_var['name'], '_', $bbcTag['tag'], '">', $bbcTag['tag'], '</label>', $bbcTag['show_help'] ? ' (<a href="' . $scripturl . '?action=quickhelp;help=tag_' . $bbcTag['tag'] . '" onclick="return reqOverlayDiv(this.href);">?</a>)' : '', '
+									<input type="checkbox" name="', $config_var['name'], '_enabledTags[]" id="tag_', $config_var['name'], '_', $bbcTag['tag'], '" value="', $bbcTag['tag'], '"', !in_array($bbcTag['tag'], $context['bbc_sections'][$config_var['name']]['disabled']) ? ' checked="checked"' : '', ' /> <label for="tag_', $config_var['name'], '_', $bbcTag['tag'], '">', $bbcTag['tag'], '</label>', $bbcTag['show_help'] ? ' (<a href="' . $scripturl . '?action=quickhelp;help=tag_' . $bbcTag['tag'] . '" onclick="return reqOverlayDiv(this.href);" class="helpicon i-help"></a>)' : '', '
 								</li>';
 					}
 
@@ -1022,7 +1022,7 @@ function template_show_settings()
 						<input type="text"', $javascript, $disabled, ' name="', $config_var['name'], '" id="', $config_var['name'], '" value="', $config_var['value'], '"', ($config_var['size'] ? ' size="' . $config_var['size'] . '"' : ''), ' class="input_text" />';
 
 				echo ($config_var['invalid']) ? '
-						<img class="icon" src="' . $settings['images_url'] . '/icons/field_invalid.png" />' : '';
+						<i class="icon i-warning"></i>' : '';
 
 				echo isset($config_var['postinput']) && $config_var['postinput'] !== '' ? '
 							' . $config_var['postinput'] : '', '
@@ -1093,7 +1093,7 @@ function template_admin_search_results()
 					<h2 class="category_header hdicon cat_img_search">
 						', sprintf($txt['admin_search_results_desc'], $context['search_term']), '
 						<form id="quick_search" class="floatright" action="', $scripturl, '?action=admin;area=search" method="post" accept-charset="UTF-8">
-							<img class="icon" src="', $settings['images_url'], '/filter.png" alt="" />
+							<i class="icon i-search"></i>
 							<input type="text" name="search_term" value="', $context['search_term'], '" class="input_text" />
 							<input type="hidden" name="sa" value="', $context['search_type'], '" />
 							<input type="submit" name="search_go" value="', $txt['admin_search_results_again'], '" />
@@ -1440,7 +1440,7 @@ function template_admin_quick_search()
 	if ($context['user']['is_admin'])
 		echo '
 			<form action="', $scripturl, '?action=admin;area=search" method="post" accept-charset="UTF-8" id="quick_search" class="floatright">
-				<img class="icon" src="', $settings['images_url'], '/filter.png" alt="" />
+				<i class="icon i-search"></i>
 				<input type="text" name="search_term" placeholder="', $txt['admin_search'], '" class="input_text" />
 				<select name="sa">
 					<option value="internal"', (empty($context['admin_preferences']['sb']) || $context['admin_preferences']['sb'] == 'internal' ? ' selected="selected"' : ''), '>', $txt['admin_search_type_internal'], '</option>

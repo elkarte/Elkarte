@@ -5326,13 +5326,14 @@ a.help .icon {
 	vertical-align: middle;
 }
 
-.helpicon {
+.helpicon, a.helpicon {
 	display: inline-block;
-	height: 1.25em;
-	width: 1.25em;
-	border-radius: 1.25em;
+	height: 1em;
+	width: 1em;
+	border-radius: 1em;
 	border: none;
 	vertical-align: text-top;
+	cursor: help;
 }
 
 .board_icon {
@@ -5367,6 +5368,10 @@ a.help .icon {
 
 .icon-top {
 	vertical-align: top;
+}
+
+.icon-text-top {
+	vertical-align: text-top;
 }
 
 .board_key {
@@ -5753,8 +5758,13 @@ a.help .icon {
 		width: 1.25em;
 	}
 
+	.icon {
+		height: 1em;
+		width: 1em;
+	}
+
 	.post {
-		margin: 0 0 0 5px;
+		margin: 0 0 0 .25em;
 	}
 
 	.frame {

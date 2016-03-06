@@ -659,7 +659,7 @@ function template_display_poll_above()
 	echo '
 			<div id="poll">
 				<h2 class="category_header">
-					<img src="', $settings['images_url'], '/topic/', $context['poll']['is_locked'] ? 'normal_poll_locked' : 'normal_poll', '.png" alt="" class="icon" /> ', $txt['poll'], '
+					<i class="icon i-poll', $context['poll']['is_locked'] ? '-locked' : '', '"></i> ', $txt['poll'], '
 				</h2>
 				<div id="poll_options" class="content">
 					<h4 id="pollquestion">
