@@ -13,7 +13,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0.4
+ * @version 1.0.7
  *
  * This file contains functions that are specifically done by administrators.
  *
@@ -268,6 +268,10 @@ function getFileVersions(&$versionOptions)
 		{
 			if (substr($entry, -4) === '.php' && !is_dir($dir . '/' . $entry) && $entry !== 'index.php' && $entry !== 'sphinxapi.php')
 			{
+				if (!is_writable($dir . '/' . $entry))
+				{
+					continue;
+				}
 				// Read the first 4k from the file.... enough for the header.
 				$header = file_get_contents($dir . '/' . $entry, false, null, 0, 768);
 
@@ -294,6 +298,10 @@ function getFileVersions(&$versionOptions)
 		{
 			if (substr($entry, -12) == 'template.php' && !is_dir($dirname . '/' . $entry))
 			{
+				if (!is_writable($dirname . '/' . $entry))
+				{
+					continue;
+				}
 				// Read the first 768 bytes from the file.... enough for the header.
 				$header = file_get_contents($dirname . '/' . $entry, false, null, 0, 768);
 
@@ -324,6 +332,10 @@ function getFileVersions(&$versionOptions)
 			{
 				if (substr($entry, -4) == '.php' && $entry != 'index.php' && !is_dir($this_lang_path . '/' . $entry))
 				{
+					if (!is_writable($this_lang_path . '/' . $entry))
+					{
+						continue;
+					}
 					// Read the first 768 bytes from the file.... enough for the header.
 					$header = file_get_contents($this_lang_path . '/' . $entry, false, null, 0, 768);
 
