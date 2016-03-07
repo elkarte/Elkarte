@@ -73,6 +73,7 @@ class Cache
 		if ($level > 0)
 		{
 			$this->enable(true);
+			$this->level = $level;
 		}
 
 		// If the cache is disabled just go out
@@ -87,8 +88,7 @@ class Cache
 		$cache_class = '\\ElkArte\\sources\\subs\\CacheMethod\\' . ucfirst($accelerator);
 		$this->_cache_obj = new $cache_class($this->_options);
 
-		if ($this->_cache_obj !== null)
-			$this->_cache_enable = $this->_cache_obj->init();
+		$this->enable($this->_cache_obj !== null && $this->_cache_obj->init());
 
 		$this->_build_prefix();
 	}
