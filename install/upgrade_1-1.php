@@ -485,7 +485,7 @@ class UpgradeInstructions_upgrade_1_1
 			)
 		);
 	}
-	
+
 	public function expand_attachments_title()
 	{
 		return 'Expand the attachments table...';
