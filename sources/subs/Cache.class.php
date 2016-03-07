@@ -73,6 +73,7 @@ class Cache
 		if ($level > 0)
 		{
 			$this->enable(true);
+			$this->level = $level;
 		}
 
 		// If the cache is disabled just go out
@@ -87,8 +88,7 @@ class Cache
 		$cache_class = '\\ElkArte\\sources\\subs\\CacheMethod\\' . ucfirst($accelerator);
 		$this->_cache_obj = new $cache_class($this->_options);
 
-		if ($this->_cache_obj !== null)
-			$this->_cache_enable = $this->_cache_obj->init();
+		$this->enable($this->_cache_obj !== null && $this->_cache_obj->init());
 
 		$this->_build_prefix();
 	}
@@ -107,9 +107,6 @@ class Cache
 	 */
 	public function quick_get($key, $file, $function, $params, $level = 1)
 	{
-		if (!$this->isEnabled())
-			return array();
-
 		call_integration_hook('pre_cache_quick_get', array(&$key, &$file, &$function, &$params, &$level));
 
 		/* Refresh the cache if either:
@@ -119,12 +116,12 @@ class Cache
 			4. The cached item has a custom expiration condition evaluating to true.
 			5. The expire time set in the cache item has passed (needed for Zend).
 		*/
-		if ($this->level < $level || !is_array($cache_block = $this->get($key, 3600)) || (!empty($cache_block['refresh_eval']) && eval($cache_block['refresh_eval'])) || (!empty($cache_block['expires']) && $cache_block['expires'] < time()))
+		if (!$this->isEnabled() || $this->level < $level || !is_array($cache_block = $this->get($key, 3600)) || (!empty($cache_block['refresh_eval']) && eval($cache_block['refresh_eval'])) || (!empty($cache_block['expires']) && $cache_block['expires'] < time()))
 		{
 			require_once(SOURCEDIR . '/' . $file);
 			$cache_block = call_user_func_array($function, $params);
 
-			if ($this->_cache_enable >= $level)
+			if ($this->level >= $level)
 				$this->put($key, $cache_block, $cache_block['expires'] - time());
 		}
 

@@ -43,6 +43,7 @@ class Drafts_PersonalMessage_Module implements ElkArte\sources\modules\Module_In
 
 		if (!empty($modSettings['drafts_enabled']) && !empty($modSettings['drafts_post_enabled']))
 		{
+			self::$_eventsManager = $eventsManager;
 			self::$_autosave_enabled = !empty($modSettings['drafts_autosave_enabled']);
 
 			add_integration_function('integrate_sa_pm_index', 'Drafts_PersonalMessage_Module::integrate_sa_pm_index', '', false);
@@ -61,7 +62,9 @@ class Drafts_PersonalMessage_Module implements ElkArte\sources\modules\Module_In
 			);
 		}
 		else
+		{
 			return array();
+		}
 	}
 
 	public static function integrate_pm_areas(&$pm_areas)
