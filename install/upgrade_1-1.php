@@ -485,7 +485,7 @@ class UpgradeInstructions_upgrade_1_1
 			)
 		);
 	}
-
+	
 	public function expand_attachments_title()
 	{
 		return 'Expand the attachments table...';
@@ -501,9 +501,59 @@ class UpgradeInstructions_upgrade_1_1
 				'function' => function($db, $db_table)
 				{
 					$db_table->db_remove_index('{db_prefix}attachments', 'id_msg');
-					$db_table->db_add_index('{db_prefix}attachments', array('name' => 'attach_source', 'columns' => array('id_msg', 'attach_source'), 'type' => 'key'),);
+					$db_table->db_add_index('{db_prefix}attachments', array('name' => 'attach_source', 'columns' => array('id_msg', 'attach_source'), 'type' => 'key'));
 				}
 			)
+		);
+	}
+
+	public function custom_field_updates_title()
+	{
+		return 'Some updates to custom fields.';
+	}
+
+	public function custom_field_updates()
+	{
+		return array(
+			array(
+				'debug_title' => 'Adding new custom field columns',
+				'function' => function($db, $db_table) {
+					$db_table->db_add_column('{db_prefix}custom_fields',
+								 array(
+									 'name' => 'rows',
+									 'type' => 'smallint',
+									 'size' => 5,
+									 'default' => 4
+								 )
+					);
+					$db_table->db_add_column('{db_prefix}custom_fields',
+								 array(
+									 'name' => 'cols',
+									 'type' => 'smallint',
+									 'size' => 5,
+									 'default' => 30
+								 )
+					);
+				}
+			),
+			array(
+				'debug_title' => 'Populating new custom field columns where needed',
+				'function' => function($db, $db_table) {
+					$result = $db->query('', 'SELECT id_field, default_value FROM {db_prefix}custom_fields WHERE field_type="textarea"');
+
+					while ($row = mysqli_fetch_assoc($result))
+					{
+						$vals = explode(',', $row['default_value']);
+						$rows = (int) $vals[0];
+						$cols = (int) $vals[1];
+
+						if (count($vals) === 2 && $rows && $cols)
+						{
+							$db->query('', 'UPDATE {db_prefix}custom_fields SET rows=' . $rows . ' , cols=' . $cols . ' WHERE id_field=' . $row['id_field']);
+						}
+					}
+				}
+			),
 		);
 	}
 }

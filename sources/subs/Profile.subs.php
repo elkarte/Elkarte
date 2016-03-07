@@ -187,7 +187,7 @@ function loadCustomFields($memID, $area = 'summary', array $custom_fields = arra
 	$request = $db->query('', '
 		SELECT
 			col_name, field_name, field_desc, field_type, show_reg, field_length, field_options,
-			default_value, bbc, enclose, placement, mask, vieworder
+			default_value, bbc, enclose, placement, mask, vieworder, rows, cols
 		FROM {db_prefix}custom_fields
 		WHERE ' . $where . '
 		ORDER BY vieworder ASC',
@@ -202,7 +202,7 @@ function loadCustomFields($memID, $area = 'summary', array $custom_fields = arra
 	{
 		// Shortcut.
 		$exists = $memID && isset($user_profile[$memID], $user_profile[$memID]['options'][$row['col_name']]);
-		$value = $exists ? $user_profile[$memID]['options'][$row['col_name']] : '';
+		$value = $exists ? $user_profile[$memID]['options'][$row['col_name']] : $row['default_value'];
 
 		// If this was submitted already then make the value the posted version.
 		if (!empty($custom_fields) && isset($custom_fields[$row['col_name']]))
@@ -218,7 +218,7 @@ function loadCustomFields($memID, $area = 'summary', array $custom_fields = arra
 		// Checkbox inputs
 		if ($row['field_type'] == 'check')
 		{
-			$true = (!$exists && $row['default_value']) || $value;
+			$true = (bool) $value;
 			$input_html = '<input id="' . $row['col_name'] . '" type="checkbox" name="customfield[' . $row['col_name'] . ']" ' . ($true ? 'checked="checked"' : '') . ' class="input_check" />';
 			$output_html = $true ? $txt['yes'] : $txt['no'];
 		}
@@ -229,7 +229,7 @@ function loadCustomFields($memID, $area = 'summary', array $custom_fields = arra
 			$options = explode(',', $row['field_options']);
 			foreach ($options as $k => $v)
 			{
-				$true = (!$exists && $row['default_value'] == $v) || $value == $v;
+				$true = ($value == $v);
 				$input_html .= '<option value="' . $k . '"' . ($true ? ' selected="selected"' : '') . '>' . $v . '</option>';
 				if ($true)
 					$output_html = $v;
@@ -244,7 +244,7 @@ function loadCustomFields($memID, $area = 'summary', array $custom_fields = arra
 			$options = explode(',', $row['field_options']);
 			foreach ($options as $k => $v)
 			{
-				$true = (!$exists && $row['default_value'] == $v) || $value == $v;
+				$true = ($value == $v);
 				$input_html .= '<label for="customfield_' . $row['col_name'] . '_' . $k . '"><input type="radio" name="customfield[' . $row['col_name'] . ']" class="input_radio" id="customfield_' . $row['col_name'] . '_' . $k . '" value="' . $k . '" ' . ($true ? 'checked="checked"' : '') . ' />' . $v . '</label><br />';
 				if ($true)
 					$output_html = $v;
@@ -259,8 +259,7 @@ function loadCustomFields($memID, $area = 'summary', array $custom_fields = arra
 		// Only thing left, a textbox for you
 		else
 		{
-			@list ($rows, $cols) = @explode(',', $row['default_value']);
-			$input_html = '<textarea id="' . $row['col_name'] . '" name="customfield[' . $row['col_name'] . ']" ' . (!empty($rows) ? 'rows="' . $rows . '"' : '') . ' ' . (!empty($cols) ? 'cols="' . $cols . '"' : '') . '>' . $value . '</textarea>';
+			$input_html = '<textarea id="' . $row['col_name'] . '" name="customfield[' . $row['col_name'] . ']" ' . (!empty($rows) ? 'rows="' . $row['rows'] . '"' : '') . ' ' . (!empty($cols) ? 'cols="' . $row['cols'] . '"' : '') . '>' . $value . '</textarea>';
 		}
 
 		// Parse BBCode
@@ -1515,7 +1514,8 @@ function makeCustomFieldChanges($memID, $area, $sanitize = true)
 		// Otherwise some form of text!
 		else
 		{
-			$value = isset($_POST['customfield'][$row['col_name']]) ? $_POST['customfield'][$row['col_name']] : '';
+			// TODO: This is a bit backwards.
+			$value = isset($_POST['customfield'][$row['col_name']]) ? $_POST['customfield'][$row['col_name']] : $row['default_value'];
 			$is_valid = isCustomFieldValid($row, $value);
 
 			if ($is_valid !== true)
@@ -1527,7 +1527,7 @@ function makeCustomFieldChanges($memID, $area, $sanitize = true)
 						break;
 					case 'custom_field_invalid_email':
 					case 'custom_field_inproper_format':
-						$value = '';
+						$value = $row['default_value'];
 						break;
 				}
 			}

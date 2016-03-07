@@ -561,6 +561,10 @@ function updateInputBoxes()
 	document.getElementById("bbc_dt").style.display = bIsText ? "" : "none";
 	document.getElementById("bbc_dd").style.display = bIsText ? "" : "none";
 
+	// And given defaults
+	document.getElementById("defaultval_dt").style.display = bIsText ? "" : "none";
+	document.getElementById("defaultval_dd").style.display = bIsText ? "" : "none";
+
 	// Selects and radio can support a list of options
 	document.getElementById("options_dt").style.display = curType === "select" || curType === "radio" ? "" : "none";
 	document.getElementById("options_dd").style.display = curType === "select" || curType === "radio" ? "" : "none";

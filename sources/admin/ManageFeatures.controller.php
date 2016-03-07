@@ -985,6 +985,7 @@ class ManageFeatures_Controller extends Action_Controller
 				'bbc' => false,
 				'default_check' => false,
 				'default_select' => '',
+				'default_value' => '',
 				'options' => array('', '', ''),
 				'active' => true,
 				'private' => false,
@@ -1029,6 +1030,10 @@ class ManageFeatures_Controller extends Action_Controller
 			$this->_req->post->field_name = $this->_req->getPost('field_name', 'Util::htmlspecialchars');
 			$this->_req->post->field_desc = $this->_req->getPost('field_desc', 'Util::htmlspecialchars');
 
+
+			$rows = isset($this->_req->post->rows) ? (int) $this->_req->post->rows : 4;
+			$cols = isset($this->_req->post->cols) ? (int) $this->_req->post->cols : 30;
+
 			// Checkboxes...
 			$show_reg = $this->_req->getPost('reg', 'intval', 0);
 			$show_display = isset($this->_req->post->display) ? 1 : 0;
@@ -1051,39 +1056,52 @@ class ManageFeatures_Controller extends Action_Controller
 			// Select options?
 			$field_options = '';
 			$newOptions = array();
-			$default = isset($this->_req->post->default_check) && $this->_req->post->field_type == 'check' ? 1 : '';
-			if (!empty($this->_req->post->select_option) && ($this->_req->post->field_type == 'select' || $this->_req->post->field_type == 'radio'))
+
+			// Set default
+			$default = '';
+
+			switch ($this->_req->post->field_type)
 			{
-				foreach ($this->_req->post->select_option as $k => $v)
-				{
-					// Clean, clean, clean...
-					$v = Util::htmlspecialchars($v);
-					$v = strtr($v, array(',' => ''));
+				case 'check':
+					$default = isset($this->_req->post->default_check) ? 1 : '';
+			    		break;
+				case 'select':
+				case 'radio':
+					if (!empty($this->_req->post->select_option))
+					{
+						foreach ($this->_req->post->select_option as $k => $v)
+						{
+							// Clean, clean, clean...
+							$v = Util::htmlspecialchars($v);
+							$v = strtr($v, array(',' => ''));
 
-					// Nada, zip, etc...
-					if (trim($v) == '')
-						continue;
+							// Nada, zip, etc...
+							if (trim($v) == '')
+								continue;
 
-					// Otherwise, save it boy.
-					$field_options .= $v . ',';
+							// Otherwise, save it boy.
+							$field_options .= $v . ',';
 
-					// This is just for working out what happened with old options...
-					$newOptions[$k] = $v;
+							// This is just for working out what happened with old options...
+							$newOptions[$k] = $v;
 
-					// Is it default?
-					if (isset($this->_req->post->default_select) && $this->_req->post->default_select == $k)
-						$default = $v;
-				}
+							// Is it default?
+							if (isset($this->_req->post->default_select) && $this->_req->post->default_select == $k)
+								$default = $v;
+						}
 
-				if (isset($_POST['default_select']) && $_POST['default_select'] == 'no_default')
-					$default = 'no_default';
+						if (isset($_POST['default_select']) && $_POST['default_select'] == 'no_default')
+							$default = 'no_default';
 
-				$field_options = substr($field_options, 0, -1);
+						$field_options = substr($field_options, 0, -1);
+					}
+					break;
+				default: $default = isset($this->_req->post->default_value) ? $this->_req->post->default_value : '';
 			}
 
 			// Text area by default has dimensions
-			if ($this->_req->post->field_type == 'textarea')
-				$default = (int) $this->_req->post->rows . ',' . (int) $this->_req->post->cols;
+//			if ($this->_req->post->field_type == 'textarea')
+//				$default = (int) $this->_req->post->rows . ',' . (int) $this->_req->post->cols;
 
 			// Come up with the unique name?
 			if (empty($context['fid']))
@@ -1166,6 +1184,8 @@ class ManageFeatures_Controller extends Action_Controller
 					'mask' => $mask,
 					'enclose' => $enclose,
 					'placement' => $placement,
+					'rows' => $rows,
+					'cols' => $cols,
 				);
 
 				updateProfileField($field_data);
@@ -1190,7 +1210,9 @@ class ManageFeatures_Controller extends Action_Controller
 					'show_profile' => $show_profile,
 					'private' => $private,
 					'active' => $active,
-					'default' => $default,
+					'default_value' => $default,
+					'rows' => $rows,
+					'cols' => $cols,
 					'can_search' => $can_search,
 					'bbc' => $bbc,
 					'mask' => $mask,
