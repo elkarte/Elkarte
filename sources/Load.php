@@ -1020,7 +1020,7 @@ function loadMemberContext($user, $display_custom_fields = false)
 	// Set things up to be used before hand.
 	$profile['signature'] = str_replace(array("\n", "\r"), array('<br />', ''), $profile['signature']);
 	$profile['signature'] = $parsers->parseSignature($profile['signature'], true);
-	$profile['is_online'] = !empty($profile['show_online']) || (allowedTo('moderate_forum') && $profile['is_online'] > 0);
+	$profile['is_online'] = (!empty($profile['show_online']) || allowedTo('moderate_forum')) && $profile['is_online'] > 0;
 	$profile['icons'] = empty($profile['icons']) ? array('', '') : explode('#', $profile['icons']);
 
 	// Setup the buddy status here (One whole in_array call saved :P)
