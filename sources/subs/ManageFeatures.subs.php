@@ -401,7 +401,7 @@ function getProfileField($id_field)
 		SELECT
 			id_field, col_name, field_name, field_desc, field_type, field_length, field_options,
 			show_reg, show_display, show_memberlist, show_profile, private, active, default_value, can_search,
-			bbc, mask, enclose, placement, vieworder
+			bbc, mask, enclose, placement, vieworder, rows, cols
 		FROM {db_prefix}custom_fields
 		WHERE id_field = {int:current_field}',
 		array(
@@ -410,14 +410,6 @@ function getProfileField($id_field)
 	);
 	while ($row = $db->fetch_assoc($request))
 	{
-		if ($row['field_type'] == 'textarea')
-			@list ($rows, $cols) = explode(',', $row['default_value']);
-		else
-		{
-			$rows = 3;
-			$cols = 30;
-		}
-
 		$field = array(
 			'name' => $row['field_name'],
 			'desc' => $row['field_desc'],
@@ -428,12 +420,13 @@ function getProfileField($id_field)
 			'memberlist' => $row['show_memberlist'],
 			'type' => $row['field_type'],
 			'max_length' => $row['field_length'],
-			'rows' => $rows,
-			'cols' => $cols,
+			'rows' => $row['rows'],
+			'cols' => $row['cols'],
 			'bbc' => $row['bbc'] ? true : false,
 			'default_check' => $row['field_type'] == 'check' && $row['default_value'] ? true : false,
 			'default_select' => $row['field_type'] == 'select' || $row['field_type'] == 'radio' ? $row['default_value'] : '',
 			'show_nodefault' => $row['field_type'] == 'select' || $row['field_type'] == 'radio',
+			'default_value' => $row['default_value'],
 			'options' => strlen($row['field_options']) > 1 ? explode(',', $row['field_options']) : array('', '', ''),
 			'active' => $row['active'],
 			'private' => $row['private'],
@@ -547,7 +540,8 @@ function updateProfileField($field_data)
 			show_profile = {string:show_profile}, private = {int:private},
 			active = {int:active}, default_value = {string:default_value},
 			can_search = {int:can_search}, bbc = {int:bbc}, mask = {string:mask},
-			enclose = {string:enclose}, placement = {int:placement}
+			enclose = {string:enclose}, placement = {int:placement}, rows = {int:rows},
+			cols = {int:cols}
 		WHERE id_field = {int:current_field}',
 		array(
 			'field_length' => $field_data['field_length'],
@@ -568,6 +562,8 @@ function updateProfileField($field_data)
 			'mask' => $field_data['mask'],
 			'enclose' => $field_data['enclose'],
 			'placement' => $field_data['placement'],
+			'rows' => $field_data['rows'],
+			'cols' => $field_data['cols'],
 		)
 	);
 }
@@ -628,14 +624,16 @@ function addProfileField($field)
 			'field_type' => 'string', 'field_length' => 'string', 'field_options' => 'string',
 			'show_reg' => 'int', 'show_display' => 'int', 'show_memberlist' => 'int', 'show_profile' => 'string',
 			'private' => 'int', 'active' => 'int', 'default_value' => 'string', 'can_search' => 'int',
-			'bbc' => 'int', 'mask' => 'string', 'enclose' => 'string', 'placement' => 'int', 'vieworder' => 'int'
+			'bbc' => 'int', 'mask' => 'string', 'enclose' => 'string', 'placement' => 'int', 'vieworder' => 'int',
+			'rows' => 'int', 'cols' => 'int'
 		),
 		array(
 			$field['col_name'], $field['field_name'], $field['field_desc'],
 			$field['field_type'], $field['field_length'], $field['field_options'],
 			$field['show_reg'], $field['show_display'], $field['show_memberlist'], $field['show_profile'],
-			$field['private'], $field['active'], $field['default'], $field['can_search'],
-			$field['bbc'], $field['mask'], $field['enclose'], $field['placement'], $field['vieworder']
+			$field['private'], $field['active'], $field['default_value'], $field['can_search'],
+			$field['bbc'], $field['mask'], $field['enclose'], $field['placement'], $field['vieworder'],
+			$field['rows'], $field['cols']
 		),
 		array('id_field')
 	);

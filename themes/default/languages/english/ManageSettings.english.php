@@ -331,6 +331,7 @@ $txt['custom_edit_options_desc'] = 'Leave option box blank to remove. Radio butt
 $txt['custom_edit_options_more'] = 'More';
 $txt['custom_edit_options_no_default'] = 'Do not set a default value.';
 $txt['custom_edit_default'] = 'Default State';
+$txt['custom_edit_default_value'] = 'Default Value';
 $txt['custom_edit_active'] = 'Active';
 $txt['custom_edit_active_desc'] = 'If not selected this field will not be shown to anyone.';
 $txt['custom_edit_privacy'] = 'Privacy';

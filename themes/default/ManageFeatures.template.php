@@ -167,6 +167,12 @@ function template_edit_profile_field()
 						<dd >
 							<input type="checkbox" name="bbc" id="bbc_dd"', $context['field']['bbc'] ? ' checked="checked"' : '', ' />
 						</dd>
+						<dt id="defaultval_dt">
+							<label for="default_dd">', $txt['custom_edit_default_value'], '</label>
+						</dt>
+						<dd id="defaultval_dd">
+							<input type="text" name="default_value" size="40" maxlength="255" value="' , $context['field']['default_value'], '" class="input_text">
+						</dd>
 						<dt id="options_dt">
 							<a href="', $scripturl, '?action=quickhelp;help=customoptions" onclick="return reqOverlayDiv(this.href);" class="helpicon i-help"><s>', $txt['help'], '</s></a>
 							<label for="options_dd">', $txt['custom_edit_options'], ':</label><br>
