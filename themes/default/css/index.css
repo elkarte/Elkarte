@@ -5320,10 +5320,11 @@ a.help .icon {
 
 .helpicon, a.helpicon {
 	display: inline-block;
-	height: 1.4em;
-	width: 1.4em;
-	border-radius: 1.4em;
-	line-height: 1.4em;
+	height: 1.25em;
+	width: 1.25em;
+	border-radius: 1.25em;
+	line-height: 1.25em;
+	margin: 0 .25em;
 	border: 1px solid;
 	vertical-align: middle;
 	text-align: center;

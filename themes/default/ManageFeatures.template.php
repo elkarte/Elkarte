@@ -208,7 +208,7 @@ function template_edit_profile_field()
 					<legend>', $txt['custom_edit_advanced'], '</legend>
 					<dl class="settings">
 						<dt id="mask_dt">
-							<a id="custom_mask" href="', $scripturl, '?action=quickhelp;help=custom_mask" onclick="return reqOverlayDiv(this.href);" class="helpicon i_help"><s>', $txt['help'], '</s></a>
+							<a id="custom_mask" href="', $scripturl, '?action=quickhelp;help=custom_mask" onclick="return reqOverlayDiv(this.href);" class="helpicon i-help"><s>', $txt['help'], '</s></a>
 							<label for="mask">', $txt['custom_edit_mask'], ':</label><br>
 							<span class="smalltext">', $txt['custom_edit_mask_desc'], '</span>
 						</dt>
