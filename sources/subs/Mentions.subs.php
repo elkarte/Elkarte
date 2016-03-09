@@ -496,7 +496,7 @@ function getTimeLastMention($id_member)
 {
 	$db = database();
 
-	list ($request) = $db->fetchQuery('
+	$request = $db->fetchQuery('
 		SELECT log_time
 		FROM {db_prefix}log_mentions
 		WHERE status = {int:status}
@@ -508,7 +508,14 @@ function getTimeLastMention($id_member)
 			'member' => $id_member
 		)
 	);
-	return $request['log_time'];
+	if (!empty($request))
+	{
+		return $request[0]['log_time'];
+	}
+	else
+	{
+		return 0;
+	}
 }
 
 /**
