@@ -809,12 +809,12 @@ function obExit($header = null, $do_footer = null, $from_index = false, $from_fa
 	// Clear out the stat cache.
 	trackStats();
 
+	Notifications::getInstance()->send();
+
 	// If we have mail to send, send it.
 	if (!empty($context['flush_mail']))
 		// @todo this relies on 'flush_mail' being only set in AddMailQueue itself... :\
 		AddMailQueue(true);
-
-	Notifications::getInstance()->send();
 
 	$do_header = $header === null ? !$header_done : $header;
 	if ($do_footer === null)
