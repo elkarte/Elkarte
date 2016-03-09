@@ -1861,21 +1861,21 @@ div.bbc_footnotes .meaction {
 
 /* Helpers */
 
-.icon-shade {
-	filter: drop-shadow(.125em .125em .125em rgba(0, 0, 0, 0.4));
+.icon-shade, .chevricon, a > .icon, a.icon {
+	filter: drop-shadow(.125em .125em .125em rgba(0, 0, 0, 0.5));
 }
 
-.icon-shadow {
+.icon-shadow, .board_icon {
 	filter: drop-shadow(.125em .125em .125em rgba(0, 0, 0, 0.8));
 }
 
-.chevricon {
-	filter: drop-shadow(.125em .125em .125em rgba(0, 0, 0, 0.4));
+.helpicon {
+	background: #fff linear-gradient(to bottom, #f2f9fe 0%,#d6f0fd 100%);
+	border-color: #1966b3;
 }
 
-/* This was an attempt at creating a nifty graphical effect. : / */
-.helpicon {
-
+a.helpicon, a > .iconline, a > .icoffline {
+	box-shadow: .125em .125em .125em rgba(0, 0, 0, 0.5);
 }
 
 .iconline {
@@ -2025,10 +2025,10 @@ div.bbc_footnotes .meaction {
 
 /* Was genderless */
 .i-undisclosed::before {
-	content: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' stroke='black' stroke-width='6em' fill='transparent' viewBox='0 0 3584 3584'%3E%3Cpath d='M2560 1920q0-370-263-633t-633-263-633 263-263 633 263 633 633 263 633-263 263-633z m256 0q0 234-91 447t-246 368-368 246-447 91-447-91-368-246-246-368-91-447 91-447 246-368 368-246 447-91 447 91 368 246 246 368 91 447z'/%3E%3C/svg%3E");
+	content: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' stroke='black' stroke-width='6em' fill='transparent' viewBox='0 0 3584 3584'%3E%3Cpath d='M3328 1792q0 418-206 771t-559 559-771 206-771-206-559-559-206-771 206-771 559-559 771-206 771 206 559 559 206 771z'/%3E%3C/svg%3E");
 }
 
-/* Standardized icons */
+/* Standard and brand icons */
 
 .i-rss::before {
 	content: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='%23FF5800' viewBox='0 0 3584 3584'%3E%3Cpath d='M1152 2688q0 160-112 272t-272 112-272-112-112-272 112-272 272-112 272 112 112 272z m1024 246q4 56-34 96-36 42-94 42h-270q-50 0-86-33t-40-83q-44-458-369-783t-783-369q-50-4-83-40t-33-86v-270q0-58 42-94 34-34 86-34h10q320 26 612 161t518 363q228 226 363 518t161 612z m1024 4q4 54-36 94-36 40-92 40h-286q-52 0-89-35t-39-85q-24-430-202-817t-463-672-672-463-817-204q-50-2-85-39t-35-87v-286q0-56 40-92 36-36 88-36h6q524 26 1003 240t851 588q374 372 588 851t240 1003z'/%3E%3C/svg%3E");

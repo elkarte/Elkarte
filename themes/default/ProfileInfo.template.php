@@ -526,7 +526,7 @@ function template_profile_block_summary()
 						<h4><span class="position">', (!empty($context['member']['group']) ? $context['member']['group'] : $context['member']['post_group']), '</span></h4>
 					</div>
 					', $context['member']['avatar']['image'], '
-					<span id="userstatus">', $context['can_send_pm'] ? '<a href="' . $context['member']['online']['href'] . '" title="' . $context['member']['online']['text'] . '" rel="nofollow">' : '',
+					<span id="userstatus">', $context['can_send_pm'] ? '<a href="' . $context['member']['online']['href'] . '" title="' . $context['member']['online']['text'] . '">' : '',
 					'<i class="', $context['member']['online']['is_online'] ? 'iconline' : 'icoffline', '" title="' . $context['member']['online']['text'] . '"></i>',
 					$context['can_send_pm'] ? '</a>' : '', '<span class="smalltext"> ' . $context['member']['online']['label'] . '</span>', '</span>
 				</div>

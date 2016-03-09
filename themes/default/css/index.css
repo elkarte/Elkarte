@@ -506,11 +506,6 @@ em, .em {
 	border: 1px solid;
 }
 
-.category_header .icon {
-	margin: 0 5px 0 0;
-	vertical-align: text-top;
-}
-
 /* Category Header icons as sprites, lots available to custom themes to use */
 .hdicon:before {
 	display: inline-block;
@@ -2247,12 +2242,6 @@ a.bbc_link {
 	padding: 0 0 4px 0;
 	font-size: 1.071em;
 	border-bottom: 1px solid;
-}
-
-/* Icons for info centre title bars. */
-.ic_section_header .icon {
-	margin: -3px 4px 0 4px;
-	vertical-align: middle;
 }
 
 #ic_recentposts, #ps_recentposts, #ps_recenttopics {
@@ -5316,6 +5305,8 @@ a.help .icon {
 	border-radius: .75em;
 	height: .75em;
 	width: .75em;
+	line-height: .75em;
+	vertical-align: middle;
 	display: inline-block;
 }
 
@@ -5323,17 +5314,22 @@ a.help .icon {
 	display: inline-block;
 	height: 1.25em;
 	width: 1.25em;
+	line-height: 1.25em;
 	vertical-align: middle;
 }
 
 .helpicon, a.helpicon {
 	display: inline-block;
-	height: 1em;
-	width: 1em;
-	border-radius: 1em;
-	border: none;
-	vertical-align: text-top;
+	height: 1.4em;
+	width: 1.4em;
+	border-radius: 1.4em;
+	line-height: 1.4em;
+	border: 1px solid;
+	vertical-align: middle;
+	text-align: center;
 	cursor: help;
+	font-size: 1em;
+	font-weight: bold;
 }
 
 .board_icon {
@@ -5341,14 +5337,24 @@ a.help .icon {
 	float: left;
 	width: 3em;
 	height: 3em;
+	line-height: 3em;
 }
 
 .chevricon {
 	display: inline-block;
 	height: 1.25em;
 	width: 1.25em;
+	line-height: 1.25em;
 	vertical-align: middle;
 	float: right;
+}
+
+.ic_section_header .icon {
+	margin: 0 .25em;
+}
+
+.category_header .icon {
+	margin: 0 .25em 0 0;
 }
 
 /* Screenreader-only shortcut.
@@ -5364,14 +5370,12 @@ a.help .icon {
 .icon-lg {
 	height: 2em;
 	width: 2em;
+	line-height: 2em;
 }
 
+/* todo: fix the linklist css so we can get rid of this */
 .icon-top {
 	vertical-align: top;
-}
-
-.icon-text-top {
-	vertical-align: text-top;
 }
 
 .board_key {

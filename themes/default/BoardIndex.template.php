@@ -46,7 +46,7 @@ function template_boards_list()
 		// If this category even can collapse, show a link to collapse it.
 		if ($category['can_collapse'])
 			echo '
-				<a class="chevricon icon-top i-chevron-', $category['is_collapsed'] ? 'down' : 'up', '" href="', $category['collapse_href'], '" title="', $category['is_collapsed'] ? $txt['show'] : $txt['hide'], '"></a>';
+				<a class="chevricon i-chevron-', $category['is_collapsed'] ? 'down' : 'up', '" href="', $category['collapse_href'], '" title="', $category['is_collapsed'] ? $txt['show'] : $txt['hide'], '"></a>';
 
 		// The "category link" is only a link for logged in members. Guests just get the name.
 		echo '

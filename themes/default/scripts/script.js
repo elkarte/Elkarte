@@ -350,7 +350,7 @@ function smc_Popup(oOptions)
 smc_Popup.prototype.show = function ()
 {
 	var popup_class = 'popup_window ' + (this.opt.custom_class ? this.opt.custom_class : 'content'),
-		icon = this.opt.icon ? '<i class="icon i-' + this.opt.icon + ' icon-text-top"></i> ' : '';
+		icon = this.opt.icon ? '<i class="icon i-' + this.opt.icon + '"></i> ' : '';
 
 	// Todo: opt.icon should be a string referencing the desired icon. Will require changing all callers.
 
