@@ -573,7 +573,7 @@ class UpgradeInstructions_upgrade_1_1
 					$result = $db->query('', 'SELECT id_field, col_name FROM {db_prefix}custom_fields WHERE placement=1');
 
 					while ($row = mysqli_fetch_assoc($result))
-					{ // <a href="skype:{INPUT}?call" class="icon i-skype icon-big" title="Skype call {INPUT}"><s>Skype call {INPUT}</s></a>
+					{
 						switch ($row['col_name']) {
 							case 'cust_skye':
 								$db->query('', 'UPDATE {db_prefix}custom_fields SET enclose=\'<a href="skype:{INPUT}?call" class="icon i-skype icon-big" title="Skype call {INPUT}"><s>Skype call {INPUT}</s></a>\' WHERE id_field=' . $row['id_field']);
