@@ -2463,6 +2463,7 @@ class InstallInstructions_install_1_1
 				array('mentions_enabled', '1'),
 				array('mentions_buddy', '0'),
 				array('mentions_dont_notify_rlike', '0'),
+				array('enabled_mentions', 'buddy,likemsg,mentionmem,quotedmem'),
 				array('badbehavior_enabled', '0'),
 				array('badbehavior_logging', '1'),
 				array('badbehavior_ip_wl', 'a:3:{i:2;s:10:"10.0.0.0/8";i:5;s:13:"172.16.0.0/12";i:6;s:14:"192.168.0.0/16";}'),
