@@ -97,11 +97,11 @@ function template_boardindex_outer_below()
 
 	if ($context['user']['is_logged'])
 		echo '
-			<p title="', $txt['new_posts'], '"><i class="icon board_key i-board-new"></i>', $txt['new_posts'], '</p>';
+			<p title="', $txt['new_posts'], '"><i class="icon i-board-new"></i>', $txt['new_posts'], '</p>';
 
 	echo '
-			<p title="', $txt['old_posts'], '"><i class="icon board_key i-board-off"></i>', $txt['old_posts'], '</p>
-			<p title="', $txt['redirect_board'], '"><i class="icon board_key i-board-redirect"></i>', $txt['redirect_board'], '</p>
+			<p title="', $txt['old_posts'], '"><i class="icon i-board-off"></i>', $txt['old_posts'], '</p>
+			<p title="', $txt['redirect_board'], '"><i class="icon i-board-redirect"></i>', $txt['redirect_board'], '</p>
 		</div>';
 
 	if (!empty($context['info_center_callbacks']))

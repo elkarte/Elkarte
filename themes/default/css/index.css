@@ -5315,6 +5315,7 @@ a.help .icon {
 	height: 1.25em;
 	width: 1.25em;
 	line-height: 1.25em;
+	margin: 0 .25em;
 	vertical-align: middle;
 }
 
@@ -5346,16 +5347,9 @@ a.help .icon {
 	height: 1.25em;
 	width: 1.25em;
 	line-height: 1.25em;
+	margin: 0 .25em;
 	vertical-align: middle;
 	float: right;
-}
-
-.ic_section_header .icon {
-	margin: 0 .25em;
-}
-
-.category_header .icon {
-	margin: 0 .25em 0 0;
 }
 
 /* Screenreader-only shortcut.
@@ -5368,6 +5362,12 @@ a.help .icon {
 	margin: -1px; padding: 0; border: 0;
 }
 
+.icon-big {
+	height: 1.5em;
+	width: 1.5em;
+	line-height: 1.5em;
+}
+
 .icon-lg {
 	height: 2em;
 	width: 2em;
@@ -5377,6 +5377,10 @@ a.help .icon {
 /* todo: fix the linklist css so we can get rid of this */
 .icon-top {
 	vertical-align: top;
+}
+
+.icon-margin {
+	margin: .25em;
 }
 
 .board_key {

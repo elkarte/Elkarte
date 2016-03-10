@@ -408,7 +408,7 @@ function template_body_below()
 					theme_copyright(), '
 				</li>',
 				!empty($context['newsfeed_urls']['rss']) ? '<li>
-					<a id="button_rss" href="' . $context['newsfeed_urls']['rss'] . '" class="rssfeeds new_win"><i class="icon i-rss icon-lg"><s>' . $txt['rss'] . '</s></i></a>
+					<a id="button_rss" href="' . $context['newsfeed_urls']['rss'] . '" class="rssfeeds new_win"><i class="icon icon-margin i-rss icon-big"><s>' . $txt['rss'] . '</s></i></a>
 				</li>' : '',
 			'</ul>';
 

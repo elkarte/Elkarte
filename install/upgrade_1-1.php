@@ -554,6 +554,101 @@ class UpgradeInstructions_upgrade_1_1
 					}
 				}
 			),
+			array(
+				'debug_title' => 'Inserting custom fields for gender/location/personal text',
+				'function' => function($db, $db_table) {
+					$db->insert('replace',
+						    '{db_prefix}custom_fields',
+						    array('col_name' => 'string', 'field_name' => 'string', 'field_desc' => 'string', 'field_type' => 'string', 'field_length' => 'int', 'field_options' => 'string', 'mask' => 'string', 'show_reg' => 'int', 'show_display' => 'int', 'show_profile' => 'string', 'private' => 'int', 'active' => 'int', 'bbc' => 'int', 'can_search' => 'int', 'default_value' => 'string', 'enclose' => 'string', 'placement' => 'int', 'rows' => 'int', 'cols' => 'int'),
+						    array(
+							    array('cust_gender', 'Gender', 'Your gender', 'radio', 15, 'undisclosed,male,female,genderless,nonbinary,transgendered', '', 0, 1, 'forumprofile', 0, 1, 0, 0, 'undisclosed', '<i class="icon i-{INPUT}" title="{INPUT}"><s>{INPUT}</s></i>', 0, 0, 0),
+							    array('cust_blurb', 'Personal Text', 'A custom bit of text for your postbit.', 'text', 120, '', '', 0, 0, 'forumprofile', 0, 1, 0, 0, 'Default Personal Text', '', 3, 0, 0),
+							    array('cust_locate', 'Location', 'Where you are', 'text', 32, '', '', 0, 0, 'forumprofile', 0, 1, 0, 0, '', '', 0, 0, 0),
+						    ));
+				}
+			),
+			array(
+				'debug_title' => 'Updating icon custom fields',
+				'function' => function($db, $db_table) {
+					$result = $db->query('', 'SELECT id_field, col_name FROM {db_prefix}custom_fields WHERE placement=1');
+
+					while ($row = mysqli_fetch_assoc($result))
+					{ // <a href="skype:{INPUT}?call" class="icon i-skype icon-big" title="Skype call {INPUT}"><s>Skype call {INPUT}</s></a>
+						switch ($row['col_name']) {
+							case 'cust_skye':
+								$db->query('', 'UPDATE {db_prefix}custom_fields SET enclose=\'<a href="skype:{INPUT}?call" class="icon i-skype icon-big" title="Skype call {INPUT}"><s>Skype call {INPUT}</s></a>\' WHERE id_field=' . $row['id_field']);
+						    		break;
+							case 'cust_fbook':
+								$db->query('', 'UPDATE {db_prefix}custom_fields SET enclose=\'<a target="_blank" href="https://www.facebook.com/{INPUT}" class="icon i-facebook icon-big" title="Facebook"><s>Facebook</s></a>\' WHERE id_field=' . $row['id_field']);
+								break;
+							case 'cust_twitt':
+								$db->query('', 'UPDATE {db_prefix}custom_fields SET enclose=\'<a target="_blank" href="https://www.twitter.com/{INPUT}" class="icon i-twitter icon-big" title="Twitter Profile"><s>Twitter Profile</s></a>\' WHERE id_field=' . $row['id_field']);
+								break;
+							case 'cust_linked':
+								$db->query('', 'UPDATE {db_prefix}custom_fields SET enclose=\'<a href="{INPUT}" class="icon i-linkedin icon-big" title="Linkedin Profile"><s>Linkedin Profile</s></a>\' WHERE id_field=' . $row['id_field']);
+								break;
+							case 'cust_gplus':
+								$db->query('', 'UPDATE {db_prefix}custom_fields SET enclose=\'<a target="_blank" href="{INPUT}" class="icon i-google-plus icon-big" title="G+ Profile"><s>G+ Profile</s></a>\' WHERE id_field=' . $row['id_field']);
+								break;
+						}
+					}
+				}
+			),
+			array(
+				'debug_title' => 'Converting gender data',
+				'function' => function($db, $db_table) {
+					$result = $db->query('', 'SELECT id_member, gender FROM {db_prefix}members');
+
+					while ($row = mysqli_fetch_assoc($result))
+					{
+						$gender = 'undisclosed';
+
+						switch ($row['gender']) {
+							case 1: $gender = 'male'; break;
+							case 2: $gender = 'female'; break;
+						}
+
+						$db->insert('replace',
+							    '{db_prefix}custom_fields_data',
+							    array('id_member' => 'int', 'variable' => 'string', 'value' => 'string'),
+							    array(
+								    array($row['id_member'], 'cust_gender', $gender),
+							    ));
+					}
+				}
+			),
+			array(
+				'debug_title' => 'Converting location',
+				'function' => function($db, $db_table) {
+					$result = $db->query('', 'SELECT id_member, location FROM {db_prefix}members');
+
+					while ($row = mysqli_fetch_assoc($result))
+					{
+						$db->insert('replace',
+							    '{db_prefix}custom_fields_data',
+							    array('id_member' => 'int', 'variable' => 'string', 'value' => 'string'),
+							    array(
+								    array($row['id_member'], 'cust_locate', $row['location']),
+							    ));
+					}
+				}
+			),
+			array(
+				'debug_title' => 'Converting personal text',
+				'function' => function($db, $db_table) {
+					$result = $db->query('', 'SELECT id_member, personal_text FROM {db_prefix}members');
+
+					while ($row = mysqli_fetch_assoc($result))
+					{
+						$db->insert('replace',
+							    '{db_prefix}custom_fields_data',
+							    array('id_member' => 'int', 'variable' => 'string', 'value' => 'string'),
+							    array(
+								    array($row['id_member'], 'cust_blurb', $row['personal_text']),
+							    ));
+					}
+				}
+			),
 		);
 	}
 }

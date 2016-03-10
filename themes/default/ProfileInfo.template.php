@@ -761,7 +761,7 @@ function template_profile_block_contact()
 		$cf_show = false;
 		foreach ($context['custom_fields'] as $field)
 		{
-			if (($field['placement'] == 1 || empty($field['output_html'])) && !empty($field['value']))
+			if ($field['placement'] == 1 && !empty($field['value']))
 			{
 				$ci_empty = false;
 				if (empty($cf_show))
@@ -771,8 +771,10 @@ function template_profile_block_contact()
 					$cf_show = true;
 				}
 
+				// removed $field['name'], ': ', as it was annoying
+
 				echo '
-					<li>', $field['name'], ': ', $field['output_html'], '</li>';
+					<li>', $field['output_html'], '</li>';
 			}
 		}
 
