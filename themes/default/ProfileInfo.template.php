@@ -526,7 +526,7 @@ function template_profile_block_summary()
 						<h4><span class="position">', (!empty($context['member']['group']) ? $context['member']['group'] : $context['member']['post_group']), '</span></h4>
 					</div>
 					', $context['member']['avatar']['image'], '
-					<span id="userstatus">', $context['can_send_pm'] ? '<a href="' . $context['member']['online']['href'] . '" title="' . $context['member']['online']['text'] . '" rel="nofollow">' : '',
+					<span id="userstatus">', $context['can_send_pm'] ? '<a href="' . $context['member']['online']['href'] . '" title="' . $context['member']['online']['text'] . '">' : '',
 					'<i class="', $context['member']['online']['is_online'] ? 'iconline' : 'icoffline', '" title="' . $context['member']['online']['text'] . '"></i>',
 					$context['can_send_pm'] ? '</a>' : '', '<span class="smalltext"> ' . $context['member']['online']['label'] . '</span>', '</span>
 				</div>
@@ -761,7 +761,7 @@ function template_profile_block_contact()
 		$cf_show = false;
 		foreach ($context['custom_fields'] as $field)
 		{
-			if (($field['placement'] == 1 || empty($field['output_html'])) && !empty($field['value']))
+			if ($field['placement'] == 1 && !empty($field['value']))
 			{
 				$ci_empty = false;
 				if (empty($cf_show))
@@ -771,8 +771,10 @@ function template_profile_block_contact()
 					$cf_show = true;
 				}
 
+				// removed $field['name'], ': ', as it was annoying
+
 				echo '
-					<li>', $field['name'], ': ', $field['output_html'], '</li>';
+					<li>', $field['output_html'], '</li>';
 			}
 		}
 

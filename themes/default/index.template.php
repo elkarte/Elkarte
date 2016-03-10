@@ -408,7 +408,7 @@ function template_body_below()
 					theme_copyright(), '
 				</li>',
 				!empty($context['newsfeed_urls']['rss']) ? '<li>
-					<a id="button_rss" href="' . $context['newsfeed_urls']['rss'] . '" class="rssfeeds new_win"><i class="icon i-rss icon-lg icon-shadow"><s>' . $txt['rss'] . '</s></i></a>
+					<a id="button_rss" href="' . $context['newsfeed_urls']['rss'] . '" class="rssfeeds new_win"><i class="icon icon-margin i-rss icon-big"><s>' . $txt['rss'] . '</s></i></a>
 				</li>' : '',
 			'</ul>';
 
@@ -474,7 +474,7 @@ function theme_linktree($default = 'linktree')
 			echo $tree['extra_before'];
 
 		// Show the link, including a URL if it should have one.
-		echo $settings['linktree_link'] && isset($tree['url']) ? '<a href="' . $tree['url'] . '">' . ($pos == 0 ? '<i class="icon i-home icon-lg icon-top icon-shade"><s>' . $txt['home'] . '</s></i>' : $tree['name']) . '</a>' : $tree['name'];
+		echo $settings['linktree_link'] && isset($tree['url']) ? '<a href="' . $tree['url'] . '">' . ($pos == 0 ? '<i class="icon i-home icon-lg icon-top"><s>' . $txt['home'] . '</s></i>' : $tree['name']) . '</a>' : $tree['name'];
 
 		// Show something after the link...?
 		if (isset($tree['extra_after']))

@@ -278,7 +278,7 @@ class ManageSmileys_Controller extends Action_Controller
 					),
 					'data' => array(
 						'function' => function($rowData) {
-							return $rowData['selected'] ? '<i class="icon i-check icon-shade"></i>' : '';
+							return $rowData['selected'] ? '<i class="icon i-check"></i>' : '';
 						},
 						'class' => 'centertext',
 					),

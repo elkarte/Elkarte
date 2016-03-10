@@ -46,7 +46,7 @@ function template_boards_list()
 		// If this category even can collapse, show a link to collapse it.
 		if ($category['can_collapse'])
 			echo '
-				<a class="chevricon icon-top i-chevron-', $category['is_collapsed'] ? 'down' : 'up', '" href="', $category['collapse_href'], '" title="', $category['is_collapsed'] ? $txt['show'] : $txt['hide'], '"></a>';
+				<a class="chevricon i-chevron-', $category['is_collapsed'] ? 'down' : 'up', '" href="', $category['collapse_href'], '" title="', $category['is_collapsed'] ? $txt['show'] : $txt['hide'], '"></a>';
 
 		// The "category link" is only a link for logged in members. Guests just get the name.
 		echo '
@@ -97,11 +97,11 @@ function template_boardindex_outer_below()
 
 	if ($context['user']['is_logged'])
 		echo '
-			<p title="', $txt['new_posts'], '"><i class="icon board_key i-board-new"></i>', $txt['new_posts'], '</p>';
+			<p title="', $txt['new_posts'], '"><i class="icon i-board-new"></i>', $txt['new_posts'], '</p>';
 
 	echo '
-			<p title="', $txt['old_posts'], '"><i class="icon board_key i-board-off"></i>', $txt['old_posts'], '</p>
-			<p title="', $txt['redirect_board'], '"><i class="icon board_key i-board-redirect"></i>', $txt['redirect_board'], '</p>
+			<p title="', $txt['old_posts'], '"><i class="icon i-board-off"></i>', $txt['old_posts'], '</p>
+			<p title="', $txt['redirect_board'], '"><i class="icon i-board-redirect"></i>', $txt['redirect_board'], '</p>
 		</div>';
 
 	if (!empty($context['info_center_callbacks']))
