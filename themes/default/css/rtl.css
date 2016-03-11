@@ -1054,7 +1054,6 @@ div.labels {
 /* The hide icon (red cross). */
 .popup_heading .hide_popup {
 	float: left;
-	background: url(../images/buttons/delete.png) 100% 50% no-repeat;
 }
 
 /*	$SEARCH		*/

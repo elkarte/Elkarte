@@ -350,7 +350,7 @@ function smc_Popup(oOptions)
 smc_Popup.prototype.show = function ()
 {
 	var popup_class = 'popup_window ' + (this.opt.custom_class ? this.opt.custom_class : 'content'),
-		icon = this.opt.icon ? '<i class="icon i-' + this.opt.icon + '"></i> ' : '';
+		icon = this.opt.icon ? '<i class="icon i-' + this.opt.icon + ' icon-top"></i> ' : '';
 
 	// Todo: opt.icon should be a string referencing the desired icon. Will require changing all callers.
 
@@ -358,7 +358,7 @@ smc_Popup.prototype.show = function ()
 	// so better here than in the CSS.
 	// Mind you, I still haven't figured out why it should be essential. Cargo cult coding FTW. :P
 	// Create the div that will be shown
-	$('body').append('<div id="' + this.popup_id + '" class="popup_container"><div class="' + popup_class + '" style="max-height: none;"><h3 class="popup_heading"><a href="javascript:void(0);" class="hide_popup" title="Close"></a>' + icon + this.opt.heading + '</h3><div class="popup_content">' + this.opt.content + '</div></div></div>');
+	$('body').append('<div id="' + this.popup_id + '" class="popup_container"><div class="' + popup_class + '" style="max-height: none;"><h3 class="popup_heading"><a href="javascript:void(0);" class="hide_popup icon i-close" title="Close"></a>' + icon + this.opt.heading + '</h3><div class="popup_content">' + this.opt.content + '</div></div></div>');
 
 	// Show it
 	this.popup_body = $('#' + this.popup_id).children('.popup_window');

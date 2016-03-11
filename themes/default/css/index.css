@@ -275,7 +275,7 @@ input[type="submit"], button[type="submit"], input[type="button"],
 .linkbutton:link, .linkbutton_right:link, .linkbutton_left:link,
 .linkbutton:visited, .linkbutton_right:visited, .linkbutton_left:visited {
 	display: inline-block;
-	padding: 0 6px;
+	padding: 0 .25em;
 }
 
 input[type="submit"], .drop_area_fileselect_text, button[type="submit"], input[type="button"],
@@ -284,7 +284,7 @@ input[type="submit"], .drop_area_fileselect_text, button[type="submit"], input[t
 .linkbutton:link, .linkbutton_right:link, .linkbutton_left:link,
 .linkbutton:visited, .linkbutton_right:visited, .linkbutton_left:visited {
 	border: 1px solid;
-	border-radius: 2px;
+	border-radius: 0.125em;
 }
 
 .left_submit, .linkbutton_left {
@@ -311,7 +311,6 @@ input[type=submit][disabled]:hover, button[disabled], button[disabled]:hover {
 .linkbutton:visited, .linkbutton_right:visited, .linkbutton_left:visited {
 	font-size: 0.857em;
 	line-height: 1.8em;
-	/*padding: 0.4em 0.5em 0.5em 0.5em;*/
 }
 
 /* Use new class that is defined to suit, and with a sensible name. */
@@ -911,10 +910,6 @@ a.bbc_link {
 	white-space: nowrap;
 }
 
-.top_button img {
-	vertical-align: middle;
-}
-
 #password_login {
 	display: inline-block;
 	vertical-align: middle;
@@ -1507,7 +1502,6 @@ a.bbc_link {
 }
 .linktree:first-child a {
 	height: 2em;
-	padding: 0 .25em;
 }
 .linktree:last-child {
 	max-width: 25em;
@@ -1553,7 +1547,7 @@ a.bbc_link {
 }
 
 .linktree:first-child {
-	padding-left: 1em;
+	padding: 0 .75em;
 }
 
 /* ------------------------------------------------------- */
@@ -2308,12 +2302,12 @@ a.bbc_link {
 }
 
 .topic_sorting:hover #sortby, #sortby:hover, #sortby {
-	right: -2.5em;
-	width: 11em;
+	right: -2em;
+	width: 12em;
 }
 
 #sort_by.topic_sorting_recent {
-	margin: 4px 6px -1px 0;
+	margin: .25em .25em 0 0;
 	border: 1px solid;
 	border-bottom: none;
 }
@@ -4656,18 +4650,15 @@ a.help .icon {
 
 /* What it says. ;) */
 .popup_heading {
-	padding: 0 0 6px 0;
+	padding: 0 0 .25em 0;
 	font-weight: bold;
-	font-size: 1.071em;
-	line-height: 2em;
+	font-size: 1.1em;
+	line-height: 1.5em;
 }
 
 /* The hide icon (red cross). */
 .popup_heading .hide_popup {
 	float: right;
-	width: 16px;
-	height: 2em;
-	background: url(../images/buttons/delete.png) 0 50% no-repeat;
 }
 
 .popup_window.in.content {
@@ -5360,6 +5351,12 @@ a.help .icon {
 	clip: rect(0 0 0 0);
 	height: 1px; width: 1px;
 	margin: -1px; padding: 0; border: 0;
+}
+
+.icon-small {
+	height: 1em;
+	width: 1em;
+	line-height: 1em;
 }
 
 .icon-big {
