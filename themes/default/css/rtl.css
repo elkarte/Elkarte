@@ -500,6 +500,9 @@ dl.settings img {
 .board_info .board_description, .board_info .moderators {
 	margin: 0 56px 0 0;
 }
+.board_name {
+	padding: 0 56px 1px 0;
+}
 .board_stats {
 	text-align: left;
 	padding: 1px 6px 1px 0;
@@ -1171,9 +1174,6 @@ div.labels {
 		margin-right: 0;
 		margin-left: 5px;
 	}
-	.board_name {
-		margin: 0 56px 0 0;
-	}
 	.board_description, .moderators, .childboards {
 		margin: 0 8px 0 0;
 	}
@@ -1247,7 +1247,8 @@ div.labels {
 		margin: 0 5px;
 	}
 	.board_name {
-		margin: 0 35px 0 0;
+		margin: 0;
+		padding: 0 35px 0 0;
 	}
 	#basicinfo, #detailedinfo {
 		float: none;
