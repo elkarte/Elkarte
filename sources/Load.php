@@ -2922,6 +2922,10 @@ function determineAvatar($profile)
 				'url' => 'http://',
 			);
 		}
+		else
+		{
+			$avatar = array();
+		}
 	}
 	// finally ...
 	else
