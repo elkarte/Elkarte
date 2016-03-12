@@ -67,6 +67,7 @@ class Attachments_Post_Module implements ElkArte\sources\modules\Module_Interfac
 				array('prepare_post', array('Attachments_Post_Module', 'prepare_post'), array()),
 				array('prepare_context', array('Attachments_Post_Module', 'prepare_context'), array('post_errors')),
 				array('finalize_post_form', array('Attachments_Post_Module', 'finalize_post_form'), array('show_additional_options', 'board', 'topic')),
+				array('after_loading_drafts', array('Attachments_Post_Module', 'after_loading_drafts'), array('current_draft')),
 			);
 
 			if (isset($_POST['save_draft']))
@@ -80,7 +81,6 @@ class Attachments_Post_Module implements ElkArte\sources\modules\Module_Interfac
 			else
 			{
 				$return = array_merge($return, array(
-					array('after_loading_drafts', array('Attachments_Post_Module', 'after_loading_drafts'), array('current_draft')),
 					array('before_preview', array('Attachments_Post_Module', 'before_preview'), array('post_errors')),
 					array('pre_save_post', array('Attachments_Post_Module', 'pre_save_post'), array('msgOptions')),
 					array('after_save_post', array('Attachments_Post_Module', 'after_save_post'), array('msgOptions')),
