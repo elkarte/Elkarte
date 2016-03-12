@@ -81,7 +81,7 @@ class Attachments_Post_Module implements ElkArte\sources\modules\Module_Interfac
 			{
 				$return = array_merge($return, array(
 					array('after_loading_drafts', array('Attachments_Post_Module', 'after_loading_drafts'), array('current_draft')),
-					array('prepare_save_post', array('Attachments_Post_Module', 'prepare_save_post'), array('post_errors')),
+					array('before_preview', array('Attachments_Post_Module', 'before_preview'), array('post_errors')),
 					array('pre_save_post', array('Attachments_Post_Module', 'pre_save_post'), array('msgOptions')),
 					array('after_save_post', array('Attachments_Post_Module', 'after_save_post'), array('msgOptions')),
 				));
@@ -311,6 +311,95 @@ class Attachments_Post_Module implements ElkArte\sources\modules\Module_Interfac
 					);
 				}
 			}
+
+			if (!empty($_SESSION['pending_attachments']))
+			{
+				// Is this a request to delete them?
+				if (isset($_GET['delete_temp']))
+				{
+					require_once(SUBSDIR . '/ManageAttachments.subs.php');
+					foreach ($_SESSION['pending_attachments'] as $attachID => $attachment)
+					{
+						removeAttachments(array('id_attach' => $attachID));
+					}
+					$this->_attach_errors->addError('temp_attachments_gone');
+				}
+				// Hmm, coming in fresh and there are files in session.
+				elseif ($context['current_action'] != 'post2' || !empty($_POST['from_qr']))
+				{
+					// Compile a list of the files to show the user.
+					$file_list = array();
+
+					// See if any files still exist before showing the warning message and the files attached.
+					foreach ($_SESSION['pending_attachments'] as $attachID => $attachment)
+					{
+						// Let's be nice and see if they belong here first.
+						if ((empty($_REQUEST['msg']) && empty($attachment['msg']) && $attachment['board'] == $board) || (!empty($_REQUEST['msg']) && $attachment['msg'] == $_REQUEST['msg']))
+						{
+
+							if ($this->_attach_errors->hasError('temp_attachments_new') === false)
+							{
+								$this->_attach_errors->addError('temp_attachments_new');
+								$context['files_in_session_warning'] = $txt['attached_files_in_session'];
+								unset($_SESSION['temp_attachments']['post']['files']);
+								continue;
+							}
+						}
+						else
+						{
+							// Since, they don't belong here. Let's inform the user that they exist..
+							if (!empty($topic))
+							{
+								$delete_url = $scripturl . '?action=post' . (!empty($_REQUEST['msg']) ? (';msg=' . $_REQUEST['msg']) : '') . (!empty($_REQUEST['last_msg']) ? (';last_msg=' . $_REQUEST['last_msg']) : '') . ';topic=' . $topic . ';delete_temp';
+							}
+							else
+							{
+								$delete_url = $scripturl . '?action=post;board=' . $board . ';delete_temp';
+							}
+
+							$file_list[] = $attachment['name'];
+
+							$_SESSION['temp_attachments']['post']['files'] = $file_list;
+							$file_list = '<div class="attachments">' . implode('<br />', $file_list) . '</div>';
+
+							if (!empty($attachment['msg']))
+							{
+								// We have a message id, so we can link back to the old topic they were trying to edit..
+								$goback_link = '<a href="' . $scripturl . '?action=post' . (!empty($attachment['msg']) ? (';msg=' . $attachment['msg']) : '') . (!empty($attachment['last_msg']) ? (';last_msg=' . $attachment['last_msg']) : '') . ';topic=' . $attachment['topic'] . ';additionalOptions">' . $txt['here'] . '</a>';
+
+								$this->_attach_errors->addError(array('temp_attachments_found', array($delete_url, $goback_link, $file_list)));
+								$context['ignore_temp_attachments'] = true;
+							}
+							else
+							{
+								$this->_attach_errors->addError(array('temp_attachments_lost', array($delete_url, $file_list)));
+								$context['ignore_temp_attachments'] = true;
+							}
+						}
+					}
+				}
+
+				foreach ($_SESSION['pending_attachments'] as $attachID => $attachment)
+				{
+					// Skipping over these
+					if (isset($context['ignore_temp_attachments']) || isset($_SESSION['pending_attachments']['post']['files']))
+						break;
+
+					$attachments['quantity']++;
+					$attachments['total_size'] += $attachment['size'];
+
+					if (!isset($context['files_in_session_warning']))
+						$context['files_in_session_warning'] = $txt['attached_files_in_session'];
+
+					$context['attachments']['current'][] = array(
+						'name' => '<span class="underline">' . htmlspecialchars($attachment['name'], ENT_COMPAT, 'UTF-8') . '</span>',
+						'size' => $attachment['size'],
+						'id' => $attachID,
+						'unchecked' => false,
+						'approved' => 1,
+					);
+				}
+			}
 		}
 
 		// If there are attachment errors. Let's show a list to the user.
@@ -359,7 +448,7 @@ class Attachments_Post_Module implements ElkArte\sources\modules\Module_Interfac
 		$show_additional_options = $show_additional_options || isset($_SESSION['temp_attachments']['post']);
 	}
 
-	public function prepare_save_post($post_errors)
+	public function before_preview($post_errors)
 	{
 		$msg = isset($_REQUEST['msg']) ? $_REQUEST['msg'] : 0;
 		$this->saveAttachments($msg);
@@ -483,7 +572,7 @@ class Attachments_Post_Module implements ElkArte\sources\modules\Module_Interfac
 
 	protected function createAttachment($msg, $attach_source = 1)
 	{
-		global $ignore_temp, $context, $user_info, $modSettings;
+		global $ignore_temp, $context, $user_info, $modSettings, $board, $topic;
 
 		// ...or attach a new file...
 		if (empty($ignore_temp) && $context['attachments']['can']['post'] && !empty($_SESSION['temp_attachments']) && empty($_POST['from_qr']))
@@ -530,7 +619,15 @@ class Attachments_Post_Module implements ElkArte\sources\modules\Module_Interfac
 								$_SESSION['pending_attachments'] = array();
 							}
 
-							$_SESSION['pending_attachments'][$attachmentOptions['id']] = array('id_attach' => $attachmentOptions['id']);
+							$_SESSION['pending_attachments'][$attachmentOptions['id']] = array(
+								'id_attach' => $attachmentOptions['id'],
+								'msg' => $msg,
+								'board' => $board,
+								'topic' => $topic,
+								'name' => $attachmentOptions['name'],
+								'size' => $attachmentOptions['size'],
+							);
+
 							if (!empty($attachmentOptions['thumb']))
 							{
 								$_SESSION['pending_attachments'][$attachmentOptions['id']]['id_thumb'] = $attachmentOptions['thumb'];
