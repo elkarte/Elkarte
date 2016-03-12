@@ -151,6 +151,40 @@ class Attachment_Error_Context
 	}
 
 	/**
+	 * If this error context has a particular error code.
+	 *
+	 * @param string $error_code the code of the error
+	 * @param string|null $attachID
+	 */
+	public function hasError($error_code, $attachID = null)
+	{
+		if ($this->_generic_error !== null)
+		{
+			if ($this->_generic_error->hasError($error_code))
+			{
+				return true;
+			}
+		}
+
+		if (!empty($this->_attachs))
+		{
+			if ($attachID !== null)
+			{
+				return isset($this->_attachs[$attachID]) && $this->_attachs[$attachID]['error']->hasError($error_code);
+			}
+			else
+			{
+				foreach ($this->_attachs as $attach)
+				{
+					if ($attach['error']->hasError($error_code))
+						return true;
+				}
+			}
+		}
+		return false;
+	}
+
+	/**
 	 * Prepare the errors for display.
 	 *
 	 * - Return an array containing the error strings
