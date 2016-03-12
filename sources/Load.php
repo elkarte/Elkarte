@@ -2912,16 +2912,20 @@ function determineAvatar($profile)
 	elseif (!empty($modSettings['avatar_default']) && empty($profile['avatar']) && empty($profile['filename']))
 	{
 		// $settings not initialized? We can't do anything further..
-		if (empty($settings))
-			return array();
-
-		// Let's proceed with the default avatar.
-		$avatar = array(
-			'name' => '',
-			'image' => '<img class="avatar avatarresize" src="' . $settings['images_url'] . '/default_avatar.png" alt="" />',
-			'href' => $settings['images_url'] . '/default_avatar.png',
-			'url' => 'http://',
-		);
+		if (!empty($settings))
+		{
+			// Let's proceed with the default avatar.
+			$avatar = array(
+				'name' => '',
+				'image' => '<img class="avatar avatarresize" src="' . $settings['images_url'] . '/default_avatar.png" alt="" />',
+				'href' => $settings['images_url'] . '/default_avatar.png',
+				'url' => 'http://',
+			);
+		}
+		else
+		{
+			$avatar = array();
+		}
 	}
 	// finally ...
 	else
@@ -2935,7 +2939,7 @@ function determineAvatar($profile)
 	// Make sure there's a preview for gravatars available.
 	$avatar['gravatar_preview'] = '//www.gravatar.com/avatar/' . md5(strtolower($profile['email_address'])) . '?s=' . $modSettings['avatar_max_height'] . (!empty($modSettings['gravatar_rating']) ? ('&amp;r=' . $modSettings['gravatar_rating']) : '');
 
-	call_integration_hook('integrate_avatar', array(&$avatar));
+	call_integration_hook('integrate_avatar', array(&$avatar, $profile));
 
 	return $avatar;
 }
