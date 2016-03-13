@@ -745,7 +745,7 @@ function template_profile_block_contact()
 		$ci_empty = false;
 		echo '
 					<dt>
-						<img src="', $settings['images_url'], '/profile//www_sm.png" alt="', $txt['website'], '" />
+						<i class="icon i-website" title="', $txt['website'], '"></i>
 					</dt>
 					<dd>
 						<a href="', $context['member']['website']['url'], '" target="_blank" class="new_win">', $context['member']['website']['title'] == '' ? $context['member']['website']['url'] : $context['member']['website']['title'], '</a>

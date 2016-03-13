@@ -301,9 +301,7 @@ function template_th_login_bar()
 
 	if (!empty($modSettings['enableOpenID']))
 		echo '
-						<a class="linkbutton top_button" href="', $scripturl, '?action=login;openid">
-							<img src="' . $settings['images_url'] . '/openid.png" title="' . $txt['openid'] . '" alt="' . $txt['openid'] . '" />
-						</a>';
+						<a class="icon icon-big icon-margin i-openid" href="', $scripturl, '?action=login;openid" title="' . $txt['openid'] . '"><s>' . $txt['openid'] . '"</s></a>';
 	echo '
 					</div>
 				</form>

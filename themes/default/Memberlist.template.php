@@ -81,12 +81,18 @@ function template_memberlist()
 	foreach ($context['columns'] as $key => $column)
 	{
 		$table_span += isset($column['colspan']) ? $column['colspan'] : 1;
+		switch ($key) {
+			case 'posts':
+			case 'date_registered': $sorticon = 'numeric';
+		    		break;
+			default: $sorticon = 'alpha';
+		}
 
 		// This is a selected column, so underline it or some such.
 		if ($column['selected'])
 			echo '
 					<div class="' . $column['class'] . '">
-						<a href="' . $column['href'] . '" rel="nofollow">' . $column['label'] . '</a><img class="sort" src="' . $settings['images_url'] . '/sort_' . $context['sort_direction'] . '.png" alt="" />
+						<a href="' . $column['href'] . '">' . $column['label'] . '<i class="icon icon-small i-sort-' . $sorticon . '-' . $context['sort_direction'] . '"></i></a>
 					</div>';
 		// This is just some column... show the link and be done with it.
 		else

@@ -322,11 +322,21 @@ class MessageIndex_Controller extends Action_Controller implements Frontpage_Int
 		// Trick
 		$txt['starter'] = $txt['started_by'];
 
+		// todo: Need to move this to theme.
 		foreach ($sort_methods as $key => $val)
 		{
+			switch ($key)
+			{
+				case 'subject':
+				case 'starter':
+				case 'last_poster': $sorticon = 'alpha';
+			    		break;
+				default: $sorticon = 'numeric';
+			}
+
 			$context['topics_headers'][$key] = array(
 				'url' => $scripturl . '?board=' . $context['current_board'] . '.' . $context['start'] . ';sort=' . $key . ($context['sort_by'] == $key && $context['sort_direction'] === 'up' ? ';desc' : ''),
-				'sort_dir_img' => $context['sort_by'] == $key ? '<img class="sort" src="' . $settings['images_url'] . '/sort_' . $context['sort_direction'] . '.png" alt="" title="' . $context['sort_title'] . '" />' : '',
+				'sort_dir_img' => $context['sort_by'] == $key ? '<i class="icon icon-small i-sort-' . $sorticon . '-' . $context['sort_direction'] . '" title="' . $context['sort_title'] . '"><s>' . $context['sort_title'] . '</s></i>' : '',
 			);
 		}
 
