@@ -5301,7 +5301,7 @@ a.help .icon {
 	display: inline-block;
 }
 
-.icon {
+.icon, .helpicon, .warnicon, .noticon, .chevricon {
 	display: inline-block;
 	height: 1.25em;
 	width: 1.25em;
@@ -5310,19 +5310,16 @@ a.help .icon {
 	vertical-align: middle;
 }
 
-.helpicon, a.helpicon {
-	display: inline-block;
-	height: 1.25em;
-	width: 1.25em;
-	border-radius: 1.25em;
-	line-height: 1.25em;
-	margin: 0 .25em;
-	border: 1px solid;
-	vertical-align: middle;
+.helpicon, .warnicon, .noticon {
+	border: 1px solid;;
 	text-align: center;
-	cursor: help;
 	font-size: 1em;
 	font-weight: bold;
+	border-radius: 1.25em;
+}
+
+.helpicon, a.helpicon {
+	cursor: help;
 }
 
 .board_icon {
@@ -5334,18 +5331,12 @@ a.help .icon {
 }
 
 .chevricon {
-	display: inline-block;
-	height: 1.25em;
-	width: 1.25em;
-	line-height: 1.25em;
-	margin: 0 .25em;
-	vertical-align: middle;
 	float: right;
 }
 
 /* Screenreader-only shortcut.
    This is the most foolproof way to ensure a screen reader reads something. */
-.icon > s, .board_icon > s, .chevricon > s, .helpicon > s {
+.icon > s, .board_icon > s, .chevricon > s, .helpicon > s, .warnicon > s, .noticon > s {
 	position: absolute;
 	overflow: hidden;
 	clip: rect(0 0 0 0);

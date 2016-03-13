@@ -124,7 +124,7 @@ function template_build_poster_div($message, $ignoring = false)
 			// Don't show an icon if they haven't specified a website.
 			if ($message['member']['website']['url'] != '' && !isset($context['disabled_fields']['website']))
 				$poster_div .= '
-											<li><a href="' . $message['member']['website']['url'] . '" title="' . $message['member']['website']['title'] . '" target="_blank" class="new_win">' . ($settings['use_image_buttons'] ? '<i class="icon i-external-link" title="' . $message['member']['website']['title'] . '"></i>' : $txt['www']) . '</a></li>';
+											<li><a href="' . $message['member']['website']['url'] . '" title="' . $message['member']['website']['title'] . '" target="_blank" class="new_win">' . ($settings['use_image_buttons'] ? '<i class="icon i-website" title="' . $message['member']['website']['title'] . '"></i>' : $txt['www']) . '</a></li>';
 
 			// Don't show the email address if they want it hidden.
 			if (in_array($message['member']['show_email'], array('yes', 'yes_permission_override', 'no_through_forum')) && $context['can_send_email'])
@@ -161,12 +161,12 @@ function template_build_poster_div($message, $ignoring = false)
 	{
 		$poster_div .= '
 									<li class="listlevel2 warning">
-										<a class="linklevel2" href="' . $scripturl . '?action=profile;area=issuewarning;u=' . $message['member']['id'] . ';msg=' . $message['id'] . '"><i class="icon i-warning" title="' . $txt['issue_warning_post'] . '"></i>' . $txt['warning_issue'] . '</a>';
+										<a class="linklevel2" href="' . $scripturl . '?action=profile;area=issuewarning;u=' . $message['member']['id'] . ';msg=' . $message['id'] . '"><i class="warnicon i-warning" title="' . $txt['issue_warning_post'] . '"></i>' . $txt['warning_issue'] . '</a>';
 
 		// Do they have a warning in place?
 		if ($message['member']['can_see_warning'] && !empty($options['hide_poster_area']))
 			$poster_div .= '
-										<a class="linklevel2" href="' . $scripturl . '?action=profile;area=issuewarning;u=' . $message['member']['id'] . '"><img src="' . $settings['images_url'] . '/profile/warning_' . $message['member']['warning_status'] . '.png" alt="' . $txt['user_warn_' . $message['member']['warning_status']] . '" /><span class="warn_' . $message['member']['warning_status'] . '">' . $txt['warn_' . $message['member']['warning_status']] . '</span></a>';
+										<a class="linklevel2" href="' . $scripturl . '?action=profile;area=issuewarning;u=' . $message['member']['id'] . '"><i class="warnicon i-warning-' . $message['member']['warning_status'] . '" title="' . $txt['user_warn_' . $message['member']['warning_status']] . '"></i><span class="warn_' . $message['member']['warning_status'] . '">' . $txt['warn_' . $message['member']['warning_status']] . '</span></a>';
 
 		$poster_div .= '
 									</li>';
@@ -176,20 +176,20 @@ function template_build_poster_div($message, $ignoring = false)
 	if (!empty($context['can_moderate_forum']) && !empty($message['member']['ip']))
 		$poster_div .= '
 									<li class="listlevel2 poster_ip">
-										<a class="linklevel2 help" href="' . $scripturl . '?action=' . (!empty($message['member']['is_guest']) ? 'trackip' : 'profile;area=history;sa=ip;u=' . $message['member']['id'] . ';searchip=' . $message['member']['ip']) . '"><img src="' . $settings['images_url'] . '/ip.png" alt="" /> ' . $message['member']['ip'] . '</a>
-										<a class="helpicon i-help" href="' . $scripturl . '?action=quickhelp;help=see_admin_ip" onclick="return reqOverlayDiv(this.href);"><s>' . $txt['help'] . '</s></a>
+										<a class="linklevel2 help" href="' . $scripturl . '?action=' . (!empty($message['member']['is_guest']) ? 'trackip' : 'profile;area=history;sa=ip;u=' . $message['member']['id'] . ';searchip=' . $message['member']['ip']) . '">' . $message['member']['ip'] . '</a>
+										<a class="helpicon i-help" href="' . $scripturl . '?action=quickhelp;help=see_admin_ip" onclick="return reqOverlayDiv(this.href);"></a>
 									</li>';
 	// Or, should we show it because this is you?
 	elseif ($message['can_see_ip'] && !empty($message['member']['ip']))
 		$poster_div .= '
 									<li class="listlevel2 poster_ip">
-										<a class="linklevel2 help" href="' . $scripturl . '?action=quickhelp;help=see_member_ip" onclick="return reqOverlayDiv(this.href);"><img src="' . $settings['images_url'] . '/ip.png" alt="" /> ' . $message['member']['ip'] . '</a>
+										<a class="linklevel2 helpicon i-help" href="' . $scripturl . '?action=quickhelp;help=see_member_ip" onclick="return reqOverlayDiv(this.href);"><s>' . $txt['help'] . '</s></a>' . $message['member']['ip'] . '
 									</li>';
 	// Okay, are you at least logged in?  Then we can show something about why IPs are logged...
 	elseif (!$context['user']['is_guest'])
 		$poster_div .= '
 									<li class="listlevel2 poster_ip">
-										<a class="linklevel2 help" href="' . $scripturl . '?action=quickhelp;help=see_member_ip" onclick="return reqOverlayDiv(this.href);">' . $txt['logged'] . '</a>
+										<a class="linklevel2 helpicon i-help" href="' . $scripturl . '?action=quickhelp;help=see_member_ip" onclick="return reqOverlayDiv(this.href);"><s>' . $txt['help'] . '</s></a>' . $txt['logged'] . '
 									</li>';
 	// Otherwise, you see NOTHING!
 	else
@@ -254,7 +254,7 @@ function template_build_poster_div($message, $ignoring = false)
 			// Are we showing the warning status?
 			if (!$message['member']['is_guest'] && $message['member']['can_see_warning'])
 				$poster_div .= '
-							<li class="listlevel1 warning">' . ($context['can_issue_warning'] ? '<a class="linklevel1" href="' . $scripturl . '?action=profile;area=issuewarning;u=' . $message['member']['id'] . '">' : '') . '<img src="' . $settings['images_url'] . '/profile/warning_' . $message['member']['warning_status'] . '.png" alt="' . $txt['user_warn_' . $message['member']['warning_status']] . '" />' . ($context['can_issue_warning'] ? '</a>' : '') . '<span class="warn_' . $message['member']['warning_status'] . '">' . $txt['warn_' . $message['member']['warning_status']] . '</span></li>';
+							<li class="listlevel1 warning">' . ($context['can_issue_warning'] ? '<a class="linklevel1" href="' . $scripturl . '?action=profile;area=issuewarning;u=' . $message['member']['id'] . '">' : '') . '<i class="warnicon i-warning-' . $message['member']['warning_status'] . '.png" title="' . $txt['user_warn_' . $message['member']['warning_status']] . '"></i>' . ($context['can_issue_warning'] ? '</a>' : '') . '<span class="warn_' . $message['member']['warning_status'] . '">' . $txt['warn_' . $message['member']['warning_status']] . '</span></li>';
 	}
 
 	return $poster_div;

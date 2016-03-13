@@ -1022,7 +1022,7 @@ function template_show_settings()
 						<input type="text"', $javascript, $disabled, ' name="', $config_var['name'], '" id="', $config_var['name'], '" value="', $config_var['value'], '"', ($config_var['size'] ? ' size="' . $config_var['size'] . '"' : ''), ' class="input_text" />';
 
 				echo ($config_var['invalid']) ? '
-						<i class="icon i-warning"></i>' : '';
+						<i class="icon i-alert"></i>' : '';
 
 				echo isset($config_var['postinput']) && $config_var['postinput'] !== '' ? '
 							' . $config_var['postinput'] : '', '
