@@ -821,6 +821,8 @@ class Display_Controller extends Action_Controller
 		$bbc_wrapper = \BBC\ParserWrapper::getInstance();
 		$message['body'] = $bbc_wrapper->parseMessage($message['body'], $message['smileys_enabled']);
 
+		call_integration_hook('integrate_before_prepare_display_context', array(&$message));
+
 		// Compose the memory eat- I mean message array.
 		require_once(SUBSDIR . '/Attachments.subs.php');
 		$output = array(

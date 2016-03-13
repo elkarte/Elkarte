@@ -33,8 +33,8 @@ class Ila_Integrate
 		return array(
 			array('integrate_bbc_codes', 'Ila_Integrate::integrate_bbc_codes'),
 			array('integrate_pre_parsebbc', 'Ila_Integrate::integrate_pre_parsebbc'),
-			array('integrate_post_parsebbc', 'Ila_Integrate::integrate_post_parsebbc'),
-			array('integrate_prepare_display_context', 'Ila_Integrate::integrate_prepare_display_context'),
+			array('integrate_post_bbc_parser', 'Ila_Integrate::integrate_post_bbc_parser'),
+			array('integrate_before_prepare_display_context', 'Ila_Integrate::integrate_before_prepare_display_context'),
 		);
 	}
 
@@ -130,7 +130,7 @@ class Ila_Integrate
 	}
 
 	/**
-	 * Subs hook, integrate_post_parsebbc
+	 * Subs hook, integrate_post_bbc_parser
 	 *
 	 * - Allow addons access to what parse_bbc created, here we call ILA to render its tags
 	 *
@@ -139,12 +139,12 @@ class Ila_Integrate
 	 * @param string $cache_id
 	 * @param string[]|null $parse_tags
 	 */
-	public static function integrate_post_parsebbc(&$message, &$smileys, &$cache_id, &$parse_tags)
+	public static function integrate_post_bbc_parser(&$message)
 	{
 		global $context;
 
 		// Enabled and we have tags, time to render them
-		if (empty($parse_tags) && empty($context['uninstalling']) && stripos($message, '[attach') !== false)
+		if (empty($context['uninstalling']) && stripos($message, '[attach') !== false)
 		{
 			if (!isset($context['attach_source']))
 				$context['attach_source'] = 0;
@@ -157,7 +157,7 @@ class Ila_Integrate
 			else
 			{
 				// Previewing a modified message, check for a value in $_REQUEST['msg']
-				$msg_id = empty($cache_id) ? (isset($_REQUEST['msg']) ? (int) $_REQUEST['msg'] : -1) : preg_replace('~[^\d]~', '', $cache_id);
+				$msg_id = isset($_REQUEST['msg']) ? (int) $_REQUEST['msg'] : -1;
 			}
 
 			$ila_parser = new In_Line_Attachment($message, $msg_id, $context['attach_source']);
@@ -166,24 +166,24 @@ class Ila_Integrate
 	}
 
 	/**
-	 * Display controller hook, called from prepareDisplayContext_callback integrate_prepare_display_context
+	 * Display controller hook, called from prepareDisplayContext_callback integrate_before_prepare_display_context
 	 *
 	 * - Drops attachments from the message if they were rendered inline
 	 *
 	 * @param mixed[] $output
 	 */
-	public static function integrate_prepare_display_context(&$output)
+	public static function integrate_before_prepare_display_context(&$message)
 	{
-		global $context;
+		global $context, $attachments;
 
-		if (empty($context['ila_dont_show_attach_below'][$output['id']]))
+		if (empty($context['ila_dont_show_attach_below']) || empty($attachments[$message['id_msg']]))
 			return;
 
 		// If the attachment has been used inline, drop it so its not shown below the message as well
-		foreach ($output['attachment'] as $id => $attachcheck)
+		foreach ($attachments[$message['id_msg']] as $id => $attachcheck)
 		{
-			if (array_key_exists($attachcheck['id'], $context['ila_dont_show_attach_below'][$output['id']]))
-				unset($output['attachment'][$id]);
+			if (in_array($attachcheck['id_attach'], $context['ila_dont_show_attach_below']))
+				unset($attachments[$message['id_msg']][$id]);
 		}
 	}
 
