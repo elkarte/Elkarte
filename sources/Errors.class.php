@@ -561,17 +561,13 @@ class Errors
 
 		$db_last_error = db_last_error();
 
-		// For our purposes, we're gonna want this on if at all possible.
-		$modSettings['cache_enable'] = 1;
-		$cache->enable(true)->setLevel(1);
-
 		if ($cache->getVar($temp, 'db_last_error', 600))
 			$db_last_error = max($db_last_error, $temp);
 
 		// Perhaps we want to notify by mail that there was a db error
 		if ($db_last_error < time() - 3600 * 24 * 3 && empty($maintenance) && !empty($db_error_send))
 		{
-			// Avoid writing to the Settings.php file if at all possible; use shared memory instead.
+			// Try using shared memory if possible.
 			$cache->put('db_last_error', time(), 600);
 			if (!$cache->getVar($temp, 'db_last_error', 600))
 				logLastDatabaseError();
