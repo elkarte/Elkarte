@@ -1612,7 +1612,7 @@ function selectMessages($topic, $start, $items_per_page, $messages = array(), $o
 
 	for ($counter = 0; $row = $db->fetch_assoc($request); $counter++)
 	{
-		$row['body'] = censor($row['subject']);
+		$row['subject'] = censor($row['subject']);
 		$row['body'] = censor($row['body']);
 
 		$row['body'] = $parser->parseMessage($row['body'], (bool) $row['smileys_enabled']);
