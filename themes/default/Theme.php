@@ -356,6 +356,41 @@ class Theme extends \Theme
 	}
 
 	/**
+	 * Output the inline-CSS in a style tag
+	 */
+	function template_inlinecss()
+	{
+		$style_tag = '';
+
+		// Combine and minify the CSS files to save bandwidth and requests?
+		if (!empty($this->css_rules))
+		{
+			if (!empty($this->css_rules['all']))
+			{
+				$style_tag .=  '
+	' . $this->css_rules['all'];
+			}
+			if (!empty($this->css_rules['media']))
+			{
+				foreach ($this->css_rules['media'] as $key => $val)
+				{
+					$style_tag .= '
+	@media ' . $key . '{
+		' . $val . '
+	}';
+				}
+			}
+		}
+
+		if (!empty($style_tag))
+		{
+			echo '
+	<style>' . $style_tag . '
+	</style>';
+		}
+	}
+
+	/**
 	 * Calls on template_show_error from index.template.php to show warnings
 	 * and security errors for admins
 	 */
@@ -676,6 +711,20 @@ class Theme extends \Theme
 		if (!empty($context['theme_variant']) && file_exists($settings['theme_dir'] . '/css/' . $context['theme_variant'] . '/custom' . $context['theme_variant'] . '.css'))
 		{
 			loadCSSFile($context['theme_variant'] . '/custom' . $context['theme_variant'] . '.css');
+		}
+
+		// Since it's nice to have avatars all of the same size, and in some cases the size detection may fail,
+		// let's add the css in any case
+		if (!isset($context['html_headers']))
+			$context['html_headers'] = '';
+
+		if (!empty($modSettings['avatar_max_width']) || !empty($modSettings['avatar_max_height']))
+		{
+			theme()->addCSSRules('
+		.avatarresize {' . (!empty($modSettings['avatar_max_width']) ? '
+			max-width:' . $modSettings['avatar_max_width'] . 'px;' : '') . (!empty($modSettings['avatar_max_height']) ? '
+			max-height:' . $modSettings['avatar_max_height'] . 'px;' : '') . '
+		}');
 		}
 	}
 

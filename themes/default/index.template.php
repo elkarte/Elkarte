@@ -199,6 +199,9 @@ function template_html_above()
 	// load in any javascript files from addons and themes
 	theme()->template_javascript();
 
+	// load in any javascript files from addons and themes
+	theme()->template_inlinecss();
+
 	// Output any remaining HTML headers. (from addons, maybe?)
 	echo $context['html_headers'];
 

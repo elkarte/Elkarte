@@ -39,6 +39,7 @@ abstract class Theme
 		'defer' => array()
 	);
 	protected $js_vars = array();
+	protected $css_rules = array();
 	protected $css_files = array();
 
 	protected $rtl;
@@ -53,6 +54,14 @@ abstract class Theme
 
 		$this->css_files = &$GLOBALS['context']['css_files'];
 		$this->js_files = &$GLOBALS['context']['js_files'];
+		$this->css_rules = &$GLOBALS['context']['css_rules'];
+		if (empty($this->css_rules))
+		{
+			$this->css_rules = array(
+				'all' => '',
+				'media' => array(),
+			);
+		}
 	}
 
 	/**
@@ -70,6 +79,40 @@ abstract class Theme
 
 		foreach ($vars as $key => $value)
 			$this->js_vars[$key] = !empty($escape) ? JavaScriptEscape($value) : $value;
+	}
+
+	/**
+	 * Add a CSS rule to a style tag in head.
+	 *
+	 * @param string $rules the CSS rule/s
+	 * @param null|string $media = null, the media query the rule belongs to
+	 */
+	public function addCSSRules($rules, $media = null)
+	{
+		if (empty($rules))
+		{
+			return;
+		}
+
+		if ($media === null)
+		{
+			if (!isset($this->css_rules['all']))
+			{
+				$this->css_rules['all'] = '';
+			}
+			$this->css_rules['all'] .= '
+		' . $rules;
+		}
+		else
+		{
+			if (!isset($this->css_rules['media'][$media]))
+			{
+				$this->css_rules['media'][$media] = '';
+			}
+
+			$this->css_rules['media'][$media] .= '
+		' . $rules;
+		}
 	}
 
 	public function getJavascriptVars()
