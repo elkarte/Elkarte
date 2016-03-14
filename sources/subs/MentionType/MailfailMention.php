@@ -1,0 +1,44 @@
+<?php
+
+/**
+ * Handles notifying users who have had email notifications disabled for failure to deliver
+ *
+ * @name      ElkArte Forum
+ * @copyright ElkArte Forum contributors
+ * @license   BSD http://opensource.org/licenses/BSD-3-Clause
+ *
+ * @version 1.0 Release Candidate 2
+ *
+ */
+
+namespace ElkArte\sources\subs\MentionType;
+
+if (!defined('ELK'))
+	die('No access...');
+
+class Mailfail_Mention extends Mention_BoardAccess_Abstract
+{
+	/**
+	 * {@inheritdoc }
+	 */
+	protected static $_type = 'mailfail';
+
+
+	/**
+	 * {@inheritdoc }
+	 */
+	public function getNotificationBody($frequency, $members)
+	{
+		if (empty($lang_data['suffix']))
+			return $this->_getNotificationStrings('', array('subject' => static::$_type, 'body' => static::$_type), $members, $this->_task);
+		else
+			$keys = array('subject' => 'notify_mailfail_' . $lang_data['subject'], 'body' => 'notify_mailfail_' . $lang_data['body']);
+
+		$replacements = array(
+			'ACTIONNAME' => $this->_task['notifier_data']['name'],
+			'MSGLINK' => replaceBasicActionUrl('{script_url}?msg=' . $this->_task->id_target),
+		);
+
+		return $this->_getNotificationStrings('notify_mailfail', $keys, $members, $this->_task, array(), $replacements);
+	}
+}
