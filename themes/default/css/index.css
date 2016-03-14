@@ -548,17 +548,13 @@ em, .em {
 	float: right;
 }
 
-/* The expand / collapse icon in the sprite */
-.collapse {background-position: 0 -25px;}
-.expand   {background-position: -116px -25px;}
-
 /* Upshrink image in the page top for the header collapse */
 #collapse_button .linklevel1 {
 	position: relative;
 	display: block;
 	overflow: hidden;
-	margin-right: 1px;
 	padding: 0;
+	height: 2em;
 }
 
 /* General code for generic divs. Should make them behave. */
@@ -1138,8 +1134,7 @@ a.bbc_link {
 	float: left;
 	margin: 0 .1em;
 	padding: .1em 0;
-	font-size: 0.929em;
-	line-height: 2.077em;
+	line-height: 2em;
 }
 
 .poster .listlevel1 {
@@ -5453,6 +5448,7 @@ a.help .icon {
 		padding: .1em;
 		border: .25em solid;
 		border-radius: .25em;
+		vertical-align: middle;
 	}
 
 	.button_title {
@@ -5478,9 +5474,9 @@ a.help .icon {
 		border: 1px solid;
 	}
 
-	#collapse_button {
+	/*#collapse_button {
 		display: none;
-	}
+	} */
 }
 
 /* This one does 800 screens at default font size. */
@@ -5769,13 +5765,8 @@ a.help .icon {
 	}
 
 	.board_icon {
-		height: 1.25em;
-		width: 1.25em;
-	}
-
-	.icon {
-		height: 1em;
-		width: 1em;
+		height: 1.5em;
+		width: 1.5em;
 	}
 
 	.post {
@@ -5789,7 +5780,7 @@ a.help .icon {
 
 	.topic_info {
 		display: block;
-		padding: 8px;
+		padding: .5em;
 		width: 95%;
 	}
 
@@ -6139,8 +6130,7 @@ a.help .icon {
 	a.linklevel1.button_strip_notify,
 	a.linklevel1.button_strip_print, a.linklevel1.button_strip_send, .inline_mod_check,
 	a.linklevel1.quotetonew_button, a.linklevel1.button_strip_post_poll,
-	.keyinfo .post_subject, li.listlevel1.quickmod_select_all,
-	#collapse_button, p.inline.membergroups {
+	.keyinfo .post_subject, li.listlevel1.quickmod_select_all, p.inline.membergroups {
 		display: none !important;
 	}
 
