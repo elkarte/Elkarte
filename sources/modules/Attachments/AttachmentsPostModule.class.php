@@ -538,6 +538,7 @@ class Attachments_Post_Module implements ElkArte\sources\modules\Module_Interfac
 	{
 		if (!empty($msg))
 		{
+			require_once(SUBSDIR . '/Attachments.subs.php');
 			$attachs = getAttachmentsFromMsg($msg, $attach_source, true);
 
 			// @todo we have to delete unwanted attachments
@@ -574,6 +575,7 @@ class Attachments_Post_Module implements ElkArte\sources\modules\Module_Interfac
 	{
 		global $ignore_temp, $context, $user_info, $modSettings, $board, $topic;
 
+		require_once(SUBSDIR . '/Attachments.subs.php');
 		// ...or attach a new file...
 		if (empty($ignore_temp) && $context['attachments']['can']['post'] && !empty($_SESSION['temp_attachments']) && empty($_POST['from_qr']))
 		{
@@ -595,51 +597,10 @@ class Attachments_Post_Module implements ElkArte\sources\modules\Module_Interfac
 				// No errors, then try to create the attachment
 				if (empty($attachment['errors']))
 				{
-					// Load the attachmentOptions array with the data needed to create an attachment
-					$attachmentOptions = array(
-						'post' => $msg,
-						'poster' => $user_info['id'],
-						'name' => $attachment['name'],
-						'tmp_name' => $attachment['tmp_name'],
-						'size' => isset($attachment['size']) ? $attachment['size'] : 0,
-						'mime_type' => isset($attachment['type']) ? $attachment['type'] : '',
-						'id_folder' => isset($attachment['id_folder']) ? $attachment['id_folder'] : 0,
-						'approved' => !$modSettings['postmod_active'] || allowedTo('post_attachment'),
-						'errors' => array(),
-						'attach_source' => $attach_source,
-					);
-
-					if (createAttachment($attachmentOptions))
+					$saved = prepareCreatingAttachment($msg, $user_info['id'], $attachment, $modSettings['postmod_active'], $board, $topic, $attach_source);
+					if ($saved !== false)
 					{
-						// If drafts are disabled or if a draft doesn't exist yet, remember what we have
-						if (empty($msg))
-						{
-							if (!isset($_SESSION['pending_attachments']))
-							{
-								$_SESSION['pending_attachments'] = array();
-							}
-
-							$_SESSION['pending_attachments'][$attachmentOptions['id']] = array(
-								'id_attach' => $attachmentOptions['id'],
-								'msg' => $msg,
-								'board' => $board,
-								'topic' => $topic,
-								'name' => $attachmentOptions['name'],
-								'size' => $attachmentOptions['size'],
-							);
-
-							if (!empty($attachmentOptions['thumb']))
-							{
-								$_SESSION['pending_attachments'][$attachmentOptions['id']]['id_thumb'] = $attachmentOptions['thumb'];
-							}
-						}
-
-						$this->_saved_attach_id[$attachmentOptions['id']] = array(
-							'id' => $attachmentOptions['id'],
-							'thumb' => !empty($attachmentOptions['thumb']) ? $attachmentOptions['thumb'] : 0,
-							'id_msg' => $msg,
-							'attach_source' => $attach_source,
-						);
+						$this->_saved_attach_id[$saved['id']] = $saved;
 					}
 				}
 				// We have errors on this file, build out the issues for display to the user
@@ -701,6 +662,7 @@ class Attachments_Post_Module implements ElkArte\sources\modules\Module_Interfac
 	{
 		if (!empty($id_draft))
 		{
+			require_once(SUBSDIR . '/Attachments.subs.php');
 			$attach_ids = getAttachmentsFromMsg($id_draft, 1);
 			$attach_to_keep = array_map('intval', $_POST['attach_del']);
 			if (!empty($this->_saved_attach_id))
