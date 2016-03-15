@@ -74,7 +74,7 @@ function writeLog($force = false)
 	$cache = Cache::instance();
 
 	// Grab the last all-of-Elk-specific log_online deletion time.
-	$do_delete = $cache->getVar($do_delete, 'log_online-update', 30) && (int) $do_delete < time() - 30;
+	$do_delete = $cache->get('log_online-update', 30) < time() - 30;
 
 	require_once(SUBSDIR . '/Logging.subs.php');
 
