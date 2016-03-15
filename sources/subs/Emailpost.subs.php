@@ -1004,6 +1004,7 @@ function pbe_prepare_text(&$message, &$subject = '', &$signature = '')
  */
 function pbe_disable_user_notify($email_message)
 {
+	global $modSettings;
 	$db = database();
 
 	$email = $email_message->get_failed_dest();
@@ -1024,7 +1025,7 @@ function pbe_disable_user_notify($email_message)
 		list ($id_member) = $db->fetch_row($request);
 		$db->free_result($request);
 
-		// Once we have the member's ID, we can turn off notifications
+		// Once we have the member's ID, we can turn off board/topic notifications
 		// by setting notify_regularity->99 ("Never")
 		$db->query('', '
 			UPDATE {db_prefix}members
@@ -1035,7 +1036,32 @@ function pbe_disable_user_notify($email_message)
 				'id_member' => $id_member
 			)
 		);
+
+		//Now that other notifications have been added, we need to turn off email for those, too.
+		//notification_level "1" = "Only mention/alert"
+		$db->query('', '
+			UPDATE {db_prefix}notifications_pref
+			SET
+				notification_level = 1
+			WHERE id_member = {int:id_member}',
+			array(
+				'id_member' => $id_member
+			)
+		);
 	}
+
+	//Add a "mention" of email notification being disabled
+    if (!empty($modSettings['mentions_enabled']))
+    {
+        $notifier = Notifications::getInstance();
+        $notifier->add(new Notifications_Task(
+            'mailfail',
+            0,
+            $id_member,
+            array('id_members'=>array($id_member))
+        ));
+		$notifier->send();
+    }
 }
 
 /**
