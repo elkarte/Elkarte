@@ -1048,20 +1048,20 @@ function pbe_disable_user_notify($email_message)
 				'id_member' => $id_member
 			)
 		);
-	}
 
-	//Add a "mention" of email notification being disabled
-    if (!empty($modSettings['mentions_enabled']))
-    {
-        $notifier = Notifications::getInstance();
-        $notifier->add(new Notifications_Task(
-            'mailfail',
-            0,
-            $id_member,
-            array('id_members'=>array($id_member))
-        ));
-		$notifier->send();
-    }
+		//Add a "mention" of email notification being disabled
+		if (!empty($modSettings['mentions_enabled']))
+		{
+			$notifier = Notifications::getInstance();
+			$notifier->add(new Notifications_Task(
+				'mailfail',
+				0,
+				$id_member,
+				array('id_members'=>array($id_member))
+			));
+			$notifier->send();
+		}
+	}
 }
 
 /**
