@@ -1861,7 +1861,7 @@ div.bbc_footnotes .meaction {
 
 /* Helpers */
 
-.icon-shade, .chevricon, button.icon, button > .icon, a > .icon, a.icon, a.warnicon, a > .warnicon, a.noticon, a > .noticon {
+.icon-shade, .chevricon, button.icon, button > .icon, a > .icon, a.icon, a.warnicon, a > .warnicon, a.noticon, a > .infoicon {
 	-webkit-filter: drop-shadow(.1em .1em .1em rgba(0, 0, 0, 0.4));
 	filter: drop-shadow(.1em .1em .1em rgba(0, 0, 0, 0.4));
 }
@@ -1871,7 +1871,7 @@ div.bbc_footnotes .meaction {
 	filter: drop-shadow(.1em .1em .1em rgba(0, 0, 0, 0.6));
 }
 
-.icon-shade:hover, .chevricon:hover, button.icon:hover, button > .icon:hover, a > .icon:hover, a.icon:hover, a.warnicon:hover, a > .warnicon:hover, a.noticon:hover, a > .noticon:hover {
+.icon-shade:hover, .chevricon:hover, button.icon:hover, button > .icon:hover, a > .icon:hover, a.icon:hover, a.warnicon:hover, a > .warnicon:hover, a.infoicon:hover, a > .noticon:hover {
 	-webkit-filter: drop-shadow(.1em .1em .1em rgba(255, 255, 255, 0.4));
 	filter: drop-shadow(.1em .1em .1em rgba(255, 255, 255, 0.4));
 }

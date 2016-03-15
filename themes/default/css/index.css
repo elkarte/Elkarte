@@ -5306,7 +5306,7 @@ a.help .icon {
 }
 
 .helpicon, .warnicon, .infoicon {
-	border: 1px solid;;
+	border: 1px solid;
 	text-align: center;
 	font-size: 1em;
 	font-weight: bold;
