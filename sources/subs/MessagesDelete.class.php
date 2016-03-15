@@ -439,7 +439,7 @@ class MessagesDelete
 
 		// If recycle topics has been set, make a copy of this message in the recycle board.
 		// Make sure we're not recycling messages that are already on the recycle board.
-		if ($row['id_board'] != $this->_recycle_board && $row['icon'] != 'recycled')
+		if (!empty($this->_recycle_board) && $row['id_board'] != $this->_recycle_board && $row['icon'] != 'recycled')
 		{
 			// Check if the recycle board exists and if so get the read status.
 			$request = $db->query('', '
