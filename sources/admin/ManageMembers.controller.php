@@ -1093,17 +1093,18 @@ class ManageMembers_Controller extends Action_Controller
 
 		// Start off clean
 		$this->conditions = array();
+		$this->_req->query->type;
 
 		// Sort out where we are going...
-		$current_filter = $this->conditions['activated_status'] = (int) $this->_req->query->orig_filter;
+		$current_filter = $this->conditions['activated_status'] = (int) $this->_req->post->orig_filter;
 
 		// If we are applying a filter do just that - then redirect.
-		if (isset($this->_req->query->filter) && $this->_req->query->filter != $this->_req->query->orig_filter)
-			redirectexit('action=admin;area=viewmembers;sa=browse;type=' . $this->_req->query->type . ';sort=' . $this->_req->query->sort . ';filter=' . $this->_req->query->filter . ';start=' . $this->_req->query->start);
+		if (isset($this->_req->post->filter) && $this->_req->post->filter != $this->_req->post->orig_filter)
+			redirectexit('action=admin;area=viewmembers;sa=browse;type=' . $this->_req->query->type . ';sort=' . $this->_req->sort . ';filter=' . $this->_req->post->filter . ';start=' . $this->_req->start);
 
 		// Nothing to do?
 		if (!isset($this->_req->post->todoAction) && !isset($this->_req->post->time_passed))
-			redirectexit('action=admin;area=viewmembers;sa=browse;type=' . $this->_req->query->type . ';sort=' . $this->_req->query->sort . ';filter=' . $current_filter . ';start=' . $this->_req->query->start);
+			redirectexit('action=admin;area=viewmembers;sa=browse;type=' . $this->_req->query->type . ';sort=' . $this->_req->sort . ';filter=' . $current_filter . ';start=' . $this->_req->start);
 
 		// Are we dealing with members who have been waiting for > set amount of time?
 		if (isset($this->_req->post->time_passed))
@@ -1118,7 +1119,7 @@ class ManageMembers_Controller extends Action_Controller
 
 		$data = retrieveMemberData($this->conditions);
 		if ($data['member_count'] == 0)
-			redirectexit('action=admin;area=viewmembers;sa=browse;type=' . $this->_req->query->type . ';sort=' . $this->_req->query->sort . ';filter=' . $current_filter . ';start=' . $this->_req->query->start);
+			redirectexit('action=admin;area=viewmembers;sa=browse;type=' . $this->_req->post->type . ';sort=' . $this->_req->sort . ';filter=' . $current_filter . ';start=' . $this->_req->start);
 
 		$this->member_info = $data['member_info'];
 		$this->conditions['members'] = $data['members'];
@@ -1175,7 +1176,7 @@ class ManageMembers_Controller extends Action_Controller
 			updatePostGroupStats($this->conditions['members']);
 		}
 
-		redirectexit('action=admin;area=viewmembers;sa=browse;type=' . $this->_req->query->type . ';sort=' . $this->_req->query->sort . ';filter=' . $current_filter . ';start=' . $this->_req->query->start);
+		redirectexit('action=admin;area=viewmembers;sa=browse;type=' . $this->_req->query->type . ';sort=' . $this->_req->sort . ';filter=' . $current_filter . ';start=' . $this->_req->start);
 	}
 
 	/**

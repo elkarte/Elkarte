@@ -536,6 +536,68 @@ function processAttachments($id_msg = null)
 }
 
 /**
+ * Wrapper function needed until a better structure is worked out.
+ *
+ * @package Attachments
+ * @param int $msg
+ * @param int $user_id
+ * @param mixed[] $attachment
+ * @param bool|int $postmod_active
+ * @param int $board
+ * @param int $topic
+ */
+function prepareCreatingAttachment($msg, $user_id, $attachment, $postmod_active, $board, $topic, $attach_source)
+{
+	// Load the attachmentOptions array with the data needed to create an attachment
+	$attachmentOptions = array(
+		'post' => $msg,
+		'poster' => $user_id,
+		'name' => $attachment['name'],
+		'tmp_name' => $attachment['tmp_name'],
+		'size' => isset($attachment['size']) ? $attachment['size'] : 0,
+		'mime_type' => isset($attachment['type']) ? $attachment['type'] : '',
+		'id_folder' => isset($attachment['id_folder']) ? $attachment['id_folder'] : 0,
+		'approved' => !$postmod_active || allowedTo('post_attachment'),
+		'errors' => array(),
+		'attach_source' => $attach_source,
+	);
+
+	if (createAttachment($attachmentOptions))
+	{
+		// If drafts are disabled or if a draft doesn't exist yet, remember what we have
+		if (empty($msg))
+		{
+			if (!isset($_SESSION['pending_attachments']))
+			{
+				$_SESSION['pending_attachments'] = array();
+			}
+
+			$_SESSION['pending_attachments'][$attachmentOptions['id']] = array(
+				'id_attach' => $attachmentOptions['id'],
+				'msg' => $msg,
+				'board' => $board,
+				'topic' => $topic,
+				'name' => $attachmentOptions['name'],
+				'size' => $attachmentOptions['size'],
+			);
+
+			if (!empty($attachmentOptions['thumb']))
+			{
+				$_SESSION['pending_attachments'][$attachmentOptions['id']]['id_thumb'] = $attachmentOptions['thumb'];
+			}
+		}
+
+		return array(
+			'id' => $attachmentOptions['id'],
+			'thumb' => !empty($attachmentOptions['thumb']) ? $attachmentOptions['thumb'] : 0,
+			'id_msg' => $msg,
+			'attach_source' => $attach_source,
+		);
+	}
+	return false;
+}
+
+/**
  * Deletes a temporary attachment from the $_SESSION (and the filesystem)
  *
  * @package Attachments

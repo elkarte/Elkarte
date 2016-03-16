@@ -1573,6 +1573,8 @@ function loadThemeContext()
 		$context['javascript_files'] = array();
 	if (!isset($context['css_files']))
 		$context['css_files'] = array();
+	if (!isset($context['css_rules']))
+		$context['css_rules'] = array();
 	if (!isset($context['javascript_inline']))
 		$context['javascript_inline'] = array('standard' => array(), 'defer' => array());
 	if (!isset($context['javascript_vars']))
@@ -2390,7 +2392,6 @@ function loadDatabase()
 function determineAvatar($profile)
 {
 	global $modSettings, $scripturl, $settings, $context;
-	static $added_once = false;
 
 	if (empty($profile))
 		return array();
@@ -2400,26 +2401,6 @@ function determineAvatar($profile)
 		$modSettings['avatar_max_height'] = $modSettings['avatar_max_height_external'];
 	if (!isset($modSettings['avatar_max_width']))
 		$modSettings['avatar_max_width'] = $modSettings['avatar_max_width_external'];
-
-	// Since it's nice to have avatars all of the same size, and in some cases the size detection may fail,
-	// let's add the css in any case
-	if (!$added_once)
-	{
-		if (!isset($context['html_headers']))
-			$context['html_headers'] = '';
-
-		if (!empty($modSettings['avatar_max_width']) || !empty($modSettings['avatar_max_height']))
-		{
-			$context['html_headers'] .= '
-	<style>
-		.avatarresize {' . (!empty($modSettings['avatar_max_width']) ? '
-			max-width:' . $modSettings['avatar_max_width'] . 'px;' : '') . (!empty($modSettings['avatar_max_height']) ? '
-			max-height:' . $modSettings['avatar_max_height'] . 'px;' : '') . '
-		}
-	</style>';
-		}
-		$added_once = true;
-	}
 
 	$avatar_protocol = substr(strtolower($profile['avatar']), 0, 7);
 

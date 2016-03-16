@@ -847,7 +847,7 @@ function loadEmailTemplate($template, $replacements = array(), $lang = '', $load
 	// Do the variable replacements.
 	foreach ($ret as $key => $val)
 	{
-		$ret[$key] = str_replace($find, $replace, $val);
+		$val = str_replace($find, $replace, $val);
 		// Now deal with the {USER.variable} items.
 		$ret[$key] = preg_replace_callback('~{USER.([^}]+)}~', 'user_info_callback', $val);
 	}

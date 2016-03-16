@@ -131,7 +131,7 @@ function template_list_boards(array $boards, $id)
 
 		echo '
 						</h3>
-						<p class="board_description">', $board['description'], '</p>';
+						<div class="board_description">', $board['description'], '</div>';
 
 		// Show the "Moderators: ". Each has name, href, link, and id. (but we're gonna use link_moderators.)
 		if (!empty($board['moderators']))

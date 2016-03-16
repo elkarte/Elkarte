@@ -54,6 +54,12 @@ class Cache
 	protected $_key_prefix = null;
 
 	/**
+	 * The accelerator in use
+	 * @var string
+	 */
+	protected $_accelerator = null;
+
+	/**
 	 * The caching object
 	 * @var object
 	 */
@@ -85,10 +91,26 @@ class Cache
 		if (empty($accelerator))
 			$accelerator = 'filebased';
 
-		$cache_class = '\\ElkArte\\sources\\subs\\CacheMethod\\' . ucfirst($accelerator);
-		$this->_cache_obj = new $cache_class($this->_options);
+		$this->_accelerator = $accelerator;
 
-		$this->enable($this->_cache_obj !== null && $this->_cache_obj->init());
+		$this->_init();
+	}
+
+	protected function _init()
+	{
+		$cache_class = '\\ElkArte\\sources\\subs\\CacheMethod\\' . ucfirst($this->_accelerator);
+		if (class_exists($cache_class))
+		{
+			$this->_cache_obj = new $cache_class($this->_options);
+
+			$this->enable = $this->_cache_obj->init();
+		}
+		else
+		{
+			$this->_cache_obj = false;
+
+			$this->enable = false;
+		}
 
 		$this->_build_prefix();
 	}
@@ -274,6 +296,10 @@ class Cache
 	 */
 	public function enable($enable)
 	{
+		if ($this->enabled === false && $this->_cache_obj === null)
+		{
+			$this->_init();
+		}
 		$this->enabled = (bool) $enable;
 
 		return $this;

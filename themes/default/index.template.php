@@ -139,13 +139,6 @@ function template_html_above()
 	// load in any css from addons or themes so they can overwrite if wanted
 	template_css();
 
-	// Save some database hits, if a width for multiple wrappers is set in admin.
-	if (!empty($settings['forum_width']))
-		echo '
-	<style>
-		.wrapper {width: ', $settings['forum_width'], ';}
-	</style>';
-
 	echo '
 	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 	<meta name="viewport" content="width=device-width" />
@@ -198,6 +191,9 @@ function template_html_above()
 
 	// load in any javascript files from addons and themes
 	theme()->template_javascript();
+
+	// load in any javascript files from addons and themes
+	theme()->template_inlinecss();
 
 	// Output any remaining HTML headers. (from addons, maybe?)
 	echo $context['html_headers'];
