@@ -451,27 +451,18 @@ class Attachments_Post_Module implements ElkArte\sources\modules\Module_Interfac
 		{
 			require_once(SUBSDIR . '/Attachments.subs.php');
 			$attachs = getAttachmentsFromMsg($msg, $attach_source, true);
+			if (!empty($_SESSION['pending_attachments']))
+			{
+				foreach ($_SESSION['pending_attachments'] as $key => $val)
+				{
+					$attachs[$key] = $val;
+				}
+			}
 
 			// @todo we have to delete unwanted attachments
 
 			foreach ($attachs as $attach)
 			{
-				$this->_saved_attach_id[$attach['id_attach']] = array(
-					'id' => $attach['id_attach'],
-					'thumb' => !empty($attach['id_thumb']) ? $attach['id_thumb'] : 0,
-					'id_msg' => $msg,
-					'attach_source' => $attach_source,
-				);
-			}
-		}
-
-		if (!empty($_SESSION['pending_attachments']))
-		{
-			foreach ($_SESSION['pending_attachments'] as $attach)
-			{
-				if (isset($this->_saved_attach_id[$attach['id_attach']]))
-					continue;
-
 				$this->_saved_attach_id[$attach['id_attach']] = array(
 					'id' => $attach['id_attach'],
 					'thumb' => !empty($attach['id_thumb']) ? $attach['id_thumb'] : 0,
@@ -547,7 +538,6 @@ class Attachments_Post_Module implements ElkArte\sources\modules\Module_Interfac
 	public function after_save_post($msgOptions)
 	{
 		$id_draft = isset($_REQUEST['id_draft']) ? $_REQUEST['id_draft'] : 0;
-
 		if ($this->_is_new_message && !empty($this->_saved_attach_id) && !empty($msgOptions['id']))
 		{
 			$ids = $this->_savedAttachments(array($msgOptions['id'], $id_draft));
