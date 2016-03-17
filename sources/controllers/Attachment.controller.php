@@ -90,7 +90,6 @@ class Attachment_Controller extends Action_Controller
 				require_once(SUBSDIR . '/Attachments.subs.php');
 
 				$process = $this->_req->getPost('msg', 'intval', '');
-
 				processAttachments($process);
 			}
 
@@ -113,17 +112,11 @@ class Attachment_Controller extends Action_Controller
 					// We need to grab the name anyhow
 					if (!empty($val['tmp_name']))
 					{
-						$saved = prepareCreatingAttachment(0, $user_info['id'], $val, $modSettings['postmod_active'], $board, $topic, 1);
-
-						if ($saved !== false)
-						{
-							$resp_data = array(
-								'name' => $val['name'],
-								'temp_attachid' => $attachID,
-								'attachid' => $modSettings['id'],
-								'size' => $val['size']
-							);
-						}
+						$resp_data = array(
+							'name' => $val['name'],
+							'attachid' => $attachID,
+							'size' => $val['size']
+						);
 					}
 				}
 
@@ -435,7 +428,7 @@ class Attachment_Controller extends Action_Controller
 
 				isAllowedTo('view_attachments');
 
-				$attachment = getAttachmentFromTopic($id_attach, $topic, 1, $user_info['id']);
+				$attachment = getAttachmentFromTopic($id_attach, $topic, (int) !empty($_REQUEST['id_draft']), $user_info['id']);
 				if (empty($attachment))
 					Errors::instance()->fatal_lang_error('no_access', false);
 
