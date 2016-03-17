@@ -1553,7 +1553,7 @@ var ElkNotifier = new ElkNotifications();
 			$trigger.click(function(e) {
 				e.preventDefault;
 
-				var ila_text = '[attach]' + attachId + '[/attach]';
+				var ila_text = '[ila=' + attachId + ']';
 				$editor_data[editor].insertText(ila_text, false, true);
 			}).attr('id', 'inline_attach_' + attachId)
 			.data('attachid', attachId);
