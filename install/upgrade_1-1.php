@@ -486,27 +486,6 @@ class UpgradeInstructions_upgrade_1_1
 		);
 	}
 
-	public function expand_attachments_title()
-	{
-		return 'Expand the attachments table...';
-	}
-
-	public function expand_attachments()
-	{
-		$columns = $this->table->db_list_columns('{db_prefix}attachments', true);
-
-		return array(
-			array(
-				'debug_title' => 'Remove the id_msg no more necessary KEY and replace it with attach_source...',
-				'function' => function($db, $db_table)
-				{
-					$db_table->db_remove_index('{db_prefix}attachments', 'id_msg');
-					$db_table->db_add_index('{db_prefix}attachments', array('name' => 'attach_source', 'columns' => array('id_msg', 'attach_source'), 'type' => 'key'));
-				}
-			)
-		);
-	}
-
 	public function custom_field_updates_title()
 	{
 		return 'Some updates to custom fields.';
