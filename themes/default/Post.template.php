@@ -471,8 +471,7 @@ function template_add_new_attachments()
 				inlineAttach.removeAttach(attachid);
 			}
 		}' . (isset($context['current_topic']) ? ',
-		topic: ' . $context['current_topic'] : '') . (isset($context['id_draft']) ? ',
-		id_draft: ' . $context['id_draft'] : '') . '
+			topic: ' . $context['current_topic'] : '') . '
 	});', true);
 }
 

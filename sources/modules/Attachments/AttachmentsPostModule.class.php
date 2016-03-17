@@ -90,10 +90,7 @@ class Attachments_Post_Module implements ElkArte\sources\modules\Module_Interfac
 				$context['attachments']['current'] = array();
 
 			$attachments = getAttachments((array) $id_draft, true, null, array(), 1);
-			if (empty($attachments))
-				return;
-
-			$attachments = $attachments[$id_draft];
+			$attachments = current($attachments);
 
 			foreach ($attachments as $attachment)
 			{

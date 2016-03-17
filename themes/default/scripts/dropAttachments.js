@@ -30,7 +30,6 @@
 			attachmentQueue = [],
 			board = 0,
 			topic = 0,
-			id_draft = 0,
 			oTxt = {},
 			// @deprecated since 1.1 - here just for backward compatibility
 			fileDisplayTemplate = '<div class="statusbar"><div class="info"></div><div class="progressBar"><div></div></div><div class="control fa fa-times-circle"></div></div>',
@@ -66,8 +65,6 @@
 				filesUploadedSuccessfully = [];
 				if (typeof params.topic !== 'undefined')
 					topic = params.topic;
-				if (typeof params.id_draft !== 'undefined')
-					id_draft = params.id_draft;
 				if (typeof params.fileDisplayTemplate !== 'undefined')
 					fileDisplayTemplate = params.fileDisplayTemplate;
 				board = params.board;
@@ -337,7 +334,7 @@
 				.attr('name', 'attach_del[]')
 				.attr('value', data.attachid));
 
-			var $img = $('<img />').attr('src', elk_scripturl + '?action=dlattach;sa=tmpattach;attach=' + $str.attr('id') + (topic != 0 ? ';topic=' + topic : (id_draft != 0 ? ';id_draft=' + id_draft : ''))),
+			var $img = $('<img />').attr('src', elk_scripturl + '?action=dlattach;sa=tmpattach;attach=' + $str.attr('id') + ';topic=' + topic),
 				$progressbar = $str.find('.progressBar');
 			$progressbar.after($('<div class="postattach_thumb" />').append($img));
 			$progressbar.remove();

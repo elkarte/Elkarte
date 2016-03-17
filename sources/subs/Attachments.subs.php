@@ -1144,10 +1144,8 @@ function getAvatar($id_attach)
  * @package Attachments
  * @param int $id_attach
  * @param int $id_topic
- * @param int $attach_source
- * @param int $owner
  */
-function getAttachmentFromTopic($id_attach, $id_topic, $attach_source = 0, $owner = 0)
+function getAttachmentFromTopic($id_attach, $id_topic, $attach_source = 0)
 {
 	$db = database();
 
@@ -1155,10 +1153,9 @@ function getAttachmentFromTopic($id_attach, $id_topic, $attach_source = 0, $owne
 	$request = $db->query('', '
 		SELECT a.id_folder, a.filename, a.file_hash, a.fileext, a.id_attach,
 			a.attachment_type, a.mime_type, a.approved, m.id_member
-		FROM {db_prefix}attachments AS a' . ($attach_source === 0 ? '
+		FROM {db_prefix}attachments AS a
 			INNER JOIN {db_prefix}messages AS m ON (m.id_msg = a.id_msg AND m.id_topic = {int:current_topic})
-			INNER JOIN {db_prefix}boards AS b ON (b.id_board = m.id_board AND {query_see_board})' : '
-			INNER JOIN {db_prefix}user_drafts AS m ON (m.id_draft = a.id_msg AND m.id_member = {int:owner})') . '
+			INNER JOIN {db_prefix}boards AS b ON (b.id_board = m.id_board AND {query_see_board})
 		WHERE a.id_attach = {int:attach}
 			AND a.attach_source = {int:attach_source}
 		LIMIT 1',
@@ -1166,7 +1163,6 @@ function getAttachmentFromTopic($id_attach, $id_topic, $attach_source = 0, $owne
 			'attach' => $id_attach,
 			'attach_source' => (int) $attach_source,
 			'current_topic' => $id_topic,
-			'owner' => $owner,
 		)
 	);
 

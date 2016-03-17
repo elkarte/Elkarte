@@ -124,8 +124,8 @@ class In_Line_Attachment
 		if (empty($modSettings['enableBBC']) || (isset($context['site_action']) && in_array($context['site_action'], array('boardindex', 'messageindex'))))
 			return $this->_message;
 
-		// No message id and not previewing a new message ($this->_attach_source will be 1)
-		if ($this->_id_msg === -1 && $this->_attach_source == 0)
+		// No message id and not previewing a new message ($_REQUEST['ila'] will be set)
+		if ($this->_id_msg === -1 && !isset($_REQUEST['ila']))
 		{
 			// Make sure block quotes are cleaned up, then return
 			$this->_find_nested();
@@ -691,16 +691,9 @@ class In_Line_Attachment
 		$msg_id = array($this->_id_msg);
 		$attachments = array();
 
-		if ($this->_attach_source == 0)
-		{
-			// With a message id and the topic we can fetch the attachments
-			if (!empty($modSettings['attachmentEnable']) && allowedTo('view_attachments', $this->_board) && $this->_topic != -1)
-				$attachments = getAttachments($msg_id, false, null, array(), $this->_attach_source);
-		}
-		else
-		{
+		// With a message id and the topic we can fetch the attachments
+		if (!empty($modSettings['attachmentEnable']) && allowedTo('view_attachments', $this->_board) && $this->_topic != -1)
 			$attachments = getAttachments($msg_id, false, null, array(), $this->_attach_source);
-		}
 
 		return $attachments;
 	}
