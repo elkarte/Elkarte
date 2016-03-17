@@ -451,13 +451,6 @@ class Attachments_Post_Module implements ElkArte\sources\modules\Module_Interfac
 		{
 			require_once(SUBSDIR . '/Attachments.subs.php');
 			$attachs = getAttachmentsFromMsg($msg, $attach_source, true);
-			if (!empty($_SESSION['pending_attachments']))
-			{
-				foreach ($_SESSION['pending_attachments'] as $key => $val)
-				{
-					$attachs[$key] = $val;
-				}
-			}
 
 			// @todo we have to delete unwanted attachments
 
@@ -502,21 +495,6 @@ class Attachments_Post_Module implements ElkArte\sources\modules\Module_Interfac
 					$saved = prepareCreatingAttachment($msg, $user_info['id'], $attachment, $modSettings['postmod_active'], $board, $topic, $attach_source);
 					if ($saved !== false)
 					{
-						// If drafts are disabled or if a draft doesn't exist yet, remember what we have
-						if (empty($msg))
-						{
-							if (!isset($_SESSION['pending_attachments']))
-							{
-								$_SESSION['pending_attachments'] = array();
-							}
-
-							$_SESSION['pending_attachments'][$attachmentOptions['id']] = array('id_attach' => $attachmentOptions['id']);
-							if (!empty($attachmentOptions['thumb']))
-							{
-								$_SESSION['pending_attachments'][$attachmentOptions['id']]['id_thumb'] = $attachmentOptions['thumb'];
-							}
-						}
-
 						$this->_saved_attach_id[$attachmentOptions['id']] = array(
 							'id' => $attachmentOptions['id'],
 							'thumb' => !empty($attachmentOptions['thumb']) ? $attachmentOptions['thumb'] : 0,
@@ -553,7 +531,6 @@ class Attachments_Post_Module implements ElkArte\sources\modules\Module_Interfac
 					bindAttachmentsTo($msgOptions['id'], $attaches, $attach_source, 0);
 				}
 			}
-			unset($_SESSION['pending_attachments']);
 		}
 	}
 
