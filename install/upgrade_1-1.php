@@ -458,7 +458,7 @@ class UpgradeInstructions_upgrade_1_1
 				'debug_title' => 'Converting IP columns to varchar instead of int...',
 				'function' => function($db, $db_table)
 				{
-					$columns = $db_table->db_remove_index('{db_prefix}log_online', true);
+					$columns = $db_table->db_list_columns('{db_prefix}log_online', true);
 
 					$column_name = 'ip';
 
