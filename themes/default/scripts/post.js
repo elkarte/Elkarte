@@ -60,16 +60,6 @@ function previewPost()
 		'ns'
 	];
 
-	ilaAttach = "";
-	while (ilaElem = document.forms.postmodify.elements[ila++])
-	{
-		if (ilaElem.name == "attachment[]")
-			ilaAttach += ilaElem.value + ",";
-	}
-	if (ilaAttach != "")
-		ilaAttach = escape(ilaAttach.slice(0,-1));
-	ila = 0;
-
 	// Get the values from the form
 	var x = [];
 	x = getFields(textFields, numericFields, checkboxFields, form_name);

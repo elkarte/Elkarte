@@ -25,9 +25,6 @@ class Drafts_Post_Module implements ElkArte\sources\modules\Module_Interface
 	protected static $_subject_length = 24;
 	protected static $_eventsManager = null;
 
-	protected $_loaded_drafts = array();
-	protected $_current_draft = array();
-
 	/**
 	 * {@inheritdoc }
 	 */
@@ -115,7 +112,6 @@ class Drafts_Post_Module implements ElkArte\sources\modules\Module_Interface
 			);
 
 			$this->_prepareDraftsContext($user_info['id'], $topic);
-			self::$_eventsManager->trigger('after_loading_drafts', array('loaded_drafts' => &$this->_loaded_drafts, 'current_draft' => &$this->_current_draft));
 
 			if (!empty($context['drafts']))
 				$template_layers->add('load_drafts', 100);
@@ -219,8 +215,8 @@ class Drafts_Post_Module implements ElkArte\sources\modules\Module_Interface
 		require_once(SUBSDIR . '/Drafts.subs.php');
 
 		// has a specific draft has been selected?  Load it up if there is not already a message already in the editor
-		if (isset($_REQUEST['id_draft']) && empty($_POST['subject']) && empty($_POST['message']) || !empty($_REQUEST['save_draft']))
-			$this->_current_draft = loadDraft((int) $_REQUEST['id_draft'], 0, true, true);
+		if (isset($_REQUEST['id_draft']) && empty($_POST['subject']) && empty($_POST['message']))
+			loadDraft((int) $_REQUEST['id_draft'], 0, true, true);
 
 		// load all the drafts for this user that meet the criteria
 		$order = 'poster_time DESC';
@@ -229,8 +225,6 @@ class Drafts_Post_Module implements ElkArte\sources\modules\Module_Interface
 		// Add them to the context draft array for template display
 		foreach ($user_drafts as $draft)
 		{
-			$this->_loaded_drafts[] = $draft['id_draft'];
-
 			$short_subject = empty($draft['subject']) ? $txt['drafts_none'] : Util::shorten_text(stripslashes($draft['subject']), self::$_subject_length);
 			$context['drafts'][] = array(
 				'subject' => censor($short_subject),

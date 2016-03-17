@@ -64,7 +64,6 @@ class Attachments_Post_Module implements ElkArte\sources\modules\Module_Interfac
 				array('pre_save_post', array('Attachments_Post_Module', 'pre_save_post'), array('msgOptions')),
 				array('after_save_post', array('Attachments_Post_Module', 'after_save_post'), array('msgOptions')),
 
-				array('after_loading_drafts', array('Attachments_Post_Module', 'after_loading_drafts'), array('current_draft')),
 				array('before_save_draft', array('Attachments_Post_Module', 'before_save_draft'), array()),
 				array('after_save_draft', array('Attachments_Post_Module', 'after_save_draft'), array()),
 			);
@@ -73,44 +72,13 @@ class Attachments_Post_Module implements ElkArte\sources\modules\Module_Interfac
 			return array();
 	}
 
-	public function after_loading_drafts($current_draft)
-	{
-		global $context;
-
-		if (empty($current_draft) && !empty($context['id_draft']))
-			$id_draft = $context['id_draft'];
-		elseif (!empty($current_draft))
-			$id_draft = $current_draft['id_draft'];
-
-		if (!empty($id_draft))
-		{
-			require_once(SUBSDIR . '/Attachments.subs.php');
-
-			if (!isset($context['attachments']['current']))
-				$context['attachments']['current'] = array();
-
-			$attachments = getAttachments((array) $id_draft, true, null, array(), 1);
-			$attachments = current($attachments);
-
-			foreach ($attachments as $attachment)
-			{
-				$context['attachments']['current'][] = array(
-					'name' => Util::htmlspecialchars($attachment['filename']),
-					'size' => $attachment['filesize'],
-					'id' => $attachment['id_attach'],
-					'approved' => $attachment['approved'],
-				);
-			}
-		}
-	}
-
 	public function before_save_draft($draft, $is_usersaved, $error_context)
 	{
 		$this->saveAttachments(isset($_REQUEST['id_draft']) ? (int) $_REQUEST['id_draft'] : 0);
 
 		if ($this->_attach_errors->hasErrors())
 		{
-			$error_context->addError(array('attachments_errors', $this->_attach_errors));
+			$error_context->add(array('attachments_errors' => $this->_attach_errors));
 		}
 		else
 		{
@@ -133,7 +101,7 @@ class Attachments_Post_Module implements ElkArte\sources\modules\Module_Interfac
 		$context['attachments']['current'] = array();
 
 		if ($this->_attach_errors->hasErrors())
-			$post_errors->addError(array('attachments_errors', $this->_attach_errors));
+			$post_errors->add(array('attachments_errors' => $this->_attach_errors));
 	}
 
 	public function finalize_post_form(&$show_additional_options, $board, $topic)
@@ -345,7 +313,7 @@ class Attachments_Post_Module implements ElkArte\sources\modules\Module_Interfac
 
 		if ($this->_attach_errors->hasErrors())
 		{
-			$post_errors->addError(array('attachments_errors', $this->_attach_errors));
+			$post_errors->add(array('attachments_errors' => $this->_attach_errors));
 		}
 		else
 		{
@@ -430,11 +398,11 @@ class Attachments_Post_Module implements ElkArte\sources\modules\Module_Interfac
 		// ...or attach a new file...
 		if (empty($ignore_temp) && $context['attachments']['can']['post'] && !empty($_SESSION['temp_attachments']) && empty($_POST['from_qr']))
 		{
+			$this->_saved_attach_id = array();
+
 			foreach ($_SESSION['temp_attachments'] as $attachID => $attachment)
 			{
 				if ($attachID != 'initial_error' && strpos($attachID, 'post_tmp_' . $user_info['id']) === false)
-					continue;
-				if (isset($this->_saved_attach_id[$attachID]))
 					continue;
 
 				// If there was an initial error just show that message.
@@ -450,12 +418,9 @@ class Attachments_Post_Module implements ElkArte\sources\modules\Module_Interfac
 					$saved = prepareCreatingAttachment($msg, $user_info['id'], $attachment, $modSettings['postmod_active'], $board, $topic, $attach_source);
 					if ($saved !== false)
 					{
-						$this->_saved_attach_id[$attachID] = array(
-							'id' => $attachmentOptions['id'],
-							'thumb' => !empty($attachmentOptions['thumb']) ? $attachmentOptions['thumb'] : 0,
-							'id_msg' => $msg,
-							'attach_source' => $attach_source,
-						);
+						$this->_saved_attach_id[] = $attachmentOptions['id'];
+						if (!empty($attachmentOptions['thumb']))
+							$this->_saved_attach_id[] = $attachmentOptions['thumb'];
 					}
 				}
 				// We have errors on this file, build out the issues for display to the user
@@ -468,38 +433,13 @@ class Attachments_Post_Module implements ElkArte\sources\modules\Module_Interfac
 
 	public function after_save_post($msgOptions)
 	{
-		if ($this->_is_new_message && !empty($this->_saved_attach_id) && !empty($msgOptions['id']))
-		{
-			$ids = $this->_savedAttachments($msgOptions['id']);
-
-			bindMessageAttachments($msgOptions['id'], $ids);
-		}
-	}
-
-	protected function _savedAttachments($msg)
-	{
-		$ids = array();
-
-		foreach ($this->_saved_attach_id as $attach)
-		{
-			if ($msg === $attach['id_msg'] || empty($attach['id_msg']))
-			{
-				$ids[] = $attach['id'];
-				if (!empty($attach['thumb']))
-				{
-					$ids[] = $attach['thumb'];
-				}
-			}
-		}
-
-		return $ids;
+		if ($this->_is_new_message && !empty($this->_saved_attach_id))
+			bindMessageAttachments($msgOptions['id'], $this->_saved_attach_id);
 	}
 
 	public function after_save_draft($id_draft)
 	{
-		if (!empty($id_draft) && !empty($this->_saved_attach_id))
-		{
-			bindMessageAttachments($id_draft, array_values($this->_saved_attach_id));
-		}
+		if ($this->_is_new_message && !empty($this->_saved_attach_id))
+			bindMessageAttachments($id_draft, $this->_saved_attach_id, 1);
 	}
 }
