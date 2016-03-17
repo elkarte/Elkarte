@@ -165,7 +165,7 @@ class Drafts_Post_Module implements ElkArte\sources\modules\Module_Interface
 				$context['drafts_save'] = !empty($modSettings['drafts_enabled']) && !empty($modSettings['drafts_post_enabled']) && allowedTo('post_draft');
 
 			// Can you be, should you be ... here?
-			if (!empty($context['drafts_save']))
+			if (!empty($context['drafts_save']) && isset($_POST['id_draft']))
 			{
 				// Prepare and clean the data, load the draft array
 				$draft = array(
