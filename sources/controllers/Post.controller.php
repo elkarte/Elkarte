@@ -692,15 +692,12 @@ class Post_Controller extends Action_Controller
 
 		$topic_info = array();
 
-		require_once(SUBSDIR . '/Boards.subs.php');
-		loadLanguage('Post');
-
-		// This is here just for attachments (in the attempt not to break other things at least for the moment)
-		$this->_events->trigger('before_preview', array('topic_info' => &$topic_info));
-
 		// Previewing? Go back to start.
 		if (isset($_REQUEST['preview']))
 			return $this->action_post();
+
+		require_once(SUBSDIR . '/Boards.subs.php');
+		loadLanguage('Post');
 
 		// Trigger the prepare_save_post event
 		$this->_events->trigger('prepare_save_post', array('topic_info' => &$topic_info));
