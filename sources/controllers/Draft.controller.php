@@ -100,7 +100,6 @@ class Draft_Controller extends Post_Controller
 		// Some initial context.
 		$context['start'] = $this->_req->getQuery('start', 'intval', 0);
 		$context['current_member'] = $this->_memID;
-		$context['attach_source'] = 1;
 
 		// If just deleting a draft, do it and then redirect back.
 		if (!empty($this->_req->query->delete) || !empty($this->_req->post->delete))

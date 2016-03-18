@@ -213,17 +213,16 @@ class Attachment_Controller extends Action_Controller
 		else
 		{
 			isAllowedTo('view_attachments');
-			$attach_source = 0;
-			$this->_events->trigger('get_attachment_data', array('attach_source' => &$attach_source));
+			$this->_events->trigger('get_attachment_data', array());
 
+			// @todo: if it is not an image, get a default icon based on extension
 			if ($this->_req->getQuery('thumb') === null)
 			{
-				$attachment = getAttachmentFromTopic($id_attach, $id_topic, $attach_source);
+				$attachment = getAttachmentFromTopic($id_attach, $topic);
 			}
 			else
 			{
-				$attachment = getAttachmentThumbFromTopic($id_attach, $id_topic, $attach_source);
-				// @todo: if it is not an image, get a default icon based on extension
+				$attachment = getAttachmentThumbFromTopic($id_attach, $topic);
 			}
 		}
 

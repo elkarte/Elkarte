@@ -139,9 +139,6 @@ class Ila_Integrate
 		// Enabled and we have tags, time to render them
 		if (empty($context['uninstalling']) && stripos($message, '[attach') !== false)
 		{
-			if (!isset($context['attach_source']))
-				$context['attach_source'] = 0;
-
 			if (!empty($_REQUEST['id_draft']))
 			{
 				// Previewing a draft
@@ -153,8 +150,8 @@ class Ila_Integrate
 				$msg_id = isset($_REQUEST['msg']) ? (int) $_REQUEST['msg'] : -1;
 			}
 
-			$ila_parser = new In_Line_Attachment($message, $msg_id, $context['attach_source']);
-			$message = $ila_parser->parse_bbc();
+			$ila_parser = new In_Line_Attachment($message, $cache_id);
+			$message = $ila_parser->ila_parse_bbc();
 		}
 	}
 

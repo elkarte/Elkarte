@@ -534,68 +534,6 @@ function processAttachments($id_msg = null)
 }
 
 /**
- * Wrapper function needed until a better structure is worked out.
- *
- * @package Attachments
- * @param int $msg
- * @param int $user_id
- * @param mixed[] $attachment
- * @param bool|int $postmod_active
- * @param int $board
- * @param int $topic
- */
-function prepareCreatingAttachment($msg, $user_id, $attachment, $postmod_active, $board, $topic, $attach_source)
-{
-	// Load the attachmentOptions array with the data needed to create an attachment
-	$attachmentOptions = array(
-		'post' => $msg,
-		'poster' => $user_id,
-		'name' => $attachment['name'],
-		'tmp_name' => $attachment['tmp_name'],
-		'size' => isset($attachment['size']) ? $attachment['size'] : 0,
-		'mime_type' => isset($attachment['type']) ? $attachment['type'] : '',
-		'id_folder' => isset($attachment['id_folder']) ? $attachment['id_folder'] : 0,
-		'approved' => !$postmod_active || allowedTo('post_attachment'),
-		'errors' => array(),
-		'attach_source' => $attach_source,
-	);
-
-	if (createAttachment($attachmentOptions))
-	{
-		// If drafts are disabled or if a draft doesn't exist yet, remember what we have
-		if (empty($msg))
-		{
-			if (!isset($_SESSION['pending_attachments']))
-			{
-				$_SESSION['pending_attachments'] = array();
-			}
-
-			$_SESSION['pending_attachments'][$attachmentOptions['id']] = array(
-				'id_attach' => $attachmentOptions['id'],
-				'msg' => $msg,
-				'board' => $board,
-				'topic' => $topic,
-				'name' => $attachmentOptions['name'],
-				'size' => $attachmentOptions['size'],
-			);
-
-			if (!empty($attachmentOptions['thumb']))
-			{
-				$_SESSION['pending_attachments'][$attachmentOptions['id']]['id_thumb'] = $attachmentOptions['thumb'];
-			}
-		}
-
-		return array(
-			'id' => $attachmentOptions['id'],
-			'thumb' => !empty($attachmentOptions['thumb']) ? $attachmentOptions['thumb'] : 0,
-			'id_msg' => $msg,
-			'attach_source' => $attach_source,
-		);
-	}
-	return false;
-}
-
-/**
  * Deletes a temporary attachment from the $_SESSION (and the filesystem)
  *
  * @package Attachments
@@ -961,18 +899,14 @@ function createAttachment(&$attachmentOptions)
 	$db->insert('',
 		'{db_prefix}attachments',
 		array(
-			'id_folder' => 'int', 'id_msg' => 'int', 'filename' => 'string-255',
-			'file_hash' => 'string-40', 'fileext' => 'string-8',
+			'id_folder' => 'int', 'id_msg' => 'int', 'filename' => 'string-255', 'file_hash' => 'string-40', 'fileext' => 'string-8',
 			'size' => 'int', 'width' => 'int', 'height' => 'int',
 			'mime_type' => 'string-20', 'approved' => 'int',
-			'attach_source' => 'int',
 		),
 		array(
-			(int) $attachmentOptions['id_folder'], (int) $attachmentOptions['post'], $attachmentOptions['name'],
-			$attachmentOptions['file_hash'], $attachmentOptions['fileext'],
+			(int) $attachmentOptions['id_folder'], (int) $attachmentOptions['post'], $attachmentOptions['name'], $attachmentOptions['file_hash'], $attachmentOptions['fileext'],
 			(int) $attachmentOptions['size'], (empty($attachmentOptions['width']) ? 0 : (int) $attachmentOptions['width']), (empty($attachmentOptions['height']) ? '0' : (int) $attachmentOptions['height']),
 			(!empty($attachmentOptions['mime_type']) ? $attachmentOptions['mime_type'] : ''), (int) $attachmentOptions['approved'],
-			(int) $attachmentOptions['attach_source'],
 		),
 		array('id_attach')
 	);
@@ -988,7 +922,6 @@ function createAttachment(&$attachmentOptions)
 
 	// If it's not approved then add to the approval queue.
 	if (!$attachmentOptions['approved'])
-	{
 		$db->insert('',
 			'{db_prefix}approval_queue',
 			array(
@@ -999,7 +932,6 @@ function createAttachment(&$attachmentOptions)
 			),
 			array()
 		);
-	}
 
 	if (empty($modSettings['attachmentThumbnails']) || (empty($attachmentOptions['width']) && empty($attachmentOptions['height'])))
 		return true;
@@ -1056,16 +988,12 @@ function createAttachment(&$attachmentOptions)
 			$db->insert('',
 				'{db_prefix}attachments',
 				array(
-					'id_folder' => 'int', 'id_msg' => 'int', 'attachment_type' => 'int',
-					'filename' => 'string-255', 'file_hash' => 'string-40',
-					'fileext' => 'string-8', 'size' => 'int', 'width' => 'int',
-					'height' => 'int', 'mime_type' => 'string-20', 'approved' => 'int',
-					'attach_source' => 'int',
+					'id_folder' => 'int', 'id_msg' => 'int', 'attachment_type' => 'int', 'filename' => 'string-255', 'file_hash' => 'string-40', 'fileext' => 'string-8',
+					'size' => 'int', 'width' => 'int', 'height' => 'int', 'mime_type' => 'string-20', 'approved' => 'int',
 				),
 				array(
 					$modSettings['currentAttachmentUploadDir'], (int) $attachmentOptions['post'], 3, $thumb_filename, $thumb_file_hash, $attachmentOptions['fileext'],
 					$thumb_size, $thumb_width, $thumb_height, $thumb_mime, (int) $attachmentOptions['approved'],
-					(int) $attachmentOptions['attach_source']
 				),
 				array('id_attach')
 			);
@@ -1145,23 +1073,20 @@ function getAvatar($id_attach)
  * @param int $id_attach
  * @param int $id_topic
  */
-function getAttachmentFromTopic($id_attach, $id_topic, $attach_source = 0)
+function getAttachmentFromTopic($id_attach, $id_topic)
 {
 	$db = database();
 
 	// Make sure this attachment is on this board.
 	$request = $db->query('', '
-		SELECT a.id_folder, a.filename, a.file_hash, a.fileext, a.id_attach,
-			a.attachment_type, a.mime_type, a.approved, m.id_member
+		SELECT a.id_folder, a.filename, a.file_hash, a.fileext, a.id_attach, a.attachment_type, a.mime_type, a.approved, m.id_member
 		FROM {db_prefix}attachments AS a
 			INNER JOIN {db_prefix}messages AS m ON (m.id_msg = a.id_msg AND m.id_topic = {int:current_topic})
 			INNER JOIN {db_prefix}boards AS b ON (b.id_board = m.id_board AND {query_see_board})
 		WHERE a.id_attach = {int:attach}
-			AND a.attach_source = {int:attach_source}
 		LIMIT 1',
 		array(
 			'attach' => $id_attach,
-			'attach_source' => (int) $attach_source,
 			'current_topic' => $id_topic,
 		)
 	);
@@ -1530,7 +1455,7 @@ function getAvatarPathID()
  * @param string|null $filter name of a callback function
  * @param mixed[] $all_posters
  */
-function getAttachments($messages, $includeUnapproved = false, $filter = null, $all_posters = array(), $attach_source = false)
+function getAttachments($messages, $includeUnapproved = false, $filter = null, $all_posters = array())
 {
 	global $modSettings;
 
@@ -1545,12 +1470,10 @@ function getAttachments($messages, $includeUnapproved = false, $filter = null, $
 			FROM {db_prefix}attachments AS a' . (empty($modSettings['attachmentShowImages']) || empty($modSettings['attachmentThumbnails']) ? '' : '
 			LEFT JOIN {db_prefix}attachments AS thumb ON (thumb.id_attach = a.id_thumb)') . '
 		WHERE a.id_msg IN ({array_int:message_list})
-			AND a.attachment_type = {int:attachment_type}
-			AND a.attach_source = {int:attach_source}',
+			AND a.attachment_type = {int:attachment_type}',
 		array(
 			'message_list' => $messages,
 			'attachment_type' => 0,
-			'attach_source' => !empty($attach_source) ? (int) $attach_source : 0,
 		)
 	);
 	$temp = array();
