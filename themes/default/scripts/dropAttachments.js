@@ -67,6 +67,7 @@
 					topic = params.topic;
 				if (typeof params.fileDisplayTemplate !== 'undefined')
 					fileDisplayTemplate = params.fileDisplayTemplate;
+				$str = $(fileDisplayTemplate);
 				board = params.board;
 				oTxt = params.oTxt;
 				if (typeof params.existingSelector !== 'undefined')
@@ -89,7 +90,7 @@
 					status.setFileNameSize($file.parent().text(), $file.data('size'));
 					status.setProgress(100);
 
-					var $button = $str.find('.control'),
+					var $button = status.getButton(),
 						data = {
 							curFileNum: curFileNum++,
 							attachid: $file.data('attachid'),
@@ -229,7 +230,7 @@
 					// Update our counters, number of files allowed and total data payload
 					totalAttachSizeUploaded -= filesUploadedSuccessfully[options.fileNum].size / 1024;
 					numAttachUploaded--;
-					triggerEvt('RemoveSuccess', $str, [dataToSend.attachid]);
+					triggerEvt('RemoveSuccess', options.control, [dataToSend.attachid]);
 
 					// Done with this one, so remove it from existence
 					$('#' + dataToSend.attachid).unbind().remove();
@@ -257,11 +258,12 @@
 		* @param {object} obj options
 		*/
 		createStatusbar = function(obj) {
-			$str = $(fileDisplayTemplate);
-			var $button = $str.find('.control');
+			var $control = $str.clone(),
+			    $button = $control.find('.control'),
+			    $progressbar = $control.find('.progressBar');
 			$button.addClass('abort');
 
-			$('.progress_tracker').append($str);
+			$('.progress_tracker').append($control);
 
 			// Provide the file size in something more legible, like 100KB or 1.1MB
 			this.setFileNameSize = function(name, size) {
@@ -274,12 +276,12 @@
 				else
 					sizeStr = sizeKB.toFixed(2) + " KB";
 
-				$str.find('.info').html(name + ' (' + sizeStr + ')');
+				$control.find('.info').html(name + ' (' + sizeStr + ')');
 			};
 
 			// Set the progress bar position
 			this.setProgress = function(progress) {
-				var $progressbar = $str.find('.progressBar'),
+				var /*$progressbar = $control.find('.progressBar'),*/
 					progressBarWidth = progress * $progressbar.width() / 100;
 
 				$progressbar.find('div').animate({
@@ -289,13 +291,17 @@
 
 			// Provide a way to stop the upload before its done
 			this.setAbort = function(jqxhr) {
-				var sb = $str;
+				var sb = $control;
 
 				$button.bind('click', function(e) {
 					e.preventDefault();
 					jqxhr.abort();
 					sb.hide();
 				});
+			};
+
+			this.getButton = function() {
+				return $button;
 			};
 
 			// Server Failure is always an option when sending files
@@ -306,8 +312,8 @@
 
 			// The file upload is successful, remove our abort event and swap the class
 			this.onUploadSuccess = function(data) {
-				fileUploadedInterface($button, data);
-				triggerEvt('UploadSuccess', $str, [data]);
+				fileUploadedInterface($control, $button, data);
+				triggerEvt('UploadSuccess', $control, [$button, data]);
 			};
 		},
 
@@ -319,14 +325,14 @@
 		* @param {object} files what files to upload
 		* @param {object} obj parent object in which file progress is shown
 		*/
-		fileUploadedInterface = function($button, data) {
+		fileUploadedInterface = function($control, $button, data) {
 			$button.unbind('click');
 			$button.removeClass('abort fa-times-circle').addClass('remove fa-minus-circle');
 
 			// Update the uploaded file with its ID
 			$button.attr('id', data.curFileNum);
-			$str.attr('id', data.attachid);
-			$str.attr('data-size', data.size);
+			$control.attr('id', data.attachid);
+			$control.attr('data-size', data.size);
 
 			// We need to tell Elk that the file should not be deleted
 			$button.after($('<input />')
@@ -334,8 +340,8 @@
 				.attr('name', 'attach_del[]')
 				.attr('value', data.attachid));
 
-			var $img = $('<img />').attr('src', elk_scripturl + '?action=dlattach;sa=tmpattach;attach=' + $str.attr('id') + ';topic=' + topic),
-				$progressbar = $str.find('.progressBar');
+			var $img = $('<img />').attr('src', elk_scripturl + '?action=dlattach;sa=tmpattach;attach=' + $control.attr('id') + ';topic=' + topic),
+			    $progressbar = $control.find('.progressBar');
 			$progressbar.after($('<div class="postattach_thumb" />').append($img));
 			$progressbar.remove();
 
@@ -348,7 +354,8 @@
 				if (confirm(oTxt.areYouSure))
 				{
 					removeFileFromServer({
-						'fileNum': fileNum
+						'fileNum': fileNum,
+						'control': $control
 					});
 				}
 			});

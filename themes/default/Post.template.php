@@ -463,9 +463,8 @@ function template_add_new_attachments()
 		},
 		existingSelector: \'.inline_insert\',
 		events: {
-			UploadSuccess: function(data) {
-				var $base = $(this).find(\'.control\');
-				inlineAttach.addInterface($base, data.attachid);
+			UploadSuccess: function($button, data) {
+				inlineAttach.addInterface($button, data.attachid);
 			},
 			RemoveSuccess: function(attachid) {
 				inlineAttach.removeAttach(attachid);
