@@ -172,9 +172,9 @@ class Attachments_Post_Module implements ElkArte\sources\modules\Module_Interfac
 						if (!empty($_SESSION['temp_attachments']['post']['msg']))
 						{
 							// We have a message id, so we can link back to the old topic they were trying to edit..
-							$goback_link = '<a href="' . $scripturl . '?action=post' . (!empty($_SESSION['temp_attachments']['post']['msg']) ? (';msg=' . $_SESSION['temp_attachments']['post']['msg']) : '') . (!empty($_SESSION['temp_attachments']['post']['last_msg']) ? (';last_msg=' . $_SESSION['temp_attachments']['post']['last_msg']) : '') . ';topic=' . $_SESSION['temp_attachments']['post']['topic'] . ';additionalOptions">' . $txt['here'] . '</a>';
+							$goback_url = $scripturl . '?action=post' . (!empty($_SESSION['temp_attachments']['post']['msg']) ? (';msg=' . $_SESSION['temp_attachments']['post']['msg']) : '') . (!empty($_SESSION['temp_attachments']['post']['last_msg']) ? (';last_msg=' . $_SESSION['temp_attachments']['post']['last_msg']) : '') . ';topic=' . $_SESSION['temp_attachments']['post']['topic'] . ';additionalOptions';
 
-							$this->_attach_errors->addError(array('temp_attachments_found', array($delete_url, $goback_link, $file_list)));
+							$this->_attach_errors->addError(array('temp_attachments_found', array($delete_url, $goback_url, $file_list)));
 							$context['ignore_temp_attachments'] = true;
 						}
 						else
