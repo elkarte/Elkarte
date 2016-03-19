@@ -186,7 +186,7 @@ class Attachment_Controller extends Action_Controller
 	 */
 	public function action_dlattach()
 	{
-		global $txt, $modSettings, $user_info, $context, $topic, $board;
+		global $txt, $modSettings, $user_info, $context, $topic, $board, $settings;
 
 		// Some defaults that we need.
 		$context['no_last_modified'] = true;
@@ -202,7 +202,7 @@ class Attachment_Controller extends Action_Controller
 		// Temporary attachment, special case...
 		if (isset($this->_req->query->attach) && strpos($this->_req->query->attach, 'post_tmp_' . $user_info['id']) !== false)
 		{
-			$id_attach = $this->_req->query->attach;
+			return $this->action_tmpattach();
 		}
 		else
 		{
@@ -217,23 +217,6 @@ class Attachment_Controller extends Action_Controller
 
 			$is_avatar = true;
 			$this->_req->query->image = true;
-		}
-		// Needed for preview of temporary attachments...
-		elseif (strpos($id_attach, 'post_tmp_' . $user_info['id']) !== false)
-		{
-				$filename = $_SESSION['temp_attachments'][$id_attach]['tmp_name'];
-
-				$attachment = array(
-					$_SESSION['temp_attachments'][$id_attach]['id_folder'],
-					$_SESSION['temp_attachments'][$id_attach]['name'],
-					$_SESSION['temp_attachments'][$id_attach]['attachid'],
-					pathinfo($_SESSION['temp_attachments'][$id_attach]['name'], PATHINFO_EXTENSION),
-					0,
-					0,
-					$_SESSION['temp_attachments'][$id_attach]['type'],
-					1,
-					$user_info['id']
-				);
 		}
 		// This is just a regular attachment...
 		else
@@ -251,7 +234,6 @@ class Attachment_Controller extends Action_Controller
 			isAllowedTo('view_attachments', $id_board);
 			$this->_events->trigger('get_attachment_data', array());
 
-			// @todo: if it is not an image, get a default icon based on extension
 			if ($this->_req->getQuery('thumb') === null)
 			{
 				$attachment = getAttachmentFromTopic($id_attach, $id_topic);
@@ -259,6 +241,37 @@ class Attachment_Controller extends Action_Controller
 			else
 			{
 				$attachment = getAttachmentThumbFromTopic($id_attach, $id_topic);
+
+				// 1 is the file name, no file name, no thumbnail, no image.
+				if (empty($attachment[1]))
+				{
+					$full_attach = getAttachmentFromTopic($id_attach, $id_topic);
+					$attachment[1] = $full_attach[1];
+					$attachment[3] = $full_attach[3];
+					$attachment[4] = 0;
+					$attachment[5] = 0;
+
+					$finfo = finfo_open(FILEINFO_MIME_TYPE); // return mime type ala mimetype extension
+
+					if (in_array($attachment[3], array(
+						'c', 'cpp', 'css', 'csv', 'doc', 'docx', 'flv', 'html', 'htm', 'java', 'js', 'log', 'mp3',
+						'mp4', 'mgp', 'pdf', 'php', 'ppt', 'rtf', 'sql', 'tgz', 'txt', 'wav', 'xls', 'xml', 'zip'
+					)))
+					{
+						$attachment[6] = 'image/png';
+
+						// Show the mine thumbnail if it exists or just the default
+						$filename = $settings['theme_dir'] . '/images/mime_images/' . $full_attach[3] . '.png';
+						if (!file_exists($filename))
+							$filename = $settings['theme_dir'] . '/images/mime_images/default.png';
+					}
+					elseif (substr(finfo_file($finfo, $filename), 0, 5) !== 'image')
+					{
+						$attachment[6] = 'image/png';
+						$filename = $settings['theme_dir'] . '/images/mime_images/default.png';
+					}
+					finfo_close($finfo);
+				}
 			}
 		}
 
