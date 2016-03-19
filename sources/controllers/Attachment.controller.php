@@ -190,6 +190,7 @@ class Attachment_Controller extends Action_Controller
 
 		// Some defaults that we need.
 		$context['no_last_modified'] = true;
+		$filename = null;
 
 		// Make sure some attachment was requested!
 		if (!isset($this->_req->query->attach) && !isset($this->_req->query->id))
@@ -198,9 +199,17 @@ class Attachment_Controller extends Action_Controller
 		// We need to do some work on attachments and avatars.
 		require_once(SUBSDIR . '/Attachments.subs.php');
 
-		$id_attach = isset($this->_req->query->attach)
-			? (int) $this->_req->query->attach
-			: (int) $this->_req->query->id;
+		// Temporary attachment, special case...
+		if (isset($this->_req->query->attach) && strpos($this->_req->query->attach, 'post_tmp_' . $user_info['id']) !== false)
+		{
+			$id_attach = $this->_req->query->attach;
+		}
+		else
+		{
+			$id_attach = isset($this->_req->query->attach)
+				? (int) $this->_req->query->attach
+				: (int) $this->_req->query->id;
+		}
 
 		if ($this->_req->getQuery('type') === 'avatar')
 		{
@@ -208,6 +217,23 @@ class Attachment_Controller extends Action_Controller
 
 			$is_avatar = true;
 			$this->_req->query->image = true;
+		}
+		// Needed for preview of temporary attachments...
+		elseif (strpos($id_attach, 'post_tmp_' . $user_info['id']) !== false)
+		{
+				$filename = $_SESSION['temp_attachments'][$id_attach]['tmp_name'];
+
+				$attachment = array(
+					$_SESSION['temp_attachments'][$id_attach]['id_folder'],
+					$_SESSION['temp_attachments'][$id_attach]['name'],
+					$_SESSION['temp_attachments'][$id_attach]['attachid'],
+					pathinfo($_SESSION['temp_attachments'][$id_attach]['name'], PATHINFO_EXTENSION),
+					0,
+					0,
+					$_SESSION['temp_attachments'][$id_attach]['type'],
+					1,
+					$user_info['id']
+				);
 		}
 		// This is just a regular attachment...
 		else
@@ -246,10 +272,13 @@ class Attachment_Controller extends Action_Controller
 			isAllowedTo('approve_posts', $id_board);
 
 		// Update the download counter (unless it's a thumbnail or an avatar).
-		if (empty($is_avatar) || $attachment_type != 3)
+		if (!empty($id_attach) && empty($is_avatar) || $attachment_type != 3)
 			increaseDownloadCounter($id_attach);
 
-		$filename = getAttachmentFilename($real_filename, $id_attach, $id_folder, false, $file_hash);
+		if ($filename === null)
+		{
+			$filename = getAttachmentFilename($real_filename, $id_attach, $id_folder, false, $file_hash);
+		}
 
 		// This is done to clear any output that was made before now.
 		while (ob_get_level() > 0)

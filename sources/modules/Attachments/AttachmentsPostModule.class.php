@@ -406,6 +406,8 @@ class Attachments_Post_Module implements ElkArte\sources\modules\Module_Interfac
 						$this->_saved_attach_id[] = $attachmentOptions['id'];
 						if (!empty($attachmentOptions['thumb']))
 							$this->_saved_attach_id[] = $attachmentOptions['thumb'];
+
+						$msgOptions['body'] = str_replace('[attach]' . $attachID . '[/attach]', '[attach]' . $attachmentOptions['id'] . '[/attach]', $msgOptions['body']);
 					}
 				}
 				// We have errors on this file, build out the issues for display to the user

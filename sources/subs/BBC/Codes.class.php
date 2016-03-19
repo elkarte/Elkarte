@@ -273,9 +273,12 @@ class Codes
 				self::ATTR_TYPE => self::TYPE_UNPARSED_CONTENT,
 				self::ATTR_CONTENT => '<a href="' . $scripturl . '?action=dlattach;attach=$1;image"><img src="' . $scripturl . '?action=dlattach;attach=$1;thumb" alt="" class="bbc_img" /></a>',
 				self::ATTR_VALIDATE => function(&$tag, &$data, $disabled) {
-					global $context;
+					global $context, $user_info;
 
-					$data = (int) $data;
+					if (strpos($data, 'post_tmp_' . $user_info['id']) === false)
+					{
+						$data = (int) $data;
+					}
 					$context['ila_dont_show_attach_below'][] = $data;
 					$context['ila_dont_show_attach_below'] = array_unique($context['ila_dont_show_attach_below']);
 				},

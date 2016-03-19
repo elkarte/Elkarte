@@ -64,7 +64,7 @@ function previewPost()
 	var x = [];
 	x = getFields(textFields, numericFields, checkboxFields, form_name);
 
-	sendXMLDocument(elk_prepareScriptUrl(elk_scripturl) + 'action=post2' + (current_message ? ';msg=' + current_message : '') + (ilaAttach ? ';ila=' + ilaAttach : '') + (current_board ? ';board=' + current_board : '') + (make_poll ? ';poll' : '') + ';preview;xml', x.join('&'), onDocSent);
+	sendXMLDocument(elk_prepareScriptUrl(elk_scripturl) + 'action=post2' + (current_board ? ';board=' + current_board : '') + (make_poll ? ';poll' : '') + ';preview;xml', x.join('&'), onDocSent);
 
 	// Show the preview section and load it with "pending results" text, onDocSent will finish things off
 	document.getElementById('preview_section').style.display = 'block';
