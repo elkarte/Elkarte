@@ -75,6 +75,9 @@ class Drafts_Post_Module implements ElkArte\sources\modules\Module_Interface
 		if (!empty($context['drafts_save']))
 		{
 			loadLanguage('Drafts');
+
+			$this->_prepareDraftsContext($user_info['id'], $topic);
+
 			if (!empty($context['drafts_autosave']) && !empty($options['drafts_autosave_enabled']))
 			{
 				if (!isset($editorOptions['plugin_addons']))
@@ -84,6 +87,8 @@ class Drafts_Post_Module implements ElkArte\sources\modules\Module_Interface
 
 				// @todo remove
 				$context['drafts_autosave_frequency'] = self::$_autosave_frequency;
+
+				$editorOptions['value'] = $context['message'];
 
 				$editorOptions['plugin_addons'][] = 'draft';
 				$editorOptions['plugin_options'][] = '
@@ -110,8 +115,6 @@ class Drafts_Post_Module implements ElkArte\sources\modules\Module_Interface
 				'value' => $txt['draft_save'],
 				'options' => 'onclick="return confirm(' . JavaScriptEscape($txt['draft_save_note']) . ') && submitThisOnce(this);" accesskey="d"',
 			);
-
-			$this->_prepareDraftsContext($user_info['id'], $topic);
 
 			if (!empty($context['drafts']))
 				$template_layers->add('load_drafts', 100);
