@@ -1990,3 +1990,41 @@ function getAttachmentFilename($filename, $attachment_id, $dir = null, $new = fa
 
 	return $path . '/' . $attachment_id . '_' . $file_hash . '.elk';
 }
+
+/**
+ * Returns the board and the topic the attachment belongs to.
+ *
+ * @package Attachments
+ * @param int $id_attach
+ * @return int[]|boolean on fail else an array of id_board, id_topic
+ */
+function getAttachmentPosition($id_attach)
+{
+	$db = database();
+
+	// Make sure this attachment is on this board.
+	$request = $db->query('', '
+		SELECT m.id_board, m.id_topic
+		FROM {db_prefix}attachments AS a
+			LEFT JOIN {db_prefix}messages AS m ON (m.id_msg = a.id_msg)
+			LEFT JOIN {db_prefix}boards AS b ON (b.id_board = m.id_board)
+		WHERE a.id_attach = {int:attach}
+			AND {query_see_board}
+		LIMIT 1',
+		array(
+			'attach' => $id_attach,
+		)
+	);
+
+	$attachmentData = $db->fetch_assoc($request);
+	$db->free_result($request);
+
+	if (empty($attachmentData))
+	{
+		return false;
+	}
+	else
+	{
+		return $attachmentData;
+	}
+}

@@ -186,7 +186,7 @@ class Attachment_Controller extends Action_Controller
 	 */
 	public function action_dlattach()
 	{
-		global $txt, $modSettings, $user_info, $context, $topic;
+		global $txt, $modSettings, $user_info, $context, $topic, $board;
 
 		// Some defaults that we need.
 		$context['no_last_modified'] = true;
@@ -212,17 +212,27 @@ class Attachment_Controller extends Action_Controller
 		// This is just a regular attachment...
 		else
 		{
-			isAllowedTo('view_attachments');
+			if (empty($topic))
+			{
+				list($id_board, $id_topic) = array_values(getAttachmentPosition($id_attach));
+			}
+			else
+			{
+				$id_board = $board;
+				$id_topic = $topic;
+			}
+
+			isAllowedTo('view_attachments', $id_board);
 			$this->_events->trigger('get_attachment_data', array());
 
 			// @todo: if it is not an image, get a default icon based on extension
 			if ($this->_req->getQuery('thumb') === null)
 			{
-				$attachment = getAttachmentFromTopic($id_attach, $topic);
+				$attachment = getAttachmentFromTopic($id_attach, $id_topic);
 			}
 			else
 			{
-				$attachment = getAttachmentThumbFromTopic($id_attach, $topic);
+				$attachment = getAttachmentThumbFromTopic($id_attach, $id_topic);
 			}
 		}
 
@@ -233,7 +243,7 @@ class Attachment_Controller extends Action_Controller
 
 		// If it isn't yet approved, do they have permission to view it?
 		if (!$is_approved && ($id_member == 0 || $user_info['id'] != $id_member) && ($attachment_type == 0 || $attachment_type == 3))
-			isAllowedTo('approve_posts');
+			isAllowedTo('approve_posts', $id_board);
 
 		// Update the download counter (unless it's a thumbnail or an avatar).
 		if (empty($is_avatar) || $attachment_type != 3)
