@@ -263,9 +263,6 @@
 				else {
 					allowedUrls[currentUrlFrag].uiFunc();
 				}
-
-				// All done
-				hideSpinnerOverlay();
 			},
 
 			// Fetch the specific tab data via ajax from the server
@@ -307,6 +304,10 @@
 							window.console.info('fail:', textStatus, errorThrown.name);
 							window.console.info(err.responseText);
 						}
+					})
+					.always(function () {
+						// All done
+						hideSpinnerOverlay();
 					});
 			},
 
