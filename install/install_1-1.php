@@ -65,7 +65,6 @@ class InstallInstructions_install_1_1
 				array('name' => 'id_msg',          'type' => 'int', 'size' => 10, 'unsigned' => true, 'default' => 0),
 				array('name' => 'id_member',       'type' => 'mediumint', 'size' => 8, 'unsigned' => true, 'default' => 0),
 				array('name' => 'id_folder',       'type' => 'tinyint', 'size' => 3, 'default' => 1),
-				array('name' => 'attach_source',   'type' => 'tinyint', 'size' => 3, 'default' => 0),
 				array('name' => 'attachment_type', 'type' => 'tinyint', 'size' => 3, 'unsigned' => true, 'default' => 0),
 				array('name' => 'filename',        'type' => 'varchar', 'default' => '', 'size' => 255),
 				array('name' => 'file_hash',       'type' => 'varchar', 'default' => '', 'size' => 40),
@@ -83,7 +82,6 @@ class InstallInstructions_install_1_1
 				array('name' => 'id_msg',          'columns' => array('id_msg'), 'type' => 'key'),
 				array('name' => 'attachment_type', 'columns' => array('attachment_type'), 'type' => 'key'),
 				array('name' => 'id_thumb',        'columns' => array('id_thumb'), 'type' => 'key'),
-				array('name' => 'attach_source',   'columns' => array('id_msg', 'attach_source'), 'type' => 'key'),
 			),
 			array(),
 			'ignore'

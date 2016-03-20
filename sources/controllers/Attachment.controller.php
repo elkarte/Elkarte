@@ -232,7 +232,6 @@ class Attachment_Controller extends Action_Controller
 			}
 
 			isAllowedTo('view_attachments', $id_board);
-			$this->_events->trigger('get_attachment_data', array());
 
 			if ($this->_req->getQuery('thumb') === null)
 			{
