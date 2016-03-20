@@ -677,11 +677,13 @@
 	this.likePostStats = likePostStats;
 
 	// Setup the menu to act as ajax tabs
-	$(".like_post_stats_menu a").on("click", function (e) {
-		if (e) {
-			e.preventDefault();
-			e.stopPropagation();
-		}
-		likePostStats.prototype.checkUrl(this.id);
+	$(document).ready(function() {
+		$(".like_post_stats_menu a").on("click", function (e) {
+			if (e) {
+				e.preventDefault();
+				e.stopPropagation();
+			}
+			likePostStats.prototype.checkUrl(this.id);
+		});
 	});
 }());
