@@ -634,15 +634,16 @@ function dbMostLikedMessagesByTopic($topic, $limit = 5)
 				ORDER BY like_count DESC
 			) AS lp
 			INNER JOIN {db_prefix}messages AS m ON (m.id_msg = lp.id_msg)
-			INNER JOIN {db_prefix}members AS mem ON (mem.id_member = m.id_member)
+			LEFT JOIN {db_prefix}members AS mem ON (mem.id_member = m.id_member)
 			INNER JOIN {db_prefix}topics AS t ON (t.id_topic = m.id_topic)
-			LEFT JOIN {db_prefix}attachments AS a ON (a.id_member = m.id_member)
+			LEFT JOIN {db_prefix}attachments AS a ON (a.id_member = m.id_member AND a.attachment_type = {int:type_avatar})
 		WHERE t.id_topic = {int:id_topic}
 		ORDER BY lp.like_count DESC
 		LIMIT {int:limit}',
 		array(
 			'id_topic' => $topic,
 			'limit' => $limit,
+			'type_avatar' => 1,
 		),
 		function($row) use ($scripturl, $bbc_parser)
 		{
