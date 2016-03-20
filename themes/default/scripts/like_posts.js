@@ -304,6 +304,10 @@
 							window.console.info('fail:', textStatus, errorThrown.name);
 							window.console.info(err.responseText);
 						}
+					})
+					.always(function () {
+						// All done
+						hideSpinnerOverlay();
 					});
 			},
 
@@ -361,9 +365,6 @@
 
 				// Hover subject link to show message body preview
 				$('.message_title').SiteTooltip({hoverIntent: {sensitivity: 10, interval: 150, timeout: 50}});
-
-				// All done
-				hideSpinnerOverlay();
 			},
 
 			// The most liked Topics !
@@ -677,11 +678,13 @@
 	this.likePostStats = likePostStats;
 
 	// Setup the menu to act as ajax tabs
-	$(".like_post_stats_menu a").on("click", function (e) {
-		if (e) {
-			e.preventDefault();
-			e.stopPropagation();
-		}
-		likePostStats.prototype.checkUrl(this.id);
+	$(document).ready(function() {
+		$(".like_post_stats_menu a").on("click", function (e) {
+			if (e) {
+				e.preventDefault();
+				e.stopPropagation();
+			}
+			likePostStats.prototype.checkUrl(this.id);
+		});
 	});
 }());

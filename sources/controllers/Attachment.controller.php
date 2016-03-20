@@ -221,9 +221,17 @@ class Attachment_Controller extends Action_Controller
 		// This is just a regular attachment...
 		else
 		{
-			if (empty($topic))
+			if (empty($topic) && !empty($id_attach))
 			{
-				list($id_board, $id_topic) = array_values(getAttachmentPosition($id_attach));
+				$attachPos = getAttachmentPosition($id_attach);
+				if ($attachPos !== false)
+				{
+					list($id_board, $id_topic) = array_values($attachPos);
+				}
+				else
+				{
+					$id_board = 0;
+				}
 			}
 			else
 			{

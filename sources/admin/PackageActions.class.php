@@ -757,7 +757,7 @@ class Package_Actions extends Action_Controller
 
 		if (!empty($this->_action['filename']))
 		{
-			$mod_actions = parseModification(file_get_contents(BOARDDIR . '/packages/temp/' . $context['base_path'] . $this->_action['filename']), false, $this->_action['reverse'], $this->_theme_paths);
+			$mod_actions = parseModification(file_get_contents(BOARDDIR . '/packages/temp/' . $this->_base_path . $this->_action['filename']), false, $this->_action['reverse'], $this->_theme_paths);
 
 			// Any errors worth noting?
 			foreach ($mod_actions as $key => $action)
@@ -788,8 +788,8 @@ class Package_Actions extends Action_Controller
 			global $context;
 
 			// Now include the file and be done with it ;).
-			if (file_exists(BOARDDIR . '/packages/temp/' . $context['base_path'] . $this->_action['filename']))
-				require(BOARDDIR . '/packages/temp/' . $context['base_path'] . $this->_action['filename']);
+			if (file_exists(BOARDDIR . '/packages/temp/' . $this->_base_path . $this->_action['filename']))
+				require(BOARDDIR . '/packages/temp/' . $this->_base_path . $this->_action['filename']);
 		}
 	}
 
@@ -836,8 +836,8 @@ class Package_Actions extends Action_Controller
 			global $context;
 
 			// Let the file work its magic ;)
-			if (file_exists(BOARDDIR . '/packages/temp/' . $context['base_path'] . $this->_action['filename']))
-				require(BOARDDIR . '/packages/temp/' . $context['base_path'] . $this->_action['filename']);
+			if (file_exists(BOARDDIR . '/packages/temp/' . $this->_base_path . $this->_action['filename']))
+				require(BOARDDIR . '/packages/temp/' . $this->_base_path . $this->_action['filename']);
 		}
 	}
 
@@ -852,8 +852,8 @@ class Package_Actions extends Action_Controller
 		if ($this->_action['type'] === 'redirect' && !empty($this->_action['redirect_url']))
 		{
 			$context['redirect_url'] = $this->_action['redirect_url'];
-			$context['redirect_text'] = !empty($this->_action['filename']) && file_exists(BOARDDIR . '/packages/temp/' . $context['base_path'] . $this->_action['filename'])
-				? file_get_contents(BOARDDIR . '/packages/temp/' . $context['base_path'] . $this->_action['filename'])
+			$context['redirect_text'] = !empty($this->_action['filename']) && file_exists(BOARDDIR . '/packages/temp/' . $this->_base_path . $this->_action['filename'])
+				? file_get_contents(BOARDDIR . '/packages/temp/' . $this->_base_path . $this->_action['filename'])
 				: ($this->_uninstalling ? $txt['package_uninstall_done'] : $txt['package_installed_done']);
 			$context['redirect_timeout'] = $this->_action['redirect_timeout'];
 
