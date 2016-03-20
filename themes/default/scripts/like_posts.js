@@ -263,6 +263,9 @@
 				else {
 					allowedUrls[currentUrlFrag].uiFunc();
 				}
+
+				// All done
+				hideSpinnerOverlay();
 			},
 
 			// Fetch the specific tab data via ajax from the server
@@ -361,9 +364,6 @@
 
 				// Hover subject link to show message body preview
 				$('.message_title').SiteTooltip({hoverIntent: {sensitivity: 10, interval: 150, timeout: 50}});
-
-				// All done
-				hideSpinnerOverlay();
 			},
 
 			// The most liked Topics !
