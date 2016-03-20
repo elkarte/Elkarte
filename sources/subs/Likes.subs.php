@@ -720,9 +720,15 @@ function dbMostLikedTopic($board = null, $limit = 10)
 	while ($row = $db->fetch_assoc($request))
 	{
 		$mostLikedTopics[$row['id_topic']] = $row;
+
+		$log = log($row['like_count'] / ($row['num_replies'] + ($row['num_replies'] == 0 || $row['like_count'] == $row['num_replies'] ? 1 : 0)));
+		$distinct_likers = max(1,
+			min($row['distinct_likers'],
+				1 / ($log == 0 ? 1 : $log)));
+
 		$mostLikedTopics[$row['id_topic']]['relevance'] = $row['distinct_likers'] +
 			$row['distinct_likers'] / $row['num_messages_liked'] +
-			min($row['distinct_likers'], 1 / (log($row['like_count'] / ($row['num_replies'] + ($row['like_count'] == $row['num_replies'] ? 1 : 0)))));
+			$distinct_likers;
 	}
 	$db->free_result($request);
 
