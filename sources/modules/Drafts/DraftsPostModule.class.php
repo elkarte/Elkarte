@@ -25,9 +25,6 @@ class Drafts_Post_Module implements ElkArte\sources\modules\Module_Interface
 	protected static $_subject_length = 24;
 	protected static $_eventsManager = null;
 
-	protected $_loaded_drafts = array();
-	protected $_current_draft = array();
-
 	/**
 	 * {@inheritdoc }
 	 */
@@ -51,15 +48,11 @@ class Drafts_Post_Module implements ElkArte\sources\modules\Module_Interface
 			$return = array(
 				array('prepare_modifying', array('Drafts_Post_Module', 'prepare_modifying'), array('really_previewing')),
 				array('finalize_post_form', array('Drafts_Post_Module', 'finalize_post_form'), array('editorOptions', 'board', 'topic', 'template_layers')),
+
+				array('prepare_save_post', array('Drafts_Post_Module', 'prepare_save_post'), array()),
+				array('before_save_post', array('Drafts_Post_Module', 'before_save_post'), array()),
+				array('after_save_post', array('Drafts_Post_Module', 'after_save_post'), array('msgOptions')),
 			);
-			if (isset($_REQUEST['save_draft']))
-			{
-				$return = array_merge($return, array(
-					array('prepare_save_post', array('Drafts_Post_Module', 'prepare_save_post'), array()),
-					array('before_save_post', array('Drafts_Post_Module', 'before_save_post'), array()),
-					array('after_save_post', array('Drafts_Post_Module', 'after_save_post'), array('msgOptions')),
-				));
-			}
 		}
 
 		return $return;
@@ -67,11 +60,6 @@ class Drafts_Post_Module implements ElkArte\sources\modules\Module_Interface
 
 	public function prepare_modifying(&$really_previewing)
 	{
-		global $context;
-
-		if (!empty($_REQUEST['id_draft']))
-			$context['attach_source'] = 1;
-
 		$really_previewing = $really_previewing && !isset($_REQUEST['save_draft']);
 	}
 
@@ -87,11 +75,8 @@ class Drafts_Post_Module implements ElkArte\sources\modules\Module_Interface
 		if (!empty($context['drafts_save']))
 		{
 			loadLanguage('Drafts');
-			if (!empty($_REQUEST['id_draft']))
-			{
-				$id_draft = (int) $_REQUEST['id_draft'];
-				$context['id_draft'] = $id_draft;
-			}
+
+			$this->_prepareDraftsContext($user_info['id'], $topic);
 
 			if (!empty($context['drafts_autosave']) && !empty($options['drafts_autosave_enabled']))
 			{
@@ -102,6 +87,8 @@ class Drafts_Post_Module implements ElkArte\sources\modules\Module_Interface
 
 				// @todo remove
 				$context['drafts_autosave_frequency'] = self::$_autosave_frequency;
+
+				$editorOptions['value'] = $context['message'];
 
 				$editorOptions['plugin_addons'][] = 'draft';
 				$editorOptions['plugin_options'][] = '
@@ -129,18 +116,6 @@ class Drafts_Post_Module implements ElkArte\sources\modules\Module_Interface
 				'options' => 'onclick="return confirm(' . JavaScriptEscape($txt['draft_save_note']) . ') && submitThisOnce(this);" accesskey="d"',
 			);
 
-			if (!empty($id_draft))
-			{
-				$this->_prepareDraftsContext($user_info['id'], $topic);
-				self::$_eventsManager->trigger('after_loading_drafts', array('loaded_drafts' => &$this->_loaded_drafts, 'current_draft' => &$this->_current_draft));
-
-				if (!empty($this->_current_draft))
-				{
-					$context['message'] = $editorOptions['value'] = $this->_current_draft['body'];
-					$context['subject'] = addcslashes($this->_current_draft['subject'], '"');
-				}
-			}
-
 			if (!empty($context['drafts']))
 				$template_layers->add('load_drafts', 100);
 		}
@@ -165,7 +140,7 @@ class Drafts_Post_Module implements ElkArte\sources\modules\Module_Interface
 				$context['drafts_save'] = !empty($modSettings['drafts_enabled']) && !empty($modSettings['drafts_post_enabled']) && allowedTo('post_draft');
 
 			// Can you be, should you be ... here?
-			if (!empty($context['drafts_save']))
+			if (!empty($context['drafts_save']) && isset($_POST['id_draft']))
 			{
 				// Prepare and clean the data, load the draft array
 				$draft = array(
@@ -181,13 +156,10 @@ class Drafts_Post_Module implements ElkArte\sources\modules\Module_Interface
 					'id_member' => $user_info['id'],
 					'is_usersaved' => (int) empty($_REQUEST['autosave']),
 				);
-				$error = Error_Context::context('post', 1);
 
-				self::$_eventsManager->trigger('before_save_draft', array('draft' => &$draft, 'is_usersaved' => empty($_REQUEST['autosave']), 'error_context' => $error));
+				self::$_eventsManager->trigger('before_save_draft', array('draft' => &$draft));
 
-				$context['id_draft'] = saveDraft($draft, isset($_REQUEST['xml']));
-
-				self::$_eventsManager->trigger('after_save_draft', array('id_draft' => $context['id_draft']));
+				saveDraft($draft, isset($_REQUEST['xml']));
 
 				// Cleanup
 				unset($_POST['save_draft']);
@@ -209,19 +181,13 @@ class Drafts_Post_Module implements ElkArte\sources\modules\Module_Interface
 		}
 	}
 
-	public function after_save_post($msgOptions)
+	public function after_save_post()
 	{
 		global $user_info;
 
 		// If we had a draft for this, its time to remove it since it was just posted
 		if (!empty($_POST['id_draft']))
-		{
-			$id_draft = (int) $_POST['id_draft'];
-
-			self::$_eventsManager->trigger('before_delete_draft', array('id_draft' => $id_draft, 'msgOptions' => $msgOptions));
-
-			deleteDrafts($id_draft, $user_info['id']);
-		}
+			deleteDrafts($_POST['id_draft'], $user_info['id']);
 	}
 
 	/**
@@ -249,12 +215,8 @@ class Drafts_Post_Module implements ElkArte\sources\modules\Module_Interface
 		require_once(SUBSDIR . '/Drafts.subs.php');
 
 		// has a specific draft has been selected?  Load it up if there is not already a message already in the editor
-		if (isset($_REQUEST['id_draft']) && empty($_POST['subject']) && empty($_POST['message']) || !empty($_REQUEST['save_draft']))
-		{
-			$id_draft = (int) $_REQUEST['id_draft'];
-			$this->_current_draft = loadDraft($id_draft, 0, true, true);
-			$context['id_draft'] = $id_draft;
-		}
+		if (isset($_REQUEST['id_draft']) && empty($_POST['subject']) && empty($_POST['message']))
+			loadDraft((int) $_REQUEST['id_draft'], 0, true, true);
 
 		// load all the drafts for this user that meet the criteria
 		$order = 'poster_time DESC';
@@ -263,8 +225,6 @@ class Drafts_Post_Module implements ElkArte\sources\modules\Module_Interface
 		// Add them to the context draft array for template display
 		foreach ($user_drafts as $draft)
 		{
-			$this->_loaded_drafts[] = $draft['id_draft'];
-
 			$short_subject = empty($draft['subject']) ? $txt['drafts_none'] : Util::shorten_text(stripslashes($draft['subject']), self::$_subject_length);
 			$context['drafts'][] = array(
 				'subject' => censor($short_subject),

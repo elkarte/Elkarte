@@ -463,16 +463,14 @@ function template_add_new_attachments()
 		},
 		existingSelector: \'.inline_insert\',
 		events: {
-			UploadSuccess: function(data) {
-				var $base = $(this).find(\'.control\');
-				inlineAttach.addInterface($base, data.attachid);
+			UploadSuccess: function($button, data) {
+				inlineAttach.addInterface($button, data.attachid);
 			},
 			RemoveSuccess: function(attachid) {
 				inlineAttach.removeAttach(attachid);
 			}
 		}' . (isset($context['current_topic']) ? ',
-		topic: ' . $context['current_topic'] : '') . (isset($context['id_draft']) ? ',
-		id_draft: ' . $context['id_draft'] : '') . '
+			topic: ' . $context['current_topic'] : '') . '
 	});', true);
 }
 

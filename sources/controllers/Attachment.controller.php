@@ -90,7 +90,6 @@ class Attachment_Controller extends Action_Controller
 				require_once(SUBSDIR . '/Attachments.subs.php');
 
 				$process = $this->_req->getPost('msg', 'intval', '');
-
 				processAttachments($process);
 			}
 
@@ -113,17 +112,11 @@ class Attachment_Controller extends Action_Controller
 					// We need to grab the name anyhow
 					if (!empty($val['tmp_name']))
 					{
-						$saved = prepareCreatingAttachment(0, $user_info['id'], $val, $modSettings['postmod_active'], $board, $topic, 1);
-
-						if ($saved !== false)
-						{
-							$resp_data = array(
-								'name' => $val['name'],
-								'temp_attachid' => $attachID,
-								'attachid' => $modSettings['id'],
-								'size' => $val['size']
-							);
-						}
+						$resp_data = array(
+							'name' => $val['name'],
+							'attachid' => $attachID,
+							'size' => $val['size']
+						);
 					}
 				}
 
@@ -193,10 +186,11 @@ class Attachment_Controller extends Action_Controller
 	 */
 	public function action_dlattach()
 	{
-		global $txt, $modSettings, $user_info, $context, $topic;
+		global $txt, $modSettings, $user_info, $context, $topic, $board, $settings;
 
 		// Some defaults that we need.
 		$context['no_last_modified'] = true;
+		$filename = null;
 
 		// Make sure some attachment was requested!
 		if (!isset($this->_req->query->attach) && !isset($this->_req->query->id))
@@ -205,9 +199,17 @@ class Attachment_Controller extends Action_Controller
 		// We need to do some work on attachments and avatars.
 		require_once(SUBSDIR . '/Attachments.subs.php');
 
-		$id_attach = isset($this->_req->query->attach)
-			? (int) $this->_req->query->attach
-			: (int) $this->_req->query->id;
+		// Temporary attachment, special case...
+		if (isset($this->_req->query->attach) && strpos($this->_req->query->attach, 'post_tmp_' . $user_info['id']) !== false)
+		{
+			return $this->action_tmpattach();
+		}
+		else
+		{
+			$id_attach = isset($this->_req->query->attach)
+				? (int) $this->_req->query->attach
+				: (int) $this->_req->query->id;
+		}
 
 		if ($this->_req->getQuery('type') === 'avatar')
 		{
@@ -219,32 +221,58 @@ class Attachment_Controller extends Action_Controller
 		// This is just a regular attachment...
 		else
 		{
-			$attach_source = $this->_req->getQuery('status', 'intval', 0);
-			$id_board = null;
-
 			if (empty($topic))
 			{
-				$msgData = getMessageDataFromAttachment($id_attach, $attach_source);
-				$id_board = (int) $msgData['id_board'];
-				$id_topic = (int) $msgData['id_topic'];
+				list($id_board, $id_topic) = array_values(getAttachmentPosition($id_attach));
 			}
 			else
 			{
+				$id_board = $board;
 				$id_topic = $topic;
 			}
 
 			isAllowedTo('view_attachments', $id_board);
 
-			$this->_events->trigger('get_attachment_data', array('attach_source' => &$attach_source));
-
 			if ($this->_req->getQuery('thumb') === null)
 			{
-				$attachment = getAttachmentFromTopic($id_attach, $id_topic, $attach_source);
+				$attachment = getAttachmentFromTopic($id_attach, $id_topic);
 			}
 			else
 			{
-				$attachment = getAttachmentThumbFromTopic($id_attach, $id_topic, $attach_source);
-				// @todo: if it is not an image, get a default icon based on extension
+				$this->_req->query->image = true;
+				$attachment = getAttachmentThumbFromTopic($id_attach, $id_topic);
+
+				// 1 is the file name, no file name, no thumbnail, no image.
+				if (empty($attachment[1]))
+				{
+					$full_attach = getAttachmentFromTopic($id_attach, $id_topic);
+					$attachment[1] = $full_attach[1];
+					$attachment[4] = 0;
+					$attachment[5] = 0;
+
+					$finfo = finfo_open(FILEINFO_MIME_TYPE); // return mime type ala mimetype extension
+
+					if (in_array($full_attach[3], array(
+						'c', 'cpp', 'css', 'csv', 'doc', 'docx', 'flv', 'html', 'htm', 'java', 'js', 'log', 'mp3',
+						'mp4', 'mgp', 'pdf', 'php', 'ppt', 'rtf', 'sql', 'tgz', 'txt', 'wav', 'xls', 'xml', 'zip'
+					)))
+					{
+						$attachment[3] = 'png';
+						$attachment[6] = 'image/png';
+
+						// Show the mine thumbnail if it exists or just the default
+						$filename = $settings['theme_dir'] . '/images/mime_images/' . $full_attach[3] . '.png';
+						if (!file_exists($filename))
+							$filename = $settings['theme_dir'] . '/images/mime_images/default.png';
+					}
+					elseif (substr(finfo_file($finfo, $filename), 0, 5) !== 'image')
+					{
+						$attachment[3] = 'png';
+						$attachment[6] = 'image/png';
+						$filename = $settings['theme_dir'] . '/images/mime_images/default.png';
+					}
+					finfo_close($finfo);
+				}
 			}
 		}
 
@@ -255,13 +283,16 @@ class Attachment_Controller extends Action_Controller
 
 		// If it isn't yet approved, do they have permission to view it?
 		if (!$is_approved && ($id_member == 0 || $user_info['id'] != $id_member) && ($attachment_type == 0 || $attachment_type == 3))
-			isAllowedTo('approve_posts');
+			isAllowedTo('approve_posts', $id_board);
 
 		// Update the download counter (unless it's a thumbnail or an avatar).
-		if (empty($is_avatar) || $attachment_type != 3)
+		if (!empty($id_attach) && empty($is_avatar) || $attachment_type != 3)
 			increaseDownloadCounter($id_attach);
 
-		$filename = getAttachmentFilename($real_filename, $id_attach, $id_folder, false, $file_hash);
+		if ($filename === null)
+		{
+			$filename = getAttachmentFilename($real_filename, $id_attach, $id_folder, false, $file_hash);
+		}
 
 		// This is done to clear any output that was made before now.
 		while (ob_get_level() > 0)
@@ -420,7 +451,7 @@ class Attachment_Controller extends Action_Controller
 
 		try
 		{
-			if ((empty($topic) && empty($_REQUEST['id_draft'])) || (string) (int) $this->_req->query->attach !== (string) $this->_req->query->attach)
+			if (empty($topic) || (string) (int) $this->_req->query->attach !== (string) $this->_req->query->attach)
 			{
 				$attach_data = getTempAttachById($this->_req->query->attach);
 				$file_ext = pathinfo($attach_data['name'], PATHINFO_EXTENSION);
@@ -434,19 +465,10 @@ class Attachment_Controller extends Action_Controller
 				$id_attach = $this->_req->getQuery('attach', 'intval', -1);
 
 				isAllowedTo('view_attachments');
-
-				$attachment = getAttachmentFromTopic($id_attach, $topic, 1, $user_info['id']);
+				$attachment = getAttachmentFromTopic($id_attach, $topic);
 
 				if (empty($attachment))
-				{
-					// Give it another try with posted attachments (he may be editing a message)
-					$attachment = getAttachmentFromTopic($id_attach, $topic, 0, $user_info['id']);
-
-					if (empty($attachment))
-					{
-						Errors::instance()->fatal_lang_error('no_access', false);
-					}
-				}
+					Errors::instance()->fatal_lang_error('no_access', false);
 
 				list ($id_folder, $real_filename, $file_hash, $file_ext, $id_attach, $attachment_type, $mime_type, $is_approved, $id_member) = $attachment;
 

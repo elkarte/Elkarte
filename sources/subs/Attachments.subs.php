@@ -420,14 +420,12 @@ function processAttachments($id_msg = null)
 
 	// Remember where we are at. If it's anywhere at all.
 	if (!$ignore_temp)
-	{
 		$_SESSION['temp_attachments']['post'] = array(
 			'msg' => !empty($id_msg) ? $id_msg : 0,
 			'last_msg' => !empty($_REQUEST['last_msg']) ? $_REQUEST['last_msg'] : 0,
 			'topic' => !empty($topic) ? $topic : 0,
 			'board' => !empty($board) ? $board : 0,
 		);
-	}
 
 	// If we have an initial error, lets just display it.
 	if (!empty($initial_error))
@@ -533,68 +531,6 @@ function processAttachments($id_msg = null)
 	//   errors => An array of errors (use the index of the $txt variable for that error).
 	// Template changes can be done using "integrate_upload_template".
 	call_integration_hook('integrate_attachment_upload');
-}
-
-/**
- * Wrapper function needed until a better structure is worked out.
- *
- * @package Attachments
- * @param int $msg
- * @param int $user_id
- * @param mixed[] $attachment
- * @param bool|int $postmod_active
- * @param int $board
- * @param int $topic
- */
-function prepareCreatingAttachment($msg, $user_id, $attachment, $postmod_active, $board, $topic, $attach_source)
-{
-	// Load the attachmentOptions array with the data needed to create an attachment
-	$attachmentOptions = array(
-		'post' => $msg,
-		'poster' => $user_id,
-		'name' => $attachment['name'],
-		'tmp_name' => $attachment['tmp_name'],
-		'size' => isset($attachment['size']) ? $attachment['size'] : 0,
-		'mime_type' => isset($attachment['type']) ? $attachment['type'] : '',
-		'id_folder' => isset($attachment['id_folder']) ? $attachment['id_folder'] : 0,
-		'approved' => !$postmod_active || allowedTo('post_attachment'),
-		'errors' => array(),
-		'attach_source' => $attach_source,
-	);
-
-	if (createAttachment($attachmentOptions))
-	{
-		// If drafts are disabled or if a draft doesn't exist yet, remember what we have
-		if (empty($msg))
-		{
-			if (!isset($_SESSION['pending_attachments']))
-			{
-				$_SESSION['pending_attachments'] = array();
-			}
-
-			$_SESSION['pending_attachments'][$attachmentOptions['id']] = array(
-				'id_attach' => $attachmentOptions['id'],
-				'msg' => $msg,
-				'board' => $board,
-				'topic' => $topic,
-				'name' => $attachmentOptions['name'],
-				'size' => $attachmentOptions['size'],
-			);
-
-			if (!empty($attachmentOptions['thumb']))
-			{
-				$_SESSION['pending_attachments'][$attachmentOptions['id']]['id_thumb'] = $attachmentOptions['thumb'];
-			}
-		}
-
-		return array(
-			'id' => $attachmentOptions['id'],
-			'thumb' => !empty($attachmentOptions['thumb']) ? $attachmentOptions['thumb'] : 0,
-			'id_msg' => $msg,
-			'attach_source' => $attach_source,
-		);
-	}
-	return false;
 }
 
 /**
@@ -963,18 +899,14 @@ function createAttachment(&$attachmentOptions)
 	$db->insert('',
 		'{db_prefix}attachments',
 		array(
-			'id_folder' => 'int', 'id_msg' => 'int', 'filename' => 'string-255',
-			'file_hash' => 'string-40', 'fileext' => 'string-8',
+			'id_folder' => 'int', 'id_msg' => 'int', 'filename' => 'string-255', 'file_hash' => 'string-40', 'fileext' => 'string-8',
 			'size' => 'int', 'width' => 'int', 'height' => 'int',
 			'mime_type' => 'string-20', 'approved' => 'int',
-			'attach_source' => 'int',
 		),
 		array(
-			(int) $attachmentOptions['id_folder'], (int) $attachmentOptions['post'], $attachmentOptions['name'],
-			$attachmentOptions['file_hash'], $attachmentOptions['fileext'],
+			(int) $attachmentOptions['id_folder'], (int) $attachmentOptions['post'], $attachmentOptions['name'], $attachmentOptions['file_hash'], $attachmentOptions['fileext'],
 			(int) $attachmentOptions['size'], (empty($attachmentOptions['width']) ? 0 : (int) $attachmentOptions['width']), (empty($attachmentOptions['height']) ? '0' : (int) $attachmentOptions['height']),
 			(!empty($attachmentOptions['mime_type']) ? $attachmentOptions['mime_type'] : ''), (int) $attachmentOptions['approved'],
-			(int) $attachmentOptions['attach_source'],
 		),
 		array('id_attach')
 	);
@@ -990,7 +922,6 @@ function createAttachment(&$attachmentOptions)
 
 	// If it's not approved then add to the approval queue.
 	if (!$attachmentOptions['approved'])
-	{
 		$db->insert('',
 			'{db_prefix}approval_queue',
 			array(
@@ -1001,7 +932,6 @@ function createAttachment(&$attachmentOptions)
 			),
 			array()
 		);
-	}
 
 	if (empty($modSettings['attachmentThumbnails']) || (empty($attachmentOptions['width']) && empty($attachmentOptions['height'])))
 		return true;
@@ -1058,16 +988,12 @@ function createAttachment(&$attachmentOptions)
 			$db->insert('',
 				'{db_prefix}attachments',
 				array(
-					'id_folder' => 'int', 'id_msg' => 'int', 'attachment_type' => 'int',
-					'filename' => 'string-255', 'file_hash' => 'string-40',
-					'fileext' => 'string-8', 'size' => 'int', 'width' => 'int',
-					'height' => 'int', 'mime_type' => 'string-20', 'approved' => 'int',
-					'attach_source' => 'int',
+					'id_folder' => 'int', 'id_msg' => 'int', 'attachment_type' => 'int', 'filename' => 'string-255', 'file_hash' => 'string-40', 'fileext' => 'string-8',
+					'size' => 'int', 'width' => 'int', 'height' => 'int', 'mime_type' => 'string-20', 'approved' => 'int',
 				),
 				array(
 					$modSettings['currentAttachmentUploadDir'], (int) $attachmentOptions['post'], 3, $thumb_filename, $thumb_file_hash, $attachmentOptions['fileext'],
 					$thumb_size, $thumb_width, $thumb_height, $thumb_mime, (int) $attachmentOptions['approved'],
-					(int) $attachmentOptions['attach_source']
 				),
 				array('id_attach')
 			);
@@ -1146,29 +1072,22 @@ function getAvatar($id_attach)
  * @package Attachments
  * @param int $id_attach
  * @param int $id_topic
- * @param int $attach_source
- * @param int $owner
  */
-function getAttachmentFromTopic($id_attach, $id_topic, $attach_source = 0, $owner = 0)
+function getAttachmentFromTopic($id_attach, $id_topic)
 {
 	$db = database();
 
 	// Make sure this attachment is on this board.
 	$request = $db->query('', '
-		SELECT a.id_folder, a.filename, a.file_hash, a.fileext, a.id_attach,
-			a.attachment_type, a.mime_type, a.approved, m.id_member
-		FROM {db_prefix}attachments AS a' . ($attach_source === 0 ? '
+		SELECT a.id_folder, a.filename, a.file_hash, a.fileext, a.id_attach, a.attachment_type, a.mime_type, a.approved, m.id_member
+		FROM {db_prefix}attachments AS a
 			INNER JOIN {db_prefix}messages AS m ON (m.id_msg = a.id_msg AND m.id_topic = {int:current_topic})
-			INNER JOIN {db_prefix}boards AS b ON (b.id_board = m.id_board AND {query_see_board})' : '
-			INNER JOIN {db_prefix}user_drafts AS m ON (m.id_draft = a.id_msg AND m.id_member = {int:owner})') . '
+			INNER JOIN {db_prefix}boards AS b ON (b.id_board = m.id_board AND {query_see_board})
 		WHERE a.id_attach = {int:attach}
-			AND a.attach_source = {int:attach_source}
 		LIMIT 1',
 		array(
 			'attach' => $id_attach,
-			'attach_source' => (int) $attach_source,
 			'current_topic' => $id_topic,
-			'owner' => $owner,
 		)
 	);
 
@@ -1191,10 +1110,8 @@ function getAttachmentFromTopic($id_attach, $id_topic, $attach_source = 0, $owne
  * @package Attachments
  * @param int $id_attach
  * @param int $id_topic
- * @param int $attach_source
- * @param int $owner
  */
-function getAttachmentThumbFromTopic($id_attach, $id_topic, $attach_source = 0, $owner = 0)
+function getAttachmentThumbFromTopic($id_attach, $id_topic)
 {
 	$db = database();
 
@@ -1202,18 +1119,14 @@ function getAttachmentThumbFromTopic($id_attach, $id_topic, $attach_source = 0, 
 	$request = $db->query('', '
 		SELECT th.id_folder, th.filename, th.file_hash, th.fileext, th.id_attach,
 			th.attachment_type, th.mime_type, a.approved, m.id_member
-		FROM {db_prefix}attachments AS a' . ($attach_source === 0 ? '
+		FROM {db_prefix}attachments AS a
 			INNER JOIN {db_prefix}messages AS m ON (m.id_msg = a.id_msg AND m.id_topic = {int:current_topic})
-			INNER JOIN {db_prefix}boards AS b ON (b.id_board = m.id_board AND {query_see_board})' : '
-			INNER JOIN {db_prefix}user_drafts AS m ON (m.id_draft = a.id_msg AND m.id_member = {int:owner})') . '
+			INNER JOIN {db_prefix}boards AS b ON (b.id_board = m.id_board AND {query_see_board})
 			LEFT JOIN {db_prefix}attachments AS th ON (th.id_attach = a.id_thumb)
-		WHERE a.id_attach = {int:attach}
-			AND a.attach_source = {int:attach_source}',
+		WHERE a.id_attach = {int:attach}',
 		array(
 			'attach' => $id_attach,
-			'attach_source' => (int) $attach_source,
 			'current_topic' => $id_topic,
-			'owner' => $owner,
 		)
 	);
 
@@ -1223,43 +1136,6 @@ function getAttachmentThumbFromTopic($id_attach, $id_topic, $attach_source = 0, 
 	$db->free_result($request);
 
 	return $attachmentData;
-}
-
-/**
- * Fetches information on the message (id, topic id, board id) based on the
- * attachment id passed.
- * Uses {query_see_board} to determine if the user can actually see the
- * attachment.
- *
- * @package Attachments
- * @param int $id_attach
- * @param int $attach_source
- */
-function getMessageDataFromAttachment($id_attach, $attach_source)
-{
-	$db = database();
-
-	// Make sure this attachment is on this board.
-	$request = $db->query('', '
-		SELECT a.id_msg, b.id_board, t.id_topic
-		FROM {db_prefix}attachments AS a
-			LEFT JOIN {db_prefix}messages AS m ON (m.id_msg = a.id_msg)
-			LEFT JOIN {db_prefix}topics AS t ON (t.id_topic = m.id_topic)
-			LEFT JOIN {db_prefix}boards AS b ON (b.id_board = m.id_board AND {query_see_board})
-		WHERE a.id_attach = {int:attach}
-			AND a.attach_source = {int:attach_source}',
-		array(
-			'attach' => $id_attach,
-			'attach_source' => $attach_source,
-		)
-	);
-
-	$msgData = array();
-	if ($db->num_rows($request) != 0)
-		$msgData = $db->fetch_assoc($request);
-	$db->free_result($request);
-
-	return new ElkArte\ValuesContainer($msgData);
 }
 
 /**
@@ -1573,7 +1449,7 @@ function getAvatarPathID()
  * @param string|null $filter name of a callback function
  * @param mixed[] $all_posters
  */
-function getAttachments($messages, $includeUnapproved = false, $filter = null, $all_posters = array(), $attach_source = false)
+function getAttachments($messages, $includeUnapproved = false, $filter = null, $all_posters = array())
 {
 	global $modSettings;
 
@@ -1582,19 +1458,16 @@ function getAttachments($messages, $includeUnapproved = false, $filter = null, $
 	$attachments = array();
 	$request = $db->query('', '
 		SELECT
-			a.id_attach, a.id_folder, a.id_msg, a.filename, a.file_hash,
-			IFNULL(a.size, 0) AS filesize, a.downloads, a.approved,
+			a.id_attach, a.id_folder, a.id_msg, a.filename, a.file_hash, IFNULL(a.size, 0) AS filesize, a.downloads, a.approved,
 			a.width, a.height' . (empty($modSettings['attachmentShowImages']) || empty($modSettings['attachmentThumbnails']) ? '' : ',
 			IFNULL(thumb.id_attach, 0) AS id_thumb, thumb.width AS thumb_width, thumb.height AS thumb_height') . '
 			FROM {db_prefix}attachments AS a' . (empty($modSettings['attachmentShowImages']) || empty($modSettings['attachmentThumbnails']) ? '' : '
 			LEFT JOIN {db_prefix}attachments AS thumb ON (thumb.id_attach = a.id_thumb)') . '
 		WHERE a.id_msg IN ({array_int:message_list})
-			AND a.attachment_type = {int:attachment_type}
-			AND a.attach_source = {int:attach_source}',
+			AND a.attachment_type = {int:attachment_type}',
 		array(
 			'message_list' => $messages,
 			'attachment_type' => 0,
-			'attach_source' => !empty($attach_source) ? (int) $attach_source : 0,
 		)
 	);
 	$temp = array();
@@ -2068,48 +1941,6 @@ function bindMessageAttachments($id_msg, $attachment_ids)
 }
 
 /**
- * Re-binds a set of attachments belonging to a draft to a message instead.
- *
- * @package Attachments
- * @param int $id_msg
- * @param int[] $attachment_ids
- */
-function bindAttachmentsTo($id_msg, $attachment_ids, $attach_source_from, $attach_source_to = 0)
-{
-	$db = database();
-
-	$db->query('', '
-		UPDATE {db_prefix}attachments
-		SET
-			id_msg = {int:id_msg},
-			attach_source = {int:attach_source_to}
-		WHERE id_attach IN ({array_int:attachment_list})
-			AND attach_source = {int:attach_source_from}',
-		array(
-			'attachment_list' => $attachment_ids,
-			'id_msg' => $id_msg,
-			'attach_source_from' => $attach_source_from,
-			'attach_source_to' => $attach_source_to,
-		)
-	);
-}
-
-function getAttachmentsFromMsg($id_draft, $attach_source = 0, $details = false)
-{
-	$db = database();
-
-	return $db->fetchQuery('
-		SELECT id_attach' . ($details === true ? ', id_thumb' : '') . '
-		FROM {db_prefix}attachments
-		WHERE id_msg = {int:id_draft}
-			AND attach_source = {int:attach_source}',
-		array(
-			'id_draft' => $id_draft,
-			'attach_source' => $attach_source,
-		)
-	);
-}
-/**
  * Get an attachment's encrypted filename. If $new is true, won't check for file existence.
  *
  * - If new is set returns a hash for the db
@@ -2152,4 +1983,42 @@ function getAttachmentFilename($filename, $attachment_id, $dir = null, $new = fa
 		$path = $modSettings['attachmentUploadDir'];
 
 	return $path . '/' . $attachment_id . '_' . $file_hash . '.elk';
+}
+
+/**
+ * Returns the board and the topic the attachment belongs to.
+ *
+ * @package Attachments
+ * @param int $id_attach
+ * @return int[]|boolean on fail else an array of id_board, id_topic
+ */
+function getAttachmentPosition($id_attach)
+{
+	$db = database();
+
+	// Make sure this attachment is on this board.
+	$request = $db->query('', '
+		SELECT m.id_board, m.id_topic
+		FROM {db_prefix}attachments AS a
+			LEFT JOIN {db_prefix}messages AS m ON (m.id_msg = a.id_msg)
+			LEFT JOIN {db_prefix}boards AS b ON (b.id_board = m.id_board)
+		WHERE a.id_attach = {int:attach}
+			AND {query_see_board}
+		LIMIT 1',
+		array(
+			'attach' => $id_attach,
+		)
+	);
+
+	$attachmentData = $db->fetch_assoc($request);
+	$db->free_result($request);
+
+	if (empty($attachmentData))
+	{
+		return false;
+	}
+	else
+	{
+		return $attachmentData;
+	}
 }

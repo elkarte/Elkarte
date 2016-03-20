@@ -479,7 +479,7 @@ function saveDraft($draft, $check_last_save = false, $id_topic = 0)
 			$post_errors->addError('draft_not_saved');
 	}
 
-	return $id_draft;
+	return;
 }
 
 /**

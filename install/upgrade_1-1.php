@@ -458,7 +458,7 @@ class UpgradeInstructions_upgrade_1_1
 				'debug_title' => 'Converting IP columns to varchar instead of int...',
 				'function' => function($db, $db_table)
 				{
-					$columns = $db_table->db_remove_index('{db_prefix}log_online', true);
+					$columns = $db_table->db_list_columns('{db_prefix}log_online', true);
 
 					$column_name = 'ip';
 
@@ -481,27 +481,6 @@ class UpgradeInstructions_upgrade_1_1
 							'default' => ''
 						)
 					);
-				}
-			)
-		);
-	}
-
-	public function expand_attachments_title()
-	{
-		return 'Expand the attachments table...';
-	}
-
-	public function expand_attachments()
-	{
-		$columns = $this->table->db_list_columns('{db_prefix}attachments', true);
-
-		return array(
-			array(
-				'debug_title' => 'Remove the id_msg no more necessary KEY and replace it with attach_source...',
-				'function' => function($db, $db_table)
-				{
-					$db_table->db_remove_index('{db_prefix}attachments', 'id_msg');
-					$db_table->db_add_index('{db_prefix}attachments', array('name' => 'attach_source', 'columns' => array('id_msg', 'attach_source'), 'type' => 'key'));
 				}
 			)
 		);

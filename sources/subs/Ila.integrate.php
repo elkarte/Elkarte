@@ -82,13 +82,6 @@ class Ila_Integrate
 			))
 		);
 
-		addJavascriptVar(array(
-			'current_message' => empty($_REQUEST['msg']) ? 'null' : (int) $_REQUEST['msg'],
-			'ilaAttach' => '""',
-			'ilaElem' => 'null',
-			'ila' => '0',
-		));
-
 		return;
 	}
 
@@ -110,9 +103,6 @@ class Ila_Integrate
 		// Enabled and we have ila tags, then hide them from parsebbc where appropriate
 		if (empty($parse_tags) && empty($context['uninstalling']) && stripos($message, '[attach') !== false)
 		{
-			if (!isset($context['attach_source']))
-				$context['attach_source'] = 0;
-
 			if (!empty($_REQUEST['id_draft']))
 			{
 				// Previewing a draft
@@ -124,7 +114,7 @@ class Ila_Integrate
 				$msg_id = empty($cache_id) ? (isset($_REQUEST['msg']) ? (int) $_REQUEST['msg'] : -1) : preg_replace('~[^\d]~', '', $cache_id);
 			}
 
-			$ila_parser = new In_Line_Attachment($message, $msg_id, $context['attach_source']);
+			$ila_parser = new In_Line_Attachment($message, $msg_id);
 			$message = $ila_parser->hide_bbc();
 		}
 	}
@@ -146,9 +136,6 @@ class Ila_Integrate
 		// Enabled and we have tags, time to render them
 		if (empty($context['uninstalling']) && stripos($message, '[attach') !== false)
 		{
-			if (!isset($context['attach_source']))
-				$context['attach_source'] = 0;
-
 			if (!empty($_REQUEST['id_draft']))
 			{
 				// Previewing a draft
@@ -160,8 +147,8 @@ class Ila_Integrate
 				$msg_id = isset($_REQUEST['msg']) ? (int) $_REQUEST['msg'] : -1;
 			}
 
-			$ila_parser = new In_Line_Attachment($message, $msg_id, $context['attach_source']);
-			$message = $ila_parser->parse_bbc();
+			$ila_parser = new In_Line_Attachment($message, $cache_id);
+			$message = $ila_parser->ila_parse_bbc();
 		}
 	}
 
