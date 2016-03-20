@@ -406,6 +406,7 @@ function loadForumTests()
 				if ($row['my_num_replies'] == $row['num_replies'])
 					return false;
 
+				require_once(SUBSDIR . '/Topic.subs.php');
 				setTopicAttribute($row['id_topic'], array(
 					'num_replies' => $row['my_num_replies'],
 				));
