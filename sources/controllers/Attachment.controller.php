@@ -240,6 +240,7 @@ class Attachment_Controller extends Action_Controller
 			}
 			else
 			{
+				$this->_req->query->image = true;
 				$attachment = getAttachmentThumbFromTopic($id_attach, $id_topic);
 
 				// 1 is the file name, no file name, no thumbnail, no image.
@@ -247,17 +248,17 @@ class Attachment_Controller extends Action_Controller
 				{
 					$full_attach = getAttachmentFromTopic($id_attach, $id_topic);
 					$attachment[1] = $full_attach[1];
-					$attachment[3] = $full_attach[3];
 					$attachment[4] = 0;
 					$attachment[5] = 0;
 
 					$finfo = finfo_open(FILEINFO_MIME_TYPE); // return mime type ala mimetype extension
 
-					if (in_array($attachment[3], array(
+					if (in_array($full_attach[3], array(
 						'c', 'cpp', 'css', 'csv', 'doc', 'docx', 'flv', 'html', 'htm', 'java', 'js', 'log', 'mp3',
 						'mp4', 'mgp', 'pdf', 'php', 'ppt', 'rtf', 'sql', 'tgz', 'txt', 'wav', 'xls', 'xml', 'zip'
 					)))
 					{
+						$attachment[3] = 'png';
 						$attachment[6] = 'image/png';
 
 						// Show the mine thumbnail if it exists or just the default
@@ -267,6 +268,7 @@ class Attachment_Controller extends Action_Controller
 					}
 					elseif (substr(finfo_file($finfo, $filename), 0, 5) !== 'image')
 					{
+						$attachment[3] = 'png';
 						$attachment[6] = 'image/png';
 						$filename = $settings['theme_dir'] . '/images/mime_images/default.png';
 					}
