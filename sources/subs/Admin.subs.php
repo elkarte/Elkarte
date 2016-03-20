@@ -250,6 +250,10 @@ function getFileVersions(&$versionOptions)
 			{
 				if (substr($entry, -4) == '.php' && $entry != 'index.php' && !is_dir($this_lang_path . '/' . $entry))
 				{
+					if (!is_writable($this_lang_path . '/' . $entry))
+					{
+						continue;
+					}
 					// Read the first 768 bytes from the file.... enough for the header.
 					$header = file_get_contents($this_lang_path . '/' . $entry, false, null, 0, 768);
 
@@ -310,6 +314,10 @@ function readFileVersions(&$version_info, $directories, $pattern)
 		{
 			if (substr($entry, $ext_offset) == $pattern && !is_dir($dirname . '/' . $entry))
 			{
+				if (!is_writable($dirname . '/' . $entry))
+				{
+					continue;
+				}
 				// Read the first 768 bytes from the file.... enough for the header.
 				$header = file_get_contents($dirname . '/' . $entry, false, null, 0, 768);
 

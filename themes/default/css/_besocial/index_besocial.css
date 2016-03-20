@@ -390,6 +390,19 @@ strong {
 	color: #377828;
 	text-decoration: none;
 }
+/* Styling for tables inside posts */
+.inner > .bbc_table_container > .bbc_table td {
+	border-bottom: 1px solid #ccc;
+	border-right: 1px solid #ccc;
+}
+.inner > .bbc_table_container > .bbc_table th {
+	border-bottom: 1px solid #bbb;
+	border-right: 1px solid #ccc;
+}
+.inner > .bbc_table_container > .bbc_table td:last-child,
+.inner > .bbc_table_container > .bbc_table th:last-child  {
+	border-right: none;
+}
 
 /* /me uses this a lot. (emote, try typing /me in a post.) */
 .meaction {

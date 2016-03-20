@@ -56,6 +56,12 @@ $txt['mod_hooks'] = 'No source edits';
 $txt['mod_date'] = 'Last updated';
 $txt['mod_section_count'] = 'Browse the (%1d) addons in this section';
 
+// Package Server strings
+$txt['package_current'] = '(%s <em>You have the Current version %s</em>)';
+$txt['package_update'] = '(%s <em>An update for your %s version is available</em>)';
+$txt['package_installed'] = 'installed';
+$txt['package_downloaded'] = 'downloaded';
+
 $txt['package_installed_key'] = 'Installed addons:';
 $txt['package_installed_current'] = 'current version';
 $txt['package_installed_old'] = 'older version';

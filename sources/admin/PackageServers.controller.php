@@ -188,18 +188,19 @@ class PackageServers_Controller extends Action_Controller
 				{
 					// Read in the package info from the fetched data
 					$package = $this->_load_package_json($thisPackage, $packageSection);
+					$package['possible_ids'] = $package['id'];
 
 					// Check the install status
 					$package['can_install'] = false;
-					$is_installed = array_intersect(array_keys($installed_adds), $package['id']);
+					$is_installed = array_intersect(array_keys($installed_adds), $package['possible_ids']);
 					$package['is_installed'] = !empty($is_installed);
 
 					// Set the ID from our potential list should the ID not be provided in the package .yaml
 					$package['id'] = $package['is_installed'] ? array_shift($is_installed) : $package['id'][0];
 
 					// Version installed vs version available
-					$package['is_current'] = !empty($package['is_installed']) && ($installed_adds[$package['id']] == $package['version']);
-					$package['is_newer'] = !empty($package['is_installed']) && ($installed_adds[$package['id']] > $package['version']);
+					$package['is_current'] = !empty($package['is_installed']) && compareVersions($installed_adds[$package['id']], $package['version']) == 0;
+					$package['is_newer'] = !empty($package['is_installed']) && compareVersions($package['version'], $installed_adds[$package['id']]) > 0;
 
 					// Set the package filename for downloading and pre-existence checking
 					$base_name = $this->_rename_master($package['server']['download']);
@@ -220,8 +221,16 @@ class PackageServers_Controller extends Action_Controller
 					$package['can_install'] = true;
 					// See if this filename already exists on the server
 					$already_exists = getPackageInfo($base_name);
-					$package['download_conflict'] = is_array($already_exists) && $already_exists['id'] == $package['id'] && $already_exists['version'] != $package['version'];
+					$package['download_conflict'] = is_array($already_exists) && in_array($already_exists['id'], $package['possible_ids']) && compareVersions($already_exists['version'], $package['version']) != 0;
 					$package['count'] = ++$packageNum;
+
+					// Maybe they have downloaded it but not installed it
+					$package['is_downloaded'] = !$package['is_installed'] && (is_array($already_exists) && in_array($already_exists['id'], $package['possible_ids']));
+					if ($package['is_downloaded'])
+					{
+						// Is the available package newer than whats been downloaded?
+						$package['is_newer'] = compareVersions($package['version'], $already_exists['version']) > 0;
+					}
 
 					// Build the download to server link
 					$server_att = $server != '' ? ';server=' . $server : '';
@@ -234,12 +243,28 @@ class PackageServers_Controller extends Action_Controller
 					$section_count++;
 				}
 
+				// Sort them naturally
+				usort($context['package_list'][$packageSection]['items'], array($this, 'package_sort'));
+
 				$context['package_list'][$packageSection]['text'] = sprintf($txt['mod_section_count'], $section_count);
 			}
 		}
 
 		// Good time to sort the categories, the packages inside each category will be by last modification date.
 		asort($context['package_list']);
+	}
+
+	/**
+	 * Case insensitive natural sort for packages
+	 *
+	 * @param array $a
+	 * @param array $b
+	 *
+	 * @return int
+	 */
+	public function package_sort($a, $b)
+	{
+		return strcasecmp($a['name'], $b['name']);
 	}
 
 	/**
@@ -301,6 +326,8 @@ class PackageServers_Controller extends Action_Controller
 			strtolower($thisPackage->author) . ':' . $none,
 			ucfirst($thisPackage->author) . ':' . $under,
 			ucfirst($thisPackage->author) . ':' . $none,
+			strtolower($thisPackage->author . ':' . $under),
+			strtolower($thisPackage->author . ':' . $none),
 		);
 	}
 
@@ -580,7 +607,7 @@ class PackageServers_Controller extends Action_Controller
 						continue;
 
 					// If it was already uploaded under another name don't upload it again.
-					if ($packageInfo['id'] == $context['package']['id'] && $packageInfo['version'] == $context['package']['version'])
+					if ($packageInfo['id'] == $context['package']['id'] && compareVersions($packageInfo['version'], $context['package']['version']) == 0)
 					{
 						@unlink($destination);
 						loadLanguage('Errors');

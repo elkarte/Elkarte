@@ -419,11 +419,9 @@ function loadBoard()
 
 	// Assume they are not a moderator.
 	$user_info['is_mod'] = false;
-	$context['user']['is_mod'] = &$user_info['is_mod'];
 	// @since 1.0.5 - is_mod takes into account only local (board) moderators,
 	// and not global moderators, is_moderator is meant to take into account both.
 	$user_info['is_moderator'] = false;
-	$context['user']['is_moderator'] = &$user_info['is_moderator'];
 
 	// Start the linktree off empty..
 	$context['linktree'] = array();
@@ -614,7 +612,6 @@ function loadBoard()
 	{
 		// Now check if the user is a moderator.
 		$user_info['is_mod'] = isset($board_info['moderators'][$user_info['id']]);
-		$user_info['is_moderator'] = $user_info['is_mod'] || allowedTo('moderate_board');
 
 		if (count(array_intersect($user_info['groups'], $board_info['groups'])) == 0 && !$user_info['is_admin'])
 			$board_info['error'] = 'access';
@@ -802,6 +799,7 @@ function loadPermissions()
 	// Load the mod cache so we can know what additional boards they should see, but no sense in doing it for guests
 	if (!$user_info['is_guest'])
 	{
+		$user_info['is_moderator'] = $user_info['is_mod'] || allowedTo('moderate_board');
 		if (!isset($_SESSION['mc']) || $_SESSION['mc']['time'] <= $modSettings['settings_updated'])
 		{
 			require_once(SUBSDIR . '/Auth.subs.php');
@@ -2431,7 +2429,7 @@ function determineAvatar($profile)
 	elseif (!empty($profile['avatar']) && $profile['avatar'] === 'gravatar')
 	{
 		// Gravatars URL.
-		$gravatar_url = '//www.gravatar.com/avatar/' . hash('md5', strtolower($profile['email_address'])) . ';s=' . $modSettings['avatar_max_height'] . (!empty($modSettings['gravatar_rating']) ? ('&amp;r=' . $modSettings['gravatar_rating']) : '');
+		$gravatar_url = '//www.gravatar.com/avatar/' . hash('md5', strtolower($profile['email_address'])) . '?s=' . $modSettings['avatar_max_height'] . (!empty($modSettings['gravatar_rating']) ? ('&amp;r=' . $modSettings['gravatar_rating']) : '');
 
 		$avatar = array(
 			'name' => $profile['avatar'],
@@ -2454,16 +2452,20 @@ function determineAvatar($profile)
 	elseif (!empty($modSettings['avatar_default']) && empty($profile['avatar']) && empty($profile['filename']))
 	{
 		// $settings not initialized? We can't do anything further..
-		if (empty($settings))
-			return array();
-
-		// Let's proceed with the default avatar.
-		$avatar = array(
-			'name' => '',
-			'image' => '<img class="avatar avatarresize" src="' . $settings['images_url'] . '/default_avatar.png" alt="" />',
-			'href' => $settings['images_url'] . '/default_avatar.png',
-			'url' => 'http://',
-		);
+		if (!empty($settings))
+		{
+			// Let's proceed with the default avatar.
+			$avatar = array(
+				'name' => '',
+				'image' => '<img class="avatar avatarresize" src="' . $settings['images_url'] . '/default_avatar.png" alt="" />',
+				'href' => $settings['images_url'] . '/default_avatar.png',
+				'url' => 'http://',
+			);
+		}
+		else
+		{
+			$avatar = array();
+		}
 	}
 	// finally ...
 	else
@@ -2475,9 +2477,9 @@ function determineAvatar($profile)
 		);
 
 	// Make sure there's a preview for gravatars available.
-	$avatar['gravatar_preview'] = '//www.gravatar.com/avatar/' . hash('md5', strtolower($profile['email_address'])) . ';s=' . $modSettings['avatar_max_height'] . (!empty($modSettings['gravatar_rating']) ? ('&amp;r=' . $modSettings['gravatar_rating']) : '');
+	$avatar['gravatar_preview'] = '//www.gravatar.com/avatar/' . hash('md5', strtolower($profile['email_address'])) . '?s=' . $modSettings['avatar_max_height'] . (!empty($modSettings['gravatar_rating']) ? ('&amp;r=' . $modSettings['gravatar_rating']) : '');
 
-	call_integration_hook('integrate_avatar', array(&$avatar));
+	call_integration_hook('integrate_avatar', array(&$avatar, $profile));
 
 	return $avatar;
 }

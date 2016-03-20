@@ -563,18 +563,24 @@ function registerMember(&$regOptions, $error_context = 'register')
 
 	$tokenizer = new Token_Hash();
 
+	// @since 1.0.7 - This is necessary because validateLoginPassword
+	// uses a pass-by-ref and would convert to hash $regOptions['password']
+	// making it impossible to send the reminder email and even integrate
+	// the registration
+	$password = $regOptions['password'];
+
 	// Some of these might be overwritten. (the lower ones that are in the arrays below.)
 	$regOptions['register_vars'] = array(
 		'member_name' => $regOptions['username'],
 		'email_address' => $regOptions['email'],
-		'passwd' => validateLoginPassword($regOptions['password'], '', $regOptions['username'], true),
+		'passwd' => validateLoginPassword($password, '', $regOptions['username'], true),
 		'password_salt' => $tokenizer->generate_hash(4),
 		'posts' => 0,
 		'date_registered' => !empty($regOptions['time']) ? $regOptions['time'] : time(),
 		'member_ip' => $regOptions['interface'] == 'admin' ? '127.0.0.1' : $regOptions['ip'],
 		'member_ip2' => $regOptions['interface'] == 'admin' ? '127.0.0.1' : $regOptions['ip2'],
 		'validation_code' => $validation_code,
-		'real_name' => $regOptions['username'],
+		'real_name' => !empty($regOptions['real_name']) ? $regOptions['real_name'] : $regOptions['username'],
 		'pm_email_notify' => 1,
 		'id_theme' => 0,
 		'id_post_group' => 4,
@@ -1918,7 +1924,9 @@ function approveMembers($conditions)
 	if ($query)
 	{
 		$data = retrieveMemberData($conditions);
-		$members_id = $data['members'];
+		$members_id = array();
+		foreach ($data['member_info'] as $member)
+			$members_id[] = $member['username'];
 	}
 	else
 	{

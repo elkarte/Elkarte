@@ -1350,6 +1350,7 @@ function reduceMailQueue($batch_size = false, $override_limit = false, $force_se
 		if ($use_sendmail)
 		{
 			$email['subject'] = strtr($email['subject'], array("\r" => '', "\n" => ''));
+			$email['body_fail'] = $email['body'];
 
 			if (!empty($modSettings['mail_strip_carriage']))
 			{

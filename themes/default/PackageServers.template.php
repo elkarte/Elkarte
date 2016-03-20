@@ -165,18 +165,45 @@ function template_package_list()
 
 			foreach ($packageSection['items'] as $id => $package)
 			{
-				echo '
-							<li>';
 				// 1. Some addon [ Download ].
 				echo '
-								<img id="ps_img_', $i, '_pkg_', $id, '" src="', $settings['images_url'], '/selected_open.png" alt="*" class="hide" />
-								<a id="ps_link_', $i, '_pkg_', $id, '" href="#">', $package['name'], '</a>',
-				$package['can_install'] ? ' <a class="linkbutton" href="' . $package['download']['href'] . '">' . $txt['download'] . '</a>' : '';
+						<li>
+							<img id="ps_img_', $i, '_pkg_', $id, '" src="', $settings['images_url'], '/selected_open.png" alt="*" class="hide" /> ';
 
-				// Mark as installed and current?
-				if ($package['is_installed'] && !$package['is_newer'])
+				// Installed but newer one is available
+				if ($package['is_installed'] && $package['is_newer'])
+				{
 					echo '
-								<img src="', $settings['images_url'], '/icons/package_', $package['is_current'] ? 'installed' : 'old', '.png" class="centericon package_img" alt="', $package['is_current'] ? $txt['package_installed_current'] : $txt['package_installed_old'], '" />';
+							<span class="package_id">', $package['name'], '</span>&nbsp;<a class="linkbutton" href="', $package['download']['href'], '">', $txt['download'], '</a>&nbsp;',
+					sprintf($txt['package_update'], '<i class="fa fa-exclamation-circle" title="' . $txt['package_installed_old'] . '"></i>', $txt['package_installed']);
+				}
+				// Installed but nothing newer is available
+				else if ($package['is_installed'])
+				{
+					echo '
+							<span class="package_id">', $package['name'], '</span>&nbsp;',
+					sprintf($txt['package_current'], '<i class="fa fa-check" title="' . $txt['package_installed_current'] . '"></i>', $txt['package_installed']);
+				}
+				// Downloaded, but there is a more recent version available
+				else if ($package['is_downloaded'] && $package['is_newer'])
+				{
+					echo '
+							<span class="package_id">', $package['name'], '</span>&nbsp;<a class="linkbutton" href="', $package['download']['href'], '">', $txt['download'], '</a>&nbsp;',
+					sprintf($txt['package_update'], '<i class="fa fa-minus-circle" title="' . $txt['package_installed_old'] . '"></i>', $txt['package_downloaded']);
+				}
+				// Downloaded, and its current
+				else if ($package['is_downloaded'])
+				{
+					echo '
+							<span class="package_id">', $package['name'], '</span>&nbsp;',
+					sprintf($txt['package_current'], '<i class="fa fa-plus-circle" title="' . $txt['package_installed_current'] . '"></i>', $txt['package_downloaded']);
+				}
+				// Not downloaded or installed
+				else
+				{
+					echo '
+							<span class="package_id">', $package['name'], '</span>&nbsp;<a class="linkbutton" href="', $package['download']['href'], '">', $txt['download'], '</a>';
+				}
 
 				echo '
 							<ul id="package_section_', $i, '_pkg_', $id, '" class="package_section">';
