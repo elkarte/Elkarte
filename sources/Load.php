@@ -103,6 +103,12 @@ function reloadSettings()
 	// Is post moderation alive and well?
 	$modSettings['postmod_active'] = isset($modSettings['admin_features']) ? in_array('pm', explode(',', $modSettings['admin_features'])) : true;
 
+	// @deprecated since 1.0.6 compatibility setting for migration
+	if (!isset($modSettings['avatar_max_height']))
+		$modSettings['avatar_max_height'] = $modSettings['avatar_max_height_external'];
+	if (!isset($modSettings['avatar_max_width']))
+		$modSettings['avatar_max_width'] = $modSettings['avatar_max_width_external'];
+
 	// Here to justify the name of this function. :P
 	// It should be added to the install and upgrade scripts.
 	// But since the convertors need to be updated also. This is easier.
@@ -1634,6 +1640,19 @@ function loadTheme($id_theme = 0, $initialize = true)
 			'atom' => $scripturl . '?action=.xml;type=atom;limit=' . (!empty($modSettings['xmlnews_limit']) ? $modSettings['xmlnews_limit'] : 5)
 		);
 
+	// Since it's nice to have avatars all of the same size, and in some cases the size detection may fail,
+	// let's add the css in any case
+	if (!empty($modSettings['avatar_max_width']) || !empty($modSettings['avatar_max_height']))
+	{
+		$context['html_headers'] .= '
+		<style>
+			.avatarresize {' . (!empty($modSettings['avatar_max_width']) ? '
+				max-width:' . $modSettings['avatar_max_width'] . 'px;' : '') . (!empty($modSettings['avatar_max_height']) ? '
+				max-height:' . $modSettings['avatar_max_height'] . 'px;' : '') . '
+			}
+		</style>';
+	}
+
 	// Default JS variables for use in every theme
 	addJavascriptVar(array(
 		'elk_theme_url' => JavaScriptEscape($settings['theme_url']),
@@ -2829,36 +2848,9 @@ function loadDatabase()
 function determineAvatar($profile)
 {
 	global $modSettings, $scripturl, $settings, $context;
-	static $added_once = false;
 
 	if (empty($profile))
 		return array();
-
-	// @todo compatibility setting for migration
-	if (!isset($modSettings['avatar_max_height']))
-		$modSettings['avatar_max_height'] = $modSettings['avatar_max_height_external'];
-	if (!isset($modSettings['avatar_max_width']))
-		$modSettings['avatar_max_width'] = $modSettings['avatar_max_width_external'];
-
-	// Since it's nice to have avatars all of the same size, and in some cases the size detection may fail,
-	// let's add the css in any case
-	if (!$added_once)
-	{
-		if (!isset($context['html_headers']))
-			$context['html_headers'] = '';
-
-		if (!empty($modSettings['avatar_max_width']) || !empty($modSettings['avatar_max_height']))
-		{
-			$context['html_headers'] .= '
-	<style>
-		.avatarresize {' . (!empty($modSettings['avatar_max_width']) ? '
-			max-width:' . $modSettings['avatar_max_width'] . 'px;' : '') . (!empty($modSettings['avatar_max_height']) ? '
-			max-height:' . $modSettings['avatar_max_height'] . 'px;' : '') . '
-		}
-	</style>';
-		}
-		$added_once = true;
-	}
 
 	$avatar_protocol = substr(strtolower($profile['avatar']), 0, 7);
 
