@@ -2553,6 +2553,7 @@ function obExit($header = null, $do_footer = null, $from_index = false, $from_fa
 		';xml',
 		';api',
 	);
+	call_integration_hook('integrate_invalid_old_url', array(&$invalid_old_url));
 	$make_old = true;
 	foreach ($invalid_old_url as $url)
 	{
