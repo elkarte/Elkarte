@@ -155,8 +155,31 @@
 				if (!videoID || !(videoID = videoID[1]))
 					return;
 
+				// There are two types of YouTube timestamped links
+				// http://youtu.be/lLOE3fBZcUU?t=1m37s when you click share underneath the video
+				// http://youtu.be/lLOE3fBZcUU?t=97 when you right click on a video and choose "Copy video URL at current time"
+				// For embedding, you need to use "?start=97" instead, so we have to convert t=1m37s to seconds while also supporting t=97
+				var startAt = path.match(/t=(?:([1-9]{1,2})h)?(?:([1-9]{1,2})m)?(?:([1-9]+)s?)/);
+				var startAtPar = '';
+				if (startAt)
+				{
+					var startAtSeconds = 0;
+
+					// Hours
+					if (typeof(startAt[1]) !== 'undefined')
+						startAtSeconds += parseInt(startAt[1]) * 3600;
+					// Minutes
+					if (typeof(startAt[2]) !== 'undefined')
+						startAtSeconds += parseInt(startAt[2]) * 60;
+					// Seconds
+					if (typeof(startAt[3]) !== 'undefined')
+						startAtSeconds += parseInt(startAt[3]);
+
+					startAtPar = '&start=' + startAtSeconds.toString();
+				}
+
 				var embedURL = '//youtube.com/embed/' + videoID,
-					tag = embedOrIMG(embed, a, '//img.youtube.com/vi/' + videoID + '/0.jpg', embedURL + '?amprel=0', embedURL + '?amprel=0&autoplay=1');
+					tag = embedOrIMG(embed, a, '//img.youtube.com/vi/' + videoID + '/0.jpg', embedURL + '?amprel=0', embedURL + '?amprel=0&autoplay=1' + startAtPar);
 
 				return [oSettings.youtube, tag];
 			},
