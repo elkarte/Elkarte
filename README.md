@@ -69,7 +69,7 @@ Browse the collections of Themes and Addons created by our [awesome community](h
 
 ## Contributing:
 
-* Troubleshoot issues you run into on the [ElkAte community forum](http://www.elkarte.net) so others can help & the developers can reference it later.
+* Troubleshoot issues you run into on the [ElkArte community forum](http://www.elkarte.net) so others can help & the developers can reference it later.
 * Have a new feature idea or improvement suggestion? Use the forum to discuss it.
 * File detailed issues on GitHub (what you did, and what the actual vs expected outcomes are).
 * Read the [Developer's Certificate of Origin](https://github.com/elkarte/Elkarte/blob/master/DCO.txt) if you want to send us code. It means you acknowledge that you can and do license your submissions under the license of the project.
