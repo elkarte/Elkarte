@@ -139,100 +139,90 @@
 
 		var domain_regex = /^[^:]*:\/\/(?:www\.)?([^\/]+)(\/.*)$/,
 			embed_html = '<div class="elk_video"><iframe width="640px" height="385px" style="max-width: 98%; max-height: auto;" src="{src}" frameborder="0" allowfullscreen></iframe></div>',
-			handlers = {
-			'youtube.com': function(path, a, embed) {
-				var videoID = path.match(/\bv[=/]([^&#?$]+)/i) || path.match(/#p\/(?:a\/)?[uf]\/\d+\/([^?$]+)/i);
-				if (!videoID || !(videoID = videoID[1]))
-					return;
+			handlers = {};
+		handlers['youtube.com'] = function(path, a, embed) {
+			var videoID = path.match(/\bv[=/]([^&#?$]+)/i) || path.match(/#p\/(?:a\/)?[uf]\/\d+\/([^?$]+)/i) || path.match(/([\w-]{11})/i);
+			if (!videoID || !(videoID = videoID[1]))
+				return;
 
-				var embedURL = '//youtube.com/embed/' + videoID,
-					tag = embedOrIMG(embed, a, '//img.youtube.com/vi/' + videoID + '/0.jpg', embedURL + '?amprel=0', embedURL + '?amprel=0&autoplay=1');
+			// There are two types of YouTube timestamped links
+			// http://youtu.be/lLOE3fBZcUU?t=1m37s when you click share underneath the video
+			// http://youtu.be/lLOE3fBZcUU?t=97 when you right click on a video and choose "Copy video URL at current time"
+			// For embedding, you need to use "?start=97" instead, so we have to convert t=1m37s to seconds while also supporting t=97
+			var startAt = path.match(/t=(?:([1-9]{1,2})h)?(?:([1-9]{1,2})m)?(?:([1-9]+)s?)/);
+			var startAtPar = '';
+			if (startAt)
+			{
+				var startAtSeconds = 0;
 
-				return [oSettings.youtube, tag];
-			},
-			'youtu.be': function(path, a, embed) {
-				var videoID = path.match(/([\w-]{11})/i);
-				if (!videoID || !(videoID = videoID[1]))
-					return;
+				// Hours
+				if (typeof(startAt[1]) !== 'undefined')
+					startAtSeconds += parseInt(startAt[1]) * 3600;
+				// Minutes
+				if (typeof(startAt[2]) !== 'undefined')
+					startAtSeconds += parseInt(startAt[2]) * 60;
+				// Seconds
+				if (typeof(startAt[3]) !== 'undefined')
+					startAtSeconds += parseInt(startAt[3]);
 
-				// There are two types of YouTube timestamped links
-				// http://youtu.be/lLOE3fBZcUU?t=1m37s when you click share underneath the video
-				// http://youtu.be/lLOE3fBZcUU?t=97 when you right click on a video and choose "Copy video URL at current time"
-				// For embedding, you need to use "?start=97" instead, so we have to convert t=1m37s to seconds while also supporting t=97
-				var startAt = path.match(/t=(?:([1-9]{1,2})h)?(?:([1-9]{1,2})m)?(?:([1-9]+)s?)/);
-				var startAtPar = '';
-				if (startAt)
-				{
-					var startAtSeconds = 0;
-
-					// Hours
-					if (typeof(startAt[1]) !== 'undefined')
-						startAtSeconds += parseInt(startAt[1]) * 3600;
-					// Minutes
-					if (typeof(startAt[2]) !== 'undefined')
-						startAtSeconds += parseInt(startAt[2]) * 60;
-					// Seconds
-					if (typeof(startAt[3]) !== 'undefined')
-						startAtSeconds += parseInt(startAt[3]);
-
-					startAtPar = '&start=' + startAtSeconds.toString();
-				}
-
-				var embedURL = '//youtube.com/embed/' + videoID,
-					tag = embedOrIMG(embed, a, '//img.youtube.com/vi/' + videoID + '/0.jpg', embedURL + '?amprel=0', embedURL + '?amprel=0&autoplay=1' + startAtPar);
-
-				return [oSettings.youtube, tag];
-			},
-			'vimeo.com': function(path, a, embed) {
-				var videoID = path.match(/^\/(\d+)/i);
-				if (!videoID || !(videoID = videoID[1]))
-					return;
-
-				var embedURL = '//player.vimeo.com/video/' + videoID,
-					tag = null,
-					img = '//assets.vimeo.com/images/logo_vimeo_land.png';
-
-				// Get the preview image or embed tag
-				if (!embed)
-				{
-					// We need to use a callback to get the thumbnail
-					getVimeoIMG(videoID, function(img) {
-						$(a).parent().next().find("img").attr("src", img);
-					});
-
-					// This is to show something while we wait for our callback to return
-					tag = embedOrIMG(embed, a, img, embedURL, embedURL + '?autoplay=1');
-				}
-				else
-					tag = embedOrIMG(embed, a, img, embedURL, embedURL + '?autoplay=1');
-
-				return [oSettings.vimeo, tag];
-			},
-			'dailymotion.com': function(path, a, embed) {
-				var videoID = path.match(/^\/(?:video|swf)\/([a-z0-9]{1,18})/i);
-				if (!videoID || !(videoID = videoID[1]))
-					return;
-
-				var embedURL = '//dailymotion.com/embed/video/' + videoID,
-					tag = null,
-					img = '//dailymotion.com/thumbnail/video/' + videoID;
-
-				// Get the preview image or embed tag
-				if (!embed)
-				{
-					// We use a callback to get the thumbnail we want
-					getDailymotionIMG(videoID, function(img) {
-						$(a).parent().next().find("img").attr("src", img);
-					});
-
-					// This is to show something while we wait for our callback to return
-					tag = embedOrIMG(embed, a, img, embedURL, embedURL + '?related=0&autoplay=1');
-				}
-				else
-					tag = embedOrIMG(embed, a, img, embedURL + '?related=0', embedURL + '?related=0&autoplay=1');
-
-				return [oSettings.dailymotion, tag];
+				startAtPar = '&start=' + startAtSeconds.toString();
 			}
+
+			var embedURL = '//youtube.com/embed/' + videoID,
+				tag = embedOrIMG(embed, a, '//img.youtube.com/vi/' + videoID + '/0.jpg', embedURL + '?amprel=0', embedURL + '?amprel=0&autoplay=1' + startAtPar);
+
+			return [oSettings.youtube, tag];
+		};
+		handlers['youtu.be'] = handlers['youtube.com'];
+		handlers['vimeo.com'] = function(path, a, embed) {
+			var videoID = path.match(/^\/(\d+)/i);
+			if (!videoID || !(videoID = videoID[1]))
+				return;
+
+			var embedURL = '//player.vimeo.com/video/' + videoID,
+				tag = null,
+				img = '//assets.vimeo.com/images/logo_vimeo_land.png';
+
+			// Get the preview image or embed tag
+			if (!embed)
+			{
+				// We need to use a callback to get the thumbnail
+				getVimeoIMG(videoID, function(img) {
+					$(a).parent().next().find("img").attr("src", img);
+				});
+
+				// This is to show something while we wait for our callback to return
+				tag = embedOrIMG(embed, a, img, embedURL, embedURL + '?autoplay=1');
+			}
+			else
+				tag = embedOrIMG(embed, a, img, embedURL, embedURL + '?autoplay=1');
+
+			return [oSettings.vimeo, tag];
+		};
+		handlers['dailymotion.com'] = function(path, a, embed) {
+			var videoID = path.match(/^\/(?:video|swf)\/([a-z0-9]{1,18})/i);
+			if (!videoID || !(videoID = videoID[1]))
+				return;
+
+			var embedURL = '//dailymotion.com/embed/video/' + videoID,
+				tag = null,
+				img = '//dailymotion.com/thumbnail/video/' + videoID;
+
+			// Get the preview image or embed tag
+			if (!embed)
+			{
+				// We use a callback to get the thumbnail we want
+				getDailymotionIMG(videoID, function(img) {
+					$(a).parent().next().find("img").attr("src", img);
+				});
+
+				// This is to show something while we wait for our callback to return
+				tag = embedOrIMG(embed, a, img, embedURL, embedURL + '?related=0&autoplay=1');
+			}
+			else
+				tag = embedOrIMG(embed, a, img, embedURL + '?related=0', embedURL + '?related=0&autoplay=1');
+
+			return [oSettings.dailymotion, tag];
 		};
 
 		// Get the links in the id="msg_1234 divs.
