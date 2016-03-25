@@ -236,6 +236,10 @@
 			var tag = links[i],
 				text = tag.innerText || tag.textContent || "";
 
+			// Ignore in sentences
+			if (tag.previousSibling && tag.previousSibling.nodeName === '#text')
+				continue;
+
 			// Ignore in quotes and signatures
 			if ("bbc_standard_quote;signature".indexOf(tag.parentNode.className) !== -1)
 				continue;
