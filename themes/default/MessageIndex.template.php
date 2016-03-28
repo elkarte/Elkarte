@@ -11,7 +11,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0.1
+ * @version 1.0.7
  *
  */
 
@@ -323,7 +323,7 @@ function template_topic_listing_below()
 
 	echo '
 	<div id="topic_icons" class="description">
-		<div class="floatright" id="message_index_jump_to">&nbsp;</div>';
+		<div class="qaction_row" id="message_index_jump_to">&nbsp;</div>';
 
 	if (!$context['no_topic_listing'])
 		template_basicicons_legend();

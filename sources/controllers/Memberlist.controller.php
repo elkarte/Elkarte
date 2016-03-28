@@ -14,7 +14,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:		BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0.5
+ * @version 1.0.7
  *
  */
 
@@ -463,11 +463,19 @@ class Memberlist_Controller extends Action_Controller
 				$curField = substr($field, 5);
 				if (substr($field, 0, 5) === 'cust_' && isset($context['custom_search_fields'][$curField]))
 				{
-					$customJoin[] = 'LEFT JOIN {db_prefix}custom_fields_data AS cfd' . $curField . ' ON (cfd' . $curField . '.variable = {string:cfd' . $curField . '} AND cfd' . $curField . '.id_member = mem.id_member)';
-					$query_parameters['cfd' . $curField] = $curField;
-					$fields += array($customCount++ => 'IFNULL(cfd' . $curField . '.value, {string:blank_string})');
+					$customJoin[] = 'LEFT JOIN {db_prefix}custom_fields_data AS cfd' . $field . ' ON (cfd' . $field . '.variable = {string:cfd' . $field . '} AND cfd' . $field . '.id_member = mem.id_member)';
+					$query_parameters['cfd' . $field] = $curField;
+					$fields += array($customCount++ => 'IFNULL(cfd' . $field . '.value, {string:blank_string})');
 					$validFields[] = $field;
 				}
+			}
+			$field = $_REQUEST['sort'];
+			$curField = substr($field, 5);
+			if (substr($field, 0, 5) === 'cust_' && isset($context['custom_search_fields'][$curField]))
+			{
+				$customJoin[] = 'LEFT JOIN {db_prefix}custom_fields_data AS cfd' . $field . ' ON (cfd' . $field . '.variable = {string:cfd' . $field . '} AND cfd' . $field . '.id_member = mem.id_member)';
+				$query_parameters['cfd' . $field] = $curField;
+				$validFields[] = $field;
 			}
 
 			if (empty($fields))
@@ -478,7 +486,7 @@ class Memberlist_Controller extends Action_Controller
 			$where = implode(' ' . $query . ' OR ', $fields) . ' ' . $query . $condition;
 
 			// Find the members from the database.
-			$numResults = ml_searchMembers($query_parameters, $customJoin, $where, $_REQUEST['start']);
+			$numResults = ml_searchMembers($query_parameters, array_unique($customJoin), $where, $_REQUEST['start']);
 			$context['page_index'] = constructPageIndex($scripturl . '?action=memberlist;sa=search;search=' . $search . ';fields=' . implode(',', $validFields), $_REQUEST['start'], $numResults, $modSettings['defaultMaxMembers']);
 		}
 		else

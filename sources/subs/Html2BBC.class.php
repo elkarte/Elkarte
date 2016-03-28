@@ -7,7 +7,7 @@
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
- * @version 1.0.2
+ * @version 1.0.7
  *
  */
 
@@ -318,6 +318,7 @@ class Html_2_BBC
 				break;
 			case 'div':
 				$bbc = $this->strip_newlines ? str_replace("\n", ' ', $this->_convert_styles($node)) : $this->_convert_styles($node);
+				$bbc = preg_replace('~ {2,}~', '&nbsp; ', $bbc);
 				break;
 			case 'em':
 			case 'i':

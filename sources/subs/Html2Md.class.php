@@ -7,7 +7,7 @@
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
- * @version 1.0.4
+ * @version 1.0.7
  *
  */
 
@@ -62,6 +62,18 @@ class Html_2_Md
 	private $_textEscapeRegex = array();
 
 	/**
+	 * The passed html string to convert
+	 * @var string
+	 */
+	public $html;
+
+	/**
+	 * The markdown equivalent to the  html string
+	 * @var string
+	 */
+	public $markdown;
+
+	/**
 	 * Gets everything started using the built in or external parser
 	 *
 	 * @param string $html string of html to convert to MD text
@@ -69,34 +81,18 @@ class Html_2_Md
 	public function __construct($html)
 	{
 		// Up front, remove whitespace between html tags
-		$html = preg_replace('/(?:(?<=\>)|(?<=\/\>))(\s+)(?=\<\/?)/', '', $html);
+		$this->html = preg_replace('/(?:(?<=\>)|(?<=\/\>))(\s+)(?=\<\/?)/', '', $html);
 
-		// The XML parser will not fix these for us
-		$html = strtr($html, array('?<' => '?&LT;', '?>' => '?&GT;') );
+		// The XML parser will not deal gracefully with these
+		$this->html = strtr($this->html, array(
+			'?<' => "|?|<",
+			'?>' => "|?|>",
+			'>?' => ">|?|",
+			'<?' => "&lt?"
+		));
 
-		// Using PHP built in functions ...
-		if (class_exists('DOMDocument'))
-		{
-			$this->_parser = true;
-			$previous = libxml_use_internal_errors(true);
-
-			// Set up basic parameters for DomDocument, including silencing structural errors
-			$this->doc = new DOMDocument();
-			$this->doc->preserveWhiteSpace = false;
-			$this->doc->encoding = 'UTF-8';
-			$this->doc->loadHTML('<?xml encoding="UTF-8">' . $html);
-
-			// Set the error handle back to what it was, and flush
-			libxml_use_internal_errors($previous);
-			libxml_clear_errors();
-		}
-		// Or using the external simple html parser
-		else
-		{
-			$this->_parser = false;
-			require_once(EXTDIR . '/simple_html_dom.php');
-			$this->doc = str_get_html($html, true, true, 'UTF-8', false);
-		}
+		// Set the dom parser to use and load the HTML to the parser
+		$this->_set_parser();
 
 		// Initialize the regex array to escape text areas so markdown does
 		// not interpret plain text as markdown syntax
@@ -118,6 +114,36 @@ class Html_2_Md
 	}
 
 	/**
+	 * Set the DOM parser for class, loads the supplied HTML
+	 */
+	private function _set_parser()
+	{
+		// Using PHP built in functions ...
+		if (class_exists('DOMDocument'))
+		{
+			$this->_parser = true;
+			$previous = libxml_use_internal_errors(true);
+
+			// Set up basic parameters for DomDocument, including silencing structural errors
+			$this->doc = new DOMDocument();
+			$this->doc->preserveWhiteSpace = false;
+			$this->doc->encoding = 'UTF-8';
+			$this->doc->loadHTML('<?xml encoding="UTF-8">' . $this->html);
+
+			// Set the error handle back to what it was, and flush
+			libxml_use_internal_errors($previous);
+			libxml_clear_errors();
+		}
+		// Or using the external simple html parser
+		else
+		{
+			$this->_parser = false;
+			require_once(EXTDIR . '/simple_html_dom.php');
+			$this->doc = str_get_html($this->html, true, true, 'UTF-8', false);
+		}
+	}
+
+	/**
 	 * Loads the html body and sends it to the parsing loop to convert all
 	 * DOM nodes to markup
 	 */
@@ -132,36 +158,54 @@ class Html_2_Md
 		$this->_convert_childNodes($body);
 
 		// Done replacing HTML elements, now get the converted DOM tree back into a string
-		$markdown = ($this->_parser) ? $this->doc->saveHTML() : $this->doc->save();
+		$this->markdown = ($this->_parser) ? $this->doc->saveHTML() : $this->doc->save();
 
+		// Using the internal DOM methods requires we need to do a little extra work
 		if ($this->_parser)
 		{
-			// Using the internal DOM methods we need to do a little extra work
-			$markdown = html_entity_decode(htmlspecialchars_decode($markdown, ENT_QUOTES), ENT_QUOTES, 'UTF-8');
-			if (preg_match('~<body>(.*)</body>~s', $markdown, $body))
-				$markdown = $body[1];
-			elseif (preg_match('~<html>(.*)</html>~s', $markdown, $body))
-				$markdown = $body[1];
+			$this->markdown = html_entity_decode(htmlspecialchars_decode($this->markdown, ENT_QUOTES), ENT_QUOTES, 'UTF-8');
+
+			if (preg_match('~<body>(.*)</body>~s', $this->markdown, $body))
+				$this->markdown = $body[1];
+			elseif (preg_match('~<html>(.*)</html>~s', $this->markdown, $body))
+				$this->markdown = $body[1];
 		}
 
-		// Remove non breakable spaces that may be hiding in here
-		$markdown = str_replace("\xC2\xA0\x20", ' ', $markdown);
-		$markdown = str_replace("\xC2\xA0", ' ', $markdown);
-
-		// Remove any "bonus" tags
-		if ($this->strip_tags)
-			$markdown = strip_tags($markdown);
-
-		// Strip the chaff and any excess blank lines we may have produced
-		$markdown = trim($markdown);
-		$markdown = preg_replace("~(\n(\s)?){3,}~", "\n\n", $markdown);
-		$markdown = preg_replace("~(^\s\s\n){3,}~", "  \n  \n", $markdown);
+		// Clean up any excess spacing etc
+		$this->_clean_markdown();
 
 		// Wordwrap?
 		if (!empty($this->body_width))
-			$markdown = $this->_utf8_wordwrap($markdown, $this->body_width, $this->line_end);
+			$this->markdown = $this->_utf8_wordwrap($this->markdown, $this->body_width, $this->line_end);
 
-		return $markdown;
+		return $this->markdown;
+	}
+
+	/**
+	 * Normalize any spacing and excess blank lines that may have been generated
+	 */
+	private function _clean_markdown()
+	{
+		// Remove non breakable spaces that may be hiding in here
+		$this->markdown = str_replace("\xC2\xA0\x20", ' ', $this->markdown);
+		$this->markdown = str_replace("\xC2\xA0", ' ', $this->markdown);
+
+		// Remove any "bonus" tags
+		if ($this->strip_tags)
+			$this->markdown = strip_tags($this->markdown);
+
+		// Replace content that we "hide" from the XML parsers
+		$this->markdown = strtr($this->markdown, array(
+			"|?|" => '?',
+			"&lt?" => '<?'
+		));
+
+		// Strip the chaff and any excess blank lines we may have produced
+		$this->markdown = trim($this->markdown);
+		$this->markdown = preg_replace("~(\n(\s)?){3,}~", "\n\n", $this->markdown);
+		$this->markdown = preg_replace("~(^\s\s\n){3,}~m", "  \n  \n", $this->markdown);
+		$this->markdown = preg_replace("~(^\s\s\r?\n){3,}~m", "  \n  \n", $this->markdown);
+		$this->markdown = preg_replace("~(^\s\s(?:\r?\n){2}){3,}~m", "  \n  \n", $this->markdown);
 	}
 
 	/**
@@ -270,7 +314,8 @@ class Html_2_Md
 				$markdown = $this->_convert_blockquote($node);
 				break;
 			case 'br':
-				$markdown = '  ' . $this->line_end;
+				// DomDocument strips empty lines, this prevents that
+				$markdown = "\xC2\xA0\xC2\xA0" . $this->line_break;
 				break;
 			case 'center':
 				$markdown = $this->line_end . $this->_get_value($node) . $this->line_end;

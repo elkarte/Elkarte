@@ -13,7 +13,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:		BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0.6
+ * @version 1.0.7
  *
  */
 
@@ -2553,6 +2553,7 @@ function obExit($header = null, $do_footer = null, $from_index = false, $from_fa
 		';xml',
 		';api',
 	);
+	call_integration_hook('integrate_invalid_old_url', array(&$invalid_old_url));
 	$make_old = true;
 	foreach ($invalid_old_url as $url)
 	{

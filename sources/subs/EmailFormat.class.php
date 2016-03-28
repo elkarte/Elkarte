@@ -7,7 +7,7 @@
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
- * @version 1.0.2
+ * @version 1.0.7
  *
  */
 
@@ -233,7 +233,7 @@ class Email_Format
 			if ($this->_body_array[$i]['content'] == '')
 			{
 				if ((isset($this->_body_array[$i - 1])) && ($this->_body_array[$i - 1]['content'] !== "\n") && (substr($this->_body_array[$i - 1]['content'], 0, 1) !== '[') && ($this->_body_array[$i - 1]['length'] > $this->_maillist_short_line))
-					$this->_body_array[$i]['content'] = "\n";
+					$this->_body_array[$i]['content'] = "\n\n";
 			}
 			// Lists like a. a) 1. 1)
 			elseif ($this->_body_array[$i]['list_item'])

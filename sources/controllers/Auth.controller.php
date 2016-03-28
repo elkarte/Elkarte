@@ -14,7 +14,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:		BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0
+ * @version 1.0.7
  *
  */
 
@@ -552,6 +552,9 @@ class Auth_Controller extends Action_Controller
 
 			// APBoard 2 Login Method.
 			$other_passwords[] = md5(crypt($_POST['passwrd'], 'CRYPT_MD5'));
+
+			// Xenforo 1.2+
+			$other_passwords[] = crypt($_POST['passwrd'], $user_settings['passwd']);
 		}
 		// The hash should be 40 if it's SHA-1, so we're safe with more here too.
 		elseif (!empty($modSettings['enable_password_conversion']) && $pw_strlen === 32)

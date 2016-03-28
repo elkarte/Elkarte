@@ -13,7 +13,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:		BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0.5
+ * @version 1.0.7
  *
  */
 
@@ -102,6 +102,12 @@ function reloadSettings()
 
 	// Is post moderation alive and well?
 	$modSettings['postmod_active'] = isset($modSettings['admin_features']) ? in_array('pm', explode(',', $modSettings['admin_features'])) : true;
+
+	// @deprecated since 1.0.6 compatibility setting for migration
+	if (!isset($modSettings['avatar_max_height']))
+		$modSettings['avatar_max_height'] = $modSettings['avatar_max_height_external'];
+	if (!isset($modSettings['avatar_max_width']))
+		$modSettings['avatar_max_width'] = $modSettings['avatar_max_width_external'];
 
 	// Here to justify the name of this function. :P
 	// It should be added to the install and upgrade scripts.
@@ -415,11 +421,9 @@ function loadBoard()
 
 	// Assume they are not a moderator.
 	$user_info['is_mod'] = false;
-	$context['user']['is_mod'] = &$user_info['is_mod'];
 	// @since 1.0.5 - is_mod takes into account only local (board) moderators,
 	// and not global moderators, is_moderator is meant to take into account both.
 	$user_info['is_moderator'] = false;
-	$context['user']['is_moderator'] = &$user_info['is_moderator'];
 
 	// Start the linktree off empty..
 	$context['linktree'] = array();
@@ -609,7 +613,6 @@ function loadBoard()
 	{
 		// Now check if the user is a moderator.
 		$user_info['is_mod'] = isset($board_info['moderators'][$user_info['id']]);
-		$user_info['is_moderator'] = $user_info['is_mod'] || allowedTo('moderate_board');
 
 		if (count(array_intersect($user_info['groups'], $board_info['groups'])) == 0 && !$user_info['is_admin'])
 			$board_info['error'] = 'access';
@@ -791,6 +794,7 @@ function loadPermissions()
 	// Load the mod cache so we can know what additional boards they should see, but no sense in doing it for guests
 	if (!$user_info['is_guest'])
 	{
+		$user_info['is_moderator'] = $user_info['is_mod'] || allowedTo('moderate_board');
 		if (!isset($_SESSION['mc']) || $_SESSION['mc']['time'] <= $modSettings['settings_updated'])
 		{
 			require_once(SUBSDIR . '/Auth.subs.php');
@@ -1635,6 +1639,19 @@ function loadTheme($id_theme = 0, $initialize = true)
 			'rss' => $scripturl . '?action=.xml;type=rss2;limit=' . (!empty($modSettings['xmlnews_limit']) ? $modSettings['xmlnews_limit'] : 5),
 			'atom' => $scripturl . '?action=.xml;type=atom;limit=' . (!empty($modSettings['xmlnews_limit']) ? $modSettings['xmlnews_limit'] : 5)
 		);
+
+	// Since it's nice to have avatars all of the same size, and in some cases the size detection may fail,
+	// let's add the css in any case
+	if (!empty($modSettings['avatar_max_width']) || !empty($modSettings['avatar_max_height']))
+	{
+		$context['html_headers'] .= '
+		<style>
+			.avatarresize {' . (!empty($modSettings['avatar_max_width']) ? '
+				max-width:' . $modSettings['avatar_max_width'] . 'px;' : '') . (!empty($modSettings['avatar_max_height']) ? '
+				max-height:' . $modSettings['avatar_max_height'] . 'px;' : '') . '
+			}
+		</style>';
+	}
 
 	// Default JS variables for use in every theme
 	addJavascriptVar(array(
@@ -2831,36 +2848,9 @@ function loadDatabase()
 function determineAvatar($profile)
 {
 	global $modSettings, $scripturl, $settings, $context;
-	static $added_once = false;
 
 	if (empty($profile))
 		return array();
-
-	// @todo compatibility setting for migration
-	if (!isset($modSettings['avatar_max_height']))
-		$modSettings['avatar_max_height'] = $modSettings['avatar_max_height_external'];
-	if (!isset($modSettings['avatar_max_width']))
-		$modSettings['avatar_max_width'] = $modSettings['avatar_max_width_external'];
-
-	// Since it's nice to have avatars all of the same size, and in some cases the size detection may fail,
-	// let's add the css in any case
-	if (!$added_once)
-	{
-		if (!isset($context['html_headers']))
-			$context['html_headers'] = '';
-
-		if (!empty($modSettings['avatar_max_width']) || !empty($modSettings['avatar_max_height']))
-		{
-			$context['html_headers'] .= '
-	<style>
-		.avatarresize {' . (!empty($modSettings['avatar_max_width']) ? '
-			max-width:' . $modSettings['avatar_max_width'] . 'px;' : '') . (!empty($modSettings['avatar_max_height']) ? '
-			max-height:' . $modSettings['avatar_max_height'] . 'px;' : '') . '
-		}
-	</style>';
-		}
-		$added_once = true;
-	}
 
 	$avatar_protocol = substr(strtolower($profile['avatar']), 0, 7);
 
@@ -2891,7 +2881,7 @@ function determineAvatar($profile)
 	elseif (!empty($profile['avatar']) && $profile['avatar'] === 'gravatar')
 	{
 		// Gravatars URL.
-		$gravatar_url = '//www.gravatar.com/avatar/' . md5(strtolower($profile['email_address'])) . ';s=' . $modSettings['avatar_max_height'] . (!empty($modSettings['gravatar_rating']) ? ('&amp;r=' . $modSettings['gravatar_rating']) : '');
+		$gravatar_url = '//www.gravatar.com/avatar/' . md5(strtolower($profile['email_address'])) . '?s=' . $modSettings['avatar_max_height'] . (!empty($modSettings['gravatar_rating']) ? ('&amp;r=' . $modSettings['gravatar_rating']) : '');
 
 		$avatar = array(
 			'name' => $profile['avatar'],
@@ -2914,16 +2904,20 @@ function determineAvatar($profile)
 	elseif (!empty($modSettings['avatar_default']) && empty($profile['avatar']) && empty($profile['filename']))
 	{
 		// $settings not initialized? We can't do anything further..
-		if (empty($settings))
-			return array();
-
-		// Let's proceed with the default avatar.
-		$avatar = array(
-			'name' => '',
-			'image' => '<img class="avatar avatarresize" src="' . $settings['images_url'] . '/default_avatar.png" alt="" />',
-			'href' => $settings['images_url'] . '/default_avatar.png',
-			'url' => 'http://',
-		);
+		if (!empty($settings))
+		{
+			// Let's proceed with the default avatar.
+			$avatar = array(
+				'name' => '',
+				'image' => '<img class="avatar avatarresize" src="' . $settings['images_url'] . '/default_avatar.png" alt="" />',
+				'href' => $settings['images_url'] . '/default_avatar.png',
+				'url' => 'http://',
+			);
+		}
+		else
+		{
+			$avatar = array();
+		}
 	}
 	// finally ...
 	else
@@ -2935,9 +2929,9 @@ function determineAvatar($profile)
 		);
 
 	// Make sure there's a preview for gravatars available.
-	$avatar['gravatar_preview'] = '//www.gravatar.com/avatar/' . md5(strtolower($profile['email_address'])) . ';s=' . $modSettings['avatar_max_height'] . (!empty($modSettings['gravatar_rating']) ? ('&amp;r=' . $modSettings['gravatar_rating']) : '');
+	$avatar['gravatar_preview'] = '//www.gravatar.com/avatar/' . md5(strtolower($profile['email_address'])) . '?s=' . $modSettings['avatar_max_height'] . (!empty($modSettings['gravatar_rating']) ? ('&amp;r=' . $modSettings['gravatar_rating']) : '');
 
-	call_integration_hook('integrate_avatar', array(&$avatar));
+	call_integration_hook('integrate_avatar', array(&$avatar, $profile));
 
 	return $avatar;
 }

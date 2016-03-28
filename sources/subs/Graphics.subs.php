@@ -17,7 +17,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0.4
+ * @version 1.0.7
  *
  */
 
@@ -324,6 +324,13 @@ function resizeImage($src_img, $destName, $src_width, $src_height, $max_width, $
 			$src_height = empty($src_height) ? $imagick->getImageHeight() : $src_height;
 			$dest_width = empty($max_width) ? $src_width : $max_width;
 			$dest_height = empty($max_height) ? $src_height : $max_height;
+
+			// Set jpeg image quality to 80
+			if ($default_formats[$preferred_format] === 'jpeg')
+			{
+				$imagick->setImageCompression(Imagick::COMPRESSION_JPEG);
+				$imagick->setImageCompressionQuality(80);
+			}
 
 			// Create a new image in our prefered format and resize it if needed
 			$imagick->setImageFormat($default_formats[$preferred_format]);

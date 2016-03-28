@@ -13,7 +13,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0.4
+ * @version 1.0.7
  *
  */
 
@@ -235,8 +235,8 @@ function ml_searchMembers($query_parameters, $customJoin = '', $where = '', $lim
 	$request = $db->query('', '
 		SELECT COUNT(*)
 		FROM {db_prefix}members AS mem
-			LEFT JOIN {db_prefix}membergroups AS mg ON (mg.id_group = CASE WHEN mem.id_group = {int:regular_id_group} THEN mem.id_post_group ELSE mem.id_group END)' .
-			(empty($customJoin) ? '' : implode('
+			LEFT JOIN {db_prefix}membergroups AS mg ON (mg.id_group = CASE WHEN mem.id_group = {int:regular_id_group} THEN mem.id_post_group ELSE mem.id_group END)
+			' . (empty($customJoin) ? '' : implode('
 			', $customJoin)) . '
 		WHERE (' . $where . ')
 			AND mem.is_activated = {int:is_activated}',
@@ -250,8 +250,8 @@ function ml_searchMembers($query_parameters, $customJoin = '', $where = '', $lim
 		SELECT mem.id_member
 		FROM {db_prefix}members AS mem
 			LEFT JOIN {db_prefix}log_online AS lo ON (lo.id_member = mem.id_member)
-			LEFT JOIN {db_prefix}membergroups AS mg ON (mg.id_group = CASE WHEN mem.id_group = {int:regular_id_group} THEN mem.id_post_group ELSE mem.id_group END)' .
-			(empty($customJoin) ? '' : implode('
+			LEFT JOIN {db_prefix}membergroups AS mg ON (mg.id_group = CASE WHEN mem.id_group = {int:regular_id_group} THEN mem.id_post_group ELSE mem.id_group END)
+			' . (empty($customJoin) ? '' : implode('
 			', $customJoin)) . '
 		WHERE (' . $where . ')
 			AND mem.is_activated = {int:is_activated}

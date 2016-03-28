@@ -13,7 +13,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0
+ * @version 1.0.7
  *
  */
 
@@ -272,6 +272,11 @@ function createMenu($menuData, $menuOptions = array())
 				}
 			}
 		}
+	}
+
+	if (!isset($context['current_subaction']) && isset($menu_context['current_subsection']))
+	{
+		$context['current_subaction'] = $menu_context['current_subsection'];
 	}
 
 	// Should we use a custom base url, or use the default?

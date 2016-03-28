@@ -198,10 +198,6 @@ function bb2_insert($settings, $package, $key)
 		// Only such much space in this column, so brutally cut it
 		// @todo in 1.1 improve logging or drop this?
 		$request_entity = substr($request_entity, 0, 254);
-
-		// Make it safe for the db
-		while (preg_match('~[\'\\\\]$~', substr($request_entity, -1)) === 1)
-			$request_entity = substr($request_entity, 0, -1);
 	}
 
 	// Add it

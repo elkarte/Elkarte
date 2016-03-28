@@ -13,7 +13,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0.5
+ * @version 1.0.7
  *
  */
 
@@ -451,8 +451,8 @@ function clean_cache($type = '')
 	}
 
 	// Invalidate cache, to be sure!
-	// ... as long as Load.php can be modified, anyway.
-	@touch(SOURCEDIR . '/Load.php');
+	// ... as long as index.php can be modified, anyway.
+	@touch(CACHEDIR . '/index.php');
 
 	// Give addons a way to trigger cache cleaning.
 	call_integration_hook('integrate_clean_cache');
@@ -473,7 +473,7 @@ function cache_get_key($key)
 
 	// no need to do this every time, slows us down :P
 	if (empty($key_prefix))
-		$key_prefix = md5($boardurl . filemtime(SOURCEDIR . '/Load.php')) . '-ELK-';
+		$key_prefix = md5($boardurl . filemtime(CACHEDIR . '/index.php')) . '-ELK-';
 
 	return $key_prefix . ((empty($cache_accelerator) || $cache_accelerator === 'filebased') ? strtr($key, ':/', '-_') : $key);
 }

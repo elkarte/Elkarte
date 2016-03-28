@@ -11,7 +11,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0.5
+ * @version 1.0.7
  *
  */
 
@@ -29,7 +29,7 @@ function optimizeBoardsSubdivision($categories, $total_boards)
 	$num_groups = 2;
 	$optimal_boards = round($total_boards / $num_groups);
 	$groups = array(0 => array());
-	$group_totals = array(0 => 0);
+	$group_totals = array(0 => 0, 1 => 0);
 	$current_streak = 0;
 	$current_group = 0;
 
