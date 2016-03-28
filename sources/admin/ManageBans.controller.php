@@ -7,7 +7,7 @@
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
- * @version 1.0
+ * @version 1.0.7
  *
  */
 
@@ -758,7 +758,7 @@ class ManageBans_Controller extends Action_Controller
 		updateBanMembers();
 
 		// Go back to an appropriate spot
-		redirectexit('action=admin;area=ban;sa=' . (isset($_POST['add_ban']) ? 'list' : 'edit;bg=' . $ban_group_id));
+		redirectexit('action=admin;area=ban;sa=' . (isset($_POST['add_ban']) || !isset($ban_group_id) ? 'list' : 'edit;bg=' . $ban_group_id));
 	}
 
 	/**
