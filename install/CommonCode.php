@@ -669,7 +669,7 @@ function saveFileSettings($config_vars, $settingsArray)
 	fclose($fp);
 
 	if (function_exists('opcache_invalidate'))
-		opcache_invalidate(dirname(__FILE__) . '/Settings.php');
+		opcache_invalidate(TMP_BOARDDIR . '/Settings.php', true);
 
 	return true;
 
