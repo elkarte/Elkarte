@@ -27,7 +27,7 @@ function optimizeBoardsSubdivision($categories, $total_boards)
 	$num_groups = 2;
 	$optimal_boards = round($total_boards / $num_groups);
 	$groups = array(0 => array());
-	$group_totals = array(0 => 0);
+	$group_totals = array(0 => 0, 1 => 0);
 	$current_streak = 0;
 	$current_group = 0;
 

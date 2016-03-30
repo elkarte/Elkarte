@@ -509,7 +509,12 @@ fieldset dl {
 	font-weight: 600;
 	border: 1px solid;
 }
-
+.package_id {
+	width: 35%;
+	min-width: 20em;
+	display: inline-block;
+	font-weight: bold;
+}
 .description, .information {
 	max-height: 16em;
 	overflow: auto;

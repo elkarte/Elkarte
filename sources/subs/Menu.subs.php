@@ -274,6 +274,11 @@ function createMenu($menuData, $menuOptions = array())
 		}
 	}
 
+	if (!isset($context['current_subaction']) && isset($menu_context['current_subsection']))
+	{
+		$context['current_subaction'] = $menu_context['current_subsection'];
+	}
+
 	// Should we use a custom base url, or use the default?
 	$menu_context['base_url'] = isset($menuOptions['base_url']) ? $menuOptions['base_url'] : $scripturl . '?action=' . $menu_context['current_action'];
 

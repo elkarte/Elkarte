@@ -227,6 +227,14 @@ input, button, select, textarea, .editor {
 	border-radius: 2px;
 }
 
+select {
+	padding: 0 0 0 2px;
+	max-width: 95%;
+	white-space: nowrap;
+	overflow: hidden;
+	text-overflow: ellipsis;
+}
+
 input, .input_text, select, button {
 	font-size: .857em;
 }
@@ -756,10 +764,10 @@ strong, .bbc_strong {
 }
 
 .bbc_table td {
-	padding: 0 1em 0 0;
 	color: inherit;
 	vertical-align: top;
 	font: inherit;
+	padding: 0 0.5em;
 }
 
 .bbc_table th {
@@ -767,6 +775,14 @@ strong, .bbc_strong {
 	color: inherit;
 	font: inherit;
 	font-weight: bold;
+	padding: 0 0.5em;
+}
+/* Styling for bbc tables inside posts */
+.inner > .bbc_table_container > .bbc_table {
+	border-collapse: collapse;
+}
+.inner > .bbc_table_container > .bbc_table th {
+	text-align: center;
 }
 
 .bbc_u {
@@ -1739,8 +1755,7 @@ a.bbc_link {
 .like_button:before, .likes_button:before, .unlike_button:before {
 	background-position: 0 -480px;
 }
-
-.unlike_button:hover:before {
+.unlike_button:before {
 	background-position: 0 -408px;
 }
 
@@ -2127,7 +2142,7 @@ a.bbc_link {
 }
 
 .board_name {
-	padding: 0 0 1px 0;
+	padding: 0 0 1px 56px;
 	font-size: 1.143em;
 }
 
@@ -4947,6 +4962,7 @@ a.help .icon {
 	padding: 0.5em;
 	border: 1px solid;
 	border-radius: 5px;
+	max-width: 12em;
 }
 
 #mlsearch_options.nojs {
@@ -4969,6 +4985,7 @@ a.help .icon {
 
 #mlsearch_options .mlsearch_option {
 	padding: 0.2em 0;
+	line-height: 2em;
 }
 
 /* ------------------------------------------------------- */
@@ -5546,7 +5563,7 @@ a.help .icon {
 	}
 
 	.board_name {
-		margin: 12px 0 0 56px;
+		margin: 12px 0 0;
 	}
 
 	.board_lastposter {
@@ -5971,7 +5988,8 @@ a.help .icon {
 	}
 
 	.board_name {
-		margin: 0 0 0 35px;
+		margin: 0;
+		padding: 0 0 1px 35px;
 	}
 
 	.board_info:after {

@@ -10,7 +10,7 @@
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
- * @version 1.1 beta 1
+ * @version 1.0.5
  *
  */
 
@@ -198,10 +198,6 @@ function bb2_insert($settings, $package, $key)
 		// Only such much space in this column, so brutally cut it
 		// @todo in 1.1 improve logging or drop this?
 		$request_entity = substr($request_entity, 0, 254);
-
-		// Make it safe for the db
-		while (preg_match('~[\'\\\\]$~', substr($request_entity, -1)) === 1)
-			$request_entity = substr($request_entity, 0, -1);
 	}
 
 	// Add it
@@ -348,10 +344,10 @@ function bb2_insert_stats($force = false)
 	if ($force || $settings['display_stats'])
 	{
 		// Get the blocked count for the last 7 days ... cache this as well
-		if (!Cache::instance()->getVar($bb2_blocked, 'bb2_blocked', 900))
+		if (($bb2_blocked = cache_get_data('bb2_blocked', 900)) === null)
 		{
 			$bb2_blocked = bb2_db_query('SELECT COUNT(*) FROM {db_prefix}log_badbehavior WHERE `valid` NOT LIKE \'00000000\'');
-			Cache::instance()->put('bb2_blocked', $bb2_blocked, 900);
+			cache_put_data('bb2_blocked', $bb2_blocked, 900);
 		}
 
 		if ($bb2_blocked !== false)

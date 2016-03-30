@@ -812,22 +812,29 @@ function fixChildren($parent, $newLevel, $newParent)
  *   $boardList: a list of boards grouped by category ID.
  *   $cat_tree:  properties of each category.
  *
+ * @param array $query
+ *
  * @package Boards
  */
-function getBoardTree()
+function getBoardTree($query = array())
 {
 	global $cat_tree, $boards, $boardList;
 
 	$db = database();
+
+	// Addons may want to add their own information to the board table.
+	call_integration_hook('integrate_board_tree_query', array(&$query));
 
 	// Getting all the board and category information you'd ever wanted.
 	$request = $db->query('', '
 		SELECT
 			IFNULL(b.id_board, 0) AS id_board, b.id_parent, b.name AS board_name, b.description, b.child_level,
 			b.board_order, b.count_posts, b.member_groups, b.id_theme, b.override_theme, b.id_profile, b.redirect,
-			b.num_posts, b.num_topics, b.deny_member_groups, c.id_cat, c.name AS cat_name, c.cat_order, c.can_collapse
+			b.num_posts, b.num_topics, b.deny_member_groups, c.id_cat, c.name AS cat_name, c.cat_order, c.can_collapse' . (!empty($query['select']) ?
+			$query['select'] : '') . '
 		FROM {db_prefix}categories AS c
-			LEFT JOIN {db_prefix}boards AS b ON (b.id_cat = c.id_cat)
+			LEFT JOIN {db_prefix}boards AS b ON (b.id_cat = c.id_cat)' . (!empty($query['join']) ?
+			$query['join'] : '') . '
 		ORDER BY c.cat_order, b.child_level, b.board_order',
 		array(
 		)
@@ -916,6 +923,9 @@ function getBoardTree()
 				$boards[$row['id_board']]['tree'] = &$boards[$row['id_parent']]['tree']['children'][$row['id_board']];
 			}
 		}
+
+		// Let integration easily add data to $boards and $cat_tree
+		call_integration_hook('integrate_board_tree', array($row));
 	}
 	$db->free_result($request);
 

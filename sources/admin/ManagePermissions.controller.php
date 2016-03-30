@@ -194,7 +194,6 @@ class ManagePermissions_Controller extends Action_Controller
 				'name' => array(
 					'header' => array(
 						'value' => $txt['membergroups_name'],
-						'class' => 'grid50',
 					),
 					'data' => array(
 						'function' => function($rowData) {
@@ -229,7 +228,7 @@ class ManagePermissions_Controller extends Action_Controller
 				'members' => array(
 					'header' => array(
 						'value' => $txt['membergroups_members_top'],
-						'class' => 'grid10',
+						'class' => 'grid17',
 					),
 					'data' => array(
 						'function' => function($rowData) {
@@ -252,7 +251,7 @@ class ManagePermissions_Controller extends Action_Controller
 				'permissions_allowed' => array(
 					'header' => array(
 						'value' => empty($modSettings['permission_enable_deny']) ? $txt['membergroups_permissions'] : $txt['permissions_allowed'],
-						'class' => 'grid8',
+						'class' => 'grid17',
 					),
 					'data' => array(
 						'function' => function($rowData) {
@@ -264,7 +263,7 @@ class ManagePermissions_Controller extends Action_Controller
 					'evaluate' => !empty($modSettings['permission_enable_deny']),
 					'header' => array(
 						'value' => $txt['permissions_denied'],
-						'class' => 'grid8',
+						'class' => 'grid17',
 					),
 					'data' => array(
 						'function' => function($rowData) {

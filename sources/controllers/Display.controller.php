@@ -558,6 +558,13 @@ class Display_Controller extends Action_Controller
 
 		// Handle approval flags...
 		$context['can_reply_approved'] = $context['can_reply'];
+
+		// Guests do not have post_unapproved_replies_own permission, so it's always post_unapproved_replies_any
+		if ($user_info['is_guest'] && allowedTo('post_unapproved_replies_any'))
+		{
+			$context['can_reply_approved'] = false;
+		}
+
 		$context['can_reply'] |= $context['can_reply_unapproved'];
 		$context['can_quote'] = $context['can_reply'] && (empty($modSettings['disabledBBC']) || !in_array('quote', explode(',', $modSettings['disabledBBC'])));
 		$context['can_mark_unread'] = !$user_info['is_guest'] && $settings['show_mark_read'];

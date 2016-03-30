@@ -699,7 +699,7 @@ class Settings_Form
 				}
 				elseif (strncasecmp($settingsArray[$i], '$' . $var, 1 + strlen($var)) == 0)
 				{
-					$comment = strstr(substr($settingsArray[$i], strpos($settingsArray[$i], ';')), '#');
+					$comment = strstr(substr(un_htmlspecialchars($settingsArray[$i]), strpos(un_htmlspecialchars($settingsArray[$i]), ';')), '#');
 					$settingsArray[$i] = '$' . $var . ' = ' . $val . ';' . ($comment == '' ? '' : "\t\t" . rtrim($comment)) . "\n";
 
 					// This one's been 'used', so to speak.

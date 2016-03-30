@@ -339,6 +339,13 @@ function resizeImage($src_img, $destName, $src_width, $src_height, $max_width, $
 			$dest_width = empty($max_width) ? $src_width : $max_width;
 			$dest_height = empty($max_height) ? $src_height : $max_height;
 
+			// Set jpeg image quality to 80
+			if ($default_formats[$preferred_format] === 'jpeg')
+			{
+				$imagick->setImageCompression(Imagick::COMPRESSION_JPEG);
+				$imagick->setImageCompressionQuality(80);
+			}
+
 			// Create a new image in our preferred format and resize it if needed
 			$imagick->setImageFormat($default_formats[$preferred_format]);
 			$imagick->resizeImage($dest_width, $dest_height, Imagick::FILTER_LANCZOS, 1, true);

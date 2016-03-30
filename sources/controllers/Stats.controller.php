@@ -68,6 +68,11 @@ class Stats_Controller extends Action_Controller
 		// Handle the XMLHttpRequest.
 		if (isset($this->_req->query->xml))
 		{
+			if (empty($year) || empty($month))
+			{
+				redirectexit('action=stats');
+			}
+
 			// Collapsing stats only needs adjustments of the session variables.
 			if (!empty($this->_req->query->collapse))
 				obExit(false);
