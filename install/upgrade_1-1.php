@@ -486,6 +486,31 @@ class UpgradeInstructions_upgrade_1_1
 		);
 	}
 
+	public function pm_count_column_title()
+	{
+		return 'Changing the pm count column to mediumint.';
+	}
+
+	public function pm_count_column()
+	{
+		return array(
+			array(
+				'debug_title' => 'Changing the pm count column to mediumint.',
+				'function' => function($db, $db_table)
+				{
+					$db_table->db_change_column('{db_prefix}members',
+								    'personal_messages',
+								    array(
+									    'type' => 'mediumint',
+									    'size' => 8,
+									    'default' => 0
+								    )
+					);
+				}
+			)
+		);
+	}
+
 	public function custom_field_updates_title()
 	{
 		return 'Some updates to custom fields.';
