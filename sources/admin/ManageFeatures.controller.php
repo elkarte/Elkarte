@@ -1335,9 +1335,6 @@ class ManageFeatures_Controller extends Action_Controller
 				array('text', 'jqueryui_version', 'postinput' => $txt['jqueryui_custom_after']),
 				array('check', 'minify_css_js'),
 			'',
-				// SEO stuff
-				array('check', 'queryless_urls', 'subtext' => '<strong>' . $txt['queryless_urls_note'] . '</strong><br />' . ($context['server']['is_apache'] || $context['server']['is_nginx'] || $context['server']['is_lighttpd'] ? $txt['queryless_urls_work'] : '<span class="error">' . $txt['queryless_urls_notwork'] . '</span>')),
-			'',
 				// Number formatting, timezones.
 				array('text', 'time_format'),
 				array('float', 'time_offset', 'subtext' => $txt['setting_time_offset_note'], 6, 'postinput' => $txt['hours']),
