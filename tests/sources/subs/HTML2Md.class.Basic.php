@@ -51,7 +51,7 @@ class TestHTML2Md extends PHPUnit_Framework_TestCase
 			array(
 				'Quotes',
 				'<blockquote><br /><p>Example:</p><pre><code>sub status {<br />    print "working";<br />}<br /></code></pre><p>Or:</p><pre><code>sub status {<br />    return "working";<br />}<br /></code></pre></blockquote>',
-				">  \n> \n> Example:\n> \n>   sub status {\n>     print \"working\";\n>   }\n> \n> \n> Or:\n> \n>   sub status {\n>     return \"working\";\n>   }"
+				">   \n> \n> Example:\n> \n>     sub status {\n>         print \"working\";\n>     }\n> \n> \n> Or:\n> \n>     sub status {\n>         return \"working\";\n>     }"
 			),
 			array(
 				'Combo',
