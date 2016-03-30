@@ -409,7 +409,7 @@ class Site_Combiner
 		{
 			// To prevent a stack overflow segmentation fault, which silently kills Apache, we need to limit
 			// recursion on windows.  This may cause JSqueeze to fail, but at least its then catchable.
-			if ($context['server']['is_windows'])
+			if (detectServer()->is('windows'))
 				@ini_set('pcre.recursion_limit', '524');
 
 			require_once(EXTDIR . '/JSqueeze.php');

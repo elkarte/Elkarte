@@ -2490,44 +2490,29 @@ function determineAvatar($profile)
 function detectServer()
 {
 	global $context;
+	static $server = null;
 
-	$context['server'] = array(
-		'is_iis'			=> serverIs('iis'),
-		'is_apache'			=> serverIs('apache'),
-		'is_litespeed' 		=> serverIs('litespeed'),
-		'is_lighttpd' 		=> serverIs('lighttpd'),
-		'is_nginx' 			=> serverIs('nginx'),
-		'is_cgi' 			=> serverIs('cgi'),
-		'is_windows' 		=> serverIs('windows'),
-		'iso_case_folding' 	=> serverIs('iso_case_folding'),
+	if ($server === null)
+	{
+		$server = new Server($_SERVER);
+		$servers = array('iis', 'apache', 'litespeed', 'lighttpd', 'nginx', 'cgi', 'windows');
+		$context['server'] = array();
+		foreach ($servers as $name)
+		{
+			$context['server']['is_' . $name] = $server->is($name);
+		}
+
+		$context['server']['iso_case_folding'] = $server->is('iso_case_folding');
 		// A bug in some versions of IIS under CGI (older ones) makes cookie setting not work with Location: headers.
-		'needs_login_fix'	=> serverIs('needs_login_fix'),
-	);
+		$context['server']['needs_login_fix'] = $server->is('needs_login_fix');
+	}
+
+	return $server;
 }
 
 function serverIs($server)
 {
-	switch ($server)
-	{
-		case 'apache':
-			return isset($_SERVER['SERVER_SOFTWARE']) && strpos($_SERVER['SERVER_SOFTWARE'], 'Apache') !== false;
-		case 'cgi':
-			return isset($_SERVER['SERVER_SOFTWARE']) && strpos(php_sapi_name(), 'cgi') !== false;
-		case 'iis':
-			return isset($_SERVER['SERVER_SOFTWARE']) && strpos($_SERVER['SERVER_SOFTWARE'], 'Microsoft-IIS') !== false;
-		case 'iso_case_folding':
-			return ord(strtolower(chr(138))) === 154;
-		case 'lighttpd':
-			return isset($_SERVER['SERVER_SOFTWARE']) && strpos($_SERVER['SERVER_SOFTWARE'], 'lighttpd') !== false;
-		case 'litespeed':
-			return isset($_SERVER['SERVER_SOFTWARE']) && strpos($_SERVER['SERVER_SOFTWARE'], 'LiteSpeed') !== false;
-		case 'needs_login_fix':
-			return serverIs('cgi') && serverIs('iis');
-		case 'nginx':
-			return isset($_SERVER['SERVER_SOFTWARE']) && strpos($_SERVER['SERVER_SOFTWARE'], 'nginx') !== false;
-		case 'windows':
-			return strpos(PHP_OS, 'WIN') === 0;
-	}
+	return detectServer()->is($server);
 }
 
 /**

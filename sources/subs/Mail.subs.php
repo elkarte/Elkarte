@@ -49,7 +49,7 @@ function sendmail($to, $subject, $message, $from = null, $message_id = null, $se
 	$maillist = !empty($modSettings['maillist_enabled']) && $from_wrapper !== null && $message_id !== null && $priority < 4 && empty($modSettings['mail_no_message_id']);
 
 	// Line breaks need to be \r\n only in windows or for SMTP.
-	$line_break = !empty($context['server']['is_windows']) || !$use_sendmail ? "\r\n" : "\n";
+	$line_break = detectServer()->is('windows') || !$use_sendmail ? "\r\n" : "\n";
 
 	// So far so good.
 	$mail_result = true;
@@ -1339,7 +1339,7 @@ function reduceMailQueue($batch_size = false, $override_limit = false, $force_se
 	$use_sendmail = empty($modSettings['mail_type']) || $modSettings['smtp_host'] == '';
 
 	// Line breaks need to be \r\n only in windows or for SMTP.
-	$line_break = !empty($context['server']['is_windows']) || !$use_sendmail ? "\r\n" : "\n";
+	$line_break = detectServer()->is('windows') || !$use_sendmail ? "\r\n" : "\n";
 
 	foreach ($emails as $key => $email)
 	{

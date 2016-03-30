@@ -1180,7 +1180,7 @@ class Theme extends \Theme
 				'elk_images_url' => JavaScriptEscape($settings['images_url']),
 				'elk_smiley_url' => JavaScriptEscape($modSettings['smileys_url']),
 				'elk_scripturl' => '\'' . $scripturl . '\'',
-				'elk_iso_case_folding' => $context['server']['iso_case_folding'] ? 'true' : 'false',
+				'elk_iso_case_folding' => detectServer()->is('iso_case_folding') ? 'true' : 'false',
 				'elk_charset' => '"UTF-8"',
 				'elk_session_id' => JavaScriptEscape($context['session_id']),
 				'elk_session_var' => JavaScriptEscape($context['session_var']),

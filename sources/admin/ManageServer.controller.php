@@ -283,7 +283,7 @@ class ManageServer_Controller extends Action_Controller
 				$cookiename = $this->_req->post->cookiename;
 				setLoginCookie(60 * $modSettings['cookieTime'], $user_settings['id_member'], hash('sha256', $user_settings['passwd'] . $user_settings['password_salt']));
 
-				redirectexit('action=admin;area=serversettings;sa=cookie;' . $context['session_var'] . '=' . $original_session_id, $context['server']['needs_login_fix']);
+				redirectexit('action=admin;area=serversettings;sa=cookie;' . $context['session_var'] . '=' . $original_session_id, detectServer()->is('needs_login_fix'));
 			}
 
 			redirectexit('action=admin;area=serversettings;sa=cookie;' . $context['session_var'] . '=' . $context['session_id'] . ';msg=' . (!empty($context['settings_message']) ? $context['settings_message'] : 'core_settings_saved'));
