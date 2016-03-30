@@ -105,6 +105,12 @@ function reloadSettings()
 	// Is post moderation alive and well?
 	$modSettings['postmod_active'] = isset($modSettings['admin_features']) ? in_array('pm', explode(',', $modSettings['admin_features'])) : true;
 
+	// @deprecated since 1.0.6 compatibility setting for migration
+	if (!isset($modSettings['avatar_max_height']))
+		$modSettings['avatar_max_height'] = $modSettings['avatar_max_height_external'];
+	if (!isset($modSettings['avatar_max_width']))
+		$modSettings['avatar_max_width'] = $modSettings['avatar_max_width_external'];
+
 	// Here to justify the name of this function. :P
 	// It should be added to the install and upgrade scripts.
 	// But since the converters need to be updated also. This is easier.
@@ -2393,12 +2399,6 @@ function determineAvatar($profile)
 
 	if (empty($profile))
 		return array();
-
-	// @todo compatibility setting for migration
-	if (!isset($modSettings['avatar_max_height']))
-		$modSettings['avatar_max_height'] = $modSettings['avatar_max_height_external'];
-	if (!isset($modSettings['avatar_max_width']))
-		$modSettings['avatar_max_width'] = $modSettings['avatar_max_width_external'];
 
 	$avatar_protocol = substr(strtolower($profile['avatar']), 0, 7);
 
