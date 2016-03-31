@@ -92,7 +92,7 @@ class HttpReq
 
 		// Make the superglobals available as R/W properties
 		$this->cookie = new ArrayObject($_COOKIE, ArrayObject::ARRAY_AS_PROPS);
-		if (session_status() === PHP_SESSION_ACTIVE)
+		if (isset($_SESSION))
 		{
 			$this->session = new ArrayObject($_SESSION, ArrayObject::ARRAY_AS_PROPS);
 		}
