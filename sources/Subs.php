@@ -947,25 +947,7 @@ function setupThemeContext($forceload = false)
  */
 function setMemoryLimit($needed, $in_use = false)
 {
-	// Everything in bytes
-	$memory_current = memoryReturnBytes(ini_get('memory_limit'));
-	$memory_needed = memoryReturnBytes($needed);
-
-	// Should we account for how much is currently being used?
-	if ($in_use)
-		$memory_needed += memory_get_usage();
-
-	// If more is needed, request it
-	if ($memory_current < $memory_needed)
-	{
-		@ini_set('memory_limit', ceil($memory_needed / 1048576) . 'M');
-		$memory_current = memoryReturnBytes(ini_get('memory_limit'));
-	}
-
-	$memory_current = max($memory_current, memoryReturnBytes(get_cfg_var('memory_limit')));
-
-	// Return success or not
-	return (bool) ($memory_current >= $memory_needed);
+	return return detectServer->setMemoryLimit($needed, $in_use);
 }
 
 /**
@@ -1023,30 +1005,11 @@ function memoryReturnBytes($val)
  *
  * @param int $time_limit The time limit
  * @param bool $server_reset whether to reset the server timer or not
+ * @deprecated since 1.1
  */
 function setTimeLimit($time_limit, $server_reset = true)
 {
-	// Make sure the function exists, it may be in the ini disable_functions list
-	if (function_exists('set_time_limit'))
-	{
-		$current = (int) ini_get('max_execution_time');
-
-		// Do not set a limit if it is currently unlimited.
-		if ($current !== 0)
-		{
-			// Set it to the maximum that we can, not more, not less
-			$time_limit = min($current, max($time_limit, $current));
-
-			// Still need error suppression as some security addons many prevent this action
-			@set_time_limit($time_limit);
-		}
-	}
-
-	// Don't let apache close the connection
-	if ($server_reset && function_exists('apache_reset_timeout'))
-		@apache_reset_timeout();
-
-	return ini_get('max_execution_time');
+	return detectServer->setTimeLimit($time_limit, $server_reset);
 }
 
 /**

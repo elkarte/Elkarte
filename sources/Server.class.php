@@ -38,7 +38,7 @@ class Server
 	 * @param bool $in_use Set to true to account for current memory usage of the script
 	 * @return boolean true if we have at least the needed memory
 	 */
-	function setMemoryLimit($needed, $in_use = false)
+	public function setMemoryLimit($needed, $in_use = false)
 	{
 		// Everything in bytes
 		$memory_current = memoryReturnBytes(ini_get('memory_limit'));
@@ -85,7 +85,7 @@ class Server
 	 * @param int $time_limit The time limit
 	 * @param bool $server_reset whether to reset the server timer or not
 	 */
-	function setTimeLimit($time_limit, $server_reset = true)
+	public function setTimeLimit($time_limit, $server_reset = true)
 	{
 		// Make sure the function exists, it may be in the ini disable_functions list
 		if (function_exists('set_time_limit'))
@@ -110,7 +110,7 @@ class Server
 		return ini_get('max_execution_time');
 	}
 
-	function is($server)
+	public function is($server)
 	{
 		switch ($server)
 		{
