@@ -141,4 +141,9 @@ class Server extends ValuesContainer
 		&&
 		($this->is('apache') || $this->is('nginx') || $this->is('lighttpd') || $this->is('litespeed'));
 	}
+
+	public function outPutCompressionEnabled()
+	{
+		return ini_get('zlib.output_compression') >= 1 || ini_get('output_handler') == 'ob_gzhandler';
+	}
 }
