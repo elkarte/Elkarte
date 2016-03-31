@@ -18,7 +18,7 @@
 if (!defined('ELK'))
 	die('No access...');
 
-class Server extends ValuesContainer
+class Server
 {
 	protected $__server = null;
 
