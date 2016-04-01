@@ -1601,7 +1601,7 @@ class InstallInstructions_install_1_1
 				array('name' => 'lngfile',              'type' => 'varchar', 'size' => 255, 'default' => ''),
 				array('name' => 'last_login',           'type' => 'int', 'size' => 10, 'unsigned' => true, 'default' => 0),
 				array('name' => 'real_name',            'type' => 'varchar', 'size' => 255, 'default' => ''),
-				array('name' => 'personal_messages',    'type' => 'smallint', 'size' => 5, 'default' => 0),
+				array('name' => 'personal_messages',    'type' => 'mediumint', 'size' => 8, 'default' => 0),
 				array('name' => 'mentions',             'type' => 'smallint', 'size' => 5, 'default' => 0),
 				array('name' => 'unread_messages',      'type' => 'smallint', 'size' => 5, 'default' => 0),
 				array('name' => 'new_pm',               'type' => 'tinyint', 'size' => 3, 'unsigned' => true, 'default' => 0),

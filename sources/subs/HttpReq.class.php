@@ -92,7 +92,10 @@ class HttpReq
 
 		// Make the superglobals available as R/W properties
 		$this->cookie = new ArrayObject($_COOKIE, ArrayObject::ARRAY_AS_PROPS);
-		$this->session = new ArrayObject($_SESSION, ArrayObject::ARRAY_AS_PROPS);
+		if (isset($_SESSION))
+		{
+			$this->session = new ArrayObject($_SESSION, ArrayObject::ARRAY_AS_PROPS);
+		}
 		$this->server = new ArrayObject($_SERVER, ArrayObject::ARRAY_AS_PROPS);
 
 		// Get will be in ->query, Post in ->post
