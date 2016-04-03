@@ -249,7 +249,7 @@ class Calendar_Controller extends Action_Controller
 		checkSession();
 
 		// Cast this for safety...
-		$event_id = isset($_REQUEST['eventid']) ? (int) $_REQUEST['eventid'] : null;
+		$event_id = $this->_req->get('eventid', 'intval');
 
 		$event = new Calendar_Event($event_id, $modSettings);
 
@@ -292,7 +292,7 @@ class Calendar_Controller extends Action_Controller
 		}
 
 		// No point hanging around here now...
-		redirectexit($scripturl . '?action=calendar;month=' . $_POST['month'] . ';year=' . $_POST['year']);
+		redirectexit($scripturl . '?action=calendar;month=' . $this->_req->get('month', 'intval') . ';year=' . $this->_req->get('year', 'intval'));
 	}
 
 	/**
