@@ -173,7 +173,7 @@ class Karma_Controller extends Action_Controller
 
 		// Figure out where to go back to.... the topic?
 		if (!empty($topic))
-			redirectexit('topic=' . $topic . '.' . $this->_req->start . '#msg' . $this->_req->get('m', 'intval');
+			redirectexit('topic=' . $topic . '.' . $this->_req->start . '#msg' . $this->_req->get('m', 'intval'));
 		// Hrm... maybe a personal message?
 		elseif (isset($_REQUEST['f']))
 			redirectexit('action=pm;f=' . $_REQUEST['f'] . ';start=' . $this->_req->start . (isset($_REQUEST['l']) ? ';l=' . $this->_req->get('l', 'intval') : '') . (isset($_REQUEST['pm']) ? '#' . $this->_req->get('pm', 'intval') : ''));
