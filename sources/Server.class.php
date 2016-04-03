@@ -18,13 +18,16 @@
 if (!defined('ELK'))
 	die('No access...');
 
-class Server
+class Server extends \ArrayObject
 {
-	protected $__server = null;
-
-	public function __construct($server)
+	public function __construct($server = null)
 	{
-		$this->__server = $server;
+		if (!is_array($server))
+		{
+			$server = isset($_SERVER) ? $_SERVER : array();
+		}
+
+		parent::__construct($server, ArrayObject::ARRAY_AS_PROPS);
 	}
 
 	/**
@@ -115,21 +118,21 @@ class Server
 		switch ($server)
 		{
 			case 'apache':
-				return isset($this->__server['SERVER_SOFTWARE']) && strpos($this->__server['SERVER_SOFTWARE'], 'Apache') !== false;
+				return isset($this->SERVER_SOFTWARE) && strpos($this->SERVER_SOFTWARE, 'Apache') !== false;
 			case 'cgi':
-				return isset($this->__server['SERVER_SOFTWARE']) && strpos(php_sapi_name(), 'cgi') !== false;
+				return isset($this->SERVER_SOFTWARE) && strpos(php_sapi_name(), 'cgi') !== false;
 			case 'iis':
-				return isset($this->__server['SERVER_SOFTWARE']) && strpos($this->__server['SERVER_SOFTWARE'], 'Microsoft-IIS') !== false;
+				return isset($this->SERVER_SOFTWARE) && strpos($this->SERVER_SOFTWARE, 'Microsoft-IIS') !== false;
 			case 'iso_case_folding':
 				return ord(strtolower(chr(138))) === 154;
 			case 'lighttpd':
-				return isset($this->__server['SERVER_SOFTWARE']) && strpos($this->__server['SERVER_SOFTWARE'], 'lighttpd') !== false;
+				return isset($this->SERVER_SOFTWARE) && strpos($this->SERVER_SOFTWARE, 'lighttpd') !== false;
 			case 'litespeed':
-				return isset($this->__server['SERVER_SOFTWARE']) && strpos($this->__server['SERVER_SOFTWARE'], 'LiteSpeed') !== false;
+				return isset($this->SERVER_SOFTWARE) && strpos($this->SERVER_SOFTWARE, 'LiteSpeed') !== false;
 			case 'needs_login_fix':
 				return $this->is('cgi') && $this->is('iis');
 			case 'nginx':
-				return isset($this->__server['SERVER_SOFTWARE']) && strpos($this->__server['SERVER_SOFTWARE'], 'nginx') !== false;
+				return isset($this->SERVER_SOFTWARE) && strpos($this->SERVER_SOFTWARE, 'nginx') !== false;
 			case 'windows':
 				return strpos(PHP_OS, 'WIN') === 0;
 		}

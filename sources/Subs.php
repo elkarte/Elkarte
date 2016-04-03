@@ -947,7 +947,7 @@ function setupThemeContext($forceload = false)
  */
 function setMemoryLimit($needed, $in_use = false)
 {
-	return return detectServer->setMemoryLimit($needed, $in_use);
+	return detectServer()->setMemoryLimit($needed, $in_use);
 }
 
 /**
@@ -1009,7 +1009,7 @@ function memoryReturnBytes($val)
  */
 function setTimeLimit($time_limit, $server_reset = true)
 {
-	return detectServer->setTimeLimit($time_limit, $server_reset);
+	return detectServer()->setTimeLimit($time_limit, $server_reset);
 }
 
 /**
