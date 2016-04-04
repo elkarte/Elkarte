@@ -98,9 +98,6 @@ class BBCParser
 			return '';
 		}
 
-		// Clean up any cut/paste issues we may have
-		$this->message = sanitizeMSCutPaste($this->message);
-
 		// @todo remove from here and make the caller figure it out
 		if (!$this->parsingEnabled())
 		{
