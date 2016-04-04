@@ -1410,51 +1410,6 @@ function remove_integration_function($hook, $function, $file = '')
 }
 
 /**
- * Microsoft uses their own character set Code Page 1252 (CP1252), which is a
- * superset of ISO 8859-1, defining several characters between DEC 128 and 159
- * that are not normally displayable.  This converts the popular ones that
- * appear from a cut and paste from windows.
- *
- * @param string|false $string The string to sanitize
- * @return string $string
- */
-function sanitizeMSCutPaste($string)
-{
-	if (empty($string))
-		return $string;
-
-	// UTF-8 occurrences of MS special characters
-	$findchars_utf8 = array(
-		"\xe2\x80\x9a", // single low-9 quotation mark
-		"\xe2\x80\x9e", // double low-9 quotation mark
-		"\xe2\x80\xa6", // horizontal ellipsis
-		"\xe2\x80\x98", // left single curly quote
-		"\xe2\x80\x99", // right single curly quote
-		"\xe2\x80\x9c", // left double curly quote
-		"\xe2\x80\x9d", // right double curly quote
-		"\xe2\x80\x93", // en dash
-		"\xe2\x80\x94", // em dash
-	);
-
-	// safe replacements
-	$replacechars = array(
-		',',   // &sbquo;
-		',,',  // &bdquo;
-		'...', // &hellip;
-		"'",   // &lsquo;
-		"'",   // &rsquo;
-		'"',   // &ldquo;
-		'"',   // &rdquo;
-		'-',   // &ndash;
-		'--',  // &mdash;
-	);
-
-	$string = str_replace($findchars_utf8, $replacechars, $string);
-
-	return $string;
-}
-
-/**
  * Decode numeric html entities to their UTF8 equivalent character.
  *
  * What it does:
