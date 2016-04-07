@@ -97,25 +97,30 @@
 		var aTo = this.draftGetRecipient('recipient_to[]'),
 			aBcc = this.draftGetRecipient('recipient_bcc[]');
 
-		// Get the rest of the form elements that we want to save, and load them up
-		var aSections = [
-			'replied_to=' + parseInt(document.forms.pmFolder.elements['replied_to'].value),
-			'id_pm_draft=' + (('id_pm_draft' in document.forms.pmFolder.elements) ? parseInt(document.forms.pmFolder.elements['id_pm_draft'].value) : 0),
-			'subject=' + document.forms.pmFolder['subject'].value.replace(/&#/g, "&#38;#").php_urlencode(),
-			'message=' + sPostdata.replace(/&#/g, "&#38;#").php_urlencode(),
-			'recipient_to=' + aTo,
-			'recipient_bcc=' + aBcc,
-			'save_draft=true',
-			'autosave=true',
-			elk_session_var + '=' + elk_session_id
-		];
+		// Get all the form elements that we want to save
+		var $aForm = $('#pmFolder').clone();
 
-		// Account for wysiwyg
-		if (this.opts.sType && this.opts.sType === 'post')
-			aSections[aSections.length] = 'message_mode=' + (editor.inSourceMode() ? '1' : '0');
+		$aForm.find("input[name='message']").val(sPostdata.replace(/&#/g, "&#38;#").php_urlencode());
+		$aForm.find("input[name='subject']").val($aForm.find("input[name='subject']").val().replace(/&#/g, "&#38;#").php_urlencode());
+		$aForm.find("input[name='replied_to']").val(parseInt($aForm.find("input[name='replied_to']").val()));
+		if ($aForm.find("input[name='id_pm_draft']").length == 1)
+		{
+			$aForm.find("input[name='id_pm_draft']").val(parseInt($aForm.find("input[name='id_pm_draft']").val()));
+		}
+		else
+		{
+			$aForm.append($('<input />').attr('name', 'id_pm_draft').val(0));
+		}
+		$aForm.append($('<input />').attr('name', 'recipient_to').val(aTo));
+		$aForm.append($('<input />').attr('name', 'recipient_bcc').val(aBcc));
+		$aForm.append($('<input />').attr('name', 'save_draft').val(true));
+		$aForm.append($('<input />').attr('name', 'autosave').val(true));
+
+		// Keep track of source or wysiwyg when using the full editor
+		$aForm.append($('<input />').attr('name', 'message_mode').val(editor.inSourceMode() ? '1' : '0'));
 
 		// Send in (post) the document for saving
-		this.draftAjax($(document.forms.pmFolder).serialize(), "?action=pm;sa=send2;xml");
+		this.draftAjax($aForm.serialize(), "?action=pm;sa=send2;xml");
 	};
 
 	/**
