@@ -49,6 +49,13 @@ abstract class Database_Abstract implements Database
 	protected $_old_skip_error = null;
 
 	/**
+	 * MySQL supports unbuffered queries, this remembers if we are running an
+	 * unbuffered or not
+	 * @var boolean
+	 */
+	protected $_unbuffered = false;
+
+	/**
 	 * This holds the "values" used in the replacement__callback method
 	 * @var mixed[]
 	 */
@@ -404,5 +411,10 @@ abstract class Database_Abstract implements Database
 			$this->_old_skip_error = $this->_skip_error;
 
 		$this->_skip_error = $set;
+	}
+
+	public function setUnbuffered($state)
+	{
+		$this->_unbuffered = (bool) $state;
 	}
 }

@@ -123,7 +123,7 @@ class Database_MySQL extends Database_Abstract
 	public function query($identifier, $db_string, $db_values = array(), $connection = null)
 	{
 		global $db_show_debug, $time_start;
-		global $db_unbuffered, $modSettings;
+		global $modSettings;
 
 		// Comments that are allowed in a query are preg_removed.
 		static $allowed_comments_from = array(
@@ -246,7 +246,7 @@ class Database_MySQL extends Database_Abstract
 				$this->error_backtrace('Hacking attempt...', 'Hacking attempt...' . "\n" . $db_string, E_USER_ERROR, __FILE__, __LINE__);
 		}
 
-		if (empty($db_unbuffered))
+		if ($this->_unbuffered === false)
 			$ret = @mysqli_query($connection, $db_string);
 		else
 			$ret = @mysqli_query($connection, $db_string, MYSQLI_USE_RESULT);
