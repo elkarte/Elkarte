@@ -1139,7 +1139,7 @@ function action_databaseChanges()
 			{
 				// Only update the version of this if complete.
 				$db->insert('replace',
-					$db_prefix . 'settings',
+					'{db_prefix}settings',
 					array('variable' => 'string', 'value' => 'string'),
 					array('elkVersion', $file[2]),
 					array('variable')
