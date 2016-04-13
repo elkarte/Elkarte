@@ -226,6 +226,10 @@ class Event_Manager
 		{
 			// Load the events for this area/class combination
 			$events = $class::hooks($this);
+			if (is_array($events) === false)
+			{
+				continue;
+			}
 
 			foreach ($events as $event)
 			{
