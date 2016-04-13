@@ -2655,6 +2655,10 @@ function loadBBCParsers()
 	// Set the default disabled BBC
 	if (!empty($modSettings['disabledBBC']))
 	{
-		\BBC\ParserWrapper::getInstance()->setDisabled($modSettings['disabledBBC']);
+		if (!is_array($modSettings['disabledBBC']))
+			$disabledBBC = explode(',', $modSettings['disabledBBC']);
+		else
+			$disabledBBC = $modSettings['disabledBBC'];
+		\BBC\ParserWrapper::getInstance()->setDisabled($disabledBBC);
 	}
 }
