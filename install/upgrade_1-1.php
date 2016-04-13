@@ -416,7 +416,7 @@ class UpgradeInstructions_upgrade_1_1
 				'debug_title' => 'Adding new columns...',
 				'function' => function($db, $db_table)
 				{
-					if ($db_table->column_exists('{db_prefix}log_reported', 'type') === true)
+					if ($db_table->column_exists('{db_prefix}log_reported', 'type') === false)
 					{
 						$db_table->db_add_column('{db_prefix}log_reported',
 							array(
