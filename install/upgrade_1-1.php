@@ -172,23 +172,32 @@ class UpgradeInstructions_upgrade_1_1
 
 					$db->query('', '
 						UPDATE {db_prefix}log_mentions
-						SET mention_type = mentionmem
-						WHERE mention_type = men',
-						array()
+						SET mention_type = {string:to}
+						WHERE mention_type = {string:from}',
+						array(
+							'from' => 'men',
+							'to' => 'mentionmem'
+						)
 					);
 
 					$db->query('', '
 						UPDATE {db_prefix}log_mentions
-						SET mention_type = likemsg
-						WHERE mention_type = like',
-						array()
+						SET mention_type = {string:to}
+						WHERE mention_type = {string:from}',
+						array(
+							'from' => 'like',
+							'to' => 'likemsg'
+						)
 					);
 
 					$db->query('', '
 						UPDATE {db_prefix}log_mentions
-						SET mention_type = rlikemsg
-						WHERE mention_type = rlike',
-						array()
+						SET mention_type = {string:to}
+						WHERE mention_type = {string:from}',
+						array(
+							'from' => 'rlike',
+							'to' => 'rlikemsg'
+						)
 					);
 
 					$enabled_mentions = !empty($modSettings['enabled_mentions']) ? explode(',', $modSettings['enabled_mentions']) : array();
@@ -416,7 +425,7 @@ class UpgradeInstructions_upgrade_1_1
 				'debug_title' => 'Adding new columns...',
 				'function' => function($db, $db_table)
 				{
-					if ($db_table->column_exists('{db_prefix}log_reported', 'type') === true)
+					if ($db_table->column_exists('{db_prefix}log_reported', 'type') === false)
 					{
 						$db_table->db_add_column('{db_prefix}log_reported',
 							array(
@@ -562,13 +571,15 @@ class UpgradeInstructions_upgrade_1_1
 				'debug_title' => 'Inserting custom fields for gender/location/personal text',
 				'function' => function($db, $db_table) {
 					$db->insert('replace',
-						    '{db_prefix}custom_fields',
-						    array('col_name' => 'string', 'field_name' => 'string', 'field_desc' => 'string', 'field_type' => 'string', 'field_length' => 'int', 'field_options' => 'string', 'mask' => 'string', 'show_reg' => 'int', 'show_display' => 'int', 'show_profile' => 'string', 'private' => 'int', 'active' => 'int', 'bbc' => 'int', 'can_search' => 'int', 'default_value' => 'string', 'enclose' => 'string', 'placement' => 'int', 'rows' => 'int', 'cols' => 'int'),
-						    array(
-							    array('cust_gender', 'Gender', 'Your gender', 'radio', 15, 'undisclosed,male,female,genderless,nonbinary,transgendered', '', 0, 1, 'forumprofile', 0, 1, 0, 0, 'undisclosed', '<i class="icon i-{INPUT}" title="{INPUT}"><s>{INPUT}</s></i>', 0, 0, 0),
-							    array('cust_blurb', 'Personal Text', 'A custom bit of text for your postbit.', 'text', 120, '', '', 0, 0, 'forumprofile', 0, 1, 0, 0, 'Default Personal Text', '', 3, 0, 0),
-							    array('cust_locate', 'Location', 'Where you are', 'text', 32, '', '', 0, 0, 'forumprofile', 0, 1, 0, 0, '', '', 0, 0, 0),
-						    ));
+						'{db_prefix}custom_fields',
+						array('col_name' => 'string', 'field_name' => 'string', 'field_desc' => 'string', 'field_type' => 'string', 'field_length' => 'int', 'field_options' => 'string', 'mask' => 'string', 'show_reg' => 'int', 'show_display' => 'int', 'show_profile' => 'string', 'private' => 'int', 'active' => 'int', 'bbc' => 'int', 'can_search' => 'int', 'default_value' => 'string', 'enclose' => 'string', 'placement' => 'int', 'rows' => 'int', 'cols' => 'int'),
+						array(
+							array('cust_gender', 'Gender', 'Your gender', 'radio', 15, 'undisclosed,male,female,genderless,nonbinary,transgendered', '', 0, 1, 'forumprofile', 0, 1, 0, 0, 'undisclosed', '<i class="icon i-{INPUT}" title="{INPUT}"><s>{INPUT}</s></i>', 0, 0, 0),
+							array('cust_blurb', 'Personal Text', 'A custom bit of text for your postbit.', 'text', 120, '', '', 0, 0, 'forumprofile', 0, 1, 0, 0, 'Default Personal Text', '', 3, 0, 0),
+							array('cust_locate', 'Location', 'Where you are', 'text', 32, '', '', 0, 0, 'forumprofile', 0, 1, 0, 0, '', '', 0, 0, 0),
+						),
+						'id_member'
+					);
 				}
 			),
 			array(
@@ -613,11 +624,13 @@ class UpgradeInstructions_upgrade_1_1
 						}
 
 						$db->insert('replace',
-							    '{db_prefix}custom_fields_data',
-							    array('id_member' => 'int', 'variable' => 'string', 'value' => 'string'),
-							    array(
-								    array($row['id_member'], 'cust_gender', $gender),
-							    ));
+							'{db_prefix}custom_fields_data',
+							array('id_member' => 'int', 'variable' => 'string', 'value' => 'string'),
+							array(
+								array($row['id_member'], 'cust_gender', $gender),
+							),
+							'id_member'
+						);
 					}
 				}
 			),
@@ -629,11 +642,13 @@ class UpgradeInstructions_upgrade_1_1
 					while ($row = mysqli_fetch_assoc($result))
 					{
 						$db->insert('replace',
-							    '{db_prefix}custom_fields_data',
-							    array('id_member' => 'int', 'variable' => 'string', 'value' => 'string'),
-							    array(
-								    array($row['id_member'], 'cust_locate', $row['location']),
-							    ));
+							'{db_prefix}custom_fields_data',
+							array('id_member' => 'int', 'variable' => 'string', 'value' => 'string'),
+							array(
+								array($row['id_member'], 'cust_locate', $row['location']),
+							),
+							'id_member'
+						);
 					}
 				}
 			),
@@ -645,11 +660,13 @@ class UpgradeInstructions_upgrade_1_1
 					while ($row = mysqli_fetch_assoc($result))
 					{
 						$db->insert('replace',
-							    '{db_prefix}custom_fields_data',
-							    array('id_member' => 'int', 'variable' => 'string', 'value' => 'string'),
-							    array(
-								    array($row['id_member'], 'cust_blurb', $row['personal_text']),
-							    ));
+							'{db_prefix}custom_fields_data',
+							array('id_member' => 'int', 'variable' => 'string', 'value' => 'string'),
+							array(
+								array($row['id_member'], 'cust_blurb', $row['personal_text']),
+							),
+							'id_member'
+						);
 					}
 				}
 			),

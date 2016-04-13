@@ -135,16 +135,16 @@ function protected_alter($change, $substep, $is_test = false)
 function upgrade_query($string, $unbuffered = false)
 {
 	global $db_connection, $db_server, $db_user, $db_passwd, $db_type, $command_line, $upcontext, $upgradeurl, $modSettings;
-	global $db_name, $db_unbuffered;
+	global $db_name;
 
 	// Retrieve our database
 	$db = load_database();
 
 	// Get the query result - working around some specific security - just this once!
 	$modSettings['disableQueryCheck'] = true;
-	$db_unbuffered = $unbuffered;
+	$db->setUnbuffered($unbuffered);
 	$result = $db->query('', $string, array('security_override' => true, 'db_error_skip' => true));
-	$db_unbuffered = false;
+	$db->setUnbuffered(false);
 
 	// Failure?!
 	if ($result !== false)
