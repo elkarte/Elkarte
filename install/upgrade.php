@@ -1102,17 +1102,21 @@ function action_databaseChanges()
 
 	// How many files are there in total?
 	if (isset($_GET['filecount']))
-		$upcontext['file_count'] = (int) $_GET['filecount'];
+	{
+		$filecount = (int) $_GET['filecount'];
+	}
 	else
 	{
-		$upcontext['file_count'] = 0;
-		foreach ($files as $file)
+		$filecount = 0;
+	}
+
+	$upcontext['file_count'] = 0;
+	foreach ($files as $file)
+	{
+		if (file_exists(__DIR__ . '/' . $file[0]) && version_compare($modSettings['elkVersion'], $file[1]) <= 0)
 		{
-			if (file_exists(__DIR__ . '/' . $file[0]) && version_compare($modSettings['elkVersion'], $file[1]) < 0)
-			{
-				$files_todo[] = $file;
-				$upcontext['file_count']++;
-			}
+			$files_todo[] = $file;
+			$upcontext['file_count']++;
 		}
 	}
 
@@ -1123,6 +1127,9 @@ function action_databaseChanges()
 	{
 		$upcontext['cur_file_num']++;
 		$upcontext['cur_file_name'] = $file[0];
+
+		if ($filecount > $upcontext['cur_file_num'])
+			continue;
 
 		// @todo Do we actually need to do this still?
 		if (file_exists(__DIR__ . '/' . $file[0]) && (!isset($modSettings['elkVersion']) || version_compare($modSettings['elkVersion'], $file[1]) <= 0))
