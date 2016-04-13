@@ -522,7 +522,7 @@ function initialize_inputs()
  */
 function action_welcomeLogin()
 {
-	global $modSettings, $upgradeurl, $upcontext, $db_type, $databases, $db_character_set;
+	global $modSettings, $upgradeurl, $upcontext, $db_type, $databases, $db_character_set, $txt;
 
 	$db = load_database();
 
