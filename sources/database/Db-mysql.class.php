@@ -123,7 +123,7 @@ class Database_MySQL extends Database_Abstract
 	public function query($identifier, $db_string, $db_values = array(), $connection = null)
 	{
 		global $db_show_debug, $time_start;
-		global $db_unbuffered, $db_callback, $modSettings;
+		global $db_unbuffered, $modSettings;
 
 		// Comments that are allowed in a query are preg_removed.
 		static $allowed_comments_from = array(
@@ -161,14 +161,16 @@ class Database_MySQL extends Database_Abstract
 
 		if (empty($db_values['security_override']) && (!empty($db_values) || strpos($db_string, '{db_prefix}') !== false))
 		{
-			// Pass some values to the global space for use in the callback function.
-			$db_callback = array($db_values, $connection);
+			// Store these values for use in the callback function.
+			$this->_db_callback_values = $db_values;
+			$this->_db_callback_connection = $connection;
 
 			// Inject the values passed to this function.
 			$db_string = preg_replace_callback('~{([a-z_]+)(?::([a-zA-Z0-9_-]+))?}~', array($this, 'replacement__callback'), $db_string);
 
-			// This shouldn't be residing in global space any longer.
-			$db_callback = array();
+			// No need for them any longer.
+			$this->_db_callback_values = array();
+			$this->_db_callback_connection = null;
 		}
 
 		// Debugging.

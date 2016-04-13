@@ -49,6 +49,19 @@ abstract class Database_Abstract implements Database
 	protected $_old_skip_error = null;
 
 	/**
+	 * This holds the "values" used in the replacement__callback method
+	 * @var mixed[]
+	 */
+	protected $_db_callback_values = array();
+
+	/**
+	 * This contains the "connection" used in the replacement__callback method
+	 * TBH I'm not sure why $this->_connection is not used
+	 * @var resource
+	 */
+	protected $_db_callback_connection = null;
+
+	/**
 	 * Private constructor.
 	 */
 	protected function __construct()
@@ -68,12 +81,10 @@ abstract class Database_Abstract implements Database
 	 */
 	public function replacement__callback($matches)
 	{
-		global $db_callback, $user_info, $db_prefix;
-
-		list ($values, $connection) = $db_callback;
+		global $user_info, $db_prefix;
 
 		// Connection gone???  This should *never* happen at this point, yet it does :'(
-		if (!$this->_validConnection($connection))
+		if (!$this->_validConnection($this->_db_callback_connection))
 			Errors::instance()->display_db_error();
 
 		if ($matches[1] === 'db_prefix')
@@ -88,10 +99,10 @@ abstract class Database_Abstract implements Database
 		if (!isset($matches[2]))
 			$this->error_backtrace('Invalid value inserted or no type specified.', '', E_USER_ERROR, __FILE__, __LINE__);
 
-		if (!isset($values[$matches[2]]))
+		if (!isset($this->_db_callback_values[$matches[2]]))
 			$this->error_backtrace('The database value you\'re trying to insert does not exist: ' . htmlspecialchars($matches[2], ENT_COMPAT, 'UTF-8'), '', E_USER_ERROR, __FILE__, __LINE__);
 
-		$replacement = $values[$matches[2]];
+		$replacement = $this->_db_callback_values[$matches[2]];
 
 		switch ($matches[1])
 		{
@@ -179,19 +190,26 @@ abstract class Database_Abstract implements Database
 	 */
 	public function quote($db_string, $db_values, $connection = null)
 	{
-		global $db_callback;
-
 		// Only bother if there's something to replace.
 		if (strpos($db_string, '{') !== false)
 		{
 			// This is needed by the callback function.
-			$db_callback = array($db_values, $connection === null ? $this->_connection : $connection);
+			$this->_db_callback_values = $db_values;
+			if ($connection === null)
+			{
+				$this->_db_callback_connection = $this->_connection;
+			}
+			else
+			{
+				$this->_db_callback_connection = $connection;
+			}
 
 			// Do the quoting and escaping
 			$db_string = preg_replace_callback('~{([a-z_]+)(?::([a-zA-Z0-9_-]+))?}~', array($this, 'replacement__callback'), $db_string);
 
-			// Clear this global variable.
-			$db_callback = array();
+			// Clear this variables.
+			$this->_db_callback_values = array();
+			$this->_db_callback_connection = null;
 		}
 
 		return $db_string;
