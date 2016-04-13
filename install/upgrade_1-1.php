@@ -172,23 +172,32 @@ class UpgradeInstructions_upgrade_1_1
 
 					$db->query('', '
 						UPDATE {db_prefix}log_mentions
-						SET mention_type = mentionmem
-						WHERE mention_type = men',
-						array()
+						SET mention_type = {string:to}
+						WHERE mention_type = {string:from}',
+						array(
+							'from' => 'men',
+							'to' => 'mentionmem'
+						)
 					);
 
 					$db->query('', '
 						UPDATE {db_prefix}log_mentions
-						SET mention_type = likemsg
-						WHERE mention_type = like',
-						array()
+						SET mention_type = {string:to}
+						WHERE mention_type = {string:from}',
+						array(
+							'from' => 'like',
+							'to' => 'likemsg'
+						)
 					);
 
 					$db->query('', '
 						UPDATE {db_prefix}log_mentions
-						SET mention_type = rlikemsg
-						WHERE mention_type = rlike',
-						array()
+						SET mention_type = {string:to}
+						WHERE mention_type = {string:from}',
+						array(
+							'from' => 'rlike',
+							'to' => 'rlikemsg'
+						)
 					);
 
 					$enabled_mentions = !empty($modSettings['enabled_mentions']) ? explode(',', $modSettings['enabled_mentions']) : array();
