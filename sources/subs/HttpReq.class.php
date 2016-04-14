@@ -96,6 +96,11 @@ class HttpReq
 		{
 			$this->session = new ArrayObject($_SESSION, ArrayObject::ARRAY_AS_PROPS);
 		}
+		else
+		{
+			$this->session = new ArrayObject(array(), ArrayObject::ARRAY_AS_PROPS);
+		}
+
 		$this->server = detectServer();
 
 		// Get will be in ->query, Post in ->post
