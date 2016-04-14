@@ -912,8 +912,7 @@ function pbe_prepare_text(&$message, &$subject = '', &$signature = '')
 		detectBrowser();
 
 	// Server?
-	if (!isset($context['server']))
-		detectServer();
+	detectServer();
 
 	// Clean it up.
 	$message = censor($message);

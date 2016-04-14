@@ -422,7 +422,7 @@ class Auth_Controller extends Action_Controller
 		if ($redirect)
 		{
 			if (empty($_SESSION['logout_url']))
-				redirectexit('', $context['server']['needs_login_fix']);
+				redirectexit('', detectServer()->is('needs_login_fix'));
 			elseif (!empty($_SESSION['logout_url']) && (substr($_SESSION['logout_url'], 0, 7) !== 'http://' && substr($_SESSION['logout_url'], 0, 8) !== 'https://'))
 			{
 				unset($_SESSION['logout_url']);
@@ -433,7 +433,7 @@ class Auth_Controller extends Action_Controller
 				$temp = $_SESSION['logout_url'];
 				unset($_SESSION['logout_url']);
 
-				redirectexit($temp, $context['server']['needs_login_fix']);
+				redirectexit($temp, detectServer()->is('needs_login_fix'));
 			}
 		}
 	}
@@ -789,9 +789,9 @@ function doLogin()
 
 	// Just log you back out if it's in maintenance mode and you AREN'T an admin.
 	if (empty($maintenance) || allowedTo('admin_forum'))
-		redirectexit('action=auth;sa=check;member=' . $user_info['id'], $context['server']['needs_login_fix']);
+		redirectexit('action=auth;sa=check;member=' . $user_info['id'], detectServer()->is('needs_login_fix'));
 	else
-		redirectexit('action=logout;' . $context['session_var'] . '=' . $context['session_id'], $context['server']['needs_login_fix']);
+		redirectexit('action=logout;' . $context['session_var'] . '=' . $context['session_id'], detectServer()->is('needs_login_fix'));
 }
 
 /**

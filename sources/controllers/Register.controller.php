@@ -489,7 +489,7 @@ class Register_Controller extends Action_Controller
 
 			setLoginCookie(60 * $modSettings['cookieTime'], $memberID, hash('sha256', Util::strtolower($regOptions['username']) . $regOptions['password'] . $regOptions['register_vars']['password_salt']));
 
-			redirectexit('action=auth;sa=check;member=' . $memberID, $context['server']['needs_login_fix']);
+			redirectexit('action=auth;sa=check;member=' . $memberID, detectServer()->is('needs_login_fix'));
 		}
 	}
 

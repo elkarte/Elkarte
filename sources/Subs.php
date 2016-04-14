@@ -384,7 +384,12 @@ function comma_format($number, $override_decimal_count = false)
 function standardTime($log_time, $show_today = true, $offset_type = false)
 {
 	global $context, $user_info, $txt, $modSettings;
-	static $non_twelve_hour;
+	static $non_twelve_hour, $support_e = null;
+
+	if ($support_e === null)
+	{
+		$support_e = detectServer()->is('windows');
+	}
 
 	// Offset the time.
 	if (!$offset_type)
@@ -452,7 +457,7 @@ function standardTime($log_time, $show_today = true, $offset_type = false)
 	}
 
 	// Windows doesn't support %e; on some versions, strftime fails altogether if used, so let's prevent that.
-	if ($context['server']['is_windows'] && strpos($str, '%e') !== false)
+	if ($support_e && strpos($str, '%e') !== false)
 		$str = str_replace('%e', ltrim(strftime('%d', $time), '0'), $str);
 
 	// Format any other characters..
@@ -737,7 +742,7 @@ function redirectexit($setLocation = '', $refresh = false)
 	elseif (isset($_GET['debug']))
 		$setLocation = preg_replace('/^' . preg_quote($scripturl, '/') . '\\??/', $scripturl . '?debug;', $setLocation);
 
-	if (!empty($modSettings['queryless_urls']) && (empty($context['server']['is_cgi']) || ini_get('cgi.fix_pathinfo') == 1 || @get_cfg_var('cgi.fix_pathinfo') == 1) && (!empty($context['server']['is_apache']) || !empty($context['server']['is_nginx']) || !empty($context['server']['is_lighttpd']) || !empty($context['server']['is_litespeed'])))
+	if (!empty($modSettings['queryless_urls']) && detectServer()->supportRewrite())
 	{
 		if (defined('SID') && SID != '')
 			$setLocation = preg_replace_callback('~^' . preg_quote($scripturl, '~') . '\?(?:' . SID . '(?:;|&|&amp;))((?:board|topic)=[^#]+?)(#[^"]*?)?$~', 'redirectexit_callback', $setLocation);
@@ -942,25 +947,7 @@ function setupThemeContext($forceload = false)
  */
 function setMemoryLimit($needed, $in_use = false)
 {
-	// Everything in bytes
-	$memory_current = memoryReturnBytes(ini_get('memory_limit'));
-	$memory_needed = memoryReturnBytes($needed);
-
-	// Should we account for how much is currently being used?
-	if ($in_use)
-		$memory_needed += memory_get_usage();
-
-	// If more is needed, request it
-	if ($memory_current < $memory_needed)
-	{
-		@ini_set('memory_limit', ceil($memory_needed / 1048576) . 'M');
-		$memory_current = memoryReturnBytes(ini_get('memory_limit'));
-	}
-
-	$memory_current = max($memory_current, memoryReturnBytes(get_cfg_var('memory_limit')));
-
-	// Return success or not
-	return (bool) ($memory_current >= $memory_needed);
+	return detectServer()->setMemoryLimit($needed, $in_use);
 }
 
 /**
@@ -1018,30 +1005,11 @@ function memoryReturnBytes($val)
  *
  * @param int $time_limit The time limit
  * @param bool $server_reset whether to reset the server timer or not
+ * @deprecated since 1.1
  */
 function setTimeLimit($time_limit, $server_reset = true)
 {
-	// Make sure the function exists, it may be in the ini disable_functions list
-	if (function_exists('set_time_limit'))
-	{
-		$current = (int) ini_get('max_execution_time');
-
-		// Do not set a limit if it is currently unlimited.
-		if ($current !== 0)
-		{
-			// Set it to the maximum that we can, not more, not less
-			$time_limit = min($current, max($time_limit, $current));
-
-			// Still need error suppression as some security addons many prevent this action
-			@set_time_limit($time_limit);
-		}
-	}
-
-	// Don't let apache close the connection
-	if ($server_reset && function_exists('apache_reset_timeout'))
-		@apache_reset_timeout();
-
-	return ini_get('max_execution_time');
+	return detectServer()->setTimeLimit($time_limit, $server_reset);
 }
 
 /**
