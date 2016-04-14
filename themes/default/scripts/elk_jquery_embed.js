@@ -168,7 +168,7 @@
 				startAtPar = '&start=' + startAtSeconds.toString();
 			}
 
-			var embedURL = '//youtube.com/embed/' + videoID + '?rel=0' + startAtPar,
+			var embedURL = '//www.youtube.com/embed/' + videoID + '?rel=0' + startAtPar,
 				tag = embedOrIMG(embed, a, '//img.youtube.com/vi/' + videoID + '/0.jpg', embedURL, embedURL + '&autoplay=1' );
 
 			return [oSettings.youtube, tag];
