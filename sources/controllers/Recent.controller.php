@@ -144,17 +144,17 @@ class Recent_Controller extends Action_Controller
 		// Set up the pageindex
 		$context['page_index'] = constructPageIndex($this->_base_url, $this->_start, min(100, $this->_total_posts), 10, !empty($this->_flex_start));
 
-		// Linktree
-		$context['linktree'][] = array(
-			'url' => $scripturl . '?action=recent' . (empty($board) ? (empty($categories) ? '' : ';c=' . implode(',', $categories)) : ';board=' . $board . '.0'),
-			'name' => $context['page_title']
-		);
-
 		// Rest of the items for the template
 		loadTemplate('Recent');
 		$context['page_title'] = $txt['recent_posts'];
 		$context['sub_template'] = 'recent';
 		$quote_enabled = empty($modSettings['disabledBBC']) || !in_array('quote', explode(',', $modSettings['disabledBBC']));
+
+		// Linktree
+		$context['linktree'][] = array(
+			'url' => $scripturl . '?action=recent' . (empty($board) ? (empty($categories) ? '' : ';c=' . implode(',', $categories)) : ';board=' . $board . '.0'),
+			'name' => $context['page_title']
+		);
 
 		// Nothing here... Or at least, nothing you can see...
 		if (!$this->_grabber->findRecentMessages($this->_start, 10))
