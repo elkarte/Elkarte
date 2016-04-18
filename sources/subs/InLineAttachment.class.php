@@ -107,115 +107,115 @@ class In_Line_Attachment
 	 * - Finds all [attach tags, determines msg number, inits values
 	 * - Calls needed functions to render ila tags
 	 */
-// 	public function parse_bbc()
-// 	{
-// 		global $modSettings, $context, $txt, $attachments, $topic;
-// 
-// 		// Addon or BBC disabled, or coming in from areas we don't want to work on
-// 		if (empty($modSettings['enableBBC']) || (isset($context['site_action']) && in_array($context['site_action'], array('boardindex', 'messageindex'))))
-// 			return $this->_message;
-// 
-// 		// No message id and not previewing a new message ($_REQUEST['ila'] will be set)
-// 		if ($this->_id_msg === -1 && !isset($_REQUEST['ila']))
-// 		{
-// 			// Make sure block quotes are cleaned up, then return
-// 			$this->_find_nested();
-// 			return $this->_message;
-// 		}
-// 
-// 		// Can't trust the $topic global due to portals and other integration
-// 		list($this->_topic, $this->_board) = $this->_get_topic($this->_id_msg);
-// 		$save_topic = !empty($topic) ? $topic : '';
-// 		$topic = $this->_topic;
-// 
-// 		// Lets make sure we have the attachments
-// 		require_once(SUBSDIR . '/Attachments.subs.php');
-// 		if (!isset($attachments[$this->_id_msg]))
-// 		{
-// 			if (is_array($attachments))
-// 				$attachments += $this->load_attachments();
-// 			else
-// 				$attachments = $this->load_attachments();
-// 		}
-// 
-// 		// Get the rest of the details for the message attachments, this uses the global topic
-// 		$this->_attachments_context = loadAttachmentContext($this->_id_msg);
-// 
-// 		// Put back the topic, whatever it was
-// 		$topic = $save_topic;
-// 
-// 		// Do we have new, not yet uploaded, attachments in either a new or a modified message (preview)?
-// 		if (isset($_REQUEST['ila']))
-// 		{
-// 			$this->_start_num = isset($attachments[$this->_id_msg]) ? count($attachments[$this->_id_msg]) : 0;
-// 			$ila_temp = explode(',', $_REQUEST['ila']);
-// 
-// 			// Add them at the end of the currently uploaded attachment count index
-// 			foreach ($ila_temp as $new_attach)
-// 			{
-// 				$this->_start_num++;
-// 				$this->_new_msg_preview[$this->_start_num] = $new_attach;
-// 			}
-// 		}
-// 
-// 		// Take care of any attach links that reside in quote blocks, we must render these first
-// 		$this->_find_nested();
-// 
-// 		// Find all of the inline attach tags in this message
-// 		// [attachimg=xx] [attach=xx] [attachurl=xx] [attachmini=xx] [attach] or
-// 		// some malformed ones like [attachIMG = "xx"]
-// 		// ila_tags[0] will hold the entire tag [1] will hold the attach type (before the ]) eg img=1
-// 		$ila_tags = array();
-// 		if (preg_match_all('~\[attach\s*?(.*?(?:".+?")?.*?|.*?)\][\r\n]?~i', $this->_message, $ila_tags))
-// 		{
-// 			// Load a simple array of elements.  We use it to keep track of attachment number usage in the message body
-// 			$this->_attachments = !empty($this->_start_num) ? range(1, $this->_start_num) : range(1, isset($attachments[$this->_id_msg]) ? count($attachments[$this->_id_msg]) : 0);
-// 			$ila_num = 0;
-// 
-// 			// If they have no permissions to view attachments then we sub out the tag with the appropriate message
-// 			if (!allowedTo('view_attachments', $this->_board))
-// 			{
-// 				$this->_message = preg_replace_callback('~\[attach\s*?(.*?(?:".+?")?.*?|.*?)\][\r\n]?~i',
-// 				function() use($context, $txt) {
-// 					if ($context['user']['is_guest'])
-// 						return $txt['ila_forbidden_for_guest'];
-// 					else
-// 						return $txt['ila_nopermission'];
-// 				},
-// 				$this->_message);
-// 			}
-// 			else
-// 			{
-// 				// If we have attachments, and ILA tags then go through each ILA tag,
-// 				// one by one, and resolve it back to the correct ELK attachment
-// 				if (!empty($ila_tags) && ((count($this->_attachments_context) > 0) || (isset($_REQUEST['ila']))))
-// 				{
-// 					foreach ($ila_tags[1] as $id => $ila_replace)
-// 					{
-// 						$this->_message = $this->str_replace_once($ila_tags[0][$id], $this->parse_bbc_tag($ila_replace, $ila_num), $this->_message);
-// 						$ila_num++;
-// 					}
-// 				}
-// 				// We have tags in the message and no attachments, replace them with an failed message
-// 				elseif (!empty($ila_tags))
-// 				{
-// 					// There are a few reasons why this can, and does, occur
-// 					//
-// 					// - The tags in the message but there is no attachments, perhaps the attachment did not upload correctly
-// 					// - The user put the tag in wrong because they are rock dumb and did not read our fantastic help,
-// 					// just kidding, really the help is not that good.
-// 					// - They don't have permission to view attachments in that board or the admin has disable attachments
-// 					foreach ($ila_tags[1] as $id => $ila_replace)
-// 						$this->_message = $this->str_replace_once($ila_tags[0][$id], $txt['ila_invalid'], $this->_message);
-// 				}
-// 			}
-// 		}
-// 
-// 		// Keep track of what we have used inline so its not shown below
-// 		$context['ila_dont_show_attach_below'][$this->_id_msg] = $this->_dont_show_attach_below;
-// 
-// 		return $this->_message;
-// 	}
+	public function parse_bbc()
+	{
+		global $modSettings, $context, $txt, $attachments, $topic;
+
+		// Addon or BBC disabled, or coming in from areas we don't want to work on
+		if (empty($modSettings['enableBBC']) || (isset($context['site_action']) && in_array($context['site_action'], array('boardindex', 'messageindex'))))
+			return $this->_message;
+
+		// No message id and not previewing a new message ($_REQUEST['ila'] will be set)
+		if ($this->_id_msg === -1 && !isset($_REQUEST['ila']))
+		{
+			// Make sure block quotes are cleaned up, then return
+			$this->_find_nested();
+			return $this->_message;
+		}
+
+		// Can't trust the $topic global due to portals and other integration
+		list($this->_topic, $this->_board) = $this->_get_topic($this->_id_msg);
+		$save_topic = !empty($topic) ? $topic : '';
+		$topic = $this->_topic;
+
+		// Lets make sure we have the attachments
+		require_once(SUBSDIR . '/Attachments.subs.php');
+		if (!isset($attachments[$this->_id_msg]))
+		{
+			if (is_array($attachments))
+				$attachments += $this->load_attachments();
+			else
+				$attachments = $this->load_attachments();
+		}
+
+		// Get the rest of the details for the message attachments, this uses the global topic
+		$this->_attachments_context = loadAttachmentContext($this->_id_msg);
+
+		// Put back the topic, whatever it was
+		$topic = $save_topic;
+
+		// Do we have new, not yet uploaded, attachments in either a new or a modified message (preview)?
+		if (isset($_REQUEST['ila']))
+		{
+			$this->_start_num = isset($attachments[$this->_id_msg]) ? count($attachments[$this->_id_msg]) : 0;
+			$ila_temp = explode(',', $_REQUEST['ila']);
+
+			// Add them at the end of the currently uploaded attachment count index
+			foreach ($ila_temp as $new_attach)
+			{
+				$this->_start_num++;
+				$this->_new_msg_preview[$this->_start_num] = $new_attach;
+			}
+		}
+
+		// Take care of any attach links that reside in quote blocks, we must render these first
+		$this->_find_nested();
+
+		// Find all of the inline attach tags in this message
+		// [attachimg=xx] [attach=xx] [attachurl=xx] [attachmini=xx] [attach] or
+		// some malformed ones like [attachIMG = "xx"]
+		// ila_tags[0] will hold the entire tag [1] will hold the attach type (before the ]) eg img=1
+		$ila_tags = array();
+		if (preg_match_all('~\[attach\s*?(.*?(?:".+?")?.*?|.*?)\][\r\n]?~i', $this->_message, $ila_tags))
+		{
+			// Load a simple array of elements.  We use it to keep track of attachment number usage in the message body
+			$this->_attachments = !empty($this->_start_num) ? range(1, $this->_start_num) : range(1, isset($attachments[$this->_id_msg]) ? count($attachments[$this->_id_msg]) : 0);
+			$ila_num = 0;
+
+			// If they have no permissions to view attachments then we sub out the tag with the appropriate message
+			if (!allowedTo('view_attachments', $this->_board))
+			{
+				$this->_message = preg_replace_callback('~\[attach\s*?(.*?(?:".+?")?.*?|.*?)\][\r\n]?~i',
+				function() use($context, $txt) {
+					if ($context['user']['is_guest'])
+						return $txt['ila_forbidden_for_guest'];
+					else
+						return $txt['ila_nopermission'];
+				},
+				$this->_message);
+			}
+			else
+			{
+				// If we have attachments, and ILA tags then go through each ILA tag,
+				// one by one, and resolve it back to the correct ELK attachment
+				if (!empty($ila_tags) && ((count($this->_attachments_context) > 0) || (isset($_REQUEST['ila']))))
+				{
+					foreach ($ila_tags[1] as $id => $ila_replace)
+					{
+						$this->_message = $this->str_replace_once($ila_tags[0][$id], $this->parse_bbc_tag($ila_replace, $ila_num), $this->_message);
+						$ila_num++;
+					}
+				}
+				// We have tags in the message and no attachments, replace them with an failed message
+				elseif (!empty($ila_tags))
+				{
+					// There are a few reasons why this can, and does, occur
+					//
+					// - The tags in the message but there is no attachments, perhaps the attachment did not upload correctly
+					// - The user put the tag in wrong because they are rock dumb and did not read our fantastic help,
+					// just kidding, really the help is not that good.
+					// - They don't have permission to view attachments in that board or the admin has disable attachments
+					foreach ($ila_tags[1] as $id => $ila_replace)
+						$this->_message = $this->str_replace_once($ila_tags[0][$id], $txt['ila_invalid'], $this->_message);
+				}
+			}
+		}
+
+		// Keep track of what we have used inline so its not shown below
+		$context['ila_dont_show_attach_below'][$this->_id_msg] = $this->_dont_show_attach_below;
+
+		return $this->_message;
+	}
 
 	/**
 	 * parse_bbc_tag()
