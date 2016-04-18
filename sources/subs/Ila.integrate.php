@@ -31,7 +31,7 @@ class Ila_Integrate
 
 		// $hook, $function, $file
 		return array(
-			array('integrate_bbc_codes', 'Ila_Integrate::integrate_bbc_codes'),
+			array('integrate_additional_bbc', 'Ila_Integrate::integrate_additional_bbc'),
 			array('integrate_pre_parsebbc', 'Ila_Integrate::integrate_pre_parsebbc'),
 			array('integrate_post_bbc_parser', 'Ila_Integrate::integrate_post_bbc_parser'),
 			array('integrate_before_prepare_display_context', 'Ila_Integrate::integrate_before_prepare_display_context'),
@@ -55,32 +55,49 @@ class Ila_Integrate
 	 *
 	 * @param mixed[] $codes
 	 */
-	public static function integrate_bbc_codes(&$codes)
+	public static function integrate_additional_bbc(&$codes)
 	{
+		global $scripturl;
+
 		// Add in our new codes, if found on to the end of this array
 		// here mostly used to null them out should they not be rendered
 		$codes = array_merge($codes, array(
 			array(
-				'tag' => 'attachimg',
-				'type' => 'closed',
-				'content' => '',
+				\BBC\Codes::ATTR_TAG => 'attach',
+				\BBC\Codes::ATTR_TYPE => \BBC\Codes::TYPE_UNPARSED_CONTENT,
+				\BBC\Codes::ATTR_CONTENT => '<a href="' . $scripturl . '?action=dlattach;attach=$1"><img src="' . $scripturl . '?action=dlattach;attach=$1;thumb" alt="" class="bbc_img" /></a>',
+				\BBC\Codes::ATTR_VALIDATE => function(&$tag, &$data, $disabled) {
+					global $context, $user_info;
+
+					if (strpos($data, 'post_tmp_' . $user_info['id']) === false)
+					{
+						$data = (int) $data;
+					}
+
+					$context['ila_dont_show_attach_below'][] = $data;
+					$context['ila_dont_show_attach_below'] = array_unique($context['ila_dont_show_attach_below']);
+				},
+				\BBC\Codes::ATTR_DISABLED_CONTENT => '<a href="' . $scripturl . '?action=dlattach;attach=$1">(' . $scripturl . '?action=dlattach;attach=$1)</a>',
+				\BBC\Codes::ATTR_BLOCK_LEVEL => false,
+				\BBC\Codes::ATTR_AUTOLINK => false,
+				\BBC\Codes::ATTR_LENGTH => 6,
 			),
-			array(
-				'tag' => 'attachurl',
-				'type' => 'closed',
-				'content' => '',
-			),
-			array(
-				'tag' => 'attachmini',
-				'type' => 'closed',
-				'content' => '',
-			),
-			array(
-				'tag' => 'attachthumb',
-				'type' => 'closed',
-				'content' => '',
-			))
-		);
+// 			array(
+// 				'tag' => 'attachurl',
+// 				'type' => 'closed',
+// 				'content' => '',
+// 			),
+// 			array(
+// 				'tag' => 'attachmini',
+// 				'type' => 'closed',
+// 				'content' => '',
+// 			),
+// 			array(
+// 				'tag' => 'attachthumb',
+// 				'type' => 'closed',
+// 				'content' => '',
+// 			)
+		));
 
 		return;
 	}
@@ -129,28 +146,28 @@ class Ila_Integrate
 	 * @param string $cache_id
 	 * @param string[]|null $parse_tags
 	 */
-	public static function integrate_post_bbc_parser(&$message)
-	{
-		global $context;
-
-		// Enabled and we have tags, time to render them
-		if (empty($context['uninstalling']) && stripos($message, '[attach') !== false)
-		{
-			if (!empty($_REQUEST['id_draft']))
-			{
-				// Previewing a draft
-				$msg_id = (int) $_REQUEST['id_draft'];
-			}
-			else
-			{
-				// Previewing a modified message, check for a value in $_REQUEST['msg']
-				$msg_id = isset($_REQUEST['msg']) ? (int) $_REQUEST['msg'] : -1;
-			}
-
-			$ila_parser = new In_Line_Attachment($message, $cache_id);
-			$message = $ila_parser->ila_parse_bbc();
-		}
-	}
+// 	public static function integrate_post_bbc_parser(&$message)
+// 	{
+// 		global $context;
+// 
+// 		// Enabled and we have tags, time to render them
+// 		if (empty($context['uninstalling']) && stripos($message, '[attach') !== false)
+// 		{
+// 			if (!empty($_REQUEST['id_draft']))
+// 			{
+// 				// Previewing a draft
+// 				$msg_id = (int) $_REQUEST['id_draft'];
+// 			}
+// 			else
+// 			{
+// 				// Previewing a modified message, check for a value in $_REQUEST['msg']
+// 				$msg_id = isset($_REQUEST['msg']) ? (int) $_REQUEST['msg'] : -1;
+// 			}
+// 
+// 			$ila_parser = new In_Line_Attachment($message);
+// 			$message = $ila_parser->parse_bbc();
+// 		}
+// 	}
 
 	/**
 	 * Display controller hook, called from prepareDisplayContext_callback integrate_before_prepare_display_context

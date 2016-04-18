@@ -220,14 +220,14 @@ class Codes
 	 */
 	public function add(array $code)
 	{
-		$first_char = $code[self::ATTR_TAG][0];
+// 		$first_char = $code[self::ATTR_TAG][0];
 
-		if (!isset($this->bbc[$first_char]))
-		{
-			$this->bbc[$first_char] = array();
-		}
+// 		if (!isset($this->bbc[$first_char]))
+// 		{
+// 			$this->bbc[$first_char] = array();
+// 		}
 
-		$this->bbc[$first_char][] = $code;
+		$this->bbc[] = $code;
 	}
 
 	public function remove($tag)
@@ -246,7 +246,7 @@ class Codes
 		global $modSettings, $txt, $scripturl;
 
 		// This array can be arranged in any order.
-		return array(
+		return array_merge($this->bbc, array(
 			array(
 				self::ATTR_TAG => 'abbr',
 				self::ATTR_TYPE => self::TYPE_UNPARSED_EQUALS,
@@ -266,25 +266,6 @@ class Codes
 				self::ATTR_AFTER => '</span>',
 				self::ATTR_BLOCK_LEVEL => false,
 				self::ATTR_AUTOLINK => true,
-				self::ATTR_LENGTH => 6,
-			),
-			array(
-				self::ATTR_TAG => 'attach',
-				self::ATTR_TYPE => self::TYPE_UNPARSED_CONTENT,
-				self::ATTR_CONTENT => '<a href="' . $scripturl . '?action=dlattach;attach=$1"><img src="' . $scripturl . '?action=dlattach;attach=$1;thumb" alt="" class="bbc_img" /></a>',
-				self::ATTR_VALIDATE => function(&$tag, &$data, $disabled) {
-					global $context, $user_info;
-
-					if (strpos($data, 'post_tmp_' . $user_info['id']) === false)
-					{
-						$data = (int) $data;
-					}
-					$context['ila_dont_show_attach_below'][] = $data;
-					$context['ila_dont_show_attach_below'] = array_unique($context['ila_dont_show_attach_below']);
-				},
-				self::ATTR_DISABLED_CONTENT => '<a href="' . $scripturl . '?action=dlattach;attach=$1">(' . $scripturl . '?action=dlattach;attach=$1)</a>',
-				self::ATTR_BLOCK_LEVEL => false,
-				self::ATTR_AUTOLINK => false,
 				self::ATTR_LENGTH => 6,
 			),
 			array(
@@ -868,7 +849,7 @@ class Codes
 				self::ATTR_AUTOLINK => false,
 				self::ATTR_LENGTH => 3,
 			),
-		);
+		));
 	}
 
 	public function getItemCodes()
