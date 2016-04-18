@@ -121,7 +121,7 @@ class Memcached extends Cache_Method_Abstract
 				$server = explode(':', trim($server));
 				$serversm[] = $server;
 			}
-			$memcached = new Memcached;
+			$memcached = new \Memcached;
 			$memcached->addServers($serversm);
 		}
 		// Don't wait too long: yes, we want the server, but we might be able to run the query faster!
