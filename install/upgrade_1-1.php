@@ -213,6 +213,17 @@ class UpgradeInstructions_upgrade_1_1
 							$enabled_mentions[] = $toggle;
 						else
 							$enabled_mentions = array_diff($enabled_mentions, array($toggle));
+
+						$db->query('', '
+							INSERT INTO {db_prefix}notifications_pref
+								(id_member, mention_type, notification_level)
+							SELECT id_member, {string:mention_type}, {int:level}
+							FROM {db_prefix}members',
+							array(
+								'mention_type' => $toggle,
+								'level' => 1,
+							)
+						);
 					}
 					updateSettings(array('enabled_mentions' => implode(',', $enabled_mentions)));
 				}
