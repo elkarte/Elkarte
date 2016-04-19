@@ -1245,7 +1245,7 @@ class BBCParser
 		$html = null;
 		call_integration_hook('integrate_recursive_bbc_parser', array(&$autolinker, &$html));
 
-		$parser = new \BBC\Parser($bbc, $autolinker, $html);
+		$parser = new \BBC\BBCParser($bbc, $autolinker, $html);
 		$data = $parser->enableSmileys(empty($tag[Codes::ATTR_PARSED_TAGS_ALLOWED]))->parse($data);
 	}
 
