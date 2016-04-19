@@ -623,7 +623,7 @@ smc_AutoSuggest.prototype.autoSuggestUpdate = function ()
 		this.oXmlRequestHandle.abort();
 
 	// Clean the text handle.
-	sSearchString = sSearchString.php_to8bit().php_urlencode();
+	sSearchString = sSearchString.php_urlencode();
 
 	// Get the document.
 	var obj = {

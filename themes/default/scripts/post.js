@@ -158,11 +158,11 @@ function getFields(textFields, numericFields, checkboxFields, form_name)
 			// Handle the editor.
 			if (textFields[i] == post_box_name && $editor_data[post_box_name] !== undefined)
 			{
-				fields[fields.length] = textFields[i] + '=' + $editor_data[post_box_name].getText().replace(/&#/g, '&#38;#').php_to8bit().php_urlencode();
+				fields[fields.length] = textFields[i] + '=' + $editor_data[post_box_name].getText().replace(/&#/g, '&#38;#').php_urlencode();
 				fields[fields.length] = 'message_mode=' + $editor_data[post_box_name].inSourceMode();
 			}
 			else
-				fields[fields.length] = textFields[i] + '=' + document.forms[form_name][textFields[i]].value.replace(/&#/g, '&#38;#').php_to8bit().php_urlencode();
+				fields[fields.length] = textFields[i] + '=' + document.forms[form_name][textFields[i]].value.replace(/&#/g, '&#38;#').php_urlencode();
 		}
 	}
 
