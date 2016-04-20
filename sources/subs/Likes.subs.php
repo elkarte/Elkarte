@@ -553,7 +553,7 @@ function dbMostLikedMessage($limit = 10)
 	while ($row = $db->fetch_assoc($request))
 	{
 		// Censor it!
-		$row['body'] = censor($row['subject']);
+		$row['subject'] = censor($row['subject']);
 		$row['body'] = censor($row['body']);
 
 		$row['body'] = $bbc_parser->parseMessage($row['body'], $row['smileys_enabled']);
@@ -649,7 +649,7 @@ function dbMostLikedMessagesByTopic($topic, $limit = 5)
 		{
 			// Censor those naughty words
 			$row['body'] = censor($row['body']);
-			$row['body'] = censor($row['subject']);
+			$row['subject'] = censor($row['subject']);
 
 			$row['body'] = $bbc_parser->parseMessage($row['body'], $row['smileys_enabled']);
 
@@ -919,7 +919,7 @@ function dbMostLikedPostsByUser($id_member, $limit = 10)
 		{
 			// Censor those naughty words
 			$row['body'] = censor($row['body']);
-			$row['body'] = censor($row['subject']);
+			$row['subject'] = censor($row['subject']);
 
 			$row['body'] = $bbc_parser->parseMessage($row['body'], $row['smileys_enabled']);
 
@@ -1036,7 +1036,7 @@ function dbRecentlyLikedPostsGivenUser($id_liker, $limit = 5)
 		{
 			// Censor those $%#^&% words
 			$row['body'] = censor($row['body']);
-			$row['body'] = censor($row['subject']);
+			$row['subject'] = censor($row['subject']);
 
 			$row['body'] = $bbc_parser->parseMessage($row['body'], $row['smileys_enabled']);
 

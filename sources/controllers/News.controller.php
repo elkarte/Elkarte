@@ -347,7 +347,7 @@ class News_Controller extends Action_Controller
 
 			// Dirty mouth?
 			$row['body'] = censor($row['body']);
-			$row['body'] = censor($row['subject']);
+			$row['subject'] = censor($row['subject']);
 
 			// Being news, this actually makes sense in rss format.
 			if ($xml_format === 'rss' || $xml_format === 'rss2')
@@ -453,7 +453,7 @@ class News_Controller extends Action_Controller
 
 			// You can't say that
 			$row['body'] = censor($row['body']);
-			$row['body'] = censor($row['subject']);
+			$row['subject'] = censor($row['subject']);
 
 			// Doesn't work as well as news, but it kinda does..
 			if ($xml_format === 'rss' || $xml_format === 'rss2')
