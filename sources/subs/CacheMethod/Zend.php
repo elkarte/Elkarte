@@ -58,7 +58,7 @@ class Zend extends Cache_Method_Abstract
 		else
 			$result = output_cache_get($key, $ttl);
 
-		$this->is_miss = $result === null || $result === false;
+		$this->is_miss = $result === null;
 
 		return $result;
 	}

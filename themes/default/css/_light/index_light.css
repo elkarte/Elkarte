@@ -2253,6 +2253,15 @@ a.helpicon:hover, a > .iconline:hover, a > .icoffline:hover {
 	.mlist li div.posts {
 		border-right-color: #CCCCCC;
 	}
+
+	#upshrink {
+		border-color: transparent;
+		margin-top: -0.4em;
+	}
+
+	#collapse_button {
+		padding-top: 0.25em;
+	}
 }
 
 /* This one does up to 540 screens. */
