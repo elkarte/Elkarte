@@ -66,7 +66,7 @@ var disableDrafts = false;
 					// What we want
 					var obj = {
 						"suggest_type": "member",
-						"search": query.php_to8bit().php_urlencode(),
+						"search": query.php_urlencode(),
 						"time": current_call
 					};
 					obj[elk_session_var] = elk_session_id;

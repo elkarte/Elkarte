@@ -440,11 +440,32 @@ function template_add_new_attachments()
 							</dd>
 						</dl>';
 
+	if (!empty($context['attachments']['ila_enabled']))
+	{
+		addInlineJavascript('
+		var IlaDropEvents = {
+			UploadSuccess: function($button, data) {
+				var inlineAttach = ElkInlineAttachments(\'#postAttachment2,#postAttachment\', \'' . $context['post_box_name'] . '\', {
+					trigger: $(\'<div class="fa share fa-share-alt-square" />\')
+				});
+				inlineAttach.addInterface($button, data.attachid);
+			},
+			RemoveSuccess: function(attachid) {
+				var inlineAttach = ElkInlineAttachments(\'#postAttachment2,#postAttachment\', \'' . $context['post_box_name'] . '\', {
+					trigger: $(\'<div class="fa share fa-share-alt-square" />\')
+				});
+				inlineAttach.removeAttach(attachid);
+			}
+		};', true);
+	}
+	else
+	{
+		addInlineJavascript('
+		var IlaDropEvents = {};', true);
+	}
+
 	// Load up the drag and drop attachment magic
 	addInlineJavascript('
-	var inlineAttach = ElkInlineAttachments(\'#postAttachment2,#postAttachment\', \'' . $context['post_box_name'] . '\', {
-		trigger: $(\'<div class="fa share fa-share-alt-square" />\')
-	});
 	var dropAttach = new dragDropAttachment({
 		board: ' . $context['current_board'] . ',
 		allowedExtensions: ' . JavaScriptEscape($context['attachments']['allowed_extensions']) . ',
@@ -462,14 +483,7 @@ function template_add_new_attachments()
 			areYouSure: ' . JavaScriptEscape($txt['ila_confirm_removal']) . '
 		},
 		existingSelector: \'.inline_insert\',
-		events: {
-			UploadSuccess: function($button, data) {
-				inlineAttach.addInterface($button, data.attachid);
-			},
-			RemoveSuccess: function(attachid) {
-				inlineAttach.removeAttach(attachid);
-			}
-		}' . (isset($context['current_topic']) ? ',
+		events: IlaDropEvents' . (isset($context['current_topic']) ? ',
 			topic: ' . $context['current_topic'] : '') . '
 	});', true);
 }

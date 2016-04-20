@@ -99,6 +99,8 @@ class Attachments_Post_Module implements ElkArte\sources\modules\Module_Interfac
 		global $txt, $context, $modSettings, $user_info, $scripturl;
 
 		$context['attachments']['can']['post'] = self::$_attach_level == 1 && (allowedTo('post_attachment') || ($modSettings['postmod_active'] && allowedTo('post_unapproved_attachments')));
+		$context['attachments']['ila_enabled'] = !empty($modSettings['attachment_inline_enabled']);
+
 		if ($context['attachments']['can']['post'])
 		{
 			// If there are attachments, calculate the total size and how many.

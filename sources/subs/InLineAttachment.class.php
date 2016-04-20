@@ -93,12 +93,10 @@ class In_Line_Attachment
 	 * Constructor, loads the message an id in to the class
 	 *
 	 * @param string $message
-	 * @param int|null $id_msg
 	 */
-	public function __construct($message, $id_msg)
+	public function __construct($message)
 	{
 		$this->_message = $message;
-		$this->_id_msg = $id_msg;
 	}
 
 	/**

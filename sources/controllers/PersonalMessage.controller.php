@@ -1126,7 +1126,7 @@ class PersonalMessage_Controller extends Action_Controller
 		}
 
 		// If they made any errors, give them a chance to make amends.
-		if ($post_errors->hasErrors() && !$is_recipient_change && !isset($this->_req->post->preview) && !isset($this->_req->query->xml))
+		if ($post_errors->hasErrors() && !$is_recipient_change && !isset($this->_req->query->preview) && !isset($this->_req->query->xml))
 		{
 			$this->messagePostError($namedRecipientList, $recipientList);
 
@@ -1134,7 +1134,7 @@ class PersonalMessage_Controller extends Action_Controller
 		}
 
 		// Want to take a second glance before you send?
-		if (isset($this->_req->post->preview))
+		if (isset($this->_req->query->preview))
 		{
 			// Set everything up to be displayed.
 			$context['preview_subject'] = Util::htmlspecialchars($this->_req->post->subject);
@@ -1181,7 +1181,7 @@ class PersonalMessage_Controller extends Action_Controller
 		}
 
 		// Safety net, it may be a module may just add to the list of errors without actually throw the error
-		if ($post_errors->hasErrors() && !isset($this->_req->post->preview) && !isset($this->_req->query->xml))
+		if ($post_errors->hasErrors() && !isset($this->_req->query->preview) && !isset($this->_req->query->xml))
 		{
 			$this->messagePostError($namedRecipientList, $recipientList);
 
