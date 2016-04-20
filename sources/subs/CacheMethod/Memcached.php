@@ -74,7 +74,7 @@ class Memcached extends Cache_Method_Abstract
 			$result = memcached_get($this->_options['memcached'], $key);
 		}
 
-		$this->is_miss = $result === null;
+		$this->is_miss = $result === null || $result === false;
 
 		return $result;
 	}
