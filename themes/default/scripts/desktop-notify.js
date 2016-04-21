@@ -250,12 +250,12 @@
 			aleradyChecked = true;
 
 			return permission_granted;
-		}
+		};
 
 		init(opt);
 		return {
 			send: send
-		}
+		};
 	});
 
 	// AMD / RequireJS

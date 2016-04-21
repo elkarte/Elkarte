@@ -1483,7 +1483,7 @@ function disableAutoComplete()
 		};
 
 		var fetch = function() {
-			if (_notifiers.length == 0)
+			if (_notifiers.length === 0)
 				return;
 
 			$.ajax({
@@ -1551,7 +1551,7 @@ var ElkNotifier = new ElkNotifications();
 			}
 
 			$trigger.click(function(e) {
-				e.preventDefault;
+				e.preventDefault();
 
 				var ila_text = '[attach]' + attachId + '[/attach]';
 				$editor_data[editor].insertText(ila_text, false, true);
@@ -1586,7 +1586,7 @@ var ElkNotifier = new ElkNotifications();
 		return {
 			addInterface: addInterface,
 			removeAttach: removeAttach
-		}
+		};
 	});
 
 	// AMD / RequireJS
