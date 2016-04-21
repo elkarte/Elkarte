@@ -683,4 +683,34 @@ class UpgradeInstructions_upgrade_1_1
 			),
 		);
 	}
+
+	public function user_drafts_title()
+	{
+		return 'Flag for user saved drafts...';
+	}
+
+	public function pm_reporting()
+	{
+		return array(
+			array(
+				'debug_title' => 'Adding new columns...',
+				'function' => function($db, $db_table)
+				{
+					if ($db_table->column_exists('{db_prefix}user_drafts', 'is_usersaved') === false)
+					{
+						$db_table->db_add_column('{db_prefix}user_drafts',
+							array(
+								'name' => 'is_usersaved',
+								'type' => 'tinyint',
+								'size' => 4,
+								'default' => 0
+							),
+							array(),
+							'ignore'
+						);
+					}
+				}
+			)
+		);
+	}
 }
