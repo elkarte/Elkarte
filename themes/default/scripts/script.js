@@ -106,68 +106,9 @@ function sendXMLDocument(sUrl, sContent, funcCallback)
 
 /**
  * All of our specialized string handling functions are defined here
- * php_to8bit, php_strtr, php_strtolower, php_urlencode, php_htmlspecialchars
+ * php_strtr, php_strtolower, php_urlencode, php_htmlspecialchars
  * php_unhtmlspecialchars, php_addslashes, removeEntities, easyReplace
  */
-
-/**
- * Convert a UTF8 string to an 8 bit representation
- *
- * - Simulate php utf8_encode function
- * - Surrogate handling leveraged from php.js which is licensed under the MIT licenses.
- */
-String.prototype.php_to8bit = function () {
-	var sReturn = '',
-		iStart = 0,
-		iEnd = 0,
-		iTextLen = this.length;
-
-	for (var i = 0; i < iTextLen; i++)
-	{
-		// Character code (UTF 16)
-		var cc = this.charCodeAt(i),
-			sUtf8enc = null;
-
-		// Simple Ascii
-		if (cc < 128)
-			iEnd++;
-		// Simple two Byte
-		else if (cc < 2048)
-			sUtf8enc = String.fromCharCode((192 | cc >> 6), (128 | cc & 63));
-		// Simple three Byte if not a surrogate pair
-		else if ((cc & 0xF800) !== 0xD800)
-			sUtf8enc = String.fromCharCode((224 | cc >> 12), (128 | cc >> 6 & 63), (128 | cc & 63));
-		else
-		{
-			// Character code for the next Byte
-			var cc2 = this.charCodeAt(++i);
-
-			// Valid surrogate pairs must have matched lead and trail
-			if ((cc & 0xFC00) !== 0xD800 || (cc2 & 0xFC00) !== 0xDC00)
-				sUtf8enc = String.fromCharCode((224 | 65533 >> 12), (128 | 65533 >> 6 & 63), (128 | 65533 & 63));
-			else
-			{
-				cc = ((cc & 0x3FF) << 10) + (cc2 & 0x3FF) + 0x10000;
-				sUtf8enc = String.fromCharCode(240 | cc >> 18, (128 | cc >> 12 & 63), (128 | cc >> 6 & 63), (128 | cc & 63));
-			}
-		}
-
-		// Had to encode the character?
-		if (sUtf8enc !== null)
-		{
-			if (iEnd > iStart)
-				sReturn += this.slice(iStart, iEnd);
-
-			sReturn += sUtf8enc;
-			iStart = iEnd = i + 1;
-		}
-	}
-
-	if (iEnd > iStart)
-		sReturn += this.slice(iStart, iTextLen);
-
-	return sReturn;
-};
 
 /**
  * Character-level replacement function.
