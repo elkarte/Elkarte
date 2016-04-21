@@ -514,8 +514,10 @@ class Database_MySQL extends Database_Abstract
 				$_SESSION['query_command_denied'][$command] = $query_error;
 
 				// Let the admin know there is a command denied issue
-				if (function_exists('log_error'))
+				if (class_exists('Errors'))
+				{
 					Errors::instance()->log_error($txt['database_error'] . ': ' . $query_error . (!empty($modSettings['enableErrorQueryLogging']) ? "\n\n$db_string" : ''), 'database', $file, $line);
+				}
 
 				return false;
 			}
