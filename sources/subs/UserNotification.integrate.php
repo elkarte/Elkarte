@@ -46,7 +46,12 @@ class User_Notification_Integrate
 	 */
 	public static function integrate_load_theme()
 	{
-		global $modSettings;
+		global $modSettings, $user_info;
+
+		if ($user_info['is_guest'])
+		{
+			return;
+		}
 
 		$notification = new User_Notification($modSettings);
 		$notification->present();
