@@ -894,8 +894,8 @@ function expandThumbLB(thumbID) {
 				screenHeight = window.innerHeight * 0.9;
 
 			$(this).css({
-				'max-width': screenWidth + 'px',
-				'max-height': screenHeight + 'px'
+				'max-width': Math.floor(screenWidth) + 'px',
+				'max-height': Math.floor(screenHeight) + 'px'
 			});
 
 			$elk_lb_content.html($(this)).append($elk_expand_icon);
@@ -916,8 +916,9 @@ function expandThumbLB(thumbID) {
 	// Provide an expand to full image icon click
 	$elk_expand_icon.on('click', function (event) {
 		$('#elk_lb_content').addClass('expand').css({
-			'height': window.innerHeight * 0.9,
-			'width': window.innerWidth * 0.9
+			'height': Math.floor(window.innerHeight * 0.95) + 'px',
+			'width': Math.floor(window.innerWidth * 0.9) + 'px',
+			'left': '0'
 		});
 		$('#elk_lb_img').removeAttr('style');
 		$elk_expand_icon.hide();

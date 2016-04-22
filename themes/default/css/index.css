@@ -3096,6 +3096,7 @@ img.new_posts {
 }
 
 #elk_lb_content.expand {
+	position: absolute;
 	overflow: auto;
 	margin-top: 20px;
 	padding: 0;
