@@ -126,7 +126,10 @@ loadDatabase();
 reloadSettings();
 
 // Our good ole' contextual array, which will hold everything
-$context = array();
+if (!isset($context))
+{
+	$context = array();
+}
 
 // Seed the random generator.
 elk_seed_generator();
