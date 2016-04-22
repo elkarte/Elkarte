@@ -146,8 +146,8 @@ class Who_Controller extends Action_Controller
 		$totalMembers = countMembersOnline($conditions);
 
 		// Prepare some page index variables.
-		$context['page_index'] = constructPageIndex($scripturl . '?action=who;sort=' . $context['sort_by'] . ($context['sort_direction'] === 'up' ? ';asc' : '') . ';show=' . $context['show_by'], $this->_req->post->start, $totalMembers, $modSettings['defaultMaxMembers']);
-		$context['start'] = $this->_req->post->start;
+		$context['page_index'] = constructPageIndex($scripturl . '?action=who;sort=' . $context['sort_by'] . ($context['sort_direction'] === 'up' ? ';asc' : '') . ';show=' . $context['show_by'], $this->_req->get('start', 'intval'), $totalMembers, $modSettings['defaultMaxMembers']);
+		$context['start'] = $this->_req->get('start', 'intval');
 		$context['sub_template'] = 'whos_online';
 		Template_Layers::getInstance()->add('whos_selection');
 
