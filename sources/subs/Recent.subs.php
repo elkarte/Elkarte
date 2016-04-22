@@ -62,7 +62,7 @@ function getLastPosts($latestPostOptions)
 	while ($row = $db->fetch_assoc($request))
 	{
 		// Censor the subject and post for the preview ;).
-		$row['body'] = censor($row['subject']);
+		$row['subject'] = censor($row['subject']);
 		$row['body'] = censor($row['body']);
 
 		$row['body'] = strip_tags(strtr($bbc_parser->parseMessage($row['body'], $row['smileys_enabled']), array('<br />' => '&#10;')));
@@ -139,7 +139,7 @@ function prepareRecentPosts($messages, $start)
 	{
 		// Censor everything.
 		$row['body'] = censor($row['body']);
-		$row['body'] = censor($row['subject']);
+		$row['subject'] = censor($row['subject']);
 
 		// BBC-atize the message.
 		$row['body'] = $bbc_parser->parseMessage($row['body'], $row['smileys_enabled']);

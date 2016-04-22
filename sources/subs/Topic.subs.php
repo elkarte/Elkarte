@@ -1672,7 +1672,7 @@ function topicMessages($topic, $render = 'print')
 	while ($row = $db->fetch_assoc($request))
 	{
 		// Censor the subject and message.
-		$row['body'] = censor($row['subject']);
+		$row['subject'] = censor($row['subject']);
 		$row['body'] = censor($row['body']);
 
 		$posts[$row['id_msg']] = array(
@@ -2796,7 +2796,7 @@ function topicNotifications($start, $items_per_page, $sort, $memID)
 	$notification_topics = array();
 	while ($row = $db->fetch_assoc($request))
 	{
-		$row['body'] = censor($row['subject']);
+		$row['subject'] = censor($row['subject']);
 
 		$notification_topics[] = array(
 			'id' => $row['id_topic'],
@@ -2917,7 +2917,7 @@ function mergeableTopics($id_board, $id_topic, $approved, $offset)
 	$topics = array();
 	while ($row = $db->fetch_assoc($request))
 	{
-		$row['body'] = censor($row['subject']);
+		$row['subject'] = censor($row['subject']);
 
 		$topics[] = array(
 			'id' => $row['id_topic'],

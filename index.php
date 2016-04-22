@@ -224,13 +224,15 @@ function elk_main()
 		detectBrowser();
 	// Load the current theme.  (note that ?theme=1 will also work, may be used for guest theming.)
 	else
+	{
 		loadTheme();
 
-	// Load BadBehavior before we go much further
-	loadBadBehavior();
+		// Load BadBehavior before we go much further
+		loadBadBehavior();
 
-	// The parser is not a DIC just yet
-	loadBBCParsers();
+		// The parser is not a DIC just yet
+		loadBBCParsers();
+	}
 
 	// Check if the user should be disallowed access.
 	is_not_banned();
@@ -243,8 +245,8 @@ function elk_main()
 	call_integration_hook('integrate_pre_log_stats', array(&$no_stat_actions));
 
 	// Do some logging, unless this is an attachment, avatar, toggle of editor buttons, theme option, XML feed etc.
-	if (empty($_REQUEST['action']) || !in_array($_REQUEST['action'], $no_stat_actions)
-		|| (!empty($_REQUEST['sa']) && !in_array($_REQUEST['sa'], $no_stat_actions)))
+	if ((empty($_REQUEST['action']) || !in_array($_REQUEST['action'], $no_stat_actions)
+		|| (!empty($_REQUEST['sa']) && !in_array($_REQUEST['sa'], $no_stat_actions))) && !isset($_REQUEST['api']))
 	{
 		// I see you!
 		writeLog();

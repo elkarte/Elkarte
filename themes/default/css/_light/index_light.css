@@ -2202,7 +2202,7 @@ a.helpicon:hover, a > .iconline:hover, a > .icoffline:hover {
 /* ------------------------------------------------------- */
 /*	$MEDIA		                                           */
 /* ------------------------------------------------------- */
-/*  TODO: This should be nearly empty for the colorized sheets.
+/*  @TODO: This should be nearly empty for the colorized sheets.
 /*
 /* Experimental media queries.
 /* NOTE:
@@ -2252,6 +2252,15 @@ a.helpicon:hover, a > .iconline:hover, a > .icoffline:hover {
 
 	.mlist li div.posts {
 		border-right-color: #CCCCCC;
+	}
+
+	#upshrink {
+		border-color: transparent;
+		margin-top: -0.4em;
+	}
+
+	#collapse_button {
+		padding-top: 0.25em;
 	}
 }
 

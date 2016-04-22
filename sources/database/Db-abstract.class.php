@@ -317,8 +317,10 @@ abstract class Database_Abstract implements Database
 			return array($file, $line);
 
 		// Is always a critical error.
-		if (function_exists('log_error'))
+		if (class_exists('Errors'))
+		{
 			Errors::instance()->log_error($log_message, 'critical', $file, $line);
+		}
 
 		if (function_exists('fatal_error'))
 		{

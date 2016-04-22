@@ -934,9 +934,18 @@ class Theme extends \Theme
 				);
 			}
 
+			if (!empty($user_info['avatar']['href']))
+			{
+				theme()->addCSSRules('
+	.i-account:before {
+		content: "";
+		background-image: url("' . $user_info['avatar']['href'] . '");
+	}');
+			}
+
 			$buttons += array(
 				'profile' => array(
-					'title' => (!empty($user_info['avatar']['href']) ? '<img class="avatar" src="' . $user_info['avatar']['href'] . '" alt="" /> ' : '') . (!empty($modSettings['displayMemberNames']) ? $user_info['name'] : $txt['account_short']),
+					'title' => !empty($modSettings['displayMemberNames']) ? $user_info['name'] : $txt['account_short'],
 					'href' => $scripturl . '?action=profile',
 					'data-icon' => 'account',
 					'show' => $context['allow_edit_profile'],

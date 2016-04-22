@@ -2484,7 +2484,7 @@ class PersonalMessage_Controller extends Action_Controller
 
 				// Censor anything we don't want to see...
 				$row['body'] = censor($row['body']);
-				$row['body'] = censor($row['subject']);
+				$row['subject'] = censor($row['subject']);
 
 				// Parse out any BBC...
 				$row['body'] = $bbc_parser->parsePM($row['body']);

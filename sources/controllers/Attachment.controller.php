@@ -155,14 +155,35 @@ class Attachment_Controller extends Action_Controller
 		}
 
 		// We need a filename and path or we are not going any further
-		if (isset($this->_req->post->attachid) && !empty($_SESSION['temp_attachments']))
+		if (isset($this->_req->post->attachid))
 		{
-			require_once(SUBSDIR . '/Attachments.subs.php');
+			if (!empty($_SESSION['temp_attachments']))
+			{
+				require_once(SUBSDIR . '/Attachments.subs.php');
 
-			$result = removeTempAttachById($this->_req->post->attachid);
-			if ($result === true)
-				$context['json_data'] = array('result' => true);
-			else
+				$result = removeTempAttachById($this->_req->post->attachid);
+				if ($result === true)
+				{
+					$context['json_data'] = array('result' => true);
+				}
+			}
+
+			if ($result !== true)
+			{
+				require_once(SUBSDIR . '/ManageAttachments.subs.php');
+				$result_tmp = removeAttachments(array('id_attach' => $this->_req->getPost('attachid', 'intval')), '', true);
+				if (!empty($result_tmp))
+				{
+					$context['json_data'] = array('result' => true);
+					$result = true;
+				}
+				else
+				{
+					$result = $result_tmp;
+				}
+			}
+
+			if ($result !== true)
 			{
 				loadLanguage('Errors');
 				$context['json_data'] = array('result' => false, 'data' => $txt[$result]);

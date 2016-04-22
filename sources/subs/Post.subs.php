@@ -1497,7 +1497,7 @@ function lastPost()
 	$db->free_result($request);
 
 	// Censor the subject and post...
-	$row['body'] = censor($row['subject']);
+	$row['subject'] = censor($row['subject']);
 	$row['body'] = censor($row['body']);
 
 	$bbc_parser = \BBC\ParserWrapper::getInstance();

@@ -282,7 +282,7 @@ class ProfileInfo_Controller extends Action_Controller
 				{
 					// Censor....
 					$row['body'] = censor($row['body']);
-					$row['body'] = censor($row['subject']);
+					$row['subject'] = censor($row['subject']);
 
 					// Do the code.
 					$row['body'] = $bbc_parser->parseMessage($row['body'], $row['smileys_enabled']);
@@ -348,7 +348,7 @@ class ProfileInfo_Controller extends Action_Controller
 				{
 					// Censor....
 					$row['body'] = censor($row['body']);
-					$row['body'] = censor($row['subject']);
+					$row['subject'] = censor($row['subject']);
 
 					// Do the code.
 					$row['body'] = $bbc_parser->parseMessage($row['body'], $row['smileys_enabled']);
@@ -592,7 +592,7 @@ class ProfileInfo_Controller extends Action_Controller
 		{
 			// Censor....
 			$row['body'] = censor($row['body']);
-			$row['body'] = censor($row['subject']);
+			$row['subject'] = censor($row['subject']);
 
 			// Do the code.
 			$row['body'] = $bbc_parser->parseMessage($row['body'], $row['smileys_enabled']);

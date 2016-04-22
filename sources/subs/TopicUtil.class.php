@@ -200,11 +200,11 @@ class Topic_Util
 				$topics[$row['id_topic']]['first_post']['started_by'] = sprintf($txt['topic_started_by_in'], '<strong>' . $topics[$row['id_topic']]['first_post']['member']['link'] . '</strong>', '<em>' . $topics[$row['id_topic']]['board']['link'] . '</em>');
 			}
 
-			if (!empty($row['avatar']))
+			if (!empty($row['avatar']) || !empty($row['id_attach']))
 			{
 				$topics[$row['id_topic']]['last_post']['member']['avatar'] = determineAvatar($row);
 			}
-			if (!empty($row['avatar_first']))
+			if (!empty($row['avatar_first']) || !empty($row['id_attach_first']))
 			{
 				$first_avatar = array(
 					'avatar' => $row['avatar_first'],

@@ -126,7 +126,10 @@ loadDatabase();
 reloadSettings();
 
 // Our good ole' contextual array, which will hold everything
-$context = array();
+if (!isset($context))
+{
+	$context = array();
+}
 
 // Seed the random generator.
 elk_seed_generator();
@@ -187,11 +190,11 @@ loadUserSettings();
 // Load the current user's permissions....
 loadPermissions();
 
-// Load BadBehavior functions
-loadBadBehavior();
-
 // Load the current or SSI theme. (just use $ssi_theme = id_theme;)
 loadTheme(isset($ssi_theme) ? (int) $ssi_theme : 0);
+
+// Load BadBehavior functions
+loadBadBehavior();
 
 // @todo: probably not the best place, but somewhere it should be set...
 if (!headers_sent())

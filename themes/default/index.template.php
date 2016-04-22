@@ -468,7 +468,7 @@ function theme_linktree($default = 'linktree')
 			echo $tree['extra_before'];
 
 		// Show the link, including a URL if it should have one.
-		echo $settings['linktree_link'] && isset($tree['url']) ? '<a href="' . $tree['url'] . '">' . ($pos == 0 ? '<i class="icon i-home icon-lg icon-top"><s>' . $txt['home'] . '</s></i>' : $tree['name']) . '</a>' : $tree['name'];
+		echo $settings['linktree_link'] && isset($tree['url']) ? '<a href="' . $tree['url'] . '">' . ($pos == 0 ? '<i class="icon i-home icon-big icon-top"><s>' . $txt['home'] . '</s></i>' : $tree['name']) . '</a>' : $tree['name'];
 
 		// Show something after the link...?
 		if (isset($tree['extra_after']))
@@ -498,7 +498,7 @@ function template_menu()
 	echo '
 						<li id="collapse_button" class="listlevel1">
 							<a class="linklevel1 panel_toggle">
-								<i id="upshrink" class="hide chevricon i-chevron-up icon-lg" title="', $txt['upshrink_description'], '"></i>
+								<i id="upshrink" class="hide chevricon i-chevron-up icon icon-menu icon-lg" title="', $txt['upshrink_description'], '"></i>
 							</a>
 						</li>';
 
@@ -506,7 +506,7 @@ function template_menu()
 	{
 		echo '
 						<li id="button_', $act, '" class="listlevel1', !empty($button['sub_buttons']) ? ' subsections" aria-haspopup="true"' : '"', ' role="menuitem">
-							<a class="linklevel1', !empty($button['active_button']) ? ' active' : '', (!empty($button['indicator']) ? ' indicator' : ''), '" href="', $button['href'], '" ', isset($button['target']) ? 'target="' . $button['target'] . '"' : '', '>', (!empty($button['data-icon']) ? '<i class="icon icon-menu icon-big i-' . $button['data-icon'] . '"></i> ' : ''), '<span class="button_title">', $button['title'], '</span></a>';
+							<a class="linklevel1', !empty($button['active_button']) ? ' active' : '', (!empty($button['indicator']) ? ' indicator' : ''), '" href="', $button['href'], '" ', isset($button['target']) ? 'target="' . $button['target'] . '"' : '', '>', (!empty($button['data-icon']) ? '<i class="icon icon-menu icon-lg i-' . $button['data-icon'] . '"></i> ' : ''), '<span class="button_title">', $button['title'], '</span></a>';
 
 		// Any 2nd level menus?
 		if (!empty($button['sub_buttons']))

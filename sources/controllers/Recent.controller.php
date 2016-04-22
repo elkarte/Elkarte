@@ -123,7 +123,7 @@ class Recent_Controller extends Action_Controller
 		$this->_grabber = new Recent_Class($user_info['id']);
 
 		// Set or use a starting point for pagination
-		$this->_start = $this->_req->getPost('start', 'intval', 0);
+		$this->_start = $this->_req->getQuery('start', 'intval', 0);
 
 		// Recent posts by category id's
 		if (!empty($this->_req->query->c) && empty($board))
