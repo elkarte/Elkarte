@@ -243,8 +243,8 @@ function elk_main()
 	call_integration_hook('integrate_pre_log_stats', array(&$no_stat_actions));
 
 	// Do some logging, unless this is an attachment, avatar, toggle of editor buttons, theme option, XML feed etc.
-	if (empty($_REQUEST['action']) || !in_array($_REQUEST['action'], $no_stat_actions)
-		|| (!empty($_REQUEST['sa']) && !in_array($_REQUEST['sa'], $no_stat_actions)))
+	if ((empty($_REQUEST['action']) || !in_array($_REQUEST['action'], $no_stat_actions)
+		|| (!empty($_REQUEST['sa']) && !in_array($_REQUEST['sa'], $no_stat_actions))) && !isset($_REQUEST['api']))
 	{
 		// I see you!
 		writeLog();
