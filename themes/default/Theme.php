@@ -939,8 +939,7 @@ class Theme extends \Theme
 				theme()->addCSSRules('
 	.i-account:before {
 		content: "";
-		background: url(' . $user_info['avatar']['href'] . ');
-		background-size: contain;
+		background-image: url("' . $user_info['avatar']['href'] . '");
 	}');
 			}
 
