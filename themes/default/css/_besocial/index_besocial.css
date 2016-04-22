@@ -341,7 +341,8 @@ strong {
 	color: #EEEEEE;
 }
 
-/*	$BBC		*/
+/* ------------------------------------------------------- */
+/* $BBC                                                    */
 /* ------------------------------------------------------- */
 /* The "Quote:" and "Code:" header parts... */
 .codeheader, .quoteheader {
@@ -412,15 +413,11 @@ strong {
 }
 
 .meaction:before {
-	content: "\270c";
-	font-size: 1.714em;
-	line-height: 1em;
+
 }
 
 .spoilerheader {
-	font-weight: bold;
-	font-size: 0.857em;
-	cursor: pointer;
+
 }
 
 .spoiler {
@@ -443,7 +440,7 @@ sup.bbc_footnotes, sup.bbc_footnotes a {
 }
 
 div.bbc_footnotes .meaction {
-	display: inline-block;
+
 }
 
 /* Prevent the footnote named anchor from hiding under the menu */
@@ -455,7 +452,8 @@ div.bbc_footnotes .meaction {
 	content: " ";
 }
 
-/*	$AJAX		*/
+/* ------------------------------------------------------- */
+/*	$AJAX                                                  */
 /* ------------------------------------------------------- */
 /* The "Loading" bar for quick edit, etc. */
 #ajax_in_progress {
@@ -469,7 +467,8 @@ div.bbc_footnotes .meaction {
 	text-decoration: underline;
 }
 
-/*	$MAIN.		*/
+/* ------------------------------------------------------- */
+/*	$MAIN.                                                 */
 /* ------------------------------------------------------- */
 /* The top bar. */
 
@@ -781,8 +780,7 @@ a.active {
 
 /* Admin menu icons. */
 .linklevel2 > img {
-	margin: 0 0 0 -4px;
-	vertical-align: middle;
+
 }
 
 /* Levels 2 and 3: hover effects. */
@@ -796,11 +794,8 @@ a.active {
 
 /* Level 2: subsection indicators. */
 .listlevel2.subsections .linklevel2:after {
-	position: absolute;
-	right: 6px;
 	color: #CCCCCC;
 	content: "\f0da";
-	font-size: 1.286em;
 	font-family: "FontAwesome";
 }
 
@@ -840,7 +835,8 @@ a.active {
 	font-family: "FontAwesome";
 }
 
-/*	$PAGELINKS	*/
+/* ------------------------------------------------------- */
+/*	$PAGELINKS	                                           */
 /* ------------------------------------------------------- */
 .selectbox, .pagelinks {
 	color: #555555;
@@ -872,31 +868,24 @@ a.active {
 }
 
 .small_pagelinks:after {
-	float: left;
 	color: #999999;
-	content: '\00BB';
-	font-size: 1.286em;
 	line-height: 1.3em;
 }
 
 /* Globally accessible top/bottom links. */
 #gotop, #gobottom {
-	border: 1px solid #222222;
-	border-bottom: none;
-	border-radius: 0 20px 0 0;
+	border-color: #222222;
 	background: #111111;
 	color: #EEEEEE;
 	opacity: 0.2;
 }
 
 #gobottom {
-	border-top: none;
-	border-radius: 0 0 20px 0;
+
 }
 
 #gotop:hover, #gobottom:hover {
 	color: #444444;
-	text-decoration: none;
 	opacity: 1;
 }
 
@@ -981,7 +970,7 @@ a.active {
 }
 
 /* ------------------------------------------------------- */
-/*	$BOARDS		                                           */
+/* $BOARDS                                                 */
 /* ------------------------------------------------------- */
 .board_name > a {
 	color: #43A8DA;
@@ -1031,7 +1020,6 @@ a.active {
 
 #topic_icons {
 	border: 1px solid #DDDDDD;
-	border-radius: 3px;
 }
 
 .modified {
@@ -1057,56 +1045,6 @@ a.active {
 
 .topic_listing > li {
 	border: none;
-}
-
-/*	$BOARDICONS	*/
-/* ------------------------------------------------------- */
-.board_icon {
-	display: block;
-	float: left;
-	width: 48px;
-	height: 48px;
-}
-
-.board_key:before {
-	display: block;
-	float: left;
-	width: 26px;
-	height: 24px;
-	content: "";
-}
-
-.category_boards .board_icon, .board_key:before {
-	background-image: url(../../images/_besocial/board_icons.png);
-	background-repeat: no-repeat;
-}
-
-.on_board {
-	background-position: 0 0;
-}
-
-.on2_board {
-	background-position: -72px 0;
-}
-
-.off_board {
-	background-position: -144px 0;
-}
-
-.redirect_board {
-	background-position: -216px 0;
-}
-
-.new_some_board:before {
-	background-position: -300px -14px;
-}
-
-.new_none_board:before {
-	background-position: -372px -14px;
-}
-
-.new_redirect_board:before {
-	background-position: -444px -14px;
 }
 
 .topic_listing li {
@@ -1194,7 +1132,8 @@ a.active {
 	border-bottom: none;
 }
 
-/*	$TOPICS		*/
+/* ------------------------------------------------------- */
+/*	$TOPICS		                                           */
 /* ------------------------------------------------------- */
 /* The display template (topic view).
 
@@ -1208,7 +1147,8 @@ a.active {
 	background: #FFFFFF;
 }
 
-/*	$EDITOR		*/
+/* ------------------------------------------------------- */
+/*	$EDITOR		                                           */
 /* ------------------------------------------------------- */
 
 .drop_area {
@@ -1450,19 +1390,14 @@ a.help .icon {
 	background: #FFFFFF;
 }
 
-/* Styles for the $TABS	*/
+/* ------------------------------------------------------- */
+/* $TABS                                                   */
 /* We can't control what jqueryui pollutes the DOM with, so deal with it */
 /* Styles for the profile summary tabs, or any jquery ui tabs */
-/* ---------------------------------------------------------- */
+/* ------------------------------------------------------- */
 .ui-tabs .ui-tabs-panel {
 	padding-top: 0;
-}
-
-.ui-tabs .ui-tabs-panel {
 	border: none;
-}
-
-.ui-tabs  .ui-tabs-panel {
 	border-top: 8px solid #F6F6F6;
 }
 
@@ -1503,19 +1438,17 @@ a.help .icon {
 	text-decoration: none;
 }
 
-/*floating error box*/
-/* currently used by like functionality*/
+/* floating error box */
+/* currently used by like functionality */
 .floating_error {
-	border: solid 1px #E4E4E4;
-	border-radius: 10px;
+	border-color: #E4E4E4;
 	background: #FFFFFF;
 	background: rgba(255, 255, 255, 1);
 	color: #404040;
-	font-size: 15px;
 }
 
 .floating_error .error_heading {
-	font-weight: bold;
+
 }
 
 .floating_error .error_msg {
@@ -1525,15 +1458,14 @@ a.help .icon {
 .floating_error .error_btn {
 	border-top: solid 1px #D6D6D6;
 	color: #157DFB;
-	font-weight: bold;
-	font-size: 16px;
 }
 
 .floating_error .error_btn:hover {
 	cursor: pointer;
 }
 
-/*	$MEMBERLIST		*/
+/* ------------------------------------------------------- */
+/*	$MEMBERLIST                                            */
 /* ------------------------------------------------------- */
 
 .mlist .mlist_header div {
@@ -1841,9 +1773,12 @@ a.help .icon {
 	content: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='%2312a5f4' viewBox='0 0 3584 3584'%3E%3Cpath d='M2602 2126q0-100-39-183t-97-137-146-98-165-68-175-46l-208-48q-60-14-88-21t-70-23-60-32-33-42-15-60q0-154 288-154 86 0 154 24t108 57 76 67 80 58 96 24q94 0 151-64t57-154q0-110-112-199t-284-135-364-46q-136 0-264 31t-239 94-178 174-67 257q0 122 38 213t112 151 160 97 206 65l292 72q180 44 224 72 64 40 64 120 0 78-80 129t-210 51q-102 0-183-32t-130-77-91-90-92-77-108-32q-100 0-151 60t-51 150q0 184 244 315t582 131q146 0 280-37t245-107 177-187 66-263z m726 434q0 318-225 543t-543 225q-260 0-468-160-154 32-300 32-286 0-547-111t-450-300-300-450-111-547q0-146 32-300-160-208-160-468 0-318 225-543t543-225q260 0 468 160 154-32 300-32 286 0 547 111t450 300 300 450 111 547q0 146-32 300 160 208 160 468z'/%3E%3C/svg%3E");
 }
 
-/*	$MEDIA		*/
-/* Experimental media queries.
 /* ------------------------------------------------------- */
+/*	$MEDIA		                                           */
+/* ------------------------------------------------------- */
+/*  @TODO: This should be nearly empty for the colorized sheets.
+/*
+/* Experimental media queries.
 /* NOTE:
 /* When setting break points for media queries, don't set them in pixels.
 /* Use em instead.
@@ -1864,7 +1799,7 @@ a.help .icon {
 
 /* Smartphones (portrait & landscape) drop the stats (views/replys) and last post from the screen */
 
-/* This one does 800 screens at default font size. */
+/* This one does 1024 screens at default font size. */
 @media screen and (max-width: 64em) {
 	.board_lastpost {
 		float: none;
