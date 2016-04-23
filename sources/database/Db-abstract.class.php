@@ -322,7 +322,7 @@ abstract class Database_Abstract implements Database
 			Errors::instance()->log_error($log_message, 'critical', $file, $line);
 		}
 
-		if (function_exists('fatal_error'))
+		if (class_exists('Errors'))
 		{
 			Errors::instance()->fatal_error($error_message, false);
 
