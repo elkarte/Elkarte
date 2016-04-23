@@ -524,8 +524,10 @@ class Database_MySQL extends Database_Abstract
 		}
 
 		// Log the error.
-		if ($query_errno != 1213 && $query_errno != 1205 && function_exists('log_error'))
+		if ($query_errno != 1213 && $query_errno != 1205 && class_exists('Errors'))
+		{
 			Errors::instance()->log_error($txt['database_error'] . ': ' . $query_error . (!empty($modSettings['enableErrorQueryLogging']) ? "\n\n$db_string" : ''), 'database', $file, $line);
+		}
 
 		// Database error auto fixing ;).
 		if (function_exists('Cache::instance()->get') && (!isset($modSettings['autoFixDatabase']) || $modSettings['autoFixDatabase'] == '1'))
