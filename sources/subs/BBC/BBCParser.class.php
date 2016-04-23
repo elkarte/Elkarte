@@ -674,6 +674,9 @@ class BBCParser
 
 	protected function handleItemCode()
 	{
+		if (!isset($this->item_codes[$this->message[$this->pos + 1]]))
+			return;
+
 		$tag = $this->item_codes[$this->message[$this->pos + 1]];
 
 		// First let's set up the tree: it needs to be in a list, or after an li.

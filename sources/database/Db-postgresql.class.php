@@ -292,7 +292,7 @@ class Database_PostgreSQL extends Database_Abstract
 			elseif (strpos($clean, 'benchmark') !== false && preg_match('~(^|[^a-z])benchmark($|[^[a-z])~s', $clean) != 0)
 				$fail = true;
 
-			if (!empty($fail) && function_exists('log_error'))
+			if (!empty($fail) && class_exists('Errors'))
 				$this->error_backtrace('Hacking attempt...', 'Hacking attempt...' . "\n" . $db_string, E_USER_ERROR, __FILE__, __LINE__);
 
 			// If we are updating something, better start a transaction so that indexes may be kept consistent
