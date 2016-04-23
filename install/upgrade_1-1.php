@@ -349,7 +349,7 @@ class UpgradeInstructions_upgrade_1_1
 				'debug_title' => 'Splitting email_id into it\'s components in postby_emails...',
 				'function' => function($db, $db_table)
 				{
-					if ($db_table->column_exists('{db_prefix}postby_emails', 'id_email') === true)
+					if ($db_table->column_exists('{db_prefix}postby_emails', 'id_email') === false)
 					{
 						// Add the new columns
 						$db_table->db_add_column('{db_prefix}postby_emails',
@@ -377,7 +377,7 @@ class UpgradeInstructions_upgrade_1_1
 								'name' => 'message_id',
 								'type' => 'mediumint',
 								'size' => 8,
-								'default' => ''
+								'default' => 0
 							),
 							array(),
 							'ignore'
