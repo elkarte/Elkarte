@@ -294,7 +294,21 @@ class Attachment_Controller extends Action_Controller
 						if (!file_exists($filename))
 							$filename = $settings['theme_dir'] . '/images/mime_images/default.png';
 					}
-					elseif (substr(finfo_file($finfo, $filename), 0, 5) !== 'image')
+					else
+					{
+						if (!is_array($modSettings['attachmentUploadDir']))
+						{
+							$attachmentUploadDir = unserialize($modSettings['attachmentUploadDir']);
+						}
+						else
+						{
+							$attachmentUploadDir = $modSettings['attachmentUploadDir'];
+						}
+
+						$filename = $attachmentUploadDir[$modSettings['currentAttachmentUploadDir']] . '/' . $attachment[1];
+					}
+
+					if (file_exists($filename) && substr(finfo_file($finfo, $filename), 0, 5) !== 'image')
 					{
 						$attachment[3] = 'png';
 						$attachment[6] = 'image/png';
