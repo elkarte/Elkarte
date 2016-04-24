@@ -753,7 +753,7 @@ class ManageBans_Controller extends Action_Controller
 		updateBanMembers();
 
 		// Go back to an appropriate spot
-		redirectexit('action=admin;area=ban;sa=' . (isset($this->_req->post->add_ban) ? 'list' : 'edit;bg=' . isset($ban_group_id) ? $ban_group_id : 0));
+		redirectexit('action=admin;area=ban;sa=' . (isset($this->_req->post->add_ban) ? 'list' : 'edit;bg=' . (isset($ban_group_id) ? $ban_group_id : 0)));
 	}
 
 	/**
