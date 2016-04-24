@@ -540,7 +540,7 @@ function template_rdf()
  */
 function template_feedatom()
 {
-	global $context, $scripturl, $txt, $boardurl;
+	global $context, $scripturl, $txt, $settings;
 
 	echo '<?xml version="1.0" encoding="UTF-8"?' . '>
 	<feed xmlns="http://www.w3.org/2005/Atom">
@@ -548,7 +548,8 @@ function template_feedatom()
 		<link rel="alternate" type="text/html" href="', $scripturl, '" />
 		<link rel="self" type="application/rss+xml" href="', $scripturl, '?type=atom;action=.xml', $context['url_parts'], '" />
 		<id>', $scripturl, '</id>
-		<icon>', $boardurl, '/favicon.ico</icon>
+		<icon>', $settings['images_url'] . '/mobile.png</icon>
+		<logo>', $context['header_logo_url_html_safe'], '</logo>
 
 		<updated>', gmstrftime('%Y-%m-%dT%H:%M:%SZ'), '</updated>
 		<subtitle><![CDATA[', strip_tags(un_htmlspecialchars($txt['xml_rss_desc'])), ']]></subtitle>
@@ -579,7 +580,7 @@ function template_feedrss()
 			<generator>ElkArte</generator>
 			<ttl>30</ttl>
 			<image>
-				<url>', $settings['default_theme_dir'], '/images/logo.png</url>
+				<url>', $context['header_logo_url_html_safe'], '</url>
 				<title>', $context['feed_title'], '</title>
 				<link>', $scripturl, '</link>
 			</image>';
