@@ -514,14 +514,12 @@ function template_modify_board()
 				<hr />';
 
 	// Add a select all box for the allowed groups section
-	echo '
-				<script><!-- // --><![CDATA[
-					$(document).ready(function () {
-						$(".select_all_box").each(function () {
-							$(this).removeClass(\'select_all_box\');
-						});
-					});
-				// ]]></script>';
+	theme()->addInlineJavascript('
+		$(document).ready(function () {
+			$(".select_all_box").each(function () {
+				$(this).removeClass(\'select_all_box\');
+			});
+		});', true);
 
 	if (empty($context['board']['is_recycle']) && empty($context['board']['topics']))
 		echo '
