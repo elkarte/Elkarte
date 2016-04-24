@@ -63,29 +63,35 @@ class Theme extends \Theme
 			header('Expires: Mon, 26 Jul 1997 05:00:00 GMT');
 			header('Last-Modified: ' . gmdate('D, d M Y H:i:s') . ' GMT');
 
-			// Are we debugging the template/html content?
-			if ((!isset($_REQUEST['xml']) || !isset($_REQUEST['api'])) && isset($_GET['debug']) && !isBrowser('ie'))
+			if ($this->headerSent('Content-Type') === false)
 			{
-				header('Content-Type: application/xhtml+xml');
-			}
-			elseif (!isset($_REQUEST['xml']) || !isset($_REQUEST['api']))
-			{
-				header('Content-Type: text/html; charset=UTF-8');
+				// Are we debugging the template/html content?
+				if ((!isset($_REQUEST['xml']) || !isset($_REQUEST['api'])) && isset($_GET['debug']) && !isBrowser('ie'))
+				{
+					header('Content-Type: application/xhtml+xml');
+				}
+				elseif (!isset($_REQUEST['xml']) || !isset($_REQUEST['api']))
+				{
+					header('Content-Type: text/html; charset=UTF-8');
+				}
 			}
 		}
 
-		// Probably temporary ($_REQUEST['xml'] should be replaced by $_REQUEST['api'])
-		if (isset($_REQUEST['api']) && $_REQUEST['api'] == 'json')
+		if ($this->headerSent('Content-Type') === false)
 		{
-			header('Content-Type: application/json; charset=UTF-8');
-		}
-		elseif (isset($_REQUEST['xml']) || isset($_REQUEST['api']))
-		{
-			header('Content-Type: text/xml; charset=UTF-8');
-		}
-		else
-		{
-			header('Content-Type: text/html; charset=UTF-8');
+			// Probably temporary ($_REQUEST['xml'] should be replaced by $_REQUEST['api'])
+			if (isset($_REQUEST['api']) && $_REQUEST['api'] == 'json')
+			{
+				header('Content-Type: application/json; charset=UTF-8');
+			}
+			elseif (isset($_REQUEST['xml']) || isset($_REQUEST['api']))
+			{
+				header('Content-Type: text/xml; charset=UTF-8');
+			}
+			else
+			{
+				header('Content-Type: text/html; charset=UTF-8');
+			}
 		}
 
 		foreach (\Template_Layers::getInstance()->prepareContext() as $layer)
@@ -97,6 +103,20 @@ class Theme extends \Theme
 			$settings['images_url'] = $settings['default_images_url'];
 			$settings['theme_dir'] = $settings['default_theme_dir'];
 		}
+	}
+
+	protected function headerSent($type)
+	{
+		$sent = headers_list();
+		foreach ($sent as $header)
+		{
+			if (substr($header, 0, strlen($type)) === $type)
+			{
+				return true;
+			}
+		}
+
+		return false;
 	}
 
 	/**
