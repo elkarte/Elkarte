@@ -66,11 +66,11 @@ class Theme extends \Theme
 			if ($this->headerSent('Content-Type') === false)
 			{
 				// Are we debugging the template/html content?
-				if ((!isset($_REQUEST['xml']) || !isset($_REQUEST['api'])) && isset($_GET['debug']) && !isBrowser('ie'))
+				if ((!isset($_REQUEST['xml']) && !isset($_REQUEST['api'])) && isset($_GET['debug']) && !isBrowser('ie'))
 				{
 					header('Content-Type: application/xhtml+xml');
 				}
-				elseif (!isset($_REQUEST['xml']) || !isset($_REQUEST['api']))
+				elseif (!isset($_REQUEST['xml']) && !isset($_REQUEST['api']))
 				{
 					header('Content-Type: text/html; charset=UTF-8');
 				}
