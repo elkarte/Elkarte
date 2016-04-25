@@ -16,6 +16,13 @@
 
 namespace BBC;
 
+/**
+ * Class Autolink
+ *
+ * Class to change url and email text to BBC link codes [url] [email]
+ *
+ * @package BBC
+ */
 class Autolink
 {
 	protected $bbc;
@@ -28,6 +35,11 @@ class Autolink
 	protected $email_search;
 	protected $email_replace;
 
+	/**
+	 * Autolink constructor.
+	 *
+	 * @param Codes $bbc
+	 */
 	public function __construct(Codes $bbc)
 	{
 		$this->bbc = $bbc;
@@ -38,57 +50,8 @@ class Autolink
 		$this->load();
 	}
 
-	public function parse(&$data)
-	{
-		if ($this->hasLinks($data))
-		{
-			$this->parseLinks($data);
-		}
-
-		if ($this->hasEmails($data))
-		{
-			$this->parseEmails($data);
-		}
-
-		call_integration_hook('integrate_autolink_area', array(&$data, $this->bbc));
-	}
-
-	public function hasLinks($data)
-	{
-		return $this->hasPossibleLink() && (strpos($data, '://') !== false || strpos($data, 'www.') !== false);
-	}
-
-	// Parse any URLs.... have to get rid of the @ problems some things cause... stupid email addresses.
-	public function parseLinks(&$data)
-	{
-		// Switch out quotes really quick because they can cause problems.
-		$data = str_replace(array('&#039;', '&nbsp;', '&quot;', '"', '&lt;'), array('\'', "\xC2\xA0", '>">', '<"<', '<lt<'), $data);
-
-		$result = preg_replace($this->search, $this->replace, $data);
-
-		// Only do this if the preg survives.
-		if (is_string($result))
-		{
-			$data = $result;
-		}
-
-		// Switch those quotes back
-		$data = str_replace(array('\'', "\xC2\xA0", '>">', '<"<', '<lt<'), array('&#039;', '&nbsp;', '&quot;', '"', '&lt;'), $data);
-	}
-
-	public function hasEmails($data)
-	{
-		return $this->hasPossibleEmail() && strpos($data, '@') !== false;
-	}
-
-	public function parseEmails(&$data)
-	{
-		// Next, emails...
-		$data = preg_replace($this->email_search, $this->email_replace, $data);
-	}
-
 	/**
-	 * Load the autolink regular expression to be used in autoLink()
+	 * Load the autolink regular expressions to be used in autoLink()
 	 */
 	protected function load()
 	{
@@ -114,6 +77,7 @@ class Autolink
 			'[email]$1[/email]',
 		);
 
+		// Allow integration an option to add / remove linking code
 		call_integration_hook('integrate_autolink_load', array(&$search_url, &$replace_url, &$search_email, &$replace_email, $this->bbc));
 
 		$this->search = $search_url;
@@ -133,6 +97,109 @@ class Autolink
 		}
 	}
 
+	/**
+	 * Parse links and emails in the data
+	 *
+	 * @param string $data
+	 */
+	public function parse(&$data)
+	{
+		if ($this->hasLinks($data))
+		{
+			$this->parseLinks($data);
+		}
+
+		if ($this->hasEmails($data))
+		{
+			$this->parseEmails($data);
+		}
+
+		call_integration_hook('integrate_autolink_area', array(&$data, $this->bbc));
+	}
+
+	/**
+	 * Checks if the string has links of any form, http:// www.xxx
+	 *
+	 * @param string $data
+	 *
+	 * @return bool
+	 */
+	public function hasLinks($data)
+	{
+		return $this->hasPossibleLink() && (strpos($data, '://') !== false || strpos($data, 'www.') !== false);
+	}
+
+	/**
+	 * Return if the message has possible urls to autolink
+	 *
+	 * @return bool
+	 */
+	public function hasPossibleLink()
+	{
+		return $this->possible_link;
+	}
+
+	/**
+	 * Parse any URLs found in the data
+	 *
+	 * - Have to get rid of the @ problems some things cause... stupid email addresses.
+	 *
+	 * @param $data
+	 */
+	public function parseLinks(&$data)
+	{
+		// Switch out quotes really quick because they can cause problems.
+		$data = str_replace(array('&#039;', '&nbsp;', '&quot;', '"', '&lt;'), array('\'', "\xC2\xA0", '>">', '<"<', '<lt<'), $data);
+
+		$result = preg_replace($this->search, $this->replace, $data);
+
+		// Only do this if the preg survives.
+		if (is_string($result))
+		{
+			$data = $result;
+		}
+
+		// Switch those quotes back
+		$data = str_replace(array('\'', "\xC2\xA0", '>">', '<"<', '<lt<'), array('&#039;', '&nbsp;', '&quot;', '"', '&lt;'), $data);
+	}
+
+	/**
+	 * Validates if the data contains email address that need to be parsed
+	 * @param string $data
+	 *
+	 * @return bool
+	 */
+	public function hasEmails($data)
+	{
+		return $this->hasPossibleEmail() && strpos($data, '@') !== false;
+	}
+
+	/**
+	 * Return if the message has possible emails to autolink
+	 *
+	 * @return bool
+	 */
+	public function hasPossibleEmail()
+	{
+		return $this->possible_email;
+	}
+
+	/**
+	 * Search and replace plain email address with bbc [email][/email]
+	 *
+	 * @param string $data
+	 */
+	public function parseEmails(&$data)
+	{
+		// Next, emails...
+		$data = preg_replace($this->email_search, $this->email_replace, $data);
+	}
+
+	/**
+	 * Quickly determine if the supplied message has potential linking code
+	 *
+	 * @param string $message
+	 */
 	public function setPossibleAutolink($message)
 	{
 		$possible_link = $this->url_enabled && (strpos($message, '://') !== false || strpos($message, 'www.') !== false);
@@ -145,18 +212,13 @@ class Autolink
 		$this->possible_email = $possible_email;
 	}
 
+	/**
+	 * Return if the message has any possible links (email or url)
+	 *
+	 * @return bool
+	 */
 	public function hasPossible()
 	{
 		return $this->hasPossibleLink() || $this->hasPossibleEmail();
-	}
-
-	public function hasPossibleLink()
-	{
-		return $this->possible_link;
-	}
-
-	public function hasPossibleEmail()
-	{
-		return $this->possible_email;
 	}
 }
