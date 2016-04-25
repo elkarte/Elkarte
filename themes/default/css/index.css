@@ -565,6 +565,10 @@ em, .em {
 	height: 2em;
 }
 
+#upshrink {
+	border: 0;
+}
+
 /* General code for generic divs. Should make them behave. */
 .content {
 	overflow: auto;
@@ -5371,27 +5375,37 @@ a.help .icon {
 	line-height: 2em;
 }
 
+/*
+ * For swapping out the icon with a mini of the user's avatar if they have one.
+ *
+ * @TODO: There is probably a cleaner way to make an icon special like this.
+ *
+ * E.g. in principle we could do the same with buddy icons, for example.
+ */
 .i-account:before {
 	display: block;
 	width: 100%;
 	height: 100%;
-	background-repeat: no-repeat;
 	background-size: contain;
-	background-position: center;
+	background: no-repeat center;
 }
 
-/* This fixes a few outliers. */
+/*
+ * This is for fixing vertical positioning with a few odd icons. Sometimes because of icons, sometimes because of
+ * css elsewhere that hasn't been fixed yet.
+ *
+ * Either way, it means there's a problem somewhere, and that this should eventually get removed.
+ */
 .icon-top {
-	vertical-align: middle;
-	padding-bottom: 3px;
+	vertical-align: top;
 }
 
 .icon-margin {
 	margin: .25em;
 }
 
+/* Helper class */
 .icon-menu {
-	vertical-align: middle;
 }
 
 /* ------------------------------------------------------- */
@@ -5433,7 +5447,7 @@ a.help .icon {
 	.icon-menu {
 		display: none;
 	}
-	#collapse_button .icon-menu, .i-account {
+	.icon-menu.i-account {
 		display: inline-block;
 	}
 }
@@ -5501,9 +5515,9 @@ a.help .icon {
 		border: 1px solid;
 	}
 
-	/*#collapse_button {
-		display: none;
-	} */
+	#collapse_button {
+		padding-top: 0.5em;
+	}
 }
 
 /* This one does 800 screens at default font size. */
