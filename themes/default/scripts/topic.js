@@ -876,11 +876,11 @@ function expandThumbLB(thumbID) {
 
 	// Create the lightbox container only if needed
 	if ($elk_lightbox.length <= 0) {
-		$('body').append('<div id="elk_lightbox"><div id="elk_lb_content"></div></div>');
-
 		// For easy manipulation
-		$elk_lightbox = $('#elk_lightbox');
-		$elk_lb_content = $('#elk_lb_content');
+		$elk_lightbox = $('<div id="elk_lightbox"></div>');
+		$elk_lb_content = $('<div id="elk_lb_content"></div>');
+
+		$('body').append($elk_lightbox.append($elk_lb_content));
 	}
 
 	// Load and show the lightbox container div
