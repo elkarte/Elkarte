@@ -588,8 +588,7 @@ class Display_Controller extends Action_Controller
 			addInlineJavascript('
 		$(document).ready(function() {
 			$().linkifyvideo(oEmbedtext);
-		});'
-			);
+		});');
 		}
 
 		// Now create the editor.
@@ -606,6 +605,7 @@ class Display_Controller extends Action_Controller
 			'preview_type' => 0,
 		);
 
+		// Trigger the prepare_context event for modules that have tied in to it
 		$this->_events->trigger('prepare_context', array('editorOptions' => &$editorOptions, 'use_quick_reply' => !empty($options['display_quick_reply'])));
 
 		// Load up the "double post" sequencing magic.
@@ -624,6 +624,7 @@ class Display_Controller extends Action_Controller
 		}
 
 		addJavascriptVar(array('notification_topic_notice' => $context['is_marked_notify'] ? $txt['notification_disable_topic'] : $txt['notification_enable_topic']), true);
+
 		if ($context['can_send_topic'])
 		{
 			addJavascriptVar(array(
@@ -657,8 +658,10 @@ class Display_Controller extends Action_Controller
 		if ($context['can_restore_topic'])
 			$context['mod_buttons'][] = array('text' => 'restore_topic', 'image' => '', 'lang' => true, 'url' => $scripturl . '?action=restoretopic;topics=' . $context['current_topic'] . ';' . $context['session_var'] . '=' . $context['session_id']);
 
+		// Quick reply & modify enabled?
 		if ($context['can_reply'] && !empty($options['display_quick_reply']))
 			$this->_template_layers->add('quickreply');
+
 		$this->_template_layers->add('pages_and_buttons');
 
 		// Allow adding new buttons easily.
@@ -668,6 +671,7 @@ class Display_Controller extends Action_Controller
 
 	/**
 	 * In-topic quick moderation.
+	 *
 	 * Accessed by ?action=quickmod2
 	 */
 	public function action_quickmod2()
