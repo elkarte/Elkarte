@@ -5383,6 +5383,7 @@ a.help .icon {
 /* This fixes a few outliers. */
 .icon-top {
 	vertical-align: middle;
+	padding-bottom: 3px;
 }
 
 .icon-margin {
