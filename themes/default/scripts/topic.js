@@ -138,7 +138,7 @@ QuickModifyTopic.prototype.modify_topic_show_edit = function (subject)
 	this.oCurSubjectDiv.onmouseover = function (oEvent) {return this.instanceRef.modify_topic_mouseover(oEvent);};
 };
 
-// Yup thats right, save it
+// Yup that's right, save it
 QuickModifyTopic.prototype.modify_topic_save = function (cur_session_id, cur_session_var)
 {
 	if (!this.bInEditMode)
@@ -530,7 +530,7 @@ QuickModify.prototype.modifySave = function (sSessionId, sSessionVar)
 	if (!this.bInEditMode)
 		return true;
 
-	this.bInEditMode = false
+	this.bInEditMode = false;
 
 	// Let's put back the accesskeys to their original place
 	if (typeof(this.opt.sFormRemoveAccessKeys) !== 'undefined')
@@ -551,7 +551,7 @@ QuickModify.prototype.modifySave = function (sSessionId, sSessionVar)
 	var oInputs = document.forms.quickModForm.getElementsByTagName('input');
 	for (i = 0; i < oInputs.length; i++)
 	{
-		if (oInputs[i].name == 'uid[]')
+		if (oInputs[i].name === 'uid[]')
 		{
 			uIds.push('uid[' + i + ']=' + parseInt(oInputs[i].value));
 		}
