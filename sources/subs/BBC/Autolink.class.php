@@ -149,7 +149,7 @@ class Autolink
 	public function parseLinks(&$data)
 	{
 		// Switch out quotes really quick because they can cause problems.
-		$data = str_replace(array('&#039;', '&nbsp;', '&quot;', '"', '&lt;'), array('\'', "\xC2\xA0", '>">', '<"<', '<lt<'), $data);
+		$data = strtr($data, array('&#039;' => '\'', '&nbsp;' => "\xC2\xA0", '&quot;' => '>">', '"' => '<"<', '&lt;' => '<lt<'));
 
 		$result = preg_replace($this->search, $this->replace, $data);
 
@@ -160,7 +160,7 @@ class Autolink
 		}
 
 		// Switch those quotes back
-		$data = str_replace(array('\'', "\xC2\xA0", '>">', '<"<', '<lt<'), array('&#039;', '&nbsp;', '&quot;', '"', '&lt;'), $data);
+		$data = strtr($data, array('\'' => '&#039;', "\xC2\xA0" => '&nbsp;', '>">' => '&quot;', '<"<' => '"', '<lt<' => '&lt;'));
 	}
 
 	/**
