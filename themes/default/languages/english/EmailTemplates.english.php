@@ -364,11 +364,15 @@ Should you have any problems with activation, please visit {ACTIVATIONLINKWITHOU
 */
 $txt['forgot_password_subject'] = 'New password for {FORUMNAME}';
 $txt['forgot_password_body'] = 'Dear {REALNAME},
+
 This mail was sent because the \'forgot password\' function has been applied to your account. To set a new password, click the following link:
 {REMINDLINK}
 
 IP: {IP}
 Username: {MEMBERNAME}
+
+If you\'ve received this password-assistance email and you didn\'t request one, it\'s likely that another user entered your email address by mistake.  If you didn\'t initiate the request, don\'t worry - your Account is secure, and there\'s no need for you to take any further action. 
+Your privacy and security aren\'t compromised by this email.
 
 {REGARDS}';
 
