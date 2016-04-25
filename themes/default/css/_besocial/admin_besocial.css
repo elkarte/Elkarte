@@ -25,9 +25,21 @@
 }
 
 #admin_content .content  {
-	background: #FCFCFC;
+	background: #F6F6F6;
 	border: none;
 	box-shadow: none;
+}
+
+.admin_menu .subsections:hover .linklevel1:after {
+	display: none;
+}
+
+#admin_main_section, .quick_tasks, #mod_main_section,
+#support_credits, #admin_newsletters,
+#core_features, #entry_form,
+#groupForm, #mailqueue_stats, #manage_maintenance,
+#new_group, #view_group, #admin_form_wrapper, .action_admin .generic_list_wrapper {
+	border: 1px solid transparent;
 }
 
 /* Styles for the manage boards section.
@@ -94,4 +106,9 @@ a.help .icon {
 	margin: 0;
 	padding: 0 6px 2px 0;
 	vertical-align: middle;
+}
+
+#quick_tasks li {
+	border-bottom: 1px solid transparent;
+	border-top: 1px solid transparent;
 }

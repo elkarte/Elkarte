@@ -187,8 +187,12 @@ strong {
 
 /* @todo - Test this everywhere. */
 .content {
-	background: #FCFCFC;
-	border: none;
+	border: 1px solid #ddd;
+	background: #fff;
+}
+.standard_category {
+	border-radius: 4px 4px 0 0;
+	background: #e4e4e4;
 }
 
 /* Styles for main headers. */
@@ -491,6 +495,7 @@ div.bbc_footnotes .meaction {
 }
 
 #search_form select {
+	border-color: #999;
 	border-right: none;
 	opacity: 0.8;
 }
@@ -631,7 +636,7 @@ div.bbc_footnotes .meaction {
 }
 
 .poster .listlevel2:hover .linklevel2 {
-	border: none;
+	border: 1px solid transparent;
 	box-shadow: none;
 	color: #008299;
 }
@@ -640,7 +645,7 @@ div.bbc_footnotes .meaction {
 	left: 40%;
 }
 
-.poster .subsections > a:after {
+.poster .subsections > a:after, .poster .subsections:hover > .name.linklevel1:after {
 	margin: 0 0 0 10px;
 	color: #CCCCCC;
 	content: "\f0d7";
@@ -648,13 +653,22 @@ div.bbc_footnotes .meaction {
 	font-family: "FontAwesome";
 }
 
+.subsections:hover .linklevel1:after {
+	position: inherit;
+}
+
+#main_menu .subsections:hover .linklevel1:after {
+	display: none;
+}
+
 .poster .linklevel2, .poster .linklevel2:hover {
 	border: 1px solid transparent !important;
 }
 
 #main_menu .linklevel1, #main_menu .linklevel1:link, #main_menu .linklevel1:visited,
-.poster li.listlevel1, .poster li.listlevel1 a, .poster li.listlevel1 a:hover {
-	border: none;
+.poster li.listlevel1, .poster li.listlevel1 a,
+.poster li.listlevel1 a:hover, .poster li.listlevel1:hover {
+	border: 1px solid transparent;
 	border-radius: 0;
 	background-color: transparent;
 	background-image: none;
@@ -746,7 +760,7 @@ a.active {
 	color: #FFFFFF;
 	font-weight: bold;
 	float: none;
-	border: none;
+	border-color: transparent;
 }
 
 .likes_indicator {
@@ -761,6 +775,10 @@ a.active {
 	font-weight: bold;
 	font-size: 0.786em;
 	line-height: 1.4em;
+}
+
+.poster .pm_indicator:hover, .linklevel1:hover .pm_indicator {
+	border-color: transparent;
 }
 
 /* Levels 2 and 3: drop menu wrapper. */
@@ -889,7 +907,29 @@ a.active {
 	opacity: 1;
 }
 
-/*End sidebar flyout coding. */
+/* ------------------------------------------------------- */
+/*	$TABLES		                                           */
+/* ------------------------------------------------------- */
+
+.table_grid {
+	border-color: transparent;
+}
+
+.table_head > th {
+	border-top-color: transparent;
+	border-bottom-color: transparent;
+}
+
+.table_grid td, .letterspacing{
+	border-color: #ccc;
+}
+
+/* ------------------------------------------------------- */
+/* $BOARDS                                                 */
+/* ------------------------------------------------------- */
+.board_latest {
+	border-left-color: transparent;
+}
 
 /*	$MAIN.		*/
 /* ------------------------------------------------------- */
@@ -1035,6 +1075,10 @@ a.active {
 	border-bottom: none;
 }
 
+#ic_recentposts td, #ps_recentposts td, #ps_recenttopics td {
+	border-top-color: transparent;
+}
+
 #posting_icons {
 	margin: 0 0 2em 0.25em;
 }
@@ -1071,11 +1115,32 @@ a.active {
 
 
 /* On to the posts */
-#quickreplybox, #forumposts, #searchform, #recentposts, #pmFolder, #topic_summary, #preview_section {
+#searchform {
+	background: #e4e4e4;
+}
+
+#quickreplybox, #forumposts, #recentposts, #pmFolder, #topic_summary, #preview_section {
 }
 
 .inner {
 	border: none;
+}
+
+/* Poor Mans lightbox support */
+#elk_lightbox {
+	background: rgba(0, 0, 0, .5);
+}
+
+#elk_lb_content.expand {
+	border-color: #fff;
+}
+
+#elk_lb_expand {
+	border-color: #CCCCCC;
+}
+
+#forumposts > div.forumposts {
+	border-color: transparent;
 }
 
 .forumposts, .profile_content {
@@ -1183,6 +1248,23 @@ a.active {
 .drop_attachments_error {
 	color: #FF0000;
 }
+
+#preview_body {
+	border-color: transparent;
+}
+
+#postAdditionalOptions, #postDraftOptions {
+	border-color: transparent;
+}
+
+#postAdditionalOptionsNC {
+	border-color: transparent;
+}
+
+.drop_area {
+	border-color: transparent;
+}
+
 
 /*	$BOXES	*/
 
@@ -1438,6 +1520,10 @@ a.help .icon {
 	text-decoration: none;
 }
 
+.admin_menu .subsections:hover .linklevel1:after {
+	display: none;
+}
+
 /* floating error box */
 /* currently used by like functionality */
 .floating_error {
@@ -1667,19 +1753,19 @@ a.help .icon {
 /* Board icons */
 
 .i-board-redirect::before {
-	content: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='%231966b3' viewBox='0 0 3584 3584'%3E%3Cpath d='M2432 1792q0 66-54 104l-896 640q-62 46-132 10-70-34-70-114v-1280q0-80 70-114 70-36 132 10l896 640q54 38 54 104z m384 960v-1920q0-28-18-46t-46-18h-1920q-28 0-46 18t-18 46v1920q0 28 18 46t46 18h1920q28 0 46-18t18-46z m512-1920v1920q0 238-169 407t-407 169h-1920q-238 0-407-169t-169-407v-1920q0-238 169-407t407-169h1920q238 0 407 169t169 407z'/%3E%3C/svg%3E");
+	content: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='%23ACACAC' viewBox='0 0 3584 3584'%3E%3Cpath d='M2432 1792q0 66-54 104l-896 640q-62 46-132 10-70-34-70-114v-1280q0-80 70-114 70-36 132 10l896 640q54 38 54 104z m384 960v-1920q0-28-18-46t-46-18h-1920q-28 0-46 18t-18 46v1920q0 28 18 46t46 18h1920q28 0 46-18t18-46z m512-1920v1920q0 238-169 407t-407 169h-1920q-238 0-407-169t-169-407v-1920q0-238 169-407t407-169h1920q238 0 407 169t169 407z'/%3E%3C/svg%3E");
 }
 
 .i-board-new::before {
-	content: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='%231ab31a' viewBox='0 0 3584 3584'%3E%3Cpath d='M3456 1216v1408q0 184-132 316t-316 132h-2432q-184 0-316-132t-132-316v-1920q0-184 132-316t316-132h640q184 0 316 132t132 316v64h1344q184 0 316 132t132 316z'/%3E%3C/svg%3E");
+	content: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='%2390CCE9' stroke='%23AEAEAE' stroke-width='200' viewBox='0 0 3984 3984'%3E%3Cpath d='M3784 1792q0 348-240 643t-652 466-900 171q-140 0-290-16-396 350-920 484-98 28-228 44-34 4-61-18t-35-58v-2q-6-8-1-24t4-20 9-19l12-18t14-17 16-18q14-16 62-69t69-76 62-79 65-102 54-118 52-152q-314-178-495-440t-181-562q0-260 142-497t382-409 572-273 696-101q488 0 900 171t652 466 240 643z'/%3E%3C/svg%3E");
 }
 
 .i-board-sub::before {
-	content: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='%231ab31a' viewBox='0 0 3584 3584'%3E%3Cpath d='M3200 2624v-1408q0-80-56-136t-136-56h-1408q-80 0-136-56t-56-136v-128q0-80-56-136t-136-56h-640q-80 0-136 56t-56 136v1920q0 80 56 136t136 56h2432q80 0 136-56t56-136z m256-1408v1408q0 184-132 316t-316 132h-2432q-184 0-316-132t-132-316v-1920q0-184 132-316t316-132h640q184 0 316 132t132 316v64h1344q184 0 316 132t132 316z'/%3E%3C/svg%3E");
+	content: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='%23CFCFCF' viewBox='0 0 3584 3584'%3E%3Cpath d='M3584 1792q0 348-240 643t-652 466-900 171q-140 0-290-16-396 350-920 484-98 28-228 44-34 4-61-18t-35-58v-2q-6-8-1-24t4-20 9-19l12-18t14-17 16-18q14-16 62-69t69-76 62-79 65-102 54-118 52-152q-314-178-495-440t-181-562q0-260 142-497t382-409 572-273 696-101q488 0 900 171t652 466 240 643z'/%3E%3C/svg%3E");
 }
 
 .i-board-off::before {
-	content: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='%23aeaeae' viewBox='0 0 3584 3584'%3E%3Cpath d='M3456 1216v1408q0 184-132 316t-316 132h-2432q-184 0-316-132t-132-316v-1920q0-184 132-316t316-132h640q184 0 316 132t132 316v64h1344q184 0 316 132t132 316z'/%3E%3C/svg%3E");
+	content: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='%23AEAEAE' viewBox='0 0 3584 3584'%3E%3Cpath d='M1792 768q-408 0-763 139t-564 375-209 510q0 224 143 427t403 351l174 100-54 192q-48 182-140 344 304-126 550-342l86-76 114 12q138 16 260 16 408 0 763-139t564-375 209-510-209-510-564-375-763-139z m1792 1024q0 348-240 643t-652 466-900 171q-140 0-290-16-396 350-920 484-98 28-228 44h-10q-30 0-54-21t-32-55v-2q-6-8-1-24t4-20 9-19l12-18t14-17 16-18q14-16 62-69t69-76 62-79 65-102 54-118 52-152q-314-178-495-440t-181-562q0-348 240-643t652-466 900-171 900 171 652 466 240 643z'/%3E%3C/svg%3E");
 }
 
 /* Sorting icons */
