@@ -890,22 +890,22 @@ function definePaths()
 	if ((empty($languagedir) || !file_exists($languagedir)) && file_exists($boarddir . '/themes/default/languages'))
 		$languagedir = $boarddir . '/themes/default/languages';
 
-	if (!DEFINED('BOARDDIR'))
+	if (!defined('BOARDDIR'))
 		DEFINE('BOARDDIR', $boarddir);
-	if (!DEFINED('CACHEDIR'))
+	if (!defined('CACHEDIR'))
 		DEFINE('CACHEDIR', $cachedir);
-	if (!DEFINED('EXTDIR'))
+	if (!defined('EXTDIR'))
 		DEFINE('EXTDIR', $extdir);
-	if (!DEFINED('LANGUAGEDIR'))
+	if (!defined('LANGUAGEDIR'))
 		DEFINE('LANGUAGEDIR', $languagedir);
-	if (!DEFINED('ADDONSDIR'))
+	if (!defined('ADDONSDIR'))
 		DEFINE('ADDONSDIR', $boarddir . '/addons');
-	if (!DEFINED('SOURCEDIR'))
+	if (!defined('SOURCEDIR'))
 		DEFINE('SOURCEDIR', $sourcedir);
-	if (!DEFINED('ADMINDIR'))
+	if (!defined('ADMINDIR'))
 		DEFINE('ADMINDIR', $sourcedir . '/admin');
-	if (!DEFINED('CONTROLLERDIR'))
+	if (!defined('CONTROLLERDIR'))
 		DEFINE('CONTROLLERDIR', $sourcedir . '/controllers');
-	if (!DEFINED('SUBSDIR'))
+	if (!defined('SUBSDIR'))
 		DEFINE('SUBSDIR', $sourcedir . '/subs');
 }

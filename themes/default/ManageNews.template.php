@@ -18,7 +18,7 @@
  */
 function template_ManageNews_init()
 {
-	loadtemplate('GenericHelpers');
+	loadTemplate('GenericHelpers');
 }
 
 /**

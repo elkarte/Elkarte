@@ -1149,7 +1149,7 @@ class ManageThemes_Controller extends Action_Controller
 			$this->installFromDir();
 		// Uploaded a zip file to install from
 		elseif ($method == 'upload')
-			$this->InstallFromZip();
+			$this->installFromZip();
 		else
 			Errors::instance()->fatal_lang_error('theme_install_general', false);
 

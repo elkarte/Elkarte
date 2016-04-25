@@ -476,10 +476,10 @@ function updateMentionMenuCount($status, $member_id)
 
 	// If its new add to our menu count
 	if ($status === 0)
-		updateMemberdata($member_id, array('mentions' => '+'));
+		updateMemberData($member_id, array('mentions' => '+'));
 	// Mark as read we decrease the count
 	elseif ($status === 1)
-		updateMemberdata($member_id, array('mentions' => '-'));
+		updateMemberData($member_id, array('mentions' => '-'));
 	// Deleting or un-approving may have been read or not, so a count is required
 	else
 		countUserMentions(false, '', $member_id);
