@@ -189,7 +189,7 @@ function deleteMembergroups($groups)
 		);
 
 	// Recalculate the post groups, as they likely changed.
-	updatePostgroupStats();
+	updatePostGroupStats();
 
 	// Make a note of the fact that the cache may be wrong.
 	$settings_update = array('settings_updated' => time());
@@ -281,7 +281,7 @@ function removeMembersFromGroups($members, $groups = null, $permissionCheckDone 
 			)
 		);
 
-		updatePostgroupStats($members);
+		updatePostGroupStats($members);
 
 		// Log what just happened.
 		foreach ($members as $member)
@@ -391,7 +391,7 @@ function removeMembersFromGroups($members, $groups = null, $permissionCheckDone 
 		updateMemberData($memberArray, array('additional_groups' => implode(',', array_diff(explode(',', $additional_groups), $groups))));
 
 	// Their post groups may have changed now...
-	updatePostgroupStats($members);
+	updatePostGroupStats($members);
 
 	// Do the log.
 	if (!empty($log_inserts) && !empty($modSettings['modlog_enabled']))
@@ -521,7 +521,7 @@ function addMembersToGroup($members, $group, $type = 'auto', $permissionCheckDon
 	call_integration_hook('integrate_add_members_to_group', array($members, $group_details, &$group_names));
 
 	// Update their postgroup statistics.
-	updatePostgroupStats($members);
+	updatePostGroupStats($members);
 
 	require_once(SOURCEDIR . '/Logging.php');
 	foreach ($members as $member)

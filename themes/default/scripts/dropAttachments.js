@@ -406,7 +406,7 @@
 					totalAttachSizeUploaded += fileSize;
 
 				if (totalSizeAllowed !== null && totalAttachSizeUploaded > totalSizeAllowed) {
-					errorMsgs.totalSizeError = oTxt.totalSizeAllowed.replace("%1$s", totalSizeAllowed).replace("%2$s", parseInt(totalSizeAllowed - (totalAttachSizeUploaded - fileSize), 10));
+					errorMsgs.totalSizeError = oTxt.totalSizeAllowed.replace("%1$s", totalSizeAllowed).replace("%2$s", String(parseInt(totalSizeAllowed - (totalAttachSizeUploaded - fileSize), 10)));
 					errorFlag = true;
 				}
 

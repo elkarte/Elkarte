@@ -96,6 +96,6 @@ class Random_Display_Module implements ElkArte\sources\modules\Module_Interface
 	{
 		global $context;
 
-		$context['can_follow_up'] = boardsallowedto('post_new') !== array();
+		$context['can_follow_up'] = boardsAllowedTo('post_new') !== array();
 	}
 }

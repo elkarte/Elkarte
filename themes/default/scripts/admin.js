@@ -1517,7 +1517,7 @@ function navigatePreview(url)
 		url = url.substr(0, url.indexOf("#"));
 	}
 
-	myDoc.open("GET", url + (url.indexOf("?") === -1 ? "?" : ";") + 'theme=', theme_id + anchor, true);
+	myDoc.open("GET", url + (url.indexOf("?") === -1 ? "?" : ";") + 'theme=' + theme_id + anchor, true);
 	myDoc.send(null);
 }
 
@@ -1757,7 +1757,7 @@ function ajax_getCensorPreview()
 }
 
 $(document).ready(function() {
-	var $headers = $("#mention input[id^='notifications'][id$='[notification]']");
+	var $headers = $("#mention").find("input[id^='notifications'][id$='[notification]']");
 
 	$headers.change(function() {
 		var $top = $(this).closest('dl'),

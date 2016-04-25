@@ -455,45 +455,45 @@ function autoRotateImage($image)
 	switch ($orientation)
 	{
 		// (0 & 1) Not set or Normal
-		case imagick::ORIENTATION_UNDEFINED:
-		case imagick::ORIENTATION_TOPLEFT:
+		case Imagick::ORIENTATION_UNDEFINED:
+		case Imagick::ORIENTATION_TOPLEFT:
 			break;
 		// (2) Mirror image, Normal orientation
-		case imagick::ORIENTATION_TOPRIGHT:
+		case Imagick::ORIENTATION_TOPRIGHT:
 			$image->flopImage();
 			break;
 		// (3) Normal image, rotated 180
-		case imagick::ORIENTATION_BOTTOMRIGHT:
+		case Imagick::ORIENTATION_BOTTOMRIGHT:
 			$image->rotateImage("#000", 180);
 			break;
 		// (4) Mirror image, rotated 180
-		case imagick::ORIENTATION_BOTTOMLEFT:
+		case Imagick::ORIENTATION_BOTTOMLEFT:
 			$image->rotateImage("#000", 180);
 			$image->flopImage();
 			break;
 		// (5) Mirror image, rotated 90 CCW
-		case imagick::ORIENTATION_LEFTTOP:
+		case Imagick::ORIENTATION_LEFTTOP:
 			$image->rotateImage("#000", 90);
 			$image->flopImage();
 			break;
 		// (6) Normal image, rotated 90 CCW
-		case imagick::ORIENTATION_RIGHTTOP:
+		case Imagick::ORIENTATION_RIGHTTOP:
 			$image->rotateImage("#000", 90);
 			break;
 		// (7) Mirror image, rotated 90 CW
-		case imagick::ORIENTATION_RIGHTBOTTOM:
+		case Imagick::ORIENTATION_RIGHTBOTTOM:
 			$image->rotateImage("#000", -90);
 			$image->flopImage();
 			break;
 		// (8) Normal image, rotated 90 CW
-		case imagick::ORIENTATION_LEFTBOTTOM:
+		case Imagick::ORIENTATION_LEFTBOTTOM:
 			$image->rotateImage("#000", -90);
 			break;
 	}
 
 	// Now that it's auto-rotated, make sure the EXIF data is correctly updated
 	if ($orientation >= 2)
-		$image->setImageOrientation(imagick::ORIENTATION_TOPLEFT);
+		$image->setImageOrientation(Imagick::ORIENTATION_TOPLEFT);
 }
 
 /**
