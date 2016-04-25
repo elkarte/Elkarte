@@ -371,7 +371,7 @@ This mail was sent because the \'forgot password\' function has been applied to 
 IP: {IP}
 Username: {MEMBERNAME}
 
-If you\'ve received this password-assistance email and you didn\'t request one, it\'s likely that another user entered your email address by mistake.  If you didn\'t initiate the request, don\'t worry - your Account is secure, and there\'s no need for you to take any further action. 
+If you\'ve received this password-assistance email and you didn\'t request one, it\'s likely that another user entered your email address by mistake.  If you didn\'t initiate the request, don\'t worry - your account is secure, and there\'s no need for you to take any further action.
 Your privacy and security aren\'t compromised by this email.
 
 {REGARDS}';
