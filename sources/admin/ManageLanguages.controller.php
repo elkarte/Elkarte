@@ -296,7 +296,7 @@ class ManageLanguages_Controller extends Action_Controller
 	 */
 	public function action_downloadlang()
 	{
-		global $context, $txt, $scripturl, $modSettings;
+		global $context, $txt, $scripturl;
 
 		// @todo for the moment there is no facility to download packages, so better kill it here
 		Errors::instance()->fatal_lang_error('no_access', false);

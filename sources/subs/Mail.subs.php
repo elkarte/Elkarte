@@ -1242,7 +1242,7 @@ function emailsInfo($number)
  */
 function reduceMailQueue($batch_size = false, $override_limit = false, $force_send = false)
 {
-	global $modSettings, $context, $webmaster_email, $scripturl;
+	global $modSettings, $webmaster_email, $scripturl;
 
 	// Do we have another script to send out the queue?
 	if (!empty($modSettings['mail_queue_use_cron']) && empty($force_send))

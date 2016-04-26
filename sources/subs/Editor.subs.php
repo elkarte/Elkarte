@@ -118,7 +118,7 @@ function getMessageIcons($board_id)
  */
 function create_control_richedit($editorOptions)
 {
-	global $txt, $modSettings, $options, $context, $settings, $user_info, $scripturl;
+	global $txt, $modSettings, $options, $context, $settings, $scripturl;
 	static $bbc_tags;
 
 	$db = database();

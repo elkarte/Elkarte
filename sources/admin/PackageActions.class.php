@@ -753,8 +753,6 @@ class Package_Actions extends Action_Controller
 	 */
 	public function action_modification2()
 	{
-		global $context;
-
 		if (!empty($this->_action['filename']))
 		{
 			$mod_actions = parseModification(file_get_contents(BOARDDIR . '/packages/temp/' . $this->_base_path . $this->_action['filename']), false, $this->_action['reverse'], $this->_theme_paths);

@@ -369,7 +369,7 @@ class Auth_Controller extends Action_Controller
 	 */
 	public function action_logout($internal = false, $redirect = true)
 	{
-		global $user_info, $user_settings, $context;
+		global $user_info, $user_settings;
 
 		// Make sure they aren't being auto-logged out.
 		if (!$internal)

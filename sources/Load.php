@@ -2395,7 +2395,7 @@ function loadDatabase()
  */
 function determineAvatar($profile)
 {
-	global $modSettings, $scripturl, $settings, $context;
+	global $modSettings, $scripturl, $settings;
 
 	if (empty($profile))
 		return array();

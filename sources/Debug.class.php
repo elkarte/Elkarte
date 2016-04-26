@@ -271,8 +271,7 @@ class Debug
 	 */
 	public function display()
 	{
-		global $scripturl, $modSettings;
-		global $txt;
+		global $scripturl, $txt;
 
 		$this->_prepare_last_bits();
 		$expand_id = array();

@@ -374,7 +374,7 @@ class Unread_Controller extends Action_Controller
 	 */
 	private function _sorting_conditions()
 	{
-		global $context, $txt, $scripturl, $settings;
+		global $context, $txt, $scripturl;
 
 		$sort_methods = array(
 			'subject' => 'ms.subject',

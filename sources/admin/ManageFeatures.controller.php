@@ -1317,7 +1317,7 @@ class ManageFeatures_Controller extends Action_Controller
 	 */
 	private function _basicSettings()
 	{
-		global $txt, $modSettings, $context;
+		global $txt;
 
 		$config_vars = array(
 				// Basic stuff, titles, permissions...

@@ -545,7 +545,7 @@ class Errors
 	 */
 	public function display_db_error()
 	{
-		global $mbname, $modSettings, $maintenance, $webmaster_email, $db_error_send;
+		global $mbname, $maintenance, $webmaster_email, $db_error_send;
 
 		$db = database();
 		$cache = Cache::instance();

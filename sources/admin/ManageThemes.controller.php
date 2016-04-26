@@ -1353,7 +1353,7 @@ class ManageThemes_Controller extends Action_Controller
 	 */
 	public function action_jsoption()
 	{
-		global $settings, $user_info, $options, $modSettings;
+		global $settings, $user_info, $options;
 
 		// Check the session id.
 		checkSession('get');

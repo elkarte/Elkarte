@@ -497,7 +497,7 @@ class In_Line_Attachment
 	 */
 	private function build_img_tag($uniqueID)
 	{
-		global $txt, $context, $modSettings, $settings;
+		global $txt, $context, $modSettings;
 
 		$inlinedtext = '';
 		$fb_link = 'rel="gallery_msg_' . $this->_id_msg . '_footer"';

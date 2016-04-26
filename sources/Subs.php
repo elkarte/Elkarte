@@ -383,7 +383,7 @@ function comma_format($number, $override_decimal_count = false)
  */
 function standardTime($log_time, $show_today = true, $offset_type = false)
 {
-	global $context, $user_info, $txt, $modSettings;
+	global $user_info, $txt, $modSettings;
 	static $non_twelve_hour, $support_e = null;
 
 	if ($support_e === null)
