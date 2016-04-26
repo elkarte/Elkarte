@@ -56,22 +56,28 @@ $settings_loc = 'Settings.php';
 if (file_exists('install'))
 {
 	if (file_exists($settings_loc))
+	{
 		require_once($settings_loc);
-
+	}
 	if (empty($ignore_install_dir))
 	{
 		if (file_exists($settings_loc) && empty($_SESSION['installing']))
+		{
 			$redirec_file = 'upgrade.php';
+		}
 		else
+		{
 			$redirec_file = 'install.php';
+		}
 
 		header('Location: http' . (!empty($_SERVER['HTTPS']) && strtolower($_SERVER['HTTPS']) == 'on' ? 's' : '') . '://' . (empty($_SERVER['HTTP_HOST']) ? $_SERVER['SERVER_NAME'] . (empty($_SERVER['SERVER_PORT']) || $_SERVER['SERVER_PORT'] == '80' ? '' : ':' . $_SERVER['SERVER_PORT']) : $_SERVER['HTTP_HOST']) . (strtr(dirname($_SERVER['PHP_SELF']), '\\', '/') == '/' ? '' : strtr(dirname($_SERVER['PHP_SELF']), '\\', '/')) . '/install/' . $redirec_file);
 		die();
 	}
 }
 else
+{
 	require_once($settings_loc);
-
+}
 
 // Make sure the paths are correct... at least try to fix them.
 if (!file_exists($boarddir) && file_exists('agreement.txt'))
