@@ -54,7 +54,7 @@
  *  - SET postinput - to put some HTML following the input box.
  *  - SET invalid - to mark the data as invalid.
  *  - PLUS you can override label and help parameters by forcing their keys in the array, for example:
- *    array('text', 'invalidlabel', 3, 'label' => 'Actual Label')
+ *    array('text', 'invalid label', 3, 'label' => 'Actual Label')
  */
 
 if (!defined('ELK'))

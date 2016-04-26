@@ -93,7 +93,7 @@ interface Database
 	public function fetch_assoc($request, $counter = false);
 
 	/**
-	 * Fetch a row from the resultset given as parameter.
+	 * Fetch a row from the result set given as parameter.
 	 *
 	 * @param resource $result
 	 * @param int|boolean $counter = false

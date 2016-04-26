@@ -174,7 +174,7 @@ class ManageAvatars_Controller extends Action_Controller
 						'x' => 'x',
 					),
 				),
-			// Uploadable avatars?
+			// Upload-able avatars?
 			array('title', 'avatar_upload'),
 				array('check', 'avatar_upload_enabled'),
 			array('title', 'avatar_resize_options'),

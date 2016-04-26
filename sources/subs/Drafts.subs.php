@@ -233,7 +233,7 @@ function load_draft($id_draft, $uid, $type = 0, $drafts_keep_days = 0, $check = 
 /**
  * Loads all of the drafts for a user
  *
- * - Optionly can load just the drafts for a specific topic (post) or reply (pm)
+ * - Optionally can load just the drafts for a specific topic (post) or reply (pm)
  *
  * @package Drafts
  * @param int $member_id - user id to get drafts for
@@ -351,8 +351,8 @@ function draftsCount($member_id, $draft_type = 0)
  * - keeps track of bcc and to names for the PM
  *
  * @package Drafts
- * @todo this is the same as whats in PersonalMessage.controller, when that gets refractored
- * this should go away and use the refractored PM subs
+ * @todo this is the same as whats in PersonalMessage.controller, when that gets refactored
+ * this should go away and use the refactored PM subs
  * @param int[] $allRecipients
  * @param mixed[] $recipient_ids
  */
