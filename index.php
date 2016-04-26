@@ -53,30 +53,26 @@ $settings_loc = 'Settings.php';
 
 // First thing: if the install dir exists, just send anybody there
 // The ignore_install_dir var is for developers only. Do not add it on production sites
-if (file_exists('install') && empty($ignore_install_dir))
+if (file_exists('install'))
 {
 	if (file_exists($settings_loc))
-	{
 		require_once($settings_loc);
-	}
 
-	if (file_exists($settings_loc) && empty($_SESSION['installing']))
+	if (empty($ignore_install_dir))
 	{
-		$redirec_file = 'upgrade.php';
-	}
-	else
-	{
-		$redirec_file = 'install.php';
-	}
+		if (file_exists($settings_loc) && empty($_SESSION['installing']))
+			$redirec_file = 'upgrade.php';
+		else
+			$redirec_file = 'install.php';
 
-	header('Location: http' . (!empty($_SERVER['HTTPS']) && strtolower($_SERVER['HTTPS']) == 'on' ? 's' : '') . '://' . (empty($_SERVER['HTTP_HOST']) ? $_SERVER['SERVER_NAME'] . (empty($_SERVER['SERVER_PORT']) || $_SERVER['SERVER_PORT'] == '80' ? '' : ':' . $_SERVER['SERVER_PORT']) : $_SERVER['HTTP_HOST']) . (strtr(dirname($_SERVER['PHP_SELF']), '\\', '/') == '/' ? '' : strtr(dirname($_SERVER['PHP_SELF']), '\\', '/')) . '/install/' . $redirec_file);
-	die;
+		header('Location: http' . (!empty($_SERVER['HTTPS']) && strtolower($_SERVER['HTTPS']) == 'on' ? 's' : '') . '://' . (empty($_SERVER['HTTP_HOST']) ? $_SERVER['SERVER_NAME'] . (empty($_SERVER['SERVER_PORT']) || $_SERVER['SERVER_PORT'] == '80' ? '' : ':' . $_SERVER['SERVER_PORT']) : $_SERVER['HTTP_HOST']) . (strtr(dirname($_SERVER['PHP_SELF']), '\\', '/') == '/' ? '' : strtr(dirname($_SERVER['PHP_SELF']), '\\', '/')) . '/install/' . $redirec_file);
+		die();
+	}
 }
 else
 {
 	require_once($settings_loc);
 }
-
 
 // Make sure the paths are correct... at least try to fix them.
 if (!file_exists($boarddir) && file_exists('agreement.txt'))
