@@ -421,8 +421,6 @@ function loadBoard()
 	$db = database();
 	$cache = Cache::instance();
 
-	$parser = \BBC\ParserWrapper::getInstance();
-
 	// Assume they are not a moderator.
 	$user_info['is_mod'] = false;
 	// @since 1.0.5 - is_mod takes into account only local (board) moderators,
