@@ -70,9 +70,8 @@ if (file_exists('install'))
 	}
 }
 else
-{
 	require_once($settings_loc);
-}
+
 
 // Make sure the paths are correct... at least try to fix them.
 if (!file_exists($boarddir) && file_exists('agreement.txt'))
