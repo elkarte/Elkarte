@@ -2,7 +2,7 @@
 
 /**
  * @name      Inline Attachments (ILA)
- * @license   Mozilla Public License version 1.1 http://www.mozilla.org/MPL/1.1/.
+ * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  * @author    Spuds
  * @copyright (c) 2014 Spuds
  *

@@ -2,7 +2,7 @@
 
 /**
  * @name      Inline Attachments (ILA)
- * @license   Mozilla Public License version 1.1 http://www.mozilla.org/MPL/1.1/.
+ * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  * @author    Spuds
  * @copyright (c) 2014 Spuds
  *
@@ -149,7 +149,7 @@ class Ila_Integrate
 // 	public static function integrate_post_bbc_parser(&$message)
 // 	{
 // 		global $context;
-// 
+//
 // 		// Enabled and we have tags, time to render them
 // 		if (empty($context['uninstalling']) && stripos($message, '[attach') !== false)
 // 		{
@@ -163,7 +163,7 @@ class Ila_Integrate
 // 				// Previewing a modified message, check for a value in $_REQUEST['msg']
 // 				$msg_id = isset($_REQUEST['msg']) ? (int) $_REQUEST['msg'] : -1;
 // 			}
-// 
+//
 // 			$ila_parser = new In_Line_Attachment($message);
 // 			$message = $ila_parser->parse_bbc();
 // 		}
