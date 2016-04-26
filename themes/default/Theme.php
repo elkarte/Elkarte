@@ -812,6 +812,16 @@ class Theme extends \Theme
 							'href' => $scripturl . '?action=recent',
 							'show' => true,
 						),
+						'like_stats' => array(
+							'title' => $txt['like_post_stats'],
+							'href' => $scripturl . '?action=likes;sa=likestats',
+							'show' => allowedTo('like_posts_stats'),
+						),
+						'contact' => array(
+							'title' => $txt['contact'],
+							'href' => $scripturl . '?action=register;sa=contact',
+							'show' => $user_info['is_guest'] && !empty($modSettings['enable_contactform']) && $modSettings['enable_contactform'] == 'menu',
+						),
 					),
 				)
 			);
@@ -1030,18 +1040,6 @@ class Theme extends \Theme
 					'href' => $scripturl . '?action=register',
 					'data-icon' => 'register',
 					'show' => $user_info['is_guest'] && $context['can_register'],
-				),
-				'like_stats' => array(
-					'title' => $txt['like_post_stats'],
-					'href' => $scripturl . '?action=likes;sa=likestats',
-					// 'data-icon' => '&#xf090;',
-					'show' => allowedTo('like_posts_stats'),
-				),
-				'contact' => array(
-					'title' => $txt['contact'],
-					'href' => $scripturl . '?action=register;sa=contact',
-					'data-icon' => 'phone',
-					'show' => $user_info['is_guest'] && !empty($modSettings['enable_contactform']) && $modSettings['enable_contactform'] == 'menu',
 				),
 			);
 
