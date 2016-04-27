@@ -79,35 +79,55 @@ class Pbe_Imap
 	{
 		// Values used for the connection
 		if (!empty($modSettings['maillist_imap_host']))
+		{
 			$this->_hostname = $modSettings['maillist_imap_host'];
+		}
+
 		if (!empty($modSettings['maillist_imap_uid']))
+		{
 			$this->_username = $modSettings['maillist_imap_uid'];
+		}
+
 		if (!empty($modSettings['maillist_imap_pass']))
+		{
 			$this->_password = $modSettings['maillist_imap_pass'];
+		}
+
 		if (!empty($modSettings['maillist_imap_mailbox']))
+		{
 			$this->_mailbox = $modSettings['maillist_imap_mailbox'];
+		}
+
 		if (!empty($modSettings['maillist_imap_connection']))
+		{
 			$this->_type = $modSettings['maillist_imap_connection'];
+		}
 
 		$this->_delete = !empty($modSettings['maillist_imap_delete']);
 		$this->_is_gmail = strpos($this->_hostname, '.gmail.') !== false;
 
 		// I suppose that without this information we can't do anything.
 		if (empty($this->_hostname) || empty($this->_username) || empty($this->_password))
+		{
 			return false;
+		}
 		else
+		{
 			return $this;
+		}
 	}
 
 	/**
-	 * Do the actual processing of the inbox posting new emails as needed
+	 * Does the actual processing of the inbox posting new emails as needed
 	 */
 	public function process()
 	{
 		$this->_get_inbox();
 
 		if ($this->_inbox === false)
+		{
 			return false;
+		}
 
 		// Grab all unseen emails, return by message ID
 		$emails = imap_search($this->_inbox, 'UNSEEN', SE_UID);
@@ -133,7 +153,9 @@ class Pbe_Imap
 
 					// Mark it for deletion?
 					if ($this->_delete)
+					{
 						$this->_delete_email($email_uid);
+					}
 				}
 			}
 		}
@@ -156,7 +178,17 @@ class Pbe_Imap
 		$this->_mailbox = $this->_imap_server . imap_utf7_encode($this->_mailbox);
 
 		// Connect to the mailbox using the supplied credentials and protocol
-		$this->_inbox = @imap_open($this->_mailbox, $this->_username, $this->_password);
+		$this->_inbox = imap_open($this->_mailbox, $this->_username, $this->_password);
+
+		// Connection error, logging may help debug
+		if ($this->_inbox === false)
+		{
+			$imap_error = imap_last_error();
+			if (!empty($imap_error))
+			{
+				log_error($imap_error, 'debug', 'IMAP');
+			}
+		}
 	}
 
 	/**
@@ -172,9 +204,13 @@ class Pbe_Imap
 
 		// Create the save-as email
 		if (!empty($headers) && !empty($message))
+		{
 			$email = $headers . "\n" . $message;
+		}
 		else
+		{
 			$email = '';
+		}
 
 		return $email;
 	}
@@ -272,7 +308,9 @@ class Pbe_Imap
 		{
 			$name = str_replace($this->_imap_server, '', $mailbox);
 			if (in_array($name, $trashbox))
+			{
 				return $name;
+			}
 		}
 
 		return 'Trash';
