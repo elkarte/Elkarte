@@ -1,25 +1,25 @@
 <?php
 
 /**
- * @name      Inline Attachments (ILA)
+ * @name      ElkArte Forum
+ * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
- * @author    Spuds
- * @copyright (c) 2014 Spuds
  *
  * @version 1.1 beta 1
- *
- * Based on original code by mouser http://www.donationcoder.com
- * Updated/Modified/etc with permission
  *
  */
 
 if (!defined('ELK'))
 	die('No access...');
 
+/**
+ * Class Ila_Integrate
+ */
 class Ila_Integrate
 {
 	/**
 	 * Register ILA hooks to the system
+	 *
 	 * @return array
 	 */
 	public static function register()
@@ -32,14 +32,13 @@ class Ila_Integrate
 		// $hook, $function, $file
 		return array(
 			array('integrate_additional_bbc', 'Ila_Integrate::integrate_additional_bbc'),
-			array('integrate_pre_parsebbc', 'Ila_Integrate::integrate_pre_parsebbc'),
-			array('integrate_post_bbc_parser', 'Ila_Integrate::integrate_post_bbc_parser'),
 			array('integrate_before_prepare_display_context', 'Ila_Integrate::integrate_before_prepare_display_context'),
 		);
 	}
 
 	/**
 	 * Register ACP config hooks for setting values
+	 *
 	 * @return array
 	 */
 	public static function settingsRegister()
@@ -57,26 +56,121 @@ class Ila_Integrate
 	 */
 	public static function integrate_additional_bbc(&$codes)
 	{
-		global $scripturl;
+		global $scripturl, $is_image;
 
-		// Add in our new codes, if found on to the end of this array
-		// here mostly used to null them out should they not be rendered
+		// Generally we don't want to render inside of these tags ...
+		// @todo move quote to ACP as option?
+		$disallow = array(
+			'quote' => 1,
+			'code' => 1,
+			'nobbc' => 1,
+			'html' => 1,
+			'php' => 1,
+		);
+
+		// This is prevents a little repetition and provides a little control for "plain" tags
+		$validate_plain = function(&$tag, &$data, $disabled) {
+			global $context, $user_info, $scripturl;
+
+			$num = $data;
+
+			// Not a preview, then sanitize the attach id
+			if (strpos($data, 'post_tmp_' . $user_info['id']) === false)
+			{
+				require_once(SUBSDIR . '/Attachments.subs.php');
+
+				$num = (int) $data;
+				if (isAttachmentImage($num) !== false)
+					$data = '<a id="link_' . $num . '" data-lightboximage="' . $num . '" href="' . $scripturl . '?action=dlattach;attach=' . $num . ';image' . '"><img src="' . $scripturl . '?action=dlattach;attach=' . $num . ';thumb" alt="" class="bbc_img" /></a>';
+				else
+					$data = '<a href="' . $scripturl . '?action=dlattach;attach=' . $num . '"><img src="' . $scripturl . '?action=dlattach;attach=' . $num . ';thumb" alt="" class="bbc_img" /></a>';
+			}
+
+			$context['ila_dont_show_attach_below'][] = $num;
+			$context['ila_dont_show_attach_below'] = array_unique($context['ila_dont_show_attach_below']);
+		};
+
+		// For tags with options (width / height / align), the param substitution happens prior so we can't return the full string
+		$validate = function(&$tag, &$data, $disabled) {
+			global $context, $user_info;
+
+			// Not a preview, then sanitize the attach id
+			if (strpos($data, 'post_tmp_' . $user_info['id']) === false)
+			{
+				$data = (int) $data;
+			}
+
+			$context['ila_dont_show_attach_below'][] = $data;
+			$context['ila_dont_show_attach_below'] = array_unique($context['ila_dont_show_attach_below']);
+		};
+
+		// Add in our ILA codes
 		$codes = array_merge($codes, array(
+			// Require a width with optional height/align to allow use of full image and not ;thumb
 			array(
 				\BBC\Codes::ATTR_TAG => 'attach',
 				\BBC\Codes::ATTR_TYPE => \BBC\Codes::TYPE_UNPARSED_CONTENT,
-				\BBC\Codes::ATTR_CONTENT => '<a href="' . $scripturl . '?action=dlattach;attach=$1"><img src="' . $scripturl . '?action=dlattach;attach=$1;thumb" alt="" class="bbc_img" /></a>',
-				\BBC\Codes::ATTR_VALIDATE => function(&$tag, &$data, $disabled) {
-					global $context, $user_info;
-
-					if (strpos($data, 'post_tmp_' . $user_info['id']) === false)
-					{
-						$data = (int) $data;
-					}
-
-					$context['ila_dont_show_attach_below'][] = $data;
-					$context['ila_dont_show_attach_below'] = array_unique($context['ila_dont_show_attach_below']);
-				},
+				\BBC\Codes::ATTR_PARAM => array(
+					'width' => array(
+						\BBC\Codes::PARAM_ATTR_OPTIONAL => false,
+						\BBC\Codes::PARAM_ATTR_VALUE => 'width:100%;max-width:$1px;',
+						\BBC\Codes::PARAM_ATTR_MATCH => '(\d+)',
+					),
+					'height' => array(
+						\BBC\Codes::PARAM_ATTR_OPTIONAL => true,
+						\BBC\Codes::PARAM_ATTR_VALUE => 'max-height:$1px;',
+						\BBC\Codes::PARAM_ATTR_MATCH => '(\d+)',
+					),
+					'align' => array(
+						\BBC\Codes::PARAM_ATTR_OPTIONAL => true,
+						\BBC\Codes::PARAM_ATTR_VALUE => 'float$1',
+						\BBC\Codes::PARAM_ATTR_MATCH => '(right|left|center)',
+					),
+				),
+				\BBC\Codes::ATTR_CONTENT => '<a id="link_$1" data-lightboximage="$1" href="' . $scripturl . '?action=dlattach;attach=$1;image"><img src="' . $scripturl . '?action=dlattach;attach=$1" style="{width}{height}" alt="" class="bbc_img {align}" /></a>',
+				\BBC\Codes::ATTR_VALIDATE => $validate,
+				\BBC\Codes::ATTR_DISALLOW_PARENTS => $disallow,
+				\BBC\Codes::ATTR_DISABLED_CONTENT => '<a href="' . $scripturl . '?action=dlattach;attach=$1">(' . $scripturl . '?action=dlattach;attach=$1)</a>',
+				\BBC\Codes::ATTR_BLOCK_LEVEL => false,
+				\BBC\Codes::ATTR_AUTOLINK => false,
+				\BBC\Codes::ATTR_LENGTH => 6,
+			),
+			// Require a height with option width/align to allow removal of ;thumb
+			array(
+				\BBC\Codes::ATTR_TAG => 'attach',
+				\BBC\Codes::ATTR_TYPE => \BBC\Codes::TYPE_UNPARSED_CONTENT,
+				\BBC\Codes::ATTR_PARAM => array(
+					'height' => array(
+						\BBC\Codes::PARAM_ATTR_OPTIONAL => false,
+						\BBC\Codes::PARAM_ATTR_VALUE => 'max-height:$1px;',
+						\BBC\Codes::PARAM_ATTR_MATCH => '(\d+)',
+					),
+					'width' => array(
+						\BBC\Codes::PARAM_ATTR_OPTIONAL => true,
+						\BBC\Codes::PARAM_ATTR_VALUE => 'width:100%;max-width:$1px;',
+						\BBC\Codes::PARAM_ATTR_MATCH => '(\d+)',
+					),
+					'align' => array(
+						\BBC\Codes::PARAM_ATTR_OPTIONAL => true,
+						\BBC\Codes::PARAM_ATTR_VALUE => 'float$1',
+						\BBC\Codes::PARAM_ATTR_MATCH => '(right|left|center)',
+					),
+				),
+				\BBC\Codes::ATTR_CONTENT => '<a id="link_$1" data-lightboximage="$1" href="' . $scripturl . '?action=dlattach;attach=$1;image"><img src="' . $scripturl . '?action=dlattach;attach=$1" style="{width}{height}" alt="" class="bbc_img {align}" /></a>',
+				\BBC\Codes::ATTR_VALIDATE => $validate,
+				\BBC\Codes::ATTR_DISALLOW_PARENTS => $disallow,
+				\BBC\Codes::ATTR_DISABLED_CONTENT => '<a href="' . $scripturl . '?action=dlattach;attach=$1">(' . $scripturl . '?action=dlattach;attach=$1)</a>',
+				\BBC\Codes::ATTR_BLOCK_LEVEL => false,
+				\BBC\Codes::ATTR_AUTOLINK => false,
+				\BBC\Codes::ATTR_LENGTH => 6,
+			),
+			// Just a simple attach, always ;thumb here
+			array(
+				\BBC\Codes::ATTR_TAG => 'attach',
+				\BBC\Codes::ATTR_TYPE => \BBC\Codes::TYPE_UNPARSED_CONTENT,
+				\BBC\Codes::ATTR_CONTENT => '$1',
+				\BBC\Codes::ATTR_VALIDATE => $validate_plain,
+				\BBC\Codes::ATTR_DISALLOW_PARENTS => $disallow,
 				\BBC\Codes::ATTR_DISABLED_CONTENT => '<a href="' . $scripturl . '?action=dlattach;attach=$1">(' . $scripturl . '?action=dlattach;attach=$1)</a>',
 				\BBC\Codes::ATTR_BLOCK_LEVEL => false,
 				\BBC\Codes::ATTR_AUTOLINK => false,
@@ -105,11 +199,12 @@ class Ila_Integrate
 	/**
 	 * Subs hook, integrate_pre_parsebbc
 	 *
+	 * What it does:
 	 * - Allow addons access before entering the main parse_bbc loop
 	 * - Prevents parseBBC from working on these tags at all
 	 *
 	 * @param string $message
-	 * @param smixed[] $smileys
+	 * @param mixed[] $smileys
 	 * @param string $cache_id
 	 * @param string[]|null $parse_tags
 	 */
@@ -137,44 +232,12 @@ class Ila_Integrate
 	}
 
 	/**
-	 * Subs hook, integrate_post_bbc_parser
-	 *
-	 * - Allow addons access to what parse_bbc created, here we call ILA to render its tags
-	 *
-	 * @param string $message
-	 * @param mixed[] $smileys
-	 * @param string $cache_id
-	 * @param string[]|null $parse_tags
-	 */
-// 	public static function integrate_post_bbc_parser(&$message)
-// 	{
-// 		global $context;
-//
-// 		// Enabled and we have tags, time to render them
-// 		if (empty($context['uninstalling']) && stripos($message, '[attach') !== false)
-// 		{
-// 			if (!empty($_REQUEST['id_draft']))
-// 			{
-// 				// Previewing a draft
-// 				$msg_id = (int) $_REQUEST['id_draft'];
-// 			}
-// 			else
-// 			{
-// 				// Previewing a modified message, check for a value in $_REQUEST['msg']
-// 				$msg_id = isset($_REQUEST['msg']) ? (int) $_REQUEST['msg'] : -1;
-// 			}
-//
-// 			$ila_parser = new In_Line_Attachment($message);
-// 			$message = $ila_parser->parse_bbc();
-// 		}
-// 	}
-
-	/**
 	 * Display controller hook, called from prepareDisplayContext_callback integrate_before_prepare_display_context
 	 *
+	 * What it does:
 	 * - Drops attachments from the message if they were rendered inline
 	 *
-	 * @param mixed[] $output
+	 * @param mixed[] $message
 	 */
 	public static function integrate_before_prepare_display_context(&$message)
 	{
@@ -192,6 +255,9 @@ class Ila_Integrate
 	}
 
 	/**
+	 * Settings hook for the admin panel
+	 *
+	 * What it does:
 	 * - Defines our settings array and uses our settings class to manage the data
 	 *
 	 * @param array $config_vars
