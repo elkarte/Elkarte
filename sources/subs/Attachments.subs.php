@@ -1139,6 +1139,37 @@ function getAttachmentThumbFromTopic($id_attach, $id_topic)
 }
 
 /**
+ * Returns if the given attachment ID is an image file or not
+ *
+ * What it does:
+ * - it only returns the attachment if it's indeed attached to a message in the topic given as parameter, and query_see_board...
+ * - Must return the same values and in the same order as getAvatar()
+ *
+ * @package Attachments
+ * @param int $id_attach
+ */
+function isAttachmentImage($id_attach)
+{
+	$db = database();
+
+	// Make sure this attachment is on this board.
+	$request = $db->query('', '
+		SELECT id_folder, filename, file_hash, fileext, id_attach, attachment_type, mime_type, approved
+		FROM {db_prefix}attachments
+		WHERE id_attach = {int:attach}',
+		array(
+			'attach' => $id_attach,
+		)
+	);
+	$attachmentData = array();
+	if ($db->num_rows($request) != 0)
+		$attachmentData = $db->fetch_assoc($request);
+	$db->free_result($request);
+
+	return !empty($attachmentData) && substr($attachmentData['mime_type'], 0, 5) === 'image' ? $attachmentData : false;
+}
+
+/**
  * Increase download counter for id_attach.
  *
  * What it does:
