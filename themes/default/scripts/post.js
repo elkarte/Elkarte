@@ -367,6 +367,11 @@ function onDocSent(XMLDoc)
 		elk_codefix();
 	if (typeof prettyPrint === 'function')
 		prettyPrint();
+
+	// Prevent lighbox or default action on the preview
+	$('[data-lightboximage]').on('click.elk_lb', function(e) {
+		e.preventDefault();
+	});
 }
 
 /**
