@@ -185,6 +185,7 @@ $txt['ila_option1'] = 'Thumbnail';
 $txt['ila_option2'] = 'Full-size image';
 $txt['ila_option3'] = 'Text link';
 $txt['ila_option4'] = 'Short text link';
+$txt['ila_confirm_removal'] = 'Are you sure you want to remove permanently this attachment?';
 /*
 $txt['ila_thereare'] = 'There are only';
 $txt['ila_attachment'] = 'attachment(s)';
