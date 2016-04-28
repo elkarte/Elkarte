@@ -436,6 +436,11 @@ em, .em {
 	float: left;
 }
 
+.floatcenter {
+	margin: 0 auto;
+	display: block;
+}
+
 .flow_auto {
 	overflow: auto;
 }
