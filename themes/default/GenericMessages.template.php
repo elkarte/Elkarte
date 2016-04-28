@@ -127,9 +127,9 @@ function template_build_poster_div($message, $ignoring = false)
 											<li><a href="' . $message['member']['website']['url'] . '" title="' . $message['member']['website']['title'] . '" target="_blank" class="new_win">' . ($settings['use_image_buttons'] ? '<i class="icon i-website" title="' . $message['member']['website']['title'] . '"></i>' : $txt['www']) . '</a></li>';
 
 			// Don't show the email address if they want it hidden.
-			if (in_array($message['member']['show_email'], array('yes', 'yes_permission_override', 'no_through_forum')) && $context['can_send_email'])
+			if ($context['can_send_email'])
 				$poster_div .= '
-											<li><a href="' . $scripturl . '?action=emailuser;sa=email;msg=' . $message['id'] . '" class="icon i-envelope" title="' . $txt['email'] . '"></a></li>';
+											<li>' . template_msg_email($message['id'], $message['member']) . '</li>';
 
 			$poster_div .= '
 										</ol>
@@ -148,9 +148,9 @@ function template_build_poster_div($message, $ignoring = false)
 		}
 	}
 	// Otherwise, show the guest's email.
-	elseif (!empty($message['member']['email']) && in_array($message['member']['show_email'], array('yes', 'yes_permission_override', 'no_through_forum')) && $context['can_send_email'])
+	elseif (!empty($message['member']['email']) && $context['can_send_email'])
 		$poster_div .= '
-									<li class="listlevel2 email"><a class="linklevel2" href="' . $scripturl . '?action=emailuser;sa=email;msg=' . $message['id'] . '" rel="nofollow">' . ($settings['use_image_buttons'] ? '<img src="' . $settings['images_url'] . '/profile/email_sm.png" alt="' . $txt['email'] . '" title="' . $txt['email'] . '" />' : $txt['email']) . '</a></li>';
+									<li class="listlevel2 email">' . template_msg_email($message['id']) . '</li>';
 
 	// Stuff for the staff to wallop them with.
 	$poster_div .= '
@@ -243,7 +243,7 @@ function template_build_poster_div($message, $ignoring = false)
 		{
 			if (!empty($modSettings['onlineEnable']))
 				$poster_div .= '
-							<li class="listlevel1 poster_online"><a class="linklevel1" href="' . $scripturl . '?action=pm;sa=send;u=' . $message['member']['id'] . '" title="' . $message['member']['online']['member_online_text'] . '">' . $txt['send_message'] . ' <img src="' . $message['member']['online']['image_href'] . '" alt="" /></a></li>';
+							<li class="listlevel1 poster_online"><a class="linklevel1" href="' . $scripturl . '?action=pm;sa=send;u=' . $message['member']['id'] . '" title="' . $message['member']['online']['member_online_text'] . '">' . $txt['send_message'] . ' ' . template_member_online($message['member'], false) . '</a></li>';
 			else
 				$poster_div .= '
 							<li class="listlevel1 poster_online"><a class="linklevel1" href="' . $scripturl . '?action=pm;sa=send;u=' . $message['member']['id'] . '">' . $txt['send_message'] . ' </a></li>';

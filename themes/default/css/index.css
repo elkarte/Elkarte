@@ -1379,6 +1379,10 @@ a.bbc_link {
 	font-weight: 700;
 }
 
+.linklevel2.help {
+	display: inline-block;
+}
+
 /* Styles for sidebar menus.
 /* Cancel default backgrounds for sidebar. */
 #menu_sidebar .linklevel1 {
@@ -5386,8 +5390,8 @@ a.help .icon {
 	display: block;
 	width: 100%;
 	height: 100%;
-	background-size: contain;
 	background: no-repeat center;
+	background-size: contain;
 }
 
 /*

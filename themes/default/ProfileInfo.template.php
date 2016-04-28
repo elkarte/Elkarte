@@ -526,9 +526,7 @@ function template_profile_block_summary()
 						<h4><span class="position">', (!empty($context['member']['group']) ? $context['member']['group'] : $context['member']['post_group']), '</span></h4>
 					</div>
 					', $context['member']['avatar']['image'], '
-					<span id="userstatus">', $context['can_send_pm'] ? '<a href="' . $context['member']['online']['href'] . '" title="' . $context['member']['online']['text'] . '">' : '',
-					'<i class="', $context['member']['online']['is_online'] ? 'iconline' : 'icoffline', '" title="' . $context['member']['online']['text'] . '"></i>',
-					$context['can_send_pm'] ? '</a>' : '', '<span class="smalltext"> ' . $context['member']['online']['label'] . '</span>', '</span>
+					<span id="userstatus">', template_member_online($context['member']), '<span class="smalltext"> ' . $context['member']['online']['label'] . '</span>', '</span>
 				</div>
 				<div id="detailedinfo">
 					<dl>';
@@ -721,22 +719,7 @@ function template_profile_block_contact()
 					<dt>
 						<i class="icon i-envelope', $context['member']['online']['is_online'] ? '' : '-blank', '"><s>', $txt['email'], '</s></i>
 					</dt>
-					<dd>';
-
-		// Only show the email address fully if it's not hidden - and we reveal the email.
-		if ($context['member']['show_email'] == 'yes')
-			echo '
-						<a class="linkbutton" href="', $scripturl, '?action=emailuser;sa=email;uid=', $context['member']['id'], '">', $txt['email'], '</a>';
-		// ... Or if the one looking at the profile is an admin they can see it anyway.
-		elseif ($context['member']['show_email'] == 'yes_permission_override')
-			echo '
-						<em><a class="linkbutton" href="', $scripturl, '?action=emailuser;sa=email;uid=', $context['member']['id'], '">', $context['member']['email'], '</a></em>';
-		else
-			echo '
-						<em>', $txt['hidden'], '</em>';
-
-		echo '
-					</dd>';
+					<dd><em>', template_member_email($context['member'], true), '</em></dd>';
 	}
 
 	// Don't show an icon if they haven't specified a website.
@@ -1027,13 +1010,11 @@ function template_profile_block_buddies()
 					<div class="generic_border centertext">
 						', $data['avatar']['image'], '<br>
 						<a href="', $scripturl, '?action=profile;u=', $data['id'], '">', $data['name'], '</a><br>
-						<em><i class="icon i-user', $data['online']['is_online'] ? '-plus' : '', '"></i>', '<span class="smalltext"> ' . $txt[$data['online']['is_online'] ? 'online' : 'offline'] . '</span></em>';
+						', template_member_online($data), '<em><span class="smalltext"> ' . $txt[$data['online']['is_online'] ? 'online' : 'offline'] . '</span></em><br>
+						';
 
 				// Only show the email address fully if it's not hidden - and we reveal the email.
-				if ($context['can_send_email'] && ($data['show_email'] == 'yes' || $data['show_email'] == 'yes_permission_override'))
-					echo '
-						<br>
-						<a href="', $scripturl, '?action=emailuser;sa=email;uid=', $data['id'], '" class="icon i-envelope', $data['online']['is_online'] ? '' : '-blank', '" title="' . $txt['email'] . ' ' . $data['name'] . '"><s>' . $txt['email'] . ' ' . $data['name'] . '</s></a>';
+				echo template_member_email($data);
 
 				// Can they send the buddy a PM?
 				if ($context['can_send_pm'])

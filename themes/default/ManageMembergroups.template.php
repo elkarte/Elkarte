@@ -624,27 +624,7 @@ function template_group_members()
 		if ($context['can_send_email'])
 		{
 			echo '
-						<td', $member['show_email'] == 'no_through_forum' && $settings['use_image_buttons'] ? ' class="centertext"' : '', '>';
-
-			// Is it totally hidden?
-			if ($member['show_email'] == 'no')
-				echo '
-								<em>', $txt['hidden'], '</em>';
-			// ... otherwise they want it hidden but it's not to this person?
-			elseif ($member['show_email'] == 'yes_permission_override')
-				echo '
-								<a href="mailto:', $member['email'], '"><em>', $member['email'], '</em></a>';
-			// ... otherwise it's visible - but only via an image?
-			elseif ($member['show_email'] == 'no_through_forum')
-				echo '
-								<a href="', $scripturl, '?action=emailuser;sa=email;uid=', $member['id'], '" rel="nofollow">', ($settings['use_image_buttons'] ? '<img src="' . $settings['images_url'] . '/profile/email_sm.png" alt="' . $txt['email'] . '" title="' . $txt['email'] . '" />' : $txt['email']), '</a>';
-			// ... otherwise it must be a 'yes', show it and show it fully.
-			else
-				echo '
-								<a href="mailto:', $member['email'], '">', $member['email'], '</a>';
-
-			echo '
-						</td>';
+						<td class="centertext"><em>' . template_member_email($member, true) . '</em></td>';
 		}
 
 		echo '

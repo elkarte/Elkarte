@@ -809,3 +809,91 @@ function template_news_fader()
 	addInlineJavascript('
 		$(\'#elkFadeScroller\').Elk_NewsFader();', true);
 }
+
+/**
+ *
+ * @TODO: These need to be moved somewhere appropriate >_>
+ *
+ * @param array $member
+ * @param bool $link
+ *
+ * @return string
+ */
+function template_member_online($member, $link = true) {
+	global $context;
+
+	return ((!empty($context['can_send_pm']) && $link) ? '<a href="' . $member['online']['href'] . '" title="' . $member['online']['text'] . '">' : '') .
+	       '<i class="' . ($member['online']['is_online'] ? 'iconline' : 'icoffline') . '" title="' . $member['online']['text'] . '"></i>' .
+	       ((!empty($context['can_send_pm']) && $link) ? '</a>' : '');
+}
+
+/**
+ * Similar to the above. Wanted to centralize this to make it easier to pull out the emailuser action and replace with
+ * a mailto: href, which many sane board admins would prefer.
+ *
+ * @param array $member
+ * @param bool  $text
+ *
+ * @return string
+ */
+function template_member_email($member, $text = false) {
+	global $context, $txt, $scripturl;
+
+	if ($context['can_send_email']) 
+	{
+		if ($text)
+		{
+			if ($member['show_email'] == 'no_through_forum')
+			{
+				return '<a class="linkbutton" href="' . $scripturl . '?action=emailuser;sa=email;uid=' . $member['id'] . '">' . $txt['email'] . '</a>';
+			} 
+			elseif ($member['show_email'] == 'yes_permission_override' || $member['show_email'] == 'yes')
+			{
+				return '<a class="linkbutton" href="' . $scripturl . '?action=emailuser;sa=email;uid=' . $member['id'] . '">' . $member['email'] . '</a>';
+			}
+			else
+			{
+				return $txt['hidden'];
+			}
+		}
+		else 
+		{
+			if ($member['show_email'] != 'no')
+			{
+				return '<a href="' . $scripturl . '?action=emailuser;sa=email;uid=' . $member['id'] . '" class="icon i-envelope' . ($member['online']['is_online'] ? '' : '-blank') . '" title="' . $txt['email'] . ' ' . $member['name'] . '"><s>' . $txt['email'] . ' ' . $member['name'] . '</s></a>';
+			}
+			else
+			{
+				return '<i class="icon i-envelope-blank" title="' . $txt['email'] . ' ' . $txt['hidden'] . '"><s>' . $txt['email'] . ' ' . $txt['hidden'] . '</s></i>';
+			}
+		}
+	}
+	
+	return '';
+}
+
+/**
+ * Sometimes we only get a message id.
+ *
+ * @param      $id
+ * @param bool $member
+ *
+ * @return string
+ */
+function template_msg_email($id, $member = false) {
+	global $context, $txt, $scripturl;
+
+	if ($context['can_send_email'])
+	{
+		if ($member === false || $member['show_email'] != 'no')
+		{
+			return '<a href="' . $scripturl . '?action=emailuser;sa=email;msg=' . $id . '" class="icon i-envelope' . (($member !== false && $member['online']['is_online']) ? '' : '-blank') . '" title="' . $txt['email'] . '"><s>' . $txt['email'] . '</s></a>';
+		}
+		else
+		{
+			return '<i class="icon i-envelope-blank" title="' . $txt['email'] . ' ' . $txt['hidden'] . '"><s>' . $txt['email'] . ' ' . $txt['hidden'] . '</s></i>';
+		}
+	}
+
+	return '';
+}
