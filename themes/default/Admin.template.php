@@ -819,10 +819,6 @@ function template_show_settings()
 {
 	global $context, $txt, $settings, $scripturl;
 
-	// @todo this should be replaced by layers
-	if (!empty($context['settings_insert_above']))
-		echo $context['settings_insert_above'];
-
 	echo '
 	<div id="', isset($context['current_subaction']) ? $context['current_subaction'] : 'admincenter', '" class="admincenter">
 		<form id="admin_form_wrapper" action="', $context['post_url'], '" method="post" accept-charset="UTF-8"', !empty($context['force_form_onsubmit']) ? ' onsubmit="' . $context['force_form_onsubmit'] . '"' : '', '>';
@@ -1076,10 +1072,6 @@ function template_show_settings()
 			<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />
 		</form>
 	</div>';
-
-	// @todo this should be replaced by layers
-	if (!empty($context['settings_insert_below']))
-		echo $context['settings_insert_below'];
 }
 
 /**

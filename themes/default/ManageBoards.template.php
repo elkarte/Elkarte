@@ -418,6 +418,7 @@ function template_modify_board()
 					<dd>';
 
 	if (!empty($modSettings['deny_boards_access']))
+	{
 		echo '
 						<table>
 							<tr>
@@ -427,10 +428,13 @@ function template_modify_board()
 								<th>', $txt['permissions_option_deny'], '</th>
 								<th></th>
 							</tr>';
+	}
 
 	// List all the membergroups so the user can choose who may access this board.
 	foreach ($context['groups'] as $group)
+	{
 		if (empty($modSettings['deny_boards_access']))
+		{
 			echo '
 						<label for="groups_', $group['id'], '">
 							<input type="checkbox" name="groups[', $group['id'], ']" value="allow" id="groups_', $group['id'], '"', $group['allow'] ? ' checked="checked"' : '', ' />
@@ -439,7 +443,9 @@ function template_modify_board()
 							</span>
 						</label>
 						<br />';
+		}
 		else
+		{
 			echo '
 							<tr>
 								<td>
@@ -458,8 +464,11 @@ function template_modify_board()
 								</td>
 								<td></td>
 							</tr>';
+		}
+	}
 
 	if (empty($modSettings['deny_boards_access']))
+	{
 		echo '
 						<span class="select_all_box">
 							<em><label for="check_all">', $txt['check_all'], '</label></em> <input type="checkbox" id="check_all" onclick="invertAll(this, this.form, \'groups[\');" />
@@ -467,7 +476,9 @@ function template_modify_board()
 						<br />
 						<br />
 					</dd>';
+	}
 	else
+	{
 		echo '
 							<tr class="select_all_box">
 								<td>
@@ -487,6 +498,7 @@ function template_modify_board()
 							</tr>
 						</table>
 					</dd>';
+	}
 
 	// Options to choose moderators, specify as announcement board and choose whether to count posts here.
 	echo '
@@ -502,14 +514,12 @@ function template_modify_board()
 				<hr />';
 
 	// Add a select all box for the allowed groups section
-	echo '
-				<script><!-- // --><![CDATA[
-					$(document).ready(function () {
-						$(".select_all_box").each(function () {
-							$(this).removeClass(\'select_all_box\');
-						});
-					});
-				// ]]></script>';
+	theme()->addInlineJavascript('
+		$(document).ready(function () {
+			$(".select_all_box").each(function () {
+				$(this).removeClass(\'select_all_box\');
+			});
+		});', true);
 
 	if (empty($context['board']['is_recycle']) && empty($context['board']['topics']))
 		echo '
