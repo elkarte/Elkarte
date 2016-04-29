@@ -189,41 +189,6 @@ class Ila_Integrate
 	}
 
 	/**
-	 * Subs hook, integrate_pre_parsebbc
-	 *
-	 * What it does:
-	 * - Allow addons access before entering the main parse_bbc loop
-	 * - Prevents parseBBC from working on these tags at all
-	 *
-	 * @param string $message
-	 * @param mixed[] $smileys
-	 * @param string $cache_id
-	 * @param string[]|null $parse_tags
-	 */
-	public static function integrate_pre_parsebbc(&$message, &$smileys, &$cache_id, &$parse_tags)
-	{
-		global $context;
-
-		// Enabled and we have ila tags, then hide them from parsebbc where appropriate
-		if (empty($parse_tags) && empty($context['uninstalling']) && stripos($message, '[attach') !== false)
-		{
-			if (!empty($_REQUEST['id_draft']))
-			{
-				// Previewing a draft
-				$msg_id = (int) $_REQUEST['id_draft'];
-			}
-			else
-			{
-				// Previewing a modified message, check for a value in $_REQUEST['msg']
-				$msg_id = empty($cache_id) ? (isset($_REQUEST['msg']) ? (int) $_REQUEST['msg'] : -1) : preg_replace('~[^\d]~', '', $cache_id);
-			}
-
-			$ila_parser = new In_Line_Attachment($message, $msg_id);
-			$message = $ila_parser->hide_bbc();
-		}
-	}
-
-	/**
 	 * Display controller hook, called from prepareDisplayContext_callback integrate_before_prepare_display_context
 	 *
 	 * What it does:
