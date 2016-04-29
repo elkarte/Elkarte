@@ -159,18 +159,27 @@ class Ila_Integrate
 				\BBC\Codes::ATTR_AUTOLINK => false,
 				\BBC\Codes::ATTR_LENGTH => 6,
 			),
-// 			array(
-// 				'tag' => 'attachurl',
-// 				'type' => 'closed',
-// 				'content' => '',
-// 			),
+			// [attachurl=xx] -- no image but a link with some details
+			array(
+				\BBC\Codes::ATTR_TAG => 'attachurl',
+				\BBC\Codes::ATTR_TYPE => \BBC\Codes::TYPE_UNPARSED_CONTENT,
+				\BBC\Codes::ATTR_CONTENT => '$1',
+				\BBC\Codes::ATTR_VALIDATE => Ila_Integrate::validate_url(),
+				\BBC\Codes::ATTR_DISALLOW_PARENTS => array('code' => 1, 'nobbc' => 1, 'php' => 1),
+				\BBC\Codes::ATTR_DISABLED_CONTENT => '<a href="' . $scripturl . '?action=dlattach;attach=$1">(' . $scripturl . '?action=dlattach;attach=$1)</a>',
+				\BBC\Codes::ATTR_BLOCK_LEVEL => false,
+				\BBC\Codes::ATTR_AUTOLINK => false,
+				\BBC\Codes::ATTR_LENGTH => 9,
+			),
+			// [attachmini] -- just a plain link type
 // 			array(
 // 				'tag' => 'attachmini',
 // 				'type' => 'closed',
 // 				'content' => '',
 // 			),
+			// [attachimg] -- full sized image
 // 			array(
-// 				'tag' => 'attachthumb',
+// 				'tag' => 'attachimg',
 // 				'type' => 'closed',
 // 				'content' => '',
 // 			)
@@ -312,6 +321,49 @@ class Ila_Integrate
 	 *
 	 * @return Closure
 	 */
+	public static function validate_url()
+	{
+		global $user_info, $scripturl;
+
+		return function (&$tag, &$data, $disabled) use($user_info, $scripturl)
+		{
+			global $context, $settings;
+			var_dump($data);
+			$num = $data;
+			$attachment = false;
+
+			// Not a preview, then sanitize the attach id and determine the details
+			if (strpos($data, 'post_tmp_' . $user_info['id']) === false)
+			{
+				require_once(SUBSDIR . '/Attachments.subs.php');
+
+				$num = (int) $data;
+				$attachment = isAttachmentImage($num);
+			}
+
+			// If we got the details ...
+			if ($attachment)
+			{
+				$data = '<a href="' . $scripturl . '?action=dlattach;attach=' . $num . '"><img src="' . $settings['images_url'] . '/icons/clip.png" alt="" class="bbc_img" />&nbsp;' . $attachment['filename'] . '</a>&nbsp;(' . $attachment['size'] . ($attachment['is_image'] ? ' ' . $attachment['width'] . 'x' . $attachment['height'] : '') . ')';
+			}
+			else
+			{
+				$data = '<a href="' . $scripturl . '?action=dlattach;attach=' . $num . '"><img src="' . $settings['images_url'] . '/icons/clip.png" alt="" class="bbc_img" />&nbsp;' . $num . '</a>';
+			}
+
+			$context['ila_dont_show_attach_below'][] = $num;
+			$context['ila_dont_show_attach_below'] = array_unique($context['ila_dont_show_attach_below']);
+		};
+	}
+
+	/**
+	 * This is prevents a little repetition and provides a some control for "plain" tags
+	 *
+	 * - Determines if the ILA is an image or not
+	 * - Keeps track of attachment usage to prevent displaying below the post
+	 *
+	 * @return Closure
+	 */
 	public static function validate_plain()
 	{
 		global $user_info, $scripturl;
@@ -329,7 +381,8 @@ class Ila_Integrate
 				require_once(SUBSDIR . '/Attachments.subs.php');
 
 				$num = (int) $data;
-				$is_image = isAttachmentImage($num) !== false;
+				$is_image = isAttachmentImage($num);
+				$is_image = $is_image['is_image'];
 			}
 
 			// An image will get the light box treatment
