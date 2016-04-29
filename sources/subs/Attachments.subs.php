@@ -1154,7 +1154,7 @@ function isAttachmentImage($id_attach)
 
 	// Make sure this attachment is on this board.
 	$request = $db->query('', '
-		SELECT id_folder, filename, file_hash, fileext, id_attach, attachment_type, mime_type, approved
+		SELECT id_folder, filename, file_hash, fileext, id_attach, attachment_type, mime_type, approved, downloads, size, width, height
 		FROM {db_prefix}attachments
 		WHERE id_attach = {int:attach}',
 		array(
@@ -1163,10 +1163,14 @@ function isAttachmentImage($id_attach)
 	);
 	$attachmentData = array();
 	if ($db->num_rows($request) != 0)
+	{
 		$attachmentData = $db->fetch_assoc($request);
+		$attachmentData['is_image'] = substr($attachmentData['mime_type'], 0, 5) === 'image';
+		$attachmentData['size'] = byte_format($attachmentData['size']);
+	}
 	$db->free_result($request);
 
-	return !empty($attachmentData) && substr($attachmentData['mime_type'], 0, 5) === 'image' ? $attachmentData : false;
+	return !empty($attachmentData) ? $attachmentData : false;
 }
 
 /**
