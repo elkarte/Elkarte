@@ -328,7 +328,7 @@ class Ila_Integrate
 		return function (&$tag, &$data, $disabled) use($user_info, $scripturl)
 		{
 			global $context, $settings;
-			var_dump($data);
+			
 			$num = $data;
 			$attachment = false;
 
