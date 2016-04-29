@@ -367,6 +367,31 @@ function comma_format($number, $override_decimal_count = false)
 }
 
 /**
+ * Formats a number to a computer byte size value xB, xKB, xMB, xGB
+ *
+ * @param int $number
+ *
+ * @return string
+ */
+function byte_format($number)
+{
+	global $txt;
+
+	$kb = '';
+	foreach (array('byte', 'kilobyte', 'megabyte', 'gigabyte') as $dummy => $kb)
+	{
+		if ($number < 1024)
+		{
+			break;
+		}
+
+		$number /= 1024;
+	}
+
+	return trim(sprintf("%5.2f", $number) . $txt[$kb]);
+}
+
+/**
  * Format a time to make it look purdy.
  *
  * What it does:
