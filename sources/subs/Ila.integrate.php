@@ -77,7 +77,7 @@ class Ila_Integrate
 				\BBC\Codes::ATTR_PARAM => array(
 					'width' => array(
 						\BBC\Codes::PARAM_ATTR_OPTIONAL => false,
-						\BBC\Codes::PARAM_ATTR_VALIDATE => Ila_Integrate::validate_width(),
+						\BBC\Codes::PARAM_ATTR_VALIDATE => self::validate_width(),
 						\BBC\Codes::PARAM_ATTR_MATCH => '(\d+)',
 					),
 					'height' => array(
@@ -92,7 +92,7 @@ class Ila_Integrate
 					),
 				),
 				\BBC\Codes::ATTR_CONTENT => '<a id="link_$1" data-lightboximage="$1" href="' . $scripturl . '?action=dlattach;attach=$1;image"><img src="' . $scripturl . '?action=dlattach;attach=$1{width}{height}" alt="" class="bbc_img {align}" /></a>',
-				\BBC\Codes::ATTR_VALIDATE => Ila_Integrate::validate_options(),
+				\BBC\Codes::ATTR_VALIDATE => self::validate_options(),
 				\BBC\Codes::ATTR_DISALLOW_PARENTS => $disallow,
 				\BBC\Codes::ATTR_DISABLED_CONTENT => '<a href="' . $scripturl . '?action=dlattach;attach=$1">(' . $scripturl . '?action=dlattach;attach=$1)</a>',
 				\BBC\Codes::ATTR_BLOCK_LEVEL => false,
@@ -111,7 +111,7 @@ class Ila_Integrate
 					),
 					'height' => array(
 						\BBC\Codes::PARAM_ATTR_OPTIONAL => false,
-						\BBC\Codes::PARAM_ATTR_VALIDATE => Ila_Integrate::validate_height(),
+						\BBC\Codes::PARAM_ATTR_VALIDATE => self::validate_height(),
 						\BBC\Codes::PARAM_ATTR_MATCH => '(\d+)',
 					),
 					'align' => array(
@@ -121,7 +121,7 @@ class Ila_Integrate
 					),
 				),
 				\BBC\Codes::ATTR_CONTENT => '<a id="link_$1" data-lightboximage="$1" href="' . $scripturl . '?action=dlattach;attach=$1;image"><img src="' . $scripturl . '?action=dlattach;attach=$1{height}{width}" alt="" class="bbc_img {align}" /></a>',
-				\BBC\Codes::ATTR_VALIDATE => Ila_Integrate::validate_options(),
+				\BBC\Codes::ATTR_VALIDATE => self::validate_options(),
 				\BBC\Codes::ATTR_DISALLOW_PARENTS => $disallow,
 				\BBC\Codes::ATTR_DISABLED_CONTENT => '<a href="' . $scripturl . '?action=dlattach;attach=$1">(' . $scripturl . '?action=dlattach;attach=$1)</a>',
 				\BBC\Codes::ATTR_BLOCK_LEVEL => false,
@@ -140,7 +140,7 @@ class Ila_Integrate
 					),
 				),
 				\BBC\Codes::ATTR_CONTENT => '<a id="link_$1" data-lightboximage="$1" href="' . $scripturl . '?action=dlattach;attach=$1;image"><img src="' . $scripturl . '?action=dlattach;attach=$1;thumb" alt="" class="bbc_img {align}" /></a>',
-				\BBC\Codes::ATTR_VALIDATE => Ila_Integrate::validate_options(),
+				\BBC\Codes::ATTR_VALIDATE => self::validate_options(),
 				\BBC\Codes::ATTR_DISALLOW_PARENTS => $disallow,
 				\BBC\Codes::ATTR_DISABLED_CONTENT => '<a href="' . $scripturl . '?action=dlattach;attach=$1">(' . $scripturl . '?action=dlattach;attach=$1)</a>',
 				\BBC\Codes::ATTR_BLOCK_LEVEL => false,
@@ -152,7 +152,7 @@ class Ila_Integrate
 				\BBC\Codes::ATTR_TAG => 'attach',
 				\BBC\Codes::ATTR_TYPE => \BBC\Codes::TYPE_UNPARSED_CONTENT,
 				\BBC\Codes::ATTR_CONTENT => '$1',
-				\BBC\Codes::ATTR_VALIDATE => Ila_Integrate::validate_plain(),
+				\BBC\Codes::ATTR_VALIDATE => self::validate_plain(),
 				\BBC\Codes::ATTR_DISALLOW_PARENTS => $disallow,
 				\BBC\Codes::ATTR_DISABLED_CONTENT => '<a href="' . $scripturl . '?action=dlattach;attach=$1">(' . $scripturl . '?action=dlattach;attach=$1)</a>',
 				\BBC\Codes::ATTR_BLOCK_LEVEL => false,
@@ -164,7 +164,7 @@ class Ila_Integrate
 				\BBC\Codes::ATTR_TAG => 'attachurl',
 				\BBC\Codes::ATTR_TYPE => \BBC\Codes::TYPE_UNPARSED_CONTENT,
 				\BBC\Codes::ATTR_CONTENT => '$1',
-				\BBC\Codes::ATTR_VALIDATE => Ila_Integrate::validate_url(),
+				\BBC\Codes::ATTR_VALIDATE => self::validate_url(),
 				\BBC\Codes::ATTR_DISALLOW_PARENTS => array('code' => 1, 'nobbc' => 1, 'php' => 1),
 				\BBC\Codes::ATTR_DISABLED_CONTENT => '<a href="' . $scripturl . '?action=dlattach;attach=$1">(' . $scripturl . '?action=dlattach;attach=$1)</a>',
 				\BBC\Codes::ATTR_BLOCK_LEVEL => false,
@@ -328,7 +328,7 @@ class Ila_Integrate
 		return function (&$tag, &$data, $disabled) use($user_info, $scripturl)
 		{
 			global $context, $settings;
-			
+
 			$num = $data;
 			$attachment = false;
 
