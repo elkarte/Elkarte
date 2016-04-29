@@ -10,7 +10,9 @@
  */
 
 if (!defined('ELK'))
+{
 	die('No access...');
+}
 
 /**
  * Class Ila_Integrate
@@ -27,7 +29,9 @@ class Ila_Integrate
 		global $modSettings;
 
 		if (empty($modSettings['attachment_inline_enabled']))
+		{
 			return array();
+		}
 
 		// $hook, $function, $file
 		return array(
@@ -56,10 +60,9 @@ class Ila_Integrate
 	 */
 	public static function integrate_additional_bbc(&$codes)
 	{
-		global $scripturl;
+		global $scripturl, $modSettings;
 
 		// Generally we don't want to render inside of these tags ...
-		// @todo move quote to ACP as option?
 		$disallow = array(
 			'quote' => 1,
 			'code' => 1,
@@ -67,6 +70,12 @@ class Ila_Integrate
 			'html' => 1,
 			'php' => 1,
 		);
+
+		// Want to see them in quotes eh?
+		if (!empty($modSettings['attachment_inline_quotes']))
+		{
+			unset($disallow['quote']);
+		}
 
 		// Add ILA codes
 		$codes = array_merge($codes, array(
@@ -172,17 +181,17 @@ class Ila_Integrate
 				\BBC\Codes::ATTR_LENGTH => 9,
 			),
 			// [attachmini] -- just a plain link type
-// 			array(
-// 				'tag' => 'attachmini',
-// 				'type' => 'closed',
-// 				'content' => '',
-// 			),
+			// 			array(
+			// 				'tag' => 'attachmini',
+			// 				'type' => 'closed',
+			// 				'content' => '',
+			// 			),
 			// [attachimg] -- full sized image
-// 			array(
-// 				'tag' => 'attachimg',
-// 				'type' => 'closed',
-// 				'content' => '',
-// 			)
+			// 			array(
+			// 				'tag' => 'attachimg',
+			// 				'type' => 'closed',
+			// 				'content' => '',
+			// 			)
 		));
 
 		return;
@@ -201,13 +210,17 @@ class Ila_Integrate
 		global $context, $attachments;
 
 		if (empty($context['ila_dont_show_attach_below']) || empty($attachments[$message['id_msg']]))
+		{
 			return;
+		}
 
 		// If the attachment has been used inline, drop it so its not shown below the message as well
 		foreach ($attachments[$message['id_msg']] as $id => $attachcheck)
 		{
 			if (in_array($attachcheck['id_attach'], $context['ila_dont_show_attach_below']))
+			{
 				unset($attachments[$message['id_msg']][$id]);
+			}
 		}
 	}
 
@@ -223,7 +236,8 @@ class Ila_Integrate
 	{
 		$config_vars[] = array('title', 'attachment_inline_title');
 		$config_vars[] = array('check', 'attachment_inline_enabled');
-		$config_vars[] = array('check', 'attachment_inline_basicmenu');
+		//$config_vars[] = array('check', 'attachment_inline_basicmenu');
+		$config_vars[] = array('check', 'attachment_inline_quotes');
 	}
 
 	/**
@@ -290,7 +304,7 @@ class Ila_Integrate
 	{
 		global $user_info, $scripturl;
 
-		return function (&$tag, &$data, $disabled) use($user_info, $scripturl)
+		return function (&$tag, &$data, $disabled) use ($user_info, $scripturl)
 		{
 			global $context, $settings;
 
@@ -309,11 +323,15 @@ class Ila_Integrate
 			// If we got the details ...
 			if ($attachment)
 			{
-				$data = '<a href="' . $scripturl . '?action=dlattach;attach=' . $num . '"><img src="' . $settings['images_url'] . '/icons/clip.png" alt="" class="bbc_img" />&nbsp;' . $attachment['filename'] . '</a>&nbsp;(' . $attachment['size'] . ($attachment['is_image'] ? ' ' . $attachment['width'] . 'x' . $attachment['height'] : '') . ')';
+				$data = '<a href="' . $scripturl . '?action=dlattach;attach=' . $num . '">
+							<img src="' . $settings['images_url'] . '/icons/clip.png" alt="" class="bbc_img" />&nbsp;' . $attachment['filename'] . '
+						</a>&nbsp;(' . $attachment['size'] . ($attachment['is_image'] ? ' ' . $attachment['width'] . 'x' . $attachment['height'] : '') . ')';
 			}
 			else
 			{
-				$data = '<a href="' . $scripturl . '?action=dlattach;attach=' . $num . '"><img src="' . $settings['images_url'] . '/icons/clip.png" alt="" class="bbc_img" />&nbsp;' . $num . '</a>';
+				$data = '<a href="' . $scripturl . '?action=dlattach;attach=' . $num . '">
+							<img src="' . $settings['images_url'] . '/icons/clip.png" alt="" class="bbc_img" />&nbsp;' . $num . '
+						</a>';
 			}
 
 			$context['ila_dont_show_attach_below'][] = $num;
@@ -322,9 +340,10 @@ class Ila_Integrate
 	}
 
 	/**
-	 * This is prevents a little repetition and provides a some control for "plain" tags
+	 * This provides for some control for "plain" tags
 	 *
 	 * - Determines if the ILA is an image or not
+	 * - Sets the lightbox attributes if an image is identified
 	 * - Keeps track of attachment usage to prevent displaying below the post
 	 *
 	 * @return Closure
@@ -333,7 +352,7 @@ class Ila_Integrate
 	{
 		global $user_info, $scripturl;
 
-		return function (&$tag, &$data, $disabled) use($user_info, $scripturl)
+		return function (&$tag, &$data, $disabled) use ($user_info, $scripturl)
 		{
 			global $context;
 
