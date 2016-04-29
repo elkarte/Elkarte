@@ -190,6 +190,7 @@ class Memberlist_Controller extends Action_Controller
 		);
 
 		$context['can_send_pm'] = allowedTo('pm_send');
+		$context['can_send_email'] = allowedTo('send_email_to_members');
 
 		// Build the memberlist button array.
 		if ($context['in_search'])

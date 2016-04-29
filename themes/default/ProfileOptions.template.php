@@ -63,12 +63,12 @@ function template_editBuddies()
 			<tr>
 				<td>', $buddy['link'], '</td>
 				<td>
-					<a href="', $buddy['online']['href'], '" class="icon i-user', $buddy['online']['is_online'] ? '-plus' : '', '" title="', $buddy['online']['text'], '"><s>', $buddy['online']['text'], '</s></a>
+					', template_member_online($buddy), '
 				</td>';
 
-		if ($context['can_send_email'] && $buddy['show_email'] != 'no')
+		if ($context['can_send_email'])
 			echo '
-				<td><a href="' . $scripturl . '?action=emailuser;sa=email;uid=' . $buddy['id'] . '" class="icon i-envelope', $buddy['online']['is_online'] ? '' : '-blank', '" title="' . $txt['email'] . ' ' . $buddy['name'] . '"></a></td>';
+				<td>', template_member_email($buddy), '</td>';
 
 		//  Any custom profile (with icon) fields to show
 		$im = array();
@@ -175,12 +175,12 @@ function template_editIgnoreList()
 			<tr>
 				<td>', $member['link'], '</td>
 				<td>
-					<a href="', $member['online']['href'], '" class="icon i-user', $member['online']['is_online'] ? '-plus' : '', '" title="', $member['online']['text'], '"></a>
+					', template_member_online($member), '
 				</td>';
 
-		if ($context['can_send_email'] && $member['show_email'] != 'no')
+		if ($context['can_send_email'])
 			echo '
-				<td><a href="' . $scripturl . '?action=emailuser;sa=email;uid=' . $member['id'] . '" class="icon i-envelope', $member['online']['is_online'] ? '' : '-blank', '" title="' . $txt['email'] . ' ' . $member['name'] . '"></a></td>';
+				<td>', template_member_email($member), '</td>';
 
 		echo '
 				<td class="righttext">

@@ -131,13 +131,11 @@ function template_memberlist()
 
 					if ($column == 'online')
 					{
-						echo '
-						', $context['can_send_pm'] ? '<a href="' . $member['online']['href'] . '" title="' . $member['online']['text'] . '">' : '', $settings['use_image_buttons'] ? '<img src="' . $member['online']['image_href'] . '" alt="' . $member['online']['text'] . '" />' : $member['online']['label'], $context['can_send_pm'] ? '</a>' : '';
+						echo template_member_online($member);
 					}
 					elseif ($column == 'email_address')
 					{
-						echo '
-					', $member['show_email'] == 'no' ? '' : '<a href="' . $scripturl . '?action=emailuser;sa=email;uid=' . $member['id'] . '" rel="nofollow"><img src="' . $settings['images_url'] . '/profile/email_sm.png" alt="' . $txt['email'] . '" title="' . $txt['email'] . ' ' . $member['name'] . '" /></a>';
+						echo template_member_email($member);
 					}
 					else
 						echo '
