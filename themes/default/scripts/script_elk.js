@@ -1523,64 +1523,63 @@ function disableAutoComplete()
 	}
 
 })();
-var ElkNotifier = new ElkNotifications();
 
+var ElkNotifier = new ElkNotifications();
 
 /**
  * Initialize the inline attachments posting interface
  */
-(function() {
-	var ElkInlineAttachments = (function(selector, editor, opt) {
+(function () {
+	var ElkInlineAttachments = (function (selector, editor, opt) {
 		'use strict';
+
 		$.extend(opt, {inlineSelector: '.inline_insert', data: 'attachid', addAfter: 'label'});
-		var $container, listAttachs = [];
 
-		var init = function(opt) {
-		},
-		addInterface = function($before, attachId) {
-			var $trigger;
+		var listAttachs = [],
+			init = function (opt) {
+			},
+			addInterface = function ($before, attachId) {
+				var $trigger;
 
-			if (typeof opt.trigger !== 'undefined')
-				$trigger = opt.trigger.clone();
-			else
-			{
-				$trigger = $('<a />');
+				if (typeof opt.trigger !== 'undefined')
+					$trigger = opt.trigger.clone();
+				else {
+					$trigger = $('<a />');
 
-				if (typeof opt.triggerClass !== 'undefined')
-					$trigger.addClass(opt.triggerClass);
-			}
+					if (typeof opt.triggerClass !== 'undefined')
+						$trigger.addClass(opt.triggerClass);
+				}
 
-			$trigger.click(function(e) {
-				e.preventDefault();
+				$trigger.click(function (e) {
+					e.preventDefault();
 
-				var ila_text = '[attach]' + attachId + '[/attach]';
-				$editor_data[editor].insertText(ila_text, false, true);
-			}).attr('id', 'inline_attach_' + attachId)
-			.data('attachid', attachId);
+					var ila_text = '[attach]' + attachId + '[/attach]';
+					$editor_data[editor].insertText(ila_text, false, true);
+				}).attr('id', 'inline_attach_' + attachId)
+					.data('attachid', attachId);
 
-			$before.after($trigger);
-			listAttachs.push($trigger);
-		},
-		removeAttach = function(attachId) {
-			var tmpList = [], i;
+				$before.after($trigger);
+				listAttachs.push($trigger);
+			},
+			removeAttach = function (attachId) {
+				var tmpList = [],
+					i;
 
-			for (i = 0; i < listAttachs.length; i++)
-			{
-				if (listAttachs[i].data('attachid') == attachId)
-					break;
+				for (i = 0; i < listAttachs.length; i++) {
+					if (listAttachs[i].data('attachid') == attachId)
+						break;
 
-				tmpList.push(listAttachs[i]);
-			}
+					tmpList.push(listAttachs[i]);
+				}
 
-			i++;
-			for (; i < listAttachs.length; i++)
-			{
-				tmpList.push(listAttachs[i]);
-			}
+				i++;
+				for (; i < listAttachs.length; i++) {
+					tmpList.push(listAttachs[i]);
+				}
 
-			listAttachs = tmpList;
-			$('#inline_attach_' + attachId).remove();
-		};
+				listAttachs = tmpList;
+				$('#inline_attach_' + attachId).remove();
+			};
 
 		init(opt);
 		return {
@@ -1590,13 +1589,13 @@ var ElkNotifier = new ElkNotifications();
 	});
 
 	// AMD / RequireJS
-	if ( typeof define !== 'undefined' && define.amd) {
-		define([], function() {
+	if (typeof define !== 'undefined' && define.amd) {
+		define([], function () {
 			return ElkInlineAttachments;
 		});
 	}
 	// CommonJS
-	else if ( typeof module !== 'undefined' && module.exports) {
+	else if (typeof module !== 'undefined' && module.exports) {
 		module.exports = ElkInlineAttachments;
 	}
 	// included directly via <script> tag

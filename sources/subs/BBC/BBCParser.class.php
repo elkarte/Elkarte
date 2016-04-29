@@ -1368,9 +1368,9 @@ class BBCParser
 			{
 				$params['{' . $key . '}'] = strtr($possible[Codes::ATTR_PARAM][$key][Codes::PARAM_ATTR_VALUE], array('$1' => $matches[$i + 1]));
 			}
-			elseif (isset($possible[Codes::ATTR_PARAM][$key][Codes::ATTR_VALIDATE]))
+			elseif (isset($possible[Codes::ATTR_PARAM][$key][Codes::PARAM_ATTR_VALIDATE]))
 			{
-				$params['{' . $key . '}'] = $possible[Codes::ATTR_PARAM][$key][Codes::ATTR_VALIDATE]($matches[$i + 1]);
+				$params['{' . $key . '}'] = $possible[Codes::ATTR_PARAM][$key][Codes::PARAM_ATTR_VALIDATE]($matches[$i + 1]);
 			}
 			else
 			{

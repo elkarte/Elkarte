@@ -151,7 +151,18 @@ class Data_Validator
 
 		// Replace the data
 		if (!empty($sanitation_rules))
-			$data = array_replace($data, $validator->validation_data());
+		{
+			// Handle cases where we have an object
+			if (is_object($data))
+			{
+				$data = array_replace((array) $data, $validator->validation_data());
+				$data = (object) $data;
+			}
+			else
+			{
+				$data = array_replace($data, $validator->validation_data());
+			}
+		}
 
 		// Return true or false on valid data
 		return $result;

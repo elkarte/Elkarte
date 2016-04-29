@@ -463,7 +463,7 @@ function deleteMembers($users, $check_not_admin = false)
  */
 function registerMember(&$regOptions, $error_context = 'register')
 {
-	global $scripturl, $txt, $modSettings;
+	global $scripturl, $txt;
 
 	$db = database();
 

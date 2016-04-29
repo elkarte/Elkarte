@@ -1117,8 +1117,8 @@ function getAttachmentThumbFromTopic($id_attach, $id_topic)
 
 	// Make sure this attachment is on this board.
 	$request = $db->query('', '
-		SELECT th.id_folder, th.filename, th.file_hash, th.fileext, th.id_attach,
-			th.attachment_type, th.mime_type, a.approved, m.id_member
+		SELECT th.id_folder, th.filename, th.file_hash, th.fileext, th.id_attach, th.attachment_type, th.mime_type,
+		 	a.approved, m.id_member
 		FROM {db_prefix}attachments AS a
 			INNER JOIN {db_prefix}messages AS m ON (m.id_msg = a.id_msg AND m.id_topic = {int:current_topic})
 			INNER JOIN {db_prefix}boards AS b ON (b.id_board = m.id_board AND {query_see_board})
@@ -1129,13 +1129,62 @@ function getAttachmentThumbFromTopic($id_attach, $id_topic)
 			'current_topic' => $id_topic,
 		)
 	);
-
 	$attachmentData = array();
 	if ($db->num_rows($request) != 0)
+	{
 		$attachmentData = $db->fetch_row($request);
+	}
 	$db->free_result($request);
 
 	return $attachmentData;
+}
+
+/**
+ * Returns if the given attachment ID is an image file or not
+ *
+ * What it does:
+ * - Given an attachment id, checks that it exists as an attachment
+ * - Verifies the message its associated is on a board the user can see
+ * - Sets 'is_image' if the attachment is an image file
+ * - Returns basic attachment values
+ *
+ * @package Attachments
+ * @param int $id_attach
+ *
+ * @returns array|boolean
+ */
+function isAttachmentImage($id_attach)
+{
+	$db = database();
+
+	// Make sure this attachment is on this board.
+	$request = $db->query('', '
+		SELECT 
+			a.filename, a.fileext, a.id_attach, a.attachment_type, a.mime_type, a.approved, a.downloads, a.size, a.width, a.height,
+			m.id_topic, m.id_board
+		FROM {db_prefix}attachments as a
+			INNER JOIN {db_prefix}messages AS m ON (m.id_msg = a.id_msg)
+			INNER JOIN {db_prefix}boards AS b ON (b.id_board = m.id_board AND {query_see_board})
+		WHERE id_attach = {int:attach}
+			AND attachment_type = {int:type}
+			AND a.approved = {int:approved}
+		LIMIT 1',
+		array(
+			'attach' => $id_attach,
+			'approved' => 1,
+			'type' => 0,
+		)
+	);
+	$attachmentData = array();
+	if ($db->num_rows($request) != 0)
+	{
+		$attachmentData = $db->fetch_assoc($request);
+		$attachmentData['is_image'] = substr($attachmentData['mime_type'], 0, 5) === 'image';
+		$attachmentData['size'] = byte_format($attachmentData['size']);
+	}
+	$db->free_result($request);
+
+	return !empty($attachmentData) ? $attachmentData : false;
 }
 
 /**

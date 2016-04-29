@@ -58,7 +58,7 @@ class Attachment_Controller extends Action_Controller
 	 */
 	public function action_ulattach()
 	{
-		global $context, $modSettings, $txt, $user_info, $board, $topic;
+		global $context, $modSettings, $txt;
 
 		$resp_data = array();
 		loadLanguage('Errors');

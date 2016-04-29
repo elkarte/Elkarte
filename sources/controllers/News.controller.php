@@ -668,7 +668,7 @@ class News_Controller extends Action_Controller
  */
 function fix_possible_url($val)
 {
-	global $modSettings, $context, $scripturl;
+	global $modSettings, $scripturl;
 
 	if (substr($val, 0, strlen($scripturl)) != $scripturl)
 		return $val;

@@ -75,7 +75,7 @@ class Browser_Detector
 	 */
 	public function detectBrowser()
 	{
-		global $context, $user_info;
+		global $context;
 
 		// Init
 		$this->_browsers = array();

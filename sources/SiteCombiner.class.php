@@ -399,8 +399,6 @@ class Site_Combiner
 	 */
 	private function _jsCompiler()
 	{
-		global $context;
-
 		// First try the closure request using code_url param
 		$fetch_data = $this->_closure_code_url();
 
