@@ -512,8 +512,10 @@ $txt['split'] = 'SPLIT';
 
 $txt['delete'] = 'Delete';
 
+$txt['byte'] = 'B';
 $txt['kilobyte'] = 'KB';
 $txt['megabyte'] = 'MB';
+$txt['gigabyte'] = 'MB';
 
 $txt['more_stats'] = '[More Stats]';
 
