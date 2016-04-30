@@ -353,6 +353,9 @@ function list_getModLogEntries($start, $items_per_page, $sort, $query_string = '
  */
 class ModLogEntriesReplacement
 {
+	public $entries;
+	public $key;
+
 	/**
 	 * Matching function to return the value in the callback
 	 *
