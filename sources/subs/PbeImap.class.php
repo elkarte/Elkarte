@@ -133,7 +133,7 @@ class Pbe_Imap
 		$emails = imap_search($this->_inbox, 'UNSEEN', SE_UID);
 
 		// You've got mail,
-		if ($emails)
+		if (!empty($emails))
 		{
 			// Initialize Emailpost controller
 			$controller = new Emailpost_Controller();

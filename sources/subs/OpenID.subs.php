@@ -419,7 +419,7 @@ class OpenID
 
 		// dirty, but .. Yadis response? Let's get the <URI>
 		preg_match('~<URI.*?>(.*)</URI>~', $webdata, $uri);
-		if ($uri)
+		if (!empty($uri))
 		{
 			$response_data['provider'] = $uri[1];
 			$response_data['server'] = $uri[1];
@@ -498,7 +498,7 @@ function long_to_binary($value)
 		$value = bcdiv($value, 256);
 	}
 
-	if ($bytes && ($bytes[0] > 127))
+	if (!empty($bytes) && ($bytes[0] > 127))
 		array_unshift($bytes, 0);
 
 	$return = '';
