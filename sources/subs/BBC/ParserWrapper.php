@@ -94,7 +94,7 @@ class ParserWrapper
 	/**
 	 * Enable or disable smileys
 	 *
-	 * @param bool $toggle
+	 * @param bool|int $toggle
 	 * @return $this
 	 */
 	public function enableSmileys($toggle)
@@ -203,7 +203,7 @@ class ParserWrapper
 	 * Parse the BBC and smileys in messages
 	 *
 	 * @param string $message
-	 * @param bool   $smileys_enabled
+	 * @param bool|int $smileys_enabled
 	 * @return string
 	 */
 	public function parseMessage($message, $smileys_enabled)
@@ -215,7 +215,7 @@ class ParserWrapper
 	 * Parse the BBC and smileys in signatures
 	 *
 	 * @param string $signature
-	 * @param string $smileys_enabled
+	 * @param bool $smileys_enabled
 	 * @return string
 	 */
 	public function parseSignature($signature, $smileys_enabled)

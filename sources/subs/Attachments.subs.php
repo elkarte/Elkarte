@@ -2002,7 +2002,7 @@ function bindMessageAttachments($id_msg, $attachment_ids)
  * Converters included.
  *
  * @param string $filename The name of the file
- * @param int $attachment_id The ID of the attachment
+ * @param int|null $attachment_id The ID of the attachment
  * @param string|null $dir Which directory it should be in (null to use current)
  * @param bool $new If this is a new attachment, if so just returns a hash
  * @param string $file_hash The file hash
