@@ -561,6 +561,7 @@ class Errors
 
 		$db_last_error = db_last_error();
 
+		$temp = '';
 		if ($cache->getVar($temp, 'db_last_error', 600))
 			$db_last_error = max($db_last_error, $temp);
 
