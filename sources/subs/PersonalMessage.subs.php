@@ -33,6 +33,7 @@ function loadMessageLimit()
 
 	$db = database();
 
+	$message_limit = 0;
 	if ($user_info['is_admin'])
 		$message_limit = 0;
 	elseif (!Cache::instance()->getVar($message_limit, 'msgLimit:' . $user_info['id'], 360))
@@ -793,6 +794,7 @@ function sendpm($recipients, $subject, $message, $store_outbox = true, $from = n
 	$id_pm = $db->insert_id('{db_prefix}personal_messages', 'id_pm');
 
 	// Add the recipients.
+	$to_list = array();
 	if (!empty($id_pm))
 	{
 		// If this is new we need to set it part of it's own conversation.
@@ -816,7 +818,6 @@ function sendpm($recipients, $subject, $message, $store_outbox = true, $from = n
 		);
 
 		$insertRows = array();
-		$to_list = array();
 		foreach ($all_to as $to)
 		{
 			$insertRows[] = array($id_pm, $to, in_array($to, $recipients['bcc']) ? 1 : 0, isset($deletes[$to]) ? 1 : 0, 1);
@@ -1401,7 +1402,7 @@ function getPmsFromDiscussion($pm_heads)
  *
  * @package PersonalMessage
  * @param mixed[] $to_label
- * @param int[] $label_type
+ * @param string[] $label_type
  * @param int $user_id
  * @return integer|null
  */

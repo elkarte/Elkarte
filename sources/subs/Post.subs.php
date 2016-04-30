@@ -1522,6 +1522,7 @@ function lastPost()
 /**
  * Prepares a post subject for the post form
  *
+ * What it does:
  * - Will add the appropriate Re: to the post subject if its a reply to an existing post
  * - If quoting a post, or editing a post, this function also prepares the message body
  * - if editing is true, returns $message|$message[errors], else returns array($subject, $message)
@@ -1540,6 +1541,8 @@ function getFormMsgSubject($editing, $topic, $first_subject = '', $msg_id = 0)
 
 	$db = database();
 
+	$form_subject = '';
+	$form_message = '';
 	switch ($editing)
 	{
 		case 1:
@@ -1547,7 +1550,7 @@ function getFormMsgSubject($editing, $topic, $first_subject = '', $msg_id = 0)
 			require_once(SUBSDIR . '/Messages.subs.php');
 
 			// Get the existing message.
-			$message = messageDetails($msg_id, $topic);
+			$message = messageDetails((int) $msg_id, (int) $topic);
 
 			// The message they were trying to edit was most likely deleted.
 			if ($message === false)
@@ -1569,7 +1572,8 @@ function getFormMsgSubject($editing, $topic, $first_subject = '', $msg_id = 0)
 
 			// Make sure they _can_ quote this post, and if so get it.
 			$request = $db->query('', '
-				SELECT m.subject, IFNULL(mem.real_name, m.poster_name) AS poster_name, m.poster_time, m.body
+				SELECT 
+					m.subject, IFNULL(mem.real_name, m.poster_name) AS poster_name, m.poster_time, m.body
 				FROM {db_prefix}messages AS m
 					INNER JOIN {db_prefix}boards AS b ON (b.id_board = m.id_board AND {query_see_board})
 					LEFT JOIN {db_prefix}members AS mem ON (mem.id_member = m.id_member)
@@ -1596,7 +1600,6 @@ function getFormMsgSubject($editing, $topic, $first_subject = '', $msg_id = 0)
 			$form_subject = censor($form_subject);
 
 			$form_message = un_preparsecode($form_message);
-
 			$form_message = removeNestedQuotes($form_message);
 
 			// Add a quote string on the front and end.
