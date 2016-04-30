@@ -1342,15 +1342,13 @@ class Post_Controller extends Action_Controller
 
 				if (!empty($actually_mentioned))
 				{
-					require_once(CONTROLLERDIR . '/Mentions.controller.php');
-					$mentions = new Mentions_Controller();
-					$mentions->setData(array(
-						'id_member' => $actually_mentioned,
-						'type' => 'men',
-						'id_msg' => $row['id_msg'],
-						'status' => $row['approved'] ? 'new' : 'unapproved',
+					$notifier = Notifications::getInstance();
+					$notifier->add(new Notifications_Task(
+						'Mentionmem',
+						$row['id_msg'],
+						$row['id_member'],
+						array('id_members' => array($actually_mentioned), 'status' => $row['approved'] ? 'new' : 'unapproved')
 					));
-					$mentions->action_add();
 				}
 			}
 
@@ -1409,7 +1407,9 @@ class Post_Controller extends Action_Controller
 
 		if (isset($_REQUEST['xml']))
 		{
+			$bbc_parser = \BBC\ParserWrapper::getInstance();
 			$context['sub_template'] = 'modifydone';
+
 			if (!$this->_post_errors->hasErrors() && isset($msgOptions['subject']) && isset($msgOptions['body']))
 			{
 				$context['message'] = array(
@@ -1483,13 +1483,19 @@ class Post_Controller extends Action_Controller
 		// Call integrate_action_XYZ_before -> XYZ_controller -> integrate_action_XYZ_after
 		call_integration_hook('integrate_action_' . $hook . '_before', array('action_index'));
 
-		$result = $controller->action_index();
+		$controller->action_index();
 
 		call_integration_hook('integrate_action_' . $hook . '_after', array('action_index'));
-
-		return $result;
 	}
 
+	/**
+	 * Toggle a post lock status
+	 *
+	 * @param int|null $lock
+	 * @param string|null $topic_info
+	 *
+	 * @return int|null
+	 */
 	protected function _checkLocked($lock, $topic_info = null)
 	{
 		global $user_info;
