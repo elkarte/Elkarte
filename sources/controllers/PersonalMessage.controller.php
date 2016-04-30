@@ -752,7 +752,7 @@ class PersonalMessage_Controller extends Action_Controller
 		{
 			$this->_events->trigger('before_set_context', array('pmsg' => isset($this->_req->query->pmsg) ? $this->_req->query->pmsg : (isset($this->_req->query->quote) ? $this->_req->query->quote : 0)));
 		}
-		catch (Pm_Error_Exception $e)
+		catch (Elk_Exception $e)
 		{
 			return $this->messagePostError($e->namedRecipientList, $e->recipientList, $e->msgOptions);
 		}

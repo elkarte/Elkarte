@@ -20,6 +20,9 @@ if (!defined('ELK'))
 	die('No access...');
 }
 
+/**
+ * Class Drafts_PersonalMessage_Module
+ */
 class Drafts_PersonalMessage_Module implements ElkArte\sources\modules\Module_Interface
 {
 	/**
@@ -133,7 +136,7 @@ class Drafts_PersonalMessage_Module implements ElkArte\sources\modules\Module_In
 	 *
 	 * @param int $pmsg
 	 *
-	 * @throws Pm_Error_Exception
+	 * @throws Elk_Exception
 	 */
 	public function before_set_context($pmsg)
 	{
@@ -146,7 +149,7 @@ class Drafts_PersonalMessage_Module implements ElkArte\sources\modules\Module_In
 			if (isset($_REQUEST['id_draft']) && empty($_POST['subject']) && empty($_POST['message']))
 			{
 				$this->_loadDraft($user_info['id'], (int) $_REQUEST['id_draft']);
-				throw new PM_Error_Exception($this->_loaded_draft->to_list, $this->_loaded_draft);
+				throw new Elk_Exception($this->_loaded_draft->to_list, $this->_loaded_draft);
 			}
 			else
 			{
@@ -180,7 +183,7 @@ class Drafts_PersonalMessage_Module implements ElkArte\sources\modules\Module_In
 		loadLanguage('Drafts');
 		require_once(SUBSDIR . '/Drafts.subs.php');
 
-		// Load it up
+		// Load the draft and add it to a object container
 		$this->_loaded_draft = new \ElkArte\ValuesContainer(loadDraft($id_draft, 1, true, true));
 	}
 
