@@ -654,6 +654,8 @@ function countTopicsFromBoard($id_board)
  *
  * @package Maintenance
  * @param int $id_board
+ *
+ * @return int[];
  */
 function getTopicsToMove($id_board)
 {

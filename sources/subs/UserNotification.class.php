@@ -16,6 +16,13 @@
 class User_Notification
 {
 	/**
+	 * Hold copy of $modSettings for the class
+	 * 
+	 * @var mixed[]
+	 */
+	protected $_modSettings;
+
+	/**
 	 * All the shapes the icon can be.
 	 *
 	 * @var string[]
