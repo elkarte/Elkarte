@@ -130,13 +130,14 @@ function addonsCredits()
 	global $txt;
 
 	$db = database();
-	$cache = Cache::instance();
 
+	$cache = Cache::instance();
+	$credits = array();
 	if (!$cache->getVar($credits, 'addons_credits', 86400))
 	{
-		$credits = array();
 		$request = $db->query('substring', '
-			SELECT version, name, credits
+			SELECT 
+				version, name, credits
 			FROM {db_prefix}log_packages
 			WHERE install_state = {int:installed_adds}
 				AND credits != {string:empty}
@@ -149,7 +150,6 @@ function addonsCredits()
 				'empty' => '',
 			)
 		);
-
 		while ($row = $db->fetch_assoc($request))
 		{
 			$credit_info = unserialize($row['credits']);
@@ -159,7 +159,7 @@ function addonsCredits()
 			$version = $txt['credits_version'] . '' . $row['version'];
 			$title = (empty($credit_info['title']) ? $row['name'] : Util::htmlspecialchars($credit_info['title'])) . ': ' . $version;
 
-			// build this one out and stash it away
+			// Build this one out and stash it away
 			$name = empty($credit_info['url']) ? $title : '<a href="' . $credit_info['url'] . '">' . $title . '</a>';
 			$credits[] = $name . (!empty($license) ? ' | ' . $license : '') . (!empty($copyright) ? ' | ' . $copyright : '');
 		}

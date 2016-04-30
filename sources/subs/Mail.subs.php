@@ -1275,6 +1275,7 @@ function reduceMailQueue($batch_size = false, $override_limit = false, $force_se
 	require_once(SUBSDIR . '/Maillist.subs.php');
 
 	// Set the delay for the next sending
+	$delay = 0;
 	if (!$override_limit)
 	{
 		// Update next send time for our mail queue, if there was something to update. Otherwise bail out :P

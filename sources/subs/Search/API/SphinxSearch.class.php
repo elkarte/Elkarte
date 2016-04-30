@@ -187,6 +187,7 @@ class Sphinx_Search extends SearchAPI
 		global $user_info, $context, $modSettings;
 
 		// Only request the results if they haven't been cached yet.
+		$cached_results = array();
 		if (!\Cache::instance()->getVar($cached_results, 'search_results_' . md5($user_info['query_see_board'] . '_' . $context['params'])))
 		{
 			// The API communicating with the search daemon.
