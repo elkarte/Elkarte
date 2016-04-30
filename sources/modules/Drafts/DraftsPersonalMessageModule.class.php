@@ -20,9 +20,6 @@ if (!defined('ELK'))
 	die('No access...');
 }
 
-/**
- * Class Drafts_PersonalMessage_Module
- */
 class Drafts_PersonalMessage_Module implements ElkArte\sources\modules\Module_Interface
 {
 	/**
@@ -136,7 +133,7 @@ class Drafts_PersonalMessage_Module implements ElkArte\sources\modules\Module_In
 	 *
 	 * @param int $pmsg
 	 *
-	 * @throws Elk_Exception
+	 * @throws Pm_Error_Exception
 	 */
 	public function before_set_context($pmsg)
 	{
@@ -149,7 +146,7 @@ class Drafts_PersonalMessage_Module implements ElkArte\sources\modules\Module_In
 			if (isset($_REQUEST['id_draft']) && empty($_POST['subject']) && empty($_POST['message']))
 			{
 				$this->_loadDraft($user_info['id'], (int) $_REQUEST['id_draft']);
-				throw new Elk_Exception($this->_loaded_draft->to_list, $this->_loaded_draft);
+				throw new PM_Error_Exception($this->_loaded_draft->to_list, $this->_loaded_draft);
 			}
 			else
 			{
