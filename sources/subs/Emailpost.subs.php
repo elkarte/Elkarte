@@ -1309,7 +1309,7 @@ function query_key_owner($email_message)
 {
 	$db = database();
 
-	if (empty($key))
+	if (empty($email_message))
 		return false;
 
 	// Check that this is a reply to an "actual" message by finding the key in the sent email table
@@ -1412,6 +1412,10 @@ function query_load_subject($message_id, $message_type, $email)
 				)
 			);
 		}
+	}
+	else
+	{
+		return $subject;
 	}
 
 	// If we found the message, topic or PM, return the subject
