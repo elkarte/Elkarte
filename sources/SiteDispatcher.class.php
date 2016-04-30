@@ -159,7 +159,6 @@ class Site_Dispatcher
 			'removetopic2' => array('RemoveTopic_Controller', 'action_removetopic2'),
 			'reporttm' => array('Emailuser_Controller', 'action_reporttm'),
 			'restoretopic' => array('RemoveTopic_Controller', 'action_restoretopic'),
-			'spellcheck' => array('Post_Controller', 'action_spellcheck'),
 			'splittopics' => array('SplitTopics_Controller', 'action_splittopics'),
 			'theme' => array('ManageThemes_Controller', 'action_thememain'),
 			'trackip' => array('ProfileHistory_Controller', 'action_trackip'),

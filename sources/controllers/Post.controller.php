@@ -1463,32 +1463,6 @@ class Post_Controller extends Action_Controller
 	}
 
 	/**
-	 * Spell checks the post for typos ;).
-	 * It uses the pspell library, which MUST be installed.
-	 * It has problems with internationalization.
-	 * It is accessed via ?action=spellcheck.
-	 * @deprecated since 1.1
-	 */
-	public function action_spellcheck()
-	{
-		// Initialize this controller with its own event manager
-		$controller = new Spellcheck_Controller(new Event_Manager());
-
-		// Fetch controllers generic hook name from the action controller
-		$hook = $controller->getHook();
-
-		// Call the controllers pre dispatch method
-		$controller->pre_dispatch();
-
-		// Call integrate_action_XYZ_before -> XYZ_controller -> integrate_action_XYZ_after
-		call_integration_hook('integrate_action_' . $hook . '_before', array('action_index'));
-
-		$controller->action_index();
-
-		call_integration_hook('integrate_action_' . $hook . '_after', array('action_index'));
-	}
-
-	/**
 	 * Toggle a post lock status
 	 *
 	 * @param int|null $lock

@@ -8,18 +8,21 @@
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
  * This file contains code covered by:
- * copyright:	2011 Simple Machines (http://www.simplemachines.org)
- * license:		BSD, See included LICENSE.TXT for terms and conditions.
+ * copyright:    2011 Simple Machines (http://www.simplemachines.org)
+ * license:        BSD, See included LICENSE.TXT for terms and conditions.
  *
  * @version 1.1 beta 1
  *
  */
 
 if (!defined('ELK'))
+{
 	die('No access...');
+}
 
 /**
  * Spellcheck_Controller Class
+ *
  * Handles the initialization pspell and spellchecker processing
  */
 class Spellcheck_Controller extends Action_Controller
@@ -39,17 +42,17 @@ class Spellcheck_Controller extends Action_Controller
 	public $pspell_link;
 
 	/**
-	 * List of words that will be spell checked, word|offset_begin|offset_end
-	 * @var string[]
-	 */
-	private $_alphas;
-
-	/**
 	 * The template layers object
 	 *
 	 * @var null|object
 	 */
 	protected $_template_layers = null;
+
+	/**
+	 * List of words that will be spell checked, word|offset_begin|offset_end
+	 * @var string[]
+	 */
+	private $_alphas;
 
 	/**
 	 * Spell checks the post for typos ;).
@@ -82,7 +85,9 @@ class Spellcheck_Controller extends Action_Controller
 
 		// Most people don't have anything but English installed... So we use English as a last resort.
 		if (!$this->pspell_link)
+		{
 			$this->pspell_link = pspell_new('en', '', '', '', PSPELL_FAST | PSPELL_RUN_TOGETHER);
+		}
 
 		// Reset error reporting to what it was
 		error_reporting($old);
@@ -90,7 +95,9 @@ class Spellcheck_Controller extends Action_Controller
 
 		// Nothing to check or nothing to check with
 		if (!isset($this->_req->post->spellstring) || !$this->pspell_link)
+		{
 			die;
+		}
 
 		// Get all the words (Javascript already separated them).
 		$this->_alphas = explode("\n", strtr($this->_req->post->spellstring, array("\r" => '')));
@@ -129,7 +136,9 @@ class Spellcheck_Controller extends Action_Controller
 
 			// If the word is a known word, or spelled right...
 			if (in_array(Util::strtolower($check_word[0]), $this->known_words) || pspell_check($this->pspell_link, $check_word[0]) || !isset($check_word[2]))
+			{
 				continue;
+			}
 
 			// Find the word, and move up the "last occurrence" to here.
 			$found_words = true;
@@ -152,7 +161,9 @@ class Spellcheck_Controller extends Action_Controller
 				}
 
 				if (!empty($suggestions))
+				{
 					$array .= '"' . implode('", "', $suggestions) . '"';
+				}
 			}
 
 			$array .= ']),';
@@ -160,7 +171,9 @@ class Spellcheck_Controller extends Action_Controller
 
 		// If words were found, take off the last comma.
 		if ($found_words)
+		{
 			$array = substr($array, 0, -1);
+		}
 
 		return $array;
 	}
