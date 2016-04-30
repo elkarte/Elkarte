@@ -114,7 +114,7 @@ class Mentions_Controller extends Action_Controller
 	 *
 	 * @param Event_Manager|null $eventManager
 	 */
-	public function __construct($eventManager)
+	public function __construct($eventManager = null)
 	{
 		$this->_known_status = array(
 			'new' => Mentioning::MNEW,
@@ -159,11 +159,11 @@ class Mentions_Controller extends Action_Controller
 
 		// @deprecated since 1.1
 		$this->_data = array(
-			'type' => isset($_REQUEST['type']) ? $_REQUEST['type'] : null,
-			'uid' => isset($_REQUEST['uid']) ? $_REQUEST['uid'] : null,
-			'msg' => isset($_REQUEST['msg']) ? $_REQUEST['msg'] : null,
-			'id_member_from' => isset($_REQUEST['from']) ? $_REQUEST['from'] : null,
-			'log_time' => isset($_REQUEST['log_time']) ? $_REQUEST['log_time'] : null,
+			'type' => $this->_req->getPost('type'),
+			'uid' => $this->_req->getPost('uid'),
+			'msg' => $this->_req->getPost('msg'),
+			'id_member_from' => $this->_req->getPost('from'),
+			'log_time' => $this->_req->getPost('log_time'),
 		);
 
 		$this->_known_mentions = $this->_findMentionTypes();
@@ -496,7 +496,7 @@ class Mentions_Controller extends Action_Controller
 	}
 
 	/**
-	 * Politley remove a mention when a post like is taken back
+	 * Politely remove a mention when a post like is taken back
 	 * @deprecated since 1.1 - Use Notifications::create instead
 	 */
 	public function action_rlike()
@@ -571,8 +571,8 @@ class Mentions_Controller extends Action_Controller
 		checkSession('request');
 
 		$this->setData(array(
-			'id_mention' => isset($_REQUEST['item']) ? $_REQUEST['item'] : 0,
-			'mark' => $_REQUEST['mark'],
+			'id_mention' => $this->_req->getPost('item', 'intval', 0),
+			'mark' => $this->_req->getPost('mark'),
 		));
 
 		// Make sure its all good
@@ -630,12 +630,12 @@ class Mentions_Controller extends Action_Controller
 	 */
 	protected function _buildUrl()
 	{
-		$this->_all = isset($_REQUEST['all']);
-		$this->_sort = isset($_REQUEST['sort']) && in_array($_REQUEST['sort'], $this->_known_sorting) ? $_REQUEST['sort'] : $this->_default_sort;
-		$this->_type = isset($_REQUEST['type']) && in_array($_REQUEST['type'], $this->_known_mentions) ? $_REQUEST['type'] : '';
-		$this->_page = isset($_REQUEST['start']) ? $_REQUEST['start'] : '';
+		$this->_all = $this->_req->get('start') !== null;
+		$this->_sort = in_array($this->_req->getQuery('sort', 'trim'), $this->_known_sorting) ? $this->_req->getQuery('sort', 'trim') : $this->_default_sort;
+		$this->_type = in_array($this->_req->getQuery('type', 'trim'), $this->_known_mentions) ? $this->_req->getQuery('type', 'trim') : '';
+		$this->_page = $this->_req->getQuery('start', 'trim', '');
 
-		$this->_url_param = ($this->_all ? ';all' : '') . (!empty($this->_type) ? ';type=' . $this->_type : '') . (isset($_REQUEST['start']) ? ';start=' . $_REQUEST['start'] : '');
+		$this->_url_param = ($this->_all ? ';all' : '') . (!empty($this->_type) ? ';type=' . $this->_type : '') . ($this->_req->get('start') !== null ? ';start=' . $this->_req->get('start') : '');
 	}
 
 	/**
