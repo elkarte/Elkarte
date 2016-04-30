@@ -434,6 +434,7 @@ class Boards_List
 		global $txt;
 
 		$boards = array_keys($this->_boards);
+		$mod_cached = array();
 
 		if (!Cache::instance()->getVar($mod_cached, 'localmods_' . md5(implode(',', $boards)), 3600))
 		{
