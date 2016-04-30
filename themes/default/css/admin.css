@@ -1008,7 +1008,7 @@ dl.themes_list dd {
 /* Theme Management>Member Options>Change Current Options
 Adjusts display of wording and selections to one line.
 ----------------------------------------------------------------*/
-#admin_form_wrapper .theme_options dt { 
+#admin_form_wrapper .theme_options dt {
     float: left;
     clear: both;
     margin: 0 0 10px 0;
@@ -1155,6 +1155,7 @@ Adjusts display of wording and selections to one line.
 #error_log td div {
 	box-sizing: border-box;
 	word-wrap: break-word;
+	word-break: break-all;
 	-webkit-hyphens: auto;
 	-moz-hyphens: auto;
 	-ms-hyphens: auto;
