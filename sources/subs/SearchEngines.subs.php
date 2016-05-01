@@ -36,6 +36,7 @@ function spiderCheck()
 	$_SESSION['robot_check'] = time();
 
 	// We cache the spider data for five minutes if we can.
+	$spider_data = array();
 	if (!Cache::instance()->getVar($spider_data, 'spider_search', 300))
 	{
 		$request = $db->query('', '
@@ -45,7 +46,6 @@ function spiderCheck()
 			array(
 			)
 		);
-		$spider_data = array();
 		while ($row = $db->fetch_assoc($request))
 			$spider_data[] = $row;
 		$db->free_result($request);

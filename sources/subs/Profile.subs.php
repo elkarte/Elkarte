@@ -103,7 +103,7 @@ function setupProfileContext($fields, $hook = '')
 				continue;
 
 			// If this is anything but complex we need to do more cleaning!
-			if ($cur_field['type'] != 'callback' && $cur_field['type'] != 'hidden')
+			if ($cur_field['type'] !== 'callback' && $cur_field['type'] !== 'hidden')
 			{
 				if (!isset($cur_field['label']))
 					$cur_field['label'] = isset($txt[$field]) ? $txt[$field] : $field;
@@ -135,14 +135,14 @@ function setupProfileContext($fields, $hook = '')
 				$context['profile_posthtml'] .= $cur_field['posthtml'];
 
 			// Finally put it into context?
-			if ($cur_field['type'] != 'hidden')
+			if ($cur_field['type'] !== 'hidden')
 			{
 				$last_type = $cur_field['type'];
 				$context['profile_fields'][$field] = &$profile_fields[$field];
 			}
 		}
 		// Bodge in a line break - without doing two in a row ;)
-		elseif ($field == 'hr' && $last_type != 'hr' && $last_type != '')
+		elseif ($field === 'hr' && $last_type !== 'hr' && $last_type != '')
 		{
 			$last_type = 'hr';
 			$context['profile_fields'][$i++]['type'] = 'hr';
@@ -169,18 +169,18 @@ function loadCustomFields($memID, $area = 'summary', array $custom_fields = arra
 
 	// Get the right restrictions in place...
 	$where = 'active = 1';
-	if (!allowedTo('admin_forum') && $area != 'register')
+	if (!allowedTo('admin_forum') && $area !== 'register')
 	{
 		// If it's the owner they can see two types of private fields, regardless.
 		if ($memID == $user_info['id'])
-			$where .= $area == 'summary' ? ' AND private < 3' : ' AND (private = 0 OR private = 2)';
+			$where .= $area === 'summary' ? ' AND private < 3' : ' AND (private = 0 OR private = 2)';
 		else
-			$where .= $area == 'summary' ? ' AND private < 2' : ' AND private = 0';
+			$where .= $area === 'summary' ? ' AND private < 2' : ' AND private = 0';
 	}
 
-	if ($area == 'register')
+	if ($area === 'register')
 		$where .= ' AND show_reg != 0';
-	elseif ($area != 'summary')
+	elseif ($area !== 'summary')
 		$where .= ' AND show_profile = {string:area}';
 
 	// Load all the relevant fields - and data.
@@ -216,16 +216,16 @@ function loadCustomFields($memID, $area = 'summary', array $custom_fields = arra
 		$output_html = $value;
 
 		// Checkbox inputs
-		if ($row['field_type'] == 'check')
+		if ($row['field_type'] === 'check')
 		{
 			$true = (bool) $value;
 			$input_html = '<input id="' . $row['col_name'] . '" type="checkbox" name="customfield[' . $row['col_name'] . ']" ' . ($true ? 'checked="checked"' : '') . ' class="input_check" />';
 			$output_html = $true ? $txt['yes'] : $txt['no'];
 		}
 		// A select list
-		elseif ($row['field_type'] == 'select')
+		elseif ($row['field_type'] === 'select')
 		{
-			$input_html = '<select id="' . $row['col_name'] . '" name="customfield[' . $row['col_name'] . ']"><option value=""' . ($row['default_value'] == 'no_default' ? ' selected="selected"' : '') . '></option>';
+			$input_html = '<select id="' . $row['col_name'] . '" name="customfield[' . $row['col_name'] . ']"><option value=""' . ($row['default_value'] === 'no_default' ? ' selected="selected"' : '') . '></option>';
 			$options = explode(',', $row['field_options']);
 			foreach ($options as $k => $v)
 			{
@@ -238,7 +238,7 @@ function loadCustomFields($memID, $area = 'summary', array $custom_fields = arra
 			$input_html .= '</select>';
 		}
 		// Radio buttons
-		elseif ($row['field_type'] == 'radio')
+		elseif ($row['field_type'] === 'radio')
 		{
 			$input_html = '<fieldset>';
 			$options = explode(',', $row['field_options']);
@@ -266,7 +266,7 @@ function loadCustomFields($memID, $area = 'summary', array $custom_fields = arra
 		if ($row['bbc'])
 			$output_html = $bbc_parser->parseCustomFields($output_html);
 		// Allow for newlines at least
-		elseif ($row['field_type'] == 'textarea')
+		elseif ($row['field_type'] === 'textarea')
 			$output_html = strtr($output_html, array("\n" => '<br />'));
 
 		// Enclosing the user input within some other text?
@@ -375,9 +375,9 @@ function loadProfileFields($force_reload = false)
 				global $cur_profile, $context;
 
 				// Split up the birth date....
-				list ($uyear, $umonth, $uday) = explode('-', empty($cur_profile['birthdate']) || $cur_profile['birthdate'] == '0001-01-01' ? '0000-00-00' : $cur_profile['birthdate']);
+				list ($uyear, $umonth, $uday) = explode('-', empty($cur_profile['birthdate']) || $cur_profile['birthdate'] === '0001-01-01' ? '0000-00-00' : $cur_profile['birthdate']);
 				$context['member']['birth_date'] = array(
-					'year' => $uyear == '0004' ? '0000' : $uyear,
+					'year' => $uyear === '0004' ? '0000' : $uyear,
 					'month' => $umonth,
 					'day' => $uday,
 				);
@@ -857,7 +857,7 @@ function loadProfileFields($force_reload = false)
 				global $modSettings;
 
 				$smiley_sets = explode(',', $modSettings['smiley_sets_known']);
-				if (!in_array($value, $smiley_sets) && $value != 'none')
+				if (!in_array($value, $smiley_sets) && $value !== 'none')
 					$value = '';
 				return true;
 			},
@@ -1014,7 +1014,7 @@ function saveProfileFields()
 	// Cycle through the profile fields working out what to do!
 	foreach ($profile_fields as $key => $field)
 	{
-		if (!isset($_POST[$key]) || !empty($field['is_dummy']) || (isset($_POST['preview_signature']) && $key == 'signature'))
+		if (!isset($_POST[$key]) || !empty($field['is_dummy']) || (isset($_POST['preview_signature']) && $key === 'signature'))
 			continue;
 
 		// What gets updated?
@@ -1045,15 +1045,15 @@ function saveProfileFields()
 		$field['cast_type'] = empty($field['cast_type']) ? $field['type'] : $field['cast_type'];
 
 		// Finally, clean up certain types.
-		if ($field['cast_type'] == 'int')
+		if ($field['cast_type'] === 'int')
 			$_POST[$key] = (int) $_POST[$key];
-		elseif ($field['cast_type'] == 'float')
+		elseif ($field['cast_type'] === 'float')
 			$_POST[$key] = (float) $_POST[$key];
-		elseif ($field['cast_type'] == 'check')
+		elseif ($field['cast_type'] === 'check')
 			$_POST[$key] = !empty($_POST[$key]) ? 1 : 0;
 
 		// If we got here we're doing OK.
-		if ($field['type'] != 'hidden' && (!isset($old_profile[$key]) || $_POST[$key] != $old_profile[$key]))
+		if ($field['type'] !== 'hidden' && (!isset($old_profile[$key]) || $_POST[$key] != $old_profile[$key]))
 		{
 			// Set the save variable.
 			$profile_vars[$db_key] = $_POST[$key];
@@ -1070,7 +1070,7 @@ function saveProfileFields()
 		}
 
 		// Logging group changes are a bit different...
-		if ($key == 'id_group' && $field['log_change'])
+		if ($key === 'id_group' && $field['log_change'])
 		{
 			profileLoadGroups();
 
@@ -1204,7 +1204,7 @@ function saveProfileChanges(&$profile_vars, $memID)
 
 	call_integration_hook('integrate_save_profile_changes', array(&$profile_bools, &$profile_ints, &$profile_floats, &$profile_strings));
 
-	if (isset($_POST['sa']) && $_POST['sa'] == 'ignoreboards' && empty($_POST['ignore_brd']))
+	if (isset($_POST['sa']) && $_POST['sa'] === 'ignoreboards' && empty($_POST['ignore_brd']))
 		$_POST['ignore_brd'] = array();
 
 	// Whatever it is set to is a dirty filthy thing.  Kinda like our minds.
@@ -1309,10 +1309,10 @@ function makeThemeChanges($memID, $id_theme)
 				continue;
 
 			// These need to be controlled.
-			if ($opt == 'topics_per_page' || $opt == 'messages_per_page')
+			if ($opt === 'topics_per_page' || $opt === 'messages_per_page')
 				$val = max(0, min($val, 50));
 			// We don't set this per theme anymore.
-			elseif ($opt == 'allow_no_censored')
+			elseif ($opt === 'allow_no_censored')
 				continue;
 
 			$themeSetArray[] = array($id_theme, $memID, $opt, is_array($val) ? implode(',', $val) : $val);
@@ -1328,10 +1328,10 @@ function makeThemeChanges($memID, $id_theme)
 				continue;
 
 			// These need to be controlled.
-			if ($opt == 'topics_per_page' || $opt == 'messages_per_page')
+			if ($opt === 'topics_per_page' || $opt === 'messages_per_page')
 				$val = max(0, min($val, 50));
 			// Only let admins and owners change the censor.
-			elseif ($opt == 'allow_no_censored' && !$user_info['is_admin'] && !$context['user']['is_owner'])
+			elseif ($opt === 'allow_no_censored' && !$user_info['is_admin'] && !$context['user']['is_owner'])
 				continue;
 
 			$themeSetArray[] = array(1, $memID, $opt, is_array($val) ? implode(',', $val) : $val);
@@ -1473,7 +1473,7 @@ function makeCustomFieldChanges($memID, $area, $sanitize = true)
 	if ($sanitize && isset($_POST['customfield']))
 		$_POST['customfield'] = htmlspecialchars__recursive($_POST['customfield']);
 
-	$where = $area == 'register' ? 'show_reg != 0' : 'show_profile = {string:area}';
+	$where = $area === 'register' ? 'show_reg != 0' : 'show_profile = {string:area}';
 
 	// Load the fields we are saving too - make sure we save valid data (etc).
 	$request = $db->query('', '
@@ -1496,13 +1496,13 @@ function makeCustomFieldChanges($memID, $area, $sanitize = true)
 			- The data is not invisible to users but editable by the owner (or if it is the user is not the owner)
 			- The area isn't registration, and if it is that the field is not supposed to be shown there.
 		*/
-		if ($row['private'] != 0 && !allowedTo('admin_forum') && ($memID != $user_info['id'] || $row['private'] != 2) && ($area != 'register' || $row['show_reg'] == 0))
+		if ($row['private'] != 0 && !allowedTo('admin_forum') && ($memID != $user_info['id'] || $row['private'] != 2) && ($area !== 'register' || $row['show_reg'] == 0))
 			continue;
 
 		// Validate the user data.
-		if ($row['field_type'] == 'check')
+		if ($row['field_type'] === 'check')
 			$value = isset($_POST['customfield'][$row['col_name']]) ? 1 : 0;
-		elseif ($row['field_type'] == 'select' || $row['field_type'] == 'radio')
+		elseif ($row['field_type'] === 'select' || $row['field_type'] === 'radio')
 		{
 			$value = $row['default_value'];
 			foreach (explode(',', $row['field_options']) as $k => $v)
@@ -1532,7 +1532,7 @@ function makeCustomFieldChanges($memID, $area, $sanitize = true)
 				}
 			}
 
-			if ($row['mask'] == 'number')
+			if ($row['mask'] === 'number')
 				$value = (int) $value;
 		}
 
@@ -1592,14 +1592,14 @@ function isCustomFieldValid($field, $value)
 		return 'custom_field_too_long';
 
 	// Any masks to apply?
-	if ($field['field_type'] == 'text' && !empty($field['mask']) && $field['mask'] != 'none')
+	if ($field['field_type'] === 'text' && !empty($field['mask']) && $field['mask'] !== 'none')
 	{
 		// @todo We never error on this - just ignore it at the moment...
-		if ($field['mask'] == 'email' && !isValidEmail($value))
+		if ($field['mask'] === 'email' && !isValidEmail($value))
 			return 'custom_field_invalid_email';
-		elseif ($field['mask'] == 'number' && preg_match('~[^\d]~', $value))
+		elseif ($field['mask'] === 'number' && preg_match('~[^\d]~', $value))
 			return 'custom_field_not_number';
-		elseif (substr($field['mask'], 0, 5) == 'regex' && trim($value) !== '' && preg_match(substr($field['mask'], 5), $value) === 0)
+		elseif (substr($field['mask'], 0, 5) === 'regex' && trim($value) !== '' && preg_match(substr($field['mask'], 5), $value) === 0)
 			return 'custom_field_inproper_format';
 	}
 
@@ -1751,7 +1751,7 @@ function profileLoadAvatarData()
 		'allow_gravatar' =>  !empty($modSettings['avatar_gravatar_enabled']) && $allowedChange,
 	);
 
-	if ($cur_profile['avatar'] == '' && $cur_profile['id_attach'] > 0 && $context['member']['avatar']['allow_upload'])
+	if ($cur_profile['avatar'] === '' && $cur_profile['id_attach'] > 0 && $context['member']['avatar']['allow_upload'])
 	{
 		$context['member']['avatar'] += array(
 			'choice' => 'upload',
@@ -1766,7 +1766,7 @@ function profileLoadAvatarData()
 			'server_pic' => 'blank.png',
 			'external' => $cur_profile['avatar']
 		);
-	elseif ($cur_profile['avatar'] == 'gravatar' && $context['member']['avatar']['allow_gravatar'])
+	elseif ($cur_profile['avatar'] === 'gravatar' && $context['member']['avatar']['allow_gravatar'])
 		$context['member']['avatar'] += array(
 			'choice' => 'gravatar',
 			'server_pic' => 'blank.png',
@@ -1944,13 +1944,13 @@ function profileValidateSignature(&$value)
 				}
 
 				// Attempt to allow all sizes of abuse, so to speak.
-				if ($matches[2][$ind] == 'px' && $size > $sig_limits[7])
+				if ($matches[2][$ind] === 'px' && $size > $sig_limits[7])
 					$limit_broke = $sig_limits[7] . 'px';
-				elseif ($matches[2][$ind] == 'pt' && $size > ($sig_limits[7] * 0.75))
+				elseif ($matches[2][$ind] === 'pt' && $size > ($sig_limits[7] * 0.75))
 					$limit_broke = ((int) $sig_limits[7] * 0.75) . 'pt';
-				elseif ($matches[2][$ind] == 'em' && $size > ((float) $sig_limits[7] / 14))
+				elseif ($matches[2][$ind] === 'em' && $size > ((float) $sig_limits[7] / 14))
 					$limit_broke = ((float) $sig_limits[7] / 14) . 'em';
-				elseif ($matches[2][$ind] != 'px' && $matches[2][$ind] != 'pt' && $matches[2][$ind] != 'em' && $sig_limits[7] < 18)
+				elseif ($matches[2][$ind] !== 'px' && $matches[2][$ind] !== 'pt' && $matches[2][$ind] !== 'em' && $sig_limits[7] < 18)
 					$limit_broke = 'large';
 
 				if ($limit_broke)
@@ -2111,7 +2111,7 @@ function profileSaveAvatarData(&$value)
 	$downloadedExternalAvatar = false;
 	$valid_http = isset($_POST['userpicpersonal']) && substr($_POST['userpicpersonal'], 0, 7) === 'http://' && strlen($_POST['userpicpersonal']) > 7;
 	$valid_https = isset($_POST['userpicpersonal']) && substr($_POST['userpicpersonal'], 0, 8) === 'https://' && strlen($_POST['userpicpersonal']) > 8;
-	if ($value == 'external' && !empty($modSettings['avatar_external_enabled']) && ($valid_http || $valid_https) && !empty($modSettings['avatar_download_external']))
+	if ($value === 'external' && !empty($modSettings['avatar_external_enabled']) && ($valid_http || $valid_https) && !empty($modSettings['avatar_download_external']))
 	{
 		loadLanguage('Post');
 		if (!is_writable($uploadDir))
@@ -2134,7 +2134,7 @@ function profileSaveAvatarData(&$value)
 		}
 	}
 
-	if ($value == 'none')
+	if ($value === 'none')
 	{
 		$profile_vars['avatar'] = '';
 
@@ -2145,10 +2145,10 @@ function profileSaveAvatarData(&$value)
 
 		removeAttachments(array('id_member' => $memID));
 	}
-	elseif ($value == 'server_stored' && !empty($modSettings['avatar_stored_enabled']))
+	elseif ($value === 'server_stored' && !empty($modSettings['avatar_stored_enabled']))
 	{
 		$profile_vars['avatar'] = strtr(empty($_POST['file']) ? (empty($_POST['cat']) ? '' : $_POST['cat']) : $_POST['file'], array('&amp;' => '&'));
-		$profile_vars['avatar'] = preg_match('~^([\w _!@%*=\-#()\[\]&.,]+/)?[\w _!@%*=\-#()\[\]&.,]+$~', $profile_vars['avatar']) != 0 && preg_match('/\.\./', $profile_vars['avatar']) == 0 && file_exists($modSettings['avatar_directory'] . '/' . $profile_vars['avatar']) ? ($profile_vars['avatar'] == 'blank.png' ? '' : $profile_vars['avatar']) : '';
+		$profile_vars['avatar'] = preg_match('~^([\w _!@%*=\-#()\[\]&.,]+/)?[\w _!@%*=\-#()\[\]&.,]+$~', $profile_vars['avatar']) != 0 && preg_match('/\.\./', $profile_vars['avatar']) == 0 && file_exists($modSettings['avatar_directory'] . '/' . $profile_vars['avatar']) ? ($profile_vars['avatar'] === 'blank.png' ? '' : $profile_vars['avatar']) : '';
 
 		// Clear current profile...
 		$cur_profile['id_attach'] = 0;
@@ -2158,7 +2158,7 @@ function profileSaveAvatarData(&$value)
 		// Get rid of their old avatar. (if uploaded.)
 		removeAttachments(array('id_member' => $memID));
 	}
-	elseif ($value == 'gravatar' && !empty($modSettings['avatar_gravatar_enabled']))
+	elseif ($value === 'gravatar' && !empty($modSettings['avatar_gravatar_enabled']))
 	{
 		$profile_vars['avatar'] = 'gravatar';
 
@@ -2169,7 +2169,7 @@ function profileSaveAvatarData(&$value)
 
 		removeAttachments(array('id_member' => $memID));
 	}
-	elseif ($value == 'external' && !empty($modSettings['avatar_external_enabled']) && ($valid_http || $valid_https) && empty($modSettings['avatar_download_external']))
+	elseif ($value === 'external' && !empty($modSettings['avatar_external_enabled']) && ($valid_http || $valid_https) && empty($modSettings['avatar_download_external']))
 	{
 		// We need these clean...
 		$cur_profile['id_attach'] = 0;
@@ -2181,7 +2181,7 @@ function profileSaveAvatarData(&$value)
 
 		$profile_vars['avatar'] = str_replace(' ', '%20', preg_replace('~action(?:=|%3d)(?!dlattach)~i', 'action-', $_POST['userpicpersonal']));
 
-		if ($profile_vars['avatar'] == 'http://' || $profile_vars['avatar'] == 'http:///')
+		if ($profile_vars['avatar'] === 'http://' || $profile_vars['avatar'] === 'http:///')
 			$profile_vars['avatar'] = '';
 		// Trying to make us do something we'll regret?
 		elseif (!$valid_http && !$valid_https)
@@ -2195,9 +2195,9 @@ function profileSaveAvatarData(&$value)
 			if (is_array($sizes) && (($sizes[0] > $modSettings['avatar_max_width'] && !empty($modSettings['avatar_max_width'])) || ($sizes[1] > $modSettings['avatar_max_height'] && !empty($modSettings['avatar_max_height']))))
 			{
 				// Houston, we have a problem. The avatar is too large!!
-				if ($modSettings['avatar_action_too_large'] == 'option_refuse')
+				if ($modSettings['avatar_action_too_large'] === 'option_refuse')
 					return 'bad_avatar';
-				elseif ($modSettings['avatar_action_too_large'] == 'option_download_and_resize')
+				elseif ($modSettings['avatar_action_too_large'] === 'option_download_and_resize')
 				{
 					// @todo remove this if appropriate
 					require_once(SUBSDIR . '/Attachments.subs.php');
@@ -2214,7 +2214,7 @@ function profileSaveAvatarData(&$value)
 			}
 		}
 	}
-	elseif (($value == 'upload' && !empty($modSettings['avatar_upload_enabled'])) || $downloadedExternalAvatar)
+	elseif (($value === 'upload' && !empty($modSettings['avatar_upload_enabled'])) || $downloadedExternalAvatar)
 	{
 		if ((isset($_FILES['attachment']['name']) && $_FILES['attachment']['name'] != '') || $downloadedExternalAvatar)
 		{
@@ -2244,7 +2244,7 @@ function profileSaveAvatarData(&$value)
 			// Check whether the image is too large.
 			elseif ((!empty($modSettings['avatar_max_width']) && $sizes[0] > $modSettings['avatar_max_width']) || (!empty($modSettings['avatar_max_height']) && $sizes[1] > $modSettings['avatar_max_height']))
 			{
-				if (!empty($modSettings['avatar_action_too_large']) && $modSettings['avatar_action_too_large'] == 'option_download_and_resize')
+				if (!empty($modSettings['avatar_action_too_large']) && $modSettings['avatar_action_too_large'] === 'option_download_and_resize')
 				{
 					// Attempt to chmod it.
 					@chmod($_FILES['attachment']['tmp_name'], 0644);
@@ -2792,7 +2792,7 @@ function count_user_posts($memID, $board = null)
 
 	$request = $db->query('', '
 		SELECT COUNT(*)
-		FROM {db_prefix}messages AS m' . ($user_info['query_see_board'] == '1=1' ? '' : '
+		FROM {db_prefix}messages AS m' . ($user_info['query_see_board'] === '1=1' ? '' : '
 			INNER JOIN {db_prefix}boards AS b ON (b.id_board = m.id_board AND {query_see_board})') . '
 		WHERE m.id_member = {int:current_member}' . (!empty($board) ? '
 			AND m.id_board = {int:board}' : '') . (!$modSettings['postmod_active'] || $is_owner ? '' : '
@@ -2829,7 +2829,7 @@ function count_user_topics($memID, $board = null)
 
 	$request = $db->query('', '
 		SELECT COUNT(*)
-		FROM {db_prefix}topics AS t' . ($user_info['query_see_board'] == '1=1' ? '' : '
+		FROM {db_prefix}topics AS t' . ($user_info['query_see_board'] === '1=1' ? '' : '
 			INNER JOIN {db_prefix}boards AS b ON (b.id_board = t.id_board AND {query_see_board})') . '
 		WHERE t.id_member_started = {int:current_member}' . (!empty($board) ? '
 			AND t.id_board = {int:board}' : '') . (!$modSettings['postmod_active'] || $is_owner ? '' : '

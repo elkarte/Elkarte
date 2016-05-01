@@ -95,7 +95,9 @@ class Theme extends \Theme
 		}
 
 		foreach (\Template_Layers::getInstance()->prepareContext() as $layer)
+		{
 			loadSubTemplate($layer . '_above', 'ignore');
+		}
 
 		if (isset($settings['use_default_images']) && $settings['use_default_images'] == 'defaults' && isset($settings['default_template']))
 		{
@@ -105,6 +107,13 @@ class Theme extends \Theme
 		}
 	}
 
+	/**
+	 * Checks if a header of a given type has already been sent
+	 *
+	 * @param string $type
+	 *
+	 * @return bool
+	 */
 	protected function headerSent($type)
 	{
 		$sent = headers_list();

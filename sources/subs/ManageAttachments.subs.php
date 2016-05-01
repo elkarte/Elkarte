@@ -1119,7 +1119,7 @@ function list_getUnapprovedAttachments($start, $items_per_page, $sort, $approve_
 				'message' => array(
 					'id' => $row['id_msg'],
 					'subject' => $row['subject'],
-					'body' => $bbc_parser->parseMessage($row['body']),
+					'body' => $bbc_parser->parseMessage($row['body'], false),
 					'time' => standardTime($row['poster_time']),
 					'html_time' => htmlTime($row['poster_time']),
 					'timestamp' => forum_time(true, $row['poster_time']),

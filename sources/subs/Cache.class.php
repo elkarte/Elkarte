@@ -103,13 +103,13 @@ class Cache
 		{
 			$this->_cache_obj = new $cache_class($this->_options);
 
-			$this->enable = $this->_cache_obj->init();
+			$this->enabled = $this->_cache_obj->init();
 		}
 		else
 		{
 			$this->_cache_obj = false;
 
-			$this->enable = false;
+			$this->enabled = false;
 		}
 
 		$this->_build_prefix();
@@ -162,7 +162,6 @@ class Cache
 	 * - It may "miss" so shouldn't be depended on
 	 * - Uses the cache engine chosen in the ACP and saved in settings.php
 	 * - It supports:
-	 *   - Turck MMCache: http://turck-mmcache.sourceforge.net/index_old.html#api
 	 *   - Xcache: http://xcache.lighttpd.net/wiki/XcacheApi
 	 *   - memcache: http://www.php.net/memcache
 	 *   - APC: http://www.php.net/apc

@@ -69,7 +69,8 @@ class Random_Post_Module implements ElkArte\sources\modules\Module_Interface
 			require_once(SUBSDIR . '/Boards.subs.php');
 			$context += getBoardList(array('not_redirection' => true, 'allowed_to' => 'post_new'));
 			$context['boards_current_disabled'] = false;
-			if (!empty($board))
+
+			if (!empty($context['categories']))
 			{
 				foreach ($context['categories'] as $id => $values)
 				{

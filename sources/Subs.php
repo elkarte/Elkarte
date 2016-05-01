@@ -1181,6 +1181,7 @@ function host_from_ip($ip)
 
 	$cache = Cache::instance();
 
+	$host = '';
 	if ($cache->getVar($host, 'hostlookup-' . $ip, 600) || empty($ip))
 		return $host;
 

@@ -413,6 +413,7 @@ function create_control_richedit($editorOptions)
 		}
 		elseif ($context['smiley_enabled'])
 		{
+			$temp = array();
 			if (!Cache::instance()->getVar($temp, 'posting_smileys', 480))
 			{
 				$db->fetchQueryCallback('

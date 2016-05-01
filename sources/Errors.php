@@ -416,6 +416,7 @@ function display_db_error()
 	$modSettings['cache_enable'] = 1;
 	$cache->enable(true)->setLevel(1);
 
+	$temp = '';
 	if ($cache->getVar($temp, 'db_last_error', 600))
 		$db_last_error = max($db_last_error, $temp);
 

@@ -16,6 +16,13 @@ namespace ElkArte;
 if (!defined('ELK'))
 	die('No access...');
 
+/**
+ * Class ValuesContainer
+ *
+ * - Implements generic ArrayAccess and getter/setter bag for use
+ * 
+ * @package ElkArte
+ */
 class ValuesContainer implements \ArrayAccess
 {
 	/**
@@ -91,7 +98,7 @@ class ValuesContainer implements \ArrayAccess
 	}
 
 	/**
-	 * Tests if an offeset key is set.
+	 * Tests if an offset key is set.
 	 *
 	 * @param string|int $offset
 	 * @return bool
@@ -102,7 +109,7 @@ class ValuesContainer implements \ArrayAccess
 	}
 
 	/**
-	 * Unsets a certain offeset key.
+	 * Unset a certain offset key.
 	 *
 	 * @param string|int $offset
 	 */

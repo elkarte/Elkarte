@@ -46,6 +46,7 @@ class Apc extends Cache_Method_Abstract
 	 */
 	public function get($key, $ttl = 120)
 	{
+		$success = false;
 		$result = apc_fetch($key . 'elkarte', $success);
 
 		$this->is_miss = !$success;

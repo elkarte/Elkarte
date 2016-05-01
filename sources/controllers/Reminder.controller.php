@@ -362,7 +362,7 @@ function secretAnswerInput()
 	loadLanguage('Login');
 
 	// Check they entered something...
-	if (empty($this->_req->post->uid))
+	if (empty($_POST['uid']))
 		Errors::instance()->fatal_lang_error('username_no_exist', false);
 
 	// Get the stuff....
@@ -386,4 +386,6 @@ function secretAnswerInput()
 	loadJavascriptFile('register.js');
 
 	createToken('remind-sai');
+
+	return true;
 }

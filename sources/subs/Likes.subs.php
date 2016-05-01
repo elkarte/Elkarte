@@ -196,7 +196,7 @@ function lastLikeOn($id_liker)
  * @package Likes
  * @param int $id_liker
  * @param int[] $liked_message
- * @param int $direction - options: - or +
+ * @param string $direction - options: - or +
  */
 function updateLike($id_liker, $liked_message, $direction)
 {
