@@ -65,6 +65,11 @@ class Pbe_Imap
 	protected $_imap_server = '';
 
 	/**
+	 * Holds modSettings for the class
+	 */
+	protected $_modSettings;
+
+	/**
 	 * The constructor, prepares few variables.
 	 *
 	 * @param mixed[] $modSettings - May contain few settings:
@@ -77,33 +82,17 @@ class Pbe_Imap
 	 */
 	public function __construct($modSettings)
 	{
+		$this->_modSettings = $modSettings;
+
 		// Values used for the connection
-		if (!empty($modSettings['maillist_imap_host']))
-		{
-			$this->_hostname = $modSettings['maillist_imap_host'];
-		}
+		$this->_hostname = $this->_load_modsettings('maillist_imap_host');
+		$this->_username = $this->_load_modsettings('maillist_imap_uid');
+		$this->_password = $this->_load_modsettings('maillist_imap_pass');
+		$this->_mailbox = $this->_load_modsettings('maillist_imap_mailbox');
+		$this->_type = $this->_load_modsettings('maillist_imap_connection');
 
-		if (!empty($modSettings['maillist_imap_uid']))
-		{
-			$this->_username = $modSettings['maillist_imap_uid'];
-		}
-
-		if (!empty($modSettings['maillist_imap_pass']))
-		{
-			$this->_password = $modSettings['maillist_imap_pass'];
-		}
-
-		if (!empty($modSettings['maillist_imap_mailbox']))
-		{
-			$this->_mailbox = $modSettings['maillist_imap_mailbox'];
-		}
-
-		if (!empty($modSettings['maillist_imap_connection']))
-		{
-			$this->_type = $modSettings['maillist_imap_connection'];
-		}
-
-		$this->_delete = !empty($modSettings['maillist_imap_delete']);
+		// Values used for options
+		$this->_delete = (bool) $this->_load_modsettings('maillist_imap_delete');
 		$this->_is_gmail = strpos($this->_hostname, '.gmail.') !== false;
 
 		// I suppose that without this information we can't do anything.
@@ -115,6 +104,18 @@ class Pbe_Imap
 		{
 			return $this;
 		}
+	}
+
+	/**
+	 * Return modSetting values as requested
+	 *
+	 * @param string $value
+	 *
+	 * @return mixed|string
+	 */
+	private function _load_modsettings($value)
+	{
+		return !empty($this->_modSettings[$value]) ? $this->_modSettings[$value] : '';
 	}
 
 	/**
