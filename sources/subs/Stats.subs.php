@@ -452,6 +452,7 @@ function topTopicStarter()
 	global $modSettings, $scripturl;
 
 	$db = database();
+	$members = array();
 
 	// Try to cache this when possible, because it's a little unavoidably slow.
 	if (!Cache::instance()->getVar($members, 'stats_top_starters', 360) || !$members)
