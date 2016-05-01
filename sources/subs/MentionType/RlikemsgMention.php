@@ -14,8 +14,17 @@
 namespace ElkArte\sources\subs\MentionType;
 
 if (!defined('ELK'))
+{
 	die('No access...');
+}
 
+/**
+ * Class Rlikemsg_Mention
+ *
+ * Handles the notification (or non-notification) of removed likes.
+ *
+ * @package ElkArte\sources\subs\MentionType
+ */
 class Rlikemsg_Mention extends Mention_BoardAccess_Abstract
 {
 	/**
@@ -29,15 +38,19 @@ class Rlikemsg_Mention extends Mention_BoardAccess_Abstract
 	public function getUsersToNotify()
 	{
 		if ($this->_task['source_data']['rlike_notif'])
+		{
 			return (array) $this->_task['source_data']['id_members'];
+		}
 		else
+		{
 			return array();
+		}
 	}
 
 	/**
 	 * {@inheritdoc }
 	 */
-	public function getNotificationBody($frequency, $users)
+	public function getNotificationBody($lang_data, $users)
 	{
 		return array();
 	}
@@ -48,6 +61,7 @@ class Rlikemsg_Mention extends Mention_BoardAccess_Abstract
 	 * a 'likemsg' mention when the post is unliked.
 	 *
 	 * @package Mentions
+	 *
 	 * @param int $member_from the id of the member mentioning
 	 * @param int[] $members_to an array of ids of the members mentioned
 	 * @param int $target the id of the target involved in the mention

@@ -14,8 +14,17 @@
 namespace ElkArte\sources\subs\MentionType;
 
 if (!defined('ELK'))
+{
 	die('No access...');
+}
 
+/**
+ * Class Likemsg_Mention
+ *
+ * Handles mentions of likes
+ *
+ * @package ElkArte\sources\subs\MentionType
+ */
 class Likemsg_Mention extends Mention_BoardAccess_Abstract
 {
 	/**
@@ -26,13 +35,17 @@ class Likemsg_Mention extends Mention_BoardAccess_Abstract
 	/**
 	 * {@inheritdoc }
 	 */
-	public function getNotificationBody($frequency, $members)
+	public function getNotificationBody($lang_data, $members)
 	{
 		// @todo send an email for any like received may be a bit too much. Consider not allowing this method of notification
 		if (empty($lang_data['suffix']))
+		{
 			return $this->_getNotificationStrings('', array('subject' => static::$_type, 'body' => static::$_type), $members, $this->_task);
+		}
 		else
+		{
 			$keys = array('subject' => 'notify_new_likemsg_' . $lang_data['subject'], 'body' => 'notify_new_likemsg_' . $lang_data['body']);
+		}
 
 		$notifier = $this->_task->getNotifierData();
 		$replacements = array(

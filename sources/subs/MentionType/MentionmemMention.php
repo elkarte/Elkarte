@@ -14,8 +14,17 @@
 namespace ElkArte\sources\subs\MentionType;
 
 if (!defined('ELK'))
+{
 	die('No access...');
+}
 
+/**
+ * Class Mentionmem_Mention
+ *
+ * Handles the mentioning of members (@ member actions)
+ *
+ * @package ElkArte\sources\subs\MentionType
+ */
 class Mentionmem_Mention extends Mention_BoardAccess_Abstract
 {
 	/**
@@ -45,9 +54,13 @@ class Mentionmem_Mention extends Mention_BoardAccess_Abstract
 		);
 
 		if (isset($methods[$controller]))
+		{
 			return $methods[$controller];
+		}
 		else
+		{
 			return array();
+		}
 	}
 
 	/**
@@ -55,8 +68,6 @@ class Mentionmem_Mention extends Mention_BoardAccess_Abstract
 	 * used to mark a mention as read.
 	 *
 	 * @param int $virtual_msg
-	 * @global $modSettings
-	 * @global $_REQUEST
 	 */
 	public function display_prepare_context($virtual_msg)
 	{
@@ -81,7 +92,9 @@ class Mentionmem_Mention extends Mention_BoardAccess_Abstract
 	{
 		// Just using the plain text quick reply and not the editor
 		if ($simple)
+		{
 			loadJavascriptFile(array('jquery.atwho.min.js', 'jquery.caret.min.js', 'mentioning.js'));
+		}
 
 		loadCSSFile('jquery.atwho.css');
 
@@ -102,7 +115,9 @@ class Mentionmem_Mention extends Mention_BoardAccess_Abstract
 		global $context;
 
 		if (!empty($_REQUEST['uid']))
+		{
 			$context['member_ids'] = array_unique(array_map('intval', $_REQUEST['uid']));
+		}
 
 		$context['mentions_enabled'] = true;
 		$this->_setup_editor();
@@ -130,8 +145,11 @@ class Mentionmem_Mention extends Mention_BoardAccess_Abstract
 			foreach ($mentioned_members as $member)
 			{
 				$_POST['message'] = str_replace('@' . $member['real_name'], '[member=' . $member['id_member'] . ']' . $member['real_name'] . '[/member]', $_POST['message'], $replacements);
+
 				if ($replacements > 0)
+				{
 					$this->_actually_mentioned[] = $member['id_member'];
+				}
 			}
 		}
 	}
@@ -152,7 +170,9 @@ class Mentionmem_Mention extends Mention_BoardAccess_Abstract
 				'mentionmem',
 				$msgOptions['id'],
 				$posterOptions['id'],
-				array('id_members' => $this->_actually_mentioned, 'notifier_data' => $posterOptions, 'status' => $becomesApproved ? 'new' : 'unapproved')
+				array('id_members' => $this->_actually_mentioned, 'notifier_data' => $posterOptions, 'status' => $becomesApproved
+					? 'new'
+					: 'unapproved')
 			));
 		}
 	}
@@ -170,12 +190,16 @@ class Mentionmem_Mention extends Mention_BoardAccess_Abstract
 	/**
 	 * {@inheritdoc }
 	 */
-	public function getNotificationBody($frequency, $members)
+	public function getNotificationBody($lang_data, $members)
 	{
 		if (empty($lang_data['suffix']))
+		{
 			return $this->_getNotificationStrings('', array('subject' => static::$_type, 'body' => static::$_type), $members, $this->_task);
+		}
 		else
+		{
 			$keys = array('subject' => 'notify_mentionmem_' . $lang_data['subject'], 'body' => 'notify_mentionmem_' . $lang_data['body']);
+		}
 
 		$replacements = array(
 			'ACTIONNAME' => $this->_task['notifier_data']['name'],

@@ -16,6 +16,11 @@ namespace ElkArte\sources\subs\MentionType;
 if (!defined('ELK'))
 	die('No access...');
 
+/**
+ * Interface Mention_Type_Interface
+ * 
+ * @package ElkArte\sources\subs\MentionType
+ */
 interface Mention_Type_Interface
 {
 	/**
@@ -79,8 +84,9 @@ interface Mention_Type_Interface
 	/**
 	 * Used by the Notifications class to retrieve the notifications to send.
 	 *
-	 * @param string $frequency
+	 * @param array $lang_data
 	 * @param int[] $users
+	 * 
 	 * @return mixed[] array(array(
 	 *                  id_member_to (int),
 	 *                  email_address (text),
@@ -89,7 +95,7 @@ interface Mention_Type_Interface
 	 *                  last_id (int), ???
 	 *                ))
 	 */
-	public function getNotificationBody($frequency, $users);
+	public function getNotificationBody($lang_data, $users);
 
 	/**
 	 * The Notifications_Task contains few data that may be necessary for the processing

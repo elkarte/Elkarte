@@ -7,15 +7,24 @@
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
- * @version 1.0 Release Candidate 2
+ * @version 1.1 beta 1
  *
  */
 
 namespace ElkArte\sources\subs\MentionType;
 
 if (!defined('ELK'))
+{
 	die('No access...');
+}
 
+/**
+ * Class Quotedmem_Mention
+ *
+ * Handles mentioning of members whose messages has been quoted
+ *
+ * @package ElkArte\sources\subs\MentionType
+ */
 class Quotedmem_Mention extends Mention_BoardAccess_Abstract
 {
 	/**
@@ -35,10 +44,7 @@ class Quotedmem_Mention extends Mention_BoardAccess_Abstract
 			'display' => array('prepare_context' => array('virtual_msg')),
 		);
 
-		if (isset($methods[$controller]))
-			return $methods[$controller];
-		else
-			return array();
+		return isset($methods[$controller]) ? $methods[$controller] : array();
 	}
 
 	/**
@@ -46,8 +52,6 @@ class Quotedmem_Mention extends Mention_BoardAccess_Abstract
 	 * used to mark a mention as read.
 	 *
 	 * @param int $virtual_msg
-	 * @global $modSettings
-	 * @global $_REQUEST
 	 */
 	public function display_prepare_context($virtual_msg)
 	{
@@ -85,6 +89,7 @@ class Quotedmem_Mention extends Mention_BoardAccess_Abstract
 	protected function _sendNotification($text, $msg_id, $status, $posterOptions)
 	{
 		$quoted_names = $this->_findQuotedMembers($text);
+
 		if (!empty($quoted_names))
 		{
 			require_once(SUBSDIR . '/Members.subs.php');
@@ -107,6 +112,7 @@ class Quotedmem_Mention extends Mention_BoardAccess_Abstract
 	 * Finds member names in quote tags present in a passed string.
 	 *
 	 * @param string $text the string to look into for member names
+	 *
 	 * @return string[] An array of member names
 	 */
 	protected function _findQuotedMembers($text)
@@ -142,22 +148,29 @@ The following bbcode is for testing, to be moved to a test when ready.
 			foreach ($blocks as $block)
 			{
 				if (empty($block))
+				{
 					continue;
+				}
 
 				if (!$skip_next)
 				{
 					preg_match('~author=(.*?)(\]|date=|link=)~', $block, $match);
 
 					if (!empty($match[1]))
+					{
 						$quoted[] = trim($match[1]);
+					}
 				}
 
 				$skip_next = strpos($block, '[/quote]') === false;
 			}
+
 			return array_unique($quoted);
 		}
 		else
+		{
 			return false;
+		}
 	}
 
 	/**
@@ -166,18 +179,23 @@ The following bbcode is for testing, to be moved to a test when ready.
 	public static function getModules($modules)
 	{
 		$modules['mentions'] = array('post', 'display');
+
 		return $modules;
 	}
 
 	/**
 	 * {@inheritdoc }
 	 */
-	public function getNotificationBody($frequency, $members)
+	public function getNotificationBody($lang_data, $members)
 	{
 		if (empty($lang_data['suffix']))
+		{
 			return $this->_getNotificationStrings('', array('subject' => static::$_type, 'body' => static::$_type), $members, $this->_task);
+		}
 		else
+		{
 			$keys = array('subject' => 'notify_quotedmem_' . $lang_data['subject'], 'body' => 'notify_quotedmem_' . $lang_data['body']);
+		}
 
 		$replacements = array(
 			'ACTIONNAME' => $this->_task['notifier_data']['name'],
