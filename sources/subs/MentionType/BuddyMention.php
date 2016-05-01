@@ -14,8 +14,17 @@
 namespace ElkArte\sources\subs\MentionType;
 
 if (!defined('ELK'))
+{
 	die('No access...');
+}
 
+/**
+ * Class Buddy_Mention
+ * 
+ * Handles mentioning of buddies
+ *
+ * @package ElkArte\sources\subs\MentionType
+ */
 class Buddy_Mention extends Mention_Message_Abstract
 {
 	/**
@@ -32,7 +41,9 @@ class Buddy_Mention extends Mention_Message_Abstract
 		{
 			// To ensure it is not done twice
 			if ($row['mention_type'] != $type)
+			{
 				continue;
+			}
 
 			$mentions[$key]['message'] = $this->_replaceMsg($row);
 		}
@@ -46,9 +57,13 @@ class Buddy_Mention extends Mention_Message_Abstract
 	public function getNotificationBody($lang_data, $members)
 	{
 		if (empty($lang_data['subject']))
+		{
 			return $this->_getNotificationStrings('', array('subject' => static::$_type, 'body' => static::$_type), $members, $this->_task);
+		}
 		else
+		{
 			$keys = array('subject' => 'notify_new_buddy_' . $lang_data['subject'], 'body' => 'notify_new_buddy_' . $lang_data['body']);
+		}
 
 		$notifier = $this->_task->getNotifierData();
 		$replacements = array(
