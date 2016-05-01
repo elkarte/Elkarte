@@ -268,7 +268,7 @@ class Reports_Controller extends Action_Controller
 		global $txt;
 
 		// Get as much memory as possible as this can be big.
-		setMemoryLimit('256M');
+		detectServer()->setMemoryLimit('256M');
 
 		// Boards, first.
 		require_once(SUBSDIR . '/Boards.subs.php');

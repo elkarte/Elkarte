@@ -212,7 +212,7 @@ class Maintenance_Controller extends Action_Controller
 		$messages = countMessages();
 
 		// 256 is what we use in the backup script
-		setMemoryLimit('256M');
+		detectServer()->setMemoryLimit('256M');
 		$memory_limit = memoryReturnBytes(ini_get('memory_limit')) / (1024 * 1024);
 
 		// Zip limit is set to more or less 1/4th the size of the available memory * 1500

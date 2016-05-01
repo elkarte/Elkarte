@@ -53,7 +53,7 @@ class RepairBoards_Controller extends Action_Controller
 		require_once(SUBSDIR . '/RepairBoards.subs.php');
 
 		// Try secure more memory.
-		setMemoryLimit('128M');
+		detectServer()->setMemoryLimit('128M');
 
 		// Print out the top of the webpage.
 		$context['page_title'] = $txt['admin_repair'];

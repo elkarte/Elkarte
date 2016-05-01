@@ -188,7 +188,7 @@ function imageMemoryCheck($sizes)
 	// Doing the old 'set it and hope' way?
 	if (empty($modSettings['attachment_thumb_memory']))
 	{
-		setMemoryLimit('128M');
+		detectServer()->setMemoryLimit('128M');
 		return true;
 	}
 
@@ -200,7 +200,7 @@ function imageMemoryCheck($sizes)
 	$needed_memory = ($sizes[0] * $sizes[1] * 5);
 
 	// If we need more, lets try to get it
-	return setMemoryLimit($needed_memory, true);
+	return detectServer()->setMemoryLimit($needed_memory, true);
 }
 
 /**

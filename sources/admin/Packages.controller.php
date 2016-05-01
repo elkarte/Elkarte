@@ -1189,7 +1189,7 @@ class Packages_Controller extends Action_Controller
 		}
 
 		// This is a time and memory eating ...
-		setMemoryLimit('128M');
+		detectServer()->setMemoryLimit('128M');
 		setTimeLimit(600);
 
 		// Load up some FTP stuff.

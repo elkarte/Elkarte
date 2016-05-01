@@ -49,7 +49,7 @@ function DumpDatabase2()
 	$start_time = time();
 
 	// @todo ... fail on not getting the requested memory?
-	setMemoryLimit('256M');
+	detectServer()->setMemoryLimit('256M');
 	$memory_limit = memoryReturnBytes(ini_get('memory_limit')) / 4;
 	$current_used_memory = 0;
 	$db_backup = '';

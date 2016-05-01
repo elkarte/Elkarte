@@ -58,7 +58,7 @@ class Xml_Array
 	public function __construct($data, $auto_trim = false, $level = null, $is_clone = false)
 	{
 		// If we're using this try to get some more memory.
-		setMemoryLimit('128M');
+		detectServer()->setMemoryLimit('128M');
 
 		// Set the debug level.
 		$this->debug_level = $level !== null ? $level : error_reporting();
