@@ -313,7 +313,7 @@ class Drafts_PersonalMessage_Module implements ElkArte\sources\modules\Module_In
 	 */
 	public function before_sending($recipientList)
 	{
-		global $context, $user_info;
+		global $context, $user_info, $modSettings;
 
 		// Ajax calling
 		if (!isset($context['drafts_pm_save']))
