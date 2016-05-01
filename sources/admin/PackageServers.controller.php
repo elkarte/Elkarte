@@ -143,7 +143,7 @@ class PackageServers_Controller extends Action_Controller
 			Errors::instance()->fatal_lang_error('couldnt_connect', false);
 
 		// Might take some time.
-		@set_time_limit(60);
+		detectServer()->setTimeLimit(60);
 
 		// Fetch the package listing from the server and json decode
 		$listing = json_decode(fetch_web_data($url));

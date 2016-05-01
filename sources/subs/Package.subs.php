@@ -1731,7 +1731,7 @@ function parseModification($file, $testing = true, $undo = false, $theme_paths =
 {
 	global $txt, $modSettings;
 
-	setTimeLimit(600);
+	detectServer()->setTimeLimit(600);
 
 	$xml = new Xml_Array(strtr($file, array("\r" => '')));
 	$actions = array();
@@ -2510,7 +2510,7 @@ function package_create_backup($id = 'backup')
 		$output_file .= $output_ext;
 
 	// Buy some more time so we have enough to create this archive
-	setTimeLimit(300);
+	detectServer()->setTimeLimit(300);
 
 	// Set up the file output handle, try gzip first to save space
 	if (function_exists('gzopen'))

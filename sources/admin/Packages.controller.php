@@ -1190,7 +1190,7 @@ class Packages_Controller extends Action_Controller
 
 		// This is a time and memory eating ...
 		detectServer()->setMemoryLimit('128M');
-		setTimeLimit(600);
+		detectServer()->setTimeLimit(600);
 
 		// Load up some FTP stuff.
 		create_chmod_control();
@@ -2220,7 +2220,7 @@ function pausePermsSave()
 	global $context, $txt;
 
 	// Try get more time...
-	setTimeLimit(600);
+	detectServer()->setTimeLimit(600);
 
 	// Set up the items for the pause form
 	$context['sub_template'] = 'pause_action_permissions';

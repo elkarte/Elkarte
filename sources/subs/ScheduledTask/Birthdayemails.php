@@ -95,7 +95,7 @@ class Birthdayemails implements Scheduled_Task_Interface
 				sendmail($recp['email'], $emaildata['subject'], $emaildata['body'], null, null, false, 4);
 
 				// Try to stop a timeout, this would be bad...
-				setTimeLimit(300);
+				detectServer()->setTimeLimit(300);
 			}
 		}
 

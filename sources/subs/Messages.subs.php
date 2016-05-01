@@ -265,7 +265,7 @@ function removeNonTopicMessages($memID)
 	// This could take a while... but ya know it's gonna be worth it in the end.
 	while ($row = $db->fetch_assoc($request))
 	{
-		setTimeLimit(300);
+		detectServer()->setTimeLimit(300);
 		removeMessage($row['id_msg']);
 	}
 	$db->free_result($request);

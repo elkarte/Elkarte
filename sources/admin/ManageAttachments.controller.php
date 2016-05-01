@@ -810,7 +810,7 @@ class ManageAttachments_Controller extends Action_Controller
 			redirectexit('action=admin;area=manageattachments;sa=maintenance');
 
 		// Try give us a while to sort this out...
-		setTimeLimit(600);
+		detectServer()->setTimeLimit(600);
 
 		$this->step = $this->_req->getQuery('step', 'intval', 0);
 		$this->substep = $this->_req->getQuery('substep', 'intval', 0);
@@ -1627,7 +1627,7 @@ class ManageAttachments_Controller extends Action_Controller
 			$break = false;
 			while ($break === false)
 			{
-				setTimeLimit(300);
+				detectServer()->setTimeLimit(300);
 
 				// If limits are set, get the file count and size for the destination folder
 				if ($dir_files <= 0 && (!empty($modSettings['attachmentDirSizeLimit']) || !empty($modSettings['attachmentDirFileLimit'])))
@@ -1761,7 +1761,7 @@ class ManageAttachments_Controller extends Action_Controller
 		global $context, $txt, $time_start;
 
 		// Try get more time...
-		setTimeLimit(600);
+		detectServer()->setTimeLimit(600);
 
 		// Have we already used our maximum time?
 		if (microtime(true) - $time_start < 3 || $this->starting_substep == $this->substep)

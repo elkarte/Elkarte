@@ -427,7 +427,7 @@ class ManageSearch_Controller extends Action_Controller
 		global $modSettings, $context, $txt, $db_show_debug;
 
 		// Scotty, we need more time...
-		setTimeLimit(600);
+		detectServer()->setTimeLimit(600);
 
 		$context[$context['admin_menu_name']]['current_subsection'] = 'method';
 		$context['page_title'] = $txt['search_index_custom'];

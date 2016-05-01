@@ -570,7 +570,7 @@ class Maintenance_Controller extends Action_Controller
 			$start = $this->_req->query->start;
 
 			// Try for as much time as possible.
-			setTimeLimit(600);
+			detectServer()->setTimeLimit(600);
 
 			while ($start < $max_msgs)
 			{
@@ -709,7 +709,7 @@ class Maintenance_Controller extends Action_Controller
 		$context['sub_template'] = 'not_done';
 
 		// Try for as much time as possible.
-		setTimeLimit(600);
+		detectServer()->setTimeLimit(600);
 
 		// Step the number of topics at a time so things don't time out...
 		$this->max_topics = getMaxTopicID();
@@ -1406,7 +1406,7 @@ class Maintenance_Controller extends Action_Controller
 		$start = $this->_req->getQuery('start', 'intval', 0);
 
 		// Ask for some extra time, on big boards this may take a bit
-		setTimeLimit(600);
+		detectServer()->setTimeLimit(600);
 
 		// The functions here will come in handy
 		require_once(SUBSDIR . '/Maintenance.subs.php');

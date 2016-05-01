@@ -1646,7 +1646,7 @@ function pauseSignatureApplySettings($applied_sigs)
 	global $context, $txt, $sig_start;
 
 	// Try get more time...
-	setTimeLimit(600);
+	detectServer()->setTimeLimit(600);
 
 	// Have we exhausted all the time we allowed?
 	if (time() - array_sum(explode(' ', $sig_start)) < 3)

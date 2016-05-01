@@ -44,7 +44,7 @@ function DumpDatabase2()
 		$_REQUEST['data'] = true;
 
 	// Attempt to stop from dying...
-	@set_time_limit(600);
+	detectServer()->setTimeLimit(600);
 	$time_limit = ini_get('max_execution_time');
 	$start_time = time();
 
@@ -153,7 +153,7 @@ function DumpDatabase2()
 			elseif (!empty($time_limit) && (((int) $start_time + (int) $time_limit - 20) > time()))
 			{
 				$start_time = time();
-				@set_time_limit(150);
+				detectServer()->setTimeLimit(150);
 			}
 
 			// for the first pass, start the output with a custom line...

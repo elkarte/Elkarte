@@ -987,7 +987,7 @@ class Post_Controller extends Action_Controller
 
 		// At about this point, we're posting and that's that.
 		ignore_user_abort(true);
-		setTimeLimit(300);
+		detectServer()->setTimeLimit(300);
 
 		// Add special html entities to the subject, name, and email.
 		$_POST['subject'] = strtr(Util::htmlspecialchars($_POST['subject']), array("\r" => '', "\n" => '', "\t" => ''));
