@@ -64,10 +64,12 @@ function getMessageIcons($board_id)
 	// Otherwise load the icons, and check we give the right image too...
 	else
 	{
-		if (!Cache::instance()->getVar($temp, 'posting_icons-' . $board_id, 480))
+		$icons = array();
+		if (!Cache::instance()->getVar($icons, 'posting_icons-' . $board_id, 480))
 		{
 			$icon_data = $db->fetchQuery('
-				SELECT title, filename
+				SELECT 
+					title, filename
 				FROM {db_prefix}message_icons
 				WHERE id_board IN (0, {int:board_id})
 				ORDER BY icon_order',
@@ -75,7 +77,6 @@ function getMessageIcons($board_id)
 					'board_id' => $board_id,
 				)
 			);
-
 			$icons = array();
 			foreach ($icon_data as $icon)
 			{
@@ -89,8 +90,6 @@ function getMessageIcons($board_id)
 
 			Cache::instance()->put('posting_icons-' . $board_id, $icons, 480);
 		}
-		else
-			$icons = $temp;
 	}
 
 	return array_values($icons);

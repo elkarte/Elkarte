@@ -1170,11 +1170,13 @@ function basicWatchedUsers()
 
 	$db = database();
 
+	$watched_users = array();
 	if (!Cache::instance()->getVar($watched_users, 'recent_user_watches', 240))
 	{
 		$modSettings['warning_watch'] = empty($modSettings['warning_watch']) ? 1 : $modSettings['warning_watch'];
 		$request = $db->query('', '
-			SELECT id_member, real_name, last_login
+			SELECT 
+				id_member, real_name, last_login
 			FROM {db_prefix}members
 			WHERE warning >= {int:warning_watch}
 			ORDER BY last_login DESC
@@ -1183,7 +1185,6 @@ function basicWatchedUsers()
 				'warning_watch' => $modSettings['warning_watch'],
 			)
 		);
-		$watched_users = array();
 		while ($row = $db->fetch_assoc($request))
 			$watched_users[] = $row;
 		$db->free_result($request);
@@ -1210,11 +1211,13 @@ function reportedPosts($show_pms = false)
 	// Got the info already?
 	$cachekey = md5(serialize($user_info['mod_cache']['bq']));
 
+	$reported_posts = array();
 	if (!Cache::instance()->getVar($reported_posts, 'reported_posts_' . $cachekey, 90))
 	{
 		// By George, that means we in a position to get the reports, jolly good.
 		$request = $db->query('', '
-			SELECT lr.id_report, lr.id_msg, lr.id_topic, lr.id_board, lr.id_member, lr.subject,
+			SELECT 
+				lr.id_report, lr.id_msg, lr.id_topic, lr.id_board, lr.id_member, lr.subject,
 				lr.num_reports, IFNULL(mem.real_name, lr.membername) AS author_name,
 				IFNULL(mem.id_member, 0) AS id_author
 			FROM {db_prefix}log_reported AS lr
@@ -1231,9 +1234,10 @@ function reportedPosts($show_pms = false)
 				'rep_type' => $show_pms ? array('pm') : array('msg'),
 			)
 		);
-		$reported_posts = array();
 		while ($row = $db->fetch_assoc($request))
+		{
 			$reported_posts[] = $row;
+		}
 		$db->free_result($request);
 
 		// Cache it.
@@ -1273,10 +1277,12 @@ function countModeratorNotes()
 {
 	$db = database();
 
+	$moderator_notes_total = 0;
 	if (!Cache::instance()->getVar($moderator_notes_total, 'moderator_notes_total', 240))
 	{
 		$request = $db->query('', '
-			SELECT COUNT(*)
+			SELECT 
+				COUNT(*)
 			FROM {db_prefix}log_comments AS lc
 				LEFT JOIN {db_prefix}members AS mem ON (mem.id_member = lc.id_member)
 			WHERE lc.comment_type = {string:modnote}',

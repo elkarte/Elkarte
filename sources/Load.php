@@ -2242,9 +2242,9 @@ function getBoardParents($id_parent)
 	$cache = Cache::instance();
 
 	// First check if we have this cached already.
+	$boards = array();
 	if (!$cache->getVar($boards, 'board_parents-' . $id_parent, 480))
 	{
-		$boards = array();
 		$original_parent = $id_parent;
 
 		// Loop while the parent is non-zero.
@@ -2264,7 +2264,9 @@ function getBoardParents($id_parent)
 			);
 			// In the EXTREMELY unlikely event this happens, give an error message.
 			if ($db->num_rows($result) == 0)
+			{
 				Errors::instance()->fatal_lang_error('parent_not_found', 'critical');
+			}
 			while ($row = $db->fetch_assoc($result))
 			{
 				if (!isset($boards[$row['id_board']]))
@@ -2277,6 +2279,7 @@ function getBoardParents($id_parent)
 						'moderators' => array()
 					);
 				}
+
 				// If a moderator exists for this board, add that moderator for all children too.
 				if (!empty($row['id_moderator']))
 					foreach ($boards as $id => $dummy)
