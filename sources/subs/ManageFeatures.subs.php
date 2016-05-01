@@ -831,7 +831,7 @@ function scanFileSystemForControllers($iterator, $namespace = '')
 				continue;
 		}
 
-		if (in_array('Action_Controller', class_implements($class_name)) && $class_name::canFrontPage())
+		if (is_subclass_of($class_name, 'Action_Controller') && $class_name::canFrontPage())
 		{
 			// Temporary
 			if (!isset($txt[$class_name]))
