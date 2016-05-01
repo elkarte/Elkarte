@@ -2240,11 +2240,12 @@ function getBoardParents($id_parent)
 
 	$db = database();
 	$cache = Cache::instance();
+	$boards = array();
 
 	// First check if we have this cached already.
-	$boards = array();
 	if (!$cache->getVar($boards, 'board_parents-' . $id_parent, 480))
 	{
+		$boards = array();
 		$original_parent = $id_parent;
 
 		// Loop while the parent is non-zero.
