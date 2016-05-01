@@ -16,7 +16,9 @@
  */
 
 if (!defined('ELK'))
+{
 	die('No access...');
+}
 
 /**
  * Class Cache - Methods that deal with getting and setting cache values.
@@ -61,7 +63,7 @@ class Cache
 
 	/**
 	 * The caching object
-	 * @var object
+	 * @var object|boolean
 	 */
 	protected $_cache_obj = null;
 
@@ -84,21 +86,31 @@ class Cache
 
 		// If the cache is disabled just go out
 		if (!$this->isEnabled())
+		{
 			return;
+		}
 
+		// Set the cache options
 		$this->_options = $options;
 
+		// Default to file based so we can slow everything down :P
 		if (empty($accelerator))
+		{
 			$accelerator = 'filebased';
+		}
 
 		$this->_accelerator = $accelerator;
 
 		$this->_init();
 	}
 
+	/**
+	 * Initialize a cache class and call its initialization method
+	 */
 	protected function _init()
 	{
 		$cache_class = '\\ElkArte\\sources\\subs\\CacheMethod\\' . ucfirst($this->_accelerator);
+
 		if (class_exists($cache_class))
 		{
 			$this->_cache_obj = new $cache_class($this->_options);
@@ -125,6 +137,7 @@ class Cache
 	 * @param string $function function to call
 	 * @param mixed[] $params parameters sent to the function
 	 * @param int $level = 1
+	 *
 	 * @return string
 	 */
 	public function quick_get($key, $file, $function, $params, $level = 1)
@@ -144,12 +157,16 @@ class Cache
 			$cache_block = call_user_func_array($function, $params);
 
 			if ($this->level >= $level)
+			{
 				$this->put($key, $cache_block, $cache_block['expires'] - time());
+			}
 		}
 
 		// Some cached data may need a freshening up after retrieval.
 		if (!empty($cache_block['post_retri_eval']))
+		{
 			eval($cache_block['post_retri_eval']);
+		}
 
 		call_integration_hook('post_cache_quick_get', array($cache_block));
 
@@ -178,8 +195,11 @@ class Cache
 		global $db_show_debug;
 
 		if (!$this->isEnabled())
+		{
 			return;
+		}
 
+		// If we are showing debug information we have some data to collect
 		if ($db_show_debug === true)
 		{
 			$cache_hit = array(
@@ -197,6 +217,7 @@ class Cache
 
 		call_integration_hook('cache_put_data', array($key, $value, $ttl));
 
+		// Show the debug cache hit information
 		if ($db_show_debug === true)
 		{
 			$cache_hit['t'] = microtime(true) - $st;
@@ -218,7 +239,9 @@ class Cache
 		global $db_show_debug;
 
 		if (!$this->isEnabled())
+		{
 			return;
+		}
 
 		if ($db_show_debug === true)
 		{
@@ -250,11 +273,13 @@ class Cache
 	 * @param mixed $var The variable to be assigned the result
 	 * @param string $key
 	 * @param int $ttl
+	 *
 	 * @return bool if it was a hit
 	 */
 	public function getVar(&$var, $key, $ttl = 120)
 	{
 		$var = $this->get($key, $ttl);
+
 		return !$this->isMiss();
 	}
 
@@ -273,7 +298,9 @@ class Cache
 	public function clean($type = '')
 	{
 		if (!$this->isEnabled())
+		{
 			return;
+		}
 
 		$this->_cache_obj->clean($type);
 
@@ -291,14 +318,17 @@ class Cache
 	 * Enable or disable caching
 	 *
 	 * @param bool $enable
+	 *
 	 * @return $this
 	 */
 	public function enable($enable)
 	{
+		// Enable it if we can
 		if ($this->enabled === false && $this->_cache_obj === null)
 		{
 			$this->_init();
 		}
+
 		$this->enabled = (bool) $enable;
 
 		return $this;
@@ -317,6 +347,7 @@ class Cache
 	 * Set the caching level. Setting it to <= 0 disables caching
 	 *
 	 * @param int $level
+	 *
 	 * @return $this
 	 */
 	public function setLevel($level)
@@ -369,6 +400,7 @@ class Cache
 	 * Get the key for the cache.
 	 *
 	 * @param string $key
+	 *
 	 * @return string
 	 */
 	protected function _key($key)
@@ -404,6 +436,7 @@ class Cache
 					'cache_password' => $cache_password,
 				);
 			}
+
 			Elk_Autoloader::getInstance()->register(SUBSDIR . '/CacheMethod', '\\ElkArte\\sources\\subs\\CacheMethod');
 
 			self::$_instance = new Cache($cache_enable, $cache_accelerator, $options);

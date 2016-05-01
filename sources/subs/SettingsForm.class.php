@@ -509,7 +509,7 @@ class Settings_Form
 	 * Helper method for saving database settings.
 	 *
 	 * @param mixed[] $config_vars
-	 * @param mixed[] $post_object
+	 * @param mixed[]|object $post_object
 	 */
 	public static function save_db(&$config_vars, $post_object = null)
 	{
