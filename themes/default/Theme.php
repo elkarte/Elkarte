@@ -996,7 +996,7 @@ class Theme extends \Theme
 						),
 						'drafts' => array(
 							'title' => $txt['mydrafts'],
-							'href' => $scripturl . '?action=pm;sa=showrafts',
+							'href' => $scripturl . '?action=profile;area=showdrafts',
 							'show' => !empty($modSettings['drafts_enabled']) && !empty($modSettings['drafts_post_enabled']) && allowedTo('post_draft'),
 						),
 						'forumprofile' => array(
