@@ -1017,7 +1017,7 @@ class Theme extends \Theme
 					'title' => $txt['pm_short'],
 					'counter' => 'unread_messages',
 					'href' => $scripturl . '?action=pm',
-					'data-icon' => ($context['user']['unread_messages'] ? 'comment' : 'comment-blank'),
+					'data-icon' => ($context['user']['unread_messages'] ? 'envelope' : 'envelope-blank'),
 					'show' => $context['allow_pm'],
 					'sub_buttons' => array(
 						'pm_read' => array(
