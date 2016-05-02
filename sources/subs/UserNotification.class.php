@@ -13,15 +13,8 @@
  *
  */
 
-class User_Notification
+class User_Notification extends AbstractModel
 {
-	/**
-	 * Hold copy of $modSettings for the class
-	 * 
-	 * @var mixed[]
-	 */
-	protected $_modSettings;
-
 	/**
 	 * All the shapes the icon can be.
 	 *
@@ -46,13 +39,10 @@ class User_Notification
 
 	/**
 	 * Construct, just load the language file.
-	 *
-	 * @param mixed[] $modSettings
 	 */
-	public function __construct($modSettings)
+	public function __construct()
 	{
-		$this->_modSettings = $modSettings;
-
+		parent::__construct();
 		loadLanguage('UserNotifications');
 	}
 

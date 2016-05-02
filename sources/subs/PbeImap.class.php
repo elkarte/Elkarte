@@ -16,7 +16,7 @@
  * Grabs unread messages from an imap account and saves them as .eml files
  * Passes any new messages found to the postby email function for processing
  */
-class Pbe_Imap
+class Pbe_Imap extends AbstractModel
 {
 	/**
 	 * The name of the imap host
@@ -65,14 +65,9 @@ class Pbe_Imap
 	protected $_imap_server = '';
 
 	/**
-	 * Holds modSettings for the class
-	 */
-	protected $_modSettings;
-
-	/**
 	 * The constructor, prepares few variables.
 	 *
-	 * @param mixed[] $modSettings - May contain few settings:
+	 * $modSettings - May contain a few needed settings:
 	 *                 - maillist_imap_host
 	 *                 - maillist_imap_uid
 	 *                 - maillist_imap_pass
@@ -80,19 +75,19 @@ class Pbe_Imap
 	 *                 - maillist_imap_connection
 	 *                 - maillist_imap_delete
 	 */
-	public function __construct($modSettings)
+	public function __construct()
 	{
-		$this->_modSettings = $modSettings;
+		parent::__construct();
 
 		// Values used for the connection
-		$this->_hostname = $this->_load_modsettings('maillist_imap_host');
-		$this->_username = $this->_load_modsettings('maillist_imap_uid');
-		$this->_password = $this->_load_modsettings('maillist_imap_pass');
-		$this->_mailbox = $this->_load_modsettings('maillist_imap_mailbox');
-		$this->_type = $this->_load_modsettings('maillist_imap_connection');
+		$this->_hostname = $this->_loadModsettings('maillist_imap_host', '');
+		$this->_username = $this->_loadModsettings('maillist_imap_uid', '');
+		$this->_password = $this->_loadModsettings('maillist_imap_pass', '');
+		$this->_mailbox = $this->_loadModsettings('maillist_imap_mailbox', '');
+		$this->_type = $this->_loadModsettings('maillist_imap_connection', '');
 
 		// Values used for options
-		$this->_delete = (bool) $this->_load_modsettings('maillist_imap_delete');
+		$this->_delete = (bool) $this->_loadModsettings('maillist_imap_delete');
 		$this->_is_gmail = strpos($this->_hostname, '.gmail.') !== false;
 
 		// I suppose that without this information we can't do anything.
@@ -104,18 +99,6 @@ class Pbe_Imap
 		{
 			return $this;
 		}
-	}
-
-	/**
-	 * Return modSetting values as requested
-	 *
-	 * @param string $value
-	 *
-	 * @return mixed|string
-	 */
-	private function _load_modsettings($value)
-	{
-		return !empty($this->_modSettings[$value]) ? $this->_modSettings[$value] : '';
 	}
 
 	/**
