@@ -5453,6 +5453,10 @@ a.help .icon {
 /* using 100% = 1 em ~= 16px ~= 14pt for our em sizing .. 64em*16px = 1024 etc. */
 
 @media screen and (max-width: 90em) {
+	.icon-menu {
+		display: none;
+	}
+
 	.icon-menu.i-account {
 		display: inline-block;
 	}
@@ -5461,10 +5465,16 @@ a.help .icon {
 /* This one does 1024 screens at default font size. */
 @media screen and (max-width: 64em) {
 	.icon-menu {
-		display: none;
+		display: inline-block;
+		margin: .1em;
+		padding: .1em;
+		border: .25em solid;
+		border-radius: .25em;
+		vertical-align: middle;
 	}
+
 	.button_title {
-		padding: 0 5px;
+		display: none;
 	}
 
 	.topic_latest {
@@ -5521,18 +5531,6 @@ a.help .icon {
 
 /* This one does 800 screens at default font size. */
 @media screen and (max-width: 50em) {
-	.icon-menu {
-		display: inline-block;
-		margin: .1em;
-		padding: .1em;
-		border: .25em solid;
-		border-radius: .25em;
-		vertical-align: middle;
-	}
-	.button_title {
-		display: none;
-	}
-	
 	dd input, dd select, dd textarea {
 		max-width: 85% !important;
 		width: 85% !important;
