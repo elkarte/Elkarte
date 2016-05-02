@@ -113,6 +113,7 @@ $txt['pm_menu_send'] = 'Send a message';
 $txt['account_short'] = 'My Account';
 // Sub menu labels
 $txt['profile'] = 'Profile';
+$txt['mydrafts'] = 'My Drafts';
 $txt['summary'] = 'Summary';
 $txt['theme'] = 'Look and Layout';
 $txt['account'] = 'Account Settings';

@@ -994,6 +994,11 @@ class Theme extends \Theme
 							'href' => $scripturl . '?action=profile;area=account',
 							'show' => allowedTo(array('profile_identity_any', 'profile_identity_own', 'manage_membergroups')),
 						),
+						'drafts' => array(
+							'title' => $txt['mydrafts'],
+							'href' => $scripturl . '?action=pm;sa=showrafts',
+							'show' => !empty($modSettings['drafts_enabled']) && !empty($modSettings['drafts_post_enabled']) && allowedTo('post_draft'),
+						),
 						'forumprofile' => array(
 							'title' => $txt['forumprofile'],
 							'href' => $scripturl . '?action=profile;area=forumprofile',
