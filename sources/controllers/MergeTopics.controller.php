@@ -188,7 +188,8 @@ class MergeTopics_Controller extends Action_Controller
 		// If we didn't get any topics then they've been messing with unapproved stuff.
 		if ($merger->hasErrors())
 		{
-			Errors::instance()->fatal_lang_error($merger->firstError());
+			$error = $merger->firstError();
+			Errors::instance()->fatal_lang_error($error[0], $error[1]);
 		}
 
 		// The parameters of action_mergeExecute were set, so this must've been an internal call.

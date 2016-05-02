@@ -135,7 +135,7 @@ class TopicsMerge
 	/**
 	 * The first error occurred
 	 *
-	 * @return bool|mixed[]
+	 * @return array|string
 	 */
 	public function firstError()
 	{
@@ -147,7 +147,7 @@ class TopicsMerge
 		}
 		else
 		{
-			return false;
+			return '';
 		}
 	}
 
@@ -163,7 +163,8 @@ class TopicsMerge
 		if (count($this->_polls) > 1)
 		{
 			$request = $this->_db->query('', '
-				SELECT t.id_topic, t.id_poll, m.subject, p.question
+				SELECT 
+					t.id_topic, t.id_poll, m.subject, p.question
 				FROM {db_prefix}polls AS p
 					INNER JOIN {db_prefix}topics AS t ON (t.id_poll = p.id_poll)
 					INNER JOIN {db_prefix}messages AS m ON (m.id_msg = t.id_first_msg)
@@ -243,7 +244,8 @@ class TopicsMerge
 
 		// Get the first and last message and the number of messages....
 		$request = $this->_db->query('', '
-			SELECT approved, MIN(id_msg) AS first_msg, MAX(id_msg) AS last_msg, COUNT(*) AS message_count
+			SELECT 
+				approved, MIN(id_msg) AS first_msg, MAX(id_msg) AS last_msg, COUNT(*) AS message_count
 			FROM {db_prefix}messages
 			WHERE id_topic IN ({array_int:topics})
 			GROUP BY approved
@@ -254,6 +256,7 @@ class TopicsMerge
 		);
 		$topic_approved = 1;
 		$first_msg = 0;
+		$num_replies = 0;
 		while ($row = $this->_db->fetch_assoc($request))
 		{
 			// If this is approved, or is fully unapproved.
@@ -309,7 +312,8 @@ class TopicsMerge
 
 		// Get the member ID of the first and last message.
 		$request = $this->_db->query('', '
-			SELECT id_member
+			SELECT 
+				id_member
 			FROM {db_prefix}messages
 			WHERE id_msg IN ({int:first_msg}, {int:last_msg})
 			ORDER BY id_msg
@@ -388,6 +392,7 @@ class TopicsMerge
 		// Update all the statistics.
 		require_once(SUBSDIR . '/Topic.subs.php');
 		updateTopicStats();
+
 		require_once(SUBSDIR . '/Messages.subs.php');
 		updateSubjectStats($id_topic, $target_subject);
 		updateLastMessages($this->boards);
@@ -444,7 +449,7 @@ class TopicsMerge
 		{
 			$this->_db->free_result($request);
 
-			$this->_errors[] = 'no_topic_id';
+			$this->_errors[] = array('no_topic_id', true);
 
 			return false;
 		}
@@ -515,7 +520,9 @@ class TopicsMerge
 
 		// If we didn't get any topics then they've been messing with unapproved stuff.
 		if (empty($this->topic_data))
-			$this->_errors[] = 'no_topic_id';
+		{
+			$this->_errors[] = array('no_topic_id', true);
+		}
 
 		return true;
 	}
