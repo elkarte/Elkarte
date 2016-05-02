@@ -53,10 +53,10 @@
 		document.getElementById('throbber').style.display = 'inline';
 		this.opts._bInDraftMode = true;
 
-		// Get all the form elements that we want to save
+		// Create a clone form to populate
 		var $aForm = $('#postmodify').clone();
 
-		$aForm.find("input[name='message']").val(sPostdata.replace(/&#/g, "&#38;#").php_urlencode());
+		$aForm.find("textarea[name='message']").val(sPostdata.replace(/&#/g, "&#38;#"));
 		$aForm.append($('<input />').attr('name', 'save_draft').val(true));
 		$aForm.append($('<input />').attr('name', 'autosave').val(true));
 
@@ -84,8 +84,10 @@
 		if (this.opts._bInDraftMode === true)
 			this.draftCancel();
 
-		// Nothing to save
+		// Get the editor data
 		var sPostdata = editor.val();
+
+		// Nothing to save
 		if (isEmptyText(sPostdata))
 			return false;
 
@@ -97,11 +99,11 @@
 		var aTo = this.draftGetRecipient('recipient_to[]'),
 			aBcc = this.draftGetRecipient('recipient_bcc[]');
 
-		// Get all the form elements that we want to save
+		// Clone the form, we will use this to send
 		var $aForm = $('#pmFolder').clone();
 
-		$aForm.find("input[name='message']").val(sPostdata.replace(/&#/g, "&#38;#").php_urlencode());
-		$aForm.find("input[name='subject']").val($aForm.find("input[name='subject']").val().replace(/&#/g, "&#38;#").php_urlencode());
+		$aForm.find("textarea[name='message']").val(sPostdata.replace(/&#/g, "&#38;#"));
+		$aForm.find("input[name='subject']").val($aForm.find("input[name='subject']").val().replace(/&#/g, "&#38;#"));
 		$aForm.find("input[name='replied_to']").val(parseInt($aForm.find("input[name='replied_to']").val()));
 		if ($aForm.find("input[name='id_pm_draft']").length == 1)
 		{
