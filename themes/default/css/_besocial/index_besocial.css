@@ -1603,7 +1603,7 @@ a.help .icon {
 /* Communication icons */
 
 .i-envelope::before {
-	content: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='%231ab31a' viewBox='0 0 3584 3584'%3E%3Cpath d='M3584 1420v1588q0 132-94 226t-226 94h-2944q-132 0-226-94t-94-226v-1588q88 98 202 174 724 492 994 690 114 84 185 131t189 96 220 49h2 2q102 0 220-49t189-96 185-131q340-246 996-690 114-78 200-174z m0-588q0 158-98 302t-244 246q-752 522-936 650-20 14-85 61t-108 76-104 65-115 54-100 18h-2-2q-46 0-100-18t-115-54-104-65-108-76-85-61q-182-128-524-365t-410-285q-124-84-234-231t-110-273q0-156 83-260t237-104h2944q130 0 225 94t95 226z'/%3E%3C/svg%3E");
+	content: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='orange' viewBox='0 0 3584 3584'%3E%3Cpath d='M3584 1420v1588q0 132-94 226t-226 94h-2944q-132 0-226-94t-94-226v-1588q88 98 202 174 724 492 994 690 114 84 185 131t189 96 220 49h2 2q102 0 220-49t189-96 185-131q340-246 996-690 114-78 200-174z m0-588q0 158-98 302t-244 246q-752 522-936 650-20 14-85 61t-108 76-104 65-115 54-100 18h-2-2q-46 0-100-18t-115-54-104-65-108-76-85-61q-182-128-524-365t-410-285q-124-84-234-231t-110-273q0-156 83-260t237-104h2944q130 0 225 94t95 226z'/%3E%3C/svg%3E");
 }
 
 .i-envelope-blank::before {
@@ -1892,19 +1892,19 @@ a.help .icon {
 	}
 }
 
-/* This one does 800 screens at default font size. */
-@media screen and (min-width: 50em) {
-	#menu_nav .listlevel1.subsections > a:before {
-		float: left;
-		margin: -1px 5px 0 0;
-		color: #43A8DA;
-		content: "\f0d7";
-		font-size: 1.2em;
-		font-family: "FontAwesome";
+/* This one seems best to switch between text and icons for this variant  */
+@media screen and (min-max: 55em) {
+	.icon-menu {
+		display: inline-block;
+		margin: .1em;
+		padding: .1em;
+		border: .25em solid;
+		border-radius: .25em;
+		vertical-align: middle;
 	}
 
-	#menu_nav .listlevel1 {
-		margin: 1px 2px 0;
+	.button_title {
+		display: none;
 	}
 }
 

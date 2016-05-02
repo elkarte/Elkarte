@@ -210,7 +210,7 @@ class Auth_Controller extends Action_Controller
 		$user_settings = loadExistingMember($_POST['user']);
 
 		// User using 2FA for login? Let's validate the token...
-		if (!empty($user_settings['enable_otp']) && empty($_POST['otp_token']))
+		if (!empty($modSettings['enableOTP']) &&!empty($user_settings['enable_otp']) && empty($_POST['otp_token']))
 		{
 			$context['login_errors'] = array($txt['otp_required']);
 			return false;
@@ -221,11 +221,17 @@ class Auth_Controller extends Action_Controller
 			require_once(EXTDIR . '/GoogleAuthenticator.php');
 			$ga = New GoogleAuthenticator();
 
-			$ga->GetCode($user_settings['otp_secret'], $_POST['otp_timestamp']);
+			$ga->GetCode($user_settings['otp_secret']);
 			$checkResult = $ga->verifyCode($user_settings['otp_secret'], $_POST['otp_token'], 2);
 			if (!$checkResult)
 			{
 				$context['login_errors'] = array($txt['invalid_otptoken']);
+				return false;
+			}
+			// OTP already used? Sorry, but this is a ONE TIME password..
+			if ($user_settings['otp_used'] == $_POST['otp_token'])
+			{
+				$context['login_errors'] = array($txt['otp_used']);
 				return false;
 			}
 		}
@@ -349,6 +355,12 @@ class Auth_Controller extends Action_Controller
 			updateMemberData($user_settings['id_member'], array('password_salt' => $user_settings['password_salt']));
 		}
 
+		// Let's track the last used one-time password.
+		if (!empty($_POST['otp_token']))
+		{
+			require_once(SUBSDIR . '/Members.subs.php');
+			updateMemberData($user_settings['id_member'], array('otp_used' => (int) $_POST['otp_token']));
+		}
 		// Check their activation status.
 		if (!checkActivation())
 			return false;

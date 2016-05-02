@@ -1651,6 +1651,7 @@ class InstallInstructions_install_1_1
 				array('name' => 'receive_from',         'type' => 'tinyint', 'size' => 4, 'unsigned' => true, 'default' => 1),
 				array('name' => 'otp_secret',           'type' => 'varchar', 'size' => 16, 'default' => ''),
 				array('name' => 'enable_otp',           'type' => 'tinyint', 'size' => 1, 'default' => 0),
+				array('name' => 'otp_used',             'type' => 'int', 'size' => 6, 'default' => 0),
 			),
 			array(
 				array('name' => 'id_member',            'columns' => array('id_member'), 'type' => 'primary'),

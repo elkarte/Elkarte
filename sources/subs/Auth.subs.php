@@ -836,7 +836,7 @@ function loadExistingMember($name, $is_id = false)
 	{
 		$request = $db->query('', '
 			SELECT passwd, id_member, id_group, lngfile, is_activated, email_address, additional_groups, member_name, password_salt,
-				openid_uri, passwd_flood, otp_secret, enable_otp
+				openid_uri, passwd_flood, otp_secret, enable_otp, otp_used
 			FROM {db_prefix}members
 			WHERE id_member = {int:id_member}
 			LIMIT 1',
@@ -850,7 +850,7 @@ function loadExistingMember($name, $is_id = false)
 		// Try to find the user, assuming a member_name was passed...
 		$request = $db->query('', '
 			SELECT passwd, id_member, id_group, lngfile, is_activated, email_address, additional_groups, member_name, password_salt,
-				openid_uri, passwd_flood, otp_secret, enable_otp
+				openid_uri, passwd_flood, otp_secret, enable_otp, otp_used
 			FROM {db_prefix}members
 			WHERE ' . (defined('DB_CASE_SENSITIVE') ? 'LOWER(member_name) = LOWER({string:user_name})' : 'member_name = {string:user_name}') . '
 			LIMIT 1',
@@ -865,7 +865,7 @@ function loadExistingMember($name, $is_id = false)
 
 			$request = $db->query('', '
 				SELECT passwd, id_member, id_group, lngfile, is_activated, email_address, additional_groups, member_name, password_salt, openid_uri,
-				passwd_flood, otp_secret, enable_otp
+				passwd_flood, otp_secret, enable_otp, otp_used
 				FROM {db_prefix}members
 				WHERE email_address = {string:user_name}
 				LIMIT 1',

@@ -994,6 +994,11 @@ class Theme extends \Theme
 							'href' => $scripturl . '?action=profile;area=account',
 							'show' => allowedTo(array('profile_identity_any', 'profile_identity_own', 'manage_membergroups')),
 						),
+						'drafts' => array(
+							'title' => $txt['mydrafts'],
+							'href' => $scripturl . '?action=profile;area=showdrafts',
+							'show' => !empty($modSettings['drafts_enabled']) && !empty($modSettings['drafts_post_enabled']) && allowedTo('post_draft'),
+						),
 						'forumprofile' => array(
 							'title' => $txt['forumprofile'],
 							'href' => $scripturl . '?action=profile;area=forumprofile',
@@ -1017,7 +1022,7 @@ class Theme extends \Theme
 					'title' => $txt['pm_short'],
 					'counter' => 'unread_messages',
 					'href' => $scripturl . '?action=pm',
-					'data-icon' => ($context['user']['unread_messages'] ? 'comment' : 'comment-blank'),
+					'data-icon' => ($context['user']['unread_messages'] ? 'envelope' : 'envelope-blank'),
 					'show' => $context['allow_pm'],
 					'sub_buttons' => array(
 						'pm_read' => array(
