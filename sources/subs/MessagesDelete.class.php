@@ -804,8 +804,10 @@ class MessagesDelete
 		{
 			if (empty($board) || $row['id_board'] != $board)
 			{
+				$remove_own = false;
 				$remove_any = boardsAllowedTo('remove_any');
 				$remove_any = in_array(0, $remove_any) || in_array($row['id_board'], $remove_any);
+
 				if (!$remove_any)
 				{
 					$remove_own = boardsAllowedTo('remove_own');
