@@ -228,6 +228,12 @@ class Auth_Controller extends Action_Controller
 				$context['login_errors'] = array($txt['invalid_otptoken']);
 				return false;
 			}
+			// OTP already used? Sorry, but this is a ONE TIME password..
+			if ($user_settings['otp_used'] == $_POST['otp_token'])
+			{
+				$context['login_errors'] = array($txt['otp_used']);
+				return false;
+			}
 		}
 
 		// Let them try again, it didn't match anything...
@@ -349,6 +355,12 @@ class Auth_Controller extends Action_Controller
 			updateMemberData($user_settings['id_member'], array('password_salt' => $user_settings['password_salt']));
 		}
 
+		// Let's track the last used one-time password.
+		if (!empty($_POST['otp_token']))
+		{
+			require_once(SUBSDIR . '/Members.subs.php');
+			updateMemberData($user_settings['id_member'], array('otp_used' => $_POST['otp_token']));
+		}
 		// Check their activation status.
 		if (!checkActivation())
 			return false;

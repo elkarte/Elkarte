@@ -115,6 +115,16 @@ class UpgradeInstructions_upgrade_1_1
 						array(),
 						'ignore'
 					);
+					$db_table->db_add_column('{db_prefix}members',
+						array(
+							'name' => 'otp_used',
+							'type' => 'int',
+							'size' => 6,
+							'default' => 0,
+						),
+						array(),
+						'ignore'
+					);
 				}
 			)
 		);

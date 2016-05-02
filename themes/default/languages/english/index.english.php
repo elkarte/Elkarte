@@ -923,5 +923,6 @@ $txt['like_post_stats'] = 'Like stats';
 $txt['otp_token'] = 'Time-based One-time Password';
 $txt['otp_enabled'] = 'Enable two factor authentication';
 $txt['invalid_otptoken'] = 'Time-based One-time Password is invalid';
+$txt['otp_used'] = 'Time-based One-time Password already used.<br /> Please wait a moment and use the next code.';
 $txt['otp_generate'] = 'Generate';
 $txt['otp_show_qr'] = 'Show QR-Code';
