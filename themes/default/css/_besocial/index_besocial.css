@@ -1892,19 +1892,19 @@ a.help .icon {
 	}
 }
 
-/* This one does 800 screens at default font size. */
-@media screen and (min-width: 50em) {
-	#menu_nav .listlevel1.subsections > a:before {
-		float: left;
-		margin: -1px 5px 0 0;
-		color: #43A8DA;
-		content: "\f0d7";
-		font-size: 1.2em;
-		font-family: "FontAwesome";
+/* This one seems best to switch between text and icons for this variant  */
+@media screen and (min-max: 55em) {
+	.icon-menu {
+		display: inline-block;
+		margin: .1em;
+		padding: .1em;
+		border: .25em solid;
+		border-radius: .25em;
+		vertical-align: middle;
 	}
 
-	#menu_nav .listlevel1 {
-		margin: 1px 2px 0;
+	.button_title {
+		display: none;
 	}
 }
 

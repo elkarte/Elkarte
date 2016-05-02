@@ -2243,17 +2243,19 @@ a.helpicon:hover, a > .iconline:hover, a > .icoffline:hover {
 		border-color: #27A348;
 	}
 
-	#main_menu .linklevel1.active, #main_menu .linklevel1.active:hover {
-		border-color: transparent;
-		background: transparent;
-	}
-
 	.listlevel1#button_profile .linklevel1 {
 
 	}
 
 	.mlist li div.posts {
 		border-right-color: #CCCCCC;
+	}
+}
+/* This one does 800 screens at default font size. */
+@media screen and (max-width: 50em) {
+	#main_menu .linklevel1.active, #main_menu .linklevel1.active:hover {
+		border-color: transparent;
+		background: transparent;
 	}
 }
 

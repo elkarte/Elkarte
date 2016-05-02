@@ -5464,19 +5464,6 @@ a.help .icon {
 
 /* This one does 1024 screens at default font size. */
 @media screen and (max-width: 64em) {
-	.icon-menu {
-		display: inline-block;
-		margin: .1em;
-		padding: .1em;
-		border: .25em solid;
-		border-radius: .25em;
-		vertical-align: middle;
-	}
-
-	.button_title {
-		display: none;
-	}
-
 	.topic_latest {
 		min-width: 20em;
 	}
@@ -5505,6 +5492,23 @@ a.help .icon {
 	.elk_previewvideo {
 		max-width: 100%;
 	}
+}
+
+/* This one does 800 screens at default font size. */
+@media screen and (max-width: 50em) {
+	.icon-menu {
+		display: inline-block;
+		margin: .1em;
+		padding: .1em;
+		border: .25em solid;
+		border-radius: .25em;
+		vertical-align: middle;
+	}
+
+	.button_title {
+		display: none;
+	}
+
 	#main_menu .linklevel1 {
 		margin-right: .1em;
 		border: 1px solid transparent;
@@ -5527,10 +5531,7 @@ a.help .icon {
 	#collapse_button {
 		padding-top: 0.5em;
 	}
-}
 
-/* This one does 800 screens at default font size. */
-@media screen and (max-width: 50em) {
 	dd input, dd select, dd textarea {
 		max-width: 85% !important;
 		width: 85% !important;
