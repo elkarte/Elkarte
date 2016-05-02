@@ -359,7 +359,7 @@ class Auth_Controller extends Action_Controller
 		if (!empty($_POST['otp_token']))
 		{
 			require_once(SUBSDIR . '/Members.subs.php');
-			updateMemberData($user_settings['id_member'], array('otp_used' => $_POST['otp_token']));
+			updateMemberData($user_settings['id_member'], array('otp_used' => (int) $_POST['otp_token']));
 		}
 		// Check their activation status.
 		if (!checkActivation())
