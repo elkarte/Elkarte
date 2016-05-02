@@ -466,9 +466,7 @@ class ManageAttachments_Controller extends Action_Controller
 					),
 					'data' => array(
 						'function' => function($rowData) {
-							global $txt;
-
-							return sprintf('%1$s%2$s', round($rowData['size'] / 1024, 2), $txt['kilobyte']);
+							return byte_format($rowData['size']);
 						},
 					),
 					'sort' => array(

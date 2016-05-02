@@ -364,11 +364,7 @@ function get_file_listing($path, $relative)
 		// A file entry has some more checks
 		else
 		{
-			$size = filesize($path . '/' . $entry);
-			if ($size > 2048 || $size == 1024)
-				$size = comma_format($size / 1024) . ' ' . $txt['themeadmin_edit_kilobytes'];
-			else
-				$size = comma_format($size) . ' ' . $txt['themeadmin_edit_bytes'];
+			$size = byte_format(filesize($path . '/' . $entry));
 
 			$writable = is_writable($path . '/' . $entry);
 

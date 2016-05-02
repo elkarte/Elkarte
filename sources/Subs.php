@@ -388,7 +388,7 @@ function byte_format($number)
 		$number /= 1024;
 	}
 
-	return trim(sprintf('%5.2f', $number) . $txt[$kb]);
+	return comma_format($number) . ' ' . $txt[$kb];
 }
 
 /**

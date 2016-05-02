@@ -1473,10 +1473,7 @@ function overallAttachmentsSize()
 	list ($attachmentDirSize) = $db->fetch_row($request);
 	$db->free_result($request);
 
-	// Divide it into kilobytes.
-	$attachmentDirSize /= 1024;
-
-	return comma_format($attachmentDirSize, 2);
+	return byte_format($attachmentDirSize);
 }
 
 /**
