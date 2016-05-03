@@ -93,7 +93,7 @@ class OpenID
 			'openid.identity=' . $openid_identity,
 			'openid.claimed_id=' . $openid_claimedid,
 			'openid.assoc_handle=' . urlencode($assoc['handle']),
-			'openid.return_to=' . urlencode($scripturl . '?action=openidreturn&sa=' . (!empty($return_action) ? $return_action : $_REQUEST['action']) . '&t=' . $request_time . (!empty($save_fields) ? '&sf=' . base64_encode(serialize($save_fields)) : '')),
+			'openid.return_to=' . urlencode($scripturl . '?action=openidreturn&sa=' . (!empty($return_action) ? $return_action : $_REQUEST['action']) . '&t=' . $request_time . (!empty($save_fields) ? '&sf=' . base64_encode(json_encode($save_fields)) : '')),
 			'openid.sreg.required=email',
 		);
 

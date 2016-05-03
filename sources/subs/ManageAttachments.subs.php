@@ -164,6 +164,12 @@ function removeAttachments($condition, $query_type = '', $return_affected_messag
 			if ($type == 'do_logging')
 				$do_logging = $condition['id_attach'];
 		}
+
+		if (empty($new_condition))
+		{
+			return false;
+		}
+
 		$condition = implode(' AND ', $new_condition);
 	}
 

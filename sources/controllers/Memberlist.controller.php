@@ -501,7 +501,7 @@ class Memberlist_Controller extends Action_Controller
 					$validFields[] = $field;
 				}
 			}
-			$field = $_REQUEST['sort'];
+			$field = $sort;
 			$curField = substr($field, 5);
 			if (substr($field, 0, 5) === 'cust_' && isset($context['custom_search_fields'][$curField]))
 			{

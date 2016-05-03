@@ -462,7 +462,7 @@ class Mentions_Controller extends Action_Controller
 	{
 		if (!empty($type))
 		{
-			$to_register = array(ucfirst($type) . '_Mention');
+			$to_register = array('\\ElkArte\\sources\\subs\\MentionType\\' . ucfirst($type) . '_Mention');
 		}
 		else
 		{

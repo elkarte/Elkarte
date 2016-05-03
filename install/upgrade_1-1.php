@@ -699,7 +699,7 @@ class UpgradeInstructions_upgrade_1_1
 		return 'Flag for user saved drafts...';
 	}
 
-	public function pm_reporting()
+	public function user_drafts()
 	{
 		return array(
 			array(

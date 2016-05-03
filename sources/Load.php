@@ -2671,6 +2671,6 @@ function loadBBCParsers()
 			$disabledBBC = explode(',', $modSettings['disabledBBC']);
 		else
 			$disabledBBC = $modSettings['disabledBBC'];
-		\BBC\ParserWrapper::getInstance()->setDisabled($disabledBBC);
+		\BBC\ParserWrapper::getInstance()->setDisabled(empty($disabledBBC) ? array() : (array) $disabledBBC);
 	}
 }
