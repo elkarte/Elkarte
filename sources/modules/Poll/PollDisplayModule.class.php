@@ -1,7 +1,7 @@
 <?php
 
 /**
- * This file contains several functions for retrieving and manipulating calendar events, birthdays and holidays.
+ * This file contains several functions for display polls and polling buttons.
  *
  * @name      ElkArte Forum
  * @copyright ElkArte Forum contributors
@@ -18,10 +18,21 @@
 if (!defined('ELK'))
 	die('No access...');
 
+/**
+ * Class Poll_Display_Module
+ */
 class Poll_Display_Module implements ElkArte\sources\modules\Module_Interface
 {
+	/**
+	 * If polls are enabled
+	 * @var bool
+	 */
 	protected static $_enabled = false;
 
+	/**
+	 * Poll id to work with
+	 * @var int
+	 */
 	protected $_id_poll = 0;
 
 	/**
@@ -43,6 +54,11 @@ class Poll_Display_Module implements ElkArte\sources\modules\Module_Interface
 		return $return;
 	}
 
+	/**
+	 * Add add/edit poll "permissions" to context
+	 *
+	 * @param array $topicinfo
+	 */
 	public function topicinfo($topicinfo)
 	{
 		global $context;
@@ -63,6 +79,11 @@ class Poll_Display_Module implements ElkArte\sources\modules\Module_Interface
 		$context['can_remove_poll'] &= self::$_enabled && $topicinfo['id_poll'] > 0;
 	}
 
+	/**
+	 * Prepare context to display the poll itself and the appropriate poll buttons
+	 *
+	 * @param Template_Layers $template_layers
+	 */
 	public function prepare_context($template_layers)
 	{
 		global $context, $scripturl, $txt;

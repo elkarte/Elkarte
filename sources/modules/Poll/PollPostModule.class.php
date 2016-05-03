@@ -1,7 +1,7 @@
 <?php
 
 /**
- * This file contains several functions for retrieving and manipulating calendar events, birthdays and holidays.
+ * This file contains several functions for retrieving and manipulating polls.
  *
  * @name      ElkArte Forum
  * @copyright ElkArte Forum contributors
@@ -18,6 +18,11 @@
 if (!defined('ELK'))
 	die('No access...');
 
+/**
+ * Class Poll_Post_Module
+ *
+ * This class contains all matter of things related to creating polls
+ */
 class Poll_Post_Module implements ElkArte\sources\modules\Module_Interface
 {
 	protected static $_make_poll = false;
@@ -34,25 +39,35 @@ class Poll_Post_Module implements ElkArte\sources\modules\Module_Interface
 
 		$return = array();
 		if (!empty($modSettings['pollMode']))
+		{
 			$return = array(
 				array('prepare_post', array('Poll_Post_Module', 'prepare_post'), array('topic', 'topic_attributes')),
 				array('prepare_context', array('Poll_Post_Module', 'prepare_context'), array('topic_attributes', 'topic', 'board')),
 				array('finalize_post_form', array('Poll_Post_Module', 'finalize_post_form'), array('destination', 'page_title', 'template_layers')),
 			);
+		}
 
 		// Posting a poll?
 		self::$_make_poll = isset($_REQUEST['poll']);
 
 		if (self::$_make_poll)
+		{
 			return array_merge($return, array(
 				array('before_save_post', array('Poll_Post_Module', 'before_save_post'), array()),
 				array('save_replying', array('Poll_Post_Module', 'save_replying'), array()),
 				array('pre_save_post', array('Poll_Post_Module', 'pre_save_post'), array('topicOptions')),
 			));
+		}
 		else
 			return $return;
 	}
 
+	/**
+	 * Validates post data to ensure no one tried to reply with a poll
+	 *
+	 * @param int $topic
+	 * @param array $topic_attributes
+	 */
 	public function prepare_post($topic, &$topic_attributes)
 	{
 		$topic_attributes['id_poll'] = 0;
@@ -64,6 +79,18 @@ class Poll_Post_Module implements ElkArte\sources\modules\Module_Interface
 		}
 	}
 
+	/**
+	 * Sets up poll options in context for use in the template
+	 *
+	 * What it does:
+	 * - Validates the topic can have a poll added
+	 * - Validates the poster can add a poll or not
+	 * - Prepares options so a poll can be added (or not) given the above results
+	 *
+	 * @param array $topic_attributes
+	 * @param int $topic
+	 * @param int $board
+	 */
 	public function prepare_context($topic_attributes, $topic, $board)
 	{
 		global $context, $user_info, $txt;
@@ -123,8 +150,17 @@ class Poll_Post_Module implements ElkArte\sources\modules\Module_Interface
 
 			$this->_preparePollContext();
 		}
+
+		return true;
 	}
 
+	/**
+	 * Prepares the post form for a poll
+	 *
+	 * @param string $destination
+	 * @param string $page_title
+	 * @param Template_Layers $template_layers
+	 */
 	public function finalize_post_form(&$destination, &$page_title, $template_layers)
 	{
 		global $txt, $context;
@@ -152,6 +188,11 @@ class Poll_Post_Module implements ElkArte\sources\modules\Module_Interface
 		}
 	}
 
+	/**
+	 * Verify that there is only one poll per topic
+	 *
+	 * @param int $topic_info
+	 */
 	public function save_replying(&$topic_info)
 	{
 		// Sorry, multiple polls aren't allowed... yet.  You should stop giving me ideas :P.
@@ -159,6 +200,12 @@ class Poll_Post_Module implements ElkArte\sources\modules\Module_Interface
 			$this->_unset_poll();
 	}
 
+	/**
+	 * Checks the poll conditions before we go to save
+	 *
+	 * @param Error_Context$post_errors
+	 * @param array $topic_info
+	 */
 	public function before_save_post($post_errors, $topic_info)
 	{
 		global $user_info;
@@ -196,6 +243,11 @@ class Poll_Post_Module implements ElkArte\sources\modules\Module_Interface
 			$post_errors->addError('poll_many');
 	}
 
+	/**
+	 * Create the poll!
+	 *
+	 * @param array $topicOptions
+	 */
 	public function pre_save_post(&$topicOptions)
 	{
 		// Make the poll...
@@ -257,11 +309,17 @@ class Poll_Post_Module implements ElkArte\sources\modules\Module_Interface
 		$context['poll']['choices'][count($context['poll']['choices']) - 1]['is_last'] = true;
 	}
 
+	/**
+	 * Helper function to remove a poll, either by user choice or by catching naughty users
+	 */
 	protected function _unset_poll()
 	{
 		self::$_make_poll = false;
-		// @deprecated since 1.1 - to be removed when sure it doesn't affect anything else
+
+		// deprecated since 1.1 - to be removed when sure it doesn't affect anything else
 		unset($_REQUEST['poll']);
+
+		return true;
 	}
 
 	/**
