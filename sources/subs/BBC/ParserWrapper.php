@@ -420,6 +420,11 @@ class ParserWrapper
 
 		if ($this->smiley_parser === null)
 		{
+			if (!isset($context['user']['smiley_path']))
+			{
+				loadUserContext();
+			}
+
 			$this->smiley_parser = new \BBC\SmileyParser($context['user']['smiley_path']);
 			$this->smiley_parser->setEnabled($context['smiley_enabled']);
 		}
