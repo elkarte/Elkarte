@@ -18,6 +18,9 @@
 if (!defined('ELK'))
 	die('No access...');
 
+/**
+ * Class Attachments_Post_Module
+ */
 class Attachments_Post_Module implements ElkArte\sources\modules\Module_Interface
 {
 	/**
@@ -71,17 +74,28 @@ class Attachments_Post_Module implements ElkArte\sources\modules\Module_Interfac
 			return array();
 	}
 
+	/**
+	 * Not sure this is implemented
+	 *
+	 * @param int $draft
+	 */
 	public function before_save_draft($draft)
 	{
 		// @todo this should actually remove any pending attachment I think
 		$this->saveAttachments(isset($_REQUEST['id_draft']) ? (int) $_REQUEST['id_draft'] : 0);
 	}
 
+	/**
+	 * Get the error handler ready for post attachments
+	 */
 	public function prepare_post()
 	{
 		$this->_initErrors();
 	}
 
+	/**
+	 * Set and activate the attachment error instance
+	 */
 	protected function _initErrors()
 	{
 		if ($this->_attach_errors === null)
@@ -92,6 +106,11 @@ class Attachments_Post_Module implements ElkArte\sources\modules\Module_Interfac
 		}
 	}
 
+	/**
+	 * Set up the errors for the template etc
+	 *
+	 * @param Error_Context $post_errors
+	 */
 	public function prepare_context($post_errors)
 	{
 		global $context;
@@ -100,9 +119,22 @@ class Attachments_Post_Module implements ElkArte\sources\modules\Module_Interfac
 		$context['attachments']['current'] = array();
 
 		if ($this->_attach_errors->hasErrors())
-			$post_errors->add(array('attachments_errors' => $this->_attach_errors));
+			$post_errors->addError(array('attachments_errors' => $this->_attach_errors));
 	}
 
+	/**
+	 * This does lots of stuff, yes it does, in fact so much that trying to document a method like this
+	 * would be insane.  What needs to be done is have this bowl of spaghetti fixed.
+	 *
+	 * What it does:
+	 * - Infuriates anyone trying to read the code or follow the execution path
+	 * - Causes hallucinations and sleepless nights
+	 * - Known to induce binge drinking
+	 *
+	 * @param bool $show_additional_options
+	 * @param int $board
+	 * @param int $topic
+	 */
 	public function finalize_post_form(&$show_additional_options, $board, $topic)
 	{
 		global $txt, $context, $modSettings, $user_info, $scripturl;
@@ -206,7 +238,7 @@ class Attachments_Post_Module implements ElkArte\sources\modules\Module_Interfac
 					if ($attachID != 'initial_error' && strpos($attachID, 'post_tmp_' . $user_info['id']) === false)
 						continue;
 
-					if ($attachID == 'initial_error')
+					if ($attachID === 'initial_error')
 					{
 						if ($context['current_action'] != 'post2')
 						{
@@ -296,9 +328,9 @@ class Attachments_Post_Module implements ElkArte\sources\modules\Module_Interfac
 					$context['attachments']['restrictions'][] = sprintf($txt['attach_restrict_' . $type], comma_format($modSettings[$type], 0));
 
 					// Show some numbers. If they exist.
-					if ($type == 'attachmentNumPerPostLimit' && $attachments['quantity'] > 0)
+					if ($type === 'attachmentNumPerPostLimit' && $attachments['quantity'] > 0)
 						$context['attachments']['restrictions'][] = sprintf($txt['attach_remaining'], $modSettings['attachmentNumPerPostLimit'] - $attachments['quantity']);
-					elseif ($type == 'attachmentPostLimit' && $attachments['total_size'] > 0)
+					elseif ($type === 'attachmentPostLimit' && $attachments['total_size'] > 0)
 						$context['attachments']['restrictions'][] = sprintf($txt['attach_available'], comma_format(round(max($modSettings['attachmentPostLimit'] - ($attachments['total_size'] / 1028), 0)), 0));
 				}
 			}
@@ -307,6 +339,11 @@ class Attachments_Post_Module implements ElkArte\sources\modules\Module_Interfac
 		$show_additional_options = $show_additional_options || isset($_SESSION['temp_attachments']['post']);
 	}
 
+	/**
+	 * Save attachments when the post is saved
+	 *
+	 * @param Error_Context $post_errors
+	 */
 	public function prepare_save_post($post_errors)
 	{
 		$this->_initErrors();
@@ -315,9 +352,14 @@ class Attachments_Post_Module implements ElkArte\sources\modules\Module_Interfac
 		$this->saveAttachments($msg);
 
 		if ($this->_attach_errors->hasErrors())
-			$post_errors->add(array('attachments_errors' => $this->_attach_errors));
+			$post_errors->addError(array('attachments_errors' => $this->_attach_errors));
 	}
 
+	/**
+	 * Handles both the saving and removing of attachments on post save
+	 *
+	 * @param int $msg
+	 */
 	protected function saveAttachments($msg)
 	{
 		global $user_info, $context, $modSettings;
@@ -371,6 +413,11 @@ class Attachments_Post_Module implements ElkArte\sources\modules\Module_Interfac
 		}
 	}
 
+	/**
+	 * Saves all valid attachments that were uploaded
+	 *
+	 * @param array $msgOptions
+	 */
 	public function pre_save_post(&$msgOptions)
 	{
 		global $ignore_temp, $context, $user_info, $modSettings;
@@ -388,7 +435,7 @@ class Attachments_Post_Module implements ElkArte\sources\modules\Module_Interfac
 					continue;
 
 				// If there was an initial error just show that message.
-				if ($attachID == 'initial_error')
+				if ($attachID === 'initial_error')
 				{
 					unset($_SESSION['temp_attachments']);
 					break;
@@ -430,6 +477,11 @@ class Attachments_Post_Module implements ElkArte\sources\modules\Module_Interfac
 			$msgOptions['icon'] = 'clip';
 	}
 
+	/**
+	 * Assigns saved attachments to the message id they were saved with
+	 *
+	 * @param array $msgOptions
+	 */
 	public function after_save_post($msgOptions)
 	{
 		if ($this->_is_new_message && !empty($this->_saved_attach_id))
