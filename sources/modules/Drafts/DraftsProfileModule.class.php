@@ -18,6 +18,11 @@
 if (!defined('ELK'))
 	die('No access...');
 
+/**
+ * Class Drafts_Profile_Module
+ *
+ * Handles adding the show drafts area to the user profile
+ */
 class Drafts_Profile_Module implements ElkArte\sources\modules\Module_Interface
 {
 	/**
@@ -38,6 +43,11 @@ class Drafts_Profile_Module implements ElkArte\sources\modules\Module_Interface
 			return array();
 	}
 
+	/**
+	 * If drafts are enabled, provides an interface to display them for the user
+	 *
+	 * @param array $profile_areas
+	 */
 	public static function integrate_profile_areas(&$profile_areas)
 	{
 		global $txt, $context;
@@ -55,6 +65,11 @@ class Drafts_Profile_Module implements ElkArte\sources\modules\Module_Interface
 			)), 'after');
 	}
 
+	/**
+	 * Load in the draft language stings when needed.
+	 *
+	 * @param array $post_errors
+	 */
 	public function pre_load($post_errors)
 	{
 		if (empty($post_errors))

@@ -1,7 +1,7 @@
 <?php
 
 /**
- * 
+ *
  *
  * @name      ElkArte Forum
  * @copyright ElkArte Forum contributors
@@ -18,6 +18,11 @@
 if (!defined('ELK'))
 	die('No access...');
 
+/**
+ * Class Verification_Display_Module
+ *
+ * Adding Visual Verification event to Quick Reply area (display.controller)
+ */
 class Verification_Display_Module implements ElkArte\sources\modules\Module_Interface
 {
 	/**

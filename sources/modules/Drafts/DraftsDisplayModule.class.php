@@ -18,9 +18,23 @@
 if (!defined('ELK'))
 	die('No access...');
 
+/**
+ * Class Drafts_Display_Module
+ *
+ * Enables draft functions for teh Display.controller page (quick reply)
+ */
 class Drafts_Display_Module implements ElkArte\sources\modules\Module_Interface
 {
+	/**
+	 * Autosave switch
+	 * @var bool
+	 */
 	protected static $_autosave_enabled = false;
+
+	/**
+	 * Autosave frequency, default to 30 seconds
+	 * @var int
+	 */
 	protected static $_autosave_frequency = 30000;
 
 	/**
@@ -45,6 +59,18 @@ class Drafts_Display_Module implements ElkArte\sources\modules\Module_Interface
 			return array();
 	}
 
+	/**
+	 * Prepares context for draft buttons and listing
+	 *
+	 * What it does:
+	 * - Sets/checks the ability to save and autosave drafts for JS and button display
+	 * - Builds the list of drafts available to load
+	 * - Loads necessary Draft javascript functions for full editor or text area
+	 *
+	 * @param bool $use_quick_reply
+	 * @param array $editorOptions
+	 * @param int $board
+	 */
 	public function prepare_context($use_quick_reply, &$editorOptions, $board)
 	{
 		global $context, $options;

@@ -568,7 +568,10 @@ function removeTempAttachById($attach_id)
  *
  * @package Attachments
  * @param string $attach_id the temporary name generated when a file is uploaded
- *               and used in $_SESSION to help identify the attachment itself
+ *  and used in $_SESSION to help identify the attachment itself
+ *
+ * @return mixed
+ * @throws Exception
  */
 function getTempAttachById($attach_id)
 {

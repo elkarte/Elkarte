@@ -18,6 +18,11 @@
 if (!defined('ELK'))
 	die('No access...');
 
+/**
+ * Class Verification_Register_Module
+ *
+ * Adds Visual Verification controls to the Registration page.
+ */
 class Verification_Register_Module implements ElkArte\sources\modules\Module_Interface
 {
 	/**

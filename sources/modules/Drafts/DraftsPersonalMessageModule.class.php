@@ -20,6 +20,11 @@ if (!defined('ELK'))
 	die('No access...');
 }
 
+/**
+ * Class Drafts_PersonalMessage_Module
+ *
+ * Prepares the draft functions for the personal message page
+ */
 class Drafts_PersonalMessage_Module implements ElkArte\sources\modules\Module_Interface
 {
 	/**
@@ -84,6 +89,7 @@ class Drafts_PersonalMessage_Module implements ElkArte\sources\modules\Module_In
 				self::$_subject_length = (int) $modSettings['draft_subject_length'];
 			}
 
+			// Events
 			return array(
 				array('before_set_context', array('Drafts_PersonalMessage_Module', 'before_set_context'), array()),
 				array('prepare_send_context', array('Drafts_PersonalMessage_Module', 'prepare_send_context'), array('editorOptions', 'recipientList')),
@@ -195,7 +201,7 @@ class Drafts_PersonalMessage_Module implements ElkArte\sources\modules\Module_In
 	 * @param int $member_id
 	 * @param int|bool $id_pm = false if set, it will try to load drafts for this id
 	 *
-	 * @return false|null
+	 * @return bool
 	 */
 	protected function _prepareDraftsContext($member_id, $id_pm = false)
 	{
@@ -231,6 +237,8 @@ class Drafts_PersonalMessage_Module implements ElkArte\sources\modules\Module_In
 						: $txt['drafts_none']) . '</a>',
 			);
 		}
+
+		return true;
 	}
 
 	/**
