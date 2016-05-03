@@ -73,14 +73,23 @@ class Attachments_Post_Module implements ElkArte\sources\modules\Module_Interfac
 
 	public function before_save_draft($draft)
 	{
+		// @todo this should actually remove any pending attachment I think
 		$this->saveAttachments(isset($_REQUEST['id_draft']) ? (int) $_REQUEST['id_draft'] : 0);
 	}
 
 	public function prepare_post()
 	{
-		$this->_attach_errors = Attachment_Error_Context::context();
+		$this->_initErrors();
+	}
 
-		$this->_attach_errors->activate();
+	protected function _initErrors()
+	{
+		if ($this->_attach_errors === null)
+		{
+			$this->_attach_errors = Attachment_Error_Context::context();
+
+			$this->_attach_errors->activate();
+		}
 	}
 
 	public function prepare_context($post_errors)
@@ -300,17 +309,18 @@ class Attachments_Post_Module implements ElkArte\sources\modules\Module_Interfac
 
 	public function prepare_save_post($post_errors)
 	{
+		$this->_initErrors();
+
 		$msg = isset($_REQUEST['msg']) ? $_REQUEST['msg'] : 0;
 		$this->saveAttachments($msg);
+
+		if ($this->_attach_errors->hasErrors())
+			$post_errors->add(array('attachments_errors' => $this->_attach_errors));
 	}
 
 	protected function saveAttachments($msg)
 	{
 		global $user_info, $context, $modSettings;
-
-		$this->_attach_errors = Attachment_Error_Context::context();
-
-		$this->_attach_errors->activate();
 
 		// First check to see if they are trying to delete any current attachments.
 		if (isset($_POST['attach_del']))
@@ -359,9 +369,6 @@ class Attachments_Post_Module implements ElkArte\sources\modules\Module_Interfac
 			else
 				processAttachments();
 		}
-
-		if ($this->_attach_errors->hasErrors())
-			$post_errors->add(array('attachments_errors' => $this->_attach_errors));
 	}
 
 	public function pre_save_post(&$msgOptions)
