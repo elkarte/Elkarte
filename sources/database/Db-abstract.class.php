@@ -91,7 +91,7 @@ abstract class Database_Abstract implements Database
 		global $user_info, $db_prefix;
 
 		// Connection gone???  This should *never* happen at this point, yet it does :'(
-		if (!$this->_validConnection($this->_db_callback_connection))
+		if (!$this->validConnection($this->_db_callback_connection))
 			Errors::instance()->display_db_error();
 
 		if ($matches[1] === 'db_prefix')
@@ -434,10 +434,8 @@ abstract class Database_Abstract implements Database
 	 *
 	 * @param mysqli|postgre|null $connection = null
 	 */
-	public function _validConnection($connection = null)
+	public function validConnection($connection = null)
 	{
-		return is_object($connection);
+		return (bool) $connection;
 	}
-
-
 }

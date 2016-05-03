@@ -1235,4 +1235,14 @@ class Database_MySQL extends Database_Abstract
 	{
 		return self::$_db;
 	}
+
+	/**
+	 * Finds out if the connection is still valid.
+	 *
+	 * @param mysqli|null $connection = null
+	 */
+	public function validConnection($connection = null)
+	{
+		return is_object($connection);
+	}
 }

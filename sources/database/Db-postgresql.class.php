@@ -1026,9 +1026,9 @@ class Database_PostgreSQL extends Database_Abstract
 	/**
 	 * Finds out if the connection is still valid.
 	 *
-	 * @param resource|null $connection = null
+	 * @param postgre|null $connection = null
 	 */
-	protected function _validConnection($connection = null)
+	public function validConnection($connection = null)
 	{
 		return is_resource($connection);
 	}
