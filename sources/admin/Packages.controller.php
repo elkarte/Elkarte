@@ -354,7 +354,7 @@ class Packages_Controller extends Action_Controller
 									'type' => $txt['package_delete'] . ' ' . ($action_data['type'] === 'require-dir' ? $txt['package_tree'] : $txt['package_file']),
 									'action' => strtr($real_path, array('\\' => '/', BOARDDIR => '.')),
 									'description' => '',
-									'value' => base64_encode(serialize(array('type' => $action_data['type'], 'orig' => $action_data['filename'], 'future' => $real_path, 'id' => $id))),
+									'value' => base64_encode(json_encode(array('type' => $action_data['type'], 'orig' => $action_data['filename'], 'future' => $real_path, 'id' => $id))),
 									'not_mod' => true,
 								);
 							else
@@ -362,7 +362,7 @@ class Packages_Controller extends Action_Controller
 									'type' => $txt['package_extract'] . ' ' . ($action_data['type'] == 'require-dir' ? $txt['package_tree'] : $txt['package_file']),
 									'action' => strtr($real_path, array('\\' => '/', BOARDDIR => '.')),
 									'description' => '',
-									'value' => base64_encode(serialize(array('type' => $action_data['type'], 'orig' => $action_data['destination'], 'future' => $real_path, 'id' => $id))),
+									'value' => base64_encode(json_encode(array('type' => $action_data['type'], 'orig' => $action_data['destination'], 'future' => $real_path, 'id' => $id))),
 									'not_mod' => true,
 								);
 						}
@@ -588,7 +588,7 @@ class Packages_Controller extends Action_Controller
 				if (empty($change))
 					continue;
 
-				$theme_data = unserialize(base64_decode($change));
+				$theme_data = json_decode(base64_decode($change));
 				if (empty($theme_data['type']))
 					continue;
 
@@ -1421,7 +1421,7 @@ class Packages_Controller extends Action_Controller
 		// Have we got a load of back-catalogue trees to expand from a submit etc?
 		if (!empty($this->_req->query->back_look))
 		{
-			$potententialTrees = unserialize(base64_decode($this->_req->query->back_look));
+			$potententialTrees = json_decode(base64_decode($this->_req->query->back_look));
 			foreach ($potententialTrees as $tree)
 				$context['look_for'][] = $tree;
 		}
@@ -1430,7 +1430,7 @@ class Packages_Controller extends Action_Controller
 		if (!empty($this->_req->post->back_look))
 			$context['only_find'] = array_merge($context['only_find'], $this->_req->post->back_look);
 
-		$context['back_look_data'] = base64_encode(serialize(array_slice($context['look_for'], 0, 15)));
+		$context['back_look_data'] = base64_encode(json_encode(array_slice($context['look_for'], 0, 15)));
 
 		// Are we finding more files than first thought?
 		$context['file_offset'] = !empty($this->_req->query->fileoffset) ? (int) $this->_req->query->fileoffset : 0;
@@ -1508,7 +1508,7 @@ class Packages_Controller extends Action_Controller
 
 			// Continuing?
 			if (isset($this->_req->post->toProcess))
-				$this->_req->post->permStatus = unserialize(base64_decode($this->_req->post->toProcess));
+				$this->_req->post->permStatus = json_decode(base64_decode($this->_req->post->toProcess));
 
 			if (isset($this->_req->post->permStatus))
 			{
@@ -1549,7 +1549,7 @@ class Packages_Controller extends Action_Controller
 
 				// Nothing to do?
 				if (empty($context['to_process']))
-					redirectexit('action=admin;area=packages;sa=perms' . (!empty($context['back_look_data']) ? ';back_look=' . base64_encode(serialize($context['back_look_data'])) : '') . ';' . $context['session_var'] . '=' . $context['session_id']);
+					redirectexit('action=admin;area=packages;sa=perms' . (!empty($context['back_look_data']) ? ';back_look=' . base64_encode(json_decode($context['back_look_data'])) : '') . ';' . $context['session_var'] . '=' . $context['session_id']);
 			}
 			// Should never get here,
 			else
@@ -1588,7 +1588,7 @@ class Packages_Controller extends Action_Controller
 		{
 			$context['predefined_type'] = $this->_req->getPost('predefined', 'trim|strval', 'restricted');
 			$context['total_items'] = $this->_req->getPost('totalItems', 'intval', 0);
-			$context['directory_list'] = isset($this->_req->post->dirList) ? unserialize(base64_decode($this->_req->post->dirList)) : array();
+			$context['directory_list'] = isset($this->_req->post->dirList) ? json_decode(base64_decode($this->_req->post->dirList)) : array();
 			$context['file_offset'] = $this->_req->getPost('fileOffset', 'intval', 0);
 
 			// Haven't counted the items yet?
@@ -1617,7 +1617,7 @@ class Packages_Controller extends Action_Controller
 			elseif ($context['predefined_type'] === 'free')
 				$context['special_files'] = array();
 			else
-				$context['special_files'] = unserialize(base64_decode($this->_req->post->specialFiles));
+				$context['special_files'] = json_decode(base64_decode($this->_req->post->specialFiles));
 
 			// Now we definitely know where we are, we need to go through again doing the chmod!
 			foreach ($context['directory_list'] as $path => $dummy)

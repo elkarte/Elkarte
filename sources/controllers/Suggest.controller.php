@@ -67,7 +67,7 @@ class Suggest_Controller extends Action_Controller
 		loadTemplate('Xml');
 
 		// Any parameters?
-		$context['search_param'] = isset($this->_req->post->search_param) ? unserialize(base64_decode($this->_req->post->search_param)) : array();
+		$search_param = isset($this->_req->post->search_param) ? json_decode(base64_decode($this->_req->post->search_param)) : array();
 
 		if (isset($this->_req->post->suggest_type, $this->_req->post->search) && isset($searchTypes[$this->_req->post->suggest_type]))
 		{
@@ -81,7 +81,7 @@ class Suggest_Controller extends Action_Controller
 			// If it is a class, let's instantiate it
 			if (!empty($currentSearch['class']) && class_exists($currentSearch['class']))
 			{
-				$suggest = new $currentSearch['class']($this->_req->post->search, $context['search_param']);
+				$suggest = new $currentSearch['class']($this->_req->post->search, $search_param);
 
 				// Okay, let's at least assume the method exists... *rolleyes*
 				$context['xml_data'] = $suggest->{$currentSearch['function']}();
@@ -90,7 +90,7 @@ class Suggest_Controller extends Action_Controller
 			elseif (function_exists('action_suggest_' . $currentSearch['function']))
 			{
 				$function = 'action_suggest_' . $searchTypes[$this->_req->post->suggest_type];
-				$context['xml_data'] = $function($this->_req->post->search, $context['search_param']);
+				$context['xml_data'] = $function($this->_req->post->search, $search_param);
 			}
 
 			// If we have data, return it
