@@ -819,7 +819,8 @@ function template_news_fader()
  *
  * @return string
  */
-function template_member_online($member, $link = true) {
+function template_member_online($member, $link = true)
+{
 	global $context;
 
 	return ((!empty($context['can_send_pm']) && $link) ? '<a href="' . $member['online']['href'] . '" title="' . $member['online']['text'] . '">' : '') .
@@ -836,7 +837,8 @@ function template_member_online($member, $link = true) {
  *
  * @return string
  */
-function template_member_email($member, $text = false) {
+function template_member_email($member, $text = false)
+{
 	global $context, $txt, $scripturl;
 
 	if ($context['can_send_email']) 
@@ -880,7 +882,8 @@ function template_member_email($member, $text = false) {
  *
  * @return string
  */
-function template_msg_email($id, $member = false) {
+function template_msg_email($id, $member = false)
+{
 	global $context, $txt, $scripturl;
 
 	if ($context['can_send_email'])
