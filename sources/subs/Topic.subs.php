@@ -122,7 +122,7 @@ function removeTopics($topics, $decreasePostCount = true, $ignoreRecycling = fal
 
 		if (!empty($possible_recycle))
 		{
-			setTimeLimit(300);
+			detectServer()->setTimeLimit(300);
 
 			// Get topics that will be recycled.
 			$recycleTopics = array();
@@ -224,7 +224,7 @@ function removeTopics($topics, $decreasePostCount = true, $ignoreRecycling = fal
 	$db->free_result($request);
 
 	// Decrease number of posts and topics for each board.
-	setTimeLimit(300);
+	detectServer()->setTimeLimit(300);
 	foreach ($adjustBoards as $stats)
 	{
 		$db->query('', '
@@ -304,7 +304,7 @@ function removeTopics($topics, $decreasePostCount = true, $ignoreRecycling = fal
 		$messages = array();
 		while ($row = $db->fetch_assoc($request))
 		{
-			setTimeLimit(300);
+			detectServer()->setTimeLimit(300);
 
 			$words = array_merge($words, text2words($row['body'], $customIndexSettings['bytes_per_word'], true));
 			$messages[] = $row['id_msg'];

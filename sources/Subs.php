@@ -388,7 +388,7 @@ function byte_format($number)
 		$number /= 1024;
 	}
 
-	return trim(sprintf('%5.2f', $number) . $txt[$kb]);
+	return comma_format($number) . ' ' . $txt[$kb];
 }
 
 /**
@@ -969,6 +969,7 @@ function setupThemeContext($forceload = false)
  * @param string $needed The amount of memory to request, if needed, like 256M
  * @param bool $in_use Set to true to account for current memory usage of the script
  * @return boolean true if we have at least the needed memory
+ * @deprecated since 1.1
  */
 function setMemoryLimit($needed, $in_use = false)
 {

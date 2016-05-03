@@ -1307,7 +1307,7 @@ class ManageThemes_Controller extends Action_Controller
 		mkdir($this->theme_dir, 0777);
 
 		// Get some more time if we can
-		setTimeLimit(600);
+		detectServer()->setTimeLimit(600);
 
 		// Create the subdirectories for css, javascript and font files.
 		mkdir($this->theme_dir . '/css', 0777);

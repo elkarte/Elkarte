@@ -532,7 +532,7 @@ class ProfileAccount_Controller extends Action_Controller
 		global $user_info, $context, $cur_profile, $user_profile, $modSettings;
 
 		// Try get more time...
-		setTimeLimit(600);
+		detectServer()->setTimeLimit(600);
 
 		// @todo Add a way to delete pms as well?
 		if (!$context['user']['is_owner'])

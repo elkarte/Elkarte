@@ -284,7 +284,7 @@ function sendmail($to, $subject, $message, $from = null, $message_id = null, $se
 			ini_set('sendmail_from', $old_return);
 
 			// Wait, wait, I'm still sending here!
-			setTimeLimit(300);
+			detectServer()->setTimeLimit(300);
 		}
 
 		// Log each email that we sent so they can be replied to
@@ -687,7 +687,7 @@ function smtp_mail($mail_to_array, $subject, $message, $headers, $priority, $mes
 		}
 
 		// Almost done, almost done... don't stop me just yet!
-		setTimeLimit(300);
+		detectServer()->setTimeLimit(300);
 	}
 
 	// say our goodbyes
@@ -1392,7 +1392,7 @@ function reduceMailQueue($batch_size = false, $override_limit = false, $force_se
 				trackStats(array('email' => '+'));
 
 			// Try to stop a timeout, this would be bad...
-			setTimeLimit(300);
+			detectServer()->setTimeLimit(300);
 		}
 		else
 			$result = smtp_mail(array($email['to']), $email['subject'], $email['body'], $email['headers'], $email['priority'], $email['message_id']);

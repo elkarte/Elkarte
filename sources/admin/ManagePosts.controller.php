@@ -163,6 +163,7 @@ class ManagePosts_Controller extends Action_Controller
 		}
 
 		// Testing a word to see how it will be censored?
+		$pre_censor = '';
 		if (isset($this->_req->post->censortest))
 		{
 			require_once(SUBSDIR . '/Post.subs.php');
@@ -175,6 +176,7 @@ class ManagePosts_Controller extends Action_Controller
 		// Set everything up for the template to do its thang.
 		$censor_vulgar = explode("\n", $modSettings['censor_vulgar']);
 		$censor_proper = explode("\n", $modSettings['censor_proper']);
+
 
 		$context['censored_words'] = array();
 		for ($i = 0, $n = count($censor_vulgar); $i < $n; $i++)

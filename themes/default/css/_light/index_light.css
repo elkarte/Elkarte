@@ -162,7 +162,7 @@ hr {
 	background: #EEEEEE;
 }
 
-strong, .bbc_strong {
+strong {
 	color: #686868;
 }
 
@@ -512,7 +512,7 @@ div.bbc_footnotes .meaction {
 }
 
 .action_viewquery a {
-	
+
 }
 
 .action_viewquery .explain {

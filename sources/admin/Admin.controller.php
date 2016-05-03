@@ -801,7 +801,7 @@ class Admin_Controller extends Action_Controller
 		global $context, $txt;
 
 		// Try to get some more memory.
-		setMemoryLimit('128M');
+		detectServer()->setMemoryLimit('128M');
 
 		// Load a lot of language files.
 		$language_files = array(

@@ -418,7 +418,7 @@ class ManageMail_Controller extends Action_Controller
 		global $context, $txt, $time_start;
 
 		// Try get more time...
-		setTimeLimit(600);
+		detectServer()->setTimeLimit(600);
 
 		// Have we already used our maximum time?
 		if (time() - array_sum(explode(' ', $time_start)) < 5)

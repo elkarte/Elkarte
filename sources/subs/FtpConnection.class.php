@@ -27,7 +27,7 @@ class Ftp_Connection
 {
 	/**
 	 * Holds the connection response
-	 * @var resource
+	 * @var resource|string
 	 */
 	public $connection;
 

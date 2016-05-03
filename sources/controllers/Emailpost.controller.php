@@ -62,7 +62,7 @@ class Emailpost_Controller extends Action_Controller
 
 		// Init
 		loadLanguage('Maillist');
-		setMemoryLimit('128M');
+		detectServer()->setMemoryLimit('128M');
 
 		// Load the email parser and get some data to work with
 		$email_message = new Email_Parse();
@@ -235,7 +235,7 @@ class Emailpost_Controller extends Action_Controller
 
 		// Init
 		loadLanguage('Maillist');
-		setMemoryLimit('256M');
+		detectServer()->setMemoryLimit('256M');
 
 		// Get the data from one of our sources
 		$email_message = new Email_Parse();

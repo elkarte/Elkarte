@@ -721,6 +721,7 @@ function loadPermissions()
 		if ($user_info['possibly_robot'])
 			$cache_groups .= '-spider';
 
+		$temp = array();
 		if ($cache->checkLevel(2) && !empty($board) && $cache->getVar($temp, 'permissions:' . $cache_groups . ':' . $board, 240) && time() - 240 > $modSettings['settings_updated'])
 		{
 			list ($user_info['permissions']) = $temp;
@@ -949,6 +950,7 @@ function loadMemberData($users, $is_name = false, $set = 'normal')
 	// Are we loading any moderators?  If so, fix their group data...
 	if (!empty($loaded_ids) && !empty($board_info['moderators']) && $set === 'normal' && count($temp_mods = array_intersect($loaded_ids, array_keys($board_info['moderators']))) !== 0)
 	{
+		$group_info = array();
 		if (!$cache->getVar($group_info, 'moderator_group_info', 480))
 		{
 			require_once(SUBSDIR . '/Membergroups.subs.php');
@@ -1225,6 +1227,7 @@ function getThemeData($id_theme, $member)
 	$cache = Cache::instance();
 
 	// Do we already have this members theme data and specific options loaded (for aggressive cache settings)
+	$temp = array();
 	if ($cache->checkLevel(2) && $cache->getVar($temp, 'theme_settings-' . $id_theme . ':' . $member, 60) && time() - 60 > $modSettings['settings_updated'])
 	{
 		$themeData = $temp;
@@ -1508,6 +1511,11 @@ function loadTheme($id_theme = 0, $initialize = true)
 	$context['theme_loaded'] = true;
 }
 
+/**
+ * Detects url and checks against expected boardurl
+ *
+ * Attempts to correct improper URL's
+ */
 function loadThemeUrls()
 {
 	global $scripturl, $boardurl, $modSettings;
@@ -1562,25 +1570,27 @@ function loadThemeUrls()
 	}
 }
 
+/**
+ * Loads various theme related settings into context and sets system wide theme defaults
+ */
 function loadThemeContext()
 {
-	global $context, $settings, $modSettings;
+	global $context, $settings, $modSettings, $txt;
 
 	// Some basic information...
-	if (!isset($context['html_headers']))
-		$context['html_headers'] = '';
-	if (!isset($context['links']))
-		$context['links'] = array();
-	if (!isset($context['javascript_files']))
-		$context['javascript_files'] = array();
-	if (!isset($context['css_files']))
-		$context['css_files'] = array();
-	if (!isset($context['css_rules']))
-		$context['css_rules'] = array();
-	if (!isset($context['javascript_inline']))
-		$context['javascript_inline'] = array('standard' => array(), 'defer' => array());
-	if (!isset($context['javascript_vars']))
-		$context['javascript_vars'] = array();
+	$init = array(
+		'html_headers' => '',
+		'links' => array(),
+		'css_files' => array(),
+		'javascript_files' => array(),
+		'css_rules' => array(),
+		'javascript_inline' => array('standard' => array(), 'defer' => array()),
+		'javascript_vars' => array(),
+	);
+	foreach ($init as $area => $value)
+	{
+		$context[$area] = isset($context[$area]) ? $context[$area] : $value;
+	}
 
 	// Set a couple of bits for the template.
 	$context['right_to_left'] = !empty($txt['lang_rtl']);
@@ -1595,13 +1605,18 @@ function loadThemeContext()
 	foreach (array('theme_header', 'upper_content') as $call)
 	{
 		if (!isset($context[$call . '_callbacks']))
+		{
 			$context[$call . '_callbacks'] = array();
+		}
 	}
 
 	// This allows sticking some HTML on the page output - useful for controls.
 	$context['insert_after_template'] = '';
 }
 
+/**
+ * Loads basic user information in to $context['user']
+ */
 function loadUserContext()
 {
 	global $context, $user_info, $txt, $modSettings;
@@ -1624,18 +1639,28 @@ function loadUserContext()
 
 	// Something for the guests
 	if (!$context['user']['is_guest'])
+	{
 		$context['user']['name'] = $user_info['name'];
+	}
 	elseif ($context['user']['is_guest'] && !empty($txt['guest_title']))
+	{
 		$context['user']['name'] = $txt['guest_title'];
+	}
 
 	$context['user']['smiley_set'] = determineSmileySet($user_info['smiley_set'], $modSettings['smiley_sets_known']);
 	$context['smiley_enabled'] = $user_info['smiley_set'] !== 'none';
 	$context['user']['smiley_path'] = $modSettings['smileys_url'] . '/' . $context['user']['smiley_set'] . '/';
 }
 
+/**
+ * Called if the detected URL is not the same as boardurl but is a common
+ * variation in which case it updates key system variables so it works.
+ *
+ * @param $detected_url
+ */
 function fixThemeUrls($detected_url)
 {
-	global $boardurl, $scripturl, $settings, $modSettings, $context;
+	global $boardurl, $scripturl, $settings, $modSettings, $context, $board_info;
 
 	// Caching is good ;).
 	$oldurl = $boardurl;
@@ -2215,6 +2240,7 @@ function getBoardParents($id_parent)
 
 	$db = database();
 	$cache = Cache::instance();
+	$boards = array();
 
 	// First check if we have this cached already.
 	if (!$cache->getVar($boards, 'board_parents-' . $id_parent, 480))
@@ -2239,7 +2265,9 @@ function getBoardParents($id_parent)
 			);
 			// In the EXTREMELY unlikely event this happens, give an error message.
 			if ($db->num_rows($result) == 0)
+			{
 				Errors::instance()->fatal_lang_error('parent_not_found', 'critical');
+			}
 			while ($row = $db->fetch_assoc($result))
 			{
 				if (!isset($boards[$row['id_board']]))
@@ -2252,6 +2280,7 @@ function getBoardParents($id_parent)
 						'moderators' => array()
 					);
 				}
+
 				// If a moderator exists for this board, add that moderator for all children too.
 				if (!empty($row['id_moderator']))
 					foreach ($boards as $id => $dummy)

@@ -14,15 +14,15 @@
  */
 
 /**
-	* Simple FTP protocol implementation.
-	*
-	* http://www.faqs.org/rfcs/rfc959.html
-	*/
+ * Simple FTP protocol implementation.
+ *
+ * http://www.faqs.org/rfcs/rfc959.html
+ */
 class Ftp_Connection
 {
 	/**
 		* holds the connection response
-		* @var resource
+		* @var resource|string
 		*/
 	public $connection;
 

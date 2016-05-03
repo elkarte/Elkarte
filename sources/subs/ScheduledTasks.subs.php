@@ -640,7 +640,7 @@ function run_this_task_compat($task_name)
 		if (method_exists($task_object, $method))
 		{
 			// Try to stop a timeout, this would be bad...
-			setTimeLimit(300);
+			detectServer()->setTimeLimit(300);
 
 			// Do the task...
 			$completed = $task_object->{$method}();

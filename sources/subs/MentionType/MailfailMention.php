@@ -7,15 +7,24 @@
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
- * @version 1.0 Release Candidate 2
+ * @version 1.1 beta 1
  *
  */
 
 namespace ElkArte\sources\subs\MentionType;
 
 if (!defined('ELK'))
+{
 	die('No access...');
+}
 
+/**
+ * Class Mailfail_Mention
+ *
+ * Handles notifying users who have had email notifications disabled for failure to deliver
+ *
+ * @package ElkArte\sources\subs\MentionType
+ */
 class Mailfail_Mention extends Mention_BoardAccess_Abstract
 {
 	/**
@@ -23,11 +32,10 @@ class Mailfail_Mention extends Mention_BoardAccess_Abstract
 	 */
 	protected static $_type = 'mailfail';
 
-
 	/**
 	 * {@inheritdoc }
 	 */
-	public function getNotificationBody($frequency, $members)
+	public function getNotificationBody($lang_data, $members)
 	{
 		$keys = array('subject' => 'notify_mailfail_' . $lang_data['subject'], 'body' => 'notify_mailfail_' . $lang_data['body']);
 

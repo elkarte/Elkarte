@@ -23,7 +23,6 @@ if (!defined('ELK'))
  */
 abstract class DbTable
 {
-
 	/**
 	 * We need a way to interact with the database
 	 * @var Database
@@ -175,6 +174,14 @@ abstract class DbTable
 	 * @return mixed
 	 */
 	abstract public function db_list_indexes($table_name, $detail = false, $parameters = array());
+
+	/**
+	 * Optimize a table
+	 * 
+	 * @param string $table - the table to be optimized
+	 * @return int
+	 */
+	abstract public function optimize($table);
 
 	/**
 	 * A very simple wrapper around the ALTER TABLE SQL statement.

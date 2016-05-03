@@ -80,11 +80,11 @@ class Errors
 	}
 
 	/**
-	 * Halts execution, optional displays an error message
+	 * Halts execution, optionally displays an error message
 	 *
 	 * @param string|integer $error
 	 */
-	protected function terminate($error = 0)
+	protected function terminate($error = '')
 	{
 		die(htmlspecialchars($error));
 	}

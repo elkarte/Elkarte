@@ -47,10 +47,10 @@ function deleteMembers($users, $check_not_admin = false)
 	$db = database();
 
 	// Try give us a while to sort this out...
-	setTimeLimit(600);
+	detectServer()->setTimeLimit(600);
 
 	// Try to get some more memory.
-	setMemoryLimit('128M');
+	detectServer()->setMemoryLimit('128M');
 
 	// If it's not an array, make it so!
 	if (!is_array($users))

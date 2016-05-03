@@ -16,7 +16,7 @@
  * Grabs unread messages from an imap account and saves them as .eml files
  * Passes any new messages found to the postby email function for processing
  */
-class Pbe_Imap
+class Pbe_Imap extends AbstractModel
 {
 	/**
 	 * The name of the imap host
@@ -67,7 +67,7 @@ class Pbe_Imap
 	/**
 	 * The constructor, prepares few variables.
 	 *
-	 * @param mixed[] $modSettings - May contain few settings:
+	 * $modSettings - May contain a few needed settings:
 	 *                 - maillist_imap_host
 	 *                 - maillist_imap_uid
 	 *                 - maillist_imap_pass
@@ -75,35 +75,19 @@ class Pbe_Imap
 	 *                 - maillist_imap_connection
 	 *                 - maillist_imap_delete
 	 */
-	public function __construct($modSettings)
+	public function __construct()
 	{
+		parent::__construct();
+
 		// Values used for the connection
-		if (!empty($modSettings['maillist_imap_host']))
-		{
-			$this->_hostname = $modSettings['maillist_imap_host'];
-		}
+		$this->_hostname = $this->_loadModsettings('maillist_imap_host', '');
+		$this->_username = $this->_loadModsettings('maillist_imap_uid', '');
+		$this->_password = $this->_loadModsettings('maillist_imap_pass', '');
+		$this->_mailbox = $this->_loadModsettings('maillist_imap_mailbox', '');
+		$this->_type = $this->_loadModsettings('maillist_imap_connection', '');
 
-		if (!empty($modSettings['maillist_imap_uid']))
-		{
-			$this->_username = $modSettings['maillist_imap_uid'];
-		}
-
-		if (!empty($modSettings['maillist_imap_pass']))
-		{
-			$this->_password = $modSettings['maillist_imap_pass'];
-		}
-
-		if (!empty($modSettings['maillist_imap_mailbox']))
-		{
-			$this->_mailbox = $modSettings['maillist_imap_mailbox'];
-		}
-
-		if (!empty($modSettings['maillist_imap_connection']))
-		{
-			$this->_type = $modSettings['maillist_imap_connection'];
-		}
-
-		$this->_delete = !empty($modSettings['maillist_imap_delete']);
+		// Values used for options
+		$this->_delete = (bool) $this->_loadModsettings('maillist_imap_delete');
 		$this->_is_gmail = strpos($this->_hostname, '.gmail.') !== false;
 
 		// I suppose that without this information we can't do anything.

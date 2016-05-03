@@ -1731,7 +1731,7 @@ function parseModification($file, $testing = true, $undo = false, $theme_paths =
 {
 	global $txt, $modSettings;
 
-	setTimeLimit(600);
+	detectServer()->setTimeLimit(600);
 
 	$xml = new Xml_Array(strtr($file, array("\r" => '')));
 	$actions = array();
@@ -2114,7 +2114,7 @@ function package_get_contents($filename)
 
 	if (!isset($package_cache))
 	{
-		$mem_check = setMemoryLimit('128M');
+		$mem_check = detectServer()->setMemoryLimit('128M');
 
 		// Windows doesn't seem to care about the memory_limit.
 		if (!empty($modSettings['package_disable_cache']) || $mem_check || stripos(PHP_OS, 'win') !== false)
@@ -2150,7 +2150,7 @@ function package_put_contents($filename, $data, $testing = false)
 	if (!isset($package_cache))
 	{
 		// Try to increase the memory limit - we don't want to run out of ram!
-		$mem_check = setMemoryLimit('128M');
+		$mem_check = detectServer()->setMemoryLimit('128M');
 
 		if (!empty($modSettings['package_disable_cache']) || $mem_check || stripos(PHP_OS, 'win') !== false)
 			$package_cache = array();
@@ -2510,7 +2510,7 @@ function package_create_backup($id = 'backup')
 		$output_file .= $output_ext;
 
 	// Buy some more time so we have enough to create this archive
-	setTimeLimit(300);
+	detectServer()->setTimeLimit(300);
 
 	// Set up the file output handle, try gzip first to save space
 	if (function_exists('gzopen'))

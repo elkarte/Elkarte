@@ -78,11 +78,11 @@ interface Database
 	 *
 	 * @param string $db_string
 	 * @param mixed[] $db_values = array()
-	 * @param object|null $callback
+	 * @param object|string $callback
 	 * @param mixed[]|null
 	 * @return array
 	 */
-	public function fetchQueryCallback($db_string, $db_values = array(), $callback = null, $seeds = null);
+	public function fetchQueryCallback($db_string, $db_values = array(), $callback = '', $seeds = null);
 
 	/**
 	 * Fetch next result as association.
@@ -278,4 +278,15 @@ interface Database
 	 * @return resource
 	 */
 	public function connection();
+
+	/**
+	 * This function lists all tables in the database.
+	 * The listing could be filtered according to $filter.
+	 *
+	 * @param string|bool $db_name_str string holding the database name, or false, default false
+	 * @param string|bool $filter string to filter by, or false, default false
+	 *
+	 * @return string[] an array of table names. (strings)
+	 */
+	public function db_list_tables($db_name_str = false, $filter = false);
 }

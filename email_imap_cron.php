@@ -44,7 +44,7 @@ function postbyemail_imap()
 	if (!function_exists('imap_open'))
 		return false;
 
-	$pbe = new Pbe_Imap($modSettings);
+	$pbe = new Pbe_Imap();
 
 	if ($pbe !== false)
 		return $pbe->process();

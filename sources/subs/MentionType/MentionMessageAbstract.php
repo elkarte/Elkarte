@@ -83,7 +83,7 @@ abstract class Mention_Message_Abstract implements Mention_Type_Interface
 	/**
 	 * {@inheritdoc }
 	 */
-	abstract public function getNotificationBody($frequency, $members);
+	abstract public function getNotificationBody($lang_data, $members);
 
 	/**
 	 * {@inheritdoc }

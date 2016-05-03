@@ -1346,7 +1346,7 @@ function pauseRepairProcess($to_fix, $current_step_description, $max_substep = 0
 	global $context, $txt, $time_start, $db_show_debug;
 
 	// More time, I need more time!
-	setTimeLimit(600);
+	detectServer()->setTimeLimit(600);
 
 	// Errr, wait.  How much time has this taken already?
 	if (!$force && microtime(true) - $time_start > 3)
@@ -1399,7 +1399,7 @@ function findForumErrors($do_fix = false)
 	$db = database();
 
 	// This may take some time...
-	setTimeLimit(600);
+	detectServer()->setTimeLimit(600);
 
 	$to_fix = !empty($_SESSION['repairboards_to_fix']) ? $_SESSION['repairboards_to_fix'] : array();
 	$context['repair_errors'] = isset($_SESSION['repairboards_to_fix2']) ? $_SESSION['repairboards_to_fix2'] : array();

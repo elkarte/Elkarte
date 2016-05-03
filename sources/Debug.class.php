@@ -249,7 +249,7 @@ class Debug
 		$this->_system['system_type'] = php_uname();
 		require_once(SUBSDIR . '/Server.subs.php');
 		$this->_system['server_load'] = detectServerLoad();
-		$this->_system['script_mem_load'] = round(memory_get_peak_usage() / 1024 / 1024, 2) . 'MB';
+		$this->_system['script_mem_load'] = byte_format(memory_get_peak_usage());
 
 		// getrusage() information is CPU time, not wall clock time like microtime, *nix only
 		$this->rusage('end');

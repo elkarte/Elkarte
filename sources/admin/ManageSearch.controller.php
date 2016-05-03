@@ -392,14 +392,14 @@ class ManageSearch_Controller extends Action_Controller
 				'custom_index_length' => $txt['not_applicable'],
 			);
 
-		// Format the data and index length in kilobytes.
+		// Format the data and index length in human readable form.
 		foreach ($context['table_info'] as $type => $size)
 		{
 			// If it's not numeric then just break.  This database engine doesn't support size.
 			if (!is_numeric($size))
 				break;
 
-			$context['table_info'][$type] = comma_format($context['table_info'][$type] / 1024) . ' ' . $txt['search_method_kilobytes'];
+			$context['table_info'][$type] = byte_format($context['table_info'][$type]);
 		}
 
 		$context['custom_index'] = !empty($modSettings['search_custom_index_config']);
@@ -427,7 +427,7 @@ class ManageSearch_Controller extends Action_Controller
 		global $modSettings, $context, $txt, $db_show_debug;
 
 		// Scotty, we need more time...
-		setTimeLimit(600);
+		detectServer()->setTimeLimit(600);
 
 		$context[$context['admin_menu_name']]['current_subsection'] = 'method';
 		$context['page_title'] = $txt['search_index_custom'];

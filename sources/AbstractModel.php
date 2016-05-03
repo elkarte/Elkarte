@@ -29,11 +29,39 @@ abstract class AbstractModel
 	protected $_db = null;
 
 	/**
-	 * Load the db to the class
-	 * @param object $db
+	 * The modSettings
+	 * @var array
 	 */
-	public function __construct($db)
+	protected $_modSettings = array();
+
+	/**
+	 * Make "global" items available to the class
+	 * @param object|null $db
+	 */
+	public function __construct($db = null)
 	{
+		global $modSettings;
+
 		$this->_db = $db;
+		$this->_modSettings = new ArrayObject($modSettings, ArrayObject::ARRAY_AS_PROPS);
+	}
+
+	/**
+	 * Method to return a $modSetting value
+	 *
+	 * - Returned value will be the value or null of the key is not set
+	 * - If you simply want a value back access it directly as $this->_modSettings->name or $this->_modSettings[name]
+	 *
+	 * @param string $name The key name of the value to return
+	 * @param mixed|null $default default value to return if key value is not found
+	 */
+	protected function _loadModsettings($name = '', $default = null)
+	{
+		if (!empty($this->_modSettings->{$name}))
+		{
+			return $this->_modSettings->{$name};
+		}
+		else
+			return $default;
 	}
 }

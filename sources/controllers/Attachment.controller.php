@@ -430,7 +430,7 @@ class Attachment_Controller extends Action_Controller
 			header('Content-Length: ' . filesize($filename));
 
 		// Try to buy some time...
-		@set_time_limit(600);
+		detectServer()->setTimeLimit(600);
 
 		// Recode line endings for text files, if enabled.
 		if (!empty($modSettings['attachmentRecodeLineEndings']) && !isset($this->_req->query->image) && in_array($file_ext, array('txt', 'css', 'htm', 'html', 'php', 'xml')))
@@ -621,7 +621,7 @@ class Attachment_Controller extends Action_Controller
 			header('Content-Length: ' . filesize($filename));
 
 		// Try to buy some time...
-		@set_time_limit(600);
+		detectServer()->setTimeLimit(600);
 
 		if ($resize && resizeImageFile($filename, $filename . '_thumb', 100, 100))
 			$filename = $filename . '_thumb';

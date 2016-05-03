@@ -355,8 +355,7 @@ class ManageLanguages_Controller extends Action_Controller
 		}
 
 		// @todo Open up the old china.
-		if (!isset($archive_content))
-			$archive_content = read_tgz_file('http://download.elkarte.net/fetch_language.php?version=' . urlencode(strtr(FORUM_VERSION, array('ElkArte ' => ''))) . ';fetch=' . urlencode($this->_req->query->did), null);
+		$archive_content = read_tgz_file('http://download.elkarte.net/fetch_language.php?version=' . urlencode(strtr(FORUM_VERSION, array('ElkArte ' => ''))) . ';fetch=' . urlencode($this->_req->query->did), null);
 
 		if (empty($archive_content))
 			Errors::instance()->fatal_error($txt['add_language_error_no_response']);

@@ -41,7 +41,7 @@ class Notifications extends AbstractModel
 	/**
 	 * Available notification frequencies
 	 *
-	 * @var string[]
+	 * @var array
 	 */
 	protected $_notifiers;
 
@@ -52,6 +52,13 @@ class Notifications extends AbstractModel
 	 */
 	protected $_protect_id = true;
 
+	/**
+	 * Notifications constructor.
+	 * 
+	 * Registers the known notifications to the system, allows for integration to add more
+	 *
+	 * @param object $db
+	 */
 	public function __construct($db)
 	{
 		parent::__construct($db);
@@ -125,6 +132,7 @@ class Notifications extends AbstractModel
 	 */
 	public function register($id, $key, $callback, $lang_data = null)
 	{
+		// 1-4 are system notifications and can not be changed.
 		if ($this->_protect_id && $id < 5)
 			throw new Elk_Exception('error_invalid_notification_id');
 
