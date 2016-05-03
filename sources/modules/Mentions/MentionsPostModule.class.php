@@ -14,6 +14,11 @@
 if (!defined('ELK'))
 	die('No access...');
 
+/**
+ * Class Mentions_Post_Module
+ *
+ * @package Mentions
+ */
 class Mentions_Post_Module extends Mentions_Module_Abstract
 {
 	/**
