@@ -23,6 +23,11 @@ if (!defined('ELK'))
  */
 class Remove_Old_Followups implements Scheduled_Task_Interface
 {
+	/**
+	 * Remove followups that point to removed topics
+	 *
+	 * @return bool
+	 */
 	public function run()
 	{
 		global $modSettings;
@@ -32,8 +37,10 @@ class Remove_Old_Followups implements Scheduled_Task_Interface
 
 		$db = database();
 
+		// The old FU request :P
 		$request = $db->query('', '
-			SELECT fu.derived_from
+			SELECT 
+				fu.derived_from
 			FROM {db_prefix}follow_ups AS fu
 				LEFT JOIN {db_prefix}messages AS m ON (fu.derived_from = m.id_msg)
 			WHERE m.id_msg IS NULL
@@ -42,7 +49,6 @@ class Remove_Old_Followups implements Scheduled_Task_Interface
 				'limit' => 100,
 			)
 		);
-
 		$remove = array();
 		while ($row = $db->fetch_assoc($request))
 			$remove[] = $row['derived_from'];

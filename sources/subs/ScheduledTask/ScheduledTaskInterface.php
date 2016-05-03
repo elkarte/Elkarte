@@ -16,6 +16,13 @@ namespace ElkArte\sources\subs\ScheduledTask;
 if (!defined('ELK'))
 	die('No access...');
 
+/**
+ * Interface Scheduled_Task_Interface
+ *
+ * - Calls the run method for all registered tasks
+ *
+ * @package ElkArte\sources\subs\ScheduledTask
+ */
 interface Scheduled_Task_Interface
 {
 	public function run();

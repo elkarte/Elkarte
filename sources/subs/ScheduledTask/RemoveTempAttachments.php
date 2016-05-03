@@ -32,6 +32,11 @@ if (!defined('ELK'))
  */
 class Remove_Temp_Attachments implements Scheduled_Task_Interface
 {
+	/**
+	 * Clean up the file system by removing up-posted or failed attachments
+	 *
+	 * @return bool
+	 */
 	public function run()
 	{
 		global $context, $txt;
@@ -61,7 +66,7 @@ class Remove_Temp_Attachments implements Scheduled_Task_Interface
 				loadLanguage('Post');
 
 				$context['scheduled_errors']['remove_temp_attachments'][] = $txt['cant_access_upload_path'] . ' (' . $attach_dir . ')';
-				Errors::instance()->log_error($txt['cant_access_upload_path'] . ' (' . $e->getMessage() . ')', 'critical');
+				\Errors::instance()->log_error($txt['cant_access_upload_path'] . ' (' . $e->getMessage() . ')', 'critical');
 
 				return false;
 			}

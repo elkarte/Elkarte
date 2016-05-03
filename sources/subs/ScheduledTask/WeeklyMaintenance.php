@@ -33,6 +33,11 @@ if (!defined('ELK'))
  */
 class Weekly_Maintenance implements Scheduled_Task_Interface
 {
+	/**
+	 * Runs the weekly maintenance tasks to keep the forum running smooth as silk
+	 *
+	 * @return bool
+	 */
 	public function run()
 	{
 		global $modSettings;
