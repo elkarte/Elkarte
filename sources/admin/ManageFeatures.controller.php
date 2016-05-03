@@ -1387,14 +1387,6 @@ class ManageFeatures_Controller extends Action_Controller
 
 		$config_vars = getFrontPageControllers();
 
-		if (!empty($front_page))
-		{
-			$config_vars = array(
-					array('select', 'front_page', $front_page),
-				'',
-			);
-		}
-
 		$config_vars += array(
 				// Pagination stuff.
 				array('check', 'compactTopicPagesEnable'),
