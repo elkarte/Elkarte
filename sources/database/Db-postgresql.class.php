@@ -850,13 +850,7 @@ class Database_PostgreSQL extends Database_Abstract
 	}
 
 	/**
-	 * This function lists all tables in the database.
-	 * The listing could be filtered according to $filter.
-	 *
-	 * @param string|bool $db_name_str string holding the database name, or false, default false
-	 * @param string|bool $filter string to filter by, or false, default false
-	 *
-	 * @return string[] an array of table names. (strings)
+	 * {@inheritdoc}
 	 */
 	public function db_list_tables($db_name_str = false, $filter = false)
 	{

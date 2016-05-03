@@ -26,7 +26,7 @@ abstract class Database_Abstract implements Database
 {
 	/**
 	 * Current connection to the database
-	 * @var resource
+	 * @var mysqli|postgre|resource
 	 */
 	protected $_connection = null;
 
@@ -185,6 +185,8 @@ abstract class Database_Abstract implements Database
 				$this->error_backtrace('Undefined type used in the database query. (' . $matches[1] . ':' . $matches[2] . ')', '', false, __FILE__, __LINE__);
 			break;
 		}
+
+		return '';
 	}
 
 	/**
@@ -193,7 +195,7 @@ abstract class Database_Abstract implements Database
 	 *
 	 * @param string $db_string
 	 * @param mixed[] $db_values
-	 * @param resource|null $connection = null
+	 * @param mysqli|postgre|null $connection = null
 	 */
 	public function quote($db_string, $db_values, $connection = null)
 	{
@@ -240,9 +242,9 @@ abstract class Database_Abstract implements Database
 	/**
 	 * {@inheritDoc}
 	 */
-	public function fetchQueryCallback($db_string, $db_values = array(), $callback = null, $seeds = null)
+	public function fetchQueryCallback($db_string, $db_values = array(), $callback = '', $seeds = null)
 	{
-		if ($callback === null)
+		if ($callback === '')
 			return $this->fetchQuery($db_string, $db_values);
 
 		$request = $this->query('', $db_string, $db_values);
@@ -333,6 +335,8 @@ abstract class Database_Abstract implements Database
 			trigger_error($error_message . ($line !== null ? '<em>(' . basename($file) . '-' . $line . ')</em>' : ''), $error_type);
 		else
 			trigger_error($error_message . ($line !== null ? '<em>(' . basename($file) . '-' . $line . ')</em>' : ''));
+
+		return array('', '');
 	}
 
 	/**
@@ -415,8 +419,25 @@ abstract class Database_Abstract implements Database
 		$this->_skip_error = $set;
 	}
 
+	/**
+	 * Set the unbuffered state for the connection
+	 *
+	 * @param bool $state
+	 */
 	public function setUnbuffered($state)
 	{
 		$this->_unbuffered = (bool) $state;
 	}
+
+	/**
+	 * Finds out if the connection is still valid.
+	 *
+	 * @param mysqli|postgre|null $connection = null
+	 */
+	public function _validConnection($connection = null)
+	{
+		return is_object($connection);
+	}
+
+
 }

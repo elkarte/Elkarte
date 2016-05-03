@@ -32,6 +32,7 @@ class Database_MySQL extends Database_Abstract
 {
 	/**
 	 * Holds current instance of the class
+	 *
 	 * @var Database_MySQL
 	 */
 	private static $_db = null;
@@ -118,12 +119,11 @@ class Database_MySQL extends Database_Abstract
 	 * @param string $identifier
 	 * @param string $db_string
 	 * @param mixed[]|false $db_values = array()
-	 * @param resource|false|null $connection = null
+	 * @param mysqli|false|null $connection = null
 	 */
 	public function query($identifier, $db_string, $db_values = array(), $connection = null)
 	{
-		global $db_show_debug, $time_start;
-		global $modSettings;
+		global $db_show_debug, $time_start, $modSettings;
 
 		// Comments that are allowed in a query are preg_removed.
 		static $allowed_comments_from = array(
@@ -357,7 +357,7 @@ class Database_MySQL extends Database_Abstract
 	/**
 	 * Affected rows from previous operation.
 	 *
-	 * @param resource|null $connection
+	 * @param mysqli|null $connection
 	 */
 	public function affected_rows($connection = null)
 	{
@@ -369,7 +369,7 @@ class Database_MySQL extends Database_Abstract
 	 *
 	 * @param string $table
 	 * @param string|null $field = null
-	 * @param resource|null $connection = null
+	 * @param mysqli|null $connection = null
 	 */
 	public function insert_id($table, $field = null, $connection = null)
 	{
@@ -378,10 +378,10 @@ class Database_MySQL extends Database_Abstract
 	}
 
 	/**
-	 * Fetch a row from the resultset given as parameter.
+	 * Fetch a row from the result set given as parameter.
 	 * MySQL implementation doesn't use $counter parameter.
 	 *
-	 * @param resource $result
+	 * @param mysqli_result $result
 	 * @param integer|bool $counter = false
 	 */
 	public function fetch_row($result, $counter = false)
@@ -393,7 +393,7 @@ class Database_MySQL extends Database_Abstract
 	/**
 	 * Free the resultset.
 	 *
-	 * @param resource $result
+	 * @param mysqli_result $result
 	 */
 	public function free_result($result)
 	{
@@ -404,7 +404,7 @@ class Database_MySQL extends Database_Abstract
 	/**
 	 * Get the number of rows in the result.
 	 *
-	 * @param resource $result
+	 * @param mysqli_result $result
 	 */
 	public function num_rows($result)
 	{
@@ -413,9 +413,9 @@ class Database_MySQL extends Database_Abstract
 	}
 
 	/**
-	 * Get the number of fields in the resultset.
+	 * Get the number of fields in the result set.
 	 *
-	 * @param resource $request
+	 * @param mysqli_result $request
 	 */
 	public function num_fields($request)
 	{
@@ -425,7 +425,7 @@ class Database_MySQL extends Database_Abstract
 	/**
 	 * Reset the internal result pointer.
 	 *
-	 * @param resource $request
+	 * @param mysqli_result $request
 	 * @param integer $counter
 	 */
 	public function data_seek($request, $counter)
@@ -438,7 +438,7 @@ class Database_MySQL extends Database_Abstract
 	 * Do a transaction.
 	 *
 	 * @param string $type - the step to perform (i.e. 'begin', 'commit', 'rollback')
-	 * @param resource|null $connection = null
+	 * @param mysqli|null $connection = null
 	 */
 	public function db_transaction($type = 'commit', $connection = null)
 	{
@@ -458,7 +458,7 @@ class Database_MySQL extends Database_Abstract
 	/**
 	 * Return last error string from the database server
 	 *
-	 * @param resource|null $connection = null
+	 * @param mysqli|null $connection = null
 	 */
 	public function last_error($connection = null)
 	{
@@ -474,12 +474,11 @@ class Database_MySQL extends Database_Abstract
 	 * Backtrace, log, try to fix.
 	 *
 	 * @param string $db_string
-	 * @param resource|null $connection = null
+	 * @param mysqli|null $connection = null
 	 */
 	public function error($db_string, $connection = null)
 	{
-		global $txt, $context, $webmaster_email, $modSettings;
-		global $db_persist;
+		global $txt, $context, $webmaster_email, $modSettings, $db_persist;
 		global $db_server, $db_user, $db_passwd, $db_name, $db_show_debug, $ssi_db_user, $ssi_db_passwd;
 
 		// Get the file and line numbers.
@@ -533,6 +532,7 @@ class Database_MySQL extends Database_Abstract
 		if (function_exists('Cache::instance()->get') && (!isset($modSettings['autoFixDatabase']) || $modSettings['autoFixDatabase'] == '1'))
 		{
 			$db_last_error = db_last_error();
+
 			// Force caching on, just for the error checking.
 			$old_cache = isset($modSettings['cache_enable']) ? $modSettings['cache_enable'] : null;
 			$modSettings['cache_enable'] = '1';
@@ -688,7 +688,7 @@ class Database_MySQL extends Database_Abstract
 	 * @param mixed[] $data
 	 * @param mixed[] $keys
 	 * @param bool $disable_trans = false
-	 * @param resource|null $connection = null
+	 * @param mysqli|null $connection = null
 	 */
 	public function insert($method = 'replace', $table, $columns, $data, $keys, $disable_trans = false, $connection = null)
 	{
@@ -730,7 +730,7 @@ class Database_MySQL extends Database_Abstract
 		}
 
 		// Determine the method of insertion.
-		$queryTitle = $method == 'replace' ? 'REPLACE' : ($method == 'ignore' ? 'INSERT IGNORE' : 'INSERT');
+		$queryTitle = $method === 'replace' ? 'REPLACE' : ($method == 'ignore' ? 'INSERT IGNORE' : 'INSERT');
 
 		// Do the insert.
 		$this->query('', '
@@ -787,7 +787,6 @@ class Database_MySQL extends Database_Abstract
 			$start = 0;
 		}
 
-		$data = '';
 		$tableName = str_replace('{db_prefix}', $db_prefix, $tableName);
 
 		// This will be handy...
@@ -958,13 +957,7 @@ class Database_MySQL extends Database_Abstract
 	}
 
 	/**
-	 * This function lists all tables in the database.
-	 * The listing could be filtered according to $filter.
-	 *
-	 * @param string|bool $db_name_str string holding the database name, or false, default false
-	 * @param string|bool $filter string to filter by, or false, default false
-	 *
-	 * @return string[] an array of table names. (strings)
+	 * {@inheritdoc}
 	 */
 	public function db_list_tables($db_name_str = false, $filter = false)
 	{
@@ -1191,7 +1184,7 @@ class Database_MySQL extends Database_Abstract
 	/**
 	 * Return server info.
 	 *
-	 * @param resource|null $connection
+	 * @param mysqli|null $connection
 	 *
 	 * @return string
 	 */
@@ -1225,7 +1218,7 @@ class Database_MySQL extends Database_Abstract
 	 * Select database.
 	 *
 	 * @param string|null $dbName = null
-	 * @param resource|null $connection = null
+	 * @param mysqli|null $connection = null
 	 */
 	public function select_db($dbName = null, $connection = null)
 	{
@@ -1241,15 +1234,5 @@ class Database_MySQL extends Database_Abstract
 	public static function db()
 	{
 		return self::$_db;
-	}
-
-	/**
-	 * Finds out if the connection is still valid.
-	 *
-	 * @param object|null $connection = null
-	 */
-	protected function _validConnection($connection = null)
-	{
-		return is_object($connection);
 	}
 }

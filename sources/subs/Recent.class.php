@@ -26,18 +26,44 @@ if (!defined('ELK'))
  */
 class Recent_Class
 {
+	/**
+	 * Holds the boards the member is looking at
+	 * @var string
+	 */
 	private $_query_this_board = '';
 
+	/**
+	 * All of hte recent messages
+	 * @var array
+	 */
 	private $_messages = array();
 
+	/**
+	 * All of the recent posts
+	 * @var array
+	 */
 	private $_board_ids = array();
 
+	/**
+	 * @var array
+	 */
 	private $_posts = array();
 
+	/**
+	 * If we will cache the results
+	 * @var bool
+	 */
 	private $_cache_results = false;
 
+	/**
+	 * user id to check for recent messages
+	 * @var int
+	 */
 	private $_user_id = 0;
 
+	/**
+	 * @var Database|null
+	 */
 	private $_db = null;
 
 	/**
@@ -65,9 +91,13 @@ class Recent_Class
 	public function setBoards($boards)
 	{
 		if (is_array($boards))
+		{
 			$this->_query_parameters['boards'] = $boards;
+		}
 		else
+		{
 			$this->_query_parameters['boards'] = array($boards);
+		}
 
 		$this->_query_this_board .= 'b.id_board IN ({array_int:boards})';
 	}
@@ -80,7 +110,7 @@ class Recent_Class
 	public function setEarliestMsg($msg_id)
 	{
 		$this->_query_this_board .= '
-						AND m.id_msg >= {int:max_id_msg}';
+			AND m.id_msg >= {int:max_id_msg}';
 		$this->_query_parameters['max_id_msg'] = $msg_id;
 	}
 
@@ -94,8 +124,8 @@ class Recent_Class
 	public function setVisibleBoards($msg_id, $recycle)
 	{
 		$this->_query_this_board .= '{query_wanna_see_board}' . (!empty($recycle) ? '
-						AND b.id_board != {int:recycle_board}' : '') . '
-						AND m.id_msg >= {int:max_id_msg}';
+			AND b.id_board != {int:recycle_board}' : '') . '
+			AND m.id_msg >= {int:max_id_msg}';
 
 		if (!empty($recycle))
 			$this->_query_parameters['recycle_board'] = $msg_id;
@@ -114,12 +144,15 @@ class Recent_Class
 		$cache = Cache::instance();
 		$key = 'recent-' . $this->_user_id . '-' . md5(serialize(array_diff_key($this->_query_parameters, array('max_id_msg' => 0)))) . '-' . $start . '-' . $limit;
 		$this->_messages = $cache->get($key, 120);
+
 		if ($cache->isMiss())
 		{
 			$this->_findRecentMessages($start, $limit);
 
 			if (!empty($this->_cache_results))
+			{
 				$cache->put($key, $this->_messages, 120);
+			}
 		}
 
 		return !empty($this->_messages);
@@ -171,8 +204,12 @@ class Recent_Class
 
 					// Okay, looks like they can do it for these posts.
 					foreach ($this->_board_ids[$type][$board_id] as $counter)
-						if ($type == 'any' || $this->_posts[$counter]['poster']['id'] == $this->_user_id)
+					{
+						if ($type === 'any' || $this->_posts[$counter]['poster']['id'] == $this->_user_id)
+						{
 							$this->_posts[$counter]['tests'][$allowed] = true;
+						}
+					}
 				}
 			}
 		}
@@ -194,7 +231,8 @@ class Recent_Class
 			// Find the 10 most recent messages they can *view*.
 			// @todo SLOW This query is really slow still, probably?
 			$request = $this->_db->query('', '
-				SELECT m.id_msg
+				SELECT 
+					m.id_msg
 				FROM {db_prefix}messages AS m
 					INNER JOIN {db_prefix}boards AS b ON (b.id_board = m.id_board)
 				WHERE ' . $this->_query_this_board . '
@@ -220,13 +258,16 @@ class Recent_Class
 		}
 		$this->_messages = array();
 		while ($row = $this->_db->fetch_assoc($request))
+		{
 			$this->_messages[] = $row['id_msg'];
-
+		}
 		$this->_db->free_result($request);
 	}
 
 	/**
 	 * For a supplied list of message id's, loads the posting details for each.
+	 *
+	 * What it does:
 	 *  - Intended to get all the most recent posts.
 	 *  - Tracks the posts made by this user (from the supplied message list) and
 	 *    loads the id's in to the 'own' or 'any' array.
@@ -260,8 +301,9 @@ class Recent_Class
 		);
 		$returns = array();
 		while ($row = $this->_db->fetch_assoc($request))
+		{
 			$returns[] = $row;
-
+		}
 		$this->_db->free_result($request);
 
 		list ($this->_posts, $this->_board_ids) = prepareRecentPosts($returns, $start);
