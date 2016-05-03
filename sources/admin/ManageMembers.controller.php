@@ -1093,7 +1093,6 @@ class ManageMembers_Controller extends Action_Controller
 
 		// Start off clean
 		$this->conditions = array();
-		$this->_req->query->type;
 
 		// Sort out where we are going...
 		$current_filter = $this->conditions['activated_status'] = (int) $this->_req->post->orig_filter;
