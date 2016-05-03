@@ -25,6 +25,11 @@ if (!defined('ELK'))
  */
 class Maillist_Fetch_IMAP implements Scheduled_Task_Interface
 {
+	/**
+	 * Run the the pseudo cron for IMAP email collection
+	 *
+	 * @return bool
+	 */
 	public function run()
 	{
 		// Only should be run if the user can't set up a proper cron job and can not pipe emails

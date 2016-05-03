@@ -29,6 +29,11 @@ if (!defined('ELK'))
  */
 class Approval_Notification implements Scheduled_Task_Interface
 {
+	/**
+	 * Checks who needs to receive approvals emails and sends them.
+	 *
+	 * @return bool
+	 */
 	public function run()
 	{
 		global $scripturl, $txt;
@@ -37,7 +42,10 @@ class Approval_Notification implements Scheduled_Task_Interface
 
 		// Grab all the items awaiting approval and sort type then board - clear up any things that are no longer relevant.
 		$request = $db->query('', '
-			SELECT aq.id_msg, aq.id_attach, aq.id_event, m.id_topic, m.id_board, m.subject, t.id_first_msg,
+			SELECT 
+				aq.id_msg, aq.id_attach, aq.id_event, 
+				m.id_topic, m.id_board, m.subject, 
+				t.id_first_msg,
 				b.id_profile
 			FROM {db_prefix}approval_queue AS aq
 				INNER JOIN {db_prefix}messages AS m ON (m.id_msg = aq.id_msg)
@@ -87,7 +95,8 @@ class Approval_Notification implements Scheduled_Task_Interface
 		// Now we need to think about finding out *who* can approve - this is hard!
 		// First off, get all the groups with this permission and sort by board.
 		$request = $db->query('', '
-			SELECT id_group, id_profile, add_deny
+			SELECT
+			 	id_group, id_profile, add_deny
 			FROM {db_prefix}board_permissions
 			WHERE permission = {string:approve_posts}
 				AND id_profile IN ({array_int:profile_list})',
@@ -129,7 +138,8 @@ class Approval_Notification implements Scheduled_Task_Interface
 
 		// Come along one and all... until we reject you ;)
 		$request = $db->query('', '
-			SELECT id_member, real_name, email_address, lngfile, id_group, additional_groups, mod_prefs
+			SELECT 
+				id_member, real_name, email_address, lngfile, id_group, additional_groups, mod_prefs
 			FROM {db_prefix}members
 			WHERE id_group IN ({array_int:additional_group_list})
 				OR FIND_IN_SET({raw:additional_group_list_implode}, additional_groups) != 0' . (empty($members) ? '' : '
