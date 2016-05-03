@@ -52,11 +52,11 @@ class Jslocale_Controller extends Action_Controller
 		$this->_file_data = '(function ($) {
 		\'use strict\';
 
-		$.sceditor.locale[' . javaScriptEscape($txt['lang_locale']) . '] = {';
+		$.sceditor.locale[' . JavaScriptEscape($txt['lang_locale']) . '] = {';
 
 		foreach ($editortxt as $key => $val)
 			$this->_file_data .= '
-			' . javaScriptEscape($key) . ': ' . javaScriptEscape($val) . ',';
+			' . JavaScriptEscape($key) . ': ' . JavaScriptEscape($val) . ',';
 
 		$this->_file_data .= '
 			dateFormat: "day.month.year"
