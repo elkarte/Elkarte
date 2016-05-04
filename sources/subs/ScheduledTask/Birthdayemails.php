@@ -28,6 +28,11 @@ if (!defined('ELK'))
  */
 class Birthdayemails implements Scheduled_Task_Interface
 {
+	/**
+	 * Happy birthday to me ! Sends out birthday greeting emails.
+	 *
+	 * @return bool
+	 */
 	public function run()
 	{
 		global $modSettings, $txt, $txtBirthdayEmails;
@@ -48,7 +53,8 @@ class Birthdayemails implements Scheduled_Task_Interface
 
 		// So who are the lucky ones?  Don't include those who are banned and those who don't want them.
 		$result = $db->query('', '
-			SELECT id_member, real_name, lngfile, email_address
+			SELECT 
+				id_member, real_name, lngfile, email_address
 			FROM {db_prefix}members
 			WHERE is_activated < 10
 				AND MONTH(birthdate) = {int:month}
@@ -62,7 +68,6 @@ class Birthdayemails implements Scheduled_Task_Interface
 				'day' => $day,
 			)
 		);
-
 		// Group them by languages.
 		$birthdays = array();
 		while ($row = $db->fetch_assoc($result))

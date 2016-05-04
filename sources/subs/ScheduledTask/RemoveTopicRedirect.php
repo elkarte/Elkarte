@@ -30,6 +30,11 @@ if (!defined('ELK'))
  */
 class Remove_Topic_Redirect implements Scheduled_Task_Interface
 {
+	/**
+	 * Removes all of the expired Move Redirect topic notices that people hate
+	 *
+	 * @return bool
+	 */
 	public function run()
 	{
 		$db = database();
@@ -42,7 +47,8 @@ class Remove_Topic_Redirect implements Scheduled_Task_Interface
 
 		// Find all of the old MOVE topic notices that were set to expire
 		$request = $db->query('', '
-			SELECT id_topic
+			SELECT 
+				id_topic
 			FROM {db_prefix}topics
 			WHERE redirect_expires <= {int:redirect_expires}
 				AND redirect_expires <> 0',
@@ -50,7 +56,6 @@ class Remove_Topic_Redirect implements Scheduled_Task_Interface
 				'redirect_expires' => time(),
 			)
 		);
-
 		while ($row = $db->fetch_row($request))
 			$topics[] = $row[0];
 		$db->free_result($request);

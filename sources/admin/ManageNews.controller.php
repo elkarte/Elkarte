@@ -250,8 +250,8 @@ class ManageNews_Controller extends Action_Controller
 			document.getElementById(\'list_news_lists_last\').style.display = "none";
 			document.getElementById("moreNewsItems_link").style.display = "inline";
 			var last_preview = 0;
-			var txt_preview = ' . javaScriptEscape($txt['preview']) . ';
-			var txt_news_error_no_news = ' . javaScriptEscape($txt['news_error_no_news']) . ';
+			var txt_preview = ' . JavaScriptEscape($txt['preview']) . ';
+			var txt_news_error_no_news = ' . JavaScriptEscape($txt['news_error_no_news']) . ';
 
 			$(document).ready(function () {
 				$("div[id ^= \'preview_\']").each(function () {

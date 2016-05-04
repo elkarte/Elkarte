@@ -18,11 +18,34 @@
 if (!defined('ELK'))
 	die('No access...');
 
+/**
+ * Class Drafts_Post_Module
+ *
+ * Events and functions for post based drafts
+ */
 class Drafts_Post_Module implements ElkArte\sources\modules\Module_Interface
 {
+	/**
+	 * Autosave enabled
+	 * @var bool
+	 */
 	protected static $_autosave_enabled = false;
+
+	/**
+	 * How often to autosave if enabled
+	 * @var int
+	 */
 	protected static $_autosave_frequency = 30000;
+
+	/**
+	 * Subject length that we can save
+	 * @var int
+	 */
 	protected static $_subject_length = 24;
+
+	/**
+	 * @var Event_Manager
+	 */
 	protected static $_eventsManager = null;
 
 	/**
@@ -58,11 +81,30 @@ class Drafts_Post_Module implements ElkArte\sources\modules\Module_Interface
 		return $return;
 	}
 
+	/**
+	 * Make sure its a preview and not saving a draft
+	 *
+	 * @param bool $really_previewing
+	 */
 	public function prepare_modifying(&$really_previewing)
 	{
 		$really_previewing = $really_previewing && !isset($_REQUEST['save_draft']);
 	}
 
+	/**
+	 * Get the post editor setup to work with drafts
+	 *
+	 * What it does:
+	 * - Loads draft plugin to the editor options
+	 * - Loads available drafts that can be loaded in to the editor
+	 * - Updates the editor shortcut lines
+	 * - Adds save draft button
+	 *
+	 * @param array $editorOptions
+	 * @param int $board
+	 * @param int $topic
+	 * @param Template_Layers $template_layers
+	 */
 	public function finalize_post_form(&$editorOptions, $board, $topic, $template_layers)
 	{
 		global $context, $user_info, $options, $txt;
@@ -121,6 +163,10 @@ class Drafts_Post_Module implements ElkArte\sources\modules\Module_Interface
 		}
 	}
 
+	/**
+	 * When the prepare_save_post event fires, checks if it was
+	 * in response to a save draft event
+	 */
 	public function prepare_save_post()
 	{
 		// Drafts enabled and needed?
@@ -128,6 +174,11 @@ class Drafts_Post_Module implements ElkArte\sources\modules\Module_Interface
 			require_once(SUBSDIR . '/Drafts.subs.php');
 	}
 
+	/**
+	 * Does the actual saving of a Draft to the DB
+	 *
+	 * @throws Controller_Redirect_Exception
+	 */
 	public function before_save_post()
 	{
 		global $context, $modSettings, $board, $user_info;
@@ -181,6 +232,9 @@ class Drafts_Post_Module implements ElkArte\sources\modules\Module_Interface
 		}
 	}
 
+	/**
+	 * Fired after the saving of a post, attempts to remove any drafts that are associated with it
+	 */
 	public function after_save_post()
 	{
 		global $user_info;
@@ -192,9 +246,11 @@ class Drafts_Post_Module implements ElkArte\sources\modules\Module_Interface
 
 	/**
 	 * Loads in a group of post drafts for the user.
-	 * Loads a specific draft for current use in the postbox if selected.
-	 * Used in the posting screens to allow draft selection
-	 * Will load a draft if selected is supplied via post
+	 *
+	 * What it does:
+	 * - Loads a specific draft for current use in the postbox if selected.
+	 * - Used in the posting screens to allow draft selection
+	 * - Will load a draft if selected is supplied via post
 	 *
 	 * @param int $member_id
 	 * @param int|bool $id_topic if set, load drafts for the specified topic
@@ -232,5 +288,7 @@ class Drafts_Post_Module implements ElkArte\sources\modules\Module_Interface
 				'link' => '<a href="' . $scripturl . '?action=post;board=' . $draft['id_board'] . ';' . (!empty($draft['id_topic']) ? 'topic=' . $draft['id_topic'] . '.0;' : '') . 'id_draft=' . $draft['id_draft'] . '">' . (!empty($draft['subject']) ? $draft['subject'] : $txt['drafts_none']) . '</a>',
 			);
 		}
+
+		return true;
 	}
 }

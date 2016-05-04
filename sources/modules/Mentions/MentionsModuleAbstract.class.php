@@ -14,6 +14,11 @@
 if (!defined('ELK'))
 	die('No access...');
 
+/**
+ * Class Mentions_Module_Abstract
+ *
+ * @package Mentions
+ */
 abstract class Mentions_Module_Abstract implements ElkArte\sources\modules\Module_Interface
 {
 	/**

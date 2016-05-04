@@ -1,7 +1,7 @@
 <?php
 
 /**
- * 
+ *
  *
  * @name      ElkArte Forum
  * @copyright ElkArte Forum contributors
@@ -18,6 +18,11 @@
 if (!defined('ELK'))
 	die('No access...');
 
+/**
+ * Class Verification_PersonalMessage_Module
+ *
+ * Adds Visual Verification controls to the PM page for those that need it.
+ */
 class Verification_PersonalMessage_Module implements ElkArte\sources\modules\Module_Interface
 {
 	/**
@@ -27,10 +32,12 @@ class Verification_PersonalMessage_Module implements ElkArte\sources\modules\Mod
 	{
 		global $user_info, $modSettings;
 
+		// Are controls required?
 		if (!$user_info['is_admin'] && !empty($modSettings['pm_posts_verification']) && $user_info['posts'] < $modSettings['pm_posts_verification'])
 		{
 			require_once(SUBSDIR . '/VerificationControls.class.php');
 
+			// Add the events to call for the verification
 			return array(
 				array('prepare_send_context', array('Verification_PersonalMessage_Module', 'prepare_send_context'), array()),
 				array('before_sending', array('Verification_PersonalMessage_Module', 'before_sending'), array('post_errors')),
@@ -59,6 +66,7 @@ class Verification_PersonalMessage_Module implements ElkArte\sources\modules\Mod
 
 	/**
 	 * Checks the user passed the verifications on the PM page.
+	 *
 	 * @param \Error_Context $post_errors
 	 */
 	public function before_sending($post_errors)

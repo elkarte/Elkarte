@@ -23,13 +23,18 @@ if (!defined('ELK'))
 /**
  * Class Paid_Subscriptions - Perform the standard checks on expiring/near expiring subscriptions:
  *
- * - remove expired subscriptions
- * - notify of subscriptions about to expire
+ * - Remove expired subscriptions
+ * - Notify of subscriptions about to expire
  *
  * @package ScheduledTasks
  */
 class Paid_Subscriptions implements Scheduled_Task_Interface
 {
+	/**
+	 * Removes expired and reminds members who have ones close to expiration
+	 * 
+	 * @return bool
+	 */
 	public function run()
 	{
 		global $scripturl, $modSettings, $language;
@@ -56,7 +61,10 @@ class Paid_Subscriptions implements Scheduled_Task_Interface
 
 		// Get all those about to expire that have not had a reminder sent.
 		$request = $db->query('', '
-			SELECT ls.id_sublog, m.id_member, m.member_name, m.email_address, m.lngfile, s.name, ls.end_time
+			SELECT 
+				ls.id_sublog, ls.end_time,
+				m.id_member, m.member_name, m.email_address, m.lngfile, 
+				s.name
 			FROM {db_prefix}log_subscribed AS ls
 				INNER JOIN {db_prefix}subscriptions AS s ON (s.id_subscribe = ls.id_subscribe)
 				INNER JOIN {db_prefix}members AS m ON (m.id_member = ls.id_member)
@@ -77,8 +85,8 @@ class Paid_Subscriptions implements Scheduled_Task_Interface
 			// If this is the first one load the important bits.
 			if (empty($subs_reminded))
 			{
-				require_once(SUBSDIR . '/Mail.subs.php');
 				// Need the below for loadLanguage to work!
+				require_once(SUBSDIR . '/Mail.subs.php');
 				loadEssentialThemeData();
 			}
 

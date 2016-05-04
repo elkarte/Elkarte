@@ -1,7 +1,7 @@
 <?php
 
 /**
- * 
+ *
  *
  * @name      ElkArte Forum
  * @copyright ElkArte Forum contributors
@@ -18,6 +18,11 @@
 if (!defined('ELK'))
 	die('No access...');
 
+/**
+ * Class Verification_Post_Module
+ *
+ * Adds Visual Verification controls to the Post page for those that need it.
+ */
 class Verification_Post_Module implements ElkArte\sources\modules\Module_Interface
 {
 	/**
@@ -27,6 +32,7 @@ class Verification_Post_Module implements ElkArte\sources\modules\Module_Interfa
 	{
 		global $user_info, $modSettings;
 
+		// Using controls and this users is the lucky recipient of them?
 		if (!$user_info['is_admin'] && !$user_info['is_moderator'] && !empty($modSettings['posts_require_captcha']) && ($user_info['posts'] < $modSettings['posts_require_captcha'] || ($user_info['is_guest'] && $modSettings['posts_require_captcha'] == -1)))
 		{
 			require_once(SUBSDIR . '/VerificationControls.class.php');
@@ -42,6 +48,7 @@ class Verification_Post_Module implements ElkArte\sources\modules\Module_Interfa
 
 	/**
 	 * Prepare $context for the post page.
+	 *
 	 * @param \Error_Context $_post_errors
 	 */
 	public function post_errors($_post_errors)
@@ -62,6 +69,7 @@ class Verification_Post_Module implements ElkArte\sources\modules\Module_Interfa
 
 	/**
 	 * Checks the user passed the verifications on the post page.
+	 * 
 	 * @param \Error_Context $_post_errors
 	 */
 	public function prepare_save_post($_post_errors)

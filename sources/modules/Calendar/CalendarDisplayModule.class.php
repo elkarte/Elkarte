@@ -20,6 +20,8 @@ if (!defined('ELK'))
 
 /**
  * We like to show events associated to the topics.
+ *
+ * @package Calendar
  */
 class Calendar_Display_Module implements ElkArte\sources\modules\Module_Interface
 {
@@ -42,6 +44,9 @@ class Calendar_Display_Module implements ElkArte\sources\modules\Module_Interfac
 			return array();
 	}
 
+	/**
+	 * Add the calendar buttons
+	 */
 	public static function integrate_mod_buttons()
 	{
 		global $context, $scripturl;
@@ -51,6 +56,12 @@ class Calendar_Display_Module implements ElkArte\sources\modules\Module_Interfac
 		$context['calendar_post'] &= allowedTo('modify_any') || ($context['user']['started'] && allowedTo('modify_own'));
 	}
 
+	/**
+	 * Fetches the topic information for linked calendar events
+	 *
+	 * @param array $topicinfo
+	 * @param int $topic
+	 */
 	public function topicinfo(&$topicinfo, $topic)
 	{
 		global $context, $user_info, $scripturl;

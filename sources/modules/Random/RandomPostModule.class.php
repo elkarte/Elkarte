@@ -14,6 +14,11 @@
 if (!defined('ELK'))
 	die('No access...');
 
+/**
+ * Class Random_Post_Module
+ *
+ * Collection of small items not requiring a separate module
+ */
 class Random_Post_Module implements ElkArte\sources\modules\Module_Interface
 {
 	/**
@@ -28,6 +33,7 @@ class Random_Post_Module implements ElkArte\sources\modules\Module_Interface
 		if (!empty($modSettings['enableFollowup']))
 		{
 			$return[] = array('prepare_context', array('Random_Post_Module', 'prepare_context_followup'), array());
+
 			add_integration_function('integrate_create_topic', 'Random_Post_Module::followup_create_topic', '', false);
 		}
 
@@ -58,7 +64,7 @@ class Random_Post_Module implements ElkArte\sources\modules\Module_Interface
 	 */
 	public function prepare_context_followup()
 	{
-		global $context;
+		global $context, $board;
 
 		// Are we moving a discussion to its own topic?
 		if (!empty($_REQUEST['followup']))

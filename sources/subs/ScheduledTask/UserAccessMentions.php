@@ -27,6 +27,11 @@ if (!defined('ELK'))
  */
 class User_Access_Mentions implements Scheduled_Task_Interface
 {
+	/**
+	 * Validates / Updates user mention access
+	 * 
+	 * @return bool
+	 */
 	public function run()
 	{
 		global $modSettings;
@@ -43,6 +48,7 @@ class User_Access_Mentions implements Scheduled_Task_Interface
 				if (empty($member))
 					continue;
 
+				// Just a touch of needy
 				require_once(SUBSDIR . '/Boards.subs.php');
 				require_once(SUBSDIR . '/Mentions.subs.php');
 				require_once(SUBSDIR . '/Members.subs.php');
@@ -61,7 +67,8 @@ class User_Access_Mentions implements Scheduled_Task_Interface
 					{
 						// Find all the mentions that this user can or cannot see
 						$request = $db->query('', '
-							SELECT mnt.id_mention, m.id_board
+							SELECT 
+								mnt.id_mention, m.id_board
 							FROM {db_prefix}log_mentions as mnt
 								LEFT JOIN {db_prefix}messages AS m ON (m.id_msg = mnt.id_target)
 								LEFT JOIN {db_prefix}boards AS b ON (b.id_board = m.id_board)
@@ -92,6 +99,7 @@ class User_Access_Mentions implements Scheduled_Task_Interface
 						{
 							removeMentions($remove);
 						}
+
 						// If we found something toggle them and increment the start for the next round
 						if (!empty($mentions))
 							toggleMentionsAccessibility($mentions, $can == 'can');
@@ -144,7 +152,6 @@ class User_Access_Mentions implements Scheduled_Task_Interface
 					'mention_types' => array('mentionmem', 'likemsg', 'rlikemsg'),
 				)
 			);
-
 			list ($remaining) = $db->fetch_row($request);
 			$db->free_result($request);
 
@@ -153,7 +160,8 @@ class User_Access_Mentions implements Scheduled_Task_Interface
 
 			// Grab users with mentions
 			$request = $db->query('', '
-				SELECT DISTINCT(id_member) as id_member
+				SELECT 
+					DISTINCT(id_member) as id_member
 				FROM {db_prefix}log_mentions
 				WHERE id_member > {int:last_id_member}
 					AND mention_type IN ({array_string:mention_types})
@@ -175,7 +183,8 @@ class User_Access_Mentions implements Scheduled_Task_Interface
 
 				// Find out if this user cannot see something that was supposed to be able to see
 				$request2 = $db->query('', '
-					SELECT mnt.id_mention
+					SELECT 
+						mnt.id_mention
 					FROM {db_prefix}log_mentions as mnt
 						LEFT JOIN {db_prefix}messages AS m ON (m.id_msg = mnt.id_target)
 						LEFT JOIN {db_prefix}boards AS b ON (b.id_board = m.id_board)

@@ -29,6 +29,11 @@ if (!defined('ELK'))
  */
 class Daily_Digest implements Scheduled_Task_Interface
 {
+	/**
+	 * Sends out the daily digest for all the DD subscribers
+	 *
+	 * @return bool
+	 */
 	public function run()
 	{
 		return $this->runDigest();
@@ -37,7 +42,7 @@ class Daily_Digest implements Scheduled_Task_Interface
 	/**
 	 * Send out a email of all subscribed topics, to members.
 	 *
-	 * - Builds email bodys of topics and messages per user as defined by their
+	 * - Builds email body's of topics and messages per user as defined by their
 	 * notification settings
 	 * - If weekly builds the weekly abridged digest
 	 *
@@ -64,8 +69,9 @@ class Daily_Digest implements Scheduled_Task_Interface
 
 		// Right - get all the notification data FIRST.
 		$request = $db->query('', '
-			SELECT ln.id_topic, COALESCE(t.id_board, ln.id_board) AS id_board, mem.email_address, mem.member_name, mem.real_name, mem.notify_types,
-				mem.lngfile, mem.id_member
+			SELECT 
+				ln.id_topic, COALESCE(t.id_board, ln.id_board) AS id_board, 
+				mem.email_address, mem.member_name, mem.real_name, mem.notify_types, mem.lngfile, mem.id_member
 			FROM {db_prefix}log_notify AS ln
 				INNER JOIN {db_prefix}members AS mem ON (mem.id_member = ln.id_member)
 				LEFT JOIN {db_prefix}topics AS t ON (ln.id_topic != {int:empty_topic} AND t.id_topic = ln.id_topic)
@@ -116,8 +122,12 @@ class Daily_Digest implements Scheduled_Task_Interface
 
 		// Get the actual topics...
 		$request = $db->query('', '
-			SELECT ld.note_type, t.id_topic, t.id_board, t.id_member_started, m.id_msg, m.subject, m.body, ld.id_msg AS last_reply,
-				b.name AS board_name, ml.body as last_body
+			SELECT 
+				ld.note_type, ld.id_msg AS last_reply,
+				t.id_topic, t.id_board, t.id_member_started, 
+				m.id_msg, m.subject, m.body, 
+				b.name AS board_name, 
+				ml.body as last_body
 			FROM {db_prefix}log_digest AS ld
 				INNER JOIN {db_prefix}topics AS t ON (t.id_topic = ld.id_topic
 					AND t.id_board IN ({array_int:board_list}))
@@ -175,7 +185,7 @@ class Daily_Digest implements Scheduled_Task_Interface
 				{
 					// Convert to markdown markup e.g. text ;)
 					pbe_prepare_text($row['body']);
-					$row['body'] = Util::shorten_text($row['body'], !empty($modSettings['digest_preview_length']) ? $modSettings['digest_preview_length'] : 375, true);
+					$row['body'] = \Util::shorten_text($row['body'], !empty($modSettings['digest_preview_length']) ? $modSettings['digest_preview_length'] : 375, true);
 					$row['body'] = preg_replace("~\n~s", "\n  ", $row['body']);
 				}
 
@@ -191,11 +201,13 @@ class Daily_Digest implements Scheduled_Task_Interface
 			elseif ($maillist && empty($modSettings['pbe_no_mod_notices']))
 			{
 				if (!isset($types[$row['note_type']][$row['id_board']]['lines'][$row['id_topic']]))
+				{
 					$types[$row['note_type']][$row['id_board']]['lines'][$row['id_topic']] = array(
 						'id' => $row['id_topic'],
 						'subject' => un_htmlspecialchars($row['subject']),
 						'starter' => $row['id_member_started'],
 					);
+				}
 			}
 
 			$types[$row['note_type']][$row['id_board']]['lines'][$row['id_topic']]['members'] = array();
@@ -221,7 +233,7 @@ class Daily_Digest implements Scheduled_Task_Interface
 					// Replace the body array with the appropriate preview message
 					$body = $types['reply'][$id]['lines'][$topic['id']]['body_text'];
 					pbe_prepare_text($body);
-					$body = Util::shorten_text($body, !empty($modSettings['digest_preview_length']) ? $modSettings['digest_preview_length'] : 375, true);
+					$body = \Util::shorten_text($body, !empty($modSettings['digest_preview_length']) ? $modSettings['digest_preview_length'] : 375, true);
 					$body = preg_replace("~\n~s", "\n  ", $body);
 					$types['reply'][$id]['lines'][$topic['id']]['body'] = $body;
 
@@ -261,7 +273,7 @@ class Daily_Digest implements Scheduled_Task_Interface
 				'see_full' => $txt['digest_see_full'],
 				'reply_preview' => $txt['digest_reply_preview'],
 				'unread_reply_link' => $txt['digest_unread_reply_link'],
-				);
+			);
 		}
 
 		// Right - send out the silly things - this will take quite some space!

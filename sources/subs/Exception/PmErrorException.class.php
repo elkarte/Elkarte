@@ -40,10 +40,10 @@ class Pm_Error_Exception extends Exception
 	 * Redefine the initialization.
 	 * Do note that parent::__construct() is not called.
 	 *
-	 * @param int[] $recipientList Array of members ID separated into 'to' and 'bcc'
+	 * @param array $recipientList Array of members ID separated into 'to' and 'bcc'
 	 * @param \ElkArte\ValuesContainer $msgOptions Some values for common
 	 * @param string[] $namedRecipientList Array of member names separated into 'to' and 'bcc'
-	 *  this argument is @deprecated
+	 *  this argument is deprecated
 	 */
 	public function __construct($recipientList, $msgOptions, $namedRecipientList = array())
 	{

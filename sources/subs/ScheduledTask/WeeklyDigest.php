@@ -27,6 +27,11 @@ if (!defined('ELK'))
  */
 class Weekly_Digest implements Scheduled_Task_Interface
 {
+	/**
+	 * Sends the weekly digest.
+	 *
+	 * @return bool
+	 */
 	public function run()
 	{
 		$digest = new Daily_Digest();

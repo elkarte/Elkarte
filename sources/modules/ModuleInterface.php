@@ -17,6 +17,11 @@ namespace ElkArte\sources\modules;
 if (!defined('ELK'))
 	die('No access...');
 
+/**
+ * Interface Module_Interface
+ *
+ * @package ElkArte\sources\modules
+ */
 interface Module_Interface
 {
 	/**

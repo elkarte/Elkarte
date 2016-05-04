@@ -27,6 +27,11 @@ if (!defined('ELK'))
  */
 class Remove_Old_Drafts implements Scheduled_Task_Interface
 {
+	/**
+	 * Scheduled task for removing those old and abandoned drafts
+	 *
+	 * @return bool
+	 */
 	public function run()
 	{
 		global $modSettings;
@@ -44,7 +49,8 @@ class Remove_Old_Drafts implements Scheduled_Task_Interface
 
 		// Find all of the old drafts
 		$request = $db->query('', '
-			SELECT id_draft
+			SELECT 
+				id_draft
 			FROM {db_prefix}user_drafts
 			WHERE poster_time <= {int:poster_time_old}',
 			array(

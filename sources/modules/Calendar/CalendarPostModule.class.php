@@ -21,9 +21,15 @@ if (!defined('ELK'))
 /**
  * This class's task is to bind the posting of a topic to a calendar event.
  * Used when from the calendar controller the poster is redirected to the post page.
+ *
+ * @package Calendar
  */
 class Calendar_Post_Module implements ElkArte\sources\modules\Module_Interface
 {
+	/**
+	 * If we are making a topic event
+	 * @var bool
+	 */
 	protected static $_make_event = false;
 
 	/**
@@ -49,17 +55,30 @@ class Calendar_Post_Module implements ElkArte\sources\modules\Module_Interface
 			return array();
 	}
 
+	/**
+	 * Prepare post event, add the make event template layer
+	 */
 	public function prepare_post()
 	{
 		Template_Layers::getInstance()->addAfter('make_event', 'postarea');
 	}
 
+	/**
+	 * before_save_post event, checks the event title is set
+	 *
+	 * @param Error_Context $post_errors
+	 */
 	public function before_save_post($post_errors)
 	{
 		if (!isset($_REQUEST['deleteevent']) && Util::htmltrim($_POST['evtitle']) === '')
 			$post_errors->addError('no_event');
 	}
 
+	/**
+	 * after_save_post event, creates/edits/removes the linked event in the calendar
+	 *
+	 * @throws Exception
+	 */
 	public function after_save_post()
 	{
 		global $user_info, $modSettings, $board, $topic;
@@ -112,6 +131,13 @@ class Calendar_Post_Module implements ElkArte\sources\modules\Module_Interface
 		}
 	}
 
+	/**
+	 * Verifies the user can edit an event and makes calls to load context related to the event
+	 *
+	 * @param int $id_member_poster
+	 *
+	 * @throws Controller_Redirect_Exception
+	 */
 	public function prepare_context($id_member_poster)
 	{
 		global $user_info, $txt, $context;
