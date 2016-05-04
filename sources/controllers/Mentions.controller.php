@@ -571,8 +571,8 @@ class Mentions_Controller extends Action_Controller
 		checkSession('request');
 
 		$this->setData(array(
-			'id_mention' => $this->_req->getPost('item', 'intval', 0),
-			'mark' => $this->_req->getPost('mark'),
+			'id_mention' => $this->_req->getQuery('item', 'intval', 0),
+			'mark' => $this->_req->getQuery('mark'),
 		));
 
 		// Make sure its all good
@@ -630,12 +630,12 @@ class Mentions_Controller extends Action_Controller
 	 */
 	protected function _buildUrl()
 	{
-		$this->_all = $this->_req->get('start') !== null;
+		$this->_all = $this->_req->getQuery('all') !== null;
 		$this->_sort = in_array($this->_req->getQuery('sort', 'trim'), $this->_known_sorting) ? $this->_req->getQuery('sort', 'trim') : $this->_default_sort;
 		$this->_type = in_array($this->_req->getQuery('type', 'trim'), $this->_known_mentions) ? $this->_req->getQuery('type', 'trim') : '';
 		$this->_page = $this->_req->getQuery('start', 'trim', '');
 
-		$this->_url_param = ($this->_all ? ';all' : '') . (!empty($this->_type) ? ';type=' . $this->_type : '') . ($this->_req->get('start') !== null ? ';start=' . $this->_req->get('start') : '');
+		$this->_url_param = ($this->_all ? ';all' : '') . (!empty($this->_type) ? ';type=' . $this->_type : '') . ($this->_req->getQuery('start') !== null ? ';start=' . $this->_req->getQuery('start') : '');
 	}
 
 	/**
