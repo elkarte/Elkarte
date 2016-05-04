@@ -40,7 +40,7 @@ class Buddy_Mention extends Mention_Message_Abstract
 		foreach ($mentions as $key => $row)
 		{
 			// To ensure it is not done twice
-			if ($row['mention_type'] != $type)
+			if ($row['mention_type'] != static::$_type)
 			{
 				continue;
 			}
