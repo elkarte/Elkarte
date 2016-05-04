@@ -16,10 +16,15 @@ namespace ElkArte\sources\subs\MentionType;
 if (!defined('ELK'))
 	die('No access...');
 
+/**
+ * Class Mention_BoardAccess_Abstract
+ *
+ * @package ElkArte\sources\subs\MentionType
+ */
 abstract class Mention_BoardAccess_Abstract extends Mention_Message_Abstract
 {
 	/**
-	 * {@inheritdoc }
+	 * {@inheritdoc}
 	 */
 	public function view($type, &$mentions)
 	{

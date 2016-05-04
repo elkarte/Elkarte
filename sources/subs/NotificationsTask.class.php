@@ -15,6 +15,9 @@
 if (!defined('ELK'))
 	die('No access...');
 
+/**
+ * Class Notifications_Task
+ */
 class Notifications_Task extends \ElkArte\ValuesContainer
 {
 	/**

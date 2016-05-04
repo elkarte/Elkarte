@@ -16,6 +16,11 @@
 
 namespace BBC;
 
+/**
+ * Class SmileyParser
+ * 
+ * @package BBC
+ */
 class SmileyParser
 {
 	protected $enabled = true;

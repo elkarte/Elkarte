@@ -66,7 +66,7 @@ function updateSignature($id_member, $signature)
 /**
  * Update all signatures given a new set of constraints
  *
- * @param array $applied_sigs
+ * @param int $applied_sigs
  */
 function updateAllSignatures($applied_sigs)
 {
@@ -743,12 +743,23 @@ function loadAllCustomFields()
 	return $custom_field_titles;
 }
 
+/**
+ * Load all the available mention types
+ *
+ * What it does:
+ * - Scans teh subs\MentionType directory for files
+ * - Calls its getType method
+ *
+ * @return array
+ */
 function getNotificationTypes()
 {
 	Elk_Autoloader::getInstance()->register(SUBSDIR . '/MentionType', '\\ElkArte\\sources\\subs\\MentionType');
 
 	$glob = new GlobIterator(SUBSDIR . '/MentionType/*Mention.php', FilesystemIterator::SKIP_DOTS);
 	$types = array();
+
+	// For each file found, call its getType method
 	foreach ($glob as $file)
 	{
 		$class_name = '\\ElkArte\\sources\\subs\\MentionType\\' . preg_replace('~([^^])((?<=)[A-Z](?=[a-z]))~', '$1_$2', $file->getBasename('.php'));
@@ -782,6 +793,15 @@ function getMentionsModules($enabled_mentions)
 	return $modules;
 }
 
+/**
+ * Loads available frontpage controllers for selection in the look/layout area of the ACP
+ *
+ * What it does:
+ * - Scans controllerdir and addonsdir for .controller.php fils
+ * - Checks if found files have a static frontPageOptions method
+ *
+ * @return array
+ */
 function getFrontPageControllers()
 {
 	global $txt;
@@ -808,6 +828,7 @@ function getFrontPageControllers()
 }
 
 /**
+ *
  * @param GlobIterator $iterator
  * @param string $namespace
  *

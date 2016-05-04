@@ -20,6 +20,9 @@ if (!defined('ELK'))
 	die('No access...');
 }
 
+/**
+ * Class Theme
+ */
 abstract class Theme
 {
 	const STANDARD = 'standard';
@@ -45,6 +48,8 @@ abstract class Theme
 	protected $rtl;
 
 	/**
+	 * Theme constructor.
+	 *
 	 * @param int $id
 	 */
 	public function __construct($id)
@@ -115,13 +120,20 @@ abstract class Theme
 		}
 	}
 
+	/**
+	 * Returns javascript vars loaded with addJavascriptVar function
+	 *
+	 * @return array
+	 */
 	public function getJavascriptVars()
 	{
 		return $this->js_vars;
 	}
 
 	/**
-	 * @param int|self::ALL $type One of ALL, SELF, DEFERRED class constants
+	 * Returns inline javascript of a give type that was added with addInlineJavascript function
+	 *
+	 * @param int $type One of ALL, SELF, DEFERRED class constants
 	 *
 	 * @return array
 	 * @throws Exception if the type is not known
@@ -160,6 +172,13 @@ abstract class Theme
 		}
 	}
 
+	/**
+	 * Turn on/off RTL language support
+	 *
+	 * @param $toggle
+	 *
+	 * @return $this
+	 */
 	public function setRTL($toggle)
 	{
 		$this->rtl = (bool) $toggle;

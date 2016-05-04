@@ -15,6 +15,11 @@
 if (!defined('ELK'))
 	die('No access...');
 
+/**
+ * Class Notifications
+ *
+ * Core area for notifications, defines the abstract model
+ */
 class Notifications extends AbstractModel
 {
 	/**
@@ -54,10 +59,10 @@ class Notifications extends AbstractModel
 
 	/**
 	 * Notifications constructor.
-	 * 
+	 *
 	 * Registers the known notifications to the system, allows for integration to add more
 	 *
-	 * @param object $db
+	 * @param \Database $db
 	 */
 	public function __construct($db)
 	{
@@ -113,8 +118,7 @@ class Notifications extends AbstractModel
 	/**
 	 * Function to register any new notification method.
 	 *
-	 * @param int $id This shall be a unique integer representing the
-	 *            notification method.
+	 * @param int $id This shall be a unique integer representing the notification method.
 	 *            <b>WARNING for addons developers</b>: please note that this has
 	 *            to be unique across addons, so if you develop an addon that
 	 *            extends notifications, please verify this id has not been
@@ -146,6 +150,11 @@ class Notifications extends AbstractModel
 		$this->_notification_frequencies[$id] = $key;
 	}
 
+	/**
+	 * Returns the notifications in the system, daily, weekly, etc
+	 *
+	 * @return string[]
+	 */
 	public function getNotifiers()
 	{
 		return $this->_notification_frequencies;

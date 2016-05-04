@@ -18,8 +18,18 @@
 if (!defined('ELK'))
 	die('No access...');
 
+/**
+ * Class Server
+ *
+ * Wrapper around many common server functions and server information
+ */
 class Server extends \ArrayObject
 {
+	/**
+	 * Server constructor.
+	 *
+	 * @param null|array $server
+	 */
 	public function __construct($server = null)
 	{
 		if (!is_array($server))
@@ -113,6 +123,13 @@ class Server extends \ArrayObject
 		return ini_get('max_execution_time');
 	}
 
+	/**
+	 * Checks the type of software the webserver is functioning under
+	 *
+	 * @param $server
+	 *
+	 * @return bool
+	 */
 	public function is($server)
 	{
 		switch ($server)
@@ -138,6 +155,11 @@ class Server extends \ArrayObject
 		}
 	}
 
+	/**
+	 * Checks if the webserver supports rewrite
+	 *
+	 * @return bool
+	 */
 	public function supportRewrite()
 	{
 		return ($this->is('cgi') === false || ini_get('cgi.fix_pathinfo') == 1 || @get_cfg_var('cgi.fix_pathinfo') == 1)
@@ -145,6 +167,11 @@ class Server extends \ArrayObject
 		($this->is('apache') || $this->is('nginx') || $this->is('lighttpd') || $this->is('litespeed'));
 	}
 
+	/**
+	 * Returns if the system supports output compression
+	 * 
+	 * @return bool
+	 */
 	public function outPutCompressionEnabled()
 	{
 		return ini_get('zlib.output_compression') >= 1 || ini_get('output_handler') == 'ob_gzhandler';

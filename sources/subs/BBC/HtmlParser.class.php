@@ -16,11 +16,19 @@
 
 namespace BBC;
 
+/**
+ * Class HtmlParser
+ *
+ * @package BBC
+ */
 class HtmlParser
 {
 	protected $empty_tags = array('br', 'hr');
 	protected $closable_tags = array('b', 'u', 'i', 's', 'em', 'ins', 'del', 'pre', 'blockquote');
 
+	/**
+	 * HtmlParser constructor.
+	 */
 	public function __construct()
 	{
 		// Commented only for testing purposes
@@ -33,6 +41,10 @@ class HtmlParser
 		$this->closable_tags = $closable_tags;
 	}
 
+	/**
+	 * Calls the functions to parse the handful of allowable HTML tags
+	 * @param $data
+	 */
 	public function parse(&$data)
 	{
 		$this->anchorTags($data);
@@ -44,6 +56,14 @@ class HtmlParser
 		$this->imageTags($data);
 	}
 
+	/**
+	 * Sets the width/height of image tags
+	 *
+	 * @param int $width
+	 * @param int $height
+	 *
+	 * @return $this
+	 */
 	public function setImageWidthHeight($width, $height)
 	{
 		$this->image_width = (int) $width;
@@ -52,6 +72,10 @@ class HtmlParser
 		return $this;
 	}
 
+	/**
+	 * Convert <a tags to [url
+	 * @param $data
+	 */
 	protected function anchorTags(&$data)
 	{
 		// Changes <a href=... to [url=
@@ -59,6 +83,10 @@ class HtmlParser
 		$data = preg_replace('~&lt;/a&gt;~i', '[/url]', $data);
 	}
 
+	/**
+	 * Converts self closing HTML to appropriate BBC tag
+	 * @param $data
+	 */
 	protected function emptyTags(&$data)
 	{
 		// <br /> should be empty.
@@ -68,6 +96,10 @@ class HtmlParser
 		}
 	}
 
+	/**
+	 * Converts simple closable tags to equivalent BBC codes
+	 * @param $data
+	 */
 	protected function closableTags(&$data)
 	{
 		foreach ($this->closable_tags as $tag)
@@ -82,6 +114,11 @@ class HtmlParser
 		}
 	}
 
+	/**
+	 * Converts <img tags to [IMG bbc code while handing height and width attributes
+	 *
+	 * @param $data
+	 */
 	protected function imageTags(&$data)
 	{
 		global $modSettings;

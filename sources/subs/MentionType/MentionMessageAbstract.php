@@ -16,6 +16,11 @@ namespace ElkArte\sources\subs\MentionType;
 if (!defined('ELK'))
 	die('No access...');
 
+/**
+ * Class Mention_Message_Abstract
+ *
+ * @package ElkArte\sources\subs\MentionType
+ */
 abstract class Mention_Message_Abstract implements Mention_Type_Interface
 {
 	/**
