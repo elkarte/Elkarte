@@ -370,6 +370,13 @@ class Cache
 		return $this->level;
 	}
 
+	/**
+	 * Checks if the system level supports the required level of the cache request
+	 * 
+	 * @param int $level
+	 *
+	 * @return bool
+	 */
 	public function checkLevel($level)
 	{
 		return $this->isEnabled() && $this->level >= $level;
