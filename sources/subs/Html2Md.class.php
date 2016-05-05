@@ -772,7 +772,7 @@ class Html_2_Md
 	/**
 	 * Helper function for getting a node length
 	 *
-	 * @param object $node
+	 * @param object|array $node
 	 */
 	private function _get_length($node)
 	{
@@ -875,7 +875,7 @@ class Html_2_Md
 	/**
 	 * Gets the inner html of a node
 	 *
-	 * @param object $node
+	 * @param DOMNode|object $node
 	 */
 	private function _get_innerHTML($node)
 	{
@@ -895,7 +895,7 @@ class Html_2_Md
 	/**
 	 * Gets the outer html of a node
 	 *
-	 * @param object $node
+	 * @param DOMNode|object $node
 	 */
 	private function _get_outerHTML($node)
 	{

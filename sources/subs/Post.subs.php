@@ -415,7 +415,7 @@ function fixTags_img_callback($matches)
  * @package Posts
  * @param string $message
  * @param string $myTag - the tag
- * @param string $protocols - http or ftp
+ * @param string[] $protocols - http or ftp
  * @param bool $embeddedUrl = false - whether it *can* be set to something
  * @param bool $hasEqualSign = false, whether it *is* set to something
  * @param bool $hasExtra = false - whether it can have extra cruft after the begin tag.

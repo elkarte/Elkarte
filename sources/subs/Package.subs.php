@@ -2769,6 +2769,8 @@ if (!function_exists('crc32_compat'))
  * @package Packages
  * @param string $id of package to check
  * @param string|null $install_id to check
+ *
+ * @return array
  */
 function isPackageInstalled($id, $install_id = null)
 {
