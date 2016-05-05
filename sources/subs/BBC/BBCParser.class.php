@@ -16,6 +16,13 @@
 
 namespace BBC;
 
+/**
+ * Class BBCParser
+ *
+ * One of the primary functions, parsing BBC to HTML
+ *
+ * @package BBC
+ */
 class BBCParser
 {
 	const MAX_PERMUTE_ITERATIONS = 5040;
@@ -42,6 +49,7 @@ class BBCParser
 	protected $can_cache = true;
 	protected $num_footnotes = 0;
 	protected $smiley_marker = "\r";
+	protected $lastAutoPos = 0;
 
 	/**
 	 * BBCParser constructor.
@@ -152,6 +160,11 @@ class BBCParser
 		return $this->message;
 	}
 
+	/**
+	 * The BBC parsing loop-o-love
+	 *
+	 * Walks the string to parse, looking for BBC tags and passing items to the required translation functions
+	 */
 	protected function parse_loop()
 	{
 		while ($this->pos !== false)
@@ -269,6 +282,9 @@ class BBCParser
 		}
 	}
 
+	/**
+	 *
+	 */
 	protected function handleOpenTags()
 	{
 		// Next closing bracket after the first character
@@ -389,6 +405,7 @@ class BBCParser
 
 	/**
 	 * Turn smiley parsing on/off
+	 *
 	 * @param bool $toggle
 	 * @return \BBC\Parser
 	 */
@@ -408,6 +425,9 @@ class BBCParser
 		return !empty($GLOBALS['modSettings']['enableBBC']);
 	}
 
+	/**
+	 * Load the HTML parsing engine
+	 */
 	public function loadHtmlParser()
 	{
 		$parser = new HtmlParser;
@@ -536,6 +556,7 @@ class BBCParser
 	}
 
 	/**
+	 * Just alternates the applied class for quotes for themes that want to distinguish them
 	 * @param array $tag
 	 */
 	protected function alternateQuoteStyle(array &$tag)
@@ -564,6 +585,8 @@ class BBCParser
 	}
 
 	/**
+	 * Parses BBC codes attributes for codes that may have them
+	 *
 	 * @param $next_c
 	 * @param array $possible
 	 * @return array|void
@@ -667,11 +690,21 @@ class BBCParser
 		return $possible;
 	}
 
+	/**
+	 * Called when a code has defined a test parameter
+	 *
+	 * @param array $possible
+	 *
+	 * @return bool
+	 */
 	protected function handleTest(array $possible)
 	{
 		return preg_match('~^' . $possible[Codes::ATTR_TEST] . '~', substr($this->message, $this->pos + 2 + $possible[Codes::ATTR_LENGTH], strpos($this->message, ']', $this->pos) - ($this->pos + 2 + $possible[Codes::ATTR_LENGTH]))) === 0;
 	}
 
+	/**
+	 * Handles item codes by converting them to lists
+	 */
 	protected function handleItemCode()
 	{
 		if (!isset($this->item_codes[$this->message[$this->pos + 1]]))
@@ -752,6 +785,7 @@ class BBCParser
 
 	/**
 	 * Handle codes that are of the parsed context type
+	 *
 	 * @param array $tag
 	 *
 	 * @return bool
@@ -769,6 +803,7 @@ class BBCParser
 
 	/**
 	 * Handle codes that are of the unparsed context type
+	 *
 	 * @param array $tag
 	 *
 	 * @return bool
@@ -808,6 +843,7 @@ class BBCParser
 
 	/**
 	 * Handle codes that are of the unparsed equals context type
+	 *
 	 * @param array $tag
 	 *
 	 * @return bool
@@ -872,6 +908,7 @@ class BBCParser
 
 	/**
 	 * Handle codes that are of the closed type
+	 *
 	 * @param array $tag
 	 *
 	 * @return bool
@@ -888,6 +925,7 @@ class BBCParser
 
 	/**
 	 * Handle codes that are of the unparsed commas context type
+	 *
 	 * @param array $tag
 	 *
 	 * @return bool
@@ -931,6 +969,7 @@ class BBCParser
 
 	/**
 	 * Handle codes that are of the unparsed commas type
+	 *
 	 * @param array $tag
 	 *
 	 * @return bool
@@ -975,6 +1014,7 @@ class BBCParser
 
 	/**
 	 * Handle codes that are of the equals type
+	 *
 	 * @param array $tag
 	 *
 	 * @return bool
@@ -1035,6 +1075,7 @@ class BBCParser
 
 	/**
 	 * Handles a tag by its type. Offloads the actual handling to handle*() method
+	 *
 	 * @param array $tag
 	 *
 	 * @return bool true if there was something wrong and the parser should advance
@@ -1075,7 +1116,11 @@ class BBCParser
 		return false;
 	}
 
-	// @todo I don't know what else to call this. It's the area that isn't a tag.
+	/**
+	 * Text between tags
+	 *
+	 * @todo I don't know what else to call this. It's the area that isn't a tag.
+	 */
 	protected function betweenTags()
 	{
 		// Make sure the $this->last_pos is not negative.
@@ -1118,6 +1163,9 @@ class BBCParser
 		}
 	}
 
+	/**
+	 * Handles special [footnote] tag processing as the tag is not rendered "inline"
+	 */
 	protected function handleFootnotes()
 	{
 		global $fn_num, $fn_content, $fn_count;
@@ -1142,7 +1190,10 @@ class BBCParser
 	}
 
 	/**
+	 * Final footnote conversions, builds the proper link code to footnote at base of post
+	 *
 	 * @param array $matches
+	 *
 	 * @return string
 	 */
 	protected function footnoteCallback(array $matches)
@@ -1157,6 +1208,7 @@ class BBCParser
 
 	/**
 	 * Parse a tag that is disabled
+	 *
 	 * @param array $tag
 	 */
 	protected function handleDisabled(array &$tag)
@@ -1179,6 +1231,8 @@ class BBCParser
 	}
 
 	/**
+	 * Map required / optional tag parameters to the found tag
+	 *
 	 * @param array &$possible
 	 * @param array &$matches
 	 * @return bool
@@ -1253,6 +1307,8 @@ class BBCParser
 	}
 
 	/**
+	 * Return the BBC codes in the system
+	 *
 	 * @return array
 	 */
 	public function getBBC()
@@ -1262,6 +1318,7 @@ class BBCParser
 
 	/**
 	 * Enable the parsing of smileys
+	 *
 	 * @param bool|true $enable
 	 *
 	 * @return $this
@@ -1274,6 +1331,7 @@ class BBCParser
 
 	/**
 	 * Open a tag
+	 *
 	 * @param array $tag
 	 */
 	protected function addOpenTag(array $tag)
@@ -1302,6 +1360,7 @@ class BBCParser
 
 	/**
 	 * Check if there are any tags that are open
+	 *
 	 * @return bool
 	 */
 	protected function hasOpenTags()
@@ -1311,6 +1370,7 @@ class BBCParser
 
 	/**
 	 * Get the last opened tag
+	 *
 	 * @return array
 	 */
 	protected function getLastOpenedTag()
@@ -1320,6 +1380,7 @@ class BBCParser
 
 	/**
 	 * Get the currently opened tags
+	 *
 	 * @param bool|false $tags_only True if you want just the tag or false for the whole code
 	 *
 	 * @return array
@@ -1340,6 +1401,8 @@ class BBCParser
 	}
 
 	/**
+	 * Does what it says, removes whitespace
+	 *
 	 * @param string &$message
 	 * @param null|int $offset = null
 	 */
@@ -1413,6 +1476,7 @@ class BBCParser
 
 	/**
 	 * Check if a tag (not a code) is open
+	 *
 	 * @param string $tag
 	 *
 	 * @return bool
@@ -1432,6 +1496,7 @@ class BBCParser
 
 	/**
 	 * Check if a character is an item code
+	 *
 	 * @param string $char
 	 *
 	 * @return bool
@@ -1489,12 +1554,22 @@ class BBCParser
 		return $this->smiley_marker . $string . $this->smiley_marker;
 	}
 
+	/**
+	 * Checks if we can cache, some codes prevent this and require parsing each time
+	 *
+	 * @return bool
+	 */
 	public function canCache()
 	{
 		return $this->can_cache;
 	}
 
-	// This is just so I can profile it.
+	/**
+	 * This is just so I can profile it.
+	 *
+	 * @param array $tag
+	 * @param $data
+	 */
 	protected function filterData(array $tag, &$data)
 	{
 		$tag[Codes::ATTR_VALIDATE]($tag, $data, $this->bbc->getDisabled());

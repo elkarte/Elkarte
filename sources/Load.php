@@ -2537,6 +2537,13 @@ function detectServer()
 	return $server;
 }
 
+/**
+ * Returns if a webserver is of type server (apache, nginx, etc)
+ * 
+ * @param $server
+ *
+ * @return bool
+ */
 function serverIs($server)
 {
 	return detectServer()->is($server);
@@ -2546,11 +2553,11 @@ function serverIs($server)
  * Do some important security checks:
  *
  * What it does:
- * - checks the existence of critical files e.g. install.php
- * - checks for an active admin session.
- * - checks cache directory is writable.
- * - calls secureDirectory to protect attachments & cache.
- * - checks if the forum is in maintenance mode.
+ * - Checks the existence of critical files e.g. install.php
+ * - Checks for an active admin session.
+ * - Checks cache directory is writable.
+ * - Calls secureDirectory to protect attachments & cache.
+ * - Checks if the forum is in maintenance mode.
  */
 function doSecurityChecks()
 {

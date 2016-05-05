@@ -119,7 +119,7 @@ class Database_MySQL extends Database_Abstract
 	 * @param string $identifier
 	 * @param string $db_string
 	 * @param mixed[]|false $db_values = array()
-	 * @param mysqli|false|null $connection = null
+	 * @param resource|false|null $connection = null
 	 */
 	public function query($identifier, $db_string, $db_values = array(), $connection = null)
 	{
@@ -1173,7 +1173,7 @@ class Database_MySQL extends Database_Abstract
 	 * The mysql implementation simply delegates to mysqli_fetch_assoc().
 	 * It ignores $counter parameter.
 	 *
-	 * @param resource $request
+	 * @param mysqli_result $request
 	 * @param int|bool $counter = false
 	 */
 	public function fetch_assoc($request, $counter = false)

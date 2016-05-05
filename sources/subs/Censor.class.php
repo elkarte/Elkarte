@@ -19,6 +19,9 @@
 if (!defined('ELK'))
 	die('No access...');
 
+/**
+ * Class Censor
+ */
 class Censor
 {
 	const WHOLE_WORD        = 'censorWholeWord';
@@ -37,6 +40,7 @@ class Censor
 
 	/**
 	 * Censor constructor.
+	 *
 	 * @param array $vulgar
 	 * @param array $proper
 	 * @param array $options
@@ -53,6 +57,8 @@ class Censor
 	}
 
 	/**
+	 * Loads options to the class, such as ignoring case, etc
+	 *
 	 * @param array $options
 	 */
 	protected function setOptions(array $options)
@@ -61,6 +67,8 @@ class Censor
 	}
 
 	/**
+	 * Searches for naughty words
+	 *
 	 * @param array $vulgar
 	 * @param array $proper
 	 */

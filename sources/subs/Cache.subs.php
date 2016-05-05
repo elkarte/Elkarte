@@ -28,7 +28,8 @@ if (!defined('ELK'))
  * @param string $function function to call
  * @param mixed[] $params parameters sent to the function
  * @param int $level = 1
- * @return string
+ *
+ * @return mixed
  */
 function cache_quick_get($key, $file, $function, $params, $level = 1)
 {

@@ -19,6 +19,11 @@ namespace BBC;
 // @todo add attribute for TEST_PARAM_STRING and TEST_CONTENT so people can test the content
 // @todo change ATTR_TEST to be able to test the entire message with the current offset
 
+/**
+ * Class Codes
+ * 
+ * @package BBC
+ */
 class Codes
 {
 	/** the tag's name - must be lowercase */

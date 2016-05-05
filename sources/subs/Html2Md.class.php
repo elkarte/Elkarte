@@ -469,9 +469,7 @@ class Html_2_Md
 			$markdown = '[' . $value . '](' . $href . ')';
 
 		// Some links can be very long and if we wrap them they break
-		$line_strlen = Util::strlen($markdown);
-		if ($line_strlen > $this->body_width)
-			$this->body_width = $line_strlen;
+		$this->_check_link_lenght($markdown);
 
 		return $markdown;
 	}
@@ -500,6 +498,7 @@ class Html_2_Md
 			$markdown .= '> ' . ltrim($line, "\t") . $this->line_end;
 
 		$markdown .= $this->line_end;
+		
 		return $markdown;
 	}
 
@@ -547,9 +546,7 @@ class Html_2_Md
 			{
 				// Adjust the word wrapping since this has code tags, leave it up to
 				// the email client to mess these up ;)
-				$line_strlen = strlen($line) + 5;
-				if ($line_strlen > $this->body_width)
-					$this->body_width = $line_strlen;
+				$this->_check_link_lenght($markdown, 5);
 
 				$markdown .= str_repeat(' ', 4) . $line . $this->line_end;
 			}
@@ -626,6 +623,9 @@ class Html_2_Md
 			$markdown = '![' . $alt . '](' . $src . ' "' . $title . '")';
 		else
 			$markdown = '![' . $alt . '](' . $src . ')';
+		
+		// Adjust width if needed to maintain the image
+		$this->_check_link_lenght($markdown);
 
 		return $markdown;
 	}
@@ -748,9 +748,7 @@ class Html_2_Md
 			}
 
 			// Adjust the word wrapping since this has a table, will get mussed by email anyway
-			$line_strlen = strlen($rows[1]) + 2;
-			if ($line_strlen > $this->body_width)
-				$this->body_width = $line_strlen;
+			$this->_check_link_lenght($rows[1], 2);
 
 			// Return what we did so it can be swapped in
 			return implode($this->line_end, $rows);
@@ -774,7 +772,7 @@ class Html_2_Md
 	/**
 	 * Helper function for getting a node length
 	 *
-	 * @param object $node
+	 * @param object|array $node
 	 */
 	private function _get_length($node)
 	{
@@ -877,7 +875,7 @@ class Html_2_Md
 	/**
 	 * Gets the inner html of a node
 	 *
-	 * @param object $node
+	 * @param DOMNode|object $node
 	 */
 	private function _get_innerHTML($node)
 	{
@@ -897,7 +895,7 @@ class Html_2_Md
 	/**
 	 * Gets the outer html of a node
 	 *
-	 * @param object $node
+	 * @param DOMNode|object $node
 	 */
 	private function _get_outerHTML($node)
 	{
@@ -979,6 +977,22 @@ class Html_2_Md
 		}
 
 		return $ticks;
+	}
+
+	/**
+	 * Helper function to adjust wrapping width for long-ish links
+	 *
+	 * @param string $markdown
+	 * @param bool|int $buffer
+	 */
+	private function _check_link_lenght($markdown, $buffer = false)
+	{
+		// Some links can be very long and if we wrap them they break
+		$line_strlen = Util::strlen($markdown) + (!empty($buffer) ? (int) $buffer : 0);
+		if ($line_strlen > $this->body_width)
+		{
+			$this->body_width = $line_strlen;
+		}
 	}
 
 	/**

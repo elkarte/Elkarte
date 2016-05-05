@@ -602,7 +602,8 @@ function countNewPosts($topic, $topicinfo, $timestamp)
  * @param string[] $msg_tables
  * @param mixed[] $msg_parameters
  * @param mixed[] $optional
- * @return A request object
+ *
+ * @return resource A request object
  */
 function loadMessageRequest($msg_selects, $msg_tables, $msg_parameters, $optional = array())
 {

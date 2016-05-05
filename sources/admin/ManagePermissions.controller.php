@@ -39,7 +39,7 @@ class ManagePermissions_Controller extends Action_Controller
 	protected $_pid = null;
 
 	/**
-	 * Dispaches to the right function based on the given subaction.
+	 * Dispatches to the right function based on the given subaction.
 	 *
 	 * - Checks the permissions, based on the sub-action.
 	 * - Called by ?action=managepermissions.

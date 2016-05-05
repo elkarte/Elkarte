@@ -178,7 +178,7 @@ class Mentioning extends AbstractModel
 	/**
 	 * Updating the status from the listing?
 	 *
-	 * @param int[] $items
+	 * @param int|int[] $items
 	 * @param string $mark
 	 */
 	public function updateStatus($items, $mark)

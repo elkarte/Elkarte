@@ -164,7 +164,7 @@ class User_Notification extends AbstractModel
 	/**
 	 * Validates the input when saving the settings.
 	 *
-	 * @param mixed[] $post An array containing the settings (usually $_POST)
+	 * @param array|object $post An array containing the settings (usually $_POST)
 	 */
 	public function validate($post)
 	{

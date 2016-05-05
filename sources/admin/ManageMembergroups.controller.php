@@ -361,7 +361,7 @@ class ManageMembergroups_Controller extends Action_Controller
 
 			// @todo Check for members with same name too?
 
-			// Don't allow copying of a real priviledged person!
+			// Don't allow copying of a real privileged person!
 			require_once(SUBSDIR . '/Permission.subs.php');
 
 			loadIllegalPermissions();

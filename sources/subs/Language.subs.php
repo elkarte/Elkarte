@@ -385,12 +385,20 @@ function list_getLanguagesList()
 	}
 }
 
+/**
+ * Finds installed language files of type lang
+ *
+ * @param string $lang
+ *
+ * @return array|bool
+ */
 function findPossiblePackages($lang)
 {
 	$db = database();
 
 	$request = $db->query('', '
-		SELECT id_install, filename
+		SELECT 
+			id_install, filename
 		FROM {db_prefix}log_packages
 		WHERE package_id LIKE {string:contains_lang}
 			AND install_state = {int:installed}',
@@ -399,7 +407,7 @@ function findPossiblePackages($lang)
 			'installed' => 1,
 		)
 	);
-
+	$file_name = '';
 	if ($db->num_rows($request) > 0)
 	{
 		list ($pid, $file_name) = $db->fetch_row($request);

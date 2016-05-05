@@ -1978,6 +1978,7 @@ function getLegacyAttachmentFilename($filename, $attachment_id, $dir = null, $ne
  *
  * @package Attachments
  * @param int $id_msg
+ * @param int[] $attachment_ids
  */
 function bindMessageAttachments($id_msg, $attachment_ids)
 {

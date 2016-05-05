@@ -17,7 +17,7 @@
  *
  * @package Likes
  * @param int $id_liker - user_id of the liker/disliker
- * @param mixed[] $liked_message - message array that is being worked on
+ * @param mixed $liked_message - message array that is being worked on
  * @param string $direction - + for like - for unlike a previous liked one
  */
 function likePost($id_liker, $liked_message, $direction)

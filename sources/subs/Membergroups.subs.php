@@ -2079,6 +2079,11 @@ function getUnassignableGroups($ignore_protected)
 	);
 }
 
+/**
+ * Returns a list of groups that a member can be assigned to
+ * 
+ * @return array
+ */
 function getGroupsList()
 {
 	global $txt;
@@ -2111,7 +2116,6 @@ function getGroupsList()
 			'newbie_group' => 4,
 		)
 	);
-
 	while ($row = $db->fetch_assoc($request))
 	{
 		// We should skip the administrator group if they don't have the admin_forum permission!
