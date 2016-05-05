@@ -698,7 +698,7 @@ class Packages_Controller extends Action_Controller
 					$package_installed['db_changes'] = serialize($db_package_log);
 				}
 				else
-					$package_installed['db_changes'] = '';
+					$package_installed['db_changes'] = array();
 
 				// What themes did we actually install?
 				$themes_installed = array_unique($themes_installed);

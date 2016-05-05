@@ -643,7 +643,7 @@ class MessageIndex_Controller extends Action_Controller implements Frontpage_Int
 			}
 		}
 
-		$affectedBoards = empty($board) ? array() : array($board => array(0, 0));
+		$affectedBoards = empty($board) ? array() : array((int) $board => array(0, 0));
 
 		// Do all the stickies...
 		if (!empty($stickyCache))

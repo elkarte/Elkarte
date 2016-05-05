@@ -156,7 +156,7 @@ class News_Controller extends Action_Controller
 			$this->_query_this_board = 'b.id_board = ' . $board;
 
 			// Try to look through just a few messages, if at all possible.
-			if ($boards_data[$board]['num_posts'] > 80 && $boards_data[$board]['num_posts'] > $modSettings['totalMessages'] / 10)
+			if ($boards_data[(int) $board]['num_posts'] > 80 && $boards_data[(int) $board]['num_posts'] > $modSettings['totalMessages'] / 10)
 				$context['optimize_msg']['lowest'] = 'm.id_msg >= ' . max(0, $modSettings['maxMsgID'] - 600 - $this->_limit * 5);
 		}
 		else
