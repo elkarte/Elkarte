@@ -1,11 +1,15 @@
-#!/usr/local/bin/php -q
+#!/usr/bin/php -q
 <?php
 
 /**
  * Handles the creating of new topics by email
  *
- * Note the shebang #!/usr/local/bin/php -q needs to point to the installed
- * location of php, this is the typical location but yours may be different.
+ * Note the shebang (#!) needs to point to the installed location of php on your
+ * system.  If you have shell access running "which php" should return the correct
+ * path to use.
+ *
+ * For example
+ * - Ubuntu and Debian would normally be #!/usr/bin/php -q
  *
  * @name      ElkArte Forum
  * @copyright ElkArte Forum contributors
