@@ -1561,12 +1561,11 @@ a.help .icon {
 	border-top: none;
 }
 
-.mlist li div, .whos_online dd:nth-child(odd) div {
-	border-top: 1px solid #CCCCCC;
-	border-bottom: 1px solid #CCCCCC;
+.mlist li div, .whos_online dt div, .whos_online dd:nth-child(odd) div {
+	border-top-color: #CCCCCC;
+	border-bottom-color: #CCCCCC;
 	background-color: #FFFFFF;
 }
-
 .mlist li.alternate_row div, .whos_online dd:nth-child(even) div {
 	border-top: 1px solid #CCCCCC;
 	border-bottom: 1px solid #CCCCCC;
