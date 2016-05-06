@@ -1523,6 +1523,9 @@ a.help .icon {
 .admin_menu .subsections:hover .linklevel1:after {
 	display: none;
 }
+#ourAnnouncements dt, #ourAnnouncements dd {
+	border-top-color: #ccc !important;
+}
 
 /* floating error box */
 /* currently used by like functionality */
