@@ -652,6 +652,9 @@ div.bbc_footnotes .meaction {
 	font-size: 1.4em;
 	font-family: "FontAwesome";
 }
+.report_seperator {
+	border-bottom-color: #CCCCCC;
+}
 
 .subsections:hover .linklevel1:after {
 	position: inherit;
