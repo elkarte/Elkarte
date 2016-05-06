@@ -1211,6 +1211,9 @@ a.active {
 	border-radius: 4px;
 	background: #FFFFFF;
 }
+.topic_details {
+	border-bottom-color: #ccc;
+}
 
 /* ------------------------------------------------------- */
 /*	$EDITOR		                                           */
