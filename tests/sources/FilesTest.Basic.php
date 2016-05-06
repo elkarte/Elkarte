@@ -113,7 +113,7 @@ class TestFiles extends PHPUnit_Framework_TestCase
  \* @version \d+\.\d+(?:\.\d+|\sdev|\s(beta|RC|Release Candidate)\s\d+)
 (?:(?: \*\n)?|(?: \*(?:\s.{0,200})?\n))+ \*\/',
 			// Pure ElkArte with php path
-			'^#!\/usr\/local\/bin\/php -q
+			'^#!\/usr\/bin\/php -q
 <\?php
 
 \/\*\*
