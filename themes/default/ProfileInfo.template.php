@@ -717,7 +717,7 @@ function template_profile_block_contact()
 		$ci_empty = false;
 		echo '
 					<dt>
-						<i class="icon i-envelope', $context['member']['online']['is_online'] ? '' : '-blank', '"><s>', $txt['email'], '</s></i>
+						<i class="icon i-envelope-o', $context['member']['online']['is_online'] ? '' : '-blank', '"><s>', $txt['email'], '</s></i>
 					</dt>
 					<dd><em>', template_member_email($context['member'], true), '</em></dd>';
 	}
