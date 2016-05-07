@@ -856,11 +856,11 @@ function deleteVariants($id)
 }
 
 /**
- * Loads all of the them variable/value pairs for a member or group of members
+ * Loads all of the theme variable/value pairs for a member or group of members
  * If supplied a variable array it will only load / return those values
  *
  * @param int|int[] $theme
- * @param int|null $memID
+ * @param int|int[]|null $memID
  * @param mixed[] $options
  * @param string[] $variables
  */

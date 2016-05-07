@@ -158,7 +158,7 @@ class UnTgz
 	/**
 	 * Class controller, calls the ungzip / untar functions in required order
 	 *
-	 * @return boolean|mixed[]
+	 * @return boolean|array
 	 */
 	public function read_tgz_data()
 	{
