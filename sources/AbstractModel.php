@@ -30,12 +30,13 @@ abstract class AbstractModel
 
 	/**
 	 * The modSettings
-	 * @var array
+	 * @var object
 	 */
 	protected $_modSettings = array();
 
 	/**
 	 * Make "global" items available to the class
+	 *
 	 * @param object|null $db
 	 */
 	public function __construct($db = null)
@@ -62,6 +63,8 @@ abstract class AbstractModel
 			return $this->_modSettings->{$name};
 		}
 		else
+		{
 			return $default;
+		}
 	}
 }
