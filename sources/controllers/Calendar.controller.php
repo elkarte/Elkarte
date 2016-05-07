@@ -254,7 +254,7 @@ class Calendar_Controller extends Action_Controller
 		$event = new Calendar_Event($event_id, $modSettings);
 
 		// Validate the post...
-		$save_data = '';
+		$save_data = array();
 		if (!isset($_POST['link_to_board']))
 		{
 			try

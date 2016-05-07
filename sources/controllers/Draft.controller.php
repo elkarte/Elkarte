@@ -121,7 +121,7 @@ class Draft_Controller extends Post_Controller
 		$context['posts'] = array();
 		foreach ($user_drafts as $row)
 		{
-			$this->_prepare_body_subject($row['body'], $row['subject'], $row['id_draft'], $txt['drafts_none'], $row['smileys_enabled']);
+			$this->_prepare_body_subject($row['body'], $row['subject'], $row['id_draft'], $txt['drafts_none'], (bool) $row['smileys_enabled']);
 
 			// And the data used by the template
 			$context['drafts'][$counter += $reverse ? -1 : 1] = array(
@@ -341,7 +341,7 @@ class Draft_Controller extends Post_Controller
 	 * @param string $subject - The subject, passed by-ref
 	 * @param int $id_draft - The id of the draft, used for caching the parsed body
 	 * @param string $default_subject - The default subject if $subject is empty
-	 * @param bool|string $smiley_enabled - Is the smiley are enabled or not
+	 * @param bool $smiley_enabled - Is the smiley are enabled or not
 	 */
 	private function _prepare_body_subject(&$body, &$subject, $id_draft, $default_subject, $smiley_enabled = true)
 	{
