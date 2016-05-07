@@ -104,7 +104,10 @@ class ManageThemes_Controller extends Action_Controller
 		global $txt, $context;
 
 		if (isset($this->_req->query->api))
-			return $this->action_index_api();
+		{
+			$this->action_index_api();
+			return;
+		}
 
 		// Load the important language files...
 		loadLanguage('ManageThemes');
@@ -121,7 +124,7 @@ class ManageThemes_Controller extends Action_Controller
 			'options' => array($this, 'action_options', 'permission' => 'admin_forum'),
 			'install' => array($this, 'action_install', 'permission' => 'admin_forum'),
 			'remove' => array($this, 'action_remove', 'permission' => 'admin_forum'),
-			'pick' => array($this, 'action_pick'),  // @todo ugly having that in this controller
+			'pick' => array($this, 'action_pick'), // @todo ugly having that in this controller
 			'edit' => array($this, 'action_edit', 'permission' => 'admin_forum'),
 			'copy' => array($this, 'action_copy', 'permission' => 'admin_forum'),
 			'themelist' => array($this, 'action_themelist', 'permission' => 'admin_forum'),
@@ -201,17 +204,17 @@ class ManageThemes_Controller extends Action_Controller
 		// Theme administration, removal, choice, or installation...
 		// Of all the actions we currently know only this
 		$subActions = array(
-		// 	'admin' => 'action_admin',
-		// 	'list' => 'action_list',
-		// 	'reset' => 'action_options',
-		// 	'options' => 'action_options',
-		// 	'install' => 'action_install',
+		// 'admin' => 'action_admin',
+		// 'list' => 'action_list',
+		// 'reset' => 'action_options',
+		// 'options' => 'action_options',
+		// 'install' => 'action_install',
 			'remove' => 'action_remove_api',
-		// 	'pick' => 'action_pick',
-		// 	'edit' => 'action_edit',
-		// 	'copy' => 'action_copy',
-		// 	'themelist' => 'action_themelist',
-		// 	'browse' => 'action_browse',
+		// 'pick' => 'action_pick',
+		// 'edit' => 'action_edit',
+		// 'copy' => 'action_copy',
+		// 'themelist' => 'action_themelist',
+		// 'browse' => 'action_browse',
 		);
 
 		// Follow the sa or just go to administration.
@@ -262,7 +265,7 @@ class ManageThemes_Controller extends Action_Controller
 				Errors::instance()->fatal_lang_error('themes_none_selectable', false);
 
 			if (!in_array($this->_req->post->options['theme_guests'], $this->_req->post->options['known_themes']))
-					Errors::instance()->fatal_lang_error('themes_default_selectable', false);
+				Errors::instance()->fatal_lang_error('themes_default_selectable', false);
 
 			// Commit the new settings.
 			updateSettings(array(

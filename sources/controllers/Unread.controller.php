@@ -414,9 +414,11 @@ class Unread_Controller extends Action_Controller
 		{
 			switch ($key) {
 				case 'subject':
-				case 'starter': $sorticon = 'alpha';
+				case 'starter':
+					$sorticon = 'alpha';
 					break;
-				default: $sorticon = 'numeric';
+				default:
+					$sorticon = 'numeric';
 			}
 
 			$context['topics_headers'][$key] = array('url' => $scripturl . '?action=' . $this->_action . ($context['showing_all_topics'] ? ';all' : '') . sprintf($context['querystring_board_limits'], $this->_req->query->start) . ';sort=' . $key . ($context['sort_by'] == $key && $context['sort_direction'] == 'up' ? ';desc' : ''), 'sort_dir_img' => $context['sort_by'] == $key ? '<i class="icon icon-small i-sort-' . $sorticon . '-' . $context['sort_direction'] . '" title="' . $context['sort_title'] . '"></i>' : '',);
