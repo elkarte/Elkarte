@@ -1612,7 +1612,7 @@ class ManageThemes_Controller extends Action_Controller
 		$is_css = substr($this->_req->post->filename, -4) == '.css';
 
 		// Check you up
-		if (checkSession('post', '', false) == '' && validateToken('admin-te-' . md5($selectedTheme . '-' . $this->_req->post->filename), 'post', false) == true)
+		if (checkSession('post', '', false) === '' && validateToken('admin-te-' . md5($selectedTheme . '-' . $this->_req->post->filename), 'post', false) === true)
 		{
 			// Consolidate the format in which we received the file contents
 			if (is_array($file))
