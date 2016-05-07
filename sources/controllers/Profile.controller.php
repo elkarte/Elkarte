@@ -745,7 +745,7 @@ class Profile_Controller extends Action_Controller
 	 */
 	private function _check_password($check_password)
 	{
-		global $user_settings, $cur_profile, $user_info, $user_profile, $post_errors;
+		global $user_settings, $cur_profile, $user_info, $user_profile, $post_errors, $context;
 
 		if ($check_password)
 		{
