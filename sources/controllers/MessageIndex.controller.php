@@ -329,9 +329,11 @@ class MessageIndex_Controller extends Action_Controller implements Frontpage_Int
 			{
 				case 'subject':
 				case 'starter':
-				case 'last_poster': $sorticon = 'alpha';
-			    		break;
-				default: $sorticon = 'numeric';
+				case 'last_poster':
+					$sorticon = 'alpha';
+					break;
+				default:
+					$sorticon = 'numeric';
 			}
 
 			$context['topics_headers'][$key] = array(

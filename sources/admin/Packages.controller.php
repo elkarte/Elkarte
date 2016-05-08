@@ -29,7 +29,7 @@ class Packages_Controller extends Action_Controller
 {
 	/**
 	 * listing of files in a packages
-	 * @var string[]|boolean
+	 * @var array|boolean
 	 */
 	private $_extracted_files;
 
@@ -181,7 +181,7 @@ class Packages_Controller extends Action_Controller
 			redirectexit('action=admin;area=packages');
 
 		// What are we trying to do
-		$this->_filename = preg_replace('~[\.]+~', '.', $file);
+		$this->_filename = (string) preg_replace('~[\.]+~', '.', $file);
 		$this->_uninstalling = $this->_req->query->sa === 'uninstall';
 
 		// If we can't find the file, our install ends here

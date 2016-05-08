@@ -32,7 +32,7 @@ class Email_Settings extends Settings_Form
 	/**
 	 * static function saveTableSettings, now part of the Settings Form class
 	 *
-	 * @param mixed[] $config_vars the key names of the vars are the table cols
+	 * @param array|object|null $config_vars the key names of the vars are the table cols
 	 * @param string $tablename name of the table the values will be saved in
 	 * @param mixed[]|null $config_values
 	 * @param string[] $index for compatibility

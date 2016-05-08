@@ -870,13 +870,17 @@ class ManageFeatures_Controller extends Action_Controller
 
 							switch ((int) $rowData['placement'])
 							{
-								case 0: $placement .= 'standard';
-							    		break;
-								case 1: $placement .= 'withicons';
+								case 0:
+									$placement .= 'standard';
 									break;
-								case 2: $placement .= 'abovesignature';
+								case 1:
+									$placement .= 'withicons';
 									break;
-								case 3: $placement .= 'aboveicons';
+								case 2:
+									$placement .= 'abovesignature';
+									break;
+								case 3:
+									$placement .= 'aboveicons';
 									break;
 							}
 
@@ -1030,7 +1034,6 @@ class ManageFeatures_Controller extends Action_Controller
 			$this->_req->post->field_name = $this->_req->getPost('field_name', 'Util::htmlspecialchars');
 			$this->_req->post->field_desc = $this->_req->getPost('field_desc', 'Util::htmlspecialchars');
 
-
 			$rows = isset($this->_req->post->rows) ? (int) $this->_req->post->rows : 4;
 			$cols = isset($this->_req->post->cols) ? (int) $this->_req->post->cols : 30;
 
@@ -1064,7 +1067,7 @@ class ManageFeatures_Controller extends Action_Controller
 			{
 				case 'check':
 					$default = isset($this->_req->post->default_check) ? 1 : '';
-			    		break;
+			    	break;
 				case 'select':
 				case 'radio':
 					if (!empty($this->_req->post->select_option))
@@ -1096,7 +1099,8 @@ class ManageFeatures_Controller extends Action_Controller
 						$field_options = substr($field_options, 0, -1);
 					}
 					break;
-				default: $default = isset($this->_req->post->default_value) ? $this->_req->post->default_value : '';
+				default:
+					$default = isset($this->_req->post->default_value) ? $this->_req->post->default_value : '';
 			}
 
 			// Text area by default has dimensions

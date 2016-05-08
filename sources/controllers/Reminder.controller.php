@@ -367,7 +367,7 @@ function secretAnswerInput()
 
 	// Get the stuff....
 	require_once(SUBSDIR . '/Members.subs.php');
-	$member = getBasicMemberData((int) $this->_req->post->uid, array('authentication' => true));
+	$member = getBasicMemberData((int) $_POST['uid'], array('authentication' => true));
 	if (empty($member))
 		Errors::instance()->fatal_lang_error('username_no_exist', false);
 

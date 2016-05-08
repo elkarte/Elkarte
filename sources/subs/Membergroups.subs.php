@@ -1924,7 +1924,7 @@ function list_getGroupRequestCount($where, $where_parameters)
  * @param int $items_per_page  The number of items to show per page
  * @param string $sort A string indicating how to sort the results
  * @param string $where
- * @param string $where_parameters
+ * @param string[] $where_parameters
  * @return mixed[] an array of group requests
  * Each group request has:
  *   'id'
@@ -2081,7 +2081,7 @@ function getUnassignableGroups($ignore_protected)
 
 /**
  * Returns a list of groups that a member can be assigned to
- * 
+ *
  * @return array
  */
 function getGroupsList()

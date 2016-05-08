@@ -78,6 +78,23 @@ function detectFulltextIndex()
 }
 
 /**
+ * Attempts to determine the version of the Sphinx damon
+ */
+function SphinxVersion()
+{
+	$version = '0.0.0';
+
+	// Can we get the version that is running/installed?
+	@exec('searchd --help', $sphver);
+	if (!empty($sphver) && preg_match('~Sphinx (\d\.\d\.\d\d?)~', $sphver[0], $match))
+	{
+		$version = $match[1];
+	}
+
+	return $version;
+}
+
+/**
  * Creates and outputs the Sphinx configuration file
  *
  * @package Search
@@ -85,6 +102,8 @@ function detectFulltextIndex()
 function createSphinxConfig()
 {
 	global $db_server, $db_name, $db_user, $db_passwd, $db_prefix, $modSettings;
+
+	$version = SphinxVersion();
 
 	// Set up to output a file to the users browser
 	while (ob_get_level() > 0)
@@ -150,6 +169,7 @@ source elkarte_source
 	sql_db				= ', $db_name, '
 	sql_port			= 3306
 	sql_query_pre		= SET NAMES utf8
+	# If you do not have query_cache enabled in my.cnf, then you can comment out the next line
 	sql_query_pre		= SET SESSION query_cache_type=OFF
 	sql_query_pre		= \
 		REPLACE INTO ', $db_prefix, 'settings (variable, value) \
@@ -185,6 +205,7 @@ source elkarte_source
 source elkarte_delta_source : elkarte_source
 {
 	sql_query_pre = SET NAMES utf8
+	# If you do not have query_cache enabled in my.cnf, then you can comment out the next line
 	sql_query_pre = SET SESSION query_cache_type=OFF
 	sql_query_range	= \
 		SELECT s1.value, s2.value \
@@ -198,9 +219,9 @@ index elkarte_base_index
 	html_strip		= 1
 	source			= elkarte_source
 	path			= ', $modSettings['sphinx_data_path'], '/elkarte_sphinx_base.index', empty($modSettings['sphinx_stopword_path']) ? '' : '
-	stopwords		= ' . $modSettings['sphinx_stopword_path'], '
-	min_word_len	= 2
-	charset_type	= utf-8
+	stopwords		= ', $modSettings['sphinx_stopword_path'], '
+	min_word_len	= 2', version_compare($version, '2.2.2') < 0 ? '
+	charset_type	= utf-8' : '', '
 	charset_table	= 0..9, A..Z->a..z, _, a..z, U+451->U+435, U+401->U+435, U+410..U+42F->U+430..U+44F, U+430..U+44F
 	ignore_chars	= -, U+AD
 }
@@ -231,8 +252,8 @@ searchd
 	query_log				= ', $modSettings['sphinx_log_path'], '/query.log
 	read_timeout			= 5
 	max_children			= 30
-	pid_file				= ', $modSettings['sphinx_data_path'], '/searchd.pid
-	max_matches				= ', (empty($modSettings['sphinx_max_results']) ? 2000 : (int) $modSettings['sphinx_max_results']), '
+	pid_file				= ', $modSettings['sphinx_data_path'], '/searchd.pid', version_compare($version, '2.2.3') < 0 ? '
+	max_matches				= ' . (empty($modSettings['sphinx_max_results']) ? 2000 : (int) $modSettings['sphinx_max_results']) : '', '
 }
 ';
 	obExit(false, false);

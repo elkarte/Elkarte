@@ -177,7 +177,7 @@ abstract class DbTable
 
 	/**
 	 * Optimize a table
-	 * 
+	 *
 	 * @param string $table - the table to be optimized
 	 * @return int
 	 */
@@ -227,7 +227,7 @@ abstract class DbTable
 	 */
 	public function package_log()
 	{
-		return;
+		return $this->_package_log;
 	}
 
 	/**

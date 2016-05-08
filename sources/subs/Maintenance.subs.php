@@ -662,7 +662,7 @@ function getTopicsToMove($id_board)
 	$db = database();
 
 	// Lets get the topics.
-	$db->fetchQueryCallback('
+	return $db->fetchQueryCallback('
 		SELECT id_topic
 		FROM {db_prefix}topics
 		WHERE id_board = {int:id_board}

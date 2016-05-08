@@ -100,7 +100,9 @@ class Attachment_Controller extends Action_Controller
 
 				// Bad news for you, the attachments did not process, lets tell them why
 				foreach ($errors as $key => $error)
+				{
 					$resp_data[] = $error;
+				}
 
 				$context['json_data'] = array('result' => false, 'data' => $resp_data);
 			}
@@ -131,6 +133,7 @@ class Attachment_Controller extends Action_Controller
 	/**
 	 * Function to remove attachments which were added via ajax calls
 	 *
+	 * What it does:
 	 * - Currently called by drag drop attachment functionality
 	 * - Requires file name and file path
 	 * - Responds back with success or error
@@ -157,6 +160,7 @@ class Attachment_Controller extends Action_Controller
 		// We need a filename and path or we are not going any further
 		if (isset($this->_req->post->attachid))
 		{
+			$result = false;
 			if (!empty($_SESSION['temp_attachments']))
 			{
 				require_once(SUBSDIR . '/Attachments.subs.php');
@@ -199,6 +203,7 @@ class Attachment_Controller extends Action_Controller
 	/**
 	 * Downloads an attachment or avatar, and increments the download count.
 	 *
+	 * What it does:
 	 * - It requires the view_attachments permission. (not for avatars!)
 	 * - It disables the session parser, and clears any previous output.
 	 * - It is accessed via the query string ?action=dlattach.
@@ -223,7 +228,8 @@ class Attachment_Controller extends Action_Controller
 		// Temporary attachment, special case...
 		if (isset($this->_req->query->attach) && strpos($this->_req->query->attach, 'post_tmp_' . $user_info['id']) !== false)
 		{
-			return $this->action_tmpattach();
+			$this->action_tmpattach();
+			return;
 		}
 		else
 		{
@@ -279,7 +285,8 @@ class Attachment_Controller extends Action_Controller
 					$attachment[4] = 0;
 					$attachment[5] = 0;
 
-					$finfo = finfo_open(FILEINFO_MIME_TYPE); // return mime type ala mimetype extension
+					// return mime type ala mimetype extension
+					$finfo = finfo_open(FILEINFO_MIME_TYPE);
 
 					if (in_array($full_attach[3], array(
 						'c', 'cpp', 'css', 'csv', 'doc', 'docx', 'flv', 'html', 'htm', 'java', 'js', 'log', 'mp3',
@@ -314,13 +321,16 @@ class Attachment_Controller extends Action_Controller
 						$attachment[6] = 'image/png';
 						$filename = $settings['theme_dir'] . '/images/mime_images/default.png';
 					}
+
 					finfo_close($finfo);
 				}
 			}
 		}
 
 		if (empty($attachment))
+		{
 			Errors::instance()->fatal_lang_error('no_access', false);
+		}
 
 		list ($id_folder, $real_filename, $file_hash, $file_ext, $id_attach, $attachment_type, $mime_type, $is_approved, $id_member) = $attachment;
 
@@ -330,7 +340,9 @@ class Attachment_Controller extends Action_Controller
 
 		// Update the download counter (unless it's a thumbnail or an avatar).
 		if (!empty($id_attach) && empty($is_avatar) || $attachment_type != 3)
+		{
 			increaseDownloadCounter($id_attach);
+		}
 
 		if ($filename === null)
 		{
@@ -342,7 +354,9 @@ class Attachment_Controller extends Action_Controller
 			@ob_end_clean();
 
 		if (!empty($modSettings['enableCompressedOutput']) && @filesize($filename) <= 4194304 && in_array($file_ext, array('txt', 'html', 'htm', 'js', 'doc', 'docx', 'rtf', 'css', 'php', 'log', 'xml', 'sql', 'c', 'java')))
+		{
 			ob_start('ob_gzhandler');
+		}
 		else
 		{
 			ob_start();
@@ -492,6 +506,12 @@ class Attachment_Controller extends Action_Controller
 		require_once(SUBSDIR . '/Attachments.subs.php');
 		require_once(SUBSDIR . '/Graphics.subs.php');
 
+		// Start off
+		$mime_type = '';
+		$real_filename = '';
+		$filename = '';
+		$file_ext = '';
+
 		try
 		{
 			if (empty($topic) || (string) (int) $this->_req->query->attach !== (string) $this->_req->query->attach)
@@ -532,7 +552,8 @@ class Attachment_Controller extends Action_Controller
 		while (ob_get_level() > 0)
 			@ob_end_clean();
 
-		$finfo = finfo_open(FILEINFO_MIME_TYPE); // return mime type ala mimetype extension
+		// return mime type ala mimetype extension
+		$finfo = finfo_open(FILEINFO_MIME_TYPE);
 
 		if (in_array($file_ext, array(
 			'c', 'cpp', 'css', 'csv', 'doc', 'docx', 'flv', 'html', 'htm', 'java', 'js', 'log', 'mp3',
@@ -626,8 +647,8 @@ class Attachment_Controller extends Action_Controller
 		if ($resize && resizeImageFile($filename, $filename . '_thumb', 100, 100))
 			$filename = $filename . '_thumb';
 
-		if (isset($callback) || @readfile($filename) === null)
-			echo isset($callback) ? $callback(file_get_contents($filename)) : file_get_contents($filename);
+		if (@readfile($filename) === null)
+			echo file_get_contents($filename);
 
 		obExit(false);
 	}

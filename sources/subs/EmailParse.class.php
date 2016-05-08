@@ -808,7 +808,7 @@ class Email_Parse
 
 		/** Add non-header-based detection **/
 	}
-	
+
 	/**
 	 * Tries to find the original intended recipient that failed to deliver
 	 *
@@ -823,11 +823,11 @@ class Email_Parse
 		/** Body->Original-Recipient Header **/
 		if (isset($this->_dsn['body']['original-recipient']['value']))
 			return $this->_dsn['body']['original-recipient']['value'];
-		
+
 		/** Body->Final-recipient Header **/
 		if (isset($this->_dsn['body']['final-recipient']['value']))
 			return $this->_dsn['body']['final-recipient']['value'];
-		
+
 		return null;
 	}
 
@@ -866,7 +866,7 @@ class Email_Parse
 		// Change it to a readable form ...
 		$this->subject = htmlspecialchars($this->_decode_header($this->headers['subject']), ENT_COMPAT, 'UTF-8');
 
-		return $this->subject;
+		return (string) $this->subject;
 	}
 
 	/**

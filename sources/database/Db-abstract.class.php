@@ -64,7 +64,7 @@ abstract class Database_Abstract implements Database
 	/**
 	 * This contains the "connection" used in the replacement__callback method
 	 * TBH I'm not sure why $this->_connection is not used
-	 * @var resource
+	 * @var resource|object
 	 */
 	protected $_db_callback_connection = null;
 

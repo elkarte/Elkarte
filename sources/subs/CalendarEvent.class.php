@@ -60,7 +60,7 @@ class Calendar_Event
 	 * Makes sure the calendar data are valid depending on settings
 	 * and permissions.
 	 *
-	 * @param mixed[] $event The options may come from a form
+	 * @param array $event The options may come from a form
 	 * @throws Elk_Exception
 	 */
 	public function validate($event)
@@ -120,7 +120,7 @@ class Calendar_Event
 	/**
 	 * Does the save of an event.
 	 *
-	 * @param mixed[] $options - An array of options for the event.
+	 * @param array $options - An array of options for the event.
 	 * @param int $member_id - the id of the member saving the event.
 	 */
 	public function insert($options, $member_id)
@@ -150,7 +150,7 @@ class Calendar_Event
 	 * Some options are validated to be sure the data inserted into the
 	 * database are correct.
 	 *
-	 * @param mixed[] $options The options may come from a form
+	 * @param array $options The options may come from a form
 	 */
 	public function update($options)
 	{
@@ -182,7 +182,7 @@ class Calendar_Event
 	 * Loads up the data of an event for the template.
 	 * If new the default values are loaded.
 	 *
-	 * @param mixed[] $options The options may come from a form. Used to set
+	 * @param array $options The options may come from a form. Used to set
 	 *                 some of the defaults in case of new events.
 	 * @param int $member_id - the id of the member saving the event
 	 * @return mixed[] The event structure.
