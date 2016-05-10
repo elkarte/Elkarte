@@ -22,18 +22,18 @@
 /*		$TABLES..............Generic tables (error log, etc.).
 /*		$SETTINGS............Generic lists for settings pages.
 /*		$BOARDS..............Board index, sub-boards, and message index.
-/*      $DRAG-N-DROP.........Post attachment area, including Drag and Drop
+/*		$DRAG-N-DROP.........Post attachment area, including Drag and Drop
 /*
 /*		$TOPICS..............The display template (topic view), including send.
 /*		$EDITOR..............Main editor (posts, events, polls) and topic summary.
 /*		$MODERATE............Move topic, split topic, merge topic.
 /*
 /*		$PROFILE.............The profile areas.
-/*      $TABS...............Tabs used in the profile section, override jqueryUI css
+/*		$TABS...............Tabs used in the profile section, override jqueryUI css
 /*		$PERSONAL............The personal messages (PM) areas.
 /*		$CALENDAR............Wombats (and the calendar).
 /*		$STATISTICS..........The statistics centre.
-/*      $LIKE STATS..........The like stats area
+/*		$LIKE STATS..........The like stats area
 /*
 /*		$HELP................Help pages, help icons and pop-ups, tooltips.
 /*		$SEARCH..............Search pages, including memberlist search.
