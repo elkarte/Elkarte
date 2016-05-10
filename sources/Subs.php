@@ -1681,50 +1681,30 @@ function replaceBasicActionUrl($string)
 
 	if ($find === null)
 	{
-		$find = array(
-			'{forum_name}',
-			'{forum_name_html_safe}',
-			'{forum_name_html_unsafe}',
-			'{script_url}',
-			'{board_url}',
-			'{login_url}',
-			'{register_url}',
-			'{activate_url}',
-			'{help_url}',
-			'{admin_url}',
-			'{moderate_url}',
-			'{recent_url}',
-			'{search_url}',
-			'{who_url}',
-			'{credits_url}',
-			'{calendar_url}',
-			'{memberlist_url}',
-			'{stats_url}',
+		$find_replace = array(
+			'{forum_name}' => $context['forum_name'],
+			'{forum_name_html_safe}' => $context['forum_name_html_safe'],
+			'{forum_name_html_unsafe}' => un_htmlspecialchars($context['forum_name_html_safe']),
+			'{script_url}' => $scripturl,
+			'{board_url}' => $boardurl,
+			'{login_url}' => $scripturl . '?action=login',
+			'{register_url}' => $scripturl . '?action=register',
+			'{activate_url}' => $scripturl . '?action=register;sa=activate',
+			'{help_url}' => $scripturl . '?action=help',
+			'{admin_url}' => $scripturl . '?action=admin',
+			'{moderate_url}' => $scripturl . '?action=moderate',
+			'{recent_url}' => $scripturl . '?action=recent',
+			'{search_url}' => $scripturl . '?action=search',
+			'{who_url}' => $scripturl . '?action=who',
+			'{credits_url}' => $scripturl . '?action=who;sa=credits',
+			'{calendar_url}' => $scripturl . '?action=calendar',
+			'{memberlist_url}' => $scripturl . '?action=memberlist',
+			'{stats_url}' => $scripturl . '?action=stats',
 		);
-		$replace = array(
-			$context['forum_name'],
-			$context['forum_name_html_safe'],
-			un_htmlspecialchars($context['forum_name_html_safe']),
-			$scripturl,
-			$boardurl,
-			$scripturl . '?action=login',
-			$scripturl . '?action=register',
-			$scripturl . '?action=register;sa=activate',
-			$scripturl . '?action=help',
-			$scripturl . '?action=admin',
-			$scripturl . '?action=moderate',
-			$scripturl . '?action=recent',
-			$scripturl . '?action=search',
-			$scripturl . '?action=who',
-			$scripturl . '?action=who;sa=credits',
-			$scripturl . '?action=calendar',
-			$scripturl . '?action=memberlist',
-			$scripturl . '?action=stats',
-		);
-		call_integration_hook('integrate_basic_url_replacement', array(&$find, &$replace));
+		call_integration_hook('integrate_basic_url_replacement', array(&$find_replace));
 	}
 
-	return str_replace($find, $replace, $string);
+	return str_replace(array_keys($find_replace), array_values($find_replace), $string);
 }
 
 /**
