@@ -473,6 +473,7 @@ class Auth_Controller extends Action_Controller
 
 		$context['sub_template'] = 'kick_guest';
 		$context['page_title'] = $txt['login'];
+		$context['default_password'] = '';
 	}
 
 	/**
