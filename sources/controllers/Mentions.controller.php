@@ -420,6 +420,7 @@ class Mentions_Controller extends Action_Controller
 		$totalMentions = countUserMentions($all, $type);
 		$mentions = array();
 		$round = 0;
+		loadLanguage('Mentions');
 
 		$this->_registerEvents($type);
 
