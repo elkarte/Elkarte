@@ -1834,7 +1834,7 @@ class ModerationCenter_Controller extends Action_Controller
 
 		$context['reported_posts'] = array();
 
-		$reported_posts = reportedPosts(allowedTo('admin_forum'));
+		$reported_posts = reportedPosts(false);
 		foreach ($reported_posts as $i => $row)
 		{
 			$context['reported_posts'][] = array(
