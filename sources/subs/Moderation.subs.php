@@ -1214,6 +1214,7 @@ function reportedPosts($show_pms = false)
 	$reported_posts = array();
 	if (!Cache::instance()->getVar($reported_posts, 'reported_posts_' . $cachekey, 90))
 	{
+		$reported_posts = array();
 		// By George, that means we in a position to get the reports, jolly good.
 		$request = $db->query('', '
 			SELECT 
