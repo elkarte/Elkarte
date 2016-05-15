@@ -27,6 +27,8 @@ class TestFiles extends PHPUnit_Framework_TestCase
 			// We do not care about non-project files
 			if (strpos($file, '/sources/ext/') !== false)
 				continue;
+			if (strpos($file, '/vendor/') !== false)
+				continue;
 
 			$this->_ourFiles[] = $file;
 		}

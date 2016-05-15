@@ -120,6 +120,7 @@ class Emailpost_Controller extends Action_Controller
 		if (empty($email_message->message_key_id))
 			return pbe_emailError('error_missing_key', $email_message);
 
+		require_once(SUBSDIR . '/Emailpost.subs.php');
 		// Good we have a key, who was it sent to?
 		$key_owner = query_key_owner($email_message);
 

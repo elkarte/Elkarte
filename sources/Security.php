@@ -202,6 +202,7 @@ function is_not_guest($message = '', $is_fatal = true)
 	// Use the kick_guest sub template...
 	$context['kick_message'] = $message;
 	$context['page_title'] = $txt['login'];
+	$context['default_password'] = '';
 
 	obExit();
 
