@@ -593,6 +593,7 @@ class Mentions_Controller extends Action_Controller
 					changeMentionStatus($this->_validator->id_mention, $this->_known_status['deleted']);
 					break;
 				case 'readall':
+					loadLanguage('Mentions');
 					$mentions = $this->list_loadMentions((int) $this->_page, $this->_items_per_page, $this->_sort, $this->_all, $this->_type);
 					$this->_markMentionsRead($mentions);
 					break;
