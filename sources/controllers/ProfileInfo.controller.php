@@ -47,7 +47,16 @@ class ProfileInfo_Controller extends Action_Controller
 	 */
 	public function pre_dispatch()
 	{
+		global $context, $user_info;
+
+		require_once(SUBSDIR . '/Profile.subs.php');
+
 		$this->_memID = currentMemberID();
+
+		if (!isset($context['user']['is_owner']))
+			$context['user']['is_owner'] = (int) $this->_memID === (int) $user_info['id'];
+
+		loadLanguage('Profile');
 	}
 
 	/**
@@ -69,24 +78,13 @@ class ProfileInfo_Controller extends Action_Controller
 	 */
 	public function action_summary()
 	{
-		global $context, $memberContext, $txt, $modSettings, $user_profile, $scripturl;
+		global $context, $memberContext, $modSettings, $scripturl;
 
 		// Attempt to load the member's profile data.
 		if (!loadMemberContext($this->_memID) || !isset($memberContext[$this->_memID]))
 			Errors::instance()->fatal_lang_error('not_a_user', false);
 
 		loadTemplate('ProfileInfo');
-
-		// Set up the context stuff and load the user.
-		$context += array(
-			'page_title' => sprintf($txt['profile_of_username'], $memberContext[$this->_memID]['name']),
-			'can_send_pm' => allowedTo('pm_send'),
-			'can_send_email' => allowedTo('send_email_to_members'),
-			'can_have_buddy' => allowedTo('profile_identity_own') && !empty($modSettings['enable_buddylist']),
-			'can_issue_warning' => in_array('w', $context['admin_features']) && allowedTo('issue_warning') && !empty($modSettings['warning_enable']),
-		);
-		$context['member'] = &$memberContext[$this->_memID];
-		$context['can_view_warning'] = in_array('w', $context['admin_features']) && (allowedTo('issue_warning') && !$context['user']['is_owner']) || (!empty($modSettings['warning_show']) && ($modSettings['warning_show'] > 1 || $context['user']['is_owner']));
 
 		// Set a canonical URL for this page.
 		$context['canonical_url'] = $scripturl . '?action=profile;u=' . $this->_memID;
@@ -97,9 +95,39 @@ class ProfileInfo_Controller extends Action_Controller
 		// Menu tab
 		$context[$context['profile_menu_name']]['tab_data'] = array();
 
-		// Tab information for use in the summary page
-		// Each tab template defines a div, the value of which are the template(s) to load in that div
-		// Templates are named template_profile_block_YOURNAME
+		// Profile summary tabs, like Summary, Recent, Buddies
+		$this->register_summarytabs();
+
+		// Load in everything we know about the user
+		$this->define_user_values();
+		$this->load_summary();
+
+		// Load data for the various summary tabs
+		$this->_load_recent_attachments();
+		//$this->_load_buddies();
+		$this->_load_recent_posts();
+		$this->_load_recent_topics();
+
+		// To finish this off, custom profile fields.
+		loadCustomFields($this->_memID);
+
+		// To make tabs work, we need jQueryUI
+		$modSettings['jquery_include_ui'] = true;
+		addInlineJavascript('start_tabs();', true);
+	}
+
+	/**
+	 * Prepares the tabs for the profile summary page
+	 *
+	 * What it does:
+	 * - Tab information for use in the summary page
+	 * - Each tab template defines a div, the value of which are the template(s) to load in that div
+	 * - Templates are named template_profile_block_YOURNAME
+	 */
+	public function register_summarytabs()
+	{
+		global $txt, $context, $modSettings, $scripturl;
+
 		$context['summarytabs'] = array(
 			'summary' => array(
 				'name' => $txt['summary'],
@@ -119,126 +147,33 @@ class ProfileInfo_Controller extends Action_Controller
 				'name' => $txt['buddies'],
 				'templates' => array('buddies'),
 				'active' => !empty($modSettings['enable_buddylist']) && $context['user']['is_owner'],
+				'href' => $scripturl . '?action=xmlhttp&sa=profile_buddies'
 			),
 		);
 
 		// Let addons add or remove to the tabs array
 		call_integration_hook('integrate_profile_summary', array($this->_memID));
 
-		// Go forward with whats left
+		// Go forward with whats left after integration adds or removes
 		$summary_areas = '';
 		foreach ($context['summarytabs'] as $id => $tab)
 		{
 			// If the tab is active we add it
 			if ($tab['active'] !== true)
+			{
 				unset($context['summarytabs'][$id]);
+			}
 			else
 			{
 				// All the active templates, used to prevent processing data we don't need
 				foreach ($tab['templates'] as $template)
+				{
 					$summary_areas .= is_array($template) ? implode(',', $template) : ',' . $template;
+				}
 			}
 		}
+
 		$this->_summary_areas = explode(',', $summary_areas);
-
-		// See if they have broken any warning levels...
-		if (!empty($modSettings['warning_mute']) && $modSettings['warning_mute'] <= $context['member']['warning'])
-			$context['warning_status'] = $txt['profile_warning_is_muted'];
-		elseif (!empty($modSettings['warning_moderate']) && $modSettings['warning_moderate'] <= $context['member']['warning'])
-			$context['warning_status'] = $txt['profile_warning_is_moderation'];
-		elseif (!empty($modSettings['warning_watch']) && $modSettings['warning_watch'] <= $context['member']['warning'])
-			$context['warning_status'] = $txt['profile_warning_is_watch'];
-
-		// They haven't even been registered for a full day!?
-		$days_registered = (int) ((time() - $user_profile[$this->_memID]['date_registered']) / (3600 * 24));
-		if (empty($user_profile[$this->_memID]['date_registered']) || $days_registered < 1)
-			$context['member']['posts_per_day'] = $txt['not_applicable'];
-		else
-			$context['member']['posts_per_day'] = comma_format($context['member']['real_posts'] / $days_registered, 3);
-
-		// Set the age...
-		if (empty($context['member']['birth_date']))
-		{
-			$context['member'] += array(
-				'age' => $txt['not_applicable'],
-				'today_is_birthday' => false
-			);
-		}
-		else
-		{
-			list ($birth_year, $birth_month, $birth_day) = sscanf($context['member']['birth_date'], '%d-%d-%d');
-			$datearray = getdate(forum_time());
-			$context['member'] += array(
-				'age' => $birth_year <= 4 ? $txt['not_applicable'] : $datearray['year'] - $birth_year - (($datearray['mon'] > $birth_month || ($datearray['mon'] == $birth_month && $datearray['mday'] >= $birth_day)) ? 0 : 1),
-				'today_is_birthday' => $datearray['mon'] == $birth_month && $datearray['mday'] == $birth_day
-			);
-		}
-
-		if (allowedTo('moderate_forum'))
-		{
-			// Make sure it's a valid ip address; otherwise, don't bother...
-			if (preg_match('/^\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}$/', $memberContext[$this->_memID]['ip']) == 1 && empty($modSettings['disableHostnameLookup']))
-				$context['member']['hostname'] = host_from_ip($memberContext[$this->_memID]['ip']);
-			else
-				$context['member']['hostname'] = '';
-
-			$context['can_see_ip'] = true;
-		}
-		else
-			$context['can_see_ip'] = false;
-
-		if (!empty($modSettings['who_enabled']) && $context['member']['online']['is_online'])
-		{
-			include_once(SUBSDIR . '/Who.subs.php');
-			$action = determineActions($user_profile[$this->_memID]['url']);
-			loadLanguage('index');
-
-			if ($action !== false)
-				$context['member']['action'] = $action;
-		}
-
-		// If the user is awaiting activation, and the viewer has permission - setup some activation context messages.
-		if ($context['member']['is_activated'] % 10 != 1 && allowedTo('moderate_forum'))
-		{
-			$context['activate_type'] = $context['member']['is_activated'];
-
-			// What should the link text be?
-			$context['activate_link_text'] = in_array($context['member']['is_activated'], array(3, 4, 5, 13, 14, 15)) ? $txt['account_approve'] : $txt['account_activate'];
-
-			// Should we show a custom message?
-			$context['activate_message'] = isset($txt['account_activate_method_' . $context['member']['is_activated'] % 10]) ? $txt['account_activate_method_' . $context['member']['is_activated'] % 10] : $txt['account_not_activated'];
-			$context['activate_url'] = $scripturl . '?action=profile;save;area=activateaccount;u=' . $this->_memID . ';' . $context['session_var'] . '=' . $context['session_id'] . ';' . $context['profile-aa' . $this->_memID . '_token_var'] . '=' . $context['profile-aa' . $this->_memID . '_token'];
-		}
-
-		// Is the signature even enabled on this forum?
-		$context['signature_enabled'] = substr($modSettings['signature_settings'], 0, 1) == 1;
-
-		// How about, are they banned?
-		if (allowedTo('moderate_forum'))
-		{
-			require_once(SUBSDIR . '/Bans.subs.php');
-			$hostname = !empty($context['member']['hostname']) ? $context['member']['hostname'] : '';
-			$email = !empty($context['member']['email']) ? $context['member']['email'] : '';
-			$context['member']['bans'] = BanCheckUser($this->_memID, $hostname, $email);
-
-			// Can they edit the ban?
-			$context['can_edit_ban'] = allowedTo('manage_bans');
-		}
-
-		// Load data for the various summary tabs
-		$this->_load_recent_attachments();
-		$this->_load_buddies();
-		$this->_load_recent_posts();
-		$this->_load_recent_topics();
-
-		// To finish this off, custom profile fields.
-		require_once(SUBSDIR . '/Profile.subs.php');
-		loadCustomFields($this->_memID);
-
-		// To make tabs work, we need jQueryUI
-		$modSettings['jquery_include_ui'] = true;
-		addInlineJavascript('
-		$(function() {$( "#tabs" ).tabs();});', true);
 	}
 
 	/**
@@ -378,17 +313,17 @@ class ProfileInfo_Controller extends Action_Controller
 	/**
 	 * Load the buddies tab with their buddies, real or imaginary
 	 */
-	private function _load_buddies()
+	public function action_load_buddies()
 	{
 		global $context, $modSettings, $memberContext, $user_info;
 
 		// Would you be mine? Could you be mine? Be my buddy :D
+		$context['buddies'] = array();
 		if (!empty($modSettings['enable_buddylist'])
 			&& $context['user']['is_owner']
 			&& !empty($user_info['buddies'])
 			&& in_array('buddies', $this->_summary_areas))
 		{
-			$context['buddies'] = array();
 			loadMemberData($user_info['buddies'], false, 'profile');
 
 			// Get the info for this buddy
@@ -398,6 +333,8 @@ class ProfileInfo_Controller extends Action_Controller
 				$context['buddies'][$buddy] = $memberContext[$buddy];
 			}
 		}
+
+		return $context['buddies'];
 	}
 
 	/**
@@ -1101,7 +1038,6 @@ class ProfileInfo_Controller extends Action_Controller
 		$modSettings['warning_moderate'] = !empty($modSettings['warning_moderate']) && !empty($modSettings['postmod_active']) ? $modSettings['warning_moderate'] : 110;
 		$modSettings['warning_mute'] = !empty($modSettings['warning_mute']) ? $modSettings['warning_mute'] : 110;
 
-
 		// Let's use a generic list to get all the current warnings
 		// and use the issue warnings grab-a-granny thing.
 		$listOptions = array(
@@ -1236,5 +1172,178 @@ class ProfileInfo_Controller extends Action_Controller
 	public function list_getNumUnwatched()
 	{
 		return getNumUnwatchedBy($this->_memID);
+	}
+
+	public function define_user_values()
+	{
+		global $context, $memberContext, $modSettings, $txt, $user_info;
+
+		if (!isset($context['user']['is_owner']))
+			$context['user']['is_owner'] = (int) $this->_memID === (int) $user_info['id'];
+
+		// Set up the context stuff and load the user.
+		$context += array(
+			'page_title' => sprintf($txt['profile_of_username'], $memberContext[$this->_memID]['name']),
+			'can_send_pm' => allowedTo('pm_send'),
+			'can_send_email' => allowedTo('send_email_to_members'),
+			'can_have_buddy' => allowedTo('profile_identity_own') && !empty($modSettings['enable_buddylist']),
+			'can_issue_warning' => in_array('w', $context['admin_features']) && allowedTo('issue_warning') && !empty($modSettings['warning_enable']),
+			'can_view_warning' => in_array('w', $context['admin_features']) && (allowedTo('issue_warning') && !$context['user']['is_owner']) || (!empty($modSettings['warning_show']) && ($modSettings['warning_show'] > 1 || $context['user']['is_owner']))
+		);
+
+		$context['member'] = &$memberContext[$this->_memID];
+
+		// Is the signature even enabled on this forum?
+		$context['signature_enabled'] = substr($modSettings['signature_settings'], 0, 1) == 1;
+	}
+
+	public function load_summary()
+	{
+		// Load all areas of interest in to context for template use
+		$this->_determine_warning_level();
+		$this->_determine_posts_per_day();
+		$this->_determine_age_birth();
+		$this->_determine_member_ip();
+		$this->_determine_member_action();
+		$this->_determine_member_activation();
+		$this->_determine_member_bans();
+	}
+
+	private function _determine_member_action()
+	{
+		global $context, $user_profile, $modSettings;
+
+		if (!empty($modSettings['who_enabled']) && $context['member']['online']['is_online'])
+		{
+			include_once(SUBSDIR . '/Who.subs.php');
+			$action = determineActions($user_profile[$this->_memID]['url']);
+			loadLanguage('index');
+
+			if ($action !== false)
+			{
+				$context['member']['action'] = $action;
+			}
+		}
+	}
+
+	private function _determine_member_activation()
+	{
+		global $context, $scripturl, $txt;
+
+		// If the user is awaiting activation, and the viewer has permission - setup some activation context messages.
+		if ($context['member']['is_activated'] % 10 != 1 && allowedTo('moderate_forum'))
+		{
+			$context['activate_type'] = $context['member']['is_activated'];
+
+			// What should the link text be?
+			$context['activate_link_text'] = in_array($context['member']['is_activated'], array(3, 4, 5, 13, 14, 15))
+				? $txt['account_approve']
+				: $txt['account_activate'];
+
+			// Should we show a custom message?
+			$context['activate_message'] = isset($txt['account_activate_method_' . $context['member']['is_activated'] % 10])
+				? $txt['account_activate_method_' . $context['member']['is_activated'] % 10]
+				: $txt['account_not_activated'];
+
+			$context['activate_url'] = $scripturl . '?action=profile;save;area=activateaccount;u=' . $this->_memID . ';' . $context['session_var'] . '=' . $context['session_id'] . ';' . $context['profile-aa' . $this->_memID . '_token_var'] . '=' . $context['profile-aa' . $this->_memID . '_token'];
+		}
+	}
+
+	private function _determine_member_bans()
+	{
+		// How about, are they banned?
+		if (allowedTo('moderate_forum'))
+		{
+			require_once(SUBSDIR . '/Bans.subs.php');
+
+			$hostname = !empty($context['member']['hostname']) ? $context['member']['hostname'] : '';
+			$email = !empty($context['member']['email']) ? $context['member']['email'] : '';
+			$context['member']['bans'] = BanCheckUser($this->_memID, $hostname, $email);
+
+			// Can they edit the ban?
+			$context['can_edit_ban'] = allowedTo('manage_bans');
+		}
+	}
+
+	private function _determine_warning_level()
+	{
+		global $modSettings, $context, $txt;
+
+		// See if they have broken any warning levels...
+		if (!empty($modSettings['warning_mute']) && $modSettings['warning_mute'] <= $context['member']['warning'])
+		{
+			$context['warning_status'] = $txt['profile_warning_is_muted'];
+		}
+		elseif (!empty($modSettings['warning_moderate']) && $modSettings['warning_moderate'] <= $context['member']['warning'])
+		{
+			$context['warning_status'] = $txt['profile_warning_is_moderation'];
+		}
+		elseif (!empty($modSettings['warning_watch']) && $modSettings['warning_watch'] <= $context['member']['warning'])
+		{
+			$context['warning_status'] = $txt['profile_warning_is_watch'];
+		}
+	}
+
+	private function _determine_posts_per_day()
+	{
+		global $user_profile, $context, $txt;
+
+		// They haven't even been registered for a full day!?
+		$days_registered = (int) ((time() - $user_profile[$this->_memID]['date_registered']) / (3600 * 24));
+		if (empty($user_profile[$this->_memID]['date_registered']) || $days_registered < 1)
+		{
+			$context['member']['posts_per_day'] = $txt['not_applicable'];
+		}
+		else
+		{
+			$context['member']['posts_per_day'] = comma_format($context['member']['real_posts'] / $days_registered, 3);
+		}
+	}
+
+	private function _determine_age_birth()
+	{
+		global $context, $txt;
+
+		// Set the age...
+		if (empty($context['member']['birth_date']))
+		{
+			$context['member'] += array(
+				'age' => $txt['not_applicable'],
+				'today_is_birthday' => false
+			);
+		}
+		else
+		{
+			list ($birth_year, $birth_month, $birth_day) = sscanf($context['member']['birth_date'], '%d-%d-%d');
+			$datearray = getdate(forum_time());
+			$context['member'] += array(
+				'age' => $birth_year <= 4 ? $txt['not_applicable'] : $datearray['year'] - $birth_year - (($datearray['mon'] > $birth_month || ($datearray['mon'] == $birth_month && $datearray['mday'] >= $birth_day)) ? 0 : 1),
+				'today_is_birthday' => $datearray['mon'] == $birth_month && $datearray['mday'] == $birth_day
+			);
+		}
+	}
+
+	private function _determine_member_ip()
+	{
+		global $context, $memberContext, $modSettings;
+
+		if (allowedTo('moderate_forum'))
+		{
+			// Make sure it's a valid ip address; otherwise, don't bother...
+			if (filter_var($memberContext[$this->_memID]['ip'], FILTER_VALIDATE_IP, FILTER_FLAG_IPV4) === false && empty($modSettings['disableHostnameLookup']))
+			{
+				$context['member']['hostname'] = host_from_ip($memberContext[$this->_memID]['ip']);
+			}
+			else
+			{
+				$context['member']['hostname'] = '';
+			}
+
+			$context['can_see_ip'] = true;
+		}
+		else
+		{
+			$context['can_see_ip'] = false;
+		}
 	}
 }
