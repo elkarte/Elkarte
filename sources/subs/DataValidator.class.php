@@ -605,7 +605,7 @@ class Data_Validator
 	 */
 	protected function _validate_contains($field, $input, $validation_parameters = null)
 	{
-		$validation_parameters = explode(',', trim(strtolower($validation_parameters)));
+		$validation_parameters = array_map('trim', explode(',', strtolower($validation_parameters)));
 		$input[$field] = isset($input[$field]) ? $input[$field] : '';
 		$value = trim(strtolower($input[$field]));
 
