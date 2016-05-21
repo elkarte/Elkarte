@@ -248,6 +248,7 @@ select[size],
 input[type="file"] {
 	max-height: none;
 	height: auto;
+	overflow-y: auto;
 }
 
 .select_multiple {
