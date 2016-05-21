@@ -16,6 +16,7 @@ if (!defined('ELK'))
 
 /**
  * Xml_Controller Class
+ *
  * Receives XMLhttp requests of various types such as
  * jump to, message and group icons, core features, drag and drop ordering
  */
@@ -40,6 +41,7 @@ class Xml_Controller extends Action_Controller
 			'smileyorder' => array('controller' => $this, 'function' => 'action_smileyorder', 'permission' => 'admin_forum'),
 			'boardorder' => array('controller' => $this, 'function' => 'action_boardorder', 'permission' => 'manage_boards'),
 			'parserorder' => array('controller' => $this, 'function' => 'action_parserorder', 'permission' => 'admin_forum'),
+			'profile_buddies' => array('controller' => $this, 'function' => 'action_profile_buddies'),
 		);
 
 		// Easy adding of xml sub actions with integrate_xmlhttp
@@ -805,5 +807,27 @@ class Xml_Controller extends Action_Controller
 				'children' => $errors,
 			),
 		);
+	}
+
+	public function action_profile_buddies()
+	{
+		global $context;
+
+		// Going to need the ProfileInfo controller
+		require_once(CONTROLLERDIR . '/ProfileInfo.controller.php');
+		$profile = new ProfileInfo_Controller();
+
+		// Prep the controller for a buddy check
+		$profile->pre_dispatch();
+		$profile->register_summarytabs();
+		$profile->define_user_values();
+
+		// Some buddies for you
+		$context['buddies'] = $profile->action_load_buddies();
+
+		loadTemplate('ProfileInfo');
+		echo template_profile_block_buddies();
+
+		obExit(false);
 	}
 }
