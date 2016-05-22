@@ -30,6 +30,9 @@ $(document).ready(function() {
 	}).change();
 });
 
+/**
+ * Profile tabs (summary, recent, buddy), for use with jqueryUI
+ */
 function start_tabs() {
 	$("#tabs").tabs({
 		// Called before tab content is loaded with href

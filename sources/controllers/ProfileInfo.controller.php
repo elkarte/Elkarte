@@ -330,8 +330,6 @@ class ProfileInfo_Controller extends Action_Controller
 				$context['buddies'][$buddy] = $memberContext[$buddy];
 			}
 		}
-
-		return $context['buddies'];
 	}
 
 	/**
@@ -1171,6 +1169,11 @@ class ProfileInfo_Controller extends Action_Controller
 		return getNumUnwatchedBy($this->_memID);
 	}
 
+	/**
+	 * Sets in to context what we know about a given user
+	 *
+	 * - Defines various user permissions for profile views
+	 */
 	public function define_user_values()
 	{
 		global $context, $memberContext, $modSettings, $txt, $user_info;
@@ -1194,6 +1197,9 @@ class ProfileInfo_Controller extends Action_Controller
 		$context['signature_enabled'] = substr($modSettings['signature_settings'], 0, 1) == 1;
 	}
 
+	/**
+	 * Loads the information needed to create the profile summary view
+	 */
 	public function load_summary()
 	{
 		// Load all areas of interest in to context for template use
@@ -1206,6 +1212,9 @@ class ProfileInfo_Controller extends Action_Controller
 		$this->_determine_member_bans();
 	}
 
+	/**
+	 * Determines what action user is "doing" at the time of the summary view
+	 */
 	private function _determine_member_action()
 	{
 		global $context, $user_profile, $modSettings;
@@ -1223,6 +1232,11 @@ class ProfileInfo_Controller extends Action_Controller
 		}
 	}
 
+	/**
+	 * Checks if hte member is activated
+	 *
+	 * - Creates a link if the viewing member can activate a user
+	 */
 	private function _determine_member_activation()
 	{
 		global $context, $scripturl, $txt;
@@ -1246,6 +1260,9 @@ class ProfileInfo_Controller extends Action_Controller
 		}
 	}
 
+	/**
+	 * Checks if a member has been banned
+	 */
 	private function _determine_member_bans()
 	{
 		// How about, are they banned?
@@ -1262,6 +1279,9 @@ class ProfileInfo_Controller extends Action_Controller
 		}
 	}
 
+	/**
+	 * If they have been disciplined, show the warning level for those that can see it.
+	 */
 	private function _determine_warning_level()
 	{
 		global $modSettings, $context, $txt;
@@ -1281,6 +1301,9 @@ class ProfileInfo_Controller extends Action_Controller
 		}
 	}
 
+	/**
+	 * Gives there spam level as a posts per day kind of statistic
+	 */
 	private function _determine_posts_per_day()
 	{
 		global $user_profile, $context, $txt;
@@ -1297,6 +1320,9 @@ class ProfileInfo_Controller extends Action_Controller
 		}
 	}
 
+	/**
+	 * Show age and birthday data if applicable.
+	 */
 	private function _determine_age_birth()
 	{
 		global $context, $txt;
@@ -1320,6 +1346,9 @@ class ProfileInfo_Controller extends Action_Controller
 		}
 	}
 
+	/**
+	 * Show IP and hostname information for the users current IP of record.
+	 */
 	private function _determine_member_ip()
 	{
 		global $context, $memberContext, $modSettings;
