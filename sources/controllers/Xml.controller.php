@@ -41,8 +41,6 @@ class Xml_Controller extends Action_Controller
 			'smileyorder' => array('controller' => $this, 'function' => 'action_smileyorder', 'permission' => 'admin_forum'),
 			'boardorder' => array('controller' => $this, 'function' => 'action_boardorder', 'permission' => 'manage_boards'),
 			'parserorder' => array('controller' => $this, 'function' => 'action_parserorder', 'permission' => 'admin_forum'),
-			'profile_buddies' => array('controller' => $this, 'function' => 'action_profile_buddies'),
-			'profile_recent' => array('controller' => $this, 'function' => 'action_profile_recent'),
 		);
 
 		// Easy adding of xml sub actions with integrate_xmlhttp
@@ -808,76 +806,5 @@ class Xml_Controller extends Action_Controller
 				'children' => $errors,
 			),
 		);
-	}
-
-	/**
-	 * Collect and output data related to the profile buddy tab
-	 */
-	public function action_profile_buddies()
-	{
-		checkSession('get');
-
-		// Going to need the ProfileInfo controller
-		require_once(CONTROLLERDIR . '/ProfileInfo.controller.php');
-		$profile = new ProfileInfo_Controller();
-
-		// Need the ProfileInfo template
-		loadTemplate('ProfileInfo');
-
-		// Prep the controller for a buddy check
-		$profile->pre_dispatch();
-		$profile->register_summarytabs();
-		$profile->define_user_values();
-
-		// Some buddies for you
-		if (in_array('buddies', $profile->summary_areas))
-		{
-			$profile->load_buddies();
-			template_profile_block_buddies();
-		}
-
-		obExit(false);
-	}
-
-	/**
-	 * Collect and output data related to the profile recent tab
-	 */
-	public function action_profile_recent()
-	{
-		checkSession('get');
-
-		// The ProfileInfo controller knows how to do this
-		require_once(CONTROLLERDIR . '/ProfileInfo.controller.php');
-		$profile = new ProfileInfo_Controller();
-
-		// Prep the controller so we can make valid calls
-		$profile->pre_dispatch();
-		$profile->register_summarytabs();
-		$profile->define_user_values();
-
-		// The block templates are here
-		loadTemplate('ProfileInfo');
-		template_ProfileInfo_init();
-
-		// So, just what have you been up to?
-		if (in_array('posts', $profile->summary_areas))
-		{
-			$profile->load_recent_posts();
-			template_profile_block_posts();
-		}
-
-		if (in_array('topics', $profile->summary_areas))
-		{
-			$profile->load_recent_topics();
-			template_profile_block_topics();
-		}
-
-		if (in_array('posts', $profile->summary_areas))
-		{
-			$profile->load_recent_attachments();
-			template_profile_block_attachments();
-		}
-
-		obExit(false);
 	}
 }
