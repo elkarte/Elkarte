@@ -723,4 +723,28 @@ class UpgradeInstructions_upgrade_1_1
 			)
 		);
 	}
+
+	public function mime_types_title()
+	{
+		return 'More space for MIME types...';
+	}
+
+	public function mime_types()
+	{
+		return array(
+			array(
+				'debug_title' => 'Altering column to varchar(255)...',
+				'function' => function($db, $db_table)
+				{
+					$db_table->db_change_column('{db_prefix}attachments',
+						'mime_type',
+						array(
+							'type' => 'varchar',
+							'size' => 255
+						),
+					);
+				}
+			)
+		);
+	}
 }
