@@ -1176,10 +1176,7 @@ class ProfileInfo_Controller extends Action_Controller
 	 */
 	public function define_user_values()
 	{
-		global $context, $memberContext, $modSettings, $txt, $user_info;
-
-		if (!isset($context['user']['is_owner']))
-			$context['user']['is_owner'] = (int) $this->_memID === (int) $user_info['id'];
+		global $context, $memberContext, $modSettings, $txt;
 
 		// Set up the context stuff and load the user.
 		$context += array(
@@ -1265,6 +1262,8 @@ class ProfileInfo_Controller extends Action_Controller
 	 */
 	private function _determine_member_bans()
 	{
+		global $context;
+
 		// How about, are they banned?
 		if (allowedTo('moderate_forum'))
 		{
