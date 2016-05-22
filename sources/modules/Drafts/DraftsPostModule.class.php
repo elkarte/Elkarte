@@ -32,6 +32,12 @@ class Drafts_Post_Module implements ElkArte\sources\modules\Module_Interface
 	protected static $_autosave_enabled = false;
 
 	/**
+	 * Allowed to save drafts?
+	 * @var bool
+	 */
+	protected static $_drafts_save = false;
+
+	/**
 	 * How often to autosave if enabled
 	 * @var int
 	 */
