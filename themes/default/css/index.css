@@ -3734,6 +3734,13 @@ dl.merge_topic dd {
 	border: none;
 }
 
+.attachment .contact a {
+	display: inline-block;
+	line-height: 1.25em;
+	margin: 0.5em 0.25em;
+	vertical-align: middle;
+}
+
 .content_noframe {
 	border: none;
 }
