@@ -36,7 +36,7 @@ class ProfileInfo_Controller extends Action_Controller
 	 * Holds the current summary tabs to load
 	 * @var array
 	 */
-	private $_summary_areas;
+	public $summary_areas;
 
 	/**
 	 * Called before all other methods when coming from the dispatcher or
@@ -98,15 +98,9 @@ class ProfileInfo_Controller extends Action_Controller
 		// Profile summary tabs, like Summary, Recent, Buddies
 		$this->register_summarytabs();
 
-		// Load in everything we know about the user
+		// Load in everything we know about the user to preload the summary tab
 		$this->define_user_values();
 		$this->load_summary();
-
-		// Load data for the various summary tabs
-		$this->_load_recent_attachments();
-		//$this->_load_buddies();
-		$this->_load_recent_posts();
-		$this->_load_recent_topics();
 
 		// To finish this off, custom profile fields.
 		loadCustomFields($this->_memID);
@@ -122,7 +116,9 @@ class ProfileInfo_Controller extends Action_Controller
 	 * What it does:
 	 * - Tab information for use in the summary page
 	 * - Each tab template defines a div, the value of which are the template(s) to load in that div
+	 * - array(array(1, 2), array(3, 4)) <div>template 1, template 2</div><div>template 3 template 4</div>
 	 * - Templates are named template_profile_block_YOURNAME
+	 * - Tabs with href defined will not preload/create any page divs but instead be loaded via ajax
 	 */
 	public function register_summarytabs()
 	{
@@ -142,13 +138,14 @@ class ProfileInfo_Controller extends Action_Controller
 				'name' => $txt['profile_recent_activity'],
 				'templates' => array('posts', 'topics', 'attachments'),
 				'active' => true,
+				'href' => $scripturl . '?action=xmlhttp&sa=profile_recent&' . $context['session_var'] . '=' . $context['session_id'],
 			),
 			'buddies' => array(
 				'name' => $txt['buddies'],
 				'templates' => array('buddies'),
 				'active' => !empty($modSettings['enable_buddylist']) && $context['user']['is_owner'],
-				'href' => $scripturl . '?action=xmlhttp&sa=profile_buddies'
-			),
+				'href' => $scripturl . '?action=xmlhttp&sa=profile_buddies&' . $context['session_var'] . '=' . $context['session_id'],
+			)
 		);
 
 		// Let addons add or remove to the tabs array
@@ -173,18 +170,18 @@ class ProfileInfo_Controller extends Action_Controller
 			}
 		}
 
-		$this->_summary_areas = explode(',', $summary_areas);
+		$this->summary_areas = explode(',', $summary_areas);
 	}
 
 	/**
 	 * Load a users recent topics
 	 */
-	private function _load_recent_topics()
+	public function load_recent_topics()
 	{
 		global $context, $modSettings, $scripturl;
 
 		// How about the most recent topics that they started?
-		if (in_array('topics', $this->_summary_areas))
+		if (in_array('topics', $this->summary_areas))
 		{
 			// Is the load average still too high?
 			if (!empty($modSettings['loadavg_show_posts']) && $modSettings['current_load'] >= $modSettings['loadavg_show_posts'])
@@ -247,12 +244,12 @@ class ProfileInfo_Controller extends Action_Controller
 	/**
 	 * Load a members most recent posts
 	 */
-	private function _load_recent_posts()
+	public function load_recent_posts()
 	{
 		global $context, $modSettings, $scripturl;
 
 		// How about their most recent posts?
-		if (in_array('posts', $this->_summary_areas))
+		if (in_array('posts', $this->summary_areas))
 		{
 			// Is the load average too high just now, then let them know
 			if (!empty($modSettings['loadavg_show_posts']) && $modSettings['current_load'] >= $modSettings['loadavg_show_posts'])
@@ -313,7 +310,7 @@ class ProfileInfo_Controller extends Action_Controller
 	/**
 	 * Load the buddies tab with their buddies, real or imaginary
 	 */
-	public function action_load_buddies()
+	public function load_buddies()
 	{
 		global $context, $modSettings, $memberContext, $user_info;
 
@@ -322,7 +319,7 @@ class ProfileInfo_Controller extends Action_Controller
 		if (!empty($modSettings['enable_buddylist'])
 			&& $context['user']['is_owner']
 			&& !empty($user_info['buddies'])
-			&& in_array('buddies', $this->_summary_areas))
+			&& in_array('buddies', $this->summary_areas))
 		{
 			loadMemberData($user_info['buddies'], false, 'profile');
 
@@ -340,7 +337,7 @@ class ProfileInfo_Controller extends Action_Controller
 	/**
 	 * If they have made recent attachments, lets get a list of them to display
 	 */
-	private function _load_recent_attachments()
+	public function load_recent_attachments()
 	{
 		global $context, $modSettings, $scripturl, $settings;
 
@@ -349,7 +346,7 @@ class ProfileInfo_Controller extends Action_Controller
 		// Load up the most recent attachments for this user for use in profile views etc.
 		if (!empty($modSettings['attachmentEnable'])
 			&& !empty($settings['attachments_on_summary'])
-			&& in_array('attachments', $this->_summary_areas))
+			&& in_array('attachments', $this->summary_areas))
 		{
 			$boardsAllowed = boardsAllowedTo('view_attachments');
 
