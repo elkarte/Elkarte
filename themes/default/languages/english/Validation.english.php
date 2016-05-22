@@ -25,4 +25,4 @@ $txt['_validate_isarray'] = 'The %1$s field does not contain a valid array.';
 $txt['_validate_php_syntax'] = 'PHP syntax error: %2$s.';
 $txt['_validate_limits'] = 'The %1$s field contains a value outside of allowable limits %2$s.';
 $txt['_validate_generic'] = 'The %1$s field contains an invalid value.';
-$txt['validation_failure'] = 'The form has the following error or errors that must be corrected before continuing:.';
+$txt['validation_failure'] = 'The form has the following error or errors that must be corrected before continuing:';
