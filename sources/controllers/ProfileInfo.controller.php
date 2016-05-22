@@ -67,8 +67,24 @@ class ProfileInfo_Controller extends Action_Controller
 	 */
 	public function action_index()
 	{
-		// what do we do, do you even know what you do?
-		// $this->action_summary();
+		// What do we do, do you even know what you do?
+		$subActions = array(
+			'buddies' => array($this, 'action_profile_buddies'),
+			'recent' => array($this, 'action_profile_recent'),
+			'summary' => array('file' => 'Profile.controller.php', 'dir' => CONTROLLERDIR, 'controller' => 'Profile_Controller', 'function' => 'action_index'),
+		);
+
+		// Action control
+		$action = new Action('profile_info');
+
+		// By default we want the summary
+		$subAction = $action->initialize($subActions, 'summary');
+
+		// Final bits
+		$context['sub_action'] = $subAction;
+
+		// Call the right function for this sub-action.
+		$action->dispatch($subAction);
 	}
 
 	/**
@@ -138,13 +154,13 @@ class ProfileInfo_Controller extends Action_Controller
 				'name' => $txt['profile_recent_activity'],
 				'templates' => array('posts', 'topics', 'attachments'),
 				'active' => true,
-				'href' => $scripturl . '?action=xmlhttp&sa=profile_recent&' . $context['session_var'] . '=' . $context['session_id'],
+				'href' => $scripturl . '?action=profileinfo&sa=recent&' . $context['session_var'] . '=' . $context['session_id'],
 			),
 			'buddies' => array(
 				'name' => $txt['buddies'],
 				'templates' => array('buddies'),
 				'active' => !empty($modSettings['enable_buddylist']) && $context['user']['is_owner'],
-				'href' => $scripturl . '?action=xmlhttp&sa=profile_buddies&' . $context['session_var'] . '=' . $context['session_id'],
+				'href' => $scripturl . '?action=profileinfo;sa=buddies;' . $context['session_var'] . '=' . $context['session_id'],
 			)
 		);
 
@@ -1117,6 +1133,71 @@ class ProfileInfo_Controller extends Action_Controller
 			if ($context['member']['warning'] >= $limit)
 				$context['current_level'] = $limit;
 		}
+	}
+
+	/**
+	 * Collect and output data related to the profile buddy tab
+	 *
+	 * - Ajax call from profile info buddy tab
+	 */
+	public function action_profile_buddies()
+	{
+		checkSession('get');
+
+		// Need the ProfileInfo template
+		loadTemplate('ProfileInfo');
+
+		// Prep for a buddy check
+		$this->register_summarytabs();
+		$this->define_user_values();
+
+		// Some buddies for you
+		if (in_array('buddies', $this->summary_areas))
+		{
+			$this->load_buddies();
+			template_profile_block_buddies();
+		}
+
+		obExit(false);
+	}
+
+	/**
+	 * Collect and output data related to the profile recent tab
+	 *
+	 * - Ajax call from profile info recent tab
+	 */
+	public function action_profile_recent()
+	{
+		checkSession('get');
+
+		// Prep for recent activity
+		$this->register_summarytabs();
+		$this->define_user_values();
+
+		// The block templates are here
+		loadTemplate('ProfileInfo');
+		template_ProfileInfo_init();
+
+		// So, just what have you been up to?
+		if (in_array('posts', $this->summary_areas))
+		{
+			$this->load_recent_posts();
+			template_profile_block_posts();
+		}
+
+		if (in_array('topics', $this->summary_areas))
+		{
+			$this->load_recent_topics();
+			template_profile_block_topics();
+		}
+
+		if (in_array('posts', $this->summary_areas))
+		{
+			$this->load_recent_attachments();
+			template_profile_block_attachments();
+		}
+
+		obExit(false);
 	}
 
 	/**
