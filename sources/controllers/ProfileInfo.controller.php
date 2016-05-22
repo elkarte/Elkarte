@@ -36,7 +36,7 @@ class ProfileInfo_Controller extends Action_Controller
 	 * Holds the current summary tabs to load
 	 * @var array
 	 */
-	public $summary_areas;
+	private $_summary_areas;
 
 	/**
 	 * Called before all other methods when coming from the dispatcher or
@@ -62,11 +62,13 @@ class ProfileInfo_Controller extends Action_Controller
 	/**
 	 * Intended as entry point which delegates to methods in this class...
 	 *
-	 * - But here, today, for now, the methods are called from other places
+	 * - But here, today, for now, the methods are mainly called from other places
 	 * like menu picks and the like.
 	 */
 	public function action_index()
 	{
+		global $context;
+
 		// What do we do, do you even know what you do?
 		$subActions = array(
 			'buddies' => array($this, 'action_profile_buddies'),
@@ -112,11 +114,11 @@ class ProfileInfo_Controller extends Action_Controller
 		$context[$context['profile_menu_name']]['tab_data'] = array();
 
 		// Profile summary tabs, like Summary, Recent, Buddies
-		$this->register_summarytabs();
+		$this->_register_summarytabs();
 
 		// Load in everything we know about the user to preload the summary tab
-		$this->define_user_values();
-		$this->load_summary();
+		$this->_define_user_values();
+		$this->_load_summary();
 
 		// To finish this off, custom profile fields.
 		loadCustomFields($this->_memID);
@@ -136,7 +138,7 @@ class ProfileInfo_Controller extends Action_Controller
 	 * - Templates are named template_profile_block_YOURNAME
 	 * - Tabs with href defined will not preload/create any page divs but instead be loaded via ajax
 	 */
-	public function register_summarytabs()
+	private function _register_summarytabs()
 	{
 		global $txt, $context, $modSettings, $scripturl;
 
@@ -186,18 +188,18 @@ class ProfileInfo_Controller extends Action_Controller
 			}
 		}
 
-		$this->summary_areas = explode(',', $summary_areas);
+		$this->_summary_areas = explode(',', $summary_areas);
 	}
 
 	/**
 	 * Load a users recent topics
 	 */
-	public function load_recent_topics()
+	private function _load_recent_topics()
 	{
 		global $context, $modSettings, $scripturl;
 
 		// How about the most recent topics that they started?
-		if (in_array('topics', $this->summary_areas))
+		if (in_array('topics', $this->_summary_areas))
 		{
 			// Is the load average still too high?
 			if (!empty($modSettings['loadavg_show_posts']) && $modSettings['current_load'] >= $modSettings['loadavg_show_posts'])
@@ -260,12 +262,12 @@ class ProfileInfo_Controller extends Action_Controller
 	/**
 	 * Load a members most recent posts
 	 */
-	public function load_recent_posts()
+	private function _load_recent_posts()
 	{
 		global $context, $modSettings, $scripturl;
 
 		// How about their most recent posts?
-		if (in_array('posts', $this->summary_areas))
+		if (in_array('posts', $this->_summary_areas))
 		{
 			// Is the load average too high just now, then let them know
 			if (!empty($modSettings['loadavg_show_posts']) && $modSettings['current_load'] >= $modSettings['loadavg_show_posts'])
@@ -326,7 +328,7 @@ class ProfileInfo_Controller extends Action_Controller
 	/**
 	 * Load the buddies tab with their buddies, real or imaginary
 	 */
-	public function load_buddies()
+	private function _load_buddies()
 	{
 		global $context, $modSettings, $memberContext, $user_info;
 
@@ -335,7 +337,7 @@ class ProfileInfo_Controller extends Action_Controller
 		if (!empty($modSettings['enable_buddylist'])
 			&& $context['user']['is_owner']
 			&& !empty($user_info['buddies'])
-			&& in_array('buddies', $this->summary_areas))
+			&& in_array('buddies', $this->_summary_areas))
 		{
 			loadMemberData($user_info['buddies'], false, 'profile');
 
@@ -351,7 +353,7 @@ class ProfileInfo_Controller extends Action_Controller
 	/**
 	 * If they have made recent attachments, lets get a list of them to display
 	 */
-	public function load_recent_attachments()
+	private function _load_recent_attachments()
 	{
 		global $context, $modSettings, $scripturl, $settings;
 
@@ -360,7 +362,7 @@ class ProfileInfo_Controller extends Action_Controller
 		// Load up the most recent attachments for this user for use in profile views etc.
 		if (!empty($modSettings['attachmentEnable'])
 			&& !empty($settings['attachments_on_summary'])
-			&& in_array('attachments', $this->summary_areas))
+			&& in_array('attachments', $this->_summary_areas))
 		{
 			$boardsAllowed = boardsAllowedTo('view_attachments');
 
@@ -1148,13 +1150,13 @@ class ProfileInfo_Controller extends Action_Controller
 		loadTemplate('ProfileInfo');
 
 		// Prep for a buddy check
-		$this->register_summarytabs();
-		$this->define_user_values();
+		$this->_register_summarytabs();
+		$this->_define_user_values();
 
 		// Some buddies for you
-		if (in_array('buddies', $this->summary_areas))
+		if (in_array('buddies', $this->_summary_areas))
 		{
-			$this->load_buddies();
+			$this->_load_buddies();
 			template_profile_block_buddies();
 		}
 
@@ -1171,29 +1173,29 @@ class ProfileInfo_Controller extends Action_Controller
 		checkSession('get');
 
 		// Prep for recent activity
-		$this->register_summarytabs();
-		$this->define_user_values();
+		$this->_register_summarytabs();
+		$this->_define_user_values();
 
 		// The block templates are here
 		loadTemplate('ProfileInfo');
 		template_ProfileInfo_init();
 
 		// So, just what have you been up to?
-		if (in_array('posts', $this->summary_areas))
+		if (in_array('posts', $this->_summary_areas))
 		{
-			$this->load_recent_posts();
+			$this->_load_recent_posts();
 			template_profile_block_posts();
 		}
 
-		if (in_array('topics', $this->summary_areas))
+		if (in_array('topics', $this->_summary_areas))
 		{
-			$this->load_recent_topics();
+			$this->_load_recent_topics();
 			template_profile_block_topics();
 		}
 
-		if (in_array('posts', $this->summary_areas))
+		if (in_array('posts', $this->_summary_areas))
 		{
-			$this->load_recent_attachments();
+			$this->_load_recent_attachments();
 			template_profile_block_attachments();
 		}
 
@@ -1255,7 +1257,7 @@ class ProfileInfo_Controller extends Action_Controller
 	 *
 	 * - Defines various user permissions for profile views
 	 */
-	public function define_user_values()
+	private function _define_user_values()
 	{
 		global $context, $memberContext, $modSettings, $txt;
 
@@ -1278,7 +1280,7 @@ class ProfileInfo_Controller extends Action_Controller
 	/**
 	 * Loads the information needed to create the profile summary view
 	 */
-	public function load_summary()
+	private function _load_summary()
 	{
 		// Load all areas of interest in to context for template use
 		$this->_determine_warning_level();
