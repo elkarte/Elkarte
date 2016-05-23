@@ -575,7 +575,7 @@ class UpgradeInstructions_upgrade_1_1
 				'function' => function($db, $db_table) {
 					$result = $db->query('', 'SELECT id_field, default_value FROM {db_prefix}custom_fields WHERE field_type="textarea"');
 
-					while ($row = mysqli_fetch_assoc($result))
+					while ($row = $db->fetch_assoc($result))
 					{
 						$vals = explode(',', $row['default_value']);
 						$rows = (int) $vals[0];
@@ -608,7 +608,7 @@ class UpgradeInstructions_upgrade_1_1
 				'function' => function($db, $db_table) {
 					$result = $db->query('', 'SELECT id_field, col_name FROM {db_prefix}custom_fields WHERE placement=1');
 
-					while ($row = mysqli_fetch_assoc($result))
+					while ($row = $db->fetch_assoc($result))
 					{
 						switch ($row['col_name']) {
 							case 'cust_skye':
@@ -635,7 +635,7 @@ class UpgradeInstructions_upgrade_1_1
 				'function' => function($db, $db_table) {
 					$result = $db->query('', 'SELECT id_member, gender FROM {db_prefix}members');
 
-					while ($row = mysqli_fetch_assoc($result))
+					while ($row = $db->fetch_assoc($result))
 					{
 						$gender = 'undisclosed';
 
@@ -660,7 +660,7 @@ class UpgradeInstructions_upgrade_1_1
 				'function' => function($db, $db_table) {
 					$result = $db->query('', 'SELECT id_member, location FROM {db_prefix}members');
 
-					while ($row = mysqli_fetch_assoc($result))
+					while ($row = $db->fetch_assoc($result))
 					{
 						$db->insert('replace',
 							'{db_prefix}custom_fields_data',
@@ -678,7 +678,7 @@ class UpgradeInstructions_upgrade_1_1
 				'function' => function($db, $db_table) {
 					$result = $db->query('', 'SELECT id_member, personal_text FROM {db_prefix}members');
 
-					while ($row = mysqli_fetch_assoc($result))
+					while ($row = $db->fetch_assoc($result))
 					{
 						$db->insert('replace',
 							'{db_prefix}custom_fields_data',
@@ -719,6 +719,30 @@ class UpgradeInstructions_upgrade_1_1
 							'ignore'
 						);
 					}
+				}
+			)
+		);
+	}
+
+	public function mime_types_title()
+	{
+		return 'More space for MIME types...';
+	}
+
+	public function mime_types()
+	{
+		return array(
+			array(
+				'debug_title' => 'Altering column to varchar(255)...',
+				'function' => function($db, $db_table)
+				{
+					$db_table->db_change_column('{db_prefix}attachments',
+						'mime_type',
+						array(
+							'type' => 'varchar',
+							'size' => 255
+						),
+					);
 				}
 			)
 		);

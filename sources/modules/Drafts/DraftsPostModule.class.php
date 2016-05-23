@@ -32,6 +32,12 @@ class Drafts_Post_Module implements ElkArte\sources\modules\Module_Interface
 	protected static $_autosave_enabled = false;
 
 	/**
+	 * Allowed to save drafts?
+	 * @var bool
+	 */
+	protected static $_drafts_save = false;
+
+	/**
 	 * How often to autosave if enabled
 	 * @var int
 	 */
@@ -67,6 +73,8 @@ class Drafts_Post_Module implements ElkArte\sources\modules\Module_Interface
 
 			if (!empty($modSettings['draft_subject_length']))
 				self::$_subject_length = (int) $modSettings['draft_subject_length'];
+
+			self::$_drafts_save = allowedTo('post_draft');
 
 			$return = array(
 				array('prepare_modifying', array('Drafts_Post_Module', 'prepare_modifying'), array('really_previewing')),
@@ -110,11 +118,11 @@ class Drafts_Post_Module implements ElkArte\sources\modules\Module_Interface
 		global $context, $user_info, $options, $txt;
 
 		// Are post drafts enabled?
-		$context['drafts_save'] = allowedTo('post_draft');
-		$context['drafts_autosave'] = $context['drafts_save'] && self::$_autosave_enabled && allowedTo('post_autosave_draft');
+		$context['drafts_save'] = self::$_drafts_save;
+		$context['drafts_autosave'] = self::$_drafts_save && self::$_autosave_enabled && allowedTo('post_autosave_draft');
 
 		// Build a list of drafts that they can load into the editor
-		if (!empty($context['drafts_save']))
+		if (!empty(self::$_drafts_save))
 		{
 			loadLanguage('Drafts');
 
@@ -186,12 +194,8 @@ class Drafts_Post_Module implements ElkArte\sources\modules\Module_Interface
 		// If drafts are enabled, then pass this off
 		if (isset($_POST['save_draft']))
 		{
-			// Ajax calling
-			if (!isset($context['drafts_save']))
-				$context['drafts_save'] = !empty($modSettings['drafts_enabled']) && !empty($modSettings['drafts_post_enabled']) && allowedTo('post_draft');
-
 			// Can you be, should you be ... here?
-			if (!empty($context['drafts_save']) && isset($_POST['id_draft']))
+			if (!empty(self::$_drafts_save))
 			{
 				// Prepare and clean the data, load the draft array
 				$draft = array(

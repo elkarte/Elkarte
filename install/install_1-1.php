@@ -73,7 +73,7 @@ class InstallInstructions_install_1_1
 				array('name' => 'downloads',       'type' => 'mediumint', 'size' => 8, 'unsigned' => true, 'default' => 0),
 				array('name' => 'width',           'type' => 'mediumint', 'size' => 8, 'unsigned' => true, 'default' => 0),
 				array('name' => 'height',          'type' => 'mediumint', 'size' => 8, 'unsigned' => true, 'default' => 0),
-				array('name' => 'mime_type',       'type' => 'varchar', 'default' => '', 'size' => 20),
+				array('name' => 'mime_type',       'type' => 'varchar', 'default' => '', 'size' => 255),
 				array('name' => 'approved',        'type' => 'tinyint', 'size' => 3, 'default' => 1),
 			),
 			array(
@@ -2711,7 +2711,7 @@ class InstallInstructions_install_1_1
 				array('name' => 'id_previous_topic', 'type' => 'mediumint', 'size' => 8, 'default' => 0),
 				array('name' => 'num_replies',       'type' => 'int', 'size' => 10, 'unsigned' => true, 'default' => 0),
 				array('name' => 'num_views',         'type' => 'int', 'size' => 10, 'unsigned' => true, 'default' => 0),
-				array('name' => 'num_likes',         'type' => 'int', 'size' => 10, 'unsigned' => true, 'default' => 0),
+				array('name' => 'num_likes',         'type' => 'int', 'size' => 10, 'default' => 0),
 				array('name' => 'locked',            'type' => 'tinyint', 'size' => 4, 'default' => 0),
 				array('name' => 'redirect_expires',  'type' => 'int', 'size' => 10, 'unsigned' => true, 'default' => 0),
 				array('name' => 'id_redirect_topic', 'type' => 'mediumint', 'size' => 8, 'unsigned' => true, 'default' => 0),

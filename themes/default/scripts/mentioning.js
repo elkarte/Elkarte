@@ -47,7 +47,8 @@ elk_mentions.prototype.attachAtWho = function ()
 	_self.$atwho.atwho({
 		at: "@",
 		limit: 7,
-		tpl: "<li data-value='${atwho-at}${name}' data-id='${id}'>${name}</li>",
+		maxLen: 25,
+		displayTpl: "<li data-value='${atwho-at}${name}' data-id='${id}'>${name}</li>",
 		callbacks: {
 			filter: function (query, items, search_key) {
 				var current_call = parseInt(new Date().getTime() / 1000);
@@ -113,7 +114,7 @@ elk_mentions.prototype.attachAtWho = function ()
 
 				return _self.names;
 			},
-			before_insert: function (value, $li) {
+			beforeInsert: function (value, $li) {
 				_self.mentions.append($('<input type="hidden" name="uid[]" />').val($li.data('id')).attr('data-name', $li.data('value')));
 
 				return value;
