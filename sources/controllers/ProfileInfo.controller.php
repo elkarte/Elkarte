@@ -156,13 +156,13 @@ class ProfileInfo_Controller extends Action_Controller
 				'name' => $txt['profile_recent_activity'],
 				'templates' => array('posts', 'topics', 'attachments'),
 				'active' => true,
-				'href' => $scripturl . '?action=profileinfo&sa=recent&' . $context['session_var'] . '=' . $context['session_id'],
+				'href' => $scripturl . '?action=profileInfo;sa=recent;xml;' . $context['session_var'] . '=' . $context['session_id'],
 			),
 			'buddies' => array(
 				'name' => $txt['buddies'],
 				'templates' => array('buddies'),
 				'active' => !empty($modSettings['enable_buddylist']) && $context['user']['is_owner'],
-				'href' => $scripturl . '?action=profileinfo;sa=buddies;' . $context['session_var'] . '=' . $context['session_id'],
+				'href' => $scripturl . '?action=profileInfo;sa=buddies;xml;' . $context['session_var'] . '=' . $context['session_id'],
 			)
 		);
 
