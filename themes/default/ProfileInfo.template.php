@@ -1068,6 +1068,26 @@ function template_profile_block_buddies()
 }
 
 /**
+ * Consolidated profile block output.
+ */
+function template_profile_blocks()
+{
+	global $context;
+
+	if (empty($context['profile_blocks']))
+	{
+		return;
+	}
+	else
+	{
+		foreach ($context['profile_blocks'] as $profile_block)
+		{
+			$profile_block();
+		}
+	}
+}
+
+/**
  * Profile Attachments Block
  *
  * Shows the most recent attachments (as thumbnails) for this user

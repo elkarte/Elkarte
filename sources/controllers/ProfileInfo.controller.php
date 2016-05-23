@@ -1144,6 +1144,8 @@ class ProfileInfo_Controller extends Action_Controller
 	 */
 	public function action_profile_buddies()
 	{
+		global $context;
+
 		checkSession('get');
 
 		// Need the ProfileInfo template
@@ -1153,14 +1155,16 @@ class ProfileInfo_Controller extends Action_Controller
 		$this->_register_summarytabs();
 		$this->_define_user_values();
 
+		// This is returned only for ajax request to a jqueryUI tab
+		Template_Layers::getInstance()->removeAll();
+		header('Content-Type: text/html; charset=UTF-8');
+
 		// Some buddies for you
 		if (in_array('buddies', $this->_summary_areas))
 		{
 			$this->_load_buddies();
-			template_profile_block_buddies();
+			$context['sub_template'] = 'profile_block_buddies';
 		}
-
-		obExit(false);
 	}
 
 	/**
@@ -1170,6 +1174,8 @@ class ProfileInfo_Controller extends Action_Controller
 	 */
 	public function action_profile_recent()
 	{
+		global $context;
+
 		checkSession('get');
 
 		// Prep for recent activity
@@ -1178,28 +1184,31 @@ class ProfileInfo_Controller extends Action_Controller
 
 		// The block templates are here
 		loadTemplate('ProfileInfo');
-		template_ProfileInfo_init();
+		$context['sub_template'] = 'profile_blocks';
+		$context['profile_blocks'] = array();
+
+		// Flush everything since we intend to return the information to an ajax handler
+		Template_Layers::getInstance()->removeAll();
+		header('Content-Type: text/html; charset=UTF-8');
 
 		// So, just what have you been up to?
 		if (in_array('posts', $this->_summary_areas))
 		{
 			$this->_load_recent_posts();
-			template_profile_block_posts();
+			$context['profile_blocks'][] = 'template_profile_block_posts';
 		}
 
 		if (in_array('topics', $this->_summary_areas))
 		{
 			$this->_load_recent_topics();
-			template_profile_block_topics();
+			$context['profile_blocks'][] = 'template_profile_block_topics';
 		}
 
-		if (in_array('posts', $this->_summary_areas))
+		if (in_array('attachments', $this->_summary_areas))
 		{
 			$this->_load_recent_attachments();
-			template_profile_block_attachments();
+			$context['profile_blocks'][] = 'template_profile_block_attachments';
 		}
-
-		obExit(false);
 	}
 
 	/**
