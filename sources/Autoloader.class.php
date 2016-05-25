@@ -227,6 +227,8 @@ class Elk_Autoloader
 
 			$this->_strict = false;
 		}
+
+		return true;
 	}
 
 	/**

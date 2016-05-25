@@ -152,6 +152,8 @@ class Server extends \ArrayObject
 				return isset($this->SERVER_SOFTWARE) && strpos($this->SERVER_SOFTWARE, 'nginx') !== false;
 			case 'windows':
 				return strpos(PHP_OS, 'WIN') === 0;
+			default:
+				return false;
 		}
 	}
 
@@ -169,7 +171,7 @@ class Server extends \ArrayObject
 
 	/**
 	 * Returns if the system supports output compression
-	 * 
+	 *
 	 * @return bool
 	 */
 	public function outPutCompressionEnabled()
