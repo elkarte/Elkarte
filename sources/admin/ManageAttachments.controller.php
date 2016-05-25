@@ -711,7 +711,7 @@ class ManageAttachments_Controller extends Action_Controller
 	{
 		checkSession('post', 'admin');
 
-		// Find humungous attachments.
+		// Find humongous attachments.
 		$messages = removeAttachments(array('attachment_type' => 0, 'size' => 1024 * $this->_req->post->size), 'messages', true);
 
 		// And make a note on the post.
