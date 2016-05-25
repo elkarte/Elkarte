@@ -289,4 +289,13 @@ interface Database
 	 * @return string[] an array of table names. (strings)
 	 */
 	public function db_list_tables($db_name_str = false, $filter = false);
+
+	/**
+	 * Dumps the schema (CREATE) for a table.
+	 *
+	 * @param string $tableName - the table name.
+	 *
+	 * @return string - the CREATE statement as string
+	 */
+	public function db_table_sql($tableName);
 }
