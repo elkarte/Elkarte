@@ -2421,23 +2421,21 @@ function package_crypt($pass)
 function package_create_backup($id = 'backup')
 {
 	$db = database();
-
-	$files = array();
+	$files = new ArrayIterator();
+	$use_relative_paths = empty($_REQUEST['use_full_paths']);
 
 	// The files that reside outside of sources, in the base, we add manually
-	$base_files = array('index.php', 'SSI.php', 'agreement.txt', 'ssi_examples.php', 'ssi_examples.shtml', 'subscriptions.php', 'email_imap_cron.php', 'emailpost.php', 'emailtopic.php');
+	$base_files = array('index.php', 'SSI.php', 'agreement.txt', 'subscriptions.php',
+	'email_imap_cron.php', 'emailpost.php', 'emailtopic.php');
 	foreach ($base_files as $file)
 	{
 		if (file_exists(BOARDDIR . '/' . $file))
-			$files[realpath(BOARDDIR . '/' . $file)] = array(
-				empty($_REQUEST['use_full_paths']) ? $file : BOARDDIR . '/' . $file,
-				stat(BOARDDIR . '/' . $file)
-			);
+			$files[$use_relative_paths ? $file : realpath(BOARDDIR . '/' . $file)] = BOARDDIR . '/' . $file;
 	}
 
 	// Root directory where most of our files reside
 	$dirs = array(
-		SOURCEDIR => empty($_REQUEST['use_full_paths']) ? 'sources/' : strtr(SOURCEDIR . '/', '\\', '/')
+		SOURCEDIR => $use_relative_paths ? 'sources/' : strtr(SOURCEDIR . '/', '\\', '/')
 	);
 
 	// Find all installed theme directories
@@ -2452,137 +2450,67 @@ function package_create_backup($id = 'backup')
 		)
 	);
 	while ($row = $db->fetch_assoc($request))
-		$dirs[$row['value']] = empty($_REQUEST['use_full_paths']) ? 'themes/' . basename($row['value']) . '/' : strtr($row['value'] . '/', '\\', '/');
+		$dirs[$row['value']] = $use_relative_paths ? 'themes/' . basename($row['value']) . '/' : strtr($row['value'] . '/', '\\', '/');
 	$db->free_result($request);
 
-	// While we have directory's to check
-	while (!empty($dirs))
+	try
 	{
-		list ($dir, $dest) = each($dirs);
-		unset($dirs[$dir]);
-
-		// Get the file listing for this directory
-		$listing = @dir($dir);
-		if (!$listing)
-			continue;
-		while ($entry = $listing->read())
+		foreach ($dirs as $dir => $dest)
 		{
-			if (preg_match('~^(\.{1,2}|CVS|backup.*|help|images|.*\~)$~', $entry) != 0)
-				continue;
+			$iter = new RecursiveIteratorIterator(
+				new RecursiveDirectoryIterator($dir, RecursiveDirectoryIterator::SKIP_DOTS),
+				RecursiveIteratorIterator::CHILD_FIRST,
+				RecursiveIteratorIterator::CATCH_GET_CHILD // Ignore "Permission denied"
+			);
 
-			$filepath = realpath($dir . '/' . $entry);
-			if (isset($files[$filepath]))
-				continue;
-
-			$stat = stat($dir . '/' . $entry);
-
-			// If this is a directory, add it to the dir stack for processing
-			if ($stat['mode'] & 040000)
+			foreach ($iter as $entry => $dir)
 			{
-				$files[$filepath] = array($dest . $entry . '/', $stat);
-				$dirs[$dir . '/' . $entry] = $dest . $entry . '/';
+				if ($dir->isDir())
+					continue;
+
+				if (preg_match('~^(\.{1,2}|CVS|backup.*|help|images|.*\~)$~', $entry) != 0)
+					continue;
+
+				$files[$use_relative_paths ? str_replace(realpath(BOARDDIR), '', $entry) : $entry] = $entry;
 			}
-			else
-				$files[$filepath] = array($dest . $entry, $stat);
 		}
 
-		$listing->close();
+		// Make sure we have a backup directory and its writable
+		if (!file_exists(BOARDDIR . '/packages/backups'))
+			mktree(BOARDDIR . '/packages/backups', 0777);
+
+		if (!is_writable(BOARDDIR . '/packages/backups'))
+			package_chmod(BOARDDIR . '/packages/backups');
+
+		// Name the output file, yyyy-mm-dd_before_package_name.tar.gz
+		$output_file = BOARDDIR . '/packages/backups/' . strftime('%Y-%m-%d_') . preg_replace('~[$\\\\/:<>|?*"\']~', '', $id);
+		$output_ext = '.tar';
+
+		if (file_exists($output_file . $output_ext))
+		{
+			$i = 2;
+			while (file_exists($output_file . '_' . $i . $output_ext))
+				$i++;
+			$output_file = $output_file . '_' . $i . $output_ext;
+		}
+		else
+			$output_file .= $output_ext;
+
+		// Buy some more time so we have enough to create this archive
+		detectServer()->setTimeLimit(300);
+
+		$a = new PharData($output_file);
+		$a->buildFromIterator($files);
+		$a->compress(Phar::GZ);
 	}
-
-	// Make sure we have a backup directory and its writable
-	if (!file_exists(BOARDDIR . '/packages/backups'))
-		mktree(BOARDDIR . '/packages/backups', 0777);
-
-	if (!is_writable(BOARDDIR . '/packages/backups'))
-		package_chmod(BOARDDIR . '/packages/backups');
-
-	// Name the output file, yyyy-mm-dd_before_package_name.tar.gz
-	$output_file = BOARDDIR . '/packages/backups/' . strftime('%Y-%m-%d_') . preg_replace('~[$\\\\/:<>|?*"\']~', '', $id);
-	$output_ext = '.tar' . (function_exists('gzopen') ? '.gz' : '');
-
-	if (file_exists($output_file . $output_ext))
+	catch (Exception $e)
 	{
-		$i = 2;
-		while (file_exists($output_file . '_' . $i . $output_ext))
-			$i++;
-		$output_file = $output_file . '_' . $i . $output_ext;
-	}
-	else
-		$output_file .= $output_ext;
+		Errors::instance()->log_error($e->getMessage(), 'backup');
 
-	// Buy some more time so we have enough to create this archive
-	detectServer()->setTimeLimit(300);
-
-	// Set up the file output handle, try gzip first to save space
-	if (function_exists('gzopen'))
-	{
-		$fwrite = 'gzwrite';
-		$fclose = 'gzclose';
-		$output = gzopen($output_file, 'wb');
-	}
-	else
-	{
-		$fwrite = 'fwrite';
-		$fclose = 'fclose';
-		$output = fopen($output_file, 'wb');
+		return false;
 	}
 
-	// For each file we found in the directory, we add them to a TAR archive
-	foreach ($files as $real_file => $file)
-	{
-		if (!file_exists($real_file))
-			continue;
-
-		// Check if its a directory
-		$stat = $file[1];
-		if (substr($file[0], -1) == '/')
-			$stat['size'] = 0;
-
-		// Create a tar file header, pack the details in to the fields
-		$current = pack('a100a8a8a8a12a12a8a1a100a6a2a32a32a8a8a155a12',
-			$file[0], // name of file
-			decoct($stat['mode']), // file mode
-			sprintf('%06d', decoct($stat['uid'])), // owner user ID
-			sprintf('%06d', decoct($stat['gid'])), // owner group ID
-			decoct($stat['size']), // length of file in bytes
-			decoct($stat['mtime']), // modify time of file
-			'', // checksum for header
-			0, // type of file
-			'', // name of linked file
-			'', // USTAR indicator
-			'', // USTAR version
-			'', // owner user name
-			'', // owner group name
-			'', // device major number
-			'', // device minor number
-			'', // prefix for file name
-			''
-		);
-
-		// Create the header checksum
-		$checksum = 256;
-		for ($i = 0; $i < 512; $i++)
-			$checksum += ord($current[$i]);
-
-		// Write out the file header (insert the checksum we just computed)
-		$fwrite($output, substr($current, 0, 148) . pack('a8', decoct($checksum)) . substr($current, 156, 511));
-
-		// If this is a directory entry all that's needed is the header
-		if ($stat['size'] == 0)
-			continue;
-
-		// Write the actual file contents to the backup file
-		$fp = fopen($real_file, 'rb');
-		while (!feof($fp))
-			$fwrite($output, fread($fp, 16384));
-		fclose($fp);
-
-		// Pad the output so its on 512 boundary's
-		$fwrite($output, pack('a' . (512 - $stat['size'] % 512), ''));
-	}
-
-	$fwrite($output, pack('a1024', ''));
-	$fclose($output);
+	return true;
 }
 
 /**
