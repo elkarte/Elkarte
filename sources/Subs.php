@@ -1677,9 +1677,9 @@ function removeScheduleTaskImmediate($task, $calculateNextTrigger = true)
 function replaceBasicActionUrl($string)
 {
 	global $scripturl, $context, $boardurl;
-	static $find = null, $replace = null;
+	static $find_replace = null;
 
-	if ($find === null)
+	if ($find_replace === null)
 	{
 		$find_replace = array(
 			'{forum_name}' => $context['forum_name'],

@@ -87,34 +87,15 @@ function validateSession($type = 'admin')
 		// Hashed password, ahoy!
 		if (isset($_POST[$type . '_hash_pass']) && strlen($_POST[$type . '_hash_pass']) === 64)
 		{
-			// Allow integration to verify the password
-			$good_password = in_array(true, call_integration_hook('integrate_verify_password', array($user_info['username'], $_POST[$type . '_hash_pass'], true)), true);
-
-			$password = $_POST[$type . '_hash_pass'];
-			if ($good_password || validateLoginPassword($password, $user_info['passwd']))
-			{
-				$_SESSION[$type . '_time'] = time();
-				unset($_SESSION['request_referer']);
-
+			if (checkPassword($type, true))
 				return true;
-			}
 		}
 
 		// Posting the password... check it.
 		if (isset($_POST[$type . '_pass']) && str_replace('*', '', $_POST[$type . '_pass']) !== '')
 		{
-			// Give integrated systems a chance to verify this password
-			$good_password = in_array(true, call_integration_hook('integrate_verify_password', array($user_info['username'], $_POST[$type . '_pass'], false)), true);
-
-			// Password correct?
-			$password = $_POST[$type . '_pass'];
-			if ($good_password || validateLoginPassword($password, $user_info['passwd'], $user_info['username']))
-			{
-				$_SESSION[$type . '_time'] = time();
-				unset($_SESSION['request_referer']);
-
+			if (checkPassword($type))
 				return true;
-			}
 		}
 	}
 
@@ -142,6 +123,39 @@ function validateSession($type = 'admin')
 		adminLogin($type);
 
 	return 'session_verify_fail';
+}
+
+/**
+ * Validates a supplied password is correct
+ *
+ * What it does:
+ * - Uses integration function to verify password is enabled
+ * - Uses validateLoginPassword to check using standard ElkArte methods
+ *
+ * @param string $type
+ * @param bool $hash if the supplied password is in _hash_pass
+ *
+ * @return bool
+ */
+function checkPassword($type, $hash = false)
+{
+	global $user_info;
+
+	$password = $_POST[$type . ($hash ? '_hash_pass' : '_pass')];
+
+	// Allow integration to verify the password
+	$good_password = in_array(true, call_integration_hook('integrate_verify_password', array($user_info['username'], $password, $hash ? true : false)), true);
+
+	// Password correct?
+	if ($good_password || validateLoginPassword($password, $user_info['passwd'], $hash ? '' : $user_info['username']))
+	{
+		$_SESSION[$type . '_time'] = time();
+		unset($_SESSION['request_referer']);
+
+		return true;
+	}
+
+	return false;
 }
 
 /**

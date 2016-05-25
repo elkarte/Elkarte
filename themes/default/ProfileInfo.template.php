@@ -44,7 +44,7 @@ function template_action_summary()
 		$tabs = array_keys($context['summarytabs']);
 		$tab_num = 0;
 
-		// Start with the naviagtion ul, its converted to the tab navigation by jquery
+		// Start with the navigation ul, its converted to the tab navigation by jqueryUI
 		echo '
 			<div class="profile_center">
 				<div id="tabs">
@@ -56,17 +56,20 @@ function template_action_summary()
 			$tab_num++;
 			echo '
 						<li>
-							<a href="#tab_', $tab_num, '">', $context['summarytabs'][$tab]['name'], '</a>
+							<a href="', (isset($context['summarytabs'][$tab]['href']) ? $context['summarytabs'][$tab]['href'] : '#tab_' . $tab_num), '">', $context['summarytabs'][$tab]['name'], '</a>
 						</li>';
 		}
 
 		echo '
 					</ul>';
 
-		// Now output the content divs and call the templates as defined by the tabs
+		// For preload tabs (those without href), output the content divs and call the templates as defined by the tabs
 		$tab_num = 0;
 		foreach ($tabs as $tab)
 		{
+			if (isset($context['summarytabs'][$tab]['href']))
+				continue;
+
 			// Start a tab
 			$tab_num++;
 			echo '
@@ -514,7 +517,7 @@ function template_viewWarning()
  */
 function template_profile_block_summary()
 {
-	global $txt, $context, $modSettings, $scripturl, $settings;
+	global $txt, $context, $modSettings, $scripturl;
 
 	echo '
 			<div class="profileblock_left">
@@ -673,7 +676,7 @@ function template_profile_block_user_info()
  */
 function template_profile_block_contact()
 {
-	global $settings, $txt, $context, $scripturl;
+	global $txt, $context, $scripturl;
 
 	$ci_empty = true;
 
@@ -981,15 +984,17 @@ function template_profile_block_moderation()
 /**
  * Profile Buddies Block
  *
- * Shows a list of your buddies with pm/email links if availalble
+ * Shows a list of your buddies with pm/email links if available
  */
 function template_profile_block_buddies()
 {
-	global $context, $settings, $scripturl, $txt, $modSettings;
+	global $context, $scripturl, $txt, $modSettings;
 
 	// Set the div height to about 4 lines of buddies w/avatars
 	if (isset($context['buddies']))
+	{
 		$div_height = 120 + (4 * max(empty($modSettings['avatar_max_height']) ? 0 : $modSettings['avatar_max_height'], empty($modSettings['avatar_max_height']) ? 0 : $modSettings['avatar_max_height'], 65));
+	}
 
 	if (!empty($modSettings['enable_buddylist']) && $context['user']['is_owner'])
 	{
@@ -1009,17 +1014,20 @@ function template_profile_block_buddies()
 				<div class="attachment">
 					<div class="generic_border centertext">
 						', $data['avatar']['image'], '<br>
-						<a href="', $scripturl, '?action=profile;u=', $data['id'], '">', $data['name'], '</a><br>
-						', template_member_online($data), '<em><span class="smalltext"> ' . $txt[$data['online']['is_online'] ? 'online' : 'offline'] . '</span></em><br>
-						';
+						<a href="', $scripturl, '?action=profile;u=', $data['id'], '">', $data['name'], '</a>
+						<br>
+						', template_member_online($data), '<em><span class="smalltext"> ' . $txt[$data['online']['is_online'] ? 'online' : 'offline'] . '</span></em>
+						<div class="contact">';
 
 				// Only show the email address fully if it's not hidden - and we reveal the email.
 				echo template_member_email($data);
 
 				// Can they send the buddy a PM?
 				if ($context['can_send_pm'])
+				{
 					echo '
-						&nbsp;<a href="', $scripturl, '?action=pm;sa=send;u=', $data['id'], '" class="icon i-comment', $data['online']['is_online'] ? '' : '-blank', '" title="', $txt['profile_sendpm_short'], ' to ', $data['name'], '"><s>', $txt['profile_sendpm_short'], ' to ', $data['name'], '</s></a>';
+						<a href="', $scripturl, '?action=pm;sa=send;u=', $data['id'], '" class="icon i-comment', $data['online']['is_online'] ? '' : '-blank', '" title="', $txt['profile_sendpm_short'], ' to ', $data['name'], '"><s>', $txt['profile_sendpm_short'], ' to ', $data['name'], '</s></a>';
+				}
 
 				// Other contact info from custom profile fields?
 				if (isset($data['custom_fields']))
@@ -1027,29 +1035,55 @@ function template_profile_block_buddies()
 					$im = array();
 
 					foreach ($data['custom_fields'] as $key => $cpf)
+					{
 						if ($cpf['placement'] == 1)
+						{
 							$im[] = $cpf['value'];
+						}
+					}
 
-					echo '
-						&nbsp;' . implode('&nbsp;', $im);
+					echo implode(' ', $im);
 				}
 				// Done with the contact information
 				echo '
+						</div>
 					</div>
 				</div>';
 			}
 		}
 		// Buddyless how sad :'(
 		else
+		{
 			echo '
 				<div class="infobox">
-						', $txt['profile_buddies_no'], '
+					', $txt['profile_buddies_no'], '
 				</div>';
+		}
 
 		// All done
 		echo '
 			</div>
 		</div>';
+	}
+}
+
+/**
+ * Consolidated profile block output.
+ */
+function template_profile_blocks()
+{
+	global $context;
+
+	if (empty($context['profile_blocks']))
+	{
+		return;
+	}
+	else
+	{
+		foreach ($context['profile_blocks'] as $profile_block)
+		{
+			$profile_block();
+		}
 	}
 }
 

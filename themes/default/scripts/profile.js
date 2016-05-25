@@ -31,6 +31,28 @@ $(document).ready(function() {
 });
 
 /**
+ * Profile tabs (summary, recent, buddy), for use with jqueryUI
+ */
+function start_tabs() {
+	$("#tabs").tabs({
+		// Called before tab content is loaded with href
+		beforeLoad: function (event, ui) {
+			// The ubiquitous ajax spinner
+			ui.panel.html('<div class="centertext"><i class="fa fa-2x fa-spinner"></i></div>');
+
+			// Ajax call failed to retrieve content
+			ui.jqXHR.fail(function () {
+				ui.panel.html('<div></div>');
+				if ('console' in window) {
+					window.console.info(event);
+					window.console.info(ui);
+				}
+			});
+		},
+	});
+}
+
+/**
  * Function to detect the time offset and populate the offset box
  *
  * @param {string} currentTime

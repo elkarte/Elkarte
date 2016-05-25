@@ -16,6 +16,7 @@ if (!defined('ELK'))
 
 /**
  * Xml_Controller Class
+ *
  * Receives XMLhttp requests of various types such as
  * jump to, message and group icons, core features, drag and drop ordering
  */
