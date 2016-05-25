@@ -1794,7 +1794,7 @@ function attachmentsSizeForMessage($id_msg, $include_count = true)
  */
 function loadAttachmentContext($id_msg)
 {
-	global $attachments, $modSettings, $txt, $scripturl, $topic;
+	global $attachments, $modSettings, $scripturl, $topic;
 
 	// Set up the attachment info - based on code by Meriadoc.
 	$attachmentData = array();
