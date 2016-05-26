@@ -1076,6 +1076,9 @@ class Maintenance_Controller extends Action_Controller
 
 		require_once(SOURCEDIR . '/DumpDatabase.php');
 		DumpDatabase2();
+
+		// Should not get here as DumpDatabase2 exits
+		return true;
 	}
 
 	/**

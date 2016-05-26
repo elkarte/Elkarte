@@ -1884,11 +1884,9 @@ function fetchBoardsInfo($conditions = 'all', $params = array())
  *
  * @package Boards
  * @param int[]|int $boards an array of board IDs (it accepts a single board too).
- * @deprecated since 1.1 - The param is passed by ref in 1.0 and the result
- *                         is returned through the param itself, starting from
- *                         1.1 the expected behaviour is that the result is
- *                         returned.
- *                         The pass-by-ref is kept for backward compatibility.
+ * NOTE: the $boards param is deprecated since 1.1 - The param is passed by ref in 1.0 and the result
+ * is returned through the param itself, starting from 1.1 the expected behaviour
+ * is that the result is returned. The pass-by-ref is kept for backward compatibility.
  * @return int[]
  */
 function addChildBoards(&$boards)
@@ -1896,13 +1894,18 @@ function addChildBoards(&$boards)
 	$db = database();
 
 	if (empty($boards))
+	{
 		return false;
+	}
 
 	if (!is_array($boards))
+	{
 		$boards = array($boards);
+	}
 
 	$request = $db->query('', '
-		SELECT b.id_board, b.id_parent
+		SELECT 
+			b.id_board, b.id_parent
 		FROM {db_prefix}boards AS b
 		WHERE {query_see_board}
 			AND b.child_level > {int:no_parents}
@@ -1915,8 +1918,12 @@ function addChildBoards(&$boards)
 		)
 	);
 	while ($row = $db->fetch_assoc($request))
+	{
 		if (in_array($row['id_parent'], $boards))
+		{
 			$boards[] = $row['id_board'];
+		}
+	}
 	$db->free_result($request);
 
 	return $boards;
