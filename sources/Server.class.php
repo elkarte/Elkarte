@@ -135,26 +135,38 @@ class Server extends \ArrayObject
 		switch ($server)
 		{
 			case 'apache':
-				return isset($this->SERVER_SOFTWARE) && strpos($this->SERVER_SOFTWARE, 'Apache') !== false;
+				return $this->_is_web_server('Apache');
 			case 'cgi':
 				return isset($this->SERVER_SOFTWARE) && strpos(php_sapi_name(), 'cgi') !== false;
 			case 'iis':
-				return isset($this->SERVER_SOFTWARE) && strpos($this->SERVER_SOFTWARE, 'Microsoft-IIS') !== false;
+				return $this->_is_web_server('Microsoft-IIS');
 			case 'iso_case_folding':
 				return ord(strtolower(chr(138))) === 154;
 			case 'lighttpd':
-				return isset($this->SERVER_SOFTWARE) && strpos($this->SERVER_SOFTWARE, 'lighttpd') !== false;
+				return $this->_is_web_server('lighttpd');
 			case 'litespeed':
-				return isset($this->SERVER_SOFTWARE) && strpos($this->SERVER_SOFTWARE, 'LiteSpeed') !== false;
+				return $this->_is_web_server('LiteSpeed');
 			case 'needs_login_fix':
-				return $this->is('cgi') && $this->is('iis');
+				return $this->is('cgi') && $this->_is_web_server('Microsoft-IIS');
 			case 'nginx':
-				return isset($this->SERVER_SOFTWARE) && strpos($this->SERVER_SOFTWARE, 'nginx') !== false;
+				return $this->_is_web_server('nginx');
 			case 'windows':
 				return strpos(PHP_OS, 'WIN') === 0;
 			default:
 				return false;
 		}
+	}
+
+	/**
+	 * Search $_SERVER['SERVER_SOFTWARE'] for a give $type
+	 *
+	 * @param string $type
+	 *
+	 * @return bool
+	 */
+	private function _is_web_server($type)
+	{
+		return isset($this->SERVER_SOFTWARE) && strpos($this->SERVER_SOFTWARE, $type) !== false;
 	}
 
 	/**
@@ -165,8 +177,7 @@ class Server extends \ArrayObject
 	public function supportRewrite()
 	{
 		return ($this->is('cgi') === false || ini_get('cgi.fix_pathinfo') == 1 || @get_cfg_var('cgi.fix_pathinfo') == 1)
-		&&
-		($this->is('apache') || $this->is('nginx') || $this->is('lighttpd') || $this->is('litespeed'));
+			&& ($this->is('apache') || $this->is('nginx') || $this->is('lighttpd') || $this->is('litespeed'));
 	}
 
 	/**
