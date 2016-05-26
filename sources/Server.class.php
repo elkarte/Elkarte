@@ -176,7 +176,7 @@ class Server extends \ArrayObject
 	 */
 	public function supportRewrite()
 	{
-		return ($this->is('cgi') === false || ini_get('cgi.fix_pathinfo') == 1 || @get_cfg_var('cgi.fix_pathinfo') == 1)
+		return (!$this->is('cgi') || ini_get('cgi.fix_pathinfo') == 1 || @get_cfg_var('cgi.fix_pathinfo') == 1)
 			&& ($this->is('apache') || $this->is('nginx') || $this->is('lighttpd') || $this->is('litespeed'));
 	}
 
