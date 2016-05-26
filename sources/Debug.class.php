@@ -174,7 +174,7 @@ class Debug
 	public function get_db()
 	{
 		if (!$this->_track)
-			return '';
+			return array();
 
 		return $this->_db_cache;
 	}
