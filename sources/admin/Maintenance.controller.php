@@ -1024,7 +1024,7 @@ class Maintenance_Controller extends Action_Controller
 	 */
 	public function action_backup_display()
 	{
-		global $context, $txt, $user_info;
+		global $user_info;
 
 		validateToken('admin-maint');
 
@@ -1034,50 +1034,66 @@ class Maintenance_Controller extends Action_Controller
 
 		checkSession('post');
 
-		if (empty($iknowitmaybeunsafe))
+		// Validate access
+		if (empty($iknowitmaybeunsafe) && !$this->_validate_access())
+			return $this->action_database();
+		else
 		{
-			require_once(SUBSDIR . '/FtpConnection.class.php');
+			require_once(SUBSDIR . '/Admin.subs.php');
 
-			$ftp = new Ftp_Connection($this->_req->post->ftp_server, $this->_req->post->ftp_port, $this->_req->post->ftp_username, $this->_req->post->ftp_password);
+			emailAdmins('admin_backup_database', array(
+				'BAK_REALNAME' => $user_info['name']
+			));
+			logAction('database_backup', array('member' => $user_info['id']), 'admin');
 
-			if ($ftp->error === false)
-			{
-				// I know, I know... but a lot of people want to type /home/xyz/... which is wrong, but logical.
-				if (!$ftp->chdir($this->_req->post->ftp_path))
-					$ftp->chdir(preg_replace('~^/home[2]?/[^/]+?~', '', $this->_req->post->ftp_path));
-			}
+			require_once(SOURCEDIR . '/DumpDatabase.php');
+			DumpDatabase2();
 
-			// If we had an error...
-			if ($ftp->error !== false)
-			{
-				loadLanguage('Packages');
-				$ftp_error = $ftp->last_message === null ? (isset($txt['package_ftp_' . $ftp->error]) ? $txt['package_ftp_' . $ftp->error] : '') : $ftp->last_message;
+			// Should not get here as DumpDatabase2 exits
+			return true;
+		}
+	}
 
-				// Fill the boxes for a FTP connection with data from the previous attempt
-				$context['package_ftp'] = array(
-					'form_elements_only' => 1,
-					'server' => $this->_req->post->ftp_server,
-					'port' => $this->_req->post->ftp_port,
-					'username' => $this->_req->post->ftp_username,
-					'path' => $this->_req->post->ftp_path,
-					'error' => empty($ftp_error) ? null : $ftp_error,
-				);
+	/**
+	 * Validates the user can make an FTP connection with the supplied uid/pass
+	 *
+	 * - Used as an extra layer of security when performing backups
+	 */
+	private function _validate_access()
+	{
+		global $context, $txt;
 
-				return $this->action_database();
-			}
+		require_once(SUBSDIR . '/FtpConnection.class.php');
+
+		$ftp = new Ftp_Connection($this->_req->post->ftp_server, $this->_req->post->ftp_port, $this->_req->post->ftp_username, $this->_req->post->ftp_password);
+
+		// No errors on the connection, id/pass are good
+		if ($ftp->error === false)
+		{
+			// I know, I know... but a lot of people want to type /home/xyz/... which is wrong, but logical.
+			if (!$ftp->chdir($this->_req->post->ftp_path))
+				$ftp->chdir(preg_replace('~^/home[2]?/[^/]+?~', '', $this->_req->post->ftp_path));
 		}
 
-		require_once(SUBSDIR . '/Admin.subs.php');
+		// If we had an error...
+		if ($ftp->error !== false)
+		{
+			loadLanguage('Packages');
+			$ftp_error = $ftp->last_message === null ? (isset($txt['package_ftp_' . $ftp->error]) ? $txt['package_ftp_' . $ftp->error] : '') : $ftp->last_message;
 
-		emailAdmins('admin_backup_database', array(
-			'BAK_REALNAME' => $user_info['name']
-		));
-		logAction('database_backup', array('member' => $user_info['id']), 'admin');
+			// Fill the boxes for a FTP connection with data from the previous attempt
+			$context['package_ftp'] = array(
+				'form_elements_only' => 1,
+				'server' => $this->_req->post->ftp_server,
+				'port' => $this->_req->post->ftp_port,
+				'username' => $this->_req->post->ftp_username,
+				'path' => $this->_req->post->ftp_path,
+				'error' => empty($ftp_error) ? null : $ftp_error,
+			);
 
-		require_once(SOURCEDIR . '/DumpDatabase.php');
-		DumpDatabase2();
+			return false;
+		}
 
-		// Should not get here as DumpDatabase2 exits
 		return true;
 	}
 
