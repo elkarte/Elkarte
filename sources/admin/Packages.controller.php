@@ -931,6 +931,8 @@ class Packages_Controller extends Action_Controller
 
 								if (isset($context['available_' . $type . ''][$package_md5]))
 									return $context['available_' . $type . ''][$package_md5]['name'];
+
+								return '';
 							},
 						),
 						'sort' => array(
@@ -949,6 +951,8 @@ class Packages_Controller extends Action_Controller
 
 								if (isset($context['available_' . $type . ''][$package_md5]))
 									return $context['available_' . $type . ''][$package_md5]['version'];
+
+								return '';
 							},
 						),
 						'sort' => array(

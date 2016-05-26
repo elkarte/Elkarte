@@ -283,7 +283,7 @@ class ManagePermissions_Controller extends Action_Controller
 							if ($rowData['id_group'] != 1)
 								return '<a href="' . $scripturl . '?action=admin;area=permissions;sa=modify;group=' . $rowData['id_group'] . '' . (isset($_pid) ? ';pid=' . $_pid : '') . '">' . $txt['membergroups_modify'] . '</a>';
 
-							return null;
+							return '';
 						},
 					),
 				),
@@ -297,6 +297,8 @@ class ManagePermissions_Controller extends Action_Controller
 						'function' => function($rowData) {
 							if ($rowData['id_group'] != 1)
 								return '<input type="checkbox" name="group[]" value="' . $rowData['id_group'] . '" class="input_check" />';
+
+							return '';
 						},
 						'class' => 'centertext',
 					),

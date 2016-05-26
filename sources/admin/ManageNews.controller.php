@@ -390,7 +390,8 @@ class ManageNews_Controller extends Action_Controller
 			$context['send_pm'] = $this->_req->getPost('send_pm', 'intval', 0);
 			$context['send_html'] = $this->_req->getPost('send_html', 'intval', 0);
 
-			return prepareMailingForPreview();
+			prepareMailingForPreview();
+			return null;
 		}
 
 		// Start by finding any manually entered members!
@@ -528,7 +529,7 @@ class ManageNews_Controller extends Action_Controller
 		{
 			$context['sub_template'] = 'email_members_succeeded';
 			loadTemplate('ManageNews');
-			return;
+			return null;
 		}
 
 		// If just previewing we prepare a message and return it for viewing
@@ -634,7 +635,7 @@ class ManageNews_Controller extends Action_Controller
 
 		// If we're only cleaning drop out here.
 		if ($clean_only)
-			return;
+			return null;
 
 		// Some functions we will need
 		require_once(SUBSDIR . '/Mail.subs.php');

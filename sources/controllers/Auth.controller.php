@@ -833,7 +833,7 @@ function phpBB3_password_check($passwd, $passwd_hash)
 {
 	// Too long or too short?
 	if (strlen($passwd_hash) != 34)
-		return;
+		return false;
 
 	// Range of characters allowed.
 	$range = './0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz';
