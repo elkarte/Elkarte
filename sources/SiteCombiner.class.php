@@ -24,6 +24,11 @@ if (!defined('ELK'))
 class Site_Combiner
 {
 	/**
+	 * Instance of the class
+	 */
+	private static $_instance = null;
+
+	/**
 	 * Holds all the files contents that we have joined in to one
 	 *
 	 * @var array
@@ -241,6 +246,23 @@ class Site_Combiner
 	}
 
 	/**
+	 * Compress a supplied JS string for output in the template
+	 *
+	 * @param string $string
+	 *
+	 * @return string
+	 */
+	public function inline_js_compress($string)
+	{
+		$min_string = $this->_squeeze_me($string);
+
+		if ($min_string === false || trim($min_string) === '')
+			$min_string = $string;
+
+		return $min_string;
+	}
+
+	/**
 	 * Add all the file parameters to the $_combine_files array
 	 *
 	 * What it does:
@@ -404,16 +426,7 @@ class Site_Combiner
 
 		// Nothing returned or an error, try our internal JSqueeze minimizer
 		if ($fetch_data === false || trim($fetch_data) == '' || preg_match('/^Error\(\d{1,2}\):\s/m', $fetch_data))
-		{
-			// To prevent a stack overflow segmentation fault, which silently kills Apache, we need to limit
-			// recursion on windows.  This may cause JSqueeze to fail, but at least its then catchable.
-			if (detectServer()->is('windows'))
-				@ini_set('pcre.recursion_limit', '524');
-
-			require_once(EXTDIR . '/JSqueeze.php');
-			$jsqueeze = new Patchwork\JSqueeze;
-			$fetch_data = $jsqueeze->squeeze($this->_cache);
-		}
+			$fetch_data = $this->_squeeze_me($this->_cache);
 
 		// If we still have no data, then try the post js_code method to the closure compiler
 		if ($fetch_data === false || trim($fetch_data) == '')
@@ -424,6 +437,27 @@ class Site_Combiner
 
 		// Return a combined pre minimized + our minimized string
 		return $this->_min_cache . "\n" . $fetch_data;
+	}
+
+	/**
+	 * Use the internal JSqueeze minimizer on a string of JS
+	 *
+	 * @param string $data
+	 *
+	 * @return string
+	 */
+	private function _squeeze_me($data)
+	{
+		require_once(EXTDIR . '/JSqueeze.php');
+
+		// To prevent a stack overflow segmentation fault, which silently kills Apache, we need to limit
+		// recursion on windows.  This may cause JSqueeze to fail, but at least its then catchable.
+		if (detectServer()->is('windows'))
+			@ini_set('pcre.recursion_limit', '524');
+
+		$jsqueeze = new Patchwork\JSqueeze;
+
+		return $jsqueeze->squeeze($data);
 	}
 
 	/**
@@ -533,5 +567,23 @@ class Site_Combiner
 		}
 
 		return $fetch_data;
+	}
+
+	/**
+	 * Find and return a default Site_Combiner instance if it exists
+	 *
+	 * - Create a new instance if it did not already exist.
+	 * - Uses default cache locations, don't use getInstance for custom invocations
+	 *
+	 * @return Site_Combiner instance of the class
+	 */
+	public static function getInstance()
+	{
+		global $boardurl;
+
+		if (self::$_instance === null)
+			self::$_instance = new Site_Combiner(CACHEDIR, $boardurl . '/cache');
+
+		return self::$_instance;
 	}
 }

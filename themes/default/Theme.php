@@ -230,12 +230,12 @@ class Theme extends \Theme
 	 */
 	protected function templateJavascriptFiles($do_deferred)
 	{
-		global $boardurl, $modSettings;
+		global $modSettings;
 
 		// Combine and minify javascript source files to save bandwidth and requests
 		if (!empty($modSettings['minify_css_js']))
 		{
-			$combiner = new \Site_Combiner(CACHEDIR, $boardurl . '/cache');
+			$combiner = \Site_Combiner::getInstance();
 			$combine_name = $combiner->site_js_combine($this->js_files, $do_deferred);
 
 			call_integration_hook('post_javascript_combine', array(&$combine_name, $combiner));
@@ -317,29 +317,52 @@ class Theme extends \Theme
 			// Deferred output waits until we are deferring !
 			if (!empty($this->js_inline['defer']) && $do_deferred)
 			{
-				// Combine them all in to one output
-				$this->js_inline['defer'] = array_map('trim', $this->js_inline['defer']);
-				$inline_defered_code = implode("\n\t\t", $this->js_inline['defer']);
-
 				// Output the deferred script
 				echo '
 	<script><!-- // --><![CDATA[
-		', $inline_defered_code, '
+		', $this->prepare_inline_js('defer'), '
 	// ]]></script>';
 			}
 
-			// Standard output, and our javascript vars, get output when we are not on a defered call
+			// Standard output, and our javascript vars, get output when we are not on a deferred call
 			if (!empty($this->js_inline['standard']) && !$do_deferred)
 			{
-				$this->js_inline['standard'] = array_map('trim', $this->js_inline['standard']);
-
 				// And output the js vars and standard scripts to the page
 				echo '
 	<script><!-- // --><![CDATA[
-		', implode("\n\t\t", $this->js_inline['standard']), '
+		', $this->prepare_inline_js('standard'), '
 	// ]]></script>';
 			}
 		}
+	}
+
+	/**
+	 * Minify a supplied string of javascript
+	 *
+	 * @param string $type
+	 *
+	 * @return string
+	 */
+	public function prepare_inline_js($type)
+	{
+		global $modSettings;
+
+		if (empty($modSettings['minify_css_js']))
+		{
+			// Normalize indentation
+			$this->js_inline[$type] = array_map('trim', $this->js_inline[$type]);
+			$inline_code = implode("\n\t\t", $this->js_inline[$type]);
+		}
+		else
+		{
+			// Run shrink code if requested
+			require_once(SOURCEDIR . '/SiteCombiner.class.php');
+			$combiner = \Site_Combiner::getInstance();
+			$inline_code = implode('', $this->js_inline[$type]);
+			$inline_code = $combiner->inline_js_compress($inline_code);
+		}
+
+		return $inline_code;
 	}
 
 	/**
@@ -350,7 +373,7 @@ class Theme extends \Theme
 	 */
 	function template_css()
 	{
-		global $modSettings, $boardurl;
+		global $modSettings;
 
 		// Use this hook to work with CSS files pre output
 		call_integration_hook('pre_css_output');
@@ -360,7 +383,7 @@ class Theme extends \Theme
 		{
 			if (!empty($modSettings['minify_css_js']))
 			{
-				$combiner = new \Site_Combiner(CACHEDIR, $boardurl . '/cache');
+				$combiner = \Site_Combiner::getInstance();
 				$combine_name = $combiner->site_css_combine($this->css_files);
 
 				call_integration_hook('post_css_combine', array(&$combine_name, $combiner));
@@ -399,6 +422,7 @@ class Theme extends \Theme
 				$style_tag .=  '
 	' . $this->css_rules['all'];
 			}
+
 			if (!empty($this->css_rules['media']))
 			{
 				foreach ($this->css_rules['media'] as $key => $val)
