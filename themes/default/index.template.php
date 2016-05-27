@@ -552,11 +552,10 @@ function template_menu()
 					</ul>';
 
 	// Define the upper_section toggle in javascript.
-	echo '
-				<script><!-- // --><![CDATA[
+	addInlineJavascript('
 					var oMainHeaderToggle = new elk_Toggle({
 						bToggleEnabled: true,
-						bCurrentlyCollapsed: ', empty($context['minmax_preferences']['upshrink']) ? 'false' : 'true', ',
+						bCurrentlyCollapsed: ' . (empty($context['minmax_preferences']['upshrink']) ? 'false' : 'true') . ',
 						aSwappableContainers: [
 							\'upper_section\',\'header\'
 						],
@@ -564,13 +563,13 @@ function template_menu()
 							{
 								sId: \'upshrink\',
 								classExpanded: \'chevricon i-chevron-up icon-lg\',
-								titleExpanded: ', JavaScriptEscape($txt['upshrink_description']), ',
+								titleExpanded: ' . JavaScriptEscape($txt['upshrink_description']) . ',
 								classCollapsed: \'chevricon i-chevron-down icon-lg\',
-								titleCollapsed: ', JavaScriptEscape($txt['upshrink_description']), '
+								titleCollapsed: ' . JavaScriptEscape($txt['upshrink_description']) . '
 							}
 						],
 						oThemeOptions: {
-							bUseThemeSettings: ', $context['user']['is_guest'] ? 'false' : 'true', ',
+							bUseThemeSettings: ' . ($context['user']['is_guest'] ? 'false' : 'true') . ',
 							sOptionName: \'minmax_preferences\',
 							sSessionId: elk_session_id,
 							sSessionVar: elk_session_var,
@@ -580,8 +579,7 @@ function template_menu()
 							bUseCookie: elk_member_id == 0 ? true : false,
 							sCookieName: \'upshrink\'
 						}
-					});
-				// ]]></script>';
+					});', true);
 }
 
 /**
