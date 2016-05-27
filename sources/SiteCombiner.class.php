@@ -204,7 +204,7 @@ class Site_Combiner
 
 		// Nothing to do so return
 		if (count($this->_combine_files) === 0)
-			return;
+			return true;
 
 		// Create the css archive name
 		$this->_buildName('.css');
@@ -220,7 +220,7 @@ class Site_Combiner
 			$compressor = new CSSmin($this->_cache);
 			$this->_minified_cache = $compressor->run($this->_cache);
 
-			// Combined in any pre minimized to our new minimized string
+			// Combine in any pre minimized css files to our new minimized string
 			$this->_minified_cache .= "\n" . $this->_min_cache;
 
 			$this->_saveFiles();
@@ -313,7 +313,7 @@ class Site_Combiner
 		// Save the hive, or a nest, or a conglomeration. Like it was grown
 		$this->_archive_name = 'hive-' . sha1($this->_archive_filenames) . $type;
 
-		// Create a unique cache stale for his hive ?12345
+		// Create a unique cache stale for this hive ?12345
 		if (!empty($this->_stales))
 			$this->_archive_stale = '?' . hash('crc32', implode(' ', $this->_stales));
 	}
@@ -508,7 +508,7 @@ class Site_Combiner
 				$data = urlencode($file['content']);
 				$data_len = Util::strlen($data);
 
-				// While we can add data to the post and not accede the post size allowed by the service
+				// While we can add data to the post and not exceed the post size allowed by the service
 				if ($data_len + $post_len < 200000)
 				{
 					$post_data .= $data;

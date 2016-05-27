@@ -682,7 +682,7 @@ function pbe_load_text(&$html, $email_message, $pbe)
 	// Do we even have a message left to post?
 	$text = Util::htmltrim($text);
 	if (empty($text))
-		return;
+		return '';
 
 	if ($email_message->message_type !== 'p')
 	{

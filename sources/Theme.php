@@ -1,15 +1,11 @@
 <?php
 
 /**
- * The main theme class
+ * The main abstract theme class
  *
  * @name      ElkArte Forum
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
- *
- * This file contains code covered by:
- * copyright:    2011 Simple Machines (http://www.simplemachines.org)
- * license:        BSD, See included LICENSE.TXT for terms and conditions.
  *
  * @version 1.1 beta 1
  *
@@ -29,22 +25,71 @@ abstract class Theme
 	const DEFERRED = 'defer';
 	const ALL = -1;
 
+	/**
+	 * The id of the theme being used
+	 * @var int
+	 */
 	protected $id;
 
+	/**
+	 * Holds the Templates instance
+	 * @var Templates
+	 */
 	protected $templates;
+
+	/**
+	 * Holds the Template_Layers instance
+	 * @var Template_Layers
+	 */
 	protected $layers;
 
+	/**
+	 * @var array
+	 */
 	protected $html_headers = array();
+
+	/**
+	 * @var array
+	 */
 	protected $links = array();
+
+	/**
+	 * All of the JS files to include
+	 * @var array
+	 */
 	protected $js_files = array();
+
+	/**
+	 * Any inline JS to output
+	 * @var array
+	 */
 	protected $js_inline = array(
 		'standard' => array(),
 		'defer' => array()
 	);
+
+	/**
+	 * JS variables to output
+	 * @var array
+	 */
 	protected $js_vars = array();
+
+	/**
+	 * Inline CSS
+	 * @var array
+	 */
 	protected $css_rules = array();
+
+	/**
+	 * CSS files
+	 * @var array
+	 */
 	protected $css_files = array();
 
+	/**
+	 * Right to left language support
+	 * @var bool
+	 */
 	protected $rtl;
 
 	/**

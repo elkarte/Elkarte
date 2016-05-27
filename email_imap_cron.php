@@ -38,8 +38,6 @@ else
  */
 function postbyemail_imap()
 {
-	global $modSettings;
-
 	// No imap, why bother?
 	if (!function_exists('imap_open'))
 		return false;

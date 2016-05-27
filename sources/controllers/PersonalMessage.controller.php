@@ -312,7 +312,7 @@ class PersonalMessage_Controller extends Action_Controller
 		}
 		else
 		{
-			// Note we send labels by id as it will have less problems in the querystring.
+			// Note we send labels by id as it will have less problems in the query string.
 			$label_counters['labels_unread_total'] = 0;
 			foreach ($context['labels'] as $label)
 			{

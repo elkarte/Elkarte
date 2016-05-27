@@ -148,8 +148,8 @@ class OpenID_Controller extends Action_Controller
 
 				$controller = new Register_Controller(new Event_Manager());
 				$controller->pre_dispatch();
-
-				return $controller->do_register(true);
+				$controller->do_register(true);
+				return null;
 			}
 			else
 				redirectexit('action=register');

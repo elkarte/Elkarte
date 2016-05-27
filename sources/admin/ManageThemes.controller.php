@@ -1133,7 +1133,7 @@ class ManageThemes_Controller extends Action_Controller
 				'name' => getThemeName($this->_req->query->theme_id),
 			);
 
-			return;
+			return null;
 		}
 
 		// How are we going to install this theme, from a dir, zip, copy of default?

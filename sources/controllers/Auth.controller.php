@@ -674,7 +674,7 @@ class Auth_Controller extends Action_Controller
  * What it does:
  * is_activated value key is as follows:
  * - > 10 Banned with activation status as value - 10
- * - 5 = Awaiting COPPA concent
+ * - 5 = Awaiting COPPA consent
  * - 4 = Awaiting Deletion approval
  * - 3 = Awaiting Admin approval
  * - 2 = Awaiting reactivation from email change
@@ -833,7 +833,7 @@ function phpBB3_password_check($passwd, $passwd_hash)
 {
 	// Too long or too short?
 	if (strlen($passwd_hash) != 34)
-		return;
+		return false;
 
 	// Range of characters allowed.
 	$range = './0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz';

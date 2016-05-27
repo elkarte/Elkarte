@@ -47,7 +47,7 @@ class Curl_Fetch_Webdata
 		CURLOPT_RETURNTRANSFER	=> 1, // Get returned value as a string (don't output it)
 		CURLOPT_HEADER			=> 1, // We need the headers to do our own redirect
 		CURLOPT_FOLLOWLOCATION	=> 0, // Don't follow, we will do it ourselves so safe mode and open_basedir will dig it
-		CURLOPT_USERAGENT		=> 'Mozilla/5.0 (compatible; MSIE 9.0; Windows NT 6.1; Trident/5.0)', // set a normal looking useragent
+		CURLOPT_USERAGENT		=> 'Mozilla/5.0 (compatible; MSIE 9.0; Windows NT 6.1; Trident/5.0)', // set a normal looking user agent
 		CURLOPT_CONNECTTIMEOUT	=> 10, // Don't wait forever on a connection
 		CURLOPT_TIMEOUT			=> 10, // A page should load in this amount of time
 		CURLOPT_MAXREDIRS		=> 3, // stop after this many redirects
@@ -199,6 +199,8 @@ class Curl_Fetch_Webdata
 			$header_location = $this->_getRedirectURL($url, $this->_headers['location']);
 			$this->_redirect($header_location, $url);
 		}
+
+		return true;
 	}
 
 	/**
@@ -298,6 +300,8 @@ class Curl_Fetch_Webdata
 	 * What it does:
 	 * - Overwrites our default values with user supplied ones or appends new user ones to what we have
 	 * - Sets the callback function now that $this exists
+	 *
+	 * @uses _headerCallback()
 	 */
 	private function _setOptions()
 	{

@@ -42,6 +42,8 @@ class MessageIndex_Controller extends Action_Controller implements Frontpage_Int
 	 */
 	public static function frontPageOptions()
 	{
+		parent::frontPageOptions();
+
 		addInlineJavascript('
 			$(\'#front_page\').on(\'change\', function() {
 				var $base = $(\'#message_index_frontpage\').parent();
@@ -65,6 +67,7 @@ class MessageIndex_Controller extends Action_Controller implements Frontpage_Int
 	 */
 	public static function validateFrontPageOptions($post)
 	{
+		parent::validateFrontPageOptions($post);
 		$boards = self::_getBoardsList();
 
 		if (empty($post->message_index_frontpage) || !isset($boards[$post->message_index_frontpage]))
@@ -574,6 +577,7 @@ class MessageIndex_Controller extends Action_Controller implements Frontpage_Int
 
 		// Validate each action.
 		$all_actions = array();
+		$action = '';
 		foreach ($actions as $topic => $action)
 		{
 			if (in_array($action, $possibleActions))
@@ -602,16 +606,41 @@ class MessageIndex_Controller extends Action_Controller implements Frontpage_Int
 				{
 					// Don't allow them to act on unapproved posts they can't see...
 					if ($modSettings['postmod_active'] && !$row['approved'] && !in_array(0, $boards_can['approve_posts']) && !in_array($row['id_board'], $boards_can['approve_posts']))
+					{
 						continue;
+					}
 					// Goodness, this is fun.  We need to validate the action.
-					elseif ($all_actions[$row['id_topic']] === 'sticky' && !in_array(0, $boards_can['make_sticky']) && !in_array($row['id_board'], $boards_can['make_sticky']))
+					elseif ($all_actions[$row['id_topic']] === 'sticky'
+						&& !in_array(0, $boards_can['make_sticky'])
+						&& !in_array($row['id_board'], $boards_can['make_sticky']))
+					{
 						continue;
-					elseif ($all_actions[$row['id_topic']] === 'move' && !in_array(0, $boards_can['move_any']) && !in_array($row['id_board'], $boards_can['move_any']) && ($row['id_member_started'] != $user_info['id'] || (!in_array(0, $boards_can['move_own']) && !in_array($row['id_board'], $boards_can['move_own']))))
+					}
+					elseif ($all_actions[$row['id_topic']] === 'move'
+						&& !in_array(0, $boards_can['move_any'])
+						&& !in_array($row['id_board'], $boards_can['move_any'])
+						&& ($row['id_member_started'] != $user_info['id']
+							|| (!in_array(0, $boards_can['move_own']) && !in_array($row['id_board'], $boards_can['move_own']))))
+					{
 						continue;
-					elseif ($all_actions[$row['id_topic']] === 'remove' && !in_array(0, $boards_can['remove_any']) && !in_array($row['id_board'], $boards_can['remove_any']) && ($row['id_member_started'] != $user_info['id'] || (!in_array(0, $boards_can['remove_own']) && !in_array($row['id_board'], $boards_can['remove_own']))))
+					}
+					elseif ($all_actions[$row['id_topic']] === 'remove'
+						&& !in_array(0, $boards_can['remove_any'])
+						&& !in_array($row['id_board'], $boards_can['remove_any'])
+						&& ($row['id_member_started'] != $user_info['id']
+							|| (!in_array(0, $boards_can['remove_own']) && !in_array($row['id_board'], $boards_can['remove_own']))))
+					{
 						continue;
-					elseif ($all_actions[$row['id_topic']] === 'lock' && !in_array(0, $boards_can['lock_any']) && !in_array($row['id_board'], $boards_can['lock_any']) && ($row['id_member_started'] != $user_info['id'] || $row['locked'] == 1 || (!in_array(0, $boards_can['lock_own']) && !in_array($row['id_board'], $boards_can['lock_own']))))
+					}
+					elseif ($all_actions[$row['id_topic']] === 'lock'
+						&& !in_array(0, $boards_can['lock_any'])
+						&& !in_array($row['id_board'], $boards_can['lock_any'])
+						&& ($row['id_member_started'] != $user_info['id']
+							|| $row['locked'] == 1
+							|| (!in_array(0, $boards_can['lock_own']) && !in_array($row['id_board'], $boards_can['lock_own']))))
+					{
 						continue;
+					}
 				}
 
 				// Separate the actions.

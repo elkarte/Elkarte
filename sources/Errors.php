@@ -198,6 +198,7 @@ function fatal_lang_error($error, $log = 'general', $sprintf = array())
 		Template_Layers::getInstance()->isError();
 
 	$reload_lang_file = true;
+	$error_message = '';
 
 	// Log the error in the forum's language, but don't waste the time if we aren't logging
 	if ($log || (!empty($modSettings['enableErrorLogging']) && $modSettings['enableErrorLogging'] == 2))

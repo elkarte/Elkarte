@@ -235,6 +235,7 @@ class Mentions_Controller extends Action_Controller
 							global $settings, $scripturl;
 
 							if (isset($settings['mentions']['mentioner_template']))
+							{
 								return str_replace(
 									array(
 										'{avatar_img}',
@@ -247,6 +248,9 @@ class Mentions_Controller extends Action_Controller
 										$row['mentioner'],
 									),
 									$settings['mentions']['mentioner_template']);
+							}
+
+							return '';
 						},
 					),
 					'sort' => array(

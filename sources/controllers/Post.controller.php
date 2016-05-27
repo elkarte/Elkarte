@@ -469,8 +469,8 @@ class Post_Controller extends Action_Controller
 			$this->_form_subject = $message['message']['subject'];
 			$this->_form_message = un_preparsecode($message['message']['body']);
 
-			$this->_form_message = censorText($this->_form_message);
-			$this->_form_subject = censorText($this->_form_subject);
+			$this->_form_message = censor($this->_form_message);
+			$this->_form_subject = censor($this->_form_subject);
 
 			// Check the boxes that should be checked.
 			$context['use_smileys'] = !empty($message['message']['smileys_enabled']);

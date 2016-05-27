@@ -33,7 +33,7 @@ if (!defined('ELK'))
  */
 function validateSession($type = 'admin')
 {
-	global $modSettings, $user_info, $user_settings;
+	global $modSettings, $user_settings;
 
 	// Guests are not welcome here.
 	is_not_guest();

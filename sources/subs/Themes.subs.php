@@ -321,7 +321,7 @@ function loadThemesAffected($id)
  */
 function get_file_listing($path, $relative)
 {
-	global $scripturl, $txt, $context;
+	global $scripturl, $context;
 
 	// Only files with these extensions will be deemed editable
 	$editable = 'php|pl|css|js|vbs|xml|xslt|txt|xsl|html|htm|shtm|shtml|asp|aspx|cgi|py';

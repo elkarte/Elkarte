@@ -782,7 +782,7 @@ function addSeparator($title = '', $custom_table = null)
 
 	// No tables - return?
 	if (empty($context['table_count']))
-		return;
+		return false;
 
 	// Specific table?
 	if ($custom_table !== null && !isset($context['tables'][$custom_table]))

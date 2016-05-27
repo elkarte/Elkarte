@@ -34,6 +34,8 @@ class AdminLog_Controller extends Action_Controller
 	/**
 	 * This method decides which log to load.
 	 * Accessed by ?action=admin;area=logs
+	 *
+	 * @uses _initPruningSettingsForm
 	 */
 	public function action_index()
 	{

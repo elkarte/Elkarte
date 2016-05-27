@@ -1804,7 +1804,9 @@ function loadTemplate($template_name, $style_sheets = array(), $fatal = true)
  */
 function loadSubTemplate($sub_template_name, $fatal = false)
 {
-	return Templates::getInstance()->loadSubTemplate($sub_template_name, $fatal);
+	Templates::getInstance()->loadSubTemplate($sub_template_name, $fatal);
+
+	return true;
 }
 
 /**
@@ -2539,7 +2541,7 @@ function detectServer()
 
 /**
  * Returns if a webserver is of type server (apache, nginx, etc)
- * 
+ *
  * @param $server
  *
  * @return bool

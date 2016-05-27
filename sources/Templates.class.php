@@ -17,46 +17,55 @@
 
 /**
  * Class Templates
+ *
+ * This class loads and processes template files and sheets.
  */
 class Templates
 {
 	protected static $instance = null;
 
+	/**
+	 * Template directory's that we will be searching for the sheets
+	 * @var array
+	 */
 	public $dirs = array();
+
+	/**
+	 * Template sheets that have not loaded
+	 * @var array
+	 */
 	protected $delayed = array();
+
+	/**
+	 * Holds the file that are in the include list
+	 * @var array
+	 */
 	protected $templates = array();
+
+	/**
+	 * Tracks if the default index.css has been loaded
+	 * @var bool
+	 */
 	protected $default_loaded = false;
 
-	public static function getInstance()
-	{
-		if (self::$instance === null)
-		{
-			self::$instance = new Templates;
-		}
-
-		return self::$instance;
-	}
-
+	/**
+	 * Templates constructor.
+	 */
 	protected function __construct()
 	{
 		// We want to be able to figure out any errors...
 		@ini_set('track_errors', '1');
 	}
 
-	public function setDirectories(array $dirs)
-	{
-		$this->dirs = $dirs;
-	}
-
 	/**
 	 * Load a template - if the theme doesn't include it, use the default.
 	 *
 	 * What it does:
-	 * - loads a template file with the name template_name from the current, default, or base theme.
-	 * - detects a wrong default theme directory and tries to work around it.
-	 * - can be used to only load style sheets by using false as the template name
+	 * - Loads a template file with the name template_name from the current, default, or base theme.
+	 * - Detects a wrong default theme directory and tries to work around it.
+	 * - Can be used to only load style sheets by using false as the template name
 	 *   loading of style sheets with this function is deprecated, use loadCSSFile instead
-	 * - if $this->dirs is empty, it delays the loading of the template
+	 * - If $this->dirs is empty, it delays the loading of the template
 	 *
 	 * @uses $this->requireTemplate() to actually load the file.
 	 *
@@ -98,10 +107,10 @@ class Templates
 	 * <b>Internal function! Do not use it, use loadTemplate instead</b>
 	 *
 	 * What it does:
-	 * - loads a template file with the name template_name from the current, default, or base theme.
-	 * - detects a wrong default theme directory and tries to work around it.
-	 * - can be used to only load style sheets by using false as the template name
-	 *   loading of style sheets with this function is deprecated, use loadCSSFile instead
+	 * - Loads a template file with the name template_name from the current, default, or base theme.
+	 * - Detects a wrong default theme directory and tries to work around it.
+	 * - Can be used to only load style sheets by using false as the template name
+	 *  loading of style sheets with this function is deprecated, use loadCSSFile instead
 	 *
 	 * @uses $this->templateInclude() to include the file.
 	 *
@@ -139,6 +148,7 @@ class Templates
 					$sheets[] = $context['theme_variant'] . '/admin' . $context['theme_variant'] . '.css';
 				}
 			}
+
 			loadCSSFile($sheets);
 		}
 
@@ -149,6 +159,7 @@ class Templates
 		}
 
 		$loaded = false;
+		$template_dir = '';
 		foreach ($this->dirs as $template_dir)
 		{
 			if (file_exists($template_dir . '/' . $template_name . '.template.php'))
@@ -193,7 +204,7 @@ class Templates
 			loadTemplate($template_name);
 		}
 		// Cause an error otherwise.
-		elseif ($template_name != 'Errors' && $template_name != 'index' && $fatal)
+		elseif ($template_name !== 'Errors' && $template_name !== 'index' && $fatal)
 		{
 			Errors::instance()->fatal_lang_error('theme_template_error', 'template', array((string) $template_name));
 		}
@@ -205,56 +216,18 @@ class Templates
 		{
 			return false;
 		}
-	}
 
-	/**
-	 * Load a sub-template.
-	 *
-	 * What it does:
-	 * - loads the sub template specified by sub_template_name, which must be in an already-loaded template.
-	 * - if ?debug is in the query string, shows administrators a marker after every sub template
-	 * for debugging purposes.
-	 *
-	 * @todo get rid of reading $_REQUEST directly
-	 *
-	 * @param string $sub_template_name
-	 * @param bool|string $fatal = false, $fatal = true is for templates that
-	 *                 shouldn't get a 'pretty' error screen 'ignore' to skip
-	 */
-	public function loadSubTemplate($sub_template_name, $fatal = false)
-	{
-		global $txt, $db_show_debug;
-
-		if ($db_show_debug === true)
-		{
-			Debug::get()->add('sub_templates', $sub_template_name);
-		}
-
-		// Figure out what the template function is named.
-		$theme_function = 'template_' . $sub_template_name;
-
-		if (function_exists($theme_function))
-		{
-			$theme_function();
-		}
-		elseif ($fatal === false)
-		{
-			Errors::instance()->fatal_lang_error('theme_template_error', 'template', array((string) $sub_template_name));
-		}
-		elseif ($fatal !== 'ignore')
-		{
-			die(Errors::instance()->log_error(sprintf(isset($txt['theme_template_error']) ? $txt['theme_template_error'] : 'Unable to load the %s sub template!', (string) $sub_template_name), 'template'));
-		}
+		return true;
 	}
 
 	/**
 	 * Load the template/language file using eval or require? (with eval we can show an error message!)
 	 *
 	 * What it does:
-	 * - loads the template or language file specified by filename.
-	 * - uses eval unless disableTemplateEval is enabled.
-	 * - outputs a parse error if the file did not exist or contained errors.
-	 * - attempts to detect the error and line, and show detailed information.
+	 * - Loads the template or language file specified by filename.
+	 * - Uses eval unless disableTemplateEval is enabled.
+	 * - Outputs a parse error if the file did not exist or contained errors.
+	 * - Attempts to detect the error and line, and show detailed information.
 	 *
 	 * @param string $filename
 	 * @param bool $once = false, if true only includes the file once (like include_once)
@@ -294,6 +267,11 @@ class Templates
 		}
 	}
 
+	/**
+	 * Displays an error when a template is not found or has syntax errors preventing its loading
+	 *
+	 * @param string $filename
+	 */
 	protected function templateNotFound($filename)
 	{
 		global $context, $txt, $scripturl, $modSettings, $boardurl;
@@ -492,13 +470,51 @@ class Templates
 		die;
 	}
 
-	public function addDirectory($dir)
+	/**
+	 * Load a sub-template.
+	 *
+	 * What it does:
+	 * - loads the sub template specified by sub_template_name, which must be in an already-loaded template.
+	 * - if ?debug is in the query string, shows administrators a marker after every sub template
+	 * for debugging purposes.
+	 *
+	 * @todo get rid of reading $_REQUEST directly
+	 *
+	 * @param string $sub_template_name
+	 * @param bool|string $fatal = false, $fatal = true is for templates that
+	 *   shouldn't get a 'pretty' error screen 'ignore' to skip
+	 */
+	public function loadSubTemplate($sub_template_name, $fatal = false)
 	{
-		$this->dirs[] = (string) $dir;
+		global $txt, $db_show_debug;
 
-		return $this;
+		if ($db_show_debug === true)
+		{
+			Debug::get()->add('sub_templates', $sub_template_name);
+		}
+
+		// Figure out what the template function is named.
+		$theme_function = 'template_' . $sub_template_name;
+
+		if (function_exists($theme_function))
+		{
+			$theme_function();
+		}
+		elseif ($fatal === false)
+		{
+			Errors::instance()->fatal_lang_error('theme_template_error', 'template', array((string) $sub_template_name));
+		}
+		elseif ($fatal !== 'ignore')
+		{
+			die(Errors::instance()->log_error(sprintf(isset($txt['theme_template_error']) ? $txt['theme_template_error'] : 'Unable to load the %s sub template!', (string) $sub_template_name), 'template'));
+		}
 	}
 
+	/**
+	 * Reloads the directory stack/queue to ensure they are searched in the proper order
+	 *
+	 * @param array $settings
+	 */
 	public function reloadDirectories(array $settings)
 	{
 		$this->dirs = array();
@@ -521,18 +537,73 @@ class Templates
 		}
 	}
 
+	/**
+	 * Add a template directory to the search stack
+	 *
+	 * @param string $dir
+	 *
+	 * @return $this
+	 */
+	public function addDirectory($dir)
+	{
+		$this->dirs[] = (string) $dir;
+
+		return $this;
+	}
+
+	/**
+	 * Sets the directory array in to the class
+	 *
+	 * @param array $dirs
+	 */
+	public function setDirectories(array $dirs)
+	{
+		$this->dirs = $dirs;
+	}
+
+	/**
+	 * Returns if theme directory's have been loaded
+	 *
+	 * @return bool
+	 */
 	public function hasDirectories()
 	{
 		return !empty($this->dirs);
 	}
 
+	/**
+	 * Return the directory's that have been loaded
+	 *
+	 * @return array
+	 */
 	public function getTemplateDirectories()
 	{
 		return $this->dirs;
 	}
 
+	/**
+	 * Return the template sheet stack
+	 *
+	 * @return array
+	 */
 	public function getIncludedTemplates()
 	{
 		return $this->templates;
+	}
+
+	/**
+	 * Find and return Templates instance if it exists,
+	 * or create a new instance
+	 *
+	 * @return Templates
+	 */
+	public static function getInstance()
+	{
+		if (self::$instance === null)
+		{
+			self::$instance = new Templates;
+		}
+
+		return self::$instance;
 	}
 }

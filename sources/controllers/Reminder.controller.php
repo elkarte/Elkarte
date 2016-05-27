@@ -150,7 +150,7 @@ class Reminder_Controller extends Action_Controller
 			$context['sub_template'] = 'sent';
 
 			// Don't really.
-			return;
+			return null;
 		}
 		// Otherwise are ready to answer the question?
 		elseif (isset($this->_req->post->reminder_type) && $this->_req->post->reminder_type === 'secret')
