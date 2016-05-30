@@ -307,7 +307,7 @@ class Codes
 			array(
 				self::ATTR_TAG => 'anchor',
 				self::ATTR_TYPE => self::TYPE_UNPARSED_EQUALS,
-				self::ATTR_TEST => '[#]?([A-Za-z][A-Za-z0-9_\-]*)$',
+				self::ATTR_TEST => '[#]?([A-Za-z][A-Za-z0-9_\-]*)',
 				self::ATTR_BEFORE => '<span id="post_$1">',
 				self::ATTR_AFTER => '</span>',
 				self::ATTR_BLOCK_LEVEL => false,
@@ -416,7 +416,7 @@ class Codes
 			array(
 				self::ATTR_TAG => 'font',
 				self::ATTR_TYPE => self::TYPE_UNPARSED_EQUALS,
-				self::ATTR_TEST => '[A-Za-z0-9_,\-\s]+?\]',
+				self::ATTR_TEST => '[A-Za-z0-9_,\-\s]+?',
 				self::ATTR_BEFORE => '<span style="font-family: $1;" class="bbc_font">',
 				self::ATTR_AFTER => '</span>',
 				self::ATTR_BLOCK_LEVEL => false,
@@ -714,7 +714,7 @@ class Codes
 			array(
 				self::ATTR_TAG => 'size',
 				self::ATTR_TYPE => self::TYPE_UNPARSED_EQUALS,
-				self::ATTR_TEST => '[1-7]{1}$',
+				self::ATTR_TEST => '[1-7]{1}',
 				self::ATTR_BEFORE => '<span style="font-size: $1;" class="bbc_size">',
 				self::ATTR_AFTER => '</span>',
 				self::ATTR_VALIDATE => function(&$tag, &$data, $disabled) {
