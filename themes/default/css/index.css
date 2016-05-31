@@ -5512,7 +5512,7 @@ a.help .icon {
 	.icon-menu {
 		display: inline-block;
 		margin: .1em;
-		padding: .1em;
+		padding: .5em;
 		border: .25em solid;
 		border-radius: .25em;
 		vertical-align: middle;
