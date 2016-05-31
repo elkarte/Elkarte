@@ -287,7 +287,7 @@ input[type="submit"], button[type="submit"], input[type="button"],
 	padding: 0 .25em;
 }
 
-input[type="submit"], .drop_area_fileselect_text, button[type="submit"], input[type="button"],
+input[type="submit"], .drop_area_fileselect_text, .drop_area .mobile, button[type="submit"], input[type="button"],
 	/* Anchors styled to look like buttons. */
 	/* These have standard body text size. Can be chained with smalltext class. */
 .linkbutton:link, .linkbutton_right:link, .linkbutton_left:link,
@@ -3471,6 +3471,7 @@ ul.post_options li {
 	font-size: 1.643em;
 	opacity: 0.6;
 	border: dashed 1px;
+	position: relative;
 	-webkit-font-smoothing: antialiased;
 }
 
@@ -3491,6 +3492,10 @@ ul.post_options li {
 .drop_area_fileselect_text {
 	padding: 0 4px;
 	white-space: nowrap;
+}
+
+.drop_area .mobile {
+	display: none;
 }
 
 .progress_tracker {
@@ -5950,6 +5955,29 @@ a.help .icon {
 	.postarea {
 		display: block;
 		margin: 0;
+	}
+
+	.drop_area .mobile .drop_area_fileselect_text {
+		padding-top: 1em;
+		padding-bottom: 1em;
+		width: 100%;
+		display: inline-block;
+	}
+
+	.drop_area .mobile {
+		display: inline-block;
+		width: 80%;
+		border: none;
+	}
+
+	.drop_area_fileselect {
+		width: 100%;
+		top: 0;
+		left: 0;
+		height: 100% !important;
+	}
+	.drop_area .desktop {
+		display: none;
 	}
 
 	#forumposts .content {

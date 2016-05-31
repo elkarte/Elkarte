@@ -699,7 +699,7 @@ class BBCParser
 	 */
 	protected function handleTest(array $possible)
 	{
-		return preg_match('~^' . $possible[Codes::ATTR_TEST] . '~', substr($this->message, $this->pos + 2 + $possible[Codes::ATTR_LENGTH], strpos($this->message, ']', $this->pos) - ($this->pos + 2 + $possible[Codes::ATTR_LENGTH]))) === 0;
+		return preg_match('~^' . $possible[Codes::ATTR_TEST] . '\]$~', substr($this->message, $this->pos + 2 + $possible[Codes::ATTR_LENGTH], strpos($this->message, ']', $this->pos) - ($this->pos + 1 + $possible[Codes::ATTR_LENGTH]))) === 0;
 	}
 
 	/**
