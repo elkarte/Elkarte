@@ -93,24 +93,79 @@ class TestBBC extends PHPUnit_Framework_TestCase
 				'<a href="mailto:anything" class="bbc_email">some text</a>',
 			),
 			array(
-				'Named links',
-				'[url=http://www.elkarte.net/]ElkArte[/url]',
-				'<a href="http://www.elkarte.net/" class="bbc_link" target="_blank">ElkArte</a>',
+				'Footnote',
+				'footnote[footnote]footnote[/footnote]',
+				'footnote<sup class="bbc_footnotes"><a class="target" href="#fn1_0" id="ref1_0">[1]</a></sup><div class="bbc_footnotes"><div class="target" id="fn1_0"><sup>1&nbsp;</sup>footnote<a class="footnote_return" href="#ref1_0">&crarr;</a></div></div>',
 			),
 			array(
-				'URL link',
-				'http://www.elkarte.net/',
-				'<a href="http://www.elkarte.net/" class="bbc_link" target="_blank">http://www.elkarte.net/</a>',
+				'Font parsed',
+				'[font=whatever]test[/font]',
+				'<span style="font-family: whatever;" class="bbc_font">test</span>',
+			),
+			array(
+				'HR',
+				'Some[hr]text',
+				'Some<hr />text',
+			),
+			array(
+				'Test italic',
+				'[i]Italic[/i]',
+				'<em>Italic</em>',
+			),
+			array(
+				'Test img 1',
+				'[img]http://adomain.tld/an_image.png[/img]',
+				'<img src="http://adomain.tld/an_image.png" alt="" class="bbc_img" />',
+			),
+			array(
+				'Test img 2',
+				'[img]adomain.tld/an_image.png[/img]',
+				'<img src="http://adomain.tld/an_image.png" alt="" class="bbc_img" />',
+			),
+			array(
+				'Test img 3',
+				'[img width=100]http://adomain.tld/an_image.png[/img]',
+				'<img src="http://adomain.tld/an_image.png" alt="" style="width:100%;max-width:100px;" class="bbc_img resized" />',
+			),
+			array(
+				'Test img 4',
+				'[img height=100]http://adomain.tld/an_image.png[/img]',
+				'<img src="http://adomain.tld/an_image.png" alt="" style="max-height:100px;" class="bbc_img resized" />',
+			),
+			array(
+				'Test img 5',
+				'[img height=100 width=150]http://adomain.tld/an_image.png[/img]',
+				'<img src="http://adomain.tld/an_image.png" alt="" style="width:100%;max-width:150px;max-height:100px;" class="bbc_img resized" />',
+			),
+			array(
+				'Test img 6',
+				'[img alt=some text height=100 width=150]http://adomain.tld/an_image.png[/img]',
+				'<img src="http://adomain.tld/an_image.png" alt="some text" style="width:100%;max-width:150px;max-height:100px;" class="bbc_img resized" />',
+			),
+			array(
+				'Test img 7',
+				'[img width=150 height=100 alt=some text]http://adomain.tld/an_image.png[/img]',
+				'<img src="http://adomain.tld/an_image.png" alt="some text" style="width:100%;max-width:150px;max-height:100px;" class="bbc_img resized" />',
+			),
+			array(
+				'Unnamed iurl links',
+				'[iurl=http://www.elkarte.net/]ElkArte[/iurl]',
+				'<a href="http://www.elkarte.net/" class="bbc_link">ElkArte</a>',
+			),
+			array(
+				'Named iurl links',
+				'[iurl=http://www.elkarte.net/]ElkArte[/iurl]',
+				'<a href="http://www.elkarte.net/" class="bbc_link">ElkArte</a>',
+			),
+			array(
+				'Left tag',
+				'[left]ElkArte[/left]',
+				'<div style="text-align: left;">ElkArte</div>',
 			),
 			array(
 				'Lists',
 				'[list][li]item[/li][li][list][li]sub item[/li][/list][/li][li]item[/li][/list]',
 				'<ul class="bbc_list"><li>item</li><li><ul class="bbc_list"><li>sub item</li></ul></li><li>item</li></ul>',
-			),
-			array(
-				'Tables',
-				'[table][tr][td][table][tr][td]test[/td][/tr][/table][/td][/tr][/table]',
-				'<div class="bbc_table_container"><table class="bbc_table"><tr><td><div class="bbc_table_container"><table class="bbc_table"><tr><td>test</td></tr></table></div></td></tr></table></div>',
 			),
 			array(
 				'Normal list',
@@ -123,19 +178,29 @@ class TestBBC extends PHPUnit_Framework_TestCase
 				'<ul class="bbc_list" style="list-style-type: decimal;"><li>test</li></ul>',
 			),
 			array(
-				'Footnote',
-				'footnote[footnote]footnote[/footnote]',
-				'footnote<sup class="bbc_footnotes"><a class="target" href="#fn1_0" id="ref1_0">[1]</a></sup><div class="bbc_footnotes"><div class="target" id="fn1_0"><sup>1&nbsp;</sup>footnote<a class="footnote_return" href="#ref1_0">&crarr;</a></div></div>',
-			),
-			array(
-				'Font parsed',
-				'[font=whatever]test[/font]',
-				'<span style="font-family: whatever;" class="bbc_font">test</span>',
+				'/me',
+				'[me=member name]text[/me]',
+				'<div class="meaction">&nbsp;member name text</div>',
 			),
 			array(
 				'Member',
 				'[member=10]Name[/member]',
 				'<span class="bbc_mention"><a href="http://127.0.0.1/index.php?action=profile;u=10">@Name</a></span>',
+			),
+			array(
+				'Named links',
+				'[url=http://www.elkarte.net/]ElkArte[/url]',
+				'<a href="http://www.elkarte.net/" class="bbc_link" target="_blank">ElkArte</a>',
+			),
+			array(
+				'URL link',
+				'http://www.elkarte.net/',
+				'<a href="http://www.elkarte.net/" class="bbc_link" target="_blank">http://www.elkarte.net/</a>',
+			),
+			array(
+				'Tables',
+				'[table][tr][td][table][tr][td]test[/td][/tr][/table][/td][/tr][/table]',
+				'<div class="bbc_table_container"><table class="bbc_table"><tr><td><div class="bbc_table_container"><table class="bbc_table"><tr><td>test</td></tr></table></div></td></tr></table></div>',
 			),
 		);
 
