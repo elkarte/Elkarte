@@ -58,7 +58,7 @@ abstract class AbstractModel
 	 */
 	protected function _loadModsettings($name = '', $default = null)
 	{
-		if (!empty($this->_modSettings->{$name}))
+		if (isset($this->_modSettings->{$name}))
 		{
 			return $this->_modSettings->{$name};
 		}
