@@ -139,7 +139,7 @@ class TestBBC extends PHPUnit_Framework_TestCase
 			),
 			array(
 				'Test img 6',
-				'[img alt=some text height=100 width=150]http://adomain.tld/an_image.png[/img]',
+				'[img alt=some text width=150 height=100]http://adomain.tld/an_image.png[/img]',
 				'<img src="http://adomain.tld/an_image.png" alt="some text" style="width:100%;max-width:150px;max-height:100px;" class="bbc_img resized" />',
 			),
 			array(
