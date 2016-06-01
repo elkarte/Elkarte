@@ -596,7 +596,7 @@ class Codes
 			array(
 				self::ATTR_TAG => 'member',
 				self::ATTR_TYPE => self::TYPE_UNPARSED_EQUALS,
-				self::ATTR_TEST => '[\d*]',
+				self::ATTR_TEST => '\d*',
 				self::ATTR_BEFORE => '<span class="bbc_mention"><a href="' . $scripturl . '?action=profile;u=$1">@',
 				self::ATTR_AFTER => '</a></span>',
 				self::ATTR_DISABLED_BEFORE => '@',
