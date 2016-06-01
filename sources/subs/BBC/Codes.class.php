@@ -296,7 +296,7 @@ class Codes
 			array(
 				self::ATTR_TAG => 'abbr',
 				self::ATTR_TYPE => self::TYPE_UNPARSED_EQUALS,
-				self::ATTR_TEST => '([A-Za-z][A-Za-z0-9_\-]*)',
+				self::ATTR_TEST => '([A-Za-z][A-Za-z0-9_\-\s]*)',
 				self::ATTR_BEFORE => '<abbr title="$1">',
 				self::ATTR_AFTER => '</abbr>',
 				self::ATTR_QUOTED => self::OPTIONAL,
