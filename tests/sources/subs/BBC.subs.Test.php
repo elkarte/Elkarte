@@ -77,6 +77,11 @@ class TestBBC extends PHPUnit_Framework_TestCase
 				'[font=whatever]test[/font]',
 				'<span style="font-family: whatever;" class="bbc_font">test</span>',
 			),
+			array(
+				'Member',
+				'[member=10]Name[/member]',
+				'<span class="bbc_mention"><a href="http://127.0.0.1/index.php?action=profile;u=10">@Name</a></span>',
+			),
 		);
 
 		// These are bbc that will not be converted to an html tag
