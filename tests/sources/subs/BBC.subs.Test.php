@@ -50,12 +50,12 @@ class TestBBC extends PHPUnit_Framework_TestCase
 			array(
 				'Unparsed code',
 				'[code]This is some code[/code]',
-				'<div class="codeheader">Code: <a href="javascript:void(0);" onclick="return elkSelectText(this);" class="codeoperation">Select</a></div><pre class="bbc_code prettyprint">This is some code</pre>',
+				'<div class="codeheader">Code: <a href="#" onclick="return elkSelectText(this);" class="codeoperation">[Select]</a></div><pre class="bbc_code prettyprint">This is some code</pre>',
 			),
 			array(
 				'Unparsed equals code',
 				'[code=unparsed text]This is some code[/code]',
-				'<div class="codeheader">Code: : (unparsed text) <a href="javascript:void(0);" onclick="return elkSelectText(this);" class="codeoperation">Select</a></div><pre class="bbc_code prettyprint">This is some code</pre>',
+				'<div class="codeheader">Code: (unparsed text) <a href="#" onclick="return elkSelectText(this);" class="codeoperation">[Select]</a></div><pre class="bbc_code prettyprint">This is some code</pre>',
 			),
 			array(
 				'Coloring 1',
