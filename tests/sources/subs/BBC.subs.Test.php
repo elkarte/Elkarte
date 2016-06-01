@@ -188,6 +188,141 @@ class TestBBC extends PHPUnit_Framework_TestCase
 				'<span class="bbc_mention"><a href="http://127.0.0.1/index.php?action=profile;u=10">@Name</a></span>',
 			),
 			array(
+				'nobbc',
+				'[nobbc][code]this is a code-block in a nobbc[/code][/nobbc]',
+				'[code]this is a code-block in a nobbc[/code]',
+			),
+			array(
+				'pre',
+				'[pre]this is a pre-block[/pre]',
+				'<pre class="bbc_pre">this is a pre-block</pre>',
+			),
+			array(
+				'Right tag',
+				'[right]ElkArte[/right]',
+				'<div style="text-align: right;">ElkArte</div>',
+			),
+			array(
+				'Strike',
+				'[s]ElkArte[/s]',
+				'<del>ElkArte</del>',
+			),
+			array(
+				'Sizes 1',
+				'[size=1]ElkArte[/size]',
+				'<span style="font-size: 0.7em;" class="bbc_size">ElkArte</span>',
+			),
+			array(
+				'Sizes 2',
+				'[size=7]ElkArte[/size]',
+				'<span style="font-size: 3.95em;" class="bbc_size">ElkArte</span>',
+			),
+			array(
+				'Sizes 3',
+				'[size=7px]ElkArte[/size]',
+				'<span style="font-size: 7px;" class="bbc_size">ElkArte</span>',
+			),
+			array(
+				'Sizes 4',
+				'[size=71px]ElkArte[/size]',
+				'<span style="font-size: 71px;" class="bbc_size">ElkArte</span>',
+			),
+			array(
+				'Sizes 3',
+				'[size=7pt]ElkArte[/size]',
+				'<span style="font-size: 7pt;" class="bbc_size">ElkArte</span>',
+			),
+			array(
+				'Sizes 4',
+				'[size=71pt]ElkArte[/size]',
+				'<span style="font-size: 71pt;" class="bbc_size">ElkArte</span>',
+			),
+			array(
+				'Sizes 5',
+				'[size=small]ElkArte[/size]',
+				'<span style="font-size: small;" class="bbc_size">ElkArte</span>',
+			),
+			array(
+				'Sizes 6',
+				'[size=smaller]ElkArte[/size]',
+				'<span style="font-size: smaller;" class="bbc_size">ElkArte</span>',
+			),
+			array(
+				'Sizes 7',
+				'[size=large]ElkArte[/size]',
+				'<span style="font-size: large;" class="bbc_size">ElkArte</span>',
+			),
+			array(
+				'Sizes 8',
+				'[size=larger]ElkArte[/size]',
+				'<span style="font-size: larger;" class="bbc_size">ElkArte</span>',
+			),
+			array(
+				'Sizes 9',
+				'[size=x-small]ElkArte[/size]',
+				'<span style="font-size: x-small;" class="bbc_size">ElkArte</span>',
+			),
+			array(
+				'Sizes 10',
+				'[size=xx-small]ElkArte[/size]',
+				'<span style="font-size: xx-small;" class="bbc_size">ElkArte</span>',
+			),
+			array(
+				'Sizes 11',
+				'[size=x-large]ElkArte[/size]',
+				'<span style="font-size: x-large;" class="bbc_size">ElkArte</span>',
+			),
+			array(
+				'Sizes 12',
+				'[size=xx-large]ElkArte[/size]',
+				'<span style="font-size: xx-large;" class="bbc_size">ElkArte</span>',
+			),
+			array(
+				'Sizes 13',
+				'[size=medium]ElkArte[/size]',
+				'<span style="font-size: medium;" class="bbc_size">ElkArte</span>',
+			),
+			array(
+				'Sizes 13',
+				'[size=0.1em]ElkArte[/size]',
+				'<span style="font-size: 0.1em;" class="bbc_size">ElkArte</span>',
+			),
+			array(
+				'Sizes 13',
+				'[size=9.11em]ElkArte[/size]',
+				'<span style="font-size: 9.11em;" class="bbc_size">ElkArte</span>',
+			),
+			array(
+				'Shhhh spoiler!',
+				'[spoiler]ElkArte[/spoiler]',
+				'<span class="spoilerheader">Spoiler (click to show/hide)</span><div class="spoiler"><div class="bbc_spoiler" style="display: none;">ElkArte</div></div>',
+			),
+			array(
+				'Sub',
+				'[sub]ElkArte[/sub]',
+				'<sub>ElkArte</sub>',
+			),
+			array(
+				'Sup',
+				'[sup]ElkArte[/sup]',
+				'<sup>ElkArte</sup>',
+			),
+			array(
+				'Tables',
+				'[table][tr][td][table][tr][td]test[/td][/tr][/table][/td][/tr][/table]',
+				'<div class="bbc_table_container"><table class="bbc_table"><tr><td><div class="bbc_table_container"><table class="bbc_table"><tr><td>test</td></tr></table></div></td></tr></table></div>',
+			),
+			array(
+				'tt',
+				'[tt]ElkArte[/tt]',
+				'<span class="bbc_tt">ElkArte</span>',
+			),
+			array(
+				'Underline',
+				'[u]ElkArte[/u]',
+				'<span class="bbc_u">ElkArte</span>',
+			),
+			array(
 				'Named links',
 				'[url=http://www.elkarte.net/]ElkArte[/url]',
 				'<a href="http://www.elkarte.net/" class="bbc_link" target="_blank">ElkArte</a>',
@@ -196,11 +331,6 @@ class TestBBC extends PHPUnit_Framework_TestCase
 				'URL link',
 				'http://www.elkarte.net/',
 				'<a href="http://www.elkarte.net/" class="bbc_link" target="_blank">http://www.elkarte.net/</a>',
-			),
-			array(
-				'Tables',
-				'[table][tr][td][table][tr][td]test[/td][/tr][/table][/td][/tr][/table]',
-				'<div class="bbc_table_container"><table class="bbc_table"><tr><td><div class="bbc_table_container"><table class="bbc_table"><tr><td>test</td></tr></table></div></td></tr></table></div>',
 			),
 		);
 
@@ -246,6 +376,26 @@ class TestBBC extends PHPUnit_Framework_TestCase
 			array(
 				'Test font',
 				'[font=wha"t"ever]test[/font]',
+			),
+			array(
+				'Sizes 1',
+				'[size=8]ElkArte[/size]',
+			),
+			array(
+				'Sizes 2',
+				'[size=711px]ElkArte[/size]',
+			),
+			array(
+				'Sizes 3',
+				'[size=711pt]ElkArte[/size]',
+			),
+			array(
+				'Sizes 4',
+				'[size=anything]ElkArte[/size]',
+			),
+			array(
+				'Sizes 5',
+				'[size=91.11em]ElkArte[/size]',
 			),
 		);
 	}
