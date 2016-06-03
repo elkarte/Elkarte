@@ -986,7 +986,7 @@ class Data_Validator
 		if (!isset($input[$field]))
 			return;
 
-		if (!is_int($input[$field]))
+		if (filter_var($input[$field], FILTER_VALIDATE_INT) === false)
 		{
 			return array(
 				'field' => $field,
@@ -1011,7 +1011,7 @@ class Data_Validator
 		if (!isset($input[$field]))
 			return;
 
-		if (!is_bool($input[$field]))
+		if (filter_var($input[$field], FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE) === null)
 		{
 			return array(
 				'field' => $field,
@@ -1036,7 +1036,7 @@ class Data_Validator
 		if (!isset($input[$field]))
 			return;
 
-		if (!is_float($input[$field]))
+		if (filter_var($input[$field], FILTER_VALIDATE_FLOAT) === false)
 		{
 			return array(
 				'field' => $field,
@@ -1272,7 +1272,7 @@ class Data_Validator
 	}
 
 	/**
-	 * Uses Util::htmlspecialchars to sanitize any html in the input
+	 * Uses Util::htmlspecialchars to sanitize any html in the intput
 	 *
 	 * @param string $input
 	 * @param string|null $sanitation_parameters
