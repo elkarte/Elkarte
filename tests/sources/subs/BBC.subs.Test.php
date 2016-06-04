@@ -471,7 +471,7 @@ class TestBBC extends PHPUnit_Framework_TestCase
 
 			$result = parse_bbc($test);
 
-			$this->assertEquals($expected, $result);
+			$this->assertEquals($expected, $result, $name);
 		}
 
 		foreach ($this->bbcInvalidTestCases as $testcase)
@@ -481,7 +481,7 @@ class TestBBC extends PHPUnit_Framework_TestCase
 
 			$result = parse_bbc($test);
 
-			$this->assertEquals($test, $result);
+			$this->assertEquals($test, $result, $name);
 		}
 	}
 }
