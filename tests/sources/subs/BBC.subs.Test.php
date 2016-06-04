@@ -234,23 +234,23 @@ class TestBBC extends PHPUnit_Framework_TestCase
 			),
 			array(
 				'Quoting is a pain 7',
-				'[quote author=an author link=board=1 date=12345678]This is a quote[/quote]',
-				'<div class="quoteheader"><a href="http://127.0.0.1/index.php?board=1">Quote from: an author on ' . htmlTime(12345678) . '</div><blockquote class="bbc_standard_quote">This is a quote</blockquote>',
+				'[quote author=an author link=board=1;topic=123 date=12345678]This is a quote[/quote]',
+				'<div class="quoteheader"><a href="http://127.0.0.1/index.php?topic=123">Quote from: an author on ' . htmlTime(12345678) . '</a></div><blockquote class="bbc_standard_quote">This is a quote</blockquote>',
 			),
 			array(
 				'Quoting is a pain 8',
 				'[quote author=an author link=topic=123.msg123#msg123 date=12345678]This is a quote[/quote]',
-				'<div class="quoteheader"><a href="http://127.0.0.1/index.php?topic=123.msg123#msg123">Quote from: an author on ' . htmlTime(12345678) . '</div><blockquote class="bbc_standard_quote">This is a quote</blockquote>',
+				'<div class="quoteheader"><a href="http://127.0.0.1/index.php?topic=123.msg123#msg123">Quote from: an author on ' . htmlTime(12345678) . '</a></div><blockquote class="bbc_standard_quote">This is a quote</blockquote>',
 			),
 			array(
 				'Quoting is a pain 9',
 				'[quote author=an author link=threadid=123.msg123#msg123 date=12345678]This is a quote[/quote]',
-				'<div class="quoteheader"><a href="http://127.0.0.1/index.php?threadid=123.msg123#msg123">Quote from: an author on ' . htmlTime(12345678) . '</div><blockquote class="bbc_standard_quote">This is a quote</blockquote>',
+				'<div class="quoteheader"><a href="http://127.0.0.1/index.php?threadid=123.msg123#msg123">Quote from: an author on ' . htmlTime(12345678) . '</a></div><blockquote class="bbc_standard_quote">This is a quote</blockquote>',
 			),
 			array(
 				'Quoting is a pain 10',
 				'[quote author=an author link=action=profile;u=123 date=12345678]This is a quote[/quote]',
-				'<div class="quoteheader"><a href="http://127.0.0.1/index.php?action=profile;u=123">Quote from: an author on ' . htmlTime(12345678) . '</div><blockquote class="bbc_standard_quote">This is a quote</blockquote>',
+				'<div class="quoteheader"><a href="http://127.0.0.1/index.php?action=profile;u=123">Quote from: an author on ' . htmlTime(12345678) . '</a></div><blockquote class="bbc_standard_quote">This is a quote</blockquote>',
 			),
 			array(
 				'Right tag',
