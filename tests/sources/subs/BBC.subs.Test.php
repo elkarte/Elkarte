@@ -481,7 +481,7 @@ class TestBBC extends PHPUnit_Framework_TestCase
 
 		foreach ($this->bbcInvalidTestCases as $testcase)
 		{
-			$name = $testcase[0];
+			$name = 'Broken ' . $testcase[0];
 			$test = $testcase[1];
 
 			$result = parse_bbc($test);
