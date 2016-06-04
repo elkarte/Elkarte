@@ -11,6 +11,8 @@
  *
  */
 
+global $txt;
+
 // Lots of needs
 require_once(BOARDDIR . '/sources/database/Db.php');
 require_once(BOARDDIR . '/sources/database/Db-abstract.class.php');
@@ -97,6 +99,10 @@ Class Elk_Testing_Setup
 	 */
 	public function load_queries($sql_file)
 	{
+		global $txt;
+
+		require_once(BOARDDIR . '/themes/default/languages/english/Install.english.php');
+
 		$replaces = array(
 			'{$db_prefix}' => $this->_db_prefix,
 			'{BOARDDIR}' => BOARDDIR,
@@ -107,6 +113,13 @@ Class Elk_Testing_Setup
 			'{$current_time}' => time(),
 			'{$sched_task_offset}' => 82800 + mt_rand(0, 86399),
 		);
+
+		foreach ($txt as $key => $value)
+		{
+			if (substr($key, 0, 8) == 'default_')
+				$replaces['{$' . $key . '}'] = addslashes($value);
+		}
+		$replaces['{$default_reserved_names}'] = strtr($replaces['{$default_reserved_names}'], array('\\\\n' => '\\n'));
 
 		$this->_db->skip_error();
 		$db_wrapper = new DbWrapper($this->_db, $replaces);
