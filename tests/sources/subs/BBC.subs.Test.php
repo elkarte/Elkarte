@@ -214,7 +214,7 @@ class TestBBC extends PHPUnit_Framework_TestCase
 			),
 			array(
 				'Quoting is a pain 3',
-				'[quote author="quoted author"]This is a quote[/quote]',
+				'[quote author=&quot;quoted author&quot;]This is a quote[/quote]',
 				'<div class="quoteheader">Quote from: quoted author</div><blockquote class="bbc_standard_quote">This is a quote</blockquote>',
 			),
 			array(
