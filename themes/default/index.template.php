@@ -297,7 +297,7 @@ function template_th_login_bar()
 
 	if (!empty($modSettings['enableOpenID']))
 		echo '
-						<a class="icon icon-big icon-margin i-openid" href="', $scripturl, '?action=login;openid" title="' . $txt['openid'] . '"><s>' . $txt['openid'] . '"</s></a>';
+						<a class="icon icon-margin i-openid" href="', $scripturl, '?action=login;openid" title="' . $txt['openid'] . '"><s>' . $txt['openid'] . '"</s></a>';
 	echo '
 					</div>
 				</form>
@@ -468,7 +468,7 @@ function theme_linktree($default = 'linktree')
 			echo $tree['extra_before'];
 
 		// Show the link, including a URL if it should have one.
-		echo $settings['linktree_link'] && isset($tree['url']) ? '<a href="' . $tree['url'] . '">' . ($pos == 0 ? '<i class="icon i-home icon-big"><s>' . $txt['home'] . '</s></i>' : $tree['name']) . '</a>' : $tree['name'];
+		echo $settings['linktree_link'] && isset($tree['url']) ? '<a href="' . $tree['url'] . '">' . ($pos == 0 ? '<i class="icon i-home"><s>' . $txt['home'] . '</s></i>' : $tree['name']) . '</a>' : $tree['name'];
 
 		// Show something after the link...?
 		if (isset($tree['extra_after']))
