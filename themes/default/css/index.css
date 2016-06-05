@@ -3477,7 +3477,7 @@ ul.post_options li {
 
 .drop_area_fileselect {
 	position: absolute;
-	margin-left: -8em;
+	margin-left: -9em;
 	margin-top: -.5em;
 	width: 8em;
 	opacity: 0.0001;
@@ -3486,7 +3486,7 @@ ul.post_options li {
 
 #chrome .drop_area_fileselect,
 #safari .drop_area_fileselect {
-	padding-left: 160px;
+	padding-left: 180px;
 }
 
 .drop_area_fileselect_text {
@@ -5971,11 +5971,20 @@ a.help .icon {
 	}
 
 	.drop_area_fileselect {
-		width: 100%;
-		top: 0;
+		width: auto;
+		top: 1em;
 		left: 0;
-		height: 100% !important;
+		padding-left: 0;
+		margin-left: 55px;
+		margin-top: 0;
+		height: 3.5em !important;
 	}
+
+	#chrome .drop_area_fileselect,
+	#safari .drop_area_fileselect{
+		padding-left: 0;
+	}
+
 	.drop_area .desktop {
 		display: none;
 	}
