@@ -27,7 +27,6 @@ class DispatcherTest extends PHPUnit_Framework_TestCase
 			'topic' => array('lock', 'printpage', 'sticky'),
 			'profile' => array('index'),
 			'reminder' => array('picktype', 'secret2', 'setpassword', 'setpassword2'),
-			'xmlpreview' => array('index'),
 		);
 
 		foreach (array_keys($auto_actions) as $action)
