@@ -296,6 +296,7 @@ class Codes
 			array(
 				self::ATTR_TAG => 'abbr',
 				self::ATTR_TYPE => self::TYPE_UNPARSED_EQUALS,
+				self::ATTR_TEST => '([A-Za-z][A-Za-z0-9_\-\s&;]*)',
 				self::ATTR_BEFORE => '<abbr title="$1">',
 				self::ATTR_AFTER => '</abbr>',
 				self::ATTR_QUOTED => self::OPTIONAL,
@@ -343,7 +344,7 @@ class Codes
 			array(
 				self::ATTR_TAG => 'code',
 				self::ATTR_TYPE => self::TYPE_UNPARSED_CONTENT,
-				self::ATTR_CONTENT => '<div class="codeheader">' . $txt['code'] . ': <a href="javascript:void(0);" onclick="return elkSelectText(this);" class="codeoperation">' . $txt['code_select'] . '</a></div><pre class="bbc_code prettyprint">$1</pre>',
+				self::ATTR_CONTENT => '<div class="codeheader">' . $txt['code'] . ': <a href="#" onclick="return elkSelectText(this);" class="codeoperation">' . $txt['code_select'] . '</a></div><pre class="bbc_code prettyprint">$1</pre>',
 				self::ATTR_VALIDATE => $this->isDisabled('code') ? null : function(&$tag, &$data, $disabled) {
 					$data = tabToHtmlTab($data);
 				},
@@ -596,7 +597,7 @@ class Codes
 			array(
 				self::ATTR_TAG => 'member',
 				self::ATTR_TYPE => self::TYPE_UNPARSED_EQUALS,
-				self::ATTR_TEST => '[\d*]',
+				self::ATTR_TEST => '\d*',
 				self::ATTR_BEFORE => '<span class="bbc_mention"><a href="' . $scripturl . '?action=profile;u=$1">@',
 				self::ATTR_AFTER => '</a></span>',
 				self::ATTR_DISABLED_BEFORE => '@',
@@ -636,7 +637,7 @@ class Codes
 				self::ATTR_TYPE => self::TYPE_PARSED_CONTENT,
 				self::ATTR_PARAM => array(
 					'author' => array(
-						self::PARAM_ATTR_MATCH => '(.{1,192}?)',
+						self::PARAM_ATTR_MATCH => '([^<>&"\'=\\\\]{1,192}?)',
 						self::PARAM_ATTR_QUOTED => self::OPTIONAL,
 					),
 				),
@@ -665,7 +666,7 @@ class Codes
 				self::ATTR_TYPE => self::TYPE_PARSED_CONTENT,
 				self::ATTR_PARAM => array(
 					'author' => array(
-						self::PARAM_ATTR_MATCH => '([^<>]{1,192}?)',
+						self::PARAM_ATTR_MATCH => '([^<>&"\'=\\\\]{1,192}?)'
 					),
 					'link' => array(
 						self::PARAM_ATTR_MATCH => '(?:board=\d+;)?((?:topic|threadid)=[\dmsg#\./]{1,40}(?:;start=[\dmsg#\./]{1,40})?|msg=\d{1,40}|action=profile;u=\d+)',
@@ -685,7 +686,9 @@ class Codes
 				self::ATTR_TAG => 'quote',
 				self::ATTR_TYPE => self::TYPE_PARSED_CONTENT,
 				self::ATTR_PARAM => array(
-					'author' => array(self::PARAM_ATTR_MATCH => '(.{1,192}?)'),
+					'author' => array(
+						self::PARAM_ATTR_MATCH => '([^<>&"\'=\\\\]{1,192}?)'
+					),
 				),
 				self::ATTR_BEFORE => '<div class="quoteheader">' . $txt['quote_from'] . ': {author}</div><blockquote>',
 				self::ATTR_AFTER => '</blockquote>',
