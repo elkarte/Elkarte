@@ -917,7 +917,7 @@ class Email_Parse
 			{
 				// Not found in the headers, so lets search the body for the [key]
 				// as we insert that on outbound email just for this
-				$regex_key = '~\[([a-z0-9]{32}\-(p|t|m)(\d+))\]~i';
+				$regex_key = '~\[(([a-z0-9]{32})\-(p|t|m)(\d+))\]~i';
 
 				// Check the message body
 				if (preg_match($regex_key, $this->body, $match) === 1)
