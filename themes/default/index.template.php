@@ -220,14 +220,14 @@ function template_body_above()
 
 	// Skip nav link.
 	echo '
-	<div id="top_section">
+	<section id="top_section">
 		<div class="wrapper">';
 
 	call_template_callbacks('th', $context['theme_header_callbacks']);
 
 	echo '
 		</div>
-		<div id="header" class="wrapper', !empty($settings['header_layout']) ? ($settings['header_layout'] == 1 ? ' centerheader' : ' rightheader') : '', empty($context['minmax_preferences']['upshrink']) ? '"' : ' hide" aria-hidden="true"', '>
+		<header id="header" class="wrapper', !empty($settings['header_layout']) ? ($settings['header_layout'] == 1 ? ' centerheader' : ' rightheader') : '', empty($context['minmax_preferences']['upshrink']) ? '"' : ' hide" aria-hidden="true"', '>
 			<h1 id="forumtitle">
 				<a class="forumlink" href="', $scripturl, '">', $context['forum_name'], '</a>';
 
@@ -240,28 +240,26 @@ function template_body_above()
 
 	// Show the menu here, according to the menu sub template.
 	echo '
-		</div>';
+		</header>';
 
-	// WAI-ARIA a11y tweaks have been applied here.
+	template_menu()
+	
 	echo '
-		<div id="menu_nav" role="navigation">
-			', template_menu(), '
-		</div>
-	</div>
+	</section>
 	<div id="wrapper" class="wrapper">
-		<div id="upper_section"', empty($context['minmax_preferences']['upshrink']) ? '' : ' class="hide" aria-hidden="true"', '>';
+		<section id="upper_section"', empty($context['minmax_preferences']['upshrink']) ? '' : ' class="hide" aria-hidden="true"', '>';
 
 	call_template_callbacks('uc', $context['upper_content_callbacks']);
 
 	echo '
-		</div>';
+		</section>';
 
 	// Show the navigation tree.
 	theme_linktree();
 
 	// The main content should go here.
 	echo '
-		<div id="main_content_section"><a id="skipnav"></a>';
+		<section id="main_content_section"><a id="skipnav"></a>';
 }
 
 /**
@@ -389,13 +387,13 @@ function template_body_below()
 	global $context, $txt;
 
 	echo '
-		</div>
+		</section>
 	</div>';
 
 	// Show RSS link, as well as the copyright.
 	// Footer is full-width. Wrapper inside automatically matches admin width setting.
 	echo '
-	<div id="footer_section"><a id="bot"></a>
+	<footer id="footer_section"><a id="bot"></a>
 		<div class="wrapper">
 			<ul>
 				<li class="copyright">',
@@ -421,7 +419,7 @@ function template_html_below()
 
 	echo '
 		</div>
-	</div>';
+	</footer>';
 
 	// load in any javascript that could be deferred to the end of the page
 	theme()->template_javascript(true);
@@ -452,6 +450,7 @@ function theme_linktree($default = 'linktree')
 
 	// @todo - Look at changing markup here slightly. Need to incorporate relevant aria roles.
 	echo '
+			<nav>
 				<ul class="navigate_section">';
 
 	// Each tree item has a URL and name. Some may have extra_before and extra_after.
@@ -480,7 +479,8 @@ function theme_linktree($default = 'linktree')
 	}
 
 	echo '
-				</ul>';
+				</ul>
+			</nav>';
 }
 
 /**
@@ -492,6 +492,7 @@ function template_menu()
 
 	// WAI-ARIA a11y tweaks have been applied here.
 	echo '
+				<nav id="menu_nav" role="navigation">
 					<ul id="main_menu" class="wrapper" role="menubar">';
 
 	// The upshrink image, right-floated.
@@ -549,7 +550,8 @@ function template_menu()
 	}
 
 	echo '
-					</ul>';
+					</ul>
+				</nav>';
 
 	// Define the upper_section toggle in javascript.
 	echo '
@@ -785,11 +787,11 @@ function template_pagesection($button_strip = false, $strip_direction = '', $opt
 		$options['extra'] = '';
 
 	echo '
-			<div class="pagesection" role="application">
+			<nav class="pagesection" role="application">
 				', $pages, '
 				', !empty($button_strip) && !empty($context[$button_strip]) ? template_button_strip($context[$button_strip], $strip_direction) : '',
 	$options['extra'], '
-			</div>';
+			</nav>';
 }
 
 /**
