@@ -40,7 +40,7 @@ function template_boards_list()
 
 		// @todo - Invent nifty class name for boardindex header bars.
 		echo '
-		<div class="forum_category" id="category_', $category['id'], '">
+		<section class="forum_category" id="category_', $category['id'], '">
 			<h2 class="category_header">';
 
 		// If this category even can collapse, show a link to collapse it.
@@ -58,7 +58,7 @@ function template_boards_list()
 			template_list_boards($category['boards'], 'category_' . $category['id'] . '_boards');
 
 		echo '
-		</div>';
+		</section>';
 	}
 }
 
@@ -117,7 +117,7 @@ function template_info_center()
 
 	// Here's where the "Info Center" starts...
 	echo '
-	<div id="info_center" class="forum_category">
+	<section id="info_center" class="forum_category">
 		<h2 class="category_header panel_toggle">
 				<i id="upshrink_ic" class="hide chevricon i-chevron-', empty($context['minmax_preferences']['info']) ? 'up' : 'down', '" title="', $txt['hide'], '"></i>
 			<a href="#" id="upshrink_link">', sprintf($txt['info_center_title'], $context['forum_name_html_safe']), '</a>
@@ -128,7 +128,7 @@ function template_info_center()
 
 	echo '
 		</ul>
-	</div>';
+	</section>';
 
 	// Info center collapse object.
 	echo '
