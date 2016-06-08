@@ -58,7 +58,7 @@ function template_messages_informations_above()
 	if (!empty($settings['display_who_viewing']) || !empty($context['topic_redirected_from']))
 	{
 		echo '
-			<div class="generalinfo">';
+			<details class="generalinfo">';
 		if (!empty($settings['display_who_viewing']))
 		{
 			echo '
@@ -83,11 +83,11 @@ function template_messages_informations_above()
 					' . sprintf($txt['no_redir'], '<a href="' . $context['topic_redirected_from']['redir_href'] . '">' . $context['topic_redirected_from']['subject'] . '</a>'), '
 				</span>';
 		echo '
-			</div>';
+			</details>';
 	}
 
 	echo '
-			<form id="quickModForm" action="', $scripturl, '?action=quickmod2;topic=', $context['current_topic'], '.', $context['start'], '" method="post" accept-charset="UTF-8" name="quickModForm" onsubmit="return oQuickModify.bInEditMode ? oQuickModify.modifySave(\'' . $context['session_id'] . '\', \'' . $context['session_var'] . '\') : false">';
+			<main><form id="quickModForm" action="', $scripturl, '?action=quickmod2;topic=', $context['current_topic'], '.', $context['start'], '" method="post" accept-charset="UTF-8" name="quickModForm" onsubmit="return oQuickModify.bInEditMode ? oQuickModify.modifySave(\'' . $context['session_id'] . '\', \'' . $context['session_var'] . '\') : false">';
 }
 
 /**
@@ -121,13 +121,13 @@ function template_messages()
 
 		// Show the message anchor and a "new" anchor if this message is new.
 		echo '
-				<div class="post_wrapper forumposts ', $message['classes'], $message['approved'] ? '' : ' approvebg', '">', $message['id'] != $context['first_message'] ? '
+				<article class="post_wrapper forumposts ', $message['classes'], $message['approved'] ? '' : ' approvebg', '">', $message['id'] != $context['first_message'] ? '
 					<a class="post_anchor" id="msg' . $message['id'] . '"></a>' . ($message['first_new'] ? '<a id="new"></a>' : '') : '';
 
 		// Showing the sidebar posting area?
 		if (empty($options['hide_poster_area']))
 			echo '
-					<ul class="poster">', template_build_poster_div($message, $ignoring), '</ul>';
+					<footer><ul class="poster">', template_build_poster_div($message, $ignoring), '</ul></footer>';
 
 		echo '
 					<div class="postarea', empty($options['hide_poster_area']) ? '' : '2', '">
@@ -373,7 +373,7 @@ function template_messages()
 
 		echo '
 					</div>
-				</div>
+				</article>
 				<hr class="post_separator" />';
 	}
 }
@@ -384,7 +384,7 @@ function template_messages()
 function template_messages_informations_below()
 {
 	echo '
-			</form>
+			</form></main>
 		</div>';
 }
 

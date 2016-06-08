@@ -221,12 +221,12 @@ function template_body_above()
 	// Skip nav link.
 	echo '
 	<section id="top_section">
-		<div class="wrapper">';
+		<aside class="wrapper">';
 
 	call_template_callbacks('th', $context['theme_header_callbacks']);
 
 	echo '
-		</div>
+		</aside>
 		<header id="header" class="wrapper', !empty($settings['header_layout']) ? ($settings['header_layout'] == 1 ? ' centerheader' : ' rightheader') : '', empty($context['minmax_preferences']['upshrink']) ? '"' : ' hide" aria-hidden="true"', '>
 			<h1 id="forumtitle">
 				<a class="forumlink" href="', $scripturl, '">', $context['forum_name'], '</a>';
@@ -242,17 +242,17 @@ function template_body_above()
 	echo '
 		</header>';
 
-	template_menu()
+	template_menu();
 	
 	echo '
 	</section>
 	<div id="wrapper" class="wrapper">
-		<section id="upper_section"', empty($context['minmax_preferences']['upshrink']) ? '' : ' class="hide" aria-hidden="true"', '>';
+		<aside id="upper_section"', empty($context['minmax_preferences']['upshrink']) ? '' : ' class="hide" aria-hidden="true"', '>';
 
 	call_template_callbacks('uc', $context['upper_content_callbacks']);
 
 	echo '
-		</section>';
+		</aside>';
 
 	// Show the navigation tree.
 	theme_linktree();

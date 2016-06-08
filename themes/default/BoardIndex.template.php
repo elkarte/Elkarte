@@ -71,11 +71,16 @@ function template_boardindex_outer_above()
 
 	// Show some statistics if info centre stats is off.
 	if (!$settings['show_stats_index'])
+	{
 		echo '
 		<div id="index_common_stats">
 			', $txt['members'], ': ', $context['common_stats']['total_members'], ' &nbsp;&#8226;&nbsp; ', $txt['posts_made'], ': ', $context['common_stats']['total_posts'], ' &nbsp;&#8226;&nbsp; ', $txt['topics_made'], ': ', $context['common_stats']['total_topics'], '<br />
 			', $settings['show_latest_member'] ? ' ' . sprintf($txt['welcome_newest_member'], ' <strong>' . $context['common_stats']['latest_member']['link'] . '</strong>') : '', '
 		</div>';
+	}
+
+		echo '
+		<main>';
 }
 
 /**
@@ -88,7 +93,8 @@ function template_boardindex_outer_below()
 	// @todo - Just <div> for the parent, <p>'s for the icon stuffz, and the buttonlist <ul> for "Mark read".
 	// Sort the floats in the CSS file, as other tricks will be needed as well (media queries, for instance).
 	echo '
-		<div id="posting_icons">';
+		</main>
+		<aside id="posting_icons">';
 
 	// Show the mark all as read button?
 	if ($settings['show_mark_read'] && !$context['user']['is_guest'] && !empty($context['categories']))
@@ -102,7 +108,7 @@ function template_boardindex_outer_below()
 	echo '
 			<p title="', $txt['old_posts'], '"><i class="icon i-board-off"></i>', $txt['old_posts'], '</p>
 			<p title="', $txt['redirect_board'], '"><i class="icon i-board-redirect"></i>', $txt['redirect_board'], '</p>
-		</div>';
+		</aside>';
 
 	if (!empty($context['info_center_callbacks']))
 		template_info_center();
