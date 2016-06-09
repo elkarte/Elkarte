@@ -76,6 +76,10 @@ a:hover, a.new_win:hover {
 	text-decoration: underline;
 }
 
+html {
+	overflow-y: scroll;
+}
+
 html, body {
 	margin: 0;
 	padding: 0;
@@ -3190,7 +3194,7 @@ img.new_posts {
 	margin: 4px 0 4px -4px;
 }
 
-#moderationbuttons ul li {
+#moderationbuttons_strip li {
 	margin: 0;
 	padding: 0 6px 4px 0;
 }
