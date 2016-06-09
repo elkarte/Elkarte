@@ -91,7 +91,7 @@ class Error_Context
 	/**
 	 * Add an error to the list
 	 *
-	 * @param string[]|string $error error code
+	 * @param mixed[]|mixed $error error code
 	 * @param string|int|null $severity error severity
 	 * @param string|null $lang_file lang_file
 	 */
@@ -101,10 +101,8 @@ class Error_Context
 
 		if (!empty($error))
 		{
-			if (is_array($error))
-				$this->_errors[$severity][$error[0]] = $error;
-			else
-				$this->_errors[$severity][$error] = $error;
+			$name = $this->getErrorName($error);
+			$this->_errors[$severity][$name] = $error;
 		}
 
 		if (!empty($lang_file) && !isset($this->_language_files[$lang_file]))
@@ -114,23 +112,39 @@ class Error_Context
 	/**
 	 * Remove an error from the list
 	 *
-	 * @param string $error error code
+	 * @param mixed[]|mixed $error error code
 	 */
 	public function removeError($error)
 	{
 		if (!empty($error))
 		{
-			if (is_array($error))
-				$error = $error[0];
+			$name = $this->getErrorName($error);
+			$this->_errors[$severity][$name] = $error;
 
 			foreach ($this->_errors as $severity => $errors)
 			{
-				if (array_key_exists($error, $errors))
-					unset($this->_errors[$severity][$error]);
+				if (array_key_exists($name, $errors))
+					unset($this->_errors[$severity][$name]);
 				if (empty($this->_errors[$severity]))
 					unset($this->_errors[$severity]);
 			}
 		}
+	}
+
+	/**
+	 * Finds the "name" of the error (either the string, the first element
+	 * of the array, or the result of getName)
+	 *
+	 * @param mixed|mixed[] $error error code
+	 */
+	protected function getErrorName($error)
+	{
+		if (is_array($error))
+			return $error[0];
+		elseif (is_object($error))
+			return $error->getName();
+		else
+			return $error;
 	}
 
 	/**
@@ -152,13 +166,14 @@ class Error_Context
 	/**
 	 * Return an error based on the id of the error set when adding the error itself.
 	 *
-	 * @param null|string $error the id of the error
+	 * @param mixed|mixed[] $error error code
 	 * @return null|mixed whatever the error is (string, object, array), noll if not found
 	 */
 	public function getError($error = null)
 	{
-		if (isset($this->_errors[$error]))
-			return $this->_errors[$error];
+		$name = $this->getErrorName($error);
+		if (isset($this->_errors[$name]))
+			return $this->_errors[$name];
 		else
 			return null;
 	}
@@ -186,18 +201,22 @@ class Error_Context
 	 */
 	public function hasError($errors)
 	{
-		if (empty($errors))
-			return false;
-		else
+		if (!empty($errors))
 		{
-			$errors = is_array($errors) ? $errors : array($errors);
+			$errors = (array) $errors;
 			foreach ($errors as $error)
 			{
+				$name = $this->getErrorName($error);
 				foreach ($this->_errors as $current_errors)
-					if (isset($current_errors[$error]))
+				{
+					if (isset($current_errors[$name]))
+					{
 						return true;
+					}
+				}
 			}
 		}
+
 		return false;
 	}
 
