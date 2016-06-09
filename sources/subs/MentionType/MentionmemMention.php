@@ -71,7 +71,7 @@ class Mentionmem_Mention extends Mention_BoardAccess_Abstract
 	 */
 	public function display_prepare_context($virtual_msg)
 	{
-		global $options, $modSettings;
+		global $options, $modSettings, $context;
 
 		// Mark the mention as read if requested
 		if (isset($_REQUEST['mentionread']) && !empty($virtual_msg))
@@ -79,6 +79,8 @@ class Mentionmem_Mention extends Mention_BoardAccess_Abstract
 			$mentions = new \Mentioning(database(), new \Data_Validator(), $modSettings['enabled_mentions']);
 			$mentions->markread((int) $_REQUEST['item']);
 		}
+
+		$context['mentions_enabled'] = true;
 
 		$this->_setup_editor(empty($options['use_editor_quick_reply']));
 	}
@@ -93,8 +95,10 @@ class Mentionmem_Mention extends Mention_BoardAccess_Abstract
 		// Just using the plain text quick reply and not the editor
 		if ($simple)
 		{
-			loadJavascriptFile(array('jquery.atwho.min.js', 'jquery.caret.min.js', 'mentioning.js'));
+			loadJavascriptFile(array('jquery.atwho.min.js', 'jquery.caret.min.js'));
 		}
+
+		loadJavascriptFile(array('mentioning.js'));
 
 		loadCSSFile('jquery.atwho.css');
 
