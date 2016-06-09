@@ -29,7 +29,7 @@ function template_display_child_boards_above()
 	global $context, $txt;
 
 	echo '
-	<div id="board_', $context['current_board'], '_childboards" class="forum_category">
+	<section id="board_', $context['current_board'], '_childboards" class="forum_category">
 		<h2 class="category_header">
 			', $txt['parent_boards'], '
 		</h2>';
@@ -37,7 +37,7 @@ function template_display_child_boards_above()
 	template_list_boards($context['boards'], 'board_' . $context['current_board'] . '_children');
 
 	echo '
-	</div>';
+	</section>';
 }
 
 /**
@@ -56,9 +56,9 @@ function template_topic_listing_above()
 	template_pagesection('normal_buttons', 'right');
 
 	echo '
-		<div id="description_board">
+		<header id="description_board">
 			<h2 class="category_header">', $context['name'], '</h2>
-			<div class="generalinfo">';
+			<details class="generalinfo">';
 
 	// Show the board description
 	if (!empty($context['description']))
@@ -114,8 +114,8 @@ function template_topic_listing_above()
 						</li>
 					</ul>
 				</div>
-			</div>
-		</div>';
+			</details>
+		</header>';
 }
 
 /**
@@ -141,7 +141,7 @@ function template_topic_listing()
 		<div class="warningbox">', $context['unapproved_posts_message'], '</div>';
 
 		echo '
-		<ul class="topic_listing" id="messageindex">';
+		<main><ul class="topic_listing" id="messageindex">';
 
 		// No topics.... just say, "sorry bub".
 		if (empty($context['topics']))
@@ -269,7 +269,7 @@ function template_topic_listing()
 		}
 
 		echo '
-		</ul>';
+		</ul></main>';
 
 		if (!empty($context['can_quick_mod']) && $options['display_quick_mod'] == 1 && !empty($context['topics']))
 		{
@@ -320,7 +320,7 @@ function template_topic_listing_below()
 	theme_linktree();
 
 	echo '
-	<div id="topic_icons" class="description">
+	<footer id="topic_icons" class="description">
 		<div class="qaction_row" id="message_index_jump_to">&nbsp;</div>';
 
 	if (!$context['no_topic_listing'])
@@ -365,7 +365,7 @@ function template_topic_listing_below()
 					sGoButtonLabel: "', $txt['quick_mod_go'], '"
 				});
 			// ]]></script>
-	</div>';
+	</footer>';
 
 	// Javascript for inline editing.
 	echo '

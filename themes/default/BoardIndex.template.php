@@ -40,7 +40,7 @@ function template_boards_list()
 
 		// @todo - Invent nifty class name for boardindex header bars.
 		echo '
-		<div class="forum_category" id="category_', $category['id'], '">
+		<section class="forum_category" id="category_', $category['id'], '">
 			<h2 class="category_header">';
 
 		// If this category even can collapse, show a link to collapse it.
@@ -58,7 +58,7 @@ function template_boards_list()
 			template_list_boards($category['boards'], 'category_' . $category['id'] . '_boards');
 
 		echo '
-		</div>';
+		</section>';
 	}
 }
 
@@ -71,11 +71,16 @@ function template_boardindex_outer_above()
 
 	// Show some statistics if info centre stats is off.
 	if (!$settings['show_stats_index'])
+	{
 		echo '
 		<div id="index_common_stats">
 			', $txt['members'], ': ', $context['common_stats']['total_members'], ' &nbsp;&#8226;&nbsp; ', $txt['posts_made'], ': ', $context['common_stats']['total_posts'], ' &nbsp;&#8226;&nbsp; ', $txt['topics_made'], ': ', $context['common_stats']['total_topics'], '<br />
 			', $settings['show_latest_member'] ? ' ' . sprintf($txt['welcome_newest_member'], ' <strong>' . $context['common_stats']['latest_member']['link'] . '</strong>') : '', '
 		</div>';
+	}
+
+		echo '
+		<main>';
 }
 
 /**
@@ -88,7 +93,8 @@ function template_boardindex_outer_below()
 	// @todo - Just <div> for the parent, <p>'s for the icon stuffz, and the buttonlist <ul> for "Mark read".
 	// Sort the floats in the CSS file, as other tricks will be needed as well (media queries, for instance).
 	echo '
-		<div id="posting_icons">';
+		</main>
+		<aside id="posting_icons">';
 
 	// Show the mark all as read button?
 	if ($settings['show_mark_read'] && !$context['user']['is_guest'] && !empty($context['categories']))
@@ -102,7 +108,7 @@ function template_boardindex_outer_below()
 	echo '
 			<p title="', $txt['old_posts'], '"><i class="icon i-board-off"></i>', $txt['old_posts'], '</p>
 			<p title="', $txt['redirect_board'], '"><i class="icon i-board-redirect"></i>', $txt['redirect_board'], '</p>
-		</div>';
+		</aside>';
 
 	if (!empty($context['info_center_callbacks']))
 		template_info_center();
@@ -117,7 +123,7 @@ function template_info_center()
 
 	// Here's where the "Info Center" starts...
 	echo '
-	<div id="info_center" class="forum_category">
+	<section id="info_center" class="forum_category">
 		<h2 class="category_header panel_toggle">
 				<i id="upshrink_ic" class="hide chevricon i-chevron-', empty($context['minmax_preferences']['info']) ? 'up' : 'down', '" title="', $txt['hide'], '"></i>
 			<a href="#" id="upshrink_link">', sprintf($txt['info_center_title'], $context['forum_name_html_safe']), '</a>
@@ -128,7 +134,7 @@ function template_info_center()
 
 	echo '
 		</ul>
-	</div>';
+	</section>';
 
 	// Info center collapse object.
 	echo '

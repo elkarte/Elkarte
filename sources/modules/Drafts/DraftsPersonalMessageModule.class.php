@@ -152,7 +152,7 @@ class Drafts_PersonalMessage_Module implements ElkArte\sources\modules\Module_In
 			if (isset($_REQUEST['id_draft']) && empty($_POST['subject']) && empty($_POST['message']))
 			{
 				$this->_loadDraft($user_info['id'], (int) $_REQUEST['id_draft']);
-				throw new PM_Error_Exception($this->_loaded_draft->to_list, $this->_loaded_draft);
+				throw new Pm_Error_Exception($this->_loaded_draft->to_list, $this->_loaded_draft);
 			}
 			else
 			{

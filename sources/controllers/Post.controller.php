@@ -1347,7 +1347,7 @@ class Post_Controller extends Action_Controller
 						'Mentionmem',
 						$row['id_msg'],
 						$row['id_member'],
-						array('id_members' => array($actually_mentioned), 'status' => $row['approved'] ? 'new' : 'unapproved')
+						array('id_members' => $actually_mentioned, 'status' => $row['approved'] ? 'new' : 'unapproved')
 					));
 				}
 			}

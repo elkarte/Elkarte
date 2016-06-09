@@ -58,7 +58,7 @@ function template_messages_informations_above()
 	if (!empty($settings['display_who_viewing']) || !empty($context['topic_redirected_from']))
 	{
 		echo '
-			<div class="generalinfo">';
+			<details class="generalinfo">';
 		if (!empty($settings['display_who_viewing']))
 		{
 			echo '
@@ -83,11 +83,11 @@ function template_messages_informations_above()
 					' . sprintf($txt['no_redir'], '<a href="' . $context['topic_redirected_from']['redir_href'] . '">' . $context['topic_redirected_from']['subject'] . '</a>'), '
 				</span>';
 		echo '
-			</div>';
+			</details>';
 	}
 
 	echo '
-			<form id="quickModForm" action="', $scripturl, '?action=quickmod2;topic=', $context['current_topic'], '.', $context['start'], '" method="post" accept-charset="UTF-8" name="quickModForm" onsubmit="return oQuickModify.bInEditMode ? oQuickModify.modifySave(\'' . $context['session_id'] . '\', \'' . $context['session_var'] . '\') : false">';
+			<main><form id="quickModForm" action="', $scripturl, '?action=quickmod2;topic=', $context['current_topic'], '.', $context['start'], '" method="post" accept-charset="UTF-8" name="quickModForm" onsubmit="return oQuickModify.bInEditMode ? oQuickModify.modifySave(\'' . $context['session_id'] . '\', \'' . $context['session_var'] . '\') : false">';
 }
 
 /**
@@ -121,7 +121,7 @@ function template_messages()
 
 		// Show the message anchor and a "new" anchor if this message is new.
 		echo '
-				<div class="post_wrapper forumposts ', $message['classes'], $message['approved'] ? '' : ' approvebg', '">', $message['id'] != $context['first_message'] ? '
+				<article class="post_wrapper forumposts ', $message['classes'], $message['approved'] ? '' : ' approvebg', '">', $message['id'] != $context['first_message'] ? '
 					<a class="post_anchor" id="msg' . $message['id'] . '"></a>' . ($message['first_new'] ? '<a id="new"></a>' : '') : '';
 
 		// Showing the sidebar posting area?
@@ -131,7 +131,7 @@ function template_messages()
 
 		echo '
 					<div class="postarea', empty($options['hide_poster_area']) ? '' : '2', '">
-						<div class="keyinfo">
+						<footer class="keyinfo">
 						', (!empty($options['hide_poster_area']) ? '<ul class="poster poster2">' . template_build_poster_div($message, $ignoring) . '</ul>' : '');
 
 		if (!empty($context['follow_ups'][$message['id']]))
@@ -163,7 +163,7 @@ function template_messages()
 								<a href="', $message['href'], '" rel="nofollow">', !empty($message['counter']) ? sprintf($txt['reply_number'], $message['counter']) : '', '</a>', !empty($message['counter']) ? ' &ndash; ' : '', $message['html_time'], '
 							</h5>
 							<div id="msg_', $message['id'], '_quick_mod"', $ignoring ? ' class="hide"' : '', '></div>
-						</div>';
+						</footer>';
 
 		// Ignoring this user? Hide the post.
 		if ($ignoring)
@@ -336,7 +336,8 @@ function template_messages()
 								</li>';
 
 		echo '
-						</ul>';
+						</ul>
+						<footer>';
 
 		// Are there any custom profile fields for above the signature?
 		// Show them if signatures are enabled and you want to see them.
@@ -352,28 +353,29 @@ function template_messages()
 				{
 					$shown = true;
 					echo '
-						<div class="custom_fields_above_signature">
-							<ul>';
+							<div class="custom_fields_above_signature">
+								<ul>';
 				}
 
 				echo '
-								<li>', $custom['value'], '</li>';
+									<li>', $custom['value'], '</li>';
 			}
 
 			if ($shown)
 				echo '
-							</ul>
-						</div>';
+								</ul>
+							</div>';
 		}
 
 		// Show the member's signature?
 		if (!empty($message['member']['signature']) && empty($options['show_no_signatures']) && $context['signature_enabled'])
 			echo '
-						<div id="msg_', $message['id'], '_signature" class="signature', $ignoring ? ' hide"' : '"', '>', $message['member']['signature'], '</div>';
+							<div id="msg_', $message['id'], '_signature" class="signature', $ignoring ? ' hide"' : '"', '>', $message['member']['signature'], '</div>';
 
 		echo '
+						</footer>
 					</div>
-				</div>
+				</article>
 				<hr class="post_separator" />';
 	}
 }
@@ -384,7 +386,7 @@ function template_messages()
 function template_messages_informations_below()
 {
 	echo '
-			</form>
+			</form></main>
 		</div>';
 }
 
@@ -657,7 +659,7 @@ function template_display_poll_above()
 	global $settings, $context, $txt, $scripturl;
 
 	echo '
-			<div id="poll">
+			<s id="poll">
 				<h2 class="category_header">
 					<i class="icon i-poll', $context['poll']['is_locked'] ? '-locked' : '', '"></i> ', $txt['poll'], '
 				</h2>
@@ -751,7 +753,7 @@ function template_display_calendar_above()
 	global $context, $txt, $settings;
 
 	echo '
-			<div class="linked_events">
+			<section class="linked_events">
 				<h2 class="category_header">', $txt['calendar_linked_events'], '</h2>
 				<div class="content">
 					<ul>';
@@ -765,7 +767,7 @@ function template_display_calendar_above()
 	echo '
 					</ul>
 				</div>
-			</div>';
+			</section>';
 }
 
 /**
@@ -835,7 +837,7 @@ function template_display_attachments($message, $ignoring)
 	global $context, $txt, $scripturl, $settings;
 
 	echo '
-							<div id="msg_', $message['id'], '_footer" class="attachments', $ignoring ? ' hide"' : '"', '>';
+							<footer id="msg_', $message['id'], '_footer" class="attachments', $ignoring ? ' hide"' : '"', '>';
 
 	$last_approved_state = 1;
 
@@ -901,5 +903,5 @@ function template_display_attachments($message, $ignoring)
 								</fieldset>';
 
 	echo '
-							</div>';
+							</footer>';
 }
