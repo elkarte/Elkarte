@@ -119,7 +119,6 @@ class Error_Context
 		if (!empty($error))
 		{
 			$name = $this->getErrorName($error);
-			$this->_errors[$severity][$name] = $error;
 
 			foreach ($this->_errors as $severity => $errors)
 			{
