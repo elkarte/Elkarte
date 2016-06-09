@@ -676,9 +676,9 @@ function fix_possible_url($val)
 	call_integration_hook('integrate_fix_url', array(&$val));
 
 	if (!empty($modSettings['queryless_urls']) && detectServer()->supportRewrite())
-		return $val;
-
-	$val = preg_replace_callback('~^' . preg_quote($scripturl, '~') . '\?((?:board|topic)=[^#"]+)(#[^"]*)?$~', 'fix_possible_url_callback', $val);
+	{
+		$val = preg_replace_callback('~^' . preg_quote($scripturl, '~') . '\?((?:board|topic)=[^#"]+)(#[^"]*)?$~', 'fix_possible_url_callback', $val);
+	}
 
 	return $val;
 }
