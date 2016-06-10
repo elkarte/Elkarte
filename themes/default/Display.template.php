@@ -58,7 +58,7 @@ function template_messages_informations_above()
 	if (!empty($settings['display_who_viewing']) || !empty($context['topic_redirected_from']))
 	{
 		echo '
-			<details class="generalinfo">';
+			<div class="generalinfo">';
 		if (!empty($settings['display_who_viewing']))
 		{
 			echo '
@@ -83,7 +83,7 @@ function template_messages_informations_above()
 					' . sprintf($txt['no_redir'], '<a href="' . $context['topic_redirected_from']['redir_href'] . '">' . $context['topic_redirected_from']['subject'] . '</a>'), '
 				</span>';
 		echo '
-			</details>';
+			</div>';
 	}
 
 	echo '
