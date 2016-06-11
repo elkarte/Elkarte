@@ -660,6 +660,7 @@ div.bbc_footnotes .meaction {
 	position: inherit;
 }
 
+.quickbuttons .subsections:hover .linklevel1:after,
 #main_menu .subsections:hover .linklevel1:after {
 	display: none;
 }
@@ -941,6 +942,8 @@ a.active {
 	border-top: none;
 	background: white;
 	margin-top: 0;
+	border-top-left-radius: 0;
+	border-top-right-radius: 0;
 }
 
 #forumtitle {

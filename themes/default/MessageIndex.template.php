@@ -58,7 +58,7 @@ function template_topic_listing_above()
 	echo '
 		<header id="description_board">
 			<h2 class="category_header">', $context['name'], '</h2>
-			<details class="generalinfo">';
+			<div class="generalinfo">';
 
 	// Show the board description
 	if (!empty($context['description']))
@@ -114,7 +114,7 @@ function template_topic_listing_above()
 						</li>
 					</ul>
 				</div>
-			</details>
+			</div>
 		</header>';
 }
 

@@ -6473,4 +6473,19 @@ a.help .icon {
 		left: auto;
 		position: relative;
 	}
+	#topic_summary .keyinfo {
+/* 		display: table-row; */
+	}
+	#topic_summary .keyinfo h5 {
+		display: table-cell;
+		margin-right: 0.2em;
+		width: 100%;
+		float: none;
+		font-size: 1em;
+		vertical-align: middle;
+	}
+	#topic_summary .keyinfo .quickbuttons {
+		float: none;
+		display: table-cell;
+	}
 }
