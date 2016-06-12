@@ -1186,6 +1186,8 @@ class BBCParser
 		// If we have footnotes, add them in at the end of the message
 		if (!empty($fn_num))
 		{
+			$this->message = rtrim($this->message, "\r");
+
 			$this->message .= '<div class="bbc_footnotes">' . implode('', $this->fn_content) . '</div>';
 		}
 	}
