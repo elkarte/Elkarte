@@ -277,7 +277,7 @@ class BBCParser
 			// Are we trimming outside this tag?
 			if (!empty($tag[Codes::ATTR_TRIM]) && $tag[Codes::ATTR_TRIM] !== Codes::TRIM_OUTSIDE)
 			{
-				$this->trimWhiteSpace($this->message, $this->pos + 1);
+				$this->message = $this->trimWhiteSpace($this->message, $this->pos + 1);
 			}
 		}
 	}
@@ -393,7 +393,7 @@ class BBCParser
 			// Trim inside whitespace
 			if (!empty($tag[Codes::ATTR_TRIM]) && $tag[Codes::ATTR_TRIM] !== Codes::TRIM_INSIDE)
 			{
-				$this->trimWhiteSpace($this->message, $this->pos + 1);
+				$this->message = $this->trimWhiteSpace($this->message, $this->pos + 1);
 			}
 		}
 
@@ -440,9 +440,9 @@ class BBCParser
 	 *
 	 * @param string $data
 	 */
-	protected function parseHTML(&$data)
+	protected function parseHTML($data)
 	{
-		$this->html_parser->parse($data);
+		return $this->html_parser->parse($data);
 	}
 
 	/**
@@ -1058,7 +1058,7 @@ class BBCParser
 		// For parsed content, we must recurse to avoid security problems.
 		if ($tag[Codes::ATTR_TYPE] === Codes::TYPE_PARSED_EQUALS)
 		{
-			$this->recursiveParser($data, $tag);
+			$data = $this->recursiveParser($data, $tag);
 		}
 
 		$tag[Codes::ATTR_AFTER] = strtr($tag[Codes::ATTR_AFTER], array('$1' => $data));
@@ -1140,7 +1140,7 @@ class BBCParser
 		if ($this->possible_html && strpos($data, '&lt;') !== false)
 		{
 			// @todo new \Parser\BBC\HTML;
-			$this->parseHTML($data);
+			$data = $this->parseHTML($data);
 		}
 
 		if (!empty($GLOBALS['modSettings']['autoLinkUrls']))
@@ -1287,7 +1287,7 @@ class BBCParser
 	 * @param string $data
 	 * @param array $tag
 	 */
-	protected function recursiveParser(&$data, array $tag)
+	protected function recursiveParser($data, array $tag)
 	{
 		// @todo if parsed tags allowed is empty, return?
 		$bbc = clone $this->bbc;
@@ -1303,7 +1303,7 @@ class BBCParser
 		call_integration_hook('integrate_recursive_bbc_parser', array(&$autolinker, &$html));
 
 		$parser = new \BBC\BBCParser($bbc, $autolinker, $html);
-		$data = $parser->enableSmileys(empty($tag[Codes::ATTR_PARSED_TAGS_ALLOWED]))->parse($data);
+		return $parser->enableSmileys(empty($tag[Codes::ATTR_PARSED_TAGS_ALLOWED]))->parse($data);
 	}
 
 	/**
@@ -1406,12 +1406,14 @@ class BBCParser
 	 * @param string &$message
 	 * @param null|int $offset = null
 	 */
-	protected function trimWhiteSpace(&$message, $offset = null)
+	protected function trimWhiteSpace($message, $offset = null)
 	{
-		if (preg_match('~(<br />|&nbsp;|\s)*~', $this->message, $matches, null, $offset) !== 0 && isset($matches[0]) && $matches[0] !== '')
+		if (preg_match('~(<br />|&nbsp;|\s)*~', $message, $matches, null, $offset) !== 0 && isset($matches[0]) && $matches[0] !== '')
 		{
-			$this->message = substr_replace($this->message, '', $this->pos, strlen($matches[0]));
+			return substr_replace($message, '', $this->pos, strlen($matches[0]));
 		}
+
+		return $message;
 	}
 
 	/**
@@ -1535,7 +1537,7 @@ class BBCParser
 
 			if (isset($tag[Codes::ATTR_TRIM]) && $tag[Codes::ATTR_TRIM] !== Codes::TRIM_INSIDE)
 			{
-				$this->trimWhiteSpace($this->message, $this->pos);
+				$this->message = $this->trimWhiteSpace($this->message, $this->pos);
 			}
 
 			$this->closeOpenedTag();
