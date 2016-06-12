@@ -50,6 +50,7 @@ class BBCParser
 	protected $num_footnotes = 0;
 	protected $smiley_marker = "\r";
 	protected $lastAutoPos = 0;
+	protected $fn_content = array();
 
 	/**
 	 * BBCParser constructor.
@@ -1168,14 +1169,14 @@ class BBCParser
 	 */
 	protected function handleFootnotes()
 	{
-		global $fn_num, $fn_content, $fn_count;
+		global $fn_num, $fn_count;
 		static $fn_total;
 
 		// @todo temporary until we have nesting
 		$this->message = str_replace(array('[footnote]', '[/footnote]'), '', $this->message);
 
 		$fn_num = 0;
-		$fn_content = array();
+		$this->fn_content = array();
 		$fn_count = isset($fn_total) ? $fn_total : 0;
 
 		// Replace our footnote text with a [1] link, save the text for use at the end of the message
@@ -1185,7 +1186,7 @@ class BBCParser
 		// If we have footnotes, add them in at the end of the message
 		if (!empty($fn_num))
 		{
-			$this->message .= '<div class="bbc_footnotes">' . implode('', $fn_content) . '</div>';
+			$this->message .= '<div class="bbc_footnotes">' . implode('', $this->fn_content) . '</div>';
 		}
 	}
 
@@ -1198,10 +1199,10 @@ class BBCParser
 	 */
 	protected function footnoteCallback(array $matches)
 	{
-		global $fn_num, $fn_content, $fn_count;
+		global $fn_num, $fn_count;
 
 		$fn_num++;
-		$fn_content[] = '<div class="target" id="fn' . $fn_num . '_' . $fn_count . '"><sup>' . $fn_num . '&nbsp;</sup>' . $matches[2] . '<a class="footnote_return" href="#ref' . $fn_num . '_' . $fn_count . '">&crarr;</a></div>';
+		$this->fn_content[] = '<div class="target" id="fn' . $fn_num . '_' . $fn_count . '"><sup>' . $fn_num . '&nbsp;</sup>' . $matches[2] . '<a class="footnote_return" href="#ref' . $fn_num . '_' . $fn_count . '">&crarr;</a></div>';
 
 		return '<a class="target" href="#fn' . $fn_num . '_' . $fn_count . '" id="ref' . $fn_num . '_' . $fn_count . '">[' . $fn_num . ']</a>';
 	}
