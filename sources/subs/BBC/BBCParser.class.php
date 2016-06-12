@@ -450,11 +450,11 @@ class BBCParser
 	 *
 	 * @param string $data
 	 */
-	protected function autoLink(&$data)
+	protected function autoLink($data)
 	{
 		if ($data === '' || $data === $this->smiley_marker || !$this->autolinker->hasPossible())
 		{
-			return;
+			return $data;
 		}
 
 		// Are we inside tags that should be auto linked?
@@ -464,12 +464,12 @@ class BBCParser
 			{
 				if (!$open_tag[Codes::ATTR_AUTOLINK])
 				{
-					return;
+					return $data;
 				}
 			}
 		}
 
-		$this->autolinker->parse($data);
+		return $this->autolinker->parse($data);
 	}
 
 	/**
@@ -1145,7 +1145,7 @@ class BBCParser
 
 		if (!empty($GLOBALS['modSettings']['autoLinkUrls']))
 		{
-			$this->autoLink($data);
+			$data = $this->autoLink($data);
 		}
 
 		// This cannot be moved earlier. It breaks tests

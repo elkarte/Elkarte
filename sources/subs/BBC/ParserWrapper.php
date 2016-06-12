@@ -179,24 +179,21 @@ class ParserWrapper
 		}
 
 		$parsers = $this->getParsersByArea($area);
+		$smileys_enabled = $this->smileys_enabled && $GLOBALS['user_info']['smiley_set'] !== 'none';
 
 		if (!$this->isEnabled())
 		{
 			// You need to run the smiley parser to get rid of the markers
-			$parsers['smiley']
-				->setEnabled($this->smileys_enabled && $GLOBALS['user_info']['smiley_set'] !== 'none')
+			return $parsers['smiley']
+				->setEnabled($smileys_enabled)
 				->parse($message);
-
-			return $message;
 		}
 
 		$message = $parsers['bbc']->parse($message);
 
-		$parsers['smiley']
-			->setEnabled($this->smileys_enabled && $GLOBALS['user_info']['smiley_set'] !== 'none')
+		return $parsers['smiley']
+			->setEnabled($smileys_enabled)
 			->parse($message);
-
-		return $message;
 	}
 
 	/**
