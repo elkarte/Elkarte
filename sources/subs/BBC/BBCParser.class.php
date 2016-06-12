@@ -277,7 +277,7 @@ class BBCParser
 			// Are we trimming outside this tag?
 			if (!empty($tag[Codes::ATTR_TRIM]) && $tag[Codes::ATTR_TRIM] !== Codes::TRIM_OUTSIDE)
 			{
-				$this->message = $this->trimWhiteSpace($this->message, $this->pos + 1);
+				$this->trimWhiteSpace($this->pos + 1);
 			}
 		}
 	}
@@ -393,7 +393,7 @@ class BBCParser
 			// Trim inside whitespace
 			if (!empty($tag[Codes::ATTR_TRIM]) && $tag[Codes::ATTR_TRIM] !== Codes::TRIM_INSIDE)
 			{
-				$this->message = $this->trimWhiteSpace($this->message, $this->pos + 1);
+				$this->trimWhiteSpace($this->pos + 1);
 			}
 		}
 
@@ -1403,17 +1403,14 @@ class BBCParser
 	/**
 	 * Does what it says, removes whitespace
 	 *
-	 * @param string &$message
 	 * @param null|int $offset = null
 	 */
-	protected function trimWhiteSpace($message, $offset = null)
+	protected function trimWhiteSpace($offset = null)
 	{
-		if (preg_match('~(<br />|&nbsp;|\s)*~', $message, $matches, null, $offset) !== 0 && isset($matches[0]) && $matches[0] !== '')
+		if (preg_match('~(<br />|&nbsp;|\s)*~', $this->message, $matches, null, $offset) !== 0 && isset($matches[0]) && $matches[0] !== '')
 		{
-			return substr_replace($message, '', $this->pos, strlen($matches[0]));
+			substr_replace($this->message, '', $this->pos, strlen($matches[0]));
 		}
-
-		return $message;
 	}
 
 	/**
@@ -1537,7 +1534,7 @@ class BBCParser
 
 			if (isset($tag[Codes::ATTR_TRIM]) && $tag[Codes::ATTR_TRIM] !== Codes::TRIM_INSIDE)
 			{
-				$this->message = $this->trimWhiteSpace($this->message, $this->pos);
+				$this->trimWhiteSpace($this->pos);
 			}
 
 			$this->closeOpenedTag();
