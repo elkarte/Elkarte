@@ -704,7 +704,7 @@ function parsesmileys(&$message)
 
 	$wrapper = \BBC\ParserWrapper::getInstance();
 	$parser = $wrapper->getSmileyParser();
-	$parser->parseBlock($message);
+	$message = $parser->parseBlock($message);
 }
 
 /**
