@@ -1915,7 +1915,7 @@ function profileValidateSignature(&$value)
 		$wrapper = \BBC\ParserWrapper::getInstance();
 		$parser = $wrapper->getSmileyParser();
 		$parser->setEnabled($GLOBALS['user_info']['smiley_set'] !== 'none' && trim($smiley_parsed) !== '');
-		$parser->parseBlock($smiley_parsed);
+		$smiley_parsed = $parser->parseBlock($smiley_parsed);
 
 		$smiley_count = substr_count(strtolower($smiley_parsed), '<img') - substr_count(strtolower($unparsed_signature), '<img');
 		if (!empty($sig_limits[4]) && $sig_limits[4] == -1 && $smiley_count > 0)

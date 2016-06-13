@@ -71,19 +71,19 @@ class SmileyParser
 	 *
 	 * @param string $message
 	 */
-	public function parseBlock(&$message)
+	public function parseBlock($message)
 	{
 		// No smiley set at all?!
 		if (!$this->enabled || $message === '' || trim($message) === '')
 		{
-			return;
+			return $message;
 		}
 
 		// Replace away!
-		$message = preg_replace_callback($this->search, array($this, 'parser_callback'), $message);
+		return preg_replace_callback($this->search, array($this, 'parser_callback'), $message);
 	}
 
-	public function parse(&$message)
+	public function parse($message)
 	{
 		// Parse the smileys within the parts where it can be done safely.
 		if ($this->enabled && trim($message) !== '')
@@ -93,15 +93,15 @@ class SmileyParser
 			// first part (0) parse smileys. Then every other one after that parse smileys
 			for ($i = 0, $n = count($message_parts); $i < $n; $i += 2)
 			{
-				$this->parseBlock($message_parts[$i]);
+				$message_parts[$i] = $this->parseBlock($message_parts[$i]);
 			}
 
-			$message = implode('', $message_parts);
+			return implode('', $message_parts);
 		}
 		// No smileys, just get rid of the markers.
 		else
 		{
-			$message = str_replace($this->marker, '', $message);
+			return str_replace($this->marker, '', $message);
 		}
 	}
 

@@ -102,19 +102,21 @@ class Autolink
 	 *
 	 * @param string $data
 	 */
-	public function parse(&$data)
+	public function parse($data)
 	{
 		if ($this->hasLinks($data))
 		{
-			$this->parseLinks($data);
+			$data = $this->parseLinks($data);
 		}
 
 		if ($this->hasEmails($data))
 		{
-			$this->parseEmails($data);
+			$data = $this->parseEmails($data);
 		}
 
 		call_integration_hook('integrate_autolink_area', array(&$data, $this->bbc));
+
+		return $data;
 	}
 
 	/**
@@ -146,7 +148,7 @@ class Autolink
 	 *
 	 * @param $data
 	 */
-	public function parseLinks(&$data)
+	public function parseLinks($data)
 	{
 		// Switch out quotes really quick because they can cause problems.
 		$data = strtr($data, array('&#039;' => '\'', '&nbsp;' => "\xC2\xA0", '&quot;' => '>">', '"' => '<"<', '&lt;' => '<lt<'));
@@ -160,7 +162,7 @@ class Autolink
 		}
 
 		// Switch those quotes back
-		$data = strtr($data, array('\'' => '&#039;', "\xC2\xA0" => '&nbsp;', '>">' => '&quot;', '<"<' => '"', '<lt<' => '&lt;'));
+		return strtr($data, array('\'' => '&#039;', "\xC2\xA0" => '&nbsp;', '>">' => '&quot;', '<"<' => '"', '<lt<' => '&lt;'));
 	}
 
 	/**
@@ -189,10 +191,10 @@ class Autolink
 	 *
 	 * @param string $data
 	 */
-	public function parseEmails(&$data)
+	public function parseEmails($data)
 	{
 		// Next, emails...
-		$data = preg_replace($this->email_search, $this->email_replace, $data);
+		return preg_replace($this->email_search, $this->email_replace, $data);
 	}
 
 	/**

@@ -398,7 +398,7 @@ function pbe_create_post($pbe, $email_message, $topic_info)
 
 	// Validate they have permission to reply
 	$becomesApproved = true;
-	if (!in_array('postby_email', $pbe['user_info']['permissions']) && !$pbe['user_info']['admin'])
+	if (!in_array('postby_email', $pbe['user_info']['permissions']) && !$pbe['user_info']['is_admin'])
 		return pbe_emailError('error_permission', $email_message);
 	elseif ($topic_info['locked'] && !$pbe['user_info']['is_admin'] && !in_array('moderate_forum', $pbe['user_info']['permissions']))
 		return pbe_emailError('error_locked', $email_message);

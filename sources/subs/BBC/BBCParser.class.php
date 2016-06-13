@@ -50,6 +50,7 @@ class BBCParser
 	protected $num_footnotes = 0;
 	protected $smiley_marker = "\r";
 	protected $lastAutoPos = 0;
+	protected $fn_content = array();
 
 	/**
 	 * BBCParser constructor.
@@ -277,7 +278,7 @@ class BBCParser
 			// Are we trimming outside this tag?
 			if (!empty($tag[Codes::ATTR_TRIM]) && $tag[Codes::ATTR_TRIM] !== Codes::TRIM_OUTSIDE)
 			{
-				$this->trimWhiteSpace($this->message, $this->pos + 1);
+				$this->trimWhiteSpace($this->pos + 1);
 			}
 		}
 	}
@@ -393,7 +394,7 @@ class BBCParser
 			// Trim inside whitespace
 			if (!empty($tag[Codes::ATTR_TRIM]) && $tag[Codes::ATTR_TRIM] !== Codes::TRIM_INSIDE)
 			{
-				$this->trimWhiteSpace($this->message, $this->pos + 1);
+				$this->trimWhiteSpace($this->pos + 1);
 			}
 		}
 
@@ -440,9 +441,9 @@ class BBCParser
 	 *
 	 * @param string $data
 	 */
-	protected function parseHTML(&$data)
+	protected function parseHTML($data)
 	{
-		$this->html_parser->parse($data);
+		return $this->html_parser->parse($data);
 	}
 
 	/**
@@ -450,11 +451,11 @@ class BBCParser
 	 *
 	 * @param string $data
 	 */
-	protected function autoLink(&$data)
+	protected function autoLink($data)
 	{
 		if ($data === '' || $data === $this->smiley_marker || !$this->autolinker->hasPossible())
 		{
-			return;
+			return $data;
 		}
 
 		// Are we inside tags that should be auto linked?
@@ -464,12 +465,12 @@ class BBCParser
 			{
 				if (!$open_tag[Codes::ATTR_AUTOLINK])
 				{
-					return;
+					return $data;
 				}
 			}
 		}
 
-		$this->autolinker->parse($data);
+		return $this->autolinker->parse($data);
 	}
 
 	/**
@@ -1058,7 +1059,7 @@ class BBCParser
 		// For parsed content, we must recurse to avoid security problems.
 		if ($tag[Codes::ATTR_TYPE] === Codes::TYPE_PARSED_EQUALS)
 		{
-			$this->recursiveParser($data, $tag);
+			$data = $this->recursiveParser($data, $tag);
 		}
 
 		$tag[Codes::ATTR_AFTER] = strtr($tag[Codes::ATTR_AFTER], array('$1' => $data));
@@ -1140,12 +1141,12 @@ class BBCParser
 		if ($this->possible_html && strpos($data, '&lt;') !== false)
 		{
 			// @todo new \Parser\BBC\HTML;
-			$this->parseHTML($data);
+			$data = $this->parseHTML($data);
 		}
 
 		if (!empty($GLOBALS['modSettings']['autoLinkUrls']))
 		{
-			$this->autoLink($data);
+			$data = $this->autoLink($data);
 		}
 
 		// This cannot be moved earlier. It breaks tests
@@ -1168,14 +1169,14 @@ class BBCParser
 	 */
 	protected function handleFootnotes()
 	{
-		global $fn_num, $fn_content, $fn_count;
+		global $fn_num, $fn_count;
 		static $fn_total;
 
 		// @todo temporary until we have nesting
 		$this->message = str_replace(array('[footnote]', '[/footnote]'), '', $this->message);
 
 		$fn_num = 0;
-		$fn_content = array();
+		$this->fn_content = array();
 		$fn_count = isset($fn_total) ? $fn_total : 0;
 
 		// Replace our footnote text with a [1] link, save the text for use at the end of the message
@@ -1185,7 +1186,9 @@ class BBCParser
 		// If we have footnotes, add them in at the end of the message
 		if (!empty($fn_num))
 		{
-			$this->message .= '<div class="bbc_footnotes">' . implode('', $fn_content) . '</div>';
+			$this->message = rtrim($this->message, "\r");
+
+			$this->message .= '<div class="bbc_footnotes">' . implode('', $this->fn_content) . '</div>';
 		}
 	}
 
@@ -1198,10 +1201,10 @@ class BBCParser
 	 */
 	protected function footnoteCallback(array $matches)
 	{
-		global $fn_num, $fn_content, $fn_count;
+		global $fn_num, $fn_count;
 
 		$fn_num++;
-		$fn_content[] = '<div class="target" id="fn' . $fn_num . '_' . $fn_count . '"><sup>' . $fn_num . '&nbsp;</sup>' . $matches[2] . '<a class="footnote_return" href="#ref' . $fn_num . '_' . $fn_count . '">&crarr;</a></div>';
+		$this->fn_content[] = '<div class="target" id="fn' . $fn_num . '_' . $fn_count . '"><sup>' . $fn_num . '&nbsp;</sup>' . $matches[2] . '<a class="footnote_return" href="#ref' . $fn_num . '_' . $fn_count . '">&crarr;</a></div>';
 
 		return '<a class="target" href="#fn' . $fn_num . '_' . $fn_count . '" id="ref' . $fn_num . '_' . $fn_count . '">[' . $fn_num . ']</a>';
 	}
@@ -1287,7 +1290,7 @@ class BBCParser
 	 * @param string $data
 	 * @param array $tag
 	 */
-	protected function recursiveParser(&$data, array $tag)
+	protected function recursiveParser($data, array $tag)
 	{
 		// @todo if parsed tags allowed is empty, return?
 		$bbc = clone $this->bbc;
@@ -1303,7 +1306,7 @@ class BBCParser
 		call_integration_hook('integrate_recursive_bbc_parser', array(&$autolinker, &$html));
 
 		$parser = new \BBC\BBCParser($bbc, $autolinker, $html);
-		$data = $parser->enableSmileys(empty($tag[Codes::ATTR_PARSED_TAGS_ALLOWED]))->parse($data);
+		return $parser->enableSmileys(empty($tag[Codes::ATTR_PARSED_TAGS_ALLOWED]))->parse($data);
 	}
 
 	/**
@@ -1403,14 +1406,13 @@ class BBCParser
 	/**
 	 * Does what it says, removes whitespace
 	 *
-	 * @param string &$message
 	 * @param null|int $offset = null
 	 */
-	protected function trimWhiteSpace(&$message, $offset = null)
+	protected function trimWhiteSpace($offset = null)
 	{
 		if (preg_match('~(<br />|&nbsp;|\s)*~', $this->message, $matches, null, $offset) !== 0 && isset($matches[0]) && $matches[0] !== '')
 		{
-			$this->message = substr_replace($this->message, '', $this->pos, strlen($matches[0]));
+			substr_replace($this->message, '', $this->pos, strlen($matches[0]));
 		}
 	}
 
@@ -1535,7 +1537,7 @@ class BBCParser
 
 			if (isset($tag[Codes::ATTR_TRIM]) && $tag[Codes::ATTR_TRIM] !== Codes::TRIM_INSIDE)
 			{
-				$this->trimWhiteSpace($this->message, $this->pos);
+				$this->trimWhiteSpace($this->pos);
 			}
 
 			$this->closeOpenedTag();
