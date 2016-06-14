@@ -45,15 +45,15 @@ class HtmlParser
 	 * Calls the functions to parse the handful of allowable HTML tags
 	 * @param $data
 	 */
-	public function parse(&$data)
+	public function parse($data)
 	{
-		$this->anchorTags($data);
+		$data = $this->anchorTags($data);
 
-		$this->emptyTags($data);
+		$data = $this->emptyTags($data);
 
-		$this->closableTags($data);
+		$data = $this->closableTags($data);
 
-		$this->imageTags($data);
+		return $this->imageTags($data);
 	}
 
 	/**
@@ -76,31 +76,32 @@ class HtmlParser
 	 * Convert <a tags to [url
 	 * @param $data
 	 */
-	protected function anchorTags(&$data)
+	protected function anchorTags($data)
 	{
 		// Changes <a href=... to [url=
 		$data = preg_replace('~&lt;a\s+href=((?:&quot;)?)((?:https?://|mailto:)\S+?)\\1&gt;~i', '[url=$2]', $data);
-		$data = preg_replace('~&lt;/a&gt;~i', '[/url]', $data);
+		return preg_replace('~&lt;/a&gt;~i', '[/url]', $data);
 	}
 
 	/**
 	 * Converts self closing HTML to appropriate BBC tag
 	 * @param $data
 	 */
-	protected function emptyTags(&$data)
+	protected function emptyTags($data)
 	{
 		// <br /> should be empty.
 		foreach ($this->empty_tags as $tag)
 		{
 			$data = str_replace(array('&lt;' . $tag . '&gt;', '&lt;' . $tag . '/&gt;', '&lt;' . $tag . ' /&gt;'), '[' . $tag . ' /]', $data);
 		}
+		return $data;
 	}
 
 	/**
 	 * Converts simple closable tags to equivalent BBC codes
 	 * @param $data
 	 */
-	protected function closableTags(&$data)
+	protected function closableTags($data)
 	{
 		foreach ($this->closable_tags as $tag)
 		{
@@ -112,6 +113,7 @@ class HtmlParser
 				$data = substr($data, 0, -1) . str_repeat('</' . $tag . '>', $diff) . substr($data, -1);
 			}
 		}
+		return $data;
 	}
 
 	/**
@@ -119,7 +121,7 @@ class HtmlParser
 	 *
 	 * @param $data
 	 */
-	protected function imageTags(&$data)
+	protected function imageTags($data)
 	{
 		global $modSettings;
 
@@ -167,5 +169,6 @@ class HtmlParser
 
 			$data = strtr($data, $replaces);
 		}
+		return $data;
 	}
 }
