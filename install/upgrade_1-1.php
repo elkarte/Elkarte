@@ -741,7 +741,7 @@ class UpgradeInstructions_upgrade_1_1
 						array(
 							'type' => 'varchar',
 							'size' => 255
-						),
+						)
 					);
 				}
 			)
