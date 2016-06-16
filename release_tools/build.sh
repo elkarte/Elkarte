@@ -43,9 +43,3 @@ rm .scrutinizer.yml
 rm .travis.yml
 
 zip "ElkArte_v${VERSION//[.]/-}_$SUBVERSION""_install.zip" -r ./
-
-# Done like that because installcore.php would be caught in an install*.php
-rm ./install/install.php
-rm ./install/install_*.php
-
-zip "ElkArte_v${VERSION//[.]/-}_$SUBVERSION""_upgrade.zip" -r ./
