@@ -43,4 +43,4 @@ rm .gitignore
 rm .scrutinizer.yml
 rm .travis.yml
 
-zip "ElkArte_v${VERSION//[.]/-}_$SUBVERSION""_install.zip" -r ./
+zip "ElkArte_v${VERSION//[.]/-}-$SUBVERSION""_install.zip" -r ./
