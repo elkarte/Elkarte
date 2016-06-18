@@ -963,9 +963,9 @@ class Database_MySQL extends Database_Abstract
 	{
 		global $db_name;
 
-		$db_name_str = $db_name_str == false ? $db_name : $db_name_str;
+		$db_name_str = $db_name_str === false ? $db_name : $db_name_str;
 		$db_name_str = trim($db_name_str);
-		$filter = $filter == false ? '' : ' LIKE \'' . $filter . '\'';
+		$filter = $filter === false ? '' : ' LIKE \'' . $filter . '\'';
 
 		$request = $this->query('', '
 			SHOW TABLES
