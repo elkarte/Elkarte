@@ -56,9 +56,23 @@ class Site_Dispatcher
 	 * This does all the work to figure out which controller and method need
 	 * to be called.
 	 */
-	public function __construct()
+	public function __construct($action = null, $subaction = null, $area = null)
 	{
 		global $board, $topic, $modSettings, $user_info, $maintenance;
+
+		// Backward compatibility with 1.0
+		if ($action === null)
+		{
+			$action = $this->_getAction();
+		}
+		if ($subaction === null)
+		{
+			$subaction = $this->_getSubAction();
+		}
+		if ($area === null)
+		{
+			$area = $this->_getArea();
+		}
 
 		// Default action of the forum: board index
 		// Every time we don't know what to do, we'll do this :P
@@ -74,10 +88,10 @@ class Site_Dispatcher
 		if (!empty($maintenance) && !allowedTo('admin_forum'))
 		{
 			// You can only login
-			if (isset($_GET['action']) && ($_GET['action'] == 'login2' || $_GET['action'] == 'logout'))
+			if ($action == 'login2' || $action == 'logout')
 			{
 				$this->_controller_name = 'Auth_Controller';
-				$this->_function_name = $_GET['action'] == 'login2' ? 'action_login2' : 'action_logout';
+				$this->_function_name = $action == 'login2' ? 'action_login2' : 'action_logout';
 			}
 			// "maintenance mode" page
 			else
@@ -87,12 +101,12 @@ class Site_Dispatcher
 			}
 		}
 		// If guest access is disallowed, a guest is kicked out... politely. :P
-		elseif (empty($modSettings['allow_guestAccess']) && $user_info['is_guest'] && (!isset($_GET['action']) || !in_array($_GET['action'], array('login', 'login2', 'register', 'reminder', 'help', 'quickhelp', 'mailq', 'openidreturn'))))
+		elseif (empty($modSettings['allow_guestAccess']) && $user_info['is_guest'] && (!in_array($action, array('login', 'login2', 'register', 'reminder', 'help', 'quickhelp', 'mailq', 'openidreturn'))))
 		{
 			$this->_controller_name = 'Auth_Controller';
 			$this->_function_name = 'action_kickguest';
 		}
-		elseif (empty($_GET['action']))
+		elseif (empty($action))
 		{
 			// Home page: board index
 			if (empty($board) && empty($topic))
@@ -177,33 +191,33 @@ class Site_Dispatcher
 		call_integration_hook('integrate_actions', array(&$actionArray, &$adminActions));
 
 		// Is it in core legacy actions?
-		if (isset($actionArray[$_GET['action']]))
+		if (isset($actionArray[$action]))
 		{
-			$this->_controller_name = $actionArray[$_GET['action']][0];
+			$this->_controller_name = $actionArray[$action][0];
 
 			// If the method is coded in, use it
-			if (!empty($actionArray[$_GET['action']][1]))
-				$this->_function_name = $actionArray[$_GET['action']][1];
+			if (!empty($actionArray[$action][1]))
+				$this->_function_name = $actionArray[$action][1];
 			// Otherwise fall back to naming patterns
-			elseif (isset($_GET['sa']) && preg_match('~^\w+$~', $_GET['sa']))
-				$this->_function_name = 'action_' . $_GET['sa'];
+			elseif (!empty($subaction) && preg_match('~^\w+$~', $subaction))
+				$this->_function_name = 'action_' . $subaction;
 			else
 				$this->_function_name = 'action_index';
 		}
 		// Fall back to naming patterns.
 		// addons can use any of them, and it should Just Work (tm).
-		elseif (preg_match('~^[a-zA-Z_\\-]+\d*$~', $_GET['action']))
+		elseif (preg_match('~^[a-zA-Z_\\-]+\d*$~', $action))
 		{
 			// Admin files have their own place
-			$path = in_array($_GET['action'], $adminActions) ? ADMINDIR : CONTROLLERDIR;
+			$path = in_array($action, $adminActions) ? ADMINDIR : CONTROLLERDIR;
 
 			// action=gallery => Gallery.controller.php
 			// sa=upload => action_upload()
-			if (file_exists($path . '/' . ucfirst($_GET['action']) . '.controller.php'))
+			if (file_exists($path . '/' . ucfirst($action) . '.controller.php'))
 			{
-				$this->_controller_name = ucfirst($_GET['action']) . '_Controller';
-				if (isset($_GET['sa']) && preg_match('~^\w+$~', $_GET['sa']) && !isset($_GET['area']))
-					$this->_function_name = 'action_' . $_GET['sa'];
+				$this->_controller_name = ucfirst($action) . '_Controller';
+				if (isset($subaction) && preg_match('~^\w+$~', $subaction) && empty($area))
+					$this->_function_name = 'action_' . $subaction;
 				else
 					$this->_function_name = 'action_index';
 			}
@@ -235,6 +249,33 @@ class Site_Dispatcher
 			$this->_controller_name = $this->_default_action['controller'];
 			$this->_function_name = $this->_default_action['function'];
 		}
+	}
+
+	/**
+	 * Backward compatibility function.
+	 * Determine the current action from $_GET
+	 */
+	protected function _getAction()
+	{
+		return isset($_GET['action']) ? $_GET['action'] : '';
+	}
+
+	/**
+	 * Backward compatibility function.
+	 * Determine the current subaction from $_GET
+	 */
+	protected function _getSubAction()
+	{
+		return isset($_GET['sa']) ? $_GET['sa'] : '';
+	}
+
+	/**
+	 * Backward compatibility function.
+	 * Determine the current area from $_GET
+	 */
+	protected function _getArea()
+	{
+		return isset($_GET['area']) ? $_GET['area'] : '';
 	}
 
 	/**
