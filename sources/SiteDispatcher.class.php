@@ -219,6 +219,22 @@ class Site_Dispatcher
 
 		if (isset($_REQUEST['api']))
 			$this->_function_name .= '_api';
+
+		// 3, 2, ... and go
+		if (is_callable(array($this->_controller_name, $this->_function_name)))
+		{
+			return;
+		}
+		elseif (is_callable(array($this->_controller_name, 'action_index')))
+		{
+			$this->_function_name = 'action_index';
+		}
+		// This should never happen, that's why its here :P
+		else
+		{
+			$this->_controller_name = $this->_default_action['controller'];
+			$this->_function_name = $this->_default_action['function'];
+		}
 	}
 
 	/**
@@ -226,49 +242,23 @@ class Site_Dispatcher
 	 */
 	public function dispatch()
 	{
-		if (!empty($this->_controller_name))
-		{
-			// 3, 2, ... and go
-			if (is_callable(array($this->_controller_name, $this->_function_name)))
-				$method = $this->_function_name;
-			elseif (is_callable(array($this->_controller_name, 'action_index')))
-				$method = 'action_index';
-			// This should never happen, that's why its here :P
-			else
-			{
-				$this->_controller_name = $this->_default_action['controller'];
-				$this->_function_name = $this->_default_action['function'];
+		// Initialize this controller with its event manager
+		$controller = new $this->_controller_name(new Event_Manager());
 
-				return $this->dispatch();
-			}
+		// Fetch controllers generic hook name from the action controller
+		$hook = $controller->getHook();
 
-			// Initialize this controller with its event manager
-			$controller = new $this->_controller_name(new Event_Manager());
+		// Call the controllers pre dispatch method
+		$controller->pre_dispatch();
 
-			// Fetch controllers generic hook name from the action controller
-			$hook = $controller->getHook();
+		// Call integrate_action_XYZ_before -> XYZ_controller -> integrate_action_XYZ_after
+		call_integration_hook('integrate_action_' . $hook . '_before', array($this->_function_name));
 
-			// Call the controllers pre dispatch method
-			$controller->pre_dispatch();
+		$result = $controller->{$this->_function_name}();
 
-			// Call integrate_action_XYZ_before -> XYZ_controller -> integrate_action_XYZ_after
-			call_integration_hook('integrate_action_' . $hook . '_before', array($this->_function_name));
+		call_integration_hook('integrate_action_' . $hook . '_after', array($this->_function_name));
 
-			$result = $controller->{$method}();
-
-			call_integration_hook('integrate_action_' . $hook . '_after', array($this->_function_name));
-
-			return $result;
-		}
-		// Things went pretty bad, huh?
-		else
-		{
-			// default action :P
-			$this->_controller_name = $this->_default_action['controller'];
-			$this->_function_name = $this->_default_action['function'];
-
-			return $this->dispatch();
-		}
+		return $result;
 	}
 
 	/**
