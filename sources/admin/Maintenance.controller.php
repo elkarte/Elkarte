@@ -1024,7 +1024,7 @@ class Maintenance_Controller extends Action_Controller
 	 */
 	public function action_backup_display()
 	{
-		global $user_info;
+		global $user_info, $iknowitmaybeunsafe;
 
 		validateToken('admin-maint');
 
