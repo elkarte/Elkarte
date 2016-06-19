@@ -185,10 +185,8 @@ class Site_Dispatcher
 			'xmlpreview' => array('XmlPreview_Controller', 'action_index'),
 		);
 
-		$adminActions = array('admin', 'jsoption', 'theme', 'viewadminfile', 'viewquery');
-
 		// Allow to extend or change $actionArray through a hook
-		call_integration_hook('integrate_actions', array(&$actionArray, &$adminActions));
+		call_integration_hook('integrate_actions', array(&$actionArray));
 
 		// Is it in core legacy actions?
 		if (isset($actionArray[$action]))
@@ -208,19 +206,13 @@ class Site_Dispatcher
 		// addons can use any of them, and it should Just Work (tm).
 		elseif (preg_match('~^[a-zA-Z_\\-]+\d*$~', $action))
 		{
-			// Admin files have their own place
-			$path = in_array($action, $adminActions) ? ADMINDIR : CONTROLLERDIR;
-
 			// action=gallery => Gallery.controller.php
 			// sa=upload => action_upload()
-			if (file_exists($path . '/' . ucfirst($action) . '.controller.php'))
-			{
-				$this->_controller_name = ucfirst($action) . '_Controller';
-				if (isset($subaction) && preg_match('~^\w+$~', $subaction) && empty($area))
-					$this->_function_name = 'action_' . $subaction;
-				else
-					$this->_function_name = 'action_index';
-			}
+			$this->_controller_name = ucfirst($action) . '_Controller';
+			if (isset($subaction) && preg_match('~^\w+$~', $subaction) && empty($area))
+				$this->_function_name = 'action_' . $subaction;
+			else
+				$this->_function_name = 'action_index';
 		}
 
 		// The file and function weren't found yet?
