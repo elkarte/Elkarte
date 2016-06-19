@@ -51,6 +51,12 @@ class Site_Dispatcher
 	protected $_default_action;
 
 	/**
+	 * The instance of the controller
+	 * @var null|Action_Controller
+	 */
+	protected $_controller;
+
+	/**
 	 * Create an instance and initialize it.
 	 *
 	 * This does all the work to figure out which controller and method need
@@ -58,7 +64,7 @@ class Site_Dispatcher
 	 */
 	public function __construct($action = null, $subaction = null, $area = null)
 	{
-		global $board, $topic, $modSettings, $user_info, $maintenance;
+		global $modSettings;
 
 		// Backward compatibility with 1.0
 		if ($action === null)
@@ -84,6 +90,29 @@ class Site_Dispatcher
 		// Reminder: hooks need to account for multiple addons setting this hook.
 		call_integration_hook('integrate_action_frontpage', array(&$this->_default_action));
 
+		$this->_noActionActions($action, !empty($modSettings['allow_guestAccess']));
+
+		// Now this return won't be cool, but lets do it
+		if (empty($this->_controller_name))
+		{
+			$this->_namingPatterns($action, $subaction, $area);
+		}
+
+		// Initialize this controller with its event manager
+		$this->_controller = new $this->_controller_name(new Event_Manager());
+	}
+
+	/**
+	 * Finds out if the current action is one of those without an "action"
+	 * parameter in the URL
+	 *
+	 * @param string $action
+	 * @param bool $allow_guestAccess
+	 */
+	protected function _noActionActions($action, $allow_guestAccess = true)
+	{
+		global $maintenance, $user_info, $board, $topic;
+
 		// Maintenance mode: you're out of here unless you're admin
 		if (!empty($maintenance) && !allowedTo('admin_forum'))
 		{
@@ -101,7 +130,7 @@ class Site_Dispatcher
 			}
 		}
 		// If guest access is disallowed, a guest is kicked out... politely. :P
-		elseif (empty($modSettings['allow_guestAccess']) && $user_info['is_guest'] && (!in_array($action, array('login', 'login2', 'register', 'reminder', 'help', 'quickhelp', 'mailq', 'openidreturn'))))
+		elseif ($allow_guestAccess === false && $user_info['is_guest'] && (!in_array($action, array('login', 'login2', 'register', 'reminder', 'help', 'quickhelp', 'mailq', 'openidreturn'))))
 		{
 			$this->_controller_name = 'Auth_Controller';
 			$this->_function_name = 'action_kickguest';
@@ -131,11 +160,18 @@ class Site_Dispatcher
 				$this->_function_name = 'action_display';
 			}
 		}
+	}
 
-		// Now this return won't be cool, but lets do it
-		if (!empty($this->_controller_name) && !empty($this->_function_name))
-			return;
-
+	/**
+	 * Compares the $_GET['action'] with array or naming patterns to find
+	 * a suitable controller.
+	 *
+	 * @param string $action
+	 * @param string $subaction
+	 * @param string $area
+	 */
+	protected function _namingPatterns($action, $subaction, $area)
+	{
 		// Start with our nice and cozy err... *cough*
 		// Format:
 		// $_GET['action'] => array($class, $method)
@@ -275,19 +311,16 @@ class Site_Dispatcher
 	 */
 	public function dispatch()
 	{
-		// Initialize this controller with its event manager
-		$controller = new $this->_controller_name(new Event_Manager());
-
 		// Fetch controllers generic hook name from the action controller
-		$hook = $controller->getHook();
+		$hook = $this->_controller->getHook();
 
 		// Call the controllers pre dispatch method
-		$controller->pre_dispatch();
+		$this->_controller->pre_dispatch();
 
 		// Call integrate_action_XYZ_before -> XYZ_controller -> integrate_action_XYZ_after
 		call_integration_hook('integrate_action_' . $hook . '_before', array($this->_function_name));
 
-		$result = $controller->{$this->_function_name}();
+		$result = $this->_controller->{$this->_function_name}();
 
 		call_integration_hook('integrate_action_' . $hook . '_after', array($this->_function_name));
 
