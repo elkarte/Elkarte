@@ -188,6 +188,7 @@ class Site_Dispatcher
 			'quickhelp' => array('Help_Controller', 'action_quickhelp'),
 			'jsmodify' => array('Post_Controller', 'action_jsmodify'),
 			'jsoption' => array('ManageThemes_Controller', 'action_jsoption'),
+			'keepalive' => array('Auth_Controller', 'action_keepalive'),
 			'lockvoting' => array('Poll_Controller', 'action_lockvoting'),
 			'login' => array('Auth_Controller', 'action_login'),
 			'login2' => array('Auth_Controller', 'action_login2'),
@@ -325,6 +326,11 @@ class Site_Dispatcher
 		call_integration_hook('integrate_action_' . $hook . '_after', array($this->_function_name));
 
 		return $result;
+	}
+
+	public function noSecurity()
+	{
+		return $this->_controller->needSecurity($this->_function_name) === false;
 	}
 
 	/**

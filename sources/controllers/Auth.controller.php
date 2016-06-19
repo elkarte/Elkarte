@@ -27,6 +27,19 @@ if (!defined('ELK'))
  */
 class Auth_Controller extends Action_Controller
 {
+
+	/**
+	 * {@inheritdoc }
+	 */
+	public function needSecurity($action = '')
+	{
+		if ($action === 'action_keepalive')
+		{
+			return false;
+		}
+		return true;
+	}
+
 	/**
 	 * Entry point in Auth controller
 	 *
@@ -544,6 +557,17 @@ class Auth_Controller extends Action_Controller
 
 		// It'll never get here... until it does :P
 		redirectexit();
+	}
+
+	public function action_keepalive()
+	{
+		global $context;
+
+		Template_Layers::getInstance()->removeAll();
+		$context['sub_template'] = false;
+
+		header('Content-Type: image/gif');
+		echo "\x47\x49\x46\x38\x39\x61\x01\x00\x01\x00\x80\x00\x00\x00\x00\x00\x00\x00\x00\x21\xF9\x04\x01\x00\x00\x00\x00\x2C\x00\x00\x00\x00\x01\x00\x01\x00\x00\x02\x02\x44\x01\x00\x3B";
 	}
 
 	/**

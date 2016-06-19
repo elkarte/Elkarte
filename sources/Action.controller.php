@@ -65,6 +65,17 @@ abstract class Action_Controller
 	}
 
 	/**
+	 * Tells if the controller requires the security framework to be loaded.
+	 *
+	 * @param string $action the function name of the current action
+	 * @return boolean
+	 */
+	public function needSecurity($action = '')
+	{
+		return true;
+	}
+
+	/**
 	 * Tells if the controller can be displayed as front page.
 	 *
 	 * @return boolean
