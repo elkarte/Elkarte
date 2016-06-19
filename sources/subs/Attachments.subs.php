@@ -358,7 +358,13 @@ function processAttachments($id_msg = null)
 		automanage_attachments_check_directory();
 
 	if (!is_array($modSettings['attachmentUploadDir']))
-		$modSettings['attachmentUploadDir'] = unserialize($modSettings['attachmentUploadDir']);
+	{
+		$attachmentUploadDir = @unserialize($modSettings['attachmentUploadDir']);
+		if (!empty($attachmentUploadDir))
+		{
+			$modSettings['attachmentUploadDir'] = $attachmentUploadDir;
+		}
+	}
 
 	$context['attach_dir'] = $modSettings['attachmentUploadDir'][$modSettings['currentAttachmentUploadDir']];
 
