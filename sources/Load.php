@@ -338,6 +338,7 @@ function loadUserSettings()
 		'language' => empty($user_settings['lngfile']) || empty($modSettings['userLanguage']) ? $language : $user_settings['lngfile'],
 		'is_guest' => $id_member == 0,
 		'is_admin' => in_array(1, $user_info['groups']),
+		'is_mod' => false,
 		'theme' => empty($user_settings['id_theme']) ? 0 : $user_settings['id_theme'],
 		'last_login' => empty($user_settings['last_login']) ? 0 : $user_settings['last_login'],
 		'ip' => $req->client_ip(),
