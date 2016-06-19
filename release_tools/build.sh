@@ -6,7 +6,8 @@
 #   sh release_tools/build.sh development 1.1 beta 2
 
 # First things first: check dependencies
-command -v zip >/dev/null 2>&1 || { echo >&2 "I require zip but it's not installed.  Aborting."; exit 1; }
+command -v git >/dev/null 2>&1 || { echo >&2 "git is required but it's not installed.  Aborting."; exit 1; }
+command -v zip >/dev/null 2>&1 || { echo >&2 "zip is required but it's not installed.  Aborting."; exit 1; }
 
 REPO="http://github.com/ElkArte/ElkArte.git"
 BRANCH=$1
@@ -42,4 +43,4 @@ rm .gitignore
 rm .scrutinizer.yml
 rm .travis.yml
 
-zip "ElkArte_v${VERSION//[.]/-}_$SUBVERSION""_install.zip" -r ./
+zip "ElkArte_v${VERSION//[.]/-}-$SUBVERSION""_install.zip" -r ./

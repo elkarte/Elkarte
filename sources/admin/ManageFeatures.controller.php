@@ -1124,6 +1124,32 @@ class ManageFeatures_Controller extends Action_Controller
 				// Still not a unique column name? Leave it up to the user, then.
 				if (!$unique)
 					Errors::instance()->fatal_lang_error('custom_option_not_unique');
+
+				// And create a new field
+				$new_field = array(
+					'col_name' => $colname,
+					'field_name' => $this->_req->post->field_name,
+					'field_desc' => $this->_req->post->field_desc,
+					'field_type' => $this->_req->post->field_type,
+					'field_length' => $field_length,
+					'field_options' => $field_options,
+					'show_reg' => $show_reg,
+					'show_display' => $show_display,
+					'show_memberlist' => $show_memberlist,
+					'show_profile' => $show_profile,
+					'private' => $private,
+					'active' => $active,
+					'default_value' => $default,
+					'rows' => $rows,
+					'cols' => $cols,
+					'can_search' => $can_search,
+					'bbc' => $bbc,
+					'mask' => $mask,
+					'enclose' => $enclose,
+					'placement' => $placement,
+					'vieworder' => list_getProfileFieldSize() + 1,
+				);
+				addProfileField($new_field);
 			}
 			// Work out what to do with the user data otherwise...
 			else
@@ -1164,11 +1190,8 @@ class ManageFeatures_Controller extends Action_Controller
 					}
 				}
 				// @todo Maybe we should adjust based on new text length limits?
-			}
 
-			// Updating an existing field?
-			if ($context['fid'])
-			{
+				// And finally update an existing field
 				$field_data = array(
 					'field_length' => $field_length,
 					'show_reg' => $show_reg,
@@ -1197,34 +1220,6 @@ class ManageFeatures_Controller extends Action_Controller
 				// Just clean up any old selects - these are a pain!
 				if (($this->_req->post->field_type == 'select' || $this->_req->post->field_type == 'radio') && !empty($newOptions))
 					deleteOldProfileFieldSelects($newOptions, $context['field']['colname']);
-			}
-			// Otherwise creating a new one
-			else
-			{
-				$new_field = array(
-					'col_name' => $colname,
-					'field_name' => $this->_req->post->field_name,
-					'field_desc' => $this->_req->post->field_desc,
-					'field_type' => $this->_req->post->field_type,
-					'field_length' => $field_length,
-					'field_options' => $field_options,
-					'show_reg' => $show_reg,
-					'show_display' => $show_display,
-					'show_memberlist' => $show_memberlist,
-					'show_profile' => $show_profile,
-					'private' => $private,
-					'active' => $active,
-					'default_value' => $default,
-					'rows' => $rows,
-					'cols' => $cols,
-					'can_search' => $can_search,
-					'bbc' => $bbc,
-					'mask' => $mask,
-					'enclose' => $enclose,
-					'placement' => $placement,
-					'vieworder' => list_getProfileFieldSize() + 1,
-				);
-				addProfileField($new_field);
 			}
 		}
 		// Deleting?

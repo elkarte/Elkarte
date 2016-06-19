@@ -449,7 +449,7 @@ class Install_Controller
 				if (!$foundOne)
 				{
 					if (isset($db['default_host']))
-						$incontext['db']['server'] = ini_get($db['default_host']) or $incontext['db']['server'] = 'localhost';
+						$incontext['db']['server'] = ini_get($db['default_host']) || $incontext['db']['server'] = 'localhost';
 					if (isset($db['default_user']))
 					{
 						$incontext['db']['user'] = ini_get($db['default_user']);

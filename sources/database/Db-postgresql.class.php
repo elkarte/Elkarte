@@ -857,7 +857,7 @@ class Database_PostgreSQL extends Database_Abstract
 		$request = $this->query('', '
 			SELECT tablename
 			FROM pg_tables
-			WHERE schemaname = {string:schema_public}' . ($filter == false ? '' : '
+			WHERE schemaname = {string:schema_public}' . ($filter === false ? '' : '
 				AND tablename LIKE {string:filter}') . '
 			ORDER BY tablename',
 			array(

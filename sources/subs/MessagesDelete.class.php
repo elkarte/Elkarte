@@ -977,7 +977,7 @@ class MessagesDelete
 		$db->free_result($request);
 
 		// Recycled topic.
-		if ($topic_exists == true)
+		if ($topic_exists === true)
 		{
 			// Fix the id_first_msg and id_last_msg for the source topic.
 			$source_topic_data = array(

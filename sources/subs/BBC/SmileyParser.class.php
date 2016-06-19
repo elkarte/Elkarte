@@ -41,6 +41,11 @@ class SmileyParser
 		}
 	}
 
+	/**
+	 * Enables/disabled the parsing
+	 *
+	 * @param bool $message
+	 */
 	public function setEnabled($toggle)
 	{
 		$this->enabled = (bool) $toggle;

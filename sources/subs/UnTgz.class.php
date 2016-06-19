@@ -163,7 +163,7 @@ class UnTgz
 	public function read_tgz_data()
 	{
 		// Snif test that this is a .tgz tar.gz file
-		if (empty($this->_header) && $this->check_valid_tgz() == false)
+		if (empty($this->_header) && $this->check_valid_tgz() === false)
 			return false;
 
 		// The tgz information for this archive
