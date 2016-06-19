@@ -1059,7 +1059,7 @@ CREATE TABLE {$db_prefix}log_online (
   log_time int(10) NOT NULL default '0',
   id_member mediumint(8) unsigned NOT NULL default '0',
   id_spider smallint(5) unsigned NOT NULL default '0',
-  ip int(10) unsigned NOT NULL default '0',
+  ip varchar(255) NOT NULL default '',
   url text NOT NULL,
   PRIMARY KEY (session),
   KEY log_time (log_time),

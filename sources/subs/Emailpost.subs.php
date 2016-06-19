@@ -1762,10 +1762,11 @@ function query_update_member_stats($pbe, $email_message, $topic_info = array())
 	// Place the entry in to the online log so the who's online can use it
 	$serialized = serialize($get_temp);
 	$session_id = 'ip' . $pbe['profile']['member_ip'];
+	$member_ip = empty($pbe['profile']['member_ip']) ? 0 : $pbe['profile']['member_ip'];
 	$db->insert($do_delete ? 'ignore' : 'replace',
 		'{db_prefix}log_online',
-		array('session' => 'string', 'id_member' => 'int', 'id_spider' => 'int', 'log_time' => 'int', 'ip' => 'raw', 'url' => 'string'),
-		array($session_id, $pbe['profile']['id_member'], 0, $last_login, 'IFNULL(INET_ATON(\'' . $pbe['profile']['member_ip'] . '\'), 0)', $serialized),
+		array('session' => 'string', 'id_member' => 'int', 'id_spider' => 'int', 'log_time' => 'int', 'ip' => 'string', 'url' => 'string'),
+		array($session_id, $pbe['profile']['id_member'], 0, $last_login, $member_ip, $serialized),
 		array('session')
 	);
 }
