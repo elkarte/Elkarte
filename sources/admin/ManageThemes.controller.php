@@ -1331,26 +1331,26 @@ class ManageThemes_Controller extends Action_Controller
 		// If this is the admin preferences the passed value will just be an element of it.
 		if ($_GET['var'] == 'admin_preferences')
 		{
-			$options['admin_preferences'] = !empty($options['admin_preferences']) ? unserialize($options['admin_preferences']) : array();
+			$options['admin_preferences'] = !empty($options['admin_preferences']) ? json_decode($options['admin_preferences'], true) : array();
 
 			// New thingy...
 			if (isset($_GET['admin_key']) && strlen($_GET['admin_key']) < 5)
 				$options['admin_preferences'][$_GET['admin_key']] = $_GET['val'];
 
 			// Change the value to be something nice,
-			$_GET['val'] = serialize($options['admin_preferences']);
+			$_GET['val'] = json_encode($options['admin_preferences']);
 		}
 		// If this is the window min/max settings, the passed window name will just be an element of it.
 		elseif ($_GET['var'] == 'minmax_preferences')
 		{
-			$options['minmax_preferences'] = !empty($options['minmax_preferences']) ? unserialize($options['minmax_preferences']) : array();
+			$options['minmax_preferences'] = !empty($options['minmax_preferences']) ? json_decode($options['minmax_preferences'], true) : array();
 
 			// New value for them
 			if (isset($_GET['minmax_key']) && strlen($_GET['minmax_key']) < 10)
 				$options['minmax_preferences'][$_GET['minmax_key']] = $_GET['val'];
 
 			// Change the value to be something nice,
-			$_GET['val'] = serialize($options['minmax_preferences']);
+			$_GET['val'] = json_encode($options['minmax_preferences']);
 		}
 
 		// Update the option.

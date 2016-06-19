@@ -1423,10 +1423,10 @@ function loadTheme($id_theme = 0, $initialize = true)
 		$context['user']['name'] = $txt['guest_title'];
 
 	// Set up some additional interface preference context
-	$context['admin_preferences'] = !empty($options['admin_preferences']) ? unserialize($options['admin_preferences']) : array();
+	$context['admin_preferences'] = !empty($options['admin_preferences']) ? json_decode($options['admin_preferences'], true) : array();
 
 	if (!$user_info['is_guest'])
-		$context['minmax_preferences'] = !empty($options['minmax_preferences']) ? unserialize($options['minmax_preferences']) : array();
+		$context['minmax_preferences'] = !empty($options['minmax_preferences']) ? json_decode($options['minmax_preferences'], true) : array();
 	// Guest may have collapsed the header, check the cookie to prevent collapse jumping
 	elseif ($user_info['is_guest'] && isset($_COOKIE['upshrink']))
 		$context['minmax_preferences'] = array('upshrink' => $_COOKIE['upshrink']);

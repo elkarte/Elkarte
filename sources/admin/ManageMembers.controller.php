@@ -283,7 +283,7 @@ class ManageMembers_Controller extends Action_Controller
 
 			$search_params = array();
 			if ($context['sub_action'] == 'query' && !empty($_REQUEST['params']) && empty($_POST['types']))
-				$search_params = @unserialize(base64_decode($_REQUEST['params']));
+				$search_params = @json_decode(base64_decode($_REQUEST['params']), true);
 			elseif (!empty($_POST))
 			{
 				$search_params['types'] = $_POST['types'];
@@ -292,7 +292,7 @@ class ManageMembers_Controller extends Action_Controller
 						$search_params[$param_name] = $_POST[$param_name];
 			}
 
-			$search_url_params = isset($search_params) ? base64_encode(serialize($search_params)) : null;
+			$search_url_params = isset($search_params) ? base64_encode(json_encode($search_params)) : null;
 
 			// @todo Validate a little more.
 			// Loop through every field of the form.
