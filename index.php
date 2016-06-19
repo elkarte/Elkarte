@@ -201,6 +201,9 @@ function elk_main()
 	// A safer way to work with our form globals
 	$_req = HttpReq::instance();
 
+	// What shall we do?
+	$dispatcher = new Site_Dispatcher();
+
 	// Special case: session keep-alive, output a transparent pixel.
 	if ($_req->getQuery('action') === 'keepalive')
 	{
@@ -258,9 +261,6 @@ function elk_main()
 			trackStats(array('hits' => '+'));
 	}
 	unset($no_stat_actions);
-
-	// What shall we do?
-	$dispatcher = new Site_Dispatcher();
 
 	// Show where we came from, and go
 	$context['site_action'] = $dispatcher->site_action();
