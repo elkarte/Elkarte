@@ -1331,7 +1331,13 @@ class ManageThemes_Controller extends Action_Controller
 		// If this is the admin preferences the passed value will just be an element of it.
 		if ($_GET['var'] == 'admin_preferences')
 		{
-			$options['admin_preferences'] = !empty($options['admin_preferences']) ? json_decode($options['admin_preferences'], true) : array();
+			$options['admin_preferences'] = serializeToJson($options['admin_preferences'], function($array_form) {
+				global $context;
+
+				$context['admin_preferences'] = $array_form;
+				require_once(SUBSDIR . '/Admin.subs.php');
+				updateAdminPreferences();
+			});
 
 			// New thingy...
 			if (isset($_GET['admin_key']) && strlen($_GET['admin_key']) < 5)
@@ -1343,7 +1349,13 @@ class ManageThemes_Controller extends Action_Controller
 		// If this is the window min/max settings, the passed window name will just be an element of it.
 		elseif ($_GET['var'] == 'minmax_preferences')
 		{
-			$options['minmax_preferences'] = !empty($options['minmax_preferences']) ? json_decode($options['minmax_preferences'], true) : array();
+			$context['minmax_preferences'] = serializeToJson($options['minmax_preferences'], function($array_form) {
+				global $settings, $user_info;
+
+				// Update the option.
+				require_once(SUBSDIR . '/Themes.subs.php');
+				updateThemeOptions(array($settings['theme_id'], $user_info['id'], 'minmax_preferences', json_encode($array_form)));
+			});
 
 			// New value for them
 			if (isset($_GET['minmax_key']) && strlen($_GET['minmax_key']) < 10)

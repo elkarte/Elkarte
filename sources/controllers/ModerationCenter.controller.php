@@ -77,7 +77,13 @@ class ModerationCenter_Controller extends Action_Controller
 		loadLanguage('ModerationCenter');
 		loadTemplate(false, 'admin');
 
-		$context['admin_preferences'] = !empty($options['admin_preferences']) ? json_decode($options['admin_preferences'], true) : array();
+		$context['admin_preferences'] = serializeToJson($options['admin_preferences'], function($array_form) {
+			global $context;
+
+			$context['admin_preferences'] = $array_form;
+			require_once(SUBSDIR . '/Admin.subs.php');
+			updateAdminPreferences();
+		});
 		$context['robot_no_index'] = true;
 
 		// Moderation counts for things that this moderator can take care of
