@@ -27,7 +27,6 @@ if (!defined('ELK'))
  */
 class Auth_Controller extends Action_Controller
 {
-
 	/**
 	 * {@inheritdoc }
 	 */
@@ -559,6 +558,9 @@ class Auth_Controller extends Action_Controller
 		redirectexit();
 	}
 
+	/**
+	 * Ping the server to keep the session alive and not let it disappear.
+	 */
 	public function action_keepalive()
 	{
 		header('Content-Type: image/gif');

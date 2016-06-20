@@ -76,6 +76,17 @@ abstract class Action_Controller
 	}
 
 	/**
+	 * Tells if the controller needs the theme loaded up.
+	 *
+	 * @param string $action the function name of the current action
+	 * @return boolean
+	 */
+	public function needTheme($action = '')
+	{
+		return true;
+	}
+
+	/**
 	 * Tells if the controller can be displayed as front page.
 	 *
 	 * @return boolean

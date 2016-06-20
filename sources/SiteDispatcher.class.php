@@ -328,9 +328,20 @@ class Site_Dispatcher
 		return $result;
 	}
 
+	/**
+	 * If the current controller needs to load all the security framework.
+	 */
 	public function needSecurity()
 	{
 		return $this->_controller->needSecurity($this->_function_name);
+	}
+
+	/**
+	 * If the current controller needs to load the theme.
+	 */
+	public function needTheme()
+	{
+		return $this->_controller->needTheme($this->_function_name);
 	}
 
 	/**

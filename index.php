@@ -220,11 +220,8 @@ function elk_main()
 		// Load the current user's permissions.
 		loadPermissions();
 
-		// Attachments don't require the entire theme to be loaded.
-		if ($_req->getQuery('action') === 'dlattach' && (!empty($modSettings['allow_guestAccess']) && $user_info['is_guest']) && (empty($maintenance) || allowedTo('admin_forum')))
-			detectBrowser();
 		// Load the current theme.  (note that ?theme=1 will also work, may be used for guest theming.)
-		else
+		if ($dispatcher->needTheme())
 		{
 			loadTheme();
 
@@ -233,6 +230,11 @@ function elk_main()
 
 			// The parser is not a DIC just yet
 			loadBBCParsers();
+		}
+		// Otherwise don't require the entire theme to be loaded.
+		else
+		{
+			detectBrowser();
 		}
 
 		// Check if the user should be disallowed access.
