@@ -28,6 +28,14 @@ class Jslocale_Controller extends Action_Controller
 	private $_file_data = null;
 
 	/**
+	 * {@inheritdoc }
+	 */
+	public function trackStats($action = '')
+	{
+		return false;
+	}
+
+	/**
 	 * The default action for the class
 	 */
 	public function action_index()

@@ -87,6 +87,22 @@ abstract class Action_Controller
 	}
 
 	/**
+	 * Tells if the controller wants to be tracked.
+	 *
+	 * @param string $action the function name of the current action
+	 * @return boolean
+	 */
+	public function trackStats($action = '')
+	{
+		if (isset($this->_req->api))
+		{
+			return false;
+		}
+
+		return true;
+	}
+
+	/**
 	 * Tells if the controller can be displayed as front page.
 	 *
 	 * @return boolean

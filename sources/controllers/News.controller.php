@@ -37,6 +37,19 @@ class News_Controller extends Action_Controller
 	private $_limit;
 
 	/**
+	 * {@inheritdoc }
+	 */
+	public function trackStats($action = '')
+	{
+		if ($action === 'action_showfeed')
+		{
+			return false;
+		}
+
+		return true;
+	}
+
+	/**
 	 * Dispatcher. Forwards to the action to execute.
 	 *
 	 * @see Action_Controller::action_index()

@@ -42,6 +42,19 @@ class Register_Controller extends Action_Controller
 	private $_row;
 
 	/**
+	 * {@inheritdoc }
+	 */
+	public function trackStats($action = '')
+	{
+		if ($this->_req->get('sa') === 'verificationcode')
+		{
+			return false;
+		}
+
+		return true;
+	}
+
+	/**
 	 * Pre Dispatch, called before other methods.
 	 */
 	public function pre_dispatch()

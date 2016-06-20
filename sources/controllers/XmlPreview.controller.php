@@ -20,6 +20,14 @@ if (!defined('ELK'))
 class XmlPreview_Controller extends Action_Controller
 {
 	/**
+	 * {@inheritdoc }
+	 */
+	public function trackStats($action = '')
+	{
+		return false;
+	}
+
+	/**
 	 * Calls the correct function for the action.
 	 *
 	 * @see Action_Controller::action_index()

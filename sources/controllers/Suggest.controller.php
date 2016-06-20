@@ -24,6 +24,14 @@ if (!defined('ELK'))
 class Suggest_Controller extends Action_Controller
 {
 	/**
+	 * {@inheritdoc }
+	 */
+	public function trackStats($action = '')
+	{
+		return false;
+	}
+
+	/**
 	 * Intended entry point for this class.
 	 *
 	 * @see Action_Controller::action_index()

@@ -88,6 +88,19 @@ class ManageThemes_Controller extends Action_Controller
 	private $images_url;
 
 	/**
+	 * {@inheritdoc }
+	 */
+	public function trackStats($action = '')
+	{
+		if ($action === 'action_jsoption')
+		{
+			return false;
+		}
+
+		return true;
+	}
+
+	/**
 	 * Subaction handler - manages the action and delegates control to the proper
 	 * sub-action.
 	 *

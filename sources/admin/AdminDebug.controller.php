@@ -24,6 +24,14 @@ if (!defined('ELK'))
 class AdminDebug_Controller extends Action_Controller
 {
 	/**
+	 * {@inheritdoc }
+	 */
+	public function trackStats($action = '')
+	{
+		return false;
+	}
+
+	/**
 	 * Main dispatcher.
 	 *
 	 * @see Action_Controller::action_index()

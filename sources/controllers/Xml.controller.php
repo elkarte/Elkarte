@@ -23,6 +23,14 @@ if (!defined('ELK'))
 class Xml_Controller extends Action_Controller
 {
 	/**
+	 * {@inheritdoc }
+	 */
+	public function trackStats($action = '')
+	{
+		return false;
+	}
+
+	/**
 	 * Main dispatcher for action=xmlhttp.
 	 *
 	 * @see Action_Controller::action_index()
