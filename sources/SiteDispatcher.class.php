@@ -328,9 +328,9 @@ class Site_Dispatcher
 		return $result;
 	}
 
-	public function noSecurity()
+	public function needSecurity()
 	{
-		return $this->_controller->needSecurity($this->_function_name) === false;
+		return $this->_controller->needSecurity($this->_function_name);
 	}
 
 	/**

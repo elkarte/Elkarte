@@ -205,65 +205,63 @@ function elk_main()
 	$dispatcher = new Site_Dispatcher();
 
 	// Special case: session keep-alive, output a transparent pixel.
-	if ($dispatcher->noSecurity())
+	if ($dispatcher->needSecurity())
 	{
-		$dispatcher->dispatch();
-		return;
+		// We should set our security headers now.
+		frameOptionsHeader();
+		securityOptionsHeader();
+
+		// Load the user's cookie (or set as guest) and load their settings.
+		loadUserSettings();
+
+		// Load the current board's information.
+		loadBoard();
+
+		// Load the current user's permissions.
+		loadPermissions();
+
+		// Attachments don't require the entire theme to be loaded.
+		if ($_req->getQuery('action') === 'dlattach' && (!empty($modSettings['allow_guestAccess']) && $user_info['is_guest']) && (empty($maintenance) || allowedTo('admin_forum')))
+			detectBrowser();
+		// Load the current theme.  (note that ?theme=1 will also work, may be used for guest theming.)
+		else
+		{
+			loadTheme();
+
+			// Load BadBehavior before we go much further
+			loadBadBehavior();
+
+			// The parser is not a DIC just yet
+			loadBBCParsers();
+		}
+
+		// Check if the user should be disallowed access.
+		is_not_banned();
+
+		// If we are in a topic and don't have permission to approve it then duck out now.
+		if (!empty($topic) && empty($board_info['cur_topic_approved']) && !allowedTo('approve_posts') && ($user_info['id'] != $board_info['cur_topic_starter'] || $user_info['is_guest']))
+			Errors::instance()->fatal_lang_error('not_a_topic', false);
+
+		$no_stat_actions = array('dlattach', 'jsoption', 'requestmembers', 'jslocale', 'xmlpreview', 'suggest', '.xml', 'xmlhttp', 'verificationcode', 'viewquery', 'viewadminfile');
+		call_integration_hook('integrate_pre_log_stats', array(&$no_stat_actions));
+
+		// Do some logging, unless this is an attachment, avatar, toggle of editor buttons, theme option, XML feed etc.
+		if ((empty($_REQUEST['action']) || !in_array($_REQUEST['action'], $no_stat_actions)
+			|| (!empty($_REQUEST['sa']) && !in_array($_REQUEST['sa'], $no_stat_actions))) && !isset($_REQUEST['api']))
+		{
+			// I see you!
+			writeLog();
+
+			// Track forum statistics and hits...?
+			if (!empty($modSettings['hitStats']))
+				trackStats(array('hits' => '+'));
+		}
+		unset($no_stat_actions);
+
+		// Show where we came from, and go
+		$context['site_action'] = $dispatcher->site_action();
+		$context['site_action'] = !empty($context['site_action']) ? $context['site_action'] : $_req->getQuery('action', 'trim|strval', '');
 	}
 
-	// We should set our security headers now.
-	frameOptionsHeader();
-	securityOptionsHeader();
-
-	// Load the user's cookie (or set as guest) and load their settings.
-	loadUserSettings();
-
-	// Load the current board's information.
-	loadBoard();
-
-	// Load the current user's permissions.
-	loadPermissions();
-
-	// Attachments don't require the entire theme to be loaded.
-	if ($_req->getQuery('action') === 'dlattach' && (!empty($modSettings['allow_guestAccess']) && $user_info['is_guest']) && (empty($maintenance) || allowedTo('admin_forum')))
-		detectBrowser();
-	// Load the current theme.  (note that ?theme=1 will also work, may be used for guest theming.)
-	else
-	{
-		loadTheme();
-
-		// Load BadBehavior before we go much further
-		loadBadBehavior();
-
-		// The parser is not a DIC just yet
-		loadBBCParsers();
-	}
-
-	// Check if the user should be disallowed access.
-	is_not_banned();
-
-	// If we are in a topic and don't have permission to approve it then duck out now.
-	if (!empty($topic) && empty($board_info['cur_topic_approved']) && !allowedTo('approve_posts') && ($user_info['id'] != $board_info['cur_topic_starter'] || $user_info['is_guest']))
-		Errors::instance()->fatal_lang_error('not_a_topic', false);
-
-	$no_stat_actions = array('dlattach', 'jsoption', 'requestmembers', 'jslocale', 'xmlpreview', 'suggest', '.xml', 'xmlhttp', 'verificationcode', 'viewquery', 'viewadminfile');
-	call_integration_hook('integrate_pre_log_stats', array(&$no_stat_actions));
-
-	// Do some logging, unless this is an attachment, avatar, toggle of editor buttons, theme option, XML feed etc.
-	if ((empty($_REQUEST['action']) || !in_array($_REQUEST['action'], $no_stat_actions)
-		|| (!empty($_REQUEST['sa']) && !in_array($_REQUEST['sa'], $no_stat_actions))) && !isset($_REQUEST['api']))
-	{
-		// I see you!
-		writeLog();
-
-		// Track forum statistics and hits...?
-		if (!empty($modSettings['hitStats']))
-			trackStats(array('hits' => '+'));
-	}
-	unset($no_stat_actions);
-
-	// Show where we came from, and go
-	$context['site_action'] = $dispatcher->site_action();
-	$context['site_action'] = !empty($context['site_action']) ? $context['site_action'] : $_req->getQuery('action', 'trim|strval', '');
 	$dispatcher->dispatch();
 }
