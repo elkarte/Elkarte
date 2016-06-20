@@ -207,6 +207,7 @@ function elk_main()
 	// Special case: session keep-alive, output a transparent pixel.
 	if ($dispatcher->noSecurity())
 	{
+		$dispatcher->dispatch();
 		return;
 	}
 
