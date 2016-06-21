@@ -196,7 +196,7 @@ obExit(null, null, true);
  */
 function elk_main()
 {
-	global $modSettings, $user_info, $topic, $board_info, $context;
+	global $modSettings, $context;
 
 	// A safer way to work with our form globals
 	$_req = HttpReq::instance();
@@ -242,10 +242,6 @@ function elk_main()
 
 		// Check if the user should be disallowed access.
 		is_not_banned();
-
-		// If we are in a topic and don't have permission to approve it then duck out now.
-		if (!empty($topic) && empty($board_info['cur_topic_approved']) && !allowedTo('approve_posts') && ($user_info['id'] != $board_info['cur_topic_starter'] || $user_info['is_guest']))
-			Errors::instance()->fatal_lang_error('not_a_topic', false);
 
 		// Do some logging, unless this is an attachment, avatar, toggle of editor buttons, theme option, XML feed etc.
 		if ($dispatcher->trackStats())
