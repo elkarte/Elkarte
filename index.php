@@ -196,7 +196,7 @@ obExit(null, null, true);
  */
 function elk_main()
 {
-	global $modSettings, $user_info, $topic, $board_info, $context, $maintenance;
+	global $modSettings, $user_info, $topic, $board_info, $context;
 
 	// A safer way to work with our form globals
 	$_req = HttpReq::instance();
