@@ -32,6 +32,7 @@ const CACHE_STALE = '?R11';
 error_reporting(E_ALL | E_STRICT & ~8192);
 
 // Directional only script time usage for display
+// getrusage is missing in php < 7 on Windows
 if (function_exists('getrusage'))
 	$rusage_start = getrusage();
 else

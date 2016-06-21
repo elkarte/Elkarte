@@ -181,7 +181,7 @@ class Debug
 
 	/**
 	 * Adds a new getrusage value (by default two are added: one at the beginning
-	 * of the script execution and one at the end
+	 * of the script execution and one at the end)
 	 *
 	 * @param string $point can be end or start depending on when the function
 	 *               is called
@@ -189,6 +189,7 @@ class Debug
 	 */
 	public function rusage($point, $rusage = null)
 	{
+		// getrusage is missing in php < 7 on Windows
 		if (!function_exists('getrusage') || !$this->_track)
 			return;
 
