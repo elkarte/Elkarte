@@ -283,6 +283,7 @@ class Site_Dispatcher
 	/**
 	 * Backward compatibility function.
 	 * Determine the current action from $_GET
+	 * @deprecated since 1.1
 	 */
 	protected function _getAction()
 	{
@@ -292,6 +293,7 @@ class Site_Dispatcher
 	/**
 	 * Backward compatibility function.
 	 * Determine the current subaction from $_GET
+	 * @deprecated since 1.1
 	 */
 	protected function _getSubAction()
 	{
@@ -301,6 +303,7 @@ class Site_Dispatcher
 	/**
 	 * Backward compatibility function.
 	 * Determine the current area from $_GET
+	 * @deprecated since 1.1
 	 */
 	protected function _getArea()
 	{

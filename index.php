@@ -200,9 +200,12 @@ function elk_main()
 
 	// A safer way to work with our form globals
 	$_req = HttpReq::instance();
+	$action = $_req->getQuery('action', 'trim|strval', '');
+	$sub_action = $_req->getQuery('sa', 'trim|strval', '');
+	$area = $_req->getQuery('area', 'trim|strval', '');
 
 	// What shall we do?
-	$dispatcher = new Site_Dispatcher();
+	$dispatcher = new Site_Dispatcher($action, $sub_action, $area);
 
 	// Special case: session keep-alive, output a transparent pixel.
 	if ($dispatcher->needSecurity())
@@ -257,7 +260,10 @@ function elk_main()
 
 		// Show where we came from, and go
 		$context['site_action'] = $dispatcher->site_action();
-		$context['site_action'] = !empty($context['site_action']) ? $context['site_action'] : $_req->getQuery('action', 'trim|strval', '');
+		if (empty($context['site_action']))
+		{
+			$context['site_action'] = $action;
+		}
 	}
 
 	$dispatcher->dispatch();
