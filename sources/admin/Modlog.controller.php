@@ -95,7 +95,7 @@ class Modlog_Controller extends Action_Controller
 		if (!empty($_REQUEST['params']) && empty($_REQUEST['is_search']))
 		{
 			$search_params = base64_decode(strtr($_REQUEST['params'], array(' ' => '+')));
-			$search_params = @unserialize($search_params);
+			$search_params = @json_decode($search_params, true);
 		}
 
 		// This array houses all the valid quick search types.
@@ -126,7 +126,7 @@ class Modlog_Controller extends Action_Controller
 		);
 
 		// Setup the search context.
-		$context['search_params'] = empty($search_params['string']) ? '' : base64_encode(serialize($search_params));
+		$context['search_params'] = empty($search_params['string']) ? '' : base64_encode(json_encode($search_params));
 		$context['search'] = array(
 			'string' => $search_params['string'],
 			'type' => $search_params['type'],

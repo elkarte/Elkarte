@@ -356,6 +356,17 @@ upgrade_query("
 ---#
 
 /******************************************************************************/
+--- Adding more space for IP addresses
+/******************************************************************************/
+---# Altering the session_id columns...
+upgrade_query("
+	TRUNCATE TABLE {db_prefix}log_online;
+
+	ALTER TABLE {$db_prefix}log_online
+	CHANGE `ip` `ip` varchar(255) NOT NULL DEFAULT ''");
+---#
+
+/******************************************************************************/
 --- Adding support for MOVED topics enhancements
 /******************************************************************************/
 ---# Adding new columns to topics table

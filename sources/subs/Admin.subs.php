@@ -405,7 +405,7 @@ function updateAdminPreferences()
 		return false;
 
 	// This is what we'll be saving.
-	$options['admin_preferences'] = serialize($context['admin_preferences']);
+	$options['admin_preferences'] = json_encode($context['admin_preferences']);
 
 	require_once(SUBSDIR . '/Themes.subs.php');
 

@@ -60,7 +60,7 @@ class Suggest_Controller extends Action_Controller
 		loadTemplate('Xml');
 
 		// Any parameters?
-		$context['search_param'] = isset($_REQUEST['search_param']) ? unserialize(base64_decode($_REQUEST['search_param'])) : array();
+		$context['search_param'] = isset($_REQUEST['search_param']) ? json_decode(base64_decode($_REQUEST['search_param']), true) : array();
 
 		if (isset($_REQUEST['suggest_type'], $_REQUEST['search']) && isset($searchTypes[$_REQUEST['suggest_type']]))
 		{

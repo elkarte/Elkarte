@@ -321,7 +321,7 @@ function toggleMentionsApproval($msgs, $approved)
 		)
 	);
 	$status = $approved ? 0 : 3;
-	while ($row = $db->fetch_row($request))
+	while ($row = $db->fetch_assoc($request))
 		updateMentionMenuCount($status, $row['id_member']);
 	$db->free_result($request);
 }

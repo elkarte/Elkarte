@@ -338,6 +338,7 @@ function loadUserSettings()
 		'language' => empty($user_settings['lngfile']) || empty($modSettings['userLanguage']) ? $language : $user_settings['lngfile'],
 		'is_guest' => $id_member == 0,
 		'is_admin' => in_array(1, $user_info['groups']),
+		'is_mod' => false,
 		'theme' => empty($user_settings['id_theme']) ? 0 : $user_settings['id_theme'],
 		'last_login' => empty($user_settings['last_login']) ? 0 : $user_settings['last_login'],
 		'ip' => $req->client_ip(),
@@ -1422,10 +1423,31 @@ function loadTheme($id_theme = 0, $initialize = true)
 		$context['user']['name'] = $txt['guest_title'];
 
 	// Set up some additional interface preference context
-	$context['admin_preferences'] = !empty($options['admin_preferences']) ? unserialize($options['admin_preferences']) : array();
+	if (!empty($options['admin_preferences']))
+	{
+		$context['admin_preferences'] = serializeToJson($options['admin_preferences'], function($array_form) {
+			global $context;
+
+			$context['admin_preferences'] = $array_form;
+			require_once(SUBSDIR . '/Admin.subs.php');
+			updateAdminPreferences();
+		});
+	}
+	else
+	{
+		$context['admin_preferences'] = array();
+	}
 
 	if (!$user_info['is_guest'])
-		$context['minmax_preferences'] = !empty($options['minmax_preferences']) ? unserialize($options['minmax_preferences']) : array();
+	{
+		$context['minmax_preferences'] = serializeToJson($options['minmax_preferences'], function($array_form) {
+			global $settings, $user_info;
+
+			// Update the option.
+			require_once(SUBSDIR . '/Themes.subs.php');
+			updateThemeOptions(array($settings['theme_id'], $user_info['id'], 'minmax_preferences', json_encode($array_form)));
+		});
+	}
 	// Guest may have collapsed the header, check the cookie to prevent collapse jumping
 	elseif ($user_info['is_guest'] && isset($_COOKIE['upshrink']))
 		$context['minmax_preferences'] = array('upshrink' => $_COOKIE['upshrink']);
@@ -3136,4 +3158,38 @@ function detectServerCores()
 	}
 
 	return 1;
+}
+
+/**
+ * This is necessary to support data stored in the pre-1.0.8 way (i.e. serialized)
+ *
+ * @deprecated since 1.0.8
+ *
+ * @param string $variable The string to convert
+ * @param null|callable $save_callback The function that will save the data to the db
+ * @return mixed[] the array
+ */
+function serializeToJson($variable, $save_callback = null)
+{
+	$array_form = json_decode($variable, true);
+
+	// decoding failed, let's try with unserialize
+	if ($array_form === null)
+	{
+		$array_form = @unserialize($variable);
+
+		// If unserialize fails as well, let's just store an empty array
+		if ($array_form === false)
+		{
+			$array_form = array();
+		}
+
+		// Time to update the value if necessary
+		if ($save_callback !== null)
+		{
+			$save_callback($array_form);
+		}
+	}
+
+	return $array_form;
 }
