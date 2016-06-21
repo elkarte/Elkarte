@@ -190,8 +190,10 @@ class Debug
 	public function rusage($point, $rusage = null)
 	{
 		// getrusage is missing in php < 7 on Windows
-		if (!function_exists('getrusage') || !$this->_track)
+		if ($this->_track === false || function_exists('getrusage') === false)
+		{
 			return;
+		}
 
 		if ($rusage === null)
 			$this->_rusage[$point] = getrusage();
