@@ -97,7 +97,7 @@ class ManageThemes_Controller extends Action_Controller
 			return false;
 		}
 
-		return true;
+		return parent::trackStats($action);
 	}
 
 	/**
