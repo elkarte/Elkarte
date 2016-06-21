@@ -314,6 +314,7 @@ function template_registration_form()
 							{
 								$field['options'] = '';
 							}
+						}
 
 						// Assuming we now have some!
 						if (is_array($field['options']))
