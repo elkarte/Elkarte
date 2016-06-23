@@ -134,7 +134,7 @@ cleanRequest();
 // Initiate the database connection and define some database functions to use.
 loadDatabase();
 
-// Let's set up out shiny new hooks handler.
+// Let's set up our shiny new hooks handler.
 Hooks::init(database(), Debug::get());
 
 // It's time for settings loaded from the database.
