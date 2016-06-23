@@ -50,7 +50,7 @@ foreach (array('db_character_set', 'cachedir') as $variable)
 		unset($GLOBALS[$variable], $GLOBALS[$variable]);
 
 // Where the Settings.php file is located
-$settings_loc = 'Settings.php';
+$settings_loc = __DIR__ . '/Settings.php';
 
 // First thing: if the install dir exists, just send anybody there
 // The ignore_install_dir var is for developers only. Do not add it on production sites
@@ -81,7 +81,7 @@ else
 }
 
 // Make sure the paths are correct... at least try to fix them.
-if (!file_exists($boarddir) && file_exists('agreement.txt'))
+if (!file_exists($boarddir) && file_exists(__DIR__ . '/agreement.txt'))
 	$boarddir = __DIR__;
 if (!file_exists($sourcedir . '/SiteDispatcher.class.php') && file_exists($boarddir . '/sources'))
 	$sourcedir = $boarddir . '/sources';
@@ -142,7 +142,10 @@ Hooks::init(database(), Debug::get());
 reloadSettings();
 
 // Our good ole' contextual array, which will hold everything
-$context = array();
+if (!isset($context))
+{
+	$context = array();
+}
 
 // Seed the random generator.
 elk_seed_generator();
