@@ -9,11 +9,6 @@
  *
  */
 
-if (!defined('ELK'))
-{
-	die('No access...');
-}
-
 /**
  * Class Ila_Integrate
  */
