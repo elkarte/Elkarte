@@ -69,6 +69,9 @@ class TestFiles extends PHPUnit_Framework_TestCase
 					$level++;
 				elseif ($token === '}')
 					$level--;
+				// This is for variables in strings "something {$a_variable} in a string"
+				elseif (is_array($token) && $token[1] === '{')
+					$level++;
 			}
 
 			if (!empty($level))
