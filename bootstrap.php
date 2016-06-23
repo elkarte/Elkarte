@@ -35,6 +35,7 @@ global $boarddir, $sourcedir;
 $ssi_error_reporting = error_reporting(E_ALL | E_STRICT);
 
 // Directional only script time usage for display
+// getrusage is missing in php < 7 on Windows
 if (function_exists('getrusage'))
 	$rusage_start = getrusage();
 else

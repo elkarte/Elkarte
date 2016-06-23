@@ -347,7 +347,15 @@ function template_edit_options()
 				{
 					// Is this some code to generate the options?
 					if (!is_array($field['options']))
-						$field['options'] = eval($field['options']);
+					{
+						try
+						{
+							$field['options'] = eval($field['options']);
+						}
+						catch (ParseError $e)
+						{
+							$field['options'] = '';
+						}
 
 					// Assuming we now have some!
 					if (is_array($field['options']))

@@ -350,6 +350,7 @@ class Auth_Controller extends Action_Controller
 		// Correct password, but they've got no salt; fix it!
 		if ($user_settings['password_salt'] === '')
 		{
+			require_once(SUBSDIR . '/Members.subs.php');
 			$tokenizer = new Token_Hash();
 			$user_settings['password_salt'] = $tokenizer->generate_hash(4);
 			updateMemberData($user_settings['id_member'], array('password_salt' => $user_settings['password_salt']));

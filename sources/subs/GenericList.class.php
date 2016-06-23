@@ -176,15 +176,32 @@ class Generic_List
 		foreach ($this->_listOptions['columns'] as $column_id => $column)
 		{
 			if (!isset($column['evaluate']) || $column['evaluate'] === true)
+			{
+				if (isset($column['header']['eval']))
+				{
+					try
+					{
+						$label = eval($column['header']['eval']);
+					}
+					catch (ParseError $e)
+					{
+						$label = isset($column['header']['value']) ? $column['header']['value'] : '';
+					}
+				}
+				else
+				{
+					$label = isset($column['header']['value']) ? $column['header']['value'] : '';
+				}
 				$list_context['headers'][] = array(
 					'id' => $column_id,
-					'label' => isset($column['header']['eval']) ? eval($column['header']['eval']) : (isset($column['header']['value']) ? $column['header']['value'] : ''),
+					'label' => $label,
 					'href' => empty($this->_listOptions['default_sort_col']) || empty($column['sort']) ? '' : $this->_listOptions['base_href'] . ';' . $request_var_sort . '=' . $column_id . ($column_id === $list_context['sort']['id'] && !$list_context['sort']['desc'] && isset($column['sort']['reverse']) ? ';' . $request_var_desc : '') . (empty($list_context['start']) ? '' : ';' . $list_context['start_var_name'] . '=' . $list_context['start']),
 					'sort_image' => empty($this->_listOptions['default_sort_col']) || empty($column['sort']) || $column_id !== $list_context['sort']['id'] ? null : ($list_context['sort']['desc'] ? 'down' : 'up'),
 					'class' => isset($column['header']['class']) ? $column['header']['class'] : '',
 					'style' => isset($column['header']['style']) ? $column['header']['style'] : '',
 					'colspan' => isset($column['header']['colspan']) ? $column['header']['colspan'] : '',
 				);
+			}
 		}
 
 		// We know the amount of columns, might be useful for the template.
@@ -233,7 +250,16 @@ class Generic_List
 					$cur_data['value'] = $column['data']['function']($list_item);
 				// A modified value (inject the database values).
 				elseif (isset($column['data']['eval']))
-					$cur_data['value'] = eval(preg_replace('~%([a-zA-Z0-9\-_]+)%~', '$list_item[\'$1\']', $column['data']['eval']));
+				{
+					try
+					{
+						$cur_data['value'] = eval(preg_replace('~%([a-zA-Z0-9\-_]+)%~', '$list_item[\'$1\']', $column['data']['eval']));
+					}
+					catch (ParseError $e)
+					{
+						$cur_data['value'] = '';
+					}
+				}
 				// A literal value.
 				elseif (isset($column['data']['value']))
 					$cur_data['value'] = $column['data']['value'];

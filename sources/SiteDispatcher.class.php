@@ -254,7 +254,7 @@ class Site_Dispatcher
 			// Call integrate_action_XYZ_before -> XYZ_controller -> integrate_action_XYZ_after
 			call_integration_hook('integrate_action_' . $hook . '_before', array($this->_function_name));
 
-			$result = $controller->$method();
+			$result = $controller->{$method}();
 
 			call_integration_hook('integrate_action_' . $hook . '_after', array($this->_function_name));
 

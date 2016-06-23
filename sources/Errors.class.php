@@ -316,11 +316,12 @@ class Errors
 	 *
 	 * - It dies with fatal_error() if the error_level matches with error_reporting.
 	 *
-	 * @param Exception $e
+	 * @param Exception|Throwable $e The error. Since the code shall work with php 5 and 7
+	 *                               we cannot type-hint the function parameter.
 	 * @param string|null $err_file
 	 * @param int|null $err_line
 	 */
-	public function exception_handler(Exception $e, $err_file = null, $err_line = null)
+	public function exception_handler($e, $err_file = null, $err_line = null)
 	{
 		$this->error_text = '';
 

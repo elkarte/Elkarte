@@ -305,13 +305,26 @@ function template_registration_form()
 					{
 						// Is this some code to generate the options?
 						if (!is_array($field['options']))
-							$field['options'] = eval($field['options']);
+						{
+							try
+							{
+								$field['options'] = eval($field['options']);
+							}
+							catch (ParseError $e)
+							{
+								$field['options'] = '';
+							}
+						}
 
 						// Assuming we now have some!
 						if (is_array($field['options']))
+						{
 							foreach ($field['options'] as $value => $name)
+							{
 								echo '
 							<option value="', $value, '" ', $value == $field['value'] ? 'selected="selected"' : '', '>', $name, '</option>';
+							}
+						}
 					}
 
 					echo '
