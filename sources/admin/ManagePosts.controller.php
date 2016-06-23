@@ -15,9 +15,6 @@
  *
  */
 
-if (!defined('ELK'))
-	die('No access...');
-
 /**
  * ManagePosts controller handles all the administration settings for topics and posts.
  *

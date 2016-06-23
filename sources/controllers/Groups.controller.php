@@ -16,9 +16,6 @@
  *
  */
 
-if (!defined('ELK'))
-	die('No access...');
-
 /**
  * Groups_Controller class
  * Shows group access and allows for add/remove group members

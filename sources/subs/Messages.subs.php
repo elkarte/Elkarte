@@ -18,9 +18,6 @@
  *
  */
 
-if (!defined('ELK'))
-	die('No access...');
-
 /**
  * Get message and attachments data, for a message ID.
  * The function returns the data in an array with:

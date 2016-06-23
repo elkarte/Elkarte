@@ -15,9 +15,6 @@
  *
  */
 
-if (!defined('ELK'))
-	die('No access...');
-
 /**
  * OpenID class, controls interfacing and communications for openid auth
  */

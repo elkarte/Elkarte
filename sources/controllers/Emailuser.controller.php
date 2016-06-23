@@ -16,9 +16,6 @@
  *
  */
 
-if (!defined('ELK'))
-	die('No access...');
-
 /**
  * Emailuser_Controller class.
  * Allows for sending topics via email

@@ -13,9 +13,6 @@
 
 namespace ElkArte\sources\subs\CacheMethod;
 
-if (!defined('ELK'))
-	die('No access...');
-
 /**
  * Alternative PHP Cache or APC / APCu
  */

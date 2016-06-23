@@ -11,9 +11,6 @@
  *
  */
 
-if (!defined('ELK'))
-	die('No access...');
-
 /**
  * MarkRead_Controller class
  * This class handles a part of the actions to mark boards, topics, or replies,

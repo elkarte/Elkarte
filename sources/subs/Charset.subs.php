@@ -15,9 +15,6 @@
  *
  */
 
-if (!defined('ELK'))
-	die('No access...');
-
 /**
  * Converts the given UTF-8 string into lowercase.
  * equivalent to mb_strtolower($string, 'UTF-8')

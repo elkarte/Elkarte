@@ -14,9 +14,6 @@
  *
  */
 
-if (!defined('ELK'))
-	die('No access...');
-
 /**
  * Retrieve all installed themes
  */

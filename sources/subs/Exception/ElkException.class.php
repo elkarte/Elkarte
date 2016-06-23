@@ -13,9 +13,6 @@
  *
  */
 
-if (!defined('ELK'))
-	die('No access...');
-
 /**
  * Class Elk_Exception
  */

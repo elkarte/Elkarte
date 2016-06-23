@@ -16,9 +16,6 @@
  *
  */
 
-if (!defined('ELK'))
-	die('No access...');
-
 /**
  * Who_Controller Class
  * I woke up in a Soho doorway A policeman knew my name He said "You can go sleep at home

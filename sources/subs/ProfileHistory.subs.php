@@ -15,9 +15,6 @@
  *
  */
 
-if (!defined('ELK'))
-	die('No access...');
-
 /**
  * Get the number of user errors.
  * Callback for createList in action_trackip() and action_trackactivity()

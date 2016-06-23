@@ -17,9 +17,6 @@
  *
  */
 
-if (!defined('ELK'))
-	die('No access...');
-
 /**
  * ProfileOptions_Controller Class.
  * Does the job of showing and editing people's profiles.

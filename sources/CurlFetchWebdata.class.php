@@ -11,9 +11,6 @@
  *
  */
 
-if (!defined('ELK'))
-	die('No access...');
-
 /**
  * Simple cURL class to fetch a web page
  * Properly redirects even with safe mode and basedir restrictions

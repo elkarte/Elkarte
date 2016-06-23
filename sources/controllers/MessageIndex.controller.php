@@ -18,9 +18,6 @@
 
 use ElkArte\sources\Frontpage_Interface;
 
-if (!defined('ELK'))
-	die('No access...');
-
 /**
  * MessageIndex_Controller class
  */

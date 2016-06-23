@@ -17,9 +17,6 @@
 
 use ElkArte\sources\Frontpage_Interface;
 
-if (!defined('ELK'))
-	die('No access...');
-
 /**
  * BoardIndex_Controller class
  * Displays the main board index

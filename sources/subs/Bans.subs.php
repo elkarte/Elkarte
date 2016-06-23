@@ -15,9 +15,6 @@
  *
  */
 
-if (!defined('ELK'))
-	die('No access...');
-
 /**
  * Saves one or more ban triggers into a ban item: according to the suggestions
  *

@@ -11,9 +11,6 @@
  *
  */
 
-if (!defined('ELK'))
-	die('No access...');
-
 /**
  * This class controls execution for admin actions in the bans area
  * of the admin panel.

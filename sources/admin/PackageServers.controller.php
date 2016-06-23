@@ -16,9 +16,6 @@
  *
  */
 
-if (!defined('ELK'))
-	die('No access...');
-
 /**
  * PackageServers controller handles browsing, adding and removing
  * package servers, and download of a package from them.

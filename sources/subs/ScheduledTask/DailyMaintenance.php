@@ -17,9 +17,6 @@
 
 namespace ElkArte\sources\subs\ScheduledTask;
 
-if (!defined('ELK'))
-	die('No access...');
-
 /**
  * Class Daily_Maintenance - This function does daily cleaning up:
  *

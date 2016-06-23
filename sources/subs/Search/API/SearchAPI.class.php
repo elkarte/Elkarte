@@ -14,9 +14,6 @@ namespace ElkArte\Search\API;
 
 use ElkArte\Search\Search_Interface;
 
-if (!defined('ELK'))
-	die('No access...');
-
 /**
  * Abstract class that defines the methods any search API shall implement
  * to properly work with ElkArte

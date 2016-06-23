@@ -15,9 +15,6 @@
  *
  */
 
-if (!defined('ELK'))
-	die('No access...');
-
 /**
  * This class is the administration package manager controller.
  * Its main job is to install/uninstall, allow to browse, packages.

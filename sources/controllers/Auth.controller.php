@@ -16,9 +16,6 @@
  *
  */
 
-if (!defined('ELK'))
-	die('No access...');
-
 /**
  * Auth_Controller class.
  * Deals with logging in and out members, and the validation of them

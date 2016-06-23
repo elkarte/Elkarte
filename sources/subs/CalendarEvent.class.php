@@ -15,9 +15,6 @@
  *
  */
 
-if (!defined('ELK'))
-	die('No access...');
-
 /**
  * A class to handle the basics of calendar events.
  * Namely a certain kind of validation, inserting a new one, updating existing,

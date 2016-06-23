@@ -16,9 +16,6 @@
  *
  */
 
-if (!defined('ELK'))
-	die('No access...');
-
 /**
  * Loads the signature from 50 members per request
  * Used in ManageFeatures to apply signature settings to all members

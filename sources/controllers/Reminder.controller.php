@@ -15,9 +15,6 @@
  *
  */
 
-if (!defined('ELK'))
-	die('No access...');
-
 /**
  * Reminder_Controller Class
  * Handles sending out reminders, and checking the secret answer and question.

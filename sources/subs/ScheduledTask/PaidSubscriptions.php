@@ -17,9 +17,6 @@
 
 namespace ElkArte\sources\subs\ScheduledTask;
 
-if (!defined('ELK'))
-	die('No access...');
-
 /**
  * Class Paid_Subscriptions - Perform the standard checks on expiring/near expiring subscriptions:
  *

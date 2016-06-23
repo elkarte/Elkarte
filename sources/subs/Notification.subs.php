@@ -11,9 +11,6 @@
  *
  */
 
-if (!defined('ELK'))
-	die('No access...');
-
 /**
  * Sends a notification to members who have elected to receive emails
  * when things happen to a topic, such as replies are posted.

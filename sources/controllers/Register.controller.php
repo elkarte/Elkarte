@@ -17,9 +17,6 @@
  *
  */
 
-if (!defined('ELK'))
-	die('No access...');
-
 /**
  * Register_Controller Class
  * It registers new members, and it allows the administrator moderate member registration

@@ -15,9 +15,6 @@
  *
  */
 
-if (!defined('ELK'))
-	die('No access...');
-
 /**
  * ModerationCenter_Controller Class
  * Provides overview of moderation items to the team

@@ -32,9 +32,6 @@
  *  - please include any special license in a license.txt file.
  */
 
-if (!defined('ELK'))
-	die('No access...');
-
 /**
  * Class to deal with theme administration.
  *

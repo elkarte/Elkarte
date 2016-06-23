@@ -10,9 +10,6 @@
  * @version 1.1 beta 1
  */
 
-if (!defined('ELK'))
-	die('No access...');
-
 /**
  * Delete all or some of the errors in the error log.
  * It applies any necessary filters to deletion.

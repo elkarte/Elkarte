@@ -15,9 +15,6 @@
  *
  */
 
-if (!defined('ELK'))
-	die('No access...');
-
 /**
  * This class has functions to handle merging of two or more topics
  * in to a single new or existing topic.

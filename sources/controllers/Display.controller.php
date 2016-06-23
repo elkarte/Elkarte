@@ -15,9 +15,6 @@
  *
  */
 
-if (!defined('ELK'))
-	die('No access...');
-
 /**
  * Display_Controller class.
  * This controller is the most important and probably most accessed of all.

@@ -19,9 +19,6 @@
  *
  */
 
-if (!defined('ELK'))
-	die('No access...');
-
 /**
  * Create a thumbnail of the given source.
  *

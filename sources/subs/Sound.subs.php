@@ -17,9 +17,6 @@
  *
  */
 
-if (!defined('ELK'))
-	die('No access...');
-
 /**
  * Creates a wave file that spells the letters of $word.
  * Tries the user's language first, and defaults to english.

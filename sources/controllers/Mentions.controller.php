@@ -11,9 +11,6 @@
  *
  */
 
-if (!defined('ELK'))
-	die('No access...');
-
 /**
  * Mentions_Controller Class:  Add mention notifications for various actions such
  * as liking a post, adding a buddy, @ calling a member in a post

@@ -15,9 +15,6 @@
  *
  */
 
-if (!defined('ELK'))
-	die('No access...');
-
 /**
  * Try to retrieve a cache entry. On failure, call the appropriate function.
  * This callback is sent as $file to include, and $function to call, with

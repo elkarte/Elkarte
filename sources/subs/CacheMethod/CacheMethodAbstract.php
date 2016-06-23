@@ -13,9 +13,6 @@
 
 namespace ElkArte\sources\subs\CacheMethod;
 
-if (!defined('ELK'))
-	die('No access...');
-
 /**
  * Abstract cache class, implementing the Cache_Method_Interface interface.
  * Used to provide common methods and properties to the caching classes

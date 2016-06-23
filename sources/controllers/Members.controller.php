@@ -15,9 +15,6 @@
  *
  */
 
-if (!defined('ELK'))
-	die('No access...');
-
 /**
  * Members Controller class.
  * Allows for the adding or removing of buddies

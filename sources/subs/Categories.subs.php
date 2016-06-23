@@ -15,9 +15,6 @@
  *
  */
 
-if (!defined('ELK'))
-	die('No access...');
-
 /**
  * Edit the position and properties of a category.
  * general function to modify the settings and position of a category.

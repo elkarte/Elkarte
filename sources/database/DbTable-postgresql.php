@@ -16,9 +16,6 @@
  *
  */
 
-if (!defined('ELK'))
-	die('No access...');
-
 /**
  * Adds PostgreSQL table level functionality,
  * Table creation / dropping, column adding / removing

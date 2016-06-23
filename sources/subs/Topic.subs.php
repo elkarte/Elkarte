@@ -18,9 +18,6 @@
  *
  */
 
-if (!defined('ELK'))
-	die('No access...');
-
 /**
  * Removes the passed id_topic's checking for permissions.
  *

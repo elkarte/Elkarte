@@ -15,9 +15,6 @@
  *
  */
 
-if (!defined('ELK'))
-	die('No access...');
-
 /**
  * Reads a .tar.gz file, filename, in and extracts file(s) from it.
  * essentially just a shortcut for read_tgz_data().

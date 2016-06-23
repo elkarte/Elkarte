@@ -13,9 +13,6 @@
 
 namespace ElkArte\sources\subs\MentionType;
 
-if (!defined('ELK'))
-	die('No access...');
-
 /**
  * Class Mention_BoardAccess_Abstract
  *

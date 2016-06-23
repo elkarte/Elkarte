@@ -16,9 +16,6 @@
  *
  */
 
-if (!defined('ELK'))
-	die('No access...');
-
 /**
  * Retrieves a list of message icons.
  * - Based on the settings, the array will either contain a list of default

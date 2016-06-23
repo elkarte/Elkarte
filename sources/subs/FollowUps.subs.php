@@ -12,9 +12,6 @@
  *
  */
 
-if (!defined('ELK'))
-	die('No access...');
-
 /**
  * Retrieves all the follow-up topic for a certain message
  *

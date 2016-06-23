@@ -15,9 +15,6 @@
  *
  */
 
-if (!defined('ELK'))
-	die('No access...');
-
 /**
  * ManageScheduledTasks admin Controller: handles the scheduled task pages
  * which allow to see and edit and run the systems scheduled tasks

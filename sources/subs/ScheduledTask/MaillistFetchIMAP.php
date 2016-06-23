@@ -13,9 +13,6 @@
 
 namespace ElkArte\sources\subs\ScheduledTask;
 
-if (!defined('ELK'))
-	die('No access...');
-
 /**
  * Class Maillist_Fetch_IMAP - Fetch emails from an imap box and process them
  *

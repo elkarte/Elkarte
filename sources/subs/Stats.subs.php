@@ -19,9 +19,6 @@
  *
  */
 
-if (!defined('ELK'))
-	die('No access...');
-
 /**
  * Return the number of currently online members.
  *

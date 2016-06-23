@@ -15,9 +15,6 @@
  *
  */
 
-if (!defined('ELK'))
-	die('No access...');
-
 /**
  * Retrieve a list of all boards plus more details
  * @todo merge with some function in Boards.subs.php

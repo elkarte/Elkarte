@@ -19,9 +19,6 @@
  *
  */
 
-if (!defined('ELK'))
-	die('No access...');
-
 /**
  * Loads information about the users personal message limit.
  *

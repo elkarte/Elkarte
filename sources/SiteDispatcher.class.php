@@ -12,9 +12,6 @@
  *
  */
 
-if (!defined('ELK'))
-	die('No access...');
-
 /**
  * Dispatch the request to the function or method registered to handle it.
  *

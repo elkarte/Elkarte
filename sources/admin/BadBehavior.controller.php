@@ -12,9 +12,6 @@
  *
  */
 
-if (!defined('ELK'))
-	die('No access...');
-
 /**
  * Class to show a list of all badbehavior log entries
  *

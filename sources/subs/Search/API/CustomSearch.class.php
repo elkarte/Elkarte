@@ -18,9 +18,6 @@
 
 namespace ElkArte\Search\API;
 
-if (!defined('ELK'))
-	die('No access...');
-
 /**
  * SearchAPI-Custom.class.php, Custom Search API class .. used when custom ElkArte index is used
  *

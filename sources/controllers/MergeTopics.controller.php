@@ -17,9 +17,6 @@
  * ETA: Sorry, we did.
  */
 
-if (!defined('ELK'))
-	die('No access...');
-
 /**
  * MergeTopics_Controller class.
  * Merges two or more topics into a single topic.

@@ -10,9 +10,6 @@
  * @version 1.1 beta 1
  */
 
-if (!defined('ELK'))
-	die('No access...');
-
 /**
  * Load a few illegal permissions in context.
  */

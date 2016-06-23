@@ -15,9 +15,6 @@
  *
  */
 
-if (!defined('ELK'))
-	die('No access...');
-
 /**
  * This is the attachments and avatars controller class.
  * It is doing the job of attachments and avatars maintenance and management.

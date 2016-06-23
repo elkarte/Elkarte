@@ -11,9 +11,6 @@
  *
  */
 
-if (!defined('ELK'))
-	die('No access...');
-
 /**
  * Count the mentions of the current user
  * callback for createList in action_list of Mentions_Controller

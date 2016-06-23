@@ -17,9 +17,6 @@
  *
  */
 
-if (!defined('ELK'))
-	die('No access...');
-
 /**
  * Post_Controller Class
  * Everything related to posting new replies and topics and modifications of them

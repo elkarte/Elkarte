@@ -16,9 +16,6 @@
  * Original module by Mach8 - We'll never forget you.
  */
 
-if (!defined('ELK'))
-	die('No access...');
-
 /**
  * SplitTopics_Controller Class
  * Allows to take a topic and split at a point or select individual messages to

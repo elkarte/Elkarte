@@ -15,9 +15,6 @@
  *
  */
 
-if (!defined('ELK'))
-	die('No access...');
-
 /**
  * Karma_Controller class,
  * Can give good or bad karma so watch out!

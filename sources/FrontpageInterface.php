@@ -14,9 +14,6 @@
 
 namespace ElkArte\sources;
 
-if (!defined('ELK'))
-	die('No access...');
-
 /**
  * Implementing this interface will make controllers usable as a front page
  * replacing the classic board index.

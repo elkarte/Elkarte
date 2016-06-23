@@ -10,9 +10,6 @@
  * @version 1.1 beta 1
  */
 
-if (!defined('ELK'))
-	die('No access...');
-
 /**
  * XmlPreview_Controller Class.
  * Handles requests for previews of an item, in an ajax enabled template.

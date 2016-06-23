@@ -15,9 +15,6 @@
  *
  */
 
-if (!defined('ELK'))
-	die('No access...');
-
 /**
  * This class controls execution for actions in the manage boards area
  * of the admin panel.
