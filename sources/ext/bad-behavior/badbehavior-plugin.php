@@ -14,8 +14,11 @@
  *
  */
 
+// This die was left on purpose, because BB is special
 if (!defined('ELK'))
+{
 	die('No access...');
+}
 
 define('BB2_CWD', dirname(__FILE__));
 
