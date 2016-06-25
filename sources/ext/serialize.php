@@ -4,6 +4,8 @@
  * @license Public Domain
  */
 
+namespace ElkArte\ext\upgradephp;
+
 /*
  * Used to impose practical limits for safe_unserialize()
  */
