@@ -506,7 +506,7 @@ class Util
 	 * @param int $level = 0
 	 * @return array|string
 	 */
-	public function urldecode_recursive($var, $level = 0)
+	public static function urldecode_recursive($var, $level = 0)
 	{
 		if (!is_array($var))
 			return urldecode($var);
@@ -516,7 +516,7 @@ class Util
 
 		// Add the htmlspecialchars to every element.
 		foreach ($var as $k => $v)
-			$new_var[urldecode($k)] = $level > 25 ? null : urldecode_recursive($v, $level + 1);
+			$new_var[urldecode($k)] = $level > 25 ? null : self::urldecode_recursive($v, $level + 1);
 
 		return $new_var;
 	}
@@ -534,7 +534,7 @@ class Util
 	 * @param mixed[]|string $var
 	 * @return array|string
 	 */
-	public function unescapestring_recursive($var)
+	public static function unescapestring_recursive($var)
 	{
 		$db = database();
 
@@ -546,7 +546,7 @@ class Util
 
 		// Strip the slashes from every element.
 		foreach ($var as $k => $v)
-			$new_var[$db->unescape_string($k)] = unescapestring_recursive($v);
+			$new_var[$db->unescape_string($k)] = self::unescapestring_recursive($v);
 
 		return $new_var;
 	}
