@@ -135,6 +135,10 @@ class TestDataValidator extends PHPUnit_Framework_TestCase
 
 	public function isValidBooleanProvider()
 	{
+		/*
+		 * Try to mimic the output of filter_var() where it returns null
+		 * when casting to boolean fails.
+		 */
 		return array(
 			array('foo', null),
 			// Fixed as of PHP 5.4.
@@ -185,6 +189,10 @@ class TestDataValidator extends PHPUnit_Framework_TestCase
 
 	public function isValidFloatProvider()
 	{
+		/*
+		 * Several of these test cases seem silly, but we should document
+		 * all of these anyway so people know what to expect.
+		 */
 		return array(
 			array('foo', false),
 			array(false, false),
@@ -221,6 +229,9 @@ class TestDataValidator extends PHPUnit_Framework_TestCase
 
 	public function isValidIntegerProvider()
 	{
+		/*
+		 * Some real head scratchers here.
+		 */
 		return array(
 			array('foo', false),
 			array(false, false),
