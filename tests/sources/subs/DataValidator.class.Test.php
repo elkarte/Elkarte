@@ -71,7 +71,7 @@ class TestDataValidator extends PHPUnit_Framework_TestCase
 			'alpha_dash'    => 'abcdefg-_',
 			'numeric'       => 2.00,
 			'integer'       => 3,
-			'boolean'       => false,
+			'boolean'       => true,
 			'float'         => 10.10,
 			'notequal'      => 'xyz',
 			'valid_url'     => 'http://www.elkarte.net',
