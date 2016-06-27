@@ -260,7 +260,7 @@ class PayPal_Payment
 			if (!empty($modSettings['paidsubs_test']))
 				$fp = fsockopen('ssl://www.sandbox.paypal.com', 443, $errno, $errstr, 30);
 			else
-				$fp = fsockopen('www.paypal.com', 80, $errno, $errstr, 30);
+				$fp = fsockopen('ssl://www.paypal.com', 443, $errno, $errstr, 30);
 
 			// Did it work?
 			if (!$fp)
