@@ -16,11 +16,6 @@
  *
  */
 
-if (!defined('ELK'))
-{
-	die('No access...');
-}
-
 /**
  * RemoveTopic_Controller Class
  * Handles the deletion of topics, posts

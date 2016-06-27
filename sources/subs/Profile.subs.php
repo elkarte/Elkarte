@@ -15,9 +15,6 @@
  *
  */
 
-if (!defined('ELK'))
-	die('No access...');
-
 /**
  * Find the ID of the "current" member
  *

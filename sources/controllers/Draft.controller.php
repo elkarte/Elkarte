@@ -11,9 +11,6 @@
  *
  */
 
-if (!defined('ELK'))
-	die('No access...');
-
 /**
  * Draft controller.
  * This class handles requests that allow for the saving,

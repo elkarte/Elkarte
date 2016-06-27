@@ -11,9 +11,6 @@
  *
  */
 
-if (!defined('ELK'))
-	die('No access...');
-
 /**
  * Utility class to unzip package files
  *

@@ -32,9 +32,6 @@
  *  - please include any special license in a license.txt file.
  */
 
-if (!defined('ELK'))
-	die('No access...');
-
 /**
  * Class to deal with theme administration.
  *
@@ -86,6 +83,19 @@ class ManageThemes_Controller extends Action_Controller
 	 * @var string|null
 	 */
 	private $images_url;
+
+	/**
+	 * {@inheritdoc }
+	 */
+	public function trackStats($action = '')
+	{
+		if ($action === 'action_jsoption')
+		{
+			return false;
+		}
+
+		return parent::trackStats($action);
+	}
 
 	/**
 	 * Subaction handler - manages the action and delegates control to the proper

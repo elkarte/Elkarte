@@ -15,11 +15,6 @@
  *
  */
 
-if (!defined('ELK'))
-{
-	die('No access...');
-}
-
 /**
  * Unread_Controller Class
  * Handles the finding of Unread posts and replies

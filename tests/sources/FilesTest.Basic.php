@@ -53,6 +53,7 @@ class TestFiles extends PHPUnit_Framework_TestCase
 
 		foreach ($this->_ourFiles as $file)
 		{
+			$syntax_valid = false;
 			$file_content = file_get_contents($file);
 
 			// This is likely to be one of the two files emailpost.php or emailtopic.php
@@ -68,10 +69,13 @@ class TestFiles extends PHPUnit_Framework_TestCase
 					$level++;
 				elseif ($token === '}')
 					$level--;
+				// This is for variables in strings "something {$a_variable} in a string"
+				elseif (is_array($token) && $token[1] === '{')
+					$level++;
 			}
 
 			if (!empty($level))
-				$this->assertTrue($syntax_valid, empty($level));
+				$this->assertTrue($syntax_valid, 'Syntax error in: ' . $file);
 			// Skipping the eval of this one?
 			elseif (!in_array($file, $skip_files) && strpos($file, '/tests/') === false)
 			{

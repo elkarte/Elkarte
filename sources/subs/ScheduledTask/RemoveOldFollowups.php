@@ -13,9 +13,6 @@
 
 namespace ElkArte\sources\subs\ScheduledTask;
 
-if (!defined('ELK'))
-	die('No access...');
-
 /**
  * Check for followups from removed topics and remove them from the table
  *

@@ -19,9 +19,6 @@
  *
  */
 
-if (!defined('ELK'))
-	die('No access...');
-
 /**
  * "Report" Functions are responsible for generating data for reporting.
  * They are all called from action_index.

@@ -15,9 +15,6 @@
  *
  */
 
-if (!defined('ELK'))
-	die('No access...');
-
 /**
  * This class takes care of the Core Features admin screen.
  *

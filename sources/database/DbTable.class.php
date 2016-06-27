@@ -14,9 +14,6 @@
  *
  */
 
-if (!defined('ELK'))
-	die('No access...');
-
 /**
  * This is used to create a table without worrying about schema compatibilities
  * across supported database systems.

@@ -11,9 +11,6 @@
  *
  */
 
-if (!defined('ELK'))
-	die('No access...');
-
 /**
  * Delete all or some of the entries in the bad behavior log.
  *

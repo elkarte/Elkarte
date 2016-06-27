@@ -15,9 +15,6 @@
  *
  */
 
-if (!defined('ELK'))
-	die('No access...');
-
 /**
  * We like to show events associated to the topics.
  *

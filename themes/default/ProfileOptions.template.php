@@ -356,6 +356,7 @@ function template_edit_options()
 						{
 							$field['options'] = '';
 						}
+					}
 
 					// Assuming we now have some!
 					if (is_array($field['options']))

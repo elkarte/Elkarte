@@ -18,9 +18,6 @@
  *
  */
 
-if (!defined('ELK'))
-	die('No access...');
-
 /**
  * Check and create a directory automatically.
  *

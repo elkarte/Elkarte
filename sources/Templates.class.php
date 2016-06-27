@@ -488,6 +488,11 @@ class Templates
 	{
 		global $txt, $db_show_debug;
 
+		if ($sub_template_name === false)
+		{
+			return;
+		}
+
 		if ($db_show_debug === true)
 		{
 			Debug::get()->add('sub_templates', $sub_template_name);

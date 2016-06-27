@@ -18,9 +18,6 @@
 
 namespace ElkArte\Search\API;
 
-if (!defined('ELK'))
-	die('No access...');
-
 /**
  * SearchAPI-Sphinxql.class.php, SphinxQL API,
  *

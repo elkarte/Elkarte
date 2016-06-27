@@ -13,9 +13,6 @@
 
 namespace ElkArte\sources\subs\ScheduledTask;
 
-if (!defined('ELK'))
-	die('No access...');
-
 /**
  * Interface Scheduled_Task_Interface
  *

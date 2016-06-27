@@ -12,9 +12,6 @@
  *
  */
 
-if (!defined('ELK'))
-	die('No access...');
-
 /**
  * Converts text / HTML to BBC
  *

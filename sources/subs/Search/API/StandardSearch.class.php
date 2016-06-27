@@ -17,9 +17,6 @@
 
 namespace ElkArte\Search\API;
 
-if (!defined('ELK'))
-	die('No access...');
-
 /**
  * SearchAPI-Standard.class.php, Standard non full index, non custom index search
  *

@@ -11,9 +11,6 @@
  *
  */
 
-if (!defined('ELK'))
-	die('No access...');
-
 /**
  * In certain cases a module of a controller my want to "redirect" to another
  * controller (e.g. from Calendar to Post).

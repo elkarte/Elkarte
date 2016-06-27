@@ -16,9 +16,6 @@
  *
  */
 
-if (!defined('ELK'))
-	die('No access...');
-
 /**
  * News Controller class
  */
@@ -35,6 +32,19 @@ class News_Controller extends Action_Controller
 	 * @var int
 	 */
 	private $_limit;
+
+	/**
+	 * {@inheritdoc }
+	 */
+	public function trackStats($action = '')
+	{
+		if ($action === 'action_showfeed')
+		{
+			return false;
+		}
+
+		return parent::trackStats($action);
+	}
 
 	/**
 	 * Dispatcher. Forwards to the action to execute.

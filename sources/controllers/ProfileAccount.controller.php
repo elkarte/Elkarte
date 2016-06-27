@@ -15,9 +15,6 @@
  *
  */
 
-if (!defined('ELK'))
-	die('No access...');
-
 /**
  * ProfileAccount_Controller Class
  * Processes user warnings, account activation and account deletion

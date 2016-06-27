@@ -15,9 +15,6 @@
  *
  */
 
-if (!defined('ELK'))
-	die('No access...');
-
 /**
  * Recent_Controller Class
  * Retrieve information about recent posts

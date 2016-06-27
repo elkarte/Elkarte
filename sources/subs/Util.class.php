@@ -11,9 +11,6 @@
  *
  */
 
-if (!defined('ELK'))
-	die('No access...');
-
 /**
  * Utility functions, such as to handle multi byte strings
  * Note: some of these might be deprecated or removed in the future.

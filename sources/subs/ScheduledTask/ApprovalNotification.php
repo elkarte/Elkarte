@@ -17,9 +17,6 @@
 
 namespace ElkArte\sources\subs\ScheduledTask;
 
-if (!defined('ELK'))
-	die('No access...');
-
 /**
  * Function to sending out approval notices to moderators.
  *

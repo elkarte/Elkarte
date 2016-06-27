@@ -18,9 +18,6 @@
  *
  */
 
-if (!defined('ELK'))
-	die('No access...');
-
 /**
  * Topic_Controller Class
  * Handles various topic actions, lock/unlock, sticky (pin) /unsticky (unpin), printing

@@ -11,9 +11,6 @@
  *
  */
 
-if (!defined('ELK'))
-	die('No access...');
-
 /**
  * Abstract base class for controllers.
  *
@@ -62,6 +59,44 @@ abstract class Action_Controller
 
 		// Initialize the events associated with this controller
 		$this->_initEventManager();
+	}
+
+	/**
+	 * Tells if the controller requires the security framework to be loaded.
+	 *
+	 * @param string $action the function name of the current action
+	 * @return boolean
+	 */
+	public function needSecurity($action = '')
+	{
+		return true;
+	}
+
+	/**
+	 * Tells if the controller needs the theme loaded up.
+	 *
+	 * @param string $action the function name of the current action
+	 * @return boolean
+	 */
+	public function needTheme($action = '')
+	{
+		return true;
+	}
+
+	/**
+	 * Tells if the controller wants to be tracked.
+	 *
+	 * @param string $action the function name of the current action
+	 * @return boolean
+	 */
+	public function trackStats($action = '')
+	{
+		if (isset($this->_req->api))
+		{
+			return false;
+		}
+
+		return true;
 	}
 
 	/**

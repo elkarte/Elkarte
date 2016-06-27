@@ -15,9 +15,6 @@
  *
  */
 
-if (!defined('ELK'))
-	die('No access...');
-
 /**
  * Get the number of mod log entries.
  * Callback for createList() in Modlog::action_log().

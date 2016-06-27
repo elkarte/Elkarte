@@ -13,9 +13,6 @@
  *
  */
 
-if (!defined('ELK'))
-	die('No access...');
-
 /**
  * Similar in construction to saveDBSettings,
  *

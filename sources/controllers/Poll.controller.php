@@ -15,9 +15,6 @@
  *
  */
 
-if (!defined('ELK'))
-	die('No access...');
-
 /**
  * Poll_Controller Class
  * This receives requests for voting, locking, removing and editing polls.

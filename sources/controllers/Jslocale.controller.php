@@ -11,9 +11,6 @@
  *
  */
 
-if (!defined('ELK'))
-	die('No access...');
-
 /**
  * Jslocale_Controller class.
  * This file is called via ?action=jslocale;sa=sceditor to load in a list of
@@ -26,6 +23,14 @@ class Jslocale_Controller extends Action_Controller
 	 * @var string
 	 */
 	private $_file_data = null;
+
+	/**
+	 * {@inheritdoc }
+	 */
+	public function trackStats($action = '')
+	{
+		return false;
+	}
 
 	/**
 	 * The default action for the class

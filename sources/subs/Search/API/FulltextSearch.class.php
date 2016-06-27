@@ -17,11 +17,6 @@
 
 namespace ElkArte\Search\API;
 
-if (!defined('ELK'))
-{
-	die('No access...');
-}
-
 /**
  * SearchAPI-Fulltext.class.php, Fulltext API, used when an SQL fulltext index is used
  *

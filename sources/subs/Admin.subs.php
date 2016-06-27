@@ -17,9 +17,6 @@
  *
  */
 
-if (!defined('ELK'))
-	die('No access...');
-
 /**
  * Get a list of versions that are currently installed on the server.
  *

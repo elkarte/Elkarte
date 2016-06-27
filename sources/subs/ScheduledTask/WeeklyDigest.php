@@ -13,9 +13,6 @@
 
 namespace ElkArte\sources\subs\ScheduledTask;
 
-if (!defined('ELK'))
-	die('No access...');
-
 /**
  * Class Weekly_Digest
  * Sends out email notifications for new/updated topics.

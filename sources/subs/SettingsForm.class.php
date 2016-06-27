@@ -57,9 +57,6 @@
  *    array('text', 'invalid label', 3, 'label' => 'Actual Label')
  */
 
-if (!defined('ELK'))
-	die('No access...');
-
 /**
  * Settings Form class.
  * This class handles display, edit, save, of forum settings.

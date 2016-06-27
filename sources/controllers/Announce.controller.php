@@ -15,9 +15,6 @@
  *
  */
 
-if (!defined('ELK'))
-	die('No access...');
-
 /**
  * Announce_Controller class.
  * Used to handle announce topic functionality.

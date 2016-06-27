@@ -16,9 +16,6 @@
  *
  */
 
-if (!defined('ELK'))
-	die('No access...');
-
 /**
  * Auth_Controller class.
  * Deals with logging in and out members, and the validation of them
@@ -27,6 +24,18 @@ if (!defined('ELK'))
  */
 class Auth_Controller extends Action_Controller
 {
+	/**
+	 * {@inheritdoc }
+	 */
+	public function needSecurity($action = '')
+	{
+		if ($action === 'action_keepalive')
+		{
+			return false;
+		}
+		return true;
+	}
+
 	/**
 	 * Entry point in Auth controller
 	 *
@@ -544,6 +553,14 @@ class Auth_Controller extends Action_Controller
 
 		// It'll never get here... until it does :P
 		redirectexit();
+	}
+
+	/**
+	 * Ping the server to keep the session alive and not let it disappear.
+	 */
+	public function action_keepalive()
+	{
+		dieGif();
 	}
 
 	/**

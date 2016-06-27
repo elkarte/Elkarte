@@ -131,11 +131,11 @@ class DispatcherTest extends PHPUnit_Framework_TestCase
 			),
 			// An existing one, with sub-action, naming patterns
 			array(
-				'test_name' => 'existing action with sub-action (naming patern)',
+				'test_name' => 'existing action with sub-action (naming pattern)',
 				'action' => 'announce',
 				'sa' => 'test',
 				'result' => array(
-					'function_name' => 'action_test',
+					'function_name' => 'action_index',
 					'controller_name' => 'Announce_Controller',
 				),
 			),

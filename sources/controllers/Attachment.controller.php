@@ -28,6 +28,39 @@
 class Attachment_Controller extends Action_Controller
 {
 	/**
+	 * {@inheritdoc }
+	 */
+	public function needTheme($action = '')
+	{
+		global $modSettings, $user_info, $maintenance;
+
+		// If guests are not allowed to browse and the use is a guest... kick him!
+		if (empty($modSettings['allow_guestAccess']) && $user_info['is_guest'])
+		{
+			return true;
+		}
+
+		// If not in maintenance or allowed to use the forum in maintenance
+		if (empty($maintenance) || allowedTo('admin_forum'))
+		{
+			return false;
+		}
+		// else... politely kick him (or her).
+		else
+		{
+			return true;
+		}
+	}
+
+	/**
+	 * {@inheritdoc }
+	 */
+	public function trackStats($action = '')
+	{
+		return false;
+	}
+
+	/**
 	 * The default action is to download an attachment.
 	 * This allows ?action=attachment to be forwarded to action_dlattach()
 	 */

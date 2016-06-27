@@ -17,11 +17,6 @@
 
 namespace Themes\DefaultTheme;
 
-if (!defined('ELK'))
-{
-	die('No access...');
-}
-
 /**
  * Class Theme
  *

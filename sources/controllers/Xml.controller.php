@@ -11,9 +11,6 @@
  *
  */
 
-if (!defined('ELK'))
-	die('No access...');
-
 /**
  * Xml_Controller Class
  *
@@ -22,6 +19,14 @@ if (!defined('ELK'))
  */
 class Xml_Controller extends Action_Controller
 {
+	/**
+	 * {@inheritdoc }
+	 */
+	public function trackStats($action = '')
+	{
+		return false;
+	}
+
 	/**
 	 * Main dispatcher for action=xmlhttp.
 	 *

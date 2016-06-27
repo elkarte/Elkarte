@@ -15,9 +15,6 @@
  *
  */
 
-if (!defined('ELK'))
-	die('No access...');
-
 /**
  * Set the permission level for a specific profile, group, or group for a profile.
  *

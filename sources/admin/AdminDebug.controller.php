@@ -15,14 +15,19 @@
  *
  */
 
-if (!defined('ELK'))
-	die('No access...');
-
 /**
  * Admin class for interfacing with the debug function viewquery
  */
 class AdminDebug_Controller extends Action_Controller
 {
+	/**
+	 * {@inheritdoc }
+	 */
+	public function trackStats($action = '')
+	{
+		return false;
+	}
+
 	/**
 	 * Main dispatcher.
 	 *

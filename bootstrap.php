@@ -15,14 +15,16 @@
  *
  */
 
-// Don't do anything if ElkArte is already loaded.
-if (defined('ELK'))
+// Bootstrap only once.
+if (defined('ELKBOOT'))
 	return true;
 
-define('ELK', 'SSI');
+$time_start = microtime(true);
+
+const ELKBOOT = 1;
 
 // Shortcut for the browser cache stale
-define('CACHE_STALE', '?R11');
+const CACHE_STALE = '?R11';
 
 // We're going to want a few globals... these are all set later.
 global $time_start, $maintenance, $msubject, $mmessage, $mbname, $language;
@@ -32,7 +34,8 @@ global $modSettings, $context, $sc, $user_info, $topic, $board, $txt;
 global $ssi_db_user, $scripturl, $ssi_db_passwd, $db_passwd;
 global $boarddir, $sourcedir;
 
-$ssi_error_reporting = error_reporting(E_ALL | E_STRICT);
+// Report errors but not depreciated ones
+$ssi_error_reporting = error_reporting(E_ALL | E_STRICT & ~8192);
 
 // Directional only script time usage for display
 // getrusage is missing in php < 7 on Windows
@@ -41,7 +44,6 @@ if (function_exists('getrusage'))
 else
 	$rusage_start = array();
 
-$time_start = microtime(true);
 $db_show_debug = false;
 
 // We don't need no globals. (a bug in "old" versions of PHP)
@@ -49,8 +51,36 @@ foreach (array('db_character_set', 'cachedir') as $variable)
 	if (isset($GLOBALS[$variable]))
 		unset($GLOBALS[$variable], $GLOBALS[$variable]);
 
-// Get the forum's settings for database and file paths.
-require_once(__DIR__ . '/Settings.php');
+// Where the Settings.php file is located
+$settings_loc = __DIR__ . '/Settings.php';
+
+// First thing: if the install dir exists, just send anybody there
+// The ignore_install_dir var is for developers only. Do not add it on production sites
+if (file_exists('install'))
+{
+	if (file_exists($settings_loc))
+	{
+		require_once($settings_loc);
+	}
+	if (empty($ignore_install_dir))
+	{
+		if (file_exists($settings_loc) && empty($_SESSION['installing']))
+		{
+			$redirec_file = 'upgrade.php';
+		}
+		else
+		{
+			$redirec_file = 'install.php';
+		}
+
+		header('Location: http' . (!empty($_SERVER['HTTPS']) && strtolower($_SERVER['HTTPS']) == 'on' ? 's' : '') . '://' . (empty($_SERVER['HTTP_HOST']) ? $_SERVER['SERVER_NAME'] . (empty($_SERVER['SERVER_PORT']) || $_SERVER['SERVER_PORT'] == '80' ? '' : ':' . $_SERVER['SERVER_PORT']) : $_SERVER['HTTP_HOST']) . (strtr(dirname($_SERVER['PHP_SELF']), '\\', '/') == '/' ? '' : strtr(dirname($_SERVER['PHP_SELF']), '\\', '/')) . '/install/' . $redirec_file);
+		die();
+	}
+}
+else
+{
+	require_once($settings_loc);
+}
 
 // Make sure the paths are correct... at least try to fix them.
 if (!file_exists($boarddir) && file_exists(__DIR__ . '/agreement.txt'))
@@ -115,7 +145,7 @@ if ($db_show_debug === true && isset($rusage_start))
 
 // Forum in extended maintenance mode? Our trip ends here with a bland message.
 if (!empty($maintenance) && $maintenance == 2)
-	display_maintenance_message();
+	Errors::instance()->display_maintenance_message();
 
 // Clean the request.
 cleanRequest();

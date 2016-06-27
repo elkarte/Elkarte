@@ -15,9 +15,6 @@
  *
  */
 
-if (!defined('ELK'))
-	die('No access...');
-
 /**
  * Repair boards controller handles a special admin action:
  * boards and categories attempt to repair, from maintenance.

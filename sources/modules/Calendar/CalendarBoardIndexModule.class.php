@@ -15,9 +15,6 @@
  *
  */
 
-if (!defined('ELK'))
-	die('No access...');
-
 /**
  * This class's task is to show the upcoming events in the BoardIndex.
  */

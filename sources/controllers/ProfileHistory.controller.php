@@ -15,9 +15,6 @@
  *
  */
 
-if (!defined('ELK'))
-	die('No access...');
-
 /**
  * ProfileHistory_Controller
  * Show a users login, profile edits, IP history

@@ -54,6 +54,9 @@ $ssi_on_error_method = false;
  */
 // $ssi_guest_access = false;
 
+// We are in Elk, but from the side-entrance.
+const ELK = 'SSI';
+
 require_once(dirname(__FILE__) . '/bootstrap.php');
 
 // Have the ability to easily add functions to SSI.

@@ -17,9 +17,6 @@
 
 namespace ElkArte\sources\subs\ScheduledTask;
 
-if (!defined('ELK'))
-	die('No access...');
-
 /**
  * Auto optimize the database.
  *

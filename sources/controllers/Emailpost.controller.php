@@ -11,9 +11,6 @@
  *
  */
 
-if (!defined('ELK'))
-	die('No access...');
-
 /**
  * Emailpost_Controller class.
  * Handles items pertaining to posting or PM an item that was received by email

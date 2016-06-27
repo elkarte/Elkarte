@@ -17,9 +17,6 @@
 
 use \ElkArte\Search\Search;
 
-if (!defined('ELK'))
-	die('No access...');
-
 // This defines two version types for checking the API's are compatible with this version of the software.
 $GLOBALS['search_versions'] = array(
 	// This is the forum version but is repeated due to some people rewriting $forum_version.

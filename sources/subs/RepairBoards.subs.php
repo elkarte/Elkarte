@@ -18,9 +18,6 @@
  *
  */
 
-if (!defined('ELK'))
-	die('No access...');
-
 /**
  * Load up all the tests we might want to do ;)
  */

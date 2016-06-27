@@ -17,9 +17,6 @@
 
 namespace ElkArte\sources\subs\ScheduledTask;
 
-if (!defined('ELK'))
-	die('No access...');
-
 /**
  * Class Remove_Topic_Redirect - This class handles known scheduled tasks.
  *

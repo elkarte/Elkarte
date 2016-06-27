@@ -15,9 +15,6 @@
  *
  */
 
-if (!defined('ELK'))
-	die('No access...');
-
 /**
  * Display_Controller class.
  * This controller is the most important and probably most accessed of all.
@@ -63,6 +60,25 @@ class Display_Controller extends Action_Controller
 	{
 		// what to do... display things!
 		$this->action_display();
+	}
+
+	/**
+	 * If we are in a topic and don't have permission to approve it then duck out now.
+	 * This is an abuse of the method, but it's easier that way.
+	 *
+	 * @param string $action the function name of the current action
+	 * @return boolean
+	 */
+	public function trackStats($action = '')
+	{
+		global $user_info, $topic, $board_info;
+
+		if (!empty($topic) && empty($board_info['cur_topic_approved']) && !allowedTo('approve_posts') && ($user_info['id'] != $board_info['cur_topic_starter'] || $user_info['is_guest']))
+		{
+			Errors::instance()->fatal_lang_error('not_a_topic', false);
+		}
+
+		return parent::trackStats($action);
 	}
 
 	/**

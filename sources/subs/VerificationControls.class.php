@@ -16,9 +16,6 @@
  *
  */
 
-if (!defined('ELK'))
-	die('No access...');
-
 /**
  * Simple function that loads and returns all the verification controls known to Elk
  */

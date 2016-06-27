@@ -15,9 +15,6 @@
  *
  */
 
-if (!defined('ELK'))
-	die('No access...');
-
 /**
  * ManageMembers controller deals with members administration, approval,
  * admin-visible list and search in it.

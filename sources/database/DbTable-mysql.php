@@ -16,9 +16,6 @@
  *
  */
 
-if (!defined('ELK'))
-	die('No access...');
-
 /**
  * Adds MySQL table level functionality,
  * Table creation / dropping, column adding / removing

@@ -16,9 +16,6 @@ namespace ElkArte\sources\subs\CacheMethod;
 use FilesystemIterator;
 use UnexpectedValueException;
 
-if (!defined('ELK'))
-	die('No access...');
-
 /**
  * Filebased caching is the fallback if nothing else is available, it simply
  * uses the filesystem to store queries results in order to try to reduce the

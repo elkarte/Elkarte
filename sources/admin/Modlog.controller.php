@@ -15,9 +15,6 @@
  *
  */
 
-if (!defined('ELK'))
-	die('No access...');
-
 /**
  * Admin and moderation log controller.
  * Depending on permissions, this class will display and allow to act on the log

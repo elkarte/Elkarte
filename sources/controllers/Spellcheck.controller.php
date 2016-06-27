@@ -15,11 +15,6 @@
  *
  */
 
-if (!defined('ELK'))
-{
-	die('No access...');
-}
-
 /**
  * Spellcheck_Controller Class
  *

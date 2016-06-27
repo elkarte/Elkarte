@@ -15,9 +15,6 @@
  *
  */
 
-if (!defined('ELK'))
-	die('No access...');
-
 /**
  * This class is in charge with administration of smileys and message icons.
  * It handles actions from the Smileys pages in admin panel.

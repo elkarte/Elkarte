@@ -13,9 +13,6 @@
 
 namespace ElkArte\sources\subs\ScheduledTask;
 
-if (!defined('ELK'))
-	die('No access...');
-
 /**
  * Re-syncs if a user can access a mention,
  *

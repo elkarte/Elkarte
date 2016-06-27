@@ -16,9 +16,6 @@
  *
  */
 
-if (!defined('ELK'))
-	die('No access...');
-
 /**
  * Notify_Controller Class
  * Functions that turn on and off various member notifications

@@ -17,11 +17,6 @@
  *
  */
 
-if (!defined('ELK'))
-{
-	die('No access...');
-}
-
 /**
  * PersonalMessage_Controller class
  * It allows viewing, sending, deleting, and marking personal messages

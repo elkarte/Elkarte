@@ -17,9 +17,6 @@
  *
  */
 
-if (!defined('ELK'))
-	die('No access...');
-
 /**
  * Takes a message and parses it, returning the prepared message as a reference.
  *

@@ -15,11 +15,6 @@
  *
  */
 
-if (!defined('ELK'))
-{
-	die('No access...');
-}
-
 /**
  * Class Cache - Methods that deal with getting and setting cache values.
  */

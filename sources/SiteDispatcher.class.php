@@ -12,9 +12,6 @@
  *
  */
 
-if (!defined('ELK'))
-	die('No access...');
-
 /**
  * Dispatch the request to the function or method registered to handle it.
  *
@@ -51,14 +48,34 @@ class Site_Dispatcher
 	protected $_default_action;
 
 	/**
+	 * The instance of the controller
+	 * @var null|Action_Controller
+	 */
+	protected $_controller;
+
+	/**
 	 * Create an instance and initialize it.
 	 *
 	 * This does all the work to figure out which controller and method need
 	 * to be called.
 	 */
-	public function __construct()
+	public function __construct($action = null, $subaction = null, $area = null)
 	{
-		global $board, $topic, $modSettings, $user_info, $maintenance;
+		global $modSettings;
+
+		// Backward compatibility with 1.0
+		if ($action === null)
+		{
+			$action = $this->_getAction();
+		}
+		if ($subaction === null)
+		{
+			$subaction = $this->_getSubAction();
+		}
+		if ($area === null)
+		{
+			$area = $this->_getArea();
+		}
 
 		// Default action of the forum: board index
 		// Every time we don't know what to do, we'll do this :P
@@ -70,14 +87,37 @@ class Site_Dispatcher
 		// Reminder: hooks need to account for multiple addons setting this hook.
 		call_integration_hook('integrate_action_frontpage', array(&$this->_default_action));
 
+		$this->_noActionActions($action, !empty($modSettings['allow_guestAccess']));
+
+		// Now this return won't be cool, but lets do it
+		if (empty($this->_controller_name))
+		{
+			$this->_namingPatterns($action, $subaction, $area);
+		}
+
+		// Initialize this controller with its event manager
+		$this->_controller = new $this->_controller_name(new Event_Manager());
+	}
+
+	/**
+	 * Finds out if the current action is one of those without an "action"
+	 * parameter in the URL
+	 *
+	 * @param string $action
+	 * @param bool $allow_guestAccess
+	 */
+	protected function _noActionActions($action, $allow_guestAccess = true)
+	{
+		global $maintenance, $user_info, $board, $topic;
+
 		// Maintenance mode: you're out of here unless you're admin
 		if (!empty($maintenance) && !allowedTo('admin_forum'))
 		{
 			// You can only login
-			if (isset($_GET['action']) && ($_GET['action'] == 'login2' || $_GET['action'] == 'logout'))
+			if ($action == 'login2' || $action == 'logout')
 			{
 				$this->_controller_name = 'Auth_Controller';
-				$this->_function_name = $_GET['action'] == 'login2' ? 'action_login2' : 'action_logout';
+				$this->_function_name = $action == 'login2' ? 'action_login2' : 'action_logout';
 			}
 			// "maintenance mode" page
 			else
@@ -87,12 +127,12 @@ class Site_Dispatcher
 			}
 		}
 		// If guest access is disallowed, a guest is kicked out... politely. :P
-		elseif (empty($modSettings['allow_guestAccess']) && $user_info['is_guest'] && (!isset($_GET['action']) || !in_array($_GET['action'], array('login', 'login2', 'register', 'reminder', 'help', 'quickhelp', 'mailq', 'openidreturn'))))
+		elseif ($allow_guestAccess === false && $user_info['is_guest'] && (!in_array($action, array('login', 'login2', 'register', 'reminder', 'help', 'quickhelp', 'mailq', 'openidreturn'))))
 		{
 			$this->_controller_name = 'Auth_Controller';
 			$this->_function_name = 'action_kickguest';
 		}
-		elseif (empty($_GET['action']))
+		elseif (empty($action))
 		{
 			// Home page: board index
 			if (empty($board) && empty($topic))
@@ -117,11 +157,18 @@ class Site_Dispatcher
 				$this->_function_name = 'action_display';
 			}
 		}
+	}
 
-		// Now this return won't be cool, but lets do it
-		if (!empty($this->_controller_name) && !empty($this->_function_name))
-			return;
-
+	/**
+	 * Compares the $_GET['action'] with array or naming patterns to find
+	 * a suitable controller.
+	 *
+	 * @param string $action
+	 * @param string $subaction
+	 * @param string $area
+	 */
+	protected function _namingPatterns($action, $subaction, $area)
+	{
 		// Start with our nice and cozy err... *cough*
 		// Format:
 		// $_GET['action'] => array($class, $method)
@@ -138,6 +185,7 @@ class Site_Dispatcher
 			'quickhelp' => array('Help_Controller', 'action_quickhelp'),
 			'jsmodify' => array('Post_Controller', 'action_jsmodify'),
 			'jsoption' => array('ManageThemes_Controller', 'action_jsoption'),
+			'keepalive' => array('Auth_Controller', 'action_keepalive'),
 			'lockvoting' => array('Poll_Controller', 'action_lockvoting'),
 			'login' => array('Auth_Controller', 'action_login'),
 			'login2' => array('Auth_Controller', 'action_login2'),
@@ -171,42 +219,34 @@ class Site_Dispatcher
 			'xmlpreview' => array('XmlPreview_Controller', 'action_index'),
 		);
 
-		$adminActions = array('admin', 'jsoption', 'theme', 'viewadminfile', 'viewquery');
-
 		// Allow to extend or change $actionArray through a hook
-		call_integration_hook('integrate_actions', array(&$actionArray, &$adminActions));
+		call_integration_hook('integrate_actions', array(&$actionArray));
 
 		// Is it in core legacy actions?
-		if (isset($actionArray[$_GET['action']]))
+		if (isset($actionArray[$action]))
 		{
-			$this->_controller_name = $actionArray[$_GET['action']][0];
+			$this->_controller_name = $actionArray[$action][0];
 
 			// If the method is coded in, use it
-			if (!empty($actionArray[$_GET['action']][1]))
-				$this->_function_name = $actionArray[$_GET['action']][1];
+			if (!empty($actionArray[$action][1]))
+				$this->_function_name = $actionArray[$action][1];
 			// Otherwise fall back to naming patterns
-			elseif (isset($_GET['sa']) && preg_match('~^\w+$~', $_GET['sa']))
-				$this->_function_name = 'action_' . $_GET['sa'];
+			elseif (!empty($subaction) && preg_match('~^\w+$~', $subaction))
+				$this->_function_name = 'action_' . $subaction;
 			else
 				$this->_function_name = 'action_index';
 		}
 		// Fall back to naming patterns.
 		// addons can use any of them, and it should Just Work (tm).
-		elseif (preg_match('~^[a-zA-Z_\\-]+\d*$~', $_GET['action']))
+		elseif (preg_match('~^[a-zA-Z_\\-]+\d*$~', $action))
 		{
-			// Admin files have their own place
-			$path = in_array($_GET['action'], $adminActions) ? ADMINDIR : CONTROLLERDIR;
-
 			// action=gallery => Gallery.controller.php
 			// sa=upload => action_upload()
-			if (file_exists($path . '/' . ucfirst($_GET['action']) . '.controller.php'))
-			{
-				$this->_controller_name = ucfirst($_GET['action']) . '_Controller';
-				if (isset($_GET['sa']) && preg_match('~^\w+$~', $_GET['sa']) && !isset($_GET['area']))
-					$this->_function_name = 'action_' . $_GET['sa'];
-				else
-					$this->_function_name = 'action_index';
-			}
+			$this->_controller_name = ucfirst($action) . '_Controller';
+			if (isset($subaction) && preg_match('~^\w+$~', $subaction) && empty($area))
+				$this->_function_name = 'action_' . $subaction;
+			else
+				$this->_function_name = 'action_index';
 		}
 
 		// The file and function weren't found yet?
@@ -219,6 +259,52 @@ class Site_Dispatcher
 
 		if (isset($_REQUEST['api']))
 			$this->_function_name .= '_api';
+
+		// 3, 2, ... and go
+		if (is_callable(array($this->_controller_name, $this->_function_name)))
+		{
+			return;
+		}
+		elseif (is_callable(array($this->_controller_name, 'action_index')))
+		{
+			$this->_function_name = 'action_index';
+		}
+		// This should never happen, that's why its here :P
+		else
+		{
+			$this->_controller_name = $this->_default_action['controller'];
+			$this->_function_name = $this->_default_action['function'];
+		}
+	}
+
+	/**
+	 * Backward compatibility function.
+	 * Determine the current action from $_GET
+	 * @deprecated since 1.1
+	 */
+	protected function _getAction()
+	{
+		return isset($_GET['action']) ? $_GET['action'] : '';
+	}
+
+	/**
+	 * Backward compatibility function.
+	 * Determine the current subaction from $_GET
+	 * @deprecated since 1.1
+	 */
+	protected function _getSubAction()
+	{
+		return isset($_GET['sa']) ? $_GET['sa'] : '';
+	}
+
+	/**
+	 * Backward compatibility function.
+	 * Determine the current area from $_GET
+	 * @deprecated since 1.1
+	 */
+	protected function _getArea()
+	{
+		return isset($_GET['area']) ? $_GET['area'] : '';
 	}
 
 	/**
@@ -226,49 +312,44 @@ class Site_Dispatcher
 	 */
 	public function dispatch()
 	{
-		if (!empty($this->_controller_name))
-		{
-			// 3, 2, ... and go
-			if (is_callable(array($this->_controller_name, $this->_function_name)))
-				$method = $this->_function_name;
-			elseif (is_callable(array($this->_controller_name, 'action_index')))
-				$method = 'action_index';
-			// This should never happen, that's why its here :P
-			else
-			{
-				$this->_controller_name = $this->_default_action['controller'];
-				$this->_function_name = $this->_default_action['function'];
+		// Fetch controllers generic hook name from the action controller
+		$hook = $this->_controller->getHook();
 
-				return $this->dispatch();
-			}
+		// Call the controllers pre dispatch method
+		$this->_controller->pre_dispatch();
 
-			// Initialize this controller with its event manager
-			$controller = new $this->_controller_name(new Event_Manager());
+		// Call integrate_action_XYZ_before -> XYZ_controller -> integrate_action_XYZ_after
+		call_integration_hook('integrate_action_' . $hook . '_before', array($this->_function_name));
 
-			// Fetch controllers generic hook name from the action controller
-			$hook = $controller->getHook();
+		$result = $this->_controller->{$this->_function_name}();
 
-			// Call the controllers pre dispatch method
-			$controller->pre_dispatch();
+		call_integration_hook('integrate_action_' . $hook . '_after', array($this->_function_name));
 
-			// Call integrate_action_XYZ_before -> XYZ_controller -> integrate_action_XYZ_after
-			call_integration_hook('integrate_action_' . $hook . '_before', array($this->_function_name));
+		return $result;
+	}
 
-			$result = $controller->{$method}();
+	/**
+	 * If the current controller needs to load all the security framework.
+	 */
+	public function needSecurity()
+	{
+		return $this->_controller->needSecurity($this->_function_name);
+	}
 
-			call_integration_hook('integrate_action_' . $hook . '_after', array($this->_function_name));
+	/**
+	 * If the current controller needs to load the theme.
+	 */
+	public function needTheme()
+	{
+		return $this->_controller->needTheme($this->_function_name);
+	}
 
-			return $result;
-		}
-		// Things went pretty bad, huh?
-		else
-		{
-			// default action :P
-			$this->_controller_name = $this->_default_action['controller'];
-			$this->_function_name = $this->_default_action['function'];
-
-			return $this->dispatch();
-		}
+	/**
+	 * If the current controller wants to track access and stats.
+	 */
+	public function trackStats()
+	{
+		return $this->_controller->trackStats($this->_function_name);
 	}
 
 	/**

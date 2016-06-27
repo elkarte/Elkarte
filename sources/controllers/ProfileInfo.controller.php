@@ -16,9 +16,6 @@
  *
  */
 
-if (!defined('ELK'))
-	die('No access...');
-
 /**
  * ProfileInfo_Controller Class
  * Access all profile summary areas for a user including overall summary,

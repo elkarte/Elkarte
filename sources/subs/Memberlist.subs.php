@@ -15,9 +15,6 @@
  *
  */
 
-if (!defined('ELK'))
-	die('No access...');
-
 /**
  * Reads the custom profile fields table and gets all items that were defined
  * as being shown on the memberlist

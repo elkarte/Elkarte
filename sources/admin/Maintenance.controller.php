@@ -15,9 +15,6 @@
  *
  */
 
-if (!defined('ELK'))
-	die('No access...');
-
 /**
  * Entry point class for all of the maintenance ,routine, members, database,
  * attachments, topics and hooks

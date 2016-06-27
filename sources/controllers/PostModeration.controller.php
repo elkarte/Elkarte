@@ -15,9 +15,6 @@
  *
  */
 
-if (!defined('ELK'))
-	die('No access...');
-
 /**
  * PostModeration_Controller Class
  * Handles post moderation actions. (approvals, unapproved)

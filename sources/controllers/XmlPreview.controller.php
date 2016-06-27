@@ -10,15 +10,20 @@
  * @version 1.1 beta 1
  */
 
-if (!defined('ELK'))
-	die('No access...');
-
 /**
  * XmlPreview_Controller Class.
  * Handles requests for previews of an item, in an ajax enabled template.
  */
 class XmlPreview_Controller extends Action_Controller
 {
+	/**
+	 * {@inheritdoc }
+	 */
+	public function trackStats($action = '')
+	{
+		return false;
+	}
+
 	/**
 	 * Calls the correct function for the action.
 	 *

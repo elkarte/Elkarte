@@ -13,9 +13,6 @@
 
 namespace ElkArte\sources\subs\CacheMethod;
 
-if (!defined('ELK'))
-	die('No access...');
-
 /**
  * In order to work with ElkArte any caching method must implement this
  * interface

@@ -15,11 +15,6 @@
  *
  */
 
-if (!defined('ELK'))
-{
-	die('No access...');
-}
-
 /**
  * Class Drafts_PersonalMessage_Module
  *

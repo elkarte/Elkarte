@@ -13,9 +13,6 @@
 
 namespace ElkArte\sources\subs\MentionType;
 
-if (!defined('ELK'))
-	die('No access...');
-
 /**
  * Interface Mention_Type_Interface
  * 

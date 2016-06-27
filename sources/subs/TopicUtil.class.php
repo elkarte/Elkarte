@@ -17,9 +17,6 @@
  *
  */
 
-if (!defined('ELK'))
-	die('No access...');
-
 /**
  * Class Topic_Util
  *

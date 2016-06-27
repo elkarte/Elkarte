@@ -15,9 +15,6 @@
  *
  */
 
-if (!defined('ELK'))
-	die('No access...');
-
 /**
  * Returns how many people are subscribed to a paid subscription.
  * @todo refactor away

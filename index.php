@@ -50,7 +50,7 @@ foreach (array('db_character_set', 'cachedir') as $variable)
 		unset($GLOBALS[$variable], $GLOBALS[$variable]);
 
 // Where the Settings.php file is located
-$settings_loc = 'Settings.php';
+$settings_loc = __DIR__ . '/Settings.php';
 
 // First thing: if the install dir exists, just send anybody there
 // The ignore_install_dir var is for developers only. Do not add it on production sites
@@ -81,7 +81,7 @@ else
 }
 
 // Make sure the paths are correct... at least try to fix them.
-if (!file_exists($boarddir) && file_exists('agreement.txt'))
+if (!file_exists($boarddir) && file_exists(__DIR__ . '/agreement.txt'))
 	$boarddir = __DIR__;
 if (!file_exists($sourcedir . '/SiteDispatcher.class.php') && file_exists($boarddir . '/sources'))
 	$sourcedir = $boarddir . '/sources';
@@ -142,7 +142,10 @@ Hooks::init(database(), Debug::get());
 reloadSettings();
 
 // Our good ole' contextual array, which will hold everything
-$context = array();
+if (!isset($context))
+{
+	$context = array();
+}
 
 // Seed the random generator.
 elk_seed_generator();
@@ -196,74 +199,71 @@ obExit(null, null, true);
  */
 function elk_main()
 {
-	global $modSettings, $user_info, $topic, $board_info, $context, $maintenance;
+	global $modSettings, $context;
 
 	// A safer way to work with our form globals
 	$_req = HttpReq::instance();
-
-	// Special case: session keep-alive, output a transparent pixel.
-	if ($_req->getQuery('action') === 'keepalive')
-	{
-		header('Content-Type: image/gif');
-		die("\x47\x49\x46\x38\x39\x61\x01\x00\x01\x00\x80\x00\x00\x00\x00\x00\x00\x00\x00\x21\xF9\x04\x01\x00\x00\x00\x00\x2C\x00\x00\x00\x00\x01\x00\x01\x00\x00\x02\x02\x44\x01\x00\x3B");
-	}
-
-	// We should set our security headers now.
-	frameOptionsHeader();
-	securityOptionsHeader();
-
-	// Load the user's cookie (or set as guest) and load their settings.
-	loadUserSettings();
-
-	// Load the current board's information.
-	loadBoard();
-
-	// Load the current user's permissions.
-	loadPermissions();
-
-	// Attachments don't require the entire theme to be loaded.
-	if ($_req->getQuery('action') === 'dlattach' && (!empty($modSettings['allow_guestAccess']) && $user_info['is_guest']) && (empty($maintenance) || allowedTo('admin_forum')))
-		detectBrowser();
-	// Load the current theme.  (note that ?theme=1 will also work, may be used for guest theming.)
-	else
-	{
-		loadTheme();
-
-		// Load BadBehavior before we go much further
-		loadBadBehavior();
-
-		// The parser is not a DIC just yet
-		loadBBCParsers();
-	}
-
-	// Check if the user should be disallowed access.
-	is_not_banned();
-
-	// If we are in a topic and don't have permission to approve it then duck out now.
-	if (!empty($topic) && empty($board_info['cur_topic_approved']) && !allowedTo('approve_posts') && ($user_info['id'] != $board_info['cur_topic_starter'] || $user_info['is_guest']))
-		Errors::instance()->fatal_lang_error('not_a_topic', false);
-
-	$no_stat_actions = array('dlattach', 'jsoption', 'requestmembers', 'jslocale', 'xmlpreview', 'suggest', '.xml', 'xmlhttp', 'verificationcode', 'viewquery', 'viewadminfile');
-	call_integration_hook('integrate_pre_log_stats', array(&$no_stat_actions));
-
-	// Do some logging, unless this is an attachment, avatar, toggle of editor buttons, theme option, XML feed etc.
-	if ((empty($_REQUEST['action']) || !in_array($_REQUEST['action'], $no_stat_actions)
-		|| (!empty($_REQUEST['sa']) && !in_array($_REQUEST['sa'], $no_stat_actions))) && !isset($_REQUEST['api']))
-	{
-		// I see you!
-		writeLog();
-
-		// Track forum statistics and hits...?
-		if (!empty($modSettings['hitStats']))
-			trackStats(array('hits' => '+'));
-	}
-	unset($no_stat_actions);
+	$action = $_req->getQuery('action', 'trim|strval', '');
+	$sub_action = $_req->getQuery('sa', 'trim|strval', '');
+	$area = $_req->getQuery('area', 'trim|strval', '');
 
 	// What shall we do?
-	$dispatcher = new Site_Dispatcher();
+	$dispatcher = new Site_Dispatcher($action, $sub_action, $area);
 
-	// Show where we came from, and go
-	$context['site_action'] = $dispatcher->site_action();
-	$context['site_action'] = !empty($context['site_action']) ? $context['site_action'] : $_req->getQuery('action', 'trim|strval', '');
+	// Special case: session keep-alive, output a transparent pixel.
+	if ($dispatcher->needSecurity())
+	{
+		// We should set our security headers now.
+		frameOptionsHeader();
+		securityOptionsHeader();
+
+		// Load the user's cookie (or set as guest) and load their settings.
+		loadUserSettings();
+
+		// Load the current board's information.
+		loadBoard();
+
+		// Load the current user's permissions.
+		loadPermissions();
+
+		// Load the current theme.  (note that ?theme=1 will also work, may be used for guest theming.)
+		if ($dispatcher->needTheme())
+		{
+			loadTheme();
+
+			// Load BadBehavior before we go much further
+			loadBadBehavior();
+
+			// The parser is not a DIC just yet
+			loadBBCParsers();
+		}
+		// Otherwise don't require the entire theme to be loaded.
+		else
+		{
+			detectBrowser();
+		}
+
+		// Check if the user should be disallowed access.
+		is_not_banned();
+
+		// Do some logging, unless this is an attachment, avatar, toggle of editor buttons, theme option, XML feed etc.
+		if ($dispatcher->trackStats())
+		{
+			// I see you!
+			writeLog();
+
+			// Track forum statistics and hits...?
+			if (!empty($modSettings['hitStats']))
+				trackStats(array('hits' => '+'));
+		}
+
+		// Show where we came from, and go
+		$context['site_action'] = $dispatcher->site_action();
+		if (empty($context['site_action']))
+		{
+			$context['site_action'] = $action;
+		}
+	}
+
 	$dispatcher->dispatch();
 }

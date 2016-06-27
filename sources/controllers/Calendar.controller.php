@@ -16,9 +16,6 @@
  *
  */
 
-if (!defined('ELK'))
-	die('No access...');
-
 /**
  * Calendar_Controller class
  * Displays the calendar for the site and provides for its navigation

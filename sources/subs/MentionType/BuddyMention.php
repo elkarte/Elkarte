@@ -13,11 +13,6 @@
 
 namespace ElkArte\sources\subs\MentionType;
 
-if (!defined('ELK'))
-{
-	die('No access...');
-}
-
 /**
  * Class Buddy_Mention
  * 

@@ -11,9 +11,6 @@
  *
  */
 
-if (!defined('ELK'))
-	die('No access...');
-
 /**
  * Builds the message index with the supplied parameters
  * creates all you ever wanted on message index, returns the data in array

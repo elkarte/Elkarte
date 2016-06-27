@@ -17,9 +17,6 @@
 
 namespace ElkArte\sources\subs\ScheduledTask;
 
-if (!defined('ELK'))
-	die('No access...');
-
 /**
  * Class Remove_Old_Drafts - Check for old drafts and remove them
  *

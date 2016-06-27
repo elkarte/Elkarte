@@ -11,9 +11,6 @@
  *
  */
 
-if (!defined('ELK'))
-	die('No access...');
-
 /**
  * Attempts, though an outrageous set of assumptions, to reflow/format an email message
  * that was previously wrapped by an email client (so it would look good on

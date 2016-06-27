@@ -10,9 +10,6 @@
  * @version 1.1 beta 1
  */
 
-if (!defined('ELK'))
-	die('No access...');
-
 /**
  * Used to combine css or js files in to a single file
  *

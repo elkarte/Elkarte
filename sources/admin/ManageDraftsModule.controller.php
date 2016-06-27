@@ -10,9 +10,6 @@
  * @version 1.1 beta 1
  */
 
-if (!defined('ELK'))
-	die('No access...');
-
 /**
  * Drafts administration controller.
  * This class allows to modify admin drafts settings for the forum.

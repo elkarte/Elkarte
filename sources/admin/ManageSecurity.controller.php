@@ -16,9 +16,6 @@
  *
  */
 
-if (!defined('ELK'))
-	die('No access...');
-
 /**
  * ManageSecurity controller handles the Security and Moderation
  * pages in admin panel.

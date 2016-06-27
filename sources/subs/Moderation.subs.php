@@ -15,9 +15,6 @@
  *
  */
 
-if (!defined('ELK'))
-	die('No access...');
-
 /**
  * How many open reports do we have?
  *  - if flush is true will clear the moderator menu count

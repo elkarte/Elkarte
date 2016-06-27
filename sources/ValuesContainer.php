@@ -13,9 +13,6 @@
 
 namespace ElkArte;
 
-if (!defined('ELK'))
-	die('No access...');
-
 /**
  * Class ValuesContainer
  *
