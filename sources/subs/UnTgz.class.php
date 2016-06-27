@@ -206,7 +206,7 @@ class UnTgz
 		$this->_header = unpack('H2a/H2b/Ct/Cf/Vmtime/Cxtra/Cos', substr($this->data, 0, 10));
 
 		// The IDentification number, gzip must be 1f8b
-		return !(strtolower($this->_header['a'] . $this->_header['b']) !== '1f8b');
+		return strtolower($this->_header['a'] . $this->_header['b']) === '1f8b';
 	}
 
 	/**
