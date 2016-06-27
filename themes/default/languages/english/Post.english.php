@@ -110,10 +110,10 @@ $txt['more_smileys_title'] = 'Additional smileys';
 $txt['more_smileys_pick'] = 'Pick a smiley';
 $txt['more_smileys_close_window'] = 'Close Window';
 
-$txt['error_new_reply'] = 'while you were typing a new reply has been posted. You may wish to review your post.';
-$txt['error_new_replies'] = 'while you were typing %1$d new replies have been posted. You may wish to review your post.';
-$txt['error_new_reply_reading'] = 'while you were reading a new reply has been posted. You may wish to review your post.';
-$txt['error_new_replies_reading'] = 'while you were reading %1$d new replies have been posted. You may wish to review your post.';
+$txt['error_new_reply'] = 'While you were typing a new reply has been posted. You may wish to review your post.';
+$txt['error_new_replies'] = 'While you were typing %1$d new replies have been posted. You may wish to review your post.';
+$txt['error_new_reply_reading'] = 'While you were reading a new reply has been posted. You may wish to review your post.';
+$txt['error_new_replies_reading'] = 'While you were reading %1$d new replies have been posted. You may wish to review your post.';
 
 $txt['announce_this_topic'] = 'Send an announcement about this topic to the members:';
 $txt['announce_title'] = 'Send an announcement';
