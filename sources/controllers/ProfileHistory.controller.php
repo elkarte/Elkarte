@@ -33,6 +33,8 @@ class ProfileHistory_Controller extends Action_Controller
 	 */
 	public function pre_dispatch()
 	{
+		require_once(SUBSDIR . '/Profile.subs.php');
+
 		$this->_memID = currentMemberID();
 	}
 
