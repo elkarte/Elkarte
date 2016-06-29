@@ -100,7 +100,6 @@ function initialize_inputs()
 	// Force an integer step, defaulting to 0.
 	$_GET['step'] = isset($_GET['step']) ? (int) $_GET['step'] : 0;
 
-	require_once(__DIR__ . '/CommonCode.php');
 	require_once(__DIR__ . '/LegacyCode.php');
 	require_once(__DIR__ . '/ToRefactorCode.php');
 	require_once(__DIR__ . '/TemplateInstall.php');
