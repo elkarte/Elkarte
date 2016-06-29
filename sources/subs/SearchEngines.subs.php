@@ -149,8 +149,7 @@ function logSpider()
 	{
 		if ($modSettings['spider_mode'] > 2)
 		{
-			$req = request();
-			$url = $_GET + array('USER_AGENT' => $req->user_agent());
+			$url = $_GET;
 			if (isset($context['session_var']))
 				unset($url['sesc'], $url[$context['session_var']]);
 			else
