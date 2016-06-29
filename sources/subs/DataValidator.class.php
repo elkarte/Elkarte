@@ -554,7 +554,7 @@ class Data_Validator
 		global $txt;
 
 		if (empty($this->_validation_errors))
-			return;
+			return false;
 
 		loadLanguage('Validation');
 		$result = array();
@@ -588,7 +588,7 @@ class Data_Validator
 				$result[] = sprintf($txt['_validate_generic'], $field);
 		}
 
-		return $result;
+		return empty($result) ? false : $result;
 	}
 
 	/**
