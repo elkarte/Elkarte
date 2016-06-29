@@ -923,7 +923,7 @@ class Maintenance_Controller extends Action_Controller
 	 */
 	public function action_version_display()
 	{
-		global $txt, $context;
+		global $txt, $context, $modSettings;
 
 		isAllowedTo('admin_forum');
 
