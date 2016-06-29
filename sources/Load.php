@@ -198,7 +198,7 @@ function loadUserSettings()
 		// Is the member data cached?
 		if (!$cache->checkLevel(2) || !$cache->getVar($user_settings, 'user_settings-' . $id_member, 60))
 		{
-			list ($user_settings) = $db->fetchQuery('
+			$this_user = $db->fetchQuery('
 				SELECT mem.*, IFNULL(a.id_attach, 0) AS id_attach, a.filename, a.attachment_type
 				FROM {db_prefix}members AS mem
 					LEFT JOIN {db_prefix}attachments AS a ON (a.id_member = {int:id_member})
@@ -209,8 +209,13 @@ function loadUserSettings()
 				)
 			);
 
-			// Make the ID specifically an integer
-			$user_settings['id_member'] = (int) $user_settings['id_member'];
+			if (!empty($this_user))
+			{
+				list ($user_settings) = $this_user;
+
+				// Make the ID specifically an integer
+				$user_settings['id_member'] = (int) $user_settings['id_member'];
+			}
 
 			if ($cache->checkLevel(2))
 				$cache->put('user_settings-' . $id_member, $user_settings, 60);
