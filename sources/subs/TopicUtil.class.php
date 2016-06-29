@@ -37,7 +37,7 @@ class Topic_Util
 	 */
 	public static function prepareContext($topics_info, $topicseen = false, $preview_length = null)
 	{
-		global $modSettings, $options, $scripturl, $txt, $user_info;
+		global $modSettings, $options, $scripturl, $txt, $user_info, $settings;
 
 		$topics = array();
 		$preview_length = (int) $preview_length;
@@ -47,7 +47,7 @@ class Topic_Util
 		$messages_per_page = empty($modSettings['disableCustomPerPage']) && !empty($options['messages_per_page']) ? $options['messages_per_page'] : $modSettings['defaultMaxMessages'];
 		$topicseen = $topicseen ? ';topicseen' : '';
 
-		$icon_sources = new MessageTopicIcons();
+		$icon_sources = new MessageTopicIcons(!empty($modSettings['messageIconChecks_enable']), $settings['theme_dir']);
 
 		$parser = \BBC\ParserWrapper::getInstance();
 
