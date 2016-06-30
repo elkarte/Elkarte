@@ -87,9 +87,7 @@ class Site_Dispatcher
 
 		if (
 			!empty($modSettings['front_page'])
-			&& is_callable(array($modSettings['front_page'], 'frontPageHook'))
-			&& is_callable(array($modSettings['front_page'], 'canFrontPage'))
-			&& call_user_func(array($modSettings['front_page'], 'canFrontPage'))
+			&& is_callable(array($modSettings['front_page'], 'frontPageHook')
 		) {
 			call_user_func(array($modSettings['front_page'], 'frontPageHook'), &$this->_default_action);
 		}
@@ -125,10 +123,6 @@ class Site_Dispatcher
 	 */
 	public function __construct(HttpReq $_req)
 	{
-		global $modSettings;
-
-		// A safer way to work with our form globals
-		$_req = HttpReq::instance();
 		$this->action = $_req->getQuery('action', 'trim|strval', '');
 		$this->area = $_req->getQuery('area', 'trim|strval', '');
 		$this->subAction = $_req->getQuery('sa', 'trim|strval', '');
