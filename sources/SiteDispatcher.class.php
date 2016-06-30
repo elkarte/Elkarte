@@ -127,18 +127,18 @@ class Site_Dispatcher
 	{
 		global $modSettings;
 
-		$this->_noActionActions($action, !empty($modSettings['allow_guestAccess']));
 		// A safer way to work with our form globals
 		$_req = HttpReq::instance();
 		$this->action = $_req->getQuery('action', 'trim|strval', '');
 		$this->area = $_req->getQuery('area', 'trim|strval', '');
 		$this->subAction = $_req->getQuery('sa', 'trim|strval', '');
 		$this->_default_action = $this->getFrontPage();
+		$this->_noActionActions();
 
 		// Now this return won't be cool, but lets do it
 		if (empty($this->_controller_name))
 		{
-			$this->_namingPatterns($action, $subaction, $area);
+			$this->_namingPatterns();
 		}
 
 		// Initialize this controller with its event manager
@@ -148,22 +148,19 @@ class Site_Dispatcher
 	/**
 	 * Finds out if the current action is one of those without an "action"
 	 * parameter in the URL
-	 *
-	 * @param string $action
-	 * @param bool $allow_guestAccess
 	 */
-	protected function _noActionActions($action, $allow_guestAccess = true)
+	protected function _noActionActions()
 	{
-		global $maintenance, $user_info, $board, $topic;
+		global $maintenance, $board, $topic;
 
 		// Maintenance mode: you're out of here unless you're admin
 		if (!empty($maintenance) && !allowedTo('admin_forum'))
 		{
 			// You can only login
-			if ($action == 'login2' || $action == 'logout')
+			if ($this->action == 'login2' || $this->action == 'logout')
 			{
 				$this->_controller_name = 'Auth_Controller';
-				$this->_function_name = $action == 'login2' ? 'action_login2' : 'action_logout';
+				$this->_function_name = 'action_' . $this->action;
 			}
 			// "maintenance mode" page
 			else
@@ -178,7 +175,7 @@ class Site_Dispatcher
 			$this->_controller_name = 'Auth_Controller';
 			$this->_function_name = 'action_kickguest';
 		}
-		elseif (empty($action))
+		elseif (empty($this->action))
 		{
 			// Home page: board index
 			if (empty($board) && empty($topic))
@@ -208,12 +205,8 @@ class Site_Dispatcher
 	/**
 	 * Compares the $_GET['action'] with array or naming patterns to find
 	 * a suitable controller.
-	 *
-	 * @param string $action
-	 * @param string $subaction
-	 * @param string $area
 	 */
-	protected function _namingPatterns($action, $subaction, $area)
+	protected function _namingPatterns()
 	{
 		// Start with our nice and cozy err... *cough*
 		// Format:
