@@ -54,28 +54,32 @@ class Site_Dispatcher
 	protected $_controller;
 
 	/**
+	 * @var string
+	 */
+	protected $action;
+
+	/**
+	 * @var string
+	 */
+	protected $area;
+
+	/**
+	 * @var string
+	 */
+	protected $subAction;
+
+	/**
 	 * Create an instance and initialize it.
 	 *
 	 * This does all the work to figure out which controller and method need
 	 * to be called.
+	 *
+	 * @param HttpReq $_req
 	 */
-	public function __construct($action = null, $subaction = null, $area = null)
+	public function __construct(HttpReq $_req)
 	{
 		global $modSettings;
 
-		// Backward compatibility with 1.0
-		if ($action === null)
-		{
-			$action = $this->_getAction();
-		}
-		if ($subaction === null)
-		{
-			$subaction = $this->_getSubAction();
-		}
-		if ($area === null)
-		{
-			$area = $this->_getArea();
-		}
 
 		// Default action of the forum: board index
 		// Every time we don't know what to do, we'll do this :P
@@ -88,6 +92,11 @@ class Site_Dispatcher
 		call_integration_hook('integrate_action_frontpage', array(&$this->_default_action));
 
 		$this->_noActionActions($action, !empty($modSettings['allow_guestAccess']));
+		// A safer way to work with our form globals
+		$_req = HttpReq::instance();
+		$this->action = $_req->getQuery('action', 'trim|strval', '');
+		$this->area = $_req->getQuery('area', 'trim|strval', '');
+		$this->subAction = $_req->getQuery('sa', 'trim|strval', '');
 
 		// Now this return won't be cool, but lets do it
 		if (empty($this->_controller_name))

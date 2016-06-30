@@ -202,15 +202,12 @@ function elk_main()
 	global $modSettings, $context;
 
 	// A safer way to work with our form globals
+	// @todo Use a DIC
 	$_req = HttpReq::instance();
-	$action = $_req->getQuery('action', 'trim|strval', '');
-	$sub_action = $_req->getQuery('sa', 'trim|strval', '');
-	$area = $_req->getQuery('area', 'trim|strval', '');
 
 	// What shall we do?
-	$dispatcher = new Site_Dispatcher($action, $sub_action, $area);
+	$dispatcher = new Site_Dispatcher($_req);
 
-	// Special case: session keep-alive, output a transparent pixel.
 	if ($dispatcher->needSecurity())
 	{
 		// We should set our security headers now.
@@ -259,10 +256,6 @@ function elk_main()
 
 		// Show where we came from, and go
 		$context['site_action'] = $dispatcher->site_action();
-		if (empty($context['site_action']))
-		{
-			$context['site_action'] = $action;
-		}
 	}
 
 	$dispatcher->dispatch();
