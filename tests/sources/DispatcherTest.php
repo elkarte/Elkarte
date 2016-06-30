@@ -170,7 +170,7 @@ class DispatcherTest extends PHPUnit_Framework_TestCase
 			);
 
 			// Start a new dispatcher every time (the dispatching is done on __construct)
-			$dispatcher = New Site_Dispatcher_Tester();
+			$dispatcher = New Site_Dispatcher_Tester(new HttpReq);
 			$this->assertTrue($dispatcher->compare($test['result']), $test['test_name']);
 		}
 	}

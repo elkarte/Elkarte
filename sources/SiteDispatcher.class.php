@@ -74,9 +74,55 @@ class Site_Dispatcher
 	protected $subAction;
 
 	/**
+	 * Build our nice and cozy err... *cough*
+	 *
 	 * @var string[]
 	 */
-	protected $actionArray;
+	protected $actionArray = array(
+		'attachapprove' => array('ModerateAttachments_Controller', 'action_attachapprove'),
+		'buddy' => array('Members_Controller', 'action_buddy'),
+		'collapse' => array('BoardIndex_Controller', 'action_collapse'),
+		'deletemsg' => array('RemoveTopic_Controller', 'action_deletemsg'),
+		'dlattach' => array('Attachment_Controller', 'action_index'),
+		'unwatchtopic' => array('Notify_Controller', 'action_unwatchtopic'),
+		'editpoll' => array('Poll_Controller', 'action_editpoll'),
+		'editpoll2' => array('Poll_Controller', 'action_editpoll2'),
+		'quickhelp' => array('Help_Controller', 'action_quickhelp'),
+		'jsmodify' => array('Post_Controller', 'action_jsmodify'),
+		'jsoption' => array('ManageThemes_Controller', 'action_jsoption'),
+		'keepalive' => array('Auth_Controller', 'action_keepalive'),
+		'lockvoting' => array('Poll_Controller', 'action_lockvoting'),
+		'login' => array('Auth_Controller', 'action_login'),
+		'login2' => array('Auth_Controller', 'action_login2'),
+		'logout' => array('Auth_Controller', 'action_logout'),
+		'markasread' => array('MarkRead_Controller', 'action_index'),
+		'mergetopics' => array('MergeTopics_Controller', 'action_index'),
+		'moderate' => array('ModerationCenter_Controller', 'action_index'),
+		'movetopic' => array('MoveTopic_Controller', 'action_movetopic'),
+		'movetopic2' => array('MoveTopic_Controller', 'action_movetopic2'),
+		'notify' => array('Notify_Controller', 'action_notify'),
+		'notifyboard' => array('Notify_Controller', 'action_notifyboard'),
+		'openidreturn' => array('OpenID_Controller', 'action_openidreturn'),
+		'xrds' => array('OpenID_Controller', 'action_xrds'),
+		'pm' => array('PersonalMessage_Controller', 'action_index'),
+		'post2' => array('Post_Controller', 'action_post2'),
+		'quotefast' => array('Post_Controller', 'action_quotefast'),
+		'quickmod' => array('MessageIndex_Controller', 'action_quickmod'),
+		'quickmod2' => array('Display_Controller', 'action_quickmod2'),
+		'removetopic2' => array('RemoveTopic_Controller', 'action_removetopic2'),
+		'reporttm' => array('Emailuser_Controller', 'action_reporttm'),
+		'restoretopic' => array('RemoveTopic_Controller', 'action_restoretopic'),
+		'splittopics' => array('SplitTopics_Controller', 'action_splittopics'),
+		'theme' => array('ManageThemes_Controller', 'action_thememain'),
+		'trackip' => array('ProfileHistory_Controller', 'action_trackip'),
+		'unreadreplies' => array('Unread_Controller', 'action_unreadreplies'),
+		'viewprofile' => array('Profile_Controller', 'action_index'),
+		'viewquery' => array('AdminDebug_Controller', 'action_viewquery'),
+		'viewadminfile' => array('AdminDebug_Controller', 'action_viewadminfile'),
+		'.xml' => array('News_Controller', 'action_showfeed'),
+		'xmlhttp' => array('Xml_Controller', 'action_index'),
+		'xmlpreview' => array('XmlPreview_Controller', 'action_index'),
+	);
 
 	/**
 	 * @return string[]
@@ -87,9 +133,9 @@ class Site_Dispatcher
 
 		if (
 			!empty($modSettings['front_page'])
-			&& is_callable(array($modSettings['front_page'], 'frontPageHook')
+			&& is_callable(array($modSettings['front_page'], 'frontPageHook'))
 		) {
-			call_user_func(array($modSettings['front_page'], 'frontPageHook'), &$this->_default_action);
+			call_user_func_array(array($modSettings['front_page'], 'frontPageHook'), array(&$this->_default_action));
 		}
 		return $this->_default_action;
 	}
@@ -107,10 +153,10 @@ class Site_Dispatcher
 		return
 			empty($modSettings['allow_guestAccess'])
 			&& $user_info['is_guest']
-			&& (!in_array($this->action, array(
+			&& !in_array($this->action, array(
 				'login', 'login2', 'register', 'reminder',
 				'help', 'quickhelp', 'mailq', 'openidreturn'
-			);
+			));
 	}
 
 	/**
@@ -202,60 +248,12 @@ class Site_Dispatcher
 	 */
 	protected function determineAction()
 	{
-		// Start with our nice and cozy err... *cough*
+		// Allow to extend or change $actionArray through a hook
 		// Format:
 		// $_GET['action'] => array($class, $method)
-		$this->actionArray = array(
-			'attachapprove' => array('ModerateAttachments_Controller', 'action_attachapprove'),
-			'buddy' => array('Members_Controller', 'action_buddy'),
-			'collapse' => array('BoardIndex_Controller', 'action_collapse'),
-			'deletemsg' => array('RemoveTopic_Controller', 'action_deletemsg'),
-			// @todo: move this to attachment action also
-			'dlattach' => array('Attachment_Controller', 'action_index'),
-			'unwatchtopic' => array('Notify_Controller', 'action_unwatchtopic'),
-			'editpoll' => array('Poll_Controller', 'action_editpoll'),
-			'editpoll2' => array('Poll_Controller', 'action_editpoll2'),
-			'quickhelp' => array('Help_Controller', 'action_quickhelp'),
-			'jsmodify' => array('Post_Controller', 'action_jsmodify'),
-			'jsoption' => array('ManageThemes_Controller', 'action_jsoption'),
-			'keepalive' => array('Auth_Controller', 'action_keepalive'),
-			'lockvoting' => array('Poll_Controller', 'action_lockvoting'),
-			'login' => array('Auth_Controller', 'action_login'),
-			'login2' => array('Auth_Controller', 'action_login2'),
-			'logout' => array('Auth_Controller', 'action_logout'),
-			'markasread' => array('MarkRead_Controller', 'action_index'),
-			'mergetopics' => array('MergeTopics_Controller', 'action_index'),
-			'moderate' => array('ModerationCenter_Controller', 'action_index'),
-			'movetopic' => array('MoveTopic_Controller', 'action_movetopic'),
-			'movetopic2' => array('MoveTopic_Controller', 'action_movetopic2'),
-			'notify' => array('Notify_Controller', 'action_notify'),
-			'notifyboard' => array('Notify_Controller', 'action_notifyboard'),
-			'openidreturn' => array('OpenID_Controller', 'action_openidreturn'),
-			'xrds' => array('OpenID_Controller', 'action_xrds'),
-			'pm' => array('PersonalMessage_Controller', 'action_index'),
-			'post2' => array('Post_Controller', 'action_post2'),
-			'quotefast' => array('Post_Controller', 'action_quotefast'),
-			'quickmod' => array('MessageIndex_Controller', 'action_quickmod'),
-			'quickmod2' => array('Display_Controller', 'action_quickmod2'),
-			'removetopic2' => array('RemoveTopic_Controller', 'action_removetopic2'),
-			'reporttm' => array('Emailuser_Controller', 'action_reporttm'),
-			'restoretopic' => array('RemoveTopic_Controller', 'action_restoretopic'),
-			'splittopics' => array('SplitTopics_Controller', 'action_splittopics'),
-			'theme' => array('ManageThemes_Controller', 'action_thememain'),
-			'trackip' => array('ProfileHistory_Controller', 'action_trackip'),
-			'unreadreplies' => array('Unread_Controller', 'action_unreadreplies'),
-			'viewprofile' => array('Profile_Controller', 'action_index'),
-			'viewquery' => array('AdminDebug_Controller', 'action_viewquery'),
-			'viewadminfile' => array('AdminDebug_Controller', 'action_viewadminfile'),
-			'.xml' => array('News_Controller', 'action_showfeed'),
-			'xmlhttp' => array('Xml_Controller', 'action_index'),
-			'xmlpreview' => array('XmlPreview_Controller', 'action_index'),
-		);
-
-		// Allow to extend or change $actionArray through a hook
 		call_integration_hook('integrate_actions', array(&$this->actionArray));
 
-		// Is it in core legacy actions?
+		// Is it in the action list?
 		if (isset($this->actionArray[$this->action]))
 		{
 			$this->_controller_name = $this->actionArray[$this->action][0];
