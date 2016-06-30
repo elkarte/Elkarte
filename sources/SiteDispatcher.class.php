@@ -74,6 +74,11 @@ class Site_Dispatcher
 	protected $subAction;
 
 	/**
+	 * @var string[]
+	 */
+	protected $actionArray;
+
+	/**
 	 * @return string[]
 	 */
 	protected function getFrontPage()
@@ -213,7 +218,7 @@ class Site_Dispatcher
 		// Start with our nice and cozy err... *cough*
 		// Format:
 		// $_GET['action'] => array($class, $method)
-		$actionArray = array(
+		$this->actionArray = array(
 			'attachapprove' => array('ModerateAttachments_Controller', 'action_attachapprove'),
 			'buddy' => array('Members_Controller', 'action_buddy'),
 			'collapse' => array('BoardIndex_Controller', 'action_collapse'),
@@ -261,31 +266,31 @@ class Site_Dispatcher
 		);
 
 		// Allow to extend or change $actionArray through a hook
-		call_integration_hook('integrate_actions', array(&$actionArray));
+		call_integration_hook('integrate_actions', array(&$this->actionArray));
 
 		// Is it in core legacy actions?
-		if (isset($actionArray[$action]))
+		if (isset($this->actionArray[$this->action]))
 		{
-			$this->_controller_name = $actionArray[$action][0];
+			$this->_controller_name = $this->actionArray[$this->action][0];
 
 			// If the method is coded in, use it
-			if (!empty($actionArray[$action][1]))
-				$this->_function_name = $actionArray[$action][1];
+			if (!empty($this->actionArray[$this->action][1]))
+				$this->_function_name = $this->actionArray[$this->action][1];
 			// Otherwise fall back to naming patterns
-			elseif (!empty($subaction) && preg_match('~^\w+$~', $subaction))
-				$this->_function_name = 'action_' . $subaction;
+			elseif (!empty($this->subAction) && preg_match('~^\w+$~', $this->subAction))
+				$this->_function_name = 'action_' . $this->subAction;
 			else
 				$this->_function_name = 'action_index';
 		}
 		// Fall back to naming patterns.
 		// addons can use any of them, and it should Just Work (tm).
-		elseif (preg_match('~^[a-zA-Z_\\-]+\d*$~', $action))
+		elseif (preg_match('~^[a-zA-Z_\\-]+\d*$~', $this->action))
 		{
 			// action=gallery => Gallery.controller.php
 			// sa=upload => action_upload()
-			$this->_controller_name = ucfirst($action) . '_Controller';
-			if (isset($subaction) && preg_match('~^\w+$~', $subaction) && empty($area))
-				$this->_function_name = 'action_' . $subaction;
+			$this->_controller_name = ucfirst($this->action) . '_Controller';
+			if (isset($this->subAction) && preg_match('~^\w+$~', $this->subAction) && empty($this->area))
+				$this->_function_name = 'action_' . $this->subAction;
 			else
 				$this->_function_name = 'action_index';
 		}
