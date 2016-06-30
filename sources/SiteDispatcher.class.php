@@ -133,12 +133,12 @@ class Site_Dispatcher
 		$this->area = $_req->getQuery('area', 'trim|strval', '');
 		$this->subAction = $_req->getQuery('sa', 'trim|strval', '');
 		$this->_default_action = $this->getFrontPage();
-		$this->_noActionActions();
+		$this->determineDefaultAction();
 
 		// Now this return won't be cool, but lets do it
 		if (empty($this->_controller_name))
 		{
-			$this->_namingPatterns();
+			$this->determineAction();
 		}
 
 		// Initialize this controller with its event manager
@@ -146,10 +146,10 @@ class Site_Dispatcher
 	}
 
 	/**
-	 * Finds out if the current action is one of those without an "action"
-	 * parameter in the URL
+	 * Finds out if the current action is one of those without
+	 * an "action" parameter in the URL
 	 */
-	protected function _noActionActions()
+	protected function determineDefaultAction()
 	{
 		global $maintenance, $board, $topic;
 
@@ -206,7 +206,7 @@ class Site_Dispatcher
 	 * Compares the $_GET['action'] with array or naming patterns to find
 	 * a suitable controller.
 	 */
-	protected function _namingPatterns()
+	protected function determineAction()
 	{
 		// Start with our nice and cozy err... *cough*
 		// Format:
