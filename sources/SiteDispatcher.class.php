@@ -74,6 +74,24 @@ class Site_Dispatcher
 	protected $subAction;
 
 	/**
+	 * @return string[]
+	 */
+	protected function getFrontPage()
+	{
+		global $modSettings;
+
+		if (
+			!empty($modSettings['front_page'])
+			&& is_callable(array($modSettings['front_page'], 'frontPageHook'))
+			&& is_callable(array($modSettings['front_page'], 'canFrontPage'))
+			&& call_user_func(array($modSettings['front_page'], 'canFrontPage'))
+		) {
+			call_user_func(array($modSettings['front_page'], 'frontPageHook'), &$this->_default_action);
+		}
+		return $this->_default_action;
+	}
+
+	/**
 	 * Create an instance and initialize it.
 	 *
 	 * This does all the work to figure out which controller and method need
@@ -85,17 +103,13 @@ class Site_Dispatcher
 	{
 		global $modSettings;
 
-
-
-		// Reminder: hooks need to account for multiple addons setting this hook.
-		call_integration_hook('integrate_action_frontpage', array(&$this->_default_action));
-
 		$this->_noActionActions($action, !empty($modSettings['allow_guestAccess']));
 		// A safer way to work with our form globals
 		$_req = HttpReq::instance();
 		$this->action = $_req->getQuery('action', 'trim|strval', '');
 		$this->area = $_req->getQuery('area', 'trim|strval', '');
 		$this->subAction = $_req->getQuery('sa', 'trim|strval', '');
+		$this->_default_action = $this->getFrontPage();
 
 		// Now this return won't be cool, but lets do it
 		if (empty($this->_controller_name))
