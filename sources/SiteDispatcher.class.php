@@ -92,6 +92,25 @@ class Site_Dispatcher
 	}
 
 	/**
+	 * Determine if guest access is restricted, and, if so,
+	 * only allow the listed actions
+	 *
+	 * @return boolean
+	 */
+	protected function restrictedGuestAccess()
+	{
+		global $modSettings, $user_info;
+
+		return
+			empty($modSettings['allow_guestAccess'])
+			&& $user_info['is_guest']
+			&& (!in_array($this->action, array(
+				'login', 'login2', 'register', 'reminder',
+				'help', 'quickhelp', 'mailq', 'openidreturn'
+			);
+	}
+
+	/**
 	 * Create an instance and initialize it.
 	 *
 	 * This does all the work to figure out which controller and method need
@@ -149,7 +168,7 @@ class Site_Dispatcher
 			}
 		}
 		// If guest access is disallowed, a guest is kicked out... politely. :P
-		elseif ($allow_guestAccess === false && $user_info['is_guest'] && (!in_array($action, array('login', 'login2', 'register', 'reminder', 'help', 'quickhelp', 'mailq', 'openidreturn'))))
+		elseif ($this->restrictedGuestAccess())
 		{
 			$this->_controller_name = 'Auth_Controller';
 			$this->_function_name = 'action_kickguest';
