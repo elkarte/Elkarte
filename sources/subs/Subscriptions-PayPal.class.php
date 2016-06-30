@@ -179,6 +179,7 @@ class PayPal_Payment
 	 * - PayPal will respond back with a single word, which is either VERIFIED if the message originated with PayPal or INVALID
 	 * - If valid returns the subscription and member IDs we are going to process if it passes
 	 *
+	 * @todo split this function into several chunks
 	 * @return string
 	 */
 	public function precheck()
@@ -213,7 +214,7 @@ class PayPal_Payment
 
 		// Post IPN data back to PayPal to validate the IPN data is genuine
 		// First we try cURL
-		if (function_exists('curl_init') && $curl = curl_init((!empty($modSettings['paidsubs_test']) ? 'https://www.sandbox.' : 'https://www.') . 'paypal.com/cgi-bin/webscr'))
+		if (function_exists('curl_init') && $curl = curl_init((!empty($modSettings['paidsubs_test']) ? 'https://ipnpb.sandbox.' : 'https://ipnpb.') . 'paypal.com/cgi-bin/webscr'))
 		{
 			// Set the post data.
 			curl_setopt($curl, CURLOPT_POST, true);
@@ -233,7 +234,7 @@ class PayPal_Payment
 			curl_setopt($curl, CURLOPT_HTTPHEADER, array(
 				'Content-Type: application/x-www-form-urlencoded',
 				'Content-Length: ' . strlen($requestString),
-				'Host: www.' . (!empty($modSettings['paidsubs_test']) ? 'sandbox.' : '') . 'paypal.com',
+				'Host: ipnpb.' . (!empty($modSettings['paidsubs_test']) ? 'sandbox.' : '') . 'paypal.com',
 				'Connection: close'
 			));
 
@@ -252,15 +253,15 @@ class PayPal_Payment
 			// Setup the headers.
 			$header = 'POST /cgi-bin/webscr HTTP/1.1' . "\r\n";
 			$header .= 'Content-Type: application/x-www-form-urlencoded' . "\r\n";
-			$header .= 'Host: www.' . (!empty($modSettings['paidsubs_test']) ? 'sandbox.' : '') . 'paypal.com' . "\r\n";
+			$header .= 'Host: ipnpb.' . (!empty($modSettings['paidsubs_test']) ? 'sandbox.' : '') . 'paypal.com' . "\r\n";
 			$header .= 'Content-Length: ' . strlen($requestString) . "\r\n";
 			$header .= 'Connection: close' . "\r\n\r\n";
 
 			// Open the connection.
 			if (!empty($modSettings['paidsubs_test']))
-				$fp = fsockopen('ssl://www.sandbox.paypal.com', 443, $errno, $errstr, 30);
+				$fp = fsockopen('ssl://ipnpb.sandbox.paypal.com', 443, $errno, $errstr, 30);
 			else
-				$fp = fsockopen('ssl://www.paypal.com', 443, $errno, $errstr, 30);
+				$fp = fsockopen('ssl://ipnpb.paypal.com', 443, $errno, $errstr, 30);
 
 			// Did it work?
 			if (!$fp)
