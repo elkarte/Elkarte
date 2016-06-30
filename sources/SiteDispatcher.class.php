@@ -83,9 +83,10 @@ class Site_Dispatcher
 			'controller' => 'BoardIndex_Controller',
 			'function' => 'action_boardindex'
 		);
-
-		// Reminder: hooks need to account for multiple addons setting this hook.
-		call_integration_hook('integrate_action_frontpage', array(&$this->_default_action));
+		if (!empty($modSettings['front_page']) && is_callable(array($modSettings['front_page'], 'frontPageHook')))
+		{
+			call_user_func_array(array($modSettings['front_page'], 'frontPageHook'), array(&$this->_default_action));
+		}
 
 		$this->_noActionActions($action, !empty($modSettings['allow_guestAccess']));
 
