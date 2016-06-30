@@ -324,36 +324,6 @@ class Site_Dispatcher
 	}
 
 	/**
-	 * Backward compatibility function.
-	 * Determine the current action from $_GET
-	 * @deprecated since 1.1
-	 */
-	protected function _getAction()
-	{
-		return isset($_GET['action']) ? $_GET['action'] : '';
-	}
-
-	/**
-	 * Backward compatibility function.
-	 * Determine the current subaction from $_GET
-	 * @deprecated since 1.1
-	 */
-	protected function _getSubAction()
-	{
-		return isset($_GET['sa']) ? $_GET['sa'] : '';
-	}
-
-	/**
-	 * Backward compatibility function.
-	 * Determine the current area from $_GET
-	 * @deprecated since 1.1
-	 */
-	protected function _getArea()
-	{
-		return isset($_GET['area']) ? $_GET['area'] : '';
-	}
-
-	/**
 	 * Relay control to the respective function or method.
 	 */
 	public function dispatch()
@@ -411,6 +381,6 @@ class Site_Dispatcher
 			$action = substr($action, -1) == 2 ? substr($action, 0, -1) : $action;
 		}
 
-		return isset($action) ? $action : '';
+		return isset($action) ? $action : $this->action;
 	}
 }
