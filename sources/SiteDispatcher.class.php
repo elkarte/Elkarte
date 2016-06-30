@@ -43,13 +43,18 @@ class Site_Dispatcher
 
 	/**
 	 * The default action data (controller and function)
+	 * Every time we don't know what to do, we'll do this :P
+	 *
 	 * @var string[]
 	 */
-	protected $_default_action;
+	protected $_default_action = array(
+		'controller' => 'BoardIndex_Controller',
+		'function' => 'action_boardindex'
+	);
 
 	/**
 	 * The instance of the controller
-	 * @var null|Action_Controller
+	 * @var Action_Controller
 	 */
 	protected $_controller;
 
@@ -81,12 +86,6 @@ class Site_Dispatcher
 		global $modSettings;
 
 
-		// Default action of the forum: board index
-		// Every time we don't know what to do, we'll do this :P
-		$this->_default_action = array(
-			'controller' => 'BoardIndex_Controller',
-			'function' => 'action_boardindex'
-		);
 
 		// Reminder: hooks need to account for multiple addons setting this hook.
 		call_integration_hook('integrate_action_frontpage', array(&$this->_default_action));
