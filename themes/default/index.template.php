@@ -367,7 +367,7 @@ function template_th_search_bar()
 		echo '
 				<input type="hidden" name="', (!empty($modSettings['search_dropdown']) ? 'sd_topic' : 'topic'), '" value="', $context['current_topic'], '" />';
 	// If we're on a certain board, limit it to this board ;).
-	elseif (!empty($context['current_board']))
+	if (!empty($context['current_board']))
 		echo '
 				<input type="hidden" name="', (!empty($modSettings['search_dropdown']) ? 'sd_brd[' : 'brd['), $context['current_board'], ']"', ' value="', $context['current_board'], '" />';
 
