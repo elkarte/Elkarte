@@ -140,40 +140,18 @@ class Site_Dispatcher
 		return $this->_default_action;
 	}
 
-	/**
-	 * Determine if guest access is restricted, and, if so,
-	 * only allow the listed actions
-	 *
-	 * @return boolean
-	 */
-	protected function restrictedGuestAccess()
-	{
-		global $modSettings, $user_info;
+		// Default action of the forum: board index
+		// Every time we don't know what to do, we'll do this :P
+		$this->_default_action = array(
+			'controller' => 'BoardIndex_Controller',
+			'function' => 'action_boardindex'
+		);
+		if (!empty($modSettings['front_page']) && is_callable(array($modSettings['front_page'], 'frontPageHook')))
+		{
+			call_user_func_array(array($modSettings['front_page'], 'frontPageHook'), array(&$this->_default_action));
+		}
 
-		return
-			empty($modSettings['allow_guestAccess'])
-			&& $user_info['is_guest']
-			&& !in_array($this->action, array(
-				'login', 'login2', 'register', 'reminder',
-				'help', 'quickhelp', 'mailq', 'openidreturn'
-			));
-	}
-
-	/**
-	 * Create an instance and initialize it.
-	 *
-	 * This does all the work to figure out which controller and method need
-	 * to be called.
-	 *
-	 * @param HttpReq $_req
-	 */
-	public function __construct(HttpReq $_req)
-	{
-		$this->action = $_req->getQuery('action', 'trim|strval', '');
-		$this->area = $_req->getQuery('area', 'trim|strval', '');
-		$this->subAction = $_req->getQuery('sa', 'trim|strval', '');
-		$this->_default_action = $this->getFrontPage();
-		$this->determineDefaultAction();
+		$this->_noActionActions($action, !empty($modSettings['allow_guestAccess']));
 
 		// Now this return won't be cool, but lets do it
 		if (empty($this->_controller_name))

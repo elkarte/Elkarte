@@ -21,7 +21,7 @@ Contributions to documentation are licensed under [CC-by-SA 3](http://creativeco
 * @Mentioning users including notifications
 * Likes for posts and topics
 * Drafts, including auto save
-* OpenID 2.0
+* OpenID 2.0 (BC Math must be available)
 * Two built in modern, responsive themes
 * Integrated video embedding for youtube, vimeo and dailymotion
 * Drag and drop ordering in the administration interface
