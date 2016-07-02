@@ -605,9 +605,7 @@ $txt['moveTopic4'] = 'Change every message\'s subject';
 $txt['move_topic_unapproved_js'] = 'Warning! This topic has not yet been approved.\\n\\nIt is not recommended that you create a redirection topic unless you intend to approve the post immediately following the move.';
 $txt['movetopic_auto_board'] = '[BOARD]';
 $txt['movetopic_auto_topic'] = '[TOPIC LINK]';
-$txt['movetopic_default'] = 'This topic has been moved to [BOARD]
-
-[TOPIC LINK]';
+$txt['movetopic_default'] = 'This topic has been moved to [BOARD] - [TOPIC LINK]';
 $txt['movetopic_redirect'] = 'Redirect to the moved topic';
 $txt['movetopic_expires'] = 'Automatically remove the redirection topic';
 
@@ -620,9 +618,7 @@ $txt['split_after_and_this_post'] = 'Split topic after and including this post.'
 $txt['select_split_posts'] = 'Select posts to split.';
 
 $txt['splittopic_notification'] = 'Post a message when the topic is split';
-$txt['splittopic_default'] = 'One or more of the messages of this topic have been moved to [BOARD]
-
-[TOPIC LINK]';
+$txt['splittopic_default'] = 'One or more of the messages of this topic have been moved to [BOARD] - [TOPIC LINK]';
 $txt['splittopic_move'] = 'Move the new topic to another board';
 
 $txt['new_topic'] = 'New Topic';
