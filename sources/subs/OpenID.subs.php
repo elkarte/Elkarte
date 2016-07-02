@@ -21,6 +21,12 @@
 class OpenID
 {
 	/**
+	 * Defined in OpenID spec.
+	 */
+	protected $p = '155172898181473697471232257763715539915724801966915404479707795314057629378541917580651227423698188993727816152646631438561595825688188889951272158842675419950341258706556549803580104870537681476726513255747040765857479291291572334510643245094715007229621094194349783925984760375594985848253359305585439638443';
+	protected $g = '2';
+
+	/**
 	 * Validate the supplied OpenID, redirects to the IDP server
 	 *
 	 * What it does:
@@ -186,8 +192,6 @@ class OpenID
 	 */
 	public function makeAssociation($server)
 	{
-		global $p;
-
 		$db = database();
 
 		$parameters = array(
@@ -236,7 +240,7 @@ class OpenID
 		// Figure out the Diffie-Hellman secret.
 		if (!empty($assoc_data['enc_mac_key']))
 		{
-			$dh_secret = bcpowmod(binary_to_long(base64_decode($assoc_data['dh_server_public'])), $dh_keys['private'], $p);
+			$dh_secret = bcpowmod(binary_to_long(base64_decode($assoc_data['dh_server_public'])), $dh_keys['private'], $this->p);
 			$secret = base64_encode(binary_xor(sha1(long_to_binary($dh_secret), true), base64_decode($assoc_data['enc_mac_key'])));
 		}
 		else
@@ -304,15 +308,9 @@ class OpenID
 	 */
 	public function setup_DH($regenerate = false)
 	{
-		global $p, $g;
-
 		// First off, do we have BC Math available?
 		if (!function_exists('bcpow'))
 			return false;
-
-		// Defined in OpenID spec.
-		$p = '155172898181473697471232257763715539915724801966915404479707795314057629378541917580651227423698188993727816152646631438561595825688188889951272158842675419950341258706556549803580104870537681476726513255747040765857479291291572334510643245094715007229621094194349783925984760375594985848253359305585439638443';
-		$g = '2';
 
 		// Make sure the scale is set.
 		bcscale(0);
@@ -329,7 +327,7 @@ class OpenID
 	 */
 	public function get_keys($regenerate)
 	{
-		global $modSettings, $p, $g;
+		global $modSettings;
 
 		// Ok lets take the easy way out, are their any keys already defined for us? They are changed in the daily maintenance scheduled task.
 		if (!empty($modSettings['dh_keys']) && !$regenerate)
@@ -345,7 +343,7 @@ class OpenID
 		// Dang it, now I have to do math.  And it's not just ordinary math, its the evil big integer math.
 		// This will take a few seconds.
 		$private = $this->generate_private_key();
-		$public = bcpowmod($g, $private, $p);
+		$public = bcpowmod($this->g, $private, $this->p);
 
 		// Now that we did all that work, lets save it so we don't have to keep doing it.
 		$keys = array('dh_keys' => base64_encode($public) . "\n" . base64_encode($private));
@@ -364,10 +362,9 @@ class OpenID
 	 */
 	public function generate_private_key()
 	{
-		global $p;
 		static $cache = array();
 
-		$byte_string = long_to_binary($p);
+		$byte_string = long_to_binary($this->p);
 
 		if (isset($cache[$byte_string]))
 			list ($dup, $num_bytes) = $cache[$byte_string];
@@ -393,7 +390,7 @@ class OpenID
 			$num = binary_to_long($bytes);
 		} while (bccomp($num, $dup) < 0);
 
-		return bcadd(bcmod($num, $p), 1);
+		return bcadd(bcmod($num, $this->p), 1);
 	}
 
 	/**

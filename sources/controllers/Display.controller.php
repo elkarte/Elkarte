@@ -522,7 +522,7 @@ class Display_Controller extends Action_Controller
 		// Set the callback.  (do you REALIZE how much memory all the messages would take?!?)
 		// This will be called from the template.
 		$context['get_message'] = array($this, 'prepareDisplayContext_callback');
-		$this->_icon_sources = new MessageTopicIcons();
+		$this->_icon_sources = new MessageTopicIcons(!empty($modSettings['messageIconChecks_enable']), $settings['theme_dir']);
 		list ($sig_limits, $sig_bbc) = explode(':', $modSettings['signature_settings']);
 		$signature_settings = explode(',', $sig_limits);
 

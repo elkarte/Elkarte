@@ -252,7 +252,7 @@ class Search_Controller extends Action_Controller
 	 */
 	public function action_results()
 	{
-		global $scripturl, $modSettings, $txt;
+		global $scripturl, $modSettings, $txt, $settings;
 		global $user_info, $context, $options, $messages_request, $boards_can;
 		global $participants;
 
@@ -504,7 +504,7 @@ class Search_Controller extends Action_Controller
 		$context['sub_template'] = 'results';
 		$context['page_title'] = $txt['search_results'];
 		$context['get_topics'] = array($this, 'prepareSearchContext_callback');
-		$this->_icon_sources = new MessageTopicIcons();
+		$this->_icon_sources = new MessageTopicIcons(!empty($modSettings['messageIconChecks_enable']), $settings['theme_dir']);
 
 		$context['jump_to'] = array(
 			'label' => addslashes(un_htmlspecialchars($txt['jump_to'])),

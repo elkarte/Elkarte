@@ -923,7 +923,7 @@ class Maintenance_Controller extends Action_Controller
 	 */
 	public function action_version_display()
 	{
-		global $txt, $context;
+		global $txt, $context, $modSettings;
 
 		isAllowedTo('admin_forum');
 
@@ -954,6 +954,7 @@ class Maintenance_Controller extends Action_Controller
 
 		$context['sub_template'] = 'view_versions';
 		$context['page_title'] = $txt['admin_version_check'];
+		$context['detailed_version_url'] = $modSettings['detailed-version.js'];
 	}
 
 	/**

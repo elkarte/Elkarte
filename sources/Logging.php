@@ -52,8 +52,7 @@ function writeLog($force = false)
 
 	if (!empty($modSettings['who_enabled']))
 	{
-		$req = request();
-		$serialized = $_GET + array('USER_AGENT' => $req->user_agent());
+		$serialized = $_GET;
 
 		// In the case of a dlattach action, session_var may not be set.
 		if (!isset($context['session_var']))

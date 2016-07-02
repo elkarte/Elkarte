@@ -56,9 +56,6 @@ abstract class Action_Controller
 		}
 
 		$this->_events = $eventManager;
-
-		// Initialize the events associated with this controller
-		$this->_initEventManager();
 	}
 
 	/**
@@ -149,6 +146,12 @@ abstract class Action_Controller
 	 */
 	public function getHook()
 	{
+		if ($this->_hook === '')
+		{
+			// Initialize the events associated with this controller
+			$this->_initEventManager();
+		}
+
 		return strtolower($this->_hook);
 	}
 

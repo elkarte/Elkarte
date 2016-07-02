@@ -659,7 +659,7 @@ function template_display_poll_above()
 	global $settings, $context, $txt, $scripturl;
 
 	echo '
-			<s id="poll">
+			<div id="poll">
 				<h2 class="category_header">
 					<i class="icon i-poll', $context['poll']['is_locked'] ? '-locked' : '', '"></i> ', $txt['poll'], '
 				</h2>

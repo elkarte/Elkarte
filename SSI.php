@@ -77,7 +77,9 @@ elseif (basename($_SERVER['PHP_SELF']) == 'SSI.php')
 
 error_reporting($ssi_error_reporting);
 if (function_exists('set_magic_quotes_runtime'))
+{
 	@set_magic_quotes_runtime($ssi_magic_quotes_runtime);
+}
 
 return true;
 
@@ -397,8 +399,7 @@ function ssi_recentTopics($num_recent = 8, $exclude_boards = null, $include_boar
 		$include_boards = array();
 	}
 
-	require_once(SUBSDIR . '/MessageIndex.subs.php');
-	$icon_sources = MessageTopicIcons();
+	$icon_sources = new MessageTopicIcons(!empty($modSettings['messageIconChecks_enable']), $settings['theme_dir']);
 
 	// Find all the posts in distinct topics. Newer ones will have higher IDs.
 	$request = $db->query('', '
@@ -467,9 +468,6 @@ function ssi_recentTopics($num_recent = 8, $exclude_boards = null, $include_boar
 		$row['subject'] = censor($row['subject']);
 		$row['body'] = censor($row['body']);
 
-		if (!empty($modSettings['messageIconChecks_enable']) && !isset($icon_sources[$row['icon']]))
-			$icon_sources[$row['icon']] = file_exists($settings['theme_dir'] . '/images/post/' . $row['icon'] . '.png') ? 'images_url' : 'default_images_url';
-
 		// Build the array.
 		$posts[] = array(
 			'board' => array(
@@ -505,7 +503,7 @@ function ssi_recentTopics($num_recent = 8, $exclude_boards = null, $include_boar
 			'new' => !empty($row['is_read']),
 			'is_new' => empty($row['is_read']),
 			'new_from' => $row['new_from'],
-			'icon' => '<img src="' . $settings[$icon_sources[$row['icon']]] . '/post/' . $row['icon'] . '.png" class="centericon" alt="' . $row['icon'] . '" />',
+			'icon' => '<img src="' . $icon_sources->{$row['icon']} . '" class="centericon" alt="' . $row['icon'] . '" />',
 		);
 	}
 	$db->free_result($request);
@@ -1585,8 +1583,7 @@ function ssi_boardNews($board = null, $limit = null, $start = null, $length = nu
 	$db->free_result($request);
 
 	// Load the message icons - the usual suspects.
-	require_once(SUBSDIR . '/MessageIndex.subs.php');
-	$icon_sources = MessageTopicIcons();
+	$icon_sources = new MessageTopicIcons(!empty($modSettings['messageIconChecks_enable']), $settings['theme_dir']);
 
 	// Find the posts.
 	$indexOptions = array(
@@ -1619,17 +1616,13 @@ function ssi_boardNews($board = null, $limit = null, $start = null, $length = nu
 		$row['poster_name'] = $row[$preview . '_display_name'];
 		$row['body'] = $bbc_parser->parseMessage($row['body'], $row['smileys_enabled']);
 
-		// Check that this message icon is there...
-		if (!empty($modSettings['messageIconChecks_enable']) && !isset($icon_sources[$row['icon']]))
-			$icon_sources[$row['icon']] = file_exists($settings['theme_dir'] . '/images/post/' . $row['icon'] . '.png') ? 'images_url' : 'default_images_url';
-
 		$row['subject'] = censor($row['subject']);
 		$row['body'] = censor($row['body']);
 
 		$return[] = array(
 			'id' => $row['id_topic'],
 			'message_id' => $row['id_msg'],
-			'icon' => '<img src="' . $settings[$icon_sources[$row['icon']]] . '/post/' . $row['icon'] . '.png" alt="' . $row['icon'] . '" />',
+			'icon' => '<img src="' . $icon_sources->{$row['icon']} . '" alt="' . $row['icon'] . '" />',
 			'subject' => $row['subject'],
 			'time' => standardTime($row['poster_time']),
 			'html_time' => htmlTime($row['poster_time']),
