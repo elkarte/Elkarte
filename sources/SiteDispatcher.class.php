@@ -43,57 +43,142 @@ class Site_Dispatcher
 
 	/**
 	 * The default action data (controller and function)
+	 * Every time we don't know what to do, we'll do this :P
+	 *
 	 * @var string[]
 	 */
-	protected $_default_action;
+	protected $_default_action = array(
+		'controller' => 'BoardIndex_Controller',
+		'function' => 'action_boardindex'
+	);
 
 	/**
 	 * The instance of the controller
-	 * @var null|Action_Controller
+	 * @var Action_Controller
 	 */
 	protected $_controller;
+
+	/**
+	 * @var string
+	 */
+	protected $action;
+
+	/**
+	 * @var string
+	 */
+	protected $area;
+
+	/**
+	 * @var string
+	 */
+	protected $subAction;
+
+	/**
+	 * Build our nice and cozy err... *cough*
+	 *
+	 * @var string[]
+	 */
+	protected $actionArray = array(
+		'attachapprove' => array('ModerateAttachments_Controller', 'action_attachapprove'),
+		'buddy' => array('Members_Controller', 'action_buddy'),
+		'collapse' => array('BoardIndex_Controller', 'action_collapse'),
+		'deletemsg' => array('RemoveTopic_Controller', 'action_deletemsg'),
+		'dlattach' => array('Attachment_Controller', 'action_index'),
+		'unwatchtopic' => array('Notify_Controller', 'action_unwatchtopic'),
+		'editpoll' => array('Poll_Controller', 'action_editpoll'),
+		'editpoll2' => array('Poll_Controller', 'action_editpoll2'),
+		'quickhelp' => array('Help_Controller', 'action_quickhelp'),
+		'jsmodify' => array('Post_Controller', 'action_jsmodify'),
+		'jsoption' => array('ManageThemes_Controller', 'action_jsoption'),
+		'keepalive' => array('Auth_Controller', 'action_keepalive'),
+		'lockvoting' => array('Poll_Controller', 'action_lockvoting'),
+		'login' => array('Auth_Controller', 'action_login'),
+		'login2' => array('Auth_Controller', 'action_login2'),
+		'logout' => array('Auth_Controller', 'action_logout'),
+		'markasread' => array('MarkRead_Controller', 'action_index'),
+		'mergetopics' => array('MergeTopics_Controller', 'action_index'),
+		'moderate' => array('ModerationCenter_Controller', 'action_index'),
+		'movetopic' => array('MoveTopic_Controller', 'action_movetopic'),
+		'movetopic2' => array('MoveTopic_Controller', 'action_movetopic2'),
+		'notify' => array('Notify_Controller', 'action_notify'),
+		'notifyboard' => array('Notify_Controller', 'action_notifyboard'),
+		'openidreturn' => array('OpenID_Controller', 'action_openidreturn'),
+		'xrds' => array('OpenID_Controller', 'action_xrds'),
+		'pm' => array('PersonalMessage_Controller', 'action_index'),
+		'post2' => array('Post_Controller', 'action_post2'),
+		'quotefast' => array('Post_Controller', 'action_quotefast'),
+		'quickmod' => array('MessageIndex_Controller', 'action_quickmod'),
+		'quickmod2' => array('Display_Controller', 'action_quickmod2'),
+		'removetopic2' => array('RemoveTopic_Controller', 'action_removetopic2'),
+		'reporttm' => array('Emailuser_Controller', 'action_reporttm'),
+		'restoretopic' => array('RemoveTopic_Controller', 'action_restoretopic'),
+		'splittopics' => array('SplitTopics_Controller', 'action_splittopics'),
+		'theme' => array('ManageThemes_Controller', 'action_thememain'),
+		'trackip' => array('ProfileHistory_Controller', 'action_trackip'),
+		'unreadreplies' => array('Unread_Controller', 'action_unreadreplies'),
+		'viewprofile' => array('Profile_Controller', 'action_index'),
+		'viewquery' => array('AdminDebug_Controller', 'action_viewquery'),
+		'viewadminfile' => array('AdminDebug_Controller', 'action_viewadminfile'),
+		'.xml' => array('News_Controller', 'action_showfeed'),
+		'xmlhttp' => array('Xml_Controller', 'action_index'),
+		'xmlpreview' => array('XmlPreview_Controller', 'action_index'),
+	);
+
+	/**
+	 * @return string[]
+	 */
+	protected function getFrontPage()
+	{
+		global $modSettings;
+
+		if (
+			!empty($modSettings['front_page'])
+			&& is_callable(array($modSettings['front_page'], 'frontPageHook'))
+		) {
+			call_user_func_array(array($modSettings['front_page'], 'frontPageHook'), array(&$this->_default_action));
+		}
+		return $this->_default_action;
+	}
+
+	/**
+	 * Determine if guest access is restricted, and, if so,
+	 * only allow the listed actions
+	 *
+	 * @return boolean
+	 */
+	protected function restrictedGuestAccess()
+	{
+		global $modSettings, $user_info;
+
+		return
+			empty($modSettings['allow_guestAccess'])
+			&& $user_info['is_guest']
+			&& !in_array($this->action, array(
+				'login', 'login2', 'register', 'reminder',
+				'help', 'quickhelp', 'mailq', 'openidreturn'
+			));
+	}
 
 	/**
 	 * Create an instance and initialize it.
 	 *
 	 * This does all the work to figure out which controller and method need
 	 * to be called.
+	 *
+	 * @param HttpReq $_req
 	 */
-	public function __construct($action = null, $subaction = null, $area = null)
+	public function __construct(HttpReq $_req)
 	{
-		global $modSettings;
-
-		// Backward compatibility with 1.0
-		if ($action === null)
-		{
-			$action = $this->_getAction();
-		}
-		if ($subaction === null)
-		{
-			$subaction = $this->_getSubAction();
-		}
-		if ($area === null)
-		{
-			$area = $this->_getArea();
-		}
-
-		// Default action of the forum: board index
-		// Every time we don't know what to do, we'll do this :P
-		$this->_default_action = array(
-			'controller' => 'BoardIndex_Controller',
-			'function' => 'action_boardindex'
-		);
-		if (!empty($modSettings['front_page']) && is_callable(array($modSettings['front_page'], 'frontPageHook')))
-		{
-			call_user_func_array(array($modSettings['front_page'], 'frontPageHook'), array(&$this->_default_action));
-		}
-
-		$this->_noActionActions($action, !empty($modSettings['allow_guestAccess']));
+		$this->action = $_req->getQuery('action', 'trim|strval', '');
+		$this->area = $_req->getQuery('area', 'trim|strval', '');
+		$this->subAction = $_req->getQuery('sa', 'trim|strval', '');
+		$this->_default_action = $this->getFrontPage();
+		$this->determineDefaultAction();
 
 		// Now this return won't be cool, but lets do it
 		if (empty($this->_controller_name))
 		{
-			$this->_namingPatterns($action, $subaction, $area);
+			$this->determineAction();
 		}
 
 		// Initialize this controller with its event manager
@@ -101,24 +186,21 @@ class Site_Dispatcher
 	}
 
 	/**
-	 * Finds out if the current action is one of those without an "action"
-	 * parameter in the URL
-	 *
-	 * @param string $action
-	 * @param bool $allow_guestAccess
+	 * Finds out if the current action is one of those without
+	 * an "action" parameter in the URL
 	 */
-	protected function _noActionActions($action, $allow_guestAccess = true)
+	protected function determineDefaultAction()
 	{
-		global $maintenance, $user_info, $board, $topic;
+		global $maintenance, $board, $topic;
 
 		// Maintenance mode: you're out of here unless you're admin
 		if (!empty($maintenance) && !allowedTo('admin_forum'))
 		{
 			// You can only login
-			if ($action == 'login2' || $action == 'logout')
+			if ($this->action == 'login2' || $this->action == 'logout')
 			{
 				$this->_controller_name = 'Auth_Controller';
-				$this->_function_name = $action == 'login2' ? 'action_login2' : 'action_logout';
+				$this->_function_name = 'action_' . $this->action;
 			}
 			// "maintenance mode" page
 			else
@@ -128,12 +210,12 @@ class Site_Dispatcher
 			}
 		}
 		// If guest access is disallowed, a guest is kicked out... politely. :P
-		elseif ($allow_guestAccess === false && $user_info['is_guest'] && (!in_array($action, array('login', 'login2', 'register', 'reminder', 'help', 'quickhelp', 'mailq', 'openidreturn'))))
+		elseif ($this->restrictedGuestAccess())
 		{
 			$this->_controller_name = 'Auth_Controller';
 			$this->_function_name = 'action_kickguest';
 		}
-		elseif (empty($action))
+		elseif (empty($this->action))
 		{
 			// Home page: board index
 			if (empty($board) && empty($topic))
@@ -163,89 +245,37 @@ class Site_Dispatcher
 	/**
 	 * Compares the $_GET['action'] with array or naming patterns to find
 	 * a suitable controller.
-	 *
-	 * @param string $action
-	 * @param string $subaction
-	 * @param string $area
 	 */
-	protected function _namingPatterns($action, $subaction, $area)
+	protected function determineAction()
 	{
-		// Start with our nice and cozy err... *cough*
+		// Allow to extend or change $actionArray through a hook
 		// Format:
 		// $_GET['action'] => array($class, $method)
-		$actionArray = array(
-			'attachapprove' => array('ModerateAttachments_Controller', 'action_attachapprove'),
-			'buddy' => array('Members_Controller', 'action_buddy'),
-			'collapse' => array('BoardIndex_Controller', 'action_collapse'),
-			'deletemsg' => array('RemoveTopic_Controller', 'action_deletemsg'),
-			// @todo: move this to attachment action also
-			'dlattach' => array('Attachment_Controller', 'action_index'),
-			'unwatchtopic' => array('Notify_Controller', 'action_unwatchtopic'),
-			'editpoll' => array('Poll_Controller', 'action_editpoll'),
-			'editpoll2' => array('Poll_Controller', 'action_editpoll2'),
-			'quickhelp' => array('Help_Controller', 'action_quickhelp'),
-			'jsmodify' => array('Post_Controller', 'action_jsmodify'),
-			'jsoption' => array('ManageThemes_Controller', 'action_jsoption'),
-			'keepalive' => array('Auth_Controller', 'action_keepalive'),
-			'lockvoting' => array('Poll_Controller', 'action_lockvoting'),
-			'login' => array('Auth_Controller', 'action_login'),
-			'login2' => array('Auth_Controller', 'action_login2'),
-			'logout' => array('Auth_Controller', 'action_logout'),
-			'markasread' => array('MarkRead_Controller', 'action_index'),
-			'mergetopics' => array('MergeTopics_Controller', 'action_index'),
-			'moderate' => array('ModerationCenter_Controller', 'action_index'),
-			'movetopic' => array('MoveTopic_Controller', 'action_movetopic'),
-			'movetopic2' => array('MoveTopic_Controller', 'action_movetopic2'),
-			'notify' => array('Notify_Controller', 'action_notify'),
-			'notifyboard' => array('Notify_Controller', 'action_notifyboard'),
-			'openidreturn' => array('OpenID_Controller', 'action_openidreturn'),
-			'xrds' => array('OpenID_Controller', 'action_xrds'),
-			'pm' => array('PersonalMessage_Controller', 'action_index'),
-			'post2' => array('Post_Controller', 'action_post2'),
-			'quotefast' => array('Post_Controller', 'action_quotefast'),
-			'quickmod' => array('MessageIndex_Controller', 'action_quickmod'),
-			'quickmod2' => array('Display_Controller', 'action_quickmod2'),
-			'removetopic2' => array('RemoveTopic_Controller', 'action_removetopic2'),
-			'reporttm' => array('Emailuser_Controller', 'action_reporttm'),
-			'restoretopic' => array('RemoveTopic_Controller', 'action_restoretopic'),
-			'splittopics' => array('SplitTopics_Controller', 'action_splittopics'),
-			'theme' => array('ManageThemes_Controller', 'action_thememain'),
-			'trackip' => array('ProfileHistory_Controller', 'action_trackip'),
-			'unreadreplies' => array('Unread_Controller', 'action_unreadreplies'),
-			'viewprofile' => array('Profile_Controller', 'action_index'),
-			'viewquery' => array('AdminDebug_Controller', 'action_viewquery'),
-			'viewadminfile' => array('AdminDebug_Controller', 'action_viewadminfile'),
-			'.xml' => array('News_Controller', 'action_showfeed'),
-			'xmlhttp' => array('Xml_Controller', 'action_index'),
-			'xmlpreview' => array('XmlPreview_Controller', 'action_index'),
-		);
+		call_integration_hook('integrate_actions', array(&$this->actionArray));
 
-		// Allow to extend or change $actionArray through a hook
-		call_integration_hook('integrate_actions', array(&$actionArray));
-
-		// Is it in core legacy actions?
-		if (isset($actionArray[$action]))
+		// Is it in the action list?
+		if (isset($this->actionArray[$this->action]))
 		{
-			$this->_controller_name = $actionArray[$action][0];
+			$this->_controller_name = $this->actionArray[$this->action][0];
 
 			// If the method is coded in, use it
-			if (!empty($actionArray[$action][1]))
-				$this->_function_name = $actionArray[$action][1];
+			if (!empty($this->actionArray[$this->action][1]))
+				$this->_function_name = $this->actionArray[$this->action][1];
 			// Otherwise fall back to naming patterns
-			elseif (!empty($subaction) && preg_match('~^\w+$~', $subaction))
-				$this->_function_name = 'action_' . $subaction;
+			elseif (!empty($this->subAction) && preg_match('~^\w+$~', $this->subAction))
+				$this->_function_name = 'action_' . $this->subAction;
 			else
 				$this->_function_name = 'action_index';
 		}
 		// Fall back to naming patterns.
 		// addons can use any of them, and it should Just Work (tm).
-		elseif (preg_match('~^[a-zA-Z_\\-]+\d*$~', $action))
+		elseif (preg_match('~^[a-zA-Z_\\-]+\d*$~', $this->action))
 		{
 			// action=gallery => Gallery.controller.php
 			// sa=upload => action_upload()
-			$this->_controller_name = ucfirst($action) . '_Controller';
-			if (isset($subaction) && preg_match('~^\w+$~', $subaction) && empty($area))
-				$this->_function_name = 'action_' . $subaction;
+			$this->_controller_name = ucfirst($this->action) . '_Controller';
+			if (isset($this->subAction) && preg_match('~^\w+$~', $this->subAction) && empty($this->area))
+				$this->_function_name = 'action_' . $this->subAction;
 			else
 				$this->_function_name = 'action_index';
 		}
@@ -276,36 +306,6 @@ class Site_Dispatcher
 			$this->_controller_name = $this->_default_action['controller'];
 			$this->_function_name = $this->_default_action['function'];
 		}
-	}
-
-	/**
-	 * Backward compatibility function.
-	 * Determine the current action from $_GET
-	 * @deprecated since 1.1
-	 */
-	protected function _getAction()
-	{
-		return isset($_GET['action']) ? $_GET['action'] : '';
-	}
-
-	/**
-	 * Backward compatibility function.
-	 * Determine the current subaction from $_GET
-	 * @deprecated since 1.1
-	 */
-	protected function _getSubAction()
-	{
-		return isset($_GET['sa']) ? $_GET['sa'] : '';
-	}
-
-	/**
-	 * Backward compatibility function.
-	 * Determine the current area from $_GET
-	 * @deprecated since 1.1
-	 */
-	protected function _getArea()
-	{
-		return isset($_GET['area']) ? $_GET['area'] : '';
 	}
 
 	/**
@@ -366,6 +366,6 @@ class Site_Dispatcher
 			$action = substr($action, -1) == 2 ? substr($action, 0, -1) : $action;
 		}
 
-		return isset($action) ? $action : '';
+		return isset($action) ? $action : $this->action;
 	}
 }
