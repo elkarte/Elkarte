@@ -63,9 +63,7 @@ class Reminder_Controller extends Action_Controller
 
 		// Security
 		checkSession();
-		//validateToken('remind');
-		createToken('remind');
-
+		validateToken('remind');
 		require_once(SUBSDIR . '/Auth.subs.php');
 
 		// No where params just yet
