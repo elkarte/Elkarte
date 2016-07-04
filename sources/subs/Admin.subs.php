@@ -478,10 +478,17 @@ function custom_profiles_toggle_callback($value)
 
 	if (!$value)
 	{
+		// Disable all fields. Wouldn't want any to show when the feature is disabled.
 		$db->query('', '
 			UPDATE {db_prefix}custom_fields
 			SET active = 0'
 		);
+	}
+	else
+	{
+		// Set the display cache for the custom profile fields.
+		require_once(SUBSDIR . '/ManageFeatures.subs.php');
+		updateDisplayCache();
 	}
 }
 
