@@ -1438,13 +1438,20 @@ function loadTheme($id_theme = 0, $initialize = true)
 
 	if (!$user_info['is_guest'])
 	{
-		$context['minmax_preferences'] = serializeToJson($options['minmax_preferences'], function($array_form) {
-			global $settings, $user_info;
+		if (!empty($options['minmax_preferences']))
+		{
+			$context['minmax_preferences'] = serializeToJson($options['minmax_preferences'], function($array_form) {
+				global $settings, $user_info;
 
-			// Update the option.
-			require_once(SUBSDIR . '/Themes.subs.php');
-			updateThemeOptions(array($settings['theme_id'], $user_info['id'], 'minmax_preferences', json_encode($array_form)));
-		});
+				// Update the option.
+				require_once(SUBSDIR . '/Themes.subs.php');
+				updateThemeOptions(array($settings['theme_id'], $user_info['id'], 'minmax_preferences', json_encode($array_form)));
+			});
+		}
+		else
+		{
+			$context['minmax_preferences'] = array();
+		}
 	}
 	// Guest may have collapsed the header, check the cookie to prevent collapse jumping
 	elseif ($user_info['is_guest'] && isset($_COOKIE['upshrink']))
