@@ -944,7 +944,7 @@ class ProfileHistory_Controller extends Action_Controller
 		$members = array();
 		while ($row = $db->fetch_assoc($request))
 		{
-			$extra = @unserialize($row['extra']);
+			$extra = Util::unserialize($row['extra']);
 			if (!empty($extra['applicator']))
 				$members[] = $extra['applicator'];
 

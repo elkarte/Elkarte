@@ -632,7 +632,7 @@ function removeMessage($message, $decreasePostCount = true)
 
 		if (!empty($modSettings['search_custom_index_config']))
 		{
-			$customIndexSettings = unserialize($modSettings['search_custom_index_config']);
+			$customIndexSettings = Util::unserialize($modSettings['search_custom_index_config']);
 			$words = text2words($row['body'], $customIndexSettings['bytes_per_word'], true);
 			if (!empty($words))
 				$db->query('', '

@@ -123,7 +123,7 @@ function reloadSettings()
 	// Integration is cool.
 	if (defined('ELK_INTEGRATION_SETTINGS'))
 	{
-		$integration_settings = unserialize(ELK_INTEGRATION_SETTINGS);
+		$integration_settings = Util::unserialize(ELK_INTEGRATION_SETTINGS);
 		foreach ($integration_settings as $hook => $function)
 			add_integration_function($hook, $function);
 	}
@@ -1099,7 +1099,7 @@ function loadMemberContext($user, $display_custom_fields = false)
 	if ($display_custom_fields && !empty($modSettings['displayFields']))
 	{
 		if (!isset($context['display_fields']))
-			$context['display_fields'] = unserialize($modSettings['displayFields']);
+			$context['display_fields'] = Util::unserialize($modSettings['displayFields']);
 
 		foreach ($context['display_fields'] as $custom)
 		{
@@ -3172,7 +3172,7 @@ function serializeToJson($variable, $save_callback = null)
 	// decoding failed, let's try with unserialize
 	if ($array_form === null)
 	{
-		$array_form = @unserialize($variable);
+		$array_form = Util::unserialize($variable);
 
 		// If unserialize fails as well, let's just store an empty array
 		if ($array_form === false)

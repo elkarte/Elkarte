@@ -156,7 +156,7 @@ class Who_Controller extends Action_Controller
 
 		foreach ($members as $row)
 		{
-			$actions = @unserialize($row['url']);
+			$actions = Util::unserialize($row['url']);
 			if ($actions === false)
 				continue;
 

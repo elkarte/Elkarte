@@ -292,7 +292,7 @@ function attachmentPaths()
 	{
 		// we have more directories
 		if (!is_array($modSettings['attachmentUploadDir']))
-			$modSettings['attachmentUploadDir'] = unserialize($modSettings['attachmentUploadDir']);
+			$modSettings['attachmentUploadDir'] = Util::unserialize($modSettings['attachmentUploadDir']);
 
 		return $modSettings['attachmentUploadDir'];
 	}
@@ -390,7 +390,7 @@ function getAttachmentDirs()
 	global $modSettings;
 
 	if (!empty($modSettings['currentAttachmentUploadDir']))
-		$attach_dirs = unserialize($modSettings['attachmentUploadDir']);
+		$attach_dirs = Util::unserialize($modSettings['attachmentUploadDir']);
 	elseif (!empty($modSettings['attachmentUploadDir']))
 		$attach_dirs = array($modSettings['attachmentUploadDir']);
 	else
@@ -714,7 +714,7 @@ function repairAttachmentData($start, $fix_errors, $to_fix)
 				$attachment_name = !empty($row['file_hash']) ? $row['id_attach'] . '_' . $row['file_hash'] . '.elk' : getLegacyAttachmentFilename($row['filename'], $row['id_attach'], null, true);
 
 				if (!is_array($modSettings['attachmentUploadDir']))
-					$modSettings['attachmentUploadDir'] = unserialize($modSettings['attachmentUploadDir']);
+					$modSettings['attachmentUploadDir'] = Util::unserialize($modSettings['attachmentUploadDir']);
 
 				// Loop through the other folders looking for this file
 				foreach ($modSettings['attachmentUploadDir'] as $id => $dir)
@@ -738,7 +738,7 @@ function repairAttachmentData($start, $fix_errors, $to_fix)
 					$attachment_name = $row['id_attach'] . '_' . $row['file_hash'];
 
 					if (!is_array($modSettings['attachmentUploadDir']))
-						$modSettings['attachmentUploadDir'] = unserialize($modSettings['attachmentUploadDir']);
+						$modSettings['attachmentUploadDir'] = Util::unserialize($modSettings['attachmentUploadDir']);
 
 					// Loop through the other folders looking for this file
 					foreach ($modSettings['attachmentUploadDir'] as $id => $dir)

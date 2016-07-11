@@ -343,10 +343,10 @@ class ManageSecurity_Controller extends Action_Controller
 			$context[$list . '_desc'] = array();
 
 			if (!empty($modSettings[$list]))
-				$context[$list] = unserialize($modSettings[$list]);
+				$context[$list] = Util::unserialize($modSettings[$list]);
 
 			if (!empty($modSettings[$list . '_desc']))
-				$context[$list . '_desc'] = unserialize($modSettings[$list . '_desc']);
+				$context[$list . '_desc'] = Util::unserialize($modSettings[$list . '_desc']);
 		}
 
 		$config_vars = $this->_bbSettings->settings();

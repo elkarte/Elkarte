@@ -241,7 +241,7 @@ class Memberlist_Controller extends Action_Controller
 		{
 			// Maybe there's something cached already.
 			if (!empty($modSettings['memberlist_cache']))
-				$memberlist_cache = @unserialize($modSettings['memberlist_cache']);
+				$memberlist_cache = Util::unserialize($modSettings['memberlist_cache']);
 
 			// The chunk size for the cached index.
 			$cache_step_size = 500;

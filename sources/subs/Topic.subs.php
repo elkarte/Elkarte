@@ -269,7 +269,7 @@ function removeTopics($topics, $decreasePostCount = true, $ignoreRecycling = fal
 	// Delete search index entries.
 	if (!empty($modSettings['search_custom_index_config']))
 	{
-		$customIndexSettings = unserialize($modSettings['search_custom_index_config']);
+		$customIndexSettings = Util::unserialize($modSettings['search_custom_index_config']);
 
 		$request = $db->query('', '
 			SELECT id_msg, body

@@ -1680,7 +1680,7 @@ class Packages_Controller extends Action_Controller
 			unset($context['file_tree'][strtr(BOARDDIR, array('\\' => '/'))]['contents']['attachments']);
 
 			if (!is_array($modSettings['attachmentUploadDir']))
-				$modSettings['attachmentUploadDir'] = unserialize($modSettings['attachmentUploadDir']);
+				$modSettings['attachmentUploadDir'] = Util::unserialize($modSettings['attachmentUploadDir']);
 
 			// @todo Should we suggest non-current directories be read only?
 			foreach ($modSettings['attachmentUploadDir'] as $dir)
