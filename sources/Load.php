@@ -177,7 +177,11 @@ function loadUserSettings()
 	if (empty($id_member) && isset($_COOKIE[$cookiename]))
 	{
 		list ($id_member, $password) = serializeToJson($_COOKIE[$cookiename], function ($array_from) use ($cookiename) {
+			global $modSettings;
+
+			require_once(SUBSDIR . '/Auth.subs.php');
 			$_COOKIE[$cookiename] = json_encode($array_from);
+			setLoginCookie(60 * $modSettings['cookieTime'], $array_from[0], $array_from[1]);
 		});
 		$id_member = !empty($id_member) && strlen($password) > 0 ? (int) $id_member : 0;
 	}
