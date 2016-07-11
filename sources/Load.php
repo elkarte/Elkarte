@@ -3163,8 +3163,6 @@ function detectServerCores()
 /**
  * This is necessary to support data stored in the pre-1.0.8 way (i.e. serialized)
  *
- * @deprecated since 1.0.8
- *
  * @param string $variable The string to convert
  * @param null|callable $save_callback The function that will save the data to the db
  * @return mixed[] the array
