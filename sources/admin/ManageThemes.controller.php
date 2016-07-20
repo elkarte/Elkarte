@@ -1358,7 +1358,7 @@ class ManageThemes_Controller extends Action_Controller
 		{
 			if (!empty($options['minmax_preferences']))
 			{
-				$context['minmax_preferences'] = serializeToJson($options['minmax_preferences'], function($array_form) {
+				$minmax_preferences = serializeToJson($options['minmax_preferences'], function($array_form) {
 					global $settings, $user_info;
 
 					// Update the option.
@@ -1368,15 +1368,15 @@ class ManageThemes_Controller extends Action_Controller
 			}
 			else
 			{
-				$context['minmax_preferences'] = $options['minmax_preferences'];
+				$minmax_preferences = array();
 			}
 
 			// New value for them
 			if (isset($_GET['minmax_key']) && strlen($_GET['minmax_key']) < 10)
-				$options['minmax_preferences'][$_GET['minmax_key']] = $_GET['val'];
+				$minmax_preferences[$_GET['minmax_key']] = $_GET['val'];
 
 			// Change the value to be something nice,
-			$_GET['val'] = json_encode($options['minmax_preferences']);
+			$_GET['val'] = json_encode($minmax_preferences);
 		}
 
 		// Update the option.
