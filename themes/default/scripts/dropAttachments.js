@@ -166,11 +166,11 @@
 
 						for (var err in resp.data) {
 							if (resp.data.hasOwnProperty(err)) {
-								errorMsgs.individualServerErr = resp.data[err].title + '<br />';
+								errorMsgs.individualServerErr = resp.data[err].title.php_htmlspecialchars() + '<br />';
 
 								for (var errMsg in resp.data[err].errors) {
 									if (resp.data[err].errors.hasOwnProperty(errMsg))
-										serverErrorFiles.push(resp.data[err].errors[errMsg]);
+										serverErrorFiles.push(resp.data[err].errors[errMsg].php_htmlspecialchars());
 								}
 							}
 							numAttachUploaded--;
@@ -188,7 +188,7 @@
 
 					numAttachUploaded--;
 					errorMsgs.individualSizeErr = oTxt.postUploadError;
-					sizeErrorFiles.push(this.fileName);
+					sizeErrorFiles.push(this.fileName.php_htmlspecialchars());
 					populateErrors({
 						'errorMsgs': errorMsgs,
 						'sizeErrorFiles': sizeErrorFiles
@@ -418,7 +418,7 @@
 
 					numAttachUploaded++;
 					fd.append('attachment[]', files[i]);
-					status.setFileNameSize(files[i].name, files[i].size);
+					status.setFileNameSize(files[i].name.php_htmlspecialchars(), files[i].size);
 					attachmentQueue.push({
 						'formData': fd,
 						'statusInstance': status,
