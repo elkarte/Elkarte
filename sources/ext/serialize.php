@@ -5,6 +5,7 @@
  */
 
 namespace ElkArte\ext\upgradephp;
+use \Exception;
 
 /*
  * Used to impose practical limits for safe_unserialize()
