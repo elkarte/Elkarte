@@ -208,7 +208,8 @@ function sessionWrite($session_id, $data)
 			array($session_id, $data, time()),
 			array('session_id')
 		);
-		$result = !empty($db->affected_rows());
+		$result = $db->affected_rows();
+		$result = !empty($result);
 	}
 
 	return $result;
