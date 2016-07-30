@@ -200,7 +200,7 @@ function sessionWrite($session_id, $data)
 	);
 
 	// If that didn't work, try inserting a new one.
-	if ($db->affected_rows() == 0)
+	if ($result === false)
 	{
 		$db->insert('ignore',
 			'{db_prefix}sessions',
@@ -208,7 +208,7 @@ function sessionWrite($session_id, $data)
 			array($session_id, $data, time()),
 			array('session_id')
 		);
-		$result = empty($db->last_error());
+		$result = !empty($db->affected_rows());
 	}
 
 	return $result;
