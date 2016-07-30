@@ -188,7 +188,7 @@ function sessionWrite($session_id, $data)
 	$db = database();
 
 	// First try to update an existing row...
-	$result = $db->query('', '
+	$db->query('', '
 		UPDATE {db_prefix}sessions
 		SET data = {string:data}, last_update = {int:last_update}
 		WHERE session_id = {string:session_id}',
@@ -199,8 +199,10 @@ function sessionWrite($session_id, $data)
 		)
 	);
 
+	$result = $db->affected_rows();
+
 	// If that didn't work, try inserting a new one.
-	if ($result === false)
+	if (empty($result))
 	{
 		$db->insert('ignore',
 			'{db_prefix}sessions',
@@ -209,10 +211,9 @@ function sessionWrite($session_id, $data)
 			array('session_id')
 		);
 		$result = $db->affected_rows();
-		$result = !empty($result);
 	}
 
-	return $result;
+	return !empty($result);
 }
 
 /**
