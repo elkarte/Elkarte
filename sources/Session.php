@@ -187,19 +187,39 @@ function sessionWrite($session_id, $data)
 	// Better safe than sorry
 	$db = database();
 
-	// First try to update an existing row...
-	$db->query('', '
-		UPDATE {db_prefix}sessions
-		SET data = {string:data}, last_update = {int:last_update}
-		WHERE session_id = {string:session_id}',
+	// Check it first
+	$result = $db->query('', '
+		SELECT COUNT(*)
+		FROM {db_prefix}sessions
+		WHERE last_update = {int:last_update}
+		AND session_id = {string:session_id}
+		AND data = {string:data}
+		LIMIT 1',
 		array(
 			'last_update' => time(),
-			'data' => $data,
 			'session_id' => $session_id,
+			'data' => $data,
 		)
 	);
 
-	$result = $db->affected_rows();
+	list ($result) = $db->fetch_row($result);
+
+	// Then try to update an existing row...
+	if (empty($result))
+	{
+		$db->query('', '
+			UPDATE {db_prefix}sessions
+			SET data = {string:data}, last_update = {int:last_update}
+			WHERE session_id = {string:session_id}',
+			array(
+				'last_update' => time(),
+				'data' => $data,
+				'session_id' => $session_id,
+			)
+		);
+
+		$result = $db->affected_rows();
+	}
 
 	// If that didn't work, try inserting a new one.
 	if (empty($result))
