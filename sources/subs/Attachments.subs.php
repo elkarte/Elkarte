@@ -1308,7 +1308,17 @@ function getAttachmentPath()
 	if (empty($modSettings['attachmentUploadDir']))
 		$attachmentDir = BOARDDIR . '/attachments';
 	elseif (!empty($modSettings['currentAttachmentUploadDir']) && !is_array($modSettings['attachmentUploadDir']) && (@unserialize($modSettings['attachmentUploadDir']) !== false))
-		$attachmentDir = Util::unserialize($modSettings['attachmentUploadDir']);
+	{
+		// @todo this is here to prevent the package manager to die when complete the installation of the patch (the new Util class has not yet been loaded so we need the normal one)
+		if (function_exists('Util::unserialize'))
+		{
+			$attachmentDir = Util::unserialize($modSettings['attachmentUploadDir']);
+		}
+		else
+		{
+			$attachmentDir = unserialize($modSettings['attachmentUploadDir']);
+		}
+	}
 	else
 		$attachmentDir = $modSettings['attachmentUploadDir'];
 
