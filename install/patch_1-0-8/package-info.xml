@@ -14,6 +14,7 @@
 		<uninstall for="1.0.8">
 			<modification reverse="true">modifications.xml</modification>
 			<remove-file name="EXTDIR/serialize.php" />
+			<require-file name="old/badbehavior-plugin.php" destination="EXTDIR/bad-behavior" />
 			<redirect url="$scripturl?action=admin;area=packages" timeout="5000" parsebbc="true">redirect</redirect>
 		</uninstall>
 </package-info>
