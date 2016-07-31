@@ -5,7 +5,6 @@
  */
 
 namespace \ElkArte\ext\upgradephp;
-use \Exception;
 
 /*
  * Used to impose practical limits for safe_unserialize()
@@ -57,13 +56,13 @@ function _safe_serialize( $value )
 	if(is_resource($value))
 	{
 		// built-in returns 'i:0;'
-		throw new Exception('safe_serialize: resources not supported');
+		throw new \Exception('safe_serialize: resources not supported');
 	}
 	if(is_object($value) || gettype($value) == 'object')
 	{
-		throw new Exception('safe_serialize: objects not supported');
+		throw new \Exception('safe_serialize: objects not supported');
 	}
-	throw new Exception('safe_serialize cannot serialize: '.gettype($value));
+	throw new \Exception('safe_serialize cannot serialize: '.gettype($value));
 }
 
 /**
@@ -107,7 +106,7 @@ function _safe_unserialize($str)
 {
 	if(strlen($str) > MAX_SERIALIZED_INPUT_LENGTH)
 	{
-		throw new Exception('safe_unserialize: input exceeds ' . MAX_SERIALIZED_INPUT_LENGTH);
+		throw new \Exception('safe_unserialize: input exceeds ' . MAX_SERIALIZED_INPUT_LENGTH);
 	}
 
 	if(empty($str) || !is_string($str))
@@ -159,11 +158,11 @@ function _safe_unserialize($str)
 		}
 		else if($type == 'O')
 		{
-			throw new Exception('safe_unserialize: objects not supported');
+			throw new \Exception('safe_unserialize: objects not supported');
 		}
 		else
 		{
-			throw new Exception('safe_unserialize: unknown/malformed type: '.$type);
+			throw new \Exception('safe_unserialize: unknown/malformed type: '.$type);
 		}
 
 		switch($state)
@@ -173,7 +172,7 @@ function _safe_unserialize($str)
 				{
 					if(count($stack) >= MAX_SERIALIZED_ARRAY_DEPTH)
 					{
-						throw new Exception('safe_unserialize: array nesting exceeds ' . MAX_SERIALIZED_ARRAY_DEPTH);
+						throw new \Exception('safe_unserialize: array nesting exceeds ' . MAX_SERIALIZED_ARRAY_DEPTH);
 					}
 
 					$stack[] = &$list;
@@ -190,14 +189,14 @@ function _safe_unserialize($str)
 					break;
 				}
 
-				throw new Exception('safe_unserialize: missing array value');
+				throw new \Exception('safe_unserialize: missing array value');
 
 			case 2: // in array, expecting end of array or a key
 				if($type == '}')
 				{
 					if(count($list) < end($expected))
 					{
-						throw new Exception('safe_unserialize: array size less than expected ' . $expected[0]);
+						throw new \Exception('safe_unserialize: array size less than expected ' . $expected[0]);
 					}
 
 					unset($list);
@@ -215,11 +214,11 @@ function _safe_unserialize($str)
 				{
 					if(count($list) >= MAX_SERIALIZED_ARRAY_LENGTH)
 					{
-						throw new Exception('safe_unserialize: array size exceeds ' . MAX_SERIALIZED_ARRAY_LENGTH);
+						throw new \Exception('safe_unserialize: array size exceeds ' . MAX_SERIALIZED_ARRAY_LENGTH);
 					}
 					if(count($list) >= end($expected))
 					{
-						throw new Exception('safe_unserialize: array size exceeds expected length');
+						throw new \Exception('safe_unserialize: array size exceeds expected length');
 					}
 
 					$key = $value;
@@ -227,14 +226,14 @@ function _safe_unserialize($str)
 					break;
 				}
 
-				throw new Exception('safe_unserialize: illegal array index type');
+				throw new \Exception('safe_unserialize: illegal array index type');
 
 			case 0: // expecting array or value
 				if($type == 'a')
 				{
 					if(count($stack) >= MAX_SERIALIZED_ARRAY_DEPTH)
 					{
-						throw new Exception('safe_unserialize: array nesting exceeds ' . MAX_SERIALIZED_ARRAY_DEPTH);
+						throw new \Exception('safe_unserialize: array nesting exceeds ' . MAX_SERIALIZED_ARRAY_DEPTH);
 					}
 
 					$data = array();
@@ -250,13 +249,13 @@ function _safe_unserialize($str)
 					break;
 				}
 
-				throw new Exception('safe_unserialize: not in array');
+				throw new \Exception('safe_unserialize: not in array');
 		}
 	}
 
 	if(!empty($str))
 	{
-		throw new Exception('safe_unserialize: trailing data in input');
+		throw new \Exception('safe_unserialize: trailing data in input');
 	}
 	return $data;
 }
