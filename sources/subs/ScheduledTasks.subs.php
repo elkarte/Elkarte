@@ -615,7 +615,7 @@ function run_this_task($id_task, $task_name)
 	}
 
 	// Log that we did it ;)
-	if ($completed)
+	if ($completed && !empty($modSettings['scheduleTaskImmediate']))
 	{
 		// Taking care of scheduleTaskImmediate having a maximum of 10 "fast" executions
 		$scheduleTaskImmediate = Util::unserialize($modSettings['scheduleTaskImmediate']);
