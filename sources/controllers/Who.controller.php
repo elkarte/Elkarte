@@ -14,7 +14,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:		BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0
+ * @version 1.0.8
  *
  */
 
@@ -156,7 +156,7 @@ class Who_Controller extends Action_Controller
 
 		foreach ($members as $row)
 		{
-			$actions = @unserialize($row['url']);
+			$actions = Util::unserialize($row['url']);
 			if ($actions === false)
 				continue;
 

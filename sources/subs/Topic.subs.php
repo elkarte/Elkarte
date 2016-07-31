@@ -16,7 +16,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0.7
+ * @version 1.0.8
  *
  */
 
@@ -269,7 +269,7 @@ function removeTopics($topics, $decreasePostCount = true, $ignoreRecycling = fal
 	// Delete search index entries.
 	if (!empty($modSettings['search_custom_index_config']))
 	{
-		$customIndexSettings = unserialize($modSettings['search_custom_index_config']);
+		$customIndexSettings = Util::unserialize($modSettings['search_custom_index_config']);
 
 		$request = $db->query('', '
 			SELECT id_msg, body
@@ -971,7 +971,7 @@ function setTopicNotification($id_member, $id_topic, $on = false)
  */
 function previousTopic($id_topic, $id_board, $id_member = 0, $includeUnapproved = false, $includeStickies = true)
 {
-	return topicPointer($id_topic, $id_board, false, $id_member = 0, $includeUnapproved = false, $includeStickies = true);
+	return topicPointer($id_topic, $id_board, false, $id_member, $includeUnapproved, $includeStickies);
 }
 
 /**
@@ -985,7 +985,7 @@ function previousTopic($id_topic, $id_board, $id_member = 0, $includeUnapproved 
  */
 function nextTopic($id_topic, $id_board, $id_member = 0, $includeUnapproved = false, $includeStickies = true)
 {
-	return topicPointer($id_topic, $id_board, true, $id_member = 0, $includeUnapproved = false, $includeStickies = true);
+	return topicPointer($id_topic, $id_board, true, $id_member, $includeUnapproved, $includeStickies);
 }
 
 /**

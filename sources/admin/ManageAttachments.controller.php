@@ -13,7 +13,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:		BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0.2
+ * @version 1.0.8
  *
  */
 
@@ -154,7 +154,7 @@ class ManageAttachments_Controller extends Action_Controller
 				if (!empty($_POST['use_subdirectories_for_attachments']) && !empty($modSettings['attachment_basedirectories']))
 				{
 					if (!is_array($modSettings['attachment_basedirectories']))
-						$modSettings['attachment_basedirectories'] = unserialize($modSettings['attachment_basedirectories']);
+						$modSettings['attachment_basedirectories'] = Util::unserialize($modSettings['attachment_basedirectories']);
 				}
 				else
 					$modSettings['attachment_basedirectories'] = array();
@@ -221,7 +221,7 @@ class ManageAttachments_Controller extends Action_Controller
 		require_once(SUBSDIR . '/Attachments.subs.php');
 
 		// Get the current attachment directory.
-		$modSettings['attachmentUploadDir'] = unserialize($modSettings['attachmentUploadDir']);
+		$modSettings['attachmentUploadDir'] = Util::unserialize($modSettings['attachmentUploadDir']);
 		$context['attachmentUploadDir'] = $modSettings['attachmentUploadDir'][$modSettings['currentAttachmentUploadDir']];
 
 		// First time here?
@@ -587,7 +587,7 @@ class ManageAttachments_Controller extends Action_Controller
 
 		$context['attach_multiple_dirs'] = count($attach_dirs) > 1 ? true : false;
 		$context['attach_dirs'] = $attach_dirs;
-		$context['base_dirs'] = !empty($modSettings['attachment_basedirectories']) ? unserialize($modSettings['attachment_basedirectories']) : array();
+		$context['base_dirs'] = !empty($modSettings['attachment_basedirectories']) ? Util::unserialize($modSettings['attachment_basedirectories']) : array();
 		$context['checked'] = isset($_SESSION['checked']) ? $_SESSION['checked'] : true;
 		if (!empty($_SESSION['results']))
 		{
@@ -917,7 +917,7 @@ class ManageAttachments_Controller extends Action_Controller
 		{
 			// Just use the current path for temp files.
 			if (!is_array($modSettings['attachmentUploadDir']))
-				$modSettings['attachmentUploadDir'] = unserialize($modSettings['attachmentUploadDir']);
+				$modSettings['attachmentUploadDir'] = Util::unserialize($modSettings['attachmentUploadDir']);
 			$attach_dirs = $modSettings['attachmentUploadDir'];
 
 			$current_check = 0;
@@ -1006,12 +1006,12 @@ class ManageAttachments_Controller extends Action_Controller
 
 		// Since this needs to be done eventually.
 		if (!is_array($modSettings['attachmentUploadDir']))
-			$modSettings['attachmentUploadDir'] = unserialize($modSettings['attachmentUploadDir']);
+			$modSettings['attachmentUploadDir'] = Util::unserialize($modSettings['attachmentUploadDir']);
 
 		if (!isset($modSettings['attachment_basedirectories']))
 			$modSettings['attachment_basedirectories'] = array();
 		elseif (!is_array($modSettings['attachment_basedirectories']))
-			$modSettings['attachment_basedirectories'] = unserialize($modSettings['attachment_basedirectories']);
+			$modSettings['attachment_basedirectories'] = Util::unserialize($modSettings['attachment_basedirectories']);
 
 		$errors = array();
 
@@ -1093,7 +1093,7 @@ class ManageAttachments_Controller extends Action_Controller
 							'attachment_basedirectories' => serialize($modSettings['attachment_basedirectories']),
 							'basedirectory_for_attachments' => $base,
 						));
-						$modSettings['attachment_basedirectories'] = unserialize($modSettings['attachment_basedirectories']);
+						$modSettings['attachment_basedirectories'] = Util::unserialize($modSettings['attachment_basedirectories']);
 					}
 				}
 
@@ -1145,7 +1145,7 @@ class ManageAttachments_Controller extends Action_Controller
 							{
 								unset($modSettings['attachment_basedirectories'][$id]);
 								updateSettings(array('attachment_basedirectories' => serialize($modSettings['attachment_basedirectories'])));
-								$modSettings['attachment_basedirectories'] = unserialize($modSettings['attachment_basedirectories']);
+								$modSettings['attachment_basedirectories'] = Util::unserialize($modSettings['attachment_basedirectories']);
 							}
 						}
 						else
@@ -1178,7 +1178,7 @@ class ManageAttachments_Controller extends Action_Controller
 			if ($_POST['current_dir'] != $modSettings['currentAttachmentUploadDir'] && !empty($modSettings['last_attachments_directory']) && (isset($modSettings['last_attachments_directory'][$_POST['current_dir']]) || isset($modSettings['last_attachments_directory'][0])))
 			{
 				if (!is_array($modSettings['last_attachments_directory']))
-					$modSettings['last_attachments_directory'] = unserialize($modSettings['last_attachments_directory']);
+					$modSettings['last_attachments_directory'] = Util::unserialize($modSettings['last_attachments_directory']);
 				$num = substr(strrchr($modSettings['attachmentUploadDir'][$_POST['current_dir']], '_'), 1);
 
 				if (is_numeric($num))
@@ -1529,9 +1529,9 @@ class ManageAttachments_Controller extends Action_Controller
 		require_once(SUBSDIR . '/ManageAttachments.subs.php');
 
 		// The list(s) of directory's that are available.
-		$modSettings['attachmentUploadDir'] = unserialize($modSettings['attachmentUploadDir']);
+		$modSettings['attachmentUploadDir'] = Util::unserialize($modSettings['attachmentUploadDir']);
 		if (!empty($modSettings['attachment_basedirectories']))
-			$modSettings['attachment_basedirectories'] = unserialize($modSettings['attachment_basedirectories']);
+			$modSettings['attachment_basedirectories'] = Util::unserialize($modSettings['attachment_basedirectories']);
 		else
 			$modSettings['basedirectory_for_attachments'] = array();
 

@@ -256,7 +256,7 @@ function bb2_read_whitelist()
 		$whitelist[$list] = array();
 		if (!empty($modSettings[$list]))
 		{
-			$whitelist[$list] = Util::unserialize($modSettings[$list]);
+			$whitelist[$list] = unserialize($modSettings[$list]);
 			$whitelist[$list] = array_filter($whitelist[$list]);
 		}
 	}

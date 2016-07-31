@@ -14,7 +14,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0
+ * @version 1.0.8
  *
  */
 
@@ -838,7 +838,7 @@ class Verification_Controls_Questions implements Verification_Controls
 			$question_answers[$row['id_question']] = array(
 				'id_question' => $row['id_question'],
 				'question' => $row['question'],
-				'answer' => unserialize($row['answer']),
+				'answer' => Util::unserialize($row['answer']),
 				'language' => $row['language'],
 			);
 		}

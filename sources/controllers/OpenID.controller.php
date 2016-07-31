@@ -11,7 +11,7 @@
  * copyright:	2012 Simple Machines Forum contributors (http://www.simplemachines.org)
  * license:		BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0
+ * @version 1.0.8
  *
  */
 
@@ -98,7 +98,7 @@ class OpenID_Controller extends Action_Controller
 			fatal_lang_error('openid_load_data');
 
 		// Any save fields to restore?
-		$context['openid_save_fields'] = isset($_GET['sf']) ? unserialize(base64_decode($_GET['sf'])) : array();
+		$context['openid_save_fields'] = isset($_GET['sf']) ? json_decode(base64_decode($_GET['sf']), true) : array();
 		$context['openid_claimed_id'] = $_GET['openid_claimed_id'];
 
 		// Is there a user with this OpenID_uri?

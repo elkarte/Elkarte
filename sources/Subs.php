@@ -13,7 +13,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:		BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0.7
+ * @version 1.0.8
  *
  */
 
@@ -3161,7 +3161,7 @@ function getAttachmentFilename($filename, $attachment_id, $dir = null, $new = fa
 	if (!empty($modSettings['currentAttachmentUploadDir']))
 	{
 		if (!is_array($modSettings['attachmentUploadDir']))
-			$modSettings['attachmentUploadDir'] = unserialize($modSettings['attachmentUploadDir']);
+			$modSettings['attachmentUploadDir'] = Util::unserialize($modSettings['attachmentUploadDir']);
 		$path = isset($modSettings['attachmentUploadDir'][$dir]) ? $modSettings['attachmentUploadDir'][$dir] : $modSettings['basedirectory_for_attachments'];
 	}
 	else
@@ -4205,7 +4205,7 @@ function prepareSearchEngines()
 	$engines = array();
 	if (!empty($modSettings['additional_search_engines']))
 	{
-		$search_engines = unserialize($modSettings['additional_search_engines']);
+		$search_engines = Util::unserialize($modSettings['additional_search_engines']);
 		foreach ($search_engines as $engine)
 			$engines[strtolower(preg_replace('~[^A-Za-z0-9 ]~', '', $engine['name']))] = $engine;
 	}
@@ -4302,7 +4302,7 @@ function scheduleTaskImmediate($task)
 	if (!isset($modSettings['scheduleTaskImmediate']))
 		$scheduleTaskImmediate = array();
 	else
-		$scheduleTaskImmediate = unserialize($modSettings['scheduleTaskImmediate']);
+		$scheduleTaskImmediate = Util::unserialize($modSettings['scheduleTaskImmediate']);
 
 	// If it has not been scheduled, the do so now
 	if (!isset($scheduleTaskImmediate[$task]))
@@ -4335,7 +4335,7 @@ function removeScheduleTaskImmediate($task, $calculateNextTrigger = true)
 	if (!isset($modSettings['scheduleTaskImmediate']))
 		return;
 	else
-		$scheduleTaskImmediate = unserialize($modSettings['scheduleTaskImmediate']);
+		$scheduleTaskImmediate = Util::unserialize($modSettings['scheduleTaskImmediate']);
 
 	// Clear / remove the task if it was set
 	if (isset($scheduleTaskImmediate[$task]))

@@ -278,6 +278,16 @@ CHANGE `session_id` `session_id` char(64) NOT NULL;
 ---#
 
 /******************************************************************************/
+--- Adding more space for IP addresses
+/******************************************************************************/
+---# Altering the session_id columns...
+TRUNCATE TABLE {db_prefix}log_online;
+
+ALTER TABLE {$db_prefix}log_online
+CHANGE `ip` `ip` varchar(255) NOT NULL DEFAULT '';
+---#
+
+/******************************************************************************/
 --- Adding support for MOVED topics enhancements
 /******************************************************************************/
 ---# Adding new columns to topics ..

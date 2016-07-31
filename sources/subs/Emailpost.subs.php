@@ -8,7 +8,7 @@
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
- * @version 1.0.3
+ * @version 1.0.8
  *
  */
 
@@ -770,7 +770,7 @@ function pbe_email_attachments($pbe, $email_message)
 	if (!empty($modSettings['currentAttachmentUploadDir']))
 	{
 		if (!is_array($modSettings['attachmentUploadDir']))
-			$modSettings['attachmentUploadDir'] = unserialize($modSettings['attachmentUploadDir']);
+			$modSettings['attachmentUploadDir'] = Util::unserialize($modSettings['attachmentUploadDir']);
 
 		// The current directory, of course!
 		$current_attach_dir = $modSettings['attachmentUploadDir'][$modSettings['currentAttachmentUploadDir']];
@@ -867,7 +867,7 @@ function pbe_find_board_number($email_address)
 	$board_number = 0;
 
 	// Load our valid email ids and the corresponding board ids
-	$data = (!empty($modSettings['maillist_receiving_address'])) ? unserialize($modSettings['maillist_receiving_address']) : array();
+	$data = (!empty($modSettings['maillist_receiving_address'])) ? Util::unserialize($modSettings['maillist_receiving_address']) : array();
 	foreach ($data as $key => $addr)
 		$valid_address[$addr[0]] = $addr[1];
 
@@ -1762,10 +1762,11 @@ function query_update_member_stats($pbe, $email_message, $topic_info = array())
 	// Place the entry in to the online log so the who's online can use it
 	$serialized = serialize($get_temp);
 	$session_id = 'ip' . $pbe['profile']['member_ip'];
+	$member_ip = empty($pbe['profile']['member_ip']) ? 0 : $pbe['profile']['member_ip'];
 	$db->insert($do_delete ? 'ignore' : 'replace',
 		'{db_prefix}log_online',
-		array('session' => 'string', 'id_member' => 'int', 'id_spider' => 'int', 'log_time' => 'int', 'ip' => 'raw', 'url' => 'string'),
-		array($session_id, $pbe['profile']['id_member'], 0, $last_login, 'IFNULL(INET_ATON(\'' . $pbe['profile']['member_ip'] . '\'), 0)', $serialized),
+		array('session' => 'string', 'id_member' => 'int', 'id_spider' => 'int', 'log_time' => 'int', 'ip' => 'string', 'url' => 'string'),
+		array($session_id, $pbe['profile']['id_member'], 0, $last_login, $member_ip, $serialized),
 		array('session')
 	);
 }

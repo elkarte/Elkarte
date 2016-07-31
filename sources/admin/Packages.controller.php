@@ -13,7 +13,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:		BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0.5
+ * @version 1.0.8
  *
  */
 
@@ -699,7 +699,7 @@ class Packages_Controller extends Action_Controller
 									'type' => $txt['package_delete'] . ' ' . ($action_data['type'] == 'require-dir' ? $txt['package_tree'] : $txt['package_file']),
 									'action' => strtr($real_path, array('\\' => '/', BOARDDIR => '.')),
 									'description' => '',
-									'value' => base64_encode(serialize(array('type' => $action_data['type'], 'orig' => $action_data['filename'], 'future' => $real_path, 'id' => $id))),
+									'value' => base64_encode(json_encode(array('type' => $action_data['type'], 'orig' => $action_data['filename'], 'future' => $real_path, 'id' => $id))),
 									'not_mod' => true,
 								);
 							else
@@ -707,7 +707,7 @@ class Packages_Controller extends Action_Controller
 									'type' => $txt['package_extract'] . ' ' . ($action_data['type'] == 'require-dir' ? $txt['package_tree'] : $txt['package_file']),
 									'action' => strtr($real_path, array('\\' => '/', BOARDDIR => '.')),
 									'description' => '',
-									'value' => base64_encode(serialize(array('type' => $action_data['type'], 'orig' => $action_data['destination'], 'future' => $real_path, 'id' => $id))),
+									'value' => base64_encode(json_encode(array('type' => $action_data['type'], 'orig' => $action_data['destination'], 'future' => $real_path, 'id' => $id))),
 									'not_mod' => true,
 								);
 						}
@@ -832,7 +832,7 @@ class Packages_Controller extends Action_Controller
 			{
 				if (empty($change))
 					continue;
-				$theme_data = unserialize(base64_decode($change));
+				$theme_data = json_decode(base64_decode($change), true);
 				if (empty($theme_data['type']))
 					continue;
 
@@ -1680,7 +1680,7 @@ class Packages_Controller extends Action_Controller
 			unset($context['file_tree'][strtr(BOARDDIR, array('\\' => '/'))]['contents']['attachments']);
 
 			if (!is_array($modSettings['attachmentUploadDir']))
-				$modSettings['attachmentUploadDir'] = unserialize($modSettings['attachmentUploadDir']);
+				$modSettings['attachmentUploadDir'] = Util::unserialize($modSettings['attachmentUploadDir']);
 
 			// @todo Should we suggest non-current directories be read only?
 			foreach ($modSettings['attachmentUploadDir'] as $dir)
@@ -1778,7 +1778,7 @@ class Packages_Controller extends Action_Controller
 		// Have we got a load of back-catalogue trees to expand from a submit etc?
 		if (!empty($_GET['back_look']))
 		{
-			$potententialTrees = unserialize(base64_decode($_GET['back_look']));
+			$potententialTrees = json_decode(base64_decode($_GET['back_look']), true);
 			foreach ($potententialTrees as $tree)
 				$context['look_for'][] = $tree;
 		}
@@ -1787,7 +1787,7 @@ class Packages_Controller extends Action_Controller
 		if (!empty($_POST['back_look']))
 			$context['only_find'] = array_merge($context['only_find'], $_POST['back_look']);
 
-		$context['back_look_data'] = base64_encode(serialize(array_slice($context['look_for'], 0, 15)));
+		$context['back_look_data'] = base64_encode(json_encode(array_slice($context['look_for'], 0, 15)));
 
 		// Are we finding more files than first thought?
 		$context['file_offset'] = !empty($_REQUEST['fileoffset']) ? (int) $_REQUEST['fileoffset'] : 0;
@@ -1865,7 +1865,7 @@ class Packages_Controller extends Action_Controller
 
 			// Continuing?
 			if (isset($_POST['toProcess']))
-				$_POST['permStatus'] = unserialize(base64_decode($_POST['toProcess']));
+				$_POST['permStatus'] = json_decode(base64_decode($_POST['toProcess']), true);
 
 			if (isset($_POST['permStatus']))
 			{
@@ -1906,7 +1906,7 @@ class Packages_Controller extends Action_Controller
 
 				// Nothing to do?
 				if (empty($context['to_process']))
-					redirectexit('action=admin;area=packages;sa=perms' . (!empty($context['back_look_data']) ? ';back_look=' . base64_encode(serialize($context['back_look_data'])) : '') . ';' . $context['session_var'] . '=' . $context['session_id']);
+					redirectexit('action=admin;area=packages;sa=perms' . (!empty($context['back_look_data']) ? ';back_look=' . base64_encode(json_encode($context['back_look_data'])) : '') . ';' . $context['session_var'] . '=' . $context['session_id']);
 			}
 			// Should never get here,
 			else
@@ -1945,7 +1945,7 @@ class Packages_Controller extends Action_Controller
 		{
 			$context['predefined_type'] = isset($_POST['predefined']) ? $_POST['predefined'] : 'restricted';
 			$context['total_items'] = isset($_POST['totalItems']) ? (int) $_POST['totalItems'] : 0;
-			$context['directory_list'] = isset($_POST['dirList']) ? unserialize(base64_decode($_POST['dirList'])) : array();
+			$context['directory_list'] = isset($_POST['dirList']) ? json_decode(base64_decode($_POST['dirList']), true) : array();
 			$context['file_offset'] = isset($_POST['fileOffset']) ? (int) $_POST['fileOffset'] : 0;
 
 			// Haven't counted the items yet?
@@ -1974,7 +1974,7 @@ class Packages_Controller extends Action_Controller
 			elseif ($context['predefined_type'] === 'free')
 				$context['special_files'] = array();
 			else
-				$context['special_files'] = unserialize(base64_decode($_POST['specialFiles']));
+				$context['special_files'] = json_decode(base64_decode($_POST['specialFiles']), true);
 
 			// Now we definitely know where we are, we need to go through again doing the chmod!
 			foreach ($context['directory_list'] as $path => $dummy)
@@ -2028,7 +2028,7 @@ class Packages_Controller extends Action_Controller
 		}
 
 		// If we're here we are done!
-		redirectexit('action=admin;area=packages;sa=perms' . (!empty($context['back_look_data']) ? ';back_look=' . base64_encode(serialize($context['back_look_data'])) : '') . ';' . $context['session_var'] . '=' . $context['session_id']);
+		redirectexit('action=admin;area=packages;sa=perms' . (!empty($context['back_look_data']) ? ';back_look=' . base64_encode(json_decode($context['back_look_data'], true)) : '') . ';' . $context['session_var'] . '=' . $context['session_id']);
 	}
 
 	/**

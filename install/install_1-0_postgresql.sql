@@ -1415,7 +1415,7 @@ CREATE TABLE {$db_prefix}log_online (
   log_time int NOT NULL default '0',
   id_member int NOT NULL default '0',
   id_spider smallint NOT NULL default '0',
-  ip bigint NOT NULL default '0',
+  ip varchar(255) NOT NULL default '',
   url text NOT NULL,
   PRIMARY KEY (session)
 );

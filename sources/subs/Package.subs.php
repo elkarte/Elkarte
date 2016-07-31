@@ -13,7 +13,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0.4
+ * @version 1.0.8
  *
  */
 
@@ -3126,7 +3126,7 @@ function isPackageInstalled($id)
 		$result = array(
 			'old_themes' => explode(',', $row['themes_installed']),
 			'old_version' => $row['version'],
-			'db_changes' => empty($row['db_changes']) ? array() : unserialize($row['db_changes']),
+			'db_changes' => empty($row['db_changes']) ? array() : Util::unserialize($row['db_changes']),
 			'package_id' => $row['package_id'],
 			'install_state' => $row['install_state'],
 		);
@@ -3260,7 +3260,7 @@ function isAuthorizedServer($remote_url)
 	global $modSettings;
 
 	// Know addon servers
-	$servers = @unserialize($modSettings['authorized_package_servers']);
+	$servers = Util::unserialize($modSettings['authorized_package_servers']);
 	if (empty($servers))
 		return false;
 

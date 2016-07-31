@@ -14,7 +14,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:		BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0.7
+ * @version 1.0.8
  *
  */
 
@@ -25,7 +25,7 @@ if (defined('ELK'))
 define('ELK', 'SSI');
 
 // Shortcut for the browser cache stale
-define('CACHE_STALE', '?107');
+define('CACHE_STALE', '?108');
 
 // We're going to want a few globals... these are all set later.
 global $time_start, $maintenance, $msubject, $mmessage, $mbname, $language;
@@ -1704,7 +1704,7 @@ function ssi_boardNews($board = null, $limit = null, $start = null, $length = nu
 			$preview = 'first';
 
 		$row['body'] = $row[$preview . '_body'];
-		$row['subject'] = $row[$preview . '_body'];
+		$row['subject'] = $row[$preview . '_subject'];
 		$row['id_msg'] = $row['id_' . $preview . '_msg'];
 		$row['icon'] = $row[$preview . '_icon'];
 		$row['id_member'] = $row[$preview . '_id_member'];

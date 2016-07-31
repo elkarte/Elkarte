@@ -7,7 +7,7 @@
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
- * @version 1.0.1
+ * @version 1.0.8
  *
  */
 
@@ -151,7 +151,7 @@ function addonsCredits()
 
 		while ($row = $db->fetch_assoc($request))
 		{
-			$credit_info = unserialize($row['credits']);
+			$credit_info = Util::unserialize($row['credits']);
 
 			$copyright = empty($credit_info['copyright']) ? '' : $txt['credits_copyright'] . ' &copy; ' . Util::htmlspecialchars($credit_info['copyright']);
 			$license = empty($credit_info['license']) ? '' : $txt['credits_license'] . ': ' . Util::htmlspecialchars($credit_info['license']);
@@ -237,7 +237,7 @@ function determineActions($urls, $preferred_prefix = false)
 	foreach ($url_list as $k => $url)
 	{
 		// Get the request parameters..
-		$actions = @unserialize($url[0]);
+		$actions = Util::unserialize($url[0]);
 		if ($actions === false)
 			continue;
 

@@ -17,7 +17,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0.6
+ * @version 1.0.8
  *
  */
 
@@ -613,7 +613,7 @@ function sendpm($recipients, $subject, $message, $store_outbox = true, $from = n
 	// Check whether we have to apply anything...
 	while ($row = $db->fetch_assoc($request))
 	{
-		$criteria = unserialize($row['criteria']);
+		$criteria = Util::unserialize($row['criteria']);
 
 		// Note we don't check the buddy status, cause deletion from buddy = madness!
 		$delete = false;
@@ -1284,8 +1284,8 @@ function loadRules($reload = false)
 		$context['rules'][$row['id_rule']] = array(
 			'id' => $row['id_rule'],
 			'name' => $row['rule_name'],
-			'criteria' => unserialize($row['criteria']),
-			'actions' => unserialize($row['actions']),
+			'criteria' => Util::unserialize($row['criteria']),
+			'actions' => Util::unserialize($row['actions']),
 			'delete' => $row['delete_pm'],
 			'logic' => $row['is_or'] ? 'or' : 'and',
 		);

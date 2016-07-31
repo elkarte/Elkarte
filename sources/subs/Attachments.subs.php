@@ -16,7 +16,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0
+ * @version 1.0.8
  *
  */
 
@@ -66,7 +66,7 @@ function automanage_attachments_check_directory()
 	if (!empty($modSettings['attachment_basedirectories']) && !empty($modSettings['use_subdirectories_for_attachments']))
 	{
 		if (!is_array($modSettings['attachment_basedirectories']))
-			$modSettings['attachment_basedirectories'] = unserialize($modSettings['attachment_basedirectories']);
+			$modSettings['attachment_basedirectories'] = Util::unserialize($modSettings['attachment_basedirectories']);
 
 		$base_dir = array_search($modSettings['basedirectory_for_attachments'], $modSettings['attachment_basedirectories']);
 	}
@@ -78,7 +78,7 @@ function automanage_attachments_check_directory()
 		if (!isset($modSettings['last_attachments_directory']))
 			$modSettings['last_attachments_directory'] = array();
 		if (!is_array($modSettings['last_attachments_directory']))
-			$modSettings['last_attachments_directory'] = unserialize($modSettings['last_attachments_directory']);
+			$modSettings['last_attachments_directory'] = Util::unserialize($modSettings['last_attachments_directory']);
 		if (!isset($modSettings['last_attachments_directory'][$base_dir]))
 			$modSettings['last_attachments_directory'][$base_dir] = 0;
 	}
@@ -111,7 +111,7 @@ function automanage_attachments_check_directory()
 	}
 
 	if (!is_array($modSettings['attachmentUploadDir']))
-		$modSettings['attachmentUploadDir'] = unserialize($modSettings['attachmentUploadDir']);
+		$modSettings['attachmentUploadDir'] = Util::unserialize($modSettings['attachmentUploadDir']);
 
 	if (!in_array($updir, $modSettings['attachmentUploadDir']) && !empty($updir))
 		$outputCreation = automanage_attachments_create_directory($updir);
@@ -213,7 +213,7 @@ function automanage_attachments_create_directory($updir)
 			'attachmentUploadDir' => serialize($modSettings['attachmentUploadDir']),
 			'currentAttachmentUploadDir' => $modSettings['currentAttachmentUploadDir'],
 		), true);
-		$modSettings['attachmentUploadDir'] = unserialize($modSettings['attachmentUploadDir']);
+		$modSettings['attachmentUploadDir'] = Util::unserialize($modSettings['attachmentUploadDir']);
 	}
 
 	$context['attach_dir'] = $modSettings['attachmentUploadDir'][$modSettings['currentAttachmentUploadDir']];
@@ -268,7 +268,7 @@ function automanage_attachments_by_space()
 			'last_attachments_directory' => serialize($modSettings['last_attachments_directory']),
 			'currentAttachmentUploadDir' => $modSettings['currentAttachmentUploadDir'],
 		));
-		$modSettings['last_attachments_directory'] = unserialize($modSettings['last_attachments_directory']);
+		$modSettings['last_attachments_directory'] = Util::unserialize($modSettings['last_attachments_directory']);
 
 		return true;
 	}
@@ -358,7 +358,13 @@ function processAttachments($id_msg = null)
 		automanage_attachments_check_directory();
 
 	if (!is_array($modSettings['attachmentUploadDir']))
-		$modSettings['attachmentUploadDir'] = unserialize($modSettings['attachmentUploadDir']);
+	{
+		$attachmentUploadDir = Util::unserialize($modSettings['attachmentUploadDir']);
+		if (!empty($attachmentUploadDir))
+		{
+			$modSettings['attachmentUploadDir'] = $attachmentUploadDir;
+		}
+	}
 
 	$context['attach_dir'] = $modSettings['attachmentUploadDir'][$modSettings['currentAttachmentUploadDir']];
 
@@ -1302,7 +1308,17 @@ function getAttachmentPath()
 	if (empty($modSettings['attachmentUploadDir']))
 		$attachmentDir = BOARDDIR . '/attachments';
 	elseif (!empty($modSettings['currentAttachmentUploadDir']) && !is_array($modSettings['attachmentUploadDir']) && (@unserialize($modSettings['attachmentUploadDir']) !== false))
-		$attachmentDir = unserialize($modSettings['attachmentUploadDir']);
+	{
+		// @todo this is here to prevent the package manager to die when complete the installation of the patch (the new Util class has not yet been loaded so we need the normal one)
+		if (function_exists('Util::unserialize'))
+		{
+			$attachmentDir = Util::unserialize($modSettings['attachmentUploadDir']);
+		}
+		else
+		{
+			$attachmentDir = unserialize($modSettings['attachmentUploadDir']);
+		}
+	}
 	else
 		$attachmentDir = $modSettings['attachmentUploadDir'];
 
@@ -1832,7 +1848,7 @@ function getLegacyAttachmentFilename($filename, $attachment_id, $dir = null, $ne
 	if (!empty($modSettings['currentAttachmentUploadDir']))
 	{
 		if (!is_array($modSettings['attachmentUploadDir']))
-			$modSettings['attachmentUploadDir'] = unserialize($modSettings['attachmentUploadDir']);
+			$modSettings['attachmentUploadDir'] = Util::unserialize($modSettings['attachmentUploadDir']);
 		$path = $modSettings['attachmentUploadDir'][$dir];
 	}
 	else

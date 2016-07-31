@@ -13,7 +13,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0.7
+ * @version 1.0.8
  *
  * This file contains functions that are specifically done by administrators.
  *
@@ -405,7 +405,7 @@ function updateAdminPreferences()
 		return false;
 
 	// This is what we'll be saving.
-	$options['admin_preferences'] = serialize($context['admin_preferences']);
+	$options['admin_preferences'] = json_encode($context['admin_preferences']);
 
 	require_once(SUBSDIR . '/Themes.subs.php');
 
@@ -522,10 +522,17 @@ function custom_profiles_toggle_callback($value)
 
 	if (!$value)
 	{
+		// Disable all fields. Wouldn't want any to show when the feature is disabled.
 		$db->query('', '
 			UPDATE {db_prefix}custom_fields
 			SET active = 0'
 		);
+	}
+	else
+	{
+		// Set the display cache for the custom profile fields.
+		require_once(SUBSDIR . '/ManageFeatures.subs.php');
+		updateDisplayCache();
 	}
 }
 

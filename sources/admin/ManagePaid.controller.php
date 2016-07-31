@@ -14,7 +14,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:		BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0
+ * @version 1.0.8
  *
  */
 
@@ -966,14 +966,14 @@ class ManagePaid_Controller extends Action_Controller
 			$context['pending_payments'] = array();
 			if (!empty($row['pending_details']))
 			{
-				$pending_details = @unserialize($row['pending_details']);
+				$pending_details = Util::unserialize($row['pending_details']);
 				foreach ($pending_details as $id => $pending)
 				{
 					// Only this type need be displayed.
 					if ($pending[3] == 'payback')
 					{
 						// Work out what the options were.
-						$costs = @unserialize($context['current_subscription']['real_cost']);
+						$costs = Util::unserialize($context['current_subscription']['real_cost']);
 
 						if ($context['current_subscription']['real_length'] == 'F')
 						{

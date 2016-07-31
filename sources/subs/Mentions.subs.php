@@ -7,7 +7,7 @@
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
- * @version 1.0.5
+ * @version 1.0.8
  *
  */
 
@@ -321,7 +321,7 @@ function toggleMentionsApproval($msgs, $approved)
 		)
 	);
 	$status = $approved ? 0 : 3;
-	while ($row = $db->fetch_row($request))
+	while ($row = $db->fetch_assoc($request))
 		updateMentionMenuCount($status, $row['id_member']);
 	$db->free_result($request);
 }
