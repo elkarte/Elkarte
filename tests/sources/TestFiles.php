@@ -35,7 +35,7 @@ class TestFiles extends UnitTestCase
 			'controllers' => CONTROLLERDIR . '/*.php',
 			'subs' => SUBSDIR . '/*.php',
 			'admin' => ADMINDIR . '/*.php',
-			'ext' => EXTDIR . '/*.php',
+// 			'ext' => EXTDIR . '/*.php',
 			'language' => LANGUAGEDIR . '/english/*.php',
 			'defaulttheme' => BOARDDIR . '/themes/default/*.php',
 		);

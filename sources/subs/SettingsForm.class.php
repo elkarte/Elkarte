@@ -13,7 +13,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0.7
+ * @version 1.0.8
  *
  *
  * Adding options to one of the setting screens isn't hard.
@@ -244,7 +244,7 @@ class Settings_Form
 					if ($config_var[0] == 'select' && !empty($config_var['multiple']))
 					{
 						$context['config_vars'][$config_var[1]]['name'] .= '[]';
-						$context['config_vars'][$config_var[1]]['value'] = !empty($context['config_vars'][$config_var[1]]['value']) ? unserialize($context['config_vars'][$config_var[1]]['value']) : array();
+						$context['config_vars'][$config_var[1]]['value'] = !empty($context['config_vars'][$config_var[1]]['value']) ? Util::unserialize($context['config_vars'][$config_var[1]]['value']) : array();
 					}
 
 					// If it's associative

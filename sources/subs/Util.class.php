@@ -7,7 +7,7 @@
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
- * @version 1.0
+ * @version 1.0.8
  *
  */
 
@@ -506,7 +506,7 @@ class Util
 	 * @param int $level = 0
 	 * @return array|string
 	 */
-	public function urldecode_recursive($var, $level = 0)
+	public static function urldecode_recursive($var, $level = 0)
 	{
 		if (!is_array($var))
 			return urldecode($var);
@@ -516,7 +516,7 @@ class Util
 
 		// Add the htmlspecialchars to every element.
 		foreach ($var as $k => $v)
-			$new_var[urldecode($k)] = $level > 25 ? null : urldecode_recursive($v, $level + 1);
+			$new_var[urldecode($k)] = $level > 25 ? null : self::urldecode_recursive($v, $level + 1);
 
 		return $new_var;
 	}
@@ -534,7 +534,7 @@ class Util
 	 * @param mixed[]|string $var
 	 * @return array|string
 	 */
-	public function unescapestring_recursive($var)
+	public static function unescapestring_recursive($var)
 	{
 		$db = database();
 
@@ -546,8 +546,47 @@ class Util
 
 		// Strip the slashes from every element.
 		foreach ($var as $k => $v)
-			$new_var[$db->unescape_string($k)] = unescapestring_recursive($v);
+			$new_var[$db->unescape_string($k)] = self::unescapestring_recursive($v);
 
 		return $new_var;
+	}
+
+	/**
+	 * Wrappers for unserialize
+	 * What it does:
+	 * - if using PHP < 7 it will use ext/safe_unserialize
+	 * - if using PHP > 7 will use the built in unserialize
+	 *
+	 * @param string $string The string to unserialize
+	 * @param string[] $options Optional, mimic the PHP 7+ option,
+	 *                          see PHP documentation for the details
+	 *                          additionally, it doesn't allow to use the option:
+	 *                            allowed_classes => true
+	 *                          that is reverted to false.
+	 * @return array|string
+	 */
+	public static function unserialize($string, $options = array())
+	{
+		static $function = null;
+
+		if ($function === null)
+		{
+			if (version_compare(PHP_VERSION, '7', '>='))
+			{
+				$function = 'unserialize';
+			}
+			else
+			{
+				require_once(EXTDIR . '/serialize.php');
+				$function = 'ElkArte\\ext\\upgradephp\\safe_unserialize';
+			}
+		}
+
+		if (!isset($options['allowed_classes']) || $options['allowed_classes'] === true)
+		{
+			$options['allowed_classes'] = false;
+		}
+
+		return @$function($string, $options);
 	}
 }

@@ -75,6 +75,7 @@ fwrite($handle, 'window.ourVersions = {');
 fwrite($handle, "\n\t'Version': '{$forum_version}',\n");
 
 foreach (array('admin', 'controllers', 'database', 'subs') as $type)
+{
 	foreach ($version_info['file_versions_' . $type] as $file => $ver)
 	{
 		if ($new_version == $ver)
@@ -83,6 +84,7 @@ foreach (array('admin', 'controllers', 'database', 'subs') as $type)
 		}
 		fwrite($handle, "\t'{$type}{$file}': '{$ver}',\n");
 	}
+}
 
 foreach ($version_info['file_versions'] as $file => $ver)
 {
@@ -172,6 +174,11 @@ function getFilesChanged($from, $to)
 		if ($file === 'SSI.php')
 		{
 			$list[] = 'sourcesSSI.php';
+			continue;
+		}
+		if ($file === 'subscriptions.php')
+		{
+			$list[] = 'sourcessubscriptions.php';
 			continue;
 		}
 

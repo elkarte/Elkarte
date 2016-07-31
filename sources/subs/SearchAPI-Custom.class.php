@@ -14,7 +14,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0
+ * @version 1.0.8
  *
  */
 
@@ -87,7 +87,7 @@ class Custom_Search
 		if (empty($modSettings['search_custom_index_config']))
 			return;
 
-		$this->indexSettings = unserialize($modSettings['search_custom_index_config']);
+		$this->indexSettings = Util::unserialize($modSettings['search_custom_index_config']);
 
 		$this->bannedWords = empty($modSettings['search_stopwords']) ? array() : explode(',', $modSettings['search_stopwords']);
 		$this->min_word_length = $this->indexSettings['bytes_per_word'];
@@ -291,7 +291,7 @@ class Custom_Search
 
 		$db = database();
 
-		$customIndexSettings = unserialize($modSettings['search_custom_index_config']);
+		$customIndexSettings = Util::unserialize($modSettings['search_custom_index_config']);
 
 		$inserts = array();
 		foreach (text2words($msgOptions['body'], $customIndexSettings['bytes_per_word'], true) as $word)
@@ -321,7 +321,7 @@ class Custom_Search
 
 		if (isset($msgOptions['body']))
 		{
-			$customIndexSettings = unserialize($modSettings['search_custom_index_config']);
+			$customIndexSettings = Util::unserialize($modSettings['search_custom_index_config']);
 			$stopwords = empty($modSettings['search_stopwords']) ? array() : explode(',', $modSettings['search_stopwords']);
 			$old_body = isset($msgOptions['old_body']) ? $msgOptions['old_body'] : '';
 

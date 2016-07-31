@@ -13,7 +13,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0.7
+ * @version 1.0.8
  *
  */
 
@@ -293,7 +293,7 @@ function cache_get_data($key, $ttl = 120)
 	if (function_exists('call_integration_hook') && isset($value))
 		call_integration_hook('cache_get_data', array($key, $ttl, $value));
 
-	return empty($value) ? null : @unserialize($value);
+	return empty($value) ? null : Util::unserialize($value);
 }
 
 /**

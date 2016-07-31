@@ -15,7 +15,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:		BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0.4
+ * @version 1.0.8
  *
  *
  * @todo Update this for the new package manager?
@@ -1222,7 +1222,7 @@ class ManageThemes_Controller extends Action_Controller
 				}
 
 				if (!empty($theme_info_xml['extra']))
-					$install_info += unserialize($theme_info_xml['extra']);
+					$install_info += Util::unserialize($theme_info_xml['extra']);
 			}
 
 			if (isset($install_info['based_on']))
@@ -1331,13 +1331,20 @@ class ManageThemes_Controller extends Action_Controller
 		// If this is the admin preferences the passed value will just be an element of it.
 		if ($_GET['var'] == 'admin_preferences')
 		{
-			$options['admin_preferences'] = serializeToJson($options['admin_preferences'], function($array_form) {
-				global $context;
+			if (!empty($options['admin_preferences']))
+			{
+				$options['admin_preferences'] = serializeToJson($options['admin_preferences'], function($array_form) {
+					global $context;
 
-				$context['admin_preferences'] = $array_form;
-				require_once(SUBSDIR . '/Admin.subs.php');
-				updateAdminPreferences();
-			});
+					$context['admin_preferences'] = $array_form;
+					require_once(SUBSDIR . '/Admin.subs.php');
+					updateAdminPreferences();
+				});
+			}
+			else
+			{
+				$options['admin_preferences'] = array();
+			}
 
 			// New thingy...
 			if (isset($_GET['admin_key']) && strlen($_GET['admin_key']) < 5)
@@ -1349,20 +1356,27 @@ class ManageThemes_Controller extends Action_Controller
 		// If this is the window min/max settings, the passed window name will just be an element of it.
 		elseif ($_GET['var'] == 'minmax_preferences')
 		{
-			$context['minmax_preferences'] = serializeToJson($options['minmax_preferences'], function($array_form) {
-				global $settings, $user_info;
+			if (!empty($options['minmax_preferences']))
+			{
+				$minmax_preferences = serializeToJson($options['minmax_preferences'], function($array_form) {
+					global $settings, $user_info;
 
-				// Update the option.
-				require_once(SUBSDIR . '/Themes.subs.php');
-				updateThemeOptions(array($settings['theme_id'], $user_info['id'], 'minmax_preferences', json_encode($array_form)));
-			});
+					// Update the option.
+					require_once(SUBSDIR . '/Themes.subs.php');
+					updateThemeOptions(array($settings['theme_id'], $user_info['id'], 'minmax_preferences', json_encode($array_form)));
+				});
+			}
+			else
+			{
+				$minmax_preferences = array();
+			}
 
 			// New value for them
 			if (isset($_GET['minmax_key']) && strlen($_GET['minmax_key']) < 10)
-				$options['minmax_preferences'][$_GET['minmax_key']] = $_GET['val'];
+				$minmax_preferences[$_GET['minmax_key']] = $_GET['val'];
 
 			// Change the value to be something nice,
-			$_GET['val'] = json_encode($options['minmax_preferences']);
+			$_GET['val'] = json_encode($minmax_preferences);
 		}
 
 		// Update the option.

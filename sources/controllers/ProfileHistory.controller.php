@@ -13,7 +13,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:		BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0
+ * @version 1.0.8
  *
  */
 
@@ -944,7 +944,7 @@ class ProfileHistory_Controller extends Action_Controller
 		$members = array();
 		while ($row = $db->fetch_assoc($request))
 		{
-			$extra = @unserialize($row['extra']);
+			$extra = Util::unserialize($row['extra']);
 			if (!empty($extra['applicator']))
 				$members[] = $extra['applicator'];
 

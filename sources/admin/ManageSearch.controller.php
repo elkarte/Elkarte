@@ -14,7 +14,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:		BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0.2
+ * @version 1.0.8
  *
  */
 
@@ -127,7 +127,7 @@ class ManageSearch_Controller extends Action_Controller
 
 		$context['search_engines'] = array();
 		if (!empty($modSettings['additional_search_engines']))
-			$context['search_engines'] = unserialize($modSettings['additional_search_engines']);
+			$context['search_engines'] = Util::unserialize($modSettings['additional_search_engines']);
 
 		for ($count = 0; $count < 3; $count++)
 			$context['search_engines'][] = array(
@@ -449,7 +449,7 @@ class ManageSearch_Controller extends Action_Controller
 		// Resume building an index that was not completed
 		if (isset($_REQUEST['resume']) && !empty($modSettings['search_custom_index_resume']))
 		{
-			$context['index_settings'] = unserialize($modSettings['search_custom_index_resume']);
+			$context['index_settings'] = Util::unserialize($modSettings['search_custom_index_resume']);
 			$context['start'] = (int) $context['index_settings']['resume_at'];
 			unset($context['index_settings']['resume_at']);
 			$context['step'] = 1;

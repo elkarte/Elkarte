@@ -13,7 +13,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0
+ * @version 1.0.8
  *
  */
 
@@ -441,7 +441,7 @@ function loadSubscriptions()
 	while ($row = $db->fetch_assoc($request))
 	{
 		// Pick a cost.
-		$costs = @unserialize($row['cost']);
+		$costs = Util::unserialize($row['cost']);
 
 		if ($row['length'] != 'F' && !empty($modSettings['paid_currency_symbol']) && !empty($costs['fixed']))
 			$cost = sprintf($modSettings['paid_currency_symbol'], $costs['fixed']);
@@ -834,7 +834,7 @@ function getSubscriptionDetails($sub_id)
 			'id' => $row['id_subscribe'],
 			'name' => $row['name'],
 			'desc' => $row['description'],
-			'cost' => @unserialize($row['cost']),
+			'cost' => Util::unserialize($row['cost']),
 			'span' => array(
 				'value' => $span_value,
 				'unit' => $span_unit,
