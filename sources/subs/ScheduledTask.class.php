@@ -1397,7 +1397,7 @@ class Scheduled_Task
 		global $modSettings;
 
 		$db = database();
-		$user_access_mentions = Util::unserialize($modSettings['user_access_mentions']);
+		$user_access_mentions = !empty($modSettings['user_access_mentions']) ? Util::unserialize($modSettings['user_access_mentions']) : array();
 
 		// This should be set only because of an immediate scheduled task, so higher priority
 		if (!empty($user_access_mentions))
