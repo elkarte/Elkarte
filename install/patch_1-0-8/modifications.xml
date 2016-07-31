@@ -347,20 +347,8 @@ function serializeToJson($variable, $save_callback = null)
 	</file>
 	<file name="SOURCEDIR/Subs.php">
 		<operation>
-			<search position="replace"><![CDATA[ * copyright:	2011 Simple Machines (http://www.simplemachines.org)
- * license:		BSD, See included LICENSE.TXT for terms and conditions.
- *
- * @version 1.0.7
- *
- */
-]]></search>
-			<add><![CDATA[ * copyright:	2011 Simple Machines (http://www.simplemachines.org)
- * license:		BSD, See included LICENSE.TXT for terms and conditions.
- *
- * @version 1.0.8
- *
- */
-]]></add>
+			<search position="replace" regexp="true"><![CDATA[ \* @version 1\.0\.\d]]></search>
+			<add><![CDATA[ * @version 1.0.8]]></add>
 		</operation>
 		<operation>
 			<search position="replace"><![CDATA[	if (!empty($modSettings['currentAttachmentUploadDir']))
@@ -1969,20 +1957,8 @@ function serializeToJson($variable, $save_callback = null)
 	</file>
 	<file name="SUBSDIR/Cache.subs.php">
 		<operation>
-			<search position="replace"><![CDATA[ * copyright:	2011 Simple Machines (http://www.simplemachines.org)
- * license:  	BSD, See included LICENSE.TXT for terms and conditions.
- *
- * @version 1.0.7
- *
- */
-]]></search>
-			<add><![CDATA[ * copyright:	2011 Simple Machines (http://www.simplemachines.org)
- * license:  	BSD, See included LICENSE.TXT for terms and conditions.
- *
- * @version 1.0.8
- *
- */
-]]></add>
+			<search position="replace" regexp="true"><![CDATA[ \* @version 1\.0\.\d]]></search>
+			<add><![CDATA[ * @version 1.0.8]]></add>
 		</operation>
 		<operation>
 			<search position="replace"><![CDATA[	if (function_exists('call_integration_hook') && isset($value))
