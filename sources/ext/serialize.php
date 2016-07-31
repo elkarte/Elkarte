@@ -4,7 +4,7 @@
  * @license Public Domain
  */
 
-namespace ElkArte\ext\upgradephp;
+namespace \ElkArte\ext\upgradephp;
 use \Exception;
 
 /*
