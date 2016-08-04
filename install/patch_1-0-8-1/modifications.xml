@@ -1,0 +1,149 @@
+<?xml version="1.0"?>
+<!DOCTYPE modification SYSTEM "http://www.elkarte.net/site/modification">
+<modification xmlns="http://www.elkarte.net/site/modification" xmlns:elk="http://www.elkarte.net/">
+
+	<id>Elkarte Contributors:ElkArte_1081_patch</id>
+	<version>1.0.0</version>
+	<file name="BOARDDIR/SSI.php">
+		<operation>
+			<search position="replace"><![CDATA[ * copyright:	2011 Simple Machines (http://www.simplemachines.org)
+ * license:		BSD, See included LICENSE.TXT for terms and conditions.
+ *
+ * @version 1.0.8
+ *
+ */
+]]></search>
+			<add><![CDATA[ * copyright:	2011 Simple Machines (http://www.simplemachines.org)
+ * license:		BSD, See included LICENSE.TXT for terms and conditions.
+ *
+ * @version 1.0.8.1
+ *
+ */
+]]></add>
+		</operation>
+		<operation>
+			<search position="replace"><![CDATA[define('ELK', 'SSI');
+
+// Shortcut for the browser cache stale
+define('CACHE_STALE', '?108');
+
+// We're going to want a few globals... these are all set later.
+global $time_start, $maintenance, $msubject, $mmessage, $mbname, $language;]]></search>
+			<add><![CDATA[define('ELK', 'SSI');
+
+// Shortcut for the browser cache stale
+define('CACHE_STALE', '?1081');
+
+// We're going to want a few globals... these are all set later.
+global $time_start, $maintenance, $msubject, $mmessage, $mbname, $language;]]></add>
+		</operation>
+	</file>
+	<file name="BOARDDIR/index.php">
+		<operation>
+			<search position="replace"><![CDATA[ * copyright:	2011 Simple Machines (http://www.simplemachines.org)
+ * license:		BSD, See included LICENSE.TXT for terms and conditions.
+ *
+ * @version 1.0.8
+ *
+ */
+
+$forum_version = 'ElkArte 1.0.8';
+define('FORUM_VERSION', $forum_version);
+
+// First things first, but not necessarily in that order.
+define('ELK', 1);
+
+// Shortcut for the browser cache stale
+define('CACHE_STALE', '?108');
+
+if (function_exists('set_magic_quotes_runtime'))
+	@set_magic_quotes_runtime(0);]]></search>
+			<add><![CDATA[ * copyright:	2011 Simple Machines (http://www.simplemachines.org)
+ * license:		BSD, See included LICENSE.TXT for terms and conditions.
+ *
+ * @version 1.0.8.1
+ *
+ */
+
+$forum_version = 'ElkArte 1.0.8.1';
+define('FORUM_VERSION', $forum_version);
+
+// First things first, but not necessarily in that order.
+define('ELK', 1);
+
+// Shortcut for the browser cache stale
+define('CACHE_STALE', '?1081');
+
+if (function_exists('set_magic_quotes_runtime'))
+	@set_magic_quotes_runtime(0);]]></add>
+		</operation>
+	</file>
+	<file name="SUBSDIR/ScheduledTasks.subs.php">
+		<operation>
+			<search position="replace"><![CDATA[ * @copyright ElkArte Forum contributors
+ * @license   BSD http://opensource.org/licenses/BSD-3-Clause
+ *
+ * @version 1.0.8
+ *
+ */
+]]></search>
+			<add><![CDATA[ * @copyright ElkArte Forum contributors
+ * @license   BSD http://opensource.org/licenses/BSD-3-Clause
+ *
+ * @version 1.0.8.1
+ *
+ */
+]]></add>
+		</operation>
+		<operation>
+			<search position="replace"><![CDATA[
+	// Log that we did it ;)
+	if ($completed)
+	{
+		// Taking care of scheduleTaskImmediate having a maximum of 10 "fast" executions
+		$scheduleTaskImmediate = Util::unserialize($modSettings['scheduleTaskImmediate']);
+		if (!empty($scheduleTaskImmediate) && isset($scheduleTaskImmediate[$task_name]))
+		{]]></search>
+			<add><![CDATA[
+	$scheduleTaskImmediate = !empty($modSettings['scheduleTaskImmediate']) ? Util::unserialize($modSettings['scheduleTaskImmediate']) : array();
+	// Log that we did it ;)
+	if ($completed)
+	{
+		// Taking care of scheduleTaskImmediate having a maximum of 10 "fast" executions
+		if (!empty($scheduleTaskImmediate) && isset($scheduleTaskImmediate[$task_name]))
+		{]]></add>
+		</operation>
+	</file>
+	<file name="SUBSDIR/ScheduledTasks.class.php">
+		<operation>
+			<search position="replace"><![CDATA[ * Simple Machines Forum (SMF)
+ * copyright:	2011 Simple Machines (http://www.simplemachines.org)
+ * license:  	BSD, See included LICENSE.TXT for terms and conditions.
+ *
+ * @version 1.0.5
+ *
+ */
+]]></search>
+			<add><![CDATA[ * Simple Machines Forum (SMF)
+ * copyright:	2011 Simple Machines (http://www.simplemachines.org)
+ * license:  	BSD, See included LICENSE.TXT for terms and conditions.
+ *
+ * @version 1.0.8.1
+ *
+ */
+]]></add>
+		</operation>
+		<operation>
+			<search position="replace"><![CDATA[		$db = database();
+		$user_access_mentions = Util::unserialize($modSettings['user_access_mentions']);
+
+		// This should be set only because of an immediate scheduled task, so higher priority
+]]></search>
+			<add><![CDATA[		$db = database();
+		$user_access_mentions = !empty($modSettings['user_access_mentions']) ? Util::unserialize($modSettings['user_access_mentions']) : array();
+
+		// This should be set only because of an immediate scheduled task, so higher priority
+]]></add>
+		</operation>
+	</file>
+</modification>
