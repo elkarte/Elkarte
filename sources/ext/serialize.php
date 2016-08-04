@@ -9,9 +9,9 @@ namespace ElkArte\ext\upgradephp;
 /*
  * Used to impose practical limits for safe_unserialize()
  */
-define('MAX_SERIALIZED_INPUT_LENGTH', 4096);
-define('MAX_SERIALIZED_ARRAY_LENGTH', 256);
-define('MAX_SERIALIZED_ARRAY_DEPTH', 3);
+define('MAX_SERIALIZED_INPUT_LENGTH', 4194304);
+define('MAX_SERIALIZED_ARRAY_LENGTH', 2048);
+define('MAX_SERIALIZED_ARRAY_DEPTH', 24);
 
 
 /**

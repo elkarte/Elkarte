@@ -16,7 +16,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:		BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0.3
+ * @version 1.0.8.1
  *
  */
 
@@ -106,6 +106,10 @@ function loadSession()
 	}
 
 	$sc = $_SESSION['session_value'];
+	// This is here only to avoid session errors in PHP7
+	// microtime effectively forces the replacing of the session in the db each
+	// time the page is loaded
+	$_SESSION['mictrotime'] = microtime();
 }
 
 /**
