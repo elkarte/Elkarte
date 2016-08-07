@@ -7,7 +7,7 @@
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
- * @version 1.0.8
+ * @version 1.0.9
  *
  */
 
@@ -55,10 +55,10 @@ function calculateNextTrigger($tasks = array(), $forceUpdate = false)
 		)
 	);
 	$tasks = array();
+	$scheduleTaskImmediate = !empty($modSettings['scheduleTaskImmediate']) ? Util::unserialize($modSettings['scheduleTaskImmediate']) : array();
 	while ($row = $db->fetch_assoc($request))
 	{
 		// scheduleTaskImmediate is a way to speed up scheduled tasts and fire them as fast as possible
-		$scheduleTaskImmediate = Util::unserialize($modSettings['scheduleTaskImmediate']);
 		if (!empty($scheduleTaskImmediate) && isset($scheduleTaskImmediate[$row['task']]))
 			$next_time = next_time(1, '', rand(0, 60), true);
 		else
@@ -614,11 +614,11 @@ function run_this_task($id_task, $task_name)
 		}
 	}
 
+	$scheduleTaskImmediate = !empty($modSettings['scheduleTaskImmediate']) ? Util::unserialize($modSettings['scheduleTaskImmediate']) : array();
 	// Log that we did it ;)
-	if ($completed && !empty($modSettings['scheduleTaskImmediate']))
+	if ($completed)
 	{
 		// Taking care of scheduleTaskImmediate having a maximum of 10 "fast" executions
-		$scheduleTaskImmediate = Util::unserialize($modSettings['scheduleTaskImmediate']);
 		if (!empty($scheduleTaskImmediate) && isset($scheduleTaskImmediate[$task_name]))
 		{
 			$scheduleTaskImmediate[$task_name]++;

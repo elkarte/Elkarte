@@ -14,7 +14,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:		BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0.8
+ * @version 1.0.9
  *
  */
 
@@ -25,7 +25,7 @@ if (defined('ELK'))
 define('ELK', 'SSI');
 
 // Shortcut for the browser cache stale
-define('CACHE_STALE', '?108');
+define('CACHE_STALE', '?109');
 
 // We're going to want a few globals... these are all set later.
 global $time_start, $maintenance, $msubject, $mmessage, $mbname, $language;
@@ -158,6 +158,10 @@ else
 		$_SESSION['session_value'] = md5(session_id() . mt_rand());
 	}
 	$sc = $_SESSION['session_value'];
+	// This is here only to avoid session errors in PHP7
+	// microtime effectively forces the replacing of the session in the db each
+	// time the page is loaded
+	$_SESSION['mictrotime'] = microtime();
 }
 
 // Get rid of $board and $topic... do stuff loadBoard would do.
