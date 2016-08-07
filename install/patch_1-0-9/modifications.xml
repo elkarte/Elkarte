@@ -37,6 +37,20 @@ define('CACHE_STALE', '?1081');
 // We're going to want a few globals... these are all set later.
 global $time_start, $maintenance, $msubject, $mmessage, $mbname, $language;]]></add>
 		</operation>
+		<operation>
+			<search position="replace"><![CDATA[
+	$sc = $_SESSION['session_value'];
+}
+]]></search>
+			<add><![CDATA[
+	$sc = $_SESSION['session_value'];
+	// This is here only to avoid session errors in PHP7
+	// microtime effectively forces the replacing of the session in the db each
+	// time the page is loaded
+	$_SESSION['mictrotime'] = microtime();
+}
+]]></add>
+		</operation>
 	</file>
 	<file name="BOARDDIR/index.php">
 		<operation>
