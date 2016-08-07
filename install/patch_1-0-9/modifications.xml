@@ -142,4 +142,36 @@ if (function_exists('set_magic_quotes_runtime'))
 ]]></add>
 		</operation>
 	</file>
+	<file name="SOURCEDIR/Session.php">
+		<operation>
+			<search position="replace"><![CDATA[ * copyright:	2011 Simple Machines (http://www.simplemachines.org)
+ * license:		BSD, See included LICENSE.TXT for terms and conditions.
+ *
+ * @version 1.0.3
+ *
+ */
+]]></search>
+			<add><![CDATA[ * copyright:	2011 Simple Machines (http://www.simplemachines.org)
+ * license:		BSD, See included LICENSE.TXT for terms and conditions.
+ *
+ * @version 1.0.9
+ *
+ */
+]]></add>
+		</operation>
+		<operation>
+			<search position="replace"><![CDATA[
+	$sc = $_SESSION['session_value'];
+}
+]]></search>
+			<add><![CDATA[
+	$sc = $_SESSION['session_value'];
+	// This is here only to avoid session errors in PHP7
+	// microtime effectively forces the replacing of the session in the db each
+	// time the page is loaded
+	$_SESSION['mictrotime'] = microtime();
+}
+]]></add>
+		</operation>
+	</file>
 </modification>
