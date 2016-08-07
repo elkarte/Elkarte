@@ -130,24 +130,6 @@ if (function_exists('set_magic_quotes_runtime'))
 	</file>
 	<file name="SUBSDIR/ScheduledTask.class.php">
 		<operation>
-			<search position="replace"><![CDATA[ * Simple Machines Forum (SMF)
- * copyright:	2011 Simple Machines (http://www.simplemachines.org)
- * license:  	BSD, See included LICENSE.TXT for terms and conditions.
- *
- * @version 1.0.8
- *
- */
-]]></search>
-			<add><![CDATA[ * Simple Machines Forum (SMF)
- * copyright:	2011 Simple Machines (http://www.simplemachines.org)
- * license:  	BSD, See included LICENSE.TXT for terms and conditions.
- *
- * @version 1.0.9
- *
- */
-]]></add>
-		</operation>
-		<operation>
 			<search position="replace"><![CDATA[		$db = database();
 		$user_access_mentions = Util::unserialize($modSettings['user_access_mentions']);
 
