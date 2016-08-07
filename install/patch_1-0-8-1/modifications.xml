@@ -113,14 +113,28 @@ if (function_exists('set_magic_quotes_runtime'))
 		if (!empty($scheduleTaskImmediate) && isset($scheduleTaskImmediate[$task_name]))
 		{]]></add>
 		</operation>
+		<operation>
+			<search position="replace"><![CDATA[	$tasks = array();
+	while ($row = $db->fetch_assoc($request))
+	{
+		// scheduleTaskImmediate is a way to speed up scheduled tasts and fire them as fast as possible
+		$scheduleTaskImmediate = Util::unserialize($modSettings['scheduleTaskImmediate']);
+		if (!empty($scheduleTaskImmediate) && isset($scheduleTaskImmediate[$row['task']]))]]></search>
+			<add><![CDATA[	$tasks = array();
+	$scheduleTaskImmediate = !empty($modSettings['scheduleTaskImmediate']) ? Util::unserialize($modSettings['scheduleTaskImmediate']) : array();
+	while ($row = $db->fetch_assoc($request))
+	{
+		// scheduleTaskImmediate is a way to speed up scheduled tasts and fire them as fast as possible
+		if (!empty($scheduleTaskImmediate) && isset($scheduleTaskImmediate[$row['task']]))]]></add>
+		</operation>
 	</file>
-	<file name="SUBSDIR/ScheduledTasks.class.php">
+	<file name="SUBSDIR/ScheduledTask.class.php">
 		<operation>
 			<search position="replace"><![CDATA[ * Simple Machines Forum (SMF)
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0.5
+ * @version 1.0.8
  *
  */
 ]]></search>
