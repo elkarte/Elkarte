@@ -16,7 +16,7 @@
 			<add><![CDATA[ * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:		BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0.8.1
+ * @version 1.0.9
  *
  */
 ]]></add>
@@ -61,11 +61,11 @@ if (function_exists('set_magic_quotes_runtime'))
 			<add><![CDATA[ * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:		BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0.8.1
+ * @version 1.0.9
  *
  */
 
-$forum_version = 'ElkArte 1.0.8.1';
+$forum_version = 'ElkArte 1.0.9';
 define('FORUM_VERSION', $forum_version);
 
 // First things first, but not necessarily in that order.
@@ -90,7 +90,7 @@ if (function_exists('set_magic_quotes_runtime'))
 			<add><![CDATA[ * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
- * @version 1.0.8.1
+ * @version 1.0.9
  *
  */
 ]]></add>
@@ -142,7 +142,7 @@ if (function_exists('set_magic_quotes_runtime'))
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.0.8.1
+ * @version 1.0.9
  *
  */
 ]]></add>
