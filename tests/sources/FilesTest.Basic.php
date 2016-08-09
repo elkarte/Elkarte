@@ -146,17 +146,6 @@ class TestFiles extends PHPUnit_Framework_TestCase
  \*
  \* @version \d+\.\d+(?:\.\d+|\sdev|\s(beta|RC|Release Candidate)\s\d+)
 (?:(?: \*\n)?|(?: \*(?:\s.{0,200})?\n))+ \*\/',
-			// ILA-specific
-			'^<\?php
-
-\/\*\*
- \* @name      Inline Attachments \(ILA\)
- \* @license   Mozilla Public License version 1\.1 http:\/\/www\.mozilla\.org\/MPL\/1\.1\/\.
- \* @author    Spuds
- \* @copyright \(c\) 2014 Spuds
- \*
- \* @version \d+\.\d+(?:\.\d+|\sdev|\s(beta|RC|Release Candidate)\s\d+)
-(( \*\n)?|( \*(\s.{0,200})?\n))+ \*\/',
 		);
 		foreach ($this->_ourFiles as $file)
 		{
