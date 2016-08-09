@@ -385,8 +385,6 @@ function createPoll($question, $id_member, $poster_name, $max_votes = 1, $hide_r
  */
 function modifyPoll($id_poll, $question, $max_votes = 1, $hide_results = 1, $expire = 0, $can_change_vote = 0, $can_guest_vote = 0)
 {
-	$expire = $expire <= 0 ? 0 : ($expire <= 9999 ? time() + $expire * 3600 * 24 : $expire);
-
 	$db = database();
 
 	$db->query('', '

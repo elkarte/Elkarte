@@ -52,10 +52,10 @@ function calculateNextTrigger($tasks = array(), $forceUpdate = false)
 		)
 	);
 	$tasks = array();
+	$scheduleTaskImmediate = !empty($modSettings['scheduleTaskImmediate']) ? Util::unserialize($modSettings['scheduleTaskImmediate']) : array();
 	while ($row = $db->fetch_assoc($request))
 	{
 		// scheduleTaskImmediate is a way to speed up scheduled tasks and fire them as fast as possible
-		$scheduleTaskImmediate = @unserialize($modSettings['scheduleTaskImmediate']);
 		if (!empty($scheduleTaskImmediate) && isset($scheduleTaskImmediate[$row['task']]))
 			$next_time = next_time(1, '', rand(0, 60), true);
 		else
@@ -582,11 +582,11 @@ function run_this_task($id_task, $task_name)
 	else
 		$completed = run_this_task_compat($task_name);
 
+	$scheduleTaskImmediate = !empty($modSettings['scheduleTaskImmediate']) ? Util::unserialize($modSettings['scheduleTaskImmediate']) : array();
 	// Log that we did it ;)
 	if ($completed)
 	{
 		// Taking care of scheduleTaskImmediate having a maximum of 10 "fast" executions
-		$scheduleTaskImmediate = @unserialize($modSettings['scheduleTaskImmediate']);
 		if (!empty($scheduleTaskImmediate) && isset($scheduleTaskImmediate[$task_name]))
 		{
 			$scheduleTaskImmediate[$task_name]++;

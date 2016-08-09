@@ -840,7 +840,7 @@ class Verification_Controls_Questions implements Verification_Controls
 			$question_answers[$row['id_question']] = array(
 				'id_question' => $row['id_question'],
 				'question' => $row['question'],
-				'answer' => unserialize($row['answer']),
+				'answer' => Util::unserialize($row['answer']),
 				'language' => $row['language'],
 			);
 		}

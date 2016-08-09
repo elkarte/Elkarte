@@ -73,7 +73,21 @@ class ModerationCenter_Controller extends Action_Controller
 		loadLanguage('ModerationCenter');
 		loadCSSFile('admin.css');
 
-		$context['admin_preferences'] = !empty($options['admin_preferences']) ? unserialize($options['admin_preferences']) : array();
+		if (!empty($options['admin_preferences']))
+		{
+			$context['admin_preferences'] = serializeToJson($options['admin_preferences'], function($array_form) {
+				global $context;
+
+				$context['admin_preferences'] = $array_form;
+				require_once(SUBSDIR . '/Admin.subs.php');
+				updateAdminPreferences();
+			});
+		}
+		else
+		{
+			$context['admin_preferences'] = array();
+		}
+
 		$context['robot_no_index'] = true;
 
 		// Moderation counts for things that this moderator can take care of
@@ -1232,7 +1246,7 @@ class ModerationCenter_Controller extends Action_Controller
 		if (!empty($this->_req->post->params) && empty($this->_req->post->is_search))
 		{
 			$search_params = base64_decode(strtr($this->_req->post->params, array(' ' => '+')));
-			$search_params = @unserialize($search_params);
+			$search_params = @json_decode($search_params);
 		}
 
 		// This array houses all the valid search types.
@@ -1262,7 +1276,7 @@ class ModerationCenter_Controller extends Action_Controller
 		);
 
 		// Setup the search context.
-		$context['search_params'] = empty($search_params['string']) ? '' : base64_encode(serialize($search_params));
+		$context['search_params'] = empty($search_params['string']) ? '' : base64_encode(json_encode($search_params));
 		$context['search'] = array(
 			'string' => $search_params['string'],
 			'type' => $search_params['type'],

@@ -1424,7 +1424,7 @@ class ManageMaillist_Controller extends Action_Controller
 
 		// Load any existing email => board values used for new topic creation
 		$context['maillist_from_to_board'] = array();
-		$data = (!empty($modSettings['maillist_receiving_address'])) ? unserialize($modSettings['maillist_receiving_address']) : array();
+		$data = (!empty($modSettings['maillist_receiving_address'])) ? Util::unserialize($modSettings['maillist_receiving_address']) : array();
 		foreach ($data as $key => $addr)
 		{
 			$context['maillist_from_to_board'][$key] = array(

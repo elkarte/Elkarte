@@ -12,10 +12,77 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:		BSD, See included LICENSE.TXT for terms and conditions.
  *
+<<<<<<< HEAD
  * @version 1.1 beta 1
  *
  */
 
+=======
+ * @version 1.0.9
+ *
+ */
+
+// Don't do anything if ElkArte is already loaded.
+if (defined('ELK'))
+	return true;
+
+define('ELK', 'SSI');
+
+// Shortcut for the browser cache stale
+define('CACHE_STALE', '?109');
+
+// We're going to want a few globals... these are all set later.
+global $time_start, $maintenance, $msubject, $mmessage, $mbname, $language;
+global $boardurl, $webmaster_email, $cookiename;
+global $db_server, $db_name, $db_user, $db_prefix, $db_persist, $db_error_send, $db_last_error;
+global $modSettings, $context, $sc, $user_info, $topic, $board, $txt;
+global $ssi_db_user, $scripturl, $ssi_db_passwd, $db_passwd;
+global $sourcedir, $boarddir;
+
+// Remember the current configuration so it can be set back.
+$ssi_magic_quotes_runtime = function_exists('get_magic_quotes_gpc') && get_magic_quotes_runtime();
+if (function_exists('set_magic_quotes_runtime'))
+	@set_magic_quotes_runtime(0);
+$time_start = microtime(true);
+
+// Just being safe...
+foreach (array('db_character_set', 'cachedir') as $variable)
+	if (isset($GLOBALS[$variable]))
+		unset($GLOBALS[$variable]);
+
+// Get the forum's settings for database and file paths.
+require_once(dirname(__FILE__) . '/Settings.php');
+
+// Fix for using the current directory as a path.
+if (substr($sourcedir, 0, 1) == '.' && substr($sourcedir, 1, 1) != '.')
+	$sourcedir = dirname(__FILE__) . substr($sourcedir, 1);
+
+// Make sure the paths are correct... at least try to fix them.
+if (!file_exists($boarddir) && file_exists(dirname(__FILE__) . '/agreement.txt'))
+	$boarddir = dirname(__FILE__);
+if (!file_exists($sourcedir) && file_exists($boarddir . '/sources'))
+	$sourcedir = $boarddir . '/sources';
+
+// Check that directories which didn't exist in past releases are initialized.
+if ((empty($cachedir) || !file_exists($cachedir)) && file_exists($boarddir . '/cache'))
+	$cachedir = $boarddir . '/cache';
+if ((empty($extdir) || !file_exists($extdir)) && file_exists($sourcedir . '/ext'))
+	$extdir = $sourcedir . '/ext';
+if ((empty($languagedir) || !file_exists($languagedir)) && file_exists($boarddir . '/themes/default/languages'))
+	$languagedir = $boarddir . '/themes/default/languages';
+
+// Time to forget about variables and go with constants!
+DEFINE('BOARDDIR', $boarddir);
+DEFINE('CACHEDIR', $cachedir);
+DEFINE('EXTDIR', $extdir);
+DEFINE('LANGUAGEDIR', $languagedir);
+DEFINE('SOURCEDIR', $sourcedir);
+DEFINE('ADMINDIR', $sourcedir . '/admin');
+DEFINE('CONTROLLERDIR', $sourcedir . '/controllers');
+DEFINE('SUBSDIR', $sourcedir . '/subs');
+unset($boarddir, $cachedir, $sourcedir, $languagedir, $extdir);
+
+$ssi_error_reporting = error_reporting(E_ALL | E_STRICT);
 /**
  * Set this to one of three values depending on what you want to happen in the case of a fatal error.
  *  - false: Default, will just load the error sub template and die - not putting any theme layers around it.
@@ -24,6 +91,7 @@
  */
 $ssi_on_error_method = false;
 
+<<<<<<< HEAD
 /**
  * Don't do john didley if the forum's been shut down competely.
  */
@@ -1607,7 +1675,7 @@ function ssi_boardNews($board = null, $limit = null, $start = null, $length = nu
 			$preview = 'first';
 
 		$row['body'] = $row[$preview . '_body'];
-		$row['subject'] = $row[$preview . '_body'];
+		$row['subject'] = $row[$preview . '_subject'];
 		$row['id_msg'] = $row['id_' . $preview . '_msg'];
 		$row['icon'] = $row[$preview . '_icon'];
 		$row['id_member'] = $row[$preview . '_id_member'];

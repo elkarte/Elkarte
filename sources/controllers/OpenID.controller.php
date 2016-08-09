@@ -97,7 +97,7 @@ class OpenID_Controller extends Action_Controller
 			Errors::instance()->fatal_lang_error('openid_load_data');
 
 		// Any save fields to restore?
-		$openid_save_fields = isset($this->_req->query->sf) ? json_decode(base64_decode($this->_req->query->sf)) : array();
+		$openid_save_fields = isset($this->_req->query->sf) ? json_decode(base64_decode($this->_req->query->sf), true) : array();
 		$context['openid_claimed_id'] = $this->_req->query->openid_claimed_id;
 
 		// Is there a user with this OpenID_uri?
