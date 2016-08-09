@@ -27,7 +27,7 @@ class TestCurl_Fetch_Webdata extends PHPUnit_Framework_TestCase
 				'https://duckduckgo.com/html',
 				array('q' => 'elkarte', 'ia' => 'about'),
 				200,
-				'Software description: ElkArte Forum. A free, open source, PHP-based discussion forum (PHP).',
+				'is a modern, powerful community building forum software. It is completely free to use and is licensed with an open source BSD-3 clause license.',
 			),
 		);
 
