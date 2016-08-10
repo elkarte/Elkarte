@@ -122,7 +122,7 @@ function reloadSettings()
 	// Integration is cool.
 	if (defined('ELK_INTEGRATION_SETTINGS'))
 	{
-		$integration_settings = unserialize(ELK_INTEGRATION_SETTINGS);
+		$integration_settings = Util::unserialize(ELK_INTEGRATION_SETTINGS);
 		foreach ($integration_settings as $hook => $function)
 			add_integration_function($hook, $function);
 	}
@@ -176,19 +176,21 @@ function loadUserSettings()
 
 	if (empty($id_member) && isset($_COOKIE[$cookiename]))
 	{
-		// Fix a security hole in PHP 4.3.9 and below...
-		if (preg_match('~^a:[34]:\{i:0;i:\d{1,8};i:1;s:(0|64):"([a-fA-F0-9]{64})?";i:2;[id]:\d{1,14};(i:3;i:\d;)?\}$~i', $_COOKIE[$cookiename]) == 1)
-		{
-			list ($id_member, $password) = @unserialize($_COOKIE[$cookiename]);
-			$id_member = !empty($id_member) && strlen($password) > 0 ? (int) $id_member : 0;
-		}
-		else
-			$id_member = 0;
+		list ($id_member, $password) = serializeToJson($_COOKIE[$cookiename], function ($array_from) use ($cookiename) {
+			global $modSettings;
+
+			require_once(SUBSDIR . '/Auth.subs.php');
+			$_COOKIE[$cookiename] = json_encode($array_from);
+			setLoginCookie(60 * $modSettings['cookieTime'], $array_from[0], $array_from[1]);
+		});
+		$id_member = !empty($id_member) && strlen($password) > 0 ? (int) $id_member : 0;
 	}
 	elseif (empty($id_member) && isset($_SESSION['login_' . $cookiename]) && ($_SESSION['USER_AGENT'] == $req->user_agent() || !empty($modSettings['disableCheckUA'])))
 	{
 		// @todo Perhaps we can do some more checking on this, such as on the first octet of the IP?
-		list ($id_member, $password, $login_span) = @unserialize($_SESSION['login_' . $cookiename]);
+		list ($id_member, $password, $login_span) = serializeToJson($_SESSION['login_' . $cookiename], function ($array_from) use ($cookiename) {
+			$_SESSION['login_' . $cookiename] = json_encode($array_from);
+		});
 		$id_member = !empty($id_member) && strlen($password) == 64 && $login_span > time() ? (int) $id_member : 0;
 	}
 
@@ -341,6 +343,7 @@ function loadUserSettings()
 		'language' => empty($user_settings['lngfile']) || empty($modSettings['userLanguage']) ? $language : $user_settings['lngfile'],
 		'is_guest' => $id_member == 0,
 		'is_admin' => in_array(1, $user_info['groups']),
+		'is_mod' => false,
 		'theme' => empty($user_settings['id_theme']) ? 0 : $user_settings['id_theme'],
 		'last_login' => empty($user_settings['last_login']) ? 0 : $user_settings['last_login'],
 		'ip' => $req->client_ip(),
@@ -1111,7 +1114,7 @@ function loadMemberContext($user, $display_custom_fields = false)
 	if ($display_custom_fields && !empty($modSettings['displayFields']))
 	{
 		if (!isset($context['display_fields']))
-			$context['display_fields'] = unserialize($modSettings['displayFields']);
+			$context['display_fields'] = Util::unserialize($modSettings['displayFields']);
 
 		foreach ($context['display_fields'] as $custom)
 		{
@@ -1381,10 +1384,38 @@ function loadTheme($id_theme = 0, $initialize = true)
 	loadUserContext();
 
 	// Set up some additional interface preference context
-	$context['admin_preferences'] = !empty($options['admin_preferences']) ? unserialize($options['admin_preferences']) : array();
+	if (!empty($options['admin_preferences']))
+	{
+		$context['admin_preferences'] = serializeToJson($options['admin_preferences'], function($array_form) {
+			global $context;
+
+			$context['admin_preferences'] = $array_form;
+			require_once(SUBSDIR . '/Admin.subs.php');
+			updateAdminPreferences();
+		});
+	}
+	else
+	{
+		$context['admin_preferences'] = array();
+	}
 
 	if (!$user_info['is_guest'])
-		$context['minmax_preferences'] = !empty($options['minmax_preferences']) ? unserialize($options['minmax_preferences']) : array();
+	{
+		if (!empty($options['minmax_preferences']))
+		{
+			$context['minmax_preferences'] = serializeToJson($options['minmax_preferences'], function($array_form) {
+				global $settings, $user_info;
+
+				// Update the option.
+				require_once(SUBSDIR . '/Themes.subs.php');
+				updateThemeOptions(array($settings['theme_id'], $user_info['id'], 'minmax_preferences', json_encode($array_form)));
+			});
+		}
+		else
+		{
+			$context['minmax_preferences'] = array();
+		}
+	}
 	// Guest may have collapsed the header, check the cookie to prevent collapse jumping
 	elseif ($user_info['is_guest'] && isset($_COOKIE['upshrink']))
 		$context['minmax_preferences'] = array('upshrink' => $_COOKIE['upshrink']);
@@ -2684,4 +2715,38 @@ function loadBBCParsers()
 			$disabledBBC = $modSettings['disabledBBC'];
 		\BBC\ParserWrapper::getInstance()->setDisabled(empty($disabledBBC) ? array() : (array) $disabledBBC);
 	}
+
+	return 1;
+}
+
+/**
+ * This is necessary to support data stored in the pre-1.0.8 way (i.e. serialized)
+ *
+ * @param string $variable The string to convert
+ * @param null|callable $save_callback The function that will save the data to the db
+ * @return mixed[] the array
+ */
+function serializeToJson($variable, $save_callback = null)
+{
+	$array_form = json_decode($variable, true);
+
+	// decoding failed, let's try with unserialize
+	if ($array_form === null)
+	{
+		$array_form = Util::unserialize($variable);
+
+		// If unserialize fails as well, let's just store an empty array
+		if ($array_form === false)
+		{
+			$array_form = array();
+		}
+
+		// Time to update the value if necessary
+		if ($save_callback !== null)
+		{
+			$save_callback($array_form);
+		}
+	}
+
+	return $array_form;
 }

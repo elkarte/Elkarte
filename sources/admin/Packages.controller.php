@@ -585,7 +585,7 @@ class Packages_Controller extends Action_Controller
 				if (empty($change))
 					continue;
 
-				$theme_data = json_decode(base64_decode($change));
+				$theme_data = json_decode(base64_decode($change), true);
 				if (empty($theme_data['type']))
 					continue;
 
@@ -1322,7 +1322,7 @@ class Packages_Controller extends Action_Controller
 			unset($context['file_tree'][strtr(BOARDDIR, array('\\' => '/'))]['contents']['attachments']);
 
 			if (!is_array($modSettings['attachmentUploadDir']))
-				$modSettings['attachmentUploadDir'] = unserialize($modSettings['attachmentUploadDir']);
+				$modSettings['attachmentUploadDir'] = Util::unserialize($modSettings['attachmentUploadDir']);
 
 			// @todo Should we suggest non-current directories be read only?
 			foreach ($modSettings['attachmentUploadDir'] as $dir)
@@ -1422,7 +1422,7 @@ class Packages_Controller extends Action_Controller
 		// Have we got a load of back-catalogue trees to expand from a submit etc?
 		if (!empty($this->_req->query->back_look))
 		{
-			$potententialTrees = json_decode(base64_decode($this->_req->query->back_look));
+			$potententialTrees = json_decode(base64_decode($this->_req->query->back_look), true);
 			foreach ($potententialTrees as $tree)
 				$context['look_for'][] = $tree;
 		}
@@ -1509,7 +1509,7 @@ class Packages_Controller extends Action_Controller
 
 			// Continuing?
 			if (isset($this->_req->post->toProcess))
-				$this->_req->post->permStatus = json_decode(base64_decode($this->_req->post->toProcess));
+				$this->_req->post->permStatus = json_decode(base64_decode($this->_req->post->toProcess), true);
 
 			if (isset($this->_req->post->permStatus))
 			{
@@ -1550,7 +1550,7 @@ class Packages_Controller extends Action_Controller
 
 				// Nothing to do?
 				if (empty($context['to_process']))
-					redirectexit('action=admin;area=packages;sa=perms' . (!empty($context['back_look_data']) ? ';back_look=' . base64_encode(json_decode($context['back_look_data'])) : '') . ';' . $context['session_var'] . '=' . $context['session_id']);
+					redirectexit('action=admin;area=packages;sa=perms' . (!empty($context['back_look_data']) ? ';back_look=' . base64_encode(json_encode($context['back_look_data'])) : '') . ';' . $context['session_var'] . '=' . $context['session_id']);
 			}
 			// Should never get here,
 			else
@@ -1589,7 +1589,7 @@ class Packages_Controller extends Action_Controller
 		{
 			$context['predefined_type'] = $this->_req->getPost('predefined', 'trim|strval', 'restricted');
 			$context['total_items'] = $this->_req->getPost('totalItems', 'intval', 0);
-			$context['directory_list'] = isset($this->_req->post->dirList) ? json_decode(base64_decode($this->_req->post->dirList)) : array();
+			$context['directory_list'] = isset($this->_req->post->dirList) ? json_decode(base64_decode($this->_req->post->dirList), true) : array();
 			$context['file_offset'] = $this->_req->getPost('fileOffset', 'intval', 0);
 
 			// Haven't counted the items yet?
@@ -1618,7 +1618,7 @@ class Packages_Controller extends Action_Controller
 			elseif ($context['predefined_type'] === 'free')
 				$context['special_files'] = array();
 			else
-				$context['special_files'] = json_decode(base64_decode($this->_req->post->specialFiles));
+				$context['special_files'] = json_decode(base64_decode($this->_req->post->specialFiles), true);
 
 			// Now we definitely know where we are, we need to go through again doing the chmod!
 			foreach ($context['directory_list'] as $path => $dummy)
@@ -1679,7 +1679,7 @@ class Packages_Controller extends Action_Controller
 		}
 
 		// If we're here we are done!
-		redirectexit('action=admin;area=packages;sa=perms' . (!empty($context['back_look_data']) ? ';back_look=' . base64_encode(serialize($context['back_look_data'])) : '') . ';' . $context['session_var'] . '=' . $context['session_id']);
+		redirectexit('action=admin;area=packages;sa=perms' . (!empty($context['back_look_data']) ? ';back_look=' . base64_encode(json_decode($context['back_look_data'], true)) : '') . ';' . $context['session_var'] . '=' . $context['session_id']);
 	}
 
 	/**

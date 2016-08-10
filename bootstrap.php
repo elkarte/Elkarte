@@ -207,6 +207,10 @@ else
 	}
 
 	$sc = $_SESSION['session_value'];
+	// This is here only to avoid session errors in PHP7
+	// microtime effectively forces the replacing of the session in the db each
+	// time the page is loaded
+	$_SESSION['mictrotime'] = microtime();
 }
 
 // Get rid of $board and $topic... do stuff loadBoard would do.

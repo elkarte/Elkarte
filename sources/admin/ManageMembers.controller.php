@@ -263,7 +263,7 @@ class ManageMembers_Controller extends Action_Controller
 
 			$search_params = array();
 			if ($context['sub_action'] == 'query' && !empty($this->_req->query->params) && empty($this->_req->post->types))
-				$search_params = @json_decode(base64_decode($this->_req->query->params));
+				$search_params = @json_decode(base64_decode($this->_req->query->params), true);
 			elseif (!empty($this->_req->post))
 			{
 				$search_params['types'] = $this->_req->post->types;

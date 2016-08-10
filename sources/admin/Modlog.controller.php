@@ -91,7 +91,7 @@ class Modlog_Controller extends Action_Controller
 		if (!empty($this->_req->post->params) && empty($this->_req->post->is_search))
 		{
 			$search_params = base64_decode(strtr($this->_req->post->params, array(' ' => '+')));
-			$search_params = @json_decode($search_params);
+			$search_params = @json_decode($search_params, true);
 		}
 
 		// This array houses all the valid quick search types.

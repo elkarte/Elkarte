@@ -45,7 +45,7 @@ class TestAuthsubs extends PHPUnit_Framework_TestCase
 		setLoginCookie(60 * 60, $user_profile[1]['id_member'], hash('sha256', $this->passwd . $salt));
 
 		// Cookie should be set, with our values
-		$array = @unserialize($_COOKIE[$cookiename]);
+		$array = json_decode($_COOKIE[$cookiename]);
 		$this->assertEquals($array[1], hash('sha256', $this->passwd . $salt));
 	}
 

@@ -10,15 +10,12 @@
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
- * @version 1.1 beta 1
+ * @version 1.0.5
  *
  */
 
-// This die was left on purpose, because BB is special
 if (!defined('ELK'))
-{
 	die('No access...');
-}
 
 define('BB2_CWD', dirname(__FILE__));
 
@@ -259,7 +256,7 @@ function bb2_read_whitelist()
 		$whitelist[$list] = array();
 		if (!empty($modSettings[$list]))
 		{
-			$whitelist[$list] = Util::unserialize($modSettings[$list]);
+			$whitelist[$list] = unserialize($modSettings[$list]);
 			$whitelist[$list] = array_filter($whitelist[$list]);
 		}
 	}
@@ -351,10 +348,10 @@ function bb2_insert_stats($force = false)
 	if ($force || $settings['display_stats'])
 	{
 		// Get the blocked count for the last 7 days ... cache this as well
-		if (!Cache::instance()->getVar($bb2_blocked, 'bb2_blocked', 900))
+		if (($bb2_blocked = cache_get_data('bb2_blocked', 900)) === null)
 		{
 			$bb2_blocked = bb2_db_query('SELECT COUNT(*) FROM {db_prefix}log_badbehavior WHERE `valid` NOT LIKE \'00000000\'');
-			Cache::instance()->put('bb2_blocked', $bb2_blocked, 900);
+			cache_put_data('bb2_blocked', $bb2_blocked, 900);
 		}
 
 		if ($bb2_blocked !== false)
