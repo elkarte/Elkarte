@@ -1089,7 +1089,6 @@ function loadMemberContext($user, $display_custom_fields = false)
 				'member_online_text' => sprintf($txt[$profile['is_online'] ? 'member_is_online' : 'member_is_offline'], Util::htmlspecialchars($profile['real_name'])),
 				'href' => $scripturl . '?action=pm;sa=send;u=' . $profile['id_member'],
 				'link' => '<a href="' . $scripturl . '?action=pm;sa=send;u=' . $profile['id_member'] . '">' . $txt[$profile['is_online'] ? 'online' : 'offline'] . '</a>',
-				'image_href' => $settings['images_url'] . '/profile/' . ($profile['buddy'] ? 'buddy_' : '') . ($profile['is_online'] ? 'useron' : 'useroff') . '.png',
 				'label' => $txt[$profile['is_online'] ? 'online' : 'offline']
 			),
 			'language' => Util::ucwords(strtr($profile['lngfile'], array('_' => ' '))),
@@ -2517,6 +2516,7 @@ function determineAvatar($profile)
 		if (!empty($settings))
 		{
 			// Let's proceed with the default avatar.
+			// TODO: This should be incorporated into the theme.
 			$avatar = array(
 				'name' => '',
 				'image' => '<img class="avatar avatarresize" src="' . $settings['images_url'] . '/default_avatar.png" alt="" />',

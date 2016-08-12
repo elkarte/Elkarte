@@ -2778,6 +2778,12 @@ img.new_posts {
 	padding: 0 0 6px 16px;
 }
 
+.poll_gradient {
+	border-radius: .25em;
+	height: .75em;
+	border: 1px solid;
+}
+
 /* On to the posts */
 #quickreplybox, #forumposts, #searchform, #recentposts, #pmFolder, #topic_summary, #preview_section {
 	border-radius: 4px 4px 0 0;
