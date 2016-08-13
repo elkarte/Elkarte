@@ -113,7 +113,7 @@ template_ssi_above();
 		<?php if ($user_info['is_admin'])
 		{
 			?>
-			<h3>Advanced Functions <img class="help" title="Functions that require additional tweaking, not just copy and paste." src="<?php echo $settings['images_url']; ?>/helptopics.png" alt="" /></h3>
+			<h3>Advanced Functions <i class="helpicon i-help" title="Functions that require additional tweaking, not just copy and paste."></i></h3>
 			<ul>
 				<li><a href="#" onclick="showSSIBlock('ssi_showPoll');
 							return false;">Show Single Poll</a></li>

@@ -956,8 +956,8 @@ function loadPollContext($poll_id)
 			'id' => 'options-' . $i,
 			'percent' => $bar,
 			'votes' => $option['votes'],
-			'voted_this' => $option['voted_this'] != -1,
-			'bar' => '<span style="white-space: nowrap;"><img src="' . $settings['images_url'] . '/poll_' . ($context['right_to_left'] ? 'right' : 'left') . '.png" alt="" /><img src="' . $settings['images_url'] . '/poll_middle.png" style="width:' . $barWide . 'px; height: 12px;" alt="-" /><img src="' . $settings['images_url'] . '/poll_' . ($context['right_to_left'] ? 'left' : 'right') . '.png" alt="" /></span>',
+			'voted_this' => $option['voted_this'] != -1, /* Todo: I notice 'bar' here is not used in the theme any longer - only in SSI. */
+			'bar' => '<div class="poll_gradient" style="width: ' . $barWide . 'px;"></div>',
 			// Note: IE < 8 requires us to set a width on the container, too.
 			'bar_ndt' => $bar > 0 ? '<div class="bar" style="width: ' . $bar . '%;"><div style="width: ' . $bar . '%;"></div></div>' : '<div class="bar"></div>',
 			'bar_width' => $barWide,

@@ -1131,8 +1131,8 @@ function ssi_recentPoll($topPollInstead = false, $output_method = 'echo')
 		$return['options'][$i] = array(
 			'id' => 'options-' . ($topPollInstead ? 'top-' : 'recent-') . $i,
 			'percent' => $bar,
-			'votes' => $option[1], /* TODO: The 'bar' should really be a gradient */
-			'bar' => '<span class="nowrap"><img src="' . $settings['images_url'] . '/poll_' . ($context['right_to_left'] ? 'right' : 'left') . '.png" alt="" /><img src="' . $settings['images_url'] . '/poll_middle.png" style="width:' . $barWide . 'px; height:12px;" alt="-" /><img src="' . $settings['images_url'] . '/poll_' . ($context['right_to_left'] ? 'left' : 'right') . '.png" alt="" /></span>',
+			'votes' => $option[1], /* Todo: gradient div will need some visual tweaking. Or replace with the current bar_ndt code from Poll.subs */
+			'bar' => '<div class="poll_gradient" style="width: ' . $barWide . 'px;"></div>',
 			'option' => $bbc_parser->parsePoll($option[0]),
 			'vote_button' => '<input type="' . ($row['max_votes'] > 1 ? 'checkbox' : 'radio') . '" name="options[]" id="options-' . ($topPollInstead ? 'top-' : 'recent-') . $i . '" value="' . $i . '" class="input_' . ($row['max_votes'] > 1 ? 'check' : 'radio') . '" />'
 		);
@@ -1820,7 +1820,7 @@ function ssi_recentAttachments($num_attachments = 10, $attachment_ext = array(),
 				'filesize' => byte_format($row['filesize']),
 				'downloads' => $row['downloads'],
 				'href' => $scripturl . '?action=dlattach;topic=' . $row['id_topic'] . '.0;attach=' . $row['id_attach'],
-				'link' => '<img src="' . $settings['images_url'] . '/icons/clip.png" alt="" /> <a href="' . $scripturl . '?action=dlattach;topic=' . $row['id_topic'] . '.0;attach=' . $row['id_attach'] . '">' . $filename . '</a>',
+				'link' => '<a href="' . $scripturl . '?action=dlattach;topic=' . $row['id_topic'] . '.0;attach=' . $row['id_attach'] . '"><i class="icon i-paperclip"><s>Attachement:</s></i> ' . $filename . '</a>',
 				'is_image' => !empty($row['width']) && !empty($row['height']) && !empty($modSettings['attachmentShowImages']),
 			),
 			'topic' => array(
