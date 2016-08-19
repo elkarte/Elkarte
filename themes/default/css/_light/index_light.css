@@ -221,7 +221,7 @@ strong {
 
 /* Sometimes there will be an error when you post */
 .error {
-	color: #FF0000;
+	color: #FF0000 !important;
 }
 
 .border_error {
