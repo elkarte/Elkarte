@@ -563,8 +563,8 @@ class ManagePermissions_Controller extends Action_Controller
 		require_once(SUBSDIR . '/Permission.subs.php');
 		require_once(SUBSDIR . '/ManagePermissions.subs.php');
 
-		loadIllegalPermissions();
-		loadIllegalGuestPermissions();
+		Permissions::loadIllegal();
+		Permissions::loadIllegalGuest();
 
 		// Make sure only one of the quick options was selected.
 		if ((!empty($this->_req->post->predefined) && ((isset($this->_req->post->copy_from) && $this->_req->post->copy_from != 'empty') || !empty($this->_req->post->permissions))) || (!empty($this->_req->post->copy_from) && $this->_req->post->copy_from != 'empty' && !empty($this->_req->post->permissions)))
@@ -630,7 +630,7 @@ class ManagePermissions_Controller extends Action_Controller
 			copyBoardPermission($this->_req->post->copy_from, $this->_req->post->group, $bid, $context['non_guest_permissions']);
 
 			// Update any children out there!
-			updateChildPermissions($this->_req->post->group, $this->_pid);
+			Permissions::updateChild($this->_req->post->group, $this->_pid);
 		}
 		// Set or unset a certain permission for the selected groups.
 		elseif (!empty($this->_req->post->permissions))
@@ -676,7 +676,7 @@ class ManagePermissions_Controller extends Action_Controller
 			}
 
 			// Another child update!
-			updateChildPermissions($this->_req->post->group, $this->_pid);
+			Permissions::updateChild($this->_req->post->group, $this->_pid);
 		}
 
 		redirectexit('action=admin;area=permissions;pid=' . $this->_pid);
@@ -796,7 +796,7 @@ class ManagePermissions_Controller extends Action_Controller
 		require_once(SUBSDIR . '/Permission.subs.php');
 		require_once(SUBSDIR . '/ManagePermissions.subs.php');
 
-		loadIllegalPermissions();
+		Permissions::loadIllegal();
 
 		$current_group_id = (int) $this->_req->query->group;
 		$this->_pid = $this->_req->getQuery('pid', 'intval');
@@ -823,7 +823,7 @@ class ManagePermissions_Controller extends Action_Controller
 		// Guest group, we need illegal, guest permissions.
 		if ($current_group_id == -1)
 		{
-			loadIllegalGuestPermissions();
+			Permissions::loadIllegalGuest();
 			$context['illegal_permissions'] = array_merge($context['illegal_permissions'], $context['non_guest_permissions']);
 		}
 
@@ -868,7 +868,7 @@ class ManagePermissions_Controller extends Action_Controller
 		}
 
 		// Update any inherited permissions as required.
-		updateChildPermissions($current_group_id, $this->_pid);
+		Permissions::updateChild($current_group_id, $this->_pid);
 
 		// Clear cached privs.
 		updateSettings(array('settings_updated' => time()));
