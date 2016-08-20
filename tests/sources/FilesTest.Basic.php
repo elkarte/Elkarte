@@ -54,7 +54,17 @@ class TestFiles extends PHPUnit_Framework_TestCase
 		foreach ($this->_ourFiles as $file)
 		{
 			$syntax_valid = false;
+			if (!is_writable($file))
+			{
+				continue;
+			}
+
 			$file_content = file_get_contents($file);
+
+			if (empty($file_content[0]))
+			{
+				continue;
+			}
 
 			// This is likely to be one of the two files emailpost.php or emailtopic.php
 			if ($file_content[0] === '#')
