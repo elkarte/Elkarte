@@ -36,7 +36,7 @@ class Inline_Permissions_Form
 
 		// Make sure they can't do certain things,
 		// unless they have the right permissions.
-		loadIllegalPermissions();
+		Permissions::loadIllegal();
 
 		$insertRows = array();
 		foreach ($permissions as $permission)
@@ -72,7 +72,7 @@ class Inline_Permissions_Form
 			);
 
 		// Do a full child update.
-		updateChildPermissions(array(), -1);
+		Permissions::updateChild(array(), -1);
 
 		// Just in case we cached this.
 		updateSettings(array('settings_updated' => time()));
