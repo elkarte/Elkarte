@@ -114,7 +114,7 @@ function setupProfileContext($fields, $hook = '')
 			}
 
 			// Was there an error with this field on posting?
-			if (isset($context['profile_errors'][$field]))
+			if (isset($context['post_errors'][$field]))
 				$cur_field['is_error'] = true;
 
 			// Any javascript stuff?
@@ -1654,7 +1654,6 @@ function profileSendActivation()
 
 /**
  * Load key signature context data.
- * @todo where does this get used at?
  * @return boolean
  */
 function profileLoadSignatureData()

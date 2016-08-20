@@ -164,6 +164,7 @@ class Profile_Controller extends Action_Controller
 		$this->_save_updates();
 
 		// Have some errors for some reason?
+		// @todo check that this can be safely removed.
 		if (!empty($post_errors))
 		{
 			// Set all the errors so the template knows what went wrong.
