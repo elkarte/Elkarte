@@ -8,7 +8,7 @@ set -x
 # some vars to make this easy to change
 SELENIUM_HUB_URL='http://127.0.0.1:4444'
 SELENIUM_JAR=/usr/share/selenium/selenium-server-standalone.jar
-SELENIUM_DOWNLOAD_URL=http://selenium-release.storage.googleapis.com/2.45/selenium-server-standalone-2.45.0.jar
+SELENIUM_DOWNLOAD_URL=http://selenium-release.storage.googleapis.com/2.53/selenium-server-standalone-2.53.0.jar
 
 # If selenium is not available, get it
 if [ ! -f "$SELENIUM_JAR" ]
@@ -19,7 +19,7 @@ fi
 
 # Update/Install Fx or chrome
 #sudo apt-get install firefox -y --no-install-recommends
-wget http://chromedriver.googlecode.com/files/chromedriver_linux32_23.0.1240.0.zip && unzip chromedriver_linux32_23.0.1240.0.zip && sudo mv chromedriver /usr/bin
+wget http://chromedriver.googlecode.com/files/chromedriver_linux64_23.0.1240.0.zip && unzip chromedriver_linux64_23.0.1240.0.zip && sudo mv chromedriver /usr/bin
 
 # Start Selenium
 export DISPLAY=:99.0
