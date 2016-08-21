@@ -6,6 +6,7 @@
 class TestInlinePermissionsForm extends PHPUnit_Framework_TestCase
 {
 	protected $permissions = array();
+	protected $temp_db = null;
 
 	/**
 	 * Prepare what is necessary to use in these tests.
@@ -18,8 +19,19 @@ class TestInlinePermissionsForm extends PHPUnit_Framework_TestCase
 
 		require_once(SOURCEDIR . '/database/Db.php');
 		require_once(SOURCEDIR . '/database/Db-abstract.class.php');
-		require_once(BOARDDIR . '/tests/dummies/Db.php');
+		if (!defined('DB_TYPE'))
+		{
+			require_once(SOURCEDIR . '/database/Db-mysql.class.php');
+		}
 		require_once(BOARDDIR . '/tests/dummies/Database.php');
+
+		$reflectedClass = new \ReflectionClass('Database_' . DB_TYPE);
+		$reflectedProperty = $reflectedClass->getProperty('_db');
+		$reflectedProperty->setAccessible(true);
+		$this->temp_db = $reflectedProperty->getValue();
+
+		$reflectedProperty->setValue(null, \ElkArte\Tests\Dummies\Database::db());
+
 		$db_prefix = 'elkarte_';
 		$settings['theme_url'] = $settings['default_theme_url'] = $boardurl . '/themes/default';
 		$settings['theme_dir'] = $settings['default_theme_dir'] = BOARDDIR . '/themes/default';
@@ -54,7 +66,7 @@ class TestInlinePermissionsForm extends PHPUnit_Framework_TestCase
 					),
 				)
 			),
-			// A slightly more complext test adding a couple of groups
+			// A slightly more complex test adding a couple of groups
 			array(
 				'permissions' => array('testing'),
 				'excluded' => array(),
@@ -132,7 +144,7 @@ class TestInlinePermissionsForm extends PHPUnit_Framework_TestCase
 					),
 				)
 			),
-			// A more complext test adding a couple of groups and excluding one of them
+			// A more complex test adding a couple of groups and excluding one of them
 			array(
 				'permissions' => array('testing'),
 				'excluded' => array(4),
@@ -209,6 +221,10 @@ class TestInlinePermissionsForm extends PHPUnit_Framework_TestCase
 
 	public function tearDown()
 	{
+		$reflectedClass = new \ReflectionClass('Database_' . DB_TYPE);
+		$reflectedProperty = $reflectedClass->getProperty('_db');
+		$reflectedProperty->setAccessible(true);
+		$reflectedProperty->setValue($this->temp_db);
 	}
 
 	/**
