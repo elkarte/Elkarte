@@ -215,6 +215,7 @@ class TestInlinePermissionsForm extends PHPUnit_Framework_TestCase
 	 * Looping over the tests to verify Inline_Permissions_Form::init works
 	 * as expected
 	 * @runInSeparateProcess
+	 * @preserveGlobalState disabled
 	 */
 	public function testInit()
 	{
