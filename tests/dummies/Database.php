@@ -2,8 +2,6 @@
 
 namespace ElkArte\Tests\Dummies;
 
-require_once(BOARDDIR . '/tests/dummies/Db.php');
-
 class Database extends \Database_Abstract
 {
 	protected $expectedQueries = array();
