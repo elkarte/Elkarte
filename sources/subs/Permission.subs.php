@@ -37,7 +37,7 @@ function loadIllegalGuestPermissions()
  */
 function updateChildPermissions($parents, $profile = null)
 {
-	Permissions::updateChild();
+	Permissions::updateChild($parents, $profile);
 }
 
 /**
