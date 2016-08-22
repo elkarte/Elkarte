@@ -47,7 +47,7 @@ class Inline_Permissions_Form
 			foreach ($_POST[$permission] as $id_group => $value)
 			{
 				if (in_array($value, array('on', 'deny')) && (empty($context['illegal_permissions']) || !in_array($permission, $context['illegal_permissions'])))
-					$insertRows[] = array((int) $id_group, $permission, $value == 'on' ? 1 : 0);
+					$insertRows[] = array('id_group' => (int) $id_group, 'permission' => $permission, 'add_deny' => $value == 'on' ? 1 : 0);
 			}
 		}
 
@@ -64,12 +64,10 @@ class Inline_Permissions_Form
 
 		// ...and replace them with new ones.
 		if (!empty($insertRows))
-			$db->insert('insert',
-				'{db_prefix}permissions',
-				array('id_group' => 'int', 'permission' => 'string', 'add_deny' => 'int'),
-				$insertRows,
-				array('id_group', 'permission')
-			);
+		{
+			require_once(SUBSDIR . '/ManagePermissions.subs.php');
+			replacePermission($permChange);
+		}
 
 		// Do a full child update.
 		Permissions::updateChild(array(), -1);

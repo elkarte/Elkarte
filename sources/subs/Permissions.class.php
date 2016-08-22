@@ -130,8 +130,12 @@ class Permissions
 			);
 			$permissions = array();
 			while ($row = $db->fetch_assoc($request))
+			{
 				foreach ($children[$row['id_group']] as $child)
-					$permissions[] = array($child, $row['permission'], $row['add_deny']);
+				{
+					$permissions[] = array('id_group' => (int) $child, 'permission' => $row['permission'], 'add_deny' => $row['add_deny']);
+				}
+			}
 			$db->free_result($request);
 
 			$db->query('', '
@@ -145,12 +149,8 @@ class Permissions
 			// Finally insert.
 			if (!empty($permissions))
 			{
-				$db->insert('insert',
-					'{db_prefix}permissions',
-					array('id_group' => 'int', 'permission' => 'string', 'add_deny' => 'int'),
-					$permissions,
-					array('id_group', 'permission')
-				);
+				require_once(SUBSDIR . '/ManagePermissions.subs.php');
+				replacePermission($permissions);
 			}
 		}
 

@@ -811,7 +811,9 @@ function copyPermission($copy_from, $groups, $illegal_permissions, $non_guest_pe
 				continue;
 
 			if ($group_id != 1 && $group_id != 3)
-				$inserts[] = array($perm, $group_id, $add_deny);
+			{
+				$inserts[] = array('permission' => $perm, 'id_group' => $group_id, 'add_deny' => $add_deny);
+			}
 		}
 
 	// Delete the previous permissions...
@@ -828,14 +830,8 @@ function copyPermission($copy_from, $groups, $illegal_permissions, $non_guest_pe
 	if (!empty($inserts))
 	{
 		// ..and insert the new ones.
-		$db->insert('',
-			'{db_prefix}permissions',
-			array(
-				'permission' => 'string', 'id_group' => 'int', 'add_deny' => 'int',
-			),
-			$inserts,
-			array('permission', 'id_group')
-		);
+		require_once(SUBSDIR . '/ManagePermissions.subs.php');
+		replacePermission($permChange);
 	}
 }
 
