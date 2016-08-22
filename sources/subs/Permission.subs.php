@@ -291,8 +291,16 @@ class InlinePermissions_Form
 			return;
 
 		// Load the permission settings for guests
+		$permissionList = array_map(
+			function($permission)
+			{
+				return $permission[1];
+			}, $permissions
+		);
+
+		// Load the permission settings for guests
 		foreach ($permissions as $permission)
-			$context[$permission] = array(
+			$context[$permission[1]] = array(
 				-1 => array(
 					'id' => -1,
 					'name' => $txt['membergroups_guests'],
@@ -314,7 +322,7 @@ class InlinePermissions_Form
 				AND permission IN ({array_string:permissions})',
 			array(
 				'denied' => 0,
-				'permissions' => $permissions,
+				'permissions' => $permissionList,
 				'deny' => 'deny',
 				'on' => 'on',
 			)
@@ -335,15 +343,15 @@ class InlinePermissions_Form
 				'not_inherited' => -2,
 				'min_posts' => -1,
 				'newbie_group' => 4,
-				'permissions' => $permissions,
+				'permissions' => $permissionList,
 			)
 		);
 		while ($row = $db->fetch_assoc($request))
 		{
 			// Initialize each permission as being 'off' until proven otherwise.
 			foreach ($permissions as $permission)
-				if (!isset($context[$permission][$row['id_group']]))
-					$context[$permission][$row['id_group']] = array(
+				if (!isset($context[$permission[1]][$row['id_group']]))
+					$context[$permission[1]][$row['id_group']] = array(
 						'id' => $row['id_group'],
 						'name' => $row['group_name'],
 						'is_postgroup' => $row['min_posts'] != -1,
@@ -354,13 +362,21 @@ class InlinePermissions_Form
 		}
 		$db->free_result($request);
 
-		// Some permissions cannot be given to certain groups. Remove the groups.
-		foreach ($excluded_groups as $group)
+		// Some permissions cannot be given to certain groups. Remove them.
+		foreach ($permissions as $permission)
 		{
-			foreach ($permissions as $permission)
+			foreach ($excluded_groups as $group)
 			{
-				if (isset($context[$permission][$group]))
-					unset($context[$permission][$group]);
+				if (isset($context[$permission[1]][$group]))
+					unset($context[$permission[1]][$group]);
+			}
+			if (isset($permission['excluded_groups']))
+			{
+				foreach ($permission['excluded_groups'] as $group)
+				{
+					if (isset($context[$permission[1]][$group]))
+						unset($context[$permission[1]][$group]);
+				}
 			}
 		}
 	}
