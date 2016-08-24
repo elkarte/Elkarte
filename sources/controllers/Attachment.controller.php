@@ -603,6 +603,7 @@ class Attachment_Controller extends Action_Controller
 		{
 			$mime_type = 'image/png';
 			$resize = false;
+			loadEssentialThemeData();
 
 			// Show the mine thumbnail if it exists or just the default
 			$filename = $settings['theme_dir'] . '/images/mime_images/' . $file_ext . '.png';
