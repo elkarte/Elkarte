@@ -397,12 +397,15 @@ class Data_Validator
 		if (!$result)
 		{
 			$errors = $sub_validator->validation_errors(true);
-			$this->_validation_errors[] = array(
-				'field' => $field,
-				'input' => $errors[0]['input'],
-				'function' => $errors[0]['function'],
-				'param' => $errors[0]['param'],
-			);
+			foreach ($errors as $error)
+			{
+				$this->_validation_errors[] = array(
+					'field' => $field,
+					'input' => $error['input'],
+					'function' => $error['function'],
+					'param' => $error['param'],
+				);
+			}
 		}
 
 		return $result;

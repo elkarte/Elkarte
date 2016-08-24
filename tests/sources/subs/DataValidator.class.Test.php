@@ -83,8 +83,8 @@ class TestDataValidator extends PHPUnit_Framework_TestCase
 			'min_len_csv'   => '1234,12345,123456',
 			'min_len_array' => array('1234', '12345', '123456'),
 			'limits'        => 9,
-			'valid_color'	=> '#ffffff',
-			'php_syntax'	=> 'if ($a == 1) {$b = true;}'
+			'valid_color'   => '#ffffff',
+			'php_syntax'    => 'if ($a == 1) {$b = true;}'
 		);
 	}
 
@@ -121,6 +121,29 @@ class TestDataValidator extends PHPUnit_Framework_TestCase
 			$value = is_array($value) ? implode(' | ', $value) : $value;
 			$this->assertFalse($validation->validation_errors($key), 'Test: ' . $test[0] . ' failed data: ' . $value . ' but it should have passed');
 		}
+	}
+
+	public function testCsv()
+	{
+		$validation = new Data_Validator();
+		$validation->validation_rules(array('csv' => 'limits[0,10]|without[1,2,3]'));
+		$validation->input_processing(array('csv' => 'csv'));
+		$validation->validate(array('csv' => '10,12,36,49,5'));
+		$result = $validation->validation_errors(true);
+
+		$this->assertCount(6, $result);
+		$this->assertSame('10', $result[0]['input']);
+		$this->assertSame('_validate_without', $result[0]['function']);
+		$this->assertSame('12', $result[1]['input']);
+		$this->assertSame('_validate_limits', $result[1]['function']);
+		$this->assertSame('12', $result[2]['input']);
+		$this->assertSame('_validate_without', $result[2]['function']);
+		$this->assertSame('36', $result[3]['input']);
+		$this->assertSame('_validate_limits', $result[3]['function']);
+		$this->assertSame('36', $result[4]['input']);
+		$this->assertSame('_validate_without', $result[4]['function']);
+		$this->assertSame('49', $result[5]['input']);
+		$this->assertSame('_validate_limits', $result[5]['function']);
 	}
 
 	/**
