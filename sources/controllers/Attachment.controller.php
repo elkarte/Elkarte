@@ -43,7 +43,15 @@ class Attachment_Controller extends Action_Controller
 		// If not in maintenance or allowed to use the forum in maintenance
 		if (empty($maintenance) || allowedTo('admin_forum'))
 		{
-			return false;
+			$sa = $this->_req->get('sa');
+			if ($sa === 'ulattach' || $sa === 'rmattach')
+			{
+				return true;
+			}
+			else
+			{
+				return false;
+			}
 		}
 		// else... politely kick him (or her).
 		else
