@@ -43,7 +43,15 @@ class Attachment_Controller extends Action_Controller
 		// If not in maintenance or allowed to use the forum in maintenance
 		if (empty($maintenance) || allowedTo('admin_forum'))
 		{
-			return false;
+			$sa = $this->_req->get('sa');
+			if ($sa === 'ulattach' || $sa === 'rmattach')
+			{
+				return true;
+			}
+			else
+			{
+				return false;
+			}
 		}
 		// else... politely kick him (or her).
 		else
@@ -595,6 +603,7 @@ class Attachment_Controller extends Action_Controller
 		{
 			$mime_type = 'image/png';
 			$resize = false;
+			loadEssentialThemeData();
 
 			// Show the mine thumbnail if it exists or just the default
 			$filename = $settings['theme_dir'] . '/images/mime_images/' . $file_ext . '.png';
