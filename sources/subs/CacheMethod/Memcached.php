@@ -35,6 +35,7 @@ class Memcached extends Cache_Method_Abstract
 		{
 			$this->obj = new \Memcache;
 		}
+		$this->setOptions();
 		$this->addServers();
 	}
 
@@ -106,9 +107,49 @@ class Memcached extends Cache_Method_Abstract
 		}
 		return $serversm;
 	}
+
+	/**
+	 * {@inheritdoc }
+	 */
+	protected function setOptions()
+	{
+		if (class_exists('Memcached', false))
 		{
+			/*
+			 * the timeout after which a server is considered DEAD.
+			 */
+			$this->obj->setOption(\Memcached::OPT_CONNECT_TIMEOUT, 100);
+
+			/*
+			 * If one memcached node is dead, its keys (and only its
+			 * keys) will be evenly distributed to other nodes.
+			 */
+			$this->obj->setOption(\Memcached::OPT_DISTRIBUTION, \Memcached::DISTRIBUTION_CONSISTENT);
+
+			/*
+			 * number of connection issues before a server is marked
+			 * as DEAD, and removed from the list of servers.
+			 */
+			$this->obj->setOption(\Memcached::OPT_SERVER_FAILURE_LIMIT, 2);
+
+			/*
+			 * enables the removal of dead servers.
+			 */
+			$this->obj->setOption(\Memcached::OPT_REMOVE_FAILED_SERVERS, true);
+
+			/*
+			 * after a node is declared DEAD, libmemcached will
+			 * try it again after that many seconds.
+			 */
+			$this->obj->setOption(\Memcached::OPT_RETRY_TIMEOUT, 1);
 		}
+		elseif (class_exists('Memcache', false))
 		{
+			$this->obj->setOption(\Memcache::OPT_CONNECT_TIMEOUT, 100);
+			$this->obj->setOption(\Memcache::OPT_DISTRIBUTION, \Memcache::DISTRIBUTION_CONSISTENT);
+			$this->obj->setOption(\Memcache::OPT_SERVER_FAILURE_LIMIT, 2);
+			$this->obj->setOption(\Memcache::OPT_REMOVE_FAILED_SERVERS, true);
+			$this->obj->setOption(\Memcache::OPT_RETRY_TIMEOUT, 1);
 		}
 	}
 
