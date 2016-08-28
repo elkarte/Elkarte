@@ -78,7 +78,7 @@ class Memcached extends Cache_Method_Abstract
 	{
 		$serversm = array();
 		$serversmList = $this->getServers();
-		foreach ($servers as $server)
+		foreach ($this->_options['servers'] as $server)
 		{
 			$server = explode(':', trim($server));
 			$server[1] = !empty($server[1]) ? $server[1] : 11211;

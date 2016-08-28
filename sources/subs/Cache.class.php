@@ -429,7 +429,7 @@ class Cache
 	{
 		if (self::$_instance === null)
 		{
-			global $cache_accelerator, $cache_enable, $cache_uid, $cache_password;
+			global $cache_accelerator, $cache_enable, $cache_uid, $cache_password, $cache_memcached;
 
 			$options = array();
 			if ($cache_accelerator === 'xcache')
@@ -437,6 +437,12 @@ class Cache
 				$options = array(
 					'cache_uid' => $cache_uid,
 					'cache_password' => $cache_password,
+				);
+			}
+			elseif ($cache_accelerator === 'memcached')
+			{
+				$options = array(
+					'servers' => explode(',', $cache_memcached),
 				);
 			}
 
