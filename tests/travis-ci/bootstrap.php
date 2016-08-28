@@ -27,7 +27,7 @@ global $ssi_db_user, $ssi_db_passwd;
 if (!defined('ELK'))
 {
 	DEFINE('ELK', '1');
-	DEFINE('CACHE_STALE', '?R11');
+	DEFINE('CACHE_STALE', '?R11B2');
 
 	// Get the forum's settings for database and file paths.
 	require_once('/var/www/Settings.php');
