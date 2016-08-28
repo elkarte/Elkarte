@@ -33,18 +33,20 @@ class Filebased extends Cache_Method_Abstract
 	 */
 	public function put($key, $value, $ttl = 120)
 	{
+		$fName = 'data_' . $key . '.json';
+
 		// Clearing this data
 		if ($value === null)
-			@unlink(CACHEDIR . '/data_' . $key . '.php');
+			@unlink(CACHEDIR . '/' . $fName);
 		// Or stashing it away
 		else
 		{
-			$cache_data = '<?php if (!defined(\'ELK\')) die; if (' . (time() + $ttl) . ' < time()) return false; else{return \'' . addcslashes($value, '\\\'') . '\';}';
+			$cache_data = json_encode(array('expiration' => time() + $ttl, 'data' => $value));
 
 			// Write out the cache file, check that the cache write was successful; all the data must be written
 			// If it fails due to low diskspace, or other, remove the cache file
-			if (@file_put_contents(CACHEDIR . '/data_' . $key . '.php', $cache_data, LOCK_EX) !== strlen($cache_data))
-				@unlink(CACHEDIR . '/data_' . $key . '.php');
+			if (@file_put_contents(CACHEDIR . '/' . $fName, $cache_data, LOCK_EX) !== strlen($cache_data))
+				@unlink(CACHEDIR . '/' . $fName);
 		}
 	}
 
@@ -53,18 +55,17 @@ class Filebased extends Cache_Method_Abstract
 	 */
 	public function get($key, $ttl = 120)
 	{
-		// Otherwise it's ElkArte data!
-		if (file_exists(CACHEDIR . '/data_' . $key . '.php') && filesize(CACHEDIR . '/data_' . $key . '.php') > 10)
+		$fName = 'data_' . $key . '.json';
+		if (file_exists(CACHEDIR . '/' . $fName) && filesize(CACHEDIR . '/' . $fName) > 10)
 		{
-			// php will cache file_exists et all, we can't 100% depend on its results so proceed with caution
-			$value = @include(CACHEDIR . '/data_' . $key . '.php');
-			if ($value === false)
+			$value = json_decode(file_get_contents(CACHEDIR . '/' . $fName));
+			if ($value['expiration'] < time())
 			{
-				@unlink(CACHEDIR . '/data_' . $key . '.php');
+				@unlink(CACHEDIR . '/' . $fName);
 				$return = null;
 			}
 			else
-				$return = $value;
+				$return = $value['data'];
 
 			unset($value);
 
