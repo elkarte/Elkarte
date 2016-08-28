@@ -109,8 +109,10 @@ class Cache
 		if (class_exists($cache_class))
 		{
 			$this->_cache_obj = new $cache_class($this->_options);
+			$this->enabled = $this->_cache_obj->isAvailable();
 
-			$this->enabled = $this->_cache_obj->init();
+			if ($this->enabled)
+				$this->_cache_obj->init();
 		}
 		else
 		{

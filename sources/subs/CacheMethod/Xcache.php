@@ -35,8 +35,6 @@ class Xcache extends Cache_Method_Abstract
 			$_SERVER['PHP_AUTH_USER'] = $this->_options['cache_uid'];
 			$_SERVER['PHP_AUTH_PW'] = $this->_options['cache_password'];
 		}
-
-		return function_exists('xcache_set') && ini_get('xcache.var_size') > 0;
 	}
 
 	/**

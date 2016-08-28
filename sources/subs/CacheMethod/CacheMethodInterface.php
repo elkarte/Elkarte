@@ -28,11 +28,6 @@ interface Cache_Method_Interface
 	public function __construct($options);
 
 	/**
-	 * A method that allows to "initialize" the caching engine if needed
-	 */
-	public function init();
-
-	/**
 	 * Puts value in the cache under key for ttl seconds.
 	 *
 	 * @param string $key

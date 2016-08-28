@@ -31,14 +31,6 @@ class Filebased extends Cache_Method_Abstract
 	/**
 	 * {@inheritdoc }
 	 */
-	public function init()
-	{
-		return @is_dir(CACHEDIR) && @is_writable(CACHEDIR);
-	}
-
-	/**
-	 * {@inheritdoc }
-	 */
 	public function put($key, $value, $ttl = 120)
 	{
 		// Clearing this data
