@@ -59,13 +59,13 @@ class Filebased extends Cache_Method_Abstract
 		if (file_exists(CACHEDIR . '/' . $fName) && filesize(CACHEDIR . '/' . $fName) > 10)
 		{
 			$value = json_decode(file_get_contents(CACHEDIR . '/' . $fName));
-			if ($value['expiration'] < time())
+			if ($value->expiration < time())
 			{
 				@unlink(CACHEDIR . '/' . $fName);
 				$return = null;
 			}
 			else
-				$return = $value['data'];
+				$return = $value->data;
 
 			unset($value);
 
