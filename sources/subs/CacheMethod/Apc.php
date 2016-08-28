@@ -19,11 +19,26 @@ namespace ElkArte\sources\subs\CacheMethod;
 class Apc extends Cache_Method_Abstract
 {
 	/**
+	 * This is prefixed to all cacahe entries so that different
+	 * applications won't interfere with each other.
+	 *
+	 * @var string
+	 */
+	protected $namespace = 'elkarte';
+
+	/**
+	 * Whether to use the APCu functions or the original APC ones.
+	 *
+	 * @var string
+	 */
+	protected $apcu = false;
+
+	/**
 	 * {@inheritdoc }
 	 */
 	public function init()
 	{
-		return function_exists('apc_store');
+		$this->apcu = function_exists('apcu_store');
 	}
 
 	/**
@@ -31,11 +46,22 @@ class Apc extends Cache_Method_Abstract
 	 */
 	public function put($key, $value, $ttl = 120)
 	{
+		$namespacedKey = $this->namespace . ':' . $key;
 		// An extended key is needed to counteract a bug in APC.
-		if ($value === null)
-			apc_delete($key . 'elkarte');
+		if ($this->apcu)
+		{
+			if ($value === null)
+				apcu_delete($namespacedKey);
+			else
+				apcu_store($namespacedKey, $value, $ttl);
+		}
 		else
-			apc_store($key . 'elkarte', $value, $ttl);
+		{
+			if ($value === null)
+				apc_delete($namespacedKey);
+			else
+				apc_store($namespacedKey, $value, $ttl);
+		}
 	}
 
 	/**
@@ -43,9 +69,12 @@ class Apc extends Cache_Method_Abstract
 	 */
 	public function get($key, $ttl = 120)
 	{
+		$namespacedKey = $this->namespace . ':' . $key;
 		$success = false;
-		$result = apc_fetch($key . 'elkarte', $success);
-
+		if ($this->apcu)
+			$result = apcu_fetch($namespacedKey, $success);
+		else
+			$result = apc_fetch($namespacedKey, $success);
 		$this->is_miss = !$success;
 
 		return $result;
@@ -64,6 +93,8 @@ class Apc extends Cache_Method_Abstract
 		}
 		elseif ($type === 'user')
 			apc_clear_cache('user');
+		elseif ($this->apcu)
+			apcu_clear_cache();
 	}
 
 	/**
