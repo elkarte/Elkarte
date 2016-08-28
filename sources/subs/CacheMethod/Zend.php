@@ -15,12 +15,11 @@ namespace ElkArte\sources\subs\CacheMethod;
 
 /**
  * Zend caching engine.
- * Supports both zend_shm_cache_store and the deprecated output_cache_put
  */
 class Zend extends Cache_Method_Abstract
 {
 	/**
-	 * This is prefixed to all cacahe entries so that different
+	 * This is prefixed to all cache entries so that different
 	 * applications won't interfere with each other.
 	 *
 	 * @var string

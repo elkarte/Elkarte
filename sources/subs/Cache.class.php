@@ -179,7 +179,6 @@ class Cache
 	 *   - Xcache: http://xcache.lighttpd.net/wiki/XcacheApi
 	 *   - memcache: http://www.php.net/memcache
 	 *   - APC: http://www.php.net/apc
-	 *   - eAccelerator: http://bart.eaccelerator.net/doc/phpdoc/
 	 *   - Zend: http://files.zend.com/help/Zend-Platform/output_cache_functions.htm
 	 *   - Zend: http://files.zend.com/help/Zend-Platform/zend_cache_functions.htm
 	 *
@@ -369,7 +368,7 @@ class Cache
 
 	/**
 	 * Checks if the system level supports the required level of the cache request
-	 * 
+	 *
 	 * @param int $level
 	 *
 	 * @return bool

@@ -68,7 +68,9 @@ class Memcached extends Cache_Method_Abstract
 	}
 
 	/**
-	 * Get memcache servers.
+	 * Add memcache servers.
+	 *
+	 * Don't add servers if they already exist. Ideal for persistent connections.
 	 *
 	 * @return bool True if there are servers in the daemon, false if not.
 	 */
