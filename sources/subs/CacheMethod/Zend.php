@@ -19,28 +19,20 @@ namespace ElkArte\sources\subs\CacheMethod;
  */
 class Zend extends Cache_Method_Abstract
 {
-	private $_shm = false;
-
 	/**
-	 * {@inheritdoc }
+	 * This is prefixed to all cacahe entries so that different
+	 * applications won't interfere with each other.
+	 *
+	 * @var string
 	 */
-	public function init()
-	{
-		$this->_shm = function_exists('zend_shm_cache_store');
-
-		return $this->_shm || function_exists('output_cache_put');
-	}
+	protected $namespace = 'elkarte';
 
 	/**
 	 * {@inheritdoc }
 	 */
 	public function put($key, $value, $ttl = 120)
 	{
-		// Zend Platform/ZPS/etc.
-		if ($this->_shm)
-			zend_shm_cache_store('ELK::' . $key, $value, $ttl);
-		else
-			output_cache_put($key, $value);
+		zend_shm_cache_store('ELK::' . $key, $value, $ttl);
 	}
 
 	/**
@@ -48,13 +40,7 @@ class Zend extends Cache_Method_Abstract
 	 */
 	public function get($key, $ttl = 120)
 	{
-
-		// Zend's pricey stuff.
-		if ($this->_shm)
-			$result = zend_shm_cache_fetch('ELK::' . $key);
-		else
-			$result = output_cache_get($key, $ttl);
-
+		$result = zend_shm_cache_fetch('ELK::' . $key);
 		$this->is_miss = $result === null;
 
 		return $result;
@@ -65,8 +51,7 @@ class Zend extends Cache_Method_Abstract
 	 */
 	public function clean($type = '')
 	{
-		if ($this->_shm)
-			zend_shm_cache_clear('ELK');
+		zend_shm_cache_clear('ELK');
 	}
 
 	/**
