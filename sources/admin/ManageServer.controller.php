@@ -628,10 +628,10 @@ class ManageServer_Controller extends Action_Controller
 
 		foreach ($detected as $key => $value)
 		{
-			$detected_names[] = $value['title'];
+			$detected_names[] = $value->title();
 
-			if (!empty($value['supported']))
-				$detected_supported[$key] = $value['title'];
+			if (!empty($value->isAvailable()))
+				$detected_supported[$key] = $value->title();
 		}
 
 		$txt['caching_information'] = str_replace('{supported_accelerators}', '<li>' . implode('</li><li>', $detected_names) . '</li>', $txt['caching_information']);
@@ -650,10 +650,9 @@ class ManageServer_Controller extends Action_Controller
 
 		foreach ($detected as $key => $value)
 		{
-			$cache_class = '\\ElkArte\\sources\\subs\\CacheMethod\\' . ucfirst($key);
-			if ($cache_class::available())
+			if ($value->isAvailable())
 			{
-				$cache_class::settings($config_vars);
+				$value->settings($config_vars);
 			}
 		}
 

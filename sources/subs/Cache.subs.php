@@ -115,14 +115,15 @@ function loadCacheEngines($supported_only = true)
 		// Validate the class name exists
 		if (class_exists($class))
 		{
-			if ($supported_only && $class::available())
-				$engines[strtolower($engine_name)] = $class::details();
-			elseif ($supported_only === false)
+			$obj = new $class(array());
+			if ($obj instanceof ElkArte\sources\subs\CacheMethod\Cache_Method_Interface)
 			{
-				$engines[strtolower($engine_name)] = array(
-					'title' => $class::title(),
-					'supported' => $class::available()
-				);
+				if ($supported_only && $obj->isAvailable())
+					$engines[strtolower($engine_name)] = $obj->details();
+				elseif ($supported_only === false)
+				{
+					$engines[strtolower($engine_name)] = $obj;
+				}
 			}
 		}
 	}

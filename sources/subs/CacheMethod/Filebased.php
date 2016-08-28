@@ -120,7 +120,7 @@ class Filebased extends Cache_Method_Abstract
 	/**
 	 * {@inheritdoc }
 	 */
-	public static function available()
+	public function isAvailable()
 	{
 		return @is_dir(CACHEDIR) && @is_writable(CACHEDIR);
 	}
@@ -128,19 +128,16 @@ class Filebased extends Cache_Method_Abstract
 	/**
 	 * {@inheritdoc }
 	 */
-	public static function details()
+	public function details()
 	{
-		return array('title' => self::title(), 'version' => 'N/A');
+		return array('title' => $this->title(), 'version' => 'N/A');
 	}
 
 	/**
 	 * {@inheritdoc }
 	 */
-	public static function title()
+	public function title()
 	{
-		if (self::available())
-			add_integration_function('integrate_modify_cache_settings', 'Filebased_Cache::settings', '', false);
-
 		return 'File-based caching';
 	}
 
@@ -151,7 +148,7 @@ class Filebased extends Cache_Method_Abstract
 	 *
 	 * @param array() $config_vars
 	 */
-	public static function settings(&$config_vars)
+	public function settings(&$config_vars)
 	{
 		global $txt;
 

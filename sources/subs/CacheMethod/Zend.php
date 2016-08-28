@@ -72,23 +72,23 @@ class Zend extends Cache_Method_Abstract
 	/**
 	 * {@inheritdoc }
 	 */
-	public static function available()
+	public function isAvailable()
 	{
-		return function_exists('zend_shm_cache_store') || function_exists('output_cache_put');
+		return function_exists('zend_shm_cache_store');
 	}
 
 	/**
 	 * {@inheritdoc }
 	 */
-	public static function details()
+	public function details()
 	{
-		return array('title' => self::title(), 'version' => zend_version());
+		return array('title' => $this->title(), 'version' => zend_version());
 	}
 
 	/**
 	 * {@inheritdoc }
 	 */
-	public static function title()
+	public function title()
 	{
 		return 'Zend Platform/Performance Suite';
 	}

@@ -69,23 +69,23 @@ class Apc extends Cache_Method_Abstract
 	/**
 	 * {@inheritdoc }
 	 */
-	public static function available()
+	public function isAvailable()
 	{
-		return extension_loaded('apc') || extension_loaded('apcu');
+		return function_exists('apc_store') || function_exists('apcu_store');
 	}
 
 	/**
 	 * {@inheritdoc }
 	 */
-	public static function details()
+	public function details()
 	{
-		return array('title' => self::title(), 'version' => phpversion('apc'));
+		return array('title' => $this->title(), 'version' => phpversion('apc'));
 	}
 
 	/**
 	 * {@inheritdoc }
 	 */
-	public static function title()
+	public function title()
 	{
 		return 'Alternative PHP Cache';
 	}

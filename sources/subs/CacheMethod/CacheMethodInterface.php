@@ -76,14 +76,14 @@ interface Cache_Method_Interface
 	public function fixkey($key);
 
 	/**
-	 * Static method to determine if the engine is available
+	 * method to determine if the engine is available
 	 *
 	 * @return bool
 	 */
-	public static function available();
+	public function isAvailable();
 
 	/**
-	 * Static method to return available details on the server settings of the
+	 * method to return available details on the server settings of the
 	 * cache engine (title and version).
 	 *
 	 * Returns an array with two indexes:
@@ -92,14 +92,14 @@ interface Cache_Method_Interface
 	 *
 	 * @return string[]
 	 */
-	public static function details();
+	public function details();
 
 	/**
 	 * Gives the (human-readable) name of the caching engine
 	 *
 	 * @return string
 	 */
-	public static function title();
+	public function title();
 
 	/**
 	 * Check if the last result was a miss

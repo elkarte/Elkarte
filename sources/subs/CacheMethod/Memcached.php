@@ -146,31 +146,24 @@ class Memcached extends Cache_Method_Abstract
 	/**
 	 * {@inheritdoc }
 	 */
-	public static function available()
+	public function isAvailable()
 	{
-		global $modSettings;
-
-		return (class_exists('Memcached') || function_exists('memcache_get')) && isset($modSettings['cache_memcached']) && trim($modSettings['cache_memcached']) != '';
+		return class_exists('Memcached') || class_exists('Memcache');
 	}
 
 	/**
 	 * {@inheritdoc }
 	 */
-	public static function details()
+	public function details()
 	{
-		$memcached = self::get_memcached_server();
-
-		return array('title' => self::title(), 'version' => empty($memcached) ? '???' : (class_exists('Memcached') ? $memcached->getVersion() : memcache_get_version()));
+		return array('title' => $this->title(), 'version' => $this->obj->getVersion());
 	}
 
 	/**
 	 * {@inheritdoc }
 	 */
-	public static function title()
+	public function title()
 	{
-		if (self::available())
-			add_integration_function('integrate_modify_cache_settings', 'Memcached_Cache::settings', '', false);
-
 		return 'Memcached';
 	}
 
@@ -181,7 +174,7 @@ class Memcached extends Cache_Method_Abstract
 	 *
 	 * @param array() $config_vars
 	 */
-	public static function settings(&$config_vars)
+	public function settings(&$config_vars)
 	{
 		global $txt;
 
