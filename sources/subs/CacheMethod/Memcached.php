@@ -20,26 +20,22 @@ namespace ElkArte\sources\subs\CacheMethod;
  */
 class Memcached extends Cache_Method_Abstract
 {
-	private $_memcache = null;
-	private $_memcachec = null;
+	protected $obj;
 
 	/**
 	 * {@inheritdoc }
 	 */
 	public function init()
 	{
-		if (!class_exists('Memcached') && !function_exists('memcache_get') && !function_exists('memcached_get'))
-			return false;
-
-		$memcached = self::get_memcached_server();
-		if (!$memcached)
-			return false;
-
-		$this->_memcachec = class_exists('Memcached');
-		$this->_memcache = function_exists('memcache_get');
-		$this->_options['memcached'] = $memcached;
-
-		return true;
+		if (class_exists('Memcached', false))
+		{
+			$this->obj = new \Memcached;
+		}
+		elseif (class_exists('Memcache', false))
+		{
+			$this->obj = new \Memcache;
+		}
+		$this->addServers();
 	}
 
 	/**
@@ -47,10 +43,7 @@ class Memcached extends Cache_Method_Abstract
 	 */
 	public function put($key, $value, $ttl = 120)
 	{
-		if ($this->_memcachec)
-			$this->_options['memcached']->set($key, $value, $ttl);
-		else
-			memcache_set($this->_options['memcached'], $key, $value, 0, $ttl);
+		$this->obj->set($key, $value, $ttl);
 	}
 
 	/**
@@ -58,19 +51,7 @@ class Memcached extends Cache_Method_Abstract
 	 */
 	public function get($key, $ttl = 120)
 	{
-		if ($this->_memcachec)
-		{
-			$result = $this->_options['memcached']->get($key);
-		}
-		elseif ($this->_memcache)
-		{
-			$result = memcache_get($this->_options['memcached'], $key);
-		}
-		else
-		{
-			$result = memcached_get($this->_options['memcached'], $key);
-		}
-
+		$result = $this->obj->get($key);
 		$this->is_miss = $result === null || $result === false;
 
 		return $result;
@@ -82,65 +63,53 @@ class Memcached extends Cache_Method_Abstract
 	public function clean($type = '')
 	{
 		// Clear it out, really invalidate whats there
-		if ($this->_memcachec)
-			$this->_options['memcached']->flush();
-		elseif ($this->_memcache)
-			memcache_flush($this->_options['memcached']);
-		else
-			memcached_flush($this->_options['memcached']);
+		$this->obj->flush();
 	}
 
 	/**
 	 * Get memcache servers.
 	 *
-	 * - This function is used by Cache::instance() and Cache::put().
-	 * - It attempts to connect to a random server in the cache_memcached setting.
-	 * - It recursively calls itself up to $level times.
-	 *
-	 * @param int $level = 3
+	 * @return bool True if there are servers in the daemon, false if not.
 	 */
-	public static function get_memcached_server($level = 3)
+	protected function addServers()
 	{
-		global $db_persist, $cache_memcached;
-
-		$servers = explode(',', $cache_memcached);
-		$server = explode(':', trim($servers[array_rand($servers)]));
-		$port = !isset($server[1]) ? 11211 : $server[1];
-
-		// Don't try more times than we have servers!
-		$level = min(count($servers), $level);
-
-		if (class_exists('Memcached'))
+		$serversm = array();
+		$serversmList = $this->getServers();
+		foreach ($servers as $server)
 		{
-			$serversm = array();
+			$server = explode(':', trim($server));
+			$server[1] = !empty($server[1]) ? $server[1] : 11211;
+			$serversm[] = $server;
+		}
+		$serversm = array_intersect($serversm, $serversmList);
+		if (!empty($serversm))
+		{
+			return $this->obj->addServers($serversm);
+		}
+
+		return !empty($serversmList);
+	}
+
+	/**
+	 * Get memcache servers.
+	 *
+	 * @return array A list of servers in the daemon.
+	 */
+	protected function getServers()
+	{
+		$servers = $this->obj->getServerList();
+		$serversm = array();
+		if (is_array($servers))
+		{
 			foreach ($servers as $server)
-			{
-				$server = explode(':', trim($server));
-				$serversm[] = $server;
-			}
-			$memcached = new \Memcached;
-			$memcached->addServers($serversm);
+				$serversm[] = array($server['host'], $server['port']);
 		}
-		// Don't wait too long: yes, we want the server, but we might be able to run the query faster!
-		elseif (empty($db_persist))
+		return $serversm;
+	}
 		{
-			if (function_exists('memcache_get'))
-				$memcached = memcache_connect($server[0], $port);
-			else
-				$memcached = memcached_connect($server[0], $port);
 		}
-		else
 		{
-			if (function_exists('memcache_get'))
-				$memcached = memcache_pconnect($server[0], $port);
-			else
-				$memcached = memcached_pconnect($server[0], $port);
 		}
-
-		if (!$memcached && $level > 0)
-			self::get_memcached_server($level - 1);
-
-		return $memcached;
 	}
 
 	/**
