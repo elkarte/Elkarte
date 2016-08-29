@@ -47,7 +47,16 @@ function sendmail($to, $subject, $message, $from = null, $message_id = null, $se
 
 	// Line breaks need to be \r\n only in windows or for SMTP.
 	$line_break = detectServer()->is('windows') || !$use_sendmail ? "\r\n" : "\n";
-	$message_type = $message_id !== null && isset($message_id[0]) ? $message_id[0] : 'm';
+
+	if ($message_id !== null && isset($message_id[0]) && in_array($message_id[0], array('m', 'p', 't')))
+	{
+		$message_type = $message_id[0];
+		$message_id = substr($message_id, 1);
+	}
+	else
+	{
+		$message_type = 'm';
+	}
 
 	// So far so good.
 	$mail_result = true;
@@ -71,7 +80,7 @@ function sendmail($to, $subject, $message, $from = null, $message_id = null, $se
 
 		// Call this function recursively for the hotmail addresses.
 		if (!empty($hotmail_to))
-			$mail_result = sendmail($hotmail_to, $subject, $message, $from, $message_id, $send_html, $priority, true, $is_private, $from_wrapper, $reference);
+			$mail_result = sendmail($hotmail_to, $subject, $message, $from, $message_type . $message_id, $send_html, $priority, true, $is_private, $from_wrapper, $reference);
 
 		// The remaining addresses no longer need the fix.
 		$hotmail_fix = false;
@@ -210,7 +219,7 @@ function sendmail($to, $subject, $message, $from = null, $message_id = null, $se
 
 	// Are we using the mail queue, if so this is where we butt in...
 	if (!empty($modSettings['mail_queue']) && $priority != 0)
-		return AddMailQueue(false, $to_array, $subject, $message, $headers, $send_html, $priority, $is_private, $message_id);
+		return AddMailQueue(false, $to_array, $subject, $message, $headers, $send_html, $priority, $is_private, $message_type . $message_id);
 	// If it's a priority mail, send it now - note though that this should NOT be used for sending many at once.
 	elseif (!empty($modSettings['mail_queue']) && !empty($modSettings['mail_period_limit']))
 	{
@@ -294,7 +303,7 @@ function sendmail($to, $subject, $message, $from = null, $message_id = null, $se
 	}
 	else
 		// SMTP protocol it is
-		$mail_result = $mail_result && smtp_mail($to_array, $subject, $message, $headers, $priority, $message_id);
+		$mail_result = $mail_result && smtp_mail($to_array, $subject, $message, $headers, $priority, $message_type . $message_id);
 
 	// Clear out the stat cache.
 	trackStats();
@@ -537,7 +546,16 @@ function smtp_mail($mail_to_array, $subject, $message, $headers, $priority, $mes
 	global $modSettings, $webmaster_email, $txt, $scripturl;
 
 	$modSettings['smtp_host'] = trim($modSettings['smtp_host']);
-	$message_type = $message_id !== null && isset($message_id[0]) ? $message_id[0] : 'm';
+
+	if ($message_id !== null && isset($message_id[0]) && in_array($message_id[0], array('m', 'p', 't')))
+	{
+		$message_type = $message_id[0];
+		$message_id = substr($message_id, 1);
+	}
+	else
+	{
+		$message_type = 'm';
+	}
 
 	// Try POP3 before SMTP?
 	// @todo There's no interface for this yet.
@@ -639,7 +657,7 @@ function smtp_mail($mail_to_array, $subject, $message, $headers, $priority, $mes
 			$unq_head_array[0] = md5($scripturl . microtime() . rand());
 			$unq_head_array[1] = $message_type;
 			$unq_head_array[2] = $message_id;
-			$unq_head = $unq_head_array[0] . '-' . $unq_head_array[2];
+			$unq_head = $unq_head_array[0] . '-' . $unq_head_array[1] . $unq_head_array[2];
 			$encoded_unq_head = base64_encode($line_break . $line_break . '[' . $unq_head . ']' . $line_break);
 			$unq_id = ($need_break ? $line_break : '') . 'Message-ID: <' . $unq_head . strstr(empty($modSettings['maillist_mail_from']) ? $webmaster_email : $modSettings['maillist_mail_from'], '@') . '>';
 			$message = mail_insert_key($message, $unq_head, $encoded_unq_head, $line_break);
@@ -1345,6 +1363,15 @@ function reduceMailQueue($batch_size = false, $override_limit = false, $force_se
 	{
 		// So that we have it, just in case it's really needed - see #2245
 		$email['body_fail'] = $email['body'];
+		if ($email['message_id'] !== null && isset($email['message_id'][0]) && in_array($email['message_id'][0], array('m', 'p', 't')))
+		{
+			$email['message_type'] = $email['message_id'][0];
+			$email['message_id'] = substr($email['message_id'], 1);
+		}
+		else
+		{
+			$email['message_type'] = 'm';
+		}
 
 		// Use the right mail resource
 		if ($use_sendmail)
@@ -1369,9 +1396,9 @@ function reduceMailQueue($batch_size = false, $override_limit = false, $force_se
 			if (!empty($modSettings['maillist_enabled']) && $email['message_id'] !== null && strpos($email['headers'], 'List-Id: <') !== false)
 			{
 				$unq_head_array[0] = md5($scripturl . microtime() . rand());
-				$unq_head_array[1] = isset($email['message_id'][0]) ? $email['message_id'][0] : 'm';
+				$unq_head_array[1] = $email['message_type'];
 				$unq_head_array[2] = $email['message_id'];
-				$unq_head = $unq_head_array[0] . '-' . $unq_head_array[2];
+				$unq_head = $unq_head_array[0] . '-' . $unq_head_array[1] . $unq_head_array[2];
 				$encoded_unq_head = base64_encode($line_break . $line_break . '[' . $unq_head . ']' . $line_break);
 				$unq_id = ($need_break ? $line_break : '') . 'Message-ID: <' . $unq_head . strstr(empty($modSettings['maillist_mail_from']) ? $webmaster_email : $modSettings['maillist_mail_from'], '@') . '>';
 				$email['body'] = mail_insert_key($email['body'], $unq_head, $encoded_unq_head, $line_break);
@@ -1394,7 +1421,7 @@ function reduceMailQueue($batch_size = false, $override_limit = false, $force_se
 			detectServer()->setTimeLimit(300);
 		}
 		else
-			$result = smtp_mail(array($email['to']), $email['subject'], $email['body'], $email['headers'], $email['priority'], $email['message_id']);
+			$result = smtp_mail(array($email['to']), $email['subject'], $email['body'], $email['headers'], $email['priority'], $email['message_type'] . $email['message_id']);
 
 		// Hopefully it sent?
 		if (!$result)
