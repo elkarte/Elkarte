@@ -23,6 +23,8 @@ interface Cache_Method_Interface
 	/**
 	 * The class is initialized passing the settings of the cache
 	 *
+	 * allows to "initialize" the caching engine if needed
+	 *
 	 * @param mixed $options
 	 */
 	public function __construct($options);

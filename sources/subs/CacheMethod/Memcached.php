@@ -25,18 +25,23 @@ class Memcached extends Cache_Method_Abstract
 	/**
 	 * {@inheritdoc }
 	 */
-	public function init()
+	public function __construct($options)
 	{
-		if (class_exists('Memcached', false))
+		parent::__construct($options);
+
+		if ($this->isAvailable())
 		{
-			$this->obj = new \Memcached;
+			if (class_exists('Memcached', false))
+			{
+				$this->obj = new \Memcached;
+			}
+			elseif (class_exists('Memcache', false))
+			{
+				$this->obj = new \Memcache;
+			}
+			$this->setOptions();
+			$this->addServers();
 		}
-		elseif (class_exists('Memcache', false))
-		{
-			$this->obj = new \Memcache;
-		}
-		$this->setOptions();
-		$this->addServers();
 	}
 
 	/**

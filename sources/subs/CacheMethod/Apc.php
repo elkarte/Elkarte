@@ -36,8 +36,9 @@ class Apc extends Cache_Method_Abstract
 	/**
 	 * {@inheritdoc }
 	 */
-	public function init()
+	public function __construct($options)
 	{
+		parent::__construct($options);
 		$this->apcu = function_exists('apcu_store');
 	}
 

@@ -36,11 +36,6 @@ abstract class Cache_Method_Abstract implements Cache_Method_Interface
 	}
 
 	/**
-	 * A method that allows to "initialize" the caching engine if needed
-	 */
-	public function init() {}
-
-	/**
 	 * {@inheritdoc }
 	 */
 	public function fixkey($key)

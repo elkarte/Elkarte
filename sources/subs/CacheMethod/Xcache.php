@@ -27,10 +27,12 @@ class Xcache extends Cache_Method_Abstract
 	/**
 	 * {@inheritdoc }
 	 */
-	public function init()
+	public function __construct($options)
 	{
+		parent::__construct($options);
+
 		// Xcache may need auth credentials, depending on how its been set up
-		if (!empty($this->_options['cache_uid']) && !empty($this->_options['cache_password']))
+		if (!empty($this->_options['cache_uid']) && !empty($this->_options['cache_password']) && $this->isAvailable())
 		{
 			$_SERVER['PHP_AUTH_USER'] = $this->_options['cache_uid'];
 			$_SERVER['PHP_AUTH_PW'] = $this->_options['cache_password'];
