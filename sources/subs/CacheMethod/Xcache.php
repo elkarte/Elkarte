@@ -25,12 +25,12 @@ namespace ElkArte\sources\subs\CacheMethod;
 class Xcache extends Cache_Method_Abstract
 {
 	/**
-	 * {@inheritdoc }
+	 * {@inheritdoc}
 	 */
 	protected $title = 'XCache';
 
 	/**
-	 * {@inheritdoc }
+	 * {@inheritdoc}
 	 */
 	public function __construct($options)
 	{
@@ -45,7 +45,7 @@ class Xcache extends Cache_Method_Abstract
 	}
 
 	/**
-	 * {@inheritdoc }
+	 * {@inheritdoc}
 	 */
 	public function put($key, $value, $ttl = 120)
 	{
@@ -56,7 +56,7 @@ class Xcache extends Cache_Method_Abstract
 	}
 
 	/**
-	 * {@inheritdoc }
+	 * {@inheritdoc}
 	 */
 	public function get($key, $ttl = 120)
 	{
@@ -66,7 +66,7 @@ class Xcache extends Cache_Method_Abstract
 	}
 
 	/**
-	 * {@inheritdoc }
+	 * {@inheritdoc}
 	 */
 	public function clean($type = '')
 	{
@@ -89,7 +89,7 @@ class Xcache extends Cache_Method_Abstract
 	}
 
 	/**
-	 * {@inheritdoc }
+	 * {@inheritdoc}
 	 */
 	public function isAvailable()
 	{
@@ -97,7 +97,7 @@ class Xcache extends Cache_Method_Abstract
 	}
 
 	/**
-	 * {@inheritdoc }
+	 * {@inheritdoc}
 	 */
 	public function details()
 	{

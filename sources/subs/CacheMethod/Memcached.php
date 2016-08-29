@@ -19,7 +19,7 @@ namespace ElkArte\sources\subs\CacheMethod;
 class Memcached extends Cache_Method_Abstract
 {
 	/**
-	 * {@inheritdoc }
+	 * {@inheritdoc}
 	 */
 	protected $title = 'Memcached';
 
@@ -32,7 +32,7 @@ class Memcached extends Cache_Method_Abstract
 	protected $obj;
 
 	/**
-	 * {@inheritdoc }
+	 * {@inheritdoc}
 	 */
 	public function __construct($options)
 	{
@@ -54,7 +54,7 @@ class Memcached extends Cache_Method_Abstract
 	}
 
 	/**
-	 * {@inheritdoc }
+	 * {@inheritdoc}
 	 */
 	public function put($key, $value, $ttl = 120)
 	{
@@ -62,7 +62,7 @@ class Memcached extends Cache_Method_Abstract
 	}
 
 	/**
-	 * {@inheritdoc }
+	 * {@inheritdoc}
 	 */
 	public function get($key, $ttl = 120)
 	{
@@ -73,7 +73,7 @@ class Memcached extends Cache_Method_Abstract
 	}
 
 	/**
-	 * {@inheritdoc }
+	 * {@inheritdoc}
 	 */
 	public function clean($type = '')
 	{
@@ -90,9 +90,12 @@ class Memcached extends Cache_Method_Abstract
 	 */
 	protected function addServers()
 	{
+		global $cache_memcached;
+
+		$servers = explode(',', $cache_memcached);
 		$serversm = array();
 		$serversmList = $this->getServers();
-		foreach ($this->_options['servers'] as $server)
+		foreach ($servers as $server)
 		{
 			$server = explode(':', trim($server));
 			$server[1] = !empty($server[1]) ? $server[1] : 11211;
@@ -114,18 +117,11 @@ class Memcached extends Cache_Method_Abstract
 	 */
 	protected function getServers()
 	{
-		$servers = $this->obj->getServerList();
-		$serversm = array();
-		if (is_array($servers))
-		{
-			foreach ($servers as $server)
-				$serversm[] = array($server['host'], $server['port']);
-		}
-		return $serversm;
+		return array_keys($this->obj->getStats());
 	}
 
 	/**
-	 * {@inheritdoc }
+	 * {@inheritdoc}
 	 */
 	protected function setOptions()
 	{
@@ -170,7 +166,7 @@ class Memcached extends Cache_Method_Abstract
 	}
 
 	/**
-	 * {@inheritdoc }
+	 * {@inheritdoc}
 	 */
 	public function isAvailable()
 	{
@@ -178,7 +174,7 @@ class Memcached extends Cache_Method_Abstract
 	}
 
 	/**
-	 * {@inheritdoc }
+	 * {@inheritdoc}
 	 */
 	public function details()
 	{
@@ -204,9 +200,9 @@ class Memcached extends Cache_Method_Abstract
 			'text', $txt['cache_memcached'], 'cache_memcached',
 			'force_div_id' => 'memcached_cache_memcached',
 		);
-		$serversmList = array_keys($this->obj->getStats());
+		$serversmList = $this->getServers();
 		if (!empty($serversmList))
-			$var['postinput'] = '<br><br>' . $txt['cache_memcached_servers'] . ':<br><br>' . implode('<br>', $serversmList);
+			$var['postinput'] = '<br><br>Added servers:<br><br>' . implode('<br>', $serversmList);
 
 		$config_vars[] = $var;
 	}

@@ -29,12 +29,12 @@ use UnexpectedValueException;
 class Filebased extends Cache_Method_Abstract
 {
 	/**
-	 * {@inheritdoc }
+	 * {@inheritdoc}
 	 */
 	protected $title = 'File-based caching';
 
 	/**
-	 * {@inheritdoc }
+	 * {@inheritdoc}
 	 */
 	public function put($key, $value, $ttl = 120)
 	{
@@ -56,7 +56,7 @@ class Filebased extends Cache_Method_Abstract
 	}
 
 	/**
-	 * {@inheritdoc }
+	 * {@inheritdoc}
 	 */
 	public function get($key, $ttl = 120)
 	{
@@ -85,7 +85,7 @@ class Filebased extends Cache_Method_Abstract
 	}
 
 	/**
-	 * {@inheritdoc }
+	 * {@inheritdoc}
 	 */
 	public function clean($type = '')
 	{
@@ -108,7 +108,7 @@ class Filebased extends Cache_Method_Abstract
 	}
 
 	/**
-	 * {@inheritdoc }
+	 * {@inheritdoc}
 	 */
 	public function fixkey($key)
 	{
@@ -116,7 +116,7 @@ class Filebased extends Cache_Method_Abstract
 	}
 
 	/**
-	 * {@inheritdoc }
+	 * {@inheritdoc}
 	 */
 	public function isAvailable()
 	{
@@ -124,7 +124,7 @@ class Filebased extends Cache_Method_Abstract
 	}
 
 	/**
-	 * {@inheritdoc }
+	 * {@inheritdoc}
 	 */
 	public function details()
 	{

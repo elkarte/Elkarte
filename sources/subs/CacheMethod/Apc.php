@@ -19,7 +19,7 @@ namespace ElkArte\sources\subs\CacheMethod;
 class Apc extends Cache_Method_Abstract
 {
 	/**
-	 * {@inheritdoc }
+	 * {@inheritdoc}
 	 */
 	protected $title = 'Alternative PHP Cache';
 
@@ -31,7 +31,7 @@ class Apc extends Cache_Method_Abstract
 	protected $apcu = false;
 
 	/**
-	 * {@inheritdoc }
+	 * {@inheritdoc}
 	 */
 	public function __construct($options)
 	{
@@ -40,7 +40,7 @@ class Apc extends Cache_Method_Abstract
 	}
 
 	/**
-	 * {@inheritdoc }
+	 * {@inheritdoc}
 	 */
 	public function put($key, $value, $ttl = 120)
 	{
@@ -63,7 +63,7 @@ class Apc extends Cache_Method_Abstract
 	}
 
 	/**
-	 * {@inheritdoc }
+	 * {@inheritdoc}
 	 */
 	public function get($key, $ttl = 120)
 	{
@@ -79,7 +79,7 @@ class Apc extends Cache_Method_Abstract
 	}
 
 	/**
-	 * {@inheritdoc }
+	 * {@inheritdoc}
 	 */
 	public function clean($type = '')
 	{
@@ -96,7 +96,7 @@ class Apc extends Cache_Method_Abstract
 	}
 
 	/**
-	 * {@inheritdoc }
+	 * {@inheritdoc}
 	 */
 	public function isAvailable()
 	{
@@ -104,7 +104,7 @@ class Apc extends Cache_Method_Abstract
 	}
 
 	/**
-	 * {@inheritdoc }
+	 * {@inheritdoc}
 	 */
 	public function details()
 	{

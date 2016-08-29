@@ -43,7 +43,7 @@ abstract class Cache_Method_Abstract implements Cache_Method_Interface
 	protected $prefix = 'elkarte';
 
 	/**
-	 * {@inheritdoc }
+	 * {@inheritdoc}
 	 */
 	public function __construct($options)
 	{
@@ -51,7 +51,7 @@ abstract class Cache_Method_Abstract implements Cache_Method_Interface
 	}
 
 	/**
-	 * {@inheritdoc }
+	 * {@inheritdoc}
 	 */
 	public function fixkey($key)
 	{
@@ -59,7 +59,7 @@ abstract class Cache_Method_Abstract implements Cache_Method_Interface
 	}
 
 	/**
-	 * {@inheritdoc }
+	 * {@inheritdoc}
 	 */
 	public function isMiss()
 	{
@@ -67,7 +67,7 @@ abstract class Cache_Method_Abstract implements Cache_Method_Interface
 	}
 
 	/**
-	 * {@inheritdoc }
+	 * {@inheritdoc}
 	 */
 	public function remove($key)
 	{
@@ -75,14 +75,14 @@ abstract class Cache_Method_Abstract implements Cache_Method_Interface
 	}
 
 	/**
-	 * {@inheritdoc }
+	 * {@inheritdoc}
 	 */
 	public function settings(&$confing_vars)
 	{
 	}
 
 	/**
-	 * {@inheritdoc }
+	 * {@inheritdoc}
 	 */
 	public function title()
 	{
