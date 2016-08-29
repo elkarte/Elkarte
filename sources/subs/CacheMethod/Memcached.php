@@ -198,6 +198,15 @@ class Memcached extends Cache_Method_Abstract
 	{
 		global $txt;
 
-		$config_vars[] = array('cache_memcached', $txt['cache_memcached'], 'file', 'text', $txt['cache_memcached'], 'cache_memcached', 'force_div_id' => 'memcached_cache_memcached');
+		$var = array(
+			'cache_memcached', $txt['cache_memcached'], 'file',
+			'text', $txt['cache_memcached'], 'cache_memcached',
+			'force_div_id' => 'memcached_cache_memcached',
+		);
+		$serversmList = array_keys($this->obj->getStats());
+		if (!empty($serversmList))
+			$var['postinput'] = '<br><br>' . $txt['cache_memcached_servers'] . ':<br><br>' . implode('<br>', $serversmList);
+
+		$config_vars[] = $var;
 	}
 }
