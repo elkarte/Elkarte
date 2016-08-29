@@ -27,6 +27,11 @@ class Xcache extends Cache_Method_Abstract
 	/**
 	 * {@inheritdoc }
 	 */
+	protected $title = 'XCache';
+
+	/**
+	 * {@inheritdoc }
+	 */
 	public function __construct($options)
 	{
 		parent::__construct($options);
@@ -96,15 +101,7 @@ class Xcache extends Cache_Method_Abstract
 	 */
 	public function details()
 	{
-		return array('title' => $this->title(), 'version' => XCACHE_VERSION);
-	}
-
-	/**
-	 * {@inheritdoc }
-	 */
-	public function title()
-	{
-		return 'XCache';
+		return array('title' => $this->title, 'version' => XCACHE_VERSION);
 	}
 
 	/**

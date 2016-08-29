@@ -28,6 +28,13 @@ abstract class Cache_Method_Abstract implements Cache_Method_Interface
 	protected $is_miss = true;
 
 	/**
+	 * the (human-readable) name of the caching engine
+	 *
+	 * @var string
+	 */
+	protected $title = '';
+
+	/**
 	 * This is prefixed to all cache entries so that different
 	 * applications won't interfere with each other.
 	 *
@@ -72,5 +79,13 @@ abstract class Cache_Method_Abstract implements Cache_Method_Interface
 	 */
 	public function settings(&$confing_vars)
 	{
+	}
+
+	/**
+	 * {@inheritdoc }
+	 */
+	public function title()
+	{
+		return $this->title;
 	}
 }

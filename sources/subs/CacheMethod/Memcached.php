@@ -14,12 +14,21 @@
 namespace ElkArte\sources\subs\CacheMethod;
 
 /**
- * Memcache and memcached.
- *
- * memcache is the first choice, if this is not available then memcached is used
+ * Memcached and Memcache.
  */
 class Memcached extends Cache_Method_Abstract
 {
+	/**
+	 * {@inheritdoc }
+	 */
+	protected $title = 'Memcached';
+
+	/**
+	 * Memcached is the first choice, if this is
+	 * not available then Memcache is used.
+	 *
+	 * @var \Memcached|\Memcache
+	 */
 	protected $obj;
 
 	/**
@@ -174,17 +183,9 @@ class Memcached extends Cache_Method_Abstract
 	public function details()
 	{
 		return array(
-			'title' => $this->title(),
+			'title' => $this->title,
 			'version' => current($this->obj->getVersion())
 		);
-	}
-
-	/**
-	 * {@inheritdoc }
-	 */
-	public function title()
-	{
-		return 'Memcached';
 	}
 
 	/**

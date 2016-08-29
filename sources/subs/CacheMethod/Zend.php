@@ -19,7 +19,9 @@ namespace ElkArte\sources\subs\CacheMethod;
 class Zend extends Cache_Method_Abstract
 {
 	/**
+	 * {@inheritdoc }
 	 */
+	protected $title = 'Zend Platform/Performance Suite';
 
 	/**
 	 * {@inheritdoc }
@@ -61,14 +63,6 @@ class Zend extends Cache_Method_Abstract
 	 */
 	public function details()
 	{
-		return array('title' => $this->title(), 'version' => zend_version());
-	}
-
-	/**
-	 * {@inheritdoc }
-	 */
-	public function title()
-	{
-		return 'Zend Platform/Performance Suite';
+		return array('title' => $this->title, 'version' => zend_version());
 	}
 }

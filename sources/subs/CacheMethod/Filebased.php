@@ -31,6 +31,11 @@ class Filebased extends Cache_Method_Abstract
 	/**
 	 * {@inheritdoc }
 	 */
+	protected $title = 'File-based caching';
+
+	/**
+	 * {@inheritdoc }
+	 */
 	public function put($key, $value, $ttl = 120)
 	{
 		$fName = 'data_' . $key . '.json';
@@ -123,15 +128,7 @@ class Filebased extends Cache_Method_Abstract
 	 */
 	public function details()
 	{
-		return array('title' => $this->title(), 'version' => 'N/A');
-	}
-
-	/**
-	 * {@inheritdoc }
-	 */
-	public function title()
-	{
-		return 'File-based caching';
+		return array('title' => $this->title, 'version' => 'N/A');
 	}
 
 	/**
