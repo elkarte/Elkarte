@@ -709,7 +709,7 @@ class Admin_Controller extends Action_Controller
 			'eaccelerator',
 			'zend',
 			'apc',
-			'memcache',
+			'memcached',
 			'xcache',
 			'opcache',
 			'php',

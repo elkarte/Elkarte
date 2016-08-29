@@ -173,7 +173,10 @@ class Memcached extends Cache_Method_Abstract
 	 */
 	public function details()
 	{
-		return array('title' => $this->title(), 'version' => $this->obj->getVersion());
+		return array(
+			'title' => $this->title(),
+			'version' => current($this->obj->getVersion())
+		);
 	}
 
 	/**
