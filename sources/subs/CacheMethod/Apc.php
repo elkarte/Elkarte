@@ -19,12 +19,9 @@ namespace ElkArte\sources\subs\CacheMethod;
 class Apc extends Cache_Method_Abstract
 {
 	/**
-	 * This is prefixed to all cache entries so that different
-	 * applications won't interfere with each other.
-	 *
-	 * @var string
+	 * {@inheritdoc }
 	 */
-	protected $namespace = 'elkarte';
+	protected $title = 'Alternative PHP Cache';
 
 	/**
 	 * Whether to use the APCu functions or the original APC ones.
@@ -47,21 +44,21 @@ class Apc extends Cache_Method_Abstract
 	 */
 	public function put($key, $value, $ttl = 120)
 	{
-		$namespacedKey = $this->namespace . ':' . $key;
+		$prefixdKey = $this->prefix . ':' . $key;
 		// An extended key is needed to counteract a bug in APC.
 		if ($this->apcu)
 		{
 			if ($value === null)
-				apcu_delete($namespacedKey);
+				apcu_delete($prefixdKey);
 			else
-				apcu_store($namespacedKey, $value, $ttl);
+				apcu_store($prefixdKey, $value, $ttl);
 		}
 		else
 		{
 			if ($value === null)
-				apc_delete($namespacedKey);
+				apc_delete($prefixdKey);
 			else
-				apc_store($namespacedKey, $value, $ttl);
+				apc_store($prefixdKey, $value, $ttl);
 		}
 	}
 
@@ -70,12 +67,12 @@ class Apc extends Cache_Method_Abstract
 	 */
 	public function get($key, $ttl = 120)
 	{
-		$namespacedKey = $this->namespace . ':' . $key;
+		$prefixdKey = $this->prefix . ':' . $key;
 		$success = false;
 		if ($this->apcu)
-			$result = apcu_fetch($namespacedKey, $success);
+			$result = apcu_fetch($prefixdKey, $success);
 		else
-			$result = apc_fetch($namespacedKey, $success);
+			$result = apc_fetch($prefixdKey, $success);
 		$this->is_miss = !$success;
 
 		return $result;
@@ -111,14 +108,6 @@ class Apc extends Cache_Method_Abstract
 	 */
 	public function details()
 	{
-		return array('title' => $this->title(), 'version' => phpversion($this->apcu ? 'apcu' : 'apc'));
-	}
-
-	/**
-	 * {@inheritdoc }
-	 */
-	public function title()
-	{
-		return 'Alternative PHP Cache';
+		return array('title' => $this->title, 'version' => phpversion($this->apcu ? 'apcu' : 'apc'));
 	}
 }

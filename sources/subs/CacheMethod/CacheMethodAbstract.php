@@ -28,6 +28,14 @@ abstract class Cache_Method_Abstract implements Cache_Method_Interface
 	protected $is_miss = true;
 
 	/**
+	 * This is prefixed to all cache entries so that different
+	 * applications won't interfere with each other.
+	 *
+	 * @var string
+	 */
+	protected $prefix = 'elkarte';
+
+	/**
 	 * {@inheritdoc }
 	 */
 	public function __construct($options)

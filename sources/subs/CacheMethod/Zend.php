@@ -19,12 +19,7 @@ namespace ElkArte\sources\subs\CacheMethod;
 class Zend extends Cache_Method_Abstract
 {
 	/**
-	 * This is prefixed to all cache entries so that different
-	 * applications won't interfere with each other.
-	 *
-	 * @var string
 	 */
-	protected $namespace = 'elkarte';
 
 	/**
 	 * {@inheritdoc }
