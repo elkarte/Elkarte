@@ -33,7 +33,7 @@ class TestCache extends PHPUnit_Framework_TestCase
 	{
 		$this->_cache_obj = new ElkArte\sources\subs\CacheMethod\Filebased(array());
 		$this->doCacheTests(function($key) {
-			return file_exists(CACHEDIR . '/data_' . $key . '.php');
+			return file_exists(CACHEDIR . '/data_' . $key . '.json');
 		});
 	}
 
