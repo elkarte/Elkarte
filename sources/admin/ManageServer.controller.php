@@ -329,16 +329,6 @@ class ManageServer_Controller extends Action_Controller
 
 		$context['settings_message'] = $txt['caching_information'];
 
-		// Let them know if they may have problems
-		if ($cache_accelerator === 'filebased' && Cache::instance()->isEnabled() && extension_loaded('Zend OPcache'))
-		{
-			// The opcache will cache the filebased user data files, updating them based on opcache.revalidate_freq
-			// which can cause delays (or prevent) the invalidation of file cache files
-			$opcache_config = @opcache_get_configuration();
-			if (!empty($opcache_config['directives']['opcache.enable']))
-				$context['settings_message'] = $txt['cache_conflict'];
-		}
-
 		// Saving again?
 		if (isset($this->_req->query->save))
 		{
