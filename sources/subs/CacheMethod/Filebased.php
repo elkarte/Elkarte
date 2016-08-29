@@ -36,9 +36,21 @@ class Filebased extends Cache_Method_Abstract
 	/**
 	 * {@inheritdoc}
 	 */
+	protected $prefix = 'data_';
+
+	/**
+	 * File extension.
+	 *
+	 * @var string
+	 */
+	protected $ext = 'json';
+
+	/**
+	 * {@inheritdoc}
+	 */
 	public function put($key, $value, $ttl = 120)
 	{
-		$fName = 'data_' . $key . '.json';
+		$fName = $this->prefix . '_' . $key . '.' . $this->ext;
 
 		// Clearing this data
 		if ($value === null)
@@ -60,7 +72,7 @@ class Filebased extends Cache_Method_Abstract
 	 */
 	public function get($key, $ttl = 120)
 	{
-		$fName = 'data_' . $key . '.json';
+		$fName = $this->prefix . '_' . $key . '.' . $this->ext;
 		if (file_exists(CACHEDIR . '/' . $fName) && filesize(CACHEDIR . '/' . $fName) > 10)
 		{
 			$value = json_decode(file_get_contents(CACHEDIR . '/' . $fName));

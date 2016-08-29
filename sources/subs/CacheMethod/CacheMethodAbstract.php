@@ -28,7 +28,7 @@ abstract class Cache_Method_Abstract implements Cache_Method_Interface
 	protected $is_miss = true;
 
 	/**
-	 * the (human-readable) name of the caching engine
+	 * the (human-readable) name of the caching engine.
 	 *
 	 * @var string
 	 */
