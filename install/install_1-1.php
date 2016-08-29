@@ -2153,7 +2153,7 @@ class InstallInstructions_install_1_1
 			array(
 				array('name' => 'message_key',  'type' => 'varchar', 'size' => 32, 'default' => ''),
 				array('name' => 'message_type', 'type' => 'varchar', 'size' => 10, 'default' => ''),
-				array('name' => 'message_id',   'type' => 'varchar', 'size' => 12, 'default' => ''),
+				array('name' => 'message_id',   'type' => 'mediumint', 'size' => 8, 'default' => 0),
 				array('name' => 'time_sent',    'type' => 'int', 'size' => 10, 'default' => 0),
 				array('name' => 'email_to',     'type' => 'varchar', 'size' => 50, 'default' => ''),
 			),
@@ -2173,7 +2173,7 @@ class InstallInstructions_install_1_1
 				array('name' => 'error',        'type' => 'varchar', 'size' => 255, 'default' => ''),
 				array('name' => 'message_key',  'type' => 'varchar', 'size' => 32, 'default' => ''),
 				array('name' => 'subject',      'type' => 'varchar', 'size' => 255, 'default' => ''),
-				array('name' => 'message_id',   'type' => 'varchar', 'size' => 12, 'default' => ''),
+				array('name' => 'message_id',   'type' => 'int', 'size' => 10, 'default' => 0),
 				array('name' => 'id_board',     'type' => 'smallint', 'size' => 5, 'default' => 0),
 				array('name' => 'email_from',   'type' => 'varchar', 'size' => 50, 'default' => ''),
 				array('name' => 'message_type', 'type' => 'char', 'size' => 10, 'default' => ''),
