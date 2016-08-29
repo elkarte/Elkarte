@@ -89,7 +89,7 @@ class Memcached extends Cache_Method_Abstract
 			$server[1] = !empty($server[1]) ? $server[1] : 11211;
 			$serversm[] = $server;
 		}
-		$serversm = array_intersect($serversm, $serversmList);
+		$serversm = array_diff($serversm, $serversmList);
 		if (!empty($serversm))
 		{
 			return $this->obj->addServers($serversm);
