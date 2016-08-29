@@ -886,9 +886,9 @@ function template_show_settings()
 			else
 			{
 				echo '
-					<p class="description">
+					<div class="description">
 						', $config_var['label'], '
-					</p>';
+					</div>';
 			}
 
 			continue;
