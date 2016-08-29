@@ -134,12 +134,6 @@ $txt['cache_memcached_servers'] = 'Added servers';
 $txt['cache_accelerator'] = 'Caching Accelerator';
 $txt['cache_uid'] = 'Cache Accelerator Userid';
 $txt['cache_password'] = 'Cache Accelerator Password';
-$txt['default_cache'] = 'File based caching';
-$txt['apc_cache'] = 'APC';
-$txt['memcached_cache'] = 'Memcached';
-$txt['zend_cache'] = 'Zend Platform/Performance Suite';
-$txt['xcache_cache'] = 'XCache';
-$txt['cache_conflict'] = 'You are using PHP\'s opcache with ElkArte\'s file based caching.  For best results you should blacklist ElkArte\'s cache directory (' . CACHEDIR . '/*) using the opcache.blacklist_filename directive.';
 
 $txt['loadavg_warning'] = '<span class="error">Please note: the settings below are to be edited with care. Setting any of them too low may render your forum <strong>unusable</strong>! The current load average is <strong>%01.2f</strong></span>';
 $txt['loadavg_enable'] = 'Enable load balancing by load averages';
