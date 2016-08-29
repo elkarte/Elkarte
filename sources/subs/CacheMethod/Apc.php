@@ -111,7 +111,7 @@ class Apc extends Cache_Method_Abstract
 	 */
 	public function details()
 	{
-		return array('title' => $this->title(), 'version' => phpversion('apc'));
+		return array('title' => $this->title(), 'version' => phpversion($this->apcu ? 'apcu' : 'apc'));
 	}
 
 	/**
