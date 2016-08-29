@@ -8,7 +8,7 @@
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
- * @version 1.1 beta 1
+ * @version 1.1 beta 2
  *
  */
 
@@ -1316,14 +1316,18 @@ function query_key_owner($email_message)
 		FROM {db_prefix}postby_emails
 		WHERE message_key = {string:key}
 			AND message_type = {string:type}
-			AND message_id = {string:message}
+			AND (message_id = {string:message}
+				OR message_id = {string:type_message}
+			)
 		LIMIT 1',
 		array(
 			'key' => $email_message->message_key,
 			'type' => $email_message->message_type,
 			'message' => $email_message->message_id,
+			'type_message' => $email_message->message_type . $email_message->message_id,
 		)
 	);
+
 	list ($email_to) = $db->fetch_row($request);
 	$db->free_result($request);
 

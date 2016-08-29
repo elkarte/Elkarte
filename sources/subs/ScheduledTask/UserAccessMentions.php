@@ -7,7 +7,7 @@
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
- * @version 1.1 beta 1
+ * @version 1.1 beta 2
  *
  */
 
@@ -34,7 +34,7 @@ class User_Access_Mentions implements Scheduled_Task_Interface
 		global $modSettings;
 
 		$db = database();
-		$user_access_mentions = @unserialize($modSettings['user_access_mentions']);
+		$user_access_mentions = \Util::unserialize($modSettings['user_access_mentions']);
 
 		// This should be set only because of an immediate scheduled task, so higher priority
 		if (!empty($user_access_mentions))
@@ -200,7 +200,7 @@ class User_Access_Mentions implements Scheduled_Task_Interface
 				if ($db->num_rows($request2) == 1)
 				{
 					if (!empty($modSettings['user_access_mentions']))
-						$modSettings['user_access_mentions'] = Util::unserialize($modSettings['user_access_mentions']);
+						$modSettings['user_access_mentions'] = \Util::unserialize($modSettings['user_access_mentions']);
 					else
 						$modSettings['user_access_mentions'] = array();
 

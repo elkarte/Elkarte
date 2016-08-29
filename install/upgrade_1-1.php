@@ -9,7 +9,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.1 beta 1
+ * @version 1.1 beta 2
  *
  */
 
@@ -429,6 +429,50 @@ class UpgradeInstructions_upgrade_1_1
 							)
 						);
 					}
+				}
+			),
+		);
+	}
+
+
+	public function fixing_postbyemail_title()
+	{
+		return 'Fix a bug in post-by-email handling...';
+	}
+
+	public function fixing_postbyemail()
+	{
+		return array(
+			array(
+				'debug_title' => 'Change the message_id column to varchar in postby_emails...',
+				'function' => function($db, $db_table)
+				{
+					$db_table->db_change_column('{db_prefix}postby_emails',
+						'message_id',
+						array(
+							'type' => 'varchar',
+							'size' => 12,
+							'default' => ''
+						),
+						array(),
+						'ignore'
+					);
+				}
+			),
+			array(
+				'debug_title' => 'Change the message_id column to varchar in postby_emails_error...',
+				'function' => function($db, $db_table)
+				{
+					$db_table->db_change_column('{db_prefix}postby_emails_error',
+						'message_id',
+						array(
+							'type' => 'varchar',
+							'size' => 12,
+							'default' => ''
+						),
+						array(),
+						'ignore'
+					);
 				}
 			),
 		);

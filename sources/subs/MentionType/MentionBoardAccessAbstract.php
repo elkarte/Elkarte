@@ -7,7 +7,7 @@
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
- * @version 1.1 beta 1
+ * @version 1.1 beta 2
  *
  */
 
@@ -86,7 +86,7 @@ abstract class Mention_BoardAccess_Abstract extends Mention_Message_Abstract
 				unset($mentions[$key]);
 
 			if (!empty($modSettings['user_access_mentions']))
-				$modSettings['user_access_mentions'] = Util::unserialize($modSettings['user_access_mentions']);
+				$modSettings['user_access_mentions'] = \Util::unserialize($modSettings['user_access_mentions']);
 			else
 				$modSettings['user_access_mentions'] = array();
 

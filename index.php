@@ -13,7 +13,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:		BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.1 beta 1
+ * @version 1.1 beta 2
  *
  */
 
@@ -26,7 +26,7 @@ const FORUM_VERSION = 'ElkArte 1.1';
 const ELK = '1';
 
 // Shortcut for the browser cache stale
-const CACHE_STALE = '?R11';
+const CACHE_STALE = '?R11B2';
 
 // Report errors but not depreciated ones
 error_reporting(E_ALL | E_STRICT & ~8192);

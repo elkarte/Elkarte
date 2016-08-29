@@ -3,13 +3,14 @@
 # Time to create an ElkArte build
 # Command example:
 #   sh release_tools/build.sh development 1.1 beta
-#   sh release_tools/build.sh development 1.1 beta 2
+#   sh release_tools/build.sh development 1.1 beta2
 
 # First things first: check dependencies
 command -v git >/dev/null 2>&1 || { echo >&2 "git is required but it's not installed.  Aborting."; exit 1; }
 command -v zip >/dev/null 2>&1 || { echo >&2 "zip is required but it's not installed.  Aborting."; exit 1; }
 
-REPO="http://github.com/ElkArte/ElkArte.git"
+# REPO="http://github.com/ElkArte/ElkArte.git"
+REPO="git@bitbucket.org:elkartesecurity/elkarte.git"
 BRANCH=$1
 VERSION=$2
 if [[ $4 && ${4-_} ]]
@@ -19,7 +20,7 @@ if [[ $4 && ${4-_} ]]
 		SUBVERSION="$3"
 fi
 
-git clone --depth 5 "$REPO" "./$VERSION""_""$SUBVERSION"
+git clone "$REPO" "./$VERSION""_""$SUBVERSION"
 
 cd "./$VERSION""_""$SUBVERSION"
 
@@ -43,4 +44,6 @@ rm .gitignore
 rm .scrutinizer.yml
 rm .travis.yml
 
-zip "ElkArte_v${VERSION//[.]/-}-$SUBVERSION""_install.zip" -r ./
+zip "../ElkArte_v${VERSION//[.]/-}-$SUBVERSION""_install.zip" -r ./
+cd ..
+rm -rf "./$VERSION""_""$SUBVERSION"

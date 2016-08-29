@@ -12,7 +12,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.1 beta 1
+ * @version 1.1 beta 2
  *
  */
 
@@ -47,6 +47,7 @@ function sendmail($to, $subject, $message, $from = null, $message_id = null, $se
 
 	// Line breaks need to be \r\n only in windows or for SMTP.
 	$line_break = detectServer()->is('windows') || !$use_sendmail ? "\r\n" : "\n";
+	$message_type = $message_id !== null && isset($message_id[0]) ? $message_id[0] : 'm';
 
 	// So far so good.
 	$mail_result = true;
@@ -244,7 +245,7 @@ function sendmail($to, $subject, $message, $from = null, $message_id = null, $se
 			if ($maillist)
 			{
 				$unq_head_array[0] = md5($boardurl . microtime() . rand());
-				$unq_head_array[1] = '';
+				$unq_head_array[1] = $message_type;
 				$unq_head_array[2] = $message_id;
 				$unq_head = $unq_head_array[0] . '-' . $unq_head_array[2];
 				$encoded_unq_head = base64_encode($line_break . $line_break . '[' . $unq_head . ']' . $line_break);
@@ -536,6 +537,7 @@ function smtp_mail($mail_to_array, $subject, $message, $headers, $priority, $mes
 	global $modSettings, $webmaster_email, $txt, $scripturl;
 
 	$modSettings['smtp_host'] = trim($modSettings['smtp_host']);
+	$message_type = $message_id !== null && isset($message_id[0]) ? $message_id[0] : 'm';
 
 	// Try POP3 before SMTP?
 	// @todo There's no interface for this yet.
@@ -635,7 +637,7 @@ function smtp_mail($mail_to_array, $subject, $message, $headers, $priority, $mes
 		if (!empty($modSettings['maillist_enabled']) && $message_id !== null && $priority != 4)
 		{
 			$unq_head_array[0] = md5($scripturl . microtime() . rand());
-			$unq_head_array[1] = '';
+			$unq_head_array[1] = $message_type;
 			$unq_head_array[2] = $message_id;
 			$unq_head = $unq_head_array[0] . '-' . $unq_head_array[2];
 			$encoded_unq_head = base64_encode($line_break . $line_break . '[' . $unq_head . ']' . $line_break);
@@ -1367,7 +1369,7 @@ function reduceMailQueue($batch_size = false, $override_limit = false, $force_se
 			if (!empty($modSettings['maillist_enabled']) && $email['message_id'] !== null && strpos($email['headers'], 'List-Id: <') !== false)
 			{
 				$unq_head_array[0] = md5($scripturl . microtime() . rand());
-				$unq_head_array[1] = '';
+				$unq_head_array[1] = isset($email['message_id'][0]) ? $email['message_id'][0] : 'm';
 				$unq_head_array[2] = $email['message_id'];
 				$unq_head = $unq_head_array[0] . '-' . $unq_head_array[2];
 				$encoded_unq_head = base64_encode($line_break . $line_break . '[' . $unq_head . ']' . $line_break);
