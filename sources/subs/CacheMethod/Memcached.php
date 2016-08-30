@@ -202,7 +202,7 @@ class Memcached extends Cache_Method_Abstract
 		);
 		$serversmList = $this->getServers();
 		if (!empty($serversmList))
-			$var['postinput'] = '<br><br>Added servers:<br><br>' . implode('<br>', $serversmList);
+			$var['postinput'] = $txt['cache_memcached_servers'] . implode('<br>', $serversmList);
 
 		$config_vars[] = $var;
 	}
