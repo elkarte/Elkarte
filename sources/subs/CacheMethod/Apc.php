@@ -44,21 +44,21 @@ class Apc extends Cache_Method_Abstract
 	 */
 	public function put($key, $value, $ttl = 120)
 	{
-		$prefixdKey = $this->prefix . ':' . $key;
+		$prefixedKey = $this->getprefixedKey($key);
 		// An extended key is needed to counteract a bug in APC.
 		if ($this->apcu)
 		{
 			if ($value === null)
-				apcu_delete($prefixdKey);
+				apcu_delete($prefixedKey);
 			else
-				apcu_store($prefixdKey, $value, $ttl);
+				apcu_store($prefixedKey, $value, $ttl);
 		}
 		else
 		{
 			if ($value === null)
-				apc_delete($prefixdKey);
+				apc_delete($prefixedKey);
 			else
-				apc_store($prefixdKey, $value, $ttl);
+				apc_store($prefixedKey, $value, $ttl);
 		}
 	}
 
@@ -67,12 +67,12 @@ class Apc extends Cache_Method_Abstract
 	 */
 	public function get($key, $ttl = 120)
 	{
-		$prefixdKey = $this->prefix . ':' . $key;
+		$prefixedKey = $this->getprefixedKey($key);
 		$success = false;
 		if ($this->apcu)
-			$result = apcu_fetch($prefixdKey, $success);
+			$result = apcu_exists($prefixedKey, $success);
 		else
-			$result = apc_fetch($prefixdKey, $success);
+			$result = apc_exists($prefixedKey, $success);
 		$this->is_miss = !$success;
 
 		return $result;

@@ -46,11 +46,31 @@ class Filebased extends Cache_Method_Abstract
 	protected $ext = 'json';
 
 	/**
+	 * Obtain from the parent class the variables necessary
+	 * to help the tests stay running smoothly.
+	 *
+	 * @param string $key
+	 * @return string
+	 */
+	public function getFileName($key)
+	{
+		return $this->prefix . '_' . $key . '.' . $this->ext;
+	}
+
+	/**
+	 * {@inheritdoc}
+	 */
+	public function exists($key)
+	{
+		return file_exists(CACHEDIR . '/' . $this->getFileName($key));
+	}
+
+	/**
 	 * {@inheritdoc}
 	 */
 	public function put($key, $value, $ttl = 120)
 	{
-		$fName = $this->prefix . '_' . $key . '.' . $this->ext;
+		$fName = $this->getFileName($key);
 
 		// Clearing this data
 		if ($value === null)
@@ -72,7 +92,7 @@ class Filebased extends Cache_Method_Abstract
 	 */
 	public function get($key, $ttl = 120)
 	{
-		$fName = $this->prefix . '_' . $key . '.' . $this->ext;
+		$fName = $this->getFileName($key);
 		if (file_exists(CACHEDIR . '/' . $fName) && filesize(CACHEDIR . '/' . $fName) > 10)
 		{
 			$value = json_decode(file_get_contents(CACHEDIR . '/' . $fName));

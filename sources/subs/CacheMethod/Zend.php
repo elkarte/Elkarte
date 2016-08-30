@@ -26,9 +26,18 @@ class Zend extends Cache_Method_Abstract
 	/**
 	 * {@inheritdoc}
 	 */
+	public function exists($key)
+	{
+		$result = $this->get($this->getprefixedKey($key));
+		return !$this->is_miss;
+	}
+
+	/**
+	 * {@inheritdoc}
+	 */
 	public function put($key, $value, $ttl = 120)
 	{
-		zend_shm_cache_store('ELK::' . $key, $value, $ttl);
+		zend_shm_cache_store($this->getprefixedKey($key), $value, $ttl);
 	}
 
 	/**
@@ -36,7 +45,7 @@ class Zend extends Cache_Method_Abstract
 	 */
 	public function get($key, $ttl = 120)
 	{
-		$result = zend_shm_cache_fetch('ELK::' . $key);
+		$result = zend_shm_cache_fetch($this->getprefixedKey($key));
 		$this->is_miss = $result === null;
 
 		return $result;
@@ -47,7 +56,7 @@ class Zend extends Cache_Method_Abstract
 	 */
 	public function clean($type = '')
 	{
-		zend_shm_cache_clear('ELK');
+		zend_shm_cache_clear($this->prefix);
 	}
 
 	/**

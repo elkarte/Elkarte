@@ -59,6 +59,18 @@ abstract class Cache_Method_Abstract implements Cache_Method_Interface
 	}
 
 	/**
+	 * Obtain the variables necessary to
+	 * help build the final key for storage.
+	 *
+	 * @param string $key
+	 * @return string
+	 */
+	public function getprefixedKey($key)
+	{
+		return $this->prefix . '::' . $key;
+	}
+
+	/**
 	 * {@inheritdoc}
 	 */
 	public function isMiss()
