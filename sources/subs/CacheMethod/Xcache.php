@@ -47,6 +47,14 @@ class Xcache extends Cache_Method_Abstract
 	/**
 	 * {@inheritdoc}
 	 */
+	public function exists($key)
+	{
+		xcache_isset($key);
+	}
+
+	/**
+	 * {@inheritdoc}
+	 */
 	public function put($key, $value, $ttl = 120)
 	{
 		if ($value === null)
@@ -62,6 +70,7 @@ class Xcache extends Cache_Method_Abstract
 	{
 		$result = xcache_get($key);
 		$this->is_miss = $result === null;
+
 		return $result;
 	}
 

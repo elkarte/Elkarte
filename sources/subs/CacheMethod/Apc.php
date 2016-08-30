@@ -42,6 +42,18 @@ class Apc extends Cache_Method_Abstract
 	/**
 	 * {@inheritdoc}
 	 */
+	public function exists($key)
+	{
+		$prefixedKey = $this->getprefixedKey($key);
+		if ($this->apcu)
+			apcu_exists($prefixedKey);
+		else
+			apc_exists($prefixedKey);
+	}
+
+	/**
+	 * {@inheritdoc}
+	 */
 	public function put($key, $value, $ttl = 120)
 	{
 		$prefixedKey = $this->getprefixedKey($key);

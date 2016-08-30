@@ -30,6 +30,14 @@ interface Cache_Method_Interface
 	public function __construct($options);
 
 	/**
+	 * Check that the specified cache entry exists on the filesystem.
+	 *
+	 * @param string $key
+	 * @return bool
+	 */
+	public function exists($key);
+
+	/**
 	 * Puts value in the cache under key for ttl seconds.
 	 *
 	 * @param string $key

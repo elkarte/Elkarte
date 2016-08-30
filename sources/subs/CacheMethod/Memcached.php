@@ -56,6 +56,15 @@ class Memcached extends Cache_Method_Abstract
 	/**
 	 * {@inheritdoc}
 	 */
+	public function exists($key)
+	{
+		$result = $this->get($key);
+		return !$this->is_miss;
+	}
+
+	/**
+	 * {@inheritdoc}
+	 */
 	public function put($key, $value, $ttl = 120)
 	{
 		$this->obj->set($key, $value, $ttl);
