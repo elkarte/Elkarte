@@ -79,3 +79,17 @@ then
         composer self-update
     fi
 fi
+
+# Instal APCu
+if [ "$TRAVIS_PHP_VERSION" != "5.3" ]
+then
+    if [ "$TRAVIS_PHP_VERSION" == "7.0" ]
+    then
+        printf "\n"| pecl install apcu
+    else
+        printf "\n"| pecl install channel://pecl.php.net/APCu-4.0.10
+    fi
+else
+    printf "extension=apc.so\napc.enabled=1" > 5.3.ini
+    phpenv config-add 5.3.ini
+fi

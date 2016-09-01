@@ -44,11 +44,8 @@ class Apc extends Cache_Method_Abstract
 	 */
 	public function exists($key)
 	{
-		$prefixedKey = $this->getprefixedKey($key);
-		if ($this->apcu)
-			apcu_exists($prefixedKey);
-		else
-			apc_exists($prefixedKey);
+		$result = $this->get($key);
+		return !$this->is_miss;
 	}
 
 	/**
@@ -82,9 +79,9 @@ class Apc extends Cache_Method_Abstract
 		$prefixedKey = $this->getprefixedKey($key);
 		$success = false;
 		if ($this->apcu)
-			$result = apcu_exists($prefixedKey, $success);
+			$result = apcu_fetch($prefixedKey, $success);
 		else
-			$result = apc_exists($prefixedKey, $success);
+			$result = apc_fetch($prefixedKey, $success);
 		$this->is_miss = !$success;
 
 		return $result;

@@ -20,22 +20,23 @@ matrix:
   fast_finish: true
 
 install:
-    - chmod +x tests/travis-ci/setup-server.sh
-    - chmod +x tests/travis-ci/setup-selenium.sh
-    - tests/travis-ci/setup-server.sh $DB $TRAVIS_PHP_VERSION
+  - chmod +x tests/travis-ci/setup-server.sh
+  - chmod +x tests/travis-ci/setup-selenium.sh
+  - tests/travis-ci/setup-server.sh $DB $TRAVIS_PHP_VERSION
 
 before_script:
-    - chmod +x tests/travis-ci/setup-elkarte.sh
-    - tests/travis-ci/setup-elkarte.sh $DB $TRAVIS_PHP_VERSION
+  - phpenv config-add tests/config.ini
+  - chmod +x tests/travis-ci/setup-elkarte.sh
+  - tests/travis-ci/setup-elkarte.sh $DB $TRAVIS_PHP_VERSION
 
 script:
-    - chmod +x /var/www/tests/travis-ci/setup-script.sh
-    - /var/www/tests/travis-ci/setup-script.sh $DB $TRAVIS_PHP_VERSION
+  - chmod +x /var/www/tests/travis-ci/setup-script.sh
+  - /var/www/tests/travis-ci/setup-script.sh $DB $TRAVIS_PHP_VERSION
 
 after_script:
-    - chmod +x /var/www/tests/travis-ci/setup-results.sh
-    - /var/www/tests/travis-ci/setup-results.sh $DB $TRAVIS_PHP_VERSION
+  - chmod +x /var/www/tests/travis-ci/setup-results.sh
+  - /var/www/tests/travis-ci/setup-results.sh $DB $TRAVIS_PHP_VERSION
 
 after_failure:
-    - chmod +x /var/www/tests/travis-ci/setup-failure.sh
-    - /var/www/tests/travis-ci/setup-failure.sh $DB $TRAVIS_PHP_VERSION
+  - chmod +x /var/www/tests/travis-ci/setup-failure.sh
+  - /var/www/tests/travis-ci/setup-failure.sh $DB $TRAVIS_PHP_VERSION

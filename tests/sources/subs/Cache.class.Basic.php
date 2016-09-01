@@ -18,20 +18,20 @@ class TestCache extends PHPUnit_Framework_TestCase
 	}
 
 	/**
-	 * Cleanup data we no longer need at the end of the tests in this class.
-	 *
-	 * tearDown() is run automatically by the testing framework after each test method.
-	 */
-	public function tearDown()
-	{
-	}
-
-	/**
-	 * Testing the filebase caching
+	 * Testing the filebased caching
 	 */
 	public function testFilebasedCache()
 	{
 		$this->_cache_obj = new ElkArte\sources\subs\CacheMethod\Filebased(array());
+		$this->doCacheTests();
+	}
+
+	/**
+	 * Testing Apc
+	 */
+	public function testApcCache()
+	{
+		$this->_cache_obj = new ElkArte\sources\subs\CacheMethod\Apc(array());
 		$this->doCacheTests();
 	}
 
