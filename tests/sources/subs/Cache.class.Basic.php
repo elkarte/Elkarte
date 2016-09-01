@@ -59,6 +59,25 @@ class TestCache extends PHPUnit_Framework_TestCase
 	}
 
 	/**
+	 * Testing Xcache
+	 */
+	public function testXcacheCache()
+	{
+		$this->_cache_obj = new ElkArte\sources\subs\CacheMethod\Xcache(array());
+
+		/*
+		 * Xcache may not be loaded, so skip this test. The developer has
+		 * not updated it for PHP 7. Also, since it conflicts with APC
+		 * (NOT APCu), this test won't work in PHP 5.3.
+		 */
+		if (!$this->_cache_obj->isAvailable())
+		{
+			$this->markTestSkipped('Xcache is not loaded; skipping this test method');
+		}
+		$this->doCacheTests();
+	}
+
+	/**
 	 * Performs the testing of the caching object
 	 */
 	private function doCacheTests()

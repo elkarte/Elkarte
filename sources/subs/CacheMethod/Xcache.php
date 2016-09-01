@@ -49,7 +49,7 @@ class Xcache extends Cache_Method_Abstract
 	 */
 	public function exists($key)
 	{
-		xcache_isset($key);
+		return xcache_isset($key);
 	}
 
 	/**
