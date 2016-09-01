@@ -36,6 +36,15 @@ class TestCache extends PHPUnit_Framework_TestCase
 	}
 
 	/**
+	 * Testing Memcached
+	 */
+	public function testMemcachedCache()
+	{
+		$this->_cache_obj = new ElkArte\sources\subs\CacheMethod\Memcached(array('servers' => array('localhost')));
+		$this->doCacheTests();
+	}
+
+	/**
 	 * Performs the testing of the caching object
 	 */
 	private function doCacheTests()

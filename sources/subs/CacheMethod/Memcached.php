@@ -99,24 +99,17 @@ class Memcached extends Cache_Method_Abstract
 	 */
 	protected function addServers()
 	{
-		global $cache_memcached;
-
-		$servers = explode(',', $cache_memcached);
-		$serversm = array();
 		$serversmList = $this->getServers();
-		foreach ($servers as $server)
+		$retVal = !empty($serversmList);
+		foreach ($this->_options['servers'] as $server)
 		{
 			$server = explode(':', trim($server));
 			$server[1] = !empty($server[1]) ? $server[1] : 11211;
-			$serversm[] = $server;
-		}
-		$serversm = array_diff($serversm, $serversmList);
-		if (!empty($serversm))
-		{
-			return $this->obj->addServers($serversm);
+			if (!in_array(implode(':', $server), $serversmList, true))
+				$retVal |= $this->obj->addServer($server[0], $server[1]);
 		}
 
-		return !empty($serversmList);
+		return $retVal;
 	}
 
 	/**
@@ -126,7 +119,7 @@ class Memcached extends Cache_Method_Abstract
 	 */
 	protected function getServers()
 	{
-		return array_keys($this->obj->getStats());
+		return array_keys((array)$this->obj->getStats());
 	}
 
 	/**

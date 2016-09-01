@@ -19,6 +19,10 @@ matrix:
         postgresql: "9.4"
   fast_finish: true
 
+# Create a Travis memcached enabled environment for the test suite to run in and
+# ensure that we test against localhost on Travis-CI.
+services: memcached
+
 install:
   - chmod +x tests/travis-ci/setup-server.sh
   - chmod +x tests/travis-ci/setup-selenium.sh
