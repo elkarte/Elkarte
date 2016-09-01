@@ -93,7 +93,8 @@ class Filebased extends Cache_Method_Abstract
 	public function get($key, $ttl = 120)
 	{
 		$fName = $this->getFileName($key);
-		if (file_exists(CACHEDIR . '/' . $fName) && filesize(CACHEDIR . '/' . $fName) > 10)
+		$this->is_miss = !(file_exists(CACHEDIR . '/' . $fName) && filesize(CACHEDIR . '/' . $fName) > 10);
+		if (!$this->is_miss)
 		{
 			$value = json_decode(file_get_contents(CACHEDIR . '/' . $fName));
 			if ($value->expiration < time())
@@ -104,14 +105,8 @@ class Filebased extends Cache_Method_Abstract
 			else
 				$return = $value->data;
 
-			unset($value);
-
-			$this->is_miss = $return === null;
-
 			return $return;
 		}
-
-		$this->is_miss = true;
 
 		return;
 	}

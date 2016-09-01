@@ -84,6 +84,14 @@ class Apc extends Cache_Method_Abstract
 			$result = apc_fetch($prefixedKey, $success);
 		$this->is_miss = !$success;
 
+		/*
+		 * Let's be conssistent, yes? All other cache methods
+		 * supported by ElkArte return null on failure to grab
+		 * the specified cache entry.
+		 */
+		if ($this->is_miss)
+			return;
+
 		return $result;
 	}
 

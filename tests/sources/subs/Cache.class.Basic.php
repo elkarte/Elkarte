@@ -42,7 +42,7 @@ class TestCache extends PHPUnit_Framework_TestCase
 	/**
 	 * Testing Apc
 	 */
-	public function testApcCache()
+	public function testApc()
 	{
 		$this->_cache_obj = new ElkArte\sources\subs\CacheMethod\Apc(array());
 		$this->doCacheTests();
@@ -51,7 +51,7 @@ class TestCache extends PHPUnit_Framework_TestCase
 	/**
 	 * Testing Memcached
 	 */
-	public function testMemcachedCache()
+	public function testMemcached()
 	{
 		$this->_cache_obj = new MockMemcached(array('servers' => array('localhost', 'localhost:11212', 'localhost:11213')));
 		$this->assertCount(3, $this->_cache_obj->getNumServers());
@@ -61,7 +61,7 @@ class TestCache extends PHPUnit_Framework_TestCase
 	/**
 	 * Testing Xcache
 	 */
-	public function testXcacheCache()
+	public function testXcache()
 	{
 		$this->_cache_obj = new ElkArte\sources\subs\CacheMethod\Xcache(array());
 
@@ -89,5 +89,10 @@ class TestCache extends PHPUnit_Framework_TestCase
 		$this->assertTrue($this->_cache_obj->exists($key));
 		$test_cached = $this->_cache_obj->get($key);
 		$this->assertSame($test_array, $test_cached);
+
+		$this->_cache_obj->put($key, null);
+		$this->assertFalse($this->_cache_obj->exists($key));
+		$test_cached = $this->_cache_obj->get($key);
+		$this->assertNull($test_cached);
 	}
 }

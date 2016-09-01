@@ -67,6 +67,9 @@ class Memcached extends Cache_Method_Abstract
 	 */
 	public function put($key, $value, $ttl = 120)
 	{
+		if ($value === null)
+			$this->obj->delete($key);
+
 		$this->obj->set($key, $value, $ttl);
 	}
 
