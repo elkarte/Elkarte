@@ -1,5 +1,18 @@
 <?php
 
+class MockMemcached extends ElkArte\sources\subs\CacheMethod\Memcached
+{
+	/**
+	 * Server count.
+	 *
+	 * @return int
+	 */
+	public function getNumServers()
+	{
+		return $this->getServers();
+	}
+}
+
 /**
  * TestCase class for caching classes.
  */
@@ -40,7 +53,8 @@ class TestCache extends PHPUnit_Framework_TestCase
 	 */
 	public function testMemcachedCache()
 	{
-		$this->_cache_obj = new ElkArte\sources\subs\CacheMethod\Memcached(array('servers' => array('localhost')));
+		$this->_cache_obj = new MockMemcached(array('servers' => array('localhost', 'localhost:11212', 'localhost:11213')));
+		$this->assertCount(3, $this->_cache_obj->getNumServers());
 		$this->doCacheTests();
 	}
 
