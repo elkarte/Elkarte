@@ -63,7 +63,7 @@ class TestCache extends PHPUnit_Framework_TestCase
 	 */
 	public function testXcache()
 	{
-		$this->_cache_obj = new ElkArte\sources\subs\CacheMethod\Xcache(array());
+		$this->_cache_obj = new ElkArte\sources\subs\CacheMethod\Xcache(array('cache_uid' => 'mOo', 'cache_password' => 'test'));
 
 		/*
 		 * Xcache may not be loaded, so skip this test. The developer has
