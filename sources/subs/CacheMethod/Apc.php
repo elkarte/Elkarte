@@ -100,16 +100,16 @@ class Apc extends Cache_Method_Abstract
 	 */
 	public function clean($type = '')
 	{
+		if ($this->apcu)
+			apcu_clear_cache();
 		// If passed a type, clear that type out
-		if ($type === '' || $type === 'data')
+		elseif ($type === '' || $type === 'data')
 		{
 			apc_clear_cache('user');
 			apc_clear_cache('system');
 		}
 		elseif ($type === 'user')
 			apc_clear_cache('user');
-		elseif ($this->apcu)
-			apcu_clear_cache();
 	}
 
 	/**
