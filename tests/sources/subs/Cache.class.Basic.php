@@ -83,16 +83,27 @@ class TestCache extends PHPUnit_Framework_TestCase
 	private function doCacheTests()
 	{
 		$test_array = serialize(array('anindex' => 'avalue'));
-		$key = 'testcache';
 
-		$this->_cache_obj->put($key, $test_array);
-		$this->assertTrue($this->_cache_obj->exists($key));
-		$test_cached = $this->_cache_obj->get($key);
-		$this->assertSame($test_array, $test_cached);
+		$this->_cache_obj->put('test', $test_array);
+		$this->assertTrue($this->_cache_obj->exists('test'));
+		$this->assertSame($test_array, $this->_cache_obj->get('test'));
 
-		$this->_cache_obj->put($key, null);
-		$this->assertFalse($this->_cache_obj->exists($key));
-		$test_cached = $this->_cache_obj->get($key);
-		$this->assertNull($test_cached);
+		$this->_cache_obj->put('test', null);
+		$this->assertFalse($this->_cache_obj->exists('test'));
+		$this->assertNull($this->_cache_obj->get('test'));
+
+		$this->_cache_obj->put('test', $test_array);
+		$this->assertTrue($this->_cache_obj->exists('test'));
+		$this->_cache_obj->remove('test');
+		$this->assertFalse($this->_cache_obj->exists('test'));
+		$this->assertNull($this->_cache_obj->get('test'));
+
+		$this->_cache_obj->put('test', $test_array);
+		$this->assertTrue($this->_cache_obj->exists('test'));
+		$this->_cache_obj->put('test2', $test_array);
+		$this->assertTrue($this->_cache_obj->exists('test2'));
+		$this->_cache_obj->clean();
+		$this->assertFalse($this->_cache_obj->exists('test'));
+		$this->assertFalse($this->_cache_obj->exists('test2'));
 	}
 }
