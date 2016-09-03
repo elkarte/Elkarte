@@ -359,9 +359,8 @@ class ManageMembergroups_Controller extends Action_Controller
 			// @todo Check for members with same name too?
 
 			// Don't allow copying of a real privileged person!
-			require_once(SUBSDIR . '/Permission.subs.php');
-
-			$permissions->loadIllegal();
+			$permissions = new Permissions;
+			$permissions->getIllegalPermissions();
 			$id_group = getMaxGroupID() + 1;
 			$minposts = !empty($this->_req->post->min_posts) ? (int) $this->_req->post->min_posts : '-1';
 
@@ -641,7 +640,7 @@ class ManageMembergroups_Controller extends Action_Controller
 			// Do we need to set inherited permissions?
 			if ($group_inherit != -2 && $group_inherit != $this->_req->post->old_inherit)
 			{
-				require_once(SUBSDIR . '/Permission.subs.php');
+				$permissions = new Permissions;
 				$permissions->updateChild($group_inherit);
 			}
 

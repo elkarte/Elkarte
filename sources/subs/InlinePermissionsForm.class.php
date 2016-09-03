@@ -7,7 +7,7 @@
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
- * @version 1.1 beta 1
+ * @version 1.1 beta 2
  */
 
 /**
@@ -29,6 +29,8 @@ class Inline_Permissions_Form
 	 * @var int[]
 	 */
 	private $excluded_groups = array();
+
+	private $db;
 
 	/**
 	 * @return string[]
@@ -70,14 +72,14 @@ class Inline_Permissions_Form
 		$this->permissions[] = $permission;
 	}
 
-	public function __consttruct()
+	public function __construct()
 	{
 		$this->db = database();
 
 		// Make sure they can't do certain things,
 		// unless they have the right permissions.
 		$permissions = new Permissions;
-		$this->illegal_permissions = $permissions->loadIllegal();
+		$this->illegal_permissions = $permissions->getIllegalPermissions();
 
 		// No permissions? Not a great deal to do here.
 		if (!allowedTo('manage_permissions'))
@@ -104,10 +106,6 @@ class Inline_Permissions_Form
 		// Almighty session check, verify our ways.
 		checkSession();
 		validateToken('admin-mp');
-
-		// Make sure they can't do certain things,
-		// unless they have the right permissions.
-		$permissions->loadIllegal();
 
 		$insertRows = array();
 		foreach ($this->permissionList as $permission)

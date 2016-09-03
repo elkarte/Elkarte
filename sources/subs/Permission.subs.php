@@ -17,7 +17,7 @@
 function loadIllegalPermissions()
 {
 	$permissions = new Permissions;
-	return $permissions->loadIllegal();
+	return $permissions->getIllegalPermissions();
 }
 
 /**
@@ -27,7 +27,7 @@ function loadIllegalPermissions()
 function loadIllegalGuestPermissions()
 {
 	$permissions = new Permissions;
-	return $permissions->loadIllegalGuest();
+	return $permissions->getIllegalGuestPermissions();
 }
 
 /**

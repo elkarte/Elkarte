@@ -30,10 +30,9 @@ function setPermissionLevel($level, $group = null, $profile = null)
 	$db = database();
 
 	// we'll need to init illegal permissions.
-	require_once(SUBSDIR . '/Permission.subs.php');
-
-	$permissions->loadIllegal();
-	$permissions->loadIllegalGuest();
+	$permissions = new Permissions;
+	$permissions->getIllegalPermissions();
+	$permissions->getIllegalGuestPermissions();
 
 	// Levels by group... restrict, standard, moderator, maintenance.
 	$groupLevels = array(
@@ -500,11 +499,9 @@ function loadAllPermissions()
 		'post',
 	);
 
-	// we'll need to init illegal permissions.
-	require_once(SUBSDIR . '/Permission.subs.php');
-
 	// We need to know what permissions we can't give to guests.
-	$permissions->loadIllegalGuest();
+	$permissions = new Permissions;
+	$permissions->getIllegalGuestPermissions();
 
 	// Some permissions are hidden if features are off.
 	$hiddenPermissions = array();

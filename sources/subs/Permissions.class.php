@@ -7,7 +7,7 @@
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
- * @version 1.1 beta 1
+ * @version 1.1 beta 2
  */
 
 class Permissions
@@ -20,6 +20,11 @@ class Permissions
 		'manage_membergroups',
 		'manage_permissions'
 	);
+
+	/**
+	 * @var string[]
+	 */
+	private $illegal_permissions = array();
 
 	/**
 	 * @var array
@@ -62,7 +67,31 @@ class Permissions
 	 * Load a few illegal permissions into context.
 	 *
 	 * Calls hook: integrate_load_illegal_permissions
-	 *
+	 */
+	public function __construct()
+	{
+		$this->db = database();
+		$this->loadIllegal();
+		$this->loadIllegalGuest();
+	}
+
+	/**
+	 * @return string[]
+	 */
+	public function getIllegalPermissions()
+	{
+		return $this->illegal_permissions;
+	}
+
+	/**
+	 * @return array
+	 */
+	public function getIllegalGuestPermissions()
+	{
+		return $this->illegal_guest_permissions;
+	}
+
+	/**
 	 * @return array
 	 */
 	public function loadIllegal()
@@ -80,7 +109,7 @@ class Permissions
 		$context['illegal_permissions'] = $illegal_permissions;
 		call_integration_hook('integrate_load_illegal_permissions');
 
-		return $illegal_permissions;
+		$this->illegal_permissions = $illegal_permissions;
 	}
 
 	/**
@@ -99,6 +128,30 @@ class Permissions
 	}
 
 	/**
+	 * Deletes permissions.
+	 *
+	 * @param string $permission
+	 * @param string $where
+	 * @param mixed[] $where_vars = array() or values used in the where statement
+	 */
+	public function deletePermissions($permission, $where, $where_parameters)
+	{
+		if (empty($this->illegal_permissions))
+			$where_parameters['ignore_boards'] = $boardListOptions['ignore'];
+
+		$this->db->query('', '
+			DELETE FROM {db_prefix}permissions
+			WHERE permission IN ({array_string:permissions})
+			' .  ? '' : ' AND permission NOT IN ({array_string:illegal_permissions})'),
+				WHERE ' . $where,
+			array_merge($where_parameters, array(
+				'current_permission' => $permission,
+				'illegal_permissions' => $this->illegal_permissions,
+			))
+		);
+	}
+
+	/**
 	 * This function updates the permissions of any groups based on the given groups.
 	 *
 	 * @param mixed[]|int $parents (array or int) group or groups whose children are to be updated
@@ -106,14 +159,12 @@ class Permissions
 	 */
 	public function updateChild($parents, $profile = null)
 	{
-		$db = database();
-
 		// All the parent groups to sort out.
 		if (!is_array($parents))
 			$parents = array($parents);
 
 		// Find all the children of this group.
-		$request = $db->query('', '
+		$request = $this->db->query('', '
 			SELECT id_parent, id_group
 			FROM {db_prefix}membergroups
 			WHERE id_parent != {int:not_inherited}
@@ -126,13 +177,13 @@ class Permissions
 		$children = array();
 		$parents = array();
 		$child_groups = array();
-		while ($row = $db->fetch_assoc($request))
+		while ($row = $this->db->fetch_assoc($request))
 		{
 			$children[$row['id_parent']][] = $row['id_group'];
 			$child_groups[] = $row['id_group'];
 			$parents[] = $row['id_parent'];
 		}
-		$db->free_result($request);
+		$this->db->free_result($request);
 
 		$parents = array_unique($parents);
 
@@ -144,7 +195,7 @@ class Permissions
 		if ($profile < 1 || $profile === null)
 		{
 			// Fetch all the parent permissions.
-			$request = $db->query('', '
+			$request = $this->db->query('', '
 				SELECT id_group, permission, add_deny
 				FROM {db_prefix}permissions
 				WHERE id_group IN ({array_int:parent_list})',
@@ -153,16 +204,16 @@ class Permissions
 				)
 			);
 			$permissions = array();
-			while ($row = $db->fetch_assoc($request))
+			while ($row = $this->db->fetch_assoc($request))
 			{
 				foreach ($children[$row['id_group']] as $child)
 				{
 					$permissions[] = array('id_group' => (int) $child, 'permission' => $row['permission'], 'add_deny' => $row['add_deny']);
 				}
 			}
-			$db->free_result($request);
+			$this->db->free_result($request);
 
-			$db->query('', '
+			$this->db->query('', '
 				DELETE FROM {db_prefix}permissions
 				WHERE id_group IN ({array_int:child_groups})',
 				array(
@@ -184,7 +235,7 @@ class Permissions
 			$profileQuery = $profile === null ? '' : ' AND id_profile = {int:current_profile}';
 
 			// Again, get all the parent permissions.
-			$request = $db->query('', '
+			$request = $this->db->query('', '
 				SELECT id_profile, id_group, permission, add_deny
 				FROM {db_prefix}board_permissions
 				WHERE id_group IN ({array_int:parent_groups})
@@ -195,12 +246,12 @@ class Permissions
 				)
 			);
 			$permissions = array();
-			while ($row = $db->fetch_assoc($request))
+			while ($row = $this->db->fetch_assoc($request))
 				foreach ($children[$row['id_group']] as $child)
 					$permissions[] = array($child, $row['id_profile'], $row['permission'], $row['add_deny']);
-			$db->free_result($request);
+			$this->db->free_result($request);
 
-			$db->query('', '
+			$this->db->query('', '
 				DELETE FROM {db_prefix}board_permissions
 				WHERE id_group IN ({array_int:child_groups})
 					' . $profileQuery,
