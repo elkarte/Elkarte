@@ -225,7 +225,7 @@ class Settings_Form
 
 				// Special case for inline permissions
 				if ($config_var[0] == 'permissions' && allowedTo('manage_permissions'))
-					$inlinePermissions[] = $config_var;
+					$inlinePermissions[] = $config_var[1];
 				elseif ($config_var[0] == 'permissions')
 					continue;
 

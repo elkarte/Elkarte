@@ -16,19 +16,86 @@
 class Inline_Permissions_Form
 {
 	/**
-	 * Save the permissions of a form containing inline permissions.
-	 *
+	 * @var string[]
+	 */
+	private $permissions = array();
+
+	/**
+	 * @var int[]
+	 */
+	private $excluded_groups = array();
+
+	/**
+	 * @return string[]
+	 */
+	public function getPermissions()
+	{
+		return $this->permissions;
+	}
+
+	/**
 	 * @param string[] $permissions
 	 */
-	public static function save($permissions)
+	public function setPermissions($permissions)
 	{
-		global $context;
+		$this->permissions = $permissions;
+	}
 
-		$db = database();
+	/**
+	 * @return int[]
+	 */
+	public function getExcludedGroups()
+	{
+		return $this->excluded_groups;
+	}
+
+	/**
+	 * @param int[] $excluded_groups
+	 */
+	public function setExcludedGroups($excluded_groups)
+	{
+		$this->excluded_groups = $excluded_groups;
+	}
+
+	/**
+	 * @param string $permission
+	 */
+
+	public function add($permission)
+	{
+		$this->permissions[] = $permission;
+	}
+
+	public function add($permission)
+	{
+		$this->permissions[] = $permission;
+	}
+
+	public function __consttruct()
+	{
+		$this->db = database();
 
 		// No permissions? Not a great deal to do here.
 		if (!allowedTo('manage_permissions'))
 			return;
+
+		// Load the permission settings for guests
+		$this->permissionList = array_map(
+			function ($permission)
+			{
+				return $permission[1];
+			}, $this->permissions
+		);
+	}
+
+	/**
+	 * Save the permissions of a form containing inline permissions.
+	 *
+	 * @param string[] $permissions
+	 */
+	public function save()
+	{
+		global $context;
 
 		// Almighty session check, verify our ways.
 		checkSession();
@@ -39,7 +106,7 @@ class Inline_Permissions_Form
 		Permissions::loadIllegal();
 
 		$insertRows = array();
-		foreach ($permissions as $permission)
+		foreach ($this->permissionList as $permission)
 		{
 			if (!isset($_POST[$permission]))
 				continue;
@@ -47,27 +114,29 @@ class Inline_Permissions_Form
 			foreach ($_POST[$permission] as $id_group => $value)
 			{
 				if (in_array($value, array('on', 'deny')) && (empty($context['illegal_permissions']) || !in_array($permission, $context['illegal_permissions'])))
-					$insertRows[] = array('id_group' => (int) $id_group, 'permission' => $permission, 'add_deny' => $value == 'on' ? 1 : 0);
+					$insertRows[] = array((int) $id_group, $permission, $value == 'on' ? 1 : 0);
 			}
 		}
 
 		// Remove the old permissions...
-		$db->query('', '
+		$this->db->query('', '
 			DELETE FROM {db_prefix}permissions
 			WHERE permission IN ({array_string:permissions})
 			' . (empty($context['illegal_permissions']) ? '' : ' AND permission NOT IN ({array_string:illegal_permissions})'),
 			array(
 				'illegal_permissions' => !empty($context['illegal_permissions']) ? $context['illegal_permissions'] : array(),
-				'permissions' => $permissions,
+				'permissions' => $this->permissions,
 			)
 		);
 
 		// ...and replace them with new ones.
 		if (!empty($insertRows))
-		{
-			require_once(SUBSDIR . '/ManagePermissions.subs.php');
-			replacePermission($permChange);
-		}
+			$this->db->insert('insert',
+				'{db_prefix}permissions',
+				array('id_group' => 'int', 'permission' => 'string', 'add_deny' => 'int'),
+				$insertRows,
+				array('id_group', 'permission')
+			);
 
 		// Do a full child update.
 		Permissions::updateChild(array(), -1);
@@ -87,23 +156,16 @@ class Inline_Permissions_Form
 	 * @uses ManagePermissions language
 	 * @uses ManagePermissions template.
 	 */
-	public static function init($permissions, $excluded_groups = array())
+	public function init()
 	{
 		global $context, $txt, $modSettings;
 
-		$db = database();
-
 		loadLanguage('ManagePermissions');
 		loadTemplate('ManagePermissions');
-		$context['can_change_permissions'] = allowedTo('manage_permissions');
-
-		// Nothing to initialize here.
-		if (!$context['can_change_permissions'])
-			return;
 
 		// Load the permission settings for guests
-		foreach ($permissions as $permission)
-			$context[$permission] = array(
+		foreach ($this->permissions as $permission)
+			$context[$permission[1]] = array(
 				-1 => array(
 					'id' => -1,
 					'name' => $txt['membergroups_guests'],
@@ -118,23 +180,23 @@ class Inline_Permissions_Form
 				),
 			);
 
-		$request = $db->query('', '
+		$request = $this->db->query('', '
 			SELECT id_group, CASE WHEN add_deny = {int:denied} THEN {string:deny} ELSE {string:on} END AS status, permission
 			FROM {db_prefix}permissions
 			WHERE id_group IN (-1, 0)
 				AND permission IN ({array_string:permissions})',
 			array(
 				'denied' => 0,
-				'permissions' => $permissions,
+				'permissions' => $this->permissionList,
 				'deny' => 'deny',
 				'on' => 'on',
 			)
 		);
-		while ($row = $db->fetch_assoc($request))
+		while ($row = $this->db->fetch_assoc($request))
 			$context[$row['permission']][$row['id_group']]['status'] = $row['status'];
-		$db->free_result($request);
+		$this->db->free_result($request);
 
-		$request = $db->query('', '
+		$request = $this->db->query('', '
 			SELECT mg.id_group, mg.group_name, mg.min_posts, IFNULL(p.add_deny, -1) AS status, p.permission
 			FROM {db_prefix}membergroups AS mg
 				LEFT JOIN {db_prefix}permissions AS p ON (p.id_group = mg.id_group AND p.permission IN ({array_string:permissions}))
@@ -146,15 +208,15 @@ class Inline_Permissions_Form
 				'not_inherited' => -2,
 				'min_posts' => -1,
 				'newbie_group' => 4,
-				'permissions' => $permissions,
+				'permissions' => $this->permissionList,
 			)
 		);
-		while ($row = $db->fetch_assoc($request))
+		while ($row = $this->db->fetch_assoc($request))
 		{
 			// Initialize each permission as being 'off' until proven otherwise.
-			foreach ($permissions as $permission)
-				if (!isset($context[$permission][$row['id_group']]))
-					$context[$permission][$row['id_group']] = array(
+			foreach ($this->permissions as $permission)
+				if (!isset($context[$permission[1]][$row['id_group']]))
+					$context[$permission[1]][$row['id_group']] = array(
 						'id' => $row['id_group'],
 						'name' => $row['group_name'],
 						'is_postgroup' => $row['min_posts'] != -1,
@@ -163,15 +225,23 @@ class Inline_Permissions_Form
 
 			$context[$row['permission']][$row['id_group']]['status'] = empty($row['status']) ? 'deny' : ($row['status'] == 1 ? 'on' : 'off');
 		}
-		$db->free_result($request);
+		$this->db->free_result($request);
 
-		// Some permissions cannot be given to certain groups. Remove the groups.
-		foreach ($excluded_groups as $group)
+		// Some permissions cannot be given to certain groups. Remove them.
+		foreach ($this->permissions as $permission)
 		{
-			foreach ($permissions as $permission)
+			foreach ($this->excluded_groups as $group)
 			{
-				if (isset($context[$permission][$group]))
-					unset($context[$permission][$group]);
+				if (isset($context[$permission[1]][$group]))
+					unset($context[$permission[1]][$group]);
+			}
+			if (isset($permission['excluded_groups']))
+			{
+				foreach ($permission['excluded_groups'] as $group)
+				{
+					if (isset($context[$permission[1]][$group]))
+						unset($context[$permission[1]][$group]);
+				}
 			}
 		}
 	}

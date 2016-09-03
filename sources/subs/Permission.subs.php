@@ -53,7 +53,9 @@ class InlinePermissions_Form extends Inline_Permissions_Form
 	 */
 	public static function save_inline_permissions($permissions)
 	{
-		return self::save($permissions);
+		$permissionsForm = new self;
+		$permissionsForm->setPermissions($permissions);
+		return $permissionsForm->save();
 	}
 
 	/**
@@ -69,7 +71,10 @@ class InlinePermissions_Form extends Inline_Permissions_Form
 	 */
 	public static function init_inline_permissions($permissions, $excluded_groups = array())
 	{
-		return self::init($permissions, $excluded_groups);
+		$permissionsForm = new self;
+		$permissionsForm->setExcludedGroups($excluded_groups);
+		$permissionsForm->setPermissions($permissions);
+		return $permissionsForm->init();
 	}
 }
 
