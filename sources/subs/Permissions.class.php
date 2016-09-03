@@ -189,12 +189,7 @@ class Permissions
 			// Do the insert.
 			if (!empty($permissions))
 			{
-				$db->insert('insert',
-					'{db_prefix}board_permissions',
-					array('id_group' => 'int', 'id_profile' => 'int', 'permission' => 'string', 'add_deny' => 'int'),
-					$permissions,
-					array('id_group', 'id_profile', 'permission')
-				);
+				replaceBoardPermission($permissions);
 			}
 		}
 	}
