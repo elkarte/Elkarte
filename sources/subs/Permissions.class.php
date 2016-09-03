@@ -13,65 +13,89 @@
 class Permissions
 {
 	/**
-	 * Load a few illegal permissions in context.
+	 * @var array
+     */
+	protected $reserved_permissions = array(
+		'admin_forum',
+		'manage_membergroups',
+		'manage_permissions'
+	);
+
+	/**
+	 * @var array
+     */
+	protected $illegal_guest_permissions = array(
+		'delete_replies',
+		'karma_edit',
+		'poll_add_own',
+		'pm_read',
+		'pm_send',
+		'profile_identity',
+		'profile_extra',
+		'profile_title',
+		'profile_remove',
+		'profile_set_avatar',
+		'profile_view_own',
+		'mark_any_notify',
+		'mark_notify',
+		'admin_forum',
+		'manage_boards',
+		'manage_attachments',
+		'manage_smileys',
+		'edit_news',
+		'access_mod_center',
+		'moderate_forum',
+		'issue_warning',
+		'manage_membergroups',
+		'manage_permissions',
+		'manage_bans',
+		'move_own',
+		'modify_replies',
+		'send_mail',
+		'approve_posts',
+		'postby_email',
+		'approve_emails',
+		'like_posts',
+	);
+
+	/**
+	 * Load a few illegal permissions into context.
+	 *
+	 * Calls hook: integrate_load_illegal_permissions
+	 *
+	 * @return array
 	 */
-	public static function loadIllegal()
+	public function loadIllegal()
 	{
 		global $context;
 
-		$context['illegal_permissions'] = array();
-		if (!allowedTo('admin_forum'))
-			$context['illegal_permissions'][] = 'admin_forum';
-		if (!allowedTo('manage_membergroups'))
-			$context['illegal_permissions'][] = 'manage_membergroups';
-		if (!allowedTo('manage_permissions'))
-			$context['illegal_permissions'][] = 'manage_permissions';
-
+		$illegal_permissions = array();
+		foreach ($this->reserved_permissions as $illegal_permission)
+		{
+			if (!allowedTo($illegal_permission))
+			{
+				$illegal_permissions[] = $illegal_permission;
+			}
+		}
+		$context['illegal_permissions'] = $illegal_permissions;
 		call_integration_hook('integrate_load_illegal_permissions');
+
+		return $illegal_permissions;
 	}
 
 	/**
 	 * Loads those permissions guests cannot have, into context.
+	 *
+	 * @return array
 	 */
-	public static function loadIllegalGuest()
+	public function loadIllegalGuest()
 	{
 		global $context;
 
-		$context['non_guest_permissions'] = array(
-			'delete_replies',
-			'karma_edit',
-			'poll_add_own',
-			'pm_read',
-			'pm_send',
-			'profile_identity',
-			'profile_extra',
-			'profile_title',
-			'profile_remove',
-			'profile_set_avatar',
-			'profile_view_own',
-			'mark_any_notify',
-			'mark_notify',
-			'admin_forum',
-			'manage_boards',
-			'manage_attachments',
-			'manage_smileys',
-			'edit_news',
-			'access_mod_center',
-			'moderate_forum',
-			'issue_warning',
-			'manage_membergroups',
-			'manage_permissions',
-			'manage_bans',
-			'move_own',
-			'modify_replies',
-			'send_mail',
-			'approve_posts',
-			'postby_email',
-			'approve_emails',
-			'like_posts',
-		);
-
+		$context['non_guest_permissions'] = $this->illegal_guest_permissions;
 		call_integration_hook('integrate_load_illegal_guest_permissions');
+
+		return $this->illegal_guest_permissions;
 	}
 
 	/**
@@ -80,7 +104,7 @@ class Permissions
 	 * @param mixed[]|int $parents (array or int) group or groups whose children are to be updated
 	 * @param int|null $profile = null an int or null for the customized profile, if any
 	 */
-	public static function updateChild($parents, $profile = null)
+	public function updateChild($parents, $profile = null)
 	{
 		$db = database();
 

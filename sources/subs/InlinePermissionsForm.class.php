@@ -18,6 +18,11 @@ class Inline_Permissions_Form
 	/**
 	 * @var string[]
 	 */
+	private $illegal_permissions = array();
+
+	/**
+	 * @var string[]
+	 */
 	private $permissions = array();
 
 	/**
@@ -60,12 +65,6 @@ class Inline_Permissions_Form
 	/**
 	 * @param string $permission
 	 */
-
-	public function add($permission)
-	{
-		$this->permissions[] = $permission;
-	}
-
 	public function add($permission)
 	{
 		$this->permissions[] = $permission;
@@ -74,6 +73,11 @@ class Inline_Permissions_Form
 	public function __consttruct()
 	{
 		$this->db = database();
+
+		// Make sure they can't do certain things,
+		// unless they have the right permissions.
+		$permissions = new Permissions;
+		$this->illegal_permissions = $permissions->loadIllegal();
 
 		// No permissions? Not a great deal to do here.
 		if (!allowedTo('manage_permissions'))
@@ -103,7 +107,7 @@ class Inline_Permissions_Form
 
 		// Make sure they can't do certain things,
 		// unless they have the right permissions.
-		Permissions::loadIllegal();
+		$permissions->loadIllegal();
 
 		$insertRows = array();
 		foreach ($this->permissionList as $permission)
@@ -113,7 +117,7 @@ class Inline_Permissions_Form
 
 			foreach ($_POST[$permission] as $id_group => $value)
 			{
-				if (in_array($value, array('on', 'deny')) && (empty($context['illegal_permissions']) || !in_array($permission, $context['illegal_permissions'])))
+				if (in_array($value, array('on', 'deny')) && !in_array($permission, $this->illegal_permissions))
 					$insertRows[] = array((int) $id_group, $permission, $value == 'on' ? 1 : 0);
 			}
 		}
@@ -122,9 +126,9 @@ class Inline_Permissions_Form
 		$this->db->query('', '
 			DELETE FROM {db_prefix}permissions
 			WHERE permission IN ({array_string:permissions})
-			' . (empty($context['illegal_permissions']) ? '' : ' AND permission NOT IN ({array_string:illegal_permissions})'),
+			' . (empty($this->illegal_permissions) ? '' : ' AND permission NOT IN ({array_string:illegal_permissions})'),
 			array(
-				'illegal_permissions' => !empty($context['illegal_permissions']) ? $context['illegal_permissions'] : array(),
+				'illegal_permissions' => $this->illegal_permissions,
 				'permissions' => $this->permissions,
 			)
 		);
@@ -139,7 +143,7 @@ class Inline_Permissions_Form
 			);
 
 		// Do a full child update.
-		Permissions::updateChild(array(), -1);
+		$permissions->updateChild(array(), -1);
 
 		// Just in case we cached this.
 		updateSettings(array('settings_updated' => time()));
@@ -150,11 +154,8 @@ class Inline_Permissions_Form
 	 * It loads a context variables for each permission.
 	 * This function is used by several settings screens to set specific permissions.
 	 *
-	 * @param string[] $permissions
-	 * @param int[] $excluded_groups = array()
-	 *
 	 * @uses ManagePermissions language
-	 * @uses ManagePermissions template.
+	 * @uses ManagePermissions template
 	 */
 	public function init()
 	{

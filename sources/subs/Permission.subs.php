@@ -16,7 +16,8 @@
  */
 function loadIllegalPermissions()
 {
-	Permissions::loadIllegal();
+	$permissions = new Permissions;
+	return $permissions->loadIllegal();
 }
 
 /**
@@ -25,7 +26,8 @@ function loadIllegalPermissions()
  */
 function loadIllegalGuestPermissions()
 {
-	Permissions::loadIllegalGuest();
+	$permissions = new Permissions;
+	return $permissions->loadIllegalGuest();
 }
 
 /**
@@ -37,7 +39,8 @@ function loadIllegalGuestPermissions()
  */
 function updateChildPermissions($parents, $profile = null)
 {
-	Permissions::updateChild($parents, $profile);
+	$permissions = new Permissions;
+	return $permissions->updateChild($parents, $profile);
 }
 
 /**

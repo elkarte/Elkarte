@@ -361,7 +361,7 @@ class ManageMembergroups_Controller extends Action_Controller
 			// Don't allow copying of a real privileged person!
 			require_once(SUBSDIR . '/Permission.subs.php');
 
-			Permissions::loadIllegal();
+			$permissions->loadIllegal();
 			$id_group = getMaxGroupID() + 1;
 			$minposts = !empty($this->_req->post->min_posts) ? (int) $this->_req->post->min_posts : '-1';
 
@@ -403,9 +403,9 @@ class ManageMembergroups_Controller extends Action_Controller
 
 				// Don't allow copying of a real privileged person!
 				require_once(SUBSDIR . '/Permission.subs.php');
-				Permissions::loadIllegal();
+				$permissions->loadIllegal();
 
-				copyPermissions($id_group, $copy_id, $context['illegal_permissions']);
+				copyPermissions($id_group, $copy_id, $illegal_permissions);
 				copyBoardPermissions($id_group, $copy_id);
 
 				// Also get some membergroup information if we're copying and not copying from guests...
@@ -642,7 +642,7 @@ class ManageMembergroups_Controller extends Action_Controller
 			if ($group_inherit != -2 && $group_inherit != $this->_req->post->old_inherit)
 			{
 				require_once(SUBSDIR . '/Permission.subs.php');
-				Permissions::updateChild($group_inherit);
+				$permissions->updateChild($group_inherit);
 			}
 
 			// Lastly, moderators!

@@ -32,8 +32,8 @@ function setPermissionLevel($level, $group = null, $profile = null)
 	// we'll need to init illegal permissions.
 	require_once(SUBSDIR . '/Permission.subs.php');
 
-	Permissions::loadIllegal();
-	Permissions::loadIllegalGuest();
+	$permissions->loadIllegal();
+	$permissions->loadIllegalGuest();
 
 	// Levels by group... restrict, standard, moderator, maintenance.
 	$groupLevels = array(
@@ -185,15 +185,15 @@ function setPermissionLevel($level, $group = null, $profile = null)
 	// Make sure we're not granting someone too many permissions!
 	foreach ($groupLevels['global'][$level] as $k => $permission)
 	{
-		if (!empty($context['illegal_permissions']) && in_array($permission, $context['illegal_permissions']))
+		if (!empty($illegal_permissions) && in_array($permission, $illegal_permissions))
 			unset($groupLevels['global'][$level][$k]);
 
-		if ($group == -1 && in_array($permission, $context['non_guest_permissions']))
+		if ($group == -1 && in_array($permission, $illegal_guest_permissions))
 			unset($groupLevels['global'][$level][$k]);
 	}
 	if ($group == -1)
 		foreach ($groupLevels['board'][$level] as $k => $permission)
-			if (in_array($permission, $context['non_guest_permissions']))
+			if (in_array($permission, $illegal_guest_permissions))
 				unset($groupLevels['board'][$level][$k]);
 
 	// Reset all cached permissions.
@@ -210,10 +210,10 @@ function setPermissionLevel($level, $group = null, $profile = null)
 		$db->query('', '
 			DELETE FROM {db_prefix}permissions
 			WHERE id_group = {int:current_group}
-			' . (empty($context['illegal_permissions']) ? '' : ' AND permission NOT IN ({array_string:illegal_permissions})'),
+			' . (empty($illegal_permissions) ? '' : ' AND permission NOT IN ({array_string:illegal_permissions})'),
 			array(
 				'current_group' => $group,
-				'illegal_permissions' => !empty($context['illegal_permissions']) ? $context['illegal_permissions'] : array(),
+				'illegal_permissions' => $illegal_permissions,
 			)
 		);
 		$db->query('', '
@@ -504,7 +504,7 @@ function loadAllPermissions()
 	require_once(SUBSDIR . '/Permission.subs.php');
 
 	// We need to know what permissions we can't give to guests.
-	Permissions::loadIllegalGuest();
+	$permissions->loadIllegalGuest();
 
 	// Some permissions are hidden if features are off.
 	$hiddenPermissions = array();
@@ -573,7 +573,7 @@ function loadAllPermissions()
 		foreach ($currentPermissionList as $permission => $permissionArray)
 		{
 			// If this is a guest permission we don't do it if it's the guest group.
-			if (isset($context['group']['id']) && $context['group']['id'] == -1 && in_array($permission, $context['non_guest_permissions']))
+			if (isset($context['group']['id']) && $context['group']['id'] == -1 && in_array($permission, $illegal_guest_permissions))
 			{
 				continue;
 			}
@@ -823,7 +823,7 @@ function copyPermission($copy_from, $groups, $illegal_permissions, $non_guest_pe
 			' . (empty($illegal_permissions) ? '' : ' AND permission NOT IN ({array_string:illegal_permissions})'),
 		array(
 			'group_list' => $groups,
-			'illegal_permissions' => !empty($illegal_permissions) ? $illegal_permissions : array(),
+			'illegal_permissions' => $illegal_permissions,
 		)
 	);
 
@@ -921,7 +921,7 @@ function deletePermission($groups, $permission, $illegal_permissions)
 		array(
 			'current_group_list' => $groups,
 			'current_permission' => $permission,
-			'illegal_permissions' => !empty($illegal_permissions) ? $illegal_permissions : array(),
+			'illegal_permissions' => $illegal_permissions,
 		)
 	);
 }
@@ -1087,7 +1087,7 @@ function deleteInvalidPermissions($id_group, $illegal_permissions)
 		' . (empty($illegal_permissions) ? '' : ' AND permission NOT IN ({array_string:illegal_permissions})'),
 		array(
 			'current_group' => $id_group,
-			'illegal_permissions' => !empty($illegal_permissions) ? $illegal_permissions : array(),
+			'illegal_permissions' => $illegal_permissions,
 		)
 	);
 }

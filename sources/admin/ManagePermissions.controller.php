@@ -30,6 +30,22 @@ class ManagePermissions_Controller extends Action_Controller
 	protected $_permSettings;
 
 	/**
+	 * Permissions object
+	 * @var Permissions
+	 */
+	protected $permissions;
+
+	/**
+	 * @var string[]
+	 */
+	private $illegal_permissions = array();
+
+	/**
+	 * @var string[]
+	 */
+	private $illegal_guest_permissions = array();
+
+	/**
 	 * The profile ID that we are working with
 	 * @var int|null
 	 */
@@ -47,6 +63,12 @@ class ManagePermissions_Controller extends Action_Controller
 	public function action_index()
 	{
 		global $txt, $context;
+
+		// Make sure they can't do certain things,
+		// unless they have the right permissions.
+		$this->permissions = new Permissions;
+		$this->illegal_permissions = $this->permissions->loadIllegal();
+		$this->illegal_guest_permissions = $this->permissions->loadIllegalGuest();
 
 		loadLanguage('ManagePermissions+ManageMembers');
 		loadTemplate('ManagePermissions');
@@ -563,8 +585,9 @@ class ManagePermissions_Controller extends Action_Controller
 		require_once(SUBSDIR . '/Permission.subs.php');
 		require_once(SUBSDIR . '/ManagePermissions.subs.php');
 
-		Permissions::loadIllegal();
-		Permissions::loadIllegalGuest();
+		$permissions = new Permissions;
+		$illegal_permissions = $permissions->loadIllegal()
+		$illegal_guest_permissions = $permissions->loadIllegalGuest();
 
 		// Make sure only one of the quick options was selected.
 		if ((!empty($this->_req->post->predefined) && ((isset($this->_req->post->copy_from) && $this->_req->post->copy_from != 'empty') || !empty($this->_req->post->permissions))) || (!empty($this->_req->post->copy_from) && $this->_req->post->copy_from != 'empty' && !empty($this->_req->post->permissions)))
@@ -624,13 +647,13 @@ class ManagePermissions_Controller extends Action_Controller
 				redirectexit('action=admin;area=permissions;pid=' . $this->_pid);
 
 			if (empty($this->_pid))
-				copyPermission($this->_req->post->copy_from, $this->_req->post->group, $context['illegal_permissions'], $context['non_guest_permissions']);
+				copyPermission($this->_req->post->copy_from, $this->_req->post->group, $illegal_permissions, $illegal_guest_permissions);
 
 			// Now do the same for the board permissions.
-			copyBoardPermission($this->_req->post->copy_from, $this->_req->post->group, $bid, $context['non_guest_permissions']);
+			copyBoardPermission($this->_req->post->copy_from, $this->_req->post->group, $bid, $illegal_guest_permissions);
 
 			// Update any children out there!
-			Permissions::updateChild($this->_req->post->group, $this->_pid);
+			:$permissions->updateChild($this->_req->post->group, $this->_pid);
 		}
 		// Set or unset a certain permission for the selected groups.
 		elseif (!empty($this->_req->post->permissions))
@@ -645,7 +668,7 @@ class ManagePermissions_Controller extends Action_Controller
 			if ($this->_req->post->add_remove == 'clear')
 			{
 				if ($permissionType == 'membergroup')
-					deletePermission($this->_req->post->group, $permission, $context['illegal_permissions']);
+					deletePermission($this->_req->post->group, $permission, $illegal_permissions);
 				else
 					deleteBoardPermission($this->_req->post->group, $bid, $permission);
 			}
@@ -656,10 +679,10 @@ class ManagePermissions_Controller extends Action_Controller
 				$permChange = array();
 				foreach ($this->_req->post->group as $groupID)
 				{
-					if ($groupID == -1 && in_array($permission, $context['non_guest_permissions']))
+					if ($groupID == -1 && in_array($permission, $illegal_guest_permissions))
 						continue;
 
-					if ($permissionType == 'membergroup' && $groupID != 1 && $groupID != 3 && (empty($context['illegal_permissions']) || !in_array($permission, $context['illegal_permissions'])))
+					if ($permissionType == 'membergroup' && $groupID != 1 && $groupID != 3 && (empty($illegal_permissions) || !in_array($permission, $illegal_permissions)))
 						$permChange[] = array($permission, $groupID, $add_deny);
 					elseif ($permissionType != 'membergroup')
 						$permChange[] = array($permission, $groupID, $add_deny, $bid);
@@ -676,7 +699,7 @@ class ManagePermissions_Controller extends Action_Controller
 			}
 
 			// Another child update!
-			Permissions::updateChild($this->_req->post->group, $this->_pid);
+			$permissions->updateChild($this->_req->post->group, $this->_pid);
 		}
 
 		redirectexit('action=admin;area=permissions;pid=' . $this->_pid);
@@ -796,7 +819,7 @@ class ManagePermissions_Controller extends Action_Controller
 		require_once(SUBSDIR . '/Permission.subs.php');
 		require_once(SUBSDIR . '/ManagePermissions.subs.php');
 
-		Permissions::loadIllegal();
+		$permissions->loadIllegal();
 
 		$current_group_id = (int) $this->_req->query->group;
 		$this->_pid = $this->_req->getQuery('pid', 'intval');
@@ -823,8 +846,8 @@ class ManagePermissions_Controller extends Action_Controller
 		// Guest group, we need illegal, guest permissions.
 		if ($current_group_id == -1)
 		{
-			Permissions::loadIllegalGuest();
-			$context['illegal_permissions'] = array_merge($context['illegal_permissions'], $context['non_guest_permissions']);
+			$permissions->loadIllegalGuest();
+			$illegal_permissions = array_merge($illegal_permissions, $illegal_guest_permissions);
 		}
 
 		// Prepare all permissions that were set or denied for addition to the DB.
@@ -838,7 +861,7 @@ class ManagePermissions_Controller extends Action_Controller
 						if ($value == 'on' || $value == 'deny')
 						{
 							// Don't allow people to escalate themselves!
-							if (!empty($context['illegal_permissions']) && in_array($permission, $context['illegal_permissions']))
+							if (!empty($illegal_permissions) && in_array($permission, $illegal_permissions))
 								continue;
 
 							$givePerms[$perm_type][] = array($permission, $current_group_id, $value == 'deny' ? 0 : 1);
@@ -850,7 +873,7 @@ class ManagePermissions_Controller extends Action_Controller
 		// Insert the general permissions.
 		if ($current_group_id != 3 && empty($this->_pid))
 		{
-			deleteInvalidPermissions($current_group_id, $context['illegal_permissions']);
+			deleteInvalidPermissions($current_group_id, $illegal_permissions);
 
 			if (!empty($givePerms['membergroup']))
 				replacePermission($givePerms['membergroup']);
@@ -868,7 +891,7 @@ class ManagePermissions_Controller extends Action_Controller
 		}
 
 		// Update any inherited permissions as required.
-		Permissions::updateChild($current_group_id, $this->_pid);
+		$permissions->updateChild($current_group_id, $this->_pid);
 
 		// Clear cached privs.
 		updateSettings(array('settings_updated' => time()));
