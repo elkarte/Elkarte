@@ -35,7 +35,7 @@ class ManagePermissions_Controller extends Action_Controller
 	 *
 	 * @var Permissions
 	 */
-	protected $permissions;
+	private $permissions;
 
 	/**
 	 * @var string[]
@@ -587,10 +587,6 @@ class ManagePermissions_Controller extends Action_Controller
 		require_once(SUBSDIR . '/Permission.subs.php');
 		require_once(SUBSDIR . '/ManagePermissions.subs.php');
 
-		$this->permissions = new Permissions;
-		$this->illegal_permissions = $this->permissions->getIllegalPermissions()
-		$this->illegal_guest_permissions = $this->permissions->getIllegalGuestPermissions();
-
 		// Make sure only one of the quick options was selected.
 		if ((!empty($this->_req->post->predefined) && ((isset($this->_req->post->copy_from) && $this->_req->post->copy_from != 'empty') || !empty($this->_req->post->permissions))) || (!empty($this->_req->post->copy_from) && $this->_req->post->copy_from != 'empty' && !empty($this->_req->post->permissions)))
 			Errors::instance()->fatal_lang_error('permissions_only_one_option', false);
@@ -655,7 +651,7 @@ class ManagePermissions_Controller extends Action_Controller
 			copyBoardPermission($this->_req->post->copy_from, $this->_req->post->group, $bid, $this->illegal_guest_permissions);
 
 			// Update any children out there!
-			:$this->permissions->updateChild($this->_req->post->group, $this->_pid);
+			$this->permissions->updateChild($this->_req->post->group, $this->_pid);
 		}
 		// Set or unset a certain permission for the selected groups.
 		elseif (!empty($this->_req->post->permissions))

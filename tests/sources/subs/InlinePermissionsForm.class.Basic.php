@@ -238,6 +238,7 @@ class TestInlinePermissionsForm extends PHPUnit_Framework_TestCase
 		global $context;
 
 		$db = database();
+		$permissionsForm = new Inline_Permissions_Form;
 
 		foreach ($this->permissions as $test)
 		{
@@ -250,7 +251,9 @@ class TestInlinePermissionsForm extends PHPUnit_Framework_TestCase
 				}
 			}
 
-			Inline_Permissions_Form::init($test['permissions'], $test['excluded']);
+			$permissionsForm->setExcludedGroups($test['excluded']);
+			$permissionsForm->setPermissions($test['permissions']);
+			$permissionsForm->init();
 			foreach ($test['permissions'] as $permission)
 			{
 				$this->assertEquals($test['result'], $context[$permission]);

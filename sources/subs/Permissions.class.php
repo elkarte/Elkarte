@@ -130,24 +130,24 @@ class Permissions
 	/**
 	 * Deletes permissions.
 	 *
-	 * @param string $permission
-	 * @param string $where
+	 * @param string[] $permissions
+	 * @param string[] $where
 	 * @param mixed[] $where_vars = array() or values used in the where statement
 	 */
-	public function deletePermissions($permission, $where, $where_parameters)
+	public function deletePermissions($permissions, $where, $where_parameters)
 	{
 		if (empty($this->illegal_permissions))
-			$where_parameters['ignore_boards'] = $boardListOptions['ignore'];
+		{
+			$where[] = 'permission NOT IN ({array_string:illegal_permissions})';
+			$where_parameters['illegal_permissions'] = $this->illegal_permissions;
+		}
+		$where[] = 'permission IN ({array_string:permissions})';
+		$where_parameters['permissions'] = $permissions;
 
 		$this->db->query('', '
 			DELETE FROM {db_prefix}permissions
-			WHERE permission IN ({array_string:permissions})
-			' .  ? '' : ' AND permission NOT IN ({array_string:illegal_permissions})'),
-				WHERE ' . $where,
-			array_merge($where_parameters, array(
-				'current_permission' => $permission,
-				'illegal_permissions' => $this->illegal_permissions,
-			))
+			WHERE ' . implode(' AND ', $where),
+			$where_parameters
 		);
 	}
 
