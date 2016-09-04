@@ -888,12 +888,10 @@ class ManageNews_Controller extends Action_Controller
 			document.getElementById("xmlnews_maxlen").disabled = !document.getElementById("xmlnews_enable").checked;
 			document.getElementById("xmlnews_limit").disabled = !document.getElementById("xmlnews_enable").checked;', true);
 
+		// Wrap it all up nice and warm...
 		$context['page_title'] = $txt['admin_edit_news'] . ' - ' . $txt['settings'];
 		$context['sub_template'] = 'show_settings';
-
-		// Wrap it all up nice and warm...
 		$context['post_url'] = $scripturl . '?action=admin;area=news;save;sa=settings';
-		$context['permissions_excluded'] = array(-1);
 
 		// Saving the settings?
 		if (isset($this->_req->query->save))

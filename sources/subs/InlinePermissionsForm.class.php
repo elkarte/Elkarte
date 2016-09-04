@@ -18,12 +18,17 @@ class Inline_Permissions_Form
 	/**
 	 * @var string[]
 	 */
+	private $permissions = array();
+
+	/**
+	 * @var string[]
+	 */
 	private $illegal_permissions = array();
 
 	/**
 	 * @var string[]
 	 */
-	private $permissions = array();
+	private $illegal_guest_permissions = array();
 
 	/**
 	 * @var int[]
@@ -80,6 +85,7 @@ class Inline_Permissions_Form
 		// unless they have the right permissions.
 		$permissions = new Permissions;
 		$this->illegal_permissions = $permissions->getIllegalPermissions();
+		$this->illegal_guest_permissions = $this->getIllegalGuestPermissions();
 
 		// No permissions? Not a great deal to do here.
 		if (!allowedTo('manage_permissions'))
@@ -241,6 +247,14 @@ class Inline_Permissions_Form
 					if (isset($context[$permission[1]][$group]))
 						unset($context[$permission[1]][$group]);
 				}
+			}
+
+			// Are any of these permissions that guests can't have?
+			$non_guest_perms = array_intersect(str_replace(array('_any', '_own'), '', $permissions), $this->illegal_guest_permissions);
+			foreach ($non_guest_perms as $permission)
+			{
+				if (isset($context[$permission][-1]))
+					unset($context[$permission][-1]);
 			}
 		}
 	}

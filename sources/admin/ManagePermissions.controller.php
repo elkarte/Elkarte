@@ -911,10 +911,7 @@ class ManagePermissions_Controller extends Action_Controller
 		// Some items for the template
 		$context['page_title'] = $txt['permission_settings_title'];
 		$context['sub_template'] = 'show_settings';
-
-		// Don't let guests have these permissions.
 		$context['post_url'] = $scripturl . '?action=admin;area=permissions;save;sa=settings';
-		$context['permissions_excluded'] = array(-1);
 
 		// Saving the settings?
 		if (isset($this->_req->query->save))

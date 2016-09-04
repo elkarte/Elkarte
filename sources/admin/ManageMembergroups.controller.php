@@ -785,9 +785,6 @@ class ManageMembergroups_Controller extends Action_Controller
 		// initialize the form
 		$this->_initGroupSettingsForm();
 
-		// Don't allow assignment of guests.
-		$context['permissions_excluded'] = array(-1);
-
 		$config_vars = $this->_groupSettings->settings();
 
 		if (isset($this->_req->query->save))
