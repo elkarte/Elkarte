@@ -49,7 +49,7 @@ class TestInlinePermissionsForm extends PHPUnit_Framework_TestCase
 		$this->permissions = array(
 			// A simple test on guests and regular members
 			array(
-				'permissions' => array('testing'),
+				'permissions' => array(array('', 'testing')),
 				'excluded' => array(),
 				'result' => array(
 					-1 => array(
@@ -68,7 +68,7 @@ class TestInlinePermissionsForm extends PHPUnit_Framework_TestCase
 			),
 			// A slightly more complex test adding a couple of groups
 			array(
-				'permissions' => array('testing'),
+				'permissions' => array(array('', 'testing')),
 				'excluded' => array(),
 				'database' => array(
 					array(
@@ -146,7 +146,7 @@ class TestInlinePermissionsForm extends PHPUnit_Framework_TestCase
 			),
 			// A more complex test adding a couple of groups and excluding one of them
 			array(
-				'permissions' => array('testing'),
+				'permissions' => array(array('', 'testing')),
 				'excluded' => array(4),
 				'database' => array(
 					array(
@@ -256,7 +256,7 @@ class TestInlinePermissionsForm extends PHPUnit_Framework_TestCase
 			$permissionsForm->init();
 			foreach ($test['permissions'] as $permission)
 			{
-				$this->assertEquals($test['result'], $context[$permission]);
+				$this->assertEquals($test['result'], $context[$permission[1]]);
 			}
 		}
 	}
