@@ -35,6 +35,7 @@ class Inline_Permissions_Form
 	 */
 	private $excluded_groups = array();
 
+	private $permissionsObject;
 	private $db;
 
 	/**
@@ -51,6 +52,24 @@ class Inline_Permissions_Form
 	public function setPermissions($permissions)
 	{
 		$this->permissions = $permissions;
+
+		// Load the permission settings for guests
+		$this->permissionList = array_map(
+			function ($permission)
+			{
+				return $permission[1];
+			}, $this->permissions
+		);
+
+		// Load the permission settings for guests
+		$this->illegal_guest_permissions = array_intersect(
+			array_map(
+				function ($permission)
+				{
+					return str_replace(array('_any', '_own'), '', $permission[1]);
+				}, $this->permissions
+			), $this->permissionsObject->getIllegalGuestPermissions()
+		);
 	}
 
 	/**
@@ -83,30 +102,8 @@ class Inline_Permissions_Form
 
 		// Make sure they can't do certain things,
 		// unless they have the right permissions.
-		$permissions = new Permissions;
-		$this->illegal_permissions = $permissions->getIllegalPermissions();
-
-		// No permissions? Not a great deal to do here.
-		if (!allowedTo('manage_permissions'))
-			return;
-
-		// Load the permission settings for guests
-		$this->permissionList = array_map(
-			function ($permission)
-			{
-				return $permission[1];
-			}, $this->permissions
-		);
-
-		// Load the permission settings for guests
-		$this->illegal_guest_permissions = array_intersect(
-			array_map(
-				function ($permission)
-				{
-					return str_replace(array('_any', '_own'), '', $permission[1]);
-				}, $this->permissions
-			), $permissions->getIllegalGuestPermissions()
-		);
+		$this->permissionsObject = new Permissions;
+		$this->illegal_permissions = $this->permissionsObject->getIllegalPermissions();
 	}
 
 	/**
@@ -176,6 +173,9 @@ class Inline_Permissions_Form
 
 		loadLanguage('ManagePermissions');
 		loadTemplate('ManagePermissions');
+		// No permissions? Not a great deal to do here.
+		if (!allowedTo('manage_permissions'))
+			return;
 
 		// Load the permission settings for guests
 		foreach ($this->permissions as $permission)
