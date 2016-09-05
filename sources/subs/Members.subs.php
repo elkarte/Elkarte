@@ -2510,14 +2510,14 @@ function updateMemberData($members, $data)
 	$cache = Cache::instance();
 
 	// Clear any caching?
-	if ($cache->checkLevel(2) && !empty($members))
+	if ($cache->levelHigher(2) && !empty($members))
 	{
 		if (!is_array($members))
 			$members = array($members);
 
 		foreach ($members as $member)
 		{
-			if ($cache->checkLevel(3))
+			if ($cache->levelHigher(3))
 			{
 				$cache->remove('member_data-profile-' . $member);
 				$cache->remove('member_data-normal-' . $member);
