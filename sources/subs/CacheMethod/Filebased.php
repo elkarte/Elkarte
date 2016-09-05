@@ -74,7 +74,9 @@ class Filebased extends Cache_Method_Abstract
 
 		// Clearing this data
 		if ($value === null)
+		{
 			@unlink(CACHEDIR . '/' . $fName);
+		}
 		// Or stashing it away
 		else
 		{

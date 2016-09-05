@@ -393,6 +393,7 @@ class Cache
 			return;
 		}
 
+		$key = $this->_key($key);
 		$this->_cache_obj->remove($key);
 	}
 
