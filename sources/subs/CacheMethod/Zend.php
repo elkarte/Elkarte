@@ -15,81 +15,63 @@ namespace ElkArte\sources\subs\CacheMethod;
 
 /**
  * Zend caching engine.
- * Supports both zend_shm_cache_store and the deprecated output_cache_put
  */
 class Zend extends Cache_Method_Abstract
 {
-	private $_shm = false;
+	/**
+	 * {@inheritdoc}
+	 */
+	protected $title = 'Zend Platform/Performance Suite';
 
 	/**
-	 * {@inheritdoc }
+	 * {@inheritdoc}
 	 */
-	public function init()
+	public function exists($key)
 	{
-		$this->_shm = function_exists('zend_shm_cache_store');
-
-		return $this->_shm || function_exists('output_cache_put');
+		$result = $this->get($this->getprefixedKey($key));
+		return !$this->is_miss;
 	}
 
 	/**
-	 * {@inheritdoc }
+	 * {@inheritdoc}
 	 */
 	public function put($key, $value, $ttl = 120)
 	{
-		// Zend Platform/ZPS/etc.
-		if ($this->_shm)
-			zend_shm_cache_store('ELK::' . $key, $value, $ttl);
-		else
-			output_cache_put($key, $value);
+		zend_shm_cache_store($this->getprefixedKey($key), $value, $ttl);
 	}
 
 	/**
-	 * {@inheritdoc }
+	 * {@inheritdoc}
 	 */
 	public function get($key, $ttl = 120)
 	{
-
-		// Zend's pricey stuff.
-		if ($this->_shm)
-			$result = zend_shm_cache_fetch('ELK::' . $key);
-		else
-			$result = output_cache_get($key, $ttl);
-
+		$result = zend_shm_cache_fetch($this->getprefixedKey($key));
 		$this->is_miss = $result === null;
 
 		return $result;
 	}
 
 	/**
-	 * {@inheritdoc }
+	 * {@inheritdoc}
 	 */
 	public function clean($type = '')
 	{
-		if ($this->_shm)
-			zend_shm_cache_clear('ELK');
+		zend_shm_cache_clear($this->prefix);
 	}
 
 	/**
-	 * {@inheritdoc }
+	 * {@inheritdoc}
 	 */
-	public static function available()
+	public function isAvailable()
 	{
-		return function_exists('zend_shm_cache_store') || function_exists('output_cache_put');
+		return function_exists('zend_shm_cache_store');
 	}
 
 	/**
-	 * {@inheritdoc }
+	 * {@inheritdoc}
 	 */
-	public static function details()
+	public function details()
 	{
-		return array('title' => self::title(), 'version' => zend_version());
-	}
-
-	/**
-	 * {@inheritdoc }
-	 */
-	public static function title()
-	{
-		return 'Zend Platform/Performance Suite';
+		return array('title' => $this->title, 'version' => zend_version());
 	}
 }

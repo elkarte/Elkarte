@@ -1,5 +1,18 @@
 <?php
 
+class MockMemcached extends ElkArte\sources\subs\CacheMethod\Memcached
+{
+	/**
+	 * Server count.
+	 *
+	 * @return int
+	 */
+	public function getNumServers()
+	{
+		return $this->getServers();
+	}
+}
+
 /**
  * TestCase class for caching classes.
  */
@@ -18,39 +31,79 @@ class TestCache extends PHPUnit_Framework_TestCase
 	}
 
 	/**
-	 * Cleanup data we no longer need at the end of the tests in this class.
-	 *
-	 * tearDown() is run automatically by the testing framework after each test method.
-	 */
-	public function tearDown()
-	{
-	}
-
-	/**
-	 * Testing the filebase caching
+	 * Testing the filebased caching
 	 */
 	public function testFilebasedCache()
 	{
 		$this->_cache_obj = new ElkArte\sources\subs\CacheMethod\Filebased(array());
-		$this->doCacheTests(function($key) {
-			return file_exists(CACHEDIR . '/data_' . $key . '.php');
-		});
+		$this->doCacheTests();
+	}
+
+	/**
+	 * Testing Apc
+	 */
+	public function testApc()
+	{
+		$this->_cache_obj = new ElkArte\sources\subs\CacheMethod\Apc(array());
+		$this->doCacheTests();
+	}
+
+	/**
+	 * Testing Memcached
+	 */
+	public function testMemcached()
+	{
+		$this->_cache_obj = new MockMemcached(array('servers' => array('localhost', 'localhost:11212', 'localhost:11213')));
+		$this->assertCount(3, $this->_cache_obj->getNumServers());
+		$this->doCacheTests();
+	}
+
+	/**
+	 * Testing Xcache
+	 */
+	public function testXcache()
+	{
+		$this->_cache_obj = new ElkArte\sources\subs\CacheMethod\Xcache(array('cache_uid' => 'mOo', 'cache_password' => 'test'));
+
+		/*
+		 * Xcache may not be loaded, so skip this test. The developer has
+		 * not updated it for PHP 7. Also, since it conflicts with APC
+		 * (NOT APCu), this test won't work in PHP 5.3.
+		 */
+		if (!$this->_cache_obj->isAvailable())
+		{
+			$this->markTestSkipped('Xcache is not loaded; skipping this test method');
+		}
+		$this->doCacheTests();
 	}
 
 	/**
 	 * Performs the testing of the caching object
 	 */
-	private function doCacheTests($putAssert = null)
+	private function doCacheTests()
 	{
 		$test_array = serialize(array('anindex' => 'avalue'));
-		$key = 'testcache';
 
-		$this->_cache_obj->put($key, $test_array);
+		$this->_cache_obj->put('test', $test_array);
+		$this->assertTrue($this->_cache_obj->exists('test'));
+		$this->assertSame($test_array, $this->_cache_obj->get('test'));
 
-		if ($putAssert !== null)
-			$this->assertTrue($putAssert($key));
+		$this->_cache_obj->put('test', null);
+		$this->assertFalse($this->_cache_obj->exists('test'));
+		$this->assertNull($this->_cache_obj->get('test'));
 
-		$test_cached = $this->_cache_obj->get($key);
-		$this->assertSame($test_array, $test_cached);
+		$this->_cache_obj->put('test', $test_array);
+		$this->assertTrue($this->_cache_obj->exists('test'));
+		$this->_cache_obj->remove('test');
+		$this->assertFalse($this->_cache_obj->exists('test'));
+		$this->assertNull($this->_cache_obj->get('test'));
+
+		$this->_cache_obj->put('test', $test_array);
+		$this->assertTrue($this->_cache_obj->exists('test'));
+		$this->_cache_obj->put('test2', $test_array);
+		$this->assertTrue($this->_cache_obj->exists('test2'));
+		$this->_cache_obj->clean();
+		$this->assertFalse($this->_cache_obj->exists('test'));
+		$this->assertFalse($this->_cache_obj->exists('test2'));
 	}
 }

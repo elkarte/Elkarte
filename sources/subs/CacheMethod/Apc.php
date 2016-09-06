@@ -19,45 +19,91 @@ namespace ElkArte\sources\subs\CacheMethod;
 class Apc extends Cache_Method_Abstract
 {
 	/**
-	 * {@inheritdoc }
+	 * {@inheritdoc}
 	 */
-	public function init()
+	protected $title = 'Alternative PHP Cache';
+
+	/**
+	 * Whether to use the APCu functions or the original APC ones.
+	 *
+	 * @var string
+	 */
+	protected $apcu = false;
+
+	/**
+	 * {@inheritdoc}
+	 */
+	public function __construct($options)
 	{
-		return function_exists('apc_store');
+		parent::__construct($options);
+		$this->apcu = function_exists('apcu_store');
 	}
 
 	/**
-	 * {@inheritdoc }
+	 * {@inheritdoc}
+	 */
+	public function exists($key)
+	{
+		$result = $this->get($key);
+		return !$this->is_miss;
+	}
+
+	/**
+	 * {@inheritdoc}
 	 */
 	public function put($key, $value, $ttl = 120)
 	{
+		$prefixedKey = $this->getprefixedKey($key);
 		// An extended key is needed to counteract a bug in APC.
-		if ($value === null)
-			apc_delete($key . 'elkarte');
+		if ($this->apcu)
+		{
+			if ($value === null)
+				apcu_delete($prefixedKey);
+			else
+				apcu_store($prefixedKey, $value, $ttl);
+		}
 		else
-			apc_store($key . 'elkarte', $value, $ttl);
+		{
+			if ($value === null)
+				apc_delete($prefixedKey);
+			else
+				apc_store($prefixedKey, $value, $ttl);
+		}
 	}
 
 	/**
-	 * {@inheritdoc }
+	 * {@inheritdoc}
 	 */
 	public function get($key, $ttl = 120)
 	{
+		$prefixedKey = $this->getprefixedKey($key);
 		$success = false;
-		$result = apc_fetch($key . 'elkarte', $success);
-
+		if ($this->apcu)
+			$result = apcu_fetch($prefixedKey, $success);
+		else
+			$result = apc_fetch($prefixedKey, $success);
 		$this->is_miss = !$success;
+
+		/*
+		 * Let's be conssistent, yes? All other cache methods
+		 * supported by ElkArte return null on failure to grab
+		 * the specified cache entry.
+		 */
+		if ($this->is_miss)
+			return;
 
 		return $result;
 	}
 
 	/**
-	 * {@inheritdoc }
+	 * {@inheritdoc}
 	 */
 	public function clean($type = '')
 	{
+		if ($this->apcu)
+			apcu_clear_cache();
 		// If passed a type, clear that type out
-		if ($type === '' || $type === 'data')
+		elseif ($type === '' || $type === 'data')
 		{
 			apc_clear_cache('user');
 			apc_clear_cache('system');
@@ -67,26 +113,18 @@ class Apc extends Cache_Method_Abstract
 	}
 
 	/**
-	 * {@inheritdoc }
+	 * {@inheritdoc}
 	 */
-	public static function available()
+	public function isAvailable()
 	{
-		return extension_loaded('apc') || extension_loaded('apcu');
+		return function_exists('apc_store') || function_exists('apcu_store');
 	}
 
 	/**
-	 * {@inheritdoc }
+	 * {@inheritdoc}
 	 */
-	public static function details()
+	public function details()
 	{
-		return array('title' => self::title(), 'version' => phpversion('apc'));
-	}
-
-	/**
-	 * {@inheritdoc }
-	 */
-	public static function title()
-	{
-		return 'Alternative PHP Cache';
+		return array('title' => $this->title, 'version' => phpversion($this->apcu ? 'apcu' : 'apc'));
 	}
 }

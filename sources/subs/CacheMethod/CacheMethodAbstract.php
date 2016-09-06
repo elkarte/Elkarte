@@ -28,7 +28,22 @@ abstract class Cache_Method_Abstract implements Cache_Method_Interface
 	protected $is_miss = true;
 
 	/**
-	 * {@inheritdoc }
+	 * the (human-readable) name of the caching engine.
+	 *
+	 * @var string
+	 */
+	protected $title = '';
+
+	/**
+	 * This is prefixed to all cache entries so that different
+	 * applications won't interfere with each other.
+	 *
+	 * @var string
+	 */
+	protected $prefix = 'elkarte';
+
+	/**
+	 * {@inheritdoc}
 	 */
 	public function __construct($options)
 	{
@@ -36,7 +51,7 @@ abstract class Cache_Method_Abstract implements Cache_Method_Interface
 	}
 
 	/**
-	 * {@inheritdoc }
+	 * {@inheritdoc}
 	 */
 	public function fixkey($key)
 	{
@@ -44,7 +59,19 @@ abstract class Cache_Method_Abstract implements Cache_Method_Interface
 	}
 
 	/**
-	 * {@inheritdoc }
+	 * Obtain the variables necessary to
+	 * help build the final key for storage.
+	 *
+	 * @param string $key
+	 * @return string
+	 */
+	public function getprefixedKey($key)
+	{
+		return $this->prefix . '::' . $key;
+	}
+
+	/**
+	 * {@inheritdoc}
 	 */
 	public function isMiss()
 	{
@@ -52,7 +79,7 @@ abstract class Cache_Method_Abstract implements Cache_Method_Interface
 	}
 
 	/**
-	 * {@inheritdoc }
+	 * {@inheritdoc}
 	 */
 	public function remove($key)
 	{
@@ -60,9 +87,17 @@ abstract class Cache_Method_Abstract implements Cache_Method_Interface
 	}
 
 	/**
-	 * {@inheritdoc }
+	 * {@inheritdoc}
 	 */
-	public static function settings(&$confing_vars)
+	public function settings(&$confing_vars)
 	{
+	}
+
+	/**
+	 * {@inheritdoc}
+	 */
+	public function title()
+	{
+		return $this->title;
 	}
 }

@@ -109,8 +109,7 @@ class Cache
 		if (class_exists($cache_class))
 		{
 			$this->_cache_obj = new $cache_class($this->_options);
-
-			$this->enabled = $this->_cache_obj->init();
+			$this->enabled = $this->_cache_obj->isAvailable();
 		}
 		else
 		{
@@ -177,7 +176,6 @@ class Cache
 	 *   - Xcache: http://xcache.lighttpd.net/wiki/XcacheApi
 	 *   - memcache: http://www.php.net/memcache
 	 *   - APC: http://www.php.net/apc
-	 *   - eAccelerator: http://bart.eaccelerator.net/doc/phpdoc/
 	 *   - Zend: http://files.zend.com/help/Zend-Platform/output_cache_functions.htm
 	 *   - Zend: http://files.zend.com/help/Zend-Platform/zend_cache_functions.htm
 	 *
@@ -367,7 +365,7 @@ class Cache
 
 	/**
 	 * Checks if the system level supports the required level of the cache request
-	 * 
+	 *
 	 * @param int $level
 	 *
 	 * @return bool
@@ -428,7 +426,7 @@ class Cache
 	{
 		if (self::$_instance === null)
 		{
-			global $cache_accelerator, $cache_enable, $cache_uid, $cache_password;
+			global $cache_accelerator, $cache_enable, $cache_uid, $cache_password, $cache_memcached;
 
 			$options = array();
 			if ($cache_accelerator === 'xcache')
@@ -436,6 +434,12 @@ class Cache
 				$options = array(
 					'cache_uid' => $cache_uid,
 					'cache_password' => $cache_password,
+				);
+			}
+			elseif ($cache_accelerator === 'memcached')
+			{
+				$options = array(
+					'servers' => explode(',', $cache_memcached),
 				);
 			}
 

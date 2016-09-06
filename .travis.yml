@@ -19,23 +19,35 @@ matrix:
         postgresql: "9.4"
   fast_finish: true
 
-install:
-    - chmod +x tests/travis-ci/setup-server.sh
-    - chmod +x tests/travis-ci/setup-selenium.sh
-    - tests/travis-ci/setup-server.sh $DB $TRAVIS_PHP_VERSION
+# Create a Travis memcached enabled environment for the test suite to run in and
+# ensure that we test against localhost on Travis-CI.
+services: memcached
 
+install:
+  - chmod +x tests/travis-ci/setup-server.sh
+  - chmod +x tests/travis-ci/setup-selenium.sh
+  - tests/travis-ci/setup-server.sh $DB $TRAVIS_PHP_VERSION
+
+
+# The `sevices: memcached` will start a memcached service on localhost
+# and on the default port, but in order to test against multiple memcached
+# instances we need to spawn a couple more, so we do that during the before
+# script
 before_script:
-    - chmod +x tests/travis-ci/setup-elkarte.sh
-    - tests/travis-ci/setup-elkarte.sh $DB $TRAVIS_PHP_VERSION
+  - memcached -p 11212 -d
+  - memcached -p 11213 -d
+  - phpenv config-add tests/config.ini
+  - chmod +x tests/travis-ci/setup-elkarte.sh
+  - tests/travis-ci/setup-elkarte.sh $DB $TRAVIS_PHP_VERSION
 
 script:
-    - chmod +x /var/www/tests/travis-ci/setup-script.sh
-    - /var/www/tests/travis-ci/setup-script.sh $DB $TRAVIS_PHP_VERSION
+  - chmod +x /var/www/tests/travis-ci/setup-script.sh
+  - /var/www/tests/travis-ci/setup-script.sh $DB $TRAVIS_PHP_VERSION
 
 after_script:
-    - chmod +x /var/www/tests/travis-ci/setup-results.sh
-    - /var/www/tests/travis-ci/setup-results.sh $DB $TRAVIS_PHP_VERSION
+  - chmod +x /var/www/tests/travis-ci/setup-results.sh
+  - /var/www/tests/travis-ci/setup-results.sh $DB $TRAVIS_PHP_VERSION
 
 after_failure:
-    - chmod +x /var/www/tests/travis-ci/setup-failure.sh
-    - /var/www/tests/travis-ci/setup-failure.sh $DB $TRAVIS_PHP_VERSION
+  - chmod +x /var/www/tests/travis-ci/setup-failure.sh
+  - /var/www/tests/travis-ci/setup-failure.sh $DB $TRAVIS_PHP_VERSION

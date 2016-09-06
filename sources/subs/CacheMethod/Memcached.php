@@ -14,164 +14,179 @@
 namespace ElkArte\sources\subs\CacheMethod;
 
 /**
- * Memcache and memcached.
- *
- * memcache is the first choice, if this is not available then memcached is used
+ * Memcached and Memcache.
  */
 class Memcached extends Cache_Method_Abstract
 {
-	private $_memcache = null;
-	private $_memcachec = null;
+	/**
+	 * {@inheritdoc}
+	 */
+	protected $title = 'Memcached';
 
 	/**
-	 * {@inheritdoc }
+	 * Memcached is the first choice, if this is
+	 * not available then Memcache is used.
+	 *
+	 * @var \Memcached|\Memcache
 	 */
-	public function init()
+	protected $obj;
+
+	/**
+	 * {@inheritdoc}
+	 */
+	public function __construct($options)
 	{
-		if (!class_exists('Memcached') && !function_exists('memcache_get') && !function_exists('memcached_get'))
-			return false;
+		parent::__construct($options);
 
-		$memcached = self::get_memcached_server();
-		if (!$memcached)
-			return false;
-
-		$this->_memcachec = class_exists('Memcached');
-		$this->_memcache = function_exists('memcache_get');
-		$this->_options['memcached'] = $memcached;
-
-		return true;
+		if ($this->isAvailable())
+		{
+			if (class_exists('Memcached', false))
+			{
+				$this->obj = new \Memcached;
+			}
+			elseif (class_exists('Memcache', false))
+			{
+				$this->obj = new \Memcache;
+			}
+			$this->setOptions();
+			$this->addServers();
+		}
 	}
 
 	/**
-	 * {@inheritdoc }
+	 * {@inheritdoc}
+	 */
+	public function exists($key)
+	{
+		$result = $this->get($key);
+		return !$this->is_miss;
+	}
+
+	/**
+	 * {@inheritdoc}
 	 */
 	public function put($key, $value, $ttl = 120)
 	{
-		if ($this->_memcachec)
-			$this->_options['memcached']->set($key, $value, $ttl);
-		else
-			memcache_set($this->_options['memcached'], $key, $value, 0, $ttl);
+		if ($value === null)
+			$this->obj->delete($key);
+
+		$this->obj->set($key, $value, $ttl);
 	}
 
 	/**
-	 * {@inheritdoc }
+	 * {@inheritdoc}
 	 */
 	public function get($key, $ttl = 120)
 	{
-		if ($this->_memcachec)
-		{
-			$result = $this->_options['memcached']->get($key);
-		}
-		elseif ($this->_memcache)
-		{
-			$result = memcache_get($this->_options['memcached'], $key);
-		}
-		else
-		{
-			$result = memcached_get($this->_options['memcached'], $key);
-		}
-
+		$result = $this->obj->get($key);
 		$this->is_miss = $result === null || $result === false;
 
 		return $result;
 	}
 
 	/**
-	 * {@inheritdoc }
+	 * {@inheritdoc}
 	 */
 	public function clean($type = '')
 	{
 		// Clear it out, really invalidate whats there
-		if ($this->_memcachec)
-			$this->_options['memcached']->flush();
-		elseif ($this->_memcache)
-			memcache_flush($this->_options['memcached']);
-		else
-			memcached_flush($this->_options['memcached']);
+		$this->obj->flush();
+	}
+
+	/**
+	 * Add memcache servers.
+	 *
+	 * Don't add servers if they already exist. Ideal for persistent connections.
+	 *
+	 * @return bool True if there are servers in the daemon, false if not.
+	 */
+	protected function addServers()
+	{
+		$serversmList = $this->getServers();
+		$retVal = !empty($serversmList);
+		foreach ($this->_options['servers'] as $server)
+		{
+			$server = explode(':', trim($server));
+			$server[1] = !empty($server[1]) ? $server[1] : 11211;
+			if (!in_array(implode(':', $server), $serversmList, true))
+				$retVal |= $this->obj->addServer($server[0], $server[1]);
+		}
+
+		return $retVal;
 	}
 
 	/**
 	 * Get memcache servers.
 	 *
-	 * - This function is used by Cache::instance() and Cache::put().
-	 * - It attempts to connect to a random server in the cache_memcached setting.
-	 * - It recursively calls itself up to $level times.
-	 *
-	 * @param int $level = 3
+	 * @return array A list of servers in the daemon.
 	 */
-	public static function get_memcached_server($level = 3)
+	protected function getServers()
 	{
-		global $db_persist, $cache_memcached;
-
-		$servers = explode(',', $cache_memcached);
-		$server = explode(':', trim($servers[array_rand($servers)]));
-		$port = !isset($server[1]) ? 11211 : $server[1];
-
-		// Don't try more times than we have servers!
-		$level = min(count($servers), $level);
-
-		if (class_exists('Memcached'))
-		{
-			$serversm = array();
-			foreach ($servers as $server)
-			{
-				$server = explode(':', trim($server));
-				$serversm[] = $server;
-			}
-			$memcached = new \Memcached;
-			$memcached->addServers($serversm);
-		}
-		// Don't wait too long: yes, we want the server, but we might be able to run the query faster!
-		elseif (empty($db_persist))
-		{
-			if (function_exists('memcache_get'))
-				$memcached = memcache_connect($server[0], $port);
-			else
-				$memcached = memcached_connect($server[0], $port);
-		}
-		else
-		{
-			if (function_exists('memcache_get'))
-				$memcached = memcache_pconnect($server[0], $port);
-			else
-				$memcached = memcached_pconnect($server[0], $port);
-		}
-
-		if (!$memcached && $level > 0)
-			self::get_memcached_server($level - 1);
-
-		return $memcached;
+		return array_keys((array)$this->obj->getStats());
 	}
 
 	/**
-	 * {@inheritdoc }
+	 * {@inheritdoc}
 	 */
-	public static function available()
+	protected function setOptions()
 	{
-		global $modSettings;
+		if (class_exists('Memcached', false))
+		{
+			/*
+			 * the timeout after which a server is considered DEAD.
+			 */
+			$this->obj->setOption(\Memcached::OPT_CONNECT_TIMEOUT, 100);
 
-		return (class_exists('Memcached') || function_exists('memcache_get')) && isset($modSettings['cache_memcached']) && trim($modSettings['cache_memcached']) != '';
+			/*
+			 * If one memcached node is dead, its keys (and only its
+			 * keys) will be evenly distributed to other nodes.
+			 */
+			$this->obj->setOption(\Memcached::OPT_DISTRIBUTION, \Memcached::DISTRIBUTION_CONSISTENT);
+
+			/*
+			 * number of connection issues before a server is marked
+			 * as DEAD, and removed from the list of servers.
+			 */
+			$this->obj->setOption(\Memcached::OPT_SERVER_FAILURE_LIMIT, 2);
+
+			/*
+			 * enables the removal of dead servers.
+			 */
+			$this->obj->setOption(\Memcached::OPT_REMOVE_FAILED_SERVERS, true);
+
+			/*
+			 * after a node is declared DEAD, libmemcached will
+			 * try it again after that many seconds.
+			 */
+			$this->obj->setOption(\Memcached::OPT_RETRY_TIMEOUT, 1);
+		}
+		elseif (class_exists('Memcache', false))
+		{
+			$this->obj->setOption(\Memcache::OPT_CONNECT_TIMEOUT, 100);
+			$this->obj->setOption(\Memcache::OPT_DISTRIBUTION, \Memcache::DISTRIBUTION_CONSISTENT);
+			$this->obj->setOption(\Memcache::OPT_SERVER_FAILURE_LIMIT, 2);
+			$this->obj->setOption(\Memcache::OPT_REMOVE_FAILED_SERVERS, true);
+			$this->obj->setOption(\Memcache::OPT_RETRY_TIMEOUT, 1);
+		}
 	}
 
 	/**
-	 * {@inheritdoc }
+	 * {@inheritdoc}
 	 */
-	public static function details()
+	public function isAvailable()
 	{
-		$memcached = self::get_memcached_server();
-
-		return array('title' => self::title(), 'version' => empty($memcached) ? '???' : (class_exists('Memcached') ? $memcached->getVersion() : memcache_get_version()));
+		return class_exists('Memcached') || class_exists('Memcache');
 	}
 
 	/**
-	 * {@inheritdoc }
+	 * {@inheritdoc}
 	 */
-	public static function title()
+	public function details()
 	{
-		if (self::available())
-			add_integration_function('integrate_modify_cache_settings', 'Memcached_Cache::settings', '', false);
-
-		return 'Memcached';
+		return array(
+			'title' => $this->title,
+			'version' => current($this->obj->getVersion())
+		);
 	}
 
 	/**
@@ -181,10 +196,19 @@ class Memcached extends Cache_Method_Abstract
 	 *
 	 * @param array() $config_vars
 	 */
-	public static function settings(&$config_vars)
+	public function settings(&$config_vars)
 	{
 		global $txt;
 
-		$config_vars[] = array('cache_memcached', $txt['cache_memcached'], 'file', 'text', $txt['cache_memcached'], 'cache_memcached', 'force_div_id' => 'memcached_cache_memcached');
+		$var = array(
+			'cache_memcached', $txt['cache_memcached'], 'file',
+			'text', $txt['cache_memcached'], 'cache_memcached',
+			'force_div_id' => 'memcached_cache_memcached',
+		);
+		$serversmList = $this->getServers();
+		if (!empty($serversmList))
+			$var['postinput'] = $txt['cache_memcached_servers'] . implode('<br>', $serversmList);
+
+		$config_vars[] = $var;
 	}
 }

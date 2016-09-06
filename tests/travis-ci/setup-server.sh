@@ -79,3 +79,30 @@ then
         composer self-update
     fi
 fi
+
+# Instal APCu
+if [ "$TRAVIS_PHP_VERSION" != "5.3" ]
+then
+    if [ "$TRAVIS_PHP_VERSION" == "7.0" ]
+    then
+        printf "\n"| pecl install apcu
+    else
+        printf "\n"| pecl install channel://pecl.php.net/APCu-4.0.10
+        
+        # Install Xcache. Not available for PHP 7 :(.
+        wget http://xcache.lighttpd.net/pub/Releases/3.2.0/xcache-3.2.0.tar.gz
+        tar xf xcache-3.2.0.tar.gz
+        cd xcache-3.2.0
+        phpize
+        ./configure
+        make
+        make install
+        cd ../
+        rm -r xcache-3.2.0
+        printf "extension=xcache.so\nxcache.size=64M\nxcache.var_size=16M\nxcache.test=On" > xcache.ini
+        phpenv config-add xcache.ini
+    fi
+else
+    printf "extension=apc.so\napc.enabled=1" > 5.3.ini
+    phpenv config-add 5.3.ini
+fi

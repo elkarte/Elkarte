@@ -108,25 +108,23 @@ class ManageServer_Controller extends Action_Controller
 		$context['settings_message'] = (isset($this->_req->query->msg) && isset($txt[$this->_req->query->msg])) ? $txt[$this->_req->query->msg] : '';
 
 		// Warn the user if there's any relevant information regarding Settings.php.
-		if ($subAction != 'cache')
+		$settings_not_writable = !is_writable(BOARDDIR . '/Settings.php');
+
+		// Warn the user if the backup of Settings.php failed.
+		$settings_backup_fail = !@is_writable(BOARDDIR . '/Settings_bak.php') || !@copy(BOARDDIR . '/Settings.php', BOARDDIR . '/Settings_bak.php');
+
+		if ($settings_not_writable)
 		{
-			// Warn the user if the backup of Settings.php failed.
-			$settings_not_writable = !is_writable(BOARDDIR . '/Settings.php');
-			$settings_backup_fail = !@is_writable(BOARDDIR . '/Settings_bak.php') || !@copy(BOARDDIR . '/Settings.php', BOARDDIR . '/Settings_bak.php');
-
-			if ($settings_not_writable)
-			{
-				$context['settings_message'] = $txt['settings_not_writable'];
-				$context['error_type'] = 'notice';
-			}
-			elseif ($settings_backup_fail)
-			{
-				$context['settings_message'] = $txt['admin_backup_fail'];
-				$context['error_type'] = 'notice';
-			}
-
-			$context['settings_not_writable'] = $settings_not_writable;
+			$context['settings_message'] = $txt['settings_not_writable'];
+			$context['error_type'] = 'notice';
 		}
+		elseif ($settings_backup_fail)
+		{
+			$context['settings_message'] = $txt['admin_backup_fail'];
+			$context['error_type'] = 'notice';
+		}
+
+		$context['settings_not_writable'] = $settings_not_writable;
 
 		// Call the right function for this sub-action.
 		$action->dispatch($subAction);
@@ -326,18 +324,6 @@ class ManageServer_Controller extends Action_Controller
 
 		// Initialize the form
 		$this->_initCacheSettingsForm();
-
-		$context['settings_message'] = $txt['caching_information'];
-
-		// Let them know if they may have problems
-		if ($cache_accelerator === 'filebased' && Cache::instance()->isEnabled() && extension_loaded('Zend OPcache'))
-		{
-			// The opcache will cache the filebased user data files, updating them based on opcache.revalidate_freq
-			// which can cause delays (or prevent) the invalidation of file cache files
-			$opcache_config = @opcache_get_configuration();
-			if (!empty($opcache_config['directives']['opcache.enable']))
-				$context['settings_message'] = $txt['cache_conflict'];
-		}
 
 		// Saving again?
 		if (isset($this->_req->query->save))
@@ -628,10 +614,11 @@ class ManageServer_Controller extends Action_Controller
 
 		foreach ($detected as $key => $value)
 		{
-			$detected_names[] = $value['title'];
+			$detected_names[] = $value->title();
+			$supported[] = $value->isAvailable();
 
-			if (!empty($value['supported']))
-				$detected_supported[$key] = $value['title'];
+			if (!empty($supported))
+				$detected_supported[$key] = $value->title();
 		}
 
 		$txt['caching_information'] = str_replace('{supported_accelerators}', '<li>' . implode('</li><li>', $detected_names) . '</li>', $txt['caching_information']);
@@ -643,17 +630,16 @@ class ManageServer_Controller extends Action_Controller
 		// Define the variables we want to edit.
 		$config_vars = array(
 			// Only a few settings, but they are important
-			array('', $txt['cache_settings_message'], '', 'desc'),
+			array('', $txt['caching_information'] . '<br><br>' . $txt['cache_settings_message'], '', 'desc'),
 			array('cache_enable', $txt['cache_enable'], 'file', 'select', $cache_level, 'cache_enable'),
 			array('cache_accelerator', $txt['cache_accelerator'], 'file', 'select', $detected_supported),
 		);
 
 		foreach ($detected as $key => $value)
 		{
-			$cache_class = '\\ElkArte\\sources\\subs\\CacheMethod\\' . ucfirst($key);
-			if ($cache_class::available())
+			if ($value->isAvailable())
 			{
-				$cache_class::settings($config_vars);
+				$value->settings($config_vars);
 			}
 		}
 

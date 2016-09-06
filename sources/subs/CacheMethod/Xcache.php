@@ -25,22 +25,35 @@ namespace ElkArte\sources\subs\CacheMethod;
 class Xcache extends Cache_Method_Abstract
 {
 	/**
-	 * {@inheritdoc }
+	 * {@inheritdoc}
 	 */
-	public function init()
+	protected $title = 'XCache';
+
+	/**
+	 * {@inheritdoc}
+	 */
+	public function __construct($options)
 	{
+		parent::__construct($options);
+
 		// Xcache may need auth credentials, depending on how its been set up
-		if (!empty($this->_options['cache_uid']) && !empty($this->_options['cache_password']))
+		if (!empty($this->_options['cache_uid']) && !empty($this->_options['cache_password']) && $this->isAvailable())
 		{
 			$_SERVER['PHP_AUTH_USER'] = $this->_options['cache_uid'];
 			$_SERVER['PHP_AUTH_PW'] = $this->_options['cache_password'];
 		}
-
-		return function_exists('xcache_set') && ini_get('xcache.var_size') > 0;
 	}
 
 	/**
-	 * {@inheritdoc }
+	 * {@inheritdoc}
+	 */
+	public function exists($key)
+	{
+		return xcache_isset($key);
+	}
+
+	/**
+	 * {@inheritdoc}
 	 */
 	public function put($key, $value, $ttl = 120)
 	{
@@ -51,17 +64,18 @@ class Xcache extends Cache_Method_Abstract
 	}
 
 	/**
-	 * {@inheritdoc }
+	 * {@inheritdoc}
 	 */
 	public function get($key, $ttl = 120)
 	{
 		$result = xcache_get($key);
 		$this->is_miss = $result === null;
+
 		return $result;
 	}
 
 	/**
-	 * {@inheritdoc }
+	 * {@inheritdoc}
 	 */
 	public function clean($type = '')
 	{
@@ -84,30 +98,19 @@ class Xcache extends Cache_Method_Abstract
 	}
 
 	/**
-	 * {@inheritdoc }
+	 * {@inheritdoc}
 	 */
-	public static function available()
+	public function isAvailable()
 	{
-		return function_exists('xcache_set');
+		return function_exists('xcache_set') && ini_get('xcache.var_size') > 0;
 	}
 
 	/**
-	 * {@inheritdoc }
+	 * {@inheritdoc}
 	 */
-	public static function details()
+	public function details()
 	{
-		return array('title' => self::title(), 'version' => XCACHE_VERSION);
-	}
-
-	/**
-	 * {@inheritdoc }
-	 */
-	public static function title()
-	{
-		if (self::available())
-			add_integration_function('integrate_modify_cache_settings', 'Xcache_Cache::settings', '', false);
-
-		return 'XCache';
+		return array('title' => $this->title, 'version' => XCACHE_VERSION);
 	}
 
 	/**
@@ -117,7 +120,7 @@ class Xcache extends Cache_Method_Abstract
 	 *
 	 * @param array() $config_vars
 	 */
-	public static function settings(&$config_vars)
+	public function settings(&$config_vars)
 	{
 		global $txt;
 
