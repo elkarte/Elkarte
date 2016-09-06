@@ -104,9 +104,13 @@ function reloadSettings()
 
 	// @deprecated since 1.0.6 compatibility setting for migration
 	if (!isset($modSettings['avatar_max_height']))
-		$modSettings['avatar_max_height'] = $modSettings['avatar_max_height_external'];
+	{
+		$modSettings['avatar_max_height'] = isset($modSettings['avatar_max_height_external']) ? $modSettings['avatar_max_height_external'] : 65;
+	}
 	if (!isset($modSettings['avatar_max_width']))
-		$modSettings['avatar_max_width'] = $modSettings['avatar_max_width_external'];
+	{
+		$modSettings['avatar_max_width'] = isset($modSettings['avatar_max_width_external']) ? $modSettings['avatar_max_width_external'] : 65;
+	}
 
 	// Here to justify the name of this function. :P
 	// It should be added to the install and upgrade scripts.
@@ -734,8 +738,13 @@ function loadPermissions()
 
 			return;
 		}
-		elseif ($cache->getVar($temp, 'permissions:' . $cache_groups, 240) && time() - 240 > $modSettings['settings_updated'])
-			list ($user_info['permissions'], $removals) = $temp;
+		elseif ($cache->getVar($temp, 'permissions:' . $cache_groups, 2) && time() - 2 > $modSettings['settings_updated'])
+		{
+			if (is_array($temp))
+			{
+				list ($user_info['permissions'], $removals) = $temp;
+			}
+		}
 	}
 
 	// If it is detected as a robot, and we are restricting permissions as a special group - then implement this.
@@ -764,7 +773,7 @@ function loadPermissions()
 		$db->free_result($request);
 
 		if (isset($cache_groups))
-			$cache->put('permissions:' . $cache_groups, array($user_info['permissions'], $removals), 240);
+			$cache->put('permissions:' . $cache_groups, array($user_info['permissions'], !empty($removals) ? $removals : array()), 2);
 	}
 
 	// Get the board permissions.
@@ -1317,7 +1326,6 @@ function initTheme($id_theme = 0)
 
 	// Load in the theme variables for them
 	$themeData = getThemeData($id_theme, $member);
-
 	$settings = $themeData[0];
 	$options = $themeData[$member];
 

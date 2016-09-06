@@ -271,6 +271,12 @@ class Cache
 	 */
 	public function getVar(&$var, $key, $ttl = 120)
 	{
+		if (!$this->isEnabled())
+		{
+			return;
+		}
+
+		$key2 = $this->_key($key);
 		$var = $this->get($key, $ttl);
 
 		return !$this->isMiss();

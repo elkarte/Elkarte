@@ -94,7 +94,9 @@ class Filebased extends Cache_Method_Abstract
 	 */
 	public function get($key, $ttl = 120)
 	{
+		$return = null;
 		$fName = $this->getFileName($key);
+
 		if (file_exists(CACHEDIR . '/' . $fName))
 		{
 			if (filesize(CACHEDIR . '/' . $fName) > 10)
@@ -117,7 +119,7 @@ class Filebased extends Cache_Method_Abstract
 		}
 		$this->is_miss = true;
 
-		return;
+		return $return;
 	}
 
 	/**
