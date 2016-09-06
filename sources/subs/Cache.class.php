@@ -73,6 +73,14 @@ class Cache
 	{
 		$this->setLevel($level);
 
+		// Default to file based so we can slow everything down :P
+		if (empty($accelerator))
+		{
+			$accelerator = 'filebased';
+		}
+
+		$this->_accelerator = $accelerator;
+
 		if ($level > 0)
 		{
 			$this->enable(true);
@@ -87,14 +95,6 @@ class Cache
 
 		// Set the cache options
 		$this->_options = $options;
-
-		// Default to file based so we can slow everything down :P
-		if (empty($accelerator))
-		{
-			$accelerator = 'filebased';
-		}
-
-		$this->_accelerator = $accelerator;
 
 		$this->_init();
 	}
@@ -463,7 +463,6 @@ class Cache
 			}
 
 			Elk_Autoloader::getInstance()->register(SUBSDIR . '/CacheMethod', '\\ElkArte\\sources\\subs\\CacheMethod');
-
 			self::$_instance = new Cache($cache_enable, $cache_accelerator, $options);
 		}
 

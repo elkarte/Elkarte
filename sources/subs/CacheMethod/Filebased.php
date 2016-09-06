@@ -133,7 +133,7 @@ class Filebased extends Cache_Method_Abstract
 
 			foreach ($files as $file)
 			{
-				if ($file !== 'index.php' && $file !== '.htaccess' && (!$type || $file->getExtension() == $type))
+				if ($file->getFileName() !== 'index.php' && $file->getFileName() !== '.htaccess' && (!$type || $file->getExtension() == $type))
 					@unlink($file->getPathname());
 			}
 		}

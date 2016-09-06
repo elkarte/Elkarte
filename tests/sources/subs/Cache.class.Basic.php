@@ -78,6 +78,55 @@ class TestCache extends PHPUnit_Framework_TestCase
 	}
 
 	/**
+	 * Testing the filebased caching
+	 */
+	public function testCacheClass()
+	{
+		global $cache_accelerator, $cache_enable;
+
+		$cache_accelerator = '';
+		$cache_enable = 1;
+
+		require_once(SUBSDIR . '/Cache.class.php');
+		$cache = Cache::instance();
+		$file_cache = new ElkArte\sources\subs\CacheMethod\Filebased(array());
+		$object = new \ReflectionClass($cache);
+		$property = $object->getProperty('_cache_obj');
+		$property->setAccessible(true);
+
+		$property->setValue($cache, $file_cache);
+
+		$cache->setLevel(1);
+		$cache->enable(true);
+		$this->assertSame($cache_enable, $cache->getLevel());
+		$this->assertTrue($cache->isEnabled());
+		
+		$test_array = array('anindex' => 'avalue', array());
+
+		$cache->put('test', $test_array);
+		$this->assertSame($test_array, $cache->get('test'));
+		$var = array();
+		$found = $cache->getVar($var, 'test');
+		$this->assertTrue($found);
+		$this->assertSame($test_array, $var);
+		$var = array();
+		$found = $cache->getVar($var, 'test_undef');
+		$this->assertFalse($found);
+		$this->assertSame(null, $var);
+
+		$cache->setLevel(2);
+		$this->assertSame(2, $cache->getLevel());
+		$this->assertFalse($cache->checkLevel(3));
+		$this->assertTrue($cache->checkLevel(2));
+		$this->assertTrue($cache->checkLevel(1));
+		$cache->enable(false);
+		$this->assertFalse($cache->checkLevel(3));
+		$this->assertFalse($cache->checkLevel(2));
+		$this->assertFalse($cache->checkLevel(1));
+		$cache->setLevel(1);
+	}
+
+	/**
 	 * Performs the testing of the caching object
 	 */
 	private function doCacheTests()
