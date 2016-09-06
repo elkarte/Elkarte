@@ -1346,9 +1346,11 @@ function spamProtection($error_type, $fatal = true)
  *
  * @param string $path the (absolute) directory path
  * @param boolean $allow_localhost if access should be allowed to localhost
+ * @param string $allow_localhost if access should be allowed to localhost
+ * @param string $files (optional, default '*') parameter for the Files tag
  * @return string|boolean on success error string if anything fails
  */
-function secureDirectory($path, $allow_localhost = false)
+function secureDirectory($path, $allow_localhost = false, $files = '*')
 {
 	if (empty($path))
 		return 'empty_path';
@@ -1373,7 +1375,7 @@ RemoveHandler .php .php3 .phtml .cgi .fcgi .pl .fpl .shtml';
 		$fh = @fopen($path . '/.htaccess', 'w');
 		if ($fh)
 		{
-			fwrite($fh, '<Files *>
+			fwrite($fh, '<Files ' . $files . '>
 	Order Deny,Allow
 	Deny from all' . $close);
 			fclose($fh);

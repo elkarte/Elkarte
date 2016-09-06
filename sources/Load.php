@@ -2627,7 +2627,7 @@ function doSecurityChecks()
 		require_once(SUBSDIR . '/Attachments.subs.php');
 		$path = getAttachmentPath();
 		secureDirectory($path, true);
-		secureDirectory(CACHEDIR);
+		secureDirectory(CACHEDIR, false, '"\.(js|css)$"');
 
 		// Active admin session?
 		if (isAdminSessionActive())
