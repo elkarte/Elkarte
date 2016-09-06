@@ -337,6 +337,11 @@ class Site_Combiner
 		// Read in all the data so we can process
 		foreach ($this->_combine_files as $key => $file)
 		{
+			if (!file_exists($file['file']))
+			{
+				continue;
+			}
+
 			$tempfile = trim(file_get_contents($file['file']));
 			$tempfile = (substr($tempfile, -3) === '}()') ? $tempfile . ';' : $tempfile;
 			$this->_combine_files[$key]['content'] = $tempfile;
