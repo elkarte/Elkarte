@@ -1345,10 +1345,10 @@ function spamProtection($error_type, $fatal = true)
  * A generic function to create a pair of index.php and .htaccess files in a directory
  *
  * @param string $path the (absolute) directory path
- * @param boolean $attachments if the directory is an attachments directory or not
+ * @param boolean $allow_localhost if access should be allowed to localhost
  * @return string|boolean on success error string if anything fails
  */
-function secureDirectory($path, $attachments = false)
+function secureDirectory($path, $allow_localhost = false)
 {
 	if (empty($path))
 		return 'empty_path';
@@ -1359,7 +1359,7 @@ function secureDirectory($path, $attachments = false)
 	$directoryname = basename($path);
 
 	$errors = array();
-	$close = empty($attachments) ? '
+	$close = empty($allow_localhost) ? '
 </Files>' : '
 	Allow from localhost
 </Files>
