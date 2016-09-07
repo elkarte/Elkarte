@@ -102,8 +102,8 @@ class Inline_Permissions_Form
 
 		// Make sure they can't do certain things,
 		// unless they have the right permissions.
-		$this->permissionsObject = new Permissions;
-		$this->illegal_permissions = $this->permissionsObject->getIllegalPermissions();
+		$this->permissionsObjectObject = new Permissions;
+		$this->illegal_permissions = $this->permissionsObjectObject->getIllegalPermissions();
 	}
 
 	/**
@@ -153,7 +153,7 @@ class Inline_Permissions_Form
 			);
 
 		// Do a full child update.
-		$permissions->updateChild(array(), -1);
+		$permissionsObject->updateChild(array(), -1);
 
 		// Just in case we cached this.
 		updateSettings(array('settings_updated' => time()));

@@ -35,7 +35,7 @@ class ManagePermissions_Controller extends Action_Controller
 	 *
 	 * @var Permissions
 	 */
-	private $permissions;
+	private $permissionsObject;
 
 	/**
 	 * @var string[]
@@ -68,9 +68,9 @@ class ManagePermissions_Controller extends Action_Controller
 
 		// Make sure they can't do certain things,
 		// unless they have the right permissions.
-		$this->permissions = new Permissions;
-		$this->illegal_permissions = $this->permissions->getIllegalPermissions();
-		$this->illegal_guest_permissions = $this->permissions->getIllegalGuestPermissions();
+		$this->permissionsObject = new Permissions;
+		$this->illegal_permissions = $this->permissionsObject->getIllegalPermissions();
+		$this->illegal_guest_permissions = $this->permissionsObject->getIllegalGuestPermissions();
 
 		loadLanguage('ManagePermissions+ManageMembers');
 		loadTemplate('ManagePermissions');
@@ -651,7 +651,7 @@ class ManagePermissions_Controller extends Action_Controller
 			copyBoardPermission($this->_req->post->copy_from, $this->_req->post->group, $bid, $this->illegal_guest_permissions);
 
 			// Update any children out there!
-			$this->permissions->updateChild($this->_req->post->group, $this->_pid);
+			$this->permissionsObject->updateChild($this->_req->post->group, $this->_pid);
 		}
 		// Set or unset a certain permission for the selected groups.
 		elseif (!empty($this->_req->post->permissions))
@@ -697,7 +697,7 @@ class ManagePermissions_Controller extends Action_Controller
 			}
 
 			// Another child update!
-			$this->permissions->updateChild($this->_req->post->group, $this->_pid);
+			$this->permissionsObject->updateChild($this->_req->post->group, $this->_pid);
 		}
 
 		redirectexit('action=admin;area=permissions;pid=' . $this->_pid);
@@ -886,7 +886,7 @@ class ManagePermissions_Controller extends Action_Controller
 		}
 
 		// Update any inherited permissions as required.
-		$this->permissions->updateChild($current_group_id, $this->_pid);
+		$this->permissionsObject->updateChild($current_group_id, $this->_pid);
 
 		// Clear cached privs.
 		updateSettings(array('settings_updated' => time()));
