@@ -415,6 +415,10 @@ class Cache
 	{
 		global $boardurl;
 
+		if (!file_exists(CACHEDIR . '/index.php'))
+		{
+			touch(CACHEDIR . '/index.php');
+		}
 		$this->_key_prefix = md5($boardurl . filemtime(CACHEDIR . '/index.php')) . '-ELK-';
 	}
 
