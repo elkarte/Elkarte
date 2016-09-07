@@ -102,8 +102,8 @@ class Inline_Permissions_Form
 
 		// Make sure they can't do certain things,
 		// unless they have the right permissions.
-		$this->permissionsObjectObject = new Permissions;
-		$this->illegal_permissions = $this->permissionsObjectObject->getIllegalPermissions();
+		$this->permissionsObject = new Permissions;
+		$this->illegal_permissions = $this->permissionsObject->getIllegalPermissions();
 	}
 
 	/**
@@ -124,32 +124,19 @@ class Inline_Permissions_Form
 			foreach ($_POST[$permission] as $id_group => $value)
 			{
 				if (in_array($value, array('on', 'deny')) && !in_array($permission, $this->illegal_permissions))
-					$insertRows[] = array((int) $id_group, $permission, $value == 'on' ? 1 : 0);
+					$insertRows[] = array($permission, (int) $id_group, $value == 'on' ? 1 : 0);
 			}
 		}
 
 		// Remove the old permissions...
-		$this->db->query('', '
-			DELETE FROM {db_prefix}permissions
-			WHERE permission IN ({array_string:permissions})
-			' . (empty($this->illegal_permissions) ? '' : ' AND permission NOT IN ({array_string:illegal_permissions})'),
-			array(
-				'illegal_permissions' => $this->illegal_permissions,
-				'permissions' => $this->permissions,
-			)
-		);
+		$this->permissionsObject->deletePermissions($this->permissionList);
 
 		// ...and replace them with new ones.
-		if (!empty($insertRows))
-			$this->db->insert('insert',
-				'{db_prefix}permissions',
-				array('id_group' => 'int', 'permission' => 'string', 'add_deny' => 'int'),
-				$insertRows,
-				array('id_group', 'permission')
-			);
+		require_once(SUBSDIR . '/ManagePermissions.subs.php');
+		replacePermission($insertRows);
 
 		// Do a full child update.
-		$permissionsObject->updateChild(array(), -1);
+		$this->permissionsObject->updateChild(array(), -1);
 
 		// Just in case we cached this.
 		updateSettings(array('settings_updated' => time()));

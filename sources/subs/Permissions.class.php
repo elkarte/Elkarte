@@ -134,9 +134,9 @@ class Permissions
 	 * @param string[] $where
 	 * @param mixed[] $where_vars = array() or values used in the where statement
 	 */
-	public function deletePermissions($permissions, $where, $where_parameters)
+	public function deletePermissions($permissions, $where = array(), $where_parameters = array())
 	{
-		if (empty($this->illegal_permissions))
+		if (count($this->illegal_permissions) > 0)
 		{
 			$where[] = 'permission NOT IN ({array_string:illegal_permissions})';
 			$where_parameters['illegal_permissions'] = $this->illegal_permissions;
@@ -191,6 +191,9 @@ class Permissions
 		if (empty($children))
 			return false;
 
+		// Need functions that modify permissions...
+		require_once(SUBSDIR . '/ManagePermissions.subs.php');
+
 		// First off, are we doing general permissions?
 		if ($profile < 1 || $profile === null)
 		{
@@ -224,7 +227,6 @@ class Permissions
 			// Finally insert.
 			if (!empty($permissions))
 			{
-				require_once(SUBSDIR . '/ManagePermissions.subs.php');
 				replacePermission($permissions);
 			}
 		}
