@@ -64,7 +64,7 @@ class TestInlinePermissionsForm extends PHPUnit_Framework_TestCase
 	 * Looping over the tests to verify
 	 * Inline_Permissions_Form::init works as expected.
 	 */
-	public function doInit()
+	public function doInit($result = array())
 	{
 		global $context;
 
@@ -73,16 +73,17 @@ class TestInlinePermissionsForm extends PHPUnit_Framework_TestCase
 		{
 			foreach ($this->config_vars as $permission)
 			{
-				$result = $this->results;
+				if (!isset($result[$permission[1]]))
+					$result[$permission[1]] = $this->results;
 				if (isset($permission['excluded_groups']))
 				{
 					foreach ($permission['excluded_groups'] as $group)
 					{
-						if (isset($result[$group]))
-							unset($result[$group]);
+						if (isset($result[$permission[1]][$group]))
+							unset($result[$permission[1]][$group]);
 					}
 				}
-				$this->assertEquals($result, $context[$permission[1]]);
+				$this->assertEquals($result[$permission[1]], $context[$permission[1]]);
 			}
 		}
 	}
@@ -102,12 +103,12 @@ class TestInlinePermissionsForm extends PHPUnit_Framework_TestCase
 		$this->permissionsForm->save();
 		foreach ($_POST as $permission => $groupList)
 		{
-			$result = $this->results;
+			$result[$permission] = $this->results;
 			foreach ($groupList as $group => $value)
 			{
-				$result[$group]['status'] = $value;
+				$result[$permission][$group]['status'] = $value;
 			}
 		}
-		$this->doInit();
+		$this->doInit($result);
 	}
 }
