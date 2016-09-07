@@ -16,6 +16,12 @@ class TestInlinePermissionsForm extends PHPUnit_Framework_TestCase
 	{
 		global $settings, $boardurl, $txt, $language, $user_info, $db_prefix;
 
+		$settings['theme_url'] = $settings['default_theme_url'] = $boardurl . '/themes/default';
+		$settings['theme_dir'] = $settings['default_theme_dir'] = BOARDDIR . '/themes/default';
+		$language = 'english';
+		$txt = array();
+		loadLanguage('Admin', 'english', true, true);
+
 		$user_info['permissions'][] = 'manage_permissions';
 
 		$this->config_vars = array(
