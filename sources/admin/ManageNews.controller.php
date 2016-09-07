@@ -904,9 +904,6 @@ class ManageNews_Controller extends Action_Controller
 			redirectexit('action=admin;area=news;sa=settings');
 		}
 
-		// We need this for the in-line permissions
-		createToken('admin-mp');
-
 		Settings_Form::prepare_db($config_vars);
 	}
 

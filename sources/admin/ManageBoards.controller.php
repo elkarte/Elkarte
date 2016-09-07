@@ -788,9 +788,6 @@ class ManageBoards_Controller extends Action_Controller
 			redirectexit('action=admin;area=manageboards;sa=settings');
 		}
 
-		// We need this for the in-line permissions
-		createToken('admin-mp');
-
 		// Prepare the settings...
 		Settings_Form::prepare_db($config_vars);
 	}

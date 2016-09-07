@@ -97,9 +97,6 @@ class ManageAvatars_Controller extends Action_Controller
 		// Attempt to figure out if the admin is trying to break things.
 		$context['settings_save_onclick'] = 'return document.getElementById(\'custom_avatar_enabled\').value == 1 && (document.getElementById(\'custom_avatar_dir\').value == \'\' || document.getElementById(\'custom_avatar_url\').value == \'\') ? confirm(\'' . $txt['custom_avatar_check_empty'] . '\') : true;';
 
-		// We need this for the in-line permissions
-		createToken('admin-mp');
-
 		// Prepare the context.
 		$context['post_url'] = $scripturl . '?action=admin;area=manageattachments;save;sa=avatars';
 		Settings_Form::prepare_db($config_vars);

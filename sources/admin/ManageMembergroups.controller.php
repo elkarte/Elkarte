@@ -798,9 +798,6 @@ class ManageMembergroups_Controller extends Action_Controller
 		$context['post_url'] = $scripturl . '?action=admin;area=membergroups;save;sa=settings';
 		$context['settings_title'] = $txt['membergroups_settings'];
 
-		// We need this for the in-line permissions
-		createToken('admin-mp');
-
 		Settings_Form::prepare_db($config_vars);
 	}
 

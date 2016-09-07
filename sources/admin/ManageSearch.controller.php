@@ -175,9 +175,6 @@ class ManageSearch_Controller extends Action_Controller
 		$context['post_url'] = $scripturl . '?action=admin;area=managesearch;save;sa=settings';
 		$context['settings_title'] = $txt['search_settings_title'];
 
-		// We need this for the in-line permissions
-		createToken('admin-mp');
-
 		Settings_Form::prepare_db($config_vars);
 	}
 

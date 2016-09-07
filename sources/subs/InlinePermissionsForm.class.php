@@ -115,10 +115,6 @@ class Inline_Permissions_Form
 	{
 		global $context;
 
-		// Almighty session check, verify our ways.
-		checkSession();
-		validateToken('admin-mp');
-
 		$insertRows = array();
 		foreach ($this->permissionList as $permission)
 		{

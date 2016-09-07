@@ -94,8 +94,6 @@ class TestInlinePermissionsForm extends PHPUnit_Framework_TestCase
 	{
 		global $context;
 
-		// We need this for the in-line permissions
-		createToken('admin-mp');
 		$_POST = array(
 			'my_dummy_permission1' => array(-1 => 'on', 0 => 'on', 2 => 'on'),
 			'my_dummy_permission3' => array(2 => 'on'),
