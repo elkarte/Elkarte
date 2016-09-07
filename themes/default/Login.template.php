@@ -60,11 +60,10 @@ function template_login()
 						<dd>
 							<input type="password" name="otp_token" id="otp_token" value="', $context['default_password'], '" size="8" class="input_password" placeholder="', $txt['otp_token'], '" />
 						</dd>';
-	echo '
-					</dl>';
 
 	if (!empty($modSettings['enableOpenID']))
 		echo '
+					</dl>
 					<p><strong>&mdash;', $txt['or'], '&mdash;</strong></p>
 					<dl>
 						<dt>
@@ -172,8 +171,7 @@ function template_kick_guest()
 						<dd>
 							<input type="password" name="otp_token" id="otp_token" value="', $context['default_password'], '" size="8" class="input_password" placeholder="', $txt['otp_token'], '" />
 						</dd>';
-	echo '
-					</dl>';
+
 	if (!empty($modSettings['enableOpenID']))
 		echo '
 				</dl>
