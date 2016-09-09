@@ -53,7 +53,7 @@ class Inline_Permissions_Form
 	{
 		$this->permissions = $permissions;
 
-		// Load the permission settings for guests
+		// Load the permission list
 		$this->permissionList = array_map(
 			function ($permission)
 			{
@@ -61,7 +61,7 @@ class Inline_Permissions_Form
 			}, $this->permissions
 		);
 
-		// Load the permission settings for guests
+		// Load the permission settings that guests cannot have
 		$this->illegal_guest_permissions = array_intersect(
 			array_map(
 				function ($permission)
@@ -86,14 +86,6 @@ class Inline_Permissions_Form
 	public function setExcludedGroups($excluded_groups)
 	{
 		$this->excluded_groups = $excluded_groups;
-	}
-
-	/**
-	 * @param string $permission
-	 */
-	public function add($permission)
-	{
-		$this->permissions[] = $permission;
 	}
 
 	public function __construct()
@@ -156,6 +148,7 @@ class Inline_Permissions_Form
 
 		loadLanguage('ManagePermissions');
 		loadTemplate('ManagePermissions');
+
 		// No permissions? Not a great deal to do here.
 		if (!allowedTo('manage_permissions'))
 			return;
@@ -240,13 +233,13 @@ class Inline_Permissions_Form
 						unset($context[$permission[1]][$group]);
 				}
 			}
-		}
+			// Is this permission one that guests can't have?
+			if (isset($this->illegal_guest_permissions[$permission[1]]))
+				unset($context[$permission[1]][-1]);
 
-		// Are any of these permissions that guests can't have?
-		foreach ($this->illegal_guest_permissions as $permission)
-		{
-			if (isset($context[$permission][-1]))
-				unset($context[$permission][-1]);
+			// Is this permission outright disabled?
+			if (isset($this->illegal_permissions[$permission[1]]))
+				unset($context[$permission[1]]);
 		}
 	}
 }

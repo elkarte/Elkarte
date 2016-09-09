@@ -1,11 +1,13 @@
 <?php
 
-
 class TestInlinePermissionsForm extends PHPUnit_Framework_TestCase
 {
 	protected $permissionsForm;
+	protected $permissionsObject;
 	protected $config_vars = array();
 	protected $results = array();
+	private $illegal_permissions = array();
+	private $illegal_guest_permissions = array();
 
 	/**
 	 * Prepare what is necessary to use in these tests.
@@ -16,19 +18,29 @@ class TestInlinePermissionsForm extends PHPUnit_Framework_TestCase
 	{
 		global $settings, $boardurl, $txt, $language, $user_info, $db_prefix;
 
+		// All this to initialize a language.
+		// @todo Surely there must be a better way...
 		$settings['theme_url'] = $settings['default_theme_url'] = $boardurl . '/themes/default';
 		$settings['theme_dir'] = $settings['default_theme_dir'] = BOARDDIR . '/themes/default';
 		$language = 'english';
 		$txt = array();
 		loadLanguage('Admin', 'english', true, true);
 
+		// Elevate the user.
 		$user_info['permissions'][] = 'manage_permissions';
+
+		// Make sure they can't do certain things,
+		// unless they have the right permissions.
+		$this->permissionsObject = new Permissions;
+		$this->illegal_permissions = $this->permissionsObject->getIllegalPermissions();
 
 		$this->config_vars = array(
 			array('permissions', 'my_dummy_permission1'),
 			array('permissions', 'my_dummy_permission2', 'excluded_groups' => array(-1, 0, 2)),
 			array('permissions', 'my_dummy_permission3', 'excluded_groups' => array(-1, 0)),
 			array('permissions', 'my_dummy_permission4', 'excluded_groups' => array(-1)),
+			array('permissions', 'admin_forum'), // Illegal permission
+			array('permissions', 'send_mail'), // Illegal guest permission
 		);
 		$this->results = array(
 			-1 => array(
@@ -53,6 +65,16 @@ class TestInlinePermissionsForm extends PHPUnit_Framework_TestCase
 
 		$this->permissionsForm = new Inline_Permissions_Form;
 		$this->permissionsForm->setPermissions($this->config_vars);
+
+		// Load the permission settings that guests cannot have
+		$this->illegal_guest_permissions = array_intersect(
+			array_map(
+				function ($permission)
+				{
+					return str_replace(array('_any', '_own'), '', $permission[1]);
+				}, $this->config_vars
+			), $this->permissionsObject->getIllegalGuestPermissions()
+		);
 	}
 
 	public function testInit()
@@ -69,22 +91,28 @@ class TestInlinePermissionsForm extends PHPUnit_Framework_TestCase
 		global $context;
 
 		$this->permissionsForm->init();
-		foreach ($this->config_vars as $test)
+		foreach ($this->config_vars as $permission)
 		{
-			foreach ($this->config_vars as $permission)
+			if (!isset($result[$permission[1]]))
+				$result[$permission[1]] = $this->results;
+			if (isset($permission['excluded_groups']))
 			{
-				if (!isset($result[$permission[1]]))
-					$result[$permission[1]] = $this->results;
-				if (isset($permission['excluded_groups']))
+				foreach ($permission['excluded_groups'] as $group)
 				{
-					foreach ($permission['excluded_groups'] as $group)
-					{
-						if (isset($result[$permission[1]][$group]))
-							unset($result[$permission[1]][$group]);
-					}
+					if (isset($result[$permission[1]][$group]))
+						unset($result[$permission[1]][$group]);
 				}
-				$this->assertEquals($result[$permission[1]], $context[$permission[1]]);
 			}
+
+			// Is this permission one that guests can't have?
+			if (isset($this->illegal_guest_permissions[$permission[1]]))
+				unset($result[$permission[1]][-1]);
+
+			// Is this permission outright disabled?
+			if (isset($this->illegal_permissions[$permission[1]]))
+				unset($result[$permission[1]]);
+
+			$this->assertEquals($result[$permission[1]], $context[$permission[1]]);
 		}
 	}
 
@@ -96,6 +124,7 @@ class TestInlinePermissionsForm extends PHPUnit_Framework_TestCase
 	{
 		global $context;
 
+		// Dummy data for setting permissions...
 		$_POST = array(
 			'my_dummy_permission1' => array(-1 => 'on', 0 => 'on', 2 => 'on'),
 			'my_dummy_permission3' => array(2 => 'on'),
