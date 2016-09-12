@@ -54,7 +54,7 @@ class ManageServer_Controller extends Action_Controller
 	 * Load balancing settings form
 	 * @var Settings_Form
 	 */
-	protected $_balancingSettingsForm;
+	protected $_loadavgSettingsForm;
 
 	/**
 	 * This is the main dispatcher. Sets up all the available sub-actions, all the tabs and selects
@@ -83,7 +83,7 @@ class ManageServer_Controller extends Action_Controller
 			'database' => array($this, 'action_databaseSettings_display', 'permission' => 'admin_forum'),
 			'cookie' => array($this, 'action_cookieSettings_display', 'permission' => 'admin_forum'),
 			'cache' => array($this, 'action_cacheSettings_display', 'permission' => 'admin_forum'),
-			'loads' => array($this, 'action_balancingSettings_display', 'permission' => 'admin_forum'),
+			'loads' => array($this, 'action_loadavgSettings_display', 'permission' => 'admin_forum'),
 			'phpinfo' => array($this, 'action_phpinfo', 'permission' => 'admin_forum'),
 		);
 
@@ -369,12 +369,12 @@ class ManageServer_Controller extends Action_Controller
 	}
 
 	/**
-	 * Allows to edit load balancing settings.
+	 * Allows to edit load management settings.
 	 *
 	 * This method handles the display, allows to edit, and saves the result
-	 * for the _balancingSettings form.
+	 * for the _loadavgSettings form.
 	 */
-	public function action_balancingSettings_display()
+	public function action_loadavgSettings_display()
 	{
 		global $txt, $scripturl, $context;
 
@@ -382,12 +382,12 @@ class ManageServer_Controller extends Action_Controller
 		$this->_initBalancingSettingsForm();
 
 		// Initialize it with our settings
-		$config_vars = $this->_balancingSettingsForm->settings();
+		$config_vars = $this->_loadavgSettingsForm->settings();
 
 		call_integration_hook('integrate_loadavg_settings');
 
 		$context['post_url'] = $scripturl . '?action=admin;area=serversettings;sa=loads;save';
-		$context['settings_title'] = $txt['load_balancing_settings'];
+		$context['settings_title'] = $txt['loadavg_settings'];
 
 		// Saving?
 		if (isset($this->_req->query->save))
@@ -413,7 +413,7 @@ class ManageServer_Controller extends Action_Controller
 
 		createToken('admin-ssc');
 		createToken('admin-dbsc');
-		$this->_balancingSettingsForm->prepare_db($config_vars);
+		$this->_loadavgSettingsForm->prepare_db($config_vars);
 	}
 
 	/**
@@ -422,13 +422,13 @@ class ManageServer_Controller extends Action_Controller
 	private function _initBalancingSettingsForm()
 	{
 		// Forms, we need them
-		$this->_balancingSettingsForm = new Settings_Form();
+		$this->_loadavgSettingsForm = new Settings_Form();
 
 		// Initialize it with our settings
-		$config_vars = $this->_balancingSettings();
+		$config_vars = $this->_loadavgSettings();
 
 		// Set them vars for our settings form
-		return $this->_balancingSettingsForm->settings($config_vars);
+		return $this->_loadavgSettingsForm->settings($config_vars);
 	}
 
 	/**
@@ -658,9 +658,9 @@ class ManageServer_Controller extends Action_Controller
 	}
 
 	/**
-	 * This little function returns load balancing settings.
+	 * This little function returns load management settings.
 	 */
-	private function _balancingSettings()
+	private function _loadavgSettings()
 	{
 		global $txt, $modSettings, $context;
 
@@ -704,11 +704,11 @@ class ManageServer_Controller extends Action_Controller
 		foreach ($default_values as $name => $value)
 		{
 			// Use the default value if the setting isn't set yet.
-			$value = !isset($modSettings[$name]) ? $value : $modSettings[$name];
+			$value = isset($modSettings[$name]) ? $modSettings[$name] : $value;
 			$config_vars[] = array('text', $name, 'value' => $value, 'disabled' => $disabled);
 		}
 
-		// Notify the integration that we're preparing to mess with balancing settings...
+		// Notify the integration that we're preparing to mess with load management settings...
 		call_integration_hook('integrate_modify_loadavg_settings', array(&$config_vars));
 
 		return $config_vars;
@@ -719,6 +719,6 @@ class ManageServer_Controller extends Action_Controller
 	 */
 	public function balancingSettings_search()
 	{
-		return $this->_balancingSettings();
+		return $this->_loadavgSettings();
 	}
 }
