@@ -27,11 +27,6 @@ namespace Themes\DefaultTheme;
 class Theme extends \Theme
 {
 	/**
-	 * @var int
-	 */
-	protected $id = 0;
-
-	/**
 	 * This is the only template included in the sources.
 	 */
 	public function template_rawdata()
@@ -89,7 +84,7 @@ class Theme extends \Theme
 			}
 		}
 
-		foreach (\Template_Layers::getInstance()->prepareContext() as $layer)
+		foreach ($this->layers->prepareContext() as $layer)
 		{
 			loadSubTemplate($layer . '_above', 'ignore');
 		}
@@ -164,9 +159,9 @@ class Theme extends \Theme
 			$settings['theme_dir'] = $settings['actual_theme_dir'];
 		}
 
-		foreach (\Template_Layers::getInstance()->reverseLayers() as $layer)
+		foreach ($this->layers->reverseLayers() as $layer)
 		{
-			loadSubTemplate($layer . '_below', 'ignore');
+			$this->templates->loadSubTemplate($layer . '_below', 'ignore');
 		}
 	}
 
@@ -744,7 +739,7 @@ class Theme extends \Theme
 
 		if (!empty($modSettings['avatar_max_width']) || !empty($modSettings['avatar_max_height']))
 		{
-			theme()->addCSSRules('
+			$this->addCSSRules('
 		.avatarresize {' . (!empty($modSettings['avatar_max_width']) ? '
 			max-width:' . $modSettings['avatar_max_width'] . 'px;' : '') . (!empty($modSettings['avatar_max_height']) ? '
 			max-height:' . $modSettings['avatar_max_height'] . 'px;' : '') . '
@@ -754,7 +749,7 @@ class Theme extends \Theme
 		// Save some database hits, if a width for multiple wrappers is set in admin.
 		if (!empty($settings['forum_width']))
 		{
-			theme()->addCSSRules('
+			$this->addCSSRules('
 		.wrapper {width: ' . $settings['forum_width'] . ';}');
 		}
 	}
@@ -970,7 +965,7 @@ class Theme extends \Theme
 
 			if (!empty($user_info['avatar']['href']))
 			{
-				theme()->addCSSRules('
+				$this->addCSSRules('
 	.i-account:before {
 		content: "";
 		background-image: url("' . $user_info['avatar']['href'] . '");
@@ -1229,18 +1224,18 @@ class Theme extends \Theme
 		);
 
 		// Auto video embedding enabled, then load the needed JS
-		theme()->autoEmbedVideo();
+		$this->autoEmbedVideo();
 
 		// Prettify code tags? Load the needed JS and CSS.
-		theme()->addCodePrettify();
+		$this->addCodePrettify();
 
 		// Relative times for posts?
-		theme()->relativeTimes();
+		$this->relativeTimes();
 
 		// If we think we have mail to send, let's offer up some possibilities... robots get pain (Now with scheduled task support!)
 		if ((!empty($modSettings['mail_next_send']) && $modSettings['mail_next_send'] < time() && empty($modSettings['mail_queue_use_cron'])) || empty($modSettings['next_task_time']) || $modSettings['next_task_time'] < time())
 		{
-			theme()->doScheduledSendMail();
+			$this->doScheduledSendMail();
 		}
 	}
 
@@ -1271,15 +1266,15 @@ class Theme extends \Theme
 
 			// @todo added because some $settings in template_init are necessary even in
 			// xml mode. Maybe move template_init to a settings file?
-			loadTemplate('index');
-			loadTemplate('Xml');
-			\Template_Layers::getInstance()->removeAll();
+			$this->templates->load('index');
+			$this->templates->load('Xml');
+			$this->layers->removeAll();
 		}
 		// These actions don't require the index template at all.
 		elseif (!empty($_REQUEST['action']) && in_array($_REQUEST['action'], $simpleActions))
 		{
 			loadLanguage('index+Addons');
-			\Template_Layers::getInstance()->removeAll();
+			$this->layers->removeAll();
 		}
 		else
 		{
@@ -1295,7 +1290,7 @@ class Theme extends \Theme
 
 			// Load each template...
 			foreach ($templates as $template)
-				loadTemplate($template);
+				$this->templates->load($template);
 
 			// ...and attempt to load their associated language files.
 			$required_files = implode('+', array_merge($templates, array('Addons')));
