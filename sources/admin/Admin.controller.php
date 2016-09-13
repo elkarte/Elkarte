@@ -197,7 +197,7 @@ class Admin_Controller extends Action_Controller
 							'database' => array($txt['database_paths_settings']),
 							'cookie' => array($txt['cookies_sessions_settings']),
 							'cache' => array($txt['caching_settings']),
-							'loads' => array($txt['load_balancing_settings']),
+							'loads' => array($txt['loadavg_settings']),
 							'phpinfo' => array($txt['phpinfo_settings']),
 						),
 					),

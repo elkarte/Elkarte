@@ -136,7 +136,7 @@ $txt['cache_uid'] = 'Cache Accelerator Userid';
 $txt['cache_password'] = 'Cache Accelerator Password';
 
 $txt['loadavg_warning'] = '<span class="error">Please note: the settings below are to be edited with care. Setting any of them too low may render your forum <strong>unusable</strong>! The current load average is <strong>%01.2f</strong></span>';
-$txt['loadavg_enable'] = 'Enable load balancing by load averages';
+$txt['loadavg_enable'] = 'Enable load management by load averages';
 $txt['loadavg_auto_opt'] = 'Threshold to disabling automatic database optimization';
 $txt['loadavg_search'] = 'Threshold to disabling search';
 $txt['loadavg_allunread'] = 'Threshold to disabling all unread topics';
@@ -145,8 +145,8 @@ $txt['loadavg_show_posts'] = 'Threshold to disabling showing user posts';
 $txt['loadavg_userstats'] = 'Threshold to disabling showing user statistics';
 $txt['loadavg_bbc'] = 'Threshold to disabling BBC formatting when showing posts';
 $txt['loadavg_forum'] = 'Threshold to disabling the forum <strong>completely</strong>';
-$txt['loadavg_disabled_windows'] = '<span class="error">Load balancing support is not available on Windows.</span>';
-$txt['loadavg_disabled_conf'] = '<span class="error">Load balancing support is disabled by your host configuration.</span>';
+$txt['loadavg_disabled_windows'] = '<span class="error">Load management is not available on Windows.</span>';
+$txt['loadavg_disabled_conf'] = '<span class="error">Load reporting is disabled by your host configuration.</span>';
 
 $txt['setting_password_strength'] = 'Required strength for user passwords';
 $txt['setting_password_strength_low'] = 'Low - 4 character minimum';

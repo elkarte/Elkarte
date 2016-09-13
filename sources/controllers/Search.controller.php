@@ -78,7 +78,7 @@ class Search_Controller extends Action_Controller
 		if (isset($_REQUEST['search_selection']) && $_REQUEST['search_selection'] === 'members')
 			redirectexit($scripturl . '?action=memberlist;sa=search;fields=name,email;search=' . urlencode($_REQUEST['search']));
 
-		// If load balancing is on and the load is high, no need to even show the form.
+		// If load management is on and the load is high, no need to even show the form.
 		if (!empty($modSettings['loadavg_search']) && $modSettings['current_load'] >= $modSettings['loadavg_search'])
 			Errors::instance()->fatal_lang_error('loadavg_search_disabled', false);
 

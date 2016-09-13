@@ -91,7 +91,7 @@ function getServerVersions($checkFor)
 		require_once(SUBSDIR . '/Server.subs.php');
 		$loading = detectServerLoad();
 		if ($loading !== false)
-			$versions['server_load'] = array('title' => $txt['load_balancing_settings'], 'version' => $loading);
+			$versions['server_load'] = array('title' => $txt['loadavg'], 'version' => $loading);
 	}
 
 	return $versions;
