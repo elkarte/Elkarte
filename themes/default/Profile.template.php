@@ -93,7 +93,7 @@ function template_showDrafts()
 	// Show page numbers
 	if (!empty($context['drafts']))
 	{
-		template_pagesection(false, false, array('extra' => '
+		template_pagesection(false, '', array('extra' => '
 			<div class="floatright">
 				<input type="submit" name="delete_selected" value="' . $txt['quick_mod_remove'] . '" class="right_submit" onclick="return confirm(' . JavaScriptEscape($txt['draft_remove_selected'] . '?') . ');" />
 				<input type="hidden" name="' . $context['session_var'] . '" value="' . $context['session_id'] . '" />

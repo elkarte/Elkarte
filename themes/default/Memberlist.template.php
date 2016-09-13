@@ -83,9 +83,11 @@ function template_memberlist()
 		$table_span += isset($column['colspan']) ? $column['colspan'] : 1;
 		switch ($key) {
 			case 'posts':
-			case 'date_registered': $sorticon = 'numeric';
-		    		break;
-			default: $sorticon = 'alpha';
+			case 'date_registered':
+				$sorticon = 'numeric';
+				break;
+			default:
+				$sorticon = 'alpha';
 		}
 
 		// This is a selected column, so underline it or some such.
@@ -178,7 +180,7 @@ function template_memberlist()
 function template_mlsearch_below()
 {
 	// Show the page numbers again. (makes 'em easier to find!)
-	template_pagesection(false, false);
+	template_pagesection();
 
 	echo '
 	</div>';

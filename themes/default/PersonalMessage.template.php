@@ -344,7 +344,7 @@ function template_pm_pages_and_buttons_below()
 	global $context, $txt;
 
 	if (empty($context['display_mode']))
-		template_pagesection(false, false, array('extra' => '<input type="submit" name="del_selected" value="' . $txt['quickmod_delete_selected'] . '" style="font-weight: normal;" onclick="if (!confirm(\'' . $txt['delete_selected_confirm'] . '\')) return false;" class="right_submit" />'));
+		template_pagesection(false, '', array('extra' => '<input type="submit" name="del_selected" value="' . $txt['quickmod_delete_selected'] . '" style="font-weight: normal;" onclick="if (!confirm(\'' . $txt['delete_selected_confirm'] . '\')) return false;" class="right_submit" />'));
 	// Show a few buttons if we are in conversation mode and outputting the first message.
 	elseif ($context['display_mode'] == 2 && isset($context['conversation_buttons']))
 		template_pagesection('conversation_buttons', 'right', array('page_index' => false));
@@ -510,7 +510,7 @@ function template_subject_list()
 	$extra .= '
 					</ul>';
 
-	template_pagesection(false, false, array('extra' => $extra));
+	template_pagesection(false, '', array('extra' => $extra));
 }
 
 /**
@@ -1070,7 +1070,7 @@ function template_send()
 				sBccLinkContainerId: \'bcc_link_container\',
 				bBccShowByDefault: ', empty($context['recipients']['bcc']) && empty($context['bcc_value']) ? 'false' : 'true', ',
 				sShowBccLinkTemplate: ', JavaScriptEscape('
-					<a href="#" id="bcc_link">' . $txt['make_bcc'] . '</a> <a href="' . $scripturl . '?action=quickhelp;help=pm_bcc" onclick="return reqOverlayDiv(this.href);" class="helpicon i-help"><s>', $txt['help'], '</s></a>'
+					<a href="#" id="bcc_link">' . $txt['make_bcc'] . '</a> <a href="' . $scripturl . '?action=quickhelp;help=pm_bcc" onclick="return reqOverlayDiv(this.href);" class="helpicon i-help"><s>' . $txt['help'] . '</s></a>'
 				), '
 			});
 		// ]]></script>';
