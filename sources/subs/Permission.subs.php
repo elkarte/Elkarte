@@ -17,6 +17,7 @@
 function loadIllegalPermissions()
 {
 	$permissionsObject = new Permissions;
+
 	return $permissionsObject->getIllegalPermissions();
 }
 
@@ -27,6 +28,7 @@ function loadIllegalPermissions()
 function loadIllegalGuestPermissions()
 {
 	$permissionsObject = new Permissions;
+
 	return $permissionsObject->getIllegalGuestPermissions();
 }
 
@@ -35,11 +37,12 @@ function loadIllegalGuestPermissions()
  * @deprecated since 1.1
  *
  * @param mixed[]|int $parents (array or int) group or groups whose children are to be updated
- * @param int|null $profile = null an int or null for the customized profile, if any
+ * @param int|null    $profile = null an int or null for the customized profile, if any
  */
 function updateChildPermissions($parents, $profile = null)
 {
 	$permissionsObject = new Permissions;
+
 	return $permissionsObject->updateChild($parents, $profile);
 }
 
@@ -58,6 +61,7 @@ class InlinePermissions_Form extends Inline_Permissions_Form
 	{
 		$permissionsForm = new self;
 		$permissionsForm->setPermissions($permissions);
+
 		return $permissionsForm->save();
 	}
 
@@ -67,7 +71,7 @@ class InlinePermissions_Form extends Inline_Permissions_Form
 	 * This function is used by several settings screens to set specific permissions.
 	 *
 	 * @param string[] $permissions
-	 * @param int[] $excluded_groups = array()
+	 * @param int[]    $excluded_groups = array()
 	 *
 	 * @uses ManagePermissions language
 	 * @uses ManagePermissions template.
@@ -77,6 +81,7 @@ class InlinePermissions_Form extends Inline_Permissions_Form
 		$permissionsForm = new self;
 		$permissionsForm->setExcludedGroups($excluded_groups);
 		$permissionsForm->setPermissions($permissions);
+
 		return $permissionsForm->init();
 	}
 }

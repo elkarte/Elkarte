@@ -8,8 +8,8 @@
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
  * This file contains code covered by:
- * copyright:	2011 Simple Machines (http://www.simplemachines.org)
- * license:  	BSD, See included LICENSE.TXT for terms and conditions.
+ * copyright:    2011 Simple Machines (http://www.simplemachines.org)
+ * license:    BSD, See included LICENSE.TXT for terms and conditions.
  *
  * @version 1.1 beta 2
  *
@@ -84,14 +84,14 @@ class Settings_Form
 	 *    2 saveto - file or db, where to save the variable name - value pair
 	 *    3 type - type of data to display int, float, text, check, select, password
 	 *    4 size - false or field size, if type is select, this needs to be an array of
-	 *				select options
+	 *                select options
 	 *    5 help - '' or helptxt variable name
 	 *  )
 	 * - The following named keys are also permitted
 	 *  'disabled' =>
 	 *  'postinput' =>
 	 *  'preinput' =>
-	 *	'subtext' =>
+	 *    'subtext' =>
 	 */
 	public function prepare_file()
 	{
@@ -105,13 +105,17 @@ class Settings_Form
 		);
 
 		$safe_strings = array(
-			'mtitle', 'mmessage', 'mbname',
+			'mtitle',
+			'mmessage',
+			'mbname',
 		);
 
 		foreach ($this->_config_vars as $identifier => $config_var)
 		{
 			if (!is_array($config_var) || !isset($config_var[1]))
+			{
 				$context['config_vars'][] = $config_var;
+			}
 			else
 			{
 				$varname = $config_var[0];
@@ -132,7 +136,9 @@ class Settings_Form
 				{
 					$value = in_array($varname, $defines) ? constant(strtoupper($varname)) : htmlspecialchars($$varname, ENT_COMPAT, 'UTF-8');
 					if (in_array($varname, $safe_strings))
+					{
 						$value = htmlspecialchars_decode($value, ENT_NOQUOTES);
+					}
 				}
 				else
 					$value = isset($modSettings[$config_var[0]]) ? htmlspecialchars($modSettings[$config_var[0]], ENT_COMPAT, 'UTF-8') : (in_array($config_var[3], array('int', 'float')) ? 0 : '');
@@ -159,11 +165,15 @@ class Settings_Form
 					// If it's associative
 					$config_values = array_values($config_var[4]);
 					if (isset($config_values[0]) && is_array($config_values[0]))
+					{
 						$context['config_vars'][$config_var[0]]['data'] = $config_var[4];
+					}
 					else
 					{
 						foreach ($config_var[4] as $key => $item)
+						{
 							$context['config_vars'][$config_var[0]]['data'][] = array($key, $item);
+						}
 					}
 				}
 
@@ -173,16 +183,24 @@ class Settings_Form
 					if (!is_numeric($k))
 					{
 						if (substr($k, 0, 2) == 'on')
+						{
 							$context['config_vars'][$config_var[0]]['javascript'] .= ' ' . $k . '="' . $v . '"';
+						}
 						else
+						{
 							$context['config_vars'][$config_var[0]][$k] = $v;
+						}
 					}
 
 					// See if there are any other labels that might fit?
 					if (isset($txt['setting_' . $config_var[0]]))
+					{
 						$context['config_vars'][$config_var[0]]['label'] = $txt['setting_' . $config_var[0]];
+					}
 					elseif (isset($txt['groups_' . $config_var[0]]))
+					{
 						$context['config_vars'][$config_var[0]]['label'] = $txt['groups_' . $config_var[0]];
+					}
 				}
 			}
 		}
@@ -203,9 +221,11 @@ class Settings_Form
 		static $known_rules = null;
 
 		if ($known_rules === null)
+		{
 			$known_rules = array(
 				'nohtml' => 'htmlspecialchars_decode[' . ENT_NOQUOTES . ']',
 			);
+		}
 
 		loadLanguage('Help');
 
@@ -216,22 +236,32 @@ class Settings_Form
 		{
 			// HR?
 			if (!is_array($config_var))
+			{
 				$context['config_vars'][] = $config_var;
+			}
 			else
 			{
 				// If it has no name it doesn't have any purpose!
 				if (empty($config_var[1]))
+				{
 					continue;
+				}
 
 				// Special case for inline permissions
 				if ($config_var[0] == 'permissions' && allowedTo('manage_permissions'))
+				{
 					$inlinePermissions[] = $config_var;
+				}
 				elseif ($config_var[0] == 'permissions')
+				{
 					continue;
+				}
 
 				// Are we showing the BBC selection box?
 				if ($config_var[0] == 'bbc')
+				{
 					$bbcChoice[] = $config_var[1];
+				}
 
 				$context['config_vars'][$config_var[1]] = array(
 					'label' => isset($config_var['text_label']) ? $config_var['text_label'] : (isset($txt[$config_var[1]]) ? $txt[$config_var[1]] : (isset($config_var[3]) && !is_array($config_var[3]) ? $config_var[3] : '')),
@@ -262,11 +292,15 @@ class Settings_Form
 
 					// If it's associative
 					if (isset($config_var[2][0]) && is_array($config_var[2][0]))
+					{
 						$context['config_vars'][$config_var[1]]['data'] = $config_var[2];
+					}
 					else
 					{
 						foreach ($config_var[2] as $key => $item)
+						{
 							$context['config_vars'][$config_var[1]]['data'][] = array($key, $item);
+						}
 					}
 				}
 
@@ -276,13 +310,19 @@ class Settings_Form
 					$rules = array();
 
 					if (!is_array($config_var['mask']))
+					{
 						$config_var['mask'] = array($config_var['mask']);
+					}
 					foreach ($config_var['mask'] as $key => $mask)
 					{
 						if (isset($known_rules[$mask]))
+						{
 							$rules[$config_var[1]][] = $known_rules[$mask];
+						}
 						elseif ($key == 'custom' && isset($mask['revert']))
+						{
 							$rules[$config_var[1]][] = $mask['revert'];
+						}
 					}
 
 					if (!empty($rules))
@@ -303,16 +343,24 @@ class Settings_Form
 					if (!is_numeric($k))
 					{
 						if (substr($k, 0, 2) == 'on')
+						{
 							$context['config_vars'][$config_var[1]]['javascript'] .= ' ' . $k . '="' . $v . '"';
+						}
 						else
+						{
 							$context['config_vars'][$config_var[1]][$k] = $v;
+						}
 					}
 
 					// See if there are any other labels that might fit?
 					if (isset($txt['setting_' . $config_var[1]]))
+					{
 						$context['config_vars'][$config_var[1]]['label'] = $txt['setting_' . $config_var[1]];
+					}
 					elseif (isset($txt['groups_' . $config_var[1]]))
+					{
 						$context['config_vars'][$config_var[1]]['label'] = $txt['groups_' . $config_var[1]];
+					}
 				}
 
 				// Set the subtext in case it's part of the label.
@@ -356,7 +404,9 @@ class Settings_Form
 			foreach ($bbcTags as $tag)
 			{
 				if ($i % $tagsPerColumn == 0 && $i != 0)
+				{
 					$col++;
+				}
 
 				$context['bbc_columns'][$col][] = array(
 					'tag' => $tag,
@@ -399,15 +449,21 @@ class Settings_Form
 
 		// Fix the darn stupid cookiename! (more may not be allowed, but these for sure!)
 		if (isset($_POST['cookiename']))
+		{
 			$_POST['cookiename'] = preg_replace('~[,;\s\.$]+~u', '', $_POST['cookiename']);
+		}
 
 		// Fix the forum's URL if necessary.
 		if (isset($_POST['boardurl']))
 		{
 			if (substr($_POST['boardurl'], -10) == '/index.php')
+			{
 				$_POST['boardurl'] = substr($_POST['boardurl'], 0, -10);
+			}
 			elseif (substr($_POST['boardurl'], -1) == '/')
+			{
 				$_POST['boardurl'] = substr($_POST['boardurl'], 0, -1);
+			}
 
 			$_POST['boardurl'] = addProtocol($_POST['boardurl'], array('http://', 'https://', 'file://'));
 		}
@@ -421,16 +477,27 @@ class Settings_Form
 
 		// All the strings to write.
 		$config_strs = array(
-			'mtitle', 'mmessage',
-			'language', 'mbname', 'boardurl',
+			'mtitle',
+			'mmessage',
+			'language',
+			'mbname',
+			'boardurl',
 			'cookiename',
 			'webmaster_email',
-			'db_name', 'db_user', 'db_server', 'db_prefix', 'ssi_db_user',
-			'cache_accelerator', 'cache_memcached', 'cache_uid',
+			'db_name',
+			'db_user',
+			'db_server',
+			'db_prefix',
+			'ssi_db_user',
+			'cache_accelerator',
+			'cache_memcached',
+			'cache_uid',
 		);
 
 		$safe_strings = array(
-			'mtitle', 'mmessage', 'mbname',
+			'mtitle',
+			'mmessage',
+			'mbname',
 		);
 
 		// All the numeric variables.
@@ -440,7 +507,8 @@ class Settings_Form
 
 		// All the checkboxes.
 		$config_bools = array(
-			'db_persist', 'db_error_send',
+			'db_persist',
+			'db_error_send',
 			'maintenance',
 		);
 
@@ -449,7 +517,9 @@ class Settings_Form
 		foreach ($config_passwords as $config_var)
 		{
 			if (isset($_POST[$config_var][1]) && $_POST[$config_var][0] == $_POST[$config_var][1])
+			{
 				$new_settings[$config_var] = '\'' . addcslashes($_POST[$config_var][0], '\'\\') . '\'';
+			}
 		}
 
 		foreach ($config_strs as $config_var)
@@ -457,16 +527,22 @@ class Settings_Form
 			if (isset($_POST[$config_var]))
 			{
 				if (in_array($config_var, $safe_strings))
+				{
 					$new_settings[$config_var] = '\'' . addcslashes(Util::htmlspecialchars($_POST[$config_var], ENT_QUOTES), '\'\\') . '\'';
+				}
 				else
+				{
 					$new_settings[$config_var] = '\'' . addcslashes($_POST[$config_var], '\'\\') . '\'';
+				}
 			}
 		}
 
 		foreach ($config_ints as $config_var)
 		{
 			if (isset($_POST[$config_var]))
+			{
 				$new_settings[$config_var] = (int) $_POST[$config_var];
+			}
 		}
 
 		foreach ($config_bools as $key)
@@ -475,9 +551,13 @@ class Settings_Form
 			if ($this->_array_value_exists__recursive($key, $this->settings()))
 			{
 				if (!empty($_POST[$key]))
+				{
 					$new_settings[$key] = '1';
+				}
 				else
+				{
 					$new_settings[$key] = '0';
+				}
 			}
 		}
 
@@ -491,7 +571,9 @@ class Settings_Form
 		{
 			// We just saved the file-based settings, so skip their definitions.
 			if (!is_array($config_var) || $config_var[2] == 'file')
+			{
 				continue;
+			}
 
 			// Rewrite the definition a bit.
 			$new_settings[] = array($config_var[3], $config_var[0]);
@@ -499,13 +581,15 @@ class Settings_Form
 
 		// Save the new database-based settings, if any.
 		if (!empty($new_settings))
+		{
 			Settings_Form::save_db($new_settings);
+		}
 	}
 
 	/**
 	 * Helper method for saving database settings.
 	 *
-	 * @param mixed[] $config_vars
+	 * @param mixed[]        $config_vars
 	 * @param mixed[]|object $post_object
 	 */
 	public static function save_db(&$config_vars, $post_object = null)
@@ -514,14 +598,18 @@ class Settings_Form
 
 		// Just look away if you have a weak stomach
 		if ($post_object !== null && is_object($post_object))
+		{
 			$_POST = array_replace($_POST, (array) $post_object);
+		}
 
 		if ($known_rules === null)
+		{
 			$known_rules = array(
 				'nohtml' => 'Util::htmlspecialchars[' . ENT_QUOTES . ']',
 				'email' => 'valid_email',
 				'url' => 'valid_url',
 			);
+		}
 
 		validateToken('admin-dbsc');
 
@@ -529,30 +617,44 @@ class Settings_Form
 		foreach ($config_vars as $var)
 		{
 			if (!isset($var[1]) || (!isset($_POST[$var[1]]) && $var[0] != 'check' && $var[0] != 'permissions' && ($var[0] != 'bbc' || !isset($_POST[$var[1] . '_enabledTags']))))
+			{
 				continue;
+			}
 
 			// Checkboxes!
 			elseif ($var[0] == 'check')
+			{
 				$setArray[$var[1]] = !empty($_POST[$var[1]]) ? '1' : '0';
+			}
 			// Select boxes!
 			elseif ($var[0] == 'select' && in_array($_POST[$var[1]], array_keys($var[2])))
+			{
 				$setArray[$var[1]] = $_POST[$var[1]];
+			}
 			elseif ($var[0] == 'select' && !empty($var['multiple']) && array_intersect($_POST[$var[1]], array_keys($var[2])) != array())
 			{
 				// For security purposes we validate this line by line.
 				$options = array();
 				foreach ($_POST[$var[1]] as $invar)
+				{
 					if (in_array($invar, array_keys($var[2])))
+					{
 						$options[] = $invar;
+					}
+				}
 
 				$setArray[$var[1]] = serialize($options);
 			}
 			// Integers!
 			elseif ($var[0] == 'int')
+			{
 				$setArray[$var[1]] = (int) $_POST[$var[1]];
+			}
 			// Floating point!
 			elseif ($var[0] == 'float')
+			{
 				$setArray[$var[1]] = (float) $_POST[$var[1]];
+			}
 			// Text!
 			elseif ($var[0] == 'text' || $var[0] == 'color' || $var[0] == 'large_text')
 			{
@@ -561,13 +663,19 @@ class Settings_Form
 					$rules = array();
 
 					if (!is_array($var['mask']))
+					{
 						$var['mask'] = array($var['mask']);
+					}
 					foreach ($var['mask'] as $key => $mask)
 					{
 						if (isset($known_rules[$mask]))
+						{
 							$rules[$var[1]][] = $known_rules[$mask];
+						}
 						elseif ($key == 'custom' && isset($mask['apply']))
+						{
 							$rules[$var[1]][] = $mask['apply'];
+						}
 					}
 
 					if (!empty($rules))
@@ -582,13 +690,17 @@ class Settings_Form
 					}
 				}
 				else
+				{
 					$setArray[$var[1]] = $_POST[$var[1]];
+				}
 			}
 			// Passwords!
 			elseif ($var[0] == 'password')
 			{
 				if (isset($_POST[$var[1]][1]) && $_POST[$var[1]][0] == $_POST[$var[1]][1])
+				{
 					$setArray[$var[1]] = $_POST[$var[1]][0];
+				}
 			}
 			// BBC.
 			elseif ($var[0] == 'bbc')
@@ -597,19 +709,27 @@ class Settings_Form
 				$bbcTags = $codes->getTags();
 
 				if (!isset($_POST[$var[1] . '_enabledTags']))
+				{
 					$_POST[$var[1] . '_enabledTags'] = array();
+				}
 				elseif (!is_array($_POST[$var[1] . '_enabledTags']))
+				{
 					$_POST[$var[1] . '_enabledTags'] = array($_POST[$var[1] . '_enabledTags']);
+				}
 
 				$setArray[$var[1]] = implode(',', array_diff($bbcTags, $_POST[$var[1] . '_enabledTags']));
 			}
 			// Permissions?
 			elseif ($var[0] == 'permissions')
+			{
 				$inlinePermissions[] = $var;
+			}
 		}
 
 		if (!empty($setArray))
+		{
 			updateSettings($setArray);
+		}
 
 		// If we have inline permissions we need to save them.
 		if (!empty($inlinePermissions) && allowedTo('manage_permissions'))
@@ -651,6 +771,7 @@ class Settings_Form
 			require_once(SUBSDIR . '/Admin.subs.php');
 
 			updateDbLastError($config_vars['db_last_error']);
+
 			return;
 		}
 
@@ -662,26 +783,38 @@ class Settings_Form
 
 		// Break it up based on \r or \n, and then clean out extra characters.
 		if (strpos($settingsArray, "\n") !== false)
+		{
 			$settingsArray = explode("\n", $settingsArray);
+		}
 		elseif (strpos($settingsArray, "\r") !== false)
+		{
 			$settingsArray = explode("\r", $settingsArray);
+		}
 		else
+		{
 			return;
+		}
 
 		// Presumably, the file has to have stuff in it for this function to be called :P.
 		if (count($settingsArray) < 10)
+		{
 			return;
+		}
 
 		// remove any /r's that made there way in here
 		foreach ($settingsArray as $k => $dummy)
+		{
 			$settingsArray[$k] = strtr($dummy, array("\r" => '')) . "\n";
+		}
 
 		// go line by line and see whats changing
 		for ($i = 0, $n = count($settingsArray); $i < $n; $i++)
 		{
 			// Don't trim or bother with it if it's not a variable.
 			if (substr($settingsArray[$i], 0, 1) != '$')
+			{
 				continue;
+			}
 
 			$settingsArray[$i] = trim($settingsArray[$i]) . "\n";
 
@@ -706,31 +839,45 @@ class Settings_Form
 
 			// End of the file ... maybe
 			if (substr(trim($settingsArray[$i]), 0, 2) == '?' . '>')
+			{
 				$end = $i;
+			}
 		}
 
 		// This should never happen, but apparently it is happening.
 		if (empty($end) || $end < 10)
+		{
 			$end = count($settingsArray) - 1;
+		}
 
 		// Still more variables to go?  Then lets add them at the end.
 		if (!empty($config_vars))
 		{
 			if (trim($settingsArray[$end]) == '?' . '>')
+			{
 				$settingsArray[$end++] = '';
+			}
 			else
+			{
 				$end++;
+			}
 
 			// Add in any newly defined vars that were passed
 			foreach ($config_vars as $var => $val)
+			{
 				$settingsArray[$end++] = '$' . $var . ' = ' . $val . ';' . "\n";
+			}
 		}
 		else
+		{
 			$settingsArray[$end] = trim($settingsArray[$end]);
+		}
 
 		// Sanity error checking: the file needs to be at least 12 lines.
 		if (count($settingsArray) < 12)
+		{
 			return;
+		}
 
 		// Try to avoid a few pitfalls:
 		//  - like a possible race condition,
@@ -739,9 +886,13 @@ class Settings_Form
 		// Check before you act: if cache is enabled, we can do a simple write test
 		// to validate that we even write things on this filesystem.
 		if ((!defined('CACHEDIR') || !file_exists(CACHEDIR)) && file_exists(BOARDDIR . '/cache'))
+		{
 			$tmp_cache = BOARDDIR . '/cache';
+		}
 		else
+		{
 			$tmp_cache = CACHEDIR;
+		}
 
 		$test_fp = @fopen($tmp_cache . '/settings_update.tmp', 'w+');
 		if ($test_fp)
@@ -777,11 +928,15 @@ class Settings_Form
 				$context['settings_message'] = 'settings_error';
 
 				if (file_exists(BOARDDIR . '/Settings_bak.php'))
+				{
 					@copy(BOARDDIR . '/Settings_bak.php', BOARDDIR . '/Settings.php');
+				}
 			}
 			// And ensure we are going to read the correct file next time
 			if (function_exists('opcache_invalidate'))
+			{
 				opcache_invalidate(BOARDDIR . '/Settings.php');
+			}
 		}
 	}
 
@@ -799,7 +954,8 @@ class Settings_Form
 	 *  - either, an empty string for a horizontal rule.
 	 *  - or, a string for a titled section.
 	 *
-	 * @param mixed[]|null $config_vars = null array of config vars, if null the method returns the current configuration
+	 * @param mixed[]|null $config_vars = null array of config vars, if null the method returns the current
+	 *                                  configuration
 	 */
 	public function settings($config_vars = null)
 	{
@@ -812,6 +968,7 @@ class Settings_Form
 		{
 			// We got presents :P
 			$this->_config_vars = is_array($config_vars) ? $config_vars : array($config_vars);
+
 			return $this->_config_vars;
 		}
 	}
@@ -819,8 +976,9 @@ class Settings_Form
 	/**
 	 * Recursively checks if a value exists in an array
 	 *
-	 * @param string $needle
+	 * @param string  $needle
 	 * @param mixed[] $haystack
+	 *
 	 * @return boolean
 	 */
 	private function _array_value_exists__recursive($needle, $haystack)
@@ -828,7 +986,9 @@ class Settings_Form
 		foreach ($haystack as $item)
 		{
 			if ($item == $needle || (is_array($item) && $this->_array_value_exists__recursive($needle, $item)))
+			{
 				return true;
+			}
 		}
 
 		return false;

@@ -9,16 +9,15 @@
  *
  * @version 1.1 beta 2
  */
-
 class Permissions
 {
 	/**
 	 * @var array
-     */
+	 */
 	protected $reserved_permissions = array(
 		'admin_forum',
 		'manage_membergroups',
-		'manage_permissions'
+		'manage_permissions',
 	);
 
 	/**
@@ -28,7 +27,7 @@ class Permissions
 
 	/**
 	 * @var array
-     */
+	 */
 	protected $illegal_guest_permissions = array(
 		'delete_replies',
 		'karma_edit',
@@ -132,7 +131,7 @@ class Permissions
 	 *
 	 * @param string[] $permissions
 	 * @param string[] $where
-	 * @param mixed[] $where_vars = array() or values used in the where statement
+	 * @param mixed[]  $where_vars = array() or values used in the where statement
 	 */
 	public function deletePermissions($permissions, $where = array(), $where_parameters = array())
 	{
@@ -155,13 +154,15 @@ class Permissions
 	 * This function updates the permissions of any groups based on the given groups.
 	 *
 	 * @param mixed[]|int $parents (array or int) group or groups whose children are to be updated
-	 * @param int|null $profile = null an int or null for the customized profile, if any
+	 * @param int|null    $profile = null an int or null for the customized profile, if any
 	 */
 	public function updateChild($parents, $profile = null)
 	{
 		// All the parent groups to sort out.
 		if (!is_array($parents))
+		{
 			$parents = array($parents);
+		}
 
 		// Find all the children of this group.
 		$request = $this->db->query('', '
@@ -189,7 +190,9 @@ class Permissions
 
 		// Not a sausage, or a child?
 		if (empty($children))
+		{
 			return false;
+		}
 
 		// Need functions that modify permissions...
 		require_once(SUBSDIR . '/ManagePermissions.subs.php');
@@ -211,7 +214,11 @@ class Permissions
 			{
 				foreach ($children[$row['id_group']] as $child)
 				{
-					$permissions[] = array('id_group' => (int) $child, 'permission' => $row['permission'], 'add_deny' => $row['add_deny']);
+					$permissions[] = array(
+						'id_group' => (int) $child,
+						'permission' => $row['permission'],
+						'add_deny' => $row['add_deny'],
+					);
 				}
 			}
 			$this->db->free_result($request);
@@ -249,8 +256,12 @@ class Permissions
 			);
 			$permissions = array();
 			while ($row = $this->db->fetch_assoc($request))
+			{
 				foreach ($children[$row['id_group']] as $child)
+				{
 					$permissions[] = array($child, $row['id_profile'], $row['permission'], $row['add_deny']);
+				}
+			}
 			$this->db->free_result($request);
 
 			$this->db->query('', '

@@ -94,23 +94,31 @@ class TestInlinePermissionsForm extends PHPUnit_Framework_TestCase
 		foreach ($this->config_vars as $permission)
 		{
 			if (!isset($result[$permission[1]]))
+			{
 				$result[$permission[1]] = $this->results;
+			}
 			if (isset($permission['excluded_groups']))
 			{
 				foreach ($permission['excluded_groups'] as $group)
 				{
 					if (isset($result[$permission[1]][$group]))
+					{
 						unset($result[$permission[1]][$group]);
+					}
 				}
 			}
 
 			// Is this permission one that guests can't have?
 			if (isset($this->illegal_guest_permissions[$permission[1]]))
+			{
 				unset($result[$permission[1]][-1]);
+			}
 
 			// Is this permission outright disabled?
 			if (isset($this->illegal_permissions[$permission[1]]))
+			{
 				unset($result[$permission[1]]);
+			}
 
 			$this->assertEquals($result[$permission[1]], $context[$permission[1]]);
 		}
