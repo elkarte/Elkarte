@@ -44,7 +44,7 @@ class Apc extends Cache_Method_Abstract
 	 */
 	public function exists($key)
 	{
-		$his->get($key);
+		$this->get($key);
 		return !$this->is_miss;
 	}
 
