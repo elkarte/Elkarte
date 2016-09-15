@@ -11,6 +11,8 @@
  */
 class Permissions
 {
+	private $db;
+
 	/**
 	 * @var array
 	 */
