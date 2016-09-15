@@ -16,7 +16,7 @@
 class Inline_Permissions_Form
 {
 	/**
-	 * @var string[]
+	 * @var array
 	 */
 	private $permissions = array();
 
@@ -34,6 +34,11 @@ class Inline_Permissions_Form
 	 * @var string[]
 	 */
 	private $illegal_guest_permissions = array();
+
+	/**
+	 * @var array
+	 */
+	private $context = array();
 
 	/**
 	 * @var int[]
@@ -108,8 +113,6 @@ class Inline_Permissions_Form
 	 */
 	public function save()
 	{
-		global $context;
-
 		$insertRows = array();
 		foreach ($this->permissionList as $permission)
 		{
@@ -151,10 +154,7 @@ class Inline_Permissions_Form
 	 */
 	public function init()
 	{
-		global $context, $txt, $modSettings;
-
-		loadLanguage('ManagePermissions');
-		loadTemplate('ManagePermissions');
+		global $modSettings;
 
 		// No permissions? Not a great deal to do here.
 		if (!allowedTo('manage_permissions'))
@@ -165,16 +165,14 @@ class Inline_Permissions_Form
 		// Load the permission settings for guests
 		foreach ($this->permissions as $permission)
 		{
-			$context[$permission[1]] = array(
+			$this->context[$permission[1]] = array(
 				-1 => array(
 					'id' => -1,
-					'name' => $txt['membergroups_guests'],
 					'is_postgroup' => false,
 					'status' => 'off',
 				),
 				0 => array(
 					'id' => 0,
-					'name' => $txt['membergroups_members'],
 					'is_postgroup' => false,
 					'status' => 'off',
 				),
@@ -195,7 +193,7 @@ class Inline_Permissions_Form
 		);
 		while ($row = $this->db->fetch_assoc($request))
 		{
-			$context[$row['permission']][$row['id_group']]['status'] = $row['status'];
+			$this->context[$row['permission']][$row['id_group']]['status'] = $row['status'];
 		}
 		$this->db->free_result($request);
 
@@ -219,9 +217,9 @@ class Inline_Permissions_Form
 			// Initialize each permission as being 'off' until proven otherwise.
 			foreach ($this->permissions as $permission)
 			{
-				if (!isset($context[$permission[1]][$row['id_group']]))
+				if (!isset($this->context[$permission[1]][$row['id_group']]))
 				{
-					$context[$permission[1]][$row['id_group']] = array(
+					$this->context[$permission[1]][$row['id_group']] = array(
 						'id' => $row['id_group'],
 						'name' => $row['group_name'],
 						'is_postgroup' => $row['min_posts'] != -1,
@@ -230,40 +228,77 @@ class Inline_Permissions_Form
 				}
 			}
 
-			$context[$row['permission']][$row['id_group']]['status'] = empty($row['status']) ? 'deny' : ($row['status'] == 1 ? 'on' : 'off');
+			$this->context[$row['permission']][$row['id_group']]['status'] = empty($row['status']) ? 'deny' : ($row['status'] == 1 ? 'on' : 'off');
 		}
 		$this->db->free_result($request);
+		$this->filterIllegalPermissions();
+		$this->prepareContext();
+	}
 
-		// Some permissions cannot be given to certain groups. Remove them.
+	/**
+	 * Prepare the template by loading context
+	 * variables for each permission.
+	 *
+	 * @uses ManagePermissions language
+	 * @uses ManagePermissions template
+	 */
+	private function prepareContext()
+	{
+		global $context, $txt, $modSettings;
+
+		loadLanguage('ManagePermissions');
+		loadTemplate('ManagePermissions');
+
+		// Load the names for guests
+		foreach ($this->permissions as $permission)
+		{
+			if (isset($this->context[$permission[1]][-1]))
+			{
+				$this->context[$permission[1]][-1]['name'] = $txt['membergroups_guests'];
+			}
+			if (isset($this->context[$permission[1]][0]))
+			{
+				$this->context[$permission[1]][0]['name'] = $txt['membergroups_members'];
+			}
+		}
+
+		$context['permissions'] = $this->context;
+	}
+
+	/**
+	 * Some permissions cannot be given to certain groups. Remove them.
+	 */
+	private function filterIllegalPermissions()
+	{
 		foreach ($this->permissions as $permission)
 		{
 			foreach ($this->excluded_groups as $group)
 			{
-				if (isset($context[$permission[1]][$group]))
+				if (isset($this->context[$permission[1]][$group]))
 				{
-					unset($context[$permission[1]][$group]);
+					unset($this->context[$permission[1]][$group]);
 				}
 			}
 			if (isset($permission['excluded_groups']))
 			{
 				foreach ($permission['excluded_groups'] as $group)
 				{
-					if (isset($context[$permission[1]][$group]))
+					if (isset($this->context[$permission[1]][$group]))
 					{
-						unset($context[$permission[1]][$group]);
+						unset($this->context[$permission[1]][$group]);
 					}
 				}
 			}
 			// Is this permission one that guests can't have?
 			if (isset($this->illegal_guest_permissions[$permission[1]]))
 			{
-				unset($context[$permission[1]][-1]);
+				unset($this->context[$permission[1]][-1]);
 			}
 
 			// Is this permission outright disabled?
 			if (isset($this->illegal_permissions[$permission[1]]))
 			{
-				unset($context[$permission[1]]);
+				unset($this->context[$permission[1]]);
 			}
 		}
 	}

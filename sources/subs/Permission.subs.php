@@ -98,7 +98,7 @@ function theme_inline_permissions($permission)
 	global $context;
 
 	$context['current_permission'] = $permission;
-	$context['member_groups'] = $context[$permission];
+	$context['member_groups'] = $context['permissions'][$permission];
 
 	template_inline_permissions();
 }
