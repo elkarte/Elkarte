@@ -96,10 +96,5 @@ class InlinePermissions_Form extends Inline_Permissions_Form
  */
 function theme_inline_permissions($permission)
 {
-	global $context;
-
-	$context['current_permission'] = $permission;
-	$context['member_groups'] = $context['permissions'][$permission];
-
-	template_inline_permissions();
+	template_inline_permissions($permission);
 }
