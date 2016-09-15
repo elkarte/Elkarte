@@ -92,6 +92,7 @@ class InlinePermissions_Form extends Inline_Permissions_Form
  * Calls the template function template_inline_permissions().
  *
  * @param string $permission
+ * @deprecated since 1.1
  */
 function theme_inline_permissions($permission)
 {
