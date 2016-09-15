@@ -131,7 +131,7 @@ class Permissions
 	 *
 	 * @param string[] $permissions
 	 * @param string[] $where
-	 * @param mixed[]  $where_vars = array() or values used in the where statement
+	 * @param mixed[]  $where_parameters = array() or values used in the where statement
 	 */
 	public function deletePermissions($permissions, $where = array(), $where_parameters = array())
 	{

@@ -105,8 +105,6 @@ class Inline_Permissions_Form
 
 	/**
 	 * Save the permissions of a form containing inline permissions.
-	 *
-	 * @param string[] $permissions
 	 */
 	public function save()
 	{
