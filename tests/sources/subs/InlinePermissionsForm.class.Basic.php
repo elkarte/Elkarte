@@ -112,12 +112,15 @@ class TestInlinePermissionsForm extends PHPUnit_Framework_TestCase
 			if (in_array($permission[1], $this->illegal_guest_permissions))
 			{
 				unset($result[$permission[1]][-1]);
+				$this->assertFalse(isset($context['permissions'][$permission[1]][-1]));
 			}
 
 			// Is this permission outright disabled?
 			if (in_array($permission[1], $this->illegal_permissions))
 			{
 				unset($result[$permission[1]]);
+				$this->assertFalse(isset($context['permissions'][$permission[1]]));
+				continue;
 			}
 
 			$this->assertEquals($result[$permission[1]], $context['permissions'][$permission[1]]);
