@@ -690,13 +690,15 @@ function template_modify_group_classic($type)
 
 /**
  * Show a collapsible box to set a specific permission.
+ *
+ * @param string $permission
  */
-function template_inline_permissions()
+function template_inline_permissions($permission)
 {
 	global $context, $txt, $modSettings;
 
 	echo '
-		<fieldset id="', $context['current_permission'], '">
+		<fieldset id="', $permission, '">
 			<legend>', $txt['avatar_select_permission'], '</legend>';
 
 	if (empty($modSettings['permission_enable_deny']))
@@ -714,7 +716,7 @@ function template_inline_permissions()
 				<dd>
 				</dd>';
 
-	foreach ($context['member_groups'] as $group)
+	foreach ($context['permissions'][$permission] as $group)
 	{
 		if (!empty($modSettings['permission_enable_deny']))
 			echo '
@@ -725,12 +727,12 @@ function template_inline_permissions()
 
 		if (empty($modSettings['permission_enable_deny']))
 			echo '
-					<input type="checkbox" name="', $context['current_permission'], '[', $group['id'], ']" value="on"', $group['status'] == 'on' ? ' checked="checked"' : '', ' />';
+					<input type="checkbox" name="', $permission, '[', $group['id'], ']" value="on"', $group['status'] == 'on' ? ' checked="checked"' : '', ' />';
 		else
 			echo '
-					<span class="perms"><input type="radio" name="', $context['current_permission'], '[', $group['id'], ']" value="on"', $group['status'] == 'on' ? ' checked="checked"' : '', ' /></span>
-					<span class="perms"><input type="radio" name="', $context['current_permission'], '[', $group['id'], ']" value="off"', $group['status'] == 'off' ? ' checked="checked"' : '', ' /></span>
-					<span class="perms"><input type="radio" name="', $context['current_permission'], '[', $group['id'], ']" value="deny"', $group['status'] == 'deny' ? ' checked="checked"' : '', ' /></span>';
+					<span class="perms"><input type="radio" name="', $permission, '[', $group['id'], ']" value="on"', $group['status'] == 'on' ? ' checked="checked"' : '', ' /></span>
+					<span class="perms"><input type="radio" name="', $permission, '[', $group['id'], ']" value="off"', $group['status'] == 'off' ? ' checked="checked"' : '', ' /></span>
+					<span class="perms"><input type="radio" name="', $permission, '[', $group['id'], ']" value="deny"', $group['status'] == 'deny' ? ' checked="checked"' : '', ' /></span>';
 
 		if (!empty($modSettings['permission_enable_deny']))
 			echo '

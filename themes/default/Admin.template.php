@@ -1044,7 +1044,7 @@ function template_show_settings()
 				// Permission group?
 				elseif ($config_var['type'] == 'permissions')
 				{
-					theme_inline_permissions($config_var['name']);
+					template_inline_permissions($config_var['name']);
 				}
 				// BBC selection?
 				elseif ($config_var['type'] == 'bbc')
