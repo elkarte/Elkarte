@@ -116,9 +116,9 @@ function template_login()
 
 	// Focus on the correct input - username or password.
 	echo '
-		<script><!-- // --><![CDATA[
+		<script>
 			document.forms.frmLogin.', !empty($context['using_openid']) ? 'openid_identifier' : (isset($context['default_username']) && $context['default_username'] != '' ? 'passwrd' : 'user'), '.focus();
-		// ]]></script>';
+		</script>';
 }
 
 /**
@@ -214,9 +214,9 @@ function template_kick_guest()
 
 	// Do the focus thing...
 	echo '
-		<script><!-- // --><![CDATA[
+		<script>
 			document.forms.frmLogin.user.focus();
-		// ]]></script>';
+		</script>';
 }
 
 /**
@@ -311,9 +311,9 @@ function template_admin_login()
 
 	// Focus on the password box.
 	echo '
-<script><!-- // --><![CDATA[
+<script>
 	document.forms.frmLogin.', $context['sessionCheckType'], '_pass.focus();
-// ]]></script>';
+</script>';
 }
 
 /**

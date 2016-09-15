@@ -259,7 +259,7 @@ function template_body_above()
 		</header>';
 
 	template_menu();
-	
+
 	echo '
 	</section>
 	<div id="wrapper" class="wrapper">
@@ -571,7 +571,7 @@ function template_menu()
 
 	// Define the upper_section toggle in javascript.
 	echo '
-				<script><!-- // --><![CDATA[
+				<script>
 					var oMainHeaderToggle = new elk_Toggle({
 						bToggleEnabled: true,
 						bCurrentlyCollapsed: ', empty($context['minmax_preferences']['upshrink']) ? 'false' : 'true', ',
@@ -599,7 +599,7 @@ function template_menu()
 							sCookieName: \'upshrink\'
 						}
 					});
-				// ]]></script>';
+				</script>';
 }
 
 /**

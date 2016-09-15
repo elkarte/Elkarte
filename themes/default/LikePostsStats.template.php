@@ -61,7 +61,7 @@ function template_lp_stats()
 	echo '
 		</div>';
 
-	echo '<script defer="defer"><!-- // --><![CDATA[
+	echo '<script defer="defer">
 		$(function() {
 			likePostStats.prototype.init({
 				txtStrings: {
@@ -97,5 +97,5 @@ function template_lp_stats()
 				}
 			});
 		})
-	// ]]></script>';
+	</script>';
 }

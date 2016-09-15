@@ -596,7 +596,7 @@ function template_set_settings()
 	if (!empty($context['theme_variants']))
 	{
 		echo '
-		<script><!-- // --><![CDATA[
+		<script>
 		var oThumbnails = {';
 
 		// All the variant thumbnails.
@@ -610,7 +610,7 @@ function template_set_settings()
 
 		echo '
 		};
-		// ]]></script>';
+		</script>';
 	}
 }
 
@@ -672,7 +672,7 @@ function template_pick()
 		if (!empty($theme['variants']))
 		{
 			echo '
-			<script><!-- // --><![CDATA[
+			<script>
 				var sBaseUseUrl', $theme['id'], ' = elk_prepareScriptUrl(elk_scripturl) + \'action=theme;sa=pick;u=', $context['current_member'], ';th=', $theme['id'], ';', $context['session_var'], '=', $context['session_id'], '\',
 					sBasePreviewUrl', $theme['id'], ' = elk_prepareScriptUrl(elk_scripturl) + \'action=theme;sa=pick;u=', $context['current_member'], ';theme=', $theme['id'], ';', $context['session_var'], '=', $context['session_id'], '\',
 					oThumbnails', $theme['id'], ' = {';
@@ -697,7 +697,7 @@ function template_pick()
 					document.getElementById(\'theme_thumb_preview_', $theme['id'], '\').href = sBasePreviewUrl', $theme['id'], ' + \';vrt=\' + sVariant + \';variant=\' + sVariant;
 					document.getElementById(\'theme_preview_', $theme['id'], '\').href = sBasePreviewUrl', $theme['id'], ' + \';vrt=\' + sVariant + \';variant=\' + sVariant;
 				}
-			// ]]></script>';
+			</script>';
 		}
 	}
 
@@ -873,9 +873,9 @@ function template_edit_style()
 	// From now on no one can complain that editing css is difficult. If you disagree, go to www.w3schools.com.
 	echo '
 	<div id="admincenter">
-		<script><!-- // --><![CDATA[
+		<script>
 			navigatePreview(elk_scripturl);
-		// ]]></script>
+		</script>
 		<iframe id="css_preview_box" name="css_preview_box" src="about:blank" frameborder="0"></iframe>';
 
 	// Just show a big box.... gray out the Save button if it's not saveable... (ie. not 777.)

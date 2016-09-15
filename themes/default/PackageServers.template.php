@@ -282,7 +282,7 @@ function template_package_list()
 	if (!empty($context['package_list']))
 	{
 		echo '
-			<script><!-- // --><![CDATA[';
+			<script>';
 		foreach ($context['package_list'] as $section => $ps)
 		{
 			echo '
@@ -340,7 +340,7 @@ function template_package_list()
 		}
 
 		echo '
-			// ]]></script>';
+			</script>';
 	}
 }
 

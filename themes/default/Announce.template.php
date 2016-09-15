@@ -88,7 +88,7 @@ function template_announcement_send()
 			</div>
 		</form>
 	</div>
-	<script><!-- // --><![CDATA[
+	<script>
 		doAutoSubmit(3, ', JavaScriptEscape($txt['announce_continue']), ');
-	// ]]></script>';
+	</script>';
 }

@@ -245,13 +245,13 @@ function template_select_search_method()
 			</div>
 		</form>
 	</div>
-	<script><!-- // --><![CDATA[
+	<script>
 		showhideSearchMethod();
 
 		$("#search_index").find("input").change(function() {
 			showhideSearchMethod();
 		});
-   // ]]></script>';
+   </script>';
 }
 
 /**
@@ -316,9 +316,9 @@ function template_create_index_progress()
 			</div>
 		</form>
 	</div>
-	<script><!-- // --><![CDATA[
+	<script>
 		doAutoSubmit(10, ', JavaScriptEscape($txt['search_create_index_continue']), ');
-	// ]]></script>';
+	</script>';
 }
 
 /**

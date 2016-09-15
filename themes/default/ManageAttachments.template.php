@@ -174,7 +174,7 @@ function template_maintenance()
 				<div id="progress_msg"></div>
 				<div id="show_progress"></div>
 			</form>
-			<script><!-- // --><![CDATA[
+			<script>
 				function start_progress() {
 					setTimeout(function() {show_msg();}, 1000);
 				}
@@ -189,7 +189,7 @@ function template_maintenance()
 					setTimeout(function() {show_progress();}, 1500);
 				}
 
-			// ]]></script>
+			</script>
 		</div>
 	</div>';
 }

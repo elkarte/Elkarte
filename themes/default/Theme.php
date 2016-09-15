@@ -201,11 +201,11 @@ class Theme extends \Theme
 				(!empty($modSettings['jquery_include_ui']) ? '
 	<script src="https://ajax.googleapis.com/ajax/libs/jqueryui/' . $jqueryui_version . '/jquery-ui.min.js" id="jqueryui"></script>' : '');
 				echo '
-	<script><!-- // --><![CDATA[
+	<script>
 		window.jQuery || document.write(\'<script src="', $settings['default_theme_url'], '/scripts/jquery-' . $jquery_version . '.min.js"><\/script>\');',
 				(!empty($modSettings['jquery_include_ui']) ? '
 		window.jQuery.ui || document.write(\'<script src="' . $settings['default_theme_url'] . '/scripts/jquery-ui-' . $jqueryui_version . '.min.js"><\/script>\')' : ''), '
-	// ]]></script>';
+	</script>';
 				break;
 		}
 	}
@@ -313,9 +313,9 @@ class Theme extends \Theme
 
 				// Output the deferred script
 				echo '
-	<script><!-- // --><![CDATA[
+	<script>
 		', $inline_defered_code, '
-	// ]]></script>';
+	</script>';
 			}
 
 			// Standard output, and our javascript vars, get output when we are not on a defered call
@@ -325,9 +325,9 @@ class Theme extends \Theme
 
 				// And output the js vars and standard scripts to the page
 				echo '
-	<script><!-- // --><![CDATA[
+	<script>
 		', implode("\n\t\t", $this->js_inline['standard']), '
-	// ]]></script>';
+	</script>';
 			}
 		}
 	}

@@ -680,7 +680,7 @@ function template_modify_board()
 
 	// Javascript for deciding what to show.
 	echo '
-	<script><!-- // --><![CDATA[
+	<script>
 		function refreshOptions()
 		{
 			var redirect = document.getElementById("redirect_enable"),
@@ -706,7 +706,7 @@ function template_modify_board()
 		}
 
 		refreshOptions();
-	// ]]></script>';
+	</script>';
 }
 
 /**

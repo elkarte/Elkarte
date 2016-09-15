@@ -71,7 +71,7 @@ function template_latest_news()
 	echo '
 								<span class="hide" id="installedVersion">??</span>
 								<span class="hide" id="latestVersion">??</span>
-								<script><!-- // --><![CDATA[
+								<script>
 						var oAdminCenter = new elk_AdminIndex({
 							bLoadAnnouncements: true,
 							sAnnouncementTemplate: ', JavaScriptEscape('
@@ -94,7 +94,7 @@ function template_latest_news()
 								<span class="alert">%currentVersion%</span>
 							'), '
 						});
-								// ]]></script>';
+								</script>';
 }
 
 /**
@@ -636,11 +636,11 @@ function template_warn_template()
 		</div>
 	</form>
 
-	<script><!-- // --><![CDATA[
+	<script>
 		$(function() {
 			$("#preview_button").click(function() {
 				return ajax_getTemplatePreview();
 			});
 		});
-	// ]]></script>';
+	</script>';
 }

@@ -93,7 +93,7 @@ function template_admin()
 
 	// This sets the announcements and current versions themselves ;).
 	echo '
-		<script><!-- // --><![CDATA[
+		<script>
 			var oAdminCenter = new elk_AdminIndex({
 				bLoadAnnouncements: true,
 				sAnnouncementTemplate: ', JavaScriptEscape('
@@ -133,7 +133,7 @@ function template_admin()
 				sUpdateNotificationLink: elk_scripturl + ', JavaScriptEscape('?action=admin;area=packageservers;sa=download;auto;package=%package%;' . $context['session_var'] . '=' . $context['session_id']), '
 
 			});
-		// ]]></script>';
+		</script>';
 }
 
 /**
@@ -244,7 +244,7 @@ function template_credits()
 
 	// This makes all the support information available to the support script...
 	echo '
-					<script><!-- // --><![CDATA[
+					<script>
 						var ourSupportVersions = {};
 
 						ourSupportVersions.forum = "', $context['forum_version'], '";';
@@ -255,11 +255,11 @@ function template_credits()
 						ourSupportVersions.', $variable, ' = "', $version['version'], '";';
 
 	echo '
-					// ]]></script>';
+					</script>';
 
 	// This sets the latest support stuff.
 	echo '
-					<script><!-- // --><![CDATA[
+					<script>
 						var oAdminCenter = new elk_AdminIndex({
 							bLoadVersions: true,
 							slatestVersionContainerId: \'latestVersion\',
@@ -269,7 +269,7 @@ function template_credits()
 							'), '
 
 						});
-					// ]]></script>';
+					</script>';
 }
 
 /**
@@ -655,7 +655,7 @@ function template_view_versions()
 	  file categories. (sources, languages, and templates.) */
 	echo '
 						<script src="', $context['detailed_version_url'], '"></script>
-						<script><!-- // --><![CDATA[
+						<script>
 							var oViewVersions = new elk_ViewVersions({
 								aKnownLanguages: [
 									\'.', implode('\',
@@ -681,7 +681,7 @@ function template_view_versions()
 								'), '
 
 							});
-						// ]]></script>';
+						</script>';
 }
 
 /**
@@ -717,9 +717,9 @@ function template_edit_censored()
 				<div class="censorWords hide" id="moreCensoredWords_link">
 					<a class="linkbutton_left" href="#" onclick="addNewWord(); return false;">', $txt['censor_clickadd'], '</a><br />
 				</div>
-				<script><!-- // --><![CDATA[
+				<script>
 					document.getElementById("moreCensoredWords_link").style.display = "block";
-				// ]]></script>
+				</script>
 				<hr class="clear" />
 				<dl class="settings">
 					<dt>
@@ -759,13 +759,13 @@ function template_edit_censored()
 			<input id="token" type="hidden" name="', $context['admin-censor_token_var'], '" value="', $context['admin-censor_token'], '" />
 		</form>
 	</div>
-	<script><!-- // --><![CDATA[
+	<script>
 		$(function() {
 			$("#preview_button").click(function() {
 				return ajax_getCensorPreview();
 			});
 		});
-	// ]]></script>';
+	</script>';
 }
 
 /**
@@ -807,9 +807,9 @@ function template_not_done()
 			</form>
 		</div>
 	</div>
-	<script><!-- // --><![CDATA[
+	<script>
 		doAutoSubmit(', $context['continue_countdown'], ', ', JavaScriptEscape($txt['not_done_continue']), ');
-	// ]]></script>';
+	</script>';
 }
 
 /**
@@ -1319,9 +1319,9 @@ function template_repair_boards()
 	if (!empty($context['redirect_to_recount']))
 	{
 		echo '
-	<script><!-- // --><![CDATA[
+	<script>
 		doAutoSubmit(5, ', JavaScriptEscape($txt['errors_recount_now']), ', "recount_form");
-	// ]]></script>';
+	</script>';
 	}
 }
 

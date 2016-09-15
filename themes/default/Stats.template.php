@@ -336,7 +336,7 @@ function template_forum_history()
 			</table>
 		</div>
 	</div>
-	<script><!-- // --><![CDATA[
+	<script>
 		var oStatsCenter = new elk_StatsCenter({
 			sTableId: \'stats\',
 
@@ -376,6 +376,6 @@ function template_forum_history()
 				\'hits\'', '
 			]
 		});
-	// ]]></script>';
+	</script>';
 	}
 }

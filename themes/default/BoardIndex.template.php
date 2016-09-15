@@ -138,7 +138,7 @@ function template_info_center()
 
 	// Info center collapse object.
 	echo '
-	<script><!-- // --><![CDATA[
+	<script>
 		var oInfoCenterToggle = new elk_Toggle({
 			bToggleEnabled: true,
 			bCurrentlyCollapsed: ', empty($context['minmax_preferences']['info']) ? 'false' : 'true', ',
@@ -173,7 +173,7 @@ function template_info_center()
 				sCookieName: \'upshrinkIC\'
 			}
 		});
-	// ]]></script>';
+	</script>';
 }
 
 /**

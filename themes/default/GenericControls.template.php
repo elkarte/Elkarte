@@ -60,7 +60,7 @@ function template_control_richedit($editor_id, $smileyContainer = null, $bbcCont
 			<textarea class="editor', isset($context['post_error']['errors']['no_message']) || isset($context['post_error']['errors']['long_message']) ? ' border_error' : '', '" name="', $editor_id, '" id="', $editor_id, '" tabindex="', $context['tabindex']++, '" style="width:', $editor_context['width'], ';height: ', $editor_context['height'], ';" required="required">', $editor_context['value'], '</textarea>
 		</label>
 		<input type="hidden" name="', $editor_id, '_mode" id="', $editor_id, '_mode" value="0" />
-		<script><!-- // --><![CDATA[
+		<script>
 			var $editor_data = {},
 				$editor_container = {};
 
@@ -160,7 +160,7 @@ function template_control_richedit($editor_id, $smileyContainer = null, $bbcCont
 			elk_editor();
 		});
 
-		// ]]></script>';
+		</script>';
 }
 
 /**

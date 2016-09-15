@@ -500,7 +500,7 @@ function template_quickreply_below()
 		if (empty($options['use_editor_quick_reply']))
 		{
 			echo '
-			<script><!-- // --><![CDATA[';
+			<script>';
 
 			// Mentions enabled
 			if (!empty($modSettings['mentions_enabled']))
@@ -508,13 +508,13 @@ function template_quickreply_below()
 				add_elk_mention(\'#message\');';
 
 			echo '
-			// ]]></script>';
+			</script>';
 		}
 	}
 
 	// Finally enable the quick reply quote function
 	echo '
-		<script><!-- // --><![CDATA[
+		<script>
 			var oQuickReply = new QuickReply({
 				bDefaultCollapsed: ', empty($context['minmax_preferences']['qreply']) ? 'false' : 'true', ',
 				iTopicId: ', $context['current_topic'], ',
@@ -542,7 +542,7 @@ function template_quickreply_below()
 					sCookieName: \'elk_qreply\'
 				}
 			});
-		// ]]></script>';
+		</script>';
 
 	// Spell check for quick modify and quick reply (w/o the editor)
 	if ($context['show_spellchecking'])
@@ -554,7 +554,7 @@ function template_quickreply_below()
 
 	// Quick moderation options
 	echo '
-			<script><!-- // --><![CDATA[';
+			<script>';
 
 	if (!empty($options['display_quick_mod']) && $options['display_quick_mod'] == 1 && $context['can_remove_post'])
 		echo '
@@ -648,7 +648,7 @@ function template_quickreply_below()
 				ignore_toggles([', implode(', ', $ignoredMsgs), '], ', JavaScriptEscape($txt['show_ignore_user_post']), ');';
 
 	echo '
-			// ]]></script>';
+			</script>';
 }
 
 /**
@@ -810,7 +810,7 @@ function template_pages_and_buttons_below()
 	// Show the jump-to box, or actually...let Javascript do it.
 	echo '
 			<div id="display_jump_to">&nbsp;</div>
-			<script><!-- // --><![CDATA[
+			<script>
 				aJumpTo[aJumpTo.length] = new JumpTo({
 					sContainerId: "display_jump_to",
 					sJumpToTemplate: "<label class=\"smalltext\" for=\"%select_id%\">', $context['jump_to']['label'], ':<" + "/label> %dropdown_list%",
@@ -823,7 +823,7 @@ function template_pages_and_buttons_below()
 					sCatPrefix: "",
 					sGoButtonLabel: "', $txt['go'], '"
 				});
-			// ]]></script>';
+			</script>';
 }
 
 /**

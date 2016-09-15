@@ -155,7 +155,7 @@ function template_new_group()
 	{
 		// Enable / disable the required posts box when the group type is post based
 		echo '
-			<script><!-- // --><![CDATA[
+			<script>
 				function swapPostGroup(isChecked)
 				{
 					var min_posts_text = document.getElementById(\'min_posts_text\');
@@ -165,7 +165,7 @@ function template_new_group()
 				}
 
 				swapPostGroup(', $context['post_group'] ? 'true' : 'false', ');
-			// ]]></script>';
+			</script>';
 	}
 
 	echo '
@@ -518,13 +518,13 @@ function template_add_edit_group_boards_list($form_id, $collapse = true)
 	// select_all_box is hidden and it's made available only if js is enabled
 	echo '
 							</fieldset>
-							<script><!-- // --><![CDATA[
+							<script>
 								$(document).ready(function () {
 									$(".select_all_box").each(function () {
 										$(this).show();
 									});
 								});
-							// ]]></script>';
+							</script>';
 }
 
 /**

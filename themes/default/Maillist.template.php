@@ -48,7 +48,7 @@ function template_bounce_email()
 
 	// Build the "it bounced" javascript ....
 	echo '
-	<script><!-- // --><![CDATA[
+	<script>
 		// Disable notification boxes as required.
 		function modifyWarnNotify()
 		{
@@ -78,7 +78,7 @@ function template_bounce_email()
 	echo '
 		}
 
-	// ]]></script>';
+	</script>';
 
 	echo '
 	<form id="admin_form_wrapper" action="', $scripturl, '?action=admin;area=maillist;sa=bounce" method="post" class="flow_hidden" accept-charset="UTF-8">
@@ -152,9 +152,9 @@ function template_bounce_email()
 
 	// kick off the javascript.
 	echo '
-	<script><!-- // --><![CDATA[
+	<script>
 		modifyWarnNotify();
-	// ]]></script>';
+	</script>';
 }
 
 /**
@@ -299,11 +299,11 @@ function template_bounce_template()
 			</div>
 		</div>
 	</form>
-	<script><!-- // --><![CDATA[
+	<script>
 		$(function() {
 			$("#preview_button").click(function() {
 				return ajax_getEmailTemplatePreview();
 			});
 		});
-	// ]]></script>';
+	</script>';
 }

@@ -22,7 +22,7 @@ function template_core_features()
 
 	// @todo move all this javascript to a file
 	echo '
-	<script><!-- // --><![CDATA[
+	<script>
 		var token_name,
 			token_value,
 			feature_on_text = ', JavaScriptEscape($txt['core_settings_switch_off']), ',
@@ -108,7 +108,7 @@ function template_core_features()
 				})
 			});
 		});
-	// ]]></script>
+	</script>
 	<div id="admincenter">';
 
 	if ($context['is_new_install'])

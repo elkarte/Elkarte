@@ -142,7 +142,7 @@ function template_permission_index()
 
 		// Javascript for the advanced stuff.
 		echo '
-	<script><!-- // --><![CDATA[
+	<script>
 		var oPermissionsPanelToggle = new elk_Toggle({
 			bToggleEnabled: true,
 			bCurrentlyCollapsed: ', empty($context['admin_preferences']['app']) ? 'false' : 'true', ',
@@ -196,7 +196,7 @@ function template_permission_index()
 
 			return true;
 		}
-	// ]]></script>';
+	</script>';
 
 		if (!empty($context['profile']))
 			echo '
@@ -297,9 +297,9 @@ function template_by_board()
 	else
 		echo '
 				<a class="edit_all_board_profiles linkbutton" href="', $scripturl, '?action=admin;area=permissions;sa=board;edit;', $context['session_var'], '=', $context['session_id'], '">', $txt['permissions_board_all'], '</a>
-				<script><!-- // --><![CDATA[
+				<script>
 					initEditProfileBoards();
-				// ]]></script>';
+				</script>';
 
 	echo '
 				<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />
@@ -402,9 +402,9 @@ function template_edit_profiles()
 				<input type="submit" name="create" value="', $txt['permissions_profile_new_create'], '" class="right_submit" />
 			</div>
 		</form>
-		<script><!-- // --><![CDATA[
+		<script>
 			initEditPermissionProfiles();
-		// ]]></script>
+		</script>
 	</div>';
 }
 
@@ -426,7 +426,7 @@ function template_modify_group()
 	else
 	{
 		echo '
-		<script><!-- // --><![CDATA[
+		<script>
 			window.elk_usedDeny = false;
 
 			function warnAboutDeny()
@@ -436,7 +436,7 @@ function template_modify_group()
 				else
 					return true;
 			}
-		// ]]></script>';
+		</script>';
 	}
 
 	echo '
