@@ -870,7 +870,7 @@ function copyBoardPermission($copy_from, $groups, $profile_id, $non_guest_permis
 			if ($group_id == -1 && in_array($perm, $non_guest_permissions))
 				continue;
 
-			$inserts[] = array($perm, $group_id, $profile_id, $add_deny);
+			$inserts[] = array($perm, $group_id, $add_deny, $profile_id);
 		}
 	}
 
@@ -888,13 +888,8 @@ function copyBoardPermission($copy_from, $groups, $profile_id, $non_guest_permis
 	// And insert the copied permissions.
 	if (!empty($inserts))
 	{
-		// ..and insert the new ones.
-		$db->insert('',
-			'{db_prefix}board_permissions',
-			array('permission' => 'string', 'id_group' => 'int', 'id_profile' => 'int', 'add_deny' => 'int'),
-			$inserts,
-			array('permission', 'id_group', 'id_profile')
-		);
+		require_once(SUBSDIR . '/ManagePermissions.subs.php');
+		replaceBoardPermission($inserts);
 	}
 }
 
