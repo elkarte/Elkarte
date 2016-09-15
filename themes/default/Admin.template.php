@@ -760,7 +760,7 @@ function template_edit_censored()
 		</form>
 	</div>
 	<script><!-- // --><![CDATA[
-		$(document).ready(function() {
+		$(function() {
 			$("#preview_button").click(function() {
 				return ajax_getCensorPreview();
 			});

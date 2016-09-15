@@ -300,7 +300,7 @@ function template_bounce_template()
 		</div>
 	</form>
 	<script><!-- // --><![CDATA[
-		$(document).ready(function() {
+		$(function() {
 			$("#preview_button").click(function() {
 				return ajax_getEmailTemplatePreview();
 			});

@@ -156,7 +156,7 @@ function template_control_richedit($editor_id, $smileyContainer = null, $bbcCont
 				$editor_container["' . $editor_id . '"].find("textarea, iframe").addClass("border_error");' : '', '
 		}
 
-		$(document).ready(function(){
+		$(function() {
 			elk_editor();
 		});
 

@@ -463,7 +463,7 @@ class Theme extends \Theme
 			loadJavascriptFile('prettify.min.js', array('defer' => true));
 
 			addInlineJavascript('
-			$(document).ready(function(){
+			$(function() {
 				prettyPrint();
 			});', true);
 		}
@@ -682,7 +682,7 @@ class Theme extends \Theme
 		if ($context['show_pm_popup'])
 		{
 			addInlineJavascript('
-			$(document).ready(function(){
+			$(function() {
 				new smc_Popup({
 					heading: ' . JavaScriptEscape($txt['show_personal_messages_heading']) . ',
 					content: ' . JavaScriptEscape(sprintf($txt['show_personal_messages'], $context['user']['unread_messages'], $scripturl . '?action=pm')) . ',

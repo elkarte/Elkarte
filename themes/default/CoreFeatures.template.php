@@ -28,7 +28,7 @@ function template_core_features()
 			feature_on_text = ', JavaScriptEscape($txt['core_settings_switch_off']), ',
 			feature_off_text = ', JavaScriptEscape($txt['core_settings_switch_on']), ';
 
-		$(document).ready(function() {
+		$(function() {
 			$(".core_features_hide").css(\'display\', \'none\');
 			$(".core_features_img").show().css({\'cursor\': \'pointer\'}).each(function() {
 				var sImageText = $(this).hasClass(\'on\') ? feature_on_text : feature_off_text;
