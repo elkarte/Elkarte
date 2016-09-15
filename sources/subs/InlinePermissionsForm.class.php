@@ -23,6 +23,11 @@ class Inline_Permissions_Form
 	/**
 	 * @var string[]
 	 */
+	private $permissionList = array();
+
+	/**
+	 * @var string[]
+	 */
 	private $illegal_permissions = array();
 
 	/**
