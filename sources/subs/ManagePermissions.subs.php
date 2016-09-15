@@ -501,7 +501,7 @@ function loadAllPermissions()
 
 	// We need to know what permissions we can't give to guests.
 	$permissionsObject = new Permissions;
-	$illegal_permissions = $permissionsObject->getIllegalGuestPermissions();
+	$illegal_guest_permissions = $permissionsObject->getIllegalGuestPermissions();
 
 	// Some permissions are hidden if features are off.
 	$hiddenPermissions = array();
@@ -828,7 +828,7 @@ function copyPermission($copy_from, $groups, $illegal_permissions, $non_guest_pe
 	{
 		// ..and insert the new ones.
 		require_once(SUBSDIR . '/ManagePermissions.subs.php');
-		replacePermission($permChange);
+		replacePermission($inserts);
 	}
 }
 
