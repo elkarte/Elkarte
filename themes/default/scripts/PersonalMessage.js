@@ -437,7 +437,8 @@ function addActionOption()
 	var label_option = '',
 		index = '';
 
-	labels = JSON.parse(labels);
+	if (typeof labels === "string")
+		labels = JSON.parse(labels);
 	for (index in labels)
 		label_option += '<option value="' + index + '">' + labels[index] + '</option>';
 

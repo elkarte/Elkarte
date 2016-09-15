@@ -1395,7 +1395,7 @@ function template_add_rule()
 				<a id="addonjs1" class="linkbutton hide" href="#" onclick="addCriteriaOption(); return false;">', $txt['pm_rule_criteria_add'], '</a>
 				<br /><br />
 				', $txt['pm_rule_logic'], ':
-				<select name="rule_logic" id="logic"">
+				<select name="rule_logic" id="logic">
 					<option value="and" ', $context['rule']['logic'] == 'and' ? 'selected="selected"' : '', '>', $txt['pm_rule_logic_and'], '</option>
 					<option value="or" ', $context['rule']['logic'] == 'or' ? 'selected="selected"' : '', '>', $txt['pm_rule_logic_or'], '</option>
 				</select>
