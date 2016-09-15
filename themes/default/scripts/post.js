@@ -358,7 +358,7 @@ function onDocSent(XMLDoc)
 		$().linkifyvideo(oEmbedtext, 'preview_body');
 
 	// Spoilers, Sweetie
-	$('.spoilerheader').click(function(){
+	$('.spoilerheader').on('click', function(){
 		$(this).next().children().slideToggle("fast");
 	});
 

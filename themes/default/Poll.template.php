@@ -22,13 +22,13 @@ function template_poll_edit()
 
 	// Some javascript for adding more options.
 	echo '
-	<script><!-- // --><![CDATA[
+	<script>
 		var pollOptionNum = 0,
 			pollTabIndex = null,
 			pollOptionId = ', $context['last_choice_id'], ',
 			txt_option = "', $txt['option'], '",
 			form_name = \'postmodify\';
-	// ]]></script>';
+	</script>';
 
 	if (!empty($context['form_url']))
 		echo '

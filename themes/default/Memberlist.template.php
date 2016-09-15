@@ -47,10 +47,10 @@ function template_mlsearch_above()
 	template_pagesection('memberlist_buttons', 'right', array('extra' => $extra));
 
 	echo '
-	<script><!-- // --><![CDATA[
+	<script>
 		// Removes the nojs class to properly style the dropdown according to js availability
 		$(\'#mlsearch_options\').removeClass(\'nojs\');
-	// ]]></script>';
+	</script>';
 }
 
 /**

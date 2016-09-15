@@ -423,7 +423,7 @@ function template_edit_options()
 
 	// Some javascript!
 	echo '
-		<script><!-- // --><![CDATA[
+		<script>
 			function checkProfileSubmit()
 			{';
 
@@ -444,7 +444,7 @@ function template_edit_options()
 
 	echo '
 			}
-		// ]]></script>';
+		</script>';
 
 	// Any final spellchecking stuff?
 	if (!empty($context['show_spellchecking']))
@@ -941,7 +941,7 @@ function template_groupMembership()
 
 		// Javascript for the selector stuff.
 		echo '
-		<script><!-- // --><![CDATA[
+		<script>
 			var prevClass = "",
 				prevDiv = "";';
 
@@ -950,7 +950,7 @@ function template_groupMembership()
 			initHighlightSelection("primdiv_' . $context['primary_group'] . '");';
 
 		echo '
-		// ]]></script>';
+		</script>';
 	}
 
 	if (!empty($context['token_check']))
@@ -1108,16 +1108,16 @@ function template_profile_signature_modify()
 
 	// Some javascript used to count how many characters have been used so far in the signature.
 	echo '
-								<script><!-- // --><![CDATA[
+								<script>
 									var maxLength = ', $context['signature_limits']['max_length'], ';
 
-									$(document).ready(function() {
+									$(function() {
 										calcCharLeft();
 										$("#preview_button").click(function() {
 											return ajax_getSignaturePreview(true);
 										});
 									});
-								// ]]></script>
+								</script>
 							</dd>';
 }
 
@@ -1230,7 +1230,7 @@ function template_profile_avatar_select()
 	}
 
 	echo '
-								<script><!-- // --><![CDATA[
+								<script>
 									var files = ["' . implode('", "', $context['avatar_list']) . '"],
 										cat = document.getElementById("cat"),
 										file = document.getElementById("file"),
@@ -1242,7 +1242,7 @@ function template_profile_avatar_select()
 
 									// Display the right avatar box based on what they are using
 									init_avatars();
-								// ]]></script>
+								</script>
 							</dd>';
 }
 
@@ -1418,7 +1418,7 @@ function template_authentication_method()
 
 	// The password stuff.
 	echo '
-	<script><!-- // --><![CDATA[
+	<script>
 		var regTextStrings = {
 			"password_short": "', $txt['registration_password_short'], '",
 			"password_reserved": "', $txt['registration_password_reserved'], '",
@@ -1430,5 +1430,5 @@ function template_authentication_method()
 		var currentAuthMethod = \'passwd\';
 
 		updateAuthMethod();
-	// ]]></script>';
+	</script>';
 }

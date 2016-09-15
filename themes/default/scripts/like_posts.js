@@ -158,9 +158,9 @@
 				else if ((e.type === 'keyup' && e.keyCode === 27) || e.type === 'click') {
 					var $floating_error = $('.floating_error');
 					$floating_error.remove();
-					$floating_error.unbind('click');
-					$(document).unbind('click', removeOverlay);
-					$(document).unbind('keyup', removeOverlay);
+					$floating_error.off('click');
+					$(document).off('click', removeOverlay);
+					$(document).off('keyup', removeOverlay);
 				}
 			};
 
@@ -678,7 +678,7 @@
 	this.likePostStats = likePostStats;
 
 	// Setup the menu to act as ajax tabs
-	$(document).ready(function() {
+	$(function() {
 		$(".like_post_stats_menu a").on("click", function (e) {
 			if (e) {
 				e.preventDefault();

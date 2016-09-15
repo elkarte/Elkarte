@@ -61,8 +61,8 @@ function template_lp_stats()
 	echo '
 		</div>';
 
-	echo '<script defer="defer"><!-- // --><![CDATA[
-		$(document).ready(function() {
+	echo '<script defer="defer">
+		$(function() {
 			likePostStats.prototype.init({
 				txtStrings: {
 					topic: ' . JavaScriptEscape($txt['like_post_topic']) . ',
@@ -97,5 +97,5 @@ function template_lp_stats()
 				}
 			});
 		})
-	// ]]></script>';
+	</script>';
 }

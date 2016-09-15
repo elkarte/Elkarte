@@ -412,7 +412,7 @@ function template_registration_form()
 			<input type="hidden" name="step" value="2" />
 		</form>
 
-		<script><!-- // --><![CDATA[
+		<script>
 			var regTextStrings = {
 				"username_valid": "', $txt['registration_username_available'], '",
 				"username_invalid": "', $txt['registration_username_unavailable'], '",
@@ -427,7 +427,7 @@ function template_registration_form()
 
 			// Update the authentication status.
 			updateAuthMethod();
-		// ]]></script>';
+		</script>';
 }
 
 /**

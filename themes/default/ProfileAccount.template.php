@@ -23,7 +23,7 @@ function template_issueWarning()
 	template_load_warning_variables();
 
 	echo '
-	<script><!-- // --><![CDATA[
+	<script>
 	var barWidth = ', $context['warningBarWidth'], ',
 		currentLevel = ', $context['member']['warning'], ',
 		minLimit = ', $context['min_allowed'], ',
@@ -54,7 +54,7 @@ function template_issueWarning()
 		echo $limit, ' :"', strtr($type['body'], array('"' => "'", "\n" => '\\n', "\r" => '')), '", ';
 
 	echo '};
-	// ]]></script>';
+	</script>';
 
 	echo '
 	<form action="', $scripturl, '?action=profile;u=', $context['id_member'], ';area=issuewarning" method="post" class="flow_hidden" accept-charset="UTF-8">
@@ -105,9 +105,9 @@ function template_issueWarning()
 						<input type="text" id="warning_level" name="warning_level" size="6" maxlength="4" value="', $context['member']['warning'], '" class="input_text" />&nbsp;', $txt['profile_warning_max'], '
 						<div id="slider-range-min"></div>
 
-						<script><!-- // --><![CDATA[
+						<script>
 							initWarnSlider("slider-range-min", "warning_level", [', implode(',', array_keys($context['level_effects'])), ']);
-						// ]]></script>
+						</script>
 					</div>
 				</dd>';
 
@@ -190,7 +190,7 @@ function template_issueWarning()
 
 	// Do our best to get pretty javascript enabled.
 	echo '
-	<script><!-- // --><![CDATA[
+	<script>
 		document.getElementById(\'preview_button\').style.display = "none";';
 
 	if (!$context['user']['is_owner'])
@@ -198,7 +198,7 @@ function template_issueWarning()
 		modifyWarnNotify();';
 
 	echo '
-	// ]]></script>';
+	</script>';
 }
 
 /**

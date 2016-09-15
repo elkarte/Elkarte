@@ -233,7 +233,7 @@
 					triggerEvt('RemoveSuccess', options.control, [dataToSend.attachid]);
 
 					// Done with this one, so remove it from existence
-					$('#' + dataToSend.attachid).unbind().remove();
+					$('#' + dataToSend.attachid).off().remove();
 				} else if ('console' in window)
 					window.console.info(resp.data);
 			}).fail(function(jqXHR, textStatus, errorThrown) {
@@ -293,7 +293,7 @@
 			this.setAbort = function(jqxhr) {
 				var sb = $control;
 
-				$button.bind('click', function(e) {
+				$button.on('click', function(e) {
 					e.preventDefault();
 					jqxhr.abort();
 					sb.hide();
@@ -326,7 +326,7 @@
 		* @param {object} obj parent object in which file progress is shown
 		*/
 		fileUploadedInterface = function($control, $button, data) {
-			$button.unbind('click');
+			$button.off('click');
 			$button.removeClass('abort fa-times-circle').addClass('remove fa-minus-circle');
 
 			// Update the uploaded file with its ID
@@ -346,7 +346,7 @@
 			$progressbar.remove();
 
 			// Provide a way to remove a file that has been sent by mistake
-			$button.bind('click', function(e) {
+			$button.on('click', function(e) {
 				e.preventDefault();
 
 				var fileNum = e.target.id;
@@ -557,7 +557,7 @@
 		/**
 		* Initialize the drag and drop function!
 		*/
-		$(document).ready(function() {
+		$(function() {
 			var obj = $(".drop_area");
 
 			// Make sure the browser supports this

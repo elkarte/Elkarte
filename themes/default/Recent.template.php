@@ -50,9 +50,9 @@ function template_recent()
 
 	if (!empty($context['using_relative_time']))
 		echo '
-		<script><!-- // --><![CDATA[
+		<script>
 			$(\'.topic_latest\').addClass(\'relative\');
-		// ]]></script>';
+		</script>';
 }
 
 /**
@@ -208,9 +208,9 @@ function template_unread_below()
 
 		if (!empty($context['using_relative_time']))
 			echo '
-			<script><!-- // --><![CDATA[
+			<script>
 				$(\'.topic_latest\').addClass(\'relative\');
-			// ]]></script>';
+			</script>';
 
 		echo '
 		</div>';

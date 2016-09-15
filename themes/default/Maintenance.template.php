@@ -159,7 +159,7 @@ function template_maintain_members()
 	global $context, $txt, $scripturl;
 
 	echo '
-	<script><!-- // --><![CDATA[
+	<script>
 		var maintain_members_choose = \'', $txt['maintain_members_choose'], '\',
 			maintain_members_all = \'', $txt['maintain_members_all'], '\',
 			reattribute_confirm = \'', addcslashes($txt['reattribute_confirm'], "'"), '\',
@@ -169,7 +169,7 @@ function template_maintain_members()
 			membersSwap = false;
 
 		setTimeout(function() {checkAttributeValidity();}, 500);
-	// ]]></script>
+	</script>
 	<div id="manage_maintenance">';
 
 	// If maintenance has finished tell the user.
@@ -257,7 +257,7 @@ function template_maintain_members()
 		</form>
 	</div>
 
-	<script><!-- // --><![CDATA[
+	<script>
 		var oAttributeMemberSuggest = new smc_AutoSuggest({
 			sSelf: \'oAttributeMemberSuggest\',
 			sSessionId: elk_session_id,
@@ -268,7 +268,7 @@ function template_maintain_members()
 			sTextDeleteItem: \'', $txt['autosuggest_delete_item'], '\',
 			bItemList: false
 		});
-	// ]]></script>';
+	</script>';
 }
 
 /**

@@ -345,9 +345,9 @@ function template_email_members_send()
 		</form>
 	</div>
 
-	<script><!-- // --><![CDATA[
+	<script>
 		doAutoSubmit(2, ', JavaScriptEscape($txt['email_continue']), ');
-	// ]]></script>';
+	</script>';
 }
 
 /**

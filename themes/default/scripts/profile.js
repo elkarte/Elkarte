@@ -14,7 +14,7 @@
  * This file contains javascript associated with the user profile
  */
 
-$(document).ready(function() {
+$(function() {
 	// Profile options changing karma
 	$('#karma_good, #karma_bad').keyup(function() {
 		var good = parseInt($('#karma_good').val()),
@@ -145,7 +145,7 @@ function ajax_getSignaturePreview(showPreview)
 				$("#" + signatures[i] + "_signature_display").css({display:"block"}).html($(request).find('[type="' + signatures[i] + '"]').text() + '<hr />');
 			}
 
-			$('.spoilerheader').click(function(){
+			$('.spoilerheader').on('click', function(){
 				$(this).next().children().slideToggle("fast");
 			});
 		}
@@ -290,7 +290,7 @@ function previewExternalAvatar(src)
 	oSid.src = src;
 
 	// Create an in-memory element to measure the real size of the image
-	$('<img />').load(function() {
+	$('<img />').on('load', function() {
 		if (refuse_too_large && ((maxWidth !== 0 && this.width > maxWidth) || (maxHeight !== 0 && this.height > maxHeight)))
 			$('#avatar_external').addClass('error');
 		else
@@ -312,7 +312,7 @@ function modifyWarnNotify()
 	document.getElementById('new_template_link').style.display = disable ? 'none' : 'inline-block';
 	document.getElementById('preview_button').style.display = disable ? 'none' : 'inline-block';
 
-	$("#preview_button").click(function() {
+	$("#preview_button").on('click', function() {
 		$.ajax({
 			type: "POST",
 			url: elk_scripturl + "?action=xmlpreview;xml",

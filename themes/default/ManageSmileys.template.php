@@ -215,13 +215,13 @@ function template_modifysmiley()
 		</form>
 	</div>
 
-	<script><!-- // --><![CDATA[
+	<script>
 		function updatePreview()
 		{
 			var currentImage = document.getElementById("preview");
 			currentImage.src = "', $modSettings['smileys_url'], '/" + document.forms.smileyForm.set.value + "/" + document.forms.smileyForm.smiley_filename.value;
 		}
-	// ]]></script>';
+	</script>';
 }
 
 /**
@@ -426,7 +426,7 @@ function template_setorder()
 
 	echo '
 	</div>
-	<script><!-- // --><![CDATA[
+	<script>
 		$().elkSortable({
 			sa: "smileyorder",
 			error: "' . $txt['admin_order_error'] . '",
@@ -439,7 +439,7 @@ function template_setorder()
 			placeholder: "ui-state-highlight",
 			token: {token_var: "' . $context['admin-sort_token_var'] . '", token_id: "' . $context['admin-sort_token'] . '"}
 		});
-	// ]]></script>';
+	</script>';
 }
 
 /**

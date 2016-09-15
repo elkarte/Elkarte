@@ -31,7 +31,7 @@ function template_postarea_above()
 
 	// Start the javascript...
 	echo '
-		<script><!-- // --><![CDATA[';
+		<script>';
 
 	// When using Go Back due to fatal_error, allow the form to be re-submitted with changes.
 	if (isBrowser('is_firefox'))
@@ -49,7 +49,7 @@ function template_postarea_above()
 
 	// End of the javascript
 	echo '
-		// ]]></script>';
+		</script>';
 
 	// Start the form and display the link tree.
 	echo '
@@ -388,13 +388,13 @@ function template_add_new_attachments()
 		// Show more boxes if they aren't approaching that limit.
 		if ($context['attachments']['num_allowed'] > 1)
 			echo '
-								<script><!-- // --><![CDATA[
+								<script>
 									var allowed_attachments = ', $context['attachments']['num_allowed'], ',
 										current_attachment = 1,
 										txt_more_attachments_error = "', $txt['more_attachments_error'], '",
 										txt_more_attachments = "', $txt['more_attachments'], '",
 										txt_clean_attach = "', $txt['clean_attach'], '";
-								// ]]></script>
+								</script>
 							</dd>
 							<dd class="smalltext drop_attachments_no_js" id="moreAttachments"><a href="#" onclick="addAttachment(); return false;">(', $txt['more_attachments'], ')</a></dd>';
 		else
@@ -523,7 +523,7 @@ function template_load_drafts_below()
 
 	// Code for showing and hiding drafts
 	echo '
-		<script><!-- // --><![CDATA[
+		<script>
 			var oSwapDraftOptions = new elk_Toggle({
 				bToggleEnabled: true,
 				bCurrentlyCollapsed: ', empty($context['minmax_preferences']['draft']) ? 'false' : 'true', ',
@@ -554,7 +554,7 @@ function template_load_drafts_below()
 					sAdditionalVars: \';minmax_key=draft\'
 				},
 			});
-		// ]]></script>';
+		</script>';
 }
 
 /**
@@ -611,7 +611,7 @@ function template_topic_replies_below()
 
 		echo '
 		</div>
-		<script><!-- // --><![CDATA[
+		<script>
 			var aIgnoreToggles = new Array();';
 
 		foreach ($ignored_posts as $post_id)
@@ -635,7 +635,7 @@ function template_topic_replies_below()
 		}
 
 		echo '
-		// ]]></script>';
+		</script>';
 	}
 }
 
@@ -692,7 +692,7 @@ function template_postarea_below()
 
 	// The variables used to preview a post without loading a new page.
 	echo '
-		<script><!-- // --><![CDATA[
+		<script>
 			var form_name = "postmodify",
 				preview_area = "post",
 				current_board = ', empty($context['current_board']) ? 'null' : $context['current_board'], ',
@@ -750,7 +750,7 @@ function template_postarea_below()
 			});';
 
 	echo '
-		// ]]></script>';
+		</script>';
 
 	template_topic_replies_below();
 }
@@ -797,16 +797,16 @@ function template_spellcheck()
 
 	// As you may expect - we need a lot of javascript for this... load it from the separate files.
 	echo '
-		<script><!-- // --><![CDATA[
+		<script>
 			var spell_formname = window.opener.spell_formname,
 				spell_fieldname = window.opener.spell_fieldname,
 				spell_full = window.opener.spell_full;
-		// ]]></script>
+		</script>
 		<script src="', $settings['default_theme_url'], '/scripts/spellcheck.js"></script>
 		<script src="', $settings['default_theme_url'], '/scripts/script.js"></script>
-		<script><!-- // --><![CDATA[
+		<script>
 			', $context['spell_js'], '
-		// ]]></script>
+		</script>
 	</head>
 	<body onload="nextWord(false);">
 		<form action="#" method="post" accept-charset="UTF-8" name="spellingForm" id="spellingForm" onsubmit="return false;" style="margin: 0;">

@@ -327,7 +327,7 @@ function template_topic_listing_below()
 		template_basicicons_legend();
 
 	echo '
-			<script><!-- // --><![CDATA[';
+			<script>';
 
 	if (!empty($context['using_relative_time']))
 		echo '
@@ -364,15 +364,15 @@ function template_topic_listing_below()
 					sCatClass: "jump_to_header",
 					sGoButtonLabel: "', $txt['quick_mod_go'], '"
 				});
-			// ]]></script>
+			</script>
 	</footer>';
 
 	// Javascript for inline editing.
 	echo '
-	<script><!-- // --><![CDATA[
+	<script>
 		var oQuickModifyTopic = new QuickModifyTopic({
 			aHidePrefixes: Array("lockicon", "stickyicon", "pages", "newicon"),
 			bMouseOnDiv: false
 		});
-	// ]]></script>';
+	</script>';
 }

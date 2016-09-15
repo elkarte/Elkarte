@@ -334,7 +334,7 @@ function template_view_package()
 
 	// Toggle options.
 	echo '
-	<script><!-- // --><![CDATA[
+	<script>
 		var aOperationElements = new Array();';
 
 	// Operations.
@@ -363,11 +363,11 @@ function template_view_package()
 	}
 
 	echo '
-	// ]]></script>';
+	</script>';
 
 	// Get the currently selected item from a select list
 	echo '
-	<script><!-- // --><![CDATA[
+	<script>
 	function get_selected(id)
 	{
 		var aSelected = document.getElementById(id);
@@ -378,17 +378,17 @@ function template_view_package()
 		}
 		return aSelected.options[0];
 	}
-	// ]]></script>';
+	</script>';
 
 	// And a bit more for database changes.
 	if ($context['uninstalling'] && !empty($context['database_changes']))
 		echo '
-	<script><!-- // --><![CDATA[
+	<script>
 		var database_changes_area = document.getElementById(\'db_changes_div\'),
 			db_vis = false;
 
 		database_changes_area.style.display = "none";
-	// ]]></script>';
+	</script>';
 }
 
 /**
@@ -401,14 +401,14 @@ function template_extract_package()
 	if (!empty($context['redirect_url']))
 	{
 		echo '
-	<script><!-- // --><![CDATA[
+	<script>
 		setTimeout(function() {doRedirect();}, ', $context['redirect_timeout'], ');
 
 		function doRedirect()
 		{
 			window.location = "', $context['redirect_url'], '";
 		}
-	// ]]></script>';
+	</script>';
 	}
 
 	echo '
@@ -676,18 +676,18 @@ function template_control_chmod()
 	// Hide the details of the list.
 	if (empty($context['package_ftp']['form_elements_only']))
 		echo '
-		<script><!-- // --><![CDATA[
+		<script>
 			document.getElementById(\'need_writable_list\').style.display = \'none\';
-		// ]]></script>';
+		</script>';
 
 	// Set up to generate the FTP test button.
 	echo '
-	<script><!-- // --><![CDATA[
+	<script>
 		var generatedButton = false,
 			package_ftp_test = "', $txt['package_ftp_test'], '",
 			package_ftp_test_connection = "', $txt['package_ftp_test_connection'], '",
 			package_ftp_test_failed = "', addcslashes($txt['package_ftp_test_failed'], "'"), '";
-	// ]]></script>';
+	</script>';
 
 	// Make sure the button gets generated last.
 	addInlineJavascript('
@@ -749,7 +749,7 @@ function template_file_permissions()
 	// This will handle expanding the selection.
 	// @todo most of this code should go in to admin.js
 	echo '
-	<script><!-- // --><![CDATA[
+	<script>
 		var oRadioColors = {
 			0: "#D1F7BF",
 			1: "#FFBBBB",
@@ -952,7 +952,7 @@ function template_file_permissions()
 
 			curCol.appendChild(curInput);
 		}
-	// ]]></script>';
+	</script>';
 
 	echo '
 	<div class="warningbox">
@@ -1151,9 +1151,9 @@ function template_permission_show_contents($ident, $contents, $level, $has_more 
 		if ($level > 1 && !$isFound)
 			echo '
 		</tbody>
-		</table><script><!-- // --><![CDATA[
+		</table><script>
 			expandFolder(\'', $js_ident, '\', \'\');
-		// ]]></script>
+		</script>
 		<table class="table_grid">
 			<tbody>
 			<tr class="hide">
@@ -1248,7 +1248,7 @@ function template_pause_action_permissions()
 
 	// Just the countdown stuff
 	echo '
-	<script><!-- // --><![CDATA[
+	<script>
 		doAutoSubmit(', $countDown, ', ', JavaScriptEscape($txt['not_done_continue']), ');
-	// ]]></script>';
+	</script>';
 }

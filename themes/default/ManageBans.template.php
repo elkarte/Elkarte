@@ -184,7 +184,7 @@ function template_ban_edit()
 	// Auto suggest only needed for adding new bans, not editing
 	if (!empty($context['use_autosuggest']))
 		echo '
-	<script><!-- // --><![CDATA[
+	<script>
 		var oAddMemberSuggest = new smc_AutoSuggest({
 			sSelf: \'oAddMemberSuggest\',
 			sSessionId: elk_session_id,
@@ -197,7 +197,7 @@ function template_ban_edit()
 		});
 
 		oAddMemberSuggest.registerCallback(\'onBeforeUpdate\', \'onUpdateName\');
-	// ]]></script>';
+	</script>';
 }
 
 /**
@@ -265,7 +265,7 @@ function template_ban_edit_trigger()
 		</form>
 	</div>
 
-	<script><!-- // --><![CDATA[
+	<script>
 		var oAddMemberSuggest = new smc_AutoSuggest({
 			sSelf: \'oAddMemberSuggest\',
 			sSessionId: elk_session_id,
@@ -278,5 +278,5 @@ function template_ban_edit_trigger()
 		});
 
 		oAddMemberSuggest.registerCallback(\'onBeforeUpdate\', \'onUpdateName\');
-	// ]]></script>';
+	</script>';
 }

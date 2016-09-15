@@ -71,9 +71,9 @@ function template_ask()
 						<label for="move_new_topic">
 							<input type="checkbox" name="move_new_topic" id="move_new_topic" onclick="document.getElementById(\'board_list\').style.display = this.checked ? \'\' : \'none\';" /> ', $txt['splittopic_move'], '
 						</label>', template_select_boards('move_to_board'), '
-						<script><!-- // --><![CDATA[
+						<script>
 							document.getElementById(\'board_list\').style.display = \'none\';
-						// ]]></script>
+						</script>
 					</p>';
 
 	echo '
@@ -185,7 +185,7 @@ function template_select()
 		</form>
 	</div>
 
-	<script><!-- // --><![CDATA[
+	<script>
 		var start = [],
 			topic_subject = "', $context['topic']['subject'], '",
 			topic_id = "', $context['topic']['id'], '",
@@ -196,5 +196,5 @@ function template_select()
 
 		start[0] = ', $context['not_selected']['start'], ';
 		start[1] = ', $context['selected']['start'], ';
-	// ]]></script>';
+	</script>';
 }
