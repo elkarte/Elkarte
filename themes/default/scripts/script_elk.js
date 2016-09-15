@@ -1125,7 +1125,7 @@ errorbox_handler.prototype.init = function()
 	else
 	{
 		var current_error_handler = this.opt.self;
-		$(document).ready(function() {
+		$(function() {
 			var current_error = eval(current_error_handler);
 			$editor_data[current_error.opt.editor_id].addEvent(current_error.opt.editor_id, 'keyup', function() {
 				current_error.checkErrors();

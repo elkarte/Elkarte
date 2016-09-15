@@ -557,7 +557,7 @@
 		/**
 		* Initialize the drag and drop function!
 		*/
-		$(document).ready(function() {
+		$(function() {
 			var obj = $(".drop_area");
 
 			// Make sure the browser supports this

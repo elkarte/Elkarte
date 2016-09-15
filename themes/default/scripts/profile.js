@@ -14,7 +14,7 @@
  * This file contains javascript associated with the user profile
  */
 
-$(document).ready(function() {
+$(function() {
 	// Profile options changing karma
 	$('#karma_good, #karma_bad').keyup(function() {
 		var good = parseInt($('#karma_good').val()),

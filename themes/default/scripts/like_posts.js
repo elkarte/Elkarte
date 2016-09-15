@@ -678,7 +678,7 @@
 	this.likePostStats = likePostStats;
 
 	// Setup the menu to act as ajax tabs
-	$(document).ready(function() {
+	$(function() {
 		$(".like_post_stats_menu a").on("click", function (e) {
 			if (e) {
 				e.preventDefault();

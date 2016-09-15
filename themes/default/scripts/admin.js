@@ -995,7 +995,7 @@ function select_in_category(operation, brd_list)
  * Server Settings > Caching, toggles input fields on/off as appropriate for
  * a given cache engine selection
  */
-$(document).ready(function() {
+$(function() {
 	$('#cache_accelerator').change(function() {
 		// Hide all the settings
 		$('#cache_accelerator').find('option').each(function() {
@@ -1756,7 +1756,7 @@ function ajax_getCensorPreview()
 	return false;
 }
 
-$(document).ready(function() {
+$(function() {
 	var $headers = $("#mention").find("input[id^='notifications'][id$='[notification]']");
 
 	$headers.change(function() {
