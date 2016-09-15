@@ -908,7 +908,7 @@ function UserStatsPostingTime($memID)
 	// Find the times when the users posts
 	$result = $db->query('user_activity_by_time', '
 		SELECT
-			HOUR(FROM_UNIXTIME(poster_time + {int:time_offset})) AS hour,
+			HOUR(FROM_UNIXTIME(poster_time + {float:time_offset})) AS hour,
 			COUNT(*) AS post_count
 		FROM {db_prefix}messages
 		WHERE id_member = {int:current_member}' . ($modSettings['totalMessages'] > 100000 ? '
