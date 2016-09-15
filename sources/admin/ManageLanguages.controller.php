@@ -608,7 +608,7 @@ class ManageLanguages_Controller extends Action_Controller
 
 		// Kill the cache, as it is now invalid..
 		$cache = Cache::instance();
-		$cache->put('known_languages', null, $cache->levelLower(1) ? 86400 : 3600);
+		$cache->put('known_languages', null, $cache->maxLevel(1) ? 86400 : 3600);
 
 		createList($listOptions);
 
@@ -750,7 +750,7 @@ class ManageLanguages_Controller extends Action_Controller
 
 			// Fifth, update getLanguages() cache.
 			$cache = Cache::instance();
-			$cache->put('known_languages', null, $cache->levelLower(1) ? 86400 : 3600);
+			$cache->put('known_languages', null, $cache->maxLevel(1) ? 86400 : 3600);
 
 			// Sixth, if we deleted the default language, set us back to english?
 			if ($context['lang_id'] == $language)

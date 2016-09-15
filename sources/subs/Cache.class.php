@@ -370,29 +370,30 @@ class Cache
 	}
 
 	/**
-	 * Checks if the system level is set to a value higher or equal to the
-	 * required level of the cache request
+	 * Checks if the system level is set to a value strictly higher than the
+	 * required level of the cache request.
 	 *
 	 * @param int $level
 	 *
 	 * @return bool
 	 */
-	public function levelHigher($level)
+	public function levelHigherThan($level)
 	{
-		return $this->isEnabled() && $this->level >= $level;
+		return $this->isEnabled() && $this->level > $level;
 	}
 
 	/**
-	 * Checks if the system level is set to a value lower or equal to the
-	 * required level of the cache request
+	 * Checks if the system level is set to a value strictly lower than the
+	 * required level of the cache request.
+	 * Returns true also if the cache is disabled (it's lower than any level).
 	 *
 	 * @param int $level
 	 *
 	 * @return bool
 	 */
-	public function levelLower($level)
+	public function levelLowerThan($level)
 	{
-		return $this->isEnabled() && $this->level <= $level;
+		return !$this->isEnabled() || $this->level < $level;
 	}
 
 	/**

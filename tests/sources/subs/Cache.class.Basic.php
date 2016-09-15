@@ -116,13 +116,19 @@ class TestCache extends PHPUnit_Framework_TestCase
 
 		$cache->setLevel(2);
 		$this->assertSame(2, $cache->getLevel());
-		$this->assertFalse($cache->checkLevel(3));
-		$this->assertTrue($cache->checkLevel(2));
-		$this->assertTrue($cache->checkLevel(1));
+		$this->assertFalse($cache->levelHigherThan(3));
+		$this->assertFalse($cache->levelHigherThan(2));
+		$this->assertTrue($cache->levelHigherThan(1));
+		$this->assertTrue($cache->levelLowerThan(3));
+		$this->assertFalse($cache->levelLowerThan(2));
+		$this->assertFalse($cache->levelLowerThan(1));
 		$cache->enable(false);
-		$this->assertFalse($cache->checkLevel(3));
-		$this->assertFalse($cache->checkLevel(2));
-		$this->assertFalse($cache->checkLevel(1));
+		$this->assertFalse($cache->levelHigherThan(3));
+		$this->assertFalse($cache->levelHigherThan(2));
+		$this->assertFalse($cache->levelHigherThan(1));
+		$this->assertTrue($cache->levelLowerThan(3));
+		$this->assertTrue($cache->levelLowerThan(2));
+		$this->assertTrue($cache->levelLowerThan(1));
 		$cache->setLevel(1);
 	}
 

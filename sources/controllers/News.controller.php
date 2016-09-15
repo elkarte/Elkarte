@@ -207,14 +207,14 @@ class News_Controller extends Action_Controller
 		$cache = Cache::instance();
 
 		// Get the associative array representing the xml.
-		if ($cache->isEnabled() && (!$user_info['is_guest'] || $cache->levelHigher(3)))
+		if (!$user_info['is_guest'] || $cache->levelHigherThan(2))
 			$xml = $cache->get('xmlfeed-' . $xml_format . ':' . ($user_info['is_guest'] ? '' : $user_info['id'] . '-') . $cachekey, 240);
 
 		if (empty($xml))
 		{
 			$xml = $this->{$subActions[$subAction][0]}($xml_format);
 
-			if ($cache->isEnabled() && (($user_info['is_guest'] && $cache->levelHigher(3)) || (!$user_info['is_guest'] && (microtime(true) - $cache_t > 0.2))))
+			if ($cache->isEnabled() && (($user_info['is_guest'] && $cache->levelHigherThan(2)) || (!$user_info['is_guest'] && (microtime(true) - $cache_t > 0.2))))
 				$cache->put('xmlfeed-' . $xml_format . ':' . ($user_info['is_guest'] ? '' : $user_info['id'] . '-') . $cachekey, $xml, 240);
 		}
 

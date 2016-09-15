@@ -55,7 +55,8 @@ function getMembersOnlineStats($membersOnlineOptions)
 
 	// Get it from the cache and send it back.
 	$temp = array();
-	if (Cache::instance()->levelHigher(2) && Cache::instance()->getVar($temp, 'membersOnlineStats-' . $membersOnlineOptions['sort'], 240))
+	$cache = Cache::instance();
+	if ($cache->levelHigherThan(1) && $cache->getVar($temp, 'membersOnlineStats-' . $membersOnlineOptions['sort'], 240))
 		return $temp;
 
 	// Initialize the array that'll be returned later on.
