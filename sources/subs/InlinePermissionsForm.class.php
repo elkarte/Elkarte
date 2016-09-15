@@ -272,21 +272,16 @@ class Inline_Permissions_Form
 	{
 		foreach ($this->permissions as $permission)
 		{
+			$excluded_groups = $this->excluded_groups;
+			if (isset($permission['excluded_groups']))
+			{
+				$excluded_groups += $permission['excluded_groups'];
+			}
 			foreach ($this->excluded_groups as $group)
 			{
 				if (isset($this->context[$permission[1]][$group]))
 				{
 					unset($this->context[$permission[1]][$group]);
-				}
-			}
-			if (isset($permission['excluded_groups']))
-			{
-				foreach ($permission['excluded_groups'] as $group)
-				{
-					if (isset($this->context[$permission[1]][$group]))
-					{
-						unset($this->context[$permission[1]][$group]);
-					}
 				}
 			}
 			// Is this permission one that guests can't have?
