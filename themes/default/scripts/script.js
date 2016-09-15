@@ -319,7 +319,7 @@ smc_Popup.prototype.show = function ()
 			popup_instance.hide();
 	});
 
-	$('#' + this.popup_id).find('.hide_popup').click(function (){ return popup_instance.hide(); });
+	$('#' + this.popup_id).find('.hide_popup').on('click', function (){ return popup_instance.hide(); });
 
 	return false;
 };
@@ -1661,7 +1661,7 @@ function expandCollapse(id, icon, speed)
  */
 function initHighlightSelection(container_id)
 {
-	$('#' + container_id + ' [name="def_language"]').click(function (ev) {
+	$('#' + container_id + ' [name="def_language"]').on('click', function (ev) {
 		$('#' + container_id + ' .standard_row').removeClass('highlight2');
 		$(this).parent().parent().addClass('highlight2');
 	});

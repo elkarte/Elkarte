@@ -73,7 +73,7 @@
 				clearTimeout(this.tagID);
 				showFlash(this, eURL);
 			})
-			.click(function(e) {
+			.on('click', function(e) {
 				// single click to begin playing the video
 				e.preventDefault();
 				var tag = this;
@@ -233,7 +233,7 @@
 			links = $('[id^=msg_] a');
 
 		// Create the show/hide button
-		var showhideBtn = $('<a class="floatright" title="' + oSettings.hide_video + '"><img src="' + elk_images_url + '/selected.png"></a>').click(function() {
+		var showhideBtn = $('<a class="floatright" title="' + oSettings.hide_video + '"><img src="' + elk_images_url + '/selected.png"></a>').on('click', function() {
 				var $img = $(this).find("img"),
 					$vid = $(this).parent().next();
 

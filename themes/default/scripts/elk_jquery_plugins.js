@@ -185,7 +185,7 @@
 				menuArrowClass: 'sf-arrows'
 			},
 			outerClick = (function() {
-				$(window).load(function() {
+				$(window).on('load', function() {
 					$('body').children().on('click.superfish', function() {
 						$('.sf-js-enabled').superfish('hide', 'true');
 					});
@@ -469,7 +469,7 @@
 				menuArrowClass: 'sf-arrows'
 			},
 			outerClick = (function () {
-				$(w).load(function () {
+				$(w).on('load', function () {
 					$('body').children().on('click.superclick', function () {
 						var $allMenus = $('.sf-js-enabled');
 						$allMenus.superclick('reset');

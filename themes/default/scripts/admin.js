@@ -721,7 +721,7 @@ function make_preview_btn (preview_id)
 {
 	var $id = $("#preview_" + preview_id);
 
-	$id.text(txt_preview).click(function () {
+	$id.text(txt_preview).on('click', function () {
 		$.ajax({
 			type: "POST",
 			url: elk_scripturl + "?action=xmlpreview;xml",
@@ -1325,10 +1325,10 @@ function ajax_getTemplatePreview()
  */
 function initEditProfileBoards()
 {
-	$('.edit_all_board_profiles').click(function(e) {
+	$('.edit_all_board_profiles').on('click', function(e) {
 		e.preventDefault();
 
-		$('.edit_board').click();
+		$('.edit_board').off('click.elkarte');
 	});
 
 	$('.edit_board').show().on('click.elkarte', function(e) {
@@ -1364,10 +1364,10 @@ function initEditProfileBoards()
 			.attr('name', 'save_changes')
 			.attr('value', txt_save)
 		);
-		$icon.off('click.elkarte').click(function(e) {
+		$icon.off('click.elkarte').on('click', function(e) {
 			e.preventDefault();
 			if ($(this).hasClass('changed'))
-				$('input[name="save_changes"]').click();
+				$('input[name="save_changes"]').off('click');
 		});
 	});
 }
@@ -1386,14 +1386,14 @@ function initEditPermissionProfiles()
 	$('.rename_profile').each(function() {
 		var $this_profile = $(this);
 
-		$this_profile.after($('<a class="js-ed edit_board" />').attr('href', '#').click(function(ev) {
+		$this_profile.after($('<a class="js-ed edit_board" />').attr('href', '#').on('click', function(ev) {
 			ev.preventDefault();
 
 			// If we have already created the cancel let's skip it
 			if (!run_once)
 			{
 				run_once = true;
-				$cancel = $('<a class="js-ed-rm linkbutton" />').click(function(ev) {
+				$cancel = $('<a class="js-ed-rm linkbutton" />').on('click', function(ev) {
 					ev.preventDefault();
 
 					// js-ed is hopefully a class introduced by this function only
@@ -1432,7 +1432,7 @@ function initEditPermissionProfiles()
  */
 function initDeleteThemes()
 {
-	$(".delete_theme").bind("click", function (event) {
+	$(".delete_theme").on("click", function (event) {
 		event.preventDefault();
 		var theme_id = $(this).data("theme_id"),
 			base_url = $(this).attr("href"),

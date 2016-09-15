@@ -869,7 +869,7 @@ function setBoardIds() {
 					$(this).remove();
 				});
 
-				expandModel.click(function(e) {
+				expandModel.on('click', function(e) {
 					var $zhis = $(this);
 					e.preventDefault();
 
@@ -889,7 +889,7 @@ function setBoardIds() {
 			}
 		}
 
-		this.attr('tabindex', 0).click(function(e) {
+		this.attr('tabindex', 0).on('click', function(e) {
 			var $zhis = $(this);
 			e.preventDefault();
 
@@ -1306,7 +1306,7 @@ function toggle_mlsearch_opt()
 	$('body').on('click', mlsearch_opt_hide);
 
 	// Except clicking on the box itself or into the search text input
-	$('#mlsearch_options, #mlsearch_input').off('click', mlsearch_opt_hide).click(function(ev) {
+	$('#mlsearch_options, #mlsearch_input').off('click', mlsearch_opt_hide).on('click', function(ev) {
 		ev.stopPropagation();
 	});
 }
@@ -1411,7 +1411,7 @@ function loadAddNewPoll(button, id_board, form_name)
 		});
 
 		// Repeated collapse/expand of fieldsets as above
-		$('#poll_main legend, #poll_options legend').click(function() {
+		$('#poll_main legend, #poll_options legend').on('click', function() {
 			$(this).siblings().slideToggle("fast");
 			$(this).parent().toggleClass("collapsed");
 		}).each(function () {
@@ -1550,7 +1550,7 @@ var ElkNotifier = new ElkNotifications();
 						$trigger.addClass(opt.triggerClass);
 				}
 
-				$trigger.click(function (e) {
+				$trigger.on('click', function (e) {
 					e.preventDefault();
 
 					var ila_text = '[attach]' + attachId + '[/attach]';

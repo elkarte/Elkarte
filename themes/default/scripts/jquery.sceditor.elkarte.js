@@ -67,7 +67,7 @@
 						alt: code,
 						title: emoticon.tooltip || emoticon
 					})
-					.click(function (e) {
+					.on('click', function (e) {
 						var start = '',
 							end = '';
 
@@ -104,7 +104,7 @@
 			if (!$.isEmptyObject(this.opts.emoticons.popup))
 			{
 				this.opts.emoticons.more = this.opts.emoticons.popup;
-				moreButton = $('<div class="sceditor-more" />').text(this._('More')).click(function () {
+				moreButton = $('<div class="sceditor-more" />').text(this._('More')).on('click', function () {
 					var popup_box = $('.sceditor-smileyPopup');
 
 					if (popup_box.length > 0)
@@ -125,7 +125,7 @@
 						if (line.children().length > 0)
 							popupContent.append(line);
 
-						closeButton = $('<div id="sceditor-popup-close" />').text('[' + base._('Close') + ']').click(function () {
+						closeButton = $('<div id="sceditor-popup-close" />').text('[' + base._('Close') + ']').on('click', function () {
 							$(".sceditor-smileyPopup").fadeOut('fast');
 						});
 
@@ -154,7 +154,7 @@
 						$('.sceditor-smileyPopup').draggable({handle: '.sceditor-popup-grip'});
 
 						// stop clicks within the dropdown from being handled
-						$dropdown.click(function (e) {
+						$dropdown.on('click', function (e) {
 							e.stopPropagation();
 						});
 					}
