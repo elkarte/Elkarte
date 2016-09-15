@@ -285,13 +285,13 @@ class Inline_Permissions_Form
 				}
 			}
 			// Is this permission one that guests can't have?
-			if (isset($this->illegal_guest_permissions[$permission[1]]))
+			if (in_array($permission[1], $this->illegal_guest_permissions))
 			{
 				unset($this->context[$permission[1]][-1]);
 			}
 
 			// Is this permission outright disabled?
-			if (isset($this->illegal_permissions[$permission[1]]))
+			if (in_array($permission[1], $this->illegal_permissions))
 			{
 				unset($this->context[$permission[1]]);
 			}
