@@ -277,7 +277,7 @@ class Inline_Permissions_Form
 			{
 				$excluded_groups += $permission['excluded_groups'];
 			}
-			foreach ($this->excluded_groups as $group)
+			foreach ($excluded_groups as $group)
 			{
 				if (isset($this->context[$permission[1]][$group]))
 				{
