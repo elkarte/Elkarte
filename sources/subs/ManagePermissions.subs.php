@@ -875,15 +875,7 @@ function copyBoardPermission($copy_from, $groups, $profile_id, $non_guest_permis
 	}
 
 	// Delete the previous global board permissions...
-	$db->query('', '
-		DELETE FROM {db_prefix}board_permissions
-		WHERE id_group IN ({array_int:current_group_list})
-			AND id_profile = {int:current_profile}',
-		array(
-			'current_group_list' => $groups,
-			'current_profile' => $profile_id,
-		)
-	);
+	deleteAllBoardPermissions($groups, $profile_id);
 
 	// And insert the copied permissions.
 	if (!empty($inserts))
@@ -1088,19 +1080,19 @@ function deleteInvalidPermissions($id_group, $illegal_permissions)
  * Deletes a membergroup's board permissions from a specified permission profile.
  *
  * @package Permissions
- * @param int $id_group
+ * @param int[] $groups
  * @param integer $id_profile
  */
-function deleteAllBoardPermissions($id_group, $id_profile)
+function deleteAllBoardPermissions(array $groups, $id_profile)
 {
 	$db = database();
 
 	$db->query('', '
 		DELETE FROM {db_prefix}board_permissions
-		WHERE id_group = {int:current_group}
-		AND id_profile = {int:current_profile}',
+		WHERE id_group IN ({array_int:current_group_list})
+			AND id_profile = {int:current_profile}',
 		array(
-			'current_group' => $id_group,
+			'current_group_list' => $groups,
 			'current_profile' => $id_profile,
 		)
 	);

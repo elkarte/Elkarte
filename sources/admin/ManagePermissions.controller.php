@@ -876,7 +876,7 @@ class ManagePermissions_Controller extends Action_Controller
 
 		// Insert the boardpermissions.
 		$profileid = max(1, $this->_pid);
-		deleteAllBoardPermissions($current_group_id, $profileid);
+		deleteAllBoardPermissions(array($current_group_id), $profileid);
 
 		if (!empty($givePerms['board']))
 		{
