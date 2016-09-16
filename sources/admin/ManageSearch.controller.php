@@ -456,10 +456,10 @@ class ManageSearch_Controller extends Action_Controller
 		else
 		{
 			$context['index_settings'] = array(
-				'bytes_per_word' => isset($this->_req->query->bytes_per_word) && isset($index_properties[$this->_req->query->bytes_per_word]) ? (int) $this->_req->query->bytes_per_word : 2,
+				'bytes_per_word' => isset($this->_req->post->bytes_per_word) && isset($index_properties[$this->_req->post->bytes_per_word]) ? (int) $this->_req->post->bytes_per_word : 2,
 			);
-			$context['start'] = isset($this->_req->query->start) ? (int) $this->_req->query->start : 0;
-			$context['step'] = isset($this->_req->query->step) ? (int) $this->_req->query->step : 0;
+			$context['start'] = isset($this->_req->post->start) ? (int) $this->_req->post->start : 0;
+			$context['step'] = isset($this->_req->post->step) ? (int) $this->_req->post->step : 0;
 
 			// Admin timeouts are painful when building these long indexes
 			if ($_SESSION['admin_time'] + 3300 < time() && $context['step'] >= 1)

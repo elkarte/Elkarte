@@ -318,7 +318,7 @@ function createSearchIndex($start, $messages_per_batch, $column_size_definition,
 		$db_search->create_word_search($column_size_definition);
 
 		// Temporarily switch back to not using a search index.
-		if (!empty($modSettings['search_index']) && $modSettings['search_index'] == 'custom')
+		if (!empty($modSettings['search_index']) && $modSettings['search_index'] === 'custom')
 			updateSettings(array('search_index' => ''));
 
 		// Don't let simultaneous processes be updating the search index.
