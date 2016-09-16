@@ -1457,10 +1457,10 @@ class ManageThemes_Controller extends Action_Controller
 
 			// New value for them
 			if (isset($this->_req->query->minmax_key) && strlen($this->_req->query->minmax_key) < 10)
-				$options['minmax_preferences'][$this->_req->query->minmax_key] = $this->_req->query->val;
+				$minmax_preferences[$this->_req->query->minmax_key] = $this->_req->query->val;
 
 			// Change the value to be something nice,
-			$this->_req->query->val = json_encode($options['minmax_preferences']);
+			$this->_req->query->val = json_encode($minmax_preferences);
 		}
 
 		// Update the option.
