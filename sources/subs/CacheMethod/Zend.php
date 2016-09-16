@@ -28,7 +28,7 @@ class Zend extends Cache_Method_Abstract
 	 */
 	public function exists($key)
 	{
-		$result = $this->get($this->getprefixedKey($key));
+		$this->get($this->getprefixedKey($key));
 		return !$this->is_miss;
 	}
 

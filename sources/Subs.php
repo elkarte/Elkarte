@@ -998,6 +998,7 @@ function memoryReturnBytes($val)
 		// fall through select m = 1024*1024
 		case 'm':
 			$num *= 1024;
+		// fall through select k = 1024
 		case 'k':
 			$num *= 1024;
 	}
@@ -1587,7 +1588,7 @@ function elk_array_insert($input, $key, $insert, $where = 'before', $assoc = tru
 		return array_merge($input, $insert);
 
 	if ($where === 'after')
-		$position += 1;
+		$position++;
 
 	// Insert as first
 	if ($position === 0)

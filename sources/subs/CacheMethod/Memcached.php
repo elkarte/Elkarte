@@ -58,7 +58,7 @@ class Memcached extends Cache_Method_Abstract
 	 */
 	public function exists($key)
 	{
-		$result = $this->get($key);
+		$this->get($key);
 		return !$this->is_miss;
 	}
 
@@ -194,7 +194,7 @@ class Memcached extends Cache_Method_Abstract
 	 *
 	 * Used by integrate_modify_cache_settings added in the title method
 	 *
-	 * @param array() $config_vars
+	 * @param array $config_vars
 	 */
 	public function settings(&$config_vars)
 	{

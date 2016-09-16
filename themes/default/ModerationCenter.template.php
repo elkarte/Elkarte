@@ -296,7 +296,7 @@ function template_reported_posts()
 							<p class="centertext">', $txt['mc_reportedp_none_found'], '</p>
 						</div>';
 	else
-		template_pagesection(false, false, array('extra' => !$context['view_closed'] && !empty($options['display_quick_mod']) && $options['display_quick_mod'] == 1 ? '<input type="submit" name="close_selected" value="' . $txt['mc_reportedp_close_selected'] . '" class="right_submit" />' : ''));
+		template_pagesection(false, '', array('extra' => !$context['view_closed'] && !empty($options['display_quick_mod']) && $options['display_quick_mod'] == 1 ? '<input type="submit" name="close_selected" value="' . $txt['mc_reportedp_close_selected'] . '" class="right_submit" />' : ''));
 
 	echo '
 						<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />
@@ -354,7 +354,7 @@ function template_unapproved_posts()
 					</div>';
 
 	if (!empty($context['unapproved_items']))
-		template_pagesection(false, false, array('extra' => $quick_mod));
+		template_pagesection(false, '', array('extra' => $quick_mod));
 
 	echo '
 					<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />

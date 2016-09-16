@@ -26,7 +26,7 @@ class Apc extends Cache_Method_Abstract
 	/**
 	 * Whether to use the APCu functions or the original APC ones.
 	 *
-	 * @var string
+	 * @var bool
 	 */
 	protected $apcu = false;
 
@@ -44,7 +44,7 @@ class Apc extends Cache_Method_Abstract
 	 */
 	public function exists($key)
 	{
-		$result = $this->get($key);
+		$this->get($key);
 		return !$this->is_miss;
 	}
 

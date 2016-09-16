@@ -83,7 +83,7 @@ function template_show_list($list_id = null)
 			<div class="flow_auto">';
 
 		echo '
-				<div class="floatleft">', template_pagesection(false, false, array('page_index_markup' => $cur_list['page_index'])), '
+				<div class="floatleft">', template_pagesection(false, '', array('page_index_markup' => $cur_list['page_index'])), '
 				</div>';
 		$close_div = true;
 	}
@@ -168,7 +168,7 @@ function template_show_list($list_id = null)
 		if (!empty($cur_list['items_per_page']) && !empty($cur_list['page_index']))
 			echo '
 				<div class="floatleft">',
-			template_pagesection(false, false, array('page_index_markup' => $cur_list['page_index'])), '
+			template_pagesection(false, '', array('page_index_markup' => $cur_list['page_index'])), '
 				</div>';
 
 		if (isset($cur_list['additional_rows']['below_table_data']))
