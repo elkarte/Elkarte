@@ -2476,6 +2476,8 @@ class InstallInstructions_install_1_1
 				array('usernotif_favicon_position', 'up'),
 				array('usernotif_favicon_textColor', '#ffff00'),
 				array('usernotif_favicon_type', 'circle'),
+				array('secureCookies', '1'),
+				array('httponlyCookies', '1'),
 			),
 			array('variable')
 		);
