@@ -1235,7 +1235,7 @@ function getThemeId($id_theme = 0)
  */
 function getThemeData($id_theme, $member)
 {
-	global $modSettings;
+	global $modSettings, $boardurl;
 
 	$cache = Cache::instance();
 
@@ -1287,6 +1287,17 @@ function getThemeData($id_theme, $member)
 				$themeData[$row['id_member']][$row['variable']] = substr($row['variable'], 0, 5) == 'show_' ? $row['value'] == '1' : $row['value'];
 		}
 		$db->free_result($result);
+
+		if (file_exists($themeData[0]['default_theme_dir'] . '/cache') /*&& is_writable($themeData[0]['default_theme_dir'] . '/cache')*/)
+		{
+			$themeData[0]['default_theme_cache_dir'] = $themeData[0]['default_theme_dir'] . '/cache';
+			$themeData[0]['default_theme_cache_url'] = $themeData[0]['default_theme_url'] . '/cache';
+		}
+		else
+		{
+			$themeData[0]['default_theme_cache_dir'] = CACHEDIR;
+			$themeData[0]['default_theme_cache_url'] = $boardurl . '/cache';
+		}
 
 		// Set the defaults if the user has not chosen on their own
 		if (!empty($themeData[-1]))

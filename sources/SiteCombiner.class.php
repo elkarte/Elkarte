@@ -127,6 +127,8 @@ class Site_Combiner
 		// Init
 		$this->_archive_dir = $cachedir;
 		$this->_archive_url = $cacheurl;
+
+		$this->_spares = array();
 	}
 
 	/**
@@ -139,9 +141,17 @@ class Site_Combiner
 	{
 		// No files or missing or not writable directory then we are done
 		if (empty($files) || !file_exists($this->_archive_dir) || !is_writable($this->_archive_dir))
+		{
+			// Anything is spare
+			if (!empty($files))
+			{
+				foreach ($files as $id => $file)
+				{
+					$this->_spares[$id] = $file;
+				}
+			}
 			return false;
-
-		$this->_spares = array();
+		}
 
 		// Get the filename's and last modified time for this batch
 		foreach ($files as $id => $file)
@@ -188,8 +198,18 @@ class Site_Combiner
 	public function site_css_combine($files)
 	{
 		// No files or missing dir then we are done
-		if (empty($files) || !file_exists($this->_archive_dir))
+		if (empty($files) || !file_exists($this->_archive_dir) || !is_writable($this->_archive_dir))
+		{
+			// Anything is spare
+			if (!empty($files))
+			{
+				foreach ($files as $id => $file)
+				{
+					$this->_spares[$id] = $file;
+				}
+			}
 			return false;
+		}
 
 		// Get the filenames and last modified time for this batch
 		foreach ($files as $id => $file)

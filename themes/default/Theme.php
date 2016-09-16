@@ -220,12 +220,12 @@ class Theme extends \Theme
 	 */
 	protected function templateJavascriptFiles($do_deferred)
 	{
-		global $boardurl, $modSettings;
+		global $modSettings, $settings;
 
 		// Combine and minify javascript source files to save bandwidth and requests
 		if (!empty($modSettings['minify_css_js']))
 		{
-			$combiner = new \Site_Combiner(CACHEDIR, $boardurl . '/cache');
+			$combiner = new \Site_Combiner($settings['default_theme_cache_dir'], $settings['default_theme_cache_url']);
 			$combine_name = $combiner->site_js_combine($this->js_files, $do_deferred);
 
 			call_integration_hook('post_javascript_combine', array(&$combine_name, $combiner));
@@ -340,7 +340,7 @@ class Theme extends \Theme
 	 */
 	function template_css()
 	{
-		global $modSettings, $boardurl;
+		global $modSettings, $settings;
 
 		// Use this hook to work with CSS files pre output
 		call_integration_hook('pre_css_output');
@@ -350,7 +350,7 @@ class Theme extends \Theme
 		{
 			if (!empty($modSettings['minify_css_js']))
 			{
-				$combiner = new \Site_Combiner(CACHEDIR, $boardurl . '/cache');
+				$combiner = new \Site_Combiner($settings['default_theme_cache_dir'], $settings['default_theme_cache_url']);
 				$combine_name = $combiner->site_css_combine($this->css_files);
 
 				call_integration_hook('post_css_combine', array(&$combine_name, $combiner));
