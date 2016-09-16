@@ -219,7 +219,10 @@ function rebuildRuleDesc()
 		foundAction = false,
 		curNum,
 		curVal,
-		curDef;
+		curDef,
+		groups,
+		labels,
+		rules;
 
 	// Global strings, convert to objects
 	if (typeof groups === "string")

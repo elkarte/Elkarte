@@ -31,6 +31,7 @@
 			board = 0,
 			topic = 0,
 			oTxt = {},
+			errorMsg = '',
 			// @deprecated since 1.1 - here just for backward compatibility
 			fileDisplayTemplate = '<div class="statusbar"><div class="info"></div><div class="progressBar"><div></div></div><div class="control fa fa-times-circle"></div></div>',
 			oEvents = {},
@@ -318,13 +319,14 @@
 		},
 
 		/**
-		* private function
-		*
-		* Prepares the uploaded file area
-		*
-		* @param {object} files what files to upload
-		* @param {object} obj parent object in which file progress is shown
-		*/
+		 * private function
+		 *
+		 * Prepares the uploaded file area
+		 *
+		 * @param {object} $control
+		 * @param {object} $button
+		 * @param {object} data
+		 */
 		fileUploadedInterface = function($control, $button, data) {
 			$button.off('click');
 			$button.removeClass('abort fa-times-circle').addClass('remove fa-minus-circle');
