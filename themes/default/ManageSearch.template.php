@@ -200,7 +200,7 @@ function template_select_search_method()
 								<strong>', $txt['search_index_size'], ':</strong> ', $context['table_info']['custom_index_length'];
 	elseif ($context['partial_custom_index'])
 		echo '
-								<strong>', $txt['search_index_label'], ':</strong> ', $txt['search_method_index_partial'], ' <a class="linkbutton" href="', $scripturl, '?action=admin;area=managesearch;sa=removecustom;', $context['session_var'], '=', $context['session_id'], ';', $context['admin-msm_token_var'], '=', $context['admin-msm_token'], '">', $txt['search_index_custom_remove'], '</a>] [<a href="', $scripturl, '?action=admin;area=managesearch;sa=createmsgindex;resume;', $context['session_var'], '=', $context['session_id'], ';', $context['admin-msm_token_var'], '=', $context['admin-msm_token'], '">', $txt['search_index_custom_resume'], '</a><br />
+								<strong>', $txt['search_index_label'], ':</strong> ', $txt['search_method_index_partial'], ' <a class="linkbutton" href="', $scripturl, '?action=admin;area=managesearch;sa=removecustom;', $context['session_var'], '=', $context['session_id'], ';', $context['admin-msm_token_var'], '=', $context['admin-msm_token'], '">', $txt['search_index_custom_remove'], '</a> <a class="linkbutton" href="', $scripturl, '?action=admin;area=managesearch;sa=createmsgindex;resume;', $context['session_var'], '=', $context['session_id'], ';', $context['admin-msm_token_var'], '=', $context['admin-msm_token'], '">', $txt['search_index_custom_resume'], '</a><br />
 								<strong>', $txt['search_index_size'], ':</strong> ', $context['table_info']['custom_index_length'];
 	else
 		echo '
@@ -263,7 +263,7 @@ function template_create_index()
 
 	echo '
 	<div id="admincenter">
-		<form action="', $scripturl, '?action=admin;area=managesearch;sa=createmsgindex;step=1" method="post" accept-charset="UTF-8" name="create_index">
+		<form action="', $scripturl, '?action=admin;area=managesearch;sa=createmsgindex" method="post" accept-charset="UTF-8" name="create_index">
 			<h2 class="category_header">', $txt['search_create_index'], '</h2>
 			<div class="content">
 				<dl class="settings">
@@ -281,6 +281,7 @@ function template_create_index()
 				<div class="submitbutton">
 					<input type="submit" name="save" value="', $txt['search_create_index_start'], '" />
 					<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />
+					<input type="hidden" name="step" value="1" />
 				</div>
 			</div>
 		</form>
@@ -333,9 +334,9 @@ function template_create_index_done()
 		<h2 class="category_header">', $txt['search_create_index'], '</h2>
 		<div class="content">
 			<p>', $txt['search_create_index_done'], '</p>
-			<p>
-				<strong><a href="', $scripturl, '?action=admin;area=managesearch;sa=method">', $txt['search_create_index_done_link'], '</a></strong>
-			</p>
+			<div class="submitbutton">
+				<strong><a class="linkbutton" href="', $scripturl, '?action=admin;area=managesearch;sa=method">', $txt['search_create_index_done_link'], '</a></strong>
+			</div>
 		</div>
 	</div>';
 }
