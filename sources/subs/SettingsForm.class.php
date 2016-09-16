@@ -121,16 +121,6 @@ class Settings_Form
 				$varname = $config_var[0];
 				global ${$varname};
 
-				// Set the subtext in case it's part of the label.
-				// @todo Temporary. Preventing divs inside label tags.
-				$divPos = strpos($config_var[1], '<div');
-				$subtext = '';
-
-				if ($divPos !== false)
-				{
-					$subtext = preg_replace('~</?div[^>]*>~', '', substr($config_var[1], $divPos));
-					$config_var[1] = substr($config_var[1], 0, $divPos);
-				}
 
 				if ($config_var[2] == 'file')
 				{
