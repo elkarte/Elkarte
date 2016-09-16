@@ -121,16 +121,6 @@ class Settings_Form
 				$varname = $config_var[0];
 				global ${$varname};
 
-
-				if ($config_var[2] == 'file')
-				{
-					$value = in_array($varname, $defines) ? constant(strtoupper($varname)) : htmlspecialchars($$varname, ENT_COMPAT, 'UTF-8');
-					if (in_array($varname, $safe_strings))
-					{
-						$value = htmlspecialchars_decode($value, ENT_NOQUOTES);
-					}
-				}
-
 				// Rewrite the definition a bit.
 				$new_setting = array(
 					$config_var[3],
@@ -144,6 +134,16 @@ class Settings_Form
 				if (isset($config_var[5]))
 				{
 					$new_setting['helptext'] = $config_var[5];
+				}
+
+				// Special value needed from the settings file?
+				if ($config_var[2] == 'file')
+				{
+					$value = in_array($varname, $defines) ? constant(strtoupper($varname)) : $$varname;
+					if (in_array($varname, $safe_strings))
+					{
+						$new_setting['mask'] = 'nohtml';
+					}
 				}
 				$new_settings[] = $new_setting;
 				$modSettings[$config_var[0]] = $value;
