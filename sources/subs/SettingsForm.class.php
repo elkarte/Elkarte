@@ -296,99 +296,140 @@ class Settings_Form
 				}
 
 				// Finally allow overrides - and some final cleanups.
-				foreach ($config_var as $k => $v)
-				{
-					if (!is_numeric($k))
-					{
-						if (substr($k, 0, 2) == 'on')
-						{
-							$context['config_vars'][$config_var[1]]['javascript'] .= ' ' . $k . '="' . $v . '"';
-						}
-						else
-						{
-							$context['config_vars'][$config_var[1]][$k] = $v;
-						}
-					}
-
-					// See if there are any other labels that might fit?
-					if (isset($txt['setting_' . $config_var[1]]))
-					{
-						$context['config_vars'][$config_var[1]]['label'] = $txt['setting_' . $config_var[1]];
-					}
-					elseif (isset($txt['groups_' . $config_var[1]]))
-					{
-						$context['config_vars'][$config_var[1]]['label'] = $txt['groups_' . $config_var[1]];
-					}
-				}
-
-				// Set the subtext in case it's part of the label.
-				// @todo Temporary. Preventing divs inside label tags.
-				$divPos = strpos($context['config_vars'][$config_var[1]]['label'], '<div');
-				if ($divPos !== false)
-				{
-					$context['config_vars'][$config_var[1]]['subtext'] = preg_replace('~</?div[^>]*>~', '', substr($context['config_vars'][$config_var[1]]['label'], $divPos));
-					$context['config_vars'][$config_var[1]]['label'] = substr($context['config_vars'][$config_var[1]]['label'], 0, $divPos);
-				}
+				self::allowOverrides($config_var);
 			}
 		}
 
 		// If we have inline permissions we need to prep them.
-		if (!empty($inlinePermissions) && allowedTo('manage_permissions'))
-		{
-			// We'll need to initialize inline permissions sub-form
-			require_once(SUBSDIR . '/Permission.subs.php');
-			InlinePermissions_Form::init_inline_permissions($inlinePermissions, isset($context['permissions_excluded']) ? $context['permissions_excluded'] : array());
-		}
+		self::init_inline_permissions($inlinePermissions, isset($context['permissions_excluded']) ? $context['permissions_excluded'] : array());
 
 		// What about any BBC selection boxes?
-		if (!empty($bbcChoice))
-		{
-			// What are the options, eh?
-			$codes = \BBC\ParserWrapper::getInstance()->getCodes();
-			$bbcTags = $codes->getTags();
-
-			$bbcTags = array_unique($bbcTags);
-			$totalTags = count($bbcTags);
-
-			// The number of columns we want to show the BBC tags in.
-			$numColumns = isset($context['num_bbc_columns']) ? $context['num_bbc_columns'] : 3;
-
-			// Start working out the context stuff.
-			$context['bbc_columns'] = array();
-			$tagsPerColumn = ceil($totalTags / $numColumns);
-
-			$col = 0;
-			$i = 0;
-			foreach ($bbcTags as $tag)
-			{
-				if ($i % $tagsPerColumn == 0 && $i != 0)
-				{
-					$col++;
-				}
-
-				$context['bbc_columns'][$col][] = array(
-					'tag' => $tag,
-					// @todo  'tag_' . ?
-					'show_help' => isset($helptxt[$tag]),
-				);
-
-				$i++;
-			}
-
-			// Now put whatever BBC options we may have into context too!
-			$context['bbc_sections'] = array();
-			foreach ($bbcChoice as $bbc)
-			{
-				$context['bbc_sections'][$bbc] = array(
-					'title' => isset($txt['bbc_title_' . $bbc]) ? $txt['bbc_title_' . $bbc] : $txt['bbcTagsToUse_select'],
-					'disabled' => empty($modSettings['bbc_disabled_' . $bbc]) ? array() : $modSettings['bbc_disabled_' . $bbc],
-					'all_selected' => empty($modSettings['bbc_disabled_' . $bbc]),
-				);
-			}
-		}
+		self::initBbcChoices($bbcChoice);
 
 		call_integration_hook('integrate_prepare_db_settings', array(&$config_vars));
 		createToken('admin-dbsc');
+	}
+
+	/**
+	 * Initialize inline permissions settings.
+	 *
+	 * @param string[] $permissions
+	 * @param int[]    $excluded_groups = array()
+	 */
+	private static function init_inline_permissions($permissions, $excluded_groups = array())
+	{
+		global $context, $modSettings;
+
+		if (empty($permissions))
+		{
+			return;
+		}
+
+		$permissionsForm = new Inline_Permissions_Form;
+		$permissionsForm->setExcludedGroups($excluded_groups);
+		$permissionsForm->setPermissions($permissions);
+
+		return $permissionsForm->init();
+	}
+
+	/**
+	 * @param mixed[] $config_var
+	 */
+	private static function allowOverrides($config_var)
+	{
+		global $context, $modSettings;
+
+		foreach ($config_var as $k => $v)
+		{
+			if (!is_numeric($k))
+			{
+				if (substr($k, 0, 2) == 'on')
+				{
+					$context['config_vars'][$config_var[1]]['javascript'] .= ' ' . $k . '="' . $v . '"';
+				}
+				else
+				{
+					$context['config_vars'][$config_var[1]][$k] = $v;
+				}
+			}
+
+			// See if there are any other labels that might fit?
+			if (isset($txt['setting_' . $config_var[1]]))
+			{
+				$context['config_vars'][$config_var[1]]['label'] = $txt['setting_' . $config_var[1]];
+			}
+			elseif (isset($txt['groups_' . $config_var[1]]))
+			{
+				$context['config_vars'][$config_var[1]]['label'] = $txt['groups_' . $config_var[1]];
+			}
+		}
+
+		// Set the subtext in case it's part of the label.
+		// @todo Temporary. Preventing divs inside label tags.
+		$divPos = strpos($context['config_vars'][$config_var[1]]['label'], '<div');
+		if ($divPos !== false)
+		{
+			$context['config_vars'][$config_var[1]]['subtext'] = preg_replace('~</?div[^>]*>~', '', substr($context['config_vars'][$config_var[1]]['label'], $divPos));
+			$context['config_vars'][$config_var[1]]['label'] = substr($context['config_vars'][$config_var[1]]['label'], 0, $divPos);
+		}
+	}
+
+	/**
+	 * Initialize a list of available BB codes.
+	 *
+	 * @param string[] $bbcChoice
+	 */
+	private static function initBbcChoices($bbcChoice)
+	{
+		global $txt, $helptxt, $context, $modSettings;
+
+		if (empty($bbcChoice))
+		{
+			return;
+		}
+
+		// What are the options, eh?
+		$codes = \BBC\ParserWrapper::getInstance()->getCodes();
+		$bbcTags = $codes->getTags();
+
+		$bbcTags = array_unique($bbcTags);
+		$totalTags = count($bbcTags);
+
+		// The number of columns we want to show the BBC tags in.
+		$numColumns = isset($context['num_bbc_columns']) ? $context['num_bbc_columns'] : 3;
+
+		// Start working out the context stuff.
+		$context['bbc_columns'] = array();
+		$tagsPerColumn = ceil($totalTags / $numColumns);
+
+		$col = 0;
+		$i = 0;
+		foreach ($bbcTags as $tag)
+		{
+			if ($i % $tagsPerColumn == 0 && $i != 0)
+			{
+				$col++;
+			}
+
+			$context['bbc_columns'][$col][] = array(
+				'tag' => $tag,
+				// @todo  'tag_' . ?
+				'show_help' => isset($helptxt[$tag]),
+			);
+
+			$i++;
+		}
+
+		// Now put whatever BBC options we may have into context too!
+		$context['bbc_sections'] = array();
+		foreach ($bbcChoice as $bbc)
+		{
+			$context['bbc_sections'][$bbc] = array(
+				'title' => isset($txt['bbc_title_' . $bbc]) ? $txt['bbc_title_' . $bbc] : $txt['bbcTagsToUse_select'],
+				'disabled' => empty($modSettings['bbc_disabled_' . $bbc]) ? array() : $modSettings['bbc_disabled_' . $bbc],
+				'all_selected' => empty($modSettings['bbc_disabled_' . $bbc]),
+			);
+		}
 	}
 
 	/**
