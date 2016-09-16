@@ -65,8 +65,10 @@ function template_admin()
 
 	// If we have lots of admins... don't show them all.
 	if (!empty($context['more_admins_link']))
+	{
 		echo '
 							(', $context['more_admins_link'], ')';
+	}
 
 	echo '
 						</div>
@@ -79,12 +81,14 @@ function template_admin()
 				<ul id="quick_tasks" class="flow_hidden">';
 
 	foreach ($context['quick_admin_tasks'] as $task)
+	{
 		echo '
 					<li>
 						', !empty($task['icon']) ? '<a href="' . $task['href'] . '"><img src="' . $settings['default_images_url'] . '/admin/' . $task['icon'] . '" alt="" class="home_image" /></a>' : '', '
 						<h5>', $task['link'], '</h5>
 						<span class="task">', $task['description'], '</span>
 					</li>';
+	}
 
 	echo '
 				</ul>
@@ -166,8 +170,10 @@ function template_credits()
 
 		// More details for this item, show them a link
 		if ($context['can_admin'] && isset($version['more']))
+		{
 			echo
 			' <a href="', $scripturl, $version['more'], ';', $context['session_var'], '=', $context['session_id'], '">', $txt['version_check_more'], '</a>';
+		}
 
 		echo '
 								<br />';
@@ -178,6 +184,7 @@ function template_credits()
 
 	// Display latest important updates
 	if (!empty($context['latest_updates']))
+	{
 		echo '
 							<h3 id="latest_updates" class="category_header">
 								', $txt['latest_updates'], '
@@ -185,6 +192,7 @@ function template_credits()
 							<div class="content">
 								', $context['latest_updates'], '
 							</div>';
+	}
 
 	// Point the admin to common support resources.
 	echo '
@@ -210,8 +218,10 @@ function template_credits()
 	foreach ($context['credits'] as $section)
 	{
 		if (isset($section['pretext']))
+		{
 			echo '
 								<p>', $section['pretext'], '</p><hr />';
+		}
 
 		echo '
 								<dl>';
@@ -219,10 +229,12 @@ function template_credits()
 		foreach ($section['groups'] as $group)
 		{
 			if (isset($group['title']))
+			{
 				echo '
 									<dt>
 										<strong>', $group['title'], ':</strong>
 									</dt>';
+			}
 
 			echo '
 									<dd>', implode(', ', $group['members']), '</dd>';
@@ -232,9 +244,11 @@ function template_credits()
 								</dl>';
 
 		if (isset($section['posttext']))
+		{
 			echo '
 								<hr />
 								<p>', $section['posttext'], '</p>';
+		}
 	}
 
 	echo '
@@ -251,8 +265,10 @@ function template_credits()
 
 	// Don't worry, none of this is logged, it's just used to give information that might be of use.
 	foreach ($context['current_versions'] as $variable => $version)
+	{
 		echo '
 						ourSupportVersions.', $variable, ' = "', $version['version'], '";';
+	}
 
 	echo '
 					</script>';
@@ -336,6 +352,7 @@ function template_view_versions()
 
 	// Loop through every source file displaying its version - using javascript.
 	foreach ($context['file_versions'] as $filename => $version)
+	{
 		echo '
 								<tr>
 									<td class="versionFilePad">
@@ -348,6 +365,7 @@ function template_view_versions()
 										<em id="oursources', $filename, '">??</em>
 									</td>
 								</tr>';
+	}
 
 	// Done with sources
 	echo '
@@ -377,6 +395,7 @@ function template_view_versions()
 
 	// Loop through every admin file displaying its version - using javascript.
 	foreach ($context['file_versions_admin'] as $filename => $version)
+	{
 		echo '
 								<tr>
 									<td class="versionFilePad">
@@ -389,6 +408,7 @@ function template_view_versions()
 										<em id="ouradmin', $filename, '">??</em>
 									</td>
 								</tr>';
+	}
 
 	// Close the admin section
 	echo '
@@ -418,6 +438,7 @@ function template_view_versions()
 
 	// Loop through every controller file displaying its version - using javascript.
 	foreach ($context['file_versions_controllers'] as $filename => $version)
+	{
 		echo '
 								<tr>
 									<td class="versionFilePad">
@@ -430,6 +451,7 @@ function template_view_versions()
 										<em id="ourcontrollers', $filename, '">??</em>
 									</td>
 								</tr>';
+	}
 
 	// Close the controller section
 	echo '
@@ -459,6 +481,7 @@ function template_view_versions()
 
 	// Loop through every database file displaying its version - using javascript.
 	foreach ($context['file_versions_database'] as $filename => $version)
+	{
 		echo '
 								<tr>
 									<td class="versionFilePad">
@@ -471,6 +494,7 @@ function template_view_versions()
 										<em id="ourdatabase', $filename, '">??</em>
 									</td>
 								</tr>';
+	}
 
 	// Close the database section
 	echo '
@@ -500,6 +524,7 @@ function template_view_versions()
 
 	// Loop through every subs file displaying its version - using javascript.
 	foreach ($context['file_versions_subs'] as $filename => $version)
+	{
 		echo '
 								<tr>
 									<td class="versionFilePad">
@@ -512,6 +537,7 @@ function template_view_versions()
 										<em id="oursubs', $filename, '">??</em>
 									</td>
 								</tr>';
+	}
 
 	// Close the subs section
 	echo '
@@ -540,6 +566,7 @@ function template_view_versions()
 								<tbody>';
 
 	foreach ($context['default_template_versions'] as $filename => $version)
+	{
 		echo '
 									<tr>
 										<td class="versionFilePad">
@@ -552,6 +579,7 @@ function template_view_versions()
 											<em id="ourdefault', $filename, '">??</em>
 										</td>
 									</tr>';
+	}
 
 	// Now the language files...
 	echo '
@@ -586,6 +614,7 @@ function template_view_versions()
 										</td>
 									</tr>';
 		foreach ($files as $filename => $version)
+		{
 			echo '
 									<tr>
 										<td class="versionFilePad">
@@ -598,6 +627,7 @@ function template_view_versions()
 											<em id="our', $filename, '.', $language, '">??</em>
 										</td>
 									</tr>';
+		}
 	}
 
 	echo '
@@ -628,6 +658,7 @@ function template_view_versions()
 								<tbody>';
 
 		foreach ($context['template_versions'] as $filename => $version)
+		{
 			echo '
 									<tr>
 										<td class="versionFilePad">
@@ -640,6 +671,7 @@ function template_view_versions()
 											<em id="ourTemplates', $filename, '">??</em>
 										</td>
 									</tr>';
+		}
 
 		echo '
 								</tbody>
@@ -703,10 +735,12 @@ function template_edit_censored()
 
 	// Show text boxes for censoring [bad] => [good].
 	foreach ($context['censored_words'] as $vulgar => $proper)
+	{
 		echo '
 				<div class="censorWords">
 					<input type="text" name="censor_vulgar[]" value="', $vulgar, '" size="30" /> <i class="fa  fa-arrow-circle-right"></i> <input type="text" name="censor_proper[]" value="', $proper, '" size="30" />
 				</div>';
+	}
 
 	// Now provide a way to censor more words.
 	echo '
@@ -788,18 +822,22 @@ function template_not_done()
 
 	// Show the progress bars
 	if (!empty($context['continue_percent']))
+	{
 		echo '
 				<div class="progress_bar">
 					<div class="full_bar">', $context['continue_percent'], '%</div>
 					<div class="green_percent" style="width: ', $context['continue_percent'], '%;">&nbsp;</div>
 				</div>';
+	}
 
 	if (!empty($context['substep_enabled']))
+	{
 		echo '
 				<div class="progress_bar">
 					<div class="full_bar">', $context['substep_title'], ' (', $context['substep_continue_percent'], '%)</div>
 					<div class="blue_percent" style="width: ', $context['substep_continue_percent'], '%;">&nbsp;</div>
 				</div>';
+	}
 
 	echo '
 				<input type="submit" name="cont" value="', $txt['not_done_continue'], '" class="right_submit" />
@@ -825,14 +863,18 @@ function template_show_settings()
 
 	// Is there a custom title, maybe even with an icon?
 	if (isset($context['settings_title']))
+	{
 		echo '
 			<h2 class="category_header', !empty($context['settings_icon']) ? ' hdicon cat_img_' . $context['settings_icon'] : '', '">', $context['settings_title'], '</h2>';
+	}
 
 	// any messages or errors to show?
 	if (!empty($context['settings_message']))
 	{
 		if (!is_array($context['settings_message']))
+		{
 			$context['settings_message'] = array($context['settings_message']);
+		}
 
 		echo '
 			<div class="', (empty($context['error_type']) ? 'infobox' : ($context['error_type'] !== 'serious' ? 'warningbox' : 'errorbox')), '" id="errors">
@@ -868,15 +910,21 @@ function template_show_settings()
 				if ($config_var['help'])
 				{
 					if (empty($config_var['class']))
+					{
 						echo '
 						<a href="' . $scripturl . '?action=quickhelp;help=' . $config_var['help'] . '" onclick="return reqOverlayDiv(this.href);" class="hdicon cat_img_helptopics help" alt="' . $txt['help'] . '"></a>';
+					}
 					else
+					{
 						echo '
 						<a href="' . $scripturl . '?action=quickhelp;help=' . $config_var['help'] . '" onclick="return reqOverlayDiv(this.href);" class="' . $config_var['class'] . ' help"><i class="helpicon i-help icon-lg"><s>', $txt['help'], '</s></i></a>';
+					}
 				}
 				elseif ($config_var['icon'])
+				{
 					echo
 						'<span class="hdicon cat_img_' . $config_var['icon'] . '"></span>';
+				}
 
 				echo
 				$config_var['label'], '
@@ -907,7 +955,9 @@ function template_show_settings()
 		if (is_array($config_var) && $config_var['type'] == 'callback')
 		{
 			if (function_exists('template_callback_' . $config_var['name']))
+			{
 				call_user_func('template_callback_' . $config_var['name']);
+			}
 
 			continue;
 		}
@@ -936,13 +986,17 @@ function template_show_settings()
 
 				// Show the [?] button.
 				if ($config_var['help'])
+				{
 					echo '
 						<a id="setting_', $config_var['name'], '" href="', $scripturl, '?action=quickhelp;help=', $config_var['help'], '" onclick="return reqOverlayDiv(this.href);" class="helpicon i-help"><s>', $txt['help'], '</s></a><span', ($config_var['disabled'] ? ' class="disabled"' : ($config_var['invalid'] ? ' class="error"' : '')), '><label for="', $config_var['name'], '">', $config_var['label'], '</label>', $subtext, '</span>
 					</dt>';
+				}
 				else
+				{
 					echo '
 						<a id="setting_', $config_var['name'], '"></a> <span', ($config_var['disabled'] ? ' class="disabled"' : ($config_var['invalid'] ? ' class="error"' : '')), '><label for="', $config_var['name'], '">', $config_var['label'], '</label>', $subtext, '</span>
 					</dt>';
+				}
 
 				echo '
 					<dd', (!empty($config_var['force_div_id']) ? ' id="' . $config_var['force_div_id'] . '_dd"' : ''), '>',
@@ -950,10 +1004,13 @@ function template_show_settings()
 
 				// Show a check box.
 				if ($config_var['type'] == 'check')
+				{
 					echo '
 						<input type="checkbox"', $javascript, $disabled, ' name="', $config_var['name'], '" id="', $config_var['name'], '"', ($config_var['value'] ? ' checked="checked"' : ''), ' value="1" />';
+				}
 				// Escape (via htmlspecialchars.) the text box.
 				elseif ($config_var['type'] == 'password')
+				{
 					echo '
 						<input type="password"', $disabled, $javascript, ' name="', $config_var['name'], '[0]" id="', $config_var['name'], '"', ($config_var['size'] ? ' size="' . $config_var['size'] . '"' : ''), ' value="*#fakepass#*" onfocus="this.value = \'\'; this.form.', $config_var['name'], '_confirm.disabled = false;" class="input_password" />
 					</dd>
@@ -962,6 +1019,7 @@ function template_show_settings()
 					</dt>
 					<dd ', (!empty($config_var['force_div_id']) ? ' id="' . $config_var['force_div_id'] . '_confirm_dd"' : ''), ' >
 						<input type="password" disabled="disabled" id="', $config_var['name'], '_confirm" name="', $config_var['name'], '[1]"', ($config_var['size'] ? ' size="' . $config_var['size'] . '"' : ''), ' class="input_password" />';
+				}
 				// Show a selection box.
 				elseif ($config_var['type'] == 'select')
 				{
@@ -969,19 +1027,25 @@ function template_show_settings()
 						<select name="', $config_var['name'], '" id="', $config_var['name'], '" ', $javascript, $disabled, (!empty($config_var['multiple']) ? ' multiple="multiple" class="select_multiple"' : ''), '>';
 
 					foreach ($config_var['data'] as $option)
+					{
 						echo '
 							<option value="', $option[0], '"', (!empty($config_var['value']) && ($option[0] == $config_var['value'] || (!empty($config_var['multiple']) && in_array($option[0], $config_var['value']))) ? ' selected="selected"' : ''), '>', $option[1], '</option>';
+					}
 
 					echo '
 						</select>';
 				}
 				// Text area?
 				elseif ($config_var['type'] == 'large_text')
+				{
 					echo '
 						<textarea rows="', (!empty($config_var['size']) ? $config_var['size'] : (!empty($config_var['rows']) ? $config_var['rows'] : 4)), '" cols="', (!empty($config_var['cols']) ? $config_var['cols'] : 30), '" name="', $config_var['name'], '" id="', $config_var['name'], '">', $config_var['value'], '</textarea>';
+				}
 				// Permission group?
 				elseif ($config_var['type'] == 'permissions')
-					theme_inline_permissions($config_var['name']);
+				{
+					template_inline_permissions($config_var['name']);
+				}
 				// BBC selection?
 				elseif ($config_var['type'] == 'bbc')
 				{
@@ -993,10 +1057,12 @@ function template_show_settings()
 					foreach ($context['bbc_columns'] as $bbcColumn)
 					{
 						foreach ($bbcColumn as $bbcTag)
+						{
 							echo '
 								<li class="list_bbc floatleft">
 									<input type="checkbox" name="', $config_var['name'], '_enabledTags[]" id="tag_', $config_var['name'], '_', $bbcTag['tag'], '" value="', $bbcTag['tag'], '"', !in_array($bbcTag['tag'], $context['bbc_sections'][$config_var['name']]['disabled']) ? ' checked="checked"' : '', ' /> <label for="tag_', $config_var['name'], '_', $bbcTag['tag'], '">', $bbcTag['tag'], '</label>', $bbcTag['show_help'] ? ' (<a href="' . $scripturl . '?action=quickhelp;help=tag_' . $bbcTag['tag'] . '" onclick="return reqOverlayDiv(this.href);" class="helpicon i-help"></a>)' : '', '
 								</li>';
+						}
 					}
 
 					echo '
@@ -1006,16 +1072,22 @@ function template_show_settings()
 				}
 				// A simple message?
 				elseif ($config_var['type'] == 'var_message')
+				{
 					echo '
 						<div', !empty($config_var['name']) ? ' id="' . $config_var['name'] . '"' : '', '>', $config_var['var_message'], '</div>';
+				}
 				// Color picker?
 				elseif ($config_var['type'] == 'color')
+				{
 					echo '
 						<input type="color"', $javascript, $disabled, ' name="', $config_var['name'], '" id="', $config_var['name'], '" value="', $config_var['value'], '"', ($config_var['size'] ? ' size="' . $config_var['size'] . '"' : ''), ' class="input_text" />';
+				}
 				// Assume it must be a text box.
 				else
+				{
 					echo '
 						<input type="text"', $javascript, $disabled, ' name="', $config_var['name'], '" id="', $config_var['name'], '" value="', $config_var['value'], '"', ($config_var['size'] ? ' size="' . $config_var['size'] . '"' : ''), ' class="input_text" />';
+				}
 
 				echo ($config_var['invalid']) ? '
 						<i class="icon i-alert"></i>' : '';
@@ -1029,44 +1101,54 @@ function template_show_settings()
 		{
 			// Just show a separator.
 			if ($config_var == '')
+			{
 				echo '
 				</dl>
 				<hr class="clear" />
 				<dl class="settings">';
+			}
 			else
+			{
 				echo '
 					<dd>
 						<strong>' . $config_var . '</strong>
 					</dd>';
+			}
 		}
 	}
 
 	if ($is_open)
+	{
 		echo '
 				</dl>';
+	}
 
 	if (empty($context['settings_save_dont_show']))
+	{
 		echo '
 				<div class="submitbutton">
 					<input type="submit" value="', $txt['save'], '"', (!empty($context['save_disabled']) ? ' disabled="disabled"' : ''), (!empty($context['settings_save_onclick']) ? ' onclick="' . $context['settings_save_onclick'] . '"' : ''), ' />
 				</div>';
+	}
 
 	if ($is_open)
+	{
 		echo '
 			</div>';
+	}
 
 	// At least one token has to be used!
 	if (isset($context['admin-ssc_token']))
+	{
 		echo '
 			<input type="hidden" name="', $context['admin-ssc_token_var'], '" value="', $context['admin-ssc_token'], '" />';
+	}
 
 	if (isset($context['admin-dbsc_token']))
+	{
 		echo '
 			<input type="hidden" name="', $context['admin-dbsc_token_var'], '" value="', $context['admin-dbsc_token'], '" />';
-
-	if (isset($context['admin-mp_token']))
-		echo '
-			<input type="hidden" name="', $context['admin-mp_token_var'], '" value="', $context['admin-mp_token'], '" />';
+	}
 
 	echo '
 			<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />
@@ -1127,8 +1209,10 @@ function template_admin_search_results()
 									<a href="', $result['url'], '"><strong>', $result['name'], '</strong></a> [', isset($txt['admin_search_section_' . $result['type']]) ? $txt['admin_search_section_' . $result['type']] : $result['type'], ']';
 
 				if ($result['help'])
+				{
 					echo '
 									<p class="double_height">', $result['help'], '</p>';
+				}
 
 				echo '
 								</li>';
@@ -1171,8 +1255,10 @@ function template_callback_question_answer_list()
 				<select name="language[', $data['id_question'], ']">';
 
 			foreach ($context['languages'] as $lang)
+			{
 				echo '
 					<option value="', $lang['filename'], '"', $lang['filename'] == $data['language'] ? ' selected="selected"' : '', '>', $lang['name'], '</option>';
+			}
 
 			echo '
 				</select>';
@@ -1184,9 +1270,11 @@ function template_callback_question_answer_list()
 
 		$count = count($data['answer']) - 1;
 		foreach ($data['answer'] as $id => $answer)
+		{
 			echo '
 				<input type="text" name="answer[', $data['id_question'], '][]" value="', $answer, '" size="40" class="input_text verification_answer" />', $id == $count ? '<br />
 				<a href="#" onclick="addAnotherAnswer(this, ' . $data['id_question'] . '); return false;">&#171; ' . $txt['setup_verification_add_more_answers'] . ' &#187;</a>' : '<br />';
+		}
 
 		echo '
 			</dd>';
@@ -1199,8 +1287,10 @@ function template_callback_question_answer_list()
 			<select name="language[b-%question_last_blank%]">';
 
 		foreach ($context['languages'] as $lang)
+		{
 			$lang_dropdown .= '
 				<option value="' . $lang['filename'] . '"' . ($lang['selected'] ? ' selected="selected"' : '') . '>' . $lang['name'] . '</option>';
+		}
 
 		$lang_dropdown .= '
 			</select>';
@@ -1268,10 +1358,12 @@ function template_repair_boards()
 			<ul>';
 
 			foreach ($context['repair_errors'] as $error)
+			{
 				echo '
 				<li>
 					', $error, '
 				</li>';
+			}
 
 			echo '
 			</ul>
@@ -1283,11 +1375,13 @@ function template_repair_boards()
 			</p>';
 		}
 		else
+		{
 			echo '
 			<p class="infobox">', $txt['maintain_no_errors'], '</p>
 			<p>
 				<a class="linkbutton" href="', $scripturl, '?action=admin;area=maintain;sa=routine">', $txt['maintain_return'], '</a>
 			</p>';
+		}
 	}
 	else
 	{
@@ -1375,8 +1469,10 @@ function template_php_info()
 				<td>', $key, '</td>';
 
 				foreach ($setting as $key_lm => $value)
+				{
 					echo '
 				<td class="centertext">', $value, '</td>';
+				}
 
 				echo '
 			</tr>';
@@ -1430,6 +1526,7 @@ function template_admin_quick_search()
 	global $context, $settings, $txt, $scripturl;
 
 	if ($context['user']['is_admin'])
+	{
 		echo '
 			<form action="', $scripturl, '?action=admin;area=search" method="post" accept-charset="UTF-8" id="quick_search" class="floatright">
 				<i class="icon i-search"></i>
@@ -1441,6 +1538,7 @@ function template_admin_quick_search()
 				</select>
 				<input type="submit" name="search_go" id="search_go" value="', $txt['admin_search_go'], '" />
 			</form>';
+	}
 }
 
 /**
@@ -1451,7 +1549,9 @@ function template_callback_external_search_engines()
 	global $txt, $context;
 
 	if (!empty($context['search_engines']))
+	{
 		foreach ($context['search_engines'] as $data)
+		{
 			echo '
 			<dt>
 				<label for="">', $txt['name'], ': <input type="text" name="engine_name[]" value="', $data['name'], '" size="50" class="input_text verification_question" /></label>
@@ -1460,6 +1560,8 @@ function template_callback_external_search_engines()
 				<label for="">', $txt['url'], ': <input type="text" name="engine_url[]" value="', $data['url'], '" size="35" class="input_text verification_answer" /></label><br />
 				<label for="">', $txt['words_sep'], ': <input type="text" name="engine_separator[]" value="', $data['separator'], '" size="5" class="input_text verification_answer" /></label>
 			</dd>';
+		}
+	}
 
 	echo '
 		<dt id="add_more_searches" class="hide"></dt>
@@ -1481,6 +1583,7 @@ function template_callback_pm_limits()
 	global $context;
 
 	foreach ($context['pm_limits'] as $group_id => $group)
+	{
 		echo '
 			<dt>
 				<label for="id_group_', $group_id, '">', $group['group_name'], '</label>
@@ -1488,6 +1591,7 @@ function template_callback_pm_limits()
 			<dd>
 				<input type="text" id="id_group_', $group_id, '" name="group[', $group_id, ']" value="', $group['max_messages'], '" size="6" class="input_text" />
 			</dd>';
+	}
 }
 
 /**

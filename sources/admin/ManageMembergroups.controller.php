@@ -359,9 +359,8 @@ class ManageMembergroups_Controller extends Action_Controller
 			// @todo Check for members with same name too?
 
 			// Don't allow copying of a real privileged person!
-			require_once(SUBSDIR . '/Permission.subs.php');
-
-			loadIllegalPermissions();
+			$permissionsObject = new Permissions;
+			$illegal_permissions = $permissionsObject->getIllegalPermissions();
 			$id_group = getMaxGroupID() + 1;
 			$minposts = !empty($this->_req->post->min_posts) ? (int) $this->_req->post->min_posts : '-1';
 
@@ -402,10 +401,7 @@ class ManageMembergroups_Controller extends Action_Controller
 				}
 
 				// Don't allow copying of a real privileged person!
-				require_once(SUBSDIR . '/Permission.subs.php');
-				loadIllegalPermissions();
-
-				copyPermissions($id_group, $copy_id, $context['illegal_permissions']);
+				copyPermissions($id_group, $copy_id, $illegal_permissions);
 				copyBoardPermissions($id_group, $copy_id);
 
 				// Also get some membergroup information if we're copying and not copying from guests...
@@ -641,8 +637,8 @@ class ManageMembergroups_Controller extends Action_Controller
 			// Do we need to set inherited permissions?
 			if ($group_inherit != -2 && $group_inherit != $this->_req->post->old_inherit)
 			{
-				require_once(SUBSDIR . '/Permission.subs.php');
-				updateChildPermissions($group_inherit);
+				$permissionsObject = new Permissions;
+				$permissionsObject->updateChild($group_inherit);
 			}
 
 			// Lastly, moderators!
@@ -786,9 +782,6 @@ class ManageMembergroups_Controller extends Action_Controller
 		// initialize the form
 		$this->_initGroupSettingsForm();
 
-		// Don't allow assignment of guests.
-		$context['permissions_excluded'] = array(-1);
-
 		$config_vars = $this->_groupSettings->settings();
 
 		if (isset($this->_req->query->save))
@@ -804,9 +797,6 @@ class ManageMembergroups_Controller extends Action_Controller
 		// Some simple context.
 		$context['post_url'] = $scripturl . '?action=admin;area=membergroups;save;sa=settings';
 		$context['settings_title'] = $txt['membergroups_settings'];
-
-		// We need this for the in-line permissions
-		createToken('admin-mp');
 
 		Settings_Form::prepare_db($config_vars);
 	}

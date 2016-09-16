@@ -135,7 +135,6 @@ class ManageSmileys_Controller extends Action_Controller
 
 		// Finish up the form...
 		$context['post_url'] = $scripturl . '?action=admin;area=smileys;save;sa=settings';
-		$context['permissions_excluded'] = array(-1);
 
 		// Saving the settings?
 		if (isset($this->_req->query->save))
@@ -158,9 +157,6 @@ class ManageSmileys_Controller extends Action_Controller
 
 			redirectexit('action=admin;area=smileys;sa=settings');
 		}
-
-		// We need this for the in-line permissions
-		createToken('admin-mp');
 
 		Settings_Form::prepare_db($config_vars);
 	}

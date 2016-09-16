@@ -6,6 +6,14 @@ class Errors
 	{
 		print_r($msg);
 	}
+	public function fatal_lang_error($msg)
+	{
+		global $txt;
+
+		if (isset($txt[$msg]))
+			$msg = $txt[$msg];
+		print_r($msg);
+	}
 	public function log_error()
 	{
 	}

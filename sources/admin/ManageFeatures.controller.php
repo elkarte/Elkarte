@@ -1280,9 +1280,6 @@ class ManageFeatures_Controller extends Action_Controller
 		$context['post_url'] = $scripturl . '?action=admin;area=featuresettings;save;sa=pmsettings';
 		$context['settings_title'] = $txt['personal_messages'];
 
-		// We need this for the in-line permissions
-		createToken('admin-mp');
-
 		Settings_Form::prepare_db($config_vars);
 	}
 
@@ -1291,10 +1288,6 @@ class ManageFeatures_Controller extends Action_Controller
 	 */
 	private function _initPMSettingsForm()
 	{
-		global $context;
-
-		$context['permissions_excluded'] = array(-1);
-
 		// Instantiate the form
 		$this->_PMSettings = new Settings_Form();
 

@@ -768,14 +768,11 @@ class ManageBoards_Controller extends Action_Controller
 		addInlineJavascript('
 				document.getElementById("recycle_board").disabled = !document.getElementById("recycle_enable").checked;', true);
 
-		// Don't let guests have these permissions.
-		$context['post_url'] = $scripturl . '?action=admin;area=manageboards;save;sa=settings';
-		$context['permissions_excluded'] = array(-1);
-
 		// Get the needed template bits
 		loadTemplate('ManageBoards');
 		$context['page_title'] = $txt['boards_and_cats'] . ' - ' . $txt['settings'];
 		$context['sub_template'] = 'show_settings';
+		$context['post_url'] = $scripturl . '?action=admin;area=manageboards;save;sa=settings';
 
 		// Warn the admin against selecting the recycle topic without selecting a board.
 		$context['force_form_onsubmit'] = 'if(document.getElementById(\'recycle_enable\').checked && document.getElementById(\'recycle_board\').value == 0) { return confirm(\'' . $txt['recycle_board_unselected_notice'] . '\');} return true;';
@@ -790,9 +787,6 @@ class ManageBoards_Controller extends Action_Controller
 			Settings_Form::save_db($config_vars);
 			redirectexit('action=admin;area=manageboards;sa=settings');
 		}
-
-		// We need this for the in-line permissions
-		createToken('admin-mp');
 
 		// Prepare the settings...
 		Settings_Form::prepare_db($config_vars);
