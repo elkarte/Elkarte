@@ -186,7 +186,7 @@ class Drafts_Post_Module implements ElkArte\sources\modules\Module_Interface
 	 */
 	public function before_save_post()
 	{
-		global $context, $modSettings, $board, $user_info;
+		global $context, $board, $user_info;
 
 		// If drafts are enabled, then pass this off
 		if (isset($_POST['save_draft']))

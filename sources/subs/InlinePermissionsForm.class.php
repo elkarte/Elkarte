@@ -244,7 +244,7 @@ class Inline_Permissions_Form
 	 */
 	private function prepareContext()
 	{
-		global $context, $txt, $modSettings;
+		global $context, $txt;
 
 		loadLanguage('ManagePermissions');
 		loadTemplate('ManagePermissions');

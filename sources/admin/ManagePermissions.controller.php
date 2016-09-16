@@ -578,8 +578,6 @@ class ManagePermissions_Controller extends Action_Controller
 	 */
 	public function action_quick()
 	{
-		global $context;
-
 		checkSession();
 		validateToken('admin-mpq', 'quick');
 
@@ -808,8 +806,6 @@ class ManagePermissions_Controller extends Action_Controller
 	 */
 	public function action_modify2()
 	{
-		global $context;
-
 		checkSession();
 		validateToken('admin-mp');
 

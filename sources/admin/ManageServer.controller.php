@@ -320,7 +320,7 @@ class ManageServer_Controller extends Action_Controller
 	 */
 	public function action_cacheSettings_display()
 	{
-		global $context, $scripturl, $txt, $cache_accelerator;
+		global $context, $scripturl, $txt;
 
 		// Initialize the form
 		$this->_initCacheSettingsForm();
