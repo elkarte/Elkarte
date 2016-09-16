@@ -109,7 +109,7 @@ class Settings_Form
 			'mmessage',
 			'mbname',
 		);
-
+		$new_settings = array();
 		foreach ($this->_config_vars as $identifier => $config_var)
 		{
 			if (!is_array($config_var) || !isset($config_var[1]))
@@ -140,74 +140,32 @@ class Settings_Form
 						$value = htmlspecialchars_decode($value, ENT_NOQUOTES);
 					}
 				}
-				else
-					$value = isset($modSettings[$config_var[0]]) ? htmlspecialchars($modSettings[$config_var[0]], ENT_COMPAT, 'UTF-8') : (in_array($config_var[3], array('int', 'float')) ? 0 : '');
 
-				$context['config_vars'][$config_var[0]] = array(
-					'label' => $config_var[1],
-					'help' => isset($config_var[5]) ? $config_var[5] : '',
-					'type' => $config_var[3],
-					'size' => empty($config_var[4]) ? 0 : $config_var[4],
-					'data' => isset($config_var[4]) && is_array($config_var[4]) && $config_var[3] != 'select' ? $config_var[4] : array(),
-					'name' => $config_var[0],
-					'value' => $value,
-					'disabled' => !empty($context['settings_not_writable']) || !empty($config_var['disabled']),
-					'invalid' => false,
-					'subtext' => !empty($config_var['subtext']) ? $config_var['subtext'] : $subtext,
-					'javascript' => '',
-					'preinput' => !empty($config_var['preinput']) ? $config_var['preinput'] : '',
-					'postinput' => !empty($config_var['postinput']) ? $config_var['postinput'] : '',
+				// Rewrite the definition a bit.
+				$new_setting = array(
+					$config_var[3],
+					$config_var[0],
+					'text_label' => $config_var[1],
 				);
-
-				// If this is a select box handle any data.
-				if (!empty($config_var[4]) && is_array($config_var[4]))
+				if (isset($config_var[4]))
 				{
-					// If it's associative
-					$config_values = array_values($config_var[4]);
-					if (isset($config_values[0]) && is_array($config_values[0]))
-					{
-						$context['config_vars'][$config_var[0]]['data'] = $config_var[4];
-					}
-					else
-					{
-						foreach ($config_var[4] as $key => $item)
-						{
-							$context['config_vars'][$config_var[0]]['data'][] = array($key, $item);
-						}
-					}
+					$new_setting[2] = $config_var[4];
 				}
-
-				// Finally allow overrides - and some final cleanups.
-				foreach ($config_var as $k => $v)
+				if (isset($config_var[5]))
 				{
-					if (!is_numeric($k))
-					{
-						if (substr($k, 0, 2) == 'on')
-						{
-							$context['config_vars'][$config_var[0]]['javascript'] .= ' ' . $k . '="' . $v . '"';
-						}
-						else
-						{
-							$context['config_vars'][$config_var[0]][$k] = $v;
-						}
-					}
-
-					// See if there are any other labels that might fit?
-					if (isset($txt['setting_' . $config_var[0]]))
-					{
-						$context['config_vars'][$config_var[0]]['label'] = $txt['setting_' . $config_var[0]];
-					}
-					elseif (isset($txt['groups_' . $config_var[0]]))
-					{
-						$context['config_vars'][$config_var[0]]['label'] = $txt['groups_' . $config_var[0]];
-					}
+					$new_setting['helptext'] = $config_var[5];
 				}
+				$new_settings[] = $new_setting;
+				$modSettings[$config_var[0]] = $value;
 			}
+		}
+		if (!empty($new_settings))
+		{
+			self::prepare_db($new_settings);
 		}
 
 		// Two tokens because saving these settings requires both save and save_db
 		createToken('admin-ssc');
-		createToken('admin-dbsc');
 	}
 
 	/**
