@@ -144,7 +144,7 @@ class DbTable_MySQL extends DbTable
 		if (substr($table_query, -1) == ',')
 			$table_query = substr($table_query, 0, -1);
 
-		$table_query .= ') ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci';
+		$table_query .= ') DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci';
 
 		// Create the table!
 		$this->_db->query('', $table_query,
