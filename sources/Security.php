@@ -688,7 +688,7 @@ function isBannedEmail($email, $restriction, $error)
  */
 function checkSession($type = 'post', $from_action = '', $is_fatal = true)
 {
-	global $sc, $modSettings, $boardurl;
+	global $modSettings, $boardurl;
 
 	// We'll work out user agent checks
 	$req = request();
@@ -697,14 +697,14 @@ function checkSession($type = 'post', $from_action = '', $is_fatal = true)
 	if ($type == 'post')
 	{
 		$check = isset($_POST[$_SESSION['session_var']]) ? $_POST[$_SESSION['session_var']] : (empty($modSettings['strictSessionCheck']) && isset($_POST['sc']) ? $_POST['sc'] : null);
-		if ($check !== $sc)
+		if ($check !== $_SESSION['session_value'])
 			$error = 'session_timeout';
 	}
 	// How about $_GET['sesc']?
 	elseif ($type === 'get')
 	{
 		$check = isset($_GET[$_SESSION['session_var']]) ? $_GET[$_SESSION['session_var']] : (empty($modSettings['strictSessionCheck']) && isset($_GET['sesc']) ? $_GET['sesc'] : null);
-		if ($check !== $sc)
+		if ($check !== $_SESSION['session_value'])
 			$error = 'session_verify_fail';
 	}
 	// Or can it be in either?
@@ -712,7 +712,7 @@ function checkSession($type = 'post', $from_action = '', $is_fatal = true)
 	{
 		$check = isset($_GET[$_SESSION['session_var']]) ? $_GET[$_SESSION['session_var']] : (empty($modSettings['strictSessionCheck']) && isset($_GET['sesc']) ? $_GET['sesc'] : (isset($_POST[$_SESSION['session_var']]) ? $_POST[$_SESSION['session_var']] : (empty($modSettings['strictSessionCheck']) && isset($_POST['sc']) ? $_POST['sc'] : null)));
 
-		if ($check !== $sc)
+		if ($check !== $_SESSION['session_value'])
 			$error = 'session_verify_fail';
 	}
 

@@ -111,7 +111,7 @@ class Auth_Controller extends Action_Controller
 	 */
 	public function action_login2()
 	{
-		global $txt, $scripturl, $user_info, $user_settings, $modSettings, $context, $sc;
+		global $txt, $scripturl, $user_info, $user_settings, $modSettings, $context;
 
 		// Load cookie authentication and all stuff.
 		require_once(SUBSDIR . '/Auth.subs.php');
@@ -265,7 +265,7 @@ class Auth_Controller extends Action_Controller
 				$valid_password = true;
 			}
 			// Maybe is an old SHA-1 and needs upgrading if the db string is an actual 40 hexchar SHA-1
-			elseif (preg_match('/^[0-9a-f]{40}$/i', $user_settings['passwd']) && isset($_POST['old_hash_passwrd']) && $_POST['old_hash_passwrd'] === hash('sha1', $user_settings['passwd'] . $sc))
+			elseif (preg_match('/^[0-9a-f]{40}$/i', $user_settings['passwd']) && isset($_POST['old_hash_passwrd']) && $_POST['old_hash_passwrd'] === hash('sha1', $user_settings['passwd'] . $_SESSION['session_value']))
 			{
 				// Old password passed, turn off hashing and ask for it again so we can update the db to something more secure.
 				$context['login_errors'] = array($txt['login_hash_error']);
@@ -574,7 +574,7 @@ class Auth_Controller extends Action_Controller
 	 */
 	private function _other_passwords($user_settings)
 	{
-		global $modSettings, $sc;
+		global $modSettings;
 
 		// What kind of data are we dealing with
 		$pw_strlen = strlen($user_settings['passwd']);
@@ -635,7 +635,7 @@ class Auth_Controller extends Action_Controller
 		{
 			// Maybe they are using a hash from before our password upgrade
 			$other_passwords[] = sha1(strtolower($user_settings['member_name']) . un_htmlspecialchars($_POST['passwrd']));
-			$other_passwords[] = sha1($user_settings['passwd'] . $sc);
+			$other_passwords[] = sha1($user_settings['passwd'] . $_SESSION['session_value']);
 
 			if (!empty($modSettings['enable_password_conversion']))
 			{
