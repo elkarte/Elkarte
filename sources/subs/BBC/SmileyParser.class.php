@@ -18,7 +18,7 @@ namespace BBC;
 
 /**
  * Class SmileyParser
- * 
+ *
  * @package BBC
  */
 class SmileyParser
@@ -44,7 +44,7 @@ class SmileyParser
 	/**
 	 * Enables/disabled the parsing
 	 *
-	 * @param bool $message
+	 * @param bool $toggle
 	 */
 	public function setEnabled($toggle)
 	{
