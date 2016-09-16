@@ -785,7 +785,6 @@ strong, .bbc_strong {
 }
 
 .bbc_table th {
-	padding: 0 1em 0 0;
 	color: inherit;
 	font: inherit;
 	font-weight: bold;
