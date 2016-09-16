@@ -137,7 +137,7 @@ function template_badbehavior_log()
  */
 function template_callback_badbehavior_add_ip()
 {
-	global $txt, $context, $scripturl, $settings;
+	global $txt, $context, $scripturl;
 
 	// Whitelist by IP
 	echo '
@@ -193,7 +193,7 @@ function template_callback_badbehavior_add_ip()
  */
 function template_callback_badbehavior_add_url()
 {
-	global $txt, $context, $scripturl, $settings;
+	global $txt, $context, $scripturl;
 
 	// whitelist by URL
 	echo '
@@ -250,7 +250,7 @@ function template_callback_badbehavior_add_url()
  */
 function template_callback_badbehavior_add_useragent()
 {
-	global $txt, $context, $scripturl, $settings;
+	global $txt, $context, $scripturl;
 
 	// whitelist by User Agent String
 	echo '

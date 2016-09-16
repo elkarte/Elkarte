@@ -1030,7 +1030,7 @@ function ssi_topPoll($output_method = 'echo')
  */
 function ssi_recentPoll($topPollInstead = false, $output_method = 'echo')
 {
-	global $txt, $settings, $boardurl, $user_info, $context, $modSettings;
+	global $txt, $boardurl, $user_info, $context, $modSettings;
 
 	$boardsAllowed = array_intersect(boardsAllowedTo('poll_view'), boardsAllowedTo('poll_vote'));
 
@@ -1759,7 +1759,7 @@ function ssi_checkPassword($id = null, $password = null, $is_username = false)
  */
 function ssi_recentAttachments($num_attachments = 10, $attachment_ext = array(), $output_method = 'echo')
 {
-	global $modSettings, $scripturl, $txt, $settings;
+	global $modSettings, $scripturl, $txt;
 
 	// We want to make sure that we only get attachments for boards that we can see *if* any.
 	$attachments_boards = boardsAllowedTo('view_attachments');

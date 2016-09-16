@@ -25,7 +25,7 @@ function template_Maintenance_init()
  */
 function template_maintain_database()
 {
-	global $context, $settings, $txt, $scripturl;
+	global $context, $txt, $scripturl;
 
 	// If maintenance has finished tell the user.
 	if (!empty($context['maintenance_finished']))

@@ -532,7 +532,7 @@ function template_add_edit_group_boards_list($form_id, $collapse = true)
  */
 function template_group_members()
 {
-	global $context, $settings, $scripturl, $txt;
+	global $context, $scripturl, $txt;
 
 	echo '
 	<div id="admincenter">

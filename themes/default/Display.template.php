@@ -656,7 +656,7 @@ function template_quickreply_below()
  */
 function template_display_poll_above()
 {
-	global $settings, $context, $txt, $scripturl;
+	global $context, $txt, $scripturl;
 
 	echo '
 			<div id="poll">

@@ -26,7 +26,7 @@ function template_ProfileOptions_init()
  */
 function template_editBuddies()
 {
-	global $context, $settings, $scripturl, $txt;
+	global $context, $scripturl, $txt;
 
 	echo '
 	<div id="edit_buddies">
@@ -139,7 +139,7 @@ function template_editBuddies()
  */
 function template_editIgnoreList()
 {
-	global $context, $settings, $scripturl, $txt;
+	global $context, $scripturl, $txt;
 
 	echo '
 	<div id="edit_buddies">
@@ -1269,7 +1269,7 @@ function template_profile_karma_modify()
  */
 function template_profile_timeformat_modify()
 {
-	global $context, $txt, $scripturl, $settings;
+	global $context, $txt, $scripturl;
 
 	echo '
 							<dt>

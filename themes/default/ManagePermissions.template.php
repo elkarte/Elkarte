@@ -18,7 +18,7 @@
  */
 function template_permission_index()
 {
-	global $context, $settings, $scripturl, $txt, $modSettings;
+	global $context, $scripturl, $txt, $modSettings;
 
 	// Not allowed to edit?
 	if (!$context['can_modify'])
@@ -503,7 +503,7 @@ function template_modify_group()
  */
 function template_modify_group_classic($type)
 {
-	global $context, $settings, $scripturl, $txt, $modSettings;
+	global $context, $scripturl, $txt, $modSettings;
 
 	$permission_type = &$context['permissions'][$type];
 	$disable_field = $context['profile']['can_modify'] ? '' : 'disabled="disabled" ';

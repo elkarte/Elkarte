@@ -58,7 +58,7 @@ function template_mlsearch_above()
  */
 function template_memberlist()
 {
-	global $context, $settings, $scripturl, $txt;
+	global $context, $txt;
 
 	echo '
 	<div id="memberlist">
