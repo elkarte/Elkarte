@@ -144,9 +144,9 @@ class Settings_Form
 					{
 						$new_setting['mask'] = 'nohtml';
 					}
+					$modSettings[$config_var[0]] = $value;
 				}
 				$new_settings[] = $new_setting;
-				$modSettings[$config_var[0]] = $value;
 			}
 		}
 		if (!empty($new_settings))
