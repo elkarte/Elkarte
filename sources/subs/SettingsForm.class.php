@@ -143,7 +143,6 @@ class Settings_Form
 	{
 		$settingsForm = new self(new SettingsFormAdapterDb);
 		$settingsForm->setConfigVars($config_vars);
-
 		$settingsForm->prepare();
 	}
 
@@ -160,7 +159,6 @@ class Settings_Form
 	public function save()
 	{
 		validateToken('admin-ssc');
-
 		$this->adapter->save();
 	}
 
@@ -170,7 +168,7 @@ class Settings_Form
 	 * @param mixed[]        $config_vars
 	 * @param mixed[]|object $post_object
 	 */
- 	public static function save_db($config_vars, $post_object = null)
+	public static function save_db($config_vars, $post_object = null)
 	{
 		// Just look away if you have a weak stomach
 		if ($post_object !== null && is_object($post_object))
@@ -184,7 +182,6 @@ class Settings_Form
 		$settingsForm = new self(new SettingsFormAdapterDb);
 		$settingsForm->setConfigVars($config_vars);
 		$settingsForm->setPostVars($post_vars);
-
 		$settingsForm->save();
 	}
 

@@ -1147,12 +1147,6 @@ function template_show_settings()
 			<input type="hidden" name="', $context['admin-ssc_token_var'], '" value="', $context['admin-ssc_token'], '" />';
 	}
 
-	if (isset($context['admin-dbsc_token']))
-	{
-		echo '
-			<input type="hidden" name="', $context['admin-dbsc_token_var'], '" value="', $context['admin-dbsc_token'], '" />';
-	}
-
 	echo '
 			<input type="hidden" name="', $context['session_var'], '" value="', $context['session_id'], '" />
 		</form>

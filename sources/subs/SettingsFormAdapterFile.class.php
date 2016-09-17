@@ -47,9 +47,9 @@ class SettingsFormAdapterFile extends SettingsFormAdapterDb
 	 *    5 help - '' or helptxt variable name
 	 *  )
 	 * - The following named keys are also permitted
-	 *  'disabled' =>
-	 *  'postinput' =>
-	 *  'preinput' =>
+	 *    'disabled' =>
+	 *    'postinput' =>
+	 *    'preinput' =>
 	 *    'subtext' =>
 	 */
 	public function prepare()
@@ -108,10 +108,7 @@ class SettingsFormAdapterFile extends SettingsFormAdapterDb
 			}
 		}
 		$this->setConfigVars($this->new_settings);
-		parent::buildFormVars();
-
-		// Two tokens because saving these settings requires both save and save_db
-		createToken('admin-ssc');
+		parent::prepare();
 	}
 
 	/**

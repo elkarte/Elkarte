@@ -295,8 +295,6 @@ class SettingsFormAdapterDb extends SettingsFormAdapter
 			);
 		}
 
-		validateToken('admin-dbsc');
-
 		$inlinePermissions = array();
 		foreach ($this->config_vars as $var)
 		{

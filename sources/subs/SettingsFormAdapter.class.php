@@ -80,8 +80,6 @@ abstract class SettingsFormAdapter implements SettingsFormAdapter_Interface
 	{
 		global $context, $txt, $modSettings;
 
-		createToken('admin-dbsc');
-
 		$context['config_vars'] = $this->context;
 	}
 
