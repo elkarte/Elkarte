@@ -67,10 +67,65 @@
 class Settings_Form
 {
 	/**
-	 * Configuration variables and values, for this settings form.
+	 * Configuration variables and values for this settings form.
+	 *
 	 * @var array
 	 */
-	protected $_config_vars;
+	protected $config_vars;
+
+	/**
+	 * Post variables and values for this settings form.
+	 *
+	 * @var array
+	 */
+	private $post_vars;
+
+	/**
+	 * @var array
+	 */
+	private $context = array();
+
+	/**
+	 * @return array
+	 */
+	public function getConfigVars()
+	{
+		return $this->config_vars;
+	}
+
+	/**
+	 * @param array $config_vars
+	 */
+	public function setConfigVars($config_vars)
+	{
+		$this->config_vars = $config_vars;
+	}
+
+	/**
+	 * @return array
+	 */
+	public function getPostVars()
+	{
+		return $this->post_vars;
+	}
+
+	/**
+	 * @param array $post_vars
+	 */
+	public function setPostVars($post_vars)
+	{
+		$this->post_vars = $post_vars;
+	}
+
+	public function __construct()
+	{
+		$this->post_vars = $_POST;
+	}
+
+	public function prepare_file()
+	{
+		$this->prepareFile();
+	}
 
 	/**
 	 * Helper method, it sets up the context for the settings which will be saved
@@ -93,11 +148,10 @@ class Settings_Form
 	 *  'preinput' =>
 	 *    'subtext' =>
 	 */
-	public function prepare_file()
+	private function prepareFile()
 	{
 		global $context, $modSettings;
 
-		$context['config_vars'] = array();
 		$defines = array(
 			'boarddir',
 			'sourcedir',
@@ -110,11 +164,11 @@ class Settings_Form
 			'mbname',
 		);
 		$new_settings = array();
-		foreach ($this->_config_vars as $identifier => $config_var)
+		foreach ($this->config_vars as $identifier => $config_var)
 		{
 			if (!is_array($config_var) || !isset($config_var[1]))
 			{
-				$context['config_vars'][] = $config_var;
+				$this->context[] = $config_var;
 			}
 			else
 			{
@@ -149,10 +203,8 @@ class Settings_Form
 				$new_settings[] = $new_setting;
 			}
 		}
-		if (!empty($new_settings))
-		{
-			self::prepare_db($new_settings);
-		}
+		$this->setConfigVars($new_settings);
+		$this->buildFormVars();
 
 		// Two tokens because saving these settings requires both save and save_db
 		createToken('admin-ssc');
@@ -163,7 +215,20 @@ class Settings_Form
 	 *
 	 * @param mixed[] $config_vars
 	 */
-	public static function prepare_db(&$config_vars)
+	public static function prepare_db($config_vars)
+	{
+		$settingsForm = new self;
+		$settingsForm->setConfigVars($config_vars);
+
+		$settingsForm->buildFormVars();
+	}
+
+	/**
+	 * Helper method, it sets up the context for database settings.
+	 *
+	 * @param mixed[] $config_vars
+	 */
+	private function buildFormVars()
 	{
 		global $txt, $helptxt, $context, $modSettings;
 		static $known_rules = null;
@@ -177,15 +242,14 @@ class Settings_Form
 
 		loadLanguage('Help');
 
-		$context['config_vars'] = array();
 		$inlinePermissions = array();
 		$bbcChoice = array();
-		foreach ($config_vars as $config_var)
+		foreach ($this->config_vars as $config_var)
 		{
 			// HR?
 			if (!is_array($config_var))
 			{
-				$context['config_vars'][] = $config_var;
+				$this->context[] = $config_var;
 			}
 			else
 			{
@@ -211,7 +275,7 @@ class Settings_Form
 					$bbcChoice[] = $config_var[1];
 				}
 
-				$context['config_vars'][$config_var[1]] = array(
+				$this->context[$config_var[1]] = array(
 					'label' => isset($config_var['text_label']) ? $config_var['text_label'] : (isset($txt[$config_var[1]]) ? $txt[$config_var[1]] : (isset($config_var[3]) && !is_array($config_var[3]) ? $config_var[3] : '')),
 					'help' => isset($config_var['helptext']) ? $config_var['helptext'] : (isset($helptxt[$config_var[1]]) ? $config_var[1] : ''),
 					'type' => $config_var[0],
@@ -234,20 +298,20 @@ class Settings_Form
 					// If we allow multiple selections, we need to adjust a few things.
 					if ($config_var[0] == 'select' && !empty($config_var['multiple']))
 					{
-						$context['config_vars'][$config_var[1]]['name'] .= '[]';
-						$context['config_vars'][$config_var[1]]['value'] = !empty($context['config_vars'][$config_var[1]]['value']) ? Util::unserialize($context['config_vars'][$config_var[1]]['value']) : array();
+						$this->context[$config_var[1]]['name'] .= '[]';
+						$this->context[$config_var[1]]['value'] = !empty($this->context[$config_var[1]]['value']) ? Util::unserialize($this->context[$config_var[1]]['value']) : array();
 					}
 
 					// If it's associative
 					if (isset($config_var[2][0]) && is_array($config_var[2][0]))
 					{
-						$context['config_vars'][$config_var[1]]['data'] = $config_var[2];
+						$this->context[$config_var[1]]['data'] = $config_var[2];
 					}
 					else
 					{
 						foreach ($config_var[2] as $key => $item)
 						{
-							$context['config_vars'][$config_var[1]]['data'][] = array($key, $item);
+							$this->context[$config_var[1]]['data'][] = array($key, $item);
 						}
 					}
 				}
@@ -279,25 +343,38 @@ class Settings_Form
 
 						$validator = new Data_Validator();
 						$validator->sanitation_rules($rules);
-						$validator->validate(array($config_var[1] => $context['config_vars'][$config_var[1]]['value']));
+						$validator->validate(array($config_var[1] => $this->context[$config_var[1]]['value']));
 
-						$context['config_vars'][$config_var[1]]['value'] = $validator->{$config_var[1]};
+						$this->context[$config_var[1]]['value'] = $validator->{$config_var[1]};
 					}
 				}
 
 				// Finally allow overrides - and some final cleanups.
-				self::allowOverrides($config_var);
+				$this->allowOverrides($config_var);
 			}
 		}
 
 		// If we have inline permissions we need to prep them.
-		self::init_inline_permissions($inlinePermissions, isset($context['permissions_excluded']) ? $context['permissions_excluded'] : array());
+		$this->init_inline_permissions($inlinePermissions, isset($context['permissions_excluded']) ? $context['permissions_excluded'] : array());
 
 		// What about any BBC selection boxes?
-		self::initBbcChoices($bbcChoice);
+		$this->initBbcChoices($bbcChoice);
 
 		call_integration_hook('integrate_prepare_db_settings', array(&$config_vars));
+		$this->prepareContext();
+	}
+
+	/**
+	 * Prepare the template by loading context
+	 * variables for each setting.
+	 */
+	private function prepareContext()
+	{
+		global $context, $txt, $modSettings;
+
 		createToken('admin-dbsc');
+
+		$context['config_vars'] = $this->context;
 	}
 
 	/**
@@ -306,7 +383,7 @@ class Settings_Form
 	 * @param string[] $permissions
 	 * @param int[]    $excluded_groups = array()
 	 */
-	private static function init_inline_permissions($permissions, $excluded_groups = array())
+	private function init_inline_permissions($permissions, $excluded_groups = array())
 	{
 		global $context, $modSettings;
 
@@ -325,7 +402,7 @@ class Settings_Form
 	/**
 	 * @param mixed[] $config_var
 	 */
-	private static function allowOverrides($config_var)
+	private function allowOverrides($config_var)
 	{
 		global $context, $modSettings;
 
@@ -335,32 +412,32 @@ class Settings_Form
 			{
 				if (substr($k, 0, 2) == 'on')
 				{
-					$context['config_vars'][$config_var[1]]['javascript'] .= ' ' . $k . '="' . $v . '"';
+					$this->context[$config_var[1]]['javascript'] .= ' ' . $k . '="' . $v . '"';
 				}
 				else
 				{
-					$context['config_vars'][$config_var[1]][$k] = $v;
+					$this->context[$config_var[1]][$k] = $v;
 				}
 			}
 
 			// See if there are any other labels that might fit?
 			if (isset($txt['setting_' . $config_var[1]]))
 			{
-				$context['config_vars'][$config_var[1]]['label'] = $txt['setting_' . $config_var[1]];
+				$this->context[$config_var[1]]['label'] = $txt['setting_' . $config_var[1]];
 			}
 			elseif (isset($txt['groups_' . $config_var[1]]))
 			{
-				$context['config_vars'][$config_var[1]]['label'] = $txt['groups_' . $config_var[1]];
+				$this->context[$config_var[1]]['label'] = $txt['groups_' . $config_var[1]];
 			}
 		}
 
 		// Set the subtext in case it's part of the label.
 		// @todo Temporary. Preventing divs inside label tags.
-		$divPos = strpos($context['config_vars'][$config_var[1]]['label'], '<div');
+		$divPos = strpos($this->context[$config_var[1]]['label'], '<div');
 		if ($divPos !== false)
 		{
-			$context['config_vars'][$config_var[1]]['subtext'] = preg_replace('~</?div[^>]*>~', '', substr($context['config_vars'][$config_var[1]]['label'], $divPos));
-			$context['config_vars'][$config_var[1]]['label'] = substr($context['config_vars'][$config_var[1]]['label'], 0, $divPos);
+			$this->context[$config_var[1]]['subtext'] = preg_replace('~</?div[^>]*>~', '', substr($this->context[$config_var[1]]['label'], $divPos));
+			$this->context[$config_var[1]]['label'] = substr($this->context[$config_var[1]]['label'], 0, $divPos);
 		}
 	}
 
@@ -369,7 +446,7 @@ class Settings_Form
 	 *
 	 * @param string[] $bbcChoice
 	 */
-	private static function initBbcChoices($bbcChoice)
+	private function initBbcChoices($bbcChoice)
 	{
 		global $txt, $helptxt, $context, $modSettings;
 
@@ -437,24 +514,24 @@ class Settings_Form
 		validateToken('admin-ssc');
 
 		// Fix the darn stupid cookiename! (more may not be allowed, but these for sure!)
-		if (isset($_POST['cookiename']))
+		if (isset($this->post_vars['cookiename']))
 		{
-			$_POST['cookiename'] = preg_replace('~[,;\s\.$]+~u', '', $_POST['cookiename']);
+			$this->post_vars['cookiename'] = preg_replace('~[,;\s\.$]+~u', '', $this->post_vars['cookiename']);
 		}
 
 		// Fix the forum's URL if necessary.
-		if (isset($_POST['boardurl']))
+		if (isset($this->post_vars['boardurl']))
 		{
-			if (substr($_POST['boardurl'], -10) == '/index.php')
+			if (substr($this->post_vars['boardurl'], -10) == '/index.php')
 			{
-				$_POST['boardurl'] = substr($_POST['boardurl'], 0, -10);
+				$this->post_vars['boardurl'] = substr($this->post_vars['boardurl'], 0, -10);
 			}
-			elseif (substr($_POST['boardurl'], -1) == '/')
+			elseif (substr($this->post_vars['boardurl'], -1) == '/')
 			{
-				$_POST['boardurl'] = substr($_POST['boardurl'], 0, -1);
+				$this->post_vars['boardurl'] = substr($this->post_vars['boardurl'], 0, -1);
 			}
 
-			$_POST['boardurl'] = addProtocol($_POST['boardurl'], array('http://', 'https://', 'file://'));
+			$this->post_vars['boardurl'] = addProtocol($this->post_vars['boardurl'], array('http://', 'https://', 'file://'));
 		}
 
 		// Any passwords?
@@ -505,32 +582,32 @@ class Settings_Form
 		$new_settings = array();
 		foreach ($config_passwords as $config_var)
 		{
-			if (isset($_POST[$config_var][1]) && $_POST[$config_var][0] == $_POST[$config_var][1])
+			if (isset($this->post_vars[$config_var][1]) && $this->post_vars[$config_var][0] == $this->post_vars[$config_var][1])
 			{
-				$new_settings[$config_var] = '\'' . addcslashes($_POST[$config_var][0], '\'\\') . '\'';
+				$new_settings[$config_var] = '\'' . addcslashes($this->post_vars[$config_var][0], '\'\\') . '\'';
 			}
 		}
 
 		foreach ($config_strs as $config_var)
 		{
-			if (isset($_POST[$config_var]))
+			if (isset($this->post_vars[$config_var]))
 			{
 				if (in_array($config_var, $safe_strings))
 				{
-					$new_settings[$config_var] = '\'' . addcslashes(Util::htmlspecialchars($_POST[$config_var], ENT_QUOTES), '\'\\') . '\'';
+					$new_settings[$config_var] = '\'' . addcslashes(Util::htmlspecialchars($this->post_vars[$config_var], ENT_QUOTES), '\'\\') . '\'';
 				}
 				else
 				{
-					$new_settings[$config_var] = '\'' . addcslashes($_POST[$config_var], '\'\\') . '\'';
+					$new_settings[$config_var] = '\'' . addcslashes($this->post_vars[$config_var], '\'\\') . '\'';
 				}
 			}
 		}
 
 		foreach ($config_ints as $config_var)
 		{
-			if (isset($_POST[$config_var]))
+			if (isset($this->post_vars[$config_var]))
 			{
-				$new_settings[$config_var] = (int) $_POST[$config_var];
+				$new_settings[$config_var] = (int) $this->post_vars[$config_var];
 			}
 		}
 
@@ -539,7 +616,7 @@ class Settings_Form
 			// Check boxes need to be part of this settings form
 			if ($this->_array_value_exists__recursive($key, $this->settings()))
 			{
-				if (!empty($_POST[$key]))
+				if (!empty($this->post_vars[$key]))
 				{
 					$new_settings[$key] = '1';
 				}
@@ -552,27 +629,33 @@ class Settings_Form
 
 		// Save the relevant settings in the Settings.php file.
 		require_once(SUBSDIR . '/Admin.subs.php');
-		Settings_Form::save_file($new_settings);
+		$this->saveFile($new_settings);
 
 		// Now loop through the remaining (database-based) settings.
-		$new_settings = array();
-		foreach ($this->_config_vars as $config_var)
-		{
-			// We just saved the file-based settings, so skip their definitions.
-			if (!is_array($config_var) || $config_var[2] == 'file')
+		$this->config_vars = array_map(
+			function ($config_var)
 			{
-				continue;
-			}
+				// We just saved the file-based settings, so skip their definitions.
+				if (!is_array($config_var) || $config_var[2] == 'file')
+				{
+					continue;
+				}
 
-			// Rewrite the definition a bit.
-			$new_settings[] = array($config_var[3], $config_var[0]);
-		}
+				// Rewrite the definition a bit.
+				if (is_array($config_var) && $config_var[2] == 'db')
+				{
+					return array($config_var[3], $config_var[0]);
+				}
+				else
+				{
+					// This is a regular config var requiring no special treatment.
+					return $config_var;
+				}
+			}, $this->config_vars
+		);
 
 		// Save the new database-based settings, if any.
-		if (!empty($new_settings))
-		{
-			Settings_Form::save_db($new_settings);
-		}
+		$this->saveBb();
 	}
 
 	/**
@@ -581,15 +664,33 @@ class Settings_Form
 	 * @param mixed[]        $config_vars
 	 * @param mixed[]|object $post_object
 	 */
-	public static function save_db(&$config_vars, $post_object = null)
+ 	public static function save_db($config_vars, $post_object = null)
 	{
-		static $known_rules = null;
-
 		// Just look away if you have a weak stomach
 		if ($post_object !== null && is_object($post_object))
 		{
-			$_POST = array_replace($_POST, (array) $post_object);
+			$post_vars = array_replace($_POST, (array) $post_object);
 		}
+		else
+		{
+			$post_vars = $_POST;
+		}
+		$settingsForm = new self;
+		$settingsForm->setConfigVars($config_vars);
+		$settingsForm->setPostVars($post_vars);
+
+		$settingsForm->saveDb();
+	}
+
+	/**
+	 * Helper method for saving database settings.
+	 *
+	 * @param mixed[]        $config_vars
+	 * @param mixed[]|object $post_object
+	 */
+	private function saveDb()
+	{
+		static $known_rules = null;
 
 		if ($known_rules === null)
 		{
@@ -603,9 +704,9 @@ class Settings_Form
 		validateToken('admin-dbsc');
 
 		$inlinePermissions = array();
-		foreach ($config_vars as $var)
+		foreach ($this->config_vars as $var)
 		{
-			if (!isset($var[1]) || (!isset($_POST[$var[1]]) && $var[0] != 'check' && $var[0] != 'permissions' && ($var[0] != 'bbc' || !isset($_POST[$var[1] . '_enabledTags']))))
+			if (!isset($var[1]) || (!isset($this->post_vars[$var[1]]) && $var[0] != 'check' && $var[0] != 'permissions' && ($var[0] != 'bbc' || !isset($this->post_vars[$var[1] . '_enabledTags']))))
 			{
 				continue;
 			}
@@ -613,18 +714,18 @@ class Settings_Form
 			// Checkboxes!
 			elseif ($var[0] == 'check')
 			{
-				$setArray[$var[1]] = !empty($_POST[$var[1]]) ? '1' : '0';
+				$setArray[$var[1]] = !empty($this->post_vars[$var[1]]) ? '1' : '0';
 			}
 			// Select boxes!
-			elseif ($var[0] == 'select' && in_array($_POST[$var[1]], array_keys($var[2])))
+			elseif ($var[0] == 'select' && in_array($this->post_vars[$var[1]], array_keys($var[2])))
 			{
-				$setArray[$var[1]] = $_POST[$var[1]];
+				$setArray[$var[1]] = $this->post_vars[$var[1]];
 			}
-			elseif ($var[0] == 'select' && !empty($var['multiple']) && array_intersect($_POST[$var[1]], array_keys($var[2])) != array())
+			elseif ($var[0] == 'select' && !empty($var['multiple']) && array_intersect($this->post_vars[$var[1]], array_keys($var[2])) != array())
 			{
 				// For security purposes we validate this line by line.
 				$options = array();
-				foreach ($_POST[$var[1]] as $invar)
+				foreach ($this->post_vars[$var[1]] as $invar)
 				{
 					if (in_array($invar, array_keys($var[2])))
 					{
@@ -637,12 +738,12 @@ class Settings_Form
 			// Integers!
 			elseif ($var[0] == 'int')
 			{
-				$setArray[$var[1]] = (int) $_POST[$var[1]];
+				$setArray[$var[1]] = (int) $this->post_vars[$var[1]];
 			}
 			// Floating point!
 			elseif ($var[0] == 'float')
 			{
-				$setArray[$var[1]] = (float) $_POST[$var[1]];
+				$setArray[$var[1]] = (float) $this->post_vars[$var[1]];
 			}
 			// Text!
 			elseif ($var[0] == 'text' || $var[0] == 'color' || $var[0] == 'large_text')
@@ -673,22 +774,22 @@ class Settings_Form
 
 						$validator = new Data_Validator();
 						$validator->sanitation_rules($rules);
-						$validator->validate($_POST);
+						$validator->validate($this->post_vars);
 
 						$setArray[$var[1]] = $validator->{$var[1]};
 					}
 				}
 				else
 				{
-					$setArray[$var[1]] = $_POST[$var[1]];
+					$setArray[$var[1]] = $this->post_vars[$var[1]];
 				}
 			}
 			// Passwords!
 			elseif ($var[0] == 'password')
 			{
-				if (isset($_POST[$var[1]][1]) && $_POST[$var[1]][0] == $_POST[$var[1]][1])
+				if (isset($this->post_vars[$var[1]][1]) && $this->post_vars[$var[1]][0] == $this->post_vars[$var[1]][1])
 				{
-					$setArray[$var[1]] = $_POST[$var[1]][0];
+					$setArray[$var[1]] = $this->post_vars[$var[1]][0];
 				}
 			}
 			// BBC.
@@ -697,16 +798,16 @@ class Settings_Form
 				$codes = \BBC\ParserWrapper::getInstance()->getCodes();
 				$bbcTags = $codes->getTags();
 
-				if (!isset($_POST[$var[1] . '_enabledTags']))
+				if (!isset($this->post_vars[$var[1] . '_enabledTags']))
 				{
-					$_POST[$var[1] . '_enabledTags'] = array();
+					$this->post_vars[$var[1] . '_enabledTags'] = array();
 				}
-				elseif (!is_array($_POST[$var[1] . '_enabledTags']))
+				elseif (!is_array($this->post_vars[$var[1] . '_enabledTags']))
 				{
-					$_POST[$var[1] . '_enabledTags'] = array($_POST[$var[1] . '_enabledTags']);
+					$this->post_vars[$var[1] . '_enabledTags'] = array($this->post_vars[$var[1] . '_enabledTags']);
 				}
 
-				$setArray[$var[1]] = implode(',', array_diff($bbcTags, $_POST[$var[1] . '_enabledTags']));
+				$setArray[$var[1]] = implode(',', array_diff($bbcTags, $this->post_vars[$var[1] . '_enabledTags']));
 			}
 			// Permissions?
 			elseif ($var[0] == 'permissions')
@@ -749,7 +850,7 @@ class Settings_Form
 	 *
 	 * @param mixed[] $config_vars
 	 */
-	public static function save_file($config_vars)
+	private function saveFile($config_vars)
 	{
 		global $context;
 
@@ -951,14 +1052,14 @@ class Settings_Form
 		if (is_null($config_vars))
 		{
 			// Simply return the config vars we have
-			return $this->_config_vars;
+			return $this->config_vars;
 		}
 		else
 		{
 			// We got presents :P
-			$this->_config_vars = is_array($config_vars) ? $config_vars : array($config_vars);
+			$this->config_vars = is_array($config_vars) ? $config_vars : array($config_vars);
 
-			return $this->_config_vars;
+			return $this->config_vars;
 		}
 	}
 
