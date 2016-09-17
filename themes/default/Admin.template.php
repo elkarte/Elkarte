@@ -721,7 +721,7 @@ function template_view_versions()
  */
 function template_edit_censored()
 {
-	global $context, $scripturl, $txt, $modSettings, $settings;
+	global $context, $scripturl, $txt, $modSettings;
 
 	// First section is for adding/removing words from the censored list.
 	echo '
@@ -855,7 +855,7 @@ function template_not_done()
  */
 function template_show_settings()
 {
-	global $context, $txt, $settings, $scripturl;
+	global $context, $txt, $scripturl;
 
 	echo '
 	<div id="', isset($context['current_subaction']) ? $context['current_subaction'] : 'admincenter', '" class="admincenter">
@@ -1161,7 +1161,7 @@ function template_show_settings()
  */
 function template_admin_search_results()
 {
-	global $context, $txt, $settings, $scripturl;
+	global $context, $txt, $scripturl;
 
 	echo '
 					<h2 class="category_header hdicon cat_img_search">
@@ -1523,7 +1523,7 @@ function template_clean_cache_button_below()
  */
 function template_admin_quick_search()
 {
-	global $context, $settings, $txt, $scripturl;
+	global $context, $txt, $scripturl;
 
 	if ($context['user']['is_admin'])
 	{

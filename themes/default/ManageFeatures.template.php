@@ -42,7 +42,7 @@ function template_show_custom_profile()
  */
 function template_edit_profile_field()
 {
-	global $context, $txt, $settings, $scripturl;
+	global $context, $txt, $scripturl;
 
 	// any errors messages to show?
 	if (!empty($context['custom_option__error']))

@@ -10,6 +10,7 @@
  */
 
 $output_file_name = 'detailed-version.js';
+
 if (empty($argv[1]))
 {
 	echo "Please specify a branch to compare against master\n";
@@ -19,6 +20,7 @@ else
 {
 	$new_release = $argv[1];
 }
+
 if (empty($argv[2]))
 {
 	echo "Please specify a version\n";
@@ -113,7 +115,9 @@ foreach ($version_info['default_language_versions'] as $lang => $files)
 	if ($lang == 'english')
 	{
 		foreach ($files as $file => $ver)
+		{
 			fwrite($handle, "\t'{$file}': '{$ver}',\n");
+		}
 		break;
 	}
 }
@@ -127,12 +131,21 @@ if (count(array_diff($update_files, $changed_files_list)) !== 0)
 	echo "Something is wrong: at least one of the files updated is not in the list of those changed since the lastest version.\nThis is a list of the files affected by the problem:\n";
 	print_r(array_diff($update_files, $changed_files_list));
 }
+
 if (count(array_diff($changed_files_list, $update_files)) !== 0)
 {
 	echo "Something is wrong: at least one of the files changed since the last released version has not been updated in the repository.\nThis is a list of the files affected by the problem:\n";
 	print_r(array_diff($changed_files_list, $update_files));
 }
 
+/**
+ * Get the listing of changed files between two releases
+ *
+ * @param string $from
+ * @param string $to
+ *
+ * @return array
+ */
 function getFilesChanged($from, $to)
 {
 	global $settings;
@@ -154,28 +167,56 @@ function getFilesChanged($from, $to)
 	foreach ($files as $file)
 	{
 		if (strpos($file, 'install') !== false)
+		{
 			continue;
+		}
+
 		if (strpos($file, '/ext') !== false)
+		{
 			continue;
+		}
+
 		if (strpos($file, 'tests') !== false)
+		{
 			continue;
+		}
+
 		if (strpos($file, 'fonts') !== false)
+		{
 			continue;
+		}
+
 		if (strpos($file, '/scripts') !== false)
+		{
 			continue;
+		}
+
 		if (strpos($file, '/images') !== false)
+		{
 			continue;
+		}
+
 		if (strpos($file, '/css') !== false)
+		{
 			continue;
+		}
+
 		if (strpos($file, '/languages') !== false)
+		{
 			continue;
+		}
+
 		if ($file === 'index.php')
+		{
 			continue;
+		}
+
 		if ($file === 'SSI.php')
 		{
 			$list[] = 'sourcesSSI.php';
 			continue;
 		}
+
 		if ($file === 'subscriptions.php')
 		{
 			$list[] = 'sourcessubscriptions.php';

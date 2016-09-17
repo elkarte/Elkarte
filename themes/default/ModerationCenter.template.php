@@ -237,7 +237,7 @@ function template_notes()
  */
 function template_action_required()
 {
-	global $context, $txt, $scripturl, $settings;
+	global $context, $txt, $scripturl;
 
 	echo '
 						<h2 class="category_header hdicon cat_img_moderation">', $txt['mc_required'], ' : ', $context['mc_required'], '</h2>

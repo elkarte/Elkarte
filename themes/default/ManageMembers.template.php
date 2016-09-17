@@ -304,6 +304,13 @@ function template_admin_browse()
 	</div>';
 }
 
+/**
+ * Generate membergroup actions pull down form
+ *
+ * @param array $groups
+ *
+ * @return string
+ */
 function template_users_multiactions($groups)
 {
 	global $txt;
@@ -328,6 +335,7 @@ function template_users_multiactions($groups)
 				' . $member_group['name'] . '
 			</option>';
 	}
+
 	$select .= '</select>
 					<input type="submit" name="maction_on_members" value="' . $txt['quick_mod_go'] . '" onclick="return confirm(\'' . $txt['quickmod_confirm'] . '\');" />';
 

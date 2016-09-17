@@ -820,7 +820,7 @@ function getPollStarter($id_topic)
  */
 function loadPollContext($poll_id)
 {
-	global $context, $user_info, $txt, $scripturl, $settings;
+	global $context, $user_info, $txt, $scripturl;
 
 	// Get the question and if it's locked.
 	$pollinfo = pollInfo($poll_id);

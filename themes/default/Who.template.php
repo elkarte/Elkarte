@@ -50,7 +50,7 @@ function template_whos_selection_above()
  */
 function template_whos_online()
 {
-	global $context, $settings, $scripturl, $txt;
+	global $context, $scripturl, $txt;
 
 	echo '
 			<div id="mlist">

@@ -288,7 +288,7 @@ function template_body_above()
  */
 function template_th_login_bar()
 {
-	global $context, $modSettings, $txt, $scripturl, $settings;
+	global $context, $modSettings, $txt, $scripturl;
 
 	echo '
 			<div id="top_section_notice" class="user">

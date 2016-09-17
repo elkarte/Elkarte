@@ -238,7 +238,7 @@ function template_ic_recent_posts()
  */
 function template_ic_show_events()
 {
-	global $context, $txt, $scripturl, $settings;
+	global $context, $txt, $scripturl;
 
 	echo '
 			<li class="board_row">

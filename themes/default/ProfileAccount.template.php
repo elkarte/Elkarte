@@ -206,7 +206,7 @@ function template_issueWarning()
  */
 function template_deleteAccount()
 {
-	global $context, $scripturl, $txt, $settings;
+	global $context, $scripturl, $txt;
 
 	// The main containing header.
 	echo '

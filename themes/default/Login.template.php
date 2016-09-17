@@ -18,7 +18,7 @@
  */
 function template_login()
 {
-	global $context, $settings, $scripturl, $modSettings, $txt;
+	global $context, $scripturl, $modSettings, $txt;
 
 	echo '
 		<form action="', $scripturl, '?action=login2" name="frmLogin" id="frmLogin" method="post" accept-charset="UTF-8" ', empty($context['disable_login_hashing']) ? ' onsubmit="hashLoginPassword(this, \'' . $context['session_id'] . '\');"' : '', '>
@@ -277,7 +277,7 @@ function template_maintenance()
  */
 function template_admin_login()
 {
-	global $context, $settings, $scripturl, $txt;
+	global $context, $scripturl, $txt;
 
 	// Since this should redirect to whatever they were doing, send all the get data.
 	echo '

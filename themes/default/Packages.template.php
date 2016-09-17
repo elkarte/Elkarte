@@ -335,7 +335,7 @@ function template_view_package()
 	// Toggle options.
 	echo '
 	<script>
-		var aOperationElements = new Array();';
+		var aOperationElements = [];';
 
 	// Operations.
 	if (!empty($js_operations))

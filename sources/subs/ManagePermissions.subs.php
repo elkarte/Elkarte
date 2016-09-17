@@ -25,8 +25,6 @@
  */
 function setPermissionLevel($level, $group = null, $profile = null)
 {
-	global $context;
-
 	$db = database();
 
 	// we'll need to init illegal permissions.

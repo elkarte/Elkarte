@@ -840,7 +840,7 @@ elk_Toggle.prototype.changeState = function(bCollapse, bInit)
 		oContainer;
 
 	// Default bInit to false.
-	bInit = typeof(bInit) === 'undefined' ? false : true;
+	bInit = typeof(bInit) !== 'undefined';
 
 	// Handle custom function hook before collapse.
 	if (!bInit && bCollapse && 'funcOnBeforeCollapse' in this.opt)
@@ -1606,7 +1606,7 @@ function initSearch()
  * Checks or unchecks the list of available boards
  *
  * @param {type} ids
- * @param {string} aFormID
+ * @param {string} aFormName
  * @param {string} sInputName
  */
 function selectBoards(ids, aFormName, sInputName)
@@ -1657,7 +1657,7 @@ function expandCollapse(id, icon, speed)
 /**
  * Highlight a selection box by adding the highlight2 class
  *
- * @param string container_id
+ * @param {string} container_id
  */
 function initHighlightSelection(container_id)
 {

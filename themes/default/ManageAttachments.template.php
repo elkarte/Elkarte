@@ -18,7 +18,7 @@
  */
 function template_maintenance()
 {
-	global $context, $settings, $scripturl, $txt, $modSettings;
+	global $context, $scripturl, $txt, $modSettings;
 
 	echo '
 	<div id="manage_attachments">

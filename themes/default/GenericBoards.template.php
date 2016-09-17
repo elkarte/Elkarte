@@ -88,7 +88,7 @@ function optimizeBoardsSubdivision($categories, $total_boards)
  */
 function template_list_boards(array $boards, $id)
 {
-	global $context, $settings, $txt, $scripturl;
+	global $context, $txt, $scripturl;
 
 	echo '
 			<ul class="category_boards" id="', $id, '">';

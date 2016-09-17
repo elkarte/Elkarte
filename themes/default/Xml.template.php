@@ -569,7 +569,7 @@ function template_feedatom()
  */
 function template_feedrss()
 {
-	global $context, $scripturl, $txt, $settings;
+	global $context, $scripturl, $txt;
 
 	echo '<?xml version="1.0" encoding="UTF-8"?' . '>
 	<rss version=', $context['xml_format'] == 'rss2' ? '"2.0" xmlns:dc="http://purl.org/dc/elements/1.1/"' : '"0.92"', ' xml:lang="', strtr($txt['lang_locale'], '_', '-'), '">
