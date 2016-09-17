@@ -410,6 +410,9 @@ class SettingsFormAdapterDb extends SettingsFormAdapter
 
 		if (!empty($setArray))
 		{
+			// Just in case we cached this.
+			$setArray['settings_updated'] = time();
+
 			updateSettings($setArray);
 		}
 
