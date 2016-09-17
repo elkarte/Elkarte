@@ -112,6 +112,11 @@ function reloadSettings()
 		$modSettings['avatar_max_width'] = isset($modSettings['avatar_max_width_external']) ? $modSettings['avatar_max_width_external'] : 65;
 	}
 
+	if (!isset($_SERVER['HTTPS']) || strtolower($_SERVER['HTTPS']) == 'off')
+	{
+		$modSettings['secureCookies'] = 0;
+	}
+
 	// Here to justify the name of this function. :P
 	// It should be added to the install and upgrade scripts.
 	// But since the converters need to be updated also. This is easier.
