@@ -57,7 +57,7 @@ class InlinePermissions_Form extends Inline_Permissions_Form
 	 *
 	 * @param string[] $permissions
 	 */
- 	public static function save_inline_permissions($permissions)
+	public static function save_inline_permissions($permissions)
 	{
 		$permissionsForm = new self;
 		$permissionsForm->setPermissions($permissions);
