@@ -238,45 +238,28 @@ class SettingsFormAdapterDb extends SettingsFormAdapter
 		// What are the options, eh?
 		$codes = \BBC\ParserWrapper::getInstance()->getCodes();
 		$bbcTags = $codes->getTags();
-
 		$bbcTags = array_unique($bbcTags);
-		$totalTags = count($bbcTags);
-
-		// The number of columns we want to show the BBC tags in.
-		$numColumns = isset($context['num_bbc_columns']) ? $context['num_bbc_columns'] : 3;
-
-		// Start working out the context stuff.
-		$context['bbc_columns'] = array();
-		$tagsPerColumn = ceil($totalTags / $numColumns);
-
-		$col = 0;
-		$i = 0;
+		$bbc_sections = array();
 		foreach ($bbcTags as $tag)
 		{
-			if ($i % $tagsPerColumn == 0 && $i != 0)
-			{
-				$col++;
-			}
-
-			$context['bbc_columns'][$col][] = array(
+			$bbc_sections[] = array(
 				'tag' => $tag,
 				// @todo  'tag_' . ?
 				'show_help' => isset($helptxt[$tag]),
 			);
-
-			$i++;
 		}
 
 		// Now put whatever BBC options we may have into context too!
-		$context['bbc_sections'] = array();
-		foreach ($bbcChoice as $bbc)
+		foreach ($bbcChoice as $varName)
 		{
-			$context['bbc_sections'][$bbc] = array(
-				'title' => isset($txt['bbc_title_' . $bbc]) ? $txt['bbc_title_' . $bbc] : $txt['bbcTagsToUse_select'],
-				'disabled' => empty($modSettings['bbc_disabled_' . $bbc]) ? array() : $modSettings['bbc_disabled_' . $bbc],
-				'all_selected' => empty($modSettings['bbc_disabled_' . $bbc]),
-			);
+			$disabled = empty($modSettings['bbc_disabled_' . $varName]);
+			$this->context[$varName] = array_merge(array(
+				'disabled' => $disabled ? array() : $modSettings['bbc_disabled_' . $varName],
+				'all_selected' => $disabled,
+				'data' => $bbc_sections,
+			), $this->context[$varName]);
 		}
+		 var_export($this->context);
 	}
 
 	/**
