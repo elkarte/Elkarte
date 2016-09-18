@@ -32,7 +32,7 @@
  */
 function log_error($error_message, $error_type = 'general', $file = null, $line = null)
 {
-	Errors::instance()->log_error($error_message, $error_type = 'general', $file = null, $line = null);
+	Errors::instance()->log_error($error_message, $error_type, $file, $line);
 }
 
 /**
@@ -47,7 +47,7 @@ function log_error($error_message, $error_type = 'general', $file = null, $line 
  */
 function log_lang_error($error, $error_type = 'general', $sprintf = array(), $file = null, $line = null)
 {
-	Errors::instance()->log_lang_error($error, $error_type = 'general', $sprintf = array(), $file = null, $line = null);
+	Errors::instance()->log_lang_error($error, $error_type, $sprintf, $file, $line);
 }
 
 /**
@@ -59,7 +59,7 @@ function log_lang_error($error, $error_type = 'general', $sprintf = array(), $fi
  */
 function fatal_error($error, $log = 'general')
 {
-	Errors::instance()->fatal_error($error, $log = 'general');
+	Errors::instance()->fatal_error($error, $log);
 }
 
 /**
@@ -79,7 +79,7 @@ function fatal_error($error, $log = 'general')
  */
 function fatal_lang_error($error, $log = 'general', $sprintf = array())
 {
-	Errors::instance()->fatal_lang_error($error, $log = 'general', $sprintf = array());
+	Errors::instance()->fatal_lang_error($error, $log, $sprintf);
 }
 
 /**
