@@ -115,7 +115,7 @@ function writeLog($force = false)
 		require_once(SUBSDIR . '/Members.subs.php');
 		updateMemberData($user_info['id'], array('last_login' => time(), 'member_ip' => $user_info['ip'], 'member_ip2' => $req->ban_ip(), 'total_time_logged_in' => $user_settings['total_time_logged_in']));
 
-		if ($cache->checkLevel(2))
+		if ($cache->levelHigherThan(1))
 			$cache->put('user_settings-' . $user_info['id'], $user_settings, 60);
 
 		$user_info['total_time_logged_in'] += time() - $_SESSION['timeOnlineUpdated'];

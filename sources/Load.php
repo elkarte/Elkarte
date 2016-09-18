@@ -104,9 +104,18 @@ function reloadSettings()
 
 	// @deprecated since 1.0.6 compatibility setting for migration
 	if (!isset($modSettings['avatar_max_height']))
-		$modSettings['avatar_max_height'] = $modSettings['avatar_max_height_external'];
+	{
+		$modSettings['avatar_max_height'] = isset($modSettings['avatar_max_height_external']) ? $modSettings['avatar_max_height_external'] : 65;
+	}
 	if (!isset($modSettings['avatar_max_width']))
-		$modSettings['avatar_max_width'] = $modSettings['avatar_max_width_external'];
+	{
+		$modSettings['avatar_max_width'] = isset($modSettings['avatar_max_width_external']) ? $modSettings['avatar_max_width_external'] : 65;
+	}
+
+	if (!isset($_SERVER['HTTPS']) || strtolower($_SERVER['HTTPS']) == 'off')
+	{
+		$modSettings['secureCookies'] = 0;
+	}
 
 	// Here to justify the name of this function. :P
 	// It should be added to the install and upgrade scripts.
@@ -198,7 +207,7 @@ function loadUserSettings()
 	if ($id_member != 0)
 	{
 		// Is the member data cached?
-		if (!$cache->checkLevel(2) || !$cache->getVar($user_settings, 'user_settings-' . $id_member, 60))
+		if ($cache->levelLowerThan(2) || $cache->getVar($user_settings, 'user_settings-' . $id_member, 60) === false)
 		{
 			$this_user = $db->fetchQuery('
 				SELECT mem.*, IFNULL(a.id_attach, 0) AS id_attach, a.filename, a.attachment_type
@@ -219,7 +228,7 @@ function loadUserSettings()
 				$user_settings['id_member'] = (int) $user_settings['id_member'];
 			}
 
-			if ($cache->checkLevel(2))
+			if ($cache->levelHigherThan(1))
 				$cache->put('user_settings-' . $id_member, $user_settings, 60);
 		}
 
@@ -270,7 +279,7 @@ function loadUserSettings()
 				updateMemberData($id_member, array('id_msg_last_visit' => (int) $modSettings['maxMsgID'], 'last_login' => time(), 'member_ip' => $req->client_ip(), 'member_ip2' => $req->ban_ip()));
 				$user_settings['last_login'] = time();
 
-				if ($cache->checkLevel(2))
+				if ($cache->levelHigherThan(1))
 					$cache->put('user_settings-' . $id_member, $user_settings, 60);
 
 				$cache->put('user_last_visit-' . $id_member, $_SESSION['id_msg_last_visit'], 5 * 3600);
@@ -473,7 +482,7 @@ function loadBoard()
 		return;
 	}
 
-	if ($cache->isEnabled() && (empty($topic) || $cache->checkLevel(3)))
+	if ($cache->isEnabled() && (empty($topic) || $cache->levelHigherThan(2)))
 	{
 		// @todo SLOW?
 		if (!empty($topic))
@@ -593,7 +602,7 @@ function loadBoard()
 
 			call_integration_hook('integrate_loaded_board', array(&$board_info, &$row));
 
-			if ($cache->isEnabled() && (empty($topic) || $cache->checkLevel(3)))
+			if ($cache->isEnabled() && (empty($topic) || $cache->levelHigherThan(2)))
 			{
 				// @todo SLOW?
 				if (!empty($topic))
@@ -727,7 +736,7 @@ function loadPermissions()
 			$cache_groups .= '-spider';
 
 		$temp = array();
-		if ($cache->checkLevel(2) && !empty($board) && $cache->getVar($temp, 'permissions:' . $cache_groups . ':' . $board, 240) && time() - 240 > $modSettings['settings_updated'])
+		if ($cache->levelHigherThan(1) && !empty($board) && $cache->getVar($temp, 'permissions:' . $cache_groups . ':' . $board, 240) && time() - 240 > $modSettings['settings_updated'])
 		{
 			list ($user_info['permissions']) = $temp;
 			banPermissions();
@@ -735,7 +744,12 @@ function loadPermissions()
 			return;
 		}
 		elseif ($cache->getVar($temp, 'permissions:' . $cache_groups, 240) && time() - 240 > $modSettings['settings_updated'])
-			list ($user_info['permissions'], $removals) = $temp;
+		{
+			if (is_array($temp))
+			{
+				list ($user_info['permissions'], $removals) = $temp;
+			}
+		}
 	}
 
 	// If it is detected as a robot, and we are restricting permissions as a special group - then implement this.
@@ -764,7 +778,7 @@ function loadPermissions()
 		$db->free_result($request);
 
 		if (isset($cache_groups))
-			$cache->put('permissions:' . $cache_groups, array($user_info['permissions'], $removals), 240);
+			$cache->put('permissions:' . $cache_groups, array($user_info['permissions'], !empty($removals) ? $removals : array()), 2);
 	}
 
 	// Get the board permissions.
@@ -800,7 +814,7 @@ function loadPermissions()
 	if (!empty($modSettings['permission_enable_deny']))
 		$user_info['permissions'] = array_diff($user_info['permissions'], $removals);
 
-	if (isset($cache_groups) && !empty($board) && $cache->checkLevel(2))
+	if (isset($cache_groups) && !empty($board) && $cache->levelHigherThan(1))
 		$cache->put('permissions:' . $cache_groups . ':' . $board, array($user_info['permissions'], null), 240);
 
 	// Banned?  Watch, don't touch..
@@ -846,7 +860,7 @@ function loadMemberData($users, $is_name = false, $set = 'normal')
 	$users = !is_array($users) ? array($users) : array_unique($users);
 	$loaded_ids = array();
 
-	if (!$is_name && $cache->isEnabled() && $cache->checkLevel(3))
+	if (!$is_name && $cache->isEnabled() && $cache->levelHigherThan(2))
 	{
 		$users = array_values($users);
 		for ($i = 0, $n = count($users); $i < $n; $i++)
@@ -946,7 +960,7 @@ function loadMemberData($users, $is_name = false, $set = 'normal')
 	if (!empty($new_loaded_ids))
 		call_integration_hook('integrate_add_member_data', array($new_loaded_ids, $set));
 
-	if (!empty($new_loaded_ids) && $cache->checkLevel(3))
+	if (!empty($new_loaded_ids) && $cache->levelHigherThan(2))
 	{
 		for ($i = 0, $n = count($new_loaded_ids); $i < $n; $i++)
 			$cache->put('member_data-' . $set . '-' . $new_loaded_ids[$i], $user_profile[$new_loaded_ids[$i]], 240);
@@ -1226,13 +1240,13 @@ function getThemeId($id_theme = 0)
  */
 function getThemeData($id_theme, $member)
 {
-	global $modSettings;
+	global $modSettings, $boardurl;
 
 	$cache = Cache::instance();
 
 	// Do we already have this members theme data and specific options loaded (for aggressive cache settings)
 	$temp = array();
-	if ($cache->checkLevel(2) && $cache->getVar($temp, 'theme_settings-' . $id_theme . ':' . $member, 60) && time() - 60 > $modSettings['settings_updated'])
+	if ($cache->levelHigherThan(1) && $cache->getVar($temp, 'theme_settings-' . $id_theme . ':' . $member, 60) && time() - 60 > $modSettings['settings_updated'])
 	{
 		$themeData = $temp;
 		$flag = true;
@@ -1279,6 +1293,17 @@ function getThemeData($id_theme, $member)
 		}
 		$db->free_result($result);
 
+		if (file_exists($themeData[0]['default_theme_dir'] . '/cache') /*&& is_writable($themeData[0]['default_theme_dir'] . '/cache')*/)
+		{
+			$themeData[0]['default_theme_cache_dir'] = $themeData[0]['default_theme_dir'] . '/cache';
+			$themeData[0]['default_theme_cache_url'] = $themeData[0]['default_theme_url'] . '/cache';
+		}
+		else
+		{
+			$themeData[0]['default_theme_cache_dir'] = CACHEDIR;
+			$themeData[0]['default_theme_cache_url'] = $boardurl . '/cache';
+		}
+
 		// Set the defaults if the user has not chosen on their own
 		if (!empty($themeData[-1]))
 		{
@@ -1290,7 +1315,7 @@ function getThemeData($id_theme, $member)
 		}
 
 		// If being aggressive we save the site wide and member theme settings
-		if ($cache->checkLevel(2))
+		if ($cache->levelHigherThan(1))
 			$cache->put('theme_settings-' . $id_theme . ':' . $member, $themeData, 60);
 		// Only if we didn't already load that part of the cache...
 		elseif (!isset($temp))
@@ -1317,7 +1342,6 @@ function initTheme($id_theme = 0)
 
 	// Load in the theme variables for them
 	$themeData = getThemeData($id_theme, $member);
-
 	$settings = $themeData[0];
 	$options = $themeData[$member];
 
@@ -2350,7 +2374,7 @@ function getLanguages($use_cache = true)
 	// Either we don't use the cache, or its expired.
 	$languages = array();
 
-	if (!$use_cache || !$cache->getVar($languages, 'known_languages', !$cache->checkLevel(1) ? 86400 : 3600))
+	if (!$use_cache || !$cache->getVar($languages, 'known_languages', $cache->levelLowerThan(2) ? 86400 : 3600))
 	{
 		// If we don't have our theme information yet, lets get it.
 		if (empty($settings['default_theme_dir']))
@@ -2403,7 +2427,7 @@ function getLanguages($use_cache = true)
 		}
 
 		// Lets cash in on this deal.
-		$cache->put('known_languages', $languages, $cache->isEnabled() && !Cache::instance()->checkLevel(1) ? 86400 : 3600);
+		$cache->put('known_languages', $languages, $cache->isEnabled() && $cache->levelLowerThan(1) ? 86400 : 3600);
 	}
 
 	return $languages;
@@ -2627,7 +2651,7 @@ function doSecurityChecks()
 		require_once(SUBSDIR . '/Attachments.subs.php');
 		$path = getAttachmentPath();
 		secureDirectory($path, true);
-		secureDirectory(CACHEDIR);
+		secureDirectory(CACHEDIR, false, '"\.(js|css)$"');
 
 		// Active admin session?
 		if (isAdminSessionActive())

@@ -1308,11 +1308,11 @@ function ssi_showPoll($topicID = null, $output_method = 'echo')
  */
 function ssi_pollVote()
 {
-	global $context, $sc, $topic, $board;
+	global $context, $topic, $board;
 
 	$pollID = isset($_POST['poll']) ? (int) $_POST['poll'] : 0;
 
-	if (empty($pollID) || !isset($_POST[$context['session_var']]) || $_POST[$context['session_var']] != $sc || empty($_POST['options']))
+	if (empty($pollID) || !isset($_POST[$context['session_var']]) || $_POST[$context['session_var']] != $_SESSION['session_value'] || empty($_POST['options']))
 	{
 		echo '<!DOCTYPE html>
 <html>

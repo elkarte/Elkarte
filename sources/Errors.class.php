@@ -101,7 +101,7 @@ class Errors
 	 */
 	public function log_error($error_message, $error_type = 'general', $file = null, $line = null)
 	{
-		global $modSettings, $sc, $user_info, $scripturl, $last_error;
+		global $modSettings, $user_info, $scripturl, $last_error;
 
 		$db = database();
 		static $tried_hook = false;
@@ -161,7 +161,7 @@ class Errors
 		$error_type = in_array($error_type, $known_error_types) && $error_type !== true ? $error_type : 'general';
 
 		// Don't log the same error countless times, as we can get in a cycle of depression...
-		$error_info = array($user_info['id'], time(), $user_info['ip'], $query_string, $error_message, (string) $sc, $error_type, $file, $line);
+		$error_info = array($user_info['id'], time(), $user_info['ip'], $query_string, $error_message, (string) $_SESSION['session_value'], $error_type, $file, $line);
 		if (empty($last_error) || $last_error != $error_info)
 		{
 			// Insert the error into the database.

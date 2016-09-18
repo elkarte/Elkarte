@@ -34,7 +34,8 @@ function spiderCheck()
 
 	// We cache the spider data for five minutes if we can.
 	$spider_data = array();
-	if (!Cache::instance()->getVar($spider_data, 'spider_search', 300))
+	$cache = Cache::instance();
+	if (!$cache->getVar($spider_data, 'spider_search', 300))
 	{
 		$request = $db->query('', '
 			SELECT id_spider, user_agent, ip_info
@@ -48,7 +49,7 @@ function spiderCheck()
 		$db->free_result($request);
 
 		// Save it in the cache
-		Cache::instance()->put('spider_search', $spider_data, 300);
+		$cache->put('spider_search', $spider_data, 300);
 	}
 
 	if (empty($spider_data))

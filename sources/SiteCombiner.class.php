@@ -127,6 +127,8 @@ class Site_Combiner
 		// Init
 		$this->_archive_dir = $cachedir;
 		$this->_archive_url = $cacheurl;
+
+		$this->_spares = array();
 	}
 
 	/**
@@ -137,11 +139,19 @@ class Site_Combiner
 	 */
 	public function site_js_combine($files, $do_defered)
 	{
-		// No files or missing or not writable directory then we are done
-		if (empty($files) || !file_exists($this->_archive_dir) || !is_writable($this->_archive_dir))
+		// No files or missing we are done
+		if (empty($files))
+		{
 			return false;
+		}
 
-		$this->_spares = array();
+		// Directory not writable then we are done
+		if ($this->_validDestination() === false)
+		{
+			// Anything is spare
+			$this->_addSpare($files);
+			return false;
+		}
 
 		// Get the filename's and last modified time for this batch
 		foreach ($files as $id => $file)
@@ -150,7 +160,9 @@ class Site_Combiner
 
 			// Get the ones that we would load locally so we can merge them
 			if ($load && (empty($file['options']['local']) || !$this->_addFile($file['options'])))
-				$this->_spares[$id] = $file;
+			{
+				$this->_addSpare(array($id => $file));
+			}
 		}
 
 		// Nothing to do, then we are done
@@ -187,16 +199,28 @@ class Site_Combiner
 	 */
 	public function site_css_combine($files)
 	{
-		// No files or missing dir then we are done
-		if (empty($files) || !file_exists($this->_archive_dir))
+		// No files or missing we are done
+		if (empty($files))
+		{
 			return false;
+		}
+
+		// Directory not writable then we are done
+		if ($this->_validDestination() === false)
+		{
+			// Anything is spare
+			$this->_addSpare($files);
+			return false;
+		}
 
 		// Get the filenames and last modified time for this batch
 		foreach ($files as $id => $file)
 		{
 			// Get the ones that we would load locally so we can merge them
 			if (empty($file['options']['local']) || !$this->_addFile($file['options']))
-				$this->_spares[$id] = $file;
+			{
+				$this->_addSpare(array($id => $file));
+			}
 		}
 
 		// Nothing to do so return
@@ -235,6 +259,29 @@ class Site_Combiner
 	public function getSpares()
 	{
 		return $this->_spares;
+	}
+
+	/**
+	 * Tests if the destination directory exists and is writable
+	 *
+	 * @return bool
+	 */
+	protected function _validDestination()
+	{
+		return file_exists($this->_archive_dir) && is_writable($this->_archive_dir);
+	}
+
+	/**
+	 * Adds files to the spare list
+	 *
+	 * @param mixed[]
+	 */
+	protected function _addSpare($files)
+	{
+		foreach ($files as $id => $file)
+		{
+			$this->_spares[$id] = $file;
+		}
 	}
 
 	/**
@@ -337,6 +384,11 @@ class Site_Combiner
 		// Read in all the data so we can process
 		foreach ($this->_combine_files as $key => $file)
 		{
+			if (!file_exists($file['file']))
+			{
+				continue;
+			}
+
 			$tempfile = trim(file_get_contents($file['file']));
 			$tempfile = (substr($tempfile, -3) === '}()') ? $tempfile . ';' : $tempfile;
 			$this->_combine_files[$key]['content'] = $tempfile;

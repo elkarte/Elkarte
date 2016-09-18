@@ -73,6 +73,14 @@ class Cache
 	{
 		$this->setLevel($level);
 
+		// Default to file based so we can slow everything down :P
+		if (empty($accelerator))
+		{
+			$accelerator = 'filebased';
+		}
+
+		$this->_accelerator = $accelerator;
+
 		if ($level > 0)
 		{
 			$this->enable(true);
@@ -87,14 +95,6 @@ class Cache
 
 		// Set the cache options
 		$this->_options = $options;
-
-		// Default to file based so we can slow everything down :P
-		if (empty($accelerator))
-		{
-			$accelerator = 'filebased';
-		}
-
-		$this->_accelerator = $accelerator;
 
 		$this->_init();
 	}
@@ -271,6 +271,12 @@ class Cache
 	 */
 	public function getVar(&$var, $key, $ttl = 120)
 	{
+		if (!$this->isEnabled())
+		{
+			return;
+		}
+
+		$key2 = $this->_key($key);
 		$var = $this->get($key, $ttl);
 
 		return !$this->isMiss();
@@ -364,15 +370,30 @@ class Cache
 	}
 
 	/**
-	 * Checks if the system level supports the required level of the cache request
+	 * Checks if the system level is set to a value strictly higher than the
+	 * required level of the cache request.
 	 *
 	 * @param int $level
 	 *
 	 * @return bool
 	 */
-	public function checkLevel($level)
+	public function levelHigherThan($level)
 	{
-		return $this->isEnabled() && $this->level >= $level;
+		return $this->isEnabled() && $this->level > $level;
+	}
+
+	/**
+	 * Checks if the system level is set to a value strictly lower than the
+	 * required level of the cache request.
+	 * Returns true also if the cache is disabled (it's lower than any level).
+	 *
+	 * @param int $level
+	 *
+	 * @return bool
+	 */
+	public function levelLowerThan($level)
+	{
+		return !$this->isEnabled() || $this->level < $level;
 	}
 
 	/**
@@ -449,7 +470,6 @@ class Cache
 			}
 
 			Elk_Autoloader::getInstance()->register(SUBSDIR . '/CacheMethod', '\\ElkArte\\sources\\subs\\CacheMethod');
-
 			self::$_instance = new Cache($cache_enable, $cache_accelerator, $options);
 		}
 
