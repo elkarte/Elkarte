@@ -320,7 +320,7 @@ function template_ic_show_users()
 	echo '
 			<li class="board_row">
 				<h3 class="ic_section_header">
-					', $context['show_who'] ? '<a href="' . $scripturl . '?action=who">' : '', '<i class="icon i-users"></i> ', $txt['online_now'], ':
+					', $context['show_who'] ? '<a href="' . $scripturl . '?action=who">' : '', '<i class="icon i-users"></i>', $txt['online_now'], ':
 					', comma_format($context['num_guests']), ' ', $context['num_guests'] == 1 ? $txt['guest'] : $txt['guests'], ', ', comma_format($context['num_users_online']), ' ', $context['num_users_online'] == 1 ? $txt['user'] : $txt['users'];
 
 	// Handle hidden users and buddies.
