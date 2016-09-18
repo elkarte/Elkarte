@@ -29,6 +29,8 @@
  * @param string|boolean $error_type = 'general'
  * @param string|null $file = null
  * @param int|null $line = null
+ * 
+ * @deprecated since 1.1
  */
 function log_error($error_message, $error_type = 'general', $file = null, $line = null)
 {
@@ -44,6 +46,8 @@ function log_error($error_message, $error_type = 'general', $file = null, $line 
  * @param string|mixed[] $sprintf = array()
  * @param string|null $file = null
  * @param int|null $line = null
+ * 
+ * @deprecated since 1.1
  */
 function log_lang_error($error, $error_type = 'general', $sprintf = array(), $file = null, $line = null)
 {
@@ -56,6 +60,8 @@ function log_lang_error($error, $error_type = 'general', $sprintf = array(), $fi
  *
  * @param string $error
  * @param string|boolean $log defaults to  'general', use false to skip setup_fatal_error_context
+ * 
+ * @deprecated since 1.1
  */
 function fatal_error($error, $log = 'general')
 {
@@ -76,6 +82,8 @@ function fatal_error($error, $log = 'general')
  * @param string $error
  * @param string|boolean $log defaults to 'general' false will skip logging, true will use general
  * @param string[] $sprintf defaults to empty array()
+ * 
+ * @deprecated since 1.1
  */
 function fatal_lang_error($error, $log = 'general', $sprintf = array())
 {
@@ -91,6 +99,8 @@ function fatal_lang_error($error, $log = 'general', $sprintf = array())
  * @param string $error_string
  * @param string $file
  * @param int $line
+ * 
+ * @deprecated since 1.1
  */
 function error_handler($error_level, $error_string, $file, $line)
 {
@@ -104,6 +114,8 @@ function error_handler($error_level, $error_string, $file, $line)
  * - It shows a complete page independent of language files or themes.
  * - It is used only if $maintenance = 2 in Settings.php.
  * - It stops further execution of the script.
+ * 
+ * @deprecated since 1.1
  */
 function display_maintenance_message()
 {
@@ -117,6 +129,8 @@ function display_maintenance_message()
  * - It shows a complete page independent of language files or themes.
  * - It is used only if there's no way to connect to the database.
  * - It stops further execution of the script.
+ * 
+ * @deprecated since 1.1
  */
 function display_db_error()
 {
@@ -130,6 +144,8 @@ function display_db_error()
  * - It shows a complete page independent of language files or themes.
  * - It is used only if the load averages are too high to continue execution.
  * - It stops further execution of the script.
+ * 
+ * @deprecated since 1.1
  */
 function display_loadavg_error()
 {
