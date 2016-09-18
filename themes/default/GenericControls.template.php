@@ -19,6 +19,8 @@
  * @param string $editor_id
  * @param string|null $smileyContainer if set show the smiley container id
  * @param string|null $bbcContainer show the bbc container id
+ *
+ * @return string as echo output
  */
 function template_control_richedit($editor_id, $smileyContainer = null, $bbcContainer = null)
 {
@@ -167,6 +169,8 @@ function template_control_richedit($editor_id, $smileyContainer = null, $bbcCont
  * Shows the buttons that the user can see .. preview, spellchecker, etc
  *
  * @param string $editor_id
+ *
+ * @return string as echo output
  */
 function template_control_richedit_buttons($editor_id)
 {
