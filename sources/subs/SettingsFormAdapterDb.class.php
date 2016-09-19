@@ -43,19 +43,9 @@ class SettingsFormAdapterDb extends SettingsFormAdapter
 				}
 
 				// Special case for inline permissions
-				if ($config_var[0] == 'permissions' && allowedTo('manage_permissions'))
-				{
-					$inlinePermissions[] = $config_var;
-				}
-				elseif ($config_var[0] == 'permissions')
+				if ($config_var[0] == 'permissions')
 				{
 					continue;
-				}
-
-				// Are we showing the BBC selection box?
-				if ($config_var[0] == 'bbc')
-				{
-					$bbcChoice[] = $config_var[1];
 				}
 
 				$this->context[$config_var[1]] = array(
@@ -87,7 +77,7 @@ class SettingsFormAdapterDb extends SettingsFormAdapter
 		}
 
 		// If we have inline permissions we need to prep them.
-		$this->init_inline_permissions($inlinePermissions, isset($context['permissions_excluded']) ? $context['permissions_excluded'] : array());
+		$this->init_inline_permissions(isset($context['permissions_excluded']) ? $context['permissions_excluded'] : array());
 
 		// What about any BBC selection boxes?
 		$this->initBbcChoices($bbcChoice);
@@ -98,18 +88,23 @@ class SettingsFormAdapterDb extends SettingsFormAdapter
 	/**
 	 * Initialize inline permissions settings.
 	 *
-	 * @param string[] $permissions
-	 * @param int[]    $excluded_groups = array()
+	 * @param int[] $excluded_groups = array()
 	 */
-	private function init_inline_permissions($permissions, $excluded_groups = array())
+	private function init_inline_permissions($excluded_groups = array())
 	{
-		if (empty($permissions))
+		$inlinePermissions = array_filter(
+			function ($config_var)
+			{
+				return $config_var[0] == 'permissions';
+			}, $this->config_vars
+		);
+		if (empty($inlinePermissions))
 		{
 			return;
 		}
 		$permissionsForm = new Inline_Permissions_Form;
 		$permissionsForm->setExcludedGroups($excluded_groups);
-		$permissionsForm->setPermissions($permissions);
+		$permissionsForm->setPermissions($inlinePermissions);
 		$permissionsForm->init();
 	}
 
@@ -156,7 +151,7 @@ class SettingsFormAdapterDb extends SettingsFormAdapter
 	/**
 	 * @param mixed[] $config_var
 	 * @param string  $str
-	 * @param mixed[] $known_rules
+	 * @param array   $known_rules
 	 *
 	 * @return string
 	 */
@@ -290,13 +285,17 @@ class SettingsFormAdapterDb extends SettingsFormAdapter
 
 	/**
 	 * Initialize a list of available BB codes.
-	 *
-	 * @param string[] $bbcChoice
 	 */
-	private function initBbcChoices($bbcChoice)
+	private function initBbcChoices()
 	{
 		global $txt, $helptxt, $context, $modSettings;
 
+		$bbcChoice = array_filter(
+			function ($config_var)
+			{
+				return $config_var[0] == 'permissions';
+			}, $this->config_vars
+		);
 		if (empty($bbcChoice))
 		{
 			return;
@@ -317,14 +316,14 @@ class SettingsFormAdapterDb extends SettingsFormAdapter
 		}
 
 		// Now put whatever BBC options we may have into context too!
-		foreach ($bbcChoice as $varName)
+		foreach ($bbcChoice as $config_var)
 		{
-			$disabled = empty($modSettings['bbc_disabled_' . $varName]);
-			$this->context[$varName] = array_merge_recursive(array(
-				'disabled_tags' => $disabled ? array() : $modSettings['bbc_disabled_' . $varName],
+			$disabled = empty($modSettings['bbc_disabled_' . $config_var[1]]);
+			$this->context[$config_var[1]] = array_merge_recursive(array(
+				'disabled_tags' => $disabled ? array() : $modSettings['bbc_disabled_' . $config_var[1]],
 				'all_selected' => $disabled,
 				'data' => $bbc_sections,
-			), $this->context[$varName]);
+			), $this->context[$config_var[1]]);
 		}
 	}
 

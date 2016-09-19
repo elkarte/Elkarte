@@ -49,4 +49,5 @@ interface SettingsFormAdapter_Interface
 	 * - Requires the admin_forum permission.
 	 * - Contains arrays of the types of data to save into Settings.php.
 	 */
-	public function save();}
+	public function save();
+}
