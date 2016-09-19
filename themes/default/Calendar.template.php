@@ -219,13 +219,13 @@ function template_show_month_grid($grid_name)
 		if (empty($calendar_data['previous_calendar']['disabled']) && $calendar_data['show_next_prev'])
 			echo '
 					<a href="', $calendar_data['previous_calendar']['href'], '" class="previous_month">
-						<span class="fa-stack"><i class="fa fa-circle-thin fa-stack-2x"></i><i class="fa fa-chevron-left fa-stack-1x"></i></span>
+						<i class="icon icon-lg i-chevron-circle-left"></i>
 					</a>';
 
 		if (empty($calendar_data['next_calendar']['disabled']) && $calendar_data['show_next_prev'])
 			echo '
 					<a href="', $calendar_data['next_calendar']['href'], '" class="next_month">
-						<span class="fa-stack"><i class="fa fa-circle-thin fa-stack-2x"></i><i class="fa fa-chevron-right fa-stack-1x"></i></span>
+						<i class="icon icon-lg i-chevron-circle-right"></i>
 					</a>';
 
 		if ($calendar_data['show_next_prev'])
@@ -234,7 +234,7 @@ function template_show_month_grid($grid_name)
 		else
 			echo '
 					<a href="', $scripturl, '?action=calendar;year=', $calendar_data['current_year'], ';month=', $calendar_data['current_month'], '">
-						<i class="fa fa-calendar-o"></i> ', $txt['months_titles'][$calendar_data['current_month']], ' ', $calendar_data['current_year'], '
+						<i class="icon icon-small i-calendar"></i> ', $txt['months_titles'][$calendar_data['current_month']], ' ', $calendar_data['current_year'], '
 					</a>';
 
 		echo '
@@ -273,7 +273,9 @@ function template_show_month_grid($grid_name)
 		if (!empty($calendar_data['show_week_links']))
 			echo '
 						<td class="weeks">
-							<a href="', $scripturl, '?action=calendar;viewweek;year=', $calendar_data['current_year'], ';month=', $calendar_data['current_month'], ';day=', $week['days'][0]['day'], '"><i class="fa fa-angle-double-right fa-lg"></i></a>
+							<a href="', $scripturl, '?action=calendar;viewweek;year=', $calendar_data['current_year'], ';month=', $calendar_data['current_month'], ';day=', $week['days'][0]['day'], '">
+								<i class="icon i-eye-plus"></i>
+							</a>
 						</td>';
 
 		// Every day has the following:
@@ -354,11 +356,15 @@ function template_show_month_grid($grid_name)
 						// If they can edit the event, show an icon they can click on....
 						if ($event['can_edit'])
 							echo '
-								<a class="modify_event" href="', $event['modify_href'], '"><img src="' . $settings['images_url'] . '/icons/calendar_modify.png" alt="*" title="' . $txt['modify'] . '" /></a>';
+								<a class="modify_event" href="', $event['modify_href'], '">
+									<img src="' . $settings['images_url'] . '/icons/calendar_modify.png" alt="*" title="' . $txt['modify'] . '" />
+								</a>';
 
 						if ($event['can_export'])
 							echo '
-								<a class="modify_event" href="', $event['export_href'], '"><img src="' . $settings['images_url'] . '/icons/calendar_export.png" alt=">" title="' . $txt['save'] . '"/></a>';
+								<a class="modify_event" href="', $event['export_href'], '">
+									<img src="' . $settings['images_url'] . '/icons/calendar_export.png" alt=">" title="' . $txt['save'] . '"/>
+								</a>';
 
 						echo '
 								', $event['link'], $event['is_last'] ? '' : '<br />';
@@ -406,7 +412,7 @@ function template_show_week_grid($grid_name)
 			echo '
 					<span class="previous_month">
 						<a href="', $calendar_data['previous_week']['href'], '">
-							<span class="fa-stack"><i class="fa fa-circle-thin fa-stack-2x"></i><i class="fa fa-chevron-left fa-stack-1x"></i></span>
+							<i class="icon icon-lg i-chevron-circle-left"></i>
 						</a>
 					</span>';
 
@@ -414,7 +420,7 @@ function template_show_week_grid($grid_name)
 			echo '
 					<span class="next_month">
 						<a href="', $calendar_data['next_week']['href'], '">
-							<span class="fa-stack"><i class="fa fa-circle-thin fa-stack-2x"></i><i class="fa fa-chevron-right fa-stack-1x"></i></span>
+							<i class="icon icon-lg i-chevron-circle-right"></i>
 						</a>
 					</span>';
 
@@ -481,7 +487,9 @@ function template_show_week_grid($grid_name)
 					// If they can edit the event, show a star they can click on....
 					if ($event['can_edit'])
 						echo '
-								<a href="', $event['modify_href'], '"><img src="' . $settings['images_url'] . '/icons/calendar_modify.png" alt="*" /></a> ';
+								<a href="', $event['modify_href'], '">
+									<img src="' . $settings['images_url'] . '/icons/calendar_modify.png" alt="*" />
+								</a> ';
 
 					echo '
 								', $event['link'], $event['is_last'] ? '' : ', ';

@@ -443,7 +443,7 @@ function template_subject_list()
 		echo '
 										};
 									// ]]></script>
-									', $message['is_replied_to'] ? '<img src="' . $settings['images_url'] . '/icons/pm_replied.png" alt="' . $txt['pm_replied'] . '" />' : '<img src="' . $settings['images_url'] . '/icons/pm_read.png" alt="' . $txt['pm_read'] . '" />', '</td>
+									', $message['is_replied_to'] ? '<img src="' . $settings['images_url'] . '/icons/pm_replied.png" alt="' . $txt['pm_replied'] . '" />' : '<i class="icon i-comment-blank"></i>', '</td>
 								<td class="pm_date">', $message['time'], '</td>
 								<td class="pm_subject">',
 									$context['display_mode'] != 0 && $context['current_pm'] == $message['id'] ? '<img src="' . $settings['images_url'] . '/selected.png" alt="*" />' : '',

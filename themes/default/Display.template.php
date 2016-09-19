@@ -883,7 +883,7 @@ function template_display_attachments($message, $ignoring)
 		echo '
 										<div class="attachment_name">
 											<a href="' . $attachment['href'] . '">
-												<img src="' . $settings['images_url'] . '/icons/clip.png" class="centericon" alt="*" />&nbsp;' . $attachment['name'] . '
+												<i class="icon icon-small i-paperclip"></i>&nbsp;' . $attachment['name'] . '
 											</a> ';
 
 		if (!$attachment['is_approved'] && $context['can_approve'])
