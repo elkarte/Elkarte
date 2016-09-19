@@ -138,7 +138,7 @@ class SettingsFormAdapterDb extends SettingsFormAdapter
 	 *
 	 * @return string
 	 */
-	private function settMasks($config_var, $str)
+	private function setMasks($config_var, $str)
 	{
 		static $known_rules = null;
 
@@ -154,9 +154,9 @@ class SettingsFormAdapterDb extends SettingsFormAdapter
 	}
 
 	/**
-	 * @param mixed[]  $config_var
-	 * @param string   $str
-	 * @param string[] $known_rules
+	 * @param mixed[] $config_var
+	 * @param string  $str
+	 * @param mixed[] $known_rules
 	 *
 	 * @return string
 	 */
