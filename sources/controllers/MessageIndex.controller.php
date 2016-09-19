@@ -461,7 +461,13 @@ class MessageIndex_Controller extends Action_Controller implements Frontpage_Int
 
 		// They can only mark read if they are logged in and it's enabled!
 		if (!$user_info['is_guest'] && $settings['show_mark_read'])
-			$context['normal_buttons']['markread'] = array('text' => 'mark_read_short', 'image' => 'markread.png', 'lang' => true, 'url' => $scripturl . '?action=markasread;sa=board;board=' . $context['current_board'] . '.0;' . $context['session_var'] . '=' . $context['session_id'], 'custom' => 'onclick="return markboardreadButton(this);"');
+			$context['normal_buttons']['markread'] = array(
+				'text' => 'mark_read_short',
+				'image' => 'markread.png',
+				'lang' => true,
+				'url' => $scripturl . '?action=markasread;sa=board;board=' . $context['current_board'] . '.0;' . $context['session_var'] . '=' . $context['session_id'],
+				'custom' => 'onclick="return markboardreadButton(this);"'
+			);
 
 		// Allow adding new buttons easily.
 		call_integration_hook('integrate_messageindex_buttons');
