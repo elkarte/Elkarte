@@ -1033,7 +1033,7 @@ function sendtopicOverlayDiv(desktopURL, sHeader, sIcon)
 		oPopup_body;
 
 	// TODO: Even if we weren't purging icons, this is still not the right icon for this.
-	sIcon = typeof(sIcon) === 'string' ? sIcon : 'envelope';
+	sIcon = typeof(sIcon) === 'string' ? sIcon : 'i-envelope';
 	sHeader = typeof(sHeader) === 'string' ? sHeader : help_popup_heading_text;
 
 	// Load the send topic overlay div
