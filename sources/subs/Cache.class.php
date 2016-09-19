@@ -276,7 +276,6 @@ class Cache
 			return;
 		}
 
-		$key2 = $this->_key($key);
 		$var = $this->get($key, $ttl);
 
 		return !$this->isMiss();
