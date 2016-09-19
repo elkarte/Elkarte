@@ -125,7 +125,7 @@ class Settings_Form
 		{
 			$this->adapter = new SettingsFormAdapterFile;
 		}
-		$this->adapter->prepare();
+		$this->prepare();
 	}
 
 	public function prepare()
@@ -160,6 +160,18 @@ class Settings_Form
 	{
 		validateToken('admin-ssc');
 		$this->adapter->save();
+	}
+
+	/**
+	 * Helper method for saving settings.
+	 *
+	 * @param mixed[] $config_vars
+	 */
+	public static function save_file($config_vars)
+	{
+		$settingsForm = new self;
+		$settingsForm->setConfigVars($config_vars);
+		$settingsForm->save();
 	}
 
 	/**
@@ -207,14 +219,14 @@ class Settings_Form
 		if (is_null($config_vars))
 		{
 			// Simply return the config vars we have
-			return $this->config_vars;
+			return $this->adapter->getConfigVars();
 		}
 		else
 		{
 			// We got presents :P
-			$this->config_vars = is_array($config_vars) ? $config_vars : array($config_vars);
+			$this->adapter->setConfigVars(is_array($config_vars) ? $config_vars : array($config_vars));
 
-			return $this->config_vars;
+			return $this->adapter->getConfigVars();
 		}
 	}
 }

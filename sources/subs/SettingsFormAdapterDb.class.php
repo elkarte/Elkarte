@@ -253,13 +253,12 @@ class SettingsFormAdapterDb extends SettingsFormAdapter
 		foreach ($bbcChoice as $varName)
 		{
 			$disabled = empty($modSettings['bbc_disabled_' . $varName]);
-			$this->context[$varName] = array_merge(array(
-				'disabled' => $disabled ? array() : $modSettings['bbc_disabled_' . $varName],
+			$this->context[$varName] = array_merge_recursive(array(
+				'disabled_tags' => $disabled ? array() : $modSettings['bbc_disabled_' . $varName],
 				'all_selected' => $disabled,
 				'data' => $bbc_sections,
 			), $this->context[$varName]);
 		}
-		 var_export($this->context);
 	}
 
 	/**

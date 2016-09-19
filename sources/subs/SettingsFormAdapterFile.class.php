@@ -67,14 +67,10 @@ class SettingsFormAdapterFile extends SettingsFormAdapterDb
 			'mmessage',
 			'mbname',
 		);
-		$this->new_settings = array();
-		foreach ($this->new_settings as $identifier => $config_var)
+		foreach ($this->config_vars as $identifier => $config_var)
 		{
-			if (!is_array($config_var) || !isset($config_var[1]))
-			{
-				$this->context[] = $config_var;
-			}
-			else
+			$new_setting = $config_var;
+			if (is_array($config_var) && isset($config_var[1]))
 			{
 				$varname = $config_var[0];
 				global ${$varname};
@@ -104,8 +100,8 @@ class SettingsFormAdapterFile extends SettingsFormAdapterDb
 					}
 					$modSettings[$config_var[0]] = $value;
 				}
-				$this->new_settings[] = $new_setting;
 			}
+			$this->new_settings[] = $new_setting;
 		}
 		$this->setConfigVars($this->new_settings);
 		parent::prepare();
@@ -177,7 +173,7 @@ class SettingsFormAdapterFile extends SettingsFormAdapterDb
 				// We just saved the file-based settings, so skip their definitions.
 				if (!is_array($config_var) || $config_var[2] == 'file')
 				{
-					continue;
+					return '';
 				}
 
 				// Rewrite the definition a bit.
@@ -299,7 +295,7 @@ class SettingsFormAdapterFile extends SettingsFormAdapterDb
 		foreach ($config_bools as $key)
 		{
 			// Check boxes need to be part of this settings form
-			if ($this->_array_value_exists__recursive($key, $this->settings()))
+			if ($this->_array_value_exists__recursive($key, $this->getConfigVars()))
 			{
 				if (!empty($this->post_vars[$key]))
 				{
