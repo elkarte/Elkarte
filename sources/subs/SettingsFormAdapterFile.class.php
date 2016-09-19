@@ -193,14 +193,17 @@ class SettingsFormAdapterFile extends SettingsFormAdapterDb
 		parent::save();
 	}
 
-	private function cleanSettings()
+	private function fixCookieName()
 	{
 		// Fix the darn stupid cookiename! (more may not be allowed, but these for sure!)
 		if (isset($this->post_vars['cookiename']))
 		{
 			$this->post_vars['cookiename'] = preg_replace('~[,;\s\.$]+~u', '', $this->post_vars['cookiename']);
 		}
+	}
 
+	private function fixBoardUrl()
+	{
 		// Fix the forum's URL if necessary.
 		if (isset($this->post_vars['boardurl']))
 		{
@@ -215,6 +218,12 @@ class SettingsFormAdapterFile extends SettingsFormAdapterDb
 
 			$this->post_vars['boardurl'] = addProtocol($this->post_vars['boardurl'], array('http://', 'https://', 'file://'));
 		}
+	}
+
+	private function cleanSettings()
+	{
+		$this->fixCookieName();
+		$this->fixBoardUrl();
 
 		// Any passwords?
 		$config_passwords = array(

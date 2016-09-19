@@ -18,20 +18,10 @@ class SettingsFormAdapterDb extends SettingsFormAdapter
 {
 	/**
 	 * Helper method, it sets up the context for database settings.
-	 *
-	 * @param mixed[] $config_vars
 	 */
 	public function prepare()
 	{
 		global $txt, $helptxt, $context, $modSettings;
-		static $known_rules = null;
-
-		if ($known_rules === null)
-		{
-			$known_rules = array(
-				'nohtml' => 'htmlspecialchars_decode[' . ENT_NOQUOTES . ']',
-			);
-		}
 
 		loadLanguage('Help');
 
@@ -86,61 +76,10 @@ class SettingsFormAdapterDb extends SettingsFormAdapter
 				);
 
 				// If this is a select box handle any data.
-				if (!empty($config_var[2]) && is_array($config_var[2]))
-				{
-					// If we allow multiple selections, we need to adjust a few things.
-					if ($config_var[0] == 'select' && !empty($config_var['multiple']))
-					{
-						$this->context[$config_var[1]]['name'] .= '[]';
-						$this->context[$config_var[1]]['value'] = !empty($this->context[$config_var[1]]['value']) ? Util::unserialize($this->context[$config_var[1]]['value']) : array();
-					}
-
-					// If it's associative
-					if (isset($config_var[2][0]) && is_array($config_var[2][0]))
-					{
-						$this->context[$config_var[1]]['data'] = $config_var[2];
-					}
-					else
-					{
-						foreach ($config_var[2] as $key => $item)
-						{
-							$this->context[$config_var[1]]['data'][] = array($key, $item);
-						}
-					}
-				}
+				$this->handleSelect($config_var);
 
 				// Revert masks if necessary
-				if (isset($config_var['mask']))
-				{
-					$rules = array();
-
-					if (!is_array($config_var['mask']))
-					{
-						$config_var['mask'] = array($config_var['mask']);
-					}
-					foreach ($config_var['mask'] as $key => $mask)
-					{
-						if (isset($known_rules[$mask]))
-						{
-							$rules[$config_var[1]][] = $known_rules[$mask];
-						}
-						elseif ($key == 'custom' && isset($mask['revert']))
-						{
-							$rules[$config_var[1]][] = $mask['revert'];
-						}
-					}
-
-					if (!empty($rules))
-					{
-						$rules[$config_var[1]] = implode('|', $rules[$config_var[1]]);
-
-						$validator = new Data_Validator();
-						$validator->sanitation_rules($rules);
-						$validator->validate(array($config_var[1] => $this->context[$config_var[1]]['value']));
-
-						$this->context[$config_var[1]]['value'] = $validator->{$config_var[1]};
-					}
-				}
+				$this->context[$config_var[1]]['value'] = $this->revertMasks($config_var, $this->context[$config_var[1]]['value']);
 
 				// Finally allow overrides - and some final cleanups.
 				$this->allowOverrides($config_var);
@@ -153,7 +92,6 @@ class SettingsFormAdapterDb extends SettingsFormAdapter
 		// What about any BBC selection boxes?
 		$this->initBbcChoices($bbcChoice);
 
-		call_integration_hook('integrate_prepare_db_settings', array(&$config_vars));
 		$this->prepareContext();
 	}
 
@@ -165,18 +103,125 @@ class SettingsFormAdapterDb extends SettingsFormAdapter
 	 */
 	private function init_inline_permissions($permissions, $excluded_groups = array())
 	{
-		global $context, $modSettings;
-
 		if (empty($permissions))
 		{
 			return;
 		}
-
 		$permissionsForm = new Inline_Permissions_Form;
 		$permissionsForm->setExcludedGroups($excluded_groups);
 		$permissionsForm->setPermissions($permissions);
+		$permissionsForm->init();
+	}
 
-		return $permissionsForm->init();
+	/**
+	 * @param mixed[] $config_var
+	 * @param string  $str
+	 *
+	 * @return string
+	 */
+	private function revertMasks($config_var, $str)
+	{
+		static $known_rules = null;
+
+		if ($known_rules === null)
+		{
+			$known_rules = array(
+				'nohtml' => 'htmlspecialchars_decode[' . ENT_NOQUOTES . ']',
+			);
+		}
+		return $this->applyMasks($config_var, $str, $known_rules);
+	}
+
+	/**
+	 * @param mixed[] $config_var
+	 * @param string  $str
+	 *
+	 * @return string
+	 */
+	private function settMasks($config_var, $str)
+	{
+		static $known_rules = null;
+
+		if ($known_rules === null)
+		{
+			$known_rules = array(
+				'nohtml' => 'Util::htmlspecialchars[' . ENT_QUOTES . ']',
+				'email' => 'valid_email',
+				'url' => 'valid_url',
+			);
+		}
+		return $this->applyMasks($config_var, $str, $known_rules);
+	}
+
+	/**
+	 * @param mixed[]  $config_var
+	 * @param string   $str
+	 * @param string[] $known_rules
+	 *
+	 * @return string
+	 */
+	private function applyMasks($config_var, $str, $known_rules)
+	{
+		if (isset($config_var['mask']))
+		{
+			$rules = array();
+			if (!is_array($config_var['mask']))
+			{
+				$config_var['mask'] = array($config_var['mask']);
+			}
+			foreach ($config_var['mask'] as $key => $mask)
+			{
+				if (isset($known_rules[$mask]))
+				{
+					$rules[$config_var[1]][] = $known_rules[$mask];
+				}
+				elseif ($key == 'custom' && isset($mask['revert']))
+				{
+					$rules[$config_var[1]][] = $mask['revert'];
+				}
+			}
+			if (!empty($rules))
+			{
+				$rules[$config_var[1]] = implode('|', $rules[$config_var[1]]);
+
+				$validator = new Data_Validator();
+				$validator->sanitation_rules($rules);
+				$validator->validate(array($config_var[1] => $str));
+
+				return $validator->{$config_var[1]};
+			}
+		}
+
+		return $str;
+	}
+
+	/**
+	 * @param mixed[] $config_var
+	 */
+	private function handleSelect($config_var)
+	{
+		if (!empty($config_var[2]) && is_array($config_var[2]))
+		{
+			// If we allow multiple selections, we need to adjust a few things.
+			if ($config_var[0] == 'select' && !empty($config_var['multiple']))
+			{
+				$this->context[$config_var[1]]['name'] .= '[]';
+				$this->context[$config_var[1]]['value'] = !empty($this->context[$config_var[1]]['value']) ? Util::unserialize($this->context[$config_var[1]]['value']) : array();
+			}
+
+			// If it's associative
+			if (isset($config_var[2][0]) && is_array($config_var[2][0]))
+			{
+				$this->context[$config_var[1]]['data'] = $config_var[2];
+			}
+			else
+			{
+				foreach ($config_var[2] as $key => $item)
+				{
+					$this->context[$config_var[1]]['data'][] = array($key, $item);
+				}
+			}
+		}
 	}
 
 	/**
@@ -184,7 +229,7 @@ class SettingsFormAdapterDb extends SettingsFormAdapter
 	 */
 	private function allowOverrides($config_var)
 	{
-		global $context, $modSettings;
+		global $txt;
 
 		foreach ($config_var as $k => $v)
 		{
@@ -219,6 +264,28 @@ class SettingsFormAdapterDb extends SettingsFormAdapter
 			$this->context[$config_var[1]]['subtext'] = preg_replace('~</?div[^>]*>~', '', substr($this->context[$config_var[1]]['label'], $divPos));
 			$this->context[$config_var[1]]['label'] = substr($this->context[$config_var[1]]['label'], 0, $divPos);
 		}
+	}
+
+	/**
+	 * @param string[] $var
+	 *
+	 * @return string
+	 */
+	private function setBbcChoices($var)
+	{
+		$codes = \BBC\ParserWrapper::getInstance()->getCodes();
+		$bbcTags = $codes->getTags();
+
+		if (!isset($this->post_vars[$var[1] . '_enabledTags']))
+		{
+			$this->post_vars[$var[1] . '_enabledTags'] = array();
+		}
+		elseif (!is_array($this->post_vars[$var[1] . '_enabledTags']))
+		{
+			$this->post_vars[$var[1] . '_enabledTags'] = array($this->post_vars[$var[1] . '_enabledTags']);
+		}
+
+		return implode(',', array_diff($bbcTags, $this->post_vars[$var[1] . '_enabledTags']));
 	}
 
 	/**
@@ -266,17 +333,7 @@ class SettingsFormAdapterDb extends SettingsFormAdapter
 	 */
 	public function save()
 	{
-		static $known_rules = null;
-
-		if ($known_rules === null)
-		{
-			$known_rules = array(
-				'nohtml' => 'Util::htmlspecialchars[' . ENT_QUOTES . ']',
-				'email' => 'valid_email',
-				'url' => 'valid_url',
-			);
-		}
-
+		$setArray = array();
 		$inlinePermissions = array();
 		foreach ($this->config_vars as $var)
 		{
@@ -322,41 +379,7 @@ class SettingsFormAdapterDb extends SettingsFormAdapter
 			// Text!
 			elseif ($var[0] == 'text' || $var[0] == 'color' || $var[0] == 'large_text')
 			{
-				if (isset($var['mask']))
-				{
-					$rules = array();
-
-					if (!is_array($var['mask']))
-					{
-						$var['mask'] = array($var['mask']);
-					}
-					foreach ($var['mask'] as $key => $mask)
-					{
-						if (isset($known_rules[$mask]))
-						{
-							$rules[$var[1]][] = $known_rules[$mask];
-						}
-						elseif ($key == 'custom' && isset($mask['apply']))
-						{
-							$rules[$var[1]][] = $mask['apply'];
-						}
-					}
-
-					if (!empty($rules))
-					{
-						$rules[$var[1]] = implode('|', $rules[$var[1]]);
-
-						$validator = new Data_Validator();
-						$validator->sanitation_rules($rules);
-						$validator->validate($this->post_vars);
-
-						$setArray[$var[1]] = $validator->{$var[1]};
-					}
-				}
-				else
-				{
-					$setArray[$var[1]] = $this->post_vars[$var[1]];
-				}
+				$setArray[$var[1]] = $this->setMasks($var, $setArray[$var[1]]);
 			}
 			// Passwords!
 			elseif ($var[0] == 'password')
@@ -369,19 +392,7 @@ class SettingsFormAdapterDb extends SettingsFormAdapter
 			// BBC.
 			elseif ($var[0] == 'bbc')
 			{
-				$codes = \BBC\ParserWrapper::getInstance()->getCodes();
-				$bbcTags = $codes->getTags();
-
-				if (!isset($this->post_vars[$var[1] . '_enabledTags']))
-				{
-					$this->post_vars[$var[1] . '_enabledTags'] = array();
-				}
-				elseif (!is_array($this->post_vars[$var[1] . '_enabledTags']))
-				{
-					$this->post_vars[$var[1] . '_enabledTags'] = array($this->post_vars[$var[1] . '_enabledTags']);
-				}
-
-				$setArray[$var[1]] = implode(',', array_diff($bbcTags, $this->post_vars[$var[1] . '_enabledTags']));
+				$setArray[$var[1]] = $this->setBbcChoices($var);
 			}
 			// Permissions?
 			elseif ($var[0] == 'permissions')
@@ -401,9 +412,9 @@ class SettingsFormAdapterDb extends SettingsFormAdapter
 		// If we have inline permissions we need to save them.
 		if (!empty($inlinePermissions) && allowedTo('manage_permissions'))
 		{
-			// we'll need to save inline permissions
-			require_once(SUBSDIR . '/Permission.subs.php');
-			InlinePermissions_Form::save_inline_permissions($inlinePermissions);
+			$permissionsForm = new Inline_Permissions_Form;
+			$permissionsForm->setPermissions($inlinePermissions);
+			$permissionsForm->save();
 		}
 	}
 }
