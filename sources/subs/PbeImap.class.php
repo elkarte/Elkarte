@@ -170,7 +170,7 @@ class Pbe_Imap extends AbstractModel
 			$imap_error = imap_last_error();
 			if (!empty($imap_error))
 			{
-				log_error($imap_error, 'debug', 'IMAP');
+				Errors::instance()->log_error($imap_error, 'debug', 'IMAP');
 			}
 		}
 	}

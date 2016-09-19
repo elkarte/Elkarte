@@ -423,7 +423,7 @@ class PackageServers_Controller extends Action_Controller
 			}
 			// Not found or some monkey business
 			else
-				fatal_lang_error('package_cant_download', false);
+				Errors::instance()->fatal_lang_error('package_cant_download', false);
 		}
 		// Entered a url and optional filename
 		elseif (isset($this->_req->post->byurl) && !empty($this->_req->post->filename))
@@ -533,7 +533,7 @@ class PackageServers_Controller extends Action_Controller
 
 			// If server does not exist then dump out.
 			if (empty($url))
-				fatal_lang_error('couldnt_connect', false);
+				Errors::instance()->fatal_lang_error('couldnt_connect', false);
 		}
 
 		return array($name, $url, $server);
