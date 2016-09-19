@@ -82,25 +82,4 @@ abstract class SettingsFormAdapter implements SettingsFormAdapter_Interface
 
 		$context['config_vars'] = $this->context;
 	}
-
-	/**
-	 * Recursively checks if a value exists in an array
-	 *
-	 * @param string  $needle
-	 * @param mixed[] $haystack
-	 *
-	 * @return boolean
-	 */
-	private function _array_value_exists__recursive($needle, $haystack)
-	{
-		foreach ($haystack as $item)
-		{
-			if ($item == $needle || (is_array($item) && $this->_array_value_exists__recursive($needle, $item)))
-			{
-				return true;
-			}
-		}
-
-		return false;
-	}
 }
