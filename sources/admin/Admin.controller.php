@@ -92,7 +92,7 @@ class Admin_Controller extends Action_Controller
 						'label' => $txt['mail_center'],
 						'controller' => 'ManageMaillist_Controller',
 						'function' => 'action_index',
-						'icon' => 'mail.png',
+						'icon' => 'transparent.png',
 						'class' => 'admin_img_mail',
 						'permission' => array('approve_emails', 'admin_forum'),
 						'enabled' => in_array('pe', $context['admin_features']),
