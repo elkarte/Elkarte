@@ -1003,7 +1003,7 @@ class Packages_Controller extends Action_Controller
 						'position' => 'bottom_of_list',
 						'class' => 'submitbutton',
 						'value' => ($context['sub_action'] == 'browse'
-							? '<div class="smalltext">' . $txt['package_installed_key'] . '<img src="' . $settings['images_url'] . '/icons/package_installed.png" alt="" class="centericon" /> ' . $txt['package_installed_current'] . '<img src="' . $settings['images_url'] . '/icons/package_old.png" alt="" class="centericon" /> ' . $txt['package_installed_old'] . '</div>'
+							? '<div class="smalltext">' . $txt['package_installed_key'] . '<i class="icon icon-small i-green-dot"></i>' . $txt['package_installed_current'] . '<i class="icon icon-small i-red-dot"></i>' . $txt['package_installed_old'] . '</div>'
 							: '<a class="linkbutton" href="' . $scripturl . '?action=admin;area=packages;sa=flush;' . $context['session_var'] . '=' . $context['session_id'] . '" onclick="return confirm(\'' . $txt['package_delete_list_warning'] . '\');">' . $txt['delete_list'] . '</a>'),
 					),
 				),

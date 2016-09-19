@@ -273,7 +273,7 @@ class ProfileAccount_Controller extends Action_Controller
 					'data' => array(
 						'function' => function ($warning)
 						{
-							global $scripturl, $txt, $settings;
+							global $scripturl, $txt;
 
 							$ret = '
 							<div class="floatleft">
@@ -285,7 +285,7 @@ class ProfileAccount_Controller extends Action_Controller
 							{
 								$ret .= '
 							<div class="floatright">
-								<a href="' . $scripturl . '?action=moderate;area=notice;nid=' . $warning['id_notice'] . '" onclick="window.open(this.href, \'\', \'scrollbars=yes,resizable=yes,width=400,height=250\');return false;" target="_blank" class="new_win" title="' . $txt['profile_warning_previous_notice'] . '"><img src="' . $settings['images_url'] . '/filter.png" alt="" /></a>
+								<a href="' . $scripturl . '?action=moderate;area=notice;nid=' . $warning['id_notice'] . '" onclick="window.open(this.href, \'\', \'scrollbars=yes,resizable=yes,width=400,height=250\');return false;" target="_blank" class="new_win" title="' . $txt['profile_warning_previous_notice'] . '"><i class="icon icon-small i-search"></i></a>
 							</div>';
 							}
 

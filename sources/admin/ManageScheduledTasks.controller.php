@@ -403,9 +403,9 @@ class ManageScheduledTasks_Controller extends Action_Controller
 					),
 					'data' => array(
 						'function' => function($rowData) {
-							global $settings, $txt;
+							global $txt;
 
-							return '<img src="' . $settings['images_url'] . '/admin/complete_' . ($rowData['task_completed'] ? 'success' : 'fail') . '.png" alt="' . sprintf($txt[$rowData['task_completed'] ? 'maintain_done' : 'maintain_fail'], $rowData['name']) . '" />';
+							return '<i class="icon ' . ($rowData['task_completed'] ? 'i-check' : 'i-fail') . '" title="' . sprintf($txt[$rowData['task_completed'] ? 'maintain_done' : 'maintain_fail'], $rowData['name']) . '" />';
 						},
 					),
 				),

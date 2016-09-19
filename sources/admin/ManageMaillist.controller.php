@@ -260,20 +260,20 @@ class ManageMaillist_Controller extends Action_Controller
 					),
 					'data' => array(
 						'function' => function($rowData) {
-							global $context, $txt, $settings;
+							global $context, $txt;
 
 							$id = $rowData['id_email'] . ';';
 							$commands = array();
 							$security = $context['session_var'] . '=' . $context['session_id'] . ';' . $context['admin-ml_token_var'] . '=' . $context['admin-ml_token'];
 
 							if ($rowData['error_code'] === 'error_pm_not_found')
-								$commands[] = '<a href="?action=admin;area=maillist;sa=approve;item=' . $id . $security . '" onclick="return confirm(' . JavaScriptEscape($txt['pm_approve_warning']) . ') && submitThisOnce(this);"><img title="' . $txt['approve'] . '" src="' . $settings['images_url'] . '/icons/field_valid.png" alt="*" /></a>&nbsp;';
+								$commands[] = '<a href="?action=admin;area=maillist;sa=approve;item=' . $id . $security . '" onclick="return confirm(' . JavaScriptEscape($txt['pm_approve_warning']) . ') && submitThisOnce(this);"><i class="icon i-check" title="' . $txt['approve'] . '"></i></a>&nbsp;';
 							else
-								$commands[] = '<a href="?action=admin;area=maillist;sa=approve;item=' . $id . $security . '"><img title="' . $txt['approve'] . '" src="' . $settings['images_url'] . '/icons/field_valid.png" alt="*" /></a>&nbsp;';
+								$commands[] = '<a href="?action=admin;area=maillist;sa=approve;item=' . $id . $security . '"><i class="icon i-check" title="' . $txt['approve'] . '"></i></a>&nbsp;';
 
-							$commands[] = '<a href="?action=admin;area=maillist;sa=delete;item=' . $id . $security . '" onclick="return confirm(' . JavaScriptEscape($txt['delete_warning']) . ') && submitThisOnce(this);" accesskey="d"><img title="' . $txt['delete'] . '" src="' . $settings['images_url'] . '/icons/quick_remove.png" alt="*" /></a><br />';
-							$commands[] = '<a href="?action=admin;area=maillist;sa=bounce;item=' . $id . $security . '"><img title="' . $txt['bounce'] . '" src="' . $settings['images_url'] . '/icons/pm_replied.png" alt="*" /></a>&nbsp;';
-							$commands[] = '<a href="?action=admin;area=maillist;sa=view;item=' . $id . $security . '"><img title="' . $txt['view'] . '" src="' . $settings['images_url'] . '/icons/pm_read.png" alt="*" /></a>';
+							$commands[] = '<a href="?action=admin;area=maillist;sa=delete;item=' . $id . $security . '" onclick="return confirm(' . JavaScriptEscape($txt['delete_warning']) . ') && submitThisOnce(this);" accesskey="d"><i class="icon i-delete" title="' . $txt['delete'] . '"></i></a><br />';
+							$commands[] = '<a href="?action=admin;area=maillist;sa=bounce;item=' . $id . $security . '"><i class="icon i-sign-out" title="' . $txt['bounce'] . '"></i></a>&nbsp;';
+							$commands[] = '<a href="?action=admin;area=maillist;sa=view;item=' . $id . $security . '"><i class="icon i-view" title="' . $txt['view'] . '"></i></a>';
 
 							return implode('', $commands);
 						},
