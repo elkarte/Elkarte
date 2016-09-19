@@ -144,16 +144,16 @@ class SettingsFormAdapterFile extends SettingsFormAdapterDb
 		$this->last_settings_change = filemtime(BOARDDIR . '/Settings.php');
 
 		// Load the settings file.
-		$this->settingsArray = trim(file_get_contents(BOARDDIR . '/Settings.php'));
+		$settingsFile = trim(file_get_contents(BOARDDIR . '/Settings.php'));
 
 		// Break it up based on \r or \n, and then clean out extra characters.
-		if (strpos($this->settingsArray, "\n") !== false)
+		if (strpos($settingsFile, "\n") !== false)
 		{
-			$this->settingsArray = explode("\n", $this->settingsArray);
+			$this->settingsArray = explode("\n", $settingsFile);
 		}
-		elseif (strpos($this->settingsArray, "\r") !== false)
+		elseif (strpos($settingsFile, "\r") !== false)
 		{
-			$this->settingsArray = explode("\r", $this->settingsArray);
+			$settingsFile = explode("\r", $this->settingsArray);
 		}
 		else
 		{
