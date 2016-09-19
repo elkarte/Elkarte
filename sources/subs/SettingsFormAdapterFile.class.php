@@ -153,7 +153,7 @@ class SettingsFormAdapterFile extends SettingsFormAdapterDb
 		}
 		elseif (strpos($settingsFile, "\r") !== false)
 		{
-			$settingsFile = explode("\r", $this->settingsArray);
+			$this->settingsArray = explode("\r", $settingsFile);
 		}
 		else
 		{
