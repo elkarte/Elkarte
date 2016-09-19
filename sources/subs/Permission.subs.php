@@ -48,7 +48,6 @@ function updateChildPermissions($parents, $profile = null)
 
 /**
  * Dummy class for compatibility sake
- * @deprecated since 1.1
  */
 class InlinePermissions_Form extends Inline_Permissions_Form
 {
@@ -56,6 +55,7 @@ class InlinePermissions_Form extends Inline_Permissions_Form
 	 * Save the permissions of a form containing inline permissions.
 	 *
 	 * @param string[] $permissions
+	 * @deprecated since 1.1
 	 */
 	public static function save_inline_permissions($permissions)
 	{
@@ -72,6 +72,7 @@ class InlinePermissions_Form extends Inline_Permissions_Form
 	 *
 	 * @param string[] $permissions
 	 * @param int[]    $excluded_groups = array()
+	 * @deprecated since 1.1
 	 *
 	 * @uses ManagePermissions language
 	 * @uses ManagePermissions template.
