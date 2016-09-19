@@ -306,14 +306,7 @@ class SettingsFormAdapterFile extends SettingsFormAdapterDb
 			// Check boxes need to be part of this settings form
 			if ($this->_array_value_exists__recursive($key, $this->getConfigVars()))
 			{
-				if (!empty($this->post_vars[$key]))
-				{
-					$this->new_settings[$key] = '1';
-				}
-				else
-				{
-					$this->new_settings[$key] = '0';
-				}
+				$this->new_settings[$key] = (int) !empty($this->post_vars[$key]);
 			}
 		}
 	}
