@@ -523,7 +523,7 @@ function template_menu()
 	{
 		echo '
 						<li id="button_', $act, '" class="listlevel1', !empty($button['sub_buttons']) ? ' subsections" aria-haspopup="true"' : '"', ' role="menuitem">
-							<a class="linklevel1', !empty($button['active_button']) ? ' active' : '', (!empty($button['indicator']) ? ' indicator' : ''), '" href="', $button['href'], '" ', isset($button['target']) ? 'target="' . $button['target'] . '"' : '', '>', (!empty($button['data-icon']) ? '<i class="icon icon-menu icon-big i-' . $button['data-icon'] . '"></i> ' : ''), '<span class="button_title">', $button['title'], '</span></a>';
+							<a class="linklevel1', !empty($button['active_button']) ? ' active' : '', (!empty($button['indicator']) ? ' indicator' : ''), '" href="', $button['href'], '" ', isset($button['target']) ? 'target="' . $button['target'] . '"' : '', '>', (!empty($button['data-icon']) ? '<i class="icon icon-menu icon-lg ' . $button['data-icon'] . '"></i> ' : ''), '<span class="button_title">', $button['title'], '</span></a>';
 
 		// Any 2nd level menus?
 		if (!empty($button['sub_buttons']))
