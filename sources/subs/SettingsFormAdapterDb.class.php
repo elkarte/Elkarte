@@ -345,7 +345,7 @@ class SettingsFormAdapterDb extends SettingsFormAdapter
 		$setArray = array();
 		foreach ($this->configVars as $var)
 		{
-			if (!isset($var[1]) || !isset($this->configValues[$var[1]]))
+			if (!isset($var[1]) || !isset($this->configValues[$var[1]]) && $var[0] != 'check')
 			{
 				continue;
 			}
