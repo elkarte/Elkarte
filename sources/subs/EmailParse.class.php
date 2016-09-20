@@ -217,8 +217,11 @@ class Email_Parse
 			if (isset($_POST['item']))
 				$this->raw_message = $this->_query_load_email($_POST['item']);
 			// Debugging file used for testing
-			elseif (file_exists($location . '/elk-test.eml') && isAllowedTo('admin_forum'))
+			elseif (file_exists($location . '/elk-test.eml'))
+			{
+				isAllowedTo('admin_forum');
 				$this->raw_message = file_get_contents($location . '/elk-test.eml');
+			}
 		}
 		else
 		{
