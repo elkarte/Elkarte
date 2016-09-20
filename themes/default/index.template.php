@@ -608,6 +608,8 @@ function template_menu()
  * @param mixed[] $button_strip
  * @param string $direction = ''
  * @param string[] $strip_options = array()
+ *
+ * @return string as echoed content
  */
 function template_button_strip($button_strip, $direction = '', $strip_options = array())
 {
@@ -615,7 +617,7 @@ function template_button_strip($button_strip, $direction = '', $strip_options = 
 
 	// Not sure if this can happen, but people can misuse functions very efficiently
 	if (empty($button_strip))
-		return;
+		return '';
 
 	if (!is_array($strip_options))
 		$strip_options = array();
@@ -635,7 +637,7 @@ function template_button_strip($button_strip, $direction = '', $strip_options = 
 
 	// No buttons? No button strip either.
 	if (empty($buttons))
-		return;
+		return '';
 
 	echo '
 							<ul role="menubar" class="buttonlist', !empty($direction) ? ' float' . $direction : '', (empty($buttons) ? ' hide"' : '"'), (!empty($strip_options['id']) ? ' id="' . $strip_options['id'] . '"' : ''), '>
@@ -783,6 +785,8 @@ function template_show_error($error_id)
  *     - 'page_index_markup' (string) markup for the page index, overrides 'page_index' and can be used if
  *        the page index code is not in the first level of $context
  *     - 'extra' (string) used to add html markup at the end of the template
+ *
+ * @return string as echoed content
  */
 function template_pagesection($button_strip = false, $strip_direction = '', $options = array())
 {

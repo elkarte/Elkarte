@@ -206,6 +206,8 @@ function template_show_list($list_id = null)
  *
  * @param int $row_position
  * @param mixed[] $cur_list
+ *
+ * @return string as echoed output
  */
 function template_additional_rows($row_position, $cur_list)
 {

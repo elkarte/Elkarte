@@ -57,6 +57,8 @@ function template_list_groups_collapsible($group = 'default_groups_list')
  * @param string $label
  * @param string $extra
  * @param boolean $all
+ *
+ * @return string as echoed output
  */
 function template_select_boards($name, $label = '', $extra = '', $all = false)
 {
