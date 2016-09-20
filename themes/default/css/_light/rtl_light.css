@@ -546,7 +546,7 @@ legend {
 	.topic_listing>li {
 		box-shadow: -3px 3px 6px #e5e5e5;
 	}
-	.forumposts .windowbg, .forumposts .windowbg2 {
+	.forumposts .content {
 		box-shadow: -3px 3px 6px #e5e5e5;
 	}
 	.linktree:after {
