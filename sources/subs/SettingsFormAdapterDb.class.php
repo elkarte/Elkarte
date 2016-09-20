@@ -21,12 +21,10 @@ class SettingsFormAdapterDb extends SettingsFormAdapter
 	 */
 	public function prepare()
 	{
-		global $txt, $helptxt, $context, $modSettings;
+		global $txt, $helptxt, $modSettings;
 
 		loadLanguage('Help');
 
-		$inlinePermissions = array();
-		$bbcChoice = array();
 		foreach ($this->config_vars as $config_var)
 		{
 			// HR?
@@ -80,7 +78,7 @@ class SettingsFormAdapterDb extends SettingsFormAdapter
 		$this->init_inline_permissions(isset($context['permissions_excluded']) ? $context['permissions_excluded'] : array());
 
 		// What about any BBC selection boxes?
-		$this->initBbcChoices($bbcChoice);
+		$this->initBbcChoices();
 
 		$this->prepareContext();
 	}
@@ -328,71 +326,87 @@ class SettingsFormAdapterDb extends SettingsFormAdapter
 	}
 
 	/**
+	 * Cast all the config vars as defined
+	 *
+	 * @return array
+	 */
+	private function sanitizeVars($configVar, $str)
+	{
+		$setTypes = array();
+		$setArray = array();
+		foreach ($this->configVars as $var)
+		{
+			if (!isset($var[1]) || !isset($this->configValues[$var[1]]))
+			{
+				continue;
+			}
+			$setTypes[$var[1]] = $var[1];
+			switch ($var[0])
+			{
+				case 'check':
+					$setTypes[$var[1]] = 'int';
+					$setArray[$var[1]] = (int) !empty($this->configValues[$var[1]]);
+					break;
+				case 'select':
+					// Select boxes!
+					$setTypes[$var[1]] = 'string';
+					if (empty($var['multiple']) && in_array($this->configValues[$var[1]], array_keys($var[2])))
+					{
+						$setArray[$var[1]] = $this->configValues[$var[1]];
+					}
+					elseif (!empty($var['multiple']))
+					{
+						// For security purposes we validate this line by line.
+						$setArray[$var[1]] = serialize(array_intersect($this->configValues[$var[1]], array_keys($var[2])));
+					}
+					break;
+				case 'int':
+					// Integers!
+					$setArray[$var[1]] = (int) $this->configValues[$var[1]];
+					break;
+				case 'float':
+					// Floating point!
+					$setArray[$var[1]] = (float) $this->configValues[$var[1]];
+					break;
+				case 'text':
+				case 'color':
+				case 'large_text':
+					// Text!
+					$setTypes[$var[1]] = 'string';
+					$setArray[$var[1]] = $this->setMasks($var, $setArray[$var[1]]);
+					break;
+				case 'password':
+					// Passwords!
+					$setTypes[$var[1]] = 'string';
+					if (isset($this->configValues[$var[1]][1]) && $this->configValues[$var[1]][0] == $this->configValues[$var[1]][1])
+					{
+						$setArray[$var[1]] = $this->configValues[$var[1]][0];
+					}
+					break;
+				case 'bbc':
+					// BBC.
+					$setTypes[$var[1]] = 'string';
+					$setArray[$var[1]] = $this->setBbcChoices($var);
+					break;
+			}
+		}
+		return array($setArray, $setTypes);
+	}
+
+	/**
 	 * Helper method for saving database settings.
 	 */
 	public function save()
 	{
-		$setArray = array();
+		list ($setArray) = $this->sanitizeVars();
 		$inlinePermissions = array();
-		foreach ($this->config_vars as $var)
+		foreach ($this->configVars as $var)
 		{
-			if (!isset($var[1]) || (!isset($this->post_vars[$var[1]]) && $var[0] != 'check' && $var[0] != 'permissions' && ($var[0] != 'bbc' || !isset($this->post_vars[$var[1] . '_enabledTags']))))
+			if (!isset($var[1]) || !isset($this->configValues[$var[1]]))
 			{
 				continue;
 			}
 
-			// Checkboxes!
-			elseif ($var[0] == 'check')
-			{
-				$setArray[$var[1]] = !empty($this->post_vars[$var[1]]) ? '1' : '0';
-			}
-			// Select boxes!
-			elseif ($var[0] == 'select' && in_array($this->post_vars[$var[1]], array_keys($var[2])))
-			{
-				$setArray[$var[1]] = $this->post_vars[$var[1]];
-			}
-			elseif ($var[0] == 'select' && !empty($var['multiple']) && array_intersect($this->post_vars[$var[1]], array_keys($var[2])) != array())
-			{
-				// For security purposes we validate this line by line.
-				$options = array();
-				foreach ($this->post_vars[$var[1]] as $invar)
-				{
-					if (in_array($invar, array_keys($var[2])))
-					{
-						$options[] = $invar;
-					}
-				}
-
-				$setArray[$var[1]] = serialize($options);
-			}
-			// Integers!
-			elseif ($var[0] == 'int')
-			{
-				$setArray[$var[1]] = (int) $this->post_vars[$var[1]];
-			}
-			// Floating point!
-			elseif ($var[0] == 'float')
-			{
-				$setArray[$var[1]] = (float) $this->post_vars[$var[1]];
-			}
-			// Text!
-			elseif ($var[0] == 'text' || $var[0] == 'color' || $var[0] == 'large_text')
-			{
-				$setArray[$var[1]] = $this->setMasks($var, $setArray[$var[1]]);
-			}
-			// Passwords!
-			elseif ($var[0] == 'password')
-			{
-				if (isset($this->post_vars[$var[1]][1]) && $this->post_vars[$var[1]][0] == $this->post_vars[$var[1]][1])
-				{
-					$setArray[$var[1]] = $this->post_vars[$var[1]][0];
-				}
-			}
-			// BBC.
-			elseif ($var[0] == 'bbc')
-			{
-				$setArray[$var[1]] = $this->setBbcChoices($var);
-			}
 			// Permissions?
 			elseif ($var[0] == 'permissions')
 			{
