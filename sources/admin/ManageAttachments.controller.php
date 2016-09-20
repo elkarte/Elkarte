@@ -1050,7 +1050,7 @@ class ManageAttachments_Controller extends Action_Controller
 		$errors = array();
 
 		// Saving?
-		if (isset($this->_req->query->save))
+		if (isset($this->_req->post->save))
 		{
 			checkSession();
 
