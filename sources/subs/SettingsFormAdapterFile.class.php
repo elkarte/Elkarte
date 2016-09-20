@@ -168,7 +168,7 @@ class SettingsFormAdapterFile extends SettingsFormAdapterDb
 	{
 		// Now loop through the remaining (database-based) settings.
 		$this->configVars = array_map(
-			function (array $configVar)
+			function ($configVar)
 			{
 				// We just saved the file-based settings, so skip their definitions.
 				if (!is_array($configVar) || $configVar[2] == 'file')

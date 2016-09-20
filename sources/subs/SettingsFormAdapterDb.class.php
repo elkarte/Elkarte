@@ -92,9 +92,9 @@ class SettingsFormAdapterDb extends SettingsFormAdapter
 	private function init_inline_permissions(array $excluded_groups = array())
 	{
 		$inlinePermissions = array_filter($this->configVars,
-			function (array $configVar)
+			function ($configVar)
 			{
-				return $configVar[0] == 'permissions';
+				return isset($configVar[0]) && $configVar[0] == 'permissions';
 			}
 		);
 		if (empty($inlinePermissions))
@@ -298,9 +298,9 @@ class SettingsFormAdapterDb extends SettingsFormAdapter
 		global $txt, $helptxt, $context, $modSettings;
 
 		$bbcChoice = array_filter($this->configVars,
-			function (array $configVar)
+			function ($configVar)
 			{
-				return $configVar[0] == 'permissions';
+				return isset($configVar[0]) && $configVar[0] == 'bbc';
 			}
 		);
 		if (empty($bbcChoice))
@@ -382,7 +382,7 @@ class SettingsFormAdapterDb extends SettingsFormAdapter
 				case 'large_text':
 					// Text!
 					$setTypes[$var[1]] = 'string';
-					$setArray[$var[1]] = $this->setMasks($var, $setArray[$var[1]]);
+					$setArray[$var[1]] = $this->setMasks($var, $this->configValues[$var[1]]);
 					break;
 				case 'password':
 					// Passwords!
