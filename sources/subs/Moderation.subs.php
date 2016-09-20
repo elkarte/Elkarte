@@ -178,13 +178,15 @@ function totalReports($status = 0, $show_pms = false)
  * @param int[]|int $reports_id an array of report IDs
  * @param string $property the property to update ('close' or 'ignore')
  * @param int $status the status of the property (mainly: 0 or 1)
+ *
+ * @return int
  */
 function updateReportsStatus($reports_id, $property = 'close', $status = 0)
 {
 	global $user_info;
 
 	if (empty($reports_id))
-		return;
+		return 0;
 
 	$db = database();
 
