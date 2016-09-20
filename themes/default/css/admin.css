@@ -1386,7 +1386,7 @@ Adjusts display of wording and selections to one line.
 	content: "\f07d";
 	vertical-align: middle;
 	font-size: 1.071em;
-	font-family: 'FontAwesome';
+	font-family: 'FontAwesome', serif;
 }
 
 #custom_profile_fields td:nth-child(2):before {
