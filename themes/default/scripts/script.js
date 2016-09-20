@@ -1101,7 +1101,7 @@ JumpTo.prototype.removeAll = function ()
 //	var dropdownList = document.getElementById(this.opt.sContainerId + '_select');
 for (var i = this.dropdownList.options.length; i > 0; i--)
 		this.dropdownList.remove(i - 1);
-}
+};
 
 // Show the initial select box (onload). Method of the JumpTo class.
 JumpTo.prototype.showSelect = function ()
