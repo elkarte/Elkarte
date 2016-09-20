@@ -1346,8 +1346,8 @@ function spamProtection($error_type, $fatal = true)
  *
  * @param string $path the (absolute) directory path
  * @param boolean $allow_localhost if access should be allowed to localhost
- * @param string $allow_localhost if access should be allowed to localhost
  * @param string $files (optional, default '*') parameter for the Files tag
+ * 
  * @return string|boolean on success error string if anything fails
  */
 function secureDirectory($path, $allow_localhost = false, $files = '*')
