@@ -90,11 +90,11 @@ class SettingsFormAdapterDb extends SettingsFormAdapter
 	 */
 	private function init_inline_permissions(array $excluded_groups = array())
 	{
-		$inlinePermissions = array_filter(
+		$inlinePermissions = array_filter($this->configVars,
 			function (array $configVar)
 			{
 				return $configVar[0] == 'permissions';
-			}, $this->configVars
+			}
 		);
 		if (empty($inlinePermissions))
 		{
@@ -278,11 +278,11 @@ class SettingsFormAdapterDb extends SettingsFormAdapter
 	{
 		global $txt, $helptxt, $context, $modSettings;
 
-		$bbcChoice = array_filter(
+		$bbcChoice = array_filter($this->configVars,
 			function (array $configVar)
 			{
 				return $configVar[0] == 'permissions';
-			}, $this->configVars
+			}
 		);
 		if (empty($bbcChoice))
 		{
