@@ -2784,7 +2784,8 @@ img.new_posts {
 }
 
 /* On to the posts */
-#quickreplybox, #forumposts, #searchform, #recentposts, #pmFolder, #topic_summary, #preview_section {
+#quickreplybox, #forumposts, #searchform, #recentposts,
+#pmFolder, #topic_summary, #preview_section {
 	border-radius: 4px 4px 0 0;
 }
 
@@ -3142,7 +3143,7 @@ img.new_posts {
 	color: #CCCCCC;
 	content: "\f065";
 	font-size: 1em;
-	font-family: 'FontAwesome';
+	font-family: 'FontAwesome', serif;
 }
 
 .attachment_thumb, .attachment_name {
@@ -3766,10 +3767,6 @@ dl.merge_topic dd {
 	-webkit-hyphens: auto;
 	-moz-hyphens: auto;
 	-ms-hyphens: auto;
-}
-
-.profileblock .icon {
-	vertical-align: bottom;
 }
 
 .profile_content {
@@ -5336,30 +5333,31 @@ a.help .icon {
 /* ------------------------------------------------------- */
 
 .iconline, .icoffline {
-	border: 1px solid;
-	border-radius: .75em;
-	height: .75em;
-	width: .75em;
-	line-height: .75em;
-	vertical-align: middle;
 	display: inline-block;
+	padding-bottom: 0;
+	width: 1em;
+	height: 1em;
+	border: 1px solid;
+	border-radius: 50%;
+	vertical-align: middle;
+	line-height: 1em;
 }
 
 .icon, .helpicon, .warnicon, .infoicon, .chevricon {
 	display: inline-block;
-	height: 1.25em;
-	width: 1.25em;
-	line-height: 1.25em;
 	margin: 0 .25em;
+	width: 1.25em;
+	height: auto;
 	vertical-align: middle;
+	line-height: 1.25em;
 }
 
 .helpicon, .warnicon, .infoicon {
-	border: 1px solid;
+	height: 1.25em;
+	vertical-align: text-bottom;
 	text-align: center;
-	font-size: 1em;
 	font-weight: bold;
-	border-radius: 1.25em;
+	font-size: 1em;
 }
 
 .helpicon, a.helpicon {
@@ -5384,8 +5382,15 @@ a.help .icon {
 	position: absolute;
 	overflow: hidden;
 	clip: rect(0 0 0 0);
-	height: 1px; width: 1px;
-	margin: -1px; padding: 0; border: 0;
+	height: 1px;
+	width: 1px;
+	margin: -1px;
+	padding: 0;
+	border: 0;
+}
+
+a > i {
+	padding-bottom: 1px;
 }
 
 .icon-small {
@@ -5481,6 +5486,9 @@ a.help .icon {
 
 	.icon-menu.i-account {
 		display: inline-block;
+		width: 1.25em;
+		height: 1.25em;
+		padding-bottom: 5px;
 	}
 }
 
@@ -5521,10 +5529,20 @@ a.help .icon {
 	.icon-menu {
 		display: inline-block;
 		margin: .1em;
-		padding: .5em;
+		padding: .45em;
 		border: .25em solid;
 		border-radius: .25em;
 		vertical-align: middle;
+	}
+
+	.icon-menu.i-account {
+		width: 2em;
+		height: 2em;
+	}
+
+	#collapse_button .linklevel1 {
+		height: 2.5em;
+		padding-top: 5px !important;
 	}
 
 	.button_title {
