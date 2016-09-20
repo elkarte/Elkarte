@@ -114,15 +114,10 @@ class SettingsFormAdapterDb extends SettingsFormAdapter
 	 */
 	private function revertMasks(array $configVar, $str)
 	{
-		static $known_rules = null;
-
-		if ($known_rules === null)
-		{
-			$known_rules = array(
-				'nohtml' => 'htmlspecialchars_decode[' . ENT_NOQUOTES . ']',
-			);
-		}
-		return $this->applyMasks(array $configVar, $str, $known_rules);
+		$known_rules = array(
+			'nohtml' => 'htmlspecialchars_decode[' . ENT_NOQUOTES . ']',
+		);
+		return $this->applyMasks($configVar, $str, $known_rules);
 	}
 
 	/**
@@ -133,16 +128,11 @@ class SettingsFormAdapterDb extends SettingsFormAdapter
 	 */
 	private function setMasks(array $configVar, $str)
 	{
-		static $known_rules = null;
-
-		if ($known_rules === null)
-		{
-			$known_rules = array(
-				'nohtml' => 'Util::htmlspecialchars[' . ENT_QUOTES . ']',
-				'email' => 'valid_email',
-				'url' => 'valid_url',
-			);
-		}
+		$known_rules = array(
+			'nohtml' => 'Util::htmlspecialchars[' . ENT_QUOTES . ']',
+			'email' => 'valid_email',
+			'url' => 'valid_url',
+		);
 		return $this->applyMasks($configVar, $str, $known_rules);
 	}
 
