@@ -307,9 +307,17 @@ class Calendar_Controller extends Action_Controller
 	protected function _returnToPost()
 	{
 		$controller = new Post_Controller(new Event_Manager());
+		$hook = $controller->getHook();
 		$controller->pre_dispatch();
+		$function_name = 'action_post';
 
-		return $controller->action_post();
+		call_integration_hook('integrate_action_' . $hook . '_before', array($function_name));
+
+		$result = $controller->{$function_name}();
+
+		call_integration_hook('integrate_action_' . $hook . '_after', array($function_name));
+
+		return $result;
 	}
 
 	/**
