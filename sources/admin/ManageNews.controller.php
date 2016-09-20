@@ -250,7 +250,7 @@ class ManageNews_Controller extends Action_Controller
 			var txt_preview = ' . JavaScriptEscape($txt['preview']) . ';
 			var txt_news_error_no_news = ' . JavaScriptEscape($txt['news_error_no_news']) . ';
 
-			$(document).ready(function () {
+			$(function() {
 				$("div[id ^= \'preview_\']").each(function () {
 					var preview_id = $(this).attr(\'id\').split(\'_\')[1];
 					if (last_preview < preview_id)

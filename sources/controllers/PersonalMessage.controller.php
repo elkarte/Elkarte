@@ -660,7 +660,7 @@ class PersonalMessage_Controller extends Action_Controller
 		if (!empty($messages_request) && !empty($modSettings['enableVideoEmbeding']))
 		{
 			addInlineJavascript('
-		$(document).ready(function() {
+		$(function() {
 			$().linkifyvideo(oEmbedtext);
 		});', true
 			);

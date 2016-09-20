@@ -477,7 +477,7 @@ class Display_Controller extends Action_Controller
 
 				// Initiate likes and the tooltips for likes
 				addInlineJavascript('
-				$(document).ready(function () {
+				$(function() {
 					var likePostInstance = likePosts.prototype.init({
 						oTxt: ({
 							btnText : ' . JavaScriptEscape($txt['ok_uppercase']) . ',
@@ -602,7 +602,7 @@ class Display_Controller extends Action_Controller
 		if (!empty($modSettings['enableVideoEmbeding']))
 		{
 			addInlineJavascript('
-		$(document).ready(function() {
+		$(function() {
 			$().linkifyvideo(oEmbedtext);
 		});');
 		}

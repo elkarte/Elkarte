@@ -762,7 +762,7 @@ class Post_Controller extends Action_Controller
 			if (empty($options['no_new_reply_warning']) && isset($_POST['last_msg']) && $topic_info['id_last_msg'] > $_POST['last_msg'])
 			{
 				addInlineJavascript('
-					$(document).ready(function () {
+					$(function() {
 						$("html,body").scrollTop($(\'.category_header:visible:first\').offset().top);
 					});'
 				);
@@ -970,7 +970,7 @@ class Post_Controller extends Action_Controller
 		if ($this->_post_errors->hasErrors())
 		{
 			addInlineJavascript('
-				$(document).ready(function () {
+				$(function() {
 					$("html,body").scrollTop($(\'.category_header:visible:first\').offset().top);
 				});'
 			);

@@ -515,7 +515,7 @@ function template_modify_board()
 
 	// Add a select all box for the allowed groups section
 	theme()->addInlineJavascript('
-		$(document).ready(function () {
+		$(function() {
 			$(".select_all_box").each(function () {
 				$(this).removeClass(\'select_all_box\');
 			});
