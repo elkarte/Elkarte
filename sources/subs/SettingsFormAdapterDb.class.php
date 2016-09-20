@@ -88,10 +88,10 @@ class SettingsFormAdapterDb extends SettingsFormAdapter
 	 *
 	 * @param int[] $excluded_groups = array()
 	 */
-	private function init_inline_permissions($excluded_groups = array())
+	private function init_inline_permissions(array $excluded_groups = array())
 	{
 		$inlinePermissions = array_filter(
-			function ($configVar)
+			function (array $configVar)
 			{
 				return $configVar[0] == 'permissions';
 			}, $this->configVars
@@ -112,7 +112,7 @@ class SettingsFormAdapterDb extends SettingsFormAdapter
 	 *
 	 * @return string
 	 */
-	private function revertMasks($configVar, $str)
+	private function revertMasks(array $configVar, $str)
 	{
 		static $known_rules = null;
 
@@ -122,7 +122,7 @@ class SettingsFormAdapterDb extends SettingsFormAdapter
 				'nohtml' => 'htmlspecialchars_decode[' . ENT_NOQUOTES . ']',
 			);
 		}
-		return $this->applyMasks($configVar, $str, $known_rules);
+		return $this->applyMasks(array $configVar, $str, $known_rules);
 	}
 
 	/**
@@ -131,7 +131,7 @@ class SettingsFormAdapterDb extends SettingsFormAdapter
 	 *
 	 * @return string
 	 */
-	private function setMasks($configVar, $str)
+	private function setMasks(array $configVar, $str)
 	{
 		static $known_rules = null;
 
@@ -153,7 +153,7 @@ class SettingsFormAdapterDb extends SettingsFormAdapter
 	 *
 	 * @return string
 	 */
-	private function applyMasks($configVar, $str, $known_rules)
+	private function applyMasks(array $configVar, $str, $known_rules)
 	{
 		if (isset($configVar['mask']))
 		{
@@ -191,7 +191,7 @@ class SettingsFormAdapterDb extends SettingsFormAdapter
 	/**
 	 * @param mixed[] $configVar
 	 */
-	private function handleSelect($configVar)
+	private function handleSelect(array $configVar)
 	{
 		if (!empty($configVar[2]) && is_array($configVar[2]))
 		{
@@ -220,7 +220,7 @@ class SettingsFormAdapterDb extends SettingsFormAdapter
 	/**
 	 * @param mixed[] $configVar
 	 */
-	private function allowOverrides($configVar)
+	private function allowOverrides(array $configVar)
 	{
 		global $txt;
 
@@ -289,7 +289,7 @@ class SettingsFormAdapterDb extends SettingsFormAdapter
 		global $txt, $helptxt, $context, $modSettings;
 
 		$bbcChoice = array_filter(
-			function ($configVar)
+			function (array $configVar)
 			{
 				return $configVar[0] == 'permissions';
 			}, $this->configVars

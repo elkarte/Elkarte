@@ -36,7 +36,7 @@ class Email_Settings extends Settings_Form
 	 * @param integer           $editId       -1 add a row, otherwise edit a row with the supplied key value
 	 * @param string            $editName     used when editing a row, needs to be the name of the col to find $editId
 	 */
-	public static function saveTableSettings($configVars, $tableName, $configValues = null, $index = array(), $editId = -1, $editName = '')
+	public static function saveTableSettings(array $configVars, $tableName, $configValues = null, $index = array(), $editId = -1, $editName = '')
 	{
 		if ($configValues === null)
 		{

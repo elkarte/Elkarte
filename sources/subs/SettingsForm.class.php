@@ -77,7 +77,7 @@ class Settings_Form
 	/**
 	 * @param array $configVars
 	 */
-	public function setConfigVars($configVars)
+	public function setConfigVars(array $configVars)
 	{
 		$this->adapter->setConfigVars($configVars);
 	}
@@ -93,7 +93,7 @@ class Settings_Form
 	/**
 	 * @param array $configValues
 	 */
-	public function setconfigValues($configValues)
+	public function setconfigValues(array $configValues)
 	{
 		$this->adapter->setconfigValues($configValues);
 	}
@@ -139,7 +139,7 @@ class Settings_Form
 	 *
 	 * @param mixed[] $configVars
 	 */
-	public static function prepare_db($configVars)
+	public static function prepare_db(array $configVars)
 	{
 		$settingsForm = new self(new SettingsFormAdapterDb);
 		$settingsForm->setConfigVars($configVars);
@@ -167,7 +167,7 @@ class Settings_Form
 	 *
 	 * @param mixed[] $configVars
 	 */
-	public static function save_file($configVars)
+	public static function save_file(array $configVars)
 	{
 		$settingsForm = new self;
 		$settingsForm->setConfigVars($configVars);
@@ -180,7 +180,7 @@ class Settings_Form
 	 * @param mixed[]        $configVars
 	 * @param mixed[]|object $post_object
 	 */
-	public static function save_db($configVars, $post_object = null)
+	public static function save_db(array $configVars, $post_object = null)
 	{
 		// Just look away if you have a weak stomach
 		if ($post_object !== null && is_object($post_object))
@@ -214,7 +214,7 @@ class Settings_Form
 	 * @param mixed[]|null $configVars = null array of config vars, if null the method returns the current
 	 *                                  configuration
 	 */
-	public function settings($configVars = null)
+	public function settings(array $configVars = null)
 	{
 		if (is_null($configVars))
 		{

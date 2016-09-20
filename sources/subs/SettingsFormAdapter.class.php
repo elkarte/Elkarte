@@ -46,7 +46,7 @@ abstract class SettingsFormAdapter implements SettingsFormAdapter_Interface
 	/**
 	 * @param array $configVars
 	 */
-	public function setConfigVars($configVars)
+	public function setConfigVars(array $configVars)
 	{
 		$this->configVars = $configVars;
 	}
@@ -62,7 +62,7 @@ abstract class SettingsFormAdapter implements SettingsFormAdapter_Interface
 	/**
 	 * @param array $configValues
 	 */
-	public function setConfigValues($configValues)
+	public function setConfigValues(array $configValues)
 	{
 		$this->configValues = $configValues;
 	}

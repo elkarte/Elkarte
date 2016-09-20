@@ -24,7 +24,7 @@ interface SettingsFormAdapter_Interface
 	/**
 	 * @param array $configVars
 	 */
-	public function setConfigVars($configVars);
+	public function setConfigVars(array $configVars);
 
 	/**
 	 * @return array
@@ -34,7 +34,7 @@ interface SettingsFormAdapter_Interface
 	/**
 	 * @param array $configValues
 	 */
-	public function setConfigValues($configValues);
+	public function setConfigValues(array $configValues);
 
 	public function prepare();
 
