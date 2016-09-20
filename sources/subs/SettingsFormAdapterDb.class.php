@@ -47,7 +47,6 @@ class SettingsFormAdapterDb extends SettingsFormAdapter
 				}
 
 				$this->context[$configVar[1]] = array(
-					'label' => isset($configVar['text_label']) ? $configVar['text_label'] : (isset($txt[$configVar[1]]) ? $txt[$configVar[1]] : (isset($configVar[3]) && !is_array($configVar[3]) ? $configVar[3] : '')),
 					'help' => isset($configVar['helptext']) ? $configVar['helptext'] : (isset($helptxt[$configVar[1]]) ? $configVar[1] : ''),
 					'type' => $configVar[0],
 					'size' => !empty($configVar[2]) && !is_array($configVar[2]) ? $configVar[2] : (in_array($configVar[0], array('int', 'float')) ? 6 : 0),
@@ -62,6 +61,8 @@ class SettingsFormAdapterDb extends SettingsFormAdapter
 					'postinput' => isset($configVar['postinput']) ? $configVar['postinput'] : '',
 					'icon' => isset($configVar['icon']) ? $configVar['icon'] : '',
 				);
+
+				$this->prepareLabel($configVar);
 
 				// If this is a select box handle any data.
 				$this->handleSelect($configVar);
@@ -227,25 +228,6 @@ class SettingsFormAdapterDb extends SettingsFormAdapter
 					$this->context[$configVar[1]][$k] = $v;
 				}
 			}
-
-			// See if there are any other labels that might fit?
-			if (isset($txt['setting_' . $configVar[1]]))
-			{
-				$this->context[$configVar[1]]['label'] = $txt['setting_' . $configVar[1]];
-			}
-			elseif (isset($txt['groups_' . $configVar[1]]))
-			{
-				$this->context[$configVar[1]]['label'] = $txt['groups_' . $configVar[1]];
-			}
-		}
-
-		// Set the subtext in case it's part of the label.
-		// @todo Temporary. Preventing divs inside label tags.
-		$divPos = strpos($this->context[$configVar[1]]['label'], '<div');
-		if ($divPos !== false)
-		{
-			$this->context[$configVar[1]]['subtext'] = preg_replace('~</?div[^>]*>~', '', substr($this->context[$configVar[1]]['label'], $divPos));
-			$this->context[$configVar[1]]['label'] = substr($this->context[$configVar[1]]['label'], 0, $divPos);
 		}
 	}
 
@@ -269,6 +251,43 @@ class SettingsFormAdapterDb extends SettingsFormAdapter
 		}
 
 		return implode(',', array_diff($bbcTags, $this->configValues[$var[1] . '_enabledTags']));
+	}
+
+	private function prepareLabel($configVar)
+	{
+		global $txt;
+
+		// See if there are any labels that might fit?
+		if (isset($configVar['text_label']))
+		{
+			$this->context[$configVar[1]]['label'] = $configVar['text_label'];
+		}
+		elseif (isset($txt[$configVar[1]]))
+		{
+			$this->context[$configVar[1]]['label'] = $txt[$configVar[1]];
+		}
+		// @todo are any of these actually used?
+		elseif (isset($txt['setting_' . $configVar[1]]))
+		{
+			$this->context[$configVar[1]]['label'] = $txt['setting_' . $configVar[1]];
+		}
+		elseif (isset($txt['groups_' . $configVar[1]]))
+		{
+			$this->context[$configVar[1]]['label'] = $txt['groups_' . $configVar[1]];
+		}
+		else
+		{
+			$this->context[$configVar[1]]['label'] = $configVar[1];
+		}
+
+		// Set the subtext in case it's part of the label.
+		// @todo Temporary. Preventing divs inside label tags.
+		$divPos = strpos($this->context[$configVar[1]]['label'], '<div');
+		if ($divPos !== false)
+		{
+			$this->context[$configVar[1]]['subtext'] = preg_replace('~</?div[^>]*>~', '', substr($this->context[$configVar[1]]['label'], $divPos));
+			$this->context[$configVar[1]]['label'] = substr($this->context[$configVar[1]]['label'], 0, $divPos);
+		}
 	}
 
 	/**
