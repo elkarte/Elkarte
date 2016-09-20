@@ -29,7 +29,7 @@ class Email_Settings extends Settings_Form
 	/**
 	 * static function saveTableSettings, now part of the Settings Form class
 	 *
-	 * @param array|object|null $configVars   the key names of the vars are the table cols
+	 * @param array             $configVars   the key names of the vars are the table cols
 	 * @param string            $tableName    name of the table the values will be saved in
 	 * @param array|object|null $configValues the key names of the vars are the table cols
 	 * @param string[]          $index        for compatibility
@@ -48,7 +48,7 @@ class Email_Settings extends Settings_Form
 		}
 		$settingsForm = new self(new SettingsFormAdapterDbTable($tableName, $editId, $editName));
 		$settingsForm->setConfigVars($configVars);
-		$settingsForm->setConfigVaues($configValues);
+		$settingsForm->setConfigValues($configValues);
 		$settingsForm->save();
 	}
 }

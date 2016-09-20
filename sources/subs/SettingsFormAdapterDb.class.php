@@ -25,52 +25,52 @@ class SettingsFormAdapterDb extends SettingsFormAdapter
 
 		loadLanguage('Help');
 
-		foreach ($this->config_vars as $config_var)
+		foreach ($this->configVars as $configVar)
 		{
 			// HR?
-			if (!is_array($config_var))
+			if (!is_array($configVar))
 			{
-				$this->context[] = $config_var;
+				$this->context[] = $configVar;
 			}
 			else
 			{
 				// If it has no name it doesn't have any purpose!
-				if (empty($config_var[1]))
+				if (empty($configVar[1]))
 				{
 					continue;
 				}
 
 				// Special case for inline permissions
-				if ($config_var[0] == 'permissions')
+				if ($configVar[0] == 'permissions')
 				{
 					continue;
 				}
 
-				$this->context[$config_var[1]] = array(
-					'label' => isset($config_var['text_label']) ? $config_var['text_label'] : (isset($txt[$config_var[1]]) ? $txt[$config_var[1]] : (isset($config_var[3]) && !is_array($config_var[3]) ? $config_var[3] : '')),
-					'help' => isset($config_var['helptext']) ? $config_var['helptext'] : (isset($helptxt[$config_var[1]]) ? $config_var[1] : ''),
-					'type' => $config_var[0],
-					'size' => !empty($config_var[2]) && !is_array($config_var[2]) ? $config_var[2] : (in_array($config_var[0], array('int', 'float')) ? 6 : 0),
+				$this->context[$configVar[1]] = array(
+					'label' => isset($configVar['text_label']) ? $configVar['text_label'] : (isset($txt[$configVar[1]]) ? $txt[$configVar[1]] : (isset($configVar[3]) && !is_array($configVar[3]) ? $configVar[3] : '')),
+					'help' => isset($configVar['helptext']) ? $configVar['helptext'] : (isset($helptxt[$configVar[1]]) ? $configVar[1] : ''),
+					'type' => $configVar[0],
+					'size' => !empty($configVar[2]) && !is_array($configVar[2]) ? $configVar[2] : (in_array($configVar[0], array('int', 'float')) ? 6 : 0),
 					'data' => array(),
-					'name' => $config_var[1],
-					'value' => isset($modSettings[$config_var[1]]) ? ($config_var[0] == 'select' ? $modSettings[$config_var[1]] : htmlspecialchars($modSettings[$config_var[1]], ENT_COMPAT, 'UTF-8')) : (in_array($config_var[0], array('int', 'float')) ? 0 : ''),
+					'name' => $configVar[1],
+					'value' => isset($modSettings[$configVar[1]]) ? ($configVar[0] == 'select' ? $modSettings[$configVar[1]] : htmlspecialchars($modSettings[$configVar[1]], ENT_COMPAT, 'UTF-8')) : (in_array($configVar[0], array('int', 'float')) ? 0 : ''),
 					'disabled' => false,
-					'invalid' => !empty($config_var['invalid']),
+					'invalid' => !empty($configVar['invalid']),
 					'javascript' => '',
-					'var_message' => !empty($config_var['message']) && isset($txt[$config_var['message']]) ? $txt[$config_var['message']] : '',
-					'preinput' => isset($config_var['preinput']) ? $config_var['preinput'] : '',
-					'postinput' => isset($config_var['postinput']) ? $config_var['postinput'] : '',
-					'icon' => isset($config_var['icon']) ? $config_var['icon'] : '',
+					'var_message' => !empty($configVar['message']) && isset($txt[$configVar['message']]) ? $txt[$configVar['message']] : '',
+					'preinput' => isset($configVar['preinput']) ? $configVar['preinput'] : '',
+					'postinput' => isset($configVar['postinput']) ? $configVar['postinput'] : '',
+					'icon' => isset($configVar['icon']) ? $configVar['icon'] : '',
 				);
 
 				// If this is a select box handle any data.
-				$this->handleSelect($config_var);
+				$this->handleSelect($configVar);
 
 				// Revert masks if necessary
-				$this->context[$config_var[1]]['value'] = $this->revertMasks($config_var, $this->context[$config_var[1]]['value']);
+				$this->context[$configVar[1]]['value'] = $this->revertMasks($configVar, $this->context[$configVar[1]]['value']);
 
 				// Finally allow overrides - and some final cleanups.
-				$this->allowOverrides($config_var);
+				$this->allowOverrides($configVar);
 			}
 		}
 
@@ -91,10 +91,10 @@ class SettingsFormAdapterDb extends SettingsFormAdapter
 	private function init_inline_permissions($excluded_groups = array())
 	{
 		$inlinePermissions = array_filter(
-			function ($config_var)
+			function ($configVar)
 			{
-				return $config_var[0] == 'permissions';
-			}, $this->config_vars
+				return $configVar[0] == 'permissions';
+			}, $this->configVars
 		);
 		if (empty($inlinePermissions))
 		{
@@ -107,12 +107,12 @@ class SettingsFormAdapterDb extends SettingsFormAdapter
 	}
 
 	/**
-	 * @param mixed[] $config_var
+	 * @param mixed[] $configVar
 	 * @param string  $str
 	 *
 	 * @return string
 	 */
-	private function revertMasks($config_var, $str)
+	private function revertMasks($configVar, $str)
 	{
 		static $known_rules = null;
 
@@ -122,16 +122,16 @@ class SettingsFormAdapterDb extends SettingsFormAdapter
 				'nohtml' => 'htmlspecialchars_decode[' . ENT_NOQUOTES . ']',
 			);
 		}
-		return $this->applyMasks($config_var, $str, $known_rules);
+		return $this->applyMasks($configVar, $str, $known_rules);
 	}
 
 	/**
-	 * @param mixed[] $config_var
+	 * @param mixed[] $configVar
 	 * @param string  $str
 	 *
 	 * @return string
 	 */
-	private function setMasks($config_var, $str)
+	private function setMasks($configVar, $str)
 	{
 		static $known_rules = null;
 
@@ -143,45 +143,45 @@ class SettingsFormAdapterDb extends SettingsFormAdapter
 				'url' => 'valid_url',
 			);
 		}
-		return $this->applyMasks($config_var, $str, $known_rules);
+		return $this->applyMasks($configVar, $str, $known_rules);
 	}
 
 	/**
-	 * @param mixed[] $config_var
+	 * @param mixed[] $configVar
 	 * @param string  $str
 	 * @param array   $known_rules
 	 *
 	 * @return string
 	 */
-	private function applyMasks($config_var, $str, $known_rules)
+	private function applyMasks($configVar, $str, $known_rules)
 	{
-		if (isset($config_var['mask']))
+		if (isset($configVar['mask']))
 		{
 			$rules = array();
-			if (!is_array($config_var['mask']))
+			if (!is_array($configVar['mask']))
 			{
-				$config_var['mask'] = array($config_var['mask']);
+				$configVar['mask'] = array($configVar['mask']);
 			}
-			foreach ($config_var['mask'] as $key => $mask)
+			foreach ($configVar['mask'] as $key => $mask)
 			{
 				if (isset($known_rules[$mask]))
 				{
-					$rules[$config_var[1]][] = $known_rules[$mask];
+					$rules[$configVar[1]][] = $known_rules[$mask];
 				}
 				elseif ($key == 'custom' && isset($mask['revert']))
 				{
-					$rules[$config_var[1]][] = $mask['revert'];
+					$rules[$configVar[1]][] = $mask['revert'];
 				}
 			}
 			if (!empty($rules))
 			{
-				$rules[$config_var[1]] = implode('|', $rules[$config_var[1]]);
+				$rules[$configVar[1]] = implode('|', $rules[$configVar[1]]);
 
 				$validator = new Data_Validator();
 				$validator->sanitation_rules($rules);
-				$validator->validate(array($config_var[1] => $str));
+				$validator->validate(array($configVar[1] => $str));
 
-				return $validator->{$config_var[1]};
+				return $validator->{$configVar[1]};
 			}
 		}
 
@@ -189,73 +189,73 @@ class SettingsFormAdapterDb extends SettingsFormAdapter
 	}
 
 	/**
-	 * @param mixed[] $config_var
+	 * @param mixed[] $configVar
 	 */
-	private function handleSelect($config_var)
+	private function handleSelect($configVar)
 	{
-		if (!empty($config_var[2]) && is_array($config_var[2]))
+		if (!empty($configVar[2]) && is_array($configVar[2]))
 		{
 			// If we allow multiple selections, we need to adjust a few things.
-			if ($config_var[0] == 'select' && !empty($config_var['multiple']))
+			if ($configVar[0] == 'select' && !empty($configVar['multiple']))
 			{
-				$this->context[$config_var[1]]['name'] .= '[]';
-				$this->context[$config_var[1]]['value'] = !empty($this->context[$config_var[1]]['value']) ? Util::unserialize($this->context[$config_var[1]]['value']) : array();
+				$this->context[$configVar[1]]['name'] .= '[]';
+				$this->context[$configVar[1]]['value'] = !empty($this->context[$configVar[1]]['value']) ? Util::unserialize($this->context[$configVar[1]]['value']) : array();
 			}
 
 			// If it's associative
-			if (isset($config_var[2][0]) && is_array($config_var[2][0]))
+			if (isset($configVar[2][0]) && is_array($configVar[2][0]))
 			{
-				$this->context[$config_var[1]]['data'] = $config_var[2];
+				$this->context[$configVar[1]]['data'] = $configVar[2];
 			}
 			else
 			{
-				foreach ($config_var[2] as $key => $item)
+				foreach ($configVar[2] as $key => $item)
 				{
-					$this->context[$config_var[1]]['data'][] = array($key, $item);
+					$this->context[$configVar[1]]['data'][] = array($key, $item);
 				}
 			}
 		}
 	}
 
 	/**
-	 * @param mixed[] $config_var
+	 * @param mixed[] $configVar
 	 */
-	private function allowOverrides($config_var)
+	private function allowOverrides($configVar)
 	{
 		global $txt;
 
-		foreach ($config_var as $k => $v)
+		foreach ($configVar as $k => $v)
 		{
 			if (!is_numeric($k))
 			{
 				if (substr($k, 0, 2) == 'on')
 				{
-					$this->context[$config_var[1]]['javascript'] .= ' ' . $k . '="' . $v . '"';
+					$this->context[$configVar[1]]['javascript'] .= ' ' . $k . '="' . $v . '"';
 				}
 				else
 				{
-					$this->context[$config_var[1]][$k] = $v;
+					$this->context[$configVar[1]][$k] = $v;
 				}
 			}
 
 			// See if there are any other labels that might fit?
-			if (isset($txt['setting_' . $config_var[1]]))
+			if (isset($txt['setting_' . $configVar[1]]))
 			{
-				$this->context[$config_var[1]]['label'] = $txt['setting_' . $config_var[1]];
+				$this->context[$configVar[1]]['label'] = $txt['setting_' . $configVar[1]];
 			}
-			elseif (isset($txt['groups_' . $config_var[1]]))
+			elseif (isset($txt['groups_' . $configVar[1]]))
 			{
-				$this->context[$config_var[1]]['label'] = $txt['groups_' . $config_var[1]];
+				$this->context[$configVar[1]]['label'] = $txt['groups_' . $configVar[1]];
 			}
 		}
 
 		// Set the subtext in case it's part of the label.
 		// @todo Temporary. Preventing divs inside label tags.
-		$divPos = strpos($this->context[$config_var[1]]['label'], '<div');
+		$divPos = strpos($this->context[$configVar[1]]['label'], '<div');
 		if ($divPos !== false)
 		{
-			$this->context[$config_var[1]]['subtext'] = preg_replace('~</?div[^>]*>~', '', substr($this->context[$config_var[1]]['label'], $divPos));
-			$this->context[$config_var[1]]['label'] = substr($this->context[$config_var[1]]['label'], 0, $divPos);
+			$this->context[$configVar[1]]['subtext'] = preg_replace('~</?div[^>]*>~', '', substr($this->context[$configVar[1]]['label'], $divPos));
+			$this->context[$configVar[1]]['label'] = substr($this->context[$configVar[1]]['label'], 0, $divPos);
 		}
 	}
 
@@ -269,16 +269,16 @@ class SettingsFormAdapterDb extends SettingsFormAdapter
 		$codes = \BBC\ParserWrapper::getInstance()->getCodes();
 		$bbcTags = $codes->getTags();
 
-		if (!isset($this->post_vars[$var[1] . '_enabledTags']))
+		if (!isset($this->configValues[$var[1] . '_enabledTags']))
 		{
-			$this->post_vars[$var[1] . '_enabledTags'] = array();
+			$this->configValues[$var[1] . '_enabledTags'] = array();
 		}
-		elseif (!is_array($this->post_vars[$var[1] . '_enabledTags']))
+		elseif (!is_array($this->configValues[$var[1] . '_enabledTags']))
 		{
-			$this->post_vars[$var[1] . '_enabledTags'] = array($this->post_vars[$var[1] . '_enabledTags']);
+			$this->configValues[$var[1] . '_enabledTags'] = array($this->configValues[$var[1] . '_enabledTags']);
 		}
 
-		return implode(',', array_diff($bbcTags, $this->post_vars[$var[1] . '_enabledTags']));
+		return implode(',', array_diff($bbcTags, $this->configValues[$var[1] . '_enabledTags']));
 	}
 
 	/**
@@ -289,10 +289,10 @@ class SettingsFormAdapterDb extends SettingsFormAdapter
 		global $txt, $helptxt, $context, $modSettings;
 
 		$bbcChoice = array_filter(
-			function ($config_var)
+			function ($configVar)
 			{
-				return $config_var[0] == 'permissions';
-			}, $this->config_vars
+				return $configVar[0] == 'permissions';
+			}, $this->configVars
 		);
 		if (empty($bbcChoice))
 		{
@@ -314,14 +314,14 @@ class SettingsFormAdapterDb extends SettingsFormAdapter
 		}
 
 		// Now put whatever BBC options we may have into context too!
-		foreach ($bbcChoice as $config_var)
+		foreach ($bbcChoice as $configVar)
 		{
-			$disabled = empty($modSettings['bbc_disabled_' . $config_var[1]]);
-			$this->context[$config_var[1]] = array_merge_recursive(array(
-				'disabled_tags' => $disabled ? array() : $modSettings['bbc_disabled_' . $config_var[1]],
+			$disabled = empty($modSettings['bbc_disabled_' . $configVar[1]]);
+			$this->context[$configVar[1]] = array_merge_recursive(array(
+				'disabled_tags' => $disabled ? array() : $modSettings['bbc_disabled_' . $configVar[1]],
 				'all_selected' => $disabled,
 				'data' => $bbc_sections,
-			), $this->context[$config_var[1]]);
+			), $this->context[$configVar[1]]);
 		}
 	}
 
@@ -330,7 +330,7 @@ class SettingsFormAdapterDb extends SettingsFormAdapter
 	 *
 	 * @return array
 	 */
-	private function sanitizeVars($configVar, $str)
+	protected function sanitizeVars()
 	{
 		$setTypes = array();
 		$setArray = array();

@@ -67,38 +67,38 @@ class SettingsFormAdapterFile extends SettingsFormAdapterDb
 			'mmessage',
 			'mbname',
 		);
-		foreach ($this->config_vars as $identifier => $config_var)
+		foreach ($this->configVars as $identifier => $configVar)
 		{
-			$new_setting = $config_var;
-			if (is_array($config_var) && isset($config_var[1]))
+			$new_setting = $configVar;
+			if (is_array($configVar) && isset($configVar[1]))
 			{
-				$varname = $config_var[0];
+				$varname = $configVar[0];
 				global ${$varname};
 
 				// Rewrite the definition a bit.
 				$new_setting = array(
-					$config_var[3],
-					$config_var[0],
-					'text_label' => $config_var[1],
+					$configVar[3],
+					$configVar[0],
+					'text_label' => $configVar[1],
 				);
-				if (isset($config_var[4]))
+				if (isset($configVar[4]))
 				{
-					$new_setting[2] = $config_var[4];
+					$new_setting[2] = $configVar[4];
 				}
-				if (isset($config_var[5]))
+				if (isset($configVar[5]))
 				{
-					$new_setting['helptext'] = $config_var[5];
+					$new_setting['helptext'] = $configVar[5];
 				}
 
 				// Special value needed from the settings file?
-				if ($config_var[2] == 'file')
+				if ($configVar[2] == 'file')
 				{
 					$value = in_array($varname, $defines) ? constant(strtoupper($varname)) : $$varname;
 					if (in_array($varname, $safe_strings))
 					{
 						$new_setting['mask'] = 'nohtml';
 					}
-					$modSettings[$config_var[0]] = $value;
+					$modSettings[$configVar[0]] = $value;
 				}
 			}
 			$this->new_settings[] = $new_setting;
@@ -167,26 +167,26 @@ class SettingsFormAdapterFile extends SettingsFormAdapterDb
 	private function saveDb()
 	{
 		// Now loop through the remaining (database-based) settings.
-		$this->config_vars = array_map(
-			function ($config_var)
+		$this->configVars = array_map(
+			function ($configVar)
 			{
 				// We just saved the file-based settings, so skip their definitions.
-				if (!is_array($config_var) || $config_var[2] == 'file')
+				if (!is_array($configVar) || $configVar[2] == 'file')
 				{
 					return '';
 				}
 
 				// Rewrite the definition a bit.
-				if (is_array($config_var) && $config_var[2] == 'db')
+				if (is_array($configVar) && $configVar[2] == 'db')
 				{
-					return array($config_var[3], $config_var[0]);
+					return array($configVar[3], $configVar[0]);
 				}
 				else
 				{
 					// This is a regular config var requiring no special treatment.
-					return $config_var;
+					return $configVar;
 				}
-			}, $this->config_vars
+			}, $this->configVars
 		);
 
 		// Save the new database-based settings, if any.
@@ -196,27 +196,27 @@ class SettingsFormAdapterFile extends SettingsFormAdapterDb
 	private function fixCookieName()
 	{
 		// Fix the darn stupid cookiename! (more may not be allowed, but these for sure!)
-		if (isset($this->post_vars['cookiename']))
+		if (isset($this->configValues['cookiename']))
 		{
-			$this->post_vars['cookiename'] = preg_replace('~[,;\s\.$]+~u', '', $this->post_vars['cookiename']);
+			$this->configValues['cookiename'] = preg_replace('~[,;\s\.$]+~u', '', $this->configValues['cookiename']);
 		}
 	}
 
 	private function fixBoardUrl()
 	{
 		// Fix the forum's URL if necessary.
-		if (isset($this->post_vars['boardurl']))
+		if (isset($this->configValues['boardurl']))
 		{
-			if (substr($this->post_vars['boardurl'], -10) == '/index.php')
+			if (substr($this->configValues['boardurl'], -10) == '/index.php')
 			{
-				$this->post_vars['boardurl'] = substr($this->post_vars['boardurl'], 0, -10);
+				$this->configValues['boardurl'] = substr($this->configValues['boardurl'], 0, -10);
 			}
-			elseif (substr($this->post_vars['boardurl'], -1) == '/')
+			elseif (substr($this->configValues['boardurl'], -1) == '/')
 			{
-				$this->post_vars['boardurl'] = substr($this->post_vars['boardurl'], 0, -1);
+				$this->configValues['boardurl'] = substr($this->configValues['boardurl'], 0, -1);
 			}
 
-			$this->post_vars['boardurl'] = addProtocol($this->post_vars['boardurl'], array('http://', 'https://', 'file://'));
+			$this->configValues['boardurl'] = addProtocol($this->configValues['boardurl'], array('http://', 'https://', 'file://'));
 		}
 	}
 
@@ -270,34 +270,34 @@ class SettingsFormAdapterFile extends SettingsFormAdapterDb
 		);
 
 		// Now sort everything into a big array, and figure out arrays and etc.
-		foreach ($config_passwords as $config_var)
+		foreach ($config_passwords as $configVar)
 		{
-			if (isset($this->post_vars[$config_var][1]) && $this->post_vars[$config_var][0] == $this->post_vars[$config_var][1])
+			if (isset($this->configValues[$configVar][1]) && $this->configValues[$configVar][0] == $this->configValues[$configVar][1])
 			{
-				$this->new_settings[$config_var] = '\'' . addcslashes($this->post_vars[$config_var][0], '\'\\') . '\'';
+				$this->new_settings[$configVar] = '\'' . addcslashes($this->configValues[$configVar][0], '\'\\') . '\'';
 			}
 		}
 
-		foreach ($config_strs as $config_var)
+		foreach ($config_strs as $configVar)
 		{
-			if (isset($this->post_vars[$config_var]))
+			if (isset($this->configValues[$configVar]))
 			{
-				if (in_array($config_var, $safe_strings))
+				if (in_array($configVar, $safe_strings))
 				{
-					$this->new_settings[$config_var] = '\'' . addcslashes(Util::htmlspecialchars($this->post_vars[$config_var], ENT_QUOTES), '\'\\') . '\'';
+					$this->new_settings[$configVar] = '\'' . addcslashes(Util::htmlspecialchars($this->configValues[$configVar], ENT_QUOTES), '\'\\') . '\'';
 				}
 				else
 				{
-					$this->new_settings[$config_var] = '\'' . addcslashes($this->post_vars[$config_var], '\'\\') . '\'';
+					$this->new_settings[$configVar] = '\'' . addcslashes($this->configValues[$configVar], '\'\\') . '\'';
 				}
 			}
 		}
 
-		foreach ($config_ints as $config_var)
+		foreach ($config_ints as $configVar)
 		{
-			if (isset($this->post_vars[$config_var]))
+			if (isset($this->configValues[$configVar]))
 			{
-				$this->new_settings[$config_var] = (int) $this->post_vars[$config_var];
+				$this->new_settings[$configVar] = (int) $this->configValues[$configVar];
 			}
 		}
 
@@ -306,7 +306,7 @@ class SettingsFormAdapterFile extends SettingsFormAdapterDb
 			// Check boxes need to be part of this settings form
 			if ($this->_array_value_exists__recursive($key, $this->getConfigVars()))
 			{
-				$this->new_settings[$key] = (int) !empty($this->post_vars[$key]);
+				$this->new_settings[$key] = (int) !empty($this->configValues[$key]);
 			}
 		}
 	}

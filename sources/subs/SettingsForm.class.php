@@ -75,27 +75,27 @@ class Settings_Form
 	}
 
 	/**
-	 * @param array $config_vars
+	 * @param array $configVars
 	 */
-	public function setConfigVars($config_vars)
+	public function setConfigVars($configVars)
 	{
-		$this->adapter->setConfigVars($config_vars);
+		$this->adapter->setConfigVars($configVars);
 	}
 
 	/**
 	 * @return array
 	 */
-	public function getPostVars()
+	public function getconfigValues()
 	{
-		return $this->adapter->getPostVars();
+		return $this->adapter->getconfigValues();
 	}
 
 	/**
-	 * @param array $post_vars
+	 * @param array $configValues
 	 */
-	public function setPostVars($post_vars)
+	public function setconfigValues($configValues)
 	{
-		$this->adapter->setPostVars($post_vars);
+		$this->adapter->setconfigValues($configValues);
 	}
 
 	/**
@@ -137,12 +137,12 @@ class Settings_Form
 	/**
 	 * Helper method, it sets up the context for database settings.
 	 *
-	 * @param mixed[] $config_vars
+	 * @param mixed[] $configVars
 	 */
-	public static function prepare_db($config_vars)
+	public static function prepare_db($configVars)
 	{
 		$settingsForm = new self(new SettingsFormAdapterDb);
-		$settingsForm->setConfigVars($config_vars);
+		$settingsForm->setConfigVars($configVars);
 		$settingsForm->prepare();
 	}
 
@@ -165,45 +165,45 @@ class Settings_Form
 	/**
 	 * Helper method for saving settings.
 	 *
-	 * @param mixed[] $config_vars
+	 * @param mixed[] $configVars
 	 */
-	public static function save_file($config_vars)
+	public static function save_file($configVars)
 	{
 		$settingsForm = new self;
-		$settingsForm->setConfigVars($config_vars);
+		$settingsForm->setConfigVars($configVars);
 		$settingsForm->save();
 	}
 
 	/**
 	 * Helper method for saving database settings.
 	 *
-	 * @param mixed[]        $config_vars
+	 * @param mixed[]        $configVars
 	 * @param mixed[]|object $post_object
 	 */
-	public static function save_db($config_vars, $post_object = null)
+	public static function save_db($configVars, $post_object = null)
 	{
 		// Just look away if you have a weak stomach
 		if ($post_object !== null && is_object($post_object))
 		{
-			$post_vars = array_replace($_POST, (array) $post_object);
+			$configValues = array_replace($_POST, (array) $post_object);
 		}
 		else
 		{
-			$post_vars = $_POST;
+			$configValues = $_POST;
 		}
 		$settingsForm = new self(new SettingsFormAdapterDb);
-		$settingsForm->setConfigVars($config_vars);
-		$settingsForm->setPostVars($post_vars);
+		$settingsForm->setConfigVars($configVars);
+		$settingsForm->setconfigValues($configValues);
 		$settingsForm->save();
 	}
 
 	/**
 	 * Method which retrieves or sets new configuration variables.
 	 *
-	 * If the $config_vars parameter is sent, the method tries to update
+	 * If the $configVars parameter is sent, the method tries to update
 	 * the internal configuration of the Settings_Form instance.
 	 *
-	 * If the $config_vars parameter is not sent (is null), the method
+	 * If the $configVars parameter is not sent (is null), the method
 	 * simply returns the current configuration set.
 	 *
 	 *  The array is formed of:
@@ -211,12 +211,12 @@ class Settings_Form
 	 *  - either, an empty string for a horizontal rule.
 	 *  - or, a string for a titled section.
 	 *
-	 * @param mixed[]|null $config_vars = null array of config vars, if null the method returns the current
+	 * @param mixed[]|null $configVars = null array of config vars, if null the method returns the current
 	 *                                  configuration
 	 */
-	public function settings($config_vars = null)
+	public function settings($configVars = null)
 	{
-		if (is_null($config_vars))
+		if (is_null($configVars))
 		{
 			// Simply return the config vars we have
 			return $this->adapter->getConfigVars();
@@ -224,7 +224,7 @@ class Settings_Form
 		else
 		{
 			// We got presents :P
-			$this->adapter->setConfigVars(is_array($config_vars) ? $config_vars : array($config_vars));
+			$this->adapter->setConfigVars(is_array($configVars) ? $configVars : array($configVars));
 
 			return $this->adapter->getConfigVars();
 		}

@@ -21,14 +21,14 @@ abstract class SettingsFormAdapter implements SettingsFormAdapter_Interface
 	 *
 	 * @var array
 	 */
-	protected $config_vars;
+	protected $configVars;
 
 	/**
 	 * Post variables and values for this settings form.
 	 *
 	 * @var array
 	 */
-	protected $post_vars;
+	protected $configValues;
 
 	/**
 	 * @var array
@@ -40,36 +40,36 @@ abstract class SettingsFormAdapter implements SettingsFormAdapter_Interface
 	 */
 	public function getConfigVars()
 	{
-		return $this->config_vars;
+		return $this->configVars;
 	}
 
 	/**
-	 * @param array $config_vars
+	 * @param array $configVars
 	 */
-	public function setConfigVars($config_vars)
+	public function setConfigVars($configVars)
 	{
-		$this->config_vars = $config_vars;
+		$this->configVars = $configVars;
 	}
 
 	/**
 	 * @return array
 	 */
-	public function getPostVars()
+	public function getConfigValues()
 	{
-		return $this->post_vars;
+		return $this->configValues;
 	}
 
 	/**
-	 * @param array $post_vars
+	 * @param array $configValues
 	 */
-	public function setPostVars($post_vars)
+	public function setConfigValues($configValues)
 	{
-		$this->post_vars = $post_vars;
+		$this->configValues = $configValues;
 	}
 
 	public function __construct()
 	{
-		$this->post_vars = $_POST;
+		$this->configValues = $_POST;
 	}
 
 	/**

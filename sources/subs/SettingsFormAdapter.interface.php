@@ -22,19 +22,19 @@ interface SettingsFormAdapter_Interface
 	public function getConfigVars();
 
 	/**
-	 * @param array $config_vars
+	 * @param array $configVars
 	 */
-	public function setConfigVars($config_vars);
+	public function setConfigVars($configVars);
 
 	/**
 	 * @return array
 	 */
-	public function getPostVars();
+	public function getConfigValues();
 
 	/**
-	 * @param array $post_vars
+	 * @param array $configValues
 	 */
-	public function setPostVars($post_vars);
+	public function setConfigValues($configValues);
 
 	public function prepare();
 

@@ -902,7 +902,7 @@ class ManageMaillist_Controller extends Action_Controller
 		$this->_initFiltersSettingsForm();
 
 		// Initialize it with our settings
-		$config_vars = $this->_filtersSettings->settings();
+		$configVars = $this->_filtersSettings->settings();
 
 		// Saving the new or edited entry?
 		if (isset($this->_req->query->save))
@@ -912,8 +912,8 @@ class ManageMaillist_Controller extends Action_Controller
 			call_integration_hook('integrate_save_filter_settings');
 
 			// Editing an entry?
-			$editid = (isset($this->_req->query->edit)) ? (int) $this->_req->query->edit : -1;
-			$editname = (isset($this->_req->query->edit)) ? 'id_filter' : '';
+			$editId = (isset($this->_req->query->edit)) ? (int) $this->_req->query->edit : -1;
+			$editName = (isset($this->_req->query->edit)) ? 'id_filter' : '';
 
 			// If its regex we do a quick check to see if its valid or not
 			if ($this->_req->post->filter_type === 'regex')
@@ -941,10 +941,10 @@ class ManageMaillist_Controller extends Action_Controller
 			if (empty($context['settings_message']))
 			{
 				// And ... its a filter
-				$config_vars[] = array('text', 'filter_style');
+				$configVars[] = array('text', 'filter_style');
 				$this->_req->post->filter_style = 'filter';
 
-				Email_Settings::saveTableSettings($config_vars, 'postby_emails_filters', $this->_req->post, array(), $editid, $editname);
+				Email_Settings::saveTableSettings($configVars, 'postby_emails_filters', $this->_req->post, array(), $editId, $editName);
 				writeLog();
 				redirectexit('action=admin;area=maillist;sa=emailfilters;saved');
 			}
@@ -965,7 +965,7 @@ class ManageMaillist_Controller extends Action_Controller
 		$context[$context['admin_menu_name']]['current_subsection'] = 'emailfilters';
 
 		// Load and show
-		Email_Settings::prepare_db($config_vars);
+		Email_Settings::prepare_db($configVars);
 		loadTemplate('Admin');
 		loadCSSFile('admin.css');
 		$context['sub_template'] = 'show_settings';
@@ -981,8 +981,8 @@ class ManageMaillist_Controller extends Action_Controller
 		// Instantiate the extended parser form
 		$this->_filtersSettings = new Email_Settings();
 
-		// Set up the config_vars for the form
-		$config_vars = array(
+		// Set up the configVars for the form
+		$configVars = array(
 			array('text', 'filter_name', 25, 'subtext' => $txt['filter_name_desc']),
 			array('select', 'filter_type',
 				array(
@@ -994,9 +994,9 @@ class ManageMaillist_Controller extends Action_Controller
 			array('text', 'filter_to', 25, 'subtext' => $txt['filter_to_desc']),
 		);
 
-		call_integration_hook('integrate_modify_maillist_filter_settings', array(&$config_vars));
+		call_integration_hook('integrate_modify_maillist_filter_settings', array(&$configVars));
 
-		return $this->_filtersSettings->settings($config_vars);
+		return $this->_filtersSettings->settings($configVars);
 	}
 
 	/**
@@ -1291,7 +1291,7 @@ class ManageMaillist_Controller extends Action_Controller
 		$this->_initParsersSettingsForm();
 
 		// Initialize it with our settings
-		$config_vars = $this->_parsersSettings->settings();
+		$configVars = $this->_parsersSettings->settings();
 
 		// Check if they are saving the changes
 		if (isset($this->_req->query->save))
@@ -1301,8 +1301,8 @@ class ManageMaillist_Controller extends Action_Controller
 			call_integration_hook('integrate_save_parser_settings');
 
 			// Editing a parser?
-			$editid = isset($this->_req->query->edit) ? (int) $this->_req->query->edit : -1;
-			$editname = isset($this->_req->query->edit) ? 'id_filter' : '';
+			$editId = isset($this->_req->query->edit) ? (int) $this->_req->query->edit : -1;
+			$editName = isset($this->_req->query->edit) ? 'id_filter' : '';
 
 			// Test the regex
 			if ($this->_req->post->filter_type === 'regex' && !empty($this->_req->post->filter_from))
@@ -1330,11 +1330,11 @@ class ManageMaillist_Controller extends Action_Controller
 			if (empty($context['settings_message']))
 			{
 				// Shhh ... its really a parser
-				$config_vars[] = array('text', 'filter_style');
+				$configVars[] = array('text', 'filter_style');
 				$this->_req->post->filter_style = 'parser';
 
 				// Save, log, show
-				Email_Settings::saveTableSettings($config_vars, 'postby_emails_filters', $this->_req->post, array(), $editid, $editname);
+				Email_Settings::saveTableSettings($configVars, 'postby_emails_filters', $this->_req->post, array(), $editId, $editName);
 				writeLog();
 				redirectexit('action=admin;area=maillist;sa=emailparser;saved');
 			}
@@ -1355,7 +1355,7 @@ class ManageMaillist_Controller extends Action_Controller
 		$context[$context['admin_menu_name']]['current_subsection'] = 'emailparser';
 
 		// prep it, load it, show it
-		Email_Settings::prepare_db($config_vars);
+		Email_Settings::prepare_db($configVars);
 		loadTemplate('Admin');
 		loadCSSFile('admin.css');
 		$context['sub_template'] = 'show_settings';
@@ -1372,7 +1372,7 @@ class ManageMaillist_Controller extends Action_Controller
 		$this->_parsersSettings = new Email_Settings();
 
 		// Define the menu array
-		$config_vars = array(
+		$configVars = array(
 			array('text', 'filter_name', 25, 'subtext' => $txt['parser_name_desc']),
 			array('select', 'filter_type', 'subtext' => $txt['parser_type_desc'],
 				array(
@@ -1383,9 +1383,9 @@ class ManageMaillist_Controller extends Action_Controller
 			array('large_text', 'filter_from', 4, 'subtext' => $txt['parser_from_desc']),
 		);
 
-		call_integration_hook('integrate_modify_maillist_parser_settings', array(&$config_vars));
+		call_integration_hook('integrate_modify_maillist_parser_settings', array(&$configVars));
 
-		return $this->_parsersSettings->settings($config_vars);
+		return $this->_parsersSettings->settings($configVars);
 	}
 
 	/**
@@ -1438,7 +1438,7 @@ class ManageMaillist_Controller extends Action_Controller
 		$this->_initMaillistSettingsForm();
 
 		// Retrieve the config settings
-		$config_vars = $this->_maillistSettings->settings();
+		$configVars = $this->_maillistSettings->settings();
 
 		// Saving settings?
 		if (isset($this->_req->query->save))
@@ -1510,7 +1510,7 @@ class ManageMaillist_Controller extends Action_Controller
 					updateSettings(array('disallow_sendBody' => ''));
 
 				updateSettings(array('maillist_receiving_address' => serialize($maillist_receiving_address)));
-				Settings_Form::save_db($config_vars, $this->_req->post);
+				Settings_Form::save_db($configVars, $this->_req->post);
 				writeLog();
 				redirectexit('action=admin;area=maillist;sa=emailsettings;saved');
 			}
@@ -1539,7 +1539,7 @@ class ManageMaillist_Controller extends Action_Controller
 		$context['page_title'] = $txt['ml_emailsettings'];
 		$context['post_url'] = $scripturl . '?action=admin;area=maillist;sa=emailsettings;save';
 		$context['sub_template'] = 'show_settings';
-		Settings_Form::prepare_db($config_vars);
+		Settings_Form::prepare_db($configVars);
 	}
 
 	/**
@@ -1551,9 +1551,9 @@ class ManageMaillist_Controller extends Action_Controller
 		$this->_maillistSettings = new Settings_Form();
 
 		// Initialize it with our settings
-		$config_vars = $this->_settings();
+		$configVars = $this->_settings();
 
-		return $this->_maillistSettings->settings($config_vars);
+		return $this->_maillistSettings->settings($configVars);
 	}
 
 	/**
@@ -1564,7 +1564,7 @@ class ManageMaillist_Controller extends Action_Controller
 		global $txt;
 
 		// Define the menu
-		$config_vars = array(
+		$configVars = array(
 				array('desc', 'maillist_help'),
 				array('check', 'maillist_enabled'),
 				array('check', 'pbe_post_enabled'),
@@ -1597,13 +1597,13 @@ class ManageMaillist_Controller extends Action_Controller
 
 		// Imap?
 		if (!function_exists('imap_open'))
-			$config_vars = array_merge($config_vars,
+			$configVars = array_merge($configVars,
 				array(
 					array('title', 'maillist_imap_missing'),
 				)
 			);
 		else
-			$config_vars = array_merge($config_vars,
+			$configVars = array_merge($configVars,
 				array(
 					array('title', 'maillist_imap'),
 					array('desc', 'maillist_imap_reason'),
@@ -1626,9 +1626,9 @@ class ManageMaillist_Controller extends Action_Controller
 				)
 			);
 
-		call_integration_hook('integrate_modify_maillist_settings', array(&$config_vars));
+		call_integration_hook('integrate_modify_maillist_settings', array(&$configVars));
 
-		return $config_vars;
+		return $configVars;
 	}
 
 	/**
