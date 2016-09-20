@@ -947,8 +947,10 @@ function expandThumbLB(thumbID) {
 	// Make the image size fluid as the browser window changes
 	$(window).on('resize.expandThumb', function () {
 		// Account for either a normal or expanded view
-		if ($('#elk_lb_content').hasClass('expand'))
-			$('#elk_lb_content').css({'height': window.innerHeight * 0.85, 'width': window.innerWidth * 0.9});
+		var $_elk_lb_content = $('#elk_lb_content');
+
+		if ($_elk_lb_content.hasClass('expand'))
+			$_elk_lb_content.css({'height': window.innerHeight * 0.85, 'width': window.innerWidth * 0.9});
 		else
 			$('#elk_lb_img').css({'max-height': window.innerHeight * 0.9, 'max-width': window.innerWidth * 0.8});
 	});

@@ -325,10 +325,11 @@ function modifyWarnNotify()
 			context: document.body
 		})
 		.done(function(request) {
-			$("#box_preview").show();
-			$("#body_preview").html($(request).find('body').text());
+			var $_preview = $("#box_preview"),
+				$_profile_error = $("#profile_error");
 
-			var $_profile_error = $("#profile_error");
+			$_preview.show();
+			$_preview.html($(request).find('body').text());
 
 			if ($(request).find("error").text() !== '')
 			{
