@@ -31,12 +31,12 @@ function template_pm_above()
 
 	// The every helpful javascript!
 	echo '
-					<script><!-- // --><![CDATA[
+					<script>
 						var allLabels = {},
 							currentLabels = {},
 							txt_pm_msg_label_remove = "', $txt['pm_msg_label_remove'], '",
 							txt_pm_msg_label_apply = "', $txt['pm_msg_label_apply'], '";
-					// ]]></script>
+					</script>
 					<div id="personal_messages">';
 
 	// Show the capacity bar, if available. @todo - This needs work.
@@ -426,7 +426,7 @@ function template_subject_list()
 		echo '
 							<tr class="standard_row">
 								<td class="pm_icon">
-									<script><!-- // --><![CDATA[
+									<script>
 										currentLabels[', $message['id'], '] = {';
 
 		if (!empty($message['labels']))
@@ -442,7 +442,7 @@ function template_subject_list()
 
 		echo '
 										};
-									// ]]></script>
+									</script>
 									', $message['is_replied_to'] ? '<img src="' . $settings['images_url'] . '/icons/pm_replied.png" alt="' . $txt['pm_replied'] . '" />' : '<i class="icon i-comment-blank"></i>', '</td>
 								<td class="pm_date">', $message['time'], '</td>
 								<td class="pm_subject">',
@@ -976,7 +976,7 @@ function template_send()
 
 	// The vars used to preview a personal message without loading a new page.
 	echo '
-	<script><!-- // --><![CDATA[
+	<script>
 		var form_name = "pmFolder",
 			preview_area = "pm",
 			txt_preview_title = "', $txt['preview_title'], '",
@@ -1017,7 +1017,7 @@ function template_send()
 		});';
 
 	echo '
-	// ]]></script>';
+	</script>';
 
 	// Show the message you're replying to.
 	if ($context['reply'])
@@ -1036,7 +1036,7 @@ function template_send()
 	</div>';
 
 	echo '
-		<script><!-- // --><![CDATA[
+		<script>
 			var oPersonalMessageSend = new elk_PersonalMessageSend({
 				sSelf: \'oPersonalMessageSend\',
 				sSessionId: elk_session_id,
@@ -1075,7 +1075,7 @@ function template_send()
 					<a href="#" id="bcc_link">' . $txt['make_bcc'] . '</a> <a href="' . $scripturl . '?action=quickhelp;help=pm_bcc" onclick="return reqOverlayDiv(this.href);" class="helpicon i-help"><s>' . $txt['help'] . '</s></a>'
 				), '
 			});
-		// ]]></script>';
+		</script>';
 }
 
 /**
@@ -1462,7 +1462,7 @@ function template_add_rule()
 
 	// Now setup all the bits!
 	echo '
-	<script><!-- // --><![CDATA[
+	<script>
 		initUpdateRulesActions();';
 
 	// If this isn't a new rule and we have JS enabled remove the JS compatibility stuff.
@@ -1476,7 +1476,7 @@ function template_add_rule()
 			document.getElementById("addonjs2").style.display = "";';
 
 	echo '
-		// ]]></script>';
+		</script>';
 }
 
 /**

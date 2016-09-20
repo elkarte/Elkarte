@@ -345,15 +345,15 @@ class Debug
 		if (!empty($expand_id))
 		{
 			echo '
-			<script><!-- // --><![CDATA[
-				$(document).ready(function() {
+			<script>
+				$(function() {
 					$(\'#', implode(', #', $expand_id), '\').click(function(ev) {
 						ev.preventDefault();
 						$(this).next().toggle();
 						$(this).remove();
 					});
 				});
-			// ]]></script>';
+			</script>';
 		}
 
 		echo '
