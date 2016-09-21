@@ -38,7 +38,7 @@ function start_tabs() {
 		// Called before tab content is loaded with href
 		beforeLoad: function (event, ui) {
 			// The ubiquitous ajax spinner
-			ui.panel.html('<div class="centertext"><i class="fa fa-2x fa-spinner"></i></div>');
+			ui.panel.html('<div class="centertext"><i class="icon icon-spin icon-big i-spinner"></i></div>');
 
 			// Ajax call failed to retrieve content
 			ui.jqXHR.fail(function () {

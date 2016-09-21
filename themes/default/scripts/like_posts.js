@@ -213,7 +213,7 @@
 
 			// Show the ajax spinner
 			showSpinnerOverlay = function () {
-				$('<div id="lp_preloader"><i class="fa fa-spinner fa-spin fa-4x"></i><div>').appendTo('#like_post_stats_overlay');
+				$('<div id="lp_preloader"><i class="icon icon-spin icon-xl i-spinner"></i><div>').appendTo('#like_post_stats_overlay');
 				$('#like_post_stats_overlay').show();
 			},
 

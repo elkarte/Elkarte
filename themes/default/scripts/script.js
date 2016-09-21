@@ -248,7 +248,7 @@ function reqWin(desktopURL, alternateWidth, alternateHeight, noScrollbars)
 function reqOverlayDiv(desktopURL, sHeader, sIcon)
 {
 	// Set up our div details
-	var sAjax_indicator = '<div class="centertext"><i class="fa fa-spinner fa-spin fa-2x"></i></div>';
+	var sAjax_indicator = '<div class="centertext"><i class="icon icon-spin icon-big i-spinner"></i></div>';
 
 	sIcon = typeof(sIcon) === 'string' ? sIcon : 'i-help';
 	sHeader = typeof(sHeader) === 'string' ? sHeader : help_popup_heading_text;

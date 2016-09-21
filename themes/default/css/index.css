@@ -335,7 +335,8 @@ input[type=submit][disabled]:hover, button[disabled], button[disabled]:hover {
 }
 
 .submitbutton input[type="submit"],
-.submitbutton input[type="button"]{
+.submitbutton input[type="button"] {
+	margin-top: -0.1em;
 	margin-right: 0.1em;
 	margin-left: 0.1em;
 	padding: 0 6px;
@@ -5406,9 +5407,30 @@ a > i {
 }
 
 .icon-lg {
-	height: 2em;
-	width: 2em;
-	line-height: 2em;
+	  height: 2em;
+	  width: 2em;
+	  line-height: 2em;
+}
+
+.icon-xl {
+	height: 4em;
+	width: 4em;
+	line-height: 4em;
+}
+
+.icon-spin {
+	animation: icon-spin 2s infinite linear;
+}
+
+@keyframes icon-spin {
+	0% {
+		-webkit-transform: rotate(0deg);
+		transform: rotate(0deg);
+	}
+	100% {
+		-webkit-transform: rotate(359deg);
+		transform: rotate(359deg);
+	}
 }
 
 /*
