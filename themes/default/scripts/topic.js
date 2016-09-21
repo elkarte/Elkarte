@@ -1272,8 +1272,8 @@ function onTopicSplitReceived(XMLDoc)
 		newItem,
 		sInsertBeforeId,
 		oListItems,
-		right_arrow = '<i class="fa fa-2x fa-arrow-circle-o-right"></i>',
-		left_arrow = '<i class="fa fa-2x fa-arrow-circle-o-left"></i>';
+		right_arrow = '<i class="icon icon-lg i-chevron-circle-right"></i>',
+		left_arrow = '<i class="icon icon-lg i-chevron-circle-left"></i>';
 
 	// Loop through all of the changes returned in the xml response
 	for (i = 0; i < numChanges; i++)

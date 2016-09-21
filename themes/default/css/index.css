@@ -1611,7 +1611,7 @@ a.bbc_link {
 	text-transform: uppercase;
 }
 
-.fa.hamburger_30 {
+.icon.hamburger_30 {
 	display: none;
 }
 
@@ -6495,13 +6495,13 @@ a > i {
 		white-space: normal;
 	}
 
-	.fa.hamburger_30 {
+	.icon.hamburger_30 {
 		padding-top: 0.1em;
 		display: inline-block;
 		vertical-align: middle;
 		cursor: pointer;
 	}
-	.fa.hamburger_30:before {
+	.icon.hamburger_30:before {
 		margin: 0.2em;
 	}
 	#display_jump_to {
@@ -6511,7 +6511,7 @@ a > i {
 		left: -9999px;
 		position: absolute;
 	}
-	.fa.hamburger_30.visible {
+	.icon.hamburger_30.visible {
 		display: none;
 	}
 	.hide_30.hamburger_30_target.visible {

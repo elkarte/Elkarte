@@ -801,7 +801,7 @@ function template_pages_and_buttons_below()
 	if (can_see_button_strip($context['mod_buttons']))
 	{
 		echo '
-			<i class="fa fa-2x fa-bars hamburger_30" data-id="moderationbuttons"></i>';
+			<i class="icon icon-lg i-menu hamburger_30" data-id="moderationbuttons"></i>';
 	}
 
 	echo '

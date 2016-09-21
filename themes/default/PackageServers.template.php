@@ -175,28 +175,28 @@ function template_package_list()
 				{
 					echo '
 							<span class="package_id">', $package['name'], '</span>&nbsp;<a class="linkbutton" href="', $package['download']['href'], '">', $txt['download'], '</a>&nbsp;',
-					sprintf($txt['package_update'], '<i class="fa fa-exclamation-circle" title="' . $txt['package_installed_old'] . '"></i>', $txt['package_installed']);
+					sprintf($txt['package_update'], '<i class="icon i-fail" title="' . $txt['package_installed_old'] . '"></i>', $txt['package_installed']);
 				}
 				// Installed but nothing newer is available
 				else if ($package['is_installed'])
 				{
 					echo '
 							<span class="package_id">', $package['name'], '</span>&nbsp;',
-					sprintf($txt['package_current'], '<i class="fa fa-check" title="' . $txt['package_installed_current'] . '"></i>', $txt['package_installed']);
+					sprintf($txt['package_current'], '<i class="icon i-check" title="' . $txt['package_installed_current'] . '"></i>', $txt['package_installed']);
 				}
 				// Downloaded, but there is a more recent version available
 				else if ($package['is_downloaded'] && $package['is_newer'])
 				{
 					echo '
 							<span class="package_id">', $package['name'], '</span>&nbsp;<a class="linkbutton" href="', $package['download']['href'], '">', $txt['download'], '</a>&nbsp;',
-					sprintf($txt['package_update'], '<i class="fa fa-minus-circle" title="' . $txt['package_installed_old'] . '"></i>', $txt['package_downloaded']);
+					sprintf($txt['package_update'], '<i class="icon i-warning" title="' . $txt['package_installed_old'] . '"></i>', $txt['package_downloaded']);
 				}
 				// Downloaded, and its current
 				else if ($package['is_downloaded'])
 				{
 					echo '
 							<span class="package_id">', $package['name'], '</span>&nbsp;',
-					sprintf($txt['package_current'], '<i class="fa fa-plus-circle" title="' . $txt['package_installed_current'] . '"></i>', $txt['package_downloaded']);
+					sprintf($txt['package_current'], '<i class="icon i-check" title="' . $txt['package_installed_current'] . '"></i>', $txt['package_downloaded']);
 				}
 				// Not downloaded or installed
 				else
@@ -231,22 +231,22 @@ function template_package_list()
 				// Nothing but hooks ?
 				if ($package['hooks'] != '' && in_array($package['hooks'], array('yes', 'true')))
 					echo '
-								<li>', $txt['mod_hooks'], ' <i class="fa fa-check-circle-o"></i></li>';
+								<li>', $txt['mod_hooks'], ' <i class="icon i-check"></i></li>';
 
 				// Location of file: http://someplace/.
 				echo '
 								<ul>
-									<li><i class="fa fa-cloud-download"></i> ', $txt['file_location'], ':&nbsp; <a href="', $package['server']['download'], '">', $package['server']['download'], '</a></li>';
+									<li><i class="icon i-download"></i> ', $txt['file_location'], ':&nbsp; <a href="', $package['server']['download'], '">', $package['server']['download'], '</a></li>';
 
 				// Location of issues?
 				if (!empty($package['server']['bugs']))
 					echo '
-									<li><i class="fa fa-bug"></i> ', $txt['bug_location'], ':&nbsp; <a href="', $package['server']['bugs'], '">', $package['server']['bugs'], '</a></li>';
+									<li><i class="icon i-bug"></i> ', $txt['bug_location'], ':&nbsp; <a href="', $package['server']['bugs'], '">', $package['server']['bugs'], '</a></li>';
 
 				// Location of support?
 				if (!empty($package['server']['support']))
 					echo '
-									<li><i class="fa fa-support"></i> ', $txt['support_location'], ':&nbsp; <a href="', $package['server']['support'], '">', $package['server']['support'], '</a></li>';
+									<li><i class="icon i-support"></i> ', $txt['support_location'], ':&nbsp; <a href="', $package['server']['support'], '">', $package['server']['support'], '</a></li>';
 
 				// Description: bleh bleh!
 				echo '
