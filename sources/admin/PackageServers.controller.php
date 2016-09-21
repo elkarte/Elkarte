@@ -370,8 +370,8 @@ class PackageServers_Controller extends Action_Controller
 	 * - Accessed by action=admin;area=packageservers;sa=download
 	 * - If server is set, loads json file from package server
 	 *     - requires both section and num values to validate the file to download from the json file
-	 * - If $_POST['byurl']) $_POST['filename'])) are set, will download a file from the url and save it as filename
-	 * - If just $_POST['byurl']) is set will fetch that file and save it
+	 * - If $_POST['byurl'] $_POST['filename'])) are set, will download a file from the url and save it as filename
+	 * - If just $_POST['byurl'] is set will fetch that file and save it
 	 *     - github and bitbucket master files are renamed to repo name to avoid collisions
 	 * - Files are saved to the package directory and validate to be ElkArte packages
 	 */
@@ -395,6 +395,7 @@ class PackageServers_Controller extends Action_Controller
 			Errors::instance()->fatal_lang_error('package_get_error_is_zero', false);
 
 		// Start off with nothing
+		$package_id = '';
 		$package_name = '';
 		$server = '';
 		$url = '';
@@ -415,6 +416,7 @@ class PackageServers_Controller extends Action_Controller
 			if (basename($section[$this->_req->query->num]->server[0]->download) === $this->_req->query->package)
 			{
 				// Where to download it from
+				$package_id = $this->_req->query->package;
 				$package_name = $this->_rename_master($section[$this->_req->query->num]->server[0]->download);
 				$path_url = pathinfo($section[$this->_req->query->num]->server[0]->download);
 				$url = isset($path_url['dirname']) ? $path_url['dirname'] . '/' : '';
@@ -425,10 +427,16 @@ class PackageServers_Controller extends Action_Controller
 		}
 		// Entered a url and optional filename
 		elseif (isset($this->_req->post->byurl) && !empty($this->_req->post->filename))
+		{
+			$package_id = $this->_req->post->package;
 			$package_name = basename($this->_req->post->filename);
+		}
 		// Must just be a link then
 		else
+		{
+			$package_id = $this->_req->post->package;
 			$package_name = $this->_rename_master($this->_req->post->package);
+		}
 
 		// Avoid over writing any existing package files of the same name
 		if (isset($this->_req->query->conflict) || (isset($this->_req->query->auto) && file_exists(BOARDDIR . '/packages/' . $package_name)))
@@ -451,7 +459,7 @@ class PackageServers_Controller extends Action_Controller
 		}
 
 		// First make sure it's a package.
-		$packageInfo = getPackageInfo($url . $this->_req->post->package);
+		$packageInfo = getPackageInfo($url . $package_id);
 
 		if (!is_array($packageInfo))
 			Errors::instance()->fatal_lang_error($packageInfo);
@@ -461,14 +469,14 @@ class PackageServers_Controller extends Action_Controller
 			array(BOARDDIR . '/packages/' . $package_name),
 			array('destination_url' => $scripturl . '?action=admin;area=packageservers;sa=download' . (isset($this->_req->query->server)
 				? ';server=' . $this->_req->query->server : '') . (isset($this->_req->query->auto)
-				? ';auto' : '') . ';package=' . $this->_req->post->package . (isset($this->_req->query->conflict)
+				? ';auto' : '') . ';package=' . $package_id . (isset($this->_req->query->conflict)
 				? ';conflict' : '') . ';' . $context['session_var'] . '=' . $context['session_id'],
 				'crash_on_error' => true)
 		);
-		package_put_contents(BOARDDIR . '/packages/' . $package_name, fetch_web_data($url . $this->_req->post->package));
+		package_put_contents(BOARDDIR . '/packages/' . $package_name, fetch_web_data($url . $package_id));
 
 		// Done!  Did we get this package automatically?
-		if (preg_match('~^http://[\w_\-]+\.elkarte\.net/~', $this->_req->post->package) == 1 && strpos($this->_req->post->package, 'dlattach') === false && isset($this->_req->query->auto))
+		if (preg_match('~^http://[\w_\-]+\.elkarte\.net/~', $package_id) == 1 && strpos($package_id, 'dlattach') === false && isset($this->_req->query->auto))
 			redirectexit('action=admin;area=packages;sa=install;package=' . $package_name);
 
 		// You just downloaded a addon from SERVER_NAME_GOES_HERE.

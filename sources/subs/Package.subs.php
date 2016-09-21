@@ -217,6 +217,8 @@ function loadInstalledPackages()
  *
  * @package Packages
  * @param string $gzfilename
+ *
+ * @reutrn array|string error string on error array on success
  */
 function getPackageInfo($gzfilename)
 {
