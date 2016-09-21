@@ -401,6 +401,7 @@ class Codes
 				self::ATTR_TYPE => self::TYPE_PARSED_CONTENT,
 				self::ATTR_BEFORE => '<sup class="bbc_footnotes">%fn%',
 				self::ATTR_AFTER => '%fn%</sup>',
+				self::ATTR_TRIM => self::TRIM_BOTH,
 				self::ATTR_DISALLOW_PARENTS => array(
 					'footnote' => 1,
 					'code' => 1,

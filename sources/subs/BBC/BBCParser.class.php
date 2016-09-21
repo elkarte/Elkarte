@@ -1186,8 +1186,6 @@ class BBCParser
 		// If we have footnotes, add them in at the end of the message
 		if (!empty($fn_num))
 		{
-			$this->message = rtrim($this->message, "\r");
-
 			$this->message .= '<div class="bbc_footnotes">' . implode('', $this->fn_content) . '</div>';
 		}
 	}
@@ -1410,9 +1408,9 @@ class BBCParser
 	 */
 	protected function trimWhiteSpace($offset = null)
 	{
-		if (preg_match('~(<br />|&nbsp;|\s)*~', $this->message, $matches, null, $offset) !== 0 && isset($matches[0]) && $matches[0] !== '')
+		if (preg_match('~(<br />|&nbsp;|\s)+~', $this->message, $matches, null, $offset) !== 0 && isset($matches[0]) && $matches[0] !== '')
 		{
-			substr_replace($this->message, '', $this->pos, strlen($matches[0]));
+			$this->message = substr_replace($this->message, '', $this->pos, strlen($matches[0]));
 		}
 	}
 
