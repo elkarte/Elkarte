@@ -591,7 +591,34 @@ class Admin_Controller extends Action_Controller
 			$module = strtolower(substr($name, 6, -6));
 
 			if (isModuleEnabled($module) && method_exists($class, 'addAdminMenu'))
+			{
 				$class::addAdminMenu($admin_areas);
+			}
+		}
+	}
+
+	/**
+	 * Searches the ADMINDIR looking for module managers and load the corresponding
+	 * admin menu entry.
+	 *
+	 * @param string[] $language_files The language files to load
+	 * @param string[] $include_files The files to load
+	 * @param mixed[] $settings_search The array of functions /controllers to call for settings
+	 */
+	protected function _getModulesHelp(&$language_files, &$include_files, &$settings_search)
+	{
+		$glob = new GlobIterator(ADMINDIR . '/Manage*Module.controller.php', FilesystemIterator::SKIP_DOTS);
+
+		foreach ($glob as $file)
+		{
+			$name = $file->getBasename('.controller.php');
+			$class = $name . '_Controller';
+			$module = strtolower(substr($name, 6, -6));
+
+			if (isModuleEnabled($module) && method_exists($class, 'addAdminSearch'))
+			{
+				$class::addAdminSearch($language_files, $include_files, $settings_search);
+			}
 		}
 	}
 
@@ -859,7 +886,11 @@ class Admin_Controller extends Action_Controller
 			array('settings_search', 'area=postsettings;sa=topics', 'ManageTopics_Controller'),
 		);
 
+		// Allow integration to add settings to search
 		call_integration_hook('integrate_admin_search', array(&$language_files, &$include_files, &$settings_search));
+
+		// Allow active modules to add settings for internal search
+		$this->_getModulesHelp($language_files, $include_files, $settings_search);
 
 		// Go through all the search data trying to find this text!
 		$search_term = strtolower(un_htmlspecialchars($context['search_term']));
