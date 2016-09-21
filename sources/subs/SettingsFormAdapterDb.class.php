@@ -276,7 +276,6 @@ class SettingsFormAdapterDb extends SettingsFormAdapter
 		{
 			$this->context[$configVar[1]]['label'] = $txt[$configVar[1]];
 		}
-		// @todo are any of these actually used?
 		elseif (isset($txt['setting_' . $configVar[1]]))
 		{
 			$this->context[$configVar[1]]['label'] = $txt['setting_' . $configVar[1]];
