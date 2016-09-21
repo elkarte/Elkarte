@@ -289,15 +289,6 @@ class SettingsFormAdapterDb extends SettingsFormAdapter
 		{
 			$this->context[$configVar[1]]['label'] = $configVar[1];
 		}
-
-		// Set the subtext in case it's part of the label.
-		// @todo Temporary. Preventing divs inside label tags.
-		$divPos = strpos($this->context[$configVar[1]]['label'], '<div');
-		if ($divPos !== false)
-		{
-			$this->context[$configVar[1]]['subtext'] = preg_replace('~</?div[^>]*>~', '', substr($this->context[$configVar[1]]['label'], $divPos));
-			$this->context[$configVar[1]]['label'] = substr($this->context[$configVar[1]]['label'], 0, $divPos);
-		}
 	}
 
 	/**
