@@ -56,11 +56,11 @@ class SettingsFormAdapterDb extends SettingsFormAdapter
 					'invalid' => !empty($configVar['invalid']),
 					'javascript' => '',
 				);
-				foreach (array('helptext', 'message'. 'preinput', 'postinput', 'icon') as $k => $v)
+				foreach (array('helptext', 'message', 'preinput', 'postinput', 'icon') as $k)
 				{
 					if (isset($configVar[$k]))
 					{
-						$this->context[$configVar[1]][$k] = $v;
+						$this->context[$configVar[1]][$k] = $configVar[$k];
 					}
 				}
 
