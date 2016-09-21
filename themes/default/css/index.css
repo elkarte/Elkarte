@@ -3130,21 +3130,19 @@ img.new_posts {
 
 #elk_lb_expand {
 	position: absolute;
-	top: 1%;
+	top: 2%;
 	right: 1%;
 	display: inline-block;
-	width: 1.15em;
-	height: 1.15em;
+	width: 2em;
+	height: 2em;
 	border: 2px solid;
 	border-radius: 4px;
-	line-height: 1em;
+	line-height: 2em;
 }
 
 #elk_lb_expand:before {
-	color: #CCCCCC;
-	content: "\f065";
-	font-size: 1em;
-	font-family: 'FontAwesome', serif;
+	content: "\21D7";
+	font-size: 2em;
 }
 
 .attachment_thumb, .attachment_name {
