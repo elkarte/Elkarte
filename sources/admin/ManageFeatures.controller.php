@@ -1370,9 +1370,8 @@ class ManageFeatures_Controller extends Action_Controller
 	{
 		global $txt;
 
-		$config_vars = getFrontPageControllers();
-
-		$config_vars += array(
+		$config_vars = array_merge(getFrontPageControllers(), array(
+			'',
 				// Pagination stuff.
 				array('check', 'compactTopicPagesEnable'),
 				array('int', 'compactTopicPagesContiguous', null, $txt['contiguous_page_display'] . '<div class="smalltext">' . str_replace(' ', '&nbsp;', '"3" ' . $txt['to_display'] . ': <strong>1 ... 4 [5] 6 ... 9</strong>') . '<br />' . str_replace(' ', '&nbsp;', '"5" ' . $txt['to_display'] . ': <strong>1 ... 3 4 [5] 6 7 ... 9</strong>') . '</div>'),
@@ -1390,7 +1389,7 @@ class ManageFeatures_Controller extends Action_Controller
 			'',
 				// This is like debugging sorta.
 				array('check', 'timeLoadPageEnable'),
-		);
+		));
 
 		call_integration_hook('integrate_modify_layout_settings', array(&$config_vars));
 
