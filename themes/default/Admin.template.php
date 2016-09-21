@@ -910,17 +910,17 @@ function template_show_settings()
 				(isset($config_var['name']) ? '<a href="#" id="' . $config_var['name'] . '"></a>' : ''), '
 					<h3 class="', !empty($config_var['class']) ? $config_var['class'] : 'category_header', '"', !empty($config_var['force_div_id']) ? ' id="' . $config_var['force_div_id'] . '"' : '', '>';
 
-				if ($config_var['help'])
+				if ($config_var['helptext'])
 				{
 					if (empty($config_var['class']))
 					{
 						echo '
-						<a href="' . $scripturl . '?action=quickhelp;help=' . $config_var['help'] . '" onclick="return reqOverlayDiv(this.href);" class="hdicon cat_img_helptopics help" alt="' . $txt['help'] . '"></a>';
+						<a href="' . $scripturl . '?action=quickhelp;help=' . $config_var['helptext'] . '" onclick="return reqOverlayDiv(this.href);" class="hdicon cat_img_helptopics help" alt="' . $txt['help'] . '"></a>';
 					}
 					else
 					{
 						echo '
-						<a href="' . $scripturl . '?action=quickhelp;help=' . $config_var['help'] . '" onclick="return reqOverlayDiv(this.href);" class="' . $config_var['class'] . ' help"><i class="helpicon i-help icon-lg"><s>', $txt['help'], '</s></i></a>';
+						<a href="' . $scripturl . '?action=quickhelp;help=' . $config_var['helptext'] . '" onclick="return reqOverlayDiv(this.href);" class="' . $config_var['class'] . ' help"><i class="helpicon i-help icon-lg"><s>', $txt['help'], '</s></i></a>';
 					}
 				}
 				elseif ($config_var['icon'])
@@ -983,27 +983,29 @@ function template_show_settings()
 					<dt', is_array($config_var) && !empty($config_var['force_div_id']) ? ' id="' . $config_var['force_div_id'] . '"' : '', '>';
 
 				// Some quick helpers...
-				$javascript = $config_var['javascript'];
+				$preinput = !empty($config_var['preinput']) ? $config_var['preinput'] : '';
+				$javascript = !empty($config_var['javascript']) ? $config_var['javascript'] : '';
 				$disabled = !empty($config_var['disabled']) ? ' disabled="disabled"' : '';
+				$invalid = !empty($config_var['invalid']) ? ' class="error"' : '';
+				$size = !empty($config_var['size']) ? ' size="' . $config_var['size'] . '"' : '';
 				$subtext = !empty($config_var['subtext']) ? '<br /><span class="smalltext"> ' . $config_var['subtext'] . '</span>' : '';
 
 				// Show the [?] button.
-				if ($config_var['help'])
+				if (isset($config_var['helptext']))
 				{
 					echo '
-						<a id="setting_', $config_var['name'], '" href="', $scripturl, '?action=quickhelp;help=', $config_var['help'], '" onclick="return reqOverlayDiv(this.href);" class="helpicon i-help"><s>', $txt['help'], '</s></a><span', ($config_var['disabled'] ? ' class="disabled"' : ($config_var['invalid'] ? ' class="error"' : '')), '><label for="', $config_var['name'], '">', $config_var['label'], '</label>', $subtext, '</span>
-					</dt>';
+						<a id="setting_', $config_var['name'], '" href="', $scripturl, '?action=quickhelp;help=', $config_var['helptext'], '" onclick="return reqOverlayDiv(this.href);" class="helpicon i-help"><s>', $txt['help'], '</s>';
 				}
 				else
 				{
 					echo '
-						<a id="setting_', $config_var['name'], '"></a> <span', ($config_var['disabled'] ? ' class="disabled"' : ($config_var['invalid'] ? ' class="error"' : '')), '><label for="', $config_var['name'], '">', $config_var['label'], '</label>', $subtext, '</span>
-					</dt>';
+						<a id="setting_', $config_var['name'], '">';
 				}
 
-				echo '
+				echo '</a> <span', ($config_var['disabled'] ? ' class="disabled"' : ($config_var['invalid'] ? ' class="error"' : '')), '><label for="', $config_var['name'], '">', $config_var['label'], '</label>', $subtext, '</span>
+					</dt>
 					<dd', (!empty($config_var['force_div_id']) ? ' id="' . $config_var['force_div_id'] . '_dd"' : ''), '>',
-				$config_var['preinput'];
+				$preinput;
 
 				// Show a check box.
 				if ($config_var['type'] == 'check')
@@ -1031,8 +1033,17 @@ function template_show_settings()
 
 					foreach ($config_var['data'] as $option)
 					{
+						$selected = false;
+						if (empty($var['multiple']))
+						{
+							$selected = $option[0] == $config_var['value'];
+						}
+						else
+						{
+							$selected = in_array($option[0], $config_var['value']);
+						}
 						echo '
-							<option value="', $option[0], '"', (!empty($config_var['value']) && ($option[0] == $config_var['value'] || (!empty($config_var['multiple']) && in_array($option[0], $config_var['value']))) ? ' selected="selected"' : ''), '>', $option[1], '</option>';
+							<option value="', $option[0], '"', ($selected ? ' selected' : ''), '>', $option[1], '</option>';
 					}
 
 					echo '
@@ -1077,10 +1088,10 @@ function template_show_settings()
 						</fieldset>';
 				}
 				// A simple message?
-				elseif ($config_var['type'] == 'var_message')
+				elseif ($config_var['type'] == 'message')
 				{
 					echo '
-						<div', !empty($config_var['name']) ? ' id="' . $config_var['name'] . '"' : '', '>', $config_var['var_message'], '</div>';
+						<div', !empty($config_var['name']) ? ' id="' . $config_var['name'] . '"' : '', '>', $config_var['message'], '</div>';
 				}
 				// Color picker?
 				elseif ($config_var['type'] == 'color')

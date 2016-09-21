@@ -47,7 +47,6 @@ class SettingsFormAdapterDb extends SettingsFormAdapter
 				}
 
 				$this->context[$configVar[1]] = array(
-					'help' => isset($configVar['helptext']) ? $configVar['helptext'] : (isset($helptxt[$configVar[1]]) ? $configVar[1] : ''),
 					'type' => $configVar[0],
 					'size' => !empty($configVar[2]) && !is_array($configVar[2]) ? $configVar[2] : (in_array($configVar[0], array('int', 'float')) ? 6 : 0),
 					'data' => array(),
@@ -56,11 +55,14 @@ class SettingsFormAdapterDb extends SettingsFormAdapter
 					'disabled' => false,
 					'invalid' => !empty($configVar['invalid']),
 					'javascript' => '',
-					'var_message' => !empty($configVar['message']) && isset($txt[$configVar['message']]) ? $txt[$configVar['message']] : '',
-					'preinput' => isset($configVar['preinput']) ? $configVar['preinput'] : '',
-					'postinput' => isset($configVar['postinput']) ? $configVar['postinput'] : '',
-					'icon' => isset($configVar['icon']) ? $configVar['icon'] : '',
 				);
+				foreach (array('helptext', 'message'. 'preinput', 'postinput', 'icon') as $k => $v)
+				{
+					if (isset($configVar[$k]))
+					{
+						$this->context[$configVar[1]][$k] = $v;
+					}
+				}
 
 				$this->prepareLabel($configVar);
 
@@ -76,7 +78,7 @@ class SettingsFormAdapterDb extends SettingsFormAdapter
 		}
 
 		// If we have inline permissions we need to prep them.
-		$this->init_inline_permissions(isset($context['permissions_excluded']) ? $context['permissions_excluded'] : array());
+		$this->init_inline_permissions();
 
 		// What about any BBC selection boxes?
 		$this->initBbcChoices();
@@ -86,11 +88,11 @@ class SettingsFormAdapterDb extends SettingsFormAdapter
 
 	/**
 	 * Initialize inline permissions settings.
-	 *
-	 * @param int[] $excluded_groups = array()
 	 */
-	private function init_inline_permissions(array $excluded_groups = array())
+	private function init_inline_permissions()
 	{
+		global $context;
+
 		$inlinePermissions = array_filter($this->configVars,
 			function ($configVar)
 			{
@@ -102,7 +104,7 @@ class SettingsFormAdapterDb extends SettingsFormAdapter
 			return;
 		}
 		$permissionsForm = new Inline_Permissions_Form;
-		$permissionsForm->setExcludedGroups($excluded_groups);
+		$permissionsForm->setExcludedGroups(isset($context['permissions_excluded']) ? $context['permissions_excluded'] : array());
 		$permissionsForm->setPermissions($inlinePermissions);
 		$permissionsForm->init();
 	}
@@ -213,7 +215,7 @@ class SettingsFormAdapterDb extends SettingsFormAdapter
 	 */
 	private function allowOverrides(array $configVar)
 	{
-		global $txt;
+		global $txt, $helptxt;
 
 		foreach ($configVar as $k => $v)
 		{
@@ -228,6 +230,14 @@ class SettingsFormAdapterDb extends SettingsFormAdapter
 					$this->context[$configVar[1]][$k] = $v;
 				}
 			}
+		}
+		if (isset($configVar['message'], $txt[$configVar['message']]))
+		{
+			$this->context[$configVar[1]]['message'] = $txt[$configVar['message']];
+		}
+		if (isset($helptxt[$configVar[1]]))
+		{
+			$this->context[$configVar[1]]['helptext'] = $configVar[1];
 		}
 	}
 
