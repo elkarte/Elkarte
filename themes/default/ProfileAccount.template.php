@@ -210,7 +210,7 @@ function template_deleteAccount()
 
 	// The main containing header.
 	echo '
-		<form id="creator" action="', $scripturl, '?action=profile;area=deleteaccount" method="post" accept-charset="UTF-8" name="creator">
+		<form id="creator" action="', $scripturl, '?action=profile;area=deleteaccount;u=', $context['id_member'], '" method="post" accept-charset="UTF-8" name="creator">
 			<h2 class="category_header hdicon cat_img_profile">
 				', $txt['deleteAccount'], '
 			</h2>';
@@ -236,8 +236,7 @@ function template_deleteAccount()
 				<div class="submitbutton">
 					<strong', (isset($context['modify_error']['bad_password']) || isset($context['modify_error']['no_password']) ? ' class="error"' : ''), '><label for="oldpasswrd">', $txt['current_password'], '</label>: </strong>
 					<input type="password" id="oldpasswrd" name="oldpasswrd" size="20" class="input_password" />&nbsp;&nbsp;&nbsp;&nbsp;
-					<input type="submit" value="', $txt['delete'], '" />
-					<input type="hidden" name="save" value="save" />';
+					<input type="submit" name="save" value="', $txt['delete'], '" />';
 
 		if (!empty($context['token_check']))
 			echo '
@@ -279,7 +278,7 @@ function template_deleteAccount()
 						<input type="checkbox" name="deleteAccount" id="deleteAccount" value="1" onclick="if (this.checked) return confirm(\'', $txt['deleteAccount_confirm'], '\');" />
 					</dd>
 				</dl>
-				<input type="submit" value="', $txt['delete'], '" class="right_submit" />';
+				<input type="submit" name="save" value="', $txt['delete'], '" class="right_submit" />';
 
 		if (!empty($context['token_check']))
 			echo '

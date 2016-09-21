@@ -509,6 +509,10 @@ class ProfileAccount_Controller extends Action_Controller
 		elseif (!allowedTo('profile_remove_any'))
 			isAllowedTo('profile_remove_own');
 
+		if (isset($this->_req->post->save))
+		{
+			return $this->action_deleteaccount2();
+		}
 		// Permissions for removing stuff...
 		$context['can_delete_posts'] = !$context['user']['is_owner'] && allowedTo('moderate_forum');
 
@@ -533,15 +537,21 @@ class ProfileAccount_Controller extends Action_Controller
 
 		// @todo Add a way to delete pms as well?
 		if (!$context['user']['is_owner'])
+		{
 			isAllowedTo('profile_remove_any');
+		}
 		elseif (!allowedTo('profile_remove_any'))
+		{
 			isAllowedTo('profile_remove_own');
+		}
 
 		checkSession();
 
 		// Check we got here as we should have!
 		if ($cur_profile != $user_profile[$this->_memID])
+		{
 			Errors::instance()->fatal_lang_error('no_access', false);
+		}
 
 		$old_profile = &$cur_profile;
 
