@@ -347,6 +347,16 @@ function deleteMembers($users, $check_not_admin = false)
 			'users' => $users,
 		)
 	);
+	// And null all those that were added by him
+	$db->query('', '
+		UPDATE {db_prefix}log_mentions
+		SET id_member_from = {int:zero}
+		WHERE id_member_from IN ({array_int:users})',
+		array(
+			'zero' => 0,
+			'users' => $users,
+		)
+	);
 
 	// Delete personal messages.
 	require_once(SUBSDIR . '/PersonalMessage.subs.php');

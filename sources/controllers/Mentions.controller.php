@@ -241,7 +241,7 @@ class Mentions_Controller extends Action_Controller
 									),
 									array(
 										$row['avatar']['image'],
-										!empty($row['id_member_from']) ? $scripturl . '?action=profile;u=' . $row['id_member_from'] : '',
+										!empty($row['id_member_from']) ? $scripturl . '?action=profile;u=' . $row['id_member_from'] : '#',
 										$row['mentioner'],
 									),
 									$settings['mentions']['mentioner_template']);
