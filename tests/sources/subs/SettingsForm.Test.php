@@ -112,7 +112,7 @@ class TestSettingsForm extends PHPUnit_Framework_TestCase
 	 */
 	public function testSave()
 	{
-		global $modSettings;
+		global $context, $modSettings;
 
 		$settingsForm = new Settings_Form(Settings_Form::DB_ADAPTER);
 		$settingsForm->setConfigVars($this->configVars);
