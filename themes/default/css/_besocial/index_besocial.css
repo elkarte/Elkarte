@@ -892,8 +892,12 @@ a.active {
 
 /* Skip navigation link. */
 #top {
-	border-color: #5BA048;
+	border-color: #1E69DE;
 	background: #FEFEFE;
+}
+
+#top:focus {
+	top: 0;
 }
 
 /* ------------------------------------------------------- */
