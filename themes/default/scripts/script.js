@@ -1112,7 +1112,7 @@ JumpTo.prototype.showSelect = function ()
 		sChildLevelPrefix += this.opt.sBoardChildLevelIndicator;
 
 	if (sChildLevelPrefix !== '')
-		sChildLevelPrefix = sChildLevelPrefix + this.opt.sBoardPrefix;
+		sChildLevelPrefix += this.opt.sBoardPrefix;
 
 	document.getElementById(this.opt.sContainerId).innerHTML = this.opt.sJumpToTemplate.replace(/%select_id%/, this.opt.sContainerId + '_select').replace(/%dropdown_list%/, '<select ' + (this.opt.bDisabled === true ? 'disabled="disabled" ' : '') + (this.opt.sClassName !== undefined ? 'class="' + this.opt.sClassName + '" ' : '') + 'name="' + (this.opt.sCustomName !== undefined ? this.opt.sCustomName : this.opt.sContainerId + '_select') + '" id="' + this.opt.sContainerId + '_select" ' + ('implementation' in document ? '' : 'onmouseover="grabJumpToContent(this);" ') + ('onbeforeactivate' in document ? 'onbeforeactivate' : 'onfocus') + '="grabJumpToContent(this);"><option value="' + (this.opt.bNoRedirect !== undefined && this.opt.bNoRedirect === true ? this.opt.iCurBoardId : '?board=' + this.opt.iCurBoardId + '.0') + '">' + sChildLevelPrefix + this.opt.sCurBoardName.removeEntities() + '</option></select>&nbsp;' + (this.opt.sGoButtonLabel !== undefined ? '<input type="button" class="button_submit" value="' + this.opt.sGoButtonLabel + '" onclick="window.location.href = \'' + elk_prepareScriptUrl(elk_scripturl) + 'board=' + this.opt.iCurBoardId + '.0\';" />' : ''));
 	this.dropdownList = document.getElementById(this.opt.sContainerId + '_select');
@@ -1122,6 +1122,7 @@ JumpTo.prototype.showSelect = function ()
 JumpTo.prototype.fillSelect = function (aBoardsAndCategories)
 {
 	this.removeAll();
+
 	if ('onbeforeactivate' in document)
 		this.dropdownList.onbeforeactivate = null;
 	else
@@ -1152,7 +1153,7 @@ JumpTo.prototype.fillSelect = function (aBoardsAndCategories)
 				sChildLevelPrefix += this.opt.sBoardChildLevelIndicator;
 
 			if (sChildLevelPrefix !== '')
-				sChildLevelPrefix = sChildLevelPrefix + this.opt.sBoardPrefix;
+				sChildLevelPrefix += this.opt.sBoardPrefix;
 		}
 
 		oOption = document.createElement('option');
