@@ -757,6 +757,7 @@ function changeVariant(sVariant)
  */
 function setPreviewTimeout()
 {
+	/** global: previewTimeout */
 	if (previewTimeout)
 	{
 		window.clearTimeout(previewTimeout);
@@ -1120,13 +1121,16 @@ function swapMembers()
  */
 function checkAttributeValidity()
 {
+	/** global: origText */
 	origText = reattribute_confirm;
+	/** global: valid */
 	valid = true;
 
 	// Do all the fields!
 	if (!document.getElementById('to').value)
 		valid = false;
 
+	/** global: warningMessage */
 	warningMessage = origText.replace(/%member_to%/, document.getElementById('to').value);
 
 	// Using email address to find the member
@@ -1498,6 +1502,7 @@ function navigatePreview(url)
 
 		if (myDoc.responseText !== null && myDoc.status === 200)
 		{
+			/** global: previewData */
 			previewData = myDoc.responseText;
 			document.getElementById('css_preview_box').style.display = "block";
 
@@ -1505,6 +1510,7 @@ function navigatePreview(url)
 			var tempImage = new Image();
 			tempImage.src = elk_prepareScriptUrl(elk_scripturl) + 'action=admin;area=theme;sa=edit;theme=' + theme_id + ';preview;' + (new Date().getTime());
 
+			/** global: refreshPreviewCache */
 			refreshPreviewCache = null;
 			refreshPreview(false);
 		}

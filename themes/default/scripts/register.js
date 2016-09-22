@@ -17,9 +17,9 @@
 /**
  * Elk Registration class
  *
- * @param {string} name of the registration form
- * @param {int} passwordDifficultyLevel
- * @param {array} regTextStrings
+ * @param {String} formID name of the registration form
+ * @param {Number} passwordDifficultyLevel
+ * @param {Array.} regTextStrings
  */
 function elkRegister(formID, passwordDifficultyLevel, regTextStrings)
 {

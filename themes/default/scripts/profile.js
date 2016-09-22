@@ -48,7 +48,7 @@ function start_tabs() {
 					window.console.info(ui);
 				}
 			});
-		},
+		}
 	});
 }
 

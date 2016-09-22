@@ -222,10 +222,13 @@ function rebuildRuleDesc()
 		curDef;
 
 	// GLOBAL strings, convert to objects
+	/** global: groups */
 	if (typeof groups === "string")
 		groups = JSON.parse(groups);
+	/** global: labels */
 	if (typeof labels === "string")
 		labels = JSON.parse(labels);
+	/** global: rules */
 	if (typeof rules === "string")
 		rules = JSON.parse(rules);
 

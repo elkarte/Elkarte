@@ -467,7 +467,7 @@ function in_array(variable, theArray)
  * Checks for variable in theArray and returns the array key
  *
  * @param {string} variable
- * @param {array} theArray
+ * @param {Array.} theArray
  */
 function array_search(variable, theArray)
 {
@@ -1506,7 +1506,7 @@ function elkSelectText(oCurElement, bActOnElement)
  * A function needed to discern HTML entities from non-western characters.
  *
  * @param {string} sFormName
- * @param {array} aElementNames
+ * @param {Array.} aElementNames
  * @param {string} sMask
  */
 function smc_saveEntities(sFormName, aElementNames, sMask)

@@ -277,7 +277,7 @@
 
 		/**
 		 * How often we are going to save a draft in the background
-		 * @type {Integer}
+		 * @type {Number}
 		 */
 		_interval_id: null,
 
