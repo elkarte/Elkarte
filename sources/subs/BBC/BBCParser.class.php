@@ -48,7 +48,7 @@ class BBCParser
 
 	protected $can_cache = true;
 	protected $num_footnotes = 0;
-	protected $smiley_marker = "<!-- s -->";
+	protected $smiley_marker = "\r";
 	protected $lastAutoPos = 0;
 	protected $fn_content = array();
 
