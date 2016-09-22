@@ -677,8 +677,10 @@ div.bbc_footnotes .meaction {
 	background-image: linear-gradient(to bottom, #4D4F53 0%, #333333 49%, #333333 51%, #4D4F53 100%);
 	color: #EEEEEE;
 	line-height: 30px;
+	transform: translateZ(0);
 	-webkit-transform: translateZ(0);
 	-ms-transform: translateZ(0);
+	backface-visibility: hidden;
 	-webkit-backface-visibility: hidden;
 }
 

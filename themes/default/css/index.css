@@ -706,6 +706,7 @@ em, .em {
 	font-weight: 600;
 	font-family: "Segoe UI Semibold", "Segoe UI", "Helvetica Neue Medium", "Helvetica Neue", serif;
 	-webkit-font-smoothing: antialiased;
+	-moz-osx-font-smoothing: grayscale;
 }
 
 /* [Select] link to copy code. */
@@ -1941,7 +1942,9 @@ a.bbc_link {
 	height: 1.5em;
 	font-weight: bold;
 	font-size: 2em;
+	transform: translateZ(0);
 	-webkit-transform: translateZ(0);
+	backface-visibility: hidden;
 	-webkit-backface-visibility: hidden;
 	border: 1px solid;
 	border-bottom: none;
@@ -2838,6 +2841,7 @@ img.new_posts {
 	vertical-align: top;
 	word-wrap: break-word;
 	word-break: normal;
+	hyphens: auto;
 	-webkit-hyphens: auto;
 	-moz-hyphens: auto;
 	-ms-hyphens: auto;
@@ -3049,6 +3053,7 @@ img.new_posts {
 	padding: 7px 8px 2px 2px;
 	min-height: 70px;
 	word-wrap: break-word;
+	hyphens: auto;
 	-webkit-hyphens: auto;
 	-moz-hyphens: auto;
 	-ms-hyphens: auto;
@@ -3483,6 +3488,7 @@ ul.post_options li {
 	border: dashed 1px;
 	position: relative;
 	-webkit-font-smoothing: antialiased;
+	-moz-osx-font-smoothing: grayscale;
 }
 
 .drop_area_fileselect {
@@ -3764,6 +3770,7 @@ dl.merge_topic dd {
 	margin-top: 4px;
 	padding: 4px 8px;
 	word-wrap: break-word;
+	hyphens: auto;
 	-webkit-hyphens: auto;
 	-moz-hyphens: auto;
 	-ms-hyphens: auto;
