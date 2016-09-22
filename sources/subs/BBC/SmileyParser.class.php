@@ -28,7 +28,7 @@ class SmileyParser
 	// This smiley regex makes sure it doesn't parse smileys within code tags (so [url=mailto:David@bla.com] doesn't parse the :D smiley)
 	protected $search = '';
 	protected $replace = array();
-	protected $marker = "\r";
+	protected $marker = "<!-- s -->";
 	protected $path = '';
 
 	public function __construct($path, array $smileys = array())
