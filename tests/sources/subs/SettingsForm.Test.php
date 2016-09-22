@@ -79,7 +79,7 @@ class TestSettingsForm extends PHPUnit_Framework_TestCase
 
 	/**
 	 * Looping over the tests to verify
-	 * Settings_Form::init works as expected.
+	 * Settings_Form::prepare works as expected.
 	 */
 	public function testInit()
 	{
@@ -184,9 +184,58 @@ class TestSettingsForm extends PHPUnit_Framework_TestCase
 			$modSettings[$row[0]] = $row[1];
 		$db->free_result($request);
 
-		$modSettings = $this->configValues;
 		$modSettings['bbc_disabled_' . $this->configVars[9][1]] = $this->configValues['name9_enabledTags'];
 		Settings_Form::prepare_db($this->configVars);
 		$this->assertisSaved();
+	}
+
+	public function testInitFile()
+	{
+		global $context;
+
+		$this->configVars = array(
+			array('mtitle', 'maintenance_subject', 'file', 'text', 36),
+			array('enableCompressedOutput', 'enableCompressedOutput', 'db', 'check', null, 'enableCompressedOutput'),
+		);
+		$settingsForm = new Settings_Form(new SettingsFormAdapterFile);
+		$settingsForm->setConfigVars($this->configVars);
+		$settingsForm->prepare();
+		foreach ($this->configVars as $configVar)
+		{
+			$this->assertTrue(isset($context['config_vars'][$configVar[0]]));
+			$this->assertSame($configVar[3], $context['config_vars'][$configVar[00]]['type']);
+			$this->assertSame($configVar[0], $context['config_vars'][$configVar[0]]['name']);
+		}
+		global $mtitle;
+		$this->assertSame('Maintenance Mode', $mtitle);
+		$this->assertSame('Maintenance Mode', $context['config_vars'][$this->configVars[0][0]]['value']);
+		$this->assertEquals(0, $context['config_vars'][$this->configVars[1][0]]['value']);
+	}
+
+	public function testSaveFile()
+	{
+		global $context;
+
+		$this->configVars = array(
+			array('mtitle', 'maintenance_subject', 'file', 'text', 36),
+			array('enableCompressedOutput', 'enableCompressedOutput', 'db', 'check', null, 'enableCompressedOutput'),
+		);
+		$this->configValues = array(
+			'mtitle' => 'value',
+			'enableCompressedOutput' => '1'
+		);
+		$settingsForm = new Settings_Form(new SettingsFormAdapterFile);
+		$settingsForm->setConfigVars($this->configVars);
+		$settingsForm->setConfigValues($this->configValues);
+		$settingsForm->save();
+
+		// Reload
+		global $mtitle;
+		require(BOARDDIR . '/Settings.php');
+		$settingsForm->setConfigVars($this->configVars);
+		$settingsForm->prepare();
+		$this->assertSame('value', $mtitle);
+		$this->assertSame('value', $context['config_vars'][$this->configVars[0][0]]['value']);
+		$this->assertEquals(1, $context['config_vars'][$this->configVars[1][0]]['value']);
 	}
 }
