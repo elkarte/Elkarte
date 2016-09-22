@@ -1043,7 +1043,7 @@ function template_show_settings()
 							$selected = in_array($option[0], $config_var['value']);
 						}
 						echo '
-							<option value="', $option[0], '"', ($selected ? ' selected' : ''), '>', $option[1], '</option>';
+							<option value="', $option[0], '"', $selected ? ' selected' : '', '>', $option[1], '</option>';
 					}
 
 					echo '

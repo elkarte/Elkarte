@@ -59,7 +59,7 @@ class DbTable extends Db
 			$insertValues[] = $this->editId;
 		}
 
-		// Do it !!
+		// Do it!!
 		$this->db->insert($update ? 'replace' : 'insert',
 			'{db_prefix}' . $this->tableName,
 			$insertVars,
