@@ -75,7 +75,6 @@ body {
 
 fieldset {
 	border: 1px solid #CCCCCC;
-	border-radius: 5px;
 	background: transparent;
 	box-shadow: none;
 }
@@ -814,7 +813,7 @@ a.active {
 /* Styles for sidebar menus. */
 /* Same styling for Level 1 and Level 2. */
 #menu_sidebar .linklevel1, #menu_sidebar .linklevel2 {
-	border: 1px solid transparent;
+	border-color: transparent;
 	color: black;
 }
 
@@ -1140,7 +1139,7 @@ a.active {
 	color: #BBBBBB;
 }
 
-#forumposts > div.forumposts {
+#forumposts > div.forumposts, #recentposts > div.forumposts {
 	border-color: transparent;
 }
 
@@ -1340,6 +1339,10 @@ a.active {
 
 /*	$PROFILE		*/
 /* ------------------------------------------------------- */
+.generic_border {
+	border-color: #CCCCCC;
+}
+
 #warndiv .ui-widget-header {
 	background: transparent;
 }
@@ -1372,6 +1375,16 @@ a.active {
 
 .activity_stats li .bar div {
 	background: #43A8DA;
+}
+
+/*	$CALENDAR		*/
+/* ------------------------------------------------------- */
+.calendar_table {
+	border-top-color: transparent;
+}
+
+#calendar_navigation {
+	border-color: transparent;
 }
 
 /*	$HELP		*/
@@ -1420,6 +1433,10 @@ a.help .icon {
 /* ------------------------------------------------------- */
 .search_results_posts > li {
 	border-bottom: 4px solid #DDDDDD;
+}
+
+.ignoreboards a {
+	border-bottom-color: transparent;
 }
 
 /* $STATISTICS	*/
@@ -1552,7 +1569,7 @@ a.help .icon {
 /* ------------------------------------------------------- */
 
 .mlist .mlist_header div {
-	border-top: none;
+	border-top: 1px solid #CCCCCC;
 }
 
 .mlist li div, .whos_online dt div, .whos_online dd:nth-child(odd) div {
@@ -1569,10 +1586,12 @@ a.help .icon {
 
 .mlist li div:first-child {
 	border-left-color: #CCCCCC;
+	border-top-color: #CCCCCC;
 }
 
 .mlist li div:last-child {
 	border-right-color: #CCCCCC;
+	border-top-color: #CCCCCC;
 }
 
 .letter_row > h3 {
