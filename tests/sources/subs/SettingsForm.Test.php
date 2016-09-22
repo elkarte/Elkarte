@@ -121,6 +121,8 @@ class TestSettingsForm extends PHPUnit_Framework_TestCase
 		$modSettings['bbc_disabled_' . $this->configVars[9][1]] = $this->configValues['name9'];
 		$settingsForm->prepare();
 		$this->assertisSaved();
+		$this->permissionResults[0]['status'] = 'on';
+		$this->assertEquals($this->permissionResults, $context['permissions'][$this->configVars[8][1]]);
 	}
 
 	public function assertisSaved()
@@ -138,8 +140,6 @@ class TestSettingsForm extends PHPUnit_Framework_TestCase
 		$this->assertSame('value', $context['config_vars'][$this->configVars[5][1]]['value']);
 		$this->assertContains('value1', $context['config_vars'][$this->configVars[6][1]]['value']);
 		$this->assertSame(array('b', 'i'), $context['config_vars'][$this->configVars[9][1]]['disabled_tags']);
-		$this->permissionResults[0]['status'] = 'on';
-		$this->assertEquals($this->permissionResults, $context['permissions'][$this->configVars[8][1]]);
 	}
 
 	/**
@@ -161,7 +161,13 @@ class TestSettingsForm extends PHPUnit_Framework_TestCase
 
 	public function testOld()
 	{
-		global $modSettings;
+		global $modSettings, $user_info;
+
+		// Remove permisssion
+		$user_info['permissions'] = array_filter($user_info['permissions'], function ($permisssion) {
+			return $permisssion !== 'manage_permissions';
+		});
+		unset($this->configVars[8]);
 
 		$settingsForm = new Settings_Form;
 		$settingsForm->settings($this->configVars);
