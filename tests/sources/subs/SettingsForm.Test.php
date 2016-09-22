@@ -203,7 +203,7 @@ class TestSettingsForm extends PHPUnit_Framework_TestCase
 		foreach ($this->configVars as $configVar)
 		{
 			$this->assertTrue(isset($context['config_vars'][$configVar[0]]));
-			$this->assertSame($configVar[3], $context['config_vars'][$configVar[00]]['type']);
+			$this->assertSame($configVar[3], $context['config_vars'][$configVar[0]]['type']);
 			$this->assertSame($configVar[0], $context['config_vars'][$configVar[0]]['name']);
 		}
 		global $mtitle;
