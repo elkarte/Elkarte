@@ -103,10 +103,10 @@ class SettingsFormAdapterDb extends SettingsFormAdapter
 		{
 			return;
 		}
-		$permissionsForm = new Inline_Permissions_Form;
+		$permissionsForm = new InlinePermissionsAdapter;
 		$permissionsForm->setExcludedGroups(isset($context['permissions_excluded']) ? $context['permissions_excluded'] : array());
 		$permissionsForm->setPermissions($inlinePermissions);
-		$permissionsForm->init();
+		$permissionsForm->prepare();
 	}
 
 	/**
@@ -434,7 +434,7 @@ class SettingsFormAdapterDb extends SettingsFormAdapter
 		// If we have inline permissions we need to save them.
 		if (!empty($inlinePermissions) && allowedTo('manage_permissions'))
 		{
-			$permissionsForm = new Inline_Permissions_Form;
+			$permissionsForm = new InlinePermissionsAdapter;
 			$permissionsForm->setPermissions($inlinePermissions);
 			$permissionsForm->save();
 		}

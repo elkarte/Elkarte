@@ -49,7 +49,7 @@ function updateChildPermissions($parents, $profile = null)
 /**
  * Dummy class for compatibility sake
  */
-class InlinePermissions_Form extends Inline_Permissions_Form
+class InlinePermissions_Form extends InlinePermissionsAdapter
 {
 	/**
 	 * Save the permissions of a form containing inline permissions.
@@ -83,7 +83,7 @@ class InlinePermissions_Form extends Inline_Permissions_Form
 		$permissionsForm->setExcludedGroups($excluded_groups);
 		$permissionsForm->setPermissions($permissions);
 
-		return $permissionsForm->init();
+		return $permissionsForm->prepare();
 	}
 }
 

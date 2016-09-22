@@ -7,13 +7,13 @@
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
- * @version 1.1 beta 3
+ * @version 1.1 beta 2
  */
 
 /**
  * Class to initialize inline permissions sub-form and save its settings
  */
-class Inline_Permissions_Form
+class InlinePermissionsAdapter extends SettingsFormAdapter
 {
 	/**
 	 * @var array
@@ -34,11 +34,6 @@ class Inline_Permissions_Form
 	 * @var string[]
 	 */
 	private $illegal_guest_permissions = array();
-
-	/**
-	 * @var array
-	 */
-	private $context = array();
 
 	/**
 	 * @var int[]
@@ -157,7 +152,7 @@ class Inline_Permissions_Form
 	 * @uses ManagePermissions language
 	 * @uses ManagePermissions template
 	 */
-	public function init()
+	public function prepare()
 	{
 		global $modSettings;
 
@@ -244,15 +239,13 @@ class Inline_Permissions_Form
 	 * Prepare the template by loading context
 	 * variables for each permission.
 	 *
-	 * @uses ManagePermissions language
 	 * @uses ManagePermissions template
 	 */
-	private function prepareContext()
+	protected function prepareContext()
 	{
 		global $context, $txt;
 
 		loadLanguage('ManagePermissions');
-		loadTemplate('ManagePermissions');
 
 		// Load the names for guests
 		foreach ($this->permissions as $permission)

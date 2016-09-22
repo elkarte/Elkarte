@@ -63,7 +63,7 @@ class TestInlinePermissionsForm extends PHPUnit_Framework_TestCase
 			),
 		);
 
-		$this->permissionsForm = new Inline_Permissions_Form;
+		$this->permissionsForm = new InlinePermissionsAdapter;
 		$this->permissionsForm->setPermissions($this->config_vars);
 
 		// Load the permission settings that guests cannot have
@@ -84,13 +84,13 @@ class TestInlinePermissionsForm extends PHPUnit_Framework_TestCase
 
 	/**
 	 * Looping over the tests to verify
-	 * Inline_Permissions_Form::init works as expected.
+	 * InlinePermissionsAdapter::prepare works as expected.
 	 */
 	public function doInit($result = array())
 	{
 		global $context;
 
-		$this->permissionsForm->init();
+		$this->permissionsForm->prepare();
 		foreach ($this->config_vars as $permission)
 		{
 			if (!isset($result[$permission[1]]))
@@ -129,7 +129,7 @@ class TestInlinePermissionsForm extends PHPUnit_Framework_TestCase
 
 	/**
 	 * Looping over the tests to verify
-	 * Inline_Permissions_Form::save works as expected.
+	 * InlinePermissionsAdapter::save works as expected.
 	 */
 	public function testSave()
 	{
