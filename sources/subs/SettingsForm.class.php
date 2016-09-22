@@ -127,9 +127,9 @@ class Settings_Form
 
 	public function prepare_file()
 	{
-		if (!$this->adapter instanceof SettingsFormAdapterFile)
+		if (!$this->adapter instanceof ElkArte\sources\subs\SettingsFormAdapter\File)
 		{
-			$this->adapter = new SettingsFormAdapterFile;
+			$this->adapter = new ElkArte\sources\subs\SettingsFormAdapter\File;
 		}
 		$this->prepare();
 	}
