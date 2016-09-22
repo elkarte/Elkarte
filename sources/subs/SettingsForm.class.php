@@ -187,14 +187,14 @@ class Settings_Form
 	 * Helper method for saving database settings.
 	 *
 	 * @param mixed[]        $configVars
-	 * @param mixed[]|object $post_object
+	 * @param mixed[]|object $configValues
 	 */
-	public static function save_db(array $configVars, $post_object = null)
+	public static function save_db(array $configVars, $configValues = null)
 	{
 		// Just look away if you have a weak stomach
-		if ($post_object !== null && is_object($post_object))
+		if ($configValues !== null && is_object($configValues))
 		{
-			$configValues = array_replace($_POST, (array) $post_object);
+			$configValues = array_replace($_POST, (array) $configValues);
 		}
 		else
 		{

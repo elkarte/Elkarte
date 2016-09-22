@@ -172,7 +172,7 @@ class TestSettingsForm extends PHPUnit_Framework_TestCase
 		$settingsForm = new Settings_Form;
 		$settingsForm->settings($this->configVars);
 		$this->assertSame($this->configVars, $settingsForm->settings());
-		Settings_Form::save_db($this->configVars, (object) $this->configValues);
+		Settings_Form::save_db($this->configVars, $this->configValues);
 
 		$db = database();
 		$request = $db->query('', '
