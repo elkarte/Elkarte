@@ -113,6 +113,11 @@ class Inline_Permissions_Form
 	 */
 	public function save()
 	{
+		// No permissions? Not a great deal to do here.
+		if (!allowedTo('manage_permissions'))
+		{
+			return;
+		}
 		$insertRows = array();
 		foreach ($this->permissionList as $permission)
 		{

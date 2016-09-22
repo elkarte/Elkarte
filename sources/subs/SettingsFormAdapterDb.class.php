@@ -41,7 +41,7 @@ class SettingsFormAdapterDb extends SettingsFormAdapter
 				}
 
 				// Special case for inline permissions
-				if ($configVar[0] == 'permissions')
+				if ($configVar[0] == 'permissions' && !allowedTo('manage_permissions'))
 				{
 					continue;
 				}

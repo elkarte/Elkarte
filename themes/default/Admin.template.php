@@ -910,7 +910,7 @@ function template_show_settings()
 				(isset($config_var['name']) ? '<a href="#" id="' . $config_var['name'] . '"></a>' : ''), '
 					<h3 class="', !empty($config_var['class']) ? $config_var['class'] : 'category_header', '"', !empty($config_var['force_div_id']) ? ' id="' . $config_var['force_div_id'] . '"' : '', '>';
 
-				if ($config_var['helptext'])
+				if (isset($config_var['helptext']))
 				{
 					if (empty($config_var['class']))
 					{
@@ -923,7 +923,7 @@ function template_show_settings()
 						<a href="' . $scripturl . '?action=quickhelp;help=' . $config_var['helptext'] . '" onclick="return reqOverlayDiv(this.href);" class="' . $config_var['class'] . ' help"><i class="helpicon i-help icon-lg"><s>', $txt['help'], '</s></i></a>';
 					}
 				}
-				elseif ($config_var['icon'])
+				elseif (isset($config_var['icon']))
 				{
 					echo
 						'<span class="hdicon cat_img_' . $config_var['icon'] . '"></span>';
