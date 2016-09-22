@@ -14,7 +14,10 @@
  * @version 1.1 beta 2
  *
  */
-interface SettingsFormAdapter_Interface
+
+namespace ElkArte\sources\subs\SettingsFormAdapter;
+
+interface AdapterInterface
 {
 	/**
 	 * @return array

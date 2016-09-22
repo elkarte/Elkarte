@@ -63,7 +63,7 @@ class TestInlinePermissionsForm extends PHPUnit_Framework_TestCase
 			),
 		);
 
-		$this->permissionsForm = new InlinePermissionsAdapter;
+		$this->permissionsForm = new ElkArte\sources\subs\SettingsFormAdapter\InlinePermissions;
 		$this->permissionsForm->setPermissions($this->config_vars);
 
 		// Load the permission settings that guests cannot have

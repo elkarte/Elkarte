@@ -14,7 +14,10 @@
  * @version 1.1 beta 2
  *
  */
-abstract class SettingsFormAdapter implements SettingsFormAdapter_Interface
+
+namespace ElkArte\sources\subs\SettingsFormAdapter;
+
+abstract class Adapter implements AdapterInterface
 {
 	/**
 	 * Configuration variables and values for this settings form.

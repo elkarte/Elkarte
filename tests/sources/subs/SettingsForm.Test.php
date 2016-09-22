@@ -85,11 +85,11 @@ class TestSettingsForm extends PHPUnit_Framework_TestCase
 	{
 		global $context;
 
-		$settingsForm = new Settings_Form(new SettingsFormAdapterDb);
+		$settingsForm = new Settings_Form(Settings_Form::DB_ADAPTER);
 		$settingsForm->setConfigVars($this->configVars);
 		$settingsForm->prepare();
 		$this->assertSame($this->configVars, $settingsForm->getConfigVars());
-		$this->assertInstanceOf('SettingsFormAdapter', $settingsForm->getAdapter());
+		$this->assertInstanceOf('ElkArte\\sources\\subs\\SettingsFormAdapter\\Adapter', $settingsForm->getAdapter());
 		$this->assertCount(1, $context['config_vars'][$this->configVars[5][1]]['data']);
 		$this->assertContains('value', $context['config_vars'][$this->configVars[5][1]]['data'][0]);
 		$this->assertCount(2, $context['config_vars'][$this->configVars[6][1]]['data']);
@@ -114,7 +114,7 @@ class TestSettingsForm extends PHPUnit_Framework_TestCase
 	{
 		global $modSettings;
 
-		$settingsForm = new Settings_Form(new SettingsFormAdapterDb);
+		$settingsForm = new Settings_Form(Settings_Form::DB_ADAPTER);
 		$settingsForm->setConfigVars($this->configVars);
 		$settingsForm->setConfigValues($this->configValues);
 		$settingsForm->save();
@@ -203,7 +203,7 @@ class TestSettingsForm extends PHPUnit_Framework_TestCase
 			array('mtitle', 'maintenance_subject', 'file', 'text', 36),
 			array('enableCompressedOutput', 'enableCompressedOutput', 'db', 'check', null, 'enableCompressedOutput'),
 		);
-		$settingsForm = new Settings_Form(new SettingsFormAdapterFile);
+		$settingsForm = new Settings_Form(Settings_Form::FILE_ADAPTER);
 		$settingsForm->setConfigVars($this->configVars);
 		$settingsForm->prepare();
 		foreach ($this->configVars as $configVar)
@@ -230,7 +230,7 @@ class TestSettingsForm extends PHPUnit_Framework_TestCase
 			'mtitle' => 'value',
 			'enableCompressedOutput' => '1'
 		);
-		$settingsForm = new Settings_Form(new SettingsFormAdapterFile);
+		$settingsForm = new Settings_Form(Settings_Form::FILE_ADAPTER);
 		$settingsForm->setConfigVars($this->configVars);
 		$settingsForm->setConfigValues($this->configValues);
 		$settingsForm->save();

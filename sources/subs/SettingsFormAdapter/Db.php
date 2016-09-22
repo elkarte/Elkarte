@@ -14,7 +14,10 @@
  * @version 1.1 beta 2
  *
  */
-class SettingsFormAdapterDb extends SettingsFormAdapter
+
+namespace ElkArte\sources\subs\SettingsFormAdapter;
+
+class Db extends Adapter
 {
 	/**
 	 * Helper method, it sets up the context for database settings.
@@ -103,7 +106,7 @@ class SettingsFormAdapterDb extends SettingsFormAdapter
 		{
 			return;
 		}
-		$permissionsForm = new InlinePermissionsAdapter;
+		$permissionsForm = new InlinePermissions;
 		$permissionsForm->setExcludedGroups(isset($context['permissions_excluded']) ? $context['permissions_excluded'] : array());
 		$permissionsForm->setPermissions($inlinePermissions);
 		$permissionsForm->prepare();
@@ -170,7 +173,7 @@ class SettingsFormAdapterDb extends SettingsFormAdapter
 			{
 				$rules[$configVar[1]] = implode('|', $rules[$configVar[1]]);
 
-				$validator = new Data_Validator();
+				$validator = new \Data_Validator();
 				$validator->sanitation_rules($rules);
 				$validator->validate(array($configVar[1] => $str));
 
@@ -192,7 +195,7 @@ class SettingsFormAdapterDb extends SettingsFormAdapter
 			if ($configVar[0] == 'select' && !empty($configVar['multiple']))
 			{
 				$this->context[$configVar[1]]['name'] .= '[]';
-				$this->context[$configVar[1]]['value'] = !empty($this->context[$configVar[1]]['value']) ? Util::unserialize($this->context[$configVar[1]]['value']) : array();
+				$this->context[$configVar[1]]['value'] = !empty($this->context[$configVar[1]]['value']) ? \Util::unserialize($this->context[$configVar[1]]['value']) : array();
 			}
 
 			// If it's associative
@@ -434,7 +437,7 @@ class SettingsFormAdapterDb extends SettingsFormAdapter
 		// If we have inline permissions we need to save them.
 		if (!empty($inlinePermissions) && allowedTo('manage_permissions'))
 		{
-			$permissionsForm = new InlinePermissionsAdapter;
+			$permissionsForm = new InlinePermissions;
 			$permissionsForm->setPermissions($inlinePermissions);
 			$permissionsForm->save();
 		}

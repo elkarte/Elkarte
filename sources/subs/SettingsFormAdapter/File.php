@@ -14,7 +14,10 @@
  * @version 1.1 beta 2
  *
  */
-class SettingsFormAdapterFile extends SettingsFormAdapterDb
+
+namespace ElkArte\sources\subs\SettingsFormAdapter;
+
+class File extends Db
 {
 	/**
 	 * @var int
@@ -284,7 +287,7 @@ class SettingsFormAdapterFile extends SettingsFormAdapterDb
 			{
 				if (in_array($configVar, $safe_strings))
 				{
-					$this->new_settings[$configVar] = '\'' . addcslashes(Util::htmlspecialchars($this->configValues[$configVar], ENT_QUOTES), '\'\\') . '\'';
+					$this->new_settings[$configVar] = '\'' . addcslashes(\Util::htmlspecialchars($this->configValues[$configVar], ENT_QUOTES), '\'\\') . '\'';
 				}
 				else
 				{

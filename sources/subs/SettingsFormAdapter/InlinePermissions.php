@@ -10,10 +10,12 @@
  * @version 1.1 beta 2
  */
 
+namespace ElkArte\sources\subs\SettingsFormAdapter;
+
 /**
  * Class to initialize inline permissions sub-form and save its settings
  */
-class InlinePermissionsAdapter extends SettingsFormAdapter
+class InlinePermissions extends Adapter
 {
 	/**
 	 * @var array
@@ -99,7 +101,7 @@ class InlinePermissionsAdapter extends SettingsFormAdapter
 
 		// Make sure they can't do certain things,
 		// unless they have the right permissions.
-		$this->permissionsObject = new Permissions;
+		$this->permissionsObject = new \Permissions;
 		$this->illegal_permissions = $this->permissionsObject->getIllegalPermissions();
 	}
 

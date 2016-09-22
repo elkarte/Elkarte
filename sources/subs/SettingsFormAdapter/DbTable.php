@@ -10,7 +10,10 @@
  * @version 1.1 beta 2
  *
  */
-class SettingsFormAdapterDbTable extends SettingsFormAdapterDb
+
+namespace ElkArte\sources\subs\SettingsFormAdapter;
+
+class DbTable extends Db
 {
 	private $db;
 

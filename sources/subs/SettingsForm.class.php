@@ -66,6 +66,10 @@
  */
 class Settings_Form
 {
+	const DB_ADAPTER = 'ElkArte\\sources\\subs\\SettingsFormAdapter\\Db';
+	const DBTABLE_ADAPTER = 'ElkArte\\sources\\subs\\SettingsFormAdapter\\DbTable';
+	const FILE_ADAPTER = 'ElkArte\\sources\\subs\\SettingsFormAdapter\\File';
+
 	/**
 	 * @return array
 	 */
@@ -104,11 +108,13 @@ class Settings_Form
 	private $adapter;
 
 	/**
-	 * @var SettingsFormAdapter $adapter
+	 * @var string $adapter
 	 */
-	public function __construct(SettingsFormAdapter $adapter = null)
+	public function __construct($adapter = null)
 	{
-		$this->adapter = $adapter ?: new SettingsFormAdapterFile;
+		$fqcn = $adapter ?: self::FILE_ADAPTER;
+
+		$this->adapter = new $fqcn;
 	}
 
 	/**
@@ -141,8 +147,11 @@ class Settings_Form
 	 */
 	public static function prepare_db(array $configVars)
 	{
-		$settingsForm = new self(new SettingsFormAdapterDb);
+		global $modSettings;
+
+		$settingsForm = new self(self::DB_ADAPTER);
 		$settingsForm->setConfigVars($configVars);
+		$settingsForm->setconfigValues($modSettings);
 		$settingsForm->prepare();
 	}
 
@@ -191,7 +200,7 @@ class Settings_Form
 		{
 			$configValues = $_POST;
 		}
-		$settingsForm = new self(new SettingsFormAdapterDb);
+		$settingsForm = new self(self::DB_ADAPTER);
 		$settingsForm->setConfigVars($configVars);
 		$settingsForm->setconfigValues($configValues);
 		$settingsForm->save();
