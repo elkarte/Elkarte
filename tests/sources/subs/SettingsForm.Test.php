@@ -142,6 +142,23 @@ class TestSettingsForm extends PHPUnit_Framework_TestCase
 		$this->assertEquals($this->permissionResults, $context['permissions'][$this->configVars[8][1]]);
 	}
 
+	/**
+	 * cleanup data we no longer need at the end of the tests in this class.
+	 *
+	 * tearDown() is run automatically by the testing framework after each test method.
+	 */
+	public function tearDown()
+	{
+		$db = database();
+		$request = $db->query('', '
+			DELETE FROM {db_prefix}settings
+			WHERE variable IN ({array_string:setting_name})',
+			array(
+				'setting_name' => array_keys($this->configValues),
+			)
+		);
+	}
+
 	public function testOld()
 	{
 		global $modSettings;
