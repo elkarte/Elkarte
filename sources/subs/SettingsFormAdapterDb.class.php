@@ -251,16 +251,16 @@ class SettingsFormAdapterDb extends SettingsFormAdapter
 		$codes = \BBC\ParserWrapper::getInstance()->getCodes();
 		$bbcTags = $codes->getTags();
 
-		if (!isset($this->configValues[$var[1] . '_enabledTags']))
+		if (!isset($this->configValues[$var[1]]))
 		{
-			$this->configValues[$var[1] . '_enabledTags'] = array();
+			$this->configValues[$var[1]] = array();
 		}
-		elseif (!is_array($this->configValues[$var[1] . '_enabledTags']))
+		elseif (!is_array($this->configValues[$var[1]]))
 		{
-			$this->configValues[$var[1] . '_enabledTags'] = array($this->configValues[$var[1] . '_enabledTags']);
+			$this->configValues[$var[1]] = array($this->configValues[$var[1]]);
 		}
 
-		return implode(',', array_diff($bbcTags, $this->configValues[$var[1] . '_enabledTags']));
+		return implode(',', array_diff($bbcTags, $this->configValues[$var[1]]));
 	}
 
 	private function prepareLabel($configVar)

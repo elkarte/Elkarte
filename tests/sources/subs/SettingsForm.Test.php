@@ -68,7 +68,7 @@ class TestSettingsForm extends PHPUnit_Framework_TestCase
 			'name6m' => array('value1', 'value2'),
 			'name7' => array('value', 'value'),
 			'name8' => array(0 => 'on'),
-			'name9_enabledTags' => array('b', 'i')
+			'name9' => array('b', 'i')
 		);
 
 		// Dummy data for setting permissions...
@@ -118,7 +118,7 @@ class TestSettingsForm extends PHPUnit_Framework_TestCase
 		$settingsForm->setConfigVars($this->configVars);
 		$settingsForm->setConfigValues($this->configValues);
 		$settingsForm->save();
-		$modSettings['bbc_disabled_' . $this->configVars[9][1]] = $this->configValues['name9_enabledTags'];
+		$modSettings['bbc_disabled_' . $this->configVars[9][1]] = $this->configValues['name9'];
 		$settingsForm->prepare();
 		$this->assertisSaved();
 	}
@@ -184,7 +184,7 @@ class TestSettingsForm extends PHPUnit_Framework_TestCase
 			$modSettings[$row[0]] = $row[1];
 		$db->free_result($request);
 
-		$modSettings['bbc_disabled_' . $this->configVars[9][1]] = $this->configValues['name9_enabledTags'];
+		$modSettings['bbc_disabled_' . $this->configVars[9][1]] = $this->configValues['name9'];
 		Settings_Form::prepare_db($this->configVars);
 		$this->assertisSaved();
 	}
