@@ -510,8 +510,8 @@ class Profile_Controller extends Action_Controller
 		);
 
 		// Actually create the menu!
-		$this->_menu = new Menu_Create($profile_areas, $menuOptions);
-		$this->_profile_include_data = $this->_menu->createMenu();
+		$this->_menu = new Menu_Create();
+		$this->_profile_include_data = $this->_menu->prepareMenu($profile_areas, $menuOptions);
 		unset($profile_areas);
 	}
 
