@@ -576,7 +576,8 @@ class Admin_Controller extends Action_Controller
 		$menuOptions = array('hook' => 'admin', 'default_include_dir' => ADMINDIR);
 
 		// Actually create the menu!
-		$admin_include_data = createMenu($admin_areas, $menuOptions);
+		$menu = new Menu_Create($admin_areas, $menuOptions);
+		$admin_include_data = $menu->createMenu();
 		unset($admin_areas);
 
 		// Nothing valid?
