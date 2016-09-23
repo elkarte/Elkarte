@@ -1186,8 +1186,6 @@ class BBCParser
 		// If we have footnotes, add them in at the end of the message
 		if (!empty($fn_num))
 		{
-			$this->message = rtrim($this->message, "\r");
-
 			$this->message .= '<div class="bbc_footnotes">' . implode('', $this->fn_content) . '</div>';
 		}
 	}
@@ -1204,9 +1202,9 @@ class BBCParser
 		global $fn_num, $fn_count;
 
 		$fn_num++;
-		$this->fn_content[] = '<div class="target" id="fn' . $fn_num . '_' . $fn_count . '"><sup>' . $fn_num . '&nbsp;</sup>' . $matches[2] . '<a class="footnote_return" href="#ref' . $fn_num . '_' . $fn_count . '">&crarr;</a></div>';
+		$this->fn_content[] = $this->smiley_marker . '<div class="target" id="fn' . $fn_num . '_' . $fn_count . '"><sup>' . $fn_num . '&nbsp;</sup>' . $this->smiley_marker . $matches[2] . $this->smiley_marker . '<a class="footnote_return" href="#ref' . $fn_num . '_' . $fn_count . '">&crarr;</a></div>' . $this->smiley_marker;
 
-		return '<a class="target" href="#fn' . $fn_num . '_' . $fn_count . '" id="ref' . $fn_num . '_' . $fn_count . '">[' . $fn_num . ']</a>';
+		return $this->smiley_marker . '<a class="target" href="#fn' . $fn_num . '_' . $fn_count . '" id="ref' . $fn_num . '_' . $fn_count . '">[' . $fn_num . ']</a>';
 	}
 
 	/**
@@ -1412,7 +1410,7 @@ class BBCParser
 	{
 		if (preg_match('~(<br />|&nbsp;|\s)*~', $this->message, $matches, null, $offset) !== 0 && isset($matches[0]) && $matches[0] !== '')
 		{
-			substr_replace($this->message, '', $this->pos, strlen($matches[0]));
+			$this->message = substr_replace($this->message, '', $this->pos, strlen($matches[0]));
 		}
 	}
 

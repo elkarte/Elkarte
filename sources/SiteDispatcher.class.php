@@ -191,31 +191,9 @@ class Site_Dispatcher
 	 */
 	protected function determineDefaultAction()
 	{
-		global $maintenance, $board, $topic;
+		global $board, $topic;
 
-		// Maintenance mode: you're out of here unless you're admin
-		if (!empty($maintenance) && !allowedTo('admin_forum'))
-		{
-			// You can only login
-			if ($this->action == 'login2' || $this->action == 'logout')
-			{
-				$this->_controller_name = 'Auth_Controller';
-				$this->_function_name = 'action_' . $this->action;
-			}
-			// "maintenance mode" page
-			else
-			{
-				$this->_controller_name = 'Auth_Controller';
-				$this->_function_name = 'action_maintenance_mode';
-			}
-		}
-		// If guest access is disallowed, a guest is kicked out... politely. :P
-		elseif ($this->restrictedGuestAccess())
-		{
-			$this->_controller_name = 'Auth_Controller';
-			$this->_function_name = 'action_kickguest';
-		}
-		elseif (empty($this->action))
+		if (empty($this->action))
 		{
 			// Home page: board index
 			if (empty($board) && empty($topic))
@@ -342,6 +320,37 @@ class Site_Dispatcher
 	 */
 	public function needTheme()
 	{
+		global $maintenance;
+
+		// Maintenance mode: you're out of here unless you're admin
+		if (!empty($maintenance) && !allowedTo('admin_forum'))
+		{
+			// You can only login
+			if ($this->action == 'login2' || $this->action == 'logout')
+			{
+				$this->_controller_name = 'Auth_Controller';
+				$this->_function_name = 'action_' . $this->action;
+			}
+			// "maintenance mode" page
+			else
+			{
+				$this->_controller_name = 'Auth_Controller';
+				$this->_function_name = 'action_maintenance_mode';
+			}
+
+			// re-initialize the controller and the event manager
+			$this->_controller = new $this->_controller_name(new Event_Manager());
+		}
+		// If guest access is disallowed, a guest is kicked out... politely. :P
+		elseif ($this->restrictedGuestAccess())
+		{
+			$this->_controller_name = 'Auth_Controller';
+			$this->_function_name = 'action_kickguest';
+
+			// re-initialize... you got the drift
+			$this->_controller = new $this->_controller_name(new Event_Manager());
+		}
+
 		return $this->_controller->needTheme($this->_function_name);
 	}
 

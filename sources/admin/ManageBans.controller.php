@@ -672,6 +672,10 @@ class ManageBans_Controller extends Action_Controller
 
 			// Let's collect all the information we need
 			$ban_info['id'] = $this->_req->getQuery('bg', 'intval', 0);
+			if (empty($ban_info['id']))
+			{
+				$ban_info['id'] = $this->_req->getPost('bg', 'intval', 0);
+			}
 			$ban_info['is_new'] = empty($ban_info['id']);
 			$ban_info['expire_date'] = $this->_req->getPost('expire_date', 'intval', 0);
 			$ban_info['expiration'] = array(

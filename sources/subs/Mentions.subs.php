@@ -72,7 +72,7 @@ function countUserMentions($all = false, $type = '', $id_member = null)
  */
 function getUserMentions($start, $limit, $sort, $all = false, $type = '')
 {
-	global $user_info;
+	global $user_info, $txt;
 
 	$db = database();
 
@@ -80,7 +80,7 @@ function getUserMentions($start, $limit, $sort, $all = false, $type = '')
 		SELECT
 			mtn.id_mention, mtn.id_target, mtn.id_member_from, mtn.log_time, mtn.mention_type, mtn.status,
 			m.subject, m.id_topic, m.id_board,
-			IFNULL(mem.real_name, m.poster_name) as mentioner, mem.avatar, mem.email_address,
+			IFNULL(mem.real_name, {string:guest_text}) as mentioner, mem.avatar, mem.email_address,
 			IFNULL(a.id_attach, 0) AS id_attach, a.filename, a.attachment_type
 		FROM {db_prefix}log_mentions AS mtn
 			LEFT JOIN {db_prefix}messages AS m ON (mtn.id_target = m.id_msg)
@@ -97,6 +97,7 @@ function getUserMentions($start, $limit, $sort, $all = false, $type = '')
 			'current_user' => $user_info['id'],
 			'current_type' => $type,
 			'status' => $all ? array(0, 1) : array(0),
+			'guest_text' => $txt['guest'],
 			'is_accessible' => 1,
 			'start' => $start,
 			'limit' => $limit,
