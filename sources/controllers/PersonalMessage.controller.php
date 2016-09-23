@@ -359,8 +359,8 @@ class PersonalMessage_Controller extends Action_Controller
 		);
 
 		// Actually create the menu!
-		$menu = new Menu_Create($pm_areas, $menuOptions);
-		$pm_include_data = $menu->createMenu();
+		$menu = new Menu_Create();
+		$pm_include_data = $menu->prepareMenu($pm_areas, $menuOptions);
 		unset($pm_areas);
 
 		// No menu means no access.
