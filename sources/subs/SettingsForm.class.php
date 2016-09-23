@@ -108,7 +108,7 @@ class Settings_Form
 	private $adapter;
 
 	/**
-	 * @var string $adapter
+	 * @var string $adapter Will default to the file adapter if none is specified.
 	 */
 	public function __construct($adapter = null)
 	{
@@ -158,12 +158,12 @@ class Settings_Form
 	/**
 	 * This method saves the settings.
 	 *
-	 * It will put them in Settings.php or in the settings table.
+	 * It will put them in Settings.php or in the settings table
+	 * according to the adapter specified in the constructor.
 	 *
-	 * What it does:
-	 * - Used to save those settings set from ?action=admin;area=serversettings.
-	 * - Requires the admin_forum permission.
-	 * - Contains arrays of the types of data to save into Settings.php.
+	 * May read from $_POST to retain backwards compatibility.
+	 * Some older controller may have modified this superglobal,
+	 * and HttpReq does not contain the newly modified information.
 	 */
 	public function save()
 	{
@@ -180,6 +180,9 @@ class Settings_Form
 	/**
 	 * Helper method for saving settings.
 	 *
+	 * Uses $_POST becaause the controller may have modified this superglobal,
+	 * and HttpReq does not contain the newly modified information.
+	 *
 	 * @param mixed[] $configVars
 	 */
 	public static function save_file(array $configVars)
@@ -192,6 +195,9 @@ class Settings_Form
 
 	/**
 	 * Helper method for saving database settings.
+	 *
+	 * Uses $_POST becaause the controller may have modified it,
+	 * and HttpReq does not contain the newly modified information.
 	 *
 	 * @param mixed[]        $configVars
 	 * @param mixed[]|object $configValues
