@@ -164,9 +164,9 @@ class Db extends Adapter
 				{
 					$rules[$configVar[1]][] = $known_rules[$mask];
 				}
-				elseif ($key == 'custom' && isset($mask['revert']))
+				else
 				{
-					$rules[$configVar[1]][] = $mask['revert'];
+					$rules[$configVar[1]][] = $mask;
 				}
 			}
 			if (!empty($rules))
