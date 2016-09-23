@@ -32,17 +32,33 @@ class DbTable extends Db
 	 */
 	private $editName;
 
-	/**
-	 * @param string $tableName name of the table the values will be saved in
-	 * @param int    $editId    -1 add a row, otherwise edit a row with the supplied key value
-	 * @param string $editName  used when editing a row, needs to be the name of the col to find $editId
-	 */
-	public function __construct($tableName, $editId, $editName)
+	public function __construct()
 	{
 		$this->db = database();
-		$this->tableName = $tableName;
-		$this->editId = $editId;
+	}
+
+	/**
+	 * @param string $editName used when editing a row, needs to be the name of the col to find $editId
+	 */
+	public function setEditName($editName)
+	{
 		$this->editName = $editName;
+	}
+
+	/**
+	 * @param string $tableName name of the table the values will be saved in
+	 */
+	public function setTableName($tableName)
+	{
+		$this->tableName = $tableName;
+	}
+
+	/**
+	 * @param int $editId -1 add a row, otherwise edit a row with the supplied key value
+	 */
+	public function setEditId($editId)
+	{
+		$this->editId = $editId;
 	}
 
 	public function save()
