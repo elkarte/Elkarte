@@ -6,7 +6,8 @@
  * @name      ElkArte Forum
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
- * @depreciated since 1.1 use MenuCreate.class
+ *
+ * @version 1.1 beta 2
  *
  */
 
