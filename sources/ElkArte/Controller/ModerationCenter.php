@@ -38,6 +38,12 @@ class ModerationCenter extends AbstractController
 	private $_mod_include_data;
 
 	/**
+	 * Holds the create menu object
+	 * @var object
+	 */
+	private $_menu;
+
+	/**
 	 * Entry point for the moderation center.
 	 *
 	 * @see \ElkArte\AbstractController::action_index()
@@ -53,7 +59,7 @@ class ModerationCenter extends AbstractController
 			require_once($this->_mod_include_data['file']);
 		}
 
-		callMenu($this->_mod_include_data);
+		$this->_menu->callMenu($this->_mod_include_data);
 	}
 
 	/**
@@ -284,7 +290,8 @@ class ModerationCenter extends AbstractController
 			'default_include_dir' => CONTROLLERDIR,
 		);
 
-		$mod_include_data = createMenu($moderation_areas, $menuOptions);
+		$this->_menu = new Menu_Create($moderation_areas, $menuOptions);
+		$mod_include_data = $this->_menu->createMenu();
 		unset($moderation_areas);
 
 		// We got something - didn't we? DIDN'T WE!
