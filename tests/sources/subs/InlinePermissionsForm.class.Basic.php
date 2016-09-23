@@ -77,16 +77,16 @@ class TestInlinePermissionsForm extends PHPUnit_Framework_TestCase
 		);
 	}
 
-	public function testInit()
+	public function testPrepare()
 	{
-		$this->doInit();
+		$this->doPrepare();
 	}
 
 	/**
 	 * Looping over the tests to verify
 	 * InlinePermissionsAdapter::prepare works as expected.
 	 */
-	public function doInit($result = array())
+	public function doPrepare($result = array())
 	{
 		global $context;
 
@@ -149,6 +149,6 @@ class TestInlinePermissionsForm extends PHPUnit_Framework_TestCase
 				$result[$permission][$group]['status'] = $value;
 			}
 		}
-		$this->doInit($result);
+		$this->doPrepare($result);
 	}
 }

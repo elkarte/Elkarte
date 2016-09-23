@@ -89,17 +89,17 @@ class Settings_Form
 	/**
 	 * @return array
 	 */
-	public function getconfigValues()
+	public function getConfigValues()
 	{
-		return $this->adapter->getconfigValues();
+		return $this->adapter->getConfigValues();
 	}
 
 	/**
 	 * @param array $configValues
 	 */
-	public function setconfigValues(array $configValues)
+	public function setConfigValues(array $configValues)
 	{
-		$this->adapter->setconfigValues($configValues);
+		$this->adapter->setConfigValues($configValues);
 	}
 
 	/**
@@ -151,7 +151,7 @@ class Settings_Form
 
 		$settingsForm = new self(self::DB_ADAPTER);
 		$settingsForm->setConfigVars($configVars);
-		$settingsForm->setconfigValues($modSettings);
+		$settingsForm->setConfigValues($modSettings);
 		$settingsForm->prepare();
 	}
 
@@ -202,7 +202,7 @@ class Settings_Form
 		}
 		$settingsForm = new self(self::DB_ADAPTER);
 		$settingsForm->setConfigVars($configVars);
-		$settingsForm->setconfigValues($configValues);
+		$settingsForm->setConfigValues($configValues);
 		$settingsForm->save();
 	}
 

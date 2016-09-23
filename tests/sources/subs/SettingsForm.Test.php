@@ -81,7 +81,7 @@ class TestSettingsForm extends PHPUnit_Framework_TestCase
 	 * Looping over the tests to verify
 	 * Settings_Form::prepare works as expected.
 	 */
-	public function testInit()
+	public function testPrepare()
 	{
 		global $context;
 
@@ -110,13 +110,14 @@ class TestSettingsForm extends PHPUnit_Framework_TestCase
 	 * Looping over the tests to verify
 	 * Settings_Form::save works as expected.
 	 */
-	public function testSave()
+	public function testSaveDb()
 	{
 		global $context, $modSettings;
 
 		$settingsForm = new Settings_Form(Settings_Form::DB_ADAPTER);
 		$settingsForm->setConfigVars($this->configVars);
 		$settingsForm->setConfigValues($this->configValues);
+		$this->assertSame($this->configValues, $settingsForm->getConfigValues());
 		$settingsForm->save();
 		$modSettings['bbc_disabled_' . $this->configVars[9][1]] = $this->configValues['name9'];
 		$settingsForm->prepare();
@@ -195,7 +196,7 @@ class TestSettingsForm extends PHPUnit_Framework_TestCase
 		$this->assertisSaved();
 	}
 
-	public function testInitFile()
+	public function testPrepareFile()
 	{
 		global $context;
 

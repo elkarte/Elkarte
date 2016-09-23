@@ -164,10 +164,10 @@ class File extends Db
 		}
 		$this->prepareSettings();
 		$this->updateSettingsFile();
-		$this->saveDb();
+		$this->extractDbVars();
 	}
 
-	private function saveDb()
+	private function extractDbVars()
 	{
 		// Now loop through the remaining (database-based) settings.
 		$this->configVars = array_map(
