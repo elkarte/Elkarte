@@ -36,7 +36,14 @@ Class Menu_Create
 	protected $_sub;
 
 	/**
-	 * Class constructor
+	 * Menu_Create constructor.
+	 */
+	public function __construct()
+	{
+	}
+
+	/**
+	 * Class prepareMenu
 	 *
 	 * @param array $menuData the menu array
 	 *   Possible indexes:
@@ -80,8 +87,10 @@ Class Menu_Create
 	 *        - layer_name                => alternative layer name for the menu
 	 *        - hook                      => hook name to call integrate_ . 'hook name' . '_areas'
 	 *        - default_include_dir       => directory to include for function support
+	 *
+	 * @return array|bool
 	 */
-	public function __construct($menuData, $menuOptions = array())
+	public function prepareMenu($menuData, $menuOptions = array())
 	{
 		global $context, $settings;
 
@@ -105,6 +114,8 @@ Class Menu_Create
 
 		// This is necessary only in profile (at least for the core), but we do it always because it's easier
 		$this->_permission_set = !empty($context['user']['is_owner']) ? 'own' : 'any';
+
+		return $this->createMenu();
 	}
 
 	/**
