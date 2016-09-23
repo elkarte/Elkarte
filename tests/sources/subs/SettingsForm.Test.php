@@ -60,10 +60,10 @@ class TestSettingsForm extends PHPUnit_Framework_TestCase
 			),
 		);
 		$this->configValues = array(
-			'name1' => 'value',
+			'name1' => 'value1',
 			'name2' => '5',
 			'name3' => '4.6',
-			'name4' => 'value',
+			'name4' => 'value4',
 			'name5' => '1',
 			'name6' => 'value',
 			'name6m' => array('value1', 'value2'),

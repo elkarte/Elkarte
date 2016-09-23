@@ -206,7 +206,7 @@ class Settings_Form
 	public static function save_db(array $configVars, $configValues = null)
 	{
 		// Just look away if you have a weak stomach
-		if ($configValues !== null && is_object($configValues))
+		if ($configValues !== null)
 		{
 			$configValues = array_replace($_POST, (array) $configValues);
 		}

@@ -49,7 +49,7 @@ function updateChildPermissions($parents, $profile = null)
 /**
  * Dummy class for compatibility sake
  */
-class InlinePermissions_Form extends InlinePermissionsAdapter
+class InlinePermissions_Form extends ElkArte\sources\subs\SettingsFormAdapter\InlinePermissions
 {
 	/**
 	 * Save the permissions of a form containing inline permissions.

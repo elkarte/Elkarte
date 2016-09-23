@@ -77,7 +77,7 @@ class DbTable extends Db
 
 	public function save()
 	{
-		list ($insertVars, $insertValues) = $this->sanitizeVars();
+		list ($insertValues, $insertVars) = $this->sanitizeVars();
 		$update = false;
 
 		// Everything is now set so is this a new row or an edit?
