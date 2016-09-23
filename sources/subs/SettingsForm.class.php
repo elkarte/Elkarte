@@ -108,7 +108,7 @@ class Settings_Form
 	private $adapter;
 
 	/**
-	 * @var string $adapter Will default to the file adapter if none is specified.
+	 * @param string $adapter Will default to the file adapter if none is specified.
 	 */
 	public function __construct($adapter = null)
 	{
