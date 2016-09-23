@@ -132,17 +132,6 @@ class File extends Db
 	{
 		$this->cleanSettings();
 
-		// Some older code is trying to updating the db_last_error,
-		// then don't mess around with Settings.php
-		if (count($this->new_settings) === 1 && isset($this->new_settings['db_last_error']))
-		{
-			require_once(SUBSDIR . '/Admin.subs.php');
-
-			updateDbLastError($this->new_settings['db_last_error']);
-
-			return;
-		}
-
 		// When was Settings.php last changed?
 		$this->last_settings_change = filemtime(BOARDDIR . '/Settings.php');
 
@@ -363,13 +352,7 @@ class File extends Db
 			// Look through the variables to set....
 			foreach ($this->new_settings as $var => $val)
 			{
-				// be sure someone is not updating db_last_error this with a group
-				if ($var === 'db_last_error')
-				{
-					updateDbLastError($val);
-					unset($this->new_settings[$var]);
-				}
-				elseif (strncasecmp($this->settingsArray[$i], '$' . $var, 1 + strlen($var)) == 0)
+				if (strncasecmp($this->settingsArray[$i], '$' . $var, 1 + strlen($var)) == 0)
 				{
 					$comment = strstr(substr(un_htmlspecialchars($this->settingsArray[$i]), strpos(un_htmlspecialchars($this->settingsArray[$i]), ';')), '#');
 					$this->settingsArray[$i] = '$' . $var . ' = ' . $val . ';' . ($comment == '' ? '' : "\t\t" . rtrim($comment)) . "\n";
