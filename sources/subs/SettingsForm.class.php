@@ -168,6 +168,12 @@ class Settings_Form
 	public function save()
 	{
 		validateToken('admin-ssc');
+
+		// Retain backwards compatibility
+		if (empty($this->getConfigValues()))
+		{
+			$this->setConfigValues($_POST);
+		}
 		$this->adapter->save();
 	}
 
@@ -180,6 +186,7 @@ class Settings_Form
 	{
 		$settingsForm = new self;
 		$settingsForm->setConfigVars($configVars);
+		$settingsForm->setConfigValues($_POST);
 		$settingsForm->save();
 	}
 

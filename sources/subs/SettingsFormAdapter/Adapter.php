@@ -70,11 +70,6 @@ abstract class Adapter implements AdapterInterface
 		$this->configValues = $configValues;
 	}
 
-	public function __construct()
-	{
-		$this->configValues = $_POST;
-	}
-
 	/**
 	 * Prepare the template by loading context
 	 * variables for each setting.
