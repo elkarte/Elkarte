@@ -170,7 +170,7 @@ class Settings_Form
 		validateToken('admin-ssc');
 
 		// Retain backwards compatibility
-		if (empty($this->getConfigValues()))
+		if (empty($this->configValues))
 		{
 			$this->setConfigValues($_POST);
 		}
