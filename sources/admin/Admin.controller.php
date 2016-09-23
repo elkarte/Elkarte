@@ -535,11 +535,12 @@ class Admin_Controller extends Action_Controller
 		$menuOptions = array('hook' => 'admin', 'default_include_dir' => ADMINDIR);
 
 		// Actually create the menu!
-		$admin_include_data = createMenu($admin_areas, $menuOptions);
+		$menu = new Menu_Create($admin_areas, $menuOptions);
+		$admin_include_data = $menu->createMenu();
 		unset($admin_areas);
 
 		// Nothing valid?
-		if ($admin_include_data == false)
+		if ($admin_include_data === false)
 			Errors::instance()->fatal_lang_error('no_access', false);
 
 		// Build the link tree.
@@ -571,7 +572,7 @@ class Admin_Controller extends Action_Controller
 		if (isset($admin_include_data['file']))
 			require_once($admin_include_data['file']);
 
-		callMenu($admin_include_data);
+		$menu->callMenu($admin_include_data);
 	}
 
 	/**
