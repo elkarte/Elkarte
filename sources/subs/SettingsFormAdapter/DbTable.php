@@ -32,6 +32,11 @@ class DbTable extends Db
 	 */
 	private $editName;
 
+	/**
+	 * @var string[]
+	 */
+	private $indexes = array();
+
 	public function __construct()
 	{
 		$this->db = database();
@@ -54,6 +59,15 @@ class DbTable extends Db
 	}
 
 	/**
+	 * @param string[] $indexes name of the table indexes
+	 *                 (just the primary keys will suffice)
+	 */
+	public function setIndexes(array $indexes)
+	{
+		$this->indexes = $indexes;
+	}
+
+	/**
 	 * @param int $editId -1 add a row, otherwise edit a row with the supplied key value
 	 */
 	public function setEditId($editId)
@@ -71,8 +85,8 @@ class DbTable extends Db
 		{
 			// Time to edit, add in the id col name, assumed to be primary/unique!
 			$update = true;
-			$insertVars[$this->editName] = 'int';
-			$insertValues[] = $this->editId;
+			$insertVars = array_merge(array($this->editName => 'int'),  $insertVars);
+			array_unshift($insertValues, $this->editId);
 		}
 
 		// Do it!!
@@ -80,7 +94,7 @@ class DbTable extends Db
 			'{db_prefix}' . $this->tableName,
 			$insertVars,
 			$insertValues,
-			array()
+			$this->indexes
 		);
 	}
 }

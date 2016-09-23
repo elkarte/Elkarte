@@ -171,6 +171,7 @@ class TestSettingsForm extends PHPUnit_Framework_TestCase
 		$settingsForm->getAdapter()->setTableName('messages');
 		$settingsForm->getAdapter()->setEditId(1);
 		$settingsForm->getAdapter()->setEditName('id_msg');
+		$settingsForm->getAdapter()->setIndexes(array('id_msg'));
 		$settingsForm->setConfigVars(array(array('text', 'body', 'mask' => array('ucfirst'))));
 		$settingsForm->setConfigValues(array('body' => 'hi & by'));
 		$settingsForm->save();

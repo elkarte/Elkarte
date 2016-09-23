@@ -944,7 +944,7 @@ class ManageMaillist_Controller extends Action_Controller
 				$configVars[] = array('text', 'filter_style');
 				$this->_req->post->filter_style = 'filter';
 
-				Email_Settings::saveTableSettings($configVars, 'postby_emails_filters', $this->_req->post, array(), $editId, $editName);
+				Email_Settings::saveTableSettings($configVars, 'postby_emails_filters', $this->_req->post, array('id_filter'), $editId, $editName);
 				writeLog();
 				redirectexit('action=admin;area=maillist;sa=emailfilters;saved');
 			}
@@ -1334,7 +1334,7 @@ class ManageMaillist_Controller extends Action_Controller
 				$this->_req->post->filter_style = 'parser';
 
 				// Save, log, show
-				Email_Settings::saveTableSettings($configVars, 'postby_emails_filters', $this->_req->post, array(), $editId, $editName);
+				Email_Settings::saveTableSettings($configVars, 'postby_emails_filters', $this->_req->post, array('id_filter'), $editId, $editName);
 				writeLog();
 				redirectexit('action=admin;area=maillist;sa=emailparser;saved');
 			}
