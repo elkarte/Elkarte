@@ -168,7 +168,7 @@ class TestSettingsForm extends PHPUnit_Framework_TestCase
 		$settingsForm->setEditId(1);
 		$settingsForm->setEditName('id_msg');
 		$settingsForm->setConfigVars(array(array('text', 'body', 'mask' => array('custom' => array('revert' => 'ucfirst')))));
-		$settingsForm->setConfigValues($array('body' => 'hi & by'));
+		$settingsForm->setConfigValues(array('body' => 'hi & by'));
 		$settingsForm->save();
 		$this->assertSame('Hi & by', $this->getMessageBody());
 	}
