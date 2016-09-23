@@ -47,9 +47,9 @@ class Email_Settings extends Settings_Form
 			$configValues = (array) $configValues;
 		}
 		$settingsForm = new self(self::DBTABLE_ADAPTER);
-		$settingsForm->setTableName($tableName);
-		$settingsForm->setEditId($editId);
-		$settingsForm->setEditName($editName);
+		$settingsForm->getAdapter()->setTableName($tableName);
+		$settingsForm->getAdapter()->setEditId($editId);
+		$settingsForm->getAdapter()->setEditName($editName);
 		$settingsForm->setConfigVars($configVars);
 		$settingsForm->setConfigValues($configValues);
 		$settingsForm->save();

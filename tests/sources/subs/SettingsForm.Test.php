@@ -164,9 +164,9 @@ class TestSettingsForm extends PHPUnit_Framework_TestCase
 	{
 		$this->assertSame('W', chr(ord($this->getMessageBody())));
 		$settingsForm = new Settings_Form(Settings_Form::DBTABLE_ADAPTER);
-		$settingsForm->setTableName('messages');
-		$settingsForm->setEditId(1);
-		$settingsForm->setEditName('id_msg');
+		$settingsForm->getAdapter()->setTableName('messages');
+		$settingsForm->getAdapter()->setEditId(1);
+		$settingsForm->getAdapter()->setEditName('id_msg');
 		$settingsForm->setConfigVars(array(array('text', 'body', 'mask' => array('custom' => array('revert' => 'ucfirst')))));
 		$settingsForm->setConfigValues(array('body' => 'hi & by'));
 		$settingsForm->save();
