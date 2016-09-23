@@ -588,8 +588,8 @@ class Admin extends AbstractController
 		$menuOptions = array('hook' => 'admin', 'default_include_dir' => ADMINDIR);
 
 		// Actually create the menu!
-		$menu = new Menu_Create($admin_areas, $menuOptions);
-		$admin_include_data = $menu->createMenu();
+		$menu = new Menu_Create();
+		$admin_include_data = $menu->prepareMenu($admin_areas, $menuOptions);
 		unset($admin_areas);
 
 		// Nothing valid?
