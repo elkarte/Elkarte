@@ -36,7 +36,8 @@ class TestSettingsForm extends PHPUnit_Framework_TestCase
 			array('select', 'name6m', array('value1' => 'display1', 'value2' => 'display2'), 'multiple' => true),
 			array('password', 'name7'),
 			array('permissions', 'name8'),
-			array('bbc', 'name9')
+			array('bbc', 'name9'),
+		''
 		);
 		$this->permissionResults = array(
 			-1 => array(
@@ -99,9 +100,12 @@ class TestSettingsForm extends PHPUnit_Framework_TestCase
 		$context['config_vars'][$this->configVars[6][1]]['name'] = str_replace('[]', '', $context['config_vars'][$this->configVars[6][1]]['name']);
 		foreach ($this->configVars as $configVar)
 		{
-			$this->assertTrue(isset($context['config_vars'][$configVar[1]]));
-			$this->assertSame($configVar[0], $context['config_vars'][$configVar[1]]['type']);
-			$this->assertSame($configVar[1], $context['config_vars'][$configVar[1]]['name']);
+			if (is_array($configVar))
+			{
+				$this->assertTrue(isset($context['config_vars'][$configVar[1]]));
+				$this->assertSame($configVar[0], $context['config_vars'][$configVar[1]]['type']);
+				$this->assertSame($configVar[1], $context['config_vars'][$configVar[1]]['name']);
+			}
 		}
 		$this->assertEquals($this->permissionResults, $context['permissions'][$this->configVars[8][1]]);
 	}
