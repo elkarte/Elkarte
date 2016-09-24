@@ -254,14 +254,12 @@ class ManageMail_Controller extends Action_Controller
 
 			// We don't want to save the subject and body previews.
 			unset($config_vars['birthday_subject'], $config_vars['birthday_body']);
-			$settingsForm->setConfigVars($config_vars);
 			call_integration_hook('integrate_save_mail_settings');
 
 			// You can not send more per page load than you can per minute
 			if (!empty($this->_req->post->mail_batch_size))
 				$this->_req->post->mail_batch_size = min((int) $this->_req->post->mail_batch_size, (int) $this->_req->post->mail_period_limit);
 
-			$settingsForm->setConfigVars($config_vars);
 			$settingsForm->setConfigValues((array) $this->_req->post);
 			$settingsForm->save();
 			redirectexit('action=admin;area=mailqueue;sa=settings');

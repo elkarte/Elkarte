@@ -784,7 +784,8 @@ class ManageBoards_Controller extends Action_Controller
 
 			call_integration_hook('integrate_save_board_settings');
 
-			Settings_Form::save_db($config_vars);
+			$settingsForm->setConfigValues((array) $this->_req->post);
+			$settingsForm->save();
 			redirectexit('action=admin;area=manageboards;sa=settings');
 		}
 

@@ -291,7 +291,7 @@ class ManageCalendarModule_Controller extends Action_Controller
 		$settingsForm = new Settings_Form(Settings_Form::DB_ADAPTER);
 
 		// Initialize it with our settings
-		$config_vars = $this->_settings();
+		$settingsForm->setConfigVars($this->_settings());
 
 		// Some important context stuff
 		$context['page_title'] = $txt['calendar_settings'];
@@ -301,8 +301,6 @@ class ManageCalendarModule_Controller extends Action_Controller
 		addInlineJavascript('var legend = $(\'legend\');
 			legend.siblings().slideToggle("fast");
 			legend.parent().toggleClass("collapsed")', true);
-
-		$settingsForm->setConfigVars($config_vars);
 
 		// Get the final touches in place.
 		$context['post_url'] = $scripturl . '?action=admin;area=managecalendar;save;sa=settings';

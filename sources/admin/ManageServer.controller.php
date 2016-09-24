@@ -151,10 +151,7 @@ class ManageServer_Controller extends Action_Controller
 		$this->_generalSettingsForm = new Settings_Form(Settings_Form::FILE_ADAPTER);
 
 		// Initialize it with our settings
-		$config_vars = $this->_generalSettings();
-
-		// Set them vars for our settings form
-		$settingsForm->setConfigVars($config_vars);
+		$settingsForm->setConfigVars($this->_generalSettings());
 
 		// Setup the template stuff.
 		$context['post_url'] = $scripturl . '?action=admin;area=serversettings;sa=general;save';
@@ -227,10 +224,7 @@ class ManageServer_Controller extends Action_Controller
 		$this->_cookieSettingsForm = new Settings_Form(Settings_Form::FILE_ADAPTER);
 
 		// Initialize it with our settings
-		$config_vars = $this->_cookieSettings();
-
-		// Set them vars for our settings form
-		$settingsForm->setConfigVars($config_vars);
+		$settingsForm->setConfigVars($this->_cookieSettings());
 
 		$context['post_url'] = $scripturl . '?action=admin;area=serversettings;sa=cookie;save';
 		$context['settings_title'] = $txt['cookies_sessions_settings'];
@@ -297,10 +291,7 @@ class ManageServer_Controller extends Action_Controller
 		$this->_cacheSettingsForm = new Settings_Form(Settings_Form::FILE_ADAPTER);
 
 		// Initialize it with our settings
-		$config_vars = $this->_cacheSettings();
-
-		// Set them vars for our settings form
-		$settingsForm->setConfigVars($config_vars);
+		$settingsForm->setConfigVars($this->_cacheSettings());
 
 		// Saving again?
 		if (isset($this->_req->query->save))
@@ -345,10 +336,7 @@ class ManageServer_Controller extends Action_Controller
 		$settingsForm = new Settings_Form(Settings_Form::FILE_ADAPTER);
 
 		// Initialize it with our settings
-		$config_vars = $this->_loadavgSettings();
-
-		// Set them vars for our settings form
-		$settingsForm->setConfigVars($config_vars);
+		$settingsForm->setConfigVars($this->_loadavgSettings());
 
 		call_integration_hook('integrate_loadavg_settings');
 

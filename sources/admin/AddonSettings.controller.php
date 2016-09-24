@@ -88,7 +88,7 @@ class AddonSettings_Controller extends Action_Controller
 		$settingsForm = new Settings_Form(Settings_Form::DB_ADAPTER);
 
 		// initialize it with our existing settings. If any.
-		$config_vars = $this->_settings();
+		$settingsForm->setConfigVars($this->_settings());
 
 		if (empty($config_vars))
 		{

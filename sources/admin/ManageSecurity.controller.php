@@ -111,10 +111,10 @@ class ManageSecurity_Controller extends Action_Controller
 		global $txt, $scripturl, $context;
 
 		// Initialize the form
-		$this->_initSecuritySettingsForm();
+		$settingsForm = new Settings_Form(Settings_Form::DB_ADAPTER);
 
-		// Retrieve the current config settings
-		$config_vars = $settingsForm->settings();
+		// Initialize it with our settings
+		$settingsForm->setConfigVars($this->_securitySettings());
 
 		// Saving?
 		if (isset($this->_req->query->save))
@@ -137,20 +137,6 @@ class ManageSecurity_Controller extends Action_Controller
 	}
 
 	/**
-	 * Initializes security settings admin screen data.
-	 */
-	private function _initSecuritySettingsForm()
-	{
-		// Instantiate the form
-		$settingsForm = new Settings_Form(Settings_Form::DB_ADAPTER);
-
-		// Initialize it with our settings
-		$config_vars = $this->_securitySettings();
-
-		$settingsForm->setConfigVars($config_vars);
-	}
-
-	/**
 	 * Allows to display and eventually change the moderation settings of the forum.
 	 *
 	 * - Uses the moderation settings form.
@@ -160,10 +146,10 @@ class ManageSecurity_Controller extends Action_Controller
 		global $txt, $scripturl, $context, $modSettings;
 
 		// Initialize the form
-		$this->_initModerationSettingsForm();
+		$settingsForm = new Settings_Form(Settings_Form::DB_ADAPTER);
 
-		// Retrieve the current config settings
-		$config_vars = $settingsForm->settings();
+		// Initialize it with our settings
+		$settingsForm->setConfigVars($this->_moderationSettings());
 
 		// Cannot use moderation if post moderation is not enabled.
 		if (!$modSettings['postmod_active'])
@@ -211,22 +197,6 @@ class ManageSecurity_Controller extends Action_Controller
 	}
 
 	/**
-	 * Initialize moderation settings form with the current configuration options.
-	 *
-	 * @return mixed[] config var settings array
-	 */
-	private function _initModerationSettingsForm()
-	{
-		// Instantiate the form
-		$settingsForm = new Settings_Form(Settings_Form::DB_ADAPTER);
-
-		// Initialize it with our settings
-		$config_vars = $this->_moderationSettings();
-
-		$settingsForm->setConfigVars($config_vars);
-	}
-
-	/**
 	 * Handles admin security spam settings.
 	 *
 	 * - Displays a page with settings and eventually allows the admin to change them.
@@ -236,10 +206,10 @@ class ManageSecurity_Controller extends Action_Controller
 		global $txt, $scripturl, $context, $modSettings;
 
 		// Initialize the form
-		$this->_initSpamSettingsForm();
+		$settingsForm = new Settings_Form(Settings_Form::DB_ADAPTER);
 
-		// Retrieve the current config settings
-		$config_vars = $settingsForm->settings();
+		// Initialize it with our settings
+		$settingsForm->setConfigVars($this->_spamSettings());
 
 		// Saving?
 		if (isset($this->_req->query->save))
@@ -283,20 +253,6 @@ class ManageSecurity_Controller extends Action_Controller
 	}
 
 	/**
-	 * Initializes spam settings with the current configuration saved.
-	 */
-	private function _initSpamSettingsForm()
-	{
-		// Instantiate the form
-		$settingsForm = new Settings_Form(Settings_Form::DB_ADAPTER);
-
-		// Initialize it with our settings
-		$config_vars = $this->_spamSettings();
-
-		$settingsForm->setConfigVars($config_vars);
-	}
-
-	/**
 	 * Change the way bad behavior ... well behaves
 	 */
 	public function action_bbSettings_display()
@@ -304,7 +260,10 @@ class ManageSecurity_Controller extends Action_Controller
 		global $txt, $scripturl, $context, $modSettings, $boardurl;
 
 		// Initialize the form
-		$this->_initBBSettingsForm();
+		$settingsForm = new Settings_Form(Settings_Form::DB_ADAPTER);
+
+		// Initialize it with our settings
+		$settingsForm->setConfigVars($this->_bbSettings());
 
 		// Our callback templates are here
 		loadTemplate('BadBehavior');
@@ -383,22 +342,6 @@ class ManageSecurity_Controller extends Action_Controller
 		));
 
 		$settingsForm->prepare();
-	}
-
-	/**
-	 * Retrieves and returns the configuration settings for Bad Behavior.
-	 *
-	 * - Initializes bbSettings form.
-	 */
-	private function _initBBSettingsForm()
-	{
-		// Instantiate the form
-		$settingsForm = new Settings_Form(Settings_Form::DB_ADAPTER);
-
-		// Initialize it with our settings
-		$config_vars = $this->_bbSettings();
-
-		$settingsForm->setConfigVars($config_vars);
 	}
 
 	/**

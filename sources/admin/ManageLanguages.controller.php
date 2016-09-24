@@ -1021,7 +1021,10 @@ class ManageLanguages_Controller extends Action_Controller
 		global $scripturl, $context, $txt;
 
 		// Initialize the form
-		$this->_initLanguageSettingsForm();
+		$settingsForm = new Settings_Form(Settings_Form::DB_ADAPTER);
+
+		// Initialize it with our settings
+		$settingsForm->setConfigVars($this->_settings());
 
 		// Warn the user if the backup of Settings.php failed.
 		$settings_not_writable = !is_writable(BOARDDIR . '/Settings.php');
@@ -1034,6 +1037,7 @@ class ManageLanguages_Controller extends Action_Controller
 
 			call_integration_hook('integrate_save_language_settings');
 
+			$settingsForm->setConfigValues((array) $this->_req->post);
 			$settingsForm->save();
 			redirectexit('action=admin;area=languages;sa=settings');
 		}
@@ -1055,31 +1059,7 @@ class ManageLanguages_Controller extends Action_Controller
 		}
 
 		// Fill the config array in contextual data for the template.
-		$settingsForm->prepare_file();
-	}
-
-	/**
-	 * Administration settings for languages area:
-	 *
-	 * - the method will initialize the form config array with all settings.
-	 *
-	 * Format of the array:
-	 *  - either, variable name, description, type (constant), size/possible values, helptext.
-	 *  - or, an empty string for a horizontal rule.
-	 *  - or, a string for a titled section.
-	 *
-	 * Initialize _languageSettings form.
-	 */
-	private function _initLanguageSettingsForm()
-	{
-		// Make it happen!
-		$settingsForm = new Settings_Form(Settings_Form::DB_ADAPTER);
-
-		// Initialize it with our settings
-		$config_vars = $this->_settings();
-
-		// Initialize the little form
-		return $settingsForm->setConfigVars($config_vars);
+		$settingsForm->prepare();
 	}
 
 	/**

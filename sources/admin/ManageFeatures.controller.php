@@ -198,9 +198,7 @@ class ManageFeatures_Controller extends Action_Controller
 		$settingsForm = new Settings_Form(Settings_Form::DB_ADAPTER);
 
 		// Initialize it with our settings
-		$config_vars = $this->_basicSettings();
-
-		$settingsForm->setConfigVars($config_vars);
+		$settingsForm->setConfigVars($this->_basicSettings());
 
 		// Saving?
 		if (isset($this->_req->query->save))
@@ -242,9 +240,7 @@ class ManageFeatures_Controller extends Action_Controller
 		$settingsForm = new Settings_Form(Settings_Form::DB_ADAPTER);
 
 		// Initialize it with our settings
-		$config_vars = $this->_layoutSettings();
-
-		$settingsForm->setConfigVars($config_vars);
+		$settingsForm->setConfigVars($this->_layoutSettings());
 
 		// Saving?
 		if (isset($this->_req->query->save))
@@ -291,9 +287,7 @@ class ManageFeatures_Controller extends Action_Controller
 		$settingsForm = new Settings_Form(Settings_Form::DB_ADAPTER);
 
 		// Initialize it with our settings
-		$config_vars = $this->_karmaSettings();
-
-		$settingsForm->setConfigVars($config_vars);
+		$settingsForm->setConfigVars($this->_karmaSettings());
 
 		// Saving?
 		if (isset($this->_req->query->save))
@@ -326,9 +320,7 @@ class ManageFeatures_Controller extends Action_Controller
 		$settingsForm = new Settings_Form(Settings_Form::DB_ADAPTER);
 
 		// Initialize it with our settings
-		$config_vars = $this->_likesSettings();
-
-		$settingsForm->setConfigVars($config_vars);
+		$settingsForm->setConfigVars($this->_likesSettings());
 
 		// Saving?
 		if (isset($this->_req->query->save))
@@ -363,13 +355,11 @@ class ManageFeatures_Controller extends Action_Controller
 		$settingsForm = new Settings_Form(Settings_Form::DB_ADAPTER);
 
 		// Initialize it with our settings
-		$config_vars = $this->_notificationsSettings();
+		$settingsForm->setConfigVars($this->_notificationsSettings());
 
 		// Some context stuff
 		$context['page_title'] = $txt['mentions_settings'];
 		$context['sub_template'] = 'show_settings';
-
-		$settingsForm->setConfigVars($config_vars);
 
 		// Saving the settings?
 		if (isset($this->_req->query->save))
@@ -463,9 +453,7 @@ class ManageFeatures_Controller extends Action_Controller
 		$settingsForm = new Settings_Form(Settings_Form::DB_ADAPTER);
 
 		// Initialize it with our settings
-		$config_vars = $this->_signatureSettings();
-
-		$settingsForm->setConfigVars($config_vars);
+		$settingsForm->setConfigVars($this->_signatureSettings());
 
 		// Setup the template.
 		$context['page_title'] = $txt['signature_settings'];
@@ -1186,9 +1174,7 @@ class ManageFeatures_Controller extends Action_Controller
 		$settingsForm = new Settings_Form(Settings_Form::DB_ADAPTER);
 
 		// Initialize it with our settings
-		$config_vars = $this->_pmSettings();
-
-		$settingsForm->setConfigVars($config_vars);
+		$settingsForm->setConfigVars($this->_pmSettings());
 
 		require_once(SUBSDIR . '/PersonalMessage.subs.php');
 		loadLanguage('ManageMembers');
