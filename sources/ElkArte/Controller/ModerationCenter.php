@@ -291,7 +291,10 @@ class ModerationCenter extends AbstractController
 		);
 
 		$this->_menu = new Menu();
-		$mod_include_data = $this->_menu->prepareMenu($moderation_areas, $menuOptions);
+		$this->_menu->addOptions($menuOptions);
+		$this->_menu->addAreas($moderation_areas);
+		$mod_include_data = $this->_menu->prepareMenu();
+		$this->_menu->setContext();
 		unset($moderation_areas);
 
 		// We got something - didn't we? DIDN'T WE!

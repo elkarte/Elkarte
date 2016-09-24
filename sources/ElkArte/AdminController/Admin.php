@@ -589,7 +589,10 @@ class Admin extends AbstractController
 
 		// Actually create the menu!
 		$menu = new Menu();
-		$admin_include_data = $menu->prepareMenu($admin_areas, $menuOptions);
+		$menu->addOptions($menuOptions);
+		$menu->addAreas($admin_areas);
+		$admin_include_data = $menu->prepareMenu();
+		$menu->setContext();
 		unset($admin_areas);
 
 		// Nothing valid?

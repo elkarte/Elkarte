@@ -378,7 +378,10 @@ class PersonalMessage extends AbstractController
 
 		// Actually create the menu!
 		$menu = new Menu();
-		$pm_include_data = $menu->prepareMenu($pm_areas, $menuOptions);
+		$menu->addOptions($menuOptions);
+		$menu->addAreas($pm_areas);
+		$pm_include_data = $menu->prepareMenu();
+		$menu->setContext();
 		unset($pm_areas);
 
 		// No menu means no access.

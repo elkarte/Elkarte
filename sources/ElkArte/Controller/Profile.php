@@ -556,7 +556,10 @@ class Profile extends AbstractController
 
 		// Actually create the menu!
 		$this->_menu = new Menu();
-		$this->_profile_include_data = $this->_menu->prepareMenu($profile_areas, $menuOptions);
+		$this->_menu->addOptions($menuOptions);
+		$this->_menu->addAreas($profile_areas);
+		$this->_profile_include_data = $this->_menu->prepareMenu();
+		$this->_menu->setContext();
 		unset($profile_areas);
 	}
 
