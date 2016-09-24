@@ -27,15 +27,15 @@ Class Menu
 	protected $_permission_set;
 	protected $_found_section;
 	protected $_backup_area = '';
-	protected $_include_data = array();
-	protected $_section_id;
-	protected $_section;
-	protected $_area_id;
-	protected $_area;
-	protected $_sa;
-	protected $_sub;
 	protected $_current_subaction;
-	protected $_max_menu_id;
+	private $_include_data = array();
+	private $_section_id;
+	private $_section;
+	private $_area_id;
+	private $_area;
+	private $_sa;
+	private $_sub;
+	private $_max_menu_id;
 
 	/**
 	 * Menu_Create constructor.
@@ -70,8 +70,10 @@ Class Menu
 		// This is necessary only in profile (at least for the core), but we do it always because it's easier
 		$this->_permission_set = !empty($context['user']['is_owner']) ? 'own' : 'any';
 
+		// We may have a current subaction
 		$this->_current_subaction = isset($context['current_subaction']) ? $context['current_subaction'] : null;
 
+		// Create menu will return the include data
 		return $this->createMenu();
 	}
 
@@ -94,6 +96,7 @@ Class Menu
 		// Set the current
 		$this->_determineCurrentAction();
 
+		// Check the menus urls
 		$this->_checkBaseUrl();
 
 		if (!$this->_validateData())
@@ -110,6 +113,13 @@ Class Menu
 		return $this->_include_data;
 	}
 
+	/**
+	 * Performs a sanity check that a menu was created successfully
+	 *
+	 *   - If it fails to find valid data, will reset max_menu_id and any menu context created
+	 *
+	 * @return bool
+	 */
 	private function _validateData()
 	{
 		global $context;
@@ -137,12 +147,7 @@ Class Menu
 		}
 
 		// Check we had something - for sanity sake.
-		if (empty($this->_include_data))
-		{
-			return false;
-		}
-
-		return true;
+		return !empty($this->_include_data);
 	}
 
 	/**
@@ -206,14 +211,8 @@ Class Menu
 		// Now setup the context correctly.
 		foreach ($this->_menuData as $this->_section_id => $this->_section)
 		{
-			// Is this section enabled?
-			if (!$this->_sectionEnabled())
-			{
-				continue;
-			}
-
-			// Do they have permissions?
-			if (!$this->_sectionPermissions())
+			// Is this section enabled? and do they have permissions?
+			if (!$this->_sectionEnabled() || !$this->_sectionPermissions())
 			{
 				continue;
 			}
@@ -571,6 +570,9 @@ Class Menu
 		return $first_sa;
 	}
 
+	/**
+	 * Checks that a current subaction for the menu is set
+	 */
 	private function _determineCurrentAction()
 	{
 		// Ensure we have a current subaction defined
@@ -581,7 +583,7 @@ Class Menu
 	}
 
 	/**
-	 *    If there is a current section, checks if the base menu has an url
+	 * Checks and updates base and section urls
 	 */
 	private function _checkBaseUrl()
 	{
@@ -679,6 +681,14 @@ Class Menu
 		$this->_menuData = $menuData;
 	}
 
+	/**
+	 * Finalizes items so the computed menu can be used
+	 *
+	 * What it does:
+	 *   - Sets the menu layer in the template stack
+	 *   - Loads context with the computed menu context
+	 *   - Sets current subaction and current max menu id
+	 */
 	public function setContext()
 	{
 		global $user_info, $settings, $options, $context;
@@ -747,8 +757,7 @@ Class Menu
 			Errors::instance()->fatal_lang_error('no_access', false);
 		}
 
-		// We use only selectedMenu['function'] and
-		// selectedMenu['controller'] if the latter is set.
+		// We use only selectedMenu ['function'] and selectedMenu ['controller'] if the latter is set.
 		if (!empty($selectedMenu['controller']))
 		{
 			// 'controller' => 'ManageAttachments_Controller'
