@@ -87,7 +87,6 @@ class ManageBBC_Controller extends Action_Controller
 		{
 			checkSession();
 
-
 			// Security: make a pass through all tags and fix them as necessary
 			$codes = \BBC\ParserWrapper::getInstance()->getCodes();
 			$bbcTags = $codes->getTags();

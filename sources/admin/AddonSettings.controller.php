@@ -99,7 +99,7 @@ class AddonSettings_Controller extends Action_Controller
 		$context['post_url'] = $scripturl . '?action=admin;area=addonsettings;save;sa=general';
 		$context['settings_title'] = $txt['mods_cat_modifications_misc'];
 
-		return $settingsForm->setConfigVars($config_vars);
+		return;
 
 		// Saving?
 		if (isset($this->_req->query->save))
