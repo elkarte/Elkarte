@@ -82,32 +82,6 @@ class AddonSettings_Controller extends Action_Controller
 	 */
 	public function action_addonSettings_display()
 	{
-		// Initialize the form
-		$this->_initAddonSettingsForm();
-
-		// Initialize settings
-		$config_vars = $settingsForm->settings();
-
-		// Saving?
-		if (isset($this->_req->query->save))
-		{
-			checkSession();
-
-			call_integration_hook('integrate_save_general_mod_settings');
-
-			Settings_Form::save_db($config_vars);
-
-			redirectexit('action=admin;area=addonsettings;sa=general');
-		}
-
-		$settingsForm->prepare();
-	}
-
-	/**
-	 * Initialize the customSettings form with any custom admin settings for or from addons.
-	 */
-	public function _initAddonSettingsForm()
-	{
 		global $context, $txt, $scripturl;
 
 		// instantiate the form
@@ -126,6 +100,21 @@ class AddonSettings_Controller extends Action_Controller
 		$context['settings_title'] = $txt['mods_cat_modifications_misc'];
 
 		return $settingsForm->setConfigVars($config_vars);
+
+		// Saving?
+		if (isset($this->_req->query->save))
+		{
+			checkSession();
+
+			call_integration_hook('integrate_save_general_mod_settings');
+
+			$settingsForm->setConfigValues((array) $this->_req->post);
+			$settingsForm->save();
+
+			redirectexit('action=admin;area=addonsettings;sa=general');
+		}
+
+		$settingsForm->prepare();
 	}
 
 	/**

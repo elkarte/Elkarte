@@ -898,12 +898,6 @@ class ManageMaillist_Controller extends Action_Controller
 			$context['settings_message'] = array();
 		}
 
-		// Initialize the filer settings form
-		$this->_initFiltersSettingsForm();
-
-		// Initialize it with our settings
-		$configVars = $settingsForm->settings();
-
 		// Saving the new or edited entry?
 		if (isset($this->_req->query->save))
 		{
@@ -1512,7 +1506,7 @@ class ManageMaillist_Controller extends Action_Controller
 					updateSettings(array('disallow_sendBody' => ''));
 
 				updateSettings(array('maillist_receiving_address' => serialize($maillist_receiving_address)));
-				$settingsForm->setConfigValues($this->_req->post);
+				$settingsForm->setConfigValues((array) $this->_req->post);
 				$settingsForm->save();
 				writeLog();
 				redirectexit('action=admin;area=maillist;sa=emailsettings;saved');

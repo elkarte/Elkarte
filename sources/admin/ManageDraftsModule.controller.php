@@ -232,7 +232,7 @@ class ManageDraftsModule_Controller extends Action_Controller
 			// Protect them from themselves.
 			$this->_req->post->drafts_autosave_frequency = $this->_req->post->drafts_autosave_frequency < 30 ? 30 : $this->_req->post->drafts_autosave_frequency;
 
-			$settingsForm->setConfigValues($this->_req->post);
+			$settingsForm->setConfigValues((array) $this->_req->post);
 			$settingsForm->save();
 			redirectexit('action=admin;area=managedrafts');
 		}

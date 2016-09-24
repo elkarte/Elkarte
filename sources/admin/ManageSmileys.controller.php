@@ -153,7 +153,7 @@ class ManageSmileys_Controller extends Action_Controller
 			call_integration_hook('integrate_save_smiley_settings');
 
 			// Save away
-			$settingsForm->setConfigValues($this->_req->post);
+			$settingsForm->setConfigValues((array) $this->_req->post);
 			$settingsForm->save();
 
 			// Flush the cache so the new settings take effect

@@ -213,7 +213,7 @@ class ManageFeatures_Controller extends Action_Controller
 
 			call_integration_hook('integrate_save_basic_settings');
 
-			$settingsForm->setConfigValues($this->_req->post);
+			$settingsForm->setConfigValues((array) $this->_req->post);
 			$settingsForm->save();
 
 			writeLog();
@@ -265,7 +265,7 @@ class ManageFeatures_Controller extends Action_Controller
 
 			call_integration_hook('integrate_save_layout_settings');
 
-			$settingsForm->setConfigValues($this->_req->post);
+			$settingsForm->setConfigValues((array) $this->_req->post);
 			$settingsForm->save();
 			writeLog();
 
@@ -302,7 +302,7 @@ class ManageFeatures_Controller extends Action_Controller
 
 			call_integration_hook('integrate_save_karma_settings');
 
-			$settingsForm->setConfigValues($this->_req->post);
+			$settingsForm->setConfigValues((array) $this->_req->post);
 			$settingsForm->save();
 			redirectexit('action=admin;area=featuresettings;sa=karma');
 		}
@@ -337,7 +337,7 @@ class ManageFeatures_Controller extends Action_Controller
 
 			call_integration_hook('integrate_save_likes_settings');
 
-			$settingsForm->setConfigValues($this->_req->post);
+			$settingsForm->setConfigValues((array) $this->_req->post);
 			$settingsForm->save();
 			redirectexit('action=admin;area=featuresettings;sa=likes');
 		}
@@ -440,7 +440,7 @@ class ManageFeatures_Controller extends Action_Controller
 			}
 
 			updateSettings(array('enabled_mentions' => implode(',', array_unique($enabled_mentions)), 'notification_methods' => $notification_methods));
-			$settingsForm->setConfigValues($this->_req->post);
+			$settingsForm->setConfigValues((array) $this->_req->post);
 			$settingsForm->save();
 			redirectexit('action=admin;area=featuresettings;sa=mention');
 		}
@@ -549,14 +549,14 @@ class ManageFeatures_Controller extends Action_Controller
 
 			call_integration_hook('integrate_save_signature_settings', array(&$sig_limits, &$bbcTags));
 
-			$settingsForm = implode(',', $sig_limits) . ':' . implode(',', array_diff($bbcTags, $this->_req->post->signature_bbc_enabledTags));
+			$this->_req->post->signature_settings = implode(',', $sig_limits) . ':' . implode(',', array_diff($bbcTags, $this->_req->post->signature_bbc_enabledTags));
 
 			// Even though we have practically no settings let's keep the convention going!
 			$save_vars = array();
 			$save_vars[] = array('text', 'signature_settings');
 
 			$settingsForm->setConfigVars($save_vars);
-			$settingsForm->setConfigValues($this->_req->post);
+			$settingsForm->setConfigValues((array) $this->_req->post);
 			$settingsForm->save();
 			Settings_Form::save_db($save_vars, $this->_req->post);
 			redirectexit('action=admin;area=featuresettings;sa=sig');
@@ -1209,7 +1209,7 @@ class ManageFeatures_Controller extends Action_Controller
 
 			call_integration_hook('integrate_save_pmsettings_settings');
 
-			$settingsForm->setConfigValues($this->_req->post);
+			$settingsForm->setConfigValues((array) $this->_req->post);
 			$settingsForm->save();
 			redirectexit('action=admin;area=featuresettings;sa=pmsettings');
 		}

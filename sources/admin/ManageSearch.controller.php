@@ -170,7 +170,7 @@ class ManageSearch_Controller extends Action_Controller
 				'additional_search_engines' => !empty($new_engines) ? serialize($new_engines) : ''
 			));
 
-			$settingsForm->setConfigValues($this->_req->post);
+			$settingsForm->setConfigValues((array) $this->_req->post);
 			$settingsForm->save();
 			redirectexit('action=admin;area=managesearch;sa=settings;' . $context['session_var'] . '=' . $context['session_id']);
 		}

@@ -353,7 +353,7 @@ class ManageRegistration_Controller extends Action_Controller
 
 			call_integration_hook('integrate_save_registration_settings');
 
-			$settingsForm->setConfigValues($this->_req->post);
+			$settingsForm->setConfigValues((array) $this->_req->post);
 			$settingsForm->save();
 
 			redirectexit('action=admin;area=regcenter;sa=settings');

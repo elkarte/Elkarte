@@ -156,7 +156,12 @@ class AdminLog_Controller extends Action_Controller
 
 		$context['page_title'] = $txt['pruning_title'];
 
-		$config_vars = $settingsForm->settings();
+		$settingsForm = new Settings_Form(Settings_Form::DB_ADAPTER);
+
+		// Initialize settings
+		$config_vars = $this->_settings();
+
+		return $settingsForm->setConfigVars($config_vars);
 
 		call_integration_hook('integrate_prune_settings');
 
@@ -184,7 +189,9 @@ class AdminLog_Controller extends Action_Controller
 			else
 				$_POST['pruningOptions'] = '';
 
-			Settings_Form::save_db($savevar);
+			$settingsForm->setConfigVars($savevar);
+			$settingsForm->setConfigValues((array) $_POST);
+			$settingsForm->save();
 			redirectexit('action=admin;area=logs;sa=pruning');
 		}
 
@@ -199,20 +206,6 @@ class AdminLog_Controller extends Action_Controller
 			$modSettings['pruneErrorLog'] = $modSettings['pruneModLog'] = $modSettings['pruneBanLog'] = $modSettings['pruneReportLog'] = $modSettings['pruneScheduledTaskLog'] = $modSettings['pruneBadbehaviorLog'] = $modSettings['pruneSpiderHitLog'] = 0;
 
 		$settingsForm->prepare();
-	}
-
-	/**
-	 * Initializes the _pruningSettings form.
-	 */
-	private function _initPruningSettingsForm()
-	{
-		// instantiate the form
-		$settingsForm = new Settings_Form(Settings_Form::DB_ADAPTER);
-
-		// Initialize settings
-		$config_vars = $this->_settings();
-
-		return $settingsForm->setConfigVars($config_vars);
 	}
 
 	/**

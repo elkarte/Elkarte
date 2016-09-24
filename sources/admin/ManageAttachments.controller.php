@@ -160,7 +160,7 @@ class ManageAttachments_Controller extends Action_Controller
 		global $modSettings, $scripturl, $context;
 
 		// initialize the form
-		$this->_attachSettingsForm = new Settings_Form(Settings_Form::DB_ADAPTER);
+		$settingsForm = new Settings_Form(Settings_Form::DB_ADAPTER);
 
 		// Initialize settings
 		$config_vars = $this->_settings();
@@ -233,7 +233,7 @@ class ManageAttachments_Controller extends Action_Controller
 
 			call_integration_hook('integrate_save_attachment_settings');
 
-			$settingsForm->setConfigValues($this->_req->post);
+			$settingsForm->setConfigValues((array) $this->_req->post);
 			$settingsForm->save();
 			redirectexit('action=admin;area=manageattachments;sa=attachments');
 		}

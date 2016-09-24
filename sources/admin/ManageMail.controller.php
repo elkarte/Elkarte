@@ -267,7 +267,7 @@ class ManageMail_Controller extends Action_Controller
 			if (!empty($this->_req->post->mail_batch_size))
 				$this->_req->post->mail_batch_size = min((int) $this->_req->post->mail_batch_size, (int) $this->_req->post->mail_period_limit);
 
-			$settingsForm->setConfigValues($this->_req->post);
+			$settingsForm->setConfigValues((array) $this->_req->post);
 			$settingsForm->save();
 			redirectexit('action=admin;area=mailqueue;sa=settings');
 		}

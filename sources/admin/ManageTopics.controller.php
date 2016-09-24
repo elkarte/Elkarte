@@ -88,7 +88,7 @@ class ManageTopics_Controller extends Action_Controller
 			call_integration_hook('integrate_save_topic_settings');
 
 			// Save the result!
-			$settingsForm->setConfigValues($this->_req->post);
+			$settingsForm->setConfigValues((array) $this->_req->post);
 			$settingsForm->save();
 
 			// We're done here, pal.

@@ -93,7 +93,7 @@ class ManageAvatars_Controller extends Action_Controller
 			if (isset($this->_req->post->custom_avatar_enabled) && $this->_req->post->custom_avatar_enabled == 1 && (empty($this->_req->post->custom_avatar_dir) || empty($this->_req->post->custom_avatar_url)))
 				$this->_req->post->custom_avatar_enabled = 0;
 
-			$settingsForm->setConfigValues($this->_req->post);
+			$settingsForm->setConfigValues((array) $this->_req->post);
 			$settingsForm->save();
 			redirectexit('action=admin;area=manageattachments;sa=avatars');
 		}

@@ -194,7 +194,7 @@ class ManagePaid_Controller extends Action_Controller
 				$this->_req->post->paid_currency_code = trim($this->_req->post->paid_currency_code);
 
 				unset($config_vars['dummy_currency']);
-				$settingsForm->setConfigValues($this->_req->post);
+				$settingsForm->setConfigValues((array) $this->_req->post);
 				$settingsForm->save();
 				redirectexit('action=admin;area=paidsubscribe;sa=settings');
 			}

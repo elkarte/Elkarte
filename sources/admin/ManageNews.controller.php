@@ -903,7 +903,7 @@ class ManageNews_Controller extends Action_Controller
 
 			call_integration_hook('integrate_save_news_settings');
 
-			$settingsForm->setConfigValues($this->_req->post);
+			$settingsForm->setConfigValues((array) $this->_req->post);
 			$settingsForm->save();
 			redirectexit('action=admin;area=news;sa=settings');
 		}

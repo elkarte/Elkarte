@@ -165,7 +165,7 @@ class ManageServer_Controller extends Action_Controller
 		{
 			call_integration_hook('integrate_save_general_settings');
 
-			$settingsForm->setConfigValues($this->_req->post);
+			$settingsForm->setConfigValues((array) $this->_req->post);
 			$settingsForm->save();
 			redirectexit('action=admin;area=serversettings;sa=general;' . $context['session_var'] . '=' . $context['session_id'] . ';msg=' . (!empty($context['settings_message']) ? $context['settings_message'] : 'core_settings_saved'));
 		}
@@ -204,7 +204,7 @@ class ManageServer_Controller extends Action_Controller
 		{
 			call_integration_hook('integrate_save_database_settings');
 
-			$settingsForm->setConfigValues($this->_req->post);
+			$settingsForm->setConfigValues((array) $this->_req->post);
 			$settingsForm->save();
 			redirectexit('action=admin;area=serversettings;sa=database;' . $context['session_var'] . '=' . $context['session_id'] . ';msg=' . (!empty($context['settings_message']) ? $context['settings_message'] : 'core_settings_saved'));
 		}
@@ -247,7 +247,7 @@ class ManageServer_Controller extends Action_Controller
 			if (!empty($this->_req->post->globalCookiesDomain) && strpos($boardurl, $this->_req->post->globalCookiesDomain) === false)
 				Errors::instance()->fatal_lang_error('invalid_cookie_domain', false);
 
-			$settingsForm->setConfigValues($this->_req->post);
+			$settingsForm->setConfigValues((array) $this->_req->post);
 			$settingsForm->save();
 
 			// If the cookie name was changed, reset the cookie.
@@ -307,7 +307,7 @@ class ManageServer_Controller extends Action_Controller
 		{
 			call_integration_hook('integrate_save_cache_settings');
 
-			$settingsForm->setConfigValues($this->_req->post);
+			$settingsForm->setConfigValues((array) $this->_req->post);
 			$settingsForm->save();
 
 			// we need to save the $cache_enable to $modSettings as well
@@ -373,7 +373,7 @@ class ManageServer_Controller extends Action_Controller
 
 			call_integration_hook('integrate_save_loadavg_settings');
 
-			$settingsForm->setConfigValues($this->_req->post);
+			$settingsForm->setConfigValues((array) $this->_req->post);
 			$settingsForm->save();
 			redirectexit('action=admin;area=serversettings;sa=loads;' . $context['session_var'] . '=' . $context['session_id']);
 		}

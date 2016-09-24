@@ -120,7 +120,7 @@ class TestSettingsForm extends PHPUnit_Framework_TestCase
 
 		$settingsForm = new Settings_Form(Settings_Form::DB_ADAPTER);
 		$settingsForm->setConfigVars($this->configVars);
-		$settingsForm->setConfigValues($this->configValues);
+		$settingsForm->setConfigValues((array) $this->configValues);
 		$this->assertSame($this->configValues, $settingsForm->getConfigValues());
 		$settingsForm->save();
 		$modSettings['bbc_disabled_' . $this->configVars[9][1]] = $this->configValues['name9'];
@@ -173,7 +173,7 @@ class TestSettingsForm extends PHPUnit_Framework_TestCase
 		$settingsForm->getAdapter()->setEditName('id_msg');
 		$settingsForm->getAdapter()->setIndexes(array('id_msg'));
 		$settingsForm->setConfigVars(array(array('text', 'body', 'mask' => array('ucfirst'))));
-		$settingsForm->setConfigValues(array('body' => 'hi & by'));
+		$settingsForm->setConfigValues((array) array('body' => 'hi & by'));
 		$settingsForm->save();
 		$this->assertSame('Hi & by', $this->getMessageBody());
 	}
@@ -264,7 +264,7 @@ class TestSettingsForm extends PHPUnit_Framework_TestCase
 		);
 		$settingsForm = new Settings_Form(Settings_Form::FILE_ADAPTER);
 		$settingsForm->setConfigVars($this->configVars);
-		$settingsForm->setConfigValues($this->configValues);
+		$settingsForm->setConfigValues((array) $this->configValues);
 		$settingsForm->save();
 
 		// Reload

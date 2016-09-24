@@ -794,7 +794,7 @@ class ManageMembergroups_Controller extends Action_Controller
 			call_integration_hook('integrate_save_membergroup_settings');
 
 			// Yeppers, saving this...
-			$settingsForm->setConfigValues($this->_req->post);
+			$settingsForm->setConfigValues((array) $this->_req->post);
 			$settingsForm->save();
 			redirectexit('action=admin;area=membergroups;sa=settings');
 		}

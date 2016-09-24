@@ -121,7 +121,7 @@ class ManageSecurity_Controller extends Action_Controller
 		{
 			checkSession();
 
-			$settingsForm->setConfigValues($this->_req->post);
+			$settingsForm->setConfigValues((array) $this->_req->post);
 			$settingsForm->save();
 
 			call_integration_hook('integrate_save_general_security_settings');
@@ -195,7 +195,7 @@ class ManageSecurity_Controller extends Action_Controller
 
 			call_integration_hook('integrate_save_moderation_settings');
 
-			$settingsForm->setConfigValues($this->_req->post);
+			$settingsForm->setConfigValues((array) $this->_req->post);
 			$settingsForm->save();
 			redirectexit('action=admin;area=securitysettings;sa=moderation');
 		}
@@ -260,7 +260,7 @@ class ManageSecurity_Controller extends Action_Controller
 			call_integration_hook('integrate_save_spam_settings');
 
 			// Now save.
-			$settingsForm->setConfigValues($this->_req->post);
+			$settingsForm->setConfigValues((array) $this->_req->post);
 			$settingsForm->save();
 			Cache::instance()->remove('verificationQuestionIds');
 			redirectexit('action=admin;area=securitysettings;sa=spam');
@@ -362,7 +362,7 @@ class ManageSecurity_Controller extends Action_Controller
 				updateSettings(array($list => serialize($this_list), $list . '_desc' => serialize($this_desc)));
 			}
 
-			$settingsForm->setConfigValues($this->_req->post);
+			$settingsForm->setConfigValues((array) $this->_req->post);
 			$settingsForm->save();
 			redirectexit('action=admin;area=securitysettings;sa=badbehavior');
 		}

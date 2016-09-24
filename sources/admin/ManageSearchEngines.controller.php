@@ -118,7 +118,7 @@ class ManageSearchEngines_Controller extends Action_Controller
 			call_integration_hook('integrate_save_search_engine_settings');
 
 			// save the results!
-			$settingsForm->setConfigValues($this->_req->post);
+			$settingsForm->setConfigValues((array) $this->_req->post);
 			$settingsForm->save();
 
 			// make sure to rebuild the cache with updated results
