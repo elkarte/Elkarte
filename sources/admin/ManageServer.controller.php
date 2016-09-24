@@ -333,7 +333,7 @@ class ManageServer_Controller extends Action_Controller
 		global $txt, $scripturl, $context;
 
 		// Initialize the form
-		$settingsForm = new Settings_Form(Settings_Form::FILE_ADAPTER);
+		$settingsForm = new Settings_Form(Settings_Form::DB_ADAPTER);
 
 		// Initialize it with our settings
 		$settingsForm->setConfigVars($this->_loadavgSettings());
