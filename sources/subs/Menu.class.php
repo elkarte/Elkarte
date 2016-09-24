@@ -18,7 +18,7 @@
 /**
  * This class implements a standard way of creating menus
  */
-Class Menu_Create
+Class Menu
 {
 	protected $_req;
 	protected $_menuOptions;
