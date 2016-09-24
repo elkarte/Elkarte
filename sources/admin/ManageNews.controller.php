@@ -882,9 +882,7 @@ class ManageNews_Controller extends Action_Controller
 		$settingsForm = new Settings_Form(Settings_Form::DB_ADAPTER);
 
 		// Initialize it with our settings
-		$config_vars = $this->_settings();
-
-		$settingsForm->setConfigVars($config_vars);
+		$settingsForm->setConfigVars($this->_settings());
 
 		// Add some javascript at the bottom...
 		addInlineJavascript('

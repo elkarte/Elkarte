@@ -163,9 +163,7 @@ class ManageAttachments_Controller extends Action_Controller
 		$settingsForm = new Settings_Form(Settings_Form::DB_ADAPTER);
 
 		// Initialize settings
-		$config_vars = $this->_settings();
-
-		$settingsForm->setConfigVars($config_vars);
+		$settingsForm->setConfigVars($this->_settings());
 
 		addInlineJavascript('
 	var storing_type = document.getElementById(\'automanage_attachments\'),

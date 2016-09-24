@@ -209,9 +209,7 @@ class ManageDraftsModule_Controller extends Action_Controller
 		$settingsForm = new Settings_Form(Settings_Form::DB_ADAPTER);
 
 		// Initialize it with our settings
-		$config_vars = $this->_settings();
-
-		$settingsForm->setConfigVars($config_vars);
+		$settingsForm->setConfigVars($this->_settings());
 
 		// Setup the template.
 		$context['page_title'] = $txt['managedrafts_settings'];
