@@ -509,10 +509,12 @@ class Profile_Controller extends Action_Controller
 			'default_include_dir' => CONTROLLERDIR,
 		);
 
-		// Actually create the menu!
-		$this->_menu = new Menu();
+		// Setup the profile menu
+		$this->_menu = Menu::instance();
 		$this->_menu->addOptions($menuOptions);
 		$this->_menu->addAreas($profile_areas);
+
+		// Create the menu, calling integrate_profile_areas at the start
 		$this->_profile_include_data = $this->_menu->prepareMenu();
 		$this->_menu->setContext();
 		unset($profile_areas);
