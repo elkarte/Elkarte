@@ -243,18 +243,14 @@ class ManageMail_Controller extends Action_Controller
 			$processedBirthdayEmails[$index][$element] = $value;
 		}
 
-
 		// Saving?
 		if (isset($this->_req->query->save))
 		{
-			// TODO: $postobj is should be removed after save_db is properly refactored.
-			$postobj = null;
 			// Make the SMTP password a little harder to see in a backup etc.
 			if (!empty($this->_req->post->smtp_password[1]))
 			{
 				$this->_req->post->smtp_password[0] = base64_encode($this->_req->post->smtp_password[0]);
 				$this->_req->post->smtp_password[1] = base64_encode($this->_req->post->smtp_password[1]);
-				$postobj = array('smtp_password' => array(0 => ($this->_req->post->smtp_password[0]), 1 => ($this->_req->post->smtp_password[1])));
 			}
 			checkSession();
 
