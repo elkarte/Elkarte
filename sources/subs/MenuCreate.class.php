@@ -423,6 +423,8 @@ Class Menu_Create
 	 */
 	private function _areaLabel()
 	{
+		global $txt;
+
 		return isset($this->_area['label']) || (isset($txt[$this->_area_id]) && !isset($this->_area['select']));
 	}
 
@@ -692,12 +694,18 @@ Class Menu_Create
 	 * If $selectedMenu['controller'] is set, then it is a class, and $selectedMenu['function'] will be a method of it.
 	 * If it is not set, then $selectedMenu['function'] is simply a function to call.
 	 *
-	 * @param array|string $selectedMenu
+	 * @param array|bool $selectedMenu
 	 */
 	public function callMenu($selectedMenu)
 	{
-		// We use only $selectedMenu['function'] and
-		//  $selectedMenu['controller'] if the latter is set.
+		// Always be safe
+		if (empty($selectedMenu) || empty($selectedMenu['function']))
+		{
+			Errors::instance()->fatal_lang_error('no_access', false);
+		}
+
+		// We use only selectedMenu['function'] and
+		// selectedMenu['controller'] if the latter is set.
 		if (!empty($selectedMenu['controller']))
 		{
 			// 'controller' => 'ManageAttachments_Controller'
