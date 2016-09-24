@@ -187,7 +187,18 @@ Class Menu
 		}
 
 		// Build a list of additional parameters that should go in the URL.
+		$this->_buildAdditionalParams();
+	}
+
+	/**
+	 * Build the menuOption additional parameters for use in the url
+	 */
+	private function _buildAdditionalParams()
+	{
+		global $context;
+
 		$this->_menu_context['extra_parameters'] = '';
+
 		if (!empty($this->_menuOptions['extra_url_parameters']))
 		{
 			foreach ($this->_menuOptions['extra_url_parameters'] as $key => $value)
