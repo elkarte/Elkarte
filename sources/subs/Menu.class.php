@@ -34,6 +34,8 @@ Class Menu
 	protected $_area;
 	protected $_sa;
 	protected $_sub;
+	protected $_current_subaction;
+	protected $_max_menu_id;
 
 	/**
 	 * Menu_Create constructor.
@@ -45,58 +47,11 @@ Class Menu
 	/**
 	 * Class prepareMenu
 	 *
-	 * @param array $menuData the menu array
-	 *   Possible indexes:
-	 *   Menu name with named indexes as follows:
-	 *        - string $title     => Section title
-	 *        - bool $enabled     => Is the section enabled / shown
-	 *        - array $this->_areas      => Array of areas within this menu section, see below
-	 *        - array $permission => Permission required to access the whole section
-	 *
-	 *   areas sub array from above, named indexes as follows:
-	 *        - array $permission  => Array of permissions to determine who can access this area
-	 *        - string $label      => Optional text string for link (Otherwise $txt[$index] will be used)
-	 *        - string $controller => Name of controller required for this area
-	 *        - string $function   => Method in controller to call when area is selected
-	 *        - string $icon       => File name of an icon to use on the menu, if using a class set as transparent.png
-	 *        - string $class      => CSS class name to apply to the icon img, used to apply a sprite icon
-	 *        - string $custom_url => URL to call for this menu item
-	 *        - bool $enabled      => Should this area even be enabled / accessible?
-	 *        - bool $hidden       => If the area is visible in the menu
-	 *        - string $select     => If set, references another area
-	 *        - array $subsections => Array of subsections for this menu area, see below
-	 *
-	 *   subsections sub array from above, unnamed indexes interpreted as follows, single named index 'enabled'
-	 *        - string 0           => Label for this subsection
-	 *        - array 1            => Array of permissions to check for this subsection.
-	 *        - bool 2             => Is this the default subaction - if not set for any will default to first...
-	 *        - bool enabled       => Enabled or not
-	 *        - array active       => Set the button active for other subsections.
-	 *        - string url         => Custom url for the subsection
-	 *
-	 * @param array $menuOptions an array of options that can be used to override some default behaviours.
-	 *   It can accept the following indexes:
-	 *        - action                    => overrides the default action
-	 *        - current_area              => overrides the current area
-	 *        - extra_url_parameters      => an array or pairs or parameters to be added to the url
-	 *        - disable_url_session_check => (boolean) if true the session var/id are omitted from the url
-	 *        - base_url                  => an alternative base url
-	 *        - menu_type                 => alternative menu types?
-	 *        - can_toggle_drop_down      => (boolean) if the menu can "toggle"
-	 *        - template_name             => an alternative template to load (instead of Generic)
-	 *        - layer_name                => alternative layer name for the menu
-	 *        - hook                      => hook name to call integrate_ . 'hook name' . '_areas'
-	 *        - default_include_dir       => directory to include for function support
-	 *
 	 * @return array|bool
 	 */
-	public function prepareMenu($menuData, $menuOptions = array())
+	public function prepareMenu()
 	{
 		global $context, $settings;
-
-		// Set the passed menu definition to class vars
-		$this->_menuData = $menuData;
-		$this->_menuOptions = $menuOptions;
 
 		// Access to post/get data
 		$this->_req = HttpReq::instance();
@@ -107,13 +62,15 @@ Class Menu
 			: $settings['default_images_url'] . '/admin';
 
 		// Every menu gets a unique ID, these are shown in first in, first out order.
-		$context['max_menu_id'] = isset($context['max_menu_id']) ? $context['max_menu_id']++ : 1;
+		$this->_max_menu_id = isset($context['max_menu_id']) ? $context['max_menu_id']++ : 1;
 
 		// This will be all the data for this menu
 		$this->_menu_context = array();
 
 		// This is necessary only in profile (at least for the core), but we do it always because it's easier
 		$this->_permission_set = !empty($context['user']['is_owner']) ? 'own' : 'any';
+
+		$this->_current_subaction = isset($context['current_subaction']) ? $context['current_subaction'] : null;
 
 		return $this->createMenu();
 	}
@@ -125,8 +82,6 @@ Class Menu
 	 */
 	public function createMenu()
 	{
-		global $context, $settings, $options, $scripturl, $user_info;
-
 		// Call this menus integration hook
 		$this->_integrationHook();
 
@@ -136,62 +91,13 @@ Class Menu
 		// Process the menu Data
 		$this->processMenuData();
 
-		// Ensure we have a current subaction defined
-		if (!isset($context['current_subaction']) && isset($this->_menu_context['current_subsection']))
-		{
-			$context['current_subaction'] = $this->_menu_context['current_subsection'];
-		}
-
-		// Should we use a custom base url, or use the default?
-		$this->_menu_context['base_url'] = isset($this->_menuOptions['base_url'])
-			? $this->_menuOptions['base_url']
-			: $scripturl . '?action=' . $this->_menu_context['current_action'];
+		// Set the current
+		$this->_determineCurrentAction();
 
 		$this->_checkBaseUrl();
 
-		// If we didn't find the area we were looking for go to a default one.
-		if (isset($this->_backup_area) && empty($this->_found_section))
-		{
-			$this->_menu_context['current_area'] = $this->_backup_area;
-		}
-
-		// If still no data then return - nothing to show!
-		if (empty($this->_menu_context['sections']))
-		{
-			// Never happened!
-			$context['max_menu_id']--;
-			if ($context['max_menu_id'] == 0)
-			{
-				unset($context['max_menu_id']);
-			}
-
+		if (!$this->_validateData())
 			return false;
-		}
-
-		// What type of menu is this?
-		if (empty($this->_menuOptions['menu_type']))
-		{
-			$this->_menuOptions['menu_type'] = '_' . (empty($options['use_sidebar_menu']) ? 'dropdown' : 'sidebar');
-			$this->_menu_context['can_toggle_drop_down'] = !$user_info['is_guest'] && isset($settings['theme_version']) && $settings['theme_version'] >= 2.0;
-		}
-		else
-		{
-			$this->_menu_context['can_toggle_drop_down'] = !empty($this->_menuOptions['can_toggle_drop_down']);
-		}
-
-		// Almost there - load the template and add to the template layers.
-		loadTemplate(isset($this->_menuOptions['template_name']) ? $this->_menuOptions['template_name'] : 'GenericMenu');
-		$this->_menu_context['layer_name'] = (isset($this->_menuOptions['layer_name']) ? $this->_menuOptions['layer_name'] : 'generic_menu') . $this->_menuOptions['menu_type'];
-		Template_Layers::getInstance()->add($this->_menu_context['layer_name']);
-
-		// Check we had something - for sanity sake.
-		if (empty($this->_include_data))
-		{
-			return false;
-		}
-
-		// Set it all to context for template consumption
-		$context['menu_data_' . $context['max_menu_id']] = $this->_menu_context;
 
 		// Finally - return information on the selected item.
 		$this->_include_data += array(
@@ -202,6 +108,41 @@ Class Menu
 		);
 
 		return $this->_include_data;
+	}
+
+	private function _validateData()
+	{
+		global $context;
+
+		// If we didn't find the area we were looking for go to a default one.
+		if (isset($this->_backup_area) && empty($this->_found_section))
+		{
+			$this->_menu_context['current_area'] = $this->_backup_area;
+		}
+
+		// If still no data then reset - nothing to show!
+		if (empty($this->_menu_context['sections']))
+		{
+			// Never happened!
+			$this->_menu_context = array();
+			$this->_max_menu_id--;
+			$context['max_menu_id'] = $this->_max_menu_id;
+
+			if ($this->_max_menu_id === 0)
+			{
+				unset($context['max_menu_id']);
+			}
+
+			return false;
+		}
+
+		// Check we had something - for sanity sake.
+		if (empty($this->_include_data))
+		{
+			return false;
+		}
+
+		return true;
 	}
 
 	/**
@@ -630,12 +571,26 @@ Class Menu
 		return $first_sa;
 	}
 
+	private function _determineCurrentAction()
+	{
+		// Ensure we have a current subaction defined
+		if (!isset($this->_current_subaction) && isset($this->_menu_context['current_subsection']))
+		{
+			$this->_current_subaction = $this->_menu_context['current_subsection'];
+		}
+	}
+
 	/**
-	 * 	If there is a current section, checks if the base menu has an url
+	 *    If there is a current section, checks if the base menu has an url
 	 */
 	private function _checkBaseUrl()
 	{
-		global $context;
+		global $scripturl;
+
+		// Should we use a custom base url, or use the default?
+		$this->_menu_context['base_url'] = isset($this->_menuOptions['base_url'])
+			? $this->_menuOptions['base_url']
+			: $scripturl . '?action=' . $this->_menu_context['current_action'];
 
 		// If there are sections quickly goes through all the sections to check if the base menu has an url
 		if (!empty($this->_menu_context['current_section']))
@@ -643,9 +598,9 @@ Class Menu
 			$this->_menu_context['sections'][$this->_menu_context['current_section']]['selected'] = true;
 			$this->_menu_context['sections'][$this->_menu_context['current_section']]['areas'][$this->_menu_context['current_area']]['selected'] = true;
 
-			if (!empty($this->_menu_context['sections'][$this->_menu_context['current_section']]['areas'][$this->_menu_context['current_area']]['subsections'][$context['current_subaction']]))
+			if (!empty($this->_menu_context['sections'][$this->_menu_context['current_section']]['areas'][$this->_menu_context['current_area']]['subsections'][$this->_current_subaction]))
 			{
-				$this->_menu_context['sections'][$this->_menu_context['current_section']]['areas'][$this->_menu_context['current_area']]['subsections'][$context['current_subaction']]['selected'] = true;
+				$this->_menu_context['sections'][$this->_menu_context['current_section']]['areas'][$this->_menu_context['current_area']]['subsections'][$this->_current_subaction]['selected'] = true;
 			}
 
 			foreach ($this->_menu_context['sections'] as $this->_section_id => $this->_section)
@@ -665,6 +620,92 @@ Class Menu
 	}
 
 	/**
+	 * Add the base menu options for this menu
+	 *
+	 * @param array $menuOptions an array of options that can be used to override some default behaviours.
+	 * It can accept the following indexes:
+	 *      - action                    => overrides the default action
+	 *      - current_area              => overrides the current area
+	 *      - extra_url_parameters      => an array or pairs or parameters to be added to the url
+	 *      - disable_url_session_check => (boolean) if true the session var/id are omitted from the url
+	 *      - base_url                  => an alternative base url
+	 *      - menu_type                 => alternative menu types?
+	 *      - can_toggle_drop_down      => (boolean) if the menu can "toggle"
+	 *      - template_name             => an alternative template to load (instead of Generic)
+	 *      - layer_name                => alternative layer name for the menu
+	 *      - hook                      => hook name to call integrate_ . 'hook name' . '_areas'
+	 *      - default_include_dir       => directory to include for function support
+	 */
+	public function addOptions($menuOptions = array())
+	{
+		$this->_menuOptions = $menuOptions;
+	}
+
+	/**
+	 * Add the data the is used to build the menu
+	 *
+	 * @param array $menuData the menu array
+	 *   Possible indexes:
+	 *   Menu name with named indexes as follows:
+	 *        - string $title       => Section title
+	 *        - bool $enabled       => Is the section enabled / shown
+	 *        - array $this->_areas => Array of areas within this menu section, see below
+	 *        - array $permission   => Permission required to access the whole section
+	 *
+	 *   areas sub array from above, named indexes as follows:
+	 *        - array $permission  => Array of permissions to determine who can access this area
+	 *        - string $label      => Optional text string for link (Otherwise $txt[$index] will be used)
+	 *        - string $controller => Name of controller required for this area
+	 *        - string $function   => Method in controller to call when area is selected
+	 *        - string $icon       => File name of an icon to use on the menu, if using a class set as transparent.png
+	 *        - string $class      => CSS class name to apply to the icon img, used to apply a sprite icon
+	 *        - string $custom_url => URL to call for this menu item
+	 *        - bool $enabled      => Should this area even be enabled / accessible?
+	 *        - bool $hidden       => If the area is visible in the menu
+	 *        - string $select     => If set, references another area
+	 *        - array $subsections => Array of subsections for this menu area, see below
+	 *
+	 *   subsections sub array from above, unnamed indexes interpreted as follows, single named index 'enabled'
+	 *        - string 0           => Label for this subsection
+	 *        - array 1            => Array of permissions to check for this subsection.
+	 *        - bool 2             => Is this the default subaction - if not set for any will default to first...
+	 *        - bool enabled       => Enabled or not
+	 *        - array active       => Set the button active for other subsections.
+	 *        - string url         => Custom url for the subsection
+	 *
+	 */
+	public function addAreas($menuData)
+	{
+		$this->_menuData = $menuData;
+	}
+
+	public function setContext()
+	{
+		global $user_info, $settings, $options, $context;
+
+		// What type of menu is this, dropdown or sidebar
+		if (empty($this->_menuOptions['menu_type']))
+		{
+			$this->_menuOptions['menu_type'] = '_' . (empty($options['use_sidebar_menu']) ? 'dropdown' : 'sidebar');
+			$this->_menu_context['can_toggle_drop_down'] = !$user_info['is_guest'] && isset($settings['theme_version']) && $settings['theme_version'] >= 2.0;
+		}
+		else
+		{
+			$this->_menu_context['can_toggle_drop_down'] = !empty($this->_menuOptions['can_toggle_drop_down']);
+		}
+
+		// Almost there - load the template and add to the template layers.
+		loadTemplate(isset($this->_menuOptions['template_name']) ? $this->_menuOptions['template_name'] : 'GenericMenu');
+		$this->_menu_context['layer_name'] = (isset($this->_menuOptions['layer_name']) ? $this->_menuOptions['layer_name'] : 'generic_menu') . $this->_menuOptions['menu_type'];
+		Template_Layers::getInstance()->add($this->_menu_context['layer_name']);
+
+		// Set it all to context for template consumption
+		$context['max_menu_id'] = $this->_max_menu_id;
+		$context['current_subaction'] = $this->_current_subaction;
+		$context['menu_data_' . $this->_max_menu_id] = $this->_menu_context;
+	}
+
+	/**
 	 * Delete a menu.
 	 *
 	 * @param string $menu_id = 'last'
@@ -675,7 +716,10 @@ Class Menu
 	{
 		global $context;
 
-		$menu_name = $menu_id == 'last' && isset($context['max_menu_id']) && isset($context['menu_data_' . $context['max_menu_id']]) ? 'menu_data_' . $context['max_menu_id'] : 'menu_data_' . $menu_id;
+		$menu_name = $menu_id === 'last' && isset($context['max_menu_id'], $context['menu_data_' . $context['max_menu_id']])
+			? 'menu_data_' . $context['max_menu_id']
+			: 'menu_data_' . $menu_id;
+
 		if (!isset($context[$menu_name]))
 		{
 			return false;
