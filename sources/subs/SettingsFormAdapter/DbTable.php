@@ -89,7 +89,7 @@ class DbTable extends Db
 			array_unshift($insertValues, $this->editId);
 		}
 
-		// Do it!!
+		// Do it!
 		$this->db->insert($update ? 'replace' : 'insert',
 			'{db_prefix}' . $this->tableName,
 			$insertVars,

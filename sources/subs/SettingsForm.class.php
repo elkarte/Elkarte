@@ -103,12 +103,12 @@ class Settings_Form
 	}
 
 	/**
-	 * @var SettingsFormAdapter
+	 * @var ElkArte\sources\subs\SettingsFormAdapter\Adapter
 	 */
 	private $adapter;
 
 	/**
-	 * @param string $adapter Will default to the file adapter if none is specified.
+	 * @param string|null $adapter Will default to the file adapter if none is specified.
 	 */
 	public function __construct($adapter = null)
 	{
@@ -118,7 +118,7 @@ class Settings_Form
 	}
 
 	/**
-	 * @return SettingsFormAdapter
+	 * @return ElkArte\sources\subs\SettingsFormAdapter\Adapter
 	 */
 	public function getAdapter()
 	{
@@ -181,7 +181,7 @@ class Settings_Form
 	/**
 	 * Helper method for saving settings.
 	 *
-	 * Uses $_POST becaause the controller may have modified this superglobal,
+	 * Uses $_POST because the controller may have modified this superglobal,
 	 * and HttpReq does not contain the newly modified information.
 	 *
 	 * @param mixed[] $configVars
@@ -197,13 +197,13 @@ class Settings_Form
 	/**
 	 * Helper method for saving database settings.
 	 *
-	 * Uses $_POST becaause the controller may have modified it,
+	 * Uses $_POST because the controller may have modified it,
 	 * and HttpReq does not contain the newly modified information.
 	 *
-	 * @param mixed[]        $configVars
-	 * @param mixed[]|object $configValues
+	 * @param array        $configVars
+	 * @param array|object $configValues
 	 */
-	public static function save_db(array $configVars, $configValues = null)
+	public static function save_db(array $configVars, $configValues = array())
 	{
 		// Just look away if you have a weak stomach
 		if ($configValues !== null)

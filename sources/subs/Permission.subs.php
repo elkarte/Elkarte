@@ -68,13 +68,13 @@ class InlinePermissions_Form extends ElkArte\sources\subs\SettingsFormAdapter\In
 	/**
 	 * Initialize a form with inline permissions settings.
 	 * It loads a context variables for each permission.
-	 * This function is used by several settings screens to set specific permissions.
+	 * This function is used by several settings screens
+	 * to set specific permissions.
 	 *
 	 * @param string[] $permissions
 	 * @param int[]    $excluded_groups = array()
 	 * @deprecated since 1.1
 	 *
-	 * @uses ManagePermissions language
 	 * @uses ManagePermissions template.
 	 */
 	public static function init_inline_permissions($permissions, $excluded_groups = array())
