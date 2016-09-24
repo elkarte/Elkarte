@@ -531,6 +531,9 @@ function sendpm($recipients, $subject, $message, $store_outbox = true, $from = n
 	else
 		$user_info['name'] = $from['name'];
 
+	// Integrated PMs
+	call_integration_hook('integrate_personal_message', array(&$recipients, &$from, &$subject, &$message));
+
 	// This is the one that will go in their inbox.
 	$htmlmessage = Util::htmlspecialchars($message, ENT_QUOTES, 'UTF-8', true);
 	preparsecode($htmlmessage);
@@ -541,9 +544,6 @@ function sendpm($recipients, $subject, $message, $store_outbox = true, $from = n
 	// Make sure is an array
 	if (!is_array($recipients))
 		$recipients = array($recipients);
-
-	// Integrated PMs
-	call_integration_hook('integrate_personal_message', array(&$recipients, &$from, &$subject, &$message));
 
 	// Get a list of usernames and convert them to IDs.
 	$usernames = array();
