@@ -22,8 +22,12 @@
 function createMenu($menuData, $menuOptions = array())
 {
 	$menu = new Menu();
+	$menu->addOptions($menuOptions);
+	$menu->addAreas($menuData);
+	$include_data = $menu->prepareMenu();
+	$menu->setContext();
 
-	return $menu->prepareMenu($menuData, $menuOptions);
+	return $include_data;
 }
 
 /**
@@ -44,7 +48,7 @@ function destroyMenu($menu_id = 'last')
  *
  * @depreciated since 1.1 use MenuCreate.class
  *
- * @param array|string $selectedMenu
+ * @param array $selectedMenu
  */
 function callMenu($selectedMenu)
 {
