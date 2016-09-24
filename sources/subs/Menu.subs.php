@@ -21,7 +21,7 @@
  */
 function createMenu($menuData, $menuOptions = array())
 {
-	$menu = new Menu();
+	$menu = Menu::instance();
 	$menu->addOptions($menuOptions);
 	$menu->addAreas($menuData);
 	$include_data = $menu->prepareMenu();

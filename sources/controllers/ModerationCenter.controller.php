@@ -274,9 +274,12 @@ class ModerationCenter_Controller extends Action_Controller
 			'default_include_dir' => CONTROLLERDIR,
 		);
 
-		$this->_menu = new Menu();
+		// Setup the menu
+		$this->_menu = Menu::instance();
 		$this->_menu->addOptions($menuOptions);
 		$this->_menu->addAreas($moderation_areas);
+
+		// Create the menu, calling integrate_moderation_areas at the start
 		$mod_include_data = $this->_menu->prepareMenu();
 		$this->_menu->setContext();
 		unset($moderation_areas);
