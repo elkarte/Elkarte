@@ -580,17 +580,21 @@ class Admin extends AbstractController
 			),
 		);
 
-		$this->_events->trigger('addMenu', array('admin_areas' => &$admin_areas));
+		// Any menu items that Modules want to add
+		$this->_getModulesMenu($admin_areas);
 
 		// Any files to include for administration?
 		call_integration_include_hook('integrate_admin_include');
 
+		// Set our menu options
 		$menuOptions = array('hook' => 'admin', 'default_include_dir' => ADMINDIR);
 
-		// Actually create the menu!
-		$menu = new Menu();
+		// Setup the menu
+		$menu = Menu::instance();
 		$menu->addOptions($menuOptions);
 		$menu->addAreas($admin_areas);
+
+		// Create the menu, calling integrate_admin_areas at the start
 		$admin_include_data = $menu->prepareMenu();
 		$menu->setContext();
 		unset($admin_areas);
@@ -626,7 +630,7 @@ class Admin extends AbstractController
 			'name' => $txt['admin_center'],
 		);
 
-		if (isset($admin_include_data['current_area']) && $admin_include_data['current_area'] != 'index')
+		if (isset($admin_include_data['current_area']) && $admin_include_data['current_area'] !== 'index')
 		{
 			$context['linktree'][] = array(
 				'url' => getUrl('admin', ['action' => 'admin', 'area' => $admin_include_data['current_area'], '{session_data}']),
