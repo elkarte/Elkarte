@@ -125,6 +125,9 @@ class Settings_Form
 		return $this->adapter;
 	}
 
+	/**
+	 * @deprecated since 1.1
+	 */
 	public function prepare_file()
 	{
 		if (!$this->adapter instanceof ElkArte\sources\subs\SettingsFormAdapter\File)
@@ -142,6 +145,8 @@ class Settings_Form
 
 	/**
 	 * Helper method, it sets up the context for database settings.
+	 *
+	 * @deprecated since 1.1
 	 *
 	 * @param mixed[] $configVars
 	 */
@@ -184,6 +189,8 @@ class Settings_Form
 	 * Uses $_POST because the controller may have modified this superglobal,
 	 * and HttpReq does not contain the newly modified information.
 	 *
+	 * @deprecated since 1.1
+	 *
 	 * @param mixed[] $configVars
 	 */
 	public static function save_file(array $configVars)
@@ -199,6 +206,8 @@ class Settings_Form
 	 *
 	 * Uses $_POST because the controller may have modified it,
 	 * and HttpReq does not contain the newly modified information.
+	 *
+	 * @deprecated since 1.1
 	 *
 	 * @param array        $configVars
 	 * @param array|object $configValues
@@ -233,6 +242,8 @@ class Settings_Form
 	 *  - either, variable name, description, type (constant), size/possible values, helptext.
 	 *  - either, an empty string for a horizontal rule.
 	 *  - or, a string for a titled section.
+	 *
+	 * @deprecated since 1.1
 	 *
 	 * @param mixed[]|null $configVars = null array of config vars, if null the method returns the current
 	 *                                  configuration
