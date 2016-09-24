@@ -196,7 +196,7 @@ class ManageBans_Controller extends Action_Controller
 						'value' => $txt['ban_added'],
 					),
 					'data' => array(
-						'function' => function($rowData) {
+						'function' => function ($rowData) {
 							global $context;
 							return standardTime($rowData['ban_time'], empty($context['ban_time_format']) ? true : $context['ban_time_format']);
 						},
@@ -211,7 +211,7 @@ class ManageBans_Controller extends Action_Controller
 						'value' => $txt['ban_expires'],
 					),
 					'data' => array(
-						'function' => function($rowData) {
+						'function' => function ($rowData) {
 							global $txt;
 
 							// This ban never expires...whahaha.
@@ -600,7 +600,7 @@ class ManageBans_Controller extends Action_Controller
 						'value' => $txt['ban_log_date'],
 					),
 					'data' => array(
-						'function' => function($rowData) {
+						'function' => function ($rowData) {
 							return standardTime($rowData['log_time']);
 						},
 					),
@@ -1024,7 +1024,7 @@ class ManageBans_Controller extends Action_Controller
 		if ($context['selected_entity'] === 'ip')
 		{
 			$listOptions['columns']['banned_entity']['data'] = array(
-				'function' => function($rowData) {
+				'function' => function ($rowData) {
 					return range2ip(array(
 						$rowData['ip_low1'],
 						$rowData['ip_low2'],
@@ -1054,7 +1054,7 @@ class ManageBans_Controller extends Action_Controller
 		elseif ($context['selected_entity'] === 'hostname')
 		{
 			$listOptions['columns']['banned_entity']['data'] = array(
-				'function' => function($rowData) {
+				'function' => function ($rowData) {
 					return strtr(Util::htmlspecialchars($rowData['hostname']), array('%' => '*'));
 				},
 			);
@@ -1066,7 +1066,7 @@ class ManageBans_Controller extends Action_Controller
 		elseif ($context['selected_entity'] === 'email')
 		{
 			$listOptions['columns']['banned_entity']['data'] = array(
-				'function' => function($rowData) {
+				'function' => function ($rowData) {
 					return strtr(Util::htmlspecialchars($rowData['email_address']), array('%' => '*'));
 				},
 			);

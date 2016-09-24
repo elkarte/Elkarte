@@ -929,7 +929,7 @@ class ManageNews_Controller extends Action_Controller
 		);
 
 		// Add new settings with a nice hook, makes them available for admin settings search as well
-		call_integration_hook('integrate_modify_news_settings', array(&$config_vars));
+		call_integration_hook('integrate_modify_news_settings');
 
 		return $config_vars;
 	}

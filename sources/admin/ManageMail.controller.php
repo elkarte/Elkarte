@@ -118,7 +118,7 @@ class ManageMail_Controller extends Action_Controller
 						'value' => $txt['mailqueue_subject'],
 					),
 					'data' => array(
-						'function' => function($rowData) {
+						'function' => function ($rowData) {
 							return Util::shorten_text(Util::htmlspecialchars($rowData['subject'], 50));
 						},
 						'class' => 'smalltext',
@@ -151,7 +151,7 @@ class ManageMail_Controller extends Action_Controller
 						'class' => 'centertext',
 					),
 					'data' => array(
-						'function' => function($rowData) {
+						'function' => function ($rowData) {
 							global $txt;
 
 							// We probably have a text label with your priority.
@@ -172,7 +172,7 @@ class ManageMail_Controller extends Action_Controller
 						'value' => $txt['mailqueue_age'],
 					),
 					'data' => array(
-						'function' => function($rowData) {
+						'function' => function ($rowData) {
 							return time_since(time() - $rowData['time_sent']);
 						},
 						'class' => 'smalltext',
@@ -187,7 +187,7 @@ class ManageMail_Controller extends Action_Controller
 						'value' => '<input type="checkbox" onclick="invertAll(this, this.form);" class="input_check" />',
 					),
 					'data' => array(
-						'function' => function($rowData) {
+						'function' => function ($rowData) {
 							return '<input type="checkbox" name="delete[]" value="' . $rowData['id_mail'] . '" class="input_check" />';
 						},
 						'class' => 'centertext',

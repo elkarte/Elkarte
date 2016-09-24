@@ -190,7 +190,7 @@ class ManageLanguages_Controller extends Action_Controller
 			'base_href' => $scripturl . '?action=admin;area=languages',
 			'title' => $txt['edit_languages'],
 			'data_check' => array(
-				'class' => function($rowData) {
+				'class' => function ($rowData) {
 					if ($rowData['default'])
 						return 'highlight2';
 					else
@@ -210,7 +210,7 @@ class ManageLanguages_Controller extends Action_Controller
 						'class' => 'centertext',
 					),
 					'data' => array(
-						'function' => function($rowData) {
+						'function' => function ($rowData) {
 							return '<input type="radio" name="def_language" value="' . $rowData['id'] . '" ' . ($rowData['default'] ? 'checked="checked"' : '') . ' class="input_radio" />';
 						},
 						'style' => 'width: 8%;',
@@ -222,7 +222,7 @@ class ManageLanguages_Controller extends Action_Controller
 						'value' => $txt['languages_lang_name'],
 					),
 					'data' => array(
-						'function' => function($rowData) {
+						'function' => function ($rowData) {
 							global $scripturl;
 
 							return sprintf('<a href="%1$s?action=admin;area=languages;sa=editlang;lid=%2$s">%3$s</a>', $scripturl, $rowData['id'], $rowData['name']);
@@ -538,7 +538,7 @@ class ManageLanguages_Controller extends Action_Controller
 			'id' => 'lang_main_files_list',
 			'title' => $txt['languages_download_main_files'],
 			'get_items' => array(
-				'function' => function() {
+				'function' => function () {
 					global $context;
 					return $context['files']['lang'];
 				},
@@ -549,7 +549,7 @@ class ManageLanguages_Controller extends Action_Controller
 						'value' => $txt['languages_download_filename'],
 					),
 					'data' => array(
-						'function' => function($rowData) {
+						'function' => function ($rowData) {
 							global $txt;
 
 							return '<strong>' . $rowData['name'] . '</strong><br /><span class="smalltext">' . $txt['languages_download_dest'] . ': ' . $rowData['destination'] . '</span>' . ($rowData['version_compare'] == 'older' ? '<br />' . $txt['languages_download_older'] : '');
@@ -561,7 +561,7 @@ class ManageLanguages_Controller extends Action_Controller
 						'value' => $txt['languages_download_writable'],
 					),
 					'data' => array(
-						'function' => function($rowData) {
+						'function' => function ($rowData) {
 							global $txt;
 
 							return '<span class="' . ($rowData['writable'] ? 'success' : 'error') . ';">' . ($rowData['writable'] ? $txt['yes'] : $txt['no']) . '</span>';
@@ -573,7 +573,7 @@ class ManageLanguages_Controller extends Action_Controller
 						'value' => $txt['languages_download_version'],
 					),
 					'data' => array(
-						'function' => function($rowData) {
+						'function' => function ($rowData) {
 							return '<span class="' . ($rowData['version_compare'] == 'older' ? 'error' : ($rowData['version_compare'] == 'same' ? 'softalert' : 'success')) . ';">' . $rowData['version'] . '</span>';
 						},
 					),
@@ -583,7 +583,7 @@ class ManageLanguages_Controller extends Action_Controller
 						'value' => $txt['languages_download_exists'],
 					),
 					'data' => array(
-						'function' => function($rowData) {
+						'function' => function ($rowData) {
 							global $txt;
 
 							return $rowData['exists'] ? ($rowData['exists'] == 'same' ? $txt['languages_download_exists_same'] : $txt['languages_download_exists_different']) : $txt['no'];
@@ -596,7 +596,7 @@ class ManageLanguages_Controller extends Action_Controller
 						'class' => 'centertext',
 					),
 					'data' => array(
-						'function' => function($rowData) {
+						'function' => function ($rowData) {
 							return '<input type="checkbox" name="copy_file[]" value="' . $rowData['generaldest'] . '" ' . ($rowData['default_copy'] ? 'checked="checked"' : '') . ' class="input_check" />';
 						},
 						'style' => 'width: 4%;',
@@ -686,7 +686,7 @@ class ManageLanguages_Controller extends Action_Controller
 				);
 			}
 			$dir->close();
-			usort($context['possible_files'][$theme]['files'], function($val1, $val2) {
+			usort($context['possible_files'][$theme]['files'], function ($val1, $val2) {
 				return strcmp($val1['name'], $val2['name']);
 			});
 		}

@@ -147,7 +147,7 @@ class ManageDraftsModule_Controller extends Action_Controller
 	 */
 	public static function integrate_sa_manage_maintenance(&$subActions)
 	{
-		$subActions['topics']['activities']['olddrafts'] = function() {
+		$subActions['topics']['activities']['olddrafts'] = function () {
 			$controller = new ManageDraftsModule_Controller(new Event_manager());
 			$controller->pre_dispatch();
 			$controller->action_olddrafts_display();

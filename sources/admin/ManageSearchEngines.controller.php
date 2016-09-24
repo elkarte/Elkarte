@@ -167,6 +167,19 @@ class ManageSearchEngines_Controller extends Action_Controller
 			array('select', 'show_spider_online', array($txt['show_spider_online_no'], $txt['show_spider_online_summary'], $txt['show_spider_online_detail'], $txt['show_spider_online_detail_admin'])),
 		);
 
+		require_once(SUBSDIR . '/SearchEngines.subs.php');
+		require_once(SUBSDIR . '/Membergroups.subs.php');
+
+		$groups = getBasicMembergroupData(array('globalmod', 'postgroups', 'protected', 'member'));
+		foreach ($groups as $row)
+		{
+			// Unfortunately, regular members have to be 1 because 0 is for disabled.
+			if ($row['id'] == 0)
+				$config_vars['spider_group'][2][1] = $row['name'];
+			else
+				$config_vars['spider_group'][2][$row['id']] = $row['name'];
+		}
+
 		// Notify the integration that we're preparing to mess up with search engine settings...
 		call_integration_hook('integrate_modify_search_engine_settings', array(&$config_vars));
 
@@ -243,7 +256,7 @@ class ManageSearchEngines_Controller extends Action_Controller
 						'value' => $txt['spider_name'],
 					),
 					'data' => array(
-						'function' => function($rowData) {
+						'function' => function ($rowData) {
 							global $scripturl;
 
 							return sprintf('<a href="%1$s?action=admin;area=sengines;sa=editspiders;sid=%2$d">%3$s</a>', $scripturl, $rowData['id_spider'], htmlspecialchars($rowData['spider_name'], ENT_COMPAT, 'UTF-8'));
@@ -259,7 +272,7 @@ class ManageSearchEngines_Controller extends Action_Controller
 						'value' => $txt['spider_last_seen'],
 					),
 					'data' => array(
-						'function' => function($rowData) {
+						'function' => function ($rowData) {
 							global $context, $txt;
 
 							return isset($context['spider_last_seen'][$rowData['id_spider']]) ? standardTime($context['spider_last_seen'][$rowData['id_spider']]) : $txt['spider_last_never'];
@@ -444,7 +457,7 @@ class ManageSearchEngines_Controller extends Action_Controller
 						'value' => $txt['spider_time'],
 					),
 					'data' => array(
-						'function' => function($rowData) {
+						'function' => function ($rowData) {
 							return standardTime($rowData['log_time']);
 						},
 					),

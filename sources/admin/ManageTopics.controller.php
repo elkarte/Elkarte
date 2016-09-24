@@ -70,9 +70,6 @@ class ManageTopics_Controller extends Action_Controller
 		// Initialize it with our settings
 		$settingsForm->setConfigVars($this->_settings());
 
-		// Retrieve the current config settings
-		$config_vars = $settingsForm->settings();
-
 		// Setup the template.
 		$context['sub_template'] = 'show_settings';
 

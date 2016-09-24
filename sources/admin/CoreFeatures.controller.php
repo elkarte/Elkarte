@@ -124,7 +124,7 @@ class CoreFeatures_Controller extends Action_Controller
 			'cp' => array(
 				'url' => 'action=admin;area=featuresettings;sa=profile',
 				'save_callback' => 'custom_profiles_toggle_callback',
-				'setting_callback' => function($value) {
+				'setting_callback' => function ($value) {
 					if (!$value)
 						return array(
 							'disabled_profile_fields' => '',
@@ -148,7 +148,7 @@ class CoreFeatures_Controller extends Action_Controller
 				'settings' => array(
 					'likes_enabled' => 1,
 				),
-				'setting_callback' => function($value) {
+				'setting_callback' => function ($value) {
 					global $modSettings;
 
 					require_once(SUBSDIR . '/Mentions.subs.php');
@@ -185,7 +185,7 @@ class CoreFeatures_Controller extends Action_Controller
 			// pm = post moderation.
 			'pm' => array(
 				'url' => 'action=admin;area=permissions;sa=postmod',
-				'setting_callback' => function($value) {
+				'setting_callback' => function ($value) {
 					// Cannot use warning post moderation if disabled!
 					if (!$value)
 					{
@@ -213,7 +213,7 @@ class CoreFeatures_Controller extends Action_Controller
 			// w = warning.
 			'w' => array(
 				'url' => 'action=admin;area=securitysettings;sa=moderation',
-				'setting_callback' => function($value) {
+				'setting_callback' => function ($value) {
 					global $modSettings;
 
 					list ($modSettings['warning_enable'], $modSettings['user_limit'], $modSettings['warning_decrement']) = explode(',', $modSettings['warning_settings']);
@@ -247,12 +247,12 @@ class CoreFeatures_Controller extends Action_Controller
 				'settings' => array(
 					'spider_mode' => 1,
 				),
-				'setting_callback' => function($value) {
+				'setting_callback' => function ($value) {
 					// Turn off the spider group if disabling.
 					if (!$value)
 						return array('spider_group' => 0, 'show_spider_online' => 0);
 				},
-				'on_save' => function() {
+				'on_save' => function () {
 					require_once(SUBSDIR . '/SearchEngines.subs.php');
 				},
 			),
@@ -304,7 +304,7 @@ class CoreFeatures_Controller extends Action_Controller
 
 			if (method_exists($integration['class'], 'on_save'))
 			{
-				$core_features[$integration['id']]['on_save'] = function() use ($integration) {
+				$core_features[$integration['id']]['on_save'] = function () use ($integration) {
 					$integration['class']::on_save();
 				};
 			}
@@ -454,7 +454,7 @@ class CoreFeatures_Controller extends Action_Controller
 		}
 
 		// Sort by title attribute
-		uasort($features, function($a, $b) {
+		uasort($features, function ($a, $b) {
 			return strcmp(strtolower($a['title']), strtolower($b['title']));
 		});
 

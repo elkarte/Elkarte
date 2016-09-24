@@ -88,7 +88,8 @@ class AddonSettings_Controller extends Action_Controller
 		$settingsForm = new Settings_Form(Settings_Form::DB_ADAPTER);
 
 		// initialize it with our existing settings. If any.
-		$settingsForm->setConfigVars($this->_settings());
+		$config_vars = $this->_settings();
+		$settingsForm->setConfigVars($config_vars);
 
 		if (empty($config_vars))
 		{
@@ -98,8 +99,6 @@ class AddonSettings_Controller extends Action_Controller
 
 		$context['post_url'] = $scripturl . '?action=admin;area=addonsettings;save;sa=general';
 		$context['settings_title'] = $txt['mods_cat_modifications_misc'];
-
-		return;
 
 		// Saving?
 		if (isset($this->_req->query->save))

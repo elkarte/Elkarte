@@ -371,7 +371,7 @@ class ManageScheduledTasks_Controller extends Action_Controller
 						'value' => $txt['scheduled_log_time_run'],
 					),
 					'data' => array(
-						'function' => function($rowData) {
+						'function' => function ($rowData) {
 							return standardTime($rowData['time_run'], true);
 						},
 					),

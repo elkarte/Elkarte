@@ -163,7 +163,7 @@ class ManageCalendarModule_Controller extends Action_Controller
 						'value' => $txt['date'],
 					),
 					'data' => array(
-						'function' => function($rowData) {
+						'function' => function ($rowData) {
 							global $txt;
 
 							// Recurring every year or just a single year?

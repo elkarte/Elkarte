@@ -149,11 +149,8 @@ class ManageSecurity_Controller extends Action_Controller
 		$settingsForm = new Settings_Form(Settings_Form::DB_ADAPTER);
 
 		// Initialize it with our settings
-		$settingsForm->setConfigVars($this->_moderationSettings());
-
-		// Cannot use moderation if post moderation is not enabled.
-		if (!$modSettings['postmod_active'])
-			unset($config_vars['moderate']);
+		$config_vars = $this->_settings();
+		$settingsForm->setConfigVars($config_vars);
 
 		// Saving?
 		if (isset($this->_req->query->save))
@@ -181,6 +178,7 @@ class ManageSecurity_Controller extends Action_Controller
 
 			call_integration_hook('integrate_save_moderation_settings');
 
+			$settingsForm->setConfigVars($config_vars);
 			$settingsForm->setConfigValues((array) $this->_req->post);
 			$settingsForm->save();
 			redirectexit('action=admin;area=securitysettings;sa=moderation');
@@ -209,7 +207,8 @@ class ManageSecurity_Controller extends Action_Controller
 		$settingsForm = new Settings_Form(Settings_Form::DB_ADAPTER);
 
 		// Initialize it with our settings
-		$settingsForm->setConfigVars($this->_spamSettings());
+		$config_vars = $this->_settings();
+		$settingsForm->setConfigVars($config_vars);
 
 		// Saving?
 		if (isset($this->_req->query->save))
@@ -217,7 +216,7 @@ class ManageSecurity_Controller extends Action_Controller
 			checkSession();
 
 			// Fix PM settings.
-			$settingsForm = (int) $this->_req->post->max_pm_recipients . ',' . (int) $this->_req->post->pm_posts_verification . ',' . (int) $this->_req->post->pm_posts_per_hour;
+			$this->_req->post->pm_spam_settings = (int) $this->_req->post->max_pm_recipients . ',' . (int) $this->_req->post->pm_posts_verification . ',' . (int) $this->_req->post->pm_posts_per_hour;
 
 			// Guest requiring verification!
 			if (empty($this->_req->post->posts_require_captcha) && !empty($this->_req->post->guests_require_captcha))
@@ -292,8 +291,6 @@ class ManageSecurity_Controller extends Action_Controller
 			if (!empty($modSettings[$list . '_desc']))
 				$context[$list . '_desc'] = Util::unserialize($modSettings[$list . '_desc']);
 		}
-
-		$config_vars = $settingsForm->settings();
 
 		// Saving?
 		if (isset($this->_req->query->save))
@@ -425,7 +422,7 @@ class ManageSecurity_Controller extends Action_Controller
 	 */
 	private function _spamSettings()
 	{
-		global $txt;
+		global $txt, $modSettings;
 
 		// Build up our options array
 		$config_vars = array(
@@ -441,6 +438,10 @@ class ManageSecurity_Controller extends Action_Controller
 				'pm2' => array('int', 'pm_posts_verification', 'postinput' => $txt['pm_posts_verification_note']),
 				'pm3' => array('int', 'pm_posts_per_hour', 'postinput' => $txt['pm_posts_per_hour_note']),
 		);
+
+		// Cannot use moderation if post moderation is not enabled.
+		if (!$modSettings['postmod_active'])
+			unset($config_vars['moderate']);
 
 		require_once(SUBSDIR . '/VerificationControls.class.php');
 		$known_verifications = loadVerificationControls();

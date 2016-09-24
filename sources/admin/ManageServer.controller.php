@@ -148,7 +148,7 @@ class ManageServer_Controller extends Action_Controller
 		global $scripturl, $context, $txt;
 
 		// Initialize the form
-		$this->_generalSettingsForm = new Settings_Form(Settings_Form::FILE_ADAPTER);
+		$settingsForm = new Settings_Form(Settings_Form::FILE_ADAPTER);
 
 		// Initialize it with our settings
 		$settingsForm->setConfigVars($this->_generalSettings());
@@ -189,7 +189,10 @@ class ManageServer_Controller extends Action_Controller
 		global $scripturl, $context, $txt;
 
 		// Initialize the form
-		$this->_initDatabaseSettingsForm();
+		$settingsForm = new Settings_Form(Settings_Form::FILE_ADAPTER);
+
+		// Initialize it with our settings
+		$settingsForm->setConfigVars($this->_databaseSettings ());
 
 		// Setup the template stuff.
 		$context['post_url'] = $scripturl . '?action=admin;area=serversettings;sa=database;save';
@@ -221,7 +224,7 @@ class ManageServer_Controller extends Action_Controller
 		global $context, $scripturl, $txt, $modSettings, $cookiename, $user_settings, $boardurl;
 
 		// Initialize the form
-		$this->_cookieSettingsForm = new Settings_Form(Settings_Form::FILE_ADAPTER);
+		$settingsForm = new Settings_Form(Settings_Form::FILE_ADAPTER);
 
 		// Initialize it with our settings
 		$settingsForm->setConfigVars($this->_cookieSettings());
@@ -269,7 +272,7 @@ class ManageServer_Controller extends Action_Controller
 		hideGlobalCookies();
 
 		// Update when clicked
-		$("#localCookies, #globalCookies").click(function() {
+		$("#localCookies, #globalCookies").click(function () {
 			hideGlobalCookies();
 		});', true);
 
@@ -288,7 +291,7 @@ class ManageServer_Controller extends Action_Controller
 		global $context, $scripturl, $txt;
 
 		// Initialize the form
-		$this->_cacheSettingsForm = new Settings_Form(Settings_Form::FILE_ADAPTER);
+		$settingsForm = new Settings_Form(Settings_Form::FILE_ADAPTER);
 
 		// Initialize it with our settings
 		$settingsForm->setConfigVars($this->_cacheSettings());

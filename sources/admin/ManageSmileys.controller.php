@@ -258,7 +258,7 @@ class ManageSmileys_Controller extends Action_Controller
 						'class' => 'centertext',
 					),
 					'data' => array(
-						'function' => function($rowData) {
+						'function' => function ($rowData) {
 							return $rowData['selected'] ? '<i class="icon i-check"></i>' : '';
 						},
 						'class' => 'centertext',
@@ -315,7 +315,7 @@ class ManageSmileys_Controller extends Action_Controller
 						'class' => 'centertext',
 					),
 					'data' => array(
-						'function' => function($rowData) {
+						'function' => function ($rowData) {
 							return $rowData['id'] == 0 ? '' : sprintf('<input type="checkbox" name="smiley_set[%1$d]" class="input_check" />', $rowData['id']);
 						},
 						'class' => 'centertext',
@@ -929,7 +929,7 @@ class ManageSmileys_Controller extends Action_Controller
 							'value' => $txt['smileys_location'],
 						),
 						'data' => array(
-							'function' => function($rowData) {
+							'function' => function ($rowData) {
 								global $txt;
 
 								if (empty($rowData['hidden']))
@@ -950,7 +950,7 @@ class ManageSmileys_Controller extends Action_Controller
 							'value' => $txt['smileys_description'],
 						),
 						'data' => array(
-							'function' => function($rowData) {
+							'function' => function ($rowData) {
 								global $context, $txt, $modSettings;
 
 								if (empty($modSettings['smileys_dir']) || !is_dir($modSettings['smileys_dir']))

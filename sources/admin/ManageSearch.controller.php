@@ -120,13 +120,6 @@ class ManageSearch_Controller extends Action_Controller
 		// Initialize it with our settings
 		$settingsForm->setConfigVars($this->_settings());
 
-		// Perhaps the search method wants to add some settings?
-		$search = new \ElkArte\Search\Search();
-		$searchAPI = $search->findSearchAPI();
-
-		if (is_callable(array($searchAPI, 'searchSettings')))
-			call_user_func_array($searchAPI->searchSettings, array(&$config_vars));
-
 		$context['page_title'] = $txt['search_settings_title'];
 		$context['sub_template'] = 'show_settings';
 
@@ -201,6 +194,13 @@ class ManageSearch_Controller extends Action_Controller
 				array('title', 'additional_search_engines'),
 				array('callback', 'external_search_engines'),
 		);
+
+		// Perhaps the search method wants to add some settings?
+		$search = new \ElkArte\Search\Search();
+		$searchAPI = $search->findSearchAPI();
+
+		if (is_callable(array($searchAPI, 'searchSettings')))
+			call_user_func_array($searchAPI->searchSettings);
 
 		// Add new settings with a nice hook, makes them available for admin settings search as well
 		call_integration_hook('integrate_modify_search_settings', array(&$config_vars));

@@ -816,9 +816,9 @@ class Package_Actions extends Action_Controller
 		if (isset($this->_action['hook'], $this->_action['function']))
 		{
 			if ($this->_action['reverse'])
-				remove_integration_function($this->_action['hook'], $this->_action['function'], $this->_action['include_file']);
+				remove_integration_function ($this->_action['hook'], $this->_action['function'], $this->_action['include_file']);
 			else
-				add_integration_function($this->_action['hook'], $this->_action['function'], $this->_action['include_file']);
+				add_integration_function ($this->_action['hook'], $this->_action['function'], $this->_action['include_file']);
 		}
 	}
 
