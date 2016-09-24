@@ -262,7 +262,6 @@ Class Menu_Create
 	 */
 	protected function processMenuData()
 	{
-
 		// Now setup the context correctly.
 		foreach ($this->_menuData as $this->_section_id => $this->_section)
 		{
@@ -583,7 +582,7 @@ Class Menu_Create
 	}
 
 	/**
-	 * Does teh subsection have a custom url ?
+	 * Does the subsection have a custom url ?
 	 */
 	private function _setSubsSectionUrl()
 	{
@@ -691,8 +690,8 @@ Class Menu_Create
 	 * Call the function or method for the selected menu item.
 	 * $selectedMenu is the array of menu information, with the format as retrieved from createMenu()
 	 *
-	 * If $selectedMenu['controller'] is set, then it is a class, and $selectedMenu['function'] will be a method of it.
-	 * If it is not set, then $selectedMenu['function'] is simply a function to call.
+	 * If $selectedMenu ['controller'] is set, then it is a class, and $selectedMenu['function'] will be a method of it.
+	 * If it is not set, then $selectedMenu ['function'] is simply a function to call.
 	 *
 	 * @param array|bool $selectedMenu
 	 */
