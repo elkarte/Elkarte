@@ -20,22 +20,107 @@
  */
 Class Menu
 {
+	/**
+	 * instnace of HttpReq
+	 * @var HttpReq
+	 */
 	protected $_req;
-	protected $_menuOptions;
-	protected $_menuData;
+
+	/**
+	 * Will hold the created $context
+	 * @var array
+	 */
 	protected $_menu_context = array();
+
+	/**
+	 * Used for profile menu for own / any
+	 * @var string
+	 */
 	protected $_permission_set;
+
+	/**
+	 * If we found the menu item selected
+	 * @var bool
+	 */
 	protected $_found_section;
+
+	/**
+	 * If we can't find the selection, we pick for them
+	 * @var string
+	 */
 	protected $_backup_area = '';
+
+	/**
+	 * The current subaction of the system
+	 * @var string
+	 */
 	protected $_current_subaction;
+
+	/**
+	 * Will hold the selected menu data that is returned to the caller
+	 * @var array
+	 */
 	private $_include_data = array();
+
+	/**
+	 * Loop id for menu
+	 * @var string
+	 */
 	private $_section_id;
+
+	/**
+	 * Loop data for menu
+	 * @var array
+	 */
 	private $_section;
+
+	/**
+	 * Loop id for a specific menu level
+	 * @var
+	 */
 	private $_area_id;
+
+	/**
+	 * Loop data for the menu level
+	 * @var array
+	 */
 	private $_area;
+
+	/**
+	 * Loop id for the subaction of a menu
+	 * @var string
+	 */
 	private $_sa;
+
+	/**
+	 * Loop data for the subaction
+	 * @var array
+	 */
 	private $_sub;
+
+	/**
+	 * Unique menu number
+	 * @var int
+	 */
 	private $_max_menu_id;
+
+	/**
+	 * Hey its me, the menu object
+	 * @var Menu
+	 */
+	private static $_instance;
+
+	/**
+	 * Holds menu options set by AddOptions
+	 * @var array
+	 */
+	public $menuOptions = array();
+
+	/**
+	 * Holds menu definition structure set by AddAreas
+	 * @var array
+	 */
+	public $menuData = array();
 
 	/**
 	 * Menu_Create constructor.
@@ -161,9 +246,11 @@ Class Menu
 	private function _integrationHook()
 	{
 		// Allow extend *any* menu with a single hook
-		if (!empty($this->_menuOptions['hook']))
+		if (!empty($this->menuOptions['hook']))
 		{
-			call_integration_hook('integrate_' . $this->_menuOptions['hook'] . '_areas', array(&$this->_menuData, &$this->_menuOptions));
+			global $modSettings;
+			$modSettings['integrate_admin_areas'] = 'blabla';
+			call_integration_hook('integrate_' . $this->menuOptions['hook'] . '_areas', array(&$this->menuData, &$this->menuOptions));
 		}
 	}
 
@@ -175,15 +262,15 @@ Class Menu
 		global $context;
 
 		// What is the general action of this menu i.e. $scripturl?action=XYZ.
-		$this->_menu_context['current_action'] = isset($this->_menuOptions['action'])
-			? $this->_menuOptions['action']
+		$this->_menu_context['current_action'] = isset($this->menuOptions['action'])
+			? $this->menuOptions['action']
 			: $context['current_action'];
 
 		// What is the current area selected?
-		if (isset($this->_menuOptions['current_area']) || isset($this->_req->query->area))
+		if (isset($this->menuOptions['current_area']) || isset($this->_req->query->area))
 		{
-			$this->_menu_context['current_area'] = isset($this->_menuOptions['current_area'])
-				? $this->_menuOptions['current_area']
+			$this->_menu_context['current_area'] = isset($this->menuOptions['current_area'])
+				? $this->menuOptions['current_area']
 				: $this->_req->query->area;
 		}
 
@@ -200,16 +287,16 @@ Class Menu
 
 		$this->_menu_context['extra_parameters'] = '';
 
-		if (!empty($this->_menuOptions['extra_url_parameters']))
+		if (!empty($this->menuOptions['extra_url_parameters']))
 		{
-			foreach ($this->_menuOptions['extra_url_parameters'] as $key => $value)
+			foreach ($this->menuOptions['extra_url_parameters'] as $key => $value)
 			{
 				$this->_menu_context['extra_parameters'] .= ';' . $key . '=' . $value;
 			}
 		}
 
 		// Only include the session ID in the URL if it's strictly necessary.
-		if (empty($this->_menuOptions['disable_url_session_check']))
+		if (empty($this->menuOptions['disable_url_session_check']))
 		{
 			$this->_menu_context['extra_parameters'] .= ';' . $context['session_var'] . '=' . $context['session_id'];
 		}
@@ -223,7 +310,7 @@ Class Menu
 	protected function processMenuData()
 	{
 		// Now setup the context correctly.
-		foreach ($this->_menuData as $this->_section_id => $this->_section)
+		foreach ($this->menuData as $this->_section_id => $this->_section)
 		{
 			// Is this section enabled? and do they have permissions?
 			if (!$this->_sectionEnabled() || !$this->_menuPermissions($this->_section))
@@ -369,7 +456,7 @@ Class Menu
 	{
 		if (!empty($this->_area['file']))
 		{
-			$this->_area['file'] = (!empty($this->_area['dir']) ? $this->_area['dir'] : (!empty($this->_menuOptions['default_include_dir']) ? $this->_menuOptions['default_include_dir'] : CONTROLLERDIR)) . '/' . $this->_area['file'];
+			$this->_area['file'] = (!empty($this->_area['dir']) ? $this->_area['dir'] : (!empty($this->menuOptions['default_include_dir']) ? $this->menuOptions['default_include_dir'] : CONTROLLERDIR)) . '/' . $this->_area['file'];
 		}
 	}
 
@@ -399,9 +486,9 @@ Class Menu
 
 		if (!isset($this->_menu_context['sections'][$this->_section_id]))
 		{
-			if (isset($this->_menuOptions['counters'], $this->_section['counter']) && !empty($this->_menuOptions['counters'][$this->_section['counter']]))
+			if (isset($this->menuOptions['counters'], $this->_section['counter']) && !empty($this->menuOptions['counters'][$this->_section['counter']]))
 			{
-				$this->_section['title'] .= sprintf($settings['menu_numeric_notice'][0], $this->_menuOptions['counters'][$this->_section['counter']]);
+				$this->_section['title'] .= sprintf($settings['menu_numeric_notice'][0], $this->menuOptions['counters'][$this->_section['counter']]);
 			}
 
 			$this->_menu_context['sections'][$this->_section_id]['title'] = $this->_section['title'];
@@ -411,9 +498,9 @@ Class Menu
 			'label' => isset($this->_area['label']) ? $this->_area['label'] : $txt[$this->_area_id]
 		);
 
-		if (isset($this->_menuOptions['counters'], $this->_area['counter']) && !empty($this->_menuOptions['counters'][$this->_area['counter']]))
+		if (isset($this->menuOptions['counters'], $this->_area['counter']) && !empty($this->menuOptions['counters'][$this->_area['counter']]))
 		{
-			$this->_menu_context['sections'][$this->_section_id]['areas'][$this->_area_id]['label'] .= sprintf($settings['menu_numeric_notice'][1], $this->_menuOptions['counters'][$this->_area['counter']]);
+			$this->_menu_context['sections'][$this->_section_id]['areas'][$this->_area_id]['label'] .= sprintf($settings['menu_numeric_notice'][1], $this->menuOptions['counters'][$this->_area['counter']]);
 		}
 
 		// We'll need the ID as well...
@@ -477,9 +564,9 @@ Class Menu
 
 					// sub[0] is a string containing the label for this subsection
 					$this->_menu_context['sections'][$this->_section_id]['areas'][$this->_area_id]['subsections'][$this->_sa] = array('label' => $this->_sub[0]);
-					if (isset($this->_menuOptions['counters'], $this->_sub['counter']) && !empty($this->_menuOptions['counters'][$this->_sub['counter']]))
+					if (isset($this->menuOptions['counters'], $this->_sub['counter']) && !empty($this->menuOptions['counters'][$this->_sub['counter']]))
 					{
-						$this->_menu_context['sections'][$this->_section_id]['areas'][$this->_area_id]['subsections'][$this->_sa]['label'] .= sprintf($settings['menu_numeric_notice'][2], $this->_menuOptions['counters'][$this->_sub['counter']]);
+						$this->_menu_context['sections'][$this->_section_id]['areas'][$this->_area_id]['subsections'][$this->_sa]['label'] .= sprintf($settings['menu_numeric_notice'][2], $this->menuOptions['counters'][$this->_sub['counter']]);
 					}
 
 					$this->_setSubsSectionUrl();
@@ -580,8 +667,8 @@ Class Menu
 		global $scripturl;
 
 		// Should we use a custom base url, or use the default?
-		$this->_menu_context['base_url'] = isset($this->_menuOptions['base_url'])
-			? $this->_menuOptions['base_url']
+		$this->_menu_context['base_url'] = isset($this->menuOptions['base_url'])
+			? $this->menuOptions['base_url']
 			: $scripturl . '?action=' . $this->_menu_context['current_action'];
 
 		// If there are sections quickly goes through all the sections to check if the base menu has an url
@@ -628,9 +715,9 @@ Class Menu
 	 *      - hook                      => hook name to call integrate_ . 'hook name' . '_areas'
 	 *      - default_include_dir       => directory to include for function support
 	 */
-	public function addOptions($menuOptions = array())
+	public function addOptions($menuOptions)
 	{
-		$this->_menuOptions = $menuOptions;
+		$this->menuOptions = array_merge($this->menuOptions, $menuOptions);
 	}
 
 	/**
@@ -668,7 +755,7 @@ Class Menu
 	 */
 	public function addAreas($menuData)
 	{
-		$this->_menuData = $menuData;
+		$this->menuData = array_merge_recursive($this->menuData, $menuData);
 	}
 
 	/**
@@ -684,19 +771,19 @@ Class Menu
 		global $user_info, $settings, $options, $context;
 
 		// What type of menu is this, dropdown or sidebar
-		if (empty($this->_menuOptions['menu_type']))
+		if (empty($this->menuOptions['menu_type']))
 		{
-			$this->_menuOptions['menu_type'] = '_' . (empty($options['use_sidebar_menu']) ? 'dropdown' : 'sidebar');
+			$this->menuOptions['menu_type'] = '_' . (empty($options['use_sidebar_menu']) ? 'dropdown' : 'sidebar');
 			$this->_menu_context['can_toggle_drop_down'] = !$user_info['is_guest'] && isset($settings['theme_version']) && $settings['theme_version'] >= 2.0;
 		}
 		else
 		{
-			$this->_menu_context['can_toggle_drop_down'] = !empty($this->_menuOptions['can_toggle_drop_down']);
+			$this->_menu_context['can_toggle_drop_down'] = !empty($this->menuOptions['can_toggle_drop_down']);
 		}
 
 		// Almost there - load the template and add to the template layers.
-		loadTemplate(isset($this->_menuOptions['template_name']) ? $this->_menuOptions['template_name'] : 'GenericMenu');
-		$this->_menu_context['layer_name'] = (isset($this->_menuOptions['layer_name']) ? $this->_menuOptions['layer_name'] : 'generic_menu') . $this->_menuOptions['menu_type'];
+		loadTemplate(isset($this->menuOptions['template_name']) ? $this->menuOptions['template_name'] : 'GenericMenu');
+		$this->_menu_context['layer_name'] = (isset($this->menuOptions['layer_name']) ? $this->menuOptions['layer_name'] : 'generic_menu') . $this->menuOptions['menu_type'];
 		Template_Layers::getInstance()->add($this->_menu_context['layer_name']);
 
 		// Set it all to context for template consumption
@@ -765,5 +852,18 @@ Class Menu
 			// A single function name... call it over!
 			$selectedMenu['function']();
 		}
+	}
+
+	/**
+	 * Retrieve easily the sole instance of this class.
+	 *
+	 * @return Menu
+	 */
+	public static function instance()
+	{
+		if (self::$_instance === null)
+			self::$_instance = new Menu();
+
+		return self::$_instance;
 	}
 }
