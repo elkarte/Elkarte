@@ -117,9 +117,12 @@ class ManagePaid_Controller extends Action_Controller
 		require_once(SUBSDIR . '/PaidSubscriptions.subs.php');
 
 		// Initialize the form
-		$this->_init_paidSettingsForm();
+		$settingsForm = new Settings_Form(Settings_Form::DB_ADAPTER);
 
-		$config_vars = $this->_paidSettings->settings();
+		// Initialize it with our settings
+		$config_vars = $this->_settings();
+
+		$settingsForm->setConfigVars($config_vars);
 
 		// Now load all the other gateway settings.
 		$gateways = loadPaymentGateways();
@@ -191,27 +194,14 @@ class ManagePaid_Controller extends Action_Controller
 				$this->_req->post->paid_currency_code = trim($this->_req->post->paid_currency_code);
 
 				unset($config_vars['dummy_currency']);
-				Settings_Form::save_db($config_vars, $this->_req->post);
+				$settingsForm->setConfigValues($this->_req->post);
+				$settingsForm->save();
 				redirectexit('action=admin;area=paidsubscribe;sa=settings');
 			}
 		}
 
 		// Prepare the settings...
-		Settings_Form::prepare_db($config_vars);
-	}
-
-	/**
-	 * Retrieve subscriptions settings and initialize the form.
-	 */
-	private function _init_paidSettingsForm()
-	{
-		// Instantiate the form
-		$this->_paidSettings = new Settings_Form();
-
-		// Initialize it with our settings
-		$config_vars = $this->_settings();
-
-		return $this->_paidSettings->settings($config_vars);
+		$settingsForm->prepare();
 	}
 
 	/**

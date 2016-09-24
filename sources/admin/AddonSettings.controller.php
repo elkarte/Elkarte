@@ -86,7 +86,7 @@ class AddonSettings_Controller extends Action_Controller
 		$this->_initAddonSettingsForm();
 
 		// Initialize settings
-		$config_vars = $this->_addonSettings->settings();
+		$config_vars = $settingsForm->settings();
 
 		// Saving?
 		if (isset($this->_req->query->save))
@@ -100,7 +100,7 @@ class AddonSettings_Controller extends Action_Controller
 			redirectexit('action=admin;area=addonsettings;sa=general');
 		}
 
-		Settings_Form::prepare_db($config_vars);
+		$settingsForm->prepare();
 	}
 
 	/**
@@ -111,7 +111,7 @@ class AddonSettings_Controller extends Action_Controller
 		global $context, $txt, $scripturl;
 
 		// instantiate the form
-		$this->_addonSettings = new Settings_Form();
+		$settingsForm = new Settings_Form(Settings_Form::DB_ADAPTER);
 
 		// initialize it with our existing settings. If any.
 		$config_vars = $this->_settings();
@@ -125,7 +125,7 @@ class AddonSettings_Controller extends Action_Controller
 		$context['post_url'] = $scripturl . '?action=admin;area=addonsettings;save;sa=general';
 		$context['settings_title'] = $txt['mods_cat_modifications_misc'];
 
-		return $this->_addonSettings->settings($config_vars);
+		return $settingsForm->setConfigVars($config_vars);
 	}
 
 	/**

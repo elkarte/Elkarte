@@ -41,23 +41,23 @@ abstract class AbstractModel
 		global $modSettings;
 
 		$this->_db = $db;
-		$this->_modSettings = new ArrayObject($modSettings, ArrayObject::ARRAY_AS_PROPS);
+		$settingsForm = new ArrayObject($modSettings, ArrayObject::ARRAY_AS_PROPS);
 	}
 
 	/**
 	 * Method to return a $modSetting value
 	 *
 	 * - Returned value will be the value or null of the key is not set
-	 * - If you simply want a value back access it directly as $this->_modSettings->name or $this->_modSettings[name]
+	 * - If you simply want a value back access it directly as $settingsForm->name or $this->_modSettings[name]
 	 *
 	 * @param string $name The key name of the value to return
 	 * @param mixed|null $default default value to return if key value is not found
 	 */
 	protected function _loadModsettings($name = '', $default = null)
 	{
-		if (isset($this->_modSettings->{$name}))
+		if (isset($settingsForm->{$name}))
 		{
-			return $this->_modSettings->{$name};
+			return $settingsForm->{$name};
 		}
 		else
 		{

@@ -160,9 +160,12 @@ class ManageAttachments_Controller extends Action_Controller
 		global $modSettings, $scripturl, $context;
 
 		// initialize the form
-		$this->_initAttachSettingsForm();
+		$this->_attachSettingsForm = new Settings_Form(Settings_Form::DB_ADAPTER);
 
-		$config_vars = $this->_attachSettingsForm->settings();
+		// Initialize settings
+		$config_vars = $this->_settings();
+
+		$settingsForm->setConfigVars($config_vars);
 
 		addInlineJavascript('
 	var storing_type = document.getElementById(\'automanage_attachments\'),
@@ -230,30 +233,15 @@ class ManageAttachments_Controller extends Action_Controller
 
 			call_integration_hook('integrate_save_attachment_settings');
 
-			Settings_Form::save_db($config_vars, $this->_req->post);
+			$settingsForm->setConfigValues($this->_req->post);
+			$settingsForm->save();
 			redirectexit('action=admin;area=manageattachments;sa=attachments');
 		}
 
 		$context['post_url'] = $scripturl . '?action=admin;area=manageattachments;save;sa=attachments';
-		Settings_Form::prepare_db($config_vars);
+		$settingsForm->prepare();
 
 		$context['sub_template'] = 'show_settings';
-	}
-
-	/**
-	 * Initialize attachmentForm.
-	 *
-	 * - Retrieve and return the administration settings for attachments.
-	 */
-	private function _initAttachSettingsForm()
-	{
-		// Instantiate the form
-		$this->_attachSettingsForm = new Settings_Form();
-
-		// Initialize settings
-		$config_vars = $this->_settings();
-
-		return $this->_attachSettingsForm->settings($config_vars);
 	}
 
 	/**

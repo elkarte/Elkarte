@@ -195,10 +195,12 @@ class ManageFeatures_Controller extends Action_Controller
 		global $txt, $scripturl, $context;
 
 		// Initialize the form
-		$this->_initBasicSettingsForm();
+		$settingsForm = new Settings_Form(Settings_Form::DB_ADAPTER);
 
-		// Retrieve the current config settings
-		$config_vars = $this->_basicSettings->settings();
+		// Initialize it with our settings
+		$config_vars = $this->_basicSettings();
+
+		$settingsForm->setConfigVars($config_vars);
 
 		// Saving?
 		if (isset($this->_req->query->save))
@@ -211,7 +213,8 @@ class ManageFeatures_Controller extends Action_Controller
 
 			call_integration_hook('integrate_save_basic_settings');
 
-			Settings_Form::save_db($config_vars, $this->_req->post);
+			$settingsForm->setConfigValues($this->_req->post);
+			$settingsForm->save();
 
 			writeLog();
 			redirectexit('action=admin;area=featuresettings;sa=basic');
@@ -223,21 +226,7 @@ class ManageFeatures_Controller extends Action_Controller
 		// Show / hide custom jquery fields as required
 		addInlineJavascript('showhideJqueryOptions();', true);
 
-		Settings_Form::prepare_db($config_vars);
-	}
-
-	/**
-	 * Initialize basic settings form.
-	 */
-	private function _initBasicSettingsForm()
-	{
-		// Instantiate the form
-		$this->_basicSettings = new Settings_Form();
-
-		// Initialize it with our settings
-		$config_vars = $this->_basicSettings();
-
-		return $this->_basicSettings->settings($config_vars);
+		$settingsForm->prepare();
 	}
 
 	/**
@@ -250,10 +239,12 @@ class ManageFeatures_Controller extends Action_Controller
 		global $txt, $scripturl, $context, $modSettings;
 
 		// Initialize the form
-		$this->_initLayoutSettingsForm();
+		$settingsForm = new Settings_Form(Settings_Form::DB_ADAPTER);
 
-		// Retrieve the current config settings
-		$config_vars = $this->_layoutSettings->settings();
+		// Initialize it with our settings
+		$config_vars = $this->_layoutSettings();
+
+		$settingsForm->setConfigVars($config_vars);
 
 		// Saving?
 		if (isset($this->_req->query->save))
@@ -274,7 +265,8 @@ class ManageFeatures_Controller extends Action_Controller
 
 			call_integration_hook('integrate_save_layout_settings');
 
-			Settings_Form::save_db($config_vars, $this->_req->post);
+			$settingsForm->setConfigValues($this->_req->post);
+			$settingsForm->save();
 			writeLog();
 
 			redirectexit('action=admin;area=featuresettings;sa=layout');
@@ -283,21 +275,7 @@ class ManageFeatures_Controller extends Action_Controller
 		$context['post_url'] = $scripturl . '?action=admin;area=featuresettings;save;sa=layout';
 		$context['settings_title'] = $txt['mods_cat_layout'];
 
-		Settings_Form::prepare_db($config_vars);
-	}
-
-	/**
-	 * Initialize the layout settings screen from features and options admin area.
-	 */
-	private function _initLayoutSettingsForm()
-	{
-		// Instantiate the form
-		$this->_layoutSettings = new Settings_Form();
-
-		// Initialize it with our settings
-		$config_vars = $this->_layoutSettings();
-
-		return $this->_layoutSettings->settings($config_vars);
+		$settingsForm->prepare();
 	}
 
 	/**
@@ -310,10 +288,12 @@ class ManageFeatures_Controller extends Action_Controller
 		global $txt, $scripturl, $context;
 
 		// Initialize the form
-		$this->_initKarmaSettingsForm();
+		$settingsForm = new Settings_Form(Settings_Form::DB_ADAPTER);
 
-		// Retrieve the current config settings
-		$config_vars = $this->_karmaSettings->settings();
+		// Initialize it with our settings
+		$config_vars = $this->_karmaSettings();
+
+		$settingsForm->setConfigVars($config_vars);
 
 		// Saving?
 		if (isset($this->_req->query->save))
@@ -322,28 +302,15 @@ class ManageFeatures_Controller extends Action_Controller
 
 			call_integration_hook('integrate_save_karma_settings');
 
-			Settings_Form::save_db($config_vars, $this->_req->post);
+			$settingsForm->setConfigValues($this->_req->post);
+			$settingsForm->save();
 			redirectexit('action=admin;area=featuresettings;sa=karma');
 		}
 
 		$context['post_url'] = $scripturl . '?action=admin;area=featuresettings;save;sa=karma';
 		$context['settings_title'] = $txt['karma'];
 
-		Settings_Form::prepare_db($config_vars);
-	}
-
-	/**
-	 * Initializes the karma settings admin page.
-	 */
-	private function _initKarmaSettingsForm()
-	{
-		// Instantiate the form
-		$this->_karmaSettings = new Settings_Form();
-
-		// Initialize it with our settings
-		$config_vars = $this->_karmaSettings();
-
-		return $this->_karmaSettings->settings($config_vars);
+		$settingsForm->prepare();
 	}
 
 	/**
@@ -356,10 +323,12 @@ class ManageFeatures_Controller extends Action_Controller
 		global $txt, $scripturl, $context;
 
 		// Initialize the form
-		$this->_initLikesSettingsForm();
+		$settingsForm = new Settings_Form(Settings_Form::DB_ADAPTER);
 
-		// retrieve the current config settings
-		$config_vars = $this->_likesSettings->settings();
+		// Initialize it with our settings
+		$config_vars = $this->_likesSettings();
+
+		$settingsForm->setConfigVars($config_vars);
 
 		// Saving?
 		if (isset($this->_req->query->save))
@@ -368,28 +337,15 @@ class ManageFeatures_Controller extends Action_Controller
 
 			call_integration_hook('integrate_save_likes_settings');
 
-			Settings_Form::save_db($config_vars, $this->_req->post);
+			$settingsForm->setConfigValues($this->_req->post);
+			$settingsForm->save();
 			redirectexit('action=admin;area=featuresettings;sa=likes');
 		}
 
 		$context['post_url'] = $scripturl . '?action=admin;area=featuresettings;save;sa=likes';
 		$context['settings_title'] = $txt['likes'];
 
-		Settings_Form::prepare_db($config_vars);
-	}
-
-	/**
-	 * Initializes the likes settings admin page.
-	 */
-	private function _initLikesSettingsForm()
-	{
-		// Instantiate the form
-		$this->_likesSettings = new Settings_Form();
-
-		// Initialize it with our settings
-		$config_vars = $this->_likesSettings();
-
-		return $this->_likesSettings->settings($config_vars);
+		$settingsForm->prepare();
 	}
 
 	/**
@@ -399,13 +355,21 @@ class ManageFeatures_Controller extends Action_Controller
 	 */
 	public function action_notificationsSettings_display()
 	{
-		global $context, $scripturl, $modSettings;
+		global $txt, $context, $scripturl, $modSettings;
 
-		// Initialize the form
-		$this->_initMentionSettingsForm();
+		loadLanguage('Mentions');
+
+		// Instantiate the form
+		$settingsForm = new Settings_Form(Settings_Form::DB_ADAPTER);
 
 		// Initialize it with our settings
-		$config_vars = $this->_notificationsSettings->settings();
+		$config_vars = $this->_notificationsSettings();
+
+		// Some context stuff
+		$context['page_title'] = $txt['mentions_settings'];
+		$context['sub_template'] = 'show_settings';
+
+		$settingsForm->setConfigVars($config_vars);
 
 		// Saving the settings?
 		if (isset($this->_req->query->save))
@@ -476,35 +440,14 @@ class ManageFeatures_Controller extends Action_Controller
 			}
 
 			updateSettings(array('enabled_mentions' => implode(',', array_unique($enabled_mentions)), 'notification_methods' => $notification_methods));
-			Settings_Form::save_db($config_vars, $this->_req->post);
+			$settingsForm->setConfigValues($this->_req->post);
+			$settingsForm->save();
 			redirectexit('action=admin;area=featuresettings;sa=mention');
 		}
 
 		// Prepare the settings for display
 		$context['post_url'] = $scripturl . '?action=admin;area=featuresettings;save;sa=mention';
-		Settings_Form::prepare_db($config_vars);
-	}
-
-	/**
-	 * Retrieve and return all admin settings for mentions.
-	 */
-	private function _initMentionSettingsForm()
-	{
-		global $txt, $context;
-
-		loadLanguage('Mentions');
-
-		// Instantiate the form
-		$this->_notificationsSettings = new Settings_Form();
-
-		// Initialize it with our settings
-		$config_vars = $this->_notificationsSettings();
-
-		// Some context stuff
-		$context['page_title'] = $txt['mentions_settings'];
-		$context['sub_template'] = 'show_settings';
-
-		return $this->_notificationsSettings->settings($config_vars);
+		$settingsForm->prepare();
 	}
 
 	/**
@@ -517,10 +460,12 @@ class ManageFeatures_Controller extends Action_Controller
 		global $context, $txt, $modSettings, $sig_start, $scripturl;
 
 		// Initialize the form
-		$this->_initSignatureSettingsForm();
+		$settingsForm = new Settings_Form(Settings_Form::DB_ADAPTER);
 
-		// Retrieve the current config settings
-		$config_vars = $this->_signatureSettings->settings();
+		// Initialize it with our settings
+		$config_vars = $this->_signatureSettings();
+
+		$settingsForm->setConfigVars($config_vars);
 
 		// Setup the template.
 		$context['page_title'] = $txt['signature_settings'];
@@ -604,12 +549,15 @@ class ManageFeatures_Controller extends Action_Controller
 
 			call_integration_hook('integrate_save_signature_settings', array(&$sig_limits, &$bbcTags));
 
-			$this->_req->post->signature_settings = implode(',', $sig_limits) . ':' . implode(',', array_diff($bbcTags, $this->_req->post->signature_bbc_enabledTags));
+			$settingsForm = implode(',', $sig_limits) . ':' . implode(',', array_diff($bbcTags, $this->_req->post->signature_bbc_enabledTags));
 
 			// Even though we have practically no settings let's keep the convention going!
 			$save_vars = array();
 			$save_vars[] = array('text', 'signature_settings');
 
+			$settingsForm->setConfigVars($save_vars);
+			$settingsForm->setConfigValues($this->_req->post);
+			$settingsForm->save();
 			Settings_Form::save_db($save_vars, $this->_req->post);
 			redirectexit('action=admin;area=featuresettings;sa=sig');
 		}
@@ -618,21 +566,7 @@ class ManageFeatures_Controller extends Action_Controller
 		$context['settings_title'] = $txt['signature_settings'];
 		$context['settings_message'] = !empty($settings_applied) ? $txt['signature_settings_applied'] : sprintf($txt['signature_settings_warning'], $scripturl . '?action=admin;area=featuresettings;sa=sig;apply;' . $context['session_var'] . '=' . $context['session_id']);
 
-		Settings_Form::prepare_db($config_vars);
-	}
-
-	/**
-	 * Initializes signature settings form.
-	 */
-	private function _initSignatureSettingsForm()
-	{
-		// Instantiate the form
-		$this->_signatureSettings = new Settings_Form();
-
-		// Initialize it with our settings
-		$config_vars = $this->_signatureSettings();
-
-		return $this->_signatureSettings->settings($config_vars);
+		$settingsForm->prepare();
 	}
 
 	/**
@@ -1249,10 +1183,12 @@ class ManageFeatures_Controller extends Action_Controller
 		global $txt, $scripturl, $context;
 
 		// Initialize the form
-		$this->_initPMSettingsForm();
+		$settingsForm = new Settings_Form(Settings_Form::DB_ADAPTER);
 
-		// Retrieve the current config settings
-		$config_vars = $this->_PMSettings->settings();
+		// Initialize it with our settings
+		$config_vars = $this->_pmSettings();
+
+		$settingsForm->setConfigVars($config_vars);
 
 		require_once(SUBSDIR . '/PersonalMessage.subs.php');
 		loadLanguage('ManageMembers');
@@ -1273,28 +1209,15 @@ class ManageFeatures_Controller extends Action_Controller
 
 			call_integration_hook('integrate_save_pmsettings_settings');
 
-			Settings_Form::save_db($config_vars, $this->_req->post);
+			$settingsForm->setConfigValues($this->_req->post);
+			$settingsForm->save();
 			redirectexit('action=admin;area=featuresettings;sa=pmsettings');
 		}
 
 		$context['post_url'] = $scripturl . '?action=admin;area=featuresettings;save;sa=pmsettings';
 		$context['settings_title'] = $txt['personal_messages'];
 
-		Settings_Form::prepare_db($config_vars);
-	}
-
-	/**
-	 * Initializes the personal messages settings admin page.
-	 */
-	private function _initPMSettingsForm()
-	{
-		// Instantiate the form
-		$this->_PMSettings = new Settings_Form();
-
-		// Initialize it with our settings
-		$config_vars = $this->_pmSettings();
-
-		return $this->_PMSettings->settings($config_vars);
+		$settingsForm->prepare();
 	}
 
 	/**

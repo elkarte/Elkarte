@@ -227,7 +227,12 @@ class ManageMail_Controller extends Action_Controller
 		$context['sub_template'] = 'show_settings';
 
 		// Initialize the form
-		$this->_initMailSettingsForm();
+		$settingsForm = new Settings_Form(Settings_Form::DB_ADAPTER);
+
+		// Initialize it with our settings
+		$config_vars = $this->_settings();
+
+		$settingsForm->setConfigVars($config_vars);
 
 		// Piece of redundant code, for the javascript
 		$processedBirthdayEmails = array();
@@ -238,7 +243,6 @@ class ManageMail_Controller extends Action_Controller
 			$processedBirthdayEmails[$index][$element] = $value;
 		}
 
-		$config_vars = $this->_mailSettings->settings();
 
 		// Saving?
 		if (isset($this->_req->query->save))
@@ -256,13 +260,15 @@ class ManageMail_Controller extends Action_Controller
 
 			// We don't want to save the subject and body previews.
 			unset($config_vars['birthday_subject'], $config_vars['birthday_body']);
+			$settingsForm->setConfigVars($config_vars);
 			call_integration_hook('integrate_save_mail_settings');
 
 			// You can not send more per page load than you can per minute
 			if (!empty($this->_req->post->mail_batch_size))
 				$this->_req->post->mail_batch_size = min((int) $this->_req->post->mail_batch_size, (int) $this->_req->post->mail_period_limit);
 
-			Settings_Form::save_db($config_vars, (object) $postobj);
+			$settingsForm->setConfigValues($this->_req->post);
+			$settingsForm->save();
 			redirectexit('action=admin;area=mailqueue;sa=settings');
 		}
 
@@ -270,7 +276,7 @@ class ManageMail_Controller extends Action_Controller
 		$context['settings_title'] = $txt['mailqueue_settings'];
 
 		// Prepare the config form
-		Settings_Form::prepare_db($config_vars);
+		$settingsForm->prepare();
 
 		// Build a little JS so the birthday mail can be seen
 		$javascript = '
@@ -296,20 +302,6 @@ class ManageMail_Controller extends Action_Controller
 			document.getElementById(\'birthday_subject\').innerHTML = bDay[index].subject;
 			document.getElementById(\'birthday_body\').innerHTML = bDay[index].body;
 		}', true);
-	}
-
-	/**
-	 * Initialize mail administration settings.
-	 */
-	private function _initMailSettingsForm()
-	{
-		// Instantiate the form
-		$this->_mailSettings = new Settings_Form();
-
-		// Initialize it with our settings
-		$config_vars = $this->_settings();
-
-		return $this->_mailSettings->settings($config_vars);
 	}
 
 	/**

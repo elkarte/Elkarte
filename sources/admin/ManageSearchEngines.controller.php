@@ -77,9 +77,12 @@ class ManageSearchEngines_Controller extends Action_Controller
 		global $context, $txt, $scripturl;
 
 		// Initialize the form
-		$this->_initEngineSettingsForm();
+		$settingsForm = new Settings_Form(Settings_Form::DB_ADAPTER);
 
-		$config_vars = $this->_engineSettings->settings();
+		// Initialize it with our settings
+		$config_vars = $this->_settings();
+
+		$settingsForm->setConfigVars($config_vars);
 
 		// Set up a message.
 		$context['settings_message'] = sprintf($txt['spider_settings_desc'], $scripturl . '?action=admin;area=logs;sa=pruning;' . $context['session_var'] . '=' . $context['session_id']);
@@ -115,7 +118,8 @@ class ManageSearchEngines_Controller extends Action_Controller
 			call_integration_hook('integrate_save_search_engine_settings');
 
 			// save the results!
-			Settings_Form::save_db($config_vars);
+			$settingsForm->setConfigValues($this->_req->post);
+			$settingsForm->save();
 
 			// make sure to rebuild the cache with updated results
 			recacheSpiderNames();
@@ -148,21 +152,7 @@ class ManageSearchEngines_Controller extends Action_Controller
 		addInlineJavascript($javascript_function, true);
 
 		// Prepare the settings...
-		Settings_Form::prepare_db($config_vars);
-	}
-
-	/**
-	 * Initialize the form with configuration settings for search engines
-	 */
-	private function _initEngineSettingsForm()
-	{
-		// Instantiate the form
-		$this->_engineSettings = new Settings_Form();
-
-		// Initialize it with our settings
-		$config_vars = $this->_settings();
-
-		return $this->_engineSettings->settings($config_vars);
+		$settingsForm->prepare();
 	}
 
 	/**

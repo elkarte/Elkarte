@@ -1034,7 +1034,7 @@ class ManageLanguages_Controller extends Action_Controller
 
 			call_integration_hook('integrate_save_language_settings');
 
-			$this->_languageSettings->save();
+			$settingsForm->save();
 			redirectexit('action=admin;area=languages;sa=settings');
 		}
 
@@ -1055,7 +1055,7 @@ class ManageLanguages_Controller extends Action_Controller
 		}
 
 		// Fill the config array in contextual data for the template.
-		$this->_languageSettings->prepare_file();
+		$settingsForm->prepare_file();
 	}
 
 	/**
@@ -1073,13 +1073,13 @@ class ManageLanguages_Controller extends Action_Controller
 	private function _initLanguageSettingsForm()
 	{
 		// Make it happen!
-		$this->_languageSettings = new Settings_Form();
+		$settingsForm = new Settings_Form(Settings_Form::DB_ADAPTER);
 
 		// Initialize it with our settings
 		$config_vars = $this->_settings();
 
 		// Initialize the little form
-		return $this->_languageSettings->settings($config_vars);
+		return $settingsForm->setConfigVars($config_vars);
 	}
 
 	/**

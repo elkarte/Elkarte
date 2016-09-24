@@ -902,7 +902,7 @@ class ManageMaillist_Controller extends Action_Controller
 		$this->_initFiltersSettingsForm();
 
 		// Initialize it with our settings
-		$configVars = $this->_filtersSettings->settings();
+		$configVars = $settingsForm->settings();
 
 		// Saving the new or edited entry?
 		if (isset($this->_req->query->save))
@@ -979,7 +979,7 @@ class ManageMaillist_Controller extends Action_Controller
 		global $txt;
 
 		// Instantiate the extended parser form
-		$this->_filtersSettings = new Email_Settings();
+		$settingsForm = new Email_Settings();
 
 		// Set up the configVars for the form
 		$configVars = array(
@@ -996,7 +996,7 @@ class ManageMaillist_Controller extends Action_Controller
 
 		call_integration_hook('integrate_modify_maillist_filter_settings', array(&$configVars));
 
-		return $this->_filtersSettings->settings($configVars);
+		$settingsForm->settings($configVars);
 	}
 
 	/**
@@ -1291,7 +1291,7 @@ class ManageMaillist_Controller extends Action_Controller
 		$this->_initParsersSettingsForm();
 
 		// Initialize it with our settings
-		$configVars = $this->_parsersSettings->settings();
+		$configVars = $settingsForm->settings();
 
 		// Check if they are saving the changes
 		if (isset($this->_req->query->save))
@@ -1369,7 +1369,7 @@ class ManageMaillist_Controller extends Action_Controller
 		global $txt;
 
 		// Instantiate the extended parser form
-		$this->_parsersSettings = new Email_Settings();
+		$settingsForm = new Email_Settings();
 
 		// Define the menu array
 		$configVars = array(
@@ -1385,7 +1385,7 @@ class ManageMaillist_Controller extends Action_Controller
 
 		call_integration_hook('integrate_modify_maillist_parser_settings', array(&$configVars));
 
-		return $this->_parsersSettings->settings($configVars);
+		$settingsForm->settings($configVars);
 	}
 
 	/**
@@ -1435,10 +1435,12 @@ class ManageMaillist_Controller extends Action_Controller
 		}
 
 		// Initialize the maillist settings form
-		$this->_initMaillistSettingsForm();
+		$settingsForm = new Settings_Form(Settings_Form::DB_ADAPTER);
 
-		// Retrieve the config settings
-		$configVars = $this->_maillistSettings->settings();
+		// Initialize it with our settings
+		$configVars = $this->_settings();
+
+		$settingsForm->settings($configVars);
 
 		// Saving settings?
 		if (isset($this->_req->query->save))
@@ -1510,7 +1512,8 @@ class ManageMaillist_Controller extends Action_Controller
 					updateSettings(array('disallow_sendBody' => ''));
 
 				updateSettings(array('maillist_receiving_address' => serialize($maillist_receiving_address)));
-				Settings_Form::save_db($configVars, $this->_req->post);
+				$settingsForm->setConfigValues($this->_req->post);
+				$settingsForm->save();
 				writeLog();
 				redirectexit('action=admin;area=maillist;sa=emailsettings;saved');
 			}
@@ -1539,21 +1542,7 @@ class ManageMaillist_Controller extends Action_Controller
 		$context['page_title'] = $txt['ml_emailsettings'];
 		$context['post_url'] = $scripturl . '?action=admin;area=maillist;sa=emailsettings;save';
 		$context['sub_template'] = 'show_settings';
-		Settings_Form::prepare_db($configVars);
-	}
-
-	/**
-	 * Initialize Maillist settings form.
-	 */
-	private function _initMaillistSettingsForm()
-	{
-		// Instantiate the form
-		$this->_maillistSettings = new Settings_Form();
-
-		// Initialize it with our settings
-		$configVars = $this->_settings();
-
-		return $this->_maillistSettings->settings($configVars);
+		$settingsForm->prepare();
 	}
 
 	/**

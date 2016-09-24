@@ -329,9 +329,12 @@ class ManageRegistration_Controller extends Action_Controller
 		global $txt, $context, $scripturl, $modSettings;
 
 		// Initialize the form
-		$this->_init_registerSettingsForm();
+		$settingsForm = new Settings_Form(Settings_Form::DB_ADAPTER);
 
-		$config_vars = $this->_registerSettings->settings();
+		// Initialize it with our settings
+		$config_vars = $this->_settings();
+
+		$settingsForm->setConfigVars($config_vars);
 
 		// Setup the template
 		$context['sub_template'] = 'show_settings';
@@ -350,7 +353,8 @@ class ManageRegistration_Controller extends Action_Controller
 
 			call_integration_hook('integrate_save_registration_settings');
 
-			Settings_Form::save_db($config_vars, $this->_req->post);
+			$settingsForm->setConfigValues($this->_req->post);
+			$settingsForm->save();
 
 			redirectexit('action=admin;area=regcenter;sa=settings');
 		}
@@ -375,21 +379,7 @@ class ManageRegistration_Controller extends Action_Controller
 		// Turn the postal address into something suitable for a textbox.
 		$modSettings['coppaPost'] = !empty($modSettings['coppaPost']) ? preg_replace('~<br ?/?' . '>~', "\n", $modSettings['coppaPost']) : '';
 
-		Settings_Form::prepare_db($config_vars);
-	}
-
-	/**
-	 * Initialize settings form with the configuration settings for new members registration.
-	 */
-	private function _init_registerSettingsForm()
-	{
-		// Instantiate the form
-		$this->_registerSettings = new Settings_Form();
-
-		// Initialize it with our settings
-		$config_vars = $this->_settings();
-
-		return $this->_registerSettings->settings($config_vars);
+		$settingsForm->prepare();
 	}
 
 	/**

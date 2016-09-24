@@ -900,9 +900,12 @@ class ManagePermissions_Controller extends Action_Controller
 		require_once(SUBSDIR . '/ManagePermissions.subs.php');
 
 		// Initialize the form
-		$this->_initPermSettingsForm();
+		$settingsForm = new Settings_Form(Settings_Form::DB_ADAPTER);
 
-		$config_vars = $this->_permSettings->settings();
+		// Initialize it with our settings
+		$config_vars = $this->_settings();
+
+		$settingsForm->setConfigVars($config_vars);
 
 		// Some items for the template
 		$context['page_title'] = $txt['permission_settings_title'];
@@ -914,7 +917,8 @@ class ManagePermissions_Controller extends Action_Controller
 		{
 			checkSession('post');
 			call_integration_hook('integrate_save_permission_settings');
-			Settings_Form::save_db($config_vars, $this->_req->post);
+			$settingsForm->setConfigValues($this->_req->post);
+			$settingsForm->save();
 
 			// Clear all deny permissions...if we want that.
 			if (empty($modSettings['permission_enable_deny']))
@@ -930,21 +934,7 @@ class ManagePermissions_Controller extends Action_Controller
 		// We need this for the in-line permissions
 		createToken('admin-mp');
 
-		Settings_Form::prepare_db($config_vars);
-	}
-
-	/**
-	 * Initialize the settings form.
-	 */
-	private function _initPermSettingsForm()
-	{
-		// Instantiate the form
-		$this->_permSettings = new Settings_Form();
-
-		// Initialize it with our settings
-		$config_vars = $this->_settings();
-
-		return $this->_permSettings->settings($config_vars);
+		$settingsForm->prepare();
 	}
 
 	/**

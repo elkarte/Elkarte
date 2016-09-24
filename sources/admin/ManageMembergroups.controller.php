@@ -780,9 +780,13 @@ class ManageMembergroups_Controller extends Action_Controller
 		$context['page_title'] = $txt['membergroups_settings'];
 
 		// initialize the form
-		$this->_initGroupSettingsForm();
+		// Instantiate the form
+		$settingsForm = new Settings_Form(Settings_Form::DB_ADAPTER);
 
-		$config_vars = $this->_groupSettings->settings();
+		// Initialize it with our settings
+		$config_vars = $this->_settings();
+
+		$settingsForm->setConfigVars($config_vars);
 
 		if (isset($this->_req->query->save))
 		{
@@ -790,7 +794,8 @@ class ManageMembergroups_Controller extends Action_Controller
 			call_integration_hook('integrate_save_membergroup_settings');
 
 			// Yeppers, saving this...
-			Settings_Form::save_db($config_vars);
+			$settingsForm->setConfigValues($this->_req->post);
+			$settingsForm->save();
 			redirectexit('action=admin;area=membergroups;sa=settings');
 		}
 
@@ -798,21 +803,7 @@ class ManageMembergroups_Controller extends Action_Controller
 		$context['post_url'] = $scripturl . '?action=admin;area=membergroups;save;sa=settings';
 		$context['settings_title'] = $txt['membergroups_settings'];
 
-		Settings_Form::prepare_db($config_vars);
-	}
-
-	/**
-	 * Return the configuration settings for membergroups management.
-	 */
-	private function _initGroupSettingsForm()
-	{
-		// Instantiate the form
-		$this->_groupSettings = new Settings_Form();
-
-		// Initialize it with our settings
-		$config_vars = $this->_settings();
-
-		return $this->_groupSettings->settings($config_vars);
+		$settingsForm->prepare();
 	}
 
 	/**

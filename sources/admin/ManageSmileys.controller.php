@@ -125,9 +125,12 @@ class ManageSmileys_Controller extends Action_Controller
 		global $context, $scripturl;
 
 		// initialize the form
-		$this->_initSmileySettingsForm();
+		$settingsForm = new Settings_Form(Settings_Form::DB_ADAPTER);
 
-		$config_vars = $this->_smileySettings->settings();
+		// Initialize it with our settings
+		$config_vars = $this->_settings();
+
+		$settingsForm->setConfigVars($config_vars);
 
 		// For the basics of the settings.
 		require_once(SUBSDIR . '/Smileys.subs.php');
@@ -150,7 +153,8 @@ class ManageSmileys_Controller extends Action_Controller
 			call_integration_hook('integrate_save_smiley_settings');
 
 			// Save away
-			Settings_Form::save_db($config_vars, $this->_req->post);
+			$settingsForm->setConfigValues($this->_req->post);
+			$settingsForm->save();
 
 			// Flush the cache so the new settings take effect
 			$this->clearSmileyCache();
@@ -158,21 +162,7 @@ class ManageSmileys_Controller extends Action_Controller
 			redirectexit('action=admin;area=smileys;sa=settings');
 		}
 
-		Settings_Form::prepare_db($config_vars);
-	}
-
-	/**
-	 * Retrieve and initialize the form with smileys administration settings.
-	 */
-	private function _initSmileySettingsForm()
-	{
-		// Instantiate the form
-		$this->_smileySettings = new Settings_Form();
-
-		// Initialize it with our settings
-		$config_vars = $this->_settings();
-
-		return $this->_smileySettings->settings($config_vars);
+		$settingsForm->prepare();
 	}
 
 	/**

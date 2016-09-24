@@ -285,45 +285,10 @@ class ManageCalendarModule_Controller extends Action_Controller
 	 */
 	public function action_calendarSettings_display()
 	{
-		global $context, $scripturl;
+		global $txt, $context, $scripturl;
 
 		// Initialize the form
-		$this->_initCalendarSettingsForm();
-
-		$config_vars = $this->_calendarSettings->settings();
-
-		// Get the final touches in place.
-		$context['post_url'] = $scripturl . '?action=admin;area=managecalendar;save;sa=settings';
-		$context[$context['admin_menu_name']]['current_subsection'] = 'settings';
-
-		// Saving the settings?
-		if (isset($this->_req->query->save))
-		{
-			checkSession();
-			call_integration_hook('integrate_save_calendar_settings');
-			Settings_Form::save_db($config_vars, $this->_req->post);
-
-			// Update the stats in case.
-			updateSettings(array(
-				'calendar_updated' => time(),
-			));
-
-			redirectexit('action=admin;area=managecalendar;sa=settings');
-		}
-
-		// Prepare the settings...
-		Settings_Form::prepare_db($config_vars);
-	}
-
-	/**
-	 * Retrieve and return all admin settings for the calendar.
-	 */
-	private function _initCalendarSettingsForm()
-	{
-		global $txt, $context;
-
-		// Instantiate the form
-		$this->_calendarSettings = new Settings_Form();
+		$settingsForm = new Settings_Form(Settings_Form::DB_ADAPTER);
 
 		// Initialize it with our settings
 		$config_vars = $this->_settings();
@@ -337,7 +302,30 @@ class ManageCalendarModule_Controller extends Action_Controller
 			legend.siblings().slideToggle("fast");
 			legend.parent().toggleClass("collapsed")', true);
 
-		return $this->_calendarSettings->settings($config_vars);
+		$settingsForm->setConfigVars($config_vars);
+
+		// Get the final touches in place.
+		$context['post_url'] = $scripturl . '?action=admin;area=managecalendar;save;sa=settings';
+		$context[$context['admin_menu_name']]['current_subsection'] = 'settings';
+
+		// Saving the settings?
+		if (isset($this->_req->query->save))
+		{
+			checkSession();
+			call_integration_hook('integrate_save_calendar_settings');
+			$settingsForm->setConfigValues($this->_req->post);
+			$settingsForm->save();
+
+			// Update the stats in case.
+			updateSettings(array(
+				'calendar_updated' => time(),
+			));
+
+			redirectexit('action=admin;area=managecalendar;sa=settings');
+		}
+
+		// Prepare the settings...
+		$settingsForm->prepare();
 	}
 
 	/**

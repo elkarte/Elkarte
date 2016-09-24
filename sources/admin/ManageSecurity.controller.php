@@ -114,14 +114,15 @@ class ManageSecurity_Controller extends Action_Controller
 		$this->_initSecuritySettingsForm();
 
 		// Retrieve the current config settings
-		$config_vars = $this->_securitySettings->settings();
+		$config_vars = $settingsForm->settings();
 
 		// Saving?
 		if (isset($this->_req->query->save))
 		{
 			checkSession();
 
-			Settings_Form::save_db($config_vars, $this->_req->post);
+			$settingsForm->setConfigValues($this->_req->post);
+			$settingsForm->save();
 
 			call_integration_hook('integrate_save_general_security_settings');
 
@@ -132,7 +133,7 @@ class ManageSecurity_Controller extends Action_Controller
 		$context['post_url'] = $scripturl . '?action=admin;area=securitysettings;save;sa=general';
 		$context['settings_title'] = $txt['mods_cat_security_general'];
 
-		Settings_Form::prepare_db($config_vars);
+		$settingsForm->prepare();
 	}
 
 	/**
@@ -141,12 +142,12 @@ class ManageSecurity_Controller extends Action_Controller
 	private function _initSecuritySettingsForm()
 	{
 		// Instantiate the form
-		$this->_securitySettings = new Settings_Form();
+		$settingsForm = new Settings_Form(Settings_Form::DB_ADAPTER);
 
 		// Initialize it with our settings
 		$config_vars = $this->_securitySettings();
 
-		return $this->_securitySettings->settings($config_vars);
+		$settingsForm->setConfigVars($config_vars);
 	}
 
 	/**
@@ -162,7 +163,7 @@ class ManageSecurity_Controller extends Action_Controller
 		$this->_initModerationSettingsForm();
 
 		// Retrieve the current config settings
-		$config_vars = $this->_moderationSettings->settings();
+		$config_vars = $settingsForm->settings();
 
 		// Cannot use moderation if post moderation is not enabled.
 		if (!$modSettings['postmod_active'])
@@ -188,13 +189,14 @@ class ManageSecurity_Controller extends Action_Controller
 			}
 
 			// Fix the warning setting array!
-			$this->_req->post->warning_settings = '1,' . min(100, (int) $this->_req->post->user_limit) . ',' . min(100, (int) $this->_req->post->warning_decrement);
+			$settingsForm = '1,' . min(100, (int) $this->_req->post->user_limit) . ',' . min(100, (int) $this->_req->post->warning_decrement);
 			$config_vars[] = array('text', 'warning_settings');
 			unset($config_vars['rem1'], $config_vars['rem2']);
 
 			call_integration_hook('integrate_save_moderation_settings');
 
-			Settings_Form::save_db($config_vars, $this->_req->post);
+			$settingsForm->setConfigValues($this->_req->post);
+			$settingsForm->save();
 			redirectexit('action=admin;area=securitysettings;sa=moderation');
 		}
 
@@ -205,7 +207,7 @@ class ManageSecurity_Controller extends Action_Controller
 		$context['settings_title'] = $txt['moderation_settings'];
 		$context['settings_message'] = $txt['warning_enable'];
 
-		Settings_Form::prepare_db($config_vars);
+		$settingsForm->prepare();
 	}
 
 	/**
@@ -216,12 +218,12 @@ class ManageSecurity_Controller extends Action_Controller
 	private function _initModerationSettingsForm()
 	{
 		// Instantiate the form
-		$this->_moderationSettings = new Settings_Form();
+		$settingsForm = new Settings_Form(Settings_Form::DB_ADAPTER);
 
 		// Initialize it with our settings
 		$config_vars = $this->_moderationSettings();
 
-		return $this->_moderationSettings->settings($config_vars);
+		$settingsForm->setConfigVars($config_vars);
 	}
 
 	/**
@@ -237,7 +239,7 @@ class ManageSecurity_Controller extends Action_Controller
 		$this->_initSpamSettingsForm();
 
 		// Retrieve the current config settings
-		$config_vars = $this->_spamSettings->settings();
+		$config_vars = $settingsForm->settings();
 
 		// Saving?
 		if (isset($this->_req->query->save))
@@ -245,7 +247,7 @@ class ManageSecurity_Controller extends Action_Controller
 			checkSession();
 
 			// Fix PM settings.
-			$this->_req->post->pm_spam_settings = (int) $this->_req->post->max_pm_recipients . ',' . (int) $this->_req->post->pm_posts_verification . ',' . (int) $this->_req->post->pm_posts_per_hour;
+			$settingsForm = (int) $this->_req->post->max_pm_recipients . ',' . (int) $this->_req->post->pm_posts_verification . ',' . (int) $this->_req->post->pm_posts_per_hour;
 
 			// Guest requiring verification!
 			if (empty($this->_req->post->posts_require_captcha) && !empty($this->_req->post->guests_require_captcha))
@@ -258,7 +260,8 @@ class ManageSecurity_Controller extends Action_Controller
 			call_integration_hook('integrate_save_spam_settings');
 
 			// Now save.
-			Settings_Form::save_db($config_vars, $this->_req->post);
+			$settingsForm->setConfigValues($this->_req->post);
+			$settingsForm->save();
 			Cache::instance()->remove('verificationQuestionIds');
 			redirectexit('action=admin;area=securitysettings;sa=spam');
 		}
@@ -276,7 +279,7 @@ class ManageSecurity_Controller extends Action_Controller
 
 		$context['post_url'] = $scripturl . '?action=admin;area=securitysettings;save;sa=spam';
 		$context['settings_title'] = $txt['antispam_Settings'];
-		Settings_Form::prepare_db($config_vars);
+		$settingsForm->prepare();
 	}
 
 	/**
@@ -285,12 +288,12 @@ class ManageSecurity_Controller extends Action_Controller
 	private function _initSpamSettingsForm()
 	{
 		// Instantiate the form
-		$this->_spamSettings = new Settings_Form();
+		$settingsForm = new Settings_Form(Settings_Form::DB_ADAPTER);
 
 		// Initialize it with our settings
 		$config_vars = $this->_spamSettings();
 
-		return $this->_spamSettings->settings($config_vars);
+		$settingsForm->setConfigVars($config_vars);
 	}
 
 	/**
@@ -331,7 +334,7 @@ class ManageSecurity_Controller extends Action_Controller
 				$context[$list . '_desc'] = Util::unserialize($modSettings[$list . '_desc']);
 		}
 
-		$config_vars = $this->_bbSettings->settings();
+		$config_vars = $settingsForm->settings();
 
 		// Saving?
 		if (isset($this->_req->query->save))
@@ -359,7 +362,8 @@ class ManageSecurity_Controller extends Action_Controller
 				updateSettings(array($list => serialize($this_list), $list . '_desc' => serialize($this_desc)));
 			}
 
-			Settings_Form::save_db($config_vars, $this->_req->post);
+			$settingsForm->setConfigValues($this->_req->post);
+			$settingsForm->save();
 			redirectexit('action=admin;area=securitysettings;sa=badbehavior');
 		}
 
@@ -378,7 +382,7 @@ class ManageSecurity_Controller extends Action_Controller
 			'oIpOptionsdd' => '{name: \'badbehavior_ip_wl[]\', class: \'input_text\'}'
 		));
 
-		Settings_Form::prepare_db($config_vars);
+		$settingsForm->prepare();
 	}
 
 	/**
@@ -389,12 +393,12 @@ class ManageSecurity_Controller extends Action_Controller
 	private function _initBBSettingsForm()
 	{
 		// Instantiate the form
-		$this->_bbSettings = new Settings_Form();
+		$settingsForm = new Settings_Form(Settings_Form::DB_ADAPTER);
 
 		// Initialize it with our settings
 		$config_vars = $this->_bbSettings();
 
-		return $this->_bbSettings->settings($config_vars);
+		$settingsForm->setConfigVars($config_vars);
 	}
 
 	/**

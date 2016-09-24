@@ -206,9 +206,12 @@ class ManageDraftsModule_Controller extends Action_Controller
 		loadLanguage('Drafts');
 
 		// Initialize the form
-		$this->_initDraftSettingsForm();
+		$settingsForm = new Settings_Form(Settings_Form::DB_ADAPTER);
 
-		$config_vars = $this->_draftSettings->settings();
+		// Initialize it with our settings
+		$config_vars = $this->_settings();
+
+		$settingsForm->setConfigVars($config_vars);
 
 		// Setup the template.
 		$context['page_title'] = $txt['managedrafts_settings'];
@@ -229,7 +232,8 @@ class ManageDraftsModule_Controller extends Action_Controller
 			// Protect them from themselves.
 			$this->_req->post->drafts_autosave_frequency = $this->_req->post->drafts_autosave_frequency < 30 ? 30 : $this->_req->post->drafts_autosave_frequency;
 
-			Settings_Form::save_db($config_vars, $this->_req->post);
+			$settingsForm->setConfigValues($this->_req->post);
+			$settingsForm->save();
 			redirectexit('action=admin;area=managedrafts');
 		}
 
@@ -253,21 +257,7 @@ class ManageDraftsModule_Controller extends Action_Controller
 		$context['settings_title'] = $txt['managedrafts_settings'];
 
 		// Prepare the settings...
-		Settings_Form::prepare_db($config_vars);
-	}
-
-	/**
-	 * Initialize drafts settings with the current forum settings
-	 */
-	private function _initDraftSettingsForm()
-	{
-		// Instantiate the form
-		$this->_draftSettings = new Settings_Form();
-
-		// Initialize it with our settings
-		$config_vars = $this->_settings();
-
-		return $this->_draftSettings->settings($config_vars);
+		$settingsForm->prepare();
 	}
 
 	/**
