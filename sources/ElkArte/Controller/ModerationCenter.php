@@ -290,7 +290,7 @@ class ModerationCenter extends AbstractController
 			'default_include_dir' => CONTROLLERDIR,
 		);
 
-		$this->_menu = new Menu_Create();
+		$this->_menu = new Menu();
 		$mod_include_data = $this->_menu->prepareMenu($moderation_areas, $menuOptions);
 		unset($moderation_areas);
 

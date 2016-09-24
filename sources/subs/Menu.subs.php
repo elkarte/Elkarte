@@ -21,7 +21,7 @@
  */
 function createMenu($menuData, $menuOptions = array())
 {
-	$menu = new Menu_Create();
+	$menu = new Menu();
 
 	return $menu->prepareMenu($menuData, $menuOptions);
 }
@@ -35,7 +35,7 @@ function createMenu($menuData, $menuOptions = array())
  */
 function destroyMenu($menu_id = 'last')
 {
-	$menu = new Menu_Create();
+	$menu = new Menu();
 	$menu->destroyMenu($menu_id);
 }
 
@@ -48,6 +48,6 @@ function destroyMenu($menu_id = 'last')
  */
 function callMenu($selectedMenu)
 {
-	$menu = new Menu_Create();
+	$menu = new Menu();
 	$menu->callMenu($selectedMenu);
 }
