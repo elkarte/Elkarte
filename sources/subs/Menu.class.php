@@ -99,6 +99,7 @@ Class Menu
 		// Check the menus urls
 		$this->_checkBaseUrl();
 
+		// Make sure we created some awesome sauce
 		if (!$this->_validateData())
 			return false;
 
@@ -216,6 +217,8 @@ Class Menu
 
 	/**
 	 * Process the menuData array passed to the class
+	 *
+	 *   - Only processes areas that are enabled and that the user has permissions
 	 */
 	protected function processMenuData()
 	{
@@ -223,12 +226,12 @@ Class Menu
 		foreach ($this->_menuData as $this->_section_id => $this->_section)
 		{
 			// Is this section enabled? and do they have permissions?
-			if (!$this->_sectionEnabled() || !$this->_sectionPermissions())
+			if (!$this->_sectionEnabled() || !$this->_menuPermissions($this->_section))
 			{
 				continue;
 			}
 
-			// Process the sections to pick the right area.
+			// Process this menu section
 			$this->processSectionAreas();
 		}
 	}
@@ -244,23 +247,25 @@ Class Menu
 	}
 
 	/**
-	 * Determines if the user has the permissions to access the section
+	 * Determines if the user has the permissions to access the section/area
+	 *
+	 * @param array $area area or section being checked
 	 *
 	 * @return bool
 	 */
-	private function _sectionPermissions()
+	private function _menuPermissions($area)
 	{
-		if (isset($this->_section['permission']))
+		if (!empty($area['permission']))
 		{
 			// The profile menu has slightly different permissions
-			if (is_array($this->_section['permission']) && isset($this->_section['permission']['own'], $this->_section['permission']['any']))
+			if (is_array($area['permission']) && isset($area['permission']['own'], $area['permission']['any']))
 			{
-				if (empty($this->_area['permission'][$this->_permission_set]) || !allowedTo($this->_section['permission'][$this->_permission_set]))
+				if (empty($area['permission'][$this->_permission_set]) || !allowedTo($area['permission'][$this->_permission_set]))
 				{
 					return false;
 				}
 			}
-			elseif (!allowedTo($this->_section['permission']))
+			elseif (!allowedTo($area['permission']))
 			{
 				return false;
 			}
@@ -278,7 +283,7 @@ Class Menu
 		foreach ($this->_section['areas'] as $this->_area_id => $this->_area)
 		{
 			// Is the area enabled, Does the user have permission and it has some form of a name
-			if (!$this->_areaEnabled() || !$this->_areaPermissions() || !$this->_areaLabel())
+			if (!$this->_areaEnabled() || !$this->_menuPermissions($this->_area) || !$this->_areaLabel())
 			{
 				continue;
 			}
@@ -338,32 +343,6 @@ Class Menu
 	private function _areaEnabled()
 	{
 		return !isset($this->_area['enabled']) || (bool) $this->_area['enabled'] !== false;
-	}
-
-	/**
-	 * Determines if a user has permission to access an area
-	 *
-	 * @return bool
-	 */
-	private function _areaPermissions()
-	{
-		if (!empty($this->_area['permission']))
-		{
-			// The profile menu has slightly different permissions
-			if (is_array($this->_area['permission']) && isset($this->_area['permission']['own'], $this->_area['permission']['any']))
-			{
-				if (empty($this->_area['permission'][$this->_permission_set]) || !allowedTo($this->_area['permission'][$this->_permission_set]))
-				{
-					return false;
-				}
-			}
-			elseif (!allowedTo($this->_area['permission']))
-			{
-				return false;
-			}
-		}
-
-		return true;
 	}
 
 	/**
