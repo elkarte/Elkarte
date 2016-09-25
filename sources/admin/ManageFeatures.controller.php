@@ -546,7 +546,6 @@ class ManageFeatures_Controller extends Action_Controller
 			$settingsForm->setConfigVars($save_vars);
 			$settingsForm->setConfigValues((array) $this->_req->post);
 			$settingsForm->save();
-			Settings_Form::save_db($save_vars, $this->_req->post);
 			redirectexit('action=admin;area=featuresettings;sa=sig');
 		}
 

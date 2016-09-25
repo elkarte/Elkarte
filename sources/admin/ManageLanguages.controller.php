@@ -176,8 +176,8 @@ class ManageLanguages_Controller extends Action_Controller
 
 			if ($this->_req->post->def_language != $language && $lang_exists)
 			{
-				Settings_Form::save_file(array('language' => '\'' . $this->_req->post->def_language . '\''));
 				$language = $this->_req->post->def_language;
+				$this->updateLanguage($language);
 			}
 		}
 
@@ -752,11 +752,11 @@ class ManageLanguages_Controller extends Action_Controller
 			$cache = Cache::instance();
 			$cache->put('known_languages', null, $cache->maxLevel(1) ? 86400 : 3600);
 
-			// Sixth, if we deleted the default language, set us back to english?
+			// Sixth, if we deleted the default language, set us back to english.
 			if ($context['lang_id'] == $language)
 			{
 				$language = 'english';
-				Settings_Form::save_file(array('language' => '\'' . $language . '\''));
+				$this->updateLanguage($language);
 			}
 
 			// Seventh, get out of here.
@@ -1093,5 +1093,21 @@ class ManageLanguages_Controller extends Action_Controller
 	public function settings_search()
 	{
 		return $this->_settings();
+	}
+
+	private function updateLanguage($language)
+	{
+		global $context;
+
+		$configVars = array(
+			array('language')
+		);
+		$configValues = array(
+			'language' => $language
+		);
+		$settingsForm = new Settings_Form(Settings_Form::FILE_ADAPTER);
+		$settingsForm->setConfigVars($configVars);
+		$settingsForm->setConfigValues((array) $configValues);
+		$settingsForm->save();
 	}
 }
