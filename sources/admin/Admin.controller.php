@@ -527,19 +527,27 @@ class Admin_Controller extends Action_Controller
 			),
 		);
 
+		// Any menu items that Modules want to add
 		$this->_getModulesMenu($admin_areas);
 
 		// Any files to include for administration?
 		call_integration_include_hook('integrate_admin_include');
 
+		// Set our menu options
 		$menuOptions = array('hook' => 'admin', 'default_include_dir' => ADMINDIR);
 
-		// Actually create the menu!
-		$admin_include_data = createMenu($admin_areas, $menuOptions);
+		// Setup the menu
+		$menu = Menu::instance();
+		$menu->addOptions($menuOptions);
+		$menu->addAreas($admin_areas);
+
+		// Create the menu, calling integrate_admin_areas at the start
+		$admin_include_data = $menu->prepareMenu();
+		$menu->setContext();
 		unset($admin_areas);
 
 		// Nothing valid?
-		if ($admin_include_data == false)
+		if ($admin_include_data === false)
 			Errors::instance()->fatal_lang_error('no_access', false);
 
 		// Build the link tree.
@@ -548,7 +556,7 @@ class Admin_Controller extends Action_Controller
 			'name' => $txt['admin_center'],
 		);
 
-		if (isset($admin_include_data['current_area']) && $admin_include_data['current_area'] != 'index')
+		if (isset($admin_include_data['current_area']) && $admin_include_data['current_area'] !== 'index')
 			$context['linktree'][] = array(
 				'url' => $scripturl . '?action=admin;area=' . $admin_include_data['current_area'] . ';' . $context['session_var'] . '=' . $context['session_id'],
 				'name' => $admin_include_data['label'],
@@ -571,7 +579,7 @@ class Admin_Controller extends Action_Controller
 		if (isset($admin_include_data['file']))
 			require_once($admin_include_data['file']);
 
-		callMenu($admin_include_data);
+		$menu->callMenu($admin_include_data);
 	}
 
 	/**

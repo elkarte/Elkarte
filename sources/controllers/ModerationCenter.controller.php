@@ -28,6 +28,12 @@ class ModerationCenter_Controller extends Action_Controller
 	private $_mod_include_data;
 
 	/**
+	 * Holds the create menu object
+	 * @var object
+	 */
+	private $_menu;
+
+	/**
 	 * Entry point for the moderation center.
 	 *
 	 * @see Action_Controller::action_index()
@@ -41,7 +47,7 @@ class ModerationCenter_Controller extends Action_Controller
 		if (isset($this->_mod_include_data['file']))
 			require_once($this->_mod_include_data['file']);
 
-		callMenu($this->_mod_include_data);
+		$this->_menu->callMenu($this->_mod_include_data);
 	}
 
 	/**
@@ -268,7 +274,14 @@ class ModerationCenter_Controller extends Action_Controller
 			'default_include_dir' => CONTROLLERDIR,
 		);
 
-		$mod_include_data = createMenu($moderation_areas, $menuOptions);
+		// Setup the menu
+		$this->_menu = Menu::instance();
+		$this->_menu->addOptions($menuOptions);
+		$this->_menu->addAreas($moderation_areas);
+
+		// Create the menu, calling integrate_moderation_areas at the start
+		$mod_include_data = $this->_menu->prepareMenu();
+		$this->_menu->setContext();
 		unset($moderation_areas);
 
 		// We got something - didn't we? DIDN'T WE!

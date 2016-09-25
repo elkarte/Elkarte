@@ -354,8 +354,14 @@ class PersonalMessage_Controller extends Action_Controller
 			'default_include_dir' => CONTROLLERDIR,
 		);
 
-		// Actually create the menu!
-		$pm_include_data = createMenu($pm_areas, $menuOptions);
+		// Setup the PM menu
+		$menu = Menu::instance();
+		$menu->addOptions($menuOptions);
+		$menu->addAreas($pm_areas);
+
+		// Create the menu, calling integrate_pm_areas at the start
+		$pm_include_data = $menu->prepareMenu();
+		$menu->setContext();
 		unset($pm_areas);
 
 		// No menu means no access.
