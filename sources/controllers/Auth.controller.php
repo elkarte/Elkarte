@@ -219,7 +219,7 @@ class Auth_Controller extends Action_Controller
 		$user_settings = loadExistingMember($_POST['user']);
 
 		// User using 2FA for login? Let's validate the token...
-		if (!empty($modSettings['enableOTP']) &&!empty($user_settings['enable_otp']) && empty($_POST['otp_token']))
+		if (!empty($modSettings['enableOTP']) && !empty($user_settings['enable_otp']) && empty($_POST['otp_token']))
 		{
 			$context['login_errors'] = array($txt['otp_required']);
 			return false;

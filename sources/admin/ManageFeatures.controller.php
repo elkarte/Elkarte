@@ -762,7 +762,7 @@ class ManageFeatures_Controller extends Action_Controller
 					),
 					'data' => array(
 						'function' => function ($rowData) {
-							$isChecked = $rowData['active'] ? ' checked="checked"' :  '';
+							$isChecked = $rowData['active'] ? ' checked="checked"' : '';
 							return sprintf('<input type="checkbox" name="cust[]" id="cust_%1$s" value="%1$s" class="input_check"%2$s />', $rowData['id_field'], $isChecked);
 						},
 						'style' => 'width: 8%;',
@@ -981,7 +981,7 @@ class ManageFeatures_Controller extends Action_Controller
 			{
 				case 'check':
 					$default = isset($this->_req->post->default_check) ? 1 : '';
-			    	break;
+					break;
 				case 'select':
 				case 'radio':
 					if (!empty($this->_req->post->select_option))

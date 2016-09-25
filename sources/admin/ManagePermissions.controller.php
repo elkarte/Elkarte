@@ -440,7 +440,7 @@ class ManagePermissions_Controller extends Action_Controller
 								if ($rowData['id_parent'] == -2)
 										return '<a href="' . $scripturl . '?action=admin;area=permissions;sa=modify;group=' . $rowData['id_group'] . (isset($_pid) ? ';pid=' . $_pid : '') . '">' . $txt['membergroups_modify'] . '</a>';
 									else
-										return '<span class="smalltext">' . $txt['permissions_includes_inherited_from'] . '&quot;' .  $rowData['parent_name'] . '&quot;</span>
+										return '<span class="smalltext">' . $txt['permissions_includes_inherited_from'] . '&quot;' . $rowData['parent_name'] . '&quot;</span>
 											<br />
 											<a href="' . $scripturl . '?action=admin;area=permissions;sa=modify;group=' . $rowData['id_parent'] . (isset($_pid) ? ';pid=' . $_pid : '') . '">' . $txt['membergroups_modify_parent'] . '</a>';
 							}
@@ -770,7 +770,7 @@ class ManagePermissions_Controller extends Action_Controller
 			$permissions['membergroup'] = fetchPermissions($this->_req->query->group);
 
 		// Fetch current board permissions...
-		$permissions['board'] = fetchBoardPermissions( $context['group']['id'], $context['permission_type'], $context['profile']['id']);
+		$permissions['board'] = fetchBoardPermissions($context['group']['id'], $context['permission_type'], $context['profile']['id']);
 
 		// Loop through each permission and set whether it's checked.
 		foreach ($context['permissions'] as $permissionType => $tmp)

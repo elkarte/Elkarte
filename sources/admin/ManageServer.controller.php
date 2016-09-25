@@ -192,7 +192,7 @@ class ManageServer_Controller extends Action_Controller
 		$settingsForm = new Settings_Form(Settings_Form::FILE_ADAPTER);
 
 		// Initialize it with our settings
-		$settingsForm->setConfigVars($this->_databaseSettings ());
+		$settingsForm->setConfigVars($this->_databaseSettings());
 
 		// Setup the template stuff.
 		$context['post_url'] = $scripturl . '?action=admin;area=serversettings;sa=database;save';

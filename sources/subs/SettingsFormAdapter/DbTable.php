@@ -85,7 +85,7 @@ class DbTable extends Db
 		{
 			// Time to edit, add in the id col name, assumed to be primary/unique!
 			$update = true;
-			$insertVars = array_merge(array($this->editName => 'int'),  $insertVars);
+			$insertVars = array_merge(array($this->editName => 'int'), $insertVars);
 			array_unshift($insertValues, $this->editId);
 		}
 

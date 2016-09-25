@@ -40,7 +40,7 @@ class ManageMembergroups_Controller extends Action_Controller
 	 * @uses ManageMembergroups template.
 	 * @uses ManageMembers language file.
 	 * @see Action_Controller::action_index()
-	*/
+	 */
 	public function action_index()
 	{
 		global $context, $txt;

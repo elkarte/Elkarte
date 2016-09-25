@@ -987,7 +987,7 @@ class ManageMembers_Controller extends Action_Controller
 								else
 									$member_links[] = $member['name'] . ' (' . $txt['guest'] . ')';
 							}
-							return implode (', ', $member_links);
+							return implode(', ', $member_links);
 						},
 						'class' => 'smalltext',
 					),
