@@ -87,6 +87,8 @@ class ManageCalendarModule_Controller extends Action_Controller
 	 */
 	public static function addAdminSearch(&$language_files, &$include_files, &$settings_search)
 	{
+		$language_files[] = 'ManageCalendar';
+		$include_files[] = 'ManageCalendarModule.controller';
 		$settings_search[] = array('settings_search', 'area=managecalendar;sa=settings', 'ManageCalendarModule_Controller');
 	}
 
