@@ -149,7 +149,7 @@ class ManageSecurity_Controller extends Action_Controller
 		$settingsForm = new Settings_Form(Settings_Form::DB_ADAPTER);
 
 		// Initialize it with our settings
-		$config_vars = $this->_settings();
+		$config_vars = $this->_moderationSettings();
 		$settingsForm->setConfigVars($config_vars);
 
 		// Saving?
@@ -172,7 +172,7 @@ class ManageSecurity_Controller extends Action_Controller
 			}
 
 			// Fix the warning setting array!
-			$settingsForm = '1,' . min(100, (int) $this->_req->post->user_limit) . ',' . min(100, (int) $this->_req->post->warning_decrement);
+			$this->_req->post->warning_settings = '1,' . min(100, (int) $this->_req->post->user_limit) . ',' . min(100, (int) $this->_req->post->warning_decrement);
 			$config_vars[] = array('text', 'warning_settings');
 			unset($config_vars['rem1'], $config_vars['rem2']);
 
@@ -207,7 +207,7 @@ class ManageSecurity_Controller extends Action_Controller
 		$settingsForm = new Settings_Form(Settings_Form::DB_ADAPTER);
 
 		// Initialize it with our settings
-		$config_vars = $this->_settings();
+		$config_vars = $this->_spamSettings();
 		$settingsForm->setConfigVars($config_vars);
 
 		// Saving?

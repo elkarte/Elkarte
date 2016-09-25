@@ -159,7 +159,8 @@ class AdminLog_Controller extends Action_Controller
 		$settingsForm = new Settings_Form(Settings_Form::DB_ADAPTER);
 
 		// Initialize settings
-		$settingsForm->setConfigVars($this->_settings());
+		$config_vars = $this->_settings();
+		$settingsForm->setConfigVars($config_vars);
 
 		call_integration_hook('integrate_prune_settings');
 

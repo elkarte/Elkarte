@@ -80,7 +80,8 @@ class ManageSearchEngines_Controller extends Action_Controller
 		$settingsForm = new Settings_Form(Settings_Form::DB_ADAPTER);
 
 		// Initialize it with our settings
-		$settingsForm->setConfigVars($this->_settings());
+		$config_vars = $this->_settings();
+		$settingsForm->setConfigVars($config_vars);
 
 		// Set up a message.
 		$context['settings_message'] = sprintf($txt['spider_settings_desc'], $scripturl . '?action=admin;area=logs;sa=pruning;' . $context['session_var'] . '=' . $context['session_id']);
