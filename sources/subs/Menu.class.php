@@ -130,7 +130,7 @@ Class Menu
 	}
 
 	/**
-	 * Class prepareMenu
+	 * Initial processing for the menu
 	 *
 	 * @return array|bool
 	 */
@@ -163,7 +163,7 @@ Class Menu
 	}
 
 	/**
-	 * Create a menu.
+	 * Create a menu
 	 *
 	 * @return array|bool
 	 */
@@ -192,7 +192,7 @@ Class Menu
 		$this->_include_data += array(
 			'current_action' => $this->_menu_context['current_action'],
 			'current_area' => $this->_menu_context['current_area'],
-			'current_section' => $this->_menu_context['current_section'],
+			'current_section' => !empty($this->_menu_context['current_section']) ? $this->_menu_context['current_section'] : '',
 			'current_subsection' => !empty($this->_menu_context['current_subsection']) ? $this->_menu_context['current_subsection'] : '',
 		);
 
@@ -248,8 +248,6 @@ Class Menu
 		// Allow extend *any* menu with a single hook
 		if (!empty($this->menuOptions['hook']))
 		{
-			global $modSettings;
-			$modSettings['integrate_admin_areas'] = 'blabla';
 			call_integration_hook('integrate_' . $this->menuOptions['hook'] . '_areas', array(&$this->menuData, &$this->menuOptions));
 		}
 	}
@@ -398,27 +396,36 @@ Class Menu
 			}
 
 			// Is this the current section?
-			// @todo why $this->_found_section is not initialized outside one of the loops? (Not sure which one lol)
-			if ($this->_menu_context['current_area'] == $this->_area_id && empty($this->_found_section))
-			{
-				// Only do this once?
-				$this->_found_section = true;
+			$this->_checkCurrentSection();
+		}
+	}
 
-				// Update the context if required - as we can have areas pretending to be others. ;)
-				$this->_menu_context['current_section'] = $this->_section_id;
+	/**
+	 * Checks the menu item to see if it is the currently selected one
+	 */
+	private function _checkCurrentSection()
+	{
+		// Is this the current section?
+		// @todo why $this->_found_section is not initialized outside one of the loops? (Not sure which one lol)
+		if ($this->_menu_context['current_area'] == $this->_area_id && empty($this->_found_section))
+		{
+			// Only do this once?
+			$this->_found_section = true;
 
-				$this->_menu_context['current_area'] = isset($this->_area['select']) ? $this->_area['select'] : $this->_area_id;
+			// Update the context if required - as we can have areas pretending to be others. ;)
+			$this->_menu_context['current_section'] = $this->_section_id;
 
-				// This will be the data we return.
-				$this->_include_data = $this->_area;
-			}
-			// Make sure we have something in case it's an invalid area.
-			elseif (empty($this->_found_section) && empty($this->_include_data))
-			{
-				$this->_menu_context['current_section'] = $this->_section_id;
-				$this->_backup_area = isset($this->_area['select']) ? $this->_area['select'] : $this->_area_id;
-				$this->_include_data = $this->_area;
-			}
+			$this->_menu_context['current_area'] = isset($this->_area['select']) ? $this->_area['select'] : $this->_area_id;
+
+			// This will be the data we return.
+			$this->_include_data = $this->_area;
+		}
+		// Make sure we have something in case it's an invalid area.
+		elseif (empty($this->_found_section) && empty($this->_include_data))
+		{
+			$this->_menu_context['current_section'] = $this->_section_id;
+			$this->_backup_area = isset($this->_area['select']) ? $this->_area['select'] : $this->_area_id;
+			$this->_include_data = $this->_area;
 		}
 	}
 
@@ -628,12 +635,12 @@ Class Menu
 			}
 
 			// Is this the current subsection?
-			$sa_check = $this->_req->getQuery('sa', 'trim', '');
+			$sa_check = $this->_req->getQuery('sa', 'trim', null);
 			if ($sa_check == $this->_sa)
 			{
 				$this->_menu_context['current_subsection'] = $this->_sa;
 			}
-			elseif (isset($this->_sub['active']) && in_array($sa_check, $this->_sub['active']))
+			elseif (isset($this->_sub['active']) && isset($sa_check) && in_array($sa_check, $this->_sub['active']))
 			{
 				$this->_menu_context['current_subsection'] = $this->_sa;
 			}
