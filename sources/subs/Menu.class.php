@@ -21,7 +21,7 @@
 Class Menu
 {
 	/**
-	 * instnace of HttpReq
+	 * Instance of HttpReq
 	 * @var HttpReq
 	 */
 	protected $_req;
@@ -628,15 +628,15 @@ Class Menu
 			}
 
 			// Is this the current subsection?
-			if (isset($this->_req->query->sa) && $this->_req->query->sa == $this->_sa)
+			$sa_check = $this->_req->getQuery('sa', 'trim', '');
+			if ($sa_check == $this->_sa)
 			{
 				$this->_menu_context['current_subsection'] = $this->_sa;
 			}
-			elseif (isset($this->_sub['active']) && isset($this->_req->query->sa) && in_array($this->_req->query->sa, $this->_sub['active']))
+			elseif (isset($this->_sub['active']) && in_array($sa_check, $this->_sub['active']))
 			{
 				$this->_menu_context['current_subsection'] = $this->_sa;
 			}
-
 			// Otherwise is it the default?
 			elseif (!isset($this->_menu_context['current_subsection']) && !empty($this->_sub[2]))
 			{
@@ -728,7 +728,7 @@ Class Menu
 	 *   Menu name with named indexes as follows:
 	 *        - string $title       => Section title
 	 *        - bool $enabled       => Is the section enabled / shown
-	 *        - array $this->_areas => Array of areas within this menu section, see below
+	 *        - array $areas        => Array of areas within this menu section, see below
 	 *        - array $permission   => Permission required to access the whole section
 	 *
 	 *   areas sub array from above, named indexes as follows:
@@ -753,9 +753,41 @@ Class Menu
 	 *        - string url         => Custom url for the subsection
 	 *
 	 */
-	public function addAreas($menuData)
+	public function addAreas($menuData = array())
 	{
-		$this->menuData = array_merge_recursive($this->menuData, $menuData);
+		$this->menuData = $this->mergeAreas($this->menuData, $menuData);
+	}
+
+	/**
+	 * Recursive array merge for adding and replacing areas
+	 *
+	 * What it does:
+	 *   - Adds new keys in array2 that don't exist in array1
+	 *   - Replaces keys in array2 that exist in array1
+	 *   - array_merge_recursive does not do this as needed, so you get comp101
+	 *
+	 * @param array $array1 beginning array
+	 * @param array $array2 array to replace / add to array1
+	 *
+	 * @return array
+	 */
+	public function mergeAreas(&$array1, &$array2)
+	{
+		$merged = $array1;
+
+		foreach ($array2 as $key => &$value)
+		{
+			if (is_array($value) && isset($merged[$key]) && is_array($merged[$key]))
+			{
+				$merged[$key] = $this->mergeAreas($merged[$key], $value);
+			}
+			else
+			{
+				$merged[$key] = $value;
+			}
+		}
+
+		return $merged;
 	}
 
 	/**
