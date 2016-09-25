@@ -85,19 +85,6 @@ class ManageSearchEngines_Controller extends Action_Controller
 		// Set up a message.
 		$context['settings_message'] = sprintf($txt['spider_settings_desc'], $scripturl . '?action=admin;area=logs;sa=pruning;' . $context['session_var'] . '=' . $context['session_id']);
 
-		require_once(SUBSDIR . '/SearchEngines.subs.php');
-		require_once(SUBSDIR . '/Membergroups.subs.php');
-
-		$groups = getBasicMembergroupData(array('globalmod', 'postgroups', 'protected', 'member'));
-		foreach ($groups as $row)
-		{
-			// Unfortunately, regular members have to be 1 because 0 is for disabled.
-			if ($row['id'] == 0)
-				$config_vars['spider_group'][2][1] = $row['name'];
-			else
-				$config_vars['spider_group'][2][$row['id']] = $row['name'];
-		}
-
 		// Make sure it's valid - note that regular members are given id_group = 1 which is reversed in Load.php - no admins here!
 		if (isset($this->_req->post->spider_group) && !isset($config_vars['spider_group'][2][$this->_req->post->spider_group]))
 			$this->_req->post->spider_group = 0;
