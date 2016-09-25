@@ -112,7 +112,7 @@ class ManagePaid_Controller extends Action_Controller
 	 */
 	public function action_paidSettings_display()
 	{
-		global $context, $txt, $scripturl;
+		global $context, $txt, $scripturl, $modSettings;
 
 		require_once(SUBSDIR . '/PaidSubscriptions.subs.php');
 
@@ -159,7 +159,7 @@ class ManagePaid_Controller extends Action_Controller
 				else
 				{
 					// That's not an email, lets set it back in the form to be fixed and let them know its wrong
-					$config_vars[1]['value'] = $this->_req->post->paid_email_to;
+					$modSettings['paid_email_to'] = $this->_req->post->paid_email_to;
 					$context['error_type'] = 'minor';
 					$context['settings_message'] = array();
 					foreach ($validator->validation_errors() as $id => $error)
