@@ -40,11 +40,11 @@ class ManageDraftsModule_Controller extends Action_Controller
 				'drafts_autosave_enabled' => 2,
 				'drafts_show_saved_enabled' => 2,
 			),
-			'setting_callback' => function($value) {
+			'setting_callback' => function ($value) {
 				require_once(SUBSDIR . '/ScheduledTasks.subs.php');
 				toggleTaskStatusByName('remove_old_drafts', $value);
 
-				$modules = array('post', 'display', 'profile', 'personalmessage');
+				$modules = array('admin', 'post', 'display', 'profile', 'personalmessage');
 
 				// Enabling, let's register the modules and prepare the scheduled task
 				if ($value)
@@ -60,26 +60,6 @@ class ManageDraftsModule_Controller extends Action_Controller
 					Hooks::get()->disableIntegration('Drafts_Integrate');
 				}
 			},
-		);
-	}
-
-	/**
-	 * Used to add the Drafts entry to the admin menu.
-	 *
-	 * @param mixed[] $admin_areas The admin menu array
-	 */
-	public static function addAdminMenu(&$admin_areas)
-	{
-		global $txt, $context;
-
-		$admin_areas['layout']['areas']['managedrafts'] = array(
-			'label' => $txt['manage_drafts'],
-			'controller' => 'ManageDraftsModule_Controller',
-			'function' => 'action_index',
-			'icon' => 'transparent.png',
-			'class' => 'admin_img_logs',
-			'permission' => array('admin_forum'),
-			'enabled' => in_array('dr', $context['admin_features']),
 		);
 	}
 
@@ -194,18 +174,6 @@ class ManageDraftsModule_Controller extends Action_Controller
 		$context['maintenance_finished'] = array(
 			'errors' => array(sprintf($txt['maintain_done'], $txt['maintain_old_drafts'])),
 		);
-	}
-
-	/**
-	 * Used to add the Drafts entry to the admin search.
-	 *
-	 * @param string[] $language_files
-	 * @param string[] $include_files
-	 * @param mixed[] $settings_search
-	 */
-	public static function addAdminSearch(&$language_files, &$include_files, &$settings_search)
-	{
-		$settings_search[] = array('settings_search', 'area=managedrafts', 'ManageDraftsModule_Controller');
 	}
 
 	/**
