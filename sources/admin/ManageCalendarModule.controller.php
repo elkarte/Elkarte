@@ -41,55 +41,17 @@ class ManageCalendarModule_Controller extends Action_Controller
 			'settings' => array(
 				'cal_enabled' => 1,
 			),
-			'setting_callback' => function($value) {
+			'setting_callback' => function ($value) {
 				if ($value)
 				{
-					enableModules('calendar', array('post', 'boardindex', 'display'));
+					enableModules('calendar', array('admin', 'post', 'boardindex', 'display'));
 				}
 				else
 				{
-					disableModules('calendar', array('post', 'boardindex', 'display'));
+					disableModules('calendar', array('admin', 'post', 'boardindex', 'display'));
 				}
 			},
 		);
-	}
-
-	/**
-	 * Used to add the Calendar entry to the admin menu.
-	 *
-	 * @param mixed[] $admin_areas The admin menu array
-	 */
-	public static function addAdminMenu(&$admin_areas)
-	{
-		global $txt, $context, $modSettings;
-
-		$admin_areas['layout']['areas']['managecalendar'] = array(
-			'label' => $txt['manage_calendar'],
-			'controller' => 'ManageCalendarModule_Controller',
-			'function' => 'action_index',
-			'icon' => 'transparent.png',
-			'class' => 'admin_img_calendar',
-			'permission' => array('admin_forum'),
-			'enabled' => in_array('cd', $context['admin_features']),
-			'subsections' => array(
-				'holidays' => array($txt['manage_holidays'], 'admin_forum', 'enabled' => !empty($modSettings['cal_enabled'])),
-				'settings' => array($txt['calendar_settings'], 'admin_forum'),
-			),
-		);
-	}
-
-	/**
-	 * Used to add the Calendar entry to the admin search.
-	 *
-	 * @param string[] $language_files
-	 * @param string[] $include_files
-	 * @param mixed[] $settings_search
-	 */
-	public static function addAdminSearch(&$language_files, &$include_files, &$settings_search)
-	{
-		$language_files[] = 'ManageCalendar';
-		$include_files[] = 'ManageCalendarModule.controller';
-		$settings_search[] = array('settings_search', 'area=managecalendar;sa=settings', 'ManageCalendarModule_Controller');
 	}
 
 	/**
