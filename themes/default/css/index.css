@@ -292,7 +292,7 @@ input[type="submit"], button[type="submit"], input[type="button"],
 .linkbutton:link, .linkbutton_right:link, .linkbutton_left:link,
 .linkbutton:visited, .linkbutton_right:visited, .linkbutton_left:visited {
 	display: inline-block;
-	padding: 0 .25em;
+	padding: 0 .35em;
 }
 
 input[type="submit"], .drop_area_fileselect_text, .drop_area .mobile, button[type="submit"], input[type="button"],
@@ -327,7 +327,7 @@ input[type=submit][disabled]:hover, button[disabled], button[disabled]:hover {
 .linkbutton:link, .linkbutton_right:link, .linkbutton_left:link,
 .linkbutton:visited, .linkbutton_right:visited, .linkbutton_left:visited {
 	font-size: 0.857em;
-	line-height: 1.8em;
+	line-height: 1.85em;
 }
 
 /* Use new class that is defined to suit, and with a sensible name. */
@@ -340,7 +340,7 @@ input[type=submit][disabled]:hover, button[disabled], button[disabled]:hover {
 
 .submitbutton input[type="submit"],
 .submitbutton input[type="button"] {
-	margin-top: -0.1em;
+	margin-top: -0.05em;
 	margin-right: 0.1em;
 	margin-left: 0.1em;
 	padding: 0 6px;
