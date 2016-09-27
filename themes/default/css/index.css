@@ -86,13 +86,17 @@ html, body {
 }
 
 body, input, button, select, textarea, .editor {
-	/* Set a font-size that will look the same in all browsers. */
-	/* Start with the best Vista/W7 font, then Mac, Linux, then old fallbacks. */
-	/* this results in a base 14pt and pt to em translation approx as so
-	/* 9 - .643, 10 - .714, 11 - .786, 12 - .857, 13 - .929, 14 - 1, 15 - 1.071, 16 - 1.143
-	/* 17 - 1.214, 18 - 1.286, 19 - 1.357, 20 - 1.429, 21 - 1.5, 22 - 1.571, 23 - 1.643
-	/* 24 - 1.714, 25 - 1.786, 26 - 1.857, 27 - 1.929, 28 - 2, 29 - 2.071 */
-	font: 87.5%/150% "Segoe UI", "Helvetica Neue", "Liberation Sans", "Nimbus Sans L", "Trebuchet MS", Arial, sans-serif;
+	/* Set a font-size that will look the mostly the same in all browsers.
+	 * Start with calling OSx system’s UI font with -apple-system, BlinkMacSystemFont this will pull in
+	 * (San Francisco, Neue Helvetica and Lucida Grande depends on OS version)
+	 * Then Windows (Segoe UI), Android (Roboto), Unix (KDE, Ubuntu, Gnome), Old Android (Droid Sans),
+	 * OSx pre apple-system support (Helvetica Neue), fallbacks (Arial, sans-serif)
+	 * this results in a base 14pt and pt to em translation approx as so
+	 * 9 - .643, 10 - .714, 11 - .786, 12 - .857, 13 - .929, 14 - 1, 15 - 1.071, 16 - 1.143
+	 * 17 - 1.214, 18 - 1.286, 19 - 1.357, 20 - 1.429, 21 - 1.5, 22 - 1.571, 23 - 1.643
+	 * 24 - 1.714, 25 - 1.786, 26 - 1.857, 27 - 1.929, 28 - 2, 29 - 2.071
+	 */
+	font: 87.5%/150% -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen", "Ubuntu", "Cantarell", "Droid Sans", "Helvetica Neue", Arial, sans-serif;
 }
 
 legend {
