@@ -660,7 +660,7 @@ class PersonalMessage_Controller extends Action_Controller
 		if (!empty($messages_request) && !empty($modSettings['enableVideoEmbeding']))
 		{
 			addInlineJavascript('
-		$(document).ready(function() {
+		$(function() {
 			$().linkifyvideo(oEmbedtext);
 		});', true
 			);
@@ -2018,16 +2018,20 @@ class PersonalMessage_Controller extends Action_Controller
 			// Any known rule
 			$js_rules = '';
 			foreach ($context['known_rules'] as $rule)
+			{
 				$js_rules[$rule] = $txt['pm_rule_' . $rule];
+			}
 			$js_rules = json_encode($js_rules);
 
 			// Any known label
 			$js_labels = '';
 			foreach ($context['labels'] as $label)
+			{
 				if ($label['id'] != -1)
 				{
 					$js_labels[$label['id'] + 1] = $label['name'];
 				}
+			}
 			$js_labels = json_encode($js_labels);
 
 			// And all of the groups as well

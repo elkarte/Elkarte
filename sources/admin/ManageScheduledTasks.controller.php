@@ -158,7 +158,7 @@ class ManageScheduledTasks_Controller extends Action_Controller
 					'data' => array(
 						'sprintf' => array(
 							'format' => '
-								<a class="linkbutton" href="' . $scripturl . '?action=admin;area=scheduledtasks;sa=taskedit;tid=%1$d" title="' . $txt['scheduled_task_edit'] . ' %2$s"><i class="fa fa-pencil-square-o"></i> %2$s</a><br /><span class="smalltext">%3$s</span>',
+								<a class="linkbutton" href="' . $scripturl . '?action=admin;area=scheduledtasks;sa=taskedit;tid=%1$d" title="' . $txt['scheduled_task_edit'] . ' %2$s"><i class="icon icon-small i-pencil"></i> %2$s</a><br /><span class="smalltext">%3$s</span>',
 							'params' => array(
 								'id' => false,
 								'name' => false,
@@ -403,9 +403,9 @@ class ManageScheduledTasks_Controller extends Action_Controller
 					),
 					'data' => array(
 						'function' => function($rowData) {
-							global $settings, $txt;
+							global $txt;
 
-							return '<img src="' . $settings['images_url'] . '/admin/complete_' . ($rowData['task_completed'] ? 'success' : 'fail') . '.png" alt="' . sprintf($txt[$rowData['task_completed'] ? 'maintain_done' : 'maintain_fail'], $rowData['name']) . '" />';
+							return '<i class="icon ' . ($rowData['task_completed'] ? 'i-check' : 'i-fail') . '" title="' . sprintf($txt[$rowData['task_completed'] ? 'maintain_done' : 'maintain_fail'], $rowData['name']) . '" />';
 						},
 					),
 				),

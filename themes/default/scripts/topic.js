@@ -868,7 +868,7 @@ function expandThumbLB(thumbID) {
 		$elk_lightbox = $('#elk_lightbox'),
 		$elk_lb_content = $('#elk_lb_content'),
 		ajaxIndicatorOn = function () {
-			$('<div id="lightbox-loading"><i class="fa fa-spinner fa-spin fa-4x"></i><div>').appendTo($elk_lb_content);
+			$('<div id="lightbox-loading"><i class="icon icon-spin icon-xl i-spinner"></i><div>').appendTo($elk_lb_content);
 		},
 		ajaxIndicatorOff = function () {
 			$('#lightbox-loading').remove();
@@ -947,8 +947,10 @@ function expandThumbLB(thumbID) {
 	// Make the image size fluid as the browser window changes
 	$(window).on('resize.expandThumb', function () {
 		// Account for either a normal or expanded view
-		if ($('#elk_lb_content').hasClass('expand'))
-			$('#elk_lb_content').css({'height': window.innerHeight * 0.85, 'width': window.innerWidth * 0.9});
+		var $_elk_lb_content = $('#elk_lb_content');
+
+		if ($_elk_lb_content.hasClass('expand'))
+			$_elk_lb_content.css({'height': window.innerHeight * 0.85, 'width': window.innerWidth * 0.9});
 		else
 			$('#elk_lb_img').css({'max-height': window.innerHeight * 0.9, 'max-width': window.innerWidth * 0.8});
 	});
@@ -1029,11 +1031,11 @@ function ignore_toggles(msgids, text)
 function sendtopicOverlayDiv(desktopURL, sHeader, sIcon)
 {
 	// Set up our div details
-	var sAjax_indicator = '<div class="centertext"><i class="fa fa-spinner fa-spin"></i></div>',
+	var sAjax_indicator = '<div class="centertext"><i class="icon icon-spin i-spinner"></i></div>',
 		oPopup_body;
 
 	// TODO: Even if we weren't purging icons, this is still not the right icon for this.
-	sIcon = typeof(sIcon) === 'string' ? sIcon : 'envelope';
+	sIcon = typeof(sIcon) === 'string' ? sIcon : 'i-envelope';
 	sHeader = typeof(sHeader) === 'string' ? sHeader : help_popup_heading_text;
 
 	// Load the send topic overlay div
@@ -1270,8 +1272,8 @@ function onTopicSplitReceived(XMLDoc)
 		newItem,
 		sInsertBeforeId,
 		oListItems,
-		right_arrow = '<i class="fa fa-2x fa-arrow-circle-o-right"></i>',
-		left_arrow = '<i class="fa fa-2x fa-arrow-circle-o-left"></i>';
+		right_arrow = '<i class="icon icon-lg i-chevron-circle-right"></i>',
+		left_arrow = '<i class="icon icon-lg i-chevron-circle-left"></i>';
 
 	// Loop through all of the changes returned in the xml response
 	for (i = 0; i < numChanges; i++)

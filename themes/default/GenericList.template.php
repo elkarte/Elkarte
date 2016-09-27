@@ -117,7 +117,7 @@ function template_show_list($list_id = null)
 			$sort_title = $col_header['sort_image'] === 'up' ? $txt['sort_desc'] : $txt['sort_asc'];
 
 			echo '
-					<th scope="col" id="header_', $list_id, '_', $col_header['id'], '"', empty($col_header['class']) ? '' : ' class="' . $col_header['class'] . '"', empty($col_header['style']) ? '' : ' style="' . $col_header['style'] . '"', empty($col_header['colspan']) ? '' : ' colspan="' . $col_header['colspan'] . '"', '>', empty($col_header['href']) ? '' : '<a href="' . $col_header['href'] . '" rel="nofollow">', empty($col_header['label']) ? '&nbsp;' : $col_header['label'], empty($col_header['href']) ? '' : (empty($col_header['sort_image']) ? '</a>' : ' <img class="sort" src="' . $settings['images_url'] . '/sort_' . $col_header['sort_image'] . '.png" alt="" title="' . $sort_title . '" /></a>'), '</th>';
+					<th scope="col" id="header_', $list_id, '_', $col_header['id'], '"', empty($col_header['class']) ? '' : ' class="' . $col_header['class'] . '"', empty($col_header['style']) ? '' : ' style="' . $col_header['style'] . '"', empty($col_header['colspan']) ? '' : ' colspan="' . $col_header['colspan'] . '"', '>', empty($col_header['href']) ? '' : '<a href="' . $col_header['href'] . '" rel="nofollow">', empty($col_header['label']) ? '&nbsp;' : $col_header['label'], empty($col_header['href']) ? '' : (empty($col_header['sort_image']) ? '</a>' : ' <i class="sort icon i-sort-amount-' . $col_header['sort_image'] . '" title="' . $sort_title . '"></i></a>'), '</th>';
 		}
 
 		echo '
@@ -206,6 +206,8 @@ function template_show_list($list_id = null)
  *
  * @param int $row_position
  * @param mixed[] $cur_list
+ *
+ * @return string as echoed output
  */
 function template_additional_rows($row_position, $cur_list)
 {

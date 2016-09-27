@@ -1349,16 +1349,17 @@ class ModerationCenter_Controller extends Action_Controller
 					),
 					'data' => array(
 						'function' => function ($warning) {
-							global $scripturl, $settings, $txt;
+							global $scripturl, $txt;
 
 							$output = '
 								<div class="floatleft">
 									' . $warning['reason'] . '
 								</div>';
 
+							// If a notice was sent, provide a link to it
 							if (!empty($warning['id_notice']))
 								$output .= '
-									<a href="' . $scripturl . '?action=moderate;area=notice;nid=' . $warning['id_notice'] . '" onclick="window.open(this.href, \'\', \'scrollbars=yes,resizable=yes,width=480,height=320\');return false;" target="_blank" class="new_win" title="' . $txt['profile_warning_previous_notice'] . '"><img src="' . $settings['default_images_url'] . '/filter.png" alt="' . $txt['profile_warning_previous_notice'] . '" /></a>';
+									<a href="' . $scripturl . '?action=moderate;area=notice;nid=' . $warning['id_notice'] . '" onclick="window.open(this.href, \'\', \'scrollbars=yes,resizable=yes,width=480,height=320\');return false;" target="_blank" class="new_win" title="' . $txt['profile_warning_previous_notice'] . '"><i class="icon icon-small i-search" title"' . $txt['profile_warning_previous_notice'] . '"></i></a>';
 							return $output;
 						},
 					),

@@ -1354,7 +1354,7 @@ class Maintenance_Controller extends Action_Controller
 						'function' => function ($data) {
 							global $settings;
 
-							return '<img src="' . $settings['images_url'] . '/admin/post_moderation_' . $data['status'] . '.png" alt="' . $data['img_text'] . '" title="' . $data['img_text'] . '" />';
+							return '<i class="icon i-post_moderation_' . $data['status'] . '" title="' . $data['img_text'] . '"></i>';
 						},
 						'class' => 'centertext',
 					),
@@ -1370,13 +1370,13 @@ class Maintenance_Controller extends Action_Controller
 					'value' => $txt['hooks_disable_legend'] . ':
 					<ul>
 						<li>
-							<img src="' . $settings['images_url'] . '/admin/post_moderation_allow.png" alt="' . $txt['hooks_active'] . '" title="' . $txt['hooks_active'] . '" /> ' . $txt['hooks_disable_legend_exists'] . '
+							<i class="icon i-post_moderation_allow" title="' . $txt['hooks_active'] . '"></i>' . $txt['hooks_disable_legend_exists'] . '
 						</li>
 						<li>
-							<img src="' . $settings['images_url'] . '/admin/post_moderation_moderate.png" alt="' . $txt['hooks_disabled'] . '" title="' . $txt['hooks_disabled'] . '" /> ' . $txt['hooks_disable_legend_disabled'] . '
+							<i class="icon i-post_moderation_moderate" title="' . $txt['hooks_disabled'] . '"></i>' . $txt['hooks_disable_legend_disabled'] . '
 						</li>
 						<li>
-							<img src="' . $settings['images_url'] . '/admin/post_moderation_deny.png" alt="' . $txt['hooks_missing'] . '" title="' . $txt['hooks_missing'] . '" /> ' . $txt['hooks_disable_legend_missing'] . '
+							<i class="icon i-post_moderation_deny" title="' . $txt['hooks_missing'] . '"/></i>' . $txt['hooks_disable_legend_missing'] . '
 						</li>
 					</ul>'
 				),

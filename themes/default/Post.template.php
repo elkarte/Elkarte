@@ -371,7 +371,7 @@ function template_add_new_attachments()
 	{
 		echo '
 							<dt class="drop_area">
-								<i class="fa fa-upload"></i>
+								<i class="icon i-upload"></i>
 								<span class="desktop">', $txt['attach_drop_files'], '</span>
 								<span class="mobile">', $txt['attach_drop_files_mobile'], '</span>
 								<input class="drop_area_fileselect" type="file" multiple="multiple" name="attachment_click[]" id="attachment_click" class="input_file" />

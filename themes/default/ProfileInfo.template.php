@@ -694,7 +694,7 @@ function template_profile_block_contact()
 		$ci_empty = false;
 		echo '
 					<dt>
-						<i class="icon i-user', $context['member']['is_buddy'] ? '-plus' : '', '"></i>
+						<i class="icon i-user', $context['member']['is_buddy'] ? '-minus' : '-plus', '"></i>
 					</dt>
 					<dd>
 						<a class="linkbutton" href="', $scripturl, '?action=buddy;u=', $context['id_member'], ';', $context['session_var'], '=', $context['session_id'], ';sa=', ($context['member']['is_buddy'] ? 'remove' : 'add'), '">', $txt['buddy_' . ($context['member']['is_buddy'] ? 'remove' : 'add')], '</a>

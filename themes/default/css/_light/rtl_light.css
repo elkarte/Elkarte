@@ -541,13 +541,12 @@ legend {
 		border-radius: 8px 0 0 0;
 	}
 	.board_latest {
-		border-left: auto;
-		border-right: 0;
+		border-right-width: 0;
 	}
 	.topic_listing>li {
 		box-shadow: -3px 3px 6px #e5e5e5;
 	}
-	.forumposts .windowbg, .forumposts .windowbg2 {
+	.forumposts .content {
 		box-shadow: -3px 3px 6px #e5e5e5;
 	}
 	.linktree:after {

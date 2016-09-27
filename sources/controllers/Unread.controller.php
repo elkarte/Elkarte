@@ -204,7 +204,7 @@ class Unread_Controller extends Action_Controller
 		if ($this->_num_topics == 0)
 		{
 			// Messages mark always, topics only if this is an all topics query
-			if ($type == 'message' || ($type == 'topics' && $context['showing_all_topics']))
+			if ($type === 'message' || ($type === 'topics' && $context['showing_all_topics']))
 			{
 				// Since there are no unread topics, mark the boards as read!
 				// @todo look at this... there are no more unread topics already.
@@ -213,7 +213,8 @@ class Unread_Controller extends Action_Controller
 			}
 
 			$context['topics'] = array();
-			if ($context['querystring_board_limits'] == ';start=%1$d')
+
+			if ($context['querystring_board_limits'] === ';start=%1$d')
 			{
 				$context['querystring_board_limits'] = '';
 			}
@@ -223,8 +224,9 @@ class Unread_Controller extends Action_Controller
 			}
 		}
 		else
+		{
 			$context['topics'] = $this->_grabber->getUnreads($type, $this->_req->query->start, $context['topics_per_page'], $settings['avatars_on_indexes']);
-
+		}
 		$this->_exiting_unread();
 
 		return true;
@@ -251,7 +253,7 @@ class Unread_Controller extends Action_Controller
 		if ($this->_num_topics == 0)
 		{
 			$context['topics'] = array();
-			if ($context['querystring_board_limits'] == ';start=%1$d')
+			if ($context['querystring_board_limits'] === ';start=%1$d')
 			{
 				$context['querystring_board_limits'] = '';
 			}
@@ -271,13 +273,13 @@ class Unread_Controller extends Action_Controller
 				'current_page' => $this->_req->query->start / $context['topics_per_page'] + 1,
 				'num_pages' => floor(($this->_num_topics - 1) / $context['topics_per_page']) + 1
 			);
-
 			$context['topics'] = $this->_grabber->getUnreads(null, $this->_req->query->start, $context['topics_per_page'], $settings['avatars_on_indexes']);
 
 			if ($context['topics'] === false)
 			{
 				$context['topics'] = array();
-				if ($context['querystring_board_limits'] == ';start=%1$d')
+
+				if ($context['querystring_board_limits'] === ';start=%1$d')
 				{
 					$context['querystring_board_limits'] = '';
 				}
@@ -416,7 +418,7 @@ class Unread_Controller extends Action_Controller
 					$sorticon = 'numeric';
 			}
 
-			$context['topics_headers'][$key] = array('url' => $scripturl . '?action=' . $this->_action . ($context['showing_all_topics'] ? ';all' : '') . sprintf($context['querystring_board_limits'], $this->_req->query->start) . ';sort=' . $key . ($context['sort_by'] == $key && $context['sort_direction'] == 'up' ? ';desc' : ''), 'sort_dir_img' => $context['sort_by'] == $key ? '<i class="icon icon-small i-sort-' . $sorticon . '-' . $context['sort_direction'] . '" title="' . $context['sort_title'] . '"></i>' : '',);
+			$context['topics_headers'][$key] = array('url' => $scripturl . '?action=' . $this->_action . ($context['showing_all_topics'] ? ';all' : '') . sprintf($context['querystring_board_limits'], $this->_req->query->start) . ';sort=' . $key . ($context['sort_by'] == $key && $context['sort_direction'] === 'up' ? ';desc' : ''), 'sort_dir_img' => $context['sort_by'] == $key ? '<i class="icon icon-small i-sort-' . $sorticon . '-' . $context['sort_direction'] . '" title="' . $context['sort_title'] . '"></i>' : '',);
 		}
 	}
 
@@ -501,7 +503,13 @@ class Unread_Controller extends Action_Controller
 		if ($this->_is_topics)
 		{
 			$context['recent_buttons'] = array(
-				'markread' => array('text' => !empty($context['no_board_limits']) ? 'mark_as_read' : 'mark_read_short', 'image' => 'markread.png', 'lang' => true, 'custom' => 'onclick="return markunreadButton(this);"', 'url' => $scripturl . '?action=markasread;sa=' . (!empty($context['no_board_limits']) ? 'all' : 'board' . $context['querystring_board_limits']) . ';' . $context['session_var'] . '=' . $context['session_id']),
+				'markread' => array(
+					'text' => !empty($context['no_board_limits']) ? 'mark_as_read' : 'mark_read_short',
+					'image' => 'markread.png',
+					'lang' => true,
+					'custom' => 'onclick="return markunreadButton(this);"',
+					'url' => $scripturl . '?action=markasread;sa=' . (!empty($context['no_board_limits']) ? 'all' : 'board' . $context['querystring_board_limits']) . ';' . $context['session_var'] . '=' . $context['session_id'],
+				),
 			);
 
 			if ($context['showCheckboxes'])
@@ -522,7 +530,12 @@ class Unread_Controller extends Action_Controller
 		elseif (!$this->_is_topics && isset($topics_to_mark))
 		{
 			$context['recent_buttons'] = array(
-				'markread' => array('text' => 'mark_these_as_read', 'image' => 'markread.png', 'lang' => true, 'url' => $scripturl . '?action=markasread;sa=unreadreplies;topics=' . $topics_to_mark . ';' . $context['session_var'] . '=' . $context['session_id']),
+				'markread' => array(
+					'text' => 'mark_these_as_read',
+					'image' => 'markread.png',
+					'lang' => true,
+					'url' => $scripturl . '?action=markasread;sa=unreadreplies;topics=' . $topics_to_mark . ';' . $context['session_var'] . '=' . $context['session_id'],
+				),
 			);
 
 			if ($context['showCheckboxes'])

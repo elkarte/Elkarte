@@ -219,16 +219,16 @@ function rebuildRuleDesc()
 		foundAction = false,
 		curNum,
 		curVal,
-		curDef,
-		groups,
-		labels,
-		rules;
+		curDef;
 
-	// Global strings, convert to objects
+	// GLOBAL strings, convert to objects
+	/** global: groups */
 	if (typeof groups === "string")
 		groups = JSON.parse(groups);
+	/** global: labels */
 	if (typeof labels === "string")
 		labels = JSON.parse(labels);
+	/** global: rules */
 	if (typeof rules === "string")
 		rules = JSON.parse(rules);
 
@@ -240,10 +240,12 @@ function rebuildRuleDesc()
 				joinText = document.getElementById("logic").value === 'and' ? ' ' + txt_pm_readable_and + ' ' : ' ' + txt_pm_readable_or + ' ';
 			else
 				joinText = '';
+
 			foundCriteria = true;
 
 			curNum = document.forms.addrule.elements[i].id.match(/\d+/);
 			curVal = document.forms.addrule.elements[i].value;
+
 			if (curVal === "gid")
 				curDef = document.getElementById("ruledefgroup" + curNum).value.php_htmlspecialchars();
 			else if (curVal !== "bud")
@@ -273,10 +275,12 @@ function rebuildRuleDesc()
 				joinText = ' ' + txt_pm_readable_and + ' ';
 			else
 				joinText = "";
+
 			foundAction = true;
 
 			curNum = document.forms.addrule.elements[i].id.match(/\d+/);
 			curVal = document.forms.addrule.elements[i].value;
+
 			if (curVal === "lab")
 				curDef = document.getElementById("labdef" + curNum).value.php_htmlspecialchars();
 			else
@@ -310,7 +314,12 @@ function initUpdateRulesActions()
 	 * Maintains the personal message rule options to conform with the rule choice
 	 * so that the form only makes available the proper choices (input, select, none, etc)
 	 */
-	$('#criteria').on('change', '[name^="ruletype"]', function() {
+
+	// Handy shortcuts
+	var $criteria = $('#criteria'),
+		$actions = $('#actions');
+
+	$criteria.on('change', '[name^="ruletype"]', function() {
 		var optNum = $(this).data('optnum');
 
 		if (document.getElementById("ruletype" + optNum).value === "gid")
@@ -334,7 +343,7 @@ function initUpdateRulesActions()
 	* Maintains the personal message rule action options to conform with the action choice
 	* so that the form only makes available the proper choice
 	*/
-	$('#actions').on('change', '[name^="acttype"]', function() {
+	$actions.on('change', '[name^="acttype"]', function() {
 		var optNum = $(this).data('actnum');
 
 		if (document.getElementById("acttype" + optNum).value === "lab")
@@ -348,11 +357,11 @@ function initUpdateRulesActions()
 	});
 
 	// Trigger a change on the existing in order to let the function run
-	$('#criteria').find('[name^="ruletype"]').change();
-	$('#actions').find('[name^="acttype"]').change();
+	$criteria.find('[name^="ruletype"]').change();
+	$actions.find('[name^="acttype"]').change();
 
 	// Make sure the description is rebuilt every time something changes, even on elements not yet existing
-	$('#criteria').on('change keyup',
+	$criteria.on('change keyup',
 		'[name^="ruletype"], [name^="ruledefgroup"], [name^="ruledef"], [name^="acttype"], [name^="labdef"], #logic',
 		function() {
 			rebuildRuleDesc();
@@ -383,10 +392,13 @@ function addCriteriaOption()
 	criteriaNum++;
 
 	// Global strings, convert to objects
+	/** global: groups */
 	if (typeof groups === "string")
 		groups = JSON.parse(groups);
+	/** global: labels */
 	if (typeof labels === "string")
 		labels = JSON.parse(labels);
+	/** global: rules */
 	if (typeof rules === "string")
 		rules = JSON.parse(rules);
 

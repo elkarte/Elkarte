@@ -486,7 +486,7 @@ function template_quickreply_below()
 		if (!empty($context['drafts_autosave']) && !empty($options['drafts_autosave_enabled']))
 			echo '
 							<div class="draftautosave">
-								<span id="throbber" class="hide"><i class="fa fa-spinner fa-spin"></i>&nbsp;</span>
+								<span id="throbber" class="hide"><i class="icon icon-spin i-spinner"></i>&nbsp;</span>
 								<span id="draft_lastautosave"></span>
 							</div>';
 
@@ -801,7 +801,7 @@ function template_pages_and_buttons_below()
 	if (can_see_button_strip($context['mod_buttons']))
 	{
 		echo '
-			<i class="fa fa-2x fa-bars hamburger_30" data-id="moderationbuttons"></i>';
+			<i class="icon icon-lg i-menu hamburger_30" data-id="moderationbuttons"></i>';
 	}
 
 	echo '
@@ -883,7 +883,7 @@ function template_display_attachments($message, $ignoring)
 		echo '
 										<div class="attachment_name">
 											<a href="' . $attachment['href'] . '">
-												<img src="' . $settings['images_url'] . '/icons/clip.png" class="centericon" alt="*" />&nbsp;' . $attachment['name'] . '
+												<i class="icon icon-small i-paperclip"></i>&nbsp;' . $attachment['name'] . '
 											</a> ';
 
 		if (!$attachment['is_approved'] && $context['can_approve'])

@@ -38,7 +38,7 @@ function start_tabs() {
 		// Called before tab content is loaded with href
 		beforeLoad: function (event, ui) {
 			// The ubiquitous ajax spinner
-			ui.panel.html('<div class="centertext"><i class="fa fa-2x fa-spinner"></i></div>');
+			ui.panel.html('<div class="centertext"><i class="icon icon-spin icon-big i-spinner"></i></div>');
 
 			// Ajax call failed to retrieve content
 			ui.jqXHR.fail(function () {
@@ -48,7 +48,7 @@ function start_tabs() {
 					window.console.info(ui);
 				}
 			});
-		},
+		}
 	});
 }
 
@@ -325,10 +325,11 @@ function modifyWarnNotify()
 			context: document.body
 		})
 		.done(function(request) {
-			$("#box_preview").show();
-			$("#body_preview").html($(request).find('body').text());
+			var $_preview = $("#box_preview"),
+				$_profile_error = $("#profile_error");
 
-			var $_profile_error = $("#profile_error");
+			$_preview.show();
+			$_preview.html($(request).find('body').text());
 
 			if ($(request).find("error").text() !== '')
 			{

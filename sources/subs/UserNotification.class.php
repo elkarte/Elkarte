@@ -92,7 +92,7 @@ class User_Notification extends AbstractModel
 		}
 
 		addInlineJavascript('
-			$(document).ready(function() {
+			$(function() {
 				ElkNotifier.add(new ElkFavicon({
 					number: ' . $number . ',
 					fontStyle: \'bolder\',
@@ -108,7 +108,7 @@ class User_Notification extends AbstractModel
 	{
 		loadJavascriptFile('desktop-notify.js');
 		addInlineJavascript('
-			$(document).ready(function() {
+			$(function() {
 				ElkNotifier.add(new ElkDesktop());
 			});', true);
 	}

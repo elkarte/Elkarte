@@ -519,7 +519,7 @@ function template_add_edit_group_boards_list($form_id, $collapse = true)
 	echo '
 							</fieldset>
 							<script>
-								$(document).ready(function () {
+								$(function() {
 									$(".select_all_box").each(function () {
 										$(this).show();
 									});

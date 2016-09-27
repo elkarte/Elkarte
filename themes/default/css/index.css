@@ -1,55 +1,57 @@
 /* INTRODUCTION
-/* This is the standard Elkarte default theme.
-/* This file contains essential layout code only.
-/* Colors, gradients, images, etc. are in _variantname.css.
-/*
-/* All theme variants depend on this layout code for stability.
-/* It is better to copy code to a variant CSS file for testing.
-/* ------------------------------------------------------- */
-/* $CONTENTS - still a bit WIP. @todo
-/*
-/*		$GENERAL.............Global resets, clearfixes, etc.
-/*		$COMMON..............Common classes to drive you bonkers.
-/*		$BBC.................Quotes, code blocks, BBC styles.
-/*		$AJAX................The "loading" bar (quick edit, etc).
-/*
-/*		$MAIN................Forum header, wrapper, and footer.
-/*		$MENUS...............Main and secondary menus.
-/*		$LINKTREE............The breadcrumbs.
-/*		$BUTTONS.............Most button strips.
-/*		$PAGELINKS...........Page navigation links.
-/*
-/*		$TABLES..............Generic tables (error log, etc.).
-/*		$SETTINGS............Generic lists for settings pages.
-/*		$BOARDS..............Board index, sub-boards, and message index.
-/*		$DRAG-N-DROP.........Post attachment area, including Drag and Drop
-/*
-/*		$TOPICS..............The display template (topic view), including send.
-/*		$EDITOR..............Main editor (posts, events, polls) and topic summary.
-/*		$MODERATE............Move topic, split topic, merge topic.
-/*
-/*		$PROFILE.............The profile areas.
-/*		$TABS...............Tabs used in the profile section, override jqueryUI css
-/*		$PERSONAL............The personal messages (PM) areas.
-/*		$CALENDAR............Wombats (and the calendar).
-/*		$STATISTICS..........The statistics centre.
-/*		$LIKE STATS..........The like stats area
-/*
-/*		$HELP................Help pages, help icons and pop-ups, tooltips.
-/*		$SEARCH..............Search pages, including memberlist search.
-/*		$MEMBERLIST..........The memberlist table.
-/*		$LOGIN...............Login and registration, maintenance mode.
-/*
-/*		$BOXES...............Message boxes (error, warning, info, etc).
-/*		$PROGRESS............Nifty progress bars.
-/*		$MEDIA...............Experimental media queries.
-/* ------------------------------------------------------- */
+ * This is the standard Elkarte default theme.
+ * This file contains essential layout code only.
+ * Colors, gradients, images, etc. are in _variantname.css.
+ *
+ * All theme variants depend on this layout code for stability.
+ * It is better to copy code to a variant CSS file for testing.
+ * -------------------------------------------------------
+ * $CONTENTS - still a bit WIP. @todo
+ *
+ *		$GENERAL.............Global resets, clearfixes, etc.
+ *		$COMMON..............Common classes to drive you bonkers.
+ *		$BBC.................Quotes, code blocks, BBC styles.
+ *		$AJAX................The "loading" bar (quick edit, etc).
+ *
+ *		$MAIN................Forum header, wrapper, and footer.
+ *		$MENUS...............Main and secondary menus.
+ *		$LINKTREE............The breadcrumbs.
+ *		$BUTTONS.............Most button strips.
+ *		$PAGELINKS...........Page navigation links.
+ *
+ *		$TABLES..............Generic tables (error log, etc.).
+ *		$SETTINGS............Generic lists for settings pages.
+ *		$BOARDS..............Board index, sub-boards, and message index.
+ *		$DRAG-N-DROP.........Post attachment area, including Drag and Drop
+ *
+ *		$TOPICS..............The display template (topic view), including send.
+ *		$EDITOR..............Main editor (posts, events, polls) and topic summary.
+ *		$MODERATE............Move topic, split topic, merge topic.
+ *
+ *		$PROFILE.............The profile areas.
+ *		$TABS...............Tabs used in the profile section, override jqueryUI css
+ *		$PERSONAL............The personal messages (PM) areas.
+ *		$CALENDAR............Wombats (and the calendar).
+ *		$STATISTICS..........The statistics centre.
+ *		$LIKE STATS..........The like stats area
+ *
+ *		$HELP................Help pages, help icons and pop-ups, tooltips.
+ *		$SEARCH..............Search pages, including memberlist search.
+ *		$MEMBERLIST..........The memberlist table.
+ *		$LOGIN...............Login and registration, maintenance mode.
+ *
+ *		$BOXES...............Message boxes (error, warning, info, etc).
+ *		$PROGRESS............Nifty progress bars.
+ *		$MEDIA...............Experimental media queries.
+ * -------------------------------------------------------
+ */
 
-/* ------------------------------------------------------- */
-/*	$GENERAL                                               */
-/* ------------------------------------------------------- */
-/* Put this here to make it easy to find. */
-/* Width control for top bar, header, main content and footer content. */
+/* -------------------------------------------------------
+ *	$GENERAL
+ * -------------------------------------------------------
+ * Put this here to make it easy to find.
+ * Width control for top bar, header, main content and footer content.
+ */
 .wrapper {
 	margin: 0 auto;
 	/* Next controls forum width, when it is not set in admin. */
@@ -60,9 +62,11 @@
 	max-width: 90em;
 }
 
-/* ------------------------------------------------------- */
-/*	$GENERAL	                                           */
-/* ------------------------------------------------------- */
+/* -------------------------------------------------------
+ *	$GENERAL
+ * -------------------------------------------------------
+ */
+
 /* Normal, standard links. */
 a, a:link, a:visited,
 	/* Links that open in a new window. */
@@ -86,13 +90,17 @@ html, body {
 }
 
 body, input, button, select, textarea, .editor {
-	/* Set a font-size that will look the same in all browsers. */
-	/* Start with the best Vista/W7 font, then Mac, Linux, then old fallbacks. */
-	/* this results in a base 14pt and pt to em translation approx as so
-	/* 9 - .643, 10 - .714, 11 - .786, 12 - .857, 13 - .929, 14 - 1, 15 - 1.071, 16 - 1.143
-	/* 17 - 1.214, 18 - 1.286, 19 - 1.357, 20 - 1.429, 21 - 1.5, 22 - 1.571, 23 - 1.643
-	/* 24 - 1.714, 25 - 1.786, 26 - 1.857, 27 - 1.929, 28 - 2, 29 - 2.071 */
-	font: 87.5%/150% "Segoe UI", "Helvetica Neue", "Liberation Sans", "Nimbus Sans L", "Trebuchet MS", Arial, sans-serif;
+	/* Set a font-size that will look the mostly the same in all browsers.
+	 * Start with calling OSx system’s UI font with -apple-system, BlinkMacSystemFont this will pull in
+	 * (San Francisco, Neue Helvetica and Lucida Grande depends on OS version)
+	 * Then Windows (Segoe UI), Android (Roboto), Unix (KDE, Ubuntu, Gnome), Old Android (Droid Sans),
+	 * OSx pre apple-system support (Helvetica Neue), fallbacks (Arial, sans-serif)
+	 * this results in a base 14pt and pt to em translation approx as so
+	 * 9 - .643, 10 - .714, 11 - .786, 12 - .857, 13 - .929, 14 - 1, 15 - 1.071, 16 - 1.143
+	 * 17 - 1.214, 18 - 1.286, 19 - 1.357, 20 - 1.429, 21 - 1.5, 22 - 1.571, 23 - 1.643
+	 * 24 - 1.714, 25 - 1.786, 26 - 1.857, 27 - 1.929, 28 - 2, 29 - 2.071
+	 */
+	font: 87.5%/150% -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen", "Ubuntu", "Cantarell", "Droid Sans", "Helvetica Neue", Arial, sans-serif;
 }
 
 legend {
@@ -107,10 +115,11 @@ table {
 	empty-cells: show;
 }
 
-/* Global box sizing, for stabilising fluid layouts. */
-/* IMPORTANT: Do not declare div here (borks jQuery menus). */
-/* Default most elements to zero padding and margin. */
-/* Declare these separately to divs to avoid padding and margin problems. */
+/* Global box sizing, for stabilising fluid layouts.
+ * IMPORTANT: Do not declare div here (borks jQuery menus).
+ * Default most elements to zero padding and margin.
+ * Declare these separately to divs to avoid padding and margin problems.
+ */
 h1, h2, h3, h4, h5, h6,
 ul, ol, li,
 dl, dd, dt,
@@ -124,9 +133,10 @@ form, input, button, select, textarea,
 	font-size: 1em;
 }
 
-/* Fieldsets are used to group elements. */
-/* @todo - Can we do this by class? What about default styling? Needed? */
-/* Declaring as overflow: auto; is probably a good idea. */
+/* Fieldsets are used to group elements.
+ * @todo - Can we do this by class? What about default styling? Needed?
+ * Declaring as overflow: auto; is probably a good idea.
+ */
 
 fieldset {
 	margin: 5px 0;
@@ -181,24 +191,24 @@ a img {
 }
 
 /* Style the different types of inputs to be uniform for all browsers.
-/*
-/* NOTE: This does require some browser-specific code to get good results.
-/* Padding on all types of inputs are set here.
-/* If specific styling is wanted for some inputs, be aware of browser
-/* differences when adding custom padding, or it will drive you mental.
-/*
-/* ALSO: This is still not quite pixel perfect everywhere for all browsers,
-/* in particular not for Internet Explorer. They can live with it.
-/*
-	.button_submit - covers input[type=submit], input[type=button],
-	                 button[type=submit] and button[type=button]
-	.linkbutton    - covers links, to make them look like a submit button.
-	.button_reset  - covers input[type=reset] and button[type=reset]
-	.input_check   - covers input[type=checkbox]
-	.input_radio   - covers input[type=radio]
-	.input_text    - covers input[type=text]
-	.input_file    - covers input[type=file]
-*/
+ *
+ * NOTE: This does require some browser-specific code to get good results.
+ * Padding on all types of inputs are set here.
+ * If specific styling is wanted for some inputs, be aware of browser
+ * differences when adding custom padding, or it will drive you mental.
+ *
+ * ALSO: This is still not quite pixel perfect everywhere for all browsers,
+ * in particular not for Internet Explorer. They can live with it.
+ *
+ *	.button_submit - covers input[type=submit], input[type=button],
+ *	                 button[type=submit] and button[type=button]
+ *	.linkbutton    - covers links, to make them look like a submit button.
+ *	.button_reset  - covers input[type=reset] and button[type=reset]
+ *	.input_check   - covers input[type=checkbox]
+ *	.input_radio   - covers input[type=radio]
+ *	.input_text    - covers input[type=text]
+ *	.input_file    - covers input[type=file]
+ */
 button::-moz-focus-inner,
 input::-moz-focus-inner {
 	padding: 0;
@@ -215,10 +225,7 @@ textarea, .editor {
 }
 
 /* Declarations for inputs, selects and buttons */
-input,
-.input_text,
-button,
-select {
+input, .input_text, button, select {
 	padding: 0 6px;
 	min-height: 2em;
 	max-height: 2em;
@@ -288,12 +295,12 @@ input[type="submit"], button[type="submit"], input[type="button"],
 .linkbutton:link, .linkbutton_right:link, .linkbutton_left:link,
 .linkbutton:visited, .linkbutton_right:visited, .linkbutton_left:visited {
 	display: inline-block;
-	padding: 0 .25em;
+	padding: 0 .35em;
 }
 
 input[type="submit"], .drop_area_fileselect_text, .drop_area .mobile, button[type="submit"], input[type="button"],
-	/* Anchors styled to look like buttons. */
-	/* These have standard body text size. Can be chained with smalltext class. */
+/* Anchors styled to look like buttons. */
+/* These have standard body text size. Can be chained with smalltext class. */
 .linkbutton:link, .linkbutton_right:link, .linkbutton_left:link,
 .linkbutton:visited, .linkbutton_right:visited, .linkbutton_left:visited {
 	border: 1px solid;
@@ -323,7 +330,7 @@ input[type=submit][disabled]:hover, button[disabled], button[disabled]:hover {
 .linkbutton:link, .linkbutton_right:link, .linkbutton_left:link,
 .linkbutton:visited, .linkbutton_right:visited, .linkbutton_left:visited {
 	font-size: 0.857em;
-	line-height: 1.8em;
+	line-height: 1.85em;
 }
 
 /* Use new class that is defined to suit, and with a sensible name. */
@@ -335,7 +342,8 @@ input[type=submit][disabled]:hover, button[disabled], button[disabled]:hover {
 }
 
 .submitbutton input[type="submit"],
-.submitbutton input[type="button"]{
+.submitbutton input[type="button"] {
+	margin-top: -0.05em;
 	margin-right: 0.1em;
 	margin-left: 0.1em;
 	padding: 0 6px;
@@ -346,9 +354,10 @@ input[type=submit][disabled]:hover, button[disabled], button[disabled]:hover {
 	padding: 0 0 0 6px;
 }
 
-/* the new "button" */
-/* @todo - Might add extra fallbacks. Possibly monospace. */
-/* @todo - Also, look at deprecating spans here. */
+/* the new "button"
+ * @todo - Might add extra fallbacks. Possibly monospace.
+ * @todo - Also, look at deprecating spans here.
+ */
 .new_posts, .require_approval {
 	border-radius: 2px;
 	padding: 1px 4px 2px 4px;
@@ -418,9 +427,10 @@ em, .em {
 	width: 49.5% !important;
 }
 
-/* ------------------------------------------------------- */
-/*	$COMMON                                                */
-/* ------------------------------------------------------- */
+/* -------------------------------------------------------
+ *	$COMMON
+ * -------------------------------------------------------
+ */
 
 /* HTML5 additions for deprecated tags. */
 .tt {
@@ -467,8 +477,9 @@ em, .em {
 }
 
 /* Default font sizes (defined in em, so IE can resize): small (12px default),
-/* normal (14px default), and large (16px default).
-/* Since these are purely presentational classes, they should be used sparingly. */
+ * normal (14px default), and large (16px default).
+ * Since these are purely presentational classes, they should be used sparingly.
+ */
 .smalltext {
 	font-size: 0.857em;
 }
@@ -561,7 +572,6 @@ em, .em {
 .cat_img_talk:before        {background-position: 0 -576px;}
 
 /* Expand/Collapse image in the various headers */
-
 .collapse, .expand {
 	float: right;
 }
@@ -594,19 +604,6 @@ em, .em {
 .highlight {
 	font-weight: bold;
 	font-size: 1.071em;
-}
-
-/* Used for sections that need somewhat larger corners */
- .well, .roundframe {
-	overflow: hidden;
-	margin: 2px 0 0 0;
-	padding: 9px;
-	border: 1px solid;
-	border-radius: 7px;
-}
-
-.well p, .roundframe p {
-	padding: 6px;
 }
 
 .additional_row {
@@ -674,9 +671,11 @@ em, .em {
 	width: 100%;
 }
 
-/* ------------------------------------------------------- */
-/*	$BBC                                                   */
-/* ------------------------------------------------------- */
+/* -------------------------------------------------------
+ *	$BBC
+ * -------------------------------------------------------
+ */
+
 /* The "Quote:" and "Code:" header parts... */
 .codeheader, .quoteheader {
 	margin: 6px 0 0 0;
@@ -705,6 +704,7 @@ em, .em {
 	font-weight: 600;
 	font-family: "Segoe UI Semibold", "Segoe UI", "Helvetica Neue Medium", "Helvetica Neue", serif;
 	-webkit-font-smoothing: antialiased;
+	-moz-osx-font-smoothing: grayscale;
 }
 
 /* [Select] link to copy code. */
@@ -790,10 +790,12 @@ strong, .bbc_strong {
 	font-weight: bold;
 	padding: 0 0.5em;
 }
+
 /* Styling for bbc tables inside posts */
 .inner > .bbc_table_container > .bbc_table {
 	border-collapse: collapse;
 }
+
 .inner > .bbc_table_container > .bbc_table th {
 	text-align: center;
 }
@@ -873,9 +875,10 @@ a.bbc_link {
 	cursor: pointer;
 }
 
-/* ------------------------------------------------------- */
-/*	$AJAX                                                  */
-/* ------------------------------------------------------- */
+/* -------------------------------------------------------
+ *	$AJAX
+ * -------------------------------------------------------
+ */
 
 /* The "Loading" bar for quick edit, etc. */
 #ajax_in_progress {
@@ -905,9 +908,11 @@ a.bbc_link {
 	width: 85%;
 }
 
-/* ------------------------------------------------------- */
-/*	$MAIN.		                                           */
-/* ------------------------------------------------------- */
+/* -------------------------------------------------------
+ *	$MAIN.
+ * -------------------------------------------------------
+ */
+
 /* The top bar. */
 #top_section {
 	margin: 0;
@@ -987,9 +992,11 @@ a.bbc_link {
 	font-size: 2.357em;
 	line-height: 1.455em;
 }
+
 .centerheader .forumlink {
 	display: none;
 }
+
 .rightheader #forumtitle .forumlink {
 	float: right;
 }
@@ -1123,18 +1130,21 @@ a.bbc_link {
 	width: 90%;
 }
 
-/* ------------------------------------------------------- */
-/*	$MENUS                                                 */
-/* ------------------------------------------------------- */
+/* -------------------------------------------------------
+ *	$MENUS
+ * -------------------------------------------------------
+ */
+
 /* This section contains code for the main forum menu (#main_menu),
-/* and for the secondary menus in admin/profile/pm (.admin_menu),
-/* and for the tertiary menu strip in admin/etc (#adm_submenus).
-/*
-/* Top level <ul> elements have the class or id mentioned above.
-/* <li> elements are for positioning only (classes are listlevel1, etc).
-/* Top level links (like main menu buttons) have the class linklevel1.
-/* Drop menu wrappers are either menulevel2 or menulevel3.
-/* Drop menu links are either linklevel2 or linklevel3. */
+ * and for the secondary menus in admin/profile/pm (.admin_menu),
+ * and for the tertiary menu strip in admin/etc (#adm_submenus).
+ *
+ * Top level <ul> elements have the class or id mentioned above.
+ * <li> elements are for positioning only (classes are listlevel1, etc).
+ * Top level links (like main menu buttons) have the class linklevel1.
+ * Drop menu wrappers are either menulevel2 or menulevel3.
+ * Drop menu links are either linklevel2 or linklevel3.
+ */
 
 /* Main menu bar: wrapper/background. */
 #menu_nav {
@@ -1156,8 +1166,9 @@ a.bbc_link {
 	padding: 0 3px;
 }
 
-/* Level 1 button positioning. */
-/* 1px padding gives slight gap between buttons, and drop menus. */
+/* Level 1 button positioning.
+ * 1px padding gives slight gap between buttons, and drop menus.
+ */
 .listlevel1 {
 	position: relative;
 	float: left;
@@ -1255,8 +1266,9 @@ a.bbc_link {
 	border-bottom: 1px solid;
 }
 
-/* Top level subsection indicators. */
-/* Comment these out if you don't want them. */
+/* Top level subsection indicators.
+ * Comment these out if you don't want them.
+ */
 .subsections:hover .linklevel1:after {
 	position: absolute;
 	right: 0.4em;
@@ -1337,8 +1349,9 @@ a.bbc_link {
 	left: -14px;
 }
 
-/* Level 2 and 3 button positioning. */
-/* 1px vertical padding gives slight gap between buttons. */
+/* Level 2 and 3 button positioning.
+ * 1px vertical padding gives slight gap between buttons.
+ */
 .listlevel2, .listlevel3 {
 	position: relative;
 	float: none;
@@ -1393,13 +1406,15 @@ a.bbc_link {
 }
 
 /* Styles for sidebar menus.
-/* Cancel default backgrounds for sidebar. */
+ * Cancel default backgrounds for sidebar.
+ */
 #menu_sidebar .linklevel1 {
 	border: 1px solid;
 }
 
 /* Tricky PM indicator. Define it carefully,
-/* just in case someone tries to use this class elsewhere. */
+ * just in case someone tries to use this class elsewhere.
+ */
 .pm_indicator, .likes_indicator {
 	position: absolute;
 	top: -1.45em;
@@ -1429,9 +1444,10 @@ a.bbc_link {
 	line-height: 1.5em;
 }
 
-/* @todo - Note: The next declarations are for keyboard access with js disabled. */
-/* Hmm. These are tricky with the new Superfish/Superclick combo. */
-/* May need a noScript class added somewhere. Pondering required. */
+/* @todo - Note: The next declarations are for keyboard access with js disabled.
+ * Hmm. These are tricky with the new Superfish/Superclick combo.
+ * May need a noScript class added somewhere. Pondering required.
+ */
 /*
 .linklevel2:focus, .linklevel3:focus {
 	margin-left: 9990px;
@@ -1451,8 +1467,7 @@ a.bbc_link {
 }
 */
 
-/* Styles for sidebar menus.
-------------------------------------------------------- */
+/* Styles for sidebar menus. */
 #main_admsection {
 	overflow: auto;
 }
@@ -1484,9 +1499,10 @@ a.bbc_link {
 	font-size: 0.6em;
 }
 
-/* @todo - Note: The next declarations are for keyboard access with js disabled. */
-/* Hmm. These are tricky with the new Superfish/Superclick combo. */
-/* May need a noScript class added somewhere. Pondering required. */
+/* @todo - Note: The next declarations are for keyboard access with js disabled.
+ * Hmm. These are tricky with the new Superfish/Superclick combo.
+ * May need a noScript class added somewhere. Pondering required.
+ */
 /*
 #menu_sidebar .linklevel2:focus {
 	margin-left: 10150px;
@@ -1501,9 +1517,11 @@ a.bbc_link {
 }
 */
 
-/* ------------------------------------------------------- */
-/*	$LINKTREE                                              */
-/* ------------------------------------------------------- */
+/* -------------------------------------------------------
+ *	$LINKTREE
+ * -------------------------------------------------------
+ */
+
 /* The navigation list (i.e. linktree, breadcrumbs) */
 .navigate_section {
 	overflow: hidden;
@@ -1528,9 +1546,11 @@ a.bbc_link {
 	line-height: 2em;
 	border-bottom: 1px solid;
 }
+
 .linktree:first-child a {
 	height: 2em;
 }
+
 .linktree:last-child {
 	max-width: 25em;
 }
@@ -1578,16 +1598,16 @@ a.bbc_link {
 	padding: 0 .75em;
 }
 
-/* ------------------------------------------------------- */
-/*	$BUTTONS                                               */
-/* This section contains code for the quickbuttons (quote, quick edit, etc)
-/* and for the buttonlist class (reply, add poll, notify, etc).
-/* These classes share some styling.
-/* Declarations are amalgamated where styling is shared.
-/* ------------------------------------------------------- */
+/* -------------------------------------------------------
+ *	$BUTTONS
+ * This section contains code for the quickbuttons (quote, quick edit, etc)
+ * and for the buttonlist class (reply, add poll, notify, etc).
+ * These classes share some styling.
+ * Declarations are amalgamated where styling is shared.
+ * -------------------------------------------------------
+ */
 
-/* Styles for the standard button lists.
-/* ------------------------------------------------------- */
+/* Styles for the standard button lists. */
 .buttonlist {
 	padding: 5px 5px 0 5px;
 }
@@ -1610,12 +1630,11 @@ a.bbc_link {
 	text-transform: uppercase;
 }
 
-.fa.hamburger_30 {
+.icon.hamburger_30 {
 	display: none;
 }
 
 /* The quick buttons. */
-/* ------------------------------------------------------- */
 .quickbuttons {
 	margin: 8px 0 6px 0;
 	text-align: right;
@@ -1641,7 +1660,6 @@ a.bbc_link {
 }
 
 /* Odd cases. */
-
 .moderation_link, .moderation_link:visited {
 	font-weight: bold;
 }
@@ -1669,8 +1687,9 @@ a.bbc_link {
 	border-radius: 0;
 }
 
-/* @todo - Check with js disabled after sorting most of the other crud. */
-/* Note: The next declarations are for keyboard access with js disabled. */
+/* @todo - Check with js disabled after sorting most of the other crud.
+ * Note: The next declarations are for keyboard access with js disabled.
+ */
 /*.quickbuttons .linklevel1:focus {
 	margin: 0 -9910px 0 9910px;
 }*/
@@ -1696,7 +1715,8 @@ a.bbc_link {
 }
 
 /* The rest of them.
- @todo: font awesome yadda yadda */
+ * @todo: font awesome yadda yadda
+ */
 .quickbuttons .linklevel1:before, .quickbuttons .linklevel2:before {
 	background-image: url(../images/theme/quickbuttons.png);
 	/* A rare example of where longhand background declarations work well. */
@@ -1750,6 +1770,7 @@ a.bbc_link {
 
 /* "More..." gets custom padding (no icon). */
 .linklevel1.post_options,
+
 /* Follow ups gets custom padding (no icon). */
 .follow_ups .linklevel1 {
 	padding: 1px 6px 0 6px;
@@ -1772,6 +1793,7 @@ a.bbc_link {
 .like_button:before, .likes_button:before, .unlike_button:before {
 	background-position: 0 -480px;
 }
+
 .unlike_button:before {
 	background-position: 0 -408px;
 }
@@ -1798,9 +1820,10 @@ a.bbc_link {
 	line-height: 2.1em;
 }
 
-/* ------------------------------------------------------- */
-/*	$PAGELINKS                                             */
-/* ------------------------------------------------------- */
+/* -------------------------------------------------------
+ *	$PAGELINKS
+ * -------------------------------------------------------
+ */
 
 /* The page navigation area. */
 .pagesection {
@@ -1828,11 +1851,12 @@ a.bbc_link {
 	font-size: 0.857em;
 }
 
-/* @todo - Styling will need a bit more thought here. */
-/* Do not use display: inline-block;*/
-/* Why not? Because it has a well-known quirk. It's white-space-dependent. */
-/* http://robertnyman.com/2010/02/24/css-display-inline-block-why-it-rocks-and-why-it-sucks/ */
-/* Specifically, the section titled "The enormous drawback". */
+/* @todo - Styling will need a bit more thought here.
+ * Do not use display: inline-block;
+ * Why not? Because it has a well-known quirk. It's white-space-dependent.
+ * http://robertnyman.com/2010/02/24/css-display-inline-block-why-it-rocks-and-why-it-sucks/
+ * Specifically, the section titled "The enormous drawback".
+ */
 .pagelinks .navPages, .pagelinks .current_page, .expand_pages, .small_pagelinks .navPages {
 	display: block;
 	float: left;
@@ -1940,7 +1964,9 @@ a.bbc_link {
 	height: 1.5em;
 	font-weight: bold;
 	font-size: 2em;
+	transform: translateZ(0);
 	-webkit-transform: translateZ(0);
+	backface-visibility: hidden;
 	-webkit-backface-visibility: hidden;
 	border: 1px solid;
 	border-bottom: none;
@@ -1964,20 +1990,22 @@ a.bbc_link {
 	top: -10em;
 	left: 3em;
 	padding: 1em 2em;
-	background: none repeat scroll 0 0 rgba(0, 0, 0, 0);
+	background: none repeat scroll 0 0 #ffffff;
 	font-weight: bold;
 	transition: top .5s ease-out 0s, background 1s linear 0s;
 	border: 4px solid;
 	border-radius: 0 0 6px 6px;
+	z-index: 200;
 }
 
 #top:focus {
 	top: -4px;
 }
 
-/* ------------------------------------------------------- */
-/*	$TABLES                                                */
-/* ------------------------------------------------------- */
+/* -------------------------------------------------------
+ *	$TABLES
+ * -------------------------------------------------------
+ */
 
 /* A general table class. */
 .table_grid {
@@ -2021,16 +2049,17 @@ a.bbc_link {
 }
 
 /* For Errors.template.php. */
-/* ------------------------------------------------------- */
 #errorfile_table .current {
 	font-weight: bold;
 	border: 1px solid;
 }
 
-/* ------------------------------------------------------- */
-/* $SETTINGS                                               */
-/* ------------------------------------------------------- */
-/* Lists - settings use these a lot.                       */
+/* -------------------------------------------------------
+ * $SETTINGS
+ * -------------------------------------------------------
+ */
+
+/* Lists - settings use these a lot. */
 .settings {
 	clear: right;
 	overflow: auto;
@@ -2055,8 +2084,9 @@ a.bbc_link {
 	width: 55%;
 }
 
-/* I'm a tad leary of these setting new margins, but this line is here to compress     */
-/* listings in fieldset, like a permissions radio listing, from taking up excess space */
+/* I'm a tad leary of these setting new margins, but this line is here to compress
+ * listings in fieldset, like a permissions radio listing, from taking up excess space
+ */
 .settings dd > fieldset dd, .settings dd > fieldset dt {
 	margin: 0;
 }
@@ -2086,11 +2116,12 @@ a.bbc_link {
 	padding-left: 1em;
 }
 
-/* ------------------------------------------------------- */
-/*	$BOARDS		                                           */
-/* ------------------------------------------------------- */
-/* The small stats, under upper linktree.                  */
+/* -------------------------------------------------------
+ *	$BOARDS
+ * -------------------------------------------------------
+ */
 
+/* The small stats, under upper linktree. */
 #index_common_stats {
 	margin: 0 8px 6px 8px;
 	font-size: 0.857em;
@@ -2581,8 +2612,7 @@ img.new_posts {
 	width: 100%;
 }
 
-/* Message index icons and topic status as sprites
-------------------------------------------------- */
+/* Message index icons and topic status as sprites */
 .topicicon:before,
 .sticky_row .topic_info:before,
 .locked_row .topic_info:before,
@@ -2693,12 +2723,14 @@ img.new_posts {
 	border: none;
 }
 
-/* ------------------------------------------------------- */
-/*	$TOPICS                                                */
-/* ------------------------------------------------------- */
+/* -------------------------------------------------------
+ *	$TOPICS
+ * -------------------------------------------------------
+ */
 
 /* The display template (topic view).
-/* Events */
+ * Events
+ */
 .linked_events {
 	padding: 12px 0;
 }
@@ -2784,11 +2816,11 @@ img.new_posts {
 }
 
 /* On to the posts */
-#quickreplybox, #forumposts, #searchform, #recentposts, #pmFolder, #topic_summary, #preview_section {
+#quickreplybox, #forumposts, #searchform, #recentposts,
+#pmFolder, #topic_summary, #preview_section {
 	border-radius: 4px 4px 0 0;
 }
 
-/* On to the posts */
 #forumposts {
 	clear: both;
 	margin: 6px 0 0 0;
@@ -2835,6 +2867,7 @@ img.new_posts {
 	vertical-align: top;
 	word-wrap: break-word;
 	word-break: normal;
+	hyphens: auto;
 	-webkit-hyphens: auto;
 	-moz-hyphens: auto;
 	-ms-hyphens: auto;
@@ -2945,7 +2978,6 @@ img.new_posts {
 	font-weight: bold;
 }
 
-/* @todo - Save code by amalgamating common button background declarations. */
 .poster_online .linklevel1 {
 	position: relative;
 	display: block;
@@ -3046,6 +3078,7 @@ img.new_posts {
 	padding: 7px 8px 2px 2px;
 	min-height: 70px;
 	word-wrap: break-word;
+	hyphens: auto;
 	-webkit-hyphens: auto;
 	-moz-hyphens: auto;
 	-ms-hyphens: auto;
@@ -3128,21 +3161,19 @@ img.new_posts {
 
 #elk_lb_expand {
 	position: absolute;
-	top: 1%;
+	top: 2%;
 	right: 1%;
 	display: inline-block;
-	width: 1.15em;
-	height: 1.15em;
+	width: 2em;
+	height: 2em;
 	border: 2px solid;
 	border-radius: 4px;
-	line-height: 1em;
+	line-height: 2em;
 }
 
 #elk_lb_expand:before {
-	color: #CCCCCC;
-	content: "\f065";
-	font-size: 1em;
-	font-family: 'FontAwesome';
+	content: "\21D7";
+	font-size: 2em;
 }
 
 .attachment_thumb, .attachment_name {
@@ -3216,7 +3247,6 @@ img.new_posts {
 }
 
 /* The quick reply area. */
-/* @todo - Markup and CSS could be tweaked here. */
 #quickreplybox {
 	clear: both;
 	margin: 6px 0 0 0;
@@ -3287,9 +3317,10 @@ dl.send_mail dd {
 	margin-bottom: 15px;
 }
 
-/* ------------------------------------------------------- */
-/*	$EDITOR                                                */
-/* ------------------------------------------------------- */
+/* -------------------------------------------------------
+ *	$EDITOR
+ * -------------------------------------------------------
+ */
 
 /* The main post editor section. */
 #preview_body {
@@ -3352,7 +3383,7 @@ ul.post_options li {
 	margin: 0 0 1em 0;
 	border: 1px solid;
 	border-top: none;
-	border-radius: 0 0 4px 4px
+	border-radius: 0 0 4px 4px;
 }
 
 #postAdditionalOptionsNC {
@@ -3468,10 +3499,10 @@ ul.post_options li {
 	white-space: nowrap;
 }
 
-
-/* ------------------------------------------------------- */
-/*	$DRAG-N-DROP                                           */
-/* ------------------------------------------------------- */
+/* -------------------------------------------------------
+ *	$DRAG-N-DROP
+ * -------------------------------------------------------
+ */
 .drop_area {
 	display: none;
 	padding: 1em 0;
@@ -3482,6 +3513,7 @@ ul.post_options li {
 	border: dashed 1px;
 	position: relative;
 	-webkit-font-smoothing: antialiased;
+	-moz-osx-font-smoothing: grayscale;
 }
 
 .drop_area_fileselect {
@@ -3596,9 +3628,10 @@ ul.post_options li {
 	padding: 0 1em;
 }
 
-/* ------------------------------------------------------- */
-/*	$MODERATE                                              */
-/* ------------------------------------------------------- */
+/* -------------------------------------------------------
+ *	$MODERATE
+ * -------------------------------------------------------
+ */
 
 /* The move topic section. */
 #move_topic dl {
@@ -3675,12 +3708,15 @@ dl.merge_topic dd {
 	margin: 6px 0;
 }
 
-/* ------------------------------------------------------- */
-/* $TABS                                                   */
-/* ------------------------------------------------------- */
-/* We can't control what jQueryui pollutes the DOM with, so deal with it
-/* Styles for the profile summary tabs, or any jQuery ui tabs */
+/* -------------------------------------------------------
+ * $TABS
+ * -------------------------------------------------------
+ */
 
+
+/* We can't control what jQueryui pollutes the DOM with, so deal with it
+ * Styles for the profile summary tabs, or any jQuery ui tabs
+ */
 .ui-tabs .ui-tabs-nav {
 	position: relative;
 	margin: 0;
@@ -3725,9 +3761,10 @@ dl.merge_topic dd {
 	text-decoration: none;
 }
 
-/* ------------------------------------------------------- */
-/*	$PROFILE                                               */
-/* ------------------------------------------------------- */
+/* -------------------------------------------------------
+ *	$PROFILE
+ * -------------------------------------------------------
+ */
 .ui-tabs .ui-tabs-panel {
 	clear: both;
 	padding-top: 8px;
@@ -3763,13 +3800,10 @@ dl.merge_topic dd {
 	margin-top: 4px;
 	padding: 4px 8px;
 	word-wrap: break-word;
+	hyphens: auto;
 	-webkit-hyphens: auto;
 	-moz-hyphens: auto;
 	-ms-hyphens: auto;
-}
-
-.profileblock .icon {
-	vertical-align: bottom;
 }
 
 .profile_content {
@@ -3854,6 +3888,7 @@ dl.merge_topic dd {
 	margin-top: 0;
 	width: 70%;
 	word-wrap: break-word;
+	hyphens: auto;
 	-webkit-hyphens: auto;
 	-moz-hyphens: auto;
 	-ms-hyphens: auto;
@@ -4222,9 +4257,10 @@ dl.merge_topic dd {
 	margin-top: 10px;
 }
 
-/* ------------------------------------------------------- */
-/* $PERSONAL                                               */
-/* ------------------------------------------------------- */
+/* -------------------------------------------------------
+ * $PERSONAL
+ * -------------------------------------------------------
+ */
 
 #personal_messages .labels {
 	padding: 11px 0 0;
@@ -4309,9 +4345,10 @@ div.labels {
 	vertical-align: top;
 }
 
-/* ------------------------------------------------------- */
-/* $CALENDAR                                               */
-/* ------------------------------------------------------- */
+/* -------------------------------------------------------
+ * $CALENDAR
+ * -------------------------------------------------------
+ */
 #calendar {
 	text-align: center;
 }
@@ -4432,8 +4469,8 @@ div.labels {
 	padding: 0 6px;
 }
 
-/* See, I told you there was wombatz here. */
-/*
+/* See, I told you there was wombatz here.
+
 			   ,.--""""--.._
 			 ."     .'      `-.
 			;      ;           ;
@@ -4454,9 +4491,10 @@ div.labels {
 	 akg           ////
 */
 
-/* ------------------------------------------------------- */
-/* MENTIONS                                                */
-/* ------------------------------------------------------- */
+/* -------------------------------------------------------
+ * MENTIONS
+ * -------------------------------------------------------
+ */
 .mentionavatar .avatar {
 	display: block;
 	max-width: 60px;
@@ -4468,14 +4506,14 @@ div.labels {
 	min-height: 60px;
 }
 
-/* ------------------------------------------------------- */
-/* $STATISTICS	*/
-/* ------------------------------------------------------- */
+/* -------------------------------------------------------
+ * $STATISTICS
+ * -------------------------------------------------------
+ */
 .statistics {
 	margin: 3px 0;
 }
 
-/* @todo */
 .statistics .category_header:after {
 	display: none;
 }
@@ -4590,9 +4628,10 @@ div.labels {
 	padding: 4px 8px 4px 60px;
 }
 
-/* ------------------------------------------------------- */
-/*	$HELP                                                  */
-/* ------------------------------------------------------- */
+/* -------------------------------------------------------
+ *	$HELP
+ * -------------------------------------------------------
+ */
 
 #help_container {
 	overflow: auto;
@@ -4726,9 +4765,10 @@ a.help .icon {
 	margin: 0 2em;
 }
 
-/* ------------------------------------------------------- */
-/*	$SEARCH                                                */
-/* ------------------------------------------------------- */
+/* -------------------------------------------------------
+ *	$SEARCH
+ * -------------------------------------------------------
+ */
 
 /* The basic search section. */
 #simple_search, #advanced_search {
@@ -4776,7 +4816,6 @@ a.help .icon {
 
 
 /* The search results page. @todo - Duplicated in the .table_grid code? */
-
 .search_results_posts {
 	overflow: hidden;
 	padding: 0.2em 1em;
@@ -4850,9 +4889,10 @@ a.help .icon {
 	content: "";
 }
 
-/* ------------------------------------------------------- */
-/*	$MEMBERLIST                                            */
-/* ------------------------------------------------------- */
+/* -------------------------------------------------------
+ *	$MEMBERLIST
+ * -------------------------------------------------------
+ */
 .mlist, .whos_online {
 	display: table;
 	width: 100%;
@@ -5020,11 +5060,12 @@ a.help .icon {
 	line-height: 2em;
 }
 
-/* ------------------------------------------------------- */
-/*	$LOGIN                                                 */
-/* ------------------------------------------------------- */
-/* Styles for the login areas. */
+/* -------------------------------------------------------
+ *	$LOGIN
+ * -------------------------------------------------------
+ */
 
+/* Styles for the login areas. */
 .login {
 	margin: 0 auto;
 	max-width: 40em;
@@ -5082,8 +5123,9 @@ a.help .icon {
 	text-align: justify;
 }
 
-/* Common for all admin sections. */
-/* The admin logon form */
+/* Common for all admin sections.
+ * The admin logon form
+ */
 #admin_content {
 	clear: both;
 	padding-top: 8px;
@@ -5103,9 +5145,23 @@ a.help .icon {
 	vertical-align: middle;
 }
 
-/* ------------------------------------------------------- */
-/*	$BOXES                                                 */
-/* ------------------------------------------------------- */
+/* -------------------------------------------------------
+ *	$BOXES
+ * -------------------------------------------------------
+ */
+
+/* Used for sections that need somewhat larger corners */
+.well, .roundframe {
+	overflow: hidden;
+	margin: 2px 0 0 0;
+	padding: 9px;
+	border: 1px solid;
+	border-radius: 7px;
+}
+
+.well p, .roundframe p {
+	padding: 6px;
+}
 
 /* Lotsa boxes. */
 .description, .information, .warningbox, .successbox, .infobox, .errorbox {
@@ -5177,9 +5233,11 @@ a.help .icon {
 	border: 2px dashed;
 }
 
-/* ------------------------------------------------------- */
-/*	$PROGRESS                                              */
-/* ------------------------------------------------------- */
+/* -------------------------------------------------------
+ *	$PROGRESS
+ * -------------------------------------------------------
+ */
+
 /* Styles for the progress bar */
 .progress_bar {
 	position: relative;
@@ -5225,8 +5283,7 @@ a.help .icon {
 	height: 35px;
 }
 
-/* floating error box */
-/* currently used by like functionality */
+/* floating error box, currently used by like functionality */
 .floating_error {
 	position: fixed;
 	z-index: 102;
@@ -5264,9 +5321,10 @@ a.help .icon {
 	cursor: pointer;
 }
 
-/* ------------------------------------------------------- */
-/*	$LIKE STATS                                            */
-/* ------------------------------------------------------- */
+/* -------------------------------------------------------
+ *	$LIKE STATS
+ * -------------------------------------------------------
+ */
 
 .like_post_stats {
 	position: relative;
@@ -5325,41 +5383,42 @@ a.help .icon {
 }
 
 
-/* ------------------------------------------------------- */
-/*	$ICONS                                     */
-/* ------------------------------------------------------- */
-/*
-/* Icons. Since embedded icons need to have color data
-/* included, the icons themselves go into the color files.
-/* This just holds sizing code.
-/*
-/* ------------------------------------------------------- */
-
+/* -------------------------------------------------------
+ *	$ICONS
+ * -------------------------------------------------------
+ *
+ * Icons. Since embedded icons need to have color data
+ * included, the icons themselves go into the color files.
+ * This just holds sizing code.
+ *
+ * -------------------------------------------------------
+ */
 .iconline, .icoffline {
-	border: 1px solid;
-	border-radius: .75em;
-	height: .75em;
-	width: .75em;
-	line-height: .75em;
-	vertical-align: middle;
 	display: inline-block;
+	padding-bottom: 0;
+	width: 1em;
+	height: 1em;
+	border: 1px solid;
+	border-radius: 50%;
+	vertical-align: middle;
+	line-height: 1em;
 }
 
 .icon, .helpicon, .warnicon, .infoicon, .chevricon {
 	display: inline-block;
-	height: 1.25em;
-	width: 1.25em;
-	line-height: 1.25em;
 	margin: 0 .25em;
+	width: 1.25em;
+	height: auto;
 	vertical-align: middle;
+	line-height: 1.25em;
 }
 
 .helpicon, .warnicon, .infoicon {
-	border: 1px solid;
+	height: 1.25em;
+	vertical-align: text-bottom;
 	text-align: center;
-	font-size: 1em;
 	font-weight: bold;
-	border-radius: 1.25em;
+	font-size: 1em;
 }
 
 .helpicon, a.helpicon {
@@ -5379,13 +5438,21 @@ a.help .icon {
 }
 
 /* Screenreader-only shortcut.
-   This is the most foolproof way to ensure a screen reader reads something. */
+ * This is the most foolproof way to ensure a screen reader reads something.
+ */
 .icon > s, .board_icon > s, .chevricon > s, .helpicon > s, .warnicon > s, .infoicon > s {
 	position: absolute;
 	overflow: hidden;
 	clip: rect(0 0 0 0);
-	height: 1px; width: 1px;
-	margin: -1px; padding: 0; border: 0;
+	height: 1px;
+	width: 1px;
+	margin: -1px;
+	padding: 0;
+	border: 0;
+}
+
+a > i {
+	padding-bottom: 1px;
 }
 
 .icon-small {
@@ -5401,13 +5468,33 @@ a.help .icon {
 }
 
 .icon-lg {
-	height: 2em;
-	width: 2em;
-	line-height: 2em;
+	  height: 2em;
+	  width: 2em;
+	  line-height: 2em;
 }
 
-/*
- * For swapping out the icon with a mini of the user's avatar if they have one.
+.icon-xl {
+	height: 4em;
+	width: 4em;
+	line-height: 4em;
+}
+
+.icon-spin {
+	animation: icon-spin 2s infinite linear;
+}
+
+@keyframes icon-spin {
+	0% {
+		-webkit-transform: rotate(0deg);
+		transform: rotate(0deg);
+	}
+	100% {
+		-webkit-transform: rotate(359deg);
+		transform: rotate(359deg);
+	}
+}
+
+/* For swapping out the icon with a mini of the user's avatar if they have one.
  *
  * @TODO: There is probably a cleaner way to make an icon special like this.
  *
@@ -5421,8 +5508,7 @@ a.help .icon {
 	background-size: contain;
 }
 
-/*
- * This is for fixing vertical positioning with a few odd icons. Sometimes because of icons, sometimes because of
+/* This is for fixing vertical positioning with a few odd icons. Sometimes because of icons, sometimes because of
  * css elsewhere that hasn't been fixed yet.
  *
  * Either way, it means there's a problem somewhere, and that this should eventually get removed.
@@ -5439,30 +5525,30 @@ a.help .icon {
 .icon-menu {
 }
 
-/* ------------------------------------------------------- */
-/*	$MEDIA                                                 */
-/* ------------------------------------------------------- */
-/* Experimental media queries.
-/* NOTE:
-/* When setting break points for media queries, don't set them in pixels.
-/* Use em instead.
-/* Why? Because the point of re-stacking/dropping content is to fit it all
-/* in the available space. This is dependent not just on width in pixels,
-/* but also on the user-selected text size that is set in the browser.
-/*
-/* If, for whatever reason (eyesight, pixel pitch, workstation arrangement, etc.)
-/* a user requires text 50% larger than theme default, then their screen is
-/* effectively a lot smaller than its nominal resolution would indicate.
-/* If the break points are set in em, suddenly the media queries become equally
-/* responsive for all users, without any extra code being required.
-/*
-/* Testing em break points is just as easy as testing pixels,
-/* and it will make more people happier. This is cool. :)
-/*
-/* Of course, having comments to map em to px for each query is a good idea too.
+/* -------------------------------------------------------
+ *	$MEDIA
+ * -------------------------------------------------------
+ * Experimental media queries.
+ * NOTE:
+ * When setting break points for media queries, don't set them in pixels.
+ * Use em instead.
+ * Why? Because the point of re-stacking/dropping content is to fit it all
+ * in the available space. This is dependent not just on width in pixels,
+ * but also on the user-selected text size that is set in the browser.
+ *
+ * If, for whatever reason (eyesight, pixel pitch, workstation arrangement, etc.)
+ * a user requires text 50% larger than theme default, then their screen is
+ * effectively a lot smaller than its nominal resolution would indicate.
+ * If the break points are set in em, suddenly the media queries become equally
+ * responsive for all users, without any extra code being required.
+ *
+ * Testing em break points is just as easy as testing pixels,
+ * and it will make more people happier. This is cool. :)
+ *
+ * Of course, having comments to map em to px for each query is a good idea too.
+ */
 
-/* Styles for print media.
-------------------------------------------------------- */
+/* Styles for print media. */
 @media print {
 	#headerarea {
 		display: none;
@@ -5470,10 +5556,10 @@ a.help .icon {
 }
 
 /* Not sure how fussy we should get here,
-/* Am currently inclined to think that just having break points that correlate
-/* to 1024, 800, 540 and 480 at standard font size is probably adequate. */
-/* using 100% = 1 em ~= 16px ~= 14pt for our em sizing .. 64em*16px = 1024 etc. */
-
+ * Am currently inclined to think that just having break points that correlate
+ * to 1024, 800, 540 and 480 at standard font size is probably adequate.
+ * using 100% = 1 em ~= 16px ~= 14pt for our em sizing .. 64em*16px = 1024 etc.
+ */
 @media screen and (max-width: 90em) {
 	.icon-menu {
 		display: none;
@@ -5481,6 +5567,9 @@ a.help .icon {
 
 	.icon-menu.i-account {
 		display: inline-block;
+		width: 1.25em;
+		height: 1.25em;
+		padding-bottom: 5px;
 	}
 }
 
@@ -5521,10 +5610,20 @@ a.help .icon {
 	.icon-menu {
 		display: inline-block;
 		margin: .1em;
-		padding: .5em;
+		padding: .45em;
 		border: .25em solid;
 		border-radius: .25em;
 		vertical-align: middle;
+	}
+
+	.icon-menu.i-account {
+		width: 2em;
+		height: 2em;
+	}
+
+	#collapse_button .linklevel1 {
+		height: 2.5em;
+		padding-top: 5px !important;
 	}
 
 	.button_title {
@@ -6455,13 +6554,13 @@ a.help .icon {
 		white-space: normal;
 	}
 
-	.fa.hamburger_30 {
+	.icon.hamburger_30 {
 		padding-top: 0.1em;
 		display: inline-block;
 		vertical-align: middle;
 		cursor: pointer;
 	}
-	.fa.hamburger_30:before {
+	.icon.hamburger_30:before {
 		margin: 0.2em;
 	}
 	#display_jump_to {
@@ -6471,7 +6570,7 @@ a.help .icon {
 		left: -9999px;
 		position: absolute;
 	}
-	.fa.hamburger_30.visible {
+	.icon.hamburger_30.visible {
 		display: none;
 	}
 	.hide_30.hamburger_30_target.visible {

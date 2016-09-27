@@ -125,8 +125,20 @@ class Reports_Controller extends Action_Controller
 
 		// Build the reports button array.
 		$context['report_buttons'] = array(
-			'generate_reports' => array('text' => 'generate_reports', 'image' => 'print.png', 'lang' => true, 'url' => $scripturl . '?action=admin;area=reports', 'active' => true),
-			'print' => array('text' => 'print', 'image' => 'print.png', 'lang' => true, 'url' => $scripturl . '?action=admin;area=reports;rt=' . $context['report_type'] . ';st=print', 'custom' => 'target="_blank"'),
+			'generate_reports' => array(
+				'text' => 'generate_reports',
+				'image' => 'print.png',
+				'lang' => true,
+				'url' => $scripturl . '?action=admin;area=reports',
+				'active' => true,
+			),
+			'print' => array(
+				'text' => 'print',
+				'image' => 'print.png',
+				'lang' => true,
+				'url' => $scripturl . '?action=admin;area=reports;rt=' . $context['report_type'] . ';st=print',
+				'custom' => 'target="_blank"',
+			),
 		);
 
 		// Allow mods to add additional buttons here

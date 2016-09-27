@@ -358,7 +358,7 @@ class ManagePaid_Controller extends Action_Controller
 						'function' => function($rowData) {
 							global $scripturl, $txt, $settings;
 
-							return '<a href="' . $scripturl . '?action=admin;area=paidsubscribe;sa=viewsub;sid=' . $rowData['id'] . '"><img title="' . $txt['view'] . '" src="' . $settings['images_url'] . '/icons/members.png" alt="*" /></a>';
+							return '<a href="' . $scripturl . '?action=admin;area=paidsubscribe;sa=viewsub;sid=' . $rowData['id'] . '"><i class="icon i-view" title="' . $txt['view'] . '"></i></a>';
 						},
 						'class' => 'centertext',
 					),
@@ -369,9 +369,9 @@ class ManagePaid_Controller extends Action_Controller
 					),
 					'data' => array(
 						'function' => function($rowData) {
-							global $txt, $scripturl, $settings;
+							global $txt, $scripturl;
 
-							return '<a href="' . $scripturl . '?action=admin;area=paidsubscribe;sa=modify;sid=' . $rowData['id'] . '"><img title="' . $txt['modify'] . '" src="' . $settings['images_url'] . '/icons/modify_inline.png" alt="*" /></a>';
+							return '<a href="' . $scripturl . '?action=admin;area=paidsubscribe;sa=modify;sid=' . $rowData['id'] . '"><i class="icon i-modify" title="' . $txt['modify'] . '"></i></a>';
 						},
 						'class' => 'centertext',
 					),
@@ -384,7 +384,7 @@ class ManagePaid_Controller extends Action_Controller
 						'function' => function($rowData) {
 							global $txt, $scripturl, $settings;
 
-							return '<a href="' . $scripturl . '?action=admin;area=paidsubscribe;sa=modify;delete;sid=' . $rowData['id'] . '"><img title="' . $txt['delete'] . '" src="' . $settings['images_url'] . '/icons/delete.png" alt="*" /></a>';
+							return '<a href="' . $scripturl . '?action=admin;area=paidsubscribe;sa=modify;delete;sid=' . $rowData['id'] . '"><i class="icon i-delete" title="' . $txt['delete'] . '"></i></a>';
 						},
 						'class' => 'centertext',
 					),

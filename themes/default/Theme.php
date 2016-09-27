@@ -686,7 +686,7 @@ class Theme extends \Theme
 				new smc_Popup({
 					heading: ' . JavaScriptEscape($txt['show_personal_messages_heading']) . ',
 					content: ' . JavaScriptEscape(sprintf($txt['show_personal_messages'], $context['user']['unread_messages'], $scripturl . '?action=pm')) . ',
-					icon: elk_images_url + \'/im_sm_newmsg.png\'
+					icon: \'i-envelope\'
 				});
 			});', true);
 		}
@@ -803,7 +803,7 @@ class Theme extends \Theme
 				'home' => array(
 					'title' => $txt['community'],
 					'href' => $scripturl,
-					'data-icon' => 'home',
+					'data-icon' => 'i-home',
 					'show' => true,
 					'sub_buttons' => array(
 						'help' => array(
@@ -853,7 +853,7 @@ class Theme extends \Theme
 					'title' => $context['current_action'] !== 'moderate' ? $txt['admin'] : $txt['moderate'],
 					'counter' => 'grand_total',
 					'href' => $scripturl . '?action=admin',
-					'data-icon' => 'cog',
+					'data-icon' => 'i-cog',
 					'show' => true,
 					'sub_buttons' => array(
 						'admin_center' => array(
@@ -927,7 +927,7 @@ class Theme extends \Theme
 					'title' => $txt['moderate'],
 					'counter' => 'grand_total',
 					'href' => $scripturl . '?action=moderate',
-					'data-icon' => 'cog',
+					'data-icon' => 'i-cog',
 					'show' => $context['allow_moderation_center'],
 					'sub_buttons' => array(
 						'reports' => array(
@@ -976,7 +976,7 @@ class Theme extends \Theme
 				'profile' => array(
 					'title' => !empty($modSettings['displayMemberNames']) ? $user_info['name'] : $txt['account_short'],
 					'href' => $scripturl . '?action=profile',
-					'data-icon' => 'account',
+					'data-icon' => 'i-account',
 					'show' => $context['allow_edit_profile'],
 					'sub_buttons' => array(
 						'account' => array(
@@ -1012,7 +1012,7 @@ class Theme extends \Theme
 					'title' => $txt['pm_short'],
 					'counter' => 'unread_messages',
 					'href' => $scripturl . '?action=pm',
-					'data-icon' => ($context['user']['unread_messages'] ? 'envelope' : 'envelope-blank'),
+					'data-icon' => ($context['user']['unread_messages'] ? 'i-envelope' : 'i-envelope-blank'),
 					'show' => $context['allow_pm'],
 					'sub_buttons' => array(
 						'pm_read' => array(
@@ -1031,7 +1031,7 @@ class Theme extends \Theme
 					'title' => $txt['mention'],
 					'counter' => 'mentions',
 					'href' => $scripturl . '?action=mentions',
-					'data-icon' => ($context['user']['mentions'] ? 'bell' : 'bell-blank'),
+					'data-icon' => ($context['user']['mentions'] ? 'i-bell' : 'i-bell-blank'),
 					'show' => !$user_info['is_guest'] && !empty($modSettings['mentions_enabled']),
 				),
 				// The old language string made no sense, and was too long.
@@ -1040,7 +1040,7 @@ class Theme extends \Theme
 				'unread' => array(
 					'title' => $txt['view_unread_category'],
 					'href' => $scripturl . '?action=unread',
-					'data-icon' => 'comments',
+					'data-icon' => 'i-comments',
 					'show' => !$user_info['is_guest'],
 				),
 				// The old language string made no sense, and was too long.
@@ -1049,20 +1049,20 @@ class Theme extends \Theme
 				'unreadreplies' => array(
 					'title' => $txt['view_replies_category'],
 					'href' => $scripturl . '?action=unreadreplies',
-					'data-icon' => 'comments-blank',
+					'data-icon' => 'i-comments-blank',
 					'show' => !$user_info['is_guest'],
 				),
 				'login' => array(
 					'title' => $txt['login'],
 					'href' => $scripturl . '?action=login',
-					'data-icon' => 'sign-in',
+					'data-icon' => 'i-sign-in',
 					'show' => $user_info['is_guest'],
 				),
 
 				'register' => array(
 					'title' => $txt['register'],
 					'href' => $scripturl . '?action=register',
-					'data-icon' => 'register',
+					'data-icon' => 'i-register',
 					'show' => $user_info['is_guest'] && $context['can_register'],
 				),
 			);

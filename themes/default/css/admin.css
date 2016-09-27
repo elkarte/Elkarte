@@ -827,6 +827,7 @@ dl.admin_permissions dd {
 .file_permissions .table_grid {
 	table-layout: fixed;
 	word-wrap: break-word;
+	hyphens: auto;
 	-webkit-hyphens: auto;
 	-moz-hyphens: auto;
 	-ms-hyphens: auto;
@@ -1156,6 +1157,7 @@ Adjusts display of wording and selections to one line.
 	box-sizing: border-box;
 	word-wrap: break-word;
 	word-break: break-all;
+	hyphens: auto;
 	-webkit-hyphens: auto;
 	-moz-hyphens: auto;
 	-ms-hyphens: auto;
@@ -1383,10 +1385,8 @@ Adjusts display of wording and selections to one line.
 #manage_boards li .floatleft:before {
 	margin-top: 1px;
 	padding-right: 5px;
-	content: "\f07d";
-	vertical-align: middle;
+	content: "\2195";
 	font-size: 1.071em;
-	font-family: 'FontAwesome';
 }
 
 #custom_profile_fields td:nth-child(2):before {

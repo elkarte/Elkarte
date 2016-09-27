@@ -52,11 +52,12 @@
 				if (typeof params.events !== 'undefined')
 				{
 					for (var event in params.events) {
-							if (params.events.hasOwnProperty(event)) {
-								addEventListener(event, params.events[event]);
-							}
+						if (params.events.hasOwnProperty(event)) {
+							addEventListener(event, params.events[event]);
+						}
 					}
 				}
+
 				allowedExtensions = (params.allowedExtensions === '') ? [] : params.allowedExtensions.toLowerCase().replace(/\s/g, '').split(',');
 				totalSizeAllowed = (params.totalSizeAllowed === '') ? null : params.totalSizeAllowed;
 				individualSizeAllowed = (params.individualSizeAllowed === '') ? null : params.individualSizeAllowed;

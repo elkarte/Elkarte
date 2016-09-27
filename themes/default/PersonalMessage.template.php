@@ -31,12 +31,12 @@ function template_pm_above()
 
 	// The every helpful javascript!
 	echo '
-					<script><!-- // --><![CDATA[
+					<script>
 						var allLabels = {},
 							currentLabels = {},
 							txt_pm_msg_label_remove = "', $txt['pm_msg_label_remove'], '",
 							txt_pm_msg_label_apply = "', $txt['pm_msg_label_apply'], '";
-					// ]]></script>
+					</script>
 					<div id="personal_messages">';
 
 	// Show the capacity bar, if available. @todo - This needs work.
@@ -387,12 +387,14 @@ function template_subject_list()
 {
 	global $context, $settings, $txt, $scripturl;
 
-	echo '
+	echo '										
 					<table class="table_grid">
 						<thead>
 							<tr class="table_head">
 								<th class="pm_icon">
-									<a href="', $scripturl, '?action=pm;view;f=', $context['folder'], ';start=', $context['start'], ';sort=', $context['sort_by'], ($context['sort_direction'] == 'up' ? '' : ';desc'), ($context['current_label_id'] != -1 ? ';l=' . $context['current_label_id'] : ''), '"><img src="', $settings['images_url'], '/im_switch.png" alt="', $txt['pm_change_view'], '" title="', $txt['pm_change_view'], '" width="16" height="16" /></a>
+									<a href="', $scripturl, '?action=pm;view;f=', $context['folder'], ';start=', $context['start'], ';sort=', $context['sort_by'], ($context['sort_direction'] == 'up' ? '' : ';desc'), ($context['current_label_id'] != -1 ? ';l=' . $context['current_label_id'] : ''), '">
+										<i class="icon i-shuffle" title="', $txt['pm_change_view'], '"><s>', $txt['pm_change_view'], '</s></i>
+									</a>
 								</th>
 								<th class="pm_date">
 									<a href="', $scripturl, '?action=pm;f=', $context['folder'], ';start=', $context['start'], ';sort=date', $context['sort_by'] == 'date' && $context['sort_direction'] == 'up' ? ';desc' : '', $context['current_label_id'] != -1 ? ';l=' . $context['current_label_id'] : '', '">', $txt['date'], $context['sort_by'] == 'date' ? ' <i class="icon icon-small i-sort-numeric-' . $context['sort_direction'] . '"></i>' : '', '</a>
@@ -424,7 +426,7 @@ function template_subject_list()
 		echo '
 							<tr class="standard_row">
 								<td class="pm_icon">
-									<script><!-- // --><![CDATA[
+									<script>
 										currentLabels[', $message['id'], '] = {';
 
 		if (!empty($message['labels']))
@@ -440,8 +442,8 @@ function template_subject_list()
 
 		echo '
 										};
-									// ]]></script>
-									', $message['is_replied_to'] ? '<img src="' . $settings['images_url'] . '/icons/pm_replied.png" alt="' . $txt['pm_replied'] . '" />' : '<img src="' . $settings['images_url'] . '/icons/pm_read.png" alt="' . $txt['pm_read'] . '" />', '</td>
+									</script>
+									', $message['is_replied_to'] ? '<img src="' . $settings['images_url'] . '/icons/pm_replied.png" alt="' . $txt['pm_replied'] . '" />' : '<i class="icon i-comment-blank"></i>', '</td>
 								<td class="pm_date">', $message['time'], '</td>
 								<td class="pm_subject">',
 									$context['display_mode'] != 0 && $context['current_pm'] == $message['id'] ? '<img src="' . $settings['images_url'] . '/selected.png" alt="*" />' : '',
@@ -974,7 +976,7 @@ function template_send()
 
 	// The vars used to preview a personal message without loading a new page.
 	echo '
-	<script><!-- // --><![CDATA[
+	<script>
 		var form_name = "pmFolder",
 			preview_area = "pm",
 			txt_preview_title = "', $txt['preview_title'], '",
@@ -1015,7 +1017,7 @@ function template_send()
 		});';
 
 	echo '
-	// ]]></script>';
+	</script>';
 
 	// Show the message you're replying to.
 	if ($context['reply'])
@@ -1034,7 +1036,7 @@ function template_send()
 	</div>';
 
 	echo '
-		<script><!-- // --><![CDATA[
+		<script>
 			var oPersonalMessageSend = new elk_PersonalMessageSend({
 				sSelf: \'oPersonalMessageSend\',
 				sSessionId: elk_session_id,
@@ -1073,7 +1075,7 @@ function template_send()
 					<a href="#" id="bcc_link">' . $txt['make_bcc'] . '</a> <a href="' . $scripturl . '?action=quickhelp;help=pm_bcc" onclick="return reqOverlayDiv(this.href);" class="helpicon i-help"><s>' . $txt['help'] . '</s></a>'
 				), '
 			});
-		// ]]></script>';
+		</script>';
 }
 
 /**
@@ -1460,7 +1462,7 @@ function template_add_rule()
 
 	// Now setup all the bits!
 	echo '
-	<script><!-- // --><![CDATA[
+	<script>
 		initUpdateRulesActions();';
 
 	// If this isn't a new rule and we have JS enabled remove the JS compatibility stuff.
@@ -1474,7 +1476,7 @@ function template_add_rule()
 			document.getElementById("addonjs2").style.display = "";';
 
 	echo '
-		// ]]></script>';
+		</script>';
 }
 
 /**

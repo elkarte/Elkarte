@@ -248,8 +248,10 @@ function template_action_required()
 	{
 		echo '
 								<li>
-									<i class="icon i-', ($total == 0) ? 'check' : 'warning', '"></i>
-									<a href="', $scripturl, $context['links'][$area], '"><span class="smalltext">', $txt['mc_' . $area], ' : ', $total, '</span></a>
+									<i class="icon ', ($total == 0) ? 'i-check' : 'i-warning', '"></i>
+									<a href="', $scripturl, $context['links'][$area], '">
+										<span class="smalltext">', $txt['mc_' . $area], ' : ', $total, '</span>
+									</a>
 								</li>';
 	}
 

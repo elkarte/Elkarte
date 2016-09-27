@@ -181,9 +181,9 @@ class Karma_Controller extends Action_Controller
 <html ', $context['right_to_left'] ? 'dir="rtl"' : '', '>
 	<head>
 		<title>...</title>
-		<script><!-- // --><![CDATA[
+		<script>
 			history.go(-1);
-		// ]]></script>
+		</script>
 	</head>
 	<body>&laquo;</body>
 </html>';

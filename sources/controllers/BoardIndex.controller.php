@@ -133,7 +133,13 @@ class BoardIndex_Controller extends Action_Controller implements Frontpage_Inter
 
 		// Mark read button
 		$context['mark_read_button'] = array(
-			'markread' => array('text' => 'mark_as_read', 'image' => 'markread.png', 'lang' => true, 'custom' => 'onclick="return markallreadButton(this);"', 'url' => $scripturl . '?action=markasread;sa=all;bi;' . $context['session_var'] . '=' . $context['session_id']),
+			'markread' => array(
+				'text' => 'mark_as_read',
+				'image' => 'markread.png',
+				'lang' => true,
+				'custom' => 'onclick="return markallreadButton(this);"',
+				'url' => $scripturl . '?action=markasread;sa=all;bi;' . $context['session_var'] . '=' . $context['session_id']
+			),
 		);
 
 		// Allow mods to add additional buttons here

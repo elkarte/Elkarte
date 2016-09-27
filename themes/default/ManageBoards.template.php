@@ -47,9 +47,8 @@ function template_manage_boards()
 		// Link to modify the category.
 		echo '
 			<h2 class="category_header">
-			<i class="fa fa-pencil-square-o"></i>
 				<a href="' . $scripturl . '?action=admin;area=manageboards;sa=cat;cat=' . $category['id'] . '">', $category['name'], '</a>
-				<a href="' . $scripturl . '?action=admin;area=manageboards;sa=cat;cat=' . $category['id'] . '">&nbsp;', $txt['catModify'], '</a>
+				<a href="' . $scripturl . '?action=admin;area=manageboards;sa=cat;cat=' . $category['id'] . '"><i class="icon icon-small i-pencil"></i>', $txt['catModify'], '</a>
 			</h2>';
 
 		// Boards table header.
@@ -515,7 +514,7 @@ function template_modify_board()
 
 	// Add a select all box for the allowed groups section
 	theme()->addInlineJavascript('
-		$(document).ready(function () {
+		$(function() {
 			$(".select_all_box").each(function () {
 				$(this).removeClass(\'select_all_box\');
 			});

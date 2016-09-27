@@ -350,9 +350,9 @@ class Likes_Controller extends Action_Controller
 					),
 					'data' => array(
 						'function' => function ($row) {
-							global $txt, $settings;
+							global $txt;
 
-							$result = '<a href="' . $row['delete'] . '" onclick="return confirm(\'' . $txt['likes_confirm_delete'] . '\');" title="' . $txt['likes_delete'] . '"><img src="' . $settings['images_url'] . '/icons/delete.png" alt="" /></a>';
+							$result = '<a href="' . $row['delete'] . '" onclick="return confirm(\'' . $txt['likes_confirm_delete'] . '\');" title="' . $txt['likes_delete'] . '"><i class="icon i-delete"></i></a>';
 
 							return $result;
 						},
@@ -454,7 +454,7 @@ class Likes_Controller extends Action_Controller
 						'function' => function ($row) {
 							global $txt, $settings;
 
-							$result = '<a href="' . $row['who'] . '" title="' . $txt['likes_show_who'] . '"><img src="' . $settings['images_url'] . '/icons/members.png" alt="" /></a>';
+							$result = '<a href="' . $row['who'] . '" title="' . $txt['likes_show_who'] . '"><i class="icon i-users"></i></a>';
 
 							return $result;
 						},

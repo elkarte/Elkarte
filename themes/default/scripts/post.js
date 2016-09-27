@@ -402,7 +402,9 @@ function addPollOption()
  */
 function addAttachment()
 {
+	/** global: allowed_attachments */
 	allowed_attachments -= 1;
+	/** global: current_attachment */
 	current_attachment += 1;
 
 	if (allowed_attachments <= 0)

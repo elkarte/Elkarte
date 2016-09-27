@@ -1003,9 +1003,9 @@ function ssi_login($redirect_to = '', $output_method = 'echo')
 
 	// Focus on the correct input - username or password.
 	echo '
-		<script><!-- // --><![CDATA[
+		<script>
 			document.forms.frmLogin.', isset($context['default_username']) && $context['default_username'] != '' ? 'passwrd' : 'user', '.focus();
-		// ]]></script>';
+		</script>';
 
 }
 
@@ -1317,9 +1317,9 @@ function ssi_pollVote()
 		echo '<!DOCTYPE html>
 <html>
 <head>
-	<script><!-- // --><![CDATA[
+	<script>
 		history.go(-1);
-	// ]]></script>
+	</script>
 </head>
 <body>&laquo;</body>
 </html>';

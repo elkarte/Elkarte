@@ -248,9 +248,9 @@ function reqWin(desktopURL, alternateWidth, alternateHeight, noScrollbars)
 function reqOverlayDiv(desktopURL, sHeader, sIcon)
 {
 	// Set up our div details
-	var sAjax_indicator = '<div class="centertext"><i class="fa fa-spinner fa-spin fa-2x"></i></div>';
+	var sAjax_indicator = '<div class="centertext"><i class="icon icon-spin icon-big i-spinner"></i></div>';
 
-	sIcon = typeof(sIcon) === 'string' ? sIcon : 'help';
+	sIcon = typeof(sIcon) === 'string' ? sIcon : 'i-help';
 	sHeader = typeof(sHeader) === 'string' ? sHeader : help_popup_heading_text;
 
 	// Create the div that we are going to load
@@ -291,7 +291,7 @@ function smc_Popup(oOptions)
 smc_Popup.prototype.show = function ()
 {
 	var popup_class = 'popup_window ' + (this.opt.custom_class ? this.opt.custom_class : 'content'),
-		icon = this.opt.icon ? '<i class="icon i-' + this.opt.icon + ' icon-top"></i> ' : '';
+		icon = this.opt.icon ? '<i class="icon ' + this.opt.icon + ' icon-top"></i> ' : '';
 
 	// Todo: opt.icon should be a string referencing the desired icon. Will require changing all callers.
 
@@ -467,7 +467,7 @@ function in_array(variable, theArray)
  * Checks for variable in theArray and returns the array key
  *
  * @param {string} variable
- * @param {array} theArray
+ * @param {Array.} theArray
  */
 function array_search(variable, theArray)
 {
@@ -1101,7 +1101,7 @@ JumpTo.prototype.removeAll = function ()
 //	var dropdownList = document.getElementById(this.opt.sContainerId + '_select');
 for (var i = this.dropdownList.options.length; i > 0; i--)
 		this.dropdownList.remove(i - 1);
-}
+};
 
 // Show the initial select box (onload). Method of the JumpTo class.
 JumpTo.prototype.showSelect = function ()
@@ -1112,7 +1112,7 @@ JumpTo.prototype.showSelect = function ()
 		sChildLevelPrefix += this.opt.sBoardChildLevelIndicator;
 
 	if (sChildLevelPrefix !== '')
-		sChildLevelPrefix = sChildLevelPrefix + this.opt.sBoardPrefix;
+		sChildLevelPrefix += this.opt.sBoardPrefix;
 
 	document.getElementById(this.opt.sContainerId).innerHTML = this.opt.sJumpToTemplate.replace(/%select_id%/, this.opt.sContainerId + '_select').replace(/%dropdown_list%/, '<select ' + (this.opt.bDisabled === true ? 'disabled="disabled" ' : '') + (this.opt.sClassName !== undefined ? 'class="' + this.opt.sClassName + '" ' : '') + 'name="' + (this.opt.sCustomName !== undefined ? this.opt.sCustomName : this.opt.sContainerId + '_select') + '" id="' + this.opt.sContainerId + '_select" ' + ('implementation' in document ? '' : 'onmouseover="grabJumpToContent(this);" ') + ('onbeforeactivate' in document ? 'onbeforeactivate' : 'onfocus') + '="grabJumpToContent(this);"><option value="' + (this.opt.bNoRedirect !== undefined && this.opt.bNoRedirect === true ? this.opt.iCurBoardId : '?board=' + this.opt.iCurBoardId + '.0') + '">' + sChildLevelPrefix + this.opt.sCurBoardName.removeEntities() + '</option></select>&nbsp;' + (this.opt.sGoButtonLabel !== undefined ? '<input type="button" class="button_submit" value="' + this.opt.sGoButtonLabel + '" onclick="window.location.href = \'' + elk_prepareScriptUrl(elk_scripturl) + 'board=' + this.opt.iCurBoardId + '.0\';" />' : ''));
 	this.dropdownList = document.getElementById(this.opt.sContainerId + '_select');
@@ -1122,6 +1122,7 @@ JumpTo.prototype.showSelect = function ()
 JumpTo.prototype.fillSelect = function (aBoardsAndCategories)
 {
 	this.removeAll();
+
 	if ('onbeforeactivate' in document)
 		this.dropdownList.onbeforeactivate = null;
 	else
@@ -1152,7 +1153,7 @@ JumpTo.prototype.fillSelect = function (aBoardsAndCategories)
 				sChildLevelPrefix += this.opt.sBoardChildLevelIndicator;
 
 			if (sChildLevelPrefix !== '')
-				sChildLevelPrefix = sChildLevelPrefix + this.opt.sBoardPrefix;
+				sChildLevelPrefix += this.opt.sBoardPrefix;
 		}
 
 		oOption = document.createElement('option');
@@ -1505,7 +1506,7 @@ function elkSelectText(oCurElement, bActOnElement)
  * A function needed to discern HTML entities from non-western characters.
  *
  * @param {string} sFormName
- * @param {array} aElementNames
+ * @param {Array.} aElementNames
  * @param {string} sMask
  */
 function smc_saveEntities(sFormName, aElementNames, sMask)

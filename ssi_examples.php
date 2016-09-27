@@ -587,7 +587,7 @@ function template_ssi_above()
 				text-align: right;
 			}
 		</style>
-		<script><!-- // --><![CDATA[
+		<script>
 			var elk_scripturl = "', $scripturl, '",
 				elk_iso_case_folding = ', $context['server']['iso_case_folding'] ? 'true' : 'false', ',
 				elk_charset = "UTF-8",
@@ -616,7 +616,7 @@ function template_ssi_above()
 					oSections[i].style.display = bHide ? "none" : "block";
 				}
 			}
-		// ]]></script>
+		</script>
 	</head>
 	<body>
 		<div id="top_section">
@@ -637,9 +637,9 @@ function template_ssi_above()
 function template_ssi_below()
 {
 	echo '
-									<script><!-- // --><![CDATA[
+									<script>
 										showSSIBlock("ssi_recentTopics");
-									// ]]></script>
+									</script>
 								</div>
 							</div>
 						</div>

@@ -738,14 +738,17 @@ function template_edit_censored()
 	{
 		echo '
 				<div class="censorWords">
-					<input type="text" name="censor_vulgar[]" value="', $vulgar, '" size="30" /> <i class="fa  fa-arrow-circle-right"></i> <input type="text" name="censor_proper[]" value="', $proper, '" size="30" />
+					<input type="text" name="censor_vulgar[]" value="', $vulgar, '" size="30" /> <i class="icon i-chevron-circle-right"></i>
+ 					<input type="text" name="censor_proper[]" value="', $proper, '" size="30" />
 				</div>';
 	}
 
 	// Now provide a way to censor more words.
 	echo '
 				<div class="censorWords">
-					<input type="text" name="censor_vulgar[]" size="30" class="input_text" /> <i class="fa  fa-arrow-circle-right"></i> <input type="text" name="censor_proper[]" size="30" class="input_text" />
+					<input type="text" name="censor_vulgar[]" size="30" class="input_text" />
+					 <i class="icon i-chevron-circle-right"></i>
+					 <input type="text" name="censor_proper[]" size="30" class="input_text" />
 				</div>
 				<div id="moreCensoredWords"></div>
 				<div class="censorWords hide" id="moreCensoredWords_link">
