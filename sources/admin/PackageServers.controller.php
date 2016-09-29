@@ -289,13 +289,13 @@ class PackageServers_Controller extends Action_Controller
 			'license' => $thisPackage->license,
 			'hooks' => $thisPackage->allhooks,
 			'server' => array(
-				'download' => filter_var($thisPackage->server[0]->download, FILTER_VALIDATE_URL)
+				'download' => (strpos($thisPackage->server[0]->download, "http://") === 0 || strpos($thisPackage->server[0]->download, "https://") === 0) && filter_var($thisPackage->server[0]->download, FILTER_VALIDATE_URL)
 					? $thisPackage->server[0]->download : '',
-				'support' => filter_var($thisPackage->server[0]->support, FILTER_VALIDATE_URL)
+				'support' => (strpos($thisPackage->server[0]->support, "http://") === 0 || strpos($thisPackage->server[0]->support, "https://") === 0) && filter_var($thisPackage->server[0]->support, FILTER_VALIDATE_URL)
 					? $thisPackage->server[0]->support : '',
-				'bugs' => filter_var($thisPackage->server[0]->bugs, FILTER_VALIDATE_URL)
+				'bugs' => (strpos($thisPackage->server[0]->bugs, "http://") === 0 || strpos($thisPackage->server[0]->bugs, "https://") === 0) && filter_var($thisPackage->server[0]->bugs, FILTER_VALIDATE_URL)
 					? $thisPackage->server[0]->bugs : '',
-				'link' => filter_var($thisPackage->server[0]->url, FILTER_VALIDATE_URL)
+				'link' => (strpos($thisPackage->server[0]->url, "http://") === 0 || strpos($thisPackage->server[0]->url, "https://") === 0) && filter_var($thisPackage->server[0]->url, FILTER_VALIDATE_URL)
 					? $thisPackage->server[0]->url : '',
 			),
 		);
@@ -468,10 +468,10 @@ class PackageServers_Controller extends Action_Controller
 		create_chmod_control(
 			array(BOARDDIR . '/packages/' . $package_name),
 			array('destination_url' => $scripturl . '?action=admin;area=packageservers;sa=download' . (isset($this->_req->query->server)
-				? ';server=' . $this->_req->query->server : '') . (isset($this->_req->query->auto)
-				? ';auto' : '') . ';package=' . $package_id . (isset($this->_req->query->conflict)
-				? ';conflict' : '') . ';' . $context['session_var'] . '=' . $context['session_id'],
-				'crash_on_error' => true)
+					? ';server=' . $this->_req->query->server : '') . (isset($this->_req->query->auto)
+					? ';auto' : '') . ';package=' . $package_id . (isset($this->_req->query->conflict)
+					? ';conflict' : '') . ';' . $context['session_var'] . '=' . $context['session_id'],
+				  'crash_on_error' => true)
 		);
 		package_put_contents(BOARDDIR . '/packages/' . $package_name, fetch_web_data($url . $package_id));
 
