@@ -890,8 +890,8 @@ function expandThumbLB(thumbID) {
 	// Fetch the image, replace the spinner with it when it arrives
 	$('<img id="elk_lb_img" src="' + link.href + '">')
 		.on('load', function () {
-			var screenWidth = window.innerWidth * 0.9,
-				screenHeight = window.innerHeight * 0.9;
+			var screenWidth = (window.innerWidth ? window.innerWidth : $(window).width()) * (is_mobile ? 0.8 : 0.9),
+				screenHeight = (window.innerHeight ? window.innerHeight : $(window).height()) * 0.9;
 
 			$(this).css({
 				'max-width': Math.floor(screenWidth) + 'px',
