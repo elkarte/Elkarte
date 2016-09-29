@@ -3138,9 +3138,9 @@ img.new_posts {
 #elk_lb_content {
 	position: relative;
 	display: inline-block;
-	margin-right: 5%;
-	margin-left: 5%;
-	padding: 20px;
+	margin-right: 3%;
+	margin-left: 3%;
+	margin-top: 2em;
 	min-width: 30%;
 	white-space: normal;
 }
@@ -3154,15 +3154,14 @@ img.new_posts {
 #elk_lb_content.expand {
 	position: absolute;
 	overflow: auto;
-	margin-top: 20px;
 	padding: 0;
 	border: 1px solid;
 }
 
 #elk_lb_expand {
 	position: absolute;
-	top: 2%;
-	right: 1%;
+	top: -3%;
+	right: -3%;
 	display: inline-block;
 	width: 2em;
 	height: 2em;
@@ -3174,6 +3173,7 @@ img.new_posts {
 #elk_lb_expand:before {
 	content: "\21D7";
 	font-size: 2em;
+	color: #CCCCCC;
 }
 
 .attachment_thumb, .attachment_name {
