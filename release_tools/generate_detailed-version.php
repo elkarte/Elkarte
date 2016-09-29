@@ -62,7 +62,7 @@ $index = file_get_contents(BOARDDIR . '/index.php');
 $index_lines = explode("\n", $index);
 foreach ($index_lines as $line)
 {
-	if (strpos($line, '$forum_version') !== false)
+	if (strpos($line, 'const FORUM_VERSION') !== false)
 	{
 		preg_match('~\'(ElkArte .*)\';$~', $line, $matches);
 		$forum_version = $matches[1];

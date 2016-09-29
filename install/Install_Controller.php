@@ -1076,7 +1076,7 @@ class Install_Controller
 	private function action_deleteInstall()
 	{
 		global $txt, $incontext, $db_character_set;
-		global $current_version, $databases, $forum_version, $modSettings, $user_info, $db_type;
+		global $databases, $modSettings, $user_info, $db_type;
 
 		// A few items we will load in from settings and make avaialble.
 		global $boardurl, $db_prefix, $cookiename, $mbname, $language;
@@ -1207,7 +1207,7 @@ class Install_Controller
 		if (isset($modSettings['recycle_board']))
 		{
 			// The variable is usually defined in index.php so lets just use our variable to do it for us.
-			$forum_version = $current_version;
+			$forum_version = CURRENT_VERSION;
 
 			// We've just installed!
 			$user_info['ip'] = $_SERVER['REMOTE_ADDR'];
