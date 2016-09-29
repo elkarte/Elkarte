@@ -95,6 +95,7 @@ class ParserWrapper
 	 * Enable or disable smileys
 	 *
 	 * @param bool|int $toggle
+	 *
 	 * @return $this
 	 */
 	public function enableSmileys($toggle)
@@ -168,6 +169,7 @@ class ParserWrapper
 	 *
 	 * @param string $area Where this is being called from
 	 * @param string $message The message to be parsed
+	 *
 	 * @return string The Parsed message
 	 */
 	protected function parse($area, $message)
@@ -201,6 +203,7 @@ class ParserWrapper
 	 *
 	 * @param string $message
 	 * @param bool|int $smileys_enabled
+	 *
 	 * @return string
 	 */
 	public function parseMessage($message, $smileys_enabled)
@@ -213,6 +216,7 @@ class ParserWrapper
 	 *
 	 * @param string $signature
 	 * @param bool $smileys_enabled
+	 *
 	 * @return string
 	 */
 	public function parseSignature($signature, $smileys_enabled)
@@ -224,6 +228,7 @@ class ParserWrapper
 	 * Parse the BBC and smileys in news items
 	 *
 	 * @param string $news
+	 *
 	 * @return string
 	 */
 	public function parseNews($news)
@@ -235,6 +240,7 @@ class ParserWrapper
 	 * Parse the BBC and smileys in emails
 	 *
 	 * @param string $email
+	 *
 	 * @return string
 	 */
 	public function parseEmail($email)
@@ -246,6 +252,7 @@ class ParserWrapper
 	 * Parse the BBC and smileys in custom profile fields
 	 *
 	 * @param string $field
+	 *
 	 * @return string
 	 */
 	public function parseCustomFields($field)
@@ -259,6 +266,7 @@ class ParserWrapper
 	 * Parse the BBC and smileys in poll questions/answers
 	 *
 	 * @param string $poll
+	 *
 	 * @return string
 	 */
 	public function parsePoll($poll)
@@ -270,6 +278,7 @@ class ParserWrapper
 	 * Parse the BBC and smileys in the registration agreement
 	 *
 	 * @param string $agreement
+	 *
 	 * @return string
 	 */
 	public function parseAgreement($agreement)
@@ -281,6 +290,7 @@ class ParserWrapper
 	 * Parse the BBC and smileys in personal messages
 	 *
 	 * @param string $pm
+	 *
 	 * @return string
 	 */
 	public function parsePM($pm)
@@ -292,6 +302,7 @@ class ParserWrapper
 	 * Parse the BBC and smileys in user submitted reports
 	 *
 	 * @param string $report
+	 *
 	 * @return string
 	 */
 	public function parseReport($report)
@@ -303,6 +314,7 @@ class ParserWrapper
 	 * Parse the BBC and smileys in package descriptions
 	 *
 	 * @param string $package
+	 *
 	 * @return string
 	 */
 	public function parsePackage($package)
@@ -314,6 +326,7 @@ class ParserWrapper
 	 * Parse the BBC and smileys in user verification controls
 	 *
 	 * @param string $question
+	 *
 	 * @return string
 	 */
 	public function parseVerificationControls($question)
@@ -325,6 +338,7 @@ class ParserWrapper
 	 * Parse the BBC and smileys in moderator notices to users
 	 *
 	 * @param string $notice
+	 *
 	 * @return string
 	 */
 	public function parseNotice($notice)
@@ -336,6 +350,7 @@ class ParserWrapper
 	 * Parse the BBC and smileys in board descriptions
 	 *
 	 * @param string $board
+	 *
 	 * @return string
 	 */
 	public function parseBoard($board)
@@ -347,6 +362,7 @@ class ParserWrapper
 	 * Set the disabled tags
 	 *
 	 * @param string[] $disabled (usually from $modSettings['disabledBBC'])
+	 *
 	 * @return $this
 	 */
 	public function setDisabled(array $disabled)

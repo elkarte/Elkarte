@@ -21,7 +21,7 @@ namespace BBC;
 
 /**
  * Class Codes
- * 
+ *
  * @package BBC
  */
 class Codes
@@ -233,6 +233,12 @@ class Codes
 	protected $disabled = array();
 	protected $parsing_codes = array();
 
+	/**
+	 * Codes constructor.
+	 *
+	 * @param array $tags
+	 * @param array $disabled
+	 */
 	public function __construct(array $tags = array(), array $disabled = array())
 	{
 		$this->additional_bbc = $tags;
@@ -252,10 +258,12 @@ class Codes
 
 	/**
 	 * Add a code
+	 *
 	 * @param array $code
 	 */
 	public function add(array $code)
 	{
+
 // 		$first_char = $code[self::ATTR_TAG][0];
 
 // 		if (!isset($this->bbc[$first_char]))
@@ -892,6 +900,11 @@ class Codes
 		));
 	}
 
+	/**
+	 * Returns the item codes array, used for simple lists, e.g. [*]
+	 *
+	 * @return array
+	 */
 	public function getItemCodes()
 	{
 		$item_codes = array(
@@ -905,6 +918,7 @@ class Codes
 			'O' => 'circle',
 		);
 
+		// Want to add some more ?
 		call_integration_hook('integrate_item_codes', array(&$item_codes));
 
 		return $item_codes;
@@ -920,6 +934,11 @@ class Codes
 		return $this->bbc;
 	}
 
+	/**
+	 * Returns an array of installed bbc codes grouped by attr type e.g. quote[0], quote[1]
+	 *
+	 * @return array
+	 */
 	public function getCodesGroupedByTag()
 	{
 		$bbc = array();
@@ -989,6 +1008,13 @@ class Codes
 		return $return;
 	}
 
+	/**
+	 * Returns the first letter of all valid bbc codes for the parser
+	 *
+	 * @todo not used
+	 *
+	 * @return $this
+	 */
 	public function setParsingCodes()
 	{
 		$this->parsing_bbc = $this->getForParsing();
@@ -996,16 +1022,42 @@ class Codes
 		return $this;
 	}
 
+	/**
+	 * Return if the found code [X is possibly a valid one by checking
+	 * if we have a code that begins with X
+	 *
+	 * @todo not used
+	 *
+	 * @param $char
+	 *
+	 * @return bool
+	 */
 	public function hasChar($char)
 	{
 		return isset($this->parsing_codes[$char]);
 	}
 
+	/**
+	 * Get BCC codes by character start
+	 *
+	 * @todo not used
+	 *
+	 * @param $char
+	 *
+	 * @return mixed
+	 */
 	public function getCodesByChar($char)
 	{
 		return $this->parsing_codes[$char];
 	}
 
+	/**
+	 * Generates item code tags
+	 *
+	 * @param $code
+	 *
+	 * @return array
+	 */
 	protected function getItemCodeTag($code)
 	{
 		return array(
@@ -1016,6 +1068,11 @@ class Codes
 		);
 	}
 
+	/**
+	 * Disables certain tags when we are going to print
+	 *
+	 * @return $this
+	 */
 	public function setForPrinting()
 	{
 		// Colors can't well be displayed... supposed to be black and white.
@@ -1039,16 +1096,35 @@ class Codes
 		return $this;
 	}
 
+	/**
+	 * Return if a tag is enable
+	 *
+	 * @param $tag
+	 *
+	 * @return bool
+	 */
 	public function isDisabled($tag)
 	{
 		return isset($this->disabled[$tag]);
 	}
 
+	/**
+	 * If BBC Parsing is enabled
+	 *
+	 * @return array
+	 */
 	public function getDisabled()
 	{
 		return $this->disabled;
 	}
 
+	/**
+	 * Disable a tag from parsing
+	 *
+	 * @param $tag
+	 *
+	 * @return bool
+	 */
 	public function disable($tag)
 	{
 		// It was already disabled.
@@ -1060,6 +1136,11 @@ class Codes
 		$this->disabled[$tag] = $tag;
 	}
 
+	/**
+	 * Set the tags that will be parsed
+	 *
+	 * @param $parse_tags
+	 */
 	public function setParsedTags($parse_tags)
 	{
 		foreach ($this->bbc as $k => $code)

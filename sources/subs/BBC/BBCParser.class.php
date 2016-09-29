@@ -25,31 +25,50 @@ namespace BBC;
  */
 class BBCParser
 {
+	/** The max number of iterations to perform while solving for out of order attributes */
 	const MAX_PERMUTE_ITERATIONS = 5040;
 
+	/** @var string  */
 	protected $message;
+	/** @var Codes  */
 	protected $bbc;
+	/** @var array  */
 	protected $bbc_codes;
+	/** @var array  */
 	protected $item_codes;
+	/** @var array  */
 	protected $tags;
+	/** @var int parser position in message */
 	protected $pos;
+	/** @var int  */
 	protected $pos1;
+	/** @var int  */
 	protected $pos2;
+	/** @var int  */
 	protected $pos3;
+	/** @var int  */
 	protected $last_pos;
+	/** @var bool  */
 	protected $do_smileys = true;
+	/** @var array  */
 	protected $open_tags = array();
-	// This is the actual tag that's open
+	/** @var  This is the actual tag that's open */
 	protected $inside_tag;
-
+	/** @var Autolink|null  */
 	protected $autolinker;
+	/** @var bool  */
 	protected $possible_html;
+	/** @var HtmlParser|null  */
 	protected $html_parser;
-
+	/** @var bool if we can cache the message or not (some tags disallow caching) */
 	protected $can_cache = true;
+	/** @var int footnote tracker */
 	protected $num_footnotes = 0;
+	/** @var string used to mark smiles in a message */
 	protected $smiley_marker = "\r";
+	/** @var int  */
 	protected $lastAutoPos = 0;
+	/** @var array content fo the footnotes */
 	protected $fn_content = array();
 
 	/**
@@ -215,7 +234,7 @@ class BBCParser
 
 			if ($this->isItemCode($next_char) && isset($this->message[$this->pos + 2]) && $this->message[$this->pos + 2] === ']' && !$this->bbc->isDisabled('list') && !$this->bbc->isDisabled('li'))
 			{
-				// Itemcodes cannot be 0 and must be preceeded by a semi-colon, space, tab, new line, or greater than sign
+				// Itemcodes cannot be 0 and must be proceeded by a semi-colon, space, tab, new line, or greater than sign
 				if (!($this->message[$this->pos + 1] === '0' && !in_array($this->message[$this->pos - 1], array(';', ' ', "\t", "\n", '>'))))
 				{
 					// Item codes are complicated buggers... they are implicit [li]s and can make [list]s!
@@ -284,7 +303,7 @@ class BBCParser
 	}
 
 	/**
-	 *
+	 * Process a tag once the closing character / has been found
 	 */
 	protected function handleOpenTags()
 	{
@@ -548,6 +567,7 @@ class BBCParser
 			$this->can_cache = empty($tag[Codes::ATTR_NO_CACHE]);
 		}
 
+		// If its a footnote, keep track of the number
 		if ($tag[Codes::ATTR_TAG] === 'footnote')
 		{
 			$this->num_footnotes++;
@@ -558,6 +578,7 @@ class BBCParser
 
 	/**
 	 * Just alternates the applied class for quotes for themes that want to distinguish them
+	 *
 	 * @param array $tag
 	 */
 	protected function alternateQuoteStyle(array &$tag)
@@ -588,9 +609,9 @@ class BBCParser
 	/**
 	 * Parses BBC codes attributes for codes that may have them
 	 *
-	 * @param $next_c
+	 * @param string $next_c
 	 * @param array $possible
-	 * @return array|void
+	 * @return array|null
 	 */
 	protected function checkCodeAttributes($next_c, array $possible)
 	{
@@ -599,7 +620,7 @@ class BBCParser
 		{
 			if ($next_c !== ' ')
 			{
-				return;
+				return null;
 			}
 		}
 		// parsed_content demands an immediate ] without parameters!
@@ -607,7 +628,7 @@ class BBCParser
 		{
 			if ($next_c !== ']')
 			{
-				return;
+				return null;
 			}
 		}
 		else
@@ -615,7 +636,7 @@ class BBCParser
 			// Do we need an equal sign?
 			if ($next_c !== '=' && in_array($possible[Codes::ATTR_TYPE], array(Codes::TYPE_UNPARSED_EQUALS, Codes::TYPE_UNPARSED_COMMAS, Codes::TYPE_UNPARSED_COMMAS_CONTENT, Codes::TYPE_UNPARSED_EQUALS_CONTENT, Codes::TYPE_PARSED_EQUALS)))
 			{
-				return;
+				return null;
 			}
 
 			if ($next_c !== ']')
@@ -623,34 +644,33 @@ class BBCParser
 				// An immediate ]?
 				if ($possible[Codes::ATTR_TYPE] === Codes::TYPE_UNPARSED_CONTENT)
 				{
-					return;
+					return null;
 				}
 				// Maybe we just want a /...
 				elseif ($possible[Codes::ATTR_TYPE] === Codes::TYPE_CLOSED && substr_compare($this->message, '/]', $this->pos + 1 + $possible[Codes::ATTR_LENGTH], 2) !== 0 && substr_compare($this->message, ' /]', $this->pos + 1 + $possible[Codes::ATTR_LENGTH], 3) !== 0)
 				{
-					return;
+					return null;
 				}
 			}
 		}
 
-
 		// Check allowed tree?
 		if (isset($possible[Codes::ATTR_REQUIRE_PARENTS]) && ($this->inside_tag === null || !isset($possible[Codes::ATTR_REQUIRE_PARENTS][$this->inside_tag[Codes::ATTR_TAG]])))
 		{
-			return;
+			return null;
 		}
 
 		if ($this->inside_tag !== null)
 		{
 			if (isset($this->inside_tag[Codes::ATTR_REQUIRE_CHILDREN]) && !isset($this->inside_tag[Codes::ATTR_REQUIRE_CHILDREN][$possible[Codes::ATTR_TAG]]))
 			{
-				return;
+				return null;
 			}
 
 			// If this is in the list of disallowed child tags, don't parse it.
 			if (isset($this->inside_tag[Codes::ATTR_DISALLOW_CHILDREN]) && isset($this->inside_tag[Codes::ATTR_DISALLOW_CHILDREN][$possible[Codes::ATTR_TAG]]))
 			{
-				return;
+				return null;
 			}
 
 			// Not allowed in this parent, replace the tags or show it like regular text
@@ -658,7 +678,7 @@ class BBCParser
 			{
 				if (!isset($possible[Codes::ATTR_DISALLOW_BEFORE], $possible[Codes::ATTR_DISALLOW_AFTER]))
 				{
-					return;
+					return null;
 				}
 
 				$possible[Codes::ATTR_BEFORE] = isset($possible[Codes::ATTR_DISALLOW_BEFORE]) ? $possible[Codes::ATTR_DISALLOW_BEFORE] : $possible[Codes::ATTR_BEFORE];
@@ -668,7 +688,7 @@ class BBCParser
 
 		if (isset($possible[Codes::ATTR_TEST]) && $this->handleTest($possible))
 		{
-			return;
+			return null;
 		}
 
 		// +1 for [, then the length of the tag, then a space
@@ -682,7 +702,7 @@ class BBCParser
 			// Didn't match our parameter list, try the next possible.
 			if (!$match)
 			{
-				return;
+				return null;
 			}
 
 			return $this->setupTagParameters($possible, $matches);
@@ -1304,6 +1324,7 @@ class BBCParser
 		call_integration_hook('integrate_recursive_bbc_parser', array(&$autolinker, &$html));
 
 		$parser = new \BBC\BBCParser($bbc, $autolinker, $html);
+
 		return $parser->enableSmileys(empty($tag[Codes::ATTR_PARSED_TAGS_ALLOWED]))->parse($data);
 	}
 
@@ -1327,6 +1348,7 @@ class BBCParser
 	public function enableSmileys($enable = true)
 	{
 		$this->do_smileys = (bool) $enable;
+
 		return $this;
 	}
 
@@ -1355,6 +1377,7 @@ class BBCParser
 		{
 			$return = $this->open_tags[$tag];
 			unset($this->open_tags[$tag]);
+
 			return $return;
 		}
 	}
@@ -1398,6 +1421,7 @@ class BBCParser
 		{
 			$tags[] = $tag[Codes::ATTR_TAG];
 		}
+
 		return $tags;
 	}
 
@@ -1460,10 +1484,12 @@ class BBCParser
 		{
 			$tag[Codes::ATTR_BEFORE] = strtr($tag[Codes::ATTR_BEFORE], $params);
 		}
+
 		if (isset($tag[Codes::ATTR_AFTER]))
 		{
 			$tag[Codes::ATTR_AFTER] = strtr($tag[Codes::ATTR_AFTER], $params);
 		}
+
 		if (isset($tag[Codes::ATTR_CONTENT]))
 		{
 			$tag[Codes::ATTR_CONTENT] = strtr($tag[Codes::ATTR_CONTENT], $params);

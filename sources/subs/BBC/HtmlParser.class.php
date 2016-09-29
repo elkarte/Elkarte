@@ -23,7 +23,9 @@ namespace BBC;
  */
 class HtmlParser
 {
+	/** @var array tags that are stand alone */
 	protected $empty_tags = array('br', 'hr');
+	/** @var array tags we will allow */
 	protected $closable_tags = array('b', 'u', 'i', 's', 'em', 'ins', 'del', 'pre', 'blockquote');
 
 	/**
@@ -36,6 +38,7 @@ class HtmlParser
 
 		$empty_tags = $this->empty_tags;
 		$closable_tags = $this->closable_tags;
+
 		call_integration_hook('integrate_html_parser_load', array(&$empty_tags, &$closable_tags));
 		$this->empty_tags = $empty_tags;
 		$this->closable_tags = $closable_tags;
@@ -43,6 +46,7 @@ class HtmlParser
 
 	/**
 	 * Calls the functions to parse the handful of allowable HTML tags
+	 *
 	 * @param $data
 	 */
 	public function parse($data)
@@ -74,17 +78,20 @@ class HtmlParser
 
 	/**
 	 * Convert <a tags to [url
+	 *
 	 * @param $data
 	 */
 	protected function anchorTags($data)
 	{
 		// Changes <a href=... to [url=
 		$data = preg_replace('~&lt;a\s+href=((?:&quot;)?)((?:https?://|mailto:)\S+?)\\1&gt;~i', '[url=$2]', $data);
+
 		return preg_replace('~&lt;/a&gt;~i', '[/url]', $data);
 	}
 
 	/**
 	 * Converts self closing HTML to appropriate BBC tag
+	 *
 	 * @param $data
 	 */
 	protected function emptyTags($data)
@@ -94,11 +101,13 @@ class HtmlParser
 		{
 			$data = str_replace(array('&lt;' . $tag . '&gt;', '&lt;' . $tag . '/&gt;', '&lt;' . $tag . ' /&gt;'), '[' . $tag . ' /]', $data);
 		}
+
 		return $data;
 	}
 
 	/**
 	 * Converts simple closable tags to equivalent BBC codes
+	 *
 	 * @param $data
 	 */
 	protected function closableTags($data)
@@ -113,6 +122,7 @@ class HtmlParser
 				$data = substr($data, 0, -1) . str_repeat('</' . $tag . '>', $diff) . substr($data, -1);
 			}
 		}
+
 		return $data;
 	}
 
@@ -169,6 +179,7 @@ class HtmlParser
 
 			$data = strtr($data, $replaces);
 		}
+
 		return $data;
 	}
 }

@@ -25,14 +25,23 @@ namespace BBC;
  */
 class Autolink
 {
+	/** @var Codes  */
 	protected $bbc;
+	/** @var bool  */
 	protected $url_enabled;
+	/** @var bool  */
 	protected $email_enabled;
+	/** @var bool  */
 	protected $possible_link;
+	/** @var bool  */
 	protected $possible_email;
+	/** @var array of search regex for urls  */
 	protected $search;
+	/** @var array of bbc url coded links  */
 	protected $replace;
+	/** @var array of search regex for email  */
 	protected $email_search;
+	/** @var array of bbc email coded links  */
 	protected $email_replace;
 
 	/**
@@ -80,6 +89,7 @@ class Autolink
 		// Allow integration an option to add / remove linking code
 		call_integration_hook('integrate_autolink_load', array(&$search_url, &$replace_url, &$search_email, &$replace_email, $this->bbc));
 
+		// Load them to the class
 		$this->search = $search_url;
 		$this->replace = $replace_url;
 
