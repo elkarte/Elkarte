@@ -9,8 +9,13 @@
 command -v git >/dev/null 2>&1 || { echo >&2 "git is required but it's not installed.  Aborting."; exit 1; }
 command -v zip >/dev/null 2>&1 || { echo >&2 "zip is required but it's not installed.  Aborting."; exit 1; }
 
-# REPO="http://github.com/ElkArte/ElkArte.git"
-REPO="git@bitbucket.org:elkartesecurity/elkarte.git"
+if [[ "$5" = "sec" ]]
+	then
+		REPO="git@bitbucket.org:elkartesecurity/elkarte.git"
+	else
+		REPO="http://github.com/ElkArte/ElkArte.git"
+fi
+
 BRANCH=$1
 VERSION=$2
 if [[ $4 && ${4-_} ]]
