@@ -855,7 +855,7 @@
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
- * @version 1.1 beta 2
+ * @version 1.1 beta 3
  *
  * This bits acts as middle-man between the Favico and the ElkNotifications
  * providing the interface required by the latter.
