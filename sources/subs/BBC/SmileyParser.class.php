@@ -23,14 +23,25 @@ namespace BBC;
  */
 class SmileyParser
 {
+	/** @var bool Are smiley enabled */
 	protected $enabled = true;
+	/** @var array|void the smiles*/
 	protected $smileys = array();
-	// This smiley regex makes sure it doesn't parse smileys within code tags (so [url=mailto:David@bla.com] doesn't parse the :D smiley)
+	/** @var string smiley regex for parse protection */
 	protected $search = '';
+	/** @var array The replacement images for the ;) */
 	protected $replace = array();
+	/** @var string marker */
 	protected $marker = "\r";
+	/** @var string path */
 	protected $path = '';
 
+	/**
+	 * SmileyParser constructor.
+	 *
+	 * @param string $path
+	 * @param array $smileys
+	 */
 	public function __construct($path, array $smileys = array())
 	{
 		$this->setPath($path);
@@ -42,22 +53,38 @@ class SmileyParser
 	}
 
 	/**
-	 * Enables/disabled the parsing
+	 * Enables/disabled the smiley parsing
 	 *
 	 * @param bool $toggle
 	 */
 	public function setEnabled($toggle)
 	{
 		$this->enabled = (bool) $toggle;
+
 		return $this;
 	}
 
+	/**
+	 * Set the smiley separation marker
+	 *
+	 * @param string $marker
+	 *
+	 * @return $this
+	 */
 	public function setMarker($marker)
 	{
 		$this->marker = $marker;
+
 		return $this;
 	}
 
+	/**
+	 * Set the image path to the smileys
+	 *
+	 * @param string $path
+	 *
+	 * @return $this
+	 */
 	public function setPath($path)
 	{
 		$this->path = htmlspecialchars($path);
@@ -68,18 +95,18 @@ class SmileyParser
 	 * Parse smileys in the passed message.
 	 *
 	 * What it does:
-	 * - The smiley parsing function which makes pretty faces appear :).
-	 * - If custom smiley sets are turned off by smiley_enable, the default set of smileys will be used.
-	 * - These are specifically not parsed in code tags [url=mailto:Dad@blah.com]
-	 * - Caches the smileys from the database or array in memory.
-	 * - Doesn't return anything, but rather modifies message directly.
+	 *   - The smiley parsing function which makes pretty faces appear :)
+	 *   - If custom smiley sets are turned off by smiley_enable, the default set of smileys will be used.
+	 *   - These are specifically not parsed in code tags [url=mailto:Dad@blah.com]
+	 *   - Caches the smileys from the database or array in memory.
+	 *   - Doesn't return anything, but rather modifies message directly.
 	 *
 	 * @param string $message
 	 */
 	public function parseBlock($message)
 	{
 		// No smiley set at all?!
-		if (!$this->enabled || $message === '' || trim($message) === '')
+		if (!$this->enabled || trim($message) === '')
 		{
 			return $message;
 		}
@@ -88,6 +115,11 @@ class SmileyParser
 		return preg_replace_callback($this->search, array($this, 'parser_callback'), $message);
 	}
 
+	/**
+	 * @param string $message
+	 *
+	 * @return mixed|string
+	 */
 	public function parse($message)
 	{
 		// Parse the smileys within the parts where it can be done safely.
@@ -110,24 +142,51 @@ class SmileyParser
 		}
 	}
 
+	/**
+	 * This as you may have guessed, does nothing.
+	 *
+	 * @param $from
+	 * @param $to
+	 * @param $description
+	 */
 	public function add($from, $to, $description)
 	{
 
 	}
 
+	/**
+	 * Callback function for parseBlock
+	 *
+	 * @param array $matches
+	 *
+	 * @return mixed
+	 */
 	protected function parser_callback(array $matches)
 	{
 		return $this->replace[$matches[0]];
 	}
 
+	/**
+	 * Builds the search and replace sequence for the :) => img
+	 *
+	 * What it does:
+	 *   - Creates the search regex to find the enabled smiles in a message
+	 *   - Builds the replacement array for text smiley to image smiley
+	 *
+	 * @param array $smileysfrom
+	 * @param array $smileysto
+	 * @param array $smileysdescs
+	 */
 	protected function setSearchReplace($smileysfrom, $smileysto, $smileysdescs)
 	{
 		$searchParts = array();
 
+		$replace = array(':' => '&#58;', '(' => '&#40;', ')' => '&#41;', '$' => '&#36;', '[' => '&#091;');
+
 		for ($i = 0, $n = count($smileysfrom); $i < $n; $i++)
 		{
 			$specialChars = htmlspecialchars($smileysfrom[$i], ENT_QUOTES);
-			$smileyCode = '<img src="' . $this->path . $smileysto[$i] . '" alt="' . strtr($specialChars, array(':' => '&#58;', '(' => '&#40;', ')' => '&#41;', '$' => '&#36;', '[' => '&#091;')) . '" title="' . strtr(htmlspecialchars($smileysdescs[$i]), array(':' => '&#58;', '(' => '&#40;', ')' => '&#41;', '$' => '&#36;', '[' => '&#091;')) . '" class="smiley" />';
+			$smileyCode = '<img src="' . $this->path . $smileysto[$i] . '" alt="' . strtr($specialChars, $replace) . '" title="' . strtr(htmlspecialchars($smileysdescs[$i]), $replace) . '" class="smiley" />';
 
 			$this->replace[$smileysfrom[$i]] = $smileyCode;
 
@@ -139,9 +198,14 @@ class SmileyParser
 			}
 		}
 
+		// This smiley regex makes sure it doesn't parse smileys within code tags
+		// (so [url=mailto:David@bla.com] doesn't parse the :D smiley)
 		$this->search = '~(?<=[>:\?\.\s\x{A0}[\]()*\\\;]|^)(' . implode('|', $searchParts) . ')(?=[^[:alpha:]0-9]|$)~';
 	}
 
+	/**
+	 * Load in the enabled smileys, either default ones or from the DB
+	 */
 	protected function load()
 	{
 		global $modSettings;
@@ -156,9 +220,15 @@ class SmileyParser
 			list ($smileysfrom, $smileysto, $smileysdescs) = $this->getFromDB();
 		}
 
+		// Build the search/replace regex
 		$this->setSearchReplace($smileysfrom, $smileysto, $smileysdescs);
 	}
 
+	/**
+	 * Returns the default / built in array of smileys
+	 *
+	 * @return array
+	 */
 	protected function getDefault()
 	{
 		global $txt;
@@ -170,6 +240,11 @@ class SmileyParser
 		return array($smileysfrom, $smileysto, $smileysdescs);
 	}
 
+	/**
+	 * Returns the chosen/custom smileys from the database
+	 *
+	 * @return array
+	 */
 	protected function getFromDB()
 	{
 		// Load the smileys in reverse order by length so they don't get parsed wrong.
@@ -182,9 +257,9 @@ class SmileyParser
 			$db = database();
 
 			$db->fetchQueryCallback('
-					SELECT code, filename, description
-					FROM {db_prefix}smileys
-					ORDER BY LENGTH(code) DESC',
+				SELECT code, filename, description
+				FROM {db_prefix}smileys
+				ORDER BY LENGTH(code) DESC',
 				array(
 				),
 				function($row) use (&$smileysfrom, &$smileysto, &$smileysdescs)
@@ -195,8 +270,8 @@ class SmileyParser
 				}
 			);
 
+			// Cache this for a bit
 			$temp = array($smileysfrom, $smileysto, $smileysdescs);
-
 			\Cache::instance()->put('parsing_smileys', $temp, 480);
 		}
 
