@@ -11,7 +11,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:		BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.1 beta 2
+ * @version 1.1 beta 3
  *
  */
 
@@ -1288,8 +1288,6 @@ class ManageAttachments_Controller extends Action_Controller
 					$update = (array(
 						'basedirectory_for_attachments' => $modSettings['attachmentUploadDir'][$this->current_base_dir],
 					));
-
-				//$modSettings['attachmentUploadDir'] = serialize($modSettings['attachmentUploadDir']);
 			}
 
 			if (isset($this->_req->post->base_dir))

@@ -11,21 +11,11 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.1 beta 2
+ * @version 1.1 beta 3
  *
  */
 
 namespace ElkArte\Search;
-
-// This defines two version types for checking the API's are compatible with this version of the software.
-$GLOBALS['search_versions'] = array(
-	// This is the forum version but is repeated due to some people rewriting $forum_version.
-	'forum_version' => 'ElkArte 1.1',
-
-	// This is the minimum version of ElkArte that an API could have been written for to work.
-	// (strtr to stop accidentally updating version on release)
-	'search_version' => strtr('ElkArte 1+1', array('+' => '.', '=' => ' ')),
-);
 
 /**
  * Actually do the searches
@@ -38,6 +28,12 @@ class Search
 	 * (strtr to stop accidentally updating version on release)
 	 */
 	private $_search_version = '';
+
+	/**
+	 * This is the forum version but is repeated due to some people
+	 * rewriting FORUM_VERSION.
+	 */
+	private $_forum_version = '';
 
 	/**
 	 * $_search_params will carry all settings that differ from the default search parameters.
@@ -199,6 +195,7 @@ class Search
 	public function __construct()
 	{
 		$this->_search_version = strtr('ElkArte 1+1', array('+' => '.', '=' => ' '));
+		$this->_forum_version = 'ElkArte 1.1';
 		$this->_db = database();
 		$this->_db_search = db_search();
 
@@ -246,7 +243,7 @@ class Search
 	 */
 	public function findSearchAPI()
 	{
-		global $modSettings, $search_versions, $txt;
+		global $modSettings, $txt;
 
 		require_once(SUBSDIR . '/Package.subs.php');
 
@@ -267,7 +264,7 @@ class Search
 		$this->_searchAPI = new $search_class_name();
 
 		// An invalid Search API? Log the error and set it to use the standard API
-		if (!$this->_searchAPI || (!$this->_searchAPI->isValid()) || !matchPackageVersion($search_versions['forum_version'], $this->_searchAPI->min_elk_version . '-' . $this->_searchAPI->version_compatible))
+		if (!$this->_searchAPI || (!$this->_searchAPI->isValid()) || !matchPackageVersion($this->_forum_version, $this->_searchAPI->min_elk_version . '-' . $this->_searchAPI->version_compatible))
 		{
 			// Log the error.
 			loadLanguage('Errors');

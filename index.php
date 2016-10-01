@@ -13,20 +13,20 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:		BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.1 beta 2
+ * @version 1.1 beta 3
  *
  */
 
 $time_start = microtime(true);
 
 // The software version
-const FORUM_VERSION = 'ElkArte 1.1';
+const FORUM_VERSION = 'ElkArte 1.1 beta 3';
 
 // First things first, but not necessarily in that order.
 const ELK = '1';
 
 // Shortcut for the browser cache stale
-const CACHE_STALE = '?R11B2';
+const CACHE_STALE = '?R11B3';
 
 // Report errors but not depreciated ones
 error_reporting(E_ALL | E_STRICT & ~8192);

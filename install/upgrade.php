@@ -9,7 +9,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:  	BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.1 beta 2
+ * @version 1.1 beta 3
  *
  */
 
@@ -1196,7 +1196,7 @@ function action_databaseChanges()
  */
 function action_deleteUpgrade()
 {
-	global $command_line, $language, $upcontext, $forum_version, $user_info, $maintenance, $db_type, $modSettings;
+	global $command_line, $language, $upcontext, $user_info, $maintenance, $db_type, $modSettings;
 
 	// Now it's nice to have some of the basic source files.
 	if (!isset($_GET['ssi']) && !$command_line)
@@ -1261,7 +1261,7 @@ function action_deleteUpgrade()
 		),
 		array(
 			time(), 3, $user_info['id'], $command_line ? '127.0.0.1' : $user_info['ip'], 'upgrade',
-			0, 0, 0, serialize(array('version' => $forum_version, 'member' => $user_info['id'])),
+			0, 0, 0, serialize(array('version' => FORUM_VERSION, 'member' => $user_info['id'])),
 		),
 		array('id_action')
 	);

@@ -11,7 +11,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:		BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.1 beta 2
+ * @version 1.1 beta 3
  *
  */
 
@@ -130,6 +130,10 @@ class BoardIndex_Controller extends Action_Controller implements Frontpage_Inter
 		$context['info_center_callbacks'][] = 'show_users';
 
 		$this->_events->trigger('post_load', array('callbacks' => &$context['info_center_callbacks']));
+
+		addJavascriptVar(array(
+			'txt_mark_as_read_confirm' => $txt['mark_as_read_confirm']
+		), true);
 
 		// Mark read button
 		$context['mark_read_button'] = array(

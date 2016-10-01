@@ -7,7 +7,7 @@
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
- * @version 1.1 beta 2
+ * @version 1.1 beta 3
  *
  */
 
@@ -56,6 +56,42 @@ abstract class Action_Controller
 		}
 
 		$this->_events = $eventManager;
+	}
+
+	/**
+	 * Standard method to add an "home" button when using a custom action
+	 * as forum index.
+	 */
+	public static function addForumButton(&$buttons)
+	{
+		global $scripturl, $txt;
+
+		$buttons = array_merge(array('base' => array(
+				'title' => $txt['home'],
+				'href' => $scripturl,
+				'data-icon' => 'i-home',
+				'show' => true,
+				'action_hook' => true,
+			)), $buttons);
+
+		$buttons['home']['href'] = $scripturl . '?action=forum';
+		$buttons['home']['data-icon'] = 'i-forum';
+	}
+
+	/**
+	 * Standard method to tweak the current action when using a custom
+	 * action as forum index.
+	 */
+	public static function fixCurrentAction(&$current_action)
+	{
+		if ($current_action === 'home')
+		{
+			$current_action = 'base';
+		}
+		if (!empty($_REQUEST['action']) && $_REQUEST['action'] === 'forum')
+		{
+			$current_action = 'home';
+		}
 	}
 
 	/**

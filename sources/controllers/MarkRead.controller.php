@@ -7,7 +7,7 @@
  * @copyright ElkArte Forum contributors
  * @license   BSD http://opensource.org/licenses/BSD-3-Clause
  *
- * @version 1.1 beta 2
+ * @version 1.1 beta 3
  *
  */
 
@@ -250,9 +250,6 @@ class MarkRead_Controller extends Action_Controller
 	public function action_markasread()
 	{
 		global $board, $board_info;
-
-		// @todo check on why this is commented out
-		//checkSession('get');
 
 		require_once(SUBSDIR . '/Boards.subs.php');
 

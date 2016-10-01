@@ -11,7 +11,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:		BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.1 beta 2
+ * @version 1.1 beta 3
  *
  */
 
@@ -502,6 +502,10 @@ class Unread_Controller extends Action_Controller
 
 		if ($this->_is_topics)
 		{
+			addJavascriptVar(array(
+				'txt_mark_as_read_confirm' => $txt['mark_these_as_read_confirm']
+			), true);
+
 			$context['recent_buttons'] = array(
 				'markread' => array(
 					'text' => !empty($context['no_board_limits']) ? 'mark_as_read' : 'mark_read_short',
@@ -529,6 +533,10 @@ class Unread_Controller extends Action_Controller
 		}
 		elseif (!$this->_is_topics && isset($topics_to_mark))
 		{
+			addJavascriptVar(array(
+				'txt_mark_as_read_confirm' => $txt['mark_these_as_read_confirm']
+			), true);
+
 			$context['recent_buttons'] = array(
 				'markread' => array(
 					'text' => 'mark_these_as_read',

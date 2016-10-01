@@ -12,7 +12,7 @@
  * copyright:	2011 Simple Machines (http://www.simplemachines.org)
  * license:		BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.1 beta 2
+ * @version 1.1 beta 3
  *
  */
 
@@ -122,7 +122,7 @@ class PackageServers_Controller extends Action_Controller
 	 */
 	public function action_browse()
 	{
-		global $txt, $scripturl, $context, $forum_version;
+		global $txt, $scripturl, $context;
 
 		// Load our subs worker.
 		require_once(SUBSDIR . '/PackageServers.subs.php');
@@ -164,7 +164,7 @@ class PackageServers_Controller extends Action_Controller
 			foreach ($instadds as $installed_add)
 				$installed_adds[$installed_add['package_id']] = $installed_add['version'];
 
-			$the_version = strtr($forum_version, array('ElkArte ' => ''));
+			$the_version = strtr(FORUM_VERSION, array('ElkArte ' => ''));
 			if (!empty($_SESSION['version_emulate']))
 				$the_version = $_SESSION['version_emulate'];
 
