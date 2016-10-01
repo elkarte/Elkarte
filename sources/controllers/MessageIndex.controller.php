@@ -28,6 +28,9 @@ class MessageIndex_Controller extends Action_Controller implements Frontpage_Int
 	 */
 	public static function frontPageHook(&$default_action)
 	{
+		add_integration_function('integrate_menu_buttons', 'MessageIndex_Controller::addForumButton', '', false);
+		add_integration_function('integrate_current_action', 'MessageIndex_Controller::fixCurrentAction', '', false);
+
 		$default_action = array(
 			'controller' => 'MessageIndex_Controller',
 			'function' => 'action_messageindex_fp'

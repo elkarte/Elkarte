@@ -59,6 +59,42 @@ abstract class Action_Controller
 	}
 
 	/**
+	 * Standard method to add an "home" button when using a custom action
+	 * as forum index.
+	 */
+	public static function addForumButton(&$buttons)
+	{
+		global $scripturl, $txt;
+
+		$buttons = array_merge(array('base' => array(
+				'title' => $txt['home'],
+				'href' => $scripturl,
+				'data-icon' => 'i-home',
+				'show' => true,
+				'action_hook' => true,
+			)), $buttons);
+
+		$buttons['home']['href'] = $scripturl . '?action=forum';
+		$buttons['home']['data-icon'] = 'i-forum';
+	}
+
+	/**
+	 * Standard method to tweak the current action when using a custom
+	 * action as forum index.
+	 */
+	public static function fixCurrentAction(&$current_action)
+	{
+		if ($current_action === 'home')
+		{
+			$current_action = 'base';
+		}
+		if (!empty($_REQUEST['action']) && $_REQUEST['action'] === 'forum')
+		{
+			$current_action = 'home';
+		}
+	}
+
+	/**
 	 * Tells if the controller requires the security framework to be loaded.
 	 *
 	 * @param string $action the function name of the current action
