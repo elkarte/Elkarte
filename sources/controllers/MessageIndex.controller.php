@@ -459,6 +459,10 @@ class MessageIndex_Controller extends Action_Controller implements Frontpage_Int
 			'notify' => array('test' => 'can_mark_notify', 'text' => $context['is_marked_notify'] ? 'unnotify' : 'notify', 'image' => ($context['is_marked_notify'] ? 'un' : '') . 'notify.png', 'lang' => true, 'custom' => 'onclick="return notifyboardButton(this);"', 'url' => $scripturl . '?action=notifyboard;sa=' . ($context['is_marked_notify'] ? 'off' : 'on') . ';board=' . $context['current_board'] . '.' . $context['start'] . ';' . $context['session_var'] . '=' . $context['session_id']),
 		);
 
+		addJavascriptVar(array(
+			'txt_mark_as_read_confirm' => $txt['mark_these_as_read_confirm']
+		), true);
+
 		// They can only mark read if they are logged in and it's enabled!
 		if (!$user_info['is_guest'] && $settings['show_mark_read'])
 			$context['normal_buttons']['markread'] = array(

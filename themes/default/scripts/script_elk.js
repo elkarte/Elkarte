@@ -203,6 +203,11 @@ function unwatchButton(btn)
  */
 function markboardreadButton(btn)
 {
+	if (!confirm(txt_mark_as_read_confirm))
+	{
+		return false;
+	}
+
 	toggleButtonAJAX(btn);
 
 	// Remove all the "new" icons next to the topics subjects
@@ -218,6 +223,11 @@ function markboardreadButton(btn)
  */
 function markallreadButton(btn)
 {
+	if (!confirm(txt_mark_as_read_confirm))
+	{
+		return false;
+	}
+
 	toggleButtonAJAX(btn);
 
 	// Remove all the "new" icons next to the topics subjects
@@ -240,6 +250,11 @@ function markallreadButton(btn)
  */
 function markunreadButton(btn)
 {
+	if (!confirm(txt_mark_as_read_confirm))
+	{
+		return false;
+	}
+
 	toggleHeaderAJAX(btn, 'main_content_section');
 
 	return false;

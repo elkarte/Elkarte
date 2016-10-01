@@ -369,7 +369,9 @@ $txt['your_ban_expires_never'] = 'This ban is not set to expire.';
 $txt['ban_continue_browse'] = 'You may continue to browse the forum as a guest.';
 
 $txt['mark_as_read'] = 'Mark ALL messages as read';
+$txt['mark_as_read_confirm'] = 'Are you sure you want to mark ALL messages as read?';
 $txt['mark_these_as_read'] = 'Mark THESE messages as read';
+$txt['mark_these_as_read_confirm'] = 'Are you sure you want to mark THESE messages as read?';
 
 $txt['locked_topic'] = 'Locked Topic';
 $txt['normal_topic'] = 'Normal Topic';

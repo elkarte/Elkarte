@@ -131,6 +131,10 @@ class BoardIndex_Controller extends Action_Controller implements Frontpage_Inter
 
 		$this->_events->trigger('post_load', array('callbacks' => &$context['info_center_callbacks']));
 
+		addJavascriptVar(array(
+			'txt_mark_as_read_confirm' => $txt['mark_as_read_confirm']
+		), true);
+
 		// Mark read button
 		$context['mark_read_button'] = array(
 			'markread' => array(
