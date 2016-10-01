@@ -242,12 +242,14 @@ class InlinePermissions extends Adapter
 	 * variables for each permission.
 	 *
 	 * @uses ManagePermissions template
+	 * @uses ManagePermissions languuge
 	 */
 	protected function prepareContext()
 	{
 		global $context, $txt;
 
 		loadTemplate('ManagePermissions');
+		loadLanguage('ManagePermissions');
 
 		// Load the names for guests
 		foreach ($this->permissions as $permission)
