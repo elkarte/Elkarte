@@ -251,9 +251,6 @@ class MarkRead_Controller extends Action_Controller
 	{
 		global $board, $board_info;
 
-		// @todo check on why this is commented out
-		//checkSession('get');
-
 		require_once(SUBSDIR . '/Boards.subs.php');
 
 		$categories = array();
