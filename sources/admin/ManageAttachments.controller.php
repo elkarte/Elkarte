@@ -1288,8 +1288,6 @@ class ManageAttachments_Controller extends Action_Controller
 					$update = (array(
 						'basedirectory_for_attachments' => $modSettings['attachmentUploadDir'][$this->current_base_dir],
 					));
-
-				//$modSettings['attachmentUploadDir'] = serialize($modSettings['attachmentUploadDir']);
 			}
 
 			if (isset($this->_req->post->base_dir))
