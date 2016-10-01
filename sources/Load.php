@@ -1293,7 +1293,7 @@ function getThemeData($id_theme, $member)
 		}
 		$db->free_result($result);
 
-		if (file_exists($themeData[0]['default_theme_dir'] . '/cache') /*&& is_writable($themeData[0]['default_theme_dir'] . '/cache')*/)
+		if (file_exists($themeData[0]['default_theme_dir'] . '/cache') && is_writable($themeData[0]['default_theme_dir'] . '/cache'))
 		{
 			$themeData[0]['default_theme_cache_dir'] = $themeData[0]['default_theme_dir'] . '/cache';
 			$themeData[0]['default_theme_cache_url'] = $themeData[0]['default_theme_url'] . '/cache';
