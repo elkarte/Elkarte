@@ -940,8 +940,6 @@ class ManagePermissions_Controller extends Action_Controller
 	 */
 	private function _settings()
 	{
-		global $txt;
-
 		// All the setting variables
 		$config_vars = array(
 			array('title', 'settings'),
@@ -949,8 +947,8 @@ class ManagePermissions_Controller extends Action_Controller
 				array('permissions', 'manage_permissions'),
 			'',
 				// A few useful settings
-				array('check', 'permission_enable_deny', 0, $txt['permission_settings_enable_deny'], 'help' => 'permissions_deny'),
-				array('check', 'permission_enable_postgroups', 0, $txt['permission_settings_enable_postgroups'], 'help' => 'permissions_postgroups'),
+				array('check', 'permission_enable_deny'),
+				array('check', 'permission_enable_postgroups'),
 		);
 
 		// Add new settings with a nice hook, makes them available for admin settings search as well
