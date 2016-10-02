@@ -11,7 +11,7 @@
  * copyright:    2011 Simple Machines (http://www.simplemachines.org)
  * license:    BSD, See included LICENSE.TXT for terms and conditions.
  *
- * @version 1.1 beta 2
+ * @version 1.1 beta 3
  *
  */
 
@@ -24,91 +24,91 @@ Class Menu
 	 * Instance of HttpReq
 	 * @var HttpReq
 	 */
-	protected $_req;
+	protected $req;
 
 	/**
 	 * Will hold the created $context
 	 * @var array
 	 */
-	protected $_menu_context = array();
+	protected $menu_context = array();
 
 	/**
 	 * Used for profile menu for own / any
 	 * @var string
 	 */
-	protected $_permission_set;
+	protected $permission_set;
 
 	/**
 	 * If we found the menu item selected
 	 * @var bool
 	 */
-	protected $_found_section;
+	protected $found_section;
 
 	/**
 	 * If we can't find the selection, we pick for them
 	 * @var string
 	 */
-	protected $_backup_area = '';
+	protected $backup_area = '';
 
 	/**
 	 * The current subaction of the system
 	 * @var string
 	 */
-	protected $_current_subaction;
+	protected $current_subaction;
 
 	/**
 	 * Will hold the selected menu data that is returned to the caller
 	 * @var array
 	 */
-	private $_include_data = array();
+	private $include_data = array();
 
 	/**
 	 * Loop id for menu
 	 * @var string
 	 */
-	private $_section_id;
+	private $section_id;
 
 	/**
 	 * Loop data for menu
 	 * @var array
 	 */
-	private $_section;
+	private $section;
 
 	/**
 	 * Loop id for a specific menu level
 	 * @var
 	 */
-	private $_area_id;
+	private $area_id;
 
 	/**
 	 * Loop data for the menu level
 	 * @var array
 	 */
-	private $_area;
+	private $area;
 
 	/**
 	 * Loop id for the subaction of a menu
 	 * @var string
 	 */
-	private $_sa;
+	private $sa;
 
 	/**
 	 * Loop data for the subaction
 	 * @var array
 	 */
-	private $_sub;
+	private $sub;
 
 	/**
 	 * Unique menu number
 	 * @var int
 	 */
-	private $_max_menu_id;
+	private $max_menu_id;
 
 	/**
 	 * Hey its me, the menu object
 	 * @var Menu
 	 */
-	private static $_instance;
+	private static $instance;
 
 	/**
 	 * Holds menu options set by AddOptions
@@ -125,7 +125,7 @@ Class Menu
 	/**
 	 * Menu_Create constructor.
 	 */
-	public function __construct()
+	public function _construct()
 	{
 	}
 
@@ -139,7 +139,7 @@ Class Menu
 		global $context, $settings;
 
 		// Access to post/get data
-		$this->_req = HttpReq::instance();
+		$this->req = HttpReq::instance();
 
 		// Work out where we should get our menu images from.
 		$context['menu_image_path'] = file_exists($settings['theme_dir'] . '/images/admin/change_menu.png')
@@ -147,16 +147,16 @@ Class Menu
 			: $settings['default_images_url'] . '/admin';
 
 		// Every menu gets a unique ID, these are shown in first in, first out order.
-		$this->_max_menu_id = isset($context['max_menu_id']) ? $context['max_menu_id']++ : 1;
+		$this->max_menu_id = isset($context['max_menu_id']) ? $context['max_menu_id']++ : 1;
 
 		// This will be all the data for this menu
-		$this->_menu_context = array();
+		$this->menu_context = array();
 
 		// This is necessary only in profile (at least for the core), but we do it always because it's easier
-		$this->_permission_set = !empty($context['user']['is_owner']) ? 'own' : 'any';
+		$this->permission_set = !empty($context['user']['is_owner']) ? 'own' : 'any';
 
 		// We may have a current subaction
-		$this->_current_subaction = isset($context['current_subaction']) ? $context['current_subaction'] : null;
+		$this->current_subaction = isset($context['current_subaction']) ? $context['current_subaction'] : null;
 
 		// Create menu will return the include data
 		return $this->createMenu();
@@ -170,7 +170,7 @@ Class Menu
 	public function createMenu()
 	{
 		// Call this menus integration hook
-		$this->_integrationHook();
+		$this->integrationHook();
 
 		// Process the menu Options
 		$this->processMenuOptions();
@@ -179,24 +179,24 @@ Class Menu
 		$this->processMenuData();
 
 		// Set the current
-		$this->_determineCurrentAction();
+		$this->determineCurrentAction();
 
 		// Check the menus urls
-		$this->_checkBaseUrl();
+		$this->checkBaseUrl();
 
 		// Make sure we created some awesome sauce
-		if (!$this->_validateData())
+		if (!$this->validateData())
 			return false;
 
 		// Finally - return information on the selected item.
-		$this->_include_data += array(
-			'current_action' => $this->_menu_context['current_action'],
-			'current_area' => $this->_menu_context['current_area'],
-			'current_section' => !empty($this->_menu_context['current_section']) ? $this->_menu_context['current_section'] : '',
-			'current_subsection' => !empty($this->_menu_context['current_subsection']) ? $this->_menu_context['current_subsection'] : '',
+		$this->include_data += array(
+			'current_action' => $menu_context['current_action'],
+			'current_area' => $menu_context['current_area'],
+			'current_section' => !empty($this->menu_context['current_section']) ? $this->menu_context['current_section'] : '',
+			'current_subsection' => !empty($this->menu_context['current_subsection']) ? $this->menu_context['current_subsection'] : '',
 		);
 
-		return $this->_include_data;
+		return $this->include_data;
 	}
 
 	/**
@@ -206,25 +206,25 @@ Class Menu
 	 *
 	 * @return bool
 	 */
-	private function _validateData()
+	private function validateData()
 	{
 		global $context;
 
 		// If we didn't find the area we were looking for go to a default one.
-		if (isset($this->_backup_area) && empty($this->_found_section))
+		if (isset($this->backup_area) && empty($this->found_section))
 		{
-			$this->_menu_context['current_area'] = $this->_backup_area;
+			$this->menu_context['current_area'] = $this->backup_area;
 		}
 
 		// If still no data then reset - nothing to show!
-		if (empty($this->_menu_context['sections']))
+		if (empty($this->menu_context['sections']))
 		{
 			// Never happened!
-			$this->_menu_context = array();
-			$this->_max_menu_id--;
-			$context['max_menu_id'] = $this->_max_menu_id;
+			$this->menu_context = array();
+			$this->max_menu_id--;
+			$context['max_menu_id'] = $this->max_menu_id;
 
-			if ($this->_max_menu_id === 0)
+			if ($this->max_menu_id === 0)
 			{
 				unset($context['max_menu_id']);
 			}
@@ -233,7 +233,7 @@ Class Menu
 		}
 
 		// Check we had something - for sanity sake.
-		return !empty($this->_include_data);
+		return !empty($this->include_data);
 	}
 
 	/**
@@ -243,7 +243,7 @@ Class Menu
 	 *   - If supplied a hook name in the menuOptions, calls the integration function
 	 *   - Called before other menu processing to allow hook full control
 	 */
-	private function _integrationHook()
+	private function integrationHook()
 	{
 		// Allow extend *any* menu with a single hook
 		if (!empty($this->menuOptions['hook']))
@@ -260,43 +260,43 @@ Class Menu
 		global $context;
 
 		// What is the general action of this menu i.e. $scripturl?action=XYZ.
-		$this->_menu_context['current_action'] = isset($this->menuOptions['action'])
+		$this->menu_context['current_action'] = isset($this->menuOptions['action'])
 			? $this->menuOptions['action']
 			: $context['current_action'];
 
 		// What is the current area selected?
-		if (isset($this->menuOptions['current_area']) || isset($this->_req->query->area))
+		if (isset($this->menuOptions['current_area']) || isset($this->req->query->area))
 		{
-			$this->_menu_context['current_area'] = isset($this->menuOptions['current_area'])
+			$this->menu_context['current_area'] = isset($this->menuOptions['current_area'])
 				? $this->menuOptions['current_area']
-				: $this->_req->query->area;
+				: $this->req->query->area;
 		}
 
 		// Build a list of additional parameters that should go in the URL.
-		$this->_buildAdditionalParams();
+		$this->buildAdditionalParams();
 	}
 
 	/**
 	 * Build the menuOption additional parameters for use in the url
 	 */
-	private function _buildAdditionalParams()
+	private function buildAdditionalParams()
 	{
 		global $context;
 
-		$this->_menu_context['extra_parameters'] = '';
+		$this->menu_context['extra_parameters'] = '';
 
 		if (!empty($this->menuOptions['extra_url_parameters']))
 		{
 			foreach ($this->menuOptions['extra_url_parameters'] as $key => $value)
 			{
-				$this->_menu_context['extra_parameters'] .= ';' . $key . '=' . $value;
+				$this->menu_context['extra_parameters'] .= ';' . $key . '=' . $value;
 			}
 		}
 
 		// Only include the session ID in the URL if it's strictly necessary.
 		if (empty($this->menuOptions['disable_url_session_check']))
 		{
-			$this->_menu_context['extra_parameters'] .= ';' . $context['session_var'] . '=' . $context['session_id'];
+			$this->menu_context['extra_parameters'] .= ';' . $context['session_var'] . '=' . $context['session_id'];
 		}
 	}
 
@@ -308,10 +308,10 @@ Class Menu
 	protected function processMenuData()
 	{
 		// Now setup the context correctly.
-		foreach ($this->menuData as $this->_section_id => $this->_section)
+		foreach ($this->menuData as $section_id => $section)
 		{
 			// Is this section enabled? and do they have permissions?
-			if (!$this->_sectionEnabled() || !$this->_menuPermissions($this->_section))
+			if (!$this->sectionEnabled() || !$this->menuPermissions($this->section))
 			{
 				continue;
 			}
@@ -326,9 +326,9 @@ Class Menu
 	 *
 	 * @return bool
 	 */
-	private function _sectionEnabled()
+	private function sectionEnabled()
 	{
-		return !isset($this->_section['enabled']) || (bool) $this->_section['enabled'] !== false;
+		return !isset($this->section['enabled']) || (bool) $this->section['enabled'] !== false;
 	}
 
 	/**
@@ -338,14 +338,14 @@ Class Menu
 	 *
 	 * @return bool
 	 */
-	private function _menuPermissions($area)
+	private function menuPermissions($area)
 	{
 		if (!empty($area['permission']))
 		{
 			// The profile menu has slightly different permissions
 			if (is_array($area['permission']) && isset($area['permission']['own'], $area['permission']['any']))
 			{
-				if (empty($area['permission'][$this->_permission_set]) || !allowedTo($area['permission'][$this->_permission_set]))
+				if (empty($area['permission'][$this->permission_set]) || !allowedTo($area['permission'][$this->permission_set]))
 				{
 					return false;
 				}
@@ -365,67 +365,67 @@ Class Menu
 	protected function processSectionAreas()
 	{
 		// Now we cycle through the sections to pick the right area.
-		foreach ($this->_section['areas'] as $this->_area_id => $this->_area)
+		foreach ($this->section['areas'] as $area_id => $area)
 		{
 			// Is the area enabled, Does the user have permission and it has some form of a name
-			if (!$this->_areaEnabled() || !$this->_menuPermissions($this->_area) || !$this->_areaLabel())
+			if (!$this->areaEnabled() || !$this->menuPermissions($this->area) || !$this->areaLabel())
 			{
 				continue;
 			}
 
 			// We may want to include a file, let's find out the path
-			$this->_setAreaFile();
+			$this->setAreaFile();
 
 			// Make sure we have a valid current area
-			$this->_setAreaCurrent();
+			$this->setAreaCurrent();
 
 			// If this is hidden from view don't do the rest.
-			if (empty($this->_area['hidden']))
+			if (empty($this->area['hidden']))
 			{
 				// First time this section?
-				$this->_setSectionId();
+				$this->setSectionId();
 
 				// Maybe a custom url
-				$this->_setAreaCustomUrl();
+				$this->setAreaCustomUrl();
 
 				// Even a little icon
-				$this->_setAreaIcon();
+				$this->setAreaIcon();
 
 				// Did it have subsections?
 				$this->processAreaSubsections();
 			}
 
 			// Is this the current section?
-			$this->_checkCurrentSection();
+			$this->checkCurrentSection();
 		}
 	}
 
 	/**
 	 * Checks the menu item to see if it is the currently selected one
 	 */
-	private function _checkCurrentSection()
+	private function checkCurrentSection()
 	{
 		// Is this the current section?
-		// @todo why $this->_found_section is not initialized outside one of the loops? (Not sure which one lol)
-		if ($this->_menu_context['current_area'] == $this->_area_id && empty($this->_found_section))
+		// @todo why $this->found_section is not initialized outside one of the loops? (Not sure which one lol)
+		if ($this->menu_context['current_area'] == $this->area_id && empty($this->found_section))
 		{
 			// Only do this once?
-			$this->_found_section = true;
+			$this->found_section = true;
 
 			// Update the context if required - as we can have areas pretending to be others. ;)
-			$this->_menu_context['current_section'] = $this->_section_id;
+			$this->menu_context['current_section'] = $this->section_id;
 
-			$this->_menu_context['current_area'] = isset($this->_area['select']) ? $this->_area['select'] : $this->_area_id;
+			$this->menu_context['current_area'] = isset($this->area['select']) ? $this->area['select'] : $this->area_id;
 
 			// This will be the data we return.
-			$this->_include_data = $this->_area;
+			$this->include_data = $this->area;
 		}
 		// Make sure we have something in case it's an invalid area.
-		elseif (empty($this->_found_section) && empty($this->_include_data))
+		elseif (empty($this->found_section) && empty($this->include_data))
 		{
-			$this->_menu_context['current_section'] = $this->_section_id;
-			$this->_backup_area = isset($this->_area['select']) ? $this->_area['select'] : $this->_area_id;
-			$this->_include_data = $this->_area;
+			$this->menu_context['current_section'] = $this->section_id;
+			$this->backup_area = isset($this->area['select']) ? $this->area['select'] : $this->area_id;
+			$this->include_data = $this->area;
 		}
 	}
 
@@ -434,9 +434,9 @@ Class Menu
 	 *
 	 * @return bool
 	 */
-	private function _areaEnabled()
+	private function areaEnabled()
 	{
-		return !isset($this->_area['enabled']) || (bool) $this->_area['enabled'] !== false;
+		return !isset($this->area['enabled']) || (bool) $this->area['enabled'] !== false;
 	}
 
 	/**
@@ -444,11 +444,11 @@ Class Menu
 	 *
 	 * @return bool
 	 */
-	private function _areaLabel()
+	private function areaLabel()
 	{
 		global $txt;
 
-		return isset($this->_area['label']) || (isset($txt[$this->_area_id]) && !isset($this->_area['select']));
+		return isset($this->area['label']) || (isset($txt[$this->area_id]) && !isset($this->area['select']));
 	}
 
 	/**
@@ -459,24 +459,24 @@ Class Menu
 	 *   - Sets it to 'default_include_dir' if that is set in the menuOptions
 	 *   - Defaults to CONTROLLERDIR
 	 */
-	private function _setAreaFile()
+	private function setAreaFile()
 	{
-		if (!empty($this->_area['file']))
+		if (!empty($this->area['file']))
 		{
-			$this->_area['file'] = (!empty($this->_area['dir']) ? $this->_area['dir'] : (!empty($this->menuOptions['default_include_dir']) ? $this->menuOptions['default_include_dir'] : CONTROLLERDIR)) . '/' . $this->_area['file'];
+			$this->area['file'] = (!empty($this->area['dir']) ? $this->area['dir'] : (!empty($this->menuOptions['default_include_dir']) ? $this->menuOptions['default_include_dir'] : CONTROLLERDIR)) . '/' . $this->area['file'];
 		}
 	}
 
 	/**
 	 * Simply sets the current area
 	 */
-	private function _setAreaCurrent()
+	private function setAreaCurrent()
 	{
 		// If we don't have an area then the first valid one is our choice.
-		if (!isset($this->_menu_context['current_area']))
+		if (!isset($this->menu_context['current_area']))
 		{
-			$this->_menu_context['current_area'] = $this->_area_id;
-			$this->_include_data = $this->_area;
+			$this->menu_context['current_area'] = $this->area_id;
+			$this->include_data = $this->area;
 		}
 	}
 
@@ -487,60 +487,60 @@ Class Menu
 	 *   - If the ID is not set, sets it and sets the section title
 	 *   - Sets the section title
 	 */
-	private function _setSectionId()
+	private function setSectionId()
 	{
 		global $txt, $settings;
 
-		if (!isset($this->_menu_context['sections'][$this->_section_id]))
+		if (!isset($this->menu_context['sections'][$this->section_id]))
 		{
-			if (isset($this->menuOptions['counters'], $this->_section['counter']) && !empty($this->menuOptions['counters'][$this->_section['counter']]))
+			if (isset($this->menuOptions['counters'], $this->section['counter']) && !empty($this->menuOptions['counters'][$this->section['counter']]))
 			{
-				$this->_section['title'] .= sprintf($settings['menu_numeric_notice'][0], $this->menuOptions['counters'][$this->_section['counter']]);
+				$this->section['title'] .= sprintf($settings['menu_numeric_notice'][0], $this->menuOptions['counters'][$this->section['counter']]);
 			}
 
-			$this->_menu_context['sections'][$this->_section_id]['title'] = $this->_section['title'];
+			$this->menu_context['sections'][$this->section_id]['title'] = $this->section['title'];
 		}
 
-		$this->_menu_context['sections'][$this->_section_id]['areas'][$this->_area_id] = array(
-			'label' => isset($this->_area['label']) ? $this->_area['label'] : $txt[$this->_area_id]
+		$this->menu_context['sections'][$this->section_id]['areas'][$this->area_id] = array(
+			'label' => isset($this->area['label']) ? $this->area['label'] : $txt[$this->area_id]
 		);
 
-		if (isset($this->menuOptions['counters'], $this->_area['counter']) && !empty($this->menuOptions['counters'][$this->_area['counter']]))
+		if (isset($this->menuOptions['counters'], $this->area['counter']) && !empty($this->menuOptions['counters'][$this->area['counter']]))
 		{
-			$this->_menu_context['sections'][$this->_section_id]['areas'][$this->_area_id]['label'] .= sprintf($settings['menu_numeric_notice'][1], $this->menuOptions['counters'][$this->_area['counter']]);
+			$this->menu_context['sections'][$this->section_id]['areas'][$this->area_id]['label'] .= sprintf($settings['menu_numeric_notice'][1], $this->menuOptions['counters'][$this->area['counter']]);
 		}
 
 		// We'll need the ID as well...
-		$this->_menu_context['sections'][$this->_section_id]['id'] = $this->_section_id;
+		$this->menu_context['sections'][$this->section_id]['id'] = $this->section_id;
 	}
 
 	/**
 	 * Set the custom URL for the menu item
 	 */
-	private function _setAreaCustomUrl()
+	private function setAreaCustomUrl()
 	{
 		// Does it have a custom URL?
-		if (isset($this->_area['custom_url']))
+		if (isset($this->area['custom_url']))
 		{
-			$this->_menu_context['sections'][$this->_section_id]['areas'][$this->_area_id]['url'] = $this->_area['custom_url'];
+			$this->menu_context['sections'][$this->section_id]['areas'][$this->area_id]['url'] = $this->area['custom_url'];
 		}
 	}
 
 	/**
 	 * Set the menu icon
 	 */
-	private function _setAreaIcon()
+	private function setAreaIcon()
 	{
 		global $context;
 
 		// Does this area have its own icon?
-		if (isset($this->_area['icon']))
+		if (isset($this->area['icon']))
 		{
-			$this->_menu_context['sections'][$this->_section_id]['areas'][$this->_area_id]['icon'] = '<img ' . (isset($this->_area['class']) ? 'class="' . $this->_area['class'] . '" ' : 'style="background: none"') . ' src="' . $context['menu_image_path'] . '/' . $this->_area['icon'] . '" alt="" />&nbsp;&nbsp;';
+			$this->menu_context['sections'][$this->section_id]['areas'][$this->area_id]['icon'] = '<img ' . (isset($this->area['class']) ? 'class="' . $this->area['class'] . '" ' : 'style="background: none"') . ' src="' . $context['menu_image_path'] . '/' . $this->area['icon'] . '" alt="" />&nbsp;&nbsp;';
 		}
 		else
 		{
-			$this->_menu_context['sections'][$this->_section_id]['areas'][$this->_area_id]['icon'] = '';
+			$this->menu_context['sections'][$this->section_id]['areas'][$this->area_id]['icon'] = '';
 		}
 	}
 
@@ -552,54 +552,54 @@ Class Menu
 		global $settings, $context;
 
 		// If there are subsections for this menu item
-		if (!empty($this->_area['subsections']))
+		if (!empty($this->area['subsections']))
 		{
-			$this->_menu_context['sections'][$this->_section_id]['areas'][$this->_area_id]['subsections'] = array();
+			$this->menu_context['sections'][$this->section_id]['areas'][$this->area_id]['subsections'] = array();
 			$first_sa = null;
 			$last_sa = null;
 
 			// For each subsection process the options
-			foreach ($this->_area['subsections'] as $this->_sa => $this->_sub)
+			foreach ($this->area['subsections'] as $sa => $sub)
 			{
 				// Sub[1] is an array of permissions to check for this subsection
-				if ((empty($this->_sub[1]) || allowedTo($this->_sub[1])) && (!isset($this->_sub['enabled']) || !empty($this->_sub['enabled'])))
+				if ((empty($this->sub[1]) || allowedTo($this->sub[1])) && (!isset($this->sub['enabled']) || !empty($this->sub['enabled'])))
 				{
 					if ($first_sa === null)
 					{
-						$first_sa = $this->_sa;
+						$first_sa = $this->sa;
 					}
 
 					// sub[0] is a string containing the label for this subsection
-					$this->_menu_context['sections'][$this->_section_id]['areas'][$this->_area_id]['subsections'][$this->_sa] = array('label' => $this->_sub[0]);
-					if (isset($this->menuOptions['counters'], $this->_sub['counter']) && !empty($this->menuOptions['counters'][$this->_sub['counter']]))
+					$this->menu_context['sections'][$this->section_id]['areas'][$this->area_id]['subsections'][$this->sa] = array('label' => $sub[0]);
+					if (isset($this->menuOptions['counters'], $this->sub['counter']) && !empty($this->menuOptions['counters'][$this->sub['counter']]))
 					{
-						$this->_menu_context['sections'][$this->_section_id]['areas'][$this->_area_id]['subsections'][$this->_sa]['label'] .= sprintf($settings['menu_numeric_notice'][2], $this->menuOptions['counters'][$this->_sub['counter']]);
+						$this->menu_context['sections'][$this->section_id]['areas'][$this->area_id]['subsections'][$this->sa]['label'] .= sprintf($settings['menu_numeric_notice'][2], $this->menuOptions['counters'][$this->sub['counter']]);
 					}
 
-					$this->_setSubsSectionUrl();
+					$this->setSubsSectionUrl();
 
 					// A bit complicated - but is this set?
-					$first_sa = $this->_setCurrentSubSection($first_sa);
+					$first_sa = $this->setCurrentSubSection($first_sa);
 
 					// Let's assume this is the last, for now.
-					$last_sa = $this->_sa;
+					$last_sa = $this->sa;
 				}
 				// Mark it as disabled...
 				else
 				{
-					$this->_menu_context['sections'][$this->_section_id]['areas'][$this->_area_id]['subsections'][$this->_sa]['disabled'] = true;
+					$this->menu_context['sections'][$this->section_id]['areas'][$this->area_id]['subsections'][$this->sa]['disabled'] = true;
 				}
 			}
 
 			// Set which one is first, last and selected in the group.
-			if (!empty($this->_menu_context['sections'][$this->_section_id]['areas'][$this->_area_id]['subsections']))
+			if (!empty($this->menu_context['sections'][$this->section_id]['areas'][$this->area_id]['subsections']))
 			{
-				$this->_menu_context['sections'][$this->_section_id]['areas'][$this->_area_id]['subsections'][$context['right_to_left'] ? $last_sa : $first_sa]['is_first'] = true;
-				$this->_menu_context['sections'][$this->_section_id]['areas'][$this->_area_id]['subsections'][$context['right_to_left'] ? $first_sa : $last_sa]['is_last'] = true;
+				$this->menu_context['sections'][$this->section_id]['areas'][$this->area_id]['subsections'][$context['right_to_left'] ? $last_sa : $first_sa]['is_first'] = true;
+				$this->menu_context['sections'][$this->section_id]['areas'][$this->area_id]['subsections'][$context['right_to_left'] ? $first_sa : $last_sa]['is_last'] = true;
 
-				if ($this->_menu_context['current_area'] == $this->_area_id && !isset($this->_menu_context['current_subsection']))
+				if ($this->menu_context['current_area'] == $this->area_id && !isset($this->menu_context['current_subsection']))
 				{
-					$this->_menu_context['current_subsection'] = $first_sa;
+					$this->menu_context['current_subsection'] = $first_sa;
 				}
 			}
 		}
@@ -608,12 +608,12 @@ Class Menu
 	/**
 	 * Does the subsection have a custom url ?
 	 */
-	private function _setSubsSectionUrl()
+	private function setSubsSectionUrl()
 	{
 		// Custom URL?
-		if (isset($this->_sub['url']))
+		if (isset($this->sub['url']))
 		{
-			$this->_menu_context['sections'][$this->_section_id]['areas'][$this->_area_id]['subsections'][$this->_sa]['url'] = $this->_sub['url'];
+			$this->menu_context['sections'][$this->section_id]['areas'][$this->area_id]['subsections'][$this->sa]['url'] = $this->sub['url'];
 		}
 	}
 
@@ -624,30 +624,30 @@ Class Menu
 	 *
 	 * @return mixed
 	 */
-	private function _setCurrentSubSection($first_sa)
+	private function setCurrentSubSection($first_sa)
 	{
-		if ($this->_menu_context['current_area'] == $this->_area_id)
+		if ($this->menu_context['current_area'] == $this->area_id)
 		{
 			// Save which is the first...
 			if (empty($first_sa))
 			{
-				$first_sa = $this->_sa;
+				$first_sa = $this->sa;
 			}
 
 			// Is this the current subsection?
-			$sa_check = $this->_req->getQuery('sa', 'trim', null);
-			if ($sa_check == $this->_sa)
+			$sa_check = $this->req->getQuery('sa', 'trim', null);
+			if ($sa_check == $this->sa)
 			{
-				$this->_menu_context['current_subsection'] = $this->_sa;
+				$this->menu_context['current_subsection'] = $this->sa;
 			}
-			elseif (isset($this->_sub['active']) && isset($sa_check) && in_array($sa_check, $this->_sub['active']))
+			elseif (isset($this->sub['active']) && isset($sa_check) && in_array($sa_check, $this->sub['active']))
 			{
-				$this->_menu_context['current_subsection'] = $this->_sa;
+				$this->menu_context['current_subsection'] = $this->sa;
 			}
 			// Otherwise is it the default?
-			elseif (!isset($this->_menu_context['current_subsection']) && !empty($this->_sub[2]))
+			elseif (!isset($this->menu_context['current_subsection']) && !empty($this->sub[2]))
 			{
-				$this->_menu_context['current_subsection'] = $this->_sa;
+				$this->menu_context['current_subsection'] = $this->sa;
 			}
 		}
 
@@ -657,47 +657,47 @@ Class Menu
 	/**
 	 * Checks that a current subaction for the menu is set
 	 */
-	private function _determineCurrentAction()
+	private function determineCurrentAction()
 	{
 		// Ensure we have a current subaction defined
-		if (!isset($this->_current_subaction) && isset($this->_menu_context['current_subsection']))
+		if (!isset($this->current_subaction) && isset($this->menu_context['current_subsection']))
 		{
-			$this->_current_subaction = $this->_menu_context['current_subsection'];
+			$this->current_subaction = $this->menu_context['current_subsection'];
 		}
 	}
 
 	/**
 	 * Checks and updates base and section urls
 	 */
-	private function _checkBaseUrl()
+	private function checkBaseUrl()
 	{
 		global $scripturl;
 
 		// Should we use a custom base url, or use the default?
-		$this->_menu_context['base_url'] = isset($this->menuOptions['base_url'])
+		$this->menu_context['base_url'] = isset($this->menuOptions['base_url'])
 			? $this->menuOptions['base_url']
-			: $scripturl . '?action=' . $this->_menu_context['current_action'];
+			: $scripturl . '?action=' . $this->menu_context['current_action'];
 
 		// If there are sections quickly goes through all the sections to check if the base menu has an url
-		if (!empty($this->_menu_context['current_section']))
+		if (!empty($this->menu_context['current_section']))
 		{
-			$this->_menu_context['sections'][$this->_menu_context['current_section']]['selected'] = true;
-			$this->_menu_context['sections'][$this->_menu_context['current_section']]['areas'][$this->_menu_context['current_area']]['selected'] = true;
+			$this->menu_context['sections'][$this->menu_context['current_section']]['selected'] = true;
+			$this->menu_context['sections'][$this->menu_context['current_section']]['areas'][$this->menu_context['current_area']]['selected'] = true;
 
-			if (!empty($this->_menu_context['sections'][$this->_menu_context['current_section']]['areas'][$this->_menu_context['current_area']]['subsections'][$this->_current_subaction]))
+			if (!empty($this->menu_context['sections'][$this->menu_context['current_section']]['areas'][$this->menu_context['current_area']]['subsections'][$this->current_subaction]))
 			{
-				$this->_menu_context['sections'][$this->_menu_context['current_section']]['areas'][$this->_menu_context['current_area']]['subsections'][$this->_current_subaction]['selected'] = true;
+				$this->menu_context['sections'][$this->menu_context['current_section']]['areas'][$this->menu_context['current_area']]['subsections'][$this->current_subaction]['selected'] = true;
 			}
 
-			foreach ($this->_menu_context['sections'] as $this->_section_id => $this->_section)
+			foreach ($this->menu_context['sections'] as $section_id => $section)
 			{
-				foreach ($this->_section['areas'] as $this->_area_id => $this->_area)
+				foreach ($this->section['areas'] as $area_id => $area)
 				{
-					if (!isset($this->_menu_context['sections'][$this->_section_id]['url']))
+					if (!isset($this->menu_context['sections'][$this->section_id]['url']))
 					{
-						$this->_menu_context['sections'][$this->_section_id]['url'] = isset($this->_area['url'])
-							? $this->_area['url']
-							: $this->_menu_context['base_url'] . ';area=' . $this->_area_id;
+						$this->menu_context['sections'][$this->section_id]['url'] = isset($this->area['url'])
+							? $this->area['url']
+							: $this->menu_context['base_url'] . ';area=' . $this->area_id;
 						break;
 					}
 				}
@@ -813,22 +813,22 @@ Class Menu
 		if (empty($this->menuOptions['menu_type']))
 		{
 			$this->menuOptions['menu_type'] = '_' . (empty($options['use_sidebar_menu']) ? 'dropdown' : 'sidebar');
-			$this->_menu_context['can_toggle_drop_down'] = !$user_info['is_guest'] && isset($settings['theme_version']) && $settings['theme_version'] >= 2.0;
+			$this->menu_context['can_toggle_drop_down'] = !$user_info['is_guest'] && isset($settings['theme_version']) && $settings['theme_version'] >= 2.0;
 		}
 		else
 		{
-			$this->_menu_context['can_toggle_drop_down'] = !empty($this->menuOptions['can_toggle_drop_down']);
+			$this->menu_context['can_toggle_drop_down'] = !empty($this->menuOptions['can_toggle_drop_down']);
 		}
 
 		// Almost there - load the template and add to the template layers.
 		loadTemplate(isset($this->menuOptions['template_name']) ? $this->menuOptions['template_name'] : 'GenericMenu');
-		$this->_menu_context['layer_name'] = (isset($this->menuOptions['layer_name']) ? $this->menuOptions['layer_name'] : 'generic_menu') . $this->menuOptions['menu_type'];
-		Template_Layers::getInstance()->add($this->_menu_context['layer_name']);
+		$this->menu_context['layer_name'] = (isset($this->menuOptions['layer_name']) ? $this->menuOptions['layer_name'] : 'generic_menu') . $this->menuOptions['menu_type'];
+		Template_Layers::getInstance()->add($this->menu_context['layer_name']);
 
 		// Set it all to context for template consumption
-		$context['max_menu_id'] = $this->_max_menu_id;
-		$context['current_subaction'] = $this->_current_subaction;
-		$context['menu_data_' . $this->_max_menu_id] = $this->_menu_context;
+		$context['max_menu_id'] = $this->max_menu_id;
+		$context['current_subaction'] = $this->current_subaction;
+		$context['menu_data_' . $this->max_menu_id] = $this->menu_context;
 	}
 
 	/**
@@ -900,9 +900,9 @@ Class Menu
 	 */
 	public static function instance()
 	{
-		if (self::$_instance === null)
-			self::$_instance = new Menu();
+		if (self::$instance === null)
+			self::$instance = new Menu();
 
-		return self::$_instance;
+		return self::$instance;
 	}
 }
