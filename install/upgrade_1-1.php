@@ -626,6 +626,9 @@ class UpgradeInstructions_upgrade_1_1
 							case 'cust_gplus':
 								$db->query('', 'UPDATE {db_prefix}custom_fields SET enclose=\'<a target="_blank" href="{INPUT}" class="icon i-google-plus icon-big" title="G+ Profile"><s>G+ Profile</s></a>\' WHERE id_field=' . $row['id_field']);
 								break;
+							case 'cust_icq':
+								$db->query('', 'UPDATE {db_prefix}custom_fields SET enclose=\'<a class="icq" href="//www.icq.com/people/{INPUT}" target="_blank" title="ICQ - {INPUT}"><img src="http://status.icq.com/online.gif?img=5&icq={INPUT}" alt="ICQ - {INPUT}" width="18" height="18"></a>\' WHERE id_field=' . $row['id_field']);
+								break;
 						}
 					}
 				}
