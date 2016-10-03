@@ -6588,4 +6588,8 @@ a > i {
 		float: none;
 		display: table-cell;
 	}
+
+	.linklevel1 {
+		white-space: normal;
+	}
 }
