@@ -520,6 +520,7 @@ function availableThemes($current_theme, $current_member)
 
 		// The thumbnail needs the correct path.
 		$settings['images_url'] = &$theme_data['images_url'];
+		$theme_thumbnail_href = $theme_data['images_url'] . '/thumbnail.png';
 
 		if (file_exists($theme_data['theme_dir'] . '/languages/' . $user_info['language'] . '/Settings.' . $user_info['language'] . '.php'))
 			include($theme_data['theme_dir'] . '/languages/' . $user_info['language'] . '/Settings.' . $user_info['language'] . '.php');
@@ -527,11 +528,10 @@ function availableThemes($current_theme, $current_member)
 			include($theme_data['theme_dir'] . '/languages/' . $language . '/Settings.' . $language . '.php');
 		else
 		{
-			$txt['theme_thumbnail_href'] = $theme_data['images_url'] . '/thumbnail.png';
 			$txt['theme_description'] = '';
 		}
 
-		$available_themes[$id_theme]['thumbnail_href'] = str_replace('{images_url}', $settings['images_url'], $txt['theme_thumbnail_href']);
+		$available_themes[$id_theme]['thumbnail_href'] = str_replace('{images_url}', $settings['images_url'], $theme_thumbnail_href);
 		$available_themes[$id_theme]['description'] = $txt['theme_description'];
 
 		// Are there any variants?
