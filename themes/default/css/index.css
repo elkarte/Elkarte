@@ -6503,10 +6503,6 @@ a > i {
 		max-width: 12em;
 	}
 
-	#button_admin {
-		display: none;
-	}
-
 	.quickbuttons .modified {
 		display: none;
 	}
