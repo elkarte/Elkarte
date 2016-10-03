@@ -55,6 +55,11 @@ class Generic_List
 	protected $context = array();
 
 	/**
+	 * @var array
+	 */
+	protected $listItems = array();
+
+	/**
 	 * Starts a new list
 	 * Makes sure the passed list contains the minimum needed options to create a list
 	 * Loads the options in to this instance
@@ -122,11 +127,26 @@ class Generic_List
 	 */
 	public function buildList()
 	{
-		// Figure out the sort.
+		$this->prepareSort();
+		$this->calculatePages();
+		$this->prepareHeaders();
+		$this->prepareColumns();
+		$this->setTitle();
+		$this->prepareForm();
+		$this->prepareNoItemsLabel();
+		$this->prepareAdditionalRows();
+		$this->prepareContext();
+	}
+
+	/**
+	 * Figure out the sorting method.
+	 */
+	protected function prepareSort()
+	{
 		if (empty($this->listOptions['default_sort_col']))
 		{
 			$this->context['sort'] = array();
-			$sort = '1=1';
+			$this->sort = '1=1';
 		}
 		else
 		{
@@ -144,22 +164,21 @@ class Generic_List
 			{
 				$this->context['sort'] = array(
 					'id' => $this->listOptions['default_sort_col'],
-					'desc' => (!empty($this->listOptions['default_sort_dir']) && $this->listOptions['default_sort_dir'] == 'desc') || (!empty($this->listOptions['columns'][$this->listOptions['default_sort_col']]['sort']['default']) && substr($this->listOptions['columns'][$this->listOptions['default_sort_col']]['sort']['default'], -4, 4) == 'desc') ? true : false,
+					'desc' => (!empty($this->listOptions['default_sort_dir']) && $this->listOptions['default_sort_dir'] == 'desc') || (!empty($this->listOptions['columns'][$this->listOptions['default_sort_col']]['sort']['default']) && substr($this->listOptions['columns'][$this->listOptions['default_sort_col']]['sort']['default'], -4, 4) == 'desc'),
 				);
 			}
 
 			// Set the database column sort.
-			$sort = $this->listOptions['columns'][$this->context['sort']['id']]['sort'][$this->context['sort']['desc'] ? 'reverse' : 'default'];
+			$this->sort = $this->context['sort']['desc'] ? 'reverse' : 'default';
 		}
 
 		$this->context['start_var_name'] = isset($this->listOptions['start_var_name']) ? $this->listOptions['start_var_name'] : 'start';
 	}
 
 	/**
-	 * Prepare the template by loading context
-	 * variables for each setting.
+	 * Calculate the page index.
 	 */
-	protected function prepareContext()
+	protected function calculatePages()
 	{
 		// In some cases the full list must be shown, regardless of the amount of items.
 		if (empty($this->listOptions['items_per_page']))
@@ -189,7 +208,7 @@ class Generic_List
 	/**
 	 * Prepare the headers of the table.
 	 */
-	protected function prepareContext()
+	protected function prepareHeaders()
 	{
 		$this->context['headers'] = array();
 		foreach ($this->listOptions['columns'] as $column_id => $column)
@@ -223,12 +242,17 @@ class Generic_List
 			require_once($this->listOptions['get_items']['file']);
 
 		// Call the function and include which items we want and in what order.
-		$list_items = call_user_func_array($this->listOptions['get_items']['function'], array_merge(array($this->context['start'], $this->context['items_per_page'], $sort), empty($this->listOptions['get_items']['params']) ? array() : $this->listOptions['get_items']['params']));
-		$list_items = !empty($list_items) ?: array();
+		$this->listItems = call_user_func_array($this->listOptions['get_items']['function'], array_merge(array($this->context['start'], $this->context['items_per_page'], $this->sort), empty($this->listOptions['get_items']['params']) ? array() : $this->listOptions['get_items']['params']));
+		$this->listItems = !empty($this->listItems) ?: array();
 
+		$this->loopItems();
+	}
+
+	protected function loopItems()
+	{
 		// Loop through the list items to be shown and construct the data values.
 		$this->context['rows'] = array();
-		foreach ($list_items as $item_id => $list_item)
+		foreach ($this->listItems as $item_id => $list_item)
 		{
 			$cur_row = array();
 			foreach ($this->listOptions['columns'] as $column_id => $column)
@@ -284,7 +308,6 @@ class Generic_List
 				// Add the data cell properties to the current row.
 				$cur_row[$column_id] = $cur_data;
 			}
-
 			$this->context['rows'][$item_id]['class'] = '';
 			$this->context['rows'][$item_id]['style'] = '';
 
