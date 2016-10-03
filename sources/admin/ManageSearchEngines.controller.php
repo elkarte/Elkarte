@@ -77,25 +77,14 @@ class ManageSearchEngines_Controller extends Action_Controller
 		global $context, $txt, $scripturl;
 
 		// Initialize the form
-		$this->_initEngineSettingsForm();
+		$settingsForm = new Settings_Form(Settings_Form::DB_ADAPTER);
 
-		$config_vars = $this->_engineSettings->settings();
+		// Initialize it with our settings
+		$config_vars = $this->_settings();
+		$settingsForm->setConfigVars($config_vars);
 
 		// Set up a message.
 		$context['settings_message'] = sprintf($txt['spider_settings_desc'], $scripturl . '?action=admin;area=logs;sa=pruning;' . $context['session_var'] . '=' . $context['session_id']);
-
-		require_once(SUBSDIR . '/SearchEngines.subs.php');
-		require_once(SUBSDIR . '/Membergroups.subs.php');
-
-		$groups = getBasicMembergroupData(array('globalmod', 'postgroups', 'protected', 'member'));
-		foreach ($groups as $row)
-		{
-			// Unfortunately, regular members have to be 1 because 0 is for disabled.
-			if ($row['id'] == 0)
-				$config_vars['spider_group'][2][1] = $row['name'];
-			else
-				$config_vars['spider_group'][2][$row['id']] = $row['name'];
-		}
 
 		// Make sure it's valid - note that regular members are given id_group = 1 which is reversed in Load.php - no admins here!
 		if (isset($this->_req->post->spider_group) && !isset($config_vars['spider_group'][2][$this->_req->post->spider_group]))
@@ -115,7 +104,8 @@ class ManageSearchEngines_Controller extends Action_Controller
 			call_integration_hook('integrate_save_search_engine_settings');
 
 			// save the results!
-			Settings_Form::save_db($config_vars);
+			$settingsForm->setConfigValues((array) $this->_req->post);
+			$settingsForm->save();
 
 			// make sure to rebuild the cache with updated results
 			recacheSpiderNames();
@@ -148,21 +138,7 @@ class ManageSearchEngines_Controller extends Action_Controller
 		addInlineJavascript($javascript_function, true);
 
 		// Prepare the settings...
-		Settings_Form::prepare_db($config_vars);
-	}
-
-	/**
-	 * Initialize the form with configuration settings for search engines
-	 */
-	private function _initEngineSettingsForm()
-	{
-		// Instantiate the form
-		$this->_engineSettings = new Settings_Form();
-
-		// Initialize it with our settings
-		$config_vars = $this->_settings();
-
-		return $this->_engineSettings->settings($config_vars);
+		$settingsForm->prepare();
 	}
 
 	/**
@@ -178,6 +154,19 @@ class ManageSearchEngines_Controller extends Action_Controller
 			'spider_group' => array('select', 'spider_group', 'subtext' => $txt['spider_group_note'], array($txt['spider_group_none'])),
 			array('select', 'show_spider_online', array($txt['show_spider_online_no'], $txt['show_spider_online_summary'], $txt['show_spider_online_detail'], $txt['show_spider_online_detail_admin'])),
 		);
+
+		require_once(SUBSDIR . '/SearchEngines.subs.php');
+		require_once(SUBSDIR . '/Membergroups.subs.php');
+
+		$groups = getBasicMembergroupData(array('globalmod', 'postgroups', 'protected', 'member'));
+		foreach ($groups as $row)
+		{
+			// Unfortunately, regular members have to be 1 because 0 is for disabled.
+			if ($row['id'] == 0)
+				$config_vars['spider_group'][2][1] = $row['name'];
+			else
+				$config_vars['spider_group'][2][$row['id']] = $row['name'];
+		}
 
 		// Notify the integration that we're preparing to mess up with search engine settings...
 		call_integration_hook('integrate_modify_search_engine_settings', array(&$config_vars));
@@ -255,7 +244,7 @@ class ManageSearchEngines_Controller extends Action_Controller
 						'value' => $txt['spider_name'],
 					),
 					'data' => array(
-						'function' => function($rowData) {
+						'function' => function ($rowData) {
 							global $scripturl;
 
 							return sprintf('<a href="%1$s?action=admin;area=sengines;sa=editspiders;sid=%2$d">%3$s</a>', $scripturl, $rowData['id_spider'], htmlspecialchars($rowData['spider_name'], ENT_COMPAT, 'UTF-8'));
@@ -271,7 +260,7 @@ class ManageSearchEngines_Controller extends Action_Controller
 						'value' => $txt['spider_last_seen'],
 					),
 					'data' => array(
-						'function' => function($rowData) {
+						'function' => function ($rowData) {
 							global $context, $txt;
 
 							return isset($context['spider_last_seen'][$rowData['id_spider']]) ? standardTime($context['spider_last_seen'][$rowData['id_spider']]) : $txt['spider_last_never'];
@@ -456,7 +445,7 @@ class ManageSearchEngines_Controller extends Action_Controller
 						'value' => $txt['spider_time'],
 					),
 					'data' => array(
-						'function' => function($rowData) {
+						'function' => function ($rowData) {
 							return standardTime($rowData['log_time']);
 						},
 					),

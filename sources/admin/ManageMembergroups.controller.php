@@ -40,7 +40,7 @@ class ManageMembergroups_Controller extends Action_Controller
 	 * @uses ManageMembergroups template.
 	 * @uses ManageMembers language file.
 	 * @see Action_Controller::action_index()
-	*/
+	 */
 	public function action_index()
 	{
 		global $context, $txt;
@@ -138,7 +138,7 @@ class ManageMembergroups_Controller extends Action_Controller
 						'value' => $txt['membergroups_name'],
 					),
 					'data' => array(
-						'function' => function($rowData) {
+						'function' => function ($rowData) {
 							global $scripturl;
 
 							// Since the moderator group has no explicit members, no link is needed.
@@ -168,7 +168,7 @@ class ManageMembergroups_Controller extends Action_Controller
 						'value' => $txt['membergroups_icons'],
 					),
 					'data' => array(
-						'function' => function($rowData) {
+						'function' => function ($rowData) {
 							global $settings;
 
 							if (!empty($rowData['icons'][0]) && !empty($rowData['icons'][1]))
@@ -187,7 +187,7 @@ class ManageMembergroups_Controller extends Action_Controller
 						'value' => $txt['membergroups_members_top'],
 					),
 					'data' => array(
-						'function' => function($rowData) {
+						'function' => function ($rowData) {
 							global $txt;
 
 							// No explicit members for the moderator group.
@@ -250,7 +250,7 @@ class ManageMembergroups_Controller extends Action_Controller
 						'value' => $txt['membergroups_name'],
 					),
 					'data' => array(
-						'function' => function($rowData) {
+						'function' => function ($rowData) {
 							global $scripturl;
 
 							return sprintf('<a href="%1$s?action=admin;area=membergroups;sa=members;group=%2$d">%3$s</a>', $scripturl, $rowData['id_group'], $rowData['group_name_color']);
@@ -266,7 +266,7 @@ class ManageMembergroups_Controller extends Action_Controller
 						'value' => $txt['membergroups_icons'],
 					),
 					'data' => array(
-						'function' => function($rowData) {
+						'function' => function ($rowData) {
 							global $settings;
 
 							if (!empty($rowData['icons'][0]) && !empty($rowData['icons'][1]))
@@ -780,9 +780,11 @@ class ManageMembergroups_Controller extends Action_Controller
 		$context['page_title'] = $txt['membergroups_settings'];
 
 		// initialize the form
-		$this->_initGroupSettingsForm();
+		// Instantiate the form
+		$settingsForm = new Settings_Form(Settings_Form::DB_ADAPTER);
 
-		$config_vars = $this->_groupSettings->settings();
+		// Initialize it with our settings
+		$settingsForm->setConfigVars($this->_settings());
 
 		if (isset($this->_req->query->save))
 		{
@@ -790,7 +792,8 @@ class ManageMembergroups_Controller extends Action_Controller
 			call_integration_hook('integrate_save_membergroup_settings');
 
 			// Yeppers, saving this...
-			Settings_Form::save_db($config_vars);
+			$settingsForm->setConfigValues((array) $this->_req->post);
+			$settingsForm->save();
 			redirectexit('action=admin;area=membergroups;sa=settings');
 		}
 
@@ -798,21 +801,7 @@ class ManageMembergroups_Controller extends Action_Controller
 		$context['post_url'] = $scripturl . '?action=admin;area=membergroups;save;sa=settings';
 		$context['settings_title'] = $txt['membergroups_settings'];
 
-		Settings_Form::prepare_db($config_vars);
-	}
-
-	/**
-	 * Return the configuration settings for membergroups management.
-	 */
-	private function _initGroupSettingsForm()
-	{
-		// Instantiate the form
-		$this->_groupSettings = new Settings_Form();
-
-		// Initialize it with our settings
-		$config_vars = $this->_settings();
-
-		return $this->_groupSettings->settings($config_vars);
+		$settingsForm->prepare();
 	}
 
 	/**

@@ -10,10 +10,12 @@
  * @version 1.1 beta 3
  */
 
+namespace ElkArte\sources\subs\SettingsFormAdapter;
+
 /**
  * Class to initialize inline permissions sub-form and save its settings
  */
-class Inline_Permissions_Form
+class InlinePermissions extends Adapter
 {
 	/**
 	 * @var array
@@ -34,11 +36,6 @@ class Inline_Permissions_Form
 	 * @var string[]
 	 */
 	private $illegal_guest_permissions = array();
-
-	/**
-	 * @var array
-	 */
-	private $context = array();
 
 	/**
 	 * @var int[]
@@ -104,7 +101,7 @@ class Inline_Permissions_Form
 
 		// Make sure they can't do certain things,
 		// unless they have the right permissions.
-		$this->permissionsObject = new Permissions;
+		$this->permissionsObject = new \Permissions;
 		$this->illegal_permissions = $this->permissionsObject->getIllegalPermissions();
 	}
 
@@ -113,6 +110,11 @@ class Inline_Permissions_Form
 	 */
 	public function save()
 	{
+		// No permissions? Not a great deal to do here.
+		if (!allowedTo('manage_permissions'))
+		{
+			return;
+		}
 		$insertRows = array();
 		foreach ($this->permissionList as $permission)
 		{
@@ -152,7 +154,7 @@ class Inline_Permissions_Form
 	 * @uses ManagePermissions language
 	 * @uses ManagePermissions template
 	 */
-	public function init()
+	public function prepare()
 	{
 		global $modSettings;
 
@@ -239,15 +241,15 @@ class Inline_Permissions_Form
 	 * Prepare the template by loading context
 	 * variables for each permission.
 	 *
-	 * @uses ManagePermissions language
 	 * @uses ManagePermissions template
+	 * @uses ManagePermissions languuge
 	 */
-	private function prepareContext()
+	protected function prepareContext()
 	{
 		global $context, $txt;
 
-		loadLanguage('ManagePermissions');
 		loadTemplate('ManagePermissions');
+		loadLanguage('ManagePermissions');
 
 		// Load the names for guests
 		foreach ($this->permissions as $permission)

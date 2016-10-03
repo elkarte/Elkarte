@@ -176,8 +176,8 @@ class ManageLanguages_Controller extends Action_Controller
 
 			if ($this->_req->post->def_language != $language && $lang_exists)
 			{
-				Settings_Form::save_file(array('language' => '\'' . $this->_req->post->def_language . '\''));
 				$language = $this->_req->post->def_language;
+				$this->updateLanguage($language);
 			}
 		}
 
@@ -190,7 +190,7 @@ class ManageLanguages_Controller extends Action_Controller
 			'base_href' => $scripturl . '?action=admin;area=languages',
 			'title' => $txt['edit_languages'],
 			'data_check' => array(
-				'class' => function($rowData) {
+				'class' => function ($rowData) {
 					if ($rowData['default'])
 						return 'highlight2';
 					else
@@ -210,7 +210,7 @@ class ManageLanguages_Controller extends Action_Controller
 						'class' => 'centertext',
 					),
 					'data' => array(
-						'function' => function($rowData) {
+						'function' => function ($rowData) {
 							return '<input type="radio" name="def_language" value="' . $rowData['id'] . '" ' . ($rowData['default'] ? 'checked="checked"' : '') . ' class="input_radio" />';
 						},
 						'style' => 'width: 8%;',
@@ -222,7 +222,7 @@ class ManageLanguages_Controller extends Action_Controller
 						'value' => $txt['languages_lang_name'],
 					),
 					'data' => array(
-						'function' => function($rowData) {
+						'function' => function ($rowData) {
 							global $scripturl;
 
 							return sprintf('<a href="%1$s?action=admin;area=languages;sa=editlang;lid=%2$s">%3$s</a>', $scripturl, $rowData['id'], $rowData['name']);
@@ -538,7 +538,7 @@ class ManageLanguages_Controller extends Action_Controller
 			'id' => 'lang_main_files_list',
 			'title' => $txt['languages_download_main_files'],
 			'get_items' => array(
-				'function' => function() {
+				'function' => function () {
 					global $context;
 					return $context['files']['lang'];
 				},
@@ -549,7 +549,7 @@ class ManageLanguages_Controller extends Action_Controller
 						'value' => $txt['languages_download_filename'],
 					),
 					'data' => array(
-						'function' => function($rowData) {
+						'function' => function ($rowData) {
 							global $txt;
 
 							return '<strong>' . $rowData['name'] . '</strong><br /><span class="smalltext">' . $txt['languages_download_dest'] . ': ' . $rowData['destination'] . '</span>' . ($rowData['version_compare'] == 'older' ? '<br />' . $txt['languages_download_older'] : '');
@@ -561,7 +561,7 @@ class ManageLanguages_Controller extends Action_Controller
 						'value' => $txt['languages_download_writable'],
 					),
 					'data' => array(
-						'function' => function($rowData) {
+						'function' => function ($rowData) {
 							global $txt;
 
 							return '<span class="' . ($rowData['writable'] ? 'success' : 'error') . ';">' . ($rowData['writable'] ? $txt['yes'] : $txt['no']) . '</span>';
@@ -573,7 +573,7 @@ class ManageLanguages_Controller extends Action_Controller
 						'value' => $txt['languages_download_version'],
 					),
 					'data' => array(
-						'function' => function($rowData) {
+						'function' => function ($rowData) {
 							return '<span class="' . ($rowData['version_compare'] == 'older' ? 'error' : ($rowData['version_compare'] == 'same' ? 'softalert' : 'success')) . ';">' . $rowData['version'] . '</span>';
 						},
 					),
@@ -583,7 +583,7 @@ class ManageLanguages_Controller extends Action_Controller
 						'value' => $txt['languages_download_exists'],
 					),
 					'data' => array(
-						'function' => function($rowData) {
+						'function' => function ($rowData) {
 							global $txt;
 
 							return $rowData['exists'] ? ($rowData['exists'] == 'same' ? $txt['languages_download_exists_same'] : $txt['languages_download_exists_different']) : $txt['no'];
@@ -596,7 +596,7 @@ class ManageLanguages_Controller extends Action_Controller
 						'class' => 'centertext',
 					),
 					'data' => array(
-						'function' => function($rowData) {
+						'function' => function ($rowData) {
 							return '<input type="checkbox" name="copy_file[]" value="' . $rowData['generaldest'] . '" ' . ($rowData['default_copy'] ? 'checked="checked"' : '') . ' class="input_check" />';
 						},
 						'style' => 'width: 4%;',
@@ -686,7 +686,7 @@ class ManageLanguages_Controller extends Action_Controller
 				);
 			}
 			$dir->close();
-			usort($context['possible_files'][$theme]['files'], function($val1, $val2) {
+			usort($context['possible_files'][$theme]['files'], function ($val1, $val2) {
 				return strcmp($val1['name'], $val2['name']);
 			});
 		}
@@ -752,11 +752,11 @@ class ManageLanguages_Controller extends Action_Controller
 			$cache = Cache::instance();
 			$cache->put('known_languages', null, $cache->maxLevel(1) ? 86400 : 3600);
 
-			// Sixth, if we deleted the default language, set us back to english?
+			// Sixth, if we deleted the default language, set us back to english.
 			if ($context['lang_id'] == $language)
 			{
 				$language = 'english';
-				Settings_Form::save_file(array('language' => '\'' . $language . '\''));
+				$this->updateLanguage($language);
 			}
 
 			// Seventh, get out of here.
@@ -1021,7 +1021,10 @@ class ManageLanguages_Controller extends Action_Controller
 		global $scripturl, $context, $txt;
 
 		// Initialize the form
-		$this->_initLanguageSettingsForm();
+		$settingsForm = new Settings_Form(Settings_Form::DB_ADAPTER);
+
+		// Initialize it with our settings
+		$settingsForm->setConfigVars($this->_settings());
 
 		// Warn the user if the backup of Settings.php failed.
 		$settings_not_writable = !is_writable(BOARDDIR . '/Settings.php');
@@ -1034,7 +1037,8 @@ class ManageLanguages_Controller extends Action_Controller
 
 			call_integration_hook('integrate_save_language_settings');
 
-			$this->_languageSettings->save();
+			$settingsForm->setConfigValues((array) $this->_req->post);
+			$settingsForm->save();
 			redirectexit('action=admin;area=languages;sa=settings');
 		}
 
@@ -1055,31 +1059,7 @@ class ManageLanguages_Controller extends Action_Controller
 		}
 
 		// Fill the config array in contextual data for the template.
-		$this->_languageSettings->prepare_file();
-	}
-
-	/**
-	 * Administration settings for languages area:
-	 *
-	 * - the method will initialize the form config array with all settings.
-	 *
-	 * Format of the array:
-	 *  - either, variable name, description, type (constant), size/possible values, helptext.
-	 *  - or, an empty string for a horizontal rule.
-	 *  - or, a string for a titled section.
-	 *
-	 * Initialize _languageSettings form.
-	 */
-	private function _initLanguageSettingsForm()
-	{
-		// Make it happen!
-		$this->_languageSettings = new Settings_Form();
-
-		// Initialize it with our settings
-		$config_vars = $this->_settings();
-
-		// Initialize the little form
-		return $this->_languageSettings->settings($config_vars);
+		$settingsForm->prepare();
 	}
 
 	/**
@@ -1113,5 +1093,21 @@ class ManageLanguages_Controller extends Action_Controller
 	public function settings_search()
 	{
 		return $this->_settings();
+	}
+
+	private function updateLanguage($language)
+	{
+		global $context;
+
+		$configVars = array(
+			array('language')
+		);
+		$configValues = array(
+			'language' => $language
+		);
+		$settingsForm = new Settings_Form(Settings_Form::FILE_ADAPTER);
+		$settingsForm->setConfigVars($configVars);
+		$settingsForm->setConfigValues((array) $configValues);
+		$settingsForm->save();
 	}
 }

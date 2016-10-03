@@ -81,7 +81,8 @@ function template_memberlist()
 	foreach ($context['columns'] as $key => $column)
 	{
 		$table_span += isset($column['colspan']) ? $column['colspan'] : 1;
-		switch ($key) {
+		switch ($key)
+		{
 			case 'posts':
 			case 'date_registered':
 				$sorticon = 'numeric';

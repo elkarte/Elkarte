@@ -125,9 +125,10 @@ class ManageSmileys_Controller extends Action_Controller
 		global $context, $scripturl;
 
 		// initialize the form
-		$this->_initSmileySettingsForm();
+		$settingsForm = new Settings_Form(Settings_Form::DB_ADAPTER);
 
-		$config_vars = $this->_smileySettings->settings();
+		// Initialize it with our settings
+		$settingsForm->setConfigVars($this->_settings());
 
 		// For the basics of the settings.
 		require_once(SUBSDIR . '/Smileys.subs.php');
@@ -150,7 +151,8 @@ class ManageSmileys_Controller extends Action_Controller
 			call_integration_hook('integrate_save_smiley_settings');
 
 			// Save away
-			Settings_Form::save_db($config_vars, $this->_req->post);
+			$settingsForm->setConfigValues((array) $this->_req->post);
+			$settingsForm->save();
 
 			// Flush the cache so the new settings take effect
 			$this->clearSmileyCache();
@@ -158,21 +160,7 @@ class ManageSmileys_Controller extends Action_Controller
 			redirectexit('action=admin;area=smileys;sa=settings');
 		}
 
-		Settings_Form::prepare_db($config_vars);
-	}
-
-	/**
-	 * Retrieve and initialize the form with smileys administration settings.
-	 */
-	private function _initSmileySettingsForm()
-	{
-		// Instantiate the form
-		$this->_smileySettings = new Settings_Form();
-
-		// Initialize it with our settings
-		$config_vars = $this->_settings();
-
-		return $this->_smileySettings->settings($config_vars);
+		$settingsForm->prepare();
 	}
 
 	/**
@@ -270,7 +258,7 @@ class ManageSmileys_Controller extends Action_Controller
 						'class' => 'centertext',
 					),
 					'data' => array(
-						'function' => function($rowData) {
+						'function' => function ($rowData) {
 							return $rowData['selected'] ? '<i class="icon i-check"></i>' : '';
 						},
 						'class' => 'centertext',
@@ -327,7 +315,7 @@ class ManageSmileys_Controller extends Action_Controller
 						'class' => 'centertext',
 					),
 					'data' => array(
-						'function' => function($rowData) {
+						'function' => function ($rowData) {
 							return $rowData['id'] == 0 ? '' : sprintf('<input type="checkbox" name="smiley_set[%1$d]" class="input_check" />', $rowData['id']);
 						},
 						'class' => 'centertext',
@@ -941,7 +929,7 @@ class ManageSmileys_Controller extends Action_Controller
 							'value' => $txt['smileys_location'],
 						),
 						'data' => array(
-							'function' => function($rowData) {
+							'function' => function ($rowData) {
 								global $txt;
 
 								if (empty($rowData['hidden']))
@@ -962,7 +950,7 @@ class ManageSmileys_Controller extends Action_Controller
 							'value' => $txt['smileys_description'],
 						),
 						'data' => array(
-							'function' => function($rowData) {
+							'function' => function ($rowData) {
 								global $context, $txt, $modSettings;
 
 								if (empty($modSettings['smileys_dir']) || !is_dir($modSettings['smileys_dir']))

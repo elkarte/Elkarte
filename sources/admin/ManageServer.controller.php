@@ -148,7 +148,10 @@ class ManageServer_Controller extends Action_Controller
 		global $scripturl, $context, $txt;
 
 		// Initialize the form
-		$this->_initGeneralSettingsForm();
+		$settingsForm = new Settings_Form(Settings_Form::FILE_ADAPTER);
+
+		// Initialize it with our settings
+		$settingsForm->setConfigVars($this->_generalSettings());
 
 		// Setup the template stuff.
 		$context['post_url'] = $scripturl . '?action=admin;area=serversettings;sa=general;save';
@@ -159,27 +162,13 @@ class ManageServer_Controller extends Action_Controller
 		{
 			call_integration_hook('integrate_save_general_settings');
 
-			$this->_generalSettingsForm->save();
+			$settingsForm->setConfigValues((array) $this->_req->post);
+			$settingsForm->save();
 			redirectexit('action=admin;area=serversettings;sa=general;' . $context['session_var'] . '=' . $context['session_id'] . ';msg=' . (!empty($context['settings_message']) ? $context['settings_message'] : 'core_settings_saved'));
 		}
 
 		// Fill the config array for the template and all that.
-		$this->_generalSettingsForm->prepare_file();
-	}
-
-	/**
-	 * Initialize _generalSettings form.
-	 */
-	private function _initGeneralSettingsForm()
-	{
-		// Start the form
-		$this->_generalSettingsForm = new Settings_Form();
-
-		// Initialize it with our settings
-		$config_vars = $this->_generalSettings();
-
-		// Set them vars for our settings form
-		return $this->_generalSettingsForm->settings($config_vars);
+		$settingsForm->prepare();
 	}
 
 	/**
@@ -200,7 +189,10 @@ class ManageServer_Controller extends Action_Controller
 		global $scripturl, $context, $txt;
 
 		// Initialize the form
-		$this->_initDatabaseSettingsForm();
+		$settingsForm = new Settings_Form(Settings_Form::FILE_ADAPTER);
+
+		// Initialize it with our settings
+		$settingsForm->setConfigVars($this->_databaseSettings());
 
 		// Setup the template stuff.
 		$context['post_url'] = $scripturl . '?action=admin;area=serversettings;sa=database;save';
@@ -212,25 +204,13 @@ class ManageServer_Controller extends Action_Controller
 		{
 			call_integration_hook('integrate_save_database_settings');
 
-			$this->_databaseSettingsForm->save();
+			$settingsForm->setConfigValues((array) $this->_req->post);
+			$settingsForm->save();
 			redirectexit('action=admin;area=serversettings;sa=database;' . $context['session_var'] . '=' . $context['session_id'] . ';msg=' . (!empty($context['settings_message']) ? $context['settings_message'] : 'core_settings_saved'));
 		}
 
 		// Fill the config array for the template.
-		$this->_databaseSettingsForm->prepare_file();
-	}
-
-	/**
-	 * Initialize _databaseSettings form.
-	 */
-	private function _initDatabaseSettingsForm()
-	{
-		// instantiate the form
-		$this->_databaseSettingsForm = new Settings_Form();
-		$config_vars = $this->_databaseSettings();
-
-		// Set them vars for our settings form
-		return $this->_databaseSettingsForm->settings($config_vars);
+		$settingsForm->prepare();
 	}
 
 	/**
@@ -244,7 +224,10 @@ class ManageServer_Controller extends Action_Controller
 		global $context, $scripturl, $txt, $modSettings, $cookiename, $user_settings, $boardurl;
 
 		// Initialize the form
-		$this->_initCookieSettingsForm();
+		$settingsForm = new Settings_Form(Settings_Form::FILE_ADAPTER);
+
+		// Initialize it with our settings
+		$settingsForm->setConfigVars($this->_cookieSettings());
 
 		$context['post_url'] = $scripturl . '?action=admin;area=serversettings;sa=cookie;save';
 		$context['settings_title'] = $txt['cookies_sessions_settings'];
@@ -261,8 +244,8 @@ class ManageServer_Controller extends Action_Controller
 			if (!empty($this->_req->post->globalCookiesDomain) && strpos($boardurl, $this->_req->post->globalCookiesDomain) === false)
 				Errors::instance()->fatal_lang_error('invalid_cookie_domain', false);
 
-			//Settings_Form::save_db($config_vars);
-			$this->_cookieSettingsForm->save();
+			$settingsForm->setConfigValues((array) $this->_req->post);
+			$settingsForm->save();
 
 			// If the cookie name was changed, reset the cookie.
 			if ($cookiename != $this->_req->post->cookiename)
@@ -289,27 +272,12 @@ class ManageServer_Controller extends Action_Controller
 		hideGlobalCookies();
 
 		// Update when clicked
-		$("#localCookies, #globalCookies").click(function() {
+		$("#localCookies, #globalCookies").click(function () {
 			hideGlobalCookies();
 		});', true);
 
 		// Fill the config array.
-		$this->_cookieSettingsForm->prepare_file();
-	}
-
-	/**
-	 * Initialize _cookieSettings form.
-	 */
-	private function _initCookieSettingsForm()
-	{
-		// Start a new form
-		$this->_cookieSettingsForm = new Settings_Form();
-
-		// Initialize it with our settings
-		$config_vars = $this->_cookieSettings();
-
-		// Set them vars for our settings form
-		return $this->_cookieSettingsForm->settings($config_vars);
+		$settingsForm->prepare();
 	}
 
 	/**
@@ -323,14 +291,18 @@ class ManageServer_Controller extends Action_Controller
 		global $context, $scripturl, $txt;
 
 		// Initialize the form
-		$this->_initCacheSettingsForm();
+		$settingsForm = new Settings_Form(Settings_Form::FILE_ADAPTER);
+
+		// Initialize it with our settings
+		$settingsForm->setConfigVars($this->_cacheSettings());
 
 		// Saving again?
 		if (isset($this->_req->query->save))
 		{
 			call_integration_hook('integrate_save_cache_settings');
 
-			$this->_cacheSettingsForm->save();
+			$settingsForm->setConfigValues((array) $this->_req->post);
+			$settingsForm->save();
 
 			// we need to save the $cache_enable to $modSettings as well
 			updateSettings(array('cache_enable' => (int) $this->_req->post->cache_enable));
@@ -350,22 +322,7 @@ class ManageServer_Controller extends Action_Controller
 		createToken('admin-ssc');
 
 		// Prepare settings for display in the template.
-		$this->_cacheSettingsForm->prepare_file();
-	}
-
-	/**
-	 * Initialize _cacheSettings form.
-	 */
-	private function _initCacheSettingsForm()
-	{
-		// We need a setting form
-		$this->_cacheSettingsForm = new Settings_Form();
-
-		// Initialize it with our settings
-		$config_vars = $this->_cacheSettings();
-
-		// Set them vars for our settings form
-		return $this->_cacheSettingsForm->settings($config_vars);
+		$settingsForm->prepare();
 	}
 
 	/**
@@ -379,10 +336,10 @@ class ManageServer_Controller extends Action_Controller
 		global $txt, $scripturl, $context;
 
 		// Initialize the form
-		$this->_initBalancingSettingsForm();
+		$settingsForm = new Settings_Form(Settings_Form::DB_ADAPTER);
 
 		// Initialize it with our settings
-		$config_vars = $this->_loadavgSettingsForm->settings();
+		$settingsForm->setConfigVars($this->_loadavgSettings());
 
 		call_integration_hook('integrate_loadavg_settings');
 
@@ -407,28 +364,14 @@ class ManageServer_Controller extends Action_Controller
 
 			call_integration_hook('integrate_save_loadavg_settings');
 
-			Settings_Form::save_db($config_vars, $this->_req->post);
+			$settingsForm->setConfigValues((array) $this->_req->post);
+			$settingsForm->save();
 			redirectexit('action=admin;area=serversettings;sa=loads;' . $context['session_var'] . '=' . $context['session_id']);
 		}
 
 		createToken('admin-ssc');
 		createToken('admin-dbsc');
-		$this->_loadavgSettingsForm->prepare_db($config_vars);
-	}
-
-	/**
-	 * Initialize balancingSettings form.
-	 */
-	private function _initBalancingSettingsForm()
-	{
-		// Forms, we need them
-		$this->_loadavgSettingsForm = new Settings_Form();
-
-		// Initialize it with our settings
-		$config_vars = $this->_loadavgSettings();
-
-		// Set them vars for our settings form
-		return $this->_loadavgSettingsForm->settings($config_vars);
+		$settingsForm->prepare();
 	}
 
 	/**

@@ -879,9 +879,10 @@ class ManageNews_Controller extends Action_Controller
 		global $context, $txt, $scripturl;
 
 		// Initialize the form
-		$this->_initNewsSettingsForm();
+		$settingsForm = new Settings_Form(Settings_Form::DB_ADAPTER);
 
-		$config_vars = $this->_newsSettings->settings();
+		// Initialize it with our settings
+		$settingsForm->setConfigVars($this->_settings());
 
 		// Add some javascript at the bottom...
 		addInlineJavascript('
@@ -900,25 +901,12 @@ class ManageNews_Controller extends Action_Controller
 
 			call_integration_hook('integrate_save_news_settings');
 
-			Settings_Form::save_db($config_vars, $this->_req->post);
+			$settingsForm->setConfigValues((array) $this->_req->post);
+			$settingsForm->save();
 			redirectexit('action=admin;area=news;sa=settings');
 		}
 
-		Settings_Form::prepare_db($config_vars);
-	}
-
-	/**
-	 * Initialize the news settings screen in admin area for the forum.
-	 */
-	private function _initNewsSettingsForm()
-	{
-		// Instantiate the form
-		$this->_newsSettings = new Settings_Form();
-
-		// Initialize it with our settings
-		$config_vars = $this->_settings();
-
-		return $this->_newsSettings->settings($config_vars);
+		$settingsForm->prepare();
 	}
 
 	/**
@@ -941,7 +929,7 @@ class ManageNews_Controller extends Action_Controller
 		);
 
 		// Add new settings with a nice hook, makes them available for admin settings search as well
-		call_integration_hook('integrate_modify_news_settings', array(&$config_vars));
+		call_integration_hook('integrate_modify_news_settings');
 
 		return $config_vars;
 	}

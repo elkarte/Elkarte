@@ -657,7 +657,7 @@ class Verification_Controls_Questions implements Verification_Controls
 	/**
 	 * Required by the interface, returns true for question challenges
 	 *
-	 * @return boo
+	 * @return boolean
 	 */
 	public function hasVisibleTemplate()
 	{

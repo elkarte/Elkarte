@@ -255,7 +255,7 @@ class News_Controller extends Action_Controller
 			{
 				if (isset($this->_req->query->{$var}))
 				{
-					$url_parts[] = $var . '=' . (is_array( $this->_req->query->{$var}) ? implode(',',  $this->_req->query->{$var}) : $this->_req->query->{$var});
+					$url_parts[] = $var . '=' . (is_array($this->_req->query->{$var}) ? implode(',', $this->_req->query->{$var}) : $this->_req->query->{$var});
 				}
 			}
 

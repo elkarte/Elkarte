@@ -1417,7 +1417,7 @@ class ManageThemes_Controller extends Action_Controller
 		{
 			if (!empty($options['admin_preferences']))
 			{
-				$options['admin_preferences'] = serializeToJson($options['admin_preferences'], function($array_form) {
+				$options['admin_preferences'] = serializeToJson($options['admin_preferences'], function ($array_form) {
 					global $context;
 
 					$context['admin_preferences'] = $array_form;
@@ -1442,7 +1442,7 @@ class ManageThemes_Controller extends Action_Controller
 		{
 			if (!empty($options['minmax_preferences']))
 			{
-				$minmax_preferences = serializeToJson($options['minmax_preferences'], function($array_form) {
+				$minmax_preferences = serializeToJson($options['minmax_preferences'], function ($array_form) {
 					global $settings, $user_info;
 
 					// Update the option.

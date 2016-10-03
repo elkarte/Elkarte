@@ -910,20 +910,20 @@ function template_show_settings()
 				(isset($config_var['name']) ? '<a href="#" id="' . $config_var['name'] . '"></a>' : ''), '
 					<h3 class="', !empty($config_var['class']) ? $config_var['class'] : 'category_header', '"', !empty($config_var['force_div_id']) ? ' id="' . $config_var['force_div_id'] . '"' : '', '>';
 
-				if ($config_var['help'])
+				if (isset($config_var['helptext']))
 				{
 					if (empty($config_var['class']))
 					{
 						echo '
-						<a href="' . $scripturl . '?action=quickhelp;help=' . $config_var['help'] . '" onclick="return reqOverlayDiv(this.href);" class="hdicon cat_img_helptopics help" alt="' . $txt['help'] . '"></a>';
+						<a href="' . $scripturl . '?action=quickhelp;help=' . $config_var['helptext'] . '" onclick="return reqOverlayDiv(this.href);" class="hdicon cat_img_helptopics help" alt="' . $txt['help'] . '"></a>';
 					}
 					else
 					{
 						echo '
-						<a href="' . $scripturl . '?action=quickhelp;help=' . $config_var['help'] . '" onclick="return reqOverlayDiv(this.href);" class="' . $config_var['class'] . ' help"><i class="helpicon i-help icon-lg"><s>', $txt['help'], '</s></i></a>';
+						<a href="' . $scripturl . '?action=quickhelp;help=' . $config_var['helptext'] . '" onclick="return reqOverlayDiv(this.href);" class="' . $config_var['class'] . ' help"><i class="helpicon i-help icon-lg"><s>', $txt['help'], '</s></i></a>';
 					}
 				}
-				elseif ($config_var['icon'])
+				elseif (isset($config_var['icon']))
 				{
 					echo
 						'<span class="hdicon cat_img_' . $config_var['icon'] . '"></span>';
@@ -983,27 +983,29 @@ function template_show_settings()
 					<dt', is_array($config_var) && !empty($config_var['force_div_id']) ? ' id="' . $config_var['force_div_id'] . '"' : '', '>';
 
 				// Some quick helpers...
-				$javascript = $config_var['javascript'];
+				$preinput = !empty($config_var['preinput']) ? $config_var['preinput'] : '';
+				$javascript = !empty($config_var['javascript']) ? $config_var['javascript'] : '';
 				$disabled = !empty($config_var['disabled']) ? ' disabled="disabled"' : '';
+				$invalid = !empty($config_var['invalid']) ? ' class="error"' : '';
+				$size = !empty($config_var['size']) ? ' size="' . $config_var['size'] . '"' : '';
 				$subtext = !empty($config_var['subtext']) ? '<br /><span class="smalltext"> ' . $config_var['subtext'] . '</span>' : '';
 
 				// Show the [?] button.
-				if ($config_var['help'])
+				if (isset($config_var['helptext']))
 				{
 					echo '
-						<a id="setting_', $config_var['name'], '" href="', $scripturl, '?action=quickhelp;help=', $config_var['help'], '" onclick="return reqOverlayDiv(this.href);" class="helpicon i-help"><s>', $txt['help'], '</s></a><span', ($config_var['disabled'] ? ' class="disabled"' : ($config_var['invalid'] ? ' class="error"' : '')), '><label for="', $config_var['name'], '">', $config_var['label'], '</label>', $subtext, '</span>
-					</dt>';
+						<a id="setting_', $config_var['name'], '" href="', $scripturl, '?action=quickhelp;help=', $config_var['helptext'], '" onclick="return reqOverlayDiv(this.href);" class="helpicon i-help"><s>', $txt['help'], '</s>';
 				}
 				else
 				{
 					echo '
-						<a id="setting_', $config_var['name'], '"></a> <span', ($config_var['disabled'] ? ' class="disabled"' : ($config_var['invalid'] ? ' class="error"' : '')), '><label for="', $config_var['name'], '">', $config_var['label'], '</label>', $subtext, '</span>
-					</dt>';
+						<a id="setting_', $config_var['name'], '">';
 				}
 
-				echo '
+				echo '</a> <span', ($config_var['disabled'] ? ' class="disabled"' : $invalid), '><label for="', $config_var['name'], '">', $config_var['label'], '</label>', $subtext, '</span>
+					</dt>
 					<dd', (!empty($config_var['force_div_id']) ? ' id="' . $config_var['force_div_id'] . '_dd"' : ''), '>',
-				$config_var['preinput'];
+				$preinput;
 
 				// Show a check box.
 				if ($config_var['type'] == 'check')
@@ -1015,13 +1017,13 @@ function template_show_settings()
 				elseif ($config_var['type'] == 'password')
 				{
 					echo '
-						<input type="password"', $disabled, $javascript, ' name="', $config_var['name'], '[0]" id="', $config_var['name'], '"', ($config_var['size'] ? ' size="' . $config_var['size'] . '"' : ''), ' value="*#fakepass#*" onfocus="this.value = \'\'; this.form.', $config_var['name'], '_confirm.disabled = false;" class="input_password" />
+						<input type="password"', $disabled, $javascript, ' name="', $config_var['name'], '[0]" id="', $config_var['name'], '"', $size, ' value="*#fakepass#*" onfocus="this.value = \'\'; this.form.', $config_var['name'], '_confirm.disabled = false;" class="input_password" />
 					</dd>
 					<dt>
-						<a id="setting_', $config_var['name'], '_confirm"></a><span', ($config_var['disabled'] ? ' class="disabled"' : ($config_var['invalid'] ? ' class="error"' : '')), '><label for="', $config_var['name'], '_confirm"><em>', $txt['admin_confirm_password'], '</em></label></span>
+						<a id="setting_', $config_var['name'], '_confirm"></a><span', ($config_var['disabled'] ? ' class="disabled"' : $invalid), '><label for="', $config_var['name'], '_confirm"><em>', $txt['admin_confirm_password'], '</em></label></span>
 					</dt>
 					<dd ', (!empty($config_var['force_div_id']) ? ' id="' . $config_var['force_div_id'] . '_confirm_dd"' : ''), ' >
-						<input type="password" disabled="disabled" id="', $config_var['name'], '_confirm" name="', $config_var['name'], '[1]"', ($config_var['size'] ? ' size="' . $config_var['size'] . '"' : ''), ' class="input_password" />';
+						<input type="password" disabled id="', $config_var['name'], '_confirm" name="', $config_var['name'], '[1]"', $size, ' class="input_password" />';
 				}
 				// Show a selection box.
 				elseif ($config_var['type'] == 'select')
@@ -1031,8 +1033,17 @@ function template_show_settings()
 
 					foreach ($config_var['data'] as $option)
 					{
+						$selected = false;
+						if (empty($var['multiple']))
+						{
+							$selected = $option[0] == $config_var['value'];
+						}
+						else
+						{
+							$selected = in_array($option[0], $config_var['value']);
+						}
 						echo '
-							<option value="', $option[0], '"', (!empty($config_var['value']) && ($option[0] == $config_var['value'] || (!empty($config_var['multiple']) && in_array($option[0], $config_var['value']))) ? ' selected="selected"' : ''), '>', $option[1], '</option>';
+							<option value="', $option[0], '"', $selected ? ' selected' : '', '>', $option[1], '</option>';
 					}
 
 					echo '
@@ -1055,41 +1066,44 @@ function template_show_settings()
 					echo '
 						<fieldset id="', $config_var['name'], '">
 							<legend>', $txt['bbcTagsToUse_select'], '</legend>
-							<ul>';
+							<ul class="list_bbc">';
 
-					foreach ($context['bbc_columns'] as $bbcColumn)
+					foreach ($config_var['data'] as $bbcTag)
 					{
-						foreach ($bbcColumn as $bbcTag)
-						{
-							echo '
-								<li class="list_bbc floatleft">
-									<input type="checkbox" name="', $config_var['name'], '_enabledTags[]" id="tag_', $config_var['name'], '_', $bbcTag['tag'], '" value="', $bbcTag['tag'], '"', !in_array($bbcTag['tag'], $context['bbc_sections'][$config_var['name']]['disabled']) ? ' checked="checked"' : '', ' /> <label for="tag_', $config_var['name'], '_', $bbcTag['tag'], '">', $bbcTag['tag'], '</label>', $bbcTag['show_help'] ? ' (<a href="' . $scripturl . '?action=quickhelp;help=tag_' . $bbcTag['tag'] . '" onclick="return reqOverlayDiv(this.href);" class="helpicon i-help"></a>)' : '', '
+						echo '
+								<li>
+									<label>
+										<input type="checkbox" name="', $config_var['name'], '_enabledTags[]" value="', $bbcTag['tag'], '"', !in_array($bbcTag['tag'], $config_var['disabled_tags']) ? ' checked' : '', ' /> ', $bbcTag['tag'], '
+									</label>', $bbcTag['show_help'] ? '
+									<a href="' . $scripturl . '?action=quickhelp;help=tag_' . $bbcTag['tag'] . '" onclick="return reqOverlayDiv(this.href);" class="helpicon i-help"></a>' : '', '
 								</li>';
-						}
 					}
 
 					echo '
 							</ul>
-							<input type="checkbox" id="bbc_', $config_var['name'], '_select_all" onclick="invertAll(this, this.form, \'', $config_var['name'], '_enabledTags\');"', $context['bbc_sections'][$config_var['name']]['all_selected'] ? ' checked="checked"' : '', ' /> <label for="bbc_', $config_var['name'], '_select_all"><em>', $txt['bbcTagsToUse_select_all'], '</em></label>
+							<label>
+								<input type="checkbox" onclick="invertAll(this, this.form, \'', $config_var['name'], '_enabledTags\');"', $config_var['all_selected'] ? ' checked' : '', ' />
+								<em>', $txt['bbcTagsToUse_select_all'], '</em>
+							</label>
 						</fieldset>';
 				}
 				// A simple message?
-				elseif ($config_var['type'] == 'var_message')
+				elseif ($config_var['type'] == 'message')
 				{
 					echo '
-						<div', !empty($config_var['name']) ? ' id="' . $config_var['name'] . '"' : '', '>', $config_var['var_message'], '</div>';
+						<div', !empty($config_var['name']) ? ' id="' . $config_var['name'] . '"' : '', '>', $config_var['message'], '</div>';
 				}
 				// Color picker?
 				elseif ($config_var['type'] == 'color')
 				{
 					echo '
-						<input type="color"', $javascript, $disabled, ' name="', $config_var['name'], '" id="', $config_var['name'], '" value="', $config_var['value'], '"', ($config_var['size'] ? ' size="' . $config_var['size'] . '"' : ''), ' class="input_text" />';
+						<input type="color"', $javascript, $disabled, ' name="', $config_var['name'], '" id="', $config_var['name'], '" value="', $config_var['value'], '"', $size, ' class="input_text" />';
 				}
 				// Assume it must be a text box.
 				else
 				{
 					echo '
-						<input type="text"', $javascript, $disabled, ' name="', $config_var['name'], '" id="', $config_var['name'], '" value="', $config_var['value'], '"', ($config_var['size'] ? ' size="' . $config_var['size'] . '"' : ''), ' class="input_text" />';
+						<input type="text"', $javascript, $disabled, ' name="', $config_var['name'], '" id="', $config_var['name'], '" value="', $config_var['value'], '"', $size, ' class="input_text" />';
 				}
 
 				echo ($config_var['invalid']) ? '
@@ -1145,12 +1159,6 @@ function template_show_settings()
 	{
 		echo '
 			<input type="hidden" name="', $context['admin-ssc_token_var'], '" value="', $context['admin-ssc_token'], '" />';
-	}
-
-	if (isset($context['admin-dbsc_token']))
-	{
-		echo '
-			<input type="hidden" name="', $context['admin-dbsc_token_var'], '" value="', $context['admin-dbsc_token'], '" />';
 	}
 
 	echo '

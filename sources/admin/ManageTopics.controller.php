@@ -65,10 +65,10 @@ class ManageTopics_Controller extends Action_Controller
 		global $context, $txt, $scripturl;
 
 		// Initialize the form
-		$this->_initTopicSettingsForm();
+		$settingsForm = new Settings_Form(Settings_Form::DB_ADAPTER);
 
-		// Retrieve the current config settings
-		$config_vars = $this->_topicSettings->settings();
+		// Initialize it with our settings
+		$settingsForm->setConfigVars($this->_settings());
 
 		// Setup the template.
 		$context['sub_template'] = 'show_settings';
@@ -83,7 +83,8 @@ class ManageTopics_Controller extends Action_Controller
 			call_integration_hook('integrate_save_topic_settings');
 
 			// Save the result!
-			Settings_Form::save_db($config_vars, $this->_req->post);
+			$settingsForm->setConfigValues((array) $this->_req->post);
+			$settingsForm->save();
 
 			// We're done here, pal.
 			redirectexit('action=admin;area=postsettings;sa=topics');
@@ -94,21 +95,7 @@ class ManageTopics_Controller extends Action_Controller
 		$context['settings_title'] = $txt['manageposts_topic_settings'];
 
 		// Prepare the settings
-		Settings_Form::prepare_db($config_vars);
-	}
-
-	/**
-	 * Initialize topicSettings form with the configuration settings for topics.
-	 */
-	private function _initTopicSettingsForm()
-	{
-		// Instantiate the form
-		$this->_topicSettings = new Settings_Form();
-
-		// Initialize it with our settings
-		$config_vars = $this->_settings();
-
-		return $this->_topicSettings->settings($config_vars);
+		$settingsForm->prepare();
 	}
 
 	/**

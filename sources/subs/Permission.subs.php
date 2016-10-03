@@ -48,16 +48,16 @@ function updateChildPermissions($parents, $profile = null)
 
 /**
  * Dummy class for compatibility sake
- * @deprecated since 1.1
  */
-class InlinePermissions_Form extends Inline_Permissions_Form
+class InlinePermissions_Form extends ElkArte\sources\subs\SettingsFormAdapter\InlinePermissions
 {
 	/**
 	 * Save the permissions of a form containing inline permissions.
 	 *
 	 * @param string[] $permissions
+	 * @deprecated since 1.1
 	 */
- 	public static function save_inline_permissions($permissions)
+	public static function save_inline_permissions($permissions)
 	{
 		$permissionsForm = new self;
 		$permissionsForm->setPermissions($permissions);
@@ -68,12 +68,13 @@ class InlinePermissions_Form extends Inline_Permissions_Form
 	/**
 	 * Initialize a form with inline permissions settings.
 	 * It loads a context variables for each permission.
-	 * This function is used by several settings screens to set specific permissions.
+	 * This function is used by several settings screens
+	 * to set specific permissions.
 	 *
 	 * @param string[] $permissions
 	 * @param int[]    $excluded_groups = array()
+	 * @deprecated since 1.1
 	 *
-	 * @uses ManagePermissions language
 	 * @uses ManagePermissions template.
 	 */
 	public static function init_inline_permissions($permissions, $excluded_groups = array())
@@ -82,7 +83,7 @@ class InlinePermissions_Form extends Inline_Permissions_Form
 		$permissionsForm->setExcludedGroups($excluded_groups);
 		$permissionsForm->setPermissions($permissions);
 
-		return $permissionsForm->init();
+		return $permissionsForm->prepare();
 	}
 }
 

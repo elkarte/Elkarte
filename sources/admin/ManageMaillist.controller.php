@@ -24,24 +24,6 @@
 class ManageMaillist_Controller extends Action_Controller
 {
 	/**
-	 * Basic feature settings form
-	 * @var Settings_Form
-	 */
-	protected $_maillistSettings;
-
-	/**
-	 * Basic filter settings form
-	 * @var Settings_Form
-	 */
-	protected $_filtersSettings;
-
-	/**
-	 * Parsers settings form
-	 * @var Settings_Form
-	 */
-	protected $_parsersSettings;
-
-	/**
 	 * Main dispatcher.
 	 *
 	 * This function checks permissions and passes control to the sub action.
@@ -159,7 +141,7 @@ class ManageMaillist_Controller extends Action_Controller
 						'value' => $txt['error'],
 					),
 					'data' => array(
-						'function' => function($rowData) {
+						'function' => function ($rowData) {
 							$error = $rowData['error_code'];
 							if ($error === 'error_pm_not_found')
 								return '<span class="error">' . $rowData['error'] . '<span>';
@@ -232,7 +214,7 @@ class ManageMaillist_Controller extends Action_Controller
 						'value' => $txt['message_type'],
 					),
 					'data' => array(
-						'function' => function($rowData) {
+						'function' => function ($rowData) {
 							global $txt;
 
 							// Do we have a type?
@@ -898,11 +880,12 @@ class ManageMaillist_Controller extends Action_Controller
 			$context['settings_message'] = array();
 		}
 
-		// Initialize the filer settings form
-		$this->_initFiltersSettingsForm();
+		// Initialize the form
+		$settingsForm = new Settings_Form(Settings_Form::DB_ADAPTER);
 
 		// Initialize it with our settings
-		$config_vars = $this->_filtersSettings->settings();
+		$config_vars = $this->_filtersSettings();
+		$settingsForm->setConfigVars($config_vars);
 
 		// Saving the new or edited entry?
 		if (isset($this->_req->query->save))
@@ -912,8 +895,8 @@ class ManageMaillist_Controller extends Action_Controller
 			call_integration_hook('integrate_save_filter_settings');
 
 			// Editing an entry?
-			$editid = (isset($this->_req->query->edit)) ? (int) $this->_req->query->edit : -1;
-			$editname = (isset($this->_req->query->edit)) ? 'id_filter' : '';
+			$editId = (isset($this->_req->query->edit)) ? (int) $this->_req->query->edit : -1;
+			$editName = (isset($this->_req->query->edit)) ? 'id_filter' : '';
 
 			// If its regex we do a quick check to see if its valid or not
 			if ($this->_req->post->filter_type === 'regex')
@@ -944,7 +927,7 @@ class ManageMaillist_Controller extends Action_Controller
 				$config_vars[] = array('text', 'filter_style');
 				$this->_req->post->filter_style = 'filter';
 
-				Email_Settings::saveTableSettings($config_vars, 'postby_emails_filters', $this->_req->post, array(), $editid, $editname);
+				Email_Settings::saveTableSettings($config_vars, 'postby_emails_filters', $this->_req->post, array('id_filter'), $editId, $editName);
 				writeLog();
 				redirectexit('action=admin;area=maillist;sa=emailfilters;saved');
 			}
@@ -965,7 +948,7 @@ class ManageMaillist_Controller extends Action_Controller
 		$context[$context['admin_menu_name']]['current_subsection'] = 'emailfilters';
 
 		// Load and show
-		Email_Settings::prepare_db($config_vars);
+		$settingsForm->prepare();
 		loadTemplate('Admin');
 		loadCSSFile('admin.css');
 		$context['sub_template'] = 'show_settings';
@@ -974,14 +957,10 @@ class ManageMaillist_Controller extends Action_Controller
 	/**
 	 * Initialize Mailist settings form.
 	 */
-	private function _initFiltersSettingsForm()
+	private function _filtersSettings()
 	{
 		global $txt;
 
-		// Instantiate the extended parser form
-		$this->_filtersSettings = new Email_Settings();
-
-		// Set up the config_vars for the form
 		$config_vars = array(
 			array('text', 'filter_name', 25, 'subtext' => $txt['filter_name_desc']),
 			array('select', 'filter_type',
@@ -996,7 +975,7 @@ class ManageMaillist_Controller extends Action_Controller
 
 		call_integration_hook('integrate_modify_maillist_filter_settings', array(&$config_vars));
 
-		return $this->_filtersSettings->settings($config_vars);
+		return $config_vars;
 	}
 
 	/**
@@ -1287,11 +1266,12 @@ class ManageMaillist_Controller extends Action_Controller
 			$context['editing'] = false;
 		}
 
-		// Initialize the mailparser settings form
-		$this->_initParsersSettingsForm();
+		// Initialize the form
+		$settingsForm = new Settings_Form(Settings_Form::DB_ADAPTER);
 
 		// Initialize it with our settings
-		$config_vars = $this->_parsersSettings->settings();
+		$config_vars = $this->_parsersSettings();
+		$settingsForm->setConfigVars($config_vars);
 
 		// Check if they are saving the changes
 		if (isset($this->_req->query->save))
@@ -1301,8 +1281,8 @@ class ManageMaillist_Controller extends Action_Controller
 			call_integration_hook('integrate_save_parser_settings');
 
 			// Editing a parser?
-			$editid = isset($this->_req->query->edit) ? (int) $this->_req->query->edit : -1;
-			$editname = isset($this->_req->query->edit) ? 'id_filter' : '';
+			$editId = isset($this->_req->query->edit) ? (int) $this->_req->query->edit : -1;
+			$editName = isset($this->_req->query->edit) ? 'id_filter' : '';
 
 			// Test the regex
 			if ($this->_req->post->filter_type === 'regex' && !empty($this->_req->post->filter_from))
@@ -1334,7 +1314,7 @@ class ManageMaillist_Controller extends Action_Controller
 				$this->_req->post->filter_style = 'parser';
 
 				// Save, log, show
-				Email_Settings::saveTableSettings($config_vars, 'postby_emails_filters', $this->_req->post, array(), $editid, $editname);
+				Email_Settings::saveTableSettings($config_vars, 'postby_emails_filters', $this->_req->post, array('id_filter'), $editId, $editName);
 				writeLog();
 				redirectexit('action=admin;area=maillist;sa=emailparser;saved');
 			}
@@ -1355,7 +1335,7 @@ class ManageMaillist_Controller extends Action_Controller
 		$context[$context['admin_menu_name']]['current_subsection'] = 'emailparser';
 
 		// prep it, load it, show it
-		Email_Settings::prepare_db($config_vars);
+		$settingsForm->prepare();
 		loadTemplate('Admin');
 		loadCSSFile('admin.css');
 		$context['sub_template'] = 'show_settings';
@@ -1364,14 +1344,10 @@ class ManageMaillist_Controller extends Action_Controller
 	/**
 	 * Initialize Mailist settings form.
 	 */
-	private function _initParsersSettingsForm()
+	private function _parsersSettings()
 	{
 		global $txt;
 
-		// Instantiate the extended parser form
-		$this->_parsersSettings = new Email_Settings();
-
-		// Define the menu array
 		$config_vars = array(
 			array('text', 'filter_name', 25, 'subtext' => $txt['parser_name_desc']),
 			array('select', 'filter_type', 'subtext' => $txt['parser_type_desc'],
@@ -1385,7 +1361,7 @@ class ManageMaillist_Controller extends Action_Controller
 
 		call_integration_hook('integrate_modify_maillist_parser_settings', array(&$config_vars));
 
-		return $this->_parsersSettings->settings($config_vars);
+		return $config_vars;
 	}
 
 	/**
@@ -1435,10 +1411,10 @@ class ManageMaillist_Controller extends Action_Controller
 		}
 
 		// Initialize the maillist settings form
-		$this->_initMaillistSettingsForm();
+		$settingsForm = new Settings_Form(Settings_Form::DB_ADAPTER);
 
-		// Retrieve the config settings
-		$config_vars = $this->_maillistSettings->settings();
+		// Initialize it with our settings
+		$settingsForm->setConfigVars($this->_settings());
 
 		// Saving settings?
 		if (isset($this->_req->query->save))
@@ -1510,7 +1486,8 @@ class ManageMaillist_Controller extends Action_Controller
 					updateSettings(array('disallow_sendBody' => ''));
 
 				updateSettings(array('maillist_receiving_address' => serialize($maillist_receiving_address)));
-				Settings_Form::save_db($config_vars, $this->_req->post);
+				$settingsForm->setConfigValues((array) $this->_req->post);
+				$settingsForm->save();
 				writeLog();
 				redirectexit('action=admin;area=maillist;sa=emailsettings;saved');
 			}
@@ -1539,21 +1516,7 @@ class ManageMaillist_Controller extends Action_Controller
 		$context['page_title'] = $txt['ml_emailsettings'];
 		$context['post_url'] = $scripturl . '?action=admin;area=maillist;sa=emailsettings;save';
 		$context['sub_template'] = 'show_settings';
-		Settings_Form::prepare_db($config_vars);
-	}
-
-	/**
-	 * Initialize Maillist settings form.
-	 */
-	private function _initMaillistSettingsForm()
-	{
-		// Instantiate the form
-		$this->_maillistSettings = new Settings_Form();
-
-		// Initialize it with our settings
-		$config_vars = $this->_settings();
-
-		return $this->_maillistSettings->settings($config_vars);
+		$settingsForm->prepare();
 	}
 
 	/**
@@ -1730,7 +1693,7 @@ class ManageMaillist_Controller extends Action_Controller
 						'class' => 'centertext',
 					),
 					'data' => array(
-						'function' => function($rowData) {
+						'function' => function ($rowData) {
 							return '<input type="checkbox" name="deltpl[]" value="' . $rowData['id_comment'] . '" class="input_check" />';
 						},
 						'class' => 'centertext',

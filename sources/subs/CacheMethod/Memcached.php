@@ -122,7 +122,7 @@ class Memcached extends Cache_Method_Abstract
 	 */
 	protected function getServers()
 	{
-		return array_keys((array)$this->obj->getStats());
+		return array_keys((array) $this->obj->getStats());
 	}
 
 	/**

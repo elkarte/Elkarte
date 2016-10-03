@@ -70,9 +70,10 @@ class ManageBBC_Controller extends Action_Controller
 		global $context, $txt, $modSettings, $scripturl;
 
 		// Initialize the form
-		$this->_initBBCSettingsForm();
+		$settingsForm = new Settings_Form(Settings_Form::DB_ADAPTER);
 
-		$config_vars = $this->_bbcSettings->settings();
+		// Initialize it with our settings
+		$settingsForm->setConfigVars($this->_settings());
 
 		// Make sure a nifty javascript will enable/disable checkboxes, according to BBC globally set or not.
 		addInlineJavascript('
@@ -85,7 +86,6 @@ class ManageBBC_Controller extends Action_Controller
 		if (isset($this->_req->query->save))
 		{
 			checkSession();
-
 
 			// Security: make a pass through all tags and fix them as necessary
 			$codes = \BBC\ParserWrapper::getInstance()->getCodes();
@@ -103,7 +103,8 @@ class ManageBBC_Controller extends Action_Controller
 			call_integration_hook('integrate_save_bbc_settings', array($bbcTags));
 
 			// Save the result
-			Settings_Form::save_db($config_vars, $this->_req->post);
+			$settingsForm->setConfigValues((array) $this->_req->post);
+			$settingsForm->save();
 
 			// And we're out of here!
 			redirectexit('action=admin;area=postsettings;sa=bbc');
@@ -115,21 +116,7 @@ class ManageBBC_Controller extends Action_Controller
 		$context['post_url'] = $scripturl . '?action=admin;area=postsettings;save;sa=bbc';
 		$context['settings_title'] = $txt['manageposts_bbc_settings_title'];
 
-		Settings_Form::prepare_db($config_vars);
-	}
-
-	/**
-	 * Initializes the form with the current BBC settings of the forum.
-	 */
-	private function _initBBCSettingsForm()
-	{
-		// Instantiate the form
-		$this->_bbcSettings = new Settings_Form();
-
-		// Initialize it with our settings
-		$config_vars = $this->_settings();
-
-		return $this->_bbcSettings->settings($config_vars);
+		$settingsForm->prepare();
 	}
 
 	/**

@@ -217,7 +217,7 @@ class ManagePermissions_Controller extends Action_Controller
 						'value' => $txt['membergroups_name'],
 					),
 					'data' => array(
-						'function' => function($rowData) {
+						'function' => function ($rowData) {
 							global $scripturl, $txt;
 
 							// Since the moderator group has no explicit members, no link is needed.
@@ -252,7 +252,7 @@ class ManagePermissions_Controller extends Action_Controller
 						'class' => 'grid17',
 					),
 					'data' => array(
-						'function' => function($rowData) {
+						'function' => function ($rowData) {
 							global $txt, $scripturl;
 
 							// No explicit members for guests and the moderator group.
@@ -275,7 +275,7 @@ class ManagePermissions_Controller extends Action_Controller
 						'class' => 'grid17',
 					),
 					'data' => array(
-						'function' => function($rowData) {
+						'function' => function ($rowData) {
 							return $rowData['num_permissions']['allowed'];
 						},
 					),
@@ -287,7 +287,7 @@ class ManagePermissions_Controller extends Action_Controller
 						'class' => 'grid17',
 					),
 					'data' => array(
-						'function' => function($rowData) {
+						'function' => function ($rowData) {
 							return $rowData['num_permissions']['denied'];
 						},
 					),
@@ -315,7 +315,7 @@ class ManagePermissions_Controller extends Action_Controller
 						'style' => 'width:4%;',
 					),
 					'data' => array(
-						'function' => function($rowData) {
+						'function' => function ($rowData) {
 							if ($rowData['id_group'] != 1)
 								return '<input type="checkbox" name="group[]" value="' . $rowData['id_group'] . '" class="input_check" />';
 
@@ -361,7 +361,7 @@ class ManagePermissions_Controller extends Action_Controller
 							'class' => 'grid25',
 						),
 						'data' => array(
-							'function' => function($rowData) {
+							'function' => function ($rowData) {
 								global $scripturl;
 
 								return sprintf('<a href="%1$s?action=admin;area=permissions;sa=members;group=%2$d">%3$s</a>', $scripturl, $rowData['id_group'], $rowData['group_name_color']);
@@ -391,7 +391,7 @@ class ManagePermissions_Controller extends Action_Controller
 							'class' => 'grid10',
 						),
 						'data' => array(
-							'function' => function($rowData) {
+							'function' => function ($rowData) {
 								global $scripturl;
 
 								if ($rowData['can_search'])
@@ -411,7 +411,7 @@ class ManagePermissions_Controller extends Action_Controller
 							'class' => 'grid8',
 						),
 						'data' => array(
-							'function' => function($rowData) {
+							'function' => function ($rowData) {
 								return $rowData['num_permissions']['allowed'];
 							},
 						),
@@ -423,7 +423,7 @@ class ManagePermissions_Controller extends Action_Controller
 							'class' => 'grid8',
 						),
 						'data' => array(
-							'function' => function($rowData) {
+							'function' => function ($rowData) {
 								return $rowData['num_permissions']['denied'];
 							},
 						),
@@ -434,13 +434,13 @@ class ManagePermissions_Controller extends Action_Controller
 							'class' => 'grid17',
 						),
 						'data' => array(
-							'function' => function($rowData) use ($_pid) {
+							'function' => function ($rowData) use ($_pid) {
 								global $scripturl, $txt;
 
 								if ($rowData['id_parent'] == -2)
 										return '<a href="' . $scripturl . '?action=admin;area=permissions;sa=modify;group=' . $rowData['id_group'] . (isset($_pid) ? ';pid=' . $_pid : '') . '">' . $txt['membergroups_modify'] . '</a>';
 									else
-										return '<span class="smalltext">' . $txt['permissions_includes_inherited_from'] . '&quot;' .  $rowData['parent_name'] . '&quot;</span>
+										return '<span class="smalltext">' . $txt['permissions_includes_inherited_from'] . '&quot;' . $rowData['parent_name'] . '&quot;</span>
 											<br />
 											<a href="' . $scripturl . '?action=admin;area=permissions;sa=modify;group=' . $rowData['id_parent'] . (isset($_pid) ? ';pid=' . $_pid : '') . '">' . $txt['membergroups_modify_parent'] . '</a>';
 							}
@@ -770,7 +770,7 @@ class ManagePermissions_Controller extends Action_Controller
 			$permissions['membergroup'] = fetchPermissions($this->_req->query->group);
 
 		// Fetch current board permissions...
-		$permissions['board'] = fetchBoardPermissions( $context['group']['id'], $context['permission_type'], $context['profile']['id']);
+		$permissions['board'] = fetchBoardPermissions($context['group']['id'], $context['permission_type'], $context['profile']['id']);
 
 		// Loop through each permission and set whether it's checked.
 		foreach ($context['permissions'] as $permissionType => $tmp)
@@ -900,9 +900,10 @@ class ManagePermissions_Controller extends Action_Controller
 		require_once(SUBSDIR . '/ManagePermissions.subs.php');
 
 		// Initialize the form
-		$this->_initPermSettingsForm();
+		$settingsForm = new Settings_Form(Settings_Form::DB_ADAPTER);
 
-		$config_vars = $this->_permSettings->settings();
+		// Initialize it with our settings
+		$settingsForm->setConfigVars($this->_settings());
 
 		// Some items for the template
 		$context['page_title'] = $txt['permission_settings_title'];
@@ -914,7 +915,8 @@ class ManagePermissions_Controller extends Action_Controller
 		{
 			checkSession('post');
 			call_integration_hook('integrate_save_permission_settings');
-			Settings_Form::save_db($config_vars, $this->_req->post);
+			$settingsForm->setConfigValues((array) $this->_req->post);
+			$settingsForm->save();
 
 			// Clear all deny permissions...if we want that.
 			if (empty($modSettings['permission_enable_deny']))
@@ -930,21 +932,7 @@ class ManagePermissions_Controller extends Action_Controller
 		// We need this for the in-line permissions
 		createToken('admin-mp');
 
-		Settings_Form::prepare_db($config_vars);
-	}
-
-	/**
-	 * Initialize the settings form.
-	 */
-	private function _initPermSettingsForm()
-	{
-		// Instantiate the form
-		$this->_permSettings = new Settings_Form();
-
-		// Initialize it with our settings
-		$config_vars = $this->_settings();
-
-		return $this->_permSettings->settings($config_vars);
+		$settingsForm->prepare();
 	}
 
 	/**
@@ -952,8 +940,6 @@ class ManagePermissions_Controller extends Action_Controller
 	 */
 	private function _settings()
 	{
-		global $txt;
-
 		// All the setting variables
 		$config_vars = array(
 			array('title', 'settings'),
@@ -961,8 +947,8 @@ class ManagePermissions_Controller extends Action_Controller
 				array('permissions', 'manage_permissions'),
 			'',
 				// A few useful settings
-				array('check', 'permission_enable_deny', 0, $txt['permission_settings_enable_deny'], 'help' => 'permissions_deny'),
-				array('check', 'permission_enable_postgroups', 0, $txt['permission_settings_enable_postgroups'], 'help' => 'permissions_postgroups'),
+				array('check', 'permission_enable_deny'),
+				array('check', 'permission_enable_postgroups'),
 		);
 
 		// Add new settings with a nice hook, makes them available for admin settings search as well

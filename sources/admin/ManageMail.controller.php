@@ -118,7 +118,7 @@ class ManageMail_Controller extends Action_Controller
 						'value' => $txt['mailqueue_subject'],
 					),
 					'data' => array(
-						'function' => function($rowData) {
+						'function' => function ($rowData) {
 							return Util::shorten_text(Util::htmlspecialchars($rowData['subject'], 50));
 						},
 						'class' => 'smalltext',
@@ -151,7 +151,7 @@ class ManageMail_Controller extends Action_Controller
 						'class' => 'centertext',
 					),
 					'data' => array(
-						'function' => function($rowData) {
+						'function' => function ($rowData) {
 							global $txt;
 
 							// We probably have a text label with your priority.
@@ -172,7 +172,7 @@ class ManageMail_Controller extends Action_Controller
 						'value' => $txt['mailqueue_age'],
 					),
 					'data' => array(
-						'function' => function($rowData) {
+						'function' => function ($rowData) {
 							return time_since(time() - $rowData['time_sent']);
 						},
 						'class' => 'smalltext',
@@ -187,7 +187,7 @@ class ManageMail_Controller extends Action_Controller
 						'value' => '<input type="checkbox" onclick="invertAll(this, this.form);" class="input_check" />',
 					),
 					'data' => array(
-						'function' => function($rowData) {
+						'function' => function ($rowData) {
 							return '<input type="checkbox" name="delete[]" value="' . $rowData['id_mail'] . '" class="input_check" />';
 						},
 						'class' => 'centertext',
@@ -227,7 +227,10 @@ class ManageMail_Controller extends Action_Controller
 		$context['sub_template'] = 'show_settings';
 
 		// Initialize the form
-		$this->_initMailSettingsForm();
+		$settingsForm = new Settings_Form(Settings_Form::DB_ADAPTER);
+
+		// Initialize it with our settings
+		$settingsForm->setConfigVars($this->_settings());
 
 		// Piece of redundant code, for the javascript
 		$processedBirthdayEmails = array();
@@ -238,19 +241,14 @@ class ManageMail_Controller extends Action_Controller
 			$processedBirthdayEmails[$index][$element] = $value;
 		}
 
-		$config_vars = $this->_mailSettings->settings();
-
 		// Saving?
 		if (isset($this->_req->query->save))
 		{
-			// TODO: $postobj is should be removed after save_db is properly refactored.
-			$postobj = null;
 			// Make the SMTP password a little harder to see in a backup etc.
 			if (!empty($this->_req->post->smtp_password[1]))
 			{
 				$this->_req->post->smtp_password[0] = base64_encode($this->_req->post->smtp_password[0]);
 				$this->_req->post->smtp_password[1] = base64_encode($this->_req->post->smtp_password[1]);
-				$postobj = array('smtp_password' => array(0 => ($this->_req->post->smtp_password[0]), 1 => ($this->_req->post->smtp_password[1])));
 			}
 			checkSession();
 
@@ -262,7 +260,8 @@ class ManageMail_Controller extends Action_Controller
 			if (!empty($this->_req->post->mail_batch_size))
 				$this->_req->post->mail_batch_size = min((int) $this->_req->post->mail_batch_size, (int) $this->_req->post->mail_period_limit);
 
-			Settings_Form::save_db($config_vars, (object) $postobj);
+			$settingsForm->setConfigValues((array) $this->_req->post);
+			$settingsForm->save();
 			redirectexit('action=admin;area=mailqueue;sa=settings');
 		}
 
@@ -270,7 +269,7 @@ class ManageMail_Controller extends Action_Controller
 		$context['settings_title'] = $txt['mailqueue_settings'];
 
 		// Prepare the config form
-		Settings_Form::prepare_db($config_vars);
+		$settingsForm->prepare();
 
 		// Build a little JS so the birthday mail can be seen
 		$javascript = '
@@ -296,20 +295,6 @@ class ManageMail_Controller extends Action_Controller
 			document.getElementById(\'birthday_subject\').innerHTML = bDay[index].subject;
 			document.getElementById(\'birthday_body\').innerHTML = bDay[index].body;
 		}', true);
-	}
-
-	/**
-	 * Initialize mail administration settings.
-	 */
-	private function _initMailSettingsForm()
-	{
-		// Instantiate the form
-		$this->_mailSettings = new Settings_Form();
-
-		// Initialize it with our settings
-		$config_vars = $this->_settings();
-
-		return $this->_mailSettings->settings($config_vars);
 	}
 
 	/**

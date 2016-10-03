@@ -115,16 +115,10 @@ class ManageSearch_Controller extends Action_Controller
 		global $txt, $context, $scripturl, $modSettings;
 
 		// Initialize the form
-		$this->_initSearchSettingsForm();
+		$settingsForm = new Settings_Form(Settings_Form::DB_ADAPTER);
 
-		$config_vars = $this->_searchSettings->settings();
-
-		// Perhaps the search method wants to add some settings?
-		$search = new \ElkArte\Search\Search();
-		$searchAPI = $search->findSearchAPI();
-
-		if (is_callable(array($searchAPI, 'searchSettings')))
-			call_user_func_array($searchAPI->searchSettings, array(&$config_vars));
+		// Initialize it with our settings
+		$settingsForm->setConfigVars($this->_settings());
 
 		$context['page_title'] = $txt['search_settings_title'];
 		$context['sub_template'] = 'show_settings';
@@ -167,7 +161,8 @@ class ManageSearch_Controller extends Action_Controller
 				'additional_search_engines' => !empty($new_engines) ? serialize($new_engines) : ''
 			));
 
-			Settings_Form::save_db($config_vars, $this->_req->post);
+			$settingsForm->setConfigValues((array) $this->_req->post);
+			$settingsForm->save();
 			redirectexit('action=admin;area=managesearch;sa=settings;' . $context['session_var'] . '=' . $context['session_id']);
 		}
 
@@ -175,22 +170,7 @@ class ManageSearch_Controller extends Action_Controller
 		$context['post_url'] = $scripturl . '?action=admin;area=managesearch;save;sa=settings';
 		$context['settings_title'] = $txt['search_settings_title'];
 
-		Settings_Form::prepare_db($config_vars);
-	}
-
-	/**
-	 * Initialize admin searchSettings form with the existing forum settings
-	 * for search.
-	 */
-	private function _initSearchSettingsForm()
-	{
-		// Instantiate the form
-		$this->_searchSettings = new Settings_Form();
-
-		// Initialize it with our settings
-		$config_vars = $this->_settings();
-
-		return $this->_searchSettings->settings($config_vars);
+		$settingsForm->prepare();
 	}
 
 	/**
@@ -214,6 +194,13 @@ class ManageSearch_Controller extends Action_Controller
 				array('title', 'additional_search_engines'),
 				array('callback', 'external_search_engines'),
 		);
+
+		// Perhaps the search method wants to add some settings?
+		$search = new \ElkArte\Search\Search();
+		$searchAPI = $search->findSearchAPI();
+
+		if (is_callable(array($searchAPI, 'searchSettings')))
+			call_user_func_array($searchAPI->searchSettings);
 
 		// Add new settings with a nice hook, makes them available for admin settings search as well
 		call_integration_hook('integrate_modify_search_settings', array(&$config_vars));

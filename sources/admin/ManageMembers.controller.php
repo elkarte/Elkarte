@@ -512,7 +512,7 @@ class ManageMembers_Controller extends Action_Controller
 						'value' => $txt['viewmembers_online'],
 					),
 					'data' => array(
-						'function' => function($rowData) {
+						'function' => function ($rowData) {
 							global $txt;
 
 							require_once(SUBSDIR . '/Members.subs.php');
@@ -555,7 +555,7 @@ class ManageMembers_Controller extends Action_Controller
 						'class' => 'centertext',
 					),
 					'data' => array(
-						'function' => function($rowData) {
+						'function' => function ($rowData) {
 							global $user_info;
 
 							return '<input type="checkbox" name="members[]" value="' . $rowData['id_member'] . '" class="input_check" ' . ($rowData['id_member'] == $user_info['id'] || $rowData['id_group'] == 1 || in_array(1, explode(',', $rowData['additional_groups'])) ? 'disabled="disabled"' : '') . ' />';
@@ -947,7 +947,7 @@ class ManageMembers_Controller extends Action_Controller
 						'value' => $txt['hostname'],
 					),
 					'data' => array(
-						'function' => function($rowData) {
+						'function' => function ($rowData) {
 							return host_from_ip($rowData['member_ip']);
 						},
 						'class' => 'smalltext',
@@ -958,7 +958,7 @@ class ManageMembers_Controller extends Action_Controller
 						'value' => $context['current_filter'] == 4 ? $txt['viewmembers_online'] : $txt['date_registered'],
 					),
 					'data' => array(
-						'function' => function($rowData) {
+						'function' => function ($rowData) {
 							global $context;
 
 							return standardTime($rowData['' . ($context['current_filter'] == 4 ? 'last_login' : 'date_registered') . '']);
@@ -976,7 +976,7 @@ class ManageMembers_Controller extends Action_Controller
 						'style' => 'width: 20%;',
 					),
 					'data' => array(
-						'function' => function($rowData) {
+						'function' => function ($rowData) {
 							global $scripturl, $txt;
 
 							$member_links = array();
@@ -987,7 +987,7 @@ class ManageMembers_Controller extends Action_Controller
 								else
 									$member_links[] = $member['name'] . ' (' . $txt['guest'] . ')';
 							}
-							return implode (', ', $member_links);
+							return implode(', ', $member_links);
 						},
 						'class' => 'smalltext',
 					),

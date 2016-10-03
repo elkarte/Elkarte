@@ -228,9 +228,10 @@ class ManagePosts_Controller extends Action_Controller
 		global $context, $txt, $modSettings, $scripturl;
 
 		// Initialize the form
-		$this->_initPostSettingsForm();
+		$settingsForm = new Settings_Form(Settings_Form::DB_ADAPTER);
 
-		$config_vars = $this->_postSettings->settings();
+		// Initialize it with our settings
+		$settingsForm->setConfigVars($this->_settings());
 
 		// Setup the template.
 		$context['page_title'] = $txt['manageposts_settings'];
@@ -263,7 +264,8 @@ class ManagePosts_Controller extends Action_Controller
 
 			call_integration_hook('integrate_save_post_settings');
 
-			Settings_Form::save_db($config_vars, $this->_req->post);
+			$settingsForm->setConfigValues((array) $this->_req->post);
+			$settingsForm->save();
 			redirectexit('action=admin;area=postsettings;sa=posts');
 		}
 
@@ -272,21 +274,7 @@ class ManagePosts_Controller extends Action_Controller
 		$context['settings_title'] = $txt['manageposts_settings'];
 
 		// Prepare the settings...
-		Settings_Form::prepare_db($config_vars);
-	}
-
-	/**
-	 * Initialize postSettings form with admin configuration settings for posts.
-	 */
-	private function _initPostSettingsForm()
-	{
-		// Instantiate the form
-		$this->_postSettings = new Settings_Form();
-
-		// Initialize it with our settings
-		$config_vars = $this->_settings();
-
-		return $this->_postSettings->settings($config_vars);
+		$settingsForm->prepare();
 	}
 
 	/**

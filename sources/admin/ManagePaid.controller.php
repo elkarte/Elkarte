@@ -112,27 +112,15 @@ class ManagePaid_Controller extends Action_Controller
 	 */
 	public function action_paidSettings_display()
 	{
-		global $context, $txt, $scripturl;
+		global $context, $txt, $scripturl, $modSettings;
 
 		require_once(SUBSDIR . '/PaidSubscriptions.subs.php');
 
 		// Initialize the form
-		$this->_init_paidSettingsForm();
+		$settingsForm = new Settings_Form(Settings_Form::DB_ADAPTER);
 
-		$config_vars = $this->_paidSettings->settings();
-
-		// Now load all the other gateway settings.
-		$gateways = loadPaymentGateways();
-		foreach ($gateways as $gateway)
-		{
-			$gatewayClass = new $gateway['display_class']();
-			$setting_data = $gatewayClass->getGatewaySettings();
-			if (!empty($setting_data))
-			{
-				$config_vars[] = array('title', $gatewayClass->title, 'text_label' => (isset($txt['paidsubs_gateway_title_' . $gatewayClass->title]) ? $txt['paidsubs_gateway_title_' . $gatewayClass->title] : $gatewayClass->title));
-				$config_vars = array_merge($config_vars, $setting_data);
-			}
-		}
+		// Initialize it with our settings
+		$settingsForm->setConfigVars($this->_settings());
 
 		// Some important context stuff
 		$context['page_title'] = $txt['settings'];
@@ -171,7 +159,7 @@ class ManagePaid_Controller extends Action_Controller
 				else
 				{
 					// That's not an email, lets set it back in the form to be fixed and let them know its wrong
-					$config_vars[1]['value'] = $this->_req->post->paid_email_to;
+					$modSettings['paid_email_to'] = $this->_req->post->paid_email_to;
 					$context['error_type'] = 'minor';
 					$context['settings_message'] = array();
 					foreach ($validator->validation_errors() as $id => $error)
@@ -191,27 +179,14 @@ class ManagePaid_Controller extends Action_Controller
 				$this->_req->post->paid_currency_code = trim($this->_req->post->paid_currency_code);
 
 				unset($config_vars['dummy_currency']);
-				Settings_Form::save_db($config_vars, $this->_req->post);
+				$settingsForm->setConfigValues((array) $this->_req->post);
+				$settingsForm->save();
 				redirectexit('action=admin;area=paidsubscribe;sa=settings');
 			}
 		}
 
 		// Prepare the settings...
-		Settings_Form::prepare_db($config_vars);
-	}
-
-	/**
-	 * Retrieve subscriptions settings and initialize the form.
-	 */
-	private function _init_paidSettingsForm()
-	{
-		// Instantiate the form
-		$this->_paidSettings = new Settings_Form();
-
-		// Initialize it with our settings
-		$config_vars = $this->_settings();
-
-		return $this->_paidSettings->settings($config_vars);
+		$settingsForm->prepare();
 	}
 
 	/**
@@ -236,6 +211,19 @@ class ManagePaid_Controller extends Action_Controller
 				array('text', 'paid_currency_symbol', 'subtext' => $txt['paid_currency_symbol_desc'], 'size' => 8, 'force_div_id' => 'custom_currency_symbol_div'),
 				array('check', 'paidsubs_test', 'subtext' => $txt['paidsubs_test_desc'], 'onclick' => 'return document.getElementById(\'paidsubs_test\').checked ? confirm(\'' . $txt['paidsubs_test_confirm'] . '\') : true;'),
 		);
+
+		// Now load all the other gateway settings.
+		$gateways = loadPaymentGateways();
+		foreach ($gateways as $gateway)
+		{
+			$gatewayClass = new $gateway['display_class']();
+			$setting_data = $gatewayClass->getGatewaySettings();
+			if (!empty($setting_data))
+			{
+				$config_vars[] = array('title', $gatewayClass->title, 'text_label' => (isset($txt['paidsubs_gateway_title_' . $gatewayClass->title]) ? $txt['paidsubs_gateway_title_' . $gatewayClass->title] : $gatewayClass->title));
+				$config_vars = array_merge($config_vars, $setting_data);
+			}
+		}
 
 		call_integration_hook('integrate_modify_subscription_settings', array(&$config_vars));
 
@@ -275,13 +263,13 @@ class ManagePaid_Controller extends Action_Controller
 			'items_per_page' => 20,
 			'base_href' => $scripturl . '?action=admin;area=paidsubscribe;sa=view',
 			'get_items' => array(
-				'function' => function() {
+				'function' => function () {
 					global $context;
 					return $context['subscriptions'];
 				},
 			),
 			'get_count' => array(
-				'function' => function() {
+				'function' => function () {
 					global $context;
 					return count($context['subscriptions']);
 				},
@@ -294,7 +282,7 @@ class ManagePaid_Controller extends Action_Controller
 						'style' => 'width: 30%;',
 					),
 					'data' => array(
-						'function' => function($rowData) {
+						'function' => function ($rowData) {
 							global $scripturl;
 
 							return sprintf('<a href="%1$s?action=admin;area=paidsubscribe;sa=viewsub;sid=%2$s">%3$s</a>', $scripturl, $rowData['id'], $rowData['name']);
@@ -306,7 +294,7 @@ class ManagePaid_Controller extends Action_Controller
 						'value' => $txt['paid_cost'],
 					),
 					'data' => array(
-						'function' => function($rowData) {
+						'function' => function ($rowData) {
 							global $txt;
 
 							return $rowData['flexible'] ? '<em>' . $txt['flexible'] . '</em>' : $rowData['cost'] . ' / ' . $rowData['length'];
@@ -343,7 +331,7 @@ class ManagePaid_Controller extends Action_Controller
 						'value' => $txt['paid_is_active'],
 					),
 					'data' => array(
-						'function' => function($rowData) {
+						'function' => function ($rowData) {
 							global $txt;
 
 							return '<span class="' . ($rowData['active'] ? 'success' : 'alert') . '">' . ($rowData['active'] ? $txt['yes'] : $txt['no']) . '</span>';
@@ -355,7 +343,7 @@ class ManagePaid_Controller extends Action_Controller
 						'value' => $txt['subscribers'],
 					),
 					'data' => array(
-						'function' => function($rowData) {
+						'function' => function ($rowData) {
 							global $scripturl, $txt, $settings;
 
 							return '<a href="' . $scripturl . '?action=admin;area=paidsubscribe;sa=viewsub;sid=' . $rowData['id'] . '"><i class="icon i-view" title="' . $txt['view'] . '"></i></a>';
@@ -381,7 +369,7 @@ class ManagePaid_Controller extends Action_Controller
 						'value' => $txt['remove']
 					),
 					'data' => array(
-						'function' => function($rowData) {
+						'function' => function ($rowData) {
 							global $txt, $scripturl, $settings;
 
 							return '<a href="' . $scripturl . '?action=admin;area=paidsubscribe;sa=modify;delete;sid=' . $rowData['id'] . '"><i class="icon i-delete" title="' . $txt['delete'] . '"></i></a>';
@@ -634,7 +622,7 @@ class ManagePaid_Controller extends Action_Controller
 						'style' => 'width: 20%;',
 					),
 					'data' => array(
-						'function' => function($rowData) {
+						'function' => function ($rowData) {
 							global $txt, $scripturl;
 
 							return $rowData['id_member'] == 0 ? $txt['guest'] : '<a href="' . $scripturl . '?action=profile;u=' . $rowData['id_member'] . '">' . $rowData['name'] . '</a>';
@@ -706,7 +694,7 @@ class ManagePaid_Controller extends Action_Controller
 						'value' => $txt['edit_subscriber'],
 					),
 					'data' => array(
-						'function' => function($rowData) {
+						'function' => function ($rowData) {
 							global $txt, $scripturl;
 
 							return '<a href="' . $scripturl . '?action=admin;area=paidsubscribe;sa=modifyuser;lid=' . $rowData['id'] . '">' . $txt['modify'] . '</a>';
@@ -720,7 +708,7 @@ class ManagePaid_Controller extends Action_Controller
 						'class' => 'centertext',
 					),
 					'data' => array(
-						'function' => function($rowData) {
+						'function' => function ($rowData) {
 							return '<input type="checkbox" name="delsub[' . $rowData['id'] . ']" class="input_check" />';
 						},
 						'class' => 'centertext',

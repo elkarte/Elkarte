@@ -75,9 +75,10 @@ class ManageAvatars_Controller extends Action_Controller
 		global $txt, $context, $scripturl;
 
 		// Initialize the form
-		$this->_initAvatarSettingsForm();
+		$settingsForm = new Settings_Form(Settings_Form::DB_ADAPTER);
 
-		$config_vars = $this->_avatarSettings->settings();
+		// Initialize settings
+		$settingsForm->setConfigVars($this->_settings());
 
 		// Saving avatar settings?
 		if (isset($this->_req->query->save))
@@ -90,7 +91,8 @@ class ManageAvatars_Controller extends Action_Controller
 			if (isset($this->_req->post->custom_avatar_enabled) && $this->_req->post->custom_avatar_enabled == 1 && (empty($this->_req->post->custom_avatar_dir) || empty($this->_req->post->custom_avatar_url)))
 				$this->_req->post->custom_avatar_enabled = 0;
 
-			Settings_Form::save_db($config_vars, $this->_req->post);
+			$settingsForm->setConfigValues((array) $this->_req->post);
+			$settingsForm->save();
 			redirectexit('action=admin;area=manageattachments;sa=avatars');
 		}
 
@@ -99,26 +101,9 @@ class ManageAvatars_Controller extends Action_Controller
 
 		// Prepare the context.
 		$context['post_url'] = $scripturl . '?action=admin;area=manageattachments;save;sa=avatars';
-		Settings_Form::prepare_db($config_vars);
+		$settingsForm->prepare();
 
 		$context['sub_template'] = 'show_settings';
-	}
-
-	/**
-	 * This method retrieves and returns avatar settings.
-	 *
-	 * - It also returns the avatar-related permission profile_set_avatar.
-	 * - Initializes the avatarSettings form.
-	 */
-	private function _initAvatarSettingsForm()
-	{
-		// Instantiate the form
-		$this->_avatarSettings = new Settings_Form();
-
-		// Initialize settings
-		$config_vars = $this->_settings();
-
-		return $this->_avatarSettings->settings($config_vars);
 	}
 
 	/**

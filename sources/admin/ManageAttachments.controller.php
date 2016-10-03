@@ -160,9 +160,10 @@ class ManageAttachments_Controller extends Action_Controller
 		global $modSettings, $scripturl, $context;
 
 		// initialize the form
-		$this->_initAttachSettingsForm();
+		$settingsForm = new Settings_Form(Settings_Form::DB_ADAPTER);
 
-		$config_vars = $this->_attachSettingsForm->settings();
+		// Initialize settings
+		$settingsForm->setConfigVars($this->_settings());
 
 		addInlineJavascript('
 	var storing_type = document.getElementById(\'automanage_attachments\'),
@@ -230,30 +231,15 @@ class ManageAttachments_Controller extends Action_Controller
 
 			call_integration_hook('integrate_save_attachment_settings');
 
-			Settings_Form::save_db($config_vars, $this->_req->post);
+			$settingsForm->setConfigValues((array) $this->_req->post);
+			$settingsForm->save();
 			redirectexit('action=admin;area=manageattachments;sa=attachments');
 		}
 
 		$context['post_url'] = $scripturl . '?action=admin;area=manageattachments;save;sa=attachments';
-		Settings_Form::prepare_db($config_vars);
+		$settingsForm->prepare();
 
 		$context['sub_template'] = 'show_settings';
-	}
-
-	/**
-	 * Initialize attachmentForm.
-	 *
-	 * - Retrieve and return the administration settings for attachments.
-	 */
-	private function _initAttachSettingsForm()
-	{
-		// Instantiate the form
-		$this->_attachSettingsForm = new Settings_Form();
-
-		// Initialize settings
-		$config_vars = $this->_settings();
-
-		return $this->_attachSettingsForm->settings($config_vars);
 	}
 
 	/**
@@ -419,7 +405,7 @@ class ManageAttachments_Controller extends Action_Controller
 						'class' => 'grid50',
 					),
 					'data' => array(
-						'function' => function($rowData) {
+						'function' => function ($rowData) {
 							global $modSettings, $context, $scripturl;
 
 							$link = '<a href="';
@@ -462,7 +448,7 @@ class ManageAttachments_Controller extends Action_Controller
 						'class' => 'nowrap',
 					),
 					'data' => array(
-						'function' => function($rowData) {
+						'function' => function ($rowData) {
 							return byte_format($rowData['size']);
 						},
 					),
@@ -477,7 +463,7 @@ class ManageAttachments_Controller extends Action_Controller
 						'class' => 'nowrap',
 					),
 					'data' => array(
-						'function' => function($rowData) {
+						'function' => function ($rowData) {
 							global $scripturl;
 
 							// In case of an attachment, return the poster of the attachment.
@@ -500,7 +486,7 @@ class ManageAttachments_Controller extends Action_Controller
 						'class' => 'nowrap',
 					),
 					'data' => array(
-						'function' => function($rowData) {
+						'function' => function ($rowData) {
 							global $txt, $context, $scripturl;
 
 							// The date the message containing the attachment was posted or the owner of the avatar was active.
@@ -1389,7 +1375,7 @@ class ManageAttachments_Controller extends Action_Controller
 						'class' => 'centertext',
 					),
 					'data' => array(
-						'function' => function($rowData) {
+						'function' => function ($rowData) {
 							return '<input type="radio" name="current_dir" value="' . $rowData['id'] . '" ' . ($rowData['current'] ? ' checked="checked"' : '') . (!empty($rowData['disable_current']) ? ' disabled="disabled"' : '') . ' class="input_radio" />';
 						},
 						'style' => 'width: 10%;',
@@ -1401,7 +1387,7 @@ class ManageAttachments_Controller extends Action_Controller
 						'value' => $txt['attach_path'],
 					),
 					'data' => array(
-						'function' => function($rowData) {
+						'function' => function ($rowData) {
 							return '<input type="hidden" name="dirs[' . $rowData['id'] . ']" value="' . $rowData['path'] . '" /><input type="text" size="40" name="dirs[' . $rowData['id'] . ']" value="' . $rowData['path'] . '"' . (!empty($rowData['disable_base_dir']) ? ' disabled="disabled"' : '') . ' class="input_text"/>';
 						},
 						'style' => 'width: 40%;',
@@ -1478,7 +1464,7 @@ class ManageAttachments_Controller extends Action_Controller
 							'class' => 'centertext',
 						),
 						'data' => array(
-							'function' => function($rowData) {
+							'function' => function ($rowData) {
 								return '<input type="radio" name="current_base_dir" value="' . $rowData['id'] . '" ' . ($rowData['current'] ? ' checked="checked"' : '') . ' class="input_radio" />';
 							},
 							'style' => 'width: 10%;',

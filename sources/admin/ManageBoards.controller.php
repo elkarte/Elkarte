@@ -759,10 +759,10 @@ class ManageBoards_Controller extends Action_Controller
 		global $context, $txt, $scripturl;
 
 		// Initialize the form
-		$this->_initBoardSettingsForm();
+		$settingsForm = new Settings_Form(Settings_Form::DB_ADAPTER);
 
-		// Get all settings
-		$config_vars = $this->_boardSettings->settings();
+		// Initialize it with our settings
+		$settingsForm->setConfigVars($this->_settings());
 
 		// Add some javascript stuff for the recycle box.
 		addInlineJavascript('
@@ -784,27 +784,13 @@ class ManageBoards_Controller extends Action_Controller
 
 			call_integration_hook('integrate_save_board_settings');
 
-			Settings_Form::save_db($config_vars);
+			$settingsForm->setConfigValues((array) $this->_req->post);
+			$settingsForm->save();
 			redirectexit('action=admin;area=manageboards;sa=settings');
 		}
 
 		// Prepare the settings...
-		Settings_Form::prepare_db($config_vars);
-	}
-
-	/**
-	 * Initialize the boardSettings form, with the current configuration
-	 * options for admin board settings screen.
-	 */
-	private function _initBoardSettingsForm()
-	{
-		// Instantiate the form
-		$this->_boardSettings = new Settings_Form();
-
-		// Initialize it with our settings
-		$config_vars = $this->_settings();
-
-		return $this->_boardSettings->settings($config_vars);
+		$settingsForm->prepare();
 	}
 
 	/**
