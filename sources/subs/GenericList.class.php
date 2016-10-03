@@ -47,7 +47,7 @@ class Generic_List
 	 *   'function'
 	 * @var array
 	 */
-	protected $_listOptions;
+	protected $listOptions = array();
 
 	/**
 	 * @var array
@@ -59,15 +59,15 @@ class Generic_List
 	 * Makes sure the passed list contains the minimum needed options to create a list
 	 * Loads the options in to this instance
 	 *
-	 * @param mixed[] $listOptions
+	 * @param array $listOptions
 	 */
-	public function __construct($listOptions)
+	public function __construct(array $listOptions)
 	{
 		// First make sure the array is constructed properly.
-		$this->_validateListOptions($listOptions);
+		$this->validateListOptions($listOptions);
 
 		// Now that we've done that, let's set it, we're gonna need it!
-		$this->_listOptions = $listOptions;
+		$this->listOptions = $listOptions;
 
 		// Be ready for those pesky errors
 		loadLanguage('Errors');
@@ -81,7 +81,7 @@ class Generic_List
 	 *
 	 * @param mixed[] $listOptions
 	 */
-	protected function _validateListOptions($listOptions)
+	protected function validateListOptions($listOptions)
 	{
 		// @todo trigger error here?
 		assert(isset($listOptions['id']));
@@ -100,18 +100,18 @@ class Generic_List
 	{
 		global $context, $txt, $modSettings;
 
-		$context[$this->_listOptions['id']] = $this->context;
+		$context[$this->listOptions['id']] = $this->context;
 
 		// Let's set some default that could be useful to avoid repetitions
 		if (!isset($context['sub_template']))
 		{
-			if (function_exists('template_' . $this->_listOptions['id']))
-				$context['sub_template'] = $this->_listOptions['id'];
+			if (function_exists('template_' . $this->listOptions['id']))
+				$context['sub_template'] = $this->listOptions['id'];
 			else
 			{
 				$context['sub_template'] = 'show_list';
 				if (!isset($context['default_list']))
-					$context['default_list'] = $this->_listOptions['id'];
+					$context['default_list'] = $this->listOptions['id'];
 			}
 		}
 	}
@@ -123,36 +123,36 @@ class Generic_List
 	public function buildList()
 	{
 		// Figure out the sort.
-		if (empty($this->_listOptions['default_sort_col']))
+		if (empty($this->listOptions['default_sort_col']))
 		{
 			$this->context['sort'] = array();
 			$sort = '1=1';
 		}
 		else
 		{
-			$request_var_sort = isset($this->_listOptions['request_vars']['sort']) ? $this->_listOptions['request_vars']['sort'] : 'sort';
-			$request_var_desc = isset($this->_listOptions['request_vars']['desc']) ? $this->_listOptions['request_vars']['desc'] : 'desc';
+			$request_var_sort = isset($this->listOptions['request_vars']['sort']) ? $this->listOptions['request_vars']['sort'] : 'sort';
+			$request_var_desc = isset($this->listOptions['request_vars']['desc']) ? $this->listOptions['request_vars']['desc'] : 'desc';
 
-			if (isset($_REQUEST[$request_var_sort], $this->_listOptions['columns'][$_REQUEST[$request_var_sort]], $this->_listOptions['columns'][$_REQUEST[$request_var_sort]]['sort']))
+			if (isset($_REQUEST[$request_var_sort], $this->listOptions['columns'][$_REQUEST[$request_var_sort]], $this->listOptions['columns'][$_REQUEST[$request_var_sort]]['sort']))
 			{
 					$this->context['sort'] = array(
 					'id' => $_REQUEST[$request_var_sort],
-					'desc' => isset($_REQUEST[$request_var_desc]) && isset($this->_listOptions['columns'][$_REQUEST[$request_var_sort]]['sort']['reverse']),
+					'desc' => isset($_REQUEST[$request_var_desc]) && isset($this->listOptions['columns'][$_REQUEST[$request_var_sort]]['sort']['reverse']),
 				);
 			}
 			else
 			{
 				$this->context['sort'] = array(
-					'id' => $this->_listOptions['default_sort_col'],
-					'desc' => (!empty($this->_listOptions['default_sort_dir']) && $this->_listOptions['default_sort_dir'] == 'desc') || (!empty($this->_listOptions['columns'][$this->_listOptions['default_sort_col']]['sort']['default']) && substr($this->_listOptions['columns'][$this->_listOptions['default_sort_col']]['sort']['default'], -4, 4) == 'desc') ? true : false,
+					'id' => $this->listOptions['default_sort_col'],
+					'desc' => (!empty($this->listOptions['default_sort_dir']) && $this->listOptions['default_sort_dir'] == 'desc') || (!empty($this->listOptions['columns'][$this->listOptions['default_sort_col']]['sort']['default']) && substr($this->listOptions['columns'][$this->listOptions['default_sort_col']]['sort']['default'], -4, 4) == 'desc') ? true : false,
 				);
 			}
 
 			// Set the database column sort.
-			$sort = $this->_listOptions['columns'][$this->context['sort']['id']]['sort'][$this->context['sort']['desc'] ? 'reverse' : 'default'];
+			$sort = $this->listOptions['columns'][$this->context['sort']['id']]['sort'][$this->context['sort']['desc'] ? 'reverse' : 'default'];
 		}
 
-		$this->context['start_var_name'] = isset($this->_listOptions['start_var_name']) ? $this->_listOptions['start_var_name'] : 'start';
+		$this->context['start_var_name'] = isset($this->listOptions['start_var_name']) ? $this->listOptions['start_var_name'] : 'start';
 	}
 
 	/**
@@ -162,7 +162,7 @@ class Generic_List
 	protected function prepareContext()
 	{
 		// In some cases the full list must be shown, regardless of the amount of items.
-		if (empty($this->_listOptions['items_per_page']))
+		if (empty($this->listOptions['items_per_page']))
 		{
 			$this->context['start'] = 0;
 			$this->context['items_per_page'] = 0;
@@ -171,18 +171,18 @@ class Generic_List
 		else
 		{
 			// First get an impression of how many items to expect.
-			if (isset($this->_listOptions['get_count']['file']))
-				require_once($this->_listOptions['get_count']['file']);
+			if (isset($this->listOptions['get_count']['file']))
+				require_once($this->listOptions['get_count']['file']);
 
-			$this->context['total_num_items'] = call_user_func_array($this->_listOptions['get_count']['function'], empty($this->_listOptions['get_count']['params']) ? array() : $this->_listOptions['get_count']['params']);
+			$this->context['total_num_items'] = call_user_func_array($this->listOptions['get_count']['function'], empty($this->listOptions['get_count']['params']) ? array() : $this->listOptions['get_count']['params']);
 
 			// Default the start to the beginning...sounds logical.
 			$this->context['start'] = isset($_REQUEST[$this->context['start_var_name']]) ? (int) $_REQUEST[$this->context['start_var_name']] : 0;
-			$this->context['items_per_page'] = $this->_listOptions['items_per_page'];
+			$this->context['items_per_page'] = $this->listOptions['items_per_page'];
 
 			// Then create a page index.
 			if ($this->context['total_num_items'] > $this->context['items_per_page'])
-				$this->context['page_index'] = constructPageIndex($this->_listOptions['base_href'] . (empty($this->context['sort']) ? '' : ';' . $request_var_sort . '=' . $this->context['sort']['id'] . ($this->context['sort']['desc'] ? ';' . $request_var_desc : '')) . ($this->context['start_var_name'] != 'start' ? ';' . $this->context['start_var_name'] . '=%1$d' : ''), $this->context['start'], $this->context['total_num_items'], $this->context['items_per_page'], $this->context['start_var_name'] != 'start');
+				$this->context['page_index'] = constructPageIndex($this->listOptions['base_href'] . (empty($this->context['sort']) ? '' : ';' . $request_var_sort . '=' . $this->context['sort']['id'] . ($this->context['sort']['desc'] ? ';' . $request_var_desc : '')) . ($this->context['start_var_name'] != 'start' ? ';' . $this->context['start_var_name'] . '=%1$d' : ''), $this->context['start'], $this->context['total_num_items'], $this->context['items_per_page'], $this->context['start_var_name'] != 'start');
 		}
 	}
 
@@ -192,13 +192,13 @@ class Generic_List
 	protected function prepareContext()
 	{
 		$this->context['headers'] = array();
-		foreach ($this->_listOptions['columns'] as $column_id => $column)
+		foreach ($this->listOptions['columns'] as $column_id => $column)
 		{
 				$this->context['headers'][] = array(
 					'id' => $column_id,
 					'label' => isset($column['header']['value']) ?: '',
-					'href' => empty($this->_listOptions['default_sort_col']) || empty($column['sort']) ? '' : $this->_listOptions['base_href'] . ';' . $request_var_sort . '=' . $column_id . ($column_id === $this->context['sort']['id'] && !$this->context['sort']['desc'] && isset($column['sort']['reverse']) ? ';' . $request_var_desc : '') . (empty($this->context['start']) ? '' : ';' . $this->context['start_var_name'] . '=' . $this->context['start']),
-					'sort_image' => empty($this->_listOptions['default_sort_col']) || empty($column['sort']) || $column_id !== $this->context['sort']['id'] ? null : ($this->context['sort']['desc'] ? 'down' : 'up'),
+					'href' => empty($this->listOptions['default_sort_col']) || empty($column['sort']) ? '' : $this->listOptions['base_href'] . ';' . $request_var_sort . '=' . $column_id . ($column_id === $this->context['sort']['id'] && !$this->context['sort']['desc'] && isset($column['sort']['reverse']) ? ';' . $request_var_desc : '') . (empty($this->context['start']) ? '' : ';' . $this->context['start_var_name'] . '=' . $this->context['start']),
+					'sort_image' => empty($this->listOptions['default_sort_col']) || empty($column['sort']) || $column_id !== $this->context['sort']['id'] ? null : ($this->context['sort']['desc'] ? 'down' : 'up'),
 					'class' => isset($column['header']['class']) ? $column['header']['class'] : '',
 					'style' => isset($column['header']['style']) ? $column['header']['style'] : '',
 					'colspan' => isset($column['header']['colspan']) ? $column['header']['colspan'] : '',
@@ -212,18 +212,18 @@ class Generic_List
 	protected function prepareColumns()
 	{
 		// We know the amount of columns, might be useful for the template.
-		$this->context['num_columns'] = count($this->_listOptions['columns']);
-		$this->context['width'] = isset($this->_listOptions['width']) ? $this->_listOptions['width'] : '0';
+		$this->context['num_columns'] = count($this->listOptions['columns']);
+		$this->context['width'] = isset($this->listOptions['width']) ? $this->listOptions['width'] : '0';
 
 		// Maybe we want this one to interact with jquery UI sortable
-		$this->context['sortable'] = isset($this->_listOptions['sortable']);
+		$this->context['sortable'] = isset($this->listOptions['sortable']);
 
 		// Get the file with the function for the item list.
-		if (isset($this->_listOptions['get_items']['file']))
-			require_once($this->_listOptions['get_items']['file']);
+		if (isset($this->listOptions['get_items']['file']))
+			require_once($this->listOptions['get_items']['file']);
 
 		// Call the function and include which items we want and in what order.
-		$list_items = call_user_func_array($this->_listOptions['get_items']['function'], array_merge(array($this->context['start'], $this->context['items_per_page'], $sort), empty($this->_listOptions['get_items']['params']) ? array() : $this->_listOptions['get_items']['params']));
+		$list_items = call_user_func_array($this->listOptions['get_items']['function'], array_merge(array($this->context['start'], $this->context['items_per_page'], $sort), empty($this->listOptions['get_items']['params']) ? array() : $this->listOptions['get_items']['params']));
 		$list_items = !empty($list_items) ?: array();
 
 		// Loop through the list items to be shown and construct the data values.
@@ -231,7 +231,7 @@ class Generic_List
 		foreach ($list_items as $item_id => $list_item)
 		{
 			$cur_row = array();
-			foreach ($this->_listOptions['columns'] as $column_id => $column)
+			foreach ($this->listOptions['columns'] as $column_id => $column)
 			{
 				if (isset($column['evaluate']) && $column['evaluate'] === false)
 					continue;
@@ -289,13 +289,13 @@ class Generic_List
 			$this->context['rows'][$item_id]['style'] = '';
 
 			// Maybe we wat set a custom class for the row based on the data in the row itself
-			if (isset($this->_listOptions['data_check']))
+			if (isset($this->listOptions['data_check']))
 			{
-				if (isset($this->_listOptions['data_check']['class']))
-					$this->context['rows'][$item_id]['class'] = ' ' . $this->_listOptions['data_check']['class']($list_item);
+				if (isset($this->listOptions['data_check']['class']))
+					$this->context['rows'][$item_id]['class'] = ' ' . $this->listOptions['data_check']['class']($list_item);
 
-				if (isset($this->_listOptions['data_check']['style']))
-					$this->context['rows'][$item_id]['style'] = ' style="' . $this->_listOptions['data_check']['style']($list_item) . '"';
+				if (isset($this->listOptions['data_check']['style']))
+					$this->context['rows'][$item_id]['style'] = ' style="' . $this->listOptions['data_check']['style']($list_item) . '"';
 			}
 
 			// Insert the row into the list.
@@ -309,13 +309,13 @@ class Generic_List
 	protected function setTitle()
 	{
 		// The title is currently optional.
-		if (isset($this->_listOptions['title']))
+		if (isset($this->listOptions['title']))
 		{
-			$this->context['title'] = $this->_listOptions['title'];
+			$this->context['title'] = $this->listOptions['title'];
 
 			// And the icon is optional for the title
-			if (isset($this->_listOptions['icon']))
-				$this->context['icon'] = $this->_listOptions['icon'];
+			if (isset($this->listOptions['icon']))
+				$this->context['icon'] = $this->listOptions['icon'];
 		}
 	}
 
@@ -327,9 +327,9 @@ class Generic_List
 	protected function prepareForm()
 	{
 		// In case there's a form, share it with the template context.
-		if (isset($this->_listOptions['form']))
+		if (isset($this->listOptions['form']))
 		{
-			$this->context['form'] = $this->_listOptions['form'];
+			$this->context['form'] = $this->listOptions['form'];
 
 			if (!isset($this->context['form']['hidden_fields']))
 				$this->context['form']['hidden_fields'] = array();
@@ -338,8 +338,8 @@ class Generic_List
 			$this->context['form']['hidden_fields'][$context['session_var']] = $context['session_id'];
 
 			// Will this do a token check?
-			if (isset($this->_listOptions['form']['token']))
-				$this->context['form']['hidden_fields'][$context[$this->_listOptions['form']['token'] . '_token_var']] = $context[$this->_listOptions['form']['token'] . '_token'];
+			if (isset($this->listOptions['form']['token']))
+				$this->context['form']['hidden_fields'][$context[$this->listOptions['form']['token'] . '_token_var']] = $context[$this->listOptions['form']['token'] . '_token'];
 
 			// Include the starting page as hidden field?
 			if (!empty($this->context['form']['include_start']) && !empty($this->context['start']))
@@ -361,10 +361,10 @@ class Generic_List
 	 */
 	protected function prepareNoItemsLabel()
 	{
-		if (isset($this->_listOptions['no_items_label']))
+		if (isset($this->listOptions['no_items_label']))
 		{
-			$this->context['no_items_label'] = $this->_listOptions['no_items_label'];
-			$this->context['no_items_align'] = isset($this->_listOptions['no_items_align']) ? $this->_listOptions['no_items_align'] : '';
+			$this->context['no_items_label'] = $this->listOptions['no_items_label'];
+			$this->context['no_items_align'] = isset($this->listOptions['no_items_align']) ? $this->listOptions['no_items_align'] : '';
 		}
 	}
 
@@ -376,10 +376,10 @@ class Generic_List
 	 */
 	protected function prepareAdditionalRows()
 	{
-		if (isset($this->_listOptions['additional_rows']))
+		if (isset($this->listOptions['additional_rows']))
 		{
 			$this->context['additional_rows'] = array();
-			foreach ($this->_listOptions['additional_rows'] as $row)
+			foreach ($this->listOptions['additional_rows'] as $row)
 			{
 				if (empty($row))
 					continue;
