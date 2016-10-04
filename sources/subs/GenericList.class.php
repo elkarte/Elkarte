@@ -50,6 +50,13 @@ class Generic_List
 	protected $listOptions = array();
 
 	/**
+	 * Instance of HttpReq
+	 * @var HttpReq
+	 */
+	protected $req;
+
+	/**
+	 * Will hold the created $context
 	 * @var array
 	 */
 	protected $context = array();
@@ -60,6 +67,21 @@ class Generic_List
 	protected $listItems = array();
 
 	/**
+	 * @var string
+	 */
+	protected $sort = '';
+
+	/**
+	 * @var string
+	 */
+	protected $sortVar = '';
+
+	/**
+	 * @var string
+	 */
+	protected $descVar = '';
+
+	/**
 	 * Starts a new list
 	 * Makes sure the passed list contains the minimum needed options to create a list
 	 * Loads the options in to this instance
@@ -68,6 +90,9 @@ class Generic_List
 	 */
 	public function __construct(array $listOptions)
 	{
+		// Access to post/get data
+		$this->req = HttpReq::instance();
+
 		// First make sure the array is constructed properly.
 		$this->validateListOptions($listOptions);
 
@@ -150,14 +175,16 @@ class Generic_List
 		}
 		else
 		{
-			$request_var_sort = isset($this->listOptions['request_vars']['sort']) ? $this->listOptions['request_vars']['sort'] : 'sort';
-			$request_var_desc = isset($this->listOptions['request_vars']['desc']) ? $this->listOptions['request_vars']['desc'] : 'desc';
+			$this->sortVar = isset($this->listOptions['request_vars']['sort']) ? $this->listOptions['request_vars']['sort'] : 'sort';
+			$this->descVar = isset($this->listOptions['request_vars']['desc']) ? $this->listOptions['request_vars']['desc'] : 'desc';
+			$sortReq = $this->req->getQuery($this->sortVar);
+			$descReq = $this->req->getQuery($this->descVar);
 
-			if (isset($_REQUEST[$request_var_sort], $this->listOptions['columns'][$_REQUEST[$request_var_sort]], $this->listOptions['columns'][$_REQUEST[$request_var_sort]]['sort']))
+			if (isset($this->listOptions['columns'][$sortReq], $this->listOptions['columns'][$sortReq]['sort']))
 			{
 					$this->context['sort'] = array(
-					'id' => $_REQUEST[$request_var_sort],
-					'desc' => isset($_REQUEST[$request_var_desc]) && isset($this->listOptions['columns'][$_REQUEST[$request_var_sort]]['sort']['reverse']),
+					'id' => $sortReq,
+					'desc' => isset($_REQUEST[$this->descVar]) && isset($this->listOptions['columns'][$sortReq]['sort']['reverse']),
 				);
 			}
 			else
@@ -169,7 +196,7 @@ class Generic_List
 			}
 
 			// Set the database column sort.
-			$this->sort = $this->context['sort']['desc'] ? 'reverse' : 'default';
+			$this->sort = $this->listOptions['columns'][$this->context['sort']['id']]['sort'][$this->context['sort']['desc'] ? 'reverse' : 'default'];
 		}
 
 		$this->context['start_var_name'] = isset($this->listOptions['start_var_name']) ? $this->listOptions['start_var_name'] : 'start';
@@ -195,13 +222,13 @@ class Generic_List
 
 			$this->context['total_num_items'] = call_user_func_array($this->listOptions['get_count']['function'], empty($this->listOptions['get_count']['params']) ? array() : $this->listOptions['get_count']['params']);
 
-			// Default the start to the beginning...sounds logical.
-			$this->context['start'] = isset($_REQUEST[$this->context['start_var_name']]) ? (int) $_REQUEST[$this->context['start_var_name']] : 0;
+			// Default the start to the beginning... sounds logical, amirite?
+			$this->context['start'] = $this->req->getQuery($this->context['start_var_name'], 'intval', 0);
 			$this->context['items_per_page'] = $this->listOptions['items_per_page'];
 
 			// Then create a page index.
 			if ($this->context['total_num_items'] > $this->context['items_per_page'])
-				$this->context['page_index'] = constructPageIndex($this->listOptions['base_href'] . (empty($this->context['sort']) ? '' : ';' . $request_var_sort . '=' . $this->context['sort']['id'] . ($this->context['sort']['desc'] ? ';' . $request_var_desc : '')) . ($this->context['start_var_name'] != 'start' ? ';' . $this->context['start_var_name'] . '=%1$d' : ''), $this->context['start'], $this->context['total_num_items'], $this->context['items_per_page'], $this->context['start_var_name'] != 'start');
+				$this->context['page_index'] = constructPageIndex($this->listOptions['base_href'] . (empty($this->context['sort']) ? '' : ';' . $this->sortVar . '=' . $this->context['sort']['id'] . ($this->context['sort']['desc'] ? ';' . $this->descVar : '')) . ($this->context['start_var_name'] != 'start' ? ';' . $this->context['start_var_name'] . '=%1$d' : ''), $this->context['start'], $this->context['total_num_items'], $this->context['items_per_page'], $this->context['start_var_name'] != 'start');
 		}
 	}
 
@@ -215,8 +242,8 @@ class Generic_List
 		{
 				$this->context['headers'][] = array(
 					'id' => $column_id,
-					'label' => isset($column['header']['value']) ?: '',
-					'href' => empty($this->listOptions['default_sort_col']) || empty($column['sort']) ? '' : $this->listOptions['base_href'] . ';' . $request_var_sort . '=' . $column_id . ($column_id === $this->context['sort']['id'] && !$this->context['sort']['desc'] && isset($column['sort']['reverse']) ? ';' . $request_var_desc : '') . (empty($this->context['start']) ? '' : ';' . $this->context['start_var_name'] . '=' . $this->context['start']),
+					'label' => isset($column['header']['value']) ?$column['header']['value']: '',
+					'href' => empty($this->listOptions['default_sort_col']) || empty($column['sort']) ? '' : $this->listOptions['base_href'] . ';' . $this->sortVar . '=' . $column_id . ($column_id === $this->context['sort']['id'] && !$this->context['sort']['desc'] && isset($column['sort']['reverse']) ? ';' . $this->descVar : '') . (empty($this->context['start']) ? '' : ';' . $this->context['start_var_name'] . '=' . $this->context['start']),
 					'sort_image' => empty($this->listOptions['default_sort_col']) || empty($column['sort']) || $column_id !== $this->context['sort']['id'] ? null : ($this->context['sort']['desc'] ? 'down' : 'up'),
 					'class' => isset($column['header']['class']) ? $column['header']['class'] : '',
 					'style' => isset($column['header']['style']) ? $column['header']['style'] : '',
@@ -243,7 +270,7 @@ class Generic_List
 
 		// Call the function and include which items we want and in what order.
 		$this->listItems = call_user_func_array($this->listOptions['get_items']['function'], array_merge(array($this->context['start'], $this->context['items_per_page'], $this->sort), empty($this->listOptions['get_items']['params']) ? array() : $this->listOptions['get_items']['params']));
-		$this->listItems = !empty($this->listItems) ?: array();
+		$this->listItems = !empty($this->listItems) ?$this->listItems: array();
 
 		$this->loopItems();
 	}
