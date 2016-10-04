@@ -416,5 +416,4 @@ class Generic_List
 			}
 		}
 	}
-	}
 }
