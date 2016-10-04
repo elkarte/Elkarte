@@ -258,6 +258,8 @@ class Package_Actions extends Action_Controller
 			$context[$type] = htmlspecialchars(trim(file_get_contents(BOARDDIR . '/packages/temp/' . $this->_base_path . $this->_action['filename']), "\n\r"), ENT_COMPAT, 'UTF-8');
 		elseif (file_exists($this->_action['filename']))
 			$context[$type] = htmlspecialchars(trim(file_get_contents($this->_action['filename']), "\n\r"), ENT_COMPAT, 'UTF-8');
+		elseif (file_exists(BOARDDIR . '/packages/temp/' . $this->_action['filename']))
+			$context[$type] = htmlspecialchars(trim(file_get_contents(BOARDDIR . '/packages/temp/' . $this->_action['filename']), "\n\r"), ENT_COMPAT, 'UTF-8');
 
 		// Fancy or plain
 		if (!empty($this->_action['parse_bbc']))
