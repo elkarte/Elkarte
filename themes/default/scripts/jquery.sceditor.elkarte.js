@@ -532,12 +532,12 @@ $.sceditor.plugins.bbcode.bbcode
 		skipLastLineBreak: true,
 		allowedChildren: ['#', '*', 'li'],
 		html: function(element, attrs, content) {
-			var style = '',
-				code = 'ul';
+			var style = '';
 
-			if (attrs.type)
-				style = 'style="list-style-type: ' + attrs.type + '"';
-			return '<' + code + ' ' + style + '>' + content + '</' + code + '>';
+			if (typeof attrs.type !== "undefined")
+				style = ' style="list-style-type: ' + attrs.type + '"';
+
+			return '<ul' + style + '>' + content.replace("</li><br />", "</li>") + '</ul>';
 		}
 	})
 	.set('li', {
@@ -549,10 +549,12 @@ $.sceditor.plugins.bbcode.bbcode
 		},
 		breakStart: true,
 		format: function(element, content) {
-			if ($(element[0]).css('list-style-type') === 'disc')
+			var type = $(element[0]).prop('style')['list-style-type'];
+
+			if (type === 'disc' || type === '')
 				return '[list]' + content + '[/list]';
 			else
-				return '[list type=' + $(element[0]).css('list-style-type') + ']' + content + '[/list]';
+				return '[list type=' + type + ']' + content + '[/list]';
 		},
 		isInline: false,
 		skipLastLineBreak: true,
