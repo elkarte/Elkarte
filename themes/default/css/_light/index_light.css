@@ -2334,6 +2334,10 @@ a.helpicon:hover, a > .iconline:hover, a > .icoffline:hover {
 		border-color: transparent;
 		background: transparent;
 	}
+
+	#main_menu .linklevel1.active, #main_menu .linklevel1.active:hover {
+		border: none;
+	}
 }
 
 /* This one does up to 540 screens. */
