@@ -103,7 +103,7 @@ class Generic_List
 	 */
 	protected function prepareContext()
 	{
-		global $context, $txt, $modSettings;
+		global $context;
 
 		$context[$this->listOptions['id']] = $this->context;
 
@@ -349,6 +349,8 @@ class Generic_List
 	 */
 	protected function prepareForm()
 	{
+		global $context;
+
 		// In case there's a form, share it with the template context.
 		if (isset($this->listOptions['form']))
 		{
