@@ -160,6 +160,8 @@ class Generic_List
 		$this->prepareForm();
 		$this->prepareNoItemsLabel();
 		$this->prepareAdditionalRows();
+		$this->prepareJavascript();
+		$this->prepareMenu();
 		$this->prepareContext();
 	}
 
@@ -441,6 +443,29 @@ class Generic_List
 
 				$this->context['additional_rows'][$row['position']][] = $row;
 			}
+		}
+	}
+
+	/**
+	 * Add an option for inline JavaScript.
+	 */
+	protected function prepareJavascript()
+	{
+		if (isset($this->listOptions['javascript']))
+			addInlineJavascript($this->listOptions['javascript'], true);
+	}
+
+	/**
+	 * We want a menu.
+	 */
+	protected function prepareMenu()
+	{
+		if (isset($this->listOptions['list_menu']))
+		{
+			if (!isset($this->listOptions['list_menu']['position']))
+				$this->listOptions['list_menu']['position'] = 'left';
+
+			$this->context['list_menu'] = $this->listOptions['list_menu'];
 		}
 	}
 }
