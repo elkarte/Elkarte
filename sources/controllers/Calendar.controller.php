@@ -263,9 +263,9 @@ class Calendar_Controller extends Action_Controller
 			{
 				$save_data = $event->validate($_POST);
 			}
-			catch (Exception $e)
+			catch (Elk_Exception $e)
 			{
-				throw $e;
+				$e->fatalLangError();
 			}
 		}
 
