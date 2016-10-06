@@ -1,7 +1,7 @@
 <?php
 
 /**
- * TestCase class for ACP add group controller actions
+ * TestCase class for managing members
  *
  * Functional testing of web pages requests
  *
@@ -66,7 +66,7 @@ class TestManageMembers_Controller extends ElkArteWebTest
 	{
 		$this->activateMember('user0', 'activate', 'delete');
 
-		// Start at the add member group page
+		// Should be gone.
 		$this->url('index.php?action=admin;area=viewmembers;sa=all');
 		$this->assertNotContains('user0', $this->byId('member_list')->text());
 	}
