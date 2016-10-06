@@ -62,7 +62,8 @@ html {
 }
 
 body {
-	background: #585858 linear-gradient(to right, #333333 0%, #888888 50%, #333333 100%);
+	background: #585858;
+	background-image: linear-gradient(to right, #333333 0%, #888888 50%, #333333 100%);
 	color: #585858;
 }
 
@@ -120,7 +121,8 @@ input[type="submit"], .drop_area_fileselect_text, button[type="submit"], input[t
 	border-color: #AFAFAF;
 	border-top-color: #CFCFCF;
 	border-left-color: #BFBFBF;
-	background: #F4F4F4 linear-gradient(to bottom, #FEFEFE, #E4E4E4);
+	background: #F4F4F4;
+	background-image: linear-gradient(to bottom, #FEFEFE, #E4E4E4);
 	box-shadow: 1px 1px 2px #E4E4E4, 0 -1px 0 #E4E4E4 inset;
 	color: #585858;
 }
@@ -178,7 +180,8 @@ strong {
 	border-color: #CCCCCC;
 	border-top-color: #DDDDDD;
 	border-bottom-color: #BBBBBB;
-	background: #EBEBEB linear-gradient(to bottom, #FAFAFA, #EAEAEA);
+	background: #EBEBEB;
+	background-image: linear-gradient(to bottom, #FAFAFA, #EAEAEA);
 	color: #566450;
 	text-shadow: 1px 1px 0 #EBEBEB;
 }
@@ -187,14 +190,16 @@ strong {
 .category_header, .content_category .category_header {
 	border-top-color: #CFCFCF;
 	border-bottom-color: #BBBBBB;
-	background: #E9E9E9 linear-gradient(to bottom, #FAFAFA, #E4E4E4);
+	background: #E9E9E9;
+	background-image: linear-gradient(to bottom, #FAFAFA, #E4E4E4);
 }
 
 /* Styles for subsection headers. @todo */
 .secondary_header {
 	border-color: #CCCCCC;
 	border-top-color: #DDDDDD;
-	background: #FAFAFA linear-gradient(to bottom, #FAFAFA, #EBEBEB);
+	background: #FAFAFA;
+	background-image: linear-gradient(to bottom, #FAFAFA, #EBEBEB);
 	text-shadow: 1px 1px 0 #FEFEFE;
 }
 
@@ -412,7 +417,8 @@ div.bbc_footnotes .meaction {
 #top_section {
 	border-top-color: #5BA048;
 	border-bottom-color: #3D6E32;
-	background: #F4F4F4 linear-gradient(to bottom, #FEFEFE, #EEEEEE);
+	background: #F4F4F4;
+	background-image: linear-gradient(to bottom, #FEFEFE, #EEEEEE);
 	box-shadow: 0 1px 4px rgba(0, 0, 0, 0.3), 0 1px 0 #38642D inset;
 }
 
@@ -536,7 +542,8 @@ div.bbc_footnotes .meaction {
 	border-color: #AFAFAF;
 	border-top-color: #CFCFCF;
 	border-left-color: #BFBFBF;
-	background: #F4F4F4 linear-gradient(to bottom, #FEFEFE, #E4E4E4);
+	background: #F4F4F4;
+	background-image: linear-gradient(to bottom, #FEFEFE, #E4E4E4);
 	box-shadow: 1px 1px 2px #E4E4E4;
 	color: #566E4B;
 }
@@ -573,7 +580,8 @@ div.bbc_footnotes .meaction {
 	border-color: #AFAFAF;
 	border-top-color: #CFCFCF;
 	border-left-color: #BFBFBF;
-	background: #F4F4F4 linear-gradient(to bottom, #FEFEFE, #E4E4E4);
+	background: #F4F4F4;
+	background-image: linear-gradient(to bottom, #FEFEFE, #E4E4E4);
 	box-shadow: 1px 1px 2px #E4E4E4;
 	color: #566E4B;
 }
@@ -593,7 +601,8 @@ div.bbc_footnotes .meaction {
 	border-color: #3D6E32;
 	border-top-color: #4B863C;
 	border-left-color: #38642D;
-	background: #4B863C linear-gradient(to bottom, #5BA048, #3D6E32);
+	background: #4B863C;
+	background-image: linear-gradient(to bottom, #5BA048, #3D6E32);
 	box-shadow: 1px 1px 2px #BBBBBB;
 	color: #FEFEFE;
 }
@@ -758,11 +767,13 @@ div.bbc_footnotes .meaction {
 }
 
 .linktree:hover, .linktree:last-child {
-	background: #5BA048 linear-gradient(0deg, #4B863C, #5BA048);
+	background: #5BA048;
+	background-image: linear-gradient(0deg, #4B863C, #5BA048);
 }
 
 .linktree:hover:after, .linktree:last-child:after {
-	background: #5BA048 linear-gradient(315deg, #4B863C, #5BA048);
+	background: #5BA048;
+	background-image: linear-gradient(315deg, #4B863C, #5BA048);
 }
 
 .linktree:last-child:hover, .linktree:last-child:hover:after {
@@ -1097,7 +1108,8 @@ div.bbc_footnotes .meaction {
 }
 
 .jump_to_header {
-	background: #EBEBEB linear-gradient(to bottom, #FAFAFA, #EAEAEA);
+	background: #EBEBEB;
+	background-image: linear-gradient(to bottom, #FAFAFA, #EAEAEA);
 	box-shadow: 2px 1px rgba(1, 1, 1, 0.07) inset;
 	color: #566450;
 }
@@ -1254,7 +1266,8 @@ div.bbc_footnotes .meaction {
 	border-color: #AFAFAF;
 	border-top-color: #CFCFCF;
 	border-left-color: #BFBFBF;
-	background: #F4F4F4 linear-gradient(to bottom, #FEFEFE 0%, #E4E4E4 100%);
+	background: #F4F4F4;
+	background-image: linear-gradient(to bottom, #FEFEFE 0%, #E4E4E4 100%);
 	box-shadow: 1px 1px 2px #EEEEEE;
 }
 
@@ -1329,7 +1342,8 @@ div.bbc_footnotes .meaction {
 }
 
 #postAdditionalOptionsHeader, #postDraftOptionsHeader {
-	background: #FAFAFA linear-gradient(to bottom, #FAFAFA 0%, #EBEBEB 100%);
+	background: #FAFAFA;
+	background-image: linear-gradient(to bottom, #FAFAFA 0%, #EBEBEB 100%);
 }
 
 #postAdditionalOptions, #postDraftOptions {
@@ -1412,11 +1426,13 @@ div.bbc_footnotes .meaction {
 }
 
 .ui-tabs .ui-tabs-nav .ui-state-default a {
-	background: #F4F4F4 linear-gradient(to bottom, #FEFEFE, #E4E4E4) repeat scroll 0 0;
+	background: #F4F4F4;
+	background-image: linear-gradient(to bottom, #FEFEFE, #E4E4E4);
 }
 
 .ui-tabs .ui-tabs-nav .ui-state-active a, .ui-tabs .ui-tabs-nav .ui-state-active {
-	background: #4B863C linear-gradient(to bottom, #5BA048, #3D6E32) repeat scroll 0 0;
+	background: #4B863C;
+	background-image: linear-gradient(to bottom, #5BA048, #3D6E32);
 	color: #FEFEFE;
 }
 
@@ -1476,7 +1492,8 @@ div.bbc_footnotes .meaction {
 }
 
 .activity_stats li .bar div {
-	background: #60BC78 linear-gradient(to bottom, #60BC78 0%, #27A348 100%);
+	background: #60BC78;
+	background-image: linear-gradient(to bottom, #60BC78 0%, #27A348 100%);
 }
 
 .profile_pie {
@@ -1712,7 +1729,8 @@ div.bbc_footnotes .meaction {
 
 .letter_row > h3 {
 	border-color: #CCCCCC;
-	background: #EBEBEB linear-gradient(to bottom, #FAFAFA, #EAEAEA);
+	background: #EBEBEB;
+	background-image: linear-gradient(to bottom, #FAFAFA, #EAEAEA);
 }
 
 /* ------------------------------------------------------- */
@@ -1830,7 +1848,8 @@ div.bbc_footnotes .meaction {
 
 /* Status Bar Green */
 .statsbar .bar {
-	background: #5BA048 linear-gradient(to bottom, #60BC78 0%, #27A348 100%);
+	background: #5BA048;
+	background-image: linear-gradient(to bottom, #60BC78 0%, #27A348 100%);
 }
 
 /* Absolute positioning stops these breaking the bars on narrow screens. */
@@ -1917,12 +1936,14 @@ a.helpicon:hover, a > .iconline:hover, a > .icoffline:hover {
 } */
 
 .iconline {
-	background: #b4e391 linear-gradient(to bottom, #b4e391 0%,#61c419 50%,#b4e391 100%);
+	background: #B4E391;
+	background-image: linear-gradient(to bottom, #b4e391 0%,#61c419 50%,#b4e391 100%);
 	border-color: #27A348;
 }
 
 .icoffline {
-	background: #bababa linear-gradient(to bottom, #bababa 0%,#6f6f6f 50%,#bababa 100%);
+	background: #BABABA;
+	background-image: linear-gradient(to bottom, #bababa 0%,#6f6f6f 50%,#bababa 100%);
 	border-color: #828282;
 }
 
