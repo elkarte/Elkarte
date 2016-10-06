@@ -29,6 +29,8 @@ class TestRegister_Controller extends ElkArteWebTest
 		// Set it to email activation
 		updateSettings(array('registration_method' => 1));
 		updateSettings(array('visual_verification_type' => 0));
+
+		parent::setUp();
 	}
 
 	/**
@@ -43,10 +45,7 @@ class TestRegister_Controller extends ElkArteWebTest
 		updateSettings(array('visual_verification_type' => $this->visual_verification_type));
 	}
 
-	/**
-	 * Register like a bot, go to fast and fail
-	 */
-	public function testRegisterInValid()
+	public function registerMember()
 	{
 		$username = 'testuser';
 		$email = 'a.valid@emailaddress.tld';
@@ -66,6 +65,14 @@ class TestRegister_Controller extends ElkArteWebTest
 		$this->byId('elk_autov_reserve1')->value($email);
 		$this->byId('elk_autov_pwmain')->value($password);
 		$this->byId('elk_autov_pwverify')->value($password);
+	}
+
+	/**
+	 * Register like a bot, go too fast and fail
+	 */
+	public function testRegisterInValid()
+	{
+		$this->registerMember();
 
 		// Lets select register!
 		$this->byName("regSubmit")->click();
@@ -79,38 +86,7 @@ class TestRegister_Controller extends ElkArteWebTest
 	 */
 	public function testRegisterValid()
 	{
-		$username = 'testuser';
-		$email = 'a.valid@emailaddress.tld';
-		$password = 'ainttellin';
-
-		// Register from the main menu
-		$this->url('index.php');
-		$this->byCssSelector('#button_register > a')->click();
-		$this->assertEquals('Registration Agreement', $this->title());
-
-		// Accept the agreement, we should see the Registration form
-		$this->byCssSelector('#confirm_buttons input[type="submit"]')->click();
-		$this->assertEquals('Registration Form', $this->title());
-
-		// Fill out the registration form
-		$usernameInput = $this->byId('elk_autov_username');
-		$usernameInput->clear();
-		$this->keys($username);
-		$this->assertEquals($username, $usernameInput->value());
-
-		$emailInput = $this->byId('elk_autov_reserve1');
-		$emailInput->clear();
-		$this->keys($email);
-		$this->assertEquals($email, $emailInput->value());
-
-		$passInput = $this->byId('elk_autov_pwmain');
-		$passInput->clear();
-		$this->keys($password);
-		$this->assertEquals($password, $passInput->value());
-
-		$passInput = $this->byId('elk_autov_pwverify');
-		$passInput->clear();
-		$this->keys($password);
+		$this->registerMember();
 
 		// We need this to avoid our anti-spam feature
 		sleep(8.5);
@@ -118,7 +94,54 @@ class TestRegister_Controller extends ElkArteWebTest
 		// Lets select register!
 		$this->byName("regSubmit")->click();
 
-		// I hope :P
+		// Did it work? Did it work?
 		$this->assertEquals("Registration Successful", $this->byCssSelector("h2.category_header")->text());
+	}
+
+	/**
+	 * Delete the account
+	 */
+	public function testDeleteAccount()
+	{
+		require_once(SUBSDIR . '/Members.subs.php');
+		$_SESSION['just_registered'] = 0;
+		$regOptions = array(
+			'interface' => 'admin',
+			'username' => 'user49',
+			'email' => 'user49@mydomain.com',
+			'password' => 'user49',
+			'password_check' => 'user49',
+			'require' => 'nothing',
+		);
+		$memberID = registerMember($regOptions);
+		$_SESSION['just_registered'] = 0;
+
+		// Select login from the main page
+		$this->url('index.php');
+		$this->byCssSelector('#button_login > a')->click();
+		$this->assertEquals('Log in', $this->title());
+
+		// Fill in the form, long hand style
+		$usernameInput = $this->byId('user');
+		$usernameInput->clear();
+		$this->keys('user49');
+
+		$passwordInput = $this->byId('passwrd');
+		$passwordInput->clear();
+		$this->keys('user49');
+
+		// Submit it
+		$this->byCssSelector('.login > div > dl > input[type="submit"]')->click();
+		$this->url('index.php?action=profile;area=deleteaccount');
+
+		// Delete the account by using the mainprofile area.
+		$this->assertEquals('Delete this account: user49', $this->title());
+		$passwordInput = $this->byId('oldpasswrd');
+		$passwordInput->clear();
+		$this->keys('user49');
+		$this->assertEquals('user49', $passwordInput->value());
+
+		// Submit it
+		$this->byCssSelector('input[type="submit"]')->click();
 	}
 }
