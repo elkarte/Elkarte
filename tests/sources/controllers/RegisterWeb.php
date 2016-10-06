@@ -75,10 +75,10 @@ class TestRegister_Controller extends ElkArteWebTest
 		$this->registerMember();
 
 		// Lets select register!
-		$this->byName("regSubmit")->click();
+		$this->byName('regSubmit')->click();
 
 		// Should fail for speed reasons
-		$this->assertContains("You went through the registration process too quickly", $this->byCssSelector("div.errorbox")->text());
+		$this->assertContains('You went through the registration process too quickly', $this->byCssSelector('div.errorbox')->text());
 	}
 
 	/**
@@ -92,10 +92,10 @@ class TestRegister_Controller extends ElkArteWebTest
 		sleep(8.5);
 
 		// Lets select register!
-		$this->byName("regSubmit")->click();
+		$this->byName('regSubmit')->click();
 
 		// Did it work? Did it work?
-		$this->assertEquals("Registration Successful", $this->byCssSelector("h2.category_header")->text());
+		$this->assertEquals('Registration Successful', $this->byCssSelector('h2.category_header')->text());
 	}
 
 	/**

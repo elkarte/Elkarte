@@ -34,7 +34,7 @@ class TestManageMembers_Controller extends ElkArteWebTest
 	{
 		// First, navigate to member management.
 		$this->url('index.php?action=admin;area=viewmembers;sa=browse;type=' . $act);
-		$this->assertEquals("Manage Members", $this->title());
+		$this->assertEquals('Manage Members', $this->title());
 
 		// Let's do it: approve/delete...
 		$this->assertContains('new accounts', $this->byCssSelector('.additional_row a:last-child')->text());

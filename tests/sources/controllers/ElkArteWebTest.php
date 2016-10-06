@@ -99,12 +99,12 @@ abstract class ElkArteWebTest extends PHPUnit_Extensions_Selenium2TestCase
 	public function enterACP()
 	{
 		// Select admin, enter password
-		$this->byCssSelector("#button_admin > a")->click();
+		$this->byCssSelector('#button_admin > a')->click();
 		$this->assertEquals('Administration Log in', $this->title());
 		$this->byId('admin_pass')->value($this->adminpass);
 		$this->byCssSelector('input[type="submit"]')->click();
 
 		// Validate we are there
-		$this->assertEquals("Administration Center", $this->title());
+		$this->assertEquals('Administration Center', $this->title());
 	}
 }
