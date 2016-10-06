@@ -74,7 +74,7 @@ class TestRegister_Controller extends ElkArteWebTest
 	{
 		$this->registerMember();
 
-		// Lets select register!
+		// Let's select register!
 		$this->byName('regSubmit')->click();
 
 		// Should fail for speed reasons
@@ -91,7 +91,7 @@ class TestRegister_Controller extends ElkArteWebTest
 		// We need this to avoid our anti-spam feature
 		sleep(8.5);
 
-		// Lets select register!
+		// Let's select register!
 		$this->byName('regSubmit')->click();
 
 		// Did it work? Did it work?
@@ -134,7 +134,7 @@ class TestRegister_Controller extends ElkArteWebTest
 		$this->byCssSelector('.login > div > dl > input[type="submit"]')->click();
 		$this->url('index.php?action=profile;area=deleteaccount');
 
-		// Delete the account by using the mainprofile area.
+		// Delete the account by using the main profile area.
 		$this->assertEquals('Delete this account: user49', $this->title());
 		$passwordInput = $this->byId('oldpasswrd');
 		$passwordInput->clear();
