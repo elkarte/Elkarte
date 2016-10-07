@@ -109,17 +109,19 @@ function template_boardindex_outer_below()
 			<p title="', $txt['old_posts'], '"><i class="icon i-board-off"></i>', $txt['old_posts'], '</p>
 			<p title="', $txt['redirect_board'], '"><i class="icon i-board-redirect"></i>', $txt['redirect_board'], '</p>
 		</aside>';
-
-	if (!empty($context['info_center_callbacks']))
-		template_info_center();
 }
 
 /**
  * The infocenter ... stats, recent topics, other important information that never gets seen :P
  */
-function template_info_center()
+function template_info_center_below()
 {
 	global $context, $txt;
+
+	if (empty($context['info_center_callbacks']))
+	{
+		return;
+	}
 
 	// Here's where the "Info Center" starts...
 	echo '
