@@ -343,7 +343,7 @@ function getCalendarGrid($month, $year, $calendarOptions)
 		'next_calendar' => array(
 			'year' => $month == 12 ? $year + 1 : $year,
 			'month' => $month == 12 ? 1 : $month + 1,
-			'disabled' => $modSettings['cal_maxyear'] < ($month == 12 ? $year + 1 : $year),
+			'disabled' => date('Y') + $modSettings['cal_limityear'] < ($month == 12 ? $year + 1 : $year),
 		),
 		'size' => isset($calendarOptions['size']) ? $calendarOptions['size'] : 'large',
 	);
@@ -514,7 +514,7 @@ function getCalendarWeek($month, $year, $day, $calendarOptions)
 			'disabled' => $day < 7 && $modSettings['cal_minyear'] > ($month == 1 ? $year - 1 : $year),
 		),
 		'next_week' => array(
-			'disabled' => $day > 25 && $modSettings['cal_maxyear'] < ($month == 12 ? $year + 1 : $year),
+			'disabled' => $day > 25 && date('Y') + $modSettings['cal_limityear'] < ($month == 12 ? $year + 1 : $year),
 		),
 	);
 
