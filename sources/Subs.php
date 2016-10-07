@@ -1967,7 +1967,7 @@ function dieGif($expired = false)
 	// or at least once the bug is fixes #2391
 	$filename = '';
 	$linenum = '';
-	if (!headers_sent($filename, $linenum))
+	if (headers_sent($filename, $linenum))
 	{
 		Errors::instance()->log_error('Headers already sent in ' . $filename . ' at line ' . $linenum);
 	}
