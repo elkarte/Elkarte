@@ -1038,7 +1038,7 @@ function getBasicMembergroupData($includes = array(), $excludes = array(), $sort
 	// Local Moderators?
 	$where .= in_array('mod', $includes) ? '' : ' AND id_group != {int:moderator_group}';
 	// Ignore the first post based group?
-	$where .= in_array('newbie', $excludes) ? '' : ' AND id_group != {int:newbie_group}';
+	$where .= !in_array('newbie', $excludes) ? '' : ' AND id_group != {int:newbie_group}';
 	// Exclude custom groups?
 	$where .= !in_array('custom', $excludes) ? '' : ' AND id_group < {int:newbie_group}';
 	// Exclude hidden?

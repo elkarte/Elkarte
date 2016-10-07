@@ -47,22 +47,57 @@ class Generic_List
 	 *   'function'
 	 * @var array
 	 */
-	protected $_listOptions;
+	protected $listOptions = array();
+
+	/**
+	 * Instance of HttpReq
+	 * @var HttpReq
+	 */
+	protected $req;
+
+	/**
+	 * Will hold the created $context
+	 * @var array
+	 */
+	protected $context = array();
+
+	/**
+	 * @var array
+	 */
+	protected $listItems = array();
+
+	/**
+	 * @var string
+	 */
+	protected $sort = '';
+
+	/**
+	 * @var string
+	 */
+	protected $sortVar = '';
+
+	/**
+	 * @var string
+	 */
+	protected $descVar = '';
 
 	/**
 	 * Starts a new list
 	 * Makes sure the passed list contains the minimum needed options to create a list
 	 * Loads the options in to this instance
 	 *
-	 * @param mixed[] $listOptions
+	 * @param array $listOptions
 	 */
-	public function __construct($listOptions)
+	public function __construct(array $listOptions)
 	{
+		// Access to post/get data
+		$this->req = HttpReq::instance();
+
 		// First make sure the array is constructed properly.
-		$this->_validateListOptions($listOptions);
+		$this->validateListOptions($listOptions);
 
 		// Now that we've done that, let's set it, we're gonna need it!
-		$this->_listOptions = $listOptions;
+		$this->listOptions = $listOptions;
 
 		// Be ready for those pesky errors
 		loadLanguage('Errors');
@@ -76,7 +111,7 @@ class Generic_List
 	 *
 	 * @param mixed[] $listOptions
 	 */
-	protected function _validateListOptions($listOptions)
+	protected function validateListOptions($listOptions)
 	{
 		// @todo trigger error here?
 		assert(isset($listOptions['id']));
@@ -88,140 +123,168 @@ class Generic_List
 	}
 
 	/**
+	 * Prepare the template by loading context
+	 * variables for each setting.
+	 */
+	protected function prepareContext()
+	{
+		global $context;
+
+		$context[$this->listOptions['id']] = $this->context;
+
+		// Let's set some default that could be useful to avoid repetitions
+		if (!isset($context['sub_template']))
+		{
+			if (function_exists('template_' . $this->listOptions['id']))
+				$context['sub_template'] = $this->listOptions['id'];
+			else
+			{
+				$context['sub_template'] = 'show_list';
+				if (!isset($context['default_list']))
+					$context['default_list'] = $this->listOptions['id'];
+			}
+		}
+	}
+
+	/**
 	 * Make the list.
 	 * The list will be populated in $context.
 	 */
 	public function buildList()
 	{
-		global $context;
+		$this->prepareSort();
+		$this->calculatePages();
+		$this->prepareHeaders();
+		$this->prepareColumns();
+		$this->setTitle();
+		$this->prepareForm();
+		$this->prepareNoItemsLabel();
+		$this->prepareAdditionalRows();
+		$this->prepareJavascript();
+		$this->prepareMenu();
+		$this->prepareContext();
+	}
 
-		// All the context data will be easily accessible by using a reference.
-		$context[$this->_listOptions['id']] = array();
-		$list_context = &$context[$this->_listOptions['id']];
-
-		// Let's set some default that could be useful to avoid repetitions
-		if (!isset($context['sub_template']))
+	/**
+	 * Figure out the sorting method.
+	 */
+	protected function prepareSort()
+	{
+		if (empty($this->listOptions['default_sort_col']))
 		{
-			if (function_exists('template_' . $this->_listOptions['id']))
-				$context['sub_template'] = $this->_listOptions['id'];
-			else
-			{
-				$context['sub_template'] = 'show_list';
-				if (!isset($context['default_list']))
-					$context['default_list'] = $this->_listOptions['id'];
-			}
-		}
-
-		// Figure out the sort.
-		if (empty($this->_listOptions['default_sort_col']))
-		{
-			$list_context['sort'] = array();
-			$sort = '1=1';
+			$this->context['sort'] = array();
+			$this->sort = '1=1';
 		}
 		else
 		{
-			$request_var_sort = isset($this->_listOptions['request_vars']['sort']) ? $this->_listOptions['request_vars']['sort'] : 'sort';
-			$request_var_desc = isset($this->_listOptions['request_vars']['desc']) ? $this->_listOptions['request_vars']['desc'] : 'desc';
+			$this->sortVar = isset($this->listOptions['request_vars']['sort']) ? $this->listOptions['request_vars']['sort'] : 'sort';
+			$this->descVar = isset($this->listOptions['request_vars']['desc']) ? $this->listOptions['request_vars']['desc'] : 'desc';
+			$sortReq = $this->req->getQuery($this->sortVar);
+			$descReq = $this->req->getQuery($this->descVar);
 
-			if (isset($_REQUEST[$request_var_sort], $this->_listOptions['columns'][$_REQUEST[$request_var_sort]], $this->_listOptions['columns'][$_REQUEST[$request_var_sort]]['sort']))
+			if (isset($this->listOptions['columns'][$sortReq], $this->listOptions['columns'][$sortReq]['sort']))
 			{
-					$list_context['sort'] = array(
-					'id' => $_REQUEST[$request_var_sort],
-					'desc' => isset($_REQUEST[$request_var_desc]) && isset($this->_listOptions['columns'][$_REQUEST[$request_var_sort]]['sort']['reverse']),
+					$this->context['sort'] = array(
+					'id' => $sortReq,
+					'desc' => isset($_REQUEST[$this->descVar]) && isset($this->listOptions['columns'][$sortReq]['sort']['reverse']),
 				);
 			}
 			else
 			{
-				$list_context['sort'] = array(
-					'id' => $this->_listOptions['default_sort_col'],
-					'desc' => (!empty($this->_listOptions['default_sort_dir']) && $this->_listOptions['default_sort_dir'] == 'desc') || (!empty($this->_listOptions['columns'][$this->_listOptions['default_sort_col']]['sort']['default']) && substr($this->_listOptions['columns'][$this->_listOptions['default_sort_col']]['sort']['default'], -4, 4) == 'desc') ? true : false,
+				$this->context['sort'] = array(
+					'id' => $this->listOptions['default_sort_col'],
+					'desc' => (!empty($this->listOptions['default_sort_dir']) && $this->listOptions['default_sort_dir'] == 'desc') || (!empty($this->listOptions['columns'][$this->listOptions['default_sort_col']]['sort']['default']) && substr($this->listOptions['columns'][$this->listOptions['default_sort_col']]['sort']['default'], -4, 4) == 'desc'),
 				);
 			}
 
 			// Set the database column sort.
-			$sort = $this->_listOptions['columns'][$list_context['sort']['id']]['sort'][$list_context['sort']['desc'] ? 'reverse' : 'default'];
+			$this->sort = $this->listOptions['columns'][$this->context['sort']['id']]['sort'][$this->context['sort']['desc'] ? 'reverse' : 'default'];
 		}
 
-		$list_context['start_var_name'] = isset($this->_listOptions['start_var_name']) ? $this->_listOptions['start_var_name'] : 'start';
+		$this->context['start_var_name'] = isset($this->listOptions['start_var_name']) ? $this->listOptions['start_var_name'] : 'start';
+	}
 
+	/**
+	 * Calculate the page index.
+	 */
+	protected function calculatePages()
+	{
 		// In some cases the full list must be shown, regardless of the amount of items.
-		if (empty($this->_listOptions['items_per_page']))
+		if (empty($this->listOptions['items_per_page']))
 		{
-			$list_context['start'] = 0;
-			$list_context['items_per_page'] = 0;
+			$this->context['start'] = 0;
+			$this->context['items_per_page'] = 0;
 		}
 		// With items per page set, calculate total number of items and page index.
 		else
 		{
 			// First get an impression of how many items to expect.
-			if (isset($this->_listOptions['get_count']['file']))
-				require_once($this->_listOptions['get_count']['file']);
+			if (isset($this->listOptions['get_count']['file']))
+				require_once($this->listOptions['get_count']['file']);
 
-			$list_context['total_num_items'] = call_user_func_array($this->_listOptions['get_count']['function'], empty($this->_listOptions['get_count']['params']) ? array() : $this->_listOptions['get_count']['params']);
+			$this->context['total_num_items'] = call_user_func_array($this->listOptions['get_count']['function'], empty($this->listOptions['get_count']['params']) ? array() : $this->listOptions['get_count']['params']);
 
-			// Default the start to the beginning...sounds logical.
-			$list_context['start'] = isset($_REQUEST[$list_context['start_var_name']]) ? (int) $_REQUEST[$list_context['start_var_name']] : 0;
-			$list_context['items_per_page'] = $this->_listOptions['items_per_page'];
+			// Default the start to the beginning... sounds logical, amirite?
+			$this->context['start'] = $this->req->getQuery($this->context['start_var_name'], 'intval', 0);
+			$this->context['items_per_page'] = $this->listOptions['items_per_page'];
 
 			// Then create a page index.
-			if ($list_context['total_num_items'] > $list_context['items_per_page'])
-				$list_context['page_index'] = constructPageIndex($this->_listOptions['base_href'] . (empty($list_context['sort']) ? '' : ';' . $request_var_sort . '=' . $list_context['sort']['id'] . ($list_context['sort']['desc'] ? ';' . $request_var_desc : '')) . ($list_context['start_var_name'] != 'start' ? ';' . $list_context['start_var_name'] . '=%1$d' : ''), $list_context['start'], $list_context['total_num_items'], $list_context['items_per_page'], $list_context['start_var_name'] != 'start');
+			if ($this->context['total_num_items'] > $this->context['items_per_page'])
+				$this->context['page_index'] = constructPageIndex($this->listOptions['base_href'] . (empty($this->context['sort']) ? '' : ';' . $this->sortVar . '=' . $this->context['sort']['id'] . ($this->context['sort']['desc'] ? ';' . $this->descVar : '')) . ($this->context['start_var_name'] != 'start' ? ';' . $this->context['start_var_name'] . '=%1$d' : ''), $this->context['start'], $this->context['total_num_items'], $this->context['items_per_page'], $this->context['start_var_name'] != 'start');
 		}
+	}
 
-		// Prepare the headers of the table.
-		$list_context['headers'] = array();
-		foreach ($this->_listOptions['columns'] as $column_id => $column)
+	/**
+	 * Prepare the headers of the table.
+	 */
+	protected function prepareHeaders()
+	{
+		$this->context['headers'] = array();
+		foreach ($this->listOptions['columns'] as $column_id => $column)
 		{
-			if (!isset($column['evaluate']) || $column['evaluate'] === true)
-			{
-				if (isset($column['header']['eval']))
-				{
-					try
-					{
-						$label = eval($column['header']['eval']);
-					}
-					catch (ParseError $e)
-					{
-						$label = isset($column['header']['value']) ? $column['header']['value'] : '';
-					}
-				}
-				else
-				{
-					$label = isset($column['header']['value']) ? $column['header']['value'] : '';
-				}
-				$list_context['headers'][] = array(
+				$this->context['headers'][] = array(
 					'id' => $column_id,
-					'label' => $label,
-					'href' => empty($this->_listOptions['default_sort_col']) || empty($column['sort']) ? '' : $this->_listOptions['base_href'] . ';' . $request_var_sort . '=' . $column_id . ($column_id === $list_context['sort']['id'] && !$list_context['sort']['desc'] && isset($column['sort']['reverse']) ? ';' . $request_var_desc : '') . (empty($list_context['start']) ? '' : ';' . $list_context['start_var_name'] . '=' . $list_context['start']),
-					'sort_image' => empty($this->_listOptions['default_sort_col']) || empty($column['sort']) || $column_id !== $list_context['sort']['id'] ? null : ($list_context['sort']['desc'] ? 'down' : 'up'),
+					'label' => isset($column['header']['value']) ?$column['header']['value']: '',
+					'href' => empty($this->listOptions['default_sort_col']) || empty($column['sort']) ? '' : $this->listOptions['base_href'] . ';' . $this->sortVar . '=' . $column_id . ($column_id === $this->context['sort']['id'] && !$this->context['sort']['desc'] && isset($column['sort']['reverse']) ? ';' . $this->descVar : '') . (empty($this->context['start']) ? '' : ';' . $this->context['start_var_name'] . '=' . $this->context['start']),
+					'sort_image' => empty($this->listOptions['default_sort_col']) || empty($column['sort']) || $column_id !== $this->context['sort']['id'] ? null : ($this->context['sort']['desc'] ? 'down' : 'up'),
 					'class' => isset($column['header']['class']) ? $column['header']['class'] : '',
 					'style' => isset($column['header']['style']) ? $column['header']['style'] : '',
 					'colspan' => isset($column['header']['colspan']) ? $column['header']['colspan'] : '',
 				);
-			}
 		}
+	}
 
+	/**
+	 * Prepare columns.
+	 */
+	protected function prepareColumns()
+	{
 		// We know the amount of columns, might be useful for the template.
-		$list_context['num_columns'] = count($this->_listOptions['columns']);
-		$list_context['width'] = isset($this->_listOptions['width']) ? $this->_listOptions['width'] : '0';
+		$this->context['num_columns'] = count($this->listOptions['columns']);
+		$this->context['width'] = isset($this->listOptions['width']) ? $this->listOptions['width'] : '0';
 
 		// Maybe we want this one to interact with jquery UI sortable
-		$list_context['sortable'] = isset($this->_listOptions['sortable']) ? true : false;
+		$this->context['sortable'] = isset($this->listOptions['sortable']);
 
 		// Get the file with the function for the item list.
-		if (isset($this->_listOptions['get_items']['file']))
-			require_once($this->_listOptions['get_items']['file']);
+		if (isset($this->listOptions['get_items']['file']))
+			require_once($this->listOptions['get_items']['file']);
 
 		// Call the function and include which items we want and in what order.
-		$list_items = call_user_func_array($this->_listOptions['get_items']['function'], array_merge(array($list_context['start'], $list_context['items_per_page'], $sort), empty($this->_listOptions['get_items']['params']) ? array() : $this->_listOptions['get_items']['params']));
-		$list_items = empty($list_items) ? array() : $list_items;
+		$this->listItems = call_user_func_array($this->listOptions['get_items']['function'], array_merge(array($this->context['start'], $this->context['items_per_page'], $this->sort), empty($this->listOptions['get_items']['params']) ? array() : $this->listOptions['get_items']['params']));
+		$this->listItems = !empty($this->listItems) ?$this->listItems: array();
 
+		$this->loopItems();
+	}
+
+	protected function loopItems()
+	{
 		// Loop through the list items to be shown and construct the data values.
-		$list_context['rows'] = array();
-		foreach ($list_items as $item_id => $list_item)
+		$this->context['rows'] = array();
+		foreach ($this->listItems as $item_id => $list_item)
 		{
 			$cur_row = array();
-			foreach ($this->_listOptions['columns'] as $column_id => $column)
+			foreach ($this->listOptions['columns'] as $column_id => $column)
 			{
 				if (isset($column['evaluate']) && $column['evaluate'] === false)
 					continue;
@@ -245,18 +308,6 @@ class Generic_List
 				// The most flexible way probably is applying a custom function.
 				elseif (isset($column['data']['function']))
 					$cur_data['value'] = $column['data']['function']($list_item);
-				// A modified value (inject the database values).
-				elseif (isset($column['data']['eval']))
-				{
-					try
-					{
-						$cur_data['value'] = eval(preg_replace('~%([a-zA-Z0-9\-_]+)%~', '$list_item[\'$1\']', $column['data']['eval']));
-					}
-					catch (ParseError $e)
-					{
-						$cur_data['value'] = '';
-					}
-				}
 				// A literal value.
 				elseif (isset($column['data']['value']))
 					$cur_data['value'] = $column['data']['value'];
@@ -286,99 +337,135 @@ class Generic_List
 				// Add the data cell properties to the current row.
 				$cur_row[$column_id] = $cur_data;
 			}
-
-			$list_context['rows'][$item_id]['class'] = '';
-			$list_context['rows'][$item_id]['style'] = '';
+			$this->context['rows'][$item_id]['class'] = '';
+			$this->context['rows'][$item_id]['style'] = '';
 
 			// Maybe we wat set a custom class for the row based on the data in the row itself
-			if (isset($this->_listOptions['data_check']))
+			if (isset($this->listOptions['data_check']))
 			{
-				if (isset($this->_listOptions['data_check']['class']))
-					$list_context['rows'][$item_id]['class'] = ' ' . $this->_listOptions['data_check']['class']($list_item);
+				if (isset($this->listOptions['data_check']['class']))
+					$this->context['rows'][$item_id]['class'] = ' ' . $this->listOptions['data_check']['class']($list_item);
 
-				if (isset($this->_listOptions['data_check']['style']))
-					$list_context['rows'][$item_id]['style'] = ' style="' . $this->_listOptions['data_check']['style']($list_item) . '"';
+				if (isset($this->listOptions['data_check']['style']))
+					$this->context['rows'][$item_id]['style'] = ' style="' . $this->listOptions['data_check']['style']($list_item) . '"';
 			}
 
 			// Insert the row into the list.
-			$list_context['rows'][$item_id]['data'] = $cur_row;
+			$this->context['rows'][$item_id]['data'] = $cur_row;
 		}
+	}
 
+	/**
+	 * Prepare the title (optional).
+	 */
+	protected function setTitle()
+	{
 		// The title is currently optional.
-		if (isset($this->_listOptions['title']))
+		if (isset($this->listOptions['title']))
 		{
-			$list_context['title'] = $this->_listOptions['title'];
+			$this->context['title'] = $this->listOptions['title'];
 
 			// And the icon is optional for the title
-			if (isset($this->_listOptions['icon']))
-				$list_context['icon'] = $this->_listOptions['icon'];
+			if (isset($this->listOptions['icon']))
+				$this->context['icon'] = $this->listOptions['icon'];
 		}
+	}
+
+	/**
+	 * Prepare a form (optional) with hidden fields.
+	 *
+	 * Session check is added automatically. Both a token and a page identifier are optional.
+	 */
+	protected function prepareForm()
+	{
+		global $context;
 
 		// In case there's a form, share it with the template context.
-		if (isset($this->_listOptions['form']))
+		if (isset($this->listOptions['form']))
 		{
-			$list_context['form'] = $this->_listOptions['form'];
+			$this->context['form'] = $this->listOptions['form'];
 
-			if (!isset($list_context['form']['hidden_fields']))
-				$list_context['form']['hidden_fields'] = array();
+			if (!isset($this->context['form']['hidden_fields']))
+				$this->context['form']['hidden_fields'] = array();
 
 			// Always add a session check field.
-			$list_context['form']['hidden_fields'][$context['session_var']] = $context['session_id'];
+			$this->context['form']['hidden_fields'][$context['session_var']] = $context['session_id'];
 
 			// Will this do a token check?
-			if (isset($this->_listOptions['form']['token']))
-				$list_context['form']['hidden_fields'][$context[$this->_listOptions['form']['token'] . '_token_var']] = $context[$this->_listOptions['form']['token'] . '_token'];
+			if (isset($this->listOptions['form']['token']))
+				$this->context['form']['hidden_fields'][$context[$this->listOptions['form']['token'] . '_token_var']] = $context[$this->listOptions['form']['token'] . '_token'];
 
 			// Include the starting page as hidden field?
-			if (!empty($list_context['form']['include_start']) && !empty($list_context['start']))
-				$list_context['form']['hidden_fields'][$list_context['start_var_name']] = $list_context['start'];
+			if (!empty($this->context['form']['include_start']) && !empty($this->context['start']))
+				$this->context['form']['hidden_fields'][$this->context['start_var_name']] = $this->context['start'];
 
 			// If sorting needs to be the same after submitting, add the parameter.
-			if (!empty($list_context['form']['include_sort']) && !empty($list_context['sort']))
+			if (!empty($this->context['form']['include_sort']) && !empty($this->context['sort']))
 			{
-				$list_context['form']['hidden_fields']['sort'] = $list_context['sort']['id'];
+				$this->context['form']['hidden_fields']['sort'] = $this->context['sort']['id'];
 
-				if ($list_context['sort']['desc'])
-					$list_context['form']['hidden_fields']['desc'] = 1;
+				if ($this->context['sort']['desc'])
+					$this->context['form']['hidden_fields']['desc'] = 1;
 			}
 		}
+	}
 
-		// Wanna say something nice in case there are no items?
-		if (isset($this->_listOptions['no_items_label']))
+	/**
+	 * Say something nice in case there are no items.
+	 */
+	protected function prepareNoItemsLabel()
+	{
+		if (isset($this->listOptions['no_items_label']))
 		{
-			$list_context['no_items_label'] = $this->_listOptions['no_items_label'];
-			$list_context['no_items_align'] = isset($this->_listOptions['no_items_align']) ? $this->_listOptions['no_items_align'] : '';
+			$this->context['no_items_label'] = $this->listOptions['no_items_label'];
+			$this->context['no_items_align'] = isset($this->listOptions['no_items_align']) ? $this->listOptions['no_items_align'] : '';
 		}
+	}
 
-		// A list can sometimes need a few extra rows above and below.
-		if (isset($this->_listOptions['additional_rows']))
+	/**
+	 * A list can sometimes need a few extra rows above and below.
+	 *
+	 * Supported row positions: top_of_list, after_title, selectors,
+	 * above_column_headers, below_table_data, bottom_of_list.
+	 */
+	protected function prepareAdditionalRows()
+	{
+		if (isset($this->listOptions['additional_rows']))
 		{
-			$list_context['additional_rows'] = array();
-			foreach ($this->_listOptions['additional_rows'] as $row)
+			$this->context['additional_rows'] = array();
+			foreach ($this->listOptions['additional_rows'] as $row)
 			{
 				if (empty($row))
 					continue;
 
-				// Supported row positions: top_of_list, after_title, selectors,
-				// above_column_headers, below_table_data, bottom_of_list.
-				if (!isset($list_context['additional_rows'][$row['position']]))
-					$list_context['additional_rows'][$row['position']] = array();
+				if (!isset($this->context['additional_rows'][$row['position']]))
+					$this->context['additional_rows'][$row['position']] = array();
 
-				$list_context['additional_rows'][$row['position']][] = $row;
+				$this->context['additional_rows'][$row['position']][] = $row;
 			}
 		}
+	}
 
-		// Add an option for inline JavaScript.
-		if (isset($this->_listOptions['javascript']))
-			addInlineJavascript($this->_listOptions['javascript'], true);
+	/**
+	 * Add an option for inline JavaScript.
+	 */
+	protected function prepareJavascript()
+	{
+		if (isset($this->listOptions['javascript']))
+			addInlineJavascript($this->listOptions['javascript'], true);
+	}
 
-		// We want a menu.
-		if (isset($this->_listOptions['list_menu']))
+	/**
+	 * We want a menu.
+	 */
+	protected function prepareMenu()
+	{
+		if (isset($this->listOptions['list_menu']))
 		{
-			if (!isset($this->_listOptions['list_menu']['position']))
-				$this->_listOptions['list_menu']['position'] = 'left';
+			if (!isset($this->listOptions['list_menu']['position']))
+				$this->listOptions['list_menu']['position'] = 'left';
 
-			$list_context['list_menu'] = $this->_listOptions['list_menu'];
+			$this->context['list_menu'] = $this->listOptions['list_menu'];
 		}
 	}
 }
