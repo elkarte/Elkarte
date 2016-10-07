@@ -69,7 +69,7 @@
 
 /* Normal, standard links. */
 a, a:link, a:visited,
-	/* Links that open in a new window. */
+/* Links that open in a new window. */
 a.new_win:link, a.new_win:visited {
 	text-decoration: none;
 }
@@ -1080,7 +1080,6 @@ a.bbc_link {
 	padding: 6px 12px;
 	min-height: 60px;
 	height: 60px;
-	/* Longhand style due to JS bug in IE! */
 	border: 1px solid;
 	resize: vertical;
 }

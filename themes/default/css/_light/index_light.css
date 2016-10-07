@@ -1,48 +1,51 @@
 /* INTRODUCTION
-/* This variant is the standard, light, Elkarte default theme.
-/* This is eye candy only. All the layout code is in index.css.
-/*
-/* All theme variants depend on the layout code for stability.
-/* It is better to copy code to a variant CSS file for testing.
-/* ------------------------------------------------------- */
-/* $CONTENTS - still a bit WIP. @todo
-/*
-/*		$GENERAL.............Global resets, clearfixes, etc.
-/*		$COMMON..............Common classes to drive you bonkers.
-/*		$BBC.................Quotes, code blocks, BBC styles.
-/*		$AJAX................The "loading" bar (quick edit, etc).
-/*
-/*		$MAIN................Forum header, wrapper, and footer.
-/*		$MENUS...............Main and secondary menus.
-/*		$LINKTREE............The breadcrumbs.
-/*		$BUTTONS.............Most button strips.
-/*		$PAGELINKS...........Page navigation links.
-/*
-/*		$TABLES..............Generic tables (memberlist, error log, etc).
-/*		$SETTINGS............Generic lists for settings pages.
-/*		$BOARDS..............Board index, sub-boards, and message index.
-/*
-/*		$TOPICS..............The display template (topic view), including send.
-/*		$EDITOR..............Main editor (posts, events, polls) and topic summary.
-/*		$MODERATE............Move topic, split topic, merge topic.
-/*
-/*		$PROFILE.............The profile areas.
-/*		$PERSONAL............The personal messages (PM) areas.
-/*		$CALENDAR............The calendar
-/*		$STATISTICS..........The statistics centre.
-/*
-/*		$HELP................Help pages, help icons and pop-ups, tooltips.
-/*		$SEARCH..............Search pages, including memberlist search.
-/*		$MEMBERLIST..........The memberlist table.
-/*		$LOGIN...............Login and registration, maintenance mode.
-/*
-/*		$BOXES...............Message boxes (error, warning, info, etc).
-/*		$PROGRESS............Nifty progress bars.
-/*		$MEDIA...............Experimental media queries.
+ * This variant is the standard, light, Elkarte default theme.
+ * This is eye candy only. All the layout code is in index.css.
+ *
+ * All theme variants depend on the layout code for stability.
+ * It is better to copy code to a variant CSS file for testing.
+ * -------------------------------------------------------
+ * $CONTENTS - still a bit WIP. @todo
+ *
+ *		$GENERAL.............Global resets, clearfixes, etc.
+ *		$COMMON..............Common classes to drive you bonkers.
+ *		$BBC.................Quotes, code blocks, BBC styles.
+ *		$AJAX................The "loading" bar (quick edit, etc).
+ *
+ *		$MAIN................Forum header, wrapper, and footer.
+ *		$MENUS...............Main and secondary menus.
+ *		$LINKTREE............The breadcrumbs.
+ *		$BUTTONS.............Most button strips.
+ *		$PAGELINKS...........Page navigation links.
+ *
+ *		$TABLES..............Generic tables (memberlist, error log, etc).
+ *		$SETTINGS............Generic lists for settings pages.
+ *		$BOARDS..............Board index, sub-boards, and message index.
+ *
+ *		$TOPICS..............The display template (topic view), including send.
+ *		$EDITOR..............Main editor (posts, events, polls) and topic summary.
+ *		$MODERATE............Move topic, split topic, merge topic.
+ *
+ *		$PROFILE.............The profile areas.
+ *		$PERSONAL............The personal messages (PM) areas.
+ *		$CALENDAR............The calendar
+ *		$STATISTICS..........The statistics centre.
+ *
+ *		$HELP................Help pages, help icons and pop-ups, tooltips.
+ *		$SEARCH..............Search pages, including memberlist search.
+ *		$MEMBERLIST..........The memberlist table.
+ *		$LOGIN...............Login and registration, maintenance mode.
+ *
+ *		$BOXES...............Message boxes (error, warning, info, etc).
+ *		$PROGRESS............Nifty progress bars.
+ *		$MEDIA...............Experimental media queries.
+ */
 
-/* ------------------------------------------------------- */
-/*	$GENERAL	                                           */
-/* ------------------------------------------------------- */
+/* -------------------------------------------------------
+ *	$GENERAL
+ * -------------------------------------------------------
+ */
+
 /* Normal, standard links. */
 a, a:link, a:visited,
 /* Links that open in a new window. */
@@ -55,8 +58,9 @@ a:hover, a.new_win:hover {
 
 }
 
-/* Stop white band under footer on short pages. */
-/* This color should match $FOOTER background. */
+/* Stop white band under footer on short pages.
+ * This color should match $FOOTER background.
+ */
 html {
 	background: #222222;
 }
@@ -123,7 +127,7 @@ input[type="submit"], .drop_area_fileselect_text, button[type="submit"], input[t
 	border-left-color: #BFBFBF;
 	background: #F4F4F4;
 	background-image: linear-gradient(to bottom, #FEFEFE, #E4E4E4);
-	box-shadow: 1px 1px 2px #E4E4E4, 0 -1px 0 #E4E4E4 inset;
+	box-shadow: 1px 1px 2px #E5E5E5, 0 -1px 0 #E5E5E5 inset;
 	color: #585858;
 }
 
@@ -207,8 +211,9 @@ strong {
 	color: #566450;
 }
 
-/* Custom highlighted text style for modern browsers. */
-/* Nicer than default. Needs two separate rules. */
+/* Custom highlighted text style for modern browsers.
+ * Nicer than default. Needs two separate rules.
+ */
 ::-moz-selection {
 	background: #D8FFDF;
 	color: #444444;
@@ -299,9 +304,11 @@ strong {
 	color: #EEEEEE;
 }
 
-/* ------------------------------------------------------- */
-/* $BBC                                                    */
-/* ------------------------------------------------------- */
+/* -------------------------------------------------------
+ * $BBC
+ * -------------------------------------------------------
+ */
+
 /* The "Quote:" and "Code:" header parts... */
 .codeheader, .quoteheader {
 	border-color: #CCCCCC;
@@ -320,7 +327,7 @@ strong {
 
 /* A quote, perhaps from another post. */
 .bbc_standard_quote, .bbc_alternate_quote,
-	/* A code block - maybe PHP ;) - shared styles. */
+/* A code block - maybe PHP ;) - shared styles. */
 .bbc_code {
 	border-color: #CCCCCC;
 	background: #FEFEFE;
@@ -396,9 +403,11 @@ div.bbc_footnotes .meaction {
 
 }
 
-/* ------------------------------------------------------- */
-/*	$AJAX                                                  */
-/* ------------------------------------------------------- */
+/* -------------------------------------------------------
+ *	$AJAX
+ * -------------------------------------------------------
+ */
+
 /* The "Loading" bar for quick edit, etc. */
 #ajax_in_progress {
 	border-bottom-color: #3D6E32;
@@ -410,9 +419,11 @@ div.bbc_footnotes .meaction {
 	color: #FFA500;
 }
 
-/* ------------------------------------------------------- */
-/*	$MAIN.                                                 */
-/* ------------------------------------------------------- */
+/* -------------------------------------------------------
+ *	$MAIN.
+ * -------------------------------------------------------
+ */
+
 /* The top bar. */
 #top_section {
 	border-top-color: #5BA048;
@@ -534,9 +545,11 @@ div.bbc_footnotes .meaction {
 
 }
 
-/* ------------------------------------------------------- */
-/*	$MENUS                                                 */
-/* ------------------------------------------------------- */
+/* -------------------------------------------------------
+ *	$MENUS
+ * -------------------------------------------------------
+ */
+
 /* Level 1 Menu bar: link or button. General styling. */
 .linklevel1, .linklevel1:link, .linklevel1:visited {
 	border-color: #AFAFAF;
@@ -625,8 +638,9 @@ div.bbc_footnotes .meaction {
 	border-bottom-color: #2D5024;
 }
 
-/* Top level subsection indicators. */
-/* Comment these out if you don't want them. */
+/* Top level subsection indicators.
+ * Comment these out if you don't want them.
+ */
 .subsections:hover .linklevel1:after {
 
 }
@@ -675,7 +689,8 @@ div.bbc_footnotes .meaction {
 }
 
 /* Tricky PM indicator. Define it carefully,
-/* just in case someone tries to use this class elsewhere. */
+ * just in case someone tries to use this class elsewhere.
+ */
 .pm_indicator, .likes_indicator {
 	box-shadow: 2px 2px 3px rgba(0, 0, 0, 0.25), 0 -1px 0 #3D6E32 inset;
 }
@@ -716,15 +731,17 @@ div.bbc_footnotes .meaction {
 	box-shadow: 0 -1px 0 #BBBBBB;
 }
 
-/* Levels 2 and 3: highlighting of current section */
-/* @todo - Should probably be applied to main menu as well, for consistency. */
+/* Levels 2 and 3: highlighting of current section
+ * @todo - Should probably be applied to main menu as well, for consistency.
+ */
 .linklevel2.chosen, .linklevel3.chosen,
 #menu_current_area .linklevel1 {
 
 }
 
 /* Styles for sidebar menus.
-/* Cancel default backgrounds for sidebar. */
+ * Cancel default backgrounds for sidebar.
+ */
 #menu_sidebar .linklevel1 {
 	border-color: transparent;
 	background: none;
@@ -732,12 +749,13 @@ div.bbc_footnotes .meaction {
 	color: #585858;
 }
 
-/*End sidebar flyout coding. */
+/* End sidebar flyout coding. */
 
-/* ------------------------------------------------------- */
-/*	$LINKTREE	                                           */
-/* ------------------------------------------------------- */
-/* The navigation list (i.e. linktree) */
+/* -------------------------------------------------------
+ *	$LINKTREE
+ * -------------------------------------------------------
+ */
+
 /* Wrapper/background. */
 .navigate_section {
 	border-color: #CCCCCC;
@@ -780,15 +798,16 @@ div.bbc_footnotes .meaction {
 	background: #4B863C;
 }
 
-/* ------------------------------------------------------- */
-/* $BUTTONS	                                               */
-/* This section contains code for the quickbuttons (quote, quick edit, etc)
-/* and for the buttonlist class (reply, add poll, notify, etc).
-/* These classes share some styling.
-/* Declarations are amalgamated where styling is shared.
-/* ------------------------------------------------------- */
+/* -------------------------------------------------------
+ * $BUTTONS
+ * This section contains code for the quickbuttons (quote, quick edit, etc)
+ * and for the buttonlist class (reply, add poll, notify, etc).
+ * These classes share some styling.
+ * Declarations are amalgamated where styling is shared.
+ * -------------------------------------------------------
+ */
+
 /* Styles for the standard button lists.
-/* ------------------------------------------------------- */
 /* @todo - Save code by amalgamating common button background declarations. */
 .buttonlist li a.linklevel1 {
 	box-shadow: 1px 1px 2px #E4E4E4, 0 -1px 0 #E4E4E4 inset;
@@ -800,7 +819,6 @@ div.bbc_footnotes .meaction {
 }
 
 /* The quick buttons. */
-/* ------------------------------------------------------- */
 .quickbuttons .modified {
 	color: #686868;
 }
@@ -828,9 +846,11 @@ div.bbc_footnotes .meaction {
 
 }
 
-/* ------------------------------------------------------- */
-/*	$PAGELINKS	                                           */
-/* ------------------------------------------------------- */
+/* -------------------------------------------------------
+ *	$PAGELINKS
+ * -------------------------------------------------------
+ */
+
 .selectbox, .pagelinks {
 	color: #585858;
 }
@@ -892,11 +912,11 @@ div.bbc_footnotes .meaction {
 	background: #FEFEFE;
 }
 
-/* ------------------------------------------------------- */
-/*	$TABLES		                                           */
-/* ------------------------------------------------------- */
+/* -------------------------------------------------------
+ *	$TABLES
+ * -------------------------------------------------------
+ */
 
-/* @todo */
 /* A general table class. */
 .table_grid {
 	border-color: #DDDDDD;
@@ -923,8 +943,9 @@ div.bbc_footnotes .meaction {
 	background: #FEFEFE;
 }
 
-/* Legacy highlight color, for selected membergroups etc. */
-/* Used by JS to show a selected item. Still used in manage languages */
+/* Legacy highlight color, for selected membergroups etc.
+ * Used by JS to show a selected item. Still used in manage languages
+ */
 .table_grid .standard_row.highlight2 {
 	background: #E4E4E4;
 	color: #585858;
@@ -936,22 +957,25 @@ div.bbc_footnotes .meaction {
 	background: #FFF5CD;
 }
 
-/* ------------------------------------------------------- */
-/* $SETTINGS                                               */
-/* ------------------------------------------------------- */
-/* Lists - settings use these a lot.                       */
+/* -------------------------------------------------------
+ * $SETTINGS
+ * -------------------------------------------------------
+ */
+
+/* Lists - settings use these a lot. */
 .settings label {
 	color: #585858;
 }
 
-/* ------------------------------------------------------- */
-/* $BOARDS                                                 */
-/* ------------------------------------------------------- */
-/* Set up some general framing classes. @todo */
-/*    .forum_category for board index/sub-boards. */
-/*    .forumposts for thread pages and recent posts, etc. */
-/*    .content_category for general divisions around the place. */
-/* All styled the same in default variant, but available for fun and games. */
+/* -------------------------------------------------------
+ * $BOARDS
+ * -------------------------------------------------------
+ * Set up some general framing classes. @todo
+ *    .forum_category for board index/sub-boards.
+ *    .forumposts for thread pages and recent posts, etc.
+ *    .content_category for general divisions around the place.
+ * All styled the same in default variant, but available for fun and games.
+ */
 
 /* The board categories and newsfader - some shared styling. */
 .forum_category, .content_category {
@@ -997,7 +1021,7 @@ div.bbc_footnotes .meaction {
 }
 
 .childboards {
-	border-top-color: #CCCCCC;
+	border-top-color: transparent;
 }
 
 .childboard_row h4, .board_new_posts {
@@ -1119,13 +1143,14 @@ div.bbc_footnotes .meaction {
 	color: #585858;
 }
 
-/* --------------------------------------------------------------------- */
-/* The following are alternative layout orders for the board index rows. */
-/* They are basic demonstrations only. Extra custom styling can be done.
-/* These demos can be commented and un-commented to see them in action.
-/* Note: similar tricks can be performed with the new message index too.
-/* --------------------------------------------------------------------- */
-/* This one simply puts the board stats back in the old SMF location. */
+/* ---------------------------------------------------------------------
+ * The following are alternative layout orders for the board index rows.
+ * They are basic demonstrations only. Extra custom styling can be done.
+ * These demos can be commented and un-commented to see them in action.
+ * Note: similar tricks can be performed with the new message index too.
+ * ---------------------------------------------------------------------
+ * This one simply puts the board stats back in the old SMF location.
+ */
 /*
 .board_stats {
 	text-align: left;
@@ -1157,9 +1182,10 @@ div.bbc_footnotes .meaction {
 	border: none;
 }
 */
-/* ------------------------------------------------------ */
-/* This is where the fun starts. Absolute positioning. :D */
-/* ------------------------------------------------------ */
+/* ------------------------------------------------------
+ * This is where the fun starts. Absolute positioning. :D
+ * ------------------------------------------------------
+ */
 /* This one takes the previous example, and puts the board icon back to far left. */
 /*
 .board_row {
@@ -1177,7 +1203,8 @@ div.bbc_footnotes .meaction {
 }
 */
 /* You want more? Ok. This one does the above, but also puts board stats over
-/* at far right, and sets board name and description back to left aligned. */
+ * at far right, and sets board name and description back to left aligned.
+ */
 /*
 .board_row {
 	direction: rtl;
@@ -1206,10 +1233,10 @@ div.bbc_footnotes .meaction {
 */
 /* There are more options, but those should be enough to give the general idea. */
 
-/* ------------------------------------------------------- */
-/*	$TOPICS		                                           */
-/* ------------------------------------------------------- */
-/* The display template (topic view).
+/* -------------------------------------------------------
+ *	$TOPICS
+ * -------------------------------------------------------
+ */
 
 /* Poll vote options */
 #poll_options .options {
@@ -1222,10 +1249,8 @@ div.bbc_footnotes .meaction {
 }
 
 .poll_gradient {
-	background: #1e5799;
-	background: -moz-linear-gradient(top, #1e5799 0%, #2989d8 50%, #207cca 51%, #7db9e8 100%);
-	background: -webkit-linear-gradient(top, #1e5799 0%,#2989d8 50%,#207cca 51%,#7db9e8 100%);
-	background: linear-gradient(to bottom, #1e5799 0%,#2989d8 50%,#207cca 51%,#7db9e8 100%);
+	background: #1E5799;
+	background: linear-gradient(to bottom, #1E5799 0%,#2989d8 50%,#207CCA 51%,#7DB9E8 100%);
 	border-color: #111;
 }
 
@@ -1330,9 +1355,10 @@ div.bbc_footnotes .meaction {
 	color: #FEFEFE;
 }
 
-/* ------------------------------------------------------- */
-/*	$EDITOR		                                           */
-/* ------------------------------------------------------- */
+/* -------------------------------------------------------
+ *	$EDITOR
+ * -------------------------------------------------------
+ */
 
 /* The main post editor section. */
 #preview_body {
@@ -1406,11 +1432,12 @@ div.bbc_footnotes .meaction {
 	border-top-color: #FEFEFE;
 }
 
-/* ------------------------------------------------------- */
-/* $TABS                                                   */
-/* We can't control what jqueryui pollutes the DOM with, so deal with it */
-/* Styles for the profile summary tabs, or any jquery ui tabs */
-/* ------------------------------------------------------- */
+/* -------------------------------------------------------
+ * $TABS
+ * We can't control what jqueryui pollutes the DOM with, so deal with it
+ * Styles for the profile summary tabs, or any jquery ui tabs
+ * -------------------------------------------------------
+ */
 
 .ui-tabs .ui-tabs-nav li {
 	border: 1px #CCCCCC solid;
@@ -1444,10 +1471,10 @@ div.bbc_footnotes .meaction {
 	color: #585858;
 }
 
-/* ------------------------------------------------------- */
-/* $PROFILE	                                               */
-/* ------------------------------------------------------- */
-/* Profile colors */
+/* -------------------------------------------------------
+ * $PROFILE
+ * -------------------------------------------------------
+ */
 
 .ui-tabs .ui-tabs-panel {
 	border-color: #DDDDDD;
@@ -1540,9 +1567,10 @@ div.bbc_footnotes .meaction {
 	color: #585858;
 }
 
-/* ------------------------------------------------------- */
-/* $PERSONAL                                               */
-/* ------------------------------------------------------- */
+/* -------------------------------------------------------
+ * $PERSONAL
+ * -------------------------------------------------------
+ */
 
 #personal_messages .capacity_bar {
 	border-color: #AFAFAF;
@@ -1568,10 +1596,11 @@ div.bbc_footnotes .meaction {
 	color: #585858;
 }
 
-/* ------------------------------------------------------- */
-/* $CALENDAR                                               */
-/* ------------------------------------------------------- */
-/* Calendar colors for birthdays, events and holidays */
+/* -------------------------------------------------------
+ * $CALENDAR
+ * -------------------------------------------------------
+ */
+
 .birthday {
 	color: #920AC4;
 }
@@ -1637,9 +1666,10 @@ div.bbc_footnotes .meaction {
 	border-color: #DDDDDD;
 }
 
-/* ------------------------------------------------------- */
-/*	$HELP                                                  */
-/* ------------------------------------------------------- */
+/* -------------------------------------------------------
+ *	$HELP
+ * -------------------------------------------------------
+ */
 
 #helpmain {
 	border-color: #CCCCCC;
@@ -1678,9 +1708,10 @@ div.bbc_footnotes .meaction {
 	box-shadow: 0 -2px 2px rgba(0, 0, 0, 0.1);
 }
 
-/* ------------------------------------------------------- */
-/*	$SEARCH                                                */
-/* ------------------------------------------------------- */
+/* -------------------------------------------------------
+ *	$SEARCH
+ * -------------------------------------------------------
+ */
 
 #mlsearch_options {
 	border-color: #DDDDDD;
@@ -1700,9 +1731,10 @@ div.bbc_footnotes .meaction {
 	border-bottom-color: #DDDDDD;
 }
 
-/* ------------------------------------------------------- */
-/*	$MEMBERLIST                                            */
-/* ------------------------------------------------------- */
+/* -------------------------------------------------------
+ *	$MEMBERLIST
+ * -------------------------------------------------------
+ */
 .mlist .mlist_header div {
 
 }
@@ -1733,9 +1765,10 @@ div.bbc_footnotes .meaction {
 	background-image: linear-gradient(to bottom, #FAFAFA, #EAEAEA);
 }
 
-/* ------------------------------------------------------- */
-/*	$LOGIN                                                 */
-/* ------------------------------------------------------- */
+/* -------------------------------------------------------
+ *	$LOGIN
+ * -------------------------------------------------------
+ */
 
 .coppa_contact {
 	border-color: #585858;
@@ -1751,9 +1784,10 @@ div.bbc_footnotes .meaction {
 	background: #FFEEEE;
 }
 
-/* ------------------------------------------------------- */
-/*	$BOXES		                                           */
-/* ------------------------------------------------------- */
+/* -------------------------------------------------------
+ *	$BOXES
+ * -------------------------------------------------------
+ */
 
 /* Lotsa boxes. */
 .description, .information, .warningbox, .successbox, .infobox, .errorbox {
@@ -1794,10 +1828,11 @@ div.bbc_footnotes .meaction {
 	border-color: #FF0000 !important;
 }
 
-/* ------------------------------------------------------- */
-/*	$PROGRESS                                              */
-/* ------------------------------------------------------- */
-/* Styles for the progress bar */
+/* -------------------------------------------------------
+ *	$PROGRESS
+ * -------------------------------------------------------
+ */
+
 .progress_bar {
 	border-color: black;
 	background: white;
@@ -1816,9 +1851,11 @@ div.bbc_footnotes .meaction {
 	background-color: #0000FF;
 }
 
-/* ------------------------------------------------------- */
-/* $STATISTICS                                             */
-/* ------------------------------------------------------- */
+/* -------------------------------------------------------
+ * $STATISTICS
+ * -------------------------------------------------------
+ */
+
 .statistics .category_header {
 	border-bottom-color: #CCCCCC;
 	background: none;
@@ -1865,8 +1902,7 @@ div.bbc_footnotes .meaction {
 	background: rgba(0, 0, 0, .5);
 }
 
-/* floating error box */
-/* currently used by like functionality */
+/* floating error box currently used by like functionality */
 .floating_error {
 	border-color: #E4E4E4;
 	background: #FEFEFE;
@@ -1890,14 +1926,15 @@ div.bbc_footnotes .meaction {
 
 }
 
-/* ------------------------------------------------------- */
-/*	$ICONS                                     */
-/* ------------------------------------------------------- */
-/*
-/* Icons. The color file is the place for this since we
-/* can't style embedded material.
-/*
-/* ------------------------------------------------------- */
+/* -------------------------------------------------------
+ *	$ICONS
+ * -------------------------------------------------------
+ *
+ * Icons. The color file is the place for this since we
+ * can't style embedded material.
+ *
+ * -------------------------------------------------------
+ */
 
 /* Helpers */
 
@@ -2018,7 +2055,6 @@ a.helpicon:hover, a > .iconline:hover, a > .icoffline:hover {
 
 
 /* General icons */
-
 .i-close::before, .i-remove::before {
 	content: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='%23af0101' viewBox='0 0 38 38'%3E%3Cpath d='M31.708 25.708L22 16l9.708-9.708c.105-.105.18-.227.23-.357.132-.356.056-.77-.23-1.057L27.122.292c-.286-.286-.702-.36-1.057-.23-.13.05-.252.125-.357.23L16 9.998 6.292.29C6.187.188 6.065.11 5.935.064c-.356-.133-.77-.057-1.057.23L.292 4.877c-.286.286-.36.702-.23 1.057.05.13.125.252.23.357L10 16 .292 25.708c-.104.105-.18.227-.23.357-.132.355-.056.77.23 1.057l4.586 4.586c.286.286.702.36 1.057.23.13-.05.252-.125.357-.23L16 22l9.708 9.708c.105.105.227.18.357.23.356.132.77.056 1.057-.23l4.586-4.586c.286-.286.362-.702.23-1.057-.05-.13-.125-.252-.23-.357z'/%3E%3C/svg%3E");
 }
@@ -2188,7 +2224,6 @@ a.helpicon:hover, a > .iconline:hover, a > .icoffline:hover {
 
 
 /* Board icons */
-
 .i-board-redirect::before {
 	content: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3ClinearGradient id='brdGrd' x1='0%25' y1='0%25' x2='0%25' y2='100%25'%3E%3Cstop offset='0%25' stop-color='%235FA77B'/%3E%3Cstop offset='35%25' stop-color='%23539442'/%3E%3Cstop offset='60%25' stop-color='%23539442'/%3E%3Cstop offset='100%25' stop-color='%235FA77B'/%3E%3C/linearGradient%3E%3Cpath fill='url(%23brdGrd)' d='M24 20v-4H14v-4h10V8l6 6zm-2-2v8H12v6L0 26V0h22v10h-2V2H4l8 4v18h8v-6z'/%3E%3C/svg%3E");
 }
@@ -2206,7 +2241,6 @@ a.helpicon:hover, a > .iconline:hover, a > .icoffline:hover {
 }
 
 /* Sorting icons */
-
 .i-sort-alpha-up::before {
 	content: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Cpath d='M10 24V0H6v24H1l7 7 7-7h-5zm19 8h-8c-.37 0-.708-.203-.882-.528s-.155-.72.05-1.027L27.13 20H21c-.552 0-1-.448-1-1s.448-1 1-1h8c.37 0 .708.203.882.528s.155.72-.05 1.027L22.87 30H29c.552 0 1 .448 1 1s-.448 1-1 1zm2.894-19.447l-6-12C25.724.213 25.378 0 25 0s-.725.214-.895.553l-6 12c-.247.494-.047 1.095.447 1.342.144.072.296.106.447.106.364 0 .72-.2.892-.55L21.618 10h6.764l1.724 3.448c.247.494.848.694 1.342.447s.694-.848.447-1.342zM22.618 8L25 3.236 27.382 8h-4.764z'/%3E%3C/svg%3E");
 }
@@ -2232,7 +2266,6 @@ a.helpicon:hover, a > .iconline:hover, a > .icoffline:hover {
 }
 
 /* Gender icons are all from Font Awesome */
-
 .i-female::before {
 	content: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' stroke='black' stroke-width='9em' fill='%23ff80c8' viewBox='0 0 3584 3584'%3E%3Cpath d='M2816 1152q0 442-295 769t-729 375v520h448q28 0 46 18t18 46v128q0 28-18 46t-46 18h-448v448q0 28-18 46t-46 18h-128q-28 0-46-18t-18-46v-448h-448q-28 0-46-18t-18-46v-128q0-28 18-46t46-18h448v-520q-300-32-543-206t-372-448-105-584q22-268 161-498t364-376 491-176q340-38 638 108t472 424 174 612z m-2048 0q0 370 263 633t633 263 633-263 263-633-263-633-633-263-633 263-263 633z'/%3E%3C/svg%3E");
 }
@@ -2267,7 +2300,7 @@ a.helpicon:hover, a > .iconline:hover, a > .icoffline:hover {
 }
 
 /* Standard and brand icons */
-
+/* From Font Awesome */
 .i-openid::before {
 	content: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='%23f78c40' viewBox='0 0 3584 3584'%3E%3Cpath d='M2172 0v3072l-544 256q-456-40-828-204t-586-417-214-545q0-280 201-527t550-411 783-216v344q-434 76-713 300t-279 510q0 304 309 534t777 290v-2720z m1338 1164l74 780-1050-228 294-166q-238-140-560-198v-344q554 66 962 314z'/%3E%3C/svg%3E");
 }
@@ -2298,31 +2331,30 @@ a.helpicon:hover, a > .iconline:hover, a > .icoffline:hover {
 
 
 
-/* ------------------------------------------------------- */
-/*	$MEDIA		                                           */
-/* ------------------------------------------------------- */
-/*  @TODO: This should be nearly empty for the colorized sheets.
-/*
-/* Experimental media queries.
-/* NOTE:
-/* When setting break points for media queries, don't set them in pixels.
-/* Use em instead.
-/* Why? Because the point of re-stacking/dropping content is to fit it all
-/* in the available space. This is dependent not just on width in pixels,
-/* but also on the user-selected text size that is set in the browser.
-/*
-/* If, for whatever reason (eyesight, pixel pitch, workstation arrangement, etc)
-/* a user requires text 50% larger than theme default, then their screen is
-/* effectively a lot smaller than its nominal resolution would indicate.
-/* If the break points are set in em, suddenly the media queries become equally
-/* responsive for all users, without any extra code being required.
-/*
-/* Testing em break points is just as easy as testing pixels,
-/* and it will make more people happier. This is cool. :)
-/*
-/* Of course, having comments to map em to px for each query is a good idea too.
-
-/* Smartphones (portrait & landscape) drop the stats (views/replys) and last post from the screen */
+/* -------------------------------------------------------
+ *	$MEDIA
+ * -------------------------------------------------------
+ * @TODO: This should be nearly empty for the colorized sheets.
+ *
+ * Experimental media queries.
+ * NOTE:
+ * When setting break points for media queries, don't set them in pixels.
+ * Use em instead.
+ * Why? Because the point of re-stacking/dropping content is to fit it all
+ * in the available space. This is dependent not just on width in pixels,
+ * but also on the user-selected text size that is set in the browser.
+ *
+ * If, for whatever reason (eyesight, pixel pitch, workstation arrangement, etc)
+ * a user requires text 50% larger than theme default, then their screen is
+ * effectively a lot smaller than its nominal resolution would indicate.
+ * If the break points are set in em, suddenly the media queries become equally
+ * responsive for all users, without any extra code being required.
+ *
+ * Testing em break points is just as easy as testing pixels,
+ * and it will make more people happier. This is cool. :)
+ *
+ * Of course, having comments to map em to px for each query is a good idea too.
+ */
 
 /* This one does 1024 screens at default font size. */
 @media screen and (max-width: 64em) {
