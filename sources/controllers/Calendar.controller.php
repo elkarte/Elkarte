@@ -65,6 +65,8 @@ class Calendar_Controller extends Action_Controller
 
 		// Is this a week view?
 		$context['view_week'] = isset($_GET['viewweek']);
+		$context['cal_minyear'] = $modSettings['cal_minyear'];
+		$context['cal_maxyear'] = date('Y') + $modSettings['cal_limityear'];
 
 		// Don't let search engines index weekly calendar pages.
 		if ($context['view_week'])
@@ -85,7 +87,7 @@ class Calendar_Controller extends Action_Controller
 		if ($curPage['month'] < 1 || $curPage['month'] > 12)
 			Errors::instance()->fatal_lang_error('invalid_month', false);
 
-		if ($curPage['year'] < $modSettings['cal_minyear'] || $curPage['year'] > $modSettings['cal_maxyear'])
+		if ($curPage['year'] < $context['cal_minyear'] || $curPage['year'] > $context['cal_maxyear'])
 			Errors::instance()->fatal_lang_error('invalid_year', false);
 
 		// If we have a day clean that too.
@@ -123,11 +125,11 @@ class Calendar_Controller extends Action_Controller
 		$context['calendar_grid_current'] = getCalendarGrid($curPage['month'], $curPage['year'], $calendarOptions);
 
 		// Only show previous month if it isn't pre-January of the min-year
-		if ($context['calendar_grid_current']['previous_calendar']['year'] > $modSettings['cal_minyear'] || $curPage['month'] != 1)
+		if ($context['calendar_grid_current']['previous_calendar']['year'] > $context['cal_minyear'] || $curPage['month'] != 1)
 			$context['calendar_grid_prev'] = getCalendarGrid($context['calendar_grid_current']['previous_calendar']['month'], $context['calendar_grid_current']['previous_calendar']['year'], $calendarOptions);
 
 		// Only show next month if it isn't post-December of the max-year
-		if ($context['calendar_grid_current']['next_calendar']['year'] < $modSettings['cal_maxyear'] || $curPage['month'] != 12)
+		if ($context['calendar_grid_current']['next_calendar']['year'] < $context['cal_maxyear'] || $curPage['month'] != 12)
 			$context['calendar_grid_next'] = getCalendarGrid($context['calendar_grid_current']['next_calendar']['month'], $context['calendar_grid_current']['next_calendar']['year'], $calendarOptions);
 
 		// Basic template stuff.
@@ -234,6 +236,8 @@ class Calendar_Controller extends Action_Controller
 		loadTemplate('Calendar');
 		$context['sub_template'] = 'unlinked_event_post';
 
+		$context['cal_minyear'] = $modSettings['cal_minyear'];
+		$context['cal_maxyear'] = date('Y') + $modSettings['cal_limityear'];
 		$context['page_title'] = $event->isNew() ? $txt['calendar_edit'] : $txt['calendar_post_event'];
 		$context['linktree'][] = array(
 			'name' => $context['page_title'],
@@ -263,9 +267,9 @@ class Calendar_Controller extends Action_Controller
 			{
 				$save_data = $event->validate($_POST);
 			}
-			catch (Exception $e)
+			catch (Elk_Exception $e)
 			{
-				throw $e;
+				$e->fatalLangError();
 			}
 		}
 

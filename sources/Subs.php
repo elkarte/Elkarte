@@ -1963,6 +1963,15 @@ function theme()
  */
 function dieGif($expired = false)
 {
+	// The following logging is just for debug, it should be removed before final
+	// or at least once the bug is fixes #2391
+	$filename = '';
+	$linenum = '';
+	if (headers_sent($filename, $linenum))
+	{
+		Errors::instance()->log_error('Headers already sent in ' . $filename . ' at line ' . $linenum);
+	}
+
 	if ($expired === true)
 	{
 		header('Expires: Mon, 26 Jul 1997 05:00:00 GMT');

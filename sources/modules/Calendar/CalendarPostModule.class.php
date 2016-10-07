@@ -34,12 +34,14 @@ class Calendar_Post_Module implements ElkArte\sources\modules\Module_Interface
 	 */
 	public static function hooks(\Event_Manager $eventsManager)
 	{
-		global $context;
+		global $context, $modSettings;
 
 		// Posting an event?
 		self::$_make_event = isset($_REQUEST['calendar']);
 
 		$context['make_event'] = self::$_make_event;
+		$context['cal_minyear'] = $modSettings['cal_minyear'];
+		$context['cal_maxyear'] = date('Y') + $modSettings['cal_limityear'];
 
 		if (self::$_make_event)
 			return array(
@@ -224,7 +226,7 @@ class Calendar_Post_Module implements ElkArte\sources\modules\Module_Interface
 			if ($context['event']['month'] < 1 || $context['event']['month'] > 12)
 				Errors::instance()->fatal_lang_error('invalid_month', false);
 
-			if ($context['event']['year'] < $modSettings['cal_minyear'] || $context['event']['year'] > $modSettings['cal_maxyear'])
+			if ($context['event']['year'] < $modSettings['cal_minyear'] || $context['event']['year'] > date('Y') + $modSettings['cal_limityear'])
 				Errors::instance()->fatal_lang_error('invalid_year', false);
 
 			// Get a list of boards they can post in.

@@ -26,7 +26,7 @@ function template_Calendar_init()
  */
 function template_show_calendar()
 {
-	global $context, $txt, $scripturl, $modSettings;
+	global $context, $txt, $scripturl;
 
 	echo '
 		<div id="calendar">
@@ -57,7 +57,7 @@ function template_show_calendar()
 					<select name="year">';
 
 	// Show a link for every year.....
-	for ($year = $modSettings['cal_minyear']; $year <= $modSettings['cal_maxyear']; $year++)
+	for ($year = $context['cal_minyear']; $year <= $context['cal_maxyear']; $year++)
 		echo '
 						<option value="', $year, '"', $year == $context['current_year'] ? ' selected="selected"' : '', '>', $year, '</option>';
 
@@ -113,7 +113,7 @@ function template_unlinked_event_post()
 						<select name="year" id="year" tabindex="', $context['tabindex']++, '" onchange="generateDays();">';
 
 	// Show a list of all the years we allow...
-	for ($year = $modSettings['cal_minyear']; $year <= $modSettings['cal_maxyear']; $year++)
+	for ($year = $context['cal_minyear']; $year <= $context['cal_maxyear']; $year++)
 		echo '
 							<option value="', $year, '"', $year == $context['event']['year'] ? ' selected="selected"' : '', '>', $year, '</option>';
 

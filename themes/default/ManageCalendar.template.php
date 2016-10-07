@@ -18,7 +18,7 @@
  */
 function template_edit_holiday()
 {
-	global $context, $scripturl, $txt, $modSettings;
+	global $context, $scripturl, $txt;
 
 	// Show a form for all the holiday information.
 	echo '
@@ -41,7 +41,7 @@ function template_edit_holiday()
 							<option value="0000"', $context['holiday']['year'] == '0000' ? ' selected="selected"' : '', '>', $txt['every_year'], '</option>';
 
 	// Show a list of all the years we allow...
-	for ($year = $modSettings['cal_minyear']; $year <= $modSettings['cal_maxyear']; $year++)
+	for ($year = $context['cal_minyear']; $year <= $context['cal_maxyear']; $year++)
 		echo '
 							<option value="', $year, '"', $year == $context['holiday']['year'] ? ' selected="selected"' : '', '>', $year, '</option>';
 

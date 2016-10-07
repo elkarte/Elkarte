@@ -750,4 +750,25 @@ class UpgradeInstructions_upgrade_1_1
 			)
 		);
 	}
+
+	public function settings_title()
+	{
+		return 'Updating needed settings...';
+	}
+
+	public function mime_types()
+	{
+		return array(
+			array(
+				'debug_title' => 'Adjusting cal_maxyear/cal_limityear...',
+				'function' => function($db, $db_table)
+				{
+					updateSettings(array(
+						'cal_maxyear' => '2030',
+						'cal_limityear' => '10',
+					));
+				}
+			)
+		);
+	}
 }

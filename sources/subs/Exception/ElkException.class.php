@@ -33,6 +33,13 @@ class Elk_Exception extends Exception
 	protected $sprintf = array();
 
 	/**
+	 * The $txt index of the error message.
+	 *
+	 * @var string
+	 */
+	protected $index_message = '';
+
+	/**
 	 * Elk_Exception constructor.
 	 * Extended exception rules because we need more stuff
 	 *
@@ -51,12 +58,12 @@ class Elk_Exception extends Exception
 		$this->log = $log;
 		$this->sprintf = $sprintf;
 
-		$index_message = $this->_cleanMessage($message);
+		$this->index_message = $this->_cleanMessage($message);
 
-		if (isset($txt[$index_message]))
-			$real_message = $txt[$index_message];
+		if (isset($txt[$this->index_message]))
+			$real_message = $txt[$this->index_message];
 		else
-			$real_message = $index_message;
+			$real_message = $this->index_message;
 
 		// Make sure everything is assigned properly
 		parent::__construct($real_message, $code, $previous);
@@ -116,6 +123,6 @@ class Elk_Exception extends Exception
 	 */
 	public function fatalLangError()
 	{
-		Errors::instance()->fatal_lang_error($this->message, $this->log, $this->sprintf);
+		Errors::instance()->fatal_lang_error($this->index_message, $this->log, $this->sprintf);
 	}
 }

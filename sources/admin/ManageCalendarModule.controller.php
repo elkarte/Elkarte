@@ -221,7 +221,7 @@ class ManageCalendarModule_Controller extends Action_Controller
 	 */
 	public function action_editholiday()
 	{
-		global $txt, $context;
+		global $txt, $context, $modSettings;
 
 		//We need this, really..
 		require_once(SUBSDIR . '/Calendar.subs.php');
@@ -229,6 +229,8 @@ class ManageCalendarModule_Controller extends Action_Controller
 		loadTemplate('ManageCalendar');
 
 		$context['is_new'] = !isset($this->_req->query->holiday);
+		$context['cal_minyear'] = $modSettings['cal_minyear'];
+		$context['cal_maxyear'] = date('Y') + $modSettings['cal_limityear'];
 		$context['page_title'] = $context['is_new'] ? $txt['holidays_add'] : $txt['holidays_edit'];
 		$context['sub_template'] = 'edit_holiday';
 
@@ -364,7 +366,8 @@ class ManageCalendarModule_Controller extends Action_Controller
 			'',
 				// Dates of calendar...
 				array('int', 'cal_minyear'),
-				array('int', 'cal_maxyear'),
+				// cal_maxyear kept for compatibility purposes
+// 				array('int', 'cal_maxyear'),
 			'',
 				// Calendar spanning...
 				array('check', 'cal_allowspan'),
