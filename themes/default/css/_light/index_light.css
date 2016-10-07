@@ -143,7 +143,7 @@ input[type=submit][disabled]:hover, button[disabled], button[disabled]:hover {
 	border-color: #AFAFAF;
 	border-top-color: #CFCFCF;
 	border-left-color: #BFBFBF;
-	box-shadow: 1px 1px 2px #E5E5E5;
+	box-shadow: 1px 1px 2px #E4E4E4;
 }
 
 /* the new "button" */
@@ -190,7 +190,7 @@ strong {
 .category_header, .content_category .category_header {
 	border-top-color: #CFCFCF;
 	border-bottom-color: #BBBBBB;
-	background: #E9E9E9;
+	background: #EBEBEB;
 	background-image: linear-gradient(to bottom, #FAFAFA, #E4E4E4);
 }
 
@@ -1231,7 +1231,7 @@ div.bbc_footnotes .meaction {
 
 /* On to the posts */
 #quickreplybox, #forumposts, #searchform, #recentposts, #pmFolder, #topic_summary, #preview_section {
-	background: #E5E5E5;
+	background: #E4E4E4;
 	box-shadow: 1px 2px 4px #EEEEEE;
 }
 
@@ -1457,7 +1457,7 @@ div.bbc_footnotes .meaction {
 
 #profile_attachments {
 	border-color: #CCCCCC;
-	background: #EEEFEE;
+	background: #EEEEEE;
 	box-shadow: 0 -2px 2px rgba(0, 0, 0, 0.1);
 }
 
@@ -1937,13 +1937,13 @@ a.helpicon:hover, a > .iconline:hover, a > .icoffline:hover {
 
 .iconline {
 	background: #B4E391;
-	background-image: linear-gradient(to bottom, #b4e391 0%,#61c419 50%,#b4e391 100%);
+	background-image: linear-gradient(to bottom, #B4E391 0%,#61C419 50%,#b4E391 100%);
 	border-color: #27A348;
 }
 
 .icoffline {
-	background: #BABABA;
-	background-image: linear-gradient(to bottom, #bababa 0%,#6f6f6f 50%,#bababa 100%);
+	background: #BBBBBB;
+	background-image: linear-gradient(to bottom, #BBBBBB 0%,#6f6f6f 50%,#BBBBBB 100%);
 	border-color: #828282;
 }
 
