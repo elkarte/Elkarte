@@ -5467,9 +5467,9 @@ a > i {
 }
 
 .icon-lg {
-	  height: 2em;
-	  width: 2em;
-	  line-height: 2em;
+	height: 2em;
+	width: 2em;
+	line-height: 2em;
 }
 
 .icon-xl {
@@ -5505,7 +5505,7 @@ a > i {
 	height: 1.75em;
 	background: no-repeat center;
 	background-size: contain;
-	margin: -2px 0 0 -4px;
+	margin: -3px 0 0 -4px;
 }
 
 /* This is for fixing vertical positioning with a few odd icons. Sometimes because of icons, sometimes because of
@@ -5523,6 +5523,9 @@ a > i {
 
 /* Helper class */
 .icon-menu {
+	height: 1.5em;
+	width: 1.5em;
+	padding: 0 0 3px 0;
 }
 
 /* -------------------------------------------------------
@@ -5603,22 +5606,33 @@ a > i {
 	.elk_previewvideo {
 		max-width: 100%;
 	}
+
+	#menu_nav {
+		padding: 6px 0;
+	}
 }
 
 /* This one does 800 screens at default font size. */
 @media screen and (max-width: 50em) {
 	.icon-menu {
 		display: inline-block;
-		margin: .1em;
-		padding: .45em;
+		margin: .05em;
+		padding: .35em;
 		border: .25em solid;
 		border-radius: .25em;
 		vertical-align: middle;
+		width: 2em;
+		height: 2em;
 	}
 
 	.icon-menu.i-account {
 		width: 2em;
 		height: 2em;
+	}
+
+	.i-account:before {
+		width: 2.5em;
+		height: 2.5em;
 	}
 
 	#collapse_button .linklevel1 {
@@ -5650,7 +5664,7 @@ a > i {
 	}
 
 	#collapse_button {
-		padding-top: 0.5em;
+		padding-top: 0.2em;
 	}
 
 	dd input, dd select, dd textarea {
@@ -6491,6 +6505,21 @@ a > i {
 
 /* This one does 480px screens at default font size. */
 @media screen and (max-width: 30em) {
+	.icon-menu {
+		width: 1.75em;
+		height: 1.75em;
+	}
+
+	.icon-menu.i-account {
+		width: 1.75em;
+		height: 1.75em;
+	}
+
+	.i-account:before {
+		width: 2.25em;
+		height: 2.25em;
+	}
+
 	.content {
 		padding: 0.1em 0.1em;
 	}
