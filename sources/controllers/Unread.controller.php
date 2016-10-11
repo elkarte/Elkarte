@@ -498,7 +498,7 @@ class Unread_Controller extends Action_Controller
 	 */
 	private function _buttonsArray($topics_to_mark)
 	{
-		global $context, $scripturl;
+		global $context, $scripturl, $txt;
 
 		if ($this->_is_topics)
 		{

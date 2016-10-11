@@ -394,7 +394,6 @@ hr {
 	color: #377828;
 	text-decoration: none;
 }
-
 /* Styling for tables inside posts */
 .inner > .bbc_table_container > .bbc_table td {
 	border-bottom: 1px solid #ccc;
@@ -1409,8 +1408,10 @@ a.active {
 	background: #43A8DA;
 }
 
-/*	$CALENDAR		*/
-/* ------------------------------------------------------- */
+/* -------------------------------------------------------
+ *	$CALENDAR
+ * -------------------------------------------------------
+ */
 .calendar_table {
 	border-top-color: transparent;
 }
@@ -1605,9 +1606,10 @@ a.help .icon {
 	cursor: pointer;
 }
 
-/* ------------------------------------------------------- */
-/*	$MEMBERLIST                                            */
-/* ------------------------------------------------------- */
+/* -------------------------------------------------------
+ *	$MEMBERLIST
+ * -------------------------------------------------------
+ */
 
 .mlist .mlist_header div {
 	border-top: 1px solid #CCCCCC;
@@ -1641,7 +1643,7 @@ a.help .icon {
 }
 
 #error_log, .error_where {
-    border-top-color: #ccc !important;
+    border-top-color: #CCCCCC !important;
 }
 
 .iconline {
@@ -1699,7 +1701,7 @@ a.help .icon {
 }
 
 .i-envelope-o-blank::before {
-  content: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='orange' viewBox='0 0 3584 3584'%3E%3Cpath d='M3328 3008v-1536q-64 72-138 132-536 412-852 676-102 86-166 134t-173 97-205 49h-2-2q-96 0-205-49t-173-97-166-134q-316-264-852-676-74-60-138-132v1536q0 26 19 45t45 19h2944q26 0 45-19t19-45z m0-2102v-22-27t-1-26-6-25-11-18-18-15-28-5h-2944q-26 0-45 19t-19 45q0 336 294 568 386 304 802 634 12 10 70 59t92 75 89 63 101 55 86 18h2 2q40 0 86-18t101-55 89-63 92-75 70-59q416-330 802-634 108-86 201-231t93-263z m256-74v2176q0 132-94 226t-226 94h-2944q-132 0-226-94t-94-226v-2176q0-132 94-226t226-94h2944q132 0 226 94t94 226z'/%3E%3C/svg%3E");
+	content: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='orange' viewBox='0 0 3584 3584'%3E%3Cpath d='M3328 3008v-1536q-64 72-138 132-536 412-852 676-102 86-166 134t-173 97-205 49h-2-2q-96 0-205-49t-173-97-166-134q-316-264-852-676-74-60-138-132v1536q0 26 19 45t45 19h2944q26 0 45-19t19-45z m0-2102v-22-27t-1-26-6-25-11-18-18-15-28-5h-2944q-26 0-45 19t-19 45q0 336 294 568 386 304 802 634 12 10 70 59t92 75 89 63 101 55 86 18h2 2q40 0 86-18t101-55 89-63 92-75 70-59q416-330 802-634 108-86 201-231t93-263z m256-74v2176q0 132-94 226t-226 94h-2944q-132 0-226-94t-94-226v-2176q0-132 94-226t226-94h2944q132 0 226 94t94 226z'/%3E%3C/svg%3E");
 }
 
 
@@ -2033,11 +2035,13 @@ a.help .icon {
 @media screen and (max-width: 55em) and (min-width: 55em) {
 	.icon-menu {
 		display: inline-block;
-		margin: .1em;
-		padding: .1em;
+		margin: .05em;
+		padding: .35em;
 		border: .25em solid;
 		border-radius: .25em;
 		vertical-align: middle;
+		width: 2em;
+		height: 2em;
 	}
 
 	.button_title {
@@ -2050,10 +2054,7 @@ a.help .icon {
 	body {
 		margin-top: 20px;
 	}
-	.icon-menu {
-		font-size: 130% !important;
-		border: 3px solid;
-	}
+
 	#menu_sidebar {
 		border-color: #AAAAAA;
 		border-radius: 4px;
