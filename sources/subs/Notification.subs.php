@@ -716,7 +716,7 @@ function sendAdminNotifications($type, $memberID, $member_name = null)
 	// Needed to notify admins, or anyone
 	require_once(SUBSDIR . '/Mail.subs.php');
 
-	if ($member_name == null)
+	if ($member_name === null)
 	{
 		require_once(SUBSDIR . '/Members.subs.php');
 

@@ -214,7 +214,7 @@ class Database_MySQL extends Database_Abstract
 					$pos2 = strpos($db_string, '\\', $pos + 1);
 					if ($pos1 === false)
 						break;
-					elseif ($pos2 == false || $pos2 > $pos1)
+					elseif ($pos2 === false || $pos2 > $pos1)
 					{
 						$pos = $pos1;
 						break;

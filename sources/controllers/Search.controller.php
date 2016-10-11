@@ -535,7 +535,7 @@ class Search_Controller extends Action_Controller
 
 		// Remember which message this is.  (ie. reply #83)
 		static $counter = null;
-		if ($counter == null || $reset)
+		if ($counter === null || $reset)
 			$counter = $_REQUEST['start'] + 1;
 
 		// Start from the beginning...

@@ -523,7 +523,7 @@ function registerMember(&$regOptions, $error_context = 'register')
 		$passwordError = validatePassword($regOptions['password'], $regOptions['username'], array($regOptions['email']));
 
 		// Password isn't legal?
-		if ($passwordError != null)
+		if ($passwordError !== null)
 			$reg_errors->addError('profile_error_password_' . $passwordError);
 	}
 

@@ -272,7 +272,7 @@ class ModerationCenter_Controller extends Action_Controller
 		unset($moderation_areas);
 
 		// We got something - didn't we? DIDN'T WE!
-		if ($mod_include_data == false)
+		if ($mod_include_data === false)
 			Errors::instance()->fatal_lang_error('no_access', false);
 
 		// Retain the ID information in case required by a subaction.

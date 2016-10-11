@@ -556,12 +556,12 @@ class Install_Controller
 			$db = database();
 
 			// No dice?  Let's try adding the prefix they specified, just in case they misread the instructions ;)
-			if ($db_connection == null)
+			if ($db_connection === null)
 			{
 				$db_error = $db->last_error();
 
 				$db_connection = elk_db_initiate($db_server, $db_name, $_POST['db_prefix'] . $db_user, $db_passwd, $db_prefix, array('non_fatal' => true, 'dont_select_db' => true, 'port' => $db_port), $db_type);
-				if ($db_connection != null)
+				if ($db_connection !== null)
 				{
 					$db_user = $_POST['db_prefix'] . $db_user;
 					updateSettingsFile(array('db_user' => $db_user));

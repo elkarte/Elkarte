@@ -222,7 +222,7 @@ function preparsetable($message)
 	);
 
 	// Find all closing tags (/table /tr /td etc)
-	while (preg_match('~\[(/)*(table|tr|td|th)\]~', $table_check, $matches) != false)
+	while (preg_match('~\[(/)*(table|tr|td|th)\]~', $table_check, $matches) !== false)
 	{
 		// Keep track of where this is.
 		$offset = strpos($table_check, $matches[0]);
@@ -1569,7 +1569,7 @@ function getFormMsgSubject($editing, $topic, $first_subject = '', $msg_id = 0)
 
 			// Make sure they _can_ quote this post, and if so get it.
 			$request = $db->query('', '
-				SELECT 
+				SELECT
 					m.subject, IFNULL(mem.real_name, m.poster_name) AS poster_name, m.poster_time, m.body
 				FROM {db_prefix}messages AS m
 					INNER JOIN {db_prefix}boards AS b ON (b.id_board = m.id_board AND {query_see_board})

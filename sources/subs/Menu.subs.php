@@ -127,7 +127,7 @@ function createMenu($menuData, $menuOptions = array())
 		foreach ($section['areas'] as $area_id => $area)
 		{
 			// Can we do this?
-			if (!isset($area['enabled']) || $area['enabled'] != false)
+			if (!isset($area['enabled']) || $area['enabled'] !== false)
 			{
 				// Has permission check?
 				if (!empty($area['permission']))
@@ -194,7 +194,7 @@ function createMenu($menuData, $menuOptions = array())
 							{
 								if ((empty($sub[1]) || allowedTo($sub[1])) && (!isset($sub['enabled']) || !empty($sub['enabled'])))
 								{
-									if ($first_sa == null)
+									if ($first_sa === null)
 										$first_sa = $sa;
 
 									$menu_context['sections'][$section_id]['areas'][$area_id]['subsections'][$sa] = array('label' => $sub[0]);

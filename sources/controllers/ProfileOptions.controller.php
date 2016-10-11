@@ -392,7 +392,7 @@ class ProfileOptions_Controller extends Action_Controller
 			);
 		}
 	}
-	
+
 
 	/**
 	 * Allow the user to change the forum options in their profile.
@@ -508,7 +508,7 @@ class ProfileOptions_Controller extends Action_Controller
 					$passwordErrors = validatePassword($this->_req->post->passwrd1, $cur_profile['member_name'], array($cur_profile['real_name'], $cur_profile['email_address']));
 
 					// Were there errors?
-					if ($passwordErrors != null)
+					if ($passwordErrors !== null)
 						$post_errors[] = 'password_' . $passwordErrors;
 				}
 

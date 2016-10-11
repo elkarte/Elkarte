@@ -640,7 +640,7 @@ function packageRequireFTP($destination_url, $files = null, $return = false)
 	}
 
 	// They've opted to not use FTP, and try anyway.
-	if (isset($_SESSION['pack_ftp']) && $_SESSION['pack_ftp'] == false)
+	if (isset($_SESSION['pack_ftp']) && $_SESSION['pack_ftp'] === false)
 	{
 		if ($files === null)
 			return array();
@@ -1650,7 +1650,7 @@ function copytree($source, $destination)
 		mktree($destination, 0777);
 
 	$current_dir = opendir($source);
-	if ($current_dir == false)
+	if ($current_dir === false)
 		return;
 
 	while ($entryname = readdir($current_dir))

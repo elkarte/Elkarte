@@ -650,7 +650,7 @@ function loadProfileFields($force_reload = false)
 				$passwordErrors = validatePassword($value, $cur_profile['member_name'], array($cur_profile['real_name'], $user_info['username'], $user_info['name'], $user_info['email']));
 
 				// Were there errors?
-				if ($passwordErrors != null)
+				if ($passwordErrors !== null)
 					return 'password_' . $passwordErrors;
 
 				// Set up the new password variable... ready for storage.
@@ -2118,7 +2118,7 @@ function profileSaveAvatarData(&$value)
 		$url = parse_url($_POST['userpicpersonal']);
 		$contents = fetch_web_data((empty($url['scheme']) ? 'http://' : $url['scheme'] . '://') . $url['host'] . (empty($url['port']) ? '' : ':' . $url['port']) . str_replace(' ', '%20', trim($url['path'])));
 
-		if ($contents != false)
+		if ($contents !== false)
 		{
 			// Create a hashed name to save
 			$new_avatar_name = $uploadDir . '/' . getAttachmentFilename('avatar_tmp_' . $memID, false, null, true);

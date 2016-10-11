@@ -129,7 +129,7 @@ function sendmail($to, $subject, $message, $from = null, $message_id = null, $se
 		$from_name = '"' . $from_name . '"';
 
 	// Construct the from / replyTo mail headers, based on if we showing a users name
-	if ($from_wrapper != null)
+	if ($from_wrapper !== null)
 	{
 		$headers = 'From: ' . $from_name . ' <' . $from_wrapper . '>' . $line_break;
 

@@ -264,7 +264,7 @@ class Database_PostgreSQL extends Database_Abstract
 
 					if ($pos1 === false)
 						break;
-					elseif ($pos2 == false || $pos2 > $pos1)
+					elseif ($pos2 === false || $pos2 > $pos1)
 					{
 						$pos = $pos1;
 						break;

@@ -934,7 +934,7 @@ class ManageMaillist_Controller extends Action_Controller
 		}
 
 		// Prepare some final context for the template
-		$title = !empty($this->_req->query->saved) ? 'saved_filter' : ($context['editing'] == true ? 'edit_filter' : 'add_filter');
+		$title = !empty($this->_req->query->saved) ? 'saved_filter' : ($context['editing'] === true ? 'edit_filter' : 'add_filter');
 		$context['post_url'] = $scripturl . '?action=admin;area=maillist;sa=editfilter' . ($context['editing'] ? ';edit=' . $modSettings['id_filter'] : ';new') . ';save';
 		$context['settings_title'] = $txt[$title];
 		$context['linktree'][] = array(
@@ -1321,7 +1321,7 @@ class ManageMaillist_Controller extends Action_Controller
 		}
 
 		// Prepare the context for viewing
-		$title = ((isset($this->_req->query->saved) && $this->_req->query->saved == '1') ? 'saved_parser' : ($context['editing'] == true ? 'edit_parser' : 'add_parser'));
+		$title = ((isset($this->_req->query->saved) && $this->_req->query->saved == '1') ? 'saved_parser' : ($context['editing'] === true ? 'edit_parser' : 'add_parser'));
 		$context['settings_title'] = $txt[$title];
 		$context['post_url'] = $scripturl . '?action=admin;area=maillist;sa=editparser' . ($context['editing'] ? ';edit=' . $modSettings['id_filter'] : ';new') . ';save';
 		$context['linktree'][] = array(
