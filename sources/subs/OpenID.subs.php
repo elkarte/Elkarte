@@ -54,7 +54,7 @@ class OpenID
 			return 'no_data';
 
 		// Is there an existing association?
-		if (($assoc = $this->getAssociation($response_data['provider'])) == null)
+		if (($assoc = $this->getAssociation($response_data['provider'])) === null)
 			$assoc = $this->makeAssociation($response_data['provider']);
 
 		// Include file for member existence

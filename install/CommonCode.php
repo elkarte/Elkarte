@@ -443,9 +443,9 @@ class Ftp_Connection
 				$lookup_file = $_SERVER['PHP_SELF'];
 
 			$found_path = dirname($this->locate('*' . basename(dirname($lookup_file)) . '/' . basename($lookup_file), $data));
-			if ($found_path == false)
+			if ($found_path === false)
 				$found_path = dirname($this->locate(basename($lookup_file)));
-			if ($found_path != false)
+			if ($found_path !== false)
 				$path = $found_path;
 		}
 		elseif (is_resource($this->connection))

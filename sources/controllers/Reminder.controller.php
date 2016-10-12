@@ -227,7 +227,7 @@ class Reminder_Controller extends Action_Controller
 		$passwordError = validatePassword($this->_req->post->passwrd1, $member['member_name'], array($member['email_address']));
 
 		// What - it's not?
-		if ($passwordError != null)
+		if ($passwordError !== null)
 			Errors::instance()->fatal_lang_error('profile_error_password_' . $passwordError, false);
 
 		// Quit if this code is not right.
@@ -317,7 +317,7 @@ class Reminder_Controller extends Action_Controller
 		$passwordError = validatePassword($this->_req->post->passwrd1, $member['member_name'], array($member['email_address']));
 
 		// Invalid?
-		if ($passwordError != null)
+		if ($passwordError !== null)
 			Errors::instance()->fatal_lang_error('profile_error_password_' . $passwordError, false);
 
 		// Alright, so long as 'yer sure.

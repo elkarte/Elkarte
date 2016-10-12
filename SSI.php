@@ -186,7 +186,7 @@ function ssi_recentPosts($num_recent = 8, $exclude_boards = null, $include_board
 	{
 		$include_boards = is_array($include_boards) ? $include_boards : array($include_boards);
 	}
-	elseif ($include_boards != null)
+	elseif ($include_boards !== null)
 	{
 		$include_boards = array();
 	}
@@ -393,7 +393,7 @@ function ssi_recentTopics($num_recent = 8, $exclude_boards = null, $include_boar
 	// Only some boards?.
 	if (is_array($include_boards) || (int) $include_boards === $include_boards)
 		$include_boards = is_array($include_boards) ? $include_boards : array($include_boards);
-	elseif ($include_boards != null)
+	elseif ($include_boards !== null)
 	{
 		$output_method = $include_boards;
 		$include_boards = array();
@@ -1070,7 +1070,7 @@ function ssi_recentPoll($topPollInstead = false, $output_method = 'echo')
 	$db->free_result($request);
 
 	// This user has voted on all the polls.
-	if ($row == false)
+	if ($row === false)
 		return array();
 
 	// If this is a guest who's voted we'll through ourselves to show poll to show the results.

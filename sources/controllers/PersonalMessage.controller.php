@@ -3003,7 +3003,7 @@ function preparePMContext_callback($type = 'subject', $reset = false)
 	}
 
 	// Bail if it's false, ie. no messages.
-	if ($messages_request == false)
+	if ($messages_request === false)
 	{
 		return false;
 	}

@@ -242,7 +242,7 @@ class ManageBoards_Controller extends Action_Controller
 							$context['categories'][$catid]['boards'][$prev_board]['move_links'] = array();
 
 						for ($i = 0; $i < -$difference; $i++)
-							if (($temp = array_pop($stack)) != null)
+							if (($temp = array_pop($stack)) !== null)
 								array_unshift($context['categories'][$catid]['boards'][$prev_board]['move_links'], $temp);
 					}
 
@@ -565,7 +565,7 @@ class ManageBoards_Controller extends Action_Controller
 			$context['can_move_children'] = false;
 			$context['children'] = $boards[$this->boardid]['tree']['children'];
 			foreach ($context['board_order'] as $board)
-				if ($board['is_child'] == false && $board['selected'] == false)
+				if ($board['is_child'] === false && $board['selected'] === false)
 					$context['can_move_children'] = true;
 		}
 

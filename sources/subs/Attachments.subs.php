@@ -1166,7 +1166,7 @@ function isAttachmentImage($id_attach)
 
 	// Make sure this attachment is on this board.
 	$request = $db->query('', '
-		SELECT 
+		SELECT
 			a.filename, a.fileext, a.id_attach, a.attachment_type, a.mime_type, a.approved, a.downloads, a.size, a.width, a.height,
 			m.id_topic, m.id_board
 		FROM {db_prefix}attachments as a
@@ -1372,7 +1372,7 @@ function url_image_size($url)
 		$fp = @fsockopen($match[1], 80, $temp, $temp, 0.5);
 
 		// Successful?  Continue...
-		if ($fp != false)
+		if ($fp !== false)
 		{
 			// Send the HEAD request (since we don't have to worry about chunked, HTTP/1.1 is fine here.)
 			fwrite($fp, 'HEAD /' . $match[2] . ' HTTP/1.1' . "\r\n" . 'Host: ' . $match[1] . "\r\n" . 'User-Agent: PHP/ELK' . "\r\n" . 'Connection: close' . "\r\n\r\n");

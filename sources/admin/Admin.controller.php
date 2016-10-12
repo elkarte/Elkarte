@@ -539,7 +539,7 @@ class Admin_Controller extends Action_Controller
 		unset($admin_areas);
 
 		// Nothing valid?
-		if ($admin_include_data == false)
+		if ($admin_include_data === false)
 			Errors::instance()->fatal_lang_error('no_access', false);
 
 		// Build the link tree.

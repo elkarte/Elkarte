@@ -351,7 +351,7 @@ function pbe_parse_email_message(&$body)
 			// Test the regex and if good add it to the array, else skip it
 			// @todo these are tested at insertion now, so this test is really not necessary
 			$temp = preg_replace($row['filter_from'], '', '$5#6#8%9456@^)098');
-			if ($temp != null)
+			if ($temp !== null)
 				$expressions[] = array('type' => 'regex', 'parser' => $row['filter_from']);
 		}
 		else
@@ -418,7 +418,7 @@ function pbe_filter_email_message($text)
 
 			// Test the regex and if good use, else skip, don't want a bad regex to empty the message!
 			$temp = preg_replace($row['filter_from'], $row['filter_to'], $text);
-			if ($temp != null)
+			if ($temp !== null)
 				$text = $temp;
 		}
 		else

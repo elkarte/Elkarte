@@ -772,7 +772,7 @@ class Display_Controller extends Action_Controller
 		static $signature_shown = null;
 
 		// If the query returned false, bail.
-		if ($messages_request == false)
+		if ($messages_request === false)
 			return false;
 
 		// Remember which message this is.  (ie. reply #83)
