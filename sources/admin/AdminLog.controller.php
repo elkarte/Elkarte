@@ -39,7 +39,7 @@ class AdminLog_Controller extends Action_Controller
 		global $context, $txt, $scripturl, $modSettings;
 
 		// These are the logs they can load.
-		$log_functions = array(
+		$subActions = array(
 			'errorlog' => array(
 				'function' => 'action_index',
 				'controller' => 'ManageErrors_Controller'),
@@ -102,44 +102,18 @@ class AdminLog_Controller extends Action_Controller
 			),
 		);
 
-		// Give integration a way to add items
-		call_integration_hook('integrate_manage_logs', array(&$log_functions));
-		$sub_action = isset($this->_req->query->sa, $log_functions[$this->_req->query->sa]) && empty($log_functions[$this->_req->query->sa]['disabled']) ? $this->_req->query->sa : 'errorlog';
-
 		// If it's not got a sa set it must have come here for first time, pretend error log should be reversed.
 		if (!isset($this->_req->query->sa))
 			$this->_req->query->desc = true;
 
-		// figure out what to call
-		if (isset($log_functions[$sub_action]['file']))
-		{
-			// different file
-			require_once(ADMINDIR . '/' . $log_functions[$sub_action]['file']);
-		}
+		// Set up the action control
+		$action = new Action('manage_logs');
 
-		if (isset($log_functions[$sub_action]['controller']))
-		{
-			// if we have an object oriented controller, call its method
-			$controller = new $log_functions[$sub_action]['controller'](new Event_Manager());
-			$controller->pre_dispatch();
-			$controller->{$log_functions[$sub_action]['function']}();
-		}
-		elseif (isset($log_functions[$sub_action]['function']))
-		{
-			// procedural: call the function
-			$log_functions[$sub_action]['function']();
-		}
-		else
-		{
-			// our own method then
+		// By default do the basic settings, call integrate_sa_modify_features
+		$subAction = $action->initialize($subActions, 'errorlog');
 
-			// initialize the form
-			$this->{$log_functions[$sub_action]['init']}();
-
-			// call the action handler
-			// this is hardcoded now, to be fixed
-			$this->{$log_functions[$sub_action]['display']}();
-		}
+		// Call the right function for this sub-action.
+		$action->dispatch($subAction);
 	}
 
 	/**
