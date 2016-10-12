@@ -36,15 +36,20 @@ class Memcached extends Cache_Method_Abstract
 	 */
 	public function __construct($options)
 	{
+		if (empty($options['servers']))
+		{
+			$options['servers'] = array();
+		}
+
 		parent::__construct($options);
 
 		if ($this->isAvailable())
 		{
-			if (class_exists('Memcached', false))
+			if (class_exists('\\Memcached', false))
 			{
 				$this->obj = new \Memcached;
 			}
-			elseif (class_exists('Memcache', false))
+			elseif (class_exists('\\Memcache', false))
 			{
 				$this->obj = new \Memcache;
 			}
@@ -130,7 +135,7 @@ class Memcached extends Cache_Method_Abstract
 	 */
 	protected function setOptions()
 	{
-		if (class_exists('Memcached', false))
+		if (class_exists('\\Memcached', false))
 		{
 			/*
 			 * the timeout after which a server is considered DEAD.
@@ -160,7 +165,7 @@ class Memcached extends Cache_Method_Abstract
 			 */
 			$this->obj->setOption(\Memcached::OPT_RETRY_TIMEOUT, 1);
 		}
-		elseif (class_exists('Memcache', false))
+		elseif (class_exists('\\Memcache', false))
 		{
 			$this->obj->setOption(\Memcache::OPT_CONNECT_TIMEOUT, 100);
 			$this->obj->setOption(\Memcache::OPT_DISTRIBUTION, \Memcache::DISTRIBUTION_CONSISTENT);
@@ -175,7 +180,7 @@ class Memcached extends Cache_Method_Abstract
 	 */
 	public function isAvailable()
 	{
-		return class_exists('Memcached') || class_exists('Memcache');
+		return class_exists('\\Memcached') || class_exists('\\Memcache');
 	}
 
 	/**
@@ -183,9 +188,11 @@ class Memcached extends Cache_Method_Abstract
 	 */
 	public function details()
 	{
+		$version = $this->obj->getVersion();
+
 		return array(
 			'title' => $this->title,
-			'version' => current($this->obj->getVersion())
+			'version' => !empty($version) ? current($version) : 0
 		);
 	}
 
