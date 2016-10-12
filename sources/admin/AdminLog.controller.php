@@ -64,8 +64,8 @@ class AdminLog_Controller extends Action_Controller
 				'function' => 'action_log',
 				'controller' => 'ManageScheduledTasks_Controller'),
 			'pruning' => array(
-				'init' => '_initPruningSettingsForm',
-				'display' => 'action_pruningSettings_display'),
+				'controller' => $this,
+				'function' => 'action_pruningSettings_display'),
 		);
 
 		// Setup the tabs.
