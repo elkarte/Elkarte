@@ -55,6 +55,7 @@ class UpgradeInstructions_upgrade_1_1
 				'debug_title' => 'Remove any old file left and check if the table is empty...',
 				'function' => function($db, $db_table)
 				{
+					updateSettings(array('detailed-version.js' => 'https://elkarte.github.io/Elkarte/site/detailed-version.js'));
 					foreach (array('current-version.js', 'detailed-version.js', 'latest-news.js', 'latest-smileys.js', 'latest-versions.txt') as $file)
 					{
 						$db->query('', '
