@@ -231,7 +231,7 @@ class Attachment_Controller extends Action_Controller
 			if ($result !== true)
 			{
 				loadLanguage('Errors');
-				$context['json_data'] = array('result' => false, 'data' => $txt[$result]);
+				$context['json_data'] = array('result' => false, 'data' => $txt[!empty($result) ? $result : 'attachment_not_found']);
 			}
 		}
 		else
