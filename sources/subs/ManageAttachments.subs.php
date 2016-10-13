@@ -277,6 +277,8 @@ function removeAttachments($condition, $query_type = '', $return_affected_messag
 
 	if ($return_affected_messages)
 		return array_unique($msgs);
+	else
+		return true;
 }
 
 /**
