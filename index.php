@@ -62,13 +62,14 @@ if (file_exists('install'))
 	}
 	if (empty($ignore_install_dir))
 	{
-		if (file_exists($settings_loc) && empty($_SESSION['installing']))
+		// No install_time defined or finished the installing in the last 2 minutes
+		if (empty($install_time) || $install_time - time() < 120)
 		{
-			$redirec_file = 'upgrade.php';
+			$redirec_file = 'install.php';
 		}
 		else
 		{
-			$redirec_file = 'install.php';
+			$redirec_file = 'upgrade.php';
 		}
 
 		header('Location: http' . (!empty($_SERVER['HTTPS']) && strtolower($_SERVER['HTTPS']) == 'on' ? 's' : '') . '://' . (empty($_SERVER['HTTP_HOST']) ? $_SERVER['SERVER_NAME'] . (empty($_SERVER['SERVER_PORT']) || $_SERVER['SERVER_PORT'] == '80' ? '' : ':' . $_SERVER['SERVER_PORT']) : $_SERVER['HTTP_HOST']) . (strtr(dirname($_SERVER['PHP_SELF']), '\\', '/') == '/' ? '' : strtr(dirname($_SERVER['PHP_SELF']), '\\', '/')) . '/install/' . $redirec_file);

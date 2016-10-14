@@ -1261,7 +1261,7 @@ function action_deleteUpgrade()
 		),
 		array(
 			time(), 3, $user_info['id'], $command_line ? '127.0.0.1' : $user_info['ip'], 'upgrade',
-			0, 0, 0, serialize(array('version' => FORUM_VERSION, 'member' => $user_info['id'])),
+			0, 0, 0, serialize(array('version' => CURRENT_VERSION, 'member' => $user_info['id'])),
 		),
 		array('id_action')
 	);

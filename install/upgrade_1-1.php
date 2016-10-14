@@ -757,7 +757,7 @@ class UpgradeInstructions_upgrade_1_1
 		return 'Updating needed settings...';
 	}
 
-	public function mime_types()
+	public function settings()
 	{
 		return array(
 			array(

@@ -449,7 +449,10 @@ class Install_Controller
 				if (!$foundOne)
 				{
 					if (isset($db['default_host']))
-						$incontext['db']['server'] = ini_get($db['default_host']) || $incontext['db']['server'] = 'localhost';
+					{
+						$default_host = ini_get($db['default_host']);
+						$incontext['db']['server'] = !empty($default_host) ? $default_host : 'localhost';
+					}
 					if (isset($db['default_user']))
 					{
 						$incontext['db']['user'] = ini_get($db['default_user']);
@@ -876,7 +879,7 @@ class Install_Controller
 		}
 
 		// Check for the ALTER privilege.
-		if (!empty($databases[$db_type]['alter_support']) && $db->query('', "ALTER TABLE {$db_prefix}boards ORDER BY id_board", array('security_override' => true, 'db_error_skip' => true)) === false)
+		if (!empty($databases[$db_type]['alter_support']) && $db->query('', "ALTER TABLE {$db_prefix}log_digest ORDER BY id_topic", array('security_override' => true, 'db_error_skip' => true)) === false)
 		{
 			$incontext['error'] = $txt['error_db_alter_priv'];
 			return false;
@@ -1112,9 +1115,12 @@ class Install_Controller
 
 		// Bring a warning over.
 		if (!empty($incontext['account_existed']))
+		{
 			$incontext['warning'] = $incontext['account_existed'];
+		}
 
 		if (!empty($db_character_set) && !empty($databases[$db_type]['utf8_support']))
+		{
 			$db->query('', '
 				SET NAMES {raw:db_character_set}',
 				array(
@@ -1122,6 +1128,7 @@ class Install_Controller
 					'db_error_skip' => true,
 				)
 			);
+		}
 
 		// As track stats is by default enabled let's add some activity.
 		$db->insert('ignore',
@@ -1130,6 +1137,10 @@ class Install_Controller
 			array(strftime('%Y-%m-%d', time()), 1, 1, (!empty($incontext['member_id']) ? 1 : 0)),
 			array('date')
 		);
+
+		// Take notes of when the installation was finished not to send to the
+		// upgrade when pointing to index.php and the install directory is still there.
+		updateSettingsFile(array('install_time' => time()));
 
 		// We're going to want our lovely $modSettings now.
 		$request = $db->query('', '
