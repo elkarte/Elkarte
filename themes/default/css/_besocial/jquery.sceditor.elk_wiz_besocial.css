@@ -21,7 +21,7 @@ body {
 }
 
 [contenteditable="true"] {
-	font: 90%/130% Helvetica, Arial, "Nimbus Sans L", sans-serif;
+	font: 90%/130% Helvetica, "Helvetica Neue", "Liberation Sans", Arial, sans-serif;
 }
 
 ul, ol {
@@ -54,7 +54,7 @@ code {
 	border-bottom: 3px solid #AAAAAA;
 	background: #F3F3F3;
 	white-space: pre;
-	font-size: 0.7em;
+	font-size: .9em;
 	font-family: "DejaVu Sans Mono", Monaco, Consolas, monospace;
 }
 

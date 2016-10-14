@@ -21,7 +21,7 @@ body {
 }
 
 [contenteditable="true"] {
-	font: 87.5%/150% "Segoe UI", "Helvetica Neue", "Liberation Sans", "Nimbus Sans L", Arial, sans-serif;
+	font: 87.5%/150% "Segoe UI", -apple-system, BlinkMacSystemFont, "Roboto", "Oxygen", "Ubuntu", "Cantarell", "Droid Sans", "Helvetica Neue", "Trebuchet MS", Arial, sans-serif;
 }
 
 ul, ol {
@@ -47,7 +47,7 @@ code:before {
 	top: -1.7em;
 	left: 0;
 	content: 'Code:';
-	font-size: 1.2em;
+	font-size: 1em;
 }
 
 code {
@@ -59,7 +59,7 @@ code {
 	border-bottom: 3px solid #AAAAAA;
 	background: #F3F3F3;
 	white-space: pre;
-	font-size: 0.7em;
+	font-size: 0.9em;
 	font-family: "DejaVu Sans Mono", Monaco, Consolas, monospace;
 }
 
