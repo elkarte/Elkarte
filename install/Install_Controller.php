@@ -1115,9 +1115,12 @@ class Install_Controller
 
 		// Bring a warning over.
 		if (!empty($incontext['account_existed']))
+		{
 			$incontext['warning'] = $incontext['account_existed'];
+		}
 
 		if (!empty($db_character_set) && !empty($databases[$db_type]['utf8_support']))
+		{
 			$db->query('', '
 				SET NAMES {raw:db_character_set}',
 				array(
@@ -1125,6 +1128,7 @@ class Install_Controller
 					'db_error_skip' => true,
 				)
 			);
+		}
 
 		// As track stats is by default enabled let's add some activity.
 		$db->insert('ignore',
@@ -1133,6 +1137,10 @@ class Install_Controller
 			array(strftime('%Y-%m-%d', time()), 1, 1, (!empty($incontext['member_id']) ? 1 : 0)),
 			array('date')
 		);
+
+		// Take notes of when the installation was finished not to send to the
+		// upgrade when pointing to index.php and the install directory is still there.
+		updateSettingsFile(array('install_time' => time()));
 
 		// We're going to want our lovely $modSettings now.
 		$request = $db->query('', '
