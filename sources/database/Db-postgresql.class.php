@@ -942,6 +942,17 @@ class Database_PostgreSQL extends Database_Abstract
 	}
 
 	/**
+	 * Quotes identifiers for replacement__callback.
+	 *
+	 * @param mixed $replacement
+	 * @return string
+	 */
+	protected function _replaceIdentifier($replacement)
+	{
+		return '"' . strtr($replacement, array('`' => '', '.' => '')) . '"';
+	}
+
+	/**
 	 * Escape string for the database input
 	 *
 	 * @param string $string
