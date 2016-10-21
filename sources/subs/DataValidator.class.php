@@ -986,7 +986,14 @@ class Data_Validator
 		if (!isset($input[$field]))
 			return;
 
-		if (filter_var($input[$field], FILTER_VALIDATE_INT) === false)
+		$filter = filter_var($input[$field], FILTER_VALIDATE_INT);
+
+		if ($filter === false && version_compare(PHP_VERSION, 5.4, '<') && ($input[$field] === '+0' || $input[$field] === '-0'))
+		{
+			$filter = true;
+		}
+
+		if ($filter === false)
 		{
 			return array(
 				'field' => $field,

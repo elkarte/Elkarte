@@ -272,8 +272,8 @@ class TestDataValidator extends PHPUnit_Framework_TestCase
 			array(4.2, false),
 			array('4.2', false),
 			array('0', true),
-			array('+0', version_compare(PHP_VERSION, 5.4, '<') ? false : true),
-			array('-0', version_compare(PHP_VERSION, 5.4, '<') ? false : true),
+			array('+0', true),
+			array('-0', true),
 			array('', false),
 			array(array(), false),
 		);
