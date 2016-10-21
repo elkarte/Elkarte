@@ -12,7 +12,7 @@ $txt['permissions_for_profile'] = 'Permissions for Profile';
 $txt['permissions_boards_desc'] = 'The list below shows which set of permissions has been assigned to each board on your forum. You may edit the assigned permission profile by either clicking the board name or select &quot;edit all&quot; from the bottom of the page. To edit the profile itself simply click the profile name.';
 $txt['permissions_board_all'] = 'Edit All';
 $txt['permission_profile'] = 'Permission Profile';
-$txt['permission_profile_desc'] = 'Which <a href="%1$s">permission set</a> the board should use.';
+$txt['permission_profile_desc'] = 'Which <a target="_blank" href="%1$s">permission set</a> the board should use.';
 $txt['permission_profile_inherit'] = 'Inherit from parent board';
 
 $txt['permissions_profile'] = 'Profile';
