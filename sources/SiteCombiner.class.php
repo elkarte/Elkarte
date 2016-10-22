@@ -262,6 +262,42 @@ class Site_Combiner
 	}
 
 	/**
+	 * Deletes the CSS hives from the cache.
+	 */
+	public function removeCssHives()
+	{
+		return $this->_removeHives('css');
+	}
+
+	/**
+	 * Deletes the JS hives from the cache.
+	 */
+	public function removeJsHives()
+	{
+		return $this->_removeHives('js');
+	}
+
+	/**
+	 * Deletes hives from the cache based on extension.
+	 */
+	protected function _removeHives($ext)
+	{
+		global $context;
+
+		$path = $this->_archive_dir . '/hive-*.' . $ext;
+		$names = array();
+
+		$glob = new GlobIterator($path, FilesystemIterator::SKIP_DOTS);
+		$return  = true;
+
+		foreach ($glob as $file)
+		{
+			$return &= @unlink($file->getPathname());
+		}
+		return $return;
+	}
+
+	/**
 	 * Tests if the destination directory exists and is writable
 	 *
 	 * @return bool
