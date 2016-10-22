@@ -942,6 +942,22 @@ class Database_PostgreSQL extends Database_Abstract
 	}
 
 	/**
+	 * Quotes identifiers for replacement__callback.
+	 *
+	 * @param mixed $replacement
+	 * @return string
+	 */
+	protected function _replaceIdentifier($replacement)
+	{
+		if (preg_match('~[a-z_][0-9,a-z,A-Z$_]{0,60}~', $replacement) !== 1)
+		{
+			$this->error_backtrace('Wrong value type sent to the database. Invalid identifier used. (' . $replacement . ')', '', E_USER_ERROR, __FILE__, __LINE__);
+		}
+
+		return '"' . $replacement . '"';
+	}
+
+	/**
 	 * Escape string for the database input
 	 *
 	 * @param string $string

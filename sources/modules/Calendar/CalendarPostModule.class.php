@@ -39,6 +39,10 @@ class Calendar_Post_Module implements ElkArte\sources\modules\Module_Interface
 		// Posting an event?
 		self::$_make_event = isset($_REQUEST['calendar']);
 
+		if (empty($modSettings['cal_limityear']))
+		{
+			$modSettings['cal_limityear'] = 10;
+		}
 		$context['make_event'] = self::$_make_event;
 		$context['cal_minyear'] = $modSettings['cal_minyear'];
 		$context['cal_maxyear'] = date('Y') + $modSettings['cal_limityear'];

@@ -111,67 +111,32 @@ abstract class Database_Abstract implements Database
 		switch ($matches[1])
 		{
 			case 'int':
-				if (!is_numeric($replacement) || (string) $replacement !== (string) (int) $replacement)
-					$this->error_backtrace('Wrong value type sent to the database. Integer expected. (' . $matches[2] . ')', '', E_USER_ERROR, __FILE__, __LINE__);
-				return (string) (int) $replacement;
+				return $this->_replaceInt($matches[2], $replacement);
 			break;
 
 			case 'string':
 			case 'text':
-				return sprintf('\'%1$s\'', $this->escape_string($replacement));
+				return $this->_replaceString($replacement);
 			break;
 
 			case 'array_int':
-				if (is_array($replacement))
-				{
-					if (empty($replacement))
-						$this->error_backtrace('Database error, given array of integer values is empty. (' . $matches[2] . ')', '', E_USER_ERROR, __FILE__, __LINE__);
-
-					foreach ($replacement as $key => $value)
-					{
-						if (!is_numeric($value) || (string) $value !== (string) (int) $value)
-							$this->error_backtrace('Wrong value type sent to the database. Array of integers expected. (' . $matches[2] . ')', '', E_USER_ERROR, __FILE__, __LINE__);
-
-						$replacement[$key] = (string) (int) $value;
-					}
-
-					return implode(', ', $replacement);
-				}
-				else
-					$this->error_backtrace('Wrong value type sent to the database. Array of integers expected. (' . $matches[2] . ')', '', E_USER_ERROR, __FILE__, __LINE__);
-
+				return $this->_replaceArrayInt($matches[2], $replacement);
 			break;
 
 			case 'array_string':
-				if (is_array($replacement))
-				{
-					if (empty($replacement))
-						$this->error_backtrace('Database error, given array of string values is empty. (' . $matches[2] . ')', '', E_USER_ERROR, __FILE__, __LINE__);
-
-					foreach ($replacement as $key => $value)
-						$replacement[$key] = sprintf('\'%1$s\'', $this->escape_string($value));
-
-					return implode(', ', $replacement);
-				}
-				else
-					$this->error_backtrace('Wrong value type sent to the database. Array of strings expected. (' . $matches[2] . ')', '', E_USER_ERROR, __FILE__, __LINE__);
+				return $this->_replaceArrayString($matches[2], $replacement);
 			break;
 
 			case 'date':
-				if (preg_match('~^(\d{4})-([0-1]?\d)-([0-3]?\d)$~', $replacement, $date_matches) === 1)
-					return sprintf('\'%04d-%02d-%02d\'', $date_matches[1], $date_matches[2], $date_matches[3]);
-				else
-					$this->error_backtrace('Wrong value type sent to the database. Date expected. (' . $matches[2] . ')', '', E_USER_ERROR, __FILE__, __LINE__);
+				return $this->_replaceDate($matches[2], $replacement);
 			break;
 
 			case 'float':
-				if (!is_numeric($replacement))
-					$this->error_backtrace('Wrong value type sent to the database. Floating point number expected. (' . $matches[2] . ')', '', E_USER_ERROR, __FILE__, __LINE__);
-				return (string) (float) $replacement;
+				return $this->_replaceFloat($matches[2], $replacement);
 			break;
 
 			case 'identifier':
-				return '`' . strtr($replacement, array('`' => '', '.' => '')) . '`';
+				return $this->_replaceIdentifier($replacement);
 			break;
 
 			case 'raw':
@@ -279,6 +244,131 @@ abstract class Database_Abstract implements Database
 			// @todo should throw an E_WARNING if count($combined) != count($keys)
 			return $combined;
 		}
+	}
+
+	/**
+	 * Tests and casts integers for replacement__callback.
+	 *
+	 * @param mixed $identifier
+	 * @param mixed $replacement
+	 * @return string
+	 */
+	protected function _replaceInt($identifier, $replacement)
+	{
+		if (!is_numeric($replacement) || (string) $replacement !== (string) (int) $replacement)
+			$this->error_backtrace('Wrong value type sent to the database. Integer expected. (' . $identifier . ')', '', E_USER_ERROR, __FILE__, __LINE__);
+		return (string) (int) $replacement;
+	}
+
+	/**
+	 * Tests and casts arrays of integers for replacement__callback.
+	 *
+	 * @param string $identifier
+	 * @param mixed[] $replacement
+	 * @return string
+	 */
+	protected function _replaceArrayInt($identifier, $replacement)
+	{
+			if (is_array($replacement))
+			{
+				if (empty($replacement))
+					$this->error_backtrace('Database error, given array of integer values is empty. (' . $identifier . ')', '', E_USER_ERROR, __FILE__, __LINE__);
+
+				foreach ($replacement as $key => $value)
+				{
+					if (!is_numeric($value) || (string) $value !== (string) (int) $value)
+						$this->error_backtrace('Wrong value type sent to the database. Array of integers expected. (' . $identifier . ')', '', E_USER_ERROR, __FILE__, __LINE__);
+
+					$replacement[$key] = (string) (int) $value;
+				}
+
+				return implode(', ', $replacement);
+			}
+			else
+			{
+				$this->error_backtrace('Wrong value type sent to the database. Array of integers expected. (' . $identifier . ')', '', E_USER_ERROR, __FILE__, __LINE__);
+			}
+	}
+
+	/**
+	 * Casts values to string for replacement__callback.
+	 *
+	 * @param mixed $replacement
+	 * @return string
+	 */
+	protected function _replaceString($replacement)
+	{
+		return sprintf('\'%1$s\'', $this->escape_string($replacement));
+	}
+
+	/**
+	 * Tests and casts arrays of strings for replacement__callback.
+	 *
+	 * @param string $identifier
+	 * @param mixed[] $replacement
+	 * @return string
+	 */
+	protected function _replaceArrayString($identifier, $replacement)
+	{
+		if (is_array($replacement))
+		{
+			if (empty($replacement))
+				$this->error_backtrace('Database error, given array of string values is empty. (' . $identifier . ')', '', E_USER_ERROR, __FILE__, __LINE__);
+
+			foreach ($replacement as $key => $value)
+				$replacement[$key] = sprintf('\'%1$s\'', $this->escape_string($value));
+
+			return implode(', ', $replacement);
+		}
+		else
+		{
+			$this->error_backtrace('Wrong value type sent to the database. Array of strings expected. (' . $identifier . ')', '', E_USER_ERROR, __FILE__, __LINE__);
+		}
+	}
+
+	/**
+	 * Tests and casts date for replacement__callback.
+	 *
+	 * @param mixed $identifier
+	 * @param mixed $replacement
+	 * @return string
+	 */
+	protected function _replaceDate($identifier, $replacement)
+	{
+		if (preg_match('~^(\d{4})-([0-1]?\d)-([0-3]?\d)$~', $replacement, $date_matches) === 1)
+			return sprintf('\'%04d-%02d-%02d\'', $date_matches[1], $date_matches[2], $date_matches[3]);
+		else
+			$this->error_backtrace('Wrong value type sent to the database. Date expected. (' . $identifier . ')', '', E_USER_ERROR, __FILE__, __LINE__);
+	}
+
+	/**
+	 * Tests and casts floating numbers for replacement__callback.
+	 *
+	 * @param mixed $identifier
+	 * @param mixed $replacement
+	 * @return string
+	 */
+	protected function _replaceFloat($identifier, $replacement)
+	{
+		if (!is_numeric($replacement))
+			$this->error_backtrace('Wrong value type sent to the database. Floating point number expected. (' . $identifier . ')', '', E_USER_ERROR, __FILE__, __LINE__);
+		return (string) (float) $replacement;
+	}
+
+	/**
+	 * Quotes identifiers for replacement__callback.
+	 *
+	 * @param mixed $replacement
+	 * @return string
+	 */
+	protected function _replaceIdentifier($replacement)
+	{
+		if (preg_match('~[a-z_][0-9,a-z,A-Z$_]{0,60}~', $replacement) !== 1)
+		{
+			$this->error_backtrace('Wrong value type sent to the database. Invalid identifier used. (' . $replacement . ')', '', E_USER_ERROR, __FILE__, __LINE__);
+		}
+
+		return '`' . $replacement . '`';
 	}
 
 	/**

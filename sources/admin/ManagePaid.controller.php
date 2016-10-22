@@ -212,6 +212,7 @@ class ManagePaid_Controller extends Action_Controller
 				array('check', 'paidsubs_test', 'subtext' => $txt['paidsubs_test_desc'], 'onclick' => 'return document.getElementById(\'paidsubs_test\').checked ? confirm(\'' . $txt['paidsubs_test_confirm'] . '\') : true;'),
 		);
 
+		require_once(SUBSDIR . '/PaidSubscriptions.subs.php');
 		// Now load all the other gateway settings.
 		$gateways = loadPaymentGateways();
 		foreach ($gateways as $gateway)

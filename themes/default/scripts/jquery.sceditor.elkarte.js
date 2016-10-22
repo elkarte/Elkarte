@@ -59,9 +59,12 @@
 		},
 		appendEmoticon: function (code, emoticon) {
 			if (emoticon === '')
+			{
 				line.append($('<br />'));
+			}
 			else
-				line.append($('<img />')
+			{
+				$img = $('<img />')
 					.attr({
 						src: emoticon.url || emoticon,
 						alt: code,
@@ -83,8 +86,10 @@
 							base.wysiwygEditorInsertHtml(start + '<img src="' + $(this).attr("src") + '" data-sceditor-emoticon="' + $(this).attr('alt') + '" />' + end);
 
 						e.preventDefault();
-					})
-				);
+					});
+				$wrapper = $('<span class="smiley"></span>').append($img)
+				line.append($wrapper);
+			}
 		},
 		storeLastState: function (){
 			this.wasSource = this.inSourceMode();

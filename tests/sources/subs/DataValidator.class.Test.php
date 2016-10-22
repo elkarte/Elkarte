@@ -165,7 +165,7 @@ class TestDataValidator extends PHPUnit_Framework_TestCase
 		return array(
 			array('foo', null),
 			// Fixed as of PHP 5.4.
-			array(false, version_compare(PHP_VERSION, 5.4, '<') ? null : false),
+			array(false, false),
 			array('baz', null),
 			array(array(1,2), null),
 			array(array(1), null),
@@ -189,14 +189,14 @@ class TestDataValidator extends PHPUnit_Framework_TestCase
 			array('4.2', null),
 			array('0', false),
 			// Fixed as of PHP 5.4.
-			array('', version_compare(PHP_VERSION, 5.4, '<') ? null : false),
+			array('', false),
 			array(array(), null),
 
 			/*
 			 * Objects (even empty ones) should not be able to evaluate to
 			 * a boolean without __tostring() defined. This was fixed in PHP 7.
 			 */
-			array(new stdClass, version_compare(PHP_VERSION, 7, '<') ? false : null),
+			array(new stdClass, null),
 		);
 	}
 
@@ -272,8 +272,8 @@ class TestDataValidator extends PHPUnit_Framework_TestCase
 			array(4.2, false),
 			array('4.2', false),
 			array('0', true),
-			array('+0', version_compare(PHP_VERSION, 5.4, '<') ? false : true),
-			array('-0', version_compare(PHP_VERSION, 5.4, '<') ? false : true),
+			array('+0', true),
+			array('-0', true),
 			array('', false),
 			array(array(), false),
 		);

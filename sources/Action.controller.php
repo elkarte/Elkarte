@@ -75,7 +75,7 @@ abstract class Action_Controller
 			)), $buttons);
 
 		$buttons['home']['href'] = $scripturl . '?action=forum';
-		$buttons['home']['data-icon'] = 'i-forum';
+		$buttons['home']['data-icon'] = 'i-comment-blank';
 	}
 
 	/**
