@@ -1618,3 +1618,67 @@ var ElkNotifier = new ElkNotifications();
 		this.ElkInlineAttachments = ElkInlineAttachments;
 	}
 })();
+
+/**
+ * Initialize the ajax info-bar
+ */
+(function () {
+	var ElkInfoBar = (function (elem_id, opt) {
+		'use strict';
+
+		opt = $.extend(opt, {text: '', class: 'ajax_infobar', hide_delay: 5000});
+
+		var $elem = $('#' + elem_id),
+			init = function (elem_id, opt) {
+				if ($elem.length == 0) {
+					$elem = $('<div id="' + elem_id + '" class="' + opt.class + '" />');
+					$('body').append($elem);
+					$elem.attr('id', elem_id);
+					$elem.addClass(opt.class);
+					$elem.text(opt.text);
+				}
+			},
+			changeText = function (text) {
+				$elem.html(text);
+			},
+			addClass = function (aClass) {
+				$elem.addClass(aClass);
+			},
+			removeClass = function (aClass) {
+				$elem.removeClass(aClass);
+			},
+			showBar = function() {
+				$elem.fadeIn();
+				setTimeout(function() {
+					$elem.slideUp();
+				}, opt.hide_delay);
+			},
+			hide = function () {
+				$elem.slideUp();
+			};
+
+		init(elem_id, opt);
+		return {
+			changeText: changeText,
+			addClass: addClass,
+			removeClass: removeClass,
+			showBar: showBar,
+			hide: hide
+		};
+	});
+
+	// AMD / RequireJS
+	if (typeof define !== 'undefined' && define.amd) {
+		define([], function () {
+			return ElkInfoBar;
+		});
+	}
+	// CommonJS
+	else if (typeof module !== 'undefined' && module.exports) {
+		module.exports = ElkInfoBar;
+	}
+	// included directly via <script> tag
+	else {
+		this.ElkInfoBar = ElkInfoBar;
+	}
+})();
