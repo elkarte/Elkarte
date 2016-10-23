@@ -1791,3 +1791,35 @@ $(function() {
 	});
 	$headers.change();
 });
+
+$(function() {
+	$('#clean_hives').on('click', function () {
+		var infoBar = new ElkInfoBar('bar_clean_hives');
+		$.ajax({
+			type: 'POST',
+			dataType: 'json',
+			url: elk_scripturl + "?action=admin;area=featuresettings;sa=basic;xml;api=json",
+			data: {
+				cleanhives: true
+			}
+		})
+		.done(function(request) {
+			infoBar.changeText(request.response);
+			if (request.success == true) {
+				infoBar.addClass('success');
+			}
+			else {
+				infoBar.addClass('error');
+			}
+		})
+		.fail(function(request) {
+			infoBar.addClass('error');
+			infoBar.changeText(txt_invalid_response);
+		})
+		.always(function(request) {
+			infoBar.showBar();
+		});
+
+		return false;
+	});
+});
