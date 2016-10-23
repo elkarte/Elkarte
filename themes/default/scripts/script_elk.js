@@ -1661,9 +1661,13 @@ var ElkNotifier = new ElkNotifications();
 			showBar = function() {
 				clearTimeout(time_out);
 				$elem.fadeIn();
-				time_out = setTimeout(function() {
-					hide();
-				}, opt.hide_delay);
+
+				if (opt.hide_delay != 0)
+				{
+					time_out = setTimeout(function() {
+						hide();
+					}, opt.hide_delay);
+				}
 				return this;
 			},
 			isError = function() {
