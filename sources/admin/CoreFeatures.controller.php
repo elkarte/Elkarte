@@ -107,6 +107,12 @@ class CoreFeatures_Controller extends Action_Controller
 			'help' => '',
 			'description' => $txt['core_settings_desc'],
 		);
+		addJavascriptVar(array(
+			'token_name' => '',
+			'token_value' => '',
+			'feature_on_text' => $txt['core_settings_switch_off'],
+			'feature_off_text' => $txt['core_settings_switch_on']
+		), true);
 
 		// We love our tokens.
 		createToken('admin-core');
