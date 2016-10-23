@@ -45,7 +45,7 @@ function template_core_features()
 			$(".core_features_img").click(function(){
 				var cc = $(this),
 					cf = $(this).attr("id").substring(7),
-					imgs = new Array("', $settings['images_url'], '/admin/switch_off.png", "', $settings['images_url'], '/admin/switch_on.png"),
+					imgs = new Array(elk_images_url + "/admin/switch_off.png", elk_images_url + "/admin/switch_on.png"),
 					new_state = !$("#feature_" + cf).attr("checked"),
 					ajax_infobar = new ElkInfoBar(\'core_features_bar\', {error_class: \'errorbox\', success_class: \'successbox\'});
 
@@ -86,8 +86,8 @@ function template_core_features()
 						});
 						$("#feature_link_" + cf).fadeOut().fadeIn();
 						ajax_infobar.isSuccess();
-						var message = new_state ? ' . JavaScriptEscape($txt['core_settings_activation_message']) . ' : ' . JavaScriptEscape($txt['core_settings_deactivation_message']) . ';
-						ajax_infobar.changeText(message.replace(\'{core_feature}\', $(request).find("corefeatures").find("corefeature").text())).showBar();
+						var message = $(request).find("messages").find("message").text();
+						ajax_infobar.changeText(message).showBar();
 
 						token_name = $(request).find("tokens").find(\'[type="token"]\').text();
 						token_value = $(request).find("tokens").find(\'[type="token_var"]\').text();
@@ -95,7 +95,7 @@ function template_core_features()
 					else
 					{
 						ajax_infobar.isError();
-						ajax_infobar.changeText(' . JavaScriptEscape($txt['core_settings_generic_error']) . ').showBar(\'fast\');
+						ajax_infobar.changeText(core_settings_generic_error).showBar();
 					}
 				})
 				.fail(function(error) {
