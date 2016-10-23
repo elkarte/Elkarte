@@ -1640,21 +1640,26 @@ var ElkNotifier = new ElkNotifications();
 			},
 			changeText = function (text) {
 				$elem.html(text);
+				return this;
 			},
 			addClass = function (aClass) {
 				$elem.addClass(aClass);
+				return this;
 			},
 			removeClass = function (aClass) {
 				$elem.removeClass(aClass);
+				return this;
 			},
 			showBar = function() {
 				$elem.fadeIn();
 				setTimeout(function() {
 					$elem.slideUp();
 				}, opt.hide_delay);
+				return this;
 			},
 			hide = function () {
 				$elem.slideUp();
+				return this;
 			};
 
 		init(elem_id, opt);

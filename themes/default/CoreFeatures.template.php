@@ -47,10 +47,8 @@ function template_core_features()
 					cf = $(this).attr("id").substring(7),
 					imgs = new Array("', $settings['images_url'], '/admin/switch_off.png", "', $settings['images_url'], '/admin/switch_on.png"),
 					new_state = !$("#feature_" + cf).attr("checked"),
-					ajax_infobar = document.createElement(\'div\');
+					ajax_infobar = new ElkInfoBar(\'core_features_bar\');
 
-				$(ajax_infobar).css({\'position\': \'fixed\', \'top\': \'0\', \'left\': \'0\', \'width\': \'100%\', \'z-index\': 10, \'display\': \'none\'});
-				$("body").append(ajax_infobar);
 				$("#feature_" + cf).attr("checked", new_state);
 
 				data = {save: "save", feature_id: cf};
@@ -75,8 +73,8 @@ function template_core_features()
 				.done(function(request) {
 					if ($(request).find("errors").find("error").length !== 0)
 					{
-						$(ajax_infobar).attr(\'class\', \'errorbox\');
-						$(ajax_infobar).html($(request).find("errors").find("error").text()).slideDown(\'fast\');
+						ajax_infobar.removeClass(\'successbox\').addClass(\'errorbox\');
+						ajax_infobar.changeText($(request).find("errors").find("error").text()).showBar();
 					}
 					else if ($(request).find("elk").length !== 0)
 					{
@@ -87,24 +85,21 @@ function template_core_features()
 							"alt": new_state ? feature_on_text : feature_off_text
 						});
 						$("#feature_link_" + cf).fadeOut().fadeIn();
-						$(ajax_infobar).attr(\'class\', \'successbox\');
+						ajax_infobar.removeClass(\'errorbox\').addClass(\'successbox\');
 						var message = new_state ? ' . JavaScriptEscape($txt['core_settings_activation_message']) . ' : ' . JavaScriptEscape($txt['core_settings_deactivation_message']) . ';
-						$(ajax_infobar).html(message.replace(\'{core_feature}\', $(request).find("corefeatures").find("corefeature").text())).slideDown();
-						setTimeout(function() {
-							$(ajax_infobar).slideUp();
-						}, 4000);
+						ajax_infobar.changeText(message.replace(\'{core_feature}\', $(request).find("corefeatures").find("corefeature").text())).showBar();
 
 						token_name = $(request).find("tokens").find(\'[type="token"]\').text();
 						token_value = $(request).find("tokens").find(\'[type="token_var"]\').text();
 					}
 					else
 					{
-						$(ajax_infobar).attr(\'class\', \'errorbox\');
-						$(ajax_infobar).html(' . JavaScriptEscape($txt['core_settings_generic_error']) . ').slideDown(\'fast\');
+						ajax_infobar.removeClass(\'successbox\').addClass(\'errorbox\');
+						ajax_infobar.changeText(' . JavaScriptEscape($txt['core_settings_generic_error']) . ').showBar(\'fast\');
 					}
 				})
 				.fail(function(error) {
-						$(ajax_infobar).html(error).slideDown(\'fast\');
+					ajax_infobar.changeText(error).showBar();
 				})
 			});
 		});
