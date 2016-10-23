@@ -1626,13 +1626,13 @@ var ElkNotifier = new ElkNotifications();
 	var ElkInfoBar = (function (elem_id, opt) {
 		'use strict';
 
-		opt = $.extend(opt, {
+		opt = $.extend({
 			text: '',
 			class: 'ajax_infobar',
 			hide_delay: 5000,
 			error_class: 'error',
 			success_class: 'success',
-		});
+		}, opt);
 
 		var $elem = $('#' + elem_id),
 			time_out = null,
