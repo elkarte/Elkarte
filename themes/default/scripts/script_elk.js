@@ -605,12 +605,11 @@ function add_elk_mention(selector, oOptions)
 
 		if (typeof oSettings.infobar === 'undefined')
 		{
-			oSettings.infobar = new ElkInfoBar('sortable_bar', {error_class: 'errorbox', success_class: 'infobox', hide_delay: 0});
+			oSettings.infobar = new ElkInfoBar('sortable_bar', {error_class: 'errorbox', success_class: 'infobox'});
 		}
 
 		// Divs to hold our responses
-		var /*ajax_infobar = new ElkInfoBar('sortable_bar', {error_class: 'errorbox', success_class: 'infobox'}),*/
-			ajax_errorbox = $("<div id='errorContainer'><div/>").appendTo('body');
+		var ajax_errorbox = $("<div id='errorContainer'><div/>").appendTo('body');
 
 		$('#errorContainer').css({'display': 'none'});
 
