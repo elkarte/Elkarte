@@ -603,14 +603,14 @@ function add_elk_mention(selector, oOptions)
 		// Account for any user options
 		var oSettings = $.extend({}, $.fn.elkSortable.oDefaultsSettings, oInstanceSettings || {});
 
-		// Divs to hold our responses
-		var ajax_infobar = document.createElement('div'),
-			ajax_errorbox = $("<div id='errorContainer'><div/>").appendTo('body');
+		if (typeof oSettings.infobar === 'undefined')
+		{
+			oSettings.infobar = new ElkInfoBar('sortable_bar', {error_class: 'errorbox', success_class: 'infobox', hide_delay: 0});
+		}
 
-		// Prepare the infobar and errorbox divs to confirm valid responses or show an error
-		$(ajax_infobar).css({'position': 'fixed', 'top': '0', 'left': '0', 'width': '100%', 'z-index': '100'});
-		$("body").append(ajax_infobar);
-		$(ajax_infobar).slideUp();
+		// Divs to hold our responses
+		var /*ajax_infobar = new ElkInfoBar('sortable_bar', {error_class: 'errorbox', success_class: 'infobox'}),*/
+			ajax_errorbox = $("<div id='errorContainer'><div/>").appendTo('body');
 
 		$('#errorContainer').css({'display': 'none'});
 
@@ -711,11 +711,8 @@ function add_elk_mention(selector, oOptions)
 					data: postdata
 				})
 				.fail(function(jqXHR, textStatus, errorThrown) {
-					$(ajax_infobar).attr('class', 'errorbox');
-					$(ajax_infobar).html(textStatus).slideDown('fast');
-					setTimeout(function() {
-						$(ajax_infobar).slideUp();
-					}, 3500);
+					oSettings.infobar.isError();
+					oSettings.infobar.changeText(textStatus).showBar();
 					// Reset the interface?
 					if (oSettings.href !== '')
 						setTimeout(function() {
@@ -745,11 +742,8 @@ function add_elk_mention(selector, oOptions)
 					else if ($(data).find("elk").length !== 0)
 					{
 						// Valid responses get the unobtrusive slider
-						$(ajax_infobar).attr('class', 'infobox');
-						$(ajax_infobar).html($(data).find('elk > orders > order').text()).slideDown('fast');
-						setTimeout(function() {
-							$(ajax_infobar).slideUp();
-						}, 3500);
+						oSettings.infobar.isSuccess();
+						oSettings.infobar.changeText($(data).find('elk > orders > order').text()).showBar();
 					}
 					else
 					{
@@ -1637,6 +1631,7 @@ var ElkNotifier = new ElkNotifications();
 		var $elem = $('#' + elem_id),
 			time_out = null,
 			init = function (elem_id, opt) {
+				clearTimeout(time_out);
 				if ($elem.length == 0) {
 					$elem = $('<div id="' + elem_id + '" class="' + opt.class + '" />');
 					$('body').append($elem);
