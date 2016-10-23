@@ -1640,6 +1640,7 @@ var ElkNotifier = new ElkNotifications();
 				if ($elem.length == 0) {
 					$elem = $('<div id="' + elem_id + '" class="' + opt.class + '" />');
 					$('body').append($elem);
+					hide();
 					$elem.attr('id', elem_id);
 					$elem.addClass(opt.class);
 					$elem.text(opt.text);
