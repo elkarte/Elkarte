@@ -1675,6 +1675,7 @@ var ElkNotifier = new ElkNotifications();
 				addClass(opt.success_class);
 			},
 			hide = function () {
+				clearTimeout(time_out);
 				$elem.slideUp();
 				return this;
 			};
