@@ -1825,7 +1825,7 @@ $(function() {
 });
 
 $(function() {
-	if (typeof document.getElementById('core_features') == 'undefined')
+	if ($('#core_features').length == 0)
 	{
 		return;
 	}
