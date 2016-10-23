@@ -1626,9 +1626,16 @@ var ElkNotifier = new ElkNotifications();
 	var ElkInfoBar = (function (elem_id, opt) {
 		'use strict';
 
-		opt = $.extend(opt, {text: '', class: 'ajax_infobar', hide_delay: 5000});
+		opt = $.extend(opt, {
+			text: '',
+			class: 'ajax_infobar',
+			hide_delay: 5000,
+			error_class: 'error',
+			success_class: 'success',
+		});
 
 		var $elem = $('#' + elem_id),
+			time_out = null,
 			init = function (elem_id, opt) {
 				if ($elem.length == 0) {
 					$elem = $('<div id="' + elem_id + '" class="' + opt.class + '" />');
@@ -1639,6 +1646,7 @@ var ElkNotifier = new ElkNotifications();
 				}
 			},
 			changeText = function (text) {
+				clearTimeout(time_out);
 				$elem.html(text);
 				return this;
 			},
@@ -1651,11 +1659,20 @@ var ElkNotifier = new ElkNotifications();
 				return this;
 			},
 			showBar = function() {
+				clearTimeout(time_out);
 				$elem.fadeIn();
-				setTimeout(function() {
-					$elem.slideUp();
+				time_out = setTimeout(function() {
+					hide();
 				}, opt.hide_delay);
 				return this;
+			},
+			isError = function() {
+				removeClass(opt.success_class);
+				addClass(opt.error_class);
+			},
+			isSuccess = function() {
+				removeClass(opt.error_class);
+				addClass(opt.success_class);
 			},
 			hide = function () {
 				$elem.slideUp();
@@ -1668,6 +1685,8 @@ var ElkNotifier = new ElkNotifications();
 			addClass: addClass,
 			removeClass: removeClass,
 			showBar: showBar,
+			isError: isError,
+			isSuccess: isSuccess,
 			hide: hide
 		};
 	});

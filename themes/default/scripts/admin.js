@@ -1806,14 +1806,14 @@ $(function() {
 		.done(function(request) {
 			infoBar.changeText(request.response);
 			if (request.success == true) {
-				infoBar.addClass('success');
+				infoBar.isSuccess();
 			}
 			else {
-				infoBar.addClass('error');
+				infoBar.isError();
 			}
 		})
 		.fail(function(request) {
-			infoBar.addClass('error');
+			infoBar.isError();
 			infoBar.changeText(txt_invalid_response);
 		})
 		.always(function(request) {

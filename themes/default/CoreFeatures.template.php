@@ -47,7 +47,7 @@ function template_core_features()
 					cf = $(this).attr("id").substring(7),
 					imgs = new Array("', $settings['images_url'], '/admin/switch_off.png", "', $settings['images_url'], '/admin/switch_on.png"),
 					new_state = !$("#feature_" + cf).attr("checked"),
-					ajax_infobar = new ElkInfoBar(\'core_features_bar\');
+					ajax_infobar = new ElkInfoBar(\'core_features_bar\', {error_class: \'errorbox\', success_class: \'successbox\'});
 
 				$("#feature_" + cf).attr("checked", new_state);
 
@@ -73,7 +73,7 @@ function template_core_features()
 				.done(function(request) {
 					if ($(request).find("errors").find("error").length !== 0)
 					{
-						ajax_infobar.removeClass(\'successbox\').addClass(\'errorbox\');
+						ajax_infobar.isError();
 						ajax_infobar.changeText($(request).find("errors").find("error").text()).showBar();
 					}
 					else if ($(request).find("elk").length !== 0)
@@ -85,7 +85,7 @@ function template_core_features()
 							"alt": new_state ? feature_on_text : feature_off_text
 						});
 						$("#feature_link_" + cf).fadeOut().fadeIn();
-						ajax_infobar.removeClass(\'errorbox\').addClass(\'successbox\');
+						ajax_infobar.isSuccess();
 						var message = new_state ? ' . JavaScriptEscape($txt['core_settings_activation_message']) . ' : ' . JavaScriptEscape($txt['core_settings_deactivation_message']) . ';
 						ajax_infobar.changeText(message.replace(\'{core_feature}\', $(request).find("corefeatures").find("corefeature").text())).showBar();
 
@@ -94,7 +94,7 @@ function template_core_features()
 					}
 					else
 					{
-						ajax_infobar.removeClass(\'successbox\').addClass(\'errorbox\');
+						ajax_infobar.isError();
 						ajax_infobar.changeText(' . JavaScriptEscape($txt['core_settings_generic_error']) . ').showBar(\'fast\');
 					}
 				})
