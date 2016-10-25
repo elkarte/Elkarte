@@ -131,7 +131,25 @@ function template_registration_form()
 									<img id="elk_autov_username_img" src="', $settings['images_url'], '/icons/field_check.png" alt="*" />
 								</a>
 							</span>
-						</dd>
+						</dd>';
+
+	if ($context['insert_display_name'] == true)
+	{
+		echo '
+						<dt>
+							<label for="elk_autov_displayname">', $txt['display_name'], ':</label>
+						</dt>
+						<dd>
+							<input type="text" name="display" id="elk_autov_displayname" size="30" tabindex="', $context['tabindex']++, '" maxlength="25" value="', isset($context['display_name']) ? $context['display_name'] : '', '" class="input_text" placeholder="', $txt['display_name'], '" required="required" />
+							<span id="elk_autov_displayname_div" class="hide">
+								<a id="elk_autov_displayname_link" href="#">
+									<img id="elk_autov_displayname_img" src="', $settings['images_url'], '/icons/field_check.png" alt="*" />
+								</a>
+							</span>
+						</dd>';
+	}
+
+	echo '
 						<dt>
 							<label for="elk_autov_reserve1">', $txt['user_email_address'], ':</label>
 						</dt>

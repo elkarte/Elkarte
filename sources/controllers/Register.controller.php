@@ -125,6 +125,15 @@ class Register_Controller extends Action_Controller
 		$context['registration_passed_agreement'] = !empty($_SESSION['registration_agreed']);
 		$context['show_coppa'] = !empty($modSettings['coppaAge']);
 		$context['show_contact_button'] = !empty($modSettings['enable_contactform']) && $modSettings['enable_contactform'] === 'registration';
+		if (!empty($modSettings['show_DisplayNameOnRegistration']))
+		{
+			$context['insert_display_name'] = true;
+			loadLanguage('Profile');
+		}
+		else
+		{
+			$context['insert_display_name'] = false;
+		}
 
 		// Under age restrictions?
 		if ($context['show_coppa'])

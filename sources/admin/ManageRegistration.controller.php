@@ -392,6 +392,7 @@ class ManageRegistration_Controller extends Action_Controller
 				array('check', 'enableOpenID'),
 				array('check', 'notify_new_registration'),
 				array('check', 'send_welcomeEmail'),
+				array('check', 'show_DisplayNameOnRegistration'),
 			'',
 				array('int', 'coppaAge', 'subtext' => $txt['setting_coppaAge_desc'], 'onchange' => 'checkCoppa();', 'onkeyup' => 'checkCoppa();'),
 				array('select', 'coppaType', array($txt['setting_coppaType_reject'], $txt['setting_coppaType_approval']), 'onchange' => 'checkCoppa();'),
