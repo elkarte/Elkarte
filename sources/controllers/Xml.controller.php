@@ -146,6 +146,7 @@ class Xml_Controller extends Action_Controller
 
 		// Just in case, maybe we don't need it
 		loadLanguage('Errors');
+		loadLanguage('Admin');
 
 		// We need (at least) this to ensure that mod files are included
 		call_integration_include_hook('integrate_admin_include');
@@ -153,6 +154,7 @@ class Xml_Controller extends Action_Controller
 		$errors = array();
 		$returns = array();
 		$tokens = array();
+		$feature_title = '';
 
 		// You have to be allowed to do this of course
 		$validation = validateSession();
@@ -172,8 +174,9 @@ class Xml_Controller extends Action_Controller
 				{
 					$feature = $context['features'][$id];
 					$feature_id = 'feature_' . $id;
+					$feature_title = (!empty($this->_req->post->{$feature_id}) && $feature['url'] ? '<a href="' . $feature['url'] . '">' . $feature['title'] . '</a>' : $feature['title']);
 					$returns[] = array(
-						'value' => (!empty($this->_req->post->{$feature_id}) && $feature['url'] ? '<a href="' . $feature['url'] . '">' . $feature['title'] . '</a>' : $feature['title']),
+						'value' => $feature_title,
 					);
 
 					createToken('admin-core', 'post');
@@ -201,10 +204,19 @@ class Xml_Controller extends Action_Controller
 
 		// Return the response to the calling program
 		$context['sub_template'] = 'generic_xml';
+		addJavascriptVar(array('core_settings_generic_error' => $txt['core_settings_generic_error']), true);
+
+		$message = str_replace('{core_feature}', $feature_title, !empty($feature_id) && !empty($this->_req->post->{$feature_id}) ? $txt['core_settings_activation_message'] : $txt['core_settings_deactivation_message']);
 		$context['xml_data'] = array(
 			'corefeatures' => array(
 				'identifier' => 'corefeature',
 				'children' => $returns,
+			),
+			'messages' => array(
+				'identifier' => 'message',
+				'children' => array(array(
+					'value' => $message
+				)),
 			),
 			'tokens' => array(
 				'identifier' => 'token',

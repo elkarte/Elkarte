@@ -409,7 +409,7 @@ div.bbc_footnotes .meaction {
  */
 
 /* The "Loading" bar for quick edit, etc. */
-#ajax_in_progress {
+#ajax_in_progress, .ajax_infobar {
 	border-bottom-color: #3D6E32;
 	background: #FEFEFE;
 	color: #3D6E32;

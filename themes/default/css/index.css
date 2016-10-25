@@ -881,7 +881,7 @@ a.bbc_link {
  */
 
 /* The "Loading" bar for quick edit, etc. */
-#ajax_in_progress {
+#ajax_in_progress, .ajax_infobar {
 	position: fixed;
 	top: 0;
 	left: 0;

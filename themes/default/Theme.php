@@ -261,6 +261,31 @@ class Theme extends \Theme
 	}
 
 	/**
+	 * Deletes the hives (aggregated CSS and JS files) previously created.
+	 *
+	 * @param string $type = 'all' Filters the types of hives (valid values:
+	 *                               * 'all'
+	 *                               * 'css'
+	 *                               * 'js'
+	 */
+	public function cleanHives($type = 'all')
+	{
+		global $settings;
+
+		$combiner = new \Site_Combiner($settings['default_theme_cache_dir'], $settings['default_theme_cache_url']);
+		$result = true;
+		if ($type === 'all' || $type === 'css')
+		{
+			$result &= $combiner->removeCssHives();
+		}
+		if ($type === 'all' || $type === 'js')
+		{
+			$result &= $combiner->removeJsHives();
+		}
+		return $result;
+	}
+
+	/**
 	 * Output the Javascript files
 	 *
 	 * What it does:

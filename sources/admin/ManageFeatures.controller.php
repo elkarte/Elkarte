@@ -217,6 +217,20 @@ class ManageFeatures_Controller extends Action_Controller
 			writeLog();
 			redirectexit('action=admin;area=featuresettings;sa=basic');
 		}
+		if (isset($this->_req->post->cleanhives))
+		{
+			$clean_hives_result = theme()->cleanHives();
+
+			Template_Layers::getInstance()->removeAll();
+			loadTemplate('Json');
+			addJavascriptVar(array('txt_invalid_response' => $txt['ajax_bad_response']), true);
+			$context['sub_template'] = 'send_json';
+			$context['json_data'] = array(
+				'success' => $clean_hives_result,
+				'response' => $clean_hives_result ? $txt['clean_hives_sucess'] : $txt['clean_hives_failed']
+			);
+			return;
+		}
 
 		$context['post_url'] = $scripturl . '?action=admin;area=featuresettings;save;sa=basic';
 		$context['settings_title'] = $txt['mods_cat_features'];
@@ -1226,7 +1240,7 @@ class ManageFeatures_Controller extends Action_Controller
 				array('text', 'jquery_version', 'postinput' => $txt['jquery_custom_after']),
 				array('check', 'jqueryui_default', 'onchange' => 'showhideJqueryOptions();'),
 				array('text', 'jqueryui_version', 'postinput' => $txt['jqueryui_custom_after']),
-				array('check', 'minify_css_js'),
+				array('check', 'minify_css_js', 'postinput' => '<a href="#" id="clean_hives">' . $txt['clean_hives'] . '</a>'),
 			'',
 				// Number formatting, timezones.
 				array('text', 'time_format'),

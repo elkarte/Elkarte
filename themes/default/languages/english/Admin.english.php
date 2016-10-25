@@ -714,7 +714,7 @@ $txt['pruning_title'] = 'Log Pruning';
 
 $txt['core_settings_activation_message'] = 'The feature {core_feature} has been activated, click on the title to configure it';
 $txt['core_settings_deactivation_message'] = 'The feature {core_feature} has been deactivated';
-$txt['core_settings_generic_error'] = 'An unforeseen error occurred, please reload the page and try again';
+$txt['core_settings_generic_error'] = 'An error occurred, please reload the page and try again.';
 
 $txt['boardsEdit'] = 'Modify Boards';
 $txt['mboards_new_cat'] = 'Create new category';

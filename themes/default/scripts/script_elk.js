@@ -603,14 +603,13 @@ function add_elk_mention(selector, oOptions)
 		// Account for any user options
 		var oSettings = $.extend({}, $.fn.elkSortable.oDefaultsSettings, oInstanceSettings || {});
 
-		// Divs to hold our responses
-		var ajax_infobar = document.createElement('div'),
-			ajax_errorbox = $("<div id='errorContainer'><div/>").appendTo('body');
+		if (typeof oSettings.infobar === 'undefined')
+		{
+			oSettings.infobar = new ElkInfoBar('sortable_bar', {error_class: 'errorbox', success_class: 'infobox'});
+		}
 
-		// Prepare the infobar and errorbox divs to confirm valid responses or show an error
-		$(ajax_infobar).css({'position': 'fixed', 'top': '0', 'left': '0', 'width': '100%', 'z-index': '100'});
-		$("body").append(ajax_infobar);
-		$(ajax_infobar).slideUp();
+		// Divs to hold our responses
+		var ajax_errorbox = $("<div id='errorContainer'><div/>").appendTo('body');
 
 		$('#errorContainer').css({'display': 'none'});
 
@@ -711,11 +710,8 @@ function add_elk_mention(selector, oOptions)
 					data: postdata
 				})
 				.fail(function(jqXHR, textStatus, errorThrown) {
-					$(ajax_infobar).attr('class', 'errorbox');
-					$(ajax_infobar).html(textStatus).slideDown('fast');
-					setTimeout(function() {
-						$(ajax_infobar).slideUp();
-					}, 3500);
+					oSettings.infobar.isError();
+					oSettings.infobar.changeText(textStatus).showBar();
 					// Reset the interface?
 					if (oSettings.href !== '')
 						setTimeout(function() {
@@ -745,11 +741,8 @@ function add_elk_mention(selector, oOptions)
 					else if ($(data).find("elk").length !== 0)
 					{
 						// Valid responses get the unobtrusive slider
-						$(ajax_infobar).attr('class', 'infobox');
-						$(ajax_infobar).html($(data).find('elk > orders > order').text()).slideDown('fast');
-						setTimeout(function() {
-							$(ajax_infobar).slideUp();
-						}, 3500);
+						oSettings.infobar.isSuccess();
+						oSettings.infobar.changeText($(data).find('elk > orders > order').text()).showBar();
 					}
 					else
 					{
@@ -1616,5 +1609,100 @@ var ElkNotifier = new ElkNotifications();
 	// included directly via <script> tag
 	else {
 		this.ElkInlineAttachments = ElkInlineAttachments;
+	}
+})();
+
+/**
+ * Initialize the ajax info-bar
+ */
+(function () {
+	var ElkInfoBar = (function (elem_id, opt) {
+		'use strict';
+
+		opt = $.extend({
+			text: '',
+			class: 'ajax_infobar',
+			hide_delay: 5000,
+			error_class: 'error',
+			success_class: 'success',
+		}, opt);
+
+		var $elem = $('#' + elem_id),
+			time_out = null,
+			init = function (elem_id, opt) {
+				clearTimeout(time_out);
+				if ($elem.length == 0) {
+					$elem = $('<div id="' + elem_id + '" class="' + opt.class + '" />');
+					$('body').append($elem);
+					hide();
+					$elem.attr('id', elem_id);
+					$elem.addClass(opt.class);
+					$elem.text(opt.text);
+				}
+			},
+			changeText = function (text) {
+				clearTimeout(time_out);
+				$elem.html(text);
+				return this;
+			},
+			addClass = function (aClass) {
+				$elem.addClass(aClass);
+				return this;
+			},
+			removeClass = function (aClass) {
+				$elem.removeClass(aClass);
+				return this;
+			},
+			showBar = function() {
+				clearTimeout(time_out);
+				$elem.fadeIn();
+
+				if (opt.hide_delay != 0)
+				{
+					time_out = setTimeout(function() {
+						hide();
+					}, opt.hide_delay);
+				}
+				return this;
+			},
+			isError = function() {
+				removeClass(opt.success_class);
+				addClass(opt.error_class);
+			},
+			isSuccess = function() {
+				removeClass(opt.error_class);
+				addClass(opt.success_class);
+			},
+			hide = function () {
+				clearTimeout(time_out);
+				$elem.slideUp();
+				return this;
+			};
+
+		init(elem_id, opt);
+		return {
+			changeText: changeText,
+			addClass: addClass,
+			removeClass: removeClass,
+			showBar: showBar,
+			isError: isError,
+			isSuccess: isSuccess,
+			hide: hide
+		};
+	});
+
+	// AMD / RequireJS
+	if (typeof define !== 'undefined' && define.amd) {
+		define([], function () {
+			return ElkInfoBar;
+		});
+	}
+	// CommonJS
+	else if (typeof module !== 'undefined' && module.exports) {
+		module.exports = ElkInfoBar;
+	}
+	// included directly via <script> tag
+	else {
+		this.ElkInfoBar = ElkInfoBar;
 	}
 })();
