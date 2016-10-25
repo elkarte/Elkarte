@@ -118,6 +118,7 @@ function template_registration_form()
 			<h2 class="category_header">', $txt['registration_form'], '</h2>
 			<h2 class="category_header">', $txt['required_info'], '</h2>
 				<input type="password" name="autofill_honey_pot" class="hide" />
+				<input type="hidden" name="allow_email" value="0" />
 				<fieldset class="content">
 					<dl class="settings">
 						<dt>
@@ -136,12 +137,6 @@ function template_registration_form()
 						</dt>
 						<dd>
 							<input type="email" name="email" id="elk_autov_reserve1" size="30" tabindex="', $context['tabindex']++, '" value="', isset($context['email']) ? $context['email'] : '', '" class="input_text" placeholder="', $txt['user_email_address'], '" required="required" />
-						</dd>
-						<dt>
-							<label for="allow_email">', $txt['allow_user_email'], ':</label>
-						</dt>
-						<dd>
-							<input type="checkbox" name="allow_email" id="allow_email" tabindex="', $context['tabindex']++, '" />
 						</dd>
 					</dl>';
 
