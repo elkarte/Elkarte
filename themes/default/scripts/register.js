@@ -27,6 +27,7 @@ function elkRegister(formID, passwordDifficultyLevel, regTextStrings)
 	this.verificationFieldLength = 0;
 	this.textStrings = regTextStrings ? regTextStrings : [];
 	this.passwordLevel = passwordDifficultyLevel ? passwordDifficultyLevel : 0;
+	this.displayChanged = false;
 
 	// Setup all the fields!
 	this.autoSetup(formID);
@@ -52,6 +53,8 @@ elkRegister.prototype.addVerificationField = function(fieldType, fieldID)
 		eventHandler = 'refreshVerifyPassword';
 	else if (fieldType === 'username')
 		eventHandler = 'refreshUsername';
+	else if (fieldType === 'displayname')
+		eventHandler = 'refreshDisplayname';
 	else if (fieldType === 'reserved')
 		eventHandler = 'refreshMainPassword';
 
@@ -118,6 +121,8 @@ elkRegister.prototype.autoSetup = function(formID)
 			// Username can only be done with XML.
 			if (curElement.id.indexOf('username') !== -1)
 				curType = 'username';
+			else if (curElement.id.indexOf('displayname') !== -1)
+				curType = 'displayname';
 			else if (curElement.id.indexOf('pwmain') !== -1)
 				curType = 'pwmain';
 			else if (curElement.id.indexOf('pwverify') !== -1)
@@ -215,6 +220,11 @@ elkRegister.prototype.refreshUsername = function()
 	if (!this.verificationFields.username)
 		return false;
 
+	if (typeof this.verificationFields.displayname !== 'undefined' && this.displayChanged === false)
+	{
+		this.verificationFields.displayname[1].value = this.verificationFields.username[1].value;
+	}
+
 	// Restore the class name.
 	if (this.verificationFields.username[1].className)
 		this.verificationFields.username[1].className = this.verificationFields.username[5];
@@ -222,6 +232,34 @@ elkRegister.prototype.refreshUsername = function()
 	// Check the image is correct.
 	var alt = this.textStrings.username_check ? this.textStrings.username_check : '';
 	this.setVerificationImage(this.verificationFields.username[2], 'check', alt);
+
+	// Check the password is still OK.
+	this.refreshMainPassword();
+
+	return true;
+};
+
+// If the displayname is changed just revert the status of whether it's valid!
+elkRegister.prototype.refreshDisplayname = function(e)
+{
+	if (!this.verificationFields.displayname)
+		return false;
+
+	if (typeof e !== 'undefined')
+	{
+		if (!(e.altKey || e.ctrlKey || e.shiftKey) && e.which > 48)
+		{
+			this.displayChanged = true;
+		}
+	}
+
+	// Restore the class name.
+	if (this.verificationFields.displayname[1].className)
+		this.verificationFields.displayname[1].className = this.verificationFields.displayname[5];
+
+	// Check the image is correct.
+	var alt = this.textStrings.username_check ? this.textStrings.username_check : '';
+	this.setVerificationImage(this.verificationFields.displayname[2], 'check', alt);
 
 	// Check the password is still OK.
 	this.refreshMainPassword();
@@ -243,8 +281,11 @@ elkRegister.prototype.checkUsername = function(is_auto)
 
 	// Get the username and do nothing without one!
 	var curUsername = this.verificationFields.username[1].value;
-	if (!curUsername)
+	var curDisplayname = typeof this.verificationFields.displayname !== 'undefined' ? this.verificationFields.displayname[1].value : '';
+
+	if (!curUsername && !curDisplayname)
 		return false;
+
 
 	if (!is_auto)
 		ajax_indicator(true);
@@ -252,6 +293,11 @@ elkRegister.prototype.checkUsername = function(is_auto)
 	// Request a search on that username.
 	var checkName = curUsername.php_urlencode();
 	sendXMLDocument.call(this, elk_prepareScriptUrl(elk_scripturl) + 'action=register;sa=usernamecheck;xml;username=' + checkName, null, this.checkUsernameCallback);
+	if (curDisplayname)
+	{
+		var checkDisplay = curDisplayname.php_urlencode();
+		sendXMLDocument.call(this, elk_prepareScriptUrl(elk_scripturl) + 'action=register;sa=usernamecheck;xml;username=' + checkDisplay, null, this.checkDisplaynameCallback);
+	}
 
 	return true;
 };
@@ -269,6 +315,23 @@ elkRegister.prototype.checkUsernameCallback = function(XMLDoc)
 
 	this.verificationFields.username[1].className = this.verificationFields.username[5] + ' ' + (isValid === 1 ? 'valid_input' : 'invalid_input');
 	this.setVerificationImage(this.verificationFields.username[2], isValid === 1, alt);
+
+	ajax_indicator(false);
+};
+
+// Callback for getting the displayname data.
+elkRegister.prototype.checkDisplaynameCallback = function(XMLDoc)
+{
+	var isValid = true;
+
+	if (XMLDoc.getElementsByTagName("username"))
+		isValid = parseInt(XMLDoc.getElementsByTagName("username")[0].getAttribute("valid"));
+
+	// What to alt?
+	var alt = this.textStrings[isValid === 1 ? 'username_valid' : 'username_invalid'] ? this.textStrings[isValid === 1 ? 'username_valid' : 'username_invalid'] : '';
+
+	this.verificationFields.displayname[1].className = this.verificationFields.displayname[5] + ' ' + (isValid === 1 ? 'valid_input' : 'invalid_input');
+	this.setVerificationImage(this.verificationFields.displayname[2], isValid === 1, alt);
 
 	ajax_indicator(false);
 };

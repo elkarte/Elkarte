@@ -217,6 +217,7 @@ function template_warning_divs()
 
 	// Errors are very serious..
 	if (!empty($incontext['error']))
+	{
 		echo '
 		<div class="errorbox">
 			<strong style="text-decoration: underline;">', $txt['upgrade_critical_error'], '</strong><br />
@@ -224,8 +225,10 @@ function template_warning_divs()
 				', $incontext['error'], '
 			</div>
 		</div>';
+	}
 	// A warning message?
-	elseif (!empty($incontext['warning']))
+	if (!empty($incontext['warning']))
+	{
 		echo '
 		<div class="warningbox">
 			<strong style="text-decoration: underline;">', $txt['upgrade_warning'], '</strong><br />
@@ -233,6 +236,18 @@ function template_warning_divs()
 				', $incontext['warning'], '
 			</div>
 		</div>';
+	}
+	// Any message?
+	if (!empty($incontext['infobox']))
+	{
+		echo '
+		<div class="information">
+			<strong style="text-decoration: underline;">', $txt['upgrade_note'], '</strong><br />
+			<div>
+				', $incontext['infobox'], '
+			</div>
+		</div>';
+	}
 
 	return empty($incontext['error']) && empty($incontext['warning']);
 }

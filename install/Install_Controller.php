@@ -123,7 +123,7 @@ class Install_Controller
 		// If there is no Settings.php then we need a new one that only the owner can provide
 		if (!file_exists(TMP_BOARDDIR . '/Settings.php'))
 		{
-			$incontext['warning'] = $txt['error_no_settings'];
+			$incontext['infobox'] = $txt['error_no_settings'];
 		}
 
 		// Is some database support even compiled in?
