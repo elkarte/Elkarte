@@ -147,13 +147,13 @@ class ManageSearch_Controller extends Action_Controller
 			$new_engines = array();
 			foreach ($this->_req->post->engine_name as $id => $searchengine)
 			{
-				$url = $this->_req->post->engine_url[$id];
+				$url = trim(str_replace(array('"', '<', '>'), array('&quot;', '&lt;', '&gt;'), $this->_req->post->engine_url[$id]));
 				// If no url, forget it
 				if (!empty($searchengine) && !empty($url) && filter_var($url, FILTER_VALIDATE_URL))
 				{
 					$new_engines[] = array(
 						'name' => trim(Util::htmlspecialchars($searchengine, ENT_COMPAT)),
-						'url' => trim($url),
+						'url' => $url,
 						'separator' => trim(Util::htmlspecialchars(!empty($this->_req->post->engine_separator[$id]) ? $this->_req->post->engine_separator[$id] : '+', ENT_COMPAT)),
 					);
 				}
