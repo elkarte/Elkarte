@@ -600,6 +600,16 @@ class Packages_Controller extends Action_Controller
 			Errors::instance()->fatal_lang_error($packageInfo);
 
 		$packageInfo['filename'] = $this->_filename;
+		$pathinfo = pathinfo($this->_filename);
+
+		if (file_exists(BOARDDIR . '/packages/temp/package-info.xml'))
+		{
+			$context['base_path'] = '';
+		}
+		elseif (file_exists(BOARDDIR . '/packages/temp/' . $pathinfo['filename'] . '/package-info.xml'))
+		{
+			$context['base_path'] = $pathinfo['filename'] . '/';
+		}
 
 		// Create a backup file to roll back to! (but if they do this more than once, don't run it a zillion times.)
 		if (!empty($modSettings['package_make_full_backups']) && (!isset($_SESSION['last_backup_for']) || $_SESSION['last_backup_for'] != $this->_filename . ($this->_uninstalling ? '$$' : '$')))
