@@ -2485,10 +2485,10 @@ function package_create_backup($id = 'backup')
 		$output_file = BOARDDIR . '/packages/backups/' . strftime('%Y-%m-%d_') . preg_replace('~[$\\\\/:<>|?*"\']~', '', $id);
 		$output_ext = '.tar';
 
-		if (file_exists($output_file . $output_ext))
+		if (file_exists($output_file . $output_ext . '.gz'))
 		{
 			$i = 2;
-			while (file_exists($output_file . '_' . $i . $output_ext))
+			while (file_exists($output_file . '_' . $i . $output_ext . '.gz'))
 				$i++;
 			$output_file = $output_file . '_' . $i . $output_ext;
 		}
