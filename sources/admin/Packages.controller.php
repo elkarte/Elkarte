@@ -1826,6 +1826,9 @@ class Packages_Controller extends Action_Controller
 		{
 			$dir = new FilesystemIterator(BOARDDIR . '/packages', FilesystemIterator::SKIP_DOTS);
 
+			$filter = new PackagesFilterIterator($dir);
+			$iterator = new \IteratorIterator($filter);
+
 			$dirs = array();
 			$sort_id = array(
 				'mod' => 1,
@@ -1836,15 +1839,8 @@ class Packages_Controller extends Action_Controller
 				'smiley' => 1,
 				'unknown' => 1,
 			);
-			foreach ($dir as $package)
+			foreach ($iterator as $package)
 			{
-				if ($package->getFilename() == 'temp'
-					|| (!($package->isDir() && file_exists($package->getPathname() . '/package-info.xml'))
-						&& substr(strtolower($package->getFilename()), -7) !== '.tar.gz'
-						&& strtolower($package->getExtension()) !== 'tgz'
-						&& strtolower($package->getExtension()) !== 'zip'))
-					continue;
-
 				foreach ($context['package_types'] as $type)
 					if (isset($context['available_' . $type][md5($package->getFilename())]))
 						continue 2;
