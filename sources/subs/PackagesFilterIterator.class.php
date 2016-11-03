@@ -20,7 +20,8 @@ class PackagesFilterIterator extends \FilterIterator
 {
 	public function accept()
 	{
-		$filename = $this->current()->getFilename();
+		$current = $this->current();
+		$filename = $current->getFilename();
 
 		// Skip hidden files and directories.
 		if ($filename[0] === '.')
@@ -33,7 +34,7 @@ class PackagesFilterIterator extends \FilterIterator
 			return false;
 		}
 		// Anything that, once extracted, doesn't contain a package-info.xml.
-		if (!($this->isDir()) && file_exists($this->getPathname() . '/package-info.xml'))
+		if (!($current->isDir()) && file_exists($current->getPathname() . '/package-info.xml'))
 		{
 			return false;
 		}

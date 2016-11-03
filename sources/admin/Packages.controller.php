@@ -1835,9 +1835,7 @@ class Packages_Controller extends Action_Controller
 		try
 		{
 			$dir = new FilesystemIterator(BOARDDIR . '/packages', FilesystemIterator::SKIP_DOTS);
-
-			$filter = new PackagesFilterIterator($dir);
-			$iterator = new \IteratorIterator($filter);
+			$filtered_dir = new PackagesFilterIterator($dir);
 
 			$dirs = array();
 			$sort_id = array(
@@ -1849,7 +1847,7 @@ class Packages_Controller extends Action_Controller
 				'smiley' => 1,
 				'unknown' => 1,
 			);
-			foreach ($iterator as $package)
+			foreach ($filtered_dir as $package)
 			{
 				foreach ($context['package_types'] as $type)
 					if (isset($context['available_' . $type][md5($package->getFilename())]))
