@@ -115,7 +115,7 @@ class BoardIndex_Controller extends Action_Controller implements Frontpage_Inter
 			}
 			else
 			{
-				$context['latest_posts'] = cache_quick_get('boardindex-latest_topics:' . md5($user_info['query_wanna_see_board'] . $user_info['language']), 'subs/RecentTopics.class.php', 'cache_getLastTopics', array($latestPostOptions));
+				$context['latest_posts'] = cache_quick_get('boardindex-latest_topics:' . md5($user_info['query_wanna_see_board'] . $user_info['language']), 'subs/Recent.subs.php', 'cache_getLastTopics', array($latestPostOptions));
 			}
 		}
 
