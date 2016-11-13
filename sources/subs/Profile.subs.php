@@ -2225,7 +2225,10 @@ function profileSaveAvatarData(&$value)
 
 				$new_avatar_name = $uploadDir . '/' . getAttachmentFilename('avatar_tmp_' . $memID, false, null, true);
 				if (!move_uploaded_file($_FILES['attachment']['tmp_name'], $new_avatar_name))
+				{
+					loadLanguage('Post');
 					Errors::instance()->fatal_lang_error('attach_timeout', 'critical');
+				}
 
 				$_FILES['attachment']['tmp_name'] = $new_avatar_name;
 			}
@@ -2351,6 +2354,7 @@ function profileSaveAvatarData(&$value)
 				$destinationPath = $uploadDir . '/' . (empty($file_hash) ? $destName : $cur_profile['id_attach'] . '_' . $file_hash . '.elk');
 				if (!rename($_FILES['attachment']['tmp_name'], $destinationPath))
 				{
+					loadLanguage('Post');
 					// I guess a man can try.
 					removeAttachments(array('id_member' => $memID));
 					Errors::instance()->fatal_lang_error('attach_timeout', 'critical');
