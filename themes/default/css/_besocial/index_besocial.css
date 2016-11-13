@@ -2067,7 +2067,7 @@ a.help .icon {
 	}
 
 	#main_menu .linklevel1.active, #main_menu .linklevel1.active:hover {
-		border: 0px;
+		border-color: transparent;
 	}
 	.statistics .flow_hidden, .statistics .floatleft {
 		border: none;
