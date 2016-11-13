@@ -2066,6 +2066,9 @@ a.help .icon {
 		box-shadow: 3px 3px 3px rgba(0, 0, 0, 0.3);
 	}
 
+	#main_menu .linklevel1.active, #main_menu .linklevel1.active:hover {
+		border: 0px;
+	}
 	.statistics .flow_hidden, .statistics .floatleft {
 		border: none;
 	}
