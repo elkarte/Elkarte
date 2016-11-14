@@ -595,15 +595,15 @@ class PackageServers_Controller extends Action_Controller
 		{
 			try
 			{
-				$packages = new FilesystemIterator(BOARDDIR . '/packages', FilesystemIterator::SKIP_DOTS);
+				$dir = new FilesystemIterator(BOARDDIR . '/packages', FilesystemIterator::SKIP_DOTS);
+
+				$filter = new PackagesFilterIterator($dir);
+				$packages = new \IteratorIterator($filter);
+
 				foreach ($packages as $package)
 				{
 					// No need to check these
-					if ($package->getFilename() === 'temp' || $package->getFilename() == $packageName ||
-						(!($package->isDir()) && file_exists($package->getPathname() . '/package-info.xml')
-							&& substr(strtolower($package->getFilename()), -7) !== '.tar.gz'
-							&& strtolower($package->getExtension()) !== 'tgz'
-							&& strtolower($package->getExtension()) !== 'zip'))
+					if ($package->getFilename() == $packageName)
 						continue;
 
 					// Read package info for the archive we found

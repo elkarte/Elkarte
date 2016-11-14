@@ -600,6 +600,9 @@ class Packages_Controller extends Action_Controller
 			Errors::instance()->fatal_lang_error($packageInfo);
 
 		$packageInfo['filename'] = $this->_filename;
+		$pathinfo = pathinfo($this->_filename);
+
+		$context['base_path'] = $this->_base_path;
 
 		// Create a backup file to roll back to! (but if they do this more than once, don't run it a zillion times.)
 		if (!empty($modSettings['package_make_full_backups']) && (!isset($_SESSION['last_backup_for']) || $_SESSION['last_backup_for'] != $this->_filename . ($this->_uninstalling ? '$$' : '$')))
@@ -695,7 +698,7 @@ class Packages_Controller extends Action_Controller
 					$package_installed['db_changes'] = serialize($db_package_log);
 				}
 				else
-					$package_installed['db_changes'] = array();
+					$package_installed['db_changes'] = '';
 
 				// What themes did we actually install?
 				$themes_installed = array_unique($themes_installed);
@@ -1825,6 +1828,7 @@ class Packages_Controller extends Action_Controller
 		try
 		{
 			$dir = new FilesystemIterator(BOARDDIR . '/packages', FilesystemIterator::SKIP_DOTS);
+			$filtered_dir = new PackagesFilterIterator($dir);
 
 			$dirs = array();
 			$sort_id = array(
@@ -1836,15 +1840,8 @@ class Packages_Controller extends Action_Controller
 				'smiley' => 1,
 				'unknown' => 1,
 			);
-			foreach ($dir as $package)
+			foreach ($filtered_dir as $package)
 			{
-				if ($package->getFilename() == 'temp'
-					|| (!($package->isDir() && file_exists($package->getPathname() . '/package-info.xml'))
-						&& substr(strtolower($package->getFilename()), -7) !== '.tar.gz'
-						&& strtolower($package->getExtension()) !== 'tgz'
-						&& strtolower($package->getExtension()) !== 'zip'))
-					continue;
-
 				foreach ($context['package_types'] as $type)
 					if (isset($context['available_' . $type][md5($package->getFilename())]))
 						continue 2;

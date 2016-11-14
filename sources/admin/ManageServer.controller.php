@@ -440,7 +440,7 @@ class ManageServer_Controller extends Action_Controller
 			'',
 				array('maintenance', $txt['admin_maintain'], 'file', 'check'),
 				array('mtitle', $txt['maintenance_subject'], 'file', 'text', 36),
-				array('mmessage', $txt['maintenance_message'], 'file', 'text', 36),
+				array('mmessage', $txt['maintenance_message'], 'file', 'large_text'),
 			'',
 				array('webmaster_email', $txt['admin_webmaster_email'], 'file', 'text', 30),
 			'',

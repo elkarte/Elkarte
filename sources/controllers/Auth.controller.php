@@ -508,7 +508,7 @@ class Auth_Controller extends Action_Controller
 		// Basic template stuff..
 		$context['sub_template'] = 'maintenance';
 		$context['title'] = &$mtitle;
-		$context['description'] = &$mmessage;
+		$context['description'] = un_htmlspecialchars($mmessage);
 		$context['page_title'] = $txt['maintain_mode'];
 	}
 

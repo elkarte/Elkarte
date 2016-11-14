@@ -1014,9 +1014,13 @@ function parsePackageInfo(&$packageXML, $testing_only = true, $method = 'install
 			if (substr($actionType, 0, 4) == 'move' || substr($actionType, 0, 7) == 'require')
 			{
 				if ($action->exists('@from'))
+				{
 					$this_action['source'] = parse_path($action->fetch('@from'));
+				}
 				else
+				{
 					$this_action['source'] = $temp_path . $this_action['filename'];
+				}
 			}
 
 			// Check if these things can be done. (chmod's etc.)

@@ -107,8 +107,16 @@ class BoardIndex_Controller extends Action_Controller implements Frontpage_Inter
 		{
 			$latestPostOptions = array(
 				'number_posts' => $settings['number_recent_posts'],
+				'id_member' => $user_info['id'],
 			);
-			$context['latest_posts'] = cache_quick_get('boardindex-latest_posts:' . md5($user_info['query_wanna_see_board'] . $user_info['language']), 'subs/Recent.subs.php', 'cache_getLastPosts', array($latestPostOptions));
+			if (empty($settings['recent_post_topics']))
+			{
+				$context['latest_posts'] = cache_quick_get('boardindex-latest_posts:' . md5($user_info['query_wanna_see_board'] . $user_info['language']), 'subs/Recent.subs.php', 'cache_getLastPosts', array($latestPostOptions));
+			}
+			else
+			{
+				$context['latest_posts'] = cache_quick_get('boardindex-latest_topics:' . md5($user_info['query_wanna_see_board'] . $user_info['language']), 'subs/Recent.subs.php', 'cache_getLastTopics', array($latestPostOptions));
+			}
 		}
 
 		// Let the template know what the members can do if the theme enables these options
