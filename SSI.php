@@ -432,27 +432,46 @@ function ssi_recentTopics($num_recent = 8, $exclude_boards = null, $include_boar
 	if (empty($topics))
 		return array();
 
+	$topic_list = array_keys($topics);
+
+	// Count number of new posts per topic.
+	if (!$user_info['is_guest'])
+	{
+		$request = $smcFunc['db_query']('', '
+			SELECT
+				m.id_topic, COALESCE(lt.id_msg, lmr.id_msg, -2) + 1 AS new_from
+			FROM {db_prefix}messages AS m
+				LEFT JOIN {db_prefix}log_topics AS lt ON (lt.id_topic = m.id_topic AND lt.id_member = {int:current_member})
+				LEFT JOIN {db_prefix}log_mark_read AS lmr ON (lmr.id_board = m.id_board AND lmr.id_member = {int:current_member})
+			WHERE
+				m.id_topic IN ({array_int:topic_list})
+				AND (m.id_msg > COALESCE(lt.id_msg, lmr.id_msg, 0))
+			GROUP BY m.id_topic',
+			array(
+				'current_member' => $user_info['id'],
+				'topic_list' => $topic_list
+			)
+		);
+		while ($row = $db->fetch_assoc($request))
+			$topics[$row['id_topic']] += $row;
+		$db->free_result($request);
+	}
+
 	// Find all the posts in distinct topics. Newer ones will have higher IDs.
 	$request = $db->query('substring', '
 		SELECT
 			ml.poster_time, mf.subject, mf.id_member AS id_op_member, ml.id_member, ml.id_msg, t.id_topic, t.num_replies, t.num_views, mg.online_color,
 			IFNULL(mem.real_name, ml.poster_name) AS poster_name,
-			IFNULL(memop.real_name, mf.poster_name) AS op_name, ' . ($user_info['is_guest'] ? '1 AS is_read, 0 AS new_from' : '
-			IFNULL(lt.id_msg, IFNULL(lmr.id_msg, 0)) >= ml.id_msg_modified AS is_read,
-			IFNULL(lt.id_msg, IFNULL(lmr.id_msg, -1)) + 1 AS new_from') . ', SUBSTRING(ml.body, 1, 384) AS body, ml.smileys_enabled, ml.icon
+			IFNULL(memop.real_name, mf.poster_name) AS op_name, SUBSTRING(ml.body, 1, 384) AS body, ml.smileys_enabled, ml.icon
 		FROM {db_prefix}topics AS t
 			INNER JOIN {db_prefix}messages AS ml ON (ml.id_msg = t.id_last_msg)
 			INNER JOIN {db_prefix}messages AS mf ON (mf.id_msg = t.id_first_msg)
 			LEFT JOIN {db_prefix}members AS mem ON (mem.id_member = ml.id_member)
-			LEFT JOIN {db_prefix}members AS memop ON (memop.id_member = mf.id_member)' . (!$user_info['is_guest'] ? '
-			LEFT JOIN {db_prefix}log_topics AS lt ON (lt.id_topic = t.id_topic AND lt.id_member = {int:current_member})
-			LEFT JOIN {db_prefix}log_mark_read AS lmr ON (lmr.id_board = t.id_board AND lmr.id_member = {int:current_member})' : '') . '
+			LEFT JOIN {db_prefix}members AS memop ON (memop.id_member = mf.id_member)
 			LEFT JOIN {db_prefix}membergroups AS mg ON (mg.id_group = mem.id_group)
-		WHERE t.id_topic IN ({array_int:topic_list})
-		ORDER BY t.id_last_msg DESC',
+		WHERE t.id_topic IN ({array_int:topic_list})',
 		array(
-			'current_member' => $user_info['id'],
-			'topic_list' => array_keys($topics),
+			'topic_list' => $topic_list
 		)
 	);
 
@@ -469,7 +488,7 @@ function ssi_recentTopics($num_recent = 8, $exclude_boards = null, $include_boar
 		$row['body'] = censor($row['body']);
 
 		// Build the array.
-		$posts[] = array(
+		$posts[$row['id_last_msg']] = array(
 			'board' => array(
 				'id' => $topics[$row['id_topic']]['id_board'],
 				'name' => $topics[$row['id_topic']]['board_name'],
@@ -499,14 +518,13 @@ function ssi_recentTopics($num_recent = 8, $exclude_boards = null, $include_boar
 			'timestamp' => forum_time(true, $row['poster_time']),
 			'href' => $scripturl . '?topic=' . $row['id_topic'] . '.msg' . $row['id_msg'] . ';topicseen#new',
 			'link' => '<a href="' . $scripturl . '?topic=' . $row['id_topic'] . '.msg' . $row['id_msg'] . '#new" rel="nofollow">' . $row['subject'] . '</a>',
-			// Retained for compatibility - is technically incorrect!
-			'new' => !empty($row['is_read']),
-			'is_new' => empty($row['is_read']),
-			'new_from' => $row['new_from'],
+			'is_new' => !empty($topics[$row['id_topic']]['new_from']),
+			'new_from' => empty($topics[$row['id_topic']]['new_from']) ? 0 : $topics[$row['id_topic']]['new_from'],
 			'icon' => '<img src="' . $icon_sources->{$row['icon']} . '" class="centericon" alt="' . $row['icon'] . '" />',
 		);
 	}
 	$db->free_result($request);
+	krsort($posts);
 
 	// Just return it.
 	if ($output_method != 'echo' || empty($posts))
