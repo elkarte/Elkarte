@@ -23,35 +23,23 @@
  */
 class Post_Controller extends Action_Controller
 {
-	/**
-	 * The post (messages) errors object
-	 * @var null|object
-	 */
+	/** @var null|Error_Context The post (messages) errors object */
 	protected $_post_errors = null;
 
-	/**
-	 * The template layers object
-	 * @var null|object
-	 */
+	/** @var null|Template_Layers The template layers object */
 	protected $_template_layers = null;
 
-	/**
-	 * An array of attributes of the topic (if not new)
-	 * @var mixed[]
-	 */
+	/** @var array An array of attributes of the topic (if not new) */
 	protected $_topic_attributes = array();
 
-	/**
-	 * The message subject
-	 * @var string
-	 */
+	/** @var string The message subject */
 	protected $_form_subject = '';
 
-	/**
-	 * The message
-	 * @var string
-	 */
+	/** @var string The message  */
 	protected $_form_message = '';
+
+	/** @var \BBC\PreparseCode */
+	protected $preparse;
 
 	/**
 	 * Sets up common stuff for all or most of the actions.
@@ -60,6 +48,8 @@ class Post_Controller extends Action_Controller
 	{
 		$this->_post_errors = Error_Context::context('post', 1);
 		$this->_template_layers = Template_Layers::getInstance();
+
+		$this->preparse = \BBC\PreparseCode::getInstance();
 
 		require_once(SUBSDIR . '/Post.subs.php');
 		require_once(SUBSDIR . '/Messages.subs.php');
@@ -369,11 +359,11 @@ class Post_Controller extends Action_Controller
 			{
 				// Set up the preview message and subject
 				$context['preview_message'] = $this->_form_message;
-				preparsecode($this->_form_message, true);
+				$this->preparse->preparsecode($this->_form_message, true);
 
 				// Do all bulletin board code thing on the message
 				$bbc_parser = \BBC\ParserWrapper::getInstance();
-				preparsecode($context['preview_message']);
+				$this->preparse->preparsecode($context['preview_message']);
 				$context['preview_message'] = $bbc_parser->parseMessage($context['preview_message'], isset($_REQUEST['ns']) ? 0 : 1);
 				$context['preview_message'] = censor($context['preview_message']);
 
@@ -464,7 +454,7 @@ class Post_Controller extends Action_Controller
 
 			// Get the stuff ready for the form.
 			$this->_form_subject = $message['message']['subject'];
-			$this->_form_message = un_preparsecode($message['message']['body']);
+			$this->_form_message = $this->preparse->un_preparsecode($message['message']['body']);
 
 			$this->_form_message = censor($this->_form_message);
 			$this->_form_subject = censor($this->_form_subject);
@@ -928,7 +918,8 @@ class Post_Controller extends Action_Controller
 			// Preparse code. (Zef)
 			if ($user_info['is_guest'])
 				$user_info['name'] = $_POST['guestname'];
-			preparsecode($_POST['message']);
+
+			$this->preparse->preparsecode($_POST['message']);
 
 			$bbc_parser = \BBC\ParserWrapper::getInstance();
 
@@ -1172,7 +1163,7 @@ class Post_Controller extends Action_Controller
 		if (!empty($can_view_post))
 		{
 			// Remove special formatting we don't want anymore.
-			$row['body'] = un_preparsecode($row['body']);
+			$row['body'] = $this->preparse->un_preparsecode($row['body']);
 
 			// Censor the message!
 			$row['body'] = censor($row['body']);
@@ -1298,7 +1289,7 @@ class Post_Controller extends Action_Controller
 			{
 				$_POST['message'] = Util::htmlspecialchars($_POST['message'], ENT_QUOTES, 'UTF-8', true);
 
-				preparsecode($_POST['message']);
+				$this->preparse->preparsecode($_POST['message']);
 				$bbc_parser = \BBC\ParserWrapper::getInstance();
 
 				if (Util::htmltrim(strip_tags($bbc_parser->parseMessage($_POST['message'], false), '<img>')) === '')

@@ -2,6 +2,10 @@
 
 class TestBBC extends PHPUnit_Framework_TestCase
 {
+	protected $bbcTestCases;
+	protected $bbcInvalidTestCases;
+	protected $bbcPreparseTestCases;
+
 	/**
 	 * Prepare what is necessary to use in these tests.
 	 *
@@ -9,8 +13,12 @@ class TestBBC extends PHPUnit_Framework_TestCase
 	 */
 	public function setUp()
 	{
+		global $modSettings;
+		$modSettings['user_access_mentions'] = array();
+
 		loadTheme();
 
+		// Standard testcases
 		$this->bbcTestCases = array(
 			array(
 				'Test abbreviation',
@@ -462,10 +470,69 @@ class TestBBC extends PHPUnit_Framework_TestCase
 				'[quote author=qwertyuioplkjhgfdsazxcvbnmqwertyuioplkjhgfdsazxcvbnmqwertyuioplkjhgfdsazxcvbnmqwertyuioplkjhgfdsazxcvbnmqwertyuioplkjhgfdsazxcvbnmqwertyuioplkjhgfdsazxcvbnmqwertyuioplkjhgfdsazxcvbnmqwertyuiopl]This is a quote[/quote]',
 			),
 			// This form currently parses using "]This is a quote" as author. It's not correct but that is.
-// 			array(
-// 				'Quoting is a pain 2',
-// 				'[quote author=]This is a quote[/quote]',
-// 			),
+			// 			array(
+			// 				'Quoting is a pain 2',
+			// 				'[quote author=]This is a quote[/quote]',
+			// 			),
+		);
+
+		// Others that preparse should fix or damage
+		$this->bbcPreparseTestCases = array(
+			array(
+				'Table1',
+				'[table][tr][td]let me see[/td][td][table][tr][td]if[/td][td]I[/td][/tr][tr][td]can[/td][td]break[/td][/tr][tr][td]the[/td][td]internet[/td][/td][/tr][/table]',
+				'<div class="bbc_table_container"><table class="bbc_table"><tr><td>let me see</td><td><div class="bbc_table_container"><table class="bbc_table"><tr><td>if</td><td>I</td></tr><tr><td>can</td><td>break</td></tr><tr><td>the</td><td>internet</td></tr></table></div></td></tr></table></div>'
+			),
+			array(
+				'Item Codes',
+				'[*]Ahoy!\n[*]Me[@]Matey\n[+]Shiver\n[x]Me\n[#]Timbers\n[!]\n[*]I[*]dunno[*]why',
+				'<ul style="list-style-type: disc" class="bbc_list"><li>Ahoy!\n</li><li>Me</li><li>Matey\n</li><li>Shiver\n</li><li>Me\n</li><li>Timbers\n[!]\n</li><li>I</li><li>dunno</li><li>why</li></ul>'
+			),
+			array(
+				'UTF8',
+				'[url]www.ñchan.org[/url]',
+				'<a href="http://www.ñchan.org" class="bbc_link" target="_blank">www.ñchan.org</a>'
+			),
+			array(
+				'ListCode1',
+				'[list][li]Test[/li][li]More [code]Some COde[/code][/li][/list]',
+				'<ul class="bbc_list"><li>Test</li><li>More <div class="codeheader">Code: <a href="#" onclick="return elkSelectText(this);" class="codeoperation">[Select]</a></div><pre class="bbc_code prettyprint">Some COde</pre></li></ul>'
+			),
+			array(
+				'ListCode2',
+				'some list[code][list][li]one[/list][/code]',
+				'some list<div class="codeheader">Code: <a href="#" onclick="return elkSelectText(this);" class="codeoperation">[Select]</a></div><pre class="bbc_code prettyprint">[list][li]one[/list]</pre>'
+			),
+			array(
+				'emptyQuote',
+				'something[quote][/quote]',
+				'something'
+			),
+			array(
+				'openCode',
+				'something[code]without a closing tag',
+				'something<div class="codeheader">Code: <a href="#" onclick="return elkSelectText(this);" class="codeoperation">[Select]</a></div><pre class="bbc_code prettyprint">without a closing tag</pre>'
+			),
+			array(
+				'openList',
+				'some open list[list][li]one[/list]',
+				'some open list<ul class="bbc_list"><li>one</li></ul>'
+			),
+			array(
+				'manyFonts',
+				'[font=something, someother]text[/font]',
+				'<span style="font-family: something;" class="bbc_font">text</span>'
+			),
+			array(
+				'itsMe',
+				'/me likes this',
+				'<div class="meaction">&nbsp; likes this</div>'
+			),
+			array(
+				'schemelessUrl',
+				'[url=//www.google.com]Google[/url]',
+				'<a href="http://www.google.com" class="bbc_link" target="_blank">Google</a>'
+			)
 		);
 	}
 
@@ -484,7 +551,13 @@ class TestBBC extends PHPUnit_Framework_TestCase
 
 			$this->assertEquals($expected, $result, $name);
 		}
+	}
 
+	/**
+	 * testBBcode, parse bbcode and checks that the results are what we expect
+	 */
+	public function testInvalidBBcode()
+	{
 		foreach ($this->bbcInvalidTestCases as $testcase)
 		{
 			$name = 'Broken ' . $testcase[0];
@@ -493,6 +566,27 @@ class TestBBC extends PHPUnit_Framework_TestCase
 			$result = parse_bbc($test);
 
 			$this->assertEquals($test, $result, $name);
+		}
+	}
+
+	/**
+	 * testPreparseBBcode, preparse bbcode and check that the results are what we expect
+	 */
+	public function testPreparseBBcode()
+	{
+		$preparse = new \BBC\PreparseCode;
+		$parse = \BBC\ParserWrapper::getInstance();
+
+		foreach ($this->bbcPreparseTestCases as $testcase)
+		{
+			$name = $testcase[0];
+			$test = $testcase[1];
+			$expected = $testcase[2];
+
+			$preparse->preparsecode($test, false);
+			$result = $parse->parseMessage($test, true);
+
+			$this->assertEquals($expected, $result, $name);
 		}
 	}
 }
