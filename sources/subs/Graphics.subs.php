@@ -238,24 +238,40 @@ function resizeImageFile($source, $destination, $max_width, $max_height, $prefer
 
 	// Get the image file, we have to work with something after all
 	$fp_destination = fopen($destination, 'wb');
-	if ($fp_destination && (substr($source, 0, 7) == 'http://' || substr($source, 0, 8) == 'https://'))
+	if ($fp_destination && (substr($source, 0, 7) === 'http://' || substr($source, 0, 8) === 'https://'))
 	{
 		$fileContents = fetch_web_data($source);
 
 		fwrite($fp_destination, $fileContents);
 		fclose($fp_destination);
 
-		$sizes = @getimagesize($destination);
+		try
+		{
+			$sizes = getimagesize($destination);
+		}
+		catch (Exception $e)
+		{
+			$sizes = array(-1, -1, -1);
+		}
 	}
 	elseif ($fp_destination)
 	{
-		$sizes = @getimagesize($source);
+		try
+		{
+			$sizes = getimagesize($source);
+		}
+		catch (Exception $e)
+		{
+			$sizes = array(-1, -1, -1);
+		}
 
 		$fp_source = fopen($source, 'rb');
 		if ($fp_source !== false)
 		{
 			while (!feof($fp_source))
+			{
 				fwrite($fp_destination, fread($fp_source, 8192));
+			}
 			fclose($fp_source);
 		}
 		else
@@ -272,12 +288,16 @@ function resizeImageFile($source, $destination, $max_width, $max_height, $prefer
 
 	// A known and supported format?
 	if (checkImagick() && isset($default_formats[$sizes[2]]))
+	{
 		return resizeImage(null, $destination, null, null, $max_width, $max_height, true, $preferred_format);
+	}
 	elseif (checkGD() && isset($default_formats[$sizes[2]]) && function_exists('imagecreatefrom' . $default_formats[$sizes[2]]))
 	{
 		$imagecreatefrom = 'imagecreatefrom' . $default_formats[$sizes[2]];
 		if ($src_img = @$imagecreatefrom($destination))
+		{
 			return resizeImage($src_img, $destination, imagesx($src_img), imagesy($src_img), $max_width === null ? imagesx($src_img) : $max_width, $max_height === null ? imagesy($src_img) : $max_height, true, $preferred_format);
+		}
 	}
 
 	return false;
@@ -464,30 +484,30 @@ function autoRotateImage($image)
 			break;
 		// (3) Normal image, rotated 180
 		case Imagick::ORIENTATION_BOTTOMRIGHT:
-			$image->rotateImage("#000", 180);
+			$image->rotateImage('#000', 180);
 			break;
 		// (4) Mirror image, rotated 180
 		case Imagick::ORIENTATION_BOTTOMLEFT:
-			$image->rotateImage("#000", 180);
+			$image->rotateImage('#000', 180);
 			$image->flopImage();
 			break;
 		// (5) Mirror image, rotated 90 CCW
 		case Imagick::ORIENTATION_LEFTTOP:
-			$image->rotateImage("#000", 90);
+			$image->rotateImage('#000', 90);
 			$image->flopImage();
 			break;
 		// (6) Normal image, rotated 90 CCW
 		case Imagick::ORIENTATION_RIGHTTOP:
-			$image->rotateImage("#000", 90);
+			$image->rotateImage('#000', 90);
 			break;
 		// (7) Mirror image, rotated 90 CW
 		case Imagick::ORIENTATION_RIGHTBOTTOM:
-			$image->rotateImage("#000", -90);
+			$image->rotateImage('#000', -90);
 			$image->flopImage();
 			break;
 		// (8) Normal image, rotated 90 CW
 		case Imagick::ORIENTATION_LEFTBOTTOM:
-			$image->rotateImage("#000", -90);
+			$image->rotateImage('#000', -90);
 			break;
 	}
 
