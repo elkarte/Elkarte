@@ -858,9 +858,9 @@ function moveTopicConcurrence($move_from = null, $id_board = null, $id_topic = n
 	// @deprecated since 1.1
 	if ($move_from === null && isset($_GET['current_board']))
 		$move_from = (int) $_GET['current_board'];
-	if ($id_board = null && !empty($board))
+	if ($id_board === null && !empty($board))
 		$id_board = $board;
-	if ($id_topic = null && !empty($topic))
+	if ($id_topic === null && !empty($topic))
 		$id_topic = $topic;
 
 	if (empty($move_from) || empty($id_board) || empty($id_topic))
@@ -1127,6 +1127,7 @@ function setTopicNotification($id_member, $id_topic, $on = false)
  * @param int $id_member = 0 member id
  * @param bool $includeUnapproved = false whether to include unapproved topics
  * @param bool $includeStickies = true whether to include sticky topics
+ * @return int topic number
  */
 function previousTopic($id_topic, $id_board, $id_member = 0, $includeUnapproved = false, $includeStickies = true)
 {
@@ -1141,6 +1142,7 @@ function previousTopic($id_topic, $id_board, $id_member = 0, $includeUnapproved 
  * @param int $id_member = 0 member id
  * @param bool $includeUnapproved = false whether to include unapproved topics
  * @param bool $includeStickies = true whether to include sticky topics
+ * @return int topic number
  */
 function nextTopic($id_topic, $id_board, $id_member = 0, $includeUnapproved = false, $includeStickies = true)
 {
@@ -1159,6 +1161,7 @@ function nextTopic($id_topic, $id_board, $id_member = 0, $includeUnapproved = fa
  * @param int $id_member = 0 member id
  * @param bool $includeUnapproved = false whether to include unapproved topics
  * @param bool $includeStickies = true whether to include sticky topics
+ * @return int the topic number
  */
 function topicPointer($id_topic, $id_board, $next = true, $id_member = 0, $includeUnapproved = false, $includeStickies = true)
 {
@@ -1266,6 +1269,7 @@ function setTopicWatch($id_member, $topic, $on = false)
  *    - if 'all' returns additional infos about the read/unwatched status
  * @param string[] $selects (optional from integration)
  * @param string[] $tables (optional from integration)
+ * @return array to topic attributes
  */
 function getTopicInfo($topic_parameters, $full = '', $selects = array(), $tables = array())
 {
@@ -1326,6 +1330,7 @@ function getTopicInfo($topic_parameters, $full = '', $selects = array(), $tables
  *
  * @param int $topic id of a topic
  * @param int|null $msg the id of a message, if empty, t.id_first_msg is used
+ * @return array to topic attributes
  */
 function getTopicInfoByMsg($topic, $msg = null)
 {
@@ -1763,6 +1768,7 @@ function messagesAttachments($id_messages)
  *
  * @param int $id_topic topic id
  * @param int $id_member member id
+ * @return array|int empty array if no member supplied, otherwise number of posts
  */
 function unapprovedPosts($id_topic, $id_member)
 {
@@ -1880,6 +1886,7 @@ function topicStatus($topic)
  * @param int|int[] $topic
  * @param mixed[] $attributes
  * @todo limited to integer attributes
+ * @return int number of row affected
  */
 function setTopicAttribute($topic, $attributes)
 {
@@ -1920,7 +1927,7 @@ function setTopicAttribute($topic, $attributes)
  *
  * @param int|int[] $id_topic topic to get the status for
  * @param string|string[] $attributes Basically the column names
- * @return int|int[]
+ * @return array named array based on attributes requested
  */
 function topicAttribute($id_topic, $attributes)
 {
