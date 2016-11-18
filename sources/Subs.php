@@ -242,7 +242,7 @@ function constructPageIndex($base_url, &$start, $max_value, $num_per_page, $flex
 	if (empty($modSettings['compactTopicPagesEnable']))
 	{
 		// Show the left arrow.
-		$pageindex = $start == 0 ? ' ' : sprintf($base_link, $start - $num_per_page, str_replace('{prev_txt}', $txt['prev'], $settings['page_index_template']['previous_page']));
+		$pageindex = $start == 0 || !$show['prev_next'] ? ' ' : sprintf($base_link, $start - $num_per_page, str_replace('{prev_txt}', $txt['prev'], $settings['page_index_template']['previous_page']));
 
 		// Show all the pages.
 		$display_page = 1;
@@ -251,17 +251,8 @@ function constructPageIndex($base_url, &$start, $max_value, $num_per_page, $flex
 
 		// Show the right arrow.
 		$display_page = ($start + $num_per_page) > $max_value ? $max_value : ($start + $num_per_page);
-		if ($start != $counter - $max_value && !$start_invalid)
+		if ($start != $counter - $max_value && !$start_invalid && $show['prev_next'])
 			$pageindex .= $display_page > $counter - $num_per_page ? ' ' : sprintf($base_link, $display_page, str_replace('{next_txt}', $txt['next'], $settings['page_index_template']['next_page']));
-
-		// The "all" button
-		if ($show['all'])
-		{
-			if (!empty($show['all_selected']))
-				$pageindex .= sprintf($settings['page_index_template']['current_page'], $txt['all']);
-			else
-				$pageindex .= sprintf(str_replace('.%1$d', '.%1$s', $base_link), '0;all', str_replace('{all_txt}', $txt['all'], $settings['page_index_template']['all']));
-		}
 	}
 	else
 	{
@@ -316,15 +307,15 @@ function constructPageIndex($base_url, &$start, $max_value, $num_per_page, $flex
 		// Show the "next page" link. (prev page 1 ... 6 7 [8] 9 10 ... 15 >next page<)
 		if ($start != $tmpMaxPages && $show['prev_next'])
 			$pageindex .= sprintf($base_link, $start + $num_per_page, str_replace('{next_txt}', $txt['next'], $settings['page_index_template']['next_page']));
+	}
 
-		// The "all" button
-		if ($show['all'])
-		{
-			if (!empty($show['all_selected']))
-				$pageindex .= sprintf($settings['page_index_template']['current_page'], $txt['all']);
-			else
-				$pageindex .= sprintf(str_replace('.%1$d', '.%1$s', $base_link), '0;all', str_replace('{all_txt}', $txt['all'], $settings['page_index_template']['all']));
-		}
+	// The "all" button
+	if ($show['all'])
+	{
+		if (!empty($show['all_selected']))
+			$pageindex .= sprintf($settings['page_index_template']['current_page'], $txt['all']);
+		else
+			$pageindex .= sprintf(str_replace('%1$d', '%1$s', $base_link), '0;all', str_replace('{all_txt}', $txt['all'], $settings['page_index_template']['all']));
 	}
 
 	return $pageindex;
