@@ -247,7 +247,7 @@ function constructPageIndex($base_url, &$start, $max_value, $num_per_page, $flex
 		// Show all the pages.
 		$display_page = 1;
 		for ($counter = 0; $counter < $max_value; $counter += $num_per_page)
-			$pageindex .= $start == $counter && !$start_invalid ? sprintf($settings['page_index_template']['current_page'], $display_page++) : sprintf($base_link, $counter, $display_page++);
+			$pageindex .= $start == $counter && !$start_invalid && empty($show['all_selected']) ? sprintf($settings['page_index_template']['current_page'], $display_page++) : sprintf($base_link, $counter, $display_page++);
 
 		// Show the right arrow.
 		$display_page = ($start + $num_per_page) > $max_value ? $max_value : ($start + $num_per_page);
@@ -282,7 +282,7 @@ function constructPageIndex($base_url, &$start, $max_value, $num_per_page, $flex
 			}
 
 		// Show the current page. (prev page 1 ... 6 7 >[8]< 9 10 ... 15 next page)
-		if (!$start_invalid)
+		if (!$start_invalid && empty($show['all_selected']))
 			$pageindex .= sprintf($settings['page_index_template']['current_page'], ($start / $num_per_page + 1));
 		else
 			$pageindex .= sprintf($base_link, $start, $start / $num_per_page + 1);
