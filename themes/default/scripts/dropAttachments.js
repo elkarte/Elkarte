@@ -168,11 +168,11 @@
 
 						for (var err in resp.data) {
 							if (resp.data.hasOwnProperty(err)) {
-								errorMsgs.individualServerErr = resp.data[err].title.php_htmlspecialchars() + '<br />';
+								errorMsgs.individualServerErr = resp.data[err].title.php_unhtmlspecialchars() + '<br />';
 
 								for (var errMsg in resp.data[err].errors) {
 									if (resp.data[err].errors.hasOwnProperty(errMsg))
-										serverErrorFiles.push(resp.data[err].errors[errMsg].php_htmlspecialchars());
+										serverErrorFiles.push(resp.data[err].errors[errMsg].php_unhtmlspecialchars());
 								}
 							}
 							numAttachUploaded--;
