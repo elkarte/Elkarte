@@ -507,7 +507,7 @@ function processAttachments($id_msg = null)
 		if (!empty($_SESSION['temp_attachments'][$attachID]['errors']))
 		{
 			$attach_errors->addAttach($attachID, $_SESSION['temp_attachments'][$attachID]['name']);
-			$log_these = array('attachments_no_create', 'attachments_no_write', 'attach_timeout', 'ran_out_of_space', 'cant_access_upload_path', 'attach_0_byte_file');
+			$log_these = array('attachments_no_create', 'attachments_no_write', 'attach_timeout', 'ran_out_of_space', 'cant_access_upload_path', 'attach_0_byte_file', 'bad_attachment');
 
 			foreach ($_SESSION['temp_attachments'][$attachID]['errors'] as $error)
 			{
@@ -515,7 +515,16 @@ function processAttachments($id_msg = null)
 				{
 					$attach_errors->addError($error);
 					if (in_array($error, $log_these))
+					{
 						Errors::instance()->log_error($_SESSION['temp_attachments'][$attachID]['name'] . ': ' . $txt[$error], 'critical');
+
+						// For critical errors, we don't want the file or session data to persist
+						if (file_exists($_SESSION['temp_attachments'][$attachID]['tmp_name']))
+						{
+							unlink($_SESSION['temp_attachments'][$attachID]['tmp_name']);
+						}
+						unset($_SESSION['temp_attachments'][$attachID]);
+					}
 				}
 				else
 					$attach_errors->addError(array($error[0], $error[1]));
