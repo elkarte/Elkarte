@@ -699,7 +699,8 @@ function attachmentChecks($attachID)
 	}
 
 	// First, the dreaded security check. Sorry folks, but this should't be avoided
-	$size = @getimagesize($_SESSION['temp_attachments'][$attachID]['tmp_name']);
+	$size = elk_getimagesize($_SESSION['temp_attachments'][$attachID]['tmp_name']);
+
 	if (isset($validImageTypes[$size[2]]))
 	{
 		require_once(SUBSDIR . '/Graphics.subs.php');
@@ -716,11 +717,14 @@ function attachmentChecks($attachID)
 			// Success! However, successes usually come for a price:
 			// we might get a new format for our image...
 			$old_format = $size[2];
-			$size = @getimagesize($attachmentOptions['tmp_name']);
-			if (!(empty($size)) && ($size[2] != $old_format))
+			$size = elk_getimagesize($attachmentOptions['tmp_name']);
+
+			if (!(empty($size)) && ($size[2] !== $old_format))
 			{
 				if (isset($validImageTypes[$size[2]]))
+				{
 					$_SESSION['temp_attachments'][$attachID]['type'] = 'image/' . $validImageTypes[$size[2]];
+				}
 			}
 		}
 	}
@@ -829,6 +833,7 @@ function attachmentChecks($attachID)
 
 		$context['attachments']['total_size'] -= $_SESSION['temp_attachments'][$attachID]['size'];
 		$context['attachments']['quantity']--;
+
 		return false;
 	}
 
@@ -868,7 +873,7 @@ function createAttachment(&$attachmentOptions)
 	);
 
 	// If this is an image we need to set a few additional parameters.
-	$size = @getimagesize($attachmentOptions['tmp_name']);
+	$size = elk_getimagesize($attachmentOptions['tmp_name']);
 	list ($attachmentOptions['width'], $attachmentOptions['height']) = $size;
 
 	// If it's an image get the mime type right.
@@ -948,7 +953,7 @@ function createAttachment(&$attachmentOptions)
 		if (createThumbnail($attachmentOptions['destination'], $modSettings['attachmentThumbWidth'], $modSettings['attachmentThumbHeight']))
 		{
 			// Figure out how big we actually made it.
-			$size = @getimagesize($attachmentOptions['destination'] . '_thumb');
+			$size = elk_getimagesize($attachmentOptions['destination'] . '_thumb');
 			list ($thumb_width, $thumb_height) = $size;
 
 			if (!empty($size['mime']))
@@ -1288,7 +1293,7 @@ function saveAvatar($temporary_path, $memID, $max_width, $max_height)
 		// Remove the .tmp extension from the attachment.
 		if (rename($tempName, $destName))
 		{
-			list ($width, $height) = getimagesize($destName);
+			list ($width, $height) = elk_getimagesize($destName);
 			$mime_type = 'image/' . $ext;
 
 			// Write filesize in the database.
@@ -1364,7 +1369,7 @@ function url_image_size($url)
 	if ($url == '' || $url == 'http://' || $url == 'https://')
 		return false;
 	elseif (!isset($match[1]))
-		$size = @getimagesize($url);
+		$size = elk_getimagesize($url, false);
 	else
 	{
 		// Try to connect to the server... give it half a second.
@@ -1384,7 +1389,7 @@ function url_image_size($url)
 			// See if it returned a 404/403 or something.
 			if ($test < 4)
 			{
-				$size = @getimagesize($url);
+				$size = elk_getimagesize($url, false);
 
 				// This probably means allow_url_fopen is off, let's try GD.
 				if ($size === false && function_exists('imagecreatefromstring'))
@@ -1690,7 +1695,7 @@ function updateAttachmentThumbnail($filename, $id_attach, $id_msg, $old_id_thumb
 		$id_folder_thumb = getAttachmentPathID();
 
 		// Calculate the size of the created thumbnail.
-		$size = @getimagesize($filename . '_thumb');
+		$size = elk_getimagesize($filename . '_thumb');
 		list ($attachment['thumb_width'], $attachment['thumb_height']) = $size;
 		$thumb_size = filesize($filename . '_thumb');
 
@@ -2089,4 +2094,29 @@ function getAttachmentPosition($id_attach)
 	{
 		return $attachmentData;
 	}
+}
+
+/**
+ * Simple wrapper for getimagesize
+ *
+ * @param string $file
+ * @param string $error return array or false on error
+ *
+ * @return array|boolean
+ */
+function elk_getimagesize($file, $error = 'array')
+{
+	try
+	{
+		$sizes = getimagesize($file);
+	}
+	catch (\Exception $e)
+	{
+		if ($error === 'array')
+			$sizes = array(-1, -1, -1);
+		else
+			$sizes = false;
+	}
+
+	return $sizes;
 }
