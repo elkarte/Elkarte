@@ -2239,7 +2239,7 @@ function profileSaveAvatarData(&$value)
 			}
 
 			// If there is no size, then it's probably not a valid pic, so lets remove it.
-			$sizes = @getimagesize($_FILES['attachment']['tmp_name']);
+			$sizes = elk_getimagesize($_FILES['attachment']['tmp_name'], false);
 			if ($sizes === false)
 			{
 				@unlink($_FILES['attachment']['tmp_name']);
@@ -2313,7 +2313,7 @@ function profileSaveAvatarData(&$value)
 					}
 
 					// We were successful. However, at what price?
-					$sizes = @getimagesize($_FILES['attachment']['tmp_name']);
+					$sizes = elk_getimagesize($_FILES['attachment']['tmp_name'], false);
 
 					// Hard to believe this would happen, but can you bet?
 					if ($sizes === false)
@@ -2333,7 +2333,7 @@ function profileSaveAvatarData(&$value)
 				$extension = isset($extensions[$sizes[2]]) ? $extensions[$sizes[2]] : 'bmp';
 				$mime_type = 'image/' . ($extension === 'jpg' ? 'jpeg' : ($extension === 'bmp' ? 'x-ms-bmp' : $extension));
 				$destName = 'avatar_' . $memID . '_' . time() . '.' . $extension;
-				list ($width, $height) = getimagesize($_FILES['attachment']['tmp_name']);
+				list ($width, $height) = elk_getimagesize($_FILES['attachment']['tmp_name']);
 				$file_hash = empty($modSettings['custom_avatar_enabled']) ? getAttachmentFilename($destName, null, null, true) : '';
 
 				// Remove previous attachments this member might have had.
