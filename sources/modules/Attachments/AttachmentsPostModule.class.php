@@ -249,7 +249,7 @@ class Attachments_Post_Module implements ElkArte\sources\modules\Module_Interfac
 					// Show any errors which might have occurred.
 					if (!empty($attachment['errors']))
 					{
-						if ($context['current_action'] != 'post2')
+						if ($context['current_action'] !== 'post2')
 						{
 							$txt['error_attach_errors'] = empty($txt['error_attach_errors']) ? '<br />' : '';
 							$txt['error_attach_errors'] .= vsprintf($txt['attach_warning'], $attachment['name']) . '<div class="attachmenterrors">';
@@ -428,7 +428,7 @@ class Attachments_Post_Module implements ElkArte\sources\modules\Module_Interfac
 
 			foreach ($_SESSION['temp_attachments'] as $attachID => $attachment)
 			{
-				if ($attachID != 'initial_error' && strpos($attachID, 'post_tmp_' . $user_info['id']) === false)
+				if ($attachID !== 'initial_error' && strpos($attachID, 'post_tmp_' . $user_info['id']) === false)
 					continue;
 
 				// If there was an initial error just show that message.
