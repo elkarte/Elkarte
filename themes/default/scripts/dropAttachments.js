@@ -604,6 +604,7 @@
 				e.preventDefault();
 				var files = $(this)[0].files;
 				handleFileUpload(files, obj);
+				this.value = null;
 			});
 		});
 		init(params);
