@@ -500,37 +500,37 @@ function autoRotateImageWithGD($image_name)
 	// Time to spin and mirror as needed
 	switch ($orientation)
 	{
-		// (0 & 1) Not set or Normal
+		// 0 & 1 Not set or Normal
 		case 0:
 		case 1:
 			break;
-		// (2) Mirror image, Normal orientation
+		// 2 Mirror image, Normal orientation
 		case 2:
 			$source = flopImageGD($source, $sizes);
 			break;
-		// (3) Normal image, rotated 180
+		// 3 Normal image, rotated 180
 		case 3:
 			$source = rotateImageGD($source, 180);
 			break;
-		// (4) Mirror image, rotated 180
+		// 4 Mirror image, rotated 180
 		case 4:
 			$source = flipImageGD($source, $sizes);
 			break;
-		// (5) Mirror image, rotated 90 CCW
+		// 5 Mirror image, rotated 90 CCW
 		case 5:
 			$source = flopImageGD($source, $sizes);
 			$source = rotateImageGD($source, 90);
 			break;
-		// (6) Normal image, rotated 90 CCW
+		// 6 Normal image, rotated 90 CCW
 		case 6:
 			$source = rotateImageGD($source, -90);
 			break;
-		// (7) Mirror image, rotated 90 CW
+		// 7 Mirror image, rotated 90 CW
 		case 7:
 			$source = flopImageGD($source, $sizes);
 			$source = rotateImageGD($source, -90);
 			break;
-		// (8) Normal image, rotated 90 CW
+		// 8 Normal image, rotated 90 CW
 		case 8:
 			$source = rotateImageGD($source, 90);
 			break;
@@ -572,37 +572,37 @@ function autoRotateImageWithIM($image_name)
 		$orientation = $image->getImageOrientation();
 		switch ($orientation)
 		{
-			// (0 & 1) Not set or Normal
+			// 0 & 1 Not set or Normal
 			case Imagick::ORIENTATION_UNDEFINED:
 			case Imagick::ORIENTATION_TOPLEFT:
 				break;
-			// (2) Mirror image, Normal orientation
+			// 2 Mirror image, Normal orientation
 			case Imagick::ORIENTATION_TOPRIGHT:
 				$image->flopImage();
 				break;
-			// (3) Normal image, rotated 180
+			// 3 Normal image, rotated 180
 			case Imagick::ORIENTATION_BOTTOMRIGHT:
 				$image->rotateImage('#000', 180);
 				break;
-			// (4) Mirror image, rotated 180
+			// 4 Mirror image, rotated 180
 			case Imagick::ORIENTATION_BOTTOMLEFT:
 				$image->flipImage();
 				break;
-			// (5) Mirror image, rotated 90 CCW
+			// 5 Mirror image, rotated 90 CCW
 			case Imagick::ORIENTATION_LEFTTOP:
 				$image->rotateImage('#000', 90);
 				$image->flopImage();
 				break;
-			// (6) Normal image, rotated 90 CCW
+			// 6 Normal image, rotated 90 CCW
 			case Imagick::ORIENTATION_RIGHTTOP:
 				$image->rotateImage('#000', 90);
 				break;
-			// (7) Mirror image, rotated 90 CW
+			// 7 Mirror image, rotated 90 CW
 			case Imagick::ORIENTATION_RIGHTBOTTOM:
 				$image->rotateImage('#000', -90);
 				$image->flopImage();
 				break;
-			// (8) Normal image, rotated 90 CW
+			// 8 Normal image, rotated 90 CW
 			case Imagick::ORIENTATION_LEFTBOTTOM:
 				$image->rotateImage('#000', -90);
 				break;
@@ -655,7 +655,7 @@ function rotateImageGD($image, $degrees)
 }
 
 /**
- * Flop an image using GD functions by copying top to bottom / flip horizontal
+ * Flop an image using GD functions by copying top to bottom / flop
  *
  * @param resource $image
  * @param array $sizes populated with getimagesize results
@@ -666,28 +666,7 @@ function rotateImageGD($image, $degrees)
  */
 function flopImageGD($image, $sizes)
 {
-	// If the built in function (php 5.5) is available, use it
-	if (function_exists('imageflip'))
-	{
-		imageflip($image, IMG_FLIP_HORIZONTAL);
-	}
-	// Pixel mapping it is
-	else
-	{
-		$new = imagecreatetruecolor($sizes[0], $sizes[1]);
-		imagealphablending($new, false);
-		imagesavealpha($new, true);
-
-		for ($x = 0; $x < $sizes[0]; $x++)
-		{
-			imagecopy($new, $image, $x, 0, $sizes[0] - $x - 1, 0, 1, $sizes[1]);
-		}
-
-		$image = $new;
-		unset($new);
-	}
-
-	return $image;
+	return flipImageGD($image, $sizes, 'horizontal');
 }
 
 /**
@@ -695,17 +674,18 @@ function flopImageGD($image, $sizes)
  *
  * @param resource $image
  * @param array $sizes populated with getimagesize results
+ * @param string $axis vertical for flip about vertical otherwise horizontal flip
  *
  * @package Graphics
  * @uses GD
  * @return resource
  */
-function flipImageGD($image, $sizes)
+function flipImageGD($image, $sizes, $axis = 'vertical')
 {
 	// If the built in function (php 5.5) is available, use it
 	if (function_exists('imageflip'))
 	{
-		imageflip($image, IMG_FLIP_VERTICAL);
+		imageflip($image, $axis === 'vertical' ? IMG_FLIP_VERTICAL : IMG_FLIP_HORIZONTAL);
 	}
 	// Pixel mapping then
 	else
@@ -714,9 +694,19 @@ function flipImageGD($image, $sizes)
 		imagealphablending($new, false);
 		imagesavealpha($new, true);
 
-		for ($y = 0; $y < $sizes[1]; $y++)
+		if ($axis === 'vertical')
 		{
-			imagecopy($new, $image, 0, $y, 0, $sizes[1] - $y - 1, $sizes[0], 1);
+			for ($y = 0; $y < $sizes[1]; $y++)
+			{
+				imagecopy($new, $image, 0, $y, 0, $sizes[1] - $y - 1, $sizes[0], 1);
+			}
+		}
+		else
+		{
+			for ($x = 0; $x < $sizes[0]; $x++)
+			{
+				imagecopy($new, $image, $x, 0, $sizes[0] - $x - 1, 0, 1, $sizes[1]);
+			}
 		}
 
 		$image = $new;
