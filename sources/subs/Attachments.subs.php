@@ -2115,7 +2115,7 @@ function getAttachmentPosition($id_attach)
  * Simple wrapper for getimagesize
  *
  * @param string $file
- * @param string $error return array or false on error
+ * @param string|boolean $error return array or false on error
  *
  * @return array|boolean
  */

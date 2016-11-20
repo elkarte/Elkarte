@@ -187,6 +187,12 @@ function imageMemoryCheck($sizes)
 {
 	global $modSettings;
 
+	// Just to be sure
+	if (!is_array($sizes) || $sizes[0] === -1)
+	{
+		return true;
+	}
+
 	// Doing the old 'set it and hope' way?
 	if (empty($modSettings['attachment_thumb_memory']))
 	{
