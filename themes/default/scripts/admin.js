@@ -26,7 +26,7 @@
 /** global: txt_save, txt_permissions_profile_rename, ajax_notification_cancel_text, txt_theme_remove_confirm, XMLHttpRequest */
 /** global: theme_id, frames, editFilename, txt_ban_name_empty, txt_ban_restriction_empty, ElkInfoBar, txt_invalid_response */
 /** global: feature_on_text, feature_off_text, core_settings_generic_error, startOptID, add_question_template, question_last_blank */
-/** global: ourLanguageVersions, ourVersions, txt_add_another_answer */
+/** global: ourLanguageVersions, ourVersions, txt_add_another_answer, txt_permissions_commit, Image */
 
 /**
  * Admin index class with the following methods
@@ -438,6 +438,11 @@ elk_ViewVersions.prototype.determineVersions = function ()
 
 		for (var sVersionType in oLowVersion)
 		{
+			if (!oLowVersion.hasOwnProperty(sVersionType))
+			{
+				continue;
+			}
+
 			if (sFilename.substr(0, sVersionType.length) === sVersionType)
 			{
 				sCurVersionType = sVersionType;
@@ -918,6 +923,8 @@ function generateFTPTest()
 		ftpTest.value = package_ftp_test_connection;
 		document.getElementById("test_ftp_placeholder_full").appendChild(ftpTest);
 	}
+
+	return true;
 }
 
 /**
@@ -976,12 +983,10 @@ function expandFolder(folderIdent, folderReal)
 	{
 		return false;
 	}
+
 	// Otherwise we need to get the wicked thing.
-	else
-	{
-		ajax_indicator(true);
-		getXMLDocument(elk_prepareScriptUrl(elk_scripturl) + 'action=admin;area=packages;onlyfind=' + folderReal.php_urlencode() + ';sa=perms;xml;' + elk_session_var + '=' + elk_session_id, onNewFolderReceived);
-	}
+	ajax_indicator(true);
+	getXMLDocument(elk_prepareScriptUrl(elk_scripturl) + 'action=admin;area=packages;onlyfind=' + folderReal.php_urlencode() + ';sa=perms;xml;' + elk_session_var + '=' + elk_session_id, onNewFolderReceived);
 
 	return false;
 }
@@ -1004,8 +1009,12 @@ function dynamicExpandFolder()
  */
 function select_in_category(operation, brd_list)
 {
-	for (var brd in brd_list)
+	for (var brd in brd_list) {
+		if (!brd_list.hasOwnProperty(brd))
+			continue;
+
 		document.getElementById(operation + '_brd' + brd_list[brd]).checked = true;
+	}
 }
 
 /**
@@ -1390,8 +1399,9 @@ function initEditProfileBoards()
 }
 
 /**
- * Creates the image and attach the even to convert the name of the permission
+ * Creates the image and attaches the event to convert the name of the permission
  * profile into an input to change its name and back.
+ *
  * It also removes the "Rename all" and "Remove Selected" buttons
  * and the "Delete" column for consistency
  */
@@ -1409,6 +1419,8 @@ function initEditPermissionProfiles()
 			// If we have already created the cancel let's skip it
 			if (!run_once)
 			{
+				var $cancel;
+
 				run_once = true;
 				$cancel = $('<a class="js-ed-rm linkbutton" />').on('click', function(ev) {
 					ev.preventDefault();
@@ -1587,7 +1599,8 @@ function refreshPreview(check)
 	{
 		var data = previewData,
 			preview_sheet = document.forms.stylesheetForm.entire_file.value,
-			stylesheetMatch = new RegExp('<link rel="stylesheet"[^>]+href="[^"]+' + editFilename + '[^>]*>');
+			stylesheetMatch = new RegExp('<link rel="stylesheet"[^>]+href="[^"]+' + editFilename + '[^>]*>'),
+			iframe;
 
 		// Replace the paths for images.
 		preview_sheet = preview_sheet.replace(/url\(\.\.\/images/gi, "url(" + elk_images_url);
@@ -1647,6 +1660,8 @@ function confirmBan(aForm)
 		alert(txt_ban_restriction_empty);
 		return false;
 	}
+
+	return true;
 }
 
 // Enable/disable some fields when working with bans.
@@ -1716,7 +1731,8 @@ function ajax_getEmailTemplatePreview()
 		if ($(request).find("error").text() !== '')
 		{
 			var errors_html = '',
-				$_errors = $("#errors");
+				$_errors = $("#errors"),
+				errors;
 
 			// Build the error string
 			errors = $(request).find('error').each(function() {
@@ -1773,6 +1789,10 @@ function ajax_getCensorPreview()
 	return false;
 }
 
+/**
+ * Used to show/hide sub options for the various notifications
+ * action=admin;area=featuresettings;sa=mention
+ */
 $(function() {
 	var $headers = $("#mention").find("input[id^='notifications'][id$='[notification]']");
 
@@ -1800,12 +1820,18 @@ $(function() {
 		$hparent.show();
 		$hparent.prev().show();
 	});
+
 	$headers.change();
 });
 
+/**
+ * Ajax function to clear CSS and JS hives.  Called from action=admin;area=featuresettings;sa=basic
+ * Remove Hives button.
+ */
 $(function() {
 	$('#clean_hives').on('click', function () {
 		var infoBar = new ElkInfoBar('bar_clean_hives');
+
 		$.ajax({
 			type: 'POST',
 			dataType: 'json',
@@ -1816,7 +1842,8 @@ $(function() {
 		})
 		.done(function(request) {
 			infoBar.changeText(request.response);
-			if (request.success == true) {
+
+			if (request.success === true) {
 				infoBar.isSuccess();
 			}
 			else {
@@ -1835,8 +1862,11 @@ $(function() {
 	});
 });
 
+/**
+ * Enable / disable "core" features of the software. Called from action=admin;area=corefeatures
+ */
 $(function() {
-	if ($('#core_features').length == 0)
+	if ($('#core_features').length === 0)
 	{
 		return;
 	}
@@ -1854,12 +1884,14 @@ $(function() {
 	if (!token_value)
 		token_value = $("#core_features_token").attr("value");
 
-	$(".core_features_img").click(function(){
+	// Attach our action to the core features power button
+	$(".core_features_img").click(function() {
 		var cc = $(this),
 			cf = $(this).attr("id").substring(7),
 			imgs = new Array(elk_images_url + "/admin/switch_off.png", elk_images_url + "/admin/switch_on.png"),
 			new_state = !$("#feature_" + cf).attr("checked"),
-			ajax_infobar = new ElkInfoBar('core_features_bar', {error_class: 'errorbox', success_class: 'successbox'});
+			ajax_infobar = new ElkInfoBar('core_features_bar', {error_class: 'errorbox', success_class: 'successbox'}),
+			data = {};
 
 		$("#feature_" + cf).attr("checked", new_state);
 
@@ -1880,7 +1912,7 @@ $(function() {
 			type: "post",
 
 			// The type of data that is getting returned.
-			data: data,
+			data: data
 		})
 		.done(function(request) {
 			if ($(request).find("errors").find("error").length !== 0)
@@ -1912,6 +1944,6 @@ $(function() {
 		})
 		.fail(function(error) {
 			ajax_infobar.changeText(error).showBar();
-		})
+		});
 	});
 });
