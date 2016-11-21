@@ -411,7 +411,6 @@ class ManageFeatures_Controller extends Action_Controller
 			{
 				foreach ($this->_req->post->notifications as $type => $val)
 				{
-
 					if (!isset($current_settings[$type]))
 					{
 						toggleMentionsVisibility($type, true);
@@ -1240,7 +1239,7 @@ class ManageFeatures_Controller extends Action_Controller
 				array('text', 'jquery_version', 'postinput' => $txt['jquery_custom_after']),
 				array('check', 'jqueryui_default', 'onchange' => 'showhideJqueryOptions();'),
 				array('text', 'jqueryui_version', 'postinput' => $txt['jqueryui_custom_after']),
-				array('check', 'minify_css_js', 'postinput' => '<a href="#" id="clean_hives">' . $txt['clean_hives'] . '</a>'),
+				array('check', 'minify_css_js', 'postinput' => '<a href="#" id="clean_hives" class="linkbutton">' . $txt['clean_hives'] . '</a>'),
 			'',
 				// Number formatting, timezones.
 				array('text', 'time_format'),
@@ -1409,7 +1408,7 @@ class ManageFeatures_Controller extends Action_Controller
 		// The mentions settings
 		$config_vars = array(
 			array('title', 'mentions_settings'),
-				array('check', 'mentions_enabled'),
+			array('check', 'mentions_enabled'),
 		);
 
 		$notification_methods = Notifications::getInstance()->getNotifiers();
