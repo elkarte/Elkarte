@@ -1622,19 +1622,18 @@ var ElkNotifier = new ElkNotifications();
 		opt = $.extend({
 			text: '',
 			class: 'ajax_infobar',
-			hide_delay: 5000,
+			hide_delay: 4000,
 			error_class: 'error',
-			success_class: 'success',
+			success_class: 'success'
 		}, opt);
 
 		var $elem = $('#' + elem_id),
 			time_out = null,
 			init = function (elem_id, opt) {
 				clearTimeout(time_out);
-				if ($elem.length == 0) {
-					$elem = $('<div id="' + elem_id + '" class="' + opt.class + '" />');
+				if ($elem.length === 0) {
+					$elem = $('<div id="' + elem_id + '" class="' + opt.class + ' hide" />');
 					$('body').append($elem);
-					hide();
 					$elem.attr('id', elem_id);
 					$elem.addClass(opt.class);
 					$elem.text(opt.text);
@@ -1657,7 +1656,7 @@ var ElkNotifier = new ElkNotifications();
 				clearTimeout(time_out);
 				$elem.fadeIn();
 
-				if (opt.hide_delay != 0)
+				if (opt.hide_delay !== 0)
 				{
 					time_out = setTimeout(function() {
 						hide();
@@ -1679,7 +1678,9 @@ var ElkNotifier = new ElkNotifications();
 				return this;
 			};
 
+		// Call the init function by default
 		init(elem_id, opt);
+
 		return {
 			changeText: changeText,
 			addClass: addClass,
