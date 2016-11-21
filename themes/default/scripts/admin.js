@@ -15,6 +15,20 @@
  */
 
 /**
+ * We like the globals cuz they is good to us
+ */
+
+/** global: previewTimeout, origText, valid, warningMessage, previewData, refreshPreviewCache, add_answer_template */
+/** global: txt_add_another_answer, last_preview, txt_preview, elk_scripturl, txt_news_error_no_news, oThumbnails, elk_smiley_url */
+/** global: db_vis, database_changes_area, elk_session_var, package_ftp_test, package_ftp_test_connection, package_ftp_test_failed */
+/** global: onNewFolderReceived, elk_session_id, membersSwap, elk_images_url, maintain_members_choose, maintain_members_all */
+/** global: reattribute_confirm, reattribute_confirm_email, reattribute_confirm_username, oModeratorSuggest, permission_profiles */
+/** global: txt_save, txt_permissions_profile_rename, ajax_notification_cancel_text, txt_theme_remove_confirm, XMLHttpRequest */
+/** global: theme_id, frames, editFilename, txt_ban_name_empty, txt_ban_restriction_empty, ElkInfoBar, txt_invalid_response */
+/** global: feature_on_text, feature_off_text, core_settings_generic_error, startOptID, add_question_template, question_last_blank */
+/** global: ourLanguageVersions, ourVersions, txt_add_another_answer */
+
+/**
  * Admin index class with the following methods
  * elk_AdminIndex(oOptions)
  * {
@@ -412,10 +426,13 @@ elk_ViewVersions.prototype.determineVersions = function ()
 	// for each file in the detailed-version.js
 	for (var sFilename in window.ourVersions)
 	{
-		sCurVersionType = '';
+		if (!window.ourVersions.hasOwnProperty(sFilename))
+			continue;
 
 		if (!document.getElementById('our' + sFilename))
 			continue;
+
+		sCurVersionType = '';
 
 		sinstalledVersion = document.getElementById('your' + sFilename).innerHTML;
 
@@ -757,7 +774,6 @@ function changeVariant(sVariant)
  */
 function setPreviewTimeout()
 {
-	/** global: previewTimeout */
 	if (previewTimeout)
 	{
 		window.clearTimeout(previewTimeout);
@@ -1121,16 +1137,13 @@ function swapMembers()
  */
 function checkAttributeValidity()
 {
-	/** global: origText */
 	origText = reattribute_confirm;
-	/** global: valid */
 	valid = true;
 
 	// Do all the fields!
 	if (!document.getElementById('to').value)
 		valid = false;
 
-	/** global: warningMessage */
 	warningMessage = origText.replace(/%member_to%/, document.getElementById('to').value);
 
 	// Using email address to find the member
@@ -1502,7 +1515,6 @@ function navigatePreview(url)
 
 		if (myDoc.responseText !== null && myDoc.status === 200)
 		{
-			/** global: previewData */
 			previewData = myDoc.responseText;
 			document.getElementById('css_preview_box').style.display = "block";
 
@@ -1510,7 +1522,6 @@ function navigatePreview(url)
 			var tempImage = new Image();
 			tempImage.src = elk_prepareScriptUrl(elk_scripturl) + 'action=admin;area=theme;sa=edit;theme=' + theme_id + ';preview;' + (new Date().getTime());
 
-			/** global: refreshPreviewCache */
 			refreshPreviewCache = null;
 			refreshPreview(false);
 		}
