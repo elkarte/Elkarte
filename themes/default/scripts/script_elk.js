@@ -11,6 +11,14 @@
  */
 
 /**
+ * We like the globals cuz they is good to us
+ */
+
+/** global: notification_topic_notice, notification_board_notice, txt_mark_as_read_confirm, oRttime */
+/** global: $editor_data, elk_scripturl, elk_smiley_url, elk_session_var elk_session_id, elk_images_url */
+/** global: poll_add, poll_remove, poll_add, XMLHttpRequest, ElkInfoBar */
+
+/**
  * Sets an auto height so small code blocks collapse
  * Sets a height for larger code blocks and lets them resize / overflow as normal
  */
@@ -609,7 +617,7 @@ function add_elk_mention(selector, oOptions)
 		}
 
 		// Divs to hold our responses
-		var ajax_errorbox = $("<div id='errorContainer'><div/>").appendTo('body');
+		$("<div id='errorContainer'><div/>").appendTo('body');
 
 		$('#errorContainer').css({'display': 'none'});
 
