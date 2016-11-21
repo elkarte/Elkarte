@@ -1222,7 +1222,7 @@ function host_from_ip($ip)
  * Chops a string into words and prepares them to be inserted into (or searched from) the database.
  *
  * @param string $text The string to process
- * @param int|null $max_chars = 20
+ * @param int $max_chars defaults to 20
  *     - if encrypt = true this is the maximum number of bytes to use in integer hashes (for searching)
  *     - if encrypt = false this is the maximum number of letters in each word
  * @param bool $encrypt = false Used for custom search indexes to return an int[] array representing the words
