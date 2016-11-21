@@ -541,7 +541,7 @@ class Util
 	 *                          additionally, it doesn't allow to use the option:
 	 *                            allowed_classes => true
 	 *                          that is reverted to false.
-	 * @return array|string
+	 * @return array
 	 */
 	public static function unserialize($string, $options = array())
 	{
