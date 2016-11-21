@@ -680,14 +680,21 @@ class Attachment_Controller extends Action_Controller
 
 		header('Cache-Control: max-age=' . (525600 * 60) . ', private');
 
-		if (empty($modSettings['enableCompressedOutput']) || filesize($filename) > 4194304)
-			header('Content-Length: ' . filesize($filename));
-
 		// Try to buy some time...
 		detectServer()->setTimeLimit(600);
 
 		if ($resize && resizeImageFile($filename, $filename . '_thumb', 100, 100))
+		{
+			if (!empty($modSettings['attachment_autorotate']))
+			{
+				autoRotateImage($filename . '_thumb');
+			}
+
 			$filename = $filename . '_thumb';
+		}
+
+		if (empty($modSettings['enableCompressedOutput']) || filesize($filename) > 4194304)
+			header('Content-Length: ' . filesize($filename));
 
 		if (@readfile($filename) === null)
 			echo file_get_contents($filename);

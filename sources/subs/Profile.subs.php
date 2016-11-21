@@ -596,12 +596,16 @@ function loadProfileFields($force_reload = false)
 
 					// Maybe they are trying to change their password as well?
 					$resetPassword = true;
-					if (isset($_POST['passwrd1']) && $_POST['passwrd1'] != '' && isset($_POST['passwrd2']) && $_POST['passwrd1'] == $_POST['passwrd2'] && validatePassword($_POST['passwrd1'], $value, array($cur_profile['real_name'], $user_info['username'], $user_info['name'], $user_info['email'])) == null)
+					if (isset($_POST['passwrd1']) && $_POST['passwrd1'] !== '' && isset($_POST['passwrd2']) && $_POST['passwrd1'] === $_POST['passwrd2'] && validatePassword($_POST['passwrd1'], $value, array($cur_profile['real_name'], $user_info['username'], $user_info['name'], $user_info['email'])) === null)
+					{
 						$resetPassword = false;
+					}
 
 					// Do the reset... this will send them an email too.
 					if ($resetPassword)
+					{
 						resetPassword($context['id_member'], $value);
+					}
 					elseif ($value !== null)
 					{
 						$errors = Error_Context::context('change_username', 0);
@@ -1137,6 +1141,7 @@ function profileValidateEmail($email, $memID = 0)
 	$db = database();
 
 	// Check the name and email for validity.
+	$check = array();
 	$check['email'] = strtr($email, array('&#039;' => '\''));
 	if (Data_Validator::is_valid($check, array('email' => 'valid_email|required'), array('email' => 'trim')))
 		$email = $check['email'];
@@ -2121,7 +2126,7 @@ function profileSaveAvatarData(&$value)
 		if ($contents !== false)
 		{
 			// Create a hashed name to save
-			$new_avatar_name = $uploadDir . '/' . getAttachmentFilename('avatar_tmp_' . $memID, false, null, true);
+			$new_avatar_name = $uploadDir . '/' . getAttachmentFilename('avatar_tmp_' . $memID, null, null, true);
 			if (file_put_contents($new_avatar_name, $contents) !== false)
 			{
 				$downloadedExternalAvatar = true;
@@ -2223,7 +2228,7 @@ function profileSaveAvatarData(&$value)
 					Errors::instance()->fatal_lang_error('attachments_no_write', 'critical');
 				}
 
-				$new_avatar_name = $uploadDir . '/' . getAttachmentFilename('avatar_tmp_' . $memID, false, null, true);
+				$new_avatar_name = $uploadDir . '/' . getAttachmentFilename('avatar_tmp_' . $memID, null, null, true);
 				if (!move_uploaded_file($_FILES['attachment']['tmp_name'], $new_avatar_name))
 				{
 					loadLanguage('Post');
@@ -2234,7 +2239,7 @@ function profileSaveAvatarData(&$value)
 			}
 
 			// If there is no size, then it's probably not a valid pic, so lets remove it.
-			$sizes = @getimagesize($_FILES['attachment']['tmp_name']);
+			$sizes = elk_getimagesize($_FILES['attachment']['tmp_name'], false);
 			if ($sizes === false)
 			{
 				@unlink($_FILES['attachment']['tmp_name']);
@@ -2308,7 +2313,7 @@ function profileSaveAvatarData(&$value)
 					}
 
 					// We were successful. However, at what price?
-					$sizes = @getimagesize($_FILES['attachment']['tmp_name']);
+					$sizes = elk_getimagesize($_FILES['attachment']['tmp_name'], false);
 
 					// Hard to believe this would happen, but can you bet?
 					if ($sizes === false)
@@ -2328,8 +2333,8 @@ function profileSaveAvatarData(&$value)
 				$extension = isset($extensions[$sizes[2]]) ? $extensions[$sizes[2]] : 'bmp';
 				$mime_type = 'image/' . ($extension === 'jpg' ? 'jpeg' : ($extension === 'bmp' ? 'x-ms-bmp' : $extension));
 				$destName = 'avatar_' . $memID . '_' . time() . '.' . $extension;
-				list ($width, $height) = getimagesize($_FILES['attachment']['tmp_name']);
-				$file_hash = empty($modSettings['custom_avatar_enabled']) ? getAttachmentFilename($destName, false, null, true) : '';
+				list ($width, $height) = elk_getimagesize($_FILES['attachment']['tmp_name']);
+				$file_hash = empty($modSettings['custom_avatar_enabled']) ? getAttachmentFilename($destName, null, null, true) : '';
 
 				// Remove previous attachments this member might have had.
 				removeAttachments(array('id_member' => $memID));
@@ -2539,6 +2544,7 @@ function list_getUserWarnings($start, $items_per_page, $sort, $memID)
  * Returns the total number of warnings for the user
  *
  * @param int $memID
+ * @return int the number of warnings
  */
 function list_getUserWarningCount($memID)
 {
@@ -2649,6 +2655,7 @@ function profileLoadAttachments($start, $items_per_page, $sort, $boardsAllowed, 
  *
  * @param int[] $boardsAllowed
  * @param int $memID
+ * @return int number of attachments
  */
 function getNumAttachments($boardsAllowed, $memID)
 {
@@ -2749,6 +2756,7 @@ function getUnwatchedBy($start, $items_per_page, $sort, $memID)
  * Count the number of topics in the unwatched list
  *
  * @param int $memID
+ * @return int
  */
 function getNumUnwatchedBy($memID)
 {

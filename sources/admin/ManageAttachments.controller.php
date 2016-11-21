@@ -321,6 +321,7 @@ class ManageAttachments_Controller extends Action_Controller
 				array('warning', empty($testUM) ? 'attachment_filesize_warning' : ''),
 				array('int', 'attachmentSizeLimit', 'subtext' => $txt['zero_for_no_limit'], 6, 'postinput' => $txt['kilobyte']),
 				array('int', 'attachmentNumPerPostLimit', 'subtext' => $txt['zero_for_no_limit'], 6),
+				array('check', 'attachment_autorotate'),
 			// Security Items
 			array('title', 'attachment_security_settings'),
 				// Extension checks etc.
@@ -339,7 +340,6 @@ class ManageAttachments_Controller extends Action_Controller
 				array('check', 'attachmentThumbnails'),
 				array('check', 'attachment_thumb_png'),
 				array('check', 'attachment_thumb_memory', 'subtext' => $txt['attachment_thumb_memory_note1'], 'postinput' => $txt['attachment_thumb_memory_note2']),
-				array('warning', 'attachment_thumb_memory_note'),
 				array('text', 'attachmentThumbWidth', 6),
 				array('text', 'attachmentThumbHeight', 6),
 			'',
