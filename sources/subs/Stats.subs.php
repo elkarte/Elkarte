@@ -195,7 +195,7 @@ function topBoards($limit = null, $read_status = false)
 
 	$boards_result = $db->query('', '
 		SELECT b.id_board, b.name, b.num_posts, b.num_topics' . ($read_status ? ',' . (!$user_info['is_guest'] ? ' 1 AS is_read' : '
-			(IFNULL(lb.id_msg, 0) >= b.id_last_msg) AS is_read') : '') . '
+			(COALESCE(lb.id_msg, 0) >= b.id_last_msg) AS is_read') : '') . '
 		FROM {db_prefix}boards AS b' . ($read_status ? '
 			LEFT JOIN {db_prefix}log_boards AS lb ON (lb.id_board = b.id_board AND lb.id_member = {int:current_member})' : '') . '
 		WHERE {query_see_board}' . (!empty($modSettings['recycle_enable']) && $modSettings['recycle_board'] > 0 ? '

@@ -93,13 +93,13 @@ function messageIndexTopics($id_board, $id_member, $start, $items_per_page, $sor
 			// Double equal comparison for 1 because it is backward compatible with 1.0 where the value was true/false
 			if ($indexOptions['include_avatars'] == 1 || $indexOptions['include_avatars'] === 3)
 			{
-				$indexOptions['custom_selects'] = array_merge($indexOptions['custom_selects'], array('meml.avatar', 'IFNULL(a.id_attach, 0) AS id_attach', 'a.filename', 'a.attachment_type', 'meml.email_address'));
+				$indexOptions['custom_selects'] = array_merge($indexOptions['custom_selects'], array('meml.avatar', 'COALESCE(a.id_attach, 0) AS id_attach', 'a.filename', 'a.attachment_type', 'meml.email_address'));
 				$indexOptions['custom_joins'] = array_merge($indexOptions['custom_joins'], array('LEFT JOIN {db_prefix}attachments AS a ON (a.id_member = ml.id_member AND a.id_member != 0)'));
 			}
 
 			if ($indexOptions['include_avatars'] === 2 || $indexOptions['include_avatars'] === 3)
 			{
-				$indexOptions['custom_selects'] = array_merge($indexOptions['custom_selects'], array('memf.avatar AS avatar_first', 'IFNULL(af.id_attach, 0) AS id_attach_first', 'af.filename AS filename_first', 'af.attachment_type AS attachment_type_first', 'memf.email_address AS email_address_first'));
+				$indexOptions['custom_selects'] = array_merge($indexOptions['custom_selects'], array('memf.avatar AS avatar_first', 'COALESCE(af.id_attach, 0) AS id_attach_first', 'af.filename AS filename_first', 'af.attachment_type AS attachment_type_first', 'memf.email_address AS email_address_first'));
 				$indexOptions['custom_joins'] = array_merge($indexOptions['custom_joins'], array('LEFT JOIN {db_prefix}attachments AS af ON (af.id_member = mf.id_member AND af.id_member != 0)'));
 			}
 		}
@@ -107,14 +107,14 @@ function messageIndexTopics($id_board, $id_member, $start, $items_per_page, $sor
 		$request = $db->query('substring', '
 			SELECT
 				t.id_topic, t.num_replies, t.locked, t.num_views, t.num_likes, t.is_sticky, t.id_poll, t.id_previous_board,
-				' . ($id_member == 0 ? '0' : 'IFNULL(lt.id_msg, IFNULL(lmr.id_msg, -1)) + 1') . ' AS new_from,
+				' . ($id_member == 0 ? '0' : 'COALESCE(lt.id_msg, lmr.id_msg, -1 + 1') . ' AS new_from,
 				t.id_last_msg, t.approved, t.unapproved_posts, t.id_redirect_topic, t.id_first_msg,
 				ml.poster_time AS last_poster_time, ml.id_msg_modified, ml.subject AS last_subject, ml.icon AS last_icon,
 				ml.poster_name AS last_member_name, ml.id_member AS last_id_member, ml.smileys_enabled AS last_smileys,
-				IFNULL(meml.real_name, ml.poster_name) AS last_display_name,
+				COALESCE(meml.real_name, ml.poster_name) AS last_display_name,
 				mf.poster_time AS first_poster_time, mf.subject AS first_subject, mf.icon AS first_icon,
 				mf.poster_name AS first_member_name, mf.id_member AS first_id_member, mf.smileys_enabled AS first_smileys,
-				IFNULL(memf.real_name, mf.poster_name) AS first_display_name
+				COALESCE(memf.real_name, mf.poster_name) AS first_display_name
 				' . (!empty($indexOptions['custom_selects']) ? ' ,' . implode(',', $indexOptions['custom_selects']) : '') . '
 			FROM {db_prefix}topics AS t
 				INNER JOIN {db_prefix}messages AS ml ON (ml.id_msg = t.id_last_msg)
@@ -157,8 +157,8 @@ function messageIndexSort()
 	// Default sort methods for message index.
 	$sort_methods = array(
 		'subject' => 'mf.subject',
-		'starter' => 'IFNULL(memf.real_name, mf.poster_name)',
-		'last_poster' => 'IFNULL(meml.real_name, ml.poster_name)',
+		'starter' => 'COALESCE(memf.real_name, mf.poster_name)',
+		'last_poster' => 'COALESCE(meml.real_name, ml.poster_name)',
 		'replies' => 't.num_replies',
 		'views' => 't.num_views',
 		'likes' => 't.num_likes',

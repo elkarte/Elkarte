@@ -447,8 +447,8 @@ function warningTemplates($start, $items_per_page, $sort, $template_type = 'warn
 	$db = database();
 
 	$request = $db->query('', '
-		SELECT lc.id_comment, IFNULL(mem.id_member, 0) AS id_member,
-			IFNULL(mem.real_name, lc.member_name) AS creator_name, recipient_name AS template_title,
+		SELECT lc.id_comment, COALESCE(mem.id_member, 0) AS id_member,
+			COALESCE(mem.real_name, lc.member_name) AS creator_name, recipient_name AS template_title,
 			lc.log_time, lc.body
 		FROM {db_prefix}log_comments AS lc
 			LEFT JOIN {db_prefix}members AS mem ON (mem.id_member = lc.id_member)
@@ -529,8 +529,8 @@ function warnings($start, $items_per_page, $sort, $query_string = '', $query_par
 	$db = database();
 
 	$request = $db->query('', '
-		SELECT IFNULL(mem.id_member, 0) AS id_member, IFNULL(mem.real_name, lc.member_name) AS member_name_col,
-			IFNULL(mem2.id_member, 0) AS id_recipient, IFNULL(mem2.real_name, lc.recipient_name) AS recipient_name,
+		SELECT COALESCE(mem.id_member, 0) AS id_member, COALESCE(mem.real_name, lc.member_name) AS member_name_col,
+			COALESCE(mem2.id_member, 0) AS id_recipient, COALESCE(mem2.real_name, lc.recipient_name) AS recipient_name,
 			lc.log_time, lc.body, lc.id_notice, lc.counter
 		FROM {db_prefix}log_comments AS lc
 			LEFT JOIN {db_prefix}members AS mem ON (mem.id_member = lc.id_member)
@@ -701,7 +701,7 @@ function modReportDetails($id_report, $show_pms = false)
 	$request = $db->query('', '
 		SELECT lr.id_report, lr.id_msg, lr.id_topic, lr.id_board, lr.id_member, lr.subject, lr.body,
 			lr.time_started, lr.time_updated, lr.num_reports, lr.closed, lr.ignore_all,
-			IFNULL(mem.real_name, lr.membername) AS author_name, IFNULL(mem.id_member, 0) AS id_author
+			COALESCE(mem.real_name, lr.membername) AS author_name, COALESCE(mem.id_member, 0) AS id_author
 		FROM {db_prefix}log_reported AS lr
 			LEFT JOIN {db_prefix}members AS mem ON (mem.id_member = lr.id_member)
 		WHERE lr.id_report = {int:id_report}
@@ -744,7 +744,7 @@ function getModReports($status = 0, $start = 0, $limit = 10, $show_pms = false)
 		$request = $db->query('', '
 			SELECT lr.id_report, lr.id_msg, lr.id_topic, lr.id_board, lr.id_member, lr.subject, lr.body,
 				lr.time_started, lr.time_updated, lr.num_reports, lr.closed, lr.ignore_all,
-				IFNULL(mem.real_name, lr.membername) AS author_name, IFNULL(mem.id_member, 0) AS id_author
+				COALESCE(mem.real_name, lr.membername) AS author_name, COALESCE(mem.id_member, 0) AS id_author
 			FROM {db_prefix}log_reported AS lr
 				LEFT JOIN {db_prefix}members AS mem ON (mem.id_member = lr.id_member)
 			WHERE lr.closed = {int:view_closed}
@@ -781,7 +781,7 @@ function getReportsUserComments($id_reports)
 
 	$request = $db->query('', '
 		SELECT lrc.id_comment, lrc.id_report, lrc.time_sent, lrc.comment, lrc.member_ip,
-			IFNULL(mem.id_member, 0) AS id_member, IFNULL(mem.real_name, lrc.membername) AS reporter
+			COALESCE(mem.id_member, 0) AS id_member, COALESCE(mem.real_name, lrc.membername) AS reporter
 		FROM {db_prefix}log_reported_comments AS lrc
 			LEFT JOIN {db_prefix}members AS mem ON (mem.id_member = lrc.id_member)
 		WHERE lrc.id_report IN ({array_int:report_list})',
@@ -810,7 +810,7 @@ function getReportModeratorsComments($id_report)
 
 	$request = $db->query('', '
 			SELECT lc.id_comment, lc.id_notice, lc.log_time, lc.body,
-				IFNULL(mem.id_member, 0) AS id_member, IFNULL(mem.real_name, lc.member_name) AS moderator
+				COALESCE(mem.id_member, 0) AS id_member, COALESCE(mem.real_name, lc.member_name) AS moderator
 			FROM {db_prefix}log_comments AS lc
 				LEFT JOIN {db_prefix}members AS mem ON (mem.id_member = lc.id_member)
 			WHERE lc.id_notice = {int:id_report}
@@ -1218,8 +1218,8 @@ function reportedPosts($show_pms = false)
 		$request = $db->query('', '
 			SELECT 
 				lr.id_report, lr.id_msg, lr.id_topic, lr.id_board, lr.id_member, lr.subject,
-				lr.num_reports, IFNULL(mem.real_name, lr.membername) AS author_name,
-				IFNULL(mem.id_member, 0) AS id_author
+				lr.num_reports, COALESCE(mem.real_name, lr.membername) AS author_name,
+				COALESCE(mem.id_member, 0) AS id_author
 			FROM {db_prefix}log_reported AS lr
 				LEFT JOIN {db_prefix}members AS mem ON (mem.id_member = lr.id_member)
 			WHERE ' . ($user_info['mod_cache']['bq'] == '1=1' || $user_info['mod_cache']['bq'] == '0=1' ? $user_info['mod_cache']['bq'] : 'lr.' . $user_info['mod_cache']['bq']) . '
@@ -1366,7 +1366,7 @@ function moderatorNotes($offset)
 	if ($offset != 0 || !Cache::instance()->getVar($moderator_notes, 'moderator_notes', 240))
 	{
 		$request = $db->query('', '
-			SELECT IFNULL(mem.id_member, 0) AS id_member, IFNULL(mem.real_name, lc.member_name) AS member_name,
+			SELECT COALESCE(mem.id_member, 0) AS id_member, COALESCE(mem.real_name, lc.member_name) AS member_name,
 				lc.log_time, lc.body, lc.id_comment AS id_note
 			FROM {db_prefix}log_comments AS lc
 				LEFT JOIN {db_prefix}members AS mem ON (mem.id_member = lc.id_member)
@@ -1476,7 +1476,7 @@ function getUnapprovedPosts($approve_query, $current_view, $boards_allowed, $sta
 
 	$request = $db->query('', '
 		SELECT m.id_msg, m.id_topic, m.id_board, m.subject, m.body, m.id_member,
-			IFNULL(mem.real_name, m.poster_name) AS poster_name, m.poster_time, m.smileys_enabled,
+			COALESCE(mem.real_name, m.poster_name) AS poster_name, m.poster_time, m.smileys_enabled,
 			t.id_member_started, t.id_first_msg, b.name AS board_name, c.id_cat, c.name AS cat_name
 		FROM {db_prefix}messages AS m
 			INNER JOIN {db_prefix}topics AS t ON (t.id_topic = m.id_topic)

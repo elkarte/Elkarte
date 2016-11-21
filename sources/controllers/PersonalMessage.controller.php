@@ -443,7 +443,7 @@ class PersonalMessage_Controller extends Action_Controller
 				$descending = !empty($options['view_newest_pm_first']);
 				break;
 			case 'name':
-				$sort_by_query = 'IFNULL(mem.real_name, \'\')';
+				$sort_by_query = 'COALESCE(mem.real_name, \'\')';
 				break;
 			case 'subject':
 				$sort_by_query = 'pm.subject';

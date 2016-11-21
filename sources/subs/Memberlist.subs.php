@@ -64,8 +64,8 @@ function ml_CustomProfile()
 			// Build the sort queries.
 			if ($row['field_type'] != 'check')
 				$context['custom_profile_fields']['columns'][$curField]['sort'] = array(
-					'down' => 'LENGTH(cfd' . $curField . '.value) > 0 ASC, IFNULL(cfd' . $curField . '.value, 1=1) DESC, cfd' . $curField . '.value DESC',
-					'up' => 'LENGTH(cfd' . $curField . '.value) > 0 DESC, IFNULL(cfd' . $curField . '.value, 1=1) ASC, cfd' . $curField . '.value ASC'
+					'down' => 'LENGTH(cfd' . $curField . '.value) > 0 ASC, COALESCE(cfd' . $curField . '.value, 1=1) DESC, cfd' . $curField . '.value DESC',
+					'up' => 'LENGTH(cfd' . $curField . '.value) > 0 DESC, COALESCE(cfd' . $curField . '.value, 1=1) ASC, cfd' . $curField . '.value ASC'
 				);
 			else
 				$context['custom_profile_fields']['columns'][$curField]['sort'] = array(

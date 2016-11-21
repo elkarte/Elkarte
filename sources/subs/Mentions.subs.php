@@ -80,8 +80,8 @@ function getUserMentions($start, $limit, $sort, $all = false, $type = '')
 		SELECT
 			mtn.id_mention, mtn.id_target, mtn.id_member_from, mtn.log_time, mtn.mention_type, mtn.status,
 			m.subject, m.id_topic, m.id_board,
-			IFNULL(mem.real_name, {string:guest_text}) as mentioner, mem.avatar, mem.email_address,
-			IFNULL(a.id_attach, 0) AS id_attach, a.filename, a.attachment_type
+			COALESCE(mem.real_name, {string:guest_text}) as mentioner, mem.avatar, mem.email_address,
+			COALESCE(a.id_attach, 0) AS id_attach, a.filename, a.attachment_type
 		FROM {db_prefix}log_mentions AS mtn
 			LEFT JOIN {db_prefix}messages AS m ON (mtn.id_target = m.id_msg)
 			LEFT JOIN {db_prefix}members AS mem ON (mtn.id_member_from = mem.id_member)

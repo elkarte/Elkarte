@@ -601,13 +601,13 @@ function moveTopics($topics, $toBoard, $log = false)
 	// Move over the mark_read data. (because it may be read and now not by some!)
 	$SaveAServer = max(0, $modSettings['maxMsgID'] - 50000);
 	$request = $db->query('', '
-		SELECT lmr.id_member, lmr.id_msg, t.id_topic, IFNULL(lt.unwatched, 0) as unwatched
+		SELECT lmr.id_member, lmr.id_msg, t.id_topic, COALESCE(lt.unwatched, 0) as unwatched
 		FROM {db_prefix}topics AS t
 			INNER JOIN {db_prefix}log_mark_read AS lmr ON (lmr.id_board = t.id_board
 				AND lmr.id_msg > t.id_first_msg AND lmr.id_msg > {int:protect_lmr_msg})
 			LEFT JOIN {db_prefix}log_topics AS lt ON (lt.id_topic = t.id_topic AND lt.id_member = lmr.id_member)
 		WHERE t.id_topic IN ({array_int:topics})
-			AND lmr.id_msg > IFNULL(lt.id_msg, 0)',
+			AND lmr.id_msg > COALESCE(lt.id_msg, 0)',
 		array(
 			'protect_lmr_msg' => $SaveAServer,
 			'topics' => $topics,
@@ -791,7 +791,7 @@ function moveTopics($topics, $toBoard, $log = false)
 
 	// Mark target board as seen, if it was already marked as seen before.
 	$request = $db->query('', '
-		SELECT (IFNULL(lb.id_msg, 0) >= b.id_msg_updated) AS isSeen
+		SELECT (COALESCE(lb.id_msg, 0) >= b.id_msg_updated) AS isSeen
 		FROM {db_prefix}boards AS b
 			LEFT JOIN {db_prefix}log_boards AS lb ON (lb.id_board = b.id_board AND lb.id_member = {int:current_member})
 		WHERE b.id_board = {int:id_board}',
@@ -1038,8 +1038,8 @@ function getUnreadCountSince($id_board, $id_msg_last_visit)
 			LEFT JOIN {db_prefix}log_boards AS lb ON (lb.id_board = {int:current_board} AND lb.id_member = {int:current_member})
 			LEFT JOIN {db_prefix}log_topics AS lt ON (lt.id_topic = t.id_topic AND lt.id_member = {int:current_member})
 		WHERE t.id_board = {int:current_board}
-			AND t.id_last_msg > IFNULL(lb.id_msg, 0)
-			AND t.id_last_msg > IFNULL(lt.id_msg, 0)' .
+			AND t.id_last_msg > COALESCE(lb.id_msg, 0)
+			AND t.id_last_msg > COALESCE(lt.id_msg, 0)' .
 				(empty($id_msg_last_visit) ? '' : '
 			AND t.id_last_msg > {int:id_msg_last_visit}'),
 		array(
@@ -1297,10 +1297,10 @@ function getTopicInfo($topic_parameters, $full = '', $selects = array(), $tables
 			t.num_replies, t.num_views, t.num_likes, t.locked, t.redirect_expires,
 			t.id_redirect_topic, t.unapproved_posts, t.approved' . ($messages_table ? ',
 			ms.subject, ms.body, ms.id_member, ms.poster_time, ms.approved as msg_approved' : '') . ($members_table ? ',
-			IFNULL(mem.real_name, ms.poster_name) AS poster_name' : '') . ($logs_table ? ',
-			' . ($user_info['is_guest'] ? 't.id_last_msg + 1' : 'IFNULL(lt.id_msg, IFNULL(lmr.id_msg, -1)) + 1') . ' AS new_from
+			COALESCE(mem.real_name, ms.poster_name) AS poster_name' : '') . ($logs_table ? ',
+			' . ($user_info['is_guest'] ? 't.id_last_msg + 1' : 'COALESCE(lt.id_msg, lmr.id_msg, -1 + 1') . ' AS new_from
 			' . (!empty($modSettings['recycle_board']) && $modSettings['recycle_board'] == $board ? ', t.id_previous_board, t.id_previous_topic' : '') . '
-			' . (!$user_info['is_guest'] ? ', IFNULL(lt.unwatched, 0) as unwatched' : '') : '') .
+			' . (!$user_info['is_guest'] ? ', COALESCE(lt.unwatched, 0) as unwatched' : '') : '') .
 			(!empty($selects) ? ', ' . implode(', ', $selects) : '') . '
 		FROM {db_prefix}topics AS t' . ($messages_table ? '
 			INNER JOIN {db_prefix}messages AS ms ON (ms.id_msg = t.id_first_msg)' : '') . ($members_table ? '
@@ -1581,7 +1581,7 @@ function selectMessages($topic, $start, $items_per_page, $messages = array(), $o
 
 	// Get the messages and stick them into an array.
 	$request = $db->query('', '
-		SELECT m.subject, IFNULL(mem.real_name, m.poster_name) AS real_name, m.poster_time, m.body, m.id_msg, m.smileys_enabled, m.id_member
+		SELECT m.subject, COALESCE(mem.real_name, m.poster_name) AS real_name, m.poster_time, m.body, m.id_msg, m.smileys_enabled, m.id_member
 		FROM {db_prefix}messages AS m
 			LEFT JOIN {db_prefix}members AS mem ON (mem.id_member = m.id_member)
 		WHERE m.id_topic = {int:current_topic}' . (empty($messages['before']) ? '' : '
@@ -1645,7 +1645,7 @@ function topicMessages($topic, $render = 'print')
 	$db = database();
 
 	$request = $db->query('', '
-		SELECT subject, poster_time, body, IFNULL(mem.real_name, poster_name) AS poster_name, id_msg
+		SELECT subject, poster_time, body, COALESCE(mem.real_name, poster_name) AS poster_name, id_msg
 		FROM {db_prefix}messages AS m
 			LEFT JOIN {db_prefix}members AS mem ON (mem.id_member = m.id_member)
 		WHERE m.id_topic = {int:current_topic}' . ($modSettings['postmod_active'] && !allowedTo('approve_posts') ? '
@@ -1981,7 +1981,7 @@ function topicUserAttributes($id_topic, $user)
 
 	$request = $db->query('', '
 		SELECT
-			t.locked, IFNULL(ln.id_topic, 0) AS notify, t.is_sticky, t.id_poll,
+			t.locked, COALESCE(ln.id_topic, 0) AS notify, t.is_sticky, t.id_poll,
 			t.id_last_msg, mf.id_member, t.id_first_msg, mf.subject,
 			CASE WHEN ml.poster_time > ml.modified_time THEN ml.poster_time ELSE ml.modified_time END AS last_post_time
 		FROM {db_prefix}topics AS t
@@ -2765,10 +2765,10 @@ function topicNotifications($start, $items_per_page, $sort, $memID)
 	// All the topics with notification on...
 	$request = $db->query('', '
 		SELECT
-			IFNULL(lt.id_msg, IFNULL(lmr.id_msg, -1)) + 1 AS new_from, b.id_board, b.name,
-			t.id_topic, ms.subject, ms.id_member, IFNULL(mem.real_name, ms.poster_name) AS real_name_col,
+			COALESCE(lt.id_msg, lmr.id_msg, -1 + 1 AS new_from, b.id_board, b.name,
+			t.id_topic, ms.subject, ms.id_member, COALESCE(mem.real_name, ms.poster_name) AS real_name_col,
 			ml.id_msg_modified, ml.poster_time, ml.id_member AS id_member_updated,
-			IFNULL(mem2.real_name, ml.poster_name) AS last_real_name
+			COALESCE(mem2.real_name, ml.poster_name) AS last_real_name
 		FROM {db_prefix}log_notify AS ln
 			INNER JOIN {db_prefix}topics AS t ON (t.id_topic = ln.id_topic' . ($modSettings['postmod_active'] ? ' AND t.approved = {int:is_approved}' : '') . ')
 			INNER JOIN {db_prefix}boards AS b ON (b.id_board = t.id_board AND {query_see_board})
@@ -2894,7 +2894,7 @@ function mergeableTopics($id_board, $id_topic, $approved, $offset)
 
 	// Get some topics to merge it with.
 	$request = $db->query('', '
-		SELECT t.id_topic, m.subject, m.id_member, IFNULL(mem.real_name, m.poster_name) AS poster_name
+		SELECT t.id_topic, m.subject, m.id_member, COALESCE(mem.real_name, m.poster_name) AS poster_name
 		FROM {db_prefix}topics AS t
 			INNER JOIN {db_prefix}messages AS m ON (m.id_msg = t.id_first_msg)
 			LEFT JOIN {db_prefix}members AS mem ON (mem.id_member = m.id_member)

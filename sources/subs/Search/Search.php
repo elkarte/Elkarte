@@ -704,7 +704,7 @@ class Search
 		if (!empty($this->_search_params['minage']) || !empty($this->_search_params['maxage']))
 		{
 			$request = $this->_db->query('', '
-				SELECT ' . (empty($this->_search_params['maxage']) ? '0, ' : 'IFNULL(MIN(id_msg), -1), ') . (empty($this->_search_params['minage']) ? '0' : 'IFNULL(MAX(id_msg), -1)') . '
+				SELECT ' . (empty($this->_search_params['maxage']) ? '0, ' : 'COALESCE(MIN(id_msg), -1), ') . (empty($this->_search_params['minage']) ? '0' : 'COALESCE(MAX(id_msg), -1)') . '
 				FROM {db_prefix}messages
 				WHERE 1=1' . ($modSettings['postmod_active'] ? '
 					AND approved = {int:is_approved_true}' : '') . (empty($this->_search_params['minage']) ? '' : '
@@ -1523,9 +1523,9 @@ class Search
 				m.id_msg, m.subject, m.poster_name, m.poster_email, m.poster_time, m.id_member,
 				m.icon, m.poster_ip, m.body, m.smileys_enabled, m.modified_time, m.modified_name,
 				first_m.id_msg AS first_msg, first_m.subject AS first_subject, first_m.icon AS first_icon, first_m.poster_time AS first_poster_time,
-				first_mem.id_member AS first_member_id, IFNULL(first_mem.real_name, first_m.poster_name) AS first_member_name,
+				first_mem.id_member AS first_member_id, COALESCE(first_mem.real_name, first_m.poster_name) AS first_member_name,
 				last_m.id_msg AS last_msg, last_m.poster_time AS last_poster_time, last_mem.id_member AS last_member_id,
-				IFNULL(last_mem.real_name, last_m.poster_name) AS last_member_name, last_m.icon AS last_icon, last_m.subject AS last_subject,
+				COALESCE(last_mem.real_name, last_m.poster_name) AS last_member_name, last_m.icon AS last_icon, last_m.subject AS last_subject,
 				t.id_topic, t.is_sticky, t.locked, t.id_poll, t.num_replies, t.num_views, t.num_likes,
 				b.id_board, b.name AS board_name, c.id_cat, c.name AS cat_name
 			FROM {db_prefix}messages AS m

@@ -115,8 +115,8 @@ class Memberlist_Controller extends Action_Controller
 				'label' => $txt['status'],
 				'class' => 'status',
 				'sort' => array(
-					'down' => allowedTo('moderate_forum') ? 'IFNULL(lo.log_time, 1) ASC, real_name ASC' : 'CASE WHEN mem.show_online THEN IFNULL(lo.log_time, 1) ELSE 1 END ASC, real_name ASC',
-					'up' => allowedTo('moderate_forum') ? 'IFNULL(lo.log_time, 1) DESC, real_name DESC' : 'CASE WHEN mem.show_online THEN IFNULL(lo.log_time, 1) ELSE 1 END DESC, real_name DESC'
+					'down' => allowedTo('moderate_forum') ? 'COALESCE(lo.log_time, 1) ASC, real_name ASC' : 'CASE WHEN mem.show_online THEN COALESCE(lo.log_time, 1) ELSE 1 END ASC, real_name ASC',
+					'up' => allowedTo('moderate_forum') ? 'COALESCE(lo.log_time, 1) DESC, real_name DESC' : 'CASE WHEN mem.show_online THEN COALESCE(lo.log_time, 1) ELSE 1 END DESC, real_name DESC'
 				),
 			),
 			'email_address' => array(
@@ -132,16 +132,16 @@ class Memberlist_Controller extends Action_Controller
 				'class' => 'website',
 				'link_with' => 'website',
 				'sort' => array(
-					'down' => 'LENGTH(mem.website_url) > 0 ASC, IFNULL(mem.website_url, 1=1) DESC, mem.website_url DESC',
-					'up' => 'LENGTH(mem.website_url) > 0 DESC, IFNULL(mem.website_url, 1=1) ASC, mem.website_url ASC'
+					'down' => 'LENGTH(mem.website_url) > 0 ASC, COALESCE(mem.website_url, 1=1) DESC, mem.website_url DESC',
+					'up' => 'LENGTH(mem.website_url) > 0 DESC, COALESCE(mem.website_url, 1=1) ASC, mem.website_url ASC'
 				),
 			),
 			'id_group' => array(
 				'label' => $txt['position'],
 				'class' => 'group',
 				'sort' => array(
-					'down' => 'IFNULL(mg.group_name, 1=1) DESC, mg.group_name DESC',
-					'up' => 'IFNULL(mg.group_name, 1=1) ASC, mg.group_name ASC'
+					'down' => 'COALESCE(mg.group_name, 1=1) DESC, mg.group_name DESC',
+					'up' => 'COALESCE(mg.group_name, 1=1) ASC, mg.group_name ASC'
 				),
 			),
 			'date_registered' => array(
@@ -465,7 +465,7 @@ class Memberlist_Controller extends Action_Controller
 
 			// Search for groups.
 			if (in_array('group', $input_fields))
-				$fields += array(9 => 'IFNULL(group_name, {string:blank_string})');
+				$fields += array(9 => 'COALESCE(group_name, {string:blank_string})');
 
 			// Search for an email address?
 			if (in_array('email', $input_fields))
@@ -494,7 +494,7 @@ class Memberlist_Controller extends Action_Controller
 				{
 					$customJoin[] = 'LEFT JOIN {db_prefix}custom_fields_data AS cfd' . $field . ' ON (cfd' . $field . '.variable = {string:cfd' . $field . '} AND cfd' . $field . '.id_member = mem.id_member)';
 					$query_parameters['cfd' . $field] = $curField;
-					$fields += array($customCount++ => 'IFNULL(cfd' . $field . '.value, {string:blank_string})');
+					$fields += array($customCount++ => 'COALESCE(cfd' . $field . '.value, {string:blank_string})');
 					$validFields[] = $field;
 				}
 			}

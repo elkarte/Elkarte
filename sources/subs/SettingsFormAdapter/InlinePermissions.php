@@ -200,7 +200,7 @@ class InlinePermissions extends Adapter
 		$this->db->free_result($request);
 
 		$request = $this->db->query('', '
-			SELECT mg.id_group, mg.group_name, mg.min_posts, IFNULL(p.add_deny, -1) AS status, p.permission
+			SELECT mg.id_group, mg.group_name, mg.min_posts, COALESCE(p.add_deny, -1) AS status, p.permission
 			FROM {db_prefix}membergroups AS mg
 				LEFT JOIN {db_prefix}permissions AS p ON (p.id_group = mg.id_group AND p.permission IN ({array_string:permissions}))
 			WHERE mg.id_group NOT IN (1, 3)

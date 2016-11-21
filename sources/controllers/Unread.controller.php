@@ -375,7 +375,7 @@ class Unread_Controller extends Action_Controller
 
 		$sort_methods = array(
 			'subject' => 'ms.subject',
-			'starter' => 'IFNULL(mems.real_name, ms.poster_name)',
+			'starter' => 'COALESCE(mems.real_name, ms.poster_name)',
 			'replies' => 't.num_replies',
 			'views' => 't.num_views',
 			'first_post' => 't.id_topic',

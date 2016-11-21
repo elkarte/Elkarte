@@ -118,7 +118,7 @@ class Who_Controller extends Action_Controller
 
 		$conditions = array();
 		if (!allowedTo('moderate_forum'))
-			$conditions[] = '(IFNULL(mem.show_online, 1) = 1)';
+			$conditions[] = '(COALESCE(mem.show_online, 1) = 1)';
 
 		// Fallback to top filter?
 		if (isset($this->_req->post->submit_top, $this->_req->post->show_top))

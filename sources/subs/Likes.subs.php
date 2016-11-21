@@ -447,7 +447,7 @@ function postLikers($start, $items_per_page, $sort, $messageID, $simple = true)
 		SELECT
 			l.id_member, l.id_msg,
 			m.real_name' . ($simple === true ? '' : ',
-			IFNULL(a.id_attach, 0) AS id_attach,
+			COALESCE(a.id_attach, 0) AS id_attach,
 			a.filename, a.attachment_type, m.avatar, m.email_address') . '
 		FROM {db_prefix}message_likes AS l
 			LEFT JOIN {db_prefix}members AS m ON (m.id_member = l.id_member)' . ($simple === true ? '' : '
@@ -523,10 +523,10 @@ function dbMostLikedMessage($limit = 10)
 	// Most liked Message
 	$request = $db->query('', '
 		SELECT
-			IFNULL(mem.real_name, m.poster_name) AS member_received_name,
+			COALESCE(mem.real_name, m.poster_name) AS member_received_name,
 			lp.id_msg, lp.like_count AS like_count,
 			m.id_topic, m.id_board, m.id_member, m.subject, m.body, m.poster_time, m.smileys_enabled,
-			IFNULL(a.id_attach, 0) AS id_attach, a.filename, a.attachment_type,
+			COALESCE(a.id_attach, 0) AS id_attach, a.filename, a.attachment_type,
 			mem.avatar, mem.posts, mem.email_address
 		FROM (
 				SELECT
@@ -621,10 +621,10 @@ function dbMostLikedMessagesByTopic($topic, $limit = 5)
 	// Most liked messages in a given topic
 	return $db->fetchQueryCallback('
 		SELECT
-			IFNULL(mem.real_name, m.poster_name) AS member_received_name, lp.id_msg,
+			COALESCE(mem.real_name, m.poster_name) AS member_received_name, lp.id_msg,
 			m.id_topic, m.id_board, m.id_member, m.subject, m.body, m.poster_time,
 			lp.like_count AS like_count,
-			IFNULL(a.id_attach, 0) AS id_attach, a.filename, a.attachment_type,
+			COALESCE(a.id_attach, 0) AS id_attach, a.filename, a.attachment_type,
 			mem.posts, m.smileys_enabled, mem.email_address, mem.avatar
 		FROM (
 				SELECT
@@ -834,8 +834,8 @@ function dbMostLikesReceivedUser($limit = 10)
 	$request = $db->query('', '
 		SELECT
 			lp.id_poster, lp.like_count,
-			IFNULL(a.id_attach, 0) AS id_attach, a.filename, a.attachment_type,
-			IFNULL(mem.real_name, m.poster_name) AS real_name,
+			COALESCE(a.id_attach, 0) AS id_attach, a.filename, a.attachment_type,
+			COALESCE(mem.real_name, m.poster_name) AS real_name,
 			mem.avatar, mem.date_registered, mem.posts, mem.email_address
 		FROM (
 			SELECT
@@ -957,8 +957,8 @@ function dbMostLikesGivenUser($limit = 10)
 	$request = $db->query('', '
 		SELECT
 			lp.id_member, lp.like_count,
-			IFNULL(a.id_attach, 0) AS id_attach, a.filename, a.attachment_type,
-			IFNULL(mem.real_name, m.poster_name) AS real_name,
+			COALESCE(a.id_attach, 0) AS id_attach, a.filename, a.attachment_type,
+			COALESCE(mem.real_name, m.poster_name) AS real_name,
 			mem.avatar, mem.date_registered, mem.posts, mem.email_address
 		FROM (
 			SELECT

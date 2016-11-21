@@ -150,7 +150,7 @@ function pollInfo($id_poll, $ignore_permissions = true)
 	$request = $db->query('', '
 		SELECT
 			p.question, p.voting_locked, p.hide_results, p.expire_time, p.max_votes, p.change_vote,
-			p.guest_vote, p.id_member, IFNULL(mem.real_name, p.poster_name) AS poster_name,
+			p.guest_vote, p.id_member, COALESCE(mem.real_name, p.poster_name) AS poster_name,
 			p.num_guest_voters, p.reset_poll' . ($ignore_permissions ? '' : ',
 			b.id_board') . '
 		FROM {db_prefix}polls AS p
@@ -280,7 +280,7 @@ function pollOptionsForMember($id_poll, $id_member)
 
 	// Get the choices
 	$request = $db->query('', '
-		SELECT pc.id_choice, pc.label, pc.votes, IFNULL(lp.id_choice, -1) AS voted_this
+		SELECT pc.id_choice, pc.label, pc.votes, COALESCE(lp.id_choice, -1) AS voted_this
 		FROM {db_prefix}poll_choices AS pc
 			LEFT JOIN {db_prefix}log_polls AS lp ON (lp.id_choice = pc.id_choice AND lp.id_poll = {int:id_poll} AND lp.id_member = {int:current_member} AND lp.id_member != {int:not_guest})
 		WHERE pc.id_poll = {int:id_poll}',
@@ -547,7 +547,7 @@ function checkVote($topic)
 	$db = database();
 
 	$request = $db->query('', '
-		SELECT IFNULL(lp.id_choice, -1) AS selected, p.voting_locked, p.id_poll, p.expire_time, p.max_votes, p.change_vote,
+		SELECT COALESCE(lp.id_choice, -1) AS selected, p.voting_locked, p.id_poll, p.expire_time, p.max_votes, p.change_vote,
 			p.guest_vote, p.reset_poll, p.num_guest_voters
 		FROM {db_prefix}topics AS t
 			INNER JOIN {db_prefix}polls AS p ON (p.id_poll = t.id_poll)

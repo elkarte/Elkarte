@@ -426,8 +426,8 @@ class TopicsMerge
 		$request = $this->_db->query('', '
 			SELECT
 				t.id_topic, t.id_board, b.id_cat, t.id_poll, t.num_views, t.is_sticky, t.approved, t.num_replies, t.unapproved_posts,
-				m1.subject, m1.poster_time AS time_started, IFNULL(mem1.id_member, 0) AS id_member_started, IFNULL(mem1.real_name, m1.poster_name) AS name_started,
-				m2.poster_time AS time_updated, IFNULL(mem2.id_member, 0) AS id_member_updated, IFNULL(mem2.real_name, m2.poster_name) AS name_updated
+				m1.subject, m1.poster_time AS time_started, COALESCE(mem1.id_member, 0) AS id_member_started, COALESCE(mem1.real_name, m1.poster_name) AS name_started,
+				m2.poster_time AS time_updated, COALESCE(mem2.id_member, 0) AS id_member_updated, COALESCE(mem2.real_name, m2.poster_name) AS name_updated
 			FROM {db_prefix}topics AS t
 				INNER JOIN {db_prefix}messages AS m1 ON (m1.id_msg = t.id_first_msg)
 				INNER JOIN {db_prefix}messages AS m2 ON (m2.id_msg = t.id_last_msg)

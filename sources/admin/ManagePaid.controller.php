@@ -590,7 +590,7 @@ class ManagePaid_Controller extends Action_Controller
 		$context['subscription'] = getSubscriptionDetails($context['sub_id']);
 
 		// Are we searching for people?
-		$search_string = isset($this->_req->post->ssearch) && !empty($this->_req->post->sub_search) ? ' AND IFNULL(mem.real_name, {string:guest}) LIKE {string:search}' : '';
+		$search_string = isset($this->_req->post->ssearch) && !empty($this->_req->post->sub_search) ? ' AND COALESCE(mem.real_name, {string:guest}) LIKE {string:search}' : '';
 		$search_vars = empty($this->_req->post->sub_search) ? array() : array('search' => '%' . $this->_req->post->sub_search . '%', 'guest' => $txt['guest']);
 
 		$listOptions = array(

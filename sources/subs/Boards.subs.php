@@ -825,7 +825,7 @@ function getBoardTree($query = array())
 	// Getting all the board and category information you'd ever wanted.
 	$request = $db->query('', '
 		SELECT
-			IFNULL(b.id_board, 0) AS id_board, b.id_parent, b.name AS board_name, b.description, b.child_level,
+			COALESCE(b.id_board, 0) AS id_board, b.id_parent, b.name AS board_name, b.description, b.child_level,
 			b.board_order, b.count_posts, b.member_groups, b.id_theme, b.override_theme, b.id_profile, b.redirect,
 			b.num_posts, b.num_topics, b.deny_member_groups, c.id_cat, c.name AS cat_name, c.cat_order, c.can_collapse' . (!empty($query['select']) ?
 			$query['select'] : '') . '
@@ -1005,7 +1005,7 @@ function getBoardList($boardListOptions = array(), $simple = false)
 	{
 		$join[] = '
 			LEFT JOIN {db_prefix}moderators AS mods ON (mods.id_board = b.id_board AND mods.id_member = {int:current_member})';
-		$select .= ', b.id_profile, b.member_groups, IFNULL(mods.id_member, 0) AS is_mod';
+		$select .= ', b.id_profile, b.member_groups, COALESCE(mods.id_member, 0) AS is_mod';
 		$where_parameters['current_member'] = $boardListOptions['moderator'];
 	}
 
@@ -1748,7 +1748,7 @@ function sumRecentPosts()
 	global $modSettings;
 
 	$request = $db->query('', '
-		SELECT IFNULL(SUM(num_posts), 0)
+		SELECT COALESCE(SUM(num_posts), 0)
 		FROM {db_prefix}boards as b
 		WHERE {query_wanna_see_board}' . (!empty($modSettings['recycle_enable']) && $modSettings['recycle_board'] > 0 ? '
 			AND b.id_board != {int:recycle_board}' : ''),
@@ -2036,7 +2036,7 @@ function boardNotifications($start, $items_per_page, $sort, $memID)
 
 	// All the boards that you have notification enabled
 	$notification_boards = $db->fetchQueryCallback('
-		SELECT b.id_board, b.name, IFNULL(lb.id_msg, 0) AS board_read, b.id_msg_updated
+		SELECT b.id_board, b.name, COALESCE(lb.id_msg, 0) AS board_read, b.id_msg_updated
 		FROM {db_prefix}log_notify AS ln
 			INNER JOIN {db_prefix}boards AS b ON (b.id_board = ln.id_board)
 			LEFT JOIN {db_prefix}log_boards AS lb ON (lb.id_board = b.id_board AND lb.id_member = {int:current_member})
@@ -2062,7 +2062,7 @@ function boardNotifications($start, $items_per_page, $sort, $memID)
 
 	// and all the boards that you can see but don't have notify turned on for
 	$request = $db->query('', '
-		SELECT b.id_board, b.name, IFNULL(lb.id_msg, 0) AS board_read, b.id_msg_updated
+		SELECT b.id_board, b.name, COALESCE(lb.id_msg, 0) AS board_read, b.id_msg_updated
 		FROM {db_prefix}boards AS b
 			LEFT JOIN {db_prefix}log_notify AS ln ON (ln.id_board = b.id_board AND ln.id_member = {int:selected_member})
 			LEFT JOIN {db_prefix}log_boards AS lb ON (lb.id_board = b.id_board AND lb.id_member = {int:current_member})

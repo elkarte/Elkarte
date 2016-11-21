@@ -170,13 +170,13 @@ class Boards_List
 				b.id_board, b.name AS board_name, b.description,
 				CASE WHEN b.redirect != {string:blank_string} THEN 1 ELSE 0 END AS is_redirect,
 				b.num_posts, b.num_topics, b.unapproved_posts, b.unapproved_topics, b.id_parent,
-				IFNULL(m.poster_time, 0) AS poster_time, IFNULL(mem.member_name, m.poster_name) AS poster_name,
-				m.subject, m.id_topic, IFNULL(mem.real_name, m.poster_name) AS real_name,
+				COALESCE(m.poster_time, 0) AS poster_time, COALESCE(mem.member_name, m.poster_name) AS poster_name,
+				m.subject, m.id_topic, COALESCE(mem.real_name, m.poster_name) AS real_name,
 				' . ($this->_user['is_guest'] ? ' 1 AS is_read, 0 AS new_from,' : '
-				(IFNULL(lb.id_msg, 0) >= b.id_msg_updated) AS is_read, IFNULL(lb.id_msg, -1) + 1 AS new_from,' . ($this->_options['include_categories'] ? '
-				c.can_collapse, IFNULL(cc.id_member, 0) AS is_collapsed,' : '')) . '
-				IFNULL(mem.id_member, 0) AS id_member, mem.avatar, m.id_msg' . ($this->_options['avatars_on_indexes'] ? ',
-				IFNULL(a.id_attach, 0) AS id_attach, a.filename, a.attachment_type, mem.email_address' : '') . '
+				(COALESCE(lb.id_msg, 0) >= b.id_msg_updated) AS is_read, COALESCE(lb.id_msg, -1) + 1 AS new_from,' . ($this->_options['include_categories'] ? '
+				c.can_collapse, COALESCE(cc.id_member, 0) AS is_collapsed,' : '')) . '
+				COALESCE(mem.id_member, 0) AS id_member, mem.avatar, m.id_msg' . ($this->_options['avatars_on_indexes'] ? ',
+				COALESCE(a.id_attach, 0) AS id_attach, a.filename, a.attachment_type, mem.email_address' : '') . '
 			FROM {db_prefix}boards AS b' . ($this->_options['include_categories'] ? '
 				LEFT JOIN {db_prefix}categories AS c ON (c.id_cat = b.id_cat)' : '') . '
 				LEFT JOIN {db_prefix}messages AS m ON (m.id_msg = b.id_last_msg)
@@ -436,7 +436,7 @@ class Boards_List
 		if (!Cache::instance()->getVar($mod_cached, 'localmods_' . md5(implode(',', $boards)), 3600))
 		{
 			$mod_cached = $this->_db->fetchQuery('
-				SELECT mods.id_board, IFNULL(mods_mem.id_member, 0) AS id_moderator, mods_mem.real_name AS mod_real_name
+				SELECT mods.id_board, COALESCE(mods_mem.id_member, 0) AS id_moderator, mods_mem.real_name AS mod_real_name
 				FROM {db_prefix}moderators AS mods
 					LEFT JOIN {db_prefix}members AS mods_mem ON (mods_mem.id_member = mods.id_member)
 				WHERE mods.id_board IN ({array_int:id_boards})',

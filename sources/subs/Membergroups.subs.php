@@ -630,7 +630,7 @@ function list_getMembergroups($start, $items_per_page, $sort, $membergroup_type,
 
 	$request = $db->query('', '
 		SELECT mg.id_group, mg.group_name, mg.min_posts, mg.description, mg.group_type, mg.online_color,
-			mg.hidden, mg.id_parent, mg.icons, IFNULL(gm.id_member, 0) AS can_moderate, 0 AS num_members
+			mg.hidden, mg.id_parent, mg.icons, COALESCE(gm.id_member, 0) AS can_moderate, 0 AS num_members
 		FROM {db_prefix}membergroups AS mg
 			LEFT JOIN {db_prefix}group_moderators AS gm ON (gm.id_group = mg.id_group AND gm.id_member = {int:current_member})
 		WHERE mg.min_posts {raw:min_posts}' . ($include_all ? '' : '
@@ -1812,7 +1812,7 @@ function loadGroups($id_member, $show_hidden = false, $min_posts = -1)
 	$db = database();
 
 	$request = $db->query('', '
-		SELECT mg.id_group, mg.group_name, IFNULL(gm.id_member, 0) AS can_moderate, mg.hidden
+		SELECT mg.id_group, mg.group_name, COALESCE(gm.id_member, 0) AS can_moderate, mg.hidden
 		FROM {db_prefix}membergroups AS mg
 			LEFT JOIN {db_prefix}group_moderators AS gm ON (gm.id_group = mg.id_group AND gm.id_member = {int:current_member})
 		WHERE mg.min_posts = {int:min_posts}
@@ -1857,7 +1857,7 @@ function accessibleGroups()
 	$db = database();
 
 	$request = $db->query('', '
-		SELECT mg.id_group, mg.group_name, IFNULL(gm.id_member, 0) AS can_moderate, mg.hidden
+		SELECT mg.id_group, mg.group_name, COALESCE(gm.id_member, 0) AS can_moderate, mg.hidden
 		FROM {db_prefix}membergroups AS mg
 			LEFT JOIN {db_prefix}group_moderators AS gm ON (gm.id_group = mg.id_group AND gm.id_member = {int:current_member})
 		WHERE mg.min_posts = {int:min_posts}
