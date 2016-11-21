@@ -15,7 +15,7 @@
  */
 
 /** global: notification_topic_notice, notification_board_notice, txt_mark_as_read_confirm, oRttime */
-/** global: $editor_data, elk_scripturl, elk_smiley_url, elk_session_var elk_session_id, elk_images_url */
+/** global: $editor_data, elk_scripturl, elk_smiley_url, elk_session_var, elk_session_id, elk_images_url */
 /** global: poll_add, poll_remove, poll_add, XMLHttpRequest, ElkInfoBar */
 
 /**

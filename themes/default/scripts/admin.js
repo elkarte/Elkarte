@@ -1891,7 +1891,7 @@ $(function() {
 			imgs = new Array(elk_images_url + "/admin/switch_off.png", elk_images_url + "/admin/switch_on.png"),
 			new_state = !$("#feature_" + cf).attr("checked"),
 			ajax_infobar = new ElkInfoBar('core_features_bar', {error_class: 'errorbox', success_class: 'successbox'}),
-			data = {};
+			data;
 
 		$("#feature_" + cf).attr("checked", new_state);
 
