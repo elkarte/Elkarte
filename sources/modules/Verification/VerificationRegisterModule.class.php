@@ -74,6 +74,8 @@ class Verification_Register_Module implements ElkArte\sources\modules\Module_Int
 	 */
 	public function before_complete_register($reg_errors)
 	{
+		global $context;
+
 		// Check whether the visual verification code was entered correctly.
 		$verificationOptions = array(
 			'id' => 'register',
