@@ -33,7 +33,7 @@ class Unread
 	private $_num_topics = 0;
 	/** @var int */
 	private $_min_message = 0;
-	/** @var UNREAD */
+	/** @var int */
 	private $_action = self::UNREAD;
 	/** @var int */
 	private $_earliest_msg = 0;
