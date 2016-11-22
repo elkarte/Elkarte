@@ -313,7 +313,7 @@ class Database_PostgreSQL extends Database_Abstract
 		if ($db_show_debug === true)
 		{
 			$db_cache['t'] = microtime(true) - $st;
-			$debug->db($db_cache);
+			$debug->db_query($db_cache);
 		}
 
 		return $this->_db_last_result;
