@@ -17,61 +17,75 @@ class Priority
 {
 	/**
 	 * An array containing all the entities added
+	 * @var array
 	 */
 	protected $_all_general = array();
 
 	/**
 	 * An array containing all the entities that should go *after* another one
+	 * @var array
 	 */
 	protected $_all_after = array();
 
 	/**
 	 * An array containing all the entities that should go *before* another one
+	 * @var array
 	 */
 	protected $_all_before = array();
 
 	/**
 	 * An array containing all the entities that should go at the end of the list
+	 * @var array
 	 */
 	protected $_all_end = array();
 
 	/**
 	 * An array containing all the entities that should go at the beginning
+	 * @var array
 	 */
 	protected $_all_begin = array();
 
 	/**
 	 * The highest priority assigned at a certain moment for $_all_general
+	 * @var int
 	 */
 	protected $_general_highest_priority = 0;
 
 	/**
 	 * The highest priority assigned at a certain moment for $_all_end
+	 * @var int
 	 */
 	protected $_end_highest_priority = 10000;
 
 	/**
 	 * The highest priority assigned at a certain moment for $_all_begin
 	 * Highest priority at "begin" is sort of tricky, because the value is negative
+	 * @var int
 	 */
 	protected $_begin_highest_priority = -10000;
 
 	/**
 	 * Array of sorted entities
+	 * @var array
 	 */
 	protected $_sorted_entities = null;
 
+	/**
+	 * Default priority
+	 */
 	const STDPRIORITY = 0;
 
 	/**
 	 * Add a new entity to the pile
 	 *
-	 * @param string $entity name of a entity
+	 * @param string   $entity name of a entity
 	 * @param int|null $priority an integer defining the priority of the entity.
 	 */
 	public function add($entity, $priority = null)
 	{
-		$this->_all_general[$entity] = $priority === null ? $this->_general_highest_priority : (int) $priority;
+		$this->_all_general[$entity] = $priority === null
+			? $this->_general_highest_priority
+			: (int) $priority;
 		$this->_general_highest_priority = max($this->_all_general) + 100;
 	}
 
@@ -100,24 +114,28 @@ class Priority
 	/**
 	 * Add a entity at the end of the pile
 	 *
-	 * @param string $entity name of a entity
+	 * @param string   $entity name of a entity
 	 * @param int|null $priority an integer defining the priority of the entity.
 	 */
 	public function addEnd($entity, $priority = null)
 	{
-		$this->_all_end[$entity] = $priority === null ? $this->_end_highest_priority : (int) $priority;
+		$this->_all_end[$entity] = $priority === null
+			? $this->_end_highest_priority
+			: (int) $priority;
 		$this->_end_highest_priority = max($this->_all_end) + 100;
 	}
 
 	/**
 	 * Add a entity at the beginning of the pile
 	 *
-	 * @param string $entity name of a entity
+	 * @param string   $entity name of a entity
 	 * @param int|null $priority an integer defining the priority of the entity.
 	 */
 	public function addBegin($entity, $priority = null)
 	{
-		$this->_all_begin[$entity] = $priority === null ? $this->_begin_highest_priority : (int) -$priority;
+		$this->_all_begin[$entity] = $priority === null
+			? $this->_begin_highest_priority
+			: (int) -$priority;
 		$this->_begin_highest_priority = max($this->_all_begin) + 100;
 	}
 
@@ -129,15 +147,25 @@ class Priority
 	public function remove($entity)
 	{
 		if (isset($this->_all_general[$entity]))
+		{
 			unset($this->_all_general[$entity]);
+		}
 		elseif (isset($this->_all_after[$entity]))
+		{
 			unset($this->_all_after[$entity]);
+		}
 		elseif (isset($this->_all_before[$entity]))
+		{
 			unset($this->_all_before[$entity]);
+		}
 		elseif (isset($this->_all_end[$entity]))
+		{
 			unset($this->_all_end[$entity]);
+		}
 		elseif (isset($this->_all_begin[$entity]))
+		{
 			unset($this->_all_begin[$entity]);
+		}
 	}
 
 	/**
@@ -164,6 +192,7 @@ class Priority
 	public function sort()
 	{
 		$this->_sorted_entities = array();
+		$all = array();
 
 		// Sorting
 		asort($this->_all_begin);
@@ -185,12 +214,20 @@ class Priority
 			'after' => array()
 		);
 		foreach ($this->_all_before as $key => $value)
+		{
 			if (in_array($value, $all_known))
+			{
 				$all['before'][$key] = $value;
+			}
+		}
 
 		foreach ($this->_all_after as $key => $value)
+		{
 			if (in_array($value, $all_known))
+			{
 				$all['after'][$key] = $value;
+			}
+		}
 
 		// This is terribly optimized, though it shouldn't loop over too many things (hopefully)
 		// It "iteratively" adds all the after/before entities shifting priority
@@ -200,9 +237,12 @@ class Priority
 			foreach (array('after' => 1, 'before' => -1) as $where => $inc)
 			{
 				if (empty($all[$where]))
+				{
 					continue;
+				}
 
 				foreach ($all[$where] as $entity => $reference)
+				{
 					if (isset($all_entities[$reference]))
 					{
 						$priority_threshold = $all_entities[$reference];
@@ -211,16 +251,21 @@ class Priority
 							{
 								case 'after':
 									if ($val <= $priority_threshold)
+									{
 										$all_entities[$key] -= $inc;
+									}
 									break;
 								case 'before':
 									if ($val >= $priority_threshold)
+									{
 										$all_entities[$key] -= $inc;
+									}
 									break;
 							}
 						unset($all[$where][$entity]);
 						$all_entities[$entity] = $priority_threshold;
 					}
+				}
 			}
 		}
 
@@ -239,9 +284,13 @@ class Priority
 	public function hasEntities()
 	{
 		if ($this->_sorted_entities === null)
+		{
 			return (!empty($this->_all_general) || !empty($this->_all_begin) || !empty($this->_all_end));
+		}
 		else
+		{
 			return !empty($this->_sorted_entities);
+		}
 	}
 
 	/**
