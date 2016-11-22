@@ -11,6 +11,14 @@
  */
 
 /**
+ * We like the globals cuz they is good to us
+ */
+
+/** global: notification_topic_notice, notification_board_notice, txt_mark_as_read_confirm, oRttime */
+/** global: $editor_data, elk_scripturl, elk_smiley_url, elk_session_var, elk_session_id, elk_images_url */
+/** global: poll_add, poll_remove, poll_add, XMLHttpRequest, ElkInfoBar */
+
+/**
  * Sets an auto height so small code blocks collapse
  * Sets a height for larger code blocks and lets them resize / overflow as normal
  */
@@ -609,7 +617,7 @@ function add_elk_mention(selector, oOptions)
 		}
 
 		// Divs to hold our responses
-		var ajax_errorbox = $("<div id='errorContainer'><div/>").appendTo('body');
+		$("<div id='errorContainer'><div/>").appendTo('body');
 
 		$('#errorContainer').css({'display': 'none'});
 
@@ -1622,19 +1630,18 @@ var ElkNotifier = new ElkNotifications();
 		opt = $.extend({
 			text: '',
 			class: 'ajax_infobar',
-			hide_delay: 5000,
+			hide_delay: 4000,
 			error_class: 'error',
-			success_class: 'success',
+			success_class: 'success'
 		}, opt);
 
 		var $elem = $('#' + elem_id),
 			time_out = null,
 			init = function (elem_id, opt) {
 				clearTimeout(time_out);
-				if ($elem.length == 0) {
-					$elem = $('<div id="' + elem_id + '" class="' + opt.class + '" />');
+				if ($elem.length === 0) {
+					$elem = $('<div id="' + elem_id + '" class="' + opt.class + ' hide" />');
 					$('body').append($elem);
-					hide();
 					$elem.attr('id', elem_id);
 					$elem.addClass(opt.class);
 					$elem.text(opt.text);
@@ -1657,7 +1664,7 @@ var ElkNotifier = new ElkNotifications();
 				clearTimeout(time_out);
 				$elem.fadeIn();
 
-				if (opt.hide_delay != 0)
+				if (opt.hide_delay !== 0)
 				{
 					time_out = setTimeout(function() {
 						hide();
@@ -1679,7 +1686,9 @@ var ElkNotifier = new ElkNotifications();
 				return this;
 			};
 
+		// Call the init function by default
 		init(elem_id, opt);
+
 		return {
 			changeText: changeText,
 			addClass: addClass,

@@ -296,7 +296,7 @@ class Theme extends \Theme
 	 *
 	 * @param bool $do_deferred = false
 	 */
-	function template_javascript($do_deferred = false)
+	public function template_javascript($do_deferred = false)
 	{
 		global $modSettings;
 
@@ -363,7 +363,7 @@ class Theme extends \Theme
 	 * What it does:
 	 *  - If the admin option to combine files is set, will use Combiner.class
 	 */
-	function template_css()
+	public function template_css()
 	{
 		global $modSettings, $settings;
 
@@ -402,7 +402,7 @@ class Theme extends \Theme
 	/**
 	 * Output the inline-CSS in a style tag
 	 */
-	function template_inlinecss()
+	public function template_inlinecss()
 	{
 		$style_tag = '';
 
@@ -438,7 +438,7 @@ class Theme extends \Theme
 	 * Calls on template_show_error from index.template.php to show warnings
 	 * and security errors for admins
 	 */
-	function template_admin_warning_above()
+	public function template_admin_warning_above()
 	{
 		global $context, $txt;
 
@@ -593,7 +593,7 @@ class Theme extends \Theme
 	 *
 	 * @param bool $forceload = false
 	 */
-	function setupThemeContext($forceload = false)
+	public function setupThemeContext($forceload = false)
 	{
 		global $modSettings, $user_info, $scripturl, $context, $settings, $options, $txt, $boarddir;
 

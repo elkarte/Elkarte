@@ -1347,7 +1347,7 @@ function spamProtection($error_type, $fatal = true)
  * @param string $path the (absolute) directory path
  * @param boolean $allow_localhost if access should be allowed to localhost
  * @param string $files (optional, default '*') parameter for the Files tag
- * 
+ *
  * @return string|boolean on success error string if anything fails
  */
 function secureDirectory($path, $allow_localhost = false, $files = '*')
@@ -1604,8 +1604,8 @@ function securityOptionsHeader($override = null)
  */
 function stop_prefetching()
 {
-	if (isset($_SERVER["HTTP_X_PURPOSE"]) && in_array($_SERVER["HTTP_X_PURPOSE"], array("preview", "instant"))
-		|| (isset($_SERVER['HTTP_X_MOZ']) && $_SERVER['HTTP_X_MOZ'] === "prefetch"))
+	if (isset($_SERVER['HTTP_X_PURPOSE']) && in_array($_SERVER['HTTP_X_PURPOSE'], array('preview', 'instant'))
+		|| (isset($_SERVER['HTTP_X_MOZ']) && $_SERVER['HTTP_X_MOZ'] === 'prefetch'))
 	{
 		@ob_end_clean();
 		header('HTTP/1.1 403 Forbidden');
@@ -1635,7 +1635,7 @@ function isAdminSessionActive()
  */
 function checkSecurityFiles()
 {
-	global $txt;
+	global $txt, $context;
 
 	$has_files = false;
 

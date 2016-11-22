@@ -1035,8 +1035,11 @@ function prepareDeleteSubscriptions($toDelete)
 			'subscription_list' => $toDelete,
 		)
 	);
+	$delete = array();
 	while ($row = $db->fetch_assoc($request))
+	{
 		$delete[$row['id_subscribe']] = $row['id_member'];
+	}
 	$db->free_result($request);
 
 	return $delete;

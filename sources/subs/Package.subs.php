@@ -218,7 +218,7 @@ function loadInstalledPackages()
  * @package Packages
  * @param string $gzfilename
  *
- * @reutrn array|string error string on error array on success
+ * @return array|string error string on error array on success
  */
 function getPackageInfo($gzfilename)
 {
@@ -281,7 +281,7 @@ function getPackageInfo($gzfilename)
  * @param string[] $chmodFiles
  * @param mixed[] $chmodOptions
  * @param boolean $restore_write_status
- * @return boolean
+ * @return array|boolean
  */
 function create_chmod_control($chmodFiles = array(), $chmodOptions = array(), $restore_write_status = false)
 {
@@ -1275,7 +1275,7 @@ function parsePackageInfo(&$packageXML, $testing_only = true, $method = 'install
  * @param string $versions
  * @param boolean $reset
  * @param string $the_version
- * @return highest install value string or false
+ * @return string|boolean highest install value string or false
  */
 function matchHighestPackageVersion($versions, $reset = false, $the_version)
 {
@@ -1434,7 +1434,7 @@ function parse_path($path)
 	global $modSettings, $settings, $temp_path;
 
 	if (empty($path))
-		return;
+		return '';
 
 	$dirs = array(
 		'\\' => '/',
@@ -2795,8 +2795,6 @@ function setPackageState($id, $install_id)
 function checkPackageDependency($id)
 {
 	$db = database();
-
-	$version = false;
 
 	$request = $db->query('', '
 		SELECT version

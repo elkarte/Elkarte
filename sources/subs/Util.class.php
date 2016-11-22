@@ -211,7 +211,7 @@ class Util
 		if (empty($modSettings['disableEntityCheck']))
 			$string = preg_replace_callback(self::$_entity_check_reg, 'entity_fix__callback', $string);
 
-		preg_match('~^(' . $ent_list . '|.){' . Util::strlen(substr($string, 0, $length)) . '}~u', $string, $matches);
+		preg_match('~^(' . $ent_list . '|.){' . self::strlen(substr($string, 0, $length)) . '}~u', $string, $matches);
 		$string = $matches[0];
 		while (strlen($string) > $length)
 			$string = preg_replace('~(?:' . $ent_list . '|.)$~u', '', $string);
@@ -242,25 +242,25 @@ class Util
 	public static function shorten_text($string, $length = 384, $cutword = false, $ellipsis = '...', $exact = true, $buffer = 12)
 	{
 		// Does len include the ellipsis or are the ellipsis appended
-		$ending = !empty($ellipsis) && $exact ? Util::strlen($ellipsis) : 0;
+		$ending = !empty($ellipsis) && $exact ? self::strlen($ellipsis) : 0;
 
 		// If its to long, cut it down to size
-		if (Util::strlen($string) > $length)
+		if (self::strlen($string) > $length)
 		{
 			// Try to cut on a word boundary
 			if ($cutword)
 			{
-				$string = Util::substr($string, 0, $length - $ending);
-				$space_pos = Util::strpos($string, ' ', 0, true);
+				$string = self::substr($string, 0, $length - $ending);
+				$space_pos = self::strpos($string, ' ', 0, true);
 
 				// Always one clown in the audience who likes long words or not using the spacebar
 				if (!empty($space_pos) && ($length - $space_pos <= $buffer))
-					$string = Util::substr($string, 0, $space_pos);
+					$string = self::substr($string, 0, $space_pos);
 
 				$string = rtrim($string) . ($ellipsis ? $ellipsis : '');
 			}
 			else
-				$string = Util::substr($string, 0, $length - $ending) . ($ellipsis ? $ellipsis : '');
+				$string = self::substr($string, 0, $length - $ending) . ($ellipsis ? $ellipsis : '');
 		}
 
 		return $string;
@@ -281,11 +281,11 @@ class Util
 	public static function shorten_html($string, $length = 384, $ellipsis = '...', $exact = true)
 	{
 		// If its shorter than the maximum length, while accounting for html tags, simply return
-		if (Util::strlen(preg_replace('~<.*?>~', '', $string)) <= $length)
+		if (self::strlen(preg_replace('~<.*?>~', '', $string)) <= $length)
 			return $string;
 
 		// Start off empty
-		$total_length = $exact ? Util::strlen($ellipsis) : 0;
+		$total_length = $exact ? self::strlen($ellipsis) : 0;
 		$open_tags = array();
 		$truncate = '';
 
@@ -315,14 +315,14 @@ class Util
 			$truncate .= $tag[1];
 
 			// Calculate the length of the actual tag content, accounts for html entities as a single characters
-			$content_length = Util::strlen($tag[3]);
+			$content_length = self::strlen($tag[3]);
 
 			// Have we exceeded the allowed length limit, only add in what we are allowed
 			if ($content_length + $total_length > $length)
 			{
 				// The number of characters which we can still return
 				$remaining = $length - $total_length;
-				$truncate .= Util::substr($tag[3], 0, $remaining);
+				$truncate .= self::substr($tag[3], 0, $remaining);
 				break;
 			}
 			// Still room to go so add the tag content and continue
@@ -338,13 +338,13 @@ class Util
 		}
 
 		// Our truncated string up to the last space
-		$space_pos = Util::strpos($truncate, ' ', 0, true);
+		$space_pos = self::strpos($truncate, ' ', 0, true);
 		$space_pos = empty($space_pos) ? $length : $space_pos;
-		$truncate_check = Util::substr($truncate, 0, $space_pos);
+		$truncate_check = self::substr($truncate, 0, $space_pos);
 
 		// Make sure this would not cause a cut in the middle of a tag
-		$lastOpenTag = (int) Util::strpos($truncate_check, '<', 0, true);
-		$lastCloseTag = (int) Util::strpos($truncate_check, '>', 0, true);
+		$lastOpenTag = (int) self::strpos($truncate_check, '<', 0, true);
+		$lastCloseTag = (int) self::strpos($truncate_check, '>', 0, true);
 		if ($lastOpenTag > $lastCloseTag)
 		{
 			// Find the last full open tag in our truncated string, its what was being cut
@@ -352,12 +352,12 @@ class Util
 			$last_tag = array_pop($lastTagMatches[0]);
 
 			// Set the space to just after the last tag
-			$space_pos = Util::strpos($truncate, $last_tag, 0, true) + strlen($last_tag);
+			$space_pos = self::strpos($truncate, $last_tag, 0, true) + strlen($last_tag);
 			$space_pos = empty($space_pos) ? $length : $space_pos;
 		}
 
 		// Look at what we are going to cut off the end of our truncated string
-		$bits = Util::substr($truncate, $space_pos);
+		$bits = self::substr($truncate, $space_pos);
 
 		// Does it cut a tag off, if so we need to know so it can be added back at the cut point
 		preg_match_all('~<\/([a-z]+)>~', $bits, $dropped_tags, PREG_SET_ORDER);
@@ -379,7 +379,7 @@ class Util
 		}
 
 		// Cut it
-		$truncate = Util::substr($truncate, 0, $space_pos);
+		$truncate = self::substr($truncate, 0, $space_pos);
 
 		// Dot dot dot
 		$truncate .= $ellipsis;
@@ -398,7 +398,7 @@ class Util
 	 */
 	public static function ucfirst($string)
 	{
-		return Util::strtoupper(Util::substr($string, 0, 1)) . Util::substr($string, 1);
+		return self::strtoupper(self::substr($string, 0, 1)) . self::substr($string, 1);
 	}
 
 	/**
@@ -410,7 +410,7 @@ class Util
 	{
 		$words = preg_split('~([\s\r\n\t]+)~', $string, -1, PREG_SPLIT_DELIM_CAPTURE);
 		for ($i = 0, $n = count($words); $i < $n; $i += 2)
-			$words[$i] = Util::ucfirst($words[$i]);
+			$words[$i] = self::ucfirst($words[$i]);
 		return implode('', $words);
 	}
 
@@ -541,7 +541,7 @@ class Util
 	 *                          additionally, it doesn't allow to use the option:
 	 *                            allowed_classes => true
 	 *                          that is reverted to false.
-	 * @return array|string
+	 * @return array
 	 */
 	public static function unserialize($string, $options = array())
 	{

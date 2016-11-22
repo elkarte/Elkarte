@@ -44,14 +44,8 @@ class Attachment_Controller extends Action_Controller
 		if (empty($maintenance) || allowedTo('admin_forum'))
 		{
 			$sa = $this->_req->get('sa');
-			if ($sa === 'ulattach' || $sa === 'rmattach')
-			{
-				return true;
-			}
-			else
-			{
-				return false;
-			}
+
+			return ($sa === 'ulattach' || $sa === 'rmattach') ? true : false;
 		}
 		// else... politely kick him (or her).
 		else

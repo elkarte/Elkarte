@@ -19,7 +19,7 @@
 /**
  * Class Hooks
  */
-class Hooks
+final class Hooks
 {
 	/**
 	 * The instance of the class

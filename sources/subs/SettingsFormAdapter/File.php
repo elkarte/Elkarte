@@ -151,12 +151,16 @@ class File extends Db
 		{
 			return;
 		}
-		$this->prepareSettings();
-		$this->updateSettingsFile();
-		$this->extractDbVars();
+
+		$this->_prepareSettings();
+		$this->_updateSettingsFile();
+		$this->_extractDbVars();
 	}
 
-	private function extractDbVars()
+	/**
+	 * Find and save the new database-based settings, if any
+	 */
+	private function _extractDbVars()
 	{
 		// Now loop through the remaining (database-based) settings.
 		$this->configVars = array_map(
@@ -185,6 +189,9 @@ class File extends Db
 		parent::save();
 	}
 
+	/**
+	 * Fix the cookie name by removing invalid characters
+	 */
 	private function fixCookieName()
 	{
 		// Fix the darn stupid cookiename! (more may not be allowed, but these for sure!)
@@ -194,6 +201,9 @@ class File extends Db
 		}
 	}
 
+	/**
+	 *
+	 */
 	private function fixBoardUrl()
 	{
 		// Fix the forum's URL if necessary.
@@ -212,6 +222,9 @@ class File extends Db
 		}
 	}
 
+	/**
+	 *
+	 */
 	private function cleanSettings()
 	{
 		$this->fixCookieName();
@@ -324,7 +337,10 @@ class File extends Db
 		return false;
 	}
 
-	private function prepareSettings()
+	/**
+	 *
+	 */
+	private function _prepareSettings()
 	{
 		// Presumably, the file has to have stuff in it for this function to be called :P.
 		if (count($this->settingsArray) < 10)
@@ -404,7 +420,7 @@ class File extends Db
 	 * This function will add the variables passed to it in $this->new_settings,
 	 * to the Settings.php file.
 	 */
-	private function updateSettingsFile()
+	private function _updateSettingsFile()
 	{
 		global $context;
 

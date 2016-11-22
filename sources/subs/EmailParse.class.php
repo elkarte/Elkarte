@@ -533,7 +533,7 @@ class Email_Parse
 							$dsn_body = array();
 							foreach (explode("\n", str_replace("\r\n", "\n", $this->_boundary_section[$i]->body)) as $l)
 							{
-								$type = $val = "";
+								$type = $val = '';
 								list($field, $rest) = explode(':', $l);
 
 								if (strpos($l, ';'))

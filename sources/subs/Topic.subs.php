@@ -1330,7 +1330,7 @@ function getTopicInfo($topic_parameters, $full = '', $selects = array(), $tables
  *
  * @param int $topic id of a topic
  * @param int|null $msg the id of a message, if empty, t.id_first_msg is used
- * @return array to topic attributes
+ * @return mixed[]|boolean to topic attributes
  */
 function getTopicInfoByMsg($topic, $msg = null)
 {
@@ -1361,10 +1361,11 @@ function getTopicInfoByMsg($topic, $msg = null)
 			'guest_id' => 0,
 		)
 	);
-
 	$topic_info = array();
 	if ($request !== false)
+	{
 		$topic_info = $db->fetch_assoc($request);
+	}
 	$db->free_result($request);
 
 	return $topic_info;
