@@ -1152,6 +1152,7 @@ class Data_Validator
 	 *
 	 * Usage: '[key]' => 'php_syntax'
 	 *
+	 * @uses ParseError
 	 * @param string $field
 	 * @param mixed[] $input
 	 * @param mixed[]|null $validation_parameters array or null

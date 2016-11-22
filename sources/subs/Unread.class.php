@@ -23,30 +23,31 @@ class Unread
 	const UNREAD = 0;
 	const UNREADREPLIES = 1;
 
+	/** @var bool */
 	private $_have_temp_table = false;
-
+	/** @var bool */
 	private $_ascending = false;
-
+	/** @var string */
 	private $_sort_query = '';
-
+	/** @var int */
 	private $_num_topics = 0;
-
+	/** @var int */
 	private $_min_message = 0;
-
+	/** @var UNREAD */
 	private $_action = self::UNREAD;
-
+	/** @var int */
 	private $_earliest_msg = 0;
-
+	/** @var bool */
 	private $_showing_all_topics = false;
-
+	/** @var int */
 	private $_user_id = 0;
-
+	/** @var bool */
 	private $_post_mod = false;
-
+	/** @var bool */
 	private $_unwatch = false;
-
+	/** @var Database|null */
 	private $_db = null;
-
+	/** @var int|string */
 	private $_preview_bodies = 0;
 
 	/**

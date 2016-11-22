@@ -159,7 +159,7 @@ class Recent_Class
 	 * Find the most recent messages in the forum.
 	 *
 	 * @param int $start - position to start the query
-	 * @param string[]|mixed[] $permissions - An array of boards permissions the members have.
+	 * @param array $permissions - An array of boards permissions the members have.
 	 *                 Used to define the buttons a member can see next to a message.
 	 *                 Format of the array is:
 	 *                 array(
