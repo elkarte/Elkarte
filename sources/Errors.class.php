@@ -53,10 +53,17 @@ class Errors
 	private $error_level;
 
 	/**
-	 * Common name for the error , Error, Waning, Notice
+	 * Common name for the error, Error, Waning, Notice
 	 * @var string
 	 */
 	private $error_name;
+
+	/**
+	 * If true PHP errors/warnings/notices will be handled by our error handler.
+	 * Otherwise, they will be left for PHP's default handler
+	 * @var boolean
+	 */
+	protected static $ourPhpError = true;
 
 	/**
 	 * Good old constructor
@@ -298,14 +305,22 @@ class Errors
 	 */
 	public function error_handler($error_level, $error_string, $file, $line)
 	{
+		// Not using our php error handler
+		if (!self::$ourPhpError)
+		{
+			return false;
+		}
+
 		// Ignore errors if we're ignoring them or if the error code is not included in error_reporting
 		if (!($error_level & error_reporting()))
+		{
 			return true;
+		}
 
 		// Throw it as an exception so our exception_handler deals with it
 		$this->exception_handler(new Exception($error_string, $error_level), $file, $line);
 
-		return false;
+		return true;
 	}
 
 	/**
@@ -637,6 +652,23 @@ class Errors
 		header('HTTP/1.1 503 Service Temporarily Unavailable');
 		header('Status: 503 Service Temporarily Unavailable');
 		header('Retry-After: 3600');
+	}
+
+	/**
+	 * Disables ElkArte's PHP error handler, so a previously registered one
+	 * or the default PHP error handler can run instead.
+	 */
+	public static function disablePhpErrorHandler()
+	{
+		self::$ourPhpError = false;
+	}
+
+	/**
+	 * Enables ElkArte's PHP error handler, which is on by default.
+	 */
+	public static function enablePhpErrorHandler()
+	{
+		self::$ourPhpError = true;
 	}
 
 	/**
