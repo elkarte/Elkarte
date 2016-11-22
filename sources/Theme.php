@@ -204,7 +204,7 @@ abstract class Theme
 	 * @param string $javascript
 	 * @param bool $defer = false, define if the script should load in <head> or before the closing <html> tag
 	 */
-	function addInlineJavascript($javascript, $defer = false)
+	public function addInlineJavascript($javascript, $defer = false)
 	{
 		if (!empty($javascript))
 		{
