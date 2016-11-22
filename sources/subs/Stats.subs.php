@@ -452,7 +452,7 @@ function topTopicStarter()
 	$members = array();
 
 	// Try to cache this when possible, because it's a little unavoidably slow.
-	if (!Cache::instance()->getVar($members, 'stats_top_starters', 360) || !$members)
+	if (!Cache::instance()->getVar($members, 'stats_top_starters', 360) || empty($members))
 	{
 		$request = $db->query('', '
 			SELECT id_member_started, COUNT(*) AS hits
