@@ -14,7 +14,7 @@
 /**
  *  This class is an experiment for the job of handling errors.
  */
-class Error_Context
+final class Error_Context
 {
 	/**
 	 * Holds the unique identifier of the error (a name).
@@ -74,11 +74,11 @@ class Error_Context
 			$this->_name = $id;
 
 		// Initialize severity levels... waiting for details!
-		$this->_severity_levels = array(Error_Context::MINOR, Error_Context::SERIOUS);
+		$this->_severity_levels = array(self::MINOR, self::SERIOUS);
 
 		// Initialize default severity (not sure this is needed)
 		if ($default_severity === null || !in_array($default_severity, $this->_severity_levels))
-			$this->_default_severity = Error_Context::MINOR;
+			$this->_default_severity = self::MINOR;
 		else
 			$this->_default_severity = $default_severity;
 

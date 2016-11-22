@@ -23,7 +23,7 @@ final class Hooks
 {
 	/**
 	 * The instance of the class
-	 * @var object
+	 * @var Hooks
 	 */
 	private static $_instance = null;
 
@@ -518,7 +518,7 @@ final class Hooks
 	public static function get($db = null, $debug = null, $paths = null)
 	{
 		if (self::$_instance === null)
-			Hooks::init($db, $debug, $paths);
+			self::init($db, $debug, $paths);
 		elseif ($paths !== null)
 			self::$_instance->newPaths($paths);
 
