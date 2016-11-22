@@ -21,7 +21,7 @@
  * Table creation / dropping, column adding / removing
  * Most often used during install and Upgrades of the forum and addons
  */
-class DbTable_MySQL extends DbTable
+final class DbTable_MySQL extends DbTable
 {
 	/**
 	 * Holds this instance of the table interface

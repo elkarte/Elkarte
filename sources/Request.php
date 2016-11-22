@@ -18,7 +18,7 @@
  * - Sanitizes the necessary data
  * - Determines the origin of $_REQUEST for use in security checks
  */
-class Request
+final class Request
 {
 	/**
 	 * Remote IP, if we can know it easily (as found in $_SERVER['REMOTE_ADDR'])

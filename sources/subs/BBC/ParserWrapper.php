@@ -18,7 +18,7 @@ namespace BBC;
  * Wrap around the BBC parsers before we implement a DIC.
  * Deprecate in future versions in favor of a DIC
  */
-class ParserWrapper
+final class ParserWrapper
 {
 	/** @var array Disabled tags */
 	protected $disabled = array();
