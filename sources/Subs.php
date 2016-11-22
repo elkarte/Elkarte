@@ -1531,7 +1531,7 @@ function currentContext($messages_request, $reset = false)
 		return $db->data_seek($messages_request, 0);
 
 	// If the query has already returned false, get out of here
-	if ($messages_request === false)
+	if (empty($messages_request))
 		return false;
 
 	// Attempt to get the next message.
