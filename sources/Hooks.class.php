@@ -520,7 +520,7 @@ final class Hooks
 		if (self::$_instance === null)
 			self::init($db, $debug, $paths);
 		elseif ($paths !== null)
-			self::$_instance->newPaths($paths);
+			self::$_instance->newPath($paths);
 
 		return self::$_instance;
 	}
