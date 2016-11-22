@@ -85,10 +85,10 @@ class Mentioning extends AbstractModel
 	public function __construct($db, $validator, $enabled_mentions = '')
 	{
 		$this->_known_status = array(
-			'new' => Mentioning::MNEW,
-			'read' => Mentioning::READ,
-			'deleted' => Mentioning::DELETED,
-			'unapproved' => Mentioning::UNAPPROVED,
+			'new' => self::MNEW,
+			'read' => self::READ,
+			'deleted' => self::DELETED,
+			'unapproved' => self::UNAPPROVED,
 		);
 
 		$this->_validator = $validator;

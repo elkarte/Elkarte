@@ -600,7 +600,6 @@ class Packages_Controller extends Action_Controller
 			Errors::instance()->fatal_lang_error($packageInfo);
 
 		$packageInfo['filename'] = $this->_filename;
-		$pathinfo = pathinfo($this->_filename);
 
 		$context['base_path'] = $this->_base_path;
 

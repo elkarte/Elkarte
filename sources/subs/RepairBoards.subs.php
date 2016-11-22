@@ -202,9 +202,9 @@ function loadForumTests()
 							'topics' => $topics,
 						)
 					);
-					$db->query('', "
+					$db->query('', '
 						DELETE FROM {db_prefix}log_topics
-						WHERE id_topic IN ({array_int:topics})",
+						WHERE id_topic IN ({array_int:topics})',
 						array(
 							'topics' => $topics,
 						)
@@ -273,7 +273,7 @@ function loadForumTests()
 					array('id_topic')
 				);
 
-				$newMessageID = $db->insert_id("{db_prefix}messages", 'id_msg');
+				$newMessageID = $db->insert_id('{db_prefix}messages', 'id_msg');
 
 				$db->insert('',
 					'{db_prefix}topics',
