@@ -1129,7 +1129,7 @@ class Codes
 	{
 		$this->disabled[$tag] = $tag;
 
-		return (isset($this->disabled[$tag]);
+		return isset($this->disabled[$tag]);
 	}
 
 	/**
