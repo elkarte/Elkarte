@@ -1127,13 +1127,9 @@ class Codes
 	 */
 	public function disable($tag)
 	{
-		// It was already disabled.
-		if (isset($this->disabled[$tag]))
-		{
-			return true;
-		}
-
 		$this->disabled[$tag] = $tag;
+
+		return (isset($this->disabled[$tag]);
 	}
 
 	/**

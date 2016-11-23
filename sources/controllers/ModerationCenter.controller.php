@@ -1575,13 +1575,11 @@ class ModerationCenter_Controller extends Action_Controller
 	 * @param int $start The item to start with (for pagination purposes)
 	 * @param int $items_per_page  The number of items to show per page
 	 * @param string $sort A string indicating how to sort the results
-	 * @param string $approve_query
-	 * @param string $dummy
 	 */
-	public function list_getWatchedUsers($start, $items_per_page, $sort, $approve_query, $dummy)
+	public function list_getWatchedUsers($start, $items_per_page, $sort)
 	{
 		// Find all our watched users
-		return watchedUsers($start, $items_per_page, $sort, $approve_query, $dummy);
+		return watchedUsers($start, $items_per_page, $sort);
 	}
 
 	/**
