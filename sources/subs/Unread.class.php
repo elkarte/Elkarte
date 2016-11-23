@@ -259,7 +259,7 @@ class Unread
 				ml.poster_time AS last_poster_time, COALESCE(mems.real_name, ms.poster_name) AS first_display_name,
 				COALESCE(meml.real_name, ml.poster_name) AS last_display_name, ml.subject AS last_subject,
 				ml.icon AS last_icon, ms.icon AS first_icon, t.id_poll, t.is_sticky, t.locked, ml.modified_time AS last_modified_time,
-				COALESCE(lt.id_msg, lmr.id_msg, -1 + 1 AS new_from,
+				COALESCE(lt.id_msg, lmr.id_msg, -1) + 1 AS new_from,
 				' . $body_query . '
 				' . (!empty($custom_selects) ? implode(',', $custom_selects) . ', ' : '') . '
 				ml.smileys_enabled AS last_smileys, ms.smileys_enabled AS first_smileys, t.id_first_msg, t.id_last_msg
@@ -275,7 +275,7 @@ class Unread
 				LEFT JOIN {db_prefix}log_mark_read AS lmr ON (lmr.id_board = t.id_board AND lmr.id_member = {int:current_member})
 			WHERE t.id_board IN ({array_int:boards})
 				AND t.id_last_msg >= {int:min_message}
-				AND COALESCE(lt.id_msg, lmr.id_msg, 0 < ml.id_msg' .
+				AND COALESCE(lt.id_msg, lmr.id_msg, 0) < ml.id_msg' .
 				($this->_post_mod ? ' AND ms.approved = {int:is_approved}' : '') .
 				($this->_unwatch ? ' AND COALESCE(lt.unwatched, 0) != 1' : '') . '
 			ORDER BY {raw:order}
@@ -327,7 +327,7 @@ class Unread
 					LEFT JOIN {db_prefix}log_mark_read AS lmr ON (lmr.id_board = t.id_board AND lmr.id_member = {int:current_member})
 				WHERE t.id_board IN ({array_int:boards})
 					AND m.id_member = {int:current_member}
-					AND COALESCE(lt.id_msg, lmr.id_msg, 0 < t.id_last_msg' . ($this->_post_mod ? '
+					AND COALESCE(lt.id_msg, lmr.id_msg, 0) < t.id_last_msg' . ($this->_post_mod ? '
 					AND t.approved = {int:is_approved}' : '') . ($this->_unwatch ? '
 					AND COALESCE(lt.unwatched, 0) != 1' : ''),
 				array_merge($this->_query_parameters, array(
@@ -359,7 +359,7 @@ class Unread
 			WHERE t.id_board IN ({array_int:boards})' . ($this->_showing_all_topics && !empty($this->_earliest_msg) ? '
 				AND t.id_last_msg > {int:earliest_msg}' : (!$this->_showing_all_topics && $is_first_login ? '
 				AND t.id_last_msg > {int:id_msg_last_visit}' : '')) . '
-				AND COALESCE(lt.id_msg, lmr.id_msg, 0 < t.id_last_msg' .
+				AND COALESCE(lt.id_msg, lmr.id_msg, 0) < t.id_last_msg' .
 				($this->_post_mod ? ' AND t.approved = {int:is_approved}' : '') .
 				($this->_unwatch ? ' AND COALESCE(lt.unwatched, 0) != 1' : ''),
 			array_merge($this->_query_parameters, array(
@@ -479,7 +479,7 @@ class Unread
 				ml.poster_time AS last_poster_time, COALESCE(mems.real_name, ms.poster_name) AS first_display_name,
 				COALESCE(meml.real_name, ml.poster_name) AS last_display_name, ml.subject AS last_subject,
 				ml.icon AS last_icon, ms.icon AS first_icon, t.id_poll, t.is_sticky, t.locked, ml.modified_time AS last_modified_time,
-				COALESCE(lt.id_msg, lmr.id_msg, -1 + 1 AS new_from,
+				COALESCE(lt.id_msg, lmr.id_msg, -1) + 1 AS new_from,
 				' . $body_query . '
 				' . (!empty($custom_selects) ? implode(',', $custom_selects) . ', ' : '') . '
 				ml.smileys_enabled AS last_smileys, ms.smileys_enabled AS first_smileys, t.id_first_msg, t.id_last_msg

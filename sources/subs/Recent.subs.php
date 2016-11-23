@@ -309,7 +309,7 @@ function getLastTopics($latestTopicOptions)
 	$request = $db->query('substring', '
 		SELECT
 			ml.poster_time, mf.subject, ml.id_topic, ml.id_member, ml.id_msg, t.id_first_msg, ml.id_msg_modified,
-			' . ($latestTopicOptions['id_member'] == 0 ? '0' : 'COALESCE(lt.id_msg, lmr.id_msg, -1 + 1') . ' AS new_from,
+			' . ($latestTopicOptions['id_member'] == 0 ? '0' : 'COALESCE(lt.id_msg, lmr.id_msg, -1) + 1') . ' AS new_from,
 			COALESCE(mem.real_name, ml.poster_name) AS poster_name, t.id_board, b.name AS board_name,
 			SUBSTRING(ml.body, 1, 385) AS body, ml.smileys_enabled
 		FROM {db_prefix}topics AS t

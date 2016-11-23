@@ -1298,7 +1298,7 @@ function getTopicInfo($topic_parameters, $full = '', $selects = array(), $tables
 			t.id_redirect_topic, t.unapproved_posts, t.approved' . ($messages_table ? ',
 			ms.subject, ms.body, ms.id_member, ms.poster_time, ms.approved as msg_approved' : '') . ($members_table ? ',
 			COALESCE(mem.real_name, ms.poster_name) AS poster_name' : '') . ($logs_table ? ',
-			' . ($user_info['is_guest'] ? 't.id_last_msg + 1' : 'COALESCE(lt.id_msg, lmr.id_msg, -1 + 1') . ' AS new_from
+			' . ($user_info['is_guest'] ? 't.id_last_msg + 1' : 'COALESCE(lt.id_msg, lmr.id_msg, -1) + 1') . ' AS new_from
 			' . (!empty($modSettings['recycle_board']) && $modSettings['recycle_board'] == $board ? ', t.id_previous_board, t.id_previous_topic' : '') . '
 			' . (!$user_info['is_guest'] ? ', COALESCE(lt.unwatched, 0) as unwatched' : '') : '') .
 			(!empty($selects) ? ', ' . implode(', ', $selects) : '') . '
@@ -2765,7 +2765,7 @@ function topicNotifications($start, $items_per_page, $sort, $memID)
 	// All the topics with notification on...
 	$request = $db->query('', '
 		SELECT
-			COALESCE(lt.id_msg, lmr.id_msg, -1 + 1 AS new_from, b.id_board, b.name,
+			COALESCE(lt.id_msg, lmr.id_msg, -1) + 1 AS new_from, b.id_board, b.name,
 			t.id_topic, ms.subject, ms.id_member, COALESCE(mem.real_name, ms.poster_name) AS real_name_col,
 			ml.id_msg_modified, ml.poster_time, ml.id_member AS id_member_updated,
 			COALESCE(mem2.real_name, ml.poster_name) AS last_real_name
