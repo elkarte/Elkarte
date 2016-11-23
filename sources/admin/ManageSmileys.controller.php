@@ -1721,10 +1721,6 @@ class ManageSmileys_Controller extends Action_Controller
 
 	/**
 	 * Callback function for createList().
-	 *
-	 * @param int $start The item to start with (for pagination purposes)
-	 * @param int $items_per_page  The number of items to show per page
-	 * @param string $sort A string indicating how to sort the results
 	 */
 	public function list_fetchMessageIconsDetails()
 	{

@@ -1297,7 +1297,6 @@ class Data_Validator
 	 * Uses Util::htmlspecialchars to sanitize any html in the input
 	 *
 	 * @param string $input
-	 * @param string|null $sanitation_parameters
 	 */
 	protected function _sanitation_cleanhtml($input)
 	{

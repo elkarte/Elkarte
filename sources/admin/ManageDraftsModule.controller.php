@@ -83,9 +83,6 @@ class ManageDraftsModule_Controller extends Action_Controller
 	 *
 	 * @param array $permissionGroups
 	 * @param array $permissionList
-	 * @param array $leftPermissionGroups
-	 * @param array $hiddenPermissions
-	 * @param array $relabelPermissions
 	 */
 	public static function integrate_load_permissions(&$permissionGroups, &$permissionList)
 	{

@@ -991,8 +991,6 @@ class Database_PostgreSQL extends Database_Abstract
 	/**
 	 * Return server info.
 	 *
-	 * @param resource|null $connection
-	 *
 	 * @return string
 	 */
 	public function db_server_info()
