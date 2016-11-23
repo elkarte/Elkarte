@@ -24,12 +24,6 @@
 class ManageSearchEngines_Controller extends Action_Controller
 {
 	/**
-	 * Search engines settings form
-	 * @var Settings_Form
-	 */
-	protected $_engineSettings;
-
-	/**
 	 * Entry point for this section.
 	 *
 	 * @see Action_Controller::action_index()

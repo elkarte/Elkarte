@@ -27,12 +27,6 @@
 class AddonSettings_Controller extends Action_Controller
 {
 	/**
-	 * General addon settings form.
-	 * @var Settings_Form
-	 */
-	protected $_addonSettings;
-
-	/**
 	 * This, my friend, is for all the authors of addons out there.
 	 *
 	 * @see Action_Controller::action_index()

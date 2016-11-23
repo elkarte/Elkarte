@@ -24,12 +24,6 @@
 class ManageSearch_Controller extends Action_Controller
 {
 	/**
-	 * Search settings form
-	 * @var Settings_Form
-	 */
-	protected $_searchSettings;
-
-	/**
 	 * Pre Dispatch, called before other methods.
 	 */
 	public function pre_dispatch()

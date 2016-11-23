@@ -117,11 +117,9 @@ function loadSession()
  * - executed when the session is being opened with db sessions
  * - It simply returns true.
  *
- * @param string $save_path
- * @param string $session_name
  * @return boolean
  */
-function sessionOpen($save_path, $session_name)
+function sessionOpen()
 {
 	return true;
 }

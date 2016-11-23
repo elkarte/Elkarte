@@ -27,36 +27,6 @@
 class ManageServer_Controller extends Action_Controller
 {
 	/**
-	 * Database settings form
-	 * @var Settings_Form
-	 */
-	protected $_databaseSettingsForm;
-
-	/**
-	 * General settings form
-	 * @var Settings_Form
-	 */
-	protected $_generalSettingsForm;
-
-	/**
-	 * Cache settings form
-	 * @var Settings_Form
-	 */
-	protected $_cacheSettingsForm;
-
-	/**
-	 * Cookies settings form
-	 * @var Settings_Form
-	 */
-	protected $_cookieSettingsForm;
-
-	/**
-	 * Load balancing settings form
-	 * @var Settings_Form
-	 */
-	protected $_loadavgSettingsForm;
-
-	/**
 	 * This is the main dispatcher. Sets up all the available sub-actions, all the tabs and selects
 	 * the appropriate one based on the sub-action.
 	 *

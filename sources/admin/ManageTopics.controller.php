@@ -17,12 +17,6 @@
 class ManageTopics_Controller extends Action_Controller
 {
 	/**
-	 * Topic settings form
-	 * @var Settings_Form
-	 */
-	protected $_topicSettings;
-
-	/**
 	 * Check permissions and forward to the right method.
 	 *
 	 * @see Action_Controller::action_index()

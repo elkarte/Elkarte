@@ -36,12 +36,6 @@ class ManageBoards_Controller extends Action_Controller
 	public $boardid;
 
 	/**
-	 * Boards settings form.
-	 * @var Settings_Form
-	 */
-	protected $_boardSettings;
-
-	/**
 	 * The main dispatcher; delegates.
 	 *
 	 * What it does:

@@ -19,13 +19,6 @@
 class ManageBBC_Controller extends Action_Controller
 {
 	/**
-	 * BBC settings form
-	 *
-	 * @var Settings_Form
-	 */
-	protected $_bbcSettings;
-
-	/**
 	 * The BBC admin area
 	 *
 	 * What it does:

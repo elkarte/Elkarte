@@ -797,33 +797,6 @@ class Html_2_BBC
 	}
 
 	/**
-	 * Helper function for getting a node object
-	 *
-	 * @param DOMNode|object $node
-	 * @param int $item
-	 */
-	private function _get_item($node, $item)
-	{
-		if ($this->_parser)
-			return $node->item($item);
-		else
-			return $node[$item];
-	}
-
-	/**
-	 * Helper function for getting a node length
-	 *
-	 * @param DOMNode|array $node
-	 */
-	private function _get_length($node)
-	{
-		if ($this->_parser)
-			return $node->length;
-		else
-			return count($node);
-	}
-
-	/**
 	 * Helper function for getting a node value
 	 *
 	 * @param DOMNode|object $node

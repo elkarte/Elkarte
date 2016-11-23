@@ -71,12 +71,6 @@ class ManageAttachments_Controller extends Action_Controller
 	 */
 	public $to;
 
-	/**
-	 * Attachments settings form
-	 * @var Settings_Form
-	 */
-	protected $_attachSettingsForm;
-
 	public function pre_dispatch()
 	{
 		// These get used often enough that it makes sense to include them for every action

@@ -23,12 +23,6 @@
 class ManageNews_Controller extends Action_Controller
 {
 	/**
-	 * News settings form.
-	 * @var Settings_Form
-	 */
-	protected $_newsSettings;
-
-	/**
 	 * Members specifically being included in a newsletter
 	 * @var array
 	 */

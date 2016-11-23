@@ -24,48 +24,6 @@
 class ManageFeatures_Controller extends Action_Controller
 {
 	/**
-	 * Basic feature settings form
-	 * @var Settings_Form
-	 */
-	protected $_basicSettings;
-
-	/**
-	 * Karma settings form
-	 * @var Settings_Form
-	 */
-	protected $_karmaSettings;
-
-	/**
-	 * Likes settings form
-	 * @var Settings_Form
-	 */
-	protected $_likesSettings;
-
-	/**
-	 * Layout settings form
-	 * @var Settings_Form
-	 */
-	protected $_layoutSettings;
-
-	/**
-	 * Signature settings form
-	 * @var Settings_Form
-	 */
-	protected $_signatureSettings;
-
-	/**
-	 * Mentions settings form
-	 * @var Settings_Form
-	 */
-	protected $_notificationsSettings;
-
-	/**
-	 * Mentions settings form
-	 * @var Settings_Form
-	 */
-	protected $_PMSettings;
-
-	/**
 	 * Pre Dispatch, called before other methods.
 	 */
 	public function pre_dispatch()

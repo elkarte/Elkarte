@@ -29,12 +29,6 @@
 class ManageRegistration_Controller extends Action_Controller
 {
 	/**
-	 * Registration settings form
-	 * @var Settings_Form
-	 */
-	protected $_registerSettings;
-
-	/**
 	 * Entrance point for the registration center, it checks permissions and forwards
 	 * to the right method based on the subaction.
 	 *

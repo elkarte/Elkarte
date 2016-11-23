@@ -24,13 +24,6 @@
 class ManagePermissions_Controller extends Action_Controller
 {
 	/**
-	 * Permissions settings form
-	 *
-	 * @var Settings_Form
-	 */
-	protected $_permSettings;
-
-	/**
 	 * Permissions object
 	 *
 	 * @var Permissions

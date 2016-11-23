@@ -1265,9 +1265,8 @@ class Data_Validator
 	 * - auser@gmail.com, a.user@gmail.com, auser+big@gmail.com and a.user+gigantic@googlemail.com are same email address.
 	 *
 	 * @param string $input
-	 * @param string|null $sanitation_parameters
 	 */
-	protected function _sanitation_gmail_normalize($input, $sanitation_parameters = null)
+	protected function _sanitation_gmail_normalize($input)
 	{
 		if (!isset($input))
 			return;
@@ -1298,9 +1297,8 @@ class Data_Validator
 	 * Uses Util::htmlspecialchars to sanitize any html in the input
 	 *
 	 * @param string $input
-	 * @param string|null $sanitation_parameters
 	 */
-	protected function _sanitation_cleanhtml($input, $sanitation_parameters = null)
+	protected function _sanitation_cleanhtml($input)
 	{
 		if (!isset($input))
 			return;

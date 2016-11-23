@@ -38,20 +38,10 @@ class PackagesFilterIterator extends \FilterIterator
 		{
 			return false;
 		}
-		// Accept anything that has a "package-like" extension.
-		if (substr(strtolower($filename), -7) == '.tar.gz')
-		{
-			return true;
-		}
-		if (substr(strtolower($filename), -4) != '.tgz')
-		{
-			return true;
-		}
-		if (substr(strtolower($filename), -4) != '.zip')
-		{
-			return true;
-		}
-		// And give up on anything else.
-		return false;
+		// And finally, ccept anything that has a "package-like" extension.
+		return
+			substr(strtolower($filename), -7) == '.tar.gz'
+			|| substr(strtolower($filename), -4) != '.tgz'
+			|| substr(strtolower($filename), -4) != '.zip';
 	}
 }

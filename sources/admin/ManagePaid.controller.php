@@ -24,12 +24,6 @@
 class ManagePaid_Controller extends Action_Controller
 {
 	/**
-	 * Paid subscriptions settings form.
-	 * @var Settings_Form
-	 */
-	protected $_paidSettings;
-
-	/**
 	 * The main entrance point for the 'Paid Subscription' screen,
 	 *
 	 * What it does:

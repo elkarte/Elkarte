@@ -23,12 +23,6 @@
 class ManagePosts_Controller extends Action_Controller
 {
 	/**
-	 * Posts settings form
-	 * @var Settings_Form
-	 */
-	protected $_postSettings;
-
-	/**
 	 * The main entrance point for the 'Posts and topics' screen.
 	 *
 	 * What it does:

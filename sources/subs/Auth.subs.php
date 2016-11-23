@@ -581,9 +581,6 @@ function validateLoginPassword(&$password, $hash, $user = '', $returnhash = fals
 	// Get an instance of the hasher
 	$hasher = new PasswordHash($hash_cost_log2, $hash_portable);
 
-	// Guilty until we know otherwise
-	$passhash = false;
-
 	// If the password is not 64 characters, lets make it a (SHA-256)
 	if (strlen($password) !== 64)
 		$password = hash('sha256', Util::strtolower($user) . un_htmlspecialchars($password));

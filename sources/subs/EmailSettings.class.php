@@ -26,6 +26,9 @@
  */
 class Email_Settings extends Settings_Form
 {
+	/** @var ElkArte\sources\subs\SettingsFormAdapter\DbTable */
+	private $adapter;
+
 	/**
 	 * static function saveTableSettings, now part of the Settings Form class
 	 *
@@ -47,10 +50,11 @@ class Email_Settings extends Settings_Form
 			$configValues = (array) $configValues;
 		}
 		$settingsForm = new self(self::DBTABLE_ADAPTER);
-		$settingsForm->getAdapter()->setTableName($tableName);
-		$settingsForm->getAdapter()->setEditId($editId);
-		$settingsForm->getAdapter()->setEditName($editName);
-		$settingsForm->getAdapter()->setIndexes($indexes);
+		$adapter = $settingsForm->getAdapter();
+		$adapter->setTableName($tableName);
+		$adapter->setEditId($editId);
+		$adapter->setEditName($editName);
+		$adapter->setIndexes($indexes);
 		$settingsForm->setConfigVars($configVars);
 		$settingsForm->setConfigValues($configValues);
 		$settingsForm->save();

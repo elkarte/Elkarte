@@ -63,23 +63,10 @@ class Attachments_Post_Module implements ElkArte\sources\modules\Module_Interfac
 				array('prepare_save_post', array('Attachments_Post_Module', 'prepare_save_post'), array('post_errors')),
 				array('pre_save_post', array('Attachments_Post_Module', 'pre_save_post'), array('msgOptions')),
 				array('after_save_post', array('Attachments_Post_Module', 'after_save_post'), array('msgOptions')),
-
-				array('before_save_draft', array('Attachments_Post_Module', 'before_save_draft'), array('draft')),
 			);
 		}
 		else
 			return array();
-	}
-
-	/**
-	 * Not sure this is implemented
-	 *
-	 * @param int $draft
-	 */
-	public function before_save_draft($draft)
-	{
-		// @todo this should actually remove any pending attachment I think
-		$this->saveAttachments(isset($_REQUEST['id_draft']) ? (int) $_REQUEST['id_draft'] : 0);
 	}
 
 	/**

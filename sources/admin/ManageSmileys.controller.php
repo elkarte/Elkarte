@@ -22,12 +22,6 @@
 class ManageSmileys_Controller extends Action_Controller
 {
 	/**
-	 * Smileys configuration settings form
-	 * @var Settings_Form
-	 */
-	protected $_smileySettings;
-
-	/**
 	 * Contextual information about smiley sets.
 	 * @var mixed[]
 	 */
@@ -1619,7 +1613,6 @@ class ManageSmileys_Controller extends Action_Controller
 		// Do the actual install
 		else
 		{
-			$actions = parsePackageInfo($smileyInfo['xml'], false, 'install');
 			foreach ($context['actions'] as $action)
 			{
 				updateSettings(array(
@@ -1728,12 +1721,8 @@ class ManageSmileys_Controller extends Action_Controller
 
 	/**
 	 * Callback function for createList().
-	 *
-	 * @param int $start The item to start with (for pagination purposes)
-	 * @param int $items_per_page  The number of items to show per page
-	 * @param string $sort A string indicating how to sort the results
 	 */
-	public function list_fetchMessageIconsDetails($start, $items_per_page, $sort)
+	public function list_fetchMessageIconsDetails()
 	{
 		return fetchMessageIconsDetails();
 	}

@@ -83,10 +83,7 @@ function reencodeImage($fileName, $preferred_format = 0)
 	if (!unlink($fileName))
 		return false;
 
-	if (!rename($fileName . '.tmp', $fileName))
-		return false;
-
-	return true;
+	return !rename($fileName . '.tmp', $fileName);
 }
 
 /**

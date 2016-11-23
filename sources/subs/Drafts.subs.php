@@ -413,9 +413,8 @@ function getOldDrafts($days)
  * @package Drafts
  * @param mixed[] $draft
  * @param boolean $check_last_save
- * @param int $id_topic
  */
-function saveDraft($draft, $check_last_save = false, $id_topic = 0)
+function saveDraft($draft, $check_last_save = false)
 {
 	global $context;
 

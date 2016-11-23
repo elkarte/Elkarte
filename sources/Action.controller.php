@@ -39,6 +39,7 @@ abstract class Action_Controller
 
 	/**
 	 * Constructor...
+	 *
 	 * Requires the name of the controller we want to instantiate, lowercase and
 	 * without the "_Controller" part.
 	 *
@@ -49,7 +50,7 @@ abstract class Action_Controller
 		// Dependency injection will come later
 		$this->_req = HttpReq::instance();
 
-		// A safety-net to remain backward compatibility
+		// A safety-net to remain backward compatible
 		if ($eventManager === null)
 		{
 			$eventManager = new Event_Manager();
@@ -124,12 +125,7 @@ abstract class Action_Controller
 	 */
 	public function trackStats($action = '')
 	{
-		if (isset($this->_req->api))
-		{
-			return false;
-		}
-
-		return true;
+		return !isset($this->_req->api);
 	}
 
 	/**
@@ -165,9 +161,6 @@ abstract class Action_Controller
 	 */
 	protected function _initEventManager()
 	{
-		// Use the base controller name for the hook, ie post
-		$this->_hook = str_replace('_Controller', '', get_class($this));
-
 		// Find any module classes associated with this controller
 		$classes = $this->_loadModules();
 
@@ -184,6 +177,8 @@ abstract class Action_Controller
 	{
 		if ($this->_hook === '')
 		{
+			// Use the base controller name for the hook, ie post
+			$this->_hook = str_replace('_Controller', '', get_class($this));
 			// Initialize the events associated with this controller
 			$this->_initEventManager();
 		}
@@ -209,8 +204,7 @@ abstract class Action_Controller
 		global $modSettings;
 
 		$classes = array();
-		$hook = str_replace('_Controller', '', $this->_hook);
-		$setting_key = 'modules_' . strtolower($hook);
+		$setting_key = 'modules_' . $this->getHook();
 
 		// For all the modules that have been registered see if we have a class to load for this hook area
 		if (!empty($modSettings[$setting_key]))
@@ -218,7 +212,7 @@ abstract class Action_Controller
 			$modules = explode(',', $modSettings[$setting_key]);
 			foreach ($modules as $module)
 			{
-				$class = ucfirst($module) . '_' . ucfirst($hook) . '_Module';
+				$class = ucfirst($module) . '_' . ucfirst($this->getHook()) . '_Module';
 				if (class_exists($class))
 				{
 					$classes[] = $class;

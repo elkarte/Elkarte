@@ -1559,11 +1559,9 @@ class ModerationCenter_Controller extends Action_Controller
 	 *
 	 * - returns count
 	 *
-	 * @todo $approve_query is not used
 	 * @uses watchedUserCount()
-	 * @param string $approve_query
 	 */
-	public function list_getWatchedUserCount($approve_query)
+	public function list_getWatchedUserCount()
 	{
 		global $modSettings;
 

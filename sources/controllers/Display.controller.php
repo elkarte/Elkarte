@@ -523,7 +523,7 @@ class Display_Controller extends Action_Controller
 		// This will be called from the template.
 		$context['get_message'] = array($this, 'prepareDisplayContext_callback');
 		$this->_icon_sources = new MessageTopicIcons(!empty($modSettings['messageIconChecks_enable']), $settings['theme_dir']);
-		list ($sig_limits, $sig_bbc) = explode(':', $modSettings['signature_settings']);
+		list ($sig_limits) = explode(':', $modSettings['signature_settings']);
 		$signature_settings = explode(',', $sig_limits);
 
 		if ($user_info['is_guest'])

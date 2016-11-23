@@ -476,16 +476,15 @@ function isAccessiblePM($pmID, $validFor = 'in_or_outbox')
 	{
 		case 'inbox':
 			return !empty($validationResult['valid_for_inbox']);
-			break;
+
 		case 'outbox':
 			return !empty($validationResult['valid_for_outbox']);
-			break;
+
 		case 'in_or_outbox':
 			return !empty($validationResult['valid_for_inbox']) || !empty($validationResult['valid_for_outbox']);
-			break;
+
 		default:
 			trigger_error('Undefined validation type given', E_USER_ERROR);
-			break;
 	}
 }
 

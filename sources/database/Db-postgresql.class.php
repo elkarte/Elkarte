@@ -991,11 +991,9 @@ class Database_PostgreSQL extends Database_Abstract
 	/**
 	 * Return server info.
 	 *
-	 * @param resource|null $connection
-	 *
 	 * @return string
 	 */
-	public function db_server_info($connection = null)
+	public function db_server_info()
 	{
 		// give info on client! we use it in install and upgrade and such things.
 		$version = pg_version();

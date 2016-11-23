@@ -403,7 +403,7 @@ class PackageServers_Controller extends Action_Controller
 		// Download from a package server?
 		if (isset($this->_req->query->server))
 		{
-			list($dummy, $url, $server) = $this->_package_server();
+			list(, $url, $server) = $this->_package_server();
 
 			// Fetch the package listing from the package server
 			$listing = json_decode(fetch_web_data($url));
