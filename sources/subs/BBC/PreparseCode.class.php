@@ -476,8 +476,7 @@ class PreparseCode
 					$desired_width = (int) (($desired_height * $width) / $height);
 				}
 				// Scale if to the height.
-				elseif (!empty($width)
-				)
+				elseif (!empty($width))
 				{
 					$desired_height = (int) (($desired_width * $height) / $width);
 				}
