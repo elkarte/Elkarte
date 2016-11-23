@@ -353,7 +353,7 @@ class Codes
 				self::ATTR_TAG => 'code',
 				self::ATTR_TYPE => self::TYPE_UNPARSED_CONTENT,
 				self::ATTR_CONTENT => '<div class="codeheader">' . $txt['code'] . ': <a href="#" onclick="return elkSelectText(this);" class="codeoperation">' . $txt['code_select'] . '</a></div><pre class="bbc_code prettyprint">$1</pre>',
-				self::ATTR_VALIDATE => $this->isDisabled('code') ? null : function (&$tag, &$data, $disabled) {
+				self::ATTR_VALIDATE => $this->isDisabled('code') ? null : function (&$tag, &$data) {
 					$data = tabToHtmlTab($data);
 				},
 				self::ATTR_BLOCK_LEVEL => true,
@@ -364,7 +364,7 @@ class Codes
 				self::ATTR_TAG => 'code',
 				self::ATTR_TYPE => self::TYPE_UNPARSED_EQUALS_CONTENT,
 				self::ATTR_CONTENT => '<div class="codeheader">' . $txt['code'] . ': ($2) <a href="#" onclick="return elkSelectText(this);" class="codeoperation">' . $txt['code_select'] . '</a></div><pre class="bbc_code prettyprint">$1</pre>',
-				self::ATTR_VALIDATE => $this->isDisabled('code') ? null : function (&$tag, &$data, $disabled) {
+				self::ATTR_VALIDATE => $this->isDisabled('code') ? null : function (&$tag, &$data) {
 					$data[0] = tabToHtmlTab($data[0]);
 				},
 				self::ATTR_BLOCK_LEVEL => true,
@@ -469,7 +469,7 @@ class Codes
 					),
 				),
 				self::ATTR_CONTENT => '<img src="$1" alt="{alt}" style="{width}{height}" class="bbc_img resized" />',
-				self::ATTR_VALIDATE => function (&$tag, &$data, $disabled) {
+				self::ATTR_VALIDATE => function (&$tag, &$data) {
 					if (strpos($data, 'http://') !== 0 && strpos($data, 'https://') !== 0)
 					{
 						$data = 'http://' . $data;
@@ -484,7 +484,7 @@ class Codes
 				self::ATTR_TAG => 'img',
 				self::ATTR_TYPE => self::TYPE_UNPARSED_CONTENT,
 				self::ATTR_CONTENT => '<img src="$1" alt="" class="bbc_img" />',
-				self::ATTR_VALIDATE => function (&$tag, &$data, $disabled) {
+				self::ATTR_VALIDATE => function (&$tag, &$data) {
 					if (strpos($data, 'http://') !== 0 && strpos($data, 'https://') !== 0)
 					{
 						$data = 'http://' . $data;
@@ -499,7 +499,7 @@ class Codes
 				self::ATTR_TAG => 'iurl',
 				self::ATTR_TYPE => self::TYPE_UNPARSED_CONTENT,
 				self::ATTR_CONTENT => '<a href="$1" class="bbc_link">$1</a>',
-				self::ATTR_VALIDATE => function (&$tag, &$data, $disabled) {
+				self::ATTR_VALIDATE => function (&$tag, &$data) {
 					//$data = removeBr($data);
 					if (strpos($data, 'http://') !== 0 && strpos($data, 'https://') !== 0)
 					{
@@ -515,7 +515,7 @@ class Codes
 				self::ATTR_TYPE => self::TYPE_UNPARSED_EQUALS,
 				self::ATTR_BEFORE => '<a href="$1" class="bbc_link">',
 				self::ATTR_AFTER => '</a>',
-				self::ATTR_VALIDATE => function (&$tag, &$data, $disabled) {
+				self::ATTR_VALIDATE => function (&$tag, &$data) {
 					if ($data[0] === '#')
 					{
 						$data = '#post_' . substr($data, 1);
@@ -729,7 +729,7 @@ class Codes
 				self::ATTR_TEST => '[1-7]{1}',
 				self::ATTR_BEFORE => '<span style="font-size: $1;" class="bbc_size">',
 				self::ATTR_AFTER => '</span>',
-				self::ATTR_VALIDATE => function (&$tag, &$data, $disabled) {
+				self::ATTR_VALIDATE => function (&$tag, &$data) {
 					$sizes = array(1 => 0.7, 2 => 1.0, 3 => 1.35, 4 => 1.45, 5 => 2.0, 6 => 2.65, 7 => 3.95);
 					$data = $sizes[(int) $data] . 'em';
 				},
@@ -866,7 +866,7 @@ class Codes
 				self::ATTR_TAG => 'url',
 				self::ATTR_TYPE => self::TYPE_UNPARSED_CONTENT,
 				self::ATTR_CONTENT => '<a href="$1" class="bbc_link" target="_blank">$1</a>',
-				self::ATTR_VALIDATE => function (&$tag, &$data, $disabled) {
+				self::ATTR_VALIDATE => function (&$tag, &$data) {
 					if (strpos($data, 'http://') !== 0 && strpos($data, 'https://') !== 0)
 					{
 						$data = 'http://' . $data;
@@ -881,7 +881,7 @@ class Codes
 				self::ATTR_TYPE => self::TYPE_UNPARSED_EQUALS,
 				self::ATTR_BEFORE => '<a href="$1" class="bbc_link" target="_blank">',
 				self::ATTR_AFTER => '</a>',
-				self::ATTR_VALIDATE => function (&$tag, &$data, $disabled) {
+				self::ATTR_VALIDATE => function (&$tag, &$data) {
 					if (strpos($data, 'http://') !== 0 && strpos($data, 'https://') !== 0)
 					{
 						$data = 'http://' . $data;
