@@ -534,7 +534,7 @@ class ManageServer_Controller extends Action_Controller
 				$detected_supported[$key] = $value->title();
 		}
 
-		$txt['caching_information'] = str_replace('{supported_accelerators}', '<li>' . implode('</li><li>', $detected_names) . '</li>', $txt['caching_information']);
+		$txt['caching_information'] = str_replace('{supported_accelerators}', '<i>' . implode(', ', $detected_names) . '</i><br />', $txt['caching_information']);
 
 		// Set our values to show what, if anything, we found
 		$txt['cache_settings_message'] = sprintf($txt['detected_accelerators'], implode(', ', $detected_supported));
@@ -543,11 +543,12 @@ class ManageServer_Controller extends Action_Controller
 		// Define the variables we want to edit.
 		$config_vars = array(
 			// Only a few settings, but they are important
-			array('', $txt['caching_information'] . '<br><br>' . $txt['cache_settings_message'], '', 'desc'),
+			array('desc', $txt['caching_information'] . '<br><br>' . $txt['cache_settings_message'], '', 'desc'),
 			array('cache_enable', $txt['cache_enable'], 'file', 'select', $cache_level, 'cache_enable'),
 			array('cache_accelerator', $txt['cache_accelerator'], 'file', 'select', $detected_supported),
 		);
 
+		// If the cache engine has specific settings, add them in
 		foreach ($detected as $key => $value)
 		{
 			if ($value->isAvailable())
