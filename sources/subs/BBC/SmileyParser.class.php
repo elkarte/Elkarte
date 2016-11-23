@@ -118,7 +118,7 @@ class SmileyParser
 	/**
 	 * @param string $message
 	 *
-	 * @return mixed|string
+	 * @return string
 	 */
 	public function parse($message)
 	{

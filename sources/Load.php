@@ -1712,7 +1712,7 @@ function loadUserContext()
  * Called if the detected URL is not the same as boardurl but is a common
  * variation in which case it updates key system variables so it works.
  *
- * @param $detected_url
+ * @param string $detected_url
  */
 function fixThemeUrls($detected_url)
 {

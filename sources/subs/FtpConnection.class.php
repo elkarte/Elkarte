@@ -204,7 +204,8 @@ class Ftp_Connection
 	{
 		// Wait for a response that isn't continued with -, but don't wait too long.
 		$time = time();
-		do {
+		do
+		{
 					$this->last_message = fgets($this->connection, 1024);
 		} while ((strlen($this->last_message) < 4 || strpos($this->last_message, ' ') === 0 || strpos($this->last_message, ' ', 3) !== 3) && time() - $time < 5);
 
@@ -226,7 +227,8 @@ class Ftp_Connection
 		// Request a passive connection - this means, we'll talk to you, you don't talk to us.
 		@fwrite($this->connection, 'PASV' . "\r\n");
 		$time = time();
-		do {
+		do
+		{
 					$response = fgets($this->connection, 1024);
 		} while (substr($response, 3, 1) !== ' ' && time() - $time < 5);
 
@@ -349,7 +351,8 @@ class Ftp_Connection
 
 		@fwrite($this->connection, 'PWD' . "\r\n");
 		$time = time();
-		do {
+		do
+		{
 					$response = fgets($this->connection, 1024);
 		} while (substr($response, 3, 1) !== ' ' && time() - $time < 5);
 

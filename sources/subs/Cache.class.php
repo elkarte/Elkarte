@@ -267,7 +267,7 @@ class Cache
 	 * @param string $key
 	 * @param int $ttl
 	 *
-	 * @return bool if it was a hit
+	 * @return null|boolean if it was a hit
 	 */
 	public function getVar(&$var, $key, $ttl = 120)
 	{
