@@ -87,7 +87,7 @@ class ManageDraftsModule_Controller extends Action_Controller
 	 * @param array $hiddenPermissions
 	 * @param array $relabelPermissions
 	 */
-	public static function integrate_load_permissions(&$permissionGroups, &$permissionList, &$leftPermissionGroups, &$hiddenPermissions, &$relabelPermissions)
+	public static function integrate_load_permissions(&$permissionGroups, &$permissionList)
 	{
 		$permissionList['board'] += array(
 			'post_draft' => array(false, 'topic'),

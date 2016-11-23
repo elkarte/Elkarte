@@ -1201,7 +1201,7 @@ class Packages_Controller extends Action_Controller
 		if (empty($package_ftp) && !isset($this->_req->post->skip_ftp))
 		{
 			$ftp = new Ftp_Connection(null);
-			list ($username, $detect_path, $found_path) = $ftp->detect_path(BOARDDIR);
+			list ($username, $detect_path) = $ftp->detect_path(BOARDDIR);
 
 			$context['package_ftp'] = array(
 				'server' => isset($modSettings['package_server']) ? $modSettings['package_server'] : 'localhost',

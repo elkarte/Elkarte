@@ -180,7 +180,6 @@ class Generic_List
 			$this->sortVar = isset($this->listOptions['request_vars']['sort']) ? $this->listOptions['request_vars']['sort'] : 'sort';
 			$this->descVar = isset($this->listOptions['request_vars']['desc']) ? $this->listOptions['request_vars']['desc'] : 'desc';
 			$sortReq = $this->req->getQuery($this->sortVar);
-			$descReq = $this->req->getQuery($this->descVar);
 
 			if (isset($this->listOptions['columns'][$sortReq], $this->listOptions['columns'][$sortReq]['sort']))
 			{

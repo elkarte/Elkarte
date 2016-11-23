@@ -915,10 +915,8 @@ function watchedUserCount($warning_watch = 0)
  * @param int $start The item to start with (for pagination purposes)
  * @param int $items_per_page  The number of items to show per page
  * @param string $sort A string indicating how to sort the results
- * @param string $approve_query
- * @param string $dummy
  */
-function watchedUsers($start, $items_per_page, $sort, $approve_query, $dummy)
+function watchedUsers($start, $items_per_page, $sort)
 {
 	global $txt, $modSettings, $user_info;
 
@@ -1174,7 +1172,7 @@ function basicWatchedUsers()
 	{
 		$modSettings['warning_watch'] = empty($modSettings['warning_watch']) ? 1 : $modSettings['warning_watch'];
 		$request = $db->query('', '
-			SELECT 
+			SELECT
 				id_member, real_name, last_login
 			FROM {db_prefix}members
 			WHERE warning >= {int:warning_watch}
@@ -1216,7 +1214,7 @@ function reportedPosts($show_pms = false)
 		$reported_posts = array();
 		// By George, that means we in a position to get the reports, jolly good.
 		$request = $db->query('', '
-			SELECT 
+			SELECT
 				lr.id_report, lr.id_msg, lr.id_topic, lr.id_board, lr.id_member, lr.subject,
 				lr.num_reports, IFNULL(mem.real_name, lr.membername) AS author_name,
 				IFNULL(mem.id_member, 0) AS id_author
@@ -1281,7 +1279,7 @@ function countModeratorNotes()
 	if (!Cache::instance()->getVar($moderator_notes_total, 'moderator_notes_total', 240))
 	{
 		$request = $db->query('', '
-			SELECT 
+			SELECT
 				COUNT(*)
 			FROM {db_prefix}log_comments AS lc
 				LEFT JOIN {db_prefix}members AS mem ON (mem.id_member = lc.id_member)

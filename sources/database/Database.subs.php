@@ -38,7 +38,7 @@ function elk_db_initiate($db_server, $db_name, $db_user, $db_passwd, $db_prefix,
  *
  * @param string $type = 'extra'
  */
-function db_extend($type = 'extra')
+function db_extend()
 {
 	// this can be removed.
 }

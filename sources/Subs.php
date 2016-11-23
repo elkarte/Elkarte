@@ -640,19 +640,12 @@ function pc_next_permutation($p, $size)
  * - Handles basic HTML, if enablePostHTML is on.
  * - Caches the from/to replace regular expressions so as not to reload them every time a string is parsed.
  * - Only parses smileys if smileys is true.
- * - Does nothing if the enableBBC setting is off.
- * - Uses the cache_id as a unique identifier to facilitate any caching it may do.
- *    - Only caches long messages, if cache is set to high then > 1000 or normal cache > 2400 characters
- *    - Only caches full parsing runs ($parse_tags set to null)
- * - Returns the modified message.
  *
  * @param string|false $message if false return list of enabled bbc codes
  * @param bool|string $smileys = true if to parse smileys as well
- * @param string $cache_id = '' the cache id to use
- * @param string[]|null $parse_tags array of tags to parse, null for all
  * @return string
  */
-function parse_bbc($message, $smileys = true, $cache_id = '', $parse_tags = array())
+function parse_bbc($message, $smileys = true)
 {
 	// Don't waste cycles
 	if ($message === '')

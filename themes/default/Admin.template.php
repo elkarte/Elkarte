@@ -1033,7 +1033,6 @@ function template_show_settings()
 
 					foreach ($config_var['data'] as $option)
 					{
-						$selected = false;
 						if (empty($var['multiple']))
 						{
 							$selected = $option[0] == $config_var['value'];

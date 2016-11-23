@@ -240,9 +240,8 @@ class Drafts_PersonalMessage_Module implements ElkArte\sources\modules\Module_In
 	 * Activates the draft plugin for use in the editor
 	 *
 	 * @param array $editorOptions
-	 * @param array $recipientList
 	 */
-	public function prepare_send_context(&$editorOptions, &$recipientList)
+	public function prepare_send_context(&$editorOptions)
 	{
 		global $context, $options, $txt;
 

@@ -29,11 +29,7 @@ class Auth_Controller extends Action_Controller
 	 */
 	public function needSecurity($action = '')
 	{
-		if ($action === 'action_keepalive')
-		{
-			return false;
-		}
-		return true;
+		return !($action === 'action_keepalive');
 	}
 
 	/**
