@@ -1017,7 +1017,7 @@ class Codes
 	 */
 	public function setParsingCodes()
 	{
-		$this->parsing_bbc = $this->getForParsing();
+		$this->parsing_codes = $this->getForParsing();
 
 		return $this;
 	}
