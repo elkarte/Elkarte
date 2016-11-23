@@ -205,7 +205,7 @@ class ManageRegistration_Controller extends Action_Controller
 		$("input[type=email]").on("blur", function(event) {
 			$(this).mailcheck({
 				suggested: function(element, suggestion) {
-				  	$("#suggestion").html("Did you mean <b><i>" + suggestion.full + "</b></i>");
+				  	$("#suggestion").html("' . $txt['register_did_you'] . ' <b><i>" + suggestion.full + "</b></i>");
 				},
 				empty: function(element) {
 				  	$("#suggestion").html("");
