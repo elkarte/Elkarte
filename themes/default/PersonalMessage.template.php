@@ -980,14 +980,15 @@ function template_send()
 		var form_name = "pmFolder",
 			preview_area = "pm",
 			txt_preview_title = "', $txt['preview_title'], '",
-			txt_preview_fetch = "', $txt['preview_fetch'], '";';
+			txt_preview_fetch = "', $txt['preview_fetch'], '";
+	</script>';
 
 	// Code for showing and hiding drafts
 	if (!empty($context['drafts']))
-		echo '
+		addInlineJavascript('
 		var oSwapDraftOptions = new elk_Toggle({
 			bToggleEnabled: true,
-			bCurrentlyCollapsed: ', empty($context['minmax_preferences']['pmdraft']) ? 'false' : 'true', ',
+			bCurrentlyCollapsed: ' . (empty($context['minmax_preferences']['pmdraft']) ? 'false' : 'true') . ',
 			aSwappableContainers: [
 				\'postDraftOptions\',
 			],
@@ -995,29 +996,26 @@ function template_send()
 				{
 					sId: \'postDraftExpand\',
 					classExpanded: \'chevricon i-chevron-up\',
-					titleExpanded: ', JavaScriptEscape($txt['hide']), ',
+					titleExpanded: ' . JavaScriptEscape($txt['hide']) . ',
 					classCollapsed: \'chevricon i-chevron-down\',
-					titleCollapsed: ', JavaScriptEscape($txt['show']), '
+					titleCollapsed: ' . JavaScriptEscape($txt['show']) . '
 				}
 			],
 			aSwapLinks: [
 				{
 					sId: \'postDraftExpandLink\',
-					msgExpanded: ', JavaScriptEscape($txt['draft_hide']), ',
-					msgCollapsed: ', JavaScriptEscape($txt['draft_load']), '
+					msgExpanded: ' . JavaScriptEscape($txt['draft_hide']) . ',
+					msgCollapsed: ' . JavaScriptEscape($txt['draft_load']) . '
 				}
 			],
 			oThemeOptions: {
-				bUseThemeSettings: ', $context['user']['is_guest'] ? 'false' : 'true', ',
+				bUseThemeSettings: ' . ($context['user']['is_guest'] ? 'false' : 'true') . ',
 				sOptionName: \'minmax_preferences\',
 				sSessionId: elk_session_id,
 				sSessionVar: elk_session_var,
 				sAdditionalVars: \';minmax_key=pmdraft\'
 			},
-		});';
-
-	echo '
-	</script>';
+		});', true);
 
 	// Show the message you're replying to.
 	if ($context['reply'])

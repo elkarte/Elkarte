@@ -141,11 +141,10 @@ function template_permission_index()
 			</div>';
 
 		// Javascript for the advanced stuff.
-		echo '
-	<script>
+		addInlineJavascript('
 		var oPermissionsPanelToggle = new elk_Toggle({
 			bToggleEnabled: true,
-			bCurrentlyCollapsed: ', empty($context['admin_preferences']['app']) ? 'false' : 'true', ',
+			bCurrentlyCollapsed: ' . (empty($context['admin_preferences']['app']) ? 'false' : 'true') . ',
 			aSwappableContainers: [
 				\'permissions_panel_advanced\'
 			],
@@ -153,30 +152,30 @@ function template_permission_index()
 				{
 					sId: \'upshrink_ic\',
 					classExpanded: \'chevricon i-chevron-up\',
-					titleExpanded: ', JavaScriptEscape($txt['hide']), ',
+					titleExpanded: ' . JavaScriptEscape($txt['hide']) . ',
 					classCollapsed: \'chevricon i-chevron-down\',
-					titleCollapsed: ', JavaScriptEscape($txt['show']), '
+					titleCollapsed: ' . JavaScriptEscape($txt['show']) . '
 				}
 			],
 			aSwapLinks: [
 				{
 					sId: \'permissions_panel_link\',
-					msgExpanded: ', JavaScriptEscape($txt['permissions_advanced_options']), ',
-					msgCollapsed: ', JavaScriptEscape($txt['permissions_advanced_options']), '
+					msgExpanded: ' . JavaScriptEscape($txt['permissions_advanced_options']) . ',
+					msgCollapsed: ' . JavaScriptEscape($txt['permissions_advanced_options']) . '
 				}
 			],
 			oThemeOptions: {
-				bUseThemeSettings: ', $context['user']['is_guest'] ? 'false' : 'true', ',
+				bUseThemeSettings: ' . ($context['user']['is_guest'] ? 'false' : 'true') . ',
 				sOptionName: \'admin_preferences\',
 				sSessionVar: elk_session_var,
 				sSessionId: elk_session_id,
 				sThemeId: \'1\',
 				sAdditionalVars: \';admin_key=app\'
 			}
-		});';
+		});', true);
 
 		echo '
-
+	<script>
 		function checkSubmit()
 		{
 			if ((document.forms.permissionForm.predefined.value !== "" && (document.forms.permissionForm.copy_from.value !== "empty" || document.forms.permissionForm.permissions.value !== "")) || (document.forms.permissionForm.copy_from.value !== "empty" && document.forms.permissionForm.permissions.value !== ""))
