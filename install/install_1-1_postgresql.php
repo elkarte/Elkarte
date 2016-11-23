@@ -36,6 +36,41 @@ class InstallInstructions_install_1_1_postgresql
 	public function create_functions()
 	{
 		$this->db->query('', '
+		CREATE OR REPLACE FUNCTION FROM_UNIXTIME(integer) RETURNS timestamp AS
+			\'SELECT timestamp \'\'epoch\'\' + $1 * interval \'\'1 second\'\' AS result\'
+		LANGUAGE \'sql\';');
+
+		$this->db->query('', '
+		CREATE OR REPLACE FUNCTION COALESCE (text, text) RETURNS text AS
+			\'SELECT COALESCE($1, $2) AS result\'
+		LANGUAGE \'sql\';');
+
+		$this->db->query('', '
+		CREATE OR REPLACE FUNCTION COALESCE (int4, int4) RETURNS int4 AS
+			\'SELECT COALESCE($1, $2) AS result\'
+		LANGUAGE \'sql\';');
+
+		$this->db->query('', '
+		CREATE OR REPLACE FUNCTION COALESCE (int8, int8) RETURNS int8 AS
+			\'SELECT COALESCE($1, $2) AS result\'
+		LANGUAGE \'sql\';');
+
+		$this->db->query('', '
+		CREATE OR REPLACE FUNCTION COALESCE (character varying, character varying) RETURNS character varying AS
+			\'SELECT COALESCE($1, $2) AS result\'
+		LANGUAGE \'sql\';');
+
+		$this->db->query('', '
+		CREATE OR REPLACE FUNCTION COALESCE (character varying, boolean) RETURNS character varying AS
+			\'SELECT COALESCE($1, CAST(CAST($2 AS int) AS varchar)) AS result\'
+		LANGUAGE \'sql\';');
+
+		$this->db->query('', '
+		CREATE OR REPLACE FUNCTION COALESCE (int, boolean) RETURNS int AS
+			\'SELECT COALESCE($1, CAST($2 AS int)) AS result\'
+		LANGUAGE \'sql\';');
+
+		$this->db->query('', '
 		CREATE OR REPLACE FUNCTION INET_ATON(text) RETURNS bigint AS \'
 			SELECT
 			CASE WHEN
