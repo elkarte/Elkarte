@@ -1568,15 +1568,15 @@ class Search
 	 *
 	 * @param int $id_search - the id of the search to delete from logs
 	 *
-	 * @return array - the number of search results and if a temporary table has been created
+	 * @return int - the number of search results
 	 */
 	private function _log_search_subjects($id_search)
 	{
 		global $modSettings;
 
-		if (empty($this->_search_params['topic']))
+		if (!empty($this->_search_params['topic']))
 		{
-			return array(0, false);
+			return 0;
 		}
 
 		$inserts = array();
