@@ -155,6 +155,7 @@ function template_registration_form()
 						</dt>
 						<dd>
 							<input type="email" name="email" id="elk_autov_reserve1" size="30" tabindex="', $context['tabindex']++, '" value="', isset($context['email']) ? $context['email'] : '', '" class="input_text" placeholder="', $txt['user_email_address'], '" required="required" />
+							<span id="suggestion" class="smalltext"></span>
 						</dd>
 					</dl>';
 
@@ -628,8 +629,8 @@ function template_admin_register()
 							<span class="smalltext">', $txt['admin_register_email_desc'], '</span>
 						</dt>
 						<dd>
-
 							<input type="email" name="email" id="email_input" tabindex="', $context['tabindex']++, '" size="30" class="input_text" />
+							<span id="suggestion" class="smalltext"></span>
 						</dd>
 						<dt>
 							<label for="password_input">', $txt['admin_register_password'], ':</label>
@@ -826,6 +827,7 @@ function template_contact_form()
 					</dt>
 					<dd>
 						<input type="email" name="emailaddress" id="emailaddress" value="', !empty($context['emailaddress']) ? $context['emailaddress'] : '', '" tabindex="', $context['tabindex']++, '" />
+						<span id="suggestion" class="smalltext"></span>
 					</dd>
 					<dt>
 						<label for="contactmessage">', $txt['contact_your_message'], '</label>

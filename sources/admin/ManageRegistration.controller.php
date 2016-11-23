@@ -200,7 +200,18 @@ class ManageRegistration_Controller extends Action_Controller
 			$context['member_groups'] = array();
 
 		// Basic stuff.
-		addInlineJavascript('disableAutoComplete();', true);
+		loadJavascriptFile('mailcheck.min.js');
+		addInlineJavascript('disableAutoComplete();
+		$("input[type=email]").on("blur", function(event) {
+			$(this).mailcheck({
+				suggested: function(element, suggestion) {
+				  	$("#suggestion").html("Did you mean <b><i>" + suggestion.full + "</b></i>");
+				},
+				empty: function(element) {
+				  	$("#suggestion").html("");
+				}
+			});
+		});', true);
 		$context['sub_template'] = 'admin_register';
 		$context['page_title'] = $txt['registration_center'];
 		createToken('admin-regc');
