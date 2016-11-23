@@ -23,12 +23,6 @@
 class ManageMembergroups_Controller extends Action_Controller
 {
 	/**
-	 * Groups Settings form
-	 * @var Settings_Form
-	 */
-	protected $_groupSettings;
-
-	/**
 	 * Main dispatcher, the en\trance point for all 'Manage Membergroup' actions.
 	 *
 	 * What it does:

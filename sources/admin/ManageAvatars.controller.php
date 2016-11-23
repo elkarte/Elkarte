@@ -21,13 +21,6 @@
 class ManageAvatars_Controller extends Action_Controller
 {
 	/**
-	 * Avatars settings form
-	 *
-	 * @var Settings_Form
-	 */
-	protected $_avatarSettings;
-
-	/**
 	 * The Avatars admin area
 	 *
 	 * What it does:

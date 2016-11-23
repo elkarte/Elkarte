@@ -23,12 +23,6 @@
 class AdminLog_Controller extends Action_Controller
 {
 	/**
-	 * Pruning Settings form
-	 * @var Settings_Form
-	 */
-	protected $_pruningSettings;
-
-	/**
 	 * This method decides which log to load.
 	 * Accessed by ?action=admin;area=logs
 	 *

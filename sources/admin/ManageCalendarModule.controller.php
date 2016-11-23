@@ -24,12 +24,6 @@
 class ManageCalendarModule_Controller extends Action_Controller
 {
 	/**
-	 * Calendar settings form
-	 * @var Settings_Form
-	 */
-	protected $_calendarSettings;
-
-	/**
 	 * Used to add the Calendar entry to the Core Features list.
 	 *
 	 * @param mixed[] $core_features The core features array

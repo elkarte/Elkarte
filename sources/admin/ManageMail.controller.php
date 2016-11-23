@@ -26,12 +26,6 @@
 class ManageMail_Controller extends Action_Controller
 {
 	/**
-	 * Mail settings form
-	 * @var Settings_Form
-	 */
-	protected $_mailSettings;
-
-	/**
 	 * Main dispatcher.
 	 *
 	 * - This function checks permissions and passes control through to the relevant section.

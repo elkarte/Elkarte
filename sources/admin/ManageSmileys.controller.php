@@ -22,12 +22,6 @@
 class ManageSmileys_Controller extends Action_Controller
 {
 	/**
-	 * Smileys configuration settings form
-	 * @var Settings_Form
-	 */
-	protected $_smileySettings;
-
-	/**
 	 * Contextual information about smiley sets.
 	 * @var mixed[]
 	 */

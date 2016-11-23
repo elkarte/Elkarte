@@ -25,30 +25,6 @@
 class ManageSecurity_Controller extends Action_Controller
 {
 	/**
-	 * Bad Behavior settings form.
-	 * @var Settings_Form
-	 */
-	protected $_bbSettings;
-
-	/**
-	 * Security settings form.
-	 * @var Settings_Form
-	 */
-	protected $_securitySettings;
-
-	/**
-	 * Moderation settings form.
-	 * @var Settings_Form
-	 */
-	protected $_moderationSettings;
-
-	/**
-	 * Spam settings form.
-	 * @var Settings_Form
-	 */
-	protected $_spamSettings;
-
-	/**
 	 * This function passes control through to the relevant security tab.
 	 *
 	 * @see Action_Controller::action_index()

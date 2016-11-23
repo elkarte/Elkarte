@@ -23,12 +23,6 @@
 class ManageLanguages_Controller extends Action_Controller
 {
 	/**
-	 * Language settings form
-	 * @var Settings_Form
-	 */
-	protected $_languageSettings;
-
-	/**
 	 * This is the main function for the languages area.
 	 *
 	 * What it does:
