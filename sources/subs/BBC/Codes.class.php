@@ -1099,7 +1099,7 @@ class Codes
 	/**
 	 * Return if a tag is enable
 	 *
-	 * @param $tag
+	 * @param string $tag
 	 *
 	 * @return bool
 	 */
