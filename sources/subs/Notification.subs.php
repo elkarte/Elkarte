@@ -58,7 +58,7 @@ function sendNotifications($topics, $type, $exclude = array(), $members_only = a
 	// Get the subject, body and basic poster details, number of attachments if any
 	$result = $db->query('', '
 		SELECT mf.subject, ml.body, ml.id_member, t.id_last_msg, t.id_topic, t.id_board, mem.signature,
-			IFNULL(mem.real_name, ml.poster_name) AS poster_name, COUNT(a.id_attach) as num_attach
+			COALESCE(mem.real_name, ml.poster_name) AS poster_name, COUNT(a.id_attach) as num_attach
 		FROM {db_prefix}topics AS t
 			INNER JOIN {db_prefix}messages AS mf ON (mf.id_msg = t.id_first_msg)
 			INNER JOIN {db_prefix}messages AS ml ON (ml.id_msg = t.id_last_msg)

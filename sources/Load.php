@@ -210,7 +210,7 @@ function loadUserSettings()
 		if ($cache->levelLowerThan(2) || $cache->getVar($user_settings, 'user_settings-' . $id_member, 60) === false)
 		{
 			$this_user = $db->fetchQuery('
-				SELECT mem.*, IFNULL(a.id_attach, 0) AS id_attach, a.filename, a.attachment_type
+				SELECT mem.*, COALESCE(a.id_attach, 0) AS id_attach, a.filename, a.attachment_type
 				FROM {db_prefix}members AS mem
 					LEFT JOIN {db_prefix}attachments AS a ON (a.id_member = {int:id_member})
 				WHERE mem.id_member = {int:id_member}
@@ -507,7 +507,7 @@ function loadBoard()
 		$request = $db->query('', '
 			SELECT
 				c.id_cat, b.name AS bname, b.description, b.num_topics, b.member_groups, b.deny_member_groups,
-				b.id_parent, c.name AS cname, IFNULL(mem.id_member, 0) AS id_moderator,
+				b.id_parent, c.name AS cname, COALESCE(mem.id_member, 0) AS id_moderator,
 				mem.real_name' . (!empty($topic) ? ', b.id_board' : '') . ', b.child_level,
 				b.id_theme, b.override_theme, b.count_posts, b.id_profile, b.redirect,
 				b.unapproved_topics, b.unapproved_posts' . (!empty($topic) ? ', t.approved, t.id_member_started' : '') . (!empty($select_columns) ? ', ' . implode(', ', $select_columns) : '') . '
@@ -877,13 +877,13 @@ function loadMemberData($users, $is_name = false, $set = 'normal')
 
 	// Used by default
 	$select_columns = '
-			IFNULL(lo.log_time, 0) AS is_online, IFNULL(a.id_attach, 0) AS id_attach, a.filename, a.attachment_type,
+			COALESCE(lo.log_time, 0) AS is_online, COALESCE(a.id_attach, 0) AS id_attach, a.filename, a.attachment_type,
 			mem.signature, mem.avatar, mem.id_member, mem.member_name,
 			mem.real_name, mem.email_address, mem.hide_email, mem.date_registered, mem.website_title, mem.website_url,
 			mem.birthdate, mem.member_ip, mem.member_ip2, mem.posts, mem.last_login, mem.likes_given, mem.likes_received,
 			mem.karma_good, mem.id_post_group, mem.karma_bad, mem.lngfile, mem.id_group, mem.time_offset, mem.show_online,
-			mg.online_color AS member_group_color, IFNULL(mg.group_name, {string:blank_string}) AS member_group,
-			pg.online_color AS post_group_color, IFNULL(pg.group_name, {string:blank_string}) AS post_group,
+			mg.online_color AS member_group_color, COALESCE(mg.group_name, {string:blank_string}) AS member_group,
+			pg.online_color AS post_group_color, COALESCE(pg.group_name, {string:blank_string}) AS post_group,
 			mem.is_activated, mem.warning, ' . (!empty($modSettings['titlesEnable']) ? 'mem.usertitle, ' : '') . '
 			CASE WHEN mem.id_group = 0 OR mg.icons = {string:blank_string} THEN pg.icons ELSE mg.icons END AS icons';
 	$select_tables = '
@@ -2311,7 +2311,7 @@ function getBoardParents($id_parent)
 		{
 			$result = $db->query('', '
 				SELECT
-					b.id_parent, b.name, {int:board_parent} AS id_board, IFNULL(mem.id_member, 0) AS id_moderator,
+					b.id_parent, b.name, {int:board_parent} AS id_board, COALESCE(mem.id_member, 0) AS id_moderator,
 					mem.real_name, b.child_level
 				FROM {db_prefix}boards AS b
 					LEFT JOIN {db_prefix}moderators AS mods ON (mods.id_board = b.id_board)

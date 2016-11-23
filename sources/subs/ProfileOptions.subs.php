@@ -85,7 +85,7 @@ function loadMembergroupsJoin($current_groups, $memID)
 	// Get all the membergroups they can join.
 	$request = $db->query('', '
 		SELECT mg.id_group, mg.group_name, mg.description, mg.group_type, mg.online_color, mg.hidden,
-			IFNULL(lgr.id_member, 0) AS pending
+			COALESCE(lgr.id_member, 0) AS pending
 		FROM {db_prefix}membergroups AS mg
 			LEFT JOIN {db_prefix}log_group_requests AS lgr ON (lgr.id_member = {int:selected_member} AND lgr.id_group = mg.id_group)
 		WHERE (mg.id_group IN ({array_int:group_list}) OR mg.group_type > {int:nonjoin_group_id})

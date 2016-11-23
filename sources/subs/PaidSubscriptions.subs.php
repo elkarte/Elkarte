@@ -67,7 +67,7 @@ function list_getSubscribedUsers($start, $items_per_page, $sort, $id_sub, $searc
 	$request = $db->query('', '
 		SELECT
 			ls.id_sublog, ls.start_time, ls.end_time, ls.status, ls.payments_pending,
-			IFNULL(mem.id_member, 0) AS id_member, IFNULL(mem.real_name, {string:guest}) AS name
+			COALESCE(mem.id_member, 0) AS id_member, COALESCE(mem.real_name, {string:guest}) AS name
 		FROM {db_prefix}log_subscribed AS ls
 			LEFT JOIN {db_prefix}members AS mem ON (mem.id_member = ls.id_member)
 		WHERE ls.id_subscribe = {int:current_subscription} ' . $search_string . '
@@ -600,7 +600,7 @@ function loadAllSubsctiptions($sub_id)
 	$request = $db->query('', '
 		SELECT
 			ls.id_member, ls.old_id_group, ls.id_subscribe, ls.status,
-			mem.id_group, mem.additional_groups, IFNULL(mem.id_member, 0) AS id_member, IFNULL(mem.real_name, {string:guest}) AS name
+			mem.id_group, mem.additional_groups, COALESCE(mem.id_member, 0) AS id_member, COALESCE(mem.real_name, {string:guest}) AS name
 		FROM {db_prefix}log_subscribed AS ls
 			INNER JOIN {db_prefix}members AS mem ON (ls.id_member = mem.id_member)
 		WHERE ls.id_subscribe = {int:current_subscription}
@@ -1058,7 +1058,7 @@ function getPendingSubscriptions($log_id)
 	$request = $db->query('', '
 		SELECT
 			ls.id_sublog, ls.id_subscribe, ls.id_member,
-			start_time, end_time, status, payments_pending, pending_details, IFNULL(mem.real_name, {string:blank_string}) AS username
+			start_time, end_time, status, payments_pending, pending_details, COALESCE(mem.real_name, {string:blank_string}) AS username
 		FROM {db_prefix}log_subscribed AS ls
 			LEFT JOIN {db_prefix}members AS mem ON (mem.id_member = ls.id_member)
 		WHERE ls.id_sublog = {int:current_subscription_item}

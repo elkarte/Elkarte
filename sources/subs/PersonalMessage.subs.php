@@ -1933,8 +1933,8 @@ function loadPMSubjectRequest($pms, $orderBy)
 	// Separate query for these bits!
 	$subjects_request = $db->query('', '
 		SELECT
-			pm.id_pm, pm.subject, pm.id_member_from, pm.msgtime, IFNULL(mem.real_name, pm.from_name) AS from_name,
-			IFNULL(mem.id_member, 0) AS not_guest
+			pm.id_pm, pm.subject, pm.id_member_from, pm.msgtime, COALESCE(mem.real_name, pm.from_name) AS from_name,
+			COALESCE(mem.id_member, 0) AS not_guest
 		FROM {db_prefix}personal_messages AS pm
 			LEFT JOIN {db_prefix}members AS mem ON (mem.id_member = pm.id_member_from)
 		WHERE pm.id_pm IN ({array_int:pm_list})
@@ -2032,7 +2032,7 @@ function loadPMQuote($pmsg, $isReceived)
 		SELECT
 			pm.id_pm, CASE WHEN pm.id_pm_head = {int:id_pm_head_empty} THEN pm.id_pm ELSE pm.id_pm_head END AS pm_head,
 			pm.body, pm.subject, pm.msgtime,
-			mem.member_name, IFNULL(mem.id_member, 0) AS id_member, IFNULL(mem.real_name, pm.from_name) AS real_name
+			mem.member_name, COALESCE(mem.id_member, 0) AS id_member, COALESCE(mem.real_name, pm.from_name) AS real_name
 		FROM {db_prefix}personal_messages AS pm' . (!$isReceived ? '' : '
 			INNER JOIN {db_prefix}pm_recipients AS pmr ON (pmr.id_pm = {int:id_pm})') . '
 			LEFT JOIN {db_prefix}members AS mem ON (mem.id_member = pm.id_member_from)
@@ -2127,7 +2127,7 @@ function loadPersonalMessage($pm_id)
 	$request = $db->query('', '
 		SELECT
 			pm.subject, pm.body, pm.msgtime, pm.id_member_from,
-			IFNULL(m.real_name, pm.from_name) AS sender_name,
+			COALESCE(m.real_name, pm.from_name) AS sender_name,
 			pm.from_name AS poster_name, msgtime
 		FROM {db_prefix}personal_messages AS pm
 			INNER JOIN {db_prefix}pm_recipients AS pmr ON (pmr.id_pm = pm.id_pm)

@@ -228,8 +228,8 @@ class ManageBans_Controller extends Action_Controller
 						},
 					),
 					'sort' => array(
-						'default' => 'IFNULL(bg.expire_time, 1=1) DESC, bg.expire_time DESC',
-						'reverse' => 'IFNULL(bg.expire_time, 1=1), bg.expire_time',
+						'default' => 'COALESCE(bg.expire_time, 1=1) DESC, bg.expire_time DESC',
+						'reverse' => 'COALESCE(bg.expire_time, 1=1), bg.expire_time',
 					),
 				),
 				'num_triggers' => array(
@@ -591,8 +591,8 @@ class ManageBans_Controller extends Action_Controller
 						),
 					),
 					'sort' => array(
-						'default' => 'IFNULL(mem.real_name, 1=1), mem.real_name',
-						'reverse' => 'IFNULL(mem.real_name, 1=1) DESC, mem.real_name DESC',
+						'default' => 'COALESCE(mem.real_name, 1=1), mem.real_name',
+						'reverse' => 'COALESCE(mem.real_name, 1=1) DESC, mem.real_name DESC',
 					),
 				),
 				'date' => array(

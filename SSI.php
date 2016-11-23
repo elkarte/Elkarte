@@ -278,9 +278,9 @@ function ssi_queryPosts($query_where = '', $query_where_params = array(), $query
 	$request = $db->query('substring', '
 		SELECT
 			m.poster_time, m.subject, m.id_topic, m.id_member, m.id_msg, m.id_board, b.name AS board_name,
-			IFNULL(mem.real_name, m.poster_name) AS poster_name, ' . ($user_info['is_guest'] ? '1 AS is_read, 0 AS new_from' : '
-			IFNULL(lt.id_msg, IFNULL(lmr.id_msg, 0)) >= m.id_msg_modified AS is_read,
-			IFNULL(lt.id_msg, IFNULL(lmr.id_msg, -1)) + 1 AS new_from') . ', ' . ($limit_body ? 'SUBSTRING(m.body, 1, 384) AS body' : 'm.body') . ', m.smileys_enabled
+			COALESCE(mem.real_name, m.poster_name) AS poster_name, ' . ($user_info['is_guest'] ? '1 AS is_read, 0 AS new_from' : '
+			COALESCE(lt.id_msg, lmr.id_msg, 0) >= m.id_msg_modified AS is_read,
+			COALESCE(lt.id_msg, lmr.id_msg, -1) + 1 AS new_from') . ', ' . ($limit_body ? 'SUBSTRING(m.body, 1, 384) AS body' : 'm.body') . ', m.smileys_enabled
 		FROM {db_prefix}messages AS m
 			INNER JOIN {db_prefix}boards AS b ON (b.id_board = m.id_board)
 			LEFT JOIN {db_prefix}members AS mem ON (mem.id_member = m.id_member)' . (!$user_info['is_guest'] ? '
@@ -461,8 +461,8 @@ function ssi_recentTopics($num_recent = 8, $exclude_boards = null, $include_boar
 	$request = $db->query('substring', '
 		SELECT
 			ml.poster_time, mf.subject, mf.id_member AS id_op_member, ml.id_member, ml.id_msg, t.id_topic, t.num_replies, t.num_views, mg.online_color,
-			IFNULL(mem.real_name, ml.poster_name) AS poster_name,
-			IFNULL(memop.real_name, mf.poster_name) AS op_name, SUBSTRING(ml.body, 1, 384) AS body, ml.smileys_enabled, ml.icon
+			COALESCE(mem.real_name, ml.poster_name) AS poster_name,
+			COALESCE(memop.real_name, mf.poster_name) AS op_name, SUBSTRING(ml.body, 1, 384) AS body, ml.smileys_enabled, ml.icon
 		FROM {db_prefix}topics AS t
 			INNER JOIN {db_prefix}messages AS ml ON (ml.id_msg = t.id_last_msg)
 			INNER JOIN {db_prefix}messages AS mf ON (mf.id_msg = t.id_first_msg)
@@ -1795,9 +1795,9 @@ function ssi_recentAttachments($num_attachments = 10, $attachment_ext = array(),
 	// Lets build the query.
 	$request = $db->query('', '
 		SELECT
-			att.id_attach, att.id_msg, att.filename, IFNULL(att.size, 0) AS filesize, att.downloads, mem.id_member,
-			IFNULL(mem.real_name, m.poster_name) AS poster_name, m.id_topic, m.subject, t.id_board, m.poster_time,
-			att.width, att.height' . (empty($modSettings['attachmentShowImages']) || empty($modSettings['attachmentThumbnails']) ? '' : ', IFNULL(thumb.id_attach, 0) AS id_thumb, thumb.width AS thumb_width, thumb.height AS thumb_height') . '
+			att.id_attach, att.id_msg, att.filename, COALESCE(att.size, 0) AS filesize, att.downloads, mem.id_member,
+			COALESCE(mem.real_name, m.poster_name) AS poster_name, m.id_topic, m.subject, t.id_board, m.poster_time,
+			att.width, att.height' . (empty($modSettings['attachmentShowImages']) || empty($modSettings['attachmentThumbnails']) ? '' : ', COALESCE(thumb.id_attach, 0) AS id_thumb, thumb.width AS thumb_width, thumb.height AS thumb_height') . '
 		FROM {db_prefix}attachments AS att
 			INNER JOIN {db_prefix}messages AS m ON (m.id_msg = att.id_msg)
 			INNER JOIN {db_prefix}topics AS t ON (t.id_topic = m.id_topic)

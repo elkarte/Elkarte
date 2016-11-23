@@ -32,7 +32,7 @@ function getLastPosts($latestPostOptions)
 	$request = $db->query('substring', '
 		SELECT
 			m.poster_time, m.subject, m.id_topic, m.id_member, m.id_msg,
-			IFNULL(mem.real_name, m.poster_name) AS poster_name, t.id_board, b.name AS board_name,
+			COALESCE(mem.real_name, m.poster_name) AS poster_name, t.id_board, b.name AS board_name,
 			SUBSTRING(m.body, 1, 385) AS body, m.smileys_enabled
 		FROM {db_prefix}messages AS m
 			INNER JOIN {db_prefix}topics AS t ON (t.id_topic = m.id_topic)
@@ -309,8 +309,8 @@ function getLastTopics($latestTopicOptions)
 	$request = $db->query('substring', '
 		SELECT
 			ml.poster_time, mf.subject, ml.id_topic, ml.id_member, ml.id_msg, t.id_first_msg, ml.id_msg_modified,
-			' . ($latestTopicOptions['id_member'] == 0 ? '0' : 'IFNULL(lt.id_msg, IFNULL(lmr.id_msg, -1)) + 1') . ' AS new_from,
-			IFNULL(mem.real_name, ml.poster_name) AS poster_name, t.id_board, b.name AS board_name,
+			' . ($latestTopicOptions['id_member'] == 0 ? '0' : 'COALESCE(lt.id_msg, lmr.id_msg, -1) + 1') . ' AS new_from,
+			COALESCE(mem.real_name, ml.poster_name) AS poster_name, t.id_board, b.name AS board_name,
 			SUBSTRING(ml.body, 1, 385) AS body, ml.smileys_enabled
 		FROM {db_prefix}topics AS t
 			INNER JOIN {db_prefix}boards AS b ON (b.id_board = t.id_board)

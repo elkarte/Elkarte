@@ -41,7 +41,7 @@ function messageDetails($id_msg, $id_topic = 0, $attachment_type = 0)
 		SELECT
 			m.id_member, m.modified_time, m.modified_name, m.smileys_enabled, m.body,
 			m.poster_name, m.poster_email, m.subject, m.icon, m.approved,
-			IFNULL(a.size, -1) AS filesize, a.filename, a.id_attach,
+			COALESCE(a.size, -1) AS filesize, a.filename, a.id_attach,
 			a.approved AS attachment_approved, t.id_member_started AS id_member_poster,
 			m.poster_time, log.id_action
 		FROM {db_prefix}messages AS m
@@ -145,7 +145,7 @@ function quoteMessageInfo($id_msg, $modify)
 	$moderate_boards = boardsAllowedTo('moderate_board');
 
 	$request = $db->query('', '
-		SELECT IFNULL(mem.real_name, m.poster_name) AS poster_name, m.poster_time, m.body, m.id_topic, m.subject,
+		SELECT COALESCE(mem.real_name, m.poster_name) AS poster_name, m.poster_time, m.body, m.id_topic, m.subject,
 			m.id_board, m.id_member, m.approved
 		FROM {db_prefix}messages AS m
 			INNER JOIN {db_prefix}topics AS t ON (t.id_topic = m.id_topic)
@@ -745,7 +745,7 @@ function mailFromMessage($id_msg)
 	$db = database();
 
 	$request = $db->query('', '
-		SELECT IFNULL(mem.email_address, m.poster_email) AS email_address, IFNULL(mem.real_name, m.poster_name) AS real_name, IFNULL(mem.id_member, 0) AS id_member, hide_email
+		SELECT COALESCE(mem.email_address, m.poster_email) AS email_address, COALESCE(mem.real_name, m.poster_name) AS real_name, COALESCE(mem.id_member, 0) AS id_member, hide_email
 		FROM {db_prefix}messages AS m
 			LEFT JOIN {db_prefix}members AS mem ON (mem.id_member = m.id_member)
 		WHERE m.id_msg = {int:id_msg}',

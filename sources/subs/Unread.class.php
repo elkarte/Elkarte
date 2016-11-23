@@ -235,7 +235,7 @@ class Unread
 			// Double equal comparison for 1 because it is backward compatible with 1.0 where the value was true/false
 			if ($include_avatars == 1 || $include_avatars === 3)
 			{
-				$custom_selects = array('meml.avatar', 'IFNULL(a.id_attach, 0) AS id_attach', 'a.filename', 'a.attachment_type', 'meml.email_address');
+				$custom_selects = array('meml.avatar', 'COALESCE(a.id_attach, 0) AS id_attach', 'a.filename', 'a.attachment_type', 'meml.email_address');
 				$custom_joins = array('LEFT JOIN {db_prefix}attachments AS a ON (a.id_member = ml.id_member AND a.id_member != 0)');
 			}
 			else
@@ -246,7 +246,7 @@ class Unread
 
 			if ($include_avatars === 2 || $include_avatars === 3)
 			{
-				$custom_selects = array_merge($custom_selects, array('memf.avatar AS avatar_first', 'IFNULL(af.id_attach, 0) AS id_attach_first', 'af.filename AS filename_first', 'af.attachment_type AS attachment_type_first', 'memf.email_address AS email_address_first'));
+				$custom_selects = array_merge($custom_selects, array('memf.avatar AS avatar_first', 'COALESCE(af.id_attach, 0) AS id_attach_first', 'af.filename AS filename_first', 'af.attachment_type AS attachment_type_first', 'memf.email_address AS email_address_first'));
 				$custom_joins = array_merge($custom_joins, array('LEFT JOIN {db_prefix}attachments AS af ON (af.id_member = mf.id_member AND af.id_member != 0)'));
 			}
 		}
@@ -256,10 +256,10 @@ class Unread
 				ms.subject AS first_subject, ms.poster_time AS first_poster_time, ms.poster_name AS first_member_name,
 				ms.id_topic, t.id_board, b.name AS bname, t.num_replies, t.num_views, t.num_likes, t.approved,
 				ms.id_member AS first_id_member, ml.id_member AS last_id_member, ml.poster_name AS last_member_name,
-				ml.poster_time AS last_poster_time, IFNULL(mems.real_name, ms.poster_name) AS first_display_name,
-				IFNULL(meml.real_name, ml.poster_name) AS last_display_name, ml.subject AS last_subject,
+				ml.poster_time AS last_poster_time, COALESCE(mems.real_name, ms.poster_name) AS first_display_name,
+				COALESCE(meml.real_name, ml.poster_name) AS last_display_name, ml.subject AS last_subject,
 				ml.icon AS last_icon, ms.icon AS first_icon, t.id_poll, t.is_sticky, t.locked, ml.modified_time AS last_modified_time,
-				IFNULL(lt.id_msg, IFNULL(lmr.id_msg, -1)) + 1 AS new_from,
+				COALESCE(lt.id_msg, lmr.id_msg, -1) + 1 AS new_from,
 				' . $body_query . '
 				' . (!empty($custom_selects) ? implode(',', $custom_selects) . ', ' : '') . '
 				ml.smileys_enabled AS last_smileys, ms.smileys_enabled AS first_smileys, t.id_first_msg, t.id_last_msg
@@ -275,9 +275,9 @@ class Unread
 				LEFT JOIN {db_prefix}log_mark_read AS lmr ON (lmr.id_board = t.id_board AND lmr.id_member = {int:current_member})
 			WHERE t.id_board IN ({array_int:boards})
 				AND t.id_last_msg >= {int:min_message}
-				AND IFNULL(lt.id_msg, IFNULL(lmr.id_msg, 0)) < ml.id_msg' .
+				AND COALESCE(lt.id_msg, lmr.id_msg, 0) < ml.id_msg' .
 				($this->_post_mod ? ' AND ms.approved = {int:is_approved}' : '') .
-				($this->_unwatch ? ' AND IFNULL(lt.unwatched, 0) != 1' : '') . '
+				($this->_unwatch ? ' AND COALESCE(lt.unwatched, 0) != 1' : '') . '
 			ORDER BY {raw:order}
 			LIMIT {int:offset}, {int:limit}',
 			array_merge($this->_query_parameters, array(
@@ -309,7 +309,7 @@ class Unread
 				FROM {db_prefix}topics_posted_in AS pi
 					LEFT JOIN {db_prefix}log_topics_posted_in AS lt ON (lt.id_topic = pi.id_topic)
 				WHERE pi.id_board IN ({array_int:boards})
-					AND IFNULL(lt.id_msg, pi.id_msg) < pi.id_last_msg',
+					AND COALESCE(lt.id_msg, pi.id_msg) < pi.id_last_msg',
 				array_merge($this->_query_parameters, array(
 				))
 			);
@@ -327,9 +327,9 @@ class Unread
 					LEFT JOIN {db_prefix}log_mark_read AS lmr ON (lmr.id_board = t.id_board AND lmr.id_member = {int:current_member})
 				WHERE t.id_board IN ({array_int:boards})
 					AND m.id_member = {int:current_member}
-					AND IFNULL(lt.id_msg, IFNULL(lmr.id_msg, 0)) < t.id_last_msg' . ($this->_post_mod ? '
+					AND COALESCE(lt.id_msg, lmr.id_msg, 0) < t.id_last_msg' . ($this->_post_mod ? '
 					AND t.approved = {int:is_approved}' : '') . ($this->_unwatch ? '
-					AND IFNULL(lt.unwatched, 0) != 1' : ''),
+					AND COALESCE(lt.unwatched, 0) != 1' : ''),
 				array_merge($this->_query_parameters, array(
 					'current_member' => $this->_user_id,
 					'is_approved' => 1,
@@ -359,9 +359,9 @@ class Unread
 			WHERE t.id_board IN ({array_int:boards})' . ($this->_showing_all_topics && !empty($this->_earliest_msg) ? '
 				AND t.id_last_msg > {int:earliest_msg}' : (!$this->_showing_all_topics && $is_first_login ? '
 				AND t.id_last_msg > {int:id_msg_last_visit}' : '')) . '
-				AND IFNULL(lt.id_msg, IFNULL(lmr.id_msg, 0)) < t.id_last_msg' .
+				AND COALESCE(lt.id_msg, lmr.id_msg, 0) < t.id_last_msg' .
 				($this->_post_mod ? ' AND t.approved = {int:is_approved}' : '') .
-				($this->_unwatch ? ' AND IFNULL(lt.unwatched, 0) != 1' : ''),
+				($this->_unwatch ? ' AND COALESCE(lt.unwatched, 0) != 1' : ''),
 			array_merge($this->_query_parameters, array(
 				'current_member' => $this->_user_id,
 				'earliest_msg' => $this->_earliest_msg,
@@ -390,9 +390,9 @@ class Unread
 				FROM {db_prefix}topics_posted_in AS t
 					LEFT JOIN {db_prefix}log_topics_posted_in AS lt ON (lt.id_topic = t.id_topic)
 				WHERE t.id_board IN ({array_int:boards})
-					AND IFNULL(lt.id_msg, t.id_msg) < t.id_last_msg' .
+					AND COALESCE(lt.id_msg, t.id_msg) < t.id_last_msg' .
 					($this->_post_mod ? ' AND t.approved = {int:is_approved}' : '') .
-					($this->_unwatch ? ' AND IFNULL(lt.unwatched, 0) != 1' : '') . '
+					($this->_unwatch ? ' AND COALESCE(lt.unwatched, 0) != 1' : '') . '
 				ORDER BY {raw:order}
 				LIMIT {int:offset}, {int:limit}',
 				array_merge($this->_query_parameters, array(
@@ -414,9 +414,9 @@ class Unread
 					LEFT JOIN {db_prefix}log_mark_read AS lmr ON (lmr.id_board = t.id_board AND lmr.id_member = {int:current_member})
 				WHERE t.id_board IN ({array_int:boards})
 					AND t.id_last_msg >= {int:min_message}
-					AND (IFNULL(lt.id_msg, IFNULL(lmr.id_msg, 0))) < t.id_last_msg' .
+					AND COALESCE(lt.id_msg, lmr.id_msg, 0) < t.id_last_msg' .
 					($this->_post_mod ? ' AND t.approved = {int:is_approved}' : '') .
-					($this->_unwatch ? ' AND IFNULL(lt.unwatched, 0) != 1' : '') . '
+					($this->_unwatch ? ' AND COALESCE(lt.unwatched, 0) != 1' : '') . '
 				ORDER BY {raw:order}
 				LIMIT {int:offset}, {int:limit}',
 				array_merge($this->_query_parameters, array(
@@ -455,7 +455,7 @@ class Unread
 			// Double equal comparison for 1 because it is backward compatible with 1.0 where the value was true/false
 			if ($include_avatars == 1 || $include_avatars === 3)
 			{
-				$custom_selects = array('meml.avatar', 'IFNULL(a.id_attach, 0) AS id_attach', 'a.filename', 'a.attachment_type', 'meml.email_address');
+				$custom_selects = array('meml.avatar', 'COALESCE(a.id_attach, 0) AS id_attach', 'a.filename', 'a.attachment_type', 'meml.email_address');
 				$custom_joins = array('LEFT JOIN {db_prefix}attachments AS a ON (a.id_member = ml.id_member AND a.id_member != 0)');
 			}
 			else
@@ -466,7 +466,7 @@ class Unread
 
 			if ($include_avatars === 2 || $include_avatars === 3)
 			{
-				$custom_selects = array_merge($custom_selects, array('memf.avatar AS avatar_first', 'IFNULL(af.id_attach, 0) AS id_attach_first', 'af.filename AS filename_first', 'af.attachment_type AS attachment_type_first', 'memf.email_address AS email_address_first'));
+				$custom_selects = array_merge($custom_selects, array('memf.avatar AS avatar_first', 'COALESCE(af.id_attach, 0) AS id_attach_first', 'af.filename AS filename_first', 'af.attachment_type AS attachment_type_first', 'memf.email_address AS email_address_first'));
 				$custom_joins = array_merge($custom_joins, array('LEFT JOIN {db_prefix}attachments AS af ON (af.id_member = ms.id_member AND af.id_member != 0)'));
 			}
 		}
@@ -476,10 +476,10 @@ class Unread
 				ms.subject AS first_subject, ms.poster_time AS first_poster_time, ms.id_topic, t.id_board, b.name AS bname,
 				ms.poster_name AS first_member_name, ml.poster_name AS last_member_name, t.approved,
 				t.num_replies, t.num_views, t.num_likes, ms.id_member AS first_id_member, ml.id_member AS last_id_member,
-				ml.poster_time AS last_poster_time, IFNULL(mems.real_name, ms.poster_name) AS first_display_name,
-				IFNULL(meml.real_name, ml.poster_name) AS last_display_name, ml.subject AS last_subject,
+				ml.poster_time AS last_poster_time, COALESCE(mems.real_name, ms.poster_name) AS first_display_name,
+				COALESCE(meml.real_name, ml.poster_name) AS last_display_name, ml.subject AS last_subject,
 				ml.icon AS last_icon, ms.icon AS first_icon, t.id_poll, t.is_sticky, t.locked, ml.modified_time AS last_modified_time,
-				IFNULL(lt.id_msg, IFNULL(lmr.id_msg, -1)) + 1 AS new_from,
+				COALESCE(lt.id_msg, lmr.id_msg, -1) + 1 AS new_from,
 				' . $body_query . '
 				' . (!empty($custom_selects) ? implode(',', $custom_selects) . ', ' : '') . '
 				ml.smileys_enabled AS last_smileys, ms.smileys_enabled AS first_smileys, t.id_first_msg, t.id_last_msg
@@ -534,7 +534,7 @@ class Unread
 		$sortKey_joins = array(
 			'ms.subject' => '
 				INNER JOIN {db_prefix}messages AS ms ON (ms.id_msg = t.id_first_msg)',
-			'IFNULL(mems.real_name, ms.poster_name)' => '
+			'COALESCE(mems.real_name, ms.poster_name)' => '
 				INNER JOIN {db_prefix}messages AS ms ON (ms.id_msg = t.id_first_msg)
 				LEFT JOIN {db_prefix}members AS mems ON (mems.id_member = ms.id_member)',
 		);
@@ -547,7 +547,7 @@ class Unread
 				id_msg int(10) unsigned NOT NULL default {string:string_zero},
 				PRIMARY KEY (id_topic)
 			)
-			SELECT t.id_topic, t.id_board, t.id_last_msg, IFNULL(lmr.id_msg, 0) AS id_msg' . (!in_array($this->_sort_query, array('t.id_last_msg', 't.id_topic')) ? ', ' . $this->_sort_query . ' AS sort_key' : '') . '
+			SELECT t.id_topic, t.id_board, t.id_last_msg, COALESCE(lmr.id_msg, 0) AS id_msg' . (!in_array($this->_sort_query, array('t.id_last_msg', 't.id_topic')) ? ', ' . $this->_sort_query . ' AS sort_key' : '') . '
 			FROM {db_prefix}messages AS m
 				INNER JOIN {db_prefix}topics AS t ON (t.id_topic = m.id_topic)' . ($this->_unwatch ? '
 				LEFT JOIN {db_prefix}log_topics AS lt ON (t.id_topic = lt.id_topic AND lt.id_member = {int:current_member})' : '') . '
@@ -555,7 +555,7 @@ class Unread
 			WHERE m.id_member = {int:current_member}' . (!empty($board_id) ? '
 				AND t.id_board = {int:current_board}' : '') . ($this->_post_mod ? '
 				AND t.approved = {int:is_approved}' : '') . ($this->_unwatch ? '
-				AND IFNULL(lt.unwatched, 0) != 1' : '') . '
+				AND COALESCE(lt.unwatched, 0) != 1' : '') . '
 			GROUP BY m.id_topic',
 			array(
 				'current_board' => $board_id,

@@ -579,7 +579,7 @@ function approvePosts($msgs, $approve = true)
 	// May as well start at the beginning, working out *what* we need to change.
 	$request = $db->query('', '
 		SELECT m.id_msg, m.approved, m.id_topic, m.id_board, t.id_first_msg, t.id_last_msg,
-			m.body, m.subject, IFNULL(mem.real_name, m.poster_name) AS poster_name, m.id_member,
+			m.body, m.subject, COALESCE(mem.real_name, m.poster_name) AS poster_name, m.id_member,
 			t.approved AS topic_approved, b.count_posts
 		FROM {db_prefix}messages AS m
 			INNER JOIN {db_prefix}topics AS t ON (t.id_topic = m.id_topic)
@@ -1054,7 +1054,7 @@ function getFormMsgSubject($editing, $topic, $first_subject = '', $msg_id = 0)
 			// Make sure they _can_ quote this post, and if so get it.
 			$request = $db->query('', '
 				SELECT
-					m.subject, IFNULL(mem.real_name, m.poster_name) AS poster_name, m.poster_time, m.body
+					m.subject, COALESCE(mem.real_name, m.poster_name) AS poster_name, m.poster_time, m.body
 				FROM {db_prefix}messages AS m
 					INNER JOIN {db_prefix}boards AS b ON (b.id_board = m.id_board AND {query_see_board})
 					LEFT JOIN {db_prefix}members AS mem ON (mem.id_member = m.id_member)

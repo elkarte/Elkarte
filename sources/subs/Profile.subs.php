@@ -2505,7 +2505,7 @@ function list_getUserWarnings($start, $items_per_page, $sort, $memID)
 	$db = database();
 
 	$request = $db->query('', '
-		SELECT IFNULL(mem.id_member, 0) AS id_member, IFNULL(mem.real_name, lc.member_name) AS member_name,
+		SELECT COALESCE(mem.id_member, 0) AS id_member, COALESCE(mem.real_name, lc.member_name) AS member_name,
 			lc.log_time, lc.body, lc.counter, lc.id_notice
 		FROM {db_prefix}log_comments AS lc
 			LEFT JOIN {db_prefix}members AS mem ON (mem.id_member = lc.id_member)
@@ -2589,7 +2589,7 @@ function profileLoadAttachments($start, $items_per_page, $sort, $boardsAllowed, 
 	// Retrieve some attachments.
 	$request = $db->query('', '
 		SELECT a.id_attach, a.id_msg, a.filename, a.downloads, a.approved, a.fileext, a.width, a.height, ' .
-			(empty($modSettings['attachmentShowImages']) || empty($modSettings['attachmentThumbnails']) ? '' : ' IFNULL(thumb.id_attach, 0) AS id_thumb, thumb.width AS thumb_width, thumb.height AS thumb_height, ') . '
+			(empty($modSettings['attachmentShowImages']) || empty($modSettings['attachmentThumbnails']) ? '' : ' COALESCE(thumb.id_attach, 0) AS id_thumb, thumb.width AS thumb_width, thumb.height AS thumb_height, ') . '
 			m.id_msg, m.id_topic, m.id_board, m.poster_time, m.subject, b.name
 		FROM {db_prefix}attachments AS a' . (empty($modSettings['attachmentShowImages']) || empty($modSettings['attachmentThumbnails']) ? '' : '
 			LEFT JOIN {db_prefix}attachments AS thumb ON (thumb.id_attach = a.id_thumb)') . '
@@ -2733,7 +2733,7 @@ function getUnwatchedBy($start, $items_per_page, $sort, $memID)
 	if (!empty($topics))
 	{
 		$request = $db->query('', '
-			SELECT mf.subject, mf.poster_time as started_on, IFNULL(memf.real_name, mf.poster_name) as started_by, ml.poster_time as last_post_on, IFNULL(meml.real_name, ml.poster_name) as last_post_by, t.id_topic
+			SELECT mf.subject, mf.poster_time as started_on, COALESCE(memf.real_name, mf.poster_name) as started_by, ml.poster_time as last_post_on, COALESCE(meml.real_name, ml.poster_name) as last_post_by, t.id_topic
 			FROM {db_prefix}topics AS t
 				INNER JOIN {db_prefix}messages AS ml ON (ml.id_msg = t.id_last_msg)
 				INNER JOIN {db_prefix}messages AS mf ON (mf.id_msg = t.id_first_msg)

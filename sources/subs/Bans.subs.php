@@ -1192,7 +1192,7 @@ function list_getBanLogEntries($start, $items_per_page, $sort)
 	$db = database();
 
 	return $db->fetchQuery('
-		SELECT lb.id_ban_log, lb.id_member, IFNULL(lb.ip, {string:dash}) AS ip, IFNULL(lb.email, {string:dash}) AS email, lb.log_time, IFNULL(mem.real_name, {string:blank_string}) AS real_name
+		SELECT lb.id_ban_log, lb.id_member, COALESCE(lb.ip, {string:dash}) AS ip, COALESCE(lb.email, {string:dash}) AS email, lb.log_time, COALESCE(mem.real_name, {string:blank_string}) AS real_name
 		FROM {db_prefix}log_banned AS lb
 			LEFT JOIN {db_prefix}members AS mem ON (mem.id_member = lb.id_member)
 		ORDER BY ' . $sort . '
@@ -1270,7 +1270,7 @@ function list_getBanItems($start = 0, $items_per_page = 0, $sort = 0, $ban_group
 			bi.ip_low1, bi.ip_high1, bi.ip_low2, bi.ip_high2, bi.ip_low3, bi.ip_high3, bi.ip_low4, bi.ip_high4,
 			bi.ip_low5, bi.ip_high5, bi.ip_low6, bi.ip_high6, bi.ip_low7, bi.ip_high7, bi.ip_low8, bi.ip_high8,
 			bg.id_ban_group, bg.name, bg.ban_time, bg.expire_time, bg.reason, bg.notes, bg.cannot_access, bg.cannot_register, bg.cannot_login, bg.cannot_post,
-			IFNULL(mem.id_member, 0) AS id_member, mem.member_name, mem.real_name
+			COALESCE(mem.id_member, 0) AS id_member, mem.member_name, mem.real_name
 		FROM {db_prefix}ban_groups AS bg
 			LEFT JOIN {db_prefix}ban_items AS bi ON (bi.id_ban_group = bg.id_ban_group)
 			LEFT JOIN {db_prefix}members AS mem ON (mem.id_member = bi.id_member)

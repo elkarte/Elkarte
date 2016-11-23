@@ -295,7 +295,7 @@ function collapseCategories($categories, $new_status, $members = null, $check_co
 			'remove' => array(),
 		);
 		$db->fetchQueryCallback('
-			SELECT mem.id_member, c.id_cat, IFNULL(cc.id_cat, 0) AS is_collapsed, c.can_collapse
+			SELECT mem.id_member, c.id_cat, COALESCE(cc.id_cat, 0) AS is_collapsed, c.can_collapse
 			FROM {db_prefix}members AS mem
 				INNER JOIN {db_prefix}categories AS c ON (c.id_cat IN ({array_int:category_list}))
 				LEFT JOIN {db_prefix}collapsed_categories AS cc ON (cc.id_cat = c.id_cat AND cc.id_member = mem.id_member)

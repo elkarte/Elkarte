@@ -58,8 +58,8 @@ function getUserErrors($start, $items_per_page, $sort, $where, $where_vars = arr
 	// Get a list of error messages from this ip (range).
 	$request = $db->query('', '
 		SELECT
-			le.log_time, le.ip, le.url, le.message, IFNULL(mem.id_member, 0) AS id_member,
-			IFNULL(mem.real_name, {string:guest_title}) AS display_name, mem.member_name
+			le.log_time, le.ip, le.url, le.message, COALESCE(mem.id_member, 0) AS id_member,
+			COALESCE(mem.real_name, {string:guest_title}) AS display_name, mem.member_name
 		FROM {db_prefix}log_errors AS le
 			LEFT JOIN {db_prefix}members AS mem ON (mem.id_member = le.id_member)
 		WHERE ' . $where . '
@@ -129,7 +129,7 @@ function getIPMessages($start, $items_per_page, $sort, $where, $where_vars = arr
 	// @todo SLOW This query is using a filesort.
 	$request = $db->query('', '
 		SELECT
-			m.id_msg, m.poster_ip, IFNULL(mem.real_name, m.poster_name) AS display_name, mem.id_member,
+			m.id_msg, m.poster_ip, COALESCE(mem.real_name, m.poster_name) AS display_name, mem.id_member,
 			m.subject, m.poster_time, m.id_topic, m.id_board
 		FROM {db_prefix}messages AS m
 			INNER JOIN {db_prefix}boards AS b ON (b.id_board = m.id_board)

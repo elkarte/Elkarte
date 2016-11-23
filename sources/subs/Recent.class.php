@@ -280,8 +280,8 @@ class Recent_Class
 			SELECT
 				m.id_msg, m.subject, m.smileys_enabled, m.poster_time, m.body, m.id_topic, t.id_board, b.id_cat,
 				b.name AS bname, c.name AS cname, t.num_replies, m.id_member, m2.id_member AS first_id_member,
-				IFNULL(mem2.real_name, m2.poster_name) AS first_display_name, t.id_first_msg,
-				IFNULL(mem.real_name, m.poster_name) AS poster_name, t.id_last_msg
+				COALESCE(mem2.real_name, m2.poster_name) AS first_display_name, t.id_first_msg,
+				COALESCE(mem.real_name, m.poster_name) AS poster_name, t.id_last_msg
 			FROM {db_prefix}messages AS m
 				INNER JOIN {db_prefix}topics AS t ON (t.id_topic = m.id_topic)
 				INNER JOIN {db_prefix}boards AS b ON (b.id_board = t.id_board)
