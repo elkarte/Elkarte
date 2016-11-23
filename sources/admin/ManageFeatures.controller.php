@@ -396,7 +396,7 @@ class ManageFeatures_Controller extends Action_Controller
 
 					// Something like enableModule('mentions', array('post', 'display');
 					foreach ($modules as $key => $val)
-						$function ($key, $val);
+						$function($key, $val);
 				}
 			}
 

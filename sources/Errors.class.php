@@ -472,7 +472,7 @@ class Errors
 		$context['error_title'] = isset($context['error_title']) ? $context['error_title'] : $txt['error_occurred'];
 		$context['error_message'] = isset($context['error_message']) ? $context['error_message'] : $error_message;
 		$context['error_code'] = isset($error_code) ? 'id="' . htmlspecialchars($error_code) . '" ' : '';
-		$context['page_title'] = empty($context['page_title']) ? $context['error_title'] : $context['page_title'] ;
+		$context['page_title'] = empty($context['page_title']) ? $context['error_title'] : $context['page_title'];
 
 		// Load the template and set the sub template.
 		loadTemplate('Errors');

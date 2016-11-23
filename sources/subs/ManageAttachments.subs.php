@@ -80,7 +80,7 @@ function approveAttachments($attachments)
 			'attachments' => $attachments,
 			'attachment_type' => 0,
 		),
-		function($row)
+		function ($row)
 		{
 			logAction(
 				'approve_attach',
@@ -251,7 +251,7 @@ function removeAttachments($condition, $query_type = '', $return_affected_messag
 				'attachments' => $do_logging,
 				'attachment_type' => 0,
 			),
-			function($row)
+			function ($row)
 			{
 				logAction(
 					'remove_attach',
@@ -642,7 +642,7 @@ function findParentsOrphanThumbnails($start, $fix_errors, $to_fix)
 			'no_thumb' => 0,
 			'substep' => $start,
 		),
-		function($row)
+		function ($row)
 		{
 			return $row['id_attach'];
 		}
@@ -833,7 +833,7 @@ function findOrphanAvatars($start, $fix_errors, $to_fix)
 			'no_msg' => 0,
 			'substep' => $start,
 		),
-		function($row) use ($fix_errors, $to_fix, $modSettings)
+		function ($row) use ($fix_errors, $to_fix, $modSettings)
 		{
 			// If we are repairing remove the file from disk now.
 			if ($fix_errors && in_array('avatar_no_member', $to_fix))
@@ -895,7 +895,7 @@ function findOrphanAttachments($start, $fix_errors, $to_fix)
 			'no_msg' => 0,
 			'substep' => $start,
 		),
-		function($row) use ($fix_errors, $to_fix)
+		function ($row) use ($fix_errors, $to_fix)
 		{
 			// If we are repairing remove the file from disk now.
 			if ($fix_errors && in_array('attachment_no_msg', $to_fix))
@@ -998,7 +998,7 @@ function validateAttachments($attachments, $approve_query)
 			'not_approved' => 0,
 			'attachment_type' => 0,
 		),
-		function($row)
+		function ($row)
 		{
 			return $row['id_attach'];
 		}
@@ -1106,7 +1106,7 @@ function list_getUnapprovedAttachments($start, $items_per_page, $sort, $approve_
 			'items_per_page' => $items_per_page,
 			'approve_query' => $approve_query,
 		),
-		function($row) use ($scripturl, $bbc_parser)
+		function ($row) use ($scripturl, $bbc_parser)
 		{
 			return array(
 				'id' => $row['id_attach'],
@@ -1668,7 +1668,7 @@ function attachmentsOfMessage($id_msg, $unapproved = false)
 			'is_approved' => 0,
 			'attachment_type' => 0,
 		),
-		function($row)
+		function ($row)
 		{
 			return $row['id_attach'];
 		}

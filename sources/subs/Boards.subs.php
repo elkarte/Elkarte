@@ -131,7 +131,7 @@ function markBoardsRead($boards, $unread = false, $resetTopics = false)
 				'board_list' => $boards,
 				'lowest_topic' => $lowest_topic,
 			),
-			function($row) use (&$delete_topics, &$update_topics, $user_info, $modSettings)
+			function ($row) use (&$delete_topics, &$update_topics, $user_info, $modSettings)
 			{
 				if (!empty($row['unwatched']))
 					$update_topics[] = array(
@@ -440,7 +440,7 @@ function modifyBoard($board_id, &$boardOptions)
 					array(
 						'moderator_list' => $moderators,
 					),
-					function($row)
+					function ($row)
 					{
 						return $row['id_member'];
 					}
@@ -778,7 +778,7 @@ function fixChildren($parent, $newLevel, $newParent)
 		array(
 			'parent_board' => $parent,
 		),
-		function($row)
+		function ($row)
 		{
 			return $row['id_board'];
 		}
@@ -1414,7 +1414,7 @@ function wantedBoards($see_board, $hide_recycle = true)
 		array(
 			'recycle_board' => (int) $modSettings['recycle_board'],
 		),
-		function($row)
+		function ($row)
 		{
 			return $row['id_board'];
 		}
@@ -1626,7 +1626,7 @@ function boardsModerated($id_member)
 		array(
 			'current_member' => $id_member,
 		),
-		function($row)
+		function ($row)
 		{
 			return $row['id_board'];
 		}
@@ -2047,7 +2047,7 @@ function boardNotifications($start, $items_per_page, $sort, $memID)
 			'current_member' => $user_info['id'],
 			'selected_member' => $memID,
 		),
-		function($row) use ($scripturl)
+		function ($row) use ($scripturl)
 		{
 			return array(
 				'id' => $row['id_board'],

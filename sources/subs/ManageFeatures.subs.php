@@ -696,7 +696,7 @@ function updateDisplayCache()
 			'not_owner_only' => 2,
 			'not_admin_only' => 3,
 		),
-		function($row)
+		function ($row)
 		{
 			return array(
 				'colname' => strtr($row['col_name'], array('|' => '', ';' => '')),

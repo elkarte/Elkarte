@@ -75,7 +75,7 @@ class ModerationCenter_Controller extends Action_Controller
 
 		if (!empty($options['admin_preferences']))
 		{
-			$context['admin_preferences'] = serializeToJson($options['admin_preferences'], function($array_form) {
+			$context['admin_preferences'] = serializeToJson($options['admin_preferences'], function ($array_form) {
 				global $context;
 
 				$context['admin_preferences'] = $array_form;
@@ -1495,7 +1495,7 @@ class ModerationCenter_Controller extends Action_Controller
 						'style' => 'width: 4%;text-align: center;',
 					),
 					'data' => array(
-						'function' => function($rowData) {
+						'function' => function ($rowData) {
 							return '<input type="checkbox" name="deltpl[]" value="' . $rowData['id_comment'] . '" class="input_check" />';
 						},
 						'class' => 'centertext',

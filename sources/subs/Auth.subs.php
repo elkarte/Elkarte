@@ -630,7 +630,7 @@ function rebuildModCache()
 			array(
 				'current_member' => $user_info['id'],
 			),
-			function($row)
+			function ($row)
 			{
 				return $row['id_group'];
 			}

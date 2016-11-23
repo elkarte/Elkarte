@@ -468,7 +468,7 @@ class Mentions_Controller extends Action_Controller
 		}
 		else
 		{
-			$to_register = array_map(function($name) {
+			$to_register = array_map(function ($name) {
 				return '\\ElkArte\\sources\\subs\\MentionType\\' . ucfirst($name) . '_Mention';
 			}, $this->_known_mentions);
 		}

@@ -361,7 +361,7 @@ function likesPostsGiven($start, $items_per_page, $sort, $memberID)
 			'start' => $start,
 			'per_page' => $items_per_page,
 		),
-		function($row) use ($scripturl, $context)
+		function ($row) use ($scripturl, $context)
 		{
 			return array(
 				'subject' => '<a href="' . $scripturl . '?topic=' . $row['id_topic'] . '.msg' . $row['id_msg'] . '#msg' . $row['id_msg'] . '">' . $row['subject'] . '</a>',
@@ -410,7 +410,7 @@ function likesPostsReceived($start, $items_per_page, $sort, $memberID)
 			'start' => $start,
 			'per_page' => $items_per_page,
 		),
-		function($row) use ($scripturl)
+		function ($row) use ($scripturl)
 		{
 			return array(
 				'subject' => '<a href="' . $scripturl . '?topic=' . $row['id_topic'] . '.msg' . $row['id_msg'] . '#msg' . $row['id_msg'] . '">' . $row['subject'] . '</a>',
@@ -461,7 +461,7 @@ function postLikers($start, $items_per_page, $sort, $messageID, $simple = true)
 			'start' => $start,
 			'per_page' => $items_per_page,
 		),
-		function($row) use ($scripturl, $simple)
+		function ($row) use ($scripturl, $simple)
 		{
 			$like = array(
 				'real_name' => $row['real_name'],
@@ -645,7 +645,7 @@ function dbMostLikedMessagesByTopic($topic, $limit = 5)
 			'limit' => $limit,
 			'type_avatar' => 1,
 		),
-		function($row) use ($scripturl, $bbc_parser)
+		function ($row) use ($scripturl, $bbc_parser)
 		{
 			// Censor those naughty words
 			$row['body'] = censor($row['body']);
@@ -1032,7 +1032,7 @@ function dbRecentlyLikedPostsGivenUser($id_liker, $limit = 5)
 			'id_member' => $id_liker,
 			'limit' => $limit
 		),
-		function($row) use ($bbc_parser)
+		function ($row) use ($bbc_parser)
 		{
 			// Censor those $%#^&% words
 			$row['body'] = censor($row['body']);

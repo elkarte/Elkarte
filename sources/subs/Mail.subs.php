@@ -1000,7 +1000,7 @@ function list_getMailQueue($start, $items_per_page, $sort)
 			'sort' => $sort,
 			'items_per_page' => $items_per_page,
 		),
-		function($row) use ($txt)
+		function ($row) use ($txt)
 		{
 			// Private PM/email subjects and similar shouldn't be shown in the mailbox area.
 			if (!empty($row['private']))
@@ -1224,7 +1224,7 @@ function emailsInfo($number)
 		LIMIT ' . $number,
 		array(
 		),
-		function($row) use(&$ids, &$emails)
+		function ($row) use(&$ids, &$emails)
 		{
 			// Just get the data and go.
 			$ids[] = $row['id_mail'];

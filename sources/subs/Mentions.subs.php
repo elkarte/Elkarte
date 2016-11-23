@@ -103,7 +103,7 @@ function getUserMentions($start, $limit, $sort, $all = false, $type = '')
 			'limit' => $limit,
 			'sort' => $sort,
 		),
-		function($row)
+		function ($row)
 		{
 			$row['avatar'] = determineAvatar($row);
 			return $row;
@@ -148,7 +148,7 @@ function addMentions($member_from, $members_to, $target, $type, $time = null, $s
 			'target' => $target,
 			'log_time' => $time === null ? time() : $time,
 		),
-		function($row)
+		function ($row)
 		{
 			return $row['id_member'];
 		}
@@ -333,7 +333,7 @@ function toggleMentionsApproval($msgs, $approved)
 		array(
 			'messages' => $msgs,
 		),
-		function($row) use ($status)
+		function ($row) use ($status)
 		{
 			updateMentionMenuCount($status, $row['id_member']);
 		}

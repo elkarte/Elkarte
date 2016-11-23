@@ -50,7 +50,6 @@ function createMenu($menuData, $menuOptions = array())
 	 *    bool $enabled:     Should section be shown?
 	 *    array $areas:      Array of areas within this section.
 	 *    array $permission: Permission required to access the whole section.
-
 	 *  For Areas:
 	 *    array $permission:  Array of permissions to determine who can access this area.
 	 *    string $label:      Optional text string for link (Otherwise $txt[$index] will be used)

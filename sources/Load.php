@@ -1067,8 +1067,8 @@ function loadMemberContext($user, $display_custom_fields = false)
 	if ($context['loadMemberContext_set'] !== 'minimal')
 	{
 		$memberContext[$user] += array(
-			'username_color' => '<span '. (!empty($profile['member_group_color']) ? 'style="color:' . $profile['member_group_color'] .';"' : '') . '>' . $profile['member_name'] .'</span>',
-			'name_color' => '<span '. (!empty($profile['member_group_color']) ? 'style="color:' . $profile['member_group_color'] .';"' : '') . '>' . $profile['real_name'] .'</span>',
+			'username_color' => '<span ' . (!empty($profile['member_group_color']) ? 'style="color:' . $profile['member_group_color'] . ';"' : '') . '>' . $profile['member_name'] . '</span>',
+			'name_color' => '<span ' . (!empty($profile['member_group_color']) ? 'style="color:' . $profile['member_group_color'] . ';"' : '') . '>' . $profile['real_name'] . '</span>',
 			'link_color' => '<a href="' . $scripturl . '?action=profile;u=' . $profile['id_member'] . '" title="' . $txt['profile_of'] . ' ' . $profile['real_name'] . '" ' . (!empty($profile['member_group_color']) ? 'style="color:' . $profile['member_group_color'] . ';"' : '') . '>' . $profile['real_name'] . '</a>',
 			'is_buddy' => $profile['buddy'],
 			'is_reverse_buddy' => in_array($user_info['id'], $buddy_list),
@@ -1409,7 +1409,7 @@ function loadTheme($id_theme = 0, $initialize = true)
 	// Set up some additional interface preference context
 	if (!empty($options['admin_preferences']))
 	{
-		$context['admin_preferences'] = serializeToJson($options['admin_preferences'], function($array_form) {
+		$context['admin_preferences'] = serializeToJson($options['admin_preferences'], function ($array_form) {
 			global $context;
 
 			$context['admin_preferences'] = $array_form;
@@ -1426,7 +1426,7 @@ function loadTheme($id_theme = 0, $initialize = true)
 	{
 		if (!empty($options['minmax_preferences']))
 		{
-			$context['minmax_preferences'] = serializeToJson($options['minmax_preferences'], function($array_form) {
+			$context['minmax_preferences'] = serializeToJson($options['minmax_preferences'], function ($array_form) {
 				global $settings, $user_info;
 
 				// Update the option.
@@ -1798,7 +1798,7 @@ function loadEssentialThemeData()
 			'no_member' => 0,
 			'theme_guests' => $modSettings['theme_guests'],
 		),
-		function($row)
+		function ($row)
 		{
 			global $settings;
 

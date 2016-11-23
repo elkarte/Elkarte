@@ -846,8 +846,8 @@ function template_member_online($member, $link = true)
 	global $context;
 
 	return ((!empty($context['can_send_pm']) && $link) ? '<a href="' . $member['online']['href'] . '" title="' . $member['online']['text'] . '">' : '') .
-	       '<i class="' . ($member['online']['is_online'] ? 'iconline' : 'icoffline') . '" title="' . $member['online']['text'] . '"></i>' .
-	       ((!empty($context['can_send_pm']) && $link) ? '</a>' : '');
+		   '<i class="' . ($member['online']['is_online'] ? 'iconline' : 'icoffline') . '" title="' . $member['online']['text'] . '"></i>' .
+		   ((!empty($context['can_send_pm']) && $link) ? '</a>' : '');
 }
 
 /**

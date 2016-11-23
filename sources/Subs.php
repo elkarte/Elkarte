@@ -1539,6 +1539,7 @@ function currentContext($messages_request, $reset = false)
 	if (!$message)
 	{
 		$db->free_result($messages_request);
+
 		return false;
 	}
 

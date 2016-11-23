@@ -425,7 +425,7 @@ function emailAdmins($template, $replacements = array(), $additional_recipients 
 			'notify_types' => 4,
 			'group_array_implode' => implode(', additional_groups) != 0 OR FIND_IN_SET(', $groups),
 		),
-		function($row) use($replacements, $modSettings, $language, $template)
+		function ($row) use($replacements, $modSettings, $language, $template)
 		{
 			// Stick their particulars in the replacement data.
 			$replacements['IDMEMBER'] = $row['id_member'];

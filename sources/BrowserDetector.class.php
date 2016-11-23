@@ -250,7 +250,8 @@ class Browser_Detector
 				// Robots shouldn't be logging in or registering.  So, they aren't a bot.  Better to be wrong than sorry (or people won't be able to log in!), anyway.
 				if ((isset($_REQUEST['action']) && in_array($_REQUEST['action'], array('login', 'login2', 'register'))) || !$user_info['is_guest'])
 					$this->_browsers['possibly_robot'] = false;
-			} else
+			}
+			else
 				$this->_browsers['possibly_robot'] = false;
 		}
 

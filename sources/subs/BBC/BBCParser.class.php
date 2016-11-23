@@ -432,6 +432,7 @@ class BBCParser
 	public function doSmileys($toggle)
 	{
 		$this->do_smileys = (bool) $toggle;
+
 		return $this;
 	}
 

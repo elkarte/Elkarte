@@ -1138,7 +1138,7 @@ function clearPostgroupPermissions()
 		array(
 			'min_posts' => -1,
 		),
-		function($row)
+		function ($row)
 		{
 			return $row['id_group'];
 		}
@@ -1203,7 +1203,7 @@ function copyPermissionProfile($profile_name, $copy_from)
 		array(
 			'copy_from' => $copy_from,
 		),
-		function($row) use ($profile_id)
+		function ($row) use ($profile_id)
 		{
 			return array($profile_id, $row['id_group'], $row['permission'], $row['add_deny']);
 		}
