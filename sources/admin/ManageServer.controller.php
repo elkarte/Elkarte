@@ -524,12 +524,11 @@ class ManageServer_Controller extends Action_Controller
 		$detected = loadCacheEngines(false);
 		$detected_names = array();
 		$detected_supported = array();
-		$supported = array();
 
 		foreach ($detected as $key => $value)
 		{
 			$detected_names[] = $value->title();
-			$supported[] = $value->isAvailable();
+			$supported = $value->isAvailable();
 
 			if (!empty($supported))
 				$detected_supported[$key] = $value->title();
