@@ -41,32 +41,32 @@ class InstallInstructions_install_1_1_postgresql
 		LANGUAGE \'sql\';');
 
 		$this->db->query('', '
-		CREATE OR REPLACE FUNCTION COALESCE (text, text) RETURNS text AS
+		CREATE OR REPLACE FUNCTION IFNULL (text, text) RETURNS text AS
 			\'SELECT COALESCE($1, $2) AS result\'
 		LANGUAGE \'sql\';');
 
 		$this->db->query('', '
-		CREATE OR REPLACE FUNCTION COALESCE (int4, int4) RETURNS int4 AS
+		CREATE OR REPLACE FUNCTION IFNULL (int4, int4) RETURNS int4 AS
 			\'SELECT COALESCE($1, $2) AS result\'
 		LANGUAGE \'sql\';');
 
 		$this->db->query('', '
-		CREATE OR REPLACE FUNCTION COALESCE (int8, int8) RETURNS int8 AS
+		CREATE OR REPLACE FUNCTION IFNULL (int8, int8) RETURNS int8 AS
 			\'SELECT COALESCE($1, $2) AS result\'
 		LANGUAGE \'sql\';');
 
 		$this->db->query('', '
-		CREATE OR REPLACE FUNCTION COALESCE (character varying, character varying) RETURNS character varying AS
+		CREATE OR REPLACE FUNCTION IFNULL (character varying, character varying) RETURNS character varying AS
 			\'SELECT COALESCE($1, $2) AS result\'
 		LANGUAGE \'sql\';');
 
 		$this->db->query('', '
-		CREATE OR REPLACE FUNCTION COALESCE (character varying, boolean) RETURNS character varying AS
+		CREATE OR REPLACE FUNCTION IFNULL (character varying, boolean) RETURNS character varying AS
 			\'SELECT COALESCE($1, CAST(CAST($2 AS int) AS varchar)) AS result\'
 		LANGUAGE \'sql\';');
 
 		$this->db->query('', '
-		CREATE OR REPLACE FUNCTION COALESCE (int, boolean) RETURNS int AS
+		CREATE OR REPLACE FUNCTION IFNULL (int, boolean) RETURNS int AS
 			\'SELECT COALESCE($1, CAST($2 AS int)) AS result\'
 		LANGUAGE \'sql\';');
 

@@ -279,7 +279,7 @@ function ssi_queryPosts($query_where = '', $query_where_params = array(), $query
 		SELECT
 			m.poster_time, m.subject, m.id_topic, m.id_member, m.id_msg, m.id_board, b.name AS board_name,
 			COALESCE(mem.real_name, m.poster_name) AS poster_name, ' . ($user_info['is_guest'] ? '1 AS is_read, 0 AS new_from' : '
-			COALESCE(lt.id_msg, lmr.id_msg, 0 >= m.id_msg_modified AS is_read,
+			COALESCE(lt.id_msg, lmr.id_msg, 0) >= m.id_msg_modified AS is_read,
 			COALESCE(lt.id_msg, lmr.id_msg, -1) + 1 AS new_from') . ', ' . ($limit_body ? 'SUBSTRING(m.body, 1, 384) AS body' : 'm.body') . ', m.smileys_enabled
 		FROM {db_prefix}messages AS m
 			INNER JOIN {db_prefix}boards AS b ON (b.id_board = m.id_board)

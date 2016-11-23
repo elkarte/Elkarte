@@ -414,7 +414,7 @@ class Unread
 					LEFT JOIN {db_prefix}log_mark_read AS lmr ON (lmr.id_board = t.id_board AND lmr.id_member = {int:current_member})
 				WHERE t.id_board IN ({array_int:boards})
 					AND t.id_last_msg >= {int:min_message}
-					AND (COALESCE(lt.id_msg, lmr.id_msg, 0) < t.id_last_msg' .
+					AND COALESCE(lt.id_msg, lmr.id_msg, 0) < t.id_last_msg' .
 					($this->_post_mod ? ' AND t.approved = {int:is_approved}' : '') .
 					($this->_unwatch ? ' AND COALESCE(lt.unwatched, 0) != 1' : '') . '
 				ORDER BY {raw:order}
