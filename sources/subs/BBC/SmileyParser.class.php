@@ -143,18 +143,6 @@ class SmileyParser
 	}
 
 	/**
-	 * This as you may have guessed, does nothing.
-	 *
-	 * @param $from
-	 * @param $to
-	 * @param $description
-	 */
-	public function add($from, $to, $description)
-	{
-
-	}
-
-	/**
 	 * Callback function for parseBlock
 	 *
 	 * @param array $matches
