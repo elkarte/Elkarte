@@ -456,6 +456,10 @@ div.bbc_footnotes .meaction {
 	opacity: 1;
 }
 
+#search_form button {
+	border-color: #CCCCCC;
+}
+
 .forumtitle > a {
 	color: #377828;
 	text-shadow: 1px 1px 0 #FEFEFE;
