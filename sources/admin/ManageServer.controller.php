@@ -285,6 +285,14 @@ class ManageServer_Controller extends Action_Controller
 		createToken('admin-maint');
 		Template_Layers::getInstance()->add('clean_cache_button');
 
+		// Some javascript to enable / disable certain settings if the option is not selected
+		addInlineJavascript('
+			var cache_type = document.getElementById(\'cache_accelerator\');
+
+			createEventListener(cache_type);
+			cache_type.addEventListener("change", toggleCache);
+			toggleCache();', true);
+
 		$context['post_url'] = $scripturl . '?action=admin;area=serversettings;sa=cache;save';
 		$context['settings_title'] = $txt['caching_settings'];
 
